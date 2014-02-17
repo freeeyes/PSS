@@ -1,0 +1,25 @@
+此工具是用来测试框架插件性能的工具，用于检测插件在抛开TCP的性能指标。
+在使用之前，首先需要做几个工作。
+第一，拷贝你的PacketParse.lib和dll到当前路径。工具需要你的数据包解析方法。
+PacketParse.lib拷贝到工程当前的lib文件夹中。
+PacketParse.dll拷贝到工程当前的Bin文件夹中。
+然后，拷贝你要测试的逻辑dll到当前工程的Bin目录下。
+第二。
+在Bin目录下找到TestInstance.xml文件。
+里面是关于插件数据的一些配置相关信息，你可以在工具运行的时候设置它，也可以在外面自己手动设置它。
+<Plugin PluginFileName="TcpTestd.dll" />
+PluginFileName这个是要测试的插件文件名称。
+<PluginTest SendCount="1" RecvCount="1" ThreadCount="1" />
+目前这三个参数无用，用于第二版本升级，一个是发送数据线程数，一个是接收数据下城数据，一个是工作线程数。
+目前都是默认的1，在当前版本下，设置这个参数暂时无效。
+<Command CommandID="0x1000" CommandGroup="1" CommandSort="1" CommandText="0a 00 00 00 00 10 be cd aa 8f 3c 01 00 00" />
+这个可以有多个。
+CommandID="0x1000" 这个是命令ID
+CommandGroup 这个参数是分组，分组是什么意思呢？就是你可以把你的数据块按照一定顺序顺序发送。
+这个要和CommandSort配合使用
+比如:
+<Command CommandID="0x1000" CommandGroup="1" CommandSort="1" CommandText="0a 00 00 00 00 10 be cd aa 8f 3c 01 00 00" />
+<Command CommandID="0x1001" CommandGroup="1" CommandSort="2" CommandText="0a 00 00 00 00 10 be cd aa 8f 3c 01 00 00" />
+这等于告诉了工具，我的命令是有发送先后顺序的，必须先发0x1000，再发0x1001。
+发送的顺序是以CommandSort的大小正序排列的。
+同时，我可以创建若干个CommandGroup，这样完全可以实现不受影响的互相执行。

@@ -1,0 +1,101 @@
+IMessage对象
+GetPacketHead(_PacketInfo)得到消息头数据信息（二进制串）
+GetPacketBody(_PacketInfo)得到消息体数据信息（二进制串）
+
+_PacketInfo的结构如下：
+
+//Message里面数据块结构体
+struct _PacketInfo
+{
+	char* m_pData;      //数据指针
+	int   m_nDataLen;   //数据长度
+
+	_PacketInfo()
+	{
+		m_pData    = NULL;
+		m_nDataLen = 0;
+	}
+};
+
+GetMessageBase()得到消息的一些信息
+这些信息包括如下
+//记录消息的一些参数
+struct _MessageBase
+{
+	uint8  m_u1PacketType;        //数据包来源类型  0是TCP数据包，1是UDP数据包
+	uint32 m_u4ConnectID;         //消息链接ConnectID，如果是UDP则这个值无效
+	uint32 m_u4PacketID;          //数据包的ID
+	uint16 m_u2Cmd;               //命令字的ID
+	uint32 m_u4MsgTime;           //消息接收到的时间
+	char   m_szIP[MAX_BUFF_20];   //客户端IP(目前只有UDP会赋值，TCP可以根据ConnectID自己去获取)
+	uint32 m_u4Port;              //客户端端口(目前只有UDP会赋值，TCP可以根据ConnectID自己去获取)
+
+};
+
+m_pServerObject->GetLogManager()用于记录日志。
+LOG_SYSTEM和logger.conf里面的日志ID对应。具体请参考《Log框架开发说明书.txt》
+
+
+对于TCP和UDP的数据发送
+TCP
+m_pServerObject->GetConnectManager()用于数据回应
+PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket)
+u4ConnectID是你要发送的链接ID,pBuffPacket为数据内容
+PostMessage是异步的，发送信息到发送队列后就会返回。pBuffPacket必须是new出来的，在放入此接口后不用释放，框架会负责释放这个对象。
+SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket)
+u4ConnectID是你要发送的链接ID,pBuffPacket为数据内容
+PostMessage是同步的，发送信息到发送队列后就会返回。pBuffPacket必须是new出来的，在放入此接口后不用释放，框架会负责释放这个对象。
+CloseConnect(uint32 u4ConnectID)服务器关闭一个存活的链接
+u4ConnectID为链接的ID
+_ClientIPInfo GetClientIPInfo(uint32 u4ConnectID)
+返回一个指定u4ConnectID对应的TCP链接的IP地址和端口。
+UDP
+m_pServerObject->GetUDPConnectManager()用于数据回应
+SendMessage(int nConnectID, const char* pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead = true)
+nConnectID是只你要从哪个UDP的ConnectID发送出去，这个ConnectID对应配置文件中的UDP设置，pMessage是你要发送的数据块指针，u4Len是你要发送的数据块长度，
+szIP是你要发送的客户度IP地址，nPort是你要发送的客户端IP端口，blHead指的是是否需要数据头，如果是true，将会调用PacketParse下的makePacket接口生成数据头并粘结你的数据，否则直接发送。
+
+IBuffPacket对象常用方法：
+	virtual uint32 GetPacketSize()      = 0;    //得到数据包的格式化长度
+	virtual uint32 GetPacketLen()       = 0;    //得到数据包的实际长度
+	virtual uint32 GetReadLen()         = 0;    //得到包读取的长度
+	virtual uint32 GetWriteLen()        = 0;    //得到包写入的长度
+	virtual uint32 GetHeadLen()         = 0;    //得到数据包头的长度
+	virtual uint32 GetPacketCount()     = 0;    //得到缓存数据包的个数
+
+	virtual void SetReadPtr(uint32 u4Pos)                                = 0;    //设置读指针的位置
+	virtual void SetPacketCount(uint32 u4PacketCount)                    = 0;    //设置缓存数据包的个数
+	virtual bool WriteStream(const char* szData, uint32 u4Len)           = 0;    //直接写入一个二进制数据块
+	virtual bool ReadStream(char*& pData, uint32 u4MaxLen, uint32 u4Len) = 0;    //直接读取出一个二进制数据块
+	virtual char* ReadPtr()                                              = 0;    //获得读指针
+	virtual char* WritePtr()                                             = 0;    //获得写指针
+	virtual bool RollBack(uint32 u4Len)                                  = 0;    //将取出的数据删除，将后面的数据加上
+
+	virtual void ReadBuffPtr(uint32 u4Size)                              = 0;    //移动指定长度的读指针
+	virtual void WriteBuffPtr(uint32 u4Size)                             = 0;    //移动指定长度的写指针
+
+	//读取
+	virtual IBuffPacket& operator >> (uint8& u1Data)   = 0;        //读出一个uint8的1字节无符号整数
+	virtual IBuffPacket& operator >> (uint16& u2Data)  = 0;        //读出一个uint16的2字节无符号整数
+	virtual IBuffPacket& operator >> (uint32& u4Data)  = 0;        //读出一个uint32的4字节无符号整数
+	virtual IBuffPacket& operator >> (uint64 &u8Data)  = 0;        //读出一个uint64的8字节无符号整数
+
+	virtual IBuffPacket& operator >> (float32& f4Data) = 0;        //读出一个float32的4字节小数
+	virtual IBuffPacket& operator >> (float64& f8Data) = 0;        //读出一个float64的8字节小数
+
+	virtual IBuffPacket& operator >> (VCHARS_STR& str) = 0;        //读出一个一个字节长度的数据块（包括1个uint8的数据长度和后面的数据块实体）
+	virtual IBuffPacket& operator >> (VCHARM_STR& str) = 0;        //读出一个一个字节长度的数据块（包括1个uint16的数据长度和后面的数据块实体）
+	virtual IBuffPacket& operator >> (VCHARB_STR& str) = 0;        //读出一个一个字节长度的数据块（包括1个uint32的数据长度和后面的数据块实体）
+
+	//写入
+	virtual IBuffPacket& operator << (uint8 u1Data)    = 0;        //写入一个uint8的1字节无符号整数
+	virtual IBuffPacket& operator << (uint16 u2Data)   = 0;        //写入一个uint16的2字节无符号整数
+	virtual IBuffPacket& operator << (uint32 u4Data)   = 0;        //写入一个uint32的4字节无符号整数
+	virtual IBuffPacket& operator << (uint64 u8Data)   = 0;        //写入一个uint64的8字节无符号整数
+
+	virtual IBuffPacket& operator << (float32 f4Data)  = 0;        //写入一个float32的4字节小数
+	virtual IBuffPacket& operator << (float64 f8Data)  = 0;        //写入一个float64的8字节小数
+
+	virtual IBuffPacket& operator << (VCHARS_STR &str) = 0;        //写入一个一个字节长度的数据块（包括1个uint8的数据长度和后面的数据块实体）
+	virtual IBuffPacket& operator << (VCHARM_STR &str) = 0;        //写入一个一个字节长度的数据块（包括1个uint16的数据长度和后面的数据块实体）
+	virtual IBuffPacket& operator << (VCHARB_STR &str) = 0;        //写入一个一个字节长度的数据块（包括1个uint32的数据长度和后面的数据块实体）

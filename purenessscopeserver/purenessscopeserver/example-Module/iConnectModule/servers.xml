@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<Server id="1" ip="127.0.0.1" port="10002" stationid="Server1"/>
+	<Server id="2" ip="127.0.0.1" port="10012" stationid="Server2"/>
+	<Server id="3" ip="127.0.0.1" port="10022" stationid="Server3"/>
+</config>

@@ -1,0 +1,11 @@
+project(Login):acelib{
+  sharedname=Login
+  dynamicflags += TEST_TCP_BUILD_LOGIN_DLL
+  libout = ./
+  specific (prop:microsoft){
+	dllout = ../../../PurenessScopeServer/Windows_Bin
+  } else {
+	dllout = ../../../PurenessScopeServer/Linux_Bin
+  }
+  includes += ../../include,../Common
+}

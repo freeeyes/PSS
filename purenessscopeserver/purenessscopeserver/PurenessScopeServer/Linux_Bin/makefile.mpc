@@ -1,0 +1,18 @@
+project(PurenessScopeServer):aceexe{
+ 	exename = PurenessScopeServer
+
+ Source_Files{
+  ../Common/*.cpp
+  ../Console/*.cpp
+  ../LogSystem/*.cpp
+  ../Message/*.cpp
+  ../PacketParse/*.cpp
+  ../Reactor/*.cpp
+  ../UDP/*.cpp
+  ../TinyXML/*.cpp
+  ../*.cpp
+ }
+ includes += ../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../IObject ../TinyXML
+ macros += __LINUX__
+ libs += PacketParse
+}

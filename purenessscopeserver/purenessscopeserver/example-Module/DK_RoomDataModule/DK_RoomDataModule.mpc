@@ -1,0 +1,12 @@
+project(DK_RoomDataModule):acelib{
+  sharedname=DK_RoomDataModule
+  dynamicflags += DK_ROOMDATAMODULE_BUILD_DLL
+  libout = ./
+  specific (prop:microsoft){
+	dllout = ../../PurenessScopeServer/Windows_Bin
+  } else {
+	macros += __LINUX__
+	dllout = ../../PurenessScopeServer/Linux_Bin
+  }
+  includes += ../Include
+}

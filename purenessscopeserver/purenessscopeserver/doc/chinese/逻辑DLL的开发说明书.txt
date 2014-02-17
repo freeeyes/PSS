@@ -1,0 +1,238 @@
+逻辑DLL的开发说明
+
+设计初衷：
+一直希望把逻辑和数据传输完全的分开，因为对于逻辑开发者，它需要关心的只是入什么数据，出什么数据。
+于是，设计了这个DLL的插件方法，可以让开发者方便的添加自己的逻辑模块。
+当然，这些DLL需要一些规范，这样便于框架实现调用。
+
+首先需要引用一下框架下的IObject目录下的所有头文件。
+这里是框架提供给DLL逻辑类使用的一些通用的数据，比如链接管理器（包含所有已经连接的对象）等。
+
+这里解释一下这些类接口:
+
+ClientCommand.h
+这个接口是所有的逻辑类都要继承的，里面只有一个接口
+DoMessage(IMessage* pMessage, bool& bDeleteFlag)
+继承的类可以通过这个去处理得到的数据，pMessages是一个消息体，返回客户端给你的消息，
+而bDeleteFlag是一个标记位，用来设置当前函数处理完成后，这个消息是否从框架删除（可能有些特殊情况下不能删除）
+默认，什么都不做，框架在你处理完成之后会删除这个消息。
+
+IBuffPacket.h
+这是一个序列化的类，实际上这个东东是我在服务器早期版本里经常使用的，来替代ACE的MessageBlock()，
+重载了 >> 基本的一些类型都能被序列化进去。后来大量使用了MessageBlock()替换了原来的模块，减少数据拷贝和移动。
+不过这个类还是留下来了，我的例子里会有它的用法。
+
+IClientManager.h
+这个类负责框架保存所有服务器向外链接其他服务器的链接信息。开发者可以绑定一个类接口，来完成接收和发送。
+
+IConnectManager.h
+当前客户端链接管理类，这里面有所有已经连接上服务器的链接信息列表。
+开发者可以根据逻辑决定发给谁。
+
+ILogManager.h
+日志类，你可以调用这个类写入系统框架日志，这个日志在你的编译文件目录下的Log目录中（Log类型和结构请参看Log框架开发说明书）
+
+IObject.h
+这个类是以上类的一个汇总，为了方便调用，将以上的类汇总在一个文件里提供调用。
+
+IMessageManager
+框架的消息管理中心，DLL通过LoadModuleData()函数向IMessageManager注册CommandID和Command对象。
+
+先创建一个文件，比如Basp.cpp（当然你也可以XXX.cpp）。
+里面提供如下方法。
+
+#include "IObject.h"
+
+static char *g_szDesc      = "Base";       //模块的描述文字
+static char *g_szName      = "Base";       //模块的名字
+static char *g_szModuleKey = "Base";       //模块的Key
+
+这里的g_szDesc，g_szName和g_szModuleKey你可以写任意名字，只要你喜欢的模块名称就行。
+
+然后
+#ifdef WIN32
+#if defined DLL_EXPORT
+	#define DECLDIR __declspec(dllexport)
+#else
+	#define DECLDIR __declspec(dllimport)
+#endif
+#else
+  #define DECLDIR
+#endif
+
+extern "C"
+{
+	DECLDIR int LoadModuleData(CServerObject* pServerObject);       //DLL框架加载的时候，会调用这个方法。
+	DECLDIR int UnLoadModuleData();                                 //当框架释放DLL的时候，会调用这个方法。
+	DECLDIR const char* GetDesc();         //返回模块的g_szDesc
+	DECLDIR const char* GetName();         //返回模块的g_szName
+	DECLDIR const char* GetModuleKey();    //返回模块的g_szModuleKey
+}
+这里是固定的写法，直接CtrlC+CtrlV就行。
+
+一共5个方法，下面的三个很简单，就不再这里解释了。
+主要解释一下LoadModuleData()和UnLoadModuleData()方法。
+
+当框架启动的时候，会读取main.conf配置文件，读取ModuleString字段。
+如果你有一个dll，可以这么写
+ModuleString=base.dll
+如果你有多个dll,可以这么写。
+ModuleString=base.dll,a.dll,b.dll
+
+框架会读取这个信息，去加载相应的DLL，当第一次加载的时候，会调用DLL的LoadModuleData()函数。
+开发者可以在这里添加自己的类（继承Command的类，比如我有一个baseCommand类，负责处理COMMAND_BASE这个命令的。COMMAND_BASE是一个uint16的无符号整形）
+
+int LoadModuleData(CServerObject* pServerObject)
+{
+	g_pServerObject = pServerObject;   //将服务器的接口框架类给这个消息处理类，用于里面的逻辑调用和支持。
+	OUR_DEBUG((LM_INFO, "[Base LoadModuleData] Begin.\n"));
+	if(g_pServerObject != NULL)
+	{
+		g_BaseCommand.SetServerObject(pServerObject);	
+	}
+	else
+	{
+		OUR_DEBUG((LM_INFO, "[Base LoadModuleData] pServerObject is NULL.\n"));
+	}
+
+  //向框架注册COMMAND_BASE和g_BaseCommand(消息处理类，当客户端收到COMMAND_BASE的数据包的话，会调用g_BaseCommand的DoMessage方法。)
+  //这里多说一句，可以多个信令(COMMAND_BASE我姑且叫它信令)绑定一个g_BaseCommand，在它的DoMessage()里面去做区分也是可以的。
+	IMessageManager* pMessageManager = g_pServerObject->GetMessageManager();
+	if(NULL != pMessageManager)
+	{
+		pMessageManager->AddClientCommand(COMMAND_BASE, &g_BaseCommand);
+	}
+	else
+	{
+		OUR_DEBUG((LM_INFO, "[Base LoadModuleData] pMessageManager = NULL.\n"));
+	}		
+
+	OUR_DEBUG((LM_INFO, "[Base LoadModuleData] End.\n"));
+
+	return 0;
+}
+
+这样，就完成了COMMAND_BASE和g_BaseCommand处理对象的绑定。
+
+同样，当这个DLL在框架中注销的时候，需要调用UnLoadModuleData()方法从框架中取消对这个类的绑定。
+示例如下：
+int UnLoadModuleData()
+{
+	OUR_DEBUG((LM_INFO, "[Base UnLoadModuleData] Begin.\n"));
+	if(g_pServerObject != NULL)
+	{
+		IMessageManager* pMessageManager = g_pServerObject->GetMessageManager();
+		if(NULL != pMessageManager)
+		{
+			pMessageManager->DelClientCommand(COMMAND_BASE);
+			pMessageManager = NULL;
+		}
+	}
+	OUR_DEBUG((LM_INFO, "[Base UnLoadModuleData] End.\n"));
+	return 0;
+}
+
+现在，比如我要实现一个当收到COMMAND_BASE数据包的时候，记录一条日志，并返回一条收到的数据
+
+class CBaseCommand : public CClientCommand //处理类必须继承CClientCommand接口，并实现DoMessage()方法。
+{
+public:
+	CBaseCommand(void);
+	~CBaseCommand(void);
+
+	int DoMessage(IMessage* pMessage, bool& bDeleteFlag);
+
+	void SetServerObject(CServerObject* pServerObject);   //得到框架中的各种信息列表
+
+private:
+	CServerObject* m_pServerObject;
+	int            m_nCount;
+};
+
+
+int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
+{
+	if(m_pServerObject == NULL)
+	{
+		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL.\n"));
+		return -1;
+	}
+
+	if(pMessage == NULL)
+	{
+		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] pMessage is NULL.\n"));
+		return -1;
+	}
+
+	uint32     u4PacketLen = 0;
+	uint16     u2CommandID = 0;
+	VCHARS_STR strsName;
+	string     strName;
+
+  //申请一个串行化类，把pMessage中的数据串行化出来，提供逻辑使用者使用，这里使用了一个内存池，池由框架提供,用的时候从池里拿出一个空闲的，用完了要归还。
+	IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();
+	if(NULL == pBodyPacket)
+	{
+		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] pBodyPacket is NULL.\n"));
+		return -1;
+	}
+	
+	//得到数据包的包体
+	_PacketInfo BodyPacket;
+	pMessage->GetPacketBody(BodyPacket);
+
+  //将包体绑定给pBodyPacket流
+	pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
+
+	(*pBodyPacket) >> u2CommandID;   //从流里面读出u2CommandID数值
+	(*pBodyPacket) >> strsName;      //从流里面读出Name字段。
+	strName.assign(strsName.text, strsName.u1Len);
+
+  //串行化的类用完了，归还到池中
+	m_pServerObject->GetPacketManager()->Delete(pBodyPacket);
+
+  //得到日志类接口
+	if(NULL != m_pServerObject->GetLogManager())
+	{
+	  //向LOG_SYSTEM日志中写入一条日志。
+		m_pServerObject->GetLogManager()->WriteLog(LOG_SYSTEM,  "[CBaseCommand::DoMessage] Get CommandID = %d", u2CommandID);
+	}
+	else
+	{
+		OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] m_pLogManager = NULL"));
+	}
+
+	//测试返回数据
+	IBuffPacket* pResponsesPacket = m_pServerObject->GetPacketManager()->Create();
+
+	VCHARS_STR strsPass;
+	uint16 u2PostCommandID = 0xe102;       //返回数据的信令ID
+	string strUserName     = "aaaac";      //返回名字
+	string strUserPass     = "aaa";        //返回密码
+
+	strsName.text = strUserName.c_str();
+	strsName.u1Len = (uint8)strUserName.length();
+
+	strsPass.text = strUserPass.c_str();
+	strsPass.u1Len = (uint8)strUserPass.length();
+
+	(*pResponsesPacket) << u2PostCommandID;
+	(*pResponsesPacket) << strsName;
+	(*pResponsesPacket) << strsPass;
+
+	if(NULL != m_pServerObject->GetConnectManager())
+	{
+	  //向数据的来源，客户端发送返回信息，客户端的链接ID保存在pMessage->GetMessageBase()这个对象里。
+		m_pServerObject->GetConnectManager()->SendMessage(pMessage->GetMessageBase()->m_u4ConnectID, pResponsesPacket);
+	}
+	else
+	{
+		OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] m_pConnectManager = NULL"));
+	}
+	
+	//这里不用归还从池里创建的PacketManager，因为发送可能为异步的，所以这里当发送完成，无论成败都会释放pResponsesPacket这个对象。所以这里不用做了。
+
+	return 0;
+}
+
+基本就是这样，就能实现一个基本的信令处理机制了。

@@ -1,0 +1,12 @@
+project(PlayerPool):acelib{
+  sharedname=PlayerPool
+  dynamicflags += PLAYERPOOL_BUILD_DLL
+  libout = ./
+  specific (prop:microsoft){
+	dllout = ../../PurenessScopeServer/Windows_Bin
+  } else {
+	dllout = ../../PurenessScopeServer/Linux_Bin
+  }
+  includes += .
+  includes += ../Include
+}

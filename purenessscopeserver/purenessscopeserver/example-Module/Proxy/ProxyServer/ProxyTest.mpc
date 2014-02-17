@@ -1,0 +1,13 @@
+project(ProxyServer):aceexe{
+ 	exename = ProxyServer
+
+	 Source_Files{
+	  ./*.cpp
+	 }
+	 includes += ./
+ 
+	 specific (prop:microsoft){
+	 } else {
+		macros += __LINUX__
+	 } 
+}

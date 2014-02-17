@@ -1,0 +1,12 @@
+project(UDPTest):acelib{
+  sharedname=UDPTest
+  dynamicflags += TEST_UDP_BUILD_DLL
+  libout = ./
+  specific (prop:microsoft){
+	dllout = ../../PurenessScopeServer/Windows_Bin
+  } else {
+	dllout = ../../PurenessScopeServer/Linux_Bin
+  }
+  includes += .
+  includes += ../Include
+}

@@ -1,0 +1,11 @@
+Projectname:
+PurenessScopeServer
+
+Project summary:
+Service in server development£¬Logic to provide DLL
+
+Description:
+Service in server development,Logic to provide DLL,The developers didn't care network IO and Focus on logical development,The logical module DLL support hot swaps on Server and without close to restart the server.Server provides comprehensive statistics analysis data for development.
+Sincerely hope to your help,thanks.
+
+http://code.google.com/p/purenessscopeserver/

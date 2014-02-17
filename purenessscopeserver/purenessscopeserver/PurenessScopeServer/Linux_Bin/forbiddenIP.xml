@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<ForbiddenIP ip="10.1.1.12" type="TCP" desc="ForbiddenIP，type is 'TCP' or 'UDP'" />
+</config>﻿

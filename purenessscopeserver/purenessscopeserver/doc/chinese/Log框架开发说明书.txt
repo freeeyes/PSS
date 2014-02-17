@@ -1,0 +1,36 @@
+Log框架开发说明
+
+框架的Log是可以通过配置文件配置的。
+Log的配置文件如下，在生成目录有一个logger.xml说明
+
+<ServerLogHead Text="127_"  desc="日志前缀的名称，所有日志生成都会添加此前缀" />
+Text 这里设置日志的前缀名称，你可以用你喜欢的名字前缀。
+
+<LogPath Path="./" desc="日志生成的主路径" />
+Path 顾名思义，日志的存放路径。
+
+<LogInfo logid="1000" logtype="1" logname="ViewSystemLog" desc="系统日志，可以用于逻辑模块输出使用" />
+logid 日志的ID
+logtype 日志的类型 1是维护型日志组，对应Operation文件夹，2是错误日志组，对应ServerError文件夹。
+logname 日志的名称，按照每天生成一个。
+
+目前支持的日志类型是：
+	<LogInfo logid="1000" logtype="1" logname="ViewSystemLog" desc="系统日志，可以用于逻辑模块输出使用" />
+	<LogInfo logid="1001" logtype="2" logname="ViewSystemError" desc="系统错误日志，当框架发现错误的时候记录于此" />
+	<LogInfo logid="1002" logtype="1" logname="ViewConnect" desc="框架链接信息日志，记录来自客户端的链接请求和断开信息" />
+	<LogInfo logid="1003" logtype="1" logname="ViewWorkThread" desc="框架工作线程日志，用于记录框架工作线程的运行状态" />
+	<LogInfo logid="1004" logtype="1" logname="ViewPostThread" desc="框架链接其他TCP接口的工作线程运行状态监控信息" />
+	<LogInfo logid="1005" logtype="1" logname="ViewUDPThread" desc="框架UDP链接建立和处理日志信息" />
+	<LogInfo logid="1006" logtype="1" logname="ViewPostConnect" desc="框架链接其他TCP接口的链接建立和断开日志信息" />
+	<LogInfo logid="1007" logtype="2" logname="ViewPacketTimeout" desc="框架记录逻辑包处理是否超时，如果有则会记录在这里" />
+	<LogInfo logid="1008" logtype="1" logname="ViewMakePacketThread" desc="框架记录逻辑包处理线程日志信息" />
+	<LogInfo logid="1009" logtype="1" logname="ViewConnectAbnormal" desc="框架记录客户端链接，在框架限定的超时限制外没有收到数据包而被服务器主动关闭的链接信息" />
+	<LogInfo logid="1010" logtype="2" logname="ViewRecvQueueError" desc="框架记录客户端接收信息超时的日志信息" />
+	<LogInfo logid="1011" logtype="2" logname="ViewSendQueueError" desc="框架记录客户端发送信息超时的日志信息" />
+	<LogInfo logid="1012" logtype="1" logname="ViewCommandData" desc="框架记录每个注册的逻辑指令的调用次数和平均时间等信息日志" />
+	<LogInfo logid="1013" logtype="1" logname="ViewConsoleData" desc="远程控制终端管理日志" />
+	
+当然，你可以在这里添加你喜欢的日志名称。
+调用方法为
+AppLogManager::instance()->WriteLog(1000, "Connection from [%s:%d] DisposeTime = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), tvOpen.msec());
+1000是你上面定义的日志ID，后面是你要写入的内容。

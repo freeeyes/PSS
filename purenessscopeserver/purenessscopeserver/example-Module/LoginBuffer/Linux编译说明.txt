@@ -1,0 +1,2 @@
+编译Login请直接make执行便可以。
+编译Watch，需要把编译完成的Watch拷贝到PSS的Linux_bin目录下，保证读取的是同一文本数据源。

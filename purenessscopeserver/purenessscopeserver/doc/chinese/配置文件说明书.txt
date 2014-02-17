@@ -1,0 +1,115 @@
+一.main.xml配置说明
+<ServerID id="1" desc="当前服务器的ID编号" />
+这里的serverID可以按照你的想法设置，用于标识当前服务器的ID，配合PSS_ClientManager可以让开发者区分当前主机ID。
+这个参数因为有开发者设置了多个服务器。通过对这些服务器标识的设置，可以让管理员知道那台主机信息。编号必须是数字，不能包含字母。、
+
+<ServerName name="Freeeyes" desc="当前服务器的名称" />
+这里设置服务器的名称，可以起任意你喜欢的名字。
+在多框架的应用中，开发者希望起不同的名字，比如"bf_01"，"bf_02"
+这里写可以通过PSS_ClientManager获得查看。
+
+<ServerVersion Version="0.90" desc="当前服务器版本" />
+这里默认是框架的版本号，一般会随着框架的升级而修改，一般不用改这里。可以在PSS_ClientManager查看到当前框架版本号。
+便于维护。
+
+<TCPServerIP ip="127.0.0.1" port="10002" desc="监听TCP服务器的IP和端口，可以是多个" />
+这里是设置监听IP和端口的地方。
+由于实际使用中，有可能有多网卡的情况，所以这里提供了设置IP的地方。
+另外，如果你需要框架同时监听多个端口。你可以复制这个条目。
+比如，你要框架启动的时候监控10002,10003和10004
+那么就这么写
+<TCPServerIP ip="127.0.0.1" port="10002"/>
+<TCPServerIP ip="127.0.0.1" port="10003"/>
+<TCPServerIP ip="127.0.0.1" port="10004"/>
+这样框架就会在启动的时候，同时打开100002,10003和10004的监听。
+这里的监听数量理论上是无限的，你可以设置任意个你需要监听的IP端口。
+
+<Console support="1" sip="127.0.0.1" sport="10010"  desc="维护端口是否开启，support为1是开启，0是关闭，后面对应IP和端口" />
+这里是设置远端PSS_ClientManager工具是否可以连接服务器的信息
+如果想让PSS_ClientManager可以连接当前框架，support必须为1，不需要的话，设置为0就可以了。后面的监听端口就不会打开。
+如果设置为0，则PSS_ClientManager将无法连接当前服务器。
+sip和sport对应的是IP和端口，这个IP和端口只针对PSS_ClientManager工具。
+你可以设置你需要的IP和端口
+
+<ConsoleKey Key="freeeyes" desc="维护端允许登录的Key值,可以是多个，key值中不能包含空格" />
+这里你可以设置PSS_ClientManager连接上来对接的口令。key就是口令值。
+在PSS_ClientManager里面，必须设置和服务器一样的口令才能操作服务器框架。否则不会被框架认可。
+当然，你可以设置多个key
+比如，你想要有freeeyes和guest两个
+那么你只要这么做就可以了。
+<ConsoleKey Key="freeeyes" />
+<ConsoleKey Key="guest" />
+再强调一次，key值里面不能包含空格。
+
+<Message Msg_High_mark="64000" Msg_Low_mark="64000" Msg_Thread="1" Msg_MaxQueue="10000" desc="消息处理线程相关参数设置，" />
+这里是设置数据包到达消息的队列信息。
+Msg_High_mark和Msg_Low_mark是高低水位表，一般不用修改。
+Msg_Thread是工作线程的数量，这里要注意一下，如果你的逻辑是可以多线程执行的，那么你可以配置多个。
+如果是有先后顺序的，比如说文件下载或者上传，这里就只能配置成1，因为你的数据包必须有先来后到。
+而当你的Msg_Thread大于1的时候，线程是抢占式的，来的数据谁闲谁处理。
+那么就会出现第一个包被线程1拿走，线程1没有处理完的时候，包2到达被线程2处理。结果造成乱序。
+这个值的设置，取决于你的逻辑，我这里只是描述使用技巧
+Msg_MaxQueue是设置队列中的最大允许个数。一般情况下，在数据流畅的情况下，队列里面的数据会维持在一个平均的水平。
+除非数据处理，也就是逻辑模块发生阻塞，导致队列数据增长而无法处理。从而累积到一个上限。当触发这个上限，服务器就会报警。
+这个值就是起这个作用的。如果不是特别的需求，一般这个值也不用改。
+
+<Module ModulePath="./" ModuleString="TcpTestPostd.dll" desc="模块加载配置相关参数，ModulePath是路径，ModuleString是模块名称，以逗号隔开"/>
+这是模块加载的信息
+ModulePath是模块存在的路径，你可以把你需要加载的so或者dll统一放在一个目录下，然后在这里指定路径。
+框架启动后，就会在这个路径下寻找需要加载的逻辑插件。
+ModuleString是需要加载的逻辑插件的列表。
+如果有多个插件，你可以这样设置。
+<Module ModulePath="./" ModuleString="aaa.dll,bbb.dll,ccc.dll"
+在linux就是
+<Module ModulePath="./" ModuleString="aaa.so,bbb.so,ccc.so"
+这样框架就会按照你的顺序，加载指定的插件。
+
+<RecvInfo RecvBuffSize="20480" RecvQueueTimeout="50" desc="接收客户端数据配置参数" />
+这里是设置框架接收TCP缓冲区大小，一般情况下，RecvBuffSize不用改，当然，你也可以设置一个你喜欢的值。
+RecvQueueTimeout是接收数据包的等待超时时间，单位是毫秒。
+
+<SendInfo SendQueueMax="100" SendThresHold="50" SendAliveTime="60" SendQueueTimeout="50" SendQueueCount="1" PutQueueTimeout = "100" desc="发送到客户端需要配置的参数" />
+SendQueueMax 是发送给客户端的队列最大允许数量。也就是在队列中等待发送的最大数量，可以由开发者自己定义。
+SendThresHold 是发送数据包的阀值，也就是说，回应客户端的数据包如果被设计成展缓发送，那么到达这个阀值的时候，服务器会一次性把这些数据包全部发出去，单位是数据包个数。
+SendAliveTime 是检测客户端连接的活跃状态，服务器会定时检测所有已经连接上来的连接活跃状态，这个时间就是检测的间隔时间，单位是秒。
+SendQueueTimeout 这个是从发送队列到实际发送完成之间的时间阀值，如果数据包进入发送队列到实际发送完成超过了这个阀值，就会被框架计入超时日志。单位是毫秒。
+SendQueueCount 这里是发送队列个个数，为了防止由于某些连接很慢造成的发送阻塞情况，你可以设置多个发送队列，客户端连接会平均分配到这些队列中，尽量做到均衡发送。
+PutQueueTimeout 是放入发送队列的时间，单位是毫秒，超过这个值就会被框架记录。一般不用修改这个值。
+
+<ThreadInfo ThreadTimeout="30" ThreadTimeCheck="120" DisposeTimeout="40" PutQueueTimeout = "100" desc="工作线程相关参数" />
+ThreadTimeout 这个是判定线程阻塞的最大时间，也就是说，如果30秒线程还没有从逻辑插件里面出来，就会被框架判定阻塞，并计入日志。
+ThreadTimeCheck 这个是工作线程自检时间，为了防止工作线程由于某些原因阻塞，框架会定时检测工作线程状态。这个就是检测的时间，单位是秒。
+DisposeTimeout 是工作线程的超时时间，也就是说，当一个数据包进入逻辑插件，到从逻辑插件返回的时间，超过了这个值，就会被框架记录日志。单位是毫秒。
+PutQueueTimeout  是放入工作线程队列的时间，单位是毫秒，超过这个值就会被框架记录。一般不用修改这个值。
+
+<ClientInfo HandlerCount="5000" MaxHandlerCount="10000" MaxConnectTime="60" CommandAccount="1" desc="客户端链接相关参数"/>
+HandlerCount 是框架启动的时候，初始化的客户端连接对象个数，为了追求效率，在框架启动的时候，这些对象就会被创建成池，当连接建立就会在这里获取，当连接断开就会归还给这个池。
+			 如果超过这个池的客户端连接，池会自己增加。但是不会超过MaxHandlerCount。当达到这个极限，框架就不会接收新的连接请求。
+MaxConnectTime 是当前客户端连接允许等待数据接收空闲的最大时间间隔。
+CommandAccount 是否需要统计命令出入服务器的信息，0是关闭，1是打开。打开后会生成相应的报表。
+		       报表的格式是，每一个命令的调用次数，平均处理时间，最后处理时间等信息。目前只支持Linux。
+
+<ConnectValid ConnectValid="1" ConnectCount="50000"  ConnectPacketCount="1000000" ConnectRecvSize="10000000" ForbiddenTime="60" desc="链接有效性管理" />
+ConnectValid是否打开连接控制。这个功能是防止某些IP过多连接服务器，一种保护服务器的设置。0为开启服务器保护，1为不开启服务器保护（一般压力测试的时候用这个数值）。
+ConnectCount 这个是单位时间（60秒）允许一个IP反复连接服务器的上限，这个在实际生产环境中非常有用。当同一个IP反复连接数超过了这个阀值，就会自动被框架禁止连接1分钟。
+ConnectPacketCount 这个是单位时间（60秒）允许客户端发送的最大包数，按照IP统计。如果一个IP在单位时间内发送的数据包（无论有效还是无效包）超过了这个阀值，就会自动被框架禁止连接1分钟。
+ConnectRecvSize 这个是单位时间（60秒）允许客户端发送的最大数据字节，按照IP统计。如果一个IP在单位时间内发送的字节数（无论有效还是无效包）超过了这个阀值，就会自动被框架禁止连接1分钟。
+ForbiddenTime 这里是设置惩罚时间，你可以设置成1分钟，也可以设置为10分钟。这段时间内这个IP的一切连接请求，发包请求都会被认为是非法而被丢弃，单位是秒。
+
+<ConnectServer TimeInterval=500 TimeCheck=30 Recvbuff=“1024” desc="框架连接其它远程服务器相关参数，TimeInterval是连接每个服务器之间的保护时间，单位是毫秒,TimeCheck单位是秒" />
+TimeInterval 这是服务器间连接，TimeInterval是每次服务器间连接的休息时间。一般情况下这里可以不动。单位是毫秒。
+TimeCheck 是自动检测所有服务器连接状态的时间，如果有连接已经断开，则会在这里被自动重连。
+Recvbuff 这是设置接收缓冲的最大字节数。一次recvData的最大字节数。
+		  服务器间连接自动重练有两种机制，一个是发包的时候，如果发现连接已经断开，则会自动重练后发送数据。还有就是没有发包的时候，连接被断开。框架会定时检查。并自动重连。
+
+二.forbiddenIP.xml文件说明
+这里是设置永久封禁IP的地方
+你可以设置多个IP，这些IP都不允许连接框架。
+<ForbiddenIP ip="10.1.1.12" type="TCP" desc="ForbiddenIPìtype is 'TCP' or 'UDP'" />
+ip 封禁的ip地址，你可以用*来代表封禁的IP段，比如10.1.1.*，那么就是10.1.1.0到10.1.1.255都不能连接
+type 是TCP还是UDP
+这里，只记录永久封禁的IP，如果是时段封禁的IP，你可以通过PSS_ClientManager设置，但是并不计入封禁文件。
+
+
+三.logger.xml文件说明
+关于Log.conf请参考《Log框架开发说明书.txt》

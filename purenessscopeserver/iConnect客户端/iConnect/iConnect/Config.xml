@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<config>
+  <Server id="1" ip="127.0.0.1" port="10002"></Server>
+  <Connect count="1"></Connect>
+  <TimeOut min="60" minnetspeed="10240"></TimeOut>
+</config>

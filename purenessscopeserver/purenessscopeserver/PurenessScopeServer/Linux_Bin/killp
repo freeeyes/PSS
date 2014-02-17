@@ -1,0 +1,7 @@
+#!/bin/sh
+ps -ef|grep $LOGNAME | grep -w $1 |grep -v pts|  grep -v killp|awk '{print $2}'|while read tt
+do
+echo "killed $tt"
+kill  $tt
+done
+#ps -ef|grep $LOGNAME|grep $1|grep -v grep|awk '{print $2}'|xargs kill -9

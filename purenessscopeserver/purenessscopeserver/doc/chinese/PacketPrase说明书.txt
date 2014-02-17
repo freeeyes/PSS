@@ -1,0 +1,157 @@
+PacketParse DLL工程说明书
+
+设计初衷：
+在设计PurenessScopeServer的时候，发现因为每个数据解析都是不同的，不同的加密，不同的数据格式。。
+如果把解析代码写死在框架里面，则非常不易扩展。
+于是想是否可以把数据解析的部分拆分出来，单独做成一个DLL插件提供给框架。
+这样开发者就不用去阅读框架繁复的代码，专注于自己逻辑的实现。
+
+于是开始想，解析一个数据包，至少需要两个元素，一个是数据包长，一个是数据包体。
+先解析出这两部分，至于其它，应该是逻辑线程去做的事情。
+进一步想，如果我能在这个类里面分出包头和包体，并提供给逻辑处理模块。是否会更简洁呢？
+因为作为逻辑，理论上应该完全不用关注数据的加解密，只需要关心的数据的顺序和正确性。
+
+于是开发了这个DLL，希望给开发者带来方便。
+有不完善的地方，请联系我，大家多多讨论。为设计一套好的服务器框架引擎而努力。
+
+类说明如下：
+#ifdef WIN32
+class DLL_EXPORT CPacketParse : public CPacketParseBase
+#else
+class CPacketParse : public CPacketParseBase
+#endif 
+{
+public:
+	CPacketParse(void);
+	virtual ~CPacketParse(void);
+
+	bool SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager);
+	bool SetPacketBody(uint32 u4ConnectID, ACE_Message_Block* pmbBody, IMessageBlockManager* pMessageBlockManager);
+
+	//专门对应 Mode为0的不带包头的数据包,如果是带包头的模式，这里什么都不用做。
+	//因为用到了内存池，所以pHead和pBody由框架提供，并且由框架回收，所以在这里，不可以用new出来的pHead和pBody，否则会造成内存泄露。
+	//这里要注意一下啊。当然，如果你觉得前面的接口繁琐，你也可以用这个接口实现你的规则，前提是你的m_u1PacketMode必须是PACKET_WITHSTREAM
+	uint8 GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurrMessage, IMessageBlockManager* pMessageBlockManager);   
+
+	//拼接数据返回包
+	bool MakePacket(uint32 u4ConnectID, const char* pData, uint32 u4Len, ACE_Message_Block* pMbData);
+	uint32 MakePacketLength(uint32 u4ConnectID, uint32 u4DataLen);
+
+	//当连接第一次建立的时候，返回的接口用于你自己的处理。
+	bool Connect(uint32 u4ConnectID);
+	//当连接断开的时候，返回你自己的处理
+	void DisConnect(uint32 u4ConnectID);
+
+};
+
+SetPacketHead()方法和SetPacketBody()方法，适合PACKET_WITHHEAD模式。
+如果使用PACKET_WITHHEAD模式，这里需要你在PacketParse初始化的时候，
+CPacketParse::CPacketParse(void)
+{
+	//如果是包头模式，这里需要设置包头的长度
+	m_u4PacketHead      = PACKET_HEAD;
+
+	//这里修改属于你的包解析版本号
+	sprintf_safe(m_szPacketVersion, MAX_BUFF_20, "0.90");
+
+	//这里设置你的包模式
+	m_u1PacketMode      = PACKET_WITHHEAD;
+}
+
+bool CPacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager)
+{
+	//这里添加自己对包头的分析，主要分析出包长度。
+	char* pData  = (char* )pmbHead->rd_ptr();
+	uint32 u4Len = pmbHead->length();
+
+	m_u4HeadSrcSize = u4Len;
+	if(u4Len == sizeof(uint32))
+	{
+		ACE_OS::memcpy(&m_u4PacketData, pData, sizeof(uint32));
+		
+		m_pmbHead = pmbHead;
+		m_blIsHead = true;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+u4ConnectID是连接ID
+这是一个标准的包头处理，pmbHead是数据块本身。那么如何判定是一个完整的数据包头呢？
+答案在你在你设置的PacketParse构造函数里面的m_u4PacketHead参数，这个参数就是包头的大小，这里规定包头接收的固定大小，比如是4个字节，代表后面的包体包长。
+m_u4PacketData是包体长度，提供给框架获取下面的数据块大小。
+在这个例子里，我是通过ACE_OS::memcpy(&m_u4PacketData, pData, sizeof(uint32));这个语句获得的。
+当然，这只是一个简单的用例，你可以用你自己的方法替换之。
+
+bool CPacketParse::SetPacketBody(uint32 u4ConnectID, ACE_Message_Block* pmbBody, IMessageBlockManager* pMessageBlockManager)
+{
+	//这里分析出包体内的一些数据，如果包头包含了CommandID，那么包体就不必做解析。
+	char* pData  = (char* )pmbBody->rd_ptr();
+	uint32 u4Len = pmbBody->length();
+
+	m_u4BodySrcSize = u4Len;
+	if(u4Len >= sizeof(uint16))
+	{
+		ACE_OS::memcpy(&m_u2PacketCommandID, pData, sizeof(uint16));
+		m_blIsHead = false;
+		m_pmbBody = pmbBody;
+		return true;
+	}
+	else
+	{
+		m_blIsHead = false;
+		return false;
+	}
+}
+u4ConnectID是连接ID
+这里是处理接收到完整的数据包体，这个函数的回调，取决于是否接收了足够的m_u4PacketData。
+当m_u4PacketData被完全接收了以后，才会回调这个方法。
+这里你需要解析出你的包体，也可以添加你的加解密函数。当然，这里有一个必要的工作去做，就是解析出m_u2PacketCommandID。
+因为m_u2PacketCommandID对应的是，框架把这个数据块发送给哪个逻辑插件。
+逻辑插件的注册是根据m_u2PacketCommandID来订阅框架消息的。
+当然，如果你的m_u2PacketCommandID在包头里面，你可以在SetPacketHead()函数里面完成这个工作。
+
+uint32 CPacketParse::MakePacketLength(uint32 u4ConnectID, uint32 u4DataLen)
+{
+	return u4DataLen + sizeof(uint32);
+}
+u4ConnectID是连接ID
+这个方法由框架调用，用于获取某一个数据包的数据实际发送长度。u4DataLen是原始包长
+如果你不确定这个长度，比如加密后或者压缩后的长度，这里完全可以返回原始包长。或者一个最大包长。
+
+bool CPacketParse::MakePacket(uint32 u4ConnectID, const char* pData, uint32 u4Len, ACE_Message_Block* pMbData)
+{
+	if(pMbData == NULL)
+	{
+		return false;
+	}
+
+	//拼装数据包
+	ACE_OS::memcpy(pMbData->wr_ptr(), (const void*)&u4Len, sizeof(uint32));
+	ACE_OS::memcpy(pMbData->wr_ptr() + sizeof(uint32), (const void*)pData, u4Len);
+	pMbData->wr_ptr(u4Len + sizeof(uint32));
+
+	return true;
+}
+u4ConnectID是连接ID
+这个方法由框架调用。用于将指定的逻辑插件发送的数据包，打包成你真正要发送的数据。
+这里可以添加你的方法，实现相关加密或压缩过程。
+pData是原始数据块指针
+u4Len是原始数据包长度
+请你把处理好的数据包填充到pMbData，就可以了。
+
+uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurrMessage, IMessageBlockManager* pMessageBlockManager)
+这个方法对应模式PACKET_WITHHEAD
+如果设置成PACKET_WITHHEAD模式，SetPacketHead()方法和SetPacketBody()方法就不会被调用了。
+这个是处理不定长的数据包，也就是你的数据包长度不是由包头决定的，或者根本就没有包头。
+这里的例子是，一个7E字节开头，一个7E字节结束的包。
+这个函数需要有几个关键数据需要给出。
+m_pmbHead ： 具体的数据包头，如果没有这里需要组织一个。用以和框架配合。
+m_pmbBody ： 具体包体
+m_u2PacketCommandID ： 具体命令字，和逻辑插件订阅的相关命令字对应
+
+
+
+
