@@ -135,6 +135,7 @@ public:
 	uint32 GetCoreFileSize();
 	uint16 GetTcpNodelay();
 	uint16 GetBacklog();
+	uint16 GetTrackIPCount();
 	ENUM_CHAR_ORDER GetCharOrder();
 
 private:
@@ -205,8 +206,9 @@ private:
 	uint8      m_u1Monitor;                        //设置当前的监控开关是否打开，0是关闭，1是打开
 	uint32     m_u4CoreFileSize;                   //Core文件的尺寸大小
 	uint16     m_u2Backlog;                        //设置的Backlog值
+	uint32     m_u4TrackIPCount;                   //监控IP的最大历史记录数
 
-	ENUM_CHAR_ORDER m_u1CharOrder;                      //当前字节序
+	ENUM_CHAR_ORDER m_u1CharOrder;                 //当前字节序
 
 	typedef vector<_ServerInfo> vecServerInfo;
 	vecServerInfo m_vecServerInfo;

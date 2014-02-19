@@ -825,6 +825,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Common\Ring.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Common\SendMessage.h"
 					>
 				</File>

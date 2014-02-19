@@ -75,6 +75,9 @@ bool CConnectHandler::Close(int nIOCount)
 	//从反应器注销事件
 	if(m_nIOCount == 0)
 	{
+		//查看是否是IP追踪信息，是则记录
+		App_IPAccount::instance()->CloseIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
+
 		//如果还存在阻塞定时器，取消之
 		if(m_u4BlockTimerID != 0)
 		{
@@ -201,7 +204,7 @@ int CConnectHandler::open(void*)
 	}
 
 	//检查单位时间链接次数是否达到上限
-	if(false == App_IPAccount::instance()->AddIP((string)m_addrRemote.get_host_addr()))
+	if(false == App_IPAccount::instance()->AddIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()))
 	{
 		OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]IP connect frequently.\n", m_addrRemote.get_host_addr()));
 		App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), App_MainConfig::instance()->GetForbiddenTime());
@@ -937,6 +940,10 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 			m_u4AllSendSize     += (uint32)pMbData->length();
 			pMbData->release();
 			m_atvOutput      = ACE_OS::gettimeofday();
+
+			//如果需要统计信息
+			App_IPAccount::instance()->UpdateIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
+
 			Close();
 			return true;
 		}
@@ -956,6 +963,9 @@ bool CConnectHandler::CheckMessage()
 {	
 	m_u4AllRecvSize += (uint32)m_pPacketParse->GetMessageHead()->length() + (uint32)m_pPacketParse->GetMessageBody()->length();
 	m_u4AllRecvCount++;
+
+	//如果需要统计信息
+	App_IPAccount::instance()->UpdateIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
 
 	ACE_Date_Time dtNow;
 	if(false == m_TimeConnectInfo.Check((uint8)dtNow.minute(), 1, m_u4AllRecvSize))

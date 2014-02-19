@@ -58,6 +58,10 @@ enum
 #define CONSOLEMESSAGE_SERVERRECONNECT    "ReConnectServer"     //远端控制重练某一个远端服务器
 #define CONSOLEMESSAGE_SETDEBUG           "SetDebug"            //设置当前DEBUG状态
 #define CONSOLEMESSAGE_SHOWDEBUG          "ShowDebug"           //查看当前DEBUG状态
+#define CONSOLEMESSAGE_SETTRACKIP         "SetTrackIP"          //设置要监控的IP
+#define CONSOLEMESSAGE_DELTRACKIP         "DelTrackIP"          //删除要监控的IP
+#define CONSOLEMESSAGE_GETTRACKIPINFO     "GetTrackIPInfo"      //得到监控IP的历史记录
+#define CONSOLEMESSAGE_GETCONNECTIPINFO   "GetConnectIPInfo"    //通过COnnectID获得相关的IP信息
 
 //命令处理参数
 struct _CommandInfo
@@ -105,6 +109,7 @@ private:
 	bool GetConnectServerID(const char* pCommand, int& nServerID);             //得到一个指定的服务器ID
 	bool GetDebug(const char* pCommand, uint8& u1Debug);                       //得到当前设置的BUDEG
 	bool CheckConsoleKey(const char* pKey);                                    //验证key
+	bool GetTrackIP(const char* pCommand, _ForbiddenIP& ForbiddenIP);          //得到设置的追踪IP
 
 	//命令具体实现部分
 private:
@@ -133,6 +138,10 @@ private:
 	bool DoMessage_CommandDataLog(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket);
 	bool DoMessage_SetDebug(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket);
 	bool DoMessage_ShowDebug(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket);
+	bool DoMessage_SetTrackIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket);
+	bool DoMessage_DelTrackIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket);
+	bool DoMessage_GetTrackIPInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket);
+	bool DoMessage_GetConnectIPInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket);
 
 private:
 	vecConsoleKey* m_pvecConsoleKey;

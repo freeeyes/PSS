@@ -215,6 +215,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DlgTrackIP.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PSS_ClientManager.cpp"
 				>
 			</File>
@@ -282,6 +286,10 @@
 			</File>
 			<File
 				RelativePath=".\DlgServerConnect.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DlgTrackIP.h"
 				>
 			</File>
 			<File

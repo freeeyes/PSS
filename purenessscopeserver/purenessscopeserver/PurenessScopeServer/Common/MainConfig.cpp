@@ -47,6 +47,7 @@ CMainConfig::CMainConfig(void)
 	m_u2SendQueuePutTime    = (uint16)MAX_MSG_PUTTIMEOUT;
 	m_u2WorkQueuePutTime    = (uint16)MAX_MSG_PUTTIMEOUT;
 	m_u2Backlog             = (uint16)MAX_ASYNCH_BACKLOG;
+	m_u4TrackIPCount        = (uint32)MAX_ASYNCH_BACKLOG;
 
 	m_u1CommandFlow         = 0;
 
@@ -522,6 +523,11 @@ bool CMainConfig::Init(const char* szConfigPath)
 	{
 		m_u2ForbiddenTime = (uint16)ACE_OS::atoi(pData);
 	}
+	pData = m_MainConfig.GetData("ConnectValid", "TrackIPCount");
+	if(NULL != pData)
+	{
+		m_u4TrackIPCount = (uint16)ACE_OS::atoi(pData);
+	}
 
 	//开始获得ConnectServer相关信息
 	pData = m_MainConfig.GetData("ConnectServer", "TimeInterval");
@@ -605,6 +611,7 @@ void CMainConfig::Display()
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u1ServerType = %d.\n", m_u1ServerType));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4SendDatamark = %d.\n", m_u4SendDatamark));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u2TcpNodelay = %d.\n", m_u2TcpNodelay));
+	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4TrackIPCount = %d.\n", m_u4TrackIPCount));
 
 	for(int i = 0; i < (int)m_vecUDPServerInfo.size(); i++)
 	{
@@ -962,4 +969,9 @@ uint16 CMainConfig::GetBacklog()
 ENUM_CHAR_ORDER CMainConfig::GetCharOrder()
 {
 	return m_u1CharOrder;
+}
+
+uint16 CMainConfig::GetTrackIPCount()
+{
+	return m_u4TrackIPCount;
 }

@@ -273,6 +273,26 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
 		DoMessage_ShowDebug(CommandInfo, pBuffPacket);
 		return CONSOLE_MESSAGE_SUCCESS;
 	}
+	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SETTRACKIP) == 0)
+	{
+		DoMessage_SetTrackIP(CommandInfo, pBuffPacket);
+		return CONSOLE_MESSAGE_SUCCESS;
+	}
+	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_DELTRACKIP) == 0)
+	{
+		DoMessage_DelTrackIP(CommandInfo, pBuffPacket);
+		return CONSOLE_MESSAGE_SUCCESS;
+	}
+	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_GETTRACKIPINFO) == 0)
+	{
+		DoMessage_GetTrackIPInfo(CommandInfo, pBuffPacket);
+		return CONSOLE_MESSAGE_SUCCESS;
+	}
+	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_GETCONNECTIPINFO) == 0)
+	{
+		DoMessage_GetConnectIPInfo(CommandInfo, pBuffPacket);
+		return CONSOLE_MESSAGE_SUCCESS;
+	}
 	else
 	{
 		return CONSOLE_MESSAGE_FAIL;
@@ -346,6 +366,25 @@ bool CConsoleMessage::GetForbiddenIP(const char* pCommand, _ForbiddenIP& Forbidd
 	ACE_OS::memcpy(szTempData, pPosBegin + 3, nLen);
 	szTempData[nLen] = '\0';
 	ForbiddenIP.m_u4Second = (uint32)ACE_OS::atoi(szTempData);
+
+	return true;
+}
+
+bool CConsoleMessage::GetTrackIP(const char* pCommand, _ForbiddenIP& ForbiddenIP)
+{
+	char szTempData[MAX_BUFF_100] = {'\0'};
+
+	//获得IP地址
+	char* pPosBegin = (char* )ACE_OS::strstr(pCommand, "-c ");
+	char* pPosEnd   = (char* )ACE_OS::strstr(pPosBegin + 3, " ");
+	int nLen = (int)(pPosEnd - pPosBegin - 3);
+	if(nLen >= MAX_BUFF_100 || nLen < 0)
+	{
+		return false;
+	}
+	ACE_OS::memcpy(szTempData, pPosBegin + 3, nLen);
+	szTempData[nLen] = '\0';
+	sprintf_safe(ForbiddenIP.m_szClientIP, MAX_IP_SIZE, szTempData);
 
 	return true;
 }
@@ -1316,6 +1355,133 @@ bool CConsoleMessage::GetDebug(const char* pCommand, uint8& u1Debug)
 	ACE_OS::memcpy(szTempData, pPosBegin + 3, nLen);
 
 	u1Debug = (uint8)ACE_OS::atoi(szTempData);
+
+	return true;
+}
+
+bool CConsoleMessage::DoMessage_SetTrackIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket)
+{
+	_ForbiddenIP ForbiddenIP;
+	if(GetTrackIP(CommandInfo.m_szCommandExp, ForbiddenIP) == true)
+	{
+		App_IPAccount::instance()->SetTrackIP(ForbiddenIP.m_szClientIP);
+
+		(*pBuffPacket) << (uint8)0;   //追踪成功
+	}
+	else
+	{
+		(*pBuffPacket) << (uint8)1;   //追踪失败
+	}
+
+	return true;
+}
+
+bool CConsoleMessage::DoMessage_DelTrackIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket)
+{
+	if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
+	{
+		//清除追踪
+		App_IPAccount::instance()->ClearTrackIP();
+
+		(*pBuffPacket) << (uint8)0;	
+	}
+
+	return true;
+}
+
+bool CConsoleMessage::DoMessage_GetTrackIPInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket)
+{
+	char szTimeBegin[MAX_BUFF_100] = {'\0'};
+	char szTimeEnd[MAX_BUFF_100]   = {'\0'};
+
+	if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
+	{
+		//清除追踪
+		int nCount = App_IPAccount::instance()->GetTrackIPInfoCount();
+		_IPTrackInfo* pIPTrackInfo = App_IPAccount::instance()->GetBase();
+
+		//寻找所有合法的历史记录
+		uint16 u2HistoryCount = 0;
+		for(int i = 0; i < nCount; i++)
+		{
+			_IPTrackInfo* pCurrInfo = pIPTrackInfo + i;
+			if(ACE_OS::strlen(pCurrInfo->m_szClientIP) != 0)
+			{
+				u2HistoryCount++;
+			}
+		}
+
+		//记录总个数
+		(*pBuffPacket) << (uint16)u2HistoryCount;	
+
+		//传入历史记录
+		for(int i = 0; i < nCount; i++)
+		{
+			_IPTrackInfo* pCurrInfo = pIPTrackInfo + i;
+			if(ACE_OS::strlen(pCurrInfo->m_szClientIP) != 0)
+			{
+				VCHARS_STR strSName;
+				strSName.text  = pCurrInfo->m_szClientIP;
+				strSName.u1Len = (uint8)ACE_OS::strlen(pCurrInfo->m_szClientIP);
+
+				(*pBuffPacket) << strSName;                    //IP
+				(*pBuffPacket) << (uint32)pCurrInfo->m_nPort;  //端口
+
+				sprintf_safe(szTimeBegin, MAX_BUFF_100, "%04d-%02d-%02d %02d:%02d:%02d", pCurrInfo->m_dtConnectStart.year(), pCurrInfo->m_dtConnectStart.month(), pCurrInfo->m_dtConnectStart.day(), pCurrInfo->m_dtConnectStart.hour(), pCurrInfo->m_dtConnectStart.minute(), pCurrInfo->m_dtConnectStart.second());
+
+				strSName.text  = szTimeBegin;
+				strSName.u1Len = (uint8)ACE_OS::strlen(szTimeBegin);
+				(*pBuffPacket) << strSName;
+
+				sprintf_safe(szTimeEnd, MAX_BUFF_100, "%04d-%02d-%02d %02d:%02d:%02d", pCurrInfo->m_dtConnectEnd.year(), pCurrInfo->m_dtConnectEnd.month(), pCurrInfo->m_dtConnectEnd.day(), pCurrInfo->m_dtConnectEnd.hour(), pCurrInfo->m_dtConnectEnd.minute(), pCurrInfo->m_dtConnectEnd.second());
+
+				strSName.text  = szTimeEnd;
+				strSName.u1Len = (uint8)ACE_OS::strlen(szTimeBegin);
+				(*pBuffPacket) << strSName;
+
+				(*pBuffPacket) << (uint32)pCurrInfo->m_u4RecvByteSize;  //接收字节数
+				(*pBuffPacket) << (uint32)pCurrInfo->m_u4SendByteSize;  //发送字节数
+				(*pBuffPacket) << (uint8)pCurrInfo->m_u1State;          //状态位 
+
+			}
+		}
+	}
+
+	return true;
+}
+
+bool CConsoleMessage::DoMessage_GetConnectIPInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket)
+{
+	int nConnectID = 0;
+	if(GetConnectServerID(CommandInfo.m_szCommandExp, nConnectID) == true)
+	{
+		char szIP[MAX_BUFF_100] = {'\0'};
+		uint32 u4Port           = 0;
+#ifdef WIN32  //如果是windows
+		_ClientIPInfo objClientIPInfo = App_ProConnectManager::instance()->GetClientIPInfo((uint32)nConnectID);
+#else
+		_ClientIPInfo objClientIPInfo = App_ConnectManager::instance()->GetClientIPInfo((uint32)nConnectID);
+#endif
+
+
+		if(ACE_OS::strlen(objClientIPInfo.m_szClientIP) == 0)
+		{
+			//没有找到对应的IP信息
+			(*pBuffPacket) << (uint16)1;
+		}
+		else
+		{
+			//找到了对应的IP信息
+			(*pBuffPacket) << (uint16)0;
+
+			VCHARS_STR strSName;
+			strSName.text  = objClientIPInfo.m_szClientIP;
+			strSName.u1Len = (uint8)ACE_OS::strlen(objClientIPInfo.m_szClientIP);
+
+			(*pBuffPacket) << strSName;                         //IP
+			(*pBuffPacket) << (uint32)objClientIPInfo.m_nPort;  //端口
+		}
+	}
 
 	return true;
 }

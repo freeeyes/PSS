@@ -257,7 +257,7 @@ void CPassTCPDlg::OnBnClickedButton1()
 		m_txtPacketTimewait.GetWindowText(strData);
 		pSocket_Info->m_nPacketTimewait = _ttoi((LPCTSTR)strData);
 
-		if(i == nThreadCount - 1)
+		if(i == nThreadCount - 1 && nThreadCount > 1)
 		{
 			pSocket_Info->m_nSendCount = nThreadSendCount + ( nAllSendCount % nThreadSendCount);
 		}
@@ -826,11 +826,11 @@ void CPassTCPDlg::OnBnClickedButton3()
 	fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
 
 	m_txtMinTime.GetWindowText(strData);
-	sprintf_s(szLogText, 1024, "最小单包响应时间:%d\n", _ttoi((LPCTSTR)strData));
+	sprintf_s(szLogText, 1024, "最小单包响应时间:%d毫秒\n", _ttoi((LPCTSTR)strData));
 	fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
 
 	m_txtMaxTime.GetWindowText(strData);
-	sprintf_s(szLogText, 1024, "最大单包响应时间:%d\n", _ttoi((LPCTSTR)strData));
+	sprintf_s(szLogText, 1024, "最大单包响应时间:%d毫秒\n", _ttoi((LPCTSTR)strData));
 	fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
 
 	//连接成功百分比

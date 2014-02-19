@@ -87,6 +87,8 @@ bool CProConnectHandle::Close(int nIOCount, int nErrno)
 	if(m_nIOCount == 0)
 	{
 		m_ThreadWriteLock.acquire();
+		//查看是否是IP追踪信息，是则记录
+		App_IPAccount::instance()->CloseIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
 
 		//调用连接断开消息，通知PacketParse接口
 		CPacketParse objPacketParse;
@@ -214,7 +216,7 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 	}
 
 	//检查单位时间链接次数是否达到上限
-	if(false == App_IPAccount::instance()->AddIP((string)m_addrRemote.get_host_addr()))
+	if(false == App_IPAccount::instance()->AddIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()))
 	{
 		OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open]IP connect frequently.\n", m_addrRemote.get_host_addr()));
 		App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), App_MainConfig::instance()->GetForbiddenTime());
@@ -534,6 +536,9 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
 		m_atvOutput = ACE_OS::gettimeofday();
 		App_MessageBlockManager::instance()->Close(&result.message_block());
 		m_u4AllSendSize += (uint32)result.bytes_to_write();
+
+		//如果需要统计信息
+		App_IPAccount::instance()->UpdateIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
 		m_ThreadWriteLock.release();
 		
 		//记录水位标
@@ -867,6 +872,9 @@ bool CProConnectHandle::CheckMessage()
 		m_ThreadWriteLock.acquire();
 		m_u4AllRecvSize += (uint32)m_pPacketParse->GetMessageHead()->length() + (uint32)m_pPacketParse->GetMessageBody()->length();
 		m_u4AllRecvCount++;
+
+		//如果有需要监控的IP，则记录字节流信息
+		App_IPAccount::instance()->UpdateIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
 		m_ThreadWriteLock.release();
 
 		ACE_Date_Time dtNow;

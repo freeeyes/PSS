@@ -95,7 +95,7 @@ bool CProServerManager::Init()
 	}
 
 	//初始化防攻击系统
-	App_IPAccount::instance()->Init(App_MainConfig::instance()->GetValid(), App_MainConfig::instance()->GetValidConnectCount());
+	App_IPAccount::instance()->Init(App_MainConfig::instance()->GetValid(), App_MainConfig::instance()->GetValidConnectCount(), App_MainConfig::instance()->GetTrackIPCount());
 
 	//初始化BuffPacket缓冲池
 	App_BuffPacketManager::instance()->Init(BUFFPACKET_MAX_COUNT);
