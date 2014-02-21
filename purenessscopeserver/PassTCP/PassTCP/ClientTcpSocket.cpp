@@ -171,6 +171,9 @@ void CClientTcpSocket::Run()
 			int nErr = connect(sckClient, (SOCKADDR*)&sockaddr, sizeof(SOCKADDR));
 			if(0 != nErr)
 			{
+				//¹Ø±Õsocket
+				closesocket(sckClient);
+
 				DWORD dwError = GetLastError();
 				WriteFile_Error("Connect error", (int)dwError);
 				m_pSocket_State_Info->m_nFailConnect++;
