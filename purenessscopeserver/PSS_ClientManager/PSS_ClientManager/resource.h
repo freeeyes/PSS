@@ -15,7 +15,6 @@
 #define IDD_DIALOG_CLIENTCONNECTM       133
 #define IDD_DIALOG_SERVERCONNECT        134
 #define IDD_DIALOG_FORBIDENIP           135
-#define IDD_DIALOG1                     137
 #define IDD_DIALOG_TRACKIP              137
 #define IDC_TAB1                        1000
 #define IDC_EDIT1                       1001
@@ -39,9 +38,11 @@
 #define IDC_LIST2                       1011
 #define IDC_EDIT9                       1011
 #define IDC_RADIO2                      1012
+#define IDC_BUTTON11                    1012
 #define IDC_EDIT8                       1013
 #define IDC_RADIO3                      1013
 #define IDC_BUTTON7                     1014
+#define IDC_LIST3                       1015
 
 // Next default values for new objects
 // 
@@ -49,7 +50,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        138
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1015
+#define _APS_NEXT_CONTROL_VALUE         1016
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif

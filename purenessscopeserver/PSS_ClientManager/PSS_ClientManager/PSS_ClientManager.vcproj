@@ -45,6 +45,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="./XML"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -250,6 +251,18 @@
 				RelativePath=".\TcpClientConnect.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\XmlOpeation.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -316,6 +329,10 @@
 				RelativePath=".\TcpClientConnect.h"
 				>
 			</File>
+			<File
+				RelativePath=".\XmlOpeation.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
@@ -333,6 +350,66 @@
 			<File
 				RelativePath=".\res\PSS_ClientManager.rc2"
 				>
+			</File>
+		</Filter>
+		<Filter
+			Name="XML"
+			>
+			<File
+				RelativePath=".\XML\tinystr.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\XML\tinystr.h"
+				>
+			</File>
+			<File
+				RelativePath=".\XML\tinyxml.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\XML\tinyxml.h"
+				>
+			</File>
+			<File
+				RelativePath=".\XML\tinyxmlerror.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\XML\tinyxmlparser.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 		<File
