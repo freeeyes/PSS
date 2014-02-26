@@ -173,10 +173,10 @@ void CDlgClientConnectM::OnBnClickedButton2()
       memcpy_s(&ClientConnectInfo.m_nRecvQueueCount, sizeof(int), &szRecvBuff[nPos], sizeof(int));
       nPos += sizeof(int);
 
-      memcpy_s(&ClientConnectInfo.m_nRecvQueueTimeCost, sizeof(int), &szRecvBuff[nPos], sizeof(long long));
+      memcpy_s(&ClientConnectInfo.m_nRecvQueueTimeCost, sizeof(long long), &szRecvBuff[nPos], sizeof(long long));
       nPos += sizeof(long long);
 
-      memcpy_s(&ClientConnectInfo.m_nSendQueueTimeCost, sizeof(int), &szRecvBuff[nPos], sizeof(long long));
+      memcpy_s(&ClientConnectInfo.m_nSendQueueTimeCost, sizeof(long long), &szRecvBuff[nPos], sizeof(long long));
       nPos += sizeof(long long);
 
       //显示在界面上

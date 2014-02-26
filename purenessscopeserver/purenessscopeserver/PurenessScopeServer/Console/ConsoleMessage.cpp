@@ -612,9 +612,9 @@ bool CConsoleMessage::DoMessage_WorkThreadState(_CommandInfo& CommandInfo, IBuff
 				_ThreadInfo* pCurrThreadInfo = pThreadInfo->GetThreadInfo(i);
 				(*pBuffPacket) << (uint8)i;
 				(*pBuffPacket) << (uint32)pCurrThreadInfo->m_tvUpdateTime.sec();
+				(*pBuffPacket) << (uint32)pCurrThreadInfo->m_tvCreateTime.sec();
 				(*pBuffPacket) << (uint8)pCurrThreadInfo->m_u4State;
 				(*pBuffPacket) << (uint32)pCurrThreadInfo->m_u4RecvPacketCount;
-				(*pBuffPacket) << (uint32)pCurrThreadInfo->m_u4SendPacketCount;
 				(*pBuffPacket) << (uint16)pCurrThreadInfo->m_u2CommandID;
 				(*pBuffPacket) << (uint16)pCurrThreadInfo->m_u2PacketTime;
 				(*pBuffPacket) << (uint32)pCurrThreadInfo->m_u4CurrPacketCount;

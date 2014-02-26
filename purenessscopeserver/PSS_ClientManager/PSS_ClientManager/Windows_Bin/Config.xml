@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<ServerInfo servername="windows PSS" sIP="127.0.0.1" sport="10010" MagicCode="freeeyes" />
+	<ServerInfo servername="Linux PSS" sIP="172.21.1.200" sport="10010" MagicCode="freeeyes" />
+</config>
