@@ -2,6 +2,7 @@
 #include "afxcmn.h"
 #include "ClientDefine.h"
 #include "TcpClientConnect.h"
+#include "XmlOpeation.h"
 
 #include <vector>
 #include <time.h>
@@ -9,6 +10,9 @@
 
 using namespace std;
 
+#define CHECKSERVER_FILE "./CheckServer.xml"
+
+//监控线程信息
 struct _WorkThreadInfo
 {
 	char                m_szThreadName[50];   //线程名称
@@ -38,6 +42,52 @@ struct _WorkThreadInfo
 
 typedef vector<_WorkThreadInfo> vecWorkThreadInfo;
 
+//监控服务器需要加载的信息
+struct _CheckServerInfo
+{
+public:
+	CTcpClientConnect m_objTcpClientConnect;
+	int               m_nCheckThreadCount;
+	_WorkThreadInfo*  m_pWorkThreadInfo;
+
+	_CheckServerInfo()
+	{
+		m_nCheckThreadCount = 0;
+		m_pWorkThreadInfo   = NULL;
+	}
+
+	~_CheckServerInfo()
+	{
+		if(NULL != m_pWorkThreadInfo)
+		{
+			delete[] m_pWorkThreadInfo;
+			m_pWorkThreadInfo = NULL;
+		}
+	}
+};
+
+typedef vector<_CheckServerInfo*> vecCheckServerInfo;
+
+//XML中记载的服务器的配置信息
+struct _CheckServer
+{
+public:
+	char m_szIP[50]; 
+	int  m_nPort;
+	char m_szMagicCode[300];
+	int  m_nThreadCount;
+
+	_CheckServer()
+	{
+		m_szIP[0]        = '\0';
+		m_nPort          = 0;
+		m_szMagicCode[0] = '\0';
+		m_nThreadCount   = 0;
+	}
+};
+
+typedef vector<_CheckServer> vecCheckServer;
+
 class CDlgClientWorkThread : public CDialog
 {
 	DECLARE_DYNAMIC(CDlgClientWorkThread)
@@ -52,13 +102,18 @@ public:
 public:
 	CString GetPageTitle();
 	void SetTcpClientConnect(CTcpClientConnect* pTcpClientConnect);
-	void CheckWorkThread();
+	void CheckWorkThread(_CheckServerInfo* pCheckServerInfo);
+	void BeepAlarm();
+	void ShowGroupServerList();
+	void ClearCheckServerInfo();
 
 private:
 	CTcpClientConnect* m_pTcpClientConnect;
-	_WorkThreadInfo*   m_pWorkThreadInfo;
-	int                m_nCheckThreadCount;
 	bool               m_blTimeRun;
+
+	//集群监控参数
+	vecCheckServerInfo m_vecCheckServerInfo;
+	vecCheckServer     m_vecCheckServer;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
@@ -69,6 +124,8 @@ public:
 	CEdit m_txtThreadCount;
 	CEdit m_txtCheckTime;
 	CListBox m_lbCheckLog;
+	CButton m_btnVoice;
+	CListBox m_lbServerList;
 
 	afx_msg void OnBnClickedButton1();
 	virtual BOOL OnInitDialog();
@@ -76,4 +133,6 @@ public:
 	afx_msg void OnBnClickedButton8();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnClose();
+	afx_msg void OnBnClickedButton3();
+	afx_msg void OnBnClickedButton4();
 };

@@ -17,12 +17,7 @@ CDlgClientWorkThread::CDlgClientWorkThread(CWnd* pParent /*=NULL*/)
 
 CDlgClientWorkThread::~CDlgClientWorkThread()
 {
-	if(m_pWorkThreadInfo != NULL)
-	{
-		delete[] m_pWorkThreadInfo;
-		m_pWorkThreadInfo   = NULL;
-		m_nCheckThreadCount = 0;
-	}
+	ClearCheckServerInfo();
 }
 
 void CDlgClientWorkThread::DoDataExchange(CDataExchange* pDX)
@@ -32,6 +27,8 @@ void CDlgClientWorkThread::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT1, m_txtThreadCount);
 	DDX_Control(pDX, IDC_EDIT2, m_txtCheckTime);
 	DDX_Control(pDX, IDC_LIST2, m_lbCheckLog);
+	DDX_Control(pDX, IDC_CHECK1, m_btnVoice);
+	DDX_Control(pDX, IDC_LIST3, m_lbServerList);
 }
 
 
@@ -41,6 +38,8 @@ BEGIN_MESSAGE_MAP(CDlgClientWorkThread, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON8, &CDlgClientWorkThread::OnBnClickedButton8)
 	ON_WM_TIMER()
 	ON_WM_CLOSE()
+	ON_BN_CLICKED(IDC_BUTTON3, &CDlgClientWorkThread::OnBnClickedButton3)
+	ON_BN_CLICKED(IDC_BUTTON4, &CDlgClientWorkThread::OnBnClickedButton4)
 END_MESSAGE_MAP()
 
 CString CDlgClientWorkThread::GetPageTitle()
@@ -194,9 +193,9 @@ BOOL CDlgClientWorkThread::OnInitDialog()
 	m_txtThreadCount.SetWindowText(_T("3"));
 	m_txtCheckTime.SetWindowText(_T("60"));
 
-	m_pWorkThreadInfo   = NULL;
-	m_nCheckThreadCount = 0;
 	m_blTimeRun         = false;
+
+	((CButton *)GetDlgItem(IDC_RADIO2))->SetCheck(TRUE);
 
 	return TRUE;
 }
@@ -204,16 +203,11 @@ BOOL CDlgClientWorkThread::OnInitDialog()
 void CDlgClientWorkThread::OnBnClickedButton2()
 {
 	//开始监控
-	if(m_pWorkThreadInfo != NULL)
-	{
-		delete[] m_pWorkThreadInfo;
-		m_pWorkThreadInfo   = NULL;
-		m_nCheckThreadCount = 0;
-	}
+	ClearCheckServerInfo();
 
 	CString strData;
 	m_txtThreadCount.GetWindowText(strData);
-	m_nCheckThreadCount = _ttoi(strData);
+	int nCheckThreadCount = _ttoi(strData);
 	m_txtCheckTime.GetWindowText(strData);
 	int nTimeInterval = _ttoi(strData);
 
@@ -223,7 +217,25 @@ void CDlgClientWorkThread::OnBnClickedButton2()
 		KillTimer(1);
 	}
 
-	m_pWorkThreadInfo = new _WorkThreadInfo[m_nCheckThreadCount];
+	//开始监控的相关准备工作
+	if(((CButton *)GetDlgItem(IDC_RADIO2))->GetCheck() == TRUE)
+	{
+		//当前监控
+		m_vecCheckServerInfo.clear();
+
+		_CheckServerInfo* pCheckServerInfo = new _CheckServerInfo();
+
+		pCheckServerInfo->m_objTcpClientConnect.Init(m_pTcpClientConnect->GetServerIP(), m_pTcpClientConnect->GetServerPort(), m_pTcpClientConnect->GetServerKey());
+		pCheckServerInfo->m_nCheckThreadCount = nCheckThreadCount;
+		pCheckServerInfo->m_pWorkThreadInfo   = new _WorkThreadInfo[nCheckThreadCount];
+		m_vecCheckServerInfo.push_back(pCheckServerInfo);
+	}
+	else
+	{
+		//群体监控
+
+	}
+
 
 	m_lbCheckLog.ResetContent();
 
@@ -245,12 +257,7 @@ void CDlgClientWorkThread::OnBnClickedButton8()
 	KillTimer(1);
 	m_blTimeRun = false;
 
-	if(m_pWorkThreadInfo != NULL)
-	{
-		delete[] m_pWorkThreadInfo;
-		m_pWorkThreadInfo = NULL;
-		m_nCheckThreadCount = 0;
-	}
+	ClearCheckServerInfo();
 
 	CString strData;
 	CString strTImeNow;
@@ -260,6 +267,12 @@ void CDlgClientWorkThread::OnBnClickedButton8()
 	strData = strTImeNow + _T("停止监控...");
 
 	m_lbCheckLog.AddString(strData);
+
+	int nCount = m_lbCheckLog.GetCount();
+	if (nCount > 0)
+	{
+		m_lbCheckLog.SetCurSel(nCount - 1);
+	}
 }
 
 void CDlgClientWorkThread::OnTimer(UINT_PTR nIDEvent)
@@ -268,14 +281,19 @@ void CDlgClientWorkThread::OnTimer(UINT_PTR nIDEvent)
 	switch(nIDEvent) 
 	{
 	case 1:
-		CheckWorkThread();
-		break;
+		{
+			for(int i = 0; i < (int)m_vecCheckServerInfo.size(); i++)
+			{
+				CheckWorkThread(m_vecCheckServerInfo[i]);
+			}
+			break;
+		}
 	}
 
 	CDialog::OnTimer(nIDEvent);
 }
 
-void CDlgClientWorkThread::CheckWorkThread()
+void CDlgClientWorkThread::CheckWorkThread(_CheckServerInfo* pCheckServerInfo)
 {
 	char szSendMessage[200] = {'\0'};
 	char szCommand[100]     = {'\0'};
@@ -287,7 +305,7 @@ void CDlgClientWorkThread::CheckWorkThread()
 
 	char szRecvBuff[100 * 1024] = {'\0'};
 	int nRecvLen = 100 * 1024;
-	bool blState = m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen + sizeof(int), (char*)szRecvBuff, nRecvLen);
+	bool blState = pCheckServerInfo->m_objTcpClientConnect.SendConsoleMessage(szSendMessage, nSendLen + sizeof(int), (char*)szRecvBuff, nRecvLen);
 	if(blState == false)
 	{
 		MessageBox(_T(MESSAGE_SENDERROR) , _T(MESSAGE_TITLE_ERROR), MB_OK);
@@ -303,17 +321,24 @@ void CDlgClientWorkThread::CheckWorkThread()
 		memcpy_s(&nThreadCount, sizeof(char), &szRecvBuff[nPos], sizeof(char));
 		nPos += sizeof(char);
 
-		if(nThreadCount != m_nCheckThreadCount)
+		if(nThreadCount != pCheckServerInfo->m_nCheckThreadCount)
 		{
 			char szError[1024]     = {'\0'};
 			wchar_t szzError[1024] = {'\0'};
 
-			sprintf_s(szError, "[错误]需要监控的线程数不等于当前服务器线程数，当前服务器线程数[%d]，当前监控线程数[%d].无法完成监控", nThreadCount, m_nCheckThreadCount);
+			sprintf_s(szError, "[%s:%d]监控线程数不符，当前服务器线程数[%d]，当前监控线程数[%d]", pCheckServerInfo->m_objTcpClientConnect.GetServerIP(), pCheckServerInfo->m_objTcpClientConnect.GetServerPort(), nThreadCount, pCheckServerInfo->m_nCheckThreadCount);
 
 			int nSrcLen = MultiByteToWideChar(CP_ACP, 0, szError, -1, NULL, 0);
-			int nDecLen = MultiByteToWideChar(CP_ACP, 0, szError, -1, szzError, 50);
+			int nDecLen = MultiByteToWideChar(CP_ACP, 0, szError, -1, szzError, 1024);
 
 			m_lbCheckLog.AddString(szzError);
+
+			int nCount = m_lbCheckLog.GetCount();
+			if (nCount > 0)
+			{
+				m_lbCheckLog.SetCurSel(nCount - 1);
+			}
+			BeepAlarm();
 
 			return;
 		}
@@ -372,17 +397,17 @@ void CDlgClientWorkThread::CheckWorkThread()
 			objvecWorkThreadInfo.push_back(WorkThreadInfo);
 		}
 
-		for(int i = 0; i < m_nCheckThreadCount; i++)
+		for(int i = 0; i < pCheckServerInfo->m_nCheckThreadCount; i++)
 		{
-			if(m_pWorkThreadInfo[i].m_nCreateTime == 0)
+			if(pCheckServerInfo->m_pWorkThreadInfo[i].m_nCreateTime == 0)
 			{
 				//第一次调用，只拷贝
-				m_pWorkThreadInfo[i] = objvecWorkThreadInfo[i];
+				pCheckServerInfo->m_pWorkThreadInfo[i] = objvecWorkThreadInfo[i];
 			}
 			else
 			{
 				//如果是已有数据，进行比较判定
-				if(m_pWorkThreadInfo[i].m_nCreateTime != objvecWorkThreadInfo[i].m_nCreateTime)
+				if(pCheckServerInfo->m_pWorkThreadInfo[i].m_nCreateTime != objvecWorkThreadInfo[i].m_nCreateTime)
 				{
 					char szError[1024]     = {'\0'};
 					char szThreadTime[100] = {'\0'};
@@ -390,7 +415,7 @@ void CDlgClientWorkThread::CheckWorkThread()
 					wchar_t szzError[1024] = {'\0'};
 
 					struct tm tmDate;
-					time_t newRawTime = m_pWorkThreadInfo[i].m_nCreateTime;
+					time_t newRawTime = pCheckServerInfo->m_pWorkThreadInfo[i].m_nCreateTime;
 					localtime_s(&tmDate, &newRawTime);
 					sprintf_s(szThreadTime, 30, "%04d-%02d-%02d %02d:%02d:%02d", tmDate.tm_year + 1900, 
 						tmDate.tm_mon + 1,
@@ -409,19 +434,151 @@ void CDlgClientWorkThread::CheckWorkThread()
 						tmDate1.tm_min,
 						tmDate1.tm_sec);
 
-					sprintf_s(szError, "[错误]原线程时间是[%s], 当前线程重启时间[%s]", szThreadTime, szCurrTime);
+					sprintf_s(szError, "[%s:%d]原线程时间是[%s], 当前线程重启时间[%s]", pCheckServerInfo->m_objTcpClientConnect.GetServerIP(), pCheckServerInfo->m_objTcpClientConnect.GetServerPort(), szThreadTime, szCurrTime);
 
 					int nSrcLen = MultiByteToWideChar(CP_ACP, 0, szError, -1, NULL, 0);
-					int nDecLen = MultiByteToWideChar(CP_ACP, 0, szError, -1, szzError, 50);
+					int nDecLen = MultiByteToWideChar(CP_ACP, 0, szError, -1, szzError, 1024);
 
 					m_lbCheckLog.AddString(szzError);
+
+					int nCount = m_lbCheckLog.GetCount();
+					if (nCount > 0)
+					{
+						m_lbCheckLog.SetCurSel(nCount - 1);
+					}
+
+					BeepAlarm();
 				}
 			}
 		}
 	}
 }
+
 void CDlgClientWorkThread::OnClose()
 {
 
 	CDialog::OnClose();
+}
+
+void CDlgClientWorkThread::BeepAlarm()
+{
+	if(m_btnVoice.GetCheck() == BST_CHECKED)
+	{
+		for(int i = 0; i < 5; i++)
+		{
+			Beep(1000, 1000);
+		}
+	}
+}
+void CDlgClientWorkThread::OnBnClickedButton3()
+{
+	//从XML文件中加载
+	m_vecCheckServer.clear();
+
+	CXmlOpeation objXmlOpeation;
+
+	bool blState = objXmlOpeation.Init(CHECKSERVER_FILE);
+	if(false == blState)
+	{
+		MessageBox(_T("读取配置文件错误，请确认当前目录下Config.xml文件存在") , _T(MESSAGE_TITLE_ERROR), MB_OK);
+		return;
+	}
+
+	TiXmlElement* pNextTiXmlElementIP        = NULL;
+	TiXmlElement* pNextTiXmlElementPort      = NULL;
+	TiXmlElement* pNextTiXmlElementMagicCode = NULL;
+	TiXmlElement* pNextTiXmlElementTCount    = NULL;
+	char* pData                              = NULL;
+
+	while(true)
+	{
+		_CheckServer objCheckServer;
+
+		pData = objXmlOpeation.GetData("ServerInfo", "sIP", pNextTiXmlElementIP);
+		if(pData != NULL)
+		{
+			sprintf_s(objCheckServer.m_szIP, sizeof(objCheckServer.m_szIP), "%s", pData);
+		}
+		else
+		{
+			break;
+		}
+
+		pData = objXmlOpeation.GetData("ServerInfo", "sport", pNextTiXmlElementPort);
+		if(pData != NULL)
+		{
+			objCheckServer.m_nPort = atoi(pData);
+		}
+		else
+		{
+			break;
+		}
+
+		pData = objXmlOpeation.GetData("ServerInfo", "MagicCode", pNextTiXmlElementMagicCode);
+		if(pData != NULL)
+		{
+			sprintf_s(objCheckServer.m_szMagicCode, sizeof(objCheckServer.m_szMagicCode), "%s", pData);
+		}
+		else
+		{
+			break;
+		}
+
+		pData = objXmlOpeation.GetData("ServerInfo", "ThreadCount", pNextTiXmlElementTCount);
+		if(pData != NULL)
+		{
+			objCheckServer.m_nThreadCount = atoi(pData);
+		}
+		else
+		{
+			break;
+		}
+
+		m_vecCheckServer.push_back(objCheckServer);
+	}
+
+	objXmlOpeation.Close();
+
+	ShowGroupServerList();
+}
+
+void CDlgClientWorkThread::OnBnClickedButton4()
+{
+	//清除加载
+	m_vecCheckServer.clear();
+
+	ShowGroupServerList();
+}
+
+void CDlgClientWorkThread::ShowGroupServerList()
+{
+	m_lbServerList.ResetContent();
+
+	for(int i = 0; i < (int)m_vecCheckServer.size(); i++)
+	{
+		char    szLog[500]  = {'\0'};
+		wchar_t szzLog[500] = {'\0'};
+
+		sprintf_s(szLog, 500, "[%s:%d]监控线程数[%d]", m_vecCheckServer[i].m_szIP, m_vecCheckServer[i].m_nPort, m_vecCheckServer[i].m_nThreadCount);
+
+		int nSrcLen = MultiByteToWideChar(CP_ACP, 0, szLog, -1, NULL, 0);
+		int nDecLen = MultiByteToWideChar(CP_ACP, 0, szLog, -1, szzLog, 500);
+
+		m_lbServerList.AddString(szzLog);
+	}
+
+}
+
+void CDlgClientWorkThread::ClearCheckServerInfo()
+{
+	for(int i = 0; i < (int)m_vecCheckServerInfo.size(); i++)
+	{
+		_CheckServerInfo* pCheckServerInfo = (_CheckServerInfo*)(m_vecCheckServerInfo[i]);
+		if(NULL != pCheckServerInfo)
+		{
+			delete pCheckServerInfo;
+		}
+	}
+
+	m_vecCheckServerInfo.clear();
 }

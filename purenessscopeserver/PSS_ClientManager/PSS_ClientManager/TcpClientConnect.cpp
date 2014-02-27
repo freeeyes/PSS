@@ -118,3 +118,18 @@ char* CTcpClientConnect::GetKey()
 {
   return m_szConsoleKey;
 }
+
+char* CTcpClientConnect::GetServerIP()
+{
+	return m_szServerIP;
+}
+
+int CTcpClientConnect::GetServerPort()
+{
+	return m_nServerPort;
+}
+
+char* CTcpClientConnect::GetServerKey()
+{
+	return m_szConsoleKey;
+}

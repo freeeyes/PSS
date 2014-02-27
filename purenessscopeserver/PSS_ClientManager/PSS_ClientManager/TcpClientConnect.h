@@ -13,6 +13,10 @@ public:
 
   bool SendConsoleMessage(const char* pMessage, int nMessageLen, char* pRevBuff, int& nRecvLen);
 
+  char* GetServerIP();
+  int GetServerPort();
+  char* GetServerKey();
+
 private:
   char m_szServerIP[20];
   int  m_nServerPort;

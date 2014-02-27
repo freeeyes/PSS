@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<!-- 监控PSS服务器集群列表 可以是多个 -->
+	<ServerInfo servername="windows PSS" sIP="127.0.0.1" sport="10010" MagicCode="freeeyes" ThreadCount="3" />
+	<!-- <ServerInfo servername="Linux PSS" sIP="172.21.1.200" sport="10010" MagicCode="freeeyes" ThreadCount="3"/> -->
+</config>
