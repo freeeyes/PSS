@@ -42,9 +42,6 @@ m_pServerObject->GetConnectManager()用于数据回应
 PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket)
 u4ConnectID是你要发送的链接ID,pBuffPacket为数据内容
 PostMessage是异步的，发送信息到发送队列后就会返回。pBuffPacket必须是new出来的，在放入此接口后不用释放，框架会负责释放这个对象。
-SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket)
-u4ConnectID是你要发送的链接ID,pBuffPacket为数据内容
-PostMessage是同步的，发送信息到发送队列后就会返回。pBuffPacket必须是new出来的，在放入此接口后不用释放，框架会负责释放这个对象。
 CloseConnect(uint32 u4ConnectID)服务器关闭一个存活的链接
 u4ConnectID为链接的ID
 _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID)

@@ -3,12 +3,9 @@
 # *****************************
 CC = g++
 AR = ar
-RANLIB = ranlib
 CFLAGS = -g -O2 -D__LINUX__
-ICONV = /home/wjl/libiconv-1.11
 INCLUDES = -I./ -I../ -I/usr/include -I${ACE_ROOT} -I../include
 LIBS = -L/usr/lib64 -L${ACE_ROOT}/lib  -L/usr/local/lib64 -L./ -L../ -lACE -lz -ldl 
-# -L${ICONV}/lib -I${ICONV}/include
 # *****************************
 # ±‰ªªπÊ‘Ú
 # *****************************
