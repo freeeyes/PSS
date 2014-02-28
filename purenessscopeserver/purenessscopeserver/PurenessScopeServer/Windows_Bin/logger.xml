@@ -3,25 +3,26 @@
 	<ServerLogHead Text="127_"  desc="日志前缀的名称，所有日志生成都会添加此前缀" />
 	<LogPath Path="./" desc="日志生成的主路径" />
 	<LogPool BlockSize="8192" PoolCount="100" desc="日志块大小相关设置，以及日志块池个数设置" />
+	<LogLevel CurrLevel="2" desc="当前日志输出级别，大于此等于级别的才会输出" />
 	<!-- logtype为1的文件会建立在Operation文件夹中 Operation为2的文件会建在ServerError文件夹中 -->
 	<!-- Display为0的会记录在文件中，Display为1的会输出在屏幕上 -->
-	<LogInfo logid="1000" logtype="1" Display="0" logname="ViewSystemLog" desc="系统日志，可以用于逻辑模块输出使用" />
-	<LogInfo logid="1001" logtype="2" Display="0" logname="ViewSystemError" desc="系统错误日志，当框架发现错误的时候记录于此" />
-	<LogInfo logid="1002" logtype="1" Display="0" logname="ViewConnect" desc="框架链接信息日志，记录来自客户端的链接请求和断开信息" />
-	<LogInfo logid="1003" logtype="1" Display="0" logname="ViewWorkThread" desc="框架工作线程日志，用于记录框架工作线程的运行状态" />
-	<LogInfo logid="1004" logtype="1" Display="0" logname="ViewPostThread" desc="框架链接其他TCP接口的工作线程运行状态监控信息" />
-	<LogInfo logid="1005" logtype="1" Display="0" logname="ViewUDPThread" desc="框架UDP链接建立和处理日志信息" />
-	<LogInfo logid="1006" logtype="1" Display="0" logname="ViewPostConnect" desc="框架链接其他TCP接口的链接建立和断开日志信息" />
-	<LogInfo logid="1007" logtype="2" Display="0" logname="ViewPacketTimeout" desc="框架记录逻辑包处理是否超时，如果有则会记录在这里" />
-	<LogInfo logid="1008" logtype="1" Display="0" logname="ViewMakePacketThread" desc="框架记录逻辑包处理线程日志信息" />
-	<LogInfo logid="1009" logtype="1" Display="0" logname="ViewConnectAbnormal" desc="框架记录客户端链接，在框架限定的超时限制外没有收到数据包而被服务器主动关闭的链接信息" />
-	<LogInfo logid="1010" logtype="2" Display="0" logname="ViewRecvQueueError" desc="框架记录客户端接收信息超时的日志信息" />
-	<LogInfo logid="1011" logtype="2" Display="0" logname="ViewSendQueueError" desc="框架记录客户端发送信息超时的日志信息" />
-	<LogInfo logid="1012" logtype="1" Display="0" logname="ViewCommandData" desc="框架记录每个注册的逻辑指令的调用次数和平均时间等信息日志" />
-	<LogInfo logid="1013" logtype="1" Display="0" logname="ViewConsoleData" desc="远程控制终端管理日志" />
-	<LogInfo logid="1014" logtype="1" Display="0" logname="ViewDebugClientRecv" desc="DEBUG日志，接收来客户端的日志，二进制字节" />
-	<LogInfo logid="1015" logtype="1" Display="0" logname="ViewDebugClientSend" desc="DEBUG日志，发送给客户端的日志，二进制字节" />
-	<LogInfo logid="1016" logtype="1" Display="0" logname="ViewDebugServerRecv" desc="DEBUG日志，接收来服务器间的日志，二进制字节" />
-	<LogInfo logid="1017" logtype="1" Display="0" logname="ViewDebugServerSend" desc="DEBUG日志，发送给服务器间的日志，二进制字节" />
-	<LogInfo logid="1018" logtype="1" Display="0" logname="ViewMonitor" desc="定时记录CPU和内存的日志" />
+	<LogInfo logid="1000" logtype="1" Display="0" Level="1" logname="ViewSystemLog" desc="系统日志，可以用于逻辑模块输出使用" />
+	<LogInfo logid="1001" logtype="2" Display="0" Level="1" logname="ViewSystemError" desc="系统错误日志，当框架发现错误的时候记录于此" />
+	<LogInfo logid="1002" logtype="1" Display="0" Level="1" logname="ViewConnect" desc="框架链接信息日志，记录来自客户端的链接请求和断开信息" />
+	<LogInfo logid="1003" logtype="1" Display="0" Level="1" logname="ViewWorkThread" desc="框架工作线程日志，用于记录框架工作线程的运行状态" />
+	<LogInfo logid="1004" logtype="1" Display="0" Level="1" logname="ViewPostThread" desc="框架链接其他TCP接口的工作线程运行状态监控信息" />
+	<LogInfo logid="1005" logtype="1" Display="0" Level="1" logname="ViewUDPThread" desc="框架UDP链接建立和处理日志信息" />
+	<LogInfo logid="1006" logtype="1" Display="0" Level="1" logname="ViewPostConnect" desc="框架链接其他TCP接口的链接建立和断开日志信息" />
+	<LogInfo logid="1007" logtype="2" Display="0" Level="1" logname="ViewPacketTimeout" desc="框架记录逻辑包处理是否超时，如果有则会记录在这里" />
+	<LogInfo logid="1008" logtype="1" Display="0" Level="1" logname="ViewMakePacketThread" desc="框架记录逻辑包处理线程日志信息" />
+	<LogInfo logid="1009" logtype="1" Display="0" Level="1" logname="ViewConnectAbnormal" desc="框架记录客户端链接，在框架限定的超时限制外没有收到数据包而被服务器主动关闭的链接信息" />
+	<LogInfo logid="1010" logtype="2" Display="0" Level="1" logname="ViewRecvQueueError" desc="框架记录客户端接收信息超时的日志信息" />
+	<LogInfo logid="1011" logtype="2" Display="0" Level="1" logname="ViewSendQueueError" desc="框架记录客户端发送信息超时的日志信息" />
+	<LogInfo logid="1012" logtype="1" Display="0" Level="1" logname="ViewCommandData" desc="框架记录每个注册的逻辑指令的调用次数和平均时间等信息日志" />
+	<LogInfo logid="1013" logtype="1" Display="0" Level="1" logname="ViewConsoleData" desc="远程控制终端管理日志" />
+	<LogInfo logid="1014" logtype="1" Display="0" Level="1" logname="ViewDebugClientRecv" desc="DEBUG日志，接收来客户端的日志，二进制字节" />
+	<LogInfo logid="1015" logtype="1" Display="0" Level="1" logname="ViewDebugClientSend" desc="DEBUG日志，发送给客户端的日志，二进制字节" />
+	<LogInfo logid="1016" logtype="1" Display="0" Level="1" logname="ViewDebugServerRecv" desc="DEBUG日志，接收来服务器间的日志，二进制字节" />
+	<LogInfo logid="1017" logtype="1" Display="0" Level="1" logname="ViewDebugServerSend" desc="DEBUG日志，发送给服务器间的日志，二进制字节" />
+	<LogInfo logid="1018" logtype="1" Display="0" Level="1" logname="ViewMonitor" desc="定时记录CPU和内存的日志" />
 </config>

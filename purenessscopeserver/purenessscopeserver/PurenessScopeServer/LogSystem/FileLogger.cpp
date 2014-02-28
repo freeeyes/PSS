@@ -61,8 +61,9 @@ bool CFileLogger::Init()
 {
 	CXmlOpeation objXmlOpeation;
 	uint16 u2LogID                  = 0;
-	uint8 u1FileClass               = 0;
-	uint8 u1DisPlay                 = 0;
+	uint8  u1FileClass              = 0;
+	uint8  u1DisPlay                = 0;
+	uint32 u4LogLevel               = 0; 
 	char szFile[MAX_BUFF_1024]      = {'\0'};
 	char szFileName[MAX_BUFF_100]   = {'\0'};
 	char szServerName[MAX_BUFF_100] = {'\0'};
@@ -108,11 +109,21 @@ bool CFileLogger::Init()
 		m_u4PoolCount = (uint32)ACE_OS::atoi(pData);
 	}
 
+	//得到日志池中的当前日志级别
+	//此功能感谢宇/ka程枫 的好想法，赞一个，积少成多就会汇聚洪流
+	uint32 u4CurrLogLevel = 0;
+	pData = objXmlOpeation.GetData("LogLevel", "CurrLevel");
+	if(pData != NULL)
+	{
+		u4CurrLogLevel = (uint32)ACE_OS::atoi(pData);
+	}
+
 	//添加子类的个数
 	TiXmlElement* pNextTiXmlElement        = NULL;
 	TiXmlElement* pNextTiXmlElementPos     = NULL;
 	TiXmlElement* pNextTiXmlElementIdx     = NULL;
 	TiXmlElement* pNextTiXmlElementDisplay = NULL;
+	TiXmlElement* pNextTiXmlElementLevel   = NULL;
 
 	while(true)
 	{
@@ -164,26 +175,41 @@ bool CFileLogger::Init()
 			break;
 		}
 
-		//添加到管理日志文件对象map中
-		mapLogFile::iterator f = m_mapLogFile.find(u2LogID);
-
-		if(f != m_mapLogFile.end())
+		//得到日志当前级别
+		pData = objXmlOpeation.GetData("LogInfo", "Level", pNextTiXmlElementDisplay);  
+		if(pData != NULL)
 		{
-			continue;
+			u4LogLevel = (uint32)atoi(pData);                                                      
+			OUR_DEBUG((LM_ERROR, "[CFileLogger::readConfig]u4LogLevel=%d\n", u4LogLevel));
+		}
+		else
+		{
+			break;
 		}
 
-		CLogFile* pLogFile = new CLogFile(m_szLogRoot, m_u4BlockSize);
+		//只有大于等于u4CurrLogLevel才会入库
+		if(u4LogLevel >= u4CurrLogLevel)
+		{
+			//添加到管理日志文件对象map中
+			mapLogFile::iterator f = m_mapLogFile.find(u2LogID);
 
-		pLogFile->SetLoggerName(szFileName);
-		pLogFile->SetLoggerType((int)u2LogID);
-		pLogFile->SetLoggerClass((int)u1FileClass);
-		pLogFile->SetServerName(szServerName);
-		pLogFile->SetDisplay(u1DisPlay);
-		pLogFile->Run();
+			if(f != m_mapLogFile.end())
+			{
+				continue;
+			}
 
-		m_mapLogFile.insert(mapLogFile::value_type(pLogFile->GetLoggerType(), pLogFile));
-		m_vecLogType.push_back(u2LogID);
+			CLogFile* pLogFile = new CLogFile(m_szLogRoot, m_u4BlockSize);
 
+			pLogFile->SetLoggerName(szFileName);
+			pLogFile->SetLoggerType((int)u2LogID);
+			pLogFile->SetLoggerClass((int)u1FileClass);
+			pLogFile->SetServerName(szServerName);
+			pLogFile->SetDisplay(u1DisPlay);
+			pLogFile->Run();
+
+			m_mapLogFile.insert(mapLogFile::value_type(pLogFile->GetLoggerType(), pLogFile));
+			m_vecLogType.push_back(u2LogID);
+		}
 	}
 
 	return true;
