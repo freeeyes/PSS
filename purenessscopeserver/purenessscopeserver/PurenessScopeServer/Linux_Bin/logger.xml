@@ -3,7 +3,7 @@
 	<ServerLogHead Text="127_"  desc="日志前缀的名称，所有日志生成都会添加此前缀" />
 	<LogPath Path="./" desc="日志生成的主路径" />
 	<LogPool BlockSize="8192" PoolCount="100" desc="日志块大小相关设置，以及日志块池个数设置" />
-	<LogLevel CurrLevel="2" desc="当前日志输出级别，大于此等于级别的才会输出" />
+	<LogLevel CurrLevel="1" desc="当前日志输出级别，大于此等于级别的才会输出" />
 	<!-- logtype为1的文件会建立在Operation文件夹中 Operation为2的文件会建在ServerError文件夹中 -->
 	<!-- Display为0的会记录在文件中，Display为1的会输出在屏幕上 -->
 	<LogInfo logid="1000" logtype="1" Display="0" Level="1" logname="ViewSystemLog" desc="系统日志，可以用于逻辑模块输出使用" />

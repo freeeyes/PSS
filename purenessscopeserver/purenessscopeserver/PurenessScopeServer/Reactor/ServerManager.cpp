@@ -8,7 +8,6 @@ CServerManager::CServerManager(void)
 CServerManager::~CServerManager(void)
 {
 	OUR_DEBUG((LM_INFO, "[CServerManager::~CServerManager].\n"));
-	SAFE_DELETE(m_pFileLogger);
 }
 
 bool CServerManager::Init()

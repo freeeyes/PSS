@@ -31,5 +31,12 @@ public:
 
 	virtual uint32 GetBlockSize()                                 = 0;
 	virtual uint32 GetPoolCount()                                 = 0;
+
+	virtual uint32 GetCurrLevel()                                 = 0;
+	virtual uint16 GetLogID(uint16 u2Index)                       = 0;
+	virtual char*  GetLogInfoByServerName(uint16 u2LogID)         = 0;
+	virtual char*  GetLogInfoByLogName(uint16 u2LogID)            = 0;
+	virtual int    GetLogInfoByLogDisplay(uint16 u2LogID)         = 0;
+	virtual bool   ReSet(uint32 u4CurrLogLevel)                   = 0;
 };
 #endif

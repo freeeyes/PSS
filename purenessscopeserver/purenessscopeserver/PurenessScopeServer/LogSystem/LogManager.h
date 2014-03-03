@@ -10,7 +10,10 @@
 #include "ILogManager.h"
 
 //管理日志块的池
+//一个使用者提议，对日志采用分级管理。
+//也就是日志里面包含了
 //add by freeeyes
+
 class CLogBlockPool
 {
 public:
@@ -26,10 +29,10 @@ public:
 	uint32 GetBlockSize();
 
 private:
-	_LogBlockInfo* m_pLogBlockInfo;
-	uint32         m_u4MaxBlockSize;
-	uint32         m_u4PoolCount;
-	uint32         m_u4CurrIndex;
+	_LogBlockInfo* m_pLogBlockInfo;       //日志池
+	uint32         m_u4MaxBlockSize;      //日志池单块最大上限
+	uint32         m_u4PoolCount;         //日志池中的日志块个数 
+	uint32         m_u4CurrIndex;         //日志池中当前已用到的日志块ID
 };
 
 
@@ -47,11 +50,23 @@ public:
 	int Start();
 	int Stop();
 	bool IsRun();
-
 	
 	int PutLog(int nLogType, _LogBlockInfo* pLogBlockInfo);
 	int RegisterLog(CServerLogger * pServerLogger);
-	int UnRegisterLog(CServerLogger * pServerLogger);
+	int UnRegisterLog();
+	
+	void SetReset(bool blReset);
+
+	void ResetLogData(uint16 u2LogLevel);
+
+	//对维护接口
+	uint32 GetLogCount();
+	uint32 GetCurrLevel();
+
+	uint16 GetLogID(uint16 u2Index);
+	char* GetLogInfoByServerName(uint16 u2LogID);
+	char* GetLogInfoByLogName(uint16 u2LogID);
+	int   GetLogInfoByLogDisplay(uint16 u2LogID);
 
 	//对外写日志的接口
 	int WriteLog(int nLogType, const char* fmt, ...);
@@ -62,12 +77,13 @@ private:
 	int ProcessLog(int nLogType, _LogBlockInfo* pLogBlockInfo);
 
 private:
-	bool                              m_blRun;
-	int                               m_nThreadCount;
-	int                               m_nQueueMax;
-	CMapTemplate<int, CServerLogger>  m_mapServerLogger;
+	bool                              m_blRun;                    //日志系统是否启动
+	bool                              m_blIsNeedReset;            //日志模块等级升级重置标志
+	int                               m_nThreadCount;             //记录日志线程个数，目前默认是1
+	int                               m_nQueueMax;                //日志线程允许的最大队列个数 
 	CLogBlockPool                     m_objLogBlockPool;          //日志块池
-	ACE_Recursive_Thread_Mutex        m_Logger_Mutex;
+	ACE_Recursive_Thread_Mutex        m_Logger_Mutex;             //线程锁
+	CServerLogger*                    m_pServerLogger;            //日志模块指针
 };
 
 

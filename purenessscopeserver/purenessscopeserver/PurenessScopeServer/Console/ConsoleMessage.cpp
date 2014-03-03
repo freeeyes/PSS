@@ -293,6 +293,16 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
 		DoMessage_GetConnectIPInfo(CommandInfo, pBuffPacket);
 		return CONSOLE_MESSAGE_SUCCESS;
 	}
+	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_GETLOGINF) == 0)
+	{
+		DoMessage_GetLogLevelInfo(CommandInfo, pBuffPacket);
+		return CONSOLE_MESSAGE_SUCCESS;
+	}
+	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SETLOGLEVEL) == 0)
+	{
+		DoMessage_SetLogLevelInfo(CommandInfo, pBuffPacket);
+		return CONSOLE_MESSAGE_SUCCESS;
+	}
 	else
 	{
 		return CONSOLE_MESSAGE_FAIL;
@@ -385,6 +395,22 @@ bool CConsoleMessage::GetTrackIP(const char* pCommand, _ForbiddenIP& ForbiddenIP
 	ACE_OS::memcpy(szTempData, pPosBegin + 3, nLen);
 	szTempData[nLen] = '\0';
 	sprintf_safe(ForbiddenIP.m_szClientIP, MAX_IP_SIZE, szTempData);
+
+	return true;
+}
+
+bool CConsoleMessage::GetLogLevel(const char* pCommand, int& nLogLevel)
+{
+	char szTempData[MAX_BUFF_100] = {'\0'};
+
+	//获得IP地址
+	char* pPosBegin = (char* )ACE_OS::strstr(pCommand, "-l ");
+	if(NULL != pPosBegin)
+	{
+		int nLen = ACE_OS::strlen(pCommand) - (int)(pPosBegin - pCommand) - 3;
+		ACE_OS::memcpy(szTempData, pPosBegin + 3, nLen);
+		nLogLevel = ACE_OS::atoi(szTempData);
+	}
 
 	return true;
 }
@@ -1455,8 +1481,6 @@ bool CConsoleMessage::DoMessage_GetConnectIPInfo(_CommandInfo& CommandInfo, IBuf
 	int nConnectID = 0;
 	if(GetConnectServerID(CommandInfo.m_szCommandExp, nConnectID) == true)
 	{
-		char szIP[MAX_BUFF_100] = {'\0'};
-		uint32 u4Port           = 0;
 #ifdef WIN32  //如果是windows
 		_ClientIPInfo objClientIPInfo = App_ProConnectManager::instance()->GetClientIPInfo((uint32)nConnectID);
 #else
@@ -1481,6 +1505,66 @@ bool CConsoleMessage::DoMessage_GetConnectIPInfo(_CommandInfo& CommandInfo, IBuf
 			(*pBuffPacket) << strSName;                         //IP
 			(*pBuffPacket) << (uint32)objClientIPInfo.m_nPort;  //端口
 		}
+	}
+
+	return true;
+}
+
+bool CConsoleMessage::DoMessage_GetLogLevelInfo( _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket )
+{
+	if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
+	{
+		(*pBuffPacket) << AppLogManager::instance()->GetLogCount();
+		(*pBuffPacket) << AppLogManager::instance()->GetCurrLevel();
+
+		for(uint16 i = 0; i < (uint16)AppLogManager::instance()->GetLogCount(); i++)
+		{
+			uint16 u2LogID = AppLogManager::instance()->GetLogID(i);
+
+			(*pBuffPacket) << u2LogID;
+
+			char* pServerName = AppLogManager::instance()->GetLogInfoByServerName(u2LogID);
+			if(NULL == pServerName)
+			{
+				//如果服务器名称为空则直接返回
+				return true;
+			}
+
+			VCHARS_STR strSName;
+			strSName.text  = pServerName;
+			strSName.u1Len = (uint8)ACE_OS::strlen(pServerName);
+
+			(*pBuffPacket) << strSName;
+
+			char* pLogName = AppLogManager::instance()->GetLogInfoByLogName(u2LogID);
+			if(NULL == pLogName)
+			{
+				//如果服务器名称为空则直接返回
+				return true;
+			}
+
+			strSName.text  = pLogName;
+			strSName.u1Len = (uint8)ACE_OS::strlen(pLogName);
+
+			(*pBuffPacket) << strSName;
+
+			uint8 u1LogType = (uint8)AppLogManager::instance()->GetLogInfoByLogDisplay(u2LogID);
+
+			(*pBuffPacket) << u1LogType;
+		}
+	}
+
+	return true;
+}
+
+bool CConsoleMessage::DoMessage_SetLogLevelInfo( _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket )
+{
+	int nLogLevel = 1;
+	if(GetLogLevel(CommandInfo.m_szCommandExp, nLogLevel) == true)
+	{
+		AppLogManager::instance()->ResetLogData(nLogLevel);
+
+		(*pBuffPacket) << (uint32)0;
 	}
 
 	return true;

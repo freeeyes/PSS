@@ -83,6 +83,16 @@ public:
 		return m_StrlogName;
 	};
 
+	ACE_TString& GetServerName()
+	{
+		return m_StrServerName;
+	}
+
+	int GetDisPlay()
+	{
+		return m_nDisplay;
+	}
+
 	void SetDisplay(int nDisplay)
 	{
 		if(nDisplay == 0)
@@ -186,7 +196,7 @@ public:
 private:
 	ACE_TString         m_StrlogName;         //模块名字
 	ACE_TString         m_StrlogType;         //日志类型
-	ACE_TString         m_StrServerName;      //日志类型
+	ACE_TString         m_StrServerName;      //服务器前缀
 	int                 m_nDisplay;           //显示还是记录文件    
 	int                 m_nType;              //模块ID
 	ACE_FILE_Connector  m_Connector;          //I/O操作连接器
@@ -209,10 +219,18 @@ public:
 	int GetLogType(int nIndex);
 
 	bool Init();
+	bool ReSet(uint32 u4CurrLogLevel);
 	bool Close();
 
 	uint32 GetBlockSize();
 	uint32 GetPoolCount();
+
+	uint32 GetCurrLevel();
+
+	uint16 GetLogID(uint16 u2Index);
+	char* GetLogInfoByServerName(uint16 u2LogID);
+	char* GetLogInfoByLogName(uint16 u2LogID);
+	int   GetLogInfoByLogDisplay(uint16 u2LogID);
 
 private:
 	typedef map<uint16, CLogFile*> mapLogFile;
@@ -224,6 +242,7 @@ private:
 
 	uint32                         m_u4BlockSize;
 	uint32                         m_u4PoolCount;
+	uint32                         m_u4CurrLogLevel;
 };
 
 #endif

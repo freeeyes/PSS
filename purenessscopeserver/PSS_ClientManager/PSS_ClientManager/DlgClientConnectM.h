@@ -35,7 +35,11 @@ protected:
 public:
   CEdit m_txtClientSocketID;
   CListCtrl m_lcClientTCPInfo;
+  CEdit m_txtLogLevel;
+  CListCtrl m_lcLogInfo;
   afx_msg void OnBnClickedButton1();
   afx_msg void OnBnClickedButton2();
   virtual BOOL OnInitDialog();
+  afx_msg void OnBnClickedButton8();
+  afx_msg void OnBnClickedButton9();
 };

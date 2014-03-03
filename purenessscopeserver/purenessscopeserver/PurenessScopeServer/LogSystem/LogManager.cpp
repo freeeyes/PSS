@@ -101,12 +101,13 @@ CLogManager::CLogManager(void)
 	m_blRun         = false;
 	m_nThreadCount  = 1;
 	m_nQueueMax     = MAX_MSG_THREADQUEUE;
+	m_pServerLogger = NULL;
 }
 
 CLogManager::~CLogManager(void)
 {
 	OUR_DEBUG((LM_ERROR,"[CLogManager::~CLogManager].\n"));
-	m_mapServerLogger.Clear();
+	SAFE_DELETE(m_pServerLogger);
 	OUR_DEBUG((LM_ERROR,"[CLogManager::~CLogManager]End.\n"));
 }
 
@@ -190,6 +191,7 @@ int CLogManager::Start()
 	}
 	else
 	{
+		SetReset(false);
 		return open();
 	}
 	
@@ -209,6 +211,14 @@ bool CLogManager::IsRun()
 int CLogManager::PutLog(int nLogType, _LogBlockInfo* pLogBlockInfo)
 {
 	ACE_Message_Block* mb = NULL;
+
+	//如果正在重新加载
+	if(m_blIsNeedReset == true)
+	{
+		//回收日志块
+		m_objLogBlockPool.ReturnBlockInfo(pLogBlockInfo);
+		return 0;
+	}
 
 	ACE_NEW_MALLOC_NORETURN (mb,
 		static_cast<ACE_Message_Block*>(_log_service_mb_allocator.malloc (sizeof (ACE_Message_Block))),
@@ -236,6 +246,8 @@ int CLogManager::PutLog(int nLogType, _LogBlockInfo* pLogBlockInfo)
 		if (msgcount >= m_nQueueMax) 
 		{
 			OUR_DEBUG((LM_INFO,"[CLogManager::PutLog] CLogManager queue is full!\n"));
+			//回收日志块
+			m_objLogBlockPool.ReturnBlockInfo(pLogBlockInfo);
 			mb->release();
 			return 1;
 		}
@@ -244,6 +256,8 @@ int CLogManager::PutLog(int nLogType, _LogBlockInfo* pLogBlockInfo)
 		if(this->putq(mb, &xtime) == -1)
 		{
 			OUR_DEBUG((LM_ERROR,"[CLogManager::PutLog] CLogManager putq error(%s)!\n", pLogBlockInfo->m_pBlock));
+			//回收日志块
+			m_objLogBlockPool.ReturnBlockInfo(pLogBlockInfo);
 			mb->release();
 			return -1;
 		}
@@ -261,18 +275,13 @@ int CLogManager::RegisterLog(CServerLogger* pServerLogger)
 		return -1;
 	}
 
-	int nLogTypeCount = pServerLogger->GetLogTypeCount();
-
-	for(int i = 0; i < nLogTypeCount; i++)
+	//填入日志类型对象
+	if(m_pServerLogger != NULL)
 	{
-		int nLogType = pServerLogger->GetLogType(i);
-		if(nLogType <= 0)
-		{
-			continue;
-		}
-
-		m_mapServerLogger.AddMapData(nLogType, pServerLogger);
+		SAFE_DELETE(m_pServerLogger);
 	}
+
+	m_pServerLogger = pServerLogger;
 
 	//初始化日志池
 	OUR_DEBUG((LM_ERROR,"[CLogManager::RegisterLog] GetBlockSize=%d, GetPoolCount=%d!\n", pServerLogger->GetBlockSize(), pServerLogger->GetPoolCount()));	
@@ -281,26 +290,11 @@ int CLogManager::RegisterLog(CServerLogger* pServerLogger)
 	return 0;
 }
 
-int CLogManager::UnRegisterLog(CServerLogger* pServerLogger)
+int CLogManager::UnRegisterLog()
 {
-	CServerLogger* pTempServerLogger = NULL;
-	vector<int>    vecDel;
-	int            i = 0;
-
-	int nLogTypeCount = m_mapServerLogger.GetSize();
-	for(i = 0; i < nLogTypeCount; i++)
+	if(m_pServerLogger != NULL)
 	{
-		pTempServerLogger = m_mapServerLogger.GetMapData(i);
-		if(pTempServerLogger == pServerLogger)
-		{
-			int nLogType = m_mapServerLogger.GetMapDataKey(i);
-			vecDel.push_back(nLogType);
-		}
-	}
-
-	for(i = 0; i < (int)vecDel.size(); i++)
-	{
-		m_mapServerLogger.DelMapData(vecDel[i]);
+		SAFE_DELETE(m_pServerLogger);
 	}
 
 	return 0;
@@ -308,16 +302,13 @@ int CLogManager::UnRegisterLog(CServerLogger* pServerLogger)
 
 int CLogManager::ProcessLog(int nLogType, _LogBlockInfo* pLogBlockInfo)
 {
-	CServerLogger* pServerLogger = NULL;
-
-	pServerLogger = m_mapServerLogger.SearchMapData(nLogType);
-	if(NULL == pServerLogger)
+	if(NULL == m_pServerLogger)
 	{
 		return -1;
 	}
 
 	//m_Logger_Mutex.acquire();
-	pServerLogger->DoLog(nLogType, pLogBlockInfo);
+	m_pServerLogger->DoLog(nLogType, pLogBlockInfo);
 	//m_Logger_Mutex.release();
 	return 0;
 }
@@ -410,4 +401,95 @@ int CLogManager::WriteLogBinary(int nLogType, const char* pData, int nLen)
 
 	m_Logger_Mutex.release();
 	return nRet;
+}
+
+void CLogManager::SetReset(bool blReset)
+{
+	m_blIsNeedReset = blReset;
+}
+
+void CLogManager::ResetLogData(uint16 u2LogLevel)
+{
+	//重新设置日志等级，加载日志文件
+	SetReset(true);
+
+	//这里等待一段时间，等待其他日志全部写入完成，在重载日志模块。
+	//这样做少加一个锁
+	ACE_Time_Value tvSleep(0, 1000);
+	ACE_OS::sleep(tvSleep);
+
+	m_pServerLogger->ReSet(u2LogLevel);
+	SetReset(false);
+}
+
+uint32 CLogManager::GetLogCount()
+{
+	if(m_pServerLogger != NULL)
+	{
+		return m_pServerLogger->GetLogTypeCount();
+	}
+	else
+	{
+		return (uint32)0;
+	}
+}
+
+uint32 CLogManager::GetCurrLevel()
+{
+	if(m_pServerLogger != NULL)
+	{
+		return m_pServerLogger->GetCurrLevel();
+	}
+	else
+	{
+		return (uint32)0;
+	}
+}
+
+uint16 CLogManager::GetLogID(uint16 u2Index)
+{
+	if(m_pServerLogger != NULL)
+	{
+		return m_pServerLogger->GetLogID(u2Index);
+	}
+	else
+	{
+		return (uint16)0;
+	}
+}
+
+char* CLogManager::GetLogInfoByServerName(uint16 u2LogID)
+{
+	if(m_pServerLogger != NULL)
+	{
+		return m_pServerLogger->GetLogInfoByServerName(u2LogID);
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+char* CLogManager::GetLogInfoByLogName(uint16 u2LogID)
+{
+	if(m_pServerLogger != NULL)
+	{
+		return m_pServerLogger->GetLogInfoByLogName(u2LogID);
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+int CLogManager::GetLogInfoByLogDisplay(uint16 u2LogID)
+{
+	if(m_pServerLogger != NULL)
+	{
+		return m_pServerLogger->GetLogType(u2LogID);
+	}
+	else
+	{
+		return 0;
+	}
 }
