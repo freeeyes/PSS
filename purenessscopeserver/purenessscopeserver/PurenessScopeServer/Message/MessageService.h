@@ -95,13 +95,14 @@ private:
 	vecMessageService m_vecMessageService;
 
 public:
-	CThreadInfo       m_objAllThreadInfo;
-	uint32            m_u4TimerID;           //定时器ID
-	uint16            m_u2ThreadTimeCheck;   //线程自检时间
-	uint32            m_u4MaxQueue;          //线程中最大消息对象个数
-	uint32            m_u4HighMask;          //线程高水位
-	uint32            m_u4LowMask;           //线程低水位
-	CRandomNumber     m_objRandomNumber;     //随机数，仅UDP使用
+	CThreadInfo                m_objAllThreadInfo;    //当前所有线程信息
+	uint32                     m_u4TimerID;           //定时器ID
+	uint16                     m_u2ThreadTimeCheck;   //线程自检时间
+	uint32                     m_u4MaxQueue;          //线程中最大消息对象个数
+	uint32                     m_u4HighMask;          //线程高水位
+	uint32                     m_u4LowMask;           //线程低水位
+	CRandomNumber              m_objRandomNumber;     //随机数，仅UDP使用
+	//ACE_Recursive_Thread_Mutex m_ThreadWriteLock;     //当前线程锁
 };
 
 

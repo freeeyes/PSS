@@ -11,11 +11,15 @@
 #define COMMAND_AUTOTEST_NOHEAD       0x5001   //不带头数据包
 #define COMMAND_AUTOTEST_HEADBUFF     0x5002   //带头缓冲数据包
 #define COMMAND_AUTOTEST_NOHEADBUFF   0x5003   //不带头缓冲数据包
+#define COMMAND_AUTOTEST_LOGDATA      0x5004   //测试记录日志
+#define COMMAND_AUTOTEST_WORKTIMEOUT  0x5005   //测试工作线程超时重建
 
 #define COMMAND_AUTOTEST_RETUEN_HEAD         0xf000   
 #define COMMAND_AUTOTEST_RETUEN_NOHEAD       0xf001
 #define COMMAND_AUTOTEST_RETUEN_HEADBUFF     0xf002
 #define COMMAND_AUTOTEST_RETUEN_NOHEADBUFF   0xf003
+#define COMMAND_AUTOTEST_RETUEN_LOGDATA      0xf004
+#define COMMAND_AUTOTEST_RETURN_WORKTIMEOUT  0xf005
 
 class CConvertBuffer
 {
@@ -199,9 +203,11 @@ public:
 // 对话框数据
 	enum { IDD = IDD_TCPPACKETCHECK_DIALOG };
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
 
+public:
+	void Run();
 
 // 实现
 protected:
@@ -223,7 +229,8 @@ private:
 	bool CheckIsNoHead(_ClientInfo& objClientInfo, int nIndex);
 	bool CheckIsHeadBuffer(_ClientInfo& objClientInfo, int nIndex);
 	bool CheckIsNoHeadBuffer(_ClientInfo& objClientInfo, int nIndex);
-
+	bool CheckLogFile(_ClientInfo& objClientInfo, int nIndex);
+	bool CheckWorkTimeout(_ClientInfo& objClientInfo, int nIndex);
 
 private:
 	CEdit m_txtPacketBuffer;
@@ -234,4 +241,7 @@ private:
 public:
 	afx_msg void OnBnClickedButton1();
 	afx_msg void OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult);
+
+public:
+	CButton m_btnRun;
 };

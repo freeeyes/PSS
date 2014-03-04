@@ -69,6 +69,14 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 	{
 		Do_NoHeadBuff(pMessage);
 	}
+	else if(pMessage->GetMessageBase()->m_u2Cmd == COMMAND_AUTOTEST_LOGDATA)
+	{
+		Do_LogData(pMessage);
+	}
+	else if(pMessage->GetMessageBase()->m_u2Cmd == COMMAND_AUTOTEST_WORKTIMEOUT)
+	{
+		Do_SleepWorkThread(pMessage);
+	}
 
 	return 0;
 
@@ -263,5 +271,108 @@ bool CBaseCommand::Do_NoHeadBuff(IMessage* pMessage)
 		m_pServerObject->GetPacketManager()->Delete(pResponsesPacket1);
 	}
 
+	return true;
+}
+
+bool CBaseCommand::Do_LogData(IMessage* pMessage)
+{
+	uint32     u4PacketLen  = 0;
+	uint16     u2CommandID  = 0;
+	uint32     u4Index      = 0;
+
+	//OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] CommandID = %d", COMMAND_BASE));
+
+	IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();
+	if(NULL == pBodyPacket)
+	{
+		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] pBodyPacket is NULL.\n"));
+		return false;
+	}
+
+	_PacketInfo BodyPacket;
+	pMessage->GetPacketBody(BodyPacket);
+
+	pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
+
+	(*pBodyPacket) >> u2CommandID;
+	(*pBodyPacket) >> u4Index;
+
+	m_pServerObject->GetPacketManager()->Delete(pBodyPacket);
+
+	//写入日志
+	m_pServerObject->GetLogManager()->WriteLog(LOG_SYSTEM, "[Do_LogData]LogData nIdex=%d.", u4Index);
+
+	IBuffPacket* pResponsesPacket = m_pServerObject->GetPacketManager()->Create();
+	uint16 u2PostCommandID = COMMAND_AUTOTEST_RETUEN_LOGDATA;
+
+	(*pResponsesPacket) << u2PostCommandID;
+	(*pResponsesPacket) << (uint32)0;
+
+	if(NULL != m_pServerObject->GetConnectManager())
+	{
+		//发送全部数据
+		m_pServerObject->GetConnectManager()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID, pResponsesPacket, SENDMESSAGE_NOMAL, u2PostCommandID, PACKET_SEND_IMMEDIATLY, PACKET_IS_FRAMEWORK_RECYC);
+	}
+	else
+	{
+		OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] m_pConnectManager = NULL"));
+		m_pServerObject->GetPacketManager()->Delete(pResponsesPacket);
+	}
+
+	return true;
+}
+
+bool CBaseCommand::Do_SleepWorkThread(IMessage* pMessage)
+{
+	uint32     u4PacketLen  = 0;
+	uint16     u2CommandID  = 0;
+	uint32     u4Index      = 0;
+
+	//OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] CommandID = %d", COMMAND_BASE));
+
+	IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();
+	if(NULL == pBodyPacket)
+	{
+		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] pBodyPacket is NULL.\n"));
+		return false;
+	}
+
+	_PacketInfo BodyPacket;
+	pMessage->GetPacketBody(BodyPacket);
+
+	pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
+
+	(*pBodyPacket) >> u2CommandID;
+	(*pBodyPacket) >> u4Index;
+
+	m_pServerObject->GetPacketManager()->Delete(pBodyPacket);
+
+	m_pServerObject->GetLogManager()->WriteLog(LOG_SYSTEM, "[Do_SleepWorkThread]LogData nIdex=%d.", u4Index);
+
+	//如果是第一个包，沉睡10秒
+	if(u4Index == 0)
+	{
+		//沉睡10秒
+		ACE_Time_Value tvSleep(10, 0);
+		ACE_OS::sleep(tvSleep);
+	}
+
+	
+	IBuffPacket* pResponsesPacket = m_pServerObject->GetPacketManager()->Create();
+	uint16 u2PostCommandID = COMMAND_AUTOTEST_RETURN_WORKTIMEOUT;
+
+	(*pResponsesPacket) << u2PostCommandID;
+	(*pResponsesPacket) << (uint32)0;
+
+	if(NULL != m_pServerObject->GetConnectManager())
+	{
+		//发送全部数据
+		m_pServerObject->GetConnectManager()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID, pResponsesPacket, SENDMESSAGE_NOMAL, u2PostCommandID, PACKET_SEND_IMMEDIATLY, PACKET_IS_FRAMEWORK_RECYC);
+	}
+	else
+	{
+		OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] m_pConnectManager = NULL"));
+		m_pServerObject->GetPacketManager()->Delete(pResponsesPacket);
+	}
 	return true;
 }

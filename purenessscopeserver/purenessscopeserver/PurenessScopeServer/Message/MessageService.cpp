@@ -40,9 +40,11 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
 	m_u4HighMask    = u4HighMask;
 	m_u4LowMask     = u4LowMask;
 
+	OUR_DEBUG((LM_INFO, "[CMessageService::Init]ID=%d,m_u4State=%d.\n", m_u4ThreadID = u4ThreadID, m_ThreadInfo.m_u4State));
+
 	//添加线程信息
 	m_u4ThreadID = u4ThreadID;
-	m_ThreadInfo.m_u4ThreadID = u4ThreadID;
+	m_ThreadInfo.m_u4ThreadID   = u4ThreadID;
 
 	m_u4WorkQueuePutTime = App_MainConfig::instance()->GetWorkQueuePutTime() * 1000;
 }
@@ -198,6 +200,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 	//在这里进行线程自检代码
 	m_ThreadInfo.m_tvUpdateTime = ACE_OS::gettimeofday();
 	m_ThreadInfo.m_u4State = THREAD_RUNBEGIN;
+	OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage]1 [%d],m_u4State=%d, commandID=%d.\n", u4ThreadID, m_ThreadInfo.m_u4State,  pMessage->GetMessageBase()->m_u2Cmd));
 
 	//抛出掉链接建立和断开，只计算逻辑数据包
 	if(pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CONNECT && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CDISCONNET && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_SDISCONNET)
@@ -218,6 +221,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 	App_MessageManager::instance()->DoMessage(pMessage, u2CommandID);
 
 	m_ThreadInfo.m_u4State = THREAD_RUNEND;
+	OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage]2 [%d],m_u4State=%d,CommandID=%d.\n", u4ThreadID, m_ThreadInfo.m_u4State, pMessage->GetMessageBase()->m_u2Cmd));
 
 	if(pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CONNECT && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CDISCONNET && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_SDISCONNET)
 	{
@@ -284,6 +288,7 @@ bool CMessageService::SaveThreadInfoData()
 	ACE_Date_Time dt(m_ThreadInfo.m_tvUpdateTime);
 
 	//开始查看线程是否超时
+	OUR_DEBUG((LM_INFO, "[CMessageService::SaveThreadInfoData]ID=%d,m_u4State=%d,m_u2ThreadTimeOut=%d,cost=%d.\n", m_ThreadInfo.m_u4ThreadID, m_ThreadInfo.m_u4State, m_u2ThreadTimeOut, tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec()));
 	if(m_ThreadInfo.m_u4State == THREAD_RUNBEGIN && tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec() > m_u2ThreadTimeOut)
 	{
 		AppLogManager::instance()->WriteLog(LOG_SYSTEM_WORKTHREAD, "[CMessageService::handle_timeout] pThreadInfo = [%d] State = [%d] Time = [%04d-%02d-%02d %02d:%02d:%02d] PacketCount = [%d] LastCommand = [0x%x] PacketTime = [%d] TimeOut > %d[%d] CurrPacketCount = [%d] QueueCount = [%d] BuffPacketUsed = [%d] BuffPacketFree = [%d].", 
@@ -366,8 +371,27 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value &tv, const void *a
 			bool blFlag = pMessageService->SaveThreadInfo();
 			if(false == blFlag)
 			{
+				//首先让对象失效
+				//m_ThreadWriteLock.acquire();
+				m_vecMessageService[i] = NULL;
+				//m_ThreadWriteLock.release();
+
 				//获得当前线程ID
 				uint32 u4ThreadID = pMessageService->GetThreadInfo()->m_u4ThreadID;
+
+				//杀死当前工作线程
+#ifdef WIN32
+				ACE_hthread_t hthread = 0; 
+				int grp_id = pMessageService->grp_id(); 
+				if (ACE_Thread_Manager::instance()->hthread_grp_list(grp_id, &hthread, 1) == 1)
+				{
+					int ret = ::TerminateThread (hthread, -1); 
+					ACE_Thread_Manager::instance()->wait_grp (grp_id); 
+					ACE_DEBUG ((LM_DEBUG, "kill return %d, %d\n", ret, GetLastError ())); 
+				}
+#else
+				ACE_Thread_Manager::instance()->kill_grp(grp_id, SIGUSR1);
+#endif
 
 				//需要重启工作线程，先关闭当前的工作线程
 				pMessageService->Close();
@@ -380,7 +404,9 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value &tv, const void *a
 					pMessageService->Init(u4ThreadID, m_u4MaxQueue, m_u4LowMask, m_u4HighMask);
 					pMessageService->Start();
 
+					//m_ThreadWriteLock.acquire();
 					m_vecMessageService[i] = pMessageService;
+					//m_ThreadWriteLock.release();
 
 				}
 				else
@@ -450,12 +476,13 @@ bool CMessageServiceGroup::PutMessage(CMessage* pMessage)
 		u4ThreadID = m_objRandomNumber.GetRandom();
 	}
 	
-
+	//m_ThreadWriteLock.acquire();
 	CMessageService* pMessageService = (CMessageService* )m_vecMessageService[u4ThreadID];
 	if(NULL != pMessageService)
 	{
 		pMessageService->PutMessage(pMessage);
 	}
+	//m_ThreadWriteLock.release();
 
 	return true;
 }

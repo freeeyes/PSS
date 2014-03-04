@@ -11,6 +11,17 @@
 
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
+//线程执行
+DWORD WINAPI ThreadProc(LPVOID argv)
+{
+	CTcpPacketCheckDlg* pTcpPacketCheckDlg = (CTcpPacketCheckDlg* )argv;
+
+	pTcpPacketCheckDlg->m_btnRun.EnableWindow(FALSE);
+	pTcpPacketCheckDlg->Run();
+	pTcpPacketCheckDlg->m_btnRun.EnableWindow(TRUE);
+
+	return 0;
+}
 
 class CAboutDlg : public CDialog
 {
@@ -60,6 +71,7 @@ void CTcpPacketCheckDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT3, m_txtPort);
 	DDX_Control(pDX, IDC_EDIT4, m_txtRecvLength);
 	DDX_Control(pDX, IDC_LIST1, m_lstResult);
+	DDX_Control(pDX, IDC_BUTTON1, m_btnRun);
 }
 
 BEGIN_MESSAGE_MAP(CTcpPacketCheckDlg, CDialog)
@@ -173,107 +185,8 @@ HCURSOR CTcpPacketCheckDlg::OnQueryDragIcon()
 
 void CTcpPacketCheckDlg::OnBnClickedButton1()
 {
-	_ClientInfo objClientInfo;
-
-	//获得发送的IP和端口
-	CString strServerIP;
-	CString strPort;
-	char szServerIP[30]   = {'\0'};
-	char szServerPort[20] = {'\0'};
-
-	m_txtServerIP.GetWindowText(strServerIP);
-	m_txtPort.GetWindowText(strPort);
-
-	int nSrcLen = WideCharToMultiByte(CP_ACP, 0, strServerIP, strServerIP.GetLength(), NULL, 0, NULL, NULL);
-	int nDecLen = WideCharToMultiByte(CP_ACP, 0, strServerIP, nSrcLen, szServerIP, 30, NULL,NULL);
-	szServerIP[nDecLen] = '\0';
-
-	nSrcLen = WideCharToMultiByte(CP_ACP, 0, strPort, strPort.GetLength(), NULL, 0, NULL, NULL);
-	nDecLen = WideCharToMultiByte(CP_ACP, 0, strPort, nSrcLen, szServerPort, 30, NULL,NULL);
-	szServerPort[nDecLen] = '\0';
-
-	if(strlen(szServerPort) == 0 || strlen(szServerIP) == 0)
-	{
-		MessageBox(_T("必须输入要发送的IP和端口") , _T("错误信息"), MB_OK);
-		return;
-	}
-
-	int nServerPort = atoi(szServerPort);
-
-	sprintf_s(objClientInfo.m_szServerIP, 30, "%s", szServerIP);
-	objClientInfo.m_nPort = nServerPort;
-
-	//获得验证包长度
-	CString strRecvLength;
-	char szRecvLength[10] = {'\0'};
-
-	m_txtRecvLength.GetWindowText(strRecvLength);
-
-	nSrcLen = WideCharToMultiByte(CP_ACP, 0, strRecvLength, strRecvLength.GetLength(), NULL, 0, NULL, NULL);
-	nDecLen = WideCharToMultiByte(CP_ACP, 0, strRecvLength, nSrcLen, szRecvLength, 30, NULL,NULL);
-	szRecvLength[nDecLen] = '\0';
-
-	if(strlen(szRecvLength) == 0)
-	{
-		MessageBox(_T("必须输入验证接收字节长度") , _T("错误信息"), MB_OK);
-		return;
-	}
-
-	objClientInfo.m_nRecvLength = atoi(szRecvLength);
-
-	//获取发送Buffer
-	CString strPacketBuffer;
-	char szPacketBuffer[500] = {'\0'};
-
-	m_txtPacketBuffer.GetWindowText(strPacketBuffer);
-
-	nSrcLen = WideCharToMultiByte(CP_ACP, 0, strPacketBuffer, strPacketBuffer.GetLength(), NULL, 0, NULL, NULL);
-	nDecLen = WideCharToMultiByte(CP_ACP, 0, strPacketBuffer, nSrcLen, szPacketBuffer, 500, NULL,NULL);
-	szPacketBuffer[nDecLen] = '\0';
-
-	if(strlen(szPacketBuffer) == 0)
-	{
-		MessageBox(_T("必须输入发送数据包") , _T("错误信息"), MB_OK);
-		return;
-	}
-
-	CConvertBuffer objConvertBuffer;
-	int nSendLength = objConvertBuffer.GetBufferSize(szPacketBuffer, nDecLen);
-	char* pSendBuffer = new char[nSendLength];
-	objConvertBuffer.Convertstr2charArray(szPacketBuffer, strlen(szPacketBuffer), (unsigned char*)pSendBuffer, nSendLength);
-
-	objClientInfo.m_pSendBuffer = pSendBuffer;
-	objClientInfo.m_nSendLength = nSendLength;
-
-	//开始测试
-	int nIndex = 0;
-	m_lstResult.DeleteAllItems();
-
-	//单个包检测
-	CheckTcpPacket(objClientInfo, nIndex++);
-
-	//多个包检测
-	CheckMultipleTcpPacket(objClientInfo, nIndex++);
-
-	//无效包检测
-	CheckValidPacket(objClientInfo, nIndex++);
-
-	//任意切割数据包检测
-	CheckHalfPacket(objClientInfo, nIndex++);
-
-	//测试数据包包含包头
-	CheckIsHead(objClientInfo, nIndex++);
-
-	//检测直接返回数据包(透传指令)
-	CheckIsNoHead(objClientInfo, nIndex++);
-
-	//检测带包头的缓冲
-	CheckIsHeadBuffer(objClientInfo, nIndex++);
-
-	//检测不带包头缓冲
-	CheckIsNoHeadBuffer(objClientInfo, nIndex++);
-
-	delete[] pSendBuffer;
+	DWORD  ThreadID = 0;
+	CreateThread(NULL, NULL, ThreadProc, (LPVOID)this, NULL, &ThreadID);
 }
 
 bool CTcpPacketCheckDlg::CheckTcpPacket( _ClientInfo& objClientInfo, int nIndex)
@@ -1791,6 +1704,440 @@ bool CTcpPacketCheckDlg::CheckIsNoHeadBuffer( _ClientInfo& objClientInfo, int nI
 	return true;
 }
 
+
+bool CTcpPacketCheckDlg::CheckLogFile( _ClientInfo& objClientInfo, int nIndex )
+{
+	SOCKET sckClient;
+	char szResult[1024]     = {'\0'};
+	wchar_t sszResult[1024] = {'\0'};
+	int nSrcLen = 0;
+	int nDecLen = 0;
+
+	int nLogCount = 2;
+
+	for(int i = 0; i < nLogCount; i++)
+	{
+		//socket创建的准备工作
+		struct sockaddr_in sockaddr;
+
+		memset(&sockaddr, 0, sizeof(sockaddr));
+		sockaddr.sin_family = AF_INET;
+		sockaddr.sin_port   = htons(objClientInfo.m_nPort);
+		sockaddr.sin_addr.S_un.S_addr = inet_addr(objClientInfo.m_szServerIP);
+
+		sckClient = socket(AF_INET, SOCK_STREAM, 0);
+
+		DWORD TimeOut = (DWORD)2000;
+		::setsockopt(sckClient, SOL_SOCKET, SO_RCVTIMEO, (char *)&TimeOut, sizeof(TimeOut));
+
+		//连接远程服务器
+		int nErr = connect(sckClient, (SOCKADDR*)&sockaddr, sizeof(SOCKADDR));
+		if(0 != nErr)
+		{
+			DWORD dwError = GetLastError();
+			sprintf_s(szResult, 1024, "[e]与[%s:%d]服务器连接失败，错误号[%d]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, dwError);
+
+			nDecLen = MultiByteToWideChar(CP_ACP, 0, szResult, -1, sszResult, 1024);
+
+			m_lstResult.InsertItem(nIndex, _T("日志信息接口检测"));
+			m_lstResult.SetItemText(nIndex, 1, sszResult);
+
+			return false;
+		}
+
+		//拼装发送包体
+		char szSendBuffer[MAX_BUFF_200] ={'\0'};
+
+		short sCommand = (short)COMMAND_AUTOTEST_LOGDATA;
+		int nPacketLen = 4 + 2;
+
+		memcpy_s(szSendBuffer, sizeof(int), (char* )&nPacketLen, sizeof(int));
+		memcpy_s((char* )&szSendBuffer[4], sizeof(short), (char* )&sCommand, sizeof(short));
+		memcpy_s((char* )&szSendBuffer[6], sizeof(int), (char* )&i, sizeof(int));
+		int nSendLen = nPacketLen + 4;
+
+		//发送数据
+		int nTotalSendLen = nSendLen;
+		int nBeginSend    = 0;
+		int nCurrSendLen  = 0;
+		bool blSendFlag   = false;
+		int nBeginRecv    = 0;
+		int nCurrRecvLen  = 0;
+		bool blRecvFlag   = false;
+		while(true)
+		{
+			nCurrSendLen = send(sckClient, szSendBuffer + nBeginSend, nTotalSendLen, 0);
+			if(nCurrSendLen <= 0)
+			{
+				closesocket(sckClient);
+
+				DWORD dwError = GetLastError();
+				sprintf_s(szResult, 1024, "[e]与[%s:%d]服务器发送数据失败，错误号[%d]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, dwError);
+
+				nDecLen = MultiByteToWideChar(CP_ACP, 0, szResult, -1, sszResult, 1024);
+
+				m_lstResult.InsertItem(nIndex, _T("日志信息接口检测"));
+				m_lstResult.SetItemText(nIndex, 1, sszResult);
+
+				return false;
+			}
+			else
+			{
+				nTotalSendLen -= nCurrSendLen;
+				if(nTotalSendLen == 0)
+				{
+					//发送完成
+					blSendFlag = true;
+					break;
+				}
+				else
+				{
+					nBeginSend += nCurrSendLen;
+				}
+			}
+		}
+
+		if(blSendFlag == false)
+		{
+			closesocket(sckClient);
+
+			sprintf_s(szResult, 1024, "[e]与[%s:%d]发送字节数不匹配，缓冲字节数[%d]，实际发送字节数[%d]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, objClientInfo.m_nSendLength, nTotalSendLen);
+
+			nDecLen = MultiByteToWideChar(CP_ACP, 0, szResult, -1, sszResult, 1024);
+
+			m_lstResult.InsertItem(nIndex, _T("日志信息接口检测"));
+			m_lstResult.SetItemText(nIndex, 1, sszResult);
+
+			return false;
+		}
+		else
+		{
+			int nTotalRecvLen               = 10;
+			char szRecvBuffData[1024 * 100] = {'\0'};
+
+			while(true)
+			{
+
+				//如果发送成功了，则处理接收数据
+				nCurrRecvLen = recv(sckClient, (char* )szRecvBuffData + nBeginRecv, nTotalRecvLen, 0);
+				if(nCurrRecvLen <= 0)
+				{
+					closesocket(sckClient);
+
+					DWORD dwError = GetLastError();
+					sprintf_s(szResult, 1024, "[e]与[%s:%d]服务器接收数据失败，错误号[%d]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, dwError);
+
+					nDecLen = MultiByteToWideChar(CP_ACP, 0, szResult, -1, sszResult, 1024);
+
+					m_lstResult.InsertItem(nIndex, _T("日志信息接口检测"));
+					m_lstResult.SetItemText(nIndex, 1, sszResult);
+
+					return false;
+				}
+				else
+				{
+					nTotalRecvLen -= nCurrRecvLen;
+					if(nTotalRecvLen == 0)
+					{
+						//接收完成
+						break;
+					}
+					else
+					{
+						nBeginRecv += nCurrRecvLen;
+					}
+				}
+			}
+
+			//检测接收数据的正确性
+			int nRecvPacketSize = 0;
+			int nReturnCommand  = 0;
+			int nResult         = 0;
+
+			memcpy_s((char* )&nRecvPacketSize, sizeof(int), (char* )&szRecvBuffData[0], sizeof(int));
+			memcpy_s((char* )&nReturnCommand, sizeof(short), (char* )&szRecvBuffData[4], sizeof(short));
+			memcpy_s((char* )&nResult, sizeof(int), (char* )&szRecvBuffData[6], sizeof(int));
+
+			//检测返回包头大小
+			if(nRecvPacketSize != 6)
+			{
+				closesocket(sckClient);
+
+				sprintf_s(szResult, 1024, "[e]与[%s:%d]接收返回包大小不对。", objClientInfo.m_szServerIP, objClientInfo.m_nPort);
+
+				nDecLen = MultiByteToWideChar(CP_ACP, 0, szResult, -1, sszResult, 1024);
+
+				m_lstResult.InsertItem(nIndex, _T("日志信息接口检测"));
+				m_lstResult.SetItemText(nIndex, 1, sszResult);
+
+				return false;
+			}
+
+			//判断返回命令字
+			if(nReturnCommand != (int)COMMAND_AUTOTEST_RETUEN_LOGDATA)
+			{
+				closesocket(sckClient);
+
+				sprintf_s(szResult, 1024, "[e]与[%s:%d]接受包返回命令字不对。", objClientInfo.m_szServerIP, objClientInfo.m_nPort);
+
+				nDecLen = MultiByteToWideChar(CP_ACP, 0, szResult, -1, sszResult, 1024);
+
+				m_lstResult.InsertItem(nIndex, _T("日志信息接口检测"));
+				m_lstResult.SetItemText(nIndex, 1, sszResult);
+
+				return false;
+			}
+
+			//判断返回数据
+			if(nResult != 0)
+			{
+				closesocket(sckClient);
+
+				sprintf_s(szResult, 1024, "[e]与[%s:%d]接受包数据和发送数据不符。", objClientInfo.m_szServerIP, objClientInfo.m_nPort);
+
+				nDecLen = MultiByteToWideChar(CP_ACP, 0, szResult, -1, sszResult, 1024);
+
+				m_lstResult.InsertItem(nIndex, _T("日志信息接口检测"));
+				m_lstResult.SetItemText(nIndex, 1, sszResult);
+
+				return false;
+			}
+		}
+
+		closesocket(sckClient);
+
+		//等待100毫秒
+		//SleepEx(100, TRUE);
+	}
+
+	sprintf_s(szResult, 1024, "[s]与[%s:%d](%d)个日志数据包检测成功。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, nLogCount);
+
+	nDecLen = MultiByteToWideChar(CP_ACP, 0, szResult, -1, sszResult, 1024);
+
+	m_lstResult.InsertItem(nIndex, _T("日志信息接口检测"));
+	m_lstResult.SetItemText(nIndex, 1, sszResult);
+
+	return true;
+}
+
+bool CTcpPacketCheckDlg::CheckWorkTimeout( _ClientInfo& objClientInfo, int nIndex )
+{
+	SOCKET sckClient;
+	char szResult[1024]     = {'\0'};
+	wchar_t sszResult[1024] = {'\0'};
+	int nSrcLen = 0;
+	int nDecLen = 0;
+
+	int nLogCount = 2;
+
+	for(int i = 0; i < nLogCount; i++)
+	{
+		//socket创建的准备工作
+		struct sockaddr_in sockaddr;
+
+		memset(&sockaddr, 0, sizeof(sockaddr));
+		sockaddr.sin_family = AF_INET;
+		sockaddr.sin_port   = htons(objClientInfo.m_nPort);
+		sockaddr.sin_addr.S_un.S_addr = inet_addr(objClientInfo.m_szServerIP);
+
+		sckClient = socket(AF_INET, SOCK_STREAM, 0);
+
+		DWORD TimeOut = (DWORD)2000;
+		::setsockopt(sckClient, SOL_SOCKET, SO_RCVTIMEO, (char *)&TimeOut, sizeof(TimeOut));
+
+		//连接远程服务器
+		int nErr = connect(sckClient, (SOCKADDR*)&sockaddr, sizeof(SOCKADDR));
+		if(0 != nErr)
+		{
+			DWORD dwError = GetLastError();
+			sprintf_s(szResult, 1024, "[e]与[%s:%d]服务器连接失败，错误号[%d]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, dwError);
+
+			nDecLen = MultiByteToWideChar(CP_ACP, 0, szResult, -1, sszResult, 1024);
+
+			m_lstResult.InsertItem(nIndex, _T("工作线程自我修复检测"));
+			m_lstResult.SetItemText(nIndex, 1, sszResult);
+
+			return false;
+		}
+
+		//拼装发送包体
+		char szSendBuffer[MAX_BUFF_200] ={'\0'};
+
+		short sCommand = (short)COMMAND_AUTOTEST_WORKTIMEOUT;
+		int nPacketLen = 4 + 2;
+
+		memcpy_s(szSendBuffer, sizeof(int), (char* )&nPacketLen, sizeof(int));
+		memcpy_s((char* )&szSendBuffer[4], sizeof(short), (char* )&sCommand, sizeof(short));
+		memcpy_s((char* )&szSendBuffer[6], sizeof(int), (char* )&i, sizeof(int));
+		int nSendLen = nPacketLen + 4;
+
+		//发送数据
+		int nTotalSendLen = nSendLen;
+		int nBeginSend    = 0;
+		int nCurrSendLen  = 0;
+		bool blSendFlag   = false;
+		int nBeginRecv    = 0;
+		int nCurrRecvLen  = 0;
+		bool blRecvFlag   = false;
+		while(true)
+		{
+			nCurrSendLen = send(sckClient, szSendBuffer + nBeginSend, nTotalSendLen, 0);
+			if(nCurrSendLen <= 0)
+			{
+				closesocket(sckClient);
+
+				DWORD dwError = GetLastError();
+				sprintf_s(szResult, 1024, "[e]与[%s:%d]服务器发送数据失败，错误号[%d]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, dwError);
+
+				nDecLen = MultiByteToWideChar(CP_ACP, 0, szResult, -1, sszResult, 1024);
+
+				m_lstResult.InsertItem(nIndex, _T("工作线程自我修复检测"));
+				m_lstResult.SetItemText(nIndex, 1, sszResult);
+
+				return false;
+			}
+			else
+			{
+				nTotalSendLen -= nCurrSendLen;
+				if(nTotalSendLen == 0)
+				{
+					//发送完成
+					blSendFlag = true;
+					break;
+				}
+				else
+				{
+					nBeginSend += nCurrSendLen;
+				}
+			}
+		}
+
+		if(blSendFlag == false)
+		{
+			closesocket(sckClient);
+
+			sprintf_s(szResult, 1024, "[e]与[%s:%d]发送字节数不匹配，缓冲字节数[%d]，实际发送字节数[%d]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, objClientInfo.m_nSendLength, nTotalSendLen);
+
+			nDecLen = MultiByteToWideChar(CP_ACP, 0, szResult, -1, sszResult, 1024);
+
+			m_lstResult.InsertItem(nIndex, _T("工作线程自我修复检测"));
+			m_lstResult.SetItemText(nIndex, 1, sszResult);
+
+			return false;
+		}
+		else
+		{
+			if(i > 0)
+			{
+				int nTotalRecvLen               = 10;
+				char szRecvBuffData[1024 * 100] = {'\0'};
+
+				while(true)
+				{
+
+					//如果发送成功了，则处理接收数据
+					nCurrRecvLen = recv(sckClient, (char* )szRecvBuffData + nBeginRecv, nTotalRecvLen, 0);
+					if(nCurrRecvLen <= 0)
+					{
+						closesocket(sckClient);
+
+						DWORD dwError = GetLastError();
+						sprintf_s(szResult, 1024, "[e]与[%s:%d]服务器接收数据失败，错误号[%d]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, dwError);
+
+						nDecLen = MultiByteToWideChar(CP_ACP, 0, szResult, -1, sszResult, 1024);
+
+						m_lstResult.InsertItem(nIndex, _T("工作线程自我修复检测"));
+						m_lstResult.SetItemText(nIndex, 1, sszResult);
+
+						return false;
+					}
+					else
+					{
+						nTotalRecvLen -= nCurrRecvLen;
+						if(nTotalRecvLen == 0)
+						{
+							//接收完成
+							break;
+						}
+						else
+						{
+							nBeginRecv += nCurrRecvLen;
+						}
+					}
+				}
+
+				//检测接收数据的正确性
+				int nRecvPacketSize = 0;
+				int nReturnCommand  = 0;
+				int nResult         = 0;
+
+				memcpy_s((char* )&nRecvPacketSize, sizeof(int), (char* )&szRecvBuffData[0], sizeof(int));
+				memcpy_s((char* )&nReturnCommand, sizeof(short), (char* )&szRecvBuffData[4], sizeof(short));
+				memcpy_s((char* )&nResult, sizeof(int), (char* )&szRecvBuffData[6], sizeof(int));
+
+				//检测返回包头大小
+				if(nRecvPacketSize != 6)
+				{
+					closesocket(sckClient);
+
+					sprintf_s(szResult, 1024, "[e]与[%s:%d]接收返回包大小不对。", objClientInfo.m_szServerIP, objClientInfo.m_nPort);
+
+					nDecLen = MultiByteToWideChar(CP_ACP, 0, szResult, -1, sszResult, 1024);
+
+					m_lstResult.InsertItem(nIndex, _T("工作线程自我修复检测"));
+					m_lstResult.SetItemText(nIndex, 1, sszResult);
+
+					return false;
+				}
+
+				//判断返回命令字
+				if(nReturnCommand != (int)COMMAND_AUTOTEST_RETURN_WORKTIMEOUT)
+				{
+					closesocket(sckClient);
+
+					sprintf_s(szResult, 1024, "[e]与[%s:%d]接受包返回命令字不对。", objClientInfo.m_szServerIP, objClientInfo.m_nPort);
+
+					nDecLen = MultiByteToWideChar(CP_ACP, 0, szResult, -1, sszResult, 1024);
+
+					m_lstResult.InsertItem(nIndex, _T("工作线程自我修复检测"));
+					m_lstResult.SetItemText(nIndex, 1, sszResult);
+
+					return false;
+				}
+
+				//判断返回数据
+				if(nResult != 0)
+				{
+					closesocket(sckClient);
+
+					sprintf_s(szResult, 1024, "[e]与[%s:%d]接受包数据和发送数据不符。", objClientInfo.m_szServerIP, objClientInfo.m_nPort);
+
+					nDecLen = MultiByteToWideChar(CP_ACP, 0, szResult, -1, sszResult, 1024);
+
+					m_lstResult.InsertItem(nIndex, _T("工作线程自我修复检测"));
+					m_lstResult.SetItemText(nIndex, 1, sszResult);
+
+					return false;
+				}
+			}
+		}
+
+		closesocket(sckClient);
+
+		//等待15秒
+		SleepEx(20000, TRUE);
+	}
+
+	sprintf_s(szResult, 1024, "[s]与[%s:%d](%d)个数据包检测成功。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, nLogCount);
+
+	nDecLen = MultiByteToWideChar(CP_ACP, 0, szResult, -1, sszResult, 1024);
+
+	m_lstResult.InsertItem(nIndex, _T("工作线程自我修复检测"));
+	m_lstResult.SetItemText(nIndex, 1, sszResult);
+
+	return true;
+}
+
 //处理行颜色
 void CTcpPacketCheckDlg::OnCustomDraw( NMHDR* pNMHDR, LRESULT* pResult )
 {
@@ -1852,4 +2199,115 @@ void CTcpPacketCheckDlg::OnCustomDraw( NMHDR* pNMHDR, LRESULT* pResult )
 			return; 
 		} 
 	} 
+}
+
+void CTcpPacketCheckDlg::Run()
+{
+	_ClientInfo objClientInfo;
+
+	//获得发送的IP和端口
+	CString strServerIP;
+	CString strPort;
+	char szServerIP[30]   = {'\0'};
+	char szServerPort[20] = {'\0'};
+
+	m_txtServerIP.GetWindowText(strServerIP);
+	m_txtPort.GetWindowText(strPort);
+
+	int nSrcLen = WideCharToMultiByte(CP_ACP, 0, strServerIP, strServerIP.GetLength(), NULL, 0, NULL, NULL);
+	int nDecLen = WideCharToMultiByte(CP_ACP, 0, strServerIP, nSrcLen, szServerIP, 30, NULL,NULL);
+	szServerIP[nDecLen] = '\0';
+
+	nSrcLen = WideCharToMultiByte(CP_ACP, 0, strPort, strPort.GetLength(), NULL, 0, NULL, NULL);
+	nDecLen = WideCharToMultiByte(CP_ACP, 0, strPort, nSrcLen, szServerPort, 30, NULL,NULL);
+	szServerPort[nDecLen] = '\0';
+
+	if(strlen(szServerPort) == 0 || strlen(szServerIP) == 0)
+	{
+		MessageBox(_T("必须输入要发送的IP和端口") , _T("错误信息"), MB_OK);
+		return;
+	}
+
+	int nServerPort = atoi(szServerPort);
+
+	sprintf_s(objClientInfo.m_szServerIP, 30, "%s", szServerIP);
+	objClientInfo.m_nPort = nServerPort;
+
+	//获得验证包长度
+	CString strRecvLength;
+	char szRecvLength[10] = {'\0'};
+
+	m_txtRecvLength.GetWindowText(strRecvLength);
+
+	nSrcLen = WideCharToMultiByte(CP_ACP, 0, strRecvLength, strRecvLength.GetLength(), NULL, 0, NULL, NULL);
+	nDecLen = WideCharToMultiByte(CP_ACP, 0, strRecvLength, nSrcLen, szRecvLength, 30, NULL,NULL);
+	szRecvLength[nDecLen] = '\0';
+
+	if(strlen(szRecvLength) == 0)
+	{
+		MessageBox(_T("必须输入验证接收字节长度") , _T("错误信息"), MB_OK);
+		return;
+	}
+
+	objClientInfo.m_nRecvLength = atoi(szRecvLength);
+
+	//获取发送Buffer
+	CString strPacketBuffer;
+	char szPacketBuffer[500] = {'\0'};
+
+	m_txtPacketBuffer.GetWindowText(strPacketBuffer);
+
+	nSrcLen = WideCharToMultiByte(CP_ACP, 0, strPacketBuffer, strPacketBuffer.GetLength(), NULL, 0, NULL, NULL);
+	nDecLen = WideCharToMultiByte(CP_ACP, 0, strPacketBuffer, nSrcLen, szPacketBuffer, 500, NULL,NULL);
+	szPacketBuffer[nDecLen] = '\0';
+
+	if(strlen(szPacketBuffer) == 0)
+	{
+		MessageBox(_T("必须输入发送数据包") , _T("错误信息"), MB_OK);
+		return;
+	}
+
+	CConvertBuffer objConvertBuffer;
+	int nSendLength = objConvertBuffer.GetBufferSize(szPacketBuffer, nDecLen);
+	char* pSendBuffer = new char[nSendLength];
+	objConvertBuffer.Convertstr2charArray(szPacketBuffer, strlen(szPacketBuffer), (unsigned char*)pSendBuffer, nSendLength);
+
+	objClientInfo.m_pSendBuffer = pSendBuffer;
+	objClientInfo.m_nSendLength = nSendLength;
+
+	//开始测试
+	int nIndex = 0;
+	m_lstResult.DeleteAllItems();
+
+	//单个包检测
+	CheckTcpPacket(objClientInfo, nIndex++);
+
+	//多个包检测
+	CheckMultipleTcpPacket(objClientInfo, nIndex++);
+
+	//无效包检测
+	CheckValidPacket(objClientInfo, nIndex++);
+
+	//任意切割数据包检测
+	CheckHalfPacket(objClientInfo, nIndex++);
+
+	//测试数据包包含包头
+	CheckIsHead(objClientInfo, nIndex++);
+
+	//检测直接返回数据包(透传指令)
+	CheckIsNoHead(objClientInfo, nIndex++);
+
+	//检测带包头的缓冲
+	CheckIsHeadBuffer(objClientInfo, nIndex++);
+
+	//检测不带包头缓冲
+	CheckIsNoHeadBuffer(objClientInfo, nIndex++);
+
+	//测试日志记录
+	CheckLogFile(objClientInfo, nIndex++);
+
+	//测试工作线程自我修复
+	CheckWorkTimeout(objClientInfo, nIndex++);
+
+	delete[] pSendBuffer;
 }
