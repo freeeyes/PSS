@@ -20,7 +20,7 @@
 	<!-- <Module ModulePath="./" ModuleString="UDPTestd.dll" desc="模块加载配置相关参数，ModulePath是路径，ModuleString是模块名称，以逗号隔开"/> -->
 	
 	<!-- 测试Tcp模块加载流程的用例 -->
-	<Module ModulePath="./" ModuleString="TcpTestd.dll" desc="模块加载配置相关参数，ModulePath是路径，ModuleString是模块名称，以逗号隔开"/>
+	<Module ModulePath="./" ModuleString="AutoTestd.dll" desc="模块加载配置相关参数，ModulePath是路径，ModuleString是模块名称，以逗号隔开"/>
 	
 	<CoreSetting CoreSize="2048" desc="Linux下开启Core文件的大小,PSS会自己设置，单位是mb" />
 	<CommandAccount Account="1" FlowAccount="1" desc="Account为1记录统计命令日志，0为不记录，FlowAccount为流量统计，1为开启，0为关闭" />
