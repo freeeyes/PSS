@@ -387,10 +387,12 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value &tv, const void *a
 				{
 					int ret = ::TerminateThread (hthread, -1); 
 					ACE_Thread_Manager::instance()->wait_grp (grp_id); 
-					ACE_DEBUG ((LM_DEBUG, "kill return %d, %d\n", ret, GetLastError ())); 
+					OUR_DEBUG((LM_DEBUG, "[CMessageServiceGroup::handle_timeout]kill return %d, %d\n", ret, GetLastError ())); 
 				}
 #else
-				ACE_Thread_Manager::instance()->kill_grp(grp_id, SIGUSR1);
+				int grp_id = pMessageService->grp_id(); 
+				int ret = ACE_Thread_Manager::instance()->kill_grp(grp_id, SIGUSR1);
+				OUR_DEBUG((LM_DEBUG, "[CMessageServiceGroup::handle_timeout]kill return %d OK.\n", ret)); 
 #endif
 
 				//需要重启工作线程，先关闭当前的工作线程

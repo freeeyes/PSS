@@ -2124,11 +2124,15 @@ bool CTcpPacketCheckDlg::CheckWorkTimeout( _ClientInfo& objClientInfo, int nInde
 
 		closesocket(sckClient);
 
-		//等待15秒
-		SleepEx(20000, TRUE);
+		//只等一次
+		if(i == 1)
+		{
+			//等待15秒
+			SleepEx(20000, TRUE);
+		}
 	}
 
-	sprintf_s(szResult, 1024, "[s]与[%s:%d](%d)个数据包检测成功。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, nLogCount);
+	sprintf_s(szResult, 1024, "[s]与[%s:%d]框架工作线程自我修复功能检测成功。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, nLogCount);
 
 	nDecLen = MultiByteToWideChar(CP_ACP, 0, szResult, -1, sszResult, 1024);
 
