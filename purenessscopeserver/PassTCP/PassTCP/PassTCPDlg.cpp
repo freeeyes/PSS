@@ -257,15 +257,17 @@ void CPassTCPDlg::OnBnClickedButton1()
 		m_txtPacketTimewait.GetWindowText(strData);
 		pSocket_Info->m_nPacketTimewait = _ttoi((LPCTSTR)strData);
 
-		if(i == nThreadCount - 1 && nThreadCount > 1)
+		if(nThreadSendCount > 0)
 		{
-			pSocket_Info->m_nSendCount = nThreadSendCount + ( nAllSendCount % nThreadSendCount);
+			if(i == nThreadCount - 1 && nThreadCount > 1)
+			{
+				pSocket_Info->m_nSendCount = nThreadSendCount + ( nAllSendCount % nThreadSendCount);
+			}
+			else
+			{
+				pSocket_Info->m_nSendCount = nThreadSendCount;
+			}
 		}
-		else
-		{
-			pSocket_Info->m_nSendCount = nThreadSendCount;
-		}
-		
 
 		m_reSendText.GetWindowText(strData);
 
