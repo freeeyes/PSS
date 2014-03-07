@@ -404,6 +404,10 @@
 					RelativePath=".\Message\ModuleMessageManager.h"
 					>
 				</File>
+				<File
+					RelativePath=".\Message\WorkThreadAI.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="cppfole"
@@ -467,6 +471,10 @@
 							UsePrecompiledHeader="0"
 						/>
 					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\Message\WorkThreadAI.cpp"
+					>
 				</File>
 			</Filter>
 		</Filter>

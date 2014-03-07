@@ -47,6 +47,15 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
 	m_ThreadInfo.m_u4ThreadID   = u4ThreadID;
 
 	m_u4WorkQueuePutTime = App_MainConfig::instance()->GetWorkQueuePutTime() * 1000;
+	
+	//初始化线程AI
+	m_WorkThreadAI.Init(App_MainConfig::instance()->GetWTAI(), 
+		App_MainConfig::instance()->GetPacketTimeOut(),
+		App_MainConfig::instance()->GetWTCheckTime(),
+		App_MainConfig::instance()->GetWTTimeoutCount(),
+		App_MainConfig::instance()->GetWTStopTime(),
+		App_MainConfig::instance()->GetWTReturnDataType(),
+		App_MainConfig::instance()->GetWTReturnData());
 }
 
 bool CMessageService::Start()
@@ -203,10 +212,37 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 	//OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage]1 [%d],m_u4State=%d, commandID=%d.\n", u4ThreadID, m_ThreadInfo.m_u4State,  pMessage->GetMessageBase()->m_u2Cmd));
 
 	//抛出掉链接建立和断开，只计算逻辑数据包
+	bool blIsDead = false;
 	if(pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CONNECT && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CDISCONNET && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_SDISCONNET)
 	{
 		m_ThreadInfo.m_u4RecvPacketCount++;
 		m_ThreadInfo.m_u4CurrPacketCount++;
+
+		blIsDead = m_WorkThreadAI.CheckCurrTimeout(pMessage->GetMessageBase()->m_u2Cmd, (uint32)m_ThreadInfo.m_tvUpdateTime.sec());
+		if(blIsDead == true)
+		{
+			OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage]Command(%d) is Delele.\n", pMessage->GetMessageBase()->m_u2Cmd));
+			//直接返回应急数据给客户端，不在到逻辑里去处理
+#ifdef WIN32
+			App_ProConnectManager::instance()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID,
+														   m_WorkThreadAI.GetReturnData(),
+														   m_WorkThreadAI.GetReturnDataLength(), 
+														   SENDMESSAGE_NOMAL,
+														   (uint16)COMMAND_RETURN_BUSY, 
+														   PACKET_SEND_IMMEDIATLY,
+														   PACKET_IS_SELF_RECYC);
+#else
+			App_ConnectManager::instance()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID,
+														m_WorkThreadAI.GetReturnData(),
+														m_WorkThreadAI.GetReturnDataLength(), 
+														SENDMESSAGE_NOMAL,
+														(uint16)COMMAND_RETURN_BUSY, 
+														PACKET_SEND_IMMEDIATLY,
+														PACKET_IS_SELF_RECYC);
+#endif
+			App_MessagePool::instance()->Delete(pMessage);
+			return true;
+		}
 	}
 
 	//将要处理的数据放到逻辑处理的地方去
@@ -218,7 +254,13 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 
 	//在包内设置工作线程ID
 	pMessage->GetMessageBase()->m_u4WorkThreadID = m_u4ThreadID;
-	App_MessageManager::instance()->DoMessage(pMessage, u2CommandID);
+	uint32 u4TimeCost = 0;
+	App_MessageManager::instance()->DoMessage(pMessage, u2CommandID, u4TimeCost);
+
+	if(pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CONNECT && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CDISCONNET && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_SDISCONNET)
+	{
+		m_WorkThreadAI.SaveTimeout(pMessage->GetMessageBase()->m_u2Cmd, u4TimeCost);
+	}
 
 	m_ThreadInfo.m_u4State = THREAD_RUNEND;
 	//OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage]2 [%d],m_u4State=%d,CommandID=%d.\n", u4ThreadID, m_ThreadInfo.m_u4State, pMessage->GetMessageBase()->m_u2Cmd));
@@ -387,7 +429,7 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value &tv, const void *a
 				{
 					int ret = ::TerminateThread (hthread, -1); 
 					ACE_Thread_Manager::instance()->wait_grp (grp_id); 
-					OUR_DEBUG((LM_DEBUG, "[CMessageServiceGroup::handle_timeout]kill return %d, %d\n", ret, GetLastError ())); 
+					OUR_DEBUG((LM_DEBUG, "[CMessageServiceGroup::handle_timeout]kill return %d, %d\n", ret, GetLastError())); 
 				}
 #else
 				int grp_id = pMessageService->grp_id(); 
@@ -425,10 +467,17 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value &tv, const void *a
 	if(App_MainConfig::instance()->GetMonitor() == 1)
 	{
 #ifdef WIN32
-		AppLogManager::instance()->WriteLog(LOG_SYSTEM_MONITOR, "[Monitor] CPU Rote=%d,Memory=%d.", GetProcessCPU_Idel(), GetProcessMemorySize());
+		uint32 u4CurrCpu    = (uint32)GetProcessCPU_Idel();
+		uint32 u4CurrMemory = (uint32)GetProcessMemorySize();
 #else
-		AppLogManager::instance()->WriteLog(LOG_SYSTEM_MONITOR, "[Monitor] CPU Rote=%d,Memory=%d.", GetProcessCPU_Idel_Linux(), GetProcessMemorySize_Linux());
+		uint32 u4CurrCpu    = (uint32)GetProcessCPU_Idel_Linux();
+		uint32 u4CurrMemory = (uint32)GetProcessMemorySize_Linux();
 #endif
+		if(u4CurrCpu > App_MainConfig::instance()->GetCpuMax() || u4CurrMemory > App_MainConfig::instance()->GetMemoryMax())
+		{
+			AppLogManager::instance()->WriteLog(LOG_SYSTEM_MONITOR, "[Monitor] CPU Rote=%d,Memory=%d.", u4CurrCpu, u4CurrMemory);
+		}
+
 	}
 
 	return 0;

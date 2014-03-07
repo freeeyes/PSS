@@ -1,28 +1,29 @@
-// TcpPacketCheckDlg.h : 头文件
-//
+#ifndef _WORKTHREADAI_H
+#define _WORKTHREADAI_H
 
-#pragma once
-#include "afxwin.h"
-#include "afxcmn.h"
+//实现对工作线程效率的监控
+//此想法来源于Bobo的建议，如果当一个工作线程持续出现阻塞处理数据缓慢怎么办？
+//杀死工作线程和增加工作线程都不是最好的办法
+//最好的办法，就是找到罪魁祸首的那个数据包
+//正常情况下，应该是某种数据处理引发的问题，而不能波及全部工作线程
+//如果这个问题数据包在一定时间内拖累了工作线程太长时间，那么就果断采取措施
+//停止此命令处理一段时间，并返回给客户端告知
+//直接走短回路回应数据异常，保证其他数据包的正常数据处理
+//并记录日志，或者提醒运维管理者
+//这样做尽力减少因为某一个指令问题而导致的整体服务器相应效率底下的问题
+//此功能，可以根据需求决定是否开启，在main.xml里面设置开关
+//如果所有数据包处理都在缓慢不在此AI的管理范围之内
+//PSS依旧还有最后的自我保护机制，重启工作线程
+//不过既然全部数据包都超时了，应用也不可能让用户满意了
+//此功能只是最大限度的保护用户体验，用户体验是服务器的衣食父母
+//add by freeeyes
 
-#define MAX_BUFF_200   200
+#include "Ring.h"
+#include "define.h"
 
-#define COMMAND_AUTOTEST_HEAD         0x5000   //带头返回数据包
-#define COMMAND_AUTOTEST_NOHEAD       0x5001   //不带头数据包
-#define COMMAND_AUTOTEST_HEADBUFF     0x5002   //带头缓冲数据包
-#define COMMAND_AUTOTEST_NOHEADBUFF   0x5003   //不带头缓冲数据包
-#define COMMAND_AUTOTEST_LOGDATA      0x5004   //测试记录日志
-#define COMMAND_AUTOTEST_WORKTIMEOUT  0x5005   //测试工作线程超时重建
-#define COMMAND_AUTOTEST_WORKAI       0x5006   //测试workAI
+#define COMMAND_RETURN_BUSY 0xffff
 
-#define COMMAND_AUTOTEST_RETUEN_HEAD         0xf000   
-#define COMMAND_AUTOTEST_RETUEN_NOHEAD       0xf001
-#define COMMAND_AUTOTEST_RETUEN_HEADBUFF     0xf002
-#define COMMAND_AUTOTEST_RETUEN_NOHEADBUFF   0xf003
-#define COMMAND_AUTOTEST_RETUEN_LOGDATA      0xf004
-#define COMMAND_AUTOTEST_RETURN_WORKTIMEOUT  0xf005
-#define COMMAND_AUTOTEST_RETURN_WORKAI       0xf006
-
+//二进制换砖类，负责二进制的代码转换
 class CConvertBuffer
 {
 public:
@@ -177,74 +178,60 @@ private:
 	}
 };
 
-struct _ClientInfo
+class CWorkThreadAI
 {
-	char  m_szServerIP[30];
-	int   m_nPort; 
-	char* m_pSendBuffer;
-	int   m_nSendLength;
-	int   m_nRecvLength;
+public:
+	CWorkThreadAI();
+	~CWorkThreadAI();
 
-	_ClientInfo()
+	void Close();
+
+	void Init(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTTimeoutCount, uint32 u4WTStopTime, uint8 u1WTReturnDataType, const char* pReturnData);
+
+	bool SaveTimeout(uint16 u2CommandID, uint32 u4TimeCost);
+
+	char* GetReturnData();
+	uint16 GetReturnDataLength();
+
+	bool CheckCurrTimeout(uint16 u2CommandID, uint32 u4Now);
+
+private:
+	uint8      m_u1WTAI;                           //工作线程AI开关，0为关闭，1为打开
+	uint16     m_u4DisposeTime;                    //业务包处理超时时间
+	uint32     m_u4WTCheckTime;                    //工作线程超时包的时间范围，单位是秒
+	uint32     m_u4WTTimeoutCount;                 //工作线程超时包的单位时间内的超时次数上限
+	uint32     m_u4WTStopTime;                     //停止此命令服务的时间
+	uint8      m_u1WTReturnDataType;               //返回错误数据的类型，1为二进制，2为文本
+	char       m_szWTReturnData[MAX_BUFF_1024];    //返回的数据体，最多1K
+	uint16     m_u2ReturnDataLen;                  //返回数据体长度
+
+private:
+	//超时命令单元
+	struct _CommandTimeout
 	{
-		m_szServerIP[0] = '\0';
-		m_nPort         = 0;
-		m_pSendBuffer   = NULL;
-		m_nSendLength   = 0;
-		m_nRecvLength   = 0;
-	}
+		uint16 m_u2CommandID;
+		uint32 m_u4Second;
+
+		_CommandTimeout()
+		{
+			m_u2CommandID = 0;
+			m_u4Second    = 0;
+		}
+	};
+
+	//超时的命令集合
+	struct _CommandTime
+	{
+		uint16 m_u2CommandID;
+		CRingLink<_CommandTimeout> m_objTime;
+
+		_CommandTime()
+		{
+			m_u2CommandID = 0;
+		}
+	};
+
+	vector<_CommandTime*>   m_vecCommandTime;
+	vector<_CommandTimeout> m_vecCommandTimeout;
 };
-
-// CTcpPacketCheckDlg 对话框
-class CTcpPacketCheckDlg : public CDialog
-{
-// 构造
-public:
-	CTcpPacketCheckDlg(CWnd* pParent = NULL);	// 标准构造函数
-
-// 对话框数据
-	enum { IDD = IDD_TCPPACKETCHECK_DIALOG };
-
-protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
-
-public:
-	void Run();
-
-// 实现
-protected:
-	HICON m_hIcon;
-
-	// 生成的消息映射函数
-	virtual BOOL OnInitDialog();
-	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
-	afx_msg void OnPaint();
-	afx_msg HCURSOR OnQueryDragIcon();
-	DECLARE_MESSAGE_MAP()
-
-private:
-	bool CheckTcpPacket(_ClientInfo& objClientInfo, int nIndex);
-	bool CheckMultipleTcpPacket(_ClientInfo& objClientInfo, int nIndex);
-	bool CheckValidPacket(_ClientInfo& objClientInfo, int nIndex);
-	bool CheckHalfPacket(_ClientInfo& objClientInfo, int nIndex);
-	bool CheckIsHead(_ClientInfo& objClientInfo, int nIndex);
-	bool CheckIsNoHead(_ClientInfo& objClientInfo, int nIndex);
-	bool CheckIsHeadBuffer(_ClientInfo& objClientInfo, int nIndex);
-	bool CheckIsNoHeadBuffer(_ClientInfo& objClientInfo, int nIndex);
-	bool CheckLogFile(_ClientInfo& objClientInfo, int nIndex);
-	bool CheckWorkTimeout(_ClientInfo& objClientInfo, int nIndex);
-	bool CheckWorkAI(_ClientInfo& objClientInfo, int nIndex);
-
-private:
-	CEdit m_txtPacketBuffer;
-	CEdit m_txtServerIP;
-	CEdit m_txtPort;
-	CEdit m_txtRecvLength;
-	CListCtrl m_lstResult;
-public:
-	afx_msg void OnBnClickedButton1();
-	afx_msg void OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult);
-
-public:
-	CButton m_btnRun;
-};
+#endif

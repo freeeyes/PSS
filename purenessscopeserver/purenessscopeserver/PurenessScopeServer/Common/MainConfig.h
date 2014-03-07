@@ -137,6 +137,14 @@ public:
 	uint16 GetBacklog();
 	uint16 GetTrackIPCount();
 	ENUM_CHAR_ORDER GetCharOrder();
+	uint32 GetCpuMax();
+	uint32 GetMemoryMax();
+	uint8  GetWTAI();
+	uint32 GetWTCheckTime();
+	uint32 GetWTTimeoutCount();
+	uint32 GetWTStopTime();
+	uint8  GetWTReturnDataType();
+	char*  GetWTReturnData();
 
 private:
 	CXmlOpeation m_MainConfig;
@@ -207,6 +215,17 @@ private:
 	uint32     m_u4CoreFileSize;                   //Core文件的尺寸大小
 	uint16     m_u2Backlog;                        //设置的Backlog值
 	uint32     m_u4TrackIPCount;                   //监控IP的最大历史记录数
+
+	uint32     m_u4MaxCpu;                         //监控CPU的最高阀值
+	uint32     m_u4MaxMemory;                      //监控内存的峰值 
+
+	//工作线程AI相关参数
+	uint8      m_u1WTAI;                           //工作线程AI开关，0为关闭，1为打开
+	uint32     m_u4WTCheckTime;                    //工作线程超时包的时间范围，单位是秒
+	uint32     m_u4WTTimeoutCount;                 //工作线程超时包的单位时间内的超时次数上限
+	uint32     m_u4WTStopTime;                     //停止此命令服务的时间
+	uint8      m_u1WTReturnDataType;               //返回错误数据的类型，1为二进制，2为文本
+	char       m_szWTReturnData[MAX_BUFF_1024];    //返回的数据体，最多1K
 
 	ENUM_CHAR_ORDER m_u1CharOrder;                 //当前字节序
 

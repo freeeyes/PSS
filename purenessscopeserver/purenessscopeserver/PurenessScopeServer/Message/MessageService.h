@@ -17,6 +17,7 @@
 #include "MainConfig.h"
 #include "TimerManager.h"
 #include "RandomNumber.h"
+#include "WorkThreadAI.h"
 
 #ifdef WIN32
 #include "ProConnectHandle.h"
@@ -64,6 +65,7 @@ private:
 	uint32                         m_u4WorkQueuePutTime;  //入队超时时间
 
 	_ThreadInfo                    m_ThreadInfo;          //当前线程信息
+	CWorkThreadAI                  m_WorkThreadAI;        //线程自我监控的AI逻辑  
 };
 
 //add by freeeyes

@@ -3,6 +3,7 @@
 
 //实现环状数据的完整读写
 //add by freeeyes
+#include <stdio.h>
 
 template <class T>
 class CRingLink
@@ -98,6 +99,11 @@ public:
 	int GetCount()
 	{
 		return m_nMaxCount;
+	}
+
+	int GetCurrIndex()
+	{
+		return m_nIndex;
 	}
 
 private:

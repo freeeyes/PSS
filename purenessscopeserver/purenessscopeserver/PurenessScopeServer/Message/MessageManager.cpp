@@ -29,7 +29,7 @@ CMessageManager::~CMessageManager(void)
 	//Close();
 }
 
-bool CMessageManager::DoMessage(IMessage* pMessage, uint16& u2CommandID)
+bool CMessageManager::DoMessage(IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost)
 {
 	if(NULL == pMessage)
 	{
@@ -68,7 +68,9 @@ bool CMessageManager::DoMessage(IMessage* pMessage, uint16& u2CommandID)
 				ACE_Time_Value tvBegin = ACE_OS::gettimeofday();
 				pClientCommandInfo->m_pClientCommand->DoMessage(pMessage, bDeleteFlag);
 				ACE_Time_Value tvCost =  ACE_OS::gettimeofday() - tvBegin;
+				u4TimeCost =  (uint32)tvCost.msec();
 				//OUR_DEBUG((LM_ERROR, "[CMessageManager::DoMessage]u2CommandID = %d End.\n", u2CommandID));
+				
 				m_ThreadWriteLock.acquire();
 
 				//添加统计信息

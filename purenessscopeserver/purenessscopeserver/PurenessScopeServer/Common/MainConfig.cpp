@@ -49,6 +49,10 @@ CMainConfig::CMainConfig(void)
 	m_u2Backlog             = (uint16)MAX_ASYNCH_BACKLOG;
 	m_u4TrackIPCount        = (uint32)MAX_ASYNCH_BACKLOG;
 
+	//默认的CPU监控和内存监控的上限
+	m_u4MaxCpu              = 90;
+	m_u4MaxMemory           = 2000;
+
 	m_u1CommandFlow         = 0;
 
 	m_u1NetworkMode         = (uint8)NETWORKMODE_PRO_IOCP;
@@ -62,6 +66,13 @@ CMainConfig::CMainConfig(void)
 
 	m_szWindowsServiceName[0] = '\0';
 	m_szDisplayServiceName[0] = '\0';
+
+	m_u1WTAI                  = (uint8)0;   //AI默认为关闭
+	m_u4WTCheckTime           = 0;
+	m_u4WTTimeoutCount        = 0;
+	m_u4WTStopTime            = 0;
+	m_u1WTReturnDataType      = 0;
+	m_szWTReturnData[0]       = '\0';
 
 	//判定字节序
 	if(O32_HOST_ORDER == O32_LITTLE_ENDIAN)
@@ -555,6 +566,18 @@ bool CMainConfig::Init(const char* szConfigPath)
 		m_u1Monitor = (uint8)ACE_OS::atoi(pData);
 	}
 
+	pData = m_MainConfig.GetData("Monitor", "CpuMax");
+	if(pData != NULL)
+	{
+		m_u4MaxCpu = (uint32)ACE_OS::atoi(pData);
+	}
+
+	pData = m_MainConfig.GetData("Monitor", "MemoryMax");
+	if(pData != NULL)
+	{
+		m_u4MaxMemory = (uint32)ACE_OS::atoi(pData);
+	}
+
 	//开始得到命令统计相关开关
 	pData = m_MainConfig.GetData("CommandAccount", "Account");
 	if(pData != NULL)
@@ -566,6 +589,43 @@ bool CMainConfig::Init(const char* szConfigPath)
 	if(pData != NULL)
 	{
 		m_u1CommandFlow = (uint8)ACE_OS::atoi(pData);
+	}
+
+	//开始获得工作线程监控相关
+	pData = m_MainConfig.GetData("ThreadInfoAI", "AI");
+	if(pData != NULL)
+	{
+		m_u1WTAI = (uint8)ACE_OS::atoi(pData);
+	}
+
+	pData = m_MainConfig.GetData("ThreadInfoAI", "CheckTime");
+	if(pData != NULL)
+	{
+		m_u4WTCheckTime = (uint32)ACE_OS::atoi(pData);
+	}
+
+	pData = m_MainConfig.GetData("ThreadInfoAI", "TimeoutCount");
+	if(pData != NULL)
+	{
+		m_u4WTTimeoutCount = (uint32)ACE_OS::atoi(pData);
+	}
+
+	pData = m_MainConfig.GetData("ThreadInfoAI", "StopTime");
+	if(pData != NULL)
+	{
+		m_u4WTStopTime = (uint32)ACE_OS::atoi(pData);
+	}
+
+	pData = m_MainConfig.GetData("ThreadInfoAI", "ReturnDataType");
+	if(pData != NULL)
+	{
+		m_u1WTReturnDataType = (uint8)ACE_OS::atoi(pData);
+	}
+
+	pData = m_MainConfig.GetData("ThreadInfoAI", "ReturnData");
+	if(pData != NULL)
+	{
+		sprintf_safe(m_szWTReturnData, MAX_BUFF_1024, "%s", pData);
 	}
 
 	return true;
@@ -975,3 +1035,44 @@ uint16 CMainConfig::GetTrackIPCount()
 {
 	return m_u4TrackIPCount;
 }
+
+uint32 CMainConfig::GetCpuMax()
+{
+	return m_u4MaxCpu;
+}
+
+uint32 CMainConfig::GetMemoryMax()
+{
+	return m_u4MaxMemory;
+}
+
+uint8 CMainConfig::GetWTAI()
+{
+	return m_u1WTAI;
+}
+
+uint32 CMainConfig::GetWTCheckTime()
+{
+	return m_u4WTCheckTime;
+}
+
+uint32 CMainConfig::GetWTTimeoutCount()
+{
+	return m_u4WTTimeoutCount;
+}
+
+uint32 CMainConfig::GetWTStopTime()
+{
+	return m_u4WTStopTime;
+}
+
+uint8 CMainConfig::GetWTReturnDataType()
+{
+	return m_u1WTReturnDataType;
+}
+
+char* CMainConfig::GetWTReturnData()
+{
+	return (char* )m_szWTReturnData;
+}
+

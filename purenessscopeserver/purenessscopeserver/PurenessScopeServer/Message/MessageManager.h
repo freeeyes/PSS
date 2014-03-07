@@ -139,7 +139,7 @@ public:
 	CMessageManager(void);
 	~CMessageManager(void);
 
-	bool DoMessage(IMessage* pMessage, uint16& u2CommandID);   //Ö´ĞĞÃüÁî
+	bool DoMessage(IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost);   //Ö´ĞĞÃüÁî
 	void Close();
 
 	bool AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName);   //×¢²áÃüÁî

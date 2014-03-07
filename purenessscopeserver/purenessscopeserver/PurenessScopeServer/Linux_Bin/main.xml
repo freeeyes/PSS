@@ -14,7 +14,7 @@
 	<ConsoleKey Key="guest" desc="维护端允许登录的Key值,可以是多个，key值中不能包含空格" />
 	<!-- <ConsoleClient cip="127.0.0.1" desc="维护端口可以访问的对应的客户端IP地址，可以支持多个" /> -->
 	
-	<Message Msg_High_mark="64000" Msg_Low_mark="64000" Msg_Thread="1" Msg_MaxQueue="10000" desc="消息处理线程相关参数设置，" />
+	<Message Msg_High_mark="64000" Msg_Low_mark="64000" Msg_Thread="3" Msg_MaxQueue="10000" desc="消息处理线程相关参数设置，" />
 	
 	<Module ModulePath="./" ModuleString="libAutoTest.so" desc="模块加载配置相关参数，ModulePath是路径，ModuleString是模块名称，以逗号隔开"/>
 	
@@ -23,10 +23,11 @@
 	<RecvInfo RecvBuffSize="20480" RecvQueueTimeout="50" desc="接收客户端数据配置参数" />
 	<SendInfo SendQueueMax="100" TcpNodelay="0" SingleConnectionMaxSendMask="20480" SendTimeout="50" SendAliveTime="60" SendQueueTimeout="50" SendQueueCount="1" PutQueueTimeout = "100" desc="发送到客户端需要配置的参数" />
 	<ThreadInfo ThreadTimeout="30" ThreadTimeCheck="120" DisposeTimeout="40" PutQueueTimeout = "100" desc="工作线程相关参数" />
+	<ThreadInfoAI AI="0" CheckTime="60" TimeoutCount="5" StopTime="30" ReturnDataType="1" ReturnData="02 00 00 00 ff ff" desc="工作线程负载自我监控相关设置，AI=0关闭，1打开" />
 	<ClientInfo HandlerCount="5000" MaxHandlerCount="10000" MaxConnectTime="60" MaxBuffRecv="1024"  desc="客户端链接相关参数"/>
 	<ConnectValid ConnectValid="1" ConnectCount="50000" ConnectPacketCount="1000000" ConnectRecvSize="10000000" ForbiddenTime="60"  TrackIPCount="100" desc="链接有效性管理" />
 	<ConnectServer TimeInterval="500" TimeCheck="30" Recvbuff="1024" desc="框架连接其它远程服务器相关参数，TimeInterval是连接每个服务器之间的保护时间，单位是毫秒" />
-	<Monitor CpuAndMemory="0" desc="是否对CPU和内存定时监控，并输出日志，0为关闭监控，1是打开监控" />
+	<Monitor CpuAndMemory="0"  CpuMax="50" MemoryMax="1000" desc="是否对CPU和内存定时监控，并输出日志，0为关闭监控，1是打开监控" />
 	
 	<!-- <UDPServerIP uip="127.0.0.1" uport="10003" uipType="IPV4" desc="监听TCP服务器的IP和端口，可以是多个" /> -->
 </config>
