@@ -377,6 +377,30 @@ _ThreadInfo* CMessageService::GetThreadInfo()
 	return &m_ThreadInfo;
 }
 
+void CMessageService::GetAIInfo(_WorkThreadAIInfo& objAIInfo)
+{
+	m_WorkThreadAI.GetAIInfo(objAIInfo);
+}
+
+uint32 CMessageService::GetThreadID()
+{
+	return m_u4ThreadID;
+}
+
+void CMessageService::GetAITO(vecCommandTimeout& objTimeout)
+{
+	m_WorkThreadAI.GetAllTimeout(m_u4ThreadID, objTimeout);
+}
+
+void CMessageService::GetAITF( vecCommandTimeout& objTimeout )
+{
+	m_WorkThreadAI.GetAllForbiden(m_u4ThreadID, objTimeout);
+}
+
+void CMessageService::SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime)
+{
+	m_WorkThreadAI.ReSet(u1AI, u4DisposeTime, u4WTCheckTime, u4WTStopTime);
+}
 
 CMessageServiceGroup::CMessageServiceGroup( void )
 {
@@ -635,3 +659,59 @@ uint32 CMessageServiceGroup::GetWorkThreadIDByIndex(uint32 u4Index)
 	}
 }
 
+void CMessageServiceGroup::GetWorkThreadAIInfo(vecWorkThreadAIInfo& objvecWorkThreadAIInfo)
+{
+	objvecWorkThreadAIInfo.clear();
+	for(int i = 0; i < (int)m_vecMessageService.size(); i++)
+	{
+		_WorkThreadAIInfo objWorkThreadAIInfo;
+		CMessageService* pMessageService = (CMessageService* )m_vecMessageService[i];
+		if(NULL != pMessageService)
+		{
+			pMessageService->GetAIInfo(objWorkThreadAIInfo);
+			objWorkThreadAIInfo.m_u4ThreadID = pMessageService->GetThreadID();
+			objvecWorkThreadAIInfo.push_back(objWorkThreadAIInfo);
+		}
+	}
+}
+
+void CMessageServiceGroup::GetAITO(vecCommandTimeout& objTimeout)
+{
+	objTimeout.clear();
+	for(int i = 0; i < (int)m_vecMessageService.size(); i++)
+	{
+		_WorkThreadAIInfo objWorkThreadAIInfo;
+		CMessageService* pMessageService = (CMessageService* )m_vecMessageService[i];
+		if(NULL != pMessageService)
+		{
+			pMessageService->GetAITO(objTimeout);
+		}
+	}
+}
+
+void CMessageServiceGroup::GetAITF(vecCommandTimeout& objTimeout)
+{
+	objTimeout.clear();
+	for(int i = 0; i < (int)m_vecMessageService.size(); i++)
+	{
+		_WorkThreadAIInfo objWorkThreadAIInfo;
+		CMessageService* pMessageService = (CMessageService* )m_vecMessageService[i];
+		if(NULL != pMessageService)
+		{
+			pMessageService->GetAITF(objTimeout);
+		}
+	}
+}
+
+void CMessageServiceGroup::SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime)
+{
+	for(int i = 0; i < (int)m_vecMessageService.size(); i++)
+	{
+		_WorkThreadAIInfo objWorkThreadAIInfo;
+		CMessageService* pMessageService = (CMessageService* )m_vecMessageService[i];
+		if(NULL != pMessageService)
+		{
+			pMessageService->SetAI(u1AI, u4DisposeTime, u4WTCheckTime, u4WTStopTime);
+		}
+	}
+}

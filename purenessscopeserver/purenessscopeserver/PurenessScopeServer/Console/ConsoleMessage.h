@@ -64,6 +64,9 @@ enum
 #define CONSOLEMESSAGE_GETCONNECTIPINFO   "GetConnectIPInfo"    //通过COnnectID获得相关的IP信息
 #define CONSOLEMESSAGE_GETLOGINF          "GetLogInfo"          //得到日志等级
 #define CONSOLEMESSAGE_SETLOGLEVEL        "SetLogLevel"         //设置日志等级
+#define CONSOLEMESSAGE_GETWTAI            "GetWorkThreadAI"     //得到Thread的AI配置信息
+#define CONSOLEMESSAGE_GETWTTIMEOUT       "GetWorkThreadTO"     //得到Thread的所有超时数据包信息
+#define CONSOLEMESSAGE_SETWTAI            "SetWorkThreadAI"     //设置ThreadAI的配置信息
 
 //命令处理参数
 struct _CommandInfo
@@ -104,15 +107,16 @@ public:
 
 	//公用数据部分
 private:
-	int ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket);          //执行命令
-	bool GetCommandInfo(const char* pCommand, _CommandInfo& CommandInfo);      //把命令切割成应该有的数据格式
-	bool GetFileInfo(const char* pFile, _FileInfo& FileInfo);                  //将一个全路径切分成文件名
-	bool GetForbiddenIP(const char* pCommand, _ForbiddenIP& ForbiddenIP);      //得到禁止的IP列表
-	bool GetConnectServerID(const char* pCommand, int& nServerID);             //得到一个指定的服务器ID
-	bool GetDebug(const char* pCommand, uint8& u1Debug);                       //得到当前设置的BUDEG
-	bool CheckConsoleKey(const char* pKey);                                    //验证key
-	bool GetTrackIP(const char* pCommand, _ForbiddenIP& ForbiddenIP);          //得到设置的追踪IP
-	bool GetLogLevel(const char* pCommand, int& nLogLevel);                    //得到日志等级
+	int ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket);                        //执行命令
+	bool GetCommandInfo(const char* pCommand, _CommandInfo& CommandInfo);                    //把命令切割成应该有的数据格式
+	bool GetFileInfo(const char* pFile, _FileInfo& FileInfo);                                //将一个全路径切分成文件名
+	bool GetForbiddenIP(const char* pCommand, _ForbiddenIP& ForbiddenIP);                    //得到禁止的IP列表
+	bool GetConnectServerID(const char* pCommand, int& nServerID);                           //得到一个指定的服务器ID
+	bool GetDebug(const char* pCommand, uint8& u1Debug);                                     //得到当前设置的BUDEG
+	bool CheckConsoleKey(const char* pKey);                                                  //验证key
+	bool GetTrackIP(const char* pCommand, _ForbiddenIP& ForbiddenIP);                        //得到设置的追踪IP
+	bool GetLogLevel(const char* pCommand, int& nLogLevel);                                  //得到日志等级
+	bool GetAIInfo(const char* pCommand, int& nAI, int& nDispose, int& nCheck, int& nStop);  //得到AI设置
 
 	//命令具体实现部分
 private:
@@ -147,6 +151,9 @@ private:
 	bool DoMessage_GetConnectIPInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket);
 	bool DoMessage_GetLogLevelInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket);
 	bool DoMessage_SetLogLevelInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket);
+	bool DoMessage_GetThreadAI(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket);
+	bool DoMessage_GetWorkThreadTO(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket);
+	bool DoMessage_SetWorkThreadAI(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket);
 
 private:
 	vecConsoleKey* m_pvecConsoleKey;

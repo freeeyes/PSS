@@ -922,7 +922,7 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 			return false;
 		}
 
-		int nDataLen = this->peer().send(pMbData->rd_ptr(), nSendPacketLen, &nowait);	
+		int nDataLen = this->peer().send(pMbData->rd_ptr(), nSendPacketLen - nIsSendSize, &nowait);	
 
 		if(nDataLen <= 0)
 		{

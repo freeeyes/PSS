@@ -77,6 +77,7 @@ bool CWorkThreadAI::SaveTimeout(uint16 u2CommandID, uint32 u4TimeCost)
 				{
 					pCommandTimeout->m_u2CommandID = u2CommandID;
 					pCommandTimeout->m_u4Second    = u4Now;
+					pCommandTimeout->m_u4Timeout   = u4TimeCost;
 				}
 				else
 				{
@@ -126,6 +127,7 @@ bool CWorkThreadAI::SaveTimeout(uint16 u2CommandID, uint32 u4TimeCost)
 		{
 			pCommandTimeout->m_u2CommandID = u2CommandID;
 			pCommandTimeout->m_u4Second    = u4Now;
+			pCommandTimeout->m_u4Timeout   = u4TimeCost;
 		}
 		pCheckCommandTime->m_objTime.Add();
 		m_vecCommandTime.push_back(pCheckCommandTime);
@@ -209,4 +211,60 @@ void CWorkThreadAI::Close()
 
 	m_vecCommandTime.clear();
 	m_vecCommandTimeout.clear();
+}
+
+void CWorkThreadAI::ReSet(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime)
+{
+	m_u1WTAI             = u1AI;
+	m_u4WTCheckTime      = u4WTCheckTime;
+	m_u4DisposeTime      = u4DisposeTime;
+	m_u4WTStopTime       = u4WTStopTime;
+}
+
+void CWorkThreadAI::GetAIInfo(_WorkThreadAIInfo& objWorkThreadAIInfo)
+{
+	objWorkThreadAIInfo.m_u1WTAI           = m_u1WTAI;
+	objWorkThreadAIInfo.m_u4DisposeTime    = m_u4DisposeTime;
+	objWorkThreadAIInfo.m_u4WTCheckTime    = m_u4WTCheckTime;
+	objWorkThreadAIInfo.m_u4WTStopTime     = m_u4WTStopTime;
+	objWorkThreadAIInfo.m_u4WTTimeoutCount = m_u4WTTimeoutCount;
+}
+
+void CWorkThreadAI::GetAllTimeout(uint32 u4ThreadID, vecCommandTimeout& objTimeout)
+{
+	//objTimeout.clear();
+
+	for(int i = 0; i < (int)m_vecCommandTime.size(); i++)
+	{
+		_CommandTime* pCommandTime = (_CommandTime* )m_vecCommandTime[i];
+		if(NULL != pCommandTime)
+		{
+			for(int j = pCommandTime->m_objTime.GetCount() - 1; j >= 0; j--)
+			{
+				_CommandTimeout objData;
+				if(pCommandTime->m_objTime.GetLinkData(j)->m_u4Second > 0)
+				{
+					objData.m_u4ThreadID  = u4ThreadID;
+					objData.m_u2CommandID = pCommandTime->m_objTime.GetLinkData(j)->m_u2CommandID;
+					objData.m_u4Second    = pCommandTime->m_objTime.GetLinkData(j)->m_u4Second;
+					objData.m_u4Timeout   = pCommandTime->m_objTime.GetLinkData(j)->m_u4Timeout;
+					objTimeout.push_back(objData);
+				}
+			}
+		}
+	}
+}
+
+void CWorkThreadAI::GetAllForbiden(uint32 u4ThreadID, vecCommandTimeout& objForbiden)
+{
+	//objForbiden.clear();
+
+	for(int i = 0; i < (int)m_vecCommandTimeout.size(); i++)
+	{
+		_CommandTimeout objData;
+		objData.m_u4ThreadID  = u4ThreadID;
+		objData.m_u2CommandID = m_vecCommandTimeout[i].m_u2CommandID;
+		objData.m_u4Second    = m_vecCommandTimeout[i].m_u4Second;
+		objForbiden.push_back(objData);
+	}
 }

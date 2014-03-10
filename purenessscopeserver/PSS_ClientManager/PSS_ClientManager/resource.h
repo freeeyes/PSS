@@ -16,6 +16,7 @@
 #define IDD_DIALOG_SERVERCONNECT        134
 #define IDD_DIALOG_FORBIDENIP           135
 #define IDD_DIALOG_TRACKIP              137
+#define IDD_DIALOG_WORKTHREADAI         138
 #define IDC_TAB1                        1000
 #define IDC_EDIT1                       1001
 #define IDC_EDIT2                       1002
@@ -39,6 +40,7 @@
 #define IDC_EDIT9                       1011
 #define IDC_RADIO2                      1012
 #define IDC_BUTTON11                    1012
+#define IDC_LIST4                       1012
 #define IDC_EDIT8                       1013
 #define IDC_RADIO3                      1013
 #define IDC_BUTTON7                     1014
@@ -49,7 +51,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        138
+#define _APS_NEXT_RESOURCE_VALUE        139
 #define _APS_NEXT_COMMAND_VALUE         32771
 #define _APS_NEXT_CONTROL_VALUE         1017
 #define _APS_NEXT_SYMED_VALUE           104

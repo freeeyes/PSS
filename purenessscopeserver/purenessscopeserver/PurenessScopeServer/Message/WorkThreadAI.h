@@ -178,6 +178,47 @@ private:
 	}
 };
 
+//相关参数设计
+struct _WorkThreadAIInfo
+{
+	uint32     m_u4ThreadID;                       //工作线程ID 
+	uint8      m_u1WTAI;                           //工作线程AI开关，0为关闭，1为打开
+	uint32     m_u4DisposeTime;                    //业务包处理超时时间
+	uint32     m_u4WTCheckTime;                    //工作线程超时包的时间范围，单位是秒
+	uint32     m_u4WTTimeoutCount;                 //工作线程超时包的单位时间内的超时次数上限
+	uint32     m_u4WTStopTime;                     //停止此命令服务的时间
+
+	_WorkThreadAIInfo()
+	{
+		m_u4ThreadID       = 0;
+		m_u1WTAI           = 0;
+		m_u4DisposeTime    = 0;
+		m_u4WTCheckTime    = 0;
+		m_u4WTTimeoutCount = 0;
+		m_u4WTStopTime     = 0;
+	}
+};
+
+//超时命令单元
+struct _CommandTimeout
+{
+	uint32 m_u4ThreadID;        //工作线程ID
+	uint16 m_u2CommandID;       //超时的命令
+	uint32 m_u4Second;          //超时当前时间，以1970年以来开始计算的秒数
+	uint32 m_u4Timeout;         //命令执行时间，单位是毫秒  
+
+	_CommandTimeout()
+	{
+		m_u4ThreadID  = 0;
+		m_u2CommandID = 0;
+		m_u4Second    = 0;
+		m_u4Timeout   = 0;
+	}
+};
+
+//这里用户回传相关查询信息
+typedef vector<_CommandTimeout> vecCommandTimeout;
+
 class CWorkThreadAI
 {
 public:
@@ -193,7 +234,14 @@ public:
 	char* GetReturnData();
 	uint16 GetReturnDataLength();
 
+	void GetAIInfo(_WorkThreadAIInfo& objWorkThreadAIInfo);
+
+	void ReSet(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime);
+
 	bool CheckCurrTimeout(uint16 u2CommandID, uint32 u4Now);
+
+	void GetAllTimeout(uint32 u4ThreadID, vecCommandTimeout& objTimeout);
+	void GetAllForbiden(uint32 u4ThreadID, vecCommandTimeout& objForbiden);
 
 private:
 	uint8      m_u1WTAI;                           //工作线程AI开关，0为关闭，1为打开
@@ -206,19 +254,6 @@ private:
 	uint16     m_u2ReturnDataLen;                  //返回数据体长度
 
 private:
-	//超时命令单元
-	struct _CommandTimeout
-	{
-		uint16 m_u2CommandID;
-		uint32 m_u4Second;
-
-		_CommandTimeout()
-		{
-			m_u2CommandID = 0;
-			m_u4Second    = 0;
-		}
-	};
-
 	//超时的命令集合
 	struct _CommandTime
 	{

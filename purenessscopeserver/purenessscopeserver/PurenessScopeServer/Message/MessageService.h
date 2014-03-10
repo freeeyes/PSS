@@ -27,6 +27,9 @@
 #include "LinuxCPU.h"
 #endif
 
+//AI配置信息表
+typedef vector<_WorkThreadAIInfo> vecWorkThreadAIInfo;
+
 class CMessageService : public ACE_Task<ACE_MT_SYNCH>
 {
 public:
@@ -46,6 +49,13 @@ public:
 	bool PutMessage(CMessage* pMessage);
 
 	_ThreadInfo* GetThreadInfo();
+
+	void GetAIInfo(_WorkThreadAIInfo& objAIInfo);           //得到所有工作线程的AI配置
+	void GetAITO(vecCommandTimeout& objTimeout);            //得到所有的AI超时数据包信息
+	void GetAITF(vecCommandTimeout& objTimeout);            //得到所有的AI封禁数据包信息
+	void SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime);  //设置AI
+
+	uint32 GetThreadID();
 
 private:
 	bool IsRun();
@@ -85,8 +95,12 @@ public:
 	bool Start();
 	CThreadInfo* GetThreadInfo();
 
-	uint32 GetWorkThreadCount();                    //得到当前工作线程的数量
-	uint32 GetWorkThreadIDByIndex(uint32 u4Index);  //得到指定工作线程的线程ID    
+	uint32 GetWorkThreadCount();                                                              //得到当前工作线程的数量
+	uint32 GetWorkThreadIDByIndex(uint32 u4Index);                                            //得到指定工作线程的线程ID
+	void GetWorkThreadAIInfo(vecWorkThreadAIInfo& objvecWorkThreadAIInfo);                    //得到线程工作AI配置信息
+	void GetAITO(vecCommandTimeout& objTimeout);                                              //得到所有的AI超时数据包信息
+	void GetAITF(vecCommandTimeout& objTimeout);                                              //得到所有的AI封禁数据包信息
+	void SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime);  //设置AI
 
 private:
 	bool StartTimer();

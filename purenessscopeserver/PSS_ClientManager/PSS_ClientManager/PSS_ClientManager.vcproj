@@ -220,6 +220,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DlgWorkThreadAI.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PSS_ClientManager.cpp"
 				>
 			</File>
@@ -303,6 +307,10 @@
 			</File>
 			<File
 				RelativePath=".\DlgTrackIP.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DlgWorkThreadAI.h"
 				>
 			</File>
 			<File

@@ -2032,9 +2032,30 @@ bool CTcpPacketCheckDlg::CheckWorkTimeout( _ClientInfo& objClientInfo, int nInde
 				int nTotalRecvLen               = 10;
 				char szRecvBuffData[1024 * 100] = {'\0'};
 
+				//首先接收4字节
+				int nPacketSize     = 0;
+				char szPacketLen[4] = {'\0'};  
+				nCurrRecvLen = recv(sckClient, (char* )szPacketLen, sizeof(int), 0);
+				if(nCurrRecvLen != sizeof(int))
+				{
+					closesocket(sckClient);
+
+					DWORD dwError = GetLastError();
+					sprintf_s(szResult, 1024, "[e]与[%s:%d]客户端接收包长失败，错误号[%d]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, dwError);
+
+					nDecLen = MultiByteToWideChar(CP_ACP, 0, szResult, -1, sszResult, 1024);
+
+					m_lstResult.InsertItem(nIndex, _T("工作线程自我修复检测"));
+					m_lstResult.SetItemText(nIndex, 1, sszResult);
+
+					return false;
+				}
+
+				memcpy_s((char* )&nPacketSize, sizeof(int), szPacketLen, sizeof(int));
+				nTotalRecvLen               = nPacketSize;
+
 				while(true)
 				{
-
 					//如果发送成功了，则处理接收数据
 					nCurrRecvLen = recv(sckClient, (char* )szRecvBuffData + nBeginRecv, nTotalRecvLen, 0);
 					if(nCurrRecvLen <= 0)
@@ -2071,27 +2092,11 @@ bool CTcpPacketCheckDlg::CheckWorkTimeout( _ClientInfo& objClientInfo, int nInde
 				int nReturnCommand  = 0;
 				int nResult         = 0;
 
-				memcpy_s((char* )&nRecvPacketSize, sizeof(int), (char* )&szRecvBuffData[0], sizeof(int));
-				memcpy_s((char* )&nReturnCommand, sizeof(short), (char* )&szRecvBuffData[4], sizeof(short));
-				memcpy_s((char* )&nResult, sizeof(int), (char* )&szRecvBuffData[6], sizeof(int));
-
-				//检测返回包头大小
-				if(nRecvPacketSize != 6)
-				{
-					closesocket(sckClient);
-
-					sprintf_s(szResult, 1024, "[e]与[%s:%d]接收返回包大小不对。", objClientInfo.m_szServerIP, objClientInfo.m_nPort);
-
-					nDecLen = MultiByteToWideChar(CP_ACP, 0, szResult, -1, sszResult, 1024);
-
-					m_lstResult.InsertItem(nIndex, _T("工作线程自我修复检测"));
-					m_lstResult.SetItemText(nIndex, 1, sszResult);
-
-					return false;
-				}
+				memcpy_s((char* )&nReturnCommand, sizeof(short), (char* )&szRecvBuffData[0], sizeof(short));
+				memcpy_s((char* )&nResult, sizeof(int), (char* )&szRecvBuffData[2], sizeof(int));
 
 				//判断返回命令字
-				if(nReturnCommand != (int)COMMAND_AUTOTEST_RETURN_WORKTIMEOUT)
+				if(nReturnCommand != (int)COMMAND_AUTOTEST_RETURN_WORKTIMEOUT || nReturnCommand != 0xffff)
 				{
 					closesocket(sckClient);
 

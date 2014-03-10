@@ -303,6 +303,21 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
 		DoMessage_SetLogLevelInfo(CommandInfo, pBuffPacket);
 		return CONSOLE_MESSAGE_SUCCESS;
 	}
+	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_GETWTAI) == 0)
+	{
+		DoMessage_GetThreadAI(CommandInfo, pBuffPacket);
+		return CONSOLE_MESSAGE_SUCCESS;
+	}
+	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_GETWTTIMEOUT) == 0)
+	{
+		DoMessage_GetWorkThreadTO(CommandInfo, pBuffPacket);
+		return CONSOLE_MESSAGE_SUCCESS;
+	}
+	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SETWTAI) == 0)
+	{
+		DoMessage_SetWorkThreadAI(CommandInfo, pBuffPacket);
+		return CONSOLE_MESSAGE_SUCCESS;
+	}
 	else
 	{
 		return CONSOLE_MESSAGE_FAIL;
@@ -411,6 +426,48 @@ bool CConsoleMessage::GetLogLevel(const char* pCommand, int& nLogLevel)
 		ACE_OS::memcpy(szTempData, pPosBegin + 3, nLen);
 		nLogLevel = ACE_OS::atoi(szTempData);
 	}
+
+	return true;
+}
+
+bool CConsoleMessage::GetAIInfo(const char* pCommand, int& nAI, int& nDispose, int& nCheck, int& nStop)
+{
+	int nIndex               = 0;
+	int nBegin               = 0;
+	int nEnd                 = 0;
+	char szTemp[MAX_BUFF_20] = {'\0'};
+
+	nBegin = 3;
+	ACE_OS::memset(szTemp, 0, MAX_BUFF_20);
+
+	for(int i = 3; i < (int)ACE_OS::strlen(pCommand); i++)
+	{
+		if(pCommand[i] == ',')
+		{
+			nEnd = i;
+			ACE_OS::memcpy(szTemp, (char* )&pCommand[nBegin], nEnd - nBegin);
+			if(nIndex == 0)
+			{
+				nAI = ACE_OS::atoi(szTemp);
+			}
+			else if(nIndex == 1)
+			{
+				nDispose = ACE_OS::atoi(szTemp);
+			}
+			else if(nIndex == 2)
+			{
+				nCheck = ACE_OS::atoi(szTemp);
+			}
+
+			ACE_OS::memset(szTemp, 0, MAX_BUFF_20);
+			nBegin = i + 1;
+			nIndex++;
+		}
+	}
+
+	//最后一个参数
+	ACE_OS::memcpy(szTemp, (char* )&pCommand[nBegin], (int)ACE_OS::strlen(pCommand) - nBegin);
+	nStop = ACE_OS::atoi(szTemp);
 
 	return true;
 }
@@ -1510,7 +1567,7 @@ bool CConsoleMessage::DoMessage_GetConnectIPInfo(_CommandInfo& CommandInfo, IBuf
 	return true;
 }
 
-bool CConsoleMessage::DoMessage_GetLogLevelInfo( _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket )
+bool CConsoleMessage::DoMessage_GetLogLevelInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket)
 {
 	if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
 	{
@@ -1557,7 +1614,7 @@ bool CConsoleMessage::DoMessage_GetLogLevelInfo( _CommandInfo& CommandInfo, IBuf
 	return true;
 }
 
-bool CConsoleMessage::DoMessage_SetLogLevelInfo( _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket )
+bool CConsoleMessage::DoMessage_SetLogLevelInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket)
 {
 	int nLogLevel = 1;
 	if(GetLogLevel(CommandInfo.m_szCommandExp, nLogLevel) == true)
@@ -1567,5 +1624,92 @@ bool CConsoleMessage::DoMessage_SetLogLevelInfo( _CommandInfo& CommandInfo, IBuf
 		(*pBuffPacket) << (uint32)0;
 	}
 
+	return true;
+}
+
+bool CConsoleMessage::DoMessage_GetThreadAI(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket)
+{
+	if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
+	{
+		vecWorkThreadAIInfo objvecWorkThreadAIInfo;
+		App_MessageServiceGroup::instance()->GetWorkThreadAIInfo(objvecWorkThreadAIInfo);
+
+		uint16 u2ThreadCount = (uint16)objvecWorkThreadAIInfo.size();
+		(*pBuffPacket) << (uint16)u2ThreadCount;
+
+		for(uint16 i = 0; i < u2ThreadCount; i++)
+		{
+			(*pBuffPacket) << objvecWorkThreadAIInfo[i].m_u4ThreadID;
+			(*pBuffPacket) << objvecWorkThreadAIInfo[i].m_u1WTAI;
+			(*pBuffPacket) << objvecWorkThreadAIInfo[i].m_u4DisposeTime;
+			(*pBuffPacket) << objvecWorkThreadAIInfo[i].m_u4WTCheckTime;
+			(*pBuffPacket) << objvecWorkThreadAIInfo[i].m_u4WTTimeoutCount;
+			(*pBuffPacket) << objvecWorkThreadAIInfo[i].m_u4WTStopTime;
+		}
+	}
+
+	return true;
+}
+
+bool CConsoleMessage::DoMessage_GetWorkThreadTO(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket)
+{
+	if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
+	{
+		vecCommandTimeout objTimeout;
+		vecCommandTimeout objTimeoutF;
+		App_MessageServiceGroup::instance()->GetAITO(objTimeout);
+
+		uint16 u2ThreadCount = (uint16)objTimeout.size();
+		(*pBuffPacket) << (uint16)u2ThreadCount;
+
+		for(uint16 i = 0; i < u2ThreadCount; i++)
+		{
+			(*pBuffPacket) << objTimeout[i].m_u4ThreadID;
+			(*pBuffPacket) << objTimeout[i].m_u2CommandID;
+			(*pBuffPacket) << objTimeout[i].m_u4Second;
+			(*pBuffPacket) << objTimeout[i].m_u4Timeout;
+		}
+
+		App_MessageServiceGroup::instance()->GetAITF(objTimeoutF);
+
+		u2ThreadCount = (uint16)objTimeoutF.size();
+		(*pBuffPacket) << (uint16)u2ThreadCount;
+
+		for(uint16 i = 0; i < u2ThreadCount; i++)
+		{
+			(*pBuffPacket) << objTimeoutF[i].m_u4ThreadID;
+			(*pBuffPacket) << objTimeoutF[i].m_u2CommandID;
+			(*pBuffPacket) << objTimeoutF[i].m_u4Second;
+		}
+	}
+
+	return true;
+}
+
+bool CConsoleMessage::DoMessage_SetWorkThreadAI(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket)
+{
+	int nAI      = 0;
+	int nDispose = 0;
+	int nCheck   = 0;
+	int nStop    = 0;
+	if(GetAIInfo(CommandInfo.m_szCommandExp, nAI, nDispose, nCheck, nStop) == true)
+	{
+		//规范化数据
+		if(nDispose > 0 && nCheck > 0 && nStop > 0)
+		{
+			if(nAI > 0)
+			{
+				nAI = 1;
+			}
+			else
+			{
+				nAI = 0;
+			}
+
+			App_MessageServiceGroup::instance()->SetAI((uint8)nAI, (uint32)nDispose, (uint32)nCheck, (uint32)nStop);
+		}
+	}
+
+	(*pBuffPacket) << (uint32)0;
 	return true;
 }

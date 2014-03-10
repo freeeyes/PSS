@@ -12,6 +12,7 @@
 #include "DlgServerConnect.h"
 #include "DlgForbidenIP.h"
 #include "DlgTrackIP.h"
+#include "DlgWorkThreadAI.h"
 
 // CPSS_ClientManagerDlg dialog
 class CPSS_ClientManagerDlg : public CDialog
@@ -52,6 +53,7 @@ private:
   CDlgServerConnect    m_DlgServerConnect;
   CDlgForbidenIP       m_DlgForbidenIP;
   CDlgTrackIP          m_DlgTrackIP;
+  CDlgWorkThreadAI     m_DlgWorkThreadAI;
   CTcpClientConnect    m_TcpClientConnect;
 
 public:

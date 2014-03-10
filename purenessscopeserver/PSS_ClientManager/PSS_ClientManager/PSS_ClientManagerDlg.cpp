@@ -165,6 +165,7 @@ void CPSS_ClientManagerDlg::InitView()
   m_tabClientMain.InsertItem(m_tabClientMain.GetItemCount(), m_DlgServerConnect.GetPageTitle());
   m_tabClientMain.InsertItem(m_tabClientMain.GetItemCount(), m_DlgForbidenIP.GetPageTitle());
   m_tabClientMain.InsertItem(m_tabClientMain.GetItemCount(), m_DlgTrackIP.GetPageTitle());
+  m_tabClientMain.InsertItem(m_tabClientMain.GetItemCount(), m_DlgWorkThreadAI.GetPageTitle());
 
   m_DlgClientMain.SetTcpClientConnect(&m_TcpClientConnect);
   m_DlgClientConnect.SetTcpClientConnect(&m_TcpClientConnect);
@@ -174,6 +175,7 @@ void CPSS_ClientManagerDlg::InitView()
   m_DlgClientWorkThread.SetTcpClientConnect(&m_TcpClientConnect);
   m_DlgForbidenIP.SetTcpClientConnect(&m_TcpClientConnect);
   m_DlgTrackIP.SetTcpClientConnect(&m_TcpClientConnect);
+  m_DlgWorkThreadAI.SetTcpClientConnect(&m_TcpClientConnect);
 
   m_DlgClientMain.Create(IDD_DIALOG_MAIN, this);
   m_DlgClientConnect.Create(IDD_DIALOG_CLIENTCONNECT, this);
@@ -183,6 +185,7 @@ void CPSS_ClientManagerDlg::InitView()
   m_DlgServerConnect.Create(IDD_DIALOG_SERVERCONNECT, this);
   m_DlgForbidenIP.Create(IDD_DIALOG_FORBIDENIP, this);
   m_DlgTrackIP.Create(IDD_DIALOG_TRACKIP, this);
+  m_DlgWorkThreadAI.Create(IDD_DIALOG_WORKTHREADAI, this);
 
   CRect rtClient;
   GetClientRect(&rtClient);
@@ -200,6 +203,7 @@ void CPSS_ClientManagerDlg::InitView()
   m_DlgServerConnect.MoveWindow(&rtTab);
   m_DlgForbidenIP.MoveWindow(&rtTab);
   m_DlgTrackIP.MoveWindow(&rtTab);
+  m_DlgWorkThreadAI.MoveWindow(&rtTab);
 
   m_tabClientMain.SetCurSel(0);
 
@@ -230,6 +234,7 @@ void CPSS_ClientManagerDlg::OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
     m_DlgServerConnect.ShowWindow(SW_HIDE);
     m_DlgForbidenIP.ShowWindow(SW_HIDE);
 	m_DlgTrackIP.ShowWindow(SW_HIDE);
+	m_DlgWorkThreadAI.ShowWindow(SW_HIDE);
     break;
   case 1:
     m_DlgClientMain.ShowWindow(SW_HIDE);
@@ -240,6 +245,7 @@ void CPSS_ClientManagerDlg::OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
     m_DlgServerConnect.ShowWindow(SW_HIDE);
     m_DlgForbidenIP.ShowWindow(SW_HIDE);
 	m_DlgTrackIP.ShowWindow(SW_HIDE);
+	m_DlgWorkThreadAI.ShowWindow(SW_HIDE);
     break;
   case 2:
     m_DlgClientMain.ShowWindow(SW_HIDE);
@@ -250,6 +256,7 @@ void CPSS_ClientManagerDlg::OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
     m_DlgServerConnect.ShowWindow(SW_HIDE);
     m_DlgForbidenIP.ShowWindow(SW_HIDE);
 	m_DlgTrackIP.ShowWindow(SW_HIDE);
+	m_DlgWorkThreadAI.ShowWindow(SW_HIDE);
     break;
   case 3:
     m_DlgClientMain.ShowWindow(SW_HIDE);
@@ -260,6 +267,7 @@ void CPSS_ClientManagerDlg::OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
     m_DlgServerConnect.ShowWindow(SW_HIDE);
     m_DlgForbidenIP.ShowWindow(SW_HIDE);
 	m_DlgTrackIP.ShowWindow(SW_HIDE);
+	m_DlgWorkThreadAI.ShowWindow(SW_HIDE);
     break;
   case 4:
     m_DlgClientMain.ShowWindow(SW_HIDE);
@@ -270,6 +278,7 @@ void CPSS_ClientManagerDlg::OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
     m_DlgServerConnect.ShowWindow(SW_HIDE);
     m_DlgForbidenIP.ShowWindow(SW_HIDE);
 	m_DlgTrackIP.ShowWindow(SW_HIDE);
+	m_DlgWorkThreadAI.ShowWindow(SW_HIDE);
     break;
   case 5:
     m_DlgClientMain.ShowWindow(SW_HIDE);
@@ -280,6 +289,7 @@ void CPSS_ClientManagerDlg::OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
     m_DlgServerConnect.ShowWindow(SW_SHOW);
     m_DlgForbidenIP.ShowWindow(SW_HIDE);
 	m_DlgTrackIP.ShowWindow(SW_HIDE);
+	m_DlgWorkThreadAI.ShowWindow(SW_HIDE);
     break;
   case 6:
     m_DlgClientMain.ShowWindow(SW_HIDE);
@@ -290,6 +300,7 @@ void CPSS_ClientManagerDlg::OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
     m_DlgServerConnect.ShowWindow(SW_HIDE);
     m_DlgForbidenIP.ShowWindow(SW_SHOW);
 	m_DlgTrackIP.ShowWindow(SW_HIDE);
+	m_DlgWorkThreadAI.ShowWindow(SW_HIDE);
     break;
   case 7:
 	  m_DlgClientMain.ShowWindow(SW_HIDE);
@@ -300,6 +311,18 @@ void CPSS_ClientManagerDlg::OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
 	  m_DlgServerConnect.ShowWindow(SW_HIDE);
 	  m_DlgForbidenIP.ShowWindow(SW_HIDE);
 	  m_DlgTrackIP.ShowWindow(SW_SHOW);
+	  m_DlgWorkThreadAI.ShowWindow(SW_HIDE);
+	  break;
+  case 8:
+	  m_DlgClientMain.ShowWindow(SW_HIDE);
+	  m_DlgClientConnect.ShowWindow(SW_HIDE);
+	  m_DlgClientModule.ShowWindow(SW_HIDE);
+	  m_DlgClientConnectM.ShowWindow(SW_HIDE);
+	  m_DlgClientWorkThread.ShowWindow(SW_HIDE);
+	  m_DlgServerConnect.ShowWindow(SW_HIDE);
+	  m_DlgForbidenIP.ShowWindow(SW_HIDE);
+	  m_DlgTrackIP.ShowWindow(SW_HIDE);
+	  m_DlgWorkThreadAI.ShowWindow(SW_SHOW);
 	  break;
   default:
     break;
