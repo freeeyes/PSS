@@ -322,7 +322,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 	//如果是DEBUG状态，记录当前接受包的二进制数据
 	if(App_MainConfig::instance()->GetDebug() == DEBUG_ON)
 	{
-		string strDebugData;
+		char szDebugData[MAX_BUFF_1024] = {'\0'};
 		char szLog[10]  = {'\0'};
 		int  nDebugSize = 0; 
 		bool blblMore   = false;
@@ -341,16 +341,16 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 		for(int i = 0; i < nDebugSize; i++)
 		{
 			sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
-			strDebugData += szLog;
+			sprintf_safe(szDebugData + 5*i, MAX_BUFF_1024 - 5*i, "%s", szLog);
 		}
 
 		if(blblMore == true)
 		{
-			AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTRECV, "[%s:%d]%s.(数据包过长只记录前200字节)", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), strDebugData.c_str());
+			AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTRECV, "[%s:%d]%s.(数据包过长只记录前200字节)", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
 		}
 		else
 		{
-			AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTRECV, "[%s:%d]%s.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), strDebugData.c_str());
+			AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTRECV, "[%s:%d]%s.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
 		}
 	}
 
@@ -738,7 +738,7 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 	//如果是DEBUG状态，记录当前发送包的二进制数据
 	if(App_MainConfig::instance()->GetDebug() == DEBUG_ON)
 	{
-		string strDebugData;
+		char szDebugData[MAX_BUFF_1024] = {'\0'};
 		char szLog[10]  = {'\0'};
 		int  nDebugSize = 0; 
 		bool blblMore   = false;
@@ -757,16 +757,16 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 		for(int i = 0; i < nDebugSize; i++)
 		{
 			sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
-			strDebugData += szLog;
+			sprintf_safe(szDebugData + 5*i, MAX_BUFF_1024 -  5*i, "0x%02X ", (unsigned char)pData[i]);
 		}
 
 		if(blblMore == true)
 		{
-			AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTSEND, "[%s:%d]%s.(数据包过长只记录前200字节)", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), strDebugData.c_str());
+			AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTSEND, "[%s:%d]%s.(数据包过长只记录前200字节)", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
 		}
 		else
 		{
-			AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTSEND, "[%s:%d]%s.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), strDebugData.c_str());
+			AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTSEND, "[%s:%d]%s.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
 		}
 	}
 

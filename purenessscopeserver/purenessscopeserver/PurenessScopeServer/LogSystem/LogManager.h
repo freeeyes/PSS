@@ -51,7 +51,7 @@ public:
 	int Stop();
 	bool IsRun();
 	
-	int PutLog(int nLogType, _LogBlockInfo* pLogBlockInfo);
+	int PutLog(_LogBlockInfo* pLogBlockInfo);
 	int RegisterLog(CServerLogger * pServerLogger);
 	int UnRegisterLog();
 	
@@ -74,7 +74,7 @@ public:
 	int WriteLogBinary(int nLogType, const char* pData, int nLen);
 
 private:
-	int ProcessLog(int nLogType, _LogBlockInfo* pLogBlockInfo);
+	int ProcessLog(_LogBlockInfo* pLogBlockInfo);
 
 private:
 	bool                              m_blRun;                    //日志系统是否启动

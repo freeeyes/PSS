@@ -77,6 +77,11 @@ _LogBlockInfo* CLogBlockPool::GetLogBlockInfo()
 	{
 		pLogBlockInfo->m_blIsUsed = true;
 	}
+	else
+	{
+		OUR_DEBUG((LM_ERROR,"[CLogBlockPool::GetLogBlockInfo]***CLogBlockPool is all used!***\n"));
+		return NULL;
+	}
 
 	m_u4CurrIndex++;
 
@@ -158,7 +163,7 @@ int CLogManager::svc(void)
 			continue;
 		}
 
-		ProcessLog(mb->msg_type(), pLogBlockInfo);
+		ProcessLog(pLogBlockInfo);
 		mb->release();
 		//OUR_DEBUG((LM_ERROR,"[CLogManager::svc] delete pstrLogText BEGIN!\n"));
 		//回收日志块
@@ -208,7 +213,7 @@ bool CLogManager::IsRun()
 	return m_blRun;
 }
 
-int CLogManager::PutLog(int nLogType, _LogBlockInfo* pLogBlockInfo)
+int CLogManager::PutLog(_LogBlockInfo* pLogBlockInfo)
 {
 	ACE_Message_Block* mb = NULL;
 
@@ -224,7 +229,7 @@ int CLogManager::PutLog(int nLogType, _LogBlockInfo* pLogBlockInfo)
 		static_cast<ACE_Message_Block*>(_log_service_mb_allocator.malloc (sizeof (ACE_Message_Block))),
 		ACE_Message_Block
 		(	sizeof(ACE_TString *), // size
-		nLogType,
+		0,
 		0,
 		0,
 		&_log_service_mb_allocator, // allocator_strategy
@@ -300,7 +305,7 @@ int CLogManager::UnRegisterLog()
 	return 0;
 }
 
-int CLogManager::ProcessLog(int nLogType, _LogBlockInfo* pLogBlockInfo)
+int CLogManager::ProcessLog(_LogBlockInfo* pLogBlockInfo)
 {
 	if(NULL == m_pServerLogger)
 	{
@@ -308,7 +313,7 @@ int CLogManager::ProcessLog(int nLogType, _LogBlockInfo* pLogBlockInfo)
 	}
 
 	//m_Logger_Mutex.acquire();
-	m_pServerLogger->DoLog(nLogType, pLogBlockInfo);
+	m_pServerLogger->DoLog((int)pLogBlockInfo->m_u4LogID, pLogBlockInfo);
 	//m_Logger_Mutex.release();
 	return 0;
 }
@@ -336,14 +341,11 @@ int CLogManager::WriteLog(int nLogType, const char* fmt, ...)
 	va_end(ap);
 
 	pLogBlockInfo->m_u4Length = (uint32)strlen(pLogBlockInfo->m_pBlock);
+	pLogBlockInfo->m_u4LogID  = (uint32)nLogType;
 
 	if (IsRun()) 
 	{
-		nRet = PutLog(nLogType, pLogBlockInfo);
-		if (nRet) 
-		{
-			m_objLogBlockPool.ReturnBlockInfo(pLogBlockInfo);
-		}
+		nRet = PutLog(pLogBlockInfo);
 	} 
 	else 
 	{
@@ -377,18 +379,19 @@ int CLogManager::WriteLogBinary(int nLogType, const char* pData, int nLen)
 		return -1;
 	}
 
+	pLogBlockInfo->m_u4LogID = nLogType;
 	char szLog[10]  = {'\0'};
 	for(int i = 0; i < nLen; i++)
 	{
 		sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
-		sprintf_safe(pLogBlockInfo->m_pBlock, m_objLogBlockPool.GetBlockSize(), "%s%s", pLogBlockInfo->m_pBlock, szLog);
+		sprintf_safe(pLogBlockInfo->m_pBlock + 5*i, m_objLogBlockPool.GetBlockSize() - 5*i, "%s", szLog);
 	}
 
 	pLogBlockInfo->m_u4Length = (uint32)(nLen * 5);
 
 	if (IsRun()) 
 	{
-		nRet = PutLog(nLogType, pLogBlockInfo);
+		nRet = PutLog(pLogBlockInfo);
 		if (nRet) 
 		{
 			m_objLogBlockPool.ReturnBlockInfo(pLogBlockInfo);

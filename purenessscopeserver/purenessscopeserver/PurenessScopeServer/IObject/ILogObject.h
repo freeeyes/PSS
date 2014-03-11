@@ -10,11 +10,13 @@ public:
 	char*  m_pBlock;      //块指针
 	uint32 m_u4Length;    //块长度
 	bool   m_blIsUsed;    //是否正在使用
+	uint32 m_u4LogID;     //LogID标记 
 
 	_LogBlockInfo()
 	{
 		m_pBlock   = NULL;
 		m_u4Length = 0;
+		m_u4LogID  = 0;
 		m_blIsUsed = false;
 	}
 };
