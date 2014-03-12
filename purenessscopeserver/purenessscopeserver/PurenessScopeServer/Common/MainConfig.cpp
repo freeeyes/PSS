@@ -73,6 +73,7 @@ CMainConfig::CMainConfig(void)
 	m_u4WTStopTime            = 0;
 	m_u1WTReturnDataType      = 0;
 	m_szWTReturnData[0]       = '\0';
+	m_blByteOrder             = false;      //默认为主机字序
 
 	//判定字节序
 	if(O32_HOST_ORDER == O32_LITTLE_ENDIAN)
@@ -150,6 +151,19 @@ bool CMainConfig::Init(const char* szConfigPath)
 	if(NULL != pData)
 	{
 		m_u2Backlog = (uint16)ACE_OS::atoi(pData);
+	}
+
+	pData = m_MainConfig.GetData("NetWorkMode", "ByteOrder");
+	if(NULL != pData)
+	{
+		if(ACE_OS::strcmp(pData, "NET_ORDER") == 0)
+		{
+			m_blByteOrder = true;
+		}
+		else
+		{
+			m_blByteOrder = false;
+		}
 	}
 
 	//获得服务器基础属性
@@ -1074,5 +1088,10 @@ uint8 CMainConfig::GetWTReturnDataType()
 char* CMainConfig::GetWTReturnData()
 {
 	return (char* )m_szWTReturnData;
+}
+
+bool CMainConfig::GetByteOrder()
+{
+	return m_blByteOrder;
 }
 

@@ -941,7 +941,7 @@ CBuffPacket& CBuffPacket::operator << (VCHARB_STR &str)
 	return *this;
 }
 
-void CBuffPacket::SetNetSort( bool blState )
+void CBuffPacket::SetNetSort(bool blState)
 {
 	m_blNetSort = blState;
 }

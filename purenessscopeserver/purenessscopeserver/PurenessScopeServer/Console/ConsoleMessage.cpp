@@ -164,67 +164,56 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
 	}
 	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_COMMANDINFO) == 0)
 	{
-		//查看指定命令的执行情况
 		DoMessage_CommandInfo(CommandInfo, pBuffPacket);
 		return CONSOLE_MESSAGE_SUCCESS;
 	}
 	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_THREADINFO) == 0)
 	{
-		//查看指定命令的执行情况
 		DoMessage_WorkThreadState(CommandInfo, pBuffPacket);
 		return CONSOLE_MESSAGE_SUCCESS;
 	}
 	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_CLIENTINFO) == 0)
 	{
-		//查看指定命令的执行情况
 		DoMessage_ClientInfo(CommandInfo, pBuffPacket);
 		return CONSOLE_MESSAGE_SUCCESS;
 	}
 	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_FORBIDDENIP) == 0)
 	{
-		//查看指定命令的执行情况
 		DoMessage_ForbiddenIP(CommandInfo, pBuffPacket);
 		return CONSOLE_MESSAGE_SUCCESS;
 	}
 	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_FORBIDDENIPSHOW) == 0)
 	{
-		//查看指定命令的执行情况
 		DoMessage_ShowForbiddenList(CommandInfo, pBuffPacket);
 		return CONSOLE_MESSAGE_SUCCESS;
 	}
 	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_LIFTED) == 0)
 	{
-		//查看指定命令的执行情况
 		DoMessage_LifedIP(CommandInfo, pBuffPacket);
 		return CONSOLE_MESSAGE_SUCCESS;
 	}
 	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_COLSECLIENT) == 0)
 	{
-		//查看指定命令的执行情况
 		DoMessgae_CloseClient(CommandInfo, pBuffPacket);
 		return CONSOLE_MESSAGE_SUCCESS;
 	}
 	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_UDPCONNECTINFO) == 0)
 	{
-		//查看指定命令的执行情况
 		DoMessage_UDPClientInfo(CommandInfo, pBuffPacket);
 		return CONSOLE_MESSAGE_SUCCESS;
 	}
 	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_SERVERCONNECT_TCP) == 0)
 	{
-		//查看指定命令的执行情况
 		DoMessage_ServerConnectTCP(CommandInfo, pBuffPacket);
 		return CONSOLE_MESSAGE_SUCCESS;
 	}
 	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_SERVERCONNECT_UDP) == 0)
 	{
-		//查看指定命令的执行情况
 		DoMessage_ServerConnectUDP(CommandInfo, pBuffPacket);
 		return CONSOLE_MESSAGE_SUCCESS;
 	}
 	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_PROCESSINFO) == 0)
 	{
-		//查看指定命令的执行情况
 		DoMessage_ShowProcessInfo(CommandInfo, pBuffPacket);
 		return CONSOLE_MESSAGE_SUCCESS;
 	}
@@ -1221,6 +1210,26 @@ bool CConsoleMessage::DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffP
 		strSTemp.text  = App_MainConfig::instance()->GetServerVersion();
 		strSTemp.u1Len = (uint8)ACE_OS::strlen(App_MainConfig::instance()->GetPacketVersion());
 		(*pBuffPacket) << strSTemp;
+
+		//返回当前服务器是大端还是小端
+		if(App_MainConfig::instance()->GetCharOrder() == SYSTEM_LITTLE_ORDER)
+		{
+			(*pBuffPacket) << (uint8)0;     //小端
+		}
+		else
+		{
+			(*pBuffPacket) << (uint8)1;     //大端
+		}
+
+		//返回当前网络包字序规则
+		if(App_MainConfig::instance()->GetByteOrder() == false)
+		{
+			(*pBuffPacket) << (uint8)0;   //主机字序
+		}
+		else
+		{
+			(*pBuffPacket) << (uint8)1;   //网络字序
+		}
 
 	}
 

@@ -1,6 +1,8 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <config>
-	<NetWorkMode Mode="Epoll"  BackLog="100" desc = "设置框架使用的网络模型,windows下mode支持Iocp。Linux下支持Select,Poll和Epoll，如果需要更换修改Mode参数，否则不用改"/>
+	<!-- ByteOrder表明当前使用的是网络字序还是主机字序，NET_ORDER是网络字序，HOST_ORDER为主机字节序 -->
+	<!-- ByteOrder会指定当前所有的使用的BuffPacket，在流入数据的时候，自动转换成你需要的字序，完全不用你写额外的代码 -->
+	<NetWorkMode Mode="Epoll"  BackLog="100" ByteOrder="HOST_ORDER" desc = "设置框架使用的网络模型,windows下mode支持Iocp。Linux下支持Select,Poll和Epoll，如果需要更换修改Mode参数，否则不用改"/>
 	<ServerType Type="0" name="Pss Service" displayname="PssService" Debug="0" desc = "Type设置为0为当前启动，1为Linux后台执行，windows启动系统服务" />
 	<ServerID id="1" desc="当前服务器的ID编号" />
 	<ServerName name="Freeeyes" desc="当前服务器的名称" />

@@ -129,6 +129,8 @@ void CDlgClientMain::OnBnClickedButton2()
 		int nModuleCount         = 0;
 		int nWorkThreadCount     = 0;
 		char szPacketVersion[20] = {'\0'};
+		int nCharOrder           = 0;
+		int nByteOrder           = 0;
 
 		memcpy_s(&nSerevrID, 2, &szRecvBuff[nPos], sizeof(short));
 		nPos += sizeof(short);
@@ -148,10 +150,34 @@ void CDlgClientMain::OnBnClickedButton2()
 		nPos += sizeof(char);
 		memcpy_s(&szPacketVersion, nTempLen, &szRecvBuff[nPos], nTempLen);
 		nPos += nTempLen;
+		memcpy_s(&nCharOrder, 1, &szRecvBuff[nPos], sizeof(char));
+		nPos += sizeof(char);
+		memcpy_s(&nByteOrder, 1, &szRecvBuff[nPos], sizeof(char));
+		nPos += sizeof(char);
+
+		char szCharOrder[20] = {'\0'};
+		if(nCharOrder == 0)
+		{
+			sprintf_s(szCharOrder, "小端");
+		}
+		else
+		{
+			sprintf_s(szCharOrder, "大端");
+		}
+
+		char szByteOrder[20] = {'\0'};
+		if(nByteOrder == 0)
+		{
+			sprintf_s(szByteOrder, "主机字节序");
+		}
+		else
+		{
+			sprintf_s(szByteOrder, "网络字节序");
+		}
 
 		char szText[2048] = {'\0'};
-		sprintf_s(szText, "服务器ID:%d.\r\n服务器名称:%s.\r\n服务器版本:%s.\r\n服务器加载模块数:%d.\r\n服务器工作线程数:%d\r\n服务器包解析版本号:%s.", 
-			nSerevrID, szServerName, szServerVersion, nModuleCount, nWorkThreadCount, szPacketVersion);
+		sprintf_s(szText, "服务器ID:%d.\r\n服务器名称:%s.\r\n服务器版本:%s.\r\n服务器加载模块数:%d.\r\n服务器工作线程数:%d\r\n服务器包解析版本号:%s\r\n服务器大小端:%s\r\n服务器字符序:%s.", 
+			nSerevrID, szServerName, szServerVersion, nModuleCount, nWorkThreadCount, szPacketVersion, szCharOrder, szByteOrder);
 
 		//显示内容
 		wchar_t szTemp[2048] = {'\0'};

@@ -41,7 +41,7 @@ public:
 	void ReadBuffPtr(uint32 u4Size);
 	void WriteBuffPtr(uint32 u4Size);
 
-	void SetNetSort(bool blState);              //设置字节序开启开关
+	void SetNetSort(bool blState);              //设置字节序开启开关，false为主机字序，true为网络字序
 
 private:
 	bool AddBuff(uint32 u4Size);

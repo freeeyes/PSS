@@ -99,7 +99,7 @@ void CBuffPacketManager::Close()
 	m_mapPacketUsed.clear();
 }
 
-void CBuffPacketManager::Init(uint32 u4PacketCount)
+void CBuffPacketManager::Init(uint32 u4PacketCount, bool blByteOrder)
 {
 	Close();
 
@@ -108,6 +108,9 @@ void CBuffPacketManager::Init(uint32 u4PacketCount)
 		CBuffPacket* pBuffPacket = new CBuffPacket();
 		if(NULL != pBuffPacket)
 		{
+			//设置BuffPacket默认字序
+			pBuffPacket->SetNetSort(blByteOrder);
+
 			//添加到Free map里面
 			mapPacket::iterator f = m_mapPacketFree.find(pBuffPacket);
 			if(f == m_mapPacketFree.end())

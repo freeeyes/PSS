@@ -145,6 +145,7 @@ public:
 	uint32 GetWTStopTime();
 	uint8  GetWTReturnDataType();
 	char*  GetWTReturnData();
+	bool   GetByteOrder();
 
 private:
 	CXmlOpeation m_MainConfig;
@@ -226,6 +227,7 @@ private:
 	uint32     m_u4WTStopTime;                     //停止此命令服务的时间
 	uint8      m_u1WTReturnDataType;               //返回错误数据的类型，1为二进制，2为文本
 	char       m_szWTReturnData[MAX_BUFF_1024];    //返回的数据体，最多1K
+	bool       m_blByteOrder;                      //当前框架使用字序，false为主机序，true为网络序
 
 	ENUM_CHAR_ORDER m_u1CharOrder;                 //当前字节序
 

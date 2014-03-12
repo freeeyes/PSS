@@ -97,8 +97,8 @@ bool CProServerManager::Init()
 	//初始化防攻击系统
 	App_IPAccount::instance()->Init(App_MainConfig::instance()->GetValid(), App_MainConfig::instance()->GetValidConnectCount(), App_MainConfig::instance()->GetTrackIPCount());
 
-	//初始化BuffPacket缓冲池
-	App_BuffPacketManager::instance()->Init(BUFFPACKET_MAX_COUNT);
+	//初始化BuffPacket缓冲池.默认都是当前最大连接数的2倍
+	App_BuffPacketManager::instance()->Init(BUFFPACKET_MAX_COUNT, App_MainConfig::instance()->GetByteOrder());
 
 	//初始化PacketParse对象池
 	App_PacketParsePool::instance()->Init(MAX_PACKET_PARSE);
