@@ -933,7 +933,7 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 			Close();
 			return false;
 		}
-		else if(nDataLen >= nSendPacketLen)   //当数据包全部发送完毕，清空。
+		else if(nDataLen >= nSendPacketLen - nIsSendSize)   //当数据包全部发送完毕，清空。
 		{
 			//OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_output] ConnectID = %d, send (%d) OK.\n", GetConnectID(), msg_queue()->is_empty()));
 			m_u4AllSendCount    += 1;
