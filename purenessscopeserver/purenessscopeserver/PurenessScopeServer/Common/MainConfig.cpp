@@ -431,7 +431,7 @@ bool CMainConfig::Init(const char* szConfigPath)
 	pData = m_MainConfig.GetData("ClientInfo", "MaxBuffRecv");
 	if(pData != NULL)
 	{
-		m_u4ServerRecvBuff = (uint8)ACE_OS::atoi(pData);
+		m_u4ServerRecvBuff = (uint32)ACE_OS::atoi(pData);
 	}
 
 	//接收客户端信息相关配置
