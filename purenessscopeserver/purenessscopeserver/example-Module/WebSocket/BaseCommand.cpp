@@ -182,11 +182,18 @@ int CBaseCommand::DoMessage_DataIn(IMessage* pMessage, bool& bDeleteFlag)
 	//数据原样返回
 	char szReturnBuff[MAX_BUFF_1024] = {'\0'};
 	uint32 u4ReturnLen = MAX_BUFF_1024;
-	WebSocketEncrypt(BodyPacket.m_pData, (uint32)BodyPacket.m_nDataLen, szReturnBuff, u4ReturnLen);
-
-	SAFE_DELETE_ARRAY(pData);
 
 	uint16 u2PostCommandID = COMMAND_RETURN_DATAIN;
+
+	//拼接返回包
+	char szTemp[MAX_BUFF_1024] = {'\0'};
+	ACE_OS::memset(szTemp, 0, MAX_BUFF_1024);
+	sprintf_safe(szTemp, MAX_BUFF_1024, "%04x,%04d", u2PostCommandID, BodyPacket.m_nDataLen + 9);
+	ACE_OS::memcpy(&szTemp[ACE_OS::strlen(szTemp)], BodyPacket.m_pData, BodyPacket.m_nDataLen);
+
+	WebSocketEncrypt(szTemp, (uint32)ACE_OS::strlen(szTemp), szReturnBuff, u4ReturnLen);
+
+	SAFE_DELETE_ARRAY(pData);
 
 	if(NULL != m_pServerObject->GetConnectManager())
 	{
@@ -205,8 +212,8 @@ int CBaseCommand::DoMessage_DataIn(IMessage* pMessage, bool& bDeleteFlag)
 
 bool CBaseCommand::WebSocketEncrypt(char* pOriData, uint32 u4OriLen, char* pEncryData, uint32& u4EnCryLen)
 {				 
-	int length =  (int)u4OriLen;
-	int expectedSize = length + 1; //flags byte.
+	uint64 length =  (uint64)u4OriLen;
+	uint64 expectedSize = length + 1; //flags byte.
 	if(length <= 125  && length <= 65535 )
 		expectedSize += 1;
 	else if(length > 125  && length <= 65535)
@@ -215,7 +222,7 @@ bool CBaseCommand::WebSocketEncrypt(char* pOriData, uint32 u4OriLen, char* pEncr
 		expectedSize += 9;
 
 	int iPyl = 0;
-	char payloadFlags = 129;
+	unsigned char payloadFlags = 129;
 	ACE_OS::memcpy(pEncryData, &payloadFlags, 1);
 	length+=1;
 	iPyl+=1;
@@ -265,7 +272,7 @@ bool CBaseCommand::WebSocketEncrypt(char* pOriData, uint32 u4OriLen, char* pEncr
 	}
 
 	ACE_OS::memcpy(pEncryData+iPyl, pOriData, u4OriLen);
-	u4EnCryLen = expectedSize;
+	u4EnCryLen = (uint32)expectedSize;
 
 	return true;
 }

@@ -14,25 +14,37 @@ enum WEBSOCKET_CONNECT_STATE
 	WEBSOCKET_STATE_DATAIN,          //需要数据包状态
 };
 
+//最大解密包的长度,以及缓冲块的大小，如果长度比这个大，请修改这里
+#define MAX_DECRYPTLENGTH 5*MAX_BUFF_1024
+
 //记录websokcet的连接状态，如果是初次连接，则设置为WEBSOCKET_STATE_HANDIN
 struct _WebSocketInfo
 {
-	uint32                  m_u4ConnectID;
-	WEBSOCKET_CONNECT_STATE m_emState;
+	uint32                  m_u4ConnectID;                  //链接的ID
+	WEBSOCKET_CONNECT_STATE m_emState;                      //当前连接的状态
+	char                    m_szData[MAX_DECRYPTLENGTH];    //当前缓冲中数据的长度、
+	uint32                  m_u4DataLength;                 //当前缓冲块中的数据长度
 
 	_WebSocketInfo()
 	{
+		Init();
+	}
+
+	void Init()
+	{
 		m_u4ConnectID = 0;
 		m_emState     = WEBSOCKET_STATE_HANDIN;
+
+		//ACE_OS::memset(m_szData, 0, MAX_DECRYPTLENGTH);
+		m_u4DataLength    = 0;
 	}
 };
 
-//(暂时不用) 需要的时候可以随时加上，替代new和delete
 //声明一个内存管理池,管理所有的_WebSocketInfo指针
 class CWebSocketInfoPool
 {
 public:
-	CWebSocketInfoPool(uint32 u4Size = 10000)
+	CWebSocketInfoPool(uint32 u4Size = 1000)
 	{
 		for(uint32 i = 0; i < u4Size; i++)
 		{
@@ -51,7 +63,6 @@ public:
 
 	~CWebSocketInfoPool()
 	{
-		Close();
 	};
 
 	_WebSocketInfo* Create()
@@ -102,6 +113,8 @@ public:
 			return false;
 		}
 
+		pWebSocketInfo->Init();
+
 		mapPacket::iterator f = m_mapPacketUsed.find(pBuff);
 		if(f != m_mapPacketUsed.end())
 		{
@@ -116,25 +129,6 @@ public:
 		}
 
 		return true;
-	};
-
-	void Close()
-	{
-		//清理所有已存在的指针
-		for(mapPacket::iterator itorFreeA = m_mapPacketFree.begin(); itorFreeA != m_mapPacketFree.end(); itorFreeA++)
-		{
-			_WebSocketInfo* pWebSocketInfo = (_WebSocketInfo* )itorFreeA->second;
-			SAFE_DELETE(pWebSocketInfo);
-		}
-
-		for(mapPacket::iterator itorUsedB = m_mapPacketUsed.begin(); itorUsedB != m_mapPacketUsed.end(); itorUsedB++)
-		{
-			_WebSocketInfo* pWebSocketInfo = (_WebSocketInfo* )itorUsedB->second;
-			SAFE_DELETE(pWebSocketInfo);
-		}
-
-		m_mapPacketFree.clear();
-		m_mapPacketUsed.clear();
 	};
 
 private:
@@ -172,8 +166,9 @@ public:
 			return false;
 		}
 
-		_WebSocketInfo* pWebSocketInfo = new _WebSocketInfo();
-		pWebSocketInfo->m_u4ConnectID = u4ConnectID;
+		//_WebSocketInfo* pWebSocketInfo = new _WebSocketInfo();
+		_WebSocketInfo* pWebSocketInfo = m_objWebSocketInfoPool.Create();
+		pWebSocketInfo->m_u4ConnectID  = u4ConnectID;
 		m_mapWebSocketInfo.insert(mapWebSocketInfo::value_type(u4ConnectID, pWebSocketInfo));
 
 		return true;
@@ -186,7 +181,8 @@ public:
 		if(f != m_mapWebSocketInfo.end())
 		{
 			_WebSocketInfo* pWebSocketInfo = (_WebSocketInfo* )f->second;
-			SAFE_DELETE(pWebSocketInfo);
+			//SAFE_DELETE(pWebSocketInfo);
+			m_objWebSocketInfoPool.Delete(pWebSocketInfo);
 			m_mapWebSocketInfo.erase(f);
 		}
 	}
@@ -212,6 +208,9 @@ private:
 
 	//考虑到大量并发下的数据验证，采用map可能优于vector
 	mapWebSocketInfo m_mapWebSocketInfo;
+
+	//考虑到大量连接频繁建立和消除，采用内存池机制管理_WebSocketInfo*
+	CWebSocketInfoPool m_objWebSocketInfoPool;
 };
 
 typedef ACE_Singleton<CWebSocketInfoManager, ACE_Null_Mutex> App_WebSocketInfoManager;

@@ -92,7 +92,7 @@ bool CPacketParse::MakePacket(uint32 u4ConnectID, const char* pData, uint32 u4Le
 
 uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurrMessage, IMessageBlockManager* pMessageBlockManager)
 {
-	//这里是测试代码，专门处理为数据流的数据包
+	//专门处理为数据流的数据包
 	if(NULL == pCurrMessage || NULL == pMessageBlockManager)
 	{
 		return PACKET_GET_ERROR;
@@ -137,22 +137,31 @@ uint8 CPacketParse::WebSocketDisposeHandIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 	char* pData   = pCurrMessage->rd_ptr();     //得到这个数据块的首字节
 	uint32 u4Data = pCurrMessage->length();     //得到这个数据块的长度
 
+	//将收到的数据粘入缓冲等待做切包处理
+	if(pWebSocketInfo->m_u4DataLength + u4Data > MAX_DECRYPTLENGTH)
+	{
+		OUR_DEBUG((LM_ERROR, "[CPacketParse::WebSocketDisposeHandIn]pWebSocketInfo is full.\n"));
+		return PACKET_GET_ERROR;
+	}
+
+	ACE_OS::memcpy(&pWebSocketInfo->m_szData[pWebSocketInfo->m_u4DataLength], pData, u4Data);
+	pWebSocketInfo->m_u4DataLength += u4Data;
+
 	//判断是不是握手包的结束，找到末尾4个字符是不是\r\n\r\n
 	if(pData[u4Data - 1] == '\n' && pData[u4Data - 2] == '\r'
 		&& pData[u4Data - 3] == '\n' && pData[u4Data - 4] == '\r')
 	{
 		//接收到了完整的握手数据包，开始处理数据
-		//将剩余的数据粘入包体，拼接成一个完整的数据包
-		m_objCurrBody.WriteStream(pCurrMessage->rd_ptr(), pCurrMessage->length());
 
 		//申请一个包头，记录当前包的所有长度
 		m_pmbHead = pMessageBlockManager->Create(sizeof(uint32));
 		if(NULL == m_pmbHead)
 		{
+			OUR_DEBUG((LM_ERROR, "[CPacketParse::WebSocketDisposeHandIn]m_pmbHead is NULL.\n"));
 			return PACKET_GET_ERROR;
 		}
 
-		uint32 u4NetPacketLen = m_objCurrBody.GetPacketLen();
+		uint32 u4NetPacketLen = pWebSocketInfo->m_u4DataLength;
 		memcpy(m_pmbHead->wr_ptr(), (char*)&u4NetPacketLen, sizeof(uint32));
 		m_pmbHead->wr_ptr(sizeof(uint32));
 
@@ -160,10 +169,11 @@ uint8 CPacketParse::WebSocketDisposeHandIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 		m_pmbBody = pMessageBlockManager->Create(u4NetPacketLen);
 		if(NULL == m_pmbBody)
 		{
+			OUR_DEBUG((LM_ERROR, "[CPacketParse::WebSocketDisposeHandIn]m_pmbBody is NULL.\n"));
 			return PACKET_GET_ERROR;
 		}
 
-		ACE_OS::memcpy(m_pmbBody->wr_ptr(), (char*)pData, u4NetPacketLen);
+		ACE_OS::memcpy(m_pmbBody->wr_ptr(), (char*)pWebSocketInfo->m_szData, pWebSocketInfo->m_u4DataLength);
 		m_pmbBody->wr_ptr(u4NetPacketLen);
 
 		//设置命令字(0xe001指的是连接ID)
@@ -176,13 +186,15 @@ uint8 CPacketParse::WebSocketDisposeHandIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 
 		//处理完的数据从池中移除
 		pCurrMessage->rd_ptr(u4Data);
+
+		//设置缓冲处理完毕
+		pWebSocketInfo->m_u4DataLength = 0;
+
 		return (uint8)PACKET_GET_ENOUGTH;
 	}
 	else
 	{
 		//没有接收到完整的握手数据包，继续接收
-		//将不完整的数据放入缓冲，等待完整后放入包体
-		m_objCurrBody.WriteStream(pCurrMessage->rd_ptr(), pCurrMessage->length());
 		return (uint8)PACKET_GET_NO_ENOUGTH;
 	}
 }
@@ -195,6 +207,16 @@ uint8 CPacketParse::WebSocketDisposeDataIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 	uint32 u4PacketLen = 0;
 	uint8 u1Ret        = (uint8)PACKET_GET_ERROR;  
 
+	//将收到的数据粘入缓冲等待做切包处理
+	if(pWebSocketInfo->m_u4DataLength + u4Data > MAX_DECRYPTLENGTH)
+	{
+		OUR_DEBUG((LM_ERROR, "[CPacketParse::WebSocketDisposeHandIn]pWebSocketInfo is full.\n"));
+		return (uint8)PACKET_GET_ERROR;
+	}
+
+	ACE_OS::memcpy(&pWebSocketInfo->m_szData[pWebSocketInfo->m_u4DataLength], pData, u4Data);
+	pWebSocketInfo->m_u4DataLength += u4Data;
+
 	//解析规则约定为
 	//<命令字>,<数据包长度><数据包体>
 
@@ -202,11 +224,30 @@ uint8 CPacketParse::WebSocketDisposeDataIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 	//如果再大，则扩展这个大小
 	char szDecryptData[MAX_DECRYPTLENGTH] = {'\0'};
 	uint32 u4DecryptLen = MAX_DECRYPTLENGTH;
-	uint32 u4OriPacketLen = u4Data;
-	u1Ret = Decrypt(pData, u4OriPacketLen, szDecryptData, u4DecryptLen);
-	if(u1Ret == (uint8)PACKET_GET_ERROR)
+	uint32 u4OriPacketLen = pWebSocketInfo->m_u4DataLength;
+	u1Ret = Decrypt(pWebSocketInfo->m_szData, u4OriPacketLen, szDecryptData, u4DecryptLen);
+	if(u1Ret != (uint8)PACKET_GET_ENOUGTH)
 	{
 		return u1Ret;
+	}
+
+	//如果接受字节少于9个，则认为包头不完整
+	if(u4Data < 9)
+	{
+		return (uint8)PACKET_GET_NO_ENOUGTH;
+	}
+
+	//已经解析出完整数据包，判断是否有后续数据包的部分数据
+	if(pWebSocketInfo->m_u4DataLength > u4OriPacketLen)
+	{
+		//有后续的数据包，在这里需要处理一下
+		pWebSocketInfo->m_u4DataLength -= u4OriPacketLen;
+
+		ACE_OS::memcpy(&pWebSocketInfo->m_szData, &pWebSocketInfo->m_szData[u4OriPacketLen], pWebSocketInfo->m_u4DataLength);
+	}
+	else
+	{
+		pWebSocketInfo->m_u4DataLength = 0;
 	}
 	
 	//接收到了完整的数据包，开始处理数据
@@ -245,8 +286,18 @@ uint8 CPacketParse::WebSocketDisposeDataIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 
 		m_objCurrBody.Clear();
 
-		//处理完的数据从池中移除
-		pCurrMessage->rd_ptr(u4Data);
+		//处理完的数据从块中移除
+		pCurrMessage->reset();
+
+		//如果有剩余数据，则再让系统判定一下
+		if(pWebSocketInfo->m_u4DataLength > 0)
+		{
+			pCurrMessage->size((size_t)pWebSocketInfo->m_u4DataLength);
+			ACE_OS::memcpy(pCurrMessage->wr_ptr(), pWebSocketInfo->m_szData, pWebSocketInfo->m_u4DataLength);
+			pCurrMessage->wr_ptr(pWebSocketInfo->m_u4DataLength);
+			pWebSocketInfo->m_u4DataLength = 0;
+		}
+
 		return (uint8)PACKET_GET_ENOUGTH;
 	}
 	else
@@ -256,7 +307,7 @@ uint8 CPacketParse::WebSocketDisposeDataIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 
 }
 
-uint8 CPacketParse::Decrypt(char* pOriData, uint32 u4Len, char* pEncryData, uint32& u4EncryLen)
+uint8 CPacketParse::Decrypt(char* pOriData, uint32& u4Len, char* pEncryData, uint32& u4EncryLen)
 {
 	if(u4Len < 6)
 	{
@@ -336,7 +387,8 @@ uint8 CPacketParse::Decrypt(char* pOriData, uint32 u4Len, char* pEncryData, uint
 
 	ACE_OS::memcpy(pEncryData, mp_payload_data, payloadSize);
 	u4EncryLen = payloadSize;
-	u4Len      = payloadSize;
+	//这里6个字节头是固定的，第一个字节固定的129，第二个字节是包长，外加4字节mark
+	u4Len      = payloadSize + 6;
 
 	return PACKET_GET_ENOUGTH;
 }
@@ -387,7 +439,15 @@ uint8 CPacketParse::ReadDataPacketInfo(const char* pData, uint32 u4DataLen, uint
 		}
 		else
 		{
-			return (uint8)PACKET_GET_ENOUGTH;
+			//判断包是否接收完整了
+			if(u4PacketLen > u4DataLen)
+			{
+				return (uint8)PACKET_GET_NO_ENOUGTH;
+			}
+			else
+			{
+				return (uint8)PACKET_GET_ENOUGTH;
+			}
 		}
 	}
 }

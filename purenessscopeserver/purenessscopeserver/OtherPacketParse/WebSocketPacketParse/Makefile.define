@@ -5,7 +5,6 @@ CC = g++
 AR = ar
 RANLIB = ranlib
 CFLAGS = -g -O2 -DOTL_ODBC_UNIX
-ICONV = /home/wjl/libiconv-1.11
 INCLUDES = -I./ -I../ -I/usr/include -I${ACE_ROOT} -I../PurenessScopeServer/Common -I../PurenessScopeServer/Reactor -I../PurenessScopeServer/IObject -I../PurenessScopeServer/LogSystem -I../PurenessScopeServer/Message -I../PurenessScopeServer/PacketParse -I../PurenessScopeServer/UDP -I../PurenessScopeServer/Proactor
 LIBS = -L/usr/lib64 -L${ACE_ROOT}/lib  -L/usr/local/lib64 -L./ -L../ -lACE -lz -ldl 
 # -L${ICONV}/lib -I${ICONV}/include

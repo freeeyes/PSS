@@ -19,6 +19,6 @@ $(LIB_BASE): $(LIB_BASE_OBJS)
 clean:
 	rm -rf *.o  $(LIB_BASE) $(LIB_BASE_OBJS)
 clear:	
-	mv libPacketParse.so ../PurenessScopeServer/Linux_Bin/
+	mv libPacketParse.so ../../PurenessScopeServer/Linux_Bin/
 cl:	
 	rm -rf *.o 

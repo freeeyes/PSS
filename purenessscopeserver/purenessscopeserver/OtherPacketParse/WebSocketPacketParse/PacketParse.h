@@ -20,9 +20,6 @@
 #define DLL_EXPORT
 #endif 
 
-//最大解密包的长度，如果长度比这个大，请修改这里
-#define MAX_DECRYPTLENGTH 5*MAX_BUFF_1024
-
 #ifdef WIN32
 class DLL_EXPORT CPacketParse : public CPacketParseBase
 #else
@@ -61,7 +58,7 @@ private:
 	//获得当前包长以及包ID
 	uint8 ReadDataPacketInfo(const char* pData, uint32 u4DataLen, uint16& u2CommandID, uint32& u4PacketLen);
 	//解密数据包
-	uint8 Decrypt(char* pOriData, uint32 u4Len, char* pEncryData, uint32& u4EncryLen);
+	uint8 Decrypt(char* pOriData, uint32& u4Len, char* pEncryData, uint32& u4EncryLen);
 };
 
 #endif
