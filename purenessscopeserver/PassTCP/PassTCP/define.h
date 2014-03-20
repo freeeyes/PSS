@@ -177,18 +177,138 @@ private:
 	}
 };
 
-//线程连接信息
-struct _Socket_Info
+enum EM_DATA_RETURN_STATE
 {
+	DATA_RETURN_STATE_SUCCESS = 0,
+	DATA_RETURN_STATE_ERROR,
+	DATA_RETURN_STATE_CONTINUE,
+};
+
+//声明一个基类，来负责格式化数据发送和接收的部分逻辑
+class CBaseDataLogic
+{
+public:
+	virtual bool InitSendSize(int nSendLen)                                 = 0;
+	virtual char* GetSendData()                                             = 0;
+	virtual char* GetSendData(int nThreadID, int nCurrIndex)                = 0;
+	virtual int GetSendLength()                                             = 0;                   
+	virtual int GetRecvLength()                                             = 0;
+	virtual void SetRecvLength(int nRecvLen)                                = 0;
+	virtual void SetMaxSendLength(int nMaxLength)                           = 0;
+	virtual EM_DATA_RETURN_STATE GetRecvData(int nThreadID, int nCurrIndex, char* pData, int nLen) = 0;
+};
+
+//普通的TCP收发相关信息处理逻辑
+//为了兼容一些特殊协议，比如websocket以及http
+//收发数据不再是单独的一个指针，而是一个继承CBaseDataLogic的类
+class CNomalLogic : public CBaseDataLogic
+{
+public:
+	CNomalLogic() 
+	{ 
+		m_pSendData    = NULL;
+		m_nSendLen     = 0;
+		m_nRecvLen     = 0;
+		m_nCurrRecvLen = 0;
+	};
+
+	~CNomalLogic() { Close(); };
+
+	void Close()
+	{
+		if(NULL != m_pSendData)
+		{
+			delete[] m_pSendData;
+			m_pSendData = NULL;
+		}
+	}
+
+	bool InitSendSize(int nSendLen)
+	{
+		Close();
+
+		m_pSendData = new char[nSendLen];
+		m_nSendLen  = nSendLen;
+
+		return true;
+	}
+
+	void SetRecvLength(int nRecvLen)
+	{
+		m_nRecvLen = nRecvLen;
+	}
+
+	void SetMaxSendLength(int nMaxLength)
+	{
+		m_nSendLen = nMaxLength;
+	}
+
+	//设置相关发送Buff
+	void SetSendBuff(const char* pData, int nLen)
+	{
+		memcpy_s(m_pSendData, nLen, pData, nLen);
+		m_nSendLen = nLen;
+	}
+
+	char* GetSendData()
+	{
+		return m_pSendData;
+	}
+
+	char* GetSendData(int nThreadID, int nCurrIndex)
+	{
+		return m_pSendData;
+	}
+
+	int GetSendLength()
+	{
+		return m_nSendLen;
+	}
+
+	int GetRecvLength()
+	{
+		return m_nRecvLen;
+	}
+
+	EM_DATA_RETURN_STATE GetRecvData(int nThreadID, int nCurrIndex, char* pData, int nLen)
+	{
+		m_nCurrRecvLen += nLen;
+		if(m_nCurrRecvLen == m_nRecvLen)
+		{
+			m_nCurrRecvLen = 0;
+			//全部接收完毕，返回正确
+			return DATA_RETURN_STATE_SUCCESS;
+		}
+		else if(nLen < m_nRecvLen)
+		{
+			//没有接收完全，继续接收
+			return DATA_RETURN_STATE_CONTINUE;
+		}
+
+		m_nCurrRecvLen = 0;
+		return DATA_RETURN_STATE_ERROR;
+	}
+
+private:
+	char* m_pSendData;
+	int   m_nSendLen;
+	int   m_nRecvLen;
+	int   m_nCurrRecvLen;
+};
+
+//线程连接信息
+class _Socket_Info
+{
+public:
 	char  m_szSerevrIP[MAX_BUFF_20];      //远程服务器的IP
 	int   m_nPort;                        //远程服务器的端口
 	int   m_nThreadID;                    //线程ID
 	int   m_nRecvTimeout;                 //接收数据超时时间（单位是毫秒）
 	int   m_nDelaySecond;                 //短连接间延时（单位是毫秒）
 	int   m_nPacketTimewait;              //数据包发送间隔(单位是毫秒)
-	int   m_nSendLength;                  //发送字符串长度
-	int   m_nRecvLength;                  //接收字符串长度限定
-	char* m_pSendBuff;                    //发送数据长度
+	//int   m_nSendLength;                //发送字符串长度
+	//int   m_nRecvLength;                //接收字符串长度限定
+	//char* m_pSendBuff;                  //发送数据长度
 	bool  m_blIsAlwayConnect;             //是否长连接
 	bool  m_blIsRadomaDelay;              //是否随机延时
 	bool  m_blIsRecv;                     //是否接收回应包
@@ -201,6 +321,7 @@ struct _Socket_Info
 	int   m_nUdpClientPort;               //UDP客户端接收数据端口
 	int   m_nSendCount;                   //发送总数据包数
 	char  m_szLuaFileName[MAX_BUFF_1024]; //高级模式的Lua文件名
+	CBaseDataLogic* m_pLogic;             //数据对象  
 
 	_Socket_Info()
 	{
@@ -210,10 +331,10 @@ struct _Socket_Info
 		m_nRecvTimeout     = 0;
 		m_nPacketTimewait  = 0;
 		m_nDelaySecond     = 0;
-		m_nSendLength      = 0;
-		m_nRecvLength      = 0;
+		//m_nSendLength      = 0;
+		//m_nRecvLength      = 0;
 		m_nSendCount       = 0;
-		m_pSendBuff        = NULL;
+		//m_pSendBuff        = NULL;
 		m_blIsAlwayConnect = false;
 		m_blIsRadomaDelay  = false;
 		m_blIsRecv         = true;
@@ -225,28 +346,17 @@ struct _Socket_Info
 		m_nConnectType     = 0;
 		m_nUdpClientPort   = 0;
 		m_szLuaFileName[0] = '\0';
+		m_pLogic           = NULL;
 	}
 
 	~_Socket_Info()
 	{
-		if(NULL != m_pSendBuff)
+		if(m_pLogic != NULL)
 		{
-			delete[] m_pSendBuff;
-			m_pSendBuff = NULL;
+			delete m_pLogic; 
 		}
 	}
 
-	void InitSendSize(int nSize)
-	{
-		if(NULL != m_pSendBuff)
-		{
-			delete[] m_pSendBuff;
-			m_pSendBuff = NULL;
-		}
-
-		m_pSendBuff = new char[nSize];
-		m_nSendLength = nSize;
-	}
 };
 
 //线程运行状态信息

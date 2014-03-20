@@ -64,7 +64,7 @@ void CClientTcpSocket::Run()
 	_ParamData* pRecvParam3   = NULL;
 	_ParamData* pRecvParamOut = NULL;
 
-	int nLuaBufferMaxLength = m_pSocket_Info->m_nSendLength;
+	int nLuaBufferMaxLength = m_pSocket_Info->m_pLogic->GetSendLength();
 
 	if(m_pSocket_Info == NULL || m_pSocket_State_Info == NULL)
 	{
@@ -107,6 +107,9 @@ void CClientTcpSocket::Run()
 	sockaddr.sin_port   = htons(m_pSocket_Info->m_nPort);
 	sockaddr.sin_addr.S_un.S_addr = inet_addr(m_pSocket_Info->m_szSerevrIP);
 
+	//发送次数
+	int nSendIndex = 0;
+
 	while(m_blRun)
 	{
 		unsigned int tBegin = (unsigned int)GetTickCount();
@@ -120,7 +123,7 @@ void CClientTcpSocket::Run()
 		if(m_pSocket_Info->m_blLuaAdvance == true)
 		{
 			//重置缓冲最大长度
-			m_pSocket_Info->m_nSendLength = nLuaBufferMaxLength;
+			m_pSocket_Info->m_pLogic->SetMaxSendLength(nLuaBufferMaxLength);
 
 			//开始调用Lua脚本，去组织数据块
 			CParamGroup objIn;
@@ -129,8 +132,9 @@ void CClientTcpSocket::Run()
 			objIn.NeedRetrieve(false);
 			objOut.NeedRetrieve(false);
 
-			pSendParam1->SetParam((char* )m_pSocket_Info->m_pSendBuff, "void", sizeof(int));
-			pSendParam2->SetParam((char* )&m_pSocket_Info->m_nSendLength, "int", sizeof(int));
+			int nLuaSendLen = m_pSocket_Info->m_pLogic->GetSendLength();
+			pSendParam1->SetParam((char* )m_pSocket_Info->m_pLogic->GetSendData(), "void", sizeof(int));
+			pSendParam2->SetParam((char* )&nLuaSendLen, "int", sizeof(int));
 			pSendParam3->SetParam((char* )&m_nThreadID, "int", sizeof(int));
 			int nSendLength = 0;
 			pSendParamOut->SetParam((char* )&nSendLength, "int", sizeof(int));
@@ -143,7 +147,7 @@ void CClientTcpSocket::Run()
 			m_objLuaFn.CallFileFn("PassTcp_CreateSendData", objIn, objOut);
 
 			int* pLength = (int* )pSendParamOut->GetParam();
-			m_pSocket_Info->m_nSendLength = (int)(*pLength);
+			m_pSocket_Info->m_pLogic->SetMaxSendLength((int)(*pLength));
 		}
 
 
@@ -210,22 +214,24 @@ void CClientTcpSocket::Run()
 
 				for(int i = 0; i < nSendCount; i++)
 				{
-					MEMCOPY_SAFE(&szSendBuffData[i * m_pSocket_Info->m_nSendLength], m_pSocket_Info->m_pSendBuff, m_pSocket_Info->m_nSendLength);
+					MEMCOPY_SAFE(&szSendBuffData[i * m_pSocket_Info->m_pLogic->GetSendLength()], 
+						m_pSocket_Info->m_pLogic->GetSendData(m_pSocket_Info->m_nThreadID, nSendIndex), 
+						m_pSocket_Info->m_pLogic->GetSendLength());
 				}
 
 				nPacketCount = nSendCount;
 
 				//发送数据
 				pSendData     = (char* )szSendBuffData;
-				nSendLen      = m_pSocket_Info->m_nSendLength * nSendCount;
-				nTotalRecvLen = m_pSocket_Info->m_nRecvLength * nSendCount;
+				nSendLen      = m_pSocket_Info->m_pLogic->GetSendLength() * nSendCount;
+				nTotalRecvLen = m_pSocket_Info->m_pLogic->GetSendLength() * nSendCount;
 			}
 			else
 			{
 				//发送数据
-				pSendData     = (char* )m_pSocket_Info->m_pSendBuff;
-				nSendLen      = m_pSocket_Info->m_nSendLength;
-				nTotalRecvLen = m_pSocket_Info->m_nRecvLength;
+				pSendData     = (char* )m_pSocket_Info->m_pLogic->GetSendData(m_pSocket_Info->m_nThreadID, nSendIndex);
+				nSendLen      = m_pSocket_Info->m_pLogic->GetSendLength();
+				nTotalRecvLen = m_pSocket_Info->m_pLogic->GetRecvLength();
 
 				nPacketCount  = 1;
 			}
@@ -283,6 +289,7 @@ void CClientTcpSocket::Run()
 					}
 				}
 			}
+			nSendIndex++;
 
 			//接收数据
 			if(blSendFlag == true && m_pSocket_Info->m_blIsRecv == true)
@@ -396,7 +403,10 @@ void CClientTcpSocket::Run()
 							//如果不是高级模式，则采用配置的判定准则
 							m_pSocket_State_Info->m_nRecvByteCount += nCurrRecvLen;
 							nTotalRecvLen -= nCurrRecvLen;
-							if(nTotalRecvLen == 0)
+
+							EM_DATA_RETURN_STATE emState = m_pSocket_Info->m_pLogic->GetRecvData(m_nThreadID, nSendIndex, szRecvBuffData, nCurrRecvLen);
+
+							if(nTotalRecvLen == 0 || emState == DATA_RETURN_STATE_SUCCESS)
 							{
 								//接收完成
 								m_pSocket_State_Info->m_nSuccessRecv += nPacketCount;

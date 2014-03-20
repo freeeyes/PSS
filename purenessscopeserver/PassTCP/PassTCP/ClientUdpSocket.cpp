@@ -46,7 +46,7 @@ void CClientUdpSocket::Run()
 	_ParamData* pRecvParam3   = NULL;
 	_ParamData* pRecvParamOut = NULL;
 
-	int nLuaBufferMaxLength = m_pSocket_Info->m_nSendLength;
+	int nLuaBufferMaxLength = m_pSocket_Info->m_pLogic->GetSendLength();
 
 	if(m_pSocket_Info == NULL || m_pSocket_State_Info == NULL)
 	{
@@ -105,6 +105,9 @@ void CClientUdpSocket::Run()
 
 	bind(sckServer, (SOCKADDR *) &clientsockaddr, sizeof(clientsockaddr));
 
+	//发送次数
+	int nSendIndex = 0;
+
 	while(m_blRun)
 	{
 		unsigned int tBegin = (unsigned int)GetTickCount();
@@ -118,7 +121,7 @@ void CClientUdpSocket::Run()
 		if(m_pSocket_Info->m_blLuaAdvance == true)
 		{
 			//重置缓冲最大长度
-			m_pSocket_Info->m_nSendLength = nLuaBufferMaxLength;
+			m_pSocket_Info->m_pLogic->SetMaxSendLength(nLuaBufferMaxLength);
 
 			//开始调用Lua脚本，去组织数据块
 			CParamGroup objIn;
@@ -127,8 +130,9 @@ void CClientUdpSocket::Run()
 			objIn.NeedRetrieve(false);
 			objOut.NeedRetrieve(false);
 
-			pSendParam1->SetParam((char* )m_pSocket_Info->m_pSendBuff, "void", sizeof(int));
-			pSendParam2->SetParam((char* )&m_pSocket_Info->m_nSendLength, "int", sizeof(int));
+			int nLuaSendLen = m_pSocket_Info->m_pLogic->GetSendLength();
+			pSendParam1->SetParam((char* )m_pSocket_Info->m_pLogic->GetSendData(), "void", sizeof(int));
+			pSendParam2->SetParam((char* )&nLuaSendLen, "int", sizeof(int));
 			pSendParam3->SetParam((char* )&m_nThreadID, "int", sizeof(int));
 			int nSendLength = 0;
 			pSendParamOut->SetParam((char* )&nSendLength, "int", sizeof(int));
@@ -141,7 +145,7 @@ void CClientUdpSocket::Run()
 			m_objLuaFn.CallFileFn("PassTcp_CreateSendData", objIn, objOut);
 
 			int* pLength = (int* )pSendParamOut->GetParam();
-			m_pSocket_Info->m_nSendLength = (int)(*pLength);
+			m_pSocket_Info->m_pLogic->SetMaxSendLength((int)(*pLength));
 		}
 
 
@@ -184,21 +188,22 @@ void CClientUdpSocket::Run()
 
 				for(int i = 0; i < nSendCount; i++)
 				{
-					memcpy(&szSendBuffData[i * m_pSocket_Info->m_nSendLength], m_pSocket_Info->m_pSendBuff, m_pSocket_Info->m_nSendLength);
+					memcpy(&szSendBuffData[i * m_pSocket_Info->m_pLogic->GetSendLength()], 
+						m_pSocket_Info->m_pLogic->GetSendData(m_nThreadID, nSendIndex), m_pSocket_Info->m_pLogic->GetSendLength());
 				}
 				nPacketCount = nSendCount;
 
 				//发送数据
 				pSendData     = (char* )szSendBuffData;
-				nSendLen      = m_pSocket_Info->m_nSendLength * nSendCount;
-				nTotalRecvLen = m_pSocket_Info->m_nRecvLength * nSendCount;
+				nSendLen      = m_pSocket_Info->m_pLogic->GetSendLength() * nSendCount;
+				nTotalRecvLen = m_pSocket_Info->m_pLogic->GetSendLength() * nSendCount;
 			}
 			else
 			{
 				//发送数据
-				pSendData     = (char* )m_pSocket_Info->m_pSendBuff;
-				nSendLen      = m_pSocket_Info->m_nSendLength;
-				nTotalRecvLen = m_pSocket_Info->m_nRecvLength;
+				pSendData     = (char* )m_pSocket_Info->m_pLogic->GetSendData(m_nThreadID, nSendIndex);
+				nSendLen      = m_pSocket_Info->m_pLogic->GetSendLength();
+				nTotalRecvLen = m_pSocket_Info->m_pLogic->GetRecvLength();
 			}
 
 			//记录应收字节总数
@@ -372,7 +377,9 @@ void CClientUdpSocket::Run()
 							//如果不是高级模式，则采用配置的判定准则
 							m_pSocket_State_Info->m_nRecvByteCount += nCurrRecvLen;
 							nTotalRecvLen -= nCurrRecvLen;
-							if(nTotalRecvLen == 0)
+
+							EM_DATA_RETURN_STATE emState = m_pSocket_Info->m_pLogic->GetRecvData(m_nThreadID, nSendLen, szRecvBuffData, nCurrRecvLen);
+							if(emState == DATA_RETURN_STATE_SUCCESS)
 							{
 								//接收完成
 								m_pSocket_State_Info->m_nSuccessRecv += nPacketCount;

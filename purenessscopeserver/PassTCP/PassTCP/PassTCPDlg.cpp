@@ -239,6 +239,10 @@ void CPassTCPDlg::OnBnClickedButton1()
 		//读取线程信息
 		_Socket_Info* pSocket_Info             = new _Socket_Info();
 		_Socket_State_Info* pSocket_State_Info = new _Socket_State_Info();
+		CNomalLogic* pNomalLogic               = new CNomalLogic();
+		
+		pSocket_Info->m_pLogic = (CBaseDataLogic* )pNomalLogic;
+
 		m_txtServerIP.GetWindowText(strData);
 		int nSrcLen = WideCharToMultiByte(CP_ACP, 0, strData, strData.GetLength(), NULL, 0, NULL, NULL);
 		int nDecLen = WideCharToMultiByte(CP_ACP, 0, strData, nSrcLen, pSocket_Info->m_szSerevrIP, MAX_BUFF_20, NULL,NULL);
@@ -251,7 +255,7 @@ void CPassTCPDlg::OnBnClickedButton1()
 		m_txtSocketInterval.GetWindowText(strData);
 		pSocket_Info->m_nDelaySecond = _ttoi((LPCTSTR)strData);
 		m_txtRecvLength.GetWindowText(strData);
-		pSocket_Info->m_nRecvLength = _ttoi((LPCTSTR)strData);
+		pSocket_Info->m_pLogic->SetRecvLength(_ttoi((LPCTSTR)strData));
 		m_txtClientUdpPort.GetWindowText(strData);
 		pSocket_Info->m_nUdpClientPort = _ttoi((LPCTSTR)strData);
 		m_txtPacketTimewait.GetWindowText(strData);
@@ -277,7 +281,7 @@ void CPassTCPDlg::OnBnClickedButton1()
 		{
 			//如果是Lua文件模式，直接初始化一个100k的数据块
 			//然后根据脚本去组织发送数据
-			pSocket_Info->InitSendSize(100 * MAX_BUFF_1024);
+			pSocket_Info->m_pLogic->InitSendSize(100 * MAX_BUFF_1024);
 		}
 		else
 		{
@@ -292,16 +296,19 @@ void CPassTCPDlg::OnBnClickedButton1()
 				//如果是二进制模式
 				CConvertBuffer objConvertBuffer;
 				//获得要转换的数据块大小
-				pSocket_Info->InitSendSize(objConvertBuffer.GetBufferSize(pSendData, nDecLen));
+				pSocket_Info->m_pLogic->InitSendSize(objConvertBuffer.GetBufferSize(pSendData, nDecLen));
 				//将数据串转换成二进制串
-				objConvertBuffer.Convertstr2charArray(pSendData, strlen(pSendData), (unsigned char*)pSocket_Info->m_pSendBuff, pSocket_Info->m_nSendLength);
+				int nSendLen = nDecLen;
+				objConvertBuffer.Convertstr2charArray(pSendData, strlen(pSendData), 
+					(unsigned char*)pSocket_Info->m_pLogic->GetSendData(), nSendLen);
+				pSocket_Info->m_pLogic->SetRecvLength(nSendLen);
 			}
 			else
 			{
 				//如果是文本模式
 				int nSendSize = nDecLen;
-				pSocket_Info->InitSendSize(nDecLen);
-				memcpy_s(pSocket_Info->m_pSendBuff, nDecLen, pSendData, nDecLen);
+				pSocket_Info->m_pLogic->InitSendSize(nDecLen);
+				memcpy_s(pSocket_Info->m_pLogic->GetSendData(), nDecLen, pSendData, nDecLen);
 			}
 
 			delete[] pSendData;

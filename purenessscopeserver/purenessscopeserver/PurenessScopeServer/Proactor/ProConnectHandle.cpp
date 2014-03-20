@@ -789,7 +789,7 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 			return false;
 		}
 
-		OUR_DEBUG ((LM_ERROR, "[CConnectHandler::PutSendPacket] Connectid=%d, length=%d!\n", GetConnectID(), pMbData->length()));
+		//OUR_DEBUG ((LM_ERROR, "[CConnectHandler::PutSendPacket] Connectid=%d, length=%d!\n", GetConnectID(), pMbData->length()));
 		if(0 != m_Writer.write(*pMbData, pMbData->length()))
 		{
 			OUR_DEBUG ((LM_ERROR, "[CConnectHandler::PutSendPacket] Connectid=%d mb=%d m_writer.write error(%d)!\n", GetConnectID(),  pMbData->length(), errno));
