@@ -208,7 +208,7 @@ uint8 CPacketParse::WebSocketDisposeDataIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 	uint8 u1Ret        = (uint8)PACKET_GET_ERROR;  
 
 	//将收到的数据粘入缓冲等待做切包处理
-	if(pWebSocketInfo->m_u4DataLength + u4Data > MAX_DECRYPTLENGTH)
+	if(pWebSocketInfo->m_u4DataLength + u4Data > MAX_ENCRYPTLENGTH)
 	{
 		OUR_DEBUG((LM_ERROR, "[CPacketParse::WebSocketDisposeHandIn]pWebSocketInfo is full.\n"));
 		return (uint8)PACKET_GET_ERROR;
@@ -222,14 +222,22 @@ uint8 CPacketParse::WebSocketDisposeDataIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 
 	//首先解密数据包,最大解密数据包是5K
 	//如果再大，则扩展这个大小
-	char szDecryptData[MAX_DECRYPTLENGTH] = {'\0'};
+	if(pWebSocketInfo->m_u4DecryptDataLen + pWebSocketInfo->m_u4DataLength > MAX_DECRYPTLENGTH)
+	{
+		OUR_DEBUG((LM_ERROR, "[CPacketParse::WebSocketDisposeHandIn]m_u4DecryptDataLen is full.\n"));
+		return (uint8)PACKET_GET_ERROR;
+	}
+
+	char* pDecryptData = (char* )&pWebSocketInfo->m_szDecryptData[pWebSocketInfo->m_u4DecryptDataLen];
 	uint32 u4DecryptLen = MAX_DECRYPTLENGTH;
 	uint32 u4OriPacketLen = pWebSocketInfo->m_u4DataLength;
-	u1Ret = Decrypt(pWebSocketInfo->m_szData, u4OriPacketLen, szDecryptData, u4DecryptLen);
+	u1Ret = Decrypt(pWebSocketInfo->m_szData, u4OriPacketLen, pDecryptData, u4DecryptLen);
 	if(u1Ret != (uint8)PACKET_GET_ENOUGTH)
 	{
 		return u1Ret;
 	}
+
+	pWebSocketInfo->m_u4DecryptDataLen += u4DecryptLen;
 
 	//如果接受字节少于9个，则认为包头不完整
 	if(u4Data < 9)
@@ -252,7 +260,8 @@ uint8 CPacketParse::WebSocketDisposeDataIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 	
 	//接收到了完整的数据包，开始处理数据
 	//获得当前包ID和包长
-	u1Ret = ReadDataPacketInfo(szDecryptData, u4DecryptLen, m_u2PacketCommandID, u4PacketLen);
+	uint32 u4CurrDecryptDataLen = pWebSocketInfo->m_u4DecryptDataLen;
+	u1Ret = ReadDataPacketInfo(pWebSocketInfo->m_szDecryptData, u4CurrDecryptDataLen, m_u2PacketCommandID, u4PacketLen);
 	if(u1Ret == PACKET_GET_ENOUGTH)
 	{
 		//申请一个包头，记录当前包的所有长度
@@ -263,14 +272,14 @@ uint8 CPacketParse::WebSocketDisposeDataIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 		}
 
 		//去掉包头，只留数据体在包体内
-		char* pInfo = (char* )ACE_OS::strstr(szDecryptData, "{");
+		char* pInfo = (char* )ACE_OS::strstr(pWebSocketInfo->m_szData, "{");
 		if(NULL == pInfo)
 		{
 			//如果找不到大括号，说明数据包异常，断开这个链接
 			return (uint8)PACKET_GET_ERROR;
 		}
 
-		uint32 u4NetPacketLen = ACE_OS::strlen(pInfo);
+		uint32 u4NetPacketLen = u4CurrDecryptDataLen - (uint32)(pInfo - pWebSocketInfo->m_szDecryptData);
 		memcpy(m_pmbHead->wr_ptr(), (char*)&u4NetPacketLen, sizeof(uint32));
 		m_pmbHead->wr_ptr(sizeof(uint32));
 
@@ -281,7 +290,7 @@ uint8 CPacketParse::WebSocketDisposeDataIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 			return PACKET_GET_ERROR;
 		}
 
-		ACE_OS::memcpy(m_pmbBody->wr_ptr(), (char*)pInfo, ACE_OS::strlen(pInfo));
+		ACE_OS::memcpy(m_pmbBody->wr_ptr(), (char*)pInfo, u4NetPacketLen);
 		m_pmbBody->wr_ptr(u4NetPacketLen);
 
 		m_objCurrBody.Clear();
@@ -298,6 +307,15 @@ uint8 CPacketParse::WebSocketDisposeDataIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 			pWebSocketInfo->m_u4DataLength = 0;
 		}
 
+		//如果解析包还有内容，则再放回去
+		pWebSocketInfo->m_u4DecryptDataLen -= u4CurrDecryptDataLen;
+		if(pWebSocketInfo->m_u4DecryptDataLen > 0)
+		{
+			ACE_OS::memcpy(pWebSocketInfo->m_szDecryptData, 
+				(char* )&pWebSocketInfo->m_szDecryptData[u4CurrDecryptDataLen], 
+				pWebSocketInfo->m_u4DecryptDataLen);
+		}
+
 		return (uint8)PACKET_GET_ENOUGTH;
 	}
 	else
@@ -309,6 +327,9 @@ uint8 CPacketParse::WebSocketDisposeDataIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 
 uint8 CPacketParse::Decrypt(char* pOriData, uint32& u4Len, char* pEncryData, uint32& u4EncryLen)
 {
+	//帧头长度，默认是6,扩展后是8
+	int nFrameLen = 6;
+
 	if(u4Len < 6)
 	{
 		m_blIsHead = true;
@@ -316,15 +337,15 @@ uint8 CPacketParse::Decrypt(char* pOriData, uint32& u4Len, char* pEncryData, uin
 		return PACKET_GET_NO_ENOUGTH;
 	}
 
-	char* mp_mask_byte = NULL;	
+	unsigned char* mp_mask_byte = NULL;	
 	int nMinExpectedSize = 0;
 
 
-	BYTE payloadFlags = pOriData[0];
+	unsigned char payloadFlags = pOriData[0];
 	if (payloadFlags != 129)
 		return PACKET_GET_ERROR;
 
-	BYTE basicSize = pOriData[1] & 0x7F;
+	unsigned char basicSize = pOriData[1] & 0x7F;
 	unsigned int payloadSize;
 	int masksOffset;
 
@@ -343,6 +364,7 @@ uint8 CPacketParse::Decrypt(char* pOriData, uint32& u4Len, char* pEncryData, uin
 		}
 		payloadSize = ntohs( *(u_short*) (pOriData + 2) );
 		masksOffset = 4;
+		nFrameLen   = 8;
 	}
 	else if (basicSize == 127)
 	{
@@ -355,6 +377,7 @@ uint8 CPacketParse::Decrypt(char* pOriData, uint32& u4Len, char* pEncryData, uin
 		}
 		payloadSize = ntohl( *(u_long*) (pOriData + 2) );
 		masksOffset = 10;
+		nFrameLen   = 8;
 	}
 	else
 	{
@@ -369,7 +392,7 @@ uint8 CPacketParse::Decrypt(char* pOriData, uint32& u4Len, char* pEncryData, uin
 		return PACKET_GET_NO_ENOUGTH;
 	}
 
-	BYTE masks[4];
+	char masks[4];
 	memcpy(masks, pOriData + masksOffset, 4);
 
 	char* mp_payload_data = new char[payloadSize + 1];
@@ -388,13 +411,15 @@ uint8 CPacketParse::Decrypt(char* pOriData, uint32& u4Len, char* pEncryData, uin
 	ACE_OS::memcpy(pEncryData, mp_payload_data, payloadSize);
 	u4EncryLen = payloadSize;
 	//这里6个字节头是固定的，第一个字节固定的129，第二个字节是包长，外加4字节mark
-	u4Len      = payloadSize + 6;
+	u4Len      = payloadSize + nFrameLen;
 
 	return PACKET_GET_ENOUGTH;
 }
 
-uint8 CPacketParse::ReadDataPacketInfo(const char* pData, uint32 u4DataLen, uint16& u2CommandID, uint32& u4PacketLen)
+uint8 CPacketParse::ReadDataPacketInfo(const char* pData, uint32& u4DataLen, uint16& u2CommandID, uint32& u4PacketLen)
 {
+	uint32 u4AllDataCount = u4DataLen;
+
 	char* pInfo = NULL;
 	char szTemp[MAX_BUFF_100] = {'\0'};
 
@@ -440,12 +465,13 @@ uint8 CPacketParse::ReadDataPacketInfo(const char* pData, uint32 u4DataLen, uint
 		else
 		{
 			//判断包是否接收完整了
-			if(u4PacketLen > u4DataLen)
+			if(u4PacketLen > u4AllDataCount)
 			{
 				return (uint8)PACKET_GET_NO_ENOUGTH;
 			}
 			else
 			{
+				u4DataLen = u4PacketLen;
 				return (uint8)PACKET_GET_ENOUGTH;
 			}
 		}

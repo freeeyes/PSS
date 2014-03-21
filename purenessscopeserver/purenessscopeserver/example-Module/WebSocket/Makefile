@@ -4,7 +4,7 @@ include Makefile.define
 default:all
 
 # 主应用文件列表
-PATS = BaseCommand.o WebSocketTest.o 
+PATS = base64.o sha1.o BaseCommand.o WebSocketTest.o 
 
 LIB_BASE_OBJS = base64.o sha1.o BaseCommand.o WebSocketTest.o 
 LIB_BASE = libWebSocketTest.so

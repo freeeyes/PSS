@@ -14,16 +14,20 @@ enum WEBSOCKET_CONNECT_STATE
 	WEBSOCKET_STATE_DATAIN,          //需要数据包状态
 };
 
-//最大解密包的长度,以及缓冲块的大小，如果长度比这个大，请修改这里
+//最大未解密包的长度,以及缓冲块的大小，如果长度比这个大，请修改这里
+#define MAX_ENCRYPTLENGTH 5*MAX_BUFF_1024
+//最大解密数据包长度，如果最大数据包比这个大，则扩展这个值
 #define MAX_DECRYPTLENGTH 5*MAX_BUFF_1024
 
 //记录websokcet的连接状态，如果是初次连接，则设置为WEBSOCKET_STATE_HANDIN
 struct _WebSocketInfo
 {
-	uint32                  m_u4ConnectID;                  //链接的ID
-	WEBSOCKET_CONNECT_STATE m_emState;                      //当前连接的状态
-	char                    m_szData[MAX_DECRYPTLENGTH];    //当前缓冲中数据的长度、
-	uint32                  m_u4DataLength;                 //当前缓冲块中的数据长度
+	uint32                  m_u4ConnectID;                         //链接的ID
+	WEBSOCKET_CONNECT_STATE m_emState;                             //当前连接的状态
+	char                    m_szData[MAX_ENCRYPTLENGTH];           //当前缓冲中数据的长度
+	char                    m_szDecryptData[MAX_DECRYPTLENGTH];    //解开的数据包
+	uint32                  m_u4DataLength;                        //当前缓冲块中的数据长度
+	uint32                  m_u4DecryptDataLen;                    //当前接收的解开的数据包长度
 
 	_WebSocketInfo()
 	{
@@ -36,7 +40,8 @@ struct _WebSocketInfo
 		m_emState     = WEBSOCKET_STATE_HANDIN;
 
 		//ACE_OS::memset(m_szData, 0, MAX_DECRYPTLENGTH);
-		m_u4DataLength    = 0;
+		m_u4DataLength     = 0;
+		m_u4DecryptDataLen = 0;
 	}
 };
 

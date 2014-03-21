@@ -56,7 +56,7 @@ private:
 	//处理数据包
 	uint8 WebSocketDisposeDataIn(_WebSocketInfo* pWebSocketInfo, ACE_Message_Block* pCurrMessage, IMessageBlockManager* pMessageBlockManager);
 	//获得当前包长以及包ID
-	uint8 ReadDataPacketInfo(const char* pData, uint32 u4DataLen, uint16& u2CommandID, uint32& u4PacketLen);
+	uint8 ReadDataPacketInfo(const char* pData, uint32& u4DataLen, uint16& u2CommandID, uint32& u4PacketLen);
 	//解密数据包
 	uint8 Decrypt(char* pOriData, uint32& u4Len, char* pEncryData, uint32& u4EncryLen);
 };
