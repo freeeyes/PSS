@@ -186,10 +186,12 @@ void CClientUdpSocket::Run()
 					nSendCount = m_pSocket_Info->m_nSendCount - m_pSocket_State_Info->m_nSuccessSend;
 				}
 
+				char* pData = m_pSocket_Info->m_pLogic->GetSendData(m_pSocket_Info->m_nThreadID, nSendIndex, nSendLen);
 				for(int i = 0; i < nSendCount; i++)
 				{
-					memcpy(&szSendBuffData[i * m_pSocket_Info->m_pLogic->GetSendLength()], 
-						m_pSocket_Info->m_pLogic->GetSendData(m_nThreadID, nSendIndex), m_pSocket_Info->m_pLogic->GetSendLength());
+					MEMCOPY_SAFE(&szSendBuffData[i * nSendLen], 
+						pData, 
+						nSendLen);
 				}
 				nPacketCount = nSendCount;
 
@@ -201,8 +203,7 @@ void CClientUdpSocket::Run()
 			else
 			{
 				//·¢ËÍÊý¾Ý
-				pSendData     = (char* )m_pSocket_Info->m_pLogic->GetSendData(m_nThreadID, nSendIndex);
-				nSendLen      = m_pSocket_Info->m_pLogic->GetSendLength();
+				pSendData     = (char* )m_pSocket_Info->m_pLogic->GetSendData(m_pSocket_Info->m_nThreadID, nSendIndex, nSendLen);
 				nTotalRecvLen = m_pSocket_Info->m_pLogic->GetRecvLength();
 			}
 

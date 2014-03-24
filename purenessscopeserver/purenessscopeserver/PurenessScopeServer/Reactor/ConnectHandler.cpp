@@ -585,6 +585,7 @@ int CConnectHandler::handle_input(ACE_HANDLE fd)
 				//看看是否接收完成了
 				if(m_pCurrMessage->length() == 0)
 				{
+					m_pCurrMessage->release();
 					break;
 				}
 				else

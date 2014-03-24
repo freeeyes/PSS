@@ -23,6 +23,83 @@ inline int RandomValue(int nMin, int nMax)
 	return  nMin + (int) ((nMax - nMin) * (rand() / (RAND_MAX + 1.0)));
 };
 
+//WebSocket加密算法
+inline void WebSocketSendData(const char* pData, int nLen, char* pSendData, int& nSendLen)
+{
+	//目前这个函数只支持小于64K的数据包
+	char szMark[4]  = {'\0'};
+	int nPos = 0;
+
+	if(nSendLen < nLen + 8)
+	{
+		//缓冲长度不够
+		return;
+	}
+
+	if(nLen <= 125) 
+	{
+		pSendData[nPos] = -127;
+		nPos++;
+
+		//发送数字长度
+		pSendData[nPos] =  (char)(nLen & 0x7F);
+		nPos++;
+
+		//4字节的mark
+		memcpy_s((char* )szMark, 4, &nLen, 4);
+		memcpy_s((char* )&pSendData[nPos], 4, szMark, 4);
+		nPos += 4;
+
+		//按位加密
+		for(int i = 0; i < nLen; i++)
+		{
+			char szTemp = pData[i] ^ (szMark[i % 4]);
+			pSendData[nPos] = szTemp;
+			nPos++;
+		}
+	}
+	else
+	{
+		pSendData[nPos] = -127;
+		nPos++;
+
+		//发送数字长度
+		pSendData[nPos] =  126;
+		nPos++;
+
+		//数据实际长度。最大65535
+		//转换成网络字序
+		short sDataLen = htons((short)nLen);
+		memcpy_s((char* )&pSendData[nPos], 2, (char* )&sDataLen, 2);
+		nPos += 2;
+
+		//4字节的mark
+		memcpy_s((char* )szMark, 4, &nLen, 4);
+		memcpy_s((char* )&pSendData[nPos], 4, szMark, 4);
+		nPos += 4;
+
+		//按位加密
+		for(int i = 0; i < nLen; i++)
+		{
+			char szTemp = pData[i] ^ (szMark[i % 4]);
+			pSendData[nPos] = szTemp;
+			nPos++;
+		}
+	}
+
+
+	nSendLen = nPos;
+}
+
+//类型
+enum ENUM_TYPE_PROTOCOL
+{
+	ENUM_PROTOCOL_TCP = 0,
+	ENUM_PROTOCOL_UDP,
+	ENUM_PROTOCOL_WEBSOCKET,
+};
+
+//二进制和字符串相互转换类
 class CConvertBuffer
 {
 public:
@@ -188,13 +265,14 @@ enum EM_DATA_RETURN_STATE
 class CBaseDataLogic
 {
 public:
-	virtual bool InitSendSize(int nSendLen)                                 = 0;
-	virtual char* GetSendData()                                             = 0;
-	virtual char* GetSendData(int nThreadID, int nCurrIndex)                = 0;
-	virtual int GetSendLength()                                             = 0;                   
-	virtual int GetRecvLength()                                             = 0;
-	virtual void SetRecvLength(int nRecvLen)                                = 0;
-	virtual void SetMaxSendLength(int nMaxLength)                           = 0;
+	virtual bool InitSendSize(int nSendLen)                                     = 0;
+	virtual char* GetSendData()                                                 = 0;
+	virtual char* GetSendData(int nThreadID, int nCurrIndex, int& nSendDataLen) = 0;
+	virtual int GetSendLength()                                                 = 0;                   
+	virtual int GetRecvLength()                                                 = 0;
+	virtual void SetRecvLength(int nRecvLen)                                    = 0;
+	virtual void SetMaxSendLength(int nMaxLength)                               = 0;
+	virtual void SetSendBuff(const char* pData, int nLen)                       = 0;
 	virtual EM_DATA_RETURN_STATE GetRecvData(int nThreadID, int nCurrIndex, char* pData, int nLen) = 0;
 };
 
@@ -255,8 +333,9 @@ public:
 		return m_pSendData;
 	}
 
-	char* GetSendData(int nThreadID, int nCurrIndex)
+	char* GetSendData(int nThreadID, int nCurrIndex, int& nSendDataLen)
 	{
+		nSendDataLen = m_nSendLen;
 		return m_pSendData;
 	}
 
@@ -290,6 +369,110 @@ public:
 	}
 
 private:
+	char* m_pSendData;
+	int   m_nSendLen;
+	int   m_nRecvLen;
+	int   m_nCurrRecvLen;
+};
+
+//websocket协议逻辑包
+class CWebSocketLogic : public CBaseDataLogic
+{
+public:
+	CWebSocketLogic() 
+	{ 
+		m_pHandInData  = NULL;
+		m_pSendData    = NULL;
+		m_nSendLen     = 0;
+		m_nRecvLen     = 0;
+		m_nCurrRecvLen = 0;
+	};
+
+	~CWebSocketLogic() { Close(); };
+
+	void Close()
+	{
+		if(NULL != m_pHandInData)
+		{
+			delete[] m_pHandInData;
+			m_pHandInData = NULL;
+		}
+
+		if(NULL != m_pSendData)
+		{
+			delete[] m_pSendData;
+			m_pSendData = NULL;
+		}
+	}
+
+	bool InitSendSize(int nSendLen)
+	{
+		Close();
+
+		m_pHandInData = new char[300];
+		sprintf_s(m_pHandInData, 300, "GET / HTTP/1.1\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: 127.0.0.1:10002\r\nSec-WebSocket-Key: cfMpieGIwzS7+4+nIqv5fA==\r\nSec-WebSocket-Version: 13\r\n\r\n");
+
+		m_pSendData = new char[nSendLen];
+		m_nSendLen  = nSendLen;
+
+		return true;
+	}
+
+	void SetRecvLength(int nRecvLen)
+	{
+		m_nRecvLen = nRecvLen;
+	}
+
+	void SetMaxSendLength(int nMaxLength)
+	{
+		m_nSendLen = nMaxLength;
+	}
+
+	//设置相关发送Buff
+	void SetSendBuff(const char* pData, int nLen)
+	{
+		//WebSocket加密数据
+		WebSocketSendData(pData, nLen, m_pSendData, m_nSendLen);
+	}
+
+	char* GetSendData()
+	{
+		return m_pSendData;
+	}
+
+	char* GetSendData(int nThreadID, int nCurrIndex, int& nSendDataLen)
+	{
+		//这里添加websocket加密善法
+		if(nCurrIndex == 0)
+		{
+			//如果是第一次发送数据，则发送握手包
+			nSendDataLen = strlen(m_pHandInData);
+			return m_pHandInData;
+		}
+		else
+		{
+			nSendDataLen = m_nSendLen;
+			return m_pSendData;
+		}
+	}
+
+	int GetSendLength()
+	{
+		return m_nSendLen;
+	}
+
+	int GetRecvLength()
+	{
+		return m_nRecvLen;
+	}
+
+	EM_DATA_RETURN_STATE GetRecvData(int nThreadID, int nCurrIndex, char* pData, int nLen)
+	{
+		return DATA_RETURN_STATE_SUCCESS;
+	}
+
+private:
+	char* m_pHandInData;
 	char* m_pSendData;
 	int   m_nSendLen;
 	int   m_nRecvLen;

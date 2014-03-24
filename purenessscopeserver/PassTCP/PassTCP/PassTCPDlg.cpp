@@ -239,9 +239,36 @@ void CPassTCPDlg::OnBnClickedButton1()
 		//读取线程信息
 		_Socket_Info* pSocket_Info             = new _Socket_Info();
 		_Socket_State_Info* pSocket_State_Info = new _Socket_State_Info();
-		CNomalLogic* pNomalLogic               = new CNomalLogic();
-		
-		pSocket_Info->m_pLogic = (CBaseDataLogic* )pNomalLogic;
+
+		ENUM_TYPE_PROTOCOL emType = ENUM_PROTOCOL_TCP;
+		//默认TCP类型，0是TCP，1是UDP
+		switch(GetCheckedRadioButton(IDC_RADIO1, IDC_RADIO3))
+		{
+		case IDC_RADIO1:
+			{
+				pSocket_Info->m_nConnectType = 0;
+				emType = ENUM_PROTOCOL_TCP;
+				CNomalLogic* pNomalLogic = new CNomalLogic();
+				pSocket_Info->m_pLogic = (CBaseDataLogic* )pNomalLogic;
+				break;
+			}
+		case IDC_RADIO2:
+			{
+				pSocket_Info->m_nConnectType = 1;
+				emType = ENUM_PROTOCOL_UDP;
+				CNomalLogic* pNomalLogic = new CNomalLogic();
+				pSocket_Info->m_pLogic = (CBaseDataLogic* )pNomalLogic;
+				break;
+			}
+		case IDC_RADIO3:
+			{
+				pSocket_Info->m_nConnectType = 0;
+				emType = ENUM_PROTOCOL_WEBSOCKET;
+				CWebSocketLogic* pWebSocketLogic = new CWebSocketLogic();
+				pSocket_Info->m_pLogic = (CBaseDataLogic* )pWebSocketLogic;
+				break;
+			}
+		}
 
 		m_txtServerIP.GetWindowText(strData);
 		int nSrcLen = WideCharToMultiByte(CP_ACP, 0, strData, strData.GetLength(), NULL, 0, NULL, NULL);
@@ -293,22 +320,48 @@ void CPassTCPDlg::OnBnClickedButton1()
 
 			if(m_cbSendBuffStyle.GetCurSel() == 0)
 			{
-				//如果是二进制模式
-				CConvertBuffer objConvertBuffer;
-				//获得要转换的数据块大小
-				pSocket_Info->m_pLogic->InitSendSize(objConvertBuffer.GetBufferSize(pSendData, nDecLen));
-				//将数据串转换成二进制串
-				int nSendLen = nDecLen;
-				objConvertBuffer.Convertstr2charArray(pSendData, strlen(pSendData), 
-					(unsigned char*)pSocket_Info->m_pLogic->GetSendData(), nSendLen);
-				pSocket_Info->m_pLogic->SetRecvLength(nSendLen);
+				if(emType != ENUM_PROTOCOL_WEBSOCKET)
+				{
+					//如果是二进制模式
+					CConvertBuffer objConvertBuffer;
+					//获得要转换的数据块大小
+					pSocket_Info->m_pLogic->InitSendSize(objConvertBuffer.GetBufferSize(pSendData, nDecLen));
+					//将数据串转换成二进制串
+					int nSendLen = nDecLen;
+					objConvertBuffer.Convertstr2charArray(pSendData, strlen(pSendData), 
+						(unsigned char*)pSocket_Info->m_pLogic->GetSendData(), nSendLen);
+					pSocket_Info->m_pLogic->SetRecvLength(nSendLen);
+				}
+				else
+				{
+					//如果是webSocket模式
+					char szOriData[100 * MAX_BUFF_1024] = {'\0'};
+					//如果是二进制模式
+					CConvertBuffer objConvertBuffer;
+					//获得要转换的数据块大小
+					pSocket_Info->m_pLogic->InitSendSize(100 * MAX_BUFF_1024);
+					//将数据串转换成二进制串
+					int nSendLen = 100 * MAX_BUFF_1024;
+					objConvertBuffer.Convertstr2charArray(pSendData, strlen(pSendData), 
+						(unsigned char*)szOriData, nSendLen);
+					
+					pSocket_Info->m_pLogic->SetSendBuff(szOriData, nSendLen);
+				}
 			}
 			else
 			{
-				//如果是文本模式
-				int nSendSize = nDecLen;
-				pSocket_Info->m_pLogic->InitSendSize(nDecLen);
-				memcpy_s(pSocket_Info->m_pLogic->GetSendData(), nDecLen, pSendData, nDecLen);
+				if(emType != ENUM_PROTOCOL_WEBSOCKET)
+				{
+					//如果是文本模式
+					pSocket_Info->m_pLogic->InitSendSize(nDecLen);
+					memcpy_s(pSocket_Info->m_pLogic->GetSendData(), nDecLen, pSendData, nDecLen);
+				}
+				else
+				{
+					//如果是webSocket模式
+					pSocket_Info->m_pLogic->InitSendSize(100 * MAX_BUFF_1024);
+					pSocket_Info->m_pLogic->SetSendBuff(pSendData, nDecLen);
+				}
 			}
 
 			delete[] pSendData;
@@ -402,17 +455,6 @@ void CPassTCPDlg::OnBnClickedButton1()
 		else
 		{
 			pSocket_Info->m_blLuaAdvance = false;
-		}
-
-		//默认TCP类型，0是TCP，1是UDP
-		switch(GetCheckedRadioButton(IDC_RADIO1, IDC_RADIO2))
-		{
-		case IDC_RADIO1:
-			pSocket_Info->m_nConnectType = 0;
-			break;
-		case IDC_RADIO2:
-			pSocket_Info->m_nConnectType = 1;
-			break;
 		}
 
 		if(pSocket_Info->m_nConnectType == 0)
@@ -592,13 +634,16 @@ void CPassTCPDlg::OnTimer(UINT_PTR nIDEvent)
 		int nMaxTime        = 0;
 
 		int nConnectType = 0;
-		switch(GetCheckedRadioButton(IDC_RADIO1, IDC_RADIO2))
+		switch(GetCheckedRadioButton(IDC_RADIO1, IDC_RADIO3))
 		{
 		case IDC_RADIO1:
 			nConnectType = 0;
 			break;
 		case IDC_RADIO2:
 			nConnectType = 1;
+			break;
+		case IDC_RADIO3:
+			nConnectType = 0;
 			break;
 		}
 
@@ -752,13 +797,16 @@ void CPassTCPDlg::OnBnClickedButton3()
 	fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
 
 	//默认TCP类型，0是TCP，1是UDP
-	switch(GetCheckedRadioButton(IDC_RADIO1, IDC_RADIO2))
+	switch(GetCheckedRadioButton(IDC_RADIO1, IDC_RADIO3))
 	{
 	case IDC_RADIO1:
 		sprintf_s(szLogText, 1024, "压测类型:TCP\n");
 		break;
 	case IDC_RADIO2:
 		sprintf_s(szLogText, 1024, "压测类型:UDP\n");
+		break;
+	case IDC_RADIO3:
+		sprintf_s(szLogText, 1024, "压测类型:WebSocket\n");
 		break;
 	}
 	fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);

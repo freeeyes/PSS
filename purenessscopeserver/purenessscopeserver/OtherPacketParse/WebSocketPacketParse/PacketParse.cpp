@@ -272,7 +272,7 @@ uint8 CPacketParse::WebSocketDisposeDataIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 		}
 
 		//去掉包头，只留数据体在包体内
-		char* pInfo = (char* )ACE_OS::strstr(pWebSocketInfo->m_szData, "{");
+		char* pInfo = (char* )ACE_OS::strstr(pWebSocketInfo->m_szDecryptData, "{");
 		if(NULL == pInfo)
 		{
 			//如果找不到大括号，说明数据包异常，断开这个链接
@@ -376,8 +376,8 @@ uint8 CPacketParse::Decrypt(char* pOriData, uint32& u4Len, char* pEncryData, uin
 			return PACKET_GET_NO_ENOUGTH;
 		}
 		payloadSize = ntohl( *(u_long*) (pOriData + 2) );
-		masksOffset = 10;
-		nFrameLen   = 8;
+		masksOffset = 6;
+		nFrameLen   = 10;
 	}
 	else
 	{
@@ -395,12 +395,11 @@ uint8 CPacketParse::Decrypt(char* pOriData, uint32& u4Len, char* pEncryData, uin
 	char masks[4];
 	memcpy(masks, pOriData + masksOffset, 4);
 
-	char* mp_payload_data = new char[payloadSize + 1];
-	memcpy(mp_payload_data, pOriData + masksOffset + 4, payloadSize);
+	memcpy(pEncryData, pOriData + masksOffset + 4, payloadSize);
 	for (unsigned int i = 0; i < payloadSize; i++) {
-		mp_payload_data[i] = (mp_payload_data[i] ^ masks[i%4]);
+		pEncryData[i] = (pEncryData[i] ^ masks[i%4]);
 	}
-	mp_payload_data[payloadSize] = '\0';
+	pEncryData[payloadSize] = '\0';
 
 	if(u4EncryLen < payloadSize)
 	{
@@ -408,9 +407,15 @@ uint8 CPacketParse::Decrypt(char* pOriData, uint32& u4Len, char* pEncryData, uin
 		return PACKET_GET_ERROR;
 	}
 
-	ACE_OS::memcpy(pEncryData, mp_payload_data, payloadSize);
+	//ACE_OS::memcpy(pEncryData, mp_payload_data, payloadSize);
 	u4EncryLen = payloadSize;
-	//这里6个字节头是固定的，第一个字节固定的129，第二个字节是包长，外加4字节mark
+	//这里6个字节头是固定的，第一个字节固定的-127,后面根据数据的长度或者4或者6字节
+	if(payloadSize + nFrameLen > u4Len)
+	{
+		//说明解析不正常，解析后的数据长度和当前数据长度不相符
+		return PACKET_GET_ERROR;
+	}
+
 	u4Len      = payloadSize + nFrameLen;
 
 	return PACKET_GET_ENOUGTH;
@@ -431,6 +436,12 @@ uint8 CPacketParse::ReadDataPacketInfo(const char* pData, uint32& u4DataLen, uin
 		return (uint8)PACKET_GET_ERROR;
 	}
 
+	if((int)(pInfo - pData) == 0)
+	{
+		//找不到前面的数据头，返回失败
+		return (uint8)PACKET_GET_ERROR;
+	}
+
 	//获得命令字符串
 	ACE_OS::memcpy(szTemp, pData, (int)(pInfo - pData));
 
@@ -445,6 +456,12 @@ uint8 CPacketParse::ReadDataPacketInfo(const char* pData, uint32& u4DataLen, uin
 	else
 	{
 		char szTemp2[MAX_BUFF_50] = {'\0'}; 
+
+		if(pCommand - szTemp == 0)
+		{
+			//说明没有找到数据头，返回失败
+			return (uint8)PACKET_GET_ERROR;
+		}
 
 		ACE_OS::memcpy(szTemp2, pData, (int)(pCommand - szTemp));
 		//得到命令字和数据包长度

@@ -189,6 +189,7 @@ void CClientTcpSocket::Run()
 				m_pSocket_State_Info->m_nSuccessConnect++;
 				m_pSocket_State_Info->m_nCurrectSocket = 1;
 				blIsConnect = true;
+				nSendIndex  = 0;
 			}
 		}
 
@@ -212,26 +213,25 @@ void CClientTcpSocket::Run()
 					nSendCount = m_pSocket_Info->m_nSendCount - m_pSocket_State_Info->m_nSuccessSend;
 				}
 
+				char* pData = m_pSocket_Info->m_pLogic->GetSendData(m_pSocket_Info->m_nThreadID, nSendIndex, nSendLen);
 				for(int i = 0; i < nSendCount; i++)
 				{
-					MEMCOPY_SAFE(&szSendBuffData[i * m_pSocket_Info->m_pLogic->GetSendLength()], 
-						m_pSocket_Info->m_pLogic->GetSendData(m_pSocket_Info->m_nThreadID, nSendIndex), 
-						m_pSocket_Info->m_pLogic->GetSendLength());
+					MEMCOPY_SAFE(&szSendBuffData[i * nSendLen], 
+						pData, 
+						nSendLen);
 				}
-
 				nPacketCount = nSendCount;
 
 				//发送数据
 				pSendData     = (char* )szSendBuffData;
-				nSendLen      = m_pSocket_Info->m_pLogic->GetSendLength() * nSendCount;
-				nTotalRecvLen = m_pSocket_Info->m_pLogic->GetSendLength() * nSendCount;
+				nSendLen      = nSendLen * nSendCount;
+				nTotalRecvLen = nSendLen * nSendCount;
 			}
 			else
 			{
 				//发送数据
-				pSendData     = (char* )m_pSocket_Info->m_pLogic->GetSendData(m_pSocket_Info->m_nThreadID, nSendIndex);
-				nSendLen      = m_pSocket_Info->m_pLogic->GetSendLength();
-				nTotalRecvLen = m_pSocket_Info->m_pLogic->GetRecvLength();
+				pSendData     = (char* )m_pSocket_Info->m_pLogic->GetSendData(m_pSocket_Info->m_nThreadID, nSendIndex, nSendLen);
+				nTotalRecvLen = nSendLen;
 
 				nPacketCount  = 1;
 			}

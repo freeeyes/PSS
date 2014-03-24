@@ -483,6 +483,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 				//看看是否接收完成了
 				if(mb.length() == 0)
 				{
+					mb.release();
 					break;
 				}
 				else
