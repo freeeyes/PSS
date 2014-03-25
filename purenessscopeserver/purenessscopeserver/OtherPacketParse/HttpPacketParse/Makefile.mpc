@@ -1,0 +1,17 @@
+project(PacketParse):acelib{
+	sharedname=PacketParse
+	dynamicflags += PACKETPARSE_BUILD_DLL
+
+	Source_Files{	
+	./*.cpp
+	}
+	
+  specific (prop:microsoft){
+	dllout = ../../PurenessScopeServer/Windows_Bin
+  } else {
+	macros += __LINUX__
+	dllout = ../../PurenessScopeServer/Linux_Bin
+  }	
+	libout = ../../PurenessScopeServer/Lib
+	includes += ../../PurenessScopeServer/Common ../../PurenessScopeServer/PacketParse
+}

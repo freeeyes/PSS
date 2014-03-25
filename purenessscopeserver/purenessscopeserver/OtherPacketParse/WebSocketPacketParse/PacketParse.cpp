@@ -182,8 +182,6 @@ uint8 CPacketParse::WebSocketDisposeHandIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 		//设置为数据包格式
 		pWebSocketInfo->m_emState = WEBSOCKET_STATE_DATAIN;
 
-		m_objCurrBody.Clear();
-
 		//处理完的数据从池中移除
 		pCurrMessage->rd_ptr(u4Data);
 
@@ -292,8 +290,6 @@ uint8 CPacketParse::WebSocketDisposeDataIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 
 		ACE_OS::memcpy(m_pmbBody->wr_ptr(), (char*)pInfo, u4NetPacketLen);
 		m_pmbBody->wr_ptr(u4NetPacketLen);
-
-		m_objCurrBody.Clear();
 
 		//处理完的数据从块中移除
 		pCurrMessage->reset();

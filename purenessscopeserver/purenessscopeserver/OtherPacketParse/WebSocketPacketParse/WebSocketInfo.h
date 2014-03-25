@@ -68,7 +68,28 @@ public:
 
 	~CWebSocketInfoPool()
 	{
+		Close();
 	};
+
+	void Close()
+	{
+		//清理所有已存在的指针
+		for(mapPacket::iterator itorFreeB = m_mapPacketFree.begin(); itorFreeB != m_mapPacketFree.end(); itorFreeB++)
+		{
+			_WebSocketInfo* pWebSocketInfo = (_WebSocketInfo* )itorFreeB->second;
+			SAFE_DELETE(pWebSocketInfo);
+		}
+
+		for(mapPacket::iterator itorUsedB = m_mapPacketUsed.begin(); itorUsedB != m_mapPacketUsed.end(); itorUsedB++)
+		{
+			_WebSocketInfo* pWebSocketInfo = (_WebSocketInfo* )itorUsedB->second;
+			SAFE_DELETE(pWebSocketInfo);
+		}
+
+		m_mapPacketFree.clear();
+		m_mapPacketUsed.clear();
+
+	}
 
 	_WebSocketInfo* Create()
 	{
@@ -152,13 +173,9 @@ public:
 
 	void Close()
 	{
-		for(mapWebSocketInfo::iterator b = m_mapWebSocketInfo.begin(); b != m_mapWebSocketInfo.end(); b++)
-		{
-			_WebSocketInfo* pWebSocketInfo = (_WebSocketInfo* )b->second;
-			SAFE_DELETE(pWebSocketInfo);
-		}
-
 		m_mapWebSocketInfo.clear();
+		//关闭缓冲池
+		m_objWebSocketInfoPool.Close();
 	}
 
 	//插入一个新的数据连接状态
