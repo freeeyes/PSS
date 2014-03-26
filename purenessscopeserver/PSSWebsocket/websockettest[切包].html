@@ -1,0 +1,218 @@
+<html>
+<head>
+<title>WebSockets Client</title>
+<style>
+body {  
+    font-family:Arial, Helvetica, sans-serif;  
+}  
+#container{  
+    border:5px solid grey;  
+    width:800px;
+    margin:0 auto;
+    padding:10px;
+}  
+#chatLog{  
+    padding:5px;
+    border:1px solid black;
+}  
+#chatLog p {
+    margin:0;
+}  
+.event {  
+    color:#999;  
+}  
+.warning{  
+    font-weight:bold;  
+    color:#CCC;  
+} 
+</style>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script>
+$(document).ready(function() {  
+  
+  if(!("WebSocket" in window)){  
+      $('#chatLog, input, button, #examples').fadeOut("fast");  
+      $('<p>Oh no, you need a browser that supports WebSockets. How about <a href="http://www.google.com/chrome">Google Chrome</a>?</p>').appendTo('#container');  
+  }else{  
+      //The user has WebSockets  
+      connect();  
+      var connected = 0;
+	  var CurrXh = 1;
+      function connect(){  
+          var socket;  
+          var host = "ws://127.0.0.1:10002";  
+		  var sendText = "";
+          //var host = "ws://localhost:10081/"; 
+          try{  
+              var socket = new WebSocket(host);
+              message('<p class="event">Socket Status: '+socket.readyState);  
+  
+              socket.onopen = function(){  
+                 message('<p class="event">Socket Status: '+socket.readyState+' (open)');	
+				 connected = 1;
+              }  
+  
+              socket.onmessage = function(msg){  
+                 message('<p class="message">Received: '+msg.data);  
+              }  
+  
+              socket.onclose = function(){  
+                message('<p class="event">Socket Status: '+socket.readyState+' (closed)');  
+				connected = 0;
+              }           
+  
+          } catch(exception){  
+             message('<p>Error'+exception);
+          }  
+  
+          function timeSend()
+		  {
+		      for(var i=0;i<2;i++)
+		         send();
+		  }
+
+          function getSendText(){
+		      var txt = $('#text').val();
+			  var len = txt.match(/[^ -~]/g) == null ? txt.length : txt.length + txt.match(/[^ -~]/g).length*2;
+			  var cmd = "ee02";
+			  var cmdLen = cmd.length;
+			  len = len + cmdLen + 1;
+			  if(len>=1000&&len < 10000)
+			    len = len+ 4;
+			  else if(len>=100&&len<1000)
+			    len = len + 3;
+			  else if(len>=10&&len<100)
+			    len = len+2;
+              else if(len<10)
+			    len = len+1;
+              sendText = cmd+","+len+txt;
+              //alert(sendText);
+		  }
+
+		  function uniencode(text) 
+		  { 
+			text = escape(text.toString()).replace(/\+/g, "%2B"); 
+			var matches = text.match(/(%([0-9A-F]{2}))/gi); 
+			if (matches) 
+			{ 
+			for (var matchid = 0; matchid < matches.length; matchid++) 
+			{ 
+			var code = matches[matchid].substring(1,3); 
+			if (parseInt(code, 16) >= 128) 
+			{ 
+			text = text.replace(matches[matchid], '%u00' + code); 
+			} 
+			} 
+			} 
+			text = text.replace('%25', '%u0025'); 
+		    return text; 
+		  } 
+		  
+          function send(){  
+              //var SourceText = "{cmd},{strlen}{msg}";
+			  var txt = $('#text').val();
+			  var len = txt.match(/[^ -~]/g) == null ? txt.length : txt.length + txt.match(/[^ -~]/g).length*2;
+			  var cmd = "ee02";
+			  var cmdLen = cmd.length;
+			  len = len + cmdLen + 1;
+			  if(len>=1000&&len < 10000)
+			    len = len+ 4;
+			  else if(len>=100&&len<1000)
+			    len = len + 3;
+			  else if(len>=10&&len<100)
+			    len = len+2;
+              else if(len<10)
+			    len = len+1;
+
+              var text = cmd+","+len+txt;
+              //alert(text);
+              if(text==""){  
+                  message('<p class="warning">Please enter a message');  
+                  return;
+              }
+              try{ 
+                  socket.send(text.toString());
+                  message('<p class="event">Send: '+text);  
+              } catch(exception){  
+                 message('<p class="warning">');  
+              }  
+              //$('#text').val("");  
+          }  
+
+		  function SendOther()
+		  {
+		      if(sendText == "")
+			    getSendText();
+
+              var endSendText = "";
+			    
+			  
+			  if(CurrXh == 1)
+			  {
+			      endSendText = sendText.substring(0,9);
+			  }
+			  else if(CurrXh == 2)
+			  {
+			      endSendText = sendText.substring(9);
+			  }
+
+              //alert(endSendText);
+              if(endSendText==""){  
+                  //message('<p class="warning">Please enter a message');  
+                  return;
+              }
+              try{ 
+                  socket.send(endSendText.toString());
+                  message('<p class="event">Send: '+endSendText);  
+              } catch(exception){  
+                 message('<p class="warning">');  
+              }  
+
+			  CurrXh++;
+			  if(CurrXh == 3)
+		        CurrXh = 1;
+          }
+
+          function message(msg){  
+            $('#chatLog').append(msg+'</p>');  
+          }  
+  
+          $('#text').keypress(function(event) {  
+              if (event.keyCode == '13') {  
+                send();  
+              }
+          });
+  
+          $('#disconnect').click(function(){  
+             socket.close();  
+          });  
+
+		  $('#timersend').click(function(){  
+		     //if(connected)
+			 //{
+			     for(var i=0;i<2;i++)
+				 {
+                 setTimeout(function() {
+	                   SendOther();
+                 }, 20);
+				 }
+			 //}
+          });
+      }//End connect  
+  }//End else  
+});  
+</script>
+</head>
+<body>
+<div id="wrapper">
+    <div id="container">
+        <h1>WebSockets Test</h1>
+        <div id="chatLog">
+        </div><!-- #chatLog --> 
+        <input id="text" type="text" />
+        <button id="disconnect">Disconnect</button>
+		<button id="timersend">Timersend</button>
+    </div><!-- #container -->
+</div>
+</body>
+</html>

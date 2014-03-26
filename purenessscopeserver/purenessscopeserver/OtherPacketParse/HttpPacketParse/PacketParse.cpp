@@ -161,10 +161,17 @@ uint8 CPacketParse::HttpDispose(_HttpInfo* pHttpInfo, ACE_Message_Block* pCurrMe
 	memcpy(m_pmbHead->wr_ptr(), (char*)pHttpInfo->m_szData, u4HttpHeadLen);
 	m_pmbHead->wr_ptr(u4HttpHeadLen);
 
+	//设置命令字
 	m_u2PacketCommandID = 0xea01;
 
 	//查看有没有包体
-	uint32 u4HttpBodyLength = GetHttpBodyLen(pHttpHead);
+	uint32 u4HttpBodyLength = 0;
+	uint8 u1Ret = GetHttpBodyLen(pHttpInfo->m_szData, pHttpInfo->m_u4DataLength, u4HttpHeadLen, u4HttpBodyLength);
+	if(u1Ret != PACKET_GET_ENOUGTH)
+	{
+		return u1Ret;
+	}
+
 	if(u4HttpBodyLength == 0)
 	{
 		//获得包体
@@ -178,6 +185,19 @@ uint8 CPacketParse::HttpDispose(_HttpInfo* pHttpInfo, ACE_Message_Block* pCurrMe
 		memcpy(m_pmbBody->wr_ptr(), (char*)&u4HttpHeadLen, sizeof(uint32));
 		m_pmbHead->wr_ptr(sizeof(uint32));
 	}
+	else
+	{
+		//有包体，创建包体
+		m_pmbBody = pMessageBlockManager->Create(u4HttpBodyLength);
+		if(NULL == m_pmbBody)
+		{
+			OUR_DEBUG((LM_ERROR, "[CPacketParse::WebSocketDisposeHandIn]m_pmbBody is NULL.\n"));
+			return PACKET_GET_ERROR;
+		}
+
+		memcpy(m_pmbBody->wr_ptr(), (char*)pHttpHead, u4HttpBodyLength);
+		m_pmbHead->wr_ptr(sizeof(uint32));
+	}
 
 	//处理完的数据从池中移除
 	pCurrMessage->rd_ptr(u4Data);
@@ -186,9 +206,40 @@ uint8 CPacketParse::HttpDispose(_HttpInfo* pHttpInfo, ACE_Message_Block* pCurrMe
 	return (uint8)PACKET_GET_ENOUGTH;
 }
 
-uint32 CPacketParse::GetHttpBodyLen(const char* pHttpHead)
+uint8 CPacketParse::GetHttpBodyLen(char* pData, uint32 u4Len, uint32 u4HeadLen, uint32& u4BodyLen)
 {
-	//char* pLength = ACE_OS::strstr(pHttpHead, HTTP_BODY_LENGTH);
+	char szBodyLen[10] = {'\0'};
+	int nNameLen = ACE_OS::strlen(HTTP_BODY_LENGTH);
 
-	return 0;
+	//解析出整个Http包长
+	char* pLength = ACE_OS::strstr(pData, HTTP_BODY_LENGTH);
+	if(NULL != pLength)
+	{
+		uint8 u1LengthLen = 0;
+		//包含了包长字段,解析出包长字段
+		for(int i = nNameLen; i < nNameLen + 9; i++)
+		{
+			if(pLength[i] == '\r')
+			{
+				break;
+			}
+			u1LengthLen++;
+		}
+
+		ACE_OS::memcpy(szBodyLen, &pLength[nNameLen], u1LengthLen);
+
+		u4BodyLen = ACE_OS::atoi(szBodyLen);
+		if(u4BodyLen == 0)
+		{
+			return PACKET_GET_ERROR;
+		}
+
+		//如果接受的字节比http里面的数据长度短，说明没接受完
+		if(u4BodyLen > u4Len - u4HeadLen)
+		{
+			return PACKET_GET_NO_ENOUGTH;
+		}
+	}
+
+	return PACKET_GET_ENOUGTH;
 }

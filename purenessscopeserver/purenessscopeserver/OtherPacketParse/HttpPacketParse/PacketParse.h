@@ -8,7 +8,7 @@
 #include "HttpInfo.h"
 
 #define HTTP_HEAD_END    "\r\n\r\n"
-#define HTTP_BODY_LENGTH "content-length"
+#define HTTP_BODY_LENGTH "Content-Length: "
 
 #ifdef WIN32
 #if defined PACKETPARSE_BUILD_DLL
@@ -55,7 +55,7 @@ private:
 	uint8 HttpDispose(_HttpInfo* pHttpInfo, ACE_Message_Block* pCurrMessage, IMessageBlockManager* pMessageBlockManager);
 
 	//解析出Http包体长度
-	uint32 GetHttpBodyLen(const char* pHttpHead);
+	uint8 GetHttpBodyLen(char* pData, uint32 u4Len, uint32 u4HeadLen, uint32& u4BodyLen);
 
 };
 
