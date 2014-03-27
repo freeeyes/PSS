@@ -7,8 +7,8 @@
 --add by freeeyes
 
 --要发送数据的事件，由PassTCP调用，这里实现你的发送数据封包
---入口参数，nThreadID是当前线程ID，szData是信息内容(char* 数组)，nLen是缓冲区最大长度 
-function PassTcp_CreateSendData(szData, nLen, nThreadID)
+--入口参数，nThreadID是当前线程ID，szData是信息内容(char* 数组)，nLen是缓冲区最大长度，nSendIndex是当前连接的发送次数
+function PassTcp_CreateSendData(szData, nLen, nThreadID, nSendIndex)
     --创建发送数据
 	--szData为char* 是你要填充的缓冲块。
 	--nLen是当前缓冲块最大长度
@@ -33,7 +33,7 @@ function PassTcp_CreateSendData(szData, nLen, nThreadID)
 end
 
 --接收到的数据事件
---入口参数，nThreadID是当前线程ID，szData是接收到的内容(char* 数组)，nLen是当前接收的长度 
+--入口参数，nThreadID是当前线程ID，szData是接收到的内容(char* 数组)，nLen是当前接收的长度，nSendIndex是当前连接的发送次数
 function PassTcp_GetRecvData(szData, nLen, nThreadID)
     --得到接收数据
 	--szData是当前收到的数据块
@@ -45,7 +45,7 @@ function PassTcp_GetRecvData(szData, nLen, nThreadID)
 	
 	--判断接收数据包的长度
 	nCurrIndex = 0;
-	nPacketLength = Lua_Tcp_Buffer_Out_Int32(szData, nCurrIndex, nLen);
+	nPacketLength = Lua_Tcp_Buffer_Out_Int32(szData, nCurrIndex, nLen, nSendIndex);
 	if nPacketLength ~= 10 then
 		return 2;
 	end

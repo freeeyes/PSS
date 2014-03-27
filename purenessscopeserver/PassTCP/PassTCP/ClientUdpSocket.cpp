@@ -40,10 +40,12 @@ void CClientUdpSocket::Run()
 	_ParamData* pSendParam1   = NULL;
 	_ParamData* pSendParam2   = NULL;
 	_ParamData* pSendParam3   = NULL;
+	_ParamData* pSendParam4   = NULL;
 	_ParamData* pSendParamOut = NULL;
 	_ParamData* pRecvParam1   = NULL;
 	_ParamData* pRecvParam2   = NULL;
 	_ParamData* pRecvParam3   = NULL;
+	_ParamData* pRecvParam4   = NULL;
 	_ParamData* pRecvParamOut = NULL;
 
 	int nLuaBufferMaxLength = m_pSocket_Info->m_pLogic->GetSendLength();
@@ -70,10 +72,12 @@ void CClientUdpSocket::Run()
 		pSendParam1   = new _ParamData();
 		pSendParam2   = new _ParamData();
 		pSendParam3   = new _ParamData();
+		pSendParam4   = new _ParamData();
 		pSendParamOut = new _ParamData();
 		pRecvParam1   = new _ParamData();
 		pRecvParam2   = new _ParamData();
 		pRecvParam3   = new _ParamData();
+		pRecvParam4   = new _ParamData();
 		pRecvParamOut = new _ParamData(); 
 
 	}
@@ -134,12 +138,15 @@ void CClientUdpSocket::Run()
 			pSendParam1->SetParam((char* )m_pSocket_Info->m_pLogic->GetSendData(), "void", sizeof(int));
 			pSendParam2->SetParam((char* )&nLuaSendLen, "int", sizeof(int));
 			pSendParam3->SetParam((char* )&m_nThreadID, "int", sizeof(int));
+			pSendParam4->SetParam((char* )&nSendIndex, "int", sizeof(int));
+
 			int nSendLength = 0;
 			pSendParamOut->SetParam((char* )&nSendLength, "int", sizeof(int));
 
 			objIn.Push(pSendParam1);
 			objIn.Push(pSendParam2);
 			objIn.Push(pSendParam3);
+			objIn.Push(pSendParam4);
 			objOut.Push(pSendParamOut);
 
 			m_objLuaFn.CallFileFn("PassTcp_CreateSendData", objIn, objOut);
@@ -301,12 +308,14 @@ void CClientUdpSocket::Run()
 							pRecvParam1->SetParam((char* )szRecvBuffData, "void", sizeof(int));
 							pRecvParam2->SetParam((char* )&nCurrRecvLen, "int", sizeof(int));
 							pRecvParam3->SetParam((char* )&m_nThreadID, "int", sizeof(int));
+							pRecvParam4->SetParam((char* )&nSendIndex, "int", sizeof(int));
 
 							pRecvParamOut->SetParam((char* )&nState, "int", sizeof(int));
 
 							objRecvIn.Push(pRecvParam1);
 							objRecvIn.Push(pRecvParam2);
 							objRecvIn.Push(pRecvParam3);
+							objRecvIn.Push(pRecvParam4);
 							objRecvOut.Push(pRecvParamOut);
 
 							//调用接收函数
@@ -451,6 +460,18 @@ void CClientUdpSocket::Run()
 	closesocket(sckServer);
 	m_pSocket_State_Info->m_nCurrectSocket = 0;
 	blIsConnect = false;
+
+	//回收所有的Lua申请的内存
+	delete pSendParam1;
+	delete pSendParam2;
+	delete pSendParam3;
+	delete pSendParam4;
+	delete pSendParamOut;
+	delete pRecvParam1;
+	delete pRecvParam2;
+	delete pRecvParam3;
+	delete pRecvParam4;
+	delete pRecvParamOut;
 }
 
 void CClientUdpSocket::Stop()
