@@ -4,12 +4,48 @@
 #include <WinSock2.h>
 #include <time.h>
 #include <string>
+#include <vector>
 
 using namespace std;
 
 #define MAX_BUFF_20   20
 #define MAX_BUFF_100  100
 #define MAX_BUFF_1024 1024
+
+#define MAX_RANDOM_PACKET 5*1024
+
+//字符串替换函数
+inline void string_replace( string&s1,const string&s2,const string&s3 )
+{	
+	string::size_type pos = 0;
+	string::size_type a = s2.size();
+	string::size_type b = s3.size();
+	while((pos=s1.find(s2,pos))!=string::npos)
+	{
+		s1.replace(pos,a,s3);
+		pos += b;
+	}
+}
+
+//随机数据包信息
+struct _RandomPacketInfo
+{
+	char szPacket[MAX_RANDOM_PACKET];   //保存随机数据包
+	int nLen;                           //随机数据包长度
+	int nType;                          //数据类型，默认是文本，文本1，二进制2
+	int nRecdvLength;                   //接收字符串的长度  
+
+	_RandomPacketInfo()
+	{
+		szPacket[0]  = '\0';
+		nLen         = 0;
+		nType        = 1;
+		nRecdvLength = 0;
+	}
+};
+
+//保存随机数据包序列
+typedef vector<_RandomPacketInfo> vecRandomPacketInfo;
 
 //设置一个随机种子
 inline void InitRandom()
@@ -265,6 +301,172 @@ enum EM_DATA_RETURN_STATE
 class CBaseDataLogic
 {
 public:
+	CBaseDataLogic()
+	{
+		m_blRandomPacket = false;
+		m_nClassTye      = 1;
+	}
+
+	void ClearRandomPacket()
+	{
+		m_vecRandomPacketInfo.clear();
+	}
+
+	void DeleteRandomPacket(int nIndex)
+	{
+		if(nIndex >= 0 && nIndex < (int)m_vecRandomPacketInfo.size())
+		{
+			int nPos = 0;
+			//删除指定数据
+			for(vecRandomPacketInfo::iterator b = m_vecRandomPacketInfo.begin();b != m_vecRandomPacketInfo.end(); b++)
+			{
+				if(nIndex == nPos)
+				{
+					m_vecRandomPacketInfo.erase(b);
+					break;
+				}
+			}
+		}
+	}
+
+	//随机包指令集
+	bool InsertRandomPacket(const char* pData, int nLen, int nRecvLength, int nType)
+	{
+		_RandomPacketInfo objRandomPacketInfo;
+
+		if(nLen >= MAX_RANDOM_PACKET || nLen <= 0)
+		{
+			return false;
+		}
+
+		memcpy_s(objRandomPacketInfo.szPacket, nLen, pData, nLen);
+		objRandomPacketInfo.szPacket[nLen] = '\0';
+		objRandomPacketInfo.nLen           = nLen;
+		objRandomPacketInfo.nRecdvLength   = nRecvLength;
+		objRandomPacketInfo.nType          = nType;
+
+		m_vecRandomPacketInfo.push_back(objRandomPacketInfo);
+
+		if(m_blRandomPacket == false)
+		{
+			m_blRandomPacket = true;
+		}
+
+		return true;
+	};
+
+	//得到随机命令包的个数
+	int  GetRandomPacketCount()
+	{
+		return (int)m_vecRandomPacketInfo.size();
+	};
+
+	_RandomPacketInfo* GettRandomPacket(int nIndex)
+	{
+		if(nIndex >= (int)m_vecRandomPacketInfo.size() || nIndex < 0)
+		{
+			return NULL;
+		}
+		else
+		{
+			return (_RandomPacketInfo* )&m_vecRandomPacketInfo[nIndex];
+		}
+	};
+
+	//得到发送数据的具体信息
+	bool GetRandomSend(int nIndex, char* pData, int& nLen, int& nRecvLength)
+	{
+		int nPos = nIndex % (int)m_vecRandomPacketInfo.size();
+
+		_RandomPacketInfo* pRandomPacketInfo = GettRandomPacket(nPos);
+		if(NULL == pRandomPacketInfo)
+		{
+			return false;
+		}
+
+		if(nLen < pRandomPacketInfo->nLen)
+		{
+			return false;
+		}
+
+		if(pRandomPacketInfo->nType == 1)
+		{
+			//只有文本模式的是时候进行数字替换
+			string strData = (string)pRandomPacketInfo->szPacket;
+
+			ReplaceNumber(strData, (string)"%01d", 1);
+			ReplaceNumber(strData, (string)"%02d", 2);
+			ReplaceNumber(strData, (string)"%03d", 3);
+			ReplaceNumber(strData, (string)"%04d", 4);
+
+			memcpy_s(pData, strData.length(), strData.c_str(), strData.length());
+			pData[strData.length()] = '\0';
+			nLen = strData.length();
+			nRecvLength = pRandomPacketInfo->nRecdvLength;
+		}
+		else
+		{
+			//进行二进制转换
+			CConvertBuffer objConvertBuffer;
+
+			//存入数据
+			objConvertBuffer.Convertstr2charArray(pRandomPacketInfo->szPacket, pRandomPacketInfo->nLen, 
+				(unsigned char*)pData, nLen);
+			nRecvLength = pRandomPacketInfo->nRecdvLength;
+		}
+
+		return true;
+	}
+
+	//显示预览
+	bool GetReview(int nIndex, char* pData, int& nLen, int& nRecvLength)
+	{
+		int nPos = nIndex % (int)m_vecRandomPacketInfo.size();
+
+		_RandomPacketInfo* pRandomPacketInfo = GettRandomPacket(nPos);
+		if(NULL == pRandomPacketInfo)
+		{
+			return false;
+		}
+
+		if(nLen < pRandomPacketInfo->nLen)
+		{
+			return false;
+		}
+
+		if(pRandomPacketInfo->nType == 1)
+		{
+			//只有文本模式的是时候进行数字替换
+			string strData = (string)pRandomPacketInfo->szPacket;
+
+			ReplaceNumber(strData, (string)"%01d", 1);
+			ReplaceNumber(strData, (string)"%02d", 2);
+			ReplaceNumber(strData, (string)"%03d", 3);
+			ReplaceNumber(strData, (string)"%04d", 4);
+
+			memcpy_s(pData, strData.length(), strData.c_str(), strData.length());
+			pData[strData.length()] = '\0';
+			nLen = strData.length();
+			nRecvLength = pRandomPacketInfo->nRecdvLength;
+		}
+		else
+		{
+			//存入数据
+			memcpy_s(pData, pRandomPacketInfo->nLen, pRandomPacketInfo->szPacket, pRandomPacketInfo->nLen);
+			nLen = pRandomPacketInfo->nLen;
+			nRecvLength = pRandomPacketInfo->nRecdvLength;
+		}
+
+		return true;
+	}
+
+	//得到是否为随机数据包
+	bool GetRandomType()
+	{
+		return m_blRandomPacket;
+	}
+
+	//正常指令集
 	virtual bool InitSendSize(int nSendLen)                                     = 0;
 	virtual char* GetSendData()                                                 = 0;
 	virtual char* GetSendData(int nThreadID, int nCurrIndex, int& nSendDataLen) = 0;
@@ -274,6 +476,46 @@ public:
 	virtual void SetMaxSendLength(int nMaxLength)                               = 0;
 	virtual void SetSendBuff(const char* pData, int nLen)                       = 0;
 	virtual EM_DATA_RETURN_STATE GetRecvData(int nThreadID, int nCurrIndex, char* pData, int nLen) = 0;
+
+private:
+	void ReplaceNumber(string& strData, string strTag, int nStep)
+	{
+		if(nStep == 1)
+		{
+			char szNumber[20] = {'\0'}; 
+			int nNumber = RandomValue(0, 9);
+			sprintf_s(szNumber, 20, "%d", nNumber);
+			string_replace(strData, strTag, (string)szNumber);
+		}
+		else if(nStep == 2)
+		{
+			char szNumber[20] = {'\0'}; 
+			int nNumber = RandomValue(0, 99);
+			sprintf_s(szNumber, 20, "%d", nNumber);
+			string_replace(strData, strTag, (string)szNumber);
+		}
+		else if(nStep == 3)
+		{
+			char szNumber[20] = {'\0'}; 
+			int nNumber = RandomValue(0, 999);
+			sprintf_s(szNumber, 20, "%d", nNumber);
+			string_replace(strData, strTag, (string)szNumber);
+		}
+		else if(nStep == 4)
+		{
+			char szNumber[20] = {'\0'}; 
+			int nNumber = RandomValue(0, 9999);
+			sprintf_s(szNumber, 20, "%d", nNumber);
+			string_replace(strData, strTag, (string)szNumber);
+		}
+	}
+
+private:
+	bool  m_blRandomPacket;     //是否包含随机包列，falase为不包含，true为包含
+	vecRandomPacketInfo m_vecRandomPacketInfo;
+
+public:
+	int m_nClassTye;    //1为CNomalLogic，2为WebSocketLogic
 };
 
 //普通的TCP收发相关信息处理逻辑
@@ -284,10 +526,11 @@ class CNomalLogic : public CBaseDataLogic
 public:
 	CNomalLogic() 
 	{ 
-		m_pSendData    = NULL;
-		m_nSendLen     = 0;
-		m_nRecvLen     = 0;
-		m_nCurrRecvLen = 0;
+		m_pSendData      = NULL;
+		m_nSendLen       = 0;
+		m_nRecvLen       = 0;
+		m_nCurrRecvLen   = 0;
+		m_nClassTye      = 1;
 	};
 
 	~CNomalLogic() { Close(); };
@@ -301,7 +544,7 @@ public:
 		}
 	}
 
-	bool InitSendSize(int nSendLen)
+	bool InitSendSize(int nSendLen = MAX_RANDOM_PACKET)
 	{
 		Close();
 
@@ -335,8 +578,19 @@ public:
 
 	char* GetSendData(int nThreadID, int nCurrIndex, int& nSendDataLen)
 	{
-		nSendDataLen = m_nSendLen;
-		return m_pSendData;
+		if(GetRandomType() == false)
+		{
+			//单一数据包
+			nSendDataLen = m_nSendLen;
+			return m_pSendData;
+		}
+		else
+		{
+			//顺序数据包
+			nSendDataLen = MAX_RANDOM_PACKET;
+			GetRandomSend(nCurrIndex, m_pSendData, nSendDataLen, m_nRecvLen);
+			return m_pSendData;
+		}
 	}
 
 	int GetSendLength()
@@ -381,11 +635,12 @@ class CWebSocketLogic : public CBaseDataLogic
 public:
 	CWebSocketLogic() 
 	{ 
-		m_pHandInData  = NULL;
-		m_pSendData    = NULL;
-		m_nSendLen     = 0;
-		m_nRecvLen     = 0;
-		m_nCurrRecvLen = 0;
+		m_pHandInData    = NULL;
+		m_pSendData      = NULL;
+		m_nSendLen       = 0;
+		m_nRecvLen       = 0;
+		m_nCurrRecvLen   = 0;
+		m_nClassTye      = 2;
 	};
 
 	~CWebSocketLogic() { Close(); };
@@ -405,7 +660,7 @@ public:
 		}
 	}
 
-	bool InitSendSize(int nSendLen)
+	bool InitSendSize(int nSendLen = MAX_RANDOM_PACKET)
 	{
 		Close();
 
@@ -451,8 +706,19 @@ public:
 		}
 		else
 		{
-			nSendDataLen = m_nSendLen;
-			return m_pSendData;
+			if(GetRandomType() == false)
+			{
+				//单一数据包
+				nSendDataLen = m_nSendLen;
+				return m_pSendData;
+			}
+			else
+			{
+				//顺序数据包
+				nSendDataLen = MAX_RANDOM_PACKET;
+				GetRandomSend(nCurrIndex - 1, m_pSendData, nSendDataLen, m_nRecvLen);
+				return m_pSendData;
+			}
 		}
 	}
 
@@ -534,10 +800,11 @@ public:
 
 	~_Socket_Info()
 	{
-		if(m_pLogic != NULL)
-		{
-			delete m_pLogic; 
-		}
+		//这里不再管释放，交由上层解决
+		//if(m_pLogic != NULL)
+		//{
+		//	delete m_pLogic; 
+		//}
 	}
 
 };

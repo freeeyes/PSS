@@ -8,7 +8,8 @@
 #include "ClientUdpSocket.h"
 #include "afxwin.h"
 #include <afxpriv.h>
-#include <vector>
+
+#include "PacketDlg.h"
 
 using namespace std;
 
@@ -54,7 +55,8 @@ private:
   CTime m_tmBegin;             //压测开始时间
   bool  m_blIsRun;             //压测是否在进行
   CTime m_tmEnd;               //压测停止时间
-  int   m_nCurrTextStyle;      //当前文本风格  
+  int   m_nCurrTextStyle;      //当前文本风格
+  CBaseDataLogic* m_pLogic;    //是否设置了最新的逻辑包
 
 public:
   CEdit m_txtServerIP;
@@ -100,4 +102,5 @@ public:
   afx_msg void OnBnClickedButton1();
   afx_msg void OnBnClickedButton4();
 
+  afx_msg void OnBnClickedButton5();
 };

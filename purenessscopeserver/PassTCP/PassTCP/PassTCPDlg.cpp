@@ -124,6 +124,7 @@ BEGIN_MESSAGE_MAP(CPassTCPDlg, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON3, &CPassTCPDlg::OnBnClickedButton3)
 	ON_CBN_SELCHANGE(IDC_COMBO1, &CPassTCPDlg::OnCbnSelchangeCombo1)
 	ON_BN_CLICKED(IDC_BUTTON4, &CPassTCPDlg::OnBnClickedButton4)
+	ON_BN_CLICKED(IDC_BUTTON5, &CPassTCPDlg::OnBnClickedButton5)
 END_MESSAGE_MAP()
 
 
@@ -248,24 +249,47 @@ void CPassTCPDlg::OnBnClickedButton1()
 			{
 				pSocket_Info->m_nConnectType = 0;
 				emType = ENUM_PROTOCOL_TCP;
-				CNomalLogic* pNomalLogic = new CNomalLogic();
-				pSocket_Info->m_pLogic = (CBaseDataLogic* )pNomalLogic;
+				if(m_pLogic == NULL)
+				{
+					CNomalLogic* pNomalLogic = new CNomalLogic();
+					m_pLogic = (CBaseDataLogic* )pNomalLogic;
+					pSocket_Info->m_pLogic = m_pLogic;
+				}
+				else
+				{
+					pSocket_Info->m_pLogic = m_pLogic;
+				}
 				break;
 			}
 		case IDC_RADIO2:
 			{
 				pSocket_Info->m_nConnectType = 1;
 				emType = ENUM_PROTOCOL_UDP;
-				CNomalLogic* pNomalLogic = new CNomalLogic();
-				pSocket_Info->m_pLogic = (CBaseDataLogic* )pNomalLogic;
+				if(m_pLogic == NULL)
+				{
+					CNomalLogic* pNomalLogic = new CNomalLogic();
+					m_pLogic =  (CBaseDataLogic* )pNomalLogic;
+					pSocket_Info->m_pLogic = m_pLogic;
+				}
+				else
+				{
+					pSocket_Info->m_pLogic = m_pLogic;
+				}
 				break;
 			}
 		case IDC_RADIO3:
 			{
 				pSocket_Info->m_nConnectType = 0;
 				emType = ENUM_PROTOCOL_WEBSOCKET;
-				CWebSocketLogic* pWebSocketLogic = new CWebSocketLogic();
-				pSocket_Info->m_pLogic = (CBaseDataLogic* )pWebSocketLogic;
+				if(m_pLogic == NULL)
+				{
+					CWebSocketLogic* pWebSocketLogic = new CWebSocketLogic();
+					pSocket_Info->m_pLogic = (CBaseDataLogic* )pWebSocketLogic;
+				}
+				else
+				{
+					pSocket_Info->m_pLogic = m_pLogic;
+				}
 				break;
 			}
 		}
@@ -495,6 +519,8 @@ void CPassTCPDlg::InitView()
 
 	SetRichTextColor(COLOR_TEXT_BULE);
 
+	m_pLogic = NULL;
+
 	m_txtServerIP.SetWindowText(_T("127.0.0.1"));
 	m_txtPort.SetWindowText(_T("10002"));
 	m_txtThreadCount.SetWindowText(_T("1"));
@@ -580,6 +606,18 @@ void CPassTCPDlg::Close()
 	}
 
 	m_vecClientTcpSocket.clear();
+
+	if(m_pLogic != NULL)
+	{
+		if(m_pLogic->m_nClassTye == 1)
+		{
+			delete (CNomalLogic* )m_pLogic;
+		}
+		else
+		{
+			delete (CWebSocketLogic* )m_pLogic;
+		}
+	}
 }
 
 void CPassTCPDlg::OnClose()
@@ -591,7 +629,7 @@ void CPassTCPDlg::OnClose()
 
 void CPassTCPDlg::OnBnClickedButton2()
 {
-	// TODO: Add your control notification handler code here
+	//停止压测
 	int nCount = (int)m_vecClientUdpSocket.size();
 	for(int i = 0; i < nCount; i++)
 	{
@@ -1115,4 +1153,51 @@ void CPassTCPDlg::OnBnClickedButton4()
 		CString strLuaFile = dlgFile.GetPathName();
 		m_txtLuaFilePath.SetWindowText(strLuaFile);
 	}
+}
+
+void CPassTCPDlg::OnBnClickedButton5()
+{
+	//设置随机数据包序列
+	CPacketDlg objPacketDlg;
+
+	switch(GetCheckedRadioButton(IDC_RADIO1, IDC_RADIO3))
+	{
+	case IDC_RADIO1:
+		{
+			if(m_pLogic != NULL)
+			{
+				delete m_pLogic;
+			}
+
+			CNomalLogic* pNomalLogic = new CNomalLogic();
+			m_pLogic = (CBaseDataLogic* )pNomalLogic;
+			break;
+		}
+	case IDC_RADIO2:
+		{
+			if(m_pLogic != NULL)
+			{
+				delete m_pLogic;
+			}
+
+			CNomalLogic* pNomalLogic = new CNomalLogic();
+			m_pLogic = (CBaseDataLogic* )pNomalLogic;
+			break;
+		}
+	case IDC_RADIO3:
+		{
+			if(m_pLogic != NULL)
+			{
+				delete m_pLogic;
+			}
+
+			CWebSocketLogic* pWebSocketLogic = new CWebSocketLogic();
+			m_pLogic = (CBaseDataLogic* )pWebSocketLogic;
+			break;
+		}
+	}
+
+	objPacketDlg.SetBaseDataLogic(m_pLogic);
+
+	objPacketDlg.DoModal();
 }

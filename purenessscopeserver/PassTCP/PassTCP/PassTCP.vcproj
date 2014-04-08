@@ -45,7 +45,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../LuaLib;./Lua"
+				AdditionalIncludeDirectories="../LuaLib;./Lua;./TinyXML"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -197,6 +197,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PacketDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PassTCP.cpp"
 				>
 			</File>
@@ -240,6 +244,10 @@
 			</File>
 			<File
 				RelativePath=".\define.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PacketDlg.h"
 				>
 			</File>
 			<File
@@ -316,6 +324,66 @@
 					>
 				</File>
 			</Filter>
+		</Filter>
+		<Filter
+			Name="XML"
+			>
+			<File
+				RelativePath=".\TinyXML\tinystr.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\TinyXML\tinystr.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TinyXML\tinyxml.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\TinyXML\tinyxml.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TinyXML\tinyxmlerror.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\TinyXML\tinyxmlparser.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\ReadMe.txt"
