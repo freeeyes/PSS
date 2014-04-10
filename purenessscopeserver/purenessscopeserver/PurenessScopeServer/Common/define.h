@@ -482,7 +482,7 @@ inline void sprintf_safe(char* szText, int nLen, const char* fmt ...)
 	va_start(ap, fmt);
 
 	ACE_OS::vsnprintf(szText, nLen, fmt, ap);
-	szText[nLen] = '\0';
+	szText[nLen - 1] = '\0';
 
 	va_end(ap);
 };
