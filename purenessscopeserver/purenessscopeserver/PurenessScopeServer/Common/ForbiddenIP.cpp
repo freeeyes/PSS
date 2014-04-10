@@ -238,14 +238,16 @@ bool CForbiddenIP::ParseTXT(const char* pText, char* pIP, char* pConnectType)
 
 bool CForbiddenIP::CompareIP(char* pTargetIP, char* pClientIP)
 {
-  char szTargetIP[20] = {'\0'};
-  char szClientIP[20] = {'\0'};
+  char szTargetIP[20];
+  char szClientIP[20];
 
-  char szTarget[5]   = {'\0'};
-  char szClient[5]   = {'\0'};
+  char szTarget[5];
+  char szClient[5];
 
   ACE_OS::memcpy(szTargetIP, pTargetIP, ACE_OS::strlen(pTargetIP));
+  szTargetIP[ACE_OS::strlen(pTargetIP)] = '\0';
   ACE_OS::memcpy(szClientIP, pClientIP, ACE_OS::strlen(pClientIP));
+  szClientIP[ACE_OS::strlen(pTargetIP)] = '\0';
 
   char* pTargetPos = (char* )szTargetIP;
   char* pClientPos = (char* )szClientIP;

@@ -85,13 +85,13 @@ _LogBlockInfo* CLogBlockPool::GetLogBlockInfo()
 
 	m_u4CurrIndex++;
 
-	memset(pLogBlockInfo->m_pBlock, 0, m_u4MaxBlockSize);
+	//memset(pLogBlockInfo->m_pBlock, 0, m_u4MaxBlockSize);
 	return pLogBlockInfo;
 }
 
 void CLogBlockPool::ReturnBlockInfo(_LogBlockInfo* pLogBlockInfo)
 {
-	memset(pLogBlockInfo->m_pBlock, 0, m_u4MaxBlockSize);
+	//memset(pLogBlockInfo->m_pBlock, 0, m_u4MaxBlockSize);
 	pLogBlockInfo->m_blIsUsed = false;
 }
 
