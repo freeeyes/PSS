@@ -18,6 +18,7 @@
 #include "ace/OS_NS_unistd.h"
 #include "ace/High_Res_Timer.h"
 #include "ace/INET_Addr.h" 
+#include <math.h>
 
 #include <vector>
 
@@ -482,6 +483,7 @@ inline void sprintf_safe(char* szText, int nLen, const char* fmt ...)
 	va_start(ap, fmt);
 
 	ACE_OS::vsnprintf(szText, nLen, fmt, ap);
+	szText[nLen - 1] = '\0';
 
 	va_end(ap);
 };
@@ -565,12 +567,12 @@ public:
 		long lTimeInterval = m_lEnd - m_lBegin;  //转换成毫秒
 		if(lTimeInterval >= (long)m_nMillionSecond)
 		{
-			char szLog[MAX_BUFF_1024] = {'\0'};
+			char szLog[MAX_BUFF_1024];
 			//记录日志
 			FILE* pFile = ACE_OS::fopen(ASSERT_TIME_PATH, "a+");
 			if(pFile != NULL)
 			{
-				char szTimeNow[MAX_BUFF_50] = {'\0'};
+				char szTimeNow[MAX_BUFF_50];
 				time_t tNow = time(NULL);
 				struct tm* tmNow = ACE_OS::localtime(&tNow);
 				sprintf_safe(szTimeNow, MAX_BUFF_50, "%04d-%02d-%02d %02d:%02d:%02d", tmNow->tm_year + 1900, tmNow->tm_mon + 1, tmNow->tm_mday, tmNow->tm_hour, tmNow->tm_min, tmNow->tm_sec);

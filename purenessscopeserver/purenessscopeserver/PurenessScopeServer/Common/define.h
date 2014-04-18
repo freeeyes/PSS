@@ -18,6 +18,7 @@
 #include "ace/OS_NS_unistd.h"
 #include "ace/High_Res_Timer.h"
 #include "ace/INET_Addr.h" 
+#include <math.h>
 
 #include <vector>
 

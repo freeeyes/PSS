@@ -157,7 +157,7 @@ int Checkfilelimit(int nMaxOpenFile)
 			if((int)rfilelimit.rlim_cur < nMaxOpenFile)
 			{
 				OUR_DEBUG((LM_INFO, "[Checkfilelimit]rlim.rlim_cur=%d, nMaxOpenFile=%d, openfile is not enougth£¬ please check [ulimit -a].\n", (int)rfilelimit.rlim_cur, nMaxOpenFile));
-				return -1
+				return -1;
 			}
 
 			//OUR_DEBUG((LM_INFO, "[Checkfilelimit]rlim.rlim_cur=%d, nMaxOpenFile=%d, openfile is not enougth£¬ please check [ulimit -a].\n", (int)rfilelimit.rlim_cur, nMaxOpenFile));
