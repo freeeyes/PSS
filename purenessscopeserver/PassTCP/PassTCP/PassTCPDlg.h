@@ -47,7 +47,7 @@ protected:
 private:
   void InitView();
   void ClearResult();
-  void Close();
+  void Close(bool blClose = false);
 
   void SetRichTextColor(int nColor);
 

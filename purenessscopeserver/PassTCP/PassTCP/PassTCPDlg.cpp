@@ -570,7 +570,7 @@ void CPassTCPDlg::ClearResult()
 	m_txtRecvByteCount.SetWindowText(_T("0"));
 }
 
-void CPassTCPDlg::Close()
+void CPassTCPDlg::Close(bool blClose)
 {
 	int nCount = m_vecClientUdpSocket.size();
 	for(int i = 0; i < nCount; i++)
@@ -607,7 +607,7 @@ void CPassTCPDlg::Close()
 
 	m_vecClientTcpSocket.clear();
 
-	if(m_pLogic != NULL)
+	if(blClose == true && m_pLogic != NULL)
 	{
 		if(m_pLogic->m_nClassTye == 1)
 		{
@@ -622,7 +622,7 @@ void CPassTCPDlg::Close()
 
 void CPassTCPDlg::OnClose()
 {
-	Close();
+	Close(true);
 	WSACleanup();
 	CDialog::OnClose();
 }
