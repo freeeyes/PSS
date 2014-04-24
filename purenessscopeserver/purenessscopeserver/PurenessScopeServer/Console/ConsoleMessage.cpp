@@ -605,15 +605,15 @@ bool CConsoleMessage::DoMessage_ShowModule(_CommandInfo& CommandInfo, IBuffPacke
 			{
 				VCHARS_STR strSName;
 				strSName.u1Len = (uint8)ACE_OS::strlen(pModuleInfo->GetName());
-				strSName.text  = pModuleInfo->GetName();
+				strSName.text  = (char* )pModuleInfo->GetName();
 				(*pBuffPacket) << strSName;
 				VCHARS_STR strSModileFile;
 				strSModileFile.u1Len = (uint8)ACE_OS::strlen(pModuleInfo->strModuleName.c_str());
-				strSModileFile.text  = pModuleInfo->strModuleName.c_str();
+				strSModileFile.text  = (char* )pModuleInfo->strModuleName.c_str();
 				(*pBuffPacket) << strSModileFile;
 				VCHARS_STR strSModileDesc;
 				strSModileDesc.u1Len = (uint8)ACE_OS::strlen(pModuleInfo->GetDesc());
-				strSModileDesc.text  = pModuleInfo->GetDesc();
+				strSModileDesc.text  = (char* )pModuleInfo->GetDesc();
 				(*pBuffPacket) << strSModileDesc;
 
 				char szTime[MAX_BUFF_100] = {'\0'};
@@ -1126,7 +1126,7 @@ bool CConsoleMessage::DoMessage_ShowClientHisTory(_CommandInfo& CommandInfo, IBu
 		for(int i = 0; i < (int)VecIPAccount.size(); i++)
 		{
 			VCHARS_STR strSName;
-			strSName.text  = VecIPAccount[i].m_strIP.c_str();
+			strSName.text  = (char* )VecIPAccount[i].m_strIP.c_str();
 			strSName.u1Len = (uint8)VecIPAccount[i].m_strIP.length();
 
 			(*pBuffPacket) << strSName;
@@ -1191,12 +1191,12 @@ bool CConsoleMessage::DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffP
 		(*pBuffPacket) << u2SerevrID;
 
 		//返回服务器名称
-		strSTemp.text  = App_MainConfig::instance()->GetServerName();
+		strSTemp.text  = (char* )App_MainConfig::instance()->GetServerName();
 		strSTemp.u1Len = (uint8)ACE_OS::strlen(App_MainConfig::instance()->GetServerName());
 		(*pBuffPacket) << strSTemp;
 
 		//返回服务器版本
-		strSTemp.text  = App_MainConfig::instance()->GetServerVersion();
+		strSTemp.text  = (char* )App_MainConfig::instance()->GetServerVersion();
 		strSTemp.u1Len = (uint8)ACE_OS::strlen(App_MainConfig::instance()->GetServerName());
 		(*pBuffPacket) << strSTemp;
 
@@ -1207,7 +1207,7 @@ bool CConsoleMessage::DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffP
 		(*pBuffPacket) << (uint16)App_MessageServiceGroup::instance()->GetThreadInfo()->GetThreadCount();
 
 		//返回当前协议包的版本号
-		strSTemp.text  = App_MainConfig::instance()->GetServerVersion();
+		strSTemp.text  = (char* )App_MainConfig::instance()->GetServerVersion();
 		strSTemp.u1Len = (uint8)ACE_OS::strlen(App_MainConfig::instance()->GetPacketVersion());
 		(*pBuffPacket) << strSTemp;
 

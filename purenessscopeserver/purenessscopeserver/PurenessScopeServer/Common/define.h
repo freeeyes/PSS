@@ -290,24 +290,199 @@ typedef ifstream _tifstream;
 typedef std::string _tstring;
 #endif // UNICODE
 
+//标记VCHARS_TYPE的模式
+enum VCHARS_TYPE
+{
+	VCHARS_TYPE_TEXT = 0,      //文本模式
+	VCHARS_TYPE_BINARY,        //二进制模式
+};
+
 #ifndef VCHARS_STR
-typedef  struct _VCHARS_STR {
-	const char *text;
-	uint8 u1Len;
+typedef  struct _VCHARS_STR 
+{
+	char*       text;            //数据指针
+	uint8       u1Len;           //数据长度
+	bool        blCopy;          //是否拷贝数据块，True是拷贝，默认是拷贝
+	bool        blNew;           //是否是new出来的数据
+	VCHARS_TYPE type;            //类型，类型定义见VCHARS_TYPE
+
+	_VCHARS_STR(bool blIsCopy = true, VCHARS_TYPE ntype = VCHARS_TYPE_TEXT)
+	{
+		text   = NULL;
+		u1Len  = 0;
+		blCopy = blIsCopy;
+		type   = ntype;
+		blNew  = false;
+	}
+
+	~_VCHARS_STR()
+	{
+		if(blNew == true)
+		{
+			delete text;
+		}
+	}
+
+	void SetData(const char* pData, uint8& u1Length)
+	{
+		if(blCopy == true)
+		{
+			//如果是需要构建新内存，则在这里申请
+			if(blNew == true)
+			{
+				delete text;
+			}
+
+			if(type == VCHARS_TYPE_TEXT)
+			{
+				//文本模式
+				text = new char[u1Length + 1];
+				ACE_OS::memcpy(text, pData, u1Length);
+				text[u1Length] = '\0';
+				u1Len = u1Length + 1;
+			}
+			else
+			{
+				//二进制模式
+				text = new char[u1Length];
+				ACE_OS::memcpy(text, pData, u1Length);
+				u1Len = u1Length;
+			}
+			blNew = true;
+		}
+		else
+		{
+			text  = (char* )pData;
+			u1Len = u1Length;
+		}
+	}
+
 }VCHARS_STR;
 #endif
 
 #ifndef VCHARM_STR
-typedef  struct _VCHARM_STR {
-	const char *text;
-	uint16 u2Len;
+typedef  struct _VCHARM_STR 
+{
+	char*       text;            //数据指针 
+	uint16      u2Len;           //数据长度
+	bool        blCopy;          //是否拷贝数据块，True是拷贝，默认是拷贝
+	bool        blNew;           //是否是new出来的数据
+	VCHARS_TYPE type;            //类型，类型定义见VCHARS_TYPE
+
+	_VCHARM_STR(bool blIsCopy = true, VCHARS_TYPE ntype = VCHARS_TYPE_TEXT)
+	{
+		text   = NULL;
+		u2Len  = 0;
+		blCopy = blIsCopy;
+		type   = ntype;
+		blNew  = false;
+	}
+
+	~_VCHARM_STR()
+	{
+		if(blNew == true)
+		{
+			delete text;
+		}
+	}
+
+	void SetData(const char* pData, uint16& u2Length)
+	{
+		if(blCopy == true)
+		{
+			//如果是需要构建新内存，则在这里申请
+			if(blNew == true)
+			{
+				delete text;
+			}
+
+			if(type == VCHARS_TYPE_TEXT)
+			{
+				//文本模式
+				text = new char[u2Length + 1];
+				ACE_OS::memcpy(text, pData, u2Length);
+				text[u2Length] = '\0';
+				u2Len = u2Length + 1;
+			}
+			else
+			{
+				//二进制模式
+				text = new char[u2Length];
+				ACE_OS::memcpy(text, pData, u2Length);
+				u2Len = u2Length;
+			}
+			blNew = true;
+		}
+		else
+		{
+			text  = (char* )pData;
+			u2Len = u2Length;
+		}
+	}
+
 }VCHARM_STR;
 #endif
 
 #ifndef VCHARB_STR
-typedef  struct _VCHARB_STR {
-	const char *text;
-	uint32 u4Len;
+typedef  struct _VCHARB_STR 
+{
+	char*       text;            //数据指针 
+	uint32      u4Len;           //数据长度
+	bool        blCopy;          //是否拷贝数据块，True是拷贝，默认是拷贝
+	bool        blNew;           //是否是new出来的数据
+	VCHARS_TYPE type;            //类型，类型定义见VCHARS_TYPE
+
+	_VCHARB_STR(bool blIsCopy = true, VCHARS_TYPE ntype = VCHARS_TYPE_TEXT)
+	{
+		text   = NULL;
+		u4Len  = 0;
+		blCopy = blIsCopy;
+		type   = ntype;
+		blNew  = false;
+	}
+
+	~_VCHARB_STR()
+	{
+		if(blNew == true)
+		{
+			delete text;
+		}
+	}
+
+	void SetData(const char* pData, uint32& u4Length)
+	{
+		if(blCopy == true)
+		{
+			//如果是需要构建新内存，则在这里申请
+			if(blNew == true)
+			{
+				delete text;
+			}
+
+			if(type == VCHARS_TYPE_TEXT)
+			{
+				//文本模式
+				text = new char[u4Length + 1];
+				ACE_OS::memcpy(text, pData, u4Length);
+				text[u4Length] = '\0';
+				u4Len = u4Length + 1;
+			}
+			else
+			{
+				//二进制模式
+				text = new char[u4Length];
+				ACE_OS::memcpy(text, pData, u4Length);
+				u4Len = u4Length;
+			}
+			blNew = true;
+		}
+		else
+		{
+			text  = (char* )pData;
+			u4Len = u4Length;
+		}
+	}
+
 }VCHARB_STR;
 #endif
 

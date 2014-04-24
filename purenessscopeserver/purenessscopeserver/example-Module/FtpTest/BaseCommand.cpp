@@ -78,8 +78,6 @@ void CBaseCommand::Do_Ftp_Login( IMessage* pMessage )
 	uint16     u2CommandID  = 0;
 	VCHARS_STR strUserName;
 	VCHARS_STR strUserPass;
-	char szUserName[MAX_BUFF_100] = {'\0'};
-	char szUserPass[MAX_BUFF_100] = {'\0'};
 
 	IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();
 	if(NULL == pBodyPacket)
@@ -98,15 +96,13 @@ void CBaseCommand::Do_Ftp_Login( IMessage* pMessage )
 	(*pBodyPacket) >> strUserPass;
 
 	//将接收数据转换为字符串
-	ACE_OS::memcpy(szUserName, strUserName.text, strUserName.u1Len);
-	ACE_OS::memcpy(szUserPass, strUserPass.text, strUserPass.u1Len);
 
 	//这里可以添加用户自己的逻辑判定方法
 	IBuffPacket* pResponsesPacket = m_pServerObject->GetPacketManager()->Create();
 	uint16 u2PostCommandID = COMMAND_RETURN_LOGIN;
 
 	//用户密码验证
-	uint32 u4Ret = CheckFtpUser(szUserName, szUserPass, pMessage->GetMessageBase()->m_u4ConnectID);
+	uint32 u4Ret = CheckFtpUser(strUserName.text, strUserPass.text, pMessage->GetMessageBase()->m_u4ConnectID);
 
 	//返回验证结果
 	(*pResponsesPacket) << (uint16)u2PostCommandID;   //拼接应答命令ID
@@ -132,8 +128,6 @@ void CBaseCommand::Do_Ftp_Logout( IMessage* pMessage )
 	uint16     u2CommandID  = 0;
 	VCHARS_STR strUserName;
 
-	char szUserName[MAX_BUFF_100] = {'\0'};
-
 	IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();
 	if(NULL == pBodyPacket)
 	{
@@ -149,15 +143,12 @@ void CBaseCommand::Do_Ftp_Logout( IMessage* pMessage )
 	(*pBodyPacket) >> u2CommandID;
 	(*pBodyPacket) >> strUserName;
 
-	//将接收数据转换为字符串
-	ACE_OS::memcpy(szUserName, strUserName.text, strUserName.u1Len);
-
 	//这里可以添加用户自己的逻辑判定方法
 	IBuffPacket* pResponsesPacket = m_pServerObject->GetPacketManager()->Create();
 	uint16 u2PostCommandID = COMMAND_RETURN_LOGOUT;
 
 	//设置用户离开
-	LeaveFtpUser(szUserName);
+	LeaveFtpUser(strUserName.text);
 
 	//返回验证结果
 	(*pResponsesPacket) << (uint16)u2PostCommandID;   //拼接应答命令ID
@@ -183,9 +174,6 @@ void CBaseCommand::Do_Ftp_FileList( IMessage* pMessage )
 	uint16     u2CommandID  = 0;
 	VCHARS_STR strUserName;
 	VCHARM_STR strFilePath;
-	
-	char szUserName[MAX_BUFF_100] = {'\0'};
-	char szFilePath[MAX_BUFF_500] = {'\0'};
 
 	IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();
 	if(NULL == pBodyPacket)
@@ -203,16 +191,12 @@ void CBaseCommand::Do_Ftp_FileList( IMessage* pMessage )
 	(*pBodyPacket) >> strUserName;
 	(*pBodyPacket) >> strFilePath;
 
-	//将接收数据转换为字符串
-	ACE_OS::memcpy(szUserName, strUserName.text, strUserName.u1Len);
-	ACE_OS::memcpy(szFilePath, strFilePath.text, strFilePath.u2Len);
-
 	//这里可以添加用户自己的逻辑判定方法
 	IBuffPacket* pResponsesPacket = m_pServerObject->GetPacketManager()->Create();
 	uint16 u2PostCommandID = COMMAND_RETURN_FILELIST;
 
 	//查看用户有无操作权限
-	bool blState = CheckOnlineUser(szUserName, pMessage->GetMessageBase()->m_u4ConnectID);
+	bool blState = CheckOnlineUser(strUserName.text, pMessage->GetMessageBase()->m_u4ConnectID);
 	if(blState == false)
 	{
 		//返回验证结果
@@ -227,7 +211,7 @@ void CBaseCommand::Do_Ftp_FileList( IMessage* pMessage )
 
 		//组织文件信息
 		vevFileInfo objvevFileInfo;
-		objDirView.GetDir(szFilePath, objvevFileInfo);
+		objDirView.GetDir(strFilePath.text, objvevFileInfo);
 		(*pResponsesPacket) << (uint32)objvevFileInfo.size();
 		VCHARS_STR strFileName;
 		for(uint32 i = 0; i < (uint32)objvevFileInfo.size(); i++)
@@ -264,9 +248,6 @@ void CBaseCommand::Do_Ftp_FileDownLoad( IMessage* pMessage )
 	uint32     u4BlockSize;            //块大小
 	uint32     u4CurrBlockIndex;       //当前块ID
 
-	char szUserName[MAX_BUFF_100] = {'\0'};
-	char szFilePath[MAX_BUFF_500] = {'\0'};
-
 	IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();
 	if(NULL == pBodyPacket)
 	{
@@ -285,19 +266,15 @@ void CBaseCommand::Do_Ftp_FileDownLoad( IMessage* pMessage )
 	(*pBodyPacket) >> u4BlockSize;
 	(*pBodyPacket) >> u4CurrBlockIndex;
 
-	//将接收数据转换为字符串
-	ACE_OS::memcpy(szUserName, strUserName.text, strUserName.u1Len);
-	ACE_OS::memcpy(szFilePath, strFilePath.text, strFilePath.u2Len);
-
 	m_pServerObject->GetPacketManager()->Delete(pBodyPacket);
 
-	bool blState = CheckOnlineUser(szUserName, pMessage->GetMessageBase()->m_u4ConnectID);
+	bool blState = CheckOnlineUser(strUserName.text, pMessage->GetMessageBase()->m_u4ConnectID);
 	if(blState == true)
 	{
 		//获得文件块
 		CDirView objDirView;
 		uint32 u4BufferCount = 0;
-		objDirView.GetFileBufferCount(szFilePath, u4BlockSize, u4BufferCount);
+		objDirView.GetFileBufferCount(strFilePath.text, u4BlockSize, u4BufferCount);
 		if(u4CurrBlockIndex > u4BufferCount)
 		{
 			return;
@@ -305,7 +282,7 @@ void CBaseCommand::Do_Ftp_FileDownLoad( IMessage* pMessage )
 
 		uint32 u4FileBlockSize = 0;
 		char* pBuffer = new char[u4BlockSize];
-		bool blRet = objDirView.GetFileBuffer(szFilePath, pBuffer, u4FileBlockSize, u4BlockSize, u4CurrBlockIndex);
+		bool blRet = objDirView.GetFileBuffer(strFilePath.text, pBuffer, u4FileBlockSize, u4BlockSize, u4CurrBlockIndex);
 		if(blRet == true)
 		{
 			//组成发送包
@@ -358,18 +335,15 @@ void CBaseCommand::Do_Ftp_FileDownLoad( IMessage* pMessage )
 }
 
 
-void CBaseCommand::Do_Ftp_FileUpLoad( IMessage* pMessage )
+void CBaseCommand::Do_Ftp_FileUpLoad(IMessage* pMessage)
 {
 	uint32     u4PacketLen  = 0;
 	uint16     u2CommandID  = 0;
 	VCHARS_STR strUserName;
 	VCHARM_STR strFilePath;
-	VCHARB_STR strFileBuffer;          //文件块信息
+	VCHARB_STR strFileBuffer(false, VCHARS_TYPE_BINARY);          //文件块信息(二进制模式)
 	uint32     u4BlockSize;            //块大小
 	uint32     u4CurrBlockIndex;       //当前块ID
-
-	char szUserName[MAX_BUFF_100] = {'\0'};
-	char szFilePath[MAX_BUFF_500] = {'\0'};
 
 	IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();
 	if(NULL == pBodyPacket)
@@ -390,19 +364,15 @@ void CBaseCommand::Do_Ftp_FileUpLoad( IMessage* pMessage )
 	(*pBodyPacket) >> u4CurrBlockIndex;
 	(*pBodyPacket) >> strFileBuffer;
 
-	//将接收数据转换为字符串
-	ACE_OS::memcpy(szUserName, strUserName.text, strUserName.u1Len);
-	ACE_OS::memcpy(szFilePath, strFilePath.text, strFilePath.u2Len);
-
 	m_pServerObject->GetPacketManager()->Delete(pBodyPacket);
 
-	bool blState = CheckOnlineUser(szUserName, pMessage->GetMessageBase()->m_u4ConnectID);
+	bool blState = CheckOnlineUser(strUserName.text, pMessage->GetMessageBase()->m_u4ConnectID);
 	if(blState == true)
 	{
 		//获得文件块
 		CDirView objDirView;
 		uint32 u4BufferCount = 0;
-		objDirView.GetFileBufferCount(szFilePath, u4BlockSize, u4BufferCount);
+		objDirView.GetFileBufferCount(strFilePath.text, u4BlockSize, u4BufferCount);
 		if(u4CurrBlockIndex > u4BufferCount)
 		{
 			return;
@@ -413,7 +383,7 @@ void CBaseCommand::Do_Ftp_FileUpLoad( IMessage* pMessage )
 
 		//接收文件块信息
 		ACE_OS::memcpy(pBuffer, strFileBuffer.text, strFileBuffer.u4Len);
-		bool blRet = objDirView.SetFileBuffer(szFilePath, pBuffer, u4BlockSize, u4CurrBlockIndex);
+		bool blRet = objDirView.SetFileBuffer(strFilePath.text, pBuffer, u4BlockSize, u4CurrBlockIndex);
 		if(blRet == true)
 		{
 			//组成发送包
