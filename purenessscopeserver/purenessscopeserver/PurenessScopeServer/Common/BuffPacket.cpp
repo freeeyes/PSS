@@ -507,7 +507,7 @@ CBuffPacket& CBuffPacket::operator >> (VCHARS_STR& str)
 	}
 	else
 	{
-		str.text = "";
+		str.text  = NULL;
 		str.u1Len = 0;
 	}
 	return *this;
@@ -526,7 +526,7 @@ CBuffPacket& CBuffPacket::operator >> (VCHARM_STR& str)
 	}
 	else
 	{
-		str.text = "";
+		str.text  = NULL;
 		str.u2Len = 0;
 	}
 	return *this;
@@ -545,7 +545,7 @@ CBuffPacket& CBuffPacket::operator >> (VCHARB_STR& str)
 	}
 	else
 	{
-		str.text = "";
+		str.text  = NULL;
 		str.u4Len = 0;
 	}
 	return *this;

@@ -146,6 +146,12 @@ public:
 	uint8  GetWTReturnDataType();
 	char*  GetWTReturnData();
 	bool   GetByteOrder();
+	uint8  GetDebugTrunOn();
+	char*  GetDebugFileName();
+	uint32 GetChkInterval();
+	uint32 GetLogFileMaxSize();
+	uint32 GetLogFileMaxCnt();
+	char*  GetDebugLevel();
 
 private:
 	CXmlOpeation m_MainConfig;
@@ -228,6 +234,14 @@ private:
 	uint8      m_u1WTReturnDataType;               //返回错误数据的类型，1为二进制，2为文本
 	char       m_szWTReturnData[MAX_BUFF_1024];    //返回的数据体，最多1K
 	bool       m_blByteOrder;                      //当前框架使用字序，false为主机序，true为网络序
+
+	//ACE_DEBUG相关设置
+	uint8      m_u1DebugTrunOn;                    //ACE_DEBUG文件输出开关，0为关闭，1为打开
+	char       m_szDeubgFileName[MAX_BUFF_100];    //输出文件名  
+	uint32     m_u4ChkInterval;                    //检测文件时间
+	uint32     m_u4LogFileMaxSize;                 //输出文件最大尺寸
+	uint32     m_u4LogFileMaxCnt;                  //输出文件最大个数，当达到最大个数自动循环
+	char       m_szDebugLevel[MAX_BUFF_100];       //输出文件级别  
 
 	ENUM_CHAR_ORDER m_u1CharOrder;                 //当前字节序
 

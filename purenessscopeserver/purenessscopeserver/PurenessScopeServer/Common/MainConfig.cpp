@@ -75,6 +75,13 @@ CMainConfig::CMainConfig(void)
 	m_szWTReturnData[0]       = '\0';
 	m_blByteOrder             = false;      //默认为主机字序
 
+	m_u1DebugTrunOn           = 0;          //0为关闭，1为打开
+	m_szDeubgFileName[0]      = '\0';
+	m_u4ChkInterval           = 600;
+	m_u4LogFileMaxSize        = MAX_BUFF_1024*10;
+	m_u4LogFileMaxCnt         = 3;
+	m_szDebugLevel[0]         = '\0';
+
 	//判定字节序
 	if(O32_HOST_ORDER == O32_LITTLE_ENDIAN)
 	{
@@ -642,6 +649,43 @@ bool CMainConfig::Init(const char* szConfigPath)
 		sprintf_safe(m_szWTReturnData, MAX_BUFF_1024, "%s", pData);
 	}
 
+	//ACE_DEBUG相关设置信息
+	pData = m_MainConfig.GetData("AceDebug", "TrunOn");
+	if(pData != NULL)
+	{
+		m_u1DebugTrunOn = (uint8)ACE_OS::atoi(pData);
+	}
+
+	pData = m_MainConfig.GetData("AceDebug", "DebugName");
+	if(pData != NULL)
+	{
+		sprintf_safe(m_szDeubgFileName, MAX_BUFF_100, "%s", pData);
+	}
+
+	pData = m_MainConfig.GetData("AceDebug", "ChkInterval");
+	if(pData != NULL)
+	{
+		m_u4ChkInterval = (uint32)ACE_OS::atoi(pData);
+	}
+
+	pData = m_MainConfig.GetData("AceDebug", "LogFileMaxSize");
+	if(pData != NULL)
+	{
+		m_u4LogFileMaxSize = (uint32)ACE_OS::atoi(pData);
+	}
+
+	pData = m_MainConfig.GetData("AceDebug", "LogFileMaxCnt");
+	if(pData != NULL)
+	{
+		m_u4LogFileMaxCnt = (uint32)ACE_OS::atoi(pData);
+	}
+
+	pData = m_MainConfig.GetData("AceDebug", "Level");
+	if(pData != NULL)
+	{
+		sprintf_safe(m_szDebugLevel, MAX_BUFF_100, "%s", pData);
+	}
+
 	return true;
 }
 
@@ -1095,3 +1139,32 @@ bool CMainConfig::GetByteOrder()
 	return m_blByteOrder;
 }
 
+uint8 CMainConfig::GetDebugTrunOn()
+{
+	return m_u1DebugTrunOn;
+}
+
+char* CMainConfig::GetDebugFileName()
+{
+	return m_szDeubgFileName;
+}
+
+uint32 CMainConfig::GetChkInterval()
+{
+	return m_u4ChkInterval;
+}
+
+uint32 CMainConfig::GetLogFileMaxSize()
+{
+	return m_u4LogFileMaxSize;
+}
+
+uint32 CMainConfig::GetLogFileMaxCnt()
+{
+	return m_u4LogFileMaxCnt;
+}
+
+char* CMainConfig::GetDebugLevel()
+{
+	return m_szDebugLevel;
+}

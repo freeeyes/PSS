@@ -11,6 +11,7 @@
 // 2013-09-24
 
 #include "MainConfig.h"
+#include "Frame_Logging_Strategy.h"
 
 #ifndef WIN32
 //如果是Linux
@@ -266,6 +267,21 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 		App_MainConfig::instance()->Display();
 	}
 
+	//是否打开ACE_DEBUG文件存储
+	Frame_Logging_Strategy objFrameLoggingStrategy;
+	Logging_Config_Param objParam;
+
+	if(App_MainConfig::instance()->GetDebugTrunOn() == 1)
+	{
+		sprintf_safe(objParam.m_strLogFile, 256, "%s", App_MainConfig::instance()->GetDebugFileName());
+		objParam.m_iChkInterval    = App_MainConfig::instance()->GetChkInterval();
+		objParam.m_iLogFileMaxCnt  = App_MainConfig::instance()->GetLogFileMaxCnt();
+		objParam.m_iLogFileMaxSize = App_MainConfig::instance()->GetLogFileMaxSize();
+		sprintf_safe(objParam.m_strLogLevel, 128, "%s", App_MainConfig::instance()->GetDebugLevel());
+
+		objFrameLoggingStrategy.InitLogStrategy(objParam);
+	}
+
 	//判断当前并行连接数是否支持框架
 	if(-1 == Checkfilelimit(App_MainConfig::instance()->GetMaxHandlerCount()))
 	{
@@ -339,6 +355,21 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 	else
 	{
 		App_MainConfig::instance()->Display();
+	}
+
+	//是否打开ACE_DEBUG文件存储
+	Frame_Logging_Strategy objFrameLoggingStrategy;
+	Logging_Config_Param objParam;
+
+	if(App_MainConfig::instance()->GetDebugTrunOn() == 1)
+	{
+		sprintf_safe(objParam.m_strLogFile, 256, "%s", App_MainConfig::instance()->GetDebugFileName());
+		objParam.m_iChkInterval    = App_MainConfig::instance()->GetChkInterval();
+		objParam.m_iLogFileMaxCnt  = App_MainConfig::instance()->GetLogFileMaxCnt();
+		objParam.m_iLogFileMaxSize = App_MainConfig::instance()->GetLogFileMaxSize();
+		sprintf_safe(objParam.m_strLogLevel, 128, "%s", App_MainConfig::instance()->GetDebugLevel());
+
+		objFrameLoggingStrategy.InitLogStrategy(objParam);
 	}
 
 	//判断是否是需要以服务的状态启动

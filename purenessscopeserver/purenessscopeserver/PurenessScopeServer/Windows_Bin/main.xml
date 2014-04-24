@@ -34,6 +34,7 @@
 	<ConnectValid ConnectValid="1" ConnectCount="50000"  ConnectPacketCount="1000000" ConnectRecvSize="10000000" ForbiddenTime="60" TrackIPCount="100" desc="链接有效性管理" />
 	<ConnectServer TimeInterval="500" TimeCheck="30" Recvbuff="1024" desc="框架连接其它远程服务器相关参数，TimeInterval是连接每个服务器之间的保护时间，单位是毫秒,TimeCheck单位是秒" />
 	<Monitor CpuAndMemory="0" CpuMax="50" MemoryMax="1000" desc="是否对CPU和内存定时监控，并输出日志，0为关闭监控，1是打开监控" />
+	<AceDebug TrunOn="1" DebugName="./serverdebug.log" ChkInterval="600" LogFileMaxSize="10240" LogFileMaxCnt="3" Level="" desc="ACEDEBUG文件输出配置，TrunOn=0为不使用，1为使用" />
 	
 	<UDPServerIP uip="127.0.0.1" uport="10003" uipType="IPV4" desc="监听TCP服务器的IP和端口，可以是多个" />
 </config>
