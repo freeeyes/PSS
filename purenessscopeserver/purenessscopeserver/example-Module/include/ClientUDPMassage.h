@@ -9,6 +9,7 @@
 class IClientUDPMessage
 {
 public:
+	virtual ~IClientUDPMessage() {};
 	virtual bool RecvData(const char* pData, int nLen) = 0;    //接收数据的函数
 };
 
