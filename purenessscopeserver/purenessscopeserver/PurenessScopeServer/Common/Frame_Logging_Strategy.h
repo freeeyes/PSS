@@ -1,12 +1,15 @@
 
 #pragma once
 
-#include "ace/Logging_Strategy.h"
+#include "MyACELoggingStrategy.h"
 #include <string>
 using namespace std;
 
 #define LOG_CONFIG_ARGV_COUNT	6
 
+//修复ACE_Logging_Strategy的一个BUG
+//解决在多线程下双写导致的tellp()函数线程安全的问题
+//不想修改ACE源码，在这里打一个补丁
 
 class Logging_Config_Param
 {
@@ -38,14 +41,10 @@ public:
 	Frame_Logging_Strategy();
 	~Frame_Logging_Strategy();
 
-    //读取日志文件配置文件
-    int Read_Log_Config(Logging_Config_Param &cfgParam);
-
     //日志级别
     string GetLogLevel(const string &strLogLevel);
-
 	
-	int InitLogStrategy();
+		int InitLogStrategy();
 
     //初始化日志策略
     int InitLogStrategy(Logging_Config_Param &ConfigParam);
@@ -55,6 +54,6 @@ public:
 
 private:
 	ACE_Reactor *pLogStraReactor;
-	ACE_Logging_Strategy *pLogStrategy; 
+	My_ACE_Logging_Strategy *pLogStrategy; 
 };
 

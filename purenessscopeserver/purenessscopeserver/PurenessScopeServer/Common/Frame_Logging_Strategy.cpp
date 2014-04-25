@@ -147,7 +147,7 @@ int Frame_Logging_Strategy::InitLogStrategy(Logging_Config_Param &ConfigParam)
     
 
     ACE_NEW_RETURN(pLogStraReactor, ACE_Reactor(pImpl ,1), -1);
-    ACE_NEW_RETURN(pLogStrategy, ACE_Logging_Strategy, -1);
+    ACE_NEW_RETURN(pLogStrategy, My_ACE_Logging_Strategy, -1);
 
     //Set Reactor
     pLogStrategy->reactor(pLogStraReactor);
@@ -170,20 +170,8 @@ int Frame_Logging_Strategy::InitLogStrategy(Logging_Config_Param &ConfigParam)
 int Frame_Logging_Strategy::InitLogStrategy()
 {
     Logging_Config_Param cfgParam;
-    if(-1 == Read_Log_Config(cfgParam))
-    {
-        return -1;
-    }
-
     return InitLogStrategy(cfgParam);
 }
-
-int Frame_Logging_Strategy::Read_Log_Config(Logging_Config_Param &cfgParam)
-{
-    return 0;
-}
-
-
 
 //½áÊø²ßÂÔ
 int Frame_Logging_Strategy::EndLogStrategy()

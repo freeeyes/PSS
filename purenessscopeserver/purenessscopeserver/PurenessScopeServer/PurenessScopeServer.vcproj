@@ -797,6 +797,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Common\Frame_Logging_Strategy.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Common\IPAccount.h"
 					>
 				</File>
@@ -818,6 +822,10 @@
 				</File>
 				<File
 					RelativePath=".\Common\MessageBlockManager.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Common\MyACELoggingStrategy.h"
 					>
 				</File>
 				<File
@@ -949,6 +957,10 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath=".\Common\Frame_Logging_Strategy.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\Common\LinuxCPU.cpp"
 					>
 					<FileConfiguration
@@ -995,6 +1007,10 @@
 							UsePrecompiledHeader="0"
 						/>
 					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\Common\MyACELoggingStrategy.cpp"
+					>
 				</File>
 				<File
 					RelativePath=".\Common\ProfileTime.cpp"
