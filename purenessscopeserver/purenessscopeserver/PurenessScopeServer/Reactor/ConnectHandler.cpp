@@ -479,35 +479,78 @@ int CConnectHandler::handle_input(ACE_HANDLE fd)
 			uint32 u4PacketBodyLen = m_pPacketParse->GetPacketBodyLen();
 			m_u4CurrSize = 0;
 
-			//如果超过了最大包长度，为非法数据
-			if(u4PacketBodyLen >= m_u4MaxPacketSize || u4PacketBodyLen <= 0)
-			{
-				m_u4CurrSize = 0;
-				OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input]u4PacketHeadLen(%d) more than %d.\n", u4PacketBodyLen, m_u4MaxPacketSize));
-				
-				//关闭当前的PacketParse
-				ClearPacketParse();
 
-				return -1;
+			//这里添加只处理包头的数据
+			//如果数据只有包头，不需要包体，在这里必须做一些处理，让数据只处理包头就扔到DoMessage()
+			if(u4PacketBodyLen == 0)
+			{
+				//只有数据包头
+				if(false == CheckMessage())
+				{
+					return -1;
+				}
+
+				m_u4CurrSize = 0;
+
+				//申请新的包
+				m_pPacketParse = App_PacketParsePool::instance()->Create();
+				if(NULL == m_pPacketParse)
+				{
+					OUR_DEBUG((LM_DEBUG,"[%t|CConnectHandle::open] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
+					return -1;
+				}
+
+				//申请头的大小对应的mb
+				m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadLen());
+				if(m_pCurrMessage == NULL)
+				{
+					AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %dws, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %dws.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, (uint32)m_u8RecvQueueTimeCost, m_u4RecvQueueCount, (uint32)m_u8SendQueueTimeCost);
+					OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvClinetPacket] pmb new is NULL.\n"));
+
+					//发送客户端链接断开消息。
+					if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, NULL))
+					{
+						OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
+					}
+
+					return -1;
+				}
+
+				Close();
 			}
 			else
 			{
-				//OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvClinetPacket] m_pPacketParse->GetPacketBodyLen())=%d.\n", m_pPacketParse->GetPacketBodyLen()));
-				//申请头的大小对应的mb
-				m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketBodyLen());
-				if(m_pCurrMessage == NULL)
+				//如果超过了最大包长度，为非法数据
+				if(u4PacketBodyLen >= m_u4MaxPacketSize)
 				{
 					m_u4CurrSize = 0;
-					//AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %d, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, m_u8RecvQueueTimeCost, m_u4RecvQueueCount, m_u8SendQueueTimeCost);
-					OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvClinetPacket] pmb new is NULL.\n"));
+					OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input]u4PacketHeadLen(%d) more than %d.\n", u4PacketBodyLen, m_u4MaxPacketSize));
 
 					//关闭当前的PacketParse
 					ClearPacketParse();
 
 					return -1;
 				}
-				Close();
+				else
+				{
+					//OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvClinetPacket] m_pPacketParse->GetPacketBodyLen())=%d.\n", m_pPacketParse->GetPacketBodyLen()));
+					//申请头的大小对应的mb
+					m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketBodyLen());
+					if(m_pCurrMessage == NULL)
+					{
+						m_u4CurrSize = 0;
+						//AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %d, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, m_u8RecvQueueTimeCost, m_u4RecvQueueCount, m_u8SendQueueTimeCost);
+						OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvClinetPacket] pmb new is NULL.\n"));
+
+						//关闭当前的PacketParse
+						ClearPacketParse();
+
+						return -1;
+					}
+					Close();
+				}
 			}
+
 		}
 		else
 		{

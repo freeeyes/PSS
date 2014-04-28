@@ -388,23 +388,57 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 				return;
 			}
 
+			//这里添加只处理包头的数据
+			//如果数据只有包头，不需要包体，在这里必须做一些处理，让数据只处理包头就扔到DoMessage()
 			uint32 u4PacketBodyLen = m_pPacketParse->GetPacketBodyLen();
 
-			//如果超过了最大包长度，为非法数据
-			if(u4PacketBodyLen >= m_u4MaxPacketSize || u4PacketBodyLen <= 0)
+			if(u4PacketBodyLen == 0)
 			{
-				OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_read_stream]u4PacketHeadLen(%d) more than %d.\n", u4PacketBodyLen, m_u4MaxPacketSize));
+				//如果只有包头没有包体，则直接丢到逻辑里处理
+				if(false == CheckMessage())
+				{
+					Close(2);
+					return;
+				}
 
-				//清理PacketParse
-				ClearPacketParse(mb);
+				m_pPacketParse = App_PacketParsePool::instance()->Create();
+				if(NULL == m_pPacketParse)
+				{
+					OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::handle_read_stream] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
+					//因为是要关闭连接，所以要多关闭一次IO，对应Open设置的1的初始值
+					//发送服务器端链接断开消息。
+					if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_SDISCONNECT, NULL))
+					{
+						OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
+					}
 
-				//关闭当前连接
-				Close(2, errno);
+					Close(2);
+					return;
+				}
+				Close();
+
+				//接受下一个数据包
+				RecvClinetPacket(m_pPacketParse->GetPacketHeadLen());
+
 			}
 			else
 			{
-				Close();
-				RecvClinetPacket(u4PacketBodyLen);
+				//如果超过了最大包长度，为非法数据
+				if(u4PacketBodyLen >= m_u4MaxPacketSize)
+				{
+					OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_read_stream]u4PacketHeadLen(%d) more than %d.\n", u4PacketBodyLen, m_u4MaxPacketSize));
+
+					//清理PacketParse
+					ClearPacketParse(mb);
+
+					//关闭当前连接
+					Close(2, errno);
+				}
+				else
+				{
+					Close();
+					RecvClinetPacket(u4PacketBodyLen);
+				}
 			}
 		}
 		else
