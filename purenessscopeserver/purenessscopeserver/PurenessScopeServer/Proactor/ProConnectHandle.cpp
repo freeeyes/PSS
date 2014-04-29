@@ -906,7 +906,14 @@ bool CProConnectHandle::CheckMessage()
 	if(m_pPacketParse->GetMessageHead() != NULL && m_pPacketParse->GetMessageBody() != NULL)
 	{
 		m_ThreadWriteLock.acquire();
-		m_u4AllRecvSize += (uint32)m_pPacketParse->GetMessageHead()->length() + (uint32)m_pPacketParse->GetMessageBody()->length();
+		if(m_pPacketParse->GetMessageBody() == NULL)
+		{
+			m_u4AllRecvSize += (uint32)m_pPacketParse->GetMessageHead()->length();
+		}
+		else
+		{
+			m_u4AllRecvSize += (uint32)m_pPacketParse->GetMessageHead()->length() + (uint32)m_pPacketParse->GetMessageBody()->length();
+		}
 		m_u4AllRecvCount++;
 
 		//如果有需要监控的IP，则记录字节流信息

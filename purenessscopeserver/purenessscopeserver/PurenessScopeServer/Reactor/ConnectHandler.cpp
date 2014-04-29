@@ -1005,7 +1005,15 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 
 bool CConnectHandler::CheckMessage()
 {	
-	m_u4AllRecvSize += (uint32)m_pPacketParse->GetMessageHead()->length() + (uint32)m_pPacketParse->GetMessageBody()->length();
+	if(m_pPacketParse->GetMessageBody() == NULL)
+	{
+		m_u4AllRecvSize += (uint32)m_pPacketParse->GetMessageHead()->length();
+	}
+	else
+	{
+		m_u4AllRecvSize += (uint32)m_pPacketParse->GetMessageHead()->length() + (uint32)m_pPacketParse->GetMessageBody()->length();
+	}
+	
 	m_u4AllRecvCount++;
 
 	//如果需要统计信息
