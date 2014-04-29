@@ -537,10 +537,10 @@ My_ACE_Logging_Strategy::handle_timeout (const ACE_Time_Value &,
 		output_file->open (ACE_TEXT_ALWAYS_CHAR (this->filename_),
 			ios::out);
 #endif /* ACE_LACKS_IOSTREAM_TOTALLY */
-
-		// Release the lock previously acquired.
-		this->log_msg_->release ();
 	}
+
+	// Release the lock previously acquired.
+	this->log_msg_->release ();
 
 	return 0;
 }
