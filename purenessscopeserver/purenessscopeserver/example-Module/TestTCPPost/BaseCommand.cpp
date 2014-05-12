@@ -70,8 +70,9 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 		char szPostData[2048] = {'\0'};
 		//sprintf_safe(szPostData, MAX_BUFF_100, "hello world");
 		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] CommandID= 0x%04x, m_nDataLen=%d.\n", u2CommandID, BodyPacket.m_nDataLen));
-		int nSendSize = BodyPacket.m_nDataLen;
-		ACE_OS::memcpy(szPostData, BodyPacket.m_pData, BodyPacket.m_nDataLen);		
+		int nSendSize = BodyPacket.m_nDataLen + sizeof(uint32);
+		ACE_OS::memcpy(szPostData, &BodyPacket.m_nDataLen, sizeof(uint32));
+		ACE_OS::memcpy(&szPostData[sizeof(uint32)], BodyPacket.m_pData, BodyPacket.m_nDataLen);		
 
 		m_pServerObject->GetPacketManager()->Delete(pBodyPacket);
 
