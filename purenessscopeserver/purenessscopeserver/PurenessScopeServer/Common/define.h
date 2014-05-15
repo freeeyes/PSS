@@ -149,10 +149,11 @@ using namespace std;
 //对应当前框架支持的网络模式
 enum
 {
-	NETWORKMODE_PRO_IOCP    = 1,
-	NETWORKMODE_RE_SELECT   = 10,
-	NETWORKMODE_RE_TPSELECT = 11,
-	NETWORKMODE_RE_EPOLL    = 12,
+	NETWORKMODE_PRO_IOCP    = 1,    //IOCP模式
+	NETWORKMODE_RE_SELECT   = 10,   //Select模式
+	NETWORKMODE_RE_TPSELECT = 11,   //TPSelect模式 
+	NETWORKMODE_RE_EPOLL    = 12,   //epolllt模式(水平触发)
+	NETWORKMODE_RE_EPOLL_ET = 13,   //epollet模式(边沿触发)
 };
 
 //对应链接的状态，用于设置链接时候的状态

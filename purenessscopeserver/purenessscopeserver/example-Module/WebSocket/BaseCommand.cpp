@@ -214,7 +214,7 @@ bool CBaseCommand::WebSocketEncrypt(char* pOriData, uint32 u4OriLen, char* pEncr
 {				 
 	uint64 length =  (uint64)u4OriLen;
 	uint64 expectedSize = length + 1; //flags byte.
-	if(length <= 125  && length <= 65535 )
+	if(length <= 125)
 		expectedSize += 1;
 	else if(length > 125  && length <= 65535)
 		expectedSize += 3;
@@ -224,7 +224,7 @@ bool CBaseCommand::WebSocketEncrypt(char* pOriData, uint32 u4OriLen, char* pEncr
 	int iPyl = 0;
 	unsigned char payloadFlags = 129;
 	ACE_OS::memcpy(pEncryData, &payloadFlags, 1);
-	length+=1;
+	//length+=1;
 	iPyl+=1;
 
 	//create the length byte
@@ -232,29 +232,29 @@ bool CBaseCommand::WebSocketEncrypt(char* pOriData, uint32 u4OriLen, char* pEncr
 	{				    
 		char basicSize = u4OriLen;
 		ACE_OS::memcpy(pEncryData+iPyl, &basicSize, 1);
-		length+=1;
+		//length+=1;
 		iPyl+=1;		
 	}
-	else if ((length > 125) & (length <= 65535))
+	else if ((length > 125) && (length <= 65535))
 	{
 		char basicSize = 126;					
 		ACE_OS::memcpy(pEncryData+iPyl, &basicSize, 1);
-		length+=1;
+		//length+=1;
 		iPyl+=1;
 
 
 		char len[2];
 		len[0] = ( length >> 8 ) & 255;
 		len[1] = ( length ) & 255;
-		ACE_OS::memcpy(pEncryData+iPyl,&length,2);
-		length+=2;
+		ACE_OS::memcpy(pEncryData+iPyl,&len,2);
+		//length+=2;
 		iPyl+=2;		
 	}
 	else
 	{
 		char basicSize = 127;					
 		ACE_OS::memcpy(pEncryData+iPyl,&basicSize,1);
-		length+=1;
+		//length+=1;
 		iPyl+=1;
 
 		char len[8];
@@ -267,7 +267,7 @@ bool CBaseCommand::WebSocketEncrypt(char* pOriData, uint32 u4OriLen, char* pEncr
 		len[6] = ( length >> 8 ) & 255;
 		len[7] = ( length ) & 255;
 		ACE_OS::memcpy(pEncryData+iPyl, len, 8);
-		length+=8;
+		//length+=8;
 		iPyl+=8;		
 	}
 

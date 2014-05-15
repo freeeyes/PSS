@@ -759,6 +759,17 @@ bool CProConnectHandle::CheckAlive()
 	{
 		//如果超过了最大时间，则服务器关闭链接
 		OUR_DEBUG ((LM_ERROR, "[CProConnectHandle::CheckAlive] Connectid=%d Server Close!\n", GetConnectID()));
+
+		//调用连接断开消息
+		CPacketParse objPacketParse;
+		objPacketParse.DisConnect(GetConnectID());		
+
+		//在这里发送一个连接断开消息给逻辑
+		if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, NULL))
+		{
+			OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
+		}
+
 		ServerClose();
 		return false;
 	}
@@ -903,7 +914,7 @@ bool CProConnectHandle::RecvClinetPacket(uint32 u4PackeLen)
 
 bool CProConnectHandle::CheckMessage()
 {
-	if(m_pPacketParse->GetMessageHead() != NULL && m_pPacketParse->GetMessageBody() != NULL)
+	if(m_pPacketParse->GetMessageHead() != NULL)
 	{
 		m_ThreadWriteLock.acquire();
 		if(m_pPacketParse->GetMessageBody() == NULL)

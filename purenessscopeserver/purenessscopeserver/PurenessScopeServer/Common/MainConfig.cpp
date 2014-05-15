@@ -142,6 +142,10 @@ bool CMainConfig::Init(const char* szConfigPath)
 		{
 			m_u1NetworkMode = (uint8)NETWORKMODE_RE_EPOLL;
 		}
+		else if(ACE_OS::strcmp(pData, "Epoll_et") == 0)
+		{
+			m_u1NetworkMode = (uint8)NETWORKMODE_RE_EPOLL_ET;
+		}
 		else
 		{
 			OUR_DEBUG((LM_INFO, "[CMainConfig::Init]NetworkMode is Invalid!!, please read main.xml desc.\n", szConfigPath));

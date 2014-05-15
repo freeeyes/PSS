@@ -1160,6 +1160,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Reactor\MyACE_Dev_Poll_Reactor.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Reactor\ServerManager.h"
 					>
 				</File>
@@ -1242,6 +1246,14 @@
 							UsePrecompiledHeader="0"
 						/>
 					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\Reactor\MyACE_Dev_Poll_Reactor.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Reactor\MyACE_Dev_Poll_Reactor.inl"
+					>
 				</File>
 				<File
 					RelativePath=".\Reactor\ServerManager.cpp"

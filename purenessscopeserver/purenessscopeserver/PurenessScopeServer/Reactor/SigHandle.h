@@ -12,12 +12,12 @@
 class CSigHandle : public ACE_Event_Handler
 {
 public:
-	CSigHandle(void);
-	~CSigHandle(void);
+    CSigHandle(void);
+    ~CSigHandle(void);
 
-	virtual int handle_signal(int nSigNum, siginfo_t* pSigInfo = 0, ucontext_t* pContext = 0);
-	int RegisterSignal(ACE_Reactor* pReactor = NULL);
+    virtual int handle_signal(int nSigNum, siginfo_t* pSigInfo = 0, ucontext_t* pContext = 0);
+    int RegisterSignal(ACE_Reactor* pReactor = NULL);
 };
 
-typedef ACE_Singleton<CSigHandle, ACE_Null_Mutex> App_SigHandler; 
+typedef ACE_Singleton<CSigHandle, ACE_Null_Mutex> App_SigHandler;
 #endif

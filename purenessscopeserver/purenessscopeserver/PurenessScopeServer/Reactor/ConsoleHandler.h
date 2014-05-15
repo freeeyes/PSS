@@ -24,65 +24,65 @@
 class CConsoleHandler : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>
 {
 public:
-	CConsoleHandler(void);
-	~CConsoleHandler(void);
+    CConsoleHandler(void);
+    ~CConsoleHandler(void);
 
-	//重写继承方法
-	virtual int open(void*);                                                //用户建立一个链接
-	virtual int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE);
-	virtual int handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask);
+    //重写继承方法
+    virtual int open(void*);                                                //用户建立一个链接
+    virtual int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE);
+    virtual int handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask);
 
-	bool SendMessage(IBuffPacket* pBuffPacket);
+    bool SendMessage(IBuffPacket* pBuffPacket);
 
-	bool Close(int nIOCount = 1);
-	bool ServerClose();
+    bool Close(int nIOCount = 1);
+    bool ServerClose();
 
-	const char* GetError();
-	void        SetConnectID(uint32 u4ConnectID);
-	uint32      GetConnectID();
-	uint8       GetConnectState();                                           //得到链接状态
-	uint8       GetSendBuffState();                                          //得到发送状态    
-	uint8       GetIsClosing();                                              //链接是否应该关闭
-
-private:
-	bool CheckMessage();                                                      //处理接收的数据
-	bool PutSendPacket(ACE_Message_Block* pMbData);                           //发送数据
+    const char* GetError();
+    void        SetConnectID(uint32 u4ConnectID);
+    uint32      GetConnectID();
+    uint8       GetConnectState();                                           //得到链接状态
+    uint8       GetSendBuffState();                                          //得到发送状态
+    uint8       GetIsClosing();                                              //链接是否应该关闭
 
 private:
-	char                       m_szError[MAX_BUFF_500];
-	ACE_INET_Addr              m_addrRemote;
-	ACE_Time_Value             m_atvConnect;
-	ACE_Time_Value             m_atvInput;
-	ACE_Time_Value             m_atvOutput;
-	ACE_Time_Value             m_atvSendAlive;
+    bool CheckMessage();                                                      //处理接收的数据
+    bool PutSendPacket(ACE_Message_Block* pMbData);                           //发送数据
 
-	uint8                      m_u1ConnectState;               //目前链接处理状态
-	uint8                      m_u1SendBuffState;              //目前缓冲器是否有等待发送的数据
-	uint8                      m_u1IsClosing;                  //是否应该关闭 0为否，1为是
-	uint16                     m_u2SendQueueMax;               //发送队列最大长度
-	uint16                     m_u2SendCount;                  //当前数据包的个数
-	uint32                     m_u4HandlerID;                  //此Hander生成时的ID
-	uint32                     m_u4ConnectID;                  //链接的ID
-	uint32                     m_u4AllRecvCount;               //当前链接接收数据包的个数
-	uint32                     m_u4AllSendCount;               //当前链接发送数据包的个数
-	uint32                     m_u4AllRecvSize;                //当前链接接收字节总数
-	uint32                     m_u4AllSendSize;                //当前链接发送字节总数
-	uint16                     m_u2MaxConnectTime;             //最大时间链接判定
+private:
+    char                       m_szError[MAX_BUFF_500];
+    ACE_INET_Addr              m_addrRemote;
+    ACE_Time_Value             m_atvConnect;
+    ACE_Time_Value             m_atvInput;
+    ACE_Time_Value             m_atvOutput;
+    ACE_Time_Value             m_atvSendAlive;
 
-	ACE_Recursive_Thread_Mutex m_ThreadLock;
+    uint8                      m_u1ConnectState;               //目前链接处理状态
+    uint8                      m_u1SendBuffState;              //目前缓冲器是否有等待发送的数据
+    uint8                      m_u1IsClosing;                  //是否应该关闭 0为否，1为是
+    uint16                     m_u2SendQueueMax;               //发送队列最大长度
+    uint16                     m_u2SendCount;                  //当前数据包的个数
+    uint32                     m_u4HandlerID;                  //此Hander生成时的ID
+    uint32                     m_u4ConnectID;                  //链接的ID
+    uint32                     m_u4AllRecvCount;               //当前链接接收数据包的个数
+    uint32                     m_u4AllSendCount;               //当前链接发送数据包的个数
+    uint32                     m_u4AllRecvSize;                //当前链接接收字节总数
+    uint32                     m_u4AllSendSize;                //当前链接发送字节总数
+    uint16                     m_u2MaxConnectTime;             //最大时间链接判定
 
-	uint32                     m_u4SendThresHold;              //发送阀值(消息包的个数)
-	uint32                     m_u4SendCheckTime;              //发送检测时间的阀值
-	int                        m_nIOCount;                     //当前IO操作的个数
+    ACE_Recursive_Thread_Mutex m_ThreadLock;
 
-	_TimerCheckID*             m_pTCClose;
+    uint32                     m_u4SendThresHold;              //发送阀值(消息包的个数)
+    uint32                     m_u4SendCheckTime;              //发送检测时间的阀值
+    int                        m_nIOCount;                     //当前IO操作的个数
 
-	CBuffPacket                m_AlivePacket;                  //服务器生存包
-	CConsolePacketParse*       m_pPacketParse;                 //数据包解析类
-	ACE_Message_Block*         m_pCurrMessage;                 //当前的MB对象
-	uint32                     m_u4CurrSize;                   //当前MB缓冲字符长度
+    _TimerCheckID*             m_pTCClose;
 
-	CConsoleMessage          m_ConsoleMessage;                 //管理消息处理类
+    CBuffPacket                m_AlivePacket;                  //服务器生存包
+    CConsolePacketParse*       m_pPacketParse;                 //数据包解析类
+    ACE_Message_Block*         m_pCurrMessage;                 //当前的MB对象
+    uint32                     m_u4CurrSize;                   //当前MB缓冲字符长度
+
+    CConsoleMessage          m_ConsoleMessage;                 //管理消息处理类
 };
 
 #endif

@@ -1,0 +1,139 @@
+// -*- C++ -*-
+// $Id: Dev_Poll_Reactor.inl 96985 2013-04-11 15:50:32Z huangh $
+
+#ifndef _MY_ACE_DEV_POLL_REACTOR_INL_H
+#define _MY_ACE_DEV_POLL_REACTOR_INL_H
+
+#include "ace/Log_Category.h"
+
+ACE_BEGIN_VERSIONED_NAMESPACE_DECL
+
+ACE_INLINE
+My_ACE_Dev_Poll_Reactor::My_Event_Tuple::My_Event_Tuple (ACE_Event_Handler *eh,
+												ACE_Reactor_Mask m,
+												bool is_suspended,
+												bool is_controlled)
+												: event_handler (eh),
+												mask (m),
+												suspended (is_suspended),
+												controlled (is_controlled)
+{
+}
+
+// ---------------------------------------------------------------------
+
+ACE_INLINE size_t
+My_ACE_Dev_Poll_Reactor::Handler_Repository::size (void) const
+{
+	ACE_TRACE ("My_ACE_Dev_Poll_Reactor::Handler_Repository::size");
+
+	return this->size_;
+}
+
+ACE_INLINE size_t
+My_ACE_Dev_Poll_Reactor::Handler_Repository::max_size (void) const
+{
+	ACE_TRACE ("My_ACE_Dev_Poll_Reactor::Handler_Repository::max_size");
+
+	return this->max_size_;
+}
+
+// -----------------------------------------------------------------
+
+ACE_INLINE
+MyACE_Dev_Poll_Handler_Guard::MyACE_Dev_Poll_Handler_Guard
+(ACE_Event_Handler *eh,
+ bool do_incr)
+ : eh_ (eh),
+ refcounted_ (false)
+{
+	if (eh == 0)
+		return;
+
+	this->refcounted_ =
+		eh->reference_counting_policy ().value () ==
+		ACE_Event_Handler::Reference_Counting_Policy::ENABLED;
+
+	if (do_incr && this->refcounted_)
+		eh->add_reference ();
+}
+
+ACE_INLINE
+MyACE_Dev_Poll_Handler_Guard::~MyACE_Dev_Poll_Handler_Guard (void)
+{
+	if (this->refcounted_ && this->eh_ != 0)
+		this->eh_->remove_reference ();
+}
+
+ACE_INLINE void
+MyACE_Dev_Poll_Handler_Guard::release (void)
+{
+	this->eh_ = 0;
+}
+
+// ---------------------------------------------------------------------
+
+ACE_INLINE int
+My_ACE_Dev_Poll_Reactor::upcall (ACE_Event_Handler *event_handler,
+							  int (ACE_Event_Handler::*callback)(ACE_HANDLE),
+							  ACE_HANDLE handle)
+{
+	// If the handler returns positive value (requesting a reactor
+	// callback) just call back as many times as the handler requests
+	// it.  The handler is suspended internally and other threads are off
+	// handling other things.
+	int status = 0;
+
+	do
+	{
+		status = (event_handler->*callback) (handle);
+	}
+	while (status > 0 && event_handler != this->notify_handler_);
+
+	return status;
+}
+
+
+/************************************************************************/
+// Methods for My_ACE_Dev_Poll_Reactor::Token_Guard
+/************************************************************************/
+
+ACE_INLINE
+My_ACE_Dev_Poll_Reactor::Token_Guard::Token_Guard (ACE_Dev_Poll_Reactor_Token &token)
+
+: token_ (token),
+owner_ (0)
+{
+}
+
+ACE_INLINE
+My_ACE_Dev_Poll_Reactor::Token_Guard::~Token_Guard (void)
+{
+	if (this->owner_ == 1)
+	{
+		ACE_MT (this->token_.release ());
+		this->owner_ = 0;
+	}
+}
+
+ACE_INLINE void
+My_ACE_Dev_Poll_Reactor::Token_Guard::release_token (void)
+{
+	if (this->owner_)
+	{
+		ACE_MT (this->token_.release ());
+
+		// We are not the owner anymore..
+		this->owner_ = 0;
+	}
+}
+
+ACE_INLINE int
+My_ACE_Dev_Poll_Reactor::Token_Guard::is_owner (void)
+{
+	return this->owner_;
+}
+
+ACE_END_VERSIONED_NAMESPACE_DECL
+
+#endif
