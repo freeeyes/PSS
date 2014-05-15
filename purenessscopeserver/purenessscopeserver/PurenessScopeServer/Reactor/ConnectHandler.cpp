@@ -391,6 +391,7 @@ int CConnectHandler::RecvData()
 		//关闭当前的PacketParse
 		ClearPacketParse();
 
+		Close();
 		return -1;
 	}
 
@@ -404,6 +405,7 @@ int CConnectHandler::RecvData()
 		//关闭当前的PacketParse
 		ClearPacketParse();
 
+		Close();
 		return -1;
 	}
 
@@ -418,6 +420,7 @@ int CConnectHandler::RecvData()
 		//关闭当前的PacketParse
 		ClearPacketParse();
 
+		Close();
 		return -1;
 	}
 
@@ -479,6 +482,7 @@ int CConnectHandler::RecvData()
 				//关闭当前的PacketParse
 				ClearPacketParse();
 
+				Close();
 				return -1;
 			}
 
@@ -493,6 +497,7 @@ int CConnectHandler::RecvData()
 				//只有数据包头
 				if(false == CheckMessage())
 				{
+					Close();
 					return -1;
 				}
 
@@ -503,6 +508,7 @@ int CConnectHandler::RecvData()
 				if(NULL == m_pPacketParse)
 				{
 					OUR_DEBUG((LM_DEBUG,"[%t|CConnectHandle::open] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
+					Close();
 					return -1;
 				}
 
@@ -519,10 +525,9 @@ int CConnectHandler::RecvData()
 						OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 					}
 
+					Close();
 					return -1;
 				}
-
-				Close();
 			}
 			else
 			{
@@ -534,7 +539,8 @@ int CConnectHandler::RecvData()
 
 					//关闭当前的PacketParse
 					ClearPacketParse();
-
+					
+					Close();
 					return -1;
 				}
 				else
@@ -551,9 +557,9 @@ int CConnectHandler::RecvData()
 						//关闭当前的PacketParse
 						ClearPacketParse();
 
+						Close();
 						return -1;
 					}
-					Close();
 				}
 			}
 
@@ -571,11 +577,13 @@ int CConnectHandler::RecvData()
 				//关闭当前的PacketParse
 				ClearPacketParse();
 
+				Close();
 				return -1;
 			}
 
 			if(false == CheckMessage())
 			{
+				Close();
 				return -1;
 			}
 
@@ -586,6 +594,7 @@ int CConnectHandler::RecvData()
 			if(NULL == m_pPacketParse)
 			{
 				OUR_DEBUG((LM_DEBUG,"[%t|CConnectHandle::open] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
+				Close();
 				return -1;
 			}
 
@@ -601,11 +610,10 @@ int CConnectHandler::RecvData()
 				{
 					OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 				}
-
+				
+				Close();
 				return -1;
 			}
-
-			Close();
 		}
 	}
 	else
@@ -618,6 +626,7 @@ int CConnectHandler::RecvData()
 			{
 				if(false == CheckMessage())
 				{
+					Close();
 					return -1;
 				}
 
@@ -628,6 +637,7 @@ int CConnectHandler::RecvData()
 				if(NULL == m_pPacketParse)
 				{
 					OUR_DEBUG((LM_DEBUG,"[%t|CConnectHandle::open] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
+					Close();
 					return -1;
 				}
 
@@ -660,7 +670,8 @@ int CConnectHandler::RecvData()
 				{
 					OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 				}
-
+				
+				Close();
 				return -1;
 			}
 		}
@@ -680,19 +691,19 @@ int CConnectHandler::RecvData()
 			{
 				OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 			}
-
+			
+			Close();
 			return -1;
 		}
 	}
 
+	Close();
 	return 0;	
 }
 
 //et模式接收数据
 int CConnectHandler::RecvData_et()
 {
-	ACE_Time_Value nowait(0, MAX_QUEUE_TIMEOUT);
-	
 	while(true)
 	{
 		m_ThreadLock.acquire();
@@ -708,7 +719,8 @@ int CConnectHandler::RecvData_et()
 	
 			//关闭当前的PacketParse
 			ClearPacketParse();
-	
+			
+			Close();
 			return -1;
 		}
 	
@@ -721,11 +733,13 @@ int CConnectHandler::RecvData_et()
 	
 			//关闭当前的PacketParse
 			ClearPacketParse();
+			
+			Close();
 	
 			return -1;
 		}
 	
-		int nDataLen = this->peer().recv(m_pCurrMessage->wr_ptr(), nCurrCount, MSG_NOSIGNAL, &nowait);
+		int nDataLen = this->peer().recv(m_pCurrMessage->wr_ptr(), nCurrCount, MSG_NOSIGNAL);
 		OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input] ConnectID=%d, GetData=[%d].\n", GetConnectID(), nDataLen));
 		if(nDataLen <= 0)
 		{
@@ -735,7 +749,7 @@ int CConnectHandler::RecvData_et()
 			sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::handle_input] ConnectID = %d, recv data is error[%d].\n", GetConnectID(), nDataLen);
 	
 			//et模式下，这里处理完了，就要等待下一次事件到达信息
-			if(u4Error == 62) 
+			if(u4Error == EINTR || u4Error == EAGAIN) 
 			{
 				Close();
 				return 0;
@@ -743,7 +757,8 @@ int CConnectHandler::RecvData_et()
 	
 			//关闭当前的PacketParse
 			ClearPacketParse();
-	
+			
+			Close();
 			return -1;
 		}
 	
@@ -804,7 +819,8 @@ int CConnectHandler::RecvData_et()
 	
 					//关闭当前的PacketParse
 					ClearPacketParse();
-	
+					
+					Close();
 					return -1;
 				}
 	
@@ -819,6 +835,7 @@ int CConnectHandler::RecvData_et()
 					//只有数据包头
 					if(false == CheckMessage())
 					{
+						Close();
 						return -1;
 					}
 	
@@ -829,6 +846,7 @@ int CConnectHandler::RecvData_et()
 					if(NULL == m_pPacketParse)
 					{
 						OUR_DEBUG((LM_DEBUG,"[%t|CConnectHandle::open] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
+						Close();
 						return -1;
 					}
 	
@@ -844,11 +862,10 @@ int CConnectHandler::RecvData_et()
 						{
 							OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 						}
-	
+						
+						Close();
 						return -1;
 					}
-	
-					Close();
 				}
 				else
 				{
@@ -858,6 +875,7 @@ int CConnectHandler::RecvData_et()
 						m_u4CurrSize = 0;
 						OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input]u4PacketHeadLen(%d) more than %d.\n", u4PacketBodyLen, m_u4MaxPacketSize));
 	
+						Close();
 						//关闭当前的PacketParse
 						ClearPacketParse();
 	
@@ -874,15 +892,14 @@ int CConnectHandler::RecvData_et()
 							//AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %d, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, m_u8RecvQueueTimeCost, m_u4RecvQueueCount, m_u8SendQueueTimeCost);
 							OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvClinetPacket] pmb new is NULL.\n"));
 	
+							Close();
 							//关闭当前的PacketParse
 							ClearPacketParse();
 	
 							return -1;
 						}
-						Close();
 					}
 				}
-	
 			}
 			else
 			{
@@ -893,7 +910,8 @@ int CConnectHandler::RecvData_et()
 					//如果数据包体是错误的，则断开连接
 					m_u4CurrSize = 0;
 					OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvClinetPacket]SetPacketBody is false.\n"));
-	
+
+					Close();	
 					//关闭当前的PacketParse
 					ClearPacketParse();
 	
@@ -902,6 +920,7 @@ int CConnectHandler::RecvData_et()
 	
 				if(false == CheckMessage())
 				{
+					Close();
 					return -1;
 				}
 	
@@ -912,6 +931,7 @@ int CConnectHandler::RecvData_et()
 				if(NULL == m_pPacketParse)
 				{
 					OUR_DEBUG((LM_DEBUG,"[%t|CConnectHandle::open] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
+					Close();
 					return -1;
 				}
 	
@@ -927,11 +947,10 @@ int CConnectHandler::RecvData_et()
 					{
 						OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 					}
-	
+					
+					Close();
 					return -1;
 				}
-	
-				Close();
 			}
 		}
 		else
@@ -944,6 +963,7 @@ int CConnectHandler::RecvData_et()
 				{
 					if(false == CheckMessage())
 					{
+						Close();
 						return -1;
 					}
 	
@@ -986,7 +1006,8 @@ int CConnectHandler::RecvData_et()
 					{
 						OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 					}
-	
+					
+					Close();
 					return -1;
 				}
 			}
@@ -1006,12 +1027,14 @@ int CConnectHandler::RecvData_et()
 				{
 					OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 				}
-	
+				
+				Close();
 				return -1;
 			}
 		}
 	}
 
+	Close();
 	return 0;		
 }
 
