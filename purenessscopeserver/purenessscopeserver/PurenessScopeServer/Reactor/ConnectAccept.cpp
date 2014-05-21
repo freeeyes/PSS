@@ -50,7 +50,7 @@ int ConnectAcceptor::make_svc_handler(CConnectHandler*& sh)
 int ConnectAcceptor::open2(ACE_INET_Addr& local_addr, ACE_Reactor* reactor, int flags, int backlog)
 {
     ACE_TRACE("ACE_Acceptor<SVC_HANDLER, PEER_ACCEPTOR>::open");
-    this->flags_ = flags;
+    //this->flags_ = flags;
     this->use_select_ = 1;
     this->reuse_addr_ = 1;
     this->peer_acceptor_addr_ = local_addr;

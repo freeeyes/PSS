@@ -78,6 +78,8 @@ bool CConnectHandler::Close(int nIOCount)
 		//查看是否是IP追踪信息，是则记录
 		App_IPAccount::instance()->CloseIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
 
+		//OUR_DEBUG((LM_ERROR, "[CConnectHandler::Close]ConnectID=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
+
 		//如果还存在阻塞定时器，取消之
 		if(m_u4BlockTimerID != 0)
 		{
@@ -221,13 +223,16 @@ int CConnectHandler::open(void*)
 		sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::open]ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>::open() error [%d].", nRet);
 		return -1;
 	}
-
-	//设置链接为非阻塞模式
-	if (this->peer().enable(ACE_NONBLOCK) == -1)
+	
+	if(App_MainConfig::instance()->GetNetworkMode() != (uint8)NETWORKMODE_RE_EPOLL_ET)
 	{
-		OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]this->peer().enable  = ACE_NONBLOCK error.\n"));
-		sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::open]this->peer().enable  = ACE_NONBLOCK error.");
-		return -1;
+		//设置链接为非阻塞模式
+		if (this->peer().enable(ACE_NONBLOCK) == -1)
+		{
+			OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]this->peer().enable  = ACE_NONBLOCK error.\n"));
+			sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::open]this->peer().enable  = ACE_NONBLOCK error.");
+			return -1;
+		}
 	}
 
 	OUR_DEBUG((LM_INFO, "[CConnectHandler::open] Connection from [%s:%d]\n",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
@@ -318,6 +323,7 @@ int CConnectHandler::open(void*)
 
 	m_u1ConnectState = CONNECT_OPEN;
 
+	nRet = this->reactor()->register_handler(this, ACE_Event_Handler::READ_MASK);
 
 	return nRet;
 }
@@ -704,11 +710,13 @@ int CConnectHandler::RecvData()
 //et模式接收数据
 int CConnectHandler::RecvData_et()
 {
+	m_ThreadLock.acquire();
+	m_nIOCount++;
+	m_ThreadLock.release();
+
 	while(true)
 	{
-		m_ThreadLock.acquire();
-		m_nIOCount++;
-		m_ThreadLock.release();
+		//OUR_DEBUG((LM_ERROR, "[CConnectHandler::RecvData_et]m_nIOCount=%d.\n", m_nIOCount));
 		
 		//判断缓冲是否为NULL
 		if(m_pCurrMessage == NULL)
@@ -749,10 +757,21 @@ int CConnectHandler::RecvData_et()
 			sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::handle_input] ConnectID = %d, recv data is error[%d].\n", GetConnectID(), nDataLen);
 	
 			//et模式下，这里处理完了，就要等待下一次事件到达信息
-			if(u4Error == EINTR || u4Error == EAGAIN) 
+			/*
+			if(nDataLen == 0)
 			{
-				Close();
-				return 0;
+				if(u4Error == EINTR || u4Error == EAGAIN) 
+				{
+					Close();
+					return 0;
+				}
+			}
+			*/
+			
+			//如果是-1 且为11的错误，忽略之
+			if(nDataLen == -1 && u4Error == EAGAIN)
+			{
+				continue;
 			}
 	
 			//关闭当前的PacketParse
@@ -2063,7 +2082,6 @@ bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType,
 						//超过了阀值，则关闭连接
 						App_BuffPacketManager::instance()->Delete(pBuffPacket);
 					}
-					Close(2);
 					continue;
 				}
 			}

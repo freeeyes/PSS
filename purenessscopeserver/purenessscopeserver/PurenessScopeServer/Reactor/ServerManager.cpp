@@ -12,6 +12,8 @@ CServerManager::~CServerManager(void)
 
 bool CServerManager::Init()
 {
+		OUR_DEBUG((LM_INFO, "[CServerManager::Init]1111.\n"));
+		
     int nServerPortCount    = App_MainConfig::instance()->GetServerPortCount();
     int nReactorCount       = App_MainConfig::instance()->GetReactorCount();
     bool blState = false;
@@ -24,6 +26,8 @@ bool CServerManager::Init()
         OUR_DEBUG((LM_INFO, "[CServerManager::Init]%s.\n", m_ConnectAcceptorManager.GetError()));
         return false;
     }
+    
+    OUR_DEBUG((LM_INFO, "[CServerManager::Init]nReactorCount=%d.\n", nReactorCount));
 
     //初始化反应器
     for (int i = 0 ; i < nReactorCount; i++)
