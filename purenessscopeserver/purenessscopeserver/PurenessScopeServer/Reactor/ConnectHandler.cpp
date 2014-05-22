@@ -224,15 +224,12 @@ int CConnectHandler::open(void*)
 		return -1;
 	}
 	
-	if(App_MainConfig::instance()->GetNetworkMode() != (uint8)NETWORKMODE_RE_EPOLL_ET)
+	//设置链接为非阻塞模式
+	if (this->peer().enable(ACE_NONBLOCK) == -1)
 	{
-		//设置链接为非阻塞模式
-		if (this->peer().enable(ACE_NONBLOCK) == -1)
-		{
-			OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]this->peer().enable  = ACE_NONBLOCK error.\n"));
-			sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::open]this->peer().enable  = ACE_NONBLOCK error.");
-			return -1;
-		}
+		OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]this->peer().enable  = ACE_NONBLOCK error.\n"));
+		sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::open]this->peer().enable  = ACE_NONBLOCK error.");
+		return -1;
 	}
 
 	OUR_DEBUG((LM_INFO, "[CConnectHandler::open] Connection from [%s:%d]\n",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
@@ -748,31 +745,20 @@ int CConnectHandler::RecvData_et()
 		}
 	
 		int nDataLen = this->peer().recv(m_pCurrMessage->wr_ptr(), nCurrCount, MSG_NOSIGNAL);
-		OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input] ConnectID=%d, GetData=[%d].\n", GetConnectID(), nDataLen));
+		//OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input] ConnectID=%d, GetData=[%d],errno=[%d].\n", GetConnectID(), nDataLen, errno));
 		if(nDataLen <= 0)
 		{
 			m_u4CurrSize = 0;
 			uint32 u4Error = (uint32)errno;
-			OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input] ConnectID = %d, recv data is error nDataLen = [%d] errno = [%d] EAGAIN=[%d].\n", GetConnectID(), nDataLen, u4Error, EAGAIN));
-			sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::handle_input] ConnectID = %d, recv data is error[%d].\n", GetConnectID(), nDataLen);
-	
-			//et模式下，这里处理完了，就要等待下一次事件到达信息
-			/*
-			if(nDataLen == 0)
-			{
-				if(u4Error == EINTR || u4Error == EAGAIN) 
-				{
-					Close();
-					return 0;
-				}
-			}
-			*/
 			
 			//如果是-1 且为11的错误，忽略之
 			if(nDataLen == -1 && u4Error == EAGAIN)
 			{
-				continue;
+				break;
 			}
+			
+			OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input] ConnectID = %d, recv data is error nDataLen = [%d] errno = [%d] EAGAIN=[%d].\n", GetConnectID(), nDataLen, u4Error, EAGAIN));
+			sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::handle_input] ConnectID = %d,nDataLen = [%d],recv data is error[%d].\n", GetConnectID(), nDataLen, u4Error);
 	
 			//关闭当前的PacketParse
 			ClearPacketParse();
@@ -1351,7 +1337,7 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 			pMbData->release();
 			return false;
 		}
-
+		
 		int nDataLen = this->peer().send(pMbData->rd_ptr(), nSendPacketLen - nIsSendSize, &nowait);	
 
 		if(nDataLen <= 0)

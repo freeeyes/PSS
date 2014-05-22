@@ -24,6 +24,7 @@ private:
   bool WriteFile_SendBuff(const char* pData, int nLen);
   bool WriteFile_RecvBuff(const char* pData, int nLen);
   bool WriteFile_Error(const char* pError, int nErrorNumber);
+  bool WriteFile_Data( const char* pError);
 
 private:
   _Socket_Info*       m_pSocket_Info;
