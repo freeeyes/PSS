@@ -39,6 +39,10 @@ public:
 
     void ClinetClose();                                    //主动关闭
     _ClientConnectInfo GetClientConnectInfo();             //得到当前链接信息
+    
+private:
+    int RecvData();                                        //接收数据，正常模式
+    int RecvData_et();                                     //接收数据，et模式 		    
 
 private:
     typedef ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_NULL_SYNCH> Super;
