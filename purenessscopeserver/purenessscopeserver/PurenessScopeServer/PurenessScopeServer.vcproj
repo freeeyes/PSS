@@ -1160,7 +1160,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Reactor\MyACE_Dev_Poll_Reactor.h"
+					RelativePath=".\Reactor\My_Dev_Poll_Reactor.h"
 					>
 				</File>
 				<File
@@ -1248,11 +1248,11 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath=".\Reactor\MyACE_Dev_Poll_Reactor.cpp"
+					RelativePath=".\Reactor\My_Dev_Poll_Reactor.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Reactor\MyACE_Dev_Poll_Reactor.inl"
+					RelativePath=".\Reactor\My_Dev_Poll_Reactor.inl"
 					>
 				</File>
 				<File
