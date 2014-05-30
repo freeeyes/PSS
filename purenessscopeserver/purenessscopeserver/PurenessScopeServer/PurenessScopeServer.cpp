@@ -33,34 +33,17 @@ int CheckCoreLimit(int nMaxCoreFile)
 
 	if(nMaxCoreFile != 0)
 	{
-		//提示Core文件尺寸不足，需要设置。
-		if((int)rCorelimit.rlim_cur < nMaxCoreFile*1024)
+		OUR_DEBUG((LM_INFO, "[CheckCoreLimit]** WARNING!WARNING!WARNING!WARNING! **.\n"));
+		OUR_DEBUG((LM_INFO, "[CheckCoreLimit]** PSS WILL AUTO UP CORE SIZE LIMIT **.\n"));
+		OUR_DEBUG((LM_INFO, "[CheckCoreLimit]** WARNING!WARNING!WARNING!WARNING! **.\n"));
+		//OUR_DEBUG((LM_INFO, "[CheckCoreLimit]rlim.rlim_cur=%d, nMaxOpenFile=%d, openfile is not enougth， please check [ulimit -a].\n", (int)rCorelimit.rlim_cur, nMaxCoreFile));	
+		rCorelimit.rlim_cur = RLIM_INFINITY;
+		rCorelimit.rlim_max = RLIM_INFINITY;			
+		if (setrlimit(RLIMIT_CORE, &rCorelimit)!= 0) 
 		{
-			OUR_DEBUG((LM_INFO, "[CheckCoreLimit]** WARNING!WARNING!WARNING!WARNING! **.\n"));
-			OUR_DEBUG((LM_INFO, "[CheckCoreLimit]** PSS WILL AUTO UP CORE SIZE LIMIT **.\n"));
-			OUR_DEBUG((LM_INFO, "[CheckCoreLimit]** WARNING!WARNING!WARNING!WARNING! **.\n"));
-			//OUR_DEBUG((LM_INFO, "[CheckCoreLimit]rlim.rlim_cur=%d, nMaxOpenFile=%d, openfile is not enougth， please check [ulimit -a].\n", (int)rCorelimit.rlim_cur, nMaxCoreFile));	
-			rCorelimit.rlim_cur = (rlim_t)nMaxCoreFile*1024;
-			rCorelimit.rlim_max = (rlim_t)nMaxCoreFile*1024;			
-			if (setrlimit(RLIMIT_CORE, &rCorelimit)!= 0) 
-			{
-				OUR_DEBUG((LM_INFO, "[CheckCoreLimit]failed to setrlimit core size(error=%s).\n", strerror(errno)));
-				return -1;
-			}
-
-			//设置完再检查一下
-			if(getrlimit(RLIMIT_CORE, &rCorelimit) != 0)
-			{
-				OUR_DEBUG((LM_INFO, "[CheckCoreLimit]failed to getrlimit number of files.\n"));
-				return -1;		
-			}						
-
-			if((int)rCorelimit.rlim_cur < nMaxCoreFile*1024)
-			{
-				OUR_DEBUG((LM_INFO, "[CheckCoreLimit]rlim.rlim_cur=%d, nMaxOpenFile=%d, openfile is not enougth， please check [ulimit -a].\n", (int)rCorelimit.rlim_cur, nMaxCoreFile));	
-				return -1;
-			}	
-		}
+			OUR_DEBUG((LM_INFO, "[CheckCoreLimit]failed to setrlimit core size(error=%s).\n", strerror(errno)));
+			return -1;
+		}	
 	}
 	else
 	{
@@ -299,7 +282,8 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 	{
 		OUR_DEBUG((LM_INFO, "[main]Procress is run background.\n"));
 		//ACE::daemonize();
-		daemonize();
+		//daemonize();
+		daemon(1,1);
 	}
 
 	//第二步，启动主服务器监控

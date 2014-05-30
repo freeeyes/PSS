@@ -70,6 +70,10 @@ public:
     bool        CheckAlive();
     _ClientConnectInfo GetClientInfo();                                      //得到客户端信息
     _ClientIPInfo      GetClientIPInfo();                                    //得到客户端IP信息
+    void SetConnectName(const char* pName);                                  //设置当前连接名称
+    char* GetConnectName();                                                  //得到别名
+    void SetIsLog(bool blIsLog);                                             //设置当前连接数据是否写入日志 
+	bool GetIsLog();                                                         //获得当前连接是否可以写入日志 
 
 private:
     bool CheckMessage();                                                     //处理接收的数据
@@ -129,6 +133,8 @@ private:
     uint32                     m_u4CurrSize;                   //当前MB缓冲字符长度
     CPacketParse               m_objSendPacketParse;           //发送数据包组织结构
     _TimeConnectInfo           m_TimeConnectInfo;              //链接健康检测器
+    char                       m_szConnectName[MAX_BUFF_100];  //连接名称，可以开放给逻辑插件去设置
+    bool                       m_blIsLog;                      //是否写入日志，false为不写入，true为写入
 };
 
 //管理所有已经建立的链接
@@ -153,6 +159,7 @@ public:
     bool CloseConnect(uint32 u4ConnectID);                                                                   //服务器关闭
     void GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo);                                         //返回当前存活链接的信息
     void SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4TimeCost);                                        //记录指定链接数据处理时间
+	void GetClientNameInfo(const char* pName, vecClientNameInfo& objClientNameInfo);                         //得到指定别名的所有设置信息
 
     _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                                                       //得到指定链接信息
 
@@ -161,6 +168,9 @@ public:
 
     int         GetCount();
     const char* GetError();
+    
+    bool SetConnectName(uint32 u4ConnectID, const char* pName);                                  //设置当前连接名称
+    bool SetIsLog(uint32 u4ConnectID, bool blIsLog);                                             //设置当前连接数据是否写入日志     
 
 private:
     bool IsRun();
@@ -222,12 +232,15 @@ public:
     bool PostMessageAll(const char* pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, bool blSendState = true, bool blDelete = true);
     bool CloseConnect(uint32 u4ConnectID);                                                                   //服务器关闭
     _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                                                       //得到指定链接信息
+   	void GetClientNameInfo(const char* pName, vecClientNameInfo& objClientNameInfo);                         //得到指定别名的所有设置信息
     void GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo);                                         //返回当前存活链接的信息
     void SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4TimeCost);                                        //记录指定链接数据处理时间
 
     int  GetCount();
     void CloseAll();
     bool Close(uint32 u4ConnectID);                                                                          //客户单关闭
+    bool SetConnectName(uint32 u4ConnectID, const char* pName);                                              //设置当前连接名称
+    bool SetIsLog(uint32 u4ConnectID, bool blIsLog);                                                         //设置当前连接数据是否写入日志      
 
     bool StartTimer();                                                                                       //开启定时器
     const char* GetError();

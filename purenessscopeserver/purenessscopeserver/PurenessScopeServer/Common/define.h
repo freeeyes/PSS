@@ -902,4 +902,34 @@ struct _ClientIPInfo
 	}
 };
 
+//链接别名映射信息(用于PSS_ClientManager管理)
+struct _ClientNameInfo
+{
+	char m_szName[MAX_BUFF_100];      //连接别名 
+	char m_szClientIP[MAX_BUFF_20];   //客户端的IP地址
+	int  m_nPort;                     //客户端的端口
+	int  m_nConnectID;                //连接ID  
+	int  m_nLog;                      //是否记录日志
+
+	_ClientNameInfo()
+	{
+		m_szName[0]     = '\0';
+		m_szClientIP[0] = '\0';
+		m_nPort         = 0;
+		m_nConnectID    = 0;
+		m_nLog          = 0;
+	}
+
+	_ClientNameInfo& operator = (const _ClientNameInfo& ar)
+	{
+		sprintf_safe(this->m_szName, MAX_BUFF_100, "%s", ar.m_szName);
+		sprintf_safe(this->m_szClientIP, MAX_BUFF_20, "%s", ar.m_szClientIP);
+		this->m_nPort      = ar.m_nPort;
+		this->m_nConnectID = ar.m_nConnectID;
+		this->m_nLog       = ar.m_nLog;
+		return *this;
+	}
+};
+typedef vector<_ClientNameInfo> vecClientNameInfo;
+
 #endif

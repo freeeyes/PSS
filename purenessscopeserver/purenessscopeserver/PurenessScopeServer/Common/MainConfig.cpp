@@ -354,7 +354,7 @@ bool CMainConfig::Init(const char* szConfigPath)
 	}
 	
 	//开始获得Core相关设定(目前仅限Linux)
-	pData = m_MainConfig.GetData("CoreSetting", "CoreSize");
+	pData = m_MainConfig.GetData("CoreSetting", "CoreNeed");
 	if(NULL != pData)
 	{
 		m_u4CoreFileSize = (uint16)ACE_OS::atoi(pData);

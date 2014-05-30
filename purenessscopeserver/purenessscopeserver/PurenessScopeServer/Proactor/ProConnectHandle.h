@@ -64,6 +64,10 @@ public:
 	uint8              GetSendBuffState();                                    //得到发送状态
 	_ClientConnectInfo GetClientInfo();                                       //得到客户端信息
 	_ClientIPInfo      GetClientIPInfo();                                     //得到客户端IP信息
+	void               SetConnectName(const char* pName);                     //设置当前连接名称
+	char*              GetConnectName();                                      //得到别名
+	void               SetIsLog(bool blIsLog);                                //设置当前连接数据是否写入日志 
+    bool               GetIsLog();                                            //得到是否可以写日志
 
 	bool SetRecvQueueTimeCost(uint32 u4TimeCost);                             //记录当前接收数据到模块处理完成的具体时间消耗
 	bool SetSendQueueTimeCost(uint32 u4TimeCost);                             //记录当前从发送队列到数据发送完成的具体时间消耗
@@ -104,6 +108,8 @@ private:
 
 	uint32             m_u4ReadSendSize;               //准备发送的字节数（水位标）
 	uint32             m_u4SuccessSendSize;            //实际客户端接收到的总字节数（水位标）
+	char               m_szConnectName[MAX_BUFF_100];  //连接名称，可以开放给逻辑插件去设置
+	bool               m_blIsLog;                      //是否写入日志，false为不写入，true为写入
 
 	ACE_Recursive_Thread_Mutex m_ThreadWriteLock;
 
@@ -142,6 +148,10 @@ public:
 	bool CloseConnect(uint32 u4ConnectID);                                                                   //服务器关闭
 	void GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo);                                         //返回当前存活链接的信息
 	void SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4TimeCost);                                        //记录指定链接数据处理时间
+
+	bool SetConnectName(uint32 u4ConnectID, const char* pName);                                              //设置当前连接名称
+	bool SetIsLog(uint32 u4ConnectID, bool blIsLog);                                                         //设置当前连接数据是否写入日志   
+	void GetClientNameInfo(const char* pName, vecClientNameInfo& objClientNameInfo);                         //得到指定别名的所有设置信息
 
 	_ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                 //得到指定链接信息
 
@@ -211,6 +221,9 @@ public:
 	_ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                                                       //得到指定链接信息
 	void GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo);                                         //返回当前存活链接的信息
 	void SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4TimeCost);                                        //记录指定链接数据处理时间
+	bool SetConnectName(uint32 u4ConnectID, const char* pName);                                              //设置当前连接名称
+	bool SetIsLog(uint32 u4ConnectID, bool blIsLog);                                                         //设置当前连接数据是否写入日志   
+	void GetClientNameInfo(const char* pName, vecClientNameInfo& objClientNameInfo);                         //得到指定别名的所有设置信息
 
 	int  GetCount();
 	void CloseAll();

@@ -302,9 +302,19 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
 		DoMessage_GetWorkThreadTO(CommandInfo, pBuffPacket);
 		return CONSOLE_MESSAGE_SUCCESS;
 	}
-	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SETWTAI) == 0)
+	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_GETWTTIMEOUT) == 0)
 	{
-		DoMessage_SetWorkThreadAI(CommandInfo, pBuffPacket);
+		DoMessage_GetWorkThreadTO(CommandInfo, pBuffPacket);
+		return CONSOLE_MESSAGE_SUCCESS;
+	}
+	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_GETNICKNAMEINFO) == 0)
+	{
+		DoMessage_GetNickNameInfo(CommandInfo, pBuffPacket);
+		return CONSOLE_MESSAGE_SUCCESS;
+	}
+	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SETCONNECTLOG) == 0)
+	{
+		DoMessage_SetConnectLog(CommandInfo, pBuffPacket);
 		return CONSOLE_MESSAGE_SUCCESS;
 	}
 	else
@@ -407,7 +417,7 @@ bool CConsoleMessage::GetLogLevel(const char* pCommand, int& nLogLevel)
 {
 	char szTempData[MAX_BUFF_100] = {'\0'};
 
-	//获得IP地址
+	//获得日志等级
 	char* pPosBegin = (char* )ACE_OS::strstr(pCommand, "-l ");
 	if(NULL != pPosBegin)
 	{
@@ -457,6 +467,60 @@ bool CConsoleMessage::GetAIInfo(const char* pCommand, int& nAI, int& nDispose, i
 	//最后一个参数
 	ACE_OS::memcpy(szTemp, (char* )&pCommand[nBegin], (int)ACE_OS::strlen(pCommand) - nBegin);
 	nStop = ACE_OS::atoi(szTemp);
+
+	return true;
+}
+
+bool CConsoleMessage::GetNickName(const char* pCommand, char* pName)
+{
+	//获得别名
+	char* pPosBegin = (char* )ACE_OS::strstr(pCommand, "-n ");
+	if(NULL != pPosBegin)
+	{
+		int nLen = ACE_OS::strlen(pCommand) - (int)(pPosBegin - pCommand) - 3;
+		ACE_OS::memcpy(pName, pPosBegin + 3, nLen);
+		pName[nLen] = '\0';
+	}
+
+	return true;
+}
+
+bool CConsoleMessage::GetConnectID(const char* pCommand, uint32& u4ConnectID, bool& blFlag)
+{
+	char szTempData[MAX_BUFF_100] = {'\0'};
+	int  nFlag                    = 0;
+
+	//获得ConnectID
+	char* pPosBegin = (char* )ACE_OS::strstr(pCommand, "-n ");
+	char* pPosEnd   = (char* )ACE_OS::strstr(pPosBegin + 3, " ");
+	int nLen = (int)(pPosEnd - pPosBegin - 3);
+	if(nLen >= MAX_BUFF_100 || nLen < 0)
+	{
+		return false;
+	}
+	ACE_OS::memcpy(szTempData, pPosBegin + 3, nLen);
+	szTempData[nLen] = '\0';
+	u4ConnectID = (uint32)ACE_OS::atoi(szTempData);
+
+	pPosBegin = (char* )ACE_OS::strstr(pCommand, "-f ");
+	pPosEnd   = (char* )ACE_OS::strstr(pPosBegin + 3, " ");
+	nLen = (int)(pPosEnd - pPosBegin - 3);
+	if(nLen >= MAX_BUFF_100 || nLen < 0)
+	{
+		return false;
+	}
+	ACE_OS::memcpy(szTempData, pPosBegin + 3, nLen);
+	szTempData[nLen] = '\0';
+	nFlag = (int)ACE_OS::atoi(szTempData);
+
+	if(nFlag == 0)
+	{
+		blFlag = false;
+	}
+	else
+	{
+		blFlag = true;
+	}
 
 	return true;
 }
@@ -1720,5 +1784,60 @@ bool CConsoleMessage::DoMessage_SetWorkThreadAI(_CommandInfo& CommandInfo, IBuff
 	}
 
 	(*pBuffPacket) << (uint32)0;
+	return true;
+}
+
+bool CConsoleMessage::DoMessage_GetNickNameInfo( _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket )
+{
+	char szNickName[MAX_BUFF_100] = {'\0'};
+	vecClientNameInfo objClientNameInfo;
+
+	if(GetNickName(CommandInfo.m_szCommandExp, szNickName) == true)
+	{
+#ifdef WIN32
+		App_ProConnectManager::instance()->GetClientNameInfo(szNickName, objClientNameInfo);
+#else
+		App_ConnectManager::instance()->GetClientNameInfo(szNickName, objClientNameInfo);
+#endif
+
+		//返回信息列表
+		(*pBuffPacket) << (uint32)objClientNameInfo.size();
+
+		for(uint32 i = 0; i < objClientNameInfo.size(); i++)
+		{
+			VCHARS_STR strIP;
+			strIP.text  = objClientNameInfo[i].m_szClientIP;
+			strIP.u1Len = (uint8)ACE_OS::strlen(objClientNameInfo[i].m_szClientIP);
+
+			VCHARS_STR strName;
+			strName.text  = objClientNameInfo[i].m_szName;
+			strName.u1Len = (uint8)ACE_OS::strlen(objClientNameInfo[i].m_szName);
+
+			(*pBuffPacket) << (uint32)objClientNameInfo[i].m_nConnectID;
+			(*pBuffPacket) << strIP;
+			(*pBuffPacket) << (uint32)objClientNameInfo[i].m_nPort;
+			(*pBuffPacket) << strName;
+			(*pBuffPacket) << (uint8)objClientNameInfo[i].m_nLog;
+		}
+	}
+
+	return true;
+}
+
+bool CConsoleMessage::DoMessage_SetConnectLog( _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket )
+{
+	uint32 u4ConnectID = 0;
+	bool blIsLog       = false;
+	if(GetConnectID(CommandInfo.m_szCommandExp, u4ConnectID, blIsLog) == true)
+	{
+#ifdef WIN32
+		App_ProConnectManager::instance()->SetIsLog(u4ConnectID, blIsLog);
+#else
+		App_ConnectManager::instance()->SetIsLog(u4ConnectID, blIsLog);
+#endif
+	}
+
+	(*pBuffPacket) << (uint32)0;
+
 	return true;
 }

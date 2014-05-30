@@ -318,6 +318,8 @@ bool CClientReConnectManager::SetHandler(int nServerID, CConnectClient* pConnect
         return false;
     }
 
+	CReactorClientInfo* pClientInfo = (CReactorClientInfo* )f->second;
+	pClientInfo->SetConnectClient(pConnectClient);
     return true;
 }
 

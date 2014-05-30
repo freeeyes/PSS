@@ -318,7 +318,7 @@ bool CClientProConnectManager::SetHandler(int nServerID, CProConnectClient* pPro
 
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 	mapProactorClientInfo::iterator f = m_mapClientInfo.find(nServerID);
-	if(f == m_mapClientInfo.end())
+	if(f != m_mapClientInfo.end())
 	{
 		//如果这个链接已经存在，则不再添加到已经存在的客户端map管理中
 		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::SetHandler]nServerID =(%d) is not exist.\n", nServerID));

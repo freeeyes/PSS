@@ -27,6 +27,9 @@ void CDlgForbidenIP::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT2, m_txtForbidenSeconds);
 	DDX_Control(pDX, IDC_LIST1, m_lcForbidenList);
 	DDX_Control(pDX, IDC_RADIO1, m_btnTimeForbiden);
+	DDX_Control(pDX, IDC_EDIT3, m_txtNickName);
+	DDX_Control(pDX, IDC_EDIT4, m_txtConnectID);
+	DDX_Control(pDX, IDC_LIST5, m_lcNickInfo);
 }
 
 
@@ -34,6 +37,9 @@ BEGIN_MESSAGE_MAP(CDlgForbidenIP, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON1, &CDlgForbidenIP::OnBnClickedButton1)
 	ON_BN_CLICKED(IDC_BUTTON2, &CDlgForbidenIP::OnBnClickedButton2)
 	ON_BN_CLICKED(IDC_BUTTON3, &CDlgForbidenIP::OnBnClickedButton3)
+	ON_BN_CLICKED(IDC_BUTTON4, &CDlgForbidenIP::OnBnClickedButton4)
+	ON_BN_CLICKED(IDC_BUTTON7, &CDlgForbidenIP::OnBnClickedButton7)
+	ON_BN_CLICKED(IDC_BUTTON5, &CDlgForbidenIP::OnBnClickedButton5)
 END_MESSAGE_MAP()
 
 CString CDlgForbidenIP::GetPageTitle()
@@ -181,6 +187,13 @@ BOOL CDlgForbidenIP::OnInitDialog()
 	m_lcForbidenList.InsertColumn(2, _T("封禁开始时间"), LVCFMT_CENTER, 200);
 	m_lcForbidenList.InsertColumn(3, _T("封禁持续秒数"), LVCFMT_CENTER, 100);
 
+	m_lcNickInfo.InsertColumn(0, _T("ConnectID"), LVCFMT_CENTER, 100);
+	m_lcNickInfo.InsertColumn(1, _T("别名"), LVCFMT_CENTER, 150);
+	m_lcNickInfo.InsertColumn(2, _T("客户端IP"), LVCFMT_CENTER, 100);
+	m_lcNickInfo.InsertColumn(3, _T("端口"), LVCFMT_CENTER, 50);
+	m_lcNickInfo.InsertColumn(4, _T("日志状态"), LVCFMT_CENTER, 50);
+
+
 	return TRUE;
 }
 
@@ -279,3 +292,178 @@ void CDlgForbidenIP::OnBnClickedButton3()
 		}
 	}
 }
+
+void CDlgForbidenIP::OnBnClickedButton4()
+{
+	//打开日志
+	char szConnectID[100] = {'\0'};
+	int  nConnectID       = 0;
+
+	CString strData;
+	m_txtConnectID.GetWindowText(strData);
+
+	int nSrcLen = WideCharToMultiByte(CP_ACP, 0, strData, strData.GetLength(), NULL, 0, NULL, NULL);
+	int nDecLen = WideCharToMultiByte(CP_ACP, 0, strData, nSrcLen, szConnectID, 100, NULL, NULL);
+	szConnectID[nDecLen] = '\0';
+	nConnectID = atoi(szConnectID);
+
+	SendSetLog(nConnectID, true);
+
+}
+
+void CDlgForbidenIP::OnBnClickedButton5()
+{
+	//关闭日志
+	char szConnectID[100] = {'\0'};
+	int  nConnectID       = 0;
+
+	CString strData;
+	m_txtConnectID.GetWindowText(strData);
+
+	int nSrcLen = WideCharToMultiByte(CP_ACP, 0, strData, strData.GetLength(), NULL, 0, NULL, NULL);
+	int nDecLen = WideCharToMultiByte(CP_ACP, 0, strData, nSrcLen, szConnectID, 100, NULL, NULL);
+	szConnectID[nDecLen] = '\0';
+	nConnectID = atoi(szConnectID);
+
+	SendSetLog(nConnectID, false);
+}
+
+void CDlgForbidenIP::OnBnClickedButton7()
+{
+	char szNickName[100] = {'\0'};
+
+	//查询别名
+	m_lcNickInfo.DeleteAllItems();
+
+	CString strData;
+	m_txtNickName.GetWindowText(strData);
+
+	int nSrcLen = WideCharToMultiByte(CP_ACP, 0, strData, strData.GetLength(), NULL, 0, NULL, NULL);
+	int nDecLen = WideCharToMultiByte(CP_ACP, 0, strData, nSrcLen, szNickName, 100, NULL,NULL);
+	szNickName[nDecLen] = '\0';
+
+	char szSendMessage[200] = {'\0'};
+	char szCommand[100]     = {'\0'};
+	sprintf_s(szCommand, 100, "%s GetNickNameInfo -n %s", m_pTcpClientConnect->GetKey(), szNickName);
+	int nSendLen = (int)strlen(szCommand); 
+
+	memcpy_s(szSendMessage, 200, &nSendLen, sizeof(int));
+	memcpy_s(&szSendMessage[4], 200, &szCommand, nSendLen);
+
+	char szRecvBuff[10 * 1024] = {'\0'};
+	int nRecvLen = 10 * 1024;
+	bool blState = m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen + sizeof(int), (char*)szRecvBuff, nRecvLen);
+	if(blState == false)
+	{
+		MessageBox(_T(MESSAGE_SENDERROR) , _T(MESSAGE_TITLE_ERROR), MB_OK);
+		return;
+	}
+	else
+	{
+		int nStrLen        = 0;
+		int nPos           = 4;
+		int nForbidenCount = 0;
+		memcpy_s(&nForbidenCount, sizeof(int), &szRecvBuff[nPos], sizeof(int));
+		nPos += sizeof(int);
+
+		for(int i = 0; i < nForbidenCount; i++)
+		{
+			//开始还原数据结构
+			_ClientNameInfo ClientNameInfo;
+
+			memcpy_s(&ClientNameInfo.m_nConnectID, sizeof(int), &szRecvBuff[nPos], sizeof(int));
+			nPos += sizeof(int);
+
+			memcpy_s(&nStrLen, sizeof(char), &szRecvBuff[nPos], sizeof(char));
+			nPos += sizeof(char);
+
+			memcpy_s(ClientNameInfo.m_szClientIP, nStrLen, &szRecvBuff[nPos], nStrLen);
+			nPos += nStrLen;
+			ClientNameInfo.m_szClientIP[nStrLen] = '\0';
+
+			memcpy_s(&ClientNameInfo.m_nPort, sizeof(int), &szRecvBuff[nPos], sizeof(int));
+			nPos += sizeof(int);
+
+			memcpy_s(&nStrLen, sizeof(char), &szRecvBuff[nPos], sizeof(char));
+			nPos += sizeof(char);
+
+			memcpy_s(ClientNameInfo.m_szName, nStrLen, &szRecvBuff[nPos], nStrLen);
+			nPos += nStrLen;
+			ClientNameInfo.m_szName[nStrLen] = '\0';
+
+			memcpy_s(&ClientNameInfo.m_nLog, sizeof(char), &szRecvBuff[nPos], sizeof(char));
+			nPos += sizeof(char);
+
+			//显示在桌面上
+			wchar_t szClienIP[200]   = {'\0'};
+			wchar_t szzNickName[100] = {'\0'};
+
+			int nSrcLen = MultiByteToWideChar(CP_ACP, 0, ClientNameInfo.m_szClientIP, -1, NULL, 0);
+			int nDecLen = MultiByteToWideChar(CP_ACP, 0, ClientNameInfo.m_szClientIP, -1, szClienIP, 20);
+
+			nSrcLen = MultiByteToWideChar(CP_ACP, 0, ClientNameInfo.m_szName, -1, NULL, 0);
+			nDecLen = MultiByteToWideChar(CP_ACP, 0, ClientNameInfo.m_szName, -1, szzNickName, 100);
+
+			CString strConnectID;
+			CString strPort;
+
+			strConnectID.Format(_T("%d"), ClientNameInfo.m_nConnectID);
+			strPort.Format(_T("%d"), ClientNameInfo.m_nPort);
+
+			m_lcNickInfo.InsertItem(i, strConnectID);
+			m_lcNickInfo.SetItemText(i, 1, szzNickName);
+			m_lcNickInfo.SetItemText(i, 2, szClienIP);
+			m_lcNickInfo.SetItemText(i, 3, strPort);
+			if(ClientNameInfo.m_nLog == 0)
+			{
+				m_lcNickInfo.SetItemText(i, 4, _T("未开启"));
+			}
+			else
+			{
+				m_lcNickInfo.SetItemText(i, 4, _T("开启"));
+			}
+		}
+	}
+}
+
+bool CDlgForbidenIP::SendSetLog( int nConnectID, bool blFlag )
+{
+	char szSendMessage[200] = {'\0'};
+	char szCommand[100]     = {'\0'};
+	int  nResult            = 0;
+
+	if(blFlag == false)
+	{
+		sprintf_s(szCommand, 100, "%s SetConnectLog -n %d -f 0 ", m_pTcpClientConnect->GetKey(), nConnectID);
+	}
+	else
+	{
+		sprintf_s(szCommand, 100, "%s SetConnectLog -n %d -f 1 ", m_pTcpClientConnect->GetKey(), nConnectID);
+	}
+	
+	int nSendLen = (int)strlen(szCommand); 
+
+	memcpy_s(szSendMessage, 200, &nSendLen, sizeof(int));
+	memcpy_s(&szSendMessage[4], 200, &szCommand, nSendLen);
+
+	char szRecvBuff[10 * 1024] = {'\0'};
+	int nRecvLen = 10 * 1024;
+	bool blState = m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen + sizeof(int), (char*)szRecvBuff, nRecvLen);
+	if(blState == false)
+	{
+		MessageBox(_T(MESSAGE_SENDERROR) , _T(MESSAGE_TITLE_ERROR), MB_OK);
+		return false;
+	}
+	else
+	{
+		int nStrLen        = 0;
+		int nPos           = 4;
+		int nForbidenCount = 0;
+		memcpy_s(&nResult, sizeof(int), &szRecvBuff[nPos], sizeof(int));
+		nPos += sizeof(int);
+
+		MessageBox(_T(MESSAGE_RESULT_SUCCESS) , _T(MESSAGE_TITLE_SUCCESS), MB_OK);
+		return true;
+	}
+}
+
