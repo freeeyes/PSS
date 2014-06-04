@@ -7,6 +7,7 @@ CReactorClientInfo::CReactorClientInfo()
     m_pReactorConnect   = NULL;
     m_nServerID         = 0;
     m_emConnectState    = SERVER_CONNECT_READY;
+	m_AddrLocal         = (ACE_INET_Addr &)ACE_Addr::sap_any;
 }
 
 CReactorClientInfo::~CReactorClientInfo()
@@ -68,7 +69,7 @@ bool CReactorClientInfo::Run(bool blIsReady, EM_Server_Connect_State emState)
 
     if (blIsReady == true)
     {
-        if (m_pReactorConnect->connect(m_pConnectClient, m_AddrServer) == -1)
+        if (m_pReactorConnect->connect(m_pConnectClient, m_AddrServer, ACE_Synch_Options::defaults, m_AddrLocal) == -1)
         {
             m_emConnectState = SERVER_CONNECT_FAIL;
             OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::Run](%s:%d) connection fails(ServerID=%d) error(%d).\n", m_AddrServer.get_host_addr(), m_AddrServer.get_port_number(), m_nServerID, ACE_OS::last_error()));
@@ -170,6 +171,18 @@ void CReactorClientInfo::SetServerConnectState(EM_Server_Connect_State objState)
     m_emConnectState = objState;
 }
 
+void CReactorClientInfo::SetLocalAddr( const char* pIP, int nPort, uint8 u1IPType )
+{
+	if(u1IPType == TYPE_IPV4)
+	{
+		m_AddrLocal.set(nPort, pIP);
+	}
+	else
+	{
+		m_AddrLocal.set(nPort, pIP, 1, PF_INET6);
+	}
+}
+
 CClientReConnectManager::CClientReConnectManager(void)
 {
     m_nTaskID         = -1;
@@ -248,6 +261,56 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, int nPort,
 
     OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]nServerID =(%d) connect is OK.\n", nServerID));
     return true;
+}
+
+bool CClientReConnectManager::Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage)
+{
+	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
+	mapReactorConnectInfo::iterator f = m_mapConnectInfo.find(nServerID);
+
+	if (f != m_mapConnectInfo.end())
+	{
+		//如果这个链接已经存在，则不创建新的链接
+		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]nServerID =(%d) is exist.\n", nServerID));
+		return false;
+	}
+
+	//初始化链接信息
+	CReactorClientInfo* pClientInfo = new CReactorClientInfo();
+
+	if (NULL == pClientInfo)
+	{
+		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]pClientInfo is NULL.\n"));
+		return false;
+	}
+
+	//链接已经建立，添加进map
+	m_mapConnectInfo[nServerID] = pClientInfo;
+
+	if (false == pClientInfo->Init(nServerID, pIP, nPort, u1IPType, &m_ReactorConnect, pClientMessage, m_pReactor))
+	{
+		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]pClientInfo Init Error.\n"));
+		delete pClientInfo;
+		pClientInfo = NULL;
+		Close(nServerID);
+		return false;
+	}
+
+	//设置本地IP和端口
+	pClientInfo->SetLocalAddr(pLocalIP, nLocalPort, u1LocalIPType);
+
+	//开始链接
+	if (false == pClientInfo->Run(m_blReactorFinish, SERVER_CONNECT_FIRST))
+	{
+		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]Run Error.\n"));
+		delete pClientInfo;
+		pClientInfo = NULL;
+		Close(nServerID);
+		return false;
+	}
+
+	OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]nServerID =(%d) connect is OK.\n", nServerID));
+	return true;
 }
 
 bool CClientReConnectManager::ConnectUDP(int nServerID, const char* pIP, int nPort, uint8 u1IPType, IClientUDPMessage* pClientUDPMessage)

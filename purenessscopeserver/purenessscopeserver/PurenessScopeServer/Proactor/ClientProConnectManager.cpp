@@ -9,6 +9,7 @@ CProactorClientInfo::CProactorClientInfo()
 	m_nPort             = 0;
 	m_nServerID         = 0;
 	m_emConnectState    = SERVER_CONNECT_READY;
+	m_AddrLocal         = (ACE_INET_Addr &)ACE_Addr::sap_any;
 }
 
 CProactorClientInfo::~CProactorClientInfo()
@@ -77,7 +78,7 @@ bool CProactorClientInfo::Run(bool blIsReadly, EM_Server_Connect_State emState)
 		pProConnectInfo->m_nServerID = m_nServerID;
 		
 		m_emConnectState = emState;
-		if(m_pProAsynchConnect->connect(m_AddrServer, (const ACE_INET_Addr &)ACE_Addr::sap_any, 1, (const void*)pProConnectInfo) == -1)
+		if(m_pProAsynchConnect->connect(m_AddrServer, (const ACE_INET_Addr &)m_AddrLocal, 1, (const void*)pProConnectInfo) == -1)
 		{
 			OUR_DEBUG((LM_ERROR, "[CProactorClientInfo::Run]m_pAsynchConnect open error(%d).\n", ACE_OS::last_error()));
 			return false;
@@ -179,6 +180,18 @@ void CProactorClientInfo::SetServerConnectState( EM_Server_Connect_State objStat
 	m_emConnectState = objState;
 }
 
+void CProactorClientInfo::SetLocalAddr( const char* pIP, int nPort, uint8 u1IPType )
+{
+	if(u1IPType == TYPE_IPV4)
+	{
+		m_AddrLocal.set(nPort, pIP);
+	}
+	else
+	{
+		m_AddrLocal.set(nPort, pIP, 1, PF_INET6);
+	}
+}
+
 CClientProConnectManager::CClientProConnectManager(void)
 {
 	m_nTaskID          = -1;
@@ -240,6 +253,48 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, int nPort
 		pClientInfo = NULL;
 		return false;
 	}
+
+	//第一次开始链接
+	if(false == pClientInfo->Run(m_blProactorFinish, SERVER_CONNECT_FIRST))
+	{
+		delete pClientInfo;
+		pClientInfo = NULL;
+		return false;
+	}
+
+	//链接已经建立，添加进map
+	m_mapClientInfo[nServerID] = pClientInfo;
+	OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) connect is OK.\n", nServerID));
+
+	//自动休眠0.1秒
+	ACE_Time_Value tvSleep(0, m_u4ConnectServerTimeout);
+	ACE_OS::sleep(tvSleep);
+
+	return true;
+}
+
+bool CClientProConnectManager::Connect( int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage )
+{
+	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
+	mapProactorClientInfo::iterator f = m_mapClientInfo.find(nServerID);
+	if(f != m_mapClientInfo.end())
+	{
+		//如果这个链接已经存在，则不创建新的链接
+		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) is exist.\n", nServerID));
+		return false;
+	}
+
+	//初始化链接信息
+	CProactorClientInfo* pClientInfo = new CProactorClientInfo();
+	if(false == pClientInfo->Init(pIP, nPort, u1IPType, nServerID, &m_ProAsynchConnect, pClientMessage))
+	{
+		delete pClientInfo;
+		pClientInfo = NULL;
+		return false;
+	}
+
+	//设置本地IP和端口
+	pClientInfo->SetLocalAddr(pLocalIP, nLocalPort, u1LocalIPType);
 
 	//第一次开始链接
 	if(false == pClientInfo->Run(m_blProactorFinish, SERVER_CONNECT_FIRST))
