@@ -1520,6 +1520,9 @@ CConnectManager::CConnectManager(void)
 	m_tvCheckConnect     = ACE_OS::gettimeofday();
 	m_blRun              = false;
 
+	m_u4TimeConnect      = 0;
+	m_u4TimeDisConnect   = 0;
+
 	//初始化发送对象池
 	m_SendMessagePool.Init();
 }
@@ -1553,6 +1556,7 @@ void CConnectManager::CloseAll()
 			{
 				b++;
 			}
+			m_u4TimeDisConnect++;
 		}
 		else
 		{
@@ -1575,6 +1579,7 @@ bool CConnectManager::Close(uint32 u4ConnectID)
 		if(pConnectHandler != NULL)
 		{
 			m_mapConnectManager.erase(f);
+			m_u4TimeDisConnect++;
 		}
 
 		return true;
@@ -1597,6 +1602,7 @@ bool CConnectManager::CloseConnect(uint32 u4ConnectID)
 		if(pConnectHandler != NULL)
 		{
 			pConnectHandler->ServerClose();
+			m_u4TimeDisConnect++;
 		}
 		m_mapConnectManager.erase(f);
 		return true;
@@ -1627,6 +1633,7 @@ bool CConnectManager::AddConnect(uint32 u4ConnectID, CConnectHandler* pConnectHa
 	pConnectHandler->SetConnectID(u4ConnectID);
 	//加入map
 	m_mapConnectManager.insert(mapConnectManager::value_type(u4ConnectID, pConnectHandler));
+	m_u4TimeConnect++;
 
 	return true;
 }
@@ -1897,8 +1904,13 @@ int CConnectManager::handle_timeout(const ACE_Time_Value &tv, const void *arg)
 		ACE_Time_Value tvInterval(tvNow - m_tvCheckConnect);
 		if(tvInterval.sec() >= MAX_MSG_HANDLETIME)
 		{
-			AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "[CConnectManager]CurrConnectCount = %d.", GetCount());
-			m_tvCheckConnect = tvNow;
+			AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "[CConnectManager]CurrConnectCount = %d,TimeInterval=%d, TimeConnect=%d, TimeDisConnect=%d.", 
+				GetCount(), MAX_MSG_HANDLETIME, m_u4TimeConnect, m_u4TimeDisConnect);
+
+			//重置单位时间连接数和断开连接数
+			m_u4TimeConnect    = 0;
+			m_u4TimeDisConnect = 0;
+			m_tvCheckConnect   = tvNow;
 		}
 
 		return 0;

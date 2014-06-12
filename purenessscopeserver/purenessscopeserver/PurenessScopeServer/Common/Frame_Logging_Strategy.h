@@ -44,7 +44,7 @@ public:
     //日志级别
     string GetLogLevel(const string &strLogLevel);
 	
-		int InitLogStrategy();
+	int InitLogStrategy();
 
     //初始化日志策略
     int InitLogStrategy(Logging_Config_Param &ConfigParam);

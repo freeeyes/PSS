@@ -14,7 +14,7 @@ static void *run_reactor (void *pReactor)
 {
     ACE_Reactor *pLogReactor = (ACE_Reactor *)pReactor;
 
-    pLogReactor->owner(ACE_Thread_Manager::instance ()->thr_self ());
+    pLogReactor->owner(ACE_Thread_Manager::instance ()->thr_self());
     pLogReactor->run_reactor_event_loop ();
 
     return 0;
@@ -58,6 +58,7 @@ Frame_Logging_Strategy::~Frame_Logging_Strategy()
 {
     if(pLogStraReactor != NULL)
     {
+		pLogStraReactor->close();
         delete pLogStraReactor;
     }
 

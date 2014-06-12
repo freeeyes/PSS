@@ -188,6 +188,8 @@ private:
     bool                        m_blRun;                 //线程是否在运行
     CSendMessagePool            m_SendMessagePool;       //发送消息体
     uint32                      m_u4SendQueuePutTime;    //发送队列入队超时时间
+	uint32                      m_u4TimeConnect;         //单位时间连接建立数
+	uint32                      m_u4TimeDisConnect;      //单位时间连接断开数
 };
 
 //链接ConnectHandler内存池
