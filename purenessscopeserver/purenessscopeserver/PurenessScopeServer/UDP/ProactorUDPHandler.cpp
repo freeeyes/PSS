@@ -62,7 +62,10 @@ int CProactorUDPHandler::OpenAddress(const ACE_INET_Addr& AddrLocal, ACE_Proacto
 	}
 
 	//³õÊ¼»¯¼ì²éÆ÷
-	m_TimeConnectInfo.Init(App_MainConfig::instance()->GetValid(), App_MainConfig::instance()->GetValidPacketCount(), App_MainConfig::instance()->GetValidRecvSize());
+	m_TimeConnectInfo.Init(App_MainConfig::instance()->GetClientDataAlert()->m_u4RecvPacketCount, 
+		App_MainConfig::instance()->GetClientDataAlert()->m_u4RecvDataMax, 
+		App_MainConfig::instance()->GetClientDataAlert()->m_u4SendPacketCount,
+		App_MainConfig::instance()->GetClientDataAlert()->m_u4SendDataMax);
 
 	m_pPacketParse = App_PacketParsePool::instance()->Create();
 

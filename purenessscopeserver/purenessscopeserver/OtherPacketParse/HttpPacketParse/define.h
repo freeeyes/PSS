@@ -18,6 +18,7 @@
 #include "ace/OS_NS_unistd.h"
 #include "ace/High_Res_Timer.h"
 #include "ace/INET_Addr.h" 
+#include <math.h>
 
 #include <vector>
 
@@ -28,6 +29,7 @@ using namespace std;
 #endif
 
 #define MAINCONFIG            "main.xml"
+#define ALERTCONFIG           "alert.xml"
 #define FORBIDDENIP_FILE      "forbiddenIP.xml"
 
 #define MAX_BUFF_9    9
@@ -148,10 +150,11 @@ using namespace std;
 //对应当前框架支持的网络模式
 enum
 {
-	NETWORKMODE_PRO_IOCP    = 1,
-	NETWORKMODE_RE_SELECT   = 10,
-	NETWORKMODE_RE_TPSELECT = 11,
-	NETWORKMODE_RE_EPOLL    = 12,
+	NETWORKMODE_PRO_IOCP    = 1,    //IOCP模式
+	NETWORKMODE_RE_SELECT   = 10,   //Select模式
+	NETWORKMODE_RE_TPSELECT = 11,   //TPSelect模式 
+	NETWORKMODE_RE_EPOLL    = 12,   //epolllt模式(水平触发)
+	NETWORKMODE_RE_EPOLL_ET = 13,   //epollet模式(边沿触发)
 };
 
 //对应链接的状态，用于设置链接时候的状态
@@ -289,77 +292,306 @@ typedef ifstream _tifstream;
 typedef std::string _tstring;
 #endif // UNICODE
 
+//标记VCHARS_TYPE的模式
+enum VCHARS_TYPE
+{
+	VCHARS_TYPE_TEXT = 0,      //文本模式
+	VCHARS_TYPE_BINARY,        //二进制模式
+};
+
 #ifndef VCHARS_STR
-typedef  struct _VCHARS_STR {
-	const char *text;
-	uint8 u1Len;
+typedef  struct _VCHARS_STR 
+{
+	char*       text;            //数据指针
+	uint8       u1Len;           //数据长度
+	bool        blCopy;          //是否拷贝数据块，True是拷贝，默认是拷贝
+	bool        blNew;           //是否是new出来的数据
+	VCHARS_TYPE type;            //类型，类型定义见VCHARS_TYPE
+
+	_VCHARS_STR(bool blIsCopy = true, VCHARS_TYPE ntype = VCHARS_TYPE_TEXT)
+	{
+		text   = NULL;
+		u1Len  = 0;
+		blCopy = blIsCopy;
+		type   = ntype;
+		blNew  = false;
+	}
+
+	~_VCHARS_STR()
+	{
+		if(blNew == true)
+		{
+			delete text;
+		}
+	}
+
+	void SetData(const char* pData, uint8& u1Length)
+	{
+		if(blCopy == true)
+		{
+			//如果是需要构建新内存，则在这里申请
+			if(blNew == true)
+			{
+				delete text;
+			}
+
+			if(type == VCHARS_TYPE_TEXT)
+			{
+				//文本模式
+				text = new char[u1Length + 1];
+				ACE_OS::memcpy(text, pData, u1Length);
+				text[u1Length] = '\0';
+				u1Len = u1Length + 1;
+			}
+			else
+			{
+				//二进制模式
+				text = new char[u1Length];
+				ACE_OS::memcpy(text, pData, u1Length);
+				u1Len = u1Length;
+			}
+			blNew = true;
+		}
+		else
+		{
+			text  = (char* )pData;
+			u1Len = u1Length;
+		}
+	}
+
 }VCHARS_STR;
 #endif
 
 #ifndef VCHARM_STR
-typedef  struct _VCHARM_STR {
-	const char *text;
-	uint16 u2Len;
+typedef  struct _VCHARM_STR 
+{
+	char*       text;            //数据指针 
+	uint16      u2Len;           //数据长度
+	bool        blCopy;          //是否拷贝数据块，True是拷贝，默认是拷贝
+	bool        blNew;           //是否是new出来的数据
+	VCHARS_TYPE type;            //类型，类型定义见VCHARS_TYPE
+
+	_VCHARM_STR(bool blIsCopy = true, VCHARS_TYPE ntype = VCHARS_TYPE_TEXT)
+	{
+		text   = NULL;
+		u2Len  = 0;
+		blCopy = blIsCopy;
+		type   = ntype;
+		blNew  = false;
+	}
+
+	~_VCHARM_STR()
+	{
+		if(blNew == true)
+		{
+			delete text;
+		}
+	}
+
+	void SetData(const char* pData, uint16& u2Length)
+	{
+		if(blCopy == true)
+		{
+			//如果是需要构建新内存，则在这里申请
+			if(blNew == true)
+			{
+				delete text;
+			}
+
+			if(type == VCHARS_TYPE_TEXT)
+			{
+				//文本模式
+				text = new char[u2Length + 1];
+				ACE_OS::memcpy(text, pData, u2Length);
+				text[u2Length] = '\0';
+				u2Len = u2Length + 1;
+			}
+			else
+			{
+				//二进制模式
+				text = new char[u2Length];
+				ACE_OS::memcpy(text, pData, u2Length);
+				u2Len = u2Length;
+			}
+			blNew = true;
+		}
+		else
+		{
+			text  = (char* )pData;
+			u2Len = u2Length;
+		}
+	}
+
 }VCHARM_STR;
 #endif
 
 #ifndef VCHARB_STR
-typedef  struct _VCHARB_STR {
-	const char *text;
-	uint32 u4Len;
+typedef  struct _VCHARB_STR 
+{
+	char*       text;            //数据指针 
+	uint32      u4Len;           //数据长度
+	bool        blCopy;          //是否拷贝数据块，True是拷贝，默认是拷贝
+	bool        blNew;           //是否是new出来的数据
+	VCHARS_TYPE type;            //类型，类型定义见VCHARS_TYPE
+
+	_VCHARB_STR(bool blIsCopy = true, VCHARS_TYPE ntype = VCHARS_TYPE_TEXT)
+	{
+		text   = NULL;
+		u4Len  = 0;
+		blCopy = blIsCopy;
+		type   = ntype;
+		blNew  = false;
+	}
+
+	~_VCHARB_STR()
+	{
+		if(blNew == true)
+		{
+			delete text;
+		}
+	}
+
+	void SetData(const char* pData, uint32& u4Length)
+	{
+		if(blCopy == true)
+		{
+			//如果是需要构建新内存，则在这里申请
+			if(blNew == true)
+			{
+				delete text;
+			}
+
+			if(type == VCHARS_TYPE_TEXT)
+			{
+				//文本模式
+				text = new char[u4Length + 1];
+				ACE_OS::memcpy(text, pData, u4Length);
+				text[u4Length] = '\0';
+				u4Len = u4Length + 1;
+			}
+			else
+			{
+				//二进制模式
+				text = new char[u4Length];
+				ACE_OS::memcpy(text, pData, u4Length);
+				u4Len = u4Length;
+			}
+			blNew = true;
+		}
+		else
+		{
+			text  = (char* )pData;
+			u4Len = u4Length;
+		}
+	}
+
 }VCHARB_STR;
 #endif
 
 //定时监控数据包和流量的数据信息，用于链接有效性的逻辑判定
 struct _TimeConnectInfo
 {
-	uint8  m_u1Minutes;           //当前的分钟数
-	uint32 m_u4PacketCount;       //当前的包数量
-	uint32 m_u4RecvSize;          //当前接收数据量
-	uint8  m_u1NeedCheck;         //是否需要验证，0为需要，1为不需要
-	uint32 m_u4ValidPacketCount;  //单位时间可允许接收数据包的上限
-	uint32 m_u4ValidRecvSize;     //单位时间可允许的数据接收量
+	uint8  m_u1Minutes;               //当前的分钟数
+	uint32 m_u4RecvPacketCount;       //当前接收包数量
+	uint32 m_u4RecvSize;              //当前接收数据量
+	uint32 m_u4SendPacketCount;       //当前发送包数量
+	uint32 m_u4SendSize;              //当前发送数据量
+
+	uint32 m_u4ValidRecvPacketCount;  //单位时间可允许接收数据包的上限
+	uint32 m_u4ValidRecvSize;         //单位时间可允许的数据接收量
+	uint32 m_u4ValidSendPacketCount;  //单位时间可允许数据数据包的上限
+	uint32 m_u4ValidSendSize;         //单位时间可允许的数据发送量
 
 	_TimeConnectInfo()
 	{ 
-		m_u1Minutes     = 0;
-		m_u4PacketCount = 0;
-		m_u4RecvSize    = 0;
+		m_u1Minutes              = 0;
+		m_u4RecvPacketCount      = 0;
+		m_u4RecvSize             = 0;
+		m_u4SendPacketCount      = 0;
+		m_u4SendSize             = 0;
 
-		m_u1NeedCheck        = 1;
-		m_u4ValidPacketCount = 0;
-		m_u4ValidRecvSize    = 0;
+		m_u4ValidRecvPacketCount = 0;
+		m_u4ValidRecvSize        = 0;
+		m_u4ValidSendPacketCount = 0;
+		m_u4ValidSendSize        = 0;
 	}
 
-	void Init(uint8 u1NeedCheck, uint32 u4PacketCount, uint32 u4RecvSize)
+	void Init(uint32 u4RecvPacketCount, uint32 u4RecvSize, uint32 u4SendPacketCount, uint32 u4ValidSendSize)
 	{
-		m_u1Minutes     = 0;
-		m_u4PacketCount = 0;
-		m_u4RecvSize    = 0;
+		m_u1Minutes              = 0;
+		m_u4RecvPacketCount      = 0;
+		m_u4RecvSize             = 0;
+		m_u4SendPacketCount      = 0;
+		m_u4SendSize             = 0;
 
-		m_u1NeedCheck        = u1NeedCheck;
-		m_u4ValidPacketCount = u4PacketCount;
-		m_u4ValidRecvSize    = u4RecvSize;
+		m_u4ValidRecvPacketCount = u4RecvPacketCount;
+		m_u4ValidRecvSize        = u4RecvSize;
+		m_u4ValidSendPacketCount = u4SendPacketCount;
+		m_u4ValidSendSize        = u4ValidSendSize;
 	}
 
-	bool Check(uint8 u1Minutes, uint16 u2PacketCount, uint32 u4RecvSize)
+	bool RecvCheck(uint8 u1Minutes, uint16 u2PacketCount, uint32 u4RecvSize)
 	{
 		if(m_u1Minutes != u1Minutes)
 		{
-			m_u1Minutes     = u1Minutes;
-			m_u4PacketCount = u2PacketCount;
-			m_u4RecvSize    = u4RecvSize;
+			m_u1Minutes         = u1Minutes;
+			m_u4RecvPacketCount = u2PacketCount;
+			m_u4RecvSize        = u4RecvSize;
 		}
 		else
 		{
-			m_u4PacketCount += u2PacketCount;
-			m_u4RecvSize    += u4RecvSize;
+			m_u4RecvPacketCount += u2PacketCount;
+			m_u4RecvSize        += u4RecvSize;
 		}
 
-		if(m_u1NeedCheck == 0)
+		if(m_u4ValidRecvPacketCount > 0)
 		{
 			//需要比较
-			if(m_u4PacketCount > m_u4ValidPacketCount || u4RecvSize > m_u4ValidRecvSize)
+			if(m_u4RecvPacketCount > m_u4ValidRecvPacketCount)
+			{
+				return false;
+			}
+		}
+
+		if(m_u4ValidRecvSize > 0)
+		{
+			//需要比较
+			if(u4RecvSize > m_u4ValidRecvSize)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	bool SendCheck(uint8 u1Minutes, uint16 u2PacketCount, uint32 u4SendSize)
+	{
+		if(m_u1Minutes != u1Minutes)
+		{
+			m_u1Minutes         = u1Minutes;
+			m_u4SendPacketCount = u2PacketCount;
+			m_u4RecvSize        = u4SendSize;
+		}
+		else
+		{
+			m_u4SendPacketCount += u2PacketCount;
+			m_u4RecvSize        += u4SendSize;
+		}
+
+		if(m_u4ValidSendPacketCount > 0)
+		{
+			//需要比较
+			if(m_u4SendPacketCount > m_u4ValidSendPacketCount)
+			{
+				return false;
+			}
+		}
+
+		if(m_u4ValidSendSize > 0)
+		{
+			//需要比较
+			if(u4SendSize > m_u4ValidSendSize)
 			{
 				return false;
 			}
@@ -482,6 +714,7 @@ inline void sprintf_safe(char* szText, int nLen, const char* fmt ...)
 	va_start(ap, fmt);
 
 	ACE_OS::vsnprintf(szText, nLen, fmt, ap);
+	szText[nLen - 1] = '\0';
 
 	va_end(ap);
 };
@@ -565,12 +798,12 @@ public:
 		long lTimeInterval = m_lEnd - m_lBegin;  //转换成毫秒
 		if(lTimeInterval >= (long)m_nMillionSecond)
 		{
-			char szLog[MAX_BUFF_1024] = {'\0'};
+			char szLog[MAX_BUFF_1024];
 			//记录日志
 			FILE* pFile = ACE_OS::fopen(ASSERT_TIME_PATH, "a+");
 			if(pFile != NULL)
 			{
-				char szTimeNow[MAX_BUFF_50] = {'\0'};
+				char szTimeNow[MAX_BUFF_50];
 				time_t tNow = time(NULL);
 				struct tm* tmNow = ACE_OS::localtime(&tNow);
 				sprintf_safe(szTimeNow, MAX_BUFF_50, "%04d-%02d-%02d %02d:%02d:%02d", tmNow->tm_year + 1900, tmNow->tm_mon + 1, tmNow->tm_mday, tmNow->tm_hour, tmNow->tm_min, tmNow->tm_sec);
@@ -723,5 +956,35 @@ struct _ClientIPInfo
 		return *this;
 	}
 };
+
+//链接别名映射信息(用于PSS_ClientManager管理)
+struct _ClientNameInfo
+{
+	char m_szName[MAX_BUFF_100];      //连接别名 
+	char m_szClientIP[MAX_BUFF_20];   //客户端的IP地址
+	int  m_nPort;                     //客户端的端口
+	int  m_nConnectID;                //连接ID  
+	int  m_nLog;                      //是否记录日志
+
+	_ClientNameInfo()
+	{
+		m_szName[0]     = '\0';
+		m_szClientIP[0] = '\0';
+		m_nPort         = 0;
+		m_nConnectID    = 0;
+		m_nLog          = 0;
+	}
+
+	_ClientNameInfo& operator = (const _ClientNameInfo& ar)
+	{
+		sprintf_safe(this->m_szName, MAX_BUFF_100, "%s", ar.m_szName);
+		sprintf_safe(this->m_szClientIP, MAX_BUFF_20, "%s", ar.m_szClientIP);
+		this->m_nPort      = ar.m_nPort;
+		this->m_nConnectID = ar.m_nConnectID;
+		this->m_nLog       = ar.m_nLog;
+		return *this;
+	}
+};
+typedef vector<_ClientNameInfo> vecClientNameInfo;
 
 #endif

@@ -36,11 +36,6 @@ CMainConfig::CMainConfig(void)
 	m_u4ConnectServerRecvBuff = MAX_BUFF_1024;
 	m_u4ServerRecvBuff        = MAX_BUFF_1024;
 
-	m_u2ValidConnectCount   = MAX_CONNECT_COUNT;
-	m_u1Valid               = 1;
-	m_u4ValidPacketCount    = 0;
-	m_u4ValidRecvSize       = 0;
-	m_u2ForbiddenTime       = 0;
 	m_u2RecvQueueTimeout    = MAX_QUEUE_TIMEOUT;
 	m_u2SendQueueTimeout    = MAX_QUEUE_TIMEOUT;
 	m_u2SendQueueCount      = SENDQUEUECOUNT;
@@ -108,17 +103,109 @@ const char* CMainConfig::GetError()
 	return m_szError;
 }
 
-bool CMainConfig::Init(const char* szConfigPath)
+bool CMainConfig::Init()
 {
 	//获得数据解析包的版本号
 	CPacketParse objPacketParse;
 	sprintf_safe(m_szPacketVersion, MAX_BUFF_20, "%s", objPacketParse.GetPacketVersion());
 
+	//读取主配置文件
+	bool blState = Init_Main(MAINCONFIG);
+	if(blState == false)
+	{
+		return false;
+	}
+
+	//读取报警相关配置文件
+	blState = Init_Alert(ALERTCONFIG);
+	if(blState == false)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+
+bool CMainConfig::Init_Alert(const char* szConfigPath)
+{
 	char* pData = NULL;
-	OUR_DEBUG((LM_INFO, "[CMainConfig::Init]Filename = %s.\n", szConfigPath));
+	OUR_DEBUG((LM_INFO, "[CMainConfig::Init_Alert]Filename = %s.\n", szConfigPath));
 	if(false == m_MainConfig.Init(szConfigPath))
 	{
-		OUR_DEBUG((LM_INFO, "[CMainConfig::Init]File Read Error = %s.\n", szConfigPath));
+		OUR_DEBUG((LM_INFO, "[CMainConfig::Init_Alert]File Read Error = %s.\n", szConfigPath));
+		return false;
+	}
+
+	//连接相关信息
+	pData = m_MainConfig.GetData("AlertConnect", "ConnectMin");
+	if(NULL != pData)
+	{
+		m_ConnectAlert.m_u4ConnectMin = (uint16)ACE_OS::atoi(pData);
+	}
+	pData = m_MainConfig.GetData("AlertConnect", "ConnectMax");
+	if(NULL != pData)
+	{
+		m_ConnectAlert.m_u4ConnectMax = (uint8)ACE_OS::atoi(pData);
+	}
+	pData = m_MainConfig.GetData("AlertConnect", "DisConnectMin");
+	if(NULL != pData)
+	{
+		m_ConnectAlert.m_u4DisConnectMin = (uint32)ACE_OS::atoi(pData);
+	}
+	pData = m_MainConfig.GetData("AlertConnect", "DisConnectMax");
+	if(NULL != pData)
+	{
+		m_ConnectAlert.m_u4DisConnectMax = (uint32)ACE_OS::atoi(pData);
+	}
+
+	//IP相关信息
+	pData = m_MainConfig.GetData("IP", "IPMax");
+	if(NULL != pData)
+	{
+		m_IPAlert.m_u4IPMaxCount = (uint32)ACE_OS::atoi(pData);
+	}
+	pData = m_MainConfig.GetData("IP", "Timeout");
+	if(NULL != pData)
+	{
+		m_IPAlert.m_u4IPTimeout = (uint32)ACE_OS::atoi(pData);
+	}
+
+	//单链接相关阀值配置
+	pData = m_MainConfig.GetData("ClientData", "RecvPacketCount");
+	if(NULL != pData)
+	{
+		m_ClientDataAlert.m_u4RecvPacketCount = (uint32)ACE_OS::atoi(pData);
+	}
+	pData = m_MainConfig.GetData("ClientData", "RecvDataMax");
+	if(NULL != pData)
+	{
+		m_ClientDataAlert.m_u4RecvDataMax = (uint32)ACE_OS::atoi(pData);
+	}
+	pData = m_MainConfig.GetData("ClientData", "SendPacketCount");
+	if(NULL != pData)
+	{
+		m_ClientDataAlert.m_u4SendPacketCount = (uint32)ACE_OS::atoi(pData);
+	}
+	pData = m_MainConfig.GetData("ClientData", "SendDataMax");
+	if(NULL != pData)
+	{
+		m_ClientDataAlert.m_u4SendDataMax = (uint32)ACE_OS::atoi(pData);
+	}
+
+	m_MainConfig.Close();
+
+	return true;
+}
+
+bool CMainConfig::Init_Main(const char* szConfigPath)
+{
+	char* pData = NULL;
+	OUR_DEBUG((LM_INFO, "[CMainConfig::Init_Main]Filename = %s.\n", szConfigPath));
+	if(false == m_MainConfig.Init(szConfigPath))
+	{
+		OUR_DEBUG((LM_INFO, "[CMainConfig::Init_Main]File Read Error = %s.\n", szConfigPath));
 		return false;
 	}
 
@@ -148,13 +235,13 @@ bool CMainConfig::Init(const char* szConfigPath)
 		}
 		else
 		{
-			OUR_DEBUG((LM_INFO, "[CMainConfig::Init]NetworkMode is Invalid!!, please read main.xml desc.\n", szConfigPath));
+			OUR_DEBUG((LM_INFO, "[CMainConfig::Init_Main]NetworkMode is Invalid!!, please read main.xml desc.\n", szConfigPath));
 			return false;
 		}
 	}
 	else
 	{
-		OUR_DEBUG((LM_INFO, "[CMainConfig::Init]NetworkMode is Invalid!!, please read main.xml desc.\n", szConfigPath));
+		OUR_DEBUG((LM_INFO, "[CMainConfig::Init_Main]NetworkMode is Invalid!!, please read main.xml desc.\n", szConfigPath));
 		return false;
 	}
 
@@ -444,6 +531,11 @@ bool CMainConfig::Init(const char* szConfigPath)
 	{
 		m_u4ServerRecvBuff = (uint32)ACE_OS::atoi(pData);
 	}
+	pData = m_MainConfig.GetData("ClientInfo", "TrackIPCount");
+	if(NULL != pData)
+	{
+		m_u4TrackIPCount = (uint16)ACE_OS::atoi(pData);
+	}
 
 	//接收客户端信息相关配置
 	pData = m_MainConfig.GetData("RecvInfo", "RecvQueueTimeout");
@@ -531,38 +623,6 @@ bool CMainConfig::Init(const char* szConfigPath)
 		}
 
 		m_vecConsoleKey.push_back(objConsoleKey);
-	}
-
-	//开始获得ConnectValid对应的参数
-	pData = m_MainConfig.GetData("ConnectValid", "ConnectCount");
-	if(NULL != pData)
-	{
-		m_u2ValidConnectCount = (uint16)ACE_OS::atoi(pData);
-	}
-	pData = m_MainConfig.GetData("ConnectValid", "ConnectValid");
-	if(NULL != pData)
-	{
-		m_u1Valid = (uint8)ACE_OS::atoi(pData);
-	}
-	pData = m_MainConfig.GetData("ConnectValid", "ConnectPacketCount");
-	if(NULL != pData)
-	{
-		m_u4ValidPacketCount = (uint32)ACE_OS::atoi(pData);
-	}
-	pData = m_MainConfig.GetData("ConnectValid", "ConnectRecvSize");
-	if(NULL != pData)
-	{
-		m_u4ValidRecvSize = (uint32)ACE_OS::atoi(pData);
-	}
-	pData = m_MainConfig.GetData("ConnectValid", "ForbiddenTime");
-	if(NULL != pData)
-	{
-		m_u2ForbiddenTime = (uint16)ACE_OS::atoi(pData);
-	}
-	pData = m_MainConfig.GetData("ConnectValid", "TrackIPCount");
-	if(NULL != pData)
-	{
-		m_u4TrackIPCount = (uint16)ACE_OS::atoi(pData);
 	}
 
 	//开始获得ConnectServer相关信息
@@ -690,6 +750,8 @@ bool CMainConfig::Init(const char* szConfigPath)
 		sprintf_safe(m_szDebugLevel, MAX_BUFF_100, "%s", pData);
 	}
 
+	m_MainConfig.Close();
+
 	return true;
 }
 
@@ -745,11 +807,6 @@ void CMainConfig::Display()
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szConsoleIP = %s.\n", m_szConsoleIP));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_nConsolePort = %d.\n", m_nConsolePort));
 
-	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u2ValidConnectCount = %d.\n", m_u2ValidConnectCount));
-	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u1Valid = %d.\n", m_u1Valid));
-	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4ValidPacketCount = %d.\n", m_u4ValidPacketCount));
-	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4ValidRecvSize = %d.\n", m_u4ValidRecvSize));
-	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u2ForbiddenTime = %d.\n", m_u2ForbiddenTime));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4ConnectServerTimerout = %d.\n", m_u4ConnectServerTimerout));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u2ConnectServerCheck = %d.\n", m_u2ConnectServerCheck));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4ConnectServerRecvBuff = %d.\n", m_u4ConnectServerRecvBuff));
@@ -946,31 +1003,6 @@ bool CMainConfig::CompareConsoleClinetIP(const char* pConsoleClientIP)
 	}
 
 	return false;
-}
-
-uint16 CMainConfig::GetValidConnectCount()
-{
-	return m_u2ValidConnectCount;
-}
-
-uint8 CMainConfig::GetValid()
-{
-	return m_u1Valid;
-}
-
-uint32 CMainConfig::GetValidPacketCount()
-{
-	return m_u4ValidPacketCount;
-}
-
-uint32 CMainConfig::GetValidRecvSize()
-{
-	return m_u4ValidRecvSize;
-}
-
-uint16 CMainConfig::GetForbiddenTime()
-{
-	return m_u2ForbiddenTime;
 }
 
 uint8 CMainConfig::GetCommandAccount()
@@ -1171,4 +1203,19 @@ uint32 CMainConfig::GetLogFileMaxCnt()
 char* CMainConfig::GetDebugLevel()
 {
 	return m_szDebugLevel;
+}
+
+_ConnectAlert* CMainConfig::GetConnectAlert()
+{
+	return &m_ConnectAlert;
+}
+
+_IPAlert* CMainConfig::GetIPAlert()
+{
+	return &m_IPAlert;
+}
+
+_ClientDataAlert* CMainConfig::GetClientDataAlert()
+{
+	return &m_ClientDataAlert;
 }

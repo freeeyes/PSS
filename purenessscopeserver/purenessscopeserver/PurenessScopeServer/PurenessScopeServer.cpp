@@ -241,7 +241,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 	SetAppPath();
 
 	//读取配置文件
-	if(!App_MainConfig::instance()->Init(MAINCONFIG))
+	if(!App_MainConfig::instance()->Init())
 	{
 		OUR_DEBUG((LM_INFO, "[main]%s\n", App_MainConfig::instance()->GetError()));
 	}
@@ -332,7 +332,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 	SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)ApplicationCrashHandler);   
 
 	//第一步，读取配置文件
-	if(!App_MainConfig::instance()->Init(MAINCONFIG))
+	if(!App_MainConfig::instance()->Init())
 	{
 		OUR_DEBUG((LM_INFO, "[main]%s\n", App_MainConfig::instance()->GetError()));
 	}

@@ -50,6 +50,54 @@ struct _ConsoleClientIP
 	}
 };
 
+//连接告警阀值相关配置
+struct _ConnectAlert
+{
+	uint32 m_u4ConnectMin;
+	uint32 m_u4ConnectMax;
+	uint32 m_u4DisConnectMin;
+	uint32 m_u4DisConnectMax;
+
+	_ConnectAlert()
+	{
+		m_u4ConnectMin    = 0;
+		m_u4ConnectMax    = 0;
+		m_u4DisConnectMin = 0;
+		m_u4DisConnectMax = 0;
+	}
+};
+
+//连接IP告警阀值相关配置
+struct _IPAlert
+{
+	uint32 m_u4IPMaxCount;
+	uint32 m_u4IPTimeout;
+
+	_IPAlert()
+	{
+		m_u4IPMaxCount = 0;
+		m_u4IPTimeout  = 0;
+	}
+};
+
+//单链接告警阀值相关配置
+struct _ClientDataAlert
+{
+	uint32 m_u4RecvPacketCount;
+	uint32 m_u4RecvDataMax;
+	uint32 m_u4SendPacketCount;
+	uint32 m_u4SendDataMax;
+
+	_ClientDataAlert()
+	{
+		m_u4RecvPacketCount = 0;
+		m_u4RecvDataMax     = 0;
+		m_u4SendPacketCount = 0;
+		m_u4SendDataMax     = 0;
+	}
+};
+
+
 enum ENUM_CHAR_ORDER
 {
 	SYSTEM_LITTLE_ORDER = 0,   //小端字序
@@ -62,7 +110,9 @@ public:
 	CMainConfig(void);
 	~CMainConfig(void);
 
-	bool Init(const char* szConfigPath);
+	bool Init();
+	bool Init_Alert(const char* szConfigPath);
+	bool Init_Main(const char* szConfigPath);
 	void Display();
 	const char* GetError();
 
@@ -113,11 +163,6 @@ public:
 
 	uint16 GetUDPServerPortCount();
 	uint32 GetReactorCount();
-	uint16 GetValidConnectCount();
-	uint8  GetValid();
-	uint32 GetValidPacketCount();
-	uint32 GetValidRecvSize();
-	uint16 GetForbiddenTime();
 	uint8  GetCommandAccount();
 	uint32 GetConnectServerTimeout();
 	uint16 GetConnectServerCheck();
@@ -152,6 +197,10 @@ public:
 	uint32 GetLogFileMaxSize();
 	uint32 GetLogFileMaxCnt();
 	char*  GetDebugLevel();
+
+	_ConnectAlert*    GetConnectAlert();
+	_IPAlert*         GetIPAlert();
+	_ClientDataAlert* GetClientDataAlert();
 
 private:
 	CXmlOpeation m_MainConfig;
@@ -189,11 +238,6 @@ private:
 	uint16     m_u2MaxHanderCount;                     //最大同时处理Handler的数量
 	uint16     m_u2MaxConnectTime;                     //最长等待连接链接时间（此时间内，如果接收和发送都没有发生，则由服务器关闭这个链接）
 
-	uint16     m_u2ValidConnectCount;              //单位时间允许的最大链接次数
-	uint8      m_u1Valid;                          //是否需要单位时间的链接阀值验证，0为允许，1为不允许
-	uint32     m_u4ValidPacketCount;               //单位时间内允许的数据包数量
-	uint32     m_u4ValidRecvSize;                  //单位时间允许的数据包发送数量
-	uint16     m_u2ForbiddenTime;                  //链接封禁时间
 	uint16     m_u2RecvQueueTimeout;               //接收队列处理超时时间限定
 	uint16     m_u2SendQueueTimeout;               //发送队列处理超时时间限定
 	uint16     m_u2SendQueueCount;                 //框架发送线程数
@@ -242,6 +286,10 @@ private:
 	uint32     m_u4LogFileMaxSize;                 //输出文件最大尺寸
 	uint32     m_u4LogFileMaxCnt;                  //输出文件最大个数，当达到最大个数自动循环
 	char       m_szDebugLevel[MAX_BUFF_100];       //输出文件级别  
+
+	_ConnectAlert    m_ConnectAlert;               //连接告警相关配置信息
+	_IPAlert         m_IPAlert;                    //IP告警阀值相关配置
+	_ClientDataAlert m_ClientDataAlert;            //单链接客户端告警阀值相关配置   
 
 	ENUM_CHAR_ORDER m_u1CharOrder;                 //当前字节序
 

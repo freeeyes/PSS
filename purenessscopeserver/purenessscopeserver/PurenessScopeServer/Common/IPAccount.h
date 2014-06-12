@@ -75,7 +75,6 @@ class CIPAccount
 public:
 	CIPAccount() 
 	{ 
-		m_nNeedCheck       = 0;
 		m_nMaxConnectCount = 100;  //默认每秒最高100次 
 		m_szTrackIP[0]     = '\0';
 	};
@@ -92,10 +91,9 @@ public:
 		m_mapIPAccount.Clear();
 	}
 
-	void Init(int nNeedCheck, int nMaxConnectCount, uint32 u4TrackLogCount)
+	void Init(uint32 u4IPCount, uint32 u4TrackLogCount)
 	{
-		m_nNeedCheck       = nNeedCheck;
-		m_nMaxConnectCount = nMaxConnectCount;
+		m_nMaxConnectCount = u4IPCount;
 
 		m_objRing.Init(u4TrackLogCount);
 	};
@@ -104,7 +102,7 @@ public:
 	{
 		bool blRet = false;
 		//看看需要不需要判定，如果需要，则进行IP统计
-		if(m_nNeedCheck == 0)
+		if(m_nMaxConnectCount > 0)
 		{
 			_IPAccount* pIPAccount = m_mapIPAccount.SearchMapData(strIP);
 			if(NULL == pIPAccount)
@@ -253,10 +251,133 @@ private:
 	vector<_IPTrackInfo>             m_vecIPTrack;                         //要追踪的IP连接信息
 	char                             m_szTrackIP[MAX_BUFF_20];             //要追踪的数据流IP，目前只考虑动态追一个，否则批量的很消耗内存，也无必要。
 	int                              m_nMaxConnectCount;                   //每秒允许的最大连接数，前提是m_nNeedCheck = 0;才会生效
-	int                              m_nNeedCheck;                         //是否需要验证，0为需要，1为不需要
 	CRingLink<_IPTrackInfo>          m_objRing;                            //环形连接日志，记录监控IP的活动 
 };
 
 typedef ACE_Singleton<CIPAccount, ACE_Recursive_Thread_Mutex> App_IPAccount;
 
+//单位时间连接数统计
+class CConnectAccount
+{
+public:
+	CConnectAccount()
+	{
+		m_u4ConnectMin    = 0;
+		m_u4ConnectMax    = 0;
+		m_u4DisConnectMin = 0;
+		m_u4DisConnectMax = 0;
+	};
+
+	~CConnectAccount()
+	{
+
+	}
+
+	void Init(uint32 u4ConnectMin, uint32 u4ConnectMax, uint32 u4DisConnectMin, uint32 u4DisConnectMax)
+	{
+		m_u4ConnectMin    = u4ConnectMin;
+		m_u4ConnectMax    = u4ConnectMax;
+		m_u4DisConnectMin = u4DisConnectMin;
+		m_u4DisConnectMax = u4DisConnectMax;
+
+		ACE_Date_Time  dtLastTime;
+		m_u1Minute = (uint8)dtLastTime.minute();
+	}
+
+	bool AddConnect()
+	{
+		if(m_u4ConnectMax > 0)
+		{
+			ACE_Date_Time  dtLastTime;
+			if(m_u1Minute != (uint8)dtLastTime.minute())
+			{
+				//新的一分钟
+				m_u4CurrConnect = 1;
+			}
+			else
+			{
+				m_u4CurrConnect++;
+			}
+
+			return true;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	bool AddDisConnect()
+	{
+		if(m_u4ConnectMax > 0)
+		{
+			ACE_Date_Time  dtLastTime;
+			if(m_u1Minute != (uint8)dtLastTime.minute())
+			{
+				//新的一分钟
+				m_u4CurrDisConnect = 1;
+			}
+			else
+			{
+				m_u4CurrDisConnect++;
+			}
+
+			return true;
+		}
+		else
+		{
+			return true;
+		}
+	}
+	
+	bool CheckConnectCount()
+	{
+		if(m_u4ConnectMax > 0)
+		{
+			if(m_u4CurrConnect > m_u4ConnectMax)
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	bool CheckDisConnectCount()
+	{
+		if(m_u4DisConnectMax > 0)
+		{
+			if(m_u4CurrDisConnect > m_u4DisConnectMax)
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+private:
+	uint32 m_u4CurrConnect;
+	uint32 m_u4CurrDisConnect;
+
+	uint32 m_u4ConnectMin;
+	uint32 m_u4ConnectMax;
+	uint32 m_u4DisConnectMin;
+	uint32 m_u4DisConnectMax;
+	uint8  m_u1Minute;            //当前分钟数
+};
+
+typedef ACE_Singleton<CConnectAccount, ACE_Recursive_Thread_Mutex> App_ConnectAccount;
 #endif
