@@ -97,6 +97,19 @@ struct _ClientDataAlert
 	}
 };
 
+//命令行告警阀值计算
+struct _CommandAlert
+{
+	uint16 m_u2CommandID;
+	uint32 m_u4CommandCount;
+
+	_CommandAlert()
+	{
+		m_u2CommandID    = 0;
+		m_u4CommandCount = 0;
+	}
+};
+typedef vector<_CommandAlert> vecCommandAlert;
 
 enum ENUM_CHAR_ORDER
 {
@@ -201,6 +214,8 @@ public:
 	_ConnectAlert*    GetConnectAlert();
 	_IPAlert*         GetIPAlert();
 	_ClientDataAlert* GetClientDataAlert();
+	uint32            GetCommandAlertCount();
+	_CommandAlert*    GetCommandAlert(int nIndex);
 
 private:
 	CXmlOpeation m_MainConfig;
@@ -300,6 +315,7 @@ private:
 	typedef vector<_ConsoleClientIP> vecConsoleClientIP;
 	vecConsoleClientIP m_vecConsoleClientIP;                  //服务器后台允许的IP
 	vecConsoleKey      m_vecConsoleKey;                       //服务器允许的key值
+	vecCommandAlert    m_vecCommandAlert;                     //命令行告警阀值相关配置
 };
 
 typedef ACE_Singleton<CMainConfig, ACE_Null_Mutex> App_MainConfig;

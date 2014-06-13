@@ -190,7 +190,7 @@ bool CMessageService::PutMessage(CMessage* pMessage)
 
 bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 {
-	CProfileTime DisposeTime;
+	//CProfileTime DisposeTime;
 	//uint32 u4Cost = (uint32)(pMessage->GetMessageBase()->m_ProfileTime.Stop());
 
 	if(NULL == pMessage)
@@ -250,8 +250,6 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 
 	u2CommandID = pMessage->GetMessageBase()->m_u2Cmd;
 
-	DisposeTime.Start();
-
 	//在包内设置工作线程ID
 	pMessage->GetMessageBase()->m_u4WorkThreadID = m_u4ThreadID;
 	uint32 u4TimeCost = 0;
@@ -293,17 +291,14 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 	*/
 
 	//开始测算数据包处理的时间
-	uint64 u8DisposeCost = DisposeTime.Stop();
-
-	uint16 u2DisposeTime = (uint16)(u8DisposeCost / 1000000);
 	if(m_ThreadInfo.m_u2PacketTime == 0)
 	{
-		m_ThreadInfo.m_u2PacketTime = u2DisposeTime;
+		m_ThreadInfo.m_u2PacketTime = (uint16)u4TimeCost;
 	}
 	else
 	{
 		//计算数据包的平均处理时间
-		m_ThreadInfo.m_u2PacketTime = (uint16)((m_ThreadInfo.m_u2PacketTime + u2DisposeTime)/2);
+		m_ThreadInfo.m_u2PacketTime = (uint16)((m_ThreadInfo.m_u2PacketTime + (uint16)u4TimeCost)/2);
 	}
 
 	return true;

@@ -41,6 +41,9 @@ public:
 			delete[] m_pRingLink;
 			m_pRingLink = NULL;
 		}
+		
+		m_nMaxCount = 0;
+		m_nIndex    = 0;
 	}
 
 	T* GetFreeData()

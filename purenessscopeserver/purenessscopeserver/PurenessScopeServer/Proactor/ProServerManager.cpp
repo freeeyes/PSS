@@ -97,6 +97,11 @@ bool CProServerManager::Init()
 	//初始化防攻击系统
 	App_IPAccount::instance()->Init(App_MainConfig::instance()->GetIPAlert()->m_u4IPMaxCount, App_MainConfig::instance()->GetTrackIPCount());
 
+	App_ConnectAccount::instance()->Init(App_MainConfig::instance()->GetConnectAlert()->m_u4ConnectMin,
+		App_MainConfig::instance()->GetConnectAlert()->m_u4ConnectMax,
+		App_MainConfig::instance()->GetConnectAlert()->m_u4DisConnectMin,
+		App_MainConfig::instance()->GetConnectAlert()->m_u4DisConnectMax);
+
 	//初始化BuffPacket缓冲池.默认都是当前最大连接数的2倍
 	App_BuffPacketManager::instance()->Init(BUFFPACKET_MAX_COUNT, App_MainConfig::instance()->GetByteOrder());
 
@@ -122,6 +127,16 @@ bool CProServerManager::Init()
 	//初始化统计模块功能
 	App_CommandAccount::instance()->Init(App_MainConfig::instance()->GetCommandAccount(), App_MainConfig::instance()->GetCommandFlow(), App_MainConfig::instance()->GetPacketTimeOut());
 	
+	//初始化CommandID告警阀值相关
+	for(int i = 0; i < (int)App_MainConfig::instance()->GetCommandAlertCount(); i++)
+	{
+		_CommandAlert* pCommandAlert = App_MainConfig::instance()->GetCommandAlert(i);
+		if(NULL != pCommandAlert)
+		{
+			App_CommandAccount::instance()->AddCommandAlert(pCommandAlert->m_u2CommandID, pCommandAlert->m_u4CommandCount);
+		}
+	}
+
 	//初始化链接管理器
 	App_ProConnectManager::instance()->Init(App_MainConfig::instance()->GetSendQueueCount());
 

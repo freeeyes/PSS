@@ -29,6 +29,21 @@ void CCommandAccount::Init(uint8 u1CommandAccount, uint8 u1Flow, uint16 u2Packet
 	m_u1Flow           = u1Flow;
 	m_u1CommandAccount = u1CommandAccount;
 	m_u8PacketTimeout  = (uint64)u2PacketTimeout;   //单位是毫秒
+
+	m_vecCommandAlertData.clear();
+}
+
+void CCommandAccount::AddCommandAlert(uint16 u2CommandID, uint32 u4Count)
+{
+	if(u4Count > 0)
+	{
+		_CommandAlertData objCommandAlertData;
+
+		objCommandAlertData.m_u2CommandID    = u2CommandID;
+		objCommandAlertData.m_u4CommandCount = u4Count;
+
+		m_vecCommandAlertData.push_back(objCommandAlertData);
+	}
 }
 
 void CCommandAccount::Close()
@@ -53,14 +68,15 @@ bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint64 u8CommandCost, 
 		objCommandTimeOut.m_u2CommandID   = u2CommandID;
 		objCommandTimeOut.m_u4TimeOutTime = (uint32)u8CommandCost;  //转换为毫秒
 		m_vecCommandTimeOut.push_back(objCommandTimeOut);
-		AppLogManager::instance()->WriteLog(LOG_SYSTEM_PACKETTIME, "u2CommandID=%d, Timeout=[%d].", u2CommandID, (uint32)u8CommandCost);
+		AppLogManager::instance()->WriteLog(LOG_SYSTEM_PACKETTIME, "u2CommandID=%d, Timeout=[%d].", 
+			u2CommandID, 
+			(uint32)u8CommandCost);
 	}
 
 	//如果流量开关打开，则记录流量(单位是分钟)
 	if(m_u1Flow == 1)
 	{
-		ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-		ACE_Date_Time dtNowTime(tvNow);
+		ACE_Date_Time dtNowTime(tvTime);
 		uint8 u1Minute = (uint8)dtNowTime.minute();
 		if(m_u1Minute != u1Minute)
 		{
@@ -98,48 +114,83 @@ bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint64 u8CommandCost, 
 	{
 		return true;
 	}
-
-	//查找并添加
-	mapCommandDataList::iterator f = m_mapCommandDataList.find(u2CommandID);
-	if(f != m_mapCommandDataList.end())
-	{
-		//如果已经存在，则直接添加
-		_CommandData* pCommandData = (_CommandData* )f->second;
-		if(pCommandData != NULL)
-		{
-			pCommandData->m_u4CommandCount++;
-			pCommandData->m_u8CommandCost += u8CommandCost;
-			pCommandData->m_u1PacketType  = u1PacketType;
-			pCommandData->m_u4PacketSize  += u4PacketSize;
-			pCommandData->m_u4CommandSize += u4CommandSize;
-			pCommandData->m_tvCommandTime = tvTime;
-		}
-		else
-		{
-			return false;
-		}
-	}
 	else
 	{
-		//添加新的命令统计信息
-		_CommandData* pCommandData =  new _CommandData();
-		if(pCommandData != NULL)
+		//查找并添加
+		mapCommandDataList::iterator f = m_mapCommandDataList.find(u2CommandID);
+		if(f != m_mapCommandDataList.end())
 		{
-			pCommandData->m_u2CommandID   = u2CommandID;
-			pCommandData->m_u1CommandType = u1CommandType;
-			pCommandData->m_u8CommandCost = u8CommandCost;
-			pCommandData->m_u1PacketType  = u1PacketType;
-			pCommandData->m_u4PacketSize  += u4PacketSize;
-			pCommandData->m_u4CommandSize += u4CommandSize;
-			pCommandData->m_tvCommandTime = tvTime;
-
-			m_mapCommandDataList.insert(mapCommandDataList::value_type(u2CommandID, pCommandData));
+			//如果已经存在，则直接添加
+			_CommandData* pCommandData = (_CommandData* )f->second;
+			if(pCommandData != NULL)
+			{
+				pCommandData->m_u4CommandCount++;
+				pCommandData->m_u8CommandCost += u8CommandCost;
+				pCommandData->m_u1PacketType  = u1PacketType;
+				pCommandData->m_u4PacketSize  += u4PacketSize;
+				pCommandData->m_u4CommandSize += u4CommandSize;
+				pCommandData->m_tvCommandTime = tvTime;
+			}
+			else
+			{
+				return false;
+			}
 		}
 		else
 		{
-			return false;
+			//添加新的命令统计信息
+			_CommandData* pCommandData = new _CommandData();
+			if(pCommandData != NULL)
+			{
+				pCommandData->m_u2CommandID   = u2CommandID;
+				pCommandData->m_u1CommandType = u1CommandType;
+				pCommandData->m_u8CommandCost = u8CommandCost;
+				pCommandData->m_u1PacketType  = u1PacketType;
+				pCommandData->m_u4PacketSize  += u4PacketSize;
+				pCommandData->m_u4CommandSize += u4CommandSize;
+				pCommandData->m_tvCommandTime = tvTime;
+
+				m_mapCommandDataList.insert(mapCommandDataList::value_type(u2CommandID, pCommandData));
+			}
+			else
+			{
+				return false;
+			}
 		}
 	}
+
+	//判定是否存在告警阀值计算
+	if(m_vecCommandAlertData.size() > 0)
+	{
+		for(int i = 0 ; i < (int)m_vecCommandAlertData.size(); i++)
+		{
+			if(m_vecCommandAlertData[i].m_u2CommandID == u2CommandID)
+			{
+				ACE_Date_Time dtNowTime(tvTime);
+				uint8 u1Minute = (uint8)dtNowTime.minute();
+				if(m_vecCommandAlertData[i].m_u1Minute != u1Minute)
+				{
+					m_vecCommandAlertData[i].m_u4CurrCount = 1;
+					m_vecCommandAlertData[i].m_u1Minute    = u1Minute;  
+				}
+				else
+				{
+					m_vecCommandAlertData[i].m_u4CurrCount++;
+					if(m_vecCommandAlertData[i].m_u4CurrCount >= m_vecCommandAlertData[i].m_u4CommandCount)
+					{
+						//如果大于阀值，则记录日志，并且归零当前计数器
+						m_vecCommandAlertData[i].m_u4CurrCount = 0;
+
+						AppLogManager::instance()->WriteLog(LOG_SYSTEM_PACKETTIME, "u2CommandID=%d, m_u4CommandCount more than [%d].", 
+							u2CommandID, 
+							(uint32) m_vecCommandAlertData[i].m_u4CommandCount);
+					}
+				}
+				break;
+			}
+		}
+	}
+
 	return true;
 }
 
@@ -200,48 +251,83 @@ bool CCommandAccount::SaveCommandData_Mutex( uint16 u2CommandID, uint64 u8Comman
 	{
 		return true;
 	}
-
-	//查找并添加
-	mapCommandDataList::iterator f = m_mapCommandDataList.find(u2CommandID);
-	if(f != m_mapCommandDataList.end())
-	{
-		//如果已经存在，则直接添加
-		_CommandData* pCommandData = (_CommandData* )f->second;
-		if(pCommandData != NULL)
-		{
-			pCommandData->m_u4CommandCount++;
-			pCommandData->m_u8CommandCost += u8CommandCost;
-			pCommandData->m_u1PacketType  = u1PacketType;
-			pCommandData->m_u4PacketSize  += u4PacketSize;
-			pCommandData->m_u4CommandSize += u4CommandSize;
-			pCommandData->m_tvCommandTime = tvTime;
-		}
-		else
-		{
-			return false;
-		}
-	}
 	else
 	{
-		//添加新的命令统计信息
-		_CommandData* pCommandData =  new _CommandData();
-		if(pCommandData != NULL)
+		//查找并添加
+		mapCommandDataList::iterator f = m_mapCommandDataList.find(u2CommandID);
+		if(f != m_mapCommandDataList.end())
 		{
-			pCommandData->m_u2CommandID   = u2CommandID;
-			pCommandData->m_u1CommandType = u1CommandType;
-			pCommandData->m_u8CommandCost = u8CommandCost;
-			pCommandData->m_u1PacketType  = u1PacketType;
-			pCommandData->m_u4PacketSize  += u4PacketSize;
-			pCommandData->m_u4CommandSize += u4CommandSize;
-			pCommandData->m_tvCommandTime = tvTime;
-
-			m_mapCommandDataList.insert(mapCommandDataList::value_type(u2CommandID, pCommandData));
+			//如果已经存在，则直接添加
+			_CommandData* pCommandData = (_CommandData* )f->second;
+			if(pCommandData != NULL)
+			{
+				pCommandData->m_u4CommandCount++;
+				pCommandData->m_u8CommandCost += u8CommandCost;
+				pCommandData->m_u1PacketType  = u1PacketType;
+				pCommandData->m_u4PacketSize  += u4PacketSize;
+				pCommandData->m_u4CommandSize += u4CommandSize;
+				pCommandData->m_tvCommandTime = tvTime;
+			}
+			else
+			{
+				return false;
+			}
 		}
 		else
 		{
-			return false;
+			//添加新的命令统计信息
+			_CommandData* pCommandData =  new _CommandData();
+			if(pCommandData != NULL)
+			{
+				pCommandData->m_u2CommandID   = u2CommandID;
+				pCommandData->m_u1CommandType = u1CommandType;
+				pCommandData->m_u8CommandCost = u8CommandCost;
+				pCommandData->m_u1PacketType  = u1PacketType;
+				pCommandData->m_u4PacketSize  += u4PacketSize;
+				pCommandData->m_u4CommandSize += u4CommandSize;
+				pCommandData->m_tvCommandTime = tvTime;
+
+				m_mapCommandDataList.insert(mapCommandDataList::value_type(u2CommandID, pCommandData));
+			}
+			else
+			{
+				return false;
+			}
 		}
 	}
+
+	//判定是否存在告警阀值计算
+	if(m_vecCommandAlertData.size() > 0)
+	{
+		for(int i = 0 ; i < (int)m_vecCommandAlertData.size(); i++)
+		{
+			if(m_vecCommandAlertData[i].m_u2CommandID == u2CommandID)
+			{
+				ACE_Date_Time dtNowTime(tvTime);
+				uint8 u1Minute = (uint8)dtNowTime.minute();
+				if(m_vecCommandAlertData[i].m_u1Minute != u1Minute)
+				{
+					m_vecCommandAlertData[i].m_u4CurrCount = 1;
+					m_vecCommandAlertData[i].m_u1Minute    = u1Minute;  
+				}
+				else
+				{
+					m_vecCommandAlertData[i].m_u4CurrCount++;
+					if(m_vecCommandAlertData[i].m_u4CurrCount >= m_vecCommandAlertData[i].m_u4CommandCount)
+					{
+						//如果大于阀值，则记录日志，并且归零当前计数器
+						m_vecCommandAlertData[i].m_u4CurrCount = 0;
+
+						AppLogManager::instance()->WriteLog(LOG_SYSTEM_PACKETTIME, "u2CommandID=%d, m_u4CommandCount more than [%d].", 
+							u2CommandID, 
+							(uint32) m_vecCommandAlertData[i].m_u4CommandCount);
+					}
+				}
+				break;
+			}
+		}
+	}
+
 	return true;
 }
 

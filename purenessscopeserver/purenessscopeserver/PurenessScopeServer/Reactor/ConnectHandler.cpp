@@ -1573,6 +1573,9 @@ void CConnectManager::CloseAll()
 				b++;
 			}
 			m_u4TimeDisConnect++;
+
+			//加入链接统计功能
+			App_ConnectAccount::instance()->AddDisConnect();
 		}
 		else
 		{
@@ -1598,6 +1601,9 @@ bool CConnectManager::Close(uint32 u4ConnectID)
 			m_u4TimeDisConnect++;
 		}
 
+		//加入链接统计功能
+		App_ConnectAccount::instance()->AddDisConnect();
+
 		return true;
 	}
 	else
@@ -1619,6 +1625,9 @@ bool CConnectManager::CloseConnect(uint32 u4ConnectID)
 		{
 			pConnectHandler->ServerClose();
 			m_u4TimeDisConnect++;
+
+			//加入链接统计功能
+			App_ConnectAccount::instance()->AddDisConnect();
 		}
 		m_mapConnectManager.erase(f);
 		return true;
@@ -1650,6 +1659,9 @@ bool CConnectManager::AddConnect(uint32 u4ConnectID, CConnectHandler* pConnectHa
 	//加入map
 	m_mapConnectManager.insert(mapConnectManager::value_type(u4ConnectID, pConnectHandler));
 	m_u4TimeConnect++;
+
+	//加入链接统计功能
+	App_ConnectAccount::instance()->AddConnect();
 
 	return true;
 }
@@ -1928,6 +1940,19 @@ int CConnectManager::handle_timeout(const ACE_Time_Value &tv, const void *arg)
 			m_u4TimeDisConnect = 0;
 			m_tvCheckConnect   = tvNow;
 		}
+
+		//检测单位时间连接数是否超越阀值
+		if(App_ConnectAccount::instance()->CheckConnectCount() == false)
+		{
+			AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "[CProConnectManager]CheckConnectCount is more than limit.");
+		}
+
+		//检测单位时间连接断开数是否超越阀值
+		if(App_ConnectAccount::instance()->CheckDisConnectCount() == false)
+		{
+			AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "[CProConnectManager]CheckDisConnectCount is more than limit.");
+		}
+
 
 		return 0;
 

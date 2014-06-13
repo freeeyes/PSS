@@ -502,13 +502,12 @@ CBuffPacket& CBuffPacket::operator >> (VCHARS_STR& str)
 
 	if(u1Len && m_u4ReadPtr <= m_u4WritePtr - u1Len)
 	{
-		str.text = (const char *)ReadPtr();
-		str.u1Len = u1Len;
+		str.SetData((char* )ReadPtr(), u1Len);
 		ReadPtr((uint32)u1Len);
 	}
 	else
 	{
-		str.text = "";
+		str.text  = NULL;
 		str.u1Len = 0;
 	}
 	return *this;
@@ -522,13 +521,12 @@ CBuffPacket& CBuffPacket::operator >> (VCHARM_STR& str)
 
 	if(u2Len && m_u4ReadPtr <= m_u4WritePtr - u2Len)
 	{
-		str.text = (const char *)ReadPtr();
-		str.u2Len = u2Len;
+		str.SetData((char* )ReadPtr(), u2Len);
 		ReadPtr((uint32)u2Len);
 	}
 	else
 	{
-		str.text = "";
+		str.text  = NULL;
 		str.u2Len = 0;
 	}
 	return *this;
@@ -542,13 +540,12 @@ CBuffPacket& CBuffPacket::operator >> (VCHARB_STR& str)
 
 	if(u4Len && m_u4ReadPtr <= m_u4WritePtr - u4Len)
 	{
-		str.text = (const char *)ReadPtr();
-		str.u4Len = u4Len;
+		str.SetData((char* )ReadPtr(), u4Len);
 		ReadPtr((uint32)u4Len);
 	}
 	else
 	{
-		str.text = "";
+		str.text  = NULL;
 		str.u4Len = 0;
 	}
 	return *this;

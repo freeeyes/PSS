@@ -152,6 +152,7 @@ int Checkfilelimit(int nMaxOpenFile)
 	return 0;
 }
 
+/*
 static int daemonize()
 {
 	pid_t pid, sid;
@@ -225,6 +226,7 @@ static int daemonize()
 
 	return 0;    
 }
+*/
 
 int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 {

@@ -194,6 +194,36 @@ bool CMainConfig::Init_Alert(const char* szConfigPath)
 		m_ClientDataAlert.m_u4SendDataMax = (uint32)ACE_OS::atoi(pData);
 	}
 
+	//√¸¡Óº‡øÿœ‡πÿ≈‰÷√
+	m_vecCommandAlert.clear();
+	TiXmlElement* pNextTiXmlElementCommand     = NULL;
+	TiXmlElement* pNextTiXmlElementCount       = NULL;
+	_CommandAlert objCommandAlert;
+	while(true)
+	{
+		pData = m_MainConfig.GetData("CommandInfo", "CommandID", pNextTiXmlElementCommand);
+		if(pData != NULL)
+		{
+			objCommandAlert.m_u2CommandID = (uint16)ACE_OS::atoi(pData);
+		}
+		else
+		{
+			break;
+		}
+
+		pData = m_MainConfig.GetData("CommandInfo", "CommandCount", pNextTiXmlElementCount);
+		if(pData != NULL)
+		{
+			objCommandAlert.m_u4CommandCount = (uint32)ACE_OS::atoi(pData);
+		}
+		else
+		{
+			break;
+		}
+
+		m_vecCommandAlert.push_back(objCommandAlert);
+	}
+
 	m_MainConfig.Close();
 
 	return true;
@@ -1218,4 +1248,21 @@ _IPAlert* CMainConfig::GetIPAlert()
 _ClientDataAlert* CMainConfig::GetClientDataAlert()
 {
 	return &m_ClientDataAlert;
+}
+
+_CommandAlert* CMainConfig::GetCommandAlert(int nIndex)
+{
+	if(nIndex < 0 || nIndex >= m_vecCommandAlert.size())
+	{
+		return NULL;
+	}
+	else
+	{
+		return (_CommandAlert*)&m_vecCommandAlert[nIndex];
+	}
+}
+
+uint32 CMainConfig::GetCommandAlertCount()
+{
+	return (uint32)m_vecCommandAlert.size();
 }
