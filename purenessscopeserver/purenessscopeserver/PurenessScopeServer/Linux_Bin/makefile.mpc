@@ -10,9 +10,10 @@ project(PurenessScopeServer):aceexe{
   ../Reactor/*.cpp
   ../UDP/*.cpp
   ../TinyXML/*.cpp
+  ../Mail/*.cpp
   ../*.cpp
  }
- includes += ../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../IObject ../TinyXML
+ includes += ../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../IObject ../TinyXML ../Mail
  macros += __LINUX__
  libs += PacketParse
 }

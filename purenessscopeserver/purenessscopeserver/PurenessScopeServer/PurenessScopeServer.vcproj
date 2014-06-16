@@ -1349,6 +1349,26 @@
 				</File>
 			</Filter>
 		</Filter>
+		<Filter
+			Name="Mail"
+			>
+			<File
+				RelativePath=".\Mail\base64.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Mail\base64.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Mail\smtp.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Mail\smtp.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\ReadMe.txt"
 			>
