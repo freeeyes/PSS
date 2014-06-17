@@ -41,19 +41,25 @@ public:
 	virtual IBuffPacket& operator >> (uint16& u2Data)  = 0;        //读出一个uint16的2字节无符号整数
 	virtual IBuffPacket& operator >> (uint32& u4Data)  = 0;        //读出一个uint32的4字节无符号整数
 	virtual IBuffPacket& operator >> (uint64 &u8Data)  = 0;        //读出一个uint64的8字节无符号整数
-
+	virtual IBuffPacket& operator >> (int8 &n1Data)    = 0;        //读出一个int8的1字节无符号整数
+	virtual IBuffPacket& operator >> (int16 &n2Data)   = 0;        //读出一个int16的2字节无符号整数
+	virtual IBuffPacket& operator >> (int32 &n8Data)   = 0;        //读出一个int32的4字节无符号整数
 	virtual IBuffPacket& operator >> (float32& f4Data) = 0;        //读出一个float32的4字节小数
 	virtual IBuffPacket& operator >> (float64& f8Data) = 0;        //读出一个float64的8字节小数
 
 	virtual IBuffPacket& operator >> (VCHARS_STR& str) = 0;        //读出一个一个字节长度的数据块（包括1个uint8的数据长度和后面的数据块实体）
 	virtual IBuffPacket& operator >> (VCHARM_STR& str) = 0;        //读出一个一个字节长度的数据块（包括1个uint16的数据长度和后面的数据块实体）
 	virtual IBuffPacket& operator >> (VCHARB_STR& str) = 0;        //读出一个一个字节长度的数据块（包括1个uint32的数据长度和后面的数据块实体）
+	virtual IBuffPacket& operator >> (string& str)     = 0;        //读出一个string
 
 	//写入
 	virtual IBuffPacket& operator << (uint8 u1Data)    = 0;        //写入一个uint8的1字节无符号整数
 	virtual IBuffPacket& operator << (uint16 u2Data)   = 0;        //写入一个uint16的2字节无符号整数
 	virtual IBuffPacket& operator << (uint32 u4Data)   = 0;        //写入一个uint32的4字节无符号整数
 	virtual IBuffPacket& operator << (uint64 u8Data)   = 0;        //写入一个uint64的8字节无符号整数
+	virtual IBuffPacket& operator << (int8 u1Data)     = 0;        //写入一个int8的1字节无符号整数
+	virtual IBuffPacket& operator << (int16 u2Data)    = 0;        //写入一个int16的2字节无符号整数
+	virtual IBuffPacket& operator << (int32 u4Data)    = 0;        //写入一个int32的4字节无符号整数
 
 	virtual IBuffPacket& operator << (float32 f4Data)  = 0;        //写入一个float32的4字节小数
 	virtual IBuffPacket& operator << (float64 f8Data)  = 0;        //写入一个float64的8字节小数
@@ -61,6 +67,7 @@ public:
 	virtual IBuffPacket& operator << (VCHARS_STR &str) = 0;        //写入一个一个字节长度的数据块（包括1个uint8的数据长度和后面的数据块实体）
 	virtual IBuffPacket& operator << (VCHARM_STR &str) = 0;        //写入一个一个字节长度的数据块（包括1个uint16的数据长度和后面的数据块实体）
 	virtual IBuffPacket& operator << (VCHARB_STR &str) = 0;        //写入一个一个字节长度的数据块（包括1个uint32的数据长度和后面的数据块实体）
+	virtual IBuffPacket& operator << (string &str)     = 0;        //写入一个string
 };
 
 #endif

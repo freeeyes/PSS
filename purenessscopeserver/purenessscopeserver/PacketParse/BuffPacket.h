@@ -55,6 +55,9 @@ public:
 	CBuffPacket& operator >> (uint16& u2Data);
 	CBuffPacket& operator >> (uint32& u4Data);
 	CBuffPacket& operator >> (uint64 &u8Data);
+	CBuffPacket& operator >> (int8 &n1Data);
+	CBuffPacket& operator >> (int16 &n2Data);
+	CBuffPacket& operator >> (int32 &n8Data);
 
 	CBuffPacket& operator >> (float32& f4Data);
 	CBuffPacket& operator >> (float64& f8Data);
@@ -62,12 +65,16 @@ public:
 	CBuffPacket& operator >> (VCHARS_STR& str);
 	CBuffPacket& operator >> (VCHARM_STR& str);
 	CBuffPacket& operator >> (VCHARB_STR& str);
+	CBuffPacket& operator >> (string& str);
 
 	//–¥»Î
 	CBuffPacket& operator << (uint8 u1Data);
 	CBuffPacket& operator << (uint16 u2Data);
 	CBuffPacket& operator << (uint32 u4Data);
 	CBuffPacket& operator << (uint64 u8Data);
+	CBuffPacket& operator << (int8 u1Data);
+	CBuffPacket& operator << (int16 u2Data);
+	CBuffPacket& operator << (int32 u4Data);
 
 	CBuffPacket& operator << (float32 f4Data);
 	CBuffPacket& operator << (float64 f8Data);
@@ -75,6 +82,7 @@ public:
 	CBuffPacket& operator << (VCHARS_STR &str);
 	CBuffPacket& operator << (VCHARM_STR &str);
 	CBuffPacket& operator << (VCHARB_STR &str);
+	CBuffPacket& operator << (string &str);
 
 private:
 	char*                     m_szData;
