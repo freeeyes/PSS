@@ -92,6 +92,7 @@ _LogBlockInfo* CLogBlockPool::GetLogBlockInfo()
 void CLogBlockPool::ReturnBlockInfo(_LogBlockInfo* pLogBlockInfo)
 {
 	//memset(pLogBlockInfo->m_pBlock, 0, m_u4MaxBlockSize);
+	pLogBlockInfo->clear();
 	pLogBlockInfo->m_blIsUsed = false;
 }
 
@@ -405,6 +406,48 @@ int CLogManager::WriteLogBinary(int nLogType, const char* pData, int nLen)
 	m_Logger_Mutex.release();
 	return nRet;
 }
+
+
+int CLogManager::WriteToMail( int nLogType, uint32 u4MailID, char* pTitle, const char* fmt, ... )
+{
+	int  nRet = 0;
+	//从日志块池里面找到一块空余的日志块
+	m_Logger_Mutex.acquire();
+	_LogBlockInfo* pLogBlockInfo = m_objLogBlockPool.GetLogBlockInfo();
+
+
+	if(NULL == pLogBlockInfo)
+	{
+		OUR_DEBUG((LM_ERROR,"[CLogManager::WriteLog] m_objLogBlockPool is full!\n"));
+		m_Logger_Mutex.release();
+		return -1;
+	}
+
+	va_list ap;
+	va_start(ap, fmt);
+	ACE_OS::vsnprintf(pLogBlockInfo->m_pBlock, m_objLogBlockPool.GetBlockSize() - 1, fmt, ap);
+	va_end(ap);
+
+	pLogBlockInfo->m_u4Length = (uint32)strlen(pLogBlockInfo->m_pBlock);
+	pLogBlockInfo->m_u4LogID  = (uint32)nLogType;
+	pLogBlockInfo->m_u4MailID = u4MailID;
+	ACE_OS::sprintf(pLogBlockInfo->m_szMailTitle, "%s", pTitle);
+
+	if (IsRun()) 
+	{
+		nRet = PutLog(pLogBlockInfo);
+	} 
+	else 
+	{
+		m_objLogBlockPool.ReturnBlockInfo(pLogBlockInfo);
+	}
+
+	m_Logger_Mutex.release();
+	return 0;
+}
+
+//*****************************************************************************
+
 
 void CLogManager::SetReset(bool blReset)
 {

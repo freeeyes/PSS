@@ -9,6 +9,7 @@
 #include "define.h"
 #include "MainConfig.h"
 #include "ILogObject.h"
+#include "smtp.h"
 
 #include <map>
 #include <vector>
@@ -75,8 +76,69 @@ public:
 			OUR_DEBUG((LM_INFO,"%s.\n", m_pBuffer));
 		}
 
+		//查看是否要发送邮件
+		if(pLogBlockInfo->m_u4MailID > 0)
+		{
+			SendMail(pLogBlockInfo);
+		}
+ 
 		return 0;
 	};
+
+	bool SendMail(_LogBlockInfo* pLogBlockInfo)
+	{
+		//发送邮件
+		_MailAlert* pMailAlert = App_MainConfig::instance()->GetMailAlert(pLogBlockInfo->m_u4MailID);
+		if(NULL == pMailAlert)
+		{
+			OUR_DEBUG((LM_ERROR, "[CLogFile::SendMail]MailID(%d) is no find.\n", pLogBlockInfo->m_u4MailID));
+			return false;
+		}
+
+		unsigned char * pMail = NULL;
+		pMail = (unsigned char * )ACE_OS::calloc(1, 1);
+
+		int nRet = 0;
+		nRet = mailText(&pMail, 
+			(const unsigned char *)pMailAlert->m_szFromMailAddr, 
+			(const unsigned char *)pMailAlert->m_szToMailAddr, 
+			(const unsigned char *)pLogBlockInfo->m_szMailTitle, 
+			(const unsigned char *)pLogBlockInfo->m_pBlock);
+		nRet = mailEnd(&pMail);
+
+		ACE_HANDLE fd;
+
+		nRet = connectSmtp(fd, (const unsigned char *)pMailAlert->m_szMailUrl, 
+			pMailAlert->m_u4MailPort);
+		if(nRet != 0)
+		{
+			OUR_DEBUG((LM_ERROR, "[CLogFile::SendMail]MailID(%d) connectSmtp error.\n", pLogBlockInfo->m_u4MailID));
+			return false;
+		}
+
+		nRet = authEmail(fd, 
+			(const unsigned char *)pMailAlert->m_szFromMailAddr, 
+			(const unsigned char *)pMailAlert->m_szMailPass);
+		if(nRet != 0)
+		{
+			OUR_DEBUG((LM_ERROR, "[CLogFile::SendMail]MailID(%d) authEmail error.\n", pLogBlockInfo->m_u4MailID));
+			return false;
+		}
+
+		nRet = sendEmail(fd, (const unsigned char *)pMailAlert->m_szFromMailAddr, 
+			(const unsigned char *)pMailAlert->m_szToMailAddr,
+			(const unsigned char *)pMail, 
+			(const int)strlen((const char *)pMail));
+		if(nRet != 0)
+		{
+			OUR_DEBUG((LM_ERROR, "[CLogFile::SendMail]MailID(%d) sendEmail error.\n", pLogBlockInfo->m_u4MailID));
+			return false;
+		}
+
+		free(pMail);
+
+		return true;
+	}
 
 	ACE_TString& GetLoggerName()
 	{

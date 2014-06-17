@@ -224,6 +224,80 @@ bool CMainConfig::Init_Alert(const char* szConfigPath)
 		m_vecCommandAlert.push_back(objCommandAlert);
 	}
 
+	//报警邮件相关设置
+	m_vecMailAlert.clear();
+	TiXmlElement* pNextTiXmlElementMailID      = NULL;
+	TiXmlElement* pNextTiXmlElementFormAddr    = NULL;
+	TiXmlElement* pNextTiXmlElementToAddr      = NULL;
+	TiXmlElement* pNextTiXmlElementMailPass    = NULL;
+	TiXmlElement* pNextTiXmlElementMailUrl     = NULL;
+	TiXmlElement* pNextTiXmlElementMailPort    = NULL;
+	_MailAlert objMailAlert;
+	while(true)
+	{
+		pData = m_MainConfig.GetData("Mail", "MailID", pNextTiXmlElementMailID);
+		if(pData != NULL)
+		{
+			objMailAlert.m_u4MailID = (uint32)ACE_OS::atoi(pData);
+		}
+		else
+		{
+			break;
+		}
+
+		pData = m_MainConfig.GetData("Mail", "fromMailAddr", pNextTiXmlElementFormAddr);
+		if(pData != NULL)
+		{
+			sprintf_safe(objMailAlert.m_szFromMailAddr, MAX_BUFF_200, "%s", pData);
+		}
+		else
+		{
+			break;
+		}
+
+		pData = m_MainConfig.GetData("Mail", "toMailAddr", pNextTiXmlElementToAddr);
+		if(pData != NULL)
+		{
+			sprintf_safe(objMailAlert.m_szToMailAddr, MAX_BUFF_200, "%s", pData);
+		}
+		else
+		{
+			break;
+		}
+
+		pData = m_MainConfig.GetData("Mail", "MailPass", pNextTiXmlElementMailPass);
+		if(pData != NULL)
+		{
+			sprintf_safe(objMailAlert.m_szMailPass, MAX_BUFF_200, "%s", pData);
+		}
+		else
+		{
+			break;
+		}
+
+		pData = m_MainConfig.GetData("Mail", "MailUrl", pNextTiXmlElementMailUrl);
+		if(pData != NULL)
+		{
+			sprintf_safe(objMailAlert.m_szMailUrl, MAX_BUFF_200, "%s", pData);
+		}
+		else
+		{
+			break;
+		}
+
+		pData = m_MainConfig.GetData("Mail", "MailPort", pNextTiXmlElementMailPort);
+		if(pData != NULL)
+		{
+			objMailAlert.m_u4MailPort = (uint32)ACE_OS::atoi(pData);
+		}
+		else
+		{
+			break;
+		}
+
+		m_vecMailAlert.push_back(objMailAlert);
+	}
+
 	m_MainConfig.Close();
 
 	return true;
@@ -1252,7 +1326,7 @@ _ClientDataAlert* CMainConfig::GetClientDataAlert()
 
 _CommandAlert* CMainConfig::GetCommandAlert(int nIndex)
 {
-	if(nIndex < 0 || nIndex >= m_vecCommandAlert.size())
+	if(nIndex < 0 || nIndex >= (int)m_vecCommandAlert.size())
 	{
 		return NULL;
 	}
@@ -1265,4 +1339,17 @@ _CommandAlert* CMainConfig::GetCommandAlert(int nIndex)
 uint32 CMainConfig::GetCommandAlertCount()
 {
 	return (uint32)m_vecCommandAlert.size();
+}
+
+_MailAlert* CMainConfig::GetMailAlert(uint32 u4MailID)
+{
+	for(uint32 i = 0; i < m_vecMailAlert.size(); i++)
+	{
+		if(m_vecMailAlert[i].m_u4MailID == u4MailID)
+		{
+			return (_MailAlert* )&m_vecMailAlert[i];
+		}
+	}
+
+	return NULL;
 }

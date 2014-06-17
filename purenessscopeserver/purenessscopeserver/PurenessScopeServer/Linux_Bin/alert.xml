@@ -16,4 +16,7 @@
 
 <!-- 1分钟内，某一个命令的调用次数最大阀值，配置可以是多个，也可以一个都不配置 -->
 <CommandInfo CommandID="4096" CommandCount="0" />
+
+<!-- 配置邮件告警功能 MailID必须大于0,可以支持多个 -->
+<Mail MailID="1" fromMailAddr="local@163.com" toMailAddr="freeeyes@163.com" MailPass="123456" MailUrl="smtp.163.com" MailPort="25" />
 </config>

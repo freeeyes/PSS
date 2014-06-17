@@ -4,13 +4,6 @@
 *
 */
 
-#include <ace/OS_NS_sys_socket.h>
-#include <ace/OS_NS_stdio.h>
-#include <ace/OS_NS_stdlib.h>
-#include <ace/OS_NS_string.h>
-#include <ace/Asynch_IO.h>
-#include <ace/OS.h> 
-#include <ace/Log_Msg.h>
 #include "smtp.h"
 #include "base64.h"
 
@@ -108,7 +101,7 @@ int recvStatus(const char *recvString)
 	ACE_OS::memset(statusStr, 0, sizeof(statusStr));
 	ACE_OS::strncpy(statusStr, (const char* )recvString, 3);
 
-	SMTP_Print6("[%s][%d] status = %d\r\n", __FILE__, __LINE__, atoi(statusStr));
+	//SMTP_Print6("[%s][%d] status = %d\r\n", __FILE__, __LINE__, atoi(statusStr));
 
 	switch (ACE_OS::atoi(statusStr))
 	{
@@ -153,7 +146,7 @@ int authEmail(const ACE_HANDLE socketFd, const unsigned char *mailAddr, const un
 	ACE_OS::memset(&readData, 0, SMTP_MTU);
 	safeRead(socketFd, readData, SMTP_MTU);
 
-	SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
+	//SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
 
 	/* Send: EHLO */
 	char szRELO[50] = {'\0'};
@@ -164,7 +157,7 @@ int authEmail(const ACE_HANDLE socketFd, const unsigned char *mailAddr, const un
 	ACE_OS::memset(&readData, 0, SMTP_MTU);
 	safeRead(socketFd, readData, SMTP_MTU);
 
-	SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
+	//SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
 	recvStatus(readData);
 
 	/* Send: AUTH LOGIN */
@@ -176,7 +169,7 @@ int authEmail(const ACE_HANDLE socketFd, const unsigned char *mailAddr, const un
 	ACE_OS::memset(&readData, 0, SMTP_MTU);
 	safeRead(socketFd, readData, SMTP_MTU);
 
-	SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
+	//SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
 	recvStatus(readData);
 
 	/* Send: username */	
@@ -193,7 +186,7 @@ int authEmail(const ACE_HANDLE socketFd, const unsigned char *mailAddr, const un
 	ACE_OS::memset(&readData, 0, SMTP_MTU);
 	safeRead(socketFd, readData, SMTP_MTU);
 
-	SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
+	//SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
 	recvStatus(readData);
 
 	/* Send: passwd */	
@@ -209,7 +202,7 @@ int authEmail(const ACE_HANDLE socketFd, const unsigned char *mailAddr, const un
 	ACE_OS::memset(&readData, 0, SMTP_MTU);
 	safeRead(socketFd, readData, SMTP_MTU);
 
-	SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
+	//SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
 	recvStatus(readData);
 
 	return 0;
@@ -230,7 +223,7 @@ int sendEmail(const ACE_HANDLE socketFd, const unsigned char *fromMail, const un
 	ACE_OS::memset(&readData, 0, SMTP_MTU);
 	safeRead(socketFd, readData, SMTP_MTU);
 
-	SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
+	//SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
 	recvStatus(readData);
 
 	/* Send: RCPT TO */
@@ -242,7 +235,7 @@ int sendEmail(const ACE_HANDLE socketFd, const unsigned char *fromMail, const un
 	ACE_OS::memset(&readData, 0, SMTP_MTU);
 	safeRead(socketFd, readData, SMTP_MTU);
 
-	SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
+	//SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
 	recvStatus(readData);
 
 	/* Send: DATA */
@@ -255,7 +248,7 @@ int sendEmail(const ACE_HANDLE socketFd, const unsigned char *fromMail, const un
 	ACE_OS::memset(&readData, 0, SMTP_MTU);
 	safeRead(socketFd, readData, SMTP_MTU);
 
-	SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
+	//SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
 	recvStatus(readData);
 
 	/* Send: MAIL TEXT */
@@ -265,7 +258,7 @@ int sendEmail(const ACE_HANDLE socketFd, const unsigned char *fromMail, const un
 	ACE_OS::memset(&readData, 0, SMTP_MTU);
 	safeRead(socketFd, readData, SMTP_MTU);
 
-	SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
+	//SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
 	recvStatus(readData);
 
 	/* Send: QUIT */
@@ -278,7 +271,6 @@ int sendEmail(const ACE_HANDLE socketFd, const unsigned char *fromMail, const un
 	ACE_OS::memset(&readData, 0, SMTP_MTU);
 	safeRead(socketFd, readData, SMTP_MTU);
 
-	SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
 	recvStatus(readData);
 
 	return 0;
@@ -396,7 +388,7 @@ int mailAttachment(unsigned char **mail, const unsigned char *filePath)
 
 	len = ACE_OS::fread(attach, sizeof(char), fileSize, fp);
 
-	SMTP_Print6("[%s][%d] %s size = %d, base64Size = %d \r\n",__FILE__, __LINE__, filePath, fileSize, base64Size);
+	//SMTP_Print6("[%s][%d] %s size = %d, base64Size = %d \r\n",__FILE__, __LINE__, filePath, fileSize, base64Size);
 
 	/* attachment transform to base64 */
 	base64_encode(base64Attach, base64Size, (const unsigned char *)attach, fileSize);
@@ -466,7 +458,7 @@ int main()
 	ret = mailAttachment(&mail, filePath);
 	ret = mailEnd(&mail);
 
-	SMTP_Print6("\r\n%s \r\n", mail);
+	//SMTP_Print6("\r\n%s \r\n", mail);
 
 	printf("\r\nprepare email OK ...\r\n");
 

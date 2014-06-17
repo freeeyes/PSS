@@ -111,6 +111,28 @@ struct _CommandAlert
 };
 typedef vector<_CommandAlert> vecCommandAlert;
 
+
+struct _MailAlert
+{
+	uint32 m_u4MailID;
+	char   m_szFromMailAddr[MAX_BUFF_200];
+	char   m_szToMailAddr[MAX_BUFF_200];
+	char   m_szMailPass[MAX_BUFF_200];
+	char   m_szMailUrl[MAX_BUFF_200];
+	uint32 m_u4MailPort;
+
+	_MailAlert()
+	{
+		m_u4MailID          = 0;
+		m_szFromMailAddr[0] = '\0';
+		m_szToMailAddr[0]   = '\0';
+		m_szMailPass[0]     = '\0';
+		m_szMailUrl[0]      = '\0';
+		m_u4MailPort        = 0;
+	}
+};
+typedef vector<_MailAlert> vecMailAlert;
+
 enum ENUM_CHAR_ORDER
 {
 	SYSTEM_LITTLE_ORDER = 0,   //小端字序
@@ -216,6 +238,7 @@ public:
 	_ClientDataAlert* GetClientDataAlert();
 	uint32            GetCommandAlertCount();
 	_CommandAlert*    GetCommandAlert(int nIndex);
+	_MailAlert*       GetMailAlert(uint32 u4MailID);
 
 private:
 	CXmlOpeation m_MainConfig;
@@ -316,6 +339,7 @@ private:
 	vecConsoleClientIP m_vecConsoleClientIP;                  //服务器后台允许的IP
 	vecConsoleKey      m_vecConsoleKey;                       //服务器允许的key值
 	vecCommandAlert    m_vecCommandAlert;                     //命令行告警阀值相关配置
+	vecMailAlert       m_vecMailAlert;                         //报警邮件相关设置 
 };
 
 typedef ACE_Singleton<CMainConfig, ACE_Null_Mutex> App_MainConfig;

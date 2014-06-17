@@ -73,6 +73,8 @@ public:
 
 	int WriteLogBinary(int nLogType, const char* pData, int nLen);
 
+	int WriteToMail(int nLogType, uint32 u4MailID, char* pTitle, const char* fmt, ...);
+
 private:
 	int ProcessLog(_LogBlockInfo* pLogBlockInfo);
 

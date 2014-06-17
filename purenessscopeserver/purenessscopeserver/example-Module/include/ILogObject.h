@@ -7,17 +7,31 @@
 struct _LogBlockInfo
 {
 public:
-	char*  m_pBlock;      //块指针
-	uint32 m_u4Length;    //块长度
-	bool   m_blIsUsed;    //是否正在使用
-	uint32 m_u4LogID;     //LogID标记 
+	char*  m_pBlock;                     //块指针
+	uint32 m_u4Length;                   //块长度
+	bool   m_blIsUsed;                   //是否正在使用
+	uint32 m_u4LogID;                    //LogID标记
+	uint32 m_u4MailID;                   //邮件对象的ID序号
+	char   m_szMailTitle[MAX_BUFF_200];  //邮件对象的标题
 
 	_LogBlockInfo()
 	{
-		m_pBlock   = NULL;
-		m_u4Length = 0;
-		m_u4LogID  = 0;
-		m_blIsUsed = false;
+		m_pBlock         = NULL;
+		m_u4Length       = 0;
+		m_u4LogID        = 0;
+		m_blIsUsed       = false;
+		m_u4MailID       = 0;
+		m_szMailTitle[0] = '\0';
+	}
+
+	void clear()
+	{
+		m_pBlock         = NULL;
+		m_u4Length       = 0;
+		m_u4LogID        = 0;
+		m_blIsUsed       = false;
+		m_u4MailID       = 0;
+		m_szMailTitle[0] = '\0';
 	}
 };
 
