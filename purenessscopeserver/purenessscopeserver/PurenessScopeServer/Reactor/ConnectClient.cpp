@@ -112,8 +112,6 @@ int CConnectClient::open(void* p)
 
 int CConnectClient::handle_input(ACE_HANDLE fd)
 {
-    ACE_Time_Value nowait(MAX_MSG_PACKETTIMEOUT);
-
     if (fd == ACE_INVALID_HANDLE)
     {
         OUR_DEBUG((LM_ERROR, "[CConnectClient::handle_input]fd == ACE_INVALID_HANDLE.\n"));
@@ -142,6 +140,20 @@ int CConnectClient::handle_input(ACE_HANDLE fd)
         return -1;
     }
 
+		if(App_MainConfig::instance()->GetNetworkMode() != (uint8)NETWORKMODE_RE_EPOLL_ET)
+		{
+			return RecvData();
+		}
+		else
+		{
+			return RecvData_et();
+		}
+}
+
+int CConnectClient::RecvData()
+{
+		 ACE_Time_Value nowait(MAX_MSG_PACKETTIMEOUT);
+		 
     int nCurrCount = (uint32)m_pCurrMessage->size();
 
     if (nCurrCount < 0)
@@ -220,7 +232,101 @@ int CConnectClient::handle_input(ACE_HANDLE fd)
     }
 
     m_pCurrMessage->reset();
-    return 0;
+    
+    return 0;	
+}
+
+int CConnectClient::RecvData_et()
+{
+    int nCurrCount = (uint32)m_pCurrMessage->size();
+
+    if (nCurrCount < 0)
+    {
+        //如果剩余字节为负，说明程序出了问题
+        OUR_DEBUG((LM_ERROR, "[CConnectClient::handle_input][%d] nCurrCount < 0 m_u4CurrSize = %d.\n", GetServerID(), m_u4CurrSize));
+        m_u4CurrSize = 0;
+
+        if (NULL != m_pClientMessage)
+        {
+            m_pClientMessage->ConnectError((int)ACE_OS::last_error());
+        }
+
+        return -1;
+    }
+
+		while(true)
+		{
+	    int nDataLen = this->peer().recv(m_pCurrMessage->wr_ptr(), nCurrCount, MSG_NOSIGNAL);
+	
+	    if (nDataLen <= 0)
+	    {
+	        m_u4CurrSize = 0;
+	        uint32 u4Error = (uint32)errno;
+	        
+					if(nDataLen == -1 && u4Error == EAGAIN)
+					{
+							break;
+					}	        
+	        
+	        OUR_DEBUG((LM_ERROR, "[CConnectClient::handle_input] ConnectID = %d, recv data is error nDataLen = [%d] errno = [%d].\n", GetServerID(), nDataLen, u4Error));
+	        sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectClient::handle_input] ConnectID = %d, recv data is error[%d].\n", GetServerID(), nDataLen);
+	
+	        if (NULL != m_pClientMessage)
+	        {
+	            m_pClientMessage->ConnectError((int)ACE_OS::last_error());
+	        }
+	
+	        return -1;
+	    }
+	
+	    //如果是DEBUG状态，记录当前接受包的二进制数据
+	    if (App_MainConfig::instance()->GetDebug() == DEBUG_ON)
+	    {
+	        char szDebugData[MAX_BUFF_1024] = {'\0'};
+	        char szLog[10]  = {'\0'};
+	        int  nDebugSize = 0;
+	        bool blblMore   = false;
+	
+	        if (nDataLen >= MAX_BUFF_200)
+	        {
+	            nDebugSize = MAX_BUFF_200;
+	            blblMore   = true;
+	        }
+	        else
+	        {
+	            nDebugSize = nDataLen;
+	        }
+	
+	        char* pData = m_pCurrMessage->wr_ptr();
+	
+	        for (int i = 0; i < nDebugSize; i++)
+	        {
+	            sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
+	            sprintf_safe(szDebugData + 5 * i, MAX_BUFF_1024 - 5 * i, "%s", szLog);
+	        }
+	
+	        if (blblMore == true)
+	        {
+	            AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_SERVERRECV, "[%s:%d]%s.(数据包过长只记录前200字节)", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
+	        }
+	        else
+	        {
+	            AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_SERVERRECV, "[%s:%d]%s.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
+	        }
+	    }
+	
+	    m_pCurrMessage->wr_ptr(nDataLen);
+	
+	    if (NULL != m_pClientMessage)
+	    {
+	        //接收数据，返回给逻辑层，自己不处理整包完整性判定
+	        m_pClientMessage->RecvData(m_pCurrMessage);
+	    }
+	
+	    m_pCurrMessage->reset();
+  	}
+    
+    return 0;		
 }
 
 int CConnectClient::handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask)

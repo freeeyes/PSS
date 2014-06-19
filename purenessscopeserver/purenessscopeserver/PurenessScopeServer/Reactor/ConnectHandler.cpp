@@ -78,6 +78,8 @@ bool CConnectHandler::Close(int nIOCount)
 		//查看是否是IP追踪信息，是则记录
 		App_IPAccount::instance()->CloseIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
 
+		//OUR_DEBUG((LM_ERROR, "[CConnectHandler::Close]ConnectID=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
+
 		//如果还存在阻塞定时器，取消之
 		if(m_u4BlockTimerID != 0)
 		{
@@ -184,6 +186,8 @@ int CConnectHandler::open(void*)
 	m_blBlockState        = false;
 	m_nBlockCount         = 0;
 	m_u8SendQueueTimeCost = 0;
+	m_blIsLog             = false;
+	m_szConnectName[0]    = '\0';
 
 	//重置缓冲区
 	m_pBlockMessage->reset();
@@ -207,12 +211,15 @@ int CConnectHandler::open(void*)
 	if(false == App_IPAccount::instance()->AddIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()))
 	{
 		OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]IP connect frequently.\n", m_addrRemote.get_host_addr()));
-		App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), App_MainConfig::instance()->GetForbiddenTime());
+		App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), App_MainConfig::instance()->GetIPAlert()->m_u4IPTimeout);
 		return -1;
 	}
 
 	//初始化检查器
-	m_TimeConnectInfo.Init(App_MainConfig::instance()->GetValid(), App_MainConfig::instance()->GetValidPacketCount(), App_MainConfig::instance()->GetValidRecvSize());
+	m_TimeConnectInfo.Init(App_MainConfig::instance()->GetClientDataAlert()->m_u4RecvPacketCount, 
+		App_MainConfig::instance()->GetClientDataAlert()->m_u4RecvDataMax, 
+		App_MainConfig::instance()->GetClientDataAlert()->m_u4SendPacketCount,
+		App_MainConfig::instance()->GetClientDataAlert()->m_u4SendDataMax);
 
 	int nRet = ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>::open();
 	if(nRet != 0)
@@ -221,7 +228,7 @@ int CConnectHandler::open(void*)
 		sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::open]ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>::open() error [%d].", nRet);
 		return -1;
 	}
-
+	
 	//设置链接为非阻塞模式
 	if (this->peer().enable(ACE_NONBLOCK) == -1)
 	{
@@ -230,6 +237,8 @@ int CConnectHandler::open(void*)
 		return -1;
 	}
 
+	//设置默认别名
+	SetConnectName(m_addrRemote.get_host_addr());
 	OUR_DEBUG((LM_INFO, "[CConnectHandler::open] Connection from [%s:%d]\n",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
 
 	//初始化当前链接的某些参数
@@ -318,6 +327,7 @@ int CConnectHandler::open(void*)
 
 	m_u1ConnectState = CONNECT_OPEN;
 
+	nRet = this->reactor()->register_handler(this, ACE_Event_Handler::READ_MASK);
 
 	return nRet;
 }
@@ -425,7 +435,7 @@ int CConnectHandler::RecvData()
 	}
 
 	//如果是DEBUG状态，记录当前接受包的二进制数据
-	if(App_MainConfig::instance()->GetDebug() == DEBUG_ON)
+	if(App_MainConfig::instance()->GetDebug() == DEBUG_ON || m_blIsLog == true)
 	{
 		char szDebugData[MAX_BUFF_1024] = {'\0'};
 		char szLog[10]  = {'\0'};
@@ -451,11 +461,11 @@ int CConnectHandler::RecvData()
 
 		if(blblMore == true)
 		{
-			AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTRECV, "[%s:%d]%s.(数据包过长只记录前200字节)", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
+			AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTRECV, "[(%s)%s:%d]%s.(数据包过长只记录前200字节)", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
 		}
 		else
 		{
-			AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTRECV, "[%s:%d]%s.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
+			AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTRECV, "[(%s)%s:%d]%s.", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
 		}
 	}
 
@@ -704,11 +714,13 @@ int CConnectHandler::RecvData()
 //et模式接收数据
 int CConnectHandler::RecvData_et()
 {
+	m_ThreadLock.acquire();
+	m_nIOCount++;
+	m_ThreadLock.release();
+
 	while(true)
 	{
-		m_ThreadLock.acquire();
-		m_nIOCount++;
-		m_ThreadLock.release();
+		//OUR_DEBUG((LM_ERROR, "[CConnectHandler::RecvData_et]m_nIOCount=%d.\n", m_nIOCount));
 		
 		//判断缓冲是否为NULL
 		if(m_pCurrMessage == NULL)
@@ -740,20 +752,20 @@ int CConnectHandler::RecvData_et()
 		}
 	
 		int nDataLen = this->peer().recv(m_pCurrMessage->wr_ptr(), nCurrCount, MSG_NOSIGNAL);
-		OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input] ConnectID=%d, GetData=[%d].\n", GetConnectID(), nDataLen));
+		//OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input] ConnectID=%d, GetData=[%d],errno=[%d].\n", GetConnectID(), nDataLen, errno));
 		if(nDataLen <= 0)
 		{
 			m_u4CurrSize = 0;
 			uint32 u4Error = (uint32)errno;
-			OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input] ConnectID = %d, recv data is error nDataLen = [%d] errno = [%d] EAGAIN=[%d].\n", GetConnectID(), nDataLen, u4Error, EAGAIN));
-			sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::handle_input] ConnectID = %d, recv data is error[%d].\n", GetConnectID(), nDataLen);
-	
-			//et模式下，这里处理完了，就要等待下一次事件到达信息
-			if(u4Error == EINTR || u4Error == EAGAIN) 
+			
+			//如果是-1 且为11的错误，忽略之
+			if(nDataLen == -1 && u4Error == EAGAIN)
 			{
-				Close();
-				return 0;
+				break;
 			}
+			
+			OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input] ConnectID = %d, recv data is error nDataLen = [%d] errno = [%d] EAGAIN=[%d].\n", GetConnectID(), nDataLen, u4Error, EAGAIN));
+			sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::handle_input] ConnectID = %d,nDataLen = [%d],recv data is error[%d].\n", GetConnectID(), nDataLen, u4Error);
 	
 			//关闭当前的PacketParse
 			ClearPacketParse();
@@ -763,7 +775,7 @@ int CConnectHandler::RecvData_et()
 		}
 	
 		//如果是DEBUG状态，记录当前接受包的二进制数据
-		if(App_MainConfig::instance()->GetDebug() == DEBUG_ON)
+		if(App_MainConfig::instance()->GetDebug() == DEBUG_ON || m_blIsLog == true)
 		{
 			char szDebugData[MAX_BUFF_1024] = {'\0'};
 			char szLog[10]  = {'\0'};
@@ -789,11 +801,11 @@ int CConnectHandler::RecvData_et()
 	
 			if(blblMore == true)
 			{
-				AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTRECV, "[%s:%d]%s.(数据包过长只记录前200字节)", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
+				AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTRECV, "[(%s)%s:%d]%s.(数据包过长只记录前200字节)", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
 			}
 			else
 			{
-				AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTRECV, "[%s:%d]%s.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
+				AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTRECV, "[(%s)%s:%d]%s.", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
 			}
 		}
 	
@@ -1257,7 +1269,7 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 {
 
 	//如果是DEBUG状态，记录当前发送包的二进制数据
-	if(App_MainConfig::instance()->GetDebug() == DEBUG_ON)
+	if(App_MainConfig::instance()->GetDebug() == DEBUG_ON || m_blIsLog == true)
 	{
 		char szDebugData[MAX_BUFF_1024] = {'\0'};
 		char szLog[10]  = {'\0'};
@@ -1283,12 +1295,26 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 
 		if(blblMore == true)
 		{
-			AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTSEND, "[%s:%d]%s.(数据包过长只记录前200字节)", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
+			AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTSEND, "[(%s)%s:%d]%s.(数据包过长只记录前200字节)", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
 		}
 		else
 		{
-			AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTSEND, "[%s:%d]%s.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
+			AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTSEND, "[(%s)%s:%d]%s.", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
 		}
+	}
+
+	//统计发送数量
+	ACE_Date_Time dtNow;
+	if(false == m_TimeConnectInfo.SendCheck((uint8)dtNow.minute(), 1, pMbData->length()))
+	{
+		//超过了限定的阀值，需要关闭链接，并记录日志
+		AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECTABNORMAL, "[TCP]IP=%s,Prot=%d,SendPacketCount=%d, SendSize=%d.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_TimeConnectInfo.m_u4SendPacketCount, m_TimeConnectInfo.m_u4SendSize);
+		//设置封禁时间
+		App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), App_MainConfig::instance()->GetIPAlert()->m_u4IPTimeout);
+		OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, Send Data is more than limit.\n", GetConnectID()));
+		//断开连接
+		Close(2);
+		return false;
 	}
 
 	//发送超时时间设置
@@ -1332,7 +1358,7 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 			pMbData->release();
 			return false;
 		}
-
+		
 		int nDataLen = this->peer().send(pMbData->rd_ptr(), nSendPacketLen - nIsSendSize, &nowait);	
 
 		if(nDataLen <= 0)
@@ -1387,17 +1413,16 @@ bool CConnectHandler::CheckMessage()
 	App_IPAccount::instance()->UpdateIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
 
 	ACE_Date_Time dtNow;
-	if(false == m_TimeConnectInfo.Check((uint8)dtNow.minute(), 1, m_u4AllRecvSize))
+	if(false == m_TimeConnectInfo.RecvCheck((uint8)dtNow.minute(), 1, m_u4AllRecvSize))
 	{
 		//超过了限定的阀值，需要关闭链接，并记录日志
-		AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECTABNORMAL, "[TCP]IP=%s,Prot=%d,PacketCount=%d, RecvSize=%d.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_TimeConnectInfo.m_u4PacketCount, m_TimeConnectInfo.m_u4RecvSize);
+		AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECTABNORMAL, "[TCP]IP=%s,Prot=%d,PacketCount=%d, RecvSize=%d.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_TimeConnectInfo.m_u4RecvPacketCount, m_TimeConnectInfo.m_u4RecvSize);
 		App_PacketParsePool::instance()->Delete(m_pPacketParse);
 		//设置封禁时间
-		App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), App_MainConfig::instance()->GetForbiddenTime());
+		App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), App_MainConfig::instance()->GetIPAlert()->m_u4IPTimeout);
 		OUR_DEBUG((LM_ERROR, "[CConnectHandle::CheckMessage] ConnectID = %d, PutMessageBlock is check invalid.\n", GetConnectID()));
 		return false;
 	}
-
 
 	//将数据Buff放入消息体中
 	if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_PARSE, m_pPacketParse))
@@ -1481,6 +1506,26 @@ void CConnectHandler::ClearPacketParse()
 	App_PacketParsePool::instance()->Delete(m_pPacketParse);
 }
 
+void CConnectHandler::SetConnectName(const char* pName)
+{
+	sprintf_safe(m_szConnectName, MAX_BUFF_100, "%s", pName);
+}
+
+void CConnectHandler::SetIsLog(bool blIsLog)
+{
+	m_blIsLog = blIsLog;
+}
+
+char* CConnectHandler::GetConnectName()
+{
+	return m_szConnectName;
+}
+
+bool CConnectHandler::GetIsLog()
+{
+	return m_blIsLog;
+}
+
 //***************************************************************************
 CConnectManager::CConnectManager(void)
 {
@@ -1490,6 +1535,9 @@ CConnectManager::CConnectManager(void)
 	m_pTCTimeSendCheck   = NULL;
 	m_tvCheckConnect     = ACE_OS::gettimeofday();
 	m_blRun              = false;
+
+	m_u4TimeConnect      = 0;
+	m_u4TimeDisConnect   = 0;
 
 	//初始化发送对象池
 	m_SendMessagePool.Init();
@@ -1524,6 +1572,10 @@ void CConnectManager::CloseAll()
 			{
 				b++;
 			}
+			m_u4TimeDisConnect++;
+
+			//加入链接统计功能
+			App_ConnectAccount::instance()->AddDisConnect();
 		}
 		else
 		{
@@ -1546,7 +1598,11 @@ bool CConnectManager::Close(uint32 u4ConnectID)
 		if(pConnectHandler != NULL)
 		{
 			m_mapConnectManager.erase(f);
+			m_u4TimeDisConnect++;
 		}
+
+		//加入链接统计功能
+		App_ConnectAccount::instance()->AddDisConnect();
 
 		return true;
 	}
@@ -1568,6 +1624,10 @@ bool CConnectManager::CloseConnect(uint32 u4ConnectID)
 		if(pConnectHandler != NULL)
 		{
 			pConnectHandler->ServerClose();
+			m_u4TimeDisConnect++;
+
+			//加入链接统计功能
+			App_ConnectAccount::instance()->AddDisConnect();
 		}
 		m_mapConnectManager.erase(f);
 		return true;
@@ -1598,6 +1658,10 @@ bool CConnectManager::AddConnect(uint32 u4ConnectID, CConnectHandler* pConnectHa
 	pConnectHandler->SetConnectID(u4ConnectID);
 	//加入map
 	m_mapConnectManager.insert(mapConnectManager::value_type(u4ConnectID, pConnectHandler));
+	m_u4TimeConnect++;
+
+	//加入链接统计功能
+	App_ConnectAccount::instance()->AddConnect();
 
 	return true;
 }
@@ -1868,9 +1932,27 @@ int CConnectManager::handle_timeout(const ACE_Time_Value &tv, const void *arg)
 		ACE_Time_Value tvInterval(tvNow - m_tvCheckConnect);
 		if(tvInterval.sec() >= MAX_MSG_HANDLETIME)
 		{
-			AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "[CConnectManager]CurrConnectCount = %d.", GetCount());
-			m_tvCheckConnect = tvNow;
+			AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "[CConnectManager]CurrConnectCount = %d,TimeInterval=%d, TimeConnect=%d, TimeDisConnect=%d.", 
+				GetCount(), MAX_MSG_HANDLETIME, m_u4TimeConnect, m_u4TimeDisConnect);
+
+			//重置单位时间连接数和断开连接数
+			m_u4TimeConnect    = 0;
+			m_u4TimeDisConnect = 0;
+			m_tvCheckConnect   = tvNow;
 		}
+
+		//检测单位时间连接数是否超越阀值
+		if(App_ConnectAccount::instance()->CheckConnectCount() == false)
+		{
+			AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "[CProConnectManager]CheckConnectCount is more than limit.");
+		}
+
+		//检测单位时间连接断开数是否超越阀值
+		if(App_ConnectAccount::instance()->CheckDisConnectCount() == false)
+		{
+			AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "[CProConnectManager]CheckDisConnectCount is more than limit.");
+		}
+
 
 		return 0;
 
@@ -2063,7 +2145,6 @@ bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType,
 						//超过了阀值，则关闭连接
 						App_BuffPacketManager::instance()->Delete(pBuffPacket);
 					}
-					Close(2);
 					continue;
 				}
 			}
@@ -2161,6 +2242,78 @@ bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType,
 	}
 
 	return true;
+}
+
+bool CConnectManager::SetConnectName(uint32 u4ConnectID, const char* pName)
+{
+	mapConnectManager::iterator f = m_mapConnectManager.find(u4ConnectID);
+
+	if(f != m_mapConnectManager.end())
+	{
+		CConnectHandler* pConnectHandler = (CConnectHandler* )f->second;
+		if(NULL != pConnectHandler)
+		{
+			pConnectHandler->SetConnectName(pName);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}	
+	else
+	{
+		return false;
+	}
+}
+
+bool CConnectManager::SetIsLog(uint32 u4ConnectID, bool blIsLog)
+{
+	mapConnectManager::iterator f = m_mapConnectManager.find(u4ConnectID);
+
+	if(f != m_mapConnectManager.end())
+	{
+		CConnectHandler* pConnectHandler = (CConnectHandler* )f->second;
+		if(NULL != pConnectHandler)
+		{
+			pConnectHandler->SetIsLog(blIsLog);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}	
+	else
+	{
+		return false;
+	}	
+}
+
+void CConnectManager::GetClientNameInfo(const char* pName, vecClientNameInfo& objClientNameInfo)
+{
+	for(mapConnectManager::iterator b = m_mapConnectManager.begin(); b != m_mapConnectManager.end(); b++)
+	{
+		CConnectHandler* pConnectHandler = (CConnectHandler* )b->second;
+		if(NULL != pConnectHandler && ACE_OS::strcmp(pConnectHandler->GetConnectName(), pName) == 0)
+		{
+			_ClientNameInfo ClientNameInfo;
+			ClientNameInfo.m_nConnectID = (int)pConnectHandler->GetConnectID();
+			sprintf_safe(ClientNameInfo.m_szName, MAX_BUFF_100, "%s", pConnectHandler->GetConnectName());
+			sprintf_safe(ClientNameInfo.m_szClientIP, MAX_BUFF_20, "%s", pConnectHandler->GetClientIPInfo().m_szClientIP);
+			ClientNameInfo.m_nPort =  pConnectHandler->GetClientIPInfo().m_nPort;
+			if(pConnectHandler->GetIsLog() == true)
+			{
+				ClientNameInfo.m_nLog = 1;
+			}
+			else
+			{
+				ClientNameInfo.m_nLog = 0;
+			}
+			
+			objClientNameInfo.push_back(ClientNameInfo);
+		}
+	}
 }
 
 //*********************************************************************************
@@ -2751,4 +2904,62 @@ bool CConnectManagerGroup::PostMessageAll( const char* pData, uint32 nDataLen, u
 	App_BuffPacketManager::instance()->Delete(pBuffPacket);
 
 	return true;
+}
+
+bool CConnectManagerGroup::SetConnectName(uint32 u4ConnectID, const char* pName)
+{
+	//判断命中到哪一个线程组里面去
+	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
+
+	mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
+	if(f == m_mapConnectManager.end())
+	{
+		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnect]Out of range Queue ID.\n"));
+		return false;
+	}
+
+	CConnectManager* pConnectManager = (CConnectManager* )f->second;
+	if(NULL == pConnectManager)
+	{
+		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnect]No find send Queue object.\n"));
+		return false;		
+	}	
+
+	return pConnectManager->SetConnectName(u4ConnectID, pName);	
+}
+
+bool CConnectManagerGroup::SetIsLog(uint32 u4ConnectID, bool blIsLog)
+{
+	//判断命中到哪一个线程组里面去
+	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
+
+	mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
+	if(f == m_mapConnectManager.end())
+	{
+		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnect]Out of range Queue ID.\n"));
+		return false;
+	}
+
+	CConnectManager* pConnectManager = (CConnectManager* )f->second;
+	if(NULL == pConnectManager)
+	{
+		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnect]No find send Queue object.\n"));
+		return false;		
+	}	
+
+	return pConnectManager->SetIsLog(u4ConnectID, blIsLog);		
+}
+
+void CConnectManagerGroup::GetClientNameInfo(const char* pName, vecClientNameInfo& objClientNameInfo)
+{
+	objClientNameInfo.clear();
+	//全部查找
+	for(mapConnectManager::iterator b = m_mapConnectManager.begin(); b != m_mapConnectManager.end(); b++)
+	{
+		CConnectManager* pConnectManager = (CConnectManager* )b->second;
+		if(NULL != pConnectManager)
+		{
+			pConnectManager->GetClientNameInfo(pName, objClientNameInfo);
+		}
+	}	
 }
