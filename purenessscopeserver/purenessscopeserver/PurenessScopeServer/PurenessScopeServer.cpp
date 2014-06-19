@@ -20,6 +20,11 @@
 #include <sys/resource.h>
 #include "ServerManager.h"
 
+static void sig_term(int /*sigNo*/)
+{
+    App_ServerManager::instance()->Close();
+}
+
 int CheckCoreLimit(int nMaxCoreFile)
 {
 	//获得当前Core大小设置
@@ -152,81 +157,7 @@ int Checkfilelimit(int nMaxOpenFile)
 	return 0;
 }
 
-/*
-static int daemonize()
-{
-	pid_t pid, sid;
-	int fd;
 
-	pid = fork();
-	switch (pid) {
-	case -1:
-		printf("[daemonize]fork() failed: %s", strerror(errno));
-		return -1;
-
-	case 0:
-		break;
-	default:
-		_exit(0);
-	}
-
-	sid = setsid();
-	if (sid < 0) {
-		printf("[daemonize]setsid() failed: %s", strerror(errno));
-		return -1;
-	}
-
-	if (signal(SIGHUP, SIG_IGN) == SIG_ERR) {
-		printf("[daemonize]signal(SIGHUP, SIG_IGN) failed: %s", strerror(errno));
-		return -1;
-	}
-
-	int status = chdir("/");
-	if (status < 0) {
-		printf("chdir(\"/\") failed: %s", strerror(errno));
-		return -1;
-	}    
-
-	umask(0);
-
-	fd = open("/dev/null", O_RDWR);
-	if (fd < 0) {
-		printf("[daemonize]open(\"/dev/null\") failed: %s", strerror(errno));
-		return -1;
-	}
-
-	status = dup2(fd, STDIN_FILENO);
-	if (status < 0) {
-		printf("[daemonize]dup2(%d, STDIN) failed: %s", fd, strerror(errno));
-		close(fd);
-		return -1;
-	}
-
-	status = dup2(fd, STDOUT_FILENO);
-	if (status < 0) {
-		printf("[daemonize]dup2(%d, STDOUT) failed: %s", fd, strerror(errno));
-		close(fd);
-		return -1;
-	}
-
-	status = dup2(fd, STDERR_FILENO);
-	if (status < 0) {
-		printf("[daemonize]dup2(%d, STDERR) failed: %s", fd, strerror(errno));
-		close(fd);
-		return -1;
-	}
-
-	if (fd > STDERR_FILENO) {
-		status = close(fd);
-		if (status < 0) {
-			printf("[daemonize]close(%d) failed: %s", fd, strerror(errno));
-			return -1;
-		}
-	}
-
-	return 0;    
-}
-*/
 
 int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 {
@@ -252,20 +183,11 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 		App_MainConfig::instance()->Display();
 	}
 
-	//是否打开ACE_DEBUG文件存储
-	Frame_Logging_Strategy objFrameLoggingStrategy;
-	Logging_Config_Param objParam;
-
-	if(App_MainConfig::instance()->GetDebugTrunOn() == 1)
-	{
-		sprintf_safe(objParam.m_strLogFile, 256, "%s", App_MainConfig::instance()->GetDebugFileName());
-		objParam.m_iChkInterval    = App_MainConfig::instance()->GetChkInterval();
-		objParam.m_iLogFileMaxCnt  = App_MainConfig::instance()->GetLogFileMaxCnt();
-		objParam.m_iLogFileMaxSize = App_MainConfig::instance()->GetLogFileMaxSize();
-		sprintf_safe(objParam.m_strLogLevel, 128, "%s", App_MainConfig::instance()->GetDebugLevel());
-
-		objFrameLoggingStrategy.InitLogStrategy(objParam);
-	}
+	/*
+	#ifndef WIN32	
+	    signal(SIGTERM, sig_term);
+	#endif //WIN32
+	*/
 
 	//判断当前并行连接数是否支持框架
 	if(-1 == Checkfilelimit(App_MainConfig::instance()->GetMaxHandlerCount()))
@@ -343,21 +265,6 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 		App_MainConfig::instance()->Display();
 	}
 
-	//是否打开ACE_DEBUG文件存储
-	Frame_Logging_Strategy objFrameLoggingStrategy;
-	Logging_Config_Param objParam;
-
-	if(App_MainConfig::instance()->GetDebugTrunOn() == 1)
-	{
-		sprintf_safe(objParam.m_strLogFile, 256, "%s", App_MainConfig::instance()->GetDebugFileName());
-		objParam.m_iChkInterval    = App_MainConfig::instance()->GetChkInterval();
-		objParam.m_iLogFileMaxCnt  = App_MainConfig::instance()->GetLogFileMaxCnt();
-		objParam.m_iLogFileMaxSize = App_MainConfig::instance()->GetLogFileMaxSize();
-		sprintf_safe(objParam.m_strLogLevel, 128, "%s", App_MainConfig::instance()->GetDebugLevel());
-
-		objFrameLoggingStrategy.InitLogStrategy(objParam);
-	}
-
 	//判断是否是需要以服务的状态启动
 	if(App_MainConfig::instance()->GetServerType() == 1)
 	{
@@ -370,8 +277,9 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 		//正常启动
 		ServerMain();
 	}
-
-
+ 
+	//等待服务结束	
+	ACE_Thread_Manager::instance()->wait();
 	return 0;
 }
 

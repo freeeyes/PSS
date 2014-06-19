@@ -38,7 +38,7 @@ public:
     void SetServerConnectState(EM_Server_Connect_State objState);                          //设置当前连接状态
 
 private:
-	ACE_INET_Addr              m_AddrLocal;              //本地的连接地址（可以指定）
+		ACE_INET_Addr              m_AddrLocal;              //本地的连接地址（可以指定）
     ACE_INET_Addr              m_AddrServer;             //远程服务器的地址
     CConnectClient*            m_pConnectClient;         //当前链接对象
     CConnectClientConnector*   m_pReactorConnect;        //Connector链接对象

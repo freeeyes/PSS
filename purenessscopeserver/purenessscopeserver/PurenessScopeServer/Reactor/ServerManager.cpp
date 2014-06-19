@@ -1,4 +1,5 @@
 #include "ServerManager.h"
+#include "Frame_Logging_Strategy.h"
 
 CServerManager::CServerManager(void)
 {
@@ -12,6 +13,20 @@ CServerManager::~CServerManager(void)
 
 bool CServerManager::Init()
 {
+	//是否打开ACE_DEBUG文件存储
+	Logging_Config_Param objParam;
+
+	if(App_MainConfig::instance()->GetDebugTrunOn() == 1)
+	{
+		sprintf_safe(objParam.m_strLogFile, 256, "%s", App_MainConfig::instance()->GetDebugFileName());
+		objParam.m_iChkInterval    = App_MainConfig::instance()->GetChkInterval();
+		objParam.m_iLogFileMaxCnt  = App_MainConfig::instance()->GetLogFileMaxCnt();
+		objParam.m_iLogFileMaxSize = App_MainConfig::instance()->GetLogFileMaxSize();
+		sprintf_safe(objParam.m_strLogLevel, 128, "%s", App_MainConfig::instance()->GetDebugLevel());
+
+		objFrameLoggingStrategy.InitLogStrategy(objParam);
+	}
+	
 		OUR_DEBUG((LM_INFO, "[CServerManager::Init]1111.\n"));
 		
     int nServerPortCount    = App_MainConfig::instance()->GetServerPortCount();
@@ -184,12 +199,11 @@ bool CServerManager::Init()
 
 bool CServerManager::Start()
 {
-    //注册信号量
-    if (0 != App_SigHandler::instance()->RegisterSignal(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_CLIENTDEFINE)))
+  	if (0 != App_SigHandler::instance()->RegisterSignal(ACE_Reactor::instance()))
     {
         return false;
-    }
-
+    }	
+		
     //启动TCP监听
     int nServerPortCount = App_MainConfig::instance()->GetServerPortCount();
 
@@ -335,15 +349,6 @@ bool CServerManager::Start()
         AppLogManager::instance()->WriteLog(LOG_SYSTEM, "[CServerManager::Init]AppLogManager is OK.");
     }
 
-    /*
-    //设置定时器策略(使用高精度定时器)
-    (void) ACE_High_Res_Timer::global_scale_factor ();
-    auto_ptr<ACE_Timer_Heap_Variable_Time_Source> tq(new ACE_Timer_Heap_Variable_Time_Source);
-    tq->set_time_policy(&ACE_High_Res_Timer::gettimeofday_hr);
-    App_TimerManager::instance()->timer_queue(tq);
-    tq.release();
-    */
-
     //启动定时器
     if (0 != App_TimerManager::instance()->activate())
     {
@@ -351,7 +356,7 @@ bool CServerManager::Start()
         return false;
     }
 
-    //先启动其他的Reactor，最后启动原始的Reactor，因为原始的会挂起线程，所以最后启动一下。
+    //启动所有Reactor对象
     if (!App_ReactorManager::instance()->StartReactor())
     {
         OUR_DEBUG((LM_INFO, "[CServerManager::Start]App_ReactorManager::instance()->StartReactor is error.\n"));
@@ -361,6 +366,7 @@ bool CServerManager::Start()
     //启动中间服务器链接管理器
     App_ClientReConnectManager::instance()->Init(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_POSTDEFINE));
     App_ClientReConnectManager::instance()->StartConnectTask(App_MainConfig::instance()->GetConnectServerCheck());
+    
     //初始化模块加载，因为这里可能包含了中间服务器连接加载
     bool blState = App_ModuleLoader::instance()->LoadModule(App_MainConfig::instance()->GetModulePath(), App_MainConfig::instance()->GetModuleString());
 
@@ -369,19 +375,15 @@ bool CServerManager::Start()
         OUR_DEBUG((LM_INFO, "[CServerManager::Start]LoadModule is error.\n"));
         return false;
     }
-
+		
     //开始消息处理线程
     App_MessageServiceGroup::instance()->Start();
     //开始启动链接发送定时器
     App_ConnectManager::instance()->StartTimer();
     //最后启动反应器
     OUR_DEBUG((LM_INFO, "[CServerManager::Start]App_ReactorManager::instance()->StartReactorDefault begin....\n"));
-
-    if (!App_ReactorManager::instance()->StartReactorDefault())
-    {
-        OUR_DEBUG((LM_INFO, "[CServerManager::Start]App_ReactorManager::instance()->StartReactorDefault is error.\n"));
-        return false;
-    }
+		
+    ACE_Thread_Manager::instance()->wait();
 
     return true;
 }
@@ -415,5 +417,7 @@ bool CServerManager::Close()
 	App_ReactorManager::instance()->StopReactor();
 	OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ReactorManager OK.\n"));	
 	OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close end....\n"));
+
+	objFrameLoggingStrategy.EndLogStrategy();
 	return true;
 }

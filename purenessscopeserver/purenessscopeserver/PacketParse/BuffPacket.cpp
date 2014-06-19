@@ -598,11 +598,7 @@ CBuffPacket& CBuffPacket::operator >> (string& str)
 
 	if(u4Len && m_u4ReadPtr <= m_u4WritePtr - u4Len)
 	{
-		char* pTemp = new char[u4Len + 1];
-		ACE_OS::memcpy(pTemp, (char* )ReadPtr(), u4Len);
-		pTemp[u4Len] = '\0';
-		str = (string)str;
-		delete pTemp;
+		str = string((char* )ReadPtr(), u4Len);
 		ReadPtr((uint32)u4Len);
 	}
 

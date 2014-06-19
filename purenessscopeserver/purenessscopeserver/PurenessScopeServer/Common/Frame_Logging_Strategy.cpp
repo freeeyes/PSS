@@ -17,6 +17,7 @@ static void *run_reactor (void *pReactor)
     pLogReactor->owner(ACE_Thread_Manager::instance ()->thr_self());
     pLogReactor->run_reactor_event_loop ();
 
+    ACE_DEBUG((LM_INFO, ACE_TEXT("(%P|%t) %M run_reactor exit[%N,%l]\n")));
     return 0;
 }
 
@@ -44,7 +45,7 @@ Logging_Config_Param::Logging_Config_Param()
 
 Logging_Config_Param::~Logging_Config_Param()
 {
-
+   ACE_DEBUG((LM_INFO, ACE_TEXT("(%P|%t) %M ~Logging_Config_Param[%N,%l]\n")));
 }
 
 //»’÷æ≤ﬂ¬‘
@@ -147,7 +148,8 @@ int Frame_Logging_Strategy::InitLogStrategy(Logging_Config_Param &ConfigParam)
     ACE_NEW_RETURN (pImpl, ACE_TP_Reactor, -1);
     
 
-    ACE_NEW_RETURN(pLogStraReactor, ACE_Reactor(pImpl ,1), -1);
+    //ACE_NEW_RETURN(pLogStraReactor, ACE_Reactor(pImpl ,1), -1);
+    ACE_NEW_RETURN(pLogStraReactor, ACE_Reactor, -1);
     ACE_NEW_RETURN(pLogStrategy, My_ACE_Logging_Strategy, -1);
 
     //Set Reactor

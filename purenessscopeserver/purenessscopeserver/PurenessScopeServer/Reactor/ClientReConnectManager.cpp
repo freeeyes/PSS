@@ -618,6 +618,7 @@ void CClientReConnectManager::Close()
 
     m_mapConnectInfo.clear();
     m_mapReactorUDPConnectInfo.clear();
+    m_ActiveTimer.deactivate();
     OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]End.\n"));
 }
 

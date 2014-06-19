@@ -178,8 +178,12 @@ int CLogManager::svc(void)
 
 int CLogManager::Close()
 {
-	msg_queue()->deactivate();
-	msg_queue()->flush();
+	if(m_blRun == true)
+	{
+		msg_queue()->deactivate();
+		msg_queue()->flush();
+		m_blRun = false;
+	}
 	return 0;
 }
 
