@@ -222,6 +222,13 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 	{
 		OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open]IP connect frequently.\n", m_addrRemote.get_host_addr()));
 		App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), App_MainConfig::instance()->GetIPAlert()->m_u4IPTimeout);
+		
+		//发送告警邮件
+		AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT, 
+			App_MainConfig::instance()->GetIPAlert()->m_u4MailID,
+			"Alert IP",
+			"[CConnectHandler::open] IP is more than IP Max,");		
+		
 		Close();
 		return;
 	}
@@ -830,7 +837,15 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 	if(false == m_TimeConnectInfo.SendCheck((uint8)dtNow.minute(), 1, pMbData->length()))
 	{
 		//超过了限定的阀值，需要关闭链接，并记录日志
-		AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECTABNORMAL, "[TCP]IP=%s,Prot=%d,SendPacketCount=%d, SendSize=%d.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_TimeConnectInfo.m_u4SendPacketCount, m_TimeConnectInfo.m_u4SendSize);
+		AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECTABNORMAL, 
+			App_MainConfig::instance()->GetClientDataAlert()->m_u4MailID, 
+			"Alert",
+			"[TCP]IP=%s,Prot=%d,SendPacketCount=%d, SendSize=%d.", 
+			m_addrRemote.get_host_addr(), 
+			m_addrRemote.get_port_number(), 
+			m_TimeConnectInfo.m_u4SendPacketCount, 
+			m_TimeConnectInfo.m_u4SendSize);
+		
 		//设置封禁时间
 		App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), App_MainConfig::instance()->GetIPAlert()->m_u4IPTimeout);
 		OUR_DEBUG((LM_ERROR, "[CProConnectHandle::PutSendPacket] ConnectID = %d, Send Data is more than limit.\n", GetConnectID()));
@@ -956,7 +971,16 @@ bool CProConnectHandle::CheckMessage()
 		if(false == m_TimeConnectInfo.RecvCheck((uint8)dtNow.minute(), 1, m_u4AllRecvSize))
 		{
 			//超过了限定的阀值，需要关闭链接，并记录日志
-			AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECTABNORMAL, "[TCP]IP=%s,Prot=%d,PacketCount=%d, RecvSize=%d.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_TimeConnectInfo.m_u4RecvPacketCount, m_TimeConnectInfo.m_u4RecvSize);
+			AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECTABNORMAL, 
+				App_MainConfig::instance()->GetClientDataAlert()->m_u4MailID,
+				"Alert", 
+				"[TCP]IP=%s,Prot=%d,PacketCount=%d, RecvSize=%d.", 
+				m_addrRemote.get_host_addr(), 
+				m_addrRemote.get_port_number(), 
+				m_TimeConnectInfo.m_u4RecvPacketCount, 
+				m_TimeConnectInfo.m_u4RecvSize);
+
+
 			App_PacketParsePool::instance()->Delete(m_pPacketParse);
 			//设置封禁时间
 			App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), App_MainConfig::instance()->GetIPAlert()->m_u4IPTimeout);
@@ -1393,15 +1417,45 @@ int CProConnectManager::handle_timeout(const ACE_Time_Value &tv, const void *arg
 	}
 
 	//检测单位时间连接数是否超越阀值
-	if(App_ConnectAccount::instance()->CheckConnectCount() == false)
+	int nCheckRet = App_ConnectAccount::instance()->CheckConnectCount();
+	if(nCheckRet == 1)
 	{
-		AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "[CProConnectManager]CheckConnectCount is more than limit.");
+		AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
+			App_MainConfig::instance()->GetConnectAlert()->m_u4MailID,
+			"Alert",
+			"[CProConnectManager]CheckConnectCount is more than limit(%d > %d).", 
+			App_ConnectAccount::instance()->GetCurrConnect(),
+			App_ConnectAccount::instance()->GetConnectMax());
+	}
+	else if(nCheckRet == 2)
+	{
+		AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
+			App_MainConfig::instance()->GetConnectAlert()->m_u4MailID,
+			"Alert",
+			"[CProConnectManager]CheckConnectCount is little than limit(%d < %d).", 
+			App_ConnectAccount::instance()->GetCurrConnect(),
+			App_ConnectAccount::instance()->Get4ConnectMin());
 	}
 
 	//检测单位时间连接断开数是否超越阀值
-	if(App_ConnectAccount::instance()->CheckDisConnectCount() == false)
+	nCheckRet = App_ConnectAccount::instance()->CheckDisConnectCount();
+	if(nCheckRet == 1)
 	{
-		AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "[CProConnectManager]CheckDisConnectCount is more than limit.");
+		AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
+			App_MainConfig::instance()->GetConnectAlert()->m_u4MailID,
+			"Alert",
+			"[CProConnectManager]CheckDisConnectCount is more than limit(%d > %d).", 
+			App_ConnectAccount::instance()->GetCurrConnect(),
+			App_ConnectAccount::instance()->GetDisConnectMax());
+	}
+	else if(nCheckRet == 2)
+	{
+		AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
+			App_MainConfig::instance()->GetConnectAlert()->m_u4MailID,
+			"Alert",
+			"[CProConnectManager]CheckDisConnectCount is little than limit(%d < %d).", 
+			App_ConnectAccount::instance()->GetCurrConnect(),
+			App_ConnectAccount::instance()->GetDisConnectMin());
 	}
 
 	return 0;

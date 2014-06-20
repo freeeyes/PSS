@@ -133,27 +133,13 @@ int CAceProactor::svc()
 bool CAceProactor::Start()
 {
 	OUR_DEBUG((LM_INFO, "[CAceProactor::Start] ProactorID = [%d] ProactorType = [%d] nThreadCount = [%d] Start!\n", GetProactorID(), m_nProactorType, m_nThreadCount));
-	if(m_nThreadCount > 0)
+	if(0 == open())
 	{
-		if(0 == open())
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return true;
 	}
 	else
 	{
-		if(0 == svc())
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return false;
 	}
 }
 
@@ -230,11 +216,6 @@ bool CAceProactorManager::AddNewProactor(int nProactorID, int nProactorType, int
 		return false;
 	}
 
-	if(nProactorID == REACTOR_CLIENTDEFINE)
-	{
-		nThreadCount = 0;
-	}
-
 	pAceProactor->SetProactorID((uint32)nProactorID);
 	bool blState = pAceProactor->Init(nProactorType, nThreadCount);
 	if(!blState)
@@ -265,9 +246,8 @@ bool CAceProactorManager::StartProactor()
 	//先启动非总的Rector
 	for(b; b!= e; b++)
 	{
-		int nProactorID           = (int)b->first;
 		CAceProactor* pAceProactor = (CAceProactor* )b->second;
-		if(NULL != pAceProactor && nProactorID != REACTOR_CLIENTDEFINE)
+		if(NULL != pAceProactor)
 		{
 			pAceProactor->Start();
 		}

@@ -57,6 +57,7 @@ struct _CommandAlertData
 {
 	uint16 m_u2CommandID;
 	uint32 m_u4CommandCount;
+	uint32 m_u4MailID;
 	uint32 m_u4CurrCount;
 	uint8  m_u1Minute;
 
@@ -64,6 +65,7 @@ struct _CommandAlertData
 	{
 		m_u2CommandID    = 0;
 		m_u4CommandCount = 0;
+		m_u4MailID       = 0;
 		m_u4CurrCount    = 0;
 		m_u1Minute       = 0;
 	}
@@ -79,7 +81,7 @@ public:
 	~CCommandAccount();
 
 	void Init(uint8 u1CommandAccount, uint8 u1Flow, uint16 u2RecvTimeout);
-	void AddCommandAlert(uint16 u2CommandID, uint32 u4Count);
+	void AddCommandAlert(uint16 u2CommandID, uint32 u4Count, uint32 u4MailID);
 
 	bool   SaveCommandData(uint16 u2CommandID, uint64 u8CommandCost, uint8 u1PacketType = PACKET_TCP, uint32 u4PacketSize = 0, uint32 u4CommandSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN, ACE_Time_Value tvTime = ACE_OS::gettimeofday());   //记录命令执行信息
 	bool   SaveCommandData_Mutex(uint16 u2CommandID, uint64 u8CommandCost, uint8 u1PacketType = PACKET_TCP, uint32 u4PacketSize = 0, uint32 u4CommandSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN, ACE_Time_Value tvTime = ACE_OS::gettimeofday());   //记录命令执行信息

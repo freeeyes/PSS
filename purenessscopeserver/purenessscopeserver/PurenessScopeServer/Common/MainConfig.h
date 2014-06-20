@@ -57,6 +57,7 @@ struct _ConnectAlert
 	uint32 m_u4ConnectMax;
 	uint32 m_u4DisConnectMin;
 	uint32 m_u4DisConnectMax;
+	uint32 m_u4MailID;
 
 	_ConnectAlert()
 	{
@@ -64,6 +65,7 @@ struct _ConnectAlert
 		m_u4ConnectMax    = 0;
 		m_u4DisConnectMin = 0;
 		m_u4DisConnectMax = 0;
+		m_u4MailID        = 0;
 	}
 };
 
@@ -72,11 +74,13 @@ struct _IPAlert
 {
 	uint32 m_u4IPMaxCount;
 	uint32 m_u4IPTimeout;
+	uint32 m_u4MailID;
 
 	_IPAlert()
 	{
 		m_u4IPMaxCount = 0;
 		m_u4IPTimeout  = 0;
+		m_u4MailID     = 0;
 	}
 };
 
@@ -87,6 +91,7 @@ struct _ClientDataAlert
 	uint32 m_u4RecvDataMax;
 	uint32 m_u4SendPacketCount;
 	uint32 m_u4SendDataMax;
+	uint32 m_u4MailID;
 
 	_ClientDataAlert()
 	{
@@ -94,6 +99,7 @@ struct _ClientDataAlert
 		m_u4RecvDataMax     = 0;
 		m_u4SendPacketCount = 0;
 		m_u4SendDataMax     = 0;
+		m_u4MailID          = 0;
 	}
 };
 
@@ -102,11 +108,13 @@ struct _CommandAlert
 {
 	uint16 m_u2CommandID;
 	uint32 m_u4CommandCount;
+	uint32 m_u4MailID;
 
 	_CommandAlert()
 	{
 		m_u2CommandID    = 0;
 		m_u4CommandCount = 0;
+		m_u4MailID       = 0;
 	}
 };
 typedef vector<_CommandAlert> vecCommandAlert;

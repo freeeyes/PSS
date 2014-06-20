@@ -262,10 +262,12 @@ class CConnectAccount
 public:
 	CConnectAccount()
 	{
-		m_u4ConnectMin    = 0;
-		m_u4ConnectMax    = 0;
-		m_u4DisConnectMin = 0;
-		m_u4DisConnectMax = 0;
+		m_u4ConnectMin     = 0;
+		m_u4ConnectMax     = 0;
+		m_u4DisConnectMin  = 0;
+		m_u4DisConnectMax  = 0;
+		m_u4CurrConnect    = 0;
+		m_u4CurrDisConnect = 0;
 	};
 
 	~CConnectAccount()
@@ -273,12 +275,44 @@ public:
 
 	}
 
+	uint32 Get4ConnectMin()
+	{
+		return m_u4ConnectMin;
+	}
+
+	uint32 GetConnectMax()
+	{
+		return m_u4ConnectMax;
+	}
+
+	uint32 GetDisConnectMin()
+	{
+		return m_u4DisConnectMin;
+	}
+
+	uint32 GetDisConnectMax()
+	{
+		return m_u4DisConnectMax;
+	}
+
+	uint32 GetCurrConnect()
+	{
+		return m_u4CurrConnect;
+	}
+
+	uint32 GetCurrDisConnect()
+	{
+		return m_u4CurrDisConnect;
+	}
+
 	void Init(uint32 u4ConnectMin, uint32 u4ConnectMax, uint32 u4DisConnectMin, uint32 u4DisConnectMax)
 	{
-		m_u4ConnectMin    = u4ConnectMin;
-		m_u4ConnectMax    = u4ConnectMax;
-		m_u4DisConnectMin = u4DisConnectMin;
-		m_u4DisConnectMax = u4DisConnectMax;
+		m_u4ConnectMin     = u4ConnectMin;
+		m_u4ConnectMax     = u4ConnectMax;
+		m_u4DisConnectMin  = u4DisConnectMin;
+		m_u4DisConnectMax  = u4DisConnectMax;
+		m_u4CurrConnect    = 0;
+		m_u4CurrDisConnect = 0;
 
 		ACE_Date_Time  dtLastTime;
 		m_u1Minute = (uint8)dtLastTime.minute();
@@ -330,42 +364,54 @@ public:
 		}
 	}
 	
-	bool CheckConnectCount()
+	int CheckConnectCount()
 	{
 		if(m_u4ConnectMax > 0)
 		{
 			if(m_u4CurrConnect > m_u4ConnectMax)
 			{
-				return false;
+				return 1;   //1为超越max上限
 			}
-			else
+		}
+
+		if(m_u4ConnectMin > 0)
+		{
+			if(m_u4CurrConnect < m_u4ConnectMin)
 			{
-				return true;
+				return 2;    //2为低于min下限
 			}
 		}
 		else
 		{
-			return true;
+			return 0;
 		}
+
+		return 0;
 	}
 
-	bool CheckDisConnectCount()
+	int CheckDisConnectCount()
 	{
 		if(m_u4DisConnectMax > 0)
 		{
 			if(m_u4CurrDisConnect > m_u4DisConnectMax)
 			{
-				return false;
-			}
-			else
+				return 1;    //1为超越max上限
+			} 
+		}
+
+		if(m_u4ConnectMin > 0)
+		{
+			if(m_u4CurrDisConnect < m_u4DisConnectMin)
 			{
-				return true;
+				return 2;    //2为低于min下限
 			}
 		}
 		else
 		{
-			return true;
+			return 0;
 		}
+
+		return 0;
 	}
 
 private:

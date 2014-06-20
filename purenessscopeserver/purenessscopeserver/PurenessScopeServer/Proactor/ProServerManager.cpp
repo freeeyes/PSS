@@ -30,47 +30,22 @@ bool CProServerManager::Init()
 	for(int i = 0 ; i < nReactorCount; i++)
 	{
 		OUR_DEBUG((LM_INFO, "[CProServerManager::Init()]... i=[%d].\n",i));
-		if(i == 0)
-		{
-			//这里区分操作系统版本，使用不同的反应器
-			if(App_MainConfig::instance()->GetNetworkMode() == NETWORKMODE_PRO_IOCP)
-			{
-				blState = App_ProactorManager::instance()->AddNewProactor(REACTOR_CLIENTDEFINE, Proactor_WIN32, 0);
-				OUR_DEBUG((LM_INFO, "[CProServerManager::Init]AddNewProactor NETWORKMODE = Proactor_WIN32.\n"));
-			}
-			else
-			{
-				OUR_DEBUG((LM_INFO, "[CProServerManager::Init]AddNewProactor NETWORKMODE Error.\n"));
-				return false;
-			}
 
-			//linux下的posix，暂时注释，因为linux对posix支持不完整，所以这种模式暂时不考虑。
-			//blState = App_ProactorManager::instance()->AddNewProactor(REACTOR_CLIENTDEFINE, Proactor_POSIX, 0);
-			//OUR_DEBUG((LM_INFO, "[CProServerManager::Init]AddNewProactor REACTOR_CLIENTDEFINE = Proactor_POSIX.\n"));			
-			if(!blState)
-			{
-				OUR_DEBUG((LM_INFO, "[CProServerManager::Init]AddNewProactor NETWORKMODE Error.\n"));
-				return false;
-			}
+		if(App_MainConfig::instance()->GetNetworkMode() == NETWORKMODE_PRO_IOCP)
+		{
+			blState = App_ProactorManager::instance()->AddNewProactor(i, Proactor_WIN32, 1);
+			OUR_DEBUG((LM_INFO, "[CProServerManager::Init]AddNewProactor NETWORKMODE = Proactor_WIN32.\n"));
 		}
 		else
 		{
-			if(App_MainConfig::instance()->GetNetworkMode() == NETWORKMODE_PRO_IOCP)
-			{
-				blState = App_ProactorManager::instance()->AddNewProactor(i, Proactor_WIN32, 1);
-				OUR_DEBUG((LM_INFO, "[CProServerManager::Init]AddNewProactor NETWORKMODE = Proactor_WIN32.\n"));
-			}
-			else
-			{
-				OUR_DEBUG((LM_INFO, "[CProServerManager::Init]AddNewProactor NETWORKMODE Error.\n"));
-				return false;
-			}
+			OUR_DEBUG((LM_INFO, "[CProServerManager::Init]AddNewProactor NETWORKMODE Error.\n"));
+			return false;
+		}
 
-			if(!blState)
-			{
-				OUR_DEBUG((LM_INFO, "[CProServerManager::Init]AddNewProactor [%d] Error.\n", i));
-				return false;
-			}
+		if(!blState)
+		{
+			OUR_DEBUG((LM_INFO, "[CProServerManager::Init]AddNewProactor [%d] Error.\n", i));
+			return false;
 		}
 	}
 
@@ -125,7 +100,9 @@ bool CProServerManager::Init()
 	}
 
 	//初始化统计模块功能
-	App_CommandAccount::instance()->Init(App_MainConfig::instance()->GetCommandAccount(), App_MainConfig::instance()->GetCommandFlow(), App_MainConfig::instance()->GetPacketTimeOut());
+	App_CommandAccount::instance()->Init(App_MainConfig::instance()->GetCommandAccount(), 
+		App_MainConfig::instance()->GetCommandFlow(), 
+		App_MainConfig::instance()->GetPacketTimeOut());
 	
 	//初始化CommandID告警阀值相关
 	for(int i = 0; i < (int)App_MainConfig::instance()->GetCommandAlertCount(); i++)
@@ -133,7 +110,9 @@ bool CProServerManager::Init()
 		_CommandAlert* pCommandAlert = App_MainConfig::instance()->GetCommandAlert(i);
 		if(NULL != pCommandAlert)
 		{
-			App_CommandAccount::instance()->AddCommandAlert(pCommandAlert->m_u2CommandID, pCommandAlert->m_u4CommandCount);
+			App_CommandAccount::instance()->AddCommandAlert(pCommandAlert->m_u2CommandID, 
+				pCommandAlert->m_u4CommandCount,
+				pCommandAlert->m_u4MailID);
 		}
 	}
 
@@ -338,13 +317,6 @@ bool CProServerManager::Start()
 		return false;
 	}
 
-	//先启动其他的Proactor，最后启动原始的Proactor，因为原始的会挂起线程，所以最后启动一下。
-	if(!App_ProactorManager::instance()->StartProactor())
-	{
-		OUR_DEBUG((LM_INFO, "[CProServerManager::Start]App_ProactorManager::instance()->StartProactor is error.\n"));
-		return false;
-	}
-
 	//启动中间服务器链接管理器
 	App_ClientProConnectManager::instance()->Init(App_ProactorManager::instance()->GetAce_Proactor(REACTOR_POSTDEFINE));
 	App_ClientProConnectManager::instance()->StartConnectTask(App_MainConfig::instance()->GetConnectServerCheck());
@@ -364,10 +336,9 @@ bool CProServerManager::Start()
 	App_ProConnectManager::instance()->StartTimer();
 
 	//最后启动反应器
-	OUR_DEBUG((LM_INFO, "[CProServerManager::Start]App_ProactorManager::instance()->StartProactorDefault begin....\n"));
-	if(!App_ProactorManager::instance()->StartProactorDefault())
+	if(!App_ProactorManager::instance()->StartProactor())
 	{
-		OUR_DEBUG((LM_INFO, "[CProServerManager::Start]App_ProactorManager::instance()->StartProactorDefault is error.\n"));
+		OUR_DEBUG((LM_INFO, "[CProServerManager::Start]App_ProactorManager::instance()->StartProactor is error.\n"));
 		return false;
 	}
 

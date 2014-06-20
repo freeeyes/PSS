@@ -33,7 +33,7 @@ void CCommandAccount::Init(uint8 u1CommandAccount, uint8 u1Flow, uint16 u2Packet
 	m_vecCommandAlertData.clear();
 }
 
-void CCommandAccount::AddCommandAlert(uint16 u2CommandID, uint32 u4Count)
+void CCommandAccount::AddCommandAlert(uint16 u2CommandID, uint32 u4Count, uint32 u4MailID)
 {
 	if(u4Count > 0)
 	{
@@ -41,6 +41,7 @@ void CCommandAccount::AddCommandAlert(uint16 u2CommandID, uint32 u4Count)
 
 		objCommandAlertData.m_u2CommandID    = u2CommandID;
 		objCommandAlertData.m_u4CommandCount = u4Count;
+		objCommandAlertData.m_u4MailID       = u4MailID;
 
 		m_vecCommandAlertData.push_back(objCommandAlertData);
 	}
@@ -181,7 +182,10 @@ bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint64 u8CommandCost, 
 						//如果大于阀值，则记录日志，并且归零当前计数器
 						m_vecCommandAlertData[i].m_u4CurrCount = 0;
 
-						AppLogManager::instance()->WriteLog(LOG_SYSTEM_PACKETTIME, "u2CommandID=%d, m_u4CommandCount more than [%d].", 
+						AppLogManager::instance()->WriteToMail(LOG_SYSTEM_PACKETTIME, 
+							m_vecCommandAlertData[i].m_u4MailID,
+							(char* )"Alert",
+							"u2CommandID=%d, m_u4CommandCount more than [%d].", 
 							u2CommandID, 
 							(uint32) m_vecCommandAlertData[i].m_u4CommandCount);
 					}

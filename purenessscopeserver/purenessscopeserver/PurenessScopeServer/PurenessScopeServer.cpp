@@ -20,11 +20,6 @@
 #include <sys/resource.h>
 #include "ServerManager.h"
 
-static void sig_term(int /*sigNo*/)
-{
-    App_ServerManager::instance()->Close();
-}
-
 int CheckCoreLimit(int nMaxCoreFile)
 {
 	//获得当前Core大小设置

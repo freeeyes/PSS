@@ -605,6 +605,7 @@ void CClientProConnectManager::Close()
 		SAFE_DELETE(pClientInfo);
 	}
 
+	m_ActiveTimer.deactivate();
 	m_mapClientInfo.clear();
 	m_mapProactorUDPClientInfo.clear();
 }

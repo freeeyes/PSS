@@ -136,7 +136,9 @@ bool CServerManager::Init()
     }
 
     //初始化统计模块功能
-    App_CommandAccount::instance()->Init(App_MainConfig::instance()->GetCommandAccount(), App_MainConfig::instance()->GetCommandFlow(), App_MainConfig::instance()->GetPacketTimeOut());
+    App_CommandAccount::instance()->Init(App_MainConfig::instance()->GetCommandAccount(), 
+		App_MainConfig::instance()->GetCommandFlow(), 
+		App_MainConfig::instance()->GetPacketTimeOut());
     
 	//初始化CommandID告警阀值相关
 	for(int i = 0; i < (int)App_MainConfig::instance()->GetCommandAlertCount(); i++)
@@ -144,7 +146,9 @@ bool CServerManager::Init()
 		_CommandAlert* pCommandAlert = App_MainConfig::instance()->GetCommandAlert(i);
 		if(NULL != pCommandAlert)
 		{
-			App_CommandAccount::instance()->AddCommandAlert(pCommandAlert->m_u2CommandID, pCommandAlert->m_u4CommandCount);
+			App_CommandAccount::instance()->AddCommandAlert(pCommandAlert->m_u2CommandID, 
+				pCommandAlert->m_u4CommandCount,
+				pCommandAlert->m_u4MailID);
 		}
 	}	
 	

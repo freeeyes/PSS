@@ -159,6 +159,11 @@ bool CMainConfig::Init_Alert(const char* szConfigPath)
 	{
 		m_ConnectAlert.m_u4DisConnectMax = (uint32)ACE_OS::atoi(pData);
 	}
+	pData = m_MainConfig.GetData("AlertConnect", "MailID");
+	if(NULL != pData)
+	{
+		m_ConnectAlert.m_u4MailID = (uint32)ACE_OS::atoi(pData);
+	}
 
 	//IP相关信息
 	pData = m_MainConfig.GetData("IP", "IPMax");
@@ -170,6 +175,11 @@ bool CMainConfig::Init_Alert(const char* szConfigPath)
 	if(NULL != pData)
 	{
 		m_IPAlert.m_u4IPTimeout = (uint32)ACE_OS::atoi(pData);
+	}
+	pData = m_MainConfig.GetData("IP", "MailID");
+	if(NULL != pData)
+	{
+		m_IPAlert.m_u4MailID = (uint32)ACE_OS::atoi(pData);
 	}
 
 	//单链接相关阀值配置
@@ -193,11 +203,17 @@ bool CMainConfig::Init_Alert(const char* szConfigPath)
 	{
 		m_ClientDataAlert.m_u4SendDataMax = (uint32)ACE_OS::atoi(pData);
 	}
+	pData = m_MainConfig.GetData("ClientData", "MailID");
+	if(NULL != pData)
+	{
+		m_ClientDataAlert.m_u4MailID = (uint32)ACE_OS::atoi(pData);
+	}
 
 	//命令监控相关配置
 	m_vecCommandAlert.clear();
 	TiXmlElement* pNextTiXmlElementCommand     = NULL;
 	TiXmlElement* pNextTiXmlElementCount       = NULL;
+	TiXmlElement* pNextTiXmlElementMailID      = NULL;
 	_CommandAlert objCommandAlert;
 	while(true)
 	{
@@ -221,12 +237,22 @@ bool CMainConfig::Init_Alert(const char* szConfigPath)
 			break;
 		}
 
+		pData = m_MainConfig.GetData("CommandInfo", "MailID", pNextTiXmlElementMailID);
+		if(pData != NULL)
+		{
+			objCommandAlert.m_u4MailID = (uint32)ACE_OS::atoi(pData);
+		}
+		else
+		{
+			break;
+		}
+
 		m_vecCommandAlert.push_back(objCommandAlert);
 	}
 
 	//报警邮件相关设置
 	m_vecMailAlert.clear();
-	TiXmlElement* pNextTiXmlElementMailID      = NULL;
+	pNextTiXmlElementMailID      = NULL;
 	TiXmlElement* pNextTiXmlElementFormAddr    = NULL;
 	TiXmlElement* pNextTiXmlElementToAddr      = NULL;
 	TiXmlElement* pNextTiXmlElementMailPass    = NULL;
