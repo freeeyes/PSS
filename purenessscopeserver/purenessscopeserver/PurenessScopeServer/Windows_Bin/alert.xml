@@ -4,7 +4,8 @@
 <!-- 告警阀值设置，如果需要设置目标值，则直接填入，如果不需要则直接把对应设置设置成0即可 -->
 <!-- AlertConnect用于设置连接指标的监控，目前单位时间是120s为单位。 -->
 <!-- ConnectMin为单位时间最小连接连接数，Max为最大连接数。DisConnect同理 -->
-<AlertConnect ConnectMin="0" ConnectMax="100000" DisConnectMin="0" DisConnectMax="0" />
+<!-- MailID=0为不发送邮件，只记录，而如果不为0，则会发到下面配置邮箱中 -->
+<AlertConnect ConnectMin="0" ConnectMax="0" DisConnectMin="0" DisConnectMax="0" MailID="0"/>
 
 <!-- IP连接相关监控，来自某一个固定IP1分钟内连接数量超过一定阀值，会报警 -->
 <!-- Timeout是IP封禁时间 -->
@@ -12,10 +13,10 @@
 
 <!-- 单客户端连接接收和发送数据流量监控,判断周期是60秒，单位是字节 -->
 <!-- RecvDataMax为1分钟内的最大流量，SendDataMax为1分钟最大发送流量 -->
-<ClientData RecvPacketCount="0" RecvDataMax="0" SendPacketCount="0" SendDataMax="0" />
+<ClientData RecvPacketCount="0" RecvDataMax="0" SendPacketCount="0" SendDataMax="0" MailID="0"/>
 
 <!-- 1分钟内，某一个命令的调用次数最大阀值，配置可以是多个，也可以一个都不配置 -->
-<CommandInfo CommandID="4096" CommandCount="0" />
+<CommandInfo CommandID="4096" CommandCount="0" MailID="0"/>
 
 <!-- 配置邮件告警功能 MailID必须大于0,可以支持多个 -->
 <Mail MailID="1" fromMailAddr="local@163.com" toMailAddr="freeeyes@163.com" MailPass="123456" MailUrl="smtp.163.com" MailPort="25" />
