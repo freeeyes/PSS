@@ -50,11 +50,11 @@ public:
 	int Start();
 	int Stop();
 	bool IsRun();
-	
+
 	int PutLog(_LogBlockInfo* pLogBlockInfo);
 	int RegisterLog(CServerLogger * pServerLogger);
 	int UnRegisterLog();
-	
+
 	void SetReset(bool blReset);
 
 	void ResetLogData(uint16 u2LogLevel);

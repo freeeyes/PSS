@@ -57,7 +57,7 @@ public:
 		char szDateBuff[MAX_TIME_SIZE] = {'\0'};
 
 		sprintf_safe(szDateBuff, MAX_TIME_SIZE, "%04d-%02d-%02d %02d:%02d:%02d%02d,", dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second(), dt.microsec()/10000);
-		
+
 		//拼接实际的日志字符串
 		sprintf_safe(m_pBuffer, m_u4BufferSize, "%s %s\n", szDateBuff, pLogBlockInfo->m_pBlock);
 
@@ -81,7 +81,7 @@ public:
 		{
 			SendMail(pLogBlockInfo);
 		}
- 
+
 		return 0;
 	};
 

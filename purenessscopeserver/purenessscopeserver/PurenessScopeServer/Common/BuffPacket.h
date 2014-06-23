@@ -78,7 +78,7 @@ public:
 
 	CBuffPacket& operator << (float32 f4Data);
 	CBuffPacket& operator << (float64 f8Data);
-	
+
 	CBuffPacket& operator << (VCHARS_STR &str);
 	CBuffPacket& operator << (VCHARM_STR &str);
 	CBuffPacket& operator << (VCHARB_STR &str);

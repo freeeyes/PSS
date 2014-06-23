@@ -31,7 +31,7 @@ bool CBuffPacket::Init(int nSize)
 			throw szError;
 		}
 
-		
+
 		//初始化包数据结构
 		m_u4ReadPtr       = 0;
 		m_u4WritePtr      = 0;
@@ -416,7 +416,7 @@ CBuffPacket& CBuffPacket::operator >> (uint16& u2Data)
 		{
 			u2Data = n2Net;
 		}
-		
+
 	}
 
 	return *this;
@@ -440,7 +440,7 @@ CBuffPacket& CBuffPacket::operator >> (uint32& u4Data)
 		{
 			u4Data = n4Net;
 		}
-		
+
 	}
 
 	return *this;

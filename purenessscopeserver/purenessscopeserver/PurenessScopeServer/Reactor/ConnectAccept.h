@@ -15,42 +15,42 @@ using namespace std;
 class ConnectConsoleAcceptor : public ACE_Acceptor<CConsoleHandler, ACE_SOCK_ACCEPTOR>
 {
 protected:
-    virtual int make_svc_handler(CConsoleHandler*& sh);
+	virtual int make_svc_handler(CConsoleHandler*& sh);
 };
 
 //用于普通客户端
 class ConnectAcceptor : public ACE_Acceptor<CConnectHandler, ACE_SOCK_ACCEPTOR>
 {
 protected:
-    virtual int make_svc_handler(CConnectHandler*& sh);
+	virtual int make_svc_handler(CConnectHandler*& sh);
 
 public:
-    //因为基础的open不能满足需求，所以在这里重载了一个open接口
-    //提供设置backlog的服务
-    int open2(ACE_INET_Addr& local_addr,
-              ACE_Reactor* reactor,
-              int flags,
-              int backlog);
+	//因为基础的open不能满足需求，所以在这里重载了一个open接口
+	//提供设置backlog的服务
+	int open2(ACE_INET_Addr& local_addr,
+		ACE_Reactor* reactor,
+		int flags,
+		int backlog);
 
 };
 
 class CConnectAcceptorManager
 {
 public:
-    CConnectAcceptorManager(void);
-    ~CConnectAcceptorManager(void);
+	CConnectAcceptorManager(void);
+	~CConnectAcceptorManager(void);
 
-    bool InitConnectAcceptor(int nCount);
-    void Close();
-    int GetCount();
-    ConnectAcceptor* GetConnectAcceptor(int nIndex);
-    const char* GetError();
+	bool InitConnectAcceptor(int nCount);
+	void Close();
+	int GetCount();
+	ConnectAcceptor* GetConnectAcceptor(int nIndex);
+	const char* GetError();
 
 private:
-    typedef vector<ConnectAcceptor*> vecConnectAcceptor;
-    vecConnectAcceptor m_vecConnectAcceptor;
-    int                m_nAcceptorCount;
-    char               m_szError[MAX_BUFF_500];
+	typedef vector<ConnectAcceptor*> vecConnectAcceptor;
+	vecConnectAcceptor m_vecConnectAcceptor;
+	int                m_nAcceptorCount;
+	char               m_szError[MAX_BUFF_500];
 };
 
 

@@ -569,7 +569,7 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
 	{
 		sprintf_safe(m_szResourceName, MAX_BUFF_200, "%s", pData);
 	}
-	
+
 	//开始获得Core相关设定(目前仅限Linux)
 	pData = m_MainConfig.GetData("CoreSetting", "CoreNeed");
 	if(NULL != pData)

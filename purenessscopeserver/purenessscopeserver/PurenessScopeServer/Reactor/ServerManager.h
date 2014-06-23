@@ -28,18 +28,18 @@
 class CServerManager
 {
 public:
-    CServerManager(void);
-    ~CServerManager(void);
+	CServerManager(void);
+	~CServerManager(void);
 
-    bool Init();
-    bool Start();
-    bool Close();
+	bool Init();
+	bool Start();
+	bool Close();
 
 private:
-    CConnectAcceptorManager m_ConnectAcceptorManager;    //普通客户端链接
-    ConnectConsoleAcceptor  m_ConnectConsoleAcceptor;    //后台管理链接
-    CFileLogger*            m_pFileLogger;               //日志类型
-    Frame_Logging_Strategy objFrameLoggingStrategy;
+	CConnectAcceptorManager m_ConnectAcceptorManager;    //普通客户端链接
+	ConnectConsoleAcceptor  m_ConnectConsoleAcceptor;    //后台管理链接
+	CFileLogger*            m_pFileLogger;               //日志类型
+	Frame_Logging_Strategy objFrameLoggingStrategy;
 };
 
 typedef ACE_Singleton<CServerManager, ACE_Null_Mutex> App_ServerManager;

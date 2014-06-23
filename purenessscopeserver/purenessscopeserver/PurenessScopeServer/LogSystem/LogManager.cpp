@@ -123,7 +123,7 @@ int CLogManager::open(void *args)
 	{
 		OUR_DEBUG((LM_ERROR,"[CLogManager::open]args is not NULL.\n"));
 	}
-	
+
 	if(activate(THR_NEW_LWP | THR_DETACHED, m_nThreadCount) == -1)
 	{
 		m_blRun = false;
@@ -204,7 +204,7 @@ int CLogManager::Start()
 		SetReset(false);
 		return open();
 	}
-	
+
 }
 
 int CLogManager::Stop()
@@ -331,7 +331,7 @@ int CLogManager::WriteLog(int nLogType, const char* fmt, ...)
 	//从日志块池里面找到一块空余的日志块
 	m_Logger_Mutex.acquire();
 	_LogBlockInfo* pLogBlockInfo = m_objLogBlockPool.GetLogBlockInfo();
-	
+
 
 	if(NULL == pLogBlockInfo)
 	{
