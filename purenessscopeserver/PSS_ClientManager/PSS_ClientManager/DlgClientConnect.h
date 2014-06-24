@@ -58,11 +58,12 @@ public:
   CButton m_btnDebug;
   CEdit m_txtFlowIn;
   CEdit m_txtFlowOut;
+  CEdit m_txtMaxConnectCount;
   CListCtrl m_lcClientConnectHistory;
   afx_msg void OnBnClickedButton1();
   virtual BOOL OnInitDialog();
   afx_msg void OnBnClickedButton6();
   afx_msg void OnBnClickedButton5();
   afx_msg void OnBnClickedButton4();
-
+  afx_msg void OnBnClickedButton12();
 };

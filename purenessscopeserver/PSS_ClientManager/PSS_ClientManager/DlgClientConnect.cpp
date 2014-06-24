@@ -31,6 +31,7 @@ void CDlgClientConnect::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RADIO2, m_btnDebug);
 	DDX_Control(pDX, IDC_EDIT7, m_txtFlowIn);
 	DDX_Control(pDX, IDC_EDIT9, m_txtFlowOut);
+	DDX_Control(pDX, IDC_EDIT10, m_txtMaxConnectCount);
 }
 
 
@@ -39,6 +40,7 @@ BEGIN_MESSAGE_MAP(CDlgClientConnect, CDialog)
   ON_BN_CLICKED(IDC_BUTTON6, &CDlgClientConnect::OnBnClickedButton6)
   ON_BN_CLICKED(IDC_BUTTON5, &CDlgClientConnect::OnBnClickedButton5)
   ON_BN_CLICKED(IDC_BUTTON4, &CDlgClientConnect::OnBnClickedButton4)
+  ON_BN_CLICKED(IDC_BUTTON12, &CDlgClientConnect::OnBnClickedButton12)
 END_MESSAGE_MAP()
 
 CString CDlgClientConnect::GetPageTitle()
@@ -75,15 +77,23 @@ void CDlgClientConnect::OnBnClickedButton1()
   }
   else
   {
-    int nStrLen       = 0;
-    int nPos          = 4;
-    int nConnectCount = 0;
+    int nStrLen          = 0;
+    int nPos             = 4;
+    int nConnectCount    = 0;
+	int nFreeCount       = 0;
+	int nMaxConnectCount = 0;
     memcpy_s(&nConnectCount, sizeof(int), &szRecvBuff[nPos], sizeof(int));
     nPos += sizeof(int);
+	memcpy_s(&nFreeCount, sizeof(int), &szRecvBuff[nPos], sizeof(int));
+	nPos += sizeof(int);
+	memcpy_s(&nMaxConnectCount, sizeof(int), &szRecvBuff[nPos], sizeof(int));
+	nPos += sizeof(int);
 
-    CString strConnectCount;
-    strConnectCount.Format(_T("%d"), nConnectCount);
-    m_txtClientConnectCount.SetWindowText(strConnectCount);
+    CString strTemp;
+    strTemp.Format(_T("%d"), nConnectCount);
+    m_txtClientConnectCount.SetWindowText(strTemp);
+	strTemp.Format(_T("%d"), nMaxConnectCount);
+	m_txtMaxConnectCount.SetWindowText(strTemp);
   }
 
   //获得CPU和内存占用量
@@ -318,6 +328,55 @@ void CDlgClientConnect::OnBnClickedButton4()
 		{
 			MessageBox(_T(MESSAGE_RESULT_SUCCESS) , _T(MESSAGE_TITLE_ERROR), MB_OK);
 			OnBnClickedButton5();
+		}
+		else
+		{
+			MessageBox(_T(MESSAGE_RESULT_FAIL) , _T(MESSAGE_TITLE_SUCCESS), MB_OK);
+		}
+	}
+}
+
+void CDlgClientConnect::OnBnClickedButton12()
+{
+	//重新设置上限
+	int nMaxConnectCount = 0;
+	CString strMaxConnectCount;
+	char szMaxConnectCount[20] = {'\0'};
+	m_txtMaxConnectCount.GetWindowText(strMaxConnectCount);
+
+	int nSrcLen = WideCharToMultiByte(CP_ACP, 0, strMaxConnectCount, strMaxConnectCount.GetLength(), NULL, 0, NULL, NULL);
+	int nDecLen = WideCharToMultiByte(CP_ACP, 0, strMaxConnectCount, nSrcLen, szMaxConnectCount, 20, NULL,NULL);
+	szMaxConnectCount[nDecLen] = '\0';
+
+	nMaxConnectCount = atoi(szMaxConnectCount);
+
+	char szSendMessage[200] = {'\0'};
+	char szCommand[100]     = {'\0'};
+	sprintf_s(szCommand, 100, "%s SetMaxConnectCount -n %d ", m_pTcpClientConnect->GetKey(), nMaxConnectCount);
+	int nSendLen = (int)strlen(szCommand); 
+
+	memcpy_s(szSendMessage, 200, &nSendLen, sizeof(int));
+	memcpy_s(&szSendMessage[4], 200, &szCommand, nSendLen);
+
+	char szRecvBuff[100 * 1024] = {'\0'};
+	int nRecvLen = 100 * 1024;
+	bool blState = m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen + sizeof(int), (char*)szRecvBuff, nRecvLen);
+	if(blState == false)
+	{
+		MessageBox(_T(MESSAGE_SENDERROR) , _T(MESSAGE_TITLE_ERROR), MB_OK);
+		return;
+	}
+	else
+	{
+		int nStrLen       = 0;
+		int nPos          = 4;
+		int nOPState      = 0;
+		memcpy_s(&nOPState, sizeof(int), &szRecvBuff[nPos], sizeof(int));
+		nPos += sizeof(int);
+
+		if(nOPState == 0)
+		{
+			MessageBox(_T(MESSAGE_RESULT_SUCCESS) , _T(MESSAGE_TITLE_ERROR), MB_OK);
 		}
 		else
 		{

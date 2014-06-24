@@ -1416,6 +1416,20 @@ int CProConnectManager::handle_timeout(const ACE_Time_Value &tv, const void *arg
 		m_tvCheckConnect   = tvNow;
 	}
 
+	//检测连接总数是否超越监控阀值
+	if(App_MainConfig::instance()->GetConnectAlert()->m_u4ConnectAlert > 0)
+	{
+		if(GetCount() > (int)App_MainConfig::instance()->GetConnectAlert()->m_u4ConnectAlert)
+		{
+			AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
+				App_MainConfig::instance()->GetConnectAlert()->m_u4MailID,
+				(char* )"Alert",
+				"[CProConnectManager]active ConnectCount is more than limit(%d > %d).", 
+				GetCount(),
+				App_MainConfig::instance()->GetConnectAlert()->m_u4ConnectAlert);
+		}
+	}
+
 	//检测单位时间连接数是否超越阀值
 	int nCheckRet = App_ConnectAccount::instance()->CheckConnectCount();
 	if(nCheckRet == 1)

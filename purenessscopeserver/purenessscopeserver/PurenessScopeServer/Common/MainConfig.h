@@ -57,6 +57,7 @@ struct _ConnectAlert
 	uint32 m_u4ConnectMax;
 	uint32 m_u4DisConnectMin;
 	uint32 m_u4DisConnectMax;
+	uint32 m_u4ConnectAlert;
 	uint32 m_u4MailID;
 
 	_ConnectAlert()
@@ -65,6 +66,7 @@ struct _ConnectAlert
 		m_u4ConnectMax    = 0;
 		m_u4DisConnectMin = 0;
 		m_u4DisConnectMax = 0;
+		m_u4ConnectAlert  = 0;
 		m_u4MailID        = 0;
 	}
 };
@@ -190,6 +192,7 @@ public:
 	uint16 GetPacketTimeOut();
 	uint16 GetSendAliveTime();
 	uint16 GetMaxHandlerCount();
+	void   SetMaxHandlerCount(uint16 u2MaxHandlerCount);
 	uint16 GetMaxConnectTime();
 	uint8  GetConsoleSupport();
 	int    GetConsolePort();

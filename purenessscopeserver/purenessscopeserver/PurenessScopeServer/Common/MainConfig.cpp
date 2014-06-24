@@ -159,6 +159,11 @@ bool CMainConfig::Init_Alert(const char* szConfigPath)
 	{
 		m_ConnectAlert.m_u4DisConnectMax = (uint32)ACE_OS::atoi(pData);
 	}
+	pData = m_MainConfig.GetData("AlertConnect", "ConnectAlert");
+	if(NULL != pData)
+	{
+		m_ConnectAlert.m_u4ConnectAlert = (uint32)ACE_OS::atoi(pData);
+	}
 	pData = m_MainConfig.GetData("AlertConnect", "MailID");
 	if(NULL != pData)
 	{
@@ -1378,4 +1383,9 @@ _MailAlert* CMainConfig::GetMailAlert(uint32 u4MailID)
 	}
 
 	return NULL;
+}
+
+void CMainConfig::SetMaxHandlerCount(uint16 u2MaxHandlerCount)
+{
+	m_u2MaxHanderCount = u2MaxHandlerCount;
 }

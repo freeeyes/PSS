@@ -4,8 +4,9 @@
 <!-- 告警阀值设置，如果需要设置目标值，则直接填入，如果不需要则直接把对应设置设置成0即可 -->
 <!-- AlertConnect用于设置连接指标的监控，目前单位时间是120s为单位。 -->
 <!-- ConnectMin为单位时间最小连接连接数，Max为最大连接数。DisConnect同理 -->
+<!-- ConnectAlert 当PSS的当前连接达到设置的设个上限的时候发送报警邮件 -->
 <!-- MailID=0为不发送邮件，只记录，而如果不为0，则会发到下面配置邮箱中 -->
-<AlertConnect ConnectMin="0" ConnectMax="0" DisConnectMin="0" DisConnectMax="0" MailID="0"/>
+<AlertConnect ConnectMin="0" ConnectMax="0" DisConnectMin="0" DisConnectMax="0" ConnectAlert="5000" MailID="0"/>
 
 <!-- IP连接相关监控，来自某一个固定IP1分钟内连接数量超过一定阀值，会报警 -->
 <!-- Timeout是IP封禁时间 -->

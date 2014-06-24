@@ -317,6 +317,11 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
 		DoMessage_SetConnectLog(CommandInfo, pBuffPacket);
 		return CONSOLE_MESSAGE_SUCCESS;
 	}
+	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SETMAXCONNECTCOUNT) == 0)
+	{
+		DoMessage_SetMaxConnectCount(CommandInfo, pBuffPacket);
+		return CONSOLE_MESSAGE_SUCCESS;
+	}
 	else
 	{
 		return CONSOLE_MESSAGE_FAIL;
@@ -525,6 +530,26 @@ bool CConsoleMessage::GetConnectID(const char* pCommand, uint32& u4ConnectID, bo
 	return true;
 }
 
+bool CConsoleMessage::GetMaxConnectCount(const char* pCommand, uint16& u2MaxConnectCount)
+{
+	char szTempData[MAX_BUFF_100] = {'\0'};
+	int  nFlag                    = 0;
+
+	//»ñµÃConnectID
+	char* pPosBegin = (char* )ACE_OS::strstr(pCommand, "-n ");
+	char* pPosEnd   = (char* )ACE_OS::strstr(pPosBegin + 3, " ");
+	int nLen = (int)(pPosEnd - pPosBegin - 3);
+	if(nLen >= MAX_BUFF_100 || nLen < 0)
+	{
+		return false;
+	}
+	ACE_OS::memcpy(szTempData, pPosBegin + 3, nLen);
+	szTempData[nLen] = '\0';
+	u2MaxConnectCount = (uint16)ACE_OS::atoi(szTempData);
+
+	return true;
+}
+
 bool CConsoleMessage::GetConnectServerID(const char* pCommand, int& nServerID)
 {
 	char szTempData[MAX_BUFF_100] = {'\0'};
@@ -635,11 +660,13 @@ bool CConsoleMessage::DoMessage_ClientMessageCount(_CommandInfo& CommandInfo, IB
 		int nPoolClient   = App_ProConnectHandlerPool::instance()->GetFreeCount();
 		(*pBuffPacket) << (uint32)nActiveClient;
 		(*pBuffPacket) << (uint32)nPoolClient;
+		(*pBuffPacket) << App_MainConfig::instance()->GetMaxHandlerCount();
 #else
 		int nActiveClient = App_ConnectManager::instance()->GetCount();
 		int nPoolClient   = App_ConnectHandlerPool::instance()->GetFreeCount();
 		(*pBuffPacket) << (uint32)nActiveClient;
 		(*pBuffPacket) << (uint32)nPoolClient;
+		(*pBuffPacket) << App_MainConfig::instance()->GetMaxHandlerCount();
 #endif
 	}
 
@@ -1835,6 +1862,22 @@ bool CConsoleMessage::DoMessage_SetConnectLog( _CommandInfo& CommandInfo, IBuffP
 #else
 		App_ConnectManager::instance()->SetIsLog(u4ConnectID, blIsLog);
 #endif
+	}
+
+	(*pBuffPacket) << (uint32)0;
+
+	return true;
+}
+
+bool CConsoleMessage::DoMessage_SetMaxConnectCount( _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket )
+{
+	uint16 u2MaxConnectHandler = 0;
+	if(GetMaxConnectCount(CommandInfo.m_szCommandExp, u2MaxConnectHandler) == true)
+	{
+		if(u2MaxConnectHandler > 0)
+		{
+			App_MainConfig::instance()->SetMaxHandlerCount(u2MaxConnectHandler);
+		}
 	}
 
 	(*pBuffPacket) << (uint32)0;
