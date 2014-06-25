@@ -3,7 +3,8 @@
 
 CServerManager::CServerManager(void)
 {
-	m_pFileLogger = NULL;
+	m_pFileLogger           = NULL;
+	m_pFrameLoggingStrategy = NULL;
 }
 
 CServerManager::~CServerManager(void)
@@ -13,21 +14,28 @@ CServerManager::~CServerManager(void)
 
 bool CServerManager::Init()
 {
-	//是否打开ACE_DEBUG文件存储
-	Logging_Config_Param objParam;
-
-	if(App_MainConfig::instance()->GetDebugTrunOn() == 1)
+	if(CONVERT_ACE_VERSION(6200) == true)
 	{
-		sprintf_safe(objParam.m_strLogFile, 256, "%s", App_MainConfig::instance()->GetDebugFileName());
-		objParam.m_iChkInterval    = App_MainConfig::instance()->GetChkInterval();
-		objParam.m_iLogFileMaxCnt  = App_MainConfig::instance()->GetLogFileMaxCnt();
-		objParam.m_iLogFileMaxSize = App_MainConfig::instance()->GetLogFileMaxSize();
-		sprintf_safe(objParam.m_strLogLevel, 128, "%s", App_MainConfig::instance()->GetDebugLevel());
 
-		objFrameLoggingStrategy.InitLogStrategy(objParam);
+
+		if(App_MainConfig::instance()->GetDebugTrunOn() == 1)
+		{
+			m_pFrameLoggingStrategy = new Frame_Logging_Strategy();
+
+			//是否打开ACE_DEBUG文件存储
+			Logging_Config_Param objParam;
+
+			sprintf_safe(objParam.m_strLogFile, 256, "%s", App_MainConfig::instance()->GetDebugFileName());
+			objParam.m_iChkInterval    = App_MainConfig::instance()->GetChkInterval();
+			objParam.m_iLogFileMaxCnt  = App_MainConfig::instance()->GetLogFileMaxCnt();
+			objParam.m_iLogFileMaxSize = App_MainConfig::instance()->GetLogFileMaxSize();
+			sprintf_safe(objParam.m_strLogLevel, 128, "%s", App_MainConfig::instance()->GetDebugLevel());
+
+			m_pFrameLoggingStrategy->InitLogStrategy(objParam);
+		}
 	}
 
-	OUR_DEBUG((LM_INFO, "[CServerManager::Init]1111.\n"));
+
 
 	int nServerPortCount    = App_MainConfig::instance()->GetServerPortCount();
 	int nReactorCount       = App_MainConfig::instance()->GetReactorCount();
@@ -390,6 +398,10 @@ bool CServerManager::Close()
 	OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ReactorManager OK.\n"));	
 	OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close end....\n"));
 
-	objFrameLoggingStrategy.EndLogStrategy();
+	if(CONVERT_ACE_VERSION(6200) == true)
+	{
+		m_pFrameLoggingStrategy->EndLogStrategy();
+		SAFE_DELETE(m_pFrameLoggingStrategy);
+	}
 	return true;
 }

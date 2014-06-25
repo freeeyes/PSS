@@ -139,7 +139,6 @@ public:
 		}
 
 		free(pMail);
-
 		return true;
 	}
 

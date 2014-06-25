@@ -42,6 +42,26 @@ using namespace std;
 #define MAX_BUFF_1000 1000
 #define MAX_BUFF_1024 1024
 
+//计算当前版本号是否与制定版本好一致
+static bool Convert_Version(int nTagVserion)
+{
+	int nCurrVserion = 0;
+	nCurrVserion += (int)ACE::major_version() * 1000;
+	nCurrVserion += (int)ACE::minor_version() * 100;
+	nCurrVserion += (int)ACE::beta_version();
+
+	if(nTagVserion >= nCurrVserion)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+#define CONVERT_ACE_VERSION(x) Convert_Version(x)
+
 //根据不同的操作系统，定义不同的recv接收参数类型
 #ifdef WIN32
 #define MSG_NOSIGNAL          0            //信号量参数（WINDOWS）

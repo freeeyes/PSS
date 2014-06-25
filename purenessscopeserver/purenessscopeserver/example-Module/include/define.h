@@ -42,6 +42,26 @@ using namespace std;
 #define MAX_BUFF_1000 1000
 #define MAX_BUFF_1024 1024
 
+//计算当前版本号是否与制定版本好一致
+static bool Convert_Version(int nTagVserion)
+{
+	int nCurrVserion = 0;
+	nCurrVserion += (int)ACE::major_version() * 1000;
+	nCurrVserion += (int)ACE::minor_version() * 100;
+	nCurrVserion += (int)ACE::beta_version();
+
+	if(nTagVserion >= nCurrVserion)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+#define CONVERT_ACE_VERSION(x) Convert_Version(x)
+
 //根据不同的操作系统，定义不同的recv接收参数类型
 #ifdef WIN32
 #define MSG_NOSIGNAL          0            //信号量参数（WINDOWS）
@@ -491,53 +511,107 @@ typedef  struct _VCHARB_STR
 //定时监控数据包和流量的数据信息，用于链接有效性的逻辑判定
 struct _TimeConnectInfo
 {
-	uint8  m_u1Minutes;           //当前的分钟数
-	uint32 m_u4PacketCount;       //当前的包数量
-	uint32 m_u4RecvSize;          //当前接收数据量
-	uint8  m_u1NeedCheck;         //是否需要验证，0为需要，1为不需要
-	uint32 m_u4ValidPacketCount;  //单位时间可允许接收数据包的上限
-	uint32 m_u4ValidRecvSize;     //单位时间可允许的数据接收量
+	uint8  m_u1Minutes;               //当前的分钟数
+	uint32 m_u4RecvPacketCount;       //当前接收包数量
+	uint32 m_u4RecvSize;              //当前接收数据量
+	uint32 m_u4SendPacketCount;       //当前发送包数量
+	uint32 m_u4SendSize;              //当前发送数据量
+
+	uint32 m_u4ValidRecvPacketCount;  //单位时间可允许接收数据包的上限
+	uint32 m_u4ValidRecvSize;         //单位时间可允许的数据接收量
+	uint32 m_u4ValidSendPacketCount;  //单位时间可允许数据数据包的上限
+	uint32 m_u4ValidSendSize;         //单位时间可允许的数据发送量
 
 	_TimeConnectInfo()
 	{ 
-		m_u1Minutes     = 0;
-		m_u4PacketCount = 0;
-		m_u4RecvSize    = 0;
+		m_u1Minutes              = 0;
+		m_u4RecvPacketCount      = 0;
+		m_u4RecvSize             = 0;
+		m_u4SendPacketCount      = 0;
+		m_u4SendSize             = 0;
 
-		m_u1NeedCheck        = 1;
-		m_u4ValidPacketCount = 0;
-		m_u4ValidRecvSize    = 0;
+		m_u4ValidRecvPacketCount = 0;
+		m_u4ValidRecvSize        = 0;
+		m_u4ValidSendPacketCount = 0;
+		m_u4ValidSendSize        = 0;
 	}
 
-	void Init(uint8 u1NeedCheck, uint32 u4PacketCount, uint32 u4RecvSize)
+	void Init(uint32 u4RecvPacketCount, uint32 u4RecvSize, uint32 u4SendPacketCount, uint32 u4ValidSendSize)
 	{
-		m_u1Minutes     = 0;
-		m_u4PacketCount = 0;
-		m_u4RecvSize    = 0;
+		m_u1Minutes              = 0;
+		m_u4RecvPacketCount      = 0;
+		m_u4RecvSize             = 0;
+		m_u4SendPacketCount      = 0;
+		m_u4SendSize             = 0;
 
-		m_u1NeedCheck        = u1NeedCheck;
-		m_u4ValidPacketCount = u4PacketCount;
-		m_u4ValidRecvSize    = u4RecvSize;
+		m_u4ValidRecvPacketCount = u4RecvPacketCount;
+		m_u4ValidRecvSize        = u4RecvSize;
+		m_u4ValidSendPacketCount = u4SendPacketCount;
+		m_u4ValidSendSize        = u4ValidSendSize;
 	}
 
-	bool Check(uint8 u1Minutes, uint16 u2PacketCount, uint32 u4RecvSize)
+	bool RecvCheck(uint8 u1Minutes, uint16 u2PacketCount, uint32 u4RecvSize)
 	{
 		if(m_u1Minutes != u1Minutes)
 		{
-			m_u1Minutes     = u1Minutes;
-			m_u4PacketCount = u2PacketCount;
-			m_u4RecvSize    = u4RecvSize;
+			m_u1Minutes         = u1Minutes;
+			m_u4RecvPacketCount = u2PacketCount;
+			m_u4RecvSize        = u4RecvSize;
 		}
 		else
 		{
-			m_u4PacketCount += u2PacketCount;
-			m_u4RecvSize    += u4RecvSize;
+			m_u4RecvPacketCount += u2PacketCount;
+			m_u4RecvSize        += u4RecvSize;
 		}
 
-		if(m_u1NeedCheck == 0)
+		if(m_u4ValidRecvPacketCount > 0)
 		{
 			//需要比较
-			if(m_u4PacketCount > m_u4ValidPacketCount || u4RecvSize > m_u4ValidRecvSize)
+			if(m_u4RecvPacketCount > m_u4ValidRecvPacketCount)
+			{
+				return false;
+			}
+		}
+
+		if(m_u4ValidRecvSize > 0)
+		{
+			//需要比较
+			if(u4RecvSize > m_u4ValidRecvSize)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	bool SendCheck(uint8 u1Minutes, uint16 u2PacketCount, uint32 u4SendSize)
+	{
+		if(m_u1Minutes != u1Minutes)
+		{
+			m_u1Minutes         = u1Minutes;
+			m_u4SendPacketCount = u2PacketCount;
+			m_u4RecvSize        = u4SendSize;
+		}
+		else
+		{
+			m_u4SendPacketCount += u2PacketCount;
+			m_u4RecvSize        += u4SendSize;
+		}
+
+		if(m_u4ValidSendPacketCount > 0)
+		{
+			//需要比较
+			if(m_u4SendPacketCount > m_u4ValidSendPacketCount)
+			{
+				return false;
+			}
+		}
+
+		if(m_u4ValidSendSize > 0)
+		{
+			//需要比较
+			if(u4SendSize > m_u4ValidSendSize)
 			{
 				return false;
 			}

@@ -26,7 +26,6 @@ public:
 
 	void clear()
 	{
-		m_pBlock         = NULL;
 		m_u4Length       = 0;
 		m_u4LogID        = 0;
 		m_blIsUsed       = false;

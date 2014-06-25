@@ -24,7 +24,9 @@
 #include "ReUDPManager.h"
 #include "CommandAccount.h"
 #include "ModuleMessageManager.h"
-#include "Frame_Logging_Strategy.h"
+
+class Frame_Logging_Strategy;
+
 class CServerManager
 {
 public:
@@ -39,8 +41,9 @@ private:
 	CConnectAcceptorManager m_ConnectAcceptorManager;    //普通客户端链接
 	ConnectConsoleAcceptor  m_ConnectConsoleAcceptor;    //后台管理链接
 	CFileLogger*            m_pFileLogger;               //日志类型
-	Frame_Logging_Strategy objFrameLoggingStrategy;
+	Frame_Logging_Strategy* m_pFrameLoggingStrategy;   //输出对象
 };
+
 
 typedef ACE_Singleton<CServerManager, ACE_Null_Mutex> App_ServerManager;
 

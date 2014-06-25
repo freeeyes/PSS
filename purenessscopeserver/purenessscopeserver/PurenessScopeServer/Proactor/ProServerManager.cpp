@@ -1,7 +1,9 @@
 #include "ProServerManager.h"
+#include "Frame_Logging_Strategy.h"
 
 CProServerManager::CProServerManager(void)
 {
+	m_pFrameLoggingStrategy = NULL;
 }
 
 CProServerManager::~CProServerManager(void)
@@ -10,6 +12,26 @@ CProServerManager::~CProServerManager(void)
 
 bool CProServerManager::Init()
 {
+	
+	if(CONVERT_ACE_VERSION(6200) == true)
+	{
+		if(App_MainConfig::instance()->GetDebugTrunOn() == 1)
+		{
+			m_pFrameLoggingStrategy = new Frame_Logging_Strategy();
+
+			//是否打开ACE_DEBUG文件存储
+			Logging_Config_Param objParam;
+
+			sprintf_safe(objParam.m_strLogFile, 256, "%s", App_MainConfig::instance()->GetDebugFileName());
+			objParam.m_iChkInterval    = App_MainConfig::instance()->GetChkInterval();
+			objParam.m_iLogFileMaxCnt  = App_MainConfig::instance()->GetLogFileMaxCnt();
+			objParam.m_iLogFileMaxSize = App_MainConfig::instance()->GetLogFileMaxSize();
+			sprintf_safe(objParam.m_strLogLevel, 128, "%s", App_MainConfig::instance()->GetDebugLevel());
+
+			m_pFrameLoggingStrategy->InitLogStrategy(objParam);
+		}
+	}
+
 	int nServerPortCount    = App_MainConfig::instance()->GetServerPortCount();
 	int nUDPServerPortCount = App_MainConfig::instance()->GetUDPServerPortCount();
 	int nReactorCount       = App_MainConfig::instance()->GetReactorCount();
@@ -374,6 +396,12 @@ bool CProServerManager::Close()
 	App_ProactorManager::instance()->StopProactor();
 	OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ReactorManager OK.\n"));	
 	OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close end....\n"));
+
+	if(CONVERT_ACE_VERSION(6200) == true)
+	{
+		m_pFrameLoggingStrategy->EndLogStrategy();
+		SAFE_DELETE(m_pFrameLoggingStrategy);
+	}
 
 	return true;
 }
