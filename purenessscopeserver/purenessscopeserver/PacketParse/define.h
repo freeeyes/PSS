@@ -42,6 +42,7 @@ using namespace std;
 #define MAX_BUFF_1000 1000
 #define MAX_BUFF_1024 1024
 
+/*
 //计算当前版本号是否与制定版本好一致
 static bool Convert_Version(int nTagVserion)
 {
@@ -60,7 +61,8 @@ static bool Convert_Version(int nTagVserion)
 	}
 }
 
-#define CONVERT_ACE_VERSION(x) Convert_Version(x)
+#define CONVERT_ACE_VERSION Convert_Version(6200)
+*/
 
 //根据不同的操作系统，定义不同的recv接收参数类型
 #ifdef WIN32

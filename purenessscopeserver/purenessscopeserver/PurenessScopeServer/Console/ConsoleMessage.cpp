@@ -533,7 +533,6 @@ bool CConsoleMessage::GetConnectID(const char* pCommand, uint32& u4ConnectID, bo
 bool CConsoleMessage::GetMaxConnectCount(const char* pCommand, uint16& u2MaxConnectCount)
 {
 	char szTempData[MAX_BUFF_100] = {'\0'};
-	int  nFlag                    = 0;
 
 	//»ñµÃConnectID
 	char* pPosBegin = (char* )ACE_OS::strstr(pCommand, "-n ");
