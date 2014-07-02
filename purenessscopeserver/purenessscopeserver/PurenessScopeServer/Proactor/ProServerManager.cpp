@@ -361,6 +361,9 @@ bool CProServerManager::Start()
 		return false;
 	}
 
+	//等待服务结束	
+	ACE_Thread_Manager::instance()->wait();
+
 	return true;
 }
 

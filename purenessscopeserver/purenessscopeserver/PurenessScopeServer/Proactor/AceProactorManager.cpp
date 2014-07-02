@@ -155,6 +155,7 @@ bool CAceProactor::Stop()
 	{
 		m_pProactor->proactor_end_event_loop();
 	}
+	m_blRun = false;
 
 	return true;
 }

@@ -273,8 +273,6 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 		ServerMain();
 	}
  
-	//等待服务结束	
-	ACE_Thread_Manager::instance()->wait();
 	return 0;
 }
 
