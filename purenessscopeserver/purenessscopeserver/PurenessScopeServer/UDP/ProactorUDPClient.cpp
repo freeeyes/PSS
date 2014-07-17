@@ -126,13 +126,11 @@ bool CProactorUDPClient::SendMessage(const char* pMessage, uint32 u4Len, const c
 		m_atvOutput = ACE_OS::gettimeofday();
 		m_u4SendSize += u4Len;
 		m_u4SendPacketCount++;
-		SAFE_DELETE_ARRAY(pMessage);
 		return true;
 	}
 	else
 	{
 		OUR_DEBUG((LM_ERROR, "[CProactorUDPClient::SendMessage]send error(%d).\n", errno));
-		SAFE_DELETE_ARRAY(pMessage);
 		return false;
 	}
 }

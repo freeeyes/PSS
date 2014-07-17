@@ -87,7 +87,6 @@ bool CReactorUDPClient::SendMessage(const char* pMessage, uint32 u4Len, const ch
 	if(nErr != 0)
 	{
 		OUR_DEBUG((LM_INFO, "[CProactorUDPHandler::SendMessage]set_address error[%d].\n", errno));
-		SAFE_DELETE_ARRAY(pMessage);
 		return false;
 	}
 
@@ -97,13 +96,11 @@ bool CReactorUDPClient::SendMessage(const char* pMessage, uint32 u4Len, const ch
 		m_atvOutput = ACE_OS::gettimeofday();
 		m_u4SendSize += u4Len;
 		m_u4SendPacketCount++;
-		SAFE_DELETE_ARRAY(pMessage);
 		return true;
 	}
 	else
 	{
 		OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::SendMessage]send error(%d).\n", errno));
-		SAFE_DELETE_ARRAY(pMessage);
 		return false;
 	}
 }
