@@ -36,6 +36,15 @@ struct _MakePacket
 		m_PacketType        = PACKET_TCP;  //0为TCP,1是UDP 默认是TCP
 		m_u4ConnectID       = 0;
 		m_u1Option          = 0;
+		m_pPacketParse      = NULL;
+	}
+
+	void Clear()
+	{
+		m_PacketType        = PACKET_TCP;  //0为TCP,1是UDP 默认是TCP
+		m_u4ConnectID       = 0;
+		m_u1Option          = 0;
+		m_pPacketParse      = NULL;
 	}
 };
 

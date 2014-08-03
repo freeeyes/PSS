@@ -106,22 +106,22 @@ bool CMakePacketPool::Delete(_MakePacket* pBuffPacket)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	_MakePacket* pBuff = (_MakePacket* )pBuffPacket;
-	if(NULL == pBuff)
+	if(NULL == pBuffPacket)
 	{
 		return false;
 	}
+	pBuffPacket->Clear();
 
-	mapPacket::iterator f = m_mapPacketUsed.find(pBuff);
+	mapPacket::iterator f = m_mapPacketUsed.find(pBuffPacket);
 	if(f != m_mapPacketUsed.end())
 	{
 		m_mapPacketUsed.erase(f);
 
 		//添加到Free map里面
-		mapPacket::iterator f = m_mapPacketFree.find(pBuff);
+		mapPacket::iterator f = m_mapPacketFree.find(pBuffPacket);
 		if(f == m_mapPacketFree.end())
 		{
-			m_mapPacketFree.insert(mapPacket::value_type(pBuff, pBuff));
+			m_mapPacketFree.insert(mapPacket::value_type(pBuffPacket, pBuffPacket));
 		}
 	}
 
