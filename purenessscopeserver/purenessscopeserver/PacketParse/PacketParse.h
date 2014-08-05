@@ -11,6 +11,7 @@
 //add by freeeyes
 
 #include "PacketParseBase.h"
+#include "PacketBuffer.h"
 
 #ifdef WIN32
 #if defined PACKETPARSE_BUILD_DLL

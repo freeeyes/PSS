@@ -23,7 +23,6 @@ CPacketParseBase::CPacketParseBase(void)
 
 CPacketParseBase::~CPacketParseBase(void)
 {
-	m_objCurrBody.Close();
 }
 
 void CPacketParseBase::Init()
@@ -47,8 +46,6 @@ void CPacketParseBase::Clear()
 
 	m_blIsHead = false;
 
-	m_objCurrBody.Clear();
-
 	m_u4PacketHead      = 0;
 	m_u4PacketData      = 0;
 	m_u4HeadSrcSize     = 0;
@@ -70,7 +67,6 @@ void CPacketParseBase::Close()
 		m_pmbBody = NULL;
 	}
 
-	m_objCurrBody.Close();
 	m_blIsHead = false;
 }
 

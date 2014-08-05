@@ -99,6 +99,12 @@ uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurr
 		return PACKET_GET_ERROR;
 	}
 
+	CBuffPacket* pBuffPacket = App_PacketBufferManager::instance()->GetBuffPacket(u4ConnectID);
+	if(NULL == pBuffPacket)
+	{
+		return PACKET_GET_ERROR;
+	}
+
 	//这里添加了我的规则，比如，我的数据包第一个字节是7E开头，以7E为结尾，那么我会这么做
 	//首先，判断数据里面第一个字节是不是7E，如果不是，则返回错误的数据。
 	//如果是错误数据，为了保证数据安全，框架会关闭这个链接。
@@ -132,7 +138,7 @@ uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurr
 			if(pCurrMessage->length() > 2)
 			{
 				//将不完整的数据放入缓冲，等待完整后放入包体
-				m_objCurrBody.WriteStream(pCurrMessage->rd_ptr() + 1, pCurrMessage->length() - 1);
+				pBuffPacket->WriteStream(pCurrMessage->rd_ptr(), pCurrMessage->length());
 			}
 
 			m_blIsHead = true;
@@ -143,7 +149,7 @@ uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurr
 		else
 		{
 			//接收到了完整数据包
-			uint32 u4PacketLen = u4Pos - 1;
+			uint32 u4PacketLen = u4Pos;
 
 			m_u4PacketHead  = sizeof(uint32);
 			m_u4HeadSrcSize = sizeof(uint32);
@@ -192,12 +198,14 @@ uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurr
 			return PACKET_GET_ERROR;
 		}
 
-		uint32 u4Pos  = 1;
+		pBuffPacket->WriteStream(pData, u4Data);
+
+		uint32 u4Pos  = 0;
 		bool   blFind = false;
-		if(m_objCurrBody.GetPacketLen() > 0)
+		if(pBuffPacket->GetPacketLen() > 0)
 		{
 			//如果有缓冲，则看看是否有结束标记
-			for(u4Pos = 0; u4Pos < u4Data; u4Pos++)
+			for(u4Pos = 1; u4Pos < u4Data; u4Pos++)
 			{
 				//找到了包末尾
 				if(pData[u4Pos] == 0x7E)
@@ -223,9 +231,6 @@ uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurr
 
 		if(blFind == false)
 		{
-			//将不完整的数据放入缓冲，等待完整后放入包体
-			m_objCurrBody.WriteStream(pData, u4Data);
-
 			m_blIsHead = true;
 
 			//没有找到包尾，需要继续接受数据
@@ -234,15 +239,10 @@ uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurr
 		else
 		{
 			//接收到了完整数据包
-			if(u4Pos > 0)
-			{
-				m_objCurrBody.WriteStream(pData, u4Pos);
-			}
-			
 			m_u4PacketHead  = sizeof(uint32);
 			m_u4HeadSrcSize = sizeof(uint32);
-			m_u4PacketData  = m_objCurrBody.GetPacketLen();
-			m_u4BodySrcSize = m_objCurrBody.GetPacketLen();
+			m_u4PacketData  = u4Pos + 1;
+			m_u4BodySrcSize = u4Pos + 1;
 
 			//从内存池中申请一个包头
 			m_pmbHead = pMessageBlockManager->Create(sizeof(uint32));
@@ -253,12 +253,12 @@ uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurr
 
 			//记录包长，并转换为网络字节序，放入包头
 			//uint32 u4NetPacketLen = ACE_HTONL(m_objCurrBody.GetPacketLen());
-			uint32 u4NetPacketLen = m_objCurrBody.GetPacketLen();
+			uint32 u4NetPacketLen = m_u4PacketData;
 			memcpy(m_pmbHead->wr_ptr(), (char*)&u4NetPacketLen, sizeof(uint32));
 			m_pmbHead->wr_ptr(sizeof(uint32));
 
 			//从内存池申请一个包体
-			m_pmbBody = pMessageBlockManager->Create(m_objCurrBody.GetPacketLen());
+			m_pmbBody = pMessageBlockManager->Create(m_u4PacketData);
 			if(NULL == m_pmbBody)
 			{
 				return PACKET_GET_ERROR;
@@ -269,13 +269,16 @@ uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurr
 
 
 			//将包内容放入包体
-			memcpy(m_pmbBody->wr_ptr(), (char*)m_objCurrBody.GetData(), m_objCurrBody.GetPacketLen());
-			m_pmbBody->wr_ptr(u4NetPacketLen);
+			memcpy(m_pmbBody->wr_ptr(), (char*)pBuffPacket->GetData(), m_u4PacketData);
+			m_pmbBody->wr_ptr(m_u4PacketData);
+
+			//删除缓冲中的数据
+			pBuffPacket->RollBack(u4Pos);
 
 			m_blIsHead = false;
 
 			//处理完的数据从池中移除
-			pCurrMessage->rd_ptr(u4Pos);
+			pCurrMessage->rd_ptr(pCurrMessage->length());
 			return PACKET_GET_ENOUGTH;
 		}
 
@@ -286,12 +289,15 @@ bool CPacketParse::Connect(uint32 u4ConnectID, _ClientIPInfo& objClientIPInfo)
 {
 	//这里添加你对连接建立的逻辑处理，如果没有则不用在这里写任何代码
 	//返回false，则连接会断开
+	App_PacketBufferManager::instance()->AddBuffer(u4ConnectID);
+
 	return true;
 }
 
 void CPacketParse::DisConnect(uint32 u4ConnectID)
 {
 	//这里添加你对连接断开的逻辑处理
+	App_PacketBufferManager::instance()->DelBuffer(u4ConnectID);
 }
 
 

@@ -376,7 +376,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\packetParse.cpp"
+				RelativePath=".\PacketBuffer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PacketParse.cpp"
 				>
 			</File>
 			<File
@@ -401,7 +405,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\packetParse.h"
+				RelativePath=".\PacketBuffer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PacketParse.h"
 				>
 			</File>
 			<File

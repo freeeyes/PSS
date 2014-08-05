@@ -70,8 +70,6 @@ protected:
 
 	ACE_Message_Block* m_pmbHead;   //包头部分
 	ACE_Message_Block* m_pmbBody;   //包体部分
-
-	CBuffPacket m_objCurrBody;      //记录尚未完整的包体
 };
 
 #endif

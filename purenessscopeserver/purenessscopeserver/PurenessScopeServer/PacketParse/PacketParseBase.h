@@ -1,6 +1,12 @@
 #ifndef _PACKETPARSEBASE_H
 #define _PACKETPARSEBASE_H
 
+//这个类是把不经常变化的函数，放在这里，只让开发者去实现必要的5个接口
+//剩下的，开发者不需要关系，这是框架自己实现的事情。
+//所以剥离出来了这个类，想让他更简洁。
+//坚持每一点滴的进步，持续的走下去，这就是梦想。
+//add by freeeyes
+
 #include "BuffPacket.h"
 #include "IMessageBlockManager.h"
 
@@ -25,31 +31,32 @@ public:
 
 	virtual ~CPacketParseBase(void);
 
-	void Init();                                 //初始化CPacketParseBase的所有数据对象
-	void Clear();                                //清理当前数据缓冲 
-	void Close();                                //删除所有当前数据对象
+	void Init();
 
-	const char* GetPacketVersion();              //得到解析包逻辑版本 
-	uint8 GetPacketMode();                       //得到当前包的模式，1是带包头的，0是不带包头的（需要判定头尾标志的），默认是1
-	uint32 GetPacketHeadLen();                   //得到数据包头长度（解密后）
-	uint32 GetPacketBodyLen();                   //得到数据包体长度（解密后）
+	void Clear();
+
+	void Close();
+
+	const char* GetPacketVersion();
+	uint8 GetPacketMode();
+	uint32 GetPacketHeadLen();
+	uint32 GetPacketBodyLen();
 
 	uint16 GetPacketCommandID();
-	bool GetIsHead();                            //得到包头标记位，如果当前是包头，则返回True，否则返回False
-	uint32 GetPacketHeadSrcLen();                //得到数据包头长度（解密前）
-	uint32 GetPacketBodySrcLen();                //得到数据包体长度（解密前）
+	bool GetIsHead();
+	uint32 GetPacketHeadSrcLen();
+	uint32 GetPacketBodySrcLen();
 
-	ACE_Message_Block* GetMessageHead();         //得到数据包头内容（解密后） 
-	ACE_Message_Block* GetMessageBody();         //得到数据包体内容（解密后）
+	ACE_Message_Block* GetMessageHead();
+	ACE_Message_Block* GetMessageBody();
 
-	virtual bool SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager)           = 0;  //设置得到的数据包头，并在这里解密
-	virtual bool SetPacketBody(uint32 u4ConnectID, ACE_Message_Block* pmbBody, IMessageBlockManager* pMessageBlockManager)           = 0;  //设置得到的数据包体，并在这里解密 
-	virtual uint8 GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurrMessage, IMessageBlockManager* pMessageBlockManager)   = 0;  //专门对应 Mode为0的不带包头的数据包,如果是带包头的模式，这里什么都不用做。
-	virtual bool MakePacket(uint32 u4ConnectID, const char* pData, uint32 u4Len, ACE_Message_Block* pMbData, uint16 u2CommandID = 0) = 0;                        //创建返回包体结构
-	virtual uint32 MakePacketLength(uint32 u4ConnectID, uint32 u4DataLen, uint16 u2CommandID = 0)                                    = 0;                        //预先得到返回包体的长度
-
-	virtual bool Connect(uint32 u4ConnectID, _ClientIPInfo& objClientIPInfo)                                                         = 0;  //处理连接建立的代码
-	virtual void DisConnect(uint32 u4ConnectID)                                                                                      = 0;  //处理连接断开的代码
+	virtual bool SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager)           = 0;
+	virtual bool SetPacketBody(uint32 u4ConnectID, ACE_Message_Block* pmbBody, IMessageBlockManager* pMessageBlockManager)           = 0;
+	virtual uint8 GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurrMessage, IMessageBlockManager* pMessageBlockManager)   = 0;
+	virtual bool MakePacket(uint32 u4ConnectID, const char* pData, uint32 u4Len, ACE_Message_Block* pMbData, uint16 u2CommandID = 0) = 0;
+	virtual uint32 MakePacketLength(uint32 u4ConnectID, uint32 u4DataLen, uint16 u2CommandID = 0)                                    = 0;
+	virtual bool Connect(uint32 u4ConnectID, _ClientIPInfo& objClientIPInfo)                                                         = 0;
+	virtual void DisConnect(uint32 u4ConnectID)                                                                                      = 0;
 
 protected:
 	uint32 m_u4PacketHead;               //包头的长度
@@ -63,8 +70,6 @@ protected:
 
 	ACE_Message_Block* m_pmbHead;   //包头部分
 	ACE_Message_Block* m_pmbBody;   //包体部分
-
-	CBuffPacket m_objCurrBody;      //记录尚未完整的包体
 };
 
 #endif
