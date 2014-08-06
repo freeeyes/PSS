@@ -262,6 +262,11 @@ CMessage* CMakePacket::SetMessage(CPacketParse* pPacketParse, uint32 u4ConnectID
 		return NULL;
 	}
 
+	//填充数据包头信息
+	_PacketHeadInfo objPacketHeadInfo;
+	pPacketParse->GetPacketHeadInfo(objPacketHeadInfo);
+	pMessage->SetPacketHeadInfo(objPacketHeadInfo);
+
 	if(NULL != pMessage->GetMessageBase())
 	{
 		//开始组装数据

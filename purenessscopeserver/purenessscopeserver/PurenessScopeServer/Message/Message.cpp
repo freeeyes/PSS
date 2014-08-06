@@ -103,6 +103,8 @@ void CMessage::Close()
 		m_pmbBody->release();
 		m_pmbBody = NULL;
 	}
+
+	m_objPacketHeadInfo.Clear();
 }
 
 void CMessage::Clear()
@@ -118,6 +120,21 @@ void CMessage::Clear()
 		App_MessageBlockManager::instance()->Close(m_pmbBody);
 		m_pmbBody = NULL;
 	}
+
+	m_objPacketHeadInfo.Clear();
+}
+
+_PacketHeadInfo* CMessage::GetPacketHeadInfo()
+{
+	return &m_objPacketHeadInfo;
+}
+
+void CMessage::SetPacketHeadInfo(_PacketHeadInfo& objPacketHeadInfo)
+{
+	m_objPacketHeadInfo.m_u2Version = objPacketHeadInfo.m_u2Version;
+	m_objPacketHeadInfo.m_u2CmdID   = objPacketHeadInfo.m_u2CmdID;
+	m_objPacketHeadInfo.m_u4BodyLen = objPacketHeadInfo.m_u4BodyLen;
+	sprintf_safe(objPacketHeadInfo.m_szSession, SESSION_LEN, "%s", m_objPacketHeadInfo.m_szSession);
 }
 
 CMessagePool::CMessagePool()

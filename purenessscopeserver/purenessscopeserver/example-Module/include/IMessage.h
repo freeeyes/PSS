@@ -44,15 +44,17 @@ public:
 	virtual void Clear() = 0;
 
 	virtual void SetMessageBase(_MessageBase* pMessageBase)              = 0; //设置连接基本信息
+	virtual void SetPacketHeadInfo(_PacketHeadInfo& objPacketHeadInfo)   = 0; //设置包头协议信息 
 
 	virtual bool GetPacketHead(_PacketInfo& PacketInfo)    = 0;               //得到包头结构体，并赋值给_PacketInfo对象
 	virtual bool GetPacketBody(_PacketInfo& PacketInfo)    = 0;               //得到包体结构体，并赋值给_PacketInfo对象
 	virtual bool SetPacketHead(ACE_Message_Block* pmbHead) = 0;               //设置包头数据块
 	virtual bool SetPacketBody(ACE_Message_Block* pmbBody) = 0;               //设置包体数据块
 
-	virtual _MessageBase* GetMessageBase() = 0;                               //得到包连接基本信息
+	virtual _MessageBase* GetMessageBase()                 = 0;               //得到包连接基本信息
+	virtual _PacketHeadInfo* GetPacketHeadInfo()           = 0;               //得到包头协议信息 
 
-	virtual const char* GetError()         = 0;
+	virtual const char* GetError()                         = 0;
 };
 
 //中间服务器消息类接口

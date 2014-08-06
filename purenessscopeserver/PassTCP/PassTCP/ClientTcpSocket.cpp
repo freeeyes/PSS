@@ -232,13 +232,13 @@ void CClientTcpSocket::Run()
 				//发送数据
 				pSendData     = (char* )szSendBuffData;
 				nSendLen      = nSendLen * nSendCount;
-				nTotalRecvLen = nSendLen * nSendCount;
+				nTotalRecvLen = m_pSocket_Info->m_pLogic->GetRecvLength() * nSendCount;
 			}
 			else
 			{
 				//发送数据
 				pSendData     = (char* )m_pSocket_Info->m_pLogic->GetSendData(m_pSocket_Info->m_nThreadID, nSendIndex, nSendLen);
-				nTotalRecvLen = nSendLen;
+				nTotalRecvLen = m_pSocket_Info->m_pLogic->GetRecvLength();
 
 				nPacketCount  = 1;
 			}

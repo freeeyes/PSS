@@ -42,6 +42,7 @@ using namespace std;
 #define MAX_BUFF_1000 1000
 #define MAX_BUFF_1024 1024
 
+/*
 //计算当前版本号是否与制定版本好一致
 static bool Convert_Version(int nTagVserion)
 {
@@ -60,7 +61,8 @@ static bool Convert_Version(int nTagVserion)
 	}
 }
 
-#define CONVERT_ACE_VERSION(x) Convert_Version(x)
+#define CONVERT_ACE_VERSION Convert_Version(6200)
+*/
 
 //根据不同的操作系统，定义不同的recv接收参数类型
 #ifdef WIN32
@@ -507,6 +509,24 @@ typedef  struct _VCHARB_STR
 
 }VCHARB_STR;
 #endif
+
+//用于记录数据包头信息
+#define SESSION_LEN           32     //Session的大小
+struct _PacketHeadInfo
+{
+	uint16 m_u2Version;              //协议版本号
+	uint16 m_u2CmdID;                //协议命令字   
+	uint32 m_u4BodyLen;              //协议数据包体长度  
+	char   m_szSession[SESSION_LEN]; //数据包Session 
+
+	void Clear()
+	{
+		m_u2Version    = 0;
+		m_u2CmdID      = 0;
+		m_u4BodyLen    = 0;
+		m_szSession[0] = '\0';
+	}
+};
 
 //定时监控数据包和流量的数据信息，用于链接有效性的逻辑判定
 struct _TimeConnectInfo

@@ -39,22 +39,11 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 	}
 
 	//处理链接建立信息
-	if(pMessage->GetMessageBase()->m_u2Cmd == CLIENT_LINK_CONNECT)
-	{
-		return Do_Connect(pMessage);
-	}
-
-	//处理链接断开信息
-	if(pMessage->GetMessageBase()->m_u2Cmd == CLIENT_LINK_CDISCONNET)
-	{
-		return Do_DisConnect(pMessage);
-	}
-
-	//处理正常信息
-	if(pMessage->GetMessageBase()->m_u2Cmd == COMMAND_BASE)
-	{
-		return Do_Base(pMessage);
-	}
+	MESSAGE_FUNCTION_BEGIN(pMessage->GetMessageBase()->m_u2Cmd);
+	MESSAGE_FUNCTION(CLIENT_LINK_CONNECT, Do_Connect, pMessage);
+	MESSAGE_FUNCTION(CLIENT_LINK_CDISCONNET, Do_DisConnect, pMessage);
+	MESSAGE_FUNCTION(COMMAND_BASE, Do_Base, pMessage);
+	MESSAGE_FUNCTION_END;
 
 	return 0;
 
@@ -101,10 +90,8 @@ int CBaseCommand::Do_Base(IMessage* pMessage)
 	_PacketInfo BodyPacket;
 	pMessage->GetPacketBody(BodyPacket);
 
-	pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
+	//pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
 
-	//(*pBodyPacket) >> u2CommandID;
-	//(*pBodyPacket) >> u8ClientTime;
 
 	//测试记录二进制日志
 	//m_pServerObject->GetLogManager()->WriteLogBinary(LOG_SYSTEM, BodyPacket.m_pData, BodyPacket.m_nDataLen);
@@ -124,7 +111,12 @@ int CBaseCommand::Do_Base(IMessage* pMessage)
 	if(NULL != m_pServerObject->GetConnectManager())
 	{
 		//发送全部数据
-		m_pServerObject->GetConnectManager()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID, pResponsesPacket, SENDMESSAGE_JAMPNOMAL, u2PostCommandID, PACKET_SEND_IMMEDIATLY, PACKET_IS_FRAMEWORK_RECYC);
+		m_pServerObject->GetConnectManager()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID, 
+			pResponsesPacket, 
+			SENDMESSAGE_JAMPNOMAL, 
+			u2PostCommandID, 
+			PACKET_SEND_IMMEDIATLY, 
+			PACKET_IS_FRAMEWORK_RECYC);
 	}
 	else
 	{

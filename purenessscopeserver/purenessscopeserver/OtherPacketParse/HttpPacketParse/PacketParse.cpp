@@ -17,6 +17,21 @@ CPacketParse::~CPacketParse(void)
 {
 }
 
+void CPacketParse::Init()
+{
+	m_u4PacketHead      = PACKET_HEAD;
+	m_u2PacketCommandID = 0;
+	m_u4PacketData      = 0;
+	m_u4HeadSrcSize     = 0;
+	m_u4BodySrcSize     = 0;
+
+	m_blIsHead          = false;
+
+	m_pmbHead           = NULL;
+	m_pmbBody           = NULL;
+}
+
+
 bool CPacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager)
 {
 	//这里添加自己对包头的分析，主要分析出包长度。

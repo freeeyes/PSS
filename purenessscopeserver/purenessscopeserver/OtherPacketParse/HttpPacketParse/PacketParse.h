@@ -30,6 +30,9 @@ public:
 	CPacketParse(void);
 	virtual ~CPacketParse(void);
 
+	//初始化PacketParsed
+	void Init();
+
 	//得到符合条件的数据包头数据块，u4ConnectID是连接ID，pmbHead是数据块，pMessageBlockManager是数据块池，如果不用解密这个参数对你无效
 	bool SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager);
 	//得到符合条件的数据包体数据块，u4ConnectID是连接ID，pmbHead是数据块，pMessageBlockManager是数据块池，如果不用解密这个参数对你无效

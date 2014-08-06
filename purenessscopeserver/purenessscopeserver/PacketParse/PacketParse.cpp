@@ -4,10 +4,10 @@
 CPacketParse::CPacketParse(void)
 {
 	//如果是包头模式，这里需要设置包头的长度
-	m_u4PacketHead      = PACKET_HEAD;
+	m_u4PacketHead      = PACKET_HEAD_LENGTH;
 
 	//这里修改属于你的包解析版本号
-	sprintf_safe(m_szPacketVersion, MAX_BUFF_20, "0.90");
+	sprintf_safe(m_szPacketVersion, MAX_BUFF_20, "0.94");
 
 	//这里设置你的包模式
 	m_u1PacketMode      = PACKET_WITHHEAD;
@@ -18,46 +18,51 @@ CPacketParse::~CPacketParse(void)
 	
 }
 
+void CPacketParse::Init()
+{
+	m_u4PacketHead      = PACKET_HEAD_LENGTH;
+	m_u2PacketCommandID = 0;
+	m_u4PacketData      = 0;
+	m_u4HeadSrcSize     = 0;
+	m_u4BodySrcSize     = 0;
+
+	m_blIsHead          = false;
+
+	m_pmbHead           = NULL;
+	m_pmbBody           = NULL;
+}
+
 bool CPacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager)
 {
 	//这里添加自己对包头的分析，主要分析出包长度。
+	//获得包头30个字节的相关信息，还原成数据包信息结构
 	char* pData  = (char* )pmbHead->rd_ptr();
 	uint32 u4Len = pmbHead->length();
+	uint32 u4Pos = 0;
 
-	m_u4HeadSrcSize = u4Len;
-	if(u4Len == sizeof(uint32))
-	{
-		ACE_OS::memcpy(&m_u4PacketData, pData, sizeof(uint32));
-		
-		m_pmbHead = pmbHead;
-		m_blIsHead = true;
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	ACE_OS::memcpy((char* )&m_objPacketHeadInfo.m_u2Version, (char* )&pData[u4Pos], sizeof(uint16));
+	u4Pos += sizeof(uint16);
+	ACE_OS::memcpy((char* )&m_objPacketHeadInfo.m_u2CmdID, (char* )&pData[u4Pos], sizeof(uint16));
+	u4Pos += sizeof(uint16);
+	ACE_OS::memcpy((char* )&m_objPacketHeadInfo.m_u4BodyLen, (char* )&pData[u4Pos], sizeof(uint32));
+	u4Pos += sizeof(uint32);
+	ACE_OS::memcpy(m_objPacketHeadInfo.m_szSession, (char* )&pData[u4Pos], sizeof(char)*32);
+	u4Pos += sizeof(char)*32;
+
+	m_u4PacketData      = m_objPacketHeadInfo.m_u4BodyLen;
+	m_u2PacketCommandID = m_objPacketHeadInfo.m_u2CmdID;
+
+	m_pmbHead = pmbHead;
+
+	return true;
 }
 
 bool CPacketParse::SetPacketBody(uint32 u4ConnectID, ACE_Message_Block* pmbBody, IMessageBlockManager* pMessageBlockManager)
 {
 	//这里分析出包体内的一些数据，如果包头包含了CommandID，那么包体就不必做解析。
-	char* pData  = (char* )pmbBody->rd_ptr();
-	uint32 u4Len = pmbBody->length();
+	m_pmbBody = pmbBody;
+	return true;
 
-	m_u4BodySrcSize = u4Len;
-	if(u4Len >= sizeof(uint16))
-	{
-		ACE_OS::memcpy(&m_u2PacketCommandID, pData, sizeof(uint16));
-		m_blIsHead = false;
-		m_pmbBody = pmbBody;
-		return true;
-	}
-	else
-	{
-		m_blIsHead = false;
-		return false;
-	}
 }
 
 
@@ -300,5 +305,11 @@ void CPacketParse::DisConnect(uint32 u4ConnectID)
 	App_PacketBufferManager::instance()->DelBuffer(u4ConnectID);
 }
 
-
+void CPacketParse::GetPacketHeadInfo(_PacketHeadInfo& objPacketHeadInfo)
+{
+	objPacketHeadInfo.m_u2Version = m_objPacketHeadInfo.m_u2Version;
+	objPacketHeadInfo.m_u2CmdID   = m_objPacketHeadInfo.m_u2CmdID;
+	objPacketHeadInfo.m_u4BodyLen = m_objPacketHeadInfo.m_u4BodyLen;
+	sprintf_safe(objPacketHeadInfo.m_szSession, SESSION_LEN, "%s", m_objPacketHeadInfo.m_szSession);
+}
 

@@ -18,6 +18,21 @@ CConsolePacketParse::~CConsolePacketParse(void)
 	
 }
 
+
+void CConsolePacketParse::Init()
+{
+	m_u4PacketHead      = PACKET_HEAD;
+	m_u2PacketCommandID = 0;
+	m_u4PacketData      = 0;
+	m_u4HeadSrcSize     = 0;
+	m_u4BodySrcSize     = 0;
+
+	m_blIsHead          = false;
+
+	m_pmbHead           = NULL;
+	m_pmbBody           = NULL;
+}
+
 bool CConsolePacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager)
 {
 	char* pData = pmbHead->rd_ptr();
@@ -104,7 +119,14 @@ bool CConsolePacketParse::MakePacket(uint32 u4ConnectID, const char* pData, uint
 
 uint8 CConsolePacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurrMessage, IMessageBlockManager* pMessageBlockManager)
 {
-	return PACKET_GET_ERROR;
+	if(0 == u4ConnectID || NULL == pCurrMessage || NULL == pMessageBlockManager)
+	{
+		return PACKET_GET_ERROR;
+	}
+	else
+	{
+		return PACKET_GET_ERROR;
+	}
 }
 
 
@@ -131,5 +153,10 @@ void CConsolePacketParse::DisConnect( uint32 u4ConnectID )
 	}
 }
 
+void CConsolePacketParse::GetPacketHeadInfo(_PacketHeadInfo& objPacketHeadInfo)
+{
+	//Console不实现此方法
+	return;
+}
 
 

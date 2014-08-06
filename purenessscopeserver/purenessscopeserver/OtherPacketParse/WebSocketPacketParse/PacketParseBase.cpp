@@ -25,20 +25,6 @@ CPacketParseBase::~CPacketParseBase(void)
 {
 }
 
-void CPacketParseBase::Init()
-{
-	m_u4PacketHead      = PACKET_HEAD;
-	m_u2PacketCommandID = 0;
-	m_u4PacketData      = 0;
-	m_u4HeadSrcSize     = 0;
-	m_u4BodySrcSize     = 0;
-
-	m_blIsHead          = false;
-
-	m_pmbHead           = NULL;
-	m_pmbBody           = NULL;
-}
-
 void CPacketParseBase::Clear()
 {
 	m_pmbHead = NULL;
@@ -51,6 +37,8 @@ void CPacketParseBase::Clear()
 	m_u4HeadSrcSize     = 0;
 	m_u4BodySrcSize     = 0;
 	m_u2PacketCommandID = 0;
+
+	m_objPacketHeadInfo.Clear();
 }
 
 void CPacketParseBase::Close()

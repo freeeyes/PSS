@@ -22,12 +22,14 @@ public:
 	void Clear();
 
 	void SetMessageBase(_MessageBase* pMessageBase);
+	void SetPacketHeadInfo(_PacketHeadInfo& objPacketHeadInfo);
 	bool SetRecvPacket(IBuffPacket* pRecvPacket);
 
 	ACE_Message_Block* GetMessageHead();
 	ACE_Message_Block* GetMessageBody();
 
 	_MessageBase* GetMessageBase();
+	_PacketHeadInfo* GetPacketHeadInfo();
 
 	bool GetPacketHead(_PacketInfo& PacketInfo);
 	bool GetPacketBody(_PacketInfo& PacketInfo);
@@ -40,8 +42,9 @@ private:
 	char          m_szError[MAX_BUFF_500];
 	_MessageBase* m_pMessageBase;
 
-	ACE_Message_Block* m_pmbHead;   //包头部分
-	ACE_Message_Block* m_pmbBody;   //包体部分
+	ACE_Message_Block* m_pmbHead;             //包头部分
+	ACE_Message_Block* m_pmbBody;             //包体部分
+	_PacketHeadInfo    m_objPacketHeadInfo;   //包头协议信息
 };
 
 
