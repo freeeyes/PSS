@@ -91,7 +91,6 @@ void CBaseCommand::Do_Ftp_Login( IMessage* pMessage )
 
 	pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
 
-	(*pBodyPacket) >> u2CommandID;
 	(*pBodyPacket) >> strUserName;
 	(*pBodyPacket) >> strUserPass;
 
@@ -140,7 +139,6 @@ void CBaseCommand::Do_Ftp_Logout( IMessage* pMessage )
 
 	pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
 
-	(*pBodyPacket) >> u2CommandID;
 	(*pBodyPacket) >> strUserName;
 
 	//这里可以添加用户自己的逻辑判定方法
@@ -187,7 +185,6 @@ void CBaseCommand::Do_Ftp_FileList( IMessage* pMessage )
 
 	pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
 
-	(*pBodyPacket) >> u2CommandID;
 	(*pBodyPacket) >> strUserName;
 	(*pBodyPacket) >> strFilePath;
 
@@ -260,7 +257,6 @@ void CBaseCommand::Do_Ftp_FileDownLoad( IMessage* pMessage )
 
 	pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
 
-	(*pBodyPacket) >> u2CommandID;
 	(*pBodyPacket) >> strUserName;
 	(*pBodyPacket) >> strFilePath;
 	(*pBodyPacket) >> u4BlockSize;
@@ -357,7 +353,6 @@ void CBaseCommand::Do_Ftp_FileUpLoad(IMessage* pMessage)
 
 	pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
 
-	(*pBodyPacket) >> u2CommandID;
 	(*pBodyPacket) >> strUserName;
 	(*pBodyPacket) >> strFilePath;
 	(*pBodyPacket) >> u4BlockSize;

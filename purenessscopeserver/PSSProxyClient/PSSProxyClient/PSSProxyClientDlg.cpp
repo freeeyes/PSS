@@ -207,7 +207,7 @@ void CPSSProxyClientDlg::InitView()
 	m_txtServerIP.SetWindowText(_T("127.0.0.1"));
 	m_txtServerPort.SetWindowText(_T("10002"));
 
-	m_txtSendData.SetWindowText(_T("0a 00 00 00 30 10 be cd aa 8f 3c 01 00 00"));
+	m_txtSendData.SetWindowText(_T("01 00 30 10 08 00 00 00 46 45 45 45 45 59 45 53 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 be cd aa 8f 3c 01 00 00"));
 
 	//初始化TCP链接
 	WSADATA wsaData;
@@ -288,9 +288,9 @@ void CPSSProxyClientDlg::Send_Data( const char* pSendBuff, int nLen )
 	}
 
 	//先接收四字节的数据包长度
-	char szRecvLength[4] = {'\0'};
-	nCurrRecvLen = recv(m_sckClient, (char* )szRecvLength, 4, 0);
-	if(nCurrRecvLen != 4)
+	char szRecvLength[30] = {'\0'};
+	nCurrRecvLen = recv(m_sckClient, (char* )szRecvLength, 30, 0);
+	if(nCurrRecvLen != 30)
 	{
 		DWORD dwError = GetLastError();
 		MessageBox(_T("远程服务器接收数据失败"), _T("错误信息"), MB_OK);
@@ -298,7 +298,7 @@ void CPSSProxyClientDlg::Send_Data( const char* pSendBuff, int nLen )
 	}
 
 	int nRecvLength = 0;
-	memcpy_s(&nRecvLength, sizeof(int), szRecvLength, sizeof(int));
+	memcpy_s(&nRecvLength, sizeof(int), &szRecvLength[4], sizeof(int));
 	char* pRecvBuff = new char[nRecvLength];
 	int nRecvBegin  = 0;
 

@@ -80,8 +80,6 @@ void CBaseCommand::Do_PlugA_DATA(IMessage* pMessage)
 	pMessage->GetPacketBody(BodyPacket);
 
 	pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
-
-	(*pBodyPacket) >> u2CommandID;
 	(*pBodyPacket) >> strUserText;
 
 	//获得数据，并交给PlugB插件去处理

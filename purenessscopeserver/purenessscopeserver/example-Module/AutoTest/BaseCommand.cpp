@@ -107,7 +107,6 @@ bool CBaseCommand::Do_Head(IMessage* pMessage)
 
 	pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
 
-	(*pBodyPacket) >> u2CommandID;
 	(*pBodyPacket) >> u8ClientTime;
 
 	IBuffPacket* pResponsesPacket = m_pServerObject->GetPacketManager()->Create();
@@ -157,6 +156,7 @@ bool CBaseCommand::Do_NoHead(IMessage* pMessage)
 
 	//数据原样奉还
 	(*pResponsesPacket) << (uint32)BodyPacket.m_nDataLen;
+	(*pResponsesPacket) << pMessage->GetPacketHeadInfo()->m_u2CmdID;
 	pResponsesPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
 
 	m_pServerObject->GetPacketManager()->Delete(pBodyPacket);
@@ -195,7 +195,6 @@ bool CBaseCommand::Do_HeadBuff(IMessage* pMessage)
 
 	pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
 
-	(*pBodyPacket) >> u2CommandID;
 	(*pBodyPacket) >> u8ClientTime;
 
 	IBuffPacket* pResponsesPacket = m_pServerObject->GetPacketManager()->Create();
@@ -298,7 +297,6 @@ bool CBaseCommand::Do_LogData(IMessage* pMessage)
 
 	pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
 
-	(*pBodyPacket) >> u2CommandID;
 	(*pBodyPacket) >> u4Index;
 
 	m_pServerObject->GetPacketManager()->Delete(pBodyPacket);
@@ -346,7 +344,6 @@ bool CBaseCommand::Do_SleepWorkThread(IMessage* pMessage)
 
 	pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
 
-	(*pBodyPacket) >> u2CommandID;
 	(*pBodyPacket) >> u4Index;
 
 	m_pServerObject->GetPacketManager()->Delete(pBodyPacket);

@@ -174,7 +174,7 @@ void CPlugClientDlg::Init()
 {
 	m_txtServerIP.SetWindowText(_T("127.0.0.1"));
 	m_txtServerPort.SetWindowText(_T("10002"));
-	m_txtText.SetWindowText(_T("freeeyes，在天际，不带走一丝云彩。"));
+	m_txtText.SetWindowText(_T("freeeyes，在天际，随云聚云散，梦起梦逝，雁过留影。"));
 
 	//初始化TCP链接
 	WSADATA wsaData;
@@ -216,7 +216,7 @@ void CPlugClientDlg::OnBnClickedButton1()
 
 	m_txtText.GetWindowText(strData);
 	nSrcLen = WideCharToMultiByte(CP_ACP, 0, strData, strData.GetLength(), NULL, 0, NULL, NULL);
-	nDecLen = WideCharToMultiByte(CP_ACP, 0, strData, nSrcLen, szText, MAX_BUFF_50, NULL,NULL);
+	nDecLen = WideCharToMultiByte(CP_ACP, 0, strData, nSrcLen, szText, MAX_BUFF_200, NULL,NULL);
 	szText[nDecLen] = '\0';
 
 	Send_Plug(szText);
@@ -262,13 +262,22 @@ bool CPlugClientDlg::Send_Plug(const char* pText, bool blIsDisPlay)
 		return false;
 	}
 
+	int nVersion = 1;
 	int nPos = 0;
-	int nLen = 2 + 2 + (int)strlen(pText);
+	int nLen = (int)strlen(pText) + 2;
+	char szSession[32] = {'\0'};
 
-	memcpy_s(&szSendBuff[nPos], sizeof(int), (char*)&nLen, sizeof(int));
-	nPos += sizeof(int);
+	sprintf_s(szSession, 32, "FREEEYES");
+
+	memcpy_s(&szSendBuff[nPos], sizeof(short), (char*)&nVersion, sizeof(short));
+	nPos += sizeof(short);
 	memcpy_s(&szSendBuff[nPos], sizeof(short), (char*)&nCommand, sizeof(short));
 	nPos += sizeof(short);
+	memcpy_s(&szSendBuff[nPos], sizeof(int), (char*)&nLen, sizeof(int));
+	nPos += sizeof(int);
+	memcpy_s(&szSendBuff[nPos], sizeof(char)*32, (char*)szSession, sizeof(char)*32);
+	nPos += sizeof(char)*32;
+
 	int nStrLen = (int)strlen(pText);
 	memcpy_s(&szSendBuff[nPos], sizeof(short), (char*)&nStrLen, sizeof(short));
 	nPos += sizeof(short);
@@ -420,7 +429,7 @@ bool CPlugClientDlg::Send_Multiple_Plug()
 
 	m_txtText.GetWindowText(strData);
 	nSrcLen = WideCharToMultiByte(CP_ACP, 0, strData, strData.GetLength(), NULL, 0, NULL, NULL);
-	nDecLen = WideCharToMultiByte(CP_ACP, 0, strData, nSrcLen, szText, MAX_BUFF_50, NULL,NULL);
+	nDecLen = WideCharToMultiByte(CP_ACP, 0, strData, nSrcLen, szText, MAX_BUFF_200, NULL,NULL);
 	szText[nDecLen] = '\0';
 
 	m_blIsRun = true;

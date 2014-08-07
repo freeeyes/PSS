@@ -13,7 +13,7 @@
 #include "PacketParseBase.h"
 #include "PacketBuffer.h"
 
-#define PACKET_HEAD_LENGTH         32            //包头长度
+#define PACKET_HEAD_LENGTH         40            //包头长度
 
 #ifdef WIN32
 #if defined PACKETPARSE_BUILD_DLL

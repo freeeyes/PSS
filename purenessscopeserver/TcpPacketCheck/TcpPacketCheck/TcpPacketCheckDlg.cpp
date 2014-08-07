@@ -194,8 +194,11 @@ bool CTcpPacketCheckDlg::CheckTcpPacket( _ClientInfo& objClientInfo, int nIndex)
 	SOCKET sckClient;
 	char szResult[1024]     = {'\0'};
 	wchar_t sszResult[1024] = {'\0'};
+	char szSession[32]      = {'\0'}; 
 	int nSrcLen = 0;
 	int nDecLen = 0;
+
+	sprintf_s(szSession, 32, "FREEEYES");
 
 	//socket创建的准备工作
 	struct sockaddr_in sockaddr;
@@ -228,13 +231,16 @@ bool CTcpPacketCheckDlg::CheckTcpPacket( _ClientInfo& objClientInfo, int nIndex)
 	//拼装发送包体
 	char szSendBuffer[MAX_BUFF_200] ={'\0'};
 
+	short sVersion = 1;
 	short sCommand = (short)COMMAND_AUTOTEST_HEAD;
-	int nPacketLen = objClientInfo.m_nSendLength + 2;
+	int nPacketLen = objClientInfo.m_nSendLength;
 
-	memcpy_s(szSendBuffer, sizeof(int), (char* )&nPacketLen, sizeof(int));
-	memcpy_s((char* )&szSendBuffer[4], sizeof(short), (char* )&sCommand, sizeof(short));
-	memcpy_s((char* )&szSendBuffer[6], sizeof(char) * objClientInfo.m_nSendLength, (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
-	int nSendLen = nPacketLen + 4;
+	memcpy_s(szSendBuffer, sizeof(short), (char* )&sVersion, sizeof(short));
+	memcpy_s((char* )&szSendBuffer[2], sizeof(short), (char* )&sCommand, sizeof(short));
+	memcpy_s((char* )&szSendBuffer[4], sizeof(int), (char* )&nPacketLen, sizeof(int));
+	memcpy_s((char* )&szSendBuffer[8], sizeof(char)*32, (char* )&szSession, sizeof(char)*32);
+	memcpy_s((char* )&szSendBuffer[40], sizeof(char) * objClientInfo.m_nSendLength, (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
+	int nSendLen = nPacketLen + 40;
 
 	//发送数据
 	int nTotalSendLen = nSendLen;
@@ -292,7 +298,7 @@ bool CTcpPacketCheckDlg::CheckTcpPacket( _ClientInfo& objClientInfo, int nIndex)
 	}
 	else
 	{
-		int nTotalRecvLen               = nSendLen;
+		int nTotalRecvLen               = nPacketLen + sizeof(int);
 		char szRecvBuffData[1024 * 100] = {'\0'};
 
 		while(true)
@@ -347,8 +353,11 @@ bool CTcpPacketCheckDlg::CheckMultipleTcpPacket( _ClientInfo& objClientInfo, int
 	SOCKET sckClient;
 	char szResult[1024]     = {'\0'};
 	wchar_t sszResult[1024] = {'\0'};
+	char szSession[32]      = {'\0'}; 
 	int nSrcLen = 0;
 	int nDecLen = 0;
+
+	sprintf_s(szSession, 32, "FREEEYES");
 
 	//socket创建的准备工作
 	struct sockaddr_in sockaddr;
@@ -381,13 +390,16 @@ bool CTcpPacketCheckDlg::CheckMultipleTcpPacket( _ClientInfo& objClientInfo, int
 	//拼装发送包体
 	char szSendBuffer[MAX_BUFF_200] ={'\0'};
 
+	short sVersion = 1;
 	short sCommand = (short)COMMAND_AUTOTEST_HEAD;
-	int nPacketLen = objClientInfo.m_nSendLength + 2;
+	int nPacketLen = objClientInfo.m_nSendLength;
 
-	memcpy_s(szSendBuffer, sizeof(int), (char* )&nPacketLen, sizeof(int));
-	memcpy_s((char* )&szSendBuffer[4], sizeof(short), (char* )&sCommand, sizeof(short));
-	memcpy_s((char* )&szSendBuffer[6], sizeof(char) * objClientInfo.m_nSendLength, (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
-	int nSendLen = nPacketLen + 4;
+	memcpy_s(szSendBuffer, sizeof(short), (char* )&sVersion, sizeof(short));
+	memcpy_s((char* )&szSendBuffer[2], sizeof(short), (char* )&sCommand, sizeof(short));
+	memcpy_s((char* )&szSendBuffer[4], sizeof(int), (char* )&nPacketLen, sizeof(int));
+	memcpy_s((char* )&szSendBuffer[8], sizeof(char)*32, (char* )&szSession, sizeof(char)*32);
+	memcpy_s((char* )&szSendBuffer[40], sizeof(char) * objClientInfo.m_nSendLength, (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);	
+	int nSendLen = nPacketLen + 40;
 
 	//固定5个数据包同时发送
 	char* pData = new char[5 * nSendLen];
@@ -454,7 +466,7 @@ bool CTcpPacketCheckDlg::CheckMultipleTcpPacket( _ClientInfo& objClientInfo, int
 	}
 	else
 	{
-		int nTotalRecvLen               = 5 * nSendLen;
+		int nTotalRecvLen               = 5 * (nPacketLen + sizeof(int));
 		char szRecvBuffData[1024 * 100] = {'\0'};
 
 		while(true)
@@ -510,8 +522,11 @@ bool CTcpPacketCheckDlg::CheckValidPacket( _ClientInfo& objClientInfo, int nInde
 	SOCKET sckClient;
 	char szResult[1024]     = {'\0'};
 	wchar_t sszResult[1024] = {'\0'};
+	char szSession[32]      = {'\0'}; 
 	int nSrcLen = 0;
 	int nDecLen = 0;
+
+	sprintf_s(szSession, 32, "FREEEYES");
 
 	//socket创建的准备工作
 	struct sockaddr_in sockaddr;
@@ -660,8 +675,11 @@ bool CTcpPacketCheckDlg::CheckHalfPacket( _ClientInfo& objClientInfo, int nIndex
 	SOCKET sckClient;
 	char szResult[1024]     = {'\0'};
 	wchar_t sszResult[1024] = {'\0'};
+	char szSession[32]      = {'\0'}; 
 	int nSrcLen = 0;
 	int nDecLen = 0;
+
+	sprintf_s(szSession, 32, "FREEEYES");
 
 	//socket创建的准备工作
 	struct sockaddr_in sockaddr;
@@ -694,13 +712,16 @@ bool CTcpPacketCheckDlg::CheckHalfPacket( _ClientInfo& objClientInfo, int nIndex
 	//拼装发送包体
 	char szSendBuffer[MAX_BUFF_200] ={'\0'};
 
+	short sVersion = 1;
 	short sCommand = (short)COMMAND_AUTOTEST_HEAD;
-	int nPacketLen = objClientInfo.m_nSendLength + 2;
+	int nPacketLen = objClientInfo.m_nSendLength;
 
-	memcpy_s(szSendBuffer, sizeof(int), (char* )&nPacketLen, sizeof(int));
-	memcpy_s((char* )&szSendBuffer[4], sizeof(short), (char* )&sCommand, sizeof(short));
-	memcpy_s((char* )&szSendBuffer[6], sizeof(char) * objClientInfo.m_nSendLength, (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
-	int nSendLen = nPacketLen + 4;
+	memcpy_s(szSendBuffer, sizeof(short), (char* )&sVersion, sizeof(short));
+	memcpy_s((char* )&szSendBuffer[2], sizeof(short), (char* )&sCommand, sizeof(short));
+	memcpy_s((char* )&szSendBuffer[4], sizeof(int), (char* )&nPacketLen, sizeof(int));
+	memcpy_s((char* )&szSendBuffer[8], sizeof(char)*32, (char* )&szSession, sizeof(char)*32);
+	memcpy_s((char* )&szSendBuffer[40], sizeof(char) * objClientInfo.m_nSendLength, (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);	
+	int nSendLen = nPacketLen + 40;
 
 	//数据包随意切分,2个数据包
 	char* pData = new char[2 * nSendLen];
@@ -809,12 +830,11 @@ bool CTcpPacketCheckDlg::CheckHalfPacket( _ClientInfo& objClientInfo, int nIndex
 	}
 	else
 	{
-		int nTotalRecvLen               = 2 * nSendLen;
+		int nTotalRecvLen               = 2 * (nPacketLen + sizeof(int));
 		char szRecvBuffData[1024 * 100] = {'\0'};
 
 		while(true)
 		{
-
 			//如果发送成功了，则处理接收数据
 			nCurrRecvLen = recv(sckClient, (char* )szRecvBuffData + nBeginRecv, nTotalRecvLen, 0);
 			if(nCurrRecvLen <= 0)
@@ -866,8 +886,11 @@ bool CTcpPacketCheckDlg::CheckIsHead( _ClientInfo& objClientInfo, int nIndex )
 	SOCKET sckClient;
 	char szResult[1024]     = {'\0'};
 	wchar_t sszResult[1024] = {'\0'};
+	char szSession[32]      = {'\0'}; 
 	int nSrcLen = 0;
 	int nDecLen = 0;
+
+	sprintf_s(szSession, 32, "FREEEYES");
 
 	//socket创建的准备工作
 	struct sockaddr_in sockaddr;
@@ -900,13 +923,16 @@ bool CTcpPacketCheckDlg::CheckIsHead( _ClientInfo& objClientInfo, int nIndex )
 	//拼装发送包体
 	char szSendBuffer[MAX_BUFF_200] ={'\0'};
 
+	short sVersion = 1;
 	short sCommand = (short)COMMAND_AUTOTEST_HEAD;
-	int nPacketLen = objClientInfo.m_nSendLength + 2;
+	int nPacketLen = objClientInfo.m_nSendLength;
 
-	memcpy_s(szSendBuffer, sizeof(int), (char* )&nPacketLen, sizeof(int));
-	memcpy_s((char* )&szSendBuffer[4], sizeof(short), (char* )&sCommand, sizeof(short));
-	memcpy_s((char* )&szSendBuffer[6], sizeof(char) * objClientInfo.m_nSendLength, (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
-	int nSendLen = nPacketLen + 4;
+	memcpy_s(szSendBuffer, sizeof(short), (char* )&sVersion, sizeof(short));
+	memcpy_s((char* )&szSendBuffer[2], sizeof(short), (char* )&sCommand, sizeof(short));
+	memcpy_s((char* )&szSendBuffer[4], sizeof(int), (char* )&nPacketLen, sizeof(int));
+	memcpy_s((char* )&szSendBuffer[8], sizeof(char)*32, (char* )&szSession, sizeof(char)*32);
+	memcpy_s((char* )&szSendBuffer[40], sizeof(char) * objClientInfo.m_nSendLength, (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
+	int nSendLen = nPacketLen + 40;
 
 	//发送数据
 	int nTotalSendLen = nSendLen;
@@ -1074,8 +1100,11 @@ bool CTcpPacketCheckDlg::CheckIsNoHead( _ClientInfo& objClientInfo, int nIndex )
 	SOCKET sckClient;
 	char szResult[1024]     = {'\0'};
 	wchar_t sszResult[1024] = {'\0'};
+	char szSession[32]      = {'\0'}; 
 	int nSrcLen = 0;
 	int nDecLen = 0;
+
+	sprintf_s(szSession, 32, "FREEEYES");
 
 	//socket创建的准备工作
 	struct sockaddr_in sockaddr;
@@ -1108,13 +1137,16 @@ bool CTcpPacketCheckDlg::CheckIsNoHead( _ClientInfo& objClientInfo, int nIndex )
 	//拼装发送包体
 	char szSendBuffer[MAX_BUFF_200] ={'\0'};
 
+	short sVersion = 1;
 	short sCommand = (short)COMMAND_AUTOTEST_NOHEAD;
 	int nPacketLen = objClientInfo.m_nSendLength + 2;
 
-	memcpy_s(szSendBuffer, sizeof(int), (char* )&nPacketLen, sizeof(int));
-	memcpy_s((char* )&szSendBuffer[4], sizeof(short), (char* )&sCommand, sizeof(short));
-	memcpy_s((char* )&szSendBuffer[6], sizeof(char) * objClientInfo.m_nSendLength, (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
-	int nSendLen = nPacketLen + 4;
+	memcpy_s(szSendBuffer, sizeof(short), (char* )&sVersion, sizeof(short));
+	memcpy_s((char* )&szSendBuffer[2], sizeof(short), (char* )&sCommand, sizeof(short));
+	memcpy_s((char* )&szSendBuffer[4], sizeof(int), (char* )&nPacketLen, sizeof(int));
+	memcpy_s((char* )&szSendBuffer[8], sizeof(char)*32, (char* )&szSession, sizeof(char)*32);
+	memcpy_s((char* )&szSendBuffer[40], sizeof(char) * objClientInfo.m_nSendLength, (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
+	int nSendLen = nPacketLen + 40;
 
 	//发送数据
 	int nTotalSendLen = nSendLen;
@@ -1172,7 +1204,7 @@ bool CTcpPacketCheckDlg::CheckIsNoHead( _ClientInfo& objClientInfo, int nIndex )
 	}
 	else
 	{
-		int nTotalRecvLen               = nSendLen;
+		int nTotalRecvLen               = objClientInfo.m_nRecvLength;
 		char szRecvBuffData[1024 * 100] = {'\0'};
 
 		while(true)
@@ -1283,8 +1315,11 @@ bool CTcpPacketCheckDlg::CheckIsHeadBuffer( _ClientInfo& objClientInfo, int nInd
 	SOCKET sckClient;
 	char szResult[1024]     = {'\0'};
 	wchar_t sszResult[1024] = {'\0'};
+	char szSession[32]      = {'\0'}; 
 	int nSrcLen = 0;
 	int nDecLen = 0;
+
+	sprintf_s(szSession, 32, "FREEEYES");
 
 	//socket创建的准备工作
 	struct sockaddr_in sockaddr;
@@ -1317,13 +1352,16 @@ bool CTcpPacketCheckDlg::CheckIsHeadBuffer( _ClientInfo& objClientInfo, int nInd
 	//拼装发送包体
 	char szSendBuffer[MAX_BUFF_200] ={'\0'};
 
+	short sVersion = 1;
 	short sCommand = (short)COMMAND_AUTOTEST_HEADBUFF;
-	int nPacketLen = objClientInfo.m_nSendLength + 2;
+	int nPacketLen = objClientInfo.m_nSendLength;
 
-	memcpy_s(szSendBuffer, sizeof(int), (char* )&nPacketLen, sizeof(int));
-	memcpy_s((char* )&szSendBuffer[4], sizeof(short), (char* )&sCommand, sizeof(short));
-	memcpy_s((char* )&szSendBuffer[6], sizeof(char) * objClientInfo.m_nSendLength, (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
-	int nSendLen = nPacketLen + 4;
+	memcpy_s(szSendBuffer, sizeof(short), (char* )&sVersion, sizeof(short));
+	memcpy_s((char* )&szSendBuffer[2], sizeof(short), (char* )&sCommand, sizeof(short));
+	memcpy_s((char* )&szSendBuffer[4], sizeof(int), (char* )&nPacketLen, sizeof(int));
+	memcpy_s((char* )&szSendBuffer[8], sizeof(char)*32, (char* )&szSession, sizeof(char)*32);
+	memcpy_s((char* )&szSendBuffer[40], sizeof(char) * objClientInfo.m_nSendLength, (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
+	int nSendLen = nPacketLen + 40;
 
 	//发送数据
 	int nTotalSendLen = nSendLen;
@@ -1381,7 +1419,7 @@ bool CTcpPacketCheckDlg::CheckIsHeadBuffer( _ClientInfo& objClientInfo, int nInd
 	}
 	else
 	{
-		int nTotalRecvLen               = nSendLen * 2;
+		int nTotalRecvLen               = (objClientInfo.m_nRecvLength) * 2;
 		char szRecvBuffData[1024 * 100] = {'\0'};
 
 		while(true)
@@ -1500,8 +1538,11 @@ bool CTcpPacketCheckDlg::CheckIsNoHeadBuffer( _ClientInfo& objClientInfo, int nI
 	SOCKET sckClient;
 	char szResult[1024]     = {'\0'};
 	wchar_t sszResult[1024] = {'\0'};
+	char szSession[32]      = {'\0'}; 
 	int nSrcLen = 0;
 	int nDecLen = 0;
+
+	sprintf_s(szSession, 32, "FREEEYES");
 
 	//socket创建的准备工作
 	struct sockaddr_in sockaddr;
@@ -1534,13 +1575,16 @@ bool CTcpPacketCheckDlg::CheckIsNoHeadBuffer( _ClientInfo& objClientInfo, int nI
 	//拼装发送包体
 	char szSendBuffer[MAX_BUFF_200] ={'\0'};
 
+	short sVersion = 1;
 	short sCommand = (short)COMMAND_AUTOTEST_NOHEADBUFF;
-	int nPacketLen = objClientInfo.m_nSendLength + 2;
+	int nPacketLen = objClientInfo.m_nSendLength;
 
-	memcpy_s(szSendBuffer, sizeof(int), (char* )&nPacketLen, sizeof(int));
-	memcpy_s((char* )&szSendBuffer[4], sizeof(short), (char* )&sCommand, sizeof(short));
-	memcpy_s((char* )&szSendBuffer[6], sizeof(char) * objClientInfo.m_nSendLength, (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
-	int nSendLen = nPacketLen + 4;
+	memcpy_s(szSendBuffer, sizeof(short), (char* )&sVersion, sizeof(short));
+	memcpy_s((char* )&szSendBuffer[2], sizeof(short), (char* )&sCommand, sizeof(short));
+	memcpy_s((char* )&szSendBuffer[4], sizeof(int), (char* )&nPacketLen, sizeof(int));
+	memcpy_s((char* )&szSendBuffer[8], sizeof(char)*32, (char* )&szSession, sizeof(char)*32);
+	memcpy_s((char* )&szSendBuffer[40], sizeof(char) * objClientInfo.m_nSendLength, (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
+	int nSendLen = nPacketLen + 40;
 
 	//发送数据
 	int nTotalSendLen = nSendLen;
@@ -1598,7 +1642,7 @@ bool CTcpPacketCheckDlg::CheckIsNoHeadBuffer( _ClientInfo& objClientInfo, int nI
 	}
 	else
 	{
-		int nTotalRecvLen               = nSendLen;
+		int nTotalRecvLen               = objClientInfo.m_nRecvLength;
 		char szRecvBuffData[1024 * 100] = {'\0'};
 
 		while(true)
@@ -1710,8 +1754,11 @@ bool CTcpPacketCheckDlg::CheckLogFile( _ClientInfo& objClientInfo, int nIndex )
 	SOCKET sckClient;
 	char szResult[1024]     = {'\0'};
 	wchar_t sszResult[1024] = {'\0'};
+	char szSession[32]      = {'\0'}; 
 	int nSrcLen = 0;
 	int nDecLen = 0;
+
+	sprintf_s(szSession, 32, "FREEEYES");
 
 	int nLogCount = 2;
 
@@ -1748,13 +1795,16 @@ bool CTcpPacketCheckDlg::CheckLogFile( _ClientInfo& objClientInfo, int nIndex )
 		//拼装发送包体
 		char szSendBuffer[MAX_BUFF_200] ={'\0'};
 
+		short sVersion = 1;
 		short sCommand = (short)COMMAND_AUTOTEST_LOGDATA;
-		int nPacketLen = 4 + 2;
+		int nPacketLen = 4;
 
-		memcpy_s(szSendBuffer, sizeof(int), (char* )&nPacketLen, sizeof(int));
-		memcpy_s((char* )&szSendBuffer[4], sizeof(short), (char* )&sCommand, sizeof(short));
-		memcpy_s((char* )&szSendBuffer[6], sizeof(int), (char* )&i, sizeof(int));
-		int nSendLen = nPacketLen + 4;
+		memcpy_s(szSendBuffer, sizeof(short), (char* )&sVersion, sizeof(short));
+		memcpy_s((char* )&szSendBuffer[2], sizeof(short), (char* )&sCommand, sizeof(short));
+		memcpy_s((char* )&szSendBuffer[4], sizeof(int), (char* )&nPacketLen, sizeof(int));
+		memcpy_s((char* )&szSendBuffer[8], sizeof(char)*32, (char* )&szSession, sizeof(char)*32);
+		memcpy_s((char* )&szSendBuffer[40], sizeof(int), (char* )&i, sizeof(int));
+		int nSendLen = 40 + 4;
 
 		//发送数据
 		int nTotalSendLen = nSendLen;
@@ -1925,8 +1975,11 @@ bool CTcpPacketCheckDlg::CheckWorkTimeout( _ClientInfo& objClientInfo, int nInde
 	SOCKET sckClient;
 	char szResult[1024]     = {'\0'};
 	wchar_t sszResult[1024] = {'\0'};
+	char szSession[32]      = {'\0'}; 
 	int nSrcLen = 0;
 	int nDecLen = 0;
+
+	sprintf_s(szSession, 32, "FREEEYES");
 
 	int nLogCount = 2;
 
@@ -1963,13 +2016,16 @@ bool CTcpPacketCheckDlg::CheckWorkTimeout( _ClientInfo& objClientInfo, int nInde
 		//拼装发送包体
 		char szSendBuffer[MAX_BUFF_200] ={'\0'};
 
+		short sVersion = 1;
 		short sCommand = (short)COMMAND_AUTOTEST_WORKTIMEOUT;
-		int nPacketLen = 4 + 2;
+		int nPacketLen = 4;
 
-		memcpy_s(szSendBuffer, sizeof(int), (char* )&nPacketLen, sizeof(int));
-		memcpy_s((char* )&szSendBuffer[4], sizeof(short), (char* )&sCommand, sizeof(short));
-		memcpy_s((char* )&szSendBuffer[6], sizeof(int), (char* )&i, sizeof(int));
-		int nSendLen = nPacketLen + 4;
+		memcpy_s(szSendBuffer, sizeof(short), (char* )&sVersion, sizeof(short));
+		memcpy_s((char* )&szSendBuffer[2], sizeof(short), (char* )&sCommand, sizeof(short));
+		memcpy_s((char* )&szSendBuffer[4], sizeof(int), (char* )&nPacketLen, sizeof(int));
+		memcpy_s((char* )&szSendBuffer[8], sizeof(char)*32, (char* )&szSession, sizeof(char)*32);
+		memcpy_s((char* )&szSendBuffer[40], sizeof(int), (char* )&i, sizeof(int));
+		int nSendLen = 4 + 40;
 
 		//发送数据
 		int nTotalSendLen = nSendLen;
@@ -2096,7 +2152,7 @@ bool CTcpPacketCheckDlg::CheckWorkTimeout( _ClientInfo& objClientInfo, int nInde
 				memcpy_s((char* )&nResult, sizeof(int), (char* )&szRecvBuffData[2], sizeof(int));
 
 				//判断返回命令字
-				if(nReturnCommand != (int)COMMAND_AUTOTEST_RETURN_WORKTIMEOUT || nReturnCommand != 0xffff)
+				if(nReturnCommand != (int)COMMAND_AUTOTEST_RETURN_WORKTIMEOUT && nReturnCommand != 0xffff)
 				{
 					closesocket(sckClient);
 
@@ -2130,7 +2186,7 @@ bool CTcpPacketCheckDlg::CheckWorkTimeout( _ClientInfo& objClientInfo, int nInde
 		closesocket(sckClient);
 
 		//只等一次
-		if(i == 1)
+		if(i == 0)
 		{
 			//等待15秒
 			SleepEx(20000, TRUE);
@@ -2152,8 +2208,12 @@ bool CTcpPacketCheckDlg::CheckWorkAI( _ClientInfo& objClientInfo, int nIndex )
 	SOCKET sckClient;
 	char szResult[1024]     = {'\0'};
 	wchar_t sszResult[1024] = {'\0'};
+	char szSession[32]      = {'\0'}; 
 	int nSrcLen = 0;
 	int nDecLen = 0;
+
+	sprintf_s(szSession, 32, "FREEEYES");
+
 	bool blIsAlert = false;
 
 	int nLogCount = 3;
@@ -2191,13 +2251,16 @@ bool CTcpPacketCheckDlg::CheckWorkAI( _ClientInfo& objClientInfo, int nIndex )
 		//拼装发送包体
 		char szSendBuffer[MAX_BUFF_200] ={'\0'};
 
+		short sVersion = 1;
 		short sCommand = (short)COMMAND_AUTOTEST_WORKAI;
-		int nPacketLen = 4 + 2;
+		int nPacketLen = 4;
 
-		memcpy_s(szSendBuffer, sizeof(int), (char* )&nPacketLen, sizeof(int));
-		memcpy_s((char* )&szSendBuffer[4], sizeof(short), (char* )&sCommand, sizeof(short));
-		memcpy_s((char* )&szSendBuffer[6], sizeof(int), (char* )&i, sizeof(int));
-		int nSendLen = nPacketLen + 4;
+		memcpy_s(szSendBuffer, sizeof(short), (char* )&sVersion, sizeof(short));
+		memcpy_s((char* )&szSendBuffer[2], sizeof(short), (char* )&sCommand, sizeof(short));
+		memcpy_s((char* )&szSendBuffer[4], sizeof(int), (char* )&nPacketLen, sizeof(int));
+		memcpy_s((char* )&szSendBuffer[8], sizeof(char)*32, (char* )&szSession, sizeof(char)*32);
+		memcpy_s((char* )&szSendBuffer[40], sizeof(int), (char* )&i, sizeof(int));
+		int nSendLen = 40 + 4;
 
 		//发送数据
 		int nTotalSendLen = nSendLen;

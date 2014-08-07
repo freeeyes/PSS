@@ -125,7 +125,9 @@ void CBaseCommand::Do_Proxy_Data( IMessage* pMessage )
 	CProxyClient* pProxyClient =  App_ProxyThreadManager::instance()->GetProxyClientManager(u4ThreadID)->FindProxyClient(pMessage->GetMessageBase()->m_u4ConnectID);
 	if(NULL != pProxyClient)
 	{
+		_PacketInfo HeadPacket;
 		_PacketInfo BodyPacket;
+		pMessage->GetPacketHead(HeadPacket);
 		pMessage->GetPacketBody(BodyPacket);
 
 		char szPostData[MAX_RECV_BUFF] = {'\0'};
@@ -138,10 +140,10 @@ void CBaseCommand::Do_Proxy_Data( IMessage* pMessage )
 		}
 
 		//组装转发包
-		ACE_OS::memcpy(szPostData, (char* )&BodyPacket.m_nDataLen, sizeof(uint32));	
-		ACE_OS::memcpy(&szPostData[4], BodyPacket.m_pData, BodyPacket.m_nDataLen);	
+		ACE_OS::memcpy(szPostData, HeadPacket.m_pData, HeadPacket.m_nDataLen);	
+		ACE_OS::memcpy(&szPostData[HeadPacket.m_nDataLen], BodyPacket.m_pData, BodyPacket.m_nDataLen);	
 
-		pProxyClient->SendData(szPostData, BodyPacket.m_nDataLen + sizeof(uint32));
+		pProxyClient->SendData(szPostData, BodyPacket.m_nDataLen + HeadPacket.m_nDataLen);
 	}
 	else
 	{

@@ -60,7 +60,7 @@ void CBaseCommand::DoModuleMessage(IBuffPacket* pBuffPacket, IBuffPacket* pRetur
 	ACE_OS::memcpy(szText, strUserText.text, strUserText.u2Len);
 
 	ACE_Date_Time dt;
-	char szDateBuff[MAX_BUFF_50] = {'\0'};
+	char szDateBuff[MAX_BUFF_200] = {'\0'};
 
 	sprintf_safe(szDateBuff, MAX_BUFF_50, "%04d-%02d-%02d %02d:%02d:%02d,", dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second());
 

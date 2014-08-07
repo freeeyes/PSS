@@ -28,13 +28,13 @@ class CAboutDlg : public CDialog
 public:
 	CAboutDlg();
 
-// 对话框数据
+	// 对话框数据
 	enum { IDD = IDD_ABOUTBOX };
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
-// 实现
+	// 实现
 protected:
 	DECLARE_MESSAGE_MAP()
 };
@@ -58,7 +58,7 @@ END_MESSAGE_MAP()
 
 
 CPssFtpClientDlg::CPssFtpClientDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CPssFtpClientDlg::IDD, pParent)
+: CDialog(CPssFtpClientDlg::IDD, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -298,7 +298,7 @@ bool CPssFtpClientDlg::Connect()
 		MessageBox(_T("连接远程服务器失败"), _T("错误信息"), MB_OK);
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -324,20 +324,28 @@ bool CPssFtpClientDlg::Send_Login()
 		return false;
 	}
 
-	int nPos = 0;
-	int nLen = 2 + 2 + (int)strlen(m_ClientFTPInfo.szUserName) + (int)strlen(m_ClientFTPInfo.szUserPass);
+	short sVersion = 1;
+	int nPos       = 0;
+	int nLen       = 1 + 1 + (int)strlen(m_ClientFTPInfo.szUserName) + (int)strlen(m_ClientFTPInfo.szUserPass);
+	char szSession[32] = {'\0'};
 
-	memcpy_s(&szSendBuff[nPos], sizeof(int), (char*)&nLen, sizeof(int));
-	nPos += sizeof(int);
+	sprintf_s(szSession, 32, "FREEEYES");
+
+	memcpy_s(&szSendBuff[nPos], sizeof(short), (char*)&sVersion, sizeof(short));
+	nPos += sizeof(short);
 	memcpy_s(&szSendBuff[nPos], sizeof(short), (char*)&nCommand, sizeof(short));
 	nPos += sizeof(short);
+	memcpy_s(&szSendBuff[nPos], sizeof(int), (char*)&nLen, sizeof(int));
+	nPos += sizeof(int);
+	memcpy_s(&szSendBuff[nPos], sizeof(char)*32, (char*)szSession, sizeof(char)*32);
+	nPos += sizeof(char)*32;
 
 	int nStrLen = (int)strlen(m_ClientFTPInfo.szUserName);
 	memcpy_s(&szSendBuff[nPos], sizeof(char), (char*)&nStrLen, sizeof(char));
 	nPos += sizeof(char);
 	memcpy_s(&szSendBuff[nPos], nStrLen, (char*)m_ClientFTPInfo.szUserName, nStrLen);
 	nPos += nStrLen;
-	
+
 	nStrLen = (int)strlen(m_ClientFTPInfo.szUserPass);
 	memcpy_s(&szSendBuff[nPos], sizeof(char), (char*)&nStrLen, sizeof(char));
 	nPos += sizeof(char);
@@ -449,13 +457,21 @@ bool CPssFtpClientDlg::Send_Logout()
 		return false;
 	}
 
-	int nPos = 0;
-	int nLen = 2 + 1 + (int)strlen(m_ClientFTPInfo.szUserName);
+	short sVersion = 1;
+	int nPos       = 0;
+	int nLen       = 1 + (int)strlen(m_ClientFTPInfo.szUserName);
+	char szSession[32] = {'\0'};
 
-	memcpy_s(&szSendBuff[nPos], sizeof(int), (char*)&nLen, sizeof(int));
-	nPos += sizeof(int);
+	sprintf_s(szSession, 32, "FREEEYES");
+
+	memcpy_s(&szSendBuff[nPos], sizeof(short), (char*)&sVersion, sizeof(short));
+	nPos += sizeof(short);
 	memcpy_s(&szSendBuff[nPos], sizeof(short), (char*)&nCommand, sizeof(short));
 	nPos += sizeof(short);
+	memcpy_s(&szSendBuff[nPos], sizeof(int), (char*)&nLen, sizeof(int));
+	nPos += sizeof(int);
+	memcpy_s(&szSendBuff[nPos], sizeof(char)*32, (char*)szSession, sizeof(char)*32);
+	nPos += sizeof(char)*32;
 
 	int nStrLen = (int)strlen(m_ClientFTPInfo.szUserName);
 	memcpy_s(&szSendBuff[nPos], sizeof(char), (char*)&nStrLen, sizeof(char));
@@ -553,13 +569,21 @@ bool CPssFtpClientDlg::Send_FileList(const char* pRemotePath)
 		return false;
 	}
 
-	int nPos = 0;
-	int nLen = 2 + 3 + (int)strlen(m_ClientFTPInfo.szUserName) + (int)strlen(pRemotePath);
+	short sVersion = 1;
+	int nPos       = 0;
+	int nLen       = 1 + 2 + (int)strlen(m_ClientFTPInfo.szUserName) + (int)strlen(pRemotePath);
+	char szSession[32] = {'\0'};
 
-	memcpy_s(&szSendBuff[nPos], sizeof(int), (char*)&nLen, sizeof(int));
-	nPos += sizeof(int);
+	sprintf_s(szSession, 32, "FREEEYES");
+
+	memcpy_s(&szSendBuff[nPos], sizeof(short), (char*)&sVersion, sizeof(short));
+	nPos += sizeof(short);
 	memcpy_s(&szSendBuff[nPos], sizeof(short), (char*)&nCommand, sizeof(short));
 	nPos += sizeof(short);
+	memcpy_s(&szSendBuff[nPos], sizeof(int), (char*)&nLen, sizeof(int));
+	nPos += sizeof(int);
+	memcpy_s(&szSendBuff[nPos], sizeof(char)*32, (char*)szSession, sizeof(char)*32);
+	nPos += sizeof(char)*32;
 
 	int nStrLen = (int)strlen(m_ClientFTPInfo.szUserName);
 	memcpy_s(&szSendBuff[nPos], sizeof(char), (char*)&nStrLen, sizeof(char));
@@ -704,13 +728,21 @@ bool CPssFtpClientDlg::Send_Download(const char* pLocalPath, const char* pFileNa
 		return false;
 	}
 
-	int nPos = 0;
-	int nLen = 2 + 3 + (int)strlen(m_ClientFTPInfo.szUserName) + (int)strlen(pRemotePath) + 8;
+	short sVersion = 1;
+	int nPos       = 0;
+	int nLen       = 2 + 1 + 8 + (int)strlen(m_ClientFTPInfo.szUserName) + (int)strlen(pRemotePath);
+	char szSession[32] = {'\0'};
 
-	memcpy_s(&szSendBuff[nPos], sizeof(int), (char*)&nLen, sizeof(int));
-	nPos += sizeof(int);
+	sprintf_s(szSession, 32, "FREEEYES");
+
+	memcpy_s(&szSendBuff[nPos], sizeof(short), (char*)&sVersion, sizeof(short));
+	nPos += sizeof(short);
 	memcpy_s(&szSendBuff[nPos], sizeof(short), (char*)&nCommand, sizeof(short));
 	nPos += sizeof(short);
+	memcpy_s(&szSendBuff[nPos], sizeof(int), (char*)&nLen, sizeof(int));
+	nPos += sizeof(int);
+	memcpy_s(&szSendBuff[nPos], sizeof(char)*32, (char*)szSession, sizeof(char)*32);
+	nPos += sizeof(char)*32;
 
 	int nStrLen = (int)strlen(m_ClientFTPInfo.szUserName);
 	memcpy_s(&szSendBuff[nPos], sizeof(char), (char*)&nStrLen, sizeof(char));
@@ -911,13 +943,21 @@ bool CPssFtpClientDlg::Send_Upload( const char* pLocalPath, const char* pFileNam
 			fseek(pFile, (long)(i * nBufferSize), SEEK_CUR);
 
 			int nReadSize = fread((char* )szBuffer, sizeof(char), nBufferSize, pFile);
-			
-			int nLen = 2 + 3 + 4 + (int)strlen(m_ClientFTPInfo.szUserName) + (int)strlen(pRemotePath) + 8 + nBufferSize;
 
-			memcpy_s(&szSendBuff[nPos], sizeof(int), (char*)&nLen, sizeof(int));
-			nPos += sizeof(int);
+			int nLen = 2 + 1 + 12 + (int)strlen(m_ClientFTPInfo.szUserName) + (int)strlen(pRemotePath) + nBufferSize;
+
+			short sVersion = 1;
+			char szSession[32] = {'\0'};
+
+			sprintf_s(szSession, 32, "FREEEYES");
+			memcpy_s(&szSendBuff[nPos], sizeof(short), (char*)&sVersion, sizeof(short));
+			nPos += sizeof(short);
 			memcpy_s(&szSendBuff[nPos], sizeof(short), (char*)&nCommand, sizeof(short));
 			nPos += sizeof(short);
+			memcpy_s(&szSendBuff[nPos], sizeof(int), (char*)&nLen, sizeof(int));
+			nPos += sizeof(int);
+			memcpy_s(&szSendBuff[nPos], sizeof(char)*32, (char*)szSession, sizeof(char)*32);
+			nPos += sizeof(char)*32;
 
 			int nStrLen = (int)strlen(m_ClientFTPInfo.szUserName);
 			memcpy_s(&szSendBuff[nPos], sizeof(char), (char*)&nStrLen, sizeof(char));
@@ -948,12 +988,20 @@ bool CPssFtpClientDlg::Send_Upload( const char* pLocalPath, const char* pFileNam
 
 			int nReadSize = fread((char* )szBuffer, sizeof(char), nLastBufferSize, pFile);
 
-			int nLen = 2 + 3 + 4 + (int)strlen(m_ClientFTPInfo.szUserName) + (int)strlen(pRemotePath) + 8 + nLastBufferSize;
+			int nLen = 2 + 1 + 12 + (int)strlen(m_ClientFTPInfo.szUserName) + (int)strlen(pRemotePath) + nLastBufferSize;
 
-			memcpy_s(&szSendBuff[nPos], sizeof(int), (char*)&nLen, sizeof(int));
-			nPos += sizeof(int);
+			short sVersion = 1;
+			char szSession[32] = {'\0'};
+
+			sprintf_s(szSession, 32, "FREEEYES");
+			memcpy_s(&szSendBuff[nPos], sizeof(short), (char*)&sVersion, sizeof(short));
+			nPos += sizeof(short);
 			memcpy_s(&szSendBuff[nPos], sizeof(short), (char*)&nCommand, sizeof(short));
 			nPos += sizeof(short);
+			memcpy_s(&szSendBuff[nPos], sizeof(int), (char*)&nLen, sizeof(int));
+			nPos += sizeof(int);
+			memcpy_s(&szSendBuff[nPos], sizeof(char)*32, (char*)szSession, sizeof(char)*32);
+			nPos += sizeof(char)*32;
 
 			int nStrLen = (int)strlen(m_ClientFTPInfo.szUserName);
 			memcpy_s(&szSendBuff[nPos], sizeof(char), (char*)&nStrLen, sizeof(char));
@@ -1111,7 +1159,7 @@ void CPssFtpClientDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 
 	if(StrPathType )
 
-	*pResult = 0;
+		*pResult = 0;
 }
 
 void CPssFtpClientDlg::OnBnClickedButton4()
