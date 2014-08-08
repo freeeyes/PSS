@@ -367,13 +367,20 @@ bool CLoginClientDlg::Send_Login(_LoginInfo& objLoginInfo)
 		return false;
 	}
 
+	short sVersion = 1;
 	int nPos = 0;
 	int nLen = 2 + 2 + (int)strlen(m_objLoginClient.m_szUserName) + (int)strlen(m_objLoginClient.m_szUserPass);
+	char szSession[32] = {'\0'};
+	sprintf_s(szSession, 32, "FREEETES");
 
-	memcpy_s(&szSendBuff[nPos], sizeof(int), (char*)&nLen, sizeof(int));
-	nPos += sizeof(int);
+	memcpy_s(&szSendBuff[nPos], sizeof(short), (char*)&sVersion, sizeof(short));
+	nPos += sizeof(short);
 	memcpy_s(&szSendBuff[nPos], sizeof(short), (char*)&nCommand, sizeof(short));
 	nPos += sizeof(short);
+	memcpy_s(&szSendBuff[nPos], sizeof(int), (char*)&nLen, sizeof(int));
+	nPos += sizeof(int);
+	memcpy_s(&szSendBuff[nPos], sizeof(char)*32, (char*)szSession, sizeof(char)*32);
+	nPos += sizeof(char)*32;
 
 	int nStrLen = (int)strlen(m_objLoginClient.m_szUserName);
 	memcpy_s(&szSendBuff[nPos], sizeof(char), (char*)&nStrLen, sizeof(char));
@@ -547,13 +554,20 @@ bool CLoginClientDlg::Send_UserInfo( int nUserID )
 		return false;
 	}
 
+	short sVersion = 1;
 	int nPos = 0;
 	int nLen = 2 + 4;
+	char szSession[32] = {'\0'};
+	sprintf_s(szSession, 32, "FREEETES");
 
-	memcpy_s(&szSendBuff[nPos], sizeof(int), (char*)&nLen, sizeof(int));
-	nPos += sizeof(int);
+	memcpy_s(&szSendBuff[nPos], sizeof(short), (char*)&sVersion, sizeof(short));
+	nPos += sizeof(short);
 	memcpy_s(&szSendBuff[nPos], sizeof(short), (char*)&nCommand, sizeof(short));
 	nPos += sizeof(short);
+	memcpy_s(&szSendBuff[nPos], sizeof(int), (char*)&nLen, sizeof(int));
+	nPos += sizeof(int);
+	memcpy_s(&szSendBuff[nPos], sizeof(char)*32, (char*)szSession, sizeof(char)*32);
+	nPos += sizeof(char)*32;
 
 	memcpy_s(&szSendBuff[nPos], sizeof(int), (char*)&nUserID, sizeof(int));
 	nPos += sizeof(int);
@@ -668,13 +682,20 @@ bool CLoginClientDlg::Send_SetUserInfo( int nUserID, int nLife, int nMagic )
 		return false;
 	}
 
+	short sVersion = 1;
 	int nPos = 0;
 	int nLen = 2 + 4 + 4 + 4;
+	char szSession[32] = {'\0'};
+	sprintf_s(szSession, 32, "FREEEYES");
 
-	memcpy_s(&szSendBuff[nPos], sizeof(int), (char*)&nLen, sizeof(int));
-	nPos += sizeof(int);
 	memcpy_s(&szSendBuff[nPos], sizeof(short), (char*)&nCommand, sizeof(short));
 	nPos += sizeof(short);
+	memcpy_s(&szSendBuff[nPos], sizeof(short), (char*)&nCommand, sizeof(short));
+	nPos += sizeof(short);
+	memcpy_s(&szSendBuff[nPos], sizeof(int), (char*)&nLen, sizeof(int));
+	nPos += sizeof(int);
+	memcpy_s(&szSendBuff[nPos], sizeof(char)*32, (char*)szSession, sizeof(char)*32);
+	nPos += sizeof(char)*32;
 
 	memcpy_s(&szSendBuff[nPos], sizeof(int), (char*)&nUserID, sizeof(int));
 	nPos += sizeof(int);

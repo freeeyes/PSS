@@ -90,7 +90,6 @@ void CBaseCommand::Do_User_Login( IMessage* pMessage )
 
 	pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
 
-	(*pBodyPacket) >> u2CommandID;
 	(*pBodyPacket) >> strUserName;
 	(*pBodyPacket) >> strUserPass;
 
@@ -228,7 +227,6 @@ void CBaseCommand::Do_User_Logout( IMessage* pMessage )
 
 	pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
 
-	(*pBodyPacket) >> u2CommandID;
 	(*pBodyPacket) >> strUserName;
 
 	//将接收数据转换为字符串
@@ -287,7 +285,6 @@ void CBaseCommand::Do_User_Info( IMessage* pMessage )
 
 	pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
 
-	(*pBodyPacket) >> u2CommandID;
 	(*pBodyPacket) >> u4UserID;
 
 	IBuffPacket* pResponsesPacket = m_pServerObject->GetPacketManager()->Create();
@@ -398,7 +395,6 @@ void CBaseCommand::Do_Set_User_Info( IMessage* pMessage )
 
 	pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
 
-	(*pBodyPacket) >> u2CommandID;
 	(*pBodyPacket) >> u4UserID;
 	(*pBodyPacket) >> u4Life;
 	(*pBodyPacket) >> u4Magic;
