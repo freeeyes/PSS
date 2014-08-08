@@ -10,6 +10,10 @@
 #define COMMAND_BASE            0x1000
 #define COMMAND_RETURN_ALIVE    0xf000
 
+#define MESSAGE_FUNCTION_BEGIN(x) switch(x) { 
+#define MESSAGE_FUNCTION(x,y,z) case x: { y(z); break; }
+#define MESSAGE_FUNCTION_END }
+
 using namespace std;
 
 class CBaseCommand : public CClientCommand
