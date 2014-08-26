@@ -1,0 +1,12 @@
+project(LogFileWatch):aceexe{
+ 	exename = LogFileWatch
+
+ Source_Files{
+  ./*.cpp
+  ./TinyXML/*.cpp
+ }
+ includes += ./ ./TinyXML
+ macros += __LINUX__
+ 
+ exeout = ./Bin
+}
