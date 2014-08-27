@@ -39,9 +39,9 @@ bool CProServerManager::Init()
 	App_ForbiddenIP::instance()->Init(FORBIDDENIP_FILE);
 
 	//初始化连接器
-	if(!m_ConnectAcceptorManager.InitConnectAcceptor(nServerPortCount))
+	if(!App_ProConnectAcceptManager::instance()->InitConnectAcceptor(nServerPortCount))
 	{
-		OUR_DEBUG((LM_INFO, "[CProServerManager::Init]%s.\n", m_ConnectAcceptorManager.GetError()));
+		OUR_DEBUG((LM_INFO, "[CProServerManager::Init]%s.\n", App_ProConnectAcceptManager::instance()->GetError()));
 		return false;
 	}
 
@@ -195,7 +195,7 @@ bool CProServerManager::Start()
 		}
 
 		//得到接收器
-		ProConnectAcceptor* pConnectAcceptor = m_ConnectAcceptorManager.GetConnectAcceptor(i);
+		ProConnectAcceptor* pConnectAcceptor = App_ProConnectAcceptManager::instance()->GetConnectAcceptor(i);
 
 		if(NULL == pConnectAcceptor)
 		{
@@ -373,7 +373,7 @@ bool CProServerManager::Start()
 bool CProServerManager::Close()
 {
 	OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close begin....\n"));
-	m_ConnectAcceptorManager.Close();
+	App_ProConnectAcceptManager::instance()->Close();
 	m_ProConsoleConnectAcceptor.cancel();
 	OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_TimerManager OK.\n"));
 	App_TimerManager::instance()->deactivate();
@@ -408,7 +408,7 @@ bool CProServerManager::Close()
 
 bool CProServerManager::AddListen(const char* pListenIP, uint32 u4Port, uint8 u1IPType)
 {
-	bool blState = m_ConnectAcceptorManager.CheckIPInfo(pListenIP, u4Port);
+	bool blState = App_ProConnectAcceptManager::instance()->CheckIPInfo(pListenIP, u4Port);
 	if(true == blState)
 	{
 		//当前监听已经存在，不可以重复建设
@@ -417,7 +417,7 @@ bool CProServerManager::AddListen(const char* pListenIP, uint32 u4Port, uint8 u1
 	}
 
 	//创建一个新的accept对象
-	ProConnectAcceptor* pProConnectAcceptor = m_ConnectAcceptorManager.GetNewConnectAcceptor();
+	ProConnectAcceptor* pProConnectAcceptor = App_ProConnectAcceptManager::instance()->GetNewConnectAcceptor();
 	if(NULL == pProConnectAcceptor)
 	{
 		OUR_DEBUG((LM_INFO, "[CProServerManager::AddListen](%s:%d) new ConnectAcceptor error.\n", pListenIP, u4Port));
@@ -467,7 +467,7 @@ bool CProServerManager::AddListen(const char* pListenIP, uint32 u4Port, uint8 u1
 
 bool CProServerManager::DelListen(const char* pListenIP, uint32 u4Port)
 {
-	bool blState = m_ConnectAcceptorManager.CheckIPInfo(pListenIP, u4Port);
+	bool blState = App_ProConnectAcceptManager::instance()->CheckIPInfo(pListenIP, u4Port);
 	if(false == blState)
 	{
 		//当前监听已经存在，不可以重复建设
@@ -475,5 +475,5 @@ bool CProServerManager::DelListen(const char* pListenIP, uint32 u4Port)
 		return false;
 	}
 
-	return m_ConnectAcceptorManager.Close(pListenIP, u4Port);
+	return App_ProConnectAcceptManager::instance()->Close(pListenIP, u4Port);
 }

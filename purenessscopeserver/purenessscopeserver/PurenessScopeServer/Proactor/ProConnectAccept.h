@@ -6,18 +6,7 @@
 using namespace std;
 
 #include "ForbiddenIP.h"
-#include "ProConsoleHandle.h"
 #include "ProConnectHandle.h"
-
-//用于后台管理的Acceptor
-class CProConsoleConnectAcceptor: public ACE_Asynch_Acceptor<CProConsoleHandle>
-{
-private:
-	virtual CProConsoleHandle *make_handler (void);
-	virtual int validate_connection (const ACE_Asynch_Accept::Result& result,
-		const ACE_INET_Addr &remote,
-		const ACE_INET_Addr& local);
-};
 
 //平常客户端的Acceptor
 class ProConnectAcceptor : public ACE_Asynch_Acceptor<CProConnectHandle>
@@ -60,4 +49,6 @@ private:
 	int                   m_nAcceptorCount;
 	char                  m_szError[MAX_BUFF_500];
 };
+
+typedef ACE_Singleton<CProConnectAcceptManager, ACE_Null_Mutex> App_ProConnectAcceptManager;
 #endif

@@ -18,11 +18,13 @@
 #include "ClientProConnectManager.h"
 #include "ProUDPManager.h"
 #include "WindowsCPU.h"
+#include "ProConnectAccept.h"
 #else
 #include "ConnectHandler.h"
 #include "ClientReConnectManager.h"
 #include "ReUDPManager.h"
 #include "LinuxCPU.h"
+#include "ConnectAccept.h"
 #endif
 
 //命令处理返回值类型定义

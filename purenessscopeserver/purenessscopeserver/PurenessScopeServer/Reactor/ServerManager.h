@@ -12,6 +12,7 @@
 #include "MainConfig.h"
 #include "ForbiddenIP.h"
 #include "ConnectAccept.h"
+#include "ConsoleAccept.h"
 #include "AceReactorManager.h"
 #include "MessageService.h"
 #include "SigHandle.h"
@@ -41,7 +42,7 @@ public:
 	bool DelListen(const char* pListenIP, uint32 u4Port);                  //关闭一个已知的连接
 
 private:
-	CConnectAcceptorManager m_ConnectAcceptorManager;    //普通客户端链接
+	//CConnectAcceptorManager m_ConnectAcceptorManager;    //普通客户端链接
 	ConnectConsoleAcceptor  m_ConnectConsoleAcceptor;    //后台管理链接
 	CFileLogger*            m_pFileLogger;               //日志类型
 	Frame_Logging_Strategy* m_pFrameLoggingStrategy;   //输出对象

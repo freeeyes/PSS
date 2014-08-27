@@ -11,13 +11,6 @@
 
 using namespace std;
 
-//用于后台管理接口
-class ConnectConsoleAcceptor : public ACE_Acceptor<CConsoleHandler, ACE_SOCK_ACCEPTOR>
-{
-protected:
-	virtual int make_svc_handler(CConsoleHandler*& sh);
-};
-
 //用于普通客户端
 class ConnectAcceptor : public ACE_Acceptor<CConnectHandler, ACE_SOCK_ACCEPTOR>
 {
@@ -64,5 +57,5 @@ private:
 };
 
 
-
+typedef ACE_Singleton<CConnectAcceptorManager, ACE_Null_Mutex> App_ConnectAcceptorManager;
 #endif
