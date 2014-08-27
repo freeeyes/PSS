@@ -27,6 +27,15 @@ private:
 	virtual int validate_connection (const ACE_Asynch_Accept::Result& result,
 		                             const ACE_INET_Addr &remote,
 		                             const ACE_INET_Addr& local);
+
+public:
+	void SetListenInfo(const char* pIP, uint32 u4Port);
+	char*  GetListenIP();
+	uint32 GetListenPort();
+
+private:
+	char   m_szListenIP[MAX_BUFF_20];
+	uint32 m_u4Port;
 };
 
 class CProConnectAcceptManager
@@ -39,7 +48,11 @@ public:
 	void Close();
 	int GetCount();
 	ProConnectAcceptor* GetConnectAcceptor(int nIndex);
+	ProConnectAcceptor* GetNewConnectAcceptor();
 	const char* GetError();
+
+	bool Close(const char* pIP, uint32 n4Port);
+	bool CheckIPInfo(const char* pIP, uint32 n4Port);
 
 private:
 	typedef vector<ProConnectAcceptor*> vecProConnectAcceptor;

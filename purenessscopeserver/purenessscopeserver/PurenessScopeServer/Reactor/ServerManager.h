@@ -37,6 +37,9 @@ public:
 	bool Start();
 	bool Close();
 
+	bool AddListen(const char* pListenIP, uint32 u4Port, uint8 u1IPType);  //打开一个新的监听端口
+	bool DelListen(const char* pListenIP, uint32 u4Port);                  //关闭一个已知的连接
+
 private:
 	CConnectAcceptorManager m_ConnectAcceptorManager;    //普通客户端链接
 	ConnectConsoleAcceptor  m_ConnectConsoleAcceptor;    //后台管理链接

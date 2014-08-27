@@ -70,6 +70,8 @@ enum
 #define CONSOLEMESSAGE_GETNICKNAMEINFO    "GetNickNameInfo"     //得到别名信息
 #define CONSOLEMESSAGE_SETCONNECTLOG      "SetConnectLog"       //设置连接日志开启状态 
 #define CONSOLEMESSAGE_SETMAXCONNECTCOUNT "SetMaxConnectCount"  //设置最大连接数
+#define CONSOLEMESSAGE_ADD_LISTEN         "AddListen"           //添加一个新的监听端口
+#define CONSOLEMESSAGE_DEL_LISTEN         "DelListen"           //删除一个新的监听端口
 
 //命令处理参数
 struct _CommandInfo
@@ -94,6 +96,21 @@ struct _FileInfo
 	{
 		m_szFilePath[0] = '\0';
 		m_szFileName[0] = '\0';
+	}
+};
+
+//监听端口信息
+struct _ListenInfo
+{
+	char   m_szListenIP[MAX_BUFF_20];
+	uint32 m_u4Port;
+	uint8  m_u1IPType;
+
+	_ListenInfo()
+	{
+		m_szListenIP[0] = '\0';
+		m_u4Port        = 0;
+		m_u1IPType      = TYPE_IPV4;
 	}
 };
 
@@ -123,6 +140,7 @@ private:
 	bool GetNickName(const char* pCommand, char* pName);                                     //得到连接别名
 	bool GetConnectID(const char* pCommand, uint32& u4ConnectID, bool& blFlag);              //得到ConnectID
 	bool GetMaxConnectCount(const char* pCommand, uint16& u2MaxConnectCount);                //得到最大的连接总数
+	bool GetListenInfo(const char* pCommand, _ListenInfo& objListenInfo);                    //得到监听端口信息
 
 	//命令具体实现部分
 private:
@@ -163,6 +181,8 @@ private:
 	bool DoMessage_GetNickNameInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket);
 	bool DoMessage_SetConnectLog(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket);
 	bool DoMessage_SetMaxConnectCount(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket);
+	bool DoMessage_AddListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket);
+	bool DoMessage_DelListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket);
 
 private:
 	vecConsoleKey* m_pvecConsoleKey;

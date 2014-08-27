@@ -55,7 +55,9 @@ int ConnectAcceptor::open2(ACE_INET_Addr& local_addr, ACE_Reactor* reactor, int 
     this->reuse_addr_ = 1;
     this->peer_acceptor_addr_ = local_addr;
 
-    // Must supply a valid Reactor to Acceptor::open()...
+	//添加记录监听服务器的IP和端口地址
+	sprintf_safe(m_szListenIP, MAX_BUFF_20, "%s", local_addr.get_host_addr());
+	m_u4Port = (uint8)local_addr.get_port_number();
 
     if (reactor == 0)
     {
@@ -91,7 +93,15 @@ int ConnectAcceptor::open2(ACE_INET_Addr& local_addr, ACE_Reactor* reactor, int 
     return result;
 }
 
+char* ConnectAcceptor::GetListenIP()
+{
+	return m_szListenIP;
+}
 
+uint32 ConnectAcceptor::GetListenPort()
+{
+	return m_u4Port;
+}
 
 //==============================================================================
 
@@ -153,6 +163,29 @@ void CConnectAcceptorManager::Close()
     m_nAcceptorCount = 0;
 }
 
+bool CConnectAcceptorManager::Close(const char* pIP, uint32 n4Port)
+{
+	//找到符合条件指定的端口停止监听
+	for(vecConnectAcceptor::iterator b = m_vecConnectAcceptor.begin(); b != m_vecConnectAcceptor.end(); b++)
+	{
+		ConnectAcceptor* pConnectAcceptor = (ConnectAcceptor*)(*b);
+
+		if (NULL != pConnectAcceptor)
+		{
+			if(ACE_OS::strcmp(pConnectAcceptor->GetListenIP(), pIP) == 0 
+				&& pConnectAcceptor->GetListenPort() == n4Port)
+			{
+				pConnectAcceptor->close();
+				SAFE_DELETE(pConnectAcceptor);
+				m_vecConnectAcceptor.erase(b);
+				break;
+			}
+		}
+	}
+
+	return true;
+}
+
 int CConnectAcceptorManager::GetCount()
 {
     return (int)m_vecConnectAcceptor.size();
@@ -171,4 +204,36 @@ ConnectAcceptor* CConnectAcceptorManager::GetConnectAcceptor(int nIndex)
 const char* CConnectAcceptorManager::GetError()
 {
     return m_szError;
+}
+
+bool CConnectAcceptorManager::CheckIPInfo(const char* pIP, uint32 n4Port)
+{
+	//找到符合条件指定的端口停止监听
+	for(vecConnectAcceptor::iterator b = m_vecConnectAcceptor.begin(); b != m_vecConnectAcceptor.end(); b++)
+	{
+		ConnectAcceptor* pConnectAcceptor = (ConnectAcceptor*)(*b);
+
+		if (NULL != pConnectAcceptor)
+		{
+			if(ACE_OS::strcmp(pConnectAcceptor->GetListenIP(), pIP) == 0 
+				&& pConnectAcceptor->GetListenPort() == n4Port)
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+ConnectAcceptor* CConnectAcceptorManager::GetNewConnectAcceptor()
+{
+	ConnectAcceptor* pConnectAcceptor = new ConnectAcceptor();
+	if(NULL == pConnectAcceptor)
+	{
+		return NULL;
+	}
+
+	m_vecConnectAcceptor.push_back(pConnectAcceptor);
+	return pConnectAcceptor;
 }

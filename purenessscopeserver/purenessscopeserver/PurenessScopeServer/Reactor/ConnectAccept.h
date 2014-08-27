@@ -32,6 +32,12 @@ public:
 		int flags,
 		int backlog);
 
+	char*  GetListenIP();
+	uint32 GetListenPort();
+
+private:
+	char   m_szListenIP[MAX_BUFF_20];
+	uint32 m_u4Port;
 };
 
 class CConnectAcceptorManager
@@ -44,7 +50,11 @@ public:
 	void Close();
 	int GetCount();
 	ConnectAcceptor* GetConnectAcceptor(int nIndex);
+	ConnectAcceptor* GetNewConnectAcceptor();
 	const char* GetError();
+
+	bool Close(const char* pIP, uint32 n4Port);
+	bool CheckIPInfo(const char* pIP, uint32 n4Port);
 
 private:
 	typedef vector<ConnectAcceptor*> vecConnectAcceptor;

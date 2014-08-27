@@ -53,6 +53,22 @@ int ProConnectAcceptor::validate_connection (const ACE_Asynch_Accept::Result& re
 	}
 }
 
+char* ProConnectAcceptor::GetListenIP()
+{
+	return m_szListenIP;
+}
+
+uint32 ProConnectAcceptor::GetListenPort()
+{
+	return m_u4Port;
+}
+
+void ProConnectAcceptor::SetListenInfo(const char* pIP, uint32 u4Port)
+{
+	sprintf_safe(m_szListenIP, MAX_BUFF_20, "%s", pIP);
+	u4Port = u4Port;
+}
+
 CProConnectAcceptManager::CProConnectAcceptManager(void)
 {
 	m_nAcceptorCount = 0;
@@ -75,7 +91,7 @@ bool CProConnectAcceptManager::InitConnectAcceptor(int nCount)
 			ProConnectAcceptor* pConnectAcceptor = new ProConnectAcceptor();
 			if(NULL == pConnectAcceptor)
 			{
-				throw "[CConnectAcceptorManager::InitConnectAcceptor]pConnectAcceptor new is fail.";
+				throw "[CProConnectAcceptManager::InitConnectAcceptor]pConnectAcceptor new is fail.";
 			}
 
 			m_vecConnectAcceptor.push_back(pConnectAcceptor);
@@ -97,13 +113,36 @@ void CProConnectAcceptManager::Close()
 		ProConnectAcceptor* pConnectAcceptor = (ProConnectAcceptor* )m_vecConnectAcceptor[i];
 		if(NULL != pConnectAcceptor)
 		{
-			delete pConnectAcceptor;
-			pConnectAcceptor = NULL;
+			pConnectAcceptor->cancel();
+			SAFE_DELETE(pConnectAcceptor);
 		}
 	}
 
 	m_vecConnectAcceptor.clear();
 	m_nAcceptorCount = 0;
+}
+
+bool CProConnectAcceptManager::Close( const char* pIP, uint32 n4Port )
+{
+	//找到符合条件指定的端口停止监听
+	for(vecProConnectAcceptor::iterator b = m_vecConnectAcceptor.begin(); b != m_vecConnectAcceptor.end(); b++)
+	{
+		ProConnectAcceptor* pConnectAcceptor = (ProConnectAcceptor*)(*b);
+
+		if (NULL != pConnectAcceptor)
+		{
+			if(ACE_OS::strcmp(pConnectAcceptor->GetListenIP(), pIP) == 0 
+				&& pConnectAcceptor->GetListenPort() == n4Port)
+			{
+				pConnectAcceptor->cancel();
+				SAFE_DELETE(pConnectAcceptor);
+				m_vecConnectAcceptor.erase(b);
+				break;
+			}
+		}
+	}
+
+	return true;
 }
 
 int CProConnectAcceptManager::GetCount()
@@ -124,4 +163,36 @@ ProConnectAcceptor* CProConnectAcceptManager::GetConnectAcceptor(int nIndex)
 const char* CProConnectAcceptManager::GetError()
 {
 	return m_szError;
+}
+
+bool CProConnectAcceptManager::CheckIPInfo(const char* pIP, uint32 n4Port)
+{
+	//找到符合条件指定的端口停止监听
+	for(vecProConnectAcceptor::iterator b = m_vecConnectAcceptor.begin(); b != m_vecConnectAcceptor.end(); b++)
+	{
+		ProConnectAcceptor* pConnectAcceptor = (ProConnectAcceptor*)(*b);
+
+		if (NULL != pConnectAcceptor)
+		{
+			if(ACE_OS::strcmp(pConnectAcceptor->GetListenIP(), pIP) == 0 
+				&& pConnectAcceptor->GetListenPort() == n4Port)
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+ProConnectAcceptor* CProConnectAcceptManager::GetNewConnectAcceptor()
+{
+	ProConnectAcceptor* pConnectAcceptor = new ProConnectAcceptor();
+	if(NULL == pConnectAcceptor)
+	{
+		return NULL;
+	}
+
+	m_vecConnectAcceptor.push_back(pConnectAcceptor);
+	return pConnectAcceptor;
 }
