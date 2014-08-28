@@ -5,7 +5,6 @@
 #include "ace/SOCK_Acceptor.h"
 #include "ace/INET_Addr.h"
 #include "ConnectHandler.h"
-#include "ConsoleHandler.h"
 
 #include <vector>
 

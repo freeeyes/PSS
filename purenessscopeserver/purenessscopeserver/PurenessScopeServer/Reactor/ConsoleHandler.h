@@ -82,7 +82,7 @@ private:
 	ACE_Message_Block*         m_pCurrMessage;                 //当前的MB对象
 	uint32                     m_u4CurrSize;                   //当前MB缓冲字符长度
 
-	CConsoleMessage          m_ConsoleMessage;                 //管理消息处理类
+	CConsoleMessage            m_ConsoleMessage;               //管理消息处理类
 };
 
 #endif

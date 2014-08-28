@@ -322,6 +322,16 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
 		DoMessage_SetMaxConnectCount(CommandInfo, pBuffPacket);
 		return CONSOLE_MESSAGE_SUCCESS;
 	}
+	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_ADD_LISTEN) == 0)
+	{
+		DoMessage_AddListen(CommandInfo, pBuffPacket);
+		return CONSOLE_MESSAGE_SUCCESS;
+	}
+	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_DEL_LISTEN) == 0)
+	{
+		DoMessage_DelListen(CommandInfo, pBuffPacket);
+		return CONSOLE_MESSAGE_SUCCESS;
+	}
 	else
 	{
 		return CONSOLE_MESSAGE_FAIL;
@@ -582,7 +592,7 @@ bool CConsoleMessage::GetListenInfo(const char* pCommand, _ListenInfo& objListen
 	}
 	ACE_OS::memcpy(szTempData, pPosBegin + 3, nLen);
 	szTempData[nLen] = '\0';
-	sprintf_s(objListenInfo.m_szListenIP, 20, szTempData);
+	sprintf_safe(objListenInfo.m_szListenIP, 20, szTempData);
 
 	//»ñµÃPort
 	pPosBegin = (char* )ACE_OS::strstr(pCommand, "-p ");
@@ -1932,9 +1942,8 @@ bool CConsoleMessage::DoMessage_AddListen(_CommandInfo& CommandInfo, IBuffPacket
 
 	if(GetListenInfo(CommandInfo.m_szCommandExp, objListenInfo) == true)
 	{
-/*
 #ifdef WIN32
-		bool blState = App_ProServerManager::instance()->AddListen(objListenInfo.m_szListenIP,
+		bool blState = App_ProControlListen::instance()->AddListen(objListenInfo.m_szListenIP,
 			objListenInfo.m_u4Port,
 			objListenInfo.m_u1IPType);
 
@@ -1947,7 +1956,7 @@ bool CConsoleMessage::DoMessage_AddListen(_CommandInfo& CommandInfo, IBuffPacket
 			(*pBuffPacket) << (uint32)1;
 		}
 #else
-		bool blState = App_ServerManager::instance()->AddListen(objListenInfo.m_szListenIP,
+		bool blState = App_ControlListen::instance()->AddListen(objListenInfo.m_szListenIP,
 			objListenInfo.m_u4Port,
 			objListenInfo.m_u1IPType);
 
@@ -1960,7 +1969,6 @@ bool CConsoleMessage::DoMessage_AddListen(_CommandInfo& CommandInfo, IBuffPacket
 			(*pBuffPacket) << (uint32)1;
 		}
 #endif
-*/
 	}
 
 	return true;
@@ -1968,6 +1976,75 @@ bool CConsoleMessage::DoMessage_AddListen(_CommandInfo& CommandInfo, IBuffPacket
 
 bool CConsoleMessage::DoMessage_DelListen( _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket )
 {
+	_ListenInfo objListenInfo;
+
+	if(GetListenInfo(CommandInfo.m_szCommandExp, objListenInfo) == true)
+	{
+#ifdef WIN32
+		bool blState = App_ProControlListen::instance()->DelListen(objListenInfo.m_szListenIP,
+			objListenInfo.m_u4Port);
+
+		if(true == blState)
+		{
+			(*pBuffPacket) << (uint32)0;
+		}
+		else
+		{
+			(*pBuffPacket) << (uint32)1;
+		}
+#else
+		bool blState = App_ControlListen::instance()->DelListen(objListenInfo.m_szListenIP,
+			objListenInfo.m_u4Port);
+
+		if(true == blState)
+		{
+			(*pBuffPacket) << (uint32)0;
+		}
+		else
+		{
+			(*pBuffPacket) << (uint32)1;
+		}
+#endif
+	}
+
 	return true;
 }
 
+bool CConsoleMessage::DoMessage_ShowListen( _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket )
+{
+	if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
+	{
+#ifdef WIN32
+		vecProControlInfo objProControlInfo;
+		App_ProControlListen::instance()->ShowListen(objProControlInfo);
+
+		(*pBuffPacket) << (uint32)objProControlInfo.size();
+		for(uint32 i = 0; i < (uint32)objProControlInfo.size(); i++)
+		{
+			VCHARS_STR strIP;
+			strIP.text  = objProControlInfo[i].m_szListenIP;
+			strIP.u1Len = (uint8)ACE_OS::strlen(objProControlInfo[i].m_szListenIP);
+
+			(*pBuffPacket) << strIP;
+			(*pBuffPacket) << objProControlInfo[i].m_u4Port;
+		}
+
+#else
+		vecControlInfo objControlInfo;
+		App_ControlListen::instance()->ShowListen(objControlInfo);
+
+		(*pBuffPacket) << (uint32)objControlInfo.size();
+		for(uint32 i = 0; i < (uint32)objControlInfo.size(); i++)
+		{
+			VCHARS_STR strIP;
+			strIP.text  = objControlInfo[i].m_szListenIP;
+			strIP.u1Len = (uint8)ACE_OS::strlen(objControlInfo[i].m_szListenIP);
+
+			(*pBuffPacket) << strIP;
+			(*pBuffPacket) << objControlInfo[i].m_u4Port;
+		}	
+#endif
+	}
+
+	return true;
+}

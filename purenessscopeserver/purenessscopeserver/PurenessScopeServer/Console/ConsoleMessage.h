@@ -18,13 +18,13 @@
 #include "ClientProConnectManager.h"
 #include "ProUDPManager.h"
 #include "WindowsCPU.h"
-#include "ProConnectAccept.h"
+#include "ProControlListen.h"
 #else
 #include "ConnectHandler.h"
 #include "ClientReConnectManager.h"
 #include "ReUDPManager.h"
 #include "LinuxCPU.h"
-#include "ConnectAccept.h"
+#include "ControlListen.h"
 #endif
 
 //命令处理返回值类型定义
@@ -74,6 +74,7 @@ enum
 #define CONSOLEMESSAGE_SETMAXCONNECTCOUNT "SetMaxConnectCount"  //设置最大连接数
 #define CONSOLEMESSAGE_ADD_LISTEN         "AddListen"           //添加一个新的监听端口
 #define CONSOLEMESSAGE_DEL_LISTEN         "DelListen"           //删除一个新的监听端口
+#define CONSOLEMESSATE_SHOW_LISTEN        "ShowListen"          //查看正在打开的监听端口 
 
 //命令处理参数
 struct _CommandInfo
@@ -185,6 +186,7 @@ private:
 	bool DoMessage_SetMaxConnectCount(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket);
 	bool DoMessage_AddListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket);
 	bool DoMessage_DelListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket);
+	bool DoMessage_ShowListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket);
 
 private:
 	vecConsoleKey* m_pvecConsoleKey;
