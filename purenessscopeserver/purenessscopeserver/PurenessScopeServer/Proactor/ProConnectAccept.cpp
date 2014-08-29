@@ -42,7 +42,7 @@ uint32 ProConnectAcceptor::GetListenPort()
 void ProConnectAcceptor::SetListenInfo(const char* pIP, uint32 u4Port)
 {
 	sprintf_safe(m_szListenIP, MAX_BUFF_20, "%s", pIP);
-	u4Port = u4Port;
+	m_u4Port = u4Port;
 }
 
 CProConnectAcceptManager::CProConnectAcceptManager(void)

@@ -25,12 +25,17 @@ void CDlgServerConnect::DoDataExchange(CDataExchange* pDX)
 	CDialog::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST1, m_lcServerConnect);
 	DDX_Control(pDX, IDC_EDIT1, m_txtServerID);
+	DDX_Control(pDX, IDC_LIST2, m_lcServerListen);
+	DDX_Control(pDX, IDC_IPADDRESS1, m_txtListenIP);
+	DDX_Control(pDX, IDC_EDIT4, m_txtListenPort);
+	DDX_Control(pDX, IDC_COMBO1, m_cbListenType);
 }
 
 
 BEGIN_MESSAGE_MAP(CDlgServerConnect, CDialog)
   ON_BN_CLICKED(IDC_BUTTON2, &CDlgServerConnect::OnBnClickedButton2)
   ON_BN_CLICKED(IDC_BUTTON1, &CDlgServerConnect::OnBnClickedButton1)
+  ON_BN_CLICKED(IDC_BUTTON8, &CDlgServerConnect::OnBnClickedButton8)
 END_MESSAGE_MAP()
 
 CString CDlgServerConnect::GetPageTitle()
@@ -196,6 +201,14 @@ BOOL CDlgServerConnect::OnInitDialog()
   m_lcServerConnect.InsertColumn(7, _T("创建时间"), LVCFMT_CENTER, 80);
   m_lcServerConnect.InsertColumn(8, _T("存活秒数"), LVCFMT_CENTER, 80);
 
+  m_lcServerListen.InsertColumn(0, _T("监听IP"), LVCFMT_CENTER, 200);
+  m_lcServerListen.InsertColumn(1, _T("监听端口"), LVCFMT_CENTER, 100);
+
+  m_cbListenType.AddString(_T("IPv4"));
+  m_cbListenType.AddString(_T("IPv6"));
+  m_cbListenType.SetCurSel(0);
+  m_txtListenPort.SetWindowText(_T("0"));
+
   return TRUE;
 }
 
@@ -338,6 +351,69 @@ void CDlgServerConnect::OnBnClickedButton1()
 			m_lcServerConnect.SetItemText(i, 8, strAliveSecond);
 
 			objvecClientConnectInfo.push_back(ClientConnectInfo);
+		}
+	}
+
+	MessageBox(_T(MESSAGE_RESULT_SUCCESS) , _T(MESSAGE_TITLE_ERROR), MB_OK);
+}
+
+void CDlgServerConnect::OnBnClickedButton8()
+{
+	//查看所有已有的监听端口信息
+	m_lcServerListen.DeleteAllItems();
+
+	char szSendMessage[200] = {'\0'};
+	char szCommand[100]     = {'\0'};
+	sprintf_s(szCommand, 100, "%s ShowListen -a", m_pTcpClientConnect->GetKey());
+	int nSendLen = (int)strlen(szCommand); 
+
+	memcpy_s(szSendMessage, 200, &nSendLen, sizeof(int));
+	memcpy_s(&szSendMessage[4], 200, &szCommand, nSendLen);
+
+	char szRecvBuff[100 * 1024] = {'\0'};
+	int nRecvLen = 100 * 1024;
+	bool blState = m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen + sizeof(int), (char*)szRecvBuff, nRecvLen);
+	if(blState == false)
+	{
+		MessageBox(_T(MESSAGE_SENDERROR) , _T(MESSAGE_TITLE_ERROR), MB_OK);
+		return;
+	}
+	else
+	{
+		int nStrLen       = 0;
+		int nPos          = 4;
+		int nTCPCount     = 0;
+		int nState        = 0;
+		memcpy_s(&nTCPCount, sizeof(int), &szRecvBuff[nPos], sizeof(int));
+		nPos += sizeof(int);
+
+		for(int i = 0; i < nTCPCount; i++)
+		{
+			//开始还原数据结构
+			char szListenIP[30] = {'\0'};
+			int  nIPLen         = 0;
+			int  nListenPort    = 0;
+
+			memcpy_s(&nIPLen, sizeof(int), &szRecvBuff[nPos], sizeof(char));
+			nPos += sizeof(char);
+
+			memcpy_s(szListenIP, 30, &szRecvBuff[nPos], sizeof(char)*nIPLen);
+			nPos += sizeof(char)*nIPLen;
+
+			memcpy_s(&nListenPort, sizeof(int), &szRecvBuff[nPos], sizeof(int));
+			nPos += sizeof(int);
+
+			//显示在界面上
+			wchar_t szzTCPIP[50]      = {'\0'};
+			CString strPort;
+
+			int nSrcLen = MultiByteToWideChar(CP_ACP, 0, szListenIP, -1, NULL, 0);
+			int nDecLen = MultiByteToWideChar(CP_ACP, 0,szListenIP, -1, szzTCPIP, 50);
+
+			strPort.Format(_T("%d"), nListenPort);
+
+			m_lcServerListen.InsertItem(i, szzTCPIP);
+			m_lcServerListen.SetItemText(i, 1, strPort);
 		}
 	}
 
