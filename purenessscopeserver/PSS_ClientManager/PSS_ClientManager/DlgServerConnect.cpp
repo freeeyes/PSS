@@ -36,6 +36,8 @@ BEGIN_MESSAGE_MAP(CDlgServerConnect, CDialog)
   ON_BN_CLICKED(IDC_BUTTON2, &CDlgServerConnect::OnBnClickedButton2)
   ON_BN_CLICKED(IDC_BUTTON1, &CDlgServerConnect::OnBnClickedButton1)
   ON_BN_CLICKED(IDC_BUTTON8, &CDlgServerConnect::OnBnClickedButton8)
+  ON_BN_CLICKED(IDC_BUTTON10, &CDlgServerConnect::OnBnClickedButton10)
+  ON_BN_CLICKED(IDC_BUTTON13, &CDlgServerConnect::OnBnClickedButton13)
 END_MESSAGE_MAP()
 
 CString CDlgServerConnect::GetPageTitle()
@@ -418,4 +420,126 @@ void CDlgServerConnect::OnBnClickedButton8()
 	}
 
 	MessageBox(_T(MESSAGE_RESULT_SUCCESS) , _T(MESSAGE_TITLE_ERROR), MB_OK);
+}
+
+void CDlgServerConnect::OnBnClickedButton10()
+{
+	//添加新监控
+	char szIP[20] = {'\0'};
+	CString strIP;
+	m_txtListenIP.GetWindowText(strIP);
+
+	int nSrcLen = WideCharToMultiByte(CP_ACP, 0, strIP, strIP.GetLength(), NULL, 0, NULL, NULL);
+	int nDecLen = WideCharToMultiByte(CP_ACP, 0, strIP, nSrcLen, szIP, 20, NULL,NULL);
+	szIP[nDecLen] = '\0';
+
+	CString strPort;
+	m_txtListenPort.GetWindowText(strPort);
+	int nPort = _ttoi(strPort);
+
+	int nType = 1;
+	if(m_cbListenType.GetCurSel() == 0)
+	{
+		nType = 1; 
+	}
+	else
+	{
+		nType = 2;
+	}
+
+	char szSendMessage[200] = {'\0'};
+	char szCommand[100]     = {'\0'};
+	sprintf_s(szCommand, 100, "%s AddListen -i %s -p %d -t %d ", m_pTcpClientConnect->GetKey(), szIP, nPort, nType);
+	int nSendLen = (int)strlen(szCommand); 
+
+	memcpy_s(szSendMessage, 200, &nSendLen, sizeof(int));
+	memcpy_s(&szSendMessage[4], 200, &szCommand, nSendLen);
+
+	char szRecvBuff[100 * 1024] = {'\0'};
+	int nRecvLen = 100 * 1024;
+	bool blState = m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen + sizeof(int), (char*)szRecvBuff, nRecvLen);
+	if(blState == false)
+	{
+		MessageBox(_T(MESSAGE_SENDERROR) , _T(MESSAGE_TITLE_ERROR), MB_OK);
+		return;
+	}
+	else
+	{
+		int nStrLen       = 0;
+		int nPos          = 4;
+		int nResult       = 0;
+		int nState        = 0;
+		memcpy_s(&nResult, sizeof(int), &szRecvBuff[nPos], sizeof(int));
+		nPos += sizeof(int);
+		if(nResult == 1)
+		{
+			MessageBox(_T(MESSAGE_RESULT_FAIL) , _T(MESSAGE_TITLE_SUCCESS), MB_OK);
+		}
+		else
+		{
+			MessageBox(_T(MESSAGE_RESULT_SUCCESS) , _T(MESSAGE_TITLE_SUCCESS), MB_OK);
+		}
+
+	}
+}
+
+void CDlgServerConnect::OnBnClickedButton13()
+{
+	//删除一个已有监控
+	char szIP[20] = {'\0'};
+	CString strIP;
+	m_txtListenIP.GetWindowText(strIP);
+
+	int nSrcLen = WideCharToMultiByte(CP_ACP, 0, strIP, strIP.GetLength(), NULL, 0, NULL, NULL);
+	int nDecLen = WideCharToMultiByte(CP_ACP, 0, strIP, nSrcLen, szIP, 20, NULL,NULL);
+	szIP[nDecLen] = '\0';
+
+	CString strPort;
+	m_txtListenPort.GetWindowText(strPort);
+	int nPort = _ttoi(strPort);
+
+	int nType = 1;
+	if(m_cbListenType.GetCurSel() == 0)
+	{
+		nType = 1; 
+	}
+	else
+	{
+		nType = 2;
+	}
+
+	char szSendMessage[200] = {'\0'};
+	char szCommand[100]     = {'\0'};
+	sprintf_s(szCommand, 100, "%s DelListen -i %s -p %d -t %d ", m_pTcpClientConnect->GetKey(), szIP, nPort, nType);
+	int nSendLen = (int)strlen(szCommand); 
+
+	memcpy_s(szSendMessage, 200, &nSendLen, sizeof(int));
+	memcpy_s(&szSendMessage[4], 200, &szCommand, nSendLen);
+
+	char szRecvBuff[100 * 1024] = {'\0'};
+	int nRecvLen = 100 * 1024;
+	bool blState = m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen + sizeof(int), (char*)szRecvBuff, nRecvLen);
+	if(blState == false)
+	{
+		MessageBox(_T(MESSAGE_SENDERROR) , _T(MESSAGE_TITLE_ERROR), MB_OK);
+		return;
+	}
+	else
+	{
+		int nStrLen       = 0;
+		int nPos          = 4;
+		int nResult       = 0;
+		int nState        = 0;
+		memcpy_s(&nResult, sizeof(int), &szRecvBuff[nPos], sizeof(int));
+		nPos += sizeof(int);
+		if(nResult == 1)
+		{
+			MessageBox(_T(MESSAGE_RESULT_FAIL) , _T(MESSAGE_TITLE_SUCCESS), MB_OK);
+		}
+		else
+		{
+			MessageBox(_T(MESSAGE_RESULT_SUCCESS) , _T(MESSAGE_TITLE_SUCCESS), MB_OK);
+		}
+
+	}
 }
