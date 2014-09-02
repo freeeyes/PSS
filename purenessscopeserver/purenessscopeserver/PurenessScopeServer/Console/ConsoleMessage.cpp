@@ -2020,18 +2020,18 @@ bool CConsoleMessage::DoMessage_ShowListen( _CommandInfo& CommandInfo, IBuffPack
 	if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
 	{
 #ifdef WIN32
-		vecProControlInfo objProControlInfo;
-		App_ProControlListen::instance()->ShowListen(objProControlInfo);
+		vecControlInfo objControlInfo;
+		App_ProControlListen::instance()->ShowListen(objControlInfo);
 
-		(*pBuffPacket) << (uint32)objProControlInfo.size();
-		for(uint32 i = 0; i < (uint32)objProControlInfo.size(); i++)
+		(*pBuffPacket) << (uint32)objControlInfo.size();
+		for(uint32 i = 0; i < (uint32)objControlInfo.size(); i++)
 		{
 			VCHARS_STR strIP;
-			strIP.text  = objProControlInfo[i].m_szListenIP;
-			strIP.u1Len = (uint8)ACE_OS::strlen(objProControlInfo[i].m_szListenIP);
+			strIP.text  = objControlInfo[i].m_szListenIP;
+			strIP.u1Len = (uint8)ACE_OS::strlen(objControlInfo[i].m_szListenIP);
 
 			(*pBuffPacket) << strIP;
-			(*pBuffPacket) << objProControlInfo[i].m_u4Port;
+			(*pBuffPacket) << objControlInfo[i].m_u4Port;
 		}
 
 #else

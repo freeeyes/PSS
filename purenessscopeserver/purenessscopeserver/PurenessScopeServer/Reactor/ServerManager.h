@@ -25,6 +25,7 @@
 #include "ReUDPManager.h"
 #include "CommandAccount.h"
 #include "ModuleMessageManager.h"
+#include "ControlListen.h"
 
 class Frame_Logging_Strategy;
 

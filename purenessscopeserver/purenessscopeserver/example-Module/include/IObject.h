@@ -15,6 +15,7 @@
 #include "IUDPConnectManager.h"
 #include "ITimerManager.h"
 #include "IModuleMessageManager.h"
+#include "IControlListen.h"
 
 class CServerObject
 {
@@ -28,6 +29,7 @@ public:
 		m_pClientManager        = NULL;
 		m_pUDPConnectManager    = NULL;
 		m_pModuleMessageManager = NULL;
+		m_pContorlListen        = NULL;
 	}
 
 	~CServerObject() {};
@@ -39,6 +41,7 @@ public:
 	void SetUDPConnectManager(IUDPConnectManager* pUDPConnectManager) { m_pUDPConnectManager = pUDPConnectManager; };
 	void SetTimerManager(ActiveTimer* pTimerManager) { m_pTimerManager = pTimerManager; }
 	void SetModuleMessageManager(IModuleMessageManager* pModuleMessageManager) { m_pModuleMessageManager = pModuleMessageManager; }
+	void SetControlListen(IControlListen* pControlListen) { m_pContorlListen = pControlListen; }
 
 	IMessageManager*       GetMessageManager() { return m_pIMessageManager; };
 	ILogManager*           GetLogManager() { return m_pLogManager; };
@@ -48,6 +51,7 @@ public:
 	IUDPConnectManager*    GetUDPConnectManager() { return m_pUDPConnectManager; };
 	ActiveTimer*           GetTimerManager() { return m_pTimerManager; }
 	IModuleMessageManager* GetModuleMessageManager() { return m_pModuleMessageManager; }
+	IControlListen*        GetControlListen() { return m_pContorlListen; }
 
 private:
 	IMessageManager*       m_pIMessageManager;
@@ -58,6 +62,7 @@ private:
 	IUDPConnectManager*    m_pUDPConnectManager;
 	ActiveTimer*           m_pTimerManager;
 	IModuleMessageManager* m_pModuleMessageManager;
+	IControlListen*        m_pContorlListen;
 };
 
 typedef ACE_Singleton<CServerObject, ACE_Null_Mutex> App_ServerObject; 

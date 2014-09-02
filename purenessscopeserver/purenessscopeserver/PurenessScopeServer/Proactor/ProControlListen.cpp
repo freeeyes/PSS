@@ -80,7 +80,7 @@ bool CProControlListen::DelListen(const char* pListenIP, uint32 u4Port)
 	return App_ProConnectAcceptManager::instance()->Close(pListenIP, u4Port);
 }
 
-void CProControlListen::ShowListen( vecProControlInfo& objProControlInfo )
+void CProControlListen::ShowListen(vecControlInfo& objProControlInfo)
 {
 	objProControlInfo.clear();
 	for(int i = 0; i < App_ProConnectAcceptManager::instance()->GetCount(); i++)
@@ -88,7 +88,7 @@ void CProControlListen::ShowListen( vecProControlInfo& objProControlInfo )
 		ProConnectAcceptor* pProConnectAcceptor = App_ProConnectAcceptManager::instance()->GetConnectAcceptor(i);
 		if(NULL != pProConnectAcceptor)
 		{
-			_ProControlInfo objInfo;
+			_ControlInfo objInfo;
 			sprintf_safe(objInfo.m_szListenIP, 
 				MAX_BUFF_20, "%s", pProConnectAcceptor->GetListenIP());
 			objInfo.m_u4Port = pProConnectAcceptor->GetListenPort();

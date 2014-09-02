@@ -153,7 +153,7 @@ bool CServerManager::Init()
 				pCommandAlert->m_u4CommandCount,
 				pCommandAlert->m_u4MailID);
 		}
-	}	
+	}
 
 	//初始化链接管理器
 	App_ConnectManager::instance()->Init(App_MainConfig::instance()->GetSendQueueCount());
@@ -168,6 +168,7 @@ bool CServerManager::Init()
 	App_ServerObject::instance()->SetUDPConnectManager((IUDPConnectManager*)App_ReUDPManager::instance());
 	App_ServerObject::instance()->SetTimerManager((ActiveTimer*)App_TimerManager::instance());
 	App_ServerObject::instance()->SetModuleMessageManager((IModuleMessageManager*)App_ModuleMessageManager::instance());
+	App_ServerObject::instance()->SetControlListen((IControlListen*)App_ControlListen::instance());
 	return true;
 }
 
