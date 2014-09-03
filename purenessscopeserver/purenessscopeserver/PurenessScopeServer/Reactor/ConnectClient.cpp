@@ -119,7 +119,10 @@ int CConnectClient::handle_input(ACE_HANDLE fd)
 
         if (NULL != m_pClientMessage)
         {
-            m_pClientMessage->ConnectError((int)ACE_OS::last_error());
+			_ClientIPInfo objServerIPInfo;
+			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+			objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+            m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
         }
 
         return -1;
@@ -134,7 +137,10 @@ int CConnectClient::handle_input(ACE_HANDLE fd)
 
         if (NULL != m_pClientMessage)
         {
-            m_pClientMessage->ConnectError((int)ACE_OS::last_error());
+			_ClientIPInfo objServerIPInfo;
+			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+			objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+			m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
         }
 
         return -1;
@@ -164,7 +170,10 @@ int CConnectClient::RecvData()
 
         if (NULL != m_pClientMessage)
         {
-            m_pClientMessage->ConnectError((int)ACE_OS::last_error());
+			_ClientIPInfo objServerIPInfo;
+			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+			objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+			m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
         }
 
         return -1;
@@ -181,7 +190,10 @@ int CConnectClient::RecvData()
 
         if (NULL != m_pClientMessage)
         {
-            m_pClientMessage->ConnectError((int)ACE_OS::last_error());
+			_ClientIPInfo objServerIPInfo;
+			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+			objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+			m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
         }
 
         return -1;
@@ -251,7 +263,10 @@ int CConnectClient::RecvData_et()
 
         if (NULL != m_pClientMessage)
         {
-            m_pClientMessage->ConnectError((int)ACE_OS::last_error());
+			_ClientIPInfo objServerIPInfo;
+			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+			objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+			m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
         }
 
         return -1;
@@ -266,17 +281,20 @@ int CConnectClient::RecvData_et()
 	        m_u4CurrSize = 0;
 	        uint32 u4Error = (uint32)errno;
 	        
-					if(nDataLen == -1 && u4Error == EAGAIN)
-					{
-							break;
-					}	        
+			if(nDataLen == -1 && u4Error == EAGAIN)
+			{
+					break;
+			}	        
 	        
 	        OUR_DEBUG((LM_ERROR, "[CConnectClient::handle_input] ConnectID = %d, recv data is error nDataLen = [%d] errno = [%d].\n", GetServerID(), nDataLen, u4Error));
 	        sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectClient::handle_input] ConnectID = %d, recv data is error[%d].\n", GetServerID(), nDataLen);
 	
 	        if (NULL != m_pClientMessage)
 	        {
-	            m_pClientMessage->ConnectError((int)ACE_OS::last_error());
+				_ClientIPInfo objServerIPInfo;
+				sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+				objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+				m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
 	        }
 	
 	        return -1;

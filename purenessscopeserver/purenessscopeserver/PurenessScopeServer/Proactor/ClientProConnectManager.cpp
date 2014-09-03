@@ -103,7 +103,10 @@ bool CProactorClientInfo::SendData(ACE_Message_Block* pmblk)
 		if(NULL != m_pClientMessage)
 		{
 			//服务器已经断开，需要等待重新连接的结果
-			m_pClientMessage->ConnectError(101);
+			_ClientIPInfo objServerIPInfo;
+			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_AddrServer.get_host_addr());
+			objServerIPInfo.m_nPort = m_AddrServer.get_port_number();
+			m_pClientMessage->ConnectError(101, objServerIPInfo);
 		}
 
 		return false;
