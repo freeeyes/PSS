@@ -24,7 +24,7 @@ public:
 
 	~CPostServerData() {};
 
-	bool RecvData(ACE_Message_Block* mbRecv)
+	bool RecvData(ACE_Message_Block* mbRecv,  _ClientIPInfo objServerIPInfo)
 	{
 		//判断返回数据块是否小于0
 		if(mbRecv->length() <= 0)

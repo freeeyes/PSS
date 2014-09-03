@@ -152,7 +152,7 @@ int CConnectClient::handle_input(ACE_HANDLE fd)
 
 int CConnectClient::RecvData()
 {
-		 ACE_Time_Value nowait(MAX_MSG_PACKETTIMEOUT);
+	ACE_Time_Value nowait(MAX_MSG_PACKETTIMEOUT);
 		 
     int nCurrCount = (uint32)m_pCurrMessage->size();
 
@@ -228,7 +228,10 @@ int CConnectClient::RecvData()
     if (NULL != m_pClientMessage)
     {
         //接收数据，返回给逻辑层，自己不处理整包完整性判定
-        m_pClientMessage->RecvData(m_pCurrMessage);
+		_ClientIPInfo objServerIPInfo;
+		sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+		objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+        m_pClientMessage->RecvData(m_pCurrMessage, objServerIPInfo);
     }
 
     m_pCurrMessage->reset();
@@ -320,7 +323,10 @@ int CConnectClient::RecvData_et()
 	    if (NULL != m_pClientMessage)
 	    {
 	        //接收数据，返回给逻辑层，自己不处理整包完整性判定
-	        m_pClientMessage->RecvData(m_pCurrMessage);
+			_ClientIPInfo objServerIPInfo;
+			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+			objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+	        m_pClientMessage->RecvData(m_pCurrMessage, objServerIPInfo);
 	    }
 	
 	    m_pCurrMessage->reset();

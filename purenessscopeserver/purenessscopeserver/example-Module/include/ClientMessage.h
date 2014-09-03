@@ -12,9 +12,9 @@ class IClientMessage
 public:
 	virtual ~IClientMessage() {};
 	
-	virtual void ReConnect(int nServerID)             = 0;    //连接重连成功接口
-	virtual bool RecvData(ACE_Message_Block* mbRecv)  = 0;    //接收数据的函数
-	virtual bool ConnectError(int nError)             = 0;    //当出错的时候，调用此接口返回错误信息  
+	virtual void ReConnect(int nServerID)                                            = 0;    //连接重连成功接口
+	virtual bool RecvData(ACE_Message_Block* mbRecv, _ClientIPInfo objServerIPInfo)  = 0;    //接收数据的函数
+	virtual bool ConnectError(int nError)                                            = 0;    //当出错的时候，调用此接口返回错误信息  
 };
 
 #endif

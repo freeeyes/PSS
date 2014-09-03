@@ -18,7 +18,7 @@ public:
 	CPostServerData() {};
 	~CPostServerData() {};
 
-	bool RecvData(const char* pData, int nLen)
+	bool RecvData(const char* pData, int nLen, _ClientIPInfo objServerIPInfo)
 	{
 		OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData]Get Data.\n"));
 		return true;

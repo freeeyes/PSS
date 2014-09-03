@@ -86,7 +86,7 @@ void CBaseCommand::InitServer()
 	CPostServerData* pPostServerData = new CPostServerData();
 	if(NULL != pPostServerData)
 	{
-		m_pServerObject->GetClientManager()->ConnectUDP(1, "127.0.0.1", 10005, pPostServerData);
+		m_pServerObject->GetClientManager()->ConnectUDP(1, "127.0.0.1", 10005, TYPE_IPV4, pPostServerData);
 	}
 }
 

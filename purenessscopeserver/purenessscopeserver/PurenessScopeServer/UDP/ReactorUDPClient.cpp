@@ -126,7 +126,10 @@ bool CReactorUDPClient::CheckMessage(const char* pData, uint32 u4Len)
 		return false;
 	}
 
-	m_pClientUDPMessage->RecvData(pData, u4Len);
+	_ClientIPInfo objServerIPInfo;
+	sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+	objServerIPInfo.m_nPort = m_addrRemote.get_port_number();	
+	m_pClientUDPMessage->RecvData(pData, u4Len, objServerIPInfo);
 
 	m_atvInput = ACE_OS::gettimeofday();
 	m_u4RecvSize += u4Len;
