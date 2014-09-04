@@ -16,6 +16,20 @@ using namespace std;
 
 typedef vector<_LogFileInfo> vecLogFileInfo;
 
+struct _ConsoleInfo
+{
+	char m_szConsoleIP[20];
+	int  m_nPort;
+	char m_szKey[50];
+
+	_ConsoleInfo()
+	{
+		m_szConsoleIP[0] = '\0';
+		m_nPort          = 0;
+		m_szKey[0]       = '\0';
+	}
+};
+
 //∂¡»°≈‰÷√Œƒº˛
 bool Init_Read_Config(vecLogFileInfo& objvecLogFileInfo)
 {
@@ -89,6 +103,37 @@ bool Init_Read_Config(vecLogFileInfo& objvecLogFileInfo)
 		}
 
 		objvecLogFileInfo.push_back(objLogFileInfo);
+	}
+
+	_ConsoleInfo objConsoleInfo;
+	pData = objMainConfig.GetData("ConsoleInfo", "IP");
+	if(pData != NULL)
+	{
+		ACE_OS::snprintf(objConsoleInfo.m_szConsoleIP, 20, "%s", pData);
+	}
+	else
+	{
+		return true;
+	}
+
+	pData = objMainConfig.GetData("ConsoleInfo", "Port");
+	if(pData != NULL)
+	{
+		objConsoleInfo.m_nPort = ACE_OS::atoi(pData);
+	}
+	else
+	{
+		return true;
+	}
+
+	pData = objMainConfig.GetData("ConsoleInfo", "Keypwd");
+	if(pData != NULL)
+	{
+		ACE_OS::snprintf(objConsoleInfo.m_szKey, 50, "%s", pData);
+	}
+	else
+	{
+		return true;
 	}
 
 	return true;
