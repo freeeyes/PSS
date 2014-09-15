@@ -246,6 +246,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\IObject\IControlListen.h"
+				>
+			</File>
+			<File
 				RelativePath=".\IObject\ILogManager.h"
 				>
 			</File>
@@ -509,7 +513,15 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Proactor\ProConsoleAccept.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Proactor\ProConsoleHandle.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Proactor\ProControlListen.h"
 					>
 				</File>
 				<File
@@ -597,6 +609,10 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath=".\Proactor\ProConsoleAccept.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\Proactor\ProConsoleHandle.cpp"
 					>
 					<FileConfiguration
@@ -607,6 +623,10 @@
 							UsePrecompiledHeader="0"
 						/>
 					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\Proactor\ProControlListen.cpp"
+					>
 				</File>
 				<File
 					RelativePath=".\Proactor\ProServerManager.cpp"
@@ -1156,7 +1176,15 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Reactor\ConsoleAccept.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Reactor\ConsoleHandler.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Reactor\ControlListen.h"
 					>
 				</File>
 				<File
@@ -1236,6 +1264,10 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath=".\Reactor\ConsoleAccept.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\Reactor\ConsoleHandler.cpp"
 					>
 					<FileConfiguration
@@ -1246,6 +1278,10 @@
 							UsePrecompiledHeader="0"
 						/>
 					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\Reactor\ControlListen.cpp"
+					>
 				</File>
 				<File
 					RelativePath=".\Reactor\My_Dev_Poll_Reactor.cpp"
