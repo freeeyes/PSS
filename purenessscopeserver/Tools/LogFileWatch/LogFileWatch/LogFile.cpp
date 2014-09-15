@@ -54,19 +54,30 @@ bool CLogFile::Check_File_Update_time()
 	}
 
 	time_t ttUpdateTime = objStat.st_mtime;
-	struct tm *pUpdateTime = NULL;
 
-	pUpdateTime = ACE_OS::localtime(&ttUpdateTime);
+	time_t ttNow = ACE_OS::time(NULL);
 
-	ACE_DEBUG((LM_INFO, "[Check_File_Update_time]File UpDate Time is[%02d-%02d-%02d %02d:%02d:%02d].\n",
-		pUpdateTime->tm_year + 1900,
-		pUpdateTime->tm_mon + 1,
-		pUpdateTime->tm_mday,
-		pUpdateTime->tm_hour,
-		pUpdateTime->tm_min,
-		pUpdateTime->tm_sec));
+	//判断更新时间是否和当前时间差距超过30秒。
+	if(ttNow - ttUpdateTime > 30)
+	{
+		struct tm *pUpdateTime = NULL;
 
-	return true;
+		pUpdateTime = ACE_OS::localtime(&ttUpdateTime);
+
+		ACE_DEBUG((LM_INFO, "[Check_File_Update_time]File UpDate Time is[%02d-%02d-%02d %02d:%02d:%02d].\n",
+			pUpdateTime->tm_year + 1900, 
+			pUpdateTime->tm_mon + 1,
+			pUpdateTime->tm_mday,
+			pUpdateTime->tm_hour,
+			pUpdateTime->tm_min,
+			pUpdateTime->tm_sec));
+
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }
 
 //检查文件最后大小
@@ -121,8 +132,6 @@ bool CLogFile::Check_File_Last_Line()
 
 bool CLogFile::Exec_Shell_Command()
 {
-	Get_Shell_Command();
-
 	int nErr = ACE_OS::system((ACE_TCHAR* )Get_Shell_Command());
 	if(nErr != 0)
 	{
