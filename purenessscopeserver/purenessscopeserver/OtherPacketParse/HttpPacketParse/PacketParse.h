@@ -51,6 +51,8 @@ public:
 	bool Connect(uint32 u4ConnectID, _ClientIPInfo& objClientIPInfo);
 	//当连接断开的时候，返回你自己的处理
 	void DisConnect(uint32 u4ConnectID);
+	//获得当前数据包头信息
+	void GetPacketHeadInfo(_PacketHeadInfo& objPacketHeadInfo);
 
 private:
 	//以下函数Http独有

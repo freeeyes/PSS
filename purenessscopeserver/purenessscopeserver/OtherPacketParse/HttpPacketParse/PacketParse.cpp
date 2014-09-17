@@ -152,6 +152,10 @@ uint8 CPacketParse::HttpDispose(_HttpInfo* pHttpInfo, ACE_Message_Block* pCurrMe
 		return PACKET_GET_ERROR;
 	}
 
+	//OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]sizeof()=%d.\n", sizeof(pHttpInfo->m_szData)));
+	//OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]m_u4DataLength=%d.\n", pHttpInfo->m_u4DataLength));
+	//OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]u4Data=%d.\n", u4Data));
+	
 	ACE_OS::memcpy(&pHttpInfo->m_szData[pHttpInfo->m_u4DataLength], pData, u4Data);
 	pHttpInfo->m_u4DataLength += u4Data;
 	pHttpInfo->m_szData[pHttpInfo->m_u4DataLength] = '\0';
@@ -164,12 +168,13 @@ uint8 CPacketParse::HttpDispose(_HttpInfo* pHttpInfo, ACE_Message_Block* pCurrMe
 	}
 
 	uint32 u4HttpHeadLen = pHttpHead - pHttpInfo->m_szData - 4;
+	//OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]u4HttpHeadLen=%d.\n", u4HttpHeadLen));
 
 	//找到了完整的包头
 	m_pmbHead = pMessageBlockManager->Create(u4HttpHeadLen);
 	if(NULL == m_pmbHead)
 	{
-		OUR_DEBUG((LM_ERROR, "[CPacketParse::WebSocketDisposeHandIn]m_pmbHead is NULL.\n"));
+		OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]m_pmbHead is NULL.\n"));
 		return PACKET_GET_ERROR;
 	}
 
@@ -187,6 +192,7 @@ uint8 CPacketParse::HttpDispose(_HttpInfo* pHttpInfo, ACE_Message_Block* pCurrMe
 		return u1Ret;
 	}
 
+	//OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]u4HttpBodyLength=%d.\n", u4HttpBodyLength));
 	if(u4HttpBodyLength == 0)
 	{
 		//获得包体
@@ -198,7 +204,7 @@ uint8 CPacketParse::HttpDispose(_HttpInfo* pHttpInfo, ACE_Message_Block* pCurrMe
 		}
 
 		memcpy(m_pmbBody->wr_ptr(), (char*)&u4HttpHeadLen, sizeof(uint32));
-		m_pmbHead->wr_ptr(sizeof(uint32));
+		m_pmbBody->wr_ptr(sizeof(uint32));
 	}
 	else
 	{
@@ -206,17 +212,51 @@ uint8 CPacketParse::HttpDispose(_HttpInfo* pHttpInfo, ACE_Message_Block* pCurrMe
 		m_pmbBody = pMessageBlockManager->Create(u4HttpBodyLength);
 		if(NULL == m_pmbBody)
 		{
-			OUR_DEBUG((LM_ERROR, "[CPacketParse::WebSocketDisposeHandIn]m_pmbBody is NULL.\n"));
+			OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]m_pmbBody is NULL.\n"));
 			return PACKET_GET_ERROR;
 		}
 
 		memcpy(m_pmbBody->wr_ptr(), (char*)pHttpHead, u4HttpBodyLength);
-		m_pmbHead->wr_ptr(sizeof(uint32));
+		m_pmbBody->wr_ptr(u4HttpBodyLength);
 	}
 
 	//处理完的数据从池中移除
 	pCurrMessage->rd_ptr(u4Data);
-
+	
+	/*
+	OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]1.\n"));
+	
+	//测试代码
+	m_pmbHead = pMessageBlockManager->Create(1);
+	if(NULL == m_pmbHead)
+	{
+		OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]m_pmbHead is NULL.\n"));
+		return PACKET_GET_ERROR;
+	}
+	m_u4PacketHead = 1;
+	
+	char cData = '1';
+	memcpy(m_pmbHead->wr_ptr(), (char*)&cData, 1);
+	m_pmbHead->wr_ptr(1);	
+	
+	m_pmbBody = pMessageBlockManager->Create(1);
+	if(NULL == m_pmbBody)
+	{
+		OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]m_pmbHead is NULL.\n"));
+		return PACKET_GET_ERROR;
+	}
+	m_u4PacketData = 1;
+	
+	OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]2.\n"));
+	
+	memcpy(m_pmbBody->wr_ptr(), (char*)&cData, 1);
+	m_pmbBody->wr_ptr(1);	
+	
+	OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]u4Data=%d.\n", u4Data));
+	pCurrMessage->rd_ptr(u4Data);
+	OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]Length=%d.\n", pCurrMessage->length()));
+	*/
+	
 	pHttpInfo->m_u4DataLength = 0;
 	return (uint8)PACKET_GET_ENOUGTH;
 }
@@ -225,6 +265,9 @@ uint8 CPacketParse::GetHttpBodyLen(char* pData, uint32 u4Len, uint32 u4HeadLen, 
 {
 	char szBodyLen[10] = {'\0'};
 	int nNameLen = ACE_OS::strlen(HTTP_BODY_LENGTH);
+		
+	//OUR_DEBUG((LM_ERROR, "[CPacketParse::GetHttpBodyLen]nNameLen=%d.\n", nNameLen));
+	//OUR_DEBUG((LM_ERROR, "[CPacketParse::GetHttpBodyLen]pData=%s.\n", pData));
 
 	//解析出整个Http包长
 	char* pLength = ACE_OS::strstr(pData, HTTP_BODY_LENGTH);
@@ -241,9 +284,11 @@ uint8 CPacketParse::GetHttpBodyLen(char* pData, uint32 u4Len, uint32 u4HeadLen, 
 			u1LengthLen++;
 		}
 
+		//OUR_DEBUG((LM_ERROR, "[CPacketParse::GetHttpBodyLen]u1LengthLen=%d.\n", u1LengthLen));
 		ACE_OS::memcpy(szBodyLen, &pLength[nNameLen], u1LengthLen);
 
 		u4BodyLen = ACE_OS::atoi(szBodyLen);
+		//OUR_DEBUG((LM_ERROR, "[CPacketParse::GetHttpBodyLen]u4BodyLen=%d.\n", u4BodyLen));
 		if(u4BodyLen == 0)
 		{
 			return PACKET_GET_ERROR;
@@ -255,6 +300,15 @@ uint8 CPacketParse::GetHttpBodyLen(char* pData, uint32 u4Len, uint32 u4HeadLen, 
 			return PACKET_GET_NO_ENOUGTH;
 		}
 	}
+	else
+	{
+		//找不到包长，就把所有数据算作包长
+		u4BodyLen = u4Len - u4HeadLen;
+	}
 
 	return PACKET_GET_ENOUGTH;
+}
+
+void CPacketParse::GetPacketHeadInfo( _PacketHeadInfo& objPacketHeadInfo )
+{
 }

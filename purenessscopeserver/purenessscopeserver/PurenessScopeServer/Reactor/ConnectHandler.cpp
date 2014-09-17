@@ -661,7 +661,6 @@ int CConnectHandler::RecvData()
 				//看看是否接收完成了
 				if(m_pCurrMessage->length() == 0)
 				{
-					m_pCurrMessage->release();
 					break;
 				}
 				else
@@ -999,7 +998,6 @@ int CConnectHandler::RecvData_et()
 					//看看是否接收完成了
 					if(m_pCurrMessage->length() == 0)
 					{
-						m_pCurrMessage->release();
 						break;
 					}
 					else

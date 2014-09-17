@@ -504,3 +504,7 @@ uint8 CPacketParse::ReadDataPacketInfo(const char* pData, uint32& u4DataLen, uin
 		}
 	}
 }
+
+void CPacketParse::GetPacketHeadInfo( _PacketHeadInfo& objPacketHeadInfo )
+{
+}
