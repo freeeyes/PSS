@@ -20,7 +20,10 @@ void CLogFile::GetFileName(char* pFileName, int nLen)
 	ACE_Date_Time dtnow;
 	dtnow.year();
 
-	ACE_OS::snprintf(pFileName, nLen, "127_%s_%04d-%02d-%02d.log", Get_File_Key(), dtnow.year(), dtnow.month(), dtnow.day());
+	ACE_OS::snprintf(pFileName, nLen, "127_%s_%04d-%02d-%02d.log", Get_File_Key(), 
+		(int)dtnow.year(), 
+		(int)dtnow.month(), 
+		(int)dtnow.day());
 	ACE_DEBUG((LM_INFO, "[CLogFile::GetFileName]pFileName=%s.\n", pFileName));
 }
 
@@ -28,9 +31,9 @@ bool CLogFile::Check_Log_File_State()
 {
 	//在这里判断文件状态
 	ACE_DEBUG((LM_INFO, "[CLogFile::Check_Log_File_State]Begin Check.\n"));
-	Check_File_Update_time();
+	bool blState = Check_File_Update_time();
 	ACE_DEBUG((LM_INFO, "[CLogFile::Check_Log_File_State]End.\n"));
-	return 0;
+	return blState;
 }
 
 int CLogFile::handle_timeout( const ACE_Time_Value &tv, const void *arg )
@@ -61,7 +64,6 @@ bool CLogFile::Check_File_Update_time()
 	char szFileName[200] = {'\0'};
 	char szPathName[300] = {'\0'};
 
-	int nErrID = 0;
 	GetFileName(szFileName, 200);
 
 	//拼接Log路径和文件名
@@ -109,7 +111,6 @@ bool CLogFile::Check_File_Size()
 	char szFileName[200] = {'\0'};
 	char szPathName[300] = {'\0'};
 
-	int nErrID = 0;
 	GetFileName(szFileName, 200);
 
 	//拼接Log路径和文件名
@@ -133,7 +134,6 @@ bool CLogFile::Check_File_Last_Line()
 	char szFileName[200] = {'\0'};
 	char szPathName[300] = {'\0'};
 
-	int nErrID = 0;
 	GetFileName(szFileName, 200);
 
 	//拼接Log路径和文件名

@@ -208,7 +208,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 	for(int i = 0; i < (int)objvecLogFileInfo.size(); i++)
 	{
 		int nID = objvecLogFileInfo[i].m_nID;
-		if(nID = 1)
+		if(nID == 1)
 		{
 			//ClogFile处理第一个日志跟踪器
 			pLogFile = new CLogFile();
@@ -224,7 +224,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 				ACE_OS::gettimeofday() + ACE_Time_Value(pLogFileBase->Get_Watch_Time()), 
 				ACE_Time_Value(pLogFileBase->Get_Watch_Time()));
 		}
-		else if(nID = 2)
+		else if(nID == 2)
 		{
 			//这里可以添加你自己的日志判定规则类
 		}

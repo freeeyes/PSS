@@ -1,4 +1,6 @@
 #!/bin/sh
+. ${HOME}/.bash_profile
+
 ps -ef|grep $LOGNAME | grep -w $1 |grep -v pts|  grep -v killp|awk '{print $2}'|while read tt
 do
 echo "killed $tt"

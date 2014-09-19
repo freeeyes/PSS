@@ -1,5 +1,5 @@
 #!/bin/sh
 . ${HOME}/.bash_profile
 
-killp PurenessScopeServer
-./PurenessScopeServer > /dev/null
+./killp PurenessScopeServer
+nohup ./PurenessScopeServer > nohup.out 2>&1 &
