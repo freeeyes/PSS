@@ -9,6 +9,12 @@
 #include "XmlOpeation.h"
 #include "TimeManager.h"
 
+#ifndef WIN32
+#include <unistd.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+#endif
+
 #include <vector>
 using namespace std;
 
@@ -29,6 +35,46 @@ struct _ConsoleInfo
 		m_szKey[0]       = '\0';
 	}
 };
+
+#ifndef WIN32
+//设置当前代码路径
+bool SetAppPath()
+{
+	char szPath[300] = {'\0'};
+	char* pFilePath = NULL;
+
+	int nSize = pathconf(".",_PC_PATH_MAX);
+	if((pFilePath = (char *)new char[nSize]) != NULL)
+	{
+		memset(pFilePath, 0, nSize);
+		sprintf(pFilePath,"/proc/%d/exe",getpid());
+
+		//从符号链接中获得当前文件全路径和文件名
+		readlink(pFilePath, szPath, nSize);
+		delete[] pFilePath;
+		pFilePath = NULL;
+		//从szPath里面拆出当前路径
+		int nLen = strlen(szPath);
+		while(szPath[nLen - 1]!='/') 
+		{
+			nLen--;
+		}
+
+		szPath[nLen > 0 ? (nLen-1) : 0]= '\0';
+
+		chdir(szPath);
+		ACE_DEBUG((LM_INFO, "[SetAppPath]Set work Path (%s) OK.\n", szPath));
+		return true;
+	}
+	else
+	{
+		ACE_DEBUG((LM_INFO, "[SetAppPath]Set work Path[null].\n"));
+		return false;
+	}
+}
+#endif
+
+
 
 //读取配置文件
 bool Init_Read_Config(vecLogFileInfo& objvecLogFileInfo)
@@ -143,6 +189,11 @@ bool Init_Read_Config(vecLogFileInfo& objvecLogFileInfo)
 int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 {
 	vecLogFileInfo objvecLogFileInfo;
+
+#ifndef WIN32
+	//Linux下设置当前路径
+	SetAppPath();
+#endif
 
 	//读取配置文件
 	if(false == Init_Read_Config(objvecLogFileInfo))

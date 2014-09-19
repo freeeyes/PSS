@@ -3,6 +3,7 @@
 
 #include "ace/OS_NS_sys_stat.h"
 #include "ace/OS_NS_time.h"
+#include "ace/Date_Time.h"
 
 #include "LogFileBase.h"
 

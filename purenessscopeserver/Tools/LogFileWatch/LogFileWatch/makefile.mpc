@@ -8,5 +8,5 @@ project(LogFileWatch):aceexe{
  includes += ./ ./TinyXML
  macros += __LINUX__
  
- exeout = ./Bin
+ exeout = ../../../purenessscopeserver\PurenessScopeServer\Linux_Bin
 }

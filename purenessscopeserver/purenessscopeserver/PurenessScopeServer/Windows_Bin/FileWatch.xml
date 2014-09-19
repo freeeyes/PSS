@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-	<FileInfo ID="1" Path=".\" Key="aaa" WatchTime="10" ShellCmd="runpss.sh" />
+	<FileInfo ID="1" Path="./Log/Operation/ViewWorkThread" Key="ViewWorkThread" WatchTime="10" ShellCmd="runpss.sh" />
 	
 	<ConsoleInfo IP="127.0.0.1" Port="10010" Keypwd="freeeyes" />
 </Config>
