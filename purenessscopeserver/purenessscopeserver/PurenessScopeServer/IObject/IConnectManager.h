@@ -24,6 +24,8 @@ public:
 	virtual bool CloseConnect(uint32 u4ConnectID)                                                                = 0;
 	//得到当前连接信息IP和端口
 	virtual _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID)                                                    = 0;
+	//得到当前连接监听IP和端口
+	virtual _ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID)                                                     = 0;
 	//得到当前连接数量
 	virtual int  GetCount()                                                                                      = 0;
 	//设置相关ConnectID和Name的映射关系

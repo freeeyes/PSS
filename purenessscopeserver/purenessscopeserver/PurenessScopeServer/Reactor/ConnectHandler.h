@@ -58,6 +58,7 @@ public:
 
 	bool SetRecvQueueTimeCost(uint32 u4TimeCost);                            //记录当前接收数据到模块处理完成的具体时间消耗
 	bool SetSendQueueTimeCost(uint32 u4TimeCost);                            //记录当前从发送队列到数据发送完成的具体时间消耗
+	void SetLocalIPInfo(const char* pLocalIP, uint32 u4LocalPort);           //设置监听IP和端口信息 
 
 	bool Close(int nIOCount = 1);                                            //关闭当前连接
 	bool ServerClose();                                                      //服务器关闭客户端链接方法
@@ -70,6 +71,7 @@ public:
 	bool        CheckAlive();
 	_ClientConnectInfo GetClientInfo();                                      //得到客户端信息
 	_ClientIPInfo      GetClientIPInfo();                                    //得到客户端IP信息
+	_ClientIPInfo      GetLocalIPInfo();                                     //得到监听IP信息
 	void SetConnectName(const char* pName);                                  //设置当前连接名称
 	char* GetConnectName();                                                  //得到别名
 	void SetIsLog(bool blIsLog);                                             //设置当前连接数据是否写入日志 
@@ -126,6 +128,9 @@ private:
 
 	_TimerCheckID*             m_pTCClose;                     //定时检测链接存活状态的定时器
 
+	char                       m_szLocalIP[MAX_BUFF_50];       //监听的IP地址
+	uint32                     m_u4LocalPort;                  //监听的端口号 
+
 	CBuffPacket                m_AlivePacket;                  //服务器生存包
 	CPacketParse*              m_pPacketParse;                 //数据包解析类
 	ACE_Message_Block*         m_pCurrMessage;                 //当前的MB对象
@@ -162,6 +167,7 @@ public:
 	void GetClientNameInfo(const char* pName, vecClientNameInfo& objClientNameInfo);                         //得到指定别名的所有设置信息
 
 	_ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                                                       //得到指定链接信息
+	_ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID);                                                        //得到监听链接信息
 
 	bool StartTimer();                                                                                       //开启定时器
 	bool KillTimer();                                                                                        //关闭定时器
@@ -234,6 +240,7 @@ public:
 	bool PostMessageAll(const char* pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, bool blSendState = true, bool blDelete = true);
 	bool CloseConnect(uint32 u4ConnectID);                                                                   //服务器关闭
 	_ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                                                       //得到指定链接信息
+	_ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID);                                                        //得到监听链接信息
 	void GetClientNameInfo(const char* pName, vecClientNameInfo& objClientNameInfo);                         //得到指定别名的所有设置信息
 	void GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo);                                         //返回当前存活链接的信息
 	void SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4TimeCost);                                        //记录指定链接数据处理时间

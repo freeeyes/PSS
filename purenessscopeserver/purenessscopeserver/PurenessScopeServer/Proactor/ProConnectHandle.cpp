@@ -1038,6 +1038,14 @@ _ClientIPInfo CProConnectHandle::GetClientIPInfo()
 	return ClientIPInfo;
 }
 
+_ClientIPInfo CProConnectHandle::GetLocalIPInfo()
+{
+	_ClientIPInfo ClientIPInfo;
+	sprintf_safe(ClientIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_szLocalIP);
+	ClientIPInfo.m_nPort = (int)m_u4LocalPort;
+	return ClientIPInfo;
+}
+
 void CProConnectHandle::ClearPacketParse(ACE_Message_Block& mbCurrBlock)
 {
 	//链接断开
@@ -1077,6 +1085,12 @@ void CProConnectHandle::SetIsLog(bool blIsLog)
 bool CProConnectHandle::GetIsLog()
 {
 	return m_blIsLog;
+}
+
+void CProConnectHandle::SetLocalIPInfo(const char* pLocalIP, uint32 u4LocalPort)
+{
+	sprintf_safe(m_szLocalIP, MAX_BUFF_50, "%s", pLocalIP);
+	m_u4LocalPort = u4LocalPort;
 }
 
 //***************************************************************************
@@ -1593,6 +1607,31 @@ _ClientIPInfo CProConnectManager::GetClientIPInfo(uint32 u4ConnectID)
 		if(NULL != pConnectHandler)
 		{
 			return pConnectHandler->GetClientIPInfo();
+		}
+		else
+		{
+			_ClientIPInfo ClientIPInfo;
+			return ClientIPInfo;
+		}
+	}
+	else
+	{
+		_ClientIPInfo ClientIPInfo;
+		return ClientIPInfo;
+	}
+}
+
+_ClientIPInfo CProConnectManager::GetLocalIPInfo(uint32 u4ConnectID)
+{
+	ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
+	mapConnectManager::iterator f = m_mapConnectManager.find(u4ConnectID);
+
+	if(f != m_mapConnectManager.end())
+	{
+		CProConnectHandle* pConnectHandler = (CProConnectHandle* )f->second;
+		if(NULL != pConnectHandler)
+		{
+			return pConnectHandler->GetLocalIPInfo();
 		}
 		else
 		{
@@ -2212,6 +2251,30 @@ _ClientIPInfo CProConnectManagerGroup::GetClientIPInfo(uint32 u4ConnectID)
 
 	return pConnectManager->GetClientIPInfo(u4ConnectID);	
 }
+
+_ClientIPInfo CProConnectManagerGroup::GetLocalIPInfo(uint32 u4ConnectID)
+{
+	_ClientIPInfo objClientIPInfo;
+	//判断命中到哪一个线程组里面去
+	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
+
+	mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
+	if(f == m_mapConnectManager.end())
+	{
+		OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::GetLocalIPInfo]Out of range Queue ID.\n"));
+		return objClientIPInfo;
+	}
+
+	CProConnectManager* pConnectManager = (CProConnectManager* )f->second;
+	if(NULL == pConnectManager)
+	{
+		OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::GetLocalIPInfo]No find send Queue object.\n"));
+		return objClientIPInfo;		
+	}	
+
+	return pConnectManager->GetLocalIPInfo(u4ConnectID);	
+}
+
 
 void CProConnectManagerGroup::GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo)
 {

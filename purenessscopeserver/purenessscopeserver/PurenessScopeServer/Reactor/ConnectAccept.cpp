@@ -16,6 +16,7 @@ int ConnectAcceptor::make_svc_handler(CConnectHandler*& sh)
 
         if (NULL != pConnectHandler)
         {
+			pConnectHandler->SetLocalIPInfo(m_szListenIP, m_u4Port);
             pConnectHandler->reactor(this->reactor());
             sh = pConnectHandler;
             return 0;

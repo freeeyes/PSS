@@ -2,7 +2,13 @@
 
 CProConnectHandle* ProConnectAcceptor::make_handler (void)
 {
-	return App_ProConnectHandlerPool::instance()->Create();
+	CProConnectHandle* pProConnectHandle = App_ProConnectHandlerPool::instance()->Create();
+	if(NULL != pProConnectHandle)
+	{
+		pProConnectHandle->SetLocalIPInfo(m_szListenIP, m_u4Port);
+	}
+
+	return pProConnectHandle;
 }
 
 int ProConnectAcceptor::validate_connection (const ACE_Asynch_Accept::Result& result,
