@@ -238,8 +238,8 @@ bool CForbiddenIP::ParseTXT(const char* pText, char* pIP, char* pConnectType)
 
 bool CForbiddenIP::CompareIP(char* pTargetIP, char* pClientIP)
 {
-  char szTargetIP[20];
-  char szClientIP[20];
+  char szTargetIP[50];
+  char szClientIP[50];
 
   char szTarget[5];
   char szClient[5];

@@ -1033,7 +1033,7 @@ _ClientConnectInfo CProConnectHandle::GetClientInfo()
 _ClientIPInfo CProConnectHandle::GetClientIPInfo()
 {
 	_ClientIPInfo ClientIPInfo;
-	sprintf_safe(ClientIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+	sprintf_safe(ClientIPInfo.m_szClientIP, MAX_BUFF_50, "%s", m_addrRemote.get_host_addr());
 	ClientIPInfo.m_nPort = (int)m_addrRemote.get_port_number();
 	return ClientIPInfo;
 }
@@ -1041,7 +1041,7 @@ _ClientIPInfo CProConnectHandle::GetClientIPInfo()
 _ClientIPInfo CProConnectHandle::GetLocalIPInfo()
 {
 	_ClientIPInfo ClientIPInfo;
-	sprintf_safe(ClientIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_szLocalIP);
+	sprintf_safe(ClientIPInfo.m_szClientIP, MAX_BUFF_50, "%s", m_szLocalIP);
 	ClientIPInfo.m_nPort = (int)m_u4LocalPort;
 	return ClientIPInfo;
 }
@@ -1807,7 +1807,7 @@ void CProConnectManager::GetClientNameInfo(const char* pName, vecClientNameInfo&
 			_ClientNameInfo ClientNameInfo;
 			ClientNameInfo.m_nConnectID = (int)pConnectHandler->GetConnectID();
 			sprintf_safe(ClientNameInfo.m_szName, MAX_BUFF_100, "%s", pConnectHandler->GetConnectName());
-			sprintf_safe(ClientNameInfo.m_szClientIP, MAX_BUFF_20, "%s", pConnectHandler->GetClientIPInfo().m_szClientIP);
+			sprintf_safe(ClientNameInfo.m_szClientIP, MAX_BUFF_50, "%s", pConnectHandler->GetClientIPInfo().m_szClientIP);
 			ClientNameInfo.m_nPort =  pConnectHandler->GetClientIPInfo().m_nPort;
 			if(pConnectHandler->GetIsLog() == true)
 			{
