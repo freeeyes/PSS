@@ -130,7 +130,7 @@ uint8 CConsolePacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block
 }
 
 
-bool CConsolePacketParse::Connect( uint32 u4ConnectID, _ClientIPInfo& objClientIPInfo)
+bool CConsolePacketParse::Connect( uint32 u4ConnectID, _ClientIPInfo objClientIPInfo, _ClientIPInfo objLocalIPInfo)
 {
 	//这里添加你对连接建立的逻辑处理，如果没有则不用在这里写任何代码
 	//返回false，则连接会断开
@@ -140,7 +140,7 @@ bool CConsolePacketParse::Connect( uint32 u4ConnectID, _ClientIPInfo& objClientI
 	}
 	
 	OUR_DEBUG((LM_INFO, "[CConsolePacketParse::Connect]IP=%s,Port=%d.\n", objClientIPInfo.m_szClientIP, objClientIPInfo.m_nPort));
-
+	OUR_DEBUG((LM_INFO, "[CConsolePacketParse::Connect]LocalIP=%s,Port=%d.\n", objLocalIPInfo.m_szClientIP, objLocalIPInfo.m_nPort));
 	return true;
 }
 

@@ -526,7 +526,7 @@ void CPassTCPDlg::InitView()
 	m_txtRecvTimeout.SetWindowText(_T("1000"));
 	m_txtPacketTimewait.SetWindowText(_T("0"));
 	m_txtSocketInterval.SetWindowText(_T("0"));
-	m_txtRecvLength.SetWindowText(_T("14"));
+	m_txtRecvLength.SetWindowText(_T("12"));
 	m_reSendText.SetWindowText(_T("01 00 00 10 08 00 00 00 46 45 45 45 45 59 45 53 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 be cd aa 8f 3c 01 00 00"));
 	m_txtClientUdpPort.SetWindowText(_T("20002"));
 

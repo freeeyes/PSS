@@ -321,10 +321,7 @@ int CConnectHandler::open(void*)
 	AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Connection from [%s:%d].",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number());
 
 	//告诉PacketParse连接应建立
-	_ClientIPInfo objClientIPInfo;
-	sprintf_safe(objClientIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-	objClientIPInfo.m_nPort = m_addrRemote.get_port_number();
-	m_pPacketParse->Connect(GetConnectID(), objClientIPInfo);
+	m_pPacketParse->Connect(GetConnectID(), GetClientIPInfo(), GetLocalIPInfo());
 
 	//发送链接建立消息。
 	if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CONNECT, NULL))

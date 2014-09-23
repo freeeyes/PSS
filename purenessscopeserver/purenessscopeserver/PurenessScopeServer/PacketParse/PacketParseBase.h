@@ -54,7 +54,7 @@ public:
 	virtual uint8 GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurrMessage, IMessageBlockManager* pMessageBlockManager)   = 0;
 	virtual bool MakePacket(uint32 u4ConnectID, const char* pData, uint32 u4Len, ACE_Message_Block* pMbData, uint16 u2CommandID = 0) = 0;
 	virtual uint32 MakePacketLength(uint32 u4ConnectID, uint32 u4DataLen, uint16 u2CommandID = 0)                                    = 0;
-	virtual bool Connect(uint32 u4ConnectID, _ClientIPInfo& objClientIPInfo)                                                         = 0;
+	virtual bool Connect(uint32 u4ConnectID, _ClientIPInfo objClientIPInfo, _ClientIPInfo objLocalIPInfo)                            = 0;
 	virtual void DisConnect(uint32 u4ConnectID)                                                                                      = 0;
 	virtual void GetPacketHeadInfo(_PacketHeadInfo& objPacketHeadInfo)                                                               = 0;
 

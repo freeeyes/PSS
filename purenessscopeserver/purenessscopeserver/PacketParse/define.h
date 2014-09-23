@@ -980,7 +980,7 @@ inline bool Replace_String(char* pText, uint32 u4Len, const char* pOld, const ch
 //客户端IP信息
 struct _ClientIPInfo
 {
-	char m_szClientIP[MAX_BUFF_20];   //客户端的IP地址
+	char m_szClientIP[MAX_BUFF_50];   //客户端的IP地址
 	int  m_nPort;                     //客户端的端口
 
 	_ClientIPInfo()
@@ -991,7 +991,7 @@ struct _ClientIPInfo
 
 	_ClientIPInfo& operator = (const _ClientIPInfo& ar)
 	{
-		sprintf_safe(this->m_szClientIP, MAX_BUFF_20, "%s", ar.m_szClientIP);
+		sprintf_safe(this->m_szClientIP, MAX_BUFF_50, "%s", ar.m_szClientIP);
 		this->m_nPort = ar.m_nPort;
 		return *this;
 	}
@@ -1001,7 +1001,7 @@ struct _ClientIPInfo
 struct _ClientNameInfo
 {
 	char m_szName[MAX_BUFF_100];      //连接别名 
-	char m_szClientIP[MAX_BUFF_20];   //客户端的IP地址
+	char m_szClientIP[MAX_BUFF_50];   //客户端的IP地址
 	int  m_nPort;                     //客户端的端口
 	int  m_nConnectID;                //连接ID  
 	int  m_nLog;                      //是否记录日志
@@ -1018,7 +1018,7 @@ struct _ClientNameInfo
 	_ClientNameInfo& operator = (const _ClientNameInfo& ar)
 	{
 		sprintf_safe(this->m_szName, MAX_BUFF_100, "%s", ar.m_szName);
-		sprintf_safe(this->m_szClientIP, MAX_BUFF_20, "%s", ar.m_szClientIP);
+		sprintf_safe(this->m_szClientIP, MAX_BUFF_50, "%s", ar.m_szClientIP);
 		this->m_nPort      = ar.m_nPort;
 		this->m_nConnectID = ar.m_nConnectID;
 		this->m_nLog       = ar.m_nLog;
