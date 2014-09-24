@@ -253,7 +253,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 	//在包内设置工作线程ID
 	pMessage->GetMessageBase()->m_u4WorkThreadID = m_u4ThreadID;
 	uint32 u4TimeCost = 0;
-	App_MessageManager::instance()->DoMessage(pMessage, u2CommandID, u4TimeCost);
+	App_MessageManager::instance()->DoMessage(m_ThreadInfo.m_tvUpdateTime, pMessage, u2CommandID, u4TimeCost);
 
 	if(pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CONNECT && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CDISCONNET && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_SDISCONNET)
 	{

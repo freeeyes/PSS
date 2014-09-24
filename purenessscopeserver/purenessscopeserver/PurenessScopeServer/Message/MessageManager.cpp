@@ -29,7 +29,7 @@ CMessageManager::~CMessageManager(void)
 	//Close();
 }
 
-bool CMessageManager::DoMessage(IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost)
+bool CMessageManager::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost)
 {
 	if(NULL == pMessage)
 	{
@@ -65,7 +65,6 @@ bool CMessageManager::DoMessage(IMessage* pMessage, uint16& u2CommandID, uint32&
 				//pMessage->GetMessageBase()->m_ProfileTime.Start();
 				//OUR_DEBUG((LM_ERROR, "[CMessageManager::DoMessage]u2CommandID = %d Begin.\n", u2CommandID));
 				//这里指记录处理毫秒数
-				ACE_Time_Value tvBegin = ACE_OS::gettimeofday();
 				pClientCommandInfo->m_pClientCommand->DoMessage(pMessage, bDeleteFlag);
 				ACE_Time_Value tvCost =  ACE_OS::gettimeofday() - tvBegin;
 				u4TimeCost =  (uint32)tvCost.msec();
@@ -274,7 +273,7 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1State
 					App_ModuleLoader::instance()->UnLoadModule(pModuleName);
 					m_mapModuleClient.erase(f);
 					SAFE_DELETE(pModuleClient);
-          return true;
+					return true;
 				}
 
 				//如果是2，则重新加载这个模块
