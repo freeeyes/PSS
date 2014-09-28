@@ -77,7 +77,7 @@ bool SetAppPath()
 		sprintf(pFilePath,"/proc/%d/exe",getpid());
 
 		//从符号链接中获得当前文件全路径和文件名
-		readlink(pFilePath, szPath, nSize);
+		readlink(pFilePath, szPath, MAX_BUFF_300 - 1);
 		delete[] pFilePath;
 		pFilePath = NULL;
 		//从szPath里面拆出当前路径
