@@ -2,7 +2,6 @@
 #define MY_ACE_LOGGING_STATEGY_H
 
 #include "ace/Service_Object.h"
-#include "ace/Log_Category.h"
 
 #if !defined (ACE_LACKS_PRAGMA_ONCE)
 # pragma once
