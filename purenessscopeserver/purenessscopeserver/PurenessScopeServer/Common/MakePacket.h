@@ -89,6 +89,7 @@ private:
 	CMessage* SetMessageConnect(uint32 u4ConnectID);                                                              //用户链接数据包消息
 	CMessage* SetMessageCDisConnect(uint32 u4ConnectID);                                                          //用户断开链接数据包消息
 	CMessage* SetMessageSDisConnect(uint32 u4ConnectID);                                                          //服务器断开链接数据包消息
+	CMessage* SetMessageSendTimeout(uint32 u4ConnectID);                                                          //服务器发送给客户端数据超时消息
 
 private:
 	CMakePacketPool                m_MakePacketPool;

@@ -1125,6 +1125,12 @@ bool CConnectHandler::SetSendQueueTimeCost(uint32 u4TimeCost)
 	if((uint32)(m_u8SendQueueTimeout) <= u4TimeCost)
 	{
 		AppLogManager::instance()->WriteLog(LOG_SYSTEM_SENDQUEUEERROR, "[TCP]IP=%s,Prot=%d,m_u8SendQueueTimeout = [%d], Timeout=[%d].", GetClientIPInfo().m_szClientIP, GetClientIPInfo().m_nPort, (uint32)m_u8SendQueueTimeout, u4TimeCost);
+
+		//告诉插件连接发送超时阀值报警
+		if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_SEND_TIMEOUT, NULL))
+		{
+			OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
+		}
 	}
 
 	//m_u8SendQueueTimeCost += u4TimeCost;

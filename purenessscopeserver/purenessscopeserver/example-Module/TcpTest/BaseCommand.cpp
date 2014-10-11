@@ -40,9 +40,10 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 
 	//处理链接建立信息
 	MESSAGE_FUNCTION_BEGIN(pMessage->GetMessageBase()->m_u2Cmd);
-	MESSAGE_FUNCTION(CLIENT_LINK_CONNECT, Do_Connect, pMessage);
-	MESSAGE_FUNCTION(CLIENT_LINK_CDISCONNET, Do_DisConnect, pMessage);
-	MESSAGE_FUNCTION(COMMAND_BASE, Do_Base, pMessage);
+	MESSAGE_FUNCTION(CLIENT_LINK_CONNECT,     Do_Connect,           pMessage);
+	MESSAGE_FUNCTION(CLIENT_LINK_CDISCONNET,  Do_DisConnect,        pMessage);
+	MESSAGE_FUNCTION(CLINET_LINK_SNEDTIMEOUT, Do_ClientSendTimeout, pMessage);
+	MESSAGE_FUNCTION(COMMAND_BASE,            Do_Base,              pMessage);
 	MESSAGE_FUNCTION_END;
 
 	return 0;
@@ -66,7 +67,16 @@ int CBaseCommand::Do_Connect(IMessage* pMessage)
 
 int CBaseCommand::Do_DisConnect(IMessage* pMessage)
 {
-	OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_DisConnect] CLIENT_LINK_CDISCONNET OK.\n"));
+	//处理连接断开事件
+	OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_DisConnect](%d)CLIENT_LINK_CDISCONNET OK.\n", pMessage->GetMessageBase()->m_u4ConnectID));
+
+	return 0;
+}
+
+int CBaseCommand::Do_ClientSendTimeout(IMessage* pMessage)
+{
+	//处理服务器发送客户端数据连接超过阀值的事件
+	OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_DisConnect](%d)CLINET_LINK_SNEDTIMEOUT OK.\n", pMessage->GetMessageBase()->m_u4ConnectID));
 
 	return 0;
 }

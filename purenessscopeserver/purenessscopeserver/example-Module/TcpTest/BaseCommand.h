@@ -28,6 +28,7 @@ public:
 private:
 	int Do_Connect(IMessage* pMessage);
 	int Do_DisConnect(IMessage* pMessage);
+	int Do_ClientSendTimeout(IMessage* pMessage);
 	int Do_Base(IMessage* pMessage);
 
 

@@ -211,12 +211,21 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 	m_ThreadInfo.m_u4State = THREAD_RUNBEGIN;
 	//OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage]1 [%d],m_u4State=%d, commandID=%d.\n", u4ThreadID, m_ThreadInfo.m_u4State,  pMessage->GetMessageBase()->m_u2Cmd));
 
+	//将要处理的数据放到逻辑处理的地方去
+	uint16 u2CommandID = 0;          //数据包的CommandID
+
+	u2CommandID = pMessage->GetMessageBase()->m_u2Cmd;
+
 	//抛出掉链接建立和断开，只计算逻辑数据包
 	bool blIsDead = false;
-	if(pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CONNECT && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CDISCONNET && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_SDISCONNET)
+	if(pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CONNECT 
+		&& pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CDISCONNET 
+		&& pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_SDISCONNET
+		&& pMessage->GetMessageBase()->m_u2Cmd != CLINET_LINK_SNEDTIMEOUT)
 	{
 		m_ThreadInfo.m_u4RecvPacketCount++;
 		m_ThreadInfo.m_u4CurrPacketCount++;
+		m_ThreadInfo.m_u2CommandID   = u2CommandID;
 
 		blIsDead = m_WorkThreadAI.CheckCurrTimeout(pMessage->GetMessageBase()->m_u2Cmd, (uint32)m_ThreadInfo.m_tvUpdateTime.sec());
 		if(blIsDead == true)
@@ -245,28 +254,21 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 		}
 	}
 
-	//将要处理的数据放到逻辑处理的地方去
-	uint16 u2CommandID = 0;          //数据包的CommandID
-
-	u2CommandID = pMessage->GetMessageBase()->m_u2Cmd;
-
 	//在包内设置工作线程ID
 	pMessage->GetMessageBase()->m_u4WorkThreadID = m_u4ThreadID;
 	uint32 u4TimeCost = 0;
 	App_MessageManager::instance()->DoMessage(m_ThreadInfo.m_tvUpdateTime, pMessage, u2CommandID, u4TimeCost);
 
-	if(pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CONNECT && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CDISCONNET && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_SDISCONNET)
+	if(pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CONNECT 
+		&& pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CDISCONNET 
+		&& pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_SDISCONNET
+		&& pMessage->GetMessageBase()->m_u2Cmd != CLINET_LINK_SNEDTIMEOUT)
 	{
 		m_WorkThreadAI.SaveTimeout(pMessage->GetMessageBase()->m_u2Cmd, u4TimeCost);
 	}
 
 	m_ThreadInfo.m_u4State = THREAD_RUNEND;
 	//OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage]2 [%d],m_u4State=%d,CommandID=%d.\n", u4ThreadID, m_ThreadInfo.m_u4State, pMessage->GetMessageBase()->m_u2Cmd));
-
-	if(pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CONNECT && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CDISCONNET && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_SDISCONNET)
-	{
-		m_ThreadInfo.m_u2CommandID   = u2CommandID;
-	}
 
 	//如果是windows服务器，默认用App_ProConnectManager，否则这里需要手动修改一下
 	//暂时无用，先注释掉
