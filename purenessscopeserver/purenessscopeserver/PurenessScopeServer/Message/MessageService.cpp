@@ -221,7 +221,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 	if(pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CONNECT 
 		&& pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CDISCONNET 
 		&& pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_SDISCONNET
-		&& pMessage->GetMessageBase()->m_u2Cmd != CLINET_LINK_SNEDTIMEOUT)
+		&& pMessage->GetMessageBase()->m_u2Cmd != CLINET_LINK_SENDTIMEOUT)
 	{
 		m_ThreadInfo.m_u4RecvPacketCount++;
 		m_ThreadInfo.m_u4CurrPacketCount++;
@@ -262,7 +262,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 	if(pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CONNECT 
 		&& pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CDISCONNET 
 		&& pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_SDISCONNET
-		&& pMessage->GetMessageBase()->m_u2Cmd != CLINET_LINK_SNEDTIMEOUT)
+		&& pMessage->GetMessageBase()->m_u2Cmd != CLINET_LINK_SENDTIMEOUT)
 	{
 		m_WorkThreadAI.SaveTimeout(pMessage->GetMessageBase()->m_u2Cmd, u4TimeCost);
 	}

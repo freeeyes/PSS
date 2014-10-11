@@ -261,7 +261,7 @@ enum
 #define CLIENT_LINK_CONNECT     0x0001      //用户链接
 #define CLIENT_LINK_CDISCONNET  0x0002      //客户端退出
 #define CLIENT_LINK_SDISCONNET  0x0003      //服务器退出
-#define CLINET_LINK_SNEDTIMEOUT 0x0004      //服务器发送客户端时间超过阀值
+#define CLINET_LINK_SENDTIMEOUT 0x0004      //服务器发送客户端时间超过阀值
 //*****************************************************************
 
 //*****************************************************************

@@ -448,7 +448,7 @@ CMessage* CMakePacket::SetMessageSendTimeout(uint32 u4ConnectID)
 	{
 		//开始组装数据
 		pMessage->GetMessageBase()->m_u4ConnectID   = u4ConnectID;
-		pMessage->GetMessageBase()->m_u2Cmd         = CLINET_LINK_SNEDTIMEOUT;
+		pMessage->GetMessageBase()->m_u2Cmd         = CLINET_LINK_SENDTIMEOUT;
 		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)ACE_OS::gettimeofday().sec();
 		pMessage->GetMessageBase()->m_u4HeadSrcSize = 0;
 		pMessage->GetMessageBase()->m_u4BodySrcSize = 0;

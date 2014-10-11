@@ -42,7 +42,7 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 	MESSAGE_FUNCTION_BEGIN(pMessage->GetMessageBase()->m_u2Cmd);
 	MESSAGE_FUNCTION(CLIENT_LINK_CONNECT,     Do_Connect,           pMessage);
 	MESSAGE_FUNCTION(CLIENT_LINK_CDISCONNET,  Do_DisConnect,        pMessage);
-	MESSAGE_FUNCTION(CLINET_LINK_SNEDTIMEOUT, Do_ClientSendTimeout, pMessage);
+	MESSAGE_FUNCTION(CLINET_LINK_SENDTIMEOUT, Do_ClientSendTimeout, pMessage);
 	MESSAGE_FUNCTION(COMMAND_BASE,            Do_Base,              pMessage);
 	MESSAGE_FUNCTION_END;
 
