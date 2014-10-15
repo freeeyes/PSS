@@ -118,23 +118,6 @@ bool CProServerManager::Init()
 		App_ProConnectHandlerPool::instance()->Init(App_MainConfig::instance()->GetHandleCount());
 	}
 
-	//初始化统计模块功能
-	App_CommandAccount::instance()->Init(App_MainConfig::instance()->GetCommandAccount(), 
-		App_MainConfig::instance()->GetCommandFlow(), 
-		App_MainConfig::instance()->GetPacketTimeOut());
-	
-	//初始化CommandID告警阀值相关
-	for(int i = 0; i < (int)App_MainConfig::instance()->GetCommandAlertCount(); i++)
-	{
-		_CommandAlert* pCommandAlert = App_MainConfig::instance()->GetCommandAlert(i);
-		if(NULL != pCommandAlert)
-		{
-			App_CommandAccount::instance()->AddCommandAlert(pCommandAlert->m_u2CommandID, 
-				pCommandAlert->m_u4CommandCount,
-				pCommandAlert->m_u4MailID);
-		}
-	}
-
 	//初始化链接管理器
 	App_ProConnectManager::instance()->Init(App_MainConfig::instance()->GetSendQueueCount());
 
@@ -391,8 +374,6 @@ bool CProServerManager::Close()
 	OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_MessageServiceGroup OK.\n"));
 	App_ProConnectManager::instance()->CloseAll();
 	OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ConnectManager OK.\n"));
-	App_CommandAccount::instance()->SaveCommandDataLog();
-	OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Save App_CommandAccount OK.\n"));
 	AppLogManager::instance()->Close();
 	OUR_DEBUG((LM_INFO, "[CProServerManager::Close]AppLogManager OK\n"));
 	App_BuffPacketManager::instance()->Close();

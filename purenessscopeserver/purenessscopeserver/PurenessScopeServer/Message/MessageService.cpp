@@ -56,6 +56,28 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
 		App_MainConfig::instance()->GetWTStopTime(),
 		App_MainConfig::instance()->GetWTReturnDataType(),
 		App_MainConfig::instance()->GetWTReturnData());
+
+	//按照线程初始化统计模块的名字
+	char szName[MAX_BUFF_50] = {'\0'};
+	sprintf_safe(szName, MAX_BUFF_50, "工作线程(%d)", u4ThreadID);
+	m_CommandAccount.InitName(szName);
+
+	//初始化统计模块功能
+	m_CommandAccount.Init(App_MainConfig::instance()->GetCommandAccount(), 
+		                  App_MainConfig::instance()->GetCommandFlow(), 
+		                  App_MainConfig::instance()->GetPacketTimeOut());
+
+	//初始化CommandID告警阀值相关
+	for(int i = 0; i < (int)App_MainConfig::instance()->GetCommandAlertCount(); i++)
+	{
+		_CommandAlert* pCommandAlert = App_MainConfig::instance()->GetCommandAlert(i);
+		if(NULL != pCommandAlert)
+		{
+			m_CommandAccount.AddCommandAlert(pCommandAlert->m_u2CommandID, 
+				                             pCommandAlert->m_u4CommandCount,
+				                             pCommandAlert->m_u4MailID);
+		}
+	}
 }
 
 bool CMessageService::Start()
@@ -256,41 +278,36 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 
 	//在包内设置工作线程ID
 	pMessage->GetMessageBase()->m_u4WorkThreadID = m_u4ThreadID;
-	uint32 u4TimeCost = 0;
-	App_MessageManager::instance()->DoMessage(m_ThreadInfo.m_tvUpdateTime, pMessage, u2CommandID, u4TimeCost);
+	uint32 u4TimeCost     = 0;      //命令执行时间
+	uint16 u2CommandCount = 0;      //命令被调用次数 
+	App_MessageManager::instance()->DoMessage(m_ThreadInfo.m_tvUpdateTime, pMessage, u2CommandID, u4TimeCost, u2CommandCount);
 
 	if(pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CONNECT 
 		&& pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CDISCONNET 
 		&& pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_SDISCONNET
 		&& pMessage->GetMessageBase()->m_u2Cmd != CLINET_LINK_SENDTIMEOUT)
 	{
+		//如果AI启动了，则在这里进行AI判定
 		m_WorkThreadAI.SaveTimeout(pMessage->GetMessageBase()->m_u2Cmd, u4TimeCost);
+
+		if(u2CommandCount > 0)
+		{
+			//获得单个命令的执行时间
+			u4TimeCost = u4TimeCost/u2CommandCount;
+		}
+
+		OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage]Command(%d)=[%d].\n", pMessage->GetMessageBase()->m_u2Cmd, u2CommandCount));
+
+		//添加统计信息
+		m_CommandAccount.SaveCommandData(u2CommandID, 
+										 (uint64)u4TimeCost, 
+			                             pMessage->GetMessageBase()->m_u1PacketType, 
+								         pMessage->GetMessageBase()->m_u4HeadSrcSize + pMessage->GetMessageBase()->m_u4BodySrcSize, 
+									     (uint32)(pMessage->GetMessageBase()->m_u4HeadSrcSize + pMessage->GetMessageBase()->m_u4BodySrcSize), 
+										 COMMAND_TYPE_IN);
 	}
 
 	m_ThreadInfo.m_u4State = THREAD_RUNEND;
-	//OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage]2 [%d],m_u4State=%d,CommandID=%d.\n", u4ThreadID, m_ThreadInfo.m_u4State, pMessage->GetMessageBase()->m_u2Cmd));
-
-	//如果是windows服务器，默认用App_ProConnectManager，否则这里需要手动修改一下
-	//暂时无用，先注释掉
-	/*
-	#ifdef WIN32
-	{
-	if(pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CONNECT && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CDISCONNET && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_SDISCONNET)
-	{
-	//其实感觉这里意义不大，因为在windows下的时钟精度到不了微秒，所以这个值很有可能没有意义。
-	App_ProConnectManager::instance()->SetRecvQueueTimeCost(pMessage->GetMessageBase()->m_u4ConnectID, u4Cost);
-	}
-	}
-	#else
-	{
-	if(pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CONNECT && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CDISCONNET && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_SDISCONNET)
-	{
-	//linux可以精确到微秒，这个值就变的有意义了
-	App_ConnectManager::instance()->SetRecvQueueTimeCost(pMessage->GetMessageBase()->m_u4ConnectID, u4Cost);
-	}
-	}
-	#endif
-	*/
 
 	//开始测算数据包处理的时间
 	if(m_ThreadInfo.m_u2PacketTime == 0)
@@ -397,6 +414,36 @@ void CMessageService::GetAITF( vecCommandTimeout& objTimeout )
 void CMessageService::SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime)
 {
 	m_WorkThreadAI.ReSet(u1AI, u4DisposeTime, u4WTCheckTime, u4WTStopTime);
+}
+
+_CommandData* CMessageService::GetCommandData(uint16 u2CommandID)
+{
+	return m_CommandAccount.GetCommandData(u2CommandID);
+}
+
+_CommandFlowAccount CMessageService::GetCommandFlowAccount()
+{
+	return m_CommandAccount.GetCommandFlowAccount();
+}
+
+void CMessageService::GetCommandTimeOut(vecCommandTimeOut& CommandTimeOutList)
+{
+	m_CommandAccount.GetCommandTimeOut(CommandTimeOutList);
+}
+
+void CMessageService::GetCommandAlertData(vecCommandAlertData& CommandAlertDataList)
+{
+	m_CommandAccount.GetCommandAlertData(CommandAlertDataList);
+}
+
+void CMessageService::ClearCommandTimeOut()
+{
+	m_CommandAccount.ClearTimeOut();
+}
+
+void CMessageService::SaveCommandDataLog()
+{
+	m_CommandAccount.SaveCommandDataLog();
 }
 
 CMessageServiceGroup::CMessageServiceGroup( void )
@@ -691,7 +738,6 @@ void CMessageServiceGroup::GetAITF(vecCommandTimeout& objTimeout)
 	objTimeout.clear();
 	for(int i = 0; i < (int)m_vecMessageService.size(); i++)
 	{
-		_WorkThreadAIInfo objWorkThreadAIInfo;
 		CMessageService* pMessageService = (CMessageService* )m_vecMessageService[i];
 		if(NULL != pMessageService)
 		{
@@ -704,11 +750,87 @@ void CMessageServiceGroup::SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCh
 {
 	for(int i = 0; i < (int)m_vecMessageService.size(); i++)
 	{
-		_WorkThreadAIInfo objWorkThreadAIInfo;
 		CMessageService* pMessageService = (CMessageService* )m_vecMessageService[i];
 		if(NULL != pMessageService)
 		{
 			pMessageService->SetAI(u1AI, u4DisposeTime, u4WTCheckTime, u4WTStopTime);
+		}
+	}
+}
+
+void CMessageServiceGroup::GetCommandData(uint16 u2CommandID, _CommandData& objCommandData)
+{
+	for(int i = 0; i < (int)m_vecMessageService.size(); i++)
+	{
+		CMessageService* pMessageService = (CMessageService* )m_vecMessageService[i];
+		if(NULL != pMessageService)
+		{
+			_CommandData* pCommandData = pMessageService->GetCommandData(u2CommandID);
+			if(NULL != pCommandData)
+			{
+				objCommandData += (*pCommandData);
+			}
+		}
+	}
+}
+
+void CMessageServiceGroup::GetFlowInfo(_CommandFlowAccount& objCommandFlowAccount)
+{
+	for(int i = 0; i < (int)m_vecMessageService.size(); i++)
+	{
+		CMessageService* pMessageService = (CMessageService* )m_vecMessageService[i];
+		if(NULL != pMessageService)
+		{
+			_CommandFlowAccount CommandFlowAccount = pMessageService->GetCommandFlowAccount();
+			objCommandFlowAccount += CommandFlowAccount;
+		}
+	}
+}
+
+void CMessageServiceGroup::GetCommandTimeOut(vecCommandTimeOut& CommandTimeOutList)
+{
+	for(int i = 0; i < (int)m_vecMessageService.size(); i++)
+	{
+		CMessageService* pMessageService = (CMessageService* )m_vecMessageService[i];
+		if(NULL != pMessageService)
+		{
+			pMessageService->GetCommandTimeOut(CommandTimeOutList);
+		}
+	}
+}
+
+void CMessageServiceGroup::GetCommandAlertData(vecCommandAlertData& CommandAlertDataList)
+{
+	for(int i = 0; i < (int)m_vecMessageService.size(); i++)
+	{
+		CMessageService* pMessageService = (CMessageService* )m_vecMessageService[i];
+		if(NULL != pMessageService)
+		{
+			pMessageService->GetCommandAlertData(CommandAlertDataList);
+		}
+	}
+}
+
+void CMessageServiceGroup::ClearCommandTimeOut()
+{
+	for(int i = 0; i < (int)m_vecMessageService.size(); i++)
+	{
+		CMessageService* pMessageService = (CMessageService* )m_vecMessageService[i];
+		if(NULL != pMessageService)
+		{
+			pMessageService->ClearCommandTimeOut();
+		}
+	}
+}
+
+void CMessageServiceGroup::SaveCommandDataLog()
+{
+	for(int i = 0; i < (int)m_vecMessageService.size(); i++)
+	{
+		CMessageService* pMessageService = (CMessageService* )m_vecMessageService[i];
+		if(NULL != pMessageService)
+		{
+			pMessageService->SaveCommandDataLog();
 		}
 	}
 }

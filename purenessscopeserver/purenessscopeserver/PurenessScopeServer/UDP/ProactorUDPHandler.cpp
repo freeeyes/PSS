@@ -161,7 +161,7 @@ bool CProactorUDPHandler::SendMessage(const char* pMessage, uint32 u4Len, const 
 			//统计发送信息
 			ACE_Time_Value tvInterval = ACE_OS::gettimeofday() - m_tvBegin;
 			uint32 u4SendCost = (uint32)(tvInterval.msec());
-			App_CommandAccount::instance()->SaveCommandData(u2CommandID, u4SendCost, PACKET_UDP, u4DataLen, u4Len, COMMAND_TYPE_OUT);
+			//App_CommandAccount::instance()->SaveCommandData(u2CommandID, u4SendCost, PACKET_UDP, u4DataLen, u4Len, COMMAND_TYPE_OUT);
 
 			//释放发送体
 			pMbData->release();
@@ -194,7 +194,7 @@ bool CProactorUDPHandler::SendMessage(const char* pMessage, uint32 u4Len, const 
 			//统计发送信息
 			ACE_Time_Value tvInterval = ACE_OS::gettimeofday() - m_tvBegin;
 			uint32 u4SendCost = (uint32)(tvInterval.msec());
-			App_CommandAccount::instance()->SaveCommandData(u2CommandID, u4SendCost, PACKET_UDP, u4Len, u4Len, COMMAND_TYPE_OUT);
+			//App_CommandAccount::instance()->SaveCommandData(u2CommandID, u4SendCost, PACKET_UDP, u4Len, u4Len, COMMAND_TYPE_OUT);
 
 			return true;
 		}

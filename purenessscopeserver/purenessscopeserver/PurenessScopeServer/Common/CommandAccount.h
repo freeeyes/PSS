@@ -28,12 +28,42 @@ struct _CommandData
 	_CommandData()
 	{
 		m_u2CommandID    = 0;
-		m_u4CommandCount = 1;
+		m_u4CommandCount = 0;
 		m_u8CommandCost  = 0;
 		m_u4PacketSize   = 0;
 		m_u4CommandSize  = 0;
 		m_u1PacketType   = PACKET_TCP;
 		m_u1CommandType  = COMMAND_TYPE_IN;
+	}
+
+	_CommandData& operator = (const _CommandData& ar)
+	{
+		this->m_u2CommandID    = ar.m_u2CommandID;
+		this->m_u4CommandCount = ar.m_u4CommandCount;
+		this->m_u8CommandCost  = ar.m_u8CommandCost;
+		this->m_u1CommandType  = ar.m_u1CommandType;
+		this->m_u4PacketSize   = ar.m_u4PacketSize;
+		this->m_u4CommandSize  = ar.m_u4CommandSize;
+		this->m_u1PacketType   = ar.m_u1PacketType;
+		this->m_tvCommandTime  = ar.m_tvCommandTime;
+		return *this;
+	}
+
+	_CommandData& operator += (const _CommandData& ar)
+	{
+		if(this->m_u2CommandID != ar.m_u2CommandID)
+		{
+			this->m_u2CommandID = ar.m_u2CommandID;
+		}
+
+		this->m_u4CommandCount += ar.m_u4CommandCount;
+		this->m_u8CommandCost  += ar.m_u8CommandCost;
+		this->m_u1CommandType  += ar.m_u1CommandType;
+		this->m_u4PacketSize   += ar.m_u4PacketSize;
+		this->m_u4CommandSize  += ar.m_u4CommandSize;
+		this->m_u1PacketType   += ar.m_u1PacketType;
+		this->m_tvCommandTime  += ar.m_tvCommandTime;
+		return *this;
 	}
 };
 
@@ -72,6 +102,35 @@ struct _CommandAlertData
 };
 typedef vector<_CommandAlertData> vecCommandAlertData;   //记录所有的告警监控阀值
 
+//流量流入和流出信息统计。
+struct _CommandFlowAccount
+{
+	uint8  m_u1FLow;
+	uint32 m_u4FlowIn;
+	uint32 m_u4FlowOut;
+
+	_CommandFlowAccount()
+	{
+		m_u1FLow    = 0;
+		m_u4FlowIn  = 0;
+		m_u4FlowOut = 0;
+	}
+
+	_CommandFlowAccount& operator = (const _CommandFlowAccount& ar)
+	{
+		this->m_u1FLow    = ar.m_u1FLow;
+		this->m_u4FlowIn  = ar.m_u4FlowIn;
+		this->m_u4FlowOut = ar.m_u4FlowOut;
+		return *this;
+	}
+
+	_CommandFlowAccount& operator += (const _CommandFlowAccount& ar)
+	{
+		this->m_u4FlowIn  += ar.m_u4FlowIn;
+		this->m_u4FlowOut += ar.m_u4FlowOut;
+		return *this;
+	}
+};
 
 //统计所有进出框架的命令执行情况，目前不包括向其他服务器请求的统计，因为这部分协议无法统一。
 class CCommandAccount
@@ -80,24 +139,30 @@ public:
 	CCommandAccount();
 	~CCommandAccount();
 
+	void InitName(const char* pName);
 	void Init(uint8 u1CommandAccount, uint8 u1Flow, uint16 u2RecvTimeout);
 	void AddCommandAlert(uint16 u2CommandID, uint32 u4Count, uint32 u4MailID);
 
 	bool   SaveCommandData(uint16 u2CommandID, uint64 u8CommandCost, uint8 u1PacketType = PACKET_TCP, uint32 u4PacketSize = 0, uint32 u4CommandSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN, ACE_Time_Value tvTime = ACE_OS::gettimeofday());   //记录命令执行信息
-	bool   SaveCommandData_Mutex(uint16 u2CommandID, uint64 u8CommandCost, uint8 u1PacketType = PACKET_TCP, uint32 u4PacketSize = 0, uint32 u4CommandSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN, ACE_Time_Value tvTime = ACE_OS::gettimeofday());   //记录命令执行信息
 	bool   SaveCommandDataLog();                       //存储命令执行信息的日志
 	void   ClearTimeOut();                             //清理超时时间的命令日志
 	uint32 GetTimeoutCount();                          //得到超时命令日志个数
 	_CommandTimeOut* GetTimeoutInfo(uint32 u4Index);   //得到超时数据库
+	_CommandData* GetCommandData(uint16 u2CommandID);  //获得指定命令的相关数据 
 
 	uint32 GetFlowIn();                                //得到单位时间进入流量
 	uint32 GetFlowOut();                               //得到党委时间流出流量
 	uint8  GetFLow();                                  //得到当前流量开关状态
 
-	void   Close();
+	_CommandFlowAccount GetCommandFlowAccount();                         //得到流量相关信息
+	void GetCommandTimeOut(vecCommandTimeOut& CommandTimeOutList);       //得到所有的超时命令信息
+	void GetCommandAlertData(vecCommandAlertData& CommandAlertDataList); //得到所有的告警命令信息
+
+	void Close();
 
 public:
 	typedef map<uint16, _CommandData*> mapCommandDataList;
+	char                        m_szName[MAX_BUFF_50];           //当前统计的名字             
 	vecCommandTimeOut           m_vecCommandTimeOut;             //处理超时命令列表
 	mapCommandDataList          m_mapCommandDataList;            //所有命令列表
 	uint8                       m_u1CommandAccount;              //是否开启命令统计，1是打开，0是关闭
@@ -108,10 +173,9 @@ public:
 	uint32                      m_u4PrvFlowIn;                   //上一分钟进入流量统计(单位，分钟)
 	uint32                      m_u4PrvFlowOut;                  //上一分钟流出流量统计(单位，分钟)
 	uint64                      m_u8PacketTimeout;               //包处理超时时间 
-	ACE_Recursive_Thread_Mutex  m_ThreadLock;                    //线程锁(在多线程发送数据时使用) 
 	vecCommandAlertData         m_vecCommandAlertData;           //告警阀值数组
 };
 
-typedef ACE_Singleton<CCommandAccount, ACE_Recursive_Thread_Mutex> App_CommandAccount; 
+//typedef ACE_Singleton<CCommandAccount, ACE_Recursive_Thread_Mutex> App_CommandAccount; 
 
 #endif

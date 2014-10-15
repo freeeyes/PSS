@@ -783,28 +783,44 @@ bool CConsoleMessage::DoMessage_CommandInfo(_CommandInfo& CommandInfo, IBuffPack
 	uint16 u2CommandID = (uint16)ACE_OS::strtol(CommandInfo.m_szCommandExp, NULL, 16);
 	if(u2CommandID != 0)
 	{
-		(*pBuffPacket) << (uint32)App_MessageManager::instance()->GetCommandCount();
-		CClientCommandList* pClientCommandList = App_MessageManager::instance()->GetClientCommandList(u2CommandID);
-		if(pClientCommandList != NULL)
+		_CommandData objCommandData;
+		_CommandData objCommandDataIn;
+		_CommandData objCommandDataOut;
+
+		//先查询接收命令
+		App_MessageServiceGroup::instance()->GetCommandData(u2CommandID, objCommandDataIn);
+		if(objCommandDataIn.m_u2CommandID == u2CommandID)
 		{
-			int nCount = pClientCommandList->GetCount();
-			(*pBuffPacket) << (uint16)nCount;
-			for(int i = 0; i < nCount; i++)
-			{
-				_ClientCommandInfo* pClientCommandInfo = pClientCommandList->GetClientCommandIndex(i);
-				if(NULL != pClientCommandInfo)
-				{
-					VCHARS_STR strSName;
-					strSName.text  = pClientCommandInfo->m_szModuleName;
-					strSName.u1Len = (uint8)ACE_OS::strlen(pClientCommandInfo->m_szModuleName);
-					(*pBuffPacket) << strSName;
-					(*pBuffPacket) << u2CommandID;
-					(*pBuffPacket) << pClientCommandInfo->m_u4Count;
-					(*pBuffPacket) << pClientCommandInfo->m_u4TimeCost;
-				}
-			}
+			objCommandData += objCommandDataIn;
 		}
-		return true;
+
+		//先查询发送命令
+		App_ProConnectManager::instance()->GetCommandData(u2CommandID, objCommandDataOut);
+		if(objCommandDataOut.m_u2CommandID == u2CommandID)
+		{
+
+			objCommandData += objCommandDataOut;
+		}
+
+		if(objCommandData.m_u2CommandID == u2CommandID)
+		{
+			(*pBuffPacket) << (uint32)1;
+			(*pBuffPacket) << (uint16)1;
+			(*pBuffPacket) << u2CommandID;
+			(*pBuffPacket) << objCommandData.m_u4CommandCount;
+			(*pBuffPacket) << (uint32)objCommandData.m_u8CommandCost;
+			return true;
+		}
+		else
+		{
+			//没有找到
+			(*pBuffPacket) << (uint32)0;
+			(*pBuffPacket) << (uint16)0;
+			(*pBuffPacket) << 0;
+			(*pBuffPacket) << 0;
+			(*pBuffPacket) << (uint32)0;
+			return true;
+		}
 	}
 	else
 	{
@@ -1230,7 +1246,13 @@ bool CConsoleMessage::DoMessage_ShowProcessInfo(_CommandInfo& CommandInfo, IBuff
 {
 	if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
 	{
+		_CommandFlowAccount objCommandFlowIn;
+		_CommandFlowAccount objCommandFlowOut;
 
+		//得到入口的所有流量统计
+		App_MessageServiceGroup::instance()->GetFlowInfo(objCommandFlowIn);
+
+		//得到所有出口流量统计
 
 #ifdef WIN32  //如果是windows
 		int nCPU = GetProcessCPU_Idel();
@@ -1239,9 +1261,9 @@ bool CConsoleMessage::DoMessage_ShowProcessInfo(_CommandInfo& CommandInfo, IBuff
 		int nMemorySize = GetProcessMemorySize();
 		(*pBuffPacket) << (uint32)nMemorySize;
 
-		(*pBuffPacket) << (uint8)App_CommandAccount::instance()->GetFLow();
-		(*pBuffPacket) << (uint32)App_CommandAccount::instance()->GetFlowIn();
-		(*pBuffPacket) << (uint32)App_CommandAccount::instance()->GetFlowOut();
+		(*pBuffPacket) << (uint8)objCommandFlowIn.m_u1FLow;
+		(*pBuffPacket) << (uint32)objCommandFlowIn.m_u4FlowIn;
+		(*pBuffPacket) << (uint32)objCommandFlowOut.m_u4FlowOut;
 
 
 #else   //如果是linux
@@ -1251,9 +1273,9 @@ bool CConsoleMessage::DoMessage_ShowProcessInfo(_CommandInfo& CommandInfo, IBuff
 		int nMemorySize = GetProcessMemorySize_Linux();
 		(*pBuffPacket) << (uint32)nMemorySize;
 
-		(*pBuffPacket) << (uint8)App_CommandAccount::instance()->GetFLow();
-		(*pBuffPacket) << (uint32)App_CommandAccount::instance()->GetFlowIn();
-		(*pBuffPacket) << (uint32)App_CommandAccount::instance()->GetFlowOut();
+		(*pBuffPacket) << (uint8)objCommandFlowIn.m_u1FLow;
+		(*pBuffPacket) << (uint32)objCommandFlowIn.m_u4FlowIn;
+		(*pBuffPacket) << (uint32)objCommandFlowOut.m_u4FlowOut;
 #endif
 	}
 
@@ -1475,18 +1497,16 @@ bool CConsoleMessage::DoMessage_CommandTimeout(_CommandInfo& CommandInfo, IBuffP
 {
 	if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
 	{
-		uint32 u4Count = App_CommandAccount::instance()->GetTimeoutCount();
+		vecCommandTimeOut CommandTimeOutList;
+		App_MessageServiceGroup::instance()->GetCommandTimeOut(CommandTimeOutList);
+		uint32 u4Count = (uint32)CommandTimeOutList.size();
 		(*pBuffPacket) << u4Count;
 
 		for(uint32 i = 0; i < u4Count; i++)
 		{
-			_CommandTimeOut* pCommandTimeOut = App_CommandAccount::instance()->GetTimeoutInfo(i);
-			if(NULL != pCommandTimeOut)
-			{
-				(*pBuffPacket) << pCommandTimeOut->m_u2CommandID;
-				(*pBuffPacket) << (uint32)pCommandTimeOut->m_tvTime.sec();
-				(*pBuffPacket) << (uint32)pCommandTimeOut->m_u4TimeOutTime;
-			}
+			(*pBuffPacket) << CommandTimeOutList[i].m_u2CommandID;
+			(*pBuffPacket) << (uint32)CommandTimeOutList[i].m_tvTime.sec();
+			(*pBuffPacket) << (uint32)CommandTimeOutList[i].m_u4TimeOutTime;
 		}
 	}
 
@@ -1497,7 +1517,7 @@ bool CConsoleMessage::DoMessage_CommandTimeoutclr(_CommandInfo& CommandInfo, IBu
 {
 	if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
 	{
-		App_CommandAccount::instance()->ClearTimeOut();
+		App_MessageServiceGroup::instance()->ClearCommandTimeOut();
 		(*pBuffPacket) << (uint8)0;	
 	}
 
@@ -1508,15 +1528,11 @@ bool CConsoleMessage::DoMessage_CommandDataLog(_CommandInfo& CommandInfo, IBuffP
 {
 	if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
 	{
-		bool blState = App_CommandAccount::instance()->SaveCommandDataLog();
-		if(blState == false)
-		{
-			(*pBuffPacket) << (uint8)1;	
-		}
-		else
-		{
-			(*pBuffPacket) << (uint8)0;	
-		}
+		//存储所有接收统计日志
+		App_MessageServiceGroup::instance()->SaveCommandDataLog();
+
+		//存储所有发送统计日志
+		(*pBuffPacket) << (uint8)0;	
 	}
 
 	return true;

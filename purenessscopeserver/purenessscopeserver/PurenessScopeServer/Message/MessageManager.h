@@ -4,7 +4,6 @@
 #include "IMessageManager.h"
 #include "Message.h"
 #include "LoadModule.h"
-#include "CommandAccount.h"
 
 //这里修改一下，如果一个命令对应一个模块是有限制的。
 //这里改为一个信令可以对应任意数量的处理模块，这样就比较好了。
@@ -139,7 +138,7 @@ public:
 	CMessageManager(void);
 	~CMessageManager(void);
 
-	bool DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost);   //执行命令
+	bool DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost, uint16& u2Count);   //执行命令
 	void Close();
 
 	bool AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName);   //注册命令

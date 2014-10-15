@@ -1234,7 +1234,7 @@ bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
 		{
 			uint32 u4PacketSize  = 0;
 			pConnectHandler->SendMessage(u2CommandID, pBuffPacket, blSendState, u1SendType, u4PacketSize, blDelete);
-
+			m_CommandAccount.SaveCommandData(u2CommandID, (uint64)0, PACKET_TCP, u4PacketSize, u4CommandSize, COMMAND_TYPE_OUT);
 			return true;
 		}
 		else
@@ -1826,6 +1826,24 @@ void CProConnectManager::GetClientNameInfo(const char* pName, vecClientNameInfo&
 	}
 }
 
+void CProConnectManager::Init(uint16 u2Index)
+{
+	//按照线程初始化统计模块的名字
+	char szName[MAX_BUFF_50] = {'\0'};
+	sprintf_safe(szName, MAX_BUFF_50, "发送线程(%d)", u2Index);
+	m_CommandAccount.InitName(szName);
+
+	//初始化统计模块功能
+	m_CommandAccount.Init(App_MainConfig::instance()->GetCommandAccount(), 
+		App_MainConfig::instance()->GetCommandFlow(), 
+		App_MainConfig::instance()->GetPacketTimeOut());
+}
+
+_CommandData* CProConnectManager::GetCommandData(uint16 u2CommandID)
+{
+	return m_CommandAccount.GetCommandData(u2CommandID);
+}
+
 //*********************************************************************************
 
 CProConnectHandlerPool::CProConnectHandlerPool(void)
@@ -1995,6 +2013,8 @@ void CProConnectManagerGroup::Init(uint16 u2SendQueueCount)
 		if(NULL != pConnectManager)	
 		{
 			//加入map
+			pConnectManager->Init((uint16)i);
+
 			m_mapConnectManager.insert(mapConnectManager::value_type(i, pConnectManager));
 			OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::Init]Creat %d SendQueue OK.\n", i));
 		}
@@ -2521,6 +2541,22 @@ void CProConnectManagerGroup::GetClientNameInfo( const char* pName, vecClientNam
 		if(NULL != pConnectManager)
 		{
 			pConnectManager->GetClientNameInfo(pName, objClientNameInfo);
+		}
+	}	
+}
+
+void CProConnectManagerGroup::GetCommandData(uint16 u2CommandID, _CommandData& objCommandData)
+{
+	for(mapConnectManager::iterator b = m_mapConnectManager.begin(); b != m_mapConnectManager.end(); b++)
+	{
+		CProConnectManager* pConnectManager = (CProConnectManager* )b->second;
+		if(NULL != pConnectManager)
+		{
+			_CommandData* pCommandData = pConnectManager->GetCommandData(u2CommandID);
+			if(pCommandData != NULL)
+			{
+				objCommandData += (*pCommandData);
+			}
 		}
 	}	
 }

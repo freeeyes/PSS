@@ -18,6 +18,7 @@
 #include "TimerManager.h"
 #include "RandomNumber.h"
 #include "WorkThreadAI.h"
+#include "CommandAccount.h"
 
 #ifdef WIN32
 #include "ProConnectHandle.h"
@@ -55,6 +56,13 @@ public:
 	void GetAITF(vecCommandTimeout& objTimeout);            //得到所有的AI封禁数据包信息
 	void SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime);  //设置AI
 
+	_CommandData* GetCommandData(uint16 u2CommandID);                      //得到命令相关信息
+	_CommandFlowAccount GetCommandFlowAccount();                           //得到流量相关信息
+	void GetCommandTimeOut(vecCommandTimeOut& CommandTimeOutList);         //得到所有超时命令
+	void GetCommandAlertData(vecCommandAlertData& CommandAlertDataList);   //得到所有超过告警阀值的命令 
+	void ClearCommandTimeOut();                                            //清除所有的超时告警
+	void SaveCommandDataLog();                                             //存储统计日志 
+
 	uint32 GetThreadID();
 
 private:
@@ -76,6 +84,7 @@ private:
 
 	_ThreadInfo                    m_ThreadInfo;          //当前线程信息
 	CWorkThreadAI                  m_WorkThreadAI;        //线程自我监控的AI逻辑  
+	CCommandAccount                m_CommandAccount;      //当前线程命令统计数据  
 };
 
 //add by freeeyes
@@ -101,6 +110,14 @@ public:
 	void GetAITO(vecCommandTimeout& objTimeout);                                              //得到所有的AI超时数据包信息
 	void GetAITF(vecCommandTimeout& objTimeout);                                              //得到所有的AI封禁数据包信息
 	void SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime);  //设置AI
+
+	void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);                    //获得指定命令统计信息
+	void GetFlowInfo(_CommandFlowAccount& objCommandFlowAccount);                             //获得指定流量相关信息
+
+	void GetCommandTimeOut(vecCommandTimeOut& CommandTimeOutList);                            //得到所有超时命令
+	void GetCommandAlertData(vecCommandAlertData& CommandAlertDataList);                      //得到所有超过告警阀值的命令 
+	void ClearCommandTimeOut();                                                               //清理所有的超时告警
+	void SaveCommandDataLog();                                                                //存储统计日志 
 
 private:
 	bool StartTimer();

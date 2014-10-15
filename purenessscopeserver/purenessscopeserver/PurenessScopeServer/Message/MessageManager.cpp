@@ -29,7 +29,7 @@ CMessageManager::~CMessageManager(void)
 	//Close();
 }
 
-bool CMessageManager::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost)
+bool CMessageManager::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost, uint16& u2Count)
 {
 	if(NULL == pMessage)
 	{
@@ -50,46 +50,16 @@ bool CMessageManager::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uin
 			_ClientCommandInfo* pClientCommandInfo = pClientCommandList->GetClientCommandIndex(i);
 			if(NULL != pClientCommandInfo && pClientCommandInfo->m_u1State == 0)
 			{
-				m_ThreadWriteLock.acquire();
-				pClientCommandInfo->m_u4CurrUsedCount++;
-				pClientCommandInfo->m_u4Count++;
-				m_ThreadWriteLock.release();
-
-				//获得包长
-				_PacketInfo PacketInfoHead;
-				_PacketInfo PacketInfoBody;
-
-				pMessage->GetPacketHead(PacketInfoHead);
-				pMessage->GetPacketBody(PacketInfoBody);
-
-				//pMessage->GetMessageBase()->m_ProfileTime.Start();
 				//OUR_DEBUG((LM_ERROR, "[CMessageManager::DoMessage]u2CommandID = %d Begin.\n", u2CommandID));
 				//这里指记录处理毫秒数
 				pClientCommandInfo->m_pClientCommand->DoMessage(pMessage, bDeleteFlag);
 				ACE_Time_Value tvCost =  ACE_OS::gettimeofday() - tvBegin;
 				u4TimeCost =  (uint32)tvCost.msec();
+
+				//记录命令被调用次数
+				u2Count++;
 				//OUR_DEBUG((LM_ERROR, "[CMessageManager::DoMessage]u2CommandID = %d End.\n", u2CommandID));
 				
-				m_ThreadWriteLock.acquire();
-
-				//添加统计信息
-				App_CommandAccount::instance()->SaveCommandData(u2CommandID, (uint64)tvCost.msec(), 
-					                                           pMessage->GetMessageBase()->m_u1PacketType, 
-															   pMessage->GetMessageBase()->m_u4HeadSrcSize + pMessage->GetMessageBase()->m_u4BodySrcSize, 
-															   (uint32)(PacketInfoHead.m_nDataLen + PacketInfoBody.m_nDataLen), 
-															   COMMAND_TYPE_IN);
-
-				if(pClientCommandInfo->m_u4CurrUsedCount > 0)
-				{
-					pClientCommandInfo->m_u4CurrUsedCount--;
-
-					//这里加一个判断，判断是否需要关闭
-					if(pClientCommandInfo->m_u1State == 1)
-					{
-						CloseCommandInfo(pClientCommandInfo->m_szModuleName);
-					}
-				}
-				m_ThreadWriteLock.release();
 			}
 		}		
 	}

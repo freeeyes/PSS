@@ -140,6 +140,8 @@ public:
 	CProConnectManager(void);
 	~CProConnectManager(void);
 
+	void Init(uint16 u2Index);
+
 	virtual int open(void* args = 0);
 	virtual int svc (void);
 	virtual int close (u_long);
@@ -158,6 +160,7 @@ public:
 	bool SetConnectName(uint32 u4ConnectID, const char* pName);                                              //设置当前连接名称
 	bool SetIsLog(uint32 u4ConnectID, bool blIsLog);                                                         //设置当前连接数据是否写入日志   
 	void GetClientNameInfo(const char* pName, vecClientNameInfo& objClientNameInfo);                         //得到指定别名的所有设置信息
+	_CommandData* GetCommandData(uint16 u2CommandID);                                                        //得到命令相关信息
 
 	_ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                 //得到指定链接信息
 	_ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID);                  //得到监听链接信息
@@ -184,6 +187,7 @@ private:
 	uint32                      m_u4SendQueuePutTime;    //发送队列入队超时时间
 	uint32                      m_u4TimeConnect;         //单位时间连接建立数
 	uint32                      m_u4TimeDisConnect;      //单位时间连接断开数
+	CCommandAccount             m_CommandAccount;        //当前线程命令统计数据  
 };
 
 //链接ConnectHandler内存池
@@ -240,7 +244,8 @@ public:
 	bool Close(uint32 u4ConnectID);                                                                          //客户单关闭
 
 	bool StartTimer();                                                                                       //开启定时器
-	const char* GetError();                                                                                      
+	const char* GetError();                                                                                  //得到错误信息
+	void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);                                   //获得指定命令统计信息
 
 private:
 	uint32 GetGroupIndex();                                                                                  //得到当前链接的ID自增量
