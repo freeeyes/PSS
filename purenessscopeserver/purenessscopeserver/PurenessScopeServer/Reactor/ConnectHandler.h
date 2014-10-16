@@ -155,6 +155,8 @@ public:
 	virtual int svc(void);
 	virtual int close(u_long);
 
+	void Init(uint16 u2Index);
+
 	void CloseAll();
 	bool AddConnect(uint32 u4ConnectID, CConnectHandler* pConnectHandler);
 	bool SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket,  uint16 u2CommandID, bool blSendState, uint8 u1SendType, ACE_Time_Value& tvSendBegin, bool blDelete = true);    //同步发送                                                                     //发送缓冲数据
@@ -171,6 +173,7 @@ public:
 
 	bool StartTimer();                                                                                       //开启定时器
 	bool KillTimer();                                                                                        //关闭定时器
+	_CommandData* GetCommandData(uint16 u2CommandID);                                                        //得到命令相关信息
 
 	int         GetCount();
 	const char* GetError();
@@ -196,6 +199,7 @@ private:
 	uint32                      m_u4SendQueuePutTime;    //发送队列入队超时时间
 	uint32                      m_u4TimeConnect;         //单位时间连接建立数
 	uint32                      m_u4TimeDisConnect;      //单位时间连接断开数
+	CCommandAccount             m_CommandAccount;        //当前线程命令统计数据  
 };
 
 //链接ConnectHandler内存池
@@ -250,6 +254,7 @@ public:
 	bool Close(uint32 u4ConnectID);                                                                          //客户单关闭
 	bool SetConnectName(uint32 u4ConnectID, const char* pName);                                              //设置当前连接名称
 	bool SetIsLog(uint32 u4ConnectID, bool blIsLog);                                                         //设置当前连接数据是否写入日志      
+	void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);                                   //获得指定命令统计信息
 
 	bool StartTimer();                                                                                       //开启定时器
 	const char* GetError();

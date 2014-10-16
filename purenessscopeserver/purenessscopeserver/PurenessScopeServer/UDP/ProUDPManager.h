@@ -4,10 +4,6 @@
 #include "ProactorUDPHandler.h"
 #include "IUDPConnectManager.h"
 
-#include <vector>
-
-using namespace std;
-
 class CProUDPManager : public IUDPConnectManager
 {
 public:

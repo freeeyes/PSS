@@ -24,6 +24,16 @@ int CProactorUDPHandler::OpenAddress(const ACE_INET_Addr& AddrLocal, ACE_Proacto
 	sprintf_safe(m_szCompletionkey, MAX_BUFF_20, "CompUDP");
 	sprintf_safe(m_szAct, MAX_BUFF_20, "ActUDP");
 
+	//按照线程初始化统计模块的名字
+	char szName[MAX_BUFF_50] = {'\0'};
+	sprintf_safe(szName, MAX_BUFF_50, "发送线程");
+	m_CommandAccount.InitName(szName);
+
+	//初始化统计模块功能
+	m_CommandAccount.Init(App_MainConfig::instance()->GetCommandAccount(), 
+		App_MainConfig::instance()->GetCommandFlow(), 
+		App_MainConfig::instance()->GetPacketTimeOut());
+
 
 	//设置发送超时时间（因为UDP如果客户端不存在的话，sendto会引起一个recv错误）
 	//在这里设置一个超时，让个recv不会无限等下去
@@ -154,14 +164,14 @@ bool CProactorUDPHandler::SendMessage(const char* pMessage, uint32 u4Len, const 
 		if((uint32)nSize == u4DataLen)
 		{
 			m_atvOutput = ACE_OS::gettimeofday();
-			m_u4SendSize += u4Len;
+			m_u4SendSize += u4DataLen;
 			m_u4SendPacketCount++;
 			SAFE_DELETE_ARRAY(pMessage);
 
 			//统计发送信息
 			ACE_Time_Value tvInterval = ACE_OS::gettimeofday() - m_tvBegin;
 			uint32 u4SendCost = (uint32)(tvInterval.msec());
-			//App_CommandAccount::instance()->SaveCommandData(u2CommandID, u4SendCost, PACKET_UDP, u4DataLen, u4Len, COMMAND_TYPE_OUT);
+			m_CommandAccount.SaveCommandData(u2CommandID, u4SendCost, PACKET_UDP, u4Len, u4DataLen, COMMAND_TYPE_OUT);
 
 			//释放发送体
 			pMbData->release();
@@ -194,7 +204,7 @@ bool CProactorUDPHandler::SendMessage(const char* pMessage, uint32 u4Len, const 
 			//统计发送信息
 			ACE_Time_Value tvInterval = ACE_OS::gettimeofday() - m_tvBegin;
 			uint32 u4SendCost = (uint32)(tvInterval.msec());
-			//App_CommandAccount::instance()->SaveCommandData(u2CommandID, u4SendCost, PACKET_UDP, u4Len, u4Len, COMMAND_TYPE_OUT);
+			m_CommandAccount.SaveCommandData(u2CommandID, u4SendCost, PACKET_UDP, u4Len, u4Len, COMMAND_TYPE_OUT);
 
 			return true;
 		}
@@ -290,3 +300,11 @@ bool CProactorUDPHandler::CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len)
 	return true;
 }
 
+void CProactorUDPHandler::GetCommandData( uint16 u2CommandID, _CommandData& objCommandData )
+{
+	_CommandData* pCommandData = m_CommandAccount.GetCommandData(u2CommandID);
+	if(pCommandData != NULL)
+	{
+		objCommandData += (*pCommandData);
+	}
+}

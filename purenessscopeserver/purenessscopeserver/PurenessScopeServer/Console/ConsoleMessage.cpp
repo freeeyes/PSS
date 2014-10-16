@@ -794,13 +794,23 @@ bool CConsoleMessage::DoMessage_CommandInfo(_CommandInfo& CommandInfo, IBuffPack
 			objCommandData += objCommandDataIn;
 		}
 
-		//ÏÈ²éÑ¯·¢ËÍÃüÁî
+#if WIN32
+		//²éÑ¯·¢ËÍÃüÁî
 		App_ProConnectManager::instance()->GetCommandData(u2CommandID, objCommandDataOut);
 		if(objCommandDataOut.m_u2CommandID == u2CommandID)
 		{
 
 			objCommandData += objCommandDataOut;
 		}
+#else
+		//²éÑ¯·¢ËÍÃüÁî
+		App_ConnectManager::instance()->GetCommandData(u2CommandID, objCommandDataOut);
+		if(objCommandDataOut.m_u2CommandID == u2CommandID)
+		{
+
+			objCommandData += objCommandDataOut;
+		}
+#endif
 
 		if(objCommandData.m_u2CommandID == u2CommandID)
 		{

@@ -29,6 +29,7 @@ public:
 	void Close();
 	bool SendMessage(const char* pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead = true, uint16 u2CommandID = 0);
 	_ClientConnectInfo GetClientConnectInfo();
+	void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);                                   //获得指定命令统计信息
 
 private:
 	bool CheckMessage(const char* pData, uint32 u4Len);     //这里解析数据包并放入数据队列
@@ -44,5 +45,6 @@ private:
 	uint32                  m_u4SendPacketCount;            //发送数据包的数量
 	uint32                  m_u4RecvSize;                   //接收数据的总大小
 	uint32                  m_u4SendSize;                   //发送数据的总大小
+	CCommandAccount         m_CommandAccount;               //数据包统计
 };
 #endif

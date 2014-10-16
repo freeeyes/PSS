@@ -28,6 +28,7 @@ public:
 	void Close();
 	bool SendMessage(const char* pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead = true, uint16 u2CommandID = 0);
 	_ClientConnectInfo GetClientConnectInfo();
+	void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);                                   //获得指定命令统计信息
 
 private:
 	bool CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len);     //这里解析数据包并放入数据队列
@@ -48,5 +49,6 @@ private:
 	char                    m_szCompletionkey[MAX_BUFF_20]; //完成端口的Key
 	char                    m_szAct[MAX_BUFF_20];           //动作
 	_TimeConnectInfo        m_TimeConnectInfo;              //链接健康检测器
+	CCommandAccount         m_CommandAccount;               //数据包统计   
 };
 #endif

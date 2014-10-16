@@ -1729,7 +1729,7 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
 			ACE_Time_Value tvInterval = ACE_OS::gettimeofday() - tvSendBegin;
 			uint32 u4SendCost = (uint32)(tvInterval.msec());
 			pConnectHandler->SetSendQueueTimeCost(u4SendCost);
-			//App_CommandAccount::instance()->SaveCommandData_Mutex(u2CommandID, (uint8)u4SendCost, PACKET_TCP, u4PacketSize, u4CommandSize, COMMAND_TYPE_OUT);
+			m_CommandAccount.SaveCommandData(u2CommandID, (uint64)u4SendCost, PACKET_TCP, u4PacketSize, u4PacketSize, COMMAND_TYPE_OUT);
 			return true;
 		}
 		else
@@ -2422,6 +2422,24 @@ void CConnectManager::GetClientNameInfo(const char* pName, vecClientNameInfo& ob
 	}
 }
 
+_CommandData* CConnectManager::GetCommandData( uint16 u2CommandID )
+{
+	return m_CommandAccount.GetCommandData(u2CommandID);
+}
+
+void CConnectManager::Init( uint16 u2Index )
+{
+	//按照线程初始化统计模块的名字
+	char szName[MAX_BUFF_50] = {'\0'};
+	sprintf_safe(szName, MAX_BUFF_50, "发送线程(%d)", u2Index);
+	m_CommandAccount.InitName(szName);
+
+	//初始化统计模块功能
+	m_CommandAccount.Init(App_MainConfig::instance()->GetCommandAccount(), 
+		App_MainConfig::instance()->GetCommandFlow(), 
+		App_MainConfig::instance()->GetPacketTimeOut());
+}
+
 //*********************************************************************************
 
 CConnectHandlerPool::CConnectHandlerPool(void)
@@ -2584,6 +2602,8 @@ void CConnectManagerGroup::Init(uint16 u2SendQueueCount)
 		CConnectManager* pConnectManager = new CConnectManager();
 		if(NULL != pConnectManager)	
 		{
+			//初始化统计器
+			pConnectManager->Init((uint16)i);
 			//加入map
 			m_mapConnectManager.insert(mapConnectManager::value_type(i, pConnectManager));
 			OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::Init]Creat %d SendQueue OK.\n", i));
@@ -3092,4 +3112,20 @@ void CConnectManagerGroup::GetClientNameInfo(const char* pName, vecClientNameInf
 			pConnectManager->GetClientNameInfo(pName, objClientNameInfo);
 		}
 	}	
+}
+
+void CConnectManagerGroup::GetCommandData( uint16 u2CommandID, _CommandData& objCommandData )
+{
+	for(mapConnectManager::iterator b = m_mapConnectManager.begin(); b != m_mapConnectManager.end(); b++)
+	{
+		CProConnectManager* pConnectManager = (CProConnectManager* )b->second;
+		if(NULL != pConnectManager)
+		{
+			_CommandData* pCommandData = pConnectManager->GetCommandData(u2CommandID);
+			if(pCommandData != NULL)
+			{
+				objCommandData += (*pCommandData);
+			}
+		}
+	}
 }

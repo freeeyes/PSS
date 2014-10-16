@@ -23,6 +23,16 @@ int CReactorUDPHander::OpenAddress(const ACE_INET_Addr& AddrRemote, ACE_Reactor*
 
 	reactor(pReactor);
 
+	//按照线程初始化统计模块的名字
+	char szName[MAX_BUFF_50] = {'\0'};
+	sprintf_safe(szName, MAX_BUFF_50, "发送线程");
+	m_CommandAccount.InitName(szName);
+
+	//初始化统计模块功能
+	m_CommandAccount.Init(App_MainConfig::instance()->GetCommandAccount(), 
+		App_MainConfig::instance()->GetCommandFlow(), 
+		App_MainConfig::instance()->GetPacketTimeOut());
+
 	//设置发送超时时间（因为UDP如果客户端不存在的话，sendto会引起一个recv错误）
 	//在这里设置一个超时，让个recv不会无限等下去
 	struct timeval timeout = {MAX_RECV_UDP_TIMEOUT, 0}; 
@@ -121,7 +131,7 @@ bool CReactorUDPHander::SendMessage(const char* pMessage, uint32 u4Len, const ch
 
 			//统计发送信息
 			uint32 u4Cost = (uint32)(ACE_OS::gethrtime() - m_tvBegin);
-			//App_CommandAccount::instance()->SaveCommandData(u2CommandID, u4Cost, PACKET_UDP, (uint32)pMbData->length(), u4Len, COMMAND_TYPE_OUT);
+			m_CommandAccount.SaveCommandData(u2CommandID, u4Cost, PACKET_UDP, (uint32)pMbData->length(), u4Len, COMMAND_TYPE_OUT);
 
 			//释放发送体
 			pMbData->release();
@@ -151,7 +161,7 @@ bool CReactorUDPHander::SendMessage(const char* pMessage, uint32 u4Len, const ch
 
 			//统计发送信息
 			uint32 u4Cost = (uint32)(ACE_OS::gethrtime() - m_tvBegin);
-			//App_CommandAccount::instance()->SaveCommandData(u2CommandID, u4Cost, PACKET_UDP, u4Len, u4Len, COMMAND_TYPE_OUT);
+			m_CommandAccount.SaveCommandData(u2CommandID, u4Cost, PACKET_UDP, u4Len, u4Len, COMMAND_TYPE_OUT);
 
 			return true;
 		}
@@ -250,4 +260,13 @@ bool CReactorUDPHander::CheckMessage(const char* pData, uint32 u4Len)
 	m_u4RecvPacketCount++;
 
 	return true;
+}
+
+void CReactorUDPHander::GetCommandData( uint16 u2CommandID, _CommandData& objCommandData )
+{
+	_CommandData* pCommandData = m_CommandAccount.GetCommandData(u2CommandID);
+	if(pCommandData != NULL)
+	{
+		objCommandData += (*pCommandData);
+	}
 }
