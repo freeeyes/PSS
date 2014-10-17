@@ -657,7 +657,7 @@ bool CConsoleMessage::DoMessage_LoadModule(_CommandInfo& CommandInfo, IBuffPacke
 
 bool CConsoleMessage::DoMessage_UnLoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket)
 {
-	if(true == App_MessageManager::instance()->UnloadModuleCommand(CommandInfo.m_szCommandExp, (uint8)1))
+	if(true == App_MessageServiceGroup::instance()->UnloadModule(CommandInfo.m_szCommandExp, (uint8)1))
 	{
 		if(NULL != pBuffPacket)
 		{
@@ -677,7 +677,7 @@ bool CConsoleMessage::DoMessage_UnLoadModule(_CommandInfo& CommandInfo, IBuffPac
 
 bool CConsoleMessage::DoMessage_ReLoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket)
 {
-	if(true == App_MessageManager::instance()->UnloadModuleCommand(CommandInfo.m_szCommandExp, (uint8)2))
+	if(true == App_MessageServiceGroup::instance()->UnloadModule(CommandInfo.m_szCommandExp, (uint8)2))
 	{
 		if(NULL != pBuffPacket)
 		{

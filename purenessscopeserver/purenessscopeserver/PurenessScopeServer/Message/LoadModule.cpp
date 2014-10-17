@@ -69,6 +69,15 @@ bool CLoadModule::LoadModule(const char* szModulePath, const char* szResourceNam
 			return false;
 		}
 
+		//查找此模块是否已经被注册，有则把信息老信息清理
+		_ModuleInfo* pOldModuleInfo = m_mapModuleInfo.SearchMapData(strModuleName);
+		if(NULL != pOldModuleInfo)
+		{
+			//关闭副本
+			ACE_OS::dlclose(pOldModuleInfo->hModule);
+			m_mapModuleInfo.DelMapData(strModuleName, true);
+		}
+
         //将注册成功的模块，加入到map中
 		if(false == m_mapModuleInfo.AddMapData(pModuleInfo->GetName(), pModuleInfo))
 		{

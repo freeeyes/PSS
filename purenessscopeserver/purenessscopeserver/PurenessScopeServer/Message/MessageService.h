@@ -31,6 +31,13 @@
 //AI配置信息表
 typedef vector<_WorkThreadAIInfo> vecWorkThreadAIInfo;
 
+enum MESSAGE_SERVICE_THREAD_STATE
+{
+	THREAD_RUN = 0,               //线程正常运行
+	THREAD_MODULE_UNLOAD,         //模块重载，需要线程支持此功能 
+	THREAD_STOP,                  //线程停止 
+};
+
 class CMessageService : public ACE_Task<ACE_MT_SYNCH>
 {
 public:
@@ -61,7 +68,10 @@ public:
 	void GetCommandTimeOut(vecCommandTimeOut& CommandTimeOutList);         //得到所有超时命令
 	void GetCommandAlertData(vecCommandAlertData& CommandAlertDataList);   //得到所有超过告警阀值的命令 
 	void ClearCommandTimeOut();                                            //清除所有的超时告警
-	void SaveCommandDataLog();                                             //存储统计日志 
+	void SaveCommandDataLog();                                             //存储统计日志
+	void SetThreadState(MESSAGE_SERVICE_THREAD_STATE emState);             //设置线程状态
+	MESSAGE_SERVICE_THREAD_STATE GetThreadState();                         //得到当前线程状态
+	uint32 GetStepState();                                                 //得到当前步数相关信息
 
 	uint32 GetThreadID();
 
@@ -81,6 +91,8 @@ private:
 	uint64                         m_u8TimeCost;          //Put到队列信息的数据处理时间
 	uint32                         m_u4Count;             //消息队列接受个数
 	uint32                         m_u4WorkQueuePutTime;  //入队超时时间
+
+	MESSAGE_SERVICE_THREAD_STATE   m_emThreadState;       //当前工作线程状态
 
 	_ThreadInfo                    m_ThreadInfo;          //当前线程信息
 	CWorkThreadAI                  m_WorkThreadAI;        //线程自我监控的AI逻辑  
@@ -117,7 +129,9 @@ public:
 	void GetCommandTimeOut(vecCommandTimeOut& CommandTimeOutList);                            //得到所有超时命令
 	void GetCommandAlertData(vecCommandAlertData& CommandAlertDataList);                      //得到所有超过告警阀值的命令 
 	void ClearCommandTimeOut();                                                               //清理所有的超时告警
-	void SaveCommandDataLog();                                                                //存储统计日志 
+	void SaveCommandDataLog();                                                                //存储统计日志
+
+	bool UnloadModule(const char* pModuleName, uint8 u1State);                                //卸载或者重载指定的模块名
 
 private:
 	bool StartTimer();

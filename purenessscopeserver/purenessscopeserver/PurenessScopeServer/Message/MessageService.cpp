@@ -17,6 +17,7 @@ CMessageService::CMessageService(void)
 	m_u4LowMask       = 0;
 	m_u8TimeCost      = 0;
 	m_u4Count         = 0;
+	m_emThreadState   = THREAD_STOP;
 
 	uint16 u2ThreadTimeOut = App_MainConfig::instance()->GetThreadTimuOut();
 	if(u2ThreadTimeOut <= 0)
@@ -82,11 +83,12 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
 
 bool CMessageService::Start()
 {
+	m_emThreadState = THREAD_RUN;
 	if(0 != open())
 	{
+		m_emThreadState = THREAD_STOP;
 		return false;
 	}
-
 
 	return true;
 }
@@ -140,10 +142,19 @@ int CMessageService::svc(void)
 			m_blRun = false;
 			break;
 		}
+
 		if (mb == NULL)
 		{
 			continue;
 		}
+
+		while(m_emThreadState != THREAD_RUN)
+		{
+			//如果模块正在卸载或者重载，线程在这里等加载完毕（等1ms）。
+			ACE_Time_Value tvsleep(0, 1000);
+			ACE_OS::sleep(tvsleep);
+		}
+
 		CMessage* msg = *((CMessage**)mb->base());
 		if (! msg)
 		{
@@ -153,6 +164,7 @@ int CMessageService::svc(void)
 		}
 
 		this->ProcessMessage(msg, m_u4ThreadID);
+
 		mb->release();
 	}
 
@@ -231,6 +243,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 	//在这里进行线程自检代码
 	m_ThreadInfo.m_tvUpdateTime = ACE_OS::gettimeofday();
 	m_ThreadInfo.m_u4State = THREAD_RUNBEGIN;
+
 	//OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage]1 [%d],m_u4State=%d, commandID=%d.\n", u4ThreadID, m_ThreadInfo.m_u4State,  pMessage->GetMessageBase()->m_u2Cmd));
 
 	//将要处理的数据放到逻辑处理的地方去
@@ -272,6 +285,8 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 														PACKET_IS_SELF_RECYC);
 #endif
 			App_MessagePool::instance()->Delete(pMessage);
+			m_ThreadInfo.m_u4State = THREAD_RUNEND;
+
 			return true;
 		}
 	}
@@ -444,6 +459,21 @@ void CMessageService::ClearCommandTimeOut()
 void CMessageService::SaveCommandDataLog()
 {
 	m_CommandAccount.SaveCommandDataLog();
+}
+
+void CMessageService::SetThreadState(MESSAGE_SERVICE_THREAD_STATE emState)
+{
+	m_emThreadState = emState;
+}
+
+MESSAGE_SERVICE_THREAD_STATE CMessageService::GetThreadState()
+{
+	return m_emThreadState;
+}
+
+uint32 CMessageService::GetStepState()
+{
+	return m_ThreadInfo.m_u4State;
 }
 
 CMessageServiceGroup::CMessageServiceGroup( void )
@@ -833,4 +863,67 @@ void CMessageServiceGroup::SaveCommandDataLog()
 			pMessageService->SaveCommandDataLog();
 		}
 	}
+}
+
+bool CMessageServiceGroup::UnloadModule(const char* pModuleName, uint8 u1State)
+{
+	OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::UnloadModule] Begin.\n"));
+	for(int i = 0; i < (int)m_vecMessageService.size(); i++)
+	{
+		CMessageService* pMessageService = (CMessageService* )m_vecMessageService[i];
+		if(NULL != pMessageService)
+		{
+			pMessageService->SetThreadState(THREAD_MODULE_UNLOAD);
+		}
+	}
+
+	OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::UnloadModule] SET THREAD_MODULE_UNLOAD.\n"));
+
+	//等待所有进程执行结果
+	bool blWait = true;
+	while(blWait)
+	{
+		blWait = false;
+		for(int i = 0; i < (int)m_vecMessageService.size(); i++)
+		{
+			CMessageService* pMessageService = (CMessageService* )m_vecMessageService[i];
+			if(NULL != pMessageService)
+			{
+				uint32 u4State = pMessageService->GetStepState();
+				if(THREAD_RUNBEGIN == u4State || THREAD_BLOCK == u4State)
+				{
+					//不是所有线程都执行完了，继续等
+					blWait = true;
+					break;
+				}
+			}
+		}
+
+		if(blWait == true)
+		{
+			ACE_Time_Value tvSleep(0, 1000);
+			ACE_OS::sleep(tvSleep);
+		}
+	}
+
+	OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::UnloadModule] THREAD_MODULE_UNLOAD OVER.\n"));
+
+	//等待结束，开始重载
+	App_MessageManager::instance()->UnloadModuleCommand(pModuleName, u1State);
+
+	OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::UnloadModule] UnloadModuleCommand OK.\n"));
+
+	//重载结束，全部恢复线程工作
+	for(int i = 0; i < (int)m_vecMessageService.size(); i++)
+	{
+		CMessageService* pMessageService = (CMessageService* )m_vecMessageService[i];
+		if(NULL != pMessageService)
+		{
+			pMessageService->SetThreadState(THREAD_RUN);
+		}
+	}
+
+	OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::UnloadModule] End.\n"));
+
+	return true;
 }

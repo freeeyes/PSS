@@ -3118,7 +3118,7 @@ void CConnectManagerGroup::GetCommandData( uint16 u2CommandID, _CommandData& obj
 {
 	for(mapConnectManager::iterator b = m_mapConnectManager.begin(); b != m_mapConnectManager.end(); b++)
 	{
-		CProConnectManager* pConnectManager = (CProConnectManager* )b->second;
+		CConnectManager* pConnectManager = (CConnectManager* )b->second;
 		if(NULL != pConnectManager)
 		{
 			_CommandData* pCommandData = pConnectManager->GetCommandData(u2CommandID);
