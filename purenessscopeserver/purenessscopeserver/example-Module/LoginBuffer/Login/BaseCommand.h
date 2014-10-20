@@ -50,7 +50,11 @@ public:
 
 	~CPostServerData() {};
 
-	bool RecvData(ACE_Message_Block* mbRecv)
+	void ReConnect(int nServerID)
+	{
+	}
+
+	bool RecvData(ACE_Message_Block* mbRecv, _ClientIPInfo objServerIPInfo)
 	{
 		//判断返回数据块是否小于0
 		uint32 u4SendPacketSize = (uint32)mbRecv->length();
@@ -230,7 +234,7 @@ public:
 		return true;
 	};
 
-	bool ConnectError(int nError)
+	bool ConnectError(int nError, _ClientIPInfo objServerIPInfo)
 	{
 		OUR_DEBUG((LM_ERROR, "[CPostServerData::ConnectError]Get Error(%d).\n", nError));
 		return true;

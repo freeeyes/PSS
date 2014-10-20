@@ -369,7 +369,7 @@ bool CLoginClientDlg::Send_Login(_LoginInfo& objLoginInfo)
 
 	short sVersion = 1;
 	int nPos = 0;
-	int nLen = 2 + 2 + (int)strlen(m_objLoginClient.m_szUserName) + (int)strlen(m_objLoginClient.m_szUserPass);
+	int nLen = 1 + 1 + (int)strlen(m_objLoginClient.m_szUserName) + (int)strlen(m_objLoginClient.m_szUserPass);
 	char szSession[32] = {'\0'};
 	sprintf_s(szSession, 32, "FREEETES");
 
