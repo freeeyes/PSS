@@ -4,12 +4,12 @@ include Makefile.define
 default:all
 
 # 主应用文件列表
-PATS = BaseCommand.o LuaTest.o 
+PATS = BaseCommand.o LuaTest.o ./Lua/LuaFn.o
 
-LIB_BASE_OBJS = BaseCommand.o LuaTest.o 
-LIB_BASE = libTcpTest.so
+LIB_BASE_OBJS = BaseCommand.o LuaTest.o LuaFn.o
+LIB_BASE = libLuaTest.so
 
-all: libTcpTest.so clear
+all: libLuaTest.so clear
 			
 # 主应用程序
 all:$(LIB_BASE) Makefile
@@ -21,6 +21,6 @@ $(LIB_BASE):$(PATS)
 clean:
 	rm -rf *.o  $(LIB_BASE) $(LIB_BASE_OBJS)
 clear:	
-	mv libTcpTest.so ../../PurenessScopeServer/Linux_Bin/	
+	mv libLuaTest.so ../../PurenessScopeServer/Linux_Bin/	
 cl:	
 	rm -rf *.o 

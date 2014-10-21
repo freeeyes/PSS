@@ -4,8 +4,9 @@
 CC = g++
 AR = ar
 CFLAGS = -g -O2 -D__LINUX__
-INCLUDES = -I./ -I../ -I/usr/include -I${ACE_ROOT} -I../include
-LIBS = -L/usr/lib64 -L${ACE_ROOT}/lib  -L/usr/local/lib64 -L./ -L../ -lACE -lz -ldl 
+LDFLAGS=-Wl,-E
+INCLUDES = -I./ -I../ -I/usr/include -I${ACE_ROOT} -I../include -I./Lua -I./LuaTest -I/m2mjk/tools/tolua/include
+LIBS = -L/usr/lib64 -L${ACE_ROOT}/lib  -L/usr/local/lib64 -L/m2mjk/tools/tolua/lib -L./ -L../ -lACE -lz -ldl -ltolua++
 # *****************************
 # ±‰ªªπÊ‘Ú
 # *****************************

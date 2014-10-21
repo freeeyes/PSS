@@ -19,6 +19,8 @@ cd tolua++-1.0.93
 cp custom-5.1.py custom.py
 vim custom.py修改里面的项如下：
 CCFLAGS = ['-I/home/jackcy/Tools/lua-5.1.4/src', '-O2', '-ansi'] 注意这里是大写i
+注意，如果是64位的linux 这里应该改写成
+CCFLAGS = ['-I/home/jackcy/Tools/lua-5.1.4/src', '-O2', '-ansi', '-fPIC'] 注意这里是大写i
 LIBPATH = ['/home/jackcy/Tools/lua-5.1.4/src']
 LIBS = ['lua', 'dl', 'm']
 prefix = '/mingw'

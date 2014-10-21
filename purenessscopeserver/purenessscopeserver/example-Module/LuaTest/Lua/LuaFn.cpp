@@ -164,7 +164,11 @@ bool CLuaFn::GetLuaGlobal_String(const char* pGlobalName, string& strGlobal)
 bool CLuaFn::GetLuaGlobal_ArrayCount(const char* pGlobalName, int& nCount)
 {
 	char szCommand[MAX_LUA_BUFF_200] = {'\0'};
+#if WIN32	
 	sprintf_s(szCommand, MAX_LUA_BUFF_200, "return #%s;", pGlobalName);
+#else	
+	sprintf(szCommand, "return #%s;", pGlobalName);
+#endif	
 	luaL_dostring(m_pState, szCommand);
 	nCount = (int)lua_tonumber(m_pState, -1);
 	lua_pop(m_pState, -1);
@@ -174,7 +178,11 @@ bool CLuaFn::GetLuaGlobal_ArrayCount(const char* pGlobalName, int& nCount)
 bool CLuaFn::GetLuaGlobal_ArrayIndex(const char* pGlobalName, int nIndex, string& strGlobal)
 {
 	char szCommand[MAX_LUA_BUFF_200] = {'\0'};
+#if WIN32		
 	sprintf_s(szCommand, MAX_LUA_BUFF_200, "return %s[%d];", pGlobalName, nIndex);
+#else	
+	sprintf(szCommand, "return %s[%d];", pGlobalName, nIndex);
+#endif	
 	luaL_dostring(m_pState, szCommand);
 	strGlobal = (string)lua_tostring(m_pState, -1);
 	lua_pop(m_pState, -1);

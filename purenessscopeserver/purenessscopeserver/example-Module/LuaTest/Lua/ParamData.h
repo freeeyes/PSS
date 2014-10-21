@@ -32,7 +32,11 @@ public:
 	void SetParam(void* pParam, const char* szType, int nTypeLen)
 	{
 		m_pParam = pParam;
+#if WIN32		
 		sprintf_s(m_szType, MAX_PARAM_200, "%s", szType);
+#else
+		sprintf(m_szType, "%s", szType);
+#endif		
 		m_TypeLen = nTypeLen;
 	};
 
