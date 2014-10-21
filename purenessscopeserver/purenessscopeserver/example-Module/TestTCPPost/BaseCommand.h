@@ -85,7 +85,7 @@ public:
 		return true;
 	};
 
-	bool ConnectError(int nError)
+	bool ConnectError(int nError,  _ClientIPInfo objServerIPInfo)
 	{
 		OUR_DEBUG((LM_ERROR, "[CPostServerData::ConnectError]Get Error(%d).\n", nError));
 		return true;
