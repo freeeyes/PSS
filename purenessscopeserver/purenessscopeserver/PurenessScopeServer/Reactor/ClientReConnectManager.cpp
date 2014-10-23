@@ -149,7 +149,7 @@ CConnectClient* CReactorClientInfo::GetConnectClient()
 IClientMessage* CReactorClientInfo::GetClientMessage()
 {
 	//这里增加是否是连接重练的判定
-	if (m_emConnectState == SERVER_CONNECT_RECONNECT && NULL != m_pClientMessage)
+	if ((m_emConnectState == SERVER_CONNECT_RECONNECT || m_emConnectState == SERVER_CONNECT_FIRST) && NULL != m_pClientMessage)
 	{
 		//通知上层某一个连接已经恢复
 		m_pClientMessage->ReConnect(m_nServerID);
