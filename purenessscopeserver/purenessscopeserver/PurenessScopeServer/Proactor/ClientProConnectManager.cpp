@@ -83,6 +83,9 @@ bool CProactorClientInfo::Run(bool blIsReadly, EM_Server_Connect_State emState)
 			OUR_DEBUG((LM_ERROR, "[CProactorClientInfo::Run]m_pAsynchConnect open error(%d).\n", ACE_OS::last_error()));
 			return false;
 		}
+
+		ACE_Time_Value tvSleep(0, 10000);
+		ACE_OS::sleep(tvSleep);
 	}
 
 	return true;
