@@ -69,7 +69,7 @@ void CDlgClientModule::OnBnClickedButton2()
 
     int nIndex        = 0;
     int nStrLen       = 0;
-    int nPos          = 4;
+    int nPos          = 0;
     int nModuleCount  = 0;
     int nCommandCount = 0;
     memcpy_s(&nModuleCount, sizeof(int), &szRecvBuff[nPos], sizeof(int));
@@ -173,7 +173,7 @@ void CDlgClientModule::OnBnClickedButton1()
 
     int nIndex            = 0;
     int nStrLen           = 0;
-    int nPos              = 4;
+    int nPos              = 0;
     int nCommandCount     = 0;
     int nCommandInfoCount = 0;
     memcpy_s(&nCommandCount, sizeof(int), &szRecvBuff[nPos], sizeof(int));
@@ -278,7 +278,7 @@ void CDlgClientModule::OnBnClickedButton8()
 	{
 		int nIndex        = 0;
 		int nStrLen       = 0;
-		int nPos          = 4;
+		int nPos          = 0;
 		int nModuleCount  = 0;
 		
 		memcpy_s(&nModuleCount, sizeof(int), &szRecvBuff[nPos], sizeof(int));

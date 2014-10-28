@@ -103,7 +103,7 @@ void CDlgForbidenIP::OnBnClickedButton1()
 	else
 	{
 		int nStrLen      = 0;
-		int nPos         = 4;
+		int nPos         = 0;
 		int nResult      = 0;
 		memcpy_s(&nResult, sizeof(int), &szRecvBuff[nPos], sizeof(int));
 		nPos += sizeof(int);
@@ -156,7 +156,7 @@ void CDlgForbidenIP::OnBnClickedButton2()
 	else
 	{
 		int nStrLen      = 0;
-		int nPos         = 4;
+		int nPos         = 0;
 		int nResult      = 0;
 		memcpy_s(&nResult, sizeof(char), &szRecvBuff[nPos], sizeof(char));
 		nPos += sizeof(char);
@@ -223,7 +223,7 @@ void CDlgForbidenIP::OnBnClickedButton3()
 	else
 	{
 		int nStrLen        = 0;
-		int nPos           = 4;
+		int nPos           = 0;
 		int nForbidenCount = 0;
 		memcpy_s(&nForbidenCount, sizeof(int), &szRecvBuff[nPos], sizeof(int));
 		nPos += sizeof(int);
@@ -361,7 +361,7 @@ void CDlgForbidenIP::OnBnClickedButton7()
 	else
 	{
 		int nStrLen        = 0;
-		int nPos           = 4;
+		int nPos           = 0;
 		int nForbidenCount = 0;
 		memcpy_s(&nForbidenCount, sizeof(int), &szRecvBuff[nPos], sizeof(int));
 		nPos += sizeof(int);
@@ -457,7 +457,7 @@ bool CDlgForbidenIP::SendSetLog( int nConnectID, bool blFlag )
 	else
 	{
 		int nStrLen        = 0;
-		int nPos           = 4;
+		int nPos           = 0;
 		int nForbidenCount = 0;
 		memcpy_s(&nResult, sizeof(int), &szRecvBuff[nPos], sizeof(int));
 		nPos += sizeof(int);

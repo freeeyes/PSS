@@ -75,7 +75,7 @@ void CDlgWorkThreadAI::OnBnClickedButton1()
 	else
 	{
 		int nStrLen       = 0;
-		int nPos          = 4;
+		int nPos          = 0;
 		int nThreadCount  = 0;
 		memcpy_s(&nThreadCount, sizeof(short), &szRecvBuff[nPos], sizeof(short));
 		nPos += sizeof(short);
@@ -193,7 +193,7 @@ void CDlgWorkThreadAI::OnBnClickedButton2()
 	else
 	{
 		int nStrLen       = 0;
-		int nPos          = 4;
+		int nPos          = 0;
 		int nThreadCount  = 0;
 		memcpy_s(&nThreadCount, sizeof(short), &szRecvBuff[nPos], sizeof(short));
 		nPos += sizeof(short);
@@ -327,7 +327,7 @@ void CDlgWorkThreadAI::OnBnClickedButton3()
 	else
 	{
 		int nStrLen       = 0;
-		int nPos          = 4;
+		int nPos          = 0;
 
 		MessageBox(_T("线程AI参数设置成功") , _T(MESSAGE_TITLE_SUCCESS), MB_OK);
 		return;

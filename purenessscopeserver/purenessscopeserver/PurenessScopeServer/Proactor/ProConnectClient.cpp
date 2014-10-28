@@ -42,7 +42,7 @@ void CProConnectClient::Close()
 
 		App_ClientProConnectManager::instance()->CloseByClient(m_nServerID);
 
-		OUR_DEBUG((LM_DEBUG, "[CProConnectClient::Close]delete OK.\n"));
+		OUR_DEBUG((LM_DEBUG, "[CProConnectClient::Close]delete OK[0x%08x].\n", this));
 		delete this;
 	}
 }
@@ -93,6 +93,7 @@ void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
 	m_u4CostTime        = 0;
 	m_atvBegin          = ACE_OS::gettimeofday();
 
+	OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::open] m_nServerID=%d, this=0x%08x.\n", m_nServerID, this));	
 	App_ClientProConnectManager::instance()->SetHandler(m_nServerID, this);
 	m_pClientMessage = App_ClientProConnectManager::instance()->GetClientMessage(m_nServerID);
 
@@ -104,6 +105,11 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 {
 	ACE_Message_Block& mb = result.message_block();
 	uint32 u4PacketLen = (uint32)result.bytes_transferred();
+
+	OUR_DEBUG((LM_DEBUG,"[CProConnectClient::handle_read_stream] m_nServerID=%d, bytes_transferred=%d, this=0x%08x.\n", 
+		m_nServerID, 
+		u4PacketLen,
+		this));
 	
 	if(!result.success() || u4PacketLen == 0)
 	{

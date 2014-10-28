@@ -885,6 +885,35 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
 		sprintf_safe(m_szDebugLevel, MAX_BUFF_100, "%s", pData);
 	}
 
+	//集群相关配置
+	pData = m_MainConfig.GetData("GroupListen", "GroupNeed");
+	if(pData != NULL)
+	{
+		m_GroupListenInfo.m_u1GroupNeed = (uint8)ACE_OS::atoi(pData);
+	}
+	pData = m_MainConfig.GetData("GroupListen", "GroupIP");
+	if(pData != NULL)
+	{
+		sprintf_safe(m_GroupListenInfo.m_szGroupIP, MAX_BUFF_50, "%s", pData);
+	}
+	pData = m_MainConfig.GetData("GroupListen", "GroupPort");
+	if(pData != NULL)
+	{
+		m_GroupListenInfo.m_u4GroupPort = (uint32)ACE_OS::atoi(pData);
+	}
+	pData = m_MainConfig.GetData("GroupListen", "GroupIpType");
+	if(pData != NULL)
+	{
+		if(ACE_OS::strcmp(pData, "IPV6") == 0)
+		{
+			m_GroupListenInfo.m_u1IPType = TYPE_IPV6;
+		}
+		else
+		{
+			m_GroupListenInfo.m_u1IPType = TYPE_IPV4;
+		}
+	}
+
 	m_MainConfig.Close();
 
 	return true;
@@ -1388,4 +1417,9 @@ _MailAlert* CMainConfig::GetMailAlert(uint32 u4MailID)
 void CMainConfig::SetMaxHandlerCount(uint16 u2MaxHandlerCount)
 {
 	m_u2MaxHanderCount = u2MaxHandlerCount;
+}
+
+_GroupListenInfo* CMainConfig::GetGroupListenInfo()
+{
+	return (_GroupListenInfo* )&m_GroupListenInfo;
 }

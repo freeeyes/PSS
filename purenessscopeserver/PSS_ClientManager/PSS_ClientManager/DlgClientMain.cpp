@@ -120,7 +120,7 @@ void CDlgClientMain::OnBnClickedButton2()
 	else
 	{
 		//处理发送的数据
-		int nPos = 4;
+		int nPos = 0;
 
 		int nTempLen             = 0;
 		int nSerevrID            = 0;
@@ -236,7 +236,7 @@ void CDlgClientMain::OnBnClickedButton3()
 	else
 	{
 		int nStrLen      = 0;
-		int nPos         = 4;
+		int nPos         = 0;
 		int nModuleCount = 0;
 		memcpy_s(&nModuleCount, sizeof(int), &szRecvBuff[nPos], sizeof(int));
 		nPos += sizeof(int);
@@ -339,7 +339,7 @@ void CDlgClientMain::OnBnClickedButton4()
 	else
 	{
 		int nStrLen      = 0;
-		int nPos         = 4;
+		int nPos         = 0;
 		int nResult      = 0;
 		memcpy_s(&nResult, sizeof(int), &szRecvBuff[nPos], sizeof(int));
 		nPos += sizeof(int);
@@ -389,7 +389,7 @@ void CDlgClientMain::OnBnClickedButton5()
 	else
 	{
 		int nStrLen      = 0;
-		int nPos         = 4;
+		int nPos         = 0;
 		int nResult      = 0;
 		memcpy_s(&nResult, sizeof(int), &szRecvBuff[nPos], sizeof(int));
 		nPos += sizeof(int);
@@ -439,7 +439,7 @@ void CDlgClientMain::OnBnClickedButton7()
 	else
 	{
 		int nStrLen      = 0;
-		int nPos         = 4;
+		int nPos         = 0;
 		int nResult      = 0;
 		memcpy_s(&nResult, sizeof(int), &szRecvBuff[nPos], sizeof(char));
 		nPos += sizeof(int);

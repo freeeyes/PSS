@@ -78,7 +78,7 @@ void CDlgClientConnect::OnBnClickedButton1()
   else
   {
     int nStrLen          = 0;
-    int nPos             = 4;
+    int nPos             = 0;
     int nConnectCount    = 0;
 	int nFreeCount       = 0;
 	int nMaxConnectCount = 0;
@@ -113,7 +113,7 @@ void CDlgClientConnect::OnBnClickedButton1()
   else
   {
     int  nStrLen       = 0;
-    int  nPos          = 4;
+    int  nPos          = 0;
     int  nCpuRote      = 0;
     int  nMemoryRote   = 0;
 	char cFlow         = 0;
@@ -194,7 +194,7 @@ void CDlgClientConnect::OnBnClickedButton6()
     vecIPAccount objvecIPAccount;
 
     int nStrLen       = 0;
-    int nPos          = 4;
+    int nPos          = 0;
     int nTCPCount     = 0;
     memcpy_s(&nTCPCount, sizeof(int), &szRecvBuff[nPos], sizeof(int));
     nPos += sizeof(int);
@@ -271,7 +271,7 @@ void CDlgClientConnect::OnBnClickedButton5()
 	else
 	{
 		int nStrLen      = 0;
-		int nPos         = 4;
+		int nPos         = 0;
 		int nResult      = 0;
 		memcpy_s(&nResult, sizeof(int), &szRecvBuff[nPos], sizeof(char));
 		nPos += sizeof(int);
@@ -319,7 +319,7 @@ void CDlgClientConnect::OnBnClickedButton4()
 	else
 	{
 		int nStrLen      = 0;
-		int nPos         = 4;
+		int nPos         = 0;
 		int nResult      = 0;
 		memcpy_s(&nResult, sizeof(int), &szRecvBuff[nPos], sizeof(char));
 		nPos += sizeof(int);
@@ -369,7 +369,7 @@ void CDlgClientConnect::OnBnClickedButton12()
 	else
 	{
 		int nStrLen       = 0;
-		int nPos          = 4;
+		int nPos          = 0;
 		int nOPState      = 0;
 		memcpy_s(&nOPState, sizeof(int), &szRecvBuff[nPos], sizeof(int));
 		nPos += sizeof(int);

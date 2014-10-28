@@ -76,7 +76,7 @@ void CDlgClientWorkThread::OnBnClickedButton1()
 		vecWorkThreadInfo objvecWorkThreadInfo;
 
 		int nStrLen       = 0;
-		int nPos          = 4;
+		int nPos          = 0;
 		int nThreadCount  = 0;
 		memcpy_s(&nThreadCount, sizeof(char), &szRecvBuff[nPos], sizeof(char));
 		nPos += sizeof(char);
@@ -316,7 +316,7 @@ void CDlgClientWorkThread::CheckWorkThread(_CheckServerInfo* pCheckServerInfo)
 		vecWorkThreadInfo objvecWorkThreadInfo;
 
 		int nStrLen       = 0;
-		int nPos          = 4;
+		int nPos          = 0;
 		int nThreadCount  = 0;
 		memcpy_s(&nThreadCount, sizeof(char), &szRecvBuff[nPos], sizeof(char));
 		nPos += sizeof(char);

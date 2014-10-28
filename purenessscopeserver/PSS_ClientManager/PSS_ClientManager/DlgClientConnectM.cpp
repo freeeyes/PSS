@@ -80,7 +80,7 @@ void CDlgClientConnectM::OnBnClickedButton1()
   else
   {
     int nStrLen       = 0;
-    int nPos          = 4;
+    int nPos          = 0;
     int nOPState      = 0;
     memcpy_s(&nOPState, sizeof(int), &szRecvBuff[nPos], sizeof(int));
     nPos += sizeof(int);
@@ -125,7 +125,7 @@ void CDlgClientConnectM::OnBnClickedButton2()
     vecClientConnectInfo objvecClientConnectInfo;
 
     int nStrLen       = 0;
-    int nPos          = 4;
+    int nPos          = 0;
     int nTCPCount     = 0;
     memcpy_s(&nTCPCount, sizeof(int), &szRecvBuff[nPos], sizeof(int));
     nPos += sizeof(int);
@@ -283,7 +283,7 @@ void CDlgClientConnectM::OnBnClickedButton8()
 	}
 	else
 	{
-		int nPos          = 4;
+		int nPos          = 0;
 		int nResult       = 0;
 
 		memcpy_s(&nResult, sizeof(int), &szRecvBuff[nPos], sizeof(int));
@@ -321,7 +321,7 @@ void CDlgClientConnectM::OnBnClickedButton9()
 	else
 	{
 		int nStrLen       = 0;
-		int nPos          = 4;
+		int nPos          = 0;
 		int nTCPCount     = 0;
 		int nLogCount     = 0;
 		int nCurrLogLevel = 0;

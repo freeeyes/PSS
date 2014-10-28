@@ -38,8 +38,8 @@ struct _ConsoleKey
 };
 
 typedef vector<_ConsoleKey> vecConsoleKey;
-using namespace std;
 
+//Console管理后台允许IP信息
 struct _ConsoleClientIP
 {
 	char m_szServerIP[MAX_BUFF_20];
@@ -121,7 +121,7 @@ struct _CommandAlert
 };
 typedef vector<_CommandAlert> vecCommandAlert;
 
-
+//邮件配置相关信息
 struct _MailAlert
 {
 	uint32 m_u4MailID;
@@ -142,6 +142,23 @@ struct _MailAlert
 	}
 };
 typedef vector<_MailAlert> vecMailAlert;
+
+//集群配置相关信息
+struct _GroupListenInfo 
+{
+	uint8  m_u1GroupNeed;
+	char   m_szGroupIP[MAX_BUFF_50];
+	uint32 m_u4GroupPort;
+	uint8  m_u1IPType;
+
+	_GroupListenInfo()
+	{
+		m_u1GroupNeed  = 0;
+		m_szGroupIP[0] = '\0';
+		m_u4GroupPort  = 0;
+		m_u1IPType     = TYPE_IPV4;
+	}
+};
 
 enum ENUM_CHAR_ORDER
 {
@@ -250,6 +267,7 @@ public:
 	uint32            GetCommandAlertCount();
 	_CommandAlert*    GetCommandAlert(int nIndex);
 	_MailAlert*       GetMailAlert(uint32 u4MailID);
+	_GroupListenInfo* GetGroupListenInfo();
 
 private:
 	CXmlOpeation m_MainConfig;
@@ -339,6 +357,7 @@ private:
 	_ConnectAlert    m_ConnectAlert;               //连接告警相关配置信息
 	_IPAlert         m_IPAlert;                    //IP告警阀值相关配置
 	_ClientDataAlert m_ClientDataAlert;            //单链接客户端告警阀值相关配置   
+	_GroupListenInfo m_GroupListenInfo;            //集群相关服务器地址配置
 
 	ENUM_CHAR_ORDER m_u1CharOrder;                 //当前字节序
 

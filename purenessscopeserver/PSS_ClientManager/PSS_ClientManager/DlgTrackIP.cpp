@@ -105,7 +105,7 @@ void CDlgTrackIP::OnBnClickedButton1()
 	else
 	{
 		int nStrLen      = 0;
-		int nPos         = 4;
+		int nPos         = 0;
 		int nResult      = 0;
 		memcpy_s(&nResult, sizeof(char), &szRecvBuff[nPos], sizeof(char));
 		nPos += sizeof(char);
@@ -143,7 +143,7 @@ void CDlgTrackIP::OnBnClickedButton2()
 	else
 	{
 		int nStrLen      = 0;
-		int nPos         = 4;
+		int nPos         = 0;
 		int nResult      = 0;
 		memcpy_s(&nResult, sizeof(char), &szRecvBuff[nPos], sizeof(char));
 		nPos += sizeof(char);
@@ -182,7 +182,7 @@ void CDlgTrackIP::OnBnClickedButton8()
 	else
 	{
 		int nStrLen      = 0;
-		int nPos         = 4;
+		int nPos         = 0;
 		int nCount       = 0;
 		memcpy_s(&nCount, sizeof(short), &szRecvBuff[nPos], sizeof(short));
 		nPos += sizeof(short);
@@ -315,7 +315,7 @@ void CDlgTrackIP::OnBnClickedButton6()
 	else
 	{
 		int nStrLen      = 0;
-		int nPos         = 4;
+		int nPos         = 0;
 		int nResult      = 0;
 		memcpy_s(&nResult, sizeof(short), &szRecvBuff[nPos], sizeof(short));
 		nPos += sizeof(short);
