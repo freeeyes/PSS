@@ -1595,31 +1595,26 @@ void CConnectManager::CloseAll()
 
 	KillTimer();
 
-	for(mapConnectManager::iterator b = m_mapConnectManager.begin(); b != m_mapConnectManager.end();)
+	vector<CConnectHandler*> vecCloseConnectHandler;
+	for(mapConnectManager::iterator b = m_mapConnectManager.begin(); b != m_mapConnectManager.end(); b++)
 	{
 		mapConnectManager::iterator itr = b;
 		CConnectHandler* pConnectHandler = (CConnectHandler* )itr->second;
 		if(pConnectHandler != NULL)
 		{
-			if(true == pConnectHandler->Close())
-			{
-				itr++;
-				b = itr;
-			}
-			else
-			{
-				b++;
-			}
+			vecCloseConnectHandler.push_back(pConnectHandler);
 			m_u4TimeDisConnect++;
 
 			//加入链接统计功能
 			//App_ConnectAccount::instance()->AddDisConnect();
 		}
-		else
-		{
-			b++;
-		}
+	}
 
+	//开始关闭所有连接
+	for(int i = 0; i < (int)vecCloseConnectHandler.size(); i++)
+	{
+		CConnectHandler* pConnectHandler = vecCloseConnectHandler[i];
+		pConnectHandler->Close();
 	}
 
 	m_mapConnectManager.clear();
