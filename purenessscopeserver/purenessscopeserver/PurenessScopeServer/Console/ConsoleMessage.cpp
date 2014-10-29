@@ -306,6 +306,10 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
 	{
 		DoMessage_ShowListen(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
 	}
+	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSATE_MONITOR_INFO) == 0)
+	{
+		DoMessage_MonitorInfo(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
+	}
 	else
 	{
 		u2ReturnCommandID = CONSOLE_COMMAND_UNKNOW;
