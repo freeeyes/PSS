@@ -174,6 +174,7 @@ public:
 	bool StartTimer();                                                                                       //开启定时器
 	bool KillTimer();                                                                                        //关闭定时器
 	_CommandData* GetCommandData(uint16 u2CommandID);                                                        //得到命令相关信息
+	uint32 GetCommandFlowAccount();                                                                          //得到出口流量信息
 
 	int         GetCount();
 	const char* GetError();
@@ -258,6 +259,7 @@ public:
 
 	bool StartTimer();                                                                                       //开启定时器
 	const char* GetError();
+	void GetCommandFlowAccount(_CommandFlowAccount& objCommandFlowAccount);                                  //得到出口流量信息
 
 private:
 	uint32 GetGroupIndex();                                                                                  //得到当前链接的ID自增量

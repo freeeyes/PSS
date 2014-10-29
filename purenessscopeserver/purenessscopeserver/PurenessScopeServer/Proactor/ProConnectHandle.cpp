@@ -1210,10 +1210,11 @@ bool CProConnectManager::AddConnect(uint32 u4ConnectID, CProConnectHandle* pConn
 	//加入map
 	m_mapConnectManager.insert(mapConnectManager::value_type(u4ConnectID, pConnectHandler));
 	m_u4TimeConnect++;
-	m_ThreadWriteLock.release();
 
 	//加入链接统计功能
 	App_ConnectAccount::instance()->AddConnect();
+
+	m_ThreadWriteLock.release();
 
 	return true;
 }
@@ -1842,6 +1843,11 @@ void CProConnectManager::Init(uint16 u2Index)
 _CommandData* CProConnectManager::GetCommandData(uint16 u2CommandID)
 {
 	return m_CommandAccount.GetCommandData(u2CommandID);
+}
+
+uint32 CProConnectManager::GetCommandFlowAccount()
+{
+	return m_CommandAccount.GetFlowOut();
 }
 
 //*********************************************************************************
@@ -2558,6 +2564,19 @@ void CProConnectManagerGroup::GetCommandData(uint16 u2CommandID, _CommandData& o
 			{
 				objCommandData += (*pCommandData);
 			}
+		}
+	}	
+}
+
+void CProConnectManagerGroup::GetCommandFlowAccount(_CommandFlowAccount& objCommandFlowAccount)
+{
+	for(mapConnectManager::iterator b = m_mapConnectManager.begin(); b != m_mapConnectManager.end(); b++)
+	{
+		CProConnectManager* pConnectManager = (CProConnectManager* )b->second;
+		if(NULL != pConnectManager)
+		{
+			uint32 u4FlowOut =  pConnectManager->GetCommandFlowAccount();
+			objCommandFlowAccount.m_u4FlowOut += u4FlowOut;
 		}
 	}	
 }

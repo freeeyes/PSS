@@ -164,6 +164,8 @@ public:
 
 	_ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                 //得到指定链接信息
 	_ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID);                  //得到监听链接信息
+	uint32 GetCommandFlowAccount();                                                                          //得到出口流量信息
+
 
 	bool StartTimer();
 	bool KillTimer();
@@ -246,6 +248,7 @@ public:
 	bool StartTimer();                                                                                       //开启定时器
 	const char* GetError();                                                                                  //得到错误信息
 	void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);                                   //获得指定命令统计信息
+	void GetCommandFlowAccount(_CommandFlowAccount& objCommandFlowAccount);                                  //得到出口流量信息
 
 private:
 	uint32 GetGroupIndex();                                                                                  //得到当前链接的ID自增量

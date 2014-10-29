@@ -1268,9 +1268,10 @@ bool CConsoleMessage::DoMessage_ShowProcessInfo(_CommandInfo& CommandInfo, IBuff
 		//得到入口的所有流量统计
 		App_MessageServiceGroup::instance()->GetFlowInfo(objCommandFlowIn);
 
-		//得到所有出口流量统计
-
 #ifdef WIN32  //如果是windows
+		//得到所有出口流量统计
+		App_ProConnectManager::instance()->GetCommandFlowAccount(objCommandFlowOut);
+
 		int nCPU = GetProcessCPU_Idel();
 		(*pBuffPacket) << (uint32)nCPU;
 
@@ -1283,6 +1284,8 @@ bool CConsoleMessage::DoMessage_ShowProcessInfo(_CommandInfo& CommandInfo, IBuff
 
 
 #else   //如果是linux
+		App_ConnectManager::instance()->GetCommandFlowAccount(objCommandFlowOut);
+
 		int nCPU = GetProcessCPU_Idel_Linux();
 		(*pBuffPacket) << (uint32)nCPU;
 
@@ -2109,5 +2112,43 @@ bool CConsoleMessage::DoMessage_ShowListen(_CommandInfo& CommandInfo, IBuffPacke
 	}
 
 	u2ReturnCommandID = CONSOLE_COMMAND_SHOW_LISTEN;
+	return true;
+}
+
+bool CConsoleMessage::DoMessage_MonitorInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+{
+		_CommandFlowAccount objCommandFlowIn;
+		_CommandFlowAccount objCommandFlowOut;
+
+		//得到入口的所有流量统计
+		App_MessageServiceGroup::instance()->GetFlowInfo(objCommandFlowIn);
+
+#if WIN32
+		//得到所有出口流量统计
+		App_ProConnectManager::instance()->GetCommandFlowAccount(objCommandFlowOut);
+
+		int nActiveClient = App_ProConnectManager::instance()->GetCount();
+		int nPoolClient   = App_ProConnectHandlerPool::instance()->GetFreeCount();
+		(*pBuffPacket) << (uint32)nActiveClient;
+		(*pBuffPacket) << (uint32)nPoolClient;
+		(*pBuffPacket) << (uint16)App_MainConfig::instance()->GetMaxHandlerCount();
+		(*pBuffPacket) << (uint16)App_ConnectAccount::instance()->GetCurrConnect();
+		(*pBuffPacket) << objCommandFlowIn.m_u4FlowIn;
+		(*pBuffPacket) << objCommandFlowOut.m_u4FlowOut;
+#else
+		//得到所有出口流量统计
+		App_ConnectManager::instance()->GetCommandFlowAccount(objCommandFlowOut);
+
+		int nActiveClient = App_ConnectManager::instance()->GetCount();
+		int nPoolClient   = App_ConnectHandlerPool::instance()->GetFreeCount();
+		(*pBuffPacket) << (uint32)nActiveClient;
+		(*pBuffPacket) << (uint32)nPoolClient;
+		(*pBuffPacket) << (uint16)App_MainConfig::instance()->GetMaxHandlerCount();
+		(*pBuffPacket) << (uint16)App_ConnectAccount::instance()->GetCurrConnect();
+		(*pBuffPacket) << objCommandFlowIn.m_u4FlowIn;
+		(*pBuffPacket) << objCommandFlowOut.m_u4FlowOut;
+#endif
+
+	u2ReturnCommandID = CONSOLE_COMMAND_MONITOR_INFO;
 	return true;
 }

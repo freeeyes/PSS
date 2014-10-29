@@ -76,6 +76,7 @@ enum
 #define CONSOLE_COMMAND_ADD_LISTEN         0x1026
 #define CONSOLE_COMMAND_DEL_LISTEN         0x1027
 #define CONSOLE_COMMAND_SHOW_LISTEN        0x1028
+#define CONSOLE_COMMAND_MONITOR_INFO       0x1029
 
 //目前支持的命令
 #define CONSOLEMESSAHE_LOADMOUDLE         "LoadModule"          //加载模块
@@ -118,6 +119,7 @@ enum
 #define CONSOLEMESSAGE_ADD_LISTEN         "AddListen"           //添加一个新的监听端口
 #define CONSOLEMESSAGE_DEL_LISTEN         "DelListen"           //删除一个新的监听端口
 #define CONSOLEMESSATE_SHOW_LISTEN        "ShowListen"          //查看正在打开的监听端口 
+#define CONSOLEMESSATE_MONITOR_INFO       "Monitor"             //监控相关运行参数接口
 
 //命令处理参数
 struct _CommandInfo
@@ -230,6 +232,7 @@ private:
 	bool DoMessage_AddListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
 	bool DoMessage_DelListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
 	bool DoMessage_ShowListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+	bool DoMessage_MonitorInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
 
 private:
 	vecConsoleKey* m_pvecConsoleKey;

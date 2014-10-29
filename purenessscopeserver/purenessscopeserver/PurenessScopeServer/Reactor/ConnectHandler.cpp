@@ -1590,7 +1590,7 @@ CConnectManager::~CConnectManager(void)
 
 void CConnectManager::CloseAll()
 {
-	//ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
+	ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
 	msg_queue()->deactivate();
 
 	KillTimer();
@@ -2440,6 +2440,11 @@ void CConnectManager::Init( uint16 u2Index )
 		App_MainConfig::instance()->GetPacketTimeOut());
 }
 
+uint32 CConnectManager::GetCommandFlowAccount()
+{
+	return m_CommandAccount.GetFlowOut();
+}
+
 //*********************************************************************************
 
 CConnectHandlerPool::CConnectHandlerPool(void)
@@ -3126,6 +3131,19 @@ void CConnectManagerGroup::GetCommandData( uint16 u2CommandID, _CommandData& obj
 			{
 				objCommandData += (*pCommandData);
 			}
+		}
+	}
+}
+
+void CConnectManagerGroup::GetCommandFlowAccount(_CommandFlowAccount& objCommandFlowAccount)
+{
+	for(mapConnectManager::iterator b = m_mapConnectManager.begin(); b != m_mapConnectManager.end(); b++)
+	{
+		CConnectManager* pConnectManager = (CConnectManager* )b->second;
+		if(NULL != pConnectManager)
+		{
+			uint32 u4FlowOut = pConnectManager->GetCommandFlowAccount();
+			objCommandFlowAccount.m_u4FlowOut += u4FlowOut;
 		}
 	}
 }
