@@ -1590,7 +1590,7 @@ CConnectManager::~CConnectManager(void)
 
 void CConnectManager::CloseAll()
 {
-	ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
+	//ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
 	msg_queue()->deactivate();
 
 	KillTimer();
@@ -1613,7 +1613,7 @@ void CConnectManager::CloseAll()
 			m_u4TimeDisConnect++;
 
 			//加入链接统计功能
-			App_ConnectAccount::instance()->AddDisConnect();
+			//App_ConnectAccount::instance()->AddDisConnect();
 		}
 		else
 		{
