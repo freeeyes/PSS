@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<RecvInfo BuffSize="1024" />
+	
+	<TCPServerIP ip="127.0.0.1" port="10010" ipType="IPV4" key="freeeyes" />
+</config>

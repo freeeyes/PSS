@@ -1,0 +1,19 @@
+project(PSS_Monitor):aceexe{
+ 	exename = PSS_Monitor
+
+ Source_Files{
+  ./TinyXML/*.cpp
+  ./Mail/*.cpp
+  ./Reactor/*.cpp
+  ./Common/*.cpp
+  ./*.cpp
+ }
+ includes += ./TinyXML ./Mail ./Common ./Reactor
+ specific (prop:microsoft){
+	exeout=./Bin
+ }else{
+	exeout=./Bin
+	macros += __LINUX__
+ }
+ 
+}
