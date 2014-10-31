@@ -323,6 +323,13 @@ bool CProServerManager::Start()
 		return false;
 	}
 
+	//启动反应器
+	if(!App_ProactorManager::instance()->StartProactor())
+	{
+		OUR_DEBUG((LM_INFO, "[CProServerManager::Start]App_ProactorManager::instance()->StartProactor is error.\n"));
+		return false;
+	}
+
 	//启动中间服务器链接管理器
 	App_ClientProConnectManager::instance()->Init(App_ProactorManager::instance()->GetAce_Proactor(REACTOR_POSTDEFINE));
 	App_ClientProConnectManager::instance()->StartConnectTask(App_MainConfig::instance()->GetConnectServerCheck());
@@ -340,13 +347,6 @@ bool CProServerManager::Start()
 
 	//开始启动链接发送定时器
 	App_ProConnectManager::instance()->StartTimer();
-
-	//最后启动反应器
-	if(!App_ProactorManager::instance()->StartProactor())
-	{
-		OUR_DEBUG((LM_INFO, "[CProServerManager::Start]App_ProactorManager::instance()->StartProactor is error.\n"));
-		return false;
-	}
 
 	//等待服务结束	
 	ACE_Thread_Manager::instance()->wait();

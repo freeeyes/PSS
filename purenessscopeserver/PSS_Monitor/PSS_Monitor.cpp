@@ -90,8 +90,8 @@ bool Start()
 	App_ReactorManager::instance()->StartReactor();
 #endif
 
-	ACE_Time_Value tvSleep(0, 10000);
-	ACE_OS::sleep(tvSleep);
+	//ACE_Time_Value tvSleep(0, 10000);
+	//ACE_OS::sleep(tvSleep);
 
 	//×¢²á¶¨Ê±Æ÷
 	ACE_Time_Value tvInterval(120, 0);

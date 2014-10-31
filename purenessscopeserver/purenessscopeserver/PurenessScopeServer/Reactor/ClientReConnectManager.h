@@ -10,6 +10,7 @@
 #include "ReactorUDPClient.h"
 
 #define RE_CONNECT_SERVER_TIMEOUT 100*1000
+#define WAIT_FOR_RECONNECT_FINISH 5000
 
 #include <map>
 

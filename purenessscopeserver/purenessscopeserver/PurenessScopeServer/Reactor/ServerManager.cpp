@@ -318,6 +318,13 @@ bool CServerManager::Start()
 	App_ClientReConnectManager::instance()->Init(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_POSTDEFINE));
 	App_ClientReConnectManager::instance()->StartConnectTask(App_MainConfig::instance()->GetConnectServerCheck());
 
+	//启动所有反应器
+	if (!App_ReactorManager::instance()->StartReactor())
+	{
+		OUR_DEBUG((LM_INFO, "[CServerManager::Start]App_ReactorManager::instance()->StartReactor is error.\n"));
+		return false;
+	}    
+
 	//初始化模块加载，因为这里可能包含了中间服务器连接加载
 	bool blState = App_ModuleLoader::instance()->LoadModule(App_MainConfig::instance()->GetModulePath(), App_MainConfig::instance()->GetModuleString());
 
@@ -332,14 +339,6 @@ bool CServerManager::Start()
 	//开始启动链接发送定时器
 	App_ConnectManager::instance()->StartTimer();
 
-	//启动所有Reactor对象
-	if (!App_ReactorManager::instance()->StartReactor())
-	{
-		OUR_DEBUG((LM_INFO, "[CServerManager::Start]App_ReactorManager::instance()->StartReactor is error.\n"));
-		return false;
-	}    
-
-	//最后启动反应器
 	OUR_DEBUG((LM_INFO, "[CServerManager::Start]App_ReactorManager::instance()->StartReactorDefault begin....\n"));
 
 	ACE_Thread_Manager::instance()->wait();

@@ -69,7 +69,7 @@ bool CProactorClientInfo::Run(bool blIsReadly, EM_Server_Connect_State emState)
 	}
 	*/
 
-	if(true == blIsReadly)
+	if(true == blIsReadly && SERVER_CONNECT_FIRST != m_emConnectState && SERVER_CONNECT_RECONNECT != m_emConnectState)
 	{
 		m_pProAsynchConnect->SetConnectState(true);
 		OUR_DEBUG((LM_ERROR, "[CProactorClientInfo::Run]Connect IP=%s,Port=%d.\n", m_AddrServer.get_host_addr(), m_AddrServer.get_port_number()));
@@ -93,30 +93,44 @@ bool CProactorClientInfo::SendData(ACE_Message_Block* pmblk)
 {
 	if(NULL == m_pProConnectClient)
 	{
-		//如果连接不存在，则建立链接。
-		Run(true);
-		if(NULL != pmblk)
+		//如果连接正在建立中，等5ms看看连接是否建立
+		if(SERVER_CONNECT_FIRST == m_emConnectState || SERVER_CONNECT_RECONNECT == m_emConnectState)
 		{
-			pmblk->release();
+			ACE_Time_Value tvSleep(0, 5000);
+			ACE_OS::sleep(tvSleep);
 		}
 
-		//如果消息有处理接口，则返回失败接口
-		if(NULL != m_pClientMessage)
+		if(NULL == m_pProConnectClient)
 		{
-			//服务器已经断开，需要等待重新连接的结果
-			_ClientIPInfo objServerIPInfo;
-			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_AddrServer.get_host_addr());
-			objServerIPInfo.m_nPort = m_AddrServer.get_port_number();
-			m_pClientMessage->ConnectError(101, objServerIPInfo);
-		}
+			//如果连接不存在，则建立链接。
+			if(SERVER_CONNECT_FIRST != m_emConnectState && SERVER_CONNECT_RECONNECT != m_emConnectState)
+			{
+				//如果连接不存在，则建立链接。
+				Run(true);
+			}
 
-		return false;
+			if(NULL != pmblk)
+			{
+				pmblk->release();
+			}
+
+			//如果消息有处理接口，则返回失败接口
+			if(NULL != m_pClientMessage)
+			{
+				//服务器已经断开，需要等待重新连接的结果
+				_ClientIPInfo objServerIPInfo;
+				sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_AddrServer.get_host_addr());
+				objServerIPInfo.m_nPort = m_AddrServer.get_port_number();
+				m_pClientMessage->ConnectError(101, objServerIPInfo);
+			}
+
+			return false;
+		}
 	}
-	else
-	{
-		//发送数据
-		return m_pProConnectClient->SendData(pmblk);
-	}
+
+	//发送数据
+	return m_pProConnectClient->SendData(pmblk);
+
 }
 
 int CProactorClientInfo::GetServerID()

@@ -19,6 +19,8 @@
 
 using namespace std;
 
+#define WAIT_FOR_PROCONNECT_FINISH 5000
+
 class CProactorClientInfo
 {
 public:
