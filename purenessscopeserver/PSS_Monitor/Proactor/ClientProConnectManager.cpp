@@ -54,12 +54,6 @@ bool CProactorClientInfo::Run(bool blIsReadly, EM_Server_Connect_State emState)
 		return false;
 	}
 
-	if(NULL == m_pProAsynchConnect)
-	{
-		OUR_DEBUG((LM_ERROR, "[CProactorClientInfo::Run]m_pAsynchConnect is NULL.\n"));
-		return false;
-	}
-
 	/*
 	//Á´½ÓÔ¶¶Ë·þÎñÆ÷
 	if(m_pProAsynchConnect->GetConnectState() == true)

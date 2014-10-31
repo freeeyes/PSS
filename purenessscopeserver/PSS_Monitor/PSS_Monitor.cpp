@@ -98,7 +98,7 @@ bool Start()
 
 	App_TimerManager::instance()->schedule(&g_MonitorFSMManager, 
 		NULL, 
-		ACE_OS::gettimeofday(), ACE_OS::gettimeofday() + tvInterval);
+		ACE_OS::gettimeofday(), tvInterval);
 
 	//Æô¶¯¶¨Ê±Æ÷
 	App_TimerManager::instance()->activate();
