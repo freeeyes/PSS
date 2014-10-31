@@ -30,8 +30,8 @@ public:
 	virtual void CancelConnectTask()                                                                                                 = 0;                                                                  
 	//关闭所有对外链接包括TCP和UDP
     virtual void Close()                                                                                                             = 0;
-	//关闭所有对外链接包括TCP和UDP
-	virtual bool GetConnectState(int nServerID)                                                                                      = 0;
+	//得到一个连接的当前状态
+	virtual EM_Server_Connect_State GetConnectState(int nServerID)                                                                   = 0;
 };
 
 #endif

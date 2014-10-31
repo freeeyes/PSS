@@ -747,34 +747,18 @@ bool CClientProConnectManager::CloseByClient(int nServerID)
 	return true;
 }
 
-
-bool CClientProConnectManager::GetConnectState(int nServerID)
+EM_Server_Connect_State CClientProConnectManager::GetConnectState(int nServerID)
 {
-	//检查当前连接是否是活跃的
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 	mapProactorClientInfo::iterator f = m_mapClientInfo.find(nServerID);
 	if(f == m_mapClientInfo.end())
 	{
 		//如果这个链接已经存在，则不创建新的链接
-		//OUR_DEBUG((LM_ERROR, "[GetConnectState::GetConnectState]nServerID =(%d) is exist.\n", nServerID));
-		return false;
+		return SERVER_CONNECT_FAIL;
 	}
 
 	CProactorClientInfo* pClientInfo = (CProactorClientInfo* )f->second;
-	if(NULL == pClientInfo)
-	{
-		//OUR_DEBUG((LM_ERROR, "[GetConnectState::GetConnectState]nServerID =(%d) pClientInfo is NULL.\n", nServerID));
-		return false;
-	}
-
-	if(NULL == pClientInfo->GetProConnectClient())
-	{
-		return false;
-	}
-	else
-	{
-		return true;
-	}
+	return pClientInfo->GetServerConnectState();
 }
 
 bool CClientProConnectManager::ReConnect( int nServerID )
@@ -784,8 +768,8 @@ bool CClientProConnectManager::ReConnect( int nServerID )
 	mapProactorClientInfo::iterator f = m_mapClientInfo.find(nServerID);
 	if(f == m_mapClientInfo.end())
 	{
-		//如果这个链接已经存在，则不创建新的链接
-		//OUR_DEBUG((LM_ERROR, "[GetConnectState::Close]nServerID =(%d) is exist.\n", nServerID));
+		//如果这个链接不存在，则不创建新的链接
+		OUR_DEBUG((LM_ERROR, "CClientProConnectManager::ReConnect]nServerID =(%d) is not exist.\n", nServerID));
 		return false;
 	}
 

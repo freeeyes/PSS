@@ -733,7 +733,7 @@ bool CClientReConnectManager::CloseByClient(int nServerID)
 	return true;
 }
 
-bool CClientReConnectManager::GetConnectState(int nServerID)
+EM_Server_Connect_State CClientReConnectManager::GetConnectState( int nServerID )
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 	mapReactorConnectInfo::iterator f = m_mapConnectInfo.find(nServerID);
@@ -741,26 +741,12 @@ bool CClientReConnectManager::GetConnectState(int nServerID)
 	if (f == m_mapConnectInfo.end())
 	{
 		//如果这个链接已经存在，则不创建新的链接
-		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]nServerID =(%d) is exist.\n", nServerID));
-		return false;
+		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::GetConnectState]nServerID =(%d) is not exist.\n", nServerID));
+		return SERVER_CONNECT_FAIL;
 	}
 
 	CReactorClientInfo* pClientInfo = (CReactorClientInfo*)f->second;
-
-	if (NULL == pClientInfo)
-	{
-		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]nServerID =(%d) pClientInfo is NULL.\n", nServerID));
-		return false;
-	}
-
-	if (NULL == pClientInfo->GetConnectClient())
-	{
-		return false;
-	}
-	else
-	{
-		return true;
-	}
+	return pClientInfo->GetServerConnectState();
 }
 
 bool CClientReConnectManager::ReConnect(int nServerID)
@@ -770,8 +756,8 @@ bool CClientReConnectManager::ReConnect(int nServerID)
 
 	if (f == m_mapConnectInfo.end())
 	{
-		//如果这个链接已经存在，则不创建新的链接
-		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]nServerID =(%d) is exist.\n", nServerID));
+		//如果这个链接不存在，则不创建新的链接
+		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]nServerID =(%d) is not exist.\n", nServerID));
 		return false;
 	}
 

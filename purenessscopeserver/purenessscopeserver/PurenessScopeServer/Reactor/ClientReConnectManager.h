@@ -72,12 +72,12 @@ public:
 	bool StartConnectTask(int nIntervalTime = CONNECT_LIMIT_RETRY);                                                            //设置自动重连的定时器
 	void CancelConnectTask();                                                                                                  //关闭重连定时器
 	void Close();                                                                                                              //关闭所有连接
-	bool GetConnectState(int nServerID);                                                                                       //得到指定连接的当前状态
 	ACE_INET_Addr GetServerAddr(int nServerID);                                                                                //得到指定服务器的远程地址连接信息
 	bool SetServerConnectState(int nServerID, EM_Server_Connect_State objState);                                               //设置指定连接的连接状态
 
 	void GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo);      //返回当前存活链接的信息（TCP）
 	void GetUDPConnectInfo(vecClientConnectInfo& VecClientConnectInfo);   //返回当前存活链接的信息（UDP）
+	EM_Server_Connect_State GetConnectState(int nServerID);               //得到一个当前连接状态
 
 	virtual int handle_timeout(const ACE_Time_Value& current_time, const void* act = 0);               //定时器执行
 
