@@ -311,7 +311,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 			u4TimeCost = u4TimeCost/u2CommandCount;
 		}
 
-		OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage]Command(%d)=[%d].\n", pMessage->GetMessageBase()->m_u2Cmd, u2CommandCount));
+		//OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage]Command(%d)=[%d].\n", pMessage->GetMessageBase()->m_u2Cmd, u2CommandCount));
 
 		//添加统计信息
 		m_CommandAccount.SaveCommandData(u2CommandID, 

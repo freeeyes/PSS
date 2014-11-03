@@ -761,7 +761,7 @@ EM_Server_Connect_State CClientProConnectManager::GetConnectState(int nServerID)
 	return pClientInfo->GetServerConnectState();
 }
 
-bool CClientProConnectManager::ReConnect( int nServerID )
+bool CClientProConnectManager::ReConnect(int nServerID)
 {
 	//检查当前连接是否是活跃的
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);

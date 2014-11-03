@@ -40,6 +40,8 @@ bool CPacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead,
 	uint32 u4Len = pmbHead->length();
 	uint32 u4Pos = 0;
 
+	m_u4HeadSrcSize = PACKET_HEAD_LENGTH;
+
 	ACE_OS::memcpy((char* )&m_objPacketHeadInfo.m_u2Version, (char* )&pData[u4Pos], sizeof(uint16));
 	u4Pos += sizeof(uint16);
 	ACE_OS::memcpy((char* )&m_objPacketHeadInfo.m_u2CmdID, (char* )&pData[u4Pos], sizeof(uint16));
@@ -61,6 +63,8 @@ bool CPacketParse::SetPacketBody(uint32 u4ConnectID, ACE_Message_Block* pmbBody,
 {
 	//这里分析出包体内的一些数据，如果包头包含了CommandID，那么包体就不必做解析。
 	m_pmbBody = pmbBody;
+
+	m_u4BodySrcSize = m_pmbBody->length();
 	return true;
 
 }

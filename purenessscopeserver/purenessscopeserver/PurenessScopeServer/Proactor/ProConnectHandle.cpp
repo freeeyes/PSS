@@ -740,7 +740,6 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 		//如果之前有缓冲数据，则和缓冲数据一起发送
 		u4PacketSize = m_pBlockMessage->length();
 
-		u4PacketSize = m_pBlockMessage->length() + pBuffPacket->GetPacketLen();
 		//如果之前有缓冲数据，则和缓冲数据一起发送
 		if(m_pBlockMessage->length() > 0)
 		{

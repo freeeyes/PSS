@@ -280,12 +280,41 @@ _CommandTimeOut* CCommandAccount::GetTimeoutInfo(uint32 u4Index)
 
 uint32 CCommandAccount::GetFlowIn()
 {
-	return m_u4PrvFlowIn;
+	ACE_Time_Value tvTime;
+	ACE_Date_Time dtNowTime(tvTime);
+	uint8 u1Minute = (uint8)dtNowTime.minute();
+	if(m_u1Minute != u1Minute)
+	{
+		m_u4PrvFlowIn  = m_u4FlowIn;
+		m_u4PrvFlowOut = m_u4FlowOut;
+
+		m_u4FlowIn  = 0;
+		m_u4FlowOut = 0;
+
+		m_u1Minute         = u1Minute;  
+	}
+
+	return m_u4FlowIn;
 }
 
 uint32 CCommandAccount::GetFlowOut()
 {
-	return m_u4PrvFlowOut;
+	ACE_Time_Value tvTime;
+	ACE_Date_Time dtNowTime(tvTime);
+	uint8 u1Minute = (uint8)dtNowTime.minute();
+	if(m_u1Minute != u1Minute)
+	{
+		m_u4PrvFlowIn  = m_u4FlowIn;
+		m_u4PrvFlowOut = m_u4FlowOut;
+
+		m_u4FlowIn  = 0;
+		m_u4FlowOut = 0;
+
+		m_u1Minute         = u1Minute;  
+	}
+
+
+	return m_u4FlowOut;
 }
 
 uint8 CCommandAccount::GetFLow()
