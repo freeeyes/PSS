@@ -1029,4 +1029,24 @@ struct _ClientNameInfo
 };
 typedef vector<_ClientNameInfo> vecClientNameInfo;
 
+struct _ServerInfo
+{
+	char  m_szServerName[MAX_BUFF_50];
+	char  m_szServerIP[MAX_BUFF_50];
+	int   m_nPort;
+	uint8 m_u1IPType;
+	char  m_szKey[MAX_BUFF_50];
+
+	_ServerInfo()
+	{
+		m_szServerName[0] = '\0';
+		m_szServerIP[0]   = '\0';
+		m_nPort           = 0;
+		m_u1IPType        = TYPE_IPV4;
+		m_szKey[0]        = '\0';
+	}
+};
+
+typedef vector<_ServerInfo> vecServerInfo;
+
 #endif

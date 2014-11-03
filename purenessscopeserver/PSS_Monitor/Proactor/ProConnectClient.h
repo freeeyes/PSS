@@ -59,12 +59,12 @@ private:
 	int                         m_nServerID;         //当前ServerID
 	ACE_Recursive_Thread_Mutex  m_ThreadWritrLock;   //线程锁
 
-	ACE_Time_Value              m_atvBegin;          //链接建立时间
-	uint32                      m_u4SendSize;        //发送字节数
-	uint32                      m_u4SendCount;       //发送数据包数  
-	uint32                      m_u4RecvSize;        //接受字节数
-	uint32                      m_u4RecvCount;       //接受数据包数
-	uint32                      m_u4CostTime;        //消息处理总时间
-	em_State                    m_emState;           //数据包状态 
+	ACE_Time_Value              m_atvBegin;                      //链接建立时间
+	uint32                      m_u4SendSize;                    //发送字节数
+	uint32                      m_u4SendCount;                   //发送数据包数  
+	uint32                      m_u4RecvSize;                    //接受字节数
+	uint32                      m_u4RecvCount;                   //接受数据包数
+	uint32                      m_u4CostTime;                    //消息处理总时间
+	em_State                    m_emState;                       //数据包状态 
 };
 #endif 

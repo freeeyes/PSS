@@ -375,6 +375,10 @@
 				Name="cppfile"
 				>
 				<File
+					RelativePath=".\Common\LogFile.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\Common\MainConfig.cpp"
 					>
 				</File>
@@ -412,6 +416,10 @@
 				</File>
 				<File
 					RelativePath=".\Common\ITimerManager.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Common\LogFile.h"
 					>
 				</File>
 				<File

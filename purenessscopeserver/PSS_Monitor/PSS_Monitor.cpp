@@ -49,14 +49,28 @@ bool Init()
 
 bool Start()
 {
+	//为了统计准确，找到分钟的整点启动
+	while(true)
+	{
+		ACE_Date_Time dtNow(ACE_OS::gettimeofday());
+		if(dtNow.second() == 59)
+		{
+			break;
+		}
+		else
+		{
+			OUR_DEBUG((LM_INFO, "[Start]Wait for second 59,runtime wait[%d].\n", 59 - dtNow.second()));
+			ACE_Time_Value tvSleep(1, 0);
+			ACE_OS::sleep(tvSleep);
+		}
+	}
+
 	for(uint32 i = 0; i < App_MainConfig::instance()->GerServerInfoCount(); i++)
 	{
 		_ServerInfo* pServerInfo = App_MainConfig::instance()->GetServerInfo(i);
 		if(NULL != pServerInfo)
 		{
-			MonitorFSM* pMonitorFSM = g_MonitorFSMManager.Create(pServerInfo->m_szServerIP, 
-				pServerInfo->m_nPort,
-				pServerInfo->m_szKey);
+			MonitorFSM* pMonitorFSM = g_MonitorFSMManager.Create(pServerInfo);
 
 			if(NULL == pMonitorFSM)
 			{
@@ -90,11 +104,8 @@ bool Start()
 	App_ReactorManager::instance()->StartReactor();
 #endif
 
-	//ACE_Time_Value tvSleep(0, 10000);
-	//ACE_OS::sleep(tvSleep);
-
 	//注册定时器
-	ACE_Time_Value tvInterval(120, 0);
+	ACE_Time_Value tvInterval(App_MainConfig::instance()->GetTimeInterval(), 0);
 
 	App_TimerManager::instance()->schedule(&g_MonitorFSMManager, 
 		NULL, 

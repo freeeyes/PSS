@@ -11,7 +11,7 @@ public:
 
 	virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);   //¶¨Ê±Æ÷¼ì²é
 
-	MonitorFSM* Create(const char* pIP, uint32 u4Port, const char* pKey);
+	MonitorFSM* Create(_ServerInfo* pServerInfo);
 
 	void Close();
 

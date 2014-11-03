@@ -280,7 +280,7 @@ _CommandTimeOut* CCommandAccount::GetTimeoutInfo(uint32 u4Index)
 
 uint32 CCommandAccount::GetFlowIn()
 {
-	ACE_Time_Value tvTime;
+	ACE_Time_Value tvTime = ACE_OS::gettimeofday();
 	ACE_Date_Time dtNowTime(tvTime);
 	uint8 u1Minute = (uint8)dtNowTime.minute();
 	if(m_u1Minute != u1Minute)
@@ -299,7 +299,7 @@ uint32 CCommandAccount::GetFlowIn()
 
 uint32 CCommandAccount::GetFlowOut()
 {
-	ACE_Time_Value tvTime;
+	ACE_Time_Value tvTime = ACE_OS::gettimeofday();
 	ACE_Date_Time dtNowTime(tvTime);
 	uint8 u1Minute = (uint8)dtNowTime.minute();
 	if(m_u1Minute != u1Minute)

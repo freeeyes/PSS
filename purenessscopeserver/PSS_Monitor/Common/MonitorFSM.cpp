@@ -3,8 +3,7 @@
 MonitorFSM::MonitorFSM()
 {
 	m_pClientMessage = NULL;
-	m_szIP[0]        = '\0';
-	m_szKey[0]       = '\0';
+	m_pServerInfo    = NULL;
 }
 
 MonitorFSM::~MonitorFSM()
@@ -17,15 +16,14 @@ IClientMessage* MonitorFSM::GetClientMessage()
 	return (IClientMessage* )m_pClientMessage;
 }
 
-void MonitorFSM::Init(const char* pIP, uint32 u4Port, const char* pKey)
+void MonitorFSM::Init(_ServerInfo* pServerInfo)
 {
-	sprintf_safe(m_szIP, MAX_BUFF_50, "%s", pIP);
-	sprintf_safe(m_szKey, MAX_BUFF_50, "%s", pKey);
-	m_u4Port = u4Port;
+	m_pServerInfo = pServerInfo;
 
 	if(NULL == m_pClientMessage)
 	{
 		m_pClientMessage = new CClientMessage();
+		m_pClientMessage->SetServerName(pServerInfo->m_szServerName);
 	}
 }
 
@@ -43,5 +41,12 @@ int MonitorFSM::GetServerID()
 
 char* MonitorFSM::GetKey()
 {
-	return m_szKey;
+	if(NULL != m_pServerInfo)
+	{
+		return m_pServerInfo->m_szKey;
+	}
+	else
+	{
+		return NULL;
+	}
 }

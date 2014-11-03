@@ -16,12 +16,12 @@ CMonitorFSMManager::~CMonitorFSMManager()
 	Close();
 }
 
-MonitorFSM* CMonitorFSMManager::Create(const char* pIP, uint32 u4Port, const char* pKey)
+MonitorFSM* CMonitorFSMManager::Create(_ServerInfo* pServerInfo)
 {
 	MonitorFSM* pMonitorFSM = new MonitorFSM();
 	if(NULL != pMonitorFSM)
 	{
-		pMonitorFSM->Init(pIP, u4Port, pKey);
+		pMonitorFSM->Init(pServerInfo);
 		m_vecMonitorFSM.push_back(pMonitorFSM);
 		return pMonitorFSM;
 	}

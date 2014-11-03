@@ -3,7 +3,8 @@
 
 CMainConfig::CMainConfig()
 {
-	m_u4BuffSize = MAX_BUFF_1024;
+	m_u4BuffSize     = MAX_BUFF_1024;
+	m_u2TimeInterval = DEFAULT_TIME_INTERVAL;
 }
 
 CMainConfig::~CMainConfig()
@@ -27,16 +28,33 @@ bool CMainConfig::Init(const char* szConfigPath)
 		m_u4BuffSize = (uint32)ACE_OS::atoi(pData);
 	}
 
+	pData = m_MainConfig.GetData("RecvInfo", "TimeInterval");
+	if(NULL != pData)
+	{
+		m_u2TimeInterval = (uint16)ACE_OS::atoi(pData);
+	}
+
 	//获得监听端口信息
 	_ServerInfo serverinfo;
 
 	m_vecServerInfo.clear();
+	TiXmlElement* pNextTiXmlElementName   = NULL;
 	TiXmlElement* pNextTiXmlElementIP     = NULL;
 	TiXmlElement* pNextTiXmlElementPort   = NULL;
 	TiXmlElement* pNextTiXmlElementIpType = NULL;
 	TiXmlElement* pNextTiXmlElementkey    = NULL;
 	while(true)
 	{
+		pData = m_MainConfig.GetData("TCPServerIP", "name", pNextTiXmlElementName);
+		if(pData != NULL)
+		{
+			sprintf_safe(serverinfo.m_szServerName, MAX_BUFF_50, "%s", pData);
+		}
+		else
+		{
+			break;
+		}
+
 		pData = m_MainConfig.GetData("TCPServerIP", "ip", pNextTiXmlElementIP);
 		if(pData != NULL)
 		{
@@ -115,6 +133,7 @@ _ServerInfo* CMainConfig::GetServerInfo(uint32 u4Index)
 void CMainConfig::Display()
 {
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4BuffSize=%d.\n", m_u4BuffSize));
+	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u2TimeInterval=%d.\n", m_u2TimeInterval));
 	for(uint32 i = 0; i < (uint32)m_vecServerInfo.size(); i++)
 	{
 		OUR_DEBUG((LM_INFO, "[CMainConfig::Display](%d)m_szServerIP=%s.\n", i, m_vecServerInfo[i].m_szServerIP));
@@ -123,3 +142,7 @@ void CMainConfig::Display()
 	}
 }
 
+uint16 CMainConfig::GetTimeInterval()
+{
+	return m_u2TimeInterval;
+}
