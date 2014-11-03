@@ -1,6 +1,6 @@
 // BuffPacket.h
-// ÕâÀï¶¨Òå½ÓÊÜÊý¾Ý°üµÄÄÚÈÝ»º³å
-// Êµ¼ÊµÄ¼á³Ö£¬ÔÚÓÚÄã¶ÔËüÊÇ·ñÊÇÖØÒªµÄ£¬Í¬Àí£¬Ëü¶ÔÄãÊÇ·ñÊÇÖØÒªµÄ¡£
+// è¿™é‡Œå®šä¹‰æŽ¥å—æ•°æ®åŒ…çš„å†…å®¹ç¼“å†²
+// å®žé™…çš„åšæŒï¼Œåœ¨äºŽä½ å¯¹å®ƒæ˜¯å¦æ˜¯é‡è¦çš„ï¼ŒåŒç†ï¼Œå®ƒå¯¹ä½ æ˜¯å¦æ˜¯é‡è¦çš„ã€‚
 // add by freeeyes
 // 2009-01-02
 
@@ -32,7 +32,7 @@ bool CBuffPacket::Init(int nSize)
 		}
 
 
-		//³õÊ¼»¯°üÊý¾Ý½á¹¹
+		//åˆå§‹åŒ–åŒ…æ•°æ®ç»“æž„
 		m_u4ReadPtr       = 0;
 		m_u4WritePtr      = 0;
 		m_u4PacketCount   = 0;
@@ -119,10 +119,10 @@ bool CBuffPacket::AddBuffPacket(uint32 u4Size)
 			throw szError;
 		}
 
-		//±£´æµ±Ç°³¤¶È
+		//ä¿å­˜å½“å‰é•¿åº¦
 		uint32 u4OldPacketLen = m_u4PacketLen;
 
-		//¸ñÊ½»¯ÐÂ´´½¨µÄÄÚ´æ´óÐ¡
+		//æ ¼å¼åŒ–æ–°åˆ›å»ºçš„å†…å­˜å¤§å°
 		u4Size = (uint32)(((int)ceil((double)u4Size/(double)DEFINE_PACKET_ADD))*DEFINE_PACKET_ADD);
 		m_u4PacketLen += u4Size;
 
@@ -142,10 +142,10 @@ bool CBuffPacket::AddBuffPacket(uint32 u4Size)
 		}
 		else
 		{
-			//ÒÆ¶¯ÄÚ´æ
+			//ç§»åŠ¨å†…å­˜
 			ACE_OS::memmove(szNewData, m_szData, u4OldPacketLen);
 
-			//É¾³ýÒÑ¾­²»ÓÃµÄÄÚ´æ
+			//åˆ é™¤å·²ç»ä¸ç”¨çš„å†…å­˜
 			App_ACEMemory::instance()->free(m_szData);
 			//delete m_szData;
 			m_szData = szNewData;
@@ -176,10 +176,10 @@ bool CBuffPacket::AddBuff(uint32 u4Size)
 			throw szError;
 		}
 
-		//±£´æµ±Ç°³¤¶È
+		//ä¿å­˜å½“å‰é•¿åº¦
 		uint32 u4OldPacketLen = m_u4PacketLen;
 
-		//¸ñÊ½»¯ÐÂ´´½¨µÄÄÚ´æ´óÐ¡
+		//æ ¼å¼åŒ–æ–°åˆ›å»ºçš„å†…å­˜å¤§å°
 		u4Size = (uint32)(((int)ceil((double)u4Size/(double)DEFINE_PACKET_ADD))*DEFINE_PACKET_ADD);
 		m_u4PacketLen += u4Size;
 
@@ -199,10 +199,10 @@ bool CBuffPacket::AddBuff(uint32 u4Size)
 		}
 		else
 		{
-			//ÒÆ¶¯ÄÚ´æ
+			//ç§»åŠ¨å†…å­˜
 			ACE_OS::memmove(szNewData, m_szData, u4OldPacketLen);
 
-			//É¾³ýÒÑ¾­²»ÓÃµÄÄÚ´æ
+			//åˆ é™¤å·²ç»ä¸ç”¨çš„å†…å­˜
 			App_ACEMemory::instance()->free(m_szData);
 			//delete m_szData;
 			m_szData = szNewData;
@@ -347,14 +347,14 @@ bool CBuffPacket::WriteStream(const char* szData, uint32 u4Len)
 			return false;
 		}
 
-		//Ð´ÈëÎÄ±¾ÄÚÈÝ
+		//å†™å…¥æ–‡æœ¬å†…å®¹
 		ACE_OS::memcpy(WritePtr(), szData, u4Len);
 		WritePtr(u4Len);
 		return true;
 	}
 	else
 	{
-		//Ð´ÈëÎÄ±¾ÄÚÈÝ
+		//å†™å…¥æ–‡æœ¬å†…å®¹
 		ACE_OS::memcpy(WritePtr(), szData, u4Len);
 		WritePtr(u4Len);
 		return true;
@@ -404,7 +404,7 @@ CBuffPacket& CBuffPacket::operator >> (uint16& u2Data)
 	u2Data = 0;
 	if(m_u4ReadPtr <= m_u4WritePtr - (uint32)sizeof(u2Data))
 	{
-		//°ÑÍøÂç×Ö½ÚÐò£¬×ª»»ÎªÖ÷»ú×Ö½ÚÐò
+		//æŠŠç½‘ç»œå­—èŠ‚åºï¼Œè½¬æ¢ä¸ºä¸»æœºå­—èŠ‚åº
 		uint16 n2Net = *(uint16 *)ReadPtr();
 		ReadPtr((uint32)sizeof(n2Net));
 
@@ -428,7 +428,7 @@ CBuffPacket& CBuffPacket::operator >> (uint32& u4Data)
 	u4Data = 0;
 	if(m_u4ReadPtr <= m_u4WritePtr - (uint32)sizeof(u4Data))
 	{
-		//°ÑÍøÂç×Ö½ÚÐò£¬×ª»»ÎªÖ÷»ú×Ö½ÚÐò
+		//æŠŠç½‘ç»œå­—èŠ‚åºï¼Œè½¬æ¢ä¸ºä¸»æœºå­—èŠ‚åº
 		uint32 n4Net = *(uint32 *)ReadPtr();
 		ReadPtr((uint32)sizeof(n4Net));
 
@@ -513,7 +513,8 @@ CBuffPacket& CBuffPacket::operator >> (float32& f4Data)
 	f4Data = 0;
 	if(m_u4ReadPtr <= m_u4WritePtr - (uint32)sizeof(f4Data))
 	{
-		f4Data = *(float32 *)ReadPtr();
+		//f4Data = *(float32 *)ReadPtr();åœ¨ios ä¸Šè·‘ä¼šå´©ï¼Œå› ä¸ºä¼šæœ‰å†…å­˜å¯¹é½ æŒ‡é’ˆç±»åž‹å¼ºåˆ¶  å†…å­˜åˆšå¥½ä¸å¯¹é½æ—¶ä¼šå‡ºçŽ°é—®é¢˜
+		memcpy(&f4Data,ReadPtr(),sizeof(float32));
 		ReadPtr((uint32)sizeof(f4Data));
 	}
 
@@ -656,7 +657,7 @@ CBuffPacket& CBuffPacket::operator << (uint16 u2Data)
 		}
 		else
 		{
-			//ÎªÁË´æÈ¡·½±ã£¬ÔÚ´æ´¢Êý×ÖµÄÊ±ºò£¬×Ô¶¯×ª»»ÎªÍøÂç×Ö½ÚÐò£¬È¡³öµÄÊ±ºò×Ô¶¯×ª»ØÖ÷»ú×Ö½ÚÐò
+			//ä¸ºäº†å­˜å–æ–¹ä¾¿ï¼Œåœ¨å­˜å‚¨æ•°å­—çš„æ—¶å€™ï¼Œè‡ªåŠ¨è½¬æ¢ä¸ºç½‘ç»œå­—èŠ‚åºï¼Œå–å‡ºçš„æ—¶å€™è‡ªåŠ¨è½¬å›žä¸»æœºå­—èŠ‚åº
 			uint16 u2Net = 0;
 			if(true == m_blNetSort)
 			{
@@ -674,7 +675,7 @@ CBuffPacket& CBuffPacket::operator << (uint16 u2Data)
 	}
 	else
 	{
-		//ÎªÁË´æÈ¡·½±ã£¬ÔÚ´æ´¢Êý×ÖµÄÊ±ºò£¬×Ô¶¯×ª»»ÎªÍøÂç×Ö½ÚÐò£¬È¡³öµÄÊ±ºò×Ô¶¯×ª»ØÖ÷»ú×Ö½ÚÐò
+		//ä¸ºäº†å­˜å–æ–¹ä¾¿ï¼Œåœ¨å­˜å‚¨æ•°å­—çš„æ—¶å€™ï¼Œè‡ªåŠ¨è½¬æ¢ä¸ºç½‘ç»œå­—èŠ‚åºï¼Œå–å‡ºçš„æ—¶å€™è‡ªåŠ¨è½¬å›žä¸»æœºå­—èŠ‚åº
 		uint16 u2Net = 0;
 		if(true == m_blNetSort)
 		{
@@ -711,7 +712,7 @@ CBuffPacket& CBuffPacket::operator << (uint32 u4Data)
 		}
 		else
 		{
-			//ÎªÁË´æÈ¡·½±ã£¬ÔÚ´æ´¢Êý×ÖµÄÊ±ºò£¬×Ô¶¯×ª»»ÎªÍøÂç×Ö½ÚÐò£¬È¡³öµÄÊ±ºò×Ô¶¯×ª»ØÖ÷»ú×Ö½ÚÐò
+			//ä¸ºäº†å­˜å–æ–¹ä¾¿ï¼Œåœ¨å­˜å‚¨æ•°å­—çš„æ—¶å€™ï¼Œè‡ªåŠ¨è½¬æ¢ä¸ºç½‘ç»œå­—èŠ‚åºï¼Œå–å‡ºçš„æ—¶å€™è‡ªåŠ¨è½¬å›žä¸»æœºå­—èŠ‚åº
 			uint32 u4Net = 0;
 			if(true == m_blNetSort)
 			{
@@ -729,7 +730,7 @@ CBuffPacket& CBuffPacket::operator << (uint32 u4Data)
 	}
 	else
 	{
-		//ÎªÁË´æÈ¡·½±ã£¬ÔÚ´æ´¢Êý×ÖµÄÊ±ºò£¬×Ô¶¯×ª»»ÎªÍøÂç×Ö½ÚÐò£¬È¡³öµÄÊ±ºò×Ô¶¯×ª»ØÖ÷»ú×Ö½ÚÐò
+		//ä¸ºäº†å­˜å–æ–¹ä¾¿ï¼Œåœ¨å­˜å‚¨æ•°å­—çš„æ—¶å€™ï¼Œè‡ªåŠ¨è½¬æ¢ä¸ºç½‘ç»œå­—èŠ‚åºï¼Œå–å‡ºçš„æ—¶å€™è‡ªåŠ¨è½¬å›žä¸»æœºå­—èŠ‚åº
 		uint32 u4Net = 0;
 		if(true == m_blNetSort)
 		{
@@ -766,7 +767,7 @@ CBuffPacket& CBuffPacket::operator << (uint64 u8Data)
 		}
 		else
 		{
-			//ÎªÁË´æÈ¡·½±ã£¬ÔÚ´æ´¢Êý×ÖµÄÊ±ºò£¬×Ô¶¯×ª»»ÎªÍøÂç×Ö½ÚÐò£¬È¡³öµÄÊ±ºò×Ô¶¯×ª»ØÖ÷»ú×Ö½ÚÐò
+			//ä¸ºäº†å­˜å–æ–¹ä¾¿ï¼Œåœ¨å­˜å‚¨æ•°å­—çš„æ—¶å€™ï¼Œè‡ªåŠ¨è½¬æ¢ä¸ºç½‘ç»œå­—èŠ‚åºï¼Œå–å‡ºçš„æ—¶å€™è‡ªåŠ¨è½¬å›žä¸»æœºå­—èŠ‚åº
 			uint64 u8Net = 0;
 			if(true == m_blNetSort)
 			{
@@ -784,7 +785,7 @@ CBuffPacket& CBuffPacket::operator << (uint64 u8Data)
 	}
 	else
 	{
-		//ÎªÁË´æÈ¡·½±ã£¬ÔÚ´æ´¢Êý×ÖµÄÊ±ºò£¬×Ô¶¯×ª»»ÎªÍøÂç×Ö½ÚÐò£¬È¡³öµÄÊ±ºò×Ô¶¯×ª»ØÖ÷»ú×Ö½ÚÐò
+		//ä¸ºäº†å­˜å–æ–¹ä¾¿ï¼Œåœ¨å­˜å‚¨æ•°å­—çš„æ—¶å€™ï¼Œè‡ªåŠ¨è½¬æ¢ä¸ºç½‘ç»œå­—èŠ‚åºï¼Œå–å‡ºçš„æ—¶å€™è‡ªåŠ¨è½¬å›žä¸»æœºå­—èŠ‚åº
 		uint64 u8Net = 0;
 		if(true == m_blNetSort)
 		{
@@ -986,10 +987,10 @@ CBuffPacket& CBuffPacket::operator << (VCHARS_STR &str)
 		}
 		else
 		{
-			//Ð´Èë×Ö·û´®³¤¶È
+			//å†™å…¥å­—ç¬¦ä¸²é•¿åº¦
 			*this << str.u1Len;
 
-			//Ð´ÈëÎÄ±¾ÄÚÈÝ
+			//å†™å…¥æ–‡æœ¬å†…å®¹
 			ACE_OS::memcpy(WritePtr(), str.text, (int)str.u1Len);
 			WritePtr(str.u1Len);
 			return *this;
@@ -997,10 +998,10 @@ CBuffPacket& CBuffPacket::operator << (VCHARS_STR &str)
 	}
 	else
 	{
-		//Ð´Èë×Ö·û´®³¤¶È
+		//å†™å…¥å­—ç¬¦ä¸²é•¿åº¦
 		*this << str.u1Len;
 
-		//Ð´ÈëÎÄ±¾ÄÚÈÝ
+		//å†™å…¥æ–‡æœ¬å†…å®¹
 		ACE_OS::memcpy(WritePtr(), str.text, (int)str.u1Len);
 		WritePtr(str.u1Len);
 		return *this;
@@ -1027,10 +1028,10 @@ CBuffPacket& CBuffPacket::operator << (VCHARM_STR &str)
 		}
 		else
 		{
-			//Ð´Èë×Ö·û´®³¤¶È
+			//å†™å…¥å­—ç¬¦ä¸²é•¿åº¦
 			*this << str.u2Len;
 
-			//Ð´ÈëÎÄ±¾ÄÚÈÝ
+			//å†™å…¥æ–‡æœ¬å†…å®¹
 			ACE_OS::memcpy(WritePtr(), str.text, (int)str.u2Len);
 			WritePtr(str.u2Len);
 			return *this;
@@ -1038,10 +1039,10 @@ CBuffPacket& CBuffPacket::operator << (VCHARM_STR &str)
 	}
 	else
 	{
-		//Ð´Èë×Ö·û´®³¤¶È
+		//å†™å…¥å­—ç¬¦ä¸²é•¿åº¦
 		*this << str.u2Len;
 
-		//Ð´ÈëÎÄ±¾ÄÚÈÝ
+		//å†™å…¥æ–‡æœ¬å†…å®¹
 		ACE_OS::memcpy(WritePtr(), str.text, (int)str.u2Len);
 		WritePtr(str.u2Len);
 		return *this;
@@ -1068,10 +1069,10 @@ CBuffPacket& CBuffPacket::operator << (VCHARB_STR &str)
 		}
 		else
 		{
-			//Ð´Èë×Ö·û´®³¤¶È
+			//å†™å…¥å­—ç¬¦ä¸²é•¿åº¦
 			*this << str.u4Len;
 
-			//Ð´ÈëÎÄ±¾ÄÚÈÝ
+			//å†™å…¥æ–‡æœ¬å†…å®¹
 			ACE_OS::memcpy(WritePtr(), str.text, (int)str.u4Len);
 			WritePtr(str.u4Len);
 			return *this;
@@ -1079,10 +1080,10 @@ CBuffPacket& CBuffPacket::operator << (VCHARB_STR &str)
 	}
 	else
 	{
-		//Ð´Èë×Ö·û´®³¤¶È
+		//å†™å…¥å­—ç¬¦ä¸²é•¿åº¦
 		*this << str.u4Len;
 
-		//Ð´ÈëÎÄ±¾ÄÚÈÝ
+		//å†™å…¥æ–‡æœ¬å†…å®¹
 		ACE_OS::memcpy(WritePtr(), str.text, (int)str.u4Len);
 		WritePtr(str.u4Len);
 		return *this;
@@ -1110,10 +1111,10 @@ CBuffPacket& CBuffPacket::operator << (string &str)
 		}
 		else
 		{
-			//Ð´Èë×Ö·û´®³¤¶È
+			//å†™å…¥å­—ç¬¦ä¸²é•¿åº¦
 			*this << u4Len;
 
-			//Ð´ÈëÎÄ±¾ÄÚÈÝ
+			//å†™å…¥æ–‡æœ¬å†…å®¹
 			ACE_OS::memcpy(WritePtr(), str.c_str(), (int)u4Len);
 			WritePtr(u4Len);
 			return *this;
@@ -1121,10 +1122,10 @@ CBuffPacket& CBuffPacket::operator << (string &str)
 	}
 	else
 	{
-		//Ð´Èë×Ö·û´®³¤¶È
+		//å†™å…¥å­—ç¬¦ä¸²é•¿åº¦
 		*this << u4Len;
 
-		//Ð´ÈëÎÄ±¾ÄÚÈÝ
+		//å†™å…¥æ–‡æœ¬å†…å®¹
 		ACE_OS::memcpy(WritePtr(), str.c_str(), (int)u4Len);
 		WritePtr(u4Len);
 		return *this;
