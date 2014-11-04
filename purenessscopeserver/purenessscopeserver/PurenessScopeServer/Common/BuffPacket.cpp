@@ -405,7 +405,9 @@ CBuffPacket& CBuffPacket::operator >> (uint16& u2Data)
 	if(m_u4ReadPtr <= m_u4WritePtr - (uint32)sizeof(u2Data))
 	{
 		//把网络字节序，转换为主机字节序
-		uint16 n2Net = *(uint16 *)ReadPtr();
+		//uint16 n2Net = *(uint16 *)ReadPtr();
+		uint16 n2Net = 0;
+		ACE_OS::memcpy(&n2Net, ReadPtr(), sizeof(uint16));
 		ReadPtr((uint32)sizeof(n2Net));
 
 		if(true == m_blNetSort)
@@ -429,7 +431,9 @@ CBuffPacket& CBuffPacket::operator >> (uint32& u4Data)
 	if(m_u4ReadPtr <= m_u4WritePtr - (uint32)sizeof(u4Data))
 	{
 		//把网络字节序，转换为主机字节序
-		uint32 n4Net = *(uint32 *)ReadPtr();
+		//uint32 n4Net = *(uint32 *)ReadPtr();
+		uint32 n4Net = 0;
+		ACE_OS::memcpy(&n4Net, ReadPtr(), sizeof(uint32));
 		ReadPtr((uint32)sizeof(n4Net));
 
 		if(true == m_blNetSort)
@@ -452,7 +456,9 @@ CBuffPacket& CBuffPacket::operator >> (uint64 &u8Data)
 	u8Data = 0;
 	if(m_u4ReadPtr <= m_u4WritePtr - (uint32)sizeof(u8Data))
 	{
-		uint64 u8Net = *(uint64 *)ReadPtr();
+		//uint64 u8Net = *(uint64 *)ReadPtr();
+		uint64 u8Net = 0;
+		ACE_OS::memcpy(&u8Net, ReadPtr(), sizeof(uint64));
 		ReadPtr((uint32)sizeof(u8Net));
 
 		if(true == m_blNetSort)
@@ -487,8 +493,21 @@ CBuffPacket& CBuffPacket::operator >> (int16& n2Data)
 	n2Data = 0;
 	if(m_u4ReadPtr <= m_u4WritePtr - sizeof(n2Data))
 	{
-		n2Data = *(int16 *)ReadPtr();
-		ReadPtr((uint32)sizeof(n2Data));
+		//n2Data = *(int16 *)ReadPtr();
+		//ReadPtr((uint32)sizeof(n2Data));
+
+		int16 n2Net = 0;
+		ACE_OS::memcpy(&n2Net, ReadPtr(), sizeof(int16));
+		ReadPtr((uint32)sizeof(n2Net));
+
+		if(true == m_blNetSort)
+		{
+			n2Data = ACE_NTOHS(n2Net);
+		}
+		else
+		{
+			n2Data = n2Net;
+		}
 	}
 
 	return *this;
@@ -500,8 +519,21 @@ CBuffPacket& CBuffPacket::operator >> (int32& n4Data)
 	n4Data = 0;
 	if(m_u4ReadPtr <= m_u4WritePtr - sizeof(n4Data))
 	{
-		n4Data = *(int32 *)ReadPtr();
-		ReadPtr((uint32)sizeof(n4Data));
+		//n4Data = *(int32 *)ReadPtr();
+		//ReadPtr((uint32)sizeof(n4Data));
+
+		int32 n4Net = 0;
+		ACE_OS::memcpy(&n4Net, ReadPtr(), sizeof(int32));
+		ReadPtr((uint32)sizeof(n4Net));
+
+		if(true == m_blNetSort)
+		{
+			n4Data = ACE_NTOHL(n4Net);
+		}
+		else
+		{
+			n4Data = n4Net;
+		}
 	}
 
 	return *this;
@@ -513,7 +545,11 @@ CBuffPacket& CBuffPacket::operator >> (float32& f4Data)
 	f4Data = 0;
 	if(m_u4ReadPtr <= m_u4WritePtr - (uint32)sizeof(f4Data))
 	{
-		f4Data = *(float32 *)ReadPtr();
+		//f4Data = *(float32 *)ReadPtr();
+		//ReadPtr((uint32)sizeof(f4Data));
+
+		//浮点型不需要字序转换
+		ACE_OS::memcpy(&f4Data, ReadPtr(), sizeof(float32));
 		ReadPtr((uint32)sizeof(f4Data));
 	}
 
@@ -526,7 +562,9 @@ CBuffPacket& CBuffPacket::operator >> (float64& f8Data)
 	f8Data = 0;
 	if(m_u4ReadPtr <= m_u4WritePtr - (uint32)sizeof(f8Data))
 	{
-		f8Data = *(float64 *)ReadPtr();
+		//f8Data = *(float64 *)ReadPtr();
+		//浮点型不需要字序转换
+		ACE_OS::memcpy(&f8Data, ReadPtr(), sizeof(float64));
 		ReadPtr((uint32)sizeof(f8Data));
 	}
 
