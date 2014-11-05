@@ -88,9 +88,8 @@ void CLogFile::CreateFile(ACE_Date_Time& dt)
 	{
 		//дXMLͷ
 		char szLog[MAX_BUFF_1000]     = {'\0'};
-		sprintf_safe(szLog, MAX_BUFF_1000, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Group>\n</Group>");
+		sprintf_safe(szLog, MAX_BUFF_1000, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<?xml-stylesheet type=\"text/xsl\" href=\"../../Sample.xsl\"?>\n<Group Name=\"%s\">\n</Group>", m_szFileName);
 		ACE_OS::fwrite(szLog, ACE_OS::strlen(szLog), sizeof(char), m_pFile);
-
 		ACE_OS::fflush(m_pFile);
 		ACE_OS::fclose(m_pFile);
 		m_pFile = NULL;

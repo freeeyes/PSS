@@ -1388,22 +1388,30 @@
 		<Filter
 			Name="Mail"
 			>
-			<File
-				RelativePath=".\Mail\base64.cpp"
+			<Filter
+				Name="cppfile"
 				>
-			</File>
-			<File
-				RelativePath=".\Mail\base64.h"
+				<File
+					RelativePath=".\Mail\base64.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Mail\smtp.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="hfile"
 				>
-			</File>
-			<File
-				RelativePath=".\Mail\smtp.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Mail\smtp.h"
-				>
-			</File>
+				<File
+					RelativePath=".\Mail\base64.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Mail\smtp.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\ReadMe.txt"
