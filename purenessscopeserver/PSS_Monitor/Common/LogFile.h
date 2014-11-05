@@ -21,16 +21,16 @@ public:
 private:
 	void CheckTime();
 	void CreateFile(ACE_Date_Time& dt);
+	void ReWriteFile();
 
 private:
 	char m_szFileName[MAX_BUFF_50];
 	char m_szRoot[MAX_BUFF_50];
 	char m_szLogPath[MAX_BUFF_100];
 	char m_szLogTime[MAX_BUFF_50];
+	char m_szCurrFilePath[MAX_BUFF_100];
 
-	ACE_FILE_Connector  m_Connector;          //I/O²Ù×÷Á¬½ÓÆ÷
-	ACE_FILE_IO         m_File;
-	ACE_FILE_Addr       m_FileAddr; 
+	FILE*  m_pFile;
 };
 
 #endif

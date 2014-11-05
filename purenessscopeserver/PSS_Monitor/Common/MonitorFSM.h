@@ -78,7 +78,7 @@ public:
 			dt.minute(),
 			dt.second());
 
-		m_objLogFile.DoLog("<Monitor Time=\"%s\" ActiveClient=\"%d\" PoolClient=\"%d\" MaxHandlerCount==\"%d\" FlowIn=\"%d\" FlowOut=\"%d\" />\n", 
+		m_objLogFile.DoLog("<Monitor Time=\"%s\" ActiveClient=\"%d\" PoolClient=\"%d\" MaxHandlerCount=\"%d\" FlowIn=\"%d\" FlowOut=\"%d\" />\n", 
 			szDate,
 			u4ActiveClient, 
 			u4PoolClient, 
