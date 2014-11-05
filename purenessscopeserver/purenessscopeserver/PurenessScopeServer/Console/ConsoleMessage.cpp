@@ -2121,6 +2121,8 @@ bool CConsoleMessage::DoMessage_ShowListen(_CommandInfo& CommandInfo, IBuffPacke
 
 bool CConsoleMessage::DoMessage_MonitorInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
+	if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
+	{
 		_CommandFlowAccount objCommandFlowIn;
 		_CommandFlowAccount objCommandFlowOut;
 
@@ -2152,6 +2154,7 @@ bool CConsoleMessage::DoMessage_MonitorInfo(_CommandInfo& CommandInfo, IBuffPack
 		(*pBuffPacket) << objCommandFlowIn.m_u4FlowIn;
 		(*pBuffPacket) << objCommandFlowOut.m_u4FlowOut;
 #endif
+	}
 
 	u2ReturnCommandID = CONSOLE_COMMAND_MONITOR_INFO;
 	return true;

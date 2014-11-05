@@ -11,6 +11,7 @@
 #include "Ring.h"
 #include "MapTemplate.h"
 #include "ace/Date_Time.h"
+#include "ace/Recursive_Thread_Mutex.h"
 
 //IP访问统计模块
 struct _IPAccount
@@ -100,6 +101,7 @@ public:
 
 	bool AddIP(string strIP, int nPort)
 	{
+		ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
 		bool blRet = false;
 		//看看需要不需要判定，如果需要，则进行IP统计
 		if(m_nMaxConnectCount > 0)
@@ -158,6 +160,7 @@ public:
 
 	bool CloseIP(string strIP, int nPort, uint32 u4RecvSize, uint32 u4SendSize)
 	{
+		ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
 		if(ACE_OS::strlen(m_szTrackIP) > 0)
 		{
 			for(int i = 0; i < m_objRing.GetCount(); i++)
@@ -182,6 +185,7 @@ public:
 
 	bool UpdateIP(string strIP, int nPort, uint32 u4RecvSize, uint32 u4SendSize)
 	{
+		ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
 		if(ACE_OS::strlen(m_szTrackIP) > 0)
 		{
 			for(int i = 0; i < m_objRing.GetCount(); i++)
@@ -189,7 +193,7 @@ public:
 				_IPTrackInfo* pIPTrackInfo = m_objRing.GetLinkData(i);
 				if(ACE_OS::strcmp(pIPTrackInfo->m_szClientIP, strIP.c_str()) == 0 && pIPTrackInfo->m_nPort == nPort)
 				{
-					//找到了匹配的IP，记录终止时间
+					//找到了匹配的IP，记录数据当前流量
 					pIPTrackInfo->m_u4RecvByteSize = u4RecvSize;
 					pIPTrackInfo->m_u4SendByteSize = u4SendSize;
 					return true;
@@ -209,6 +213,7 @@ public:
 
 	void GetInfo(vecIPAccount& VecIPAccount)
 	{
+		ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
 		for(int i = 0; i < m_mapIPAccount.GetSize(); i++)
 		{
 			_IPAccount* pIPAccount = m_mapIPAccount.GetMapData(i);
@@ -221,6 +226,7 @@ public:
 
 	void SetTrackIP(const char* pIP)
 	{
+		ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
 		//清理以前的历史记录
 		m_objRing.Clear();
 
@@ -229,6 +235,7 @@ public:
 
 	void ClearTrackIP()
 	{
+		ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
 		//清理以前的历史记录
 		m_objRing.Clear();
 
@@ -252,6 +259,7 @@ private:
 	char                             m_szTrackIP[MAX_BUFF_20];             //要追踪的数据流IP，目前只考虑动态追一个，否则批量的很消耗内存，也无必要。
 	int                              m_nMaxConnectCount;                   //每秒允许的最大连接数，前提是m_nNeedCheck = 0;才会生效
 	CRingLink<_IPTrackInfo>          m_objRing;                            //环形连接日志，记录监控IP的活动 
+	ACE_Recursive_Thread_Mutex       m_ThreadLock;                         //多线程锁 
 };
 
 typedef ACE_Singleton<CIPAccount, ACE_Recursive_Thread_Mutex> App_IPAccount;
