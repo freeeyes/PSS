@@ -78,7 +78,7 @@ public:
 			dt.minute(),
 			dt.second());
 
-		m_objLogFile.DoLog("<Monitor Time=\"%s\" ActiveClient=\"%d\" PoolClient=\"%d\" MaxHandlerCount=\"%d\" FlowIn=\"%d\" FlowOut=\"%d\" />\n", 
+		m_objLogFile.DoLog("<Monitor Time=\"%s\" State=\"Connected\" ActiveClient=\"%d\" PoolClient=\"%d\" MaxHandlerCount=\"%d\" FlowIn=\"%d\" FlowOut=\"%d\" />\n", 
 			szDate,
 			u4ActiveClient, 
 			u4PoolClient, 
@@ -92,6 +92,23 @@ public:
 	bool ConnectError(int nError, _ClientIPInfo objServerIPInfo)
 	{
 		OUR_DEBUG((LM_INFO, "[ConnectError]nServerID=%d, errno=%d.\n", m_nServerID, nError));
+
+		//记录当前时间
+		char szDate[MAX_BUFF_50] = {'\0'};
+		ACE_Date_Time dt;
+		dt.update(ACE_OS::gettimeofday());
+
+		sprintf_safe(szDate, MAX_BUFF_50, "%04d-%02d-%02d %02d:%02d:%02d", 
+			dt.year(), 
+			dt.month(),
+			dt.day(), 
+			dt.hour(),
+			dt.minute(),
+			dt.second());
+
+		m_objLogFile.DoLog("<Monitor Time=\"%s\" State=\"UnConnected\" ActiveClient=\"0\" PoolClient=\"0\" MaxHandlerCount=\"0\" FlowIn=\"0\" FlowOut=\"0\" />\n", 
+			szDate);
+
 		return true;
 	}
 
