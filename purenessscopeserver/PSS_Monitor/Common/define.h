@@ -1047,6 +1047,27 @@ struct _ServerInfo
 	}
 };
 
+//邮件配置相关信息
+struct _MailAlert
+{
+	uint32 m_u4MailID;
+	char   m_szFromMailAddr[MAX_BUFF_200];
+	char   m_szToMailAddr[MAX_BUFF_200];
+	char   m_szMailPass[MAX_BUFF_200];
+	char   m_szMailUrl[MAX_BUFF_200];
+	uint32 m_u4MailPort;
+
+	_MailAlert()
+	{
+		m_u4MailID          = 0;
+		m_szFromMailAddr[0] = '\0';
+		m_szToMailAddr[0]   = '\0';
+		m_szMailPass[0]     = '\0';
+		m_szMailUrl[0]      = '\0';
+		m_u4MailPort        = 0;
+	}
+};
+
 typedef vector<_ServerInfo> vecServerInfo;
 
 #endif

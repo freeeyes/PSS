@@ -11,7 +11,7 @@ public:
 
 	virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);   //¶¨Ê±Æ÷¼ì²é
 
-	MonitorFSM* Create(_ServerInfo* pServerInfo);
+	MonitorFSM* Create(_ServerInfo* pServerInfo, _MailAlert* pMailAlert);
 
 	void Close();
 

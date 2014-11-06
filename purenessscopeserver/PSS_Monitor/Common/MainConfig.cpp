@@ -1,6 +1,5 @@
 #include "MainConfig.h"
 
-
 CMainConfig::CMainConfig()
 {
 	m_u4BuffSize     = MAX_BUFF_1024;
@@ -105,6 +104,42 @@ bool CMainConfig::Init(const char* szConfigPath)
 		m_vecServerInfo.push_back(serverinfo);
 	}
 
+	pData = m_MainConfig.GetData("Mail", "MailID");
+	if(pData != NULL)
+	{
+		m_objMailAlert.m_u4MailID = (uint32)ACE_OS::atoi(pData);
+	}
+
+	pData = m_MainConfig.GetData("Mail", "fromMailAddr");
+	if(pData != NULL)
+	{
+		sprintf_safe(m_objMailAlert.m_szFromMailAddr, MAX_BUFF_200, "%s", pData);
+	}
+
+	pData = m_MainConfig.GetData("Mail", "toMailAddr");
+	if(pData != NULL)
+	{
+		sprintf_safe(m_objMailAlert.m_szToMailAddr, MAX_BUFF_200, "%s", pData);
+	}
+
+	pData = m_MainConfig.GetData("Mail", "MailPass");
+	if(pData != NULL)
+	{
+		sprintf_safe(m_objMailAlert.m_szMailPass, MAX_BUFF_200, "%s", pData);
+	}
+
+	pData = m_MainConfig.GetData("Mail", "MailUrl");
+	if(pData != NULL)
+	{
+		sprintf_safe(m_objMailAlert.m_szMailUrl, MAX_BUFF_200, "%s", pData);
+	}
+
+	pData = m_MainConfig.GetData("Mail", "MailPort");
+	if(pData != NULL)
+	{
+		m_objMailAlert.m_u4MailPort = (uint32)ACE_OS::atoi(pData);
+	}
+
 	return true;
 }
 
@@ -140,9 +175,20 @@ void CMainConfig::Display()
 		OUR_DEBUG((LM_INFO, "[CMainConfig::Display](%d)m_nPort=%d.\n", i, m_vecServerInfo[i].m_nPort));
 		OUR_DEBUG((LM_INFO, "[CMainConfig::Display](%d)m_nPort=%s.\n", i, m_vecServerInfo[i].m_szKey));
 	}
+	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4MailID=%d.\n", m_objMailAlert.m_u4MailID));
+	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szMailUrl=%s.\n", m_objMailAlert.m_szMailUrl));
+	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4MailPort=%d.\n", m_objMailAlert.m_u4MailPort));
+	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szMailPass=%s.\n", m_objMailAlert.m_szMailPass));
+	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szToMailAddr=%s.\n", m_objMailAlert.m_szToMailAddr));
+	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szFromMailAddr=%s.\n", m_objMailAlert.m_szFromMailAddr));
 }
 
 uint16 CMainConfig::GetTimeInterval()
 {
 	return m_u2TimeInterval;
+}
+
+_MailAlert* CMainConfig::GetMailAlert()
+{
+	return (_MailAlert* )&m_objMailAlert;
 }

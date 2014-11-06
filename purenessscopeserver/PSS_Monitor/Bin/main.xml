@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <config>
 	<RecvInfo BuffSize="1024" TimeInterval="60" />
+	<Mail MailID="0" fromMailAddr="local@163.com" toMailAddr="freeeyes@163.com" MailPass="123456" MailUrl="smtp.163.com" MailPort="25" />
 	
 	<TCPServerIP name="PSS1" ip="127.0.0.1" port="10010" ipType="IPV4" key="freeeyes" />
 </config>

@@ -1,6 +1,7 @@
 #include "define.h"
 #include "ClientMessage.h"
 #include "LogFile.h"
+#include "MailManager.h"
 
 //这个类用于实现监控各种指定的PSS数据的状态机
 //根据收到的数据，进行分析并整合，并计划下一步
@@ -23,6 +24,11 @@ public:
 	};
 
 	virtual ~CClientMessage() {};
+
+	void Init(_MailAlert* pMailAlert)
+	{
+		m_objMailManager.SetMailAlert(pMailAlert);
+	}
 
 	void SetServerName(const char* pServerName)
 	{
@@ -109,6 +115,13 @@ public:
 		m_objLogFile.DoLog("<Monitor Time=\"%s\" State=\"UnConnected\" ActiveClient=\"0\" PoolClient=\"0\" MaxHandlerCount=\"0\" FlowIn=\"0\" FlowOut=\"0\" />\n", 
 			szDate);
 
+		char szTitle[MAX_BUFF_50] = {'\0'};
+		char szBody[MAX_BUFF_100] = {'\0'};
+		sprintf_safe(szTitle, MAX_BUFF_50, "ServerMonitor disconnect");
+		sprintf_safe(szBody, MAX_BUFF_100, "[ConnectError]nServerName=%s, errno=%d.", m_szServerName, nError);
+
+		m_objMailManager.SendMail(szTitle, szBody);
+
 		return true;
 	}
 
@@ -122,6 +135,7 @@ private:
 	int                m_nServerID;
 	char               m_szServerName[MAX_BUFF_50];
 	CLogFile           m_objLogFile;
+	CMailManager       m_objMailManager; 
 };
 
 class MonitorFSM
@@ -135,7 +149,7 @@ public:
 	int GetServerID();
 	char* GetKey();
 
-	void Init(_ServerInfo* pServerInfo);
+	void Init(_ServerInfo* pServerInfo, _MailAlert* pMailAlert);
 
 private:
 	CClientMessage* m_pClientMessage;

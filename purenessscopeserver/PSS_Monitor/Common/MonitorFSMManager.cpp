@@ -16,12 +16,12 @@ CMonitorFSMManager::~CMonitorFSMManager()
 	Close();
 }
 
-MonitorFSM* CMonitorFSMManager::Create(_ServerInfo* pServerInfo)
+MonitorFSM* CMonitorFSMManager::Create(_ServerInfo* pServerInfo, _MailAlert* pMailAlert)
 {
 	MonitorFSM* pMonitorFSM = new MonitorFSM();
 	if(NULL != pMonitorFSM)
 	{
-		pMonitorFSM->Init(pServerInfo);
+		pMonitorFSM->Init(pServerInfo, pMailAlert);
 		m_vecMonitorFSM.push_back(pMonitorFSM);
 		return pMonitorFSM;
 	}

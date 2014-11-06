@@ -16,13 +16,14 @@ IClientMessage* MonitorFSM::GetClientMessage()
 	return (IClientMessage* )m_pClientMessage;
 }
 
-void MonitorFSM::Init(_ServerInfo* pServerInfo)
+void MonitorFSM::Init(_ServerInfo* pServerInfo, _MailAlert* pMailAlert)
 {
 	m_pServerInfo = pServerInfo;
 
 	if(NULL == m_pClientMessage)
 	{
 		m_pClientMessage = new CClientMessage();
+		m_pClientMessage->Init(pMailAlert);
 		m_pClientMessage->SetServerName(pServerInfo->m_szServerName);
 	}
 }

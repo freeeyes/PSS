@@ -70,7 +70,7 @@ bool Start()
 		_ServerInfo* pServerInfo = App_MainConfig::instance()->GetServerInfo(i);
 		if(NULL != pServerInfo)
 		{
-			MonitorFSM* pMonitorFSM = g_MonitorFSMManager.Create(pServerInfo);
+			MonitorFSM* pMonitorFSM = g_MonitorFSMManager.Create(pServerInfo, App_MainConfig::instance()->GetMailAlert());
 
 			if(NULL == pMonitorFSM)
 			{
