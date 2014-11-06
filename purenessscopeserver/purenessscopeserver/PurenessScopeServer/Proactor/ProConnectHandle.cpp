@@ -585,7 +585,7 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
 		m_u4AllSendSize += (uint32)result.bytes_to_write();
 
 		//如果需要统计信息
-		App_IPAccount::instance()->UpdateIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
+		//App_IPAccount::instance()->UpdateIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
 		m_ThreadWriteLock.release();
 		
 		//记录水位标
@@ -966,7 +966,7 @@ bool CProConnectHandle::CheckMessage()
 		m_u4AllRecvCount++;
 
 		//如果有需要监控的IP，则记录字节流信息
-		App_IPAccount::instance()->UpdateIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
+		//App_IPAccount::instance()->UpdateIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
 		m_ThreadWriteLock.release();
 
 		ACE_Date_Time dtNow;

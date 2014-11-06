@@ -138,7 +138,11 @@ public:
 			blRet = true;
 		}
 
+		//add by freeyes
+		//IP追踪指令，觉得有些多余，自从增加了别名系统，这个功能就变的多余了。
+		//暂时功能注释掉，不需要再使用
 		//查看这个IP是否属于要追踪的数据流
+		/*
 		if(ACE_OS::strlen(m_szTrackIP) > 0)
 		{
 			if(ACE_OS::strcmp(m_szTrackIP, strIP.c_str()) == 0)
@@ -154,12 +158,14 @@ public:
 				}
 			}
 		}
+		*/
 
 		return blRet;
 	};
 
 	bool CloseIP(string strIP, int nPort, uint32 u4RecvSize, uint32 u4SendSize)
 	{
+		/*
 		ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
 		if(ACE_OS::strlen(m_szTrackIP) > 0)
 		{
@@ -179,12 +185,14 @@ public:
 
 			return false;
 		}
+		*/
 
 		return true;
 	}
 
 	bool UpdateIP(string strIP, int nPort, uint32 u4RecvSize, uint32 u4SendSize)
 	{
+		/*
 		ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
 		if(ACE_OS::strlen(m_szTrackIP) > 0)
 		{
@@ -202,6 +210,7 @@ public:
 
 			return false;
 		}
+		*/
 
 		return true;
 	}

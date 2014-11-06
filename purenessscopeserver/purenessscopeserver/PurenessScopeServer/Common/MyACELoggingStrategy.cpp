@@ -12,7 +12,6 @@
 #include "ace/streams.h"
 
 #include "ace/Lib_Find.h"
-#include "ace/Log_Category.h"
 #include "ace/Reactor.h"
 #include "ace/OS_NS_string.h"
 #include "ace/OS_NS_stdio.h"

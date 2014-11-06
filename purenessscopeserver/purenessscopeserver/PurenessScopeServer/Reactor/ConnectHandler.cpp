@@ -1395,7 +1395,7 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 			m_atvOutput      = ACE_OS::gettimeofday();
 
 			//如果需要统计信息
-			App_IPAccount::instance()->UpdateIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
+			//App_IPAccount::instance()->UpdateIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
 
 			Close();
 			return true;
@@ -1426,7 +1426,7 @@ bool CConnectHandler::CheckMessage()
 	m_u4AllRecvCount++;
 
 	//如果需要统计信息
-	App_IPAccount::instance()->UpdateIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
+	//App_IPAccount::instance()->UpdateIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
 
 	ACE_Date_Time dtNow;
 	if(false == m_TimeConnectInfo.RecvCheck((uint8)dtNow.minute(), 1, m_u4AllRecvSize))
