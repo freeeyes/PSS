@@ -146,6 +146,7 @@ int CConsoleHandler::open(void*)
 	//int nOverTime = MAX_MSG_SENDTIMEOUT;
 	//ACE_OS::setsockopt(this->get_handle(), SOL_SOCKET, SO_SNDTIMEO, (char* )&nOverTime, sizeof(nOverTime));
 	m_pPacketParse = new CConsolePacketParse();
+	m_pPacketParse->Init();
 
 	if (NULL == m_pPacketParse)
 	{
@@ -212,11 +213,11 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
 			m_pPacketParse->GetMessageBody()->release();
 		}
 
-		if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageBody() != m_pCurrMessage)
+		if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageHead() != m_pCurrMessage)
 		{
 			m_pCurrMessage->release();
-			m_pCurrMessage = NULL;
 		}
+		m_pCurrMessage = NULL;
 
 		SAFE_DELETE(m_pPacketParse);
 		return -1;
@@ -240,7 +241,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
 			m_pPacketParse->GetMessageBody()->release();
 		}
 
-		if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageBody() != m_pCurrMessage)
+		if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageHead() != m_pCurrMessage)
 		{
 			m_pCurrMessage->release();
 			m_pCurrMessage = NULL;
@@ -269,7 +270,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
 			m_pPacketParse->GetMessageBody()->release();
 		}
 
-		if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageBody() != m_pCurrMessage)
+		if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageHead() != m_pCurrMessage)
 		{
 			m_pCurrMessage->release();
 			m_pCurrMessage = NULL;
@@ -298,7 +299,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
 		if (u4PacketBodyLen >= MAX_MSG_PACKETLENGTH || u4PacketBodyLen <= 0)
 		{
 			m_u4CurrSize = 0;
-			OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_read_stream]u4PacketHeadLen(%d) more than MAX_MSG_PACKETLENGTH.", u4PacketBodyLen));
+			OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_read_stream]u4PacketHeadLen(%d) more than MAX_MSG_PACKETLENGTH.\n", u4PacketBodyLen));
 
 			if (m_pPacketParse->GetMessageHead() != NULL)
 			{
@@ -310,11 +311,14 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
 				m_pPacketParse->GetMessageBody()->release();
 			}
 
-			if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageBody() != m_pCurrMessage)
+			OUR_DEBUG((LM_INFO, "[CConsoleHandler::handle_read_stream]m_pCurrMessage=0x%08x, m_pPacketParse->GetMessageHead()=0x%08x.\n", 
+				m_pCurrMessage, m_pPacketParse->GetMessageHead()));
+			if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageHead() != m_pCurrMessage)
 			{
+				OUR_DEBUG((LM_INFO, "[CConsoleHandler::handle_read_stream]!!!.\n"));
 				m_pCurrMessage->release();
-				m_pCurrMessage = NULL;
 			}
+			m_pCurrMessage = NULL;
 
 			SAFE_DELETE(m_pPacketParse);
 			return -1;
@@ -340,7 +344,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
 					m_pPacketParse->GetMessageBody()->release();
 				}
 
-				if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageBody() != m_pCurrMessage)
+				if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageHead() != m_pCurrMessage)
 				{
 					m_pCurrMessage->release();
 					m_pCurrMessage = NULL;

@@ -61,5 +61,6 @@ public:
     uint32                      m_u4RecvSize;        //接受字节数
     uint32                      m_u4RecvCount;       //接受数据包数
     uint32                      m_u4CostTime;        //消息处理总时间
+    em_State                    m_emState;           //数据包状态 
 };
 #endif

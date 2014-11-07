@@ -87,9 +87,14 @@ int CMonitorFSMManager::handle_timeout(const ACE_Time_Value& tv, const void* arg
 		int nServerID = pMonitorFSM->GetServerID();
 		sprintf_safe(szMonitorText, 100, "%s Monitor -a", pMonitorFSM->GetKey());
 
+		char szSendMessage[MAX_BUFF_200] = {'\0'};
+		int nSendLen = (int)ACE_OS::strlen(szMonitorText);
+		ACE_OS::memcpy(szSendMessage, &nSendLen, sizeof(int));
+		ACE_OS::memcpy(&szSendMessage[4], &szMonitorText, nSendLen);
+
 		App_ClientReConnectManager::instance()->SendData(nServerID, 
-			szMonitorText, 
-			(int)strlen(szMonitorText), false);
+			szSendMessage, 
+			nSendLen + sizeof(int), false);
 
 #endif
 	}

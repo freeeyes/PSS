@@ -140,7 +140,6 @@ void CLogFile::ReWriteFile()
 
 void CLogFile::DoLog(const char* fmt, ...)
 {
-	char szDateBuff[MAX_BUFF_100] = {'\0'};
 	char szLog[MAX_BUFF_1000]     = {'\0'};
 
 	va_list ap;

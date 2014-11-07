@@ -1,4 +1,3 @@
-#include "ace/ace.h"
 #include "ace/OS_main.h"
 #include "MainConfig.h"
 #ifdef WIN32
@@ -30,7 +29,7 @@ bool Init()
 	App_ClientProConnectManager::instance()->Init(App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE));
 	App_ClientProConnectManager::instance()->StartConnectTask(nReConnectTime);
 #else
-	bool blState = App_ReactorManager::instance()->AddNewReactor(i, Reactor_DEV_POLL, 1, 1000);
+	bool blState = App_ReactorManager::instance()->AddNewReactor(REACTOR_CLIENTDEFINE, Reactor_DEV_POLL, 1, 1000);
 	if(!blState)
 	{
 		OUR_DEBUG((LM_INFO, "[Init]AddNewReactor [%d] Error.\n", REACTOR_CLIENTDEFINE));

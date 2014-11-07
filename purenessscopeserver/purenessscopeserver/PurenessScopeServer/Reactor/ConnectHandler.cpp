@@ -261,6 +261,7 @@ int CConnectHandler::open(void*)
 	m_u8RecvQueueTimeCost = 0;
 	m_u4RecvQueueCount    = 0;
 	m_u8SendQueueTimeCost = 0;
+	m_u4CurrSize          = 0;
 
 	m_u4ReadSendSize      = 0;
 	m_u4SuccessSendSize   = 0;
@@ -1442,6 +1443,8 @@ bool CConnectHandler::CheckMessage()
 			m_TimeConnectInfo.m_u4RecvSize);
 
 		App_PacketParsePool::instance()->Delete(m_pPacketParse);
+		m_pPacketParse = NULL;
+
 		//ÉèÖÃ·â½ûÊ±¼ä
 		App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), App_MainConfig::instance()->GetIPAlert()->m_u4IPTimeout);
 		OUR_DEBUG((LM_ERROR, "[CConnectHandle::CheckMessage] ConnectID = %d, PutMessageBlock is check invalid.\n", GetConnectID()));
@@ -1452,6 +1455,8 @@ bool CConnectHandler::CheckMessage()
 	if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_PARSE, m_pPacketParse))
 	{
 		App_PacketParsePool::instance()->Delete(m_pPacketParse);
+		m_pPacketParse = NULL;
+
 		OUR_DEBUG((LM_ERROR, "[CConnectHandle::CheckMessage] ConnectID = %d, PutMessageBlock is error.\n", GetConnectID()));
 	}
 
@@ -1536,6 +1541,7 @@ void CConnectHandler::ClearPacketParse()
 	m_pCurrMessage = NULL;
 
 	App_PacketParsePool::instance()->Delete(m_pPacketParse);
+	m_pPacketParse = NULL;
 }
 
 void CConnectHandler::SetConnectName(const char* pName)

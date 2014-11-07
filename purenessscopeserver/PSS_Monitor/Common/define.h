@@ -64,6 +64,14 @@ static bool Convert_Version(int nTagVserion)
 #define CONVERT_ACE_VERSION Convert_Version(6200)
 */
 
+#define CONSOLE_HEAD_SIZE     6
+
+enum em_State
+{
+	MESSAGE_HEAD = 0,
+	MESSAGE_BODY,
+};
+
 //根据不同的操作系统，定义不同的recv接收参数类型
 #ifdef WIN32
 #define MSG_NOSIGNAL          0            //信号量参数（WINDOWS）

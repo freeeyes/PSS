@@ -38,6 +38,13 @@ bool CConnectClient::Close()
         OUR_DEBUG((LM_ERROR, "[CConnectClient::Close]Close(%s:%d) OK.\n", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
         //删除链接对象
         App_ClientReConnectManager::instance()->CloseByClient(m_nServerID);
+        	
+				//删除对象缓冲的m_pCurrMessage
+				if(m_pCurrMessage != NULL)
+				{
+					m_pCurrMessage->release();
+				}
+        	
         //回归用过的指针
         delete this;
         return true;
@@ -94,20 +101,25 @@ int CConnectClient::open(void* p)
     m_u4RecvSize        = 0;
     m_u4RecvCount       = 0;
     m_u4CostTime        = 0;
+    m_u4CurrSize        = 0;
     m_atvBegin          = ACE_OS::gettimeofday();
     m_u4CurrSize        = 0;
+    
     //申请当前的MessageBlock
-    m_pCurrMessage = App_MessageBlockManager::instance()->Create(App_MainConfig::instance()->GetBuffSize());
+    m_pCurrMessage = App_MessageBlockManager::instance()->Create(CONSOLE_HEAD_SIZE);
 
     if (m_pCurrMessage == NULL)
     {
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::RecvClinetPacket] pmb new is NULL.\n"));
+        OUR_DEBUG((LM_ERROR, "[CConnectClient::open] pmb new is NULL.\n"));
         return -1;
     }
+    
+    //OUR_DEBUG((LM_ERROR, "[CConnectClient::open]m_pCurrMessage=0x%08x.\n", m_pCurrMessage));
 
     App_ClientReConnectManager::instance()->SetHandler(m_nServerID, this);
     m_pClientMessage = App_ClientReConnectManager::instance()->GetClientMessage(m_nServerID);
     OUR_DEBUG((LM_INFO, "[CConnectClient::open] Connection from [%s:%d]\n", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
+    m_emState = MESSAGE_HEAD;
     return 0;
 }
 
@@ -120,15 +132,15 @@ int CConnectClient::handle_input(ACE_HANDLE fd)
 
         if (NULL != m_pClientMessage)
         {
-			_ClientIPInfo objServerIPInfo;
-			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-			objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+						_ClientIPInfo objServerIPInfo;
+						sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+						objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
             m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
         }
 
         return -1;
     }
-
+    
     //判断缓冲是否为NULL
     if (m_pCurrMessage == NULL)
     {
@@ -138,10 +150,10 @@ int CConnectClient::handle_input(ACE_HANDLE fd)
 
         if (NULL != m_pClientMessage)
         {
-			_ClientIPInfo objServerIPInfo;
-			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-			objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
-			m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+					_ClientIPInfo objServerIPInfo;
+					sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+					objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+					m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
         }
 
         return -1;
@@ -194,18 +206,47 @@ int CConnectClient::RecvData()
     }
 
     m_pCurrMessage->wr_ptr(nDataLen);
-
-    if (NULL != m_pClientMessage)
-    {
-        //接收数据，返回给逻辑层，自己不处理整包完整性判定
-		_ClientIPInfo objServerIPInfo;
-		sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-		objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
-        m_pClientMessage->RecvData(m_pCurrMessage, objServerIPInfo);
-    }
-
-    m_pCurrMessage->reset();
     
+    m_u4CurrSize += nDataLen;
+    
+		//如果没有读完，短读
+		if(m_pCurrMessage->size() > m_u4CurrSize)
+		{
+			return 0;
+		}
+		
+		if(MESSAGE_HEAD == m_emState) 
+		{
+			//接收包头成功
+			m_emState = MESSAGE_BODY;
+		
+			//判断包头长度
+			int nBodyLen = 0;
+			ACE_OS::memcpy(&nBodyLen, m_pCurrMessage->rd_ptr(), sizeof(uint32));
+			OUR_DEBUG((LM_ERROR, "[CConnectClient::handle_input]nBodyLen=%d.\n", nBodyLen));
+			
+			m_pCurrMessage->release();	
+			nBodyLen -= 2;
+			m_pCurrMessage = App_MessageBlockManager::instance()->Create(nBodyLen);
+					
+			return 0;
+		}
+
+    if (NULL != m_pClientMessage && m_emState == MESSAGE_BODY)
+    {
+        //接收数据，返回给逻辑层
+				_ClientIPInfo objServerIPInfo;
+				sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+				objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+		
+        m_pClientMessage->RecvData(m_pCurrMessage, objServerIPInfo);
+        
+        //重新组建包头
+        m_pCurrMessage->release();
+        m_pCurrMessage = App_MessageBlockManager::instance()->Create(CONSOLE_HEAD_SIZE);
+        
+        m_emState = MESSAGE_HEAD;
+    }    
     return 0;	
 }
 
