@@ -819,7 +819,6 @@ ACE_INET_Addr CClientProConnectManager::GetServerAddr(int nServerID)
 
 bool CClientProConnectManager::SetServerConnectState(int nServerID, EM_Server_Connect_State objState)
 {
-	ACE_INET_Addr remote_addr;
 	//检查当前连接是否是活跃的
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 	mapProactorClientInfo::iterator f = m_mapClientInfo.find(nServerID);
@@ -833,6 +832,27 @@ bool CClientProConnectManager::SetServerConnectState(int nServerID, EM_Server_Co
 	{
 		CProactorClientInfo* pClientInfo = (CProactorClientInfo* )f->second;
 		pClientInfo->SetServerConnectState(objState);
+		return true;
+	}
+}
+
+bool CClientProConnectManager::GetServerIPInfo(int nServerID, _ClientIPInfo& objServerIPInfo)
+{
+	//检查当前连接是否是活跃的
+	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
+	mapProactorClientInfo::iterator f = m_mapClientInfo.find(nServerID);
+	if(f == m_mapClientInfo.end())
+	{
+		//如果这个链接已经存在，则不创建新的链接
+		//OUR_DEBUG((LM_ERROR, "[GetConnectState::Close]nServerID =(%d) is exist.\n", nServerID));
+		return false;
+	}
+	else
+	{
+		CProactorClientInfo* pClientInfo = (CProactorClientInfo* )f->second;
+		ACE_INET_Addr remote_addr = pClientInfo->GetServerAddr();
+		sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_50, remote_addr.get_host_addr());
+		objServerIPInfo.m_nPort = remote_addr.get_port_number();
 		return true;
 	}
 }

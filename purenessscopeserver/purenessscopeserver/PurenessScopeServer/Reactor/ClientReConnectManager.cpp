@@ -822,3 +822,24 @@ bool CClientReConnectManager::SetServerConnectState(int nServerID, EM_Server_Con
 		return true;
 	}
 }
+
+bool CClientReConnectManager::GetServerIPInfo( int nServerID, _ClientIPInfo& objServerIPInfo )
+{
+	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
+	mapReactorConnectInfo::iterator f = m_mapConnectInfo.find(nServerID);
+
+	if (f == m_mapConnectInfo.end())
+	{
+		//如果这个链接已经存在，则不创建新的链接
+		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]nServerID =(%d) is exist.\n", nServerID));
+		return false;
+	}
+	else
+	{
+		CReactorClientInfo* pClientInfo = (CReactorClientInfo*)f->second;
+		ACE_INET_Addr remote_addr = pClientInfo->GetServerAddr();
+		sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_50, remote_addr.get_host_addr());
+		objServerIPInfo.m_nPort = remote_addr.get_port_number();
+		return true;
+	}
+}

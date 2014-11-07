@@ -82,6 +82,7 @@ public:
 	void GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo);      //返回当前存活链接的信息（TCP）
 	void GetUDPConnectInfo(vecClientConnectInfo& VecClientConnectInfo);   //返回当前存活链接的信息（UDP）
 	EM_Server_Connect_State GetConnectState(int nServerID);               //得到一个当前连接状态
+	bool GetServerIPInfo(int nServerID, _ClientIPInfo& objServerIPInfo);  //得到一个nServerID对应的ServerIP信息 
 
 	virtual int handle_timeout(const ACE_Time_Value &tv, const void *arg);                       //定时检测
 
