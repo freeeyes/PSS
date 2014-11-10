@@ -16,6 +16,7 @@
 #include "ITimerManager.h"
 #include "IModuleMessageManager.h"
 #include "IControlListen.h"
+#include "IModuleInfo.h"
 
 class CServerObject
 {
@@ -42,6 +43,7 @@ public:
 	void SetTimerManager(ActiveTimer* pTimerManager) { m_pTimerManager = pTimerManager; }
 	void SetModuleMessageManager(IModuleMessageManager* pModuleMessageManager) { m_pModuleMessageManager = pModuleMessageManager; }
 	void SetControlListen(IControlListen* pControlListen) { m_pContorlListen = pControlListen; }
+	void SetModuleInfo(IModuleInfo* pModuleInfo) { m_pIModuleInfo = pModuleInfo; }
 
 	IMessageManager*       GetMessageManager() { return m_pIMessageManager; };
 	ILogManager*           GetLogManager() { return m_pLogManager; };
@@ -52,6 +54,7 @@ public:
 	ActiveTimer*           GetTimerManager() { return m_pTimerManager; }
 	IModuleMessageManager* GetModuleMessageManager() { return m_pModuleMessageManager; }
 	IControlListen*        GetControlListen() { return m_pContorlListen; }
+	IModuleInfo*           GetModuleInfo() { return m_pIModuleInfo; }
 
 private:
 	IMessageManager*       m_pIMessageManager;
@@ -63,6 +66,7 @@ private:
 	ActiveTimer*           m_pTimerManager;
 	IModuleMessageManager* m_pModuleMessageManager;
 	IControlListen*        m_pContorlListen;
+	IModuleInfo*           m_pIModuleInfo;
 };
 
 typedef ACE_Singleton<CServerObject, ACE_Null_Mutex> App_ServerObject; 

@@ -33,7 +33,7 @@ struct _ModuleInfo
 	}
 };
 
-class CLoadModule
+class CLoadModule : public IModuleInfo
 {
 public:
 	CLoadModule(void);
@@ -51,6 +51,14 @@ public:
 	_ModuleInfo* GetModuleIndex(int nIndex);
 	_ModuleInfo* GetModuleInfo(const char* pModuleName);
 
+	//插件接口提供相关功能
+	bool GetModuleExist(const char* pModuleName);
+	const char* GetModuleParam(const char* pModuleName);
+	const char* GetModuleFileName(const char* pModuleName);
+	const char* GetModuleFilePath(const char* pModuleName);
+	const char* GetModuleFileDesc(const char* pModuleName);
+	uint16 GetModuleCount();
+	const char* GetModuleName(uint16 u2Index);
 
 private:
 	bool ParseModule(const char* szResourceName, vector<string>& vecModuleName);                     //将字符串解析成数组

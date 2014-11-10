@@ -19,6 +19,8 @@
 	<Message Msg_High_mark="64000" Msg_Low_mark="64000" Msg_Thread="3" Msg_MaxQueue="10000" desc="消息处理线程相关参数设置，" />
 	
 	<Module ModulePath="./" ModuleString="libAutoTest.so" desc="模块加载配置相关参数，ModulePath是路径，ModuleString是模块名称，以逗号隔开"/>
+	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="TcpTestPostd.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/> -->
+	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="TimerTestd.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/> -->	
 	
 	<CoreSetting CoreNeed="0" desc="是否需要打开Core文件支持，0为不需要，1为需要" />
 	<CommandAccount Account="1" FlowAccount="1" desc="Account为1记录统计命令日志，0为不记录，FlowAccount为流量统计，1为开启，0为关闭" />

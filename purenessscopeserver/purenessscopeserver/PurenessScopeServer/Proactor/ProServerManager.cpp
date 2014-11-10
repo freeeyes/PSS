@@ -134,6 +134,7 @@ bool CProServerManager::Init()
 	App_ServerObject::instance()->SetTimerManager((ActiveTimer* )App_TimerManager::instance());
 	App_ServerObject::instance()->SetModuleMessageManager((IModuleMessageManager* )App_ModuleMessageManager::instance());
 	App_ServerObject::instance()->SetControlListen((IControlListen* )App_ProControlListen::instance());
+	App_ServerObject::instance()->SetModuleInfo((IModuleInfo* )App_ModuleLoader::instance());
 
 	return true;
 }

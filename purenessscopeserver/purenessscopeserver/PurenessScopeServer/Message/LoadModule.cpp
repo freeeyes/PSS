@@ -316,3 +316,84 @@ int CLoadModule::SendModuleMessage(const char* pModuleName, uint16 u2CommandID, 
 	return 0;
 }
 
+bool CLoadModule::GetModuleExist(const char* pModuleName)
+{
+	_ModuleInfo* pModuleInfo = m_mapModuleInfo.SearchMapData((string)pModuleName);
+	if(NULL != pModuleInfo)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+const char* CLoadModule::GetModuleParam(const char* pModuleName)
+{
+	_ModuleInfo* pModuleInfo = m_mapModuleInfo.SearchMapData((string)pModuleName);
+	if(NULL != pModuleInfo)
+	{
+		return pModuleInfo->strModuleParam.c_str();
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+const char* CLoadModule::GetModuleFileName(const char* pModuleName)
+{
+	_ModuleInfo* pModuleInfo = m_mapModuleInfo.SearchMapData((string)pModuleName);
+	if(NULL != pModuleInfo)
+	{
+		return pModuleInfo->strModuleName.c_str();
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+const char* CLoadModule::GetModuleFilePath(const char* pModuleName)
+{
+	_ModuleInfo* pModuleInfo = m_mapModuleInfo.SearchMapData((string)pModuleName);
+	if(NULL != pModuleInfo)
+	{
+		return pModuleInfo->strModulePath.c_str();
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+const char* CLoadModule::GetModuleFileDesc(const char* pModuleName)
+{
+	_ModuleInfo* pModuleInfo = m_mapModuleInfo.SearchMapData((string)pModuleName);
+	if(NULL != pModuleInfo)
+	{
+		return pModuleInfo->GetDesc();
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+uint16 CLoadModule::GetModuleCount()
+{
+	return (uint16)m_mapModuleInfo.GetSize();
+}
+
+const char* CLoadModule::GetModuleName(uint16 u2Index)
+{
+	if(u2Index >= (uint16)m_mapModuleInfo.GetSize())
+	{
+		return NULL;
+	}
+	else
+	{
+		return m_mapModuleInfo.GetMapDataKey((int)u2Index).c_str();
+	}
+}
