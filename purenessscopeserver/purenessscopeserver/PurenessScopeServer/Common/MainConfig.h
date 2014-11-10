@@ -25,6 +25,23 @@ struct _ServerInfo
 	}
 };
 
+//单个插件加载相关信息
+struct _ModuleConfig
+{
+	char m_szModuleName[MAX_BUFF_100];
+	char m_szModulePath[MAX_BUFF_200];
+	char m_szModuleParam[MAX_BUFF_200];
+
+	_ModuleConfig()
+	{
+		m_szModuleName[0]  = '\0';
+		m_szModulePath[0]  = '\0';
+		m_szModuleParam[0] = '\0';
+	}
+};
+
+typedef vector<_ModuleConfig> vecModuleConfig;
+
 //远程管理器支持
 //记录允许远程维护接口进入的数据key的内容。
 struct _ConsoleKey
@@ -261,6 +278,9 @@ public:
 	uint32 GetLogFileMaxCnt();
 	char*  GetDebugLevel();
 
+	uint16 GetModuleInfoCount();
+	_ModuleConfig* GetModuleInfo(uint16 u2Index);
+
 	_ConnectAlert*    GetConnectAlert();
 	_IPAlert*         GetIPAlert();
 	_ClientDataAlert* GetClientDataAlert();
@@ -369,7 +389,8 @@ private:
 	vecConsoleClientIP m_vecConsoleClientIP;                  //服务器后台允许的IP
 	vecConsoleKey      m_vecConsoleKey;                       //服务器允许的key值
 	vecCommandAlert    m_vecCommandAlert;                     //命令行告警阀值相关配置
-	vecMailAlert       m_vecMailAlert;                         //报警邮件相关设置 
+	vecMailAlert       m_vecMailAlert;                        //报警邮件相关设置 
+	vecModuleConfig    m_vecModuleConfig;                     //单个模块加载相关信息 
 };
 
 typedef ACE_Singleton<CMainConfig, ACE_Null_Mutex> App_MainConfig;

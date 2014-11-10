@@ -575,6 +575,48 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
 		sprintf_safe(m_szResourceName, MAX_BUFF_200, "%s", pData);
 	}
 
+	//开始获得单例模块相关参数
+	m_vecModuleConfig.clear();
+	TiXmlElement* pNextTiXmlElementModulePath  = NULL;
+	TiXmlElement* pNextTiXmlElementModuleName  = NULL;
+	TiXmlElement* pNextTiXmlElementModuleParam = NULL;
+
+	while(true)
+	{
+		_ModuleConfig objModuleConfig;
+		pData = m_MainConfig.GetData("ModuleInfo", "ModuleSPath", pNextTiXmlElementModulePath);
+		if(pData != NULL)
+		{
+			sprintf_safe(objModuleConfig.m_szModulePath, MAX_BUFF_200, "%s", pData);
+		}
+		else
+		{
+			break;
+		}
+
+		pData = m_MainConfig.GetData("ModuleInfo", "ModuleSName", pNextTiXmlElementModuleName);
+		if(pData != NULL)
+		{
+			sprintf_safe(objModuleConfig.m_szModuleName, MAX_BUFF_100, "%s", pData);
+		}
+		else
+		{
+			break;
+		}
+
+		pData = m_MainConfig.GetData("ModuleInfo", "ModuleSParam", pNextTiXmlElementModuleParam);
+		if(pData != NULL)
+		{
+			sprintf_safe(objModuleConfig.m_szModuleParam, MAX_BUFF_200, "%s", pData);
+		}
+		else
+		{
+			break;
+		}
+
+		m_vecModuleConfig.push_back(objModuleConfig);
+	}
+
 	//开始获得Core相关设定(目前仅限Linux)
 	pData = m_MainConfig.GetData("CoreSetting", "CoreNeed");
 	if(NULL != pData)
@@ -1423,3 +1465,21 @@ _GroupListenInfo* CMainConfig::GetGroupListenInfo()
 {
 	return (_GroupListenInfo* )&m_GroupListenInfo;
 }
+
+uint16 CMainConfig::GetModuleInfoCount()
+{
+	return (uint16)m_vecModuleConfig.size();
+}
+
+_ModuleConfig* CMainConfig::GetModuleInfo(uint16 u2Index)
+{
+	if(u2Index >= (uint16)m_vecModuleConfig.size())
+	{
+		return NULL;
+	}
+	else
+	{
+		return (_ModuleConfig* )&m_vecModuleConfig[u2Index];
+	}
+}
+

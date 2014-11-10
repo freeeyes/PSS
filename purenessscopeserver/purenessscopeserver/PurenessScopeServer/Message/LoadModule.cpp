@@ -31,15 +31,15 @@ void CLoadModule::Close()
 	m_mapModuleInfo.Clear();
 }
 
-bool CLoadModule::LoadModule(const char* szModulePath, const char* szResourceName)
+bool CLoadModule::LoadModule(const char* pModulePath, const char* pResourceName)
 {
 	vector<string> vecModuleName;
 	string strModuleName;
 
 	//将字符串数组解析成单一的模块名称
-	ParseModule(szResourceName, vecModuleName);
+	ParseModule(pResourceName, vecModuleName);
 
-	sprintf_safe(m_szModulePath, MAX_BUFF_200, "%s", szModulePath);
+	sprintf_safe(m_szModulePath, MAX_BUFF_200, "%s", pModulePath);
 
 	for(uint16 i = 0; i < (uint16)vecModuleName.size(); i++)
 	{
@@ -63,7 +63,7 @@ bool CLoadModule::LoadModule(const char* szModulePath, const char* szResourceNam
 		}
 
 		//开始注册模块
-		if(false == LoadModuleInfo(strModuleName, pModuleInfo))
+		if(false == LoadModuleInfo(strModuleName, pModuleInfo, m_szModulePath))
 		{
 			SAFE_DELETE(pModuleInfo);
 			return false;
@@ -88,6 +88,58 @@ bool CLoadModule::LoadModule(const char* szModulePath, const char* szResourceNam
 
 		OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] Begin Load ModuleName[%s] OK!\n", strModuleName.c_str()));
 	}
+
+	return true;
+}
+
+bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, const char* pModuleParam)
+{
+	string strModuleName = (string)pModuleName;
+
+	//确定这个模块是否被注册过
+	_ModuleInfo* pCurr = m_mapModuleInfo.SearchMapData(strModuleName);
+	if(NULL != pCurr)
+	{
+		//如果被注册过，先卸载现有的，再重新装载
+		UnLoadModule(strModuleName.c_str());
+	}
+
+	_ModuleInfo* pModuleInfo = new _ModuleInfo();
+
+	if(NULL == pModuleInfo)
+	{
+		OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] new _ModuleInfo is error!\n"));
+		return false;
+	}
+
+	//记录模块参数
+	pModuleInfo->strModuleParam = (string)pModuleParam;
+
+	//开始注册模块
+	if(false == LoadModuleInfo(strModuleName, pModuleInfo, pModulePath))
+	{
+		SAFE_DELETE(pModuleInfo);
+		return false;
+	}
+
+	//查找此模块是否已经被注册，有则把信息老信息清理
+	_ModuleInfo* pOldModuleInfo = m_mapModuleInfo.SearchMapData(strModuleName);
+	if(NULL != pOldModuleInfo)
+	{
+		//关闭副本
+		ACE_OS::dlclose(pOldModuleInfo->hModule);
+		m_mapModuleInfo.DelMapData(strModuleName, true);
+	}
+
+	//将注册成功的模块，加入到map中
+	if(false == m_mapModuleInfo.AddMapData(pModuleInfo->GetName(), pModuleInfo))
+	{
+		OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] m_mapModuleInfo.AddMapData error!\n"));
+		SAFE_DELETE(pModuleInfo);
+		return false;
+	}
+
+	OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] Begin Load ModuleName[%s] OK!\n", strModuleName.c_str()));
 
 	return true;
 }
@@ -168,7 +220,7 @@ bool CLoadModule::ParseModule(const char* szResourceName, vector<string>& vecMod
 	return true;
 }
 
-bool CLoadModule::LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo)
+bool CLoadModule::LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo, const char* pModulePath)
 {
 	char szModuleFile[MAX_BUFF_200] = {'\0'};
 	if(NULL == pModuleInfo)
@@ -177,9 +229,9 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo)
 		return false;
 	}
 
-	pModuleInfo->strModulePath = m_szModulePath;
+	pModuleInfo->strModulePath = (string)pModulePath;
 
-	sprintf_safe(szModuleFile, MAX_BUFF_200, "%s%s", m_szModulePath, strModuleName.c_str());
+	sprintf_safe(szModuleFile, MAX_BUFF_200, "%s%s", pModulePath, strModuleName.c_str());
 
 	m_tmModule.acquire();
 
