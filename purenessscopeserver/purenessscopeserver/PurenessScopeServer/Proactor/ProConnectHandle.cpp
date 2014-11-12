@@ -1849,6 +1849,20 @@ uint32 CProConnectManager::GetCommandFlowAccount()
 	return m_CommandAccount.GetFlowOut();
 }
 
+bool CProConnectManager::GetConnectState(uint32 u4ConnectID)
+{
+	mapConnectManager::iterator f = m_mapConnectManager.find(u4ConnectID);
+
+	if(f != m_mapConnectManager.end())
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 //*********************************************************************************
 
 CProConnectHandlerPool::CProConnectHandlerPool(void)
@@ -2578,4 +2592,26 @@ void CProConnectManagerGroup::GetCommandFlowAccount(_CommandFlowAccount& objComm
 			objCommandFlowAccount.m_u4FlowOut += u4FlowOut;
 		}
 	}	
+}
+
+bool CProConnectManagerGroup::GetConnectState(uint32 u4ConnectID)
+{
+	//判断命中到哪一个线程组里面去
+	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
+
+	mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
+	if(f == m_mapConnectManager.end())
+	{
+		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnect]Out of range Queue ID.\n"));
+		return false;
+	}
+
+	CProConnectManager* pConnectManager = (CProConnectManager* )f->second;
+	if(NULL == pConnectManager)
+	{
+		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnect]No find send Queue object.\n"));
+		return false;		
+	}
+
+	return pConnectManager->GetConnectState(u4ConnectID);
 }
