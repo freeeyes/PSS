@@ -5,6 +5,7 @@
 #include "IObject.h"
 
 #include <string>
+#include <map>
 
 //定义客户端信令(TCP)
 #define COMMAND_BASE            0x1000
@@ -18,6 +19,7 @@ public:
 	CPostServerData() 
 	{ 
 		m_pServerObject      = NULL;
+		m_u4ServerID         = 0;
 		m_u4ConnectID        = 0;
 		m_u2BufferDataLength = 0;
 	};
@@ -94,6 +96,7 @@ public:
 	void ReConnect(int nServerID)
 	{
 		//数据重连成功接口
+		m_u4ServerID = (uint32)nServerID;
 		OUR_DEBUG((LM_ERROR, "[CPostServerData::ReConnect]ReConnect(%d).\n", nServerID));
 	}
 
@@ -107,12 +110,25 @@ public:
 		m_u4ConnectID = u4ConnectID;
 	}
 
+	void SetServerID(uint32 u4ServerID)
+	{
+		m_u4ServerID = u4ServerID;
+	}
+
+	uint32 GetServerID()
+	{
+		return m_u4ServerID;
+	}
+
 private:
 	CServerObject* m_pServerObject;
+	uint32         m_u4ServerID;
 	uint32         m_u4ConnectID;
 	char           m_szBufferData[MAX_BUFF_1024];    //缓冲数据
 	uint16         m_u2BufferDataLength;             //缓冲长度
 };
+
+typedef map<uint32, CPostServerData*> mapc2s;
 
 class CBaseCommand : public CClientCommand
 {
@@ -125,7 +141,13 @@ public:
 	void InitServer();
 
 private:
+	void AddClient2Server(uint32 u4ClientID);
+	void DelClient2Server(uint32 u4ClientID);
+	CPostServerData* GetClient2Server_ServerID(uint32 u4ClientID);
+	void CloseClient2Server();
+
+private:
 	CServerObject*   m_pServerObject;
 	int              m_nCount;
-	CPostServerData* m_pPostServerData1;  //中间服务器发送对象
+	mapc2s           m_mapC2S;                 //客户端和服务器映射关系 
 };

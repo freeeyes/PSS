@@ -8,7 +8,7 @@ CBaseCommand::CBaseCommand(void)
 
 CBaseCommand::~CBaseCommand(void)
 {
-	delete m_pPostServerData1;
+	CloseClient2Server();
 }
 
 void CBaseCommand::SetServerObject(CServerObject* pServerObject)
@@ -33,12 +33,14 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 	//处理链接建立信息
 	if(pMessage->GetMessageBase()->m_u2Cmd == CLIENT_LINK_CONNECT)
 	{
+		AddClient2Server(pMessage->GetMessageBase()->m_u4ConnectID);
 		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] CLIENT_LINK_CONNECT OK.\n"));
 	}
 
 	//处理链接断开信息
 	if(pMessage->GetMessageBase()->m_u2Cmd == CLIENT_LINK_CDISCONNET)
 	{
+		DelClient2Server(pMessage->GetMessageBase()->m_u4ConnectID);
 		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] CLIENT_LINK_CDISCONNET OK.\n"));
 	}
 
@@ -77,10 +79,15 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 		m_pServerObject->GetPacketManager()->Delete(pBodyPacket);
 
 		//设置当前接收数据的ConnectID，用于收到远程回应信息返回
-		m_pPostServerData1->SetConnectID(pMessage->GetMessageBase()->m_u4ConnectID);
-		if(false == m_pServerObject->GetClientManager()->SendData(1, szPostData, nSendSize, false))
+		//m_pPostServerData1->SetConnectID(pMessage->GetMessageBase()->m_u4ConnectID);
+		CPostServerData* pPostServerData = GetClient2Server_ServerID(pMessage->GetMessageBase()->m_u4ConnectID);
+
+		if(NULL != pPostServerData)
 		{
-			OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] Send Post Data Error.\n"));
+			if(false == m_pServerObject->GetClientManager()->SendData(pPostServerData->GetServerID(), szPostData, nSendSize, false))
+			{
+				OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] Send Post Data Error.\n"));
+			}
 			return 0;
 		}
 	}
@@ -91,14 +98,67 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 
 void CBaseCommand::InitServer()
 {
-	m_pPostServerData1 = new CPostServerData();
+}
+
+void CBaseCommand::AddClient2Server(uint32 u4ClientID)
+{
+	mapc2s::iterator f = m_mapC2S.find(u4ClientID);
+	if(f != m_mapC2S.end())
+	{
+		return;
+	}
+
+	CPostServerData* pPostServerData = new CPostServerData();
 
 	//设置返回客户端需要的发送对象
-	m_pPostServerData1->SetServerObject(m_pServerObject);
+	pPostServerData->SetServerObject(m_pServerObject);
+	pPostServerData->SetConnectID(u4ClientID);
+	pPostServerData->SetServerID(u4ClientID);
 
 	//初始化连接关系
-	m_pServerObject->GetClientManager()->Connect(1, "172.21.1.200", 10040, TYPE_IPV4, (IClientMessage* )m_pPostServerData1);
+	m_pServerObject->GetClientManager()->Connect(u4ClientID, "172.21.0.41", 10040, TYPE_IPV4, (IClientMessage* )pPostServerData);
+
+	m_mapC2S.insert(mapc2s::value_type(u4ClientID, pPostServerData));
+}
+
+void CBaseCommand::DelClient2Server( uint32 u4ClientID )
+{
+	mapc2s::iterator f = m_mapC2S.find(u4ClientID);
+	if(f == m_mapC2S.end())
+	{
+		return;
+	}
+
+	CPostServerData* pPostServerData = (CPostServerData* )f->second;
+	if(NULL != pPostServerData)
+	{
+		uint32 u4ServerID = pPostServerData->GetServerID();
+		m_pServerObject->GetClientManager()->Close(u4ServerID);
+	}
+	m_mapC2S.erase(f);
 
 }
 
+CPostServerData* CBaseCommand::GetClient2Server_ServerID( uint32 u4ClientID )
+{
+	mapc2s::iterator f = m_mapC2S.find(u4ClientID);
+	if(f == m_mapC2S.end())
+	{
+		return NULL;
+	}
+	else
+	{
+		return (CPostServerData* )f->second;
+	}
 
+}
+
+void CBaseCommand::CloseClient2Server()
+{
+	for(mapc2s::iterator b = m_mapC2S.begin(); b != m_mapC2S.end(); b++)
+	{
+		CPostServerData* pPostServerData = (CPostServerData* )b->second;
+		SAFE_DELETE(pPostServerData);
+	}
+	m_mapC2S.clear();
+}
