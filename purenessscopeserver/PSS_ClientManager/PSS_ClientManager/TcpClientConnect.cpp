@@ -105,7 +105,7 @@ bool CTcpClientConnect::SendConsoleMessage( const char* pMessage, int nMessageLe
 
 		//获得数据包长度
 		memcpy_s(&nBodyLen, sizeof(int), szHeadData, sizeof(int));
-		if(nBodyLen <= 0 && nBodyLen >= 10*1024)
+		if(nBodyLen <= 0 || nBodyLen >= 1024*1024)
 		{
 			closesocket(sckClient);
 			return false;

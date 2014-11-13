@@ -99,7 +99,7 @@ public:
 		m_objRing.Init(u4TrackLogCount);
 	};
 
-	bool AddIP(string strIP, int nPort)
+	bool AddIP(string strIP)
 	{
 		ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
 		bool blRet = false;
@@ -163,7 +163,7 @@ public:
 		return blRet;
 	};
 
-	bool CloseIP(string strIP, int nPort, uint32 u4RecvSize, uint32 u4SendSize)
+	bool CloseIP(/* string strIP, int nPort, uint32 u4RecvSize, uint32 u4SendSize */)
 	{
 		/*
 		ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
@@ -190,7 +190,7 @@ public:
 		return true;
 	}
 
-	bool UpdateIP(string strIP, int nPort, uint32 u4RecvSize, uint32 u4SendSize)
+	bool UpdateIP(/* string strIP, int nPort, uint32 u4RecvSize, uint32 u4SendSize */)
 	{
 		/*
 		ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
