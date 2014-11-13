@@ -2446,17 +2446,17 @@ uint32 CConnectManager::GetCommandFlowAccount()
 	return m_CommandAccount.GetFlowOut();
 }
 
-bool CConnectManager::GetConnectState(uint32 u4ConnectID)
+EM_Client_Connect_status CConnectManager::GetConnectState(uint32 u4ConnectID)
 {
 	mapConnectManager::iterator f = m_mapConnectManager.find(u4ConnectID);
 
 	if(f != m_mapConnectManager.end())
 	{
-		return true;
+		return CLIENT_CONNECT_EXIST;
 	}
 	else
 	{
-		return false;
+		return CLIENT_CONNECT_NO_EXIST;
 	}
 }
 
@@ -3163,7 +3163,7 @@ void CConnectManagerGroup::GetCommandFlowAccount(_CommandFlowAccount& objCommand
 	}
 }
 
-bool CConnectManagerGroup::GetConnectState(uint32 u4ConnectID)
+EM_Client_Connect_status CConnectManagerGroup::GetConnectState(uint32 u4ConnectID)
 {
 	//判断命中到哪一个线程组里面去
 	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
@@ -3172,14 +3172,14 @@ bool CConnectManagerGroup::GetConnectState(uint32 u4ConnectID)
 	if(f == m_mapConnectManager.end())
 	{
 		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnect]Out of range Queue ID.\n"));
-		return false;
+		return CLIENT_CONNECT_NO_EXIST;
 	}
 
 	CConnectManager* pConnectManager = (CConnectManager* )f->second;
 	if(NULL == pConnectManager)
 	{
 		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnect]No find send Queue object.\n"));
-		return false;		
+		return CLIENT_CONNECT_NO_EXIST;		
 	}
 
 	return pConnectManager->GetConnectState(u4ConnectID);

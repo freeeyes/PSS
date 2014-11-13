@@ -144,17 +144,13 @@ int CProactorClientInfo::GetServerID()
 
 bool CProactorClientInfo::Close()
 {
-	if(NULL == m_pProConnectClient)
-	{
-		return false;
-	}
-	else
+	if(NULL != m_pProConnectClient)
 	{
 		m_pProConnectClient->ClientClose();
-		return true;
+		SetProConnectClient(NULL);
 	}
 
-	SAFE_DELETE(m_pClientMessage);
+	return true;
 }
 
 void CProactorClientInfo::SetProConnectClient(CProConnectClient* pProConnectClient)
@@ -425,7 +421,7 @@ bool CClientProConnectManager::Close(int nServerID)
 		pClientInfo->GetProConnectClient()->ClientClose();
 	}
 
-	pClientInfo->SetProConnectClient(NULL);
+	pClientInfo->Close();
 	SAFE_DELETE(pClientInfo);
 	//从map里面删除当前存在的对象
 	m_mapClientInfo.erase(f);

@@ -131,20 +131,14 @@ int CReactorClientInfo::GetServerID()
 bool CReactorClientInfo::Close()
 {
 	//OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::Close]Begin.\n"));
-	if (NULL == m_pConnectClient)
+	if (NULL != m_pConnectClient)
 	{
-		OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::Close]End 1.\n", m_pClientMessage));
-		m_pClientMessage = NULL;
-		return false;
-	}
-	else
-	{
-		OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::Close]End 2.\n"));
-		m_pClientMessage = NULL;
-		m_pConnectClient->SetClientMessage(NULL);
+		//OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::Close]End 2.\n"));
 		m_pConnectClient->ClinetClose();
-		return true;
+		SetConnectClient(NULL);
 	}
+
+	return true;
 }
 
 void CReactorClientInfo::SetConnectClient(CConnectClient* pConnectClient)
@@ -427,7 +421,7 @@ bool CClientReConnectManager::Close(int nServerID)
 		pClientInfo->GetConnectClient()->ClinetClose();
 	}
 
-	pClientInfo->SetConnectClient(NULL);
+	pClientInfo->Close();
 	SAFE_DELETE(pClientInfo);
 	//从map里面删除当前存在的对象
 	m_mapConnectInfo.erase(f);

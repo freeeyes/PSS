@@ -4,6 +4,12 @@
 #include "IBuffPacket.h"
 #include <vector>
 
+enum EM_Client_Connect_status
+{
+	CLIENT_CONNECT_EXIST = 0,
+	CLIENT_CONNECT_NO_EXIST,
+};
+
 class IConnectManager
 {
 public:
@@ -35,7 +41,7 @@ public:
 	//得到指定Name的相关ConnectID映射信息
 	virtual void GetClientNameInfo(const char* pName, vecClientNameInfo& objClientNameInfo)                      = 0;
 	//得到指定的客户端连接状态,false为链接不存在，true为链接存在
-	virtual bool GetConnectState(uint32 u4ConnectID)                                                             = 0;
+	virtual EM_Client_Connect_status GetConnectState(uint32 u4ConnectID)                                         = 0;
 };
 
 #endif

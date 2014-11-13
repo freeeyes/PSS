@@ -182,7 +182,7 @@ public:
 
 	bool SetConnectName(uint32 u4ConnectID, const char* pName);                                  //设置当前连接名称
 	bool SetIsLog(uint32 u4ConnectID, bool blIsLog);                                             //设置当前连接数据是否写入日志  
-	bool GetConnectState(uint32 u4ConnectID);
+	EM_Client_Connect_status GetConnectState(uint32 u4ConnectID);                                //得到指定的连接状态 
 
 private:
 	bool IsRun();
@@ -262,7 +262,7 @@ public:
 	bool StartTimer();                                                                                       //开启定时器
 	const char* GetError();
 	void GetCommandFlowAccount(_CommandFlowAccount& objCommandFlowAccount);                                  //得到出口流量信息
-	bool GetConnectState(uint32 u4ConnectID);
+	EM_Client_Connect_status GetConnectState(uint32 u4ConnectID);
 
 private:
 	uint32 GetGroupIndex();                                                                                  //得到当前链接的ID自增量
