@@ -470,7 +470,6 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
 
             OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, error = %d.\n", GetServerID(), errno));
             pmblk->release();
-            Close();
             return false;
         }
         else if (nDataLen + nIsSendSize >= nSendLen)  //当数据包全部发送完毕，清空。

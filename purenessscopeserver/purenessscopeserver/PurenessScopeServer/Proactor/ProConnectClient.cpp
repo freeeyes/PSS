@@ -244,7 +244,6 @@ bool CProConnectClient::SendData(ACE_Message_Block* pmblk)
 				objServerIPInfo.m_nPort = m_AddrRemote.get_port_number();
 				m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
 			}
-			Close();
 			return false;
 		}
 
