@@ -88,8 +88,7 @@ bool CReactorClientInfo::SendData(ACE_Message_Block* pmblk)
 		//如果连接正在建立过程中，等待5毫秒，如果
 		if(SERVER_CONNECT_FIRST == m_emConnectState || SERVER_CONNECT_RECONNECT == m_emConnectState)
 		{
-			ACE_Time_Value tvSleep(0, WAIT_FOR_RECONNECT_FINISH);
-			ACE_OS::sleep(tvSleep);
+			return false;
 		}
 
 		if (NULL == m_pConnectClient)
@@ -648,9 +647,6 @@ int CClientReConnectManager::handle_timeout(const ACE_Time_Value& tv, const void
 		{
 			//如果连接不存在，则重新建立连接
 			pClientInfo->Run(m_blReactorFinish);
-			//自动休眠0.1秒
-			ACE_Time_Value tvSleep(0, m_u4ConnectServerTimeout);
-			ACE_OS::sleep(tvSleep);
 		}
 	}
 
@@ -767,9 +763,6 @@ bool CClientReConnectManager::ReConnect(int nServerID)
 	{
 		//如果连接不存在，则重新建立连接
 		pClientInfo->Run(m_blReactorFinish);
-		//自动休眠0.1秒
-		ACE_Time_Value tvSleep(0, m_u4ConnectServerTimeout);
-		ACE_OS::sleep(tvSleep);
 		return true;
 	}
 	else

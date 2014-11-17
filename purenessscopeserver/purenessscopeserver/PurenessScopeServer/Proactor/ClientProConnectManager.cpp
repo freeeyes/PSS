@@ -95,8 +95,7 @@ bool CProactorClientInfo::SendData(ACE_Message_Block* pmblk)
 		//如果连接正在建立过程中，等待5毫秒，如果
 		if(SERVER_CONNECT_FIRST == m_emConnectState || SERVER_CONNECT_RECONNECT == m_emConnectState)
 		{
-			ACE_Time_Value tvSleep(0, WAIT_FOR_PROCONNECT_FINISH);
-			ACE_OS::sleep(tvSleep);
+			return false;
 		}
 
 		if(NULL == m_pProConnectClient)
@@ -277,10 +276,6 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, int nPort
 	m_mapClientInfo[nServerID] = pClientInfo;
 	OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) connect is OK.\n", nServerID));
 
-	//自动休眠0.1秒
-	ACE_Time_Value tvSleep(0, m_u4ConnectServerTimeout);
-	ACE_OS::sleep(tvSleep);
-
 	return true;
 }
 
@@ -318,10 +313,6 @@ bool CClientProConnectManager::Connect( int nServerID, const char* pIP, int nPor
 	//链接已经建立，添加进map
 	m_mapClientInfo[nServerID] = pClientInfo;
 	OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) connect is OK.\n", nServerID));
-
-	//自动休眠0.1秒
-	ACE_Time_Value tvSleep(0, m_u4ConnectServerTimeout);
-	ACE_OS::sleep(tvSleep);
 
 	return true;
 }
@@ -656,9 +647,6 @@ int CClientProConnectManager::handle_timeout(const ACE_Time_Value &tv, const voi
 			//如果连接不存在，则重新建立连接
 			pClientInfo->Run(m_blProactorFinish);
 
-			//自动休眠0.1秒
-			ACE_Time_Value tvSleep(0, m_u4ConnectServerTimeout);
-			ACE_OS::sleep(tvSleep);
 		}
 	}
 	return 0;
@@ -777,11 +765,6 @@ bool CClientProConnectManager::ReConnect(int nServerID)
 	{
 		//如果连接不存在，则重新建立连接
 		pClientInfo->Run(m_blProactorFinish);
-
-		//自动休眠0.1秒
-		ACE_Time_Value tvSleep(0, m_u4ConnectServerTimeout);
-		ACE_OS::sleep(tvSleep);
-
 		return true;
 	}
 	else
