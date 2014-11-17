@@ -18,7 +18,28 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#include "WaitQuitSignal.h"
 #include "ServerManager.h"
+
+//监控信号量线程
+void *thread_Monitor(void *arg)
+{
+	if(NULL != arg)
+	{
+		OUR_DEBUG((LM_INFO, "[thread_Monitor]arg is not NULL.\n")); 
+		pthread_exit(0);
+	}	
+	
+	bool blFlag = true;
+	while(WaitQuitSignal::wait(blFlag))
+	{ 
+		//OUR_DEBUG((LM_INFO, "[thread_Monitor]blFlag=false.\n")); 
+  	sleep(1);
+  }
+  
+  OUR_DEBUG((LM_INFO, "[thread_Monitor]exit.\n")); 
+  pthread_exit(0);
+}
 
 int CheckCoreLimit(int nMaxCoreFile)
 {
@@ -195,6 +216,12 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 	{
 		return 0;
 	}
+	
+	//设置监控信号量的线程
+	WaitQuitSignal::init();
+	
+	pthread_t tid;
+	pthread_create(&tid, NULL, thread_Monitor, NULL);		
 
 	//判断是否是需要以服务的状态启动
 	if(App_MainConfig::instance()->GetServerType() == 1)
@@ -212,6 +239,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 		getchar();
 	}
 
+	OUR_DEBUG((LM_INFO, "[CServerManager::Start]Begin.\n"));
 	if(!App_ServerManager::instance()->Start())
 	{
 		OUR_DEBUG((LM_INFO, "[main]App_ServerManager::instance()->Start() error.\n"));

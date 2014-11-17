@@ -121,17 +121,6 @@ bool CAceReactor::Init(int nReactorType, int nThreadCount, int nMaxHandleCount)
                     throw "[CAceReactor::Init]New ACE_Dev_Poll_Reactor Error.";
                 }
 
-                /*
-                int nDevOpen = devreactor->open(MAX_DEV_POLL_COUNT);
-                if(nDevOpen == -1)
-                {
-                    int nErr = errno;
-                    char szError[MAX_BUFF_200] = {'\0'};
-                    sprintf_safe(szError, MAX_BUFF_200, "[CAceReactor::Init]ACE_Dev_Poll_Reactor Open Error = (%d).", nErr);
-
-                    throw szError;
-                }
-                */
                 m_pReactor = new ACE_Reactor(devreactor, 1);
 
                 if (NULL == m_pReactor)
@@ -142,37 +131,25 @@ bool CAceReactor::Init(int nReactorType, int nThreadCount, int nMaxHandleCount)
                 m_nReactorType = Reactor_DEV_POLL;
                 break;
             }
+			case Reactor_DEV_POLL_ET:
+			{
+				My_ACE_Dev_Poll_Reactor* devreactor = new My_ACE_Dev_Poll_Reactor(nMaxHandleCount);
 
-						case Reactor_DEV_POLL_ET:
-						{
-								My_ACE_Dev_Poll_Reactor* devreactor = new My_ACE_Dev_Poll_Reactor(nMaxHandleCount);
-			
-								if (NULL == devreactor)
-								{
-									throw "[CAceReactor::Init]New ACE_Dev_Poll_Reactor Error.";
-								}
-			
-								/*
-								int nDevOpen = devreactor->open(MAX_DEV_POLL_COUNT);
-								if(nDevOpen == -1)
-								{
-								int nErr = errno;
-								char szError[MAX_BUFF_200] = {'\0'};
-								sprintf_safe(szError, MAX_BUFF_200, "[CAceReactor::Init]ACE_Dev_Poll_Reactor Open Error = (%d).", nErr);
-			
-								throw szError;
-								}
-								*/
-								m_pReactor = new ACE_Reactor(devreactor, 1);
-			
-								if (NULL == m_pReactor)
-								{
-									throw "[CAceReactor::Init]New m_pReactor Error[ACE_Dev_Poll_Reactor].";
-								}
-			
-								m_nReactorType = Reactor_DEV_POLL_ET;
-								break;
-						}
+				if (NULL == devreactor)
+				{
+					throw "[CAceReactor::Init]New ACE_Dev_Poll_Reactor Error.";
+				}
+
+				m_pReactor = new ACE_Reactor(devreactor, 1);
+
+				if (NULL == m_pReactor)
+				{
+					throw "[CAceReactor::Init]New m_pReactor Error[ACE_Dev_Poll_Reactor].";
+				}
+
+				m_nReactorType = Reactor_DEV_POLL_ET;
+				break;
+			}
 #endif
         }
 
