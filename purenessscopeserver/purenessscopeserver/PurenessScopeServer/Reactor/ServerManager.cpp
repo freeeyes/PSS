@@ -159,11 +159,6 @@ bool CServerManager::Init()
 
 bool CServerManager::Start()
 {
-	if (0 != App_SigHandler::instance()->RegisterSignal(ACE_Reactor::instance()))
-	{
-		return false;
-	}	
-
 	//Æô¶¯TCP¼àÌý
 	int nServerPortCount = App_MainConfig::instance()->GetServerPortCount();
 

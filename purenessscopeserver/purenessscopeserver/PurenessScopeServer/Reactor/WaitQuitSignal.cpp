@@ -12,7 +12,8 @@
  *  Created on: Aug 14, 2011 
  *      Author: xian0617 
  */  
-  
+
+#ifndef WIN32
 #include <iostream>  
 #include "WaitQuitSignal.h"  
 #include "ServerManager.h"
@@ -48,7 +49,7 @@ bool WaitQuitSignal::wait(bool &blFlag)
   	case SIGINT:  
   	case SIGQUIT:  
   	case SIGTERM:  
-   		App_ReactorManager::instance()->Close();
+   		App_ServerManager::instance()->Close();
    		blFlag = false;
    		break;  
  		default:  
@@ -59,5 +60,6 @@ bool WaitQuitSignal::wait(bool &blFlag)
  	{  
   	std::cerr << "exception: " << e.what() << std::endl;  
  	}  
- 	return flag;  
+ 	return blFlag;  
 }  
+#endif

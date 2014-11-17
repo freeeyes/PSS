@@ -15,7 +15,6 @@
 #include "ConsoleAccept.h"
 #include "AceReactorManager.h"
 #include "MessageService.h"
-#include "SigHandle.h"
 #include "LoadModule.h"
 #include "LogManager.h"
 #include "FileLogger.h"

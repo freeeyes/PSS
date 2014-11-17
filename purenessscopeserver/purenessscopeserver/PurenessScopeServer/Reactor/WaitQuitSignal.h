@@ -8,6 +8,7 @@
 #ifndef WAITQUITSIGNAL_H_  
 #define WAITQUITSIGNAL_H_  
 
+#ifndef WIN32
 #include <signal.h>  
 #include <time.h>  
 #include <pthread.h>
@@ -21,5 +22,6 @@ private:
     static sigset_t m_wait_mask;  
     static struct timespec m_time;  
 };  
-  
+
+#endif
 #endif /* WAITQUITSIGNAL_H_ */  
