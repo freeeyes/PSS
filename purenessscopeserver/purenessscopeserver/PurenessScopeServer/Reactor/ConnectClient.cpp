@@ -12,6 +12,7 @@ CConnectClient::CConnectClient(void)
     m_u4RecvCount       = 0;
     m_u4CostTime        = 0;
     m_u4MaxPacketSize   = MAX_MSG_PACKETLENGTH;
+	m_ems2s             = S2S_NEED_CALLBACK;
 }
 
 CConnectClient::~CConnectClient(void)
@@ -35,8 +36,10 @@ bool CConnectClient::Close()
         //msg_queue()->deactivate();
         shutdown();
         OUR_DEBUG((LM_ERROR, "[CConnectClient::Close]Close(%s:%d) OK.\n", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
-        //删除链接对象
-        App_ClientReConnectManager::instance()->CloseByClient(m_nServerID);
+        
+		//删除链接对象
+		App_ClientReConnectManager::instance()->CloseByClient(m_nServerID);
+
         //回归用过的指针
         delete this;
         return true;
@@ -45,9 +48,17 @@ bool CConnectClient::Close()
     return false;
 }
 
-void CConnectClient::ClinetClose()
+void CConnectClient::ClinetClose(EM_s2s& ems2s)
 {
+	m_ems2s = ems2s;
     //msg_queue()->deactivate();
+
+	//如果对象已经在外面释放，则不需要再次回调
+	if(ems2s == S2S_INNEED_CALLBACK)
+	{
+		SetClientMessage(NULL);
+	}
+
     shutdown();
 }
 
@@ -122,7 +133,11 @@ int CConnectClient::handle_input(ACE_HANDLE fd)
 			_ClientIPInfo objServerIPInfo;
 			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
 			objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
-            m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+
+			if(S2S_NEED_CALLBACK == m_ems2s)
+			{
+				m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+			}
         }
 
         return -1;
@@ -140,7 +155,11 @@ int CConnectClient::handle_input(ACE_HANDLE fd)
 			_ClientIPInfo objServerIPInfo;
 			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
 			objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
-			m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+
+			if(S2S_NEED_CALLBACK == m_ems2s)
+			{
+				m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+			}
         }
 
         return -1;
@@ -173,7 +192,11 @@ int CConnectClient::RecvData()
 			_ClientIPInfo objServerIPInfo;
 			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
 			objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
-			m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+
+			if(S2S_NEED_CALLBACK == m_ems2s)
+			{
+				m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+			}
         }
 
         return -1;
@@ -193,7 +216,11 @@ int CConnectClient::RecvData()
 			_ClientIPInfo objServerIPInfo;
 			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
 			objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
-			m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+
+			if(S2S_NEED_CALLBACK == m_ems2s)
+			{
+				m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+			}
         }
 
         return -1;
@@ -266,7 +293,11 @@ int CConnectClient::RecvData_et()
 			_ClientIPInfo objServerIPInfo;
 			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
 			objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
-			m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+
+			if(S2S_NEED_CALLBACK == m_ems2s)
+			{
+				m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+			}
         }
 
         return -1;
@@ -294,7 +325,11 @@ int CConnectClient::RecvData_et()
 				_ClientIPInfo objServerIPInfo;
 				sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
 				objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
-				m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+
+				if(S2S_NEED_CALLBACK == m_ems2s)
+				{
+					m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+				}
 	        }
 	
 	        return -1;
@@ -467,6 +502,11 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
                 ACE_OS::sleep(tvSleep);
                 continue;
             }
+
+			_ClientIPInfo objServerIPInfo;
+			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+			objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+			m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
 
             OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, error = %d.\n", GetServerID(), errno));
             pmblk->release();

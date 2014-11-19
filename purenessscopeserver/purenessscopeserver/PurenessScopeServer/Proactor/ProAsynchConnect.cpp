@@ -60,7 +60,7 @@ int CProAsynchConnect::validate_connection(const ACE_Asynch_Connect::Result& res
 	}
 	
 	
-	OUR_DEBUG((LM_ERROR, "[CProactorClientInfo::Run]Connect IP=%s,Port=%d OK.\n", remote.get_host_addr(), remote.get_port_number()));
+	//OUR_DEBUG((LM_ERROR, "[CProAsynchConnect::validate_connection]Connect IP=%s,Port=%d OK.\n", remote.get_host_addr(), remote.get_port_number()));
 	return 0;
 }
 

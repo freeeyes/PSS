@@ -71,7 +71,7 @@ bool CProactorClientInfo::Run(bool blIsReadly, EM_Server_Connect_State emState)
 	if(true == blIsReadly && SERVER_CONNECT_FIRST != m_emConnectState && SERVER_CONNECT_RECONNECT != m_emConnectState)
 	{
 		m_pProAsynchConnect->SetConnectState(true);
-		OUR_DEBUG((LM_ERROR, "[CProactorClientInfo::Run]Connect IP=%s,Port=%d.\n", m_AddrServer.get_host_addr(), m_AddrServer.get_port_number()));
+		//OUR_DEBUG((LM_ERROR, "[CProactorClientInfo::Run]Connect IP=%s,Port=%d.\n", m_AddrServer.get_host_addr(), m_AddrServer.get_port_number()));
 		
 		//创建一个数据参数，传给远端
 		_ProConnectState_Info* pProConnectInfo = new _ProConnectState_Info();
@@ -145,7 +145,6 @@ bool CProactorClientInfo::Close()
 {
 	if(NULL != m_pProConnectClient)
 	{
-		m_pProConnectClient->ClientClose();
 		SetProConnectClient(NULL);
 	}
 
@@ -387,7 +386,7 @@ bool CClientProConnectManager::SetHandler(int nServerID, CProConnectClient* pPro
 	return true;
 }
 
-bool CClientProConnectManager::Close(int nServerID)
+bool CClientProConnectManager::Close(int nServerID, EM_s2s ems2s)
 {
 	//如果是因为服务器断开，则只删除ProConnectClient的指针
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
@@ -409,13 +408,25 @@ bool CClientProConnectManager::Close(int nServerID)
 	//关闭链接对象
 	if(NULL != pClientInfo->GetProConnectClient())
 	{
-		pClientInfo->GetProConnectClient()->ClientClose();
+		//OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Close]nServerID =(%d) Begin.\n", nServerID));
+		pClientInfo->GetProConnectClient()->ClientClose(ems2s);
+		//OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Close]nServerID =(%d) End.\n", nServerID));
 	}
 
-	pClientInfo->Close();
-	SAFE_DELETE(pClientInfo);
-	//从map里面删除当前存在的对象
-	m_mapClientInfo.erase(f);
+	if(S2S_NEED_CALLBACK == ems2s)
+	{
+		//SAFE_DELETE(pClientInfo);
+		//从map里面删除当前存在的对象
+		//m_mapClientInfo.erase(f);
+	}
+	else
+	{
+		pClientInfo->Close();
+		SAFE_DELETE(pClientInfo);
+		//从map里面删除当前存在的对象
+		m_mapClientInfo.erase(f);
+	}
+
 	return true;
 }
 
@@ -427,14 +438,14 @@ bool CClientProConnectManager::CloseUDP(int nServerID)
 	if(f == m_mapProactorUDPClientInfo.end())
 	{
 		//如果这个链接已经存在，则不创建新的链接
-		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Close]nServerID =(%d) is exist.\n", nServerID));
+		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::CloseUDP]nServerID =(%d) is not exist.\n", nServerID));
 		return false;
 	}
 
 	CProactorUDPClient* pClientInfo = (CProactorUDPClient* )f->second;
 	if(NULL == pClientInfo)
 	{
-		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Close]nServerID =(%d) pClientInfo is NULL.\n", nServerID));
+		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::CloseUDP]nServerID =(%d) pClientInfo is NULL.\n", nServerID));
 		return false;
 	}
 
@@ -452,14 +463,14 @@ bool CClientProConnectManager::ConnectErrorClose(int nServerID)
 	if(f == m_mapClientInfo.end())
 	{
 		//如果这个链接已经存在，则不创建新的链接
-		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Close]nServerID =(%d) is not exist.\n", nServerID));
+		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::ConnectErrorClose]nServerID =(%d) is not exist.\n", nServerID));
 		return false;
 	}
 
 	CProactorClientInfo* pClientInfo = (CProactorClientInfo* )f->second;
 	if(NULL == pClientInfo)
 	{
-		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Close]nServerID =(%d) pClientInfo is NULL.\n", nServerID));
+		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::ConnectErrorClose]nServerID =(%d) pClientInfo is NULL.\n", nServerID));
 		return false;
 	}
 
@@ -496,7 +507,7 @@ bool CClientProConnectManager::SendData(int nServerID, const char* pData, int nS
 	if(f == m_mapClientInfo.end())
 	{
 		//如果这个链接已经存在，则不创建新的链接
-		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Close]nServerID =(%d) is not exist.\n", nServerID));
+		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::SendData]nServerID =(%d) is not exist.\n", nServerID));
 		if(true == blIsDelete)
 		{
 			SAFE_DELETE_ARRAY(pData);
@@ -509,7 +520,7 @@ bool CClientProConnectManager::SendData(int nServerID, const char* pData, int nS
 	ACE_Message_Block* pmblk = App_MessageBlockManager::instance()->Create(nSize);
 	if(NULL == pmblk)
 	{
-		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Close]nServerID =(%d) pmblk is NULL.\n", nServerID));
+		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::SendData]nServerID =(%d) pmblk is NULL.\n", nServerID));
 		if(true == blIsDelete)
 		{
 			SAFE_DELETE_ARRAY(pData);
@@ -616,7 +627,7 @@ int CClientProConnectManager::handle_timeout(const ACE_Time_Value &tv, const voi
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 
-	//OUR_DEBUG((LM_DEBUG, "[CClientProConnectManager::handle_timeout]Begin.\n"));
+	OUR_DEBUG((LM_DEBUG, "[CClientProConnectManager::handle_timeout]Begin.\n"));
 	if(m_ProAsynchConnect.GetConnectState() == true)
 	{
 		return 0;
@@ -627,20 +638,6 @@ int CClientProConnectManager::handle_timeout(const ACE_Time_Value &tv, const voi
 
 	for(b; b!= e; b++)
 	{
-		int nServerID = (int)b->first;
-
-		/*
-		//测试代码
-		if(GetConnectState(nServerID) == false)
-		{
-		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::handle_timeout]nServerID == false (%d).\n", nServerID));
-		}
-		else
-		{
-		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::handle_timeout]nServerID == true (%d).\n", nServerID));
-		}
-		*/
-
 		CProactorClientInfo* pClientInfo = (CProactorClientInfo* )b->second;
 		if(NULL == pClientInfo->GetProConnectClient())
 		{
@@ -649,6 +646,8 @@ int CClientProConnectManager::handle_timeout(const ACE_Time_Value &tv, const voi
 
 		}
 	}
+
+	OUR_DEBUG((LM_DEBUG, "[CClientProConnectManager::handle_timeout]End.\n"));
 	return 0;
 }
 
@@ -711,14 +710,14 @@ bool CClientProConnectManager::CloseByClient(int nServerID)
 	if(f == m_mapClientInfo.end())
 	{
 		//如果这个链接已经存在，则不创建新的链接
-		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Close]nServerID =(%d) is exist.\n", nServerID));
+		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::CloseByClient]nServerID =(%d) is not exist.\n", nServerID));
 		return false;
 	}
 
 	CProactorClientInfo* pClientInfo = (CProactorClientInfo* )f->second;
 	if(NULL == pClientInfo)
 	{
-		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Close]nServerID =(%d) pClientInfo is NULL.\n", nServerID));
+		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::CloseByClient]nServerID =(%d) pClientInfo is NULL.\n", nServerID));
 		return false;
 	}
 

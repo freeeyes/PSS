@@ -133,7 +133,6 @@ bool CReactorClientInfo::Close()
 	if (NULL != m_pConnectClient)
 	{
 		//OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::Close]End 2.\n"));
-		m_pConnectClient->ClinetClose();
 		SetConnectClient(NULL);
 	}
 
@@ -393,7 +392,7 @@ bool CClientReConnectManager::SetHandler(int nServerID, CConnectClient* pConnect
 	return true;
 }
 
-bool CClientReConnectManager::Close(int nServerID)
+bool CClientReConnectManager::Close(int nServerID, EM_s2s ems2s)
 {
 	//如果是因为服务器断开，则只删除ProConnectClient的指针
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
@@ -417,13 +416,23 @@ bool CClientReConnectManager::Close(int nServerID)
 	//关闭链接对象
 	if (NULL != pClientInfo->GetConnectClient())
 	{
-		pClientInfo->GetConnectClient()->ClinetClose();
+		pClientInfo->GetConnectClient()->ClinetClose(ems2s);
 	}
 
-	pClientInfo->Close();
-	SAFE_DELETE(pClientInfo);
-	//从map里面删除当前存在的对象
-	m_mapConnectInfo.erase(f);
+	if(S2S_NEED_CALLBACK == ems2s)
+	{
+		//SAFE_DELETE(pClientInfo);
+		//从map里面删除当前存在的对象
+		//m_mapConnectInfo.erase(f);
+	}
+	else
+	{
+		pClientInfo->Close();
+		SAFE_DELETE(pClientInfo);
+		//从map里面删除当前存在的对象
+		m_mapConnectInfo.erase(f);
+	}
+
 	return true;
 }
 

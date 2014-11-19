@@ -270,6 +270,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\IObject\IModuleInfo.h"
+				>
+			</File>
+			<File
 				RelativePath=".\IObject\IModuleMessageManager.h"
 				>
 			</File>
@@ -1196,7 +1200,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Reactor\SigHandle.h"
+					RelativePath=".\Reactor\WaitQuitSignal.h"
 					>
 				</File>
 			</Filter>
@@ -1304,16 +1308,8 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath=".\Reactor\SigHandle.cpp"
+					RelativePath=".\Reactor\WaitQuitSignal.cpp"
 					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
 				</File>
 			</Filter>
 		</Filter>

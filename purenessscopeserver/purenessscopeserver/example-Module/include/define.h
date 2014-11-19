@@ -198,6 +198,13 @@ enum
 	CONNECT_SERVER_CLOSE = 12,
 };
 
+//服务器间通讯，是否需要回调的枚举
+enum EM_s2s
+{
+	S2S_NEED_CALLBACK = 0,    //需要回调
+	S2S_INNEED_CALLBACK,      //不需要回调
+};
+
 //对应处理线程的状态
 enum
 {
@@ -241,7 +248,7 @@ enum EM_Server_Connect_State
 #define DEBUG_ON  1
 #define DEBUG_OFF 0
 
-#define OUR_DEBUG(X)  ACE_DEBUG((LM_INFO, "[%t]")); ACE_DEBUG(X)
+#define OUR_DEBUG(X)  ACE_DEBUG((LM_INFO, "[%D|%t]")); ACE_DEBUG(X)
 
 enum
 {

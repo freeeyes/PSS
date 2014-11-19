@@ -37,7 +37,7 @@ public:
     bool SendData(ACE_Message_Block* pmblk);
     bool Close();
 
-    void ClinetClose();                                    //主动关闭
+    void ClinetClose(EM_s2s& ems2s);                       //主动关闭
     _ClientConnectInfo GetClientConnectInfo();             //得到当前链接信息
     
 private:
@@ -64,5 +64,6 @@ public:
     uint32                      m_u4RecvSize;        //接受字节数
     uint32                      m_u4RecvCount;       //接受数据包数
     uint32                      m_u4CostTime;        //消息处理总时间
+	EM_s2s                      m_ems2s;             //是否需要回调状态 
 };
 #endif

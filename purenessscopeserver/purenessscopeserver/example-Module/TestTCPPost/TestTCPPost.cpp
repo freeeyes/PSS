@@ -59,7 +59,7 @@ int LoadModuleData(CServerObject* pServerObject)
 	}
 
 	//在这里调用中间服务器链接初始化信息
-	g_BaseCommand.InitServer();
+	g_BaseCommand.InitServer(g_szName);
 
 	OUR_DEBUG((LM_INFO, "[Base LoadModuleData] End.\n"));
 

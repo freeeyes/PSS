@@ -8,7 +8,6 @@ CBaseCommand::CBaseCommand(void)
 
 CBaseCommand::~CBaseCommand(void)
 {
-	CloseClient2Server();
 }
 
 void CBaseCommand::SetServerObject(CServerObject* pServerObject)
@@ -30,6 +29,11 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 		return -1;
 	}
 
+	OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] WorkThreadID=%d, ClientID=%d, Cmd=%04x.\n", 
+		pMessage->GetMessageBase()->m_u4WorkThreadID, 
+		pMessage->GetMessageBase()->m_u4ConnectID,
+		pMessage->GetMessageBase()->m_u2Cmd));
+
 	MESSAGE_FUNCTION_BEGIN(pMessage->GetMessageBase()->m_u2Cmd);
 	MESSAGE_FUNCTION(CLIENT_LINK_CONNECT,     Do_Connect,           pMessage);
 	MESSAGE_FUNCTION(CLIENT_LINK_CDISCONNET,  Do_DisConnect,        pMessage);
@@ -37,74 +41,43 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 	MESSAGE_FUNCTION(COMMAND_BASE,            Do_PostBase,          pMessage);
 	MESSAGE_FUNCTION_END;
 
+	OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] WorkThreadID=%d, ClientID=%d, Cmd=%04x End.\n", 
+		pMessage->GetMessageBase()->m_u4WorkThreadID, 
+		pMessage->GetMessageBase()->m_u4ConnectID,
+		pMessage->GetMessageBase()->m_u2Cmd));
+
 	return 0;
 }
 
-void CBaseCommand::InitServer()
+void CBaseCommand::InitServer(const char* pModuleName)
 {
+	//获得当前服务器有多少个工作线程
+	//根据工作线程创建对应的map个数，这样和框架保持一致
+	//这样做就不用有多余的数据锁控制，因为工作线程是根据ConnectID取余的
+	//只要上层算法一致，就不需要线程锁的开销
+	int nWorkThreadCount = m_pServerObject->GetMessageManager()->GetWorkThreadCount();
+
+	//这里展示从框架中获得配置插件的参数，可以用来对插件启动参数化。
+	const char* pParam = m_pServerObject->GetModuleInfo()->GetModuleParam(pModuleName);
+	OUR_DEBUG((LM_ERROR, "[CBaseCommand::InitServer] pParam=%s.\n", pParam));
+
+	m_objProxyManager.Init(nWorkThreadCount);
+
 }
 
 void CBaseCommand::AddClient2Server(uint32 u4ClientID)
 {
-	mapc2s::iterator f = m_mapC2S.find(u4ClientID);
-	if(f != m_mapC2S.end())
-	{
-		return;
-	}
-
-	CPostServerData* pPostServerData = new CPostServerData();
-
-	//设置返回客户端需要的发送对象
-	pPostServerData->SetServerObject(m_pServerObject);
-	pPostServerData->SetConnectID(u4ClientID);
-	pPostServerData->SetServerID(u4ClientID);
-
-	//初始化连接关系
-	m_pServerObject->GetClientManager()->Connect(u4ClientID, "172.21.0.41", 10040, TYPE_IPV4, (IClientMessage* )pPostServerData);
-
-	m_mapC2S.insert(mapc2s::value_type(u4ClientID, pPostServerData));
+	m_objProxyManager.AddClient2Server(u4ClientID, m_pServerObject);
 }
 
-void CBaseCommand::DelClient2Server( uint32 u4ClientID )
+void CBaseCommand::DelClient2Server(uint32 u4ClientID)
 {
-	mapc2s::iterator f = m_mapC2S.find(u4ClientID);
-	if(f == m_mapC2S.end())
-	{
-		return;
-	}
-
-	CPostServerData* pPostServerData = (CPostServerData* )f->second;
-	if(NULL != pPostServerData)
-	{
-		uint32 u4ServerID = pPostServerData->GetServerID();
-		m_pServerObject->GetClientManager()->Close(u4ServerID);
-	}
-	m_mapC2S.erase(f);
-
+	m_objProxyManager.DelClient2Server(u4ClientID);
 }
 
-CPostServerData* CBaseCommand::GetClient2Server_ServerID( uint32 u4ClientID )
+CPostServerData* CBaseCommand::GetClient2Server_ServerID(uint32 u4ClientID)
 {
-	mapc2s::iterator f = m_mapC2S.find(u4ClientID);
-	if(f == m_mapC2S.end())
-	{
-		return NULL;
-	}
-	else
-	{
-		return (CPostServerData* )f->second;
-	}
-
-}
-
-void CBaseCommand::CloseClient2Server()
-{
-	for(mapc2s::iterator b = m_mapC2S.begin(); b != m_mapC2S.end(); b++)
-	{
-		CPostServerData* pPostServerData = (CPostServerData* )b->second;
-		SAFE_DELETE(pPostServerData);
-	}
-	m_mapC2S.clear();
+	return m_objProxyManager.GetClient2Server_ServerID(u4ClientID);
 }
 
 int CBaseCommand::Do_Connect(IMessage* pMessage)
@@ -142,6 +115,11 @@ int CBaseCommand::Do_PostBase(IMessage* pMessage)
 	if(NULL != pPostServerData)
 	{
 		pPostServerData->SendData(objPacketInfo.m_pData, objPacketInfo.m_nDataLen);
+	}
+	else
+	{
+		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] pPostServerData is NULL.\n"));
+		m_objProxyManager.Display(pMessage->GetMessageBase()->m_u4ConnectID);
 	}
 
 	return 0;

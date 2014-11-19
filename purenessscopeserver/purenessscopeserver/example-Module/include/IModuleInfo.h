@@ -5,6 +5,7 @@
 
 class IModuleInfo
 {
+public:
 	virtual bool GetModuleExist(const char* pModuleName)           = 0;   //指定的模块是否存在
 	virtual const char* GetModuleParam(const char* pModuleName)    = 0;   //得到模块加载参数
 	virtual const char* GetModuleFileName(const char* pModuleName) = 0;   //得到模块文件名

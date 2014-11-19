@@ -16,20 +16,21 @@
 	<ConsoleKey Key="guest" desc="维护端允许登录的Key值,可以是多个，key值中不能包含空格" />
 	<!-- <ConsoleClient cip="127.0.0.1" desc="维护端口可以访问的对应的客户端IP地址，可以支持多个" /> -->
 	
-	<!-- 消息处理工作线程相关设置 -->
-	<Message Msg_High_mark="64000" Msg_Low_mark="64000" Msg_Thread="3" Msg_MaxQueue="10000" desc="消息处理线程相关参数设置，" />
+	<Message Msg_High_mark="64000" Msg_Low_mark="64000" Msg_Thread="5" Msg_MaxQueue="10000" desc="消息处理线程相关参数设置，" />
+	
 	<!-- 测试UDP模块加载流程的用例 -->
 	<!-- <Module ModulePath="./" ModuleString="UDPTestd.dll" desc="模块加载配置相关参数，ModulePath是路径，ModuleString是模块名称，以逗号隔开"/> -->
 	
 	<!-- 测试Tcp插件加载流程的用例 -->
-	<Module ModulePath="./" ModuleString="TcpTestd.dll" desc="模块加载配置相关参数，ModulePath是路径，ModuleString是模块名称，以逗号隔开"/>
+	<Module ModulePath="./" ModuleString="" desc="模块加载配置相关参数，ModulePath是路径，ModuleString是模块名称，以逗号隔开"/>
 	
 	<!-- 允许插件设置个性化,可以多个,这里可以单独设置每个插件的不同参数,可以与Module设置同时生效,亦可不用此设置 -->
-	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="TcpTestPostd.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/> -->
+	<ModuleInfo ModuleSPath="./" ModuleSName="TcpTestPostd.dll" ModuleSParam="--DEBUG" Desc="ModuleParam为插件启动参数"/>
 	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="TimerTestd.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/> -->
 	
 	<!-- Linux Core Dump相关设置 -->
 	<CoreSetting CoreNeed="0" desc="是否需要打开Core文件支持，0为不需要，1为需要" />
+	
 	<!-- 命令包统计相关设置 -->
 	<CommandAccount Account="1" FlowAccount="1" desc="Account为1记录统计命令日志，0为不记录，FlowAccount为流量统计，1为开启，0为关闭" />
 	<!-- 接收数据包连接相关设置 -->

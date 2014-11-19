@@ -62,7 +62,7 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pResourceName)
 			return false;
 		}
 
-		//开始注册模块
+		//开始注册模块函数
 		if(false == LoadModuleInfo(strModuleName, pModuleInfo, m_szModulePath))
 		{
 			SAFE_DELETE(pModuleInfo);
@@ -83,6 +83,15 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pResourceName)
 		{
 			OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] m_mapModuleInfo.AddMapData error!\n"));
 			SAFE_DELETE(pModuleInfo);
+			return false;
+		}
+
+		//开始调用模块初始化动作
+		int nRet = pModuleInfo->LoadModuleData(App_ServerObject::instance());
+		if(nRet != 0)
+		{
+			OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Execute Function LoadModuleData is error!\n", strModuleName.c_str()));
+			m_tmModule.release();
 			return false;
 		}
 
@@ -115,7 +124,7 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, c
 	//记录模块参数
 	pModuleInfo->strModuleParam = (string)pModuleParam;
 
-	//开始注册模块
+	//开始注册模块函数
 	if(false == LoadModuleInfo(strModuleName, pModuleInfo, pModulePath))
 	{
 		SAFE_DELETE(pModuleInfo);
@@ -136,6 +145,15 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, c
 	{
 		OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] m_mapModuleInfo.AddMapData error!\n"));
 		SAFE_DELETE(pModuleInfo);
+		return false;
+	}
+
+	//开始调用模块初始化动作
+	int nRet = pModuleInfo->LoadModuleData(App_ServerObject::instance());
+	if(nRet != 0)
+	{
+		OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Execute Function LoadModuleData is error!\n", strModuleName.c_str()));
+		m_tmModule.release();
 		return false;
 	}
 
@@ -287,15 +305,6 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo,
 	if(NULL == pModuleInfo->DoModuleMessage || !pModuleInfo->DoModuleMessage)
 	{
 		OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Function DoModuleMessage is error(%d)!\n", strModuleName.c_str(), errno));
-		m_tmModule.release();
-		return false;
-	}
-
-	//加载模块代码
-	int nRet = pModuleInfo->LoadModuleData(App_ServerObject::instance());
-	if(nRet != 0)
-	{
-		OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Execute Function LoadModuleData is error!\n", strModuleName.c_str()));
 		m_tmModule.release();
 		return false;
 	}

@@ -8,6 +8,7 @@ CProConnectClient::CProConnectClient(void)
 	m_mbRecv            = NULL;
 	m_pClientMessage    = NULL;
     m_u4MaxPacketSize   = MAX_MSG_PACKETLENGTH;
+	m_ems2s             = S2S_NEED_CALLBACK;
 
 	m_u4SendSize        = 0;
 	m_u4SendCount       = 0;
@@ -42,15 +43,23 @@ void CProConnectClient::Close()
 
 		App_ClientProConnectManager::instance()->CloseByClient(m_nServerID);
 
-		OUR_DEBUG((LM_DEBUG, "[CProConnectClient::Close]delete OK[0x%08x].\n", this));
+		OUR_DEBUG((LM_DEBUG, "[CProConnectClient::Close]delete OK[0x%08x], m_ems2s=%d.\n", this, m_ems2s));
 		delete this;
 	}
 }
 
-void CProConnectClient::ClientClose()
+void CProConnectClient::ClientClose(EM_s2s& ems2s)
 {
 	if(this->handle() != ACE_INVALID_HANDLE)
 	{
+		m_ems2s = ems2s;
+
+		//如果对象已经在外面释放，则不需要再次回调
+		if(ems2s == S2S_INNEED_CALLBACK)
+		{
+			SetClientMessage(NULL);
+		}
+
 		ACE_OS::shutdown(this->handle(), SD_SEND);
 		ACE_OS::closesocket(this->handle());
 		this->handle(ACE_INVALID_HANDLE);
@@ -106,10 +115,10 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 	ACE_Message_Block& mb = result.message_block();
 	uint32 u4PacketLen = (uint32)result.bytes_transferred();
 
-	OUR_DEBUG((LM_DEBUG,"[CProConnectClient::handle_read_stream] m_nServerID=%d, bytes_transferred=%d, this=0x%08x.\n", 
-		m_nServerID, 
-		u4PacketLen,
-		this));
+	//OUR_DEBUG((LM_DEBUG,"[CProConnectClient::handle_read_stream] m_nServerID=%d, bytes_transferred=%d, this=0x%08x.\n", 
+	//	m_nServerID, 
+	//	u4PacketLen,
+	//	this));
 	
 	if(!result.success() || u4PacketLen == 0)
 	{
@@ -119,8 +128,15 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 			_ClientIPInfo objServerIPInfo;
 			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_AddrRemote.get_host_addr());
 			objServerIPInfo.m_nPort = m_AddrRemote.get_port_number();
-			m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+			
+			//这里只处理远端服务器断开连接的消息，回调ConnectError
+			//服务器主动关闭不在回调ConnectError
+			if(S2S_NEED_CALLBACK == m_ems2s)
+			{
+				m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+			}
 		}
+		//OUR_DEBUG((LM_INFO, "[CProConnectClient::handle_read_stream]m_ems2s=%d.\n", m_ems2s));
 		Close();
 		return;
 	}
@@ -181,7 +197,10 @@ bool CProConnectClient::RecvData(uint32 u4PacketLen)
 			_ClientIPInfo objServerIPInfo;
 			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_AddrRemote.get_host_addr());
 			objServerIPInfo.m_nPort = m_AddrRemote.get_port_number();
-			m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+			if(S2S_NEED_CALLBACK == m_ems2s)
+			{
+				m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+			}
 		}
 		Close();
 		return false;
