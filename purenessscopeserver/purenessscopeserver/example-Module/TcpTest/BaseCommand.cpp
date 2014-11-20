@@ -53,7 +53,7 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 
 int CBaseCommand::Do_Connect(IMessage* pMessage)
 {
-	OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_Connect] CLIENT_LINK_CONNECT OK.\n"));
+	OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_Connect] TCP CLIENT_LINK_CONNECT OK.\n"));
 
 	//判断当前连接总数是否超越了2000个
 	int nConnectCount = m_pServerObject->GetConnectManager()->GetCount();
@@ -87,7 +87,7 @@ int CBaseCommand::Do_Base(IMessage* pMessage)
 	uint16     u2CommandID  = 0;
 	uint64     u8ClientTime = 0;
 
-	//OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] CommandID = %d", COMMAND_BASE));
+	//OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] TcpTest CommandID = %d", COMMAND_BASE));
 	//m_pServerObject->GetLogManager()->WriteToMail(LOG_SYSTEM, 1, "测试邮件", "测试");
 
 	IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();

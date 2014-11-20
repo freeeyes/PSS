@@ -29,10 +29,12 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 		return -1;
 	}
 
+	/*
 	OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] WorkThreadID=%d, ClientID=%d, Cmd=%04x.\n", 
 		pMessage->GetMessageBase()->m_u4WorkThreadID, 
 		pMessage->GetMessageBase()->m_u4ConnectID,
 		pMessage->GetMessageBase()->m_u2Cmd));
+	*/
 
 	MESSAGE_FUNCTION_BEGIN(pMessage->GetMessageBase()->m_u2Cmd);
 	MESSAGE_FUNCTION(CLIENT_LINK_CONNECT,     Do_Connect,           pMessage);
@@ -41,10 +43,12 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 	MESSAGE_FUNCTION(COMMAND_BASE,            Do_PostBase,          pMessage);
 	MESSAGE_FUNCTION_END;
 
+	/*
 	OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] WorkThreadID=%d, ClientID=%d, Cmd=%04x End.\n", 
 		pMessage->GetMessageBase()->m_u4WorkThreadID, 
 		pMessage->GetMessageBase()->m_u4ConnectID,
 		pMessage->GetMessageBase()->m_u2Cmd));
+	*/
 
 	return 0;
 }
@@ -83,7 +87,7 @@ CPostServerData* CBaseCommand::GetClient2Server_ServerID(uint32 u4ClientID)
 int CBaseCommand::Do_Connect(IMessage* pMessage)
 {
 	AddClient2Server(pMessage->GetMessageBase()->m_u4ConnectID);
-	OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] CLIENT_LINK_CONNECT OK.\n"));
+	OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] TCPPOST CLIENT_LINK_CONNECT OK.\n"));
 	return 0;
 }
 
@@ -107,6 +111,8 @@ int CBaseCommand::Do_PostBase(IMessage* pMessage)
 
 	_PacketInfo objPacketInfo;
 	pMessage->GetPacketBody(objPacketInfo);
+
+	//OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] TcpPostTest CommandID = %d.\n", COMMAND_BASE));
 
 	//设置当前接收数据的ConnectID，用于收到远程回应信息返回
 	//m_pPostServerData1->SetConnectID(pMessage->GetMessageBase()->m_u4ConnectID);
