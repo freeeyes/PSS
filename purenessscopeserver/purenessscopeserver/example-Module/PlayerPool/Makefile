@@ -21,6 +21,6 @@ $(LIB_BASE): $(PATS)
 clean:
 	rm -rf *.o  $(LIB_BASE) $(LIB_BASE_OBJS)
 clear:	
-	mv libPlayerPool.so ../PurenessScopeServer/Linux_Bin/		
+	mv libPlayerPool.so ../../PurenessScopeServer/Linux_Bin/		
 cl:	
 	rm -rf *.o 
