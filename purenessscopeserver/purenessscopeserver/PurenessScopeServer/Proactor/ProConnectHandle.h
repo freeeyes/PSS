@@ -55,7 +55,7 @@ public:
 	bool CheckAlive();                                                        //检测当前链接是否超时的函数
 	bool SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, bool blState, uint8 u1SendType, uint32& u4PacketSize, bool blDelete);   //发送给客户端数据的函数
 	bool Close(int nIOCount = 1, int nErrno = 0);                             //当前连接对象关闭
-	bool ServerClose();                                                       //服务器关闭客户端链接的函数
+	bool ServerClose(EM_Client_Close_status emStatus);                        //服务器关闭客户端链接的函数
 	void SetLocalIPInfo(const char* pLocalIP, uint32 u4LocalPort);            //设置监听IP和端口信息 
 
 	const char*        GetError();                                            //得到当前链接错误信息
@@ -126,6 +126,7 @@ private:
 	int                 m_nIOCount;                     //当前IO操作的个数
 	_TimeConnectInfo    m_TimeConnectInfo;              //链接健康检测器
 	ACE_Message_Block*  m_pBlockMessage;                //当前发送缓冲等待数据块
+	EM_Client_Close_status m_emStatus;                  //当前服务器关闭标记
 
 	CPacketParse        m_objSendPacketParse;           //发送数据包组织结构
 
@@ -153,7 +154,7 @@ public:
 	bool PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, bool blSendState = true, bool blDelete = true);    //异步发送
 	bool PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, bool blSendState = true, bool blDelete = true);                     //异步群发
 	bool Close(uint32 u4ConnectID);                                                                          //客户端关闭
-	bool CloseConnect(uint32 u4ConnectID);                                                                   //服务器关闭
+	bool CloseConnect(uint32 u4ConnectID, EM_Client_Close_status emStatus);                                  //服务器关闭
 	void GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo);                                         //返回当前存活链接的信息
 	void SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4TimeCost);                                        //记录指定链接数据处理时间
 
@@ -233,7 +234,7 @@ public:
 	bool PostMessage(vector<uint32> vecConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, bool blSendState = true, bool blDlete = true);   //异步群发指定的ID
 	bool PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, bool blSendState = true, bool blDlete = true);                                       //异步群发
 	bool PostMessageAll(const char* pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, bool blSendState = true, bool blDlete = true);                             //异步群发
-	bool CloseConnect(uint32 u4ConnectID);                                                                   //服务器关闭
+	bool CloseConnect(uint32 u4ConnectID, EM_Client_Close_status emStatus = CLIENT_CLOSE_IMMEDIATLY);        //服务器关闭
 	_ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                                                       //得到指定链接信息
 	_ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID);                                                        //得到监听链接信息
 	void GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo);                                         //返回当前存活链接的信息

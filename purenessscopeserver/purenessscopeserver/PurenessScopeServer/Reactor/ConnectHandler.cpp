@@ -37,6 +37,7 @@ CConnectHandler::CConnectHandler(void)
 	m_u8SendQueueTimeout  = MAX_QUEUE_TIMEOUT * 1000 * 1000;  //目前因为记录的是纳秒
 	m_u8RecvQueueTimeout  = MAX_QUEUE_TIMEOUT * 1000 * 1000;  //目前因为记录的是纳秒
 	m_u2TcpNodelay        = TCP_NODELAY_ON;
+	m_emStatus            = CLIENT_CLOSE_NOTHING;
 }
 
 CConnectHandler::~CConnectHandler(void)
@@ -143,29 +144,36 @@ void CConnectHandler::Init(uint16 u2HandlerID)
 		m_u8RecvQueueTimeout = MAX_QUEUE_TIMEOUT * 1000 * 1000;
 	}
 
-	//m_pBlockMessage    = App_MessageBlockManager::instance()->Create(m_u4MaxPacketSize);
 	m_pBlockMessage      = new ACE_Message_Block(m_u4MaxPacketSize);
+	m_emStatus           = CLIENT_CLOSE_NOTHING;
 }
 
-bool CConnectHandler::ServerClose()
+bool CConnectHandler::ServerClose(EM_Client_Close_status emStatus)
 {
 	OUR_DEBUG((LM_ERROR, "[CConnectHandler::ServerClose]Close(%d) OK.\n", GetConnectID()));
 	//AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %d, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, m_u8RecvQueueTimeCost, m_u4RecvQueueCount, m_u8SendQueueTimeCost);
 
-	//发送客户端链接断开消息。
-	if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_SDISCONNECT, NULL))
+	if(CLIENT_CLOSE_IMMEDIATLY == emStatus)
 	{
-		OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
+		//发送客户端链接断开消息。
+		if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_SDISCONNECT, NULL))
+		{
+			OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
+		}
+
+		//调用连接断开消息
+		CPacketParse objPacketParse;
+		objPacketParse.DisConnect(GetConnectID());
+
+		m_u1ConnectState = CONNECT_SERVER_CLOSE;
+
+		//msg_queue()->deactivate();
+		shutdown();
 	}
-
-	//msg_queue()->deactivate();
-	shutdown();
-
-	//调用连接断开消息
-	CPacketParse objPacketParse;
-	objPacketParse.DisConnect(GetConnectID());
-
-	m_u1ConnectState = CONNECT_SERVER_CLOSE;
+	else
+	{
+		m_emStatus = emStatus;
+	}
 
 	return true;
 }
@@ -1088,7 +1096,7 @@ bool CConnectHandler::CheckAlive()
 			OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 		}
 
-		ServerClose();
+		ServerClose(CLIENT_CLOSE_IMMEDIATLY);
 		return false;
 	}
 	else
@@ -1395,10 +1403,17 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 			pMbData->release();
 			m_atvOutput      = ACE_OS::gettimeofday();
 
-			//如果需要统计信息
-			//App_IPAccount::instance()->UpdateIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
-
 			Close();
+
+			//看看需要不需要关闭连接
+			if(CLIENT_CLOSE_SENDOK == m_emStatus)
+			{
+				if(m_u4ReadSendSize - m_u4SuccessSendSize == 0)
+				{
+					ServerClose(CLIENT_CLOSE_IMMEDIATLY);
+				}
+			}
+
 			return true;
 		}
 		else
@@ -1652,7 +1667,7 @@ bool CConnectManager::Close(uint32 u4ConnectID)
 	}
 }
 
-bool CConnectManager::CloseConnect(uint32 u4ConnectID)
+bool CConnectManager::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status emStatus)
 {
 	//ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 	mapConnectManager::iterator f = m_mapConnectManager.find(u4ConnectID);
@@ -1662,7 +1677,7 @@ bool CConnectManager::CloseConnect(uint32 u4ConnectID)
 		CConnectHandler* pConnectHandler = (CConnectHandler* )f->second;
 		if(pConnectHandler != NULL)
 		{
-			pConnectHandler->ServerClose();
+			pConnectHandler->ServerClose(emStatus);
 			m_u4TimeDisConnect++;
 
 			//加入链接统计功能
@@ -2841,7 +2856,7 @@ bool CConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, const char*
 	return false;
 }
 
-bool CConnectManagerGroup::CloseConnect(uint32 u4ConnectID)
+bool CConnectManagerGroup::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status emStatus)
 {
 	//判断命中到哪一个线程组里面去
 	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
@@ -2860,7 +2875,7 @@ bool CConnectManagerGroup::CloseConnect(uint32 u4ConnectID)
 		return false;		
 	}	
 
-	return pConnectManager->CloseConnect(u4ConnectID);
+	return pConnectManager->CloseConnect(u4ConnectID, emStatus);
 }
 
 _ClientIPInfo CConnectManagerGroup::GetClientIPInfo(uint32 u4ConnectID)
