@@ -72,6 +72,8 @@ int LoadModuleData(CServerObject* pServerObject)
 
   OUR_DEBUG((LM_INFO, "[Base LoadModuleData] *********************************.\n"));
 
+  g_BaseCommand.ReadIniFile(pServerObject->GetModuleInfo()->GetModuleParam(g_szName));
+
   OUR_DEBUG((LM_INFO, "[Base LoadModuleData] End.\n"));
 
   return 0;

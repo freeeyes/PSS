@@ -8,5 +8,5 @@ project(TcpTest):acelib{
 	dllout = ../../PurenessScopeServer/Linux_Bin
   }
   includes += .
-  includes += ../include
+  includes += ../include ./IniRead
 }
