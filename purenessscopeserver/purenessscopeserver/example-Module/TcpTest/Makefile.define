@@ -4,7 +4,7 @@
 CC = g++
 AR = ar
 CFLAGS = -g -O2 -D__LINUX__
-INCLUDES = -I./ -I../ -I/usr/include -I${ACE_ROOT} -I../include
+INCLUDES = -I./ -I../ -I/usr/include -I${ACE_ROOT} -I../include -I ./IniRead
 LIBS = -L/usr/lib64 -L${ACE_ROOT}/lib  -L/usr/local/lib64 -L./ -L../ -lACE -lz -ldl 
 # *****************************
 # ±‰ªªπÊ‘Ú

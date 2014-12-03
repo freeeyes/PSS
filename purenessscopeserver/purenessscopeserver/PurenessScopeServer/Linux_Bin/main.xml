@@ -19,7 +19,7 @@
 	<Message Msg_High_mark="64000" Msg_Low_mark="64000" Msg_Thread="3" Msg_MaxQueue="10000" desc="消息处理线程相关参数设置，" />
 	
 	<!-- <Module ModulePath="./" ModuleString="libAutoTest.so" desc="模块加载配置相关参数，ModulePath是路径，ModuleString是模块名称，以逗号隔开"/> -->
-	<ModuleInfo ModuleSPath="./" ModuleSName="TcpTestd.dll" ModuleSParam="..\..\example-Module\TcpTest\TcpTest.ini" Desc="ModuleParam为插件启动参数"/>
+	<ModuleInfo ModuleSPath="./" ModuleSName="libTcpTest.so" ModuleSParam="../../example-Module/TcpTest/TcpTest.ini" Desc="ModuleParam为插件启动参数"/>
 	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="TcpTestPostd.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/> -->
 	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="TimerTestd.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/> -->	
 	
