@@ -62,11 +62,11 @@ static void strlwc(char* s)
 /*--------------------------------------------------------------------------*/
 static void strstrip(char* s)
 {
-    if (s==NULL) return;
+	char* last = NULL;
+	char* dest = NULL;
 
-    char* last = NULL;
+    if (s==NULL) return;
 	last = s + strlen(s);
-    char* dest = NULL;
 	dest = s;
 
     while (isspace((int)*s) && *s) s++;
