@@ -17,12 +17,6 @@
 #define MAX_BUFF_1024 1024
 #define MAX_IP_LEN    16
 
-enum em_State
-{
-	MESSAGE_HEAD = 0,
-	MESSAGE_BODY,
-};
-
 #define CONSOLE_HEAD_SIZE 6
 
 class CProConnectClient : public ACE_Service_Handler
