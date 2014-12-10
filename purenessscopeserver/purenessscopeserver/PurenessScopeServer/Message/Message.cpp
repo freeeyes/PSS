@@ -134,7 +134,7 @@ void CMessage::SetPacketHeadInfo(_PacketHeadInfo& objPacketHeadInfo)
 	m_objPacketHeadInfo.m_u2Version = objPacketHeadInfo.m_u2Version;
 	m_objPacketHeadInfo.m_u2CmdID   = objPacketHeadInfo.m_u2CmdID;
 	m_objPacketHeadInfo.m_u4BodyLen = objPacketHeadInfo.m_u4BodyLen;
-	sprintf_safe(objPacketHeadInfo.m_szSession, SESSION_LEN, "%s", m_objPacketHeadInfo.m_szSession);
+	sprintf_safe(m_objPacketHeadInfo.m_szSession, SESSION_LEN, "%s", objPacketHeadInfo.m_szSession);
 }
 
 CMessagePool::CMessagePool()
