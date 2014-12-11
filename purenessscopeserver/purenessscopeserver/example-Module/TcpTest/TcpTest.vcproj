@@ -462,7 +462,7 @@
 			Name="IniRead"
 			>
 			<File
-				RelativePath=".\IniRead\dictionary.cpp"
+				RelativePath=".\IniRead\dictionary.c"
 				>
 			</File>
 			<File
@@ -470,7 +470,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\IniRead\iniparser.cpp"
+				RelativePath=".\IniRead\iniparser.c"
 				>
 			</File>
 			<File
