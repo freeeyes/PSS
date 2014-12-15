@@ -103,7 +103,7 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pResourceName)
 
 bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, const char* pModuleParam)
 {
-	string strModuleName = (string)pModuleName;
+	string strModuleName = pModuleName;
 
 	//确定这个模块是否被注册过
 	_ModuleInfo* pCurr = m_mapModuleInfo.SearchMapData(strModuleName);
@@ -153,12 +153,11 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, c
 	if(nRet != 0)
 	{
 		OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Execute Function LoadModuleData is error!\n", strModuleName.c_str()));
-		m_tmModule.release();
+		SAFE_DELETE(pModuleInfo);
 		return false;
 	}
 
 	OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] Begin Load ModuleName[%s] OK!\n", strModuleName.c_str()));
-
 	return true;
 }
 
@@ -253,7 +252,7 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo,
 
 	m_tmModule.acquire();
 
-	pModuleInfo->hModule = ACE_OS::dlopen(szModuleFile, RTLD_NOW);
+	pModuleInfo->hModule = ACE_OS::dlopen((ACE_TCHAR *)szModuleFile, RTLD_NOW);
 	if(NULL == pModuleInfo->hModule || !pModuleInfo->hModule)
 	{
 		OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, pModuleInfo->hModule is NULL(%s)!\n", strModuleName.c_str(), ACE_OS::dlerror()));
