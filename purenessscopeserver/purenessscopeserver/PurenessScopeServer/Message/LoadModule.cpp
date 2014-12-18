@@ -89,7 +89,6 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pResourceName)
 		if(nRet != 0)
 		{
 			OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Execute Function LoadModuleData is error!\n", strModuleName.c_str()));
-			m_tmModule.release();
 			return false;
 		}
 
