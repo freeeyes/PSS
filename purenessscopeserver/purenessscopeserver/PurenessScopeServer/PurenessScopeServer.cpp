@@ -256,6 +256,8 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 	ACE_OS::sleep(tvSleep);
 
 	OUR_DEBUG((LM_INFO, "[main]Server Exit.\n"));
+	
+	pthread_exit(NULL);
 
 	return 0;
 }
