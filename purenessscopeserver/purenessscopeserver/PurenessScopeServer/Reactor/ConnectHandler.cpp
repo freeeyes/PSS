@@ -1390,13 +1390,16 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 		{
 			int nErrno = errno;
 			OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendPacket] ConnectID = %d, error = %d.\n", GetConnectID(), nErrno));
-			pMbData->release();
+			//pMbData->release();
 
 			AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "WriteError [%s:%d] nErrno = %d  result.bytes_transferred() = %d, ",
 				                                m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), nErrno, 
 				                                nIsSendSize);
 			m_atvOutput      = ACE_OS::gettimeofday();
-			App_ConnectManager::instance()->Close(GetConnectID());
+			//App_ConnectManager::instance()->Close(GetConnectID());
+			//错误消息回调
+			App_MakePacket::instance()->PutSebdErrorMessage(GetConnectID(), pMbData);			
+			
 			Close();
 			return false;
 		}

@@ -573,7 +573,7 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
 {
 	if(!result.success() || result.bytes_transferred()==0)
 	{
-		//链接断开
+		//发送失败
 		int nErrno = errno;
 		OUR_DEBUG ((LM_DEBUG,"[CConnectHandler::handle_write_stream] Connectid=[%d] begin(%d)...\n",GetConnectID(), nErrno));
 
@@ -583,7 +583,9 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
 
 		OUR_DEBUG((LM_DEBUG,"[CConnectHandler::handle_write_stream] Connectid=[%d] finish ok...\n", GetConnectID()));
 		m_atvOutput = ACE_OS::gettimeofday();
-		App_MessageBlockManager::instance()->Close(&result.message_block());
+		//App_MessageBlockManager::instance()->Close(&result.message_block());
+		//错误消息回调
+		App_MakePacket::instance()->PutSebdErrorMessage(GetConnectID(), &result.message_block());
 		Close();
 		return;
 	}
@@ -1115,6 +1117,11 @@ void CProConnectHandle::SetLocalIPInfo(const char* pLocalIP, uint32 u4LocalPort)
 {
 	sprintf_safe(m_szLocalIP, MAX_BUFF_50, "%s", pLocalIP);
 	m_u4LocalPort = u4LocalPort;
+}
+
+void CProConnectHandle::PutSendPacketError(ACE_Message_Block* pMbData)
+{
+	
 }
 
 //***************************************************************************

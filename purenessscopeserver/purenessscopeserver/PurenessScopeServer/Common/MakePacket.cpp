@@ -467,3 +467,60 @@ CMessage* CMakePacket::SetMessageSendTimeout(uint32 u4ConnectID)
 	}
 }
 
+CMessage* CMakePacket::SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage)
+{
+	//创建新的Message对象
+	CMessage* pMessage = App_MessagePool::instance()->Create();
+	if(NULL == pMessage)
+	{
+		//写入接收包错误
+		OUR_DEBUG((LM_ERROR, "[CMakePacket::SetMessageSendError] ConnectID = %d, pMessage is NULL.\n", u4ConnectID));
+		return NULL;
+	}
+
+	if(NULL != pMessage->GetMessageBase())
+	{
+		//开始组装数据
+		pMessage->GetMessageBase()->m_u4ConnectID   = u4ConnectID;
+		pMessage->GetMessageBase()->m_u2Cmd         = (uint16)CLINET_LINK_SENDERROR;
+		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)ACE_OS::gettimeofday().sec();
+		pMessage->GetMessageBase()->m_u4HeadSrcSize = 0;
+		pMessage->GetMessageBase()->m_u4BodySrcSize = 0;
+		//pMessage->GetMessageBase()->m_ProfileTime.Start();
+
+		//将接受的数据缓冲放入CMessage对象
+		pMessage->SetPacketHead(NULL);
+		pMessage->SetPacketBody(pBodyMessage);
+
+		return pMessage;
+	}
+	else
+	{
+		OUR_DEBUG((LM_ERROR, "[CMakePacket::SetMessageSendError] ConnectID = %d, pMessage->GetMessageBase() is NULL.\n", u4ConnectID));
+		return NULL;
+	}
+}
+
+bool CMakePacket::PutSebdErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage)
+{
+	CMessage* pMessage = NULL;
+	pMessage = SetMessageSendError(u4ConnectID, pBodyMessage);
+	if(NULL != pMessage)
+	{
+		//将要处理的消息放入消息处理线程
+		if(false == App_MessageServiceGroup::instance()->PutMessage(pMessage))
+		{
+			OUR_DEBUG((LM_ERROR, "[CMakePacket::PutSebdErrorMessage] App_MessageServiceGroup::instance()->PutMessage Error.\n"));
+			App_MessagePool::instance()->Delete(pMessage);
+			return false;
+		}
+	}
+	else
+	{
+		App_MessagePool::instance()->Delete(pMessage);
+		return false;	
+	}
+
+	return true;
+}
+

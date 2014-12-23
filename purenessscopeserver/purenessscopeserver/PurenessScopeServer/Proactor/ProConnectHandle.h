@@ -79,6 +79,7 @@ private:
 	bool CheckMessage();                                                      //处理接收的数据
 	bool PutSendPacket(ACE_Message_Block* pMbData);                           //将发送数据放入队列
 	void ClearPacketParse(ACE_Message_Block& mbCurrBlock);                    //清理正在使用的PacketParse
+	void PutSendPacketError(ACE_Message_Block* pMbData);                      //发送失败回调
 
 private:
 	char             m_szError[MAX_BUFF_500];          //错误信息描述文字
