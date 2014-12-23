@@ -25,11 +25,11 @@ void WaitQuitSignal::init()
 {  
  	try
  	{  
- 	 signal(SIGKILL, SIG_IGN);  
  	 sigemptyset(&m_wait_mask);  
  	 sigaddset(&m_wait_mask, SIGINT);  
  	 sigaddset(&m_wait_mask, SIGQUIT);  
  	 sigaddset(&m_wait_mask, SIGTERM);  
+ 	 sigaddset(&m_wait_mask, SIGKILL);  
  	 pthread_sigmask(SIG_BLOCK, &m_wait_mask, 0);  
 	} 
 	catch (std::exception& e)
@@ -46,6 +46,7 @@ bool WaitQuitSignal::wait(bool &blFlag)
   	siginfo_t sig ;  
   	switch(sigtimedwait(&m_wait_mask,&sig,&m_time))
   	{  
+  	case SIGKILL:
   	case SIGINT:  
   	case SIGQUIT:  
   	case SIGTERM:  
