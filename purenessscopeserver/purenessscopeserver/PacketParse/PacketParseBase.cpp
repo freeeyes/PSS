@@ -32,7 +32,6 @@ void CPacketParseBase::Clear()
 
 	m_blIsHead = false;
 
-	m_u4PacketHead      = 0;
 	m_u4PacketData      = 0;
 	m_u4HeadSrcSize     = 0;
 	m_u4BodySrcSize     = 0;

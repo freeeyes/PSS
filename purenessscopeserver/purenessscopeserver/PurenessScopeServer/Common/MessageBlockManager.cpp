@@ -11,6 +11,7 @@ CMessageBlockManager::CMessageBlockManager(void)
 
 CMessageBlockManager::~CMessageBlockManager(void)
 {
+	Close();
 }
 
 void CMessageBlockManager::Init()
@@ -22,9 +23,23 @@ void CMessageBlockManager::Init()
 
 void CMessageBlockManager::Close()
 {
-	delete m_pmsgallocator;
-	delete m_pdata_allocator;
-	delete m_pbuff_allocator;
+	if(NULL != m_pmsgallocator)
+	{
+		delete m_pmsgallocator;
+		m_pmsgallocator = NULL;
+	}
+	
+	if(NULL != m_pdata_allocator)
+	{
+		delete m_pdata_allocator;
+		m_pdata_allocator = NULL;
+	}
+	
+	if(NULL != m_pbuff_allocator)
+	{
+		delete m_pbuff_allocator;
+		m_pbuff_allocator = NULL;
+	}
 }
 
 ACE_Message_Block* CMessageBlockManager::Create(uint32 u4Size)

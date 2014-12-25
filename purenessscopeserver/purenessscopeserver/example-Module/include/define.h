@@ -270,7 +270,15 @@ enum
 #define CLIENT_LINK_CDISCONNET  0x0002      //客户端退出
 #define CLIENT_LINK_SDISCONNET  0x0003      //服务器退出
 #define CLINET_LINK_SENDTIMEOUT 0x0004      //服务器发送客户端时间超过阀值
-#define CLINET_LINK_SENDERROR   0x0005      //客户端发送失败消息  
+#define CLINET_LINK_SENDERROR   0x0005      //客户端发送失败消息 
+//*****************************************************************
+
+//*****************************************************************
+//位操作运算符
+#define BIT_SET(a,b) if((int)(sizeof(a)) * 8 > b && b >= 0) { ((a) |= ((long long)1<<(b))); }
+#define BIT_CLEAR(a,b) if((int)(sizeof(a)) * 8 > b && b >= 0) { ((a) &= ~((long long)1<<(b))); }
+#define BIT_FLIP(a,b) if((int)(sizeof(a)) * 8 > b && b >= 0) { ((a) ^= ((long long)1<<(b))); }
+#define BIT_CHECK(a,b)  if((int)(sizeof(a)) * 8 > b && b >= 0) { ((a) & ((long long)1<<(b))); }
 //*****************************************************************
 
 //*****************************************************************
