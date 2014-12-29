@@ -72,7 +72,7 @@ bool CFileLogger::Init()
 
 	Close();
 
-	sprintf_safe(szFile, MAX_BUFF_1024, "%s%s", App_MainConfig::instance()->GetModulePath(), FILELOG_CONFIG);
+	sprintf_safe(szFile, MAX_BUFF_1024, "%s", FILELOG_CONFIG);
 	if(false == objXmlOpeation.Init(szFile))
 	{
 		OUR_DEBUG((LM_ERROR,"[CFileLogger::Init] Read Configfile[%s] failed\n", szFile));

@@ -4,9 +4,9 @@ include Makefile.define
 default:all
 
 # 主应用文件列表
-PATS = BaseCommand.o TcpTest.o 
+PATS = BaseCommand.o TcpTest.o ./IniRead/dictionary.o ./IniRead/iniparser.o
 
-LIB_BASE_OBJS = BaseCommand.o TcpTest.o 
+LIB_BASE_OBJS = BaseCommand.o TcpTest.o dictionary.o iniparser.o
 LIB_BASE = libTcpTest.so
 
 all: libTcpTest.so clear

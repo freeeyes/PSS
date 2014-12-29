@@ -28,6 +28,7 @@ CProConnectHandle::CProConnectHandle(void)
 	m_u2SendQueueTimeout  = MAX_QUEUE_TIMEOUT * 1000;  //目前因为记录的是微秒，所以这里相应的扩大1000倍
 	m_u2RecvQueueTimeout  = MAX_QUEUE_TIMEOUT * 1000;  //目前因为记录的是微秒，所以这里相应的扩大1000倍
 	m_u2TcpNodelay        = TCP_NODELAY_ON;
+	m_emStatus            = CLIENT_CLOSE_NOTHING;
 }
 
 CProConnectHandle::~CProConnectHandle(void)
@@ -61,6 +62,7 @@ void CProConnectHandle::Init(uint16 u2HandlerID)
 	}
 
 	m_pBlockMessage      = new ACE_Message_Block(m_u4MaxPacketSize);
+	m_emStatus           = CLIENT_CLOSE_NOTHING;
 }
 
 const char* CProConnectHandle::GetError()
@@ -142,27 +144,35 @@ bool CProConnectHandle::Close(int nIOCount, int nErrno)
 	return false;
 }
 
-bool CProConnectHandle::ServerClose()
+bool CProConnectHandle::ServerClose(EM_Client_Close_status emStatus)
 {
-	OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::ServerClose] Close(%d) delete OK.\n", GetConnectID()));
-
-	//发送服务器端链接断开消息。
-	if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_SDISCONNECT, NULL))
+	if(CLIENT_CLOSE_IMMEDIATLY == emStatus)
 	{
-		OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_SDISCONNECT is error.\n", GetConnectID()));
-		return false;
+		//发送服务器端链接断开消息。
+		if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_SDISCONNECT, NULL))
+		{
+			OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_SDISCONNECT is error.\n", GetConnectID()));
+			return false;
+		}
+
+		m_Reader.cancel();
+		m_Writer.cancel();
+
+		if(this->handle() != ACE_INVALID_HANDLE)
+		{
+			ACE_OS::closesocket(this->handle());
+			this->handle(ACE_INVALID_HANDLE);
+		}
+
+		m_u1ConnectState = CONNECT_SERVER_CLOSE;
+
+		//将对象指针放入空池中
+		App_ProConnectHandlerPool::instance()->Delete(this);
 	}
-
-	m_Reader.cancel();
-	m_Writer.cancel();
-
-	if(this->handle() != ACE_INVALID_HANDLE)
+	else
 	{
-		ACE_OS::closesocket(this->handle());
-		this->handle(ACE_INVALID_HANDLE);
+		m_emStatus = emStatus;
 	}
-
-	m_u1ConnectState = CONNECT_SERVER_CLOSE;
 
 	return true;
 }
@@ -204,6 +214,7 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 	m_u8SendQueueTimeCost = 0;
 	m_u4SuccessSendSize   = 0;
 	m_u4ReadSendSize      = 0;
+	m_emStatus            = CLIENT_CLOSE_NOTHING;
 	m_blIsLog             = false;
 	m_szConnectName[0]    = '\0';
 
@@ -565,14 +576,19 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
 {
 	if(!result.success() || result.bytes_transferred()==0)
 	{
-		//链接断开
-		OUR_DEBUG ((LM_DEBUG,"[CConnectHandler::handle_write_stream] Connectid=[%d] begin(%d)...\n",GetConnectID(), errno));
+		//发送失败
+		int nErrno = errno;
+		OUR_DEBUG ((LM_DEBUG,"[CConnectHandler::handle_write_stream] Connectid=[%d] begin(%d)...\n",GetConnectID(), nErrno));
 
-		AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, RecvQueueCount=%d, RecvQueueTimeCost=%I64dns, SendQueueTimeCost=%I64dns.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, m_u4RecvQueueCount, m_u8RecvQueueTimeCost, m_u8SendQueueTimeCost);
+		AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "WriteError [%s:%d] nErrno = %d  result.bytes_transferred() = %d, ",
+	                            		    m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), nErrno, 
+			                                result.bytes_transferred());
 
 		OUR_DEBUG((LM_DEBUG,"[CConnectHandler::handle_write_stream] Connectid=[%d] finish ok...\n", GetConnectID()));
 		m_atvOutput = ACE_OS::gettimeofday();
-		App_MessageBlockManager::instance()->Close(&result.message_block());
+		//App_MessageBlockManager::instance()->Close(&result.message_block());
+		//错误消息回调
+		App_MakePacket::instance()->PutSebdErrorMessage(GetConnectID(), &result.message_block());
 		Close();
 		return;
 	}
@@ -588,9 +604,20 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
 		//App_IPAccount::instance()->UpdateIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
 		m_ThreadWriteLock.release();
 		
-		//记录水位标
+		//记录发送字节数
 		m_u4SuccessSendSize += (uint32)result.bytes_to_write();
 		Close();
+
+		//查看是否需要关闭
+		if(CLIENT_CLOSE_SENDOK == m_emStatus)
+		{
+			//查看是否所有字节都发送完毕，都发送完毕调用服务器关闭接口
+			if(m_u4ReadSendSize - m_u4SuccessSendSize == 0)
+			{
+				ServerClose(CLIENT_CLOSE_IMMEDIATLY);
+			}
+		}
+
 		return;
 	}
 }
@@ -787,7 +814,7 @@ bool CProConnectHandle::CheckAlive()
 			OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 		}
 
-		ServerClose();
+		ServerClose(CLIENT_CLOSE_IMMEDIATLY);
 		return false;
 	}
 	else
@@ -1095,6 +1122,11 @@ void CProConnectHandle::SetLocalIPInfo(const char* pLocalIP, uint32 u4LocalPort)
 	m_u4LocalPort = u4LocalPort;
 }
 
+void CProConnectHandle::PutSendPacketError(ACE_Message_Block* pMbData)
+{
+	
+}
+
 //***************************************************************************
 CProConnectManager::CProConnectManager(void)
 {
@@ -1160,7 +1192,7 @@ bool CProConnectManager::Close(uint32 u4ConnectID)
 	}
 }
 
-bool CProConnectManager::CloseConnect(uint32 u4ConnectID)
+bool CProConnectManager::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status emStatus)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
 	//服务器关闭
@@ -1172,7 +1204,8 @@ bool CProConnectManager::CloseConnect(uint32 u4ConnectID)
 		m_mapConnectManager.erase(f);
 		if(pConnectHandler != NULL)
 		{
-			pConnectHandler->ServerClose();
+			pConnectHandler->ServerClose(emStatus);
+
 			m_u4TimeDisConnect++;
 
 			//加入链接统计功能
@@ -2250,7 +2283,7 @@ bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, const ch
 	return false;
 }
 
-bool CProConnectManagerGroup::CloseConnect(uint32 u4ConnectID)
+bool CProConnectManagerGroup::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status emStatus)
 {
 	//判断命中到哪一个线程组里面去
 	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
@@ -2269,7 +2302,7 @@ bool CProConnectManagerGroup::CloseConnect(uint32 u4ConnectID)
 		return false;		
 	}	
 
-	return pConnectManager->CloseConnect(u4ConnectID);
+	return pConnectManager->CloseConnect(u4ConnectID, emStatus);
 }
 
 _ClientIPInfo CProConnectManagerGroup::GetClientIPInfo(uint32 u4ConnectID)

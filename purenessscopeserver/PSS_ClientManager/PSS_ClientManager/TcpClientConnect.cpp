@@ -49,7 +49,7 @@ bool CTcpClientConnect::SendConsoleMessage( const char* pMessage, int nMessageLe
 
 	while(true)
 	{
-		nCurrSendLen = send(sckClient, pMessage + nBeginSend, nTotalSendLen, 0);
+		nCurrSendLen = send(sckClient, pMessage + nBeginSend, nTotalSendLen - nBeginSend, 0);
 		if(nCurrSendLen <= 0)
 		{
 			closesocket(sckClient);

@@ -8,7 +8,7 @@
 
 Mutex_Allocator _msg_service_mb_allocator; 
 
-CMessageService::CMessageService(void)
+CMessageService::CMessageService()
 {
 	m_u4ThreadID      = 0;
 	m_u4MaxQueue      = MAX_MSG_THREADQUEUE;
@@ -30,7 +30,7 @@ CMessageService::CMessageService(void)
 	}
 }
 
-CMessageService::~CMessageService(void)
+CMessageService::~CMessageService()
 {
 	OUR_DEBUG((LM_INFO, "[CMessageService::~CMessageService].\n"));
 }
@@ -476,7 +476,7 @@ uint32 CMessageService::GetStepState()
 	return m_ThreadInfo.m_u4State;
 }
 
-CMessageServiceGroup::CMessageServiceGroup( void )
+CMessageServiceGroup::CMessageServiceGroup()
 {
 	m_u4TimerID = 0;
 
@@ -491,9 +491,9 @@ CMessageServiceGroup::CMessageServiceGroup( void )
 	}
 }
 
-CMessageServiceGroup::~CMessageServiceGroup( void )
+CMessageServiceGroup::~CMessageServiceGroup()
 {
-
+	Close();
 }
 
 int CMessageServiceGroup::handle_timeout(const ACE_Time_Value &tv, const void *arg)
@@ -646,6 +646,7 @@ void CMessageServiceGroup::Close()
 		if(NULL != pMessageService)
 		{
 			pMessageService->Close();
+			SAFE_DELETE(pMessageService);
 		}
 	}
 
@@ -692,6 +693,7 @@ bool CMessageServiceGroup::KillTimer()
 	if(m_u4TimerID > 0)
 	{
 		App_TimerManager::instance()->cancel(m_u4TimerID);
+		m_u4TimerID = 0;
 	}
 	return true;
 }

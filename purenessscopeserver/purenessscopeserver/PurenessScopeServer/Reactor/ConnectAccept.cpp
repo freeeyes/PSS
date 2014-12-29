@@ -38,7 +38,7 @@ int ConnectAcceptor::open2(ACE_INET_Addr& local_addr, ACE_Reactor* reactor, int 
 
 	//添加记录监听服务器的IP和端口地址
 	sprintf_safe(m_szListenIP, MAX_BUFF_20, "%s", local_addr.get_host_addr());
-	m_u4Port = (uint8)local_addr.get_port_number();
+	m_u4Port = (uint32)local_addr.get_port_number();
 
     if (reactor == 0)
     {

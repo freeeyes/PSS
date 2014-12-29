@@ -6,7 +6,7 @@
 	ProjectGUID="{6C2026BE-FECA-1BAD-2246-D8260000002E}"
 	RootNamespace="TcpTest"
 	Keyword="Win32Proj"
-	SignManifests="true"
+	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -25,7 +25,6 @@
 			IntermediateDirectory="Debug\TcpTest\I386"
 			ConfigurationType="2"
 			CharacterSet="0"
-
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -51,7 +50,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(ACE_ROOT),.,..\Include"
+				AdditionalIncludeDirectories="$(ACE_ROOT),.,..\Include,.\IniRead"
 				PreprocessorDefinitions="TEST_TCP_BUILD_DLL;_DEBUG;WIN32;_WINDOWS;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;MPC_LIB_MODIFIER=\&quot;d\&quot;"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
@@ -90,6 +89,9 @@
 				Name="VCALinkTool"
 			/>
 			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
 				Name="VCXDCMakeTool"
 			/>
 			<Tool
@@ -97,6 +99,9 @@
 			/>
 			<Tool
 				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -108,7 +113,6 @@
 			IntermediateDirectory="Release\TcpTest\I386"
 			ConfigurationType="2"
 			CharacterSet="0"
-
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -172,6 +176,9 @@
 				Name="VCALinkTool"
 			/>
 			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
 				Name="VCXDCMakeTool"
 			/>
 			<Tool
@@ -179,6 +186,9 @@
 			/>
 			<Tool
 				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -190,7 +200,6 @@
 			IntermediateDirectory="Debug\TcpTest\AMD64"
 			ConfigurationType="2"
 			CharacterSet="0"
-
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -274,7 +283,6 @@
 			IntermediateDirectory="Release\TcpTest\AMD64"
 			ConfigurationType="2"
 			CharacterSet="0"
-
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -357,77 +365,117 @@
 	<Files>
 		<Filter
 			Name="Source Files"
-			Filter="cpp;cxx;cc;c;C">
+			Filter="cpp;cxx;cc;c;C"
+			>
 			<File
-				RelativePath="BaseCommand.cpp">
+				RelativePath="BaseCommand.cpp"
+				>
 			</File>
 			<File
-				RelativePath="TcpTest.cpp">
+				RelativePath="TcpTest.cpp"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
-			Filter="h;hpp;hxx;hh">
+			Filter="h;hpp;hxx;hh"
+			>
 			<File
-				RelativePath="BaseCommand.h">
+				RelativePath="BaseCommand.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Build Files"
-			Filter="mpc;mpb;mwc">
+			Filter="mpc;mpb;mwc"
+			>
 			<File
-				RelativePath="TcpTest.mpc">
+				RelativePath="TcpTest.mpc"
+				>
 				<FileConfiguration
 					Name="Debug|Win32"
 					ExcludedFromBuild="true"
-				>
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
-				>
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|x64"
 					ExcludedFromBuild="true"
-				>
-				</FileConfiguration>
+				/>
 				<FileConfiguration
 					Name="Release|x64"
 					ExcludedFromBuild="true"
-				>
-				</FileConfiguration>
+				/>
 			</File>
 		</Filter>
 		<Filter
 			Name="Documentation"
-			Filter="">
+			>
 			<File
-				RelativePath="ReadMe.txt">
+				RelativePath="ReadMe.txt"
+				>
 				<FileConfiguration
 					Name="Debug|Win32"
-					ExcludedFromBuild="TRUE">
+					ExcludedFromBuild="true"
+					>
 					<Tool
-						Name="VCCustomBuildTool"/>
+						Name="VCCustomBuildTool"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32"
-					ExcludedFromBuild="TRUE">
+					ExcludedFromBuild="true"
+					>
 					<Tool
-						Name="VCCustomBuildTool"/>
+						Name="VCCustomBuildTool"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|x64"
-					ExcludedFromBuild="TRUE">
+					ExcludedFromBuild="TRUE"
+					>
 					<Tool
-						Name="VCCustomBuildTool"/>
+						Name="VCCustomBuildTool"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|x64"
-					ExcludedFromBuild="TRUE">
+					ExcludedFromBuild="TRUE"
+					>
 					<Tool
-						Name="VCCustomBuildTool"/>
+						Name="VCCustomBuildTool"
+					/>
 				</FileConfiguration>
+			</File>
+		</Filter>
+		<Filter
+			Name="IniRead"
+			>
+			<File
+				RelativePath=".\IniRead\dictionary.c"
+				>
+			</File>
+			<File
+				RelativePath=".\IniRead\dictionary.h"
+				>
+			</File>
+			<File
+				RelativePath=".\IniRead\iniparser.c"
+				>
+			</File>
+			<File
+				RelativePath=".\IniRead\iniparser.h"
+				>
 			</File>
 		</Filter>
 	</Files>

@@ -627,7 +627,7 @@ int CClientProConnectManager::handle_timeout(const ACE_Time_Value &tv, const voi
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 
-	OUR_DEBUG((LM_DEBUG, "[CClientProConnectManager::handle_timeout]Begin.\n"));
+	//OUR_DEBUG((LM_DEBUG, "[CClientProConnectManager::handle_timeout]Begin.\n"));
 	if(m_ProAsynchConnect.GetConnectState() == true)
 	{
 		return 0;
@@ -647,7 +647,7 @@ int CClientProConnectManager::handle_timeout(const ACE_Time_Value &tv, const voi
 		}
 	}
 
-	OUR_DEBUG((LM_DEBUG, "[CClientProConnectManager::handle_timeout]End.\n"));
+	//OUR_DEBUG((LM_DEBUG, "[CClientProConnectManager::handle_timeout]End.\n"));
 	return 0;
 }
 

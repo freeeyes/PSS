@@ -3,6 +3,7 @@
 #include "IBuffPacket.h"
 #include "ClientCommand.h"
 #include "IObject.h"
+#include "iniparser.h"
 
 #include <string>
 
@@ -24,6 +25,8 @@ public:
 
 	int DoMessage(IMessage* pMessage, bool& bDeleteFlag);
 	void SetServerObject(CServerObject* pServerObject);
+
+	void ReadIniFile(const char* pIniFileName);
 
 private:
 	int Do_Connect(IMessage* pMessage);

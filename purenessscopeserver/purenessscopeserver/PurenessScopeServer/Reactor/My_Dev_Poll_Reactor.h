@@ -18,6 +18,13 @@
 
 #include /**/ "ace/pre.h"
 
+//ÅÐ¶ÏACE°æ±¾ºÅ
+#ifdef ACE_VERSION
+#if ACE_MAJOR_VERSION >= 6 && ACE_MINOR_VERSION >= 3
+#include "ace/Flag_Manip.h"
+#endif
+#endif
+
 #include /**/ "ace/ACE_export.h"
 
 #if !defined (ACE_LACKS_PRAGMA_ONCE)

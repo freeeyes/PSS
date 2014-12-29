@@ -36,7 +36,7 @@ public:
 		m_StrlogType        = "ServerError";
 		m_pBuffer           = new char[u4BufferSize];   //这里是用于日志拼接时间所用
 		m_u4BufferSize      = u4BufferSize;
-		sprintf_safe(m_szFilRoot, MAX_BUFF_100, "%s", pFileRoot);
+		sprintf_safe(m_szFileRoot, MAX_BUFF_100, "%s", pFileRoot);
 	};
 
 	virtual ~CLogFile()
@@ -214,7 +214,7 @@ public:
 		sprintf_safe(szDateBuff, MAX_TIME_SIZE, "_%04d-%02d-%02d.log", dt.year(), dt.month(), dt.day());
 		sprintf_safe(m_szLogTime, MAX_TIME_SIZE, "%04d-%02d-%02d", dt.year(), dt.month(), dt.day());
 
-		ACE_TString strLogModulePath = App_MainConfig::instance()->GetModulePath();
+		ACE_TString strLogModulePath = m_szFileRoot;
 		ACE_TString strLogName       = strLogModulePath + "/Log/" + m_StrlogType + "/" + m_StrlogName + "/" + m_StrServerName + m_StrlogName + szDateBuff;
 
 		m_File.close();
@@ -247,13 +247,13 @@ public:
 	void CreatePath()
 	{
 		char szPath[MAX_CMD_NUM] = {'\0'};
-		sprintf_safe(szPath, MAX_CMD_NUM, "%s/Log/", m_szFilRoot);
+		sprintf_safe(szPath, MAX_CMD_NUM, "%s/Log/", m_szFileRoot);
 		ACE_OS::mkdir(szPath);
 
-		sprintf_safe(szPath, MAX_CMD_NUM, "%s/Log/%s/", m_szFilRoot, m_StrlogType.c_str());
+		sprintf_safe(szPath, MAX_CMD_NUM, "%s/Log/%s/", m_szFileRoot, m_StrlogType.c_str());
 		ACE_OS::mkdir(szPath);
 
-		sprintf_safe(szPath, MAX_CMD_NUM, "%s/Log/%s/%s", m_szFilRoot, m_StrlogType.c_str(), m_StrlogName.c_str());
+		sprintf_safe(szPath, MAX_CMD_NUM, "%s/Log/%s/%s", m_szFileRoot, m_StrlogType.c_str(), m_StrlogName.c_str());
 		ACE_OS::mkdir(szPath);
 	}
 
@@ -267,7 +267,7 @@ private:
 	ACE_FILE_IO         m_File;
 	ACE_FILE_Addr       m_FileAddr; 
 	char                m_szLogTime[MAX_TIME_SIZE];
-	char                m_szFilRoot[MAX_BUFF_100];   //路径的主目录
+	char                m_szFileRoot[MAX_BUFF_100];   //路径的主目录
 	char*               m_pBuffer;                   //日志缓冲指针
 	uint32              m_u4BufferSize;              //日志缓冲最大大小 
 };

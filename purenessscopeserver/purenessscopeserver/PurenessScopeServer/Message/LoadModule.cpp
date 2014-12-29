@@ -24,8 +24,6 @@ void CLoadModule::Close()
 	{
 		//卸载并删除当初new的module对象
 		UnLoadModule(m_mapModuleInfo.GetMapDataKey(i).c_str());
-		_ModuleInfo* pModuleInfo = (_ModuleInfo* )m_mapModuleInfo.GetMapData(i);
-		SAFE_DELETE(pModuleInfo);
 	}
 
 	m_mapModuleInfo.Clear();
@@ -78,7 +76,7 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pResourceName)
 			m_mapModuleInfo.DelMapData(strModuleName, true);
 		}
 
-        //将注册成功的模块，加入到map中
+		//将注册成功的模块，加入到map中
 		if(false == m_mapModuleInfo.AddMapData(pModuleInfo->GetName(), pModuleInfo))
 		{
 			OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] m_mapModuleInfo.AddMapData error!\n"));
@@ -91,7 +89,6 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pResourceName)
 		if(nRet != 0)
 		{
 			OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Execute Function LoadModuleData is error!\n", strModuleName.c_str()));
-			m_tmModule.release();
 			return false;
 		}
 
@@ -153,17 +150,17 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, c
 	if(nRet != 0)
 	{
 		OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Execute Function LoadModuleData is error!\n", strModuleName.c_str()));
-		m_tmModule.release();
+		SAFE_DELETE(pModuleInfo);
 		return false;
 	}
 
-	OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] Begin Load ModuleName[%s] OK!\n", strModuleName.c_str()));
-
+	OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] Begin Load ModuleName[%s] OK!\n", pModuleInfo->GetName()));
 	return true;
 }
 
 bool CLoadModule::UnLoadModule(const char* szResourceName)
 {
+	OUR_DEBUG((LM_ERROR, "[CLoadModule::UnLoadModule]szResourceName=%s.\n", szResourceName));
 	string strModuleName = szResourceName;
 	_ModuleInfo* pModuleInfo = m_mapModuleInfo.SearchMapData(strModuleName);
 	if(NULL == pModuleInfo)
@@ -178,11 +175,11 @@ bool CLoadModule::UnLoadModule(const char* szResourceName)
 		//这里延迟一下，因为有可能正在处理当前信息，所以必须在这里延迟一下，防止报错（改变了处理模式，这种方式是很蠢笨的，所以这段代码废弃之）
 		//ACE_Time_Value tvSleep(MAX_LOADMODEL_CLOSE, 0);
 		//ACE_OS::sleep(tvSleep);
-		
+
 		//清除模块相关索引和数据
 		int nRet = ACE_OS::dlclose(pModuleInfo->hModule);
-		m_mapModuleInfo.DelMapData(strModuleName);
-		
+		m_mapModuleInfo.DelMapData(strModuleName, true);
+
 		OUR_DEBUG((LM_ERROR, "[CLoadModule::UnLoadModule] Close Module=%s, nRet=%d!\n", strModuleName.c_str(), nRet));
 
 		return true;
@@ -253,7 +250,7 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo,
 
 	m_tmModule.acquire();
 
-	pModuleInfo->hModule = ACE_OS::dlopen(szModuleFile, RTLD_NOW);
+	pModuleInfo->hModule = ACE_OS::dlopen((ACE_TCHAR *)szModuleFile, RTLD_NOW);
 	if(NULL == pModuleInfo->hModule || !pModuleInfo->hModule)
 	{
 		OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, pModuleInfo->hModule is NULL(%s)!\n", strModuleName.c_str(), ACE_OS::dlerror()));

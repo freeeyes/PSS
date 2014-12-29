@@ -221,7 +221,11 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 	WaitQuitSignal::init();
 	
 	pthread_t tid;
-	pthread_create(&tid, NULL, thread_Monitor, NULL);		
+	pthread_attr_t attr;
+	pthread_attr_init(&attr);	
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+	
+	pthread_create(&tid, &attr, thread_Monitor, NULL);		
 
 	//判断是否是需要以服务的状态启动
 	if(App_MainConfig::instance()->GetServerType() == 1)
@@ -252,6 +256,8 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 	ACE_OS::sleep(tvSleep);
 
 	OUR_DEBUG((LM_INFO, "[main]Server Exit.\n"));
+	
+	pthread_exit(NULL);
 
 	return 0;
 }

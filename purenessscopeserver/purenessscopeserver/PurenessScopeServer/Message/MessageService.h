@@ -41,8 +41,8 @@ enum MESSAGE_SERVICE_THREAD_STATE
 class CMessageService : public ACE_Task<ACE_MT_SYNCH>
 {
 public:
-	CMessageService(void);
-	~CMessageService(void);
+	CMessageService();
+	~CMessageService();
 
 	virtual int open(void* args = 0);
 	virtual int svc (void);
@@ -104,8 +104,8 @@ private:
 class CMessageServiceGroup : public ACE_Task<ACE_MT_SYNCH>
 {
 public:
-	CMessageServiceGroup(void);
-	~CMessageServiceGroup(void);
+	CMessageServiceGroup();
+	~CMessageServiceGroup();
 
 	virtual int handle_timeout(const ACE_Time_Value &tv, const void *arg);
 
