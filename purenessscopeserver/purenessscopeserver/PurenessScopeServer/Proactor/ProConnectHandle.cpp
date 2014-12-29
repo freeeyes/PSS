@@ -165,6 +165,9 @@ bool CProConnectHandle::ServerClose(EM_Client_Close_status emStatus)
 		}
 
 		m_u1ConnectState = CONNECT_SERVER_CLOSE;
+
+		//将对象指针放入空池中
+		App_ProConnectHandlerPool::instance()->Delete(this);
 	}
 	else
 	{
