@@ -170,6 +170,8 @@ bool CConnectHandler::ServerClose(EM_Client_Close_status emStatus)
 		//msg_queue()->deactivate();
 		shutdown();
 
+		ClearPacketParse();
+
 		//回归用过的指针
 		App_ConnectHandlerPool::instance()->Delete(this);
 	}

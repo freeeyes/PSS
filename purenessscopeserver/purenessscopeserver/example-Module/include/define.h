@@ -249,7 +249,7 @@ enum EM_Server_Connect_State
 #define DEBUG_ON  1
 #define DEBUG_OFF 0
 
-#define OUR_DEBUG(X)  ACE_DEBUG((LM_INFO, "[%D|%t]")); ACE_DEBUG(X)
+#define OUR_DEBUG(X)  ACE_DEBUG((LM_INFO, "[%t]")); ACE_DEBUG(X)
 
 enum
 {
