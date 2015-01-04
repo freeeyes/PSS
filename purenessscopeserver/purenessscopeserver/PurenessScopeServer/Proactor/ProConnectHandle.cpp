@@ -61,7 +61,7 @@ void CProConnectHandle::Init(uint16 u2HandlerID)
 		m_u2RecvQueueTimeout = MAX_QUEUE_TIMEOUT * 1000;
 	}
 
-	m_pBlockMessage      = new ACE_Message_Block(m_u4MaxPacketSize);
+	m_pBlockMessage      = new ACE_Message_Block(App_MainConfig::instance()->GetSendDataMask());
 	m_emStatus           = CLIENT_CLOSE_NOTHING;
 }
 
@@ -195,6 +195,9 @@ void CProConnectHandle::addresses (const ACE_INET_Addr &remote_address, const AC
 void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 {
 	ACE_Time_Value tvOpenBegin(ACE_OS::gettimeofday());
+
+	//ÖØÖÃ»º³åÇø
+	m_pBlockMessage->reset();
 
 	OUR_DEBUG((LM_INFO, "[CProConnectHandle::open] [0x%08x]Connection from [%s:%d]\n", this, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
 
