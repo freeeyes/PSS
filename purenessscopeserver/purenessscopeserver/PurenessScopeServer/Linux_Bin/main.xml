@@ -26,7 +26,7 @@
 	<CoreSetting CoreNeed="0" desc="是否需要打开Core文件支持，0为不需要，1为需要" />
 	<CommandAccount Account="1" FlowAccount="1" desc="Account为1记录统计命令日志，0为不记录，FlowAccount为流量统计，1为开启，0为关闭" />
 	<RecvInfo RecvBuffSize="20480" RecvQueueTimeout="50" desc="接收客户端数据配置参数" />
-	<SendInfo SendQueueMax="100" TcpNodelay="0" SingleConnectionMaxSendMask="20480" SendTimeout="50" SendAliveTime="60" SendQueueTimeout="50" SendQueueCount="1" PutQueueTimeout = "100" desc="发送到客户端需要配置的参数" />
+	<SendInfo SendQueueMax="100" TcpNodelay="0" MaxSendMask="20480" MaxBlockSize="5120" SendTimeout="50" SendAliveTime="60" SendQueueTimeout="50" SendQueueCount="1" PutQueueTimeout = "100" desc="发送到客户端需要配置的参数" />
 	<ThreadInfo ThreadTimeout="30" ThreadTimeCheck="120" DisposeTimeout="40" PutQueueTimeout = "100" desc="工作线程相关参数" />
 	<ThreadInfoAI AI="0" CheckTime="60" TimeoutCount="5" StopTime="30" ReturnDataType="1" ReturnData="02 00 00 00 ff ff" desc="工作线程负载自我监控相关设置，AI=0关闭，1打开" />
 	<ClientInfo HandlerCount="5000" MaxHandlerCount="10000" MaxConnectTime="60" MaxBuffRecv="1024"  desc="客户端链接相关参数"/>

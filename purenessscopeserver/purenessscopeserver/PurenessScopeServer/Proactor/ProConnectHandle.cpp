@@ -61,7 +61,7 @@ void CProConnectHandle::Init(uint16 u2HandlerID)
 		m_u2RecvQueueTimeout = MAX_QUEUE_TIMEOUT * 1000;
 	}
 
-	m_pBlockMessage      = new ACE_Message_Block(App_MainConfig::instance()->GetSendDataMask());
+	m_pBlockMessage      = new ACE_Message_Block(App_MainConfig::instance()->GetBlockSize());
 	m_emStatus           = CLIENT_CLOSE_NOTHING;
 }
 

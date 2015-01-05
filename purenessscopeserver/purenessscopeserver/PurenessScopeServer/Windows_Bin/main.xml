@@ -37,7 +37,7 @@
 	<!-- 接收数据包连接相关设置 -->
 	<RecvInfo RecvBuffSize="20480" RecvQueueTimeout="50" desc="接收客户端数据配置参数" />
 	<!-- 发送数据包连接相关设置 -->
-	<SendInfo SendQueueMax="100" TcpNodelay="0" SingleConnectionMaxSendMask="20480" SendTimeout="50" SendAliveTime="60" SendQueueTimeout="50" SendQueueCount="1" PutQueueTimeout = "100" desc="发送到客户端需要配置的参数" />
+	<SendInfo SendQueueMax="100" TcpNodelay="0" MaxSendMask="20480" MaxBlockSize="5120" SendTimeout="50" SendAliveTime="60" SendQueueTimeout="50" SendQueueCount="1" PutQueueTimeout = "100" desc="发送到客户端需要配置的参数" />
 	<!-- 监控线程相关设置 -->
 	<ThreadInfo ThreadTimeout="30" ThreadTimeCheck="120" DisposeTimeout="40" PutQueueTimeout = "100" desc="工作线程相关参数" />
 	<!-- 监控线程AI相关设置 -->

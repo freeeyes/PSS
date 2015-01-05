@@ -277,6 +277,7 @@ public:
 	uint32 GetLogFileMaxSize();
 	uint32 GetLogFileMaxCnt();
 	char*  GetDebugLevel();
+	uint32 GetBlockSize();
 
 	uint16 GetModuleInfoCount();
 	_ModuleConfig* GetModuleInfo(uint16 u2Index);
@@ -346,6 +347,7 @@ private:
 	uint32     m_u4ConnectServerRecvBuff;          //服务器间的数据包接收缓冲大小
 	uint32     m_u4ServerRecvBuff;                 //接收从客户端到达的数据块的最大大小，只有PacketPrase流模式才会生效
 	uint32     m_u4SendDatamark;                   //发送差值的水位标（目前只有Proactor模式用这个）
+	uint32     m_u4BlockSize;                      //发送缓冲块大小设置
 	uint16     m_u2TcpNodelay;                     //TCP的Nagle算法开关，0为打开，1为关闭
 
 	uint8      m_u1NetworkMode;                    //当前可以设置的网络模式

@@ -144,7 +144,7 @@ void CConnectHandler::Init(uint16 u2HandlerID)
 		m_u8RecvQueueTimeout = MAX_QUEUE_TIMEOUT * 1000 * 1000;
 	}
 
-	m_pBlockMessage      = new ACE_Message_Block(App_MainConfig::instance()->GetSendDataMask());
+	m_pBlockMessage      = new ACE_Message_Block(App_MainConfig::instance()->GetBlockSize());
 	m_emStatus           = CLIENT_CLOSE_NOTHING;
 }
 
@@ -1451,8 +1451,8 @@ bool CConnectHandler::CheckMessage()
 	{
 		m_u4AllRecvSize += (uint32)m_pPacketParse->GetMessageHead()->length() + (uint32)m_pPacketParse->GetMessageBody()->length();
 	}
-	OUR_DEBUG((LM_ERROR, "[CConnectHandler::CheckMessage]head length=%d.\n", m_pPacketParse->GetMessageHead()->length()));
-	OUR_DEBUG((LM_ERROR, "[CConnectHandler::CheckMessage]body length=%d.\n", m_pPacketParse->GetMessageBody()->length()));
+	//OUR_DEBUG((LM_ERROR, "[CConnectHandler::CheckMessage]head length=%d.\n", m_pPacketParse->GetMessageHead()->length()));
+	//OUR_DEBUG((LM_ERROR, "[CConnectHandler::CheckMessage]body length=%d.\n", m_pPacketParse->GetMessageBody()->length()));
 
 	m_u4AllRecvCount++;
 

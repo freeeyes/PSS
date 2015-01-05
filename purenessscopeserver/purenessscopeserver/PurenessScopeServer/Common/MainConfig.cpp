@@ -25,6 +25,7 @@ CMainConfig::CMainConfig(void)
 	m_u1Debug                 = DEBUG_OFF;
 	m_u1Monitor               = 0;
 	m_u4SendDatamark          = MAX_BLOCK_SIZE;
+	m_u4BlockSize             = MAX_BLOCK_SIZE;
 	m_u4CoreFileSize          = 0;
 	m_u2TcpNodelay            = TCP_NODELAY_ON;
 
@@ -673,12 +674,16 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
 	{
 		m_u2SendQueuePutTime = (uint16)ACE_OS::atoi(pData);
 	}
-	pData = m_MainConfig.GetData("SendInfo", "SingleConnectionMaxSendMask");
+	pData = m_MainConfig.GetData("SendInfo", "MaxSendMask");
 	if(pData != NULL)
 	{
 		m_u4SendDatamark = (int)ACE_OS::atoi(pData);
 	}
-
+	pData = m_MainConfig.GetData("SendInfo", "MaxBlockSize");
+	if(pData != NULL)
+	{
+		m_u4BlockSize = (int)ACE_OS::atoi(pData);
+	}
 
 	//线程相关
 	pData = m_MainConfig.GetData("ThreadInfo", "PutQueueTimeout");
@@ -1002,6 +1007,7 @@ void CMainConfig::Display()
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4SendDatamark = %d.\n", m_u4SendDatamark));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u2TcpNodelay = %d.\n", m_u2TcpNodelay));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4TrackIPCount = %d.\n", m_u4TrackIPCount));
+	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4BlockSize = %d.\n", m_u4BlockSize));
 
 	for(int i = 0; i < (int)m_vecUDPServerInfo.size(); i++)
 	{
@@ -1483,3 +1489,7 @@ _ModuleConfig* CMainConfig::GetModuleInfo(uint16 u2Index)
 	}
 }
 
+uint32 CMainConfig::GetBlockSize()
+{
+	return m_u4BlockSize;
+}
