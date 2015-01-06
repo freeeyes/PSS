@@ -134,6 +134,8 @@ int CBaseCommand::Do_Base(IMessage* pMessage)
 		m_pServerObject->GetPacketManager()->Delete(pResponsesPacket);
 	}
 
+	//m_pServerObject->GetConnectManager()->CloseConnect(pMessage->GetMessageBase()->m_u4ConnectID);
+
 	return 0;
 }
 

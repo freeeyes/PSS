@@ -242,24 +242,23 @@ bool CMessagePool::Delete(CMessage* pBuffPacket)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	CMessage* pBuff = (CMessage* )pBuffPacket;
-	if(NULL == pBuff)
+	if(NULL == pBuffPacket)
 	{
 		return false;
 	}
 
 	pBuffPacket->Clear();
 
-	mapMessage::iterator f = m_mapMessageUsed.find(pBuff);
+	mapMessage::iterator f = m_mapMessageUsed.find(pBuffPacket);
 	if(f != m_mapMessageUsed.end())
 	{
 		m_mapMessageUsed.erase(f);
 
 		//添加到Free map里面
-		mapMessage::iterator f = m_mapMessageFree.find(pBuff);
+		mapMessage::iterator f = m_mapMessageFree.find(pBuffPacket);
 		if(f == m_mapMessageFree.end())
 		{
-			m_mapMessageFree.insert(mapMessage::value_type(pBuff, pBuff));
+			m_mapMessageFree.insert(mapMessage::value_type(pBuffPacket, pBuffPacket));
 		}
 	}
 

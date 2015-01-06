@@ -136,7 +136,7 @@ bool CProConnectHandle::Close(int nIOCount, int nErrno)
 		App_ProConnectManager::instance()->Close(GetConnectID());
 
 		//将对象指针放入空池中
-		//App_ProConnectHandlerPool::instance()->Delete(this);
+		App_ProConnectHandlerPool::instance()->Delete(this);
 
 		return true;
 	}
@@ -166,8 +166,6 @@ bool CProConnectHandle::ServerClose(EM_Client_Close_status emStatus)
 
 		m_u1ConnectState = CONNECT_SERVER_CLOSE;
 
-		//将对象指针放入空池中
-		//App_ProConnectHandlerPool::instance()->Delete(this);
 	}
 	else
 	{
@@ -194,8 +192,6 @@ void CProConnectHandle::addresses (const ACE_INET_Addr &remote_address, const AC
 
 void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 {
-	ACE_Time_Value tvOpenBegin(ACE_OS::gettimeofday());
-
 	//重置缓冲区
 	m_pBlockMessage->reset();
 
@@ -221,9 +217,6 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 	m_blIsLog             = false;
 	m_szConnectName[0]    = '\0';
 
-	ACE_Time_Value tvOpenEnd(ACE_OS::gettimeofday());
-	ACE_Time_Value tvOpen(tvOpenEnd - tvOpenBegin);
-
 	if(App_ForbiddenIP::instance()->CheckIP(m_addrRemote.get_host_addr()) == false)
 	{
 		//在禁止列表中，不允许访问
@@ -231,6 +224,7 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 		return;
 	}
 
+	
 	//检查单位时间链接次数是否达到上限
 	if(false == App_IPAccount::instance()->AddIP((string)m_addrRemote.get_host_addr()))
 	{
@@ -260,21 +254,21 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 		App_MainConfig::instance()->GetClientDataAlert()->m_u4SendPacketCount,
 		App_MainConfig::instance()->GetClientDataAlert()->m_u4SendDataMax);
 
-	//写入连接日志
-	AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Connection from [%s:%d] DisposeTime = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), tvOpen.msec());
-
 	this->handle(h);
 
 	//默认别名是IP地址
 	SetConnectName(m_addrRemote.get_host_addr());
 
 	if(this->m_Reader.open(*this, h, 0, App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE)) == -1 || 
-		this->m_Writer.open(*this, h, 0, App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE)) == -1)
+	this->m_Writer.open(*this, h, 0, App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE)) == -1)
 	{
 		OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::open] m_reader or m_reader == 0.\n"));	
 		Close();
 		return;
 	}
+
+	//写入连接日志
+	AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Connection from [%s:%d]To Server.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number());
 
 	//ACE_Sig_Action writeAction((ACE_SignalHandler)SIG_IGN);
 	//writeAction.register_action(SIGPIPE, 0);
@@ -303,7 +297,7 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 		Close();
 		return;
 	}
-
+	
 	//告诉PacketParse连接应建立
 	m_pPacketParse->Connect(GetConnectID(), GetClientIPInfo(), GetLocalIPInfo());
 
@@ -313,6 +307,7 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 		OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 	}
 
+	
 	if(m_pPacketParse->GetPacketMode() == PACKET_WITHHEAD)
 	{
 		RecvClinetPacket(m_pPacketParse->GetPacketHeadLen());
@@ -798,9 +793,9 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 	}
 }
 
-bool CProConnectHandle::CheckAlive()
+bool CProConnectHandle::CheckAlive(ACE_Time_Value& tvNow)
 {
-	ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+	//ACE_Time_Value tvNow = ACE_OS::gettimeofday();
 	ACE_Time_Value tvIntval(tvNow - m_atvInput);
 	if(tvIntval.sec() > m_u2MaxConnectTime)
 	{
@@ -943,16 +938,7 @@ bool CProConnectHandle::RecvClinetPacket(uint32 u4PackeLen)
 	{
 		AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, RecvQueueCount=%d, RecvQueueTimeCost=%I64d, SendQueueTimeCost=%I64d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, m_u4RecvQueueCount, m_u8RecvQueueTimeCost, m_u8SendQueueTimeCost);
 		OUR_DEBUG((LM_ERROR, "[CProConnectHandle::RecvClinetPacket] pmb new is NULL.\n"));
-		if(m_pPacketParse->GetMessageHead() != NULL)
-		{
-			m_pPacketParse->GetMessageHead()->release();
-		}
-
-		if(m_pPacketParse->GetMessageBody() != NULL)
-		{
-			m_pPacketParse->GetMessageBody()->release();
-		}
-		App_PacketParsePool::instance()->Delete(m_pPacketParse);
+		ClearPacketParse(*pmb);
 		Close(2);
 		return false;
 	}
@@ -962,17 +948,7 @@ bool CProConnectHandle::RecvClinetPacket(uint32 u4PackeLen)
 		//如果读失败，则关闭连接。
 		AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, RecvQueueCount=%d, RecvQueueTimeCost=%I64d, SendQueueTimeCost=%I64d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, m_u4RecvQueueCount, m_u8RecvQueueTimeCost, m_u8SendQueueTimeCost);
 		OUR_DEBUG((LM_ERROR, "[CProConnectHandle::RecvClinetPacket] m_reader.read is error(%d)(%d).\n", GetConnectID(), errno));
-		pmb->release();
-		if(m_pPacketParse->GetMessageHead() != NULL)
-		{
-			m_pPacketParse->GetMessageHead()->release();
-		}
-
-		if(m_pPacketParse->GetMessageBody() != NULL)
-		{
-			m_pPacketParse->GetMessageBody()->release();
-		}
-		App_PacketParsePool::instance()->Delete(m_pPacketParse);
+		ClearPacketParse(*pmb);
 		Close(2);
 		return false;
 	}
@@ -1081,22 +1057,34 @@ _ClientIPInfo CProConnectHandle::GetLocalIPInfo()
 void CProConnectHandle::ClearPacketParse(ACE_Message_Block& mbCurrBlock)
 {
 	//链接断开
-	if(m_pPacketParse->GetMessageHead() != NULL)
+	if(NULL != m_pPacketParse && m_pPacketParse->GetMessageHead() != NULL)
 	{
 		App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
 	}
 
-	if(m_pPacketParse->GetMessageBody() != NULL)
+	if(NULL != m_pPacketParse && m_pPacketParse->GetMessageBody() != NULL)
 	{
 		App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
 	}
 
-	if(&mbCurrBlock != m_pPacketParse->GetMessageHead() && &mbCurrBlock != m_pPacketParse->GetMessageBody())
+	if(NULL != m_pPacketParse)
 	{
-		//OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::handle_read_stream] Message_block release.\n"));
-		App_MessageBlockManager::instance()->Close(&mbCurrBlock);
+		if(NULL != &mbCurrBlock && &mbCurrBlock != m_pPacketParse->GetMessageHead() && &mbCurrBlock != m_pPacketParse->GetMessageBody())
+		{
+			//OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::handle_read_stream] Message_block release.\n"));
+			App_MessageBlockManager::instance()->Close(&mbCurrBlock);
+		}
+
+		App_PacketParsePool::instance()->Delete(m_pPacketParse);
+		m_pPacketParse = NULL;
 	}
-	App_PacketParsePool::instance()->Delete(m_pPacketParse);
+	else
+	{
+		if(NULL != &mbCurrBlock)
+		{
+			App_MessageBlockManager::instance()->Close(&mbCurrBlock);
+		}
+	}
 }
 
 char* CProConnectHandle::GetConnectName()
@@ -1429,6 +1417,7 @@ bool CProConnectManager::KillTimer()
 int CProConnectManager::handle_timeout(const ACE_Time_Value &tv, const void *arg)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
+	ACE_Time_Value tvNow = ACE_OS::gettimeofday();
 
 	//为了防止多线程下的链接删除问题，先把所有的链接ID读出来，再做遍历操作，减少线程竞争的机会。
 	if(m_mapConnectManager.size() != 0)
@@ -1438,7 +1427,7 @@ int CProConnectManager::handle_timeout(const ACE_Time_Value &tv, const void *arg
 			CProConnectHandle* pConnectHandler = (CProConnectHandle* )b->second;
 			if(pConnectHandler != NULL)
 			{
-				if(false == pConnectHandler->CheckAlive())
+				if(false == pConnectHandler->CheckAlive(tvNow))
 				{
 					//删除释放对象
 					m_mapConnectManager.erase(b++);
@@ -1456,7 +1445,6 @@ int CProConnectManager::handle_timeout(const ACE_Time_Value &tv, const void *arg
 	}
 
 	//判定是否应该记录链接日志
-	ACE_Time_Value tvNow = ACE_OS::gettimeofday();
 	ACE_Time_Value tvInterval(tvNow - m_tvCheckConnect);
 	if(tvInterval.sec() >= MAX_MSG_HANDLETIME)
 	{

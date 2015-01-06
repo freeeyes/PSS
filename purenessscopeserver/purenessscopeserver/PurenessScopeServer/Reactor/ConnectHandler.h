@@ -68,7 +68,7 @@ public:
 	uint32      GetConnectID();                                              //得到当前链接ID
 	uint8       GetConnectState();                                           //得到链接状态
 	uint8       GetSendBuffState();                                          //得到发送状态
-	bool        CheckAlive();
+	bool        CheckAlive(ACE_Time_Value& tvNow);                           //定时遍历连接存活状态
 	_ClientConnectInfo GetClientInfo();                                      //得到客户端信息
 	_ClientIPInfo      GetClientIPInfo();                                    //得到客户端IP信息
 	_ClientIPInfo      GetLocalIPInfo();                                     //得到监听IP信息

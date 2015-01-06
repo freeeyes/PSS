@@ -256,7 +256,8 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 	if(pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CONNECT 
 		&& pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CDISCONNET 
 		&& pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_SDISCONNET
-		&& pMessage->GetMessageBase()->m_u2Cmd != CLINET_LINK_SENDTIMEOUT)
+		&& pMessage->GetMessageBase()->m_u2Cmd != CLINET_LINK_SENDTIMEOUT
+		&& pMessage->GetMessageBase()->m_u2Cmd != CLINET_LINK_SENDERROR)
 	{
 		m_ThreadInfo.m_u4RecvPacketCount++;
 		m_ThreadInfo.m_u4CurrPacketCount++;
@@ -300,7 +301,8 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 	if(pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CONNECT 
 		&& pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CDISCONNET 
 		&& pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_SDISCONNET
-		&& pMessage->GetMessageBase()->m_u2Cmd != CLINET_LINK_SENDTIMEOUT)
+		&& pMessage->GetMessageBase()->m_u2Cmd != CLINET_LINK_SENDTIMEOUT
+		&& pMessage->GetMessageBase()->m_u2Cmd != CLINET_LINK_SENDERROR)
 	{
 		//如果AI启动了，则在这里进行AI判定
 		m_WorkThreadAI.SaveTimeout(pMessage->GetMessageBase()->m_u2Cmd, u4TimeCost);

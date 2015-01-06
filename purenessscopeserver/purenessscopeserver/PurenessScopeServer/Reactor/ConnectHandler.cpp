@@ -1082,9 +1082,9 @@ int CConnectHandler::handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask)
 	return 0;
 }
 
-bool CConnectHandler::CheckAlive()
+bool CConnectHandler::CheckAlive(ACE_Time_Value& tvNow)
 {
-	ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+	//ACE_Time_Value tvNow = ACE_OS::gettimeofday();
 	ACE_Time_Value tvIntval(tvNow - m_atvInput);
 	if(tvIntval.sec() > m_u2MaxConnectTime)
 	{
@@ -1956,6 +1956,7 @@ bool CConnectManager::KillTimer()
 int CConnectManager::handle_timeout(const ACE_Time_Value &tv, const void *arg)
 { 
 	//ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
+	ACE_Time_Value tvNow = ACE_OS::gettimeofday();
 	if(arg == NULL)
 	{
 		OUR_DEBUG((LM_ERROR, "[CConnectManager::handle_timeout]arg is not NULL, tv = %d.\n", tv.sec()));
@@ -1980,7 +1981,7 @@ int CConnectManager::handle_timeout(const ACE_Time_Value &tv, const void *arg)
 				CConnectHandler* pConnectHandler = (CConnectHandler* )b->second;
 				if(pConnectHandler != NULL)
 				{
-					if(false == pConnectHandler->CheckAlive())
+					if(false == pConnectHandler->CheckAlive(tvNow))
 					{
 						m_mapConnectManager.erase(b++);
 					}

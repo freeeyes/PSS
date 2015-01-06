@@ -14,7 +14,7 @@ CBuffPacket::CBuffPacket(int nSize)
 CBuffPacket::~CBuffPacket(void)
 {
 	//OUR_DEBUG((LM_ERROR, "[CBuffPacket::~CBuffPacket].\n"));
-	//Close();
+	Close();
 }
 
 bool CBuffPacket::Init(int nSize)
