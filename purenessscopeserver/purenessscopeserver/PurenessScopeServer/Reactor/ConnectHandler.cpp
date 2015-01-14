@@ -148,7 +148,7 @@ void CConnectHandler::Init(uint16 u2HandlerID)
 	m_emStatus           = CLIENT_CLOSE_NOTHING;
 }
 
-bool CConnectHandler::ServerClose(EM_Client_Close_status emStatus)
+bool CConnectHandler::ServerClose(EM_Client_Close_status emStatus, uint8 u1OptionEvent)
 {
 	OUR_DEBUG((LM_ERROR, "[CConnectHandler::ServerClose]Close(%d) OK.\n", GetConnectID()));
 	//AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %d, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, m_u8RecvQueueTimeCost, m_u4RecvQueueCount, m_u8SendQueueTimeCost);
@@ -156,7 +156,7 @@ bool CConnectHandler::ServerClose(EM_Client_Close_status emStatus)
 	if(CLIENT_CLOSE_IMMEDIATLY == emStatus)
 	{
 		//发送客户端链接断开消息。
-		if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_SDISCONNECT, NULL))
+		if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), u1OptionEvent, NULL))
 		{
 			OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 		}
@@ -1992,7 +1992,11 @@ int CConnectManager::handle_timeout(const ACE_Time_Value &tv, const void *arg)
 
 		for(uint32 i= 0; i < vecDelConnectHandler.size(); i++)
 		{
-			vecDelConnectHandler[i]->ServerClose(CLIENT_CLOSE_IMMEDIATLY);
+			//关闭引用关系
+			Close(vecDelConnectHandler[i]->GetConnectID());
+			
+			//服务器关闭连接
+			vecDelConnectHandler[i]->ServerClose(CLIENT_CLOSE_IMMEDIATLY, PACKET_CHEK_TIMEOUT);
 		}
 
 		//判定是否应该记录链接日志

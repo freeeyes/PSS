@@ -224,6 +224,10 @@ bool CMakePacket::ProcessMessageBlock(_MakePacket* pMakePacket)
 	{
 		pMessage = SetMessageSendTimeout(pMakePacket->m_u4ConnectID);
 	}
+	else if(pMakePacket->m_u1Option == PACKET_CHEK_TIMEOUT)
+	{
+		pMessage = SetMessageSendTimeout(pMakePacket->m_u4ConnectID);
+	}
 
 	if(NULL != pMessage)
 	{
@@ -466,6 +470,41 @@ CMessage* CMakePacket::SetMessageSendTimeout(uint32 u4ConnectID)
 		return NULL;
 	}
 }
+
+CMessage* CMakePacket::SetMessageCheckTimeout(uint32 u4ConnectID)
+{
+	//创建新的Message对象
+	CMessage* pMessage = App_MessagePool::instance()->Create();
+	if(NULL == pMessage)
+	{
+		//写入接收包错误
+		OUR_DEBUG((LM_ERROR, "[CMakePacket::SetMessageCheckTimeout] ConnectID = %d, pMessage is NULL.\n", u4ConnectID));
+		return NULL;
+	}
+
+	if(NULL != pMessage->GetMessageBase())
+	{
+		//开始组装数据
+		pMessage->GetMessageBase()->m_u4ConnectID   = u4ConnectID;
+		pMessage->GetMessageBase()->m_u2Cmd         = CLINET_LINK_CHECKTIMEOUT;
+		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)ACE_OS::gettimeofday().sec();
+		pMessage->GetMessageBase()->m_u4HeadSrcSize = 0;
+		pMessage->GetMessageBase()->m_u4BodySrcSize = 0;
+		//pMessage->GetMessageBase()->m_ProfileTime.Start();
+
+		//将接受的数据缓冲放入CMessage对象
+		pMessage->SetPacketHead(NULL);
+		pMessage->SetPacketBody(NULL);
+
+		return pMessage;
+	}
+	else
+	{
+		OUR_DEBUG((LM_ERROR, "[CMakePacket::SetMessageCheckTimeout] ConnectID = %d, pMessage->GetMessageBase() is NULL.\n", u4ConnectID));
+		return NULL;
+	}
+}
+
 
 CMessage* CMakePacket::SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage)
 {

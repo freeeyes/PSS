@@ -60,8 +60,8 @@ public:
 	bool SetSendQueueTimeCost(uint32 u4TimeCost);                            //记录当前从发送队列到数据发送完成的具体时间消耗
 	void SetLocalIPInfo(const char* pLocalIP, uint32 u4LocalPort);           //设置监听IP和端口信息 
 
-	bool Close(int nIOCount = 1);                                            //关闭当前连接
-	bool ServerClose(EM_Client_Close_status emStatus);                       //服务器关闭客户端链接方法
+	bool Close(int nIOCount = 1);                                                                 //关闭当前连接
+	bool ServerClose(EM_Client_Close_status emStatus, uint8 u1OptionEvent = PACKET_SDISCONNECT);  //服务器关闭客户端链接方法
 
 	const char* GetError();                                                  //得到当前错误信息
 	void        SetConnectID(uint32 u4ConnectID);                            //设置当前链接ID

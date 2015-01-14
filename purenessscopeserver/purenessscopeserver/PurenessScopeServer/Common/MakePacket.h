@@ -91,6 +91,7 @@ private:
 	CMessage* SetMessageCDisConnect(uint32 u4ConnectID);                                                          //用户断开链接数据包消息
 	CMessage* SetMessageSDisConnect(uint32 u4ConnectID);                                                          //服务器断开链接数据包消息
 	CMessage* SetMessageSendTimeout(uint32 u4ConnectID);                                                          //服务器发送给客户端数据超时消息
+	CMessage* SetMessageCheckTimeout(uint32 u4ConnectID);                                                         //服务器心跳超时消息 
 	CMessage* SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage);                           //服务发送失败回调数据包消息
 
 private:

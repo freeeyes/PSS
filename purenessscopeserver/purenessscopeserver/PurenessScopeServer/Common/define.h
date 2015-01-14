@@ -115,6 +115,7 @@ static bool Convert_Version(int nTagVserion)
 #define PACKET_SDISCONNECT    4            //服务器断开事件消息标志
 #define PACKET_SEND_ERROR     5            //数据发送失败事件 
 #define PACKET_SEND_TIMEOUT   6            //服务器发送时间超过阀值的标志
+#define PACKET_CHEK_TIMEOUT   7            //服务器心跳检测超时事件
 
 #define MAX_PACKET_PARSE      5000         //PACKETPARSE对象池个数
 #define MAX_MESSAGE_POOL      5000         //Message对象池个数
@@ -266,11 +267,12 @@ enum
 
 //*****************************************************************
 //增加两个特殊的命令头，一个是链接建立，一个是链接退出
-#define CLIENT_LINK_CONNECT     0x0001      //用户链接
-#define CLIENT_LINK_CDISCONNET  0x0002      //客户端退出
-#define CLIENT_LINK_SDISCONNET  0x0003      //服务器退出
-#define CLINET_LINK_SENDTIMEOUT 0x0004      //服务器发送客户端时间超过阀值
-#define CLINET_LINK_SENDERROR   0x0005      //客户端发送失败消息 
+#define CLIENT_LINK_CONNECT        0x0001      //用户链接
+#define CLIENT_LINK_CDISCONNET     0x0002      //客户端退出
+#define CLIENT_LINK_SDISCONNET     0x0003      //服务器退出
+#define CLINET_LINK_SENDTIMEOUT    0x0004      //服务器发送客户端时间超过阀值
+#define CLINET_LINK_SENDERROR      0x0005      //客户端发送失败消息 
+#define CLINET_LINK_CHECKTIMEOUT   0x0006      //服务器心跳检测超时消息  
 //*****************************************************************
 
 //*****************************************************************
