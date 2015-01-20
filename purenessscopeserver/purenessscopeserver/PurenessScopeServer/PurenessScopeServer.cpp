@@ -135,6 +135,7 @@ int Checkfilelimit(int nMaxOpenFile)
 	}
 	else
 	{
+		OUR_DEBUG((LM_INFO, "[Checkfilelimit]rfilelimit.rlim_cur=%d,nMaxOpenFile=%d.\n", rfilelimit.rlim_cur, nMaxOpenFile));
 		//提示同时文件打开数不足，需要设置。
 		if((int)rfilelimit.rlim_cur < nMaxOpenFile)
 		{

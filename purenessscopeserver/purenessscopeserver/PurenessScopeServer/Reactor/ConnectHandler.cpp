@@ -103,7 +103,7 @@ bool CConnectHandler::Close(int nIOCount)
 			//发送客户端链接断开消息。
 			if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, NULL))
 			{
-				OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
+				OUR_DEBUG((LM_ERROR, "[CConnectHandler::Close] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 			}
 		}
 
@@ -2789,6 +2789,7 @@ bool CConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPacket
 	for(uint32 i = 0; i < (uint32)vecConnectID.size(); i++)
 	{
 		//判断命中到哪一个线程组里面去
+		u4ConnectID = vecConnectID[i];
 		uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
 		mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
@@ -2817,6 +2818,7 @@ bool CConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, const char*
 	for(uint32 i = 0; i < (uint32)vecConnectID.size(); i++)
 	{
 		//判断命中到哪一个线程组里面去
+		u4ConnectID = vecConnectID[i];
 		uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
 		mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
