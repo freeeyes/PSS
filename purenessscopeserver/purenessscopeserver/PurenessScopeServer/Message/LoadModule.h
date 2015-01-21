@@ -27,6 +27,7 @@ struct _ModuleInfo
 	const char* (*GetName)(void);
 	const char* (*GetModuleKey)(void);
 	int (*DoModuleMessage)(uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket);
+	bool (*GetModuleState)(uint32& u4AErrorID);
 
 	_ModuleInfo()
 	{

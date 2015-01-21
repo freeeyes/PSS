@@ -507,6 +507,7 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value &tv, const void *a
 		OUR_DEBUG((LM_ERROR,"[CMessageServiceGroup::handle_timeout] arg is not NULL, time is (%d).\n", tv.sec()));
 	}
 
+	//检查所有工作线程
 	for(uint32 i = 0; i < (uint32)m_vecMessageService.size(); i++)
 	{
 		CMessageService* pMessageService = (CMessageService* )m_vecMessageService[i];
@@ -566,6 +567,7 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value &tv, const void *a
 	//记录PacketParse的统计过程
 	AppLogManager::instance()->WriteLog(LOG_SYSTEM_PACKETTHREAD, "[CMessageService::handle_timeout] UsedCount = %d, FreeCount= %d.", App_PacketParsePool::instance()->GetUsedCount(), App_PacketParsePool::instance()->GetFreeCount());
 
+	//记录统计CPU和内存的使用
 	if(App_MainConfig::instance()->GetMonitor() == 1)
 	{
 #ifdef WIN32
@@ -580,6 +582,25 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value &tv, const void *a
 			AppLogManager::instance()->WriteLog(LOG_SYSTEM_MONITOR, "[Monitor] CPU Rote=%d,Memory=%d.", u4CurrCpu, u4CurrMemory);
 		}
 
+	}
+
+	//检查所有插件状态
+	for(int i = 0; i < App_ModuleLoader::instance()->GetCurrModuleCount(); i++)
+	{
+		_ModuleInfo* pModuleInfo = App_ModuleLoader::instance()->GetModuleIndex(i);
+		if(NULL != pModuleInfo)
+		{
+			uint32 u4ErrorID = 0;
+			bool blModuleState = pModuleInfo->GetModuleState(u4ErrorID);
+			if(false == blModuleState)
+			{
+				//发送邮件
+				AppLogManager::instance()->WriteToMail(LOG_SYSTEM_MONITOR, 1, 
+					"ModuleStateError", 
+					"Module ErrorID=%d.\n", 
+					u4ErrorID);
+			}
+		}
 	}
 
 	return 0;

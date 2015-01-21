@@ -306,6 +306,14 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo,
 		return false;
 	}
 
+	pModuleInfo->GetModuleState = (bool(*)(uint32&))ACE_OS::dlsym(pModuleInfo->hModule, "GetModuleState");
+	if(NULL == pModuleInfo->DoModuleMessage || !pModuleInfo->DoModuleMessage)
+	{
+		OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Function GetModuleState is error(%d)!\n", strModuleName.c_str(), errno));
+		m_tmModule.release();
+		return false;
+	}
+
 	pModuleInfo->strModuleName = strModuleName;
 	m_tmModule.release();
 	return true;

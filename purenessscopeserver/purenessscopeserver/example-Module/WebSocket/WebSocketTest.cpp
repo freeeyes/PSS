@@ -28,6 +28,7 @@ extern "C"
 	DECLDIR const char* GetName();
 	DECLDIR const char* GetModuleKey();
 	DECLDIR int DoModuleMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket);
+	DECLDIR bool GetModuleState(uint32& u4ErrorID);
 }
 
 static CBaseCommand g_BaseCommand;
@@ -116,4 +117,14 @@ int DoModuleMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* p
 {
 	return 0;
 }
+
+//交给框架使用，用于框架定时巡检插件状态
+//默认这里返回true，如果你需要对框架内部细节做监控。
+//请在这里实现之，根据错误的不同，返回false的同时，设置ErrorID
+//框架会根据这个设置，发送邮件给指定的邮箱
+bool GetModuleState(uint32& u4ErrorID)
+{
+	return true;
+}
+
 

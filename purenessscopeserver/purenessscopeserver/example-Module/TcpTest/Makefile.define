@@ -12,11 +12,11 @@ LIBS = -L/usr/lib64 -L${ACE_ROOT}/lib  -L/usr/local/lib64 -L./ -L../ -lACE -lz -
 # Here are some rules for converting .cpp -> .o
 .SUFFIXES: .cpp .o
 .cpp.o:
-	@$(CC) -fPIC $(CFLAGS) ${INCLUDES} -c -g $*.cpp 
+	@$(CC) -fPIC $(CFLAGS) ${INCLUDES} -c $*.cpp 
 	@echo '----- '$*.cpp' is compiled ok!'
 
 # Here are some rules for converting .c -> .o
 .SUFFIXES: .c .o
 .c.o:
-	@$(CC) $(CFLAGS) -c $*.c 
+	@$(CC) -fPIC $(CFLAGS)  ${INCLUDES} -c $*.c 
 	@echo '----- '$*.c' is compiled ok!'
