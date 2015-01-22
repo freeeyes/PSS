@@ -202,10 +202,12 @@ BOOL CDlgClientMain::OnInitDialog()
 
 	OnLbnSelchangeList3();
 
-	m_lcModuleList.InsertColumn(0, _T("当前已加载模块"), LVCFMT_CENTER, 200);
-	m_lcModuleList.InsertColumn(1, _T("模块名称"), LVCFMT_CENTER, 100);
-	m_lcModuleList.InsertColumn(2, _T("模块信息"), LVCFMT_CENTER, 100);
-	m_lcModuleList.InsertColumn(3, _T("加载时间"), LVCFMT_CENTER, 200);
+	m_lcModuleList.InsertColumn(0, _T("当前已加载模块"), LVCFMT_CENTER, 120);
+	m_lcModuleList.InsertColumn(1, _T("模块名称"), LVCFMT_CENTER, 80);
+	m_lcModuleList.InsertColumn(2, _T("模块信息"), LVCFMT_CENTER, 80);
+	m_lcModuleList.InsertColumn(3, _T("加载时间"), LVCFMT_CENTER, 150);
+	m_lcModuleList.InsertColumn(4, _T("当前状态"), LVCFMT_CENTER, 80);
+	m_lcModuleList.InsertColumn(5, _T("状态ID"), LVCFMT_CENTER, 80);
 
 	return TRUE;
 }
@@ -273,6 +275,12 @@ void CDlgClientMain::OnBnClickedButton3()
 			nPos += nStrLen;
 			ModuleInfo.szModuleCreateDate[nStrLen] = '\0';
 
+			memcpy_s(&ModuleInfo.nModuleState, sizeof(char), &szRecvBuff[nPos], sizeof(char));
+			nPos += sizeof(char);
+
+			memcpy_s(&ModuleInfo.nModuleID, sizeof(int), &szRecvBuff[nPos], sizeof(int));
+			nPos += sizeof(int);
+
 			//显示在桌面上
 			wchar_t szModuleFile[200]    = {'\0'};
 			wchar_t szModuleName[200]    = {'\0'};
@@ -295,6 +303,19 @@ void CDlgClientMain::OnBnClickedButton3()
 			m_lcModuleList.SetItemText(i, 1, szModuleName);
 			m_lcModuleList.SetItemText(i, 2, szModuleDesc);
 			m_lcModuleList.SetItemText(i, 3, szModuleTime);
+
+			CString strData;
+			if(ModuleInfo.nModuleState == 0)
+			{
+				m_lcModuleList.SetItemText(i, 4, _T("正常"));
+			}
+			else
+			{
+				m_lcModuleList.SetItemText(i, 4, _T("异常"));
+			}
+			
+			strData.Format(_T("%d"), ModuleInfo.nModuleID);
+			m_lcModuleList.SetItemText(i, 5, strData);
 
 			objvecModuleInfo.push_back(ModuleInfo);
 		}

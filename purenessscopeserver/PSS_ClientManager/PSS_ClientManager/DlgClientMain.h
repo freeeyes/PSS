@@ -40,6 +40,8 @@ struct _ModuleInfo
 	char szModuleFile[200];
 	char szModuleDesc[200];
 	char szModuleCreateDate[200];
+	int  nModuleState;
+	int  nModuleID;
 
 	_ModuleInfo()
 	{
@@ -47,6 +49,8 @@ struct _ModuleInfo
 		szModuleFile[0]       = '\0';
 		szModuleDesc[0]       = '\0';
 		szModuleCreateDate[0] = '\0';
+		nModuleState          = 0;
+		nModuleID             = 0;
 	}
 };
 

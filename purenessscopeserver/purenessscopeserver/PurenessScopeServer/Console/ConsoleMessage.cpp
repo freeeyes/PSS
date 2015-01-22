@@ -762,6 +762,20 @@ bool CConsoleMessage::DoMessage_ShowModule(_CommandInfo& CommandInfo, IBuffPacke
 				strSName.text  = (char* )szTime;
 				strSName.u1Len = (uint8)ACE_OS::strlen(szTime);
 				(*pBuffPacket) << strSName;
+
+				//Ð´ÈëModuleµ±Ç°×´Ì¬
+				uint32 u4ErrorID = 0;
+				uint8  u1MouduleState = 0;
+				if(true == pModuleInfo->GetModuleState(u4ErrorID))
+				{
+					u1MouduleState = 0;
+				}
+				else
+				{
+					u1MouduleState = 1;
+				}
+				(*pBuffPacket) << u1MouduleState;
+				(*pBuffPacket) << u4ErrorID;
 			}
 		}
 
