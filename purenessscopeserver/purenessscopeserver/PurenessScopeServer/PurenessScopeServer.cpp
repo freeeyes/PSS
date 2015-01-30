@@ -207,10 +207,10 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 	*/
 
 	//判断当前并行连接数是否支持框架
-	if(-1 == Checkfilelimit(App_MainConfig::instance()->GetMaxHandlerCount()))
-	{
-		return 0;
-	}
+	//if(-1 == Checkfilelimit(App_MainConfig::instance()->GetMaxHandlerCount()))
+	//{
+	//	return 0;
+	//}
 
 	//判断当前Core文件尺寸是否需要调整
 	if(-1 == CheckCoreLimit(App_MainConfig::instance()->GetCoreFileSize()))
