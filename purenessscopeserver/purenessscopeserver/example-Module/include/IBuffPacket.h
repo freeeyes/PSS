@@ -25,8 +25,8 @@ public:
 
 	virtual void SetReadPtr(uint32 u4Pos)                                = 0;    //设置读指针的位置
 	virtual void SetPacketCount(uint32 u4PacketCount)                    = 0;    //设置缓存数据包的个数
-	virtual bool WriteStream(const char* szData, uint32 u4Len)           = 0;    //直接写入一个二进制数据块
-	virtual bool ReadStream(char*& pData, uint32 u4MaxLen, uint32 u4Len) = 0;    //直接读取出一个二进制数据块
+	virtual bool WriteStream(const char* pData, uint32 u4Len)            = 0;    //直接写入一个二进制数据块
+	virtual bool ReadStream(char*& pData, uint32& u4Len)                 = 0;    //直接读取出一个二进制数据块
 	virtual char* ReadPtr()                                              = 0;    //获得读指针
 	virtual char* WritePtr()                                             = 0;    //获得写指针
 	virtual bool RollBack(uint32 u4Len)                                  = 0;    //将取出的数据删除，将后面的数据加上

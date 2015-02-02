@@ -143,7 +143,7 @@ bool CBuffPacket::AddBuffPacket(uint32 u4Size)
 		else
 		{
 			//移动内存
-			ACE_OS::memmove(szNewData, m_szData, u4OldPacketLen);
+			memmove_safe(m_szData, u4OldPacketLen, szNewData, m_u4PacketLen);
 
 			//删除已经不用的内存
 			App_ACEMemory::instance()->free(m_szData);
@@ -200,7 +200,7 @@ bool CBuffPacket::AddBuff(uint32 u4Size)
 		else
 		{
 			//移动内存
-			ACE_OS::memmove(szNewData, m_szData, u4OldPacketLen);
+			memmove_safe(m_szData, u4OldPacketLen, szNewData, m_u4PacketLen);
 
 			//删除已经不用的内存
 			App_ACEMemory::instance()->free(m_szData);
@@ -321,7 +321,7 @@ bool CBuffPacket::RollBack(uint32 u4Len)
 	else
 	{
 		u4NewLen = m_u4WritePtr - u4Len;
-		ACE_OS::memmove(m_szData, m_szData + u4Len, u4NewLen);
+		memmove_safe(m_szData + u4Len, u4NewLen, m_szData, u4NewLen);
 
 		m_u4ReadPtr  = 0;
 		m_u4WritePtr = u4NewLen;
@@ -329,7 +329,7 @@ bool CBuffPacket::RollBack(uint32 u4Len)
 	}
 }
 
-bool CBuffPacket::WriteStream(const char* szData, uint32 u4Len)
+bool CBuffPacket::WriteStream(const char* pData, uint32 u4Len)
 {
 	//ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
 	if(u4Len + m_u4PacketLen >= MAX_PACKET_SIZE)
@@ -348,28 +348,29 @@ bool CBuffPacket::WriteStream(const char* szData, uint32 u4Len)
 		}
 
 		//写入文本内容
-		ACE_OS::memcpy(WritePtr(), szData, u4Len);
+		memcpy_safe((char* )pData, u4Len, WritePtr(), GetPacketSize() - GetWriteLen());
 		WritePtr(u4Len);
 		return true;
 	}
 	else
 	{
 		//写入文本内容
-		ACE_OS::memcpy(WritePtr(), szData, u4Len);
+		memcpy_safe((char* )pData, u4Len, WritePtr(), GetPacketSize() - GetWriteLen());
 		WritePtr(u4Len);
 		return true;
 	}
 }
 
-bool CBuffPacket::ReadStream(char*& pData, uint32 u4MaxLen, uint32 u4Len)
+bool CBuffPacket::ReadStream(char*& pData, uint32& u4Len)
 {
 	//ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
-	if(pData == NULL || u4MaxLen > m_u4PacketLen)
+	if(pData == NULL || u4Len > m_u4PacketLen - m_u4ReadPtr)
 	{
 		return false;
 	}
 
-	memcpy(pData, m_szData, u4Len);
+	memcpy_safe(ReadPtr(), u4Len, pData, u4Len);
+	ReadPtr(u4Len);
 	return true;
 }
 
@@ -405,9 +406,8 @@ CBuffPacket& CBuffPacket::operator >> (uint16& u2Data)
 	if(m_u4ReadPtr <= m_u4WritePtr - (uint32)sizeof(u2Data))
 	{
 		//把网络字节序，转换为主机字节序
-		//uint16 n2Net = *(uint16 *)ReadPtr();
 		uint16 n2Net = 0;
-		ACE_OS::memcpy(&n2Net, ReadPtr(), sizeof(uint16));
+		memcpy_safe(ReadPtr(), (uint32)sizeof(uint16), (char* )&n2Net, (uint32)sizeof(uint16));
 		ReadPtr((uint32)sizeof(n2Net));
 
 		if(true == m_blNetSort)
@@ -433,7 +433,7 @@ CBuffPacket& CBuffPacket::operator >> (uint32& u4Data)
 		//把网络字节序，转换为主机字节序
 		//uint32 n4Net = *(uint32 *)ReadPtr();
 		uint32 n4Net = 0;
-		ACE_OS::memcpy(&n4Net, ReadPtr(), sizeof(uint32));
+		memcpy_safe(ReadPtr(), (uint32)sizeof(uint32), (char* )&n4Net, (uint32)sizeof(uint32));
 		ReadPtr((uint32)sizeof(n4Net));
 
 		if(true == m_blNetSort)
@@ -458,7 +458,7 @@ CBuffPacket& CBuffPacket::operator >> (uint64 &u8Data)
 	{
 		//uint64 u8Net = *(uint64 *)ReadPtr();
 		uint64 u8Net = 0;
-		ACE_OS::memcpy(&u8Net, ReadPtr(), sizeof(uint64));
+		memcpy_safe(ReadPtr(), (uint32)sizeof(uint64), (char* )&u8Net, (uint32)sizeof(uint64));
 		ReadPtr((uint32)sizeof(u8Net));
 
 		if(true == m_blNetSort)
@@ -493,11 +493,9 @@ CBuffPacket& CBuffPacket::operator >> (int16& n2Data)
 	n2Data = 0;
 	if(m_u4ReadPtr <= m_u4WritePtr - sizeof(n2Data))
 	{
-		//n2Data = *(int16 *)ReadPtr();
-		//ReadPtr((uint32)sizeof(n2Data));
-
 		int16 n2Net = 0;
 		ACE_OS::memcpy(&n2Net, ReadPtr(), sizeof(int16));
+		memcpy_safe(ReadPtr(), (uint32)sizeof(int16), (char* )&n2Net, (uint32)sizeof(int16));
 		ReadPtr((uint32)sizeof(n2Net));
 
 		if(true == m_blNetSort)
@@ -523,7 +521,7 @@ CBuffPacket& CBuffPacket::operator >> (int32& n4Data)
 		//ReadPtr((uint32)sizeof(n4Data));
 
 		int32 n4Net = 0;
-		ACE_OS::memcpy(&n4Net, ReadPtr(), sizeof(int32));
+		memcpy_safe(ReadPtr(), (uint32)sizeof(int32), (char* )&n4Net, (uint32)sizeof(int32));
 		ReadPtr((uint32)sizeof(n4Net));
 
 		if(true == m_blNetSort)
@@ -545,11 +543,8 @@ CBuffPacket& CBuffPacket::operator >> (float32& f4Data)
 	f4Data = 0;
 	if(m_u4ReadPtr <= m_u4WritePtr - (uint32)sizeof(f4Data))
 	{
-		//f4Data = *(float32 *)ReadPtr();
-		//ReadPtr((uint32)sizeof(f4Data));
-
 		//浮点型不需要字序转换
-		ACE_OS::memcpy(&f4Data, ReadPtr(), sizeof(float32));
+		memcpy_safe(ReadPtr(), (uint32)sizeof(float32), (char* )&f4Data, (uint32)sizeof(float32));
 		ReadPtr((uint32)sizeof(f4Data));
 	}
 
@@ -562,9 +557,8 @@ CBuffPacket& CBuffPacket::operator >> (float64& f8Data)
 	f8Data = 0;
 	if(m_u4ReadPtr <= m_u4WritePtr - (uint32)sizeof(f8Data))
 	{
-		//f8Data = *(float64 *)ReadPtr();
 		//浮点型不需要字序转换
-		ACE_OS::memcpy(&f8Data, ReadPtr(), sizeof(float64));
+		memcpy_safe(ReadPtr(), (uint32)sizeof(float64), (char* )&f8Data, (uint32)sizeof(float64));
 		ReadPtr((uint32)sizeof(f8Data));
 	}
 
@@ -1028,7 +1022,7 @@ CBuffPacket& CBuffPacket::operator << (VCHARS_STR &str)
 			*this << str.u1Len;
 
 			//写入文本内容
-			ACE_OS::memcpy(WritePtr(), str.text, (int)str.u1Len);
+			memcpy_safe(str.text, (uint32)str.u1Len, WritePtr(), (uint32)str.u1Len);
 			WritePtr(str.u1Len);
 			return *this;
 		}
@@ -1039,7 +1033,7 @@ CBuffPacket& CBuffPacket::operator << (VCHARS_STR &str)
 		*this << str.u1Len;
 
 		//写入文本内容
-		ACE_OS::memcpy(WritePtr(), str.text, (int)str.u1Len);
+		memcpy_safe(str.text, (uint32)str.u1Len, WritePtr(), (uint32)str.u1Len);
 		WritePtr(str.u1Len);
 		return *this;
 	}
@@ -1069,7 +1063,7 @@ CBuffPacket& CBuffPacket::operator << (VCHARM_STR &str)
 			*this << str.u2Len;
 
 			//写入文本内容
-			ACE_OS::memcpy(WritePtr(), str.text, (int)str.u2Len);
+			memcpy_safe(str.text, (uint32)str.u2Len, WritePtr(), (uint32)str.u2Len);
 			WritePtr(str.u2Len);
 			return *this;
 		}
@@ -1080,7 +1074,7 @@ CBuffPacket& CBuffPacket::operator << (VCHARM_STR &str)
 		*this << str.u2Len;
 
 		//写入文本内容
-		ACE_OS::memcpy(WritePtr(), str.text, (int)str.u2Len);
+		memcpy_safe(str.text, (uint32)str.u2Len, WritePtr(), (uint32)str.u2Len);
 		WritePtr(str.u2Len);
 		return *this;
 	}
@@ -1110,7 +1104,7 @@ CBuffPacket& CBuffPacket::operator << (VCHARB_STR &str)
 			*this << str.u4Len;
 
 			//写入文本内容
-			ACE_OS::memcpy(WritePtr(), str.text, (int)str.u4Len);
+			memcpy_safe(str.text, (uint32)str.u4Len, WritePtr(), (uint32)str.u4Len);
 			WritePtr(str.u4Len);
 			return *this;
 		}
@@ -1121,7 +1115,7 @@ CBuffPacket& CBuffPacket::operator << (VCHARB_STR &str)
 		*this << str.u4Len;
 
 		//写入文本内容
-		ACE_OS::memcpy(WritePtr(), str.text, (int)str.u4Len);
+		memcpy_safe(str.text, (uint32)str.u4Len, WritePtr(), (uint32)str.u4Len);
 		WritePtr(str.u4Len);
 		return *this;
 	}
@@ -1152,7 +1146,7 @@ CBuffPacket& CBuffPacket::operator << (string &str)
 			*this << u4Len;
 
 			//写入文本内容
-			ACE_OS::memcpy(WritePtr(), str.c_str(), (int)u4Len);
+			memcpy_safe((char* )str.c_str(), u4Len, WritePtr(), u4Len);
 			WritePtr(u4Len);
 			return *this;
 		}
@@ -1163,7 +1157,7 @@ CBuffPacket& CBuffPacket::operator << (string &str)
 		*this << u4Len;
 
 		//写入文本内容
-		ACE_OS::memcpy(WritePtr(), str.c_str(), (int)u4Len);
+		memcpy_safe((char* )str.c_str(), u4Len, WritePtr(), u4Len);
 		WritePtr(u4Len);
 		return *this;
 	}

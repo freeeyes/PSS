@@ -16,6 +16,7 @@
 #include "ace/OS_NS_sys_stat.h"
 #include "ace/OS_NS_sys_socket.h"
 #include "ace/OS_NS_unistd.h"
+#include "ace/OS_NS_string.h"
 #include "ace/High_Res_Timer.h"
 #include "ace/INET_Addr.h" 
 #include <math.h>
@@ -335,6 +336,82 @@ typedef ifstream _tifstream;
 typedef std::string _tstring;
 #endif // UNICODE
 
+//定义一个函数，可以支持内存越界检查
+inline void sprintf_safe(char* szText, int nLen, const char* fmt ...)
+{
+	if(szText == NULL)
+	{
+		return;
+	}
+
+	va_list ap;
+	va_start(ap, fmt);
+
+	ACE_OS::vsnprintf(szText, nLen, fmt, ap);
+	szText[nLen - 1] = '\0';
+
+	va_end(ap);
+};
+
+//支持memcpy的边界检查
+inline bool memcpy_safe(char* pSrc, uint32 u4SrcLen, char* pDes, uint32 u4DesLen)
+{
+	if(u4SrcLen > u4DesLen)
+	{
+		return false;
+	}
+	else
+	{
+		ACE_OS::memcpy((void* )pSrc, (void* )pDes, (size_t)u4SrcLen);
+		return true;
+	}
+}
+
+//支持strcpy边界检查
+inline bool strcpy_safe(const char* pSrc, char* pDes, int nDesLen)
+{
+	int nSrcLen = (int)ACE_OS::strlen(pSrc);
+	if(nSrcLen <= 0 || nDesLen <= 0 || nSrcLen > nDesLen)
+	{
+		return false;
+	}
+	else
+	{
+		ACE_OS::strcpy(pDes, (const char* )pSrc);
+		return true;
+	}
+}
+
+//支持strcat边界检查
+inline bool strcat_safe(const char* pSrc, char* pDes, int nDesLen)
+{
+	int nCurrSrcLen = (int)ACE_OS::strlen(pSrc);
+	int nCurrDesLen = (int)ACE_OS::strlen(pDes);
+	if(nDesLen <= 0 || nDesLen <= nCurrSrcLen + nCurrDesLen)
+	{
+		return false;
+	}
+	else
+	{
+		ACE_OS::strcat(pDes, (const char* )pSrc);
+		return true;
+	}
+}
+
+//支持memmove边界检查
+inline bool memmove_safe(char* pSrc, uint32 u4SrcLen, char* pDes, uint32 u4DesLen)
+{
+	if(u4SrcLen > u4DesLen)
+	{
+		return false;
+	}
+	else
+	{
+		ACE_OS::memmove((void* )pDes, (void* )pSrc, (size_t)u4SrcLen);
+		return true;
+	}	
+}
+
 //标记VCHARS_TYPE的模式
 enum VCHARS_TYPE
 {
@@ -382,7 +459,7 @@ typedef  struct _VCHARS_STR
 			{
 				//文本模式
 				text = new char[u1Length + 1];
-				ACE_OS::memcpy(text, pData, u1Length);
+				memcpy_safe((char* )pData, u1Length, text, u1Length);
 				text[u1Length] = '\0';
 				u1Len = u1Length + 1;
 			}
@@ -390,7 +467,7 @@ typedef  struct _VCHARS_STR
 			{
 				//二进制模式
 				text = new char[u1Length];
-				ACE_OS::memcpy(text, pData, u1Length);
+				memcpy_safe((char* )pData, u1Length, text, u1Length);
 				u1Len = u1Length;
 			}
 			blNew = true;
@@ -445,7 +522,7 @@ typedef  struct _VCHARM_STR
 			{
 				//文本模式
 				text = new char[u2Length + 1];
-				ACE_OS::memcpy(text, pData, u2Length);
+				memcpy_safe((char* )pData, u2Length, text, u2Length);
 				text[u2Length] = '\0';
 				u2Len = u2Length + 1;
 			}
@@ -453,7 +530,7 @@ typedef  struct _VCHARM_STR
 			{
 				//二进制模式
 				text = new char[u2Length];
-				ACE_OS::memcpy(text, pData, u2Length);
+				memcpy_safe((char* )pData, u2Length, text, u2Length);
 				u2Len = u2Length;
 			}
 			blNew = true;
@@ -508,7 +585,7 @@ typedef  struct _VCHARB_STR
 			{
 				//文本模式
 				text = new char[u4Length + 1];
-				ACE_OS::memcpy(text, pData, u4Length);
+				memcpy_safe((char* )pData, u4Length, text, u4Length);
 				text[u4Length] = '\0';
 				u4Len = u4Length + 1;
 			}
@@ -516,7 +593,7 @@ typedef  struct _VCHARB_STR
 			{
 				//二进制模式
 				text = new char[u4Length];
-				ACE_OS::memcpy(text, pData, u4Length);
+				memcpy_safe((char* )pData, u4Length, text, u4Length);
 				u4Len = u4Length;
 			}
 			blNew = true;
@@ -762,23 +839,6 @@ struct _ServerConnectInfo
 #ifndef SAFE_DELETE_ARRAY
 #define SAFE_DELETE_ARRAY(x) if( (x) != NULL ) { delete[] (x); (x) = NULL; }
 #endif
-
-//定义一个函数，可以支持内存越界检查
-inline void sprintf_safe(char* szText, int nLen, const char* fmt ...)
-{
-	if(szText == NULL)
-	{
-		return;
-	}
-
-	va_list ap;
-	va_start(ap, fmt);
-
-	ACE_OS::vsnprintf(szText, nLen, fmt, ap);
-	szText[nLen - 1] = '\0';
-
-	va_end(ap);
-};
 
 //为逻辑块提供一个Try catch的保护宏，用于调试，具体使用方法请参看TestTcp用例
 //目前最多支持一条2K的日志

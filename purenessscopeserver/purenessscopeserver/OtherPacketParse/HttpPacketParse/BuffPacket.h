@@ -29,8 +29,8 @@ public:
 	bool Close();              //删除已经使用的内存
 	bool Clear();              //清除所有的标志位，并不删除内存。
 
-	bool WriteStream(const char* szData, uint32 u4Len);
-	bool ReadStream(char*& pData, uint32 u4MaxLen, uint32 u4Len);
+	bool WriteStream(const char* pData, uint32 u4Len);
+	bool ReadStream(char*& pData, uint32& u4Len);
 
 	void SetReadPtr(uint32 u4Pos);              //设置读指针的位置
 	void SetPacketCount(uint32 u4PacketCount);  //设置缓存数据包的个数
@@ -78,7 +78,7 @@ public:
 
 	CBuffPacket& operator << (float32 f4Data);
 	CBuffPacket& operator << (float64 f8Data);
-	
+
 	CBuffPacket& operator << (VCHARS_STR &str);
 	CBuffPacket& operator << (VCHARM_STR &str);
 	CBuffPacket& operator << (VCHARB_STR &str);
