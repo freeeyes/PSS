@@ -204,49 +204,17 @@ bool CForbiddenIP::SaveConfig()
   return true;
 }
 
-bool CForbiddenIP::ParseTXT(const char* pText, char* pIP, char* pConnectType)
-{
-  int i             = 0;
-  pConnectType[0]   = '\0';
-  int nLen          = (int)ACE_OS::strlen(pText);
-
-  bool bState = false;
-  for(i = 0; i < nLen; i++)
-  {
-    if(pText[i] == ',')
-    {
-      bState = true;
-      break;
-    }
-  }
-
-  if(i >= 20 || nLen >= 40)
-  {
-    bState = false;
-  }
-
-  if(bState == true)
-  {
-    ACE_OS::memcpy(pIP, pText, i);
-    pIP[i] = '\0';
-    ACE_OS::memcpy(pConnectType, &pText[i + 1], nLen - i - 1);
-    pConnectType[nLen - i - 1] = '\0';
-  }
-
-  return bState;
-}
-
 bool CForbiddenIP::CompareIP(char* pTargetIP, char* pClientIP)
 {
-  char szTargetIP[50];
-  char szClientIP[50];
+  char szTargetIP[MAX_IP_SIZE];
+  char szClientIP[MAX_IP_SIZE];
 
   char szTarget[5];
   char szClient[5];
 
-  ACE_OS::memcpy(szTargetIP, pTargetIP, ACE_OS::strlen(pTargetIP));
+  memcpy_safe(pTargetIP, (uint32)ACE_OS::strlen(pTargetIP), szTargetIP, (uint32)MAX_IP_SIZE);
   szTargetIP[ACE_OS::strlen(pTargetIP)] = '\0';
-  ACE_OS::memcpy(szClientIP, pClientIP, ACE_OS::strlen(pClientIP));
+  memcpy_safe(pTargetIP, (uint32)ACE_OS::strlen(pClientIP), szClientIP, (uint32)MAX_IP_SIZE);
   szClientIP[ACE_OS::strlen(pTargetIP)] = '\0';
 
   char* pTargetPos = (char* )szTargetIP;
@@ -262,9 +230,9 @@ bool CForbiddenIP::CompareIP(char* pTargetIP, char* pClientIP)
       return false;
     }
 
-    ACE_OS::memcpy(szTarget, pTargetPos, (int)(pTargetTPos - pTargetPos));
-    szTarget[(int)(pTargetTPos - pTargetPos)] = '\0';
-    ACE_OS::memcpy(szClient, pClientPos, (int)(pClientTPos - pClientPos));
+    memcpy_safe(pTargetPos, (uint32)(pTargetTPos - pTargetPos), szTarget, (uint32)MAX_IP_SIZE);
+	szTarget[(int)(pTargetTPos - pTargetPos)] = '\0';
+	memcpy_safe(pClientPos, (uint32)(pClientTPos - pClientPos), szClient, (uint32)MAX_IP_SIZE);
     szClient[(int)(pClientTPos - pClientPos)] = '\0';
 
     if(strcmp(szTarget, "*") != 0)

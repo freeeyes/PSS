@@ -33,7 +33,7 @@ int GetProcessCPU_Idel_Linux()
 	char szTmp[50] = {'\0'};
 	if(blFlag == true)
 	{
-		memcpy(&szTmp[0], &szbuffer[i], nLen - i);
+		memcpy_safe(&szbuffer[i], (uint32)nLen - i, szTmp, (uint32)50);
 		szTmp[nLen - i] = '\0';
 	}
 
@@ -78,7 +78,7 @@ int GetProcessMemorySize_Linux()
 	char szTmp[50] = {'\0'};
 	if(blFlag == true)
 	{
-		memcpy(&szTmp[0], &szbuffer[i], nLen - i);
+		memcpy_safe(&szbuffer[i], (uint32)nLen - i, szTmp, (uint32)50);
 		szTmp[nLen - i] = '\0';
 	}	
 

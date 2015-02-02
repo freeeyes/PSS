@@ -13,7 +13,7 @@
 #include "XmlOpeation.h"
 #include "ace/Singleton.h"
 
-#define MAX_IP_SIZE 20
+#define MAX_IP_SIZE 50
 
 struct _ForbiddenIP
 {
@@ -52,7 +52,6 @@ public:
 
 private:
   bool SaveConfig();                                                                      //存储配置文件
-  bool ParseTXT(const char* pText, char* pIP, char* pConnectType);                        //解析配置文件行信息
   bool CompareIP(char* pTargetIP, char* pClientIP);                                       //比较是否在当前IP段
 
 private:

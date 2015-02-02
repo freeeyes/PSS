@@ -494,7 +494,6 @@ CBuffPacket& CBuffPacket::operator >> (int16& n2Data)
 	if(m_u4ReadPtr <= m_u4WritePtr - sizeof(n2Data))
 	{
 		int16 n2Net = 0;
-		ACE_OS::memcpy(&n2Net, ReadPtr(), sizeof(int16));
 		memcpy_safe(ReadPtr(), (uint32)sizeof(int16), (char* )&n2Net, (uint32)sizeof(int16));
 		ReadPtr((uint32)sizeof(n2Net));
 

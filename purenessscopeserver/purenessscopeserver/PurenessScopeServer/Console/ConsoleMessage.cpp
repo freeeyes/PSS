@@ -27,7 +27,7 @@ int CConsoleMessage::Dispose(ACE_Message_Block* pmb, IBuffPacket* pBuffPacket)
 
 	pCommand[(uint32)pmb->length()] = '\0';
 
-	ACE_OS::memcpy(pCommand, pmb->rd_ptr(), (uint32)pmb->length());
+	memcpy_safe((char* )pmb->rd_ptr(), (uint32)pmb->length(), pCommand, (uint32)pmb->length() + 1);
 
 	//解析命令，把数据切割出来
 	if(CONSOLE_MESSAGE_SUCCESS != ParseCommand(pCommand, pBuffPacket))
@@ -80,7 +80,7 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
 		return false;
 	}
 
-	ACE_OS::memcpy(&szKey, pCommand, nKeyEnd);
+	memcpy_safe((char* )pCommand, (uint32)nKeyEnd, szKey, (uint32)MAX_BUFF_100);
 	szKey[nKeyEnd] = '\0';
 
 	if(false == CheckConsoleKey(szKey))
@@ -112,11 +112,11 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
 		return false;
 	}
 
-	ACE_OS::memcpy(&CommandInfo.m_szCommandTitle, pCommand + nKeyEnd + 1, i - nKeyEnd - 1);
+	memcpy_safe((char*)(pCommand + nKeyEnd + 1), (uint32)(i - nKeyEnd - 1), (char*)CommandInfo.m_szCommandTitle, (uint32)MAX_BUFF_100);
 	CommandInfo.m_szCommandTitle[i - nKeyEnd - 1] = '\0';
 
 	//获得扩展参数
-	ACE_OS::memcpy(&CommandInfo.m_szCommandExp, pCommand + i + 1, (nLen - i + 1));
+	memcpy_safe((char*)(pCommand + i + 1), (uint32)(nLen - i + 1), (char*)CommandInfo.m_szCommandExp, (uint32)MAX_BUFF_100);
 	CommandInfo.m_szCommandExp[nLen - i + 1] = '\0';
 
 	return true;
@@ -353,11 +353,11 @@ bool CConsoleMessage::GetFileInfo(const char* pFile, _FileInfo& FileInfo)
 		OUR_DEBUG((LM_ERROR, "[CConsoleMessage::GetFileInfo]No find file path.\n"));
 		return false;
 	}
-
-	ACE_OS::memcpy(&FileInfo.m_szFileName, pFile + i + 1, nLen - i - 1);
+;
+	memcpy_safe((char* )(pFile + i + 1), (uint32)nLen - i - 1, (char* )FileInfo.m_szFileName, (uint32)MAX_BUFF_100);
 	FileInfo.m_szFileName[nLen - i - 1] = '\0';
 
-	ACE_OS::memcpy(&FileInfo.m_szFilePath, pFile, i + 1);
+	memcpy_safe((char* )(pFile), (uint32)i + 1, (char* )FileInfo.m_szFilePath, (uint32)MAX_BUFF_100);
 	FileInfo.m_szFilePath[i + 1] = '\0';
 
 	return true;

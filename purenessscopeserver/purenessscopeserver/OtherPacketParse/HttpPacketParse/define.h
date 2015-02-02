@@ -1016,7 +1016,7 @@ inline bool Replace_String(char* pText, uint32 u4Len, const char* pOld, const ch
 {
 	char* pTempSrc = new char(u4Len);
 
-	ACE_OS::memcpy(pTempSrc, pText, u4Len);
+	memcpy_safe(pText, u4Len, pTempSrc, u4Len);
 	pTempSrc[u4Len - 1] = '\0';
 
 	uint16 u2NewLen = (uint16)ACE_OS::strlen(pNew);
@@ -1029,7 +1029,7 @@ inline bool Replace_String(char* pText, uint32 u4Len, const char* pOld, const ch
 		uint32 u4PosLen = (uint32)(pPos - pTempSrc);
 
 		//黏贴最前面的
-		ACE_OS::memcpy(pText, pTempSrc, u4PosLen);
+		memcpy_safe(pText, u4PosLen, pTempSrc, u4PosLen);
 		pText[u4PosLen] = '\0';
 
 		if(u4PosLen + u2NewLen >= (uint32)u4Len)
@@ -1041,13 +1041,13 @@ inline bool Replace_String(char* pText, uint32 u4Len, const char* pOld, const ch
 		else
 		{
 			//黏贴新字符
-			ACE_OS::memcpy(&pText[u4PosLen], pNew, u2NewLen);
+			memcpy_safe(pText, u2NewLen, &pText[u4PosLen], u2NewLen);
 			pText[u4PosLen + u2NewLen] = '\0';
 
 			//指针向后移动	
 			pTempSrc = 	pTempSrc + u4PosLen;
 
-			//寻找下一个透汗的字符串
+			//寻找下一个相同的字符串
 			pPos = ACE_OS::strstr(pTempSrc, pOld); 
 		}
 

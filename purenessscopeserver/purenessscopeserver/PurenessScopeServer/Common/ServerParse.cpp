@@ -4,7 +4,7 @@ CServerParse::CServerParse()
 {
 	//在这里设置包头的长度，因为大部分的包头长度是固定的。包体长度是可变的。
 	m_u4PacketHead      = PACKET_HEAD;
-	m_u4PacketCommandID = 0;
+	m_u2PacketCommandID = 0;
 	m_u4PacketData      = 0;
 
 	m_blIsHead          = false;
@@ -21,7 +21,7 @@ CServerParse::~CServerParse()
 void CServerParse::Init()
 {
 	m_u4PacketHead      = PACKET_HEAD;
-	m_u4PacketCommandID = 0;
+	m_u2PacketCommandID = 0;
 	m_u4PacketData      = 0;
 
 	m_blIsHead          = false;
@@ -42,7 +42,7 @@ uint32 CServerParse::GetPacketBodyLen()
 
 uint16 CServerParse::GetPacketCommandID()
 {
-	return m_u4PacketCommandID;
+	return m_u2PacketCommandID;
 }
 
 bool CServerParse::GetIsHead()
@@ -55,7 +55,7 @@ bool CServerParse::SetPacketHead(char* pData, uint32 u4Len)
 	//这里添加自己对包头的分析，主要分析出包长度。
 	if(u4Len == sizeof(uint32))
 	{
-		ACE_OS::memcpy(&m_u4PacketData, pData, sizeof(uint32));
+		memcpy_safe(pData, (uint32)sizeof(uint32), (char* )&m_u4PacketData, (uint32)sizeof(uint32));
 		m_blIsHead = true;
 		return true;
 	}
@@ -70,7 +70,7 @@ bool CServerParse::SetPacketBody(char* pData, uint32 u4Len)
 	//这里分析出包体内的一些数据，如果包头包含了CommandID，那么包体就不必做解析。
 	if(u4Len >= sizeof(uint16))
 	{
-		ACE_OS::memcpy(&m_u4PacketCommandID, pData, sizeof(uint16));
+		memcpy_safe(pData, (uint32)sizeof(uint16), (char* )&m_u2PacketCommandID, (uint32)sizeof(uint16));
 		m_blIsHead = false;
 		return true;
 	}
@@ -116,8 +116,9 @@ bool CServerParse::MakePacket(const char* pData, uint32 u4Len, ACE_Message_Block
 	}
 
 	//拼装数据包
-	ACE_OS::memcpy(pMbData->wr_ptr(), (const void*)&u4Len, sizeof(uint32));
-	ACE_OS::memcpy(pMbData->wr_ptr() + sizeof(uint32), (const void*)pData, u4Len);
+	memcpy_safe((char* )&u4Len, (uint32)sizeof(uint32), pMbData->wr_ptr(), (uint32)sizeof(uint32));
+	//NOTICE，这里的pMbData可能会有内存溢出，这里需要完善一下
+	memcpy_safe((char* )pData, u4Len, pMbData->wr_ptr(), u4Len);
 	pMbData->wr_ptr(u4Len + sizeof(uint32));
 
 	return true;

@@ -40,7 +40,7 @@ public:
 private:
 	uint32 m_u4PacketHead;
 	uint32 m_u4PacketData;
-	uint16 m_u4PacketCommandID;
+	uint16 m_u2PacketCommandID;
 	bool   m_blIsHead;
 
 	ACE_Message_Block* m_pmbHead;   //包头部分
