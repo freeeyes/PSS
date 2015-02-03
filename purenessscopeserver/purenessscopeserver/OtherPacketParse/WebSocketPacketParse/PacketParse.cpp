@@ -40,7 +40,7 @@ bool CPacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead,
 	m_u4HeadSrcSize = u4Len;
 	if(u4Len == sizeof(uint32))
 	{
-		ACE_OS::memcpy(&m_u4PacketData, pData, sizeof(uint32));
+		memcpy_safe(pData, (uint32)sizeof(uint32), (char* )&m_u4PacketData, (uint32)sizeof(uint32));
 		
 		m_pmbHead = pmbHead;
 		m_blIsHead = true;
@@ -61,7 +61,7 @@ bool CPacketParse::SetPacketBody(uint32 u4ConnectID, ACE_Message_Block* pmbBody,
 	m_u4BodySrcSize = u4Len;
 	if(u4Len >= sizeof(uint16))
 	{
-		ACE_OS::memcpy(&m_u2PacketCommandID, pData, sizeof(uint16));
+		memcpy_safe(pData, (uint32)sizeof(uint16), (char* )&m_u2PacketCommandID, (uint32)sizeof(uint16));
 		m_blIsHead = false;
 		m_pmbBody = pmbBody;
 		return true;
@@ -95,9 +95,10 @@ bool CPacketParse::MakePacket(uint32 u4ConnectID, const char* pData, uint32 u4Le
 	}
 
 	//拼装数据包
-	ACE_OS::memcpy(pMbData->wr_ptr(), (const void*)&u4Len, sizeof(uint32));
-	ACE_OS::memcpy(pMbData->wr_ptr() + sizeof(uint32), (const void*)pData, u4Len);
-	pMbData->wr_ptr(u4Len + sizeof(uint32));
+	memcpy_safe((char* )&u4Len, (uint32)sizeof(uint32), (char* )pMbData->wr_ptr(), (uint32)sizeof(uint32));
+	pMbData->wr_ptr(sizeof(uint32));
+	memcpy_safe((char* )pData, u4Len, pMbData->wr_ptr(), u4Len);
+	pMbData->wr_ptr(u4Len);
 
 	return true;
 }
@@ -158,7 +159,7 @@ uint8 CPacketParse::WebSocketDisposeHandIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 		return PACKET_GET_ERROR;
 	}
 
-	ACE_OS::memcpy(&pWebSocketInfo->m_szData[pWebSocketInfo->m_u4DataLength], pData, u4Data);
+	memcpy_safe(pData, u4Data, (char* )&pWebSocketInfo->m_szData[pWebSocketInfo->m_u4DataLength], u4Data);
 	pWebSocketInfo->m_u4DataLength += u4Data;
 
 	//判断是不是握手包的结束，找到末尾4个字符是不是\r\n\r\n
@@ -176,7 +177,7 @@ uint8 CPacketParse::WebSocketDisposeHandIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 		}
 
 		uint32 u4NetPacketLen = pWebSocketInfo->m_u4DataLength;
-		memcpy(m_pmbHead->wr_ptr(), (char*)&u4NetPacketLen, sizeof(uint32));
+		memcpy_safe((char*)&u4NetPacketLen, (uint32)sizeof(uint32), (char* )m_pmbHead->wr_ptr(), (uint32)sizeof(uint32));
 		m_pmbHead->wr_ptr(sizeof(uint32));
 
 		//获得包体
@@ -187,7 +188,7 @@ uint8 CPacketParse::WebSocketDisposeHandIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 			return PACKET_GET_ERROR;
 		}
 
-		ACE_OS::memcpy(m_pmbBody->wr_ptr(), (char*)pWebSocketInfo->m_szData, pWebSocketInfo->m_u4DataLength);
+		memcpy_safe((char*)pWebSocketInfo->m_szData, pWebSocketInfo->m_u4DataLength, (char* )m_pmbBody->wr_ptr(), pWebSocketInfo->m_u4DataLength);
 		m_pmbBody->wr_ptr(u4NetPacketLen);
 
 		//设置命令字(0xe001指的是连接ID)
@@ -226,7 +227,7 @@ uint8 CPacketParse::WebSocketDisposeDataIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 		return (uint8)PACKET_GET_ERROR;
 	}
 
-	ACE_OS::memcpy(&pWebSocketInfo->m_szData[pWebSocketInfo->m_u4DataLength], pData, u4Data);
+	memcpy_safe(pData, u4Data, (char* )&pWebSocketInfo->m_szData[pWebSocketInfo->m_u4DataLength], u4Data);
 	pWebSocketInfo->m_u4DataLength += u4Data;
 
 	//解析规则约定为
@@ -263,7 +264,7 @@ uint8 CPacketParse::WebSocketDisposeDataIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 		//有后续的数据包，在这里需要处理一下
 		pWebSocketInfo->m_u4DataLength -= u4OriPacketLen;
 
-		ACE_OS::memcpy(&pWebSocketInfo->m_szData, &pWebSocketInfo->m_szData[u4OriPacketLen], pWebSocketInfo->m_u4DataLength);
+		memcpy_safe((char* )&pWebSocketInfo->m_szData[u4OriPacketLen], pWebSocketInfo->m_u4DataLength, (char* )&pWebSocketInfo->m_szData, pWebSocketInfo->m_u4DataLength);
 	}
 	else
 	{
@@ -292,7 +293,7 @@ uint8 CPacketParse::WebSocketDisposeDataIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 		}
 
 		uint32 u4NetPacketLen = u4CurrDecryptDataLen - (uint32)(pInfo - pWebSocketInfo->m_szDecryptData);
-		memcpy(m_pmbHead->wr_ptr(), (char*)&u4NetPacketLen, sizeof(uint32));
+		memcpy_safe((char*)&u4NetPacketLen, (uint32)sizeof(uint32), (char* )m_pmbHead->wr_ptr(), (uint32)sizeof(uint32));
 		m_pmbHead->wr_ptr(sizeof(uint32));
 
 		//获得包体
@@ -302,7 +303,7 @@ uint8 CPacketParse::WebSocketDisposeDataIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 			return PACKET_GET_ERROR;
 		}
 
-		ACE_OS::memcpy(m_pmbBody->wr_ptr(), (char*)pInfo, u4NetPacketLen);
+		memcpy_safe((char*)pInfo, u4NetPacketLen, (char* )m_pmbBody->wr_ptr(), u4NetPacketLen);
 		m_pmbBody->wr_ptr(u4NetPacketLen);
 
 		//处理完的数据从块中移除
@@ -312,7 +313,7 @@ uint8 CPacketParse::WebSocketDisposeDataIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 		if(pWebSocketInfo->m_u4DataLength > 0)
 		{
 			pCurrMessage->size((size_t)pWebSocketInfo->m_u4DataLength);
-			ACE_OS::memcpy(pCurrMessage->wr_ptr(), pWebSocketInfo->m_szData, pWebSocketInfo->m_u4DataLength);
+			memcpy_safe(pWebSocketInfo->m_szData, pWebSocketInfo->m_u4DataLength, (char* )pCurrMessage->wr_ptr(), pWebSocketInfo->m_u4DataLength);
 			pCurrMessage->wr_ptr(pWebSocketInfo->m_u4DataLength);
 			pWebSocketInfo->m_u4DataLength = 0;
 		}
@@ -321,8 +322,9 @@ uint8 CPacketParse::WebSocketDisposeDataIn(_WebSocketInfo* pWebSocketInfo, ACE_M
 		pWebSocketInfo->m_u4DecryptDataLen -= u4CurrDecryptDataLen;
 		if(pWebSocketInfo->m_u4DecryptDataLen > 0)
 		{
-			ACE_OS::memcpy(pWebSocketInfo->m_szDecryptData, 
-				(char* )&pWebSocketInfo->m_szDecryptData[u4CurrDecryptDataLen], 
+			memcpy_safe((char* )&pWebSocketInfo->m_szDecryptData[u4CurrDecryptDataLen],
+				pWebSocketInfo->m_u4DecryptDataLen,
+				pWebSocketInfo->m_szDecryptData,
 				pWebSocketInfo->m_u4DecryptDataLen);
 		}
 
@@ -403,9 +405,9 @@ uint8 CPacketParse::Decrypt(char* pOriData, uint32& u4Len, char* pEncryData, uin
 	}
 
 	char masks[4];
-	memcpy(masks, pOriData + masksOffset, 4);
+	memcpy_safe(pOriData + masksOffset, 4, (char* )masks, 4);
 
-	memcpy(pEncryData, pOriData + masksOffset + 4, payloadSize);
+	memcpy_safe((char* )(pOriData + masksOffset + 4), payloadSize, pEncryData, payloadSize);
 	for (unsigned int i = 0; i < payloadSize; i++) {
 		pEncryData[i] = (pEncryData[i] ^ masks[i%4]);
 	}
@@ -417,7 +419,6 @@ uint8 CPacketParse::Decrypt(char* pOriData, uint32& u4Len, char* pEncryData, uin
 		return PACKET_GET_ERROR;
 	}
 
-	//ACE_OS::memcpy(pEncryData, mp_payload_data, payloadSize);
 	u4EncryLen = payloadSize;
 	//这里6个字节头是固定的，第一个字节固定的-127,后面根据数据的长度或者4或者6字节
 	if(payloadSize + nFrameLen > u4Len)
@@ -453,7 +454,7 @@ uint8 CPacketParse::ReadDataPacketInfo(const char* pData, uint32& u4DataLen, uin
 	}
 
 	//获得命令字符串
-	ACE_OS::memcpy(szTemp, pData, (int)(pInfo - pData));
+	memcpy_safe((char* )pData, (uint32)(pInfo - pData), szTemp, (uint32)MAX_BUFF_100);
 
 	//如果找到了，开始切分数据，获得数据长度和命令ID
 	char* pCommand = NULL;
@@ -473,14 +474,16 @@ uint8 CPacketParse::ReadDataPacketInfo(const char* pData, uint32& u4DataLen, uin
 			return (uint8)PACKET_GET_ERROR;
 		}
 
-		ACE_OS::memcpy(szTemp2, pData, (int)(pCommand - szTemp));
+		memcpy_safe((char* )pData, (uint32)(pCommand - szTemp), szTemp2, (uint32)MAX_BUFF_50);
 		//得到命令字和数据包长度
 		//u2CommandID = (uint16)ACE_OS::atoi(szTemp2);
 		//十六进制字符串转成整形
 		int nCommandID = 0;
 		sscanf(szTemp2, "%x", &nCommandID);
 		m_u2PacketCommandID = (uint16)nCommandID;
-		ACE_OS::memcpy(szTemp2, pCommand + 1, ACE_OS::strlen(szTemp) - (int)(pCommand - szTemp) - 1);
+		memcpy_safe((char* )(pCommand + 1), (uint32)(ACE_OS::strlen(szTemp) - (int)(pCommand - szTemp) - 1),
+			szTemp2, 
+			(uint32)MAX_BUFF_50);
 		szTemp2[ACE_OS::strlen(szTemp) - (int)(pCommand - szTemp) - 1] = '\0';
 		u4PacketLen = (uint32)ACE_OS::atoi(szTemp2);
 		

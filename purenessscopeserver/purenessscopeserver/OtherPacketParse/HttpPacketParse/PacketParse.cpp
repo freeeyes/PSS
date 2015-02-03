@@ -41,7 +41,7 @@ bool CPacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead,
 	m_u4HeadSrcSize = u4Len;
 	if(u4Len == sizeof(uint32))
 	{
-		ACE_OS::memcpy(&m_u4PacketData, pData, sizeof(uint32));
+		memcpy_safe(pData, (uint32)sizeof(uint32), (char* )&m_u4PacketData, (uint32)sizeof(uint32));
 		
 		m_pmbHead = pmbHead;
 		m_blIsHead = true;
@@ -62,7 +62,7 @@ bool CPacketParse::SetPacketBody(uint32 u4ConnectID, ACE_Message_Block* pmbBody,
 	m_u4BodySrcSize = u4Len;
 	if(u4Len >= sizeof(uint16))
 	{
-		ACE_OS::memcpy(&m_u2PacketCommandID, pData, sizeof(uint16));
+		memcpy_safe(pData, (uint32)sizeof(uint16), (char* )&m_u2PacketCommandID, (uint32)sizeof(uint16));
 		m_blIsHead = false;
 		m_pmbBody = pmbBody;
 		return true;
@@ -96,9 +96,10 @@ bool CPacketParse::MakePacket(uint32 u4ConnectID, const char* pData, uint32 u4Le
 	}
 
 	//拼装数据包
-	ACE_OS::memcpy(pMbData->wr_ptr(), (const void*)&u4Len, sizeof(uint32));
-	ACE_OS::memcpy(pMbData->wr_ptr() + sizeof(uint32), (const void*)pData, u4Len);
-	pMbData->wr_ptr(u4Len + sizeof(uint32));
+	memcpy_safe((char* )&u4Len, (uint32)sizeof(uint32), (char* )pMbData->wr_ptr(), (uint32)sizeof(uint32));
+	pMbData->wr_ptr(sizeof(uint32));
+	memcpy_safe((char* )pData, u4Len, (char* )pMbData->wr_ptr(), u4Len);
+	pMbData->wr_ptr(u4Len);
 
 	return true;
 }
@@ -156,7 +157,7 @@ uint8 CPacketParse::HttpDispose(_HttpInfo* pHttpInfo, ACE_Message_Block* pCurrMe
 	//OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]m_u4DataLength=%d.\n", pHttpInfo->m_u4DataLength));
 	//OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]u4Data=%d.\n", u4Data));
 	
-	ACE_OS::memcpy(&pHttpInfo->m_szData[pHttpInfo->m_u4DataLength], pData, u4Data);
+	memcpy_safe(pData, u4Data, (char* )&pHttpInfo->m_szData[pHttpInfo->m_u4DataLength], u4Data);
 	pHttpInfo->m_u4DataLength += u4Data;
 	pHttpInfo->m_szData[pHttpInfo->m_u4DataLength] = '\0';
 
@@ -178,7 +179,7 @@ uint8 CPacketParse::HttpDispose(_HttpInfo* pHttpInfo, ACE_Message_Block* pCurrMe
 		return PACKET_GET_ERROR;
 	}
 
-	memcpy(m_pmbHead->wr_ptr(), (char*)pHttpInfo->m_szData, u4HttpHeadLen);
+	memcpy_safe((char*)pHttpInfo->m_szData, u4HttpHeadLen, (char* )m_pmbHead->wr_ptr(), u4HttpHeadLen);
 	m_pmbHead->wr_ptr(u4HttpHeadLen);
 
 	//设置命令字
@@ -203,7 +204,7 @@ uint8 CPacketParse::HttpDispose(_HttpInfo* pHttpInfo, ACE_Message_Block* pCurrMe
 			return PACKET_GET_ERROR;
 		}
 
-		memcpy(m_pmbBody->wr_ptr(), (char*)&u4HttpHeadLen, sizeof(uint32));
+		memcpy_safe((char*)&u4HttpHeadLen, (uint32)sizeof(uint32), m_pmbBody->wr_ptr(), (uint32)sizeof(uint32));
 		m_pmbBody->wr_ptr(sizeof(uint32));
 	}
 	else
@@ -216,46 +217,12 @@ uint8 CPacketParse::HttpDispose(_HttpInfo* pHttpInfo, ACE_Message_Block* pCurrMe
 			return PACKET_GET_ERROR;
 		}
 
-		memcpy(m_pmbBody->wr_ptr(), (char*)pHttpHead, u4HttpBodyLength);
+		memcpy_safe((char*)pHttpHead, u4HttpBodyLength, m_pmbBody->wr_ptr(), u4HttpBodyLength);
 		m_pmbBody->wr_ptr(u4HttpBodyLength);
 	}
 
 	//处理完的数据从池中移除
 	pCurrMessage->rd_ptr(u4Data);
-	
-	/*
-	OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]1.\n"));
-	
-	//测试代码
-	m_pmbHead = pMessageBlockManager->Create(1);
-	if(NULL == m_pmbHead)
-	{
-		OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]m_pmbHead is NULL.\n"));
-		return PACKET_GET_ERROR;
-	}
-	m_u4PacketHead = 1;
-	
-	char cData = '1';
-	memcpy(m_pmbHead->wr_ptr(), (char*)&cData, 1);
-	m_pmbHead->wr_ptr(1);	
-	
-	m_pmbBody = pMessageBlockManager->Create(1);
-	if(NULL == m_pmbBody)
-	{
-		OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]m_pmbHead is NULL.\n"));
-		return PACKET_GET_ERROR;
-	}
-	m_u4PacketData = 1;
-	
-	OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]2.\n"));
-	
-	memcpy(m_pmbBody->wr_ptr(), (char*)&cData, 1);
-	m_pmbBody->wr_ptr(1);	
-	
-	OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]u4Data=%d.\n", u4Data));
-	pCurrMessage->rd_ptr(u4Data);
-	OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]Length=%d.\n", pCurrMessage->length()));
-	*/
 	
 	pHttpInfo->m_u4DataLength = 0;
 	return (uint8)PACKET_GET_ENOUGTH;
@@ -285,7 +252,7 @@ uint8 CPacketParse::GetHttpBodyLen(char* pData, uint32 u4Len, uint32 u4HeadLen, 
 		}
 
 		//OUR_DEBUG((LM_ERROR, "[CPacketParse::GetHttpBodyLen]u1LengthLen=%d.\n", u1LengthLen));
-		ACE_OS::memcpy(szBodyLen, &pLength[nNameLen], u1LengthLen);
+		memcpy_safe((char* )&pLength[nNameLen], u1LengthLen, szBodyLen, 10);
 
 		u4BodyLen = ACE_OS::atoi(szBodyLen);
 		//OUR_DEBUG((LM_ERROR, "[CPacketParse::GetHttpBodyLen]u4BodyLen=%d.\n", u4BodyLen));
