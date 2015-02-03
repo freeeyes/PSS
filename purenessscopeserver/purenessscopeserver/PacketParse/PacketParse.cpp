@@ -42,13 +42,13 @@ bool CPacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead,
 
 	m_u4HeadSrcSize = PACKET_HEAD_LENGTH;
 
-	ACE_OS::memcpy((char* )&m_objPacketHeadInfo.m_u2Version, (char* )&pData[u4Pos], sizeof(uint16));
+	memcpy_safe((char* )&pData[u4Pos], (uint32)sizeof(uint16), (char* )&m_objPacketHeadInfo.m_u2Version, (uint32)sizeof(uint16));
 	u4Pos += sizeof(uint16);
-	ACE_OS::memcpy((char* )&m_objPacketHeadInfo.m_u2CmdID, (char* )&pData[u4Pos], sizeof(uint16));
+	memcpy_safe((char* )&pData[u4Pos], (uint32)sizeof(uint16), (char* )&m_objPacketHeadInfo.m_u2CmdID, (uint32)sizeof(uint16));
 	u4Pos += sizeof(uint16);
-	ACE_OS::memcpy((char* )&m_objPacketHeadInfo.m_u4BodyLen, (char* )&pData[u4Pos], sizeof(uint32));
+	memcpy_safe((char* )&pData[u4Pos], (uint32)sizeof(uint32), (char* )&m_objPacketHeadInfo.m_u4BodyLen, (uint32)sizeof(uint32));
 	u4Pos += sizeof(uint32);
-	ACE_OS::memcpy(m_objPacketHeadInfo.m_szSession, (char* )&pData[u4Pos], sizeof(char)*32);
+	memcpy_safe((char* )&pData[u4Pos], (uint32)(sizeof(char)*32), (char* )&m_objPacketHeadInfo.m_szSession, (uint32)(sizeof(char)*32));
 	u4Pos += sizeof(char)*32;
 
 	m_u4PacketData      = m_objPacketHeadInfo.m_u4BodyLen;
@@ -91,9 +91,10 @@ bool CPacketParse::MakePacket(uint32 u4ConnectID, const char* pData, uint32 u4Le
 	}
 
 	//拼装数据包
-	ACE_OS::memcpy(pMbData->wr_ptr(), (const void*)&u4Len, sizeof(uint32));
-	ACE_OS::memcpy(pMbData->wr_ptr() + sizeof(uint32), (const void*)pData, u4Len);
-	pMbData->wr_ptr(u4Len + sizeof(uint32));
+	memcpy_safe((char* )&u4Len, (uint32)sizeof(uint32), pMbData->wr_ptr(), (uint32)sizeof(uint32));
+	pMbData->wr_ptr(sizeof(uint32));
+	memcpy_safe((char* )pData, u4Len, pMbData->wr_ptr(), u4Len);
+	pMbData->wr_ptr(u4Len);
 
 	return true;
 }
@@ -175,7 +176,7 @@ uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurr
 			//记录包长，并转换为网络字节序，放入包头
 			//uint32 u4NetPacketLen = ACE_HTONL(u4PacketLen);
 			uint32 u4NetPacketLen = u4PacketLen;
-			memcpy(m_pmbHead->wr_ptr(), (char*)&u4NetPacketLen, sizeof(uint32));
+			memcpy_safe((char*)&u4NetPacketLen, (uint32)sizeof(uint32), m_pmbHead->wr_ptr(), (uint32)sizeof(uint32));
 			m_pmbHead->wr_ptr(sizeof(uint32));
 			
 			//从内存池申请一个包体
@@ -186,10 +187,10 @@ uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurr
 			}
 
 			//获得包命令ID
-			ACE_OS::memcpy(&m_u2PacketCommandID, (char*)&pData[1], sizeof(uint16));
+			memcpy_safe((char*)&pData[1], (uint32)sizeof(uint16), (char* )&m_u2PacketCommandID, (uint32)sizeof(uint16));
 
 			//将包内容放入包体
-			memcpy(m_pmbBody->wr_ptr(), (char*)&pData[1], u4PacketLen);
+			memcpy_safe((char*)&pData[1], u4PacketLen, m_pmbBody->wr_ptr(), u4PacketLen);
 			m_pmbBody->wr_ptr(u4PacketLen);
 
 			m_blIsHead = false;
@@ -263,7 +264,7 @@ uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurr
 			//记录包长，并转换为网络字节序，放入包头
 			//uint32 u4NetPacketLen = ACE_HTONL(m_objCurrBody.GetPacketLen());
 			uint32 u4NetPacketLen = m_u4PacketData;
-			memcpy(m_pmbHead->wr_ptr(), (char*)&u4NetPacketLen, sizeof(uint32));
+			memcpy_safe((char*)&u4NetPacketLen, (uint32)sizeof(uint32), m_pmbHead->wr_ptr(), (uint32)sizeof(uint32));
 			m_pmbHead->wr_ptr(sizeof(uint32));
 
 			//从内存池申请一个包体
@@ -274,11 +275,10 @@ uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurr
 			}
 
 			//获得包命令ID
-			ACE_OS::memcpy(&m_u2PacketCommandID, pData, sizeof(uint16));
-
+			memcpy_safe((char*)pData, (uint32)sizeof(uint16), (char* )&m_u2PacketCommandID, (uint32)sizeof(uint16));
 
 			//将包内容放入包体
-			memcpy(m_pmbBody->wr_ptr(), (char*)pBuffPacket->GetData(), m_u4PacketData);
+			memcpy_safe((char*)pBuffPacket->GetData(), m_u4PacketData, (char* )m_pmbBody->wr_ptr(), m_u4PacketData);
 			m_pmbBody->wr_ptr(m_u4PacketData);
 
 			//删除缓冲中的数据
