@@ -362,7 +362,7 @@ inline bool memcpy_safe(char* pSrc, uint32 u4SrcLen, char* pDes, uint32 u4DesLen
 	}
 	else
 	{
-		ACE_OS::memcpy((void* )pSrc, (void* )pDes, (size_t)u4SrcLen);
+		ACE_OS::memcpy((void* )pDes, (void* )pSrc, (size_t)u4SrcLen);
 		return true;
 	}
 }

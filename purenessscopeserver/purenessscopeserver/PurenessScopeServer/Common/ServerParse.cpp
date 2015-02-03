@@ -117,9 +117,10 @@ bool CServerParse::MakePacket(const char* pData, uint32 u4Len, ACE_Message_Block
 
 	//拼装数据包
 	memcpy_safe((char* )&u4Len, (uint32)sizeof(uint32), pMbData->wr_ptr(), (uint32)sizeof(uint32));
+	pMbData->wr_ptr(sizeof(uint32));
 	//NOTICE，这里的pMbData可能会有内存溢出，这里需要完善一下
 	memcpy_safe((char* )pData, u4Len, pMbData->wr_ptr(), u4Len);
-	pMbData->wr_ptr(u4Len + sizeof(uint32));
+	pMbData->wr_ptr(u4Len);
 
 	return true;
 }

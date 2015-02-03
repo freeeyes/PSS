@@ -375,7 +375,8 @@ bool CConsoleMessage::GetForbiddenIP(const char* pCommand, _ForbiddenIP& Forbidd
 	{
 		return false;
 	}
-	ACE_OS::memcpy(szTempData, pPosBegin + 3, nLen);
+
+	memcpy_safe(pPosBegin + 3, (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
 	szTempData[nLen] = '\0';
 	sprintf_safe(ForbiddenIP.m_szClientIP, MAX_IP_SIZE, szTempData);
 
@@ -386,7 +387,8 @@ bool CConsoleMessage::GetForbiddenIP(const char* pCommand, _ForbiddenIP& Forbidd
 	{
 		return false;
 	}
-	ACE_OS::memcpy(szTempData, pPosBegin + 3, nLen);
+
+	memcpy_safe(pPosBegin + 3, (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
 	szTempData[nLen] = '\0';
 	ForbiddenIP.m_u1Type = (uint8)ACE_OS::atoi(szTempData);
 
@@ -397,7 +399,8 @@ bool CConsoleMessage::GetForbiddenIP(const char* pCommand, _ForbiddenIP& Forbidd
 	{
 		return false;
 	}
-	ACE_OS::memcpy(szTempData, pPosBegin + 3, nLen);
+
+	memcpy_safe(pPosBegin + 3, (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
 	szTempData[nLen] = '\0';
 	ForbiddenIP.m_u4Second = (uint32)ACE_OS::atoi(szTempData);
 
@@ -416,7 +419,8 @@ bool CConsoleMessage::GetTrackIP(const char* pCommand, _ForbiddenIP& ForbiddenIP
 	{
 		return false;
 	}
-	ACE_OS::memcpy(szTempData, pPosBegin + 3, nLen);
+
+	memcpy_safe(pPosBegin + 3, (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
 	szTempData[nLen] = '\0';
 	sprintf_safe(ForbiddenIP.m_szClientIP, MAX_IP_SIZE, szTempData);
 
@@ -432,7 +436,7 @@ bool CConsoleMessage::GetLogLevel(const char* pCommand, int& nLogLevel)
 	if(NULL != pPosBegin)
 	{
 		int nLen = ACE_OS::strlen(pCommand) - (int)(pPosBegin - pCommand) - 3;
-		ACE_OS::memcpy(szTempData, pPosBegin + 3, nLen);
+		memcpy_safe(pPosBegin + 3, (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
 		nLogLevel = ACE_OS::atoi(szTempData);
 	}
 
@@ -454,7 +458,7 @@ bool CConsoleMessage::GetAIInfo(const char* pCommand, int& nAI, int& nDispose, i
 		if(pCommand[i] == ',')
 		{
 			nEnd = i;
-			ACE_OS::memcpy(szTemp, (char* )&pCommand[nBegin], nEnd - nBegin);
+			memcpy_safe((char* )&pCommand[nBegin], (uint32)(nEnd - nBegin), szTemp, (uint32)MAX_BUFF_20);
 			if(nIndex == 0)
 			{
 				nAI = ACE_OS::atoi(szTemp);
@@ -475,7 +479,7 @@ bool CConsoleMessage::GetAIInfo(const char* pCommand, int& nAI, int& nDispose, i
 	}
 
 	//最后一个参数
-	ACE_OS::memcpy(szTemp, (char* )&pCommand[nBegin], (int)ACE_OS::strlen(pCommand) - nBegin);
+	memcpy_safe((char* )&pCommand[nBegin], (uint32)(ACE_OS::strlen(pCommand) - nBegin), szTemp, (uint32)MAX_BUFF_20);
 	nStop = ACE_OS::atoi(szTemp);
 
 	return true;
@@ -488,7 +492,7 @@ bool CConsoleMessage::GetNickName(const char* pCommand, char* pName)
 	if(NULL != pPosBegin)
 	{
 		int nLen = ACE_OS::strlen(pCommand) - (int)(pPosBegin - pCommand) - 3;
-		ACE_OS::memcpy(pName, pPosBegin + 3, nLen);
+		memcpy_safe((char* )(pPosBegin + 3), (uint32)nLen, pName, (uint32)MAX_BUFF_100);
 		pName[nLen] = '\0';
 	}
 
@@ -508,7 +512,7 @@ bool CConsoleMessage::GetConnectID(const char* pCommand, uint32& u4ConnectID, bo
 	{
 		return false;
 	}
-	ACE_OS::memcpy(szTempData, pPosBegin + 3, nLen);
+	memcpy_safe((char* )(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
 	szTempData[nLen] = '\0';
 	u4ConnectID = (uint32)ACE_OS::atoi(szTempData);
 
@@ -519,7 +523,7 @@ bool CConsoleMessage::GetConnectID(const char* pCommand, uint32& u4ConnectID, bo
 	{
 		return false;
 	}
-	ACE_OS::memcpy(szTempData, pPosBegin + 3, nLen);
+	memcpy_safe((char* )(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
 	szTempData[nLen] = '\0';
 	nFlag = (int)ACE_OS::atoi(szTempData);
 
@@ -547,7 +551,7 @@ bool CConsoleMessage::GetMaxConnectCount(const char* pCommand, uint16& u2MaxConn
 	{
 		return false;
 	}
-	ACE_OS::memcpy(szTempData, pPosBegin + 3, nLen);
+	memcpy_safe((char* )(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
 	szTempData[nLen] = '\0';
 	u2MaxConnectCount = (uint16)ACE_OS::atoi(szTempData);
 
@@ -566,7 +570,7 @@ bool CConsoleMessage::GetConnectServerID(const char* pCommand, int& nServerID)
 	{
 		return false;
 	}
-	ACE_OS::memcpy(szTempData, pPosBegin + 3, nLen);
+	memcpy_safe((char* )(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
 
 	nServerID = ACE_OS::atoi(szTempData);
 
@@ -585,7 +589,7 @@ bool CConsoleMessage::GetListenInfo(const char* pCommand, _ListenInfo& objListen
 	{
 		return false;
 	}
-	ACE_OS::memcpy(szTempData, pPosBegin + 3, nLen);
+	memcpy_safe((char* )(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
 	szTempData[nLen] = '\0';
 	sprintf_safe(objListenInfo.m_szListenIP, 20, szTempData);
 
@@ -597,7 +601,7 @@ bool CConsoleMessage::GetListenInfo(const char* pCommand, _ListenInfo& objListen
 	{
 		return false;
 	}
-	ACE_OS::memcpy(szTempData, pPosBegin + 3, nLen);
+	memcpy_safe((char* )(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
 	szTempData[nLen] = '\0';
 	objListenInfo.m_u4Port = ACE_OS::atoi(szTempData);
 
@@ -609,7 +613,7 @@ bool CConsoleMessage::GetListenInfo(const char* pCommand, _ListenInfo& objListen
 	{
 		return false;
 	}
-	ACE_OS::memcpy(szTempData, pPosBegin + 3, nLen);
+	memcpy_safe((char* )(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
 	szTempData[nLen] = '\0';
 	objListenInfo.m_u1IPType = ACE_OS::atoi(szTempData);
 	return true;
@@ -1654,7 +1658,7 @@ bool CConsoleMessage::GetDebug(const char* pCommand, uint8& u1Debug)
 	{
 		return false;
 	}
-	ACE_OS::memcpy(szTempData, pPosBegin + 3, nLen);
+	memcpy_safe((char* )(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
 
 	u1Debug = (uint8)ACE_OS::atoi(szTempData);
 

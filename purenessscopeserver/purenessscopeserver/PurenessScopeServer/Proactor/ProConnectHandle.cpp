@@ -732,7 +732,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 			else
 			{
 				//如果不是SENDMESSAGE_NOMAL，则直接组包
-				ACE_OS::memcpy(m_pBlockMessage->wr_ptr(), pBuffPacket->GetData(), pBuffPacket->GetPacketLen());
+				memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char* )m_pBlockMessage->wr_ptr(), pBuffPacket->GetPacketLen());
 				m_pBlockMessage->wr_ptr(pBuffPacket->GetPacketLen());
 			}
 		}
@@ -758,7 +758,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 		else
 		{
 			u4SendPacketSize = (uint32)pBuffPacket->GetPacketLen();
-			ACE_OS::memcpy(m_pBlockMessage->wr_ptr(), pBuffPacket->GetData(), pBuffPacket->GetPacketLen());
+			memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char* )m_pBlockMessage->wr_ptr(), pBuffPacket->GetPacketLen());
 			m_pBlockMessage->wr_ptr(pBuffPacket->GetPacketLen());
 		}
 
@@ -778,7 +778,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 				return false;
 			}
 
-			ACE_OS::memcpy(pMbData->wr_ptr(), m_pBlockMessage->rd_ptr(), m_pBlockMessage->length());
+			memcpy_safe(m_pBlockMessage->rd_ptr(), m_pBlockMessage->length(), pMbData->wr_ptr(), m_pBlockMessage->length());
 			pMbData->wr_ptr(m_pBlockMessage->length());
 			//放入完成，则清空缓存数据，使命完成
 			m_pBlockMessage->reset();

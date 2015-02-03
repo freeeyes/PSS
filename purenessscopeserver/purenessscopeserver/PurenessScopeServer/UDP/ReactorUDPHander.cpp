@@ -205,7 +205,7 @@ bool CReactorUDPHander::CheckMessage(const char* pData, uint32 u4Len)
 
 		//将完整的数据包转换为PacketParse对象
 		ACE_Message_Block* pMBHead = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadLen());
-		ACE_OS::memcpy(pMBHead->wr_ptr(), (const void*)pData, m_pPacketParse->GetPacketHeadLen());
+		memcpy_safe((char* )pData, m_pPacketParse->GetPacketHeadLen(), (char* )pMBHead->wr_ptr(), m_pPacketParse->GetPacketHeadLen());
 		pMBHead->wr_ptr(m_pPacketParse->GetPacketHeadLen());
 		m_pPacketParse->SetPacketHead(0, pMBHead, App_MessageBlockManager::instance());
 
@@ -217,7 +217,7 @@ bool CReactorUDPHander::CheckMessage(const char* pData, uint32 u4Len)
 
 		char* pBody = (char* )(&pData[0] + m_pPacketParse->GetPacketHeadLen());
 		ACE_Message_Block* pMBBody = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketBodyLen());
-		ACE_OS::memcpy(pMBBody->wr_ptr(), (const void*)pBody, m_pPacketParse->GetPacketBodyLen());
+		memcpy_safe(pBody, m_pPacketParse->GetPacketBodyLen(), (char* )pMBBody->wr_ptr(), m_pPacketParse->GetPacketBodyLen());
 		pMBBody->wr_ptr(m_pPacketParse->GetPacketBodyLen());
 		m_pPacketParse->SetPacketBody(0, pMBBody, App_MessageBlockManager::instance());
 
@@ -232,7 +232,7 @@ bool CReactorUDPHander::CheckMessage(const char* pData, uint32 u4Len)
 	else
 	{
 		ACE_Message_Block* pMbData = App_MessageBlockManager::instance()->Create(u4Len); 
-		ACE_OS::memcpy(pMbData->wr_ptr(), pData, u4Len);
+		memcpy_safe((char* )pData, u4Len, (char* )pMbData->wr_ptr(), u4Len);
 		pMbData->wr_ptr(u4Len);
 
 		//以数据流处理

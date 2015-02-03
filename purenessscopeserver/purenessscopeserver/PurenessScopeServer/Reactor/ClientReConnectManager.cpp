@@ -543,7 +543,7 @@ bool CClientReConnectManager::SendData(int nServerID, const char* pData, int nSi
 		return false;
 	}
 
-	ACE_OS::memcpy(pmblk->wr_ptr(), pData, nSize);
+	memcpy_safe((char* )pData, (uint32)nSize, pmblk->wr_ptr(), (uint32)nSize);
 	pmblk->wr_ptr(nSize);
 
 	if (true == blIsDelete)

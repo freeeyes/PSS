@@ -47,7 +47,7 @@ bool CConsolePacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* p
 	m_u4HeadSrcSize = u4Len;
 	if(u4Len == sizeof(uint32))
 	{
-		ACE_OS::memcpy(&m_u4PacketData, pData, sizeof(uint32));
+		memcpy_safe((char* )pData, (uint32)sizeof(uint32), (char* )&m_u4PacketData, (uint32)sizeof(uint32));
 		
 		m_pmbHead = pmbHead;
 		m_blIsHead = true;
@@ -72,7 +72,6 @@ bool CConsolePacketParse::SetPacketBody(uint32 u4ConnectID, ACE_Message_Block* p
 	m_u4BodySrcSize = u4Len;
 	if(u4Len >= sizeof(uint16))
 	{
-		//ACE_OS::memcpy(&m_u2PacketCommandID, pData, sizeof(uint16));
 		m_blIsHead = false;
 		m_pmbBody = pmbBody;
 		return true;
@@ -108,9 +107,10 @@ bool CConsolePacketParse::MakePacket(uint32 u4ConnectID, const char* pData, uint
 	}
 
 	//拼装数据包
-	ACE_OS::memcpy(pMbData->wr_ptr(), (const void*)&u4Len, sizeof(uint32));
-	ACE_OS::memcpy(pMbData->wr_ptr() + sizeof(uint32), (const void*)pData, u4Len);
-	pMbData->wr_ptr(u4Len + sizeof(uint32));
+	memcpy_safe((char* )&u4Len, (uint32)sizeof(uint32), (char* )pMbData->wr_ptr(), (uint32)sizeof(uint32));
+	pMbData->wr_ptr(sizeof(uint32));
+	memcpy_safe((char* )pData, u4Len, pMbData->wr_ptr(), u4Len);
+	pMbData->wr_ptr(u4Len);
 
 	return true;
 }

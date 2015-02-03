@@ -528,7 +528,7 @@ bool CClientProConnectManager::SendData(int nServerID, const char* pData, int nS
 		return false;
 	}
 
-	ACE_OS::memcpy(pmblk->wr_ptr(), pData, nSize);
+	memcpy_safe((char* )pData, (uint32)nSize, (char* )pmblk->wr_ptr(), (uint32)nSize);
 	pmblk->wr_ptr(nSize);
 
 	if(true == blIsDelete)
