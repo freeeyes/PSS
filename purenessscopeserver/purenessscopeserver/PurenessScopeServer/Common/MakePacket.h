@@ -96,6 +96,7 @@ private:
 
 private:
 	CMakePacketPool                m_MakePacketPool;
+	ACE_Recursive_Thread_Mutex     m_ThreadWriteLock;
 };
 typedef ACE_Singleton<CMakePacket, ACE_Null_Mutex> App_MakePacket; 
 

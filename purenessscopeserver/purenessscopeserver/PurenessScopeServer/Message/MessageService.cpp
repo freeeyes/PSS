@@ -594,9 +594,12 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value &tv, const void *a
 			bool blModuleState = pModuleInfo->GetModuleState(u4ErrorID);
 			if(false == blModuleState)
 			{
+				char szTitle[MAX_BUFF_50] = {'\0'};
+				sprintf_safe(szTitle, MAX_BUFF_50, "ModuleStateError");
+
 				//·¢ËÍÓÊ¼þ
 				AppLogManager::instance()->WriteToMail(LOG_SYSTEM_MONITOR, 1, 
-					"ModuleStateError", 
+					szTitle, 
 					"Module ErrorID=%d.\n", 
 					u4ErrorID);
 			}

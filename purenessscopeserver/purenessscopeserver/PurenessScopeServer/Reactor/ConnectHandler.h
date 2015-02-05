@@ -121,7 +121,6 @@ private:
 	int                        m_nBlockCount;                  //发生阻塞的次数
 	int                        m_nBlockMaxCount;               //阻塞允许发生的最大次数
 	int                        m_nBlockSize;                   //阻塞发生时缓冲区的大小
-	uint32                     m_u4BlockTimerID;               //阻塞定时器的ID
 
 	uint32                     m_u4ReadSendSize;               //准备发送的字节数（水位标）
 	uint32                     m_u4SuccessSendSize;            //实际客户端接收到的总字节数（水位标）

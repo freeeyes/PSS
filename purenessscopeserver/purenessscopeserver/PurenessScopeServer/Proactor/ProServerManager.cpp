@@ -39,7 +39,8 @@ bool CProServerManager::Init()
 	App_ForbiddenIP::instance()->Init(FORBIDDENIP_FILE);
 
 	//初始化连接器
-	if(!App_ProConnectAcceptManager::instance()->InitConnectAcceptor(nServerPortCount))
+	uint32 u4ClientProactorCount = (uint32)nReactorCount - 3;
+	if(!App_ProConnectAcceptManager::instance()->InitConnectAcceptor(nServerPortCount, u4ClientProactorCount))
 	{
 		OUR_DEBUG((LM_INFO, "[CProServerManager::Init]%s.\n", App_ProConnectAcceptManager::instance()->GetError()));
 		return false;

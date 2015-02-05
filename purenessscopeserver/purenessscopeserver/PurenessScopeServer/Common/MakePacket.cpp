@@ -169,6 +169,8 @@ bool CMakePacket::PutUDPMessageBlock(const ACE_INET_Addr& AddrRemote, uint8 u1Op
 
 bool CMakePacket::PutMessageBlock(uint32 u4ConnectID, uint8 u1Option, CPacketParse* pPacketParse)
 {
+	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
+	
 	_MakePacket* pMakePacket = m_MakePacketPool.Create();
 	if(NULL == pMakePacket)
 	{

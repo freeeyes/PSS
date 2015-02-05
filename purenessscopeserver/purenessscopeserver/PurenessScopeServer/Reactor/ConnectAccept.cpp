@@ -1,5 +1,19 @@
 #include "ConnectAccept.h"
 
+ConnectAcceptor::ConnectAcceptor()
+{
+	m_u4AcceptCount        = 0;
+	m_u4ClientReactorCount = 1;
+}
+
+void ConnectAcceptor::InitClientReactor(uint32 u4ClientReactorCount)
+{
+	if(u4ClientReactorCount > 0)
+	{
+		m_u4ClientReactorCount = u4ClientReactorCount;
+	}
+}
+
 int ConnectAcceptor::make_svc_handler(CConnectHandler*& sh)
 {
     //如果正在处理的链接超过了服务器设定的数值，则不允许链接继续链接服务器
@@ -16,10 +30,18 @@ int ConnectAcceptor::make_svc_handler(CConnectHandler*& sh)
 
         if (NULL != pConnectHandler)
         {
-			pConnectHandler->SetLocalIPInfo(m_szListenIP, m_u4Port);
-            pConnectHandler->reactor(this->reactor());
-            sh = pConnectHandler;
-            return 0;
+					pConnectHandler->SetLocalIPInfo(m_szListenIP, m_u4Port);
+					
+					//这里会根据反应器线程配置，自动匹配一个空闲的反应器
+					int nIndex = (int)(m_u4AcceptCount % m_u4ClientReactorCount);
+					ACE_Reactor* pReactor = App_ReactorManager::instance()->GetAce_Client_Reactor(nIndex);
+					OUR_DEBUG((LM_ERROR, "[ConnectAcceptor::make_svc_handler]m_u4AcceptCount=%d, pReactor=0x%08x.\n", m_u4AcceptCount, pReactor));
+					pConnectHandler->reactor(pReactor);
+					//pConnectHandler->reactor(this->reactor());
+					m_u4AcceptCount++;
+
+          sh = pConnectHandler;
+          return 0;
         }
         else
         {
@@ -99,7 +121,7 @@ CConnectAcceptorManager::~CConnectAcceptorManager(void)
     OUR_DEBUG((LM_INFO, "[CConnectAcceptorManager::~CConnectAcceptorManager]End.\n"));
 }
 
-bool CConnectAcceptorManager::InitConnectAcceptor(int nCount)
+bool CConnectAcceptorManager::InitConnectAcceptor(int nCount, uint32 u4ClientReactorCount)
 {
     try
     {
@@ -114,6 +136,7 @@ bool CConnectAcceptorManager::InitConnectAcceptor(int nCount)
                 throw "[CConnectAcceptorManager::InitConnectAcceptor]pConnectAcceptor new is fail.";
             }
 
+			pConnectAcceptor->InitClientReactor(u4ClientReactorCount);
             m_vecConnectAcceptor.push_back(pConnectAcceptor);
         }
 

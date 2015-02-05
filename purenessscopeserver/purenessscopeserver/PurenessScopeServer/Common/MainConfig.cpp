@@ -703,6 +703,11 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
 	{
 		m_u2MaxHanderCount = (uint16)ACE_OS::atoi(pData);
 	}
+	pData = m_MainConfig.GetData("ClientInfo", "ThreadCount");
+	if(pData != NULL)
+	{
+		m_u4ReactorCount = m_u4ReactorCount + (uint32)ACE_OS::atoi(pData);
+	}
 	pData = m_MainConfig.GetData("ClientInfo", "MaxConnectTime");
 	if(pData != NULL)
 	{

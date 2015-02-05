@@ -1,11 +1,30 @@
 #include "ProConnectAccept.h"
 
+ProConnectAcceptor::ProConnectAcceptor()
+{
+	m_u4AcceptCount         = 0;
+	m_u4ClientProactorCount = 1;
+}
+
+void ProConnectAcceptor::InitClientProactor(uint32 u4ClientProactorCount)
+{
+	if(u4ClientProactorCount  > 0)
+	{
+		m_u4ClientProactorCount = u4ClientProactorCount;
+	}
+}
+
 CProConnectHandle* ProConnectAcceptor::make_handler (void)
 {
 	CProConnectHandle* pProConnectHandle = App_ProConnectHandlerPool::instance()->Create();
 	if(NULL != pProConnectHandle)
 	{
 		pProConnectHandle->SetLocalIPInfo(m_szListenIP, m_u4Port);
+		//这里会根据反应器线程配置，自动匹配一个空闲的反应器
+		int nIndex = (int)(m_u4AcceptCount % m_u4ClientProactorCount);
+		ACE_Proactor* pProactor = App_ProactorManager::instance()->GetAce_Client_Proactor(nIndex);
+		pProConnectHandle->proactor(pProactor);
+		m_u4AcceptCount++;
 	}
 
 	return pProConnectHandle;
@@ -62,7 +81,7 @@ CProConnectAcceptManager::~CProConnectAcceptManager(void)
 	Close();
 }
 
-bool CProConnectAcceptManager::InitConnectAcceptor(int nCount)
+bool CProConnectAcceptManager::InitConnectAcceptor(int nCount, uint32 u4ClientProactorCount)
 {
 	try
 	{
@@ -76,6 +95,7 @@ bool CProConnectAcceptManager::InitConnectAcceptor(int nCount)
 				throw "[CProConnectAcceptManager::InitConnectAcceptor]pConnectAcceptor new is fail.";
 			}
 
+			pConnectAcceptor->InitClientProactor(u4ClientProactorCount);
 			m_vecConnectAcceptor.push_back(pConnectAcceptor);
 		}
 

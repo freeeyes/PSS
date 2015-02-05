@@ -82,6 +82,8 @@ public:
 
 	CAceReactor* GetAceReactor(int nReactorID);
 	ACE_Reactor* GetAce_Reactor(int nReactorID);
+	ACE_Reactor* GetAce_Client_Reactor(int nReactorID);
+	uint32 GetClientReactorCount();
 
 private:
 	typedef map<int, CAceReactor*> mapAceReactor;

@@ -329,3 +329,44 @@ ACE_Proactor* CAceProactorManager::GetAce_Proactor(int nProactorID)
 		return NULL;
 	}
 }
+
+ACE_Proactor* CAceProactorManager::GetAce_Client_Proactor(int nProactorID)
+{
+	int nClientProactor = nProactorID + 3;
+	if(nClientProactor >= (int)m_mapAceProactor.size())
+	{
+		nClientProactor = REACTOR_CLIENTDEFINE;
+	}
+
+	mapAceProactor::iterator f = m_mapAceProactor.find(nClientProactor);
+	if(f != m_mapAceProactor.end())
+	{
+		CAceProactor* pAceProactor = (CAceProactor* )f->second;
+		if(NULL != pAceProactor)
+		{
+			//OUR_DEBUG((LM_INFO, "CAceProactorManager::GetAce_Proactor id=[%d] pAceProactor=[0x%@]\n",nProactorID, pAceProactor));
+			return pAceProactor->GetProactor();
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+uint32 CAceProactorManager::GetClientReactorCount()
+{
+	uint32 u4Count = (uint32)m_mapAceProactor.size();
+	if(u4Count > 3)
+	{
+		return u4Count - 3;
+	}
+	else
+	{
+		return 0;
+	}
+}

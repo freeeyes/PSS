@@ -39,7 +39,8 @@ bool CServerManager::Init()
 	App_ForbiddenIP::instance()->Init(FORBIDDENIP_FILE);
 
 	//初始化连接器
-	if (!App_ConnectAcceptorManager::instance()->InitConnectAcceptor(nServerPortCount))
+	uint32 u4ClientReactorCount = (uint32)nReactorCount - 3;
+	if (!App_ConnectAcceptorManager::instance()->InitConnectAcceptor(nServerPortCount, u4ClientReactorCount))
 	{
 		OUR_DEBUG((LM_INFO, "[CServerManager::Init]%s.\n", App_ConnectAcceptorManager::instance()->GetError()));
 		return false;

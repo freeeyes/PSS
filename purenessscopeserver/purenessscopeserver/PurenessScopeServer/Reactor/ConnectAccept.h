@@ -5,6 +5,7 @@
 #include "ace/SOCK_Acceptor.h"
 #include "ace/INET_Addr.h"
 #include "ConnectHandler.h"
+#include "AceReactorManager.h"
 
 #include <vector>
 
@@ -13,6 +14,11 @@ using namespace std;
 //用于普通客户端
 class ConnectAcceptor : public ACE_Acceptor<CConnectHandler, ACE_SOCK_ACCEPTOR>
 {
+public:
+	ConnectAcceptor();
+
+	void InitClientReactor(uint32 u4ClientReactorCount);
+
 protected:
 	virtual int make_svc_handler(CConnectHandler*& sh);
 
@@ -30,6 +36,8 @@ public:
 private:
 	char   m_szListenIP[MAX_BUFF_20];
 	uint32 m_u4Port;
+	uint32 m_u4AcceptCount;             //接收的总连接数 
+	uint32 m_u4ClientReactorCount;      //客户端反应器的个数
 };
 
 class CConnectAcceptorManager
@@ -38,7 +46,7 @@ public:
 	CConnectAcceptorManager(void);
 	~CConnectAcceptorManager(void);
 
-	bool InitConnectAcceptor(int nCount);
+	bool InitConnectAcceptor(int nCount, uint32 u4ClientReactorCount);
 	void Close();
 	int GetCount();
 	ConnectAcceptor* GetConnectAcceptor(int nIndex);
