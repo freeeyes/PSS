@@ -1045,7 +1045,6 @@ _ClientIPInfo CProConnectHandle::GetLocalIPInfo()
 
 void CProConnectHandle::ClearPacketParse(ACE_Message_Block& mbCurrBlock)
 {
-	//Á´½Ó¶Ï¿ª
 	if(NULL != m_pPacketParse && m_pPacketParse->GetMessageHead() != NULL)
 	{
 		App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());

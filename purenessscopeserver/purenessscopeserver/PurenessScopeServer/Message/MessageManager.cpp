@@ -251,6 +251,9 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1State
 			//最后删除实际模块和CommandInfo的关系
 			SAFE_DELETE(pModuleClient);
 			m_mapModuleClient.erase(f);
+
+			//卸载插件信息
+			App_ModuleLoader::instance()->UnLoadModule(pModuleName);
 		}
 
 		//看看是否要重新加载
