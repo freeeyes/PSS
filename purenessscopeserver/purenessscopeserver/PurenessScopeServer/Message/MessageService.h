@@ -75,6 +75,9 @@ public:
 
 	uint32 GetThreadID();
 
+	CMessage* CreateMessage();
+	void DeleteMessage(CMessage* pMessage);
+
 private:
 	bool IsRun();
 	bool ProcessMessage(CMessage* pMessage, uint32 u4ThreadID);
@@ -96,7 +99,8 @@ private:
 
 	_ThreadInfo                    m_ThreadInfo;          //当前线程信息
 	CWorkThreadAI                  m_WorkThreadAI;        //线程自我监控的AI逻辑  
-	CCommandAccount                m_CommandAccount;      //当前线程命令统计数据  
+	CCommandAccount                m_CommandAccount;      //当前线程命令统计数据
+	CMessagePool                   m_MessagePool;         //消息池  
 };
 
 //add by freeeyes
@@ -131,11 +135,16 @@ public:
 	void ClearCommandTimeOut();                                                               //清理所有的超时告警
 	void SaveCommandDataLog();                                                                //存储统计日志
 
+	CMessage* CreateMessage(uint32 u4ConnectID, uint8 u1PacketType);                          //从子线程中获取一个Message对象
+	void DeleteMessage(uint32 u4ConnectID, CMessage* pMessage);                               //从子线程中回收一个Message对象 
+
 	bool UnloadModule(const char* pModuleName, uint8 u1State);                                //卸载或者重载指定的模块名
 
 private:
 	bool StartTimer();
 	bool KillTimer();
+
+	uint32 GetWorkThreadID(uint32 u4ConnectID, uint8 u1PacketType);                           //根据操作类型和ConnectID计算出那个工作线程ID
 
 private:
 	typedef vector<CMessageService*> vecMessageService;

@@ -29,7 +29,7 @@ CMessageManager::~CMessageManager(void)
 	//Close();
 }
 
-bool CMessageManager::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost, uint16& u2Count)
+bool CMessageManager::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost, uint16& u2Count, bool& bDeleteFlag)
 {
 	if(NULL == pMessage)
 	{
@@ -38,7 +38,6 @@ bool CMessageManager::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uin
 	}
 
 	//放给需要继承的ClientCommand类去处理
-	bool bDeleteFlag = true;         //数据包是否用完后删除
 	//OUR_DEBUG((LM_ERROR, "[CMessageManager::DoMessage]u2CommandID = %d.\n", u2CommandID));
 
 	CClientCommandList* pClientCommandList = GetClientCommandList(u2CommandID);
@@ -62,11 +61,6 @@ bool CMessageManager::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uin
 				
 			}
 		}		
-	}
-
-	if(true == bDeleteFlag)
-	{
-		App_MessagePool::instance()->Delete((CMessage* )pMessage);
 	}
 
 	return true;

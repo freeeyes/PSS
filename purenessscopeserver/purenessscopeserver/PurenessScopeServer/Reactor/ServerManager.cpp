@@ -123,12 +123,6 @@ bool CServerManager::Init()
 	//初始化PacketParse对象池
 	App_PacketParsePool::instance()->Init(MAX_PACKET_PARSE);
 
-	//初始化MakePacket对象池
-	App_MakePacket::instance()->Init();
-
-	//初始化Message对象池
-	App_MessagePool::instance()->Init(MAX_MESSAGE_POOL);
-
 	//初始化ConnectHandler对象池
 	if (App_MainConfig::instance()->GetHandleCount() <= 0)
 	{

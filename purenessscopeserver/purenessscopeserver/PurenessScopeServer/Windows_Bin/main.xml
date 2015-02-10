@@ -43,7 +43,7 @@
 	<!-- 监控线程AI相关设置 -->
 	<ThreadInfoAI AI="0" CheckTime="30" TimeoutCount="1" StopTime="30" ReturnDataType="1" ReturnData="ff ff" desc="工作线程负载自我监控相关设置，AI=0关闭，1打开" />
 	<!-- 客户端连接池相关设置 -->
-	<ClientInfo HandlerCount="5000" MaxHandlerCount="10000" ThreadCount="3" MaxConnectTime="60" MaxBuffRecv="1024" TrackIPCount="100" desc="客户端链接相关参数"/>
+	<ClientInfo HandlerCount="5000" MaxHandlerCount="10000" MaxConnectTime="60" MaxBuffRecv="1024" TrackIPCount="100" desc="客户端链接相关参数"/>
 	<!-- 服务器间连接相关设置 -->
 	<ConnectServer TimeInterval="500" TimeCheck="30" Recvbuff="1024" desc="框架连接其它远程服务器相关参数，TimeInterval是连接每个服务器之间的保护时间，单位是毫秒,TimeCheck单位是秒" />
 	<!-- CPU&Memory监控相关设置 -->

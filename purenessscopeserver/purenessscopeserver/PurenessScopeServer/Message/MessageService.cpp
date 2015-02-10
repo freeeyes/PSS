@@ -79,6 +79,9 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
 				                             pCommandAlert->m_u4MailID);
 		}
 	}
+
+	//设置消息池
+	m_MessagePool.Init(MAX_MESSAGE_POOL);
 }
 
 bool CMessageService::Start()
@@ -236,7 +239,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 	if(NULL == pMessage->GetMessageBase())
 	{
 		OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage] [%d]pMessage->GetMessageBase() is NULL.\n", u4ThreadID));
-		App_MessagePool::instance()->Delete(pMessage);
+		DeleteMessage(pMessage);
 		return false;
 	}
 
@@ -286,7 +289,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 														PACKET_SEND_IMMEDIATLY,
 														PACKET_IS_SELF_RECYC);
 #endif
-			App_MessagePool::instance()->Delete(pMessage);
+			DeleteMessage(pMessage);
 			m_ThreadInfo.m_u4State = THREAD_RUNEND;
 
 			return true;
@@ -297,7 +300,13 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 	pMessage->GetMessageBase()->m_u4WorkThreadID = m_u4ThreadID;
 	uint32 u4TimeCost     = 0;      //命令执行时间
 	uint16 u2CommandCount = 0;      //命令被调用次数 
-	App_MessageManager::instance()->DoMessage(m_ThreadInfo.m_tvUpdateTime, pMessage, u2CommandID, u4TimeCost, u2CommandCount);
+	bool   blDeleteFlag   = true;   //用完是否删除，默认是删除
+	App_MessageManager::instance()->DoMessage(m_ThreadInfo.m_tvUpdateTime, pMessage, u2CommandID, u4TimeCost, u2CommandCount, blDeleteFlag);
+
+	if(true == blDeleteFlag)
+	{
+		DeleteMessage(pMessage);
+	}
 
 	if(pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CONNECT 
 		&& pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CDISCONNET 
@@ -480,6 +489,16 @@ uint32 CMessageService::GetStepState()
 	return m_ThreadInfo.m_u4State;
 }
 
+CMessage* CMessageService::CreateMessage()
+{
+	return m_MessagePool.Create();
+}
+
+void CMessageService::DeleteMessage(CMessage* pMessage)
+{
+	m_MessagePool.Delete(pMessage);
+}
+
 CMessageServiceGroup::CMessageServiceGroup()
 {
 	m_u4TimerID = 0;
@@ -643,15 +662,8 @@ bool CMessageServiceGroup::PutMessage(CMessage* pMessage)
 	//判断是否为TCP包，如果是则按照ConnectID区分。UDP则随机分配一个
 	uint32 u4ThreadID = 0;
 
-	if(pMessage->GetMessageBase()->m_u1PacketType == PACKET_TCP)
-	{
-		u4ThreadID = pMessage->GetMessageBase()->m_u4ConnectID % (uint32)m_vecMessageService.size();
-	}
-	else
-	{
-		//如果是UDP协议，则获取当前随机数值
-		u4ThreadID = m_objRandomNumber.GetRandom();
-	}
+	//得到工作线程ID
+	u4ThreadID = GetWorkThreadID(pMessage->GetMessageBase()->m_u4ConnectID, pMessage->GetMessageBase()->m_u1PacketType);
 	
 	//m_ThreadWriteLock.acquire();
 	CMessageService* pMessageService = (CMessageService* )m_vecMessageService[u4ThreadID];
@@ -956,4 +968,50 @@ bool CMessageServiceGroup::UnloadModule(const char* pModuleName, uint8 u1State)
 	OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::UnloadModule] End.\n"));
 
 	return true;
+}
+
+CMessage* CMessageServiceGroup::CreateMessage(uint32 u4ConnectID, uint8 u1PacketType)
+{
+	uint32 u4ThreadID = 0;
+	u4ThreadID = GetWorkThreadID(u4ConnectID, u1PacketType);
+
+	CMessageService* pMessageService = (CMessageService* )m_vecMessageService[u4ThreadID];
+	if(NULL != pMessageService)
+	{
+		return pMessageService->CreateMessage();
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+void CMessageServiceGroup::DeleteMessage(uint32 u4ConnectID, CMessage* pMessage)
+{
+	uint32 u4ThreadID  = 0;
+	uint8 u1PacketType = PACKET_TCP;
+	u4ThreadID = GetWorkThreadID(u4ConnectID, u1PacketType);
+
+	CMessageService* pMessageService = (CMessageService* )m_vecMessageService[u4ThreadID];
+	if(NULL != pMessageService)
+	{
+		pMessageService->DeleteMessage(pMessage);
+	}
+}
+
+uint32 CMessageServiceGroup::GetWorkThreadID(uint32 u4ConnectID, uint8 u1PackeType)
+{
+	uint32 u4ThreadID = 0;
+
+	if(u1PackeType == PACKET_TCP)
+	{
+		u4ThreadID = u4ConnectID % (uint32)m_vecMessageService.size();
+	}
+	else
+	{
+		//如果是UDP协议，则获取当前随机数值
+		u4ThreadID = m_objRandomNumber.GetRandom();
+	}
+
+	return u4ThreadID;
 }

@@ -69,7 +69,6 @@ private:
 	mapMessage                  m_mapMessageUsed;                      //已使用的
 	mapMessage                  m_mapMessageFree;                      //没有使用的
 	ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;                     //控制多线程锁
-};
-typedef ACE_Singleton<CMessagePool, ACE_Null_Mutex> App_MessagePool; 
+}; 
 
 #endif
