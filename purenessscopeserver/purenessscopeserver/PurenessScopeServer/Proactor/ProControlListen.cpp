@@ -96,3 +96,8 @@ void CProControlListen::ShowListen(vecControlInfo& objProControlInfo)
 		}
 	}
 }
+
+uint32 CProControlListen::GetServerID()
+{
+	return App_MainConfig::instance()->GetServerID();
+}

@@ -89,3 +89,8 @@ void CControlListen::ShowListen( vecControlInfo& objControlInfo )
 		}
 	}
 }
+
+uint32 CControlListen::GetServerID()
+{
+	return App_MainConfig::instance()->GetServerID();
+}
