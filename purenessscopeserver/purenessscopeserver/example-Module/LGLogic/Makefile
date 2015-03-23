@@ -4,9 +4,9 @@ include Makefile.define
 default:all
 
 # 主应用文件列表
-PATS = BaseCommand.o LGLogic.o LSServerManager.o ./IniRead/dictionary.o ./IniRead/iniparser.o
+PATS = BaseCommand.o LGLogic.o LSServerManager.o ListManager.o ./IniRead/dictionary.o ./IniRead/iniparser.o
 
-LIB_BASE_OBJS = BaseCommand.o LGLogic.o LSServerManager.o dictionary.o iniparser.o
+LIB_BASE_OBJS = BaseCommand.o LGLogic.o LSServerManager.o dictionary.o iniparser.o ListManager.o
 LIB_BASE = libLGLogic.so
 
 all: libLGLogic.so clear

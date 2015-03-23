@@ -68,6 +68,10 @@ bool CLSServerManager::RecvData(ACE_Message_Block* mbRecv, _ClientIPInfo objServ
 	{
 		Recv_LS_Key_Update(pRecvBuffer, (uint32)mbRecv->length());
 	}
+	else if(u2CommandID == COMMAND_LOGIC_LG_LIST_R)
+	{
+		Recv_LS_List_Update(pRecvBuffer, (uint32)mbRecv->length());
+	}
 
 	return true;
 }
@@ -112,6 +116,35 @@ void CLSServerManager::Send_LG_Login()
 	(*pSendPacket) << strLDIP;
 	(*pSendPacket) << m_u4LGPort;
 	(*pSendPacket) << strServerCode;
+
+	m_pServerObject->GetClientManager()->SendData(m_u4ServerID, pSendPacket->GetData(), pSendPacket->GetPacketLen(), false);
+
+	m_pServerObject->GetPacketManager()->Delete(pSendPacket);
+}
+
+void CLSServerManager::Send_LG_List()
+{
+	if(NULL == m_pServerObject)
+	{
+		return;
+	}
+
+	//拼装向LS注册的数据包
+	uint32 u4SendPacketLen = sizeof(uint32);
+
+	IBuffPacket* pSendPacket = m_pServerObject->GetPacketManager()->Create();
+	(*pSendPacket) << (uint16)SERVER_PROTOCAL_VERSION;
+	(*pSendPacket) << (uint16)COMMAND_LOGIC_LG_LIST;
+	(*pSendPacket) << (uint32)u4SendPacketLen;
+	pSendPacket->WriteStream(m_szSessionKey, 32);
+
+	_VCHARS_STR strLDIP;
+	uint8 u1Len = (uint8)ACE_OS::strlen(m_szLGIP);
+	strLDIP.SetData(m_szLGIP, u1Len);
+	_VCHARS_STR strServerCode;
+	u1Len = (uint8)ACE_OS::strlen(m_szLSKey);
+	strServerCode.SetData(m_szLSKey, u1Len);
+	(*pSendPacket) << m_u4LGID;
 
 	m_pServerObject->GetClientManager()->SendData(m_u4ServerID, pSendPacket->GetData(), pSendPacket->GetPacketLen(), false);
 
@@ -189,4 +222,42 @@ void CLSServerManager::Recv_LS_Key_Update(const char* pRecvBuff, uint32 u4Len)
 char* CLSServerManager::Get_LS_Key()
 {
 	return m_szLSKey;
+}
+
+void CLSServerManager::Recv_LS_List_Update(const char* pRecvBuff, uint32 u4Len)
+{
+	//获得当前的MD5Key值
+	uint32 u4Pos = 40;
+	uint8 u1KeyLen = pRecvBuff[u4Pos];
+	u4Pos++;
+	char szMD5[33] = {'\0'};
+	memcpy_safe((char* )&pRecvBuff[u4Pos], u1KeyLen, szMD5, u1KeyLen);
+	u4Pos += (uint32)u1KeyLen;
+	m_objlistManager.Set_MD5_Data(szMD5);
+
+	//得到列表的长度
+	uint32 u4Count = 0;
+	memcpy_safe((char* )&pRecvBuff[u4Pos], (uint32)sizeof(uint32), (char* )&u4Count, (uint32)sizeof(uint32));
+	u4Pos += (uint32)sizeof(uint32);
+
+	m_objlistManager.Clear();
+
+	uint32 u4LGID     = 0;
+	char   szLGIP[50] = {'\0'};
+	uint32 u4LGPort   = 0;
+	_VCHARS_STR strIP;
+	for(uint32 i = 0; i < u4Count; i++)
+	{
+		memcpy_safe((char* )&pRecvBuff[u4Pos], (uint32)sizeof(uint32), (char* )&u4LGID, (uint32)sizeof(uint32));
+		u4Pos += (uint32)sizeof(uint32);		
+		uint8 u1IPLen = pRecvBuff[u4Pos];
+		u4Pos++;
+		memcpy_safe((char* )&pRecvBuff[u4Pos], u1IPLen, szLGIP, u1IPLen);
+		u4Pos += (uint32)u1IPLen;
+		memcpy_safe((char* )&pRecvBuff[u4Pos], (uint32)sizeof(uint32), (char* )&u4LGPort, (uint32)sizeof(uint32));
+		u4Pos += (uint32)sizeof(uint32);
+
+		m_objlistManager.Add_LG_Info(0, u4LGID, szLGIP, u4LGPort);
+	}
+
 }
