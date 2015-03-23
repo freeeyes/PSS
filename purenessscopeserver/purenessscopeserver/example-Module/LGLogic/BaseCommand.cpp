@@ -7,6 +7,7 @@ CBaseCommand::CBaseCommand(void)
 
 	m_szLSIP[0]     = '\0';
 	m_u4LSPort      = 0;
+	m_u4LSServerID  = 0;
 }
 
 CBaseCommand::~CBaseCommand(void)
@@ -198,6 +199,12 @@ void CBaseCommand::ReadIniFile(const char* pIniFileName)
 	else
 	{
 		//读取Ini文件内容
+		m_u4LSServerID = (uint32)iniparser_getint(pDictionary, "LSServer:ServerID", NULL);
+		if(NULL != m_u4LSServerID)
+		{
+			OUR_DEBUG((LM_INFO, "[CBaseCommand::ReadIniFile]ServerID=%d.\n", m_u4LSServerID));
+		}
+
 		char* pData = iniparser_getstring(pDictionary, "LSServer:IP", NULL);
 		if(NULL != pData)
 		{
@@ -205,11 +212,10 @@ void CBaseCommand::ReadIniFile(const char* pIniFileName)
 			sprintf_safe(m_szLSIP, 50, "%s", pData);
 		}
 
-		int nData = iniparser_getint(pDictionary, "LSServer:Port", 0);
-		if(0 != nData)
+		m_u4LSPort = (uint32)iniparser_getint(pDictionary, "LSServer:Port", 0);
+		if(0 != m_u4LSPort)
 		{
-			OUR_DEBUG((LM_INFO, "[CBaseCommand::ReadIniFile]Port=%d.\n", nData));
-			m_u4LSPort =(uint32)nData;
+			OUR_DEBUG((LM_INFO, "[CBaseCommand::ReadIniFile]Port=%d.\n", m_u4LSPort));
 		}
 
 		iniparser_freedict(pDictionary);

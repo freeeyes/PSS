@@ -49,6 +49,7 @@ private:
 	CLSServerManager  m_objLSServer;
 	uint32            m_u4TimeID;
 
+	uint32            m_u4LSServerID;
 	char              m_szLSIP[50];
 	uint32            m_u4LSPort;
 };
