@@ -12,9 +12,11 @@
 #define COMMAND_LOGIC_CLIENT_LIST_R 0xf000      //返回服务器列表
 
 #define COMMAND_LOGIC_LG_LOGIN      0x2000      //LG注册 
-#define COMMAND_LOGIC_ALIVE		    0x2001      //LG心跳  
+#define COMMAND_LOGIC_ALIVE		    0x2001      //LG心跳
+#define COMMAND_LOGIC_LG_LIST       0x2002      //LG获得当前服务器列表 
 #define COMMAND_LOGIC_LG_LOGIN_R    0xe000      //LG注册回应
-#define COMMAND_LOGIC_LG_KEY_R      0xe002      //LG下发列表 
+#define COMMAND_LOGIC_LG_KEY_R      0xe001      //LG下发列表Key
+#define COMMAND_LOGIC_LG_LIST_R     0xe002      //LG下发列表的相关信息    
 
 #define MESSAGE_FUNCTION_BEGIN(x) switch(x) { 
 #define MESSAGE_FUNCTION(x,y,z) case x: { y(z); break; }
@@ -41,6 +43,7 @@ private:
 	int Do_Logic_LG_Login(IMessage* pMessage);                          //处理LG登录功能
 	int Do_Logic_LG_Alive(IMessage* pMessage);                          //LG心跳
 	int Do_Logic_All_LG_Key(IMessage* pMessage, uint16 u2CommandID);    //群发所有的LG告知服务器列表更新消息
+	int Do_Logic_LG_List(IMessage* pMessage);                           //LG获得整个LG的服务器列表     
 
 private:
 	CServerObject* m_pServerObject;

@@ -31,6 +31,8 @@ public:
 	ClistManager();
 	~ClistManager();
 
+	void Clear();
+
 	void Add_LG_Info(uint32 u4ConnectID, uint32 u4LGID, const char* pIP, uint32 u4Port);
 	_LG_Info* Get_LG_Info_By_LGID(uint32 u4LGID);
 	_LG_Info* Get_LG_Info_By_ConnectID(uint32 u4ConnectID);

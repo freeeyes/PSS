@@ -243,3 +243,78 @@ int CBaseCommand::Do_Logic_All_LG_Key(IMessage* pMessage, uint16 u2CommandID)
 
 	return 0;
 }
+
+int CBaseCommand::Do_Logic_LG_List(IMessage* pMessage)
+{
+	//处理读入的数据包
+	IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();
+	if(NULL == pBodyPacket)
+	{
+		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] pBodyPacket is NULL.\n"));
+		return -1;
+	}
+
+	_PacketInfo BodyPacket;
+	pMessage->GetPacketBody(BodyPacket);
+
+	pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
+
+	_VCHARS_STR strCode;
+	(*pBodyPacket) >> strCode;
+
+	//记录客户端请求来源
+	m_pServerObject->GetLogManager()->WriteLog(LOG_SYSTEM, "[Code](%s:%d)%s.", 
+		m_pServerObject->GetConnectManager()->GetClientIPInfo(pMessage->GetMessageBase()->m_u4ConnectID).m_szClientIP, 
+		m_pServerObject->GetConnectManager()->GetClientIPInfo(pMessage->GetMessageBase()->m_u4ConnectID).m_nPort, 
+		strCode.text);
+
+	m_pServerObject->GetPacketManager()->Delete(pBodyPacket);
+
+	//设置数据列表
+	IBuffPacket* pResponsesPacket = m_pServerObject->GetPacketManager()->Create();
+	uint16 u2PostCommandID = COMMAND_LOGIC_LG_LIST_R;
+	//得到数据列表包体信息
+	IBuffPacket* pListPacket = m_pServerObject->GetPacketManager()->Create();
+
+	uint32 u4ListCount = 0;
+	m_listManager.Get_All_LG_List(pListPacket, u4ListCount);
+
+	//得到List MD5
+	_VCHARS_STR strMD5;
+	uint8 u1MD5Len = (uint8)ACE_OS::strlen(m_listManager.Get_MD5_Data());
+	strMD5.SetData(m_listManager.Get_MD5_Data(), u1MD5Len);;
+
+	//消息列表返回
+	uint32 u4SendPacketLen = pListPacket->GetPacketLen() + sizeof(u4ListCount) 
+		+ sizeof(uint8) + u1MD5Len + 1;
+	(*pResponsesPacket) << pMessage->GetPacketHeadInfo()->m_u2Version;
+	(*pResponsesPacket) << u2PostCommandID;
+	(*pResponsesPacket) << u4SendPacketLen; //数据包体长度
+	pResponsesPacket->WriteStream(pMessage->GetPacketHeadInfo()->m_szSession, SESSION_LEN);
+
+	(*pResponsesPacket) << strMD5;
+	(*pResponsesPacket) << u4ListCount;
+	pResponsesPacket->WriteStream(pListPacket->GetData(), pListPacket->GetPacketLen());
+
+	m_pServerObject->GetPacketManager()->Delete(pListPacket);
+
+	if(NULL != m_pServerObject->GetConnectManager())
+	{
+		//发送全部数据
+		m_pServerObject->GetConnectManager()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID, 
+			pResponsesPacket, 
+			SENDMESSAGE_JAMPNOMAL, 
+			u2PostCommandID, 
+			PACKET_SEND_IMMEDIATLY, 
+			PACKET_IS_FRAMEWORK_RECYC);
+	}
+	else
+	{
+		OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] m_pConnectManager = NULL.\n"));
+		m_pServerObject->GetPacketManager()->Delete(pResponsesPacket);
+	}
+
+	//m_pServerObject->GetConnectManager()->CloseConnect(pMessage->GetMessageBase()->m_u4ConnectID);
+
+	return 0;
+}

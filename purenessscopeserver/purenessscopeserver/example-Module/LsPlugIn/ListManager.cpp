@@ -138,3 +138,11 @@ char* ClistManager::Get_MD5_Data()
 
 	return (char* )m_szMD5;
 }
+
+void ClistManager::Clear()
+{
+	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
+
+	m_vecLGInfo.clear();
+	m_szMD5[0] = '\0';
+}
