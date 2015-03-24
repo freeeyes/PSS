@@ -2903,6 +2903,16 @@ bool CConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPacket
 bool CConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, bool blSendState, bool blDelete)
 {
 	uint32 u4ConnectID = 0;
+	IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create();
+	if(NULL != pBuffPacket)
+	{
+		pBuffPacket->WriteStream(pData, nDataLen);
+	}
+	else
+	{
+		return false;
+	}
+
 	for(uint32 i = 0; i < (uint32)vecConnectID.size(); i++)
 	{
 		//判断命中到哪一个线程组里面去
@@ -2922,20 +2932,11 @@ bool CConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, const char*
 			OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::PostMessage]No find send Queue object.\n"));
 			continue;
 		}
+		pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, blSendState, false);
 
-		//OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::PostMessage]u4ConnectID=%d, u2ThreadIndex=%d.\n", u4ConnectID, u2ThreadIndex));
-		IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create();
-		if(NULL != pBuffPacket)
-		{
-			return pBuffPacket->WriteStream(pData, nDataLen);
-			return pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, blSendState, true);
-		} 
-		else
-		{
-			OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::PostMessage]pBuffPacket is NULL.\n"));
-			continue;
-		}
 	}
+
+	App_BuffPacketManager::instance()->Delete(pBuffPacket);
 
 	if(true == blDelete)
 	{
