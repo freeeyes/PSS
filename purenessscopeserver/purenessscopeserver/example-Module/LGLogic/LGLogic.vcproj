@@ -384,6 +384,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ListManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\LSServerManager.cpp"
 				>
 			</File>
@@ -402,6 +406,10 @@
 			</File>
 			<File
 				RelativePath=".\IniRead\iniparser.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ListManager.h"
 				>
 			</File>
 			<File

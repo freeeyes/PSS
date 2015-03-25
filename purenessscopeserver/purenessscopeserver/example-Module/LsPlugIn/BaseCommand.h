@@ -39,11 +39,12 @@ private:
 	int Do_Connect(IMessage* pMessage);
 	int Do_DisConnect(IMessage* pMessage);
 	int Do_ClientSendTimeout(IMessage* pMessage);
-	int Do_Logic_Client_List(IMessage* pMessage);                       //处理客户端获得列表功能
-	int Do_Logic_LG_Login(IMessage* pMessage);                          //处理LG登录功能
-	int Do_Logic_LG_Alive(IMessage* pMessage);                          //LG心跳
-	int Do_Logic_All_LG_Key(IMessage* pMessage, uint16 u2CommandID);    //群发所有的LG告知服务器列表更新消息
-	int Do_Logic_LG_List(IMessage* pMessage);                           //LG获得整个LG的服务器列表     
+	int Do_Logic_Client_List(IMessage* pMessage);                                         //处理客户端获得列表功能
+	int Do_Logic_LG_Login(IMessage* pMessage);                                            //处理LG登录功能
+	int Do_Logic_LG_Alive(IMessage* pMessage);                                            //LG心跳
+	int Do_Logic_All_LG_Key(IMessage* pMessage, uint16 u2CommandID);                      //群发所有的LG告知服务器列表更新消息
+	int Do_Logic_LG_List(IMessage* pMessage);                                             //接收刷新List请求
+	int Send_Logic_LG_List(uint32 u4ConnectID, const char* pSession, uint16 u2Version);   //LG获得整个LG的服务器列表     
 
 private:
 	CServerObject* m_pServerObject;

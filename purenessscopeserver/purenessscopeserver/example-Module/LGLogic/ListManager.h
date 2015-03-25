@@ -6,6 +6,10 @@
 
 #include "define.h"
 #include "IBuffPacket.h"
+#include "iniparser.h"
+
+#define LS_LIST_FILENAME "ListServer.ini"  //本地化存储的文件名
+#define LG_LIST_MD5      "NOFILE"          //本地默认MD5 
 
 //LG服务器配置信息
 struct _LG_Info
@@ -47,6 +51,9 @@ public:
 
 	//得到指定的列表版本信息
 	char* Get_MD5_Data();
+
+	void SaveList();
+	void ReadList();
 
 private:
 	typedef vector<_LG_Info>   vecLGInfo;

@@ -58,7 +58,6 @@ private:
 	char           m_szServerIP[50];
 	uint32         m_u4Port;
 	CServerObject* m_pServerObject;
-	char           m_szLSKey[50];
 	char           m_szSessionKey[32];
 
 	char           m_szLGIP[50];

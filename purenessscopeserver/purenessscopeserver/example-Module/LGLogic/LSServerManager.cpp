@@ -5,7 +5,6 @@ CLSServerManager::CLSServerManager()
 	m_u4ServerID    = 0;
 	m_szServerIP[0] = '\0';
 	m_u4Port        = 0;
-	m_szLSKey[0]    = '\0';
 	m_pServerObject = NULL;
 
 	m_szLGIP[0]       = '\0';
@@ -13,7 +12,6 @@ CLSServerManager::CLSServerManager()
 	m_u4LGID          = 0;
 
 	sprintf_safe(m_szSessionKey, 32, "%s", SESSION_KEY);
-	sprintf_safe(m_szLSKey, 50, "%s", SESSION_KEY);
 }
 
 CLSServerManager::~CLSServerManager()
@@ -26,6 +24,9 @@ void CLSServerManager::Init(uint32 u4ServerID, const char* pIP, uint32 u4Port, C
 	m_u4Port        = u4Port; 
 	m_pServerObject = pServerObject;
 	m_u4ServerID    = u4ServerID;
+
+	//读取当前配置文件
+	m_objlistManager.ReadList();
 }
 
 bool CLSServerManager::Connect()
@@ -98,7 +99,7 @@ void CLSServerManager::Send_LG_Login()
 
 	//拼装向LS注册的数据包
 	uint32 u4SendPacketLen = 2 * sizeof(uint32) + 2 * sizeof(uint8) 
-		+ ACE_OS::strlen(m_szLGIP) + ACE_OS::strlen(m_szLSKey) + 2;
+		+ ACE_OS::strlen(m_szLGIP) + ACE_OS::strlen(m_objlistManager.Get_MD5_Data()) + 2;
 
 	IBuffPacket* pSendPacket = m_pServerObject->GetPacketManager()->Create();
 	(*pSendPacket) << (uint16)SERVER_PROTOCAL_VERSION;
@@ -110,8 +111,8 @@ void CLSServerManager::Send_LG_Login()
 	uint8 u1Len = (uint8)ACE_OS::strlen(m_szLGIP);
 	strLDIP.SetData(m_szLGIP, u1Len);
 	_VCHARS_STR strServerCode;
-	u1Len = (uint8)ACE_OS::strlen(m_szLSKey);
-	strServerCode.SetData(m_szLSKey, u1Len);
+	u1Len = (uint8)ACE_OS::strlen(m_objlistManager.Get_MD5_Data());
+	strServerCode.SetData(m_objlistManager.Get_MD5_Data(), u1Len);
 	(*pSendPacket) << m_u4LGID;
 	(*pSendPacket) << strLDIP;
 	(*pSendPacket) << m_u4LGPort;
@@ -142,8 +143,8 @@ void CLSServerManager::Send_LG_List()
 	uint8 u1Len = (uint8)ACE_OS::strlen(m_szLGIP);
 	strLDIP.SetData(m_szLGIP, u1Len);
 	_VCHARS_STR strServerCode;
-	u1Len = (uint8)ACE_OS::strlen(m_szLSKey);
-	strServerCode.SetData(m_szLSKey, u1Len);
+	u1Len = (uint8)ACE_OS::strlen(m_objlistManager.Get_MD5_Data());
+	strServerCode.SetData(m_objlistManager.Get_MD5_Data(), u1Len);
 	(*pSendPacket) << m_u4LGID;
 
 	m_pServerObject->GetClientManager()->SendData(m_u4ServerID, pSendPacket->GetData(), pSendPacket->GetPacketLen(), false);
@@ -178,8 +179,8 @@ void CLSServerManager::Send_LG_Alive()
 	uint8 u1Len = (uint8)ACE_OS::strlen(m_szLGIP);
 	strLDIP.SetData(m_szLGIP, u1Len);
 	_VCHARS_STR strServerCode;
-	u1Len = (uint8)ACE_OS::strlen(m_szLSKey);
-	strServerCode.SetData(m_szLSKey, u1Len);
+	u1Len = (uint8)ACE_OS::strlen(m_objlistManager.Get_MD5_Data());
+	strServerCode.SetData(m_objlistManager.Get_MD5_Data(), u1Len);
 	(*pSendPacket) << m_u4LGID;
 
 	m_pServerObject->GetClientManager()->SendData(m_u4ServerID, pSendPacket->GetData(), pSendPacket->GetPacketLen(), false);
@@ -189,7 +190,8 @@ void CLSServerManager::Send_LG_Alive()
 
 void CLSServerManager::Recv_LS_Login(const char* pRecvBuff, uint32 u4Len)
 {
-	uint32 u4LGID = 0;
+	uint32 u4LGID        = 0;
+	char   szListKey[33] = {'\0'};
 	memcpy_safe((char* )&pRecvBuff[40], sizeof(uint32), (char* )&u4LGID, sizeof(uint32));
 	if(m_u4LGID == u4LGID)
 	{
@@ -197,15 +199,16 @@ void CLSServerManager::Recv_LS_Login(const char* pRecvBuff, uint32 u4Len)
 		uint8 u1Len = 0;
 		memcpy_safe((char* )&pRecvBuff[44], 1, (char* )&u1Len, 1);
 
-		memcpy_safe((char* )&pRecvBuff[45], u1Len, m_szLSKey, u1Len);
+		memcpy_safe((char* )&pRecvBuff[45], u1Len, szListKey, u1Len);
 
-		OUR_DEBUG((LM_INFO, "[Recv_LS_Login]m_szLSKey=%s.\n", m_szLSKey));
+		OUR_DEBUG((LM_INFO, "[CLSServerManager::Recv_LS_Login]m_szLSKey=%s.\n", szListKey));
 	}
 }
 
 void CLSServerManager::Recv_LS_Key_Update(const char* pRecvBuff, uint32 u4Len)
 {
-	uint32 u4LGID = 0;
+	uint32 u4LGID        = 0;
+	char   szListKey[33] = {'\0'};
 	memcpy_safe((char* )&pRecvBuff[40], sizeof(uint32), (char* )&u4LGID, sizeof(uint32));
 	if(m_u4LGID == u4LGID)
 	{
@@ -213,19 +216,21 @@ void CLSServerManager::Recv_LS_Key_Update(const char* pRecvBuff, uint32 u4Len)
 		uint8 u1Len = 0;
 		memcpy_safe((char* )&pRecvBuff[44], 1, (char* )&u1Len, 1);
 
-		memcpy_safe((char* )&pRecvBuff[45], u1Len, m_szLSKey, u1Len);
+		memcpy_safe((char* )&pRecvBuff[45], u1Len, szListKey, u1Len);
 
-		OUR_DEBUG((LM_INFO, "[Recv_LS_Key_Update]m_szLSKey=%s.\n", m_szLSKey));
+		OUR_DEBUG((LM_INFO, "[CLSServerManager::Recv_LS_Key_Update]m_szLSKey=%s.\n", szListKey));
 	}
 }
 
 char* CLSServerManager::Get_LS_Key()
 {
-	return m_szLSKey;
+	return m_objlistManager.Get_MD5_Data();
 }
 
 void CLSServerManager::Recv_LS_List_Update(const char* pRecvBuff, uint32 u4Len)
 {
+	m_objlistManager.Clear();
+
 	//获得当前的MD5Key值
 	uint32 u4Pos = 40;
 	uint8 u1KeyLen = pRecvBuff[u4Pos];
@@ -239,8 +244,6 @@ void CLSServerManager::Recv_LS_List_Update(const char* pRecvBuff, uint32 u4Len)
 	uint32 u4Count = 0;
 	memcpy_safe((char* )&pRecvBuff[u4Pos], (uint32)sizeof(uint32), (char* )&u4Count, (uint32)sizeof(uint32));
 	u4Pos += (uint32)sizeof(uint32);
-
-	m_objlistManager.Clear();
 
 	uint32 u4LGID     = 0;
 	char   szLGIP[50] = {'\0'};
@@ -259,5 +262,8 @@ void CLSServerManager::Recv_LS_List_Update(const char* pRecvBuff, uint32 u4Len)
 
 		m_objlistManager.Add_LG_Info(0, u4LGID, szLGIP, u4LGPort);
 	}
+
+	//存储为本地文件
+	m_objlistManager.SaveList();
 
 }

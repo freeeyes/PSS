@@ -10,7 +10,7 @@ ClistManager::~ClistManager()
 
 }
 
-void ClistManager::Add_LG_Info(uint32 u4ConnectID, uint32 u4LGID, const char* pIP, uint32 u4Port)
+void ClistManager::Add_LG_Info(uint32 u4ConnectID, uint32 u4LGID, const char* pIP, uint32 u4Port, const char* pMD5, const char* pSession, uint16 u2Version)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
 
@@ -22,7 +22,10 @@ void ClistManager::Add_LG_Info(uint32 u4ConnectID, uint32 u4LGID, const char* pI
 		objNewInfo.m_u4LGID      = u4LGID;
 		objNewInfo.m_u4Port      = u4Port;
 		sprintf_safe(objNewInfo.m_szIP, 50, "%s", pIP);
+		sprintf_safe(objNewInfo.m_szMD5, 33, "%s", pMD5);
+		sprintf_safe(objNewInfo.m_szSession, 33, "%s", pSession);
 		m_vecLGInfo.push_back(objNewInfo);
+		objNewInfo.m_u2Version   = u2Version;
 	}
 	else
 	{
@@ -30,9 +33,14 @@ void ClistManager::Add_LG_Info(uint32 u4ConnectID, uint32 u4LGID, const char* pI
 		pInfo->m_u4LGID      = u4LGID;
 		pInfo->m_u4Port      = u4Port;
 		sprintf_safe(pInfo->m_szIP, 50, "%s", pIP);
+		sprintf_safe(pInfo->m_szMD5, 33, "%s", pMD5);
+		sprintf_safe(pInfo->m_szSession, 33, "%s", pSession);
+		pInfo->m_u2Version   = u2Version;
 	}
 
 	Compare_MD5();
+
+	Check_LG_Target(u4ConnectID, u4LGID, pIP, u4Port);
 }
 
 _LG_Info* ClistManager::Get_LG_Info_By_LGID(uint32 u4LGID)
@@ -145,4 +153,69 @@ void ClistManager::Clear()
 
 	m_vecLGInfo.clear();
 	m_szMD5[0] = '\0';
+}
+
+void ClistManager::ReadList()
+{
+	m_vecLGTargetInfo.clear();
+
+	dictionary* pDictionary = NULL;
+	pDictionary = iniparser_load(LS_LIST_FILENAME);
+	if(NULL == pDictionary)
+	{
+		OUR_DEBUG((LM_ERROR, "[ClistManager::ReadList](%s)Read Ini fail.\n", LS_LIST_FILENAME));
+		return;
+	}
+
+	uint32 u4Count = (uint32)iniparser_getint(pDictionary, "List:Count", 0);
+
+	char   szIP[50] = {'\0'};
+	uint32 u4Port   = 0;
+	uint32 u4LGID   = 0;
+
+	char szTempName[50] = {'\0'};
+
+	for(uint32 i = 0; i < u4Count; i++)
+	{
+		_LG_Target_Info objTarhgetInfo;
+		sprintf_safe(szTempName, 50, "List:LGID%d", i);
+		objTarhgetInfo.m_u4LGID = (uint32)iniparser_getint(pDictionary, szTempName, 0);
+		sprintf_safe(szTempName, 50, "List:LGIP%d", i);
+		char* pData = iniparser_getstring(pDictionary, szTempName, NULL);
+		{
+			sprintf_safe(objTarhgetInfo.m_szIP, 50, "%s", pData);
+		}
+		sprintf_safe(szTempName, 50, "List:LGPort%d", i);
+		objTarhgetInfo.m_u4Port = (uint32)iniparser_getint(pDictionary, szTempName, 0);;
+		m_vecLGTargetInfo.push_back(objTarhgetInfo);
+	}
+}
+
+void ClistManager::Check_LG_Target(uint32 u4ConnectID, uint32 u4LGID, const char* pIP, uint32 u4Port)
+{
+	for(int i = 0; i < (int)m_vecLGTargetInfo.size(); i++)
+	{
+		if(m_vecLGTargetInfo[i].m_u4LGID == u4LGID && 
+			m_vecLGTargetInfo[i].m_u4Port == u4Port &&
+			ACE_OS::strcmp(m_vecLGTargetInfo[i].m_szIP, pIP) == 0)
+		{
+			m_vecLGTargetInfo[i].m_nConnectID = (int)u4ConnectID;
+			break;
+		}
+	}
+}
+
+bool ClistManager::Get_All_Target_list_Finish()
+{
+	bool blRet = true;
+	for(int i = 0; i < (int)m_vecLGTargetInfo.size(); i++)
+	{
+		if(m_vecLGTargetInfo[i].m_nConnectID == -1)
+		{
+			blRet = false;
+			break;
+		}
+	}
+
+	return blRet;
 }

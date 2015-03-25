@@ -2,7 +2,7 @@
 
 ClistManager::ClistManager()
 {
-	m_szMD5[0] = '\0';
+	sprintf_safe(m_szMD5, 33, "%s", LG_LIST_MD5);
 }
 
 ClistManager::~ClistManager()
@@ -141,4 +141,77 @@ void ClistManager::Clear()
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
 
 	m_vecLGInfo.clear();
+	sprintf_safe(m_szMD5, 33, "%s", LG_LIST_MD5);
+}
+
+void ClistManager::SaveList()
+{
+	//将当前列表信息存入存储文件
+	FILE* pFile = fopen(LS_LIST_FILENAME, "w+");
+	if(NULL == pFile)
+	{
+		OUR_DEBUG((LM_ERROR, "[ClistManager::SaveList](%s)Write Ini fail.\n", LS_LIST_FILENAME));
+		return;
+	}
+
+	char szTemp[200] = {'\0'};
+	sprintf_safe(szTemp, 200, "[List]\nMD5=%s\nCount=%d\n", 
+		Get_MD5_Data(), 
+		Get_LG_Count());
+	fwrite(szTemp, sizeof(char), strlen(szTemp), pFile);
+	
+	for(uint32 i = 0; i < Get_LG_Count(); i++)
+	{
+		sprintf_safe(szTemp, 200, "LGID%d=%d\nLGIP%d=%s\nLGPort%d=%d", 
+			i, 
+			m_vecLGInfo[i].m_u4LGID,
+			i,
+			m_vecLGInfo[i].m_szIP,
+			i,
+			m_vecLGInfo[i].m_u4Port);
+		fwrite(szTemp, sizeof(char), strlen(szTemp), pFile);
+	}
+	fclose(pFile);
+}
+
+void ClistManager::ReadList()
+{
+	//从存储文件中还原List列表信息
+	Clear();
+
+	dictionary* pDictionary = NULL;
+	pDictionary = iniparser_load(LS_LIST_FILENAME);
+	if(NULL == pDictionary)
+	{
+		OUR_DEBUG((LM_ERROR, "[ClistManager::ReadList](%s)Read Ini fail.\n", LS_LIST_FILENAME));
+		return;
+	}
+
+	char* pData = iniparser_getstring(pDictionary, "List:MD5", NULL);
+	if(NULL != pData)
+	{
+		sprintf_safe(m_szMD5, 33, "%s", pData);
+	}
+
+	uint32 u4Count = (uint32)iniparser_getint(pDictionary, "List:Count", 0);
+
+	char   szIP[50] = {'\0'};
+	uint32 u4Port   = 0;
+	uint32 u4LGID   = 0;
+
+	char szTempName[50] = {'\0'};
+
+	for(uint32 i = 0; i < u4Count; i++)
+	{
+		sprintf_safe(szTempName, 50, "List:LGID%d", i);
+		u4LGID = (uint32)iniparser_getint(pDictionary, szTempName, 0);
+		sprintf_safe(szTempName, 50, "List:LGIP%d", i);
+		pData = iniparser_getstring(pDictionary, szTempName, NULL);
+		{
+			sprintf_safe(szIP, 50, "%s", pData);
+		}
+		sprintf_safe(szTempName, 50, "List:LGPort%d", i);
+		u4Port = (uint32)iniparser_getint(pDictionary, szTempName, 0);;
+		Add_LG_Info(0, u4LGID, szIP, u4Port);
+	}
 }

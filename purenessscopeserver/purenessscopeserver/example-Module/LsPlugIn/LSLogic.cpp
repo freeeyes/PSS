@@ -54,6 +54,7 @@ int LoadModuleData(CServerObject* pServerObject)
 
 	pMessageManager->AddClientCommand(COMMAND_LOGIC_LG_LOGIN, &g_BaseCommand, g_szName);
 	pMessageManager->AddClientCommand(COMMAND_LOGIC_ALIVE, &g_BaseCommand, g_szName);
+	pMessageManager->AddClientCommand(COMMAND_LOGIC_LG_LIST, &g_BaseCommand, g_szName);
 
     pMessageManager->AddClientCommand(CLIENT_LINK_CONNECT, &g_BaseCommand, g_szName);
     pMessageManager->AddClientCommand(CLIENT_LINK_CDISCONNET, &g_BaseCommand, g_szName);
@@ -76,6 +77,7 @@ int LoadModuleData(CServerObject* pServerObject)
   }
 
   OUR_DEBUG((LM_INFO, "[Base LoadModuleData] *********************************.\n"));
+  g_BaseCommand.ReadIniFile(pServerObject->GetModuleInfo()->GetModuleParam(g_szName));
   OUR_DEBUG((LM_INFO, "[Base LoadModuleData] End.\n"));
 
   return 0;
@@ -92,6 +94,7 @@ int UnLoadModuleData()
       pMessageManager->DelClientCommand(COMMAND_LOGIC_CLIENT_LIST, &g_BaseCommand);
 	  pMessageManager->DelClientCommand(COMMAND_LOGIC_LG_LOGIN, &g_BaseCommand);
 	  pMessageManager->DelClientCommand(COMMAND_LOGIC_ALIVE, &g_BaseCommand);
+	  pMessageManager->DelClientCommand(COMMAND_LOGIC_LG_LIST, &g_BaseCommand);
       pMessageManager->DelClientCommand(CLIENT_LINK_CONNECT, &g_BaseCommand);
       pMessageManager->DelClientCommand(CLIENT_LINK_CDISCONNET, &g_BaseCommand);
 	  pMessageManager->DelClientCommand(CLINET_LINK_SENDTIMEOUT, &g_BaseCommand);

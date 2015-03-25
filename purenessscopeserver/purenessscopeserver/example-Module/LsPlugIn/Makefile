@@ -4,9 +4,9 @@ include Makefile.define
 default:all
 
 # 主应用文件列表
-PATS = BaseCommand.o ListManager.o LSLogic.o MD5.o
+PATS = BaseCommand.o ListManager.o LSLogic.o MD5.o dictionary.o iniparser.o
 
-LIB_BASE_OBJS = BaseCommand.o ListManager.o LSLogic.o MD5.o
+LIB_BASE_OBJS = BaseCommand.o ListManager.o LSLogic.o MD5.o dictionary.o iniparser.o
 LIB_BASE = libLSLogic.so
 
 all: libLSLogic.so clear

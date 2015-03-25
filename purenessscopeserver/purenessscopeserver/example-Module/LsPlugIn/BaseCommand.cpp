@@ -148,7 +148,8 @@ int CBaseCommand::Do_Logic_Client_List(IMessage* pMessage)
 
 void CBaseCommand::ReadIniFile(const char* pIniFileName)
 {
-	//暂时不考虑
+	//初始化监控服务器列表
+	m_listManager.ReadList();
 }
 
 int CBaseCommand::Do_Logic_LG_Login(IMessage* pMessage)
@@ -181,11 +182,33 @@ int CBaseCommand::Do_Logic_LG_Login(IMessage* pMessage)
 	m_listManager.Add_LG_Info(pMessage->GetMessageBase()->m_u4ConnectID, 
 								u4LGID, 
 								strIP.text, 
-								u4Port);
+								u4Port,
+								strServerVserion.text,
+								pMessage->GetPacketHeadInfo()->m_szSession,
+								pMessage->GetPacketHeadInfo()->m_u2Version);
 
 	m_pServerObject->GetPacketManager()->Delete(pBodyPacket);
 
 	Do_Logic_All_LG_Key(pMessage, COMMAND_LOGIC_LG_LOGIN_R);
+
+	//判断是否所有的需要监控的服务器都已登陆，如果是，则下发同步所有列表
+	if(true == m_listManager.Get_All_Target_list_Finish())
+	{
+		for(uint32 i = 0; i < m_listManager.Get_LG_Count(); i++)
+		{
+			_LG_Info* pLGInfo = m_listManager.Get_LG_Info_By_Index(i);
+			if(NULL != pLGInfo && ACE_OS::strcmp(pLGInfo->m_szMD5, m_listManager.Get_MD5_Data()) != 0)
+			{
+				//赋值成新的MD5
+				sprintf_safe(pLGInfo->m_szMD5, 33, "%s", m_listManager.Get_MD5_Data());
+
+				//MD5不匹配，需要通知LG刷新列表
+				Send_Logic_LG_List(pLGInfo->m_u4ConnectID, 
+					pLGInfo->m_szSession,
+					pLGInfo->m_u2Version);
+			}
+		}
+	}
 
 	return 0;
 }
@@ -244,32 +267,8 @@ int CBaseCommand::Do_Logic_All_LG_Key(IMessage* pMessage, uint16 u2CommandID)
 	return 0;
 }
 
-int CBaseCommand::Do_Logic_LG_List(IMessage* pMessage)
+int CBaseCommand::Send_Logic_LG_List(uint32 u4ConnectID, const char* pSession, uint16 u2Version)
 {
-	//处理读入的数据包
-	IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();
-	if(NULL == pBodyPacket)
-	{
-		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] pBodyPacket is NULL.\n"));
-		return -1;
-	}
-
-	_PacketInfo BodyPacket;
-	pMessage->GetPacketBody(BodyPacket);
-
-	pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
-
-	_VCHARS_STR strCode;
-	(*pBodyPacket) >> strCode;
-
-	//记录客户端请求来源
-	m_pServerObject->GetLogManager()->WriteLog(LOG_SYSTEM, "[Code](%s:%d)%s.", 
-		m_pServerObject->GetConnectManager()->GetClientIPInfo(pMessage->GetMessageBase()->m_u4ConnectID).m_szClientIP, 
-		m_pServerObject->GetConnectManager()->GetClientIPInfo(pMessage->GetMessageBase()->m_u4ConnectID).m_nPort, 
-		strCode.text);
-
-	m_pServerObject->GetPacketManager()->Delete(pBodyPacket);
-
 	//设置数据列表
 	IBuffPacket* pResponsesPacket = m_pServerObject->GetPacketManager()->Create();
 	uint16 u2PostCommandID = COMMAND_LOGIC_LG_LIST_R;
@@ -287,10 +286,10 @@ int CBaseCommand::Do_Logic_LG_List(IMessage* pMessage)
 	//消息列表返回
 	uint32 u4SendPacketLen = pListPacket->GetPacketLen() + sizeof(u4ListCount) 
 		+ sizeof(uint8) + u1MD5Len + 1;
-	(*pResponsesPacket) << pMessage->GetPacketHeadInfo()->m_u2Version;
+	(*pResponsesPacket) << u2Version;
 	(*pResponsesPacket) << u2PostCommandID;
 	(*pResponsesPacket) << u4SendPacketLen; //数据包体长度
-	pResponsesPacket->WriteStream(pMessage->GetPacketHeadInfo()->m_szSession, SESSION_LEN);
+	pResponsesPacket->WriteStream(pSession, SESSION_LEN);
 
 	(*pResponsesPacket) << strMD5;
 	(*pResponsesPacket) << u4ListCount;
@@ -301,7 +300,7 @@ int CBaseCommand::Do_Logic_LG_List(IMessage* pMessage)
 	if(NULL != m_pServerObject->GetConnectManager())
 	{
 		//发送全部数据
-		m_pServerObject->GetConnectManager()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID, 
+		m_pServerObject->GetConnectManager()->PostMessage(u4ConnectID, 
 			pResponsesPacket, 
 			SENDMESSAGE_JAMPNOMAL, 
 			u2PostCommandID, 
@@ -315,6 +314,40 @@ int CBaseCommand::Do_Logic_LG_List(IMessage* pMessage)
 	}
 
 	//m_pServerObject->GetConnectManager()->CloseConnect(pMessage->GetMessageBase()->m_u4ConnectID);
+
+	return 0;
+}
+
+int CBaseCommand::Do_Logic_LG_List(IMessage* pMessage)
+{
+	//处理读入的数据包
+	IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();
+	if(NULL == pBodyPacket)
+	{
+		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] pBodyPacket is NULL.\n"));
+		return -1;
+	}
+
+	_PacketInfo BodyPacket;
+	pMessage->GetPacketBody(BodyPacket);
+
+	pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
+
+	_VCHARS_STR strMD5;
+
+	(*pBodyPacket) >> strMD5;
+
+	//记录客户端请求来源
+	m_pServerObject->GetLogManager()->WriteLog(LOG_SYSTEM, "[Code](%s:%d) is get list(%s).", 
+		m_pServerObject->GetConnectManager()->GetClientIPInfo(pMessage->GetMessageBase()->m_u4ConnectID).m_szClientIP, 
+		m_pServerObject->GetConnectManager()->GetClientIPInfo(pMessage->GetMessageBase()->m_u4ConnectID).m_nPort, 
+		strMD5.text);
+
+	m_pServerObject->GetPacketManager()->Delete(pBodyPacket);
+
+	Send_Logic_LG_List(pMessage->GetMessageBase()->m_u4ConnectID, 
+		pMessage->GetPacketHeadInfo()->m_szSession,
+		pMessage->GetPacketHeadInfo()->m_u2Version);
 
 	return 0;
 }
