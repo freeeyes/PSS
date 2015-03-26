@@ -267,3 +267,8 @@ void CLSServerManager::Recv_LS_List_Update(const char* pRecvBuff, uint32 u4Len)
 	m_objlistManager.SaveList();
 
 }
+
+void CLSServerManager::Get_All_LG_List(IBuffPacket* pbpList, uint32& u4Count)
+{
+	m_objlistManager.Get_All_LG_List(pbpList, u4Count);
+}

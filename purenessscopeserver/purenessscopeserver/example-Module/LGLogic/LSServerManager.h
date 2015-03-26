@@ -45,6 +45,8 @@ public:
 
 	void Send_LG_List();
 
+	void Get_All_LG_List(IBuffPacket* pbpList, uint32& u4Count);
+
 private:
 	void Recv_LS_Login(const char* pRecvBuff, uint32 u4Len);
 	void Recv_LS_Key_Update(const char* pRecvBuff, uint32 u4Len);

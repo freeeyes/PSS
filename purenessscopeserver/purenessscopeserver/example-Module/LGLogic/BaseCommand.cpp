@@ -122,13 +122,32 @@ int CBaseCommand::Do_Logic_Client_Login(IMessage* pMessage)
 	uint32 u4UserID = 0;
 	_VCHARS_STR strServerCode;
 
-	char szServerCode[20] = {'\0'};
-	sprintf_safe(szServerCode, 20, "%s", LG_SERVER_KEY);
-	uint8 u1Len = (uint8)ACE_OS::strlen(szServerCode);
-	strServerCode.SetData(szServerCode, u1Len);
+	//拼接服务器MD5
+	uint8 u1Len = (uint8)ACE_OS::strlen( m_objLSServer.Get_LS_Key());
+	strServerCode.SetData( m_objLSServer.Get_LS_Key(), u1Len);
+
+	uint32 u4ListCount       = 0;
+	IBuffPacket* pListPacket = NULL;
+	//拼接列表包体
+	if(u1Type == 1)
+	{
+		pListPacket = m_pServerObject->GetPacketManager()->Create();
+		m_objLSServer.Get_All_LG_List(pListPacket, u4ListCount);
+	}
 	
 	//消息列表返回
-	uint32 u4SendPacketLen = sizeof(uint32) + sizeof(uint8) + sizeof(uint8) + ACE_OS::strlen(szServerCode);
+	uint32 u4SendPacketLen = 0;
+	if(u1Type == 1)
+	{
+		u4SendPacketLen = sizeof(uint32) + sizeof(uint8) + 
+			sizeof(uint8) + ACE_OS::strlen( m_objLSServer.Get_LS_Key()) + 1
+			+ sizeof(uint32) + pListPacket->GetPacketLen();
+	}
+	else
+	{
+		u4SendPacketLen = sizeof(uint32) + sizeof(uint8) + 
+			sizeof(uint8) + ACE_OS::strlen( m_objLSServer.Get_LS_Key()) + 1;
+	}
 	(*pResponsesPacket) << pMessage->GetPacketHeadInfo()->m_u2Version;
 	(*pResponsesPacket) << u2PostCommandID;
 	(*pResponsesPacket) << u4SendPacketLen; //数据包体长度
@@ -137,6 +156,14 @@ int CBaseCommand::Do_Logic_Client_Login(IMessage* pMessage)
 	(*pResponsesPacket) << u4UserID;
 	(*pResponsesPacket) << u1Type;
 	(*pResponsesPacket) << strServerCode;
+
+	//如果需要发送最新List列表，则在这里拼包
+	if(u1Type == 1)
+	{
+		(*pResponsesPacket) << u4ListCount;
+		pResponsesPacket->WriteStream(pListPacket->GetData(), pListPacket->GetPacketLen());
+		m_pServerObject->GetPacketManager()->Delete(pListPacket);
+	}
 
 	if(NULL != m_pServerObject->GetConnectManager())
 	{
