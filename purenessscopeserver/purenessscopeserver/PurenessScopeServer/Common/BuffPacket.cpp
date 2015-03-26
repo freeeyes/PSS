@@ -101,6 +101,8 @@ bool CBuffPacket::Clear()
 	m_u4WritePtr      = 0;
 	m_u4PacketCount   = 0;
 
+	m_blNetSort       = false;
+
 	return true;
 }
 
