@@ -43,7 +43,6 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 	MESSAGE_FUNCTION(CLIENT_LINK_CONNECT,       Do_Connect,           pMessage);
 	MESSAGE_FUNCTION(CLIENT_LINK_CDISCONNET,    Do_DisConnect,        pMessage);
 	MESSAGE_FUNCTION(CLINET_LINK_SENDTIMEOUT,   Do_ClientSendTimeout, pMessage);
-	MESSAGE_FUNCTION(COMMAND_LOGIC_CLIENT_LIST, Do_Logic_Client_List, pMessage);
 	MESSAGE_FUNCTION(COMMAND_LOGIC_LG_LOGIN,    Do_Logic_LG_Login,    pMessage);
 	MESSAGE_FUNCTION(COMMAND_LOGIC_ALIVE,       Do_Logic_LG_Alive,    pMessage);
 	MESSAGE_FUNCTION_END;
@@ -75,74 +74,6 @@ int CBaseCommand::Do_ClientSendTimeout(IMessage* pMessage)
 {
 	//处理服务器发送客户端数据连接超过阀值的事件
 	OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_DisConnect](%d)CLINET_LINK_SNEDTIMEOUT OK.\n", pMessage->GetMessageBase()->m_u4ConnectID));
-	return 0;
-}
-
-int CBaseCommand::Do_Logic_Client_List(IMessage* pMessage)
-{
-	//处理读入的数据包
-	IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();
-	if(NULL == pBodyPacket)
-	{
-		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] pBodyPacket is NULL.\n"));
-		return -1;
-	}
-
-	_PacketInfo BodyPacket;
-	pMessage->GetPacketBody(BodyPacket);
-
-	pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
-	
-	_VCHARS_STR strCode;
-	(*pBodyPacket) >> strCode;
-
-	//记录客户端请求来源
-	m_pServerObject->GetLogManager()->WriteLog(LOG_SYSTEM, "[Code](%s:%d)%s.", 
-		m_pServerObject->GetConnectManager()->GetClientIPInfo(pMessage->GetMessageBase()->m_u4ConnectID).m_szClientIP, 
-		m_pServerObject->GetConnectManager()->GetClientIPInfo(pMessage->GetMessageBase()->m_u4ConnectID).m_nPort, 
-		strCode.text);
-
-	m_pServerObject->GetPacketManager()->Delete(pBodyPacket);
-
-	//设置数据列表
-	IBuffPacket* pResponsesPacket = m_pServerObject->GetPacketManager()->Create();
-	uint16 u2PostCommandID = COMMAND_LOGIC_CLIENT_LIST_R;
-	//得到数据列表包体信息
-	IBuffPacket* pListPacket = m_pServerObject->GetPacketManager()->Create();
-
-	uint32 u4ListCount = 0;
-	m_listManager.Get_All_LG_List(pListPacket, u4ListCount);
-
-	//消息列表返回
-	uint32 u4SendPacketLen = pListPacket->GetPacketLen() + sizeof(u4ListCount);
-	(*pResponsesPacket) << pMessage->GetPacketHeadInfo()->m_u2Version;
-	(*pResponsesPacket) << u2PostCommandID;
-	(*pResponsesPacket) << u4SendPacketLen; //数据包体长度
-	pResponsesPacket->WriteStream(pMessage->GetPacketHeadInfo()->m_szSession, SESSION_LEN);
-
-	(*pResponsesPacket) << u4ListCount;
-	pResponsesPacket->WriteStream(pListPacket->GetData(), pListPacket->GetPacketLen());
-
-	m_pServerObject->GetPacketManager()->Delete(pListPacket);
-
-	if(NULL != m_pServerObject->GetConnectManager())
-	{
-		//发送全部数据
-		m_pServerObject->GetConnectManager()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID, 
-			pResponsesPacket, 
-			SENDMESSAGE_JAMPNOMAL, 
-			u2PostCommandID, 
-			PACKET_SEND_IMMEDIATLY, 
-			PACKET_IS_FRAMEWORK_RECYC);
-	}
-	else
-	{
-		OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] m_pConnectManager = NULL.\n"));
-		m_pServerObject->GetPacketManager()->Delete(pResponsesPacket);
-	}
-
-	//m_pServerObject->GetConnectManager()->CloseConnect(pMessage->GetMessageBase()->m_u4ConnectID);
-
 	return 0;
 }
 

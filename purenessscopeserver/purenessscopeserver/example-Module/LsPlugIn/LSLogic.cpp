@@ -50,8 +50,6 @@ int LoadModuleData(CServerObject* pServerObject)
   IMessageManager* pMessageManager = g_pServerObject->GetMessageManager();
   if(NULL != pMessageManager)
   {
-    pMessageManager->AddClientCommand(COMMAND_LOGIC_CLIENT_LIST, &g_BaseCommand, g_szName);
-
 	pMessageManager->AddClientCommand(COMMAND_LOGIC_LG_LOGIN, &g_BaseCommand, g_szName);
 	pMessageManager->AddClientCommand(COMMAND_LOGIC_ALIVE, &g_BaseCommand, g_szName);
 	pMessageManager->AddClientCommand(COMMAND_LOGIC_LG_LIST, &g_BaseCommand, g_szName);
@@ -91,7 +89,6 @@ int UnLoadModuleData()
     IMessageManager* pMessageManager = g_pServerObject->GetMessageManager();
     if(NULL != pMessageManager)
     {
-      pMessageManager->DelClientCommand(COMMAND_LOGIC_CLIENT_LIST, &g_BaseCommand);
 	  pMessageManager->DelClientCommand(COMMAND_LOGIC_LG_LOGIN, &g_BaseCommand);
 	  pMessageManager->DelClientCommand(COMMAND_LOGIC_ALIVE, &g_BaseCommand);
 	  pMessageManager->DelClientCommand(COMMAND_LOGIC_LG_LIST, &g_BaseCommand);

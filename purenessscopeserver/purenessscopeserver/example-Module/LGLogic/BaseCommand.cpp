@@ -119,6 +119,9 @@ int CBaseCommand::Do_Logic_Client_Login(IMessage* pMessage)
 	IBuffPacket* pResponsesPacket = m_pServerObject->GetPacketManager()->Create();
 	uint16 u2PostCommandID = COMMAND_LOGIC_CLIENAT_LOGIN_R;
 
+	//设置数据报文采用网络字序
+	pResponsesPacket->SetNetSort(true);
+
 	uint32 u4UserID = 0;
 	_VCHARS_STR strServerCode;
 
@@ -132,6 +135,7 @@ int CBaseCommand::Do_Logic_Client_Login(IMessage* pMessage)
 	if(u1Type == 1)
 	{
 		pListPacket = m_pServerObject->GetPacketManager()->Create();
+		pListPacket->SetNetSort(true);
 		m_objLSServer.Get_All_LG_List(pListPacket, u4ListCount);
 	}
 	

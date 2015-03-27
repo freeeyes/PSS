@@ -4,7 +4,7 @@
 #include "ace/Thread_Mutex.h"
 
 #include "ACEMemory.h"
-#include "../IObject/IBuffPacket.h"
+#include "IBuffPacket.h"
 
 #define DEFINE_PACKET_SIZE 1024
 #define DEFINE_PACKET_ADD  1024
