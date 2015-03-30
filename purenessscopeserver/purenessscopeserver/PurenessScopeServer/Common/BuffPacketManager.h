@@ -24,7 +24,7 @@ public:
 	uint32 GetBuffPacketUsedCount();
 	uint32 GetBuffPacketFreeCount();
 
-	IBuffPacket* Create();
+	IBuffPacket* Create(uint32 u4BuffID = 0);
 	bool Delete(IBuffPacket* pBuffPacket);
 
 private:

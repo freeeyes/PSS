@@ -11,7 +11,7 @@ CBuffPacketManager::~CBuffPacketManager(void)
 	//Close();
 }
 
-IBuffPacket* CBuffPacketManager::Create()
+IBuffPacket* CBuffPacketManager::Create(uint32 u4BuffID)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
@@ -46,6 +46,7 @@ IBuffPacket* CBuffPacketManager::Create()
 		m_mapPacketUsed.insert(mapPacket::value_type(pBuffPacket, pBuffPacket));
 	}
 
+	pBuffPacket->SetBuffID(u4BuffID);
 	return (IBuffPacket* )pBuffPacket;
 }
 
@@ -90,8 +91,9 @@ void CBuffPacketManager::Close()
 	for(mapPacket::iterator itorUsedB = m_mapPacketUsed.begin(); itorUsedB != m_mapPacketUsed.end(); itorUsedB++)
 	{
 		CBuffPacket* pBuffPacket = (CBuffPacket* )itorUsedB->second;
+		OUR_DEBUG((LM_ERROR, "[CBuffPacketManager::Close]CBuffPacket has used!!memory address[0x%08x], BuffID=%d.\n", 
+			pBuffPacket, pBuffPacket->GetBuffID()));
 		pBuffPacket->Close();
-		OUR_DEBUG((LM_ERROR, "[CBuffPacketManager::Close]CBuffPacket has used!!memory address[0x%08x].\n", pBuffPacket));
 		SAFE_DELETE(pBuffPacket);
 	}
 
