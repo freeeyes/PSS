@@ -30,6 +30,9 @@ void CPacketParse::Init()
 
 	m_pmbHead           = NULL;
 	m_pmbBody           = NULL;
+
+	//设置为主机序，不做网序验证
+	SetSort(0);
 }
 
 bool CPacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager)
@@ -43,10 +46,13 @@ bool CPacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead,
 	m_u4HeadSrcSize = PACKET_HEAD_LENGTH;
 
 	memcpy_safe((char* )&pData[u4Pos], (uint32)sizeof(uint16), (char* )&m_objPacketHeadInfo.m_u2Version, (uint32)sizeof(uint16));
+	Check_Recv_Unit16(m_objPacketHeadInfo.m_u2Version);
 	u4Pos += sizeof(uint16);
 	memcpy_safe((char* )&pData[u4Pos], (uint32)sizeof(uint16), (char* )&m_objPacketHeadInfo.m_u2CmdID, (uint32)sizeof(uint16));
+	Check_Recv_Unit16(m_objPacketHeadInfo.m_u2CmdID);
 	u4Pos += sizeof(uint16);
 	memcpy_safe((char* )&pData[u4Pos], (uint32)sizeof(uint32), (char* )&m_objPacketHeadInfo.m_u4BodyLen, (uint32)sizeof(uint32));
+	Check_Recv_Unit32(m_objPacketHeadInfo.m_u4BodyLen);
 	u4Pos += sizeof(uint32);
 	memcpy_safe((char* )&pData[u4Pos], (uint32)(sizeof(char)*32), (char* )&m_objPacketHeadInfo.m_szSession, (uint32)(sizeof(char)*32));
 	u4Pos += sizeof(char)*32;
@@ -91,6 +97,7 @@ bool CPacketParse::MakePacket(uint32 u4ConnectID, const char* pData, uint32 u4Le
 	}
 
 	//拼装数据包
+	Check_Send_Unit32(u4Len);
 	memcpy_safe((char* )&u4Len, (uint32)sizeof(uint32), pMbData->wr_ptr(), (uint32)sizeof(uint32));
 	pMbData->wr_ptr(sizeof(uint32));
 	memcpy_safe((char* )pData, u4Len, pMbData->wr_ptr(), u4Len);
