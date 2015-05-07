@@ -1,0 +1,22 @@
+# *****************************
+# 预定义
+# *****************************
+CC = g++
+AR = ar
+CFLAGS = -g -O2 -D__LINUX__
+INCLUDES = -I./ -I../ -I/usr/include -I ./TinyXML
+LIBS = -L/usr/lib64 -L/usr/local/lib64 -L./ -L../ -lz -ldl 
+# *****************************
+# 变换规则
+# *****************************
+# Here are some rules for converting .cpp -> .o
+.SUFFIXES: .cpp .o
+.cpp.o:
+	@$(CC) -fPIC $(CFLAGS) ${INCLUDES} -c $*.cpp 
+	@echo '----- '$*.cpp' is compiled ok!'
+
+# Here are some rules for converting .c -> .o
+.SUFFIXES: .c .o
+.c.o:
+	@$(CC) -fPIC $(CFLAGS)  ${INCLUDES} -c $*.c 
+	@echo '----- '$*.c' is compiled ok!'

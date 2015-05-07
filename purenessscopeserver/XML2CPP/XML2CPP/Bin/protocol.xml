@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- add by freeeyes -->
+<!-- sport under type -->
+<!-- string(Need length),uint8,uint16,uint32,uint64,int8,int16,int32,float32,float64 -->
+<configer>
+	<UserInfo CommandID="10240" desc="用户注册数据">
+		<Name length="20" desc="名称">string</Name>
+		<Password length="20" desc="密码">string</Password>
+		<ID desc="用户ID">uint32</ID>
+		<Age desc="年龄">uint8</Age>
+	</UserInfo>
+
+	<UserData CommandID="10241" desc="用户信息">
+		<ID desc="用户ID">uint32</ID>
+		<Nick length="20" desc="昵称">string</Nick>
+		<Job desc="职业">uint8</Job>
+		<Ablity desc="能力">uint16</Ablity>
+	</UserData>	
+</configer>
