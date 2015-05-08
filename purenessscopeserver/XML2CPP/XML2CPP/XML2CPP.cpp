@@ -2,6 +2,9 @@
 //
 #include "XmlOpeation.h"
 
+#define STRUCT_DATA_FILE   "DataFormat.h"
+#define PROTOCAL_DATA_FILE "Protocol.h"
+
 void Display(_Xml_Info& objxmlInfo)
 {
 	printf("[Display]structName=%s.\n", objxmlInfo.m_szXMLName);
@@ -26,11 +29,18 @@ void Gen_2_Cpp_Struct(FILE* pFile, _Xml_Info& objxmlInfo)
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	for(int i = 0; i < (int)objxmlInfo.m_vecProperty.size(); i++)
 	{
-		if(objxmlInfo.m_vecProperty[i].m_emType == PROPERTY_STRING)
+		if(objxmlInfo.m_vecProperty[i].m_emType == PROPERTY_CHAR)
 		{
 			sprintf_safe(szTemp, 200, "\tchar m_sz%s[%d];  //%s\n", 
 				objxmlInfo.m_vecProperty[i].m_szPropertyName, 
 				objxmlInfo.m_vecProperty[i].m_nLength,
+				objxmlInfo.m_vecProperty[i].m_szDesc);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		}
+		else if(objxmlInfo.m_vecProperty[i].m_emType == PROPERTY_STRING)
+		{
+			sprintf_safe(szTemp, 200, "\tstring m_str%s;  //%s\n", 
+				objxmlInfo.m_vecProperty[i].m_szPropertyName,
 				objxmlInfo.m_vecProperty[i].m_szDesc);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		}
@@ -135,7 +145,7 @@ void Gen_2_Cpp_In_Stream(FILE* pFile, _Xml_Info& objxmlInfo)
 	//先处理字符串的声明
 	for(int i = 0; i < (int)objxmlInfo.m_vecProperty.size(); i++)
 	{
-		if(objxmlInfo.m_vecProperty[i].m_emType == PROPERTY_STRING)
+		if(objxmlInfo.m_vecProperty[i].m_emType == PROPERTY_CHAR)
 		{
 			if(objxmlInfo.m_vecProperty[i].m_nLength <= 255)
 			{
@@ -159,16 +169,19 @@ void Gen_2_Cpp_In_Stream(FILE* pFile, _Xml_Info& objxmlInfo)
 	}
 
 	//流入命令字
-	sprintf_safe(szTemp, 200, "\tuint16 u2CommandID = (uint16)%d;\n", 
-		objxmlInfo.m_nCommandID);
-	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\t(*pBuffPacketvs) << u2CommandID;\n");
-	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	if(objxmlInfo.m_nCommandID > 0)
+	{
+		sprintf_safe(szTemp, 200, "\tuint16 u2CommandID = (uint16)%d;\n", 
+			objxmlInfo.m_nCommandID);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t(*pBuffPacketvs) << u2CommandID;\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	}
 
 	//处理所有写入流
 	for(int i = 0; i < (int)objxmlInfo.m_vecProperty.size(); i++)
 	{
-		if(objxmlInfo.m_vecProperty[i].m_emType == PROPERTY_STRING)
+		if(objxmlInfo.m_vecProperty[i].m_emType == PROPERTY_CHAR)
 		{
 			sprintf_safe(szTemp, 200, "\tvs%s.SetData(obj%s.m_sz%s, (int)strlen(obj%s.m_sz%s));\n",
 				objxmlInfo.m_vecProperty[i].m_szPropertyName,
@@ -180,6 +193,13 @@ void Gen_2_Cpp_In_Stream(FILE* pFile, _Xml_Info& objxmlInfo)
 			sprintf_safe(szTemp, 200, "\t(*pBuffPacketvs) << vs%s;\n",
 				objxmlInfo.m_vecProperty[i].m_szPropertyName), 
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		}
+		else if(objxmlInfo.m_vecProperty[i].m_emType == PROPERTY_STRING)
+		{
+			sprintf_safe(szTemp, 200, "\t(*pBuffPacketvs) << obj%s.m_str%s;\n",
+				objxmlInfo.m_szXMLName,
+				objxmlInfo.m_vecProperty[i].m_szPropertyName), 
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		}
 		else if(objxmlInfo.m_vecProperty[i].m_emType == PROPERTY_UINT8)
 		{
@@ -302,15 +322,18 @@ void Gen_2_Cpp_Out_Stream(FILE* pFile, _Xml_Info& objxmlInfo)
 	}
 
 	//流出命令字
-	sprintf_safe(szTemp, 200, "\tuint16 u2CommandID = 0;\n");
-	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\t(*pBuffPacketvs) >> u2CommandID;\n");
-	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	if(objxmlInfo.m_nCommandID > 0)
+	{
+		sprintf_safe(szTemp, 200, "\tuint16 u2CommandID = 0;\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t(*pBuffPacketvs) >> u2CommandID;\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	}
 
 	//处理所有读出流
 	for(int i = 0; i < (int)objxmlInfo.m_vecProperty.size(); i++)
 	{
-		if(objxmlInfo.m_vecProperty[i].m_emType == PROPERTY_STRING)
+		if(objxmlInfo.m_vecProperty[i].m_emType == PROPERTY_CHAR)
 		{
 			sprintf_safe(szTemp, 200, "\t(*pBuffPacketvs) >> vs%s;\n",
 				objxmlInfo.m_vecProperty[i].m_szPropertyName);
@@ -322,6 +345,13 @@ void Gen_2_Cpp_Out_Stream(FILE* pFile, _Xml_Info& objxmlInfo)
 				objxmlInfo.m_vecProperty[i].m_szPropertyName);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
+		}
+		else if(objxmlInfo.m_vecProperty[i].m_emType == PROPERTY_STRING)
+		{
+			sprintf_safe(szTemp, 200, "\t(*pBuffPacketvs) >> obj%s.m_str%s;\n",
+				objxmlInfo.m_szXMLName,
+				objxmlInfo.m_vecProperty[i].m_szPropertyName), 
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		}
 		else if(objxmlInfo.m_vecProperty[i].m_emType == PROPERTY_UINT8)
 		{
@@ -395,31 +425,61 @@ void Gen_2_Cpp_Out_Stream(FILE* pFile, _Xml_Info& objxmlInfo)
 }
 
 //转化为CPP文件的方法
-void Gen_2_Cpp(_Xml_Info& objxmlInfo)
+void Gen_2_Cpp(vecXmlInfo& objvecXmlInfo)
 {
 	char szTemp[200]     = {'\0'};
-	char szFileName[100] = {'\0'};
-	sprintf_safe(szFileName, 100, "%s.h", objxmlInfo.m_szXMLName);
-	FILE* pFile = fopen(szFileName, "w");
+
+	//首先生成声明文件。
+	FILE* pFile = fopen(STRUCT_DATA_FILE, "w");
 	if(NULL == pFile)
 	{
 		return;
 	}
 
-	//生成数据结构文件
-	Gen_2_Cpp_Struct(pFile, objxmlInfo);
-
-	sprintf_safe(szTemp, 200, "\n\n", objxmlInfo.m_szDesc);
+	//写入需要引入的头文件
+	sprintf_safe(szTemp, 200, "#include \"define.h\"\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-
-	//生成数据写函数
-	Gen_2_Cpp_In_Stream(pFile, objxmlInfo);
-
-	sprintf_safe(szTemp, 200, "\n", objxmlInfo.m_szDesc);
+	sprintf_safe(szTemp, 200, "\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	for(int i = 0; i < (int)objvecXmlInfo.size(); i++)
+	{
+		//Display(objvecXmlInfo[i]);
 
-	//生成读函数
-	Gen_2_Cpp_Out_Stream(pFile, objxmlInfo);
+		//生成数据结构文件
+		Gen_2_Cpp_Struct(pFile, objvecXmlInfo[i]);
+
+		sprintf_safe(szTemp, 200, "\n", objvecXmlInfo[i].m_szDesc);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	}
+	fclose(pFile);
+
+	pFile = fopen(PROTOCAL_DATA_FILE, "w");
+	if(NULL == pFile)
+	{
+		return;
+	}
+
+	sprintf_safe(szTemp, 200, "#include \"%s\"\n", STRUCT_DATA_FILE);
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "#include \"IBuffPacket.h\"\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	//生成读取和写入文件
+	for(int i = 0; i < (int)objvecXmlInfo.size(); i++)
+	{
+		//生成数据写函数
+		Gen_2_Cpp_In_Stream(pFile, objvecXmlInfo[i]);
+
+		sprintf_safe(szTemp, 200, "\n", objvecXmlInfo[i].m_szDesc);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+		//生成读函数
+		Gen_2_Cpp_Out_Stream(pFile, objvecXmlInfo[i]);
+
+		sprintf_safe(szTemp, 200, "\n", objvecXmlInfo[i].m_szDesc);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	}
 
 	fclose(pFile);
 }
@@ -445,11 +505,7 @@ int main(int argc, char* argv[])
 	bool blState = objXmlOpeation.Parse_XML_File(szFileName, objvecXmlInfo);
 	if(true == blState)
 	{
-		for(int i = 0; i < (int)objvecXmlInfo.size(); i++)
-		{
-			Display(objvecXmlInfo[i]);
-			Gen_2_Cpp(objvecXmlInfo[i]);
-		}
+		Gen_2_Cpp(objvecXmlInfo);
 		printf("[success]OK.\n");
 	}
 	else

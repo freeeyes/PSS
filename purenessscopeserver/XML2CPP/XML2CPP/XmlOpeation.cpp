@@ -177,9 +177,9 @@ bool CXmlOpeation::Parse_XML(char* pText, _Xml_Info& objxmlInfo)
 			//printf("Name=%s,Values=%s.\n", pNode->Value(), pNode->ToElement()->GetText());
 			_Property objProperty;
 			sprintf_safe(objProperty.m_szPropertyName, 50, "%s", pNode->Value());
-			if(strcmp(pNode->ToElement()->GetText(), "string") == 0)
+			if(strcmp(pNode->ToElement()->GetText(), "char") == 0)
 			{
-				objProperty.m_emType = PROPERTY_STRING;
+				objProperty.m_emType = PROPERTY_CHAR;
 
 				//同时获得字符串最大长度
 				char* pLength = (char* )pNode->ToElement()->Attribute("length");
@@ -187,6 +187,10 @@ bool CXmlOpeation::Parse_XML(char* pText, _Xml_Info& objxmlInfo)
 				{
 					objProperty.m_nLength = (int)atoi(pLength);
 				}
+			}
+			else if(strcmp(pNode->ToElement()->GetText(), "string") == 0)
+			{
+				objProperty.m_emType = PROPERTY_STRING;
 			}
 			else if(strcmp(pNode->ToElement()->GetText(), "uint8") == 0)
 			{
@@ -298,9 +302,9 @@ bool CXmlOpeation::Parse_XML_File(char* pFileName, vecXmlInfo& objvecXmlInfo)
 				//printf("Name=%s,Values=%s.\n", pNode->Value(), pNode->ToElement()->GetText());
 				_Property objProperty;
 				sprintf_safe(objProperty.m_szPropertyName, 50, "%s", pNode->Value());
-				if(strcmp(pNode->ToElement()->GetText(), "string") == 0)
+				if(strcmp(pNode->ToElement()->GetText(), "char") == 0)
 				{
-					objProperty.m_emType = PROPERTY_STRING;
+					objProperty.m_emType = PROPERTY_CHAR;
 
 					//同时获得字符串最大长度
 					char* pLength = (char* )pNode->ToElement()->Attribute("length");
@@ -308,6 +312,10 @@ bool CXmlOpeation::Parse_XML_File(char* pFileName, vecXmlInfo& objvecXmlInfo)
 					{
 						objProperty.m_nLength = (int)atoi(pLength);
 					}
+				}
+				else if(strcmp(pNode->ToElement()->GetText(), "string") == 0)
+				{
+					objProperty.m_emType = PROPERTY_STRING;
 				}
 				else if(strcmp(pNode->ToElement()->GetText(), "uint8") == 0)
 				{
