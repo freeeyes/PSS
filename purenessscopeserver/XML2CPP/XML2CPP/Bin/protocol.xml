@@ -26,8 +26,10 @@
 		<GridItemCount desc="格子物品数量">uint8</GridItemCount>
 	</BagInfo>
 		
-	<UserBag>
+	<UserBag desc="用户背包测试">
 		<ID desc="用户ID">uint32</ID>
-		<BagInfo desc="背包信息">BagInfo</BagInfo>
+		<SingleInfo desc="单点信息">BagInfo</SingleInfo>
+		<Bag desc="背包信息" class="vector">BagInfo</Bag>
+		<UserBank desc="仓库信息" class="map" keyName="PosID" KeyClass="uint16">BagInfo</UserBank>
 	</UserBag>
 </configer>

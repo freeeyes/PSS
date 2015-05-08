@@ -32,21 +32,34 @@ enum PROPERTY_TYPE
 	PROPERTY_FLOAT64,
 };
 
+enum PROPERTY_CLASS
+{
+	CLASS_SINGLE,
+	CLASS_VECTOR,
+	CLASS_MAP,
+};
+
 //属性信息
 struct _Property
 {
-	char          m_szPropertyName[50];   //参数名称
-	char          m_szClassName[50];      //对象类名
-	char          m_szDesc[100];          //描述信息  
-	PROPERTY_TYPE m_emType;               //参数类型
-	int           m_nLength;              //长度 
+	char           m_szPropertyName[50];   //参数名称
+	char           m_szClassName[50];      //对象类名
+	char           m_szDesc[100];          //描述信息  
+	PROPERTY_TYPE  m_emType;               //参数类型
+	PROPERTY_CLASS m_emClass;              //参数类别
+	int            m_nLength;              //长度 
+	char           m_szKeyName[50];        //KeyName
+	PROPERTY_TYPE  m_emKeyType;            //key参数类型
 
 	_Property()
 	{
 		m_szPropertyName[0] = '\0';
 		m_szClassName[0]    = '\0';
 		m_szDesc[0]         = '\0';
+		m_szKeyName[0]      = '\0';
 		m_emType            = PROPERTY_UNKNOW;
+		m_emKeyType         = PROPERTY_UNKNOW;
+		m_emClass           = CLASS_SINGLE;
 		m_nLength           = 0;
 	}
 };

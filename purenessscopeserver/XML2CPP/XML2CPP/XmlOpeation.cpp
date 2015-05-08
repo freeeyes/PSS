@@ -231,6 +231,36 @@ bool CXmlOpeation::Parse_XML(char* pText, _Xml_Info& objxmlInfo)
 			else
 			{
 				objProperty.m_emType = PROPERTY_UNKNOW;
+				sprintf_safe(objProperty.m_szClassName, 100, "%s", pNode->ToElement()->GetText());
+			}
+
+			//查看参数类别
+			if(NULL != pNode->ToElement()->Attribute("class"))
+			{
+				if(strcmp(pNode->ToElement()->Attribute("class"), "vector") == 0)
+				{
+					objProperty.m_emClass = CLASS_VECTOR;
+				}
+				else if(strcmp(pNode->ToElement()->Attribute("class"), "map") == 0)
+				{
+					objProperty.m_emClass = CLASS_MAP;
+
+					//如果是map 则查看keyName和keyType
+					sprintf_safe(objProperty.m_szKeyName, 100, "%s", pNode->ToElement()->Attribute("keyName"));
+
+					if(strcmp(pNode->ToElement()->Attribute("KeyClass"), "string") == 0)
+					{
+						objProperty.m_emKeyType = PROPERTY_STRING;
+					}
+					else if(strcmp(pNode->ToElement()->Attribute("KeyClass"), "uint16") == 0)
+					{
+						objProperty.m_emKeyType = PROPERTY_UINT16;
+					}
+					else if(strcmp(pNode->ToElement()->Attribute("KeyClass"), "uint32") == 0)
+					{
+						objProperty.m_emKeyType = PROPERTY_UINT32;
+					}
+				}
 			}
 
 			sprintf_safe(objProperty.m_szDesc, 100, "%s", pNode->ToElement()->Attribute("desc"));
@@ -359,6 +389,37 @@ bool CXmlOpeation::Parse_XML_File(char* pFileName, vecXmlInfo& objvecXmlInfo)
 					objProperty.m_emType = PROPERTY_UNKNOW;
 					sprintf_safe(objProperty.m_szClassName, 100, "%s", pNode->ToElement()->GetText());
 				}
+
+				//查看参数类别
+				if(NULL != pNode->ToElement()->Attribute("class"))
+				{
+					if(strcmp(pNode->ToElement()->Attribute("class"), "vector") == 0)
+					{
+						objProperty.m_emClass = CLASS_VECTOR;
+					}
+					else if(strcmp(pNode->ToElement()->Attribute("class"), "map") == 0)
+					{
+						objProperty.m_emClass = CLASS_MAP;
+
+						//如果是map 则查看keyName和keyType
+						sprintf_safe(objProperty.m_szKeyName, 100, "%s", pNode->ToElement()->Attribute("keyName"));
+
+						if(strcmp(pNode->ToElement()->Attribute("KeyClass"), "string") == 0)
+						{
+							objProperty.m_emKeyType = PROPERTY_STRING;
+						}
+						else if(strcmp(pNode->ToElement()->Attribute("KeyClass"), "uint16") == 0)
+						{
+							objProperty.m_emKeyType = PROPERTY_UINT16;
+						}
+						else if(strcmp(pNode->ToElement()->Attribute("KeyClass"), "uint32") == 0)
+						{
+							objProperty.m_emKeyType = PROPERTY_UINT32;
+						}
+					}
+				}
+
+				//得到参数描述信息
 				sprintf_safe(objProperty.m_szDesc, 100, "%s", pNode->ToElement()->Attribute("desc"));
 
 				objxmlInfo.m_vecProperty.push_back(objProperty);

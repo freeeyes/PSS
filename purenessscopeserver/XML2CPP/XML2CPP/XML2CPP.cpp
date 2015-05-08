@@ -17,6 +17,49 @@ void Display(_Xml_Info& objxmlInfo)
 	}
 }
 
+//生成vec和map的声明结构
+void Gen_2_Cpp_Class(FILE* pFile, _Xml_Info& objxmlInfo)
+{
+	char szTemp[200] = {'\0'};
+	for(int i = 0; i < (int)objxmlInfo.m_vecProperty.size(); i++)
+	{
+		if(objxmlInfo.m_vecProperty[i].m_emType == PROPERTY_UNKNOW)
+		{
+			if(objxmlInfo.m_vecProperty[i].m_emClass == CLASS_VECTOR)
+			{
+				sprintf_safe(szTemp, 200, "typedef vector<%s> vec%s \n", 
+					objxmlInfo.m_vecProperty[i].m_szClassName,
+					objxmlInfo.m_vecProperty[i].m_szPropertyName);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+			else if(objxmlInfo.m_vecProperty[i].m_emClass == CLASS_MAP)
+			{
+				if(objxmlInfo.m_vecProperty[i].m_emKeyType == PROPERTY_STRING)
+				{
+					sprintf_safe(szTemp, 200, "typedef map<string, %s> map%s \n", 
+						objxmlInfo.m_vecProperty[i].m_szClassName,
+						objxmlInfo.m_vecProperty[i].m_szPropertyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				else if(objxmlInfo.m_vecProperty[i].m_emKeyType == PROPERTY_UINT16)
+				{
+					sprintf_safe(szTemp, 200, "typedef map<uint16, %s> map%s \n", 
+						objxmlInfo.m_vecProperty[i].m_szClassName,
+						objxmlInfo.m_vecProperty[i].m_szPropertyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				else if(objxmlInfo.m_vecProperty[i].m_emKeyType == PROPERTY_UINT32)
+				{
+					sprintf_safe(szTemp, 200, "typedef map<uint32, %s> map%s \n", 
+						objxmlInfo.m_vecProperty[i].m_szClassName,
+						objxmlInfo.m_vecProperty[i].m_szPropertyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+			}
+		}
+	}
+};
+
 //生成数据结构
 void Gen_2_Cpp_Struct(FILE* pFile, _Xml_Info& objxmlInfo)
 {
@@ -109,11 +152,30 @@ void Gen_2_Cpp_Struct(FILE* pFile, _Xml_Info& objxmlInfo)
 		}
 		else
 		{
-			sprintf_safe(szTemp, 200, "\t%s m_obj%s;  //%s\n", 
-				objxmlInfo.m_vecProperty[i].m_szClassName,
-				objxmlInfo.m_vecProperty[i].m_szPropertyName,
-				objxmlInfo.m_vecProperty[i].m_szDesc);
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			if(objxmlInfo.m_vecProperty[i].m_emClass == CLASS_SINGLE)
+			{
+				sprintf_safe(szTemp, 200, "\t%s m_obj%s;  //%s\n", 
+					objxmlInfo.m_vecProperty[i].m_szClassName,
+					objxmlInfo.m_vecProperty[i].m_szPropertyName,
+					objxmlInfo.m_vecProperty[i].m_szDesc);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+			else if(objxmlInfo.m_vecProperty[i].m_emClass == CLASS_VECTOR)
+			{
+				sprintf_safe(szTemp, 200, "\tvec%s m_objvec%s;  //%s\n", 
+					objxmlInfo.m_vecProperty[i].m_szClassName,
+					objxmlInfo.m_vecProperty[i].m_szPropertyName,
+					objxmlInfo.m_vecProperty[i].m_szDesc);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+			else if(objxmlInfo.m_vecProperty[i].m_emClass == CLASS_MAP)
+			{
+				sprintf_safe(szTemp, 200, "\tmap%s m_objmap%s;  //%s\n", 
+					objxmlInfo.m_vecProperty[i].m_szClassName,
+					objxmlInfo.m_vecProperty[i].m_szPropertyName,
+					objxmlInfo.m_vecProperty[i].m_szDesc);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
 		}
 	}
 	sprintf_safe(szTemp, 200, "};\n");
@@ -267,12 +329,89 @@ void Gen_2_Cpp_In_Stream(FILE* pFile, _Xml_Info& objxmlInfo)
 		}
 		else
 		{
-			//是类，调用类之前的方法实现之
-			sprintf_safe(szTemp, 200, "\t%s_In_Stream(obj%s.m_obj%s, pBuffPacket);\n",
-				objxmlInfo.m_vecProperty[i].m_szClassName,
-				objxmlInfo.m_szXMLName,
-				objxmlInfo.m_vecProperty[i].m_szClassName); 
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			if(objxmlInfo.m_vecProperty[i].m_emClass == CLASS_SINGLE)
+			{
+				//是类，调用类之前的方法实现之
+				sprintf_safe(szTemp, 200, "\t%s_In_Stream(obj%s.m_obj%s, pBuffPacket);\n",
+					objxmlInfo.m_vecProperty[i].m_szClassName,
+					objxmlInfo.m_szXMLName,
+					objxmlInfo.m_vecProperty[i].m_szClassName); 
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+			else if(objxmlInfo.m_vecProperty[i].m_emClass == CLASS_VECTOR)
+			{
+				//是vector
+				sprintf_safe(szTemp, 200, "\t(*pBuffPacketvs) << (uint16)obj%s.m_objvec%s.size();\n",
+					objxmlInfo.m_szXMLName,
+					objxmlInfo.m_vecProperty[i].m_szPropertyName);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\tfor(int i = 0; i < (int)obj%s.m_objvec%s.size(); i++)\n",
+					objxmlInfo.m_szXMLName,
+					objxmlInfo.m_vecProperty[i].m_szPropertyName);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t{\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t\t%s_In_Stream((%s)obj%s.m_objvec%s[i], pBuffPacket);\n",
+					objxmlInfo.m_vecProperty[i].m_szClassName,
+					objxmlInfo.m_vecProperty[i].m_szClassName,
+					objxmlInfo.m_szXMLName,
+					objxmlInfo.m_vecProperty[i].m_szPropertyName); 
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t}\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+			else
+			{
+				//是map
+				sprintf_safe(szTemp, 200, "\t(*pBuffPacketvs) << (uint16)obj%s.m_objmap%s.size();\n",
+					objxmlInfo.m_szXMLName,
+					objxmlInfo.m_vecProperty[i].m_szPropertyName);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\tfor(map%s::iterator itorFreeB = obj%s.m_objmap%s.begin(); itorFreeB != obj%s.m_objmap%s.end(); itorFreeB++)\n",
+					objxmlInfo.m_vecProperty[i].m_szPropertyName,
+					objxmlInfo.m_szXMLName,
+					objxmlInfo.m_vecProperty[i].m_szPropertyName,
+					objxmlInfo.m_szXMLName,
+					objxmlInfo.m_vecProperty[i].m_szPropertyName);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t{\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				if(objxmlInfo.m_vecProperty[i].m_emKeyType == PROPERTY_STRING)
+				{
+					sprintf_safe(szTemp, 200, "\t\t(*pBuffPacketvs) << (string)itorFreeB->first;\n",
+						objxmlInfo.m_vecProperty[i].m_szClassName,
+						objxmlInfo.m_szXMLName,
+						objxmlInfo.m_vecProperty[i].m_szClassName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				else if(objxmlInfo.m_vecProperty[i].m_emKeyType == PROPERTY_UINT16)
+				{
+					sprintf_safe(szTemp, 200, "\t\t(*pBuffPacketvs) << (uint16)itorFreeB->first;\n",
+						objxmlInfo.m_vecProperty[i].m_szClassName,
+						objxmlInfo.m_szXMLName,
+						objxmlInfo.m_vecProperty[i].m_szClassName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				else if(objxmlInfo.m_vecProperty[i].m_emKeyType == PROPERTY_UINT32)
+				{
+					sprintf_safe(szTemp, 200, "\t\t(*pBuffPacketvs) << (uint32)itorFreeB->first;\n",
+						objxmlInfo.m_vecProperty[i].m_szClassName,
+						objxmlInfo.m_szXMLName,
+						objxmlInfo.m_vecProperty[i].m_szClassName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				sprintf_safe(szTemp, 200, "\t\t%s& obj%s = (%s)itorFreeB->second;\n",
+					objxmlInfo.m_vecProperty[i].m_szClassName,
+					objxmlInfo.m_vecProperty[i].m_szClassName,
+					objxmlInfo.m_vecProperty[i].m_szClassName);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t\t%s_In_Stream(obj%s, pBuffPacket);\n",
+					objxmlInfo.m_vecProperty[i].m_szClassName,
+					objxmlInfo.m_vecProperty[i].m_szClassName); 
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t}\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
 		}
 	}
 
@@ -428,12 +567,128 @@ void Gen_2_Cpp_Out_Stream(FILE* pFile, _Xml_Info& objxmlInfo)
 		}
 		else
 		{
-			//是类，调用类之前的方法实现之
-			sprintf_safe(szTemp, 200, "\t%s_Out_Stream(obj%s.m_obj%s, pBuffPacket);\n",
-				objxmlInfo.m_vecProperty[i].m_szClassName,
-				objxmlInfo.m_szXMLName,
-				objxmlInfo.m_vecProperty[i].m_szClassName); 
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			if(objxmlInfo.m_vecProperty[i].m_emClass == CLASS_SINGLE)
+			{
+				//是类，调用类之前的方法实现之
+				sprintf_safe(szTemp, 200, "\t%s_Out_Stream(obj%s.m_obj%s, pBuffPacket);\n",
+					objxmlInfo.m_vecProperty[i].m_szClassName,
+					objxmlInfo.m_szXMLName,
+					objxmlInfo.m_vecProperty[i].m_szClassName); 
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+			else if(objxmlInfo.m_vecProperty[i].m_emClass == CLASS_VECTOR)
+			{
+				//是vector
+				sprintf_safe(szTemp, 200, "\tuint16 u2Count = 0;\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t(*pBuffPacketvs) >> u2Count;\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\tfor(int i = 0; i < (int)u2Count; i++)\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t{\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t\t%s obj%s;\n", 
+					objxmlInfo.m_vecProperty[i].m_szClassName,
+					objxmlInfo.m_vecProperty[i].m_szClassName);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t\t%s_Out_Stream(obj%s, pBuffPacket);\n",
+					objxmlInfo.m_vecProperty[i].m_szClassName,
+					objxmlInfo.m_vecProperty[i].m_szClassName); 
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t\tobj%s.m_objvec%s.push_back(obj%s);\n",
+					objxmlInfo.m_szXMLName,
+					objxmlInfo.m_vecProperty[i].m_szPropertyName,
+					objxmlInfo.m_vecProperty[i].m_szClassName); 
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t}\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+			else
+			{
+				//是map
+				sprintf_safe(szTemp, 200, "\tuint16 u2Count = 0;\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t(*pBuffPacketvs) >> u2Count;\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\tfor(int i = 0; i < (int)u2Count; i++)\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t{\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				if(objxmlInfo.m_vecProperty[i].m_emKeyType == PROPERTY_STRING)
+				{
+					sprintf_safe(szTemp, 200, "\t\tstring str%s;\n", 
+						objxmlInfo.m_vecProperty[i].m_szKeyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t%s obj%s;\n", 
+						objxmlInfo.m_vecProperty[i].m_szClassName,
+						objxmlInfo.m_vecProperty[i].m_szClassName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t(*pBuffPacketvs) >> str%s;\n", 
+						objxmlInfo.m_vecProperty[i].m_szKeyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t%s_Out_Stream(obj%s, pBuffPacket);\n",
+						objxmlInfo.m_vecProperty[i].m_szClassName,
+						objxmlInfo.m_vecProperty[i].m_szClassName); 
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\tobj%s.m_objmap%s.insert(map%s::value_type(str%s, obj%s));\n",
+						objxmlInfo.m_szXMLName,
+						objxmlInfo.m_vecProperty[i].m_szPropertyName,
+						objxmlInfo.m_vecProperty[i].m_szPropertyName,
+						objxmlInfo.m_vecProperty[i].m_szKeyName, 
+						objxmlInfo.m_vecProperty[i].m_szClassName); 
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				else if(objxmlInfo.m_vecProperty[i].m_emKeyType == PROPERTY_UINT16)
+				{
+					sprintf_safe(szTemp, 200, "\t\tuint16 u2%s;\n", 
+						objxmlInfo.m_vecProperty[i].m_szKeyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t%s obj%s;\n", 
+						objxmlInfo.m_vecProperty[i].m_szClassName,
+						objxmlInfo.m_vecProperty[i].m_szClassName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t(*pBuffPacketvs) >> u2%s;\n", 
+						objxmlInfo.m_vecProperty[i].m_szKeyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t%s_Out_Stream(obj%s, pBuffPacket);\n",
+						objxmlInfo.m_vecProperty[i].m_szClassName,
+						objxmlInfo.m_vecProperty[i].m_szClassName); 
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\tobj%s.m_objmap%s.insert(map%s::value_type(u2%s, obj%s));\n",
+						objxmlInfo.m_szXMLName,
+						objxmlInfo.m_vecProperty[i].m_szPropertyName,
+						objxmlInfo.m_vecProperty[i].m_szPropertyName,
+						objxmlInfo.m_vecProperty[i].m_szKeyName, 
+						objxmlInfo.m_vecProperty[i].m_szClassName); 
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				else if(objxmlInfo.m_vecProperty[i].m_emKeyType == PROPERTY_UINT32)
+				{
+					sprintf_safe(szTemp, 200, "\t\tuint32 u4%s;\n", 
+						objxmlInfo.m_vecProperty[i].m_szKeyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t%s obj%s;\n", 
+						objxmlInfo.m_vecProperty[i].m_szClassName,
+						objxmlInfo.m_vecProperty[i].m_szClassName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t(*pBuffPacketvs) >> u4%s;\n", 
+						objxmlInfo.m_vecProperty[i].m_szKeyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t%s_Out_Stream(obj%s, pBuffPacket);\n",
+						objxmlInfo.m_vecProperty[i].m_szClassName,
+						objxmlInfo.m_vecProperty[i].m_szClassName); 
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\tobj%s.m_objmap%s.insert(map%s::value_type(u4%s, obj%s));\n",
+						objxmlInfo.m_szXMLName,
+						objxmlInfo.m_vecProperty[i].m_szPropertyName,
+						objxmlInfo.m_vecProperty[i].m_szPropertyName,
+						objxmlInfo.m_vecProperty[i].m_szKeyName, 
+						objxmlInfo.m_vecProperty[i].m_szClassName); 
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				sprintf_safe(szTemp, 200, "\t}\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
 		}
 	}
 
@@ -463,6 +718,8 @@ void Gen_2_Cpp(vecXmlInfo& objvecXmlInfo)
 	for(int i = 0; i < (int)objvecXmlInfo.size(); i++)
 	{
 		//Display(objvecXmlInfo[i]);
+		//生成类声明
+		Gen_2_Cpp_Class(pFile, objvecXmlInfo[i]);
 
 		//生成数据结构文件
 		Gen_2_Cpp_Struct(pFile, objvecXmlInfo[i]);
