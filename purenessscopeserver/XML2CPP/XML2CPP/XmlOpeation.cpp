@@ -355,7 +355,9 @@ bool CXmlOpeation::Parse_XML_File(char* pFileName, vecXmlInfo& objvecXmlInfo)
 				}
 				else
 				{
+					//不是基本类型，是类
 					objProperty.m_emType = PROPERTY_UNKNOW;
+					sprintf_safe(objProperty.m_szClassName, 100, "%s", pNode->ToElement()->GetText());
 				}
 				sprintf_safe(objProperty.m_szDesc, 100, "%s", pNode->ToElement()->Attribute("desc"));
 

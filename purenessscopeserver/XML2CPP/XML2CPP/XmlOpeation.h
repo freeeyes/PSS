@@ -36,6 +36,7 @@ enum PROPERTY_TYPE
 struct _Property
 {
 	char          m_szPropertyName[50];   //参数名称
+	char          m_szClassName[50];      //对象类名
 	char          m_szDesc[100];          //描述信息  
 	PROPERTY_TYPE m_emType;               //参数类型
 	int           m_nLength;              //长度 
@@ -43,6 +44,7 @@ struct _Property
 	_Property()
 	{
 		m_szPropertyName[0] = '\0';
+		m_szClassName[0]    = '\0';
 		m_szDesc[0]         = '\0';
 		m_emType            = PROPERTY_UNKNOW;
 		m_nLength           = 0;

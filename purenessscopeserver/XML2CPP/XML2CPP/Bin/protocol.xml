@@ -5,16 +5,29 @@
 <!-- string(Need length),uint8,uint16,uint32,uint64,int8,int16,int32,float32,float64 -->
 <configer>
 	<UserInfo CommandID="10240" desc="用户注册数据">
-		<Name length="20" desc="名称">string</Name>
-		<Password length="20" desc="密码">string</Password>
+		<Name length="20" desc="名称">char</Name>
+		<Password length="20" desc="密码">char</Password>
 		<ID desc="用户ID">uint32</ID>
 		<Age desc="年龄">uint8</Age>
 	</UserInfo>
 
 	<UserData CommandID="10241" desc="用户信息">
 		<ID desc="用户ID">uint32</ID>
-		<Nick length="20" desc="昵称">string</Nick>
+		<Nick length="20" desc="昵称">char</Nick>
 		<Job desc="职业">uint8</Job>
-		<Ablity desc="能力">uint16</Ablity>
+		<Ablity desc="能力">uint16</Ablity>		
 	</UserData>	
+	
+	<BagInfo desc="背包信息">
+		<GridPosID desc="格子位置">uint16</GridPosID>
+		<GridState desc="格子状态">uint8</GridState>
+		<GridItemType desc="格子物品种类">uint8</GridItemType>
+		<GridItemID desc="格子物品ID">uint32</GridItemID>
+		<GridItemCount desc="格子物品数量">uint8</GridItemCount>
+	</BagInfo>
+		
+	<UserBag>
+		<ID desc="用户ID">uint32</ID>
+		<BagInfo desc="背包信息">BagInfo</BagInfo>
+	</UserBag>
 </configer>
