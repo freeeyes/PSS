@@ -273,7 +273,7 @@ bool CXmlOpeation::Parse_XML(char* pText, _Xml_Info& objxmlInfo)
 	return true;
 }
 
-bool CXmlOpeation::Parse_XML_File(char* pFileName, vecXmlInfo& objvecXmlInfo)
+bool CXmlOpeation::Parse_XML_File(const char* pFileName, vecXmlInfo& objvecXmlInfo)
 {
 	Close();
 	m_pTiXmlDocument = new TiXmlDocument(pFileName);
@@ -311,13 +311,25 @@ bool CXmlOpeation::Parse_XML_File(char* pFileName, vecXmlInfo& objvecXmlInfo)
 
 		TiXmlElement* pMainElement = pMainNode->ToElement();
 
-		//获得根元素的名称
+		//获得元素的名称
 		sprintf_safe(objxmlInfo.m_szXMLName, 60, pMainElement->Value());
 		sprintf_safe(objxmlInfo.m_szDesc, 100, "%s", pMainElement->Attribute("desc"));
 		char* pCommandID = (char* )pMainElement->Attribute("CommandID");
 		if(NULL != pCommandID)
 		{
 			objxmlInfo.m_nCommandID =atoi(pCommandID);
+		}
+		char* pCommandType = (char* )pMainElement->Attribute("CommandType");
+		if(NULL != pCommandType)
+		{
+			if(strcmp(pCommandType, "in") == 0)
+			{
+				objxmlInfo.m_emCommandType = COMMAND_IN;
+			}
+			else if(strcmp(pCommandType, "out") == 0)
+			{
+				objxmlInfo.m_emCommandType = COMMAND_OUT;
+			}
 		}
 
 		//printf("Root=%s.\n", m_pRootElement->Value());
@@ -427,6 +439,53 @@ bool CXmlOpeation::Parse_XML_File(char* pFileName, vecXmlInfo& objvecXmlInfo)
 		}
 
 		objvecXmlInfo.push_back(objxmlInfo);
+	}
+
+	Close();
+	return true;
+}
+
+bool CXmlOpeation::Parse_XML_File_Project(const char* pFileName, _Project_Info& objProjectInfo)
+{
+	Close();
+	m_pTiXmlDocument = new TiXmlDocument(pFileName);
+	if(NULL == m_pTiXmlDocument)
+	{
+		return false;
+	}
+
+	if(false == m_pTiXmlDocument->LoadFile())
+	{
+		return false;
+	}
+
+	TiXmlNode* pMainNode = NULL;
+	//获得根元素
+	m_pRootElement = m_pTiXmlDocument->RootElement();
+
+	//循环打印出每一个变量
+	if(NULL == m_pRootElement)
+	{
+		return false;
+	}
+
+	//获得头元素
+	char* pName = GetData_Text("Name");
+	if(NULL != pName)
+	{
+		sprintf_safe(objProjectInfo.m_szProjectName, 100, "%s", pName);
+	}
+
+	char* pDesc = GetData("Name", "desc");
+	if(NULL != pDesc)
+	{
+		sprintf_safe(objProjectInfo.m_szProjectDesc, 200, "%s", pDesc);
+	}
+
+	char* pKeyID = GetData("Name", "keyID");
+	if(NULL != pKeyID)
+	{
+		sprintf_safe(objProjectInfo.m_szProjectKey, 100, "%s", pDesc);
 	}
 
 	Close();

@@ -186,6 +186,14 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\Write_Packet_Parse_cpp.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Write_Plugin_Main_cpp.h"
+				>
+			</File>
+			<File
 				RelativePath=".\XmlOpeation.h"
 				>
 			</File>

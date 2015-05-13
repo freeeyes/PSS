@@ -39,6 +39,13 @@ enum PROPERTY_CLASS
 	CLASS_MAP,
 };
 
+enum COMMAND_TYPE
+{
+	COMMAND_NONE,
+	COMMAND_IN,
+	COMMAND_OUT,
+};
+
 //属性信息
 struct _Property
 {
@@ -69,19 +76,35 @@ typedef vector<_Property> vecProperty;
 //类信息
 struct _Xml_Info
 {
-	char m_szXMLName[60];
-	char m_szDesc[100];
-	int  m_nCommandID;
-	vecProperty m_vecProperty;
+	char           m_szXMLName[60];
+	char           m_szDesc[100];
+	int            m_nCommandID;
+	COMMAND_TYPE   m_emCommandType;        //命令类型 
+	vecProperty    m_vecProperty;
 
 	_Xml_Info()
 	{
-		m_nCommandID   = 0;
-		m_szXMLName[0] = '\0';
-		m_szDesc[0]    = '\0';
+		m_nCommandID    = 0;
+		m_szXMLName[0]  = '\0';
+		m_szDesc[0]     = '\0';
+		m_emCommandType = COMMAND_NONE;
 	}
 };
 typedef vector<_Xml_Info> vecXmlInfo;
+
+struct _Project_Info
+{
+	char m_szProjectName[100];   //工程名称
+	char m_szProjectDesc[200];   //工程描述
+	char m_szProjectKey[100];    //工程key
+
+	_Project_Info()
+	{
+		m_szProjectName[0] = '\0';
+		m_szProjectDesc[0] = '\0';
+		m_szProjectKey[0]  = '\0';
+	}
+};
 
 inline void sprintf_safe(char* szText, int nLen, const char* fmt ...)
 {
@@ -115,7 +138,8 @@ public:
   char* GetData_Text(const char* pName, TiXmlElement*& pNextTiXmlElement);
 
   bool Parse_XML(char* pText, _Xml_Info& objxmlInfo);
-  bool Parse_XML_File(char* pFileName, vecXmlInfo& objvecXmlInfo);
+  bool Parse_XML_File(const char* pFileName, vecXmlInfo& objvecXmlInfo);
+  bool Parse_XML_File_Project(const char* pFileName, _Project_Info& objProjectInfo);
 
   void Close();
 

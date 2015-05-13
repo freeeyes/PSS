@@ -4,14 +4,23 @@
 <!-- sport under type -->
 <!-- string(Need length),uint8,uint16,uint32,uint64,int8,int16,int32,float32,float64 -->
 <configer>
-	<UserInfo CommandID="10240" desc="用户注册数据">
+	<AskUserRegedit CommandID="10240" CommandType="in" desc="用户注册请求">
 		<Name length="20" desc="名称">char</Name>
 		<Password length="20" desc="密码">char</Password>
 		<ID desc="用户ID">uint32</ID>
 		<Age desc="年龄">uint8</Age>
-	</UserInfo>
-
-	<UserData CommandID="10241" desc="用户信息">
+	</AskUserRegedit>
+	
+	<UserRegedit CommandID="11240" CommandType="out" desc="用户注册回应">
+		<Result desc="用户ID">uint8</Result>
+		<ID desc="用户ID">uint32</ID>
+	</UserRegedit>
+	
+	<AskUser CommandID="10241" CommandType="in" desc="用户信息请求">
+		<ID desc="用户ID">uint32</ID>
+	</AskUser>	
+	
+	<UserData CommandID="11241" CommandType="out" desc="用户信息回应">
 		<ID desc="用户ID">uint32</ID>
 		<Nick length="20" desc="昵称">char</Nick>
 		<Job desc="职业">uint8</Job>
@@ -25,8 +34,12 @@
 		<GridItemID desc="格子物品ID">uint32</GridItemID>
 		<GridItemCount desc="格子物品数量">uint8</GridItemCount>
 	</BagInfo>
-		
-	<UserBag desc="用户背包测试">
+	
+	<AskBag CommandID="10242" CommandType="in" desc="用户背包请求">
+		<ID desc="用户ID">uint32</ID>
+	</AskBag>
+	
+	<UserBag CommandID="11242" CommandType="out" desc="用户背包回应">
 		<ID desc="用户ID">uint32</ID>
 		<SingleInfo desc="单点信息">BagInfo</SingleInfo>
 		<Bag desc="背包信息" class="vector">BagInfo</Bag>
