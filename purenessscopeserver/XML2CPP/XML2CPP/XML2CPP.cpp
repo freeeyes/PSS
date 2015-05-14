@@ -8,6 +8,8 @@
 
 #include "Write_Packet_Parse_cpp.h"
 #include "Write_Plugin_Main_cpp.h"
+#include "Write_Plugin_Command.h"
+#include "Write_Plugin_Make.h"
 
 int main(int argc, char* argv[])
 {
@@ -55,6 +57,18 @@ int main(int argc, char* argv[])
 
 	//写入数据包文件
 	Gen_2_Cpp_Packet(objProjectInfo.m_szProjectName, objvecXmlInfo);
+
+	//写入Command头文件
+	Gen_2_Cpp_Command_H(objProjectInfo);
+
+	//写入Command体文件
+	Gen_2_Cpp_Command_Cpp(objProjectInfo, objvecXmlInfo);
+
+	//生成make文件
+	Gen_2_Make_define(objProjectInfo.m_szProjectName);
+	Gen_2_Make(objProjectInfo.m_szProjectName, objProjectInfo);
+	Gen_2_Mpc(objProjectInfo.m_szProjectName, objProjectInfo);
+	Gen_2_ZZZ(objProjectInfo.m_szProjectName);
 
 	printf("[success]OK.\n");
 	getchar();

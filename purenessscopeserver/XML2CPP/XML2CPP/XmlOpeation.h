@@ -92,11 +92,28 @@ struct _Xml_Info
 };
 typedef vector<_Xml_Info> vecXmlInfo;
 
+struct _Command_Relation_info
+{
+	char m_szCommandFuncName[100];
+	int  m_nCommandInID;
+	int  m_nCommandOutID;
+
+	_Command_Relation_info()
+	{
+		m_szCommandFuncName[0] = '\0';
+		m_nCommandInID         = 0;
+		m_nCommandOutID        = 0;
+	}
+};
+typedef vector<_Command_Relation_info> vecCommandRelationinfo;
+
 struct _Project_Info
 {
 	char m_szProjectName[100];   //工程名称
 	char m_szProjectDesc[200];   //工程描述
 	char m_szProjectKey[100];    //工程key
+
+	vecCommandRelationinfo m_objCommandList;    //命令关系
 
 	_Project_Info()
 	{

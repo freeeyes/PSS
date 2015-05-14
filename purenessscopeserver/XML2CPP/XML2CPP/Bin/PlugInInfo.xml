@@ -1,5 +1,9 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 
 <PlugIn>
-	<Name desc="自动化测试" keyID="MachineID">MachineTest</Name>	
+	<Name desc="autotest" keyID="MachineID">MachineTest</Name>	
+	
+	<Command CommandIn="10240" CommandOut="11240" >Do_User_Regedit</Command>
+	<Command CommandIn="10241" CommandOut="11241" >Do_User_Login</Command>
+	<Command CommandIn="10242" CommandOut="11242" >Do_User_Bag</Command>
 </PlugIn>

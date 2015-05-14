@@ -485,7 +485,35 @@ bool CXmlOpeation::Parse_XML_File_Project(const char* pFileName, _Project_Info& 
 	char* pKeyID = GetData("Name", "keyID");
 	if(NULL != pKeyID)
 	{
-		sprintf_safe(objProjectInfo.m_szProjectKey, 100, "%s", pDesc);
+		sprintf_safe(objProjectInfo.m_szProjectKey, 100, "%s", pKeyID);
+	}
+
+	//循环获得当前关系图
+	TiXmlElement* pCommandElement    = NULL;
+	TiXmlElement* pCommandInElement  = NULL;
+	TiXmlElement* pCommandOutElement = NULL;
+
+	while(true)
+	{
+		char* pCommandText = GetData_Text("Command", pCommandElement);
+		if(NULL == pCommandText)
+		{
+			break;
+		}
+
+		_Command_Relation_info objCommand;
+		sprintf_safe(objCommand.m_szCommandFuncName, 100, "%s", pCommandText);
+		char* pCommandIn = GetData("Command", "CommandIn", pCommandInElement);
+		if(NULL != pCommandIn)
+		{
+			objCommand.m_nCommandInID = (int)atoi(pCommandIn);
+		}
+		char* pCommandOut = GetData("Command", "CommandOut", pCommandOutElement);
+		if(NULL != pCommandOut)
+		{
+			objCommand.m_nCommandOutID = (int)atoi(pCommandOut);
+		}
+		objProjectInfo.m_objCommandList.push_back(objCommand);
 	}
 
 	Close();

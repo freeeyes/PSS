@@ -190,7 +190,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Write_Plugin_Command.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Write_Plugin_Main_cpp.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Write_Plugin_Make.h"
 				>
 			</File>
 			<File

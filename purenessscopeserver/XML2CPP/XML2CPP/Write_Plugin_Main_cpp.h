@@ -164,7 +164,7 @@ void Gen_2_Cpp_Main(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlInfo)
 	sprintf_safe(szTemp, 200, "\tOUR_DEBUG((LM_INFO, \"[%s LoadModuleData] *********************************.\\n\"));\n\n",
 		objProjectInfo.m_szProjectName);
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\tg_BaseCommand.ReadIniFile(pServerObject->GetModuleInfo()->GetModuleParam(g_szName));\n\n");
+	sprintf_safe(szTemp, 200, "\t//add your plugin init code at here.\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\tOUR_DEBUG((LM_INFO, \"[%s LoadModuleData] End.\\n\"));\n\n",
 		objProjectInfo.m_szProjectName);
@@ -217,8 +217,6 @@ void Gen_2_Cpp_Main(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlInfo)
 	sprintf_safe(szTemp, 200, "{\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\treturn g_szDesc;\n");
-	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "}\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "}\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
