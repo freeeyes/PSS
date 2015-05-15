@@ -173,11 +173,26 @@ bool CServerManager::Start()
 
 		if (pServerInfo->m_u1IPType == TYPE_IPV4)
 		{
-			nErr = listenAddr.set(pServerInfo->m_nPort, pServerInfo->m_szServerIP);
+			if(ACE_OS::strcmp(pServerInfo->m_szServerIP, "INADDR_ANY") == 0)
+			{
+				nErr = listenAddr.set(pServerInfo->m_nPort, (uint32)INADDR_ANY);
+			}
+			else
+			{
+				nErr = listenAddr.set(pServerInfo->m_nPort, pServerInfo->m_szServerIP);
+			}
 		}
 		else
 		{
-			nErr = listenAddr.set(pServerInfo->m_nPort, pServerInfo->m_szServerIP, 1, PF_INET6);
+			if(ACE_OS::strcmp(pServerInfo->m_szServerIP, "INADDR_ANY") == 0)
+			{
+				nErr = listenAddr.set(pServerInfo->m_nPort, (uint32)INADDR_ANY);
+			}
+			else
+			{
+				nErr = listenAddr.set(pServerInfo->m_nPort, pServerInfo->m_szServerIP, 1, PF_INET6);
+			}
+			
 		}
 
 		if (nErr != 0)
@@ -225,11 +240,25 @@ bool CServerManager::Start()
 
 		if (pServerInfo->m_u1IPType == TYPE_IPV4)
 		{
-			nErr = listenAddr.set(pServerInfo->m_nPort, pServerInfo->m_szServerIP);
+			if(ACE_OS::strcmp(pServerInfo->m_szServerIP, "INADDR_ANY") == 0)
+			{
+				nErr = listenAddr.set(pServerInfo->m_nPort, (uint32)INADDR_ANY);
+			}
+			else
+			{
+				nErr = listenAddr.set(pServerInfo->m_nPort, pServerInfo->m_szServerIP);
+			}
 		}
 		else
 		{
-			nErr = listenAddr.set(pServerInfo->m_nPort, pServerInfo->m_szServerIP, 1, PF_INET6);
+			if(ACE_OS::strcmp(pServerInfo->m_szServerIP, "INADDR_ANY") == 0)
+			{
+				nErr = listenAddr.set(pServerInfo->m_nPort, (uint32)INADDR_ANY);
+			}
+			else
+			{
+				nErr = listenAddr.set(pServerInfo->m_nPort, pServerInfo->m_szServerIP, 1, PF_INET6);
+			}
 		}
 
 		if (nErr != 0)
@@ -266,11 +295,25 @@ bool CServerManager::Start()
 
 		if (App_MainConfig::instance()->GetConsoleIPType() == TYPE_IPV4)
 		{
-			nErr = listenConsoleAddr.set(App_MainConfig::instance()->GetConsolePort(), App_MainConfig::instance()->GetConsoleIP());
+			if(ACE_OS::strcmp(App_MainConfig::instance()->GetConsoleIP(), "INADDR_ANY") == 0)
+			{
+				nErr = listenConsoleAddr.set(App_MainConfig::instance()->GetConsolePort(), (uint32)INADDR_ANY);
+			}
+			else
+			{
+				nErr = listenConsoleAddr.set(App_MainConfig::instance()->GetConsolePort(), App_MainConfig::instance()->GetConsoleIP());
+			}
 		}
 		else
 		{
-			nErr = listenConsoleAddr.set(App_MainConfig::instance()->GetConsolePort(), App_MainConfig::instance()->GetConsoleIP(), 1, PF_INET6);
+			if(ACE_OS::strcmp(App_MainConfig::instance()->GetConsoleIP(), "INADDR_ANY") == 0)
+			{
+				nErr = listenConsoleAddr.set(App_MainConfig::instance()->GetConsolePort(), (uint32)INADDR_ANY);
+			}
+			else
+			{
+				nErr = listenConsoleAddr.set(App_MainConfig::instance()->GetConsolePort(), App_MainConfig::instance()->GetConsoleIP(), 1, PF_INET6);
+			}
 		}
 
 		if (nErr != 0)
