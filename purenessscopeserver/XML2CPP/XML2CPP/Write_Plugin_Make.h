@@ -87,7 +87,8 @@ void Gen_2_Make(const char* pPath, _Project_Info& objProjectInfo)
 	sprintf_safe(szTemp, 200, "PATS = BaseCommand.o %s.o\n\n",
 		objProjectInfo.m_szProjectName);
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "LIB_BASE_OBJS = BaseCommand.o s.o\n\n",
+	sprintf_safe(szTemp, 200, "LIB_BASE_OBJS = BaseCommand.o %s.o %s_Logic.o\n\n",
+		objProjectInfo.m_szProjectName,
 		objProjectInfo.m_szProjectName);
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "LIB_BASE = lib%s.so\n\n",

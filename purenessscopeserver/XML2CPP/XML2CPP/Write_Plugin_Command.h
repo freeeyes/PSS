@@ -1,13 +1,14 @@
 #ifndef _WRITE_PLUGIN_COMMAND_H
 #define _WRITE_PLUGIN_COMMAND_H
 
+#include "XmlOpeation.h"
+
 void Gen_2_Cpp_Command_H(_Project_Info& objProjectInfo)
 {
 	char szTemp[200]     = {'\0'};
 	char szPathFile[200] = {'\0'};
 
 	sprintf_safe(szPathFile, 200, "%s/BaseCommand.h", 
-		objProjectInfo.m_szProjectName, 
 		objProjectInfo.m_szProjectName);
 
 	//首先生成声明文件。
@@ -19,7 +20,8 @@ void Gen_2_Cpp_Command_H(_Project_Info& objProjectInfo)
 
 	sprintf_safe(szTemp, 200, "#pragma once\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "#include \"Protocol.h\"\n");
+	sprintf_safe(szTemp, 200, "#include \"%s_Logic.h\"\n",
+		objProjectInfo.m_szProjectName);
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "#include \"ClientCommand.h\"\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -90,7 +92,6 @@ void Gen_2_Cpp_Command_Cpp(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlI
 	char szPathFile[200] = {'\0'};
 
 	sprintf_safe(szPathFile, 200, "%s/BaseCommand.cpp", 
-		objProjectInfo.m_szProjectName, 
 		objProjectInfo.m_szProjectName);
 
 	//首先生成声明文件。
@@ -190,7 +191,7 @@ void Gen_2_Cpp_Command_Cpp(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlI
 				sprintf_safe(szTemp, 200, "\t\tOUR_DEBUG((LM_ERROR, \"[CBaseCommand::%s] pRecvPacket is NULL.\\n\"));\n",
 					objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t\t return -1;\n");
+				sprintf_safe(szTemp, 200, "\t\treturn -1;\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t}\n\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -208,9 +209,40 @@ void Gen_2_Cpp_Command_Cpp(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlI
 					pXmlInfo->m_szXMLName,
 					pXmlInfo->m_szXMLName);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\tm_pServerObject->GetPacketManager()->Delete(pRecvPacket);\n\n");
+				sprintf_safe(szTemp, 200, "\tm_pServerObject->GetPacketManager()->Delete(pRecvPacket);\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t//add your dispose code at here.\n\n");
+				sprintf_safe(szTemp, 200, "\tbool blState = false;\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				if(objProjectInfo.m_objCommandList[i].m_nCommandOutID > 0)
+				{
+					_Xml_Info* pXmlOut = Find_Xml_StructInfo(objProjectInfo.m_objCommandList[i].m_nCommandOutID, objvecXmlInfo);
+					if(NULL != pXmlOut)
+					{
+						sprintf_safe(szTemp, 200, "\t%s obj%s;\n",
+							pXmlOut->m_szXMLName,
+							pXmlOut->m_szXMLName);
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+						sprintf_safe(szTemp, 200, "\tblState = Logic_%s(obj%s, obj%s);\n",
+							pXmlInfo->m_szXMLName,
+							pXmlInfo->m_szXMLName,
+							pXmlOut->m_szXMLName);
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					}
+				}
+				else
+				{
+					sprintf_safe(szTemp, 200, "\tblState = Logic_%s(obj%s);\n", 
+						pXmlInfo->m_szXMLName,
+						pXmlInfo->m_szXMLName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				sprintf_safe(szTemp, 200, "\tif(false == blState)\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t{\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t\treturn -1;\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t}\n\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			}
 		}
@@ -220,10 +252,6 @@ void Gen_2_Cpp_Command_Cpp(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlI
 			_Xml_Info* pXmlInfo = Find_Xml_StructInfo(objProjectInfo.m_objCommandList[i].m_nCommandOutID, objvecXmlInfo);
 			if(NULL != pXmlInfo)
 			{
-				sprintf_safe(szTemp, 200, "\t%s obj%s;\n",
-					pXmlInfo->m_szXMLName,
-					pXmlInfo->m_szXMLName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\tIBuffPacket* pSendPacket = m_pServerObject->GetPacketManager()->Create();\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\tif(NULL == pSendPacket)\n");
@@ -233,7 +261,7 @@ void Gen_2_Cpp_Command_Cpp(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlI
 				sprintf_safe(szTemp, 200, "\t\tOUR_DEBUG((LM_ERROR, \"[CBaseCommand::%s] pSendPacket is NULL.\\n\"));\n",
 					objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t\t return -1;\n\n");
+				sprintf_safe(szTemp, 200, "\t\treturn -1;\n\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t}\n\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);

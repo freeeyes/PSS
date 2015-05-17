@@ -194,6 +194,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Write_Plugin_Logic.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Write_Plugin_Main_cpp.h"
 				>
 			</File>
