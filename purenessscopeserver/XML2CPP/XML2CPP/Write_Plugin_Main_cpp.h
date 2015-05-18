@@ -126,9 +126,18 @@ void Gen_2_Cpp_Main(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlInfo)
 	{
 		if(objvecXmlInfo[i].m_emCommandType == COMMAND_IN)
 		{
-			sprintf_safe(szTemp, 200, "\t\tpMessageManager->AddClientCommand((uint16)%d, &g_BaseCommand, g_szName);\n",
-				objvecXmlInfo[i].m_nCommandID);
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			if(strlen(objvecXmlInfo[i].m_szMacroName) > 0)
+			{
+				sprintf_safe(szTemp, 200, "\t\tpMessageManager->AddClientCommand((uint16)%s, &g_BaseCommand, g_szName);\n",
+					objvecXmlInfo[i].m_szMacroName);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+			else
+			{
+				sprintf_safe(szTemp, 200, "\t\tpMessageManager->AddClientCommand((uint16)%d, &g_BaseCommand, g_szName);\n",
+					objvecXmlInfo[i].m_nCommandID);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
 		}
 	}
 	sprintf_safe(szTemp, 200, "\t}\n");
@@ -194,9 +203,18 @@ void Gen_2_Cpp_Main(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlInfo)
 	{
 		if(objvecXmlInfo[i].m_emCommandType == COMMAND_IN)
 		{
-			sprintf_safe(szTemp, 200, "\t\t\tpMessageManager->DelClientCommand((uint16)%d, &g_BaseCommand);\n",
-				objvecXmlInfo[i].m_nCommandID);
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			if(strlen(objvecXmlInfo[i].m_szMacroName) > 0)
+			{
+				sprintf_safe(szTemp, 200, "\t\t\tpMessageManager->DelClientCommand((uint16)%s, &g_BaseCommand);\n",
+					objvecXmlInfo[i].m_szMacroName);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+			else
+			{
+				sprintf_safe(szTemp, 200, "\t\t\tpMessageManager->DelClientCommand((uint16)%d, &g_BaseCommand);\n",
+					objvecXmlInfo[i].m_nCommandID);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
 		}
 	}
 	sprintf_safe(szTemp, 200, "\t\t\tpMessageManager = NULL;\n");

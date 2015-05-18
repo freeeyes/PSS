@@ -331,6 +331,12 @@ bool CXmlOpeation::Parse_XML_File(const char* pFileName, vecXmlInfo& objvecXmlIn
 				objxmlInfo.m_emCommandType = COMMAND_OUT;
 			}
 		}
+		//得到宏定义
+		char* pMacroName = (char* )pMainElement->Attribute("MacroName");
+		if(NULL != pMacroName)
+		{
+			sprintf_safe(objxmlInfo.m_szMacroName, 50, "%s", pMacroName);
+		}
 
 		//printf("Root=%s.\n", m_pRootElement->Value());
 
@@ -433,7 +439,6 @@ bool CXmlOpeation::Parse_XML_File(const char* pFileName, vecXmlInfo& objvecXmlIn
 
 				//得到参数描述信息
 				sprintf_safe(objProperty.m_szDesc, 100, "%s", pNode->ToElement()->Attribute("desc"));
-
 				objxmlInfo.m_vecProperty.push_back(objProperty);
 			}
 		}

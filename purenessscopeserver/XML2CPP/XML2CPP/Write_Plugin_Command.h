@@ -155,10 +155,24 @@ void Gen_2_Cpp_Command_Cpp(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlI
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	for(int i = 0; i < (int)objProjectInfo.m_objCommandList.size(); i++)
 	{
-		sprintf_safe(szTemp, 200, "\tMESSAGE_FUNCTION((uint16)%d,  %s, pMessage);\n",
-			objProjectInfo.m_objCommandList[i].m_nCommandInID,
-			objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
-		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		_Xml_Info* pXmlInfo = Find_Xml_StructInfo(objProjectInfo.m_objCommandList[i].m_nCommandInID, objvecXmlInfo);
+		if(NULL != pXmlInfo)
+		{
+			if(strlen(pXmlInfo->m_szMacroName) > 0)
+			{
+				sprintf_safe(szTemp, 200, "\tMESSAGE_FUNCTION((uint16)%s,  %s, pMessage);\n",
+					pXmlInfo->m_szMacroName,
+					objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+			else
+			{
+				sprintf_safe(szTemp, 200, "\tMESSAGE_FUNCTION((uint16)%d,  %s, pMessage);\n",
+					objProjectInfo.m_objCommandList[i].m_nCommandInID,
+					objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+		}
 	}
 	sprintf_safe(szTemp, 200, "\tMESSAGE_FUNCTION_END;\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);

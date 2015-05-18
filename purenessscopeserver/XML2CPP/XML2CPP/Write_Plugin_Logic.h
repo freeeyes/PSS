@@ -69,7 +69,7 @@ void Gen_2_Cpp_Logic_Cpp(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlInf
 	char szTemp[200]     = {'\0'};
 	char szPathFile[200] = {'\0'};
 
-	sprintf_safe(szPathFile, 200, "%s/%sLogic.cpp", 
+	sprintf_safe(szPathFile, 200, "%s/%s_Logic.cpp", 
 		objProjectInfo.m_szProjectName, 
 		objProjectInfo.m_szProjectName);
 

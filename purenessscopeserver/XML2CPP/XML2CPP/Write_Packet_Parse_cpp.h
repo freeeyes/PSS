@@ -785,6 +785,22 @@ void Gen_2_Cpp_Packet(const char* pPath, vecXmlInfo& objvecXmlInfo)
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	//定义所有需要用到的命令宏
+	for(int i = 0; i < (int)objvecXmlInfo.size(); i++)
+	{
+		if(strlen(objvecXmlInfo[i].m_szMacroName) > 0)
+		{
+			sprintf_safe(szTemp, 200, "#define %s %d\n",
+				objvecXmlInfo[i].m_szMacroName,
+				objvecXmlInfo[i].m_nCommandID);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		}
+	}
+	sprintf_safe(szTemp, 200, "\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	//生成所有的数据结构
 	for(int i = 0; i < (int)objvecXmlInfo.size(); i++)
 	{
 		//Display(objvecXmlInfo[i]);

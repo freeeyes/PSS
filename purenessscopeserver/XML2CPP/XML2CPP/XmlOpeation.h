@@ -78,16 +78,18 @@ struct _Xml_Info
 {
 	char           m_szXMLName[60];
 	char           m_szDesc[100];
+	char           m_szMacroName[50];
 	int            m_nCommandID;
 	COMMAND_TYPE   m_emCommandType;        //√¸¡Ó¿‡–Õ 
 	vecProperty    m_vecProperty;
 
 	_Xml_Info()
 	{
-		m_nCommandID    = 0;
-		m_szXMLName[0]  = '\0';
-		m_szDesc[0]     = '\0';
-		m_emCommandType = COMMAND_NONE;
+		m_nCommandID     = 0;
+		m_szXMLName[0]   = '\0';
+		m_szDesc[0]      = '\0';
+		m_szMacroName[0] = '\0';
+		m_emCommandType  = COMMAND_NONE;
 	}
 };
 typedef vector<_Xml_Info> vecXmlInfo;
