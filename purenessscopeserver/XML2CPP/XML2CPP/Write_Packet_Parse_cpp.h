@@ -217,19 +217,19 @@ void Gen_2_Cpp_In_Stream(FILE* pFile, _Xml_Info& objxmlInfo)
 	{
 		if(objxmlInfo.m_vecProperty[i].m_emType == PROPERTY_CHAR)
 		{
-			if(objxmlInfo.m_vecProperty[i].m_nLength <= 255)
+			if(objxmlInfo.m_vecProperty[i].m_nLength <= 255 && objxmlInfo.m_vecProperty[i].m_nNeedHeadLength == 0)
 			{
 				sprintf_safe(szTemp, 200, "\t_VCHARS_STR vs%s;\n", 
 					objxmlInfo.m_vecProperty[i].m_szPropertyName);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			}
-			else if(objxmlInfo.m_vecProperty[i].m_nLength <= 56635)
+			else if(objxmlInfo.m_vecProperty[i].m_nLength <= 56635 && objxmlInfo.m_vecProperty[i].m_nNeedHeadLength == 0)
 			{
 				sprintf_safe(szTemp, 200, "\t_VCHARM_STR vs%s;\n", 
 					objxmlInfo.m_vecProperty[i].m_szPropertyName);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			}
-			else
+			else if(objxmlInfo.m_vecProperty[i].m_nNeedHeadLength == 0)
 			{
 				sprintf_safe(szTemp, 200, "\t_VCHARB_STR vs%s;\n", 
 					objxmlInfo.m_vecProperty[i].m_szPropertyName);
@@ -253,7 +253,7 @@ void Gen_2_Cpp_In_Stream(FILE* pFile, _Xml_Info& objxmlInfo)
 	{
 		if(objxmlInfo.m_vecProperty[i].m_emType == PROPERTY_CHAR)
 		{
-			if(objxmlInfo.m_vecProperty[i].m_nLength < 255)
+			if(objxmlInfo.m_vecProperty[i].m_nLength < 255  && objxmlInfo.m_vecProperty[i].m_nNeedHeadLength == 0)
 			{
 				sprintf_safe(szTemp, 200, "\tuint8 u1%sLen = (uint8)strlen(obj%s.m_sz%s);\n",
 					objxmlInfo.m_vecProperty[i].m_szPropertyName,
@@ -270,7 +270,7 @@ void Gen_2_Cpp_In_Stream(FILE* pFile, _Xml_Info& objxmlInfo)
 					objxmlInfo.m_vecProperty[i].m_szPropertyName);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			}
-			else if(objxmlInfo.m_vecProperty[i].m_nLength < 65535 && objxmlInfo.m_vecProperty[i].m_nLength >= 255)
+			else if(objxmlInfo.m_vecProperty[i].m_nLength < 65535 && objxmlInfo.m_vecProperty[i].m_nLength >= 255  && objxmlInfo.m_vecProperty[i].m_nNeedHeadLength == 0)
 			{
 				sprintf_safe(szTemp, 200, "\tuint16 u2%sLen = (uint16)strlen(obj%s.m_sz%s);\n",
 					objxmlInfo.m_vecProperty[i].m_szPropertyName,
@@ -287,7 +287,7 @@ void Gen_2_Cpp_In_Stream(FILE* pFile, _Xml_Info& objxmlInfo)
 					objxmlInfo.m_vecProperty[i].m_szPropertyName);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			}
-			else
+			else if(objxmlInfo.m_vecProperty[i].m_nNeedHeadLength == 0)
 			{
 				sprintf_safe(szTemp, 200, "\tuint32 u4%sLen = (uint32)strlen(obj%s.m_sz%s);\n",
 					objxmlInfo.m_vecProperty[i].m_szPropertyName,
@@ -302,6 +302,15 @@ void Gen_2_Cpp_In_Stream(FILE* pFile, _Xml_Info& objxmlInfo)
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t(*pBuffPacket) << vs%s;\n",
 					objxmlInfo.m_vecProperty[i].m_szPropertyName);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+			else
+			{
+				sprintf_safe(szTemp, 200, "\tpBuffPacket->WriteStream(obj%s.m_sz%s, ACE_OS::strlen(obj%s.m_sz%s));\n",
+					objxmlInfo.m_vecProperty[i].m_szPropertyName,
+					objxmlInfo.m_szXMLName,
+					objxmlInfo.m_vecProperty[i].m_szPropertyName,
+					objxmlInfo.m_szXMLName);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			}
 

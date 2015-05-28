@@ -187,6 +187,14 @@ bool CXmlOpeation::Parse_XML(char* pText, _Xml_Info& objxmlInfo)
 				{
 					objProperty.m_nLength = (int)atoi(pLength);
 				}
+				char* pNeedLength = (char* )pNode->ToElement()->Attribute("NeedHeadLength");
+				if(NULL != pNeedLength)
+				{
+					if(strcmp(pNeedLength, "NO") == 0)
+					{
+						objProperty.m_nNeedHeadLength = 1;
+					}
+				}
 			}
 			else if(strcmp(pNode->ToElement()->GetText(), "string") == 0)
 			{
@@ -360,6 +368,14 @@ bool CXmlOpeation::Parse_XML_File(const char* pFileName, vecXmlInfo& objvecXmlIn
 					{
 						objProperty.m_nLength = (int)atoi(pLength);
 					}
+					char* pNeedLength = (char* )pNode->ToElement()->Attribute("NeedHeadLength");
+					if(NULL != pNeedLength)
+					{
+						if(strcmp(pNeedLength, "NO") == 0)
+						{
+							objProperty.m_nNeedHeadLength = 1;
+						}
+					}
 				}
 				else if(strcmp(pNode->ToElement()->GetText(), "string") == 0)
 				{
@@ -517,6 +533,14 @@ bool CXmlOpeation::Parse_XML_File_Project(const char* pFileName, _Project_Info& 
 		if(NULL != pCommandOut)
 		{
 			objCommand.m_nCommandOutID = (int)atoi(pCommandOut);
+		}
+		char* pCommandOutPacket = GetData("Command", "OutPacket", pCommandOutElement);
+		if(NULL != pCommandOutPacket)
+		{
+			if(strcmp(pCommandOutPacket, "NO") == 0)
+			{
+				objCommand.m_nOutPcket = 1;
+			}
 		}
 		objProjectInfo.m_objCommandList.push_back(objCommand);
 	}

@@ -22,7 +22,7 @@
 	
 	<UserData CommandID="11241" CommandType="out" MacroName="COMMAND_LOGIN_R" desc="用户信息回应">
 		<ID desc="用户ID">uint32</ID>
-		<Nick length="20" desc="昵称">char</Nick>
+		<Nick NeedHeadLength="YES" length="20" desc="昵称">char</Nick>
 		<Job desc="职业">uint8</Job>
 		<Ablity desc="能力">uint16</Ablity>		
 	</UserData>	

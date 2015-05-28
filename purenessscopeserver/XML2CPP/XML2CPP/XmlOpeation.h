@@ -54,7 +54,8 @@ struct _Property
 	char           m_szDesc[100];          //描述信息  
 	PROPERTY_TYPE  m_emType;               //参数类型
 	PROPERTY_CLASS m_emClass;              //参数类别
-	int            m_nLength;              //长度 
+	int            m_nLength;              //长度
+	int            m_nNeedHeadLength;      //是否需要自动追加数据长度 0追加，1不追加
 	char           m_szKeyName[50];        //KeyName
 	PROPERTY_TYPE  m_emKeyType;            //key参数类型
 
@@ -68,6 +69,7 @@ struct _Property
 		m_emKeyType         = PROPERTY_UNKNOW;
 		m_emClass           = CLASS_SINGLE;
 		m_nLength           = 0;
+		m_nNeedHeadLength   = 0;
 	}
 };
 
@@ -99,12 +101,14 @@ struct _Command_Relation_info
 	char m_szCommandFuncName[100];
 	int  m_nCommandInID;
 	int  m_nCommandOutID;
+	int  m_nOutPcket;        //0为走PacketParse 1为直接发送  
 
 	_Command_Relation_info()
 	{
 		m_szCommandFuncName[0] = '\0';
 		m_nCommandInID         = 0;
 		m_nCommandOutID        = 0;
+		m_nOutPcket            = 0;
 	}
 };
 typedef vector<_Command_Relation_info> vecCommandRelationinfo;

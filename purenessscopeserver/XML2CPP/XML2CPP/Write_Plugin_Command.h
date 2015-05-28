@@ -293,8 +293,16 @@ void Gen_2_Cpp_Command_Cpp(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlI
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t\t\tpSendPacket,\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t\t\tSENDMESSAGE_NOMAL,\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				if(objProjectInfo.m_objCommandList[i].m_nOutPcket == 1)
+				{
+					sprintf_safe(szTemp, 200, "\t\t\tSENDMESSAGE_JAMPNOMAL,\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				else
+				{
+					sprintf_safe(szTemp, 200, "\t\t\tSENDMESSAGE_NOMAL,\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
 				sprintf_safe(szTemp, 200, "\t\t\t(uint16)%d,\n", 
 					objProjectInfo.m_objCommandList[i].m_nCommandOutID);
 				sprintf_safe(szTemp, 200, "\t\t\tPACKET_SEND_IMMEDIATLY,\n");
