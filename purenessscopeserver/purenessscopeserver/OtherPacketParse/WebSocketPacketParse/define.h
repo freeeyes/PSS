@@ -251,7 +251,7 @@ enum EM_Server_Connect_State
 #define DEBUG_ON  1
 #define DEBUG_OFF 0
 
-#define OUR_DEBUG(X)  ACE_DEBUG((LM_INFO, "[%t]")); ACE_DEBUG(X)
+#define OUR_DEBUG(X)  ACE_DEBUG((LM_INFO, "[%T|%t]")); ACE_DEBUG(X)
 
 enum
 {
@@ -410,6 +410,44 @@ inline bool memmove_safe(char* pSrc, uint32 u4SrcLen, char* pDes, uint32 u4DesLe
 		ACE_OS::memmove((void* )pDes, (void* )pSrc, (size_t)u4SrcLen);
 		return true;
 	}	
+}
+
+//打印指定的Messahe_Block中的信息到屏幕
+inline void Print_Binary(ACE_Message_Block* pMessageBlock)
+{
+	if(NULL != pMessageBlock)
+	{
+		char* pData = pMessageBlock->rd_ptr();
+		int nLen = pMessageBlock->length();
+		OUR_DEBUG((LM_INFO, "[Print_Binary]"));
+		for(int i = 0; i < nLen; i++)
+		{
+			OUR_DEBUG((LM_INFO, " %02x", (unsigned char)pData[i]));
+		}
+		OUR_DEBUG((LM_INFO, "\n"));
+	}
+	else
+	{
+		OUR_DEBUG((LM_INFO, "[Print_Binary]pMessageBlock is NULL.\n"));
+	}
+}
+
+//打印指定的Messahe_Block中的信息到屏幕
+inline void Print_Binary(const char* pData, int nLen)
+{
+	if(NULL != pData)
+	{
+		OUR_DEBUG((LM_INFO, "[Print_Binary]"));
+		for(int i = 0; i < nLen; i++)
+		{
+			OUR_DEBUG((LM_INFO, " %02x", (unsigned char)pData[i]));
+		}
+		OUR_DEBUG((LM_INFO, "\n"));
+	}
+	else
+	{
+		OUR_DEBUG((LM_INFO, "[Print_Binary]pData is NULL.\n"));
+	}
 }
 
 //标记VCHARS_TYPE的模式
