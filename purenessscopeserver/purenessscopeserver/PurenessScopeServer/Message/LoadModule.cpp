@@ -23,7 +23,7 @@ void CLoadModule::Close()
 	for(int i = 0; i < m_mapModuleInfo.GetSize(); i++)
 	{
 		//卸载并删除当初new的module对象
-		UnLoadModule(m_mapModuleInfo.GetMapDataKey(i).c_str());
+		UnLoadModule(m_mapModuleInfo.GetMapDataKey(i).c_str(), false);
 	}
 
 	m_mapModuleInfo.Clear();
@@ -158,7 +158,7 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, c
 	return true;
 }
 
-bool CLoadModule::UnLoadModule(const char* szResourceName)
+bool CLoadModule::UnLoadModule(const char* szResourceName, bool blIsDelete)
 {
 	OUR_DEBUG((LM_ERROR, "[CLoadModule::UnLoadModule]szResourceName=%s.\n", szResourceName));
 	string strModuleName = szResourceName;
@@ -178,7 +178,11 @@ bool CLoadModule::UnLoadModule(const char* szResourceName)
 
 		//清除模块相关索引和数据
 		int nRet = ACE_OS::dlclose(pModuleInfo->hModule);
-		m_mapModuleInfo.DelMapData(strModuleName, true);
+
+		if(true == blIsDelete)
+		{
+			m_mapModuleInfo.DelMapData(strModuleName, true);
+		}
 
 		OUR_DEBUG((LM_ERROR, "[CLoadModule::UnLoadModule] Close Module=%s, nRet=%d!\n", strModuleName.c_str(), nRet));
 
