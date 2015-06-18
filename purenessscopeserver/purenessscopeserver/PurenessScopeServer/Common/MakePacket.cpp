@@ -201,6 +201,12 @@ bool CMakePacket::ProcessMessageBlock(_MakePacket* pMakePacket)
 		if(pMakePacket->m_PacketType == 0)
 		{
 			//TCP数据包处理方法
+			//记录IP
+			sprintf_safe(pMessage->GetMessageBase()->m_szIP, MAX_BUFF_20, "%s", pMakePacket->m_AddrRemote.get_host_addr());
+			pMessage->GetMessageBase()->m_u4Port = (uint32)pMakePacket->m_AddrRemote.get_port_number(); 
+			sprintf_safe(pMessage->GetMessageBase()->m_szListenIP, MAX_BUFF_20, "%s", pMakePacket->m_AddrListen.get_host_addr());
+			pMessage->GetMessageBase()->m_u4ListenPort = (uint32)pMakePacket->m_AddrListen.get_port_number(); 
+
 			SetMessage(pMakePacket->m_pPacketParse, pMakePacket->m_u4ConnectID, pMessage);
 		}
 		else

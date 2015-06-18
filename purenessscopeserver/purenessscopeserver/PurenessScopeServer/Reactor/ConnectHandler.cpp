@@ -1548,8 +1548,15 @@ bool CConnectHandler::CheckMessage()
 	//组织数据
 	_MakePacket objMakePacket;
 
-	objMakePacket.m_u4ConnectID       = GetConnectID();
 	objMakePacket.m_pPacketParse      = m_pPacketParse;
+	if(ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
+	{
+		objMakePacket.m_AddrListen.set(m_u4LocalPort);
+	}
+	else
+	{
+		objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
+	}
 
 	//将数据Buff放入消息体中
 	if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_PARSE, &objMakePacket))

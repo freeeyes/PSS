@@ -994,7 +994,7 @@ bool CProConnectHandle::CheckMessage()
 {
 	if(m_pPacketParse->GetMessageHead() != NULL)
 	{
-		m_ThreadWriteLock.acquire();
+		//m_ThreadWriteLock.acquire();
 		if(m_pPacketParse->GetMessageBody() == NULL)
 		{
 			m_u4AllRecvSize += (uint32)m_pPacketParse->GetMessageHead()->length();
@@ -1007,7 +1007,7 @@ bool CProConnectHandle::CheckMessage()
 
 		//如果有需要监控的IP，则记录字节流信息
 		//App_IPAccount::instance()->UpdateIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
-		m_ThreadWriteLock.release();
+		//m_ThreadWriteLock.release();
 
 		ACE_Date_Time dtNow;
 		if(false == m_TimeConnectInfo.RecvCheck((uint8)dtNow.minute(), 1, m_u4AllRecvSize))
@@ -1034,6 +1034,14 @@ bool CProConnectHandle::CheckMessage()
 		_MakePacket objMakePacket;
 
 		objMakePacket.m_pPacketParse      = m_pPacketParse;
+		if(ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
+		{
+			objMakePacket.m_AddrListen.set(m_u4LocalPort);
+		}
+		else
+		{
+			objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
+		}
 
 		//将数据Buff放入消息体中，传递给MakePacket处理。
 		if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_PARSE, &objMakePacket))

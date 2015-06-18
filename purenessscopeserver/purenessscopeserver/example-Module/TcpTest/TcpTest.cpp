@@ -51,6 +51,13 @@ int LoadModuleData(CServerObject* pServerObject)
   if(NULL != pMessageManager)
   {
     pMessageManager->AddClientCommand(COMMAND_BASE, &g_BaseCommand, g_szName);
+
+	//测试绑定指定的监听端口
+	//_ClientIPInfo objClientIPInfo;
+	//sprintf_safe(objClientIPInfo.m_szClientIP, MAX_BUFF_50, "0.0.0.0", objClientIPInfo);
+	//objClientIPInfo.m_nPort = 10002;
+	//pMessageManager->AddClientCommand(COMMAND_BASE, &g_BaseCommand, g_szName);
+
     pMessageManager->AddClientCommand(CLIENT_LINK_CONNECT, &g_BaseCommand, g_szName);
     pMessageManager->AddClientCommand(CLIENT_LINK_CDISCONNET, &g_BaseCommand, g_szName);
 	pMessageManager->AddClientCommand(CLINET_LINK_SENDTIMEOUT, &g_BaseCommand, g_szName);

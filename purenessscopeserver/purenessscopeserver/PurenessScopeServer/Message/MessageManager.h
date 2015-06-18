@@ -22,6 +22,7 @@ struct _ClientCommandInfo
 	ACE_Date_Time   m_dtLoadTime;                  //当前命令加载时间
 	uint32          m_u4CurrUsedCount;             //当前正在使用的引用次数
 	uint8           m_u1State;                     //当前命令的状态，0为正常，1为正在关闭
+	_ClientIPInfo   m_objListenIPInfo;             //当前允许的IP和端口入口，默认是所有当前端口
 
 	_ClientCommandInfo()
 	{
@@ -75,7 +76,25 @@ public:
 		_ClientCommandInfo* pClientCommandInfo = new _ClientCommandInfo();
 		if(NULL != pClientCommandInfo)
 		{
-			pClientCommandInfo->m_pClientCommand = pClientCommand;
+			pClientCommandInfo->m_pClientCommand  = pClientCommand;
+			m_vecClientCommandList.push_back(pClientCommandInfo);
+			sprintf_safe(pClientCommandInfo->m_szModuleName, MAX_BUFF_100, "%s", pMuduleName);
+			return pClientCommandInfo;
+		}
+		else
+		{
+			return NULL;
+		}
+
+	};
+
+	_ClientCommandInfo* AddClientCommand(CClientCommand* pClientCommand, const char* pMuduleName, _ClientIPInfo objListenInfo)
+	{
+		_ClientCommandInfo* pClientCommandInfo = new _ClientCommandInfo();
+		if(NULL != pClientCommandInfo)
+		{
+			pClientCommandInfo->m_pClientCommand  = pClientCommand;
+			pClientCommandInfo->m_objListenIPInfo = objListenInfo;
 			m_vecClientCommandList.push_back(pClientCommandInfo);
 			sprintf_safe(pClientCommandInfo->m_szModuleName, MAX_BUFF_100, "%s", pMuduleName);
 			return pClientCommandInfo;
@@ -140,6 +159,7 @@ public:
 	bool DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost, uint16& u2Count, bool& bDeleteFlag);   //执行命令
 	void Close();
 
+	bool AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, _ClientIPInfo objListenInfo);   //注册命令
 	bool AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName);   //注册命令
 	bool DelClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand);                            //卸载命令
  

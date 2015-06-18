@@ -49,6 +49,16 @@ bool CMessageManager::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uin
 			_ClientCommandInfo* pClientCommandInfo = pClientCommandList->GetClientCommandIndex(i);
 			if(NULL != pClientCommandInfo && pClientCommandInfo->m_u1State == 0)
 			{
+				//判断当前消息是否有指定的监听端口
+				if(pClientCommandInfo->m_objListenIPInfo.m_nPort > 0)
+				{
+					if(ACE_OS::strcmp(pClientCommandInfo->m_objListenIPInfo.m_szClientIP, pMessage->GetMessageBase()->m_szListenIP) != 0 ||
+						pClientCommandInfo->m_objListenIPInfo.m_nPort != pMessage->GetMessageBase()->m_u4ListenPort)
+					{
+						continue;
+					}
+				}
+
 				//OUR_DEBUG((LM_ERROR, "[CMessageManager::DoMessage]u2CommandID = %d Begin.\n", u2CommandID));
 				//这里指记录处理毫秒数
 				pClientCommandInfo->m_pClientCommand->DoMessage(pMessage, bDeleteFlag);
@@ -152,6 +162,107 @@ bool CMessageManager::AddClientCommand(uint16 u2CommandID, CClientCommand* pClie
 			//设置命令绑定ID
 			pClientCommandInfo->m_u2CommandID = u2CommandID;			
 			
+			//添加到模块里面
+			string strModule = pModuleName;
+			mapModuleClient::iterator f = m_mapModuleClient.find(strModule);
+			if(f == m_mapModuleClient.end())
+			{
+				//找不到，创建新的模块信息
+				_ModuleClient* pModuleClient = new _ModuleClient();
+				if(NULL != pModuleClient)
+				{
+					pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
+					m_mapModuleClient.insert(mapModuleClient::value_type(strModule, pModuleClient));
+				}
+			}
+			else
+			{
+				//找到了，添加进去
+				_ModuleClient* pModuleClient = (_ModuleClient* )f->second;
+				if(NULL != pModuleClient)
+				{
+					pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
+				}
+			}
+		}
+
+		m_mapClientCommand.insert(mapClientCommand::value_type(u2CommandID, pClientCommandList));
+		OUR_DEBUG((LM_ERROR, "[CMessageManager::AddClientCommand] u2CommandID = %d Add OK***.\n", u2CommandID));
+		return true;
+	}
+}
+
+bool CMessageManager::AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, _ClientIPInfo objListenInfo)
+{
+	if(NULL == pClientCommand)
+	{
+		OUR_DEBUG((LM_ERROR, "[CMessageManager::AddClientCommand] u2CommandID = %d pClientCommand is NULL.\n", u2CommandID));
+		return false;
+	}
+
+	mapClientCommand::iterator f = m_mapClientCommand.find(u2CommandID);
+	if(f != m_mapClientCommand.end())
+	{
+		CClientCommandList* pClientCommandList = (CClientCommandList* )f->second;
+		if(NULL != pClientCommandList)
+		{
+			_ClientCommandInfo* pClientCommandInfo = pClientCommandList->AddClientCommand(pClientCommand, pModuleName, objListenInfo);
+			if(NULL != pClientCommandInfo) 
+			{
+				//设置命令绑定ID
+				pClientCommandInfo->m_u2CommandID = u2CommandID;
+
+				//添加到模块里面
+				string strModule = pModuleName;
+				mapModuleClient::iterator f = m_mapModuleClient.find(strModule);
+				if(f == m_mapModuleClient.end())
+				{
+					//找不到，创建新的模块信息
+					_ModuleClient* pModuleClient = new _ModuleClient();
+					if(NULL != pModuleClient)
+					{
+						pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
+						m_mapModuleClient.insert(mapModuleClient::value_type(strModule, pModuleClient));
+					}
+				}
+				else
+				{
+					//找到了，添加进去
+					_ModuleClient* pModuleClient = (_ModuleClient* )f->second;
+					if(NULL != pModuleClient)
+					{
+						pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
+					}
+				}
+				OUR_DEBUG((LM_ERROR, "[CMessageManager::AddClientCommand] u2CommandID = %d Add OK***.\n", u2CommandID));
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
+
+	}
+
+	//没有找到已有的命令，新建一个列表
+	CClientCommandList* pClientCommandList = new CClientCommandList();
+	if(NULL == pClientCommandList)
+	{
+		return false;
+	}
+	else
+	{
+		_ClientCommandInfo* pClientCommandInfo = pClientCommandList->AddClientCommand(pClientCommand, pModuleName, objListenInfo);
+		if(NULL != pClientCommandInfo)
+		{
+			//设置命令绑定ID
+			pClientCommandInfo->m_u2CommandID = u2CommandID;			
+
 			//添加到模块里面
 			string strModule = pModuleName;
 			mapModuleClient::iterator f = m_mapModuleClient.find(strModule);
