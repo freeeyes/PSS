@@ -53,7 +53,7 @@ bool CMessageManager::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uin
 				if(pClientCommandInfo->m_objListenIPInfo.m_nPort > 0)
 				{
 					if(ACE_OS::strcmp(pClientCommandInfo->m_objListenIPInfo.m_szClientIP, pMessage->GetMessageBase()->m_szListenIP) != 0 ||
-						pClientCommandInfo->m_objListenIPInfo.m_nPort != pMessage->GetMessageBase()->m_u4ListenPort)
+						(uint32)pClientCommandInfo->m_objListenIPInfo.m_nPort != pMessage->GetMessageBase()->m_u4ListenPort)
 					{
 						continue;
 					}
