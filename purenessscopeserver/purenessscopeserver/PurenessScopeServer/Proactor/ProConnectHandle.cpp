@@ -29,6 +29,7 @@ CProConnectHandle::CProConnectHandle(void)
 	m_u2RecvQueueTimeout  = MAX_QUEUE_TIMEOUT * 1000;  //目前因为记录的是微秒，所以这里相应的扩大1000倍
 	m_u2TcpNodelay        = TCP_NODELAY_ON;
 	m_emStatus            = CLIENT_CLOSE_NOTHING;
+	m_u4SendMaxBuffSize   = 5*1024;
 }
 
 CProConnectHandle::~CProConnectHandle(void)
@@ -61,7 +62,8 @@ void CProConnectHandle::Init(uint16 u2HandlerID)
 		m_u2RecvQueueTimeout = MAX_QUEUE_TIMEOUT * 1000;
 	}
 
-	m_pBlockMessage      = new ACE_Message_Block(App_MainConfig::instance()->GetBlockSize());
+	m_u4SendMaxBuffSize  = App_MainConfig::instance()->GetBlockSize();
+	m_pBlockMessage      = new ACE_Message_Block(m_u4SendMaxBuffSize);
 	m_emStatus           = CLIENT_CLOSE_NOTHING;
 }
 
@@ -753,7 +755,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 		}
 		u4PacketSize = u4SendPacketSize;
 
-		if(u4SendPacketSize + (uint32)m_pBlockMessage->length() >= m_u4MaxPacketSize)
+		if(u4SendPacketSize + (uint32)m_pBlockMessage->length() >= m_u4SendMaxBuffSize)
 		{
 			OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage] Connectid=[%d] m_pBlockMessage is not enougth.\n", GetConnectID()));
 			if(blState = true)
@@ -797,12 +799,38 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 		if(u1SendType == SENDMESSAGE_NOMAL)
 		{
 			u4SendPacketSize = m_objSendPacketParse.MakePacketLength(GetConnectID(), pBuffPacket->GetPacketLen(), u2CommandID);
+			
+			if(u4SendPacketSize >= m_u4SendMaxBuffSize)
+			{
+				OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", GetConnectID(), u4SendPacketSize, m_u4SendMaxBuffSize));
+				if(blDelete == true)
+				{
+					//删除发送数据包 
+					App_BuffPacketManager::instance()->Delete(pBuffPacket);
+				}
+				Close();
+				return false;
+			}
+			
 			m_objSendPacketParse.MakePacket(GetConnectID(), pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), m_pBlockMessage, u2CommandID);
 			//这里MakePacket已经加了数据长度，所以在这里不再追加
 		}
 		else
 		{
 			u4SendPacketSize = (uint32)pBuffPacket->GetPacketLen();
+
+			if(u4SendPacketSize >= m_u4SendMaxBuffSize)
+			{
+				OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", GetConnectID(), u4SendPacketSize, m_u4SendMaxBuffSize));
+				if(blDelete == true)
+				{
+					//删除发送数据包 
+					App_BuffPacketManager::instance()->Delete(pBuffPacket);
+				}
+				Close();
+				return false;
+			}
+
 			memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char* )m_pBlockMessage->wr_ptr(), pBuffPacket->GetPacketLen());
 			m_pBlockMessage->wr_ptr(pBuffPacket->GetPacketLen());
 		}

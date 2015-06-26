@@ -108,6 +108,7 @@ private:
 	uint32             m_u4AllSendSize;                //当前链接发送字节总数 
 	CPacketParse*      m_pPacketParse;                 //数据包解析类
 	uint16             m_u2TcpNodelay;                 //Nagle算法开关
+	uint32             m_u4SendMaxBuffSize;            //发送数据最大缓冲长度
 
 	uint32             m_u4ReadSendSize;               //准备发送的字节数（水位标）
 	uint32             m_u4SuccessSendSize;            //实际客户端接收到的总字节数（水位标）

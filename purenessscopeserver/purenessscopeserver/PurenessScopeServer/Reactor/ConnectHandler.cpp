@@ -37,6 +37,7 @@ CConnectHandler::CConnectHandler(void)
 	m_u8RecvQueueTimeout  = MAX_QUEUE_TIMEOUT * 1000 * 1000;  //目前因为记录的是纳秒
 	m_u2TcpNodelay        = TCP_NODELAY_ON;
 	m_emStatus            = CLIENT_CLOSE_NOTHING;
+	m_u4SendMaxBuffSize   = 5*MAX_BUFF_1024;
 }
 
 CConnectHandler::~CConnectHandler(void)
@@ -142,7 +143,8 @@ void CConnectHandler::Init(uint16 u2HandlerID)
 		m_u8RecvQueueTimeout = MAX_QUEUE_TIMEOUT * 1000 * 1000;
 	}
 
-	m_pBlockMessage      = new ACE_Message_Block(App_MainConfig::instance()->GetBlockSize());
+	m_u4SendMaxBuffSize  = App_MainConfig::instance()->GetBlockSize();
+	m_pBlockMessage      = new ACE_Message_Block(m_u4SendMaxBuffSize);
 	m_emStatus           = CLIENT_CLOSE_NOTHING;
 }
 
@@ -1252,7 +1254,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
 		}
 		u4PacketSize = u4SendPacketSize;
 
-		if(u4SendPacketSize + (uint32)m_pBlockMessage->length() >= m_u4MaxPacketSize)
+		if(u4SendPacketSize + (uint32)m_pBlockMessage->length() >= m_u4SendMaxBuffSize)
 		{
 			OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage] Connectid=[%d] m_pBlockMessage is not enougth.\n", GetConnectID()));
 			if(blDelete == true)
@@ -1298,12 +1300,38 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
 		if(u1SendType == SENDMESSAGE_NOMAL)
 		{
 			u4SendPacketSize = m_objSendPacketParse.MakePacketLength(GetConnectID(), pBuffPacket->GetPacketLen(), u2CommandID);
+
+			if(u4SendPacketSize >= m_u4SendMaxBuffSize)
+			{
+				OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", GetConnectID(), u4SendPacketSize, m_u4SendMaxBuffSize));
+				if(blDelete == true)
+				{
+					//删除发送数据包 
+					App_BuffPacketManager::instance()->Delete(pBuffPacket);
+				}
+				Close();
+				return false;
+			}
+
 			m_objSendPacketParse.MakePacket(GetConnectID(), pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), m_pBlockMessage, u2CommandID);
 			//这里MakePacket已经加了数据长度，所以在这里不再追加
 		}
 		else
 		{
 			u4SendPacketSize = (uint32)pBuffPacket->GetPacketLen();
+
+			if(u4SendPacketSize >= m_u4SendMaxBuffSize)
+			{
+				OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", GetConnectID(), u4SendPacketSize, m_u4SendMaxBuffSize));
+				if(blDelete == true)
+				{
+					//删除发送数据包 
+					App_BuffPacketManager::instance()->Delete(pBuffPacket);
+				}
+				Close();
+				return false;
+			}
+
 			memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), m_pBlockMessage->wr_ptr(), pBuffPacket->GetPacketLen());
 			m_pBlockMessage->wr_ptr(pBuffPacket->GetPacketLen());
 		}
@@ -1353,7 +1381,6 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
 
 bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 {
-
 	//如果是DEBUG状态，记录当前发送包的二进制数据
 	if(App_MainConfig::instance()->GetDebug() == DEBUG_ON || m_blIsLog == true)
 	{
@@ -1416,15 +1443,15 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 
 	if(NULL == pMbData)
 	{
-		OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendPacket] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetConnectID()));
+		OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetConnectID()));
 		Close();
 		return false;
 	}
 
 	if(get_handle() == ACE_INVALID_HANDLE)
 	{
-		OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendPacket] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetConnectID()));
-		sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::SendPacket] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetConnectID());
+		OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetConnectID()));
+		sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::PutSendPacket] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetConnectID());
 		pMbData->release();
 		Close();
 		return false;
@@ -1434,7 +1461,7 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 	char* pData = pMbData->rd_ptr();
 	if(NULL == pData)
 	{
-		OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendPacket] ConnectID = %d, pData is NULL.\n", GetConnectID()));
+		OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, pData is NULL.\n", GetConnectID()));
 		pMbData->release();
 		Close();
 		return false;
@@ -1448,7 +1475,7 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 	{
 		if(nSendPacketLen <= 0)
 		{
-			OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendPacket] ConnectID = %d, nCurrSendSize error is %d.\n", GetConnectID(), nSendPacketLen));
+			OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, nCurrSendSize error is %d.\n", GetConnectID(), nSendPacketLen));
 			pMbData->release();
 			return false;
 		}
@@ -1458,7 +1485,7 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 		if(nDataLen <= 0)
 		{
 			int nErrno = errno;
-			OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendPacket] ConnectID = %d, error = %d.\n", GetConnectID(), nErrno));
+			OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, error = %d.\n", GetConnectID(), nErrno));
 			//pMbData->release();
 
 			AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "WriteError [%s:%d] nErrno = %d  result.bytes_transferred() = %d, ",

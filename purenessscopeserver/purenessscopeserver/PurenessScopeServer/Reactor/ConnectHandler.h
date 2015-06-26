@@ -111,6 +111,7 @@ private:
 	uint64                     m_u8SendQueueTimeCost;          //成功发送数据到数据处理完成（只发送）花费的时间总和
 	uint64                     m_u8SendQueueTimeout;           //发送超时时间，超过这个时间的都会被记录到日志中
 	uint64                     m_u8RecvQueueTimeout;           //接受超时时间，超过这个时间的都会被记录到日志中
+	uint32                     m_u4SendMaxBuffSize;            //发送数据最大缓冲长度
 
 	ACE_Recursive_Thread_Mutex m_ThreadLock;
 
