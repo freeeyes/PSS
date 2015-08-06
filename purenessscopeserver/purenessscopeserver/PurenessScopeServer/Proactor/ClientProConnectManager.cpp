@@ -316,7 +316,7 @@ bool CClientProConnectManager::Connect( int nServerID, const char* pIP, int nPor
 	return true;
 }
 
-bool CClientProConnectManager::ConnectUDP(int nServerID, const char* pIP, int nPort, uint8 u1IPType, IClientUDPMessage* pClientUDPMessage)
+bool CClientProConnectManager::ConnectUDP(int nServerID, const char* pIP, int nPort, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 
@@ -338,14 +338,25 @@ bool CClientProConnectManager::ConnectUDP(int nServerID, const char* pIP, int nP
 	ACE_INET_Addr AddrLocal;
 
 	int nErr = 0;
-	if(u1IPType == TYPE_IPV4)
+
+	if(emType != UDP_BROADCAST)
 	{
-		nErr = AddrLocal.set(nPort, pIP);
+		if(u1IPType == TYPE_IPV4)
+		{
+			nErr = AddrLocal.set(nPort, pIP);
+		}
+		else
+		{
+			nErr = AddrLocal.set(nPort, pIP, 1, PF_INET6);
+		}
 	}
 	else
 	{
-		nErr = AddrLocal.set(nPort, pIP, 1, PF_INET6);
+		//如果是UDP广播
+		AddrLocal.set(nPort, (uint32)INADDR_ANY);
 	}
+
+
 	if(nErr != 0)
 	{
 		OUR_DEBUG((LM_INFO, "[CClientProConnectManager::ConnectUDP](%d)UDP set_address error[%d].\n", nServerID, errno));
@@ -353,7 +364,7 @@ bool CClientProConnectManager::ConnectUDP(int nServerID, const char* pIP, int nP
 		return false;
 	}
 
-	if(0 != pProactorUDPClient->OpenAddress(AddrLocal, App_ProactorManager::instance()->GetAce_Proactor(REACTOR_UDPDEFINE), pClientUDPMessage))
+	if(0 != pProactorUDPClient->OpenAddress(AddrLocal, emType, App_ProactorManager::instance()->GetAce_Proactor(REACTOR_UDPDEFINE), pClientUDPMessage))
 	{
 		OUR_DEBUG((LM_INFO, "[CClientProConnectManager::ConnectUDP](%d)UDP OpenAddress error.\n", nServerID));
 		SAFE_DELETE(pProactorUDPClient);

@@ -15,9 +15,9 @@ public:
 	//设置TCP链接参数，pClientMessage为远端数据到达处理类，可以设置本地IP和端口。
 	virtual bool Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage) = 0;    
     //设置UDP链接参数，pClientUDPMessage为远端数据到达处理类。
-	virtual bool ConnectUDP(int nServerID, const char* pIP, int nPort,  uint8 u1IPType, IClientUDPMessage* pClientUDPMessage)        = 0;
+	virtual bool ConnectUDP(int nServerID, const char* pIP, int nPort, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage) = 0;
     //关闭某一个ServerID对应的TCP链接
-	virtual bool Close(int nServerID, EM_s2s ems2s = S2S_INNEED_CALLBACK)                                                              = 0;
+	virtual bool Close(int nServerID, EM_s2s ems2s = S2S_INNEED_CALLBACK)                                                            = 0;
 	//关闭某一个ServerID对应的UDP链接
 	virtual bool CloseUDP(int nServerID)                                                                                             = 0;
 	//发送一个TCP的数据包，发送完数据blIsDelete来决定是否由框架回收，还是逻辑回收，不能使用CBuffPacket，因为是内存池，所以这里不能删除

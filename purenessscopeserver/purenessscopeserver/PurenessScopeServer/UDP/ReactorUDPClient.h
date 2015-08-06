@@ -23,7 +23,7 @@ public:
 	virtual int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE);
 	virtual int handle_close(ACE_HANDLE handle, ACE_Reactor_Mask close_mask);
 
-	int  OpenAddress(const ACE_INET_Addr& AddrRemote, ACE_Reactor* pReactor, IClientUDPMessage* pClientUDPMessage);
+	int  OpenAddress(const ACE_INET_Addr& AddrRemote, EM_UDP_TYPE emType, ACE_Reactor* pReactor, IClientUDPMessage* pClientUDPMessage);
 	void Close();
 	bool SendMessage(const char* pMessage, uint32 u4Len, const char* szIP, int nPort);
 	_ClientConnectInfo GetClientConnectInfo();

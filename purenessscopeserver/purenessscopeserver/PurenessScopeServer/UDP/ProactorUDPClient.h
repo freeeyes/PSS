@@ -20,7 +20,7 @@ public:
 
 	virtual void handle_read_dgram(const ACE_Asynch_Read_Dgram::Result& result);
 
-	int  OpenAddress(const ACE_INET_Addr& AddrLocal, ACE_Proactor* pProactor, IClientUDPMessage* pClientUDPMessage);
+	int  OpenAddress(const ACE_INET_Addr& AddrLocal, EM_UDP_TYPE emType, ACE_Proactor* pProactor, IClientUDPMessage* pClientUDPMessage);
 	void Close();
 	bool SendMessage(const char* pMessage, uint32 u4Len, const char* szIP, int nPort);
 	_ClientConnectInfo GetClientConnectInfo();

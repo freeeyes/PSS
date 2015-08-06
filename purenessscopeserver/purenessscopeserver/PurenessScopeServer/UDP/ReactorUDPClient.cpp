@@ -13,7 +13,7 @@ CReactorUDPClient::~CReactorUDPClient(void)
 {
 }
 
-int CReactorUDPClient::OpenAddress(const ACE_INET_Addr& AddrRemote, ACE_Reactor* pReactor, IClientUDPMessage* pClientUDPMessage)
+int CReactorUDPClient::OpenAddress(const ACE_INET_Addr& AddrRemote, EM_UDP_TYPE emType, ACE_Reactor* pReactor, IClientUDPMessage* pClientUDPMessage)
 {
 	if(m_skRemote.open(AddrRemote) == -1)
 	{
@@ -27,6 +27,12 @@ int CReactorUDPClient::OpenAddress(const ACE_INET_Addr& AddrRemote, ACE_Reactor*
 	//在这里设置一个超时，让个recv不会无限等下去
 	struct timeval timeout = {MAX_RECV_UDP_TIMEOUT, 0}; 
 	ACE_OS::setsockopt(m_skRemote.get_handle(), SOL_SOCKET, SO_RCVTIMEO, (const char *)&timeout, sizeof(timeout));
+	if(emType == UDP_BROADCAST)
+	{
+		//如果是广播，设置setopt为广播类型
+		bool bOpt = true;
+		ACE_OS::setsockopt(m_skRemote.get_handle(), SOL_SOCKET, SO_BROADCAST, (char*)&bOpt, sizeof(bOpt));
+	}
 
 	m_pClientUDPMessage = pClientUDPMessage; 
 

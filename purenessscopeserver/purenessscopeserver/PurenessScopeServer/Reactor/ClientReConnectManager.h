@@ -59,7 +59,7 @@ public:
 	bool Init(ACE_Reactor* pReactor);
 	bool Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, IClientMessage* pClientMessage);                                                             //链接服务器(TCP)
 	bool Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage);  //连接服务器(TCP)，指定本地地址
-	bool ConnectUDP(int nServerID, const char* pIP, int nPort, uint8 u1IPType, IClientUDPMessage* pClientUDPMessage);                                                    //建立一个指向UDP的链接（UDP）
+	bool ConnectUDP(int nServerID, const char* pIP, int nPort, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage);                                                    //建立一个指向UDP的链接（UDP）
 	bool ReConnect(int nServerID);                                                                                             //重新连接一个指定的服务器(TCP)
 	bool CloseByClient(int nServerID);                                                                                         //远程被动关闭(TCP)
 	bool Close(int nServerID, EM_s2s ems2s = S2S_INNEED_CALLBACK);                                                               //关闭连接

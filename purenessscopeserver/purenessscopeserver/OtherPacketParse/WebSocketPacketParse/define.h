@@ -173,6 +173,12 @@ static bool Convert_Version(int nTagVserion)
 #define TCP_NODELAY_ON      0                    //TCP Nagle算法开关开关打开
 #define TCP_NODELAY_OFF     1                    //TCP Nagle算法开关开关关闭
 
+enum EM_UDP_TYPE
+{
+	UDP_SINGLE = 0,        //UDP单独连接
+	UDP_BROADCAST,         //UDP广播  
+};
+
 //对应当前框架支持的网络模式
 enum
 {
