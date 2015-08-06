@@ -258,11 +258,14 @@ bool CProactorUDPHandler::CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len)
 
 		pMbData->rd_ptr(m_pPacketParse->GetPacketHeadLen());
 
-
-		ACE_Message_Block* pMBBody = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketBodyLen());
-		memcpy_safe((char* )pMbData->rd_ptr(), m_pPacketParse->GetPacketBodyLen(), (char* )pMBBody->wr_ptr(), m_pPacketParse->GetPacketBodyLen());
-		pMBBody->wr_ptr(m_pPacketParse->GetPacketBodyLen());
-		m_pPacketParse->SetPacketBody(0, pMBBody, App_MessageBlockManager::instance());
+		//如果包含包体
+		if(m_pPacketParse->GetPacketBodyLen() > 0)
+		{
+			ACE_Message_Block* pMBBody = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketBodyLen());
+			memcpy_safe((char* )pMbData->rd_ptr(), m_pPacketParse->GetPacketBodyLen(), (char* )pMBBody->wr_ptr(), m_pPacketParse->GetPacketBodyLen());
+			pMBBody->wr_ptr(m_pPacketParse->GetPacketBodyLen());
+			m_pPacketParse->SetPacketBody(0, pMBBody, App_MessageBlockManager::instance());
+		}
 
 		//组织数据包
 		_MakePacket objMakePacket;
