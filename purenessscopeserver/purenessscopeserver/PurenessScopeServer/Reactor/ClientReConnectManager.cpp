@@ -76,6 +76,7 @@ bool CReactorClientInfo::Run(bool blIsReady, EM_Server_Connect_State emState)
 			//这里设置为True，为了让自动重试起作用
 			return true;
 		}
+		m_emConnectState = SERVER_CONNECT_OK;
 	}
 
 	return true;
