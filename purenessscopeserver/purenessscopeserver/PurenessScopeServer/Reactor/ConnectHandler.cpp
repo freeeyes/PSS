@@ -1825,6 +1825,7 @@ bool CConnectManager::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status em
 bool CConnectManager::AddConnect(uint32 u4ConnectID, CConnectHandler* pConnectHandler)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
+
 	if(pConnectHandler == NULL)
 	{
 		OUR_DEBUG((LM_ERROR, "[CConnectManager::AddConnect]ConnectID=%d, pConnectHandler is NULL.\n", u4ConnectID));
@@ -2795,28 +2796,47 @@ bool CConnectManagerGroup::AddConnect(CConnectHandler* pConnectHandler)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
 
-	uint32 u4ConnectID = GetGroupIndex();
-
-	//判断命中到哪一个线程组里面去
-	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
-
-	mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
-	if(f == m_mapConnectManager.end())
+	bool blRet  = false;
+	int  nCount = 0;
+	while(true)
 	{
-		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::AddConnect]Out of range Queue ID.\n"));
-		return false;
+		//最多循环5次，如果5次还找不到则返回false。
+		if(nCount >= 5)
+		{
+			return false;
+		}
+
+		uint32 u4ConnectID = GetGroupIndex();
+
+		//判断命中到哪一个线程组里面去
+		uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
+
+		mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
+		if(f == m_mapConnectManager.end())
+		{
+			OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::AddConnect]Out of range Queue ID.\n"));
+			return false;
+		}
+
+		CConnectManager* pConnectManager = (CConnectManager* )f->second;
+		if(NULL == pConnectManager)
+		{
+			OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::AddConnect]No find send Queue object.\n"));
+			return false;		
+		}
+
+		//OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::Init]u4ConnectID=%d, u2ThreadIndex=%d.\n", u4ConnectID, u2ThreadIndex));
+
+		blRet = pConnectManager->AddConnect(u4ConnectID, pConnectHandler);
+		if(true == blRet)
+		{
+			return true;
+		}
+
+		nCount++;
 	}
 
-	CConnectManager* pConnectManager = (CConnectManager* )f->second;
-	if(NULL == pConnectManager)
-	{
-		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::AddConnect]No find send Queue object.\n"));
-		return false;		
-	}
-
-	//OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::Init]u4ConnectID=%d, u2ThreadIndex=%d.\n", u4ConnectID, u2ThreadIndex));
-
-	return pConnectManager->AddConnect(u4ConnectID, pConnectHandler);
+	return false;
 }
 
 bool CConnectManagerGroup::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, bool blSendState, bool blDelete)

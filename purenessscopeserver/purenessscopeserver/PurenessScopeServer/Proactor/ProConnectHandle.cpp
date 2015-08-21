@@ -2150,28 +2150,48 @@ uint32 CProConnectManagerGroup::GetGroupIndex()
 
 bool CProConnectManagerGroup::AddConnect(CProConnectHandle* pConnectHandler)
 {
-	uint32 u4ConnectID = GetGroupIndex();
-
-	//判断命中到哪一个线程组里面去
-	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
-
-	mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
-	if(f == m_mapConnectManager.end())
+	bool blRet = false;
+	int  nCount = 0;
+	while(true)
 	{
-		OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::AddConnect]Out of range Queue ID.\n"));
-		return false;
+		//最多循环5次，如果5次还找不到则返回false。
+		if(nCount >= 5)
+		{
+			return false;
+		}
+
+		uint32 u4ConnectID = GetGroupIndex();
+
+		//判断命中到哪一个线程组里面去
+		uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
+
+		mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
+		if(f == m_mapConnectManager.end())
+		{
+			OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::AddConnect]Out of range Queue ID.\n"));
+			return false;
+		}
+
+		CProConnectManager* pConnectManager = (CProConnectManager* )f->second;
+		if(NULL == pConnectManager)
+		{
+			OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::AddConnect]No find send Queue object.\n"));
+			return false;		
+		}
+
+		blRet = pConnectManager->AddConnect(u4ConnectID, pConnectHandler);
+		if(true == blRet)
+		{
+			return true;
+		}
+
+		nCount++;
 	}
 
-	CProConnectManager* pConnectManager = (CProConnectManager* )f->second;
-	if(NULL == pConnectManager)
-	{
-		OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::AddConnect]No find send Queue object.\n"));
-		return false;		
-	}
 
 	//OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::Init]u4ConnectID=%d, u2ThreadIndex=%d.\n", u4ConnectID, u2ThreadIndex));
 
-	return pConnectManager->AddConnect(u4ConnectID, pConnectHandler);
+	return false;
 }
 
 bool CProConnectManagerGroup::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, bool blSendState, bool blDelete)
