@@ -1806,7 +1806,7 @@ bool CConnectManager::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status em
 		CConnectHandler* pConnectHandler = (CConnectHandler* )f->second;
 		if(pConnectHandler != NULL)
 		{
-			//pConnectHandler->ServerClose(emStatus);
+			pConnectHandler->ServerClose(emStatus);
 			m_u4TimeDisConnect++;
 
 			//加入链接统计功能
@@ -1918,11 +1918,15 @@ bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
 			bool blState = pConnectHandler->CheckSendMask(pBuffPacket->GetPacketLen());
 			if(false == blState)
 			{
+				//超过了阀值，则关闭连接
 				if(blDelete == true)
 				{
-					//超过了阀值，则关闭连接
 					App_BuffPacketManager::instance()->Delete(pBuffPacket);
 				}
+
+				pConnectHandler->ServerClose(CLIENT_CLOSE_IMMEDIATLY);
+				m_mapConnectManager.erase(f);
+
 				return false;
 			}
 		}
@@ -2398,11 +2402,15 @@ bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType,
 				bool blState = pConnectHandler->CheckSendMask(pBuffPacket->GetPacketLen());
 				if(false == blState)
 				{
+					//超过了阀值，则关闭连接
 					if(blDelete == true)
 					{
-						//超过了阀值，则关闭连接
 						App_BuffPacketManager::instance()->Delete(pBuffPacket);
 					}
+
+					pConnectHandler->ServerClose(CLIENT_CLOSE_IMMEDIATLY);
+					m_mapConnectManager.erase(f);
+
 					continue;
 				}
 			}
