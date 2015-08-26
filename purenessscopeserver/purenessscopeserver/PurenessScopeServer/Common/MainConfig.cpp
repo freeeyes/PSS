@@ -675,15 +675,17 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
 	{
 		m_u2SendQueuePutTime = (uint16)ACE_OS::atoi(pData);
 	}
-	pData = m_MainConfig.GetData("SendInfo", "MaxSendMask");
-	if(pData != NULL)
-	{
-		m_u4SendDatamark = (int)ACE_OS::atoi(pData);
-	}
+	//pData = m_MainConfig.GetData("SendInfo", "MaxSendMask");
+	//if(pData != NULL)
+	//{
+	//	m_u4SendDatamark = (int)ACE_OS::atoi(pData);
+	//}
 	pData = m_MainConfig.GetData("SendInfo", "MaxBlockSize");
 	if(pData != NULL)
 	{
-		m_u4BlockSize = (int)ACE_OS::atoi(pData);
+		m_u4BlockSize    = (int)ACE_OS::atoi(pData);
+		//保持m_u4SendDatamark和m_u4BlockSize一致，不必在单独分开
+		m_u4SendDatamark = m_u4BlockSize;
 	}
 
 	//线程相关
