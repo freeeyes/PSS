@@ -198,7 +198,7 @@ bool CReactorUDPHander::CheckMessage(const char* pData, uint32 u4Len)
 
 	if(m_pPacketParse->GetPacketMode() == PACKET_WITHHEAD)
 	{
-		if(u4Len <= m_pPacketParse->GetPacketHeadLen())
+		if(u4Len < m_pPacketParse->GetPacketHeadLen())
 		{
 			return false;
 		}

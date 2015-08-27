@@ -59,13 +59,13 @@ bool CReactorClientInfo::Run(bool blIsReady, EM_Server_Connect_State emState)
 
 	if (NULL == m_pConnectClient)
 	{
-		OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::Run]pConnectClient new is NULL.\n"));
+		OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::Run]pConnectClient new is NULL(%d).\n", emState));
 		return false;
 	}
 
 	m_pConnectClient->SetServerID(m_nServerID);
 	m_pConnectClient->reactor(m_pReactor);
-	m_emConnectState = emState;
+	//m_emConnectState = emState;
 
 	if (blIsReady == true && SERVER_CONNECT_FIRST != m_emConnectState && SERVER_CONNECT_RECONNECT != m_emConnectState)
 	{
