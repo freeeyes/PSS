@@ -34,6 +34,7 @@
 #include "IPAccount.h"
 #include "SendMessage.h"
 #include "CommandAccount.h"
+#include "SendCacheManager.h"
 
 #include <map>
 #include <vector>
@@ -73,6 +74,7 @@ public:
 
 	bool SetRecvQueueTimeCost(uint32 u4TimeCost);                             //记录当前接收数据到模块处理完成的具体时间消耗
 	bool SetSendQueueTimeCost(uint32 u4TimeCost);                             //记录当前从发送队列到数据发送完成的具体时间消耗
+	void SetSendCacheManager(ISendCacheManager* pSendCacheManager);           //设置发送缓冲接口
 
 private:
 	bool RecvClinetPacket(uint32 u4PackeLen);                                 //接受数据包
@@ -131,6 +133,7 @@ private:
 	EM_Client_Close_status m_emStatus;                  //当前服务器关闭标记
 
 	CPacketParse        m_objSendPacketParse;           //发送数据包组织结构
+	ISendCacheManager*  m_pSendCacheManager;            //发送缓冲管理 
 
 	Fast_Asynch_Read_Stream  m_Reader;
 	Fast_Asynch_Write_Stream m_Writer;
@@ -194,6 +197,7 @@ private:
 	uint32                      m_u4TimeConnect;         //单位时间连接建立数
 	uint32                      m_u4TimeDisConnect;      //单位时间连接断开数
 	CCommandAccount             m_CommandAccount;        //当前线程命令统计数据  
+	CSendCacheManager           m_SendCacheManager;      //发送缓冲池  
 };
 
 //链接ConnectHandler内存池

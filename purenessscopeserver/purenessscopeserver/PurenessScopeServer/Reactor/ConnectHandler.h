@@ -31,6 +31,7 @@
 #include "TimerManager.h"
 #include "SendMessage.h"
 #include "CommandAccount.h"
+#include "SendCacheManager.h"
 
 #ifdef __LINUX__
 #include "netinet/tcp.h"
@@ -76,7 +77,7 @@ public:
 	char* GetConnectName();                                                  //得到别名
 	void SetIsLog(bool blIsLog);                                             //设置当前连接数据是否写入日志 
 	bool GetIsLog();                                                         //获得当前连接是否可以写入日志 
-
+	void SetSendCacheManager(CSendCacheManager* pSendCacheManager);
 
 private:
 	bool CheckMessage();                                                     //处理接收的数据
@@ -141,7 +142,7 @@ private:
 	CPacketParse               m_objSendPacketParse;           //发送数据包组织结构
 	_TimeConnectInfo           m_TimeConnectInfo;              //链接健康检测器
 	char                       m_szConnectName[MAX_BUFF_100];  //连接名称，可以开放给逻辑插件去设置
-	bool                       m_blIsLog;                      //是否写入日志，false为不写入，true为写入
+	bool                       m_blIsLog;                      //是否写入日志，false为不写入，true为写入 
 };
 
 //管理所有已经建立的链接
@@ -204,6 +205,7 @@ private:
 	uint32                      m_u4TimeConnect;         //单位时间连接建立数
 	uint32                      m_u4TimeDisConnect;      //单位时间连接断开数
 	CCommandAccount             m_CommandAccount;        //当前线程命令统计数据  
+	CSendCacheManager           m_SendCacheManager;      
 };
 
 //链接ConnectHandler内存池
@@ -247,6 +249,7 @@ public:
 	bool PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, bool blSendState = true, bool blDelete = true);
 	bool PostMessageAll(const char* pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, bool blSendState = true, bool blDelete = true);
 	bool CloseConnect(uint32 u4ConnectID, EM_Client_Close_status emStatus = CLIENT_CLOSE_IMMEDIATLY);        //服务器关闭
+	bool CloseConnectByClient(uint32 u4ConnectID);                                                           //客户端关闭
 	_ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                                                       //得到指定链接信息
 	_ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID);                                                        //得到监听链接信息
 	void GetClientNameInfo(const char* pName, vecClientNameInfo& objClientNameInfo);                         //得到指定别名的所有设置信息

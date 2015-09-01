@@ -30,6 +30,8 @@ CProConnectHandle::CProConnectHandle(void)
 	m_u2TcpNodelay        = TCP_NODELAY_ON;
 	m_emStatus            = CLIENT_CLOSE_NOTHING;
 	m_u4SendMaxBuffSize   = 5*1024;
+
+	m_pSendCacheManager   = NULL;
 }
 
 CProConnectHandle::~CProConnectHandle(void)
@@ -63,7 +65,6 @@ void CProConnectHandle::Init(uint16 u2HandlerID)
 	}
 
 	m_u4SendMaxBuffSize  = App_MainConfig::instance()->GetBlockSize();
-	m_pBlockMessage      = new ACE_Message_Block(m_u4SendMaxBuffSize);
 	m_emStatus           = CLIENT_CLOSE_NOTHING;
 }
 
@@ -146,6 +147,9 @@ bool CProConnectHandle::Close(int nIOCount, int nErrno)
 		//将对象指针放入空池中
 		App_ProConnectHandlerPool::instance()->Delete(this);
 
+		//归还发送缓冲数据块
+		m_pSendCacheManager->FreeCacheData(GetConnectID());
+
 		return true;
 	}
 
@@ -180,6 +184,9 @@ bool CProConnectHandle::ServerClose(EM_Client_Close_status emStatus)
 
 		m_u1ConnectState = CONNECT_SERVER_CLOSE;
 
+		//归还发送缓冲数据块
+		m_pSendCacheManager->FreeCacheData(GetConnectID());
+
 	}
 	else
 	{
@@ -206,9 +213,6 @@ void CProConnectHandle::addresses (const ACE_INET_Addr &remote_address, const AC
 
 void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 {
-	//重置缓冲区
-	m_pBlockMessage->reset();
-
 	OUR_DEBUG((LM_INFO, "[CProConnectHandle::open] [0x%08x]Connection from [%s:%d]\n", this, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
 
 	m_atvConnect      = ACE_OS::gettimeofday();
@@ -327,6 +331,8 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 		OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 	}
 
+	//获得使用的缓冲
+	m_pBlockMessage = m_pSendCacheManager->GetCacheData(GetConnectID());
 	
 	if(m_pPacketParse->GetPacketMode() == PACKET_WITHHEAD)
 	{
@@ -1194,6 +1200,11 @@ void CProConnectHandle::PutSendPacketError(ACE_Message_Block* pMbData)
 	
 }
 
+void CProConnectHandle::SetSendCacheManager(ISendCacheManager* pSendCacheManager)
+{
+	m_pSendCacheManager = pSendCacheManager;
+}
+
 //***************************************************************************
 CProConnectManager::CProConnectManager(void)
 {
@@ -1306,6 +1317,8 @@ bool CProConnectManager::AddConnect(uint32 u4ConnectID, CProConnectHandle* pConn
 	}
 
 	pConnectHandler->SetConnectID(u4ConnectID);
+	pConnectHandler->SetSendCacheManager((ISendCacheManager* )&m_SendCacheManager);
+
 	//加入map
 	m_mapConnectManager.insert(mapConnectManager::value_type(u4ConnectID, pConnectHandler));
 	m_u4TimeConnect++;
@@ -1933,6 +1946,9 @@ void CProConnectManager::Init(uint16 u2Index)
 	m_CommandAccount.Init(App_MainConfig::instance()->GetCommandAccount(), 
 		App_MainConfig::instance()->GetCommandFlow(), 
 		App_MainConfig::instance()->GetPacketTimeOut());
+
+	//初始化发送缓冲池
+	m_SendCacheManager.Init(MAX_CACHE_POOL_SIZE, App_MainConfig::instance()->GetBlockSize());
 }
 
 _CommandData* CProConnectManager::GetCommandData(uint16 u2CommandID)

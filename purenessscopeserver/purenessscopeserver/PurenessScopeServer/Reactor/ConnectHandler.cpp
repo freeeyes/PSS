@@ -111,7 +111,7 @@ bool CConnectHandler::Close(int nIOCount)
 		AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %dws, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %dws.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, (uint32)m_u8RecvQueueTimeCost, m_u4RecvQueueCount, (uint32)m_u8SendQueueTimeCost);
 
 		//删除链接对象
-		App_ConnectManager::instance()->CloseConnect(GetConnectID());
+		App_ConnectManager::instance()->CloseConnectByClient(GetConnectID());
 
 		//回归用过的指针
 		App_ConnectHandlerPool::instance()->Delete(this);
@@ -144,7 +144,8 @@ void CConnectHandler::Init(uint16 u2HandlerID)
 	}
 
 	m_u4SendMaxBuffSize  = App_MainConfig::instance()->GetBlockSize();
-	m_pBlockMessage      = new ACE_Message_Block(m_u4SendMaxBuffSize);
+	//m_pBlockMessage      = new ACE_Message_Block(m_u4SendMaxBuffSize);
+	m_pBlockMessage      = NULL;
 	m_emStatus           = CLIENT_CLOSE_NOTHING;
 }
 
@@ -211,7 +212,7 @@ int CConnectHandler::open(void*)
 	m_szConnectName[0]    = '\0';
 
 	//重置缓冲区
-	m_pBlockMessage->reset();
+	//m_pBlockMessage->reset();
 
 	//获得远程链接地址和端口
 	if(this->peer().get_remote_addr(m_addrRemote) == -1)
@@ -1709,6 +1710,14 @@ void CConnectHandler::SetLocalIPInfo(const char* pLocalIP, uint32 u4LocalPort)
 	m_u4LocalPort = u4LocalPort;
 }
 
+void CConnectHandler::SetSendCacheManager(CSendCacheManager* pSendCacheManager)
+{
+	if(NULL != pSendCacheManager)
+	{
+		m_pBlockMessage = pSendCacheManager->GetCacheData(GetConnectID());
+	}
+}
+
 //***************************************************************************
 CConnectManager::CConnectManager(void)
 {
@@ -1775,9 +1784,11 @@ bool CConnectManager::Close(uint32 u4ConnectID)
 		CConnectHandler* pConnectHandler = (CConnectHandler* )f->second;
 		if(pConnectHandler != NULL)
 		{
-			m_mapConnectManager.erase(f);
+			//回收发送缓冲
+			m_SendCacheManager.FreeCacheData(u4ConnectID);			
 			m_u4TimeDisConnect++;
 		}
+		m_mapConnectManager.erase(f);
 
 		//加入链接统计功能
 		App_ConnectAccount::instance()->AddDisConnect();
@@ -1806,6 +1817,8 @@ bool CConnectManager::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status em
 		CConnectHandler* pConnectHandler = (CConnectHandler* )f->second;
 		if(pConnectHandler != NULL)
 		{
+			//回收发送缓冲
+			m_SendCacheManager.FreeCacheData(u4ConnectID);
 			pConnectHandler->ServerClose(emStatus);
 			m_u4TimeDisConnect++;
 
@@ -1842,6 +1855,7 @@ bool CConnectManager::AddConnect(uint32 u4ConnectID, CConnectHandler* pConnectHa
 	}
 
 	pConnectHandler->SetConnectID(u4ConnectID);
+	pConnectHandler->SetSendCacheManager(&m_SendCacheManager);
 	//加入map
 	m_mapConnectManager.insert(mapConnectManager::value_type(u4ConnectID, pConnectHandler));
 	m_u4TimeConnect++;
@@ -2598,6 +2612,9 @@ void CConnectManager::Init( uint16 u2Index )
 	m_CommandAccount.Init(App_MainConfig::instance()->GetCommandAccount(), 
 		App_MainConfig::instance()->GetCommandFlow(), 
 		App_MainConfig::instance()->GetPacketTimeOut());
+			
+	//初始化发送缓冲
+	m_SendCacheManager.Init(MAX_CACHE_POOL_SIZE, App_MainConfig::instance()->GetBlockSize());
 }
 
 uint32 CConnectManager::GetCommandFlowAccount()
@@ -3028,6 +3045,28 @@ bool CConnectManagerGroup::CloseConnect(uint32 u4ConnectID, EM_Client_Close_stat
 	}	
 
 	return pConnectManager->CloseConnect(u4ConnectID, emStatus);
+}
+
+bool CConnectManagerGroup::CloseConnectByClient(uint32 u4ConnectID)
+{
+	//判断命中到哪一个线程组里面去
+	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
+
+	mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
+	if(f == m_mapConnectManager.end())
+	{
+		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnect]Out of range Queue ID.\n"));
+		return false;
+	}
+
+	CConnectManager* pConnectManager = (CConnectManager* )f->second;
+	if(NULL == pConnectManager)
+	{
+		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnect]No find send Queue object.\n"));
+		return false;		
+	}	
+
+	return pConnectManager->Close(u4ConnectID);
 }
 
 _ClientIPInfo CConnectManagerGroup::GetClientIPInfo(uint32 u4ConnectID)
