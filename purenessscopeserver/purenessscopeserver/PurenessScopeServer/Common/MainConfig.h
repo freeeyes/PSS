@@ -278,6 +278,7 @@ public:
 	uint32 GetLogFileMaxCnt();
 	char*  GetDebugLevel();
 	uint32 GetBlockSize();
+	uint32 GetBlockCount();
 
 	uint16 GetModuleInfoCount();
 	_ModuleConfig* GetModuleInfo(uint16 u2Index);
@@ -355,6 +356,7 @@ private:
 	uint32     m_u4CoreFileSize;                   //Core文件的尺寸大小
 	uint16     m_u2Backlog;                        //设置的Backlog值
 	uint32     m_u4TrackIPCount;                   //监控IP的最大历史记录数
+	uint32     m_u4SendBlockCount;                 //初始化发送缓冲个数 
 
 	uint32     m_u4MaxCpu;                         //监控CPU的最高阀值
 	uint32     m_u4MaxMemory;                      //监控内存的峰值 

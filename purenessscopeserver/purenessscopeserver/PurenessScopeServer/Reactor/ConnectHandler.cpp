@@ -2609,7 +2609,7 @@ void CConnectManager::Init( uint16 u2Index )
 		App_MainConfig::instance()->GetPacketTimeOut());
 			
 	//³õÊ¼»¯·¢ËÍ»º³å
-	m_SendCacheManager.Init(MAX_CACHE_POOL_SIZE, App_MainConfig::instance()->GetBlockSize());
+	m_SendCacheManager.Init(App_MainConfig::instance()->GetBlockCount(), App_MainConfig::instance()->GetBlockSize());
 }
 
 uint32 CConnectManager::GetCommandFlowAccount()

@@ -44,6 +44,7 @@ CMainConfig::CMainConfig(void)
 	m_u2WorkQueuePutTime    = (uint16)MAX_MSG_PUTTIMEOUT;
 	m_u2Backlog             = (uint16)MAX_ASYNCH_BACKLOG;
 	m_u4TrackIPCount        = (uint32)MAX_ASYNCH_BACKLOG;
+	m_u4SendBlockCount      = 10;
 
 	//默认的CPU监控和内存监控的上限
 	m_u4MaxCpu              = 90;
@@ -687,6 +688,11 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
 		//保持m_u4SendDatamark和m_u4BlockSize一致，不必在单独分开
 		m_u4SendDatamark = m_u4BlockSize;
 	}
+	pData = m_MainConfig.GetData("SendInfo", "BlockCount");
+	if(pData != NULL)
+	{
+		m_u4SendBlockCount = (uint32)ACE_OS::atoi(pData);
+	}
 
 	//线程相关
 	pData = m_MainConfig.GetData("ThreadInfo", "PutQueueTimeout");
@@ -1011,6 +1017,7 @@ void CMainConfig::Display()
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u2TcpNodelay = %d.\n", m_u2TcpNodelay));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4TrackIPCount = %d.\n", m_u4TrackIPCount));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4BlockSize = %d.\n", m_u4BlockSize));
+	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4SendBlockCount = %d.\n", m_u4SendBlockCount));
 
 	for(int i = 0; i < (int)m_vecUDPServerInfo.size(); i++)
 	{
@@ -1495,4 +1502,9 @@ _ModuleConfig* CMainConfig::GetModuleInfo(uint16 u2Index)
 uint32 CMainConfig::GetBlockSize()
 {
 	return m_u4BlockSize;
+}
+
+uint32 CMainConfig::GetBlockCount()
+{
+	return m_u4SendBlockCount;
 }

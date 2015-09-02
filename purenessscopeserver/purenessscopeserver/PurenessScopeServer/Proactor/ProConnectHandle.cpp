@@ -1935,7 +1935,7 @@ void CProConnectManager::Init(uint16 u2Index)
 		App_MainConfig::instance()->GetPacketTimeOut());
 
 	//³õÊ¼»¯·¢ËÍ»º³å³Ø
-	m_SendCacheManager.Init(MAX_CACHE_POOL_SIZE, App_MainConfig::instance()->GetBlockSize());
+	m_SendCacheManager.Init(App_MainConfig::instance()->GetBlockCount(), App_MainConfig::instance()->GetBlockSize());
 }
 
 _CommandData* CProConnectManager::GetCommandData(uint16 u2CommandID)
