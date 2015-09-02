@@ -133,7 +133,6 @@ private:
 	EM_Client_Close_status m_emStatus;                  //当前服务器关闭标记
 
 	CPacketParse        m_objSendPacketParse;           //发送数据包组织结构
-	ISendCacheManager*  m_pSendCacheManager;            //发送缓冲管理 
 
 	Fast_Asynch_Read_Stream  m_Reader;
 	Fast_Asynch_Write_Stream m_Writer;

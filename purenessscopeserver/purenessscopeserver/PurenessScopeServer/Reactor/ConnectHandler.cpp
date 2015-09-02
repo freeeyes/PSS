@@ -44,11 +44,6 @@ CConnectHandler::~CConnectHandler(void)
 {
 	//OUR_DEBUG((LM_INFO, "[CConnectHandler::~CConnectHandler].\n"));
 	SAFE_DELETE(m_pTCClose);
-	if(NULL != m_pBlockMessage)
-	{
-		m_pBlockMessage->release();
-		m_pBlockMessage = NULL;
-	}
 	//OUR_DEBUG((LM_INFO, "[CConnectHandler::~CConnectHandler]End.\n"));
 }
 

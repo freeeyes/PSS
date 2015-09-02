@@ -30,17 +30,10 @@ CProConnectHandle::CProConnectHandle(void)
 	m_u2TcpNodelay        = TCP_NODELAY_ON;
 	m_emStatus            = CLIENT_CLOSE_NOTHING;
 	m_u4SendMaxBuffSize   = 5*1024;
-
-	m_pSendCacheManager   = NULL;
 }
 
 CProConnectHandle::~CProConnectHandle(void)
 {
-	if(NULL != m_pBlockMessage)
-	{
-		m_pBlockMessage->release();
-		m_pBlockMessage = NULL;
-	}
 }
 
 void CProConnectHandle::Init(uint16 u2HandlerID)
@@ -147,9 +140,6 @@ bool CProConnectHandle::Close(int nIOCount, int nErrno)
 		//将对象指针放入空池中
 		App_ProConnectHandlerPool::instance()->Delete(this);
 
-		//归还发送缓冲数据块
-		m_pSendCacheManager->FreeCacheData(GetConnectID());
-
 		return true;
 	}
 
@@ -183,9 +173,6 @@ bool CProConnectHandle::ServerClose(EM_Client_Close_status emStatus)
 		}
 
 		m_u1ConnectState = CONNECT_SERVER_CLOSE;
-
-		//归还发送缓冲数据块
-		m_pSendCacheManager->FreeCacheData(GetConnectID());
 
 	}
 	else
@@ -330,9 +317,6 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 	{
 		OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 	}
-
-	//获得使用的缓冲
-	m_pBlockMessage = m_pSendCacheManager->GetCacheData(GetConnectID());
 	
 	if(m_pPacketParse->GetPacketMode() == PACKET_WITHHEAD)
 	{
@@ -1202,7 +1186,7 @@ void CProConnectHandle::PutSendPacketError(ACE_Message_Block* pMbData)
 
 void CProConnectHandle::SetSendCacheManager(ISendCacheManager* pSendCacheManager)
 {
-	m_pSendCacheManager = pSendCacheManager;
+	m_pBlockMessage = pSendCacheManager->GetCacheData(GetConnectID());
 }
 
 //***************************************************************************
@@ -1257,6 +1241,9 @@ bool CProConnectManager::Close(uint32 u4ConnectID)
 	{
 		m_mapConnectManager.erase(f);
 		m_u4TimeDisConnect++;
+
+		//回收发送内存块
+		m_SendCacheManager.FreeCacheData(u4ConnectID);
 
 		//加入链接统计功能
 		App_ConnectAccount::instance()->AddDisConnect();
