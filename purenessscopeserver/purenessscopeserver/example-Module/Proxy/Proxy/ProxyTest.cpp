@@ -94,6 +94,8 @@ int UnLoadModuleData()
       pMessageManager = NULL;
     }
   }
+  
+  App_ProxyThreadManager::instance()->Close();
   OUR_DEBUG((LM_INFO, "[Base UnLoadModuleData] End.\n"));
   return 0;
 }

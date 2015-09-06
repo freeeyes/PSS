@@ -210,9 +210,10 @@ void* Worker(void *arg)
 #endif	
 
 	pProxyClientConnector->m_objReactorConnect.open(pReactor);	
-	pProxyClientConnector->m_pReactor = pReactor;
+	pProxyClientConnector->m_pReactor    = pReactor;
+	pProxyClientConnector->m_blThreadRun = true;
 
-	while(true)
+	while(pProxyClientConnector->m_blThreadRun)
 	{
 		if(pReactor != NULL)
 		{
@@ -223,7 +224,8 @@ void* Worker(void *arg)
 #endif
 		}
 	}
-
+	
+	OUR_DEBUG((LM_ERROR, "[Worker]Thread is over.\n"));
 	return NULL; 
 } 
 

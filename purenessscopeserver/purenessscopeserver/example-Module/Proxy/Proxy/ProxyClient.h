@@ -167,10 +167,12 @@ struct _ProxyClientConnector
 	CProxyClientConnector    m_objReactorConnect;
 	ACE_Reactor*             m_pReactor;
 	CProxyClientManager*     m_ProxyClientManager;
+	bool                     m_blThreadRun;
 
 	_ProxyClientConnector()
 	{
-		m_pReactor = NULL;
+		m_pReactor    = NULL;
+		m_blThreadRun = false;
 	}
 };
 
@@ -185,18 +187,25 @@ public:
 
 	~CProxyClientThreadManager() 
 	{
-		Close();
+		//Close();
 	};
 
 	void Close()
 	{
+		OUR_DEBUG((LM_ERROR, "[CProxyClientThreadManager::Close]Begin.\n"));
+		ACE_Time_Value tvSleep(0, 10000); 
 		for(int i = 0; i < (int)m_vecProxyClientManager.size(); i++)
 		{
-			delete m_vecProxyClientManager[i]->m_ProxyClientManager;
+			m_vecProxyClientManager[i]->m_blThreadRun = false;
+			m_vecProxyClientManager[i]->m_pReactor->end_reactor_event_loop();
+			m_vecProxyClientManager[i]->m_pReactor->close();
+			OUR_DEBUG((LM_ERROR, "[CProxyClientThreadManager::Close](%d) is close.\n", i));
+			ACE_OS::sleep(tvSleep);
 			delete m_vecProxyClientManager[i]->m_pReactor;
 		}
 
 		m_vecProxyClientManager.clear();
+		OUR_DEBUG((LM_ERROR, "[CProxyClientThreadManager::Close]End.\n"));
 	}
 
 	void Init(int nThreadCount);
