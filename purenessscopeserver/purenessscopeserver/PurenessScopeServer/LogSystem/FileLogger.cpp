@@ -435,6 +435,6 @@ int CFileLogger::GetLogInfoByLogDisplay(uint16 u2LogID)
 	}
 	else
 	{
-		return NULL;
+		return 0;
 	}
 }
