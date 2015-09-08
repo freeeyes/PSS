@@ -536,7 +536,7 @@ bool CLoginClientDlg::Send_Multiple_Login()
 	{
 		int nIndex = Random(m_objLoginClient.m_nUserIDFrom, m_objLoginClient.m_nUserIDTo);
 
-		Send_Login(m_vecLoginInfo[nIndex - 1]);
+		Send_Login(m_vecLoginInfo[nIndex - m_objLoginClient.m_nUserIDFrom]);
 	}
 
 	m_blMultiple = false;
