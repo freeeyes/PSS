@@ -226,9 +226,6 @@ void CLoginClientDlg::OnBnClickedButton1()
 	Send_Single_Login();
 
 	Close();
-
-	Show_Send_List(false);
-
 }
 
 void CLoginClientDlg::OnBnClickedButton2()
@@ -265,7 +262,35 @@ void CLoginClientDlg::OnBnClickedButton2()
 	m_blMultiple = true;
 	m_nSendCount = 0;
 
-	SetTimer(1, 1000, NULL);
+	//初始化要发送的数据
+	m_vecLoginInfo.clear();
+	m_lcServer.SetRedraw(FALSE);
+	m_lcServer.DeleteAllItems();
+	for (int i = m_objLoginClient.m_nUserIDFrom; i < m_objLoginClient.m_nUserIDTo; i++)
+	{
+		_LoginInfo objLoginInfo;
+		sprintf_s(objLoginInfo.m_szUserName, MAX_BUFF_50, "%s%d", m_objLoginClient.m_szUserName, i);
+		sprintf_s(objLoginInfo.m_szUserPass, MAX_BUFF_50, "%s", m_objLoginClient.m_szUserPass);
+		m_vecLoginInfo.push_back(objLoginInfo);
+
+		// 插入新项
+		wchar_t wszUserName[MAX_BUFF_50] = { '\0' };
+		wchar_t wszUserPass[MAX_BUFF_50] = { '\0' };
+
+		int nSrcLen = MultiByteToWideChar(CP_ACP, 0, objLoginInfo.m_szUserName, -1, NULL, 0);
+		int nDecLen = MultiByteToWideChar(CP_ACP, 0, objLoginInfo.m_szUserName, -1, wszUserName, MAX_BUFF_50);
+
+		nSrcLen = MultiByteToWideChar(CP_ACP, 0, objLoginInfo.m_szUserPass, -1, NULL, 0);
+		nDecLen = MultiByteToWideChar(CP_ACP, 0, objLoginInfo.m_szUserPass, -1, wszUserPass, MAX_BUFF_50);
+
+		int itemIndex = m_lcServer.GetItemCount();
+		m_lcServer.InsertItem(itemIndex, wszUserName);
+		m_lcServer.SetItemText(itemIndex, 1, wszUserPass);
+		m_lcServer.SetItemText(itemIndex, 2, L"0");
+		m_lcServer.SetItemText(itemIndex, 3, L"0");
+		m_lcServer.SetItemText(itemIndex, 4, L"0");
+	}
+	m_lcServer.SetRedraw(TRUE);
 
 	DWORD  ThreadID = 0;
 	CreateThread(NULL, NULL, ThreadProc, (LPVOID)this, NULL, &ThreadID);
@@ -290,7 +315,8 @@ void CLoginClientDlg::Init()
 	DWORD dwStyle = m_lcServer.GetExtendedStyle();
 	dwStyle |= LVS_EX_FULLROWSELECT;//选中某行使整行高亮（只适用与report风格的listctrl）
 	dwStyle |= LVS_EX_GRIDLINES;//网格线（只适用与report风格的listctrl）
-	dwStyle |= LVS_EX_CHECKBOXES;//item前生成checkbox控件
+	//dwStyle |= LVS_EX_CHECKBOXES;//item前生成checkbox控件
+	dwStyle |= LVS_EX_DOUBLEBUFFER; // 使用双缓冲
 	m_lcServer.SetExtendedStyle(dwStyle); //设置扩展风格
 
 	//初始化TCP链接
@@ -502,7 +528,27 @@ bool CLoginClientDlg::Send_Single_Login()
 
 	m_vecLoginInfo.push_back(objLoginInfo);
 
+	// 插入新项
+	m_lcServer.SetRedraw(FALSE);
+	m_lcServer.DeleteAllItems();
+
+	wchar_t wszUserName[MAX_BUFF_50] = { '\0' };
+	wchar_t wszUserPass[MAX_BUFF_50] = { '\0' };
+	int nSrcLen = MultiByteToWideChar(CP_ACP, 0, objLoginInfo.m_szUserName, -1, NULL, 0);
+	int nDecLen = MultiByteToWideChar(CP_ACP, 0, objLoginInfo.m_szUserName, -1, wszUserName, MAX_BUFF_50);
+	nSrcLen = MultiByteToWideChar(CP_ACP, 0, objLoginInfo.m_szUserPass, -1, NULL, 0);
+	nDecLen = MultiByteToWideChar(CP_ACP, 0, objLoginInfo.m_szUserPass, -1, wszUserPass, MAX_BUFF_50);
+
+	m_lcServer.InsertItem(0, wszUserName);
+	m_lcServer.SetItemText(0, 1, wszUserPass);
+	m_lcServer.SetItemText(0, 2, L"0");
+	m_lcServer.SetItemText(0, 3, L"0");
+	m_lcServer.SetItemText(0, 4, L"0");
+
+	m_lcServer.SetRedraw(TRUE);
+
 	Send_Login(m_vecLoginInfo[0]);
+	updateItemData(objLoginInfo, 0);
 
 	return true;
 }
@@ -519,25 +565,24 @@ bool CLoginClientDlg::Send_Multiple_Login()
 		return false;
 	}
 
-	//初始化要发送的数据
-	m_vecLoginInfo.clear();
+	// 设置定时器去计算每秒大约发送的请求数
+	m_nLastSecondSendCount = 0;
+	m_nSendCount = 0;
+	SetTimer(1, 1000, NULL);
 
-	for(int i = m_objLoginClient.m_nUserIDFrom; i < m_objLoginClient.m_nUserIDTo; i++)
-	{
-		_LoginInfo objLoginInfo;
-
-		sprintf_s(objLoginInfo.m_szUserName, MAX_BUFF_50, "%s%d", m_objLoginClient.m_szUserName, i);
-		sprintf_s(objLoginInfo.m_szUserPass, MAX_BUFF_50, "%s", m_objLoginClient.m_szUserPass);
-
-		m_vecLoginInfo.push_back(objLoginInfo);
-	}
-
+	ULONG lulSendCount = 0;
 	while(m_blMultiple)
 	{
-		int nIndex = Random(m_objLoginClient.m_nUserIDFrom, m_objLoginClient.m_nUserIDTo);
+		int id = Random(m_objLoginClient.m_nUserIDFrom, m_objLoginClient.m_nUserIDTo);
+		int nIndex = id - m_objLoginClient.m_nUserIDFrom;
+		_LoginInfo& rdLoginInfo = m_vecLoginInfo[nIndex];
+	
+		Send_Login(rdLoginInfo);
+		updateItemData(rdLoginInfo, nIndex);
 
-		Send_Login(m_vecLoginInfo[nIndex - m_objLoginClient.m_nUserIDFrom]);
+		++m_nSendCount;
 	}
+	KillTimer(1);
 
 	m_blMultiple = false;
 	Close();
@@ -795,41 +840,23 @@ bool CLoginClientDlg::Send_SetUserInfo( int nUserID, int nLife, int nMagic )
 	return true;
 }
 
-void CLoginClientDlg::Show_Send_List(bool blAccount)
+// 更新指定项测试数据
+void CLoginClientDlg::updateItemData(_LoginInfo& objLoginInfo, const int nItemIndex)
 {
-	int nAllCount = 0;
-	m_lcServer.DeleteAllItems();
-	for(int i = 0; i < (int)m_vecLoginInfo.size(); i++)
-	{
-		CString strData;
-		wchar_t wszUserName[MAX_BUFF_50]    = {'\0'};
-		wchar_t wszUserPass[MAX_BUFF_50]    = {'\0'};
+	// 更新List列表项
+	//add by @单调
+	m_lcServer.SetRedraw(FALSE);
+	CString strData;
 
-		int nSrcLen = MultiByteToWideChar(CP_ACP, 0, m_vecLoginInfo[i].m_szUserName, -1, NULL, 0);
-		int nDecLen = MultiByteToWideChar(CP_ACP, 0, m_vecLoginInfo[i].m_szUserName, -1, wszUserName, MAX_BUFF_50);
+	strData.Format(_T("%d"), objLoginInfo.m_nSendCount);
+	m_lcServer.SetItemText(nItemIndex, 2, strData);
 
-		nSrcLen = MultiByteToWideChar(CP_ACP, 0, m_vecLoginInfo[i].m_szUserPass, -1, NULL, 0);
-		nDecLen = MultiByteToWideChar(CP_ACP, 0, m_vecLoginInfo[i].m_szUserPass, -1, wszUserPass, MAX_BUFF_50);
+	strData.Format(_T("%d"), objLoginInfo.m_nServerSuccess);
+	m_lcServer.SetItemText(nItemIndex, 3, strData);
 
-		m_lcServer.InsertItem(i, wszUserName);
-		m_lcServer.SetItemText(i, 1, wszUserPass);
-		strData.Format(_T("%d"),  m_vecLoginInfo[i].m_nSendCount);
-		m_lcServer.SetItemText(i, 2, strData);
-		strData.Format(_T("%d"),  m_vecLoginInfo[i].m_nServerSuccess);
-		m_lcServer.SetItemText(i, 3, strData);
-		strData.Format(_T("%d"),  m_vecLoginInfo[i].m_nServerFail);
-		m_lcServer.SetItemText(i, 4, strData);
-		nAllCount += m_vecLoginInfo[i].m_nSendCount;
-	}
-
-	if(blAccount == true)
-	{
-		CString steData;
-		steData.Format(_T("每秒发送[%d]个请求"), nAllCount - m_nSendCount);
-		m_txtClientCost.SetWindowText(steData);
-
-		m_nSendCount = nAllCount;
-	}
+	strData.Format(_T("%d"), objLoginInfo.m_nServerFail);
+	m_lcServer.SetItemText(nItemIndex, 4, strData);
+	m_lcServer.SetRedraw(TRUE);
 }
 
 
@@ -841,7 +868,7 @@ void CLoginClientDlg::OnBnClickedButton3()
 
 	KillTimer(1);
 
-	Show_Send_List(false);
+	m_txtClientCost.SetWindowText(L"");
 }
 
 int CLoginClientDlg::Random( int nStart, int nEnd )
@@ -855,7 +882,10 @@ void CLoginClientDlg::OnTimer(UINT_PTR nIDEvent)
 	switch(nIDEvent)
 	{
 	case 1:
-		Show_Send_List(true);
+		CString steData;
+		steData.Format(_T("每秒约发送[%d]个请求"), m_nSendCount - m_nLastSecondSendCount);
+		m_nLastSecondSendCount = m_nSendCount;
+		m_txtClientCost.SetWindowText(steData);
 	}
 
 	CDialog::OnTimer(nIDEvent);

@@ -112,7 +112,8 @@ private:
 	bool Send_UserInfo(int nUserID);
 	bool Send_SetUserInfo(int nUserID, int nLife, int nMagic);
 
-	void Show_Send_List(bool blAccount = false);
+	// 更新指定项测试数据
+	void updateItemData(_LoginInfo& objLoginInfo, const int nItemIndex); 
 
 private:
 	vecLoginInfo m_vecLoginInfo;
@@ -120,6 +121,8 @@ private:
 	_LoginClient m_objLoginClient; 
 	SOCKET       m_sckClient;
 	bool         m_blMultiple;
+
+	int	m_nLastSecondSendCount;
 	int          m_nSendCount;
 
 public:
