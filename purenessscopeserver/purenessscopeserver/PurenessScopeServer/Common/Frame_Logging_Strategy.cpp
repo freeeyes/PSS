@@ -117,14 +117,12 @@ int Frame_Logging_Strategy::InitLogStrategy(Logging_Config_Param &ConfigParam)
 {
     //Set Arg List
     char cmdline[1024] = {0};
-    int iCfgParamCnt = 0;
 
     string strTemp = ConfigParam.m_strLogLevel;
     string strLogLevel = GetLogLevel(strTemp);
 
     if(ConfigParam.m_bSendTerminal)
     {
-        iCfgParamCnt = 1;
         ACE_OS::sprintf(cmdline,"-s %s -f STDERR -p %s -i %d -m %d -N %d",
                         ConfigParam.m_strLogFile,
                         strLogLevel.c_str(),
@@ -134,7 +132,6 @@ int Frame_Logging_Strategy::InitLogStrategy(Logging_Config_Param &ConfigParam)
     }
     else
     {
-        iCfgParamCnt = LOG_CONFIG_ARGV_COUNT;
         ACE_OS::sprintf(cmdline,"-s %s -f OSTREAM -p %s -i %d -m %d -N %d",
                         ConfigParam.m_strLogFile,
                         strLogLevel.c_str(),

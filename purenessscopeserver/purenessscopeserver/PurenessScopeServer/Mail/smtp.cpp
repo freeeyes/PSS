@@ -330,7 +330,7 @@ int mailText(unsigned char **mail, const unsigned char *fromMail, const unsigned
 int mailAttachment(unsigned char **mail, const unsigned char *filePath)
 {
 	FILE *fp = NULL;
-	int fileSize, base64Size, headerSize, len;
+	int fileSize, base64Size, headerSize;
 	char *attach = NULL, *base64Attach = NULL, *attachHeader = NULL;
 	char fileName[MAX_EMAIL_LEN] = {0};
 	const char *contentType = "Content-Type: application/octet-stream";
@@ -386,7 +386,7 @@ int mailAttachment(unsigned char **mail, const unsigned char *filePath)
 		return -1;
 	}
 
-	len = ACE_OS::fread(attach, sizeof(char), fileSize, fp);
+	ACE_OS::fread(attach, sizeof(char), fileSize, fp);
 
 	//SMTP_Print6("[%s][%d] %s size = %d, base64Size = %d \r\n",__FILE__, __LINE__, filePath, fileSize, base64Size);
 

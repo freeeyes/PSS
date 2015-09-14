@@ -327,7 +327,6 @@ int CLogManager::ProcessLog(_LogBlockInfo* pLogBlockInfo)
 
 int CLogManager::WriteLog(int nLogType, const char* fmt, ...)
 {
-	int  nRet = 0;
 	//从日志块池里面找到一块空余的日志块
 	m_Logger_Mutex.acquire();
 	_LogBlockInfo* pLogBlockInfo = m_objLogBlockPool.GetLogBlockInfo();
@@ -350,7 +349,7 @@ int CLogManager::WriteLog(int nLogType, const char* fmt, ...)
 
 	if (IsRun()) 
 	{
-		nRet = PutLog(pLogBlockInfo);
+		PutLog(pLogBlockInfo);
 	} 
 	else 
 	{
@@ -414,7 +413,6 @@ int CLogManager::WriteLogBinary(int nLogType, const char* pData, int nLen)
 
 int CLogManager::WriteToMail( int nLogType, uint32 u4MailID, char* pTitle, const char* fmt, ... )
 {
-	int  nRet = 0;
 	//从日志块池里面找到一块空余的日志块
 	m_Logger_Mutex.acquire();
 	_LogBlockInfo* pLogBlockInfo = m_objLogBlockPool.GetLogBlockInfo();
@@ -439,7 +437,7 @@ int CLogManager::WriteToMail( int nLogType, uint32 u4MailID, char* pTitle, const
 
 	if (IsRun()) 
 	{
-		nRet = PutLog(pLogBlockInfo);
+		PutLog(pLogBlockInfo);
 	} 
 	else 
 	{

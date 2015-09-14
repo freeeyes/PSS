@@ -7,6 +7,7 @@
 class IMessageBlockManager
 {
 public:
+	virtual ~IMessageBlockManager() {};
 	virtual ACE_Message_Block* Create(uint32 u4Size) = 0;
 };
 
