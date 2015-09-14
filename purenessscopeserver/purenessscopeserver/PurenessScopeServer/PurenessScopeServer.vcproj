@@ -290,6 +290,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\IObject\ISendCacheManager.h"
+				>
+			</File>
+			<File
 				RelativePath=".\IObject\ITimerManager.h"
 				>
 			</File>
@@ -869,6 +873,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Common\SendCacheManager.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Common\SendMessage.h"
 					>
 				</File>
@@ -1063,6 +1071,10 @@
 							UsePrecompiledHeader="0"
 						/>
 					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\Common\SendCacheManager.cpp"
+					>
 				</File>
 				<File
 					RelativePath=".\Common\SendMessage.cpp"

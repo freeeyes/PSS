@@ -1187,6 +1187,10 @@ void CProConnectHandle::PutSendPacketError(ACE_Message_Block* pMbData)
 void CProConnectHandle::SetSendCacheManager(ISendCacheManager* pSendCacheManager)
 {
 	m_pBlockMessage = pSendCacheManager->GetCacheData(GetConnectID());
+	if(NULL == m_pBlockMessage)
+	{
+		OUR_DEBUG((LM_ERROR, "[CProConnectHandle::SetSendCacheManager] ConnectID = %d, m_pBlockMessage is NULL.\n", GetConnectID()));
+	}
 }
 
 //***************************************************************************
@@ -1234,6 +1238,7 @@ bool CProConnectManager::Close(uint32 u4ConnectID)
 {
 	//客户端关闭
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
+	//OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close](%d)Begin.\n", u4ConnectID));
 
 	mapConnectManager::iterator f = m_mapConnectManager.find(u4ConnectID);
 
@@ -1248,6 +1253,7 @@ bool CProConnectManager::Close(uint32 u4ConnectID)
 		//加入链接统计功能
 		App_ConnectAccount::instance()->AddDisConnect();
 
+		//OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close](%d)End.\n", u4ConnectID));
 		return true;
 	}
 	else
@@ -1288,13 +1294,15 @@ bool CProConnectManager::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status
 bool CProConnectManager::AddConnect(uint32 u4ConnectID, CProConnectHandle* pConnectHandler)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
+	//OUR_DEBUG((LM_ERROR, "[CProConnectHandle::AddConnect](%d)Begin.\n", u4ConnectID));
+	
 	if(pConnectHandler == NULL)
 	{
 		sprintf_safe(m_szError, MAX_BUFF_500, "[CProConnectManager::AddConnect] pConnectHandler is NULL.");
 		return false;		
 	}
 
-	m_ThreadWriteLock.acquire();
+	//m_ThreadWriteLock.acquire();
 	mapConnectManager::iterator f = m_mapConnectManager.find(u4ConnectID);
 	if(f != m_mapConnectManager.end())
 	{
@@ -1313,7 +1321,9 @@ bool CProConnectManager::AddConnect(uint32 u4ConnectID, CProConnectHandle* pConn
 	//加入链接统计功能
 	App_ConnectAccount::instance()->AddConnect();
 
-	m_ThreadWriteLock.release();
+	//m_ThreadWriteLock.release();
+
+	//OUR_DEBUG((LM_ERROR, "[CProConnectHandle::AddConnect](%d)End.\n", u4ConnectID));
 
 	return true;
 }
