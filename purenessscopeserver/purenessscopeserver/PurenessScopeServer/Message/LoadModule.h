@@ -38,7 +38,7 @@ class CLoadModule : public IModuleInfo
 {
 public:
 	CLoadModule(void);
-	~CLoadModule(void);
+	virtual ~CLoadModule(void);
 
 	void Close();
 
