@@ -159,7 +159,7 @@ bool CProConnectHandle::ServerClose(EM_Client_Close_status emStatus)
 		//发送服务器端链接断开消息。
 		if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_SDISCONNECT, &objMakePacket))
 		{
-			OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_SDISCONNECT is error.\n", GetConnectID()));
+			OUR_DEBUG((LM_ERROR, "[CProConnectHandle::ServerClose]ConnectID = %d, PACKET_SDISCONNECT is error.\n", GetConnectID()));
 			return false;
 		}
 
@@ -1279,6 +1279,9 @@ bool CProConnectManager::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status
 
 			m_u4TimeDisConnect++;
 
+			//回收发送内存块
+			m_SendCacheManager.FreeCacheData(u4ConnectID);
+
 			//加入链接统计功能
 			App_ConnectAccount::instance()->AddDisConnect();
 		}
@@ -1502,12 +1505,13 @@ bool CProConnectManager::KillTimer()
 
 int CProConnectManager::handle_timeout(const ACE_Time_Value &tv, const void *arg)
 {
-	ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
+	//ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
 	ACE_Time_Value tvNow = ACE_OS::gettimeofday();
 	vector<CProConnectHandle*> vecDelProConnectHandle;
 	//为了防止多线程下的链接删除问题，先把所有的链接ID读出来，再做遍历操作，减少线程竞争的机会。
 	if(m_mapConnectManager.size() != 0)
 	{
+		m_ThreadWriteLock.acquire();
 		for(mapConnectManager::iterator b = m_mapConnectManager.begin(); b != m_mapConnectManager.end(); b++)
 		{
 			CProConnectHandle* pConnectHandler = (CProConnectHandle* )b->second;
@@ -1519,10 +1523,15 @@ int CProConnectManager::handle_timeout(const ACE_Time_Value &tv, const void *arg
 				}
 			}
 		}
+		m_ThreadWriteLock.release();
 	}
 
 	for(uint32 i = 0; i < (uint32)vecDelProConnectHandle.size(); i++)
 	{
+		//关闭引用关系
+		Close(vecDelProConnectHandle[i]->GetConnectID());
+		//回收发送内存块
+		m_SendCacheManager.FreeCacheData(vecDelProConnectHandle[i]->GetConnectID());
 		vecDelProConnectHandle[i]->ServerClose(CLIENT_CLOSE_IMMEDIATLY);
 	}
 

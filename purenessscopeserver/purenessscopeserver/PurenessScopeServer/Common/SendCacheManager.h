@@ -37,6 +37,7 @@ private:
 	mapUsedCache               m_mapUsedCache;
 	vecFreeCache               m_vecFreeCache;
 	uint32                     m_u4CacheSize;
+	ACE_Recursive_Thread_Mutex m_ThreadLock;
 };
 
 #endif

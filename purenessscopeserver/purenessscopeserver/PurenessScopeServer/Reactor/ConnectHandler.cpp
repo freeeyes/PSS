@@ -2108,6 +2108,7 @@ int CConnectManager::handle_timeout(const ACE_Time_Value &tv, const void *arg)
 	{
 		if(m_mapConnectManager.size() > 0)
 		{
+			m_ThreadWriteLock.acquire();
 			for(mapConnectManager::iterator b = m_mapConnectManager.begin(); b != m_mapConnectManager.end(); b++)
 			{
 				CConnectHandler* pConnectHandler = (CConnectHandler* )b->second;
@@ -2119,6 +2120,7 @@ int CConnectManager::handle_timeout(const ACE_Time_Value &tv, const void *arg)
 					}
 				}
 			}
+			m_ThreadWriteLock.release();
 		}
 
 		for(uint32 i= 0; i < vecDelConnectHandler.size(); i++)
