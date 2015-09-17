@@ -301,6 +301,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 	uint32 u4TimeCost     = 0;      //命令执行时间
 	uint16 u2CommandCount = 0;      //命令被调用次数 
 	bool   blDeleteFlag   = true;   //用完是否删除，默认是删除
+
 	App_MessageManager::instance()->DoMessage(m_ThreadInfo.m_tvUpdateTime, pMessage, u2CommandID, u4TimeCost, u2CommandCount, blDeleteFlag);
 
 	if(true == blDeleteFlag)

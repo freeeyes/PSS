@@ -17,7 +17,7 @@ void CSendCacheManager::Init(uint32 u4CacheCount, uint32 u4CacheSize)
 	for(uint32 i = 0; i < u4CacheCount; i++)
 	{
 		ACE_Message_Block* pCache = new ACE_Message_Block(u4CacheSize);	
-		OUR_DEBUG((LM_INFO, "[CSendCacheManager::Init](%d)pMessage=0x%08x.\n", i, pCache));
+		//OUR_DEBUG((LM_INFO, "[CSendCacheManager::Init](%d)pMessage=0x%08x.\n", i, pCache));
 		if(NULL != pCache)
 		{
 			m_vecFreeCache.push_back(pCache);
@@ -74,6 +74,7 @@ ACE_Message_Block* CSendCacheManager::GetCacheData(uint32 u4ConnectID)
 	if(m_vecFreeCache.size() == 0)
 	{
 		pCache = App_MessageBlockManager::instance()->Create(m_u4CacheSize);	
+		//OUR_DEBUG((LM_INFO, "[CSendCacheManager::GetCacheData]***(%d)New pCache=0x%08x.\n", u4ConnectID, pCache));
 		m_mapUsedCache.insert(mapUsedCache::value_type(u4ConnectID, pCache));
 	}
 	else
@@ -81,15 +82,8 @@ ACE_Message_Block* CSendCacheManager::GetCacheData(uint32 u4ConnectID)
 		pCache = m_vecFreeCache[0];
 		m_vecFreeCache.erase(m_vecFreeCache.begin());
 		m_mapUsedCache.insert(mapUsedCache::value_type(u4ConnectID, pCache));
+		//OUR_DEBUG((LM_INFO, "[CSendCacheManager::GetCacheData]***(%d)Pool pCache=0x%08x.\n", u4ConnectID, pCache));
 	}
-		
-	/*
-	OUR_DEBUG((LM_INFO, "[CSendCacheManager::GetCacheData](%d)Used=%d,Free=%d,pCache=0x%08x.\n",
-		u4ConnectID, 
-		m_mapUsedCache.size(), 
-		m_vecFreeCache.size(), 
-		pCache));
-	*/
 		
 	return pCache;
 }
@@ -103,6 +97,8 @@ void CSendCacheManager::FreeCacheData(uint32 u4ConnectID)
 	{
 		pCache = (ACE_Message_Block* )f->second;
 
+		//OUR_DEBUG((LM_INFO, "[CSendCacheManager::GetCacheData]***(%d)free pCache=0x%08x.\n", u4ConnectID, pCache));
+
 		//÷ÿ÷√ª∫≥Â«¯
 		if(NULL != pCache)
 		{
@@ -111,11 +107,4 @@ void CSendCacheManager::FreeCacheData(uint32 u4ConnectID)
 		}
 		m_mapUsedCache.erase(f);
 	}
-	/*
-	OUR_DEBUG((LM_INFO, "[CSendCacheManager::FreeCacheData](%d)Used=%d,Free=%d,pCache=0x%08x.\n", 
-		u4ConnectID,
-		m_mapUsedCache.size(), 
-		m_vecFreeCache.size(), 
-		pCache));	
-	*/
 }

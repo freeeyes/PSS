@@ -116,6 +116,7 @@ private:
 	uint32             m_u4SuccessSendSize;            //实际客户端接收到的总字节数（水位标）
 	char               m_szConnectName[MAX_BUFF_100];  //连接名称，可以开放给逻辑插件去设置
 	bool               m_blIsLog;                      //是否写入日志，false为不写入，true为写入
+	uint8              m_u1IsActive;                   //连接是否为激活状态，0为否，1为是 
 
 
 	char               m_szLocalIP[MAX_BUFF_50];       //本地监听IP

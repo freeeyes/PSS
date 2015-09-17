@@ -130,6 +130,7 @@ private:
 	EM_Client_Close_status     m_emStatus;                     //服务器关闭标记位
 
 	_TimerCheckID*             m_pTCClose;                     //定时检测链接存活状态的定时器
+	uint8                      m_u1IsActive;                   //连接是否为激活状态，0为否，1为是 
 
 	char                       m_szLocalIP[MAX_BUFF_50];       //监听的IP地址
 	uint32                     m_u4LocalPort;                  //监听的端口号 

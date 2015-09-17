@@ -24,6 +24,7 @@ CProConnectHandle::CProConnectHandle(void)
 	m_u8SendQueueTimeCost = 0;
 	m_u4ReadSendSize      = 0;
 	m_u4SuccessSendSize   = 0;
+	m_u1IsActive          = 0;
 	m_pBlockMessage       = NULL;
 	m_u2SendQueueTimeout  = MAX_QUEUE_TIMEOUT * 1000;  //目前因为记录的是微秒，所以这里相应的扩大1000倍
 	m_u2RecvQueueTimeout  = MAX_QUEUE_TIMEOUT * 1000;  //目前因为记录的是微秒，所以这里相应的扩大1000倍
@@ -79,6 +80,11 @@ bool CProConnectHandle::Close(int nIOCount, int nErrno)
 	if(m_nIOCount > 0)
 	{
 		m_nIOCount -= nIOCount;
+	}
+
+	if(m_nIOCount == 0)
+	{
+		m_u1IsActive = 0;
 	}
 	m_ThreadWriteLock.release();
 
@@ -221,6 +227,7 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 	m_emStatus            = CLIENT_CLOSE_NOTHING;
 	m_blIsLog             = false;
 	m_szConnectName[0]    = '\0';
+	m_u1IsActive          = 1;
 
 	if(App_ForbiddenIP::instance()->CheckIP(m_addrRemote.get_host_addr()) == false)
 	{
@@ -716,17 +723,25 @@ uint8 CProConnectHandle::GetSendBuffState()
 
 bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, bool blState, uint8 u1SendType, uint32& u4PacketSize, bool blDelete)
 {
-	m_ThreadWriteLock.acquire();
-	m_nIOCount++;
-	m_ThreadWriteLock.release();	
-	//OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage]Connectid=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
+	OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage]Connectid=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
+	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);	
+	OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage]Connectid=%d,m_nIOCount=%d 1.\n", GetConnectID(), m_nIOCount));
+
+	//如果当前连接已被别的线程关闭，则这里不做处理，直接退出
+	if(m_u1IsActive == 0)
+	{
+		if(blDelete == true)
+		{					
+			App_BuffPacketManager::instance()->Delete(pBuffPacket);
+		}
+		return false;
+	}
 
 	ACE_Message_Block* pMbData = NULL;
 
 	if(NULL == pBuffPacket)
 	{
 		OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage] Connectid=[%d] pBuffPacket is NULL.\n", GetConnectID()));
-		Close();
 		return false;
 	}
 
@@ -752,7 +767,6 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 			{
 				App_BuffPacketManager::instance()->Delete(pBuffPacket);
 			}
-			Close();
 			return false;
 		}
 		else
@@ -779,7 +793,6 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 			App_BuffPacketManager::instance()->Delete(pBuffPacket);
 		}
 
-		Close();
 		return true;
 	}
 	else
@@ -798,7 +811,6 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 					//删除发送数据包 
 					App_BuffPacketManager::instance()->Delete(pBuffPacket);
 				}
-				Close();
 				return false;
 			}
 			
@@ -817,7 +829,6 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 					//删除发送数据包 
 					App_BuffPacketManager::instance()->Delete(pBuffPacket);
 				}
-				Close();
 				return false;
 			}
 
@@ -837,7 +848,6 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 			{
 				OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage] Connectid=[%d] pMbData is NULL.\n", GetConnectID()));
 				App_BuffPacketManager::instance()->Delete(pBuffPacket);
-				Close();
 				return false;
 			}
 
@@ -928,8 +938,6 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 		//设置封禁时间
 		App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), App_MainConfig::instance()->GetIPAlert()->m_u4IPTimeout);
 		OUR_DEBUG((LM_ERROR, "[CProConnectHandle::PutSendPacket] ConnectID = %d, Send Data is more than limit.\n", GetConnectID()));
-		//断开连接
-		Close(2);
 		return false;
 	}
 
@@ -945,8 +953,6 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 			OUR_DEBUG ((LM_ERROR, "[CProConnectHandle::PutSendPacket]ConnectID = %d, SingleConnectMaxSendBuffer is more than(%d)!\n", GetConnectID(), m_u4ReadSendSize - m_u4SuccessSendSize));
 			AppLogManager::instance()->WriteLog(LOG_SYSTEM_SENDQUEUEERROR, "]Connection from [%s:%d], SingleConnectMaxSendBuffer is more than(%d)!.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4ReadSendSize - m_u4SuccessSendSize);
 			pMbData->release();
-			//断开连接
-			Close(2);
 			return false;
 		}
 
@@ -955,24 +961,18 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 		{
 			OUR_DEBUG ((LM_ERROR, "[CProConnectHandle::PutSendPacket] Connectid=%d mb=%d m_writer.write error(%d)!\n", GetConnectID(),  pMbData->length(), errno));
 			pMbData->release();
-			Close();
 			return false;
 		}
 		else
 		{
-			m_ThreadWriteLock.acquire();
 			m_u4AllSendCount += 1;
 			m_atvOutput      = ACE_OS::gettimeofday();
-			m_ThreadWriteLock.release();
-			//Close();
 			return true;
 		}
-		//pMbData->release();
 	}
 	else
 	{
-		OUR_DEBUG ((LM_ERROR,"[CProConnectHandle::PutSendPacket] Connectid=%d mb is NULL!\n", GetConnectID()));
-		Close();
+		OUR_DEBUG ((LM_ERROR,"[CProConnectHandle::PutSendPacket] Connectid=%d mb is NULL!\n", GetConnectID()));;
 		return false;
 	}
 }
