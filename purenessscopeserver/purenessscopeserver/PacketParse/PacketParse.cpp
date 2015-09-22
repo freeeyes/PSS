@@ -305,7 +305,7 @@ bool CPacketParse::Connect(uint32 u4ConnectID, _ClientIPInfo objClientIPInfo, _C
 {
 	//这里添加你对连接建立的逻辑处理，如果没有则不用在这里写任何代码
 	//返回false，则连接会断开
-	App_PacketBufferManager::instance()->AddBuffer(u4ConnectID);
+	//App_PacketBufferManager::instance()->AddBuffer(u4ConnectID);
 
 	return true;
 }
@@ -313,7 +313,7 @@ bool CPacketParse::Connect(uint32 u4ConnectID, _ClientIPInfo objClientIPInfo, _C
 void CPacketParse::DisConnect(uint32 u4ConnectID)
 {
 	//这里添加你对连接断开的逻辑处理
-	App_PacketBufferManager::instance()->DelBuffer(u4ConnectID);
+	//App_PacketBufferManager::instance()->DelBuffer(u4ConnectID);
 }
 
 void CPacketParse::GetPacketHeadInfo(_PacketHeadInfo& objPacketHeadInfo)

@@ -203,7 +203,7 @@ uint32 CConnectHandler::GetConnectID()
 
 int CConnectHandler::open(void*)
 {
-	OUR_DEBUG((LM_ERROR, "[CConnectHandler::open](0x%08x),m_nIOCount=%d.\n", this, m_nIOCount));
+	//OUR_DEBUG((LM_ERROR, "[CConnectHandler::open](0x%08x),m_nIOCount=%d.\n", this, m_nIOCount));
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
 	
 	m_nIOCount            = 1;
@@ -368,7 +368,7 @@ int CConnectHandler::open(void*)
 //接受数据
 int CConnectHandler::handle_input(ACE_HANDLE fd)
 {
-	OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input](0x%08x)ConnectID=%d,m_nIOCount=%d.\n", this, GetConnectID(), m_nIOCount));
+	//OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input](0x%08x)ConnectID=%d,m_nIOCount=%d.\n", this, GetConnectID(), m_nIOCount));
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
 	//OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input]ConnectID=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
 
@@ -1223,9 +1223,9 @@ uint8 CConnectHandler::GetSendBuffState()
 
 bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, bool blState, uint8 u1SendType, uint32& u4PacketSize, bool blDelete)
 {
-	OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage](0x%08x) Connectid=%d,m_nIOCount=%d.\n", this, GetConnectID(), m_nIOCount));
+	//OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage](0x%08x) Connectid=%d,m_nIOCount=%d.\n", this, GetConnectID(), m_nIOCount));
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
-	OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage]222 Connectid=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
+	//OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage]222 Connectid=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
 
 	//如果当前连接已被别的线程关闭，则这里不做处理，直接退出
 	if(m_u1IsActive == 0)
@@ -1313,7 +1313,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
 				return false;
 			}
 
-			OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage] Connectid=[%d] aaa m_pBlockMessage=0x%08x.\n", GetConnectID(), m_pBlockMessage));
+			//OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage] Connectid=[%d] aaa m_pBlockMessage=0x%08x.\n", GetConnectID(), m_pBlockMessage));
 			m_objSendPacketParse.MakePacket(GetConnectID(), pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), m_pBlockMessage, u2CommandID);
 			//这里MakePacket已经加了数据长度，所以在这里不再追加
 		}
@@ -1332,7 +1332,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
 				return false;
 			}
 
-			OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage] Connectid=[%d] aaa m_pBlockMessage=0x%08x.\n", GetConnectID(), m_pBlockMessage));
+			//OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage] Connectid=[%d] aaa m_pBlockMessage=0x%08x.\n", GetConnectID(), m_pBlockMessage));
 			memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), m_pBlockMessage->wr_ptr(), pBuffPacket->GetPacketLen());
 			m_pBlockMessage->wr_ptr(pBuffPacket->GetPacketLen());
 		}
@@ -1356,7 +1356,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
 				return false;
 			}
 
-			OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage] Connectid=[%d] m_pBlockMessage=0x%08x.\n", GetConnectID(), m_pBlockMessage));
+			//OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage] Connectid=[%d] m_pBlockMessage=0x%08x.\n", GetConnectID(), m_pBlockMessage));
 			memcpy_safe(m_pBlockMessage->rd_ptr(), m_pBlockMessage->length(), pMbData->wr_ptr(), m_pBlockMessage->length());
 			pMbData->wr_ptr(m_pBlockMessage->length());
 			//放入完成，则清空缓存数据，使命完成
