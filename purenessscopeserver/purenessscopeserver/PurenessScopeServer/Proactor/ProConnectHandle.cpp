@@ -210,6 +210,7 @@ void CProConnectHandle::addresses (const ACE_INET_Addr &remote_address, const AC
 
 void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 {
+	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 	OUR_DEBUG((LM_INFO, "[CProConnectHandle::open] [0x%08x]Connection from [%s:%d]\n", this, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
 
 	m_atvConnect      = ACE_OS::gettimeofday();
@@ -275,8 +276,8 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 	//默认别名是IP地址
 	SetConnectName(m_addrRemote.get_host_addr());
 
-	if(this->m_Reader.open(*this, h, 0, App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE)) == -1 || 
-	this->m_Writer.open(*this, h, 0, App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE)) == -1)
+	if(this->m_Reader.open(*this, h, 0, proactor()) == -1 || 
+	this->m_Writer.open(*this, h, 0, proactor()) == -1)
 	{
 		OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::open] m_reader or m_reader == 0.\n"));	
 		Close();
@@ -304,7 +305,7 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 
 	m_u1ConnectState = CONNECT_OPEN;
 
-	OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::open] Open(%d).\n", GetConnectID()));	
+	//OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::open] Open(%d).\n", GetConnectID()));	
 
 	m_pPacketParse = App_PacketParsePool::instance()->Create();
 	if(NULL == m_pPacketParse)
@@ -328,6 +329,8 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 	{
 		OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 	}
+
+	OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::open] Open(%d) m_pPacketParse=0x%08x.\n", GetConnectID(), m_pPacketParse));
 	
 	if(m_pPacketParse->GetPacketMode() == PACKET_WITHHEAD)
 	{
@@ -343,9 +346,12 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 
 void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result &result)
 {
+	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 	ACE_Message_Block& mb = result.message_block();
 	uint32 u4PacketLen = (uint32)result.bytes_transferred();
 	int nTran = (int)result.bytes_transferred();
+
+	OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::handle_read_stream] Open(%d) m_pPacketParse=0x%08x.\n", GetConnectID(), m_pPacketParse));
 
 	if(!result.success() || result.bytes_transferred() == 0)
 	{
@@ -629,7 +635,6 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
 		//App_MessageBlockManager::instance()->Close(&result.message_block());
 		//错误消息回调
 		App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), &result.message_block());
-		Close();
 		return;
 	}
 	else
@@ -646,7 +651,6 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
 		
 		//记录发送字节数
 		m_u4SuccessSendSize += (uint32)result.bytes_to_write();
-		Close();
 
 		//查看是否需要关闭
 		if(CLIENT_CLOSE_SENDOK == m_emStatus)
@@ -727,9 +731,9 @@ uint8 CProConnectHandle::GetSendBuffState()
 
 bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, bool blState, uint8 u1SendType, uint32& u4PacketSize, bool blDelete)
 {
-	OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage]Connectid=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
+	//OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage]Connectid=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);	
-	OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage]Connectid=%d,m_nIOCount=%d 1.\n", GetConnectID(), m_nIOCount));
+	//OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage]Connectid=%d,m_nIOCount=%d 1.\n", GetConnectID(), m_nIOCount));
 
 	//如果当前连接已被别的线程关闭，则这里不做处理，直接退出
 	if(m_u1IsActive == 0)
@@ -983,9 +987,7 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 
 bool CProConnectHandle::RecvClinetPacket(uint32 u4PackeLen)
 {
-	m_ThreadWriteLock.acquire();
 	m_nIOCount++;
-	m_ThreadWriteLock.release();
 	//OUR_DEBUG((LM_ERROR, "[CProConnectHandle::RecvClinetPacket]Connectid=%d, m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
 
 	ACE_Message_Block* pmb = NULL;
