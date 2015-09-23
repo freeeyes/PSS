@@ -130,6 +130,8 @@ bool CProConnectHandle::Close(int nIOCount, int nErrno)
 		m_Reader.cancel();
 		m_Writer.cancel();
 
+		ACE_OS::shutdown(this->handle(), SD_BOTH);
+
 		if(this->handle() != ACE_INVALID_HANDLE)
 		{
 			ACE_OS::closesocket(this->handle());
@@ -171,6 +173,8 @@ bool CProConnectHandle::ServerClose(EM_Client_Close_status emStatus)
 
 		m_Reader.cancel();
 		m_Writer.cancel();
+
+		ACE_OS::shutdown(this->handle(), SD_BOTH);
 
 		if(this->handle() != ACE_INVALID_HANDLE)
 		{

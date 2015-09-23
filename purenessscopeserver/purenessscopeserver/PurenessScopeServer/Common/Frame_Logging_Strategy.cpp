@@ -145,8 +145,8 @@ int Frame_Logging_Strategy::InitLogStrategy(Logging_Config_Param &ConfigParam)
     ACE_NEW_RETURN (pImpl, ACE_TP_Reactor, -1);
     
 
-    //ACE_NEW_RETURN(pLogStraReactor, ACE_Reactor(pImpl ,1), -1);
-    ACE_NEW_RETURN(pLogStraReactor, ACE_Reactor, -1);
+    ACE_NEW_RETURN(pLogStraReactor, ACE_Reactor(pImpl ,1), -1);
+    //ACE_NEW_RETURN(pLogStraReactor, ACE_Reactor, -1);
     ACE_NEW_RETURN(pLogStrategy, My_ACE_Logging_Strategy, -1);
 
     //Set Reactor
