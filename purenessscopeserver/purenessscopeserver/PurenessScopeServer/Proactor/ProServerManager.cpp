@@ -445,8 +445,11 @@ bool CProServerManager::Close()
 	OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ReactorManager OK.\n"));	
 	OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close end....\n"));
 
-	m_pFrameLoggingStrategy->EndLogStrategy();
-	SAFE_DELETE(m_pFrameLoggingStrategy);
+	if(NULL != m_pFrameLoggingStrategy)
+	{
+		m_pFrameLoggingStrategy->EndLogStrategy();
+		SAFE_DELETE(m_pFrameLoggingStrategy);
+	}
 
 	return true;
 }
