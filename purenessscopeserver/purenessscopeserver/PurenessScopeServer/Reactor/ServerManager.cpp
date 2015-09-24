@@ -431,8 +431,11 @@ bool CServerManager::Close()
 	OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close end....\n"));
 
 
-	m_pFrameLoggingStrategy->EndLogStrategy();
-	SAFE_DELETE(m_pFrameLoggingStrategy);
+	if(NULL != m_pFrameLoggingStrategy)
+	{
+		m_pFrameLoggingStrategy->EndLogStrategy();
+		SAFE_DELETE(m_pFrameLoggingStrategy);
+	}
 
 	return true;
 }

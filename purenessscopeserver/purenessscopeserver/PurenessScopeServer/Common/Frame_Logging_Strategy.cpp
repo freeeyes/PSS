@@ -179,9 +179,12 @@ int Frame_Logging_Strategy::InitLogStrategy()
 //½áÊø²ßÂÔ
 int Frame_Logging_Strategy::EndLogStrategy()
 {
-		ACE_DEBUG((LM_INFO, ACE_TEXT("[Frame_Logging_Strategy::EndLogStrategy]Begin\n")));
-    pLogStraReactor->end_reactor_event_loop();
-    ACE_DEBUG((LM_INFO, ACE_TEXT("[Frame_Logging_Strategy::EndLogStrategy]End\n")));
+		if(NULL != pLogStrategy)
+		{
+			ACE_DEBUG((LM_INFO, ACE_TEXT("[Frame_Logging_Strategy::EndLogStrategy]Begin\n")));
+    	pLogStraReactor->end_reactor_event_loop();
+    	ACE_DEBUG((LM_INFO, ACE_TEXT("[Frame_Logging_Strategy::EndLogStrategy]End\n")));
+    }
     return 0;
 }
 
