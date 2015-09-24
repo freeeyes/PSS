@@ -57,17 +57,20 @@ Frame_Logging_Strategy::Frame_Logging_Strategy()
 
 Frame_Logging_Strategy::~Frame_Logging_Strategy()
 {
-    if(pLogStraReactor != NULL)
-    {
-		pLogStraReactor->close();
-        delete pLogStraReactor;
-    }
+	ACE_DEBUG((LM_INFO, ACE_TEXT("[Frame_Logging_Strategy::~Frame_Logging_Strategy]Begin\n")));
+  if (pLogStrategy != NULL)
+  {
+      pLogStrategy->reactor(NULL);
+      delete pLogStrategy;
+  }	
 
-    if (pLogStrategy != NULL)
-    {
-        pLogStrategy->reactor(NULL);
-        delete pLogStrategy;
-    }
+  if(pLogStraReactor != NULL)
+  {
+			pLogStraReactor->close();
+      delete pLogStraReactor;
+  }
+  
+  ACE_DEBUG((LM_INFO, ACE_TEXT("[Frame_Logging_Strategy::~Frame_Logging_Strategy]End\n")));
 }
 
 string Frame_Logging_Strategy::GetLogLevel(const string &strLogLevel)
@@ -176,7 +179,9 @@ int Frame_Logging_Strategy::InitLogStrategy()
 //½áÊø²ßÂÔ
 int Frame_Logging_Strategy::EndLogStrategy()
 {
-    pLogStraReactor->end_event_loop();
+		ACE_DEBUG((LM_INFO, ACE_TEXT("[Frame_Logging_Strategy::EndLogStrategy]Begin\n")));
+    pLogStraReactor->end_reactor_event_loop();
+    ACE_DEBUG((LM_INFO, ACE_TEXT("[Frame_Logging_Strategy::EndLogStrategy]End\n")));
     return 0;
 }
 
