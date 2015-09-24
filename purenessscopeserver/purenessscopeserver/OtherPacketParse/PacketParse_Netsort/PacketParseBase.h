@@ -45,6 +45,16 @@ public:
 	uint32 GetPacketHeadSrcLen();
 	uint32 GetPacketBodySrcLen();
 
+	void SetSort(uint8 u1Sort);
+
+	void Check_Recv_Unit16(uint16& u2Data);
+	void Check_Recv_Unit32(uint32& u4Data);
+	void Check_Recv_Unit64(uint64& u2Data);
+
+	void Check_Send_Unit16(uint16& u2Data);
+	void Check_Send_Unit32(uint32& u4Data);
+	void Check_Send_Unit64(uint64& u8Data);
+
 	ACE_Message_Block* GetMessageHead();
 	ACE_Message_Block* GetMessageBody();
 
@@ -67,6 +77,7 @@ protected:
 	bool   m_blIsHead;
 	char   m_szPacketVersion[MAX_BUFF_20];   //包解析器版本
 	uint8  m_u1PacketMode;                   //包解析模式 
+	uint8  m_u1Sort;                         //字节序规则，0为主机字节序，1为网络字节序   
 
 	_PacketHeadInfo    m_objPacketHeadInfo;  //数据包头信息 
 

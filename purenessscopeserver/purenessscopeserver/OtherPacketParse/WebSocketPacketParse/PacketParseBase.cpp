@@ -8,6 +8,7 @@ CPacketParseBase::CPacketParseBase(void)
 	m_u4PacketData      = 0;
 	m_u4HeadSrcSize     = 0;
 	m_u4BodySrcSize     = 0;
+	m_u1Sort            = 0;
 
 	//这里修改属于你的包解析版本号
 	sprintf_safe(m_szPacketVersion, MAX_BUFF_20, "0.90");
@@ -32,7 +33,6 @@ void CPacketParseBase::Clear()
 
 	m_blIsHead = false;
 
-	m_u4PacketHead      = 0;
 	m_u4PacketData      = 0;
 	m_u4HeadSrcSize     = 0;
 	m_u4BodySrcSize     = 0;
@@ -108,3 +108,61 @@ ACE_Message_Block* CPacketParseBase::GetMessageBody()
 	return m_pmbBody;
 };
 
+void CPacketParseBase::SetSort(uint8 u1Sort)
+{
+	m_u1Sort = u1Sort;
+}
+
+void CPacketParseBase::Check_Recv_Unit16(uint16& u2Data)
+{
+	if(m_u1Sort == 1)
+	{
+		//网序转换为主机字序
+		u2Data = ACE_NTOHS(u2Data);
+	}
+}
+
+void CPacketParseBase::Check_Recv_Unit32(uint32& u4Data)
+{
+	if(m_u1Sort == 1)
+	{
+		//网序转换为主机字序
+		u4Data = ACE_NTOHL(u4Data);
+	}
+}
+
+void CPacketParseBase::Check_Recv_Unit64(uint64& u8Data)
+{
+	if(m_u1Sort == 1)
+	{
+		//网序转换为主机字序
+		u8Data = ntohl64(u8Data);
+	}
+}
+
+void CPacketParseBase::Check_Send_Unit16(uint16& u2Data)
+{
+	if(m_u1Sort == 1)
+	{
+		//主机序到网序
+		u2Data = ACE_HTONS(u2Data);
+	}
+}
+
+void CPacketParseBase::Check_Send_Unit32(uint32& u4Data)
+{
+	if(m_u1Sort == 1)
+	{
+		//主机序到网序
+		u4Data = ACE_HTONL(u4Data);
+	}
+}
+
+void CPacketParseBase::Check_Send_Unit64(uint64& u8Data)
+{
+	if(m_u1Sort == 1)
+	{
+		//主机序到网序
+		u8Data = hl64ton(u8Data);
+	}
+}
