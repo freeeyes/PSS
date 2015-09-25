@@ -1022,7 +1022,7 @@ void CMessageServiceGroup::DeleteMessage(uint32 u4ConnectID, CMessage* pMessage)
 
 int32 CMessageServiceGroup::GetWorkThreadID(uint32 u4ConnectID, uint8 u1PackeType)
 {
-	uint32 u4ThreadID = -1;
+	int32 u4ThreadID = -1;
 	
 	if(m_vecMessageService.size() == 0)
 	{
