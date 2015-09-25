@@ -661,13 +661,21 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
 bool CMessageServiceGroup::PutMessage(CMessage* pMessage)
 {
 	//判断是否为TCP包，如果是则按照ConnectID区分。UDP则随机分配一个
-	uint32 u4ThreadID = 0;
+	int32 n4ThreadID = 0;
 
 	//得到工作线程ID
-	u4ThreadID = GetWorkThreadID(pMessage->GetMessageBase()->m_u4ConnectID, pMessage->GetMessageBase()->m_u1PacketType);
+	n4ThreadID = GetWorkThreadID(pMessage->GetMessageBase()->m_u4ConnectID, pMessage->GetMessageBase()->m_u1PacketType);
+	
+	if(-1 == n4ThreadID)
+	{
+		//如果没有获得工作线程ID,则删除数据
+		pMessage->Clear();
+		SAFE_DELETE(pMessage);
+		return false;
+	}
 	
 	//m_ThreadWriteLock.acquire();
-	CMessageService* pMessageService = (CMessageService* )m_vecMessageService[u4ThreadID];
+	CMessageService* pMessageService = (CMessageService* )m_vecMessageService[(uint32)n4ThreadID];
 	if(NULL != pMessageService)
 	{
 		pMessageService->PutMessage(pMessage);
@@ -973,10 +981,15 @@ bool CMessageServiceGroup::UnloadModule(const char* pModuleName, uint8 u1State)
 
 CMessage* CMessageServiceGroup::CreateMessage(uint32 u4ConnectID, uint8 u1PacketType)
 {
-	uint32 u4ThreadID = 0;
-	u4ThreadID = GetWorkThreadID(u4ConnectID, u1PacketType);
+	int32 n4ThreadID = 0;
+	n4ThreadID = GetWorkThreadID(u4ConnectID, u1PacketType);
+	
+	if(-1 == n4ThreadID)
+	{
+		return NULL;
+	}
 
-	CMessageService* pMessageService = (CMessageService* )m_vecMessageService[u4ThreadID];
+	CMessageService* pMessageService = (CMessageService* )m_vecMessageService[(uint32)n4ThreadID];
 	if(NULL != pMessageService)
 	{
 		return pMessageService->CreateMessage();
@@ -989,26 +1002,38 @@ CMessage* CMessageServiceGroup::CreateMessage(uint32 u4ConnectID, uint8 u1Packet
 
 void CMessageServiceGroup::DeleteMessage(uint32 u4ConnectID, CMessage* pMessage)
 {
-	uint32 u4ThreadID  = 0;
+	int32 n4ThreadID  = 0;
 	uint8 u1PacketType = PACKET_TCP;
-	u4ThreadID = GetWorkThreadID(u4ConnectID, u1PacketType);
+	n4ThreadID = GetWorkThreadID(u4ConnectID, u1PacketType);
+	
+	if(-1 == n4ThreadID)
+	{
+		pMessage->Clear();
+		SAFE_DELETE(pMessage);
+		return;
+	}
 
-	CMessageService* pMessageService = (CMessageService* )m_vecMessageService[u4ThreadID];
+	CMessageService* pMessageService = (CMessageService* )m_vecMessageService[(uint32)n4ThreadID];
 	if(NULL != pMessageService)
 	{
 		pMessageService->DeleteMessage(pMessage);
 	}
 }
 
-uint32 CMessageServiceGroup::GetWorkThreadID(uint32 u4ConnectID, uint8 u1PackeType)
+int32 CMessageServiceGroup::GetWorkThreadID(uint32 u4ConnectID, uint8 u1PackeType)
 {
-	uint32 u4ThreadID = 0;
+	uint32 u4ThreadID = -1;
+	
+	if(m_vecMessageService.size() == 0)
+	{
+		return u4ThreadID;
+	}
 
 	if(u1PackeType == PACKET_TCP)
 	{
 		u4ThreadID = u4ConnectID % (uint32)m_vecMessageService.size();
 	}
-	else
+	else if(u1PackeType == PACKET_UDP)
 	{
 		//如果是UDP协议，则获取当前随机数值
 		u4ThreadID = m_objRandomNumber.GetRandom();

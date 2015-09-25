@@ -253,6 +253,8 @@ int CConnectHandler::open(void*)
 		App_MainConfig::instance()->GetClientDataAlert()->m_u4SendPacketCount,
 		App_MainConfig::instance()->GetClientDataAlert()->m_u4SendDataMax);
 
+	int nRet = 0;
+	/*
 	int nRet = ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>::open();
 	if(nRet != 0)
 	{
@@ -260,6 +262,7 @@ int CConnectHandler::open(void*)
 		sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::open]ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>::open() error [%d].", nRet);
 		return -1;
 	}
+	*/
 
 	//设置链接为非阻塞模式
 	if (this->peer().enable(ACE_NONBLOCK) == -1)

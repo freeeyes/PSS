@@ -144,7 +144,7 @@ private:
 	bool StartTimer();
 	bool KillTimer();
 
-	uint32 GetWorkThreadID(uint32 u4ConnectID, uint8 u1PacketType);                           //根据操作类型和ConnectID计算出那个工作线程ID
+	int32 GetWorkThreadID(uint32 u4ConnectID, uint8 u1PacketType);                           //根据操作类型和ConnectID计算出那个工作线程ID
 
 private:
 	typedef vector<CMessageService*> vecMessageService;
