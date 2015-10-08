@@ -23,7 +23,7 @@ void CLoadModule::Close()
 	for(int i = 0; i < m_mapModuleInfo.GetSize(); i++)
 	{
 		//卸载并删除当初new的module对象
-		UnLoadModule(m_mapModuleInfo.GetMapDataKey(i).c_str(), false);
+		UnLoadModule(m_mapModuleInfo.GetMapDataKey(i).c_str());
 	}
 
 	m_mapModuleInfo.Clear();
