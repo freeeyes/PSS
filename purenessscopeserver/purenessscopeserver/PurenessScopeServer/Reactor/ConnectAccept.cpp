@@ -35,7 +35,7 @@ int ConnectAcceptor::make_svc_handler(CConnectHandler*& sh)
 			//这里会根据反应器线程配置，自动匹配一个空闲的反应器
 			int nIndex = (int)(m_u4AcceptCount % m_u4ClientReactorCount);
 			ACE_Reactor* pReactor = App_ReactorManager::instance()->GetAce_Client_Reactor(nIndex);
-			OUR_DEBUG((LM_ERROR, "[ConnectAcceptor::make_svc_handler]m_u4AcceptCount=%d, pReactor=0x%08x.\n", m_u4AcceptCount, pReactor));
+			//OUR_DEBUG((LM_ERROR, "[ConnectAcceptor::make_svc_handler]m_u4AcceptCount=%d, pReactor=0x%08x.\n", m_u4AcceptCount, pReactor));
 			pConnectHandler->reactor(pReactor);
 			//pConnectHandler->reactor(this->reactor());
 			m_u4AcceptCount++;

@@ -372,7 +372,7 @@ int CConnectHandler::open(void*)
 int CConnectHandler::handle_input(ACE_HANDLE fd)
 {
 	//OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input](0x%08x)ConnectID=%d,m_nIOCount=%d.\n", this, GetConnectID(), m_nIOCount));
-	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
+	//ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
 	//OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input]ConnectID=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
 
 	m_atvInput = ACE_OS::gettimeofday();
