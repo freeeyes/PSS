@@ -635,6 +635,9 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
 		//App_MessageBlockManager::instance()->Close(&result.message_block());
 		//错误消息回调
 		App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), &result.message_block());
+
+		App_MessageBlockManager::instance()->Close(&result.message_block());
+
 		return;
 	}
 	else
@@ -653,6 +656,7 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
 		m_u4SuccessSendSize += (uint32)result.bytes_to_write();
 
 		//查看是否需要关闭
+		/*
 		if(CLIENT_CLOSE_SENDOK == m_emStatus)
 		{
 			//查看是否所有字节都发送完毕，都发送完毕调用服务器关闭接口
@@ -661,6 +665,9 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
 				ServerClose(CLIENT_CLOSE_IMMEDIATLY);
 			}
 		}
+		*/
+
+
 
 		return;
 	}
@@ -946,6 +953,8 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 		//设置封禁时间
 		App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), App_MainConfig::instance()->GetIPAlert()->m_u4IPTimeout);
 		OUR_DEBUG((LM_ERROR, "[CProConnectHandle::PutSendPacket] ConnectID = %d, Send Data is more than limit.\n", GetConnectID()));
+		
+		App_MessageBlockManager::instance()->Close(pMbData);
 		return false;
 	}
 
@@ -960,7 +969,7 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 		{
 			OUR_DEBUG ((LM_ERROR, "[CProConnectHandle::PutSendPacket]ConnectID = %d, SingleConnectMaxSendBuffer is more than(%d)!\n", GetConnectID(), m_u4ReadSendSize - m_u4SuccessSendSize));
 			AppLogManager::instance()->WriteLog(LOG_SYSTEM_SENDQUEUEERROR, "]Connection from [%s:%d], SingleConnectMaxSendBuffer is more than(%d)!.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4ReadSendSize - m_u4SuccessSendSize);
-			pMbData->release();
+			App_MessageBlockManager::instance()->Close(pMbData);
 			return false;
 		}
 
@@ -968,7 +977,7 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 		if(0 != m_Writer.write(*pMbData, pMbData->length()))
 		{
 			OUR_DEBUG ((LM_ERROR, "[CProConnectHandle::PutSendPacket] Connectid=%d mb=%d m_writer.write error(%d)!\n", GetConnectID(),  pMbData->length(), errno));
-			pMbData->release();
+			App_MessageBlockManager::instance()->Close(pMbData);
 			return false;
 		}
 		else

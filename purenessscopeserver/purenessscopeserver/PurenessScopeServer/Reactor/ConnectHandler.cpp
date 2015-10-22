@@ -1437,8 +1437,9 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 		//设置封禁时间
 		App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), App_MainConfig::instance()->GetIPAlert()->m_u4IPTimeout);
 		OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, Send Data is more than limit.\n", GetConnectID()));
-		//断开连接
-		//Close(2);
+
+		App_MessageBlockManager::instance()->Close(pMbData);
+
 		return false;
 	}
 
@@ -1448,7 +1449,6 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 	if(NULL == pMbData)
 	{
 		OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetConnectID()));
-		Close();
 		return false;
 	}
 
@@ -1456,20 +1456,12 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 	{
 		OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetConnectID()));
 		sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::PutSendPacket] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetConnectID());
-		pMbData->release();
-		//Close();
+		App_MessageBlockManager::instance()->Close(pMbData);
 		return false;
 	}
 
 	//发送数据
 	char* pData = pMbData->rd_ptr();
-	if(NULL == pData)
-	{
-		OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, pData is NULL.\n", GetConnectID()));
-		pMbData->release();
-		//Close();
-		return false;
-	}
 
 	int nSendPacketLen = (int)pMbData->length();
 	int nIsSendSize    = 0;
@@ -1480,7 +1472,7 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 		if(nSendPacketLen <= 0)
 		{
 			OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, nCurrSendSize error is %d.\n", GetConnectID(), nSendPacketLen));
-			pMbData->release();
+			App_MessageBlockManager::instance()->Close(pMbData);
 			return false;
 		}
 
@@ -1490,7 +1482,6 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 		{
 			int nErrno = errno;
 			OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, error = %d.\n", GetConnectID(), nErrno));
-			//pMbData->release();
 
 			AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "WriteError [%s:%d] nErrno = %d  result.bytes_transferred() = %d, ",
 				                                m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), nErrno, 
@@ -1498,9 +1489,9 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 			m_atvOutput      = ACE_OS::gettimeofday();
 			//App_ConnectManager::instance()->Close(GetConnectID());
 			//错误消息回调
-			App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), pMbData);			
+			App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), pMbData);
+			App_MessageBlockManager::instance()->Close(pMbData);
 			
-			//Close();
 			return false;
 		}
 		else if(nDataLen >= nSendPacketLen - nIsSendSize)   //当数据包全部发送完毕，清空。
@@ -1508,12 +1499,11 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 			//OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_output] ConnectID = %d, send (%d) OK.\n", GetConnectID(), msg_queue()->is_empty()));
 			m_u4AllSendCount    += 1;
 			m_u4AllSendSize     += (uint32)pMbData->length();
-			pMbData->release();
-			m_atvOutput      = ACE_OS::gettimeofday();
-
-			//Close();
+			m_atvOutput         = ACE_OS::gettimeofday();
+			App_MessageBlockManager::instance()->Close(pMbData);
 
 			//看看需要不需要关闭连接
+			/*
 			if(CLIENT_CLOSE_SENDOK == m_emStatus)
 			{
 				if(m_u4ReadSendSize - m_u4SuccessSendSize == 0)
@@ -1521,6 +1511,7 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 					ServerClose(CLIENT_CLOSE_IMMEDIATLY);
 				}
 			}
+			*/
 
 			return true;
 		}
