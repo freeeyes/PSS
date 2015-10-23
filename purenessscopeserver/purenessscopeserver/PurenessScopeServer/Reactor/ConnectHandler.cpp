@@ -114,6 +114,8 @@ bool CConnectHandler::Close(int nIOCount)
 		//删除链接对象
 		App_ConnectManager::instance()->CloseConnectByClient(GetConnectID());
 
+		m_u4ConnectID = 0;
+
 		//回归用过的指针
 		App_ConnectHandlerPool::instance()->Delete(this);
 		OUR_DEBUG((LM_ERROR, "[CConnectHandler::Close](0x%08x)Close(ConnectID=%d) OK.\n", this, GetConnectID()));
@@ -169,16 +171,12 @@ bool CConnectHandler::ServerClose(EM_Client_Close_status emStatus, uint8 u1Optio
 			OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 		}
 
-		//调用连接断开消息
-		CPacketParse objPacketParse;
-		objPacketParse.DisConnect(GetConnectID());
-
-		m_u1ConnectState = CONNECT_SERVER_CLOSE;
-
 		//msg_queue()->deactivate();
 		shutdown();
 
 		ClearPacketParse();
+
+		m_u4ConnectID = 0;
 
 		//回归用过的指针
 		App_ConnectHandlerPool::instance()->Delete(this);
@@ -1487,11 +1485,14 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 				                                m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), nErrno, 
 				                                nIsSendSize);
 			m_atvOutput      = ACE_OS::gettimeofday();
-			//App_ConnectManager::instance()->Close(GetConnectID());
+
 			//错误消息回调
 			App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), pMbData);
 			App_MessageBlockManager::instance()->Close(pMbData);
 			
+			//关闭当前连接
+			App_ConnectManager::instance()->CloseUnLock(GetConnectID());
+
 			return false;
 		}
 		else if(nDataLen >= nSendPacketLen - nIsSendSize)   //当数据包全部发送完毕，清空。
@@ -1790,6 +1791,37 @@ bool CConnectManager::Close(uint32 u4ConnectID)
 		App_ConnectAccount::instance()->AddDisConnect();
 
 		OUR_DEBUG((LM_ERROR, "[CConnectManager::Close]ConnectID=%d End.\n", u4ConnectID));
+		return true;
+	}
+	else
+	{
+		sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectManager::Close] ConnectID[%d] is not find.", u4ConnectID);
+		return true;
+	}
+}
+
+bool CConnectManager::CloseUnLock(uint32 u4ConnectID)
+{
+	mapConnectManager::iterator f = m_mapConnectManager.find(u4ConnectID);
+
+	if(f != m_mapConnectManager.end())
+	{
+		CConnectHandler* pConnectHandler = (CConnectHandler* )f->second;
+		if(pConnectHandler != NULL)
+		{
+			//回收发送缓冲
+			m_SendCacheManager.FreeCacheData(u4ConnectID);			
+			m_u4TimeDisConnect++;
+		}
+		m_mapConnectManager.erase(f);
+
+		//加入链接统计功能
+		App_ConnectAccount::instance()->AddDisConnect();
+
+		OUR_DEBUG((LM_ERROR, "[CConnectManager::CloseUnLock]ConnectID=%d End.\n", u4ConnectID));
+
+		pConnectHandler->ServerClose(CLIENT_CLOSE_IMMEDIATLY);
+
 		return true;
 	}
 	else
@@ -3182,6 +3214,28 @@ bool CConnectManagerGroup::Close(uint32 u4ConnectID)
 	}	
 
 	return pConnectManager->Close(u4ConnectID);
+}
+
+bool CConnectManagerGroup::CloseUnLock(uint32 u4ConnectID)
+{
+	//判断命中到哪一个线程组里面去
+	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
+
+	mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
+	if(f == m_mapConnectManager.end())
+	{
+		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::GetClientIPInfo]Out of range Queue ID.\n"));
+		return false;
+	}
+
+	CConnectManager* pConnectManager = (CConnectManager* )f->second;
+	if(NULL == pConnectManager)
+	{
+		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::GetClientIPInfo]No find send Queue object.\n"));
+		return false;		
+	}	
+
+	return pConnectManager->CloseUnLock(u4ConnectID);
 }
 
 const char* CConnectManagerGroup::GetError()

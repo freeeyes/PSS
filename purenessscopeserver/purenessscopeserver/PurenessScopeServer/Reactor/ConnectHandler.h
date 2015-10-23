@@ -167,6 +167,7 @@ public:
 	bool PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, bool blSendState = true, bool blDelete = true); //异步发送
 	bool PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, bool blSendState = true, bool blDelete = true);                  //异步群发
 	bool Close(uint32 u4ConnectID);                                                                          //客户单关闭
+	bool CloseUnLock(uint32 u4ConnectID);                                                                    //关闭连接，不上锁版本
 	bool CloseConnect(uint32 u4ConnectID, EM_Client_Close_status emStatus);                                  //服务器关闭
 	void GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo);                                         //返回当前存活链接的信息
 	void SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4TimeCost);                                        //记录指定链接数据处理时间
@@ -260,6 +261,7 @@ public:
 	int  GetCount();
 	void CloseAll();
 	bool Close(uint32 u4ConnectID);                                                                          //客户单关闭
+	bool CloseUnLock(uint32 u4ConnectID);                                                                    //关闭连接，不上锁版本
 	bool SetConnectName(uint32 u4ConnectID, const char* pName);                                              //设置当前连接名称
 	bool SetIsLog(uint32 u4ConnectID, bool blIsLog);                                                         //设置当前连接数据是否写入日志      
 	void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);                                   //获得指定命令统计信息
