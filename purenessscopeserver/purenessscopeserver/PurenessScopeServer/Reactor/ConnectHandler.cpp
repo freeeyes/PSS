@@ -1905,9 +1905,6 @@ bool CConnectManager::AddConnect(uint32 u4ConnectID, CConnectHandler* pConnectHa
 
 bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint16 u2CommandID, bool blSendState, uint8 u1SendType, ACE_Time_Value& tvSendBegin, bool blDelete)
 {
-	//OUR_DEBUG((LM_ERROR, "[CConnectManager::SendMessage]ConnectID=%d Begin.\n", u4ConnectID));
-	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
-	//OUR_DEBUG((LM_ERROR, "[CConnectManager::SendMessage]ConnectID=%d Begin 1.\n", u4ConnectID));
 	//因为是队列调用，所以这里不需要加锁了。
 	if(NULL == pBuffPacket)
 	{
@@ -1915,11 +1912,13 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
 		return false;
 	}
 
+	m_ThreadWriteLock.acquire();
 	mapConnectManager::iterator f = m_mapConnectManager.find(u4ConnectID);
 
 	if(f != m_mapConnectManager.end())
 	{
 		CConnectHandler* pConnectHandler = (CConnectHandler* )f->second;
+		m_ThreadWriteLock.release();
 
 		if(NULL != pConnectHandler)
 		{
@@ -1943,6 +1942,7 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
 	}
 	else
 	{
+		m_ThreadWriteLock.release();
 		sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectManager::SendMessage] ConnectID[%d] is not find.", u4ConnectID);
 		App_BuffPacketManager::instance()->Delete(pBuffPacket);
 		m_ThreadWriteLock.release();

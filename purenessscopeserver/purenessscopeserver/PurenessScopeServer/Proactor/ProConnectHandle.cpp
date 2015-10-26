@@ -1348,14 +1348,14 @@ bool CProConnectManager::AddConnect(uint32 u4ConnectID, CProConnectHandle* pConn
 
 bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint16 u2CommandID, bool blSendState, uint8 u1SendType, ACE_Time_Value& tvSendBegin, bool blDelete)
 {
-	//ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
-	//OUR_DEBUG((LM_ERROR,"[CProConnectManager::SendMessage]BEGIN.\n"));
-
+	m_ThreadWriteLock.acquire();
 	mapConnectManager::iterator f = m_mapConnectManager.find(u4ConnectID);
 
 	if(f != m_mapConnectManager.end())
 	{
 		CProConnectHandle* pConnectHandler = (CProConnectHandle* )f->second;
+		m_ThreadWriteLock.release();
+
 		uint32 u4CommandSize = pBuffPacket->GetPacketLen();
 
 		if(NULL != pConnectHandler)
@@ -1374,6 +1374,7 @@ bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
 	}
 	else
 	{
+		m_ThreadWriteLock.release();
 		sprintf_safe(m_szError, MAX_BUFF_500, "[CProConnectManager::SendMessage] ConnectID[%d] is not find.", u4ConnectID);
 		//OUR_DEBUG((LM_ERROR,"[CProConnectManager::SendMessage]%s.\n", m_szError));
 		App_BuffPacketManager::instance()->Delete(pBuffPacket);
