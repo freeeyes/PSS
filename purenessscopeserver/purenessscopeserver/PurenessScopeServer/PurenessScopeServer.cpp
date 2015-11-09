@@ -174,7 +174,38 @@ int Checkfilelimit(int nMaxOpenFile)
 	return 0;
 }
 
+void Gdaemon()
+{
+	pid_t pid;
 
+	signal(SIGTTOU,SIG_IGN);
+	signal(SIGTTIN,SIG_IGN);
+	signal(SIGTSTP,SIG_IGN);
+
+	if(setpgrp() == -1)
+	{	
+		perror("setpgrp failure");
+	}
+
+	signal(SIGHUP,SIG_IGN);
+
+	if((pid = fork()) < 0)
+	{	
+		perror("fork failure");
+		exit(1);
+	}
+	else if(pid > 0)
+	{
+		exit(0);
+	}
+
+	setsid();
+	umask(0);
+
+	signal(SIGCLD,SIG_IGN);
+	signal(SIGCHLD,SIG_IGN);
+	signal(SIGPIPE,SIG_IGN);
+}
 
 int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 {
@@ -199,12 +230,14 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 	{
 		App_MainConfig::instance()->Display();
 	}
-
-	/*
-	#ifndef WIN32	
-	    signal(SIGTERM, sig_term);
-	#endif //WIN32
-	*/
+	
+	//判断是否是需要以服务的状态启动
+	if(App_MainConfig::instance()->GetServerType() == 1)
+	{
+		OUR_DEBUG((LM_INFO, "[main]Procress is run background.\n"));
+		//daemon(1,1);
+		Gdaemon();
+	}	
 
 	//判断当前并行连接数是否支持框架
 	//if(-1 == Checkfilelimit(App_MainConfig::instance()->GetMaxHandlerCount()))
@@ -227,15 +260,6 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 	
 	pthread_create(&tid, &attr, thread_Monitor, NULL);		
-
-	//判断是否是需要以服务的状态启动
-	if(App_MainConfig::instance()->GetServerType() == 1)
-	{
-		OUR_DEBUG((LM_INFO, "[main]Procress is run background.\n"));
-		//ACE::daemonize();
-		//daemonize();
-		daemon(1,1);
-	}
 
 	//第二步，启动主服务器监控
 	if(!App_ServerManager::instance()->Init())

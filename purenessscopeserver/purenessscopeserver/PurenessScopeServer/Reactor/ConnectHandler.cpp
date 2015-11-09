@@ -1459,8 +1459,6 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 	}
 
 	//·¢ËÍÊý¾Ý
-	char* pData = pMbData->rd_ptr();
-
 	int nSendPacketLen = (int)pMbData->length();
 	int nIsSendSize    = 0;
 
