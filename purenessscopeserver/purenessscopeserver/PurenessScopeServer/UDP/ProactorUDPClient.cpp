@@ -87,7 +87,9 @@ void CProactorUDPClient::handle_read_dgram(const ACE_Asynch_Read_Dgram::Result& 
 	int nPacketLen = (int)result.bytes_transferred();
 	int nTran = (int)result.bytes_transferred();
 
-	result.remote_address(m_addrRemote);
+	ACE_INET_Addr ServerAddr;  
+	result.remote_address(ServerAddr);
+	m_addrRemote.set(ServerAddr);
 
 	if(nPacketLen != 0 && nTran != 0)
 	{

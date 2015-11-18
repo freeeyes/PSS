@@ -101,7 +101,9 @@ void CProactorUDPHandler::handle_read_dgram(const ACE_Asynch_Read_Dgram::Result&
 	ACE_Message_Block* pMb = result.message_block();
 	int nTran = (int)result.bytes_transferred();
 
-	result.remote_address(m_addrRemote);
+	ACE_INET_Addr ClientAddr;  
+	result.remote_address(ClientAddr);
+	m_addrRemote.set(ClientAddr);
 
 	if(nTran != 0)
 	{
