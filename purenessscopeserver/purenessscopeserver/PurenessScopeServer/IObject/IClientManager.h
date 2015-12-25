@@ -8,7 +8,7 @@
 class IClientManager
 {
 public:
-	virtual ~IClientManager() {};
+    virtual ~IClientManager() {}
 
     //设置TCP链接参数，pClientMessage为远端数据到达处理类。
 	virtual bool Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, IClientMessage* pClientMessage)                  = 0;    

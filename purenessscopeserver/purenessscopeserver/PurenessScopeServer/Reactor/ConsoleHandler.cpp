@@ -289,7 +289,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
 		Close();
 		return 0;
 	}
-	else if (m_pCurrMessage->length() == m_pPacketParse->GetPacketHeadLen() && m_pPacketParse->GetIsHead() == false)
+    else if (m_pCurrMessage->length() == m_pPacketParse->GetPacketHeadLen() && m_pPacketParse->GetIsHandleHead())
 	{
 		m_pPacketParse->SetPacketHead(GetConnectID(), m_pCurrMessage, App_MessageBlockManager::instance());
 		uint32 u4PacketBodyLen = m_pPacketParse->GetPacketBodyLen();

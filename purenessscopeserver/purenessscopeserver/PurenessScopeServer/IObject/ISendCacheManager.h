@@ -6,7 +6,7 @@
 class ISendCacheManager
 {
 public:
-	virtual ~ISendCacheManager() {};
+    virtual ~ISendCacheManager() {}
 
 	//得到空闲块的数量
 	virtual uint32 GetFreeCount() = 0;

@@ -41,7 +41,7 @@ public:
 	uint32 GetPacketBodyLen();
 
 	uint16 GetPacketCommandID();
-	bool GetIsHead();
+	bool GetIsHandleHead();
 	uint32 GetPacketHeadSrcLen();
 	uint32 GetPacketBodySrcLen();
 
@@ -74,7 +74,7 @@ protected:
 	uint32 m_u4HeadSrcSize;              //包头的原始长度 
 	uint32 m_u4BodySrcSize;              //包体的原始长度
 	uint16 m_u2PacketCommandID;          //包命令
-	bool   m_blIsHead;
+	bool   m_blIsHandleHead;
 	char   m_szPacketVersion[MAX_BUFF_20];   //包解析器版本
 	uint8  m_u1PacketMode;                   //包解析模式 
 	uint8  m_u1Sort;                         //字节序规则，0为主机字节序，1为网络字节序   

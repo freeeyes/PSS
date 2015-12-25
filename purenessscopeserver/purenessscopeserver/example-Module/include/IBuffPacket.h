@@ -1,73 +1,75 @@
-#ifndef _IBUFFPACKET_H
+ï»¿#ifndef _IBUFFPACKET_H
 #define _IBUFFPACKET_H
 
 #include "define.h"
 
-//BuffPacketµÄ½Ó¿ÚÀà
+//BuffPacketçš„æŽ¥å£ç±»
 class IBuffPacket
 {
 public:
-	virtual ~IBuffPacket() {};
+    virtual ~IBuffPacket() {}
 
-	virtual uint32 GetPacketSize()      = 0;    //µÃµ½Êý¾Ý°üµÄ¸ñÊ½»¯³¤¶È
-	virtual uint32 GetPacketLen()       = 0;    //µÃµ½Êý¾Ý°üµÄÊµ¼Ê³¤¶È
-	virtual uint32 GetReadLen()         = 0;    //µÃµ½°ü¶ÁÈ¡µÄ³¤¶È
-	virtual uint32 GetWriteLen()        = 0;    //µÃµ½°üÐ´ÈëµÄ³¤¶È
-	virtual uint32 GetHeadLen()         = 0;    //µÃµ½Êý¾Ý°üÍ·µÄ³¤¶È
-	virtual uint32 GetPacketCount()     = 0;    //µÃµ½»º´æÊý¾Ý°üµÄ¸öÊý
+    virtual uint32 GetPacketSize()      = 0;    //å¾—åˆ°æ•°æ®åŒ…çš„æ ¼å¼åŒ–é•¿åº¦
+    virtual uint32 GetPacketLen()       = 0;    //å¾—åˆ°æ•°æ®åŒ…çš„å®žé™…é•¿åº¦
+    virtual uint32 GetReadLen()         = 0;    //å¾—åˆ°åŒ…è¯»å–çš„é•¿åº¦
+    virtual uint32 GetWriteLen()        = 0;    //å¾—åˆ°åŒ…å†™å…¥çš„é•¿åº¦
+    virtual uint32 GetHeadLen()         = 0;    //å¾—åˆ°æ•°æ®åŒ…å¤´çš„é•¿åº¦
+    virtual uint32 GetPacketCount()     = 0;    //å¾—åˆ°ç¼“å­˜æ•°æ®åŒ…çš„ä¸ªæ•°
 
-	virtual bool Init(int nSize)        = 0;
-	virtual bool Close()                = 0;
-	virtual bool Clear()                = 0;
+    virtual bool Init(int nSize)        = 0;
+    virtual bool Close()                = 0;
+    virtual bool Clear()                = 0;
 
-	virtual bool AddBuff(uint32 u4Size) = 0;
-	virtual const char* GetData()       = 0;
+    virtual bool AddBuff(uint32 u4Size) = 0;
+    virtual const char* GetData()       = 0;
 
-	virtual void SetReadPtr(uint32 u4Pos)                                = 0;    //ÉèÖÃ¶ÁÖ¸ÕëµÄÎ»ÖÃ
-	virtual void SetPacketCount(uint32 u4PacketCount)                    = 0;    //ÉèÖÃ»º´æÊý¾Ý°üµÄ¸öÊý
-	virtual bool WriteStream(const char* pData, uint32 u4Len)            = 0;    //Ö±½ÓÐ´ÈëÒ»¸ö¶þ½øÖÆÊý¾Ý¿é
-	virtual bool ReadStream(char*& pData, uint32& u4Len)                 = 0;    //Ö±½Ó¶ÁÈ¡³öÒ»¸ö¶þ½øÖÆÊý¾Ý¿é
-	virtual char* ReadPtr()                                              = 0;    //»ñµÃ¶ÁÖ¸Õë
-	virtual char* WritePtr()                                             = 0;    //»ñµÃÐ´Ö¸Õë
-	virtual bool RollBack(uint32 u4Len)                                  = 0;    //½«È¡³öµÄÊý¾ÝÉ¾³ý£¬½«ºóÃæµÄÊý¾Ý¼ÓÉÏ
+    virtual void SetReadPtr(uint32 u4Pos)                                = 0;    //è®¾ç½®è¯»æŒ‡é’ˆçš„ä½ç½®
+    virtual void SetPacketCount(uint32 u4PacketCount)                    = 0;    //è®¾ç½®ç¼“å­˜æ•°æ®åŒ…çš„ä¸ªæ•°
+    virtual bool WriteStream(const char* pData, uint32 u4Len)            = 0;    //ç›´æŽ¥å†™å…¥ä¸€ä¸ªäºŒè¿›åˆ¶æ•°æ®å—
+    virtual bool ReadStream(char*& pData, uint32& u4Len)                 = 0;    //ç›´æŽ¥è¯»å–å‡ºä¸€ä¸ªäºŒè¿›åˆ¶æ•°æ®å—
+    virtual char* ReadPtr()                                              = 0;    //èŽ·å¾—è¯»æŒ‡é’ˆ
+    virtual char* WritePtr()                                             = 0;    //èŽ·å¾—å†™æŒ‡é’ˆ
+    virtual bool RollBack(uint32 u4Len)                                  = 0;    //å°†å–å‡ºçš„æ•°æ®åˆ é™¤ï¼Œå°†åŽé¢çš„æ•°æ®åŠ ä¸Š
 
-	virtual void ReadBuffPtr(uint32 u4Size)                              = 0;    //ÒÆ¶¯Ö¸¶¨³¤¶ÈµÄ¶ÁÖ¸Õë
-	virtual void WriteBuffPtr(uint32 u4Size)                             = 0;    //ÒÆ¶¯Ö¸¶¨³¤¶ÈµÄÐ´Ö¸Õë
+    virtual void ReadBuffPtr(uint32 u4Size)                              = 0;    //ç§»åŠ¨æŒ‡å®šé•¿åº¦çš„è¯»æŒ‡é’ˆ
+    virtual void WriteBuffPtr(uint32 u4Size)                             = 0;    //ç§»åŠ¨æŒ‡å®šé•¿åº¦çš„å†™æŒ‡é’ˆ
 
-	virtual void SetNetSort(bool blState)                                = 0;    //ÉèÖÃÊÇ·ñ¿ªÆôÖ÷»ú×Ö½ÚÐò£¬falseÎª²»¿ªÆô£¬trueÎª¿ªÆô                               
+    virtual void SetNetSort(bool blState)                                = 0;    //è®¾ç½®æ˜¯å¦å¼€å¯ä¸»æœºå­—èŠ‚åºï¼Œfalseä¸ºä¸å¼€å¯ï¼Œtrueä¸ºå¼€å¯
 
-	//¶ÁÈ¡
-	virtual IBuffPacket& operator >> (uint8& u1Data)   = 0;        //¶Á³öÒ»¸öuint8µÄ1×Ö½ÚÎÞ·ûºÅÕûÊý
-	virtual IBuffPacket& operator >> (uint16& u2Data)  = 0;        //¶Á³öÒ»¸öuint16µÄ2×Ö½ÚÎÞ·ûºÅÕûÊý
-	virtual IBuffPacket& operator >> (uint32& u4Data)  = 0;        //¶Á³öÒ»¸öuint32µÄ4×Ö½ÚÎÞ·ûºÅÕûÊý
-	virtual IBuffPacket& operator >> (uint64 &u8Data)  = 0;        //¶Á³öÒ»¸öuint64µÄ8×Ö½ÚÎÞ·ûºÅÕûÊý
-	virtual IBuffPacket& operator >> (int8 &n1Data)    = 0;        //¶Á³öÒ»¸öint8µÄ1×Ö½ÚÎÞ·ûºÅÕûÊý
-	virtual IBuffPacket& operator >> (int16 &n2Data)   = 0;        //¶Á³öÒ»¸öint16µÄ2×Ö½ÚÎÞ·ûºÅÕûÊý
-	virtual IBuffPacket& operator >> (int32 &n8Data)   = 0;        //¶Á³öÒ»¸öint32µÄ4×Ö½ÚÎÞ·ûºÅÕûÊý
-	virtual IBuffPacket& operator >> (float32& f4Data) = 0;        //¶Á³öÒ»¸öfloat32µÄ4×Ö½ÚÐ¡Êý
-	virtual IBuffPacket& operator >> (float64& f8Data) = 0;        //¶Á³öÒ»¸öfloat64µÄ8×Ö½ÚÐ¡Êý
+    //è¯»å–
+    virtual IBuffPacket& operator >> (uint8& u1Data)   = 0;        //è¯»å‡ºä¸€ä¸ªuint8çš„1å­—èŠ‚æ— ç¬¦å·æ•´æ•°
+    virtual IBuffPacket& operator >> (uint16& u2Data)  = 0;        //è¯»å‡ºä¸€ä¸ªuint16çš„2å­—èŠ‚æ— ç¬¦å·æ•´æ•°
+    virtual IBuffPacket& operator >> (uint32& u4Data)  = 0;        //è¯»å‡ºä¸€ä¸ªuint32çš„4å­—èŠ‚æ— ç¬¦å·æ•´æ•°
+    virtual IBuffPacket& operator >> (uint64& u8Data)  = 0;        //è¯»å‡ºä¸€ä¸ªuint64çš„8å­—èŠ‚æ— ç¬¦å·æ•´æ•°
+    virtual IBuffPacket& operator >> (int8& n1Data)    = 0;        //è¯»å‡ºä¸€ä¸ªint8çš„1å­—èŠ‚æ— ç¬¦å·æ•´æ•°
+    virtual IBuffPacket& operator >> (int16& n2Data)   = 0;        //è¯»å‡ºä¸€ä¸ªint16çš„2å­—èŠ‚æ— ç¬¦å·æ•´æ•°
+    virtual IBuffPacket& operator >> (int32& n8Data)   = 0;        //è¯»å‡ºä¸€ä¸ªint32çš„4å­—èŠ‚æ— ç¬¦å·æ•´æ•°
+    virtual IBuffPacket& operator >> (float32& f4Data) = 0;        //è¯»å‡ºä¸€ä¸ªfloat32çš„4å­—èŠ‚å°æ•°
+    virtual IBuffPacket& operator >> (float64& f8Data) = 0;        //è¯»å‡ºä¸€ä¸ªfloat64çš„8å­—èŠ‚å°æ•°
 
-	virtual IBuffPacket& operator >> (VCHARS_STR& str) = 0;        //¶Á³öÒ»¸öÒ»¸ö×Ö½Ú³¤¶ÈµÄÊý¾Ý¿é£¨°üÀ¨1¸öuint8µÄÊý¾Ý³¤¶ÈºÍºóÃæµÄÊý¾Ý¿éÊµÌå£©
-	virtual IBuffPacket& operator >> (VCHARM_STR& str) = 0;        //¶Á³öÒ»¸öÒ»¸ö×Ö½Ú³¤¶ÈµÄÊý¾Ý¿é£¨°üÀ¨1¸öuint16µÄÊý¾Ý³¤¶ÈºÍºóÃæµÄÊý¾Ý¿éÊµÌå£©
-	virtual IBuffPacket& operator >> (VCHARB_STR& str) = 0;        //¶Á³öÒ»¸öÒ»¸ö×Ö½Ú³¤¶ÈµÄÊý¾Ý¿é£¨°üÀ¨1¸öuint32µÄÊý¾Ý³¤¶ÈºÍºóÃæµÄÊý¾Ý¿éÊµÌå£©
-	virtual IBuffPacket& operator >> (string& str)     = 0;        //¶Á³öÒ»¸östring
+    virtual IBuffPacket& operator >> (VCHARS_STR& str) = 0;        //è¯»å‡ºä¸€ä¸ªä¸€ä¸ªå­—èŠ‚é•¿åº¦çš„æ•°æ®å—ï¼ˆåŒ…æ‹¬1ä¸ªuint8çš„æ•°æ®é•¿åº¦å’ŒåŽé¢çš„æ•°æ®å—å®žä½“ï¼‰
+    virtual IBuffPacket& operator >> (VCHARM_STR& str) = 0;        //è¯»å‡ºä¸€ä¸ªä¸€ä¸ªå­—èŠ‚é•¿åº¦çš„æ•°æ®å—ï¼ˆåŒ…æ‹¬1ä¸ªuint16çš„æ•°æ®é•¿åº¦å’ŒåŽé¢çš„æ•°æ®å—å®žä½“ï¼‰
+    virtual IBuffPacket& operator >> (VCHARB_STR& str) = 0;        //è¯»å‡ºä¸€ä¸ªä¸€ä¸ªå­—èŠ‚é•¿åº¦çš„æ•°æ®å—ï¼ˆåŒ…æ‹¬1ä¸ªuint32çš„æ•°æ®é•¿åº¦å’ŒåŽé¢çš„æ•°æ®å—å®žä½“ï¼‰
+    virtual IBuffPacket& operator >> (string& str)     = 0;        //è¯»å‡ºä¸€ä¸ªstring
+    virtual IBuffPacket& operator >> (_PacketHeadInfo& ph) = 0;    //è¯»å‡ºåŒ…å¤´
 
-	//Ð´Èë
-	virtual IBuffPacket& operator << (uint8 u1Data)    = 0;        //Ð´ÈëÒ»¸öuint8µÄ1×Ö½ÚÎÞ·ûºÅÕûÊý
-	virtual IBuffPacket& operator << (uint16 u2Data)   = 0;        //Ð´ÈëÒ»¸öuint16µÄ2×Ö½ÚÎÞ·ûºÅÕûÊý
-	virtual IBuffPacket& operator << (uint32 u4Data)   = 0;        //Ð´ÈëÒ»¸öuint32µÄ4×Ö½ÚÎÞ·ûºÅÕûÊý
-	virtual IBuffPacket& operator << (uint64 u8Data)   = 0;        //Ð´ÈëÒ»¸öuint64µÄ8×Ö½ÚÎÞ·ûºÅÕûÊý
-	virtual IBuffPacket& operator << (int8 u1Data)     = 0;        //Ð´ÈëÒ»¸öint8µÄ1×Ö½ÚÎÞ·ûºÅÕûÊý
-	virtual IBuffPacket& operator << (int16 u2Data)    = 0;        //Ð´ÈëÒ»¸öint16µÄ2×Ö½ÚÎÞ·ûºÅÕûÊý
-	virtual IBuffPacket& operator << (int32 u4Data)    = 0;        //Ð´ÈëÒ»¸öint32µÄ4×Ö½ÚÎÞ·ûºÅÕûÊý
+    //å†™å…¥
+    virtual IBuffPacket& operator << (uint8 u1Data)    = 0;        //å†™å…¥ä¸€ä¸ªuint8çš„1å­—èŠ‚æ— ç¬¦å·æ•´æ•°
+    virtual IBuffPacket& operator << (uint16 u2Data)   = 0;        //å†™å…¥ä¸€ä¸ªuint16çš„2å­—èŠ‚æ— ç¬¦å·æ•´æ•°
+    virtual IBuffPacket& operator << (uint32 u4Data)   = 0;        //å†™å…¥ä¸€ä¸ªuint32çš„4å­—èŠ‚æ— ç¬¦å·æ•´æ•°
+    virtual IBuffPacket& operator << (uint64 u8Data)   = 0;        //å†™å…¥ä¸€ä¸ªuint64çš„8å­—èŠ‚æ— ç¬¦å·æ•´æ•°
+    virtual IBuffPacket& operator << (int8 u1Data)     = 0;        //å†™å…¥ä¸€ä¸ªint8çš„1å­—èŠ‚æ— ç¬¦å·æ•´æ•°
+    virtual IBuffPacket& operator << (int16 u2Data)    = 0;        //å†™å…¥ä¸€ä¸ªint16çš„2å­—èŠ‚æ— ç¬¦å·æ•´æ•°
+    virtual IBuffPacket& operator << (int32 u4Data)    = 0;        //å†™å…¥ä¸€ä¸ªint32çš„4å­—èŠ‚æ— ç¬¦å·æ•´æ•°
 
-	virtual IBuffPacket& operator << (float32 f4Data)  = 0;        //Ð´ÈëÒ»¸öfloat32µÄ4×Ö½ÚÐ¡Êý
-	virtual IBuffPacket& operator << (float64 f8Data)  = 0;        //Ð´ÈëÒ»¸öfloat64µÄ8×Ö½ÚÐ¡Êý
+    virtual IBuffPacket& operator << (float32 f4Data)  = 0;        //å†™å…¥ä¸€ä¸ªfloat32çš„4å­—èŠ‚å°æ•°
+    virtual IBuffPacket& operator << (float64 f8Data)  = 0;        //å†™å…¥ä¸€ä¸ªfloat64çš„8å­—èŠ‚å°æ•°
 
-	virtual IBuffPacket& operator << (VCHARS_STR &str) = 0;        //Ð´ÈëÒ»¸öÒ»¸ö×Ö½Ú³¤¶ÈµÄÊý¾Ý¿é£¨°üÀ¨1¸öuint8µÄÊý¾Ý³¤¶ÈºÍºóÃæµÄÊý¾Ý¿éÊµÌå£©
-	virtual IBuffPacket& operator << (VCHARM_STR &str) = 0;        //Ð´ÈëÒ»¸öÒ»¸ö×Ö½Ú³¤¶ÈµÄÊý¾Ý¿é£¨°üÀ¨1¸öuint16µÄÊý¾Ý³¤¶ÈºÍºóÃæµÄÊý¾Ý¿éÊµÌå£©
-	virtual IBuffPacket& operator << (VCHARB_STR &str) = 0;        //Ð´ÈëÒ»¸öÒ»¸ö×Ö½Ú³¤¶ÈµÄÊý¾Ý¿é£¨°üÀ¨1¸öuint32µÄÊý¾Ý³¤¶ÈºÍºóÃæµÄÊý¾Ý¿éÊµÌå£©
-	virtual IBuffPacket& operator << (string &str)     = 0;        //Ð´ÈëÒ»¸östring
+    virtual IBuffPacket& operator << (VCHARS_STR& str) = 0;        //å†™å…¥ä¸€ä¸ªä¸€ä¸ªå­—èŠ‚é•¿åº¦çš„æ•°æ®å—ï¼ˆåŒ…æ‹¬1ä¸ªuint8çš„æ•°æ®é•¿åº¦å’ŒåŽé¢çš„æ•°æ®å—å®žä½“ï¼‰
+    virtual IBuffPacket& operator << (VCHARM_STR& str) = 0;        //å†™å…¥ä¸€ä¸ªä¸€ä¸ªå­—èŠ‚é•¿åº¦çš„æ•°æ®å—ï¼ˆåŒ…æ‹¬1ä¸ªuint16çš„æ•°æ®é•¿åº¦å’ŒåŽé¢çš„æ•°æ®å—å®žä½“ï¼‰
+    virtual IBuffPacket& operator << (VCHARB_STR& str) = 0;        //å†™å…¥ä¸€ä¸ªä¸€ä¸ªå­—èŠ‚é•¿åº¦çš„æ•°æ®å—ï¼ˆåŒ…æ‹¬1ä¸ªuint32çš„æ•°æ®é•¿åº¦å’ŒåŽé¢çš„æ•°æ®å—å®žä½“ï¼‰
+    virtual IBuffPacket& operator << (string& str)     = 0;        //å†™å…¥ä¸€ä¸ªstring
+    virtual IBuffPacket& operator << (_PacketHeadInfo& ph) = 0;    //å†™å…¥åŒ…å¤´
 };
 
 #endif

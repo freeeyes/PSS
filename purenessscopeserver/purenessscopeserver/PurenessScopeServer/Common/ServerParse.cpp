@@ -7,7 +7,7 @@ CServerParse::CServerParse()
 	m_u2PacketCommandID = 0;
 	m_u4PacketData      = 0;
 
-	m_blIsHead          = false;
+    m_blIsHandleHead          = false;
 
 	m_pmbHead           = NULL;
 	m_pmbBody           = NULL;
@@ -24,7 +24,7 @@ void CServerParse::Init()
 	m_u2PacketCommandID = 0;
 	m_u4PacketData      = 0;
 
-	m_blIsHead          = false;
+    m_blIsHandleHead          = false;
 
 	m_pmbHead           = NULL;
 	m_pmbBody           = NULL;
@@ -45,9 +45,9 @@ uint16 CServerParse::GetPacketCommandID()
 	return m_u2PacketCommandID;
 }
 
-bool CServerParse::GetIsHead()
+bool CServerParse::GetIsHandleHead()
 {
-	return m_blIsHead;
+    return m_blIsHandleHead;
 }
 
 bool CServerParse::SetPacketHead(char* pData, uint32 u4Len)
@@ -56,7 +56,7 @@ bool CServerParse::SetPacketHead(char* pData, uint32 u4Len)
 	if(u4Len == sizeof(uint32))
 	{
 		memcpy_safe(pData, (uint32)sizeof(uint32), (char* )&m_u4PacketData, (uint32)sizeof(uint32));
-		m_blIsHead = true;
+        m_blIsHandleHead = true;
 		return true;
 	}
 	else
@@ -71,12 +71,12 @@ bool CServerParse::SetPacketBody(char* pData, uint32 u4Len)
 	if(u4Len >= sizeof(uint16))
 	{
 		memcpy_safe(pData, (uint32)sizeof(uint16), (char* )&m_u2PacketCommandID, (uint32)sizeof(uint16));
-		m_blIsHead = false;
+        m_blIsHandleHead = false;
 		return true;
 	}
 	else
 	{
-		m_blIsHead = false;
+        m_blIsHandleHead = false;
 		return false;
 	}
 }
@@ -139,6 +139,6 @@ void CServerParse::Close()
 		m_pmbBody = NULL;
 	}
 
-	m_blIsHead = false;
+    m_blIsHandleHead = false;
 }
 

@@ -27,8 +27,8 @@
 class CConvertBuffer
 {
 public:
-	CConvertBuffer() {};
-	~CConvertBuffer() {};
+    CConvertBuffer() {}
+    ~CConvertBuffer() {}
 	int GetBufferSize(const char* pData, int nSrcLen)
 	{
 		char szData[3] = {'\0'};
@@ -76,7 +76,7 @@ public:
 		}
 
 		return nConvertSize;
-	};
+    }
 
 	bool Convertstr2charArray(const char* pData, int nSrcLen, unsigned char* pDes, int& nMaxLen)
 	{
@@ -125,7 +125,7 @@ public:
 
 		nMaxLen = nConvertSize;
 		return true;
-	};
+    }
 private:
 	bool Get_binary_Char(unsigned char cTag, unsigned char& cDes)
 	{

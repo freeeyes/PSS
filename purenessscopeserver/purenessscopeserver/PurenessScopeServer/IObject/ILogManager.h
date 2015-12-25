@@ -6,7 +6,7 @@
 class ILogManager
 {
 public:
-	virtual ~ILogManager() {};
+    virtual ~ILogManager() {}
 	//文本日志记录
 	virtual int WriteLog(int nLogType, const char* fmt, ...)              = 0;
 	//二进制日志记录

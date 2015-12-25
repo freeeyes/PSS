@@ -1,4 +1,4 @@
-#ifndef _IMESSAGEMANAGER_H
+﻿#ifndef _IMESSAGEMANAGER_H
 #define _IMESSAGEMANAGER_H
 
 #include "ClientCommand.h"
@@ -7,7 +7,7 @@
 class IMessageManager
 {
 public:
-	virtual ~IMessageManager() {};
+	virtual ~IMessageManager() {}
 
 	virtual bool AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, _ClientIPInfo objListenInfo) = 0;
 	virtual bool AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName)                              = 0;

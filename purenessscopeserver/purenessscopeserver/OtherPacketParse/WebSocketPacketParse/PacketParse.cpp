@@ -25,7 +25,7 @@ void CPacketParse::Init()
 	m_u4HeadSrcSize     = 0;
 	m_u4BodySrcSize     = 0;
 
-	m_blIsHead          = false;
+	m_blIsHandleHead    = true;
 
 	m_pmbHead           = NULL;
 	m_pmbBody           = NULL;
@@ -43,7 +43,7 @@ bool CPacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead,
 		memcpy_safe(pData, (uint32)sizeof(uint32), (char* )&m_u4PacketData, (uint32)sizeof(uint32));
 		
 		m_pmbHead = pmbHead;
-		m_blIsHead = true;
+    m_blIsHandleHead = false;
 		return true;
 	}
 	else
@@ -62,13 +62,13 @@ bool CPacketParse::SetPacketBody(uint32 u4ConnectID, ACE_Message_Block* pmbBody,
 	if(u4Len >= sizeof(uint16))
 	{
 		memcpy_safe(pData, (uint32)sizeof(uint16), (char* )&m_u2PacketCommandID, (uint32)sizeof(uint16));
-		m_blIsHead = false;
+		m_blIsHandleHead = true;
 		m_pmbBody = pmbBody;
 		return true;
 	}
 	else
 	{
-		m_blIsHead = false;
+		m_blIsHandleHead = true;
 		return false;
 	}
 }
@@ -344,7 +344,7 @@ uint8 CPacketParse::Decrypt(char* pOriData, uint32& u4Len, char* pEncryData, uin
 
 	if(u4Len < 6)
 	{
-		m_blIsHead = true;
+		m_blIsHandleHead = true;
 
 		return PACKET_GET_NO_ENOUGTH;
 	}
@@ -371,7 +371,7 @@ uint8 CPacketParse::Decrypt(char* pOriData, uint32& u4Len, char* pEncryData, uin
 		nMinExpectedSize += 2;
 		if (u4Len < (uint32)nMinExpectedSize)
 		{
-			m_blIsHead = true;
+			m_blIsHandleHead = true;
 			return PACKET_GET_NO_ENOUGTH;
 		}
 		payloadSize = ntohs( *(u_short*) (pOriData + 2) );
@@ -383,7 +383,7 @@ uint8 CPacketParse::Decrypt(char* pOriData, uint32& u4Len, char* pEncryData, uin
 		nMinExpectedSize += 8;
 		if (u4Len < (uint32)nMinExpectedSize)
 		{
-			m_blIsHead = true;
+			m_blIsHandleHead = true;
 
 			return PACKET_GET_NO_ENOUGTH;
 		}
@@ -399,7 +399,7 @@ uint8 CPacketParse::Decrypt(char* pOriData, uint32& u4Len, char* pEncryData, uin
 	nMinExpectedSize += payloadSize;
 	if (u4Len < (uint32)nMinExpectedSize)
 	{
-		m_blIsHead = true;
+		m_blIsHandleHead = true;
 
 		return PACKET_GET_NO_ENOUGTH;
 	}

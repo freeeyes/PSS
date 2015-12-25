@@ -1,27 +1,29 @@
-#ifndef _IMESSAGE_H
+ï»¿#ifndef _IMESSAGE_H
 #define _IMESSAGE_H
 
 #include "IBuffPacket.h"
 #include "ProfileTime.h"
 
-//¼ÇÂ¼ÏûÏ¢µÄÒ»Ğ©²ÎÊı
+//è®°å½•æ¶ˆæ¯çš„ä¸€äº›å‚æ•°
 struct _MessageBase
 {
-	uint8          m_u1PacketType;        //Êı¾İ°üÀ´Ô´ÀàĞÍ  
-	uint32         m_u4ConnectID;         //ÏûÏ¢Á´½ÓConnectID£¬Èç¹ûÊÇUDPÔòÕâ¸öÖµÎŞĞ§
-	uint32         m_u4PacketID;          //Êı¾İ°üµÄID
-	uint16         m_u2Cmd;               //ÃüÁî×ÖµÄID
-	uint32         m_u4HeadSrcSize;       //°üÍ·Ô­Ê¼³¤¶È
-	uint32         m_u4BodySrcSize;       //°üÌåÔ­Ê¼³¤¶È
-	uint32         m_u4MsgTime;           //ÏûÏ¢½ÓÊÕµ½µÄÊ±¼ä
-	char           m_szIP[MAX_BUFF_20];   //¿Í»§¶ËIP(Ä¿Ç°Ö»ÓĞUDP»á¸³Öµ£¬TCP¿ÉÒÔ¸ù¾İConnectID×Ô¼ºÈ¥»ñÈ¡)
-	uint32         m_u4Port;              //¿Í»§¶Ë¶Ë¿Ú(Ä¿Ç°Ö»ÓĞUDP»á¸³Öµ£¬TCP¿ÉÒÔ¸ù¾İConnectID×Ô¼ºÈ¥»ñÈ¡)
-	uint32         m_u4WorkThreadID;      //¹¤×÷Ïß³ÌID
-	CProfileTime   m_ProfileTime;         //ÏûÏ¢µ½´ïÊ±¼ä
+	uint8          m_u1PacketType;              //æ•°æ®åŒ…æ¥æºç±»å‹  
+	uint32         m_u4ConnectID;               //æ¶ˆæ¯é“¾æ¥ConnectIDï¼Œå¦‚æœæ˜¯UDPåˆ™è¿™ä¸ªå€¼æ— æ•ˆ
+	uint32         m_u4PacketID;                //æ•°æ®åŒ…çš„ID
+	uint16         m_u2Cmd;                     //å‘½ä»¤å­—çš„ID
+	uint32         m_u4HeadSrcSize;             //åŒ…å¤´åŸå§‹é•¿åº¦
+	uint32         m_u4BodySrcSize;             //åŒ…ä½“åŸå§‹é•¿åº¦
+	uint32         m_u4MsgTime;                 //æ¶ˆæ¯æ¥æ”¶åˆ°çš„æ—¶é—´
+	char           m_szIP[MAX_BUFF_20];         //å®¢æˆ·ç«¯IP
+	uint32         m_u4Port;                    //å®¢æˆ·ç«¯ç«¯å£
+	char           m_szListenIP[MAX_BUFF_20];   //ç›‘å¬IP
+	uint32         m_u4ListenPort;              //ç›‘å¬ç«¯å£
+	uint32         m_u4WorkThreadID;            //å·¥ä½œçº¿ç¨‹ID
+	CProfileTime   m_ProfileTime;               //æ¶ˆæ¯åˆ°è¾¾æ—¶é—´
 
 	_MessageBase()
 	{
-		m_u1PacketType   = PACKET_TCP;   //Ä¬ÈÏÎªTCP
+		m_u1PacketType   = PACKET_TCP;   //é»˜è®¤ä¸ºTCP
 		m_u4ConnectID    = 0;
 		m_u4PacketID     = 0;
 		m_u2Cmd          = 0;
@@ -31,31 +33,35 @@ struct _MessageBase
 		m_u4WorkThreadID = 0;
 		m_szIP[0]        = '\0';
 		m_u4Port         = 0;
+		m_szListenIP[0]  = '\0';
+		m_u4ListenPort   = 0;
 	}
 };
 
-//ÏûÏ¢ĞÅÏ¢ÀàµÄ½Ó¿Ú
+//æ¶ˆæ¯ä¿¡æ¯ç±»çš„æ¥å£
 class IMessage
 {
 public:
-	virtual ~IMessage() {};
+	virtual ~IMessage() {}
 
 	virtual void Close() = 0;
 	virtual void Clear() = 0;
 
-	virtual void SetMessageBase(_MessageBase* pMessageBase)              = 0; //ÉèÖÃÁ¬½Ó»ù±¾ĞÅÏ¢
+	virtual void SetMessageBase(_MessageBase* pMessageBase)              = 0; //è®¾ç½®è¿æ¥åŸºæœ¬ä¿¡æ¯
+	virtual void SetPacketHeadInfo(_PacketHeadInfo& objPacketHeadInfo)   = 0; //è®¾ç½®åŒ…å¤´åè®®ä¿¡æ¯ 
 
-	virtual bool GetPacketHead(_PacketInfo& PacketInfo)    = 0;               //µÃµ½°üÍ·½á¹¹Ìå£¬²¢¸³Öµ¸ø_PacketInfo¶ÔÏó
-	virtual bool GetPacketBody(_PacketInfo& PacketInfo)    = 0;               //µÃµ½°üÌå½á¹¹Ìå£¬²¢¸³Öµ¸ø_PacketInfo¶ÔÏó
-	virtual bool SetPacketHead(ACE_Message_Block* pmbHead) = 0;               //ÉèÖÃ°üÍ·Êı¾İ¿é
-	virtual bool SetPacketBody(ACE_Message_Block* pmbBody) = 0;               //ÉèÖÃ°üÌåÊı¾İ¿é
+	virtual bool GetPacketHead(_PacketInfo& PacketInfo)    = 0;               //å¾—åˆ°åŒ…å¤´ç»“æ„ä½“ï¼Œå¹¶èµ‹å€¼ç»™_PacketInfoå¯¹è±¡
+	virtual bool GetPacketBody(_PacketInfo& PacketInfo)    = 0;               //å¾—åˆ°åŒ…ä½“ç»“æ„ä½“ï¼Œå¹¶èµ‹å€¼ç»™_PacketInfoå¯¹è±¡
+	virtual bool SetPacketHead(ACE_Message_Block* pmbHead) = 0;               //è®¾ç½®åŒ…å¤´æ•°æ®å—
+	virtual bool SetPacketBody(ACE_Message_Block* pmbBody) = 0;               //è®¾ç½®åŒ…ä½“æ•°æ®å—
 
-	virtual _MessageBase* GetMessageBase() = 0;                               //µÃµ½°üÁ¬½Ó»ù±¾ĞÅÏ¢
+	virtual _MessageBase* GetMessageBase()                 = 0;               //å¾—åˆ°åŒ…è¿æ¥åŸºæœ¬ä¿¡æ¯
+	virtual _PacketHeadInfo* GetPacketHeadInfo()           = 0;               //å¾—åˆ°åŒ…å¤´åè®®ä¿¡æ¯ 
 
-	virtual const char* GetError()         = 0;
+	virtual const char* GetError()                         = 0;
 };
 
-//ÖĞ¼ä·şÎñÆ÷ÏûÏ¢Àà½Ó¿Ú
+//ä¸­é—´æœåŠ¡å™¨æ¶ˆæ¯ç±»æ¥å£
 class IPostMessage
 {
 public:
@@ -66,12 +72,12 @@ public:
 		m_u4ServerID  = 0;
 		m_u2CommandID = 0;
 		m_blDelete    = true;
-	};
+	}
 
 	virtual ~IPostMessage()
 	{
 		Close();
-	};
+	}
 
 	virtual void Close()
 	{
@@ -90,7 +96,7 @@ public:
 		m_u4ServerID  = 0;
 		m_u2CommandID = 0;
 		m_blDelete    = true;
-	};
+	}
 
 	virtual bool SetRecvPacket(IBuffPacket* pRecvPacket)
 	{
@@ -101,7 +107,7 @@ public:
 
 		m_pRecvPacket = pRecvPacket;
 		return true;
-	};
+	}
 
 	virtual bool SetSendPacket(IBuffPacket* pSendPacket)
 	{
@@ -112,17 +118,17 @@ public:
 
 		m_pSendPacket = pSendPacket;
 		return true;
-	};
+	}
 
 	virtual IBuffPacket*  GetRecvPacket()
 	{
 		return m_pRecvPacket;
-	};
+	}
 
 	virtual IBuffPacket*  GetSendPacket()
 	{
 		return m_pSendPacket;
-	};
+	}
 
 	virtual void CallBefore()              = 0;
 	virtual void CallBack()                = 0;
@@ -130,22 +136,22 @@ public:
 	virtual void   SetServerID(uint32 u4ServerID)
 	{
 		m_u4ServerID = u4ServerID;
-	};
+	}
 
 	virtual uint32 GetServerID()
 	{
 		return m_u4ServerID;
-	};
+	}
 
 	virtual void   SetCommandID(uint16 u2CommandID)
 	{
 		m_u2CommandID = u2CommandID;
-	};
+	}
 
 	virtual uint16 GetCommandID()
 	{
 		return m_u2CommandID;
-	};
+	}
 
 private:
 	IBuffPacket* m_pRecvPacket;

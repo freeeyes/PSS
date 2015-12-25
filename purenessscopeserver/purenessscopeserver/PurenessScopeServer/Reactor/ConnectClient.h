@@ -37,7 +37,7 @@ public:
     bool SendData(ACE_Message_Block* pmblk);
     bool Close();
 
-    void ClinetClose(EM_s2s& ems2s);                       //主动关闭
+    void ClientClose(EM_s2s& ems2s);                       //主动关闭
     _ClientConnectInfo GetClientConnectInfo();             //得到当前链接信息
     
 private:

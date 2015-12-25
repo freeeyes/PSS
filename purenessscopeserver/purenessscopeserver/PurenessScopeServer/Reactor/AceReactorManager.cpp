@@ -351,7 +351,6 @@ bool CAceReactorManager::StartReactor()
 
 bool CAceReactorManager::StartReactorDefault()
 {
-    OUR_DEBUG((LM_INFO, "[CAceReactorManager::StartReactorDefault]..1. .\n"));
     //Æô¶¯Ä¬ÈÏµÄ Reactor
     mapAceReactor::iterator f = m_mapAceReactor.find(REACTOR_CLIENTDEFINE);
 
@@ -363,8 +362,6 @@ bool CAceReactorManager::StartReactorDefault()
         {
             pAceReactor->Start();
         }
-
-        OUR_DEBUG((LM_INFO, "[CAceReactorManager::StartReactorDefault]... 2.\n"));
     }
 
     return true;

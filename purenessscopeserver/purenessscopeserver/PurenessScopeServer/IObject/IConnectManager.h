@@ -20,7 +20,7 @@ enum EM_Client_Close_status
 class IConnectManager
 {
 public:
-	virtual ~IConnectManager() {};
+    virtual ~IConnectManager() {}
 	//异步发送指定的数据包(经过PacketParse整理发送包) IBuffPacket 会在内部用完自行销毁
 	virtual bool PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, bool blSendState = true, bool blDlete = true)                    = 0;  
 	//异步发送指定的数据包(不经过PacketParse整理发送包) pData在里面不负责销毁，需要在逻辑模块自行处理

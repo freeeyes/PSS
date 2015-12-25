@@ -38,7 +38,7 @@ public:
 class CServerLogger 
 {
 public:
-	virtual ~CServerLogger() {};
+    virtual ~CServerLogger() {}
 
 	virtual int DoLog(int nLogType, _LogBlockInfo* pLogBlockInfo) = 0;
 	virtual int GetLogTypeCount()                                 = 0;

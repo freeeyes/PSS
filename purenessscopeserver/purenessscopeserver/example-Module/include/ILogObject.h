@@ -1,57 +1,57 @@
-#ifndef _ILOGOBJECT
+ï»¿#ifndef _ILOGOBJECT
 #define _ILOGOBJECT
 
 #include "ace/SString.h"
 
-//ÈÕÖ¾¿éÊı¾İ½á¹¹
+//æ—¥å¿—å—æ•°æ®ç»“æ„
 struct _LogBlockInfo
 {
 public:
-	char*  m_pBlock;                     //¿éÖ¸Õë
-	uint32 m_u4Length;                   //¿é³¤¶È
-	bool   m_blIsUsed;                   //ÊÇ·ñÕıÔÚÊ¹ÓÃ
-	uint32 m_u4LogID;                    //LogID±ê¼Ç
-	uint32 m_u4MailID;                   //ÓÊ¼ş¶ÔÏóµÄIDĞòºÅ
-	char   m_szMailTitle[MAX_BUFF_200];  //ÓÊ¼ş¶ÔÏóµÄ±êÌâ
+    char*  m_pBlock;                     //å—æŒ‡é’ˆ
+    uint32 m_u4Length;                   //å—é•¿åº¦
+    bool   m_blIsUsed;                   //æ˜¯å¦æ­£åœ¨ä½¿ç”¨
+    uint32 m_u4LogID;                    //LogIDæ ‡è®°
+    uint32 m_u4MailID;                   //é‚®ä»¶å¯¹è±¡çš„IDåºå·
+    char   m_szMailTitle[MAX_BUFF_200];  //é‚®ä»¶å¯¹è±¡çš„æ ‡é¢˜
 
-	_LogBlockInfo()
-	{
-		m_pBlock         = NULL;
-		m_u4Length       = 0;
-		m_u4LogID        = 0;
-		m_blIsUsed       = false;
-		m_u4MailID       = 0;
-		m_szMailTitle[0] = '\0';
-	}
+    _LogBlockInfo()
+    {
+        m_pBlock         = NULL;
+        m_u4Length       = 0;
+        m_u4LogID        = 0;
+        m_blIsUsed       = false;
+        m_u4MailID       = 0;
+        m_szMailTitle[0] = '\0';
+    }
 
-	void clear()
-	{
-		m_u4Length       = 0;
-		m_u4LogID        = 0;
-		m_blIsUsed       = false;
-		m_u4MailID       = 0;
-		m_szMailTitle[0] = '\0';
-	}
+    void clear()
+    {
+        m_u4Length       = 0;
+        m_u4LogID        = 0;
+        m_blIsUsed       = false;
+        m_u4MailID       = 0;
+        m_szMailTitle[0] = '\0';
+    }
 };
 
-//ÈÕÖ¾Àà¶ÔÏó(ÊÇÒ»¸öĞéÀà£¬ÓÉ±ğµÄÀà¼Ì³ĞÊµÏÖÄÚ²¿)
-class CServerLogger 
+//æ—¥å¿—ç±»å¯¹è±¡(æ˜¯ä¸€ä¸ªè™šç±»ï¼Œç”±åˆ«çš„ç±»ç»§æ‰¿å®ç°å†…éƒ¨)
+class CServerLogger
 {
 public:
-	virtual ~CServerLogger() {};
+    virtual ~CServerLogger() {}
 
-	virtual int DoLog(int nLogType, _LogBlockInfo* pLogBlockInfo) = 0;
-	virtual int GetLogTypeCount()                                 = 0;
-	virtual int GetLogType(int nIndex)                            = 0;
+    virtual int DoLog(int nLogType, _LogBlockInfo* pLogBlockInfo) = 0;
+    virtual int GetLogTypeCount()                                 = 0;
+    virtual int GetLogType(int nIndex)                            = 0;
 
-	virtual uint32 GetBlockSize()                                 = 0;
-	virtual uint32 GetPoolCount()                                 = 0;
+    virtual uint32 GetBlockSize()                                 = 0;
+    virtual uint32 GetPoolCount()                                 = 0;
 
-	virtual uint32 GetCurrLevel()                                 = 0;
-	virtual uint16 GetLogID(uint16 u2Index)                       = 0;
-	virtual char*  GetLogInfoByServerName(uint16 u2LogID)         = 0;
-	virtual char*  GetLogInfoByLogName(uint16 u2LogID)            = 0;
-	virtual int    GetLogInfoByLogDisplay(uint16 u2LogID)         = 0;
-	virtual bool   ReSet(uint32 u4CurrLogLevel)                   = 0;
+    virtual uint32 GetCurrLevel()                                 = 0;
+    virtual uint16 GetLogID(uint16 u2Index)                       = 0;
+    virtual char*  GetLogInfoByServerName(uint16 u2LogID)         = 0;
+    virtual char*  GetLogInfoByLogName(uint16 u2LogID)            = 0;
+    virtual int    GetLogInfoByLogDisplay(uint16 u2LogID)         = 0;
+    virtual bool   ReSet(uint32 u4CurrLogLevel)                   = 0;
 };
 #endif

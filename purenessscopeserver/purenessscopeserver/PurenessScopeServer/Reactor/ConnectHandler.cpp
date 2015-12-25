@@ -529,7 +529,7 @@ int CConnectHandler::RecvData()
 			Close();
 			return 0;
 		}
-		else if(m_pCurrMessage->length() == m_pPacketParse->GetPacketHeadLen() && m_pPacketParse->GetIsHead() == false)
+        else if(m_pCurrMessage->length() == m_pPacketParse->GetPacketHeadLen() && m_pPacketParse->GetIsHandleHead())
 		{
 			bool blStateHead = m_pPacketParse->SetPacketHead(GetConnectID(), m_pCurrMessage, App_MessageBlockManager::instance());
 			if(false == blStateHead)
@@ -892,7 +892,7 @@ int CConnectHandler::RecvData_et()
 				Close();
 				return 0;
 			}
-			else if(m_pCurrMessage->length() == m_pPacketParse->GetPacketHeadLen() && m_pPacketParse->GetIsHead() == false)
+            else if(m_pCurrMessage->length() == m_pPacketParse->GetPacketHeadLen() && m_pPacketParse->GetIsHandleHead())
 			{
 				bool blStateHead = m_pPacketParse->SetPacketHead(GetConnectID(), m_pCurrMessage, App_MessageBlockManager::instance());
 				if(false == blStateHead)
@@ -1921,9 +1921,9 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
 		if(NULL != pConnectHandler)
 		{
 			uint32 u4PacketSize = 0;
-			OUR_DEBUG((LM_ERROR, "[CConnectManager::SendMessage]ConnectID=%d Begin 1 pConnectHandler.\n", u4ConnectID));
+            //OUR_DEBUG((LM_ERROR, "[CConnectManager::SendMessage]ConnectID=%d Begin 1 pConnectHandler.\n", u4ConnectID));
 			pConnectHandler->SendMessage(u2CommandID, pBuffPacket, blSendState, u1SendType, u4PacketSize, blDelete);
-			OUR_DEBUG((LM_ERROR, "[CConnectManager::SendMessage]ConnectID=%d End 1 pConnectHandler.\n", u4ConnectID));
+            //OUR_DEBUG((LM_ERROR, "[CConnectManager::SendMessage]ConnectID=%d End 1 pConnectHandler.\n", u4ConnectID));
 			//记录消息发送消耗时间
 			ACE_Time_Value tvInterval = ACE_OS::gettimeofday() - tvSendBegin;
 			uint32 u4SendCost = (uint32)(tvInterval.msec());

@@ -78,14 +78,14 @@ public:
 	{ 
 		m_nMaxConnectCount = 100;  //默认每秒最高100次 
 		m_szTrackIP[0]     = '\0';
-	};
+    }
 
 	~CIPAccount() 
 	{
 		OUR_DEBUG((LM_INFO, "[CIPAccount::~CIPAccount].\n"));
 		Close(); 
 		OUR_DEBUG((LM_INFO, "[CIPAccount::~CIPAccount]End.\n"));
-	};
+    }
 
 	void Close()
 	{
@@ -97,7 +97,7 @@ public:
 		m_nMaxConnectCount = u4IPCount;
 
 		m_objRing.Init(u4TrackLogCount);
-	};
+    }
 
 	bool AddIP(string strIP)
 	{
@@ -161,7 +161,7 @@ public:
 		*/
 
 		return blRet;
-	};
+    }
 
 	bool CloseIP(/* string strIP, int nPort, uint32 u4RecvSize, uint32 u4SendSize */)
 	{
@@ -285,7 +285,7 @@ public:
 		m_u4DisConnectMax  = 0;
 		m_u4CurrConnect    = 0;
 		m_u4CurrDisConnect = 0;
-	};
+    }
 
 	~CConnectAccount()
 	{

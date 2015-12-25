@@ -70,7 +70,7 @@ public:
 	My_ACE_Logging_Strategy (void);
 
 	/// Destructor.
-	~My_ACE_Logging_Strategy (void);
+    virtual ~My_ACE_Logging_Strategy (void);
 
 	/// Dynamic linking initialization hook.
 	virtual int init (int argc, ACE_TCHAR *argv[]);

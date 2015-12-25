@@ -419,7 +419,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 			}
 
 		}
-		else if(mb.length() == m_pPacketParse->GetPacketHeadLen() && m_pPacketParse->GetIsHead() == false)
+        else if(mb.length() == m_pPacketParse->GetPacketHeadLen() && m_pPacketParse->GetIsHandleHead())
 		{
 			//判断头的合法性
 			bool blStateHead = m_pPacketParse->SetPacketHead(GetConnectID(), &mb, App_MessageBlockManager::instance());

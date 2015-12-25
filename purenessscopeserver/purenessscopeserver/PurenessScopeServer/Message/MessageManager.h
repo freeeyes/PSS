@@ -54,12 +54,12 @@ private:
 public:
 	CClientCommandList()
 	{
-	};
+    }
 
 	~CClientCommandList()
 	{
 		Close();
-	};
+    }
 
 	void Close()
 	{
@@ -86,7 +86,7 @@ public:
 			return NULL;
 		}
 
-	};
+    }
 
 	_ClientCommandInfo* AddClientCommand(CClientCommand* pClientCommand, const char* pMuduleName, _ClientIPInfo objListenInfo)
 	{
@@ -104,7 +104,7 @@ public:
 			return NULL;
 		}
 
-	};
+    }
 
 	//如果返回为true，证明这个消息已经没有对应项，需要外围map中除去
 	bool DelClientCommand(CClientCommand* pClientCommand)

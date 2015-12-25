@@ -10,13 +10,13 @@
 class IPacketParse
 {
 public:
-	virtual ~IPacketParse() {};
+    virtual ~IPacketParse() {}
 
 	virtual uint32 GetPacketHeadLen()    = 0;
 	virtual uint32 GetPacketBodyLen()    = 0;
 	virtual uint16 GetPacketCommandID()  = 0;
 
-	virtual bool GetIsHead()             = 0;
+    virtual bool GetIsHandleHead()       = 0;
 
 	virtual bool SetPacketHead(char* pData, uint32 u4Len) = 0;
 	virtual bool SetPacketBody(char* pData, uint32 u4Len) = 0;

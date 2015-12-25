@@ -945,17 +945,17 @@ public:
 		sprintf_safe(m_szFileName, MAX_BUFF_300, "%s", pFileName);
 		m_nFileLine = nLine;
 		TimeBegin();
-	};
+    }
 
 	~CTimeCost()
 	{
 		TimeEnd();
-	};
+    }
 
 	void TimeBegin()
 	{
 		m_lBegin = GetSystemTickCount();
-	};
+    }
 
 	void TimeEnd()
 	{
@@ -977,7 +977,7 @@ public:
 				ACE_OS::fclose(pFile);
 			}
 		}
-	};
+    }
 
 private:
 	unsigned long GetSystemTickCount()

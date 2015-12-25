@@ -1,35 +1,41 @@
-#ifndef _ICLIENTMANAGER_H
+ï»¿#ifndef _ICLIENTMANAGER_H
 #define _ICLIENTMANAGER_H
 
 #include "ClientMessage.h"
 #include "ClientUDPMassage.h"
 
-//¸ºÔğ¹ÜÀí·şÎñÆ÷¼äÍ¨Ñ¶µÄÊı¾İ¹ÜÀí
+//è´Ÿè´£ç®¡ç†æœåŠ¡å™¨é—´é€šè®¯çš„æ•°æ®ç®¡ç†
 class IClientManager
 {
 public:
-	virtual ~IClientManager() {};
+    virtual ~IClientManager() {}
 
-	//ÉèÖÃTCPÁ´½Ó²ÎÊı£¬pClientMessageÎªÔ¶¶ËÊı¾İµ½´ï´¦ÀíÀà¡£
-	virtual bool Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, IClientMessage* pClientMessage)                  = 0;    
-	//ÉèÖÃUDPÁ´½Ó²ÎÊı£¬pClientUDPMessageÎªÔ¶¶ËÊı¾İµ½´ï´¦ÀíÀà¡£
-	virtual bool ConnectUDP(int nServerID, const char* pIP, int nPort,  uint8 u1IPType, IClientUDPMessage* pClientUDPMessage)        = 0;
-	//¹Ø±ÕÄ³Ò»¸öServerID¶ÔÓ¦µÄTCPÁ´½Ó
-	virtual bool Close(int nServerID)                                                                                                = 0;
-	//¹Ø±ÕÄ³Ò»¸öServerID¶ÔÓ¦µÄUDPÁ´½Ó
-	virtual bool CloseUDP(int nServerID)                                                                                             = 0;
-	//·¢ËÍÒ»¸öTCPµÄÊı¾İ°ü£¬·¢ËÍÍêÊı¾İblIsDeleteÀ´¾ö¶¨ÊÇ·ñÓÉ¿ò¼Ü»ØÊÕ£¬»¹ÊÇÂß¼­»ØÊÕ£¬²»ÄÜÊ¹ÓÃCBuffPacket£¬ÒòÎªÊÇÄÚ´æ³Ø£¬ËùÒÔÕâÀï²»ÄÜÉ¾³ı
-	virtual bool SendData(int nServerID, const char* pData, int nSize, bool blIsDelete = true)                                       = 0;
-	//·¢ËÍÒ»¸öUDPµÄÊı¾İ°ü£¬·¢ËÍÍêÊı¾İblIsDeleteÀ´¾ö¶¨ÊÇ·ñÓÉ¿ò¼Ü»ØÊÕ£¬»¹ÊÇÂß¼­»ØÊÕ£¬²»ÄÜÊ¹ÓÃCBuffPacket£¬ÒòÎªÊÇÄÚ´æ³Ø£¬ËùÒÔÕâÀï²»ÄÜÉ¾³ı
-	virtual bool SendDataUDP(int nServerID, const char* pIP, int nPort, const char* pMessage, uint32 u4Len, bool blIsDelete = true)  = 0;
-	//Á´½Ó´æ»î¼ì²é£¬Èç¹û·¢ÏÖÁ´½ÓÔÚ²»·¢ËÍÊı¾İ°üµÄÊ±ºò¶Ï¿ªÁË£¬Ôò»á×Ô¶¯ÖØ½¨
-	virtual bool StartConnectTask(int nIntervalTime)                                                                                 = 0;   
-	//¹Ø±ÕÁ¬½Ó´æ»î¼ì²é
-	virtual void CancelConnectTask()                                                                                                 = 0;                                                                  
-	//¹Ø±ÕËùÓĞ¶ÔÍâÁ´½Ó°üÀ¨TCPºÍUDP
-	virtual void Close()                                                                                                             = 0;
-	//¹Ø±ÕËùÓĞ¶ÔÍâÁ´½Ó°üÀ¨TCPºÍUDP
-	virtual bool GetConnectState(int nServerID)                                                                                      = 0;
+    //è®¾ç½®TCPé“¾æ¥å‚æ•°ï¼ŒpClientMessageä¸ºè¿œç«¯æ•°æ®åˆ°è¾¾å¤„ç†ç±»ã€‚
+    virtual bool Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, IClientMessage* pClientMessage)                  = 0;
+    //è®¾ç½®TCPé“¾æ¥å‚æ•°ï¼ŒpClientMessageä¸ºè¿œç«¯æ•°æ®åˆ°è¾¾å¤„ç†ç±»ï¼Œå¯ä»¥è®¾ç½®æœ¬åœ°IPå’Œç«¯å£ã€‚
+    virtual bool Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage) = 0;
+    //è®¾ç½®UDPé“¾æ¥å‚æ•°ï¼ŒpClientUDPMessageä¸ºè¿œç«¯æ•°æ®åˆ°è¾¾å¤„ç†ç±»ã€‚
+    virtual bool ConnectUDP(int nServerID, const char* pIP, int nPort, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage) = 0;
+    //å…³é—­æŸä¸€ä¸ªServerIDå¯¹åº”çš„TCPé“¾æ¥
+    virtual bool Close(int nServerID, EM_s2s ems2s = S2S_INNEED_CALLBACK)                                                            = 0;
+    //å…³é—­æŸä¸€ä¸ªServerIDå¯¹åº”çš„UDPé“¾æ¥
+    virtual bool CloseUDP(int nServerID)                                                                                             = 0;
+    //å‘é€ä¸€ä¸ªTCPçš„æ•°æ®åŒ…ï¼Œå‘é€å®Œæ•°æ®blIsDeleteæ¥å†³å®šæ˜¯å¦ç”±æ¡†æ¶å›æ”¶ï¼Œè¿˜æ˜¯é€»è¾‘å›æ”¶ï¼Œä¸èƒ½ä½¿ç”¨CBuffPacketï¼Œå› ä¸ºæ˜¯å†…å­˜æ± ï¼Œæ‰€ä»¥è¿™é‡Œä¸èƒ½åˆ é™¤
+    virtual bool SendData(int nServerID, const char* pData, int nSize, bool blIsDelete = true)                                       = 0;
+    //å‘é€ä¸€ä¸ªUDPçš„æ•°æ®åŒ…ï¼Œå‘é€å®Œæ•°æ®blIsDeleteæ¥å†³å®šæ˜¯å¦ç”±æ¡†æ¶å›æ”¶ï¼Œè¿˜æ˜¯é€»è¾‘å›æ”¶ï¼Œä¸èƒ½ä½¿ç”¨CBuffPacketï¼Œå› ä¸ºæ˜¯å†…å­˜æ± ï¼Œæ‰€ä»¥è¿™é‡Œä¸èƒ½åˆ é™¤
+    virtual bool SendDataUDP(int nServerID, const char* pIP, int nPort, const char* pMessage, uint32 u4Len, bool blIsDelete = true)  = 0;
+    //é“¾æ¥å­˜æ´»æ£€æŸ¥ï¼Œå¦‚æœå‘ç°é“¾æ¥åœ¨ä¸å‘é€æ•°æ®åŒ…çš„æ—¶å€™æ–­å¼€äº†ï¼Œåˆ™ä¼šè‡ªåŠ¨é‡å»º
+    virtual bool StartConnectTask(int nIntervalTime)                                                                                 = 0;
+    //å…³é—­è¿æ¥å­˜æ´»æ£€æŸ¥
+    virtual void CancelConnectTask()                                                                                                 = 0;
+    //å…³é—­æ‰€æœ‰å¯¹å¤–é“¾æ¥åŒ…æ‹¬TCPå’ŒUDP
+    virtual void Close()                                                                                                             = 0;
+    //å¾—åˆ°ä¸€ä¸ªè¿æ¥çš„å½“å‰çŠ¶æ€
+    virtual EM_Server_Connect_State GetConnectState(int nServerID)                                                                   = 0;
+    //è·å¾—ä¸€ä¸ªServerIDå¯¹åº”çš„pClientMessageå¯¹è±¡ä¿¡æ¯
+    virtual IClientMessage* GetClientMessage(int nServerID)                                                                          = 0;
+    //è·å¾—ä¸€ä¸ªServerIDå¯¹åº”çš„IPä¿¡æ¯
+    virtual bool GetServerIPInfo(int nServerID, _ClientIPInfo& objServerIPInfo)                                                      = 0;
 };
 
 #endif
