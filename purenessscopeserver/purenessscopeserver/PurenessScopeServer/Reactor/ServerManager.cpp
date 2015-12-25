@@ -395,8 +395,6 @@ bool CServerManager::Start()
 	//开始启动链接发送定时器
 	App_ConnectManager::instance()->StartTimer();
 
-	OUR_DEBUG((LM_INFO, "[CServerManager::Start]App_ReactorManager::instance()->StartReactorDefault begin....\n"));
-
 	ACE_Thread_Manager::instance()->wait();
 
 	return true;

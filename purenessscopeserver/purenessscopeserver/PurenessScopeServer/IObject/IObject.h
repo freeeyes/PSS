@@ -33,28 +33,88 @@ public:
 		m_pContorlListen        = NULL;
 	}
 
-	~CServerObject() {};
-	void SetMessageManager(IMessageManager* pIMessageManager) { m_pIMessageManager = pIMessageManager; };
-	void SetLogManager(ILogManager* pLogManager) { m_pLogManager = pLogManager; };
-	void SetConnectManager(IConnectManager* pConnectManager) { m_pConnectManager = pConnectManager; };
-	void SetPacketManager(IPacketManager*  pPacketManager) { m_pPacketManager = pPacketManager; };
-	void SetClientManager(IClientManager* pClientManager) { m_pClientManager = pClientManager; }
-	void SetUDPConnectManager(IUDPConnectManager* pUDPConnectManager) { m_pUDPConnectManager = pUDPConnectManager; };
-	void SetTimerManager(ActiveTimer* pTimerManager) { m_pTimerManager = pTimerManager; }
-	void SetModuleMessageManager(IModuleMessageManager* pModuleMessageManager) { m_pModuleMessageManager = pModuleMessageManager; }
-	void SetControlListen(IControlListen* pControlListen) { m_pContorlListen = pControlListen; }
-	void SetModuleInfo(IModuleInfo* pModuleInfo) { m_pIModuleInfo = pModuleInfo; }
+    virtual ~CServerObject() {}
+    void SetMessageManager(IMessageManager* pIMessageManager)
+    {
+        m_pIMessageManager = pIMessageManager;
+    }
+    void SetLogManager(ILogManager* pLogManager)
+    {
+        m_pLogManager = pLogManager;
+    }
+    void SetConnectManager(IConnectManager* pConnectManager)
+    {
+        m_pConnectManager = pConnectManager;
+    }
+    void SetPacketManager(IPacketManager*  pPacketManager)
+    {
+        m_pPacketManager = pPacketManager;
+    }
+    void SetClientManager(IClientManager* pClientManager)
+    {
+        m_pClientManager = pClientManager;
+    }
+    void SetUDPConnectManager(IUDPConnectManager* pUDPConnectManager)
+    {
+        m_pUDPConnectManager = pUDPConnectManager;
+    }
+    void SetTimerManager(ActiveTimer* pTimerManager)
+    {
+        m_pTimerManager = pTimerManager;
+    }
+    void SetModuleMessageManager(IModuleMessageManager* pModuleMessageManager)
+    {
+        m_pModuleMessageManager = pModuleMessageManager;
+    }
+    void SetControlListen(IControlListen* pControlListen)
+    {
+        m_pContorlListen = pControlListen;
+    }
+    void SetModuleInfo(IModuleInfo* pModuleInfo)
+    {
+        m_pIModuleInfo = pModuleInfo;
+    }
 
-	IMessageManager*       GetMessageManager() { return m_pIMessageManager; };
-	ILogManager*           GetLogManager() { return m_pLogManager; };
-	IConnectManager*       GetConnectManager() { return m_pConnectManager; };
-	IPacketManager*        GetPacketManager() { return m_pPacketManager; };
-	IClientManager*        GetClientManager() { return m_pClientManager; }
-	IUDPConnectManager*    GetUDPConnectManager() { return m_pUDPConnectManager; };
-	ActiveTimer*           GetTimerManager() { return m_pTimerManager; }
-	IModuleMessageManager* GetModuleMessageManager() { return m_pModuleMessageManager; }
-	IControlListen*        GetControlListen() { return m_pContorlListen; }
-	IModuleInfo*           GetModuleInfo() { return m_pIModuleInfo; }
+    IMessageManager*       GetMessageManager()
+    {
+        return m_pIMessageManager;
+    }
+    ILogManager*           GetLogManager()
+    {
+        return m_pLogManager;
+    }
+    IConnectManager*       GetConnectManager()
+    {
+        return m_pConnectManager;
+    }
+    IPacketManager*        GetPacketManager()
+    {
+        return m_pPacketManager;
+    }
+    IClientManager*        GetClientManager()
+    {
+        return m_pClientManager;
+    }
+    IUDPConnectManager*    GetUDPConnectManager()
+    {
+        return m_pUDPConnectManager;
+    }
+    ActiveTimer*           GetTimerManager()
+    {
+        return m_pTimerManager;
+    }
+    IModuleMessageManager* GetModuleMessageManager()
+    {
+        return m_pModuleMessageManager;
+    }
+    IControlListen*        GetControlListen()
+    {
+        return m_pContorlListen;
+    }
+    IModuleInfo*           GetModuleInfo()
+    {
+        return m_pIModuleInfo;
+    }
 
 private:
 	IMessageManager*       m_pIMessageManager;

@@ -10,8 +10,8 @@ using namespace std;
 class CReUDPManager : public IUDPConnectManager
 {
 public:
-	CReUDPManager() {};
-	~CReUDPManager() {};
+    CReUDPManager() {}
+    ~CReUDPManager() {}
 
 	CReactorUDPHander* Create()
 	{
@@ -24,7 +24,7 @@ public:
 		}
 
 		return NULL;
-	};
+    }
 
 	void Close()
 	{
@@ -35,7 +35,7 @@ public:
 			pReactorUDPHandler->Close();
 			SAFE_DELETE(pReactorUDPHandler);
 		}
-	};
+    }
 
 	void GetClientConnectInfo(vecClientConnectInfo& VecClientConnectInfo)
 	{
@@ -69,7 +69,7 @@ public:
 		{
 			return false;
 		}
-	};
+    }
 
 private:
 	typedef vector<CReactorUDPHander*> vecReactorUDPHandler;

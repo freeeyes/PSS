@@ -16,7 +16,7 @@ CPacketParseBase::CPacketParseBase(void)
 	//这里设置你的包模式
 	m_u1PacketMode      = PACKET_WITHHEAD;
 
-	m_blIsHead          = false;
+	m_blIsHandleHead    = true;
 
 	m_pmbHead           = NULL;
 	m_pmbBody           = NULL;
@@ -31,7 +31,7 @@ void CPacketParseBase::Clear()
 	m_pmbHead = NULL;
 	m_pmbBody = NULL;
 
-	m_blIsHead = false;
+	m_blIsHandleHead = true;
 
 	m_u4PacketData      = 0;
 	m_u4HeadSrcSize     = 0;
@@ -55,7 +55,7 @@ void CPacketParseBase::Close()
 		m_pmbBody = NULL;
 	}
 
-	m_blIsHead = false;
+	m_blIsHandleHead = true;
 }
 
 const char* CPacketParseBase::GetPacketVersion()
@@ -83,20 +83,20 @@ uint16 CPacketParseBase::GetPacketCommandID()
 	return m_u2PacketCommandID;
 }
 
-bool CPacketParseBase::GetIsHead()
+bool CPacketParseBase::GetIsHandleHead()
 {
-	return m_blIsHead;
+	return m_blIsHandleHead;
 }
 
 uint32 CPacketParseBase::GetPacketHeadSrcLen()
 {
 	return m_u4HeadSrcSize;
-};
+}
 
 uint32 CPacketParseBase::GetPacketBodySrcLen()
 {
 	return m_u4BodySrcSize;
-};
+}
 
 ACE_Message_Block* CPacketParseBase::GetMessageHead()
 {

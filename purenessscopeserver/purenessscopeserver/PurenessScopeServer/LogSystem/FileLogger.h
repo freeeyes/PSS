@@ -26,7 +26,8 @@ using namespace std;
 #define FILELOG_CONFIG    "logger.xml"
 
 //单元模式日志类
-class CLogFile {
+class CLogFile
+{
 public:
 	CLogFile(const char* pFileRoot, uint32 u4BufferSize)
 	{
@@ -37,7 +38,7 @@ public:
 		m_pBuffer           = new char[u4BufferSize];   //这里是用于日志拼接时间所用
 		m_u4BufferSize      = u4BufferSize;
 		sprintf_safe(m_szFileRoot, MAX_BUFF_100, "%s", pFileRoot);
-	};
+    }
 
 	virtual ~CLogFile()
 	{
@@ -46,7 +47,7 @@ public:
 		m_u4BufferSize = 0;
 		m_File.close();
 		OUR_DEBUG((LM_INFO,"[CLogFile::~CLogFile] End.\n"));
-	};
+    }
 
 	virtual int doLog(_LogBlockInfo* pLogBlockInfo)
 	{
@@ -83,7 +84,7 @@ public:
 		}
 
 		return 0;
-	};
+    }
 
 	bool SendMail(_LogBlockInfo* pLogBlockInfo)
 	{
@@ -145,7 +146,7 @@ public:
 	ACE_TString& GetLoggerName()
 	{
 		return m_StrlogName;
-	};
+    }
 
 	ACE_TString& GetServerName()
 	{
@@ -185,7 +186,7 @@ public:
 	void SetLoggerName(const char* szLoggerName)
 	{
 		m_StrlogName = szLoggerName;
-	};
+    }
 
 	void SetLoggerType(int nType)
 	{

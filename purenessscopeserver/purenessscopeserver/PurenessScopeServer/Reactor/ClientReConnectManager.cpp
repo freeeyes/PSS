@@ -426,7 +426,7 @@ bool CClientReConnectManager::Close(int nServerID, EM_s2s ems2s)
 	//关闭链接对象
 	if (NULL != pClientInfo->GetConnectClient())
 	{
-		pClientInfo->GetConnectClient()->ClinetClose(ems2s);
+        pClientInfo->GetConnectClient()->ClientClose(ems2s);
 	}
 
 	if(S2S_NEED_CALLBACK == ems2s)

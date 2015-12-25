@@ -6,13 +6,13 @@
 class IClientParse
 {
 public:
-	virtual ~IClientParse() {};
+    virtual ~IClientParse() {}
 
 	virtual void Init()                         = 0;
 	virtual uint32 GetPacketHeadLen()           = 0;
 	virtual uint32 GetPacketBodyLen()           = 0;
 	virtual uint16 GetPacketCommandID()         = 0;
-	virtual bool GetIsHead()                    = 0;
+    virtual bool GetIsHandleHead()              = 0;
 
 	virtual ACE_Message_Block* GetMessageHead()             = 0;
 	virtual ACE_Message_Block* GetMessageBody()             = 0;

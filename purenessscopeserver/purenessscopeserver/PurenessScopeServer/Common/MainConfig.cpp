@@ -1036,6 +1036,12 @@ void CMainConfig::Display()
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u1CommandAccount = %d.\n", m_u1CommandAccount));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4CoreFileSize = %d.\n", m_u4CoreFileSize));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u2Backlog = %d.\n", m_u2Backlog));
+    for(int i = 0; i < (int)m_vecModuleConfig.size(); i++)
+    {
+        OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szModuleName%d = %s.\n", i, m_vecModuleConfig[i].m_szModuleName));
+        OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szModulePath%d = %s.\n", i, m_vecModuleConfig[i].m_szModulePath));
+        OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szModuleParam%d = %s.\n", i, m_vecModuleConfig[i].m_szModuleParam));
+    }
 }
 
 const char* CMainConfig::GetServerName()

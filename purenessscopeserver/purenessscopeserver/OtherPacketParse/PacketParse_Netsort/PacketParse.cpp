@@ -26,7 +26,7 @@ void CPacketParse::Init()
 	m_u4HeadSrcSize     = 0;
 	m_u4BodySrcSize     = 0;
 
-	m_blIsHead          = false;
+	m_blIsHandleHead    = true;
 
 	m_pmbHead           = NULL;
 	m_pmbBody           = NULL;
@@ -60,6 +60,7 @@ bool CPacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead,
 
 	m_pmbHead = pmbHead;
 
+    m_blIsHandleHead = false;
 	return true;
 }
 
@@ -69,6 +70,7 @@ bool CPacketParse::SetPacketBody(uint32 u4ConnectID, ACE_Message_Block* pmbBody,
 	m_pmbBody = pmbBody;
 
 	m_u4BodySrcSize = m_pmbBody->length();
+    m_blIsHandleHead = true;
 	return true;
 
 }
@@ -155,7 +157,7 @@ uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurr
 				pBuffPacket->WriteStream(pCurrMessage->rd_ptr(), pCurrMessage->length());
 			}
 
-			m_blIsHead = true;
+			m_blIsHandleHead = true;
 
 			//没有找到包尾，需要继续接受数据
 			return PACKET_GET_NO_ENOUGTH;
@@ -197,7 +199,7 @@ uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurr
 			memcpy_safe((char*)&pData[1], u4PacketLen, m_pmbBody->wr_ptr(), u4PacketLen);
 			m_pmbBody->wr_ptr(u4PacketLen);
 
-			m_blIsHead = false;
+			m_blIsHandleHead = false;
 
 			//处理完的数据从池中移除
 			pCurrMessage->rd_ptr(u4Pos);
@@ -207,7 +209,7 @@ uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurr
 	else
 	{
 		//如果缓冲不存在，则说明缓冲中的包都解析完毕了
-		if(m_blIsHead == false)
+		if(m_blIsHandleHead == false)
 		{
 			return PACKET_GET_ERROR;
 		}
@@ -245,7 +247,7 @@ uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurr
 
 		if(blFind == false)
 		{
-			m_blIsHead = true;
+			m_blIsHandleHead = true;
 
 			//没有找到包尾，需要继续接受数据
 			return PACKET_GET_NO_ENOUGTH;
@@ -288,7 +290,7 @@ uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurr
 			//删除缓冲中的数据
 			pBuffPacket->RollBack(u4Pos);
 
-			m_blIsHead = false;
+			m_blIsHandleHead = false;
 
 			//处理完的数据从池中移除
 			pCurrMessage->rd_ptr(pCurrMessage->length());

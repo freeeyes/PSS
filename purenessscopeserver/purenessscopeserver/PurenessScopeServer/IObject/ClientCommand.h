@@ -8,7 +8,7 @@
 class CClientCommand
 {
 public:
-	virtual ~CClientCommand() {};
+    virtual ~CClientCommand() {}
 	virtual int DoMessage(IMessage* pMessage, bool& bDeleteFlag) = 0;                                                        //处理从客户端发送来的消息
 };
 #endif

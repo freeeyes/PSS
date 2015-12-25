@@ -12,13 +12,13 @@ public:
 	CRingLink()
 	{
 		m_pRingLink = NULL;
-	};
+    }
 
 	CRingLink(int nMaxCount)
 	{
 		m_pRingLink = NULL;
 		Init(nMaxCount);
-	};
+    }
 
 	void Init(int nMaxCount)
 	{
@@ -32,7 +32,7 @@ public:
 	~CRingLink()
 	{
 		Close();
-	};
+    }
 
 	void Close()
 	{

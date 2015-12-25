@@ -105,11 +105,11 @@ public:
 	void* operator new(size_t stSize)
 	{
 		return App_ACEMemory::instance()->malloc(stSize);
-	};
+	}
 
 	void operator delete(void* p)
 	{
 		App_ACEMemory::instance()->free(p);
-	};
+	}
 };
 #endif

@@ -1022,22 +1022,22 @@ void CMessageServiceGroup::DeleteMessage(uint32 u4ConnectID, CMessage* pMessage)
 
 int32 CMessageServiceGroup::GetWorkThreadID(uint32 u4ConnectID, uint8 u1PackeType)
 {
-	int32 u4ThreadID = -1;
+    int32 n4ThreadID = -1;
 	
 	if(m_vecMessageService.size() == 0)
 	{
-		return u4ThreadID;
+        return n4ThreadID;
 	}
 
 	if(u1PackeType == PACKET_TCP)
 	{
-		u4ThreadID = u4ConnectID % (uint32)m_vecMessageService.size();
+        n4ThreadID = u4ConnectID % (uint32)m_vecMessageService.size();
 	}
 	else if(u1PackeType == PACKET_UDP)
 	{
 		//如果是UDP协议，则获取当前随机数值
-		u4ThreadID = m_objRandomNumber.GetRandom();
+        n4ThreadID = m_objRandomNumber.GetRandom();
 	}
 
-	return u4ThreadID;
+    return n4ThreadID;
 }

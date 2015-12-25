@@ -7,8 +7,8 @@
 class CProUDPManager : public IUDPConnectManager
 {
 public:
-	CProUDPManager() {};
-	~CProUDPManager() {};
+    CProUDPManager() {}
+    ~CProUDPManager() {}
 
 	CProactorUDPHandler* Create()
 	{
@@ -21,7 +21,7 @@ public:
 		}
 
 		return NULL;
-	};
+    }
 
 	void Close()
 	{
@@ -32,7 +32,7 @@ public:
 			pProactorUDPHandler->Close();
 			SAFE_DELETE(pProactorUDPHandler);
 		}
-	};
+    }
 
 	void GetClientConnectInfo(vecClientConnectInfo& VecClientConnectInfo)
 	{
@@ -66,7 +66,7 @@ public:
 		 {
 			 return false;
 		 }
-	 };
+    }
 
 private:
 	typedef vector<CProactorUDPHandler*> vecProactorUDPHandler;

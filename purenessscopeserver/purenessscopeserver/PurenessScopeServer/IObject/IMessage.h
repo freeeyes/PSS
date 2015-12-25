@@ -42,7 +42,7 @@ struct _MessageBase
 class IMessage
 {
 public:
-	virtual ~IMessage() {};
+	virtual ~IMessage() {}
 
 	virtual void Close() = 0;
 	virtual void Clear() = 0;
@@ -72,12 +72,12 @@ public:
 		m_u4ServerID  = 0;
 		m_u2CommandID = 0;
 		m_blDelete    = true;
-	};
+	}
 
 	virtual ~IPostMessage()
 	{
 		Close();
-	};
+	}
 
 	virtual void Close()
 	{
@@ -96,7 +96,7 @@ public:
 		m_u4ServerID  = 0;
 		m_u2CommandID = 0;
 		m_blDelete    = true;
-	};
+	}
 
 	virtual bool SetRecvPacket(IBuffPacket* pRecvPacket)
 	{
@@ -107,7 +107,7 @@ public:
 
 		m_pRecvPacket = pRecvPacket;
 		return true;
-	};
+	}
 
 	virtual bool SetSendPacket(IBuffPacket* pSendPacket)
 	{
@@ -118,17 +118,17 @@ public:
 
 		m_pSendPacket = pSendPacket;
 		return true;
-	};
+	}
 
 	virtual IBuffPacket*  GetRecvPacket()
 	{
 		return m_pRecvPacket;
-	};
+	}
 
 	virtual IBuffPacket*  GetSendPacket()
 	{
 		return m_pSendPacket;
-	};
+	}
 
 	virtual void CallBefore()              = 0;
 	virtual void CallBack()                = 0;
@@ -136,22 +136,22 @@ public:
 	virtual void   SetServerID(uint32 u4ServerID)
 	{
 		m_u4ServerID = u4ServerID;
-	};
+	}
 
 	virtual uint32 GetServerID()
 	{
 		return m_u4ServerID;
-	};
+	}
 
 	virtual void   SetCommandID(uint16 u2CommandID)
 	{
 		m_u2CommandID = u2CommandID;
-	};
+	}
 
 	virtual uint16 GetCommandID()
 	{
 		return m_u2CommandID;
-	};
+	}
 
 private:
 	IBuffPacket* m_pRecvPacket;

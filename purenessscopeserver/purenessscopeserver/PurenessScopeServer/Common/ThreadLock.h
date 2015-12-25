@@ -26,12 +26,12 @@ public:
 	CThreadLock(void)
 	{
 		Init();
-	};
+    }
 
 	~CThreadLock()
 	{
 		Close();
-	};
+    }
 
 	void Init()
 	{
@@ -40,7 +40,7 @@ public:
 #else
 		pthread_mutex_init(&m_lock, NULL);
 #endif
-	};
+    }
 
 	void Close()
 	{
@@ -59,7 +59,7 @@ public:
 #else
 		pthread_mutex_lock(&m_lock);
 #endif
-	};
+    }
 
 	void UnLock()
 	{
@@ -70,7 +70,7 @@ public:
 #else
 		pthread_mutex_unlock(&m_lock);
 #endif
-	};
+    }
 
 private:
 	LOCK_MUTEXT m_lock;
@@ -88,14 +88,14 @@ public:
 		{
 			m_pThreadLock->Lock();
 		}
-	};
+    }
 	~CAutoLock() 
 	{
 		if(NULL != m_pThreadLock)
 		{
 			m_pThreadLock->UnLock();
 		}
-	};
+    }
 
 private:
 	CThreadLock* m_pThreadLock;

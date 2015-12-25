@@ -27,7 +27,7 @@ void CConsolePacketParse::Init()
 	m_u4HeadSrcSize     = 0;
 	m_u4BodySrcSize     = 0;
 
-	m_blIsHead          = false;
+    m_blIsHandleHead    = true;
 
 	m_pmbHead           = NULL;
 	m_pmbBody           = NULL;
@@ -50,7 +50,7 @@ bool CConsolePacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* p
 		memcpy_safe((char* )pData, (uint32)sizeof(uint32), (char* )&m_u4PacketData, (uint32)sizeof(uint32));
 		
 		m_pmbHead = pmbHead;
-		m_blIsHead = true;
+        m_blIsHandleHead = true;
 		return true;
 	}
 	else
@@ -72,13 +72,13 @@ bool CConsolePacketParse::SetPacketBody(uint32 u4ConnectID, ACE_Message_Block* p
 	m_u4BodySrcSize = u4Len;
 	if(u4Len >= sizeof(uint16))
 	{
-		m_blIsHead = false;
+        m_blIsHandleHead = false;
 		m_pmbBody = pmbBody;
 		return true;
 	}
 	else
 	{
-		m_blIsHead = false;
+        m_blIsHandleHead = false;
 		return false;
 	}
 }

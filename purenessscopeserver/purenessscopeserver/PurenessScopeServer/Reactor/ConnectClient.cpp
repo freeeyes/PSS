@@ -48,7 +48,7 @@ bool CConnectClient::Close()
     return false;
 }
 
-void CConnectClient::ClinetClose(EM_s2s& ems2s)
+void CConnectClient::ClientClose(EM_s2s& ems2s)
 {
 	m_ems2s = ems2s;
     //msg_queue()->deactivate();

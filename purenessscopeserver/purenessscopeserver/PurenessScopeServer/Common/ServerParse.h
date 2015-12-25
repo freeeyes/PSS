@@ -21,7 +21,7 @@ public:
 	uint32 GetPacketBodyLen();
 	uint16 GetPacketCommandID();
 
-	bool GetIsHead();
+    bool GetIsHandleHead();
 
 	ACE_Message_Block* GetMessageHead();
 	ACE_Message_Block* GetMessageBody();
@@ -41,7 +41,7 @@ private:
 	uint32 m_u4PacketHead;
 	uint32 m_u4PacketData;
 	uint16 m_u2PacketCommandID;
-	bool   m_blIsHead;
+    bool   m_blIsHandleHead;
 
 	ACE_Message_Block* m_pmbHead;   //包头部分
 	ACE_Message_Block* m_pmbBody;   //包体部分
