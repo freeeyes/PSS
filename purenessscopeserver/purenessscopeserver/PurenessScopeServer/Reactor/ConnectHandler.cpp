@@ -16,7 +16,6 @@ CConnectHandler::CConnectHandler(void)
 	m_u2SendQueueMax      = MAX_MSG_SENDPACKET;
 	m_u1ConnectState      = CONNECT_INIT;
 	m_u1SendBuffState     = CONNECT_SENDNON;
-	m_pTCClose            = NULL;
 	m_pCurrMessage        = NULL;
 	m_pBlockMessage       = NULL;
 	m_pPacketParse        = NULL;
@@ -44,7 +43,6 @@ CConnectHandler::CConnectHandler(void)
 CConnectHandler::~CConnectHandler(void)
 {
 	//OUR_DEBUG((LM_INFO, "[CConnectHandler::~CConnectHandler].\n"));
-	SAFE_DELETE(m_pTCClose);
 	//OUR_DEBUG((LM_INFO, "[CConnectHandler::~CConnectHandler]End.\n"));
 }
 

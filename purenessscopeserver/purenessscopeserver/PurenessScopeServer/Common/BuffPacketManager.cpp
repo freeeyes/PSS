@@ -2,7 +2,8 @@
 
 CBuffPacketManager::CBuffPacketManager(void)
 {
-
+	//默认为主机序
+	m_blSortType = false;
 }
 
 CBuffPacketManager::~CBuffPacketManager(void)
@@ -61,6 +62,7 @@ bool CBuffPacketManager::Delete(IBuffPacket* pBuffPacket)
 	}
 
 	pBuffPacket->Clear();
+	pBuffPacket->SetNetSort(m_blSortType);
 
 	mapPacket::iterator f = m_mapPacketUsed.find(pBuff);
 	if(f != m_mapPacketUsed.end())
@@ -121,6 +123,9 @@ void CBuffPacketManager::Init(uint32 u4PacketCount, bool blByteOrder)
 			}
 		}
 	}
+
+	//设定当前对象池的字序
+	m_blSortType = blByteOrder;
 
 }
 

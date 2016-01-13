@@ -31,6 +31,7 @@ private:
 	typedef map<CBuffPacket*, CBuffPacket*> mapPacket;
 	mapPacket                  m_mapPacketUsed;                       //已使用的
 	mapPacket                  m_mapPacketFree;                       //没有使用的
+	bool                       m_blSortType;                          //字序规则，true为网序，false为主机序
 	ACE_Recursive_Thread_Mutex m_ThreadWriteLock;
 };
 
