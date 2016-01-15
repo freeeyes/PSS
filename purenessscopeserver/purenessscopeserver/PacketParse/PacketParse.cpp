@@ -1,21 +1,21 @@
-#include "PacketParse.h"
+ï»¿#include "PacketParse.h"
 
 
 CPacketParse::CPacketParse(void)
 {
-	//Èç¹ûÊÇ°üÍ·Ä£Ê½£¬ÕâÀïĞèÒªÉèÖÃ°üÍ·µÄ³¤¶È
+	//å¦‚æœæ˜¯åŒ…å¤´æ¨¡å¼ï¼Œè¿™é‡Œéœ€è¦è®¾ç½®åŒ…å¤´çš„é•¿åº¦
 	m_u4PacketHead      = PACKET_HEAD_LENGTH;
 
-	//ÕâÀïĞŞ¸ÄÊôÓÚÄãµÄ°ü½âÎö°æ±¾ºÅ
+	//è¿™é‡Œä¿®æ”¹å±äºä½ çš„åŒ…è§£æç‰ˆæœ¬å·
 	sprintf_safe(m_szPacketVersion, MAX_BUFF_20, "0.94");
 
-	//ÕâÀïÉèÖÃÄãµÄ°üÄ£Ê½
+	//è¿™é‡Œè®¾ç½®ä½ çš„åŒ…æ¨¡å¼
 	m_u1PacketMode      = PACKET_WITHHEAD;
 }
 
 CPacketParse::~CPacketParse(void)
 {
-	
+
 }
 
 void CPacketParse::Init()
@@ -31,16 +31,16 @@ void CPacketParse::Init()
 	m_pmbHead           = NULL;
 	m_pmbBody           = NULL;
 
-	//ÉèÖÃÎªÖ÷»úĞò£¬²»×öÍøĞòÑéÖ¤
+	//è®¾ç½®ä¸ºä¸»æœºåºï¼Œä¸åšç½‘åºéªŒè¯
 	SetSort(0);
 }
 
 bool CPacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager)
 {
-	//ÕâÀïÌí¼Ó×Ô¼º¶Ô°üÍ·µÄ·ÖÎö£¬Ö÷Òª·ÖÎö³ö°ü³¤¶È¡£
-	//»ñµÃ°üÍ·30¸ö×Ö½ÚµÄÏà¹ØĞÅÏ¢£¬»¹Ô­³ÉÊı¾İ°üĞÅÏ¢½á¹¹
+	//è¿™é‡Œæ·»åŠ è‡ªå·±å¯¹åŒ…å¤´çš„åˆ†æï¼Œä¸»è¦åˆ†æå‡ºåŒ…é•¿åº¦ã€‚
+	//è·å¾—åŒ…å¤´30ä¸ªå­—èŠ‚çš„ç›¸å…³ä¿¡æ¯ï¼Œè¿˜åŸæˆæ•°æ®åŒ…ä¿¡æ¯ç»“æ„
 	char* pData  = (char* )pmbHead->rd_ptr();
-	//int32 u4Len = pmbHead->length();
+	uint32 u4Len = pmbHead->length();
 	uint32 u4Pos = 0;
 
 	m_u4HeadSrcSize = PACKET_HEAD_LENGTH;
@@ -57,19 +57,22 @@ bool CPacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead,
 	memcpy_safe((char* )&pData[u4Pos], (uint32)(sizeof(char)*32), (char* )&m_objPacketHeadInfo.m_szSession, (uint32)(sizeof(char)*32));
 	u4Pos += sizeof(char)*32;
 
+	OUR_DEBUG((LM_INFO,"[CPacketParse::SetPacketHead]m_u2Version=%d,m_u2CmdID=%d,m_u4BodyLen=%d.\n",
+		m_objPacketHeadInfo.m_u2Version,
+		m_objPacketHeadInfo.m_u2CmdID,
+		m_objPacketHeadInfo.m_u4BodyLen));
+
 	m_u4PacketData      = m_objPacketHeadInfo.m_u4BodyLen;
 	m_u2PacketCommandID = m_objPacketHeadInfo.m_u2CmdID;
 
 	m_pmbHead = pmbHead;
-
-    m_blIsHandleHead = false;
 
 	return true;
 }
 
 bool CPacketParse::SetPacketBody(uint32 u4ConnectID, ACE_Message_Block* pmbBody, IMessageBlockManager* pMessageBlockManager)
 {
-	//ÕâÀï·ÖÎö³ö°üÌåÄÚµÄÒ»Ğ©Êı¾İ£¬Èç¹û°üÍ·°üº¬ÁËCommandID£¬ÄÇÃ´°üÌå¾Í²»±Ø×ö½âÎö¡£
+	//è¿™é‡Œåˆ†æå‡ºåŒ…ä½“å†…çš„ä¸€äº›æ•°æ®ï¼Œå¦‚æœåŒ…å¤´åŒ…å«äº†CommandIDï¼Œé‚£ä¹ˆåŒ…ä½“å°±ä¸å¿…åšè§£æã€‚
 	m_pmbBody = pmbBody;
 
 	m_u4BodySrcSize = m_pmbBody->length();
@@ -99,7 +102,7 @@ bool CPacketParse::MakePacket(uint32 u4ConnectID, const char* pData, uint32 u4Le
 		return false;
 	}
 
-	//Æ´×°Êı¾İ°ü
+	//æ‹¼è£…æ•°æ®åŒ…
 	Check_Send_Unit32(u4Len);
 	memcpy_safe((char* )&u4Len, (uint32)sizeof(uint32), pMbData->wr_ptr(), (uint32)sizeof(uint32));
 	pMbData->wr_ptr(sizeof(uint32));
@@ -113,7 +116,7 @@ bool CPacketParse::MakePacket(uint32 u4ConnectID, const char* pData, uint32 u4Le
 
 uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurrMessage, IMessageBlockManager* pMessageBlockManager)
 {
-	//ÕâÀïÊÇ²âÊÔ´úÂë£¬×¨ÃÅ´¦ÀíÎªÊı¾İÁ÷µÄÊı¾İ°ü
+	//è¿™é‡Œæ˜¯æµ‹è¯•ä»£ç ï¼Œä¸“é—¨å¤„ç†ä¸ºæ•°æ®æµçš„æ•°æ®åŒ…
 	if(NULL == pCurrMessage || NULL == pMessageBlockManager)
 	{
 		return PACKET_GET_ERROR;
@@ -125,27 +128,27 @@ uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurr
 		return PACKET_GET_ERROR;
 	}
 
-	//ÕâÀïÌí¼ÓÁËÎÒµÄ¹æÔò£¬±ÈÈç£¬ÎÒµÄÊı¾İ°üµÚÒ»¸ö×Ö½ÚÊÇ7E¿ªÍ·£¬ÒÔ7EÎª½áÎ²£¬ÄÇÃ´ÎÒ»áÕâÃ´×ö
-	//Ê×ÏÈ£¬ÅĞ¶ÏÊı¾İÀïÃæµÚÒ»¸ö×Ö½ÚÊÇ²»ÊÇ7E£¬Èç¹û²»ÊÇ£¬Ôò·µ»Ø´íÎóµÄÊı¾İ¡£
-	//Èç¹ûÊÇ´íÎóÊı¾İ£¬ÎªÁË±£Ö¤Êı¾İ°²È«£¬¿ò¼Ü»á¹Ø±ÕÕâ¸öÁ´½Ó¡£
-	char* pData   = pCurrMessage->rd_ptr();     //µÃµ½Õâ¸öÊı¾İ¿éµÄÊ××Ö½Ú
-	uint32 u4Data = pCurrMessage->length();     //µÃµ½Õâ¸öÊı¾İ¿éµÄ³¤¶È
+	//è¿™é‡Œæ·»åŠ äº†æˆ‘çš„è§„åˆ™ï¼Œæ¯”å¦‚ï¼Œæˆ‘çš„æ•°æ®åŒ…ç¬¬ä¸€ä¸ªå­—èŠ‚æ˜¯7Eå¼€å¤´ï¼Œä»¥7Eä¸ºç»“å°¾ï¼Œé‚£ä¹ˆæˆ‘ä¼šè¿™ä¹ˆåš
+	//é¦–å…ˆï¼Œåˆ¤æ–­æ•°æ®é‡Œé¢ç¬¬ä¸€ä¸ªå­—èŠ‚æ˜¯ä¸æ˜¯7Eï¼Œå¦‚æœä¸æ˜¯ï¼Œåˆ™è¿”å›é”™è¯¯çš„æ•°æ®ã€‚
+	//å¦‚æœæ˜¯é”™è¯¯æ•°æ®ï¼Œä¸ºäº†ä¿è¯æ•°æ®å®‰å…¨ï¼Œæ¡†æ¶ä¼šå…³é—­è¿™ä¸ªé“¾æ¥ã€‚
+	char* pData   = pCurrMessage->rd_ptr();     //å¾—åˆ°è¿™ä¸ªæ•°æ®å—çš„é¦–å­—èŠ‚
+	uint32 u4Data = pCurrMessage->length();     //å¾—åˆ°è¿™ä¸ªæ•°æ®å—çš„é•¿åº¦
 
-	//ÅĞ¶ÏÊı¾İ³¤¶ÈÊÇ·ñÎª0
+	//åˆ¤æ–­æ•°æ®é•¿åº¦æ˜¯å¦ä¸º0
 	if(u4Data <= 0)
 	{
 		return PACKET_GET_ERROR;
 	}
 
-	//Èç¹ûÊÕÊ××Ö½Ú²»ÊÇ7E£¬ÔòÖ¤Ã÷Êı¾İÒª²»²»È«ĞèÒªÕ³°ü£¬Òª²»¾ÍÊÇ´íÊı¾İ°ü¡£
+	//å¦‚æœæ”¶é¦–å­—èŠ‚ä¸æ˜¯7Eï¼Œåˆ™è¯æ˜æ•°æ®è¦ä¸ä¸å…¨éœ€è¦ç²˜åŒ…ï¼Œè¦ä¸å°±æ˜¯é”™æ•°æ®åŒ…ã€‚
 	if(pData[0] == 0x7E)
 	{
-		//°üÍ·ÕıÈ·£¬¿ªÊ¼Ñ°ÕÒ°üÎ²
+		//åŒ…å¤´æ­£ç¡®ï¼Œå¼€å§‹å¯»æ‰¾åŒ…å°¾
 		uint32 u4Pos  = 1;
 		bool   blFind = false;
 		for(u4Pos = 1; u4Pos < u4Data; u4Pos++)
 		{
-			//ÕÒµ½ÁË°üÄ©Î²
+			//æ‰¾åˆ°äº†åŒ…æœ«å°¾
 			if(pData[u4Pos] == 0x7E)
 			{
 				blFind = true;
@@ -157,18 +160,18 @@ uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurr
 		{
 			if(pCurrMessage->length() > 2)
 			{
-				//½«²»ÍêÕûµÄÊı¾İ·ÅÈë»º³å£¬µÈ´ıÍêÕûºó·ÅÈë°üÌå
+				//å°†ä¸å®Œæ•´çš„æ•°æ®æ”¾å…¥ç¼“å†²ï¼Œç­‰å¾…å®Œæ•´åæ”¾å…¥åŒ…ä½“
 				pBuffPacket->WriteStream(pCurrMessage->rd_ptr(), pCurrMessage->length());
 			}
 
 			m_blIsHandleHead = true;
 
-			//Ã»ÓĞÕÒµ½°üÎ²£¬ĞèÒª¼ÌĞø½ÓÊÜÊı¾İ
+			//æ²¡æœ‰æ‰¾åˆ°åŒ…å°¾ï¼Œéœ€è¦ç»§ç»­æ¥å—æ•°æ®
 			return PACKET_GET_NO_ENOUGTH;
 		}
 		else
 		{
-			//½ÓÊÕµ½ÁËÍêÕûÊı¾İ°ü
+			//æ¥æ”¶åˆ°äº†å®Œæ•´æ•°æ®åŒ…
 			uint32 u4PacketLen = u4Pos;
 
 			m_u4PacketHead  = sizeof(uint32);
@@ -176,43 +179,43 @@ uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurr
 			m_u4PacketData  = u4PacketLen;
 			m_u4BodySrcSize = u4PacketLen;
 
-			//´ÓÄÚ´æ³ØÖĞÉêÇëÒ»¸ö°üÍ·
+			//ä»å†…å­˜æ± ä¸­ç”³è¯·ä¸€ä¸ªåŒ…å¤´
 			m_pmbHead = pMessageBlockManager->Create(sizeof(uint32));
 			if(NULL == m_pmbHead)
 			{
 				return PACKET_GET_ERROR;
 			}
 
-			//¼ÇÂ¼°ü³¤£¬²¢×ª»»ÎªÍøÂç×Ö½ÚĞò£¬·ÅÈë°üÍ·
+			//è®°å½•åŒ…é•¿ï¼Œå¹¶è½¬æ¢ä¸ºç½‘ç»œå­—èŠ‚åºï¼Œæ”¾å…¥åŒ…å¤´
 			//uint32 u4NetPacketLen = ACE_HTONL(u4PacketLen);
 			uint32 u4NetPacketLen = u4PacketLen;
 			memcpy_safe((char*)&u4NetPacketLen, (uint32)sizeof(uint32), m_pmbHead->wr_ptr(), (uint32)sizeof(uint32));
 			m_pmbHead->wr_ptr(sizeof(uint32));
-			
-			//´ÓÄÚ´æ³ØÉêÇëÒ»¸ö°üÌå
+
+			//ä»å†…å­˜æ± ç”³è¯·ä¸€ä¸ªåŒ…ä½“
 			m_pmbBody = pMessageBlockManager->Create(u4PacketLen);
 			if(NULL == m_pmbBody)
 			{
 				return PACKET_GET_ERROR;
 			}
 
-			//»ñµÃ°üÃüÁîID
+			//è·å¾—åŒ…å‘½ä»¤ID
 			memcpy_safe((char*)&pData[1], (uint32)sizeof(uint16), (char* )&m_u2PacketCommandID, (uint32)sizeof(uint16));
 
-			//½«°üÄÚÈİ·ÅÈë°üÌå
+			//å°†åŒ…å†…å®¹æ”¾å…¥åŒ…ä½“
 			memcpy_safe((char*)&pData[1], u4PacketLen, m_pmbBody->wr_ptr(), u4PacketLen);
 			m_pmbBody->wr_ptr(u4PacketLen);
 
 			m_blIsHandleHead = false;
 
-			//´¦ÀíÍêµÄÊı¾İ´Ó³ØÖĞÒÆ³ı
+			//å¤„ç†å®Œçš„æ•°æ®ä»æ± ä¸­ç§»é™¤
 			pCurrMessage->rd_ptr(u4Pos);
 			return PACKET_GET_ENOUGTH;
 		}
 	}
 	else
 	{
-		//Èç¹û»º³å²»´æÔÚ£¬ÔòËµÃ÷»º³åÖĞµÄ°ü¶¼½âÎöÍê±ÏÁË
+		//å¦‚æœç¼“å†²ä¸å­˜åœ¨ï¼Œåˆ™è¯´æ˜ç¼“å†²ä¸­çš„åŒ…éƒ½è§£æå®Œæ¯•äº†
 		if(m_blIsHandleHead == false)
 		{
 			return PACKET_GET_ERROR;
@@ -224,10 +227,10 @@ uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurr
 		bool   blFind = false;
 		if(pBuffPacket->GetPacketLen() > 0)
 		{
-			//Èç¹ûÓĞ»º³å£¬Ôò¿´¿´ÊÇ·ñÓĞ½áÊø±ê¼Ç
+			//å¦‚æœæœ‰ç¼“å†²ï¼Œåˆ™çœ‹çœ‹æ˜¯å¦æœ‰ç»“æŸæ ‡è®°
 			for(u4Pos = 1; u4Pos < u4Data; u4Pos++)
 			{
-				//ÕÒµ½ÁË°üÄ©Î²
+				//æ‰¾åˆ°äº†åŒ…æœ«å°¾
 				if(pData[u4Pos] == 0x7E)
 				{
 					blFind = true;
@@ -237,10 +240,10 @@ uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurr
 		}
 		else
 		{
-			//Ã»ÓĞ»º³å£¬Ôò´ÓÊ××Ö½ÚÅĞ¶Ï
+			//æ²¡æœ‰ç¼“å†²ï¼Œåˆ™ä»é¦–å­—èŠ‚åˆ¤æ–­
 			for(u4Pos = 1; u4Pos < u4Data; u4Pos++)
 			{
-				//ÕÒµ½ÁË°üÄ©Î²
+				//æ‰¾åˆ°äº†åŒ…æœ«å°¾
 				if(pData[u4Pos] == 0x7E)
 				{
 					blFind = true;
@@ -253,50 +256,50 @@ uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurr
 		{
 			m_blIsHandleHead = true;
 
-			//Ã»ÓĞÕÒµ½°üÎ²£¬ĞèÒª¼ÌĞø½ÓÊÜÊı¾İ
+			//æ²¡æœ‰æ‰¾åˆ°åŒ…å°¾ï¼Œéœ€è¦ç»§ç»­æ¥å—æ•°æ®
 			return PACKET_GET_NO_ENOUGTH;
 		}
 		else
 		{
-			//½ÓÊÕµ½ÁËÍêÕûÊı¾İ°ü
+			//æ¥æ”¶åˆ°äº†å®Œæ•´æ•°æ®åŒ…
 			m_u4PacketHead  = sizeof(uint32);
 			m_u4HeadSrcSize = sizeof(uint32);
 			m_u4PacketData  = u4Pos + 1;
 			m_u4BodySrcSize = u4Pos + 1;
 
-			//´ÓÄÚ´æ³ØÖĞÉêÇëÒ»¸ö°üÍ·
+			//ä»å†…å­˜æ± ä¸­ç”³è¯·ä¸€ä¸ªåŒ…å¤´
 			m_pmbHead = pMessageBlockManager->Create(sizeof(uint32));
 			if(NULL == m_pmbHead)
 			{
 				return PACKET_GET_ERROR;
 			}
 
-			//¼ÇÂ¼°ü³¤£¬²¢×ª»»ÎªÍøÂç×Ö½ÚĞò£¬·ÅÈë°üÍ·
+			//è®°å½•åŒ…é•¿ï¼Œå¹¶è½¬æ¢ä¸ºç½‘ç»œå­—èŠ‚åºï¼Œæ”¾å…¥åŒ…å¤´
 			//uint32 u4NetPacketLen = ACE_HTONL(m_objCurrBody.GetPacketLen());
 			uint32 u4NetPacketLen = m_u4PacketData;
 			memcpy_safe((char*)&u4NetPacketLen, (uint32)sizeof(uint32), m_pmbHead->wr_ptr(), (uint32)sizeof(uint32));
 			m_pmbHead->wr_ptr(sizeof(uint32));
 
-			//´ÓÄÚ´æ³ØÉêÇëÒ»¸ö°üÌå
+			//ä»å†…å­˜æ± ç”³è¯·ä¸€ä¸ªåŒ…ä½“
 			m_pmbBody = pMessageBlockManager->Create(m_u4PacketData);
 			if(NULL == m_pmbBody)
 			{
 				return PACKET_GET_ERROR;
 			}
 
-			//»ñµÃ°üÃüÁîID
+			//è·å¾—åŒ…å‘½ä»¤ID
 			memcpy_safe((char*)pData, (uint32)sizeof(uint16), (char* )&m_u2PacketCommandID, (uint32)sizeof(uint16));
 
-			//½«°üÄÚÈİ·ÅÈë°üÌå
+			//å°†åŒ…å†…å®¹æ”¾å…¥åŒ…ä½“
 			memcpy_safe((char*)pBuffPacket->GetData(), m_u4PacketData, (char* )m_pmbBody->wr_ptr(), m_u4PacketData);
 			m_pmbBody->wr_ptr(m_u4PacketData);
 
-			//É¾³ı»º³åÖĞµÄÊı¾İ
+			//åˆ é™¤ç¼“å†²ä¸­çš„æ•°æ®
 			pBuffPacket->RollBack(u4Pos);
 
 			m_blIsHandleHead = false;
 
-			//´¦ÀíÍêµÄÊı¾İ´Ó³ØÖĞÒÆ³ı
+			//å¤„ç†å®Œçš„æ•°æ®ä»æ± ä¸­ç§»é™¤
 			pCurrMessage->rd_ptr(pCurrMessage->length());
 			return PACKET_GET_ENOUGTH;
 		}
@@ -306,8 +309,8 @@ uint8 CPacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurr
 
 bool CPacketParse::Connect(uint32 u4ConnectID, _ClientIPInfo objClientIPInfo, _ClientIPInfo objLocalIPInfo)
 {
-	//ÕâÀïÌí¼ÓÄã¶ÔÁ¬½Ó½¨Á¢µÄÂß¼­´¦Àí£¬Èç¹ûÃ»ÓĞÔò²»ÓÃÔÚÕâÀïĞ´ÈÎºÎ´úÂë
-	//·µ»Øfalse£¬ÔòÁ¬½Ó»á¶Ï¿ª
+	//è¿™é‡Œæ·»åŠ ä½ å¯¹è¿æ¥å»ºç«‹çš„é€»è¾‘å¤„ç†ï¼Œå¦‚æœæ²¡æœ‰åˆ™ä¸ç”¨åœ¨è¿™é‡Œå†™ä»»ä½•ä»£ç 
+	//è¿”å›falseï¼Œåˆ™è¿æ¥ä¼šæ–­å¼€
 	//App_PacketBufferManager::instance()->AddBuffer(u4ConnectID);
 
 	return true;
@@ -315,15 +318,13 @@ bool CPacketParse::Connect(uint32 u4ConnectID, _ClientIPInfo objClientIPInfo, _C
 
 void CPacketParse::DisConnect(uint32 u4ConnectID)
 {
-	//ÕâÀïÌí¼ÓÄã¶ÔÁ¬½Ó¶Ï¿ªµÄÂß¼­´¦Àí
+	//è¿™é‡Œæ·»åŠ ä½ å¯¹è¿æ¥æ–­å¼€çš„é€»è¾‘å¤„ç†
 	//App_PacketBufferManager::instance()->DelBuffer(u4ConnectID);
 }
 
 void CPacketParse::GetPacketHeadInfo(_PacketHeadInfo& objPacketHeadInfo)
 {
-	objPacketHeadInfo.m_u2Version = m_objPacketHeadInfo.m_u2Version;
 	objPacketHeadInfo.m_u2CmdID   = m_objPacketHeadInfo.m_u2CmdID;
 	objPacketHeadInfo.m_u4BodyLen = m_objPacketHeadInfo.m_u4BodyLen;
-	sprintf_safe(objPacketHeadInfo.m_szSession, SESSION_LEN, "%s", m_objPacketHeadInfo.m_szSession);
 }
 

@@ -2244,8 +2244,6 @@ int CConnectManager::handle_timeout(const ACE_Time_Value &tv, const void *arg)
 				App_ConnectAccount::instance()->GetDisConnectMin());
 		}
 
-		return 0;
-
 	}
 
 	return 0;

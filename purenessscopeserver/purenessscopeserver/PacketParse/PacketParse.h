@@ -1,19 +1,19 @@
-#ifndef _PACKETPARSE_H
+ï»¿#ifndef _PACKETPARSE_H
 #define _PACKETPARSE_H
 
-//Õâ¸öÀàÊÇÍêÈ«½»¸ø¿ª·¢ÕßÊ¹ÓÃµÄ
-//ÔÚÕâÀï¿ª·¢ÕßÖ»ÒªÈ¥ÊµÏÖÏÂÃæµÄ5¸ö½Ó¿Ú£¬¾Í¿ÉÒÔÍê³ÉÒ»¸öÊı¾İ°ü´¦Àí¹ı³Ì
-//ÕâÀï¸ø³öÁËÒ»¸öÀı×Ó£¬Èç¹ûÖ»ÓÃÁ÷Ä£Ê½µÄ»°£¬ĞèÒªÔÙ¹¹Ôìº¯ÊıÀïÃæÖ¸¶¨m_u1PacketModeÎªPACKET_WITHSTREAM
-//È»ºóÊµÏÖGetPacketStream()º¯Êı£¬ÀïÃæÓĞÒ»¸öÎÒĞ´µÄĞ¡Àı×Ó¡£
-//ÆäÊµ£¬Á÷Ä£Ê½²¢·ÇÖ»Õë¶ÔÎŞ°üÍ·µÄĞ­Òé£¬ÓĞ°üÍ·µÄĞ­Òé£¬Äã²»ÏëÓÃSetPacketHeadºÍSetPacketBody
-//ÄãÒ²¿ÉÒÔ×Ô¼ºÈ¥ÔÚGetPacketStreamÕâ¸öº¯ÊıÀïÊµÏÖ
-//¿´Äã×Ô¼ºµÄÏ²ºÃ£¬²»¹ıÎÒ»¹ÊÇÍÆ¼öÇ°Õß£¬ÒòÎªÕâÑù×ö¿ÉÄÜĞ§ÂÊ±È½Ï¸ß¡£
+//è¿™ä¸ªç±»æ˜¯å®Œå…¨äº¤ç»™å¼€å‘è€…ä½¿ç”¨çš„
+//åœ¨è¿™é‡Œå¼€å‘è€…åªè¦å»å®ç°ä¸‹é¢çš„5ä¸ªæ¥å£ï¼Œå°±å¯ä»¥å®Œæˆä¸€ä¸ªæ•°æ®åŒ…å¤„ç†è¿‡ç¨‹
+//è¿™é‡Œç»™å‡ºäº†ä¸€ä¸ªä¾‹å­ï¼Œå¦‚æœåªç”¨æµæ¨¡å¼çš„è¯ï¼Œéœ€è¦å†æ„é€ å‡½æ•°é‡Œé¢æŒ‡å®šm_u1PacketModeä¸ºPACKET_WITHSTREAM
+//ç„¶åå®ç°GetPacketStream()å‡½æ•°ï¼Œé‡Œé¢æœ‰ä¸€ä¸ªæˆ‘å†™çš„å°ä¾‹å­ã€‚
+//å…¶å®ï¼Œæµæ¨¡å¼å¹¶éåªé’ˆå¯¹æ— åŒ…å¤´çš„åè®®ï¼Œæœ‰åŒ…å¤´çš„åè®®ï¼Œä½ ä¸æƒ³ç”¨SetPacketHeadå’ŒSetPacketBody
+//ä½ ä¹Ÿå¯ä»¥è‡ªå·±å»åœ¨GetPacketStreamè¿™ä¸ªå‡½æ•°é‡Œå®ç°
+//çœ‹ä½ è‡ªå·±çš„å–œå¥½ï¼Œä¸è¿‡æˆ‘è¿˜æ˜¯æ¨èå‰è€…ï¼Œå› ä¸ºè¿™æ ·åšå¯èƒ½æ•ˆç‡æ¯”è¾ƒé«˜ã€‚
 //add by freeeyes
 
 #include "PacketParseBase.h"
 #include "PacketBuffer.h"
 
-#define PACKET_HEAD_LENGTH         40            //°üÍ·³¤¶È
+#define PACKET_HEAD_LENGTH         sizeof(_PacketHeadInfo)            //åŒ…å¤´é•¿åº¦
 
 #ifdef WIN32
 #if defined PACKETPARSE_BUILD_DLL
@@ -35,28 +35,28 @@ public:
 	CPacketParse(void);
 	virtual ~CPacketParse(void);
 
-	//³õÊ¼»¯PacketParsed
+	//åˆå§‹åŒ–PacketParsed
 	void Init();
 
-	//µÃµ½·ûºÏÌõ¼şµÄÊı¾İ°üÍ·Êı¾İ¿é£¬u4ConnectIDÊÇÁ¬½ÓID£¬pmbHeadÊÇÊı¾İ¿é£¬pMessageBlockManagerÊÇÊı¾İ¿é³Ø£¬Èç¹û²»ÓÃ½âÃÜÕâ¸ö²ÎÊı¶ÔÄãÎŞĞ§
+	//å¾—åˆ°ç¬¦åˆæ¡ä»¶çš„æ•°æ®åŒ…å¤´æ•°æ®å—ï¼Œu4ConnectIDæ˜¯è¿æ¥IDï¼ŒpmbHeadæ˜¯æ•°æ®å—ï¼ŒpMessageBlockManageræ˜¯æ•°æ®å—æ± ï¼Œå¦‚æœä¸ç”¨è§£å¯†è¿™ä¸ªå‚æ•°å¯¹ä½ æ— æ•ˆ
 	bool SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager);
-	//µÃµ½·ûºÏÌõ¼şµÄÊı¾İ°üÌåÊı¾İ¿é£¬u4ConnectIDÊÇÁ¬½ÓID£¬pmbHeadÊÇÊı¾İ¿é£¬pMessageBlockManagerÊÇÊı¾İ¿é³Ø£¬Èç¹û²»ÓÃ½âÃÜÕâ¸ö²ÎÊı¶ÔÄãÎŞĞ§
+	//å¾—åˆ°ç¬¦åˆæ¡ä»¶çš„æ•°æ®åŒ…ä½“æ•°æ®å—ï¼Œu4ConnectIDæ˜¯è¿æ¥IDï¼ŒpmbHeadæ˜¯æ•°æ®å—ï¼ŒpMessageBlockManageræ˜¯æ•°æ®å—æ± ï¼Œå¦‚æœä¸ç”¨è§£å¯†è¿™ä¸ªå‚æ•°å¯¹ä½ æ— æ•ˆ
 	bool SetPacketBody(uint32 u4ConnectID, ACE_Message_Block* pmbBody, IMessageBlockManager* pMessageBlockManager);
 
-	//×¨ÃÅ¶ÔÓ¦ ModeÎª0µÄ²»´ø°üÍ·µÄÊı¾İ°ü,Èç¹ûÊÇ´ø°üÍ·µÄÄ£Ê½£¬ÕâÀïÊ²Ã´¶¼²»ÓÃ×ö¡£
-	//ÒòÎªÓÃµ½ÁËÄÚ´æ³Ø£¬ËùÒÔpHeadºÍpBodyÓÉ¿ò¼ÜÌá¹©£¬²¢ÇÒÓÉ¿ò¼Ü»ØÊÕ£¬ËùÒÔÔÚÕâÀï£¬²»¿ÉÒÔÓÃnew³öÀ´µÄpHeadºÍpBody£¬·ñÔò»áÔì³ÉÄÚ´æĞ¹Â¶¡£
-	//ÕâÀïÒª×¢ÒâÒ»ÏÂ°¡¡£µ±È»£¬Èç¹ûÄã¾õµÃÇ°ÃæµÄ½Ó¿Ú·±Ëö£¬ÄãÒ²¿ÉÒÔÓÃÕâ¸ö½Ó¿ÚÊµÏÖÄãµÄ¹æÔò£¬Ç°ÌáÊÇÄãµÄm_u1PacketMode±ØĞëÊÇPACKET_WITHSTREAM
+	//ä¸“é—¨å¯¹åº” Modeä¸º0çš„ä¸å¸¦åŒ…å¤´çš„æ•°æ®åŒ…,å¦‚æœæ˜¯å¸¦åŒ…å¤´çš„æ¨¡å¼ï¼Œè¿™é‡Œä»€ä¹ˆéƒ½ä¸ç”¨åšã€‚
+	//å› ä¸ºç”¨åˆ°äº†å†…å­˜æ± ï¼Œæ‰€ä»¥pHeadå’ŒpBodyç”±æ¡†æ¶æä¾›ï¼Œå¹¶ä¸”ç”±æ¡†æ¶å›æ”¶ï¼Œæ‰€ä»¥åœ¨è¿™é‡Œï¼Œä¸å¯ä»¥ç”¨newå‡ºæ¥çš„pHeadå’ŒpBodyï¼Œå¦åˆ™ä¼šé€ æˆå†…å­˜æ³„éœ²ã€‚
+	//è¿™é‡Œè¦æ³¨æ„ä¸€ä¸‹å•Šã€‚å½“ç„¶ï¼Œå¦‚æœä½ è§‰å¾—å‰é¢çš„æ¥å£ç¹çï¼Œä½ ä¹Ÿå¯ä»¥ç”¨è¿™ä¸ªæ¥å£å®ç°ä½ çš„è§„åˆ™ï¼Œå‰ææ˜¯ä½ çš„m_u1PacketModeå¿…é¡»æ˜¯PACKET_WITHSTREAM
 	uint8 GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurrMessage, IMessageBlockManager* pMessageBlockManager);   
 
-	//Æ´½ÓÊı¾İ·µ»Ø°ü£¬ËùÓĞµÄ·µ»ØÊı¾İ°ü¶¼»áµ÷ÓÃÕâ¸ö
+	//æ‹¼æ¥æ•°æ®è¿”å›åŒ…ï¼Œæ‰€æœ‰çš„è¿”å›æ•°æ®åŒ…éƒ½ä¼šè°ƒç”¨è¿™ä¸ª
 	bool MakePacket(uint32 u4ConnectID, const char* pData, uint32 u4Len, ACE_Message_Block* pMbData, uint16 u2CommandID = 0);
-	//µÃµ½·µ»ØÊı¾İ°üµÄ³¤¶È
+	//å¾—åˆ°è¿”å›æ•°æ®åŒ…çš„é•¿åº¦
 	uint32 MakePacketLength(uint32 u4ConnectID, uint32 u4DataLen, uint16 u2CommandID = 0);
-	//µ±Á¬½ÓµÚÒ»´Î½¨Á¢µÄÊ±ºò£¬·µ»ØµÄ½Ó¿ÚÓÃÓÚÄã×Ô¼ºµÄ´¦Àí¡£
+	//å½“è¿æ¥ç¬¬ä¸€æ¬¡å»ºç«‹çš„æ—¶å€™ï¼Œè¿”å›çš„æ¥å£ç”¨äºä½ è‡ªå·±çš„å¤„ç†ã€‚
 	bool Connect(uint32 u4ConnectID, _ClientIPInfo objClientIPInfo, _ClientIPInfo objLocalIPInfo);
-	//µ±Á¬½Ó¶Ï¿ªµÄÊ±ºò£¬·µ»ØÄã×Ô¼ºµÄ´¦Àí
+	//å½“è¿æ¥æ–­å¼€çš„æ—¶å€™ï¼Œè¿”å›ä½ è‡ªå·±çš„å¤„ç†
 	void DisConnect(uint32 u4ConnectID);
-	//»ñµÃµ±Ç°Êı¾İ°üÍ·ĞÅÏ¢
+	//è·å¾—å½“å‰æ•°æ®åŒ…å¤´ä¿¡æ¯
 	void GetPacketHeadInfo(_PacketHeadInfo& objPacketHeadInfo);
 };
 

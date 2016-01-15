@@ -104,10 +104,10 @@ void CProConsoleHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 {
 	ACE_Time_Value tvOpenBegin(ACE_OS::gettimeofday());
 
-  //初始化key值列表
-  m_ConsoleMessage.SetConsoleKey(App_MainConfig::instance()->GetConsoleKey());
+    //初始化key值列表
+    m_ConsoleMessage.SetConsoleKey(App_MainConfig::instance()->GetConsoleKey());
 
-	OUR_DEBUG((LM_INFO, "[CProConsoleHandle::open] [0x%08x]Connection from [%s:%d]\n", this, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
+	//OUR_DEBUG((LM_INFO, "[CProConsoleHandle::open] [0x%08x]Connection from [%s:%d]\n", this, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
 
 	m_atvConnect      = ACE_OS::gettimeofday();
 	m_atvInput        = ACE_OS::gettimeofday();
@@ -188,7 +188,7 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 		}
 		SAFE_DELETE(m_pPacketParse);
 
-		OUR_DEBUG((LM_DEBUG,"[%tCConnectHandler::handle_read_stream]Connectid=[%d] error(%d)...\n", GetConnectID(), errno));
+		OUR_DEBUG((LM_DEBUG,"[CConnectHandler::handle_read_stream]Connectid=[%d] error(%d)...\n", GetConnectID(), errno));
 		//AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount);
 		//因为是要关闭连接，所以要多关闭一次IO，对应Open设置的1的初始值
 

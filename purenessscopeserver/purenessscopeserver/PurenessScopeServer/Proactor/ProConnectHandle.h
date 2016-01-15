@@ -70,7 +70,7 @@ public:
 	void               SetConnectName(const char* pName);                     //设置当前连接名称
 	char*              GetConnectName();                                      //得到别名
 	void               SetIsLog(bool blIsLog);                                //设置当前连接数据是否写入日志 
-    bool               GetIsLog();                                            //得到是否可以写日志
+	bool               GetIsLog();                                            //得到是否可以写日志
 
 	bool SetRecvQueueTimeCost(uint32 u4TimeCost);                             //记录当前接收数据到模块处理完成的具体时间消耗
 	bool SetSendQueueTimeCost(uint32 u4TimeCost);                             //记录当前从发送队列到数据发送完成的具体时间消耗
