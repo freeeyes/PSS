@@ -1,29 +1,29 @@
-ï»¿#ifndef _IMESSAGE_H
+#ifndef _IMESSAGE_H
 #define _IMESSAGE_H
 
 #include "IBuffPacket.h"
 #include "ProfileTime.h"
 
-//è®°å½•æ¶ˆæ¯çš„ä¸€äº›å‚æ•°
+//¼ÇÂ¼ÏûÏ¢µÄÒ»Ğ©²ÎÊı
 struct _MessageBase
 {
-	uint8          m_u1PacketType;              //æ•°æ®åŒ…æ¥æºç±»å‹  
-	uint32         m_u4ConnectID;               //æ¶ˆæ¯é“¾æ¥ConnectIDï¼Œå¦‚æœæ˜¯UDPåˆ™è¿™ä¸ªå€¼æ— æ•ˆ
-	uint32         m_u4PacketID;                //æ•°æ®åŒ…çš„ID
-	uint16         m_u2Cmd;                     //å‘½ä»¤å­—çš„ID
-	uint32         m_u4HeadSrcSize;             //åŒ…å¤´åŸå§‹é•¿åº¦
-	uint32         m_u4BodySrcSize;             //åŒ…ä½“åŸå§‹é•¿åº¦
-	uint32         m_u4MsgTime;                 //æ¶ˆæ¯æ¥æ”¶åˆ°çš„æ—¶é—´
-	char           m_szIP[MAX_BUFF_20];         //å®¢æˆ·ç«¯IP
-	uint32         m_u4Port;                    //å®¢æˆ·ç«¯ç«¯å£
-	char           m_szListenIP[MAX_BUFF_20];   //ç›‘å¬IP
-	uint32         m_u4ListenPort;              //ç›‘å¬ç«¯å£
-	uint32         m_u4WorkThreadID;            //å·¥ä½œçº¿ç¨‹ID
-	CProfileTime   m_ProfileTime;               //æ¶ˆæ¯åˆ°è¾¾æ—¶é—´
+	uint8          m_u1PacketType;              //Êı¾İ°üÀ´Ô´ÀàĞÍ  
+	uint32         m_u4ConnectID;               //ÏûÏ¢Á´½ÓConnectID£¬Èç¹ûÊÇUDPÔòÕâ¸öÖµÎŞĞ§
+	uint32         m_u4PacketID;                //Êı¾İ°üµÄID
+	uint16         m_u2Cmd;                     //ÃüÁî×ÖµÄID
+	uint32         m_u4HeadSrcSize;             //°üÍ·Ô­Ê¼³¤¶È
+	uint32         m_u4BodySrcSize;             //°üÌåÔ­Ê¼³¤¶È
+	uint32         m_u4MsgTime;                 //ÏûÏ¢½ÓÊÕµ½µÄÊ±¼ä
+	char           m_szIP[MAX_BUFF_20];         //¿Í»§¶ËIP
+	uint32         m_u4Port;                    //¿Í»§¶Ë¶Ë¿Ú
+	char           m_szListenIP[MAX_BUFF_20];   //¼àÌıIP
+	uint32         m_u4ListenPort;              //¼àÌı¶Ë¿Ú
+	uint32         m_u4WorkThreadID;            //¹¤×÷Ïß³ÌID
+	CProfileTime   m_ProfileTime;               //ÏûÏ¢µ½´ïÊ±¼ä
 
 	_MessageBase()
 	{
-		m_u1PacketType   = PACKET_TCP;   //é»˜è®¤ä¸ºTCP
+		m_u1PacketType   = PACKET_TCP;   //Ä¬ÈÏÎªTCP
 		m_u4ConnectID    = 0;
 		m_u4PacketID     = 0;
 		m_u2Cmd          = 0;
@@ -38,7 +38,7 @@ struct _MessageBase
 	}
 };
 
-//æ¶ˆæ¯ä¿¡æ¯ç±»çš„æ¥å£
+//ÏûÏ¢ĞÅÏ¢ÀàµÄ½Ó¿Ú
 class IMessage
 {
 public:
@@ -47,21 +47,19 @@ public:
 	virtual void Close() = 0;
 	virtual void Clear() = 0;
 
-	virtual void SetMessageBase(_MessageBase* pMessageBase)              = 0; //è®¾ç½®è¿æ¥åŸºæœ¬ä¿¡æ¯
-	virtual void SetPacketHeadInfo(_PacketHeadInfo& objPacketHeadInfo)   = 0; //è®¾ç½®åŒ…å¤´åè®®ä¿¡æ¯ 
+	virtual void SetMessageBase(_MessageBase* pMessageBase)              = 0; //ÉèÖÃÁ¬½Ó»ù±¾ĞÅÏ¢
 
-	virtual bool GetPacketHead(_PacketInfo& PacketInfo)    = 0;               //å¾—åˆ°åŒ…å¤´ç»“æ„ä½“ï¼Œå¹¶èµ‹å€¼ç»™_PacketInfoå¯¹è±¡
-	virtual bool GetPacketBody(_PacketInfo& PacketInfo)    = 0;               //å¾—åˆ°åŒ…ä½“ç»“æ„ä½“ï¼Œå¹¶èµ‹å€¼ç»™_PacketInfoå¯¹è±¡
-	virtual bool SetPacketHead(ACE_Message_Block* pmbHead) = 0;               //è®¾ç½®åŒ…å¤´æ•°æ®å—
-	virtual bool SetPacketBody(ACE_Message_Block* pmbBody) = 0;               //è®¾ç½®åŒ…ä½“æ•°æ®å—
+	virtual bool GetPacketHead(_PacketInfo& PacketInfo)    = 0;               //µÃµ½°üÍ·½á¹¹Ìå£¬²¢¸³Öµ¸ø_PacketInfo¶ÔÏó
+	virtual bool GetPacketBody(_PacketInfo& PacketInfo)    = 0;               //µÃµ½°üÌå½á¹¹Ìå£¬²¢¸³Öµ¸ø_PacketInfo¶ÔÏó
+	virtual bool SetPacketHead(ACE_Message_Block* pmbHead) = 0;               //ÉèÖÃ°üÍ·Êı¾İ¿é
+	virtual bool SetPacketBody(ACE_Message_Block* pmbBody) = 0;               //ÉèÖÃ°üÌåÊı¾İ¿é
 
-	virtual _MessageBase* GetMessageBase()                 = 0;               //å¾—åˆ°åŒ…è¿æ¥åŸºæœ¬ä¿¡æ¯
-	virtual _PacketHeadInfo* GetPacketHeadInfo()           = 0;               //å¾—åˆ°åŒ…å¤´åè®®ä¿¡æ¯ 
+	virtual _MessageBase* GetMessageBase()                 = 0;               //µÃµ½°üÁ¬½Ó»ù±¾ĞÅÏ¢
 
 	virtual const char* GetError()                         = 0;
 };
 
-//ä¸­é—´æœåŠ¡å™¨æ¶ˆæ¯ç±»æ¥å£
+//ÖĞ¼ä·şÎñÆ÷ÏûÏ¢Àà½Ó¿Ú
 class IPostMessage
 {
 public:

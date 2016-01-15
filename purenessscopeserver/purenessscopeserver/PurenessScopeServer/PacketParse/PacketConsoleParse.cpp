@@ -153,11 +153,4 @@ void CConsolePacketParse::DisConnect( uint32 u4ConnectID )
 	}
 }
 
-void CConsolePacketParse::GetPacketHeadInfo(_PacketHeadInfo& objPacketHeadInfo)
-{
-	//Console不实现此方法
-	objPacketHeadInfo.Clear();
-	return;
-}
-
 

@@ -249,10 +249,6 @@ bool CMakePacket::ProcessMessageBlock(_MakePacket* pMakePacket)
 
 void CMakePacket::SetMessage(CPacketParse* pPacketParse, uint32 u4ConnectID, CMessage* pMessage)
 {
-	//填充数据包头信息
-	_PacketHeadInfo objPacketHeadInfo;
-	pPacketParse->GetPacketHeadInfo(objPacketHeadInfo);
-
 	if(NULL != pMessage->GetMessageBase())
 	{
 		//开始组装数据
@@ -263,7 +259,6 @@ void CMakePacket::SetMessage(CPacketParse* pPacketParse, uint32 u4ConnectID, CMe
 		pMessage->GetMessageBase()->m_u4BodySrcSize = pPacketParse->GetPacketBodySrcLen();
 
 		//将接受的数据缓冲放入CMessage对象
-		pMessage->SetPacketHeadInfo(objPacketHeadInfo);
 		pMessage->SetPacketHead(pPacketParse->GetMessageHead());
 		pMessage->SetPacketBody(pPacketParse->GetMessageBody());
 	}

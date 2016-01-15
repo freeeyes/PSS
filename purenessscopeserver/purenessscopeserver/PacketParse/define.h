@@ -357,7 +357,7 @@ inline void sprintf_safe(char* szText, int nLen, const char* fmt ...)
 	szText[nLen - 1] = '\0';
 
 	va_end(ap);
-}
+};
 
 //支持memcpy的边界检查
 inline bool memcpy_safe(char* pSrc, uint32 u4SrcLen, char* pDes, uint32 u4DesLen)
@@ -653,21 +653,12 @@ typedef  struct _VCHARB_STR
 #endif
 
 //用于记录数据包头信息
-#define SESSION_LEN           32     //Session的大小
-struct _PacketHeadInfo
+//这部分应该是交给PacketParse去继承实现之
+class IPacketHeadInfo
 {
-	uint16 m_u2Version;              //协议版本号
-	uint16 m_u2CmdID;                //协议命令字   
-	uint32 m_u4BodyLen;              //协议数据包体长度  
-	char   m_szSession[SESSION_LEN]; //数据包Session 
-
-	void Clear()
-	{
-		m_u2Version    = 0;
-		m_u2CmdID      = 0;
-		m_u4BodyLen    = 0;
-		m_szSession[0] = '\0';
-	}
+public:
+	IPacketHeadInfo() {};
+	virtual ~IPacketHeadInfo() {};
 };
 
 //定时监控数据包和流量的数据信息，用于链接有效性的逻辑判定

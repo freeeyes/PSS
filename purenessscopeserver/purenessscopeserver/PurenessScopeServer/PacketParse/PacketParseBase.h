@@ -41,7 +41,7 @@ public:
 	uint32 GetPacketBodyLen();
 
 	uint16 GetPacketCommandID();
-    bool GetIsHandleHead();
+	bool GetIsHandleHead();
 	uint32 GetPacketHeadSrcLen();
 	uint32 GetPacketBodySrcLen();
 
@@ -66,7 +66,8 @@ public:
 	virtual uint32 MakePacketLength(uint32 u4ConnectID, uint32 u4DataLen, uint16 u2CommandID = 0)                                    = 0;
 	virtual bool Connect(uint32 u4ConnectID, _ClientIPInfo objClientIPInfo, _ClientIPInfo objLocalIPInfo)                            = 0;
 	virtual void DisConnect(uint32 u4ConnectID)                                                                                      = 0;
-	virtual void GetPacketHeadInfo(_PacketHeadInfo& objPacketHeadInfo)                                                               = 0;
+	IPacketHeadInfo* GetPacketHeadInfo();
+	void SetPacketHeadInfo(IPacketHeadInfo* pPacketHeadInfo);
 
 protected:
 	uint32 m_u4PacketHead;               //包头的长度
@@ -74,12 +75,12 @@ protected:
 	uint32 m_u4HeadSrcSize;              //包头的原始长度 
 	uint32 m_u4BodySrcSize;              //包体的原始长度
 	uint16 m_u2PacketCommandID;          //包命令
-    bool   m_blIsHandleHead;
+	bool   m_blIsHandleHead;
 	char   m_szPacketVersion[MAX_BUFF_20];   //包解析器版本
 	uint8  m_u1PacketMode;                   //包解析模式 
 	uint8  m_u1Sort;                         //字节序规则，0为主机字节序，1为网络字节序   
 
-	_PacketHeadInfo    m_objPacketHeadInfo;  //数据包头信息 
+	IPacketHeadInfo*    m_pPacketHeadInfo;  //数据包头信息 
 
 	ACE_Message_Block* m_pmbHead;   //包头部分
 	ACE_Message_Block* m_pmbBody;   //包体部分

@@ -9,6 +9,10 @@ CPacketParse::CPacketParse(void)
 	//这里修改属于你的包解析版本号
 	sprintf_safe(m_szPacketVersion, MAX_BUFF_20, "0.94");
 
+	//这里构造包头实际结构体
+	CPacketHeadInfo* pPacketHeadInfo = new CPacketHeadInfo();
+	SetPacketHeadInfo((IPacketHeadInfo* )pPacketHeadInfo);
+
 	//这里设置你的包模式
 	m_u1PacketMode      = PACKET_WITHHEAD;
 }
@@ -45,27 +49,35 @@ bool CPacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead,
 
 	m_u4HeadSrcSize = PACKET_HEAD_LENGTH;
 
-	memcpy_safe((char* )&pData[u4Pos], (uint32)sizeof(uint16), (char* )&m_objPacketHeadInfo.m_u2Version, (uint32)sizeof(uint16));
-	Check_Recv_Unit16(m_objPacketHeadInfo.m_u2Version);
-	u4Pos += sizeof(uint16);
-	memcpy_safe((char* )&pData[u4Pos], (uint32)sizeof(uint16), (char* )&m_objPacketHeadInfo.m_u2CmdID, (uint32)sizeof(uint16));
-	Check_Recv_Unit16(m_objPacketHeadInfo.m_u2CmdID);
-	u4Pos += sizeof(uint16);
-	memcpy_safe((char* )&pData[u4Pos], (uint32)sizeof(uint32), (char* )&m_objPacketHeadInfo.m_u4BodyLen, (uint32)sizeof(uint32));
-	Check_Recv_Unit32(m_objPacketHeadInfo.m_u4BodyLen);
-	u4Pos += sizeof(uint32);
-	memcpy_safe((char* )&pData[u4Pos], (uint32)(sizeof(char)*32), (char* )&m_objPacketHeadInfo.m_szSession, (uint32)(sizeof(char)*32));
-	u4Pos += sizeof(char)*32;
+	CPacketHeadInfo* pPacketHeadInfo = (CPacketHeadInfo* )GetPacketHeadInfo();
 
-	OUR_DEBUG((LM_INFO,"[CPacketParse::SetPacketHead]m_u2Version=%d,m_u2CmdID=%d,m_u4BodyLen=%d.\n",
-		m_objPacketHeadInfo.m_u2Version,
-		m_objPacketHeadInfo.m_u2CmdID,
-		m_objPacketHeadInfo.m_u4BodyLen));
+	if(NULL != pPacketHeadInfo)
+	{
+		memcpy_safe((char* )&pData[u4Pos], (uint32)sizeof(uint16), (char* )&pPacketHeadInfo->m_u2Version, (uint32)sizeof(uint16));
+		Check_Recv_Unit16(pPacketHeadInfo->m_u2Version);
+		u4Pos += sizeof(uint16);
+		memcpy_safe((char* )&pData[u4Pos], (uint32)sizeof(uint16), (char* )&pPacketHeadInfo->m_u2CmdID, (uint32)sizeof(uint16));
+		Check_Recv_Unit16(pPacketHeadInfo->m_u2CmdID);
+		u4Pos += sizeof(uint16);
+		memcpy_safe((char* )&pData[u4Pos], (uint32)sizeof(uint32), (char* )&pPacketHeadInfo->m_u4BodyLen, (uint32)sizeof(uint32));
+		Check_Recv_Unit32(pPacketHeadInfo->m_u4BodyLen);
+		u4Pos += sizeof(uint32);
+		memcpy_safe((char* )&pData[u4Pos], (uint32)(sizeof(char)*32), (char* )&pPacketHeadInfo->m_szSession, (uint32)(sizeof(char)*32));
+		u4Pos += sizeof(char)*32;
 
-	m_u4PacketData      = m_objPacketHeadInfo.m_u4BodyLen;
-	m_u2PacketCommandID = m_objPacketHeadInfo.m_u2CmdID;
+		OUR_DEBUG((LM_INFO,"[CPacketParse::SetPacketHead]m_u2Version=%d,m_u2CmdID=%d,m_u4BodyLen=%d.\n",
+			pPacketHeadInfo->m_u2Version,
+			pPacketHeadInfo->m_u2CmdID,
+			pPacketHeadInfo->m_u4BodyLen));
+
+		m_u4PacketData      = pPacketHeadInfo->m_u4BodyLen;
+		m_u2PacketCommandID = pPacketHeadInfo->m_u2CmdID;
+	}
+
 
 	m_pmbHead = pmbHead;
+
+	m_blIsHandleHead = false;
 
 	return true;
 }
@@ -320,11 +332,5 @@ void CPacketParse::DisConnect(uint32 u4ConnectID)
 {
 	//这里添加你对连接断开的逻辑处理
 	//App_PacketBufferManager::instance()->DelBuffer(u4ConnectID);
-}
-
-void CPacketParse::GetPacketHeadInfo(_PacketHeadInfo& objPacketHeadInfo)
-{
-	objPacketHeadInfo.m_u2CmdID   = m_objPacketHeadInfo.m_u2CmdID;
-	objPacketHeadInfo.m_u4BodyLen = m_objPacketHeadInfo.m_u4BodyLen;
 }
 
