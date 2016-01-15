@@ -6,7 +6,7 @@
 	<ServerType Type="0" name="Pss Service" displayname="PssService" Debug="0" desc = "Type设置为0为当前启动，1为Linux后台执行，windows启动系统服务" />
 	<ServerID id="1" desc="当前服务器的ID编号" />
 	<ServerName name="Freeeyes" desc="当前服务器的名称" />
-	<ServerVersion Version="0.92" desc="当前服务器版本" />
+	<ServerVersion Version="0.96" desc="当前服务器版本" />
 	<TCPServerIP ip="INADDR_ANY" port="10002" ipType="IPV4" desc="监听TCP服务器的IP和端口，可以是多个" />
 	<!-- <TCPServerIP ip="fe80::d433:372b:d0ee:edc4%12" port="10002" ipType="IPV6" desc="监听TCP服务器的IP和端口，可以是多个(IPv6地址测试)" /> -->
 	<!-- <TCPServerIP ip="127.0.0.1" port="10003" ipType="IPV4" desc="监听TCP服务器的IP和端口，可以是多个，要用多个，只要多写几个这样的节点即可" /> -->
