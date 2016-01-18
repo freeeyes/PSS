@@ -13,7 +13,33 @@
 #include "PacketParseBase.h"
 #include "PacketBuffer.h"
 
-#define PACKET_HEAD_LENGTH         40            //包头长度
+#define SESSION_LEN           32     //Session的大小
+class CPacketHeadInfo : public IPacketHeadInfo
+{
+public:
+	CPacketHeadInfo() {};
+	~CPacketHeadInfo() {};
+
+	uint16 m_u2Version;              //协议版本号
+	uint16 m_u2CmdID;                //协议命令字   
+	uint32 m_u4BodyLen;              //协议数据包体长度  
+	char   m_szSession[SESSION_LEN]; //数据包Session 
+
+	void Clear()
+	{
+		m_u2Version    = 0;
+		m_u2CmdID      = 0;
+		m_u4BodyLen    = 0;
+		m_szSession[0] = '\0';
+	}
+
+	static int GetStreamLength()
+	{
+		return 40;
+	}
+};
+
+#define PACKET_HEAD_LENGTH         CPacketHeadInfo::GetStreamLength();            //包头长度
 
 #ifdef WIN32
 #if defined PACKETPARSE_BUILD_DLL
@@ -56,8 +82,6 @@ public:
 	bool Connect(uint32 u4ConnectID, _ClientIPInfo objClientIPInfo, _ClientIPInfo objLocalIPInfo);
 	//当连接断开的时候，返回你自己的处理
 	void DisConnect(uint32 u4ConnectID);
-	//获得当前数据包头信息
-	void GetPacketHeadInfo(_PacketHeadInfo& objPacketHeadInfo);
 };
 
 #endif

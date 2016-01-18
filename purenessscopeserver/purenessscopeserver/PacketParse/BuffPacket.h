@@ -4,7 +4,7 @@
 #include "ace/Thread_Mutex.h"
 
 #include "ACEMemory.h"
-#include "../IObject/IBuffPacket.h"
+#include "../PurenessScopeServer/IObject/IBuffPacket.h"
 
 #define DEFINE_PACKET_SIZE 1024
 #define DEFINE_PACKET_ADD  1024
@@ -105,11 +105,11 @@ public:
 	void* operator new(size_t stSize)
 	{
 		return App_ACEMemory::instance()->malloc(stSize);
-	}
+    }
 
 	void operator delete(void* p)
 	{
 		App_ACEMemory::instance()->free(p);
-	}
+    }
 };
 #endif

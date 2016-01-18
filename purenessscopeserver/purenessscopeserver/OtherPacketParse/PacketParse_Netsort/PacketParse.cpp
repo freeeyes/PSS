@@ -7,7 +7,11 @@ CPacketParse::CPacketParse(void)
 	m_u4PacketHead      = PACKET_HEAD_LENGTH;
 
 	//这里修改属于你的包解析版本号
-	sprintf_safe(m_szPacketVersion, MAX_BUFF_20, "0.94");
+	sprintf_safe(m_szPacketVersion, MAX_BUFF_20, "0.96");
+
+	//这里构造包头实际结构体
+	CPacketHeadInfo* pPacketHeadInfo = new CPacketHeadInfo();
+	SetPacketHeadInfo((IPacketHeadInfo* )pPacketHeadInfo);
 
 	//这里设置你的包模式
 	m_u1PacketMode      = PACKET_WITHHEAD;
@@ -43,20 +47,28 @@ bool CPacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead,
 
 	m_u4HeadSrcSize = PACKET_HEAD_LENGTH;
 
-	memcpy_safe((char* )&pData[u4Pos], (uint32)sizeof(uint16), (char* )&m_objPacketHeadInfo.m_u2Version, (uint32)sizeof(uint16));
-	m_objPacketHeadInfo.m_u2Version = ACE_NTOHS(m_objPacketHeadInfo.m_u2Version);
-	u4Pos += sizeof(uint16);
-	memcpy_safe((char* )&pData[u4Pos], (uint32)sizeof(uint16), (char* )&m_objPacketHeadInfo.m_u2CmdID, (uint32)sizeof(uint16));
-	m_objPacketHeadInfo.m_u2CmdID = ACE_NTOHS(m_objPacketHeadInfo.m_u2CmdID);
-	u4Pos += sizeof(uint16);
-	memcpy_safe((char* )&pData[u4Pos], (uint32)sizeof(uint32), (char* )&m_objPacketHeadInfo.m_u4BodyLen, (uint32)sizeof(uint32));
-	m_objPacketHeadInfo.m_u4BodyLen = ACE_NTOHL(m_objPacketHeadInfo.m_u4BodyLen);
-	u4Pos += sizeof(uint32);
-	memcpy_safe((char* )&pData[u4Pos], (uint32)(sizeof(char)*32), (char* )&m_objPacketHeadInfo.m_szSession, (uint32)(sizeof(char)*32));
-	u4Pos += sizeof(char)*32;
+	CPacketHeadInfo* pPacketHeadInfo = (CPacketHeadInfo* )GetPacketHeadInfo();
 
-	m_u4PacketData      = m_objPacketHeadInfo.m_u4BodyLen;
-	m_u2PacketCommandID = m_objPacketHeadInfo.m_u2CmdID;
+	if(NULL != pPacketHeadInfo)
+	{
+		memcpy_safe((char* )&pData[u4Pos], (uint32)sizeof(uint16), (char* )&pPacketHeadInfo->m_u2Version, (uint32)sizeof(uint16));
+		pPacketHeadInfo->m_u2Version = ACE_NTOHS(pPacketHeadInfo->m_u2Version);
+		Check_Recv_Unit16(pPacketHeadInfo->m_u2Version);
+		u4Pos += sizeof(uint16);
+		memcpy_safe((char* )&pData[u4Pos], (uint32)sizeof(uint16), (char* )&pPacketHeadInfo->m_u2CmdID, (uint32)sizeof(uint16));
+		pPacketHeadInfo->m_u2CmdID = ACE_NTOHS(pPacketHeadInfo->m_u2CmdID);
+		Check_Recv_Unit16(pPacketHeadInfo->m_u2CmdID);
+		u4Pos += sizeof(uint16);
+		memcpy_safe((char* )&pData[u4Pos], (uint32)sizeof(uint32), (char* )&pPacketHeadInfo->m_u4BodyLen, (uint32)sizeof(uint32));
+		pPacketHeadInfo->m_u4BodyLen = ACE_NTOHL(pPacketHeadInfo->m_u4BodyLen);
+		Check_Recv_Unit32(pPacketHeadInfo->m_u4BodyLen);
+		u4Pos += sizeof(uint32);
+		memcpy_safe((char* )&pData[u4Pos], (uint32)(sizeof(char)*32), (char* )&pPacketHeadInfo->m_szSession, (uint32)(sizeof(char)*32));
+		u4Pos += sizeof(char)*32;
+
+		m_u4PacketData      = pPacketHeadInfo->m_u4BodyLen;
+		m_u2PacketCommandID = pPacketHeadInfo->m_u2CmdID;
+	}
 
 	m_pmbHead = pmbHead;
 
@@ -315,11 +327,4 @@ void CPacketParse::DisConnect(uint32 u4ConnectID)
 	App_PacketBufferManager::instance()->DelBuffer(u4ConnectID);
 }
 
-void CPacketParse::GetPacketHeadInfo(_PacketHeadInfo& objPacketHeadInfo)
-{
-	objPacketHeadInfo.m_u2Version = m_objPacketHeadInfo.m_u2Version;
-	objPacketHeadInfo.m_u2CmdID   = m_objPacketHeadInfo.m_u2CmdID;
-	objPacketHeadInfo.m_u4BodyLen = m_objPacketHeadInfo.m_u4BodyLen;
-	sprintf_safe(objPacketHeadInfo.m_szSession, SESSION_LEN, "%s", m_objPacketHeadInfo.m_szSession);
-}
 

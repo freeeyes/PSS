@@ -1,10 +1,10 @@
-#ifndef _PACKETPARSEBASE_H
+ï»¿#ifndef _PACKETPARSEBASE_H
 #define _PACKETPARSEBASE_H
 
-//Õâ¸öÀàÊÇ°Ñ²»¾­³£±ä»¯µÄº¯Êı£¬·ÅÔÚÕâÀï£¬Ö»ÈÃ¿ª·¢ÕßÈ¥ÊµÏÖ±ØÒªµÄ5¸ö½Ó¿Ú
-//Ê£ÏÂµÄ£¬¿ª·¢Õß²»ĞèÒª¹ØÏµ£¬ÕâÊÇ¿ò¼Ü×Ô¼ºÊµÏÖµÄÊÂÇé¡£
-//ËùÒÔ°şÀë³öÀ´ÁËÕâ¸öÀà£¬ÏëÈÃËû¸ü¼ò½à¡£
-//¼á³ÖÃ¿Ò»µãµÎµÄ½ø²½£¬³ÖĞøµÄ×ßÏÂÈ¥£¬Õâ¾ÍÊÇÃÎÏë¡£
+//è¿™ä¸ªç±»æ˜¯æŠŠä¸ç»å¸¸å˜åŒ–çš„å‡½æ•°ï¼Œæ”¾åœ¨è¿™é‡Œï¼Œåªè®©å¼€å‘è€…å»å®ç°å¿…è¦çš„5ä¸ªæ¥å£
+//å‰©ä¸‹çš„ï¼Œå¼€å‘è€…ä¸éœ€è¦å…³ç³»ï¼Œè¿™æ˜¯æ¡†æ¶è‡ªå·±å®ç°çš„äº‹æƒ…ã€‚
+//æ‰€ä»¥å‰¥ç¦»å‡ºæ¥äº†è¿™ä¸ªç±»ï¼Œæƒ³è®©ä»–æ›´ç®€æ´ã€‚
+//åšæŒæ¯ä¸€ç‚¹æ»´çš„è¿›æ­¥ï¼ŒæŒç»­çš„èµ°ä¸‹å»ï¼Œè¿™å°±æ˜¯æ¢¦æƒ³ã€‚
 //add by freeeyes
 
 #include "BuffPacket.h"
@@ -66,23 +66,24 @@ public:
 	virtual uint32 MakePacketLength(uint32 u4ConnectID, uint32 u4DataLen, uint16 u2CommandID = 0)                                    = 0;
 	virtual bool Connect(uint32 u4ConnectID, _ClientIPInfo objClientIPInfo, _ClientIPInfo objLocalIPInfo)                            = 0;
 	virtual void DisConnect(uint32 u4ConnectID)                                                                                      = 0;
-	virtual void GetPacketHeadInfo(_PacketHeadInfo& objPacketHeadInfo)                                                               = 0;
+	IPacketHeadInfo* GetPacketHeadInfo();
+	void SetPacketHeadInfo(IPacketHeadInfo* pPacketHeadInfo);
 
 protected:
-	uint32 m_u4PacketHead;               //°üÍ·µÄ³¤¶È
-	uint32 m_u4PacketData;               //°üÌåµÄ³¤¶È
-	uint32 m_u4HeadSrcSize;              //°üÍ·µÄÔ­Ê¼³¤¶È 
-	uint32 m_u4BodySrcSize;              //°üÌåµÄÔ­Ê¼³¤¶È
-	uint16 m_u2PacketCommandID;          //°üÃüÁî
+	uint32 m_u4PacketHead;               //åŒ…å¤´çš„é•¿åº¦
+	uint32 m_u4PacketData;               //åŒ…ä½“çš„é•¿åº¦
+	uint32 m_u4HeadSrcSize;              //åŒ…å¤´çš„åŸå§‹é•¿åº¦ 
+	uint32 m_u4BodySrcSize;              //åŒ…ä½“çš„åŸå§‹é•¿åº¦
+	uint16 m_u2PacketCommandID;          //åŒ…å‘½ä»¤
 	bool   m_blIsHandleHead;
-	char   m_szPacketVersion[MAX_BUFF_20];   //°ü½âÎöÆ÷°æ±¾
-	uint8  m_u1PacketMode;                   //°ü½âÎöÄ£Ê½ 
-	uint8  m_u1Sort;                         //×Ö½ÚĞò¹æÔò£¬0ÎªÖ÷»ú×Ö½ÚĞò£¬1ÎªÍøÂç×Ö½ÚĞò   
+	char   m_szPacketVersion[MAX_BUFF_20];   //åŒ…è§£æå™¨ç‰ˆæœ¬
+	uint8  m_u1PacketMode;                   //åŒ…è§£ææ¨¡å¼ 
+	uint8  m_u1Sort;                         //å­—èŠ‚åºè§„åˆ™ï¼Œ0ä¸ºä¸»æœºå­—èŠ‚åºï¼Œ1ä¸ºç½‘ç»œå­—èŠ‚åº   
 
-	_PacketHeadInfo    m_objPacketHeadInfo;  //Êı¾İ°üÍ·ĞÅÏ¢ 
+	IPacketHeadInfo*    m_pPacketHeadInfo;  //æ•°æ®åŒ…å¤´ä¿¡æ¯ 
 
-	ACE_Message_Block* m_pmbHead;   //°üÍ·²¿·Ö
-	ACE_Message_Block* m_pmbBody;   //°üÌå²¿·Ö
+	ACE_Message_Block* m_pmbHead;   //åŒ…å¤´éƒ¨åˆ†
+	ACE_Message_Block* m_pmbBody;   //åŒ…ä½“éƒ¨åˆ†
 };
 
 #endif
