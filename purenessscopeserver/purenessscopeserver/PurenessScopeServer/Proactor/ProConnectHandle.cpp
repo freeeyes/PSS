@@ -900,6 +900,11 @@ bool CProConnectHandle::CheckAlive(ACE_Time_Value& tvNow)
 
 bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 {
+	if(NULL == pMbData)
+	{
+		return false;
+	}
+
 	//如果是DEBUG状态，记录当前发送包的二进制数据
 	if(App_MainConfig::instance()->GetDebug() == DEBUG_ON || m_blIsLog == true)
 	{
@@ -2337,7 +2342,16 @@ bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPac
 			continue;		
 		}
 
-		pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, blSendState, false);
+
+		//为每一个Connect设置发送对象数据包
+		IBuffPacket* pCurrBuffPacket = App_BuffPacketManager::instance()->Create();
+		if(NULL == pCurrBuffPacket)
+		{
+			continue;
+		}
+		pCurrBuffPacket->WriteStream(pBuffPacket->GetData(), pBuffPacket->GetWriteLen());
+
+		pConnectManager->PostMessage(u4ConnectID, pCurrBuffPacket, u1SendType, u2CommandID, blSendState, true);
 	}
 
 	if(true == blDelete)
@@ -2352,15 +2366,6 @@ bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPac
 bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, bool blSendState, bool blDelete)
 {
 	uint32 u4ConnectID = 0;
-	IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create();
-	if(NULL != pBuffPacket)
-	{
-		pBuffPacket->WriteStream(pData, nDataLen);
-	}
-	else
-	{
-		return false;
-	}
 
 	for(uint32 i = 0; i < (uint32)vecConnectID.size(); i++)
 	{
@@ -2382,10 +2387,16 @@ bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, const ch
 			continue;
 		}
 
-		pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, blSendState, false);
-	}
+		//为每一个Connect设置发送对象数据包
+		IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create();
+		if(NULL == pBuffPacket)
+		{
+			continue;
+		}
+		pBuffPacket->WriteStream(pData, nDataLen);
 
-	App_BuffPacketManager::instance()->Delete(pBuffPacket);
+		pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, blSendState, true);
+	}
 
 	if(true == blDelete)
 	{
