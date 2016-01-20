@@ -15,6 +15,7 @@
 #include "MakePacket.h"
 #include "ForbiddenIP.h"
 #include "CommandAccount.h"
+#include "LoadPacketParse.h"
 
 class CProactorUDPHandler : public ACE_Service_Handler
 {

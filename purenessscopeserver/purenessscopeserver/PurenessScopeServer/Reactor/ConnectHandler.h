@@ -32,6 +32,7 @@
 #include "SendMessage.h"
 #include "CommandAccount.h"
 #include "SendCacheManager.h"
+#include "LoadPacketParse.h"
 
 #ifdef __LINUX__
 #include "netinet/tcp.h"

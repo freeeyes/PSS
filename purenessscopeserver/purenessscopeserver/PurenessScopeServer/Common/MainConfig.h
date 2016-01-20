@@ -9,6 +9,21 @@
 
 #include "PacketParse.h"
 
+//PacketParse相关信息
+struct _PacketParseInfo
+{
+	char   m_szPacketParseName[MAX_BUFF_100];
+	uint8  m_u1Type;
+	uint32 m_u4OrgLength;
+
+	_PacketParseInfo()
+	{
+		m_szPacketParseName[0] = '\0';
+		m_u1Type               = (uint8)PACKET_WITHHEAD;
+		m_u4OrgLength          = 0;
+	}
+};
+
 //服务器信息
 //增加对IPv4和IPv6的支持
 struct _ServerInfo
@@ -290,6 +305,7 @@ public:
 	_CommandAlert*    GetCommandAlert(int nIndex);
 	_MailAlert*       GetMailAlert(uint32 u4MailID);
 	_GroupListenInfo* GetGroupListenInfo();
+	_PacketParseInfo* GetPacketParseInfo();
 
 private:
 	CXmlOpeation m_MainConfig;
@@ -382,6 +398,7 @@ private:
 	_IPAlert         m_IPAlert;                    //IP告警阀值相关配置
 	_ClientDataAlert m_ClientDataAlert;            //单链接客户端告警阀值相关配置   
 	_GroupListenInfo m_GroupListenInfo;            //集群相关服务器地址配置
+	_PacketParseInfo m_PacketParseInfo;            //数据解析模块相关信息
 
 	ENUM_CHAR_ORDER m_u1CharOrder;                 //当前字节序
 

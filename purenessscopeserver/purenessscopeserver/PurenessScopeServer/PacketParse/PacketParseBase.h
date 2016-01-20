@@ -10,21 +10,7 @@
 #include "BuffPacket.h"
 #include "IMessageBlockManager.h"
 
-#ifdef WIN32
-#if defined PACKETPARSE_BUILD_DLL
-#define DLL_EXPORT __declspec(dllexport)
-#else
-#define DLL_EXPORT __declspec(dllimport)
-#endif
-#else
-#define DLL_EXPORT
-#endif 
-
-#ifdef WIN32
-class DLL_EXPORT CPacketParseBase
-#else
 class CPacketParseBase
-#endif 
 {
 public:
 	CPacketParseBase(void);
@@ -59,19 +45,12 @@ public:
 	ACE_Message_Block* GetMessageBody();
 
 	virtual void Init() = 0;
-	virtual bool SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager)           = 0;
-	virtual bool SetPacketBody(uint32 u4ConnectID, ACE_Message_Block* pmbBody, IMessageBlockManager* pMessageBlockManager)           = 0;
-	virtual uint8 GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurrMessage, IMessageBlockManager* pMessageBlockManager)   = 0;
-	virtual bool MakePacket(uint32 u4ConnectID, const char* pData, uint32 u4Len, ACE_Message_Block* pMbData, uint16 u2CommandID = 0) = 0;
-	virtual uint32 MakePacketLength(uint32 u4ConnectID, uint32 u4DataLen, uint16 u2CommandID = 0)                                    = 0;
-	virtual bool Connect(uint32 u4ConnectID, _ClientIPInfo objClientIPInfo, _ClientIPInfo objLocalIPInfo)                            = 0;
-	virtual void DisConnect(uint32 u4ConnectID)                                                                                      = 0;
 	IPacketHeadInfo* GetPacketHeadInfo();
 	void SetPacketHeadInfo(IPacketHeadInfo* pPacketHeadInfo);
 
-protected:
+public:
 	uint32 m_u4PacketHead;               //包头的长度
-	uint32 m_u4PacketData;               //包体的长度
+	uint32 m_u4PacketBody;               //包体的长度
 	uint32 m_u4HeadSrcSize;              //包头的原始长度 
 	uint32 m_u4BodySrcSize;              //包体的原始长度
 	uint16 m_u2PacketCommandID;          //包命令

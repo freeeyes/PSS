@@ -151,7 +151,7 @@ bool CProactorUDPHandler::SendMessage(const char* pMessage, uint32 u4Len, const 
 		CPacketParse PacketParse;
 
 		ACE_Message_Block* pMbData = NULL;
-		uint32 u4SendLength = PacketParse.MakePacketLength(0, u4Len);
+		uint32 u4SendLength = App_PacketParseLoader::instance()->GetPacketParseInfo()->Make_Send_Packet_Length(0, u4Len, u2CommandID);
 		pMbData = App_MessageBlockManager::instance()->Create(u4SendLength);
 		if(NULL == pMbData)
 		{
@@ -159,7 +159,7 @@ bool CProactorUDPHandler::SendMessage(const char* pMessage, uint32 u4Len, const 
 			return false;
 		}
 
-		PacketParse.MakePacket(0, pMessage, u4Len, pMbData);
+		App_PacketParseLoader::instance()->GetPacketParseInfo()->Make_Send_Packet(0, pMessage, u4Len, pMbData, u2CommandID);
 
 		uint32 u4DataLen = (uint32)pMbData->length();
 		int nSize = (int)m_skRemote.send(pMbData->rd_ptr(), u4DataLen, AddrRemote);
@@ -248,25 +248,56 @@ bool CProactorUDPHandler::CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len)
 		}
 
 		//将完整的数据包转换为PacketParse对象
-		ACE_Message_Block* pMBHead = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadLen());
-		memcpy_safe((char* )pMbData->rd_ptr(), m_pPacketParse->GetPacketHeadLen(), (char* )pMBHead->wr_ptr(), m_pPacketParse->GetPacketHeadLen());
-		pMBHead->wr_ptr(m_pPacketParse->GetPacketHeadLen());
+		ACE_Message_Block* pMBHead = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadSrcLen());
+		memcpy_safe((char* )pMbData->rd_ptr(), m_pPacketParse->GetPacketHeadSrcLen(), (char* )pMBHead->wr_ptr(), m_pPacketParse->GetPacketHeadSrcLen());
+		pMBHead->wr_ptr(m_pPacketParse->GetPacketHeadSrcLen());
 
-		m_pPacketParse->SetPacketHead(0, pMBHead, App_MessageBlockManager::instance());
-		if(u4Len != m_pPacketParse->GetPacketHeadLen() + m_pPacketParse->GetPacketBodyLen())
+		_Head_Info obj_Head_Info;
+		bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo()->Parse_Packet_Head_Info(0, pMBHead, App_MessageBlockManager::instance(), &obj_Head_Info);
+		if(false == blStateHead)
 		{
+			pMBHead->release();
+			App_PacketParsePool::instance()->Delete(m_pPacketParse);
+			return false;
+		}
+		else
+		{
+			m_pPacketParse->m_u4PacketHead      = obj_Head_Info.m_u4HeadCurrLen;
+			m_pPacketParse->m_u4BodySrcSize     = obj_Head_Info.m_u4BodySrcLen;
+			m_pPacketParse->m_u2PacketCommandID = obj_Head_Info.m_u2PacketCommandID;
+			m_pPacketParse->m_pmbHead           = pMBHead;
+		}
+
+		if(u4Len != m_pPacketParse->GetPacketHeadSrcLen() + m_pPacketParse->GetPacketBodySrcLen())
+		{
+			pMBHead->release();
+			App_PacketParsePool::instance()->Delete(m_pPacketParse);
 			return false;
 		}
 
-		pMbData->rd_ptr(m_pPacketParse->GetPacketHeadLen());
+		pMbData->rd_ptr(m_pPacketParse->GetPacketHeadSrcLen());
 
 		//如果包含包体
 		if(m_pPacketParse->GetPacketBodyLen() > 0)
 		{
-			ACE_Message_Block* pMBBody = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketBodyLen());
-			memcpy_safe((char* )pMbData->rd_ptr(), m_pPacketParse->GetPacketBodyLen(), (char* )pMBBody->wr_ptr(), m_pPacketParse->GetPacketBodyLen());
+			ACE_Message_Block* pMBBody = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketBodySrcLen());
+			memcpy_safe((char* )pMbData->rd_ptr(), m_pPacketParse->GetPacketBodySrcLen(), (char* )pMBBody->wr_ptr(), m_pPacketParse->GetPacketBodySrcLen());
 			pMBBody->wr_ptr(m_pPacketParse->GetPacketBodyLen());
-			m_pPacketParse->SetPacketBody(0, pMBBody, App_MessageBlockManager::instance());
+
+			_Body_Info obj_Body_Info;
+			bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo()->Parse_Packet_Body_Info(0, pMBBody, App_MessageBlockManager::instance(), &obj_Body_Info);
+			if(false  == blStateBody)
+			{
+				pMBHead->release();
+				pMBBody->release();
+				App_PacketParsePool::instance()->Delete(m_pPacketParse);
+				return false;
+			}
+			else
+			{
+				m_pPacketParse->m_pmbBody      = pMBBody;
+				m_pPacketParse->m_u4PacketBody = obj_Body_Info.m_u4BodyCurrLen;
+			}
 		}
 
 		//组织数据包
@@ -286,8 +317,17 @@ bool CProactorUDPHandler::CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len)
 	else
 	{
 		//以数据流处理
-		if(PACKET_GET_ENOUGTH == m_pPacketParse->GetPacketStream(0, pMbData, App_MessageBlockManager::instance()))
+		_Packet_Info obj_Packet_Info;
+		if(PACKET_GET_ENOUGTH == App_PacketParseLoader::instance()->GetPacketParseInfo()->Parse_Packet_Stream(0, pMbData, App_MessageBlockManager::instance(), &obj_Packet_Info))
 		{
+			m_pPacketParse->m_pmbHead           = obj_Packet_Info.m_pmbHead;
+			m_pPacketParse->m_pmbBody           = obj_Packet_Info.m_pmbBody;
+			m_pPacketParse->m_u2PacketCommandID = obj_Packet_Info.m_u2PacketCommandID;
+			m_pPacketParse->m_u4PacketHead      = obj_Packet_Info.m_u4HeadCurrLen;
+			m_pPacketParse->m_u4PacketBody      = obj_Packet_Info.m_u4BodyCurrLen;
+			m_pPacketParse->m_u4HeadSrcSize     = obj_Packet_Info.m_u4HeadSrcLen;
+			m_pPacketParse->m_u4BodySrcSize     = obj_Packet_Info.m_u4BodySrcLen;
+
 			//组织数据包
 			_MakePacket objMakePacket;
 			objMakePacket.m_u4ConnectID       = UDP_HANDER_ID;

@@ -95,8 +95,7 @@ bool CProConnectHandle::Close(int nIOCount, int nErrno)
 		//App_IPAccount::instance()->CloseIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
 
 		//调用连接断开消息，通知PacketParse接口
-		CPacketParse objPacketParse;
-		objPacketParse.DisConnect(GetConnectID());
+		App_PacketParseLoader::instance()->GetPacketParseInfo()->DisConnect(GetConnectID());
 
 		//通知逻辑接口，连接已经断开
 		OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::Close]Connectid=[%d] error(%d)...\n", GetConnectID(), nErrno));
@@ -316,7 +315,7 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 	}
 
 	//告诉PacketParse连接应建立
-	m_pPacketParse->Connect(GetConnectID(), GetClientIPInfo(), GetLocalIPInfo());
+	App_PacketParseLoader::instance()->GetPacketParseInfo()->Connect(GetConnectID(), GetClientIPInfo(), GetLocalIPInfo());
 
 	//组织数据
 	_MakePacket objMakePacket;
@@ -419,10 +418,11 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 			}
 
 		}
-		else if(mb.length() == m_pPacketParse->GetPacketHeadLen() && m_pPacketParse->GetIsHandleHead())
+		else if(mb.length() == m_pPacketParse->GetPacketHeadSrcLen() && m_pPacketParse->GetIsHandleHead())
 		{
 			//判断头的合法性
-			bool blStateHead = m_pPacketParse->SetPacketHead(GetConnectID(), &mb, App_MessageBlockManager::instance());
+			_Head_Info objHeadInfo;
+			bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo()->Parse_Packet_Head_Info(GetConnectID(), &mb, App_MessageBlockManager::instance(), &objHeadInfo);
 			if(false == blStateHead)
 			{
 				//如果包头是非法的，则返回错误，断开连接。
@@ -435,10 +435,18 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 				Close(2, errno);
 				return;
 			}
+			else
+			{
+				m_pPacketParse->m_blIsHandleHead    = false;
+				m_pPacketParse->m_pmbHead           = objHeadInfo.m_pmbHead;
+				m_pPacketParse->m_u4PacketHead      = objHeadInfo.m_u4HeadCurrLen;
+				m_pPacketParse->m_u4BodySrcSize     = objHeadInfo.m_u4BodySrcLen;
+				m_pPacketParse->m_u2PacketCommandID = objHeadInfo.m_u2PacketCommandID;
+			}
 
 			//这里添加只处理包头的数据
 			//如果数据只有包头，不需要包体，在这里必须做一些处理，让数据只处理包头就扔到DoMessage()
-			uint32 u4PacketBodyLen = m_pPacketParse->GetPacketBodyLen();
+			uint32 u4PacketBodyLen = m_pPacketParse->GetPacketBodySrcLen();
 
 			if(u4PacketBodyLen == 0)
 			{
@@ -499,7 +507,8 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 		else
 		{
 			//接受完整数据完成，开始分析完整数据包
-			bool blStateBody = m_pPacketParse->SetPacketBody(GetConnectID(), &mb, App_MessageBlockManager::instance());
+			_Body_Info obj_Body_Info;
+			bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo()->Parse_Packet_Body_Info(GetConnectID(), &mb, App_MessageBlockManager::instance(), &obj_Body_Info);
 			if(false == blStateBody)
 			{
 				//如果数据包体非法，断开连接
@@ -511,6 +520,11 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 				//关闭当前连接
 				Close(2, errno);
 				return;
+			}
+			else
+			{
+				m_pPacketParse->m_pmbBody      = obj_Body_Info.m_pmbBody;
+				m_pPacketParse->m_u4PacketBody = obj_Body_Info.m_u4BodyCurrLen;
 			}
 
 			if(false == CheckMessage())
@@ -551,9 +565,18 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 		//以流模式解析
 		while(true)
 		{
-			uint8 n1Ret = m_pPacketParse->GetPacketStream(GetConnectID(), &mb, (IMessageBlockManager* )App_MessageBlockManager::instance());
+			_Packet_Info obj_Packet_Info;
+			uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo()->Parse_Packet_Stream(GetConnectID(), &mb, (IMessageBlockManager* )App_MessageBlockManager::instance(), &obj_Packet_Info);
 			if(PACKET_GET_ENOUGTH == n1Ret)
 			{
+				m_pPacketParse->m_pmbHead           = obj_Packet_Info.m_pmbHead;
+				m_pPacketParse->m_pmbBody           = obj_Packet_Info.m_pmbBody;
+				m_pPacketParse->m_u2PacketCommandID = obj_Packet_Info.m_u2PacketCommandID;
+				m_pPacketParse->m_u4PacketHead      = obj_Packet_Info.m_u4HeadCurrLen;
+				m_pPacketParse->m_u4PacketBody      = obj_Packet_Info.m_u4BodyCurrLen;
+				m_pPacketParse->m_u4HeadSrcSize     = obj_Packet_Info.m_u4HeadSrcLen;
+				m_pPacketParse->m_u4BodySrcSize     = obj_Packet_Info.m_u4BodySrcLen;
+
 				//已经接收了完整数据包，扔给工作线程去处理
 				if(false == CheckMessage())
 				{
@@ -767,7 +790,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 		uint32 u4SendPacketSize = 0;
 		if(u1SendType == SENDMESSAGE_NOMAL)
 		{
-			u4SendPacketSize = m_objSendPacketParse.MakePacketLength(GetConnectID(), pBuffPacket->GetPacketLen(), u2CommandID);
+			u4SendPacketSize = App_PacketParseLoader::instance()->GetPacketParseInfo()->Make_Send_Packet_Length(GetConnectID(), pBuffPacket->GetPacketLen(), u2CommandID);
 		}
 		else
 		{
@@ -793,7 +816,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 			if(u1SendType == SENDMESSAGE_NOMAL)
 			{
 				//这里组成返回数据包
-				m_objSendPacketParse.MakePacket(GetConnectID(), pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), m_pBlockMessage, u2CommandID);
+				App_PacketParseLoader::instance()->GetPacketParseInfo()->Make_Send_Packet(GetConnectID(), pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), m_pBlockMessage, u2CommandID);
 			}
 			else
 			{
@@ -816,7 +839,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 		uint32 u4SendPacketSize = 0;
 		if(u1SendType == SENDMESSAGE_NOMAL)
 		{
-			u4SendPacketSize = m_objSendPacketParse.MakePacketLength(GetConnectID(), pBuffPacket->GetPacketLen(), u2CommandID);
+			u4SendPacketSize = App_PacketParseLoader::instance()->GetPacketParseInfo()->Make_Send_Packet_Length(GetConnectID(), pBuffPacket->GetPacketLen(), u2CommandID);
 
 			if(u4SendPacketSize >= m_u4SendMaxBuffSize)
 			{
@@ -829,7 +852,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 				return false;
 			}
 
-			m_objSendPacketParse.MakePacket(GetConnectID(), pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), m_pBlockMessage, u2CommandID);
+			App_PacketParseLoader::instance()->GetPacketParseInfo()->Make_Send_Packet(GetConnectID(), pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), m_pBlockMessage, u2CommandID);
 			//这里MakePacket已经加了数据长度，所以在这里不再追加
 		}
 		else

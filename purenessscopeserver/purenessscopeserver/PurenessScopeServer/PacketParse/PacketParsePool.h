@@ -5,6 +5,7 @@
 #include "ace/Singleton.h"
 
 #include "PacketParse.h"
+#include "MainConfig.h"
 
 #include <map>
 

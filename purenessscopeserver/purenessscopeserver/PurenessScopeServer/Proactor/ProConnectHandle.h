@@ -35,6 +35,7 @@
 #include "SendMessage.h"
 #include "CommandAccount.h"
 #include "SendCacheManager.h"
+#include "LoadPacketParse.h"
 
 #include <map>
 #include <vector>

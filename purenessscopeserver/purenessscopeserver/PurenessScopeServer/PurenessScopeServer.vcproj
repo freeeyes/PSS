@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="aced.lib PacketParsed.lib DbgHelp.lib psapi.lib"
+				AdditionalDependencies="aced.lib DbgHelp.lib psapi.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_D.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(ACE_ROOT)\lib;.\Lib"
@@ -332,6 +332,14 @@
 						>
 					</File>
 					<File
+						RelativePath=".\PacketParse\PacketParse.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\PacketParse\PacketParseBase.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\PacketParse\PacketParsePool.cpp"
 						>
 						<FileConfiguration
@@ -401,6 +409,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Message\LoadPacketParse.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Message\Message.h"
 					>
 				</File>
@@ -435,6 +447,10 @@
 							UsePrecompiledHeader="0"
 						/>
 					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\Message\LoadPacketParse.cpp"
+					>
 				</File>
 				<File
 					RelativePath=".\Message\Message.cpp"

@@ -230,60 +230,65 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 	{
 		App_MainConfig::instance()->Display();
 	}
-	
-	//判断是否是需要以服务的状态启动
-	if(App_MainConfig::instance()->GetServerType() == 1)
-	{
-		OUR_DEBUG((LM_INFO, "[main]Procress is run background.\n"));
-		//daemon(1,1);
-		Gdaemon();
-	}	
 
-	//判断当前并行连接数是否支持框架
-	//if(-1 == Checkfilelimit(App_MainConfig::instance()->GetMaxHandlerCount()))
-	//{
-	//	return 0;
-	//}
-
-	//判断当前Core文件尺寸是否需要调整
-	if(-1 == CheckCoreLimit(App_MainConfig::instance()->GetCoreFileSize()))
+	//隐式加载PacketParse
+	bool blState = App_PacketParseLoader::instance()->LoadPacketInfo(App_MainConfig::instance()->GetPacketParseInfo()->m_szPacketParseName);
+	if(true == blState)
 	{
-		return 0;
+		//判断是否是需要以服务的状态启动
+		if(App_MainConfig::instance()->GetServerType() == 1)
+		{
+			OUR_DEBUG((LM_INFO, "[main]Procress is run background.\n"));
+			//daemon(1,1);
+			Gdaemon();
+		}	
+
+		//判断当前并行连接数是否支持框架
+		//if(-1 == Checkfilelimit(App_MainConfig::instance()->GetMaxHandlerCount()))
+		//{
+		//	return 0;
+		//}
+
+		//判断当前Core文件尺寸是否需要调整
+		if(-1 == CheckCoreLimit(App_MainConfig::instance()->GetCoreFileSize()))
+		{
+			return 0;
+		}
+
+		//设置监控信号量的线程
+		WaitQuitSignal::init();
+
+		pthread_t tid;
+		pthread_attr_t attr;
+		pthread_attr_init(&attr);	
+		pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+		pthread_create(&tid, &attr, thread_Monitor, NULL);		
+
+		//第二步，启动主服务器监控
+		if(!App_ServerManager::instance()->Init())
+		{
+			OUR_DEBUG((LM_INFO, "[main]App_ServerManager::instance()->Init() error.\n"));
+			getchar();
+		}
+
+		OUR_DEBUG((LM_INFO, "[CServerManager::Start]Begin.\n"));
+		if(!App_ServerManager::instance()->Start())
+		{
+			OUR_DEBUG((LM_INFO, "[main]App_ServerManager::instance()->Start() error.\n"));
+			getchar();
+		}
+
+		OUR_DEBUG((LM_INFO, "[main]Server Run is End.\n"));
+
+		ACE_Time_Value tvSleep(2, 0);
+		ACE_OS::sleep(tvSleep);
+
+		OUR_DEBUG((LM_INFO, "[main]Server Exit.\n"));
+
+		pthread_exit(NULL);
 	}
 	
-	//设置监控信号量的线程
-	WaitQuitSignal::init();
-	
-	pthread_t tid;
-	pthread_attr_t attr;
-	pthread_attr_init(&attr);	
-	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-	
-	pthread_create(&tid, &attr, thread_Monitor, NULL);		
-
-	//第二步，启动主服务器监控
-	if(!App_ServerManager::instance()->Init())
-	{
-		OUR_DEBUG((LM_INFO, "[main]App_ServerManager::instance()->Init() error.\n"));
-		getchar();
-	}
-
-	OUR_DEBUG((LM_INFO, "[CServerManager::Start]Begin.\n"));
-	if(!App_ServerManager::instance()->Start())
-	{
-		OUR_DEBUG((LM_INFO, "[main]App_ServerManager::instance()->Start() error.\n"));
-		getchar();
-	}
-
-	OUR_DEBUG((LM_INFO, "[main]Server Run is End.\n"));
-
-	ACE_Time_Value tvSleep(2, 0);
-	ACE_OS::sleep(tvSleep);
-
-	OUR_DEBUG((LM_INFO, "[main]Server Exit.\n"));
-	
-	pthread_exit(NULL);
-
 	return 0;
 }
 
@@ -319,17 +324,22 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 		App_MainConfig::instance()->Display();
 	}
 
-	//判断是否是需要以服务的状态启动
-	if(App_MainConfig::instance()->GetServerType() == 1)
+	//隐式加载PacketParse
+	bool blState = App_PacketParseLoader::instance()->LoadPacketInfo(App_MainConfig::instance()->GetPacketParseInfo()->m_szPacketParseName);
+	if(true == blState)
 	{
-		//以服务状态启动
-		//首先看有没有配置启动windows服务
-		App_Process::instance()->run(argc, argv);
-	}
-	else
-	{
-		//正常启动
-		ServerMain();
+		//判断是否是需要以服务的状态启动
+		if(App_MainConfig::instance()->GetServerType() == 1)
+		{
+			//以服务状态启动
+			//首先看有没有配置启动windows服务
+			App_Process::instance()->run(argc, argv);
+		}
+		else
+		{
+			//正常启动
+			ServerMain();
+		}
 	}
  
 	return 0;

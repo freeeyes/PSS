@@ -493,6 +493,32 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
 		m_vecServerInfo.push_back(serverinfo);
 	}
 
+	//开始获得数据解析模块相关信息
+	pData = m_MainConfig.GetData("PacketParse", "ModuleName");
+	if(pData != NULL)
+	{
+		sprintf_safe(m_PacketParseInfo.m_szPacketParseName, MAX_BUFF_100, "%s", pData);
+	}
+	pData = m_MainConfig.GetData("PacketParse", "Type");
+	if(pData != NULL)
+	{
+		if(ACE_OS::strcmp(pData, "STREAM") == 0)
+		{
+			//流模式
+			m_PacketParseInfo.m_u1Type = (uint8)PACKET_WITHSTREAM;
+		}
+		else
+		{
+			//数据头体模式
+			m_PacketParseInfo.m_u1Type = (uint8)PACKET_WITHHEAD;
+		}
+	}
+	pData = m_MainConfig.GetData("PacketParse", "OrgLength");
+	if(pData != NULL)
+	{
+		m_PacketParseInfo.m_u4OrgLength = (uint32)ACE_OS::atoi(pData);
+	}
+
 	//开始获得消息处理线程参数
 	pData = m_MainConfig.GetData("Message", "Msg_High_mark");
 	if(pData != NULL)
@@ -1042,6 +1068,9 @@ void CMainConfig::Display()
         OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szModulePath%d = %s.\n", i, m_vecModuleConfig[i].m_szModulePath));
         OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szModuleParam%d = %s.\n", i, m_vecModuleConfig[i].m_szModuleParam));
     }
+	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szPacketParseName = %s.\n", m_PacketParseInfo.m_szPacketParseName));
+	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u1Type = %d.\n", m_PacketParseInfo.m_u1Type));
+	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4OrgLength = %d.\n", m_PacketParseInfo.m_u4OrgLength));
 }
 
 const char* CMainConfig::GetServerName()
@@ -1486,6 +1515,11 @@ void CMainConfig::SetMaxHandlerCount(uint16 u2MaxHandlerCount)
 _GroupListenInfo* CMainConfig::GetGroupListenInfo()
 {
 	return (_GroupListenInfo* )&m_GroupListenInfo;
+}
+
+_PacketParseInfo* CMainConfig::GetPacketParseInfo()
+{
+	return (_PacketParseInfo* )&m_PacketParseInfo;
 }
 
 uint16 CMainConfig::GetModuleInfoCount()

@@ -20,6 +20,9 @@ void CPacketParsePool::Init(uint32 u4PacketCount)
 		CPacketParse* pPacket = new CPacketParse();
 		if(NULL != pPacket)
 		{
+			//设置默认包头长度
+			pPacket->m_u1PacketMode = App_MainConfig::instance()->GetPacketParseInfo()->m_u1Type;
+			pPacket->m_u4PacketHead = App_MainConfig::instance()->GetPacketParseInfo()->m_u4OrgLength;
 			//添加到Free map里面
 			mapPacketParse::iterator f = m_mapPacketFree.find(pPacket);
 			if(f == m_mapPacketFree.end())
@@ -114,6 +117,7 @@ bool CPacketParsePool::Delete(CPacketParse* pPacketParse)
 	}
 
 	pPacketParse->Clear();
+	pPacketParse->m_blIsHandleHead = true;
 
 	mapPacketParse::iterator f = m_mapPacketUsed.find(pBuff);
 	if(f != m_mapPacketUsed.end())

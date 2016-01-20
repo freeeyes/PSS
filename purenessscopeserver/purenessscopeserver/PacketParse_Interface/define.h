@@ -652,6 +652,65 @@ typedef  struct _VCHARB_STR
 }VCHARB_STR;
 #endif
 
+//定义PacketParse的相关消息体
+//数据包头结构
+struct _Head_Info
+{
+	uint32             m_u4HeadSrcLen;       //原始数据包头长（解析前）
+	uint32	           m_u4HeadCurrLen;      //当前数据包长 （解析后）
+	uint16             m_u2PacketCommandID;  //CommandID
+	uint32             m_u4BodySrcLen;       //当前包体长度（解析前）
+	ACE_Message_Block* m_pmbHead;            //包头消息体
+
+	_Head_Info()
+	{
+		m_u4HeadSrcLen      = 0;
+		m_u4HeadCurrLen     = 0;
+		m_u2PacketCommandID = 0;
+		m_pmbHead           = NULL;
+	}
+};
+
+//数据包体结构
+struct _Body_Info
+{
+	uint32             m_u4BodySrcLen;       //原始数据包头长（解析前）
+	uint32	           m_u4BodyCurrLen;      //当前数据包长 （解析后）
+	ACE_Message_Block* m_pmbBody;            //包头消息体
+
+	_Body_Info()
+	{
+		m_u4BodySrcLen      = 0;
+		m_u4BodyCurrLen     = 0;
+		m_pmbBody           = NULL;
+	}
+};
+
+//数据包完整结构
+struct _Packet_Info
+{
+	uint32             m_u4HeadSrcLen;       //原始数据包头长（解析钱）
+	uint32	           m_u4HeadCurrLen;      //当前数据包长 （解析后）
+	uint16             m_u2PacketCommandID;  //CommandID
+	ACE_Message_Block* m_pmbHead;            //包头消息体
+
+	uint32             m_u4BodySrcLen;       //原始数据包头长（解析钱）
+	uint32	           m_u4BodyCurrLen;      //当前数据包长 （解析后）
+	ACE_Message_Block* m_pmbBody;            //包头消息体
+
+	_Packet_Info()
+	{
+		m_u4HeadSrcLen      = 0;
+		m_u4HeadCurrLen     = 0;
+		m_u2PacketCommandID = 0;
+		m_pmbHead           = NULL;
+
+		m_u4BodySrcLen      = 0;
+		m_u4BodyCurrLen     = 0;
+		m_pmbBody           = NULL;
+	}
+};
+
 //用于记录数据包头信息
 //这部分应该是交给PacketParse去继承实现之
 class IPacketHeadInfo
@@ -936,17 +995,17 @@ public:
 		sprintf_safe(m_szFileName, MAX_BUFF_300, "%s", pFileName);
 		m_nFileLine = nLine;
 		TimeBegin();
-	};
+    }
 
 	~CTimeCost()
 	{
 		TimeEnd();
-	};
+    }
 
 	void TimeBegin()
 	{
 		m_lBegin = GetSystemTickCount();
-	};
+    }
 
 	void TimeEnd()
 	{
@@ -968,7 +1027,7 @@ public:
 				ACE_OS::fclose(pFile);
 			}
 		}
-	};
+    }
 
 private:
 	unsigned long GetSystemTickCount()
