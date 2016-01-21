@@ -15,5 +15,4 @@ project(PurenessScopeServer):aceexe{
  }
  includes += ../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../IObject ../TinyXML ../Mail
  macros += __LINUX__
- libs += PacketParse
 }

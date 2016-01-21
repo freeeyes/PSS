@@ -1,0 +1,47 @@
+PacketParse是处理数据包的接收判定和处理发送数据包格式的类。
+由调用者自己自由实现。
+目前支持两种模式，一种是PACKET_WITHHEAD，另一种是PACKET_WITHSTREAM
+先说PACKET_WITHHEAD模式
+这个模式，顾名思义，是包含包头的模式。
+也就是说，数据包包含了应该具备的数据头，包头的大小是定长的，包头的内容可以由开发者自己定制。
+在这个模式下，如果要框架支持你的代码。
+你需要实现几个关键的PacketParse接口
+
+uint32 GetPacketHeadLen();  
+
+这个接口是告诉框架你当前接受包的包头大小。必须是一个大于0的数字，这里的代码需要开发者自己实现。
+
+bool SetPacketHead(ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager);
+这个接口由框架调用，当接收到符合GetPacketHeadLen()大小的包头，框架会调用这个接口。
+在这解析出包体的长度，（如果包头没有包体长度，你这里必须对包体长度予以赋值）
+你需要再这里做的是
+(1)拆解出包体长度，并复制给m_u4PacketData
+(2)将你的包头指针赋值给m_pmbHead。
+   如果你需要对这个数据进行解密，你需要再这里处理你的数据。
+   并用pMessageBlockManager申请一个新的ACE_Message_Block*，然后填充解密后的数据在这里新ACE_Message_Block*
+   同时用pMessageBlockManager回收你的之前加密的ACE_Message_Block*
+
+(3)设置包头获得状态m_blIsHead = true 如果包头不合法，你在这里直接返回false。
+
+bool SetPacketBody(ACE_Message_Block* pmbBody, IMessageBlockManager* pMessageBlockManager);
+这个接口由框架调用，当接收到符合GetPacketBodyLen()大小的包头，框架会调用这个接口。
+在这解析出包体的长度，（如果包头没有包体长度，你这里必须对包体长度予以赋值）
+你需要再这里做的是
+(1)拆解出包体命令字，当然，你可以把命令字放在包头里也无所谓，并复制给m_u2PacketCommandID，
+   这个很重要，而且是必须的，这样框架可以根据m_u2PacketCommandID将消息推送给你的逻辑处理模块。
+(2)将你的包头指针赋值给m_pmbBody。
+   如果你需要对这个数据进行解密，你需要再这里处理你的数据。
+   并用pMessageBlockManager申请一个新的ACE_Message_Block*，然后填充解密后的数据在这里新ACE_Message_Block*
+   同时用pMessageBlockManager回收你的之前加密的ACE_Message_Block*
+
+实现以上三个接口，框架就可以接收你的数据包并转发给相应的逻辑模块。
+
+如果你使用流模式，也就是PACKET_WITHSTREAM
+那么以上的三个接口你都不必实现。
+你只要实现
+uint8 GetPacketStream(ACE_Message_Block* pCurrMessage, IMessageBlockManager* pMessageBlockManager);   
+我的代码里面有一个例子
+在这里，我故意使用了一种数据格式，比如不带头的数据
+7e 00 10 be cd aa 8f 3c 01 00 00 7e
+比如这类数据，7e开头，7e结尾。
+这个接口就是将数据处理权全部给开发者，让他自己去判定什么时候该结束，是一个完整数据包。
