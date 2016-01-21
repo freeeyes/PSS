@@ -4,7 +4,7 @@ include Makefile.define
 default:all
 
 # 主应用文件列表
-LIB_BASE_OBJS = PacketParse.o BuffPacket.o ACEMemory.o PacketParseBase.o
+LIB_BASE_OBJS = PacketParse_Interface.o
 LIB_BASE = libPacketParse.so
 
 all: libPacketParse.so clear
@@ -19,6 +19,6 @@ $(LIB_BASE): $(LIB_BASE_OBJS)
 clean:
 	rm -rf *.o  $(LIB_BASE) $(LIB_BASE_OBJS)
 clear:	
-	mv libPacketParse.so ../../PurenessScopeServer/Linux_Bin/
+	mv libPacketParse.so ../PurenessScopeServer/Linux_Bin/
 cl:	
 	rm -rf *.o 
