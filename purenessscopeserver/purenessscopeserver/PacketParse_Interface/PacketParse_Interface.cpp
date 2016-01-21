@@ -6,7 +6,7 @@
 #include "IMessageBlockManager.h"
 
 #ifdef WIN32
-#ifdef TEST_TCP_BUILD_DLL
+#ifdef PACKETPARSE_INTERFACE_EXPORTS
 #define DECLDIR __declspec(dllexport)
 #else
 #define DECLDIR __declspec(dllimport)
