@@ -11,7 +11,7 @@ CPacketParseBase::CPacketParseBase(void)
 	m_u1Sort            = 0;
 
 	//这里修改属于你的包解析版本号
-	sprintf_safe(m_szPacketVersion, MAX_BUFF_20, "0.90");
+	sprintf_safe(m_szPacketVersion, MAX_BUFF_20, "0.96");
 
 	//这里设置你的包模式
 	m_u1PacketMode      = PACKET_WITHHEAD;
@@ -33,10 +33,10 @@ void CPacketParseBase::Clear()
 	m_pmbHead = NULL;
 	m_pmbBody = NULL;
 
-	m_blIsHandleHead = true;
+	m_blIsHandleHead    = true;
 
+	m_u4PacketHead      = 0;
 	m_u4PacketBody      = 0;
-	m_u4HeadSrcSize     = 0;
 	m_u4BodySrcSize     = 0;
 	m_u2PacketCommandID = 0;
 }
@@ -175,4 +175,49 @@ IPacketHeadInfo* CPacketParseBase::GetPacketHeadInfo()
 void CPacketParseBase::SetPacketHeadInfo(IPacketHeadInfo* pPacketHeadInfo)
 {
 	m_pPacketHeadInfo = pPacketHeadInfo;
+}
+
+void CPacketParseBase::SetPacket_Head_Curr_Length(uint32 u4CurrLength)
+{
+	m_u4PacketHead = u4CurrLength;
+}
+
+void CPacketParseBase::SetPacket_Body_Curr_Length(uint32 u4CurrLength)
+{
+	m_u4PacketBody = u4CurrLength;
+}
+
+void CPacketParseBase::SetPacket_Head_Src_Length(uint32 u4SrcLength)
+{
+	m_u4HeadSrcSize = u4SrcLength;
+}
+
+void CPacketParseBase::SetPacket_Body_Src_Length(uint32 u4SrcLength)
+{
+	m_u4BodySrcSize = u4SrcLength;
+}
+
+void CPacketParseBase::SetPacket_CommandID(uint16 u2PacketCommandID)
+{
+	m_u2PacketCommandID = u2PacketCommandID;
+}
+
+void CPacketParseBase::SetPacket_IsHandleHead(bool blState)
+{
+	m_blIsHandleHead = blState;
+}
+
+void CPacketParseBase::SetPacket_Head_Message(ACE_Message_Block* pmbHead)
+{
+	m_pmbHead = pmbHead;
+}
+
+void CPacketParseBase::SetPacket_Body_Message(ACE_Message_Block* pmbHead)
+{
+	m_pmbBody = pmbHead;
+}
+
+void CPacketParseBase::SetPacket_Mode(uint8 u1PacketMode)
+{
+	m_u1PacketMode = u1PacketMode;
 }

@@ -4,13 +4,9 @@
 CConsolePacketParse::CConsolePacketParse(void)
 {
 	//如果是包头模式，这里需要设置包头的长度
-	m_u4PacketHead      = PACKET_HEAD;
-
-	//这里修改属于你的包解析版本号
-	sprintf_safe(m_szPacketVersion, MAX_BUFF_20, "0.92");
-
-	//这里设置你的包模式
-	m_u1PacketMode      = PACKET_WITHHEAD;
+	SetPacket_Mode(PACKET_WITHHEAD);
+	SetPacket_Head_Src_Length(PACKET_HEAD);
+	SetPacket_IsHandleHead(true);
 }
 
 CConsolePacketParse::~CConsolePacketParse(void)
@@ -21,16 +17,10 @@ CConsolePacketParse::~CConsolePacketParse(void)
 
 void CConsolePacketParse::Init()
 {
-	m_u4PacketHead      = PACKET_HEAD;
-	m_u2PacketCommandID = 0;
-	m_u4PacketBody      = 0;
-	m_u4HeadSrcSize     = 0;
-	m_u4BodySrcSize     = 0;
+	SetPacket_IsHandleHead(true);
 
-    m_blIsHandleHead    = true;
-
-	m_pmbHead           = NULL;
-	m_pmbBody           = NULL;
+	SetPacket_Head_Message(NULL);
+	SetPacket_Body_Message(NULL);
 }
 
 bool CConsolePacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager)
@@ -44,13 +34,16 @@ bool CConsolePacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* p
 	//这里添加自己对包头的分析，主要分析出包长度。
 	uint32 u4Len = pmbHead->length();
 
-	m_u4HeadSrcSize = u4Len;
+	SetPacket_Head_Curr_Length(u4Len);
 	if(u4Len == sizeof(uint32))
 	{
-		memcpy_safe((char* )pData, (uint32)sizeof(uint32), (char* )&m_u4PacketBody, (uint32)sizeof(uint32));
+		uint32 u4PacketBody = 0;
+		memcpy_safe((char* )pData, (uint32)sizeof(uint32), (char* )&u4PacketBody, (uint32)sizeof(uint32));
 		
-		m_pmbHead = pmbHead;
-        m_blIsHandleHead = true;
+		SetPacket_Head_Message(pmbHead);
+		SetPacket_Body_Src_Length(u4PacketBody);
+		SetPacket_Body_Curr_Length(u4PacketBody);
+		SetPacket_IsHandleHead(false);
 		return true;
 	}
 	else
@@ -69,16 +62,17 @@ bool CConsolePacketParse::SetPacketBody(uint32 u4ConnectID, ACE_Message_Block* p
 
 	uint32 u4Len = pmbBody->length();
 
-	m_u4BodySrcSize = u4Len;
+	SetPacket_Body_Src_Length(u4Len);
+	SetPacket_Body_Curr_Length(u4Len);
 	if(u4Len >= sizeof(uint16))
 	{
-        m_blIsHandleHead = false;
-		m_pmbBody = pmbBody;
+		SetPacket_Body_Message(pmbBody);
+		SetPacket_IsHandleHead(true);
 		return true;
 	}
 	else
 	{
-        m_blIsHandleHead = false;
+		SetPacket_IsHandleHead(true);
 		return false;
 	}
 }

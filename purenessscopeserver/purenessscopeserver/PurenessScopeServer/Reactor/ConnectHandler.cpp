@@ -314,7 +314,7 @@ int CConnectHandler::open(void*)
 	//申请头的大小对应的mb
 	if(m_pPacketParse->GetPacketMode() == PACKET_WITHHEAD)
 	{
-		m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadLen());
+		m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadSrcLen());
 	}
 	else
 	{
@@ -543,11 +543,11 @@ int CConnectHandler::RecvData()
 			}
 			else
 			{
-				m_pPacketParse->m_blIsHandleHead    = false;
-				m_pPacketParse->m_pmbHead           = objHeadInfo.m_pmbHead;
-				m_pPacketParse->m_u4PacketHead      = objHeadInfo.m_u4HeadCurrLen;
-				m_pPacketParse->m_u4BodySrcSize     = objHeadInfo.m_u4BodySrcLen;
-				m_pPacketParse->m_u2PacketCommandID = objHeadInfo.m_u2PacketCommandID;
+				m_pPacketParse->SetPacket_IsHandleHead(false);
+				m_pPacketParse->SetPacket_Head_Message(objHeadInfo.m_pmbHead);
+				m_pPacketParse->SetPacket_Head_Curr_Length(objHeadInfo.m_u4HeadCurrLen);
+				m_pPacketParse->SetPacket_Body_Src_Length(objHeadInfo.m_u4BodySrcLen);
+				m_pPacketParse->SetPacket_CommandID(objHeadInfo.m_u2PacketCommandID);
 			}
 
 			uint32 u4PacketBodyLen = m_pPacketParse->GetPacketBodySrcLen();
@@ -577,7 +577,7 @@ int CConnectHandler::RecvData()
 				}
 
 				//申请头的大小对应的mb
-				m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadLen());
+				m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadSrcLen());
 				if(m_pCurrMessage == NULL)
 				{
 					AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %dws, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %dws.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, (uint32)m_u8RecvQueueTimeCost, m_u4RecvQueueCount, (uint32)m_u8SendQueueTimeCost);
@@ -653,8 +653,8 @@ int CConnectHandler::RecvData()
 			}
 			else
 			{
-				m_pPacketParse->m_pmbBody      = obj_Body_Info.m_pmbBody;
-				m_pPacketParse->m_u4PacketBody = obj_Body_Info.m_u4BodyCurrLen;
+				m_pPacketParse->SetPacket_Body_Message(obj_Body_Info.m_pmbBody);
+				m_pPacketParse->SetPacket_Body_Curr_Length(obj_Body_Info.m_u4BodyCurrLen);
 			}
 
 			if(false == CheckMessage())
@@ -675,7 +675,7 @@ int CConnectHandler::RecvData()
 			}
 
 			//申请头的大小对应的mb
-			m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadLen());
+			m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadSrcLen());
 			if(m_pCurrMessage == NULL)
 			{
 				AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %dws, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %dws.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, (uint32)m_u8RecvQueueTimeCost, m_u4RecvQueueCount, (uint32)m_u8SendQueueTimeCost);
@@ -707,13 +707,13 @@ int CConnectHandler::RecvData()
 			uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo()->Parse_Packet_Stream(GetConnectID(), m_pCurrMessage, (IMessageBlockManager* )App_MessageBlockManager::instance(), &obj_Packet_Info);
 			if(PACKET_GET_ENOUGTH == n1Ret)
 			{
-				m_pPacketParse->m_pmbHead           = obj_Packet_Info.m_pmbHead;
-				m_pPacketParse->m_pmbBody           = obj_Packet_Info.m_pmbBody;
-				m_pPacketParse->m_u2PacketCommandID = obj_Packet_Info.m_u2PacketCommandID;
-				m_pPacketParse->m_u4PacketHead      = obj_Packet_Info.m_u4HeadCurrLen;
-				m_pPacketParse->m_u4PacketBody      = obj_Packet_Info.m_u4BodyCurrLen;
-				m_pPacketParse->m_u4HeadSrcSize     = obj_Packet_Info.m_u4HeadSrcLen;
-				m_pPacketParse->m_u4BodySrcSize     = obj_Packet_Info.m_u4BodySrcLen;
+				m_pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
+				m_pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);
+				m_pPacketParse->SetPacket_CommandID(obj_Packet_Info.m_u2PacketCommandID);
+				m_pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4HeadSrcLen);
+				m_pPacketParse->SetPacket_Head_Curr_Length(obj_Packet_Info.m_u4HeadCurrLen);
+				m_pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4BodySrcLen);
+				m_pPacketParse->SetPacket_Body_Curr_Length(obj_Packet_Info.m_u4BodyCurrLen);
 
 				if(false == CheckMessage())
 				{
@@ -930,11 +930,11 @@ int CConnectHandler::RecvData_et()
 				}
 				else
 				{
-					m_pPacketParse->m_blIsHandleHead    = false;
-					m_pPacketParse->m_pmbHead           = objHeadInfo.m_pmbHead;
-					m_pPacketParse->m_u4PacketHead      = objHeadInfo.m_u4HeadCurrLen;
-					m_pPacketParse->m_u4BodySrcSize     = objHeadInfo.m_u4BodySrcLen;
-					m_pPacketParse->m_u2PacketCommandID = objHeadInfo.m_u2PacketCommandID;
+					m_pPacketParse->SetPacket_IsHandleHead(false);
+					m_pPacketParse->SetPacket_Head_Message(objHeadInfo.m_pmbHead);
+					m_pPacketParse->SetPacket_Head_Curr_Length(objHeadInfo.m_u4HeadCurrLen);
+					m_pPacketParse->SetPacket_Body_Src_Length(objHeadInfo.m_u4BodySrcLen);
+					m_pPacketParse->SetPacket_CommandID(objHeadInfo.m_u2PacketCommandID);
 				}
 
 				uint32 u4PacketBodyLen = m_pPacketParse->GetPacketBodySrcLen();
@@ -964,7 +964,7 @@ int CConnectHandler::RecvData_et()
 					}
 
 					//申请头的大小对应的mb
-					m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadLen());
+					m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadSrcLen());
 					if(m_pCurrMessage == NULL)
 					{
 						AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %dws, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %dws.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, (uint32)m_u8RecvQueueTimeCost, m_u4RecvQueueCount, (uint32)m_u8SendQueueTimeCost);
@@ -1039,8 +1039,8 @@ int CConnectHandler::RecvData_et()
 				}
 				else
 				{
-					m_pPacketParse->m_pmbBody      = obj_Body_Info.m_pmbBody;
-					m_pPacketParse->m_u4PacketBody = obj_Body_Info.m_u4BodyCurrLen;
+					m_pPacketParse->SetPacket_Body_Message(obj_Body_Info.m_pmbBody);
+					m_pPacketParse->SetPacket_Body_Curr_Length(obj_Body_Info.m_u4BodyCurrLen);
 				}
 
 				if(false == CheckMessage())
@@ -1061,7 +1061,7 @@ int CConnectHandler::RecvData_et()
 				}
 
 				//申请头的大小对应的mb
-				m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadLen());
+				m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadSrcLen());
 				if(m_pCurrMessage == NULL)
 				{
 					AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %dws, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %dws.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, (uint32)m_u8RecvQueueTimeCost, m_u4RecvQueueCount, (uint32)m_u8SendQueueTimeCost);
@@ -1093,13 +1093,13 @@ int CConnectHandler::RecvData_et()
 				uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo()->Parse_Packet_Stream(GetConnectID(), m_pCurrMessage, (IMessageBlockManager* )App_MessageBlockManager::instance(), &obj_Packet_Info);
 				if(PACKET_GET_ENOUGTH == n1Ret)
 				{
-					m_pPacketParse->m_pmbHead           = obj_Packet_Info.m_pmbHead;
-					m_pPacketParse->m_pmbBody           = obj_Packet_Info.m_pmbBody;
-					m_pPacketParse->m_u2PacketCommandID = obj_Packet_Info.m_u2PacketCommandID;
-					m_pPacketParse->m_u4PacketHead      = obj_Packet_Info.m_u4HeadCurrLen;
-					m_pPacketParse->m_u4PacketBody      = obj_Packet_Info.m_u4BodyCurrLen;
-					m_pPacketParse->m_u4HeadSrcSize     = obj_Packet_Info.m_u4HeadSrcLen;
-					m_pPacketParse->m_u4BodySrcSize     = obj_Packet_Info.m_u4BodySrcLen;
+					m_pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
+					m_pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);
+					m_pPacketParse->SetPacket_CommandID(obj_Packet_Info.m_u2PacketCommandID);
+					m_pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4HeadSrcLen);
+					m_pPacketParse->SetPacket_Head_Curr_Length(obj_Packet_Info.m_u4HeadCurrLen);
+					m_pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4BodySrcLen);
+					m_pPacketParse->SetPacket_Body_Curr_Length(obj_Packet_Info.m_u4BodyCurrLen);
 
 					if(false == CheckMessage())
 					{
@@ -1972,7 +1972,7 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
 		{
 			uint32 u4PacketSize = 0;
             //OUR_DEBUG((LM_ERROR, "[CConnectManager::SendMessage]ConnectID=%d Begin 1 pConnectHandler.\n", u4ConnectID));
-			pConnectHandler->SendMessage(u2CommandID, pBuffPacket, blSendState, u1SendType, u4PacketSize, blDelete);
+			pConnectHandler->SendMessage(u4ConnectID, pBuffPacket, blSendState, u1SendType, u4PacketSize, blDelete);
             //OUR_DEBUG((LM_ERROR, "[CConnectManager::SendMessage]ConnectID=%d End 1 pConnectHandler.\n", u4ConnectID));
 			//记录消息发送消耗时间
 			ACE_Time_Value tvInterval = ACE_OS::gettimeofday() - tvSendBegin;

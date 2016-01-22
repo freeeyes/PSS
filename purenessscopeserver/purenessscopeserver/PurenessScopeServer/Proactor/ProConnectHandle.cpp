@@ -333,7 +333,7 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 
 	if(m_pPacketParse->GetPacketMode() == PACKET_WITHHEAD)
 	{
-		RecvClinetPacket(m_pPacketParse->GetPacketHeadLen());
+		RecvClinetPacket(m_pPacketParse->GetPacketHeadSrcLen());
 	}
 	else
 	{
@@ -437,11 +437,11 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 			}
 			else
 			{
-				m_pPacketParse->m_blIsHandleHead    = false;
-				m_pPacketParse->m_pmbHead           = objHeadInfo.m_pmbHead;
-				m_pPacketParse->m_u4PacketHead      = objHeadInfo.m_u4HeadCurrLen;
-				m_pPacketParse->m_u4BodySrcSize     = objHeadInfo.m_u4BodySrcLen;
-				m_pPacketParse->m_u2PacketCommandID = objHeadInfo.m_u2PacketCommandID;
+				m_pPacketParse->SetPacket_IsHandleHead(false);
+				m_pPacketParse->SetPacket_Head_Message(objHeadInfo.m_pmbHead);
+				m_pPacketParse->SetPacket_Head_Curr_Length(objHeadInfo.m_u4HeadCurrLen);
+				m_pPacketParse->SetPacket_Body_Src_Length(objHeadInfo.m_u4BodySrcLen);
+				m_pPacketParse->SetPacket_CommandID(objHeadInfo.m_u2PacketCommandID);
 			}
 
 			//这里添加只处理包头的数据
@@ -481,7 +481,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 				Close();
 
 				//接受下一个数据包
-				RecvClinetPacket(m_pPacketParse->GetPacketHeadLen());
+				RecvClinetPacket(m_pPacketParse->GetPacketHeadSrcLen());
 
 			}
 			else
@@ -523,8 +523,8 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 			}
 			else
 			{
-				m_pPacketParse->m_pmbBody      = obj_Body_Info.m_pmbBody;
-				m_pPacketParse->m_u4PacketBody = obj_Body_Info.m_u4BodyCurrLen;
+				m_pPacketParse->SetPacket_Body_Message(obj_Body_Info.m_pmbBody);
+				m_pPacketParse->SetPacket_Body_Curr_Length(obj_Body_Info.m_u4BodyCurrLen);
 			}
 
 			if(false == CheckMessage())
@@ -557,7 +557,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 			Close();
 
 			//接受下一个数据包
-			RecvClinetPacket(m_pPacketParse->GetPacketHeadLen());
+			RecvClinetPacket(m_pPacketParse->GetPacketHeadSrcLen());
 		}
 	}
 	else
@@ -569,13 +569,13 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 			uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo()->Parse_Packet_Stream(GetConnectID(), &mb, (IMessageBlockManager* )App_MessageBlockManager::instance(), &obj_Packet_Info);
 			if(PACKET_GET_ENOUGTH == n1Ret)
 			{
-				m_pPacketParse->m_pmbHead           = obj_Packet_Info.m_pmbHead;
-				m_pPacketParse->m_pmbBody           = obj_Packet_Info.m_pmbBody;
-				m_pPacketParse->m_u2PacketCommandID = obj_Packet_Info.m_u2PacketCommandID;
-				m_pPacketParse->m_u4PacketHead      = obj_Packet_Info.m_u4HeadCurrLen;
-				m_pPacketParse->m_u4PacketBody      = obj_Packet_Info.m_u4BodyCurrLen;
-				m_pPacketParse->m_u4HeadSrcSize     = obj_Packet_Info.m_u4HeadSrcLen;
-				m_pPacketParse->m_u4BodySrcSize     = obj_Packet_Info.m_u4BodySrcLen;
+				m_pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
+				m_pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);
+				m_pPacketParse->SetPacket_CommandID(obj_Packet_Info.m_u2PacketCommandID);
+				m_pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4HeadSrcLen);
+				m_pPacketParse->SetPacket_Head_Curr_Length(obj_Packet_Info.m_u4HeadCurrLen);
+				m_pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4BodySrcLen);
+				m_pPacketParse->SetPacket_Body_Curr_Length(obj_Packet_Info.m_u4BodyCurrLen);
 
 				//已经接收了完整数据包，扔给工作线程去处理
 				if(false == CheckMessage())
@@ -1389,7 +1389,7 @@ bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
 		if(NULL != pConnectHandler)
 		{
 			uint32 u4PacketSize  = 0;
-			pConnectHandler->SendMessage(u2CommandID, pBuffPacket, blSendState, u1SendType, u4PacketSize, blDelete);
+			pConnectHandler->SendMessage(u4ConnectID, pBuffPacket, blSendState, u1SendType, u4PacketSize, blDelete);
 			m_CommandAccount.SaveCommandData(u2CommandID, (uint64)0, PACKET_TCP, u4PacketSize, u4CommandSize, COMMAND_TYPE_OUT);
 			return true;
 		}
@@ -2364,7 +2364,6 @@ bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPac
 			OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::PostMessage]No find send Queue object.\n"));
 			continue;		
 		}
-
 
 		//为每一个Connect设置发送对象数据包
 		IBuffPacket* pCurrBuffPacket = App_BuffPacketManager::instance()->Create();

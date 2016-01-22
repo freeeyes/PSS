@@ -674,7 +674,7 @@ struct _Head_Info
 //数据包体结构
 struct _Body_Info
 {
-	uint32             m_u4BodySrcLen;       //原始数据包头长（解析前）
+	uint32             m_u4BodySrcLen;       //原始数据包体长（解析前）
 	uint32	           m_u4BodyCurrLen;      //当前数据包长 （解析后）
 	ACE_Message_Block* m_pmbBody;            //包头消息体
 

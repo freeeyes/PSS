@@ -48,7 +48,17 @@ public:
 	IPacketHeadInfo* GetPacketHeadInfo();
 	void SetPacketHeadInfo(IPacketHeadInfo* pPacketHeadInfo);
 
-public:
+	void SetPacket_Head_Curr_Length(uint32 u4CurrLength);
+	void SetPacket_Body_Curr_Length(uint32 u4CurrLength);
+	void SetPacket_Head_Src_Length(uint32 u4SrcLength);
+	void SetPacket_Body_Src_Length(uint32 u4SrcLength);
+	void SetPacket_CommandID(uint16 u2PacketCommandID);
+	void SetPacket_IsHandleHead(bool blState);
+	void SetPacket_Head_Message(ACE_Message_Block* pmbHead);
+	void SetPacket_Body_Message(ACE_Message_Block* pmbHead);
+	void SetPacket_Mode(uint8 u1PacketMode);
+
+private:
 	uint32 m_u4PacketHead;               //包头的长度
 	uint32 m_u4PacketBody;               //包体的长度
 	uint32 m_u4HeadSrcSize;              //包头的原始长度 

@@ -218,10 +218,12 @@ bool CReactorUDPHander::CheckMessage(const char* pData, uint32 u4Len)
 		}
 		else
 		{
-			m_pPacketParse->m_u4PacketHead      = obj_Head_Info.m_u4HeadCurrLen;
-			m_pPacketParse->m_u4BodySrcSize     = obj_Head_Info.m_u4BodySrcLen;
-			m_pPacketParse->m_u2PacketCommandID = obj_Head_Info.m_u2PacketCommandID;
-			m_pPacketParse->m_pmbHead           = pMBHead;
+			m_pPacketParse->SetPacket_IsHandleHead(false);
+			m_pPacketParse->SetPacket_Head_Src_Length(obj_Head_Info.m_u4HeadCurrLen);
+			m_pPacketParse->SetPacket_Head_Curr_Length(obj_Head_Info.m_u4HeadCurrLen);
+			m_pPacketParse->SetPacket_Body_Src_Length(obj_Head_Info.m_u4BodySrcLen);
+			m_pPacketParse->SetPacket_CommandID(obj_Head_Info.m_u2PacketCommandID);
+			m_pPacketParse->SetPacket_Head_Message(pMBHead);
 		}
 
 
@@ -251,8 +253,8 @@ bool CReactorUDPHander::CheckMessage(const char* pData, uint32 u4Len)
 			}
 			else
 			{
-				m_pPacketParse->m_pmbBody      = pMBBody;
-				m_pPacketParse->m_u4PacketBody = obj_Body_Info.m_u4BodyCurrLen;
+				m_pPacketParse->SetPacket_Body_Message(pMBBody);
+				m_pPacketParse->SetPacket_Body_Curr_Length(obj_Body_Info.m_u4BodyCurrLen);
 			}
 		}
 
@@ -280,13 +282,13 @@ bool CReactorUDPHander::CheckMessage(const char* pData, uint32 u4Len)
 		_Packet_Info obj_Packet_Info;
 		if(PACKET_GET_ENOUGTH == App_PacketParseLoader::instance()->GetPacketParseInfo()->Parse_Packet_Stream(0, pMbData, App_MessageBlockManager::instance(), &obj_Packet_Info))
 		{
-			m_pPacketParse->m_pmbHead           = obj_Packet_Info.m_pmbHead;
-			m_pPacketParse->m_pmbBody           = obj_Packet_Info.m_pmbBody;
-			m_pPacketParse->m_u2PacketCommandID = obj_Packet_Info.m_u2PacketCommandID;
-			m_pPacketParse->m_u4PacketHead      = obj_Packet_Info.m_u4HeadCurrLen;
-			m_pPacketParse->m_u4PacketBody      = obj_Packet_Info.m_u4BodyCurrLen;
-			m_pPacketParse->m_u4HeadSrcSize     = obj_Packet_Info.m_u4HeadSrcLen;
-			m_pPacketParse->m_u4BodySrcSize     = obj_Packet_Info.m_u4BodySrcLen;
+			m_pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
+			m_pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);
+			m_pPacketParse->SetPacket_CommandID(obj_Packet_Info.m_u2PacketCommandID);
+			m_pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4HeadSrcLen);
+			m_pPacketParse->SetPacket_Head_Curr_Length(obj_Packet_Info.m_u4HeadCurrLen);
+			m_pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4BodySrcLen);
+			m_pPacketParse->SetPacket_Body_Curr_Length(obj_Packet_Info.m_u4BodyCurrLen);
 
 			//组织数据包
 			_MakePacket objMakePacket;
