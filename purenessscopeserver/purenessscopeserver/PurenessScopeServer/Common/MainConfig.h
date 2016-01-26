@@ -239,7 +239,7 @@ public:
 	uint16 GetThreadTimuOut();
 	uint16 GetThreadTimeCheck();
 	uint16 GetPacketTimeOut();
-	uint16 GetSendAliveTime();
+	uint16 GetCheckAliveTime();
 	uint16 GetMaxHandlerCount();
 	void   SetMaxHandlerCount(uint16 u2MaxHandlerCount);
 	uint16 GetMaxConnectTime();

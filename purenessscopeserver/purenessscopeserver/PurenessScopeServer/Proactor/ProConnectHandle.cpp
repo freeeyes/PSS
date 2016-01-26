@@ -1522,8 +1522,8 @@ bool CProConnectManager::StartTimer()
 	OUR_DEBUG((LM_ERROR, "CProConnectManager::StartTimer()-->begin....\n"));
 
 	//检测链接发送存活包数
-	uint16 u2SendAlive = App_MainConfig::instance()->GetSendAliveTime();
-	m_u4TimeCheckID = App_TimerManager::instance()->schedule(this, (void *)NULL, ACE_OS::gettimeofday() + ACE_Time_Value(u2SendAlive), ACE_Time_Value(u2SendAlive));
+	uint16 u2CheckAlive = App_MainConfig::instance()->GetCheckAliveTime();
+	m_u4TimeCheckID = App_TimerManager::instance()->schedule(this, (void *)NULL, ACE_OS::gettimeofday() + ACE_Time_Value(u2CheckAlive), ACE_Time_Value(u2CheckAlive));
 	if(-1 == m_u4TimeCheckID)
 	{
 		OUR_DEBUG((LM_ERROR, "CProConnectManager::StartTimer()--> Start thread m_u4TimeCheckID error.\n"));

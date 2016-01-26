@@ -692,7 +692,7 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
 	{
 		m_u2PacketTimeOut = (uint16)ACE_OS::atoi(pData);
 	}
-	pData = m_MainConfig.GetData("SendInfo", "SendAliveTime");
+	pData = m_MainConfig.GetData("ClientInfo", "CheckAliveTime");
 	if(pData != NULL)
 	{
 		m_u2SendAliveTime = (uint16)ACE_OS::atoi(pData);
@@ -1198,7 +1198,7 @@ uint16 CMainConfig::GetPacketTimeOut()
 	return m_u2PacketTimeOut;
 }
 
-uint16 CMainConfig::GetSendAliveTime()
+uint16 CMainConfig::GetCheckAliveTime()
 {
 	return m_u2SendAliveTime;
 };
