@@ -51,7 +51,11 @@ int main(int argc, char* argv[])
 	}
 
 	//创建生成目录
+#ifdef WIN32
+	_mkdir(objProjectInfo.m_szProjectName);
+#else
 	mkdir(objProjectInfo.m_szProjectName);
+#endif
 
 	//写入主文件
 	Gen_2_Cpp_Main(objProjectInfo, objvecXmlInfo);

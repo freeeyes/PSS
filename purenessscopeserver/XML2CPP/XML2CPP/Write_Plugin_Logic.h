@@ -57,6 +57,15 @@ void Gen_2_Cpp_Logic_H(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlInfo)
 					pXmlOut->m_szXMLName);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			}
+			else
+			{
+				//两边参数都有，写入函数
+				sprintf_safe(szTemp, 200, "bool Logic_%s(%s& obj%s);\n\n", 
+					pXmlIn->m_szXMLName,
+					pXmlIn->m_szXMLName,
+					pXmlIn->m_szXMLName);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
 		}
 	}
 

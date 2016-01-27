@@ -537,9 +537,9 @@ void Gen_2_Cpp_Out_Stream(FILE* pFile, _Xml_Info& objxmlInfo)
 	//Á÷³öÃüÁî×Ö
 	if(objxmlInfo.m_nCommandID > 0)
 	{
-		sprintf_safe(szTemp, 200, "\tuint16 u2CommandID = 0;\n");
+		sprintf_safe(szTemp, 200, "\t//uint16 u2CommandID = 0;\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\t(*pBuffPacket) >> u2CommandID;\n");
+		sprintf_safe(szTemp, 200, "\t//(*pBuffPacket) >> u2CommandID;\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	}
 
