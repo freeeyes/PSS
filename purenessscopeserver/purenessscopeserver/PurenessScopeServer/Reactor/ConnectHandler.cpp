@@ -655,6 +655,10 @@ int CConnectHandler::RecvData()
 			{
 				m_pPacketParse->SetPacket_Body_Message(obj_Body_Info.m_pmbBody);
 				m_pPacketParse->SetPacket_Body_Curr_Length(obj_Body_Info.m_u4BodyCurrLen);
+				if(obj_Body_Info.m_u2PacketCommandID > 0)
+				{
+					m_pPacketParse->SetPacket_CommandID(obj_Body_Info.m_u2PacketCommandID);
+				}
 			}
 
 			if(false == CheckMessage())
@@ -1041,6 +1045,10 @@ int CConnectHandler::RecvData_et()
 				{
 					m_pPacketParse->SetPacket_Body_Message(obj_Body_Info.m_pmbBody);
 					m_pPacketParse->SetPacket_Body_Curr_Length(obj_Body_Info.m_u4BodyCurrLen);
+					if(obj_Body_Info.m_u2PacketCommandID > 0)
+					{
+						m_pPacketParse->SetPacket_CommandID(obj_Body_Info.m_u2PacketCommandID);
+					}
 				}
 
 				if(false == CheckMessage())
