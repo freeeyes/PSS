@@ -617,7 +617,7 @@ int CConnectHandler::RecvData()
 				{
 					//OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvClinetPacket] m_pPacketParse->GetPacketBodyLen())=%d.\n", m_pPacketParse->GetPacketBodyLen()));
 					//申请头的大小对应的mb
-					m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketBodyLen());
+					m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketBodySrcLen());
 					if(m_pCurrMessage == NULL)
 					{
 						m_u4CurrSize = 0;
@@ -1008,7 +1008,7 @@ int CConnectHandler::RecvData_et()
 					{
 						//OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvClinetPacket] m_pPacketParse->GetPacketBodyLen())=%d.\n", m_pPacketParse->GetPacketBodyLen()));
 						//申请头的大小对应的mb
-						m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketBodyLen());
+						m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketBodySrcLen());
 						if(m_pCurrMessage == NULL)
 						{
 							m_u4CurrSize = 0;
