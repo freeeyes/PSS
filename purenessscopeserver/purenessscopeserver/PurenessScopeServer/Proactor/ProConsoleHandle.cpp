@@ -271,14 +271,15 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 		//接受完整数据完成，开始分析完整数据包
 		m_pPacketParse->SetPacketBody(GetConnectID(), &mb, App_MessageBlockManager::instance());
 
-		CheckMessage();
+		if(true == CheckMessage())
+		{
+			m_pPacketParse = new CConsolePacketParse();
 
-		m_pPacketParse = new CConsolePacketParse();
+			Close();
 
-		Close();
-
-		//接受下一个数据包
-		RecvClinetPacket(m_pPacketParse->GetPacketHeadLen());
+			//接受下一个数据包
+			RecvClinetPacket(m_pPacketParse->GetPacketHeadLen());
+		}
 	}
 
 	return;
@@ -455,8 +456,14 @@ bool CProConsoleHandle::CheckMessage()
 				SendMessage((IBuffPacket* )pBuffPacket);
 			}
 		}
-
-		SAFE_DELETE(m_pPacketParse);
+		else if(CONSOLE_MESSAGE_FAIL == u4Return)
+		{
+			SAFE_DELETE(m_pPacketParse);
+		}
+		else
+		{
+			return false;
+		}
 	}
 	else
 	{

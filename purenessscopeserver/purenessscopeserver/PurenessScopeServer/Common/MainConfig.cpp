@@ -4,6 +4,7 @@ CMainConfig::CMainConfig(void)
 {
 	m_szError[0] = '\0';
 
+	m_u1ServerClose           = 0;
 	m_u4MsgHighMark           = 0;
 	m_u4MsgLowMark            = 0;
 	m_u4MsgThreadCount        = 0;
@@ -412,6 +413,12 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
 	if(NULL != pData)
 	{
 		m_u1Debug = (uint8)ACE_OS::atoi(pData);
+	}
+
+	pData = m_MainConfig.GetData("ServerType", "IsClose");
+	if(NULL != pData)
+	{
+		m_u1ServerClose = (uint8)ACE_OS::atoi(pData);
 	}
 
 	pData = m_MainConfig.GetData("ServerType", "name");
@@ -1008,6 +1015,7 @@ void CMainConfig::Display()
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szServerVersion = %s.\n", m_szServerVersion));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szPacketVersion = %s.\n", m_szPacketVersion));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u1Debug = %d.\n", m_u1Debug));
+	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u1ServerClose = %d.\n", m_u1ServerClose));
 
 	for(int i = 0; i < (int)m_vecServerInfo.size(); i++)
 	{
@@ -1547,4 +1555,9 @@ uint32 CMainConfig::GetBlockSize()
 uint32 CMainConfig::GetBlockCount()
 {
 	return m_u4SendBlockCount;
+}
+
+uint8 CMainConfig::GetServerClose()
+{
+	return m_u1ServerClose;
 }

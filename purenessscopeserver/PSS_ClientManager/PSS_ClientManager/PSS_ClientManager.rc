@@ -16,13 +16,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 中文(中华人民共和国) resources
+// 中文(简体，中国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
-#ifdef _WIN32
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
 #pragma code_page(936)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -123,6 +121,7 @@ BEGIN
     PUSHBUTTON      "加载",IDC_BUTTON7,375,128,50,14
     LISTBOX         IDC_LIST3,420,32,92,74,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "从配置文件加载",IDC_BUTTON11,419,18,93,14
+    PUSHBUTTON      "关闭服务器(远程服务器必须允许关闭才能生效)",IDC_BUTTON12,170,39,238,14
 END
 
 IDD_DIALOG_CLIENTCONNECT DIALOGEX 0, 0, 480, 239
@@ -309,7 +308,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
@@ -408,7 +407,7 @@ END
 //
 
 IDR_HTML_DLGCLIENTMODULE HTML                    "DlgClientModule.htm"
-#endif    // 中文(中华人民共和国) resources
+#endif    // 中文(简体，中国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -416,10 +415,8 @@ IDR_HTML_DLGCLIENTMODULE HTML                    "DlgClientModule.htm"
 // 英语(美国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -465,7 +462,7 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_ABOUTBOX            "&About PSS_ClientManager..."
 END

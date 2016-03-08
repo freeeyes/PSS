@@ -349,6 +349,7 @@
     <ClInclude Include="IObject\IPacketManager.h" />
     <ClInclude Include="IObject\IPacketParse.h" />
     <ClInclude Include="IObject\ISendCacheManager.h" />
+    <ClInclude Include="IObject\IServerManager.h" />
     <ClInclude Include="IObject\ITimerManager.h" />
     <ClInclude Include="IObject\IUDPConnectManager.h" />
     <ClInclude Include="PacketParse\PacketConsoleParse.h" />

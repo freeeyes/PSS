@@ -627,6 +627,9 @@
     <ClInclude Include="Mail\smtp.h">
       <Filter>Mail\hfile</Filter>
     </ClInclude>
+    <ClInclude Include="IObject\IServerManager.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Reactor\My_Dev_Poll_Reactor.inl">

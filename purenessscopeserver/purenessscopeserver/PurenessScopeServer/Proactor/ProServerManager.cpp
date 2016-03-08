@@ -130,6 +130,7 @@ bool CProServerManager::Init()
 	App_ServerObject::instance()->SetModuleMessageManager((IModuleMessageManager* )App_ModuleMessageManager::instance());
 	App_ServerObject::instance()->SetControlListen((IControlListen* )App_ProControlListen::instance());
 	App_ServerObject::instance()->SetModuleInfo((IModuleInfo* )App_ModuleLoader::instance());
+	App_ServerObject::instance()->SetServerManager(this);
 
 	return true;
 }
@@ -425,10 +426,10 @@ bool CProServerManager::Close()
 	OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_TimerManager OK.\n"));
 	App_TimerManager::instance()->deactivate();
 	OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ReUDPManager OK.\n"));
-	App_ClientProConnectManager::instance()->Close();
-	OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ClientReConnectManager OK.\n"));
 	App_ProUDPManager::instance()->Close();
 	OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ModuleLoader OK.\n"));
+	App_ClientProConnectManager::instance()->Close();
+	OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ClientReConnectManager OK.\n"));
 	App_ModuleLoader::instance()->Close();
 	OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_MessageManager OK.\n"));
 	App_MessageManager::instance()->Close();

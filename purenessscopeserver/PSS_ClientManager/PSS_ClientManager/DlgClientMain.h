@@ -120,4 +120,5 @@ public:
 	afx_msg void OnBnClickedButton7();
 	afx_msg void OnBnClickedButton11();
 	afx_msg void OnLbnSelchangeList3();
+	afx_msg void OnBnClickedButton12();
 };

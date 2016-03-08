@@ -294,6 +294,7 @@ public:
 	char*  GetDebugLevel();
 	uint32 GetBlockSize();
 	uint32 GetBlockCount();
+	uint8  GetServerClose();
 
 	uint16 GetModuleInfoCount();
 	_ModuleConfig* GetModuleInfo(uint16 u2Index);
@@ -314,6 +315,7 @@ private:
 	int        m_nServerID;                            //服务器ID
 	char       m_szServerName[MAX_BUFF_20];            //服务器名称
 	char       m_szServerVersion[MAX_BUFF_20];         //服务器版本
+	uint8      m_u1ServerClose;                        //服务器是否允许远程关闭
 
 	char       m_szWindowsServiceName[MAX_BUFF_50];    //windows服务名称
 	char       m_szDisplayServiceName[MAX_BUFF_50];    //windows服务显示名称

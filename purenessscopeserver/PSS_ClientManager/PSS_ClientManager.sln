@@ -1,7 +1,7 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PSS_ClientManager", "PSS_ClientManager\PSS_ClientManager.vcproj", "{A14EB494-5775-42B8-B99A-D7570633341D}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PSS_ClientManager", "PSS_ClientManager\PSS_ClientManager.vcxproj", "{A14EB494-5775-42B8-B99A-D7570633341D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

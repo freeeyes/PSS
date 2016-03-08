@@ -12,6 +12,7 @@
 #include "ForbiddenIP.h"
 #include "ace/Message_Block.h"
 #include "IPAccount.h"
+#include "IObject.h"
 
 #ifdef WIN32
 #include "ProConnectHandle.h"
@@ -32,6 +33,7 @@ enum
 {
 	CONSOLE_MESSAGE_SUCCESS = 0,
 	CONSOLE_MESSAGE_FAIL    = -1,
+	CONSOLE_MESSAGE_CLOSE   = -2,
 };
 
 //设置对应返回命令名称，用于接收端包解析
@@ -77,6 +79,7 @@ enum
 #define CONSOLE_COMMAND_DEL_LISTEN         0x1027
 #define CONSOLE_COMMAND_SHOW_LISTEN        0x1028
 #define CONSOLE_COMMAND_MONITOR_INFO       0x1029
+#define CONSOLE_COMMAND_CLOSE_SERVER       0x1030
 
 //目前支持的命令
 #define CONSOLEMESSAHE_LOADMOUDLE         "LoadModule"          //加载模块
@@ -120,6 +123,7 @@ enum
 #define CONSOLEMESSAGE_DEL_LISTEN         "DelListen"           //删除一个新的监听端口
 #define CONSOLEMESSATE_SHOW_LISTEN        "ShowListen"          //查看正在打开的监听端口 
 #define CONSOLEMESSATE_MONITOR_INFO       "Monitor"             //监控相关运行参数接口
+#define CONSOLEMESSATE_SERVER_CLOSE       "ServerClose"         //关闭当前服务器
 
 //命令处理参数
 struct _CommandInfo
@@ -233,6 +237,7 @@ private:
 	bool DoMessage_DelListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
 	bool DoMessage_ShowListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
 	bool DoMessage_MonitorInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+	bool DoMessage_ServerClose(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
 
 private:
 	vecConsoleKey* m_pvecConsoleKey;

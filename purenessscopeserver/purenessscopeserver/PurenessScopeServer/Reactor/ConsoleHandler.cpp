@@ -361,28 +361,30 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
 	{
 		//接受完整数据完成，开始分析完整数据包
 		m_pPacketParse->SetPacketBody(GetConnectID(), m_pCurrMessage, App_MessageBlockManager::instance());
-		CheckMessage();
-		m_u4CurrSize = 0;
-		//申请新的包
-		m_pPacketParse = new CConsolePacketParse();
-
-		if (NULL == m_pPacketParse)
+		if(true == CheckMessage())
 		{
-			OUR_DEBUG((LM_DEBUG, "[%t|CConnectHandle::open] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
-			return -1;
+			m_u4CurrSize = 0;
+			//申请新的包
+			m_pPacketParse = new CConsolePacketParse();
+
+			if (NULL == m_pPacketParse)
+			{
+				OUR_DEBUG((LM_DEBUG, "[%t|CConnectHandle::open] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
+				return -1;
+			}
+
+			//申请头的大小对应的mb
+			m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadLen());
+
+			if (m_pCurrMessage == NULL)
+			{
+				AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount);
+				OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvClinetPacket] pmb new is NULL.\n"));
+				return -1;
+			}
+
+			Close();
 		}
-
-		//申请头的大小对应的mb
-		m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadLen());
-
-		if (m_pCurrMessage == NULL)
-		{
-			AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount);
-			OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvClinetPacket] pmb new is NULL.\n"));
-			return -1;
-		}
-
-		Close();
 	}
 
 	return 0;
@@ -544,7 +546,14 @@ bool CConsoleHandler::CheckMessage()
 			SendMessage((IBuffPacket*)pBuffPacket);
 		}
 	}
+	else if(CONSOLE_MESSAGE_FAIL == u4Return)
+	{
+		SAFE_DELETE(m_pPacketParse);
+	}
+	else
+	{
+		return false;
+	}
 
-	SAFE_DELETE(m_pPacketParse);
 	return true;
 }

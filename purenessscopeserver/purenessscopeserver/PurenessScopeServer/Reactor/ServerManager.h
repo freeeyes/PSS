@@ -8,6 +8,7 @@
 #ifndef _SERVERMANAGER_H
 #define _SERVERMANAGER_H
 
+#include "IServerManager.h"
 #include "define.h"
 #include "MainConfig.h"
 #include "ForbiddenIP.h"
@@ -27,7 +28,7 @@
 
 class Frame_Logging_Strategy;
 
-class CServerManager
+class CServerManager : public IServerManager
 {
 public:
 	CServerManager(void);

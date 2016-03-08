@@ -1,6 +1,7 @@
 #ifndef _PROSERVERMANAGER_H
 #define _PROSERVERMANAGER_H
 
+#include "IServerManager.h"
 #include "define.h"
 #include "MainConfig.h"
 #include "ForbiddenIP.h"
@@ -22,7 +23,7 @@
 
 class Frame_Logging_Strategy;
 
-class CProServerManager
+class CProServerManager : public IServerManager
 {
 public:
 	CProServerManager(void);

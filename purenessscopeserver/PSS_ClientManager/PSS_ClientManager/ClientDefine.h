@@ -1,13 +1,16 @@
 #ifndef _CLIENTDEFINE_H
 #define _CLIENTDEFINE_H
 
-#define MESSAGE_SENDERROR      "发送给服务器命令失败"
-#define MESSAGE_TITLE_ERROR    "错误信息"
-#define MESSAGE_TITLE_SUCCESS  "服务器信息" 
-#define MESSAGE_TITLE_CONNECT  "设置服务器地址成功"
-#define MESSAGE_RESULT_SUCCESS "命令执行成功"
-#define MESSAGE_RESULT_FAIL    "命令执行失败"
-#define MESSAGE_INSERT_NULL    "必须输入相关信息才能进行此操作"
+#define MESSAGE_SENDERROR        "发送给服务器命令失败"
+#define MESSAGE_TITLE_ERROR      "错误信息"
+#define MESSAGE_TITLE_SUCCESS    "服务器信息" 
+#define MESSAGE_TITLE_CONNECT    "设置服务器地址成功"
+#define MESSAGE_RESULT_SUCCESS   "命令执行成功"
+#define MESSAGE_RESULT_FAIL      "命令执行失败"
+#define MESSAGE_INSERT_NULL      "必须输入相关信息才能进行此操作"
+#define MESSAGE_TITLE_INFO       "提示信息"
+#define MESSAGE_IS_CLOSE_SERVER  "是否真的关闭服务器？"
+#define MESSAGE_IS_CLOSE_OVER    "服务器关闭指令已发出"
 
 struct _ClientConnectInfo
 {

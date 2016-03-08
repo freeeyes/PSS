@@ -310,6 +310,12 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
 	{
 		DoMessage_MonitorInfo(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
 	}
+	else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSATE_SERVER_CLOSE) == 0)
+	{
+		//特殊指令，关闭服务器信息，所以要先清理一下内存。
+		DoMessage_ServerClose(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
+		return CONSOLE_MESSAGE_CLOSE;
+	}
 	else
 	{
 		u2ReturnCommandID = CONSOLE_COMMAND_UNKNOW;
@@ -2177,3 +2183,15 @@ bool CConsoleMessage::DoMessage_MonitorInfo(_CommandInfo& CommandInfo, IBuffPack
 	u2ReturnCommandID = CONSOLE_COMMAND_MONITOR_INFO;
 	return true;
 }
+
+bool CConsoleMessage::DoMessage_ServerClose(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+{
+	if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0 && App_MainConfig::instance()->GetServerClose() == 0)
+	{
+		u2ReturnCommandID = CONSOLE_COMMAND_CLOSE_SERVER;
+		App_ServerObject::instance()->GetServerManager()->Close();
+	}
+
+	return true;
+}
+

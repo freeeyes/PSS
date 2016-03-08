@@ -29,16 +29,16 @@ void *thread_Monitor(void *arg)
 		OUR_DEBUG((LM_INFO, "[thread_Monitor]arg is not NULL.\n")); 
 		pthread_exit(0);
 	}	
-	
+
 	bool blFlag = true;
 	while(WaitQuitSignal::wait(blFlag))
 	{ 
 		//OUR_DEBUG((LM_INFO, "[thread_Monitor]blFlag=false.\n")); 
-  	sleep(1);
-  }
-  
-  OUR_DEBUG((LM_INFO, "[thread_Monitor]exit.\n")); 
-  pthread_exit(0);
+		sleep(1);
+	}
+
+	OUR_DEBUG((LM_INFO, "[thread_Monitor]exit.\n")); 
+	pthread_exit(0);
 }
 
 int CheckCoreLimit(int nMaxCoreFile)
@@ -288,7 +288,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 
 		pthread_exit(NULL);
 	}
-	
+
 	return 0;
 }
 
@@ -341,7 +341,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 			ServerMain();
 		}
 	}
- 
+
 	return 0;
 }
 

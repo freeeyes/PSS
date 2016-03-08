@@ -43,6 +43,7 @@ BEGIN_MESSAGE_MAP(CDlgClientMain, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON7, &CDlgClientMain::OnBnClickedButton7)
 	ON_BN_CLICKED(IDC_BUTTON11, &CDlgClientMain::OnBnClickedButton11)
 	ON_LBN_SELCHANGE(IDC_LIST3, &CDlgClientMain::OnLbnSelchangeList3)
+	ON_BN_CLICKED(IDC_BUTTON12, &CDlgClientMain::OnBnClickedButton12)
 END_MESSAGE_MAP()
 
 CString CDlgClientMain::GetPageTitle()
@@ -590,4 +591,25 @@ void CDlgClientMain::OnLbnSelchangeList3()
 	szTemp[nDecLen] = '\0';
 	m_txtKey.SetWindowText(szTemp);
 
+}
+
+
+void CDlgClientMain::OnBnClickedButton12()
+{
+	// TODO: ¹Ø±Õ·þÎñÆ÷
+	if(MessageBox(_T(MESSAGE_IS_CLOSE_SERVER), _T(MESSAGE_TITLE_INFO), MB_OKCANCEL) == IDOK)
+	{
+		char szSendMessage[200] = {'\0'};
+		char szCommand[100]     = {'\0'};
+		sprintf_s(szCommand, 100, "%s ServerClose -a", m_pTcpClientConnect->GetKey());
+		int nSendLen = (int)strlen(szCommand); 
+
+		memcpy_s(szSendMessage, 200, &nSendLen, sizeof(int));
+		memcpy_s(&szSendMessage[4], 200, &szCommand, nSendLen);
+
+		char szRecvBuff[10 * 1024] = {'\0'};
+		int nRecvLen = 10 * 1024;
+		m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen + sizeof(int), (char*)szRecvBuff, nRecvLen);
+		MessageBox(_T(MESSAGE_IS_CLOSE_OVER), _T(MESSAGE_TITLE_INFO), MB_OK);
+	}
 }
