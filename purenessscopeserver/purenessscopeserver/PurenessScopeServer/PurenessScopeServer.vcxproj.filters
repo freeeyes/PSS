@@ -1,0 +1,639 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Main">
+      <UniqueIdentifier>{89d0fd0d-4ec4-4645-9c0f-0711ee34d39c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Encrypt">
+      <UniqueIdentifier>{fd953a91-eab1-499a-bf07-0122154dbcb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Encrypt\headfile">
+      <UniqueIdentifier>{f5b9a4ac-25f9-4596-a944-97aa7fabf990}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Encrypt\cppfile">
+      <UniqueIdentifier>{43bd991a-74c0-4c8b-823f-bd0d54824e18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="IObject">
+      <UniqueIdentifier>{fe19281d-75fb-41e7-a85e-4614f1f546ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="IObject\PacketParse">
+      <UniqueIdentifier>{882c9497-0193-431d-b15d-0e6bc9f6abfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="IObject\PacketParse\headfile">
+      <UniqueIdentifier>{ffbfa9a1-42c9-4895-8f14-e904173995f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="IObject\PacketParse\cppfile">
+      <UniqueIdentifier>{05c023a9-50cc-4f3d-87df-7d9356c7340f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LogSystem">
+      <UniqueIdentifier>{fdcd683e-53ba-4d71-b071-d4c853adda00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LogSystem\headfile">
+      <UniqueIdentifier>{174020bf-b3e7-4acc-8631-900a53c33c82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LogSystem\cppfile">
+      <UniqueIdentifier>{e951dd4b-2446-47b5-8c10-b1b77fda3998}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Message">
+      <UniqueIdentifier>{598b838b-b109-4bd4-827c-b97dddbb68f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Message\headfile">
+      <UniqueIdentifier>{9636a2d1-69c5-4251-99a0-e0e3a5d8e190}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Message\cppfole">
+      <UniqueIdentifier>{deb5a6f7-bcce-487b-9c7d-ad6352802469}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Proactor">
+      <UniqueIdentifier>{1d2d70a3-c4d8-45ec-b31e-5bc25b15ae49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Proactor\headfile">
+      <UniqueIdentifier>{6b2ba517-5844-47de-bdf8-c6ad6e9802f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Proactor\cppfile">
+      <UniqueIdentifier>{a900f5aa-3bd8-4ce3-a903-fe1f8f4c4f33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Console">
+      <UniqueIdentifier>{a9916996-6df4-42a4-9b05-5498773dd6f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Console\headfile">
+      <UniqueIdentifier>{aac268d9-f529-49ee-b819-501de1d45993}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Console\cppfile">
+      <UniqueIdentifier>{cab31fa0-538b-444d-ae18-d9f7df2ba0bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UDP">
+      <UniqueIdentifier>{ccbccb2c-b8b0-4e28-bd0f-569ce207bf8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UDP\headfile">
+      <UniqueIdentifier>{af0c23d0-32ea-4450-bc12-21f2bbca9b0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UDP\cppfile">
+      <UniqueIdentifier>{686ecdf4-12d6-4ce1-85bd-d049901af6a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{91407ce5-54e1-45ce-9564-081b23d090a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common\headfile">
+      <UniqueIdentifier>{e7c9c8c5-42db-48e2-b4cd-63d0bb33c75c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common\cppfile">
+      <UniqueIdentifier>{ccb5daa4-6896-42ce-b67e-c6f37d61cdfe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Reactor">
+      <UniqueIdentifier>{a6a30fe2-4fa2-4b5b-befa-ebaa0d7258c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Reactor\headfile">
+      <UniqueIdentifier>{399c72c6-2918-4ea6-9fe3-3c80784c2ceb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Reactor\cppfile">
+      <UniqueIdentifier>{a33e2b3a-7646-4287-93cc-bd13de9551ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tinyxml">
+      <UniqueIdentifier>{aaeb596b-9d0e-4fbb-bdea-db0988faa2a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tinyxml\cppfile">
+      <UniqueIdentifier>{652da30a-a686-4b7d-83d1-0a383be4cc43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tinyxml\headfile">
+      <UniqueIdentifier>{cd26ce73-026c-46be-9b94-9222920f5259}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mail">
+      <UniqueIdentifier>{b1409b54-dc4a-40df-a169-ebe9d09bc239}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mail\cppfile">
+      <UniqueIdentifier>{52a42786-5e6d-45de-8be2-ed17d1198e6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mail\hfile">
+      <UniqueIdentifier>{a7ecfde7-aabc-457a-8401-4f899c76b1ef}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="PurenessScopeServer.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Encrypt\Aes.cpp">
+      <Filter>Encrypt\headfile</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketParse\PacketConsoleParse.cpp">
+      <Filter>IObject\PacketParse\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketParse\PacketParse.cpp">
+      <Filter>IObject\PacketParse\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketParse\PacketParseBase.cpp">
+      <Filter>IObject\PacketParse\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketParse\PacketParsePool.cpp">
+      <Filter>IObject\PacketParse\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="LogSystem\FileLogger.cpp">
+      <Filter>LogSystem\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="LogSystem\LogManager.cpp">
+      <Filter>LogSystem\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Message\LoadModule.cpp">
+      <Filter>Message\cppfole</Filter>
+    </ClCompile>
+    <ClCompile Include="Message\LoadPacketParse.cpp">
+      <Filter>Message\cppfole</Filter>
+    </ClCompile>
+    <ClCompile Include="Message\Message.cpp">
+      <Filter>Message\cppfole</Filter>
+    </ClCompile>
+    <ClCompile Include="Message\MessageManager.cpp">
+      <Filter>Message\cppfole</Filter>
+    </ClCompile>
+    <ClCompile Include="Message\MessageService.cpp">
+      <Filter>Message\cppfole</Filter>
+    </ClCompile>
+    <ClCompile Include="Message\ModuleMessageManager.cpp">
+      <Filter>Message\cppfole</Filter>
+    </ClCompile>
+    <ClCompile Include="Message\WorkThreadAI.cpp">
+      <Filter>Message\cppfole</Filter>
+    </ClCompile>
+    <ClCompile Include="Proactor\AceProactorManager.cpp">
+      <Filter>Proactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Proactor\ClientProConnectManager.cpp">
+      <Filter>Proactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Proactor\ProAsynchConnect.cpp">
+      <Filter>Proactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Proactor\ProConnectAccept.cpp">
+      <Filter>Proactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Proactor\ProConnectClient.cpp">
+      <Filter>Proactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Proactor\ProConnectHandle.cpp">
+      <Filter>Proactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Proactor\ProConsoleAccept.cpp">
+      <Filter>Proactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Proactor\ProConsoleHandle.cpp">
+      <Filter>Proactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Proactor\ProControlListen.cpp">
+      <Filter>Proactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Proactor\ProServerManager.cpp">
+      <Filter>Proactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Proactor\ProSigHandle.cpp">
+      <Filter>Proactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Console\ConsoleMessage.cpp">
+      <Filter>Console\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="UDP\ProactorUDPClient.cpp">
+      <Filter>UDP\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="UDP\ProactorUDPHandler.cpp">
+      <Filter>UDP\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="UDP\ReactorUDPClient.cpp">
+      <Filter>UDP\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="UDP\ReactorUDPHander.cpp">
+      <Filter>UDP\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\ACEMemory.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\AppConfig.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\BuffPacket.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\BuffPacketManager.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\CommandAccount.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\ForbiddenIP.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Frame_Logging_Strategy.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\LinuxCPU.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\MainConfig.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\MakePacket.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\MessageBlockManager.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\MyACELoggingStrategy.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\ProfileTime.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\ProgramService.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\RandomNumber.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\SendCacheManager.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\SendMessage.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\ServerParse.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\ThreadInfo.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\TimerManager.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\WindowsCPU.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\WindowsProcess.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\XmlOpeation.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor\AceReactorManager.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor\ClientReConnectManager.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor\ConnectAccept.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor\ConnectClient.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor\ConnectHandler.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor\ConsoleAccept.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor\ConsoleHandler.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor\ControlListen.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor\My_Dev_Poll_Reactor.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor\ServerManager.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor\WaitQuitSignal.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="TinyXML\tinystr.cpp">
+      <Filter>Tinyxml\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="TinyXML\tinyxml.cpp">
+      <Filter>Tinyxml\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="TinyXML\tinyxmlerror.cpp">
+      <Filter>Tinyxml\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="TinyXML\tinyxmlparser.cpp">
+      <Filter>Tinyxml\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Mail\base64.cpp">
+      <Filter>Mail\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Mail\smtp.cpp">
+      <Filter>Mail\cppfile</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Encrypt\Aes.h">
+      <Filter>Encrypt\cppfile</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject\ClientCommand.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject\IBuffPacket.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject\ICheckPacket.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject\IClientManager.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject\IClientParse.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject\IConnectManager.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject\IControlListen.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject\ILogManager.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject\ILogObject.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject\IMessage.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject\IMessageBlockManager.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject\IMessageManager.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject\IModuleInfo.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject\IModuleMessageManager.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject\IObject.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject\IPacketManager.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject\IPacketParse.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject\ISendCacheManager.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject\ITimerManager.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject\IUDPConnectManager.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketParse\PacketConsoleParse.h">
+      <Filter>IObject\PacketParse\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketParse\PacketParse.h">
+      <Filter>IObject\PacketParse\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketParse\PacketParseBase.h">
+      <Filter>IObject\PacketParse\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketParse\PacketParsePool.h">
+      <Filter>IObject\PacketParse\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="LogSystem\FileLogger.h">
+      <Filter>LogSystem\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="LogSystem\LogManager.h">
+      <Filter>LogSystem\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Message\LoadModule.h">
+      <Filter>Message\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Message\LoadPacketParse.h">
+      <Filter>Message\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Message\Message.h">
+      <Filter>Message\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Message\MessageManager.h">
+      <Filter>Message\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Message\MessageService.h">
+      <Filter>Message\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Message\ModuleMessageManager.h">
+      <Filter>Message\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Message\WorkThreadAI.h">
+      <Filter>Message\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Proactor\AceProactorManager.h">
+      <Filter>Proactor\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Proactor\ClientProConnectManager.h">
+      <Filter>Proactor\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Proactor\ProAsynchConnect.h">
+      <Filter>Proactor\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Proactor\ProConnectAccept.h">
+      <Filter>Proactor\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Proactor\ProConnectClient.h">
+      <Filter>Proactor\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Proactor\ProConnectHandle.h">
+      <Filter>Proactor\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Proactor\ProConsoleAccept.h">
+      <Filter>Proactor\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Proactor\ProConsoleHandle.h">
+      <Filter>Proactor\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Proactor\ProControlListen.h">
+      <Filter>Proactor\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Proactor\ProServerManager.h">
+      <Filter>Proactor\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Proactor\ProSigHandle.h">
+      <Filter>Proactor\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Console\ConsoleMessage.h">
+      <Filter>Console\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="UDP\ProactorUDPClient.h">
+      <Filter>UDP\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="UDP\ProactorUDPHandler.h">
+      <Filter>UDP\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="UDP\ProUDPManager.h">
+      <Filter>UDP\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="UDP\ReactorUDPClient.h">
+      <Filter>UDP\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="UDP\ReactorUDPHander.h">
+      <Filter>UDP\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="UDP\ReUDPManager.h">
+      <Filter>UDP\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\ACEMemory.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\AppConfig.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\BuffPacket.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\BuffPacketManager.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\ClientMessage.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\ClientUDPMassage.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\CommandAccount.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\CommonData.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\define.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Fast_Asynch_Read_Stream.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\ForbiddenIP.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Frame_Logging_Strategy.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\IPAccount.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\LinuxCPU.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\MainConfig.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\MakePacket.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\MapTemplate.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\MessageBlockManager.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\MyACELoggingStrategy.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\ProfileTime.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\ProgramService.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\RandomNumber.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Ring.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\SendCacheManager.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\SendMessage.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\ServerParse.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\ThreadInfo.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\ThreadLock.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\TimerManager.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\WindowsCPU.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\WindowsDump.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\WindowsProcess.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\XmlOpeation.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\AceReactorManager.h">
+      <Filter>Reactor\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\ClientReConnectManager.h">
+      <Filter>Reactor\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\ConnectAccept.h">
+      <Filter>Reactor\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\ConnectClient.h">
+      <Filter>Reactor\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\ConnectHandler.h">
+      <Filter>Reactor\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\ConsoleAccept.h">
+      <Filter>Reactor\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\ConsoleHandler.h">
+      <Filter>Reactor\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\ControlListen.h">
+      <Filter>Reactor\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\My_Dev_Poll_Reactor.h">
+      <Filter>Reactor\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\ServerManager.h">
+      <Filter>Reactor\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\WaitQuitSignal.h">
+      <Filter>Reactor\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="TinyXML\tinystr.h">
+      <Filter>Tinyxml\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="TinyXML\tinyxml.h">
+      <Filter>Tinyxml\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Mail\base64.h">
+      <Filter>Mail\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Mail\smtp.h">
+      <Filter>Mail\hfile</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Reactor\My_Dev_Poll_Reactor.inl">
+      <Filter>Reactor\cppfile</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+</Project>
