@@ -1263,6 +1263,9 @@ CProConnectManager::~CProConnectManager(void)
 void CProConnectManager::CloseAll()
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
+
+	msg_queue()->deactivate();
+
 	KillTimer();
 	mapConnectManager::iterator b = m_mapConnectManager.begin();
 	mapConnectManager::iterator e = m_mapConnectManager.end();

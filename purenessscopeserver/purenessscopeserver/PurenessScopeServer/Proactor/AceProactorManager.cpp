@@ -27,7 +27,11 @@ uint32 CAceProactor::GetProactorID()
 
 void CAceProactor::Close()
 {
-	SAFE_DELETE(m_pProactor);
+	if (NULL != m_pProactor)
+	{
+		m_pProactor->close();
+		SAFE_DELETE(m_pProactor);
+	}
 
 	m_nProactorType = 0;
 	m_nThreadCount  = 0;
@@ -50,7 +54,7 @@ bool CAceProactor::Init(int nProactorType, int nThreadCount)
 					nEventCount = ACE_OS::num_processors_online() * 2;
 				}
 
-				ACE_WIN32_Proactor* pWin32Proactor = new ACE_WIN32_Proactor(nEventCount);
+				ACE_WIN32_Proactor* pWin32Proactor = new ACE_WIN32_Proactor(nThreadCount);
 				if(NULL == pWin32Proactor)
 				{
 					throw "[CAceProactor::Init]New ACE_WIN32_Proactor Error.";
@@ -197,6 +201,7 @@ void CAceProactorManager::Close()
 	for(b; b!= e; b++)
 	{
 		CAceProactor* pAceProactor = (CAceProactor* )b->second;
+		pAceProactor->Close();
 		SAFE_DELETE(pAceProactor);
 	}
 

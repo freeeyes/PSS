@@ -444,6 +444,7 @@ bool CProServerManager::Close()
 	OUR_DEBUG((LM_INFO, "[CProServerManager::Close]BuffPacketManager OK\n"));
 	App_ProactorManager::instance()->StopProactor();
 	OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ReactorManager OK.\n"));	
+	//App_ProactorManager::instance()->Close();
 	OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close end....\n"));
 
 	if(NULL != m_pFrameLoggingStrategy)
@@ -451,6 +452,7 @@ bool CProServerManager::Close()
 		m_pFrameLoggingStrategy->EndLogStrategy();
 		SAFE_DELETE(m_pFrameLoggingStrategy);
 	}
+	OUR_DEBUG((LM_INFO, "[CProServerManager::Close]EndLogStrategy end....\n"));
 
 	return true;
 }

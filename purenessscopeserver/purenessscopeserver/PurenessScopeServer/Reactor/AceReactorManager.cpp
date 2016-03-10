@@ -32,8 +32,7 @@ void CAceReactor::Close()
     if (NULL != m_pReactor)
     {
         m_pReactor->close();
-        delete m_pReactor;
-        m_pReactor = NULL;
+		SAFE_DELETE(m_pReactor)
     }
 
     m_nReactorType = 0;
