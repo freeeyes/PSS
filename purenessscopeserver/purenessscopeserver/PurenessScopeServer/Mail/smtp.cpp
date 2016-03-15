@@ -365,10 +365,11 @@ int mailAttachment(unsigned char **mail, const unsigned char *filePath)
 
 	headerSize = ACE_OS::strlen(contentType)+ACE_OS::strlen(contentEncode)+ACE_OS::strlen(contentDes)+200;
 	attachHeader = (char* )calloc(headerSize, 1);
-	if (NULL == attach)
+    if (NULL == attachHeader)
 	{
 		//ACE_DEBUG((LM_ERROR, "[mailAttachment]fp calloc headerSize fail.\n"));
 		ACE_OS::fclose(fp);
+        free(attach);
 		return -1;
 	}
 
@@ -383,6 +384,8 @@ int mailAttachment(unsigned char **mail, const unsigned char *filePath)
 	{
 		//ACE_DEBUG((LM_ERROR, "[mailAttachment]fp calloc base64Size fail.\n"));
 		ACE_OS::fclose(fp);
+        free(attach);
+        free(attachHeader);
 		return -1;
 	}
 
@@ -400,6 +403,7 @@ int mailAttachment(unsigned char **mail, const unsigned char *filePath)
 	{
 		//ACE_DEBUG((LM_ERROR, "[mailAttachment]fp realloc base64Size fail.\n"));
 		ACE_OS::fclose(fp);
+        free(attachHeader);
 		return -1;
 	}
 
