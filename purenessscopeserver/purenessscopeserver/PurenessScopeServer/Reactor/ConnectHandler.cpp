@@ -2001,7 +2001,6 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
 		m_ThreadWriteLock.release();
 		sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectManager::SendMessage] ConnectID[%d] is not find.", u4ConnectID);
 		App_BuffPacketManager::instance()->Delete(pBuffPacket);
-		m_ThreadWriteLock.release();
 		return true;
 	}
 
