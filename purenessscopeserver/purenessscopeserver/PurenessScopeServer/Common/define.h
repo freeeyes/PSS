@@ -1110,7 +1110,7 @@ inline uint64 ntohl64(uint64 u8Data)
 //定义一个函数，可支持字符串替换，目前先不考虑支持中文
 inline bool Replace_String(char* pText, uint32 u4Len, const char* pOld, const char* pNew)
 {
-	char* pTempSrc = new char(u4Len);
+    char* pTempSrc = new char[u4Len];
 
 	memcpy_safe(pText, u4Len, pTempSrc, u4Len);
 	pTempSrc[u4Len - 1] = '\0';
