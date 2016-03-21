@@ -9,7 +9,7 @@ CProactorClientInfo::CProactorClientInfo()
 	m_nPort             = 0;
 	m_nServerID         = 0;
 	m_emConnectState    = SERVER_CONNECT_READY;
-	m_AddrLocal         = (ACE_INET_Addr &)ACE_Addr::sap_any;
+	//m_AddrLocal         = (ACE_INET_Addr &)ACE_Addr::sap_any;
 }
 
 CProactorClientInfo::~CProactorClientInfo()
