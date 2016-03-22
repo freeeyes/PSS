@@ -495,6 +495,7 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
 
         if (nDataLen <= 0)
         {
+			/*
             if (nErr == EWOULDBLOCK)
             {
                 //如果发送堵塞，则等10毫秒后再发送。
@@ -502,6 +503,7 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
                 ACE_OS::sleep(tvSleep);
                 continue;
             }
+			*/
 
 			_ClientIPInfo objServerIPInfo;
 			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());

@@ -493,6 +493,7 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
 
 		if (nDataLen <= 0)
 		{
+			/*
 			if (nErr == EWOULDBLOCK)
 			{
 				//如果发送堵塞，则等10毫秒后再发送。
@@ -500,6 +501,7 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
 				ACE_OS::sleep(tvSleep);
 				continue;
 			}
+			*/
 
 			OUR_DEBUG((LM_ERROR, "[CConsoleHandler::SendPacket] ConnectID = %d, error = %d.\n", GetConnectID(), errno));
 			pMbData->release();

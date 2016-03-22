@@ -277,7 +277,6 @@ _ClientConnectInfo CProConnectClient::GetClientConnectInfo()
 {
 	_ClientConnectInfo ClientConnectInfo;
 	ClientConnectInfo.m_blValid       = true;
-	//ClientConnectInfo.m_addrRemote    = m_AddrRemote;
 	ClientConnectInfo.m_u4AliveTime   = (uint32)(ACE_OS::gettimeofday().sec() - m_atvBegin.sec());
 	ClientConnectInfo.m_u4AllRecvSize = m_u4RecvSize;
 	ClientConnectInfo.m_u4RecvCount   = m_u4RecvCount;
