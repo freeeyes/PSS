@@ -103,7 +103,7 @@ bool CProactorClientInfo::SendData(ACE_Message_Block* pmblk)
 			if(SERVER_CONNECT_FIRST != m_emConnectState && SERVER_CONNECT_RECONNECT != m_emConnectState)
 			{
 				//如果连接不存在，则建立链接。
-				Run(true);
+				Run(true, SERVER_CONNECT_RECONNECT);
 			}
 
 			if(NULL != pmblk)
@@ -653,7 +653,7 @@ int CClientProConnectManager::handle_timeout(const ACE_Time_Value &tv, const voi
 		if(NULL == pClientInfo->GetProConnectClient())
 		{
 			//如果连接不存在，则重新建立连接
-			pClientInfo->Run(m_blProactorFinish);
+			pClientInfo->Run(m_blProactorFinish, SERVER_CONNECT_RECONNECT);
 
 		}
 	}
@@ -774,7 +774,7 @@ bool CClientProConnectManager::ReConnect(int nServerID)
 	if(NULL == pClientInfo->GetProConnectClient())
 	{
 		//如果连接不存在，则重新建立连接
-		pClientInfo->Run(m_blProactorFinish);
+		pClientInfo->Run(m_blProactorFinish, SERVER_CONNECT_RECONNECT);
 		return true;
 	}
 	else

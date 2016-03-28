@@ -65,7 +65,6 @@ bool CReactorClientInfo::Run(bool blIsReady, EM_Server_Connect_State emState)
 
 	m_pConnectClient->SetServerID(m_nServerID);
 	m_pConnectClient->reactor(m_pReactor);
-	//m_emConnectState = emState;
 
 	if (blIsReady == true && SERVER_CONNECT_FIRST != m_emConnectState && SERVER_CONNECT_RECONNECT != m_emConnectState)
 	{
@@ -97,7 +96,7 @@ bool CReactorClientInfo::SendData(ACE_Message_Block* pmblk)
 			if(SERVER_CONNECT_FIRST != m_emConnectState && SERVER_CONNECT_RECONNECT != m_emConnectState)
 			{
 				//如果连接不存在，则建立链接。
-				Run(true);
+				Run(true, SERVER_CONNECT_RECONNECT);
 			}
 
 			if (NULL != pmblk)
@@ -153,7 +152,8 @@ CConnectClient* CReactorClientInfo::GetConnectClient()
 IClientMessage* CReactorClientInfo::GetClientMessage()
 {
 	//这里增加是否是连接重练的判定
-	if ((m_emConnectState == SERVER_CONNECT_RECONNECT || m_emConnectState == SERVER_CONNECT_FIRST) && NULL != m_pClientMessage)
+	OUR_DEBUG((LM_INFO, "[CReactorClientInfo::GetClientMessage]m_emConnectState=%d.\n", m_emConnectState))
+	if ((m_emConnectState == SERVER_CONNECT_FAIL) && NULL != m_pClientMessage)
 	{
 		//通知上层某一个连接已经恢复
 		m_pClientMessage->ReConnect(m_nServerID);
@@ -665,7 +665,7 @@ int CClientReConnectManager::handle_timeout(const ACE_Time_Value& tv, const void
 		if (NULL == pClientInfo->GetConnectClient())
 		{
 			//如果连接不存在，则重新建立连接
-			pClientInfo->Run(m_blReactorFinish);
+			pClientInfo->Run(m_blReactorFinish, SERVER_CONNECT_RECONNECT);
 		}
 	}
 
@@ -781,7 +781,7 @@ bool CClientReConnectManager::ReConnect(int nServerID)
 	if (NULL == pClientInfo->GetConnectClient())
 	{
 		//如果连接不存在，则重新建立连接
-		pClientInfo->Run(m_blReactorFinish);
+		pClientInfo->Run(m_blReactorFinish, SERVER_CONNECT_RECONNECT);
 		return true;
 	}
 	else
