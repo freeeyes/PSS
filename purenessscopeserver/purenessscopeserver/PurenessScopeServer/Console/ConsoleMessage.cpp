@@ -2186,6 +2186,11 @@ bool CConsoleMessage::DoMessage_MonitorInfo(_CommandInfo& CommandInfo, IBuffPack
 
 bool CConsoleMessage::DoMessage_ServerClose(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
+	if(NULL == pBuffPacket)
+	{
+		return false;
+	}
+
 	if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0 && App_MainConfig::instance()->GetServerClose() == 0)
 	{
 		u2ReturnCommandID = CONSOLE_COMMAND_CLOSE_SERVER;

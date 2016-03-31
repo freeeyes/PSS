@@ -32,8 +32,8 @@
 enum
 {
 	CONSOLE_MESSAGE_SUCCESS = 0,
-	CONSOLE_MESSAGE_FAIL    = -1,
-	CONSOLE_MESSAGE_CLOSE   = -2,
+	CONSOLE_MESSAGE_FAIL    = 1,
+	CONSOLE_MESSAGE_CLOSE   = 2,
 };
 
 //设置对应返回命令名称，用于接收端包解析

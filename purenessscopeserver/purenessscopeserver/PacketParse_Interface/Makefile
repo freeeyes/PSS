@@ -5,9 +5,9 @@ default:all
 
 # 主应用文件列表
 LIB_BASE_OBJS = PacketParse_Interface.o
-LIB_BASE = libPacketParse.so
+LIB_BASE = libPacketParse_Interface.so
 
-all: libPacketParse.so clear
+all: libPacketParse_Interface.so clear
 			
 # 主应用程序
 all:$(LIB_BASE) Makefile
@@ -19,6 +19,6 @@ $(LIB_BASE): $(LIB_BASE_OBJS)
 clean:
 	rm -rf *.o  $(LIB_BASE) $(LIB_BASE_OBJS)
 clear:	
-	mv libPacketParse.so ../PurenessScopeServer/Linux_Bin/
+	mv libPacketParse_Interface.so ../PurenessScopeServer/Linux_Bin/
 cl:	
 	rm -rf *.o 

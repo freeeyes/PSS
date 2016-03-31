@@ -489,7 +489,6 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
 		}
 
 		int nDataLen = this->peer().send(pMbData->rd_ptr(), nCurrSendSize, &nowait);
-		int nErr = ACE_OS::last_error();
 
 		if (nDataLen <= 0)
 		{

@@ -118,7 +118,10 @@ int CConnectClient::open(void* p)
     App_ClientReConnectManager::instance()->SetHandler(m_nServerID, this);
     m_pClientMessage = App_ClientReConnectManager::instance()->GetClientMessage(m_nServerID);
     OUR_DEBUG((LM_INFO, "[CConnectClient::open] Connection from [%s:%d]\n", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
-    return 0;
+
+	this->reactor()->register_handler(this, ACE_Event_Handler::READ_MASK);
+
+	return 0;
 }
 
 int CConnectClient::handle_input(ACE_HANDLE fd)
@@ -491,7 +494,6 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
         }
 
         int nDataLen = this->peer().send(pmblk->rd_ptr(), nSendLen - nIsSendSize, &nowait);
-        int nErr = ACE_OS::last_error();
 
         if (nDataLen <= 0)
         {
