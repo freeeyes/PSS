@@ -64,14 +64,16 @@ public:
 	//这里提供接受数据拼包算法，组成完整数据包后会调用RecvData方法
 	bool Recv_Format_data(ACE_Message_Block* mbRecv, IMessageBlockManager* pMessageBlockManager, uint16& u2CommandID, ACE_Message_Block*& mbFinishRecv)
 	{
-		//判断返回数据块是否小于0或者超过最大缓冲大小
+		//OUR_DEBUG((LM_INFO, "[CPostServerData::Recv_Format_data]u4Len=%d.\n", mbRecv->length()));
+		//OUR_DEBUG((LM_INFO, "[CPostServerData::Recv_Format_data]m_u2RecvBuffLength=%d.\n", m_u2RecvBuffLength));
+		//判断返回数据块是否小于8或者超过最大缓冲大小
 		if(m_u2RecvBuffLength + mbRecv->length() < 8 || mbRecv->length() >= RECV_BUFF_SIZE)
 		{
 			if(mbRecv->length() > 0)
 			{
 				ACE_OS::memcpy(&m_szRecvBuffData[m_u2RecvBuffLength], mbRecv->rd_ptr(), mbRecv->length());
-				mbRecv->rd_ptr(mbRecv->length());
 				m_u2RecvBuffLength += mbRecv->length();
+				mbRecv->rd_ptr(mbRecv->length());
 			}
 
 			OUR_DEBUG((LM_INFO, "[CPostServerData::Recv_Format_data]Get Data(%d).\n", mbRecv->length()));
@@ -81,8 +83,8 @@ public:
 		{
 			//统一贴入缓冲，再有缓冲切割发送数据
 			ACE_OS::memcpy(&m_szRecvBuffData[m_u2RecvBuffLength], mbRecv->rd_ptr(), mbRecv->length());
-			mbRecv->rd_ptr(mbRecv->length());
 			m_u2RecvBuffLength += mbRecv->length();
+			mbRecv->rd_ptr(mbRecv->length());
 		}
 
 		//如果接收字节固定是8字节，则认为是一个完整包
@@ -97,7 +99,15 @@ public:
 		mbFinishRecv->wr_ptr(8);
 
 		//数据缓冲向前移位
-		memcpy_safe(&m_szRecvBuffData[m_u2RecvBuffLength], m_u2RecvBuffLength - 8, m_szRecvBuffData, m_u2RecvBuffLength - 8);
+		if(m_u2RecvBuffLength - 8 > 0)
+		{
+			memcpy_safe(&m_szRecvBuffData[8], m_u2RecvBuffLength - 8, m_szRecvBuffData, m_u2RecvBuffLength - 8);
+			m_u2RecvBuffLength -= 8;
+		}
+		else
+		{
+			m_u2RecvBuffLength = 0;
+		}
 
 		return true;
 	};
@@ -117,13 +127,6 @@ public:
 			uint32 u4SendLength = u4PacketLength + sizeof(uint32);
 			m_pServerObject->GetConnectManager()->PostMessage(m_u4ConnectID, pData, u4SendLength, SENDMESSAGE_JAMPNOMAL, u2RetCommand, PACKET_SEND_IMMEDIATLY, PACKET_IS_FRAMEWORK_RECYC);
 			OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData](%d)Send Data(%d) OK.\n", m_u4ConnectID, u4SendLength));
-
-			//缓冲前移，如果有多个继续处理
-			m_u2RecvBuffLength -= u4PacketLength;
-			if(m_u2RecvBuffLength > 0)
-			{
-				ACE_OS::memcpy(&m_szRecvBuffData, (char* )&m_szRecvBuffData[m_u2RecvBuffLength], u4PacketLength);
-			}
 		}
 
 		return true;
@@ -147,17 +150,17 @@ public:
 			m_u2SendBuffLength += u4Size;
 
 			//发送数据
-			OUR_DEBUG((LM_ERROR, "[CPostServerData::SendData](%d) Send [%d] Begin.", m_u4ServerID, m_u2SendBuffLength));
+			OUR_DEBUG((LM_ERROR, "[CPostServerData::SendData](%d) Send [%d] Begin.\n", m_u4ServerID, m_u2SendBuffLength));
 			if(false == m_pServerObject->GetClientManager()->SendData((int)m_u4ServerID, m_szSendBuffData, m_u2SendBuffLength, false))
 			{
 				//发送失败，缓冲
-				OUR_DEBUG((LM_ERROR, "[CPostServerData::SendData](%d) Send [%d] End 1.", m_u4ServerID, m_u2SendBuffLength));
+				OUR_DEBUG((LM_ERROR, "[CPostServerData::SendData](%d) Send [%d] End 1.\n", m_u4ServerID, m_u2SendBuffLength));
 				return false;
 			}
 			else
 			{
 				//发送成功，清理缓冲
-				OUR_DEBUG((LM_ERROR, "[CPostServerData::SendData](%d) Send [%d] End.", m_u4ServerID, m_u2SendBuffLength));
+				OUR_DEBUG((LM_ERROR, "[CPostServerData::SendData](%d) Send [%d] End.\n", m_u4ServerID, m_u2SendBuffLength));
 				m_u2SendBuffLength = 0;
 				return true;
 			}
