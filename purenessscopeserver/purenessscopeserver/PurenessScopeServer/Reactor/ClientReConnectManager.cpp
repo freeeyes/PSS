@@ -118,8 +118,30 @@ bool CReactorClientInfo::SendData(ACE_Message_Block* pmblk)
 		}
 	}
 
-	//发送数据
-	return m_pConnectClient->SendData(pmblk);
+	if(true == m_pClientMessage->Need_Send_Format())
+	{
+		//调用数据发送组装
+		ACE_Message_Block* pSend = NULL;
+		bool blRet = m_pClientMessage->Send_Format_data(pmblk->rd_ptr(), pmblk->length(), App_MessageBlockManager::instance(), pSend);
+		if(false == blRet)
+		{
+			App_MessageBlockManager::instance()->Close(pmblk);
+			App_MessageBlockManager::instance()->Close(pSend);
+			return false;
+		}
+		else
+		{
+			App_MessageBlockManager::instance()->Close(pmblk);
+		}
+
+		//发送数据
+		return m_pConnectClient->SendData(pSend);
+	}
+	else
+	{
+		//发送数据
+		return m_pConnectClient->SendData(pmblk);
+	}
 }
 
 int CReactorClientInfo::GetServerID()

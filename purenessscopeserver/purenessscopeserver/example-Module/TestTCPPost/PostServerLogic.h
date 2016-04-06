@@ -30,6 +30,13 @@ public:
 		}
 	};
 
+	bool Need_Send_Format()
+	{
+		//如果需要调用发送组装函数，则这里返回true
+		//不需要的话这里返回false，Send_Format_data函数就不会被调用
+		return true;
+	};
+
 	//处理服务期间发送数据的组装
 	bool Send_Format_data(char* pData, uint32 u4Len, IMessageBlockManager* pMessageBlockManager, ACE_Message_Block*& mbSend)
 	{

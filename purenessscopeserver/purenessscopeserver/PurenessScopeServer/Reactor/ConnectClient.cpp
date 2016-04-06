@@ -273,7 +273,25 @@ int CConnectClient::RecvData()
 		_ClientIPInfo objServerIPInfo;
 		sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
 		objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
-        m_pClientMessage->RecvData(m_pCurrMessage, objServerIPInfo);
+
+		uint16 u2CommandID             = 0;
+		ACE_Message_Block* pRecvFinish = NULL;
+
+		while(true)
+		{
+			bool blRet = m_pClientMessage->Recv_Format_data(m_pCurrMessage, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish);
+			if(true == blRet)
+			{
+				//调用数据包处理
+				m_pClientMessage->RecvData(u2CommandID, pRecvFinish, objServerIPInfo);
+				//回收处理包
+				App_MessageBlockManager::instance()->Close(pRecvFinish);
+			}
+			else
+			{
+				break;
+			}
+		}
     }
 
     m_pCurrMessage->reset();
@@ -382,7 +400,25 @@ int CConnectClient::RecvData_et()
 			_ClientIPInfo objServerIPInfo;
 			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
 			objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
-	        m_pClientMessage->RecvData(m_pCurrMessage, objServerIPInfo);
+
+			uint16 u2CommandID             = 0;
+			ACE_Message_Block* pRecvFinish = NULL;
+
+			while(true)
+			{
+				bool blRet = m_pClientMessage->Recv_Format_data(m_pCurrMessage, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish);
+				if(true == blRet)
+				{
+					//调用数据包处理
+					m_pClientMessage->RecvData(u2CommandID, pRecvFinish, objServerIPInfo);
+					//回收处理包
+					App_MessageBlockManager::instance()->Close(pRecvFinish);
+				}
+				else
+				{
+					break;
+				}
+			}
 	    }
 	
 	    m_pCurrMessage->reset();
