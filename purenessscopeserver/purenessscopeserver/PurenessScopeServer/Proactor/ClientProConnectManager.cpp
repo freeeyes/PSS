@@ -125,8 +125,22 @@ bool CProactorClientInfo::SendData(ACE_Message_Block* pmblk)
 		}
 	}
 
+	//调用数据发送组装
+	ACE_Message_Block* pSend = NULL;
+	bool blRet = m_pClientMessage->Send_Format_data(pmblk->rd_ptr(), pmblk->length(), App_MessageBlockManager::instance(), pSend);
+	if(false == blRet)
+	{
+		App_MessageBlockManager::instance()->Close(pmblk);
+		App_MessageBlockManager::instance()->Close(pSend);
+		return false;
+	}
+	else
+	{
+		App_MessageBlockManager::instance()->Close(pmblk);
+	}
+
 	//发送数据
-	return m_pProConnectClient->SendData(pmblk);
+	return m_pProConnectClient->SendData(pSend);
 }
 
 int CProactorClientInfo::GetServerID()

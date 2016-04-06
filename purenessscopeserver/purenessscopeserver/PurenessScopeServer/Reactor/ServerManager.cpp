@@ -148,6 +148,7 @@ bool CServerManager::Init()
 	App_ServerObject::instance()->SetModuleMessageManager((IModuleMessageManager*)App_ModuleMessageManager::instance());
 	App_ServerObject::instance()->SetControlListen((IControlListen*)App_ControlListen::instance());
 	App_ServerObject::instance()->SetModuleInfo((IModuleInfo* )App_ModuleLoader::instance());
+	App_ServerObject::instance()->SetMessageBlockManager((IMessageBlockManager* )App_MessageBlockManager::instance());
 	App_ServerObject::instance()->SetServerManager(this);
 
 	return true;

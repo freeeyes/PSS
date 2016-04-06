@@ -30,63 +30,93 @@ public:
 		}
 	};
 
-	bool RecvData(ACE_Message_Block* mbRecv,  _ClientIPInfo objServerIPInfo)
+	//处理服务期间发送数据的组装
+	bool Send_Format_data(char* pData, uint32 u4Len, IMessageBlockManager* pMessageBlockManager, ACE_Message_Block*& mbSend)
 	{
-		//判断返回数据块是否小于0或者超过最大缓冲大小
-		if(mbRecv->length() <= 0 || mbRecv->length() >= RECV_BUFF_SIZE)
+		//判断缓冲池是否存在，如果不存在则返回失败
+		if(NULL == pMessageBlockManager)
 		{
-			OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData]Get Data(%d).\n", mbRecv->length()));
 			return false;
 		}
 
-		//统一贴入缓冲，再有缓冲切割发送数据
-		ACE_OS::memcpy(&m_szRecvBuffData[m_u2RecvBuffLength], mbRecv->rd_ptr(), mbRecv->length());
-		m_u2RecvBuffLength += mbRecv->length();
-
-		//判断缓冲是否存有数据
-		if(m_u2RecvBuffLength < 4)
+		//申请发送的内存
+		mbSend = pMessageBlockManager->Create(u4Len);
+		if(NULL == mbSend)
 		{
-			//缓冲内连包头都不齐，不发送
-			return true;
+			OUR_DEBUG((LM_INFO, "[CPostServerData::Send_Format_data](%d)Format Create Data NULL(%d) OK.\n", m_u4ConnectID, u4Len));
+			return false;
+		}
+
+		//如果需要组装数据，在这里写你的代码
+		//这里只是用例，只做简单的内存拷贝，演示完整的操作流程
+		memcpy_safe(pData, u4Len, mbSend->wr_ptr(), u4Len);
+		mbSend->wr_ptr(u4Len);
+		return true;
+	}
+
+	//这里提供接受数据拼包算法，组成完整数据包后会调用RecvData方法
+	bool Recv_Format_data(ACE_Message_Block* mbRecv, IMessageBlockManager* pMessageBlockManager, uint16& u2CommandID, ACE_Message_Block*& mbFinishRecv)
+	{
+		//判断返回数据块是否小于0或者超过最大缓冲大小
+		if(m_u2RecvBuffLength + mbRecv->length() < 8 || mbRecv->length() >= RECV_BUFF_SIZE)
+		{
+			if(mbRecv->length() > 0)
+			{
+				ACE_OS::memcpy(&m_szRecvBuffData[m_u2RecvBuffLength], mbRecv->rd_ptr(), mbRecv->length());
+				mbRecv->rd_ptr(mbRecv->length());
+				m_u2RecvBuffLength += mbRecv->length();
+			}
+
+			OUR_DEBUG((LM_INFO, "[CPostServerData::Recv_Format_data]Get Data(%d).\n", mbRecv->length()));
+			return false;
 		}
 		else
 		{
-			while(true)
+			//统一贴入缓冲，再有缓冲切割发送数据
+			ACE_OS::memcpy(&m_szRecvBuffData[m_u2RecvBuffLength], mbRecv->rd_ptr(), mbRecv->length());
+			mbRecv->rd_ptr(mbRecv->length());
+			m_u2RecvBuffLength += mbRecv->length();
+		}
+
+		//如果接收字节固定是8字节，则认为是一个完整包
+		//这里可以添加算法
+
+		//发现一个完整8字节长的数据包
+		u2CommandID = 0x1010;
+		mbFinishRecv = pMessageBlockManager->Create(8);
+
+		//创建完整数据包
+		memcpy_safe(m_szRecvBuffData, 8, mbFinishRecv->wr_ptr(), 8);
+		mbFinishRecv->wr_ptr(8);
+
+		//数据缓冲向前移位
+		memcpy_safe(&m_szRecvBuffData[m_u2RecvBuffLength], m_u2RecvBuffLength - 8, m_szRecvBuffData, m_u2RecvBuffLength - 8);
+
+		return true;
+	};
+
+	bool RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv,  _ClientIPInfo objServerIPInfo)
+	{
+		//数据包已经收全.发送给客户端数据
+		//OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData]Get Data(%d).\n", mbRecv->length()));
+		if(NULL != m_pServerObject &&  mbRecv->length() > 0)
+		{
+			uint16 u2RetCommand = u2CommandID;
+			uint32 u4PacketLength = 8;      //固定包体8字节
+			char* pData = new char[u4PacketLength + sizeof(uint32)];
+			ACE_OS::memcpy(pData, (char* )&u4PacketLength, sizeof(uint32));
+			ACE_OS::memcpy(&pData[sizeof(uint32)], m_szRecvBuffData, u4PacketLength);
+
+			uint32 u4SendLength = u4PacketLength + sizeof(uint32);
+			m_pServerObject->GetConnectManager()->PostMessage(m_u4ConnectID, pData, u4SendLength, SENDMESSAGE_JAMPNOMAL, u2RetCommand, PACKET_SEND_IMMEDIATLY, PACKET_IS_FRAMEWORK_RECYC);
+			OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData](%d)Send Data(%d) OK.\n", m_u4ConnectID, u4SendLength));
+
+			//缓冲前移，如果有多个继续处理
+			m_u2RecvBuffLength -= u4PacketLength;
+			if(m_u2RecvBuffLength > 0)
 			{
-				//如果接收字节是8字节，则认为是一个完整包
-				//这里可以添加算法
-
-				if(m_u2RecvBuffLength < 8)
-				{
-					//数据包没收全，不做处理
-					return true;
-				}
-				else
-				{
-					//数据包已经收全.发送给客户端数据
-					//OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData]Get Data(%d).\n", mbRecv->length()));
-					if(NULL != m_pServerObject &&  mbRecv->length() > 0)
-					{
-						uint16 u2RetCommand = 0x1010;
-						uint32 u4PacketLength = 8;      //固定包体8字节
-						char* pData = new char[u4PacketLength + sizeof(uint32)];
-						ACE_OS::memcpy(pData, (char* )&u4PacketLength, sizeof(uint32));
-						ACE_OS::memcpy(&pData[sizeof(uint32)], m_szRecvBuffData, u4PacketLength);
-
-						uint32 u4SendLength = u4PacketLength + sizeof(uint32);
-						m_pServerObject->GetConnectManager()->PostMessage(m_u4ConnectID, pData, u4SendLength, SENDMESSAGE_JAMPNOMAL, u2RetCommand, PACKET_SEND_IMMEDIATLY, PACKET_IS_FRAMEWORK_RECYC);
-						OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData](%d)Send Data(%d) OK.\n", m_u4ConnectID, u4SendLength));
-
-						//缓冲前移，如果有多个继续处理
-						m_u2RecvBuffLength -= u4PacketLength;
-						if(m_u2RecvBuffLength > 0)
-						{
-							ACE_OS::memcpy(&m_szRecvBuffData, (char* )&m_szRecvBuffData[m_u2RecvBuffLength], u4PacketLength);
-						}
-					}
-				}
+				ACE_OS::memcpy(&m_szRecvBuffData, (char* )&m_szRecvBuffData[m_u2RecvBuffLength], u4PacketLength);
 			}
-
 		}
 
 		return true;

@@ -148,7 +148,28 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 			_ClientIPInfo objServerIPInfo;
 			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_AddrRemote.get_host_addr());
 			objServerIPInfo.m_nPort = m_AddrRemote.get_port_number();
-			m_pClientMessage->RecvData(&mb, objServerIPInfo);
+			//m_pClientMessage->RecvData(&mb, objServerIPInfo);
+
+			//这里处理一下是不是完整包
+			uint16 u2CommandID             = 0;
+			ACE_Message_Block* pRecvFinish = NULL;
+
+			while(true)
+			{
+				bool blRet = m_pClientMessage->Recv_Format_data(&mb, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish);
+				if(true == blRet)
+				{
+					//调用数据包处理
+					m_pClientMessage->RecvData(u2CommandID, pRecvFinish, objServerIPInfo);
+					//回收处理包
+					App_MessageBlockManager::instance()->Close(pRecvFinish);
+				}
+				else
+				{
+					break;
+				}
+			}
+
 		}
 		mb.release();
 

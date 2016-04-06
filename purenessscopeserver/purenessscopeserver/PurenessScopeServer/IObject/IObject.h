@@ -18,6 +18,7 @@
 #include "IControlListen.h"
 #include "IModuleInfo.h"
 #include "IServerManager.h"
+#include "IMessageBlockManager.h"
 
 class CServerObject
 {
@@ -33,6 +34,7 @@ public:
 		m_pModuleMessageManager = NULL;
 		m_pContorlListen        = NULL;
 		m_pIServerManager       = NULL;
+		m_pMessageBlockManager  = NULL;
 	}
 
     virtual ~CServerObject() {}
@@ -80,6 +82,10 @@ public:
 	{
 		m_pIServerManager = pIServerManager;
 	}
+	void SetMessageBlockManager(IMessageBlockManager* pMessageBlockManager)
+	{
+		m_pMessageBlockManager = pMessageBlockManager;
+	}
 
     IMessageManager*       GetMessageManager()
     {
@@ -125,6 +131,10 @@ public:
 	{
 		return m_pIServerManager;
 	}
+	IMessageBlockManager*  GetMessageBlockManager()
+	{
+		return m_pMessageBlockManager;
+	}
 
 private:
 	IMessageManager*       m_pIMessageManager;
@@ -138,6 +148,7 @@ private:
 	IControlListen*        m_pContorlListen;
 	IModuleInfo*           m_pIModuleInfo;
 	IServerManager*        m_pIServerManager;
+	IMessageBlockManager*  m_pMessageBlockManager;
 };
 
 typedef ACE_Singleton<CServerObject, ACE_Null_Mutex> App_ServerObject; 
