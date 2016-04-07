@@ -95,21 +95,24 @@ public:
 			mbRecv->rd_ptr(mbRecv->length());
 
 			//解析头四个字节获得当前包长度
-			int nPacketSize = 0;
-			memcpy_safe(m_szRecvBuffData, sizeof(int), (char* )&nPacketSize, sizeof(int));
+			int nPacketBodySize = 0;
+			memcpy_safe(m_szRecvBuffData, sizeof(int), (char* )&nPacketBodySize, sizeof(int));
 
-			if(m_u2RecvBuffLength >= nPacketSize + sizeof(int))
+			uint32 u4PacketSize = nPacketBodySize + sizeof(int);
+
+			if(m_u2RecvBuffLength >= (uint16)u4PacketSize)
 			{
 				//这是一个完整的数据包
-				mbFinishRecv = pMessageBlockManager->Create(nPacketSize + sizeof(int));
+				mbFinishRecv = pMessageBlockManager->Create(u4PacketSize);
 
-				memcpy_safe(m_szRecvBuffData, nPacketSize + sizeof(int), mbFinishRecv->wr_ptr(), nPacketSize + sizeof(int));
+				memcpy_safe(m_szRecvBuffData, u4PacketSize, mbFinishRecv->wr_ptr(), u4PacketSize);
+				mbFinishRecv->wr_ptr(u4PacketSize);
 
 				//数据缓冲向前移位
-				if(m_u2RecvBuffLength - nPacketSize + sizeof(int) > 0)
+				if(m_u2RecvBuffLength - u4PacketSize > 0)
 				{
-					memcpy_safe(&m_szRecvBuffData[nPacketSize + sizeof(int)], m_u2RecvBuffLength - (nPacketSize + sizeof(int)), m_szRecvBuffData, m_u2RecvBuffLength - (nPacketSize + sizeof(int)));
-					m_u2RecvBuffLength -= nPacketSize + sizeof(int);
+					memcpy_safe(&m_szRecvBuffData[u4PacketSize], m_u2RecvBuffLength - u4PacketSize, m_szRecvBuffData, m_u2RecvBuffLength - u4PacketSize);
+					m_u2RecvBuffLength -= (uint16)u4PacketSize;
 				}
 				else
 				{

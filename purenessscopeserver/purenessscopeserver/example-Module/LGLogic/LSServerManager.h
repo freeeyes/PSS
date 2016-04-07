@@ -6,7 +6,7 @@
 #include "ListManager.h"
 
 #define SEND_BUFF_SIZE  MAX_BUFF_1024              //发送缓冲大小
-#define RECV_BUFF_SIZE  MAX_BUFF_1024              //接收缓冲大小
+#define RECV_BUFF_SIZE  10*MAX_BUFF_1024           //接收缓冲大小
 
 #define SERVER_PROTOCAL_VERSION       100          //服务器通讯协议版本号
 
@@ -25,13 +25,19 @@ public:
 	CLSServerManager();
 	~CLSServerManager();
 
+	bool Need_Send_Format();
+
+	bool Send_Format_data(char* pData, uint32 u4Len, IMessageBlockManager* pMessageBlockManager, ACE_Message_Block*& mbSend);
+
+	bool Recv_Format_data(ACE_Message_Block* mbRecv, IMessageBlockManager* pMessageBlockManager, uint16& u2CommandID, ACE_Message_Block*& mbFinishRecv);
+
 	void Init(uint32 u4ServerID, const char* pIP, uint32 u4Port, CServerObject* pServerObject);
 
 	void Set_LG_Info(const char* pLGIP, uint32 u4LGPort, uint32 u4LGID);
 
 	bool Connect();
 
-	bool RecvData(ACE_Message_Block* mbRecv,  _ClientIPInfo objServerIPInfo);
+	bool RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv,  _ClientIPInfo objServerIPInfo);
 
 	bool ConnectError(int nError,  _ClientIPInfo objServerIPInfo);
 
@@ -67,6 +73,9 @@ private:
 	uint32         m_u4LGID;
 
 	ClistManager   m_objlistManager;
+
+	char           m_szRecvBuffData[RECV_BUFF_SIZE];  //接收缓冲池
+	uint32         m_u4RecvBuffLength;                //接收缓冲长度
 };
 
 #endif

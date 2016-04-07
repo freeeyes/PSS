@@ -152,10 +152,31 @@ int CBaseCommand::Do_Logic_Client_Login(IMessage* pMessage)
 		u4SendPacketLen = sizeof(uint32) + sizeof(uint8) + 
 			sizeof(uint8) + ACE_OS::strlen( m_objLSServer.Get_LS_Key()) + 1;
 	}
-	(*pResponsesPacket) << pMessage->GetPacketHeadInfo()->m_u2Version;
+
+	//拆解出完整的数据包头
+	_PacketInfo HeadPacket;
+	pMessage->GetPacketHead(HeadPacket);
+
+	IBuffPacket* pHeadPacket = m_pServerObject->GetPacketManager()->Create();
+	pHeadPacket->WriteStream(HeadPacket.m_pData, HeadPacket.m_nDataLen);
+
+	uint16 u2CommandID   = 0;           //命令字 
+	uint32 u2Version     = 0;           //协议版本号
+	uint32 u4BodyLen     = 0;           //包体长度  
+	char   szSession[33] = {'\0'};      //Session字符串 
+
+	//解析包头中的数据包长
+	(*pHeadPacket) >> u2Version;
+	(*pHeadPacket) >> u2CommandID;
+	(*pHeadPacket) >> u4BodyLen;
+	pHeadPacket->WriteStream(szSession, 32);
+
+	m_pServerObject->GetPacketManager()->Delete(pHeadPacket);
+
+	(*pResponsesPacket) << u2Version;
 	(*pResponsesPacket) << u2PostCommandID;
 	(*pResponsesPacket) << u4SendPacketLen; //数据包体长度
-	pResponsesPacket->WriteStream(pMessage->GetPacketHeadInfo()->m_szSession, SESSION_LEN);
+	pResponsesPacket->WriteStream(szSession, 32);
 
 	(*pResponsesPacket) << u4UserID;
 	(*pResponsesPacket) << u1Type;
