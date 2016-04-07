@@ -35,6 +35,8 @@
 #define OP_OK                    0
 #define OP_FAIL                  1
 
+#define RECV_BUFF_SIZE  MAX_BUFF_1024      //接收缓冲大小
+
 using namespace std;
 
 typedef ACE_Singleton<CUserValidManager, ACE_Null_Mutex> App_UserValidManager;
@@ -45,7 +47,8 @@ class CPostServerData : public IClientMessage
 public:
 	CPostServerData() 
 	{ 
-		m_pServerObject = NULL;
+		m_pServerObject    = NULL;
+		m_u2RecvBuffLength = 0;
 	};
 
 	~CPostServerData() {};
@@ -54,13 +57,82 @@ public:
 	{
 	}
 
-	bool RecvData(ACE_Message_Block* mbRecv, _ClientIPInfo objServerIPInfo)
+	bool Need_Send_Format()
+	{
+		return false;
+	};
+
+	bool Send_Format_data(char* pData, uint32 u4Len, IMessageBlockManager* pMessageBlockManager, ACE_Message_Block*& mbSend)
+	{
+		return false;
+	};
+
+	bool Recv_Format_data(ACE_Message_Block* mbRecv, IMessageBlockManager* pMessageBlockManager, uint16& u2CommandID, ACE_Message_Block*& mbFinishRecv)
 	{
 		//判断返回数据块是否小于0
 		uint32 u4SendPacketSize = (uint32)mbRecv->length();
 		if(u4SendPacketSize <= 0)
 		{
-			OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData]Get Data(%d).\n", u4SendPacketSize));
+			OUR_DEBUG((LM_INFO, "[CPostServerData::Recv_Format_data]Get Data(%d) error.\n", u4SendPacketSize));
+		}
+
+		if(m_u2RecvBuffLength + mbRecv->length() < 4 || mbRecv->length() >= RECV_BUFF_SIZE)
+		{
+			if(mbRecv->length() > 0)
+			{
+				memcpy_safe(&m_szRecvBuffData[m_u2RecvBuffLength], mbRecv->length(), mbRecv->rd_ptr(), mbRecv->length());
+				m_u2RecvBuffLength += mbRecv->length();
+				mbRecv->rd_ptr(mbRecv->length());
+			}
+
+			return false;
+		}
+		else
+		{
+			//统一贴入缓冲，再有缓冲切割发送数据
+			memcpy_safe(&m_szRecvBuffData[m_u2RecvBuffLength], mbRecv->length(), mbRecv->rd_ptr(), mbRecv->length());
+			m_u2RecvBuffLength += mbRecv->length();
+			mbRecv->rd_ptr(mbRecv->length());
+
+			//解析头四个字节获得当前包长度
+			int nPacketSize = 0;
+			memcpy_safe(m_szRecvBuffData, sizeof(int), (char* )&nPacketSize, sizeof(int));
+
+			if(m_u2RecvBuffLength >= nPacketSize + sizeof(int))
+			{
+				//这是一个完整的数据包
+				mbFinishRecv = pMessageBlockManager->Create(nPacketSize + sizeof(int));
+
+				memcpy_safe(m_szRecvBuffData, nPacketSize + sizeof(int), mbFinishRecv->wr_ptr(), nPacketSize + sizeof(int));
+
+				//数据缓冲向前移位
+				if(m_u2RecvBuffLength - nPacketSize + sizeof(int) > 0)
+				{
+					memcpy_safe(&m_szRecvBuffData[nPacketSize + sizeof(int)], m_u2RecvBuffLength - (nPacketSize + sizeof(int)), m_szRecvBuffData, m_u2RecvBuffLength - (nPacketSize + sizeof(int)));
+					m_u2RecvBuffLength -= nPacketSize + sizeof(int);
+				}
+				else
+				{
+					m_u2RecvBuffLength = 0;
+				}
+
+				return true;
+			}
+			else
+			{
+				//数据包不完整，继续等待
+				return false;
+			}
+		}
+
+	};
+
+	bool RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv, _ClientIPInfo objServerIPInfo)
+	{
+		uint32 u4SendPacketSize = (uint32)mbRecv->length();
+		if(u4SendPacketSize <= 0)
+		{
+			OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData]Get Data(%d) error.\n", u4SendPacketSize));
 		}
 
 		OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData]Get Data(%d).\n", u4SendPacketSize));
@@ -247,6 +319,8 @@ public:
 
 private:
 	CServerObject* m_pServerObject;
+	char           m_szRecvBuffData[RECV_BUFF_SIZE];  //接收缓冲池
+	uint16         m_u2RecvBuffLength;                //接收缓冲长度
 };
 
 class CBaseCommand : public CClientCommand
