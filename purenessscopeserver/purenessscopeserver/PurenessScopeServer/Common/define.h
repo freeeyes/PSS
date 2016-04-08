@@ -233,6 +233,15 @@ enum EM_Server_Connect_State
 	SERVER_CONNECT_RECONNECT,
 };
 
+//服务器间通讯数据接收状态
+#define SERVER_RECV_TIMEOUT    20   //服务器间接收数据超时时间
+enum EM_Server_Recv_State
+{
+	SERVER_RECV_INIT = 0,     //未接收数据
+	SERVER_RECV_BEGIN,        //接收数据完成
+	SERVER_RECV_END,          //处理数据完成 
+};
+
 //日志编号声明
 #define LOG_SYSTEM                      1000
 #define LOG_SYSTEM_ERROR                1001

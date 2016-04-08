@@ -13,6 +13,8 @@ CConnectClient::CConnectClient(void)
     m_u4CostTime        = 0;
     m_u4MaxPacketSize   = MAX_MSG_PACKETLENGTH;
 	m_ems2s             = S2S_NEED_CALLBACK;
+
+	m_emRecvState       = SERVER_RECV_INIT;
 }
 
 CConnectClient::~CConnectClient(void)
@@ -277,6 +279,9 @@ int CConnectClient::RecvData()
 		uint16 u2CommandID             = 0;
 		ACE_Message_Block* pRecvFinish = NULL;
 
+		m_atvRecv     = ACE_OS::gettimeofday();
+		m_emRecvState = SERVER_RECV_BEGIN;
+
 		while(true)
 		{
 			bool blRet = m_pClientMessage->Recv_Format_data(m_pCurrMessage, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish);
@@ -292,6 +297,7 @@ int CConnectClient::RecvData()
 				break;
 			}
 		}
+		m_emRecvState = SERVER_RECV_END;
     }
 
     m_pCurrMessage->reset();
@@ -404,6 +410,9 @@ int CConnectClient::RecvData_et()
 			uint16 u2CommandID             = 0;
 			ACE_Message_Block* pRecvFinish = NULL;
 
+			m_atvRecv     = ACE_OS::gettimeofday();
+			m_emRecvState = SERVER_RECV_BEGIN;
+
 			while(true)
 			{
 				bool blRet = m_pClientMessage->Recv_Format_data(m_pCurrMessage, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish);
@@ -419,6 +428,7 @@ int CConnectClient::RecvData_et()
 					break;
 				}
 			}
+			m_emRecvState = SERVER_RECV_END;
 	    }
 	
 	    m_pCurrMessage->reset();
@@ -585,4 +595,22 @@ _ClientConnectInfo CConnectClient::GetClientConnectInfo()
     ClientConnectInfo.m_u4BeginTime   = (uint32)m_atvBegin.sec();
     return ClientConnectInfo;
 }
+
+bool CConnectClient::GetTimeout()
+{
+	ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+	ACE_Time_Value tvIntval(tvNow - m_atvRecv);
+
+	if(m_emRecvState == SERVER_RECV_BEGIN && tvIntval.sec() > SERVER_RECV_TIMEOUT)
+	{
+		//接收数据处理已经超时，在这里打印出来
+		OUR_DEBUG((LM_DEBUG,"[CConnectClient::GetTimeout]***(%d)recv dispose is timeout(%d)!***.\n", m_nServerID, tvIntval.sec()));	
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+
 

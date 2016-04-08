@@ -15,6 +15,8 @@ CProConnectClient::CProConnectClient(void)
 	m_u4RecvSize        = 0;
 	m_u4RecvCount       = 0;
 	m_u4CostTime        = 0;
+
+	m_emRecvState       = SERVER_RECV_INIT;
 }
 
 CProConnectClient::~CProConnectClient(void)
@@ -154,6 +156,9 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 			uint16 u2CommandID             = 0;
 			ACE_Message_Block* pRecvFinish = NULL;
 
+			m_atvRecv     = ACE_OS::gettimeofday();
+			m_emRecvState = SERVER_RECV_BEGIN;
+
 			while(true)
 			{
 				bool blRet = m_pClientMessage->Recv_Format_data(&mb, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish);
@@ -172,6 +177,8 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 
 		}
 		mb.release();
+		m_emRecvState = SERVER_RECV_END;
+
 
 		//接受下一个数据包
 		RecvData(App_MainConfig::instance()->GetConnectServerRecvBuffer());
@@ -204,6 +211,23 @@ void CProConnectClient::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
 void CProConnectClient::addresses(const ACE_INET_Addr &remote_address, const ACE_INET_Addr &local_address)
 {
 	m_AddrRemote = remote_address;
+}
+
+bool CProConnectClient::GetTimeout()
+{
+	ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+	ACE_Time_Value tvIntval(tvNow - m_atvRecv);
+
+	if(m_emRecvState == SERVER_RECV_BEGIN && tvIntval.sec() > SERVER_RECV_TIMEOUT)
+	{
+		//接收数据处理已经超时，在这里打印出来
+		OUR_DEBUG((LM_DEBUG,"[CProConnectClient::GetTimeout]***(%d)recv dispose is timeout(%d)!***.\n", m_nServerID, tvIntval.sec()));	
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }
 
 bool CProConnectClient::RecvData(uint32 u4PacketLen)
