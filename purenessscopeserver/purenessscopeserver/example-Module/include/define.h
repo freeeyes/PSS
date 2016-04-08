@@ -233,6 +233,15 @@ enum EM_Server_Connect_State
 	SERVER_CONNECT_RECONNECT,
 };
 
+//服务器间通讯数据接收状态
+#define SERVER_RECV_TIMEOUT    20   //服务器间接收数据超时时间
+enum EM_Server_Recv_State
+{
+	SERVER_RECV_INIT = 0,     //未接收数据
+	SERVER_RECV_BEGIN,        //接收数据完成
+	SERVER_RECV_END,          //处理数据完成 
+};
+
 //日志编号声明
 #define LOG_SYSTEM                      1000
 #define LOG_SYSTEM_ERROR                1001
@@ -676,12 +685,14 @@ struct _Body_Info
 {
 	uint32             m_u4BodySrcLen;       //原始数据包体长（解析前）
 	uint32	           m_u4BodyCurrLen;      //当前数据包长 （解析后）
+	uint16             m_u2PacketCommandID;  //CommandID(如果有，则直接赋值，如果没有，则保持初始值不变)
 	ACE_Message_Block* m_pmbBody;            //包头消息体
 
 	_Body_Info()
 	{
 		m_u4BodySrcLen      = 0;
 		m_u4BodyCurrLen     = 0;
+		m_u2PacketCommandID = 0;
 		m_pmbBody           = NULL;
 	}
 };
@@ -1108,7 +1119,7 @@ inline uint64 ntohl64(uint64 u8Data)
 //定义一个函数，可支持字符串替换，目前先不考虑支持中文
 inline bool Replace_String(char* pText, uint32 u4Len, const char* pOld, const char* pNew)
 {
-	char* pTempSrc = new char(u4Len);
+    char* pTempSrc = new char[u4Len];
 
 	memcpy_safe(pText, u4Len, pTempSrc, u4Len);
 	pTempSrc[u4Len - 1] = '\0';
