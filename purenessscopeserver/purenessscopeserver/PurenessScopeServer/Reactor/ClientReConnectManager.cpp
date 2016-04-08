@@ -688,6 +688,11 @@ int CClientReConnectManager::handle_timeout(const ACE_Time_Value& tv, const void
 			//如果连接不存在，则重新建立连接
 			pClientInfo->Run(m_blReactorFinish, SERVER_CONNECT_RECONNECT);
 		}
+		else
+		{
+			//检查当前连接，是否已挂起或死锁
+			pClientInfo->GetConnectClient()->GetTimeout();
+		}
 	}
 
 	return 0;

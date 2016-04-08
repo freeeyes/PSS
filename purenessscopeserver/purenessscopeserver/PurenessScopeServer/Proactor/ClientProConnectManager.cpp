@@ -678,6 +678,11 @@ int CClientProConnectManager::handle_timeout(const ACE_Time_Value &tv, const voi
 			pClientInfo->Run(m_blProactorFinish, SERVER_CONNECT_RECONNECT);
 
 		}
+		else
+		{
+			//检查当前连接，是否已挂起或死锁
+			pClientInfo->GetProConnectClient()->GetTimeout();
+		}
 	}
 
 	//OUR_DEBUG((LM_DEBUG, "[CClientProConnectManager::handle_timeout]End.\n"));
