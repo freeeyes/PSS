@@ -213,9 +213,8 @@ void CProConnectClient::addresses(const ACE_INET_Addr &remote_address, const ACE
 	m_AddrRemote = remote_address;
 }
 
-bool CProConnectClient::GetTimeout()
+bool CProConnectClient::GetTimeout(ACE_Time_Value tvNow)
 {
-	ACE_Time_Value tvNow = ACE_OS::gettimeofday();
 	ACE_Time_Value tvIntval(tvNow - m_atvRecv);
 
 	if(m_emRecvState == SERVER_RECV_BEGIN && tvIntval.sec() > SERVER_RECV_TIMEOUT)

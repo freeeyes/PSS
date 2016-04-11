@@ -261,6 +261,7 @@ public:
 	uint8  GetCommandAccount();
 	uint32 GetConnectServerTimeout();
 	uint16 GetConnectServerCheck();
+	uint8  GetConnectServerRunType();
 	uint16 GetSendQueuePutTime();
 	uint16 GetWorkQueuePutTime();
 	uint8  GetServerType();
@@ -359,11 +360,13 @@ private:
 	uint8      m_u1ConsoleIPType;                  //Console的IPType
 
 	uint8      m_u1CommandFlow;                    //命令调用统计，0为不统计，1为统计
+	
 
 	uint32     m_u4ReactorCount;                   //系统中遇到的反应器的个数
 	uint32     m_u4ConnectServerTimerout;          //连接远程服务器间隔时间  
 	uint16     m_u2ConnectServerCheck;             //服务器间连接单位检查时间
 	uint32     m_u4ConnectServerRecvBuff;          //服务器间的数据包接收缓冲大小
+	uint8      m_u1ConnectServerRunType;           //服务器间返回包处理模式，0为同步，1为异步
 	uint32     m_u4ServerRecvBuff;                 //接收从客户端到达的数据块的最大大小，只有PacketPrase流模式才会生效
 	uint32     m_u4SendDatamark;                   //发送差值的水位标（目前只有Proactor模式用这个）
 	uint32     m_u4BlockSize;                      //发送缓冲块大小设置

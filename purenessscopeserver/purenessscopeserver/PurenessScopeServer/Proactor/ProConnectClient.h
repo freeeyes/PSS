@@ -15,6 +15,7 @@
 #include "ClientMessage.h"
 #include "AceProactorManager.h"
 #include "LogManager.h"
+#include "ServerMessageTask.h"
 
 #define MAX_BUFF_1024 1024
 #define MAX_IP_LEN    16
@@ -37,7 +38,7 @@ public:
 	int  GetServerID();                                    //获得当前ServerID
 	bool SendData(ACE_Message_Block* pmblk);               //发送数据
 
-	bool GetTimeout();                                     //获得当前数据处理是否超时
+	bool GetTimeout(ACE_Time_Value tvNow);                 //获得当前数据处理是否超时
 
 	_ClientConnectInfo GetClientConnectInfo();             //得到当前链接信息
 

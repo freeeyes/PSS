@@ -36,6 +36,7 @@ CMainConfig::CMainConfig(void)
 	m_u4ConnectServerTimerout = 0;
 	m_u2ConnectServerCheck    = CONNECT_LIMIT_RETRY;
 	m_u4ConnectServerRecvBuff = MAX_BUFF_1024;
+	m_u1ConnectServerRunType  = 0;
 	m_u4ServerRecvBuff        = MAX_BUFF_1024;
 
 	m_u2RecvQueueTimeout    = MAX_QUEUE_TIMEOUT;
@@ -868,6 +869,12 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
 		m_u4ConnectServerRecvBuff = (uint32)ACE_OS::atoi(pData);
 	}
 
+	pData = m_MainConfig.GetData("ConnectServer", "RunType");
+	if(pData != NULL)
+	{
+		m_u1ConnectServerRunType = (uint32)ACE_OS::atoi(pData);
+	}
+
 	//开始获得监控数据
 	pData = m_MainConfig.GetData("Monitor", "CpuAndMemory");
 	if(pData != NULL)
@@ -1065,6 +1072,7 @@ void CMainConfig::Display()
 
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4ConnectServerTimerout = %d.\n", m_u4ConnectServerTimerout));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u2ConnectServerCheck = %d.\n", m_u2ConnectServerCheck));
+	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u1ConnectServerRunType = %d.\n", m_u1ConnectServerRunType));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4ConnectServerRecvBuff = %d.\n", m_u4ConnectServerRecvBuff));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u1CommandFlow = %d.\n", m_u1CommandFlow));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u1CommandAccount = %d.\n", m_u1CommandAccount));
@@ -1298,6 +1306,11 @@ uint32 CMainConfig::GetConnectServerTimeout()
 uint16 CMainConfig::GetConnectServerCheck()
 {
 	return m_u2ConnectServerCheck;
+}
+
+uint8 CMainConfig::GetConnectServerRunType()
+{
+	return m_u1ConnectServerRunType;
 }
 
 uint16 CMainConfig::GetSendQueuePutTime()
