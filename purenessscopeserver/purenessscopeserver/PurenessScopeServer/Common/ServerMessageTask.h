@@ -1,3 +1,6 @@
+#ifndef _SERVERMESSAGETASK_H
+#define _SERVERMESSAGETASK_H
+
 #include "define.h"
 #include "ace/Task.h"
 #include "ace/Synch.h"
@@ -65,3 +68,4 @@ private:
 };
 
 typedef ACE_Singleton<CServerMessageTask, ACE_Recursive_Thread_Mutex> App_ServerMessageTask;
+#endif

@@ -410,6 +410,12 @@ bool CProServerManager::Start()
 	//开始消息处理线程
 	App_MessageServiceGroup::instance()->Start();
 
+	if(App_MainConfig::instance()->GetConnectServerRunType() == 1)
+	{
+		//启动异步处理服务器间消息包的过程
+		App_ServerMessageTask::instance()->Start();
+	}
+
 	//开始启动链接发送定时器
 	App_ProConnectManager::instance()->StartTimer();
 

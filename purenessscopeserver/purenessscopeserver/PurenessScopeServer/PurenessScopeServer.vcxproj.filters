@@ -325,6 +325,7 @@
     <ClCompile Include="Mail\smtp.cpp">
       <Filter>Mail\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="Common\ServerMessageTask.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Encrypt\Aes.h">
@@ -630,6 +631,7 @@
     <ClInclude Include="IObject\IServerManager.h">
       <Filter>IObject</Filter>
     </ClInclude>
+    <ClInclude Include="Common\ServerMessageTask.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Reactor\My_Dev_Poll_Reactor.inl">

@@ -691,7 +691,8 @@ int CClientReConnectManager::handle_timeout(const ACE_Time_Value& tv, const void
 		else
 		{
 			//检查当前连接，是否已挂起或死锁
-			pClientInfo->GetConnectClient()->GetTimeout();
+			ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+			pClientInfo->GetConnectClient()->GetTimeout(tvNow);
 		}
 	}
 

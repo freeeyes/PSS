@@ -287,10 +287,23 @@ int CConnectClient::RecvData()
 			bool blRet = m_pClientMessage->Recv_Format_data(m_pCurrMessage, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish);
 			if(true == blRet)
 			{
-				//调用数据包处理
-				m_pClientMessage->RecvData(u2CommandID, pRecvFinish, objServerIPInfo);
-				//回收处理包
-				App_MessageBlockManager::instance()->Close(pRecvFinish);
+				if(App_MainConfig::instance()->GetConnectServerRunType() == 0)
+				{
+					//调用数据包处理
+					m_pClientMessage->RecvData(u2CommandID, pRecvFinish, objServerIPInfo);
+					//回收处理包
+					App_MessageBlockManager::instance()->Close(pRecvFinish);
+				}
+				else
+				{
+					//异步消息处理
+					_Server_Message_Info* pServer_Message_Info = new _Server_Message_Info();
+					pServer_Message_Info->m_pClientMessage  = m_pClientMessage;
+					pServer_Message_Info->m_objServerIPInfo = objServerIPInfo;
+					pServer_Message_Info->m_pRecvFinish     = pRecvFinish;
+					pServer_Message_Info->m_u2CommandID     = u2CommandID;
+					App_ServerMessageTask::instance()->PutMessage(pServer_Message_Info);
+				}
 			}
 			else
 			{
@@ -418,10 +431,23 @@ int CConnectClient::RecvData_et()
 				bool blRet = m_pClientMessage->Recv_Format_data(m_pCurrMessage, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish);
 				if(true == blRet)
 				{
-					//调用数据包处理
-					m_pClientMessage->RecvData(u2CommandID, pRecvFinish, objServerIPInfo);
-					//回收处理包
-					App_MessageBlockManager::instance()->Close(pRecvFinish);
+					if(App_MainConfig::instance()->GetConnectServerRunType() == 0)
+					{
+						//调用数据包处理
+						m_pClientMessage->RecvData(u2CommandID, pRecvFinish, objServerIPInfo);
+						//回收处理包
+						App_MessageBlockManager::instance()->Close(pRecvFinish);
+					}
+					else
+					{
+						//异步消息处理
+						_Server_Message_Info* pServer_Message_Info = new _Server_Message_Info();
+						pServer_Message_Info->m_pClientMessage  = m_pClientMessage;
+						pServer_Message_Info->m_objServerIPInfo = objServerIPInfo;
+						pServer_Message_Info->m_pRecvFinish     = pRecvFinish;
+						pServer_Message_Info->m_u2CommandID     = u2CommandID;
+						App_ServerMessageTask::instance()->PutMessage(pServer_Message_Info);
+					}
 				}
 				else
 				{
@@ -596,9 +622,8 @@ _ClientConnectInfo CConnectClient::GetClientConnectInfo()
     return ClientConnectInfo;
 }
 
-bool CConnectClient::GetTimeout()
+bool CConnectClient::GetTimeout(ACE_Time_Value tvNow)
 {
-	ACE_Time_Value tvNow = ACE_OS::gettimeofday();
 	ACE_Time_Value tvIntval(tvNow - m_atvRecv);
 
 	if(m_emRecvState == SERVER_RECV_BEGIN && tvIntval.sec() > SERVER_RECV_TIMEOUT)
