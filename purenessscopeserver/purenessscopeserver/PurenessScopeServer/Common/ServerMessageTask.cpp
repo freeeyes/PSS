@@ -186,4 +186,100 @@ bool CServerMessageTask::CheckServerMessageThread(ACE_Time_Value tvNow)
 
 }
 
+//************************************************
 
+CServerMessageManager::CServerMessageManager()
+{
+	m_pServerMessageTask = NULL;
+	Init();
+}
+
+CServerMessageManager::~CServerMessageManager()
+{
+	SAFE_DELETE(m_pServerMessageTask);
+}
+
+void CServerMessageManager::Init()
+{
+	if(NULL == m_pServerMessageTask)
+	{
+		m_pServerMessageTask = new CServerMessageTask();
+	}
+}
+
+bool CServerMessageManager::Start()
+{
+	if(NULL != m_pServerMessageTask)
+	{
+		return m_pServerMessageTask->Start();
+	}
+	else
+	{
+		return false;
+	}
+}
+
+int CServerMessageManager::Close()
+{
+	if(NULL != m_pServerMessageTask)
+	{
+		return m_pServerMessageTask->Close();
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+bool CServerMessageManager::PutMessage(_Server_Message_Info* pMessage)
+{
+	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
+	if(NULL != m_pServerMessageTask)
+	{
+		return m_pServerMessageTask->PutMessage(pMessage);
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool CServerMessageManager::CheckServerMessageThread(ACE_Time_Value tvNow)
+{
+	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
+	if(NULL != m_pServerMessageTask)
+	{
+		bool blRet = m_pServerMessageTask->CheckServerMessageThread(tvNow);
+		if(false == tvNow)
+		{
+			OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::CheckServerMessageThread]***App_ServerMessageTask Thread is DEAD***.\n"));
+			
+			//如果发现已经可能死亡，尝试重启线程
+#ifdef WIN32
+			ACE_hthread_t hthread = 0; 
+			int grp_id = m_pServerMessageTask->grp_id(); 
+			if (ACE_Thread_Manager::instance()->hthread_grp_list(grp_id, &hthread, 1) == 1)
+			{
+				int ret = ::TerminateThread (hthread, -1); 
+				ACE_Thread_Manager::instance()->wait_grp (grp_id); 
+				OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::CheckServerMessageThread]kill return %d, %d\n", ret, GetLastError())); 
+			}
+#else
+			int grp_id = m_pServerMessageTask->grp_id(); 
+			int ret = ACE_Thread_Manager::instance()->kill_grp(grp_id, SIGUSR1);
+			OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::CheckServerMessageThread]kill return %d OK.\n", ret)); 
+#endif
+			SAFE_DELETE(m_pServerMessageTask);
+
+			//重建并重启相应线程
+			Init();
+			Start();
+		}
+
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}

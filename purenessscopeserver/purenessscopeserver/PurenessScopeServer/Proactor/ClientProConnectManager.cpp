@@ -683,6 +683,12 @@ int CClientProConnectManager::handle_timeout(const ACE_Time_Value &tv, const voi
 			//检查当前连接，是否已挂起或死锁
 			ACE_Time_Value tvNow = ACE_OS::gettimeofday();
 			pClientInfo->GetProConnectClient()->GetTimeout(tvNow);
+
+			//如果是异步模式，则需要检查处理线程是否被挂起
+			if(App_MainConfig::instance()->GetConnectServerRunType() == 1)
+			{
+				App_ServerMessageTask::instance()->CheckServerMessageThread(tvNow);
+			}
 		}
 	}
 

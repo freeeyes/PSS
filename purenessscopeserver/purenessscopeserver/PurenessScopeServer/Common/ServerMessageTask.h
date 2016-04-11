@@ -67,5 +67,24 @@ private:
 
 };
 
-typedef ACE_Singleton<CServerMessageTask, ACE_Recursive_Thread_Mutex> App_ServerMessageTask;
+class CServerMessageManager
+{
+public:
+	CServerMessageManager();
+	~CServerMessageManager();
+
+	void Init();
+
+	bool Start();
+	int  Close();
+	bool PutMessage(_Server_Message_Info* pMessage);
+	bool CheckServerMessageThread(ACE_Time_Value tvNow);
+
+private:
+	CServerMessageTask*         m_pServerMessageTask;
+	ACE_Recursive_Thread_Mutex  m_ThreadWritrLock; 
+};
+
+
+typedef ACE_Singleton<CServerMessageManager, ACE_Recursive_Thread_Mutex> App_ServerMessageTask;
 #endif
