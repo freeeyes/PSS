@@ -160,6 +160,12 @@ bool CServerMessageTask::PutMessage(_Server_Message_Info* pMessage)
 
 bool CServerMessageTask::ProcessMessage(_Server_Message_Info* pMessage, uint32 u4ThreadID)
 {
+	if(NULL == pMessage)
+	{
+		OUR_DEBUG((LM_DEBUG, "[CServerMessageTask::ProcessMessage]u4ThreadID=%d, pMessage is NULL\n", u4ThreadID)); 
+		return false;
+	}
+
 	m_tvDispose = ACE_OS::gettimeofday();
 
 	m_emState   = SERVER_RECV_BEGIN;
@@ -250,7 +256,7 @@ bool CServerMessageManager::CheckServerMessageThread(ACE_Time_Value tvNow)
 	if(NULL != m_pServerMessageTask)
 	{
 		bool blRet = m_pServerMessageTask->CheckServerMessageThread(tvNow);
-		if(false == tvNow)
+		if(false == blRet)
 		{
 			OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::CheckServerMessageThread]***App_ServerMessageTask Thread is DEAD***.\n"));
 			

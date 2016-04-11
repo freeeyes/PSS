@@ -32,7 +32,7 @@
 	<ThreadInfo ThreadTimeout="30" ThreadTimeCheck="120" DisposeTimeout="40" PutQueueTimeout = "100" desc="工作线程相关参数" />
 	<ThreadInfoAI AI="0" CheckTime="60" TimeoutCount="5" StopTime="30" ReturnDataType="1" ReturnData="02 00 00 00 ff ff" desc="工作线程负载自我监控相关设置，AI=0关闭，1打开" />
 	<ClientInfo HandlerCount="5000" MaxHandlerCount="10000" MaxConnectTime="60" CheckAliveTime="60" MaxBuffRecv="1024"  desc="客户端链接相关参数"/>
-	<ConnectServer TimeInterval="500" TimeCheck="30" Recvbuff="1024" desc="框架连接其它远程服务器相关参数，TimeInterval是连接每个服务器之间的保护时间，单位是毫秒" />
+	<ConnectServer TimeInterval="500" TimeCheck="30" Recvbuff="1024" RunType="0" desc="框架连接其它远程服务器相关参数，TimeInterval是连接每个服务器之间的保护时间，单位是毫秒" />
 	<Monitor CpuAndMemory="0"  CpuMax="50" MemoryMax="1000" desc="是否对CPU和内存定时监控，并输出日志，0为关闭监控，1是打开监控" />
 	<AceDebug TrunOn="0" DebugName="./serverdebug.log" ChkInterval="600" LogFileMaxSize="10240" LogFileMaxCnt="3" Level="" desc="ACEDEBUG文件输出配置，TrunOn=0为不使用，1为使用" />
 	
