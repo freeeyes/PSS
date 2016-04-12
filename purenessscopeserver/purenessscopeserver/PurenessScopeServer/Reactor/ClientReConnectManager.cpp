@@ -452,9 +452,9 @@ bool CClientReConnectManager::Close(int nServerID, EM_s2s ems2s)
 
 	if(S2S_NEED_CALLBACK == ems2s)
 	{
-		//SAFE_DELETE(pClientInfo);
+		SAFE_DELETE(pClientInfo);
 		//从map里面删除当前存在的对象
-		//m_mapConnectInfo.erase(f);
+		m_mapConnectInfo.erase(f);
 	}
 	else
 	{

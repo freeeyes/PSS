@@ -426,7 +426,7 @@ bool CClientProConnectManager::Close(int nServerID, EM_s2s ems2s)
 	mapProactorClientInfo::iterator f = m_mapClientInfo.find(nServerID);
 	if(f == m_mapClientInfo.end())
 	{
-		//如果这个链接已经存在，则不创建新的链接
+		//如果这个链接不存在，则什么都不做
 		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Close]nServerID =(%d) is not exist.\n", nServerID));
 		return false;
 	}
@@ -448,9 +448,9 @@ bool CClientProConnectManager::Close(int nServerID, EM_s2s ems2s)
 
 	if(S2S_NEED_CALLBACK == ems2s)
 	{
-		//SAFE_DELETE(pClientInfo);
+		SAFE_DELETE(pClientInfo);
 		//从map里面删除当前存在的对象
-		//m_mapClientInfo.erase(f);
+		m_mapClientInfo.erase(f);
 	}
 	else
 	{
@@ -754,7 +754,7 @@ bool CClientProConnectManager::CloseByClient(int nServerID)
 	mapProactorClientInfo::iterator f = m_mapClientInfo.find(nServerID);
 	if(f == m_mapClientInfo.end())
 	{
-		//如果这个链接已经存在，则不创建新的链接
+		//这个链接信息不存在
 		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::CloseByClient]nServerID =(%d) is not exist.\n", nServerID));
 		return false;
 	}
