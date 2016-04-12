@@ -78,6 +78,10 @@ CPacketParse* CPacketParsePool::Create()
 
 		if(pPacket != NULL)
 		{
+			//设置默认包头长度
+			pPacket->SetPacket_Mode(App_MainConfig::instance()->GetPacketParseInfo()->m_u1Type);
+			pPacket->SetPacket_Head_Src_Length( App_MainConfig::instance()->GetPacketParseInfo()->m_u4OrgLength);
+
 			//添加到Free map里面
 			mapPacketParse::iterator f = m_mapPacketFree.find(pPacket);
 			if(f == m_mapPacketFree.end())
