@@ -36,6 +36,8 @@ public:
 	virtual IClientMessage* GetClientMessage(int nServerID)                                                                          = 0;
 	//获得一个ServerID对应的IP信息
 	virtual bool GetServerIPInfo(int nServerID, _ClientIPInfo& objServerIPInfo)                                                      = 0;
+	//删除一个正在使用的IClientMessage
+	virtual bool DeleteIClientMessage(IClientMessage* pClientMessage)                                                                = 0;
 };
 
 #endif

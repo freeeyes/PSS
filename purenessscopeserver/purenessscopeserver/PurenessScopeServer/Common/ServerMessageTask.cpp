@@ -166,6 +166,13 @@ bool CServerMessageTask::ProcessMessage(_Server_Message_Info* pMessage, uint32 u
 		return false;
 	}
 
+	//如果此数据处理指针已经不是有效指针，直接返回。
+	if(CheckValidClientMessage(pMessage->m_pClientMessage) == false)
+	{
+		OUR_DEBUG((LM_DEBUG, "[CServerMessageTask::ProcessMessage]u4ThreadID=%d, m_pClientMessage is NULL\n", u4ThreadID)); 
+		return true;
+	}
+
 	m_tvDispose = ACE_OS::gettimeofday();
 
 	m_emState   = SERVER_RECV_BEGIN;
@@ -190,6 +197,49 @@ bool CServerMessageTask::CheckServerMessageThread(ACE_Time_Value tvNow)
 		return true;
 	}
 
+}
+
+void CServerMessageTask::AddClientMessage(IClientMessage* pClientMessage)
+{
+	//先查找有效的列表中是否包含此指针
+	for(int i = 0; i < (int)m_vecValidIClientMessage.size(); i++)
+	{
+		if(m_vecValidIClientMessage[i] == pClientMessage)
+		{
+			//找到了，什么都不做
+			return;
+		}
+	}
+
+	m_vecValidIClientMessage.push_back(pClientMessage);
+
+}
+
+void CServerMessageTask::DelClientMessage(IClientMessage* pClientMessage)
+{
+	//先查找有效的列表中是否包含此指针
+	for(vecValidIClientMessage::iterator b = m_vecValidIClientMessage.begin(); b != m_vecValidIClientMessage.end(); b++)
+	{
+		if((IClientMessage* )*b == pClientMessage)
+		{
+			//找到了，什么都不做
+			m_vecValidIClientMessage.erase(b);
+			return;
+		}
+	}
+}
+
+bool CServerMessageTask::CheckValidClientMessage(IClientMessage* pClientMessage)
+{
+	for(int i = 0; i < (int)m_vecValidIClientMessage.size(); i++)
+	{
+		if(m_vecValidIClientMessage[i] == pClientMessage)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 //************************************************
@@ -287,5 +337,23 @@ bool CServerMessageManager::CheckServerMessageThread(ACE_Time_Value tvNow)
 	else
 	{
 		return true;
+	}
+}
+
+void CServerMessageManager::AddClientMessage(IClientMessage* pClientMessage)
+{
+	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
+	if(NULL != m_pServerMessageTask)
+	{
+		return m_pServerMessageTask->AddClientMessage(pClientMessage);
+	}
+}
+
+void CServerMessageManager::DelClientMessage(IClientMessage* pClientMessage)
+{
+	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
+	if(NULL != m_pServerMessageTask)
+	{
+		return m_pServerMessageTask->DelClientMessage(pClientMessage);
 	}
 }

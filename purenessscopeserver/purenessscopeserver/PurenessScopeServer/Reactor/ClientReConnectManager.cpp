@@ -268,6 +268,9 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, int nPort,
 	//链接已经建立，添加进map
 	m_mapConnectInfo[nServerID] = pClientInfo;
 
+	//添加有效的pClientMessage
+	App_ServerMessageTask::instance()->AddClientMessage(pClientMessage);
+
 	if (false == pClientInfo->Init(nServerID, pIP, nPort, u1IPType, &m_ReactorConnect, pClientMessage, m_pReactor))
 	{
 		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]pClientInfo Init Error.\n"));
@@ -314,6 +317,9 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, int nPort,
 
 	//链接已经建立，添加进map
 	m_mapConnectInfo[nServerID] = pClientInfo;
+
+	//添加有效的pClientMessage
+	App_ServerMessageTask::instance()->AddClientMessage(pClientMessage);
 
 	if (false == pClientInfo->Init(nServerID, pIP, nPort, u1IPType, &m_ReactorConnect, pClientMessage, m_pReactor))
 	{
@@ -881,4 +887,38 @@ bool CClientReConnectManager::GetServerIPInfo( int nServerID, _ClientIPInfo& obj
 		objServerIPInfo.m_nPort = remote_addr.get_port_number();
 		return true;
 	}
+}
+
+bool CClientReConnectManager::DeleteIClientMessage(IClientMessage* pClientMessage)
+{
+	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
+
+	//将异步回调有效队列中此pClientMessage设置为无效
+	App_ServerMessageTask::instance()->DelClientMessage(pClientMessage);
+
+	//一一寻找与之对应的连接以及相关信息并删除之
+	for(mapReactorConnectInfo::iterator b = m_mapConnectInfo.begin(); b!= m_mapConnectInfo.end();)
+	{
+		CReactorClientInfo* pClientInfo = (CReactorClientInfo*)b->second;
+
+		if(NULL != pClientInfo && pClientInfo->GetClientMessage() == pClientMessage)
+		{
+			//关闭连接，并删除对象。
+			//关闭链接对象
+			if (NULL != pClientInfo->GetConnectClient())
+			{
+				EM_s2s ems2s = S2S_INNEED_CALLBACK;
+				pClientInfo->GetConnectClient()->ClientClose(ems2s);
+			}
+
+			SAFE_DELETE(pClientInfo);
+			m_mapConnectInfo.erase(b++);
+		}
+		else
+		{
+			b++;
+		}
+	}
+
+	return true;
 }

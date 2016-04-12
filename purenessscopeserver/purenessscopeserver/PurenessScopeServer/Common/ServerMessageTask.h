@@ -55,7 +55,12 @@ public:
 
 	bool CheckServerMessageThread(ACE_Time_Value tvNow);
 
+	void AddClientMessage(IClientMessage* pClientMessage);
+
+	void DelClientMessage(IClientMessage* pClientMessage);
+
 private:
+	bool CheckValidClientMessage(IClientMessage* pClientMessage);
 	bool ProcessMessage(_Server_Message_Info* pMessage, uint32 u4ThreadID);
 
 private:
@@ -65,6 +70,10 @@ private:
 	EM_Server_Recv_State m_emState;     //处理状态
 	ACE_Time_Value       m_tvDispose;   //接收数据包处理时间
 
+	//记录当前有效的IClientMessage，因为是异步的关系。
+	//这里必须保证回调的时候IClientMessage是合法的。
+	typedef vector<IClientMessage*> vecValidIClientMessage;
+	vecValidIClientMessage m_vecValidIClientMessage;
 };
 
 class CServerMessageManager
@@ -79,6 +88,9 @@ public:
 	int  Close();
 	bool PutMessage(_Server_Message_Info* pMessage);
 	bool CheckServerMessageThread(ACE_Time_Value tvNow);
+
+	void AddClientMessage(IClientMessage* pClientMessage);
+	void DelClientMessage(IClientMessage* pClientMessage);
 
 private:
 	CServerMessageTask*         m_pServerMessageTask;
