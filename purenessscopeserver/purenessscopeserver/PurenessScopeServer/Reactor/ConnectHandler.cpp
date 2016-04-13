@@ -89,19 +89,16 @@ bool CConnectHandler::Close(int nIOCount)
 		//调用连接断开消息
 		App_PacketParseLoader::instance()->GetPacketParseInfo()->DisConnect(GetConnectID());
 
-		if(m_u1ConnectState != CONNECT_SERVER_CLOSE)
+		//组织数据
+		_MakePacket objMakePacket;
+
+		objMakePacket.m_u4ConnectID       = GetConnectID();
+		objMakePacket.m_pPacketParse      = NULL;
+
+		//发送客户端链接断开消息。
+		if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket))
 		{
-			//组织数据
-			_MakePacket objMakePacket;
-
-			objMakePacket.m_u4ConnectID       = GetConnectID();
-			objMakePacket.m_pPacketParse      = NULL;
-
-			//发送客户端链接断开消息。
-			if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket))
-			{
-				OUR_DEBUG((LM_ERROR, "[CConnectHandler::Close] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
-			}
+			OUR_DEBUG((LM_ERROR, "[CConnectHandler::Close] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 		}
 
 		//msg_queue()->deactivate();

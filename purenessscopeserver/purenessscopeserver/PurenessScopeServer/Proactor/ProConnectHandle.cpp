@@ -109,21 +109,17 @@ bool CProConnectHandle::Close(int nIOCount, int nErrno)
 			m_u4RecvQueueCount, 
 			m_u8RecvQueueTimeCost, 
 			m_u8SendQueueTimeCost);
-		//因为是要关闭连接，所以要多关闭一次IO，对应Open设置的1的初始值
 
-		if(m_u1ConnectState != CONNECT_SERVER_CLOSE)
+		//组织数据
+		_MakePacket objMakePacket;
+
+		objMakePacket.m_u4ConnectID       = GetConnectID();
+		objMakePacket.m_pPacketParse      = NULL;
+
+		//发送客户端链接断开消息。
+		if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket))
 		{
-			//组织数据
-			_MakePacket objMakePacket;
-
-			objMakePacket.m_u4ConnectID       = GetConnectID();
-			objMakePacket.m_pPacketParse      = NULL;
-
-			//发送客户端链接断开消息。
-			if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket))
-			{
-				OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
-			}
+			OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 		}
 
 		m_Reader.cancel();
