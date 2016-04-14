@@ -19,7 +19,7 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 {	
 	if(m_pServerObject == NULL)
 	{
-		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL.\n"));
+		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL(%d).\n", bDeleteFlag));
 		return -1;
 	}
 
@@ -101,14 +101,16 @@ int CBaseCommand::Do_DisConnect(IMessage* pMessage)
 
 int CBaseCommand::Do_ClientSendTimeout(IMessage* pMessage)
 {
+	if(NULL != pMessage)
+	{
+		OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_ClientSendTimeout] ClientSendTimeout.\n"));
+	}
+	
 	return 0;
 }
 
 int CBaseCommand::Do_PostBase(IMessage* pMessage)
 {
-	uint32     u4PacketLen = 0;
-	uint16     u2CommandID = 0;
-
 	_PacketInfo objPacketInfo;
 	pMessage->GetPacketBody(objPacketInfo);
 

@@ -97,7 +97,7 @@ public:
 		//创建完整数据包
 		memcpy_safe(m_szRecvBuffData, 8, mbFinishRecv->wr_ptr(), 8);
 		mbFinishRecv->wr_ptr(8);
-
+		
 		//数据缓冲向前移位
 		if(m_u2RecvBuffLength - 8 > 0)
 		{
@@ -127,6 +127,10 @@ public:
 			uint32 u4SendLength = u4PacketLength + sizeof(uint32);
 			m_pServerObject->GetConnectManager()->PostMessage(m_u4ConnectID, pData, u4SendLength, SENDMESSAGE_JAMPNOMAL, u2RetCommand, PACKET_SEND_IMMEDIATLY, PACKET_IS_FRAMEWORK_RECYC);
 			OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData](%d)Send Data(%d) OK.\n", m_u4ConnectID, u4SendLength));
+		}
+		else
+		{
+			OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData]Get packet error(%s:%d).\n", objServerIPInfo.m_szClientIP, objServerIPInfo.m_nPort));
 		}
 
 		return true;
@@ -185,7 +189,7 @@ public:
 
 	bool ConnectError(int nError,  _ClientIPInfo objServerIPInfo)
 	{
-		OUR_DEBUG((LM_ERROR, "[CPostServerData::ConnectError]Get Error(%d).\n", nError));
+		OUR_DEBUG((LM_ERROR, "[CPostServerData::ConnectError]Get Error[%s:%d](%d).\n", objServerIPInfo.m_szClientIP, objServerIPInfo.m_nPort, nError));
 		return true;
 	};
 
@@ -193,7 +197,7 @@ public:
 	{
 		//数据重连成功接口
 		//m_u4ServerID = (uint32)nServerID;
-		OUR_DEBUG((LM_ERROR, "[CPostServerData::ReConnect]ReConnect(%d).\n", m_u4ServerID));
+		OUR_DEBUG((LM_ERROR, "[CPostServerData::ReConnect]ReConnect(%d).\n", nServerID));
 		if(m_u2SendBuffLength > 0)
 		{
 			//发送数据

@@ -87,7 +87,6 @@ void CProxyManager::DelClient2Server(uint32 u4ClientID)
 		CPostServerData* pPostServerData = (CPostServerData* )f->second;
 		if(NULL != pPostServerData)
 		{
-			uint32 u4ServerID = pPostServerData->GetServerID();
 			pPostServerData->Close(S2S_INNEED_CALLBACK);
 			SAFE_DELETE(pPostServerData);
 		}

@@ -347,7 +347,7 @@ bool CServerManager::Start()
 	//Æô¶¯¶¨Ê±Æ÷
 	if (0 != App_TimerManager::instance()->activate())
 	{
-		OUR_DEBUG((LM_INFO, "[CProServerManager::Start]App_TimerManager::instance()->Start() is error.\n"));
+		OUR_DEBUG((LM_INFO, "[CServerManager::Start]App_TimerManager::instance()->Start() is error.\n"));
 		return false;
 	}
 
@@ -386,7 +386,7 @@ bool CServerManager::Start()
 
 			if(false == blState)
 			{
-				OUR_DEBUG((LM_INFO, "[CProServerManager::Start]LoadModule (%s)is error.\n", pModuleConfig->m_szModuleName));
+				OUR_DEBUG((LM_INFO, "[CServerManager::Start]LoadModule (%s)is error.\n", pModuleConfig->m_szModuleName));
 				return false;
 			}
 		}
