@@ -28,7 +28,7 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 
 	if(m_pServerObject == NULL)
 	{
-		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL.\n"));
+		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL(%d).\n", bDeleteFlag));
 		return -1;
 	}
 
@@ -83,10 +83,6 @@ int CBaseCommand::Do_ClientSendTimeout(IMessage* pMessage)
 
 int CBaseCommand::Do_Base(IMessage* pMessage)
 {
-	uint32     u4PacketLen  = 0;
-	uint16     u2CommandID  = 0;
-	uint64     u8ClientTime = 0;
-
 	//OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] TcpTest CommandID = %d", COMMAND_BASE));
 	//m_pServerObject->GetLogManager()->WriteToMail(LOG_SYSTEM, 1, "╡Бйтсй╪Ч", "╡Бйт");
 
