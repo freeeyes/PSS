@@ -578,7 +578,7 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value &tv, const void *a
 
 				//需要重启工作线程，先关闭当前的工作线程
 				pMessageService->Close();
-				delete pMessageService;
+				SAFE_DELETE(pMessageService);
 
 				//创建一个新的工作线程，并赋值进去
 				pMessageService = new CMessageService();

@@ -51,6 +51,10 @@ public:
 
 	uint32 GetThreadID();
 
+#ifdef __LINUX__
+	pthread_t Get_Thread_ID();
+#endif
+
 	bool PutMessage(_Server_Message_Info* pMessage);
 
 	bool CheckServerMessageThread(ACE_Time_Value tvNow);
@@ -74,6 +78,10 @@ private:
 	//这里必须保证回调的时候IClientMessage是合法的。
 	typedef vector<IClientMessage*> vecValidIClientMessage;
 	vecValidIClientMessage m_vecValidIClientMessage;
+
+#ifdef __LINUX__
+	pthread_t m_tid;                                      //linux下维护线程需要的线程ID
+#endif
 };
 
 class CServerMessageManager

@@ -8,6 +8,10 @@ CServerMessageTask::CServerMessageTask()
 	m_blRun      = false;
 	m_u4MaxQueue = MAX_SERVER_MESSAGE_QUEUE;
 	m_emState    = SERVER_RECV_INIT;
+
+#ifdef __LINUX__
+	m_tid = 0;
+#endif
 }
 
 CServerMessageTask::~CServerMessageTask()
@@ -70,6 +74,10 @@ int CServerMessageTask::svc(void)
 	ACE_Time_Value tvSleep(0, MAX_MSG_SENDCHECKTIME*MAX_BUFF_1000);
 	ACE_OS::sleep(tvSleep);
 
+#ifdef __LINUX__
+	m_tid  = pthread_self();
+#endif
+
 	while(IsRun())
 	{
 		mb = NULL;
@@ -107,6 +115,13 @@ uint32 CServerMessageTask::GetThreadID()
 {
 	return m_u4ThreadID;
 }
+
+#ifdef __LINUX__
+pthread_t CServerMessageTask::Get_Thread_ID()
+{
+	return m_tid;
+}
+#endif
 
 bool CServerMessageTask::PutMessage(_Server_Message_Info* pMessage)
 {
@@ -321,10 +336,12 @@ bool CServerMessageManager::CheckServerMessageThread(ACE_Time_Value tvNow)
 				OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::CheckServerMessageThread]kill return %d, %d\n", ret, GetLastError())); 
 			}
 #else
-			int grp_id = m_pServerMessageTask->grp_id(); 
-			int ret = ACE_Thread_Manager::instance()->kill_grp(grp_id, SIGUSR1);
+			//int grp_id = m_pServerMessageTask->grp_id(); 
+			//int ret = ACE_Thread_Manager::instance()->kill_grp(grp_id, SIGUSR1);
+			int ret = pthread_cancel(m_pServerMessageTask->Get_Thread_ID());  
 			OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::CheckServerMessageThread]kill return %d OK.\n", ret)); 
 #endif
+			m_pServerMessageTask->Close();
 			SAFE_DELETE(m_pServerMessageTask);
 
 			//重建并重启相应线程
