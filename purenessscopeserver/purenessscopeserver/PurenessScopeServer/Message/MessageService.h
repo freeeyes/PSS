@@ -75,6 +75,10 @@ public:
 
 	uint32 GetThreadID();
 
+#ifdef __LINUX__
+	pthread_t Get_Thread_ID();
+#endif
+
 	CMessage* CreateMessage();
 	void DeleteMessage(CMessage* pMessage);
 
@@ -101,6 +105,11 @@ private:
 	CWorkThreadAI                  m_WorkThreadAI;        //线程自我监控的AI逻辑  
 	CCommandAccount                m_CommandAccount;      //当前线程命令统计数据
 	CMessagePool                   m_MessagePool;         //消息池  
+
+#ifdef __LINUX__
+	pthread_t m_tid;                                      //linux下维护线程需要的线程ID
+#endif
+
 };
 
 //add by freeeyes

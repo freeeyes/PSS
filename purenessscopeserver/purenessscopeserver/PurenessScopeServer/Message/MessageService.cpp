@@ -28,6 +28,10 @@ CMessageService::CMessageService()
 	{
 		m_u2ThreadTimeOut = u2ThreadTimeOut;
 	}
+
+#ifdef __LINUX__
+	m_tid  = 0;
+#endif
 }
 
 CMessageService::~CMessageService()
@@ -134,6 +138,10 @@ int CMessageService::svc(void)
 	//稍微休息一下，等一下其他线程再如主循环
 	ACE_Time_Value tvSleep(0, MAX_MSG_SENDCHECKTIME*MAX_BUFF_1000);
 	ACE_OS::sleep(tvSleep);
+
+#ifdef __LINUX__
+	m_tid  = pthread_self();
+#endif
 
 	while(IsRun())
 	{
@@ -430,6 +438,13 @@ uint32 CMessageService::GetThreadID()
 	return m_u4ThreadID;
 }
 
+#ifdef __LINUX__
+pthread_t CMessageService::Get_Thread_ID()
+{
+	return m_tid;
+}
+#endif
+
 void CMessageService::GetAITO(vecCommandTimeout& objTimeout)
 {
 	m_WorkThreadAI.GetAllTimeout(m_u4ThreadID, objTimeout);
@@ -555,8 +570,9 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value &tv, const void *a
 					OUR_DEBUG((LM_DEBUG, "[CMessageServiceGroup::handle_timeout]kill return %d, %d\n", ret, GetLastError())); 
 				}
 #else
-				int grp_id = pMessageService->grp_id(); 
-				int ret = ACE_Thread_Manager::instance()->kill_grp(grp_id, SIGUSR1);
+				//int grp_id = pMessageService->grp_id(); 
+				//int ret = ACE_Thread_Manager::instance()->kill_grp(grp_id, SIGUSR1);
+				int ret = pthread_cancel(pMessageService->Get_Thread_ID());  
 				OUR_DEBUG((LM_DEBUG, "[CMessageServiceGroup::handle_timeout]kill return %d OK.\n", ret)); 
 #endif
 
