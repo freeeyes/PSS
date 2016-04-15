@@ -20,7 +20,10 @@ public:
 
 	bool RecvData(const char* pData, int nLen, _ClientIPInfo objServerIPInfo)
 	{
-		OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData]Get Data.\n"));
+		if(pData != NULL && nLen > 0)
+		{
+			OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData]Get Data(%s:%d).\n", objServerIPInfo.m_szClientIP, objServerIPInfo.m_nPort));
+		}
 		return true;
 	};
 };

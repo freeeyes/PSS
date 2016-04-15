@@ -1,6 +1,12 @@
 project(UDPTestPost):acelib{
   sharedname=UDPTestPost
-  dynamicflags += TEST_UDPPOST_BUILD_DLL
+  dynamicflags += TEST_UDP_BUILD_DLL
+  
+  Source_Files{
+  	./*.cpp 
+  }
+  macros += __LINUX__  
+  
   libout = ./
   specific (prop:microsoft){
 	dllout = ../../PurenessScopeServer/Windows_Bin
@@ -8,5 +14,5 @@ project(UDPTestPost):acelib{
 	dllout = ../../PurenessScopeServer/Linux_Bin
   }
   includes += .
-  includes += ../Include
+  includes += ../include
 }
