@@ -28,7 +28,7 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 
 	if(m_pServerObject == NULL)
 	{
-		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL.\n"));
+		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL(%d).\n", bDeleteFlag));
 		return -1;
 	}
 
@@ -89,8 +89,6 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 
 bool CBaseCommand::Do_Head(IMessage* pMessage)
 {
-	uint32     u4PacketLen  = 0;
-	uint16     u2CommandID  = 0;
 	uint64     u8ClientTime = 0;
 
 	//OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] CommandID = %d", COMMAND_BASE));
@@ -133,10 +131,6 @@ bool CBaseCommand::Do_Head(IMessage* pMessage)
 
 bool CBaseCommand::Do_NoHead(IMessage* pMessage)
 {
-	uint32     u4PacketLen  = 0;
-	uint16     u2CommandID  = 0;
-	uint64     u8ClientTime = 0;
-
 	//OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] CommandID = %d", COMMAND_BASE));
 
 	IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();
@@ -156,7 +150,7 @@ bool CBaseCommand::Do_NoHead(IMessage* pMessage)
 
 	//数据原样奉还
 	(*pResponsesPacket) << (uint32)BodyPacket.m_nDataLen;
-	(*pResponsesPacket) << pMessage->GetPacketHeadInfo()->m_u2CmdID;
+	(*pResponsesPacket) << u2PostCommandID;
 	pResponsesPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
 
 	m_pServerObject->GetPacketManager()->Delete(pBodyPacket);
@@ -177,8 +171,6 @@ bool CBaseCommand::Do_NoHead(IMessage* pMessage)
 
 bool CBaseCommand::Do_HeadBuff(IMessage* pMessage)
 {
-	uint32     u4PacketLen  = 0;
-	uint16     u2CommandID  = 0;
 	uint64     u8ClientTime = 0;
 
 	//OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] CommandID = %d", COMMAND_BASE));
@@ -229,10 +221,6 @@ bool CBaseCommand::Do_HeadBuff(IMessage* pMessage)
 
 bool CBaseCommand::Do_NoHeadBuff(IMessage* pMessage)
 {
-	uint32     u4PacketLen  = 0;
-	uint16     u2CommandID  = 0;
-	uint64     u8ClientTime = 0;
-
 	//OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] CommandID = %d", COMMAND_BASE));
 
 	IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();
@@ -279,8 +267,6 @@ bool CBaseCommand::Do_NoHeadBuff(IMessage* pMessage)
 
 bool CBaseCommand::Do_LogData(IMessage* pMessage)
 {
-	uint32     u4PacketLen  = 0;
-	uint16     u2CommandID  = 0;
 	uint32     u4Index      = 0;
 
 	//OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] CommandID = %d", COMMAND_BASE));
@@ -326,8 +312,6 @@ bool CBaseCommand::Do_LogData(IMessage* pMessage)
 
 bool CBaseCommand::Do_SleepWorkThread(IMessage* pMessage)
 {
-	uint32     u4PacketLen  = 0;
-	uint16     u2CommandID  = 0;
 	uint32     u4Index      = 0;
 
 	//OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] CommandID = %d", COMMAND_BASE));
@@ -380,7 +364,6 @@ bool CBaseCommand::Do_SleepWorkThread(IMessage* pMessage)
 
 bool CBaseCommand::Do_TimeoutWordThread( IMessage* pMessage )
 {
-	uint32     u4PacketLen  = 0;
 	uint16     u2CommandID  = 0;
 	uint32     u4Index      = 0;
 
