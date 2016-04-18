@@ -30,18 +30,20 @@ bool CProxyClient::Close()
 		shutdown();
 		OUR_DEBUG((LM_ERROR, "[CProxyClient::Close]Close(%s:%d) OK.\n", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
 
+		//获得客户端ID
+		uint32 u4ConnectID = App_ProxyThreadManager::instance()->GetProxyClientManager(m_u4WorkThreadID)->FindConnectID(this);
+
+		//删除映射关系
+		App_ProxyThreadManager::instance()->GetProxyClientManager(m_u4WorkThreadID)->DeleteByProxyClient(this);
+
 		//关闭远程和客户端的连接
 		if(NULL != m_pServerObject)
 		{
-			uint32 u4ConnectID = App_ProxyThreadManager::instance()->GetProxyClientManager(m_u4WorkThreadID)->FindConnectID(this);
 			if(0 != u4ConnectID)
 			{
 				m_pServerObject->GetConnectManager()->CloseConnect(u4ConnectID);
 			}
 		}
-
-		//删除映射关系
-		App_ProxyThreadManager::instance()->GetProxyClientManager(m_u4WorkThreadID)->DeleteByProxyClient(this);
 
 		//回归用过的指针
 		delete this;
@@ -84,6 +86,12 @@ int CProxyClient::open( void* )
 int CProxyClient::handle_input( ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/ )
 {
 	ACE_Time_Value     nowait(MAX_MSG_PACKETTIMEOUT);
+
+	if(fd == ACE_INVALID_HANDLE)
+	{
+		OUR_DEBUG((LM_ERROR, "[CProxyClient::handle_input]ACE_INVALID_HANDLE.\n"));
+		return false;
+	}
 
 	//接收到远程的主机返回数据，并将数据返回给客户端
 	char szClientBuff[MAX_RECV_BUFF] = {'\0'};
