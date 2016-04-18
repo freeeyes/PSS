@@ -1,6 +1,12 @@
 project(FtpTest):acelib{
   sharedname=FtpTest
   dynamicflags += TEST_TCP_BUILD_DLL
+  
+  Source_Files{
+  	./*.cpp 
+  }
+  macros += __LINUX__    
+  
   libout = ./
   specific (prop:microsoft){
 	dllout = ../../PurenessScopeServer/Windows_Bin

@@ -20,7 +20,7 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 
   if(m_pServerObject == NULL)
   {
-    OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL.\n"));
+    OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL(%d).\n", bDeleteFlag));
     return -1;
   }
 
@@ -74,8 +74,6 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 
 void CBaseCommand::Do_Ftp_Login( IMessage* pMessage )
 {
-	uint32     u4PacketLen  = 0;
-	uint16     u2CommandID  = 0;
 	VCHARS_STR strUserName;
 	VCHARS_STR strUserPass;
 
@@ -123,8 +121,6 @@ void CBaseCommand::Do_Ftp_Login( IMessage* pMessage )
 
 void CBaseCommand::Do_Ftp_Logout( IMessage* pMessage )
 {
-	uint32     u4PacketLen  = 0;
-	uint16     u2CommandID  = 0;
 	VCHARS_STR strUserName;
 
 	IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();
@@ -168,8 +164,6 @@ void CBaseCommand::Do_Ftp_Logout( IMessage* pMessage )
 
 void CBaseCommand::Do_Ftp_FileList( IMessage* pMessage )
 {
-	uint32     u4PacketLen  = 0;
-	uint16     u2CommandID  = 0;
 	VCHARS_STR strUserName;
 	VCHARM_STR strFilePath;
 
@@ -238,8 +232,6 @@ void CBaseCommand::Do_Ftp_FileList( IMessage* pMessage )
 
 void CBaseCommand::Do_Ftp_FileDownLoad( IMessage* pMessage )
 {
-	uint32     u4PacketLen  = 0;
-	uint16     u2CommandID  = 0;
 	VCHARS_STR strUserName;
 	VCHARM_STR strFilePath;
 	uint32     u4BlockSize;            //块大小
@@ -333,8 +325,6 @@ void CBaseCommand::Do_Ftp_FileDownLoad( IMessage* pMessage )
 
 void CBaseCommand::Do_Ftp_FileUpLoad(IMessage* pMessage)
 {
-	uint32     u4PacketLen  = 0;
-	uint16     u2CommandID  = 0;
 	VCHARS_STR strUserName;
 	VCHARM_STR strFilePath;
 	VCHARB_STR strFileBuffer(false, VCHARS_TYPE_BINARY);          //文件块信息(二进制模式)
@@ -373,7 +363,6 @@ void CBaseCommand::Do_Ftp_FileUpLoad(IMessage* pMessage)
 			return;
 		}
 
-		uint32 u4FileBlockSize = 0;
 		char* pBuffer = new char[u4BlockSize];
 
 		//接收文件块信息
