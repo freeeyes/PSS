@@ -1,4 +1,7 @@
 #include "ServerMessageTask.h"
+#include "ace/Sig_Handler.h"
+
+ACE_Sig_Handler g_ServerMessageTask_Handler;
 
 Mutex_Allocator _msg_server_message_mb_allocator; 
 
@@ -8,10 +11,6 @@ CServerMessageTask::CServerMessageTask()
 	m_blRun      = false;
 	m_u4MaxQueue = MAX_SERVER_MESSAGE_QUEUE;
 	m_emState    = SERVER_RECV_INIT;
-
-#ifdef __LINUX__
-	m_tid = 0;
-#endif
 }
 
 CServerMessageTask::~CServerMessageTask()
@@ -34,6 +33,22 @@ bool CServerMessageTask::Start()
 	}
 
 	return true;
+}
+
+int CServerMessageTask::handle_signal (int signum,
+									siginfo_t* siginfo,
+									ucontext_t* ucontext)
+{
+	if (signum == SIGUSR1 + grp_id())
+	{
+		OUR_DEBUG((LM_INFO,"[CServerMessageTask::handle_signal](%d) will be kill.\n", grp_id()));
+		if(NULL != siginfo && NULL != ucontext)
+		{
+			OUR_DEBUG((LM_INFO,"[CServerMessageTask::handle_signal]siginfo is not null.\n"));
+		}
+		ACE_Thread::exit();
+	}
+	return 0;
 }
 
 int CServerMessageTask::open(void* args /*= 0*/)
@@ -74,10 +89,6 @@ int CServerMessageTask::svc(void)
 	ACE_Time_Value tvSleep(0, MAX_MSG_SENDCHECKTIME*MAX_BUFF_1000);
 	ACE_OS::sleep(tvSleep);
 
-#ifdef __LINUX__
-	m_tid  = pthread_self();
-#endif
-
 	while(IsRun())
 	{
 		mb = NULL;
@@ -115,13 +126,6 @@ uint32 CServerMessageTask::GetThreadID()
 {
 	return m_u4ThreadID;
 }
-
-#ifdef __LINUX__
-pthread_t CServerMessageTask::Get_Thread_ID()
-{
-	return m_tid;
-}
-#endif
 
 bool CServerMessageTask::PutMessage(_Server_Message_Info* pMessage)
 {
@@ -282,7 +286,12 @@ bool CServerMessageManager::Start()
 {
 	if(NULL != m_pServerMessageTask)
 	{
-		return m_pServerMessageTask->Start();
+		bool blState = m_pServerMessageTask->Start();
+
+		//设计线程事件关联
+		g_ServerMessageTask_Handler.register_handler (SIGUSR1 + m_pServerMessageTask->grp_id(), m_pServerMessageTask);	
+
+		return blState;
 	}
 	else
 	{
@@ -338,7 +347,8 @@ bool CServerMessageManager::CheckServerMessageThread(ACE_Time_Value tvNow)
 #else
 			//int grp_id = m_pServerMessageTask->grp_id(); 
 			//int ret = ACE_Thread_Manager::instance()->kill_grp(grp_id, SIGUSR1);
-			int ret = pthread_cancel(m_pServerMessageTask->Get_Thread_ID());  
+			//int ret = pthread_cancel(m_pServerMessageTask->Get_Thread_ID());  
+			int ret = ACE_Thread_Manager::instance()->kill_grp(m_pServerMessageTask->grp_id(), SIGUSR1 + m_pServerMessageTask->grp_id());
 			OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::CheckServerMessageThread]kill return %d OK.\n", ret)); 
 #endif
 			m_pServerMessageTask->Close();

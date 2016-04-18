@@ -45,15 +45,15 @@ public:
 	virtual int open(void* args = 0);
 	virtual int svc (void);
 
+	virtual int handle_signal (int signum,
+		siginfo_t *  = 0,
+		ucontext_t * = 0);
+
 	bool Start();
 	int  Close();
 	bool IsRun();
 
 	uint32 GetThreadID();
-
-#ifdef __LINUX__
-	pthread_t Get_Thread_ID();
-#endif
 
 	bool PutMessage(_Server_Message_Info* pMessage);
 
@@ -78,10 +78,6 @@ private:
 	//这里必须保证回调的时候IClientMessage是合法的。
 	typedef vector<IClientMessage*> vecValidIClientMessage;
 	vecValidIClientMessage m_vecValidIClientMessage;
-
-#ifdef __LINUX__
-	pthread_t m_tid;                                      //linux下维护线程需要的线程ID
-#endif
 };
 
 class CServerMessageManager

@@ -138,10 +138,6 @@ int CMessageService::svc(void)
 	ACE_Time_Value tvSleep(0, MAX_MSG_SENDCHECKTIME*MAX_BUFF_1000);
 	ACE_OS::sleep(tvSleep);
 
-#ifdef __LINUX__
-	m_tid  = pthread_self();
-#endif
-
 	while(IsRun())
 	{
 		mb = NULL;
@@ -514,13 +510,9 @@ int CMessageService::handle_signal (int signum,
 	if (signum == SIGUSR1 + grp_id())
 	{
 		OUR_DEBUG((LM_INFO,"[CMessageService::handle_signal](%d) will be kill.\n", grp_id()));
-		if(NULL != siginfo)
+		if(NULL != siginfo && NULL != ucontext)
 		{
-			OUR_DEBUG((LM_INFO,"[CMessageService::handle_signal]siginfo=%d.\n", siginfo->si_handle_));
-		}
-		if(NULL != ucontext)
-		{
-			OUR_DEBUG((LM_INFO,"[CMessageService::handle_signal]ucontext=%d.\n", *ucontext));
+			OUR_DEBUG((LM_INFO,"[CMessageService::handle_signal]siginfo is not null.\n"));
 		}
 		ACE_Thread::exit();
 	}
@@ -584,7 +576,7 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value &tv, const void *a
 #else
 				//int grp_id = pMessageService->grp_id(); 
 				//int ret = pthread_cancel(pMessageService->Get_Thread_ID());  
-				ACE_Thread_Manager::instance()->kill_grp(pMessageService->grp_id(), SIGUSR1 + pMessageService->grp_id());
+				int ret = ACE_Thread_Manager::instance()->kill_grp(pMessageService->grp_id(), SIGUSR1 + pMessageService->grp_id());
 				OUR_DEBUG((LM_DEBUG, "[CMessageServiceGroup::handle_timeout]kill return %d OK.\n", ret)); 
 #endif
 
