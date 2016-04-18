@@ -5,6 +5,9 @@
 // 2009-01-26
 
 #include "MessageService.h"
+#include "ace/Sig_Handler.h"
+
+ACE_Sig_Handler g_MessageSerice_Handler;
 
 Mutex_Allocator _msg_service_mb_allocator; 
 
@@ -28,10 +31,6 @@ CMessageService::CMessageService()
 	{
 		m_u2ThreadTimeOut = u2ThreadTimeOut;
 	}
-
-#ifdef __LINUX__
-	m_tid  = 0;
-#endif
 }
 
 CMessageService::~CMessageService()
@@ -438,13 +437,6 @@ uint32 CMessageService::GetThreadID()
 	return m_u4ThreadID;
 }
 
-#ifdef __LINUX__
-pthread_t CMessageService::Get_Thread_ID()
-{
-	return m_tid;
-}
-#endif
-
 void CMessageService::GetAITO(vecCommandTimeout& objTimeout)
 {
 	m_WorkThreadAI.GetAllTimeout(m_u4ThreadID, objTimeout);
@@ -515,6 +507,26 @@ void CMessageService::DeleteMessage(CMessage* pMessage)
 	m_MessagePool.Delete(pMessage);
 }
 
+int CMessageService::handle_signal (int signum,
+				   siginfo_t* siginfo,
+				   ucontext_t* ucontext)
+{
+	if (signum == SIGUSR1 + grp_id())
+	{
+		OUR_DEBUG((LM_INFO,"[CMessageService::handle_signal](%d) will be kill.\n", grp_id()));
+		if(NULL != siginfo)
+		{
+			OUR_DEBUG((LM_INFO,"[CMessageService::handle_signal]siginfo=%d.\n", siginfo->si_handle_));
+		}
+		if(NULL != ucontext)
+		{
+			OUR_DEBUG((LM_INFO,"[CMessageService::handle_signal]ucontext=%d.\n", *ucontext));
+		}
+		ACE_Thread::exit();
+	}
+	return 0;
+}
+
 CMessageServiceGroup::CMessageServiceGroup()
 {
 	m_u4TimerID = 0;
@@ -571,8 +583,8 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value &tv, const void *a
 				}
 #else
 				//int grp_id = pMessageService->grp_id(); 
-				//int ret = ACE_Thread_Manager::instance()->kill_grp(grp_id, SIGUSR1);
-				int ret = pthread_cancel(pMessageService->Get_Thread_ID());  
+				//int ret = pthread_cancel(pMessageService->Get_Thread_ID());  
+				ACE_Thread_Manager::instance()->kill_grp(pMessageService->grp_id(), SIGUSR1 + pMessageService->grp_id());
 				OUR_DEBUG((LM_DEBUG, "[CMessageServiceGroup::handle_timeout]kill return %d OK.\n", ret)); 
 #endif
 
@@ -586,6 +598,9 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value &tv, const void *a
 				{
 					pMessageService->Init(u4ThreadID, m_u4MaxQueue, m_u4LowMask, m_u4HighMask);
 					pMessageService->Start();
+					
+					//注册线程全局事件
+					g_MessageSerice_Handler.register_handler (SIGUSR1 + pMessageService->grp_id(), pMessageService);	
 
 					//m_ThreadWriteLock.acquire();
 					m_vecMessageService[i] = pMessageService;
@@ -733,6 +748,7 @@ bool CMessageServiceGroup::Start()
 			pMessageService->Start();
 		}
 
+		g_MessageSerice_Handler.register_handler (SIGUSR1 + pMessageService->grp_id(), pMessageService);	
 		OUR_DEBUG((LM_INFO,"[CMessageServiceGroup::Start](%d)WorkThread is OK.\n", i));
 	}
 
@@ -1057,3 +1073,4 @@ int32 CMessageServiceGroup::GetWorkThreadID(uint32 u4ConnectID, uint8 u1PackeTyp
 
     return n4ThreadID;
 }
+
