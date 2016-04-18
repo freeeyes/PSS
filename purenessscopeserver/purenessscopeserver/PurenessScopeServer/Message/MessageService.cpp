@@ -592,8 +592,9 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value &tv, const void *a
 					pMessageService->Start();
 					
 					//注册线程全局事件
+#ifndef WIN32
 					g_MessageSerice_Handler.register_handler (SIGUSR1 + pMessageService->grp_id(), pMessageService);	
-
+#endif
 					//m_ThreadWriteLock.acquire();
 					m_vecMessageService[i] = pMessageService;
 					//m_ThreadWriteLock.release();
@@ -740,7 +741,9 @@ bool CMessageServiceGroup::Start()
 			pMessageService->Start();
 		}
 
+#ifndef WIN32
 		g_MessageSerice_Handler.register_handler (SIGUSR1 + pMessageService->grp_id(), pMessageService);	
+#endif
 		OUR_DEBUG((LM_INFO,"[CMessageServiceGroup::Start](%d)WorkThread is OK.\n", i));
 	}
 

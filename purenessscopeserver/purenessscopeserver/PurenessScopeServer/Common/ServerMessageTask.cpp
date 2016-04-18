@@ -289,7 +289,9 @@ bool CServerMessageManager::Start()
 		bool blState = m_pServerMessageTask->Start();
 
 		//设计线程事件关联
+#ifndef WIN32
 		g_ServerMessageTask_Handler.register_handler (SIGUSR1 + m_pServerMessageTask->grp_id(), m_pServerMessageTask);	
+#endif
 
 		return blState;
 	}
