@@ -21,7 +21,7 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 
   if(m_pServerObject == NULL)
   {
-    OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL.\n"));
+    OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL(%d).\n", bDeleteFlag));
     return -1;
   }
 
@@ -70,8 +70,6 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 
 void CBaseCommand::Do_User_Login( IMessage* pMessage )
 {
-	uint32     u4PacketLen  = 0;
-	uint16     u2CommandID  = 0;
 	bool       blIsNeedSend = true;
 	VCHARS_STR strUserName;
 	VCHARS_STR strUserPass;
@@ -210,8 +208,6 @@ void CBaseCommand::Do_User_Login( IMessage* pMessage )
 
 void CBaseCommand::Do_User_Logout( IMessage* pMessage )
 {
-	uint32     u4PacketLen  = 0;
-	uint16     u2CommandID  = 0;
 	VCHARS_STR strUserName;
 	char szUserName[MAX_BUFF_100] = {'\0'};
 
@@ -268,8 +264,6 @@ void CBaseCommand::Do_User_Logout( IMessage* pMessage )
 
 void CBaseCommand::Do_User_Info( IMessage* pMessage )
 {
-	uint32     u4PacketLen  = 0;
-	uint16     u2CommandID  = 0;
 	uint32     u4UserID     = 0;
 	bool       blIsNeedSend = false;
 
@@ -376,12 +370,9 @@ void CBaseCommand::Do_User_Info( IMessage* pMessage )
 
 void CBaseCommand::Do_Set_User_Info( IMessage* pMessage )
 {
-	uint32     u4PacketLen  = 0;
-	uint16     u2CommandID  = 0;
 	uint32     u4UserID     = 0;
 	uint32     u4Life       = 0;
 	uint32     u4Magic      = 0;
-	bool       blIsNeedSend = false;
 
 	IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();
 	if(NULL == pBodyPacket)

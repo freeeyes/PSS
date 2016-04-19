@@ -2,10 +2,18 @@ project(Login):acelib{
   sharedname=Login
   dynamicflags += TEST_TCP_BUILD_LOGIN_DLL
   libout = ./
+  
+  Source_Files{
+  	./*.cpp 
+	../Common/*.cpp
+  }
+  macros += __LINUX__    
+  
   specific (prop:microsoft){
 	dllout = ../../../PurenessScopeServer/Windows_Bin
   } else {
 	dllout = ../../../PurenessScopeServer/Linux_Bin
   }
-  includes += ../../include,../Common
+  includes += .
+  includes += ../../include ../Common
 }

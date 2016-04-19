@@ -55,6 +55,7 @@ public:
 
 	void ReConnect(int nServerID)
 	{
+		OUR_DEBUG((LM_INFO, "[CPostServerData::ReConnect]nServerID=%d", nServerID));
 	}
 
 	bool Need_Send_Format()
@@ -64,12 +65,17 @@ public:
 
 	bool Send_Format_data(char* pData, uint32 u4Len, IMessageBlockManager* pMessageBlockManager, ACE_Message_Block*& mbSend)
 	{
+		if(NULL != pData && NULL != pMessageBlockManager &&NULL == mbSend)
+		{
+			OUR_DEBUG((LM_INFO, "[CPostServerData::Send_Format_data]u4Len=%d", u4Len));
+		}
 		return false;
 	};
 
 	bool Recv_Format_data(ACE_Message_Block* mbRecv, IMessageBlockManager* pMessageBlockManager, uint16& u2CommandID, ACE_Message_Block*& mbFinishRecv)
 	{
 		//判断返回数据块是否小于0
+		u2CommandID = 0;
 		uint32 u4SendPacketSize = (uint32)mbRecv->length();
 		if(u4SendPacketSize <= 0)
 		{
@@ -135,7 +141,7 @@ public:
 		uint32 u4SendPacketSize = (uint32)mbRecv->length();
 		if(u4SendPacketSize <= 0)
 		{
-			OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData]Get Data(%d) error.\n", u4SendPacketSize));
+			OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData]Get Data(%d)(%s:%d) error.\n", u2CommandID, objServerIPInfo.m_szClientIP, objServerIPInfo.m_nPort));
 		}
 
 		OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData]Get Data(%d).\n", u4SendPacketSize));
@@ -311,7 +317,7 @@ public:
 
 	bool ConnectError(int nError, _ClientIPInfo objServerIPInfo)
 	{
-		OUR_DEBUG((LM_ERROR, "[CPostServerData::ConnectError]Get Error(%d).\n", nError));
+		OUR_DEBUG((LM_ERROR, "[CPostServerData::ConnectError]Get Error(%d)(%s:%d).\n", nError, objServerIPInfo.m_szClientIP, objServerIPInfo.m_nPort));
 		return true;
 	};
 
