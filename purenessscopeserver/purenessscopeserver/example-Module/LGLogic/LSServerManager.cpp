@@ -53,6 +53,7 @@ bool CLSServerManager::RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv, _
 	if(mbRecv->length() <= 40)
 	{
 		//接收到了不完整的包头，丢弃
+		OUR_DEBUG((LM_INFO, "[CLSServerManager::RecvData](%s:%d) recv not enougth.\n", objServerIPInfo.m_szClientIP, objServerIPInfo.m_nPort));
 		return true;
 	}
 
@@ -79,6 +80,7 @@ bool CLSServerManager::RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv, _
 
 bool CLSServerManager::ConnectError(int nError, _ClientIPInfo objServerIPInfo)
 {
+	OUR_DEBUG((LM_INFO, "[CLSServerManager::ConnectError]nError=%d,(%s:%d).\n", nError, objServerIPInfo.m_szClientIP, objServerIPInfo.m_nPort));
 	return true;
 }
 
@@ -192,6 +194,13 @@ void CLSServerManager::Recv_LS_Login(const char* pRecvBuff, uint32 u4Len)
 {
 	uint32 u4LGID        = 0;
 	char   szListKey[33] = {'\0'};
+
+	if(u4Len <= 40)
+	{
+		OUR_DEBUG((LM_INFO, "[CLSServerManager::Recv_LS_Login]not enought.\n"));
+		return;
+	}
+
 	memcpy_safe((char* )&pRecvBuff[40], sizeof(uint32), (char* )&u4LGID, sizeof(uint32));
 	if(m_u4LGID == u4LGID)
 	{
@@ -209,6 +218,13 @@ void CLSServerManager::Recv_LS_Key_Update(const char* pRecvBuff, uint32 u4Len)
 {
 	uint32 u4LGID        = 0;
 	char   szListKey[33] = {'\0'};
+
+	if(u4Len <= 40)
+	{
+		OUR_DEBUG((LM_INFO, "[CLSServerManager::Recv_LS_Key_Update]not enought.\n"));
+		return;
+	}
+
 	memcpy_safe((char* )&pRecvBuff[40], sizeof(uint32), (char* )&u4LGID, sizeof(uint32));
 	if(m_u4LGID == u4LGID)
 	{
@@ -229,6 +245,12 @@ char* CLSServerManager::Get_LS_Key()
 
 void CLSServerManager::Recv_LS_List_Update(const char* pRecvBuff, uint32 u4Len)
 {
+	if(u4Len <= 40)
+	{
+		OUR_DEBUG((LM_INFO, "[CLSServerManager::Recv_LS_List_Update]not enought.\n"));
+		return;
+	}
+
 	m_objlistManager.Clear();
 
 	//获得当前的MD5Key值
@@ -280,6 +302,11 @@ bool CLSServerManager::Need_Send_Format()
 
 bool CLSServerManager::Send_Format_data(char* pData, uint32 u4Len, IMessageBlockManager* pMessageBlockManager, ACE_Message_Block*& mbSend)
 {
+	if(NULL != pData && NULL != pMessageBlockManager && NULL == mbSend)
+	{
+		OUR_DEBUG((LM_INFO, "[CLSServerManager::Send_Format_data]u4Len=%d.\n", u4Len));
+	}
+
 	return false;
 }
 

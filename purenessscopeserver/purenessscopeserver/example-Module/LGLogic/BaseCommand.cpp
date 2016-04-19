@@ -32,7 +32,7 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 
 	if(m_pServerObject == NULL)
 	{
-		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL.\n"));
+		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL(%d).\n", bDeleteFlag));
 		return -1;
 	}
 
@@ -233,6 +233,11 @@ void CBaseCommand::Init(const char* pFileName)
 
 int CBaseCommand::handle_timeout( const ACE_Time_Value &tv, const void *arg )
 {
+	if(arg != NULL)
+	{
+		OUR_DEBUG((LM_INFO, "[CBaseCommand::handle_timeout]tv.sec=%d!\n", tv.sec()));
+	}
+
 	//定时器到时执行
 	OUR_DEBUG((LM_INFO, "[CBaseCommand::handle_timeout]Run!\n"));
 	m_objLSServer.Send_LG_Alive();
@@ -251,8 +256,8 @@ void CBaseCommand::ReadIniFile(const char* pIniFileName)
 	else
 	{
 		//读取Ini文件内容
-		m_u4LSServerID = (uint32)iniparser_getint(pDictionary, "LSServer:ServerID", NULL);
-		if(NULL != m_u4LSServerID)
+		m_u4LSServerID = (uint32)iniparser_getint(pDictionary, "LSServer:ServerID", 0);
+		if(0 != m_u4LSServerID)
 		{
 			OUR_DEBUG((LM_INFO, "[CBaseCommand::ReadIniFile]ServerID=%d.\n", m_u4LSServerID));
 		}

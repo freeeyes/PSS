@@ -2,11 +2,18 @@ project(LGLogic):acelib{
   sharedname=LGLogic
   dynamicflags += TEST_TCP_BUILD_DLL
   libout = ./
+  
+  Source_Files{
+  	./*.cpp 
+	./IniRead/*.c
+  }
+  macros += __LINUX__    
+  
   specific (prop:microsoft){
 	dllout = ../../PurenessScopeServer/Windows_Bin
   } else {
 	dllout = ../../PurenessScopeServer/Linux_Bin
   }
   includes += .
-  includes += ../include 
+  includes += ../include ./IniRead
 }
