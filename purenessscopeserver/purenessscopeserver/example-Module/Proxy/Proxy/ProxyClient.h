@@ -76,6 +76,7 @@ public:
 
 	bool Insert(uint32 u4ConnectID, CProxyClient* pProxyClient)
 	{
+		ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
 		mapConnectID2Proxy::iterator f = m_mapConnectID2Proxy.find(u4ConnectID);
 		if(f != m_mapConnectID2Proxy.end())
 		{
@@ -96,6 +97,7 @@ public:
 
 	uint32 FindConnectID(CProxyClient* pProxyClient)
 	{
+		ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
 		mapProxy2ConnectID::iterator f = m_mapProxy2ConnectID.find(pProxyClient);
 		if(f == m_mapProxy2ConnectID.end())
 		{
@@ -109,6 +111,7 @@ public:
 
 	CProxyClient* FindProxyClient(uint32 u4ConnectID)
 	{
+		ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
 		mapConnectID2Proxy::iterator f = m_mapConnectID2Proxy.find(u4ConnectID);
 		if(f == m_mapConnectID2Proxy.end())
 		{
@@ -122,6 +125,7 @@ public:
 
 	void DeleteByProxyClient(CProxyClient* pProxyClient)
 	{
+		ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
 		mapProxy2ConnectID::iterator f = m_mapProxy2ConnectID.find(pProxyClient);
 		if(f != m_mapProxy2ConnectID.end())
 		{
@@ -139,6 +143,7 @@ public:
 
 	void DeleteByConnectID(uint32 u4ConnectID)
 	{
+		ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
 		mapConnectID2Proxy::iterator f = m_mapConnectID2Proxy.find(u4ConnectID);
 		if(f != m_mapConnectID2Proxy.end())
 		{
@@ -159,6 +164,7 @@ public:
 private:
 	mapProxy2ConnectID m_mapProxy2ConnectID;
 	mapConnectID2Proxy m_mapConnectID2Proxy;
+	ACE_Recursive_Thread_Mutex m_ThreadLock;
 };
 
 //工作线程对应的连接结构
