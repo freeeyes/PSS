@@ -28,7 +28,7 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 
 	if(m_pServerObject == NULL)
 	{
-		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL.\n"));
+		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL(%d).\n", bDeleteFlag));
 		return -1;
 	}
 
@@ -65,6 +65,11 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 
 int CBaseCommand::DoMessage_HttpData(IMessage* pMessage, bool& bDeleteFlag)
 {
+	if(NULL == pMessage)
+	{
+		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage_HttpData] pMessage is NULL(%d).\n", bDeleteFlag));
+	}
+
 	//处理接收到的握手数据，返回握手命令
 	char szReturnData[MAX_BUFF_500] = {'\0'};
 
