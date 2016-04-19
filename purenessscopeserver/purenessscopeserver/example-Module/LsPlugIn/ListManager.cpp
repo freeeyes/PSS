@@ -169,10 +169,6 @@ void ClistManager::ReadList()
 
 	uint32 u4Count = (uint32)iniparser_getint(pDictionary, "List:Count", 0);
 
-	char   szIP[50] = {'\0'};
-	uint32 u4Port   = 0;
-	uint32 u4LGID   = 0;
-
 	char szTempName[50] = {'\0'};
 
 	for(uint32 i = 0; i < u4Count; i++)

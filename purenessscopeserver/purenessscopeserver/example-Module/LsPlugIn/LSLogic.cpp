@@ -6,6 +6,8 @@
 #include "BaseCommand.h"
 #include "IObject.h"
 
+#include "ace/svc_export.h"
+
 static const char *g_szDesc      = "List服务";          //模块的描述文字
 static const char *g_szName      = "ListServer";        //模块的名字
 static const char *g_szModuleKey = "ListServer";        //模块的Key
@@ -17,7 +19,7 @@ static const char *g_szModuleKey = "ListServer";        //模块的Key
 #define DECLDIR __declspec(dllimport)
 #endif
 #else
-#define DECLDIR
+#define DECLDIR ACE_Svc_Export
 #endif
 
 extern "C"
@@ -120,7 +122,11 @@ const char* GetModuleKey()
 //用于模块间的调用接口
 int DoModuleMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket)
 {
-  return 0;
+	OUR_DEBUG((LM_INFO, "[DoModuleMessage] u2CommandID=%d, size=%d, return=%d.\n",
+		u2CommandID,
+		pBuffPacket->GetPacketLen(),
+		pReturnBuffPacket->GetPacketLen()));
+	return 0;
 }
 
 //交给框架使用，用于框架定时巡检插件状态
@@ -129,6 +135,8 @@ int DoModuleMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* p
 //框架会根据这个设置，发送邮件给指定的邮箱
 bool GetModuleState(uint32& u4ErrorID)
 {
+	OUR_DEBUG((LM_INFO, "[GetModuleState] u4ErrorID=%d, size=%d, return=%d.\n",
+		u4ErrorID));
 	return true;
 }
 

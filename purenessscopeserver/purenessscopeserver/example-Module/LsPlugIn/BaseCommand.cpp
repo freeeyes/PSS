@@ -28,7 +28,7 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 
 	if(m_pServerObject == NULL)
 	{
-		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL.\n"));
+		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL(%d).\n", bDeleteFlag));
 		return -1;
 	}
 
@@ -79,6 +79,7 @@ int CBaseCommand::Do_ClientSendTimeout(IMessage* pMessage)
 
 void CBaseCommand::ReadIniFile(const char* pIniFileName)
 {
+	OUR_DEBUG((LM_ERROR, "[CBaseCommand::ReadIniFile]pIniFileName=%s.\n", pIniFileName));
 	//初始化监控服务器列表
 	m_listManager.ReadList();
 }
@@ -95,6 +96,25 @@ int CBaseCommand::Do_Logic_LG_Login(IMessage* pMessage)
 
 	_PacketInfo BodyPacket;
 	pMessage->GetPacketBody(BodyPacket);
+
+	_PacketInfo HeadPacket;
+	pMessage->GetPacketHead(HeadPacket);
+
+	IBuffPacket* pHeadPacket = m_pServerObject->GetPacketManager()->Create();
+	pHeadPacket->WriteStream(HeadPacket.m_pData, HeadPacket.m_nDataLen);
+
+	uint16 u2CommandID   = 0;           //命令字 
+	uint32 u2Version     = 0;           //协议版本号
+	uint32 u4BodyLen     = 0;           //包体长度  
+	char   szSession[33] = {'\0'};      //Session字符串 
+
+	//解析包头中的数据包长
+	(*pHeadPacket) >> u2Version;
+	(*pHeadPacket) >> u2CommandID;
+	(*pHeadPacket) >> u4BodyLen;
+	pHeadPacket->WriteStream(szSession, 32);
+
+	m_pServerObject->GetPacketManager()->Delete(pHeadPacket);
 
 	pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
 
@@ -115,8 +135,8 @@ int CBaseCommand::Do_Logic_LG_Login(IMessage* pMessage)
 								strIP.text, 
 								u4Port,
 								strServerVserion.text,
-								pMessage->GetPacketHeadInfo()->m_szSession,
-								pMessage->GetPacketHeadInfo()->m_u2Version);
+								szSession,
+								u2Version);
 
 	m_pServerObject->GetPacketManager()->Delete(pBodyPacket);
 
@@ -147,11 +167,34 @@ int CBaseCommand::Do_Logic_LG_Login(IMessage* pMessage)
 int CBaseCommand::Do_Logic_LG_Alive(IMessage* pMessage)
 {
 	//这里什么都不处理，依靠PSS框架本身的超时机制判定
+	if(NULL == pMessage)
+	{
+		OUR_DEBUG((LM_INFO, "[CBaseCommand::Do_Logic_LG_Alive]pMessage os NULL.\n"));
+	}
+
 	return 0;
 }
 
 int CBaseCommand::Do_Logic_All_LG_Key(IMessage* pMessage, uint16 u2CommandID)
 {
+	_PacketInfo HeadPacket;
+	pMessage->GetPacketHead(HeadPacket);
+
+	IBuffPacket* pHeadPacket = m_pServerObject->GetPacketManager()->Create();
+	pHeadPacket->WriteStream(HeadPacket.m_pData, HeadPacket.m_nDataLen);
+ 
+	uint32 u2Version     = 0;           //协议版本号
+	uint32 u4BodyLen     = 0;           //包体长度  
+	char   szSession[33] = {'\0'};      //Session字符串 
+
+	//解析包头中的数据包长
+	(*pHeadPacket) >> u2Version;
+	(*pHeadPacket) >> u2CommandID;
+	(*pHeadPacket) >> u4BodyLen;
+	pHeadPacket->WriteStream(szSession, 32);
+
+	m_pServerObject->GetPacketManager()->Delete(pHeadPacket);
+
 	//群发所有的LG KEY更新消息
 	uint32 u4Count = m_listManager.Get_LG_Count();
 	for(uint32 i = 0; i < u4Count; i++)
@@ -169,10 +212,10 @@ int CBaseCommand::Do_Logic_All_LG_Key(IMessage* pMessage, uint16 u2CommandID)
 
 			//消息列表返回
 			uint32 u4SendPacketLen = 32 + sizeof(uint8) + sizeof(uint32) + 1;
-			(*pResponsesPacket) << pMessage->GetPacketHeadInfo()->m_u2Version;
+			(*pResponsesPacket) << u2Version;
 			(*pResponsesPacket) << u2PostCommandID;
 			(*pResponsesPacket) << u4SendPacketLen; //数据包体长度
-			pResponsesPacket->WriteStream(pMessage->GetPacketHeadInfo()->m_szSession, SESSION_LEN);
+			pResponsesPacket->WriteStream(szSession, 32);
 
 			(*pResponsesPacket) << pInfo->m_u4LGID;
 			(*pResponsesPacket) << strMD5;
@@ -220,7 +263,7 @@ int CBaseCommand::Send_Logic_LG_List(uint32 u4ConnectID, const char* pSession, u
 	(*pResponsesPacket) << u2Version;
 	(*pResponsesPacket) << u2PostCommandID;
 	(*pResponsesPacket) << u4SendPacketLen; //数据包体长度
-	pResponsesPacket->WriteStream(pSession, SESSION_LEN);
+	pResponsesPacket->WriteStream(pSession, 32);
 
 	(*pResponsesPacket) << strMD5;
 	(*pResponsesPacket) << u4ListCount;
@@ -251,6 +294,25 @@ int CBaseCommand::Send_Logic_LG_List(uint32 u4ConnectID, const char* pSession, u
 
 int CBaseCommand::Do_Logic_LG_List(IMessage* pMessage)
 {
+	_PacketInfo HeadPacket;
+	pMessage->GetPacketHead(HeadPacket);
+
+	IBuffPacket* pHeadPacket = m_pServerObject->GetPacketManager()->Create();
+	pHeadPacket->WriteStream(HeadPacket.m_pData, HeadPacket.m_nDataLen);
+
+	uint16 u2CommandID   = 0;           //命令字 
+	uint32 u2Version     = 0;           //协议版本号
+	uint32 u4BodyLen     = 0;           //包体长度  
+	char   szSession[33] = {'\0'};      //Session字符串 
+
+	//解析包头中的数据包长
+	(*pHeadPacket) >> u2Version;
+	(*pHeadPacket) >> u2CommandID;
+	(*pHeadPacket) >> u4BodyLen;
+	pHeadPacket->WriteStream(szSession, 32);
+
+	m_pServerObject->GetPacketManager()->Delete(pHeadPacket);
+
 	//处理读入的数据包
 	IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();
 	if(NULL == pBodyPacket)
@@ -277,8 +339,8 @@ int CBaseCommand::Do_Logic_LG_List(IMessage* pMessage)
 	m_pServerObject->GetPacketManager()->Delete(pBodyPacket);
 
 	Send_Logic_LG_List(pMessage->GetMessageBase()->m_u4ConnectID, 
-		pMessage->GetPacketHeadInfo()->m_szSession,
-		pMessage->GetPacketHeadInfo()->m_u2Version);
+		szSession,
+		u2Version);
 
 	return 0;
 }
