@@ -6,6 +6,8 @@ CLoadPacketParse::CLoadPacketParse()
 
 CLoadPacketParse::~CLoadPacketParse()
 {
+	OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::~CLoadPacketParse]\n"));
+	//Close();
 }
 
 bool CLoadPacketParse::LoadPacketInfo(char* szPacketParseName)
@@ -73,4 +75,13 @@ bool CLoadPacketParse::LoadPacketInfo(char* szPacketParseName)
 _Packet_Parse_Info* CLoadPacketParse::GetPacketParseInfo()
 {
 	return (_Packet_Parse_Info* )&m_Packet_Parse_Info;
+}
+
+void CLoadPacketParse::Close()
+{
+	if(m_Packet_Parse_Info.hModule != NULL)
+	{
+		int nRet = ACE_OS::dlclose(m_Packet_Parse_Info.hModule);
+		OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::Close]%d.\n", nRet));
+	}
 }

@@ -1,7 +1,7 @@
 #include "ServerMessageTask.h"
-#include "ace/Sig_Handler.h"
+//#include "ace/Sig_Handler.h"
 
-ACE_Sig_Handler g_ServerMessageTask_Handler;
+//ACE_Sig_Handler g_ServerMessageTask_Handler;
 
 Mutex_Allocator _msg_server_message_mb_allocator; 
 
@@ -118,7 +118,7 @@ int CServerMessageTask::svc(void)
 		mb->release();
 	}
 
-	OUR_DEBUG((LM_INFO,"[CMessageService::svc] svc finish!\n"));
+	OUR_DEBUG((LM_INFO,"[CServerMessageTask::svc] svc finish!\n"));
 	return 0;
 }
 
@@ -271,7 +271,7 @@ CServerMessageManager::CServerMessageManager()
 
 CServerMessageManager::~CServerMessageManager()
 {
-	SAFE_DELETE(m_pServerMessageTask);
+	OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::~CServerMessageManager].\n")); 
 }
 
 void CServerMessageManager::Init()
@@ -288,11 +288,6 @@ bool CServerMessageManager::Start()
 	{
 		bool blState = m_pServerMessageTask->Start();
 
-		//设计线程事件关联
-#ifndef WIN32
-		g_ServerMessageTask_Handler.register_handler (SIGUSR1 + m_pServerMessageTask->grp_id(), m_pServerMessageTask);	
-#endif
-
 		return blState;
 	}
 	else
@@ -305,7 +300,11 @@ int CServerMessageManager::Close()
 {
 	if(NULL != m_pServerMessageTask)
 	{
-		return m_pServerMessageTask->Close();
+		m_pServerMessageTask->Close();
+		OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::Close]SAFE_DELETE Begin.\n")); 
+		SAFE_DELETE(m_pServerMessageTask);
+		OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::Close]SAFE_DELETE End.\n")); 
+		return 0;
 	}
 	else
 	{
@@ -347,10 +346,7 @@ bool CServerMessageManager::CheckServerMessageThread(ACE_Time_Value tvNow)
 				OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::CheckServerMessageThread]kill return %d, %d\n", ret, GetLastError())); 
 			}
 #else
-			//int grp_id = m_pServerMessageTask->grp_id(); 
-			//int ret = ACE_Thread_Manager::instance()->kill_grp(grp_id, SIGUSR1);
-			//int ret = pthread_cancel(m_pServerMessageTask->Get_Thread_ID());  
-			int ret = ACE_Thread_Manager::instance()->kill_grp(m_pServerMessageTask->grp_id(), SIGUSR1 + m_pServerMessageTask->grp_id());
+			int ret = ACE_Thread_Manager::instance()->cancel_task(m_pServerMessageTask);
 			OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::CheckServerMessageThread]kill return %d OK.\n", ret)); 
 #endif
 			m_pServerMessageTask->Close();

@@ -285,6 +285,9 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 		ACE_OS::sleep(tvSleep);
 
 		OUR_DEBUG((LM_INFO, "[main]Server Exit.\n"));
+		
+		//回收隐式加载PacketParse
+		App_PacketParseLoader::instance()->Close();			
 
 		pthread_exit(NULL);
 	}
@@ -341,6 +344,9 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 			ServerMain();
 		}
 	}
+	
+	//回收隐式加载PacketParse
+	App_PacketParseLoader::instance()->Close();
 
 	return 0;
 }

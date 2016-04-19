@@ -30,6 +30,8 @@ public:
 
 	bool LoadPacketInfo(char* szPacketParseName);
 
+	void Close();
+
 	_Packet_Parse_Info* GetPacketParseInfo();
 
 private:
