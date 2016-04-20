@@ -137,7 +137,7 @@ void Gen_2_Cpp_Command_Cpp(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlI
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t{\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\t\tOUR_DEBUG((LM_ERROR, \"[CBaseCommand::DoMessage] m_pServerObject is NULL.\\n\"));\n");
+	sprintf_safe(szTemp, 200, "\t\tOUR_DEBUG((LM_ERROR, \"[CBaseCommand::DoMessage] m_pServerObject is NULL(%%d).\\n\", bDeleteFlag));\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t\treturn -1;\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);

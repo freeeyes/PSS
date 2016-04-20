@@ -127,7 +127,7 @@ int DoModuleMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* p
 //框架会根据这个设置，发送邮件给指定的邮箱
 bool GetModuleState(uint32& u4ErrorID)
 {
-	OUR_DEBUG((LM_INFO, "[GetModuleState] u4ErrorID=%d, size=%d, return=%d.\n",
+	OUR_DEBUG((LM_INFO, "[GetModuleState] u4ErrorID=%d.\n",
 		u4ErrorID));
 	return true;
 }

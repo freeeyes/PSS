@@ -39,6 +39,9 @@ void Gen_2_Cpp_Main(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlInfo)
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "#include \"IObject.h\"\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "#include \"ace/svc_export.h\"\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 	sprintf_safe(szTemp, 200, "static const char *g_szDesc      = \"%s\";\n",
 		objProjectInfo.m_szProjectDesc);
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -62,7 +65,7 @@ void Gen_2_Cpp_Main(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlInfo)
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "#else\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "#define DECLDIR\n");
+	sprintf_safe(szTemp, 200, "#define DECLDIR ACE_Svc_Export\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "#endif\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -258,6 +261,14 @@ void Gen_2_Cpp_Main(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlInfo)
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "{\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tOUR_DEBUG((LM_INFO, \"[DoModuleMessage] u2CommandID=%%d, size=%%d, return=%%d.\\n\",\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t\tu2CommandID,\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t\tpBuffPacket->GetPacketLen(),\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t\tpReturnBuffPacket->GetPacketLen()));\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\treturn 0;\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "}\n\n");
@@ -265,6 +276,10 @@ void Gen_2_Cpp_Main(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlInfo)
 	sprintf_safe(szTemp, 200, "bool GetModuleState(uint32& u4ErrorID)\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "{\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tOUR_DEBUG((LM_INFO, \"[GetModuleState] u4ErrorID=%%d.\\n\",\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t\tu4ErrorID));\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\treturn 0;\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);

@@ -73,6 +73,7 @@ int main(int argc, char* argv[])
 	Gen_2_Make_define(objProjectInfo.m_szProjectName);
 	Gen_2_Make(objProjectInfo.m_szProjectName, objProjectInfo);
 	Gen_2_Mpc(objProjectInfo.m_szProjectName, objProjectInfo);
+	Gen_2_RunLinuxMake(objProjectInfo.m_szProjectName, objProjectInfo);
 	Gen_2_ZZZ(objProjectInfo.m_szProjectName);
 	Gen_2_Cpp_Logic_H(objProjectInfo, objvecXmlInfo);
 	Gen_2_Cpp_Logic_Cpp(objProjectInfo, objvecXmlInfo);

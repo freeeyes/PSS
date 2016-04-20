@@ -116,6 +116,28 @@ void Gen_2_Make(const char* pPath, _Project_Info& objProjectInfo)
 	fclose(pFile);
 }
 
+void Gen_2_RunLinuxMake(const char* pPath, _Project_Info& objProjectInfo)
+{
+	char szTemp[200]     = {'\0'};
+	char szPathFile[200] = {'\0'};
+
+	sprintf_safe(szPathFile, 200, "%s/runlinuxmake.sh", 
+		pPath,
+		pPath);
+
+	//首先生成声明文件。
+	FILE* pFile = fopen(szPathFile, "w");
+	if(NULL == pFile)
+	{
+		return;
+	}
+
+	sprintf_safe(szTemp, 200, "mwc.pl -type gnuace\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	fclose(pFile);
+}
+
 void Gen_2_Mpc(const char* pPath, _Project_Info& objProjectInfo)
 {
 	char szTemp[200]     = {'\0'};
@@ -140,7 +162,23 @@ void Gen_2_Mpc(const char* pPath, _Project_Info& objProjectInfo)
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\tdynamicflags += TEST_TCP_BUILD_DLL\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\tlibout = ./\n");
+	sprintf_safe(szTemp, 200, "\tlibout = ./\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tSource_Files{\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t./*.cpp\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t}\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tspecific (prop:microsoft){\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t}\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\telse{\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\tmacros += __LINUX__\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t}\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\tspecific (prop:microsoft){\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
