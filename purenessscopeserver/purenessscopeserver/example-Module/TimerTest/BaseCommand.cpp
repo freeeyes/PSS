@@ -34,7 +34,7 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 
 	if(m_pServerObject == NULL)
 	{
-		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL.\n"));
+		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL(%d).\n", bDeleteFlag));
 		return -1;
 	}
 
@@ -58,13 +58,16 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 
 int CBaseCommand::Do_Connect(IMessage* pMessage)
 {
-	OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_Connect] CLIENT_LINK_CONNECT OK.\n"));
-
-	//判断当前连接总数是否超越了2000个
-	int nConnectCount = m_pServerObject->GetConnectManager()->GetCount();
-	if(nConnectCount > 2000)
+	if(NULL != pMessage)
 	{
-		OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_Connect]connect count is more(%d).\n", nConnectCount));
+		OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_Connect] CLIENT_LINK_CONNECT OK.\n"));
+
+		//判断当前连接总数是否超越了2000个
+		int nConnectCount = m_pServerObject->GetConnectManager()->GetCount();
+		if(nConnectCount > 2000)
+		{
+			OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_Connect]connect count is more(%d).\n", nConnectCount));
+		}
 	}
 
 	return 0;
@@ -72,17 +75,16 @@ int CBaseCommand::Do_Connect(IMessage* pMessage)
 
 int CBaseCommand::Do_DisConnect(IMessage* pMessage)
 {
-	OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_DisConnect] CLIENT_LINK_CDISCONNET OK.\n"));
+	if(NULL != pMessage)
+	{
+		OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_DisConnect] CLIENT_LINK_CDISCONNET OK.\n"));
+	}
 
 	return 0;
 }
 
 int CBaseCommand::Do_Base(IMessage* pMessage)
 {
-	uint32     u4PacketLen  = 0;
-	uint16     u2CommandID  = 0;
-	uint64     u8ClientTime = 0;
-
 	//OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] CommandID = %d", COMMAND_BASE));
 	//m_pServerObject->GetLogManager()->WriteToMail(LOG_SYSTEM, 1, "测试邮件", "测试");
 
@@ -143,6 +145,11 @@ void CBaseCommand::Init()
 
 int CBaseCommand::handle_timeout(const ACE_Time_Value &tv, const void *arg)
 {
+	if(arg != NULL)
+	{
+		OUR_DEBUG((LM_INFO, "[CBaseCommand::handle_timeout](%d)!\n", tv.sec()));
+	}
+
 	//定时器到时执行
 	OUR_DEBUG((LM_INFO, "[CBaseCommand::handle_timeout]Hello!\n"));
 	return 0;
