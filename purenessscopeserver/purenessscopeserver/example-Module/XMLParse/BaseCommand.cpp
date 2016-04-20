@@ -28,7 +28,7 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 
 	if(m_pServerObject == NULL)
 	{
-		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL.\n"));
+		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL(%d).\n", bDeleteFlag));
 		return -1;
 	}
 
@@ -54,12 +54,14 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 int CBaseCommand::Do_Connect(IMessage* pMessage)
 {
 	OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_Connect] (%d)TCP CLIENT_LINK_CONNECT OK.\n", pMessage->GetMessageBase()->m_u4ConnectID));
-
-	//判断当前连接总数是否超越了2000个
-	int nConnectCount = m_pServerObject->GetConnectManager()->GetCount();
-	if(nConnectCount > 2000)
+	if(NULL != pMessage)
 	{
-		OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_Connect]connect count is more(%d).\n", nConnectCount));
+		//判断当前连接总数是否超越了2000个
+		int nConnectCount = m_pServerObject->GetConnectManager()->GetCount();
+		if(nConnectCount > 2000)
+		{
+			OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_Connect]connect count is more(%d).\n", nConnectCount));
+		}
 	}
 
 	return 0;
@@ -67,8 +69,11 @@ int CBaseCommand::Do_Connect(IMessage* pMessage)
 
 int CBaseCommand::Do_DisConnect(IMessage* pMessage)
 {
-	//处理连接断开事件
-	OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_DisConnect](%d)CLIENT_LINK_CDISCONNET OK.\n", pMessage->GetMessageBase()->m_u4ConnectID));
+	if(NULL != pMessage)
+	{
+		//处理连接断开事件
+		OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_DisConnect](%d)CLIENT_LINK_CDISCONNET OK.\n", pMessage->GetMessageBase()->m_u4ConnectID));
+	}
 
 	return 0;
 }
@@ -83,10 +88,6 @@ int CBaseCommand::Do_ClientSendTimeout(IMessage* pMessage)
 
 int CBaseCommand::Do_Base(IMessage* pMessage)
 {
-	uint32     u4PacketLen  = 0;
-	uint16     u2CommandID  = 0;
-	uint64     u8ClientTime = 0;
-
 	//OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] TcpTest CommandID = %d", COMMAND_BASE));
 	//m_pServerObject->GetLogManager()->WriteToMail(LOG_SYSTEM, 1, "测试邮件", "测试");
 
