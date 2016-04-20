@@ -6,6 +6,8 @@
 #include "BaseCommand.h"
 #include "IObject.h"
 
+#include "ace/svc_export.h"
+
 static const char *g_szDesc      = "PlugAÄ£¿é£¬ºÍPlugBÄ£¿éĞ­Í¬¹¤×÷";       //Ä£¿éµÄÃèÊöÎÄ×Ö
 static const char *g_szName      = "PlugAÄ£¿é";                            //Ä£¿éµÄÃû×Ö
 static const char *g_szModuleKey = "PlugA";                                //Ä£¿éµÄKey
@@ -17,7 +19,7 @@ static const char *g_szModuleKey = "PlugA";                                //Ä£¿
 #define DECLDIR __declspec(dllimport)
 #endif
 #else
-#define DECLDIR
+#define DECLDIR ACE_Svc_Export
 #endif
 
 extern "C"
@@ -104,7 +106,11 @@ const char* GetModuleKey()
 //ÓÃÓÚÄ£¿é¼äµÄµ÷ÓÃ½Ó¿Ú
 int DoModuleMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket)
 {
-  return 0;
+	OUR_DEBUG((LM_INFO, "[DoModuleMessage] u2CommandID=%d, size=%d, return=%d.\n",
+		u2CommandID,
+		pBuffPacket->GetPacketLen(),
+		pReturnBuffPacket->GetPacketLen()));
+	return 0;
 }
 
 //½»¸ø¿ò¼ÜÊ¹ÓÃ£¬ÓÃÓÚ¿ò¼Ü¶¨Ê±Ñ²¼ì²å¼ş×´Ì¬
@@ -113,6 +119,8 @@ int DoModuleMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* p
 //¿ò¼Ü»á¸ù¾İÕâ¸öÉèÖÃ£¬·¢ËÍÓÊ¼ş¸øÖ¸¶¨µÄÓÊÏä
 bool GetModuleState(uint32& u4ErrorID)
 {
+	OUR_DEBUG((LM_INFO, "[GetModuleState] u4ErrorID=%d, size=%d, return=%d.\n",
+		u4ErrorID));
 	return true;
 }
 

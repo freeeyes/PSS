@@ -26,6 +26,11 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
   //如果函数不返回任何变量，你可以使用__LEAVE_FUNCTION即可。
   __ENTER_FUNCTION();
 
+  if(NULL == pMessage)
+  {
+	  OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] pMessage is NULL(%d).\n", bDeleteFlag));
+  }
+
   return 0;
 
   __LEAVE_FUNCTION_WITHRETURN(0);
