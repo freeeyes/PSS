@@ -30,7 +30,7 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 
 	if(m_pServerObject == NULL)
 	{
-		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL.\n"));
+		OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL(%d).\n", bDeleteFlag));
 		return -1;
 	}
 
@@ -94,7 +94,7 @@ int CBaseCommand::DoMessage_HandIn(IMessage* pMessage, bool& bDeleteFlag)
 	}
 	else
 	{
-		OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage_HandIn] pClientKeyBegin = NULL.\n"));
+		OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage_HandIn] pClientKeyBegin = NULL(%d).\n", bDeleteFlag));
 		return 0;
 	}
 	
@@ -177,7 +177,7 @@ int CBaseCommand::DoMessage_DataIn(IMessage* pMessage, bool& bDeleteFlag)
 	ACE_OS::memcpy(pData, BodyPacket.m_pData, BodyPacket.m_nDataLen);
 
 	//打印接收后的数据体
-	OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage_DataIn]%s\n", pData));
+	OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage_DataIn](%d)%s\n", bDeleteFlag, pData));
 
 	//数据原样返回
 	char szReturnBuff[MAX_BUFF_1024] = {'\0'};
