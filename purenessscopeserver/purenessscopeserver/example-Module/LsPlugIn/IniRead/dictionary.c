@@ -263,7 +263,7 @@ int dictionary_set(dictionary * d, const char * key, const char * val)
        d->size. Because d->n < d->size this will necessarily
        terminate. */
     for (i=d->n ; d->key[i] ; ) {
-        if(++i == d->size) i = 0;
+        if(++i == (size_t)d->size) i = 0;
     }
     /* Copy key */
     d->key[i]  = xstrdup(key);

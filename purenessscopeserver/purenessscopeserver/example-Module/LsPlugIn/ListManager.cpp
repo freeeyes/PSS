@@ -136,8 +136,23 @@ void ClistManager::Get_All_LG_List(IBuffPacket* pbpList, uint32& u4Count)
 
 void ClistManager::Compare_MD5()
 {
-	CMD5 objMD5;
-	objMD5.ENCODE_DATA((char* )&m_vecLGInfo, sizeof(m_vecLGInfo), m_szMD5);
+	//CMD5 objMD5;
+	//objMD5.ENCODE_DATA((char* )&m_vecLGInfo, sizeof(m_vecLGInfo), m_szMD5);
+	unsigned char uszMD5[16] = {'\0'};
+	
+	MD5_CTX obj_MD5_CTX;
+	MD5Init(&obj_MD5_CTX);
+	MD5Update(&obj_MD5_CTX, (unsigned char* )&m_vecLGInfo, sizeof(m_vecLGInfo));
+	MD5Final(&obj_MD5_CTX, uszMD5);
+	
+	//将数组转换为字符串
+	char szDigit[3] = {'\0'};
+	for(int i = 0; i < 16; i++)
+	{
+		sprintf_safe(szDigit, 3, "%02x", (char)uszMD5[i]);
+		memcpy_safe((char* )&uszMD5[i*2], 32 - i*2, szDigit, 2);
+	}
+	
 }
 
 char* ClistManager::Get_MD5_Data()
