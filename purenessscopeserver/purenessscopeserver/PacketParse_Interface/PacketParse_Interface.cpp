@@ -5,6 +5,8 @@
 #include "define.h"
 #include "IMessageBlockManager.h"
 
+#include "ace/svc_export.h"
+
 #ifdef WIN32
 #ifdef PACKETPARSE_INTERFACE_EXPORTS
 #define DECLDIR __declspec(dllexport)
@@ -12,7 +14,7 @@
 #define DECLDIR __declspec(dllimport)
 #endif
 #else
-#define DECLDIR
+#define DECLDIR ACE_Svc_Export
 #endif
 
 extern "C"
