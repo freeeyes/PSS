@@ -1266,7 +1266,7 @@ bool CTcpPacketCheckDlg::CheckIsNoHead( _ClientInfo& objClientInfo, int nIndex )
 		}
 
 		//ÅÐ¶Ï·µ»ØÃüÁî×Ö
-		if(nReturnCommand != (int)COMMAND_AUTOTEST_NOHEAD)
+		if(nReturnCommand != (int)COMMAND_AUTOTEST_RETUEN_NOHEAD)
 		{
 			closesocket(sckClient);
 

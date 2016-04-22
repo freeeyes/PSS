@@ -29,7 +29,7 @@
 	
 	<!-- 允许插件设置个性化,可以多个,这里可以单独设置每个插件的不同参数,可以与Module设置同时生效,亦可不用此设置 -->
 	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="XMLParsed.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/> -->
-	<ModuleInfo ModuleSPath="./" ModuleSName="TcpTest.dll" ModuleSParam="..\..\example-Module\LGLogic\LSServer.ini" Desc="ModuleParam为插件启动参数"/>
+	<ModuleInfo ModuleSPath="./" ModuleSName="AutoTest.dll" ModuleSParam="..\..\example-Module\LGLogic\LSServer.ini" Desc="ModuleParam为插件启动参数"/>
 	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="TcpTestd.dll" ModuleSParam="--DEBUG" Desc="ModuleParam为插件启动参数"/> -->
 	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="TimerTestd.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/> -->
 	
@@ -45,7 +45,7 @@
 	<!-- 监控线程相关设置 -->
 	<ThreadInfo ThreadTimeout="30" ThreadTimeCheck="120" DisposeTimeout="40" PutQueueTimeout = "100" desc="工作线程相关参数" />
 	<!-- 监控线程AI相关设置 -->
-	<ThreadInfoAI AI="0" CheckTime="30" TimeoutCount="1" StopTime="30" ReturnDataType="1" ReturnData="ff ff" desc="工作线程负载自我监控相关设置，AI=0关闭，1打开" />
+	<ThreadInfoAI AI="1" CheckTime="5" TimeoutCount="1" StopTime="5" ReturnDataType="1" ReturnData="ff ff" desc="工作线程负载自我监控相关设置，AI=0关闭，1打开" />
 	<!-- 客户端连接池相关设置 -->
 	<ClientInfo HandlerCount="5000" MaxHandlerCount="10000" MaxConnectTime="60" CheckAliveTime="60" MaxBuffRecv="1024" TrackIPCount="100" desc="客户端链接相关参数"/>
 	<!-- 服务器间连接相关设置 -->
