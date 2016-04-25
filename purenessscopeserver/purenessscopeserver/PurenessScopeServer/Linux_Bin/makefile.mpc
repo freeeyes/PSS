@@ -14,5 +14,7 @@ project(PurenessScopeServer):aceexe{
   ../*.cpp
  }
  includes += ../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../IObject ../TinyXML ../Mail
- macros += __LINUX__
+  specific (gnuace){
+		macros += __LINUX__   
+	}
 }

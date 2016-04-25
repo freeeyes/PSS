@@ -170,11 +170,7 @@ void Gen_2_Mpc(const char* pPath, _Project_Info& objProjectInfo)
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t}\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\tspecific (prop:microsoft){\n");
-	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\t}\n");
-	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\telse{\n");
+	sprintf_safe(szTemp, 200, "\tspecific (gnuace){\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t\tmacros += __LINUX__\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
