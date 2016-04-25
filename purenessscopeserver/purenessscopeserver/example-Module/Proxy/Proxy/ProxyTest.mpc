@@ -5,7 +5,9 @@ project(ProxyTest):acelib{
   Source_Files{
   	./*.cpp 
   }
-  macros += __LINUX__   
+  specific (gnuace){
+		macros += __LINUX__   
+	}
   
   libout = ./
   specific (prop:microsoft){

@@ -7,7 +7,9 @@ project(LinuxQueue):acelib{
   	./*.cpp 
 	../Common/*.cpp
   }
-  macros += __LINUX__    
+  specific (gnuace){
+		macros += __LINUX__   
+	} 
   
   specific (prop:microsoft){
 	dllout = ../../../PurenessScopeServer/Windows_Bin

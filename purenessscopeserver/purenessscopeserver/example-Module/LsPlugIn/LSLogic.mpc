@@ -7,7 +7,9 @@ project(LSLogic):acelib{
   	./*.cpp 
 	./IniRead/*.c
   }
-  macros += __LINUX__    
+  specific (gnuace){
+		macros += __LINUX__   
+	} 
   
   specific (prop:microsoft){
 	dllout = ../../PurenessScopeServer/Windows_Bin

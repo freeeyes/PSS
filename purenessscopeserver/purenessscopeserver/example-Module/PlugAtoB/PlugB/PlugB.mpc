@@ -6,7 +6,9 @@ project(PlugB):acelib{
   Source_Files{
   	./*.cpp 
   }
-  macros += __LINUX__  
+  specific (gnuace){
+		macros += __LINUX__   
+	}
   
   specific (prop:microsoft){
 	dllout = ../../../PurenessScopeServer/Windows_Bin
