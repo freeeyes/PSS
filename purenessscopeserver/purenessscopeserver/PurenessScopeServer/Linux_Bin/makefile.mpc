@@ -14,7 +14,15 @@ project(PurenessScopeServer):aceexe{
   ../*.cpp
  }
  includes += ../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../IObject ../TinyXML ../Mail
-  specific (gnuace){
-		macros += __LINUX__   
-	}
+ macros += __LINUX__
+
+  specific(make) {
+    compile_flags += -fcheck-new
+  }
+
+  specific(gnuace) {
+    compile_flags += -Wno-deprecated
+  }
+
+
 }

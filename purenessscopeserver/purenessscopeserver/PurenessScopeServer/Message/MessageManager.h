@@ -1,11 +1,12 @@
 #ifndef _MESSAGEMANAGER_H
 #define _MESSAGEMANAGER_H
 
+#pragma once
+
 #include "IMessageManager.h"
 #include "Message.h"
 #include "LoadModule.h"
 
-/*
 #ifdef WIN32
 #include <hash_map>  
 #define HASHMAP_PREFIX stdext
@@ -13,7 +14,6 @@
 #include <ext/hash_map>  
 #define HASHMAP_PREFIX __gnu_cxx
 #endif
-*/
 
 //这里修改一下，如果一个命令对应一个模块是有限制的。
 //这里改为一个信令可以对应任意数量的处理模块，这样就比较好了。
@@ -199,8 +199,7 @@ public:
 	virtual uint32 GetWorkThreadByIndex(uint32 u4Index);
 
 private:
-	//typedef HASHMAP_PREFIX::hash_map<uint16, CClientCommandList*> mapClientCommand;
-	typedef map<uint16, CClientCommandList*> mapClientCommand;
+	typedef HASHMAP_PREFIX::hash_map<uint16, CClientCommandList*> mapClientCommand;
 
 	mapClientCommand            m_mapClientCommand;
 	mapModuleClient             m_mapModuleClient;
