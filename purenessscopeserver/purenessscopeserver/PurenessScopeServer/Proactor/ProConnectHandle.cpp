@@ -659,7 +659,7 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
 		//错误消息回调
 		App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), &result.message_block());
 
-		App_MessageBlockManager::instance()->Close(&result.message_block());
+		//App_MessageBlockManager::instance()->Close(&result.message_block());
 
 		return;
 	}

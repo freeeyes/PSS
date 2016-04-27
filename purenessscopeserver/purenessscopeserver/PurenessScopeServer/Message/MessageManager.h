@@ -5,8 +5,19 @@
 #include "Message.h"
 #include "LoadModule.h"
 
+/*
+#ifdef WIN32
+#include <hash_map>  
+#define HASHMAP_PREFIX stdext
+#else
+#include <ext/hash_map>  
+#define HASHMAP_PREFIX __gnu_cxx
+#endif
+*/
+
 //这里修改一下，如果一个命令对应一个模块是有限制的。
 //这里改为一个信令可以对应任意数量的处理模块，这样就比较好了。
+//用hash map替换map可以获得累积更高的性能提升
 //add by freeeyes
 
 using namespace std;
@@ -40,6 +51,20 @@ struct _ModuleClient
 {
 	vector<_ClientCommandInfo*> m_vecClientCommandInfo;    //一个模块所有对应命令列表
 };
+
+//hashmap的key hash生成算法
+struct str_Message_hash  
+{  
+	size_t operator()(const string &str) const    
+	{     
+		size_t  hash=0;  
+
+		for(size_t i=0;i!=str.length();++i)  
+			hash=((hash<<5)+hash)+(size_t)str[i];  
+
+		return hash;  
+	}     
+}; 
 
 //管理工具需要此数据结构，用于回传计算模块信息
 typedef map<string, _ModuleClient*> mapModuleClient;
@@ -174,6 +199,7 @@ public:
 	virtual uint32 GetWorkThreadByIndex(uint32 u4Index);
 
 private:
+	//typedef HASHMAP_PREFIX::hash_map<uint16, CClientCommandList*> mapClientCommand;
 	typedef map<uint16, CClientCommandList*> mapClientCommand;
 
 	mapClientCommand            m_mapClientCommand;

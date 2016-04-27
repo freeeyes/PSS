@@ -137,6 +137,7 @@ int CBaseCommand::Do_Base(IMessage* pMessage)
 
 void CBaseCommand::ReadIniFile(const char* pIniFileName)
 {
+	/*
 	dictionary* pDictionary = NULL;
 	pDictionary = iniparser_load(pIniFileName);
 	if(NULL == pDictionary)
@@ -169,4 +170,5 @@ void CBaseCommand::ReadIniFile(const char* pIniFileName)
 
 		iniparser_freedict(pDictionary);
 	}
+	*/
 }

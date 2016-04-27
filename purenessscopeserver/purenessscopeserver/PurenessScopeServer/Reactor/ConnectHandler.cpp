@@ -1541,7 +1541,7 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 
 			//错误消息回调
 			App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), pMbData);
-			App_MessageBlockManager::instance()->Close(pMbData);
+			//App_MessageBlockManager::instance()->Close(pMbData);
 			
 			//关闭当前连接
 			App_ConnectManager::instance()->CloseUnLock(GetConnectID());
