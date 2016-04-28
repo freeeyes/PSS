@@ -65,6 +65,15 @@ static bool Convert_Version(int nTagVserion)
 #define CONVERT_ACE_VERSION Convert_Version(6200)
 */
 
+//记录hash_map相关引用
+#ifdef WIN32
+#include <hash_map>  
+#define HASHMAP_PREFIX stdext
+#else
+#include <ext/hash_map>  
+#define HASHMAP_PREFIX __gnu_cxx
+#endif
+
 //根据不同的操作系统，定义不同的recv接收参数类型
 #ifdef WIN32
 #define MSG_NOSIGNAL          0            //信号量参数（WINDOWS）

@@ -185,7 +185,7 @@ private:
 	bool IsRun();
 
 private:
-	typedef map<uint32, CProConnectHandle*> mapConnectManager;
+	typedef HASHMAP_PREFIX::hash_map<uint32, CProConnectHandle*> mapConnectManager;
 	typedef vector<uint32> vecConnectManager;
 	mapConnectManager           m_mapConnectManager;     //当前已经存在并且激活的链接map
 	char                        m_szError[MAX_BUFF_500]; //错误信息描述

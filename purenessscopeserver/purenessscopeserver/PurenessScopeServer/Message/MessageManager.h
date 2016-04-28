@@ -7,14 +7,6 @@
 #include "Message.h"
 #include "LoadModule.h"
 
-#ifdef WIN32
-#include <hash_map>  
-#define HASHMAP_PREFIX stdext
-#else
-#include <ext/hash_map>  
-#define HASHMAP_PREFIX __gnu_cxx
-#endif
-
 //这里修改一下，如果一个命令对应一个模块是有限制的。
 //这里改为一个信令可以对应任意数量的处理模块，这样就比较好了。
 //用hash map替换map可以获得累积更高的性能提升
