@@ -1,5 +1,6 @@
 // Base.cpp : 一个TCP的测试类
 //用于PurenessScopeServer的测试和使用
+//考虑到析构顺序，static CBaseCommand改为指针，这样保证ACE的全局对象析构顺序一致。
 //add by freeeyes
 //2011-09-20
 
@@ -33,16 +34,24 @@ extern "C"
   DECLDIR bool GetModuleState(uint32& u4ErrorID);
 }
 
-static CBaseCommand g_BaseCommand;
-CServerObject*      g_pServerObject = NULL;
+static CBaseCommand* g_BaseCommand;
+CServerObject*       g_pServerObject = NULL;
 
 int LoadModuleData(CServerObject* pServerObject)
 {
   g_pServerObject = pServerObject;
+
+  if(NULL != g_BaseCommand)
+  {
+	  SAFE_DELETE(g_BaseCommand);
+  }
+
+  g_BaseCommand = new CBaseCommand();
+
   OUR_DEBUG((LM_INFO, "[Base LoadModuleData] Begin.\n"));
   if(g_pServerObject != NULL)
   {
-    g_BaseCommand.SetServerObject(pServerObject);	
+    g_BaseCommand->SetServerObject(pServerObject);	
   }
   else
   {
@@ -52,7 +61,7 @@ int LoadModuleData(CServerObject* pServerObject)
   IMessageManager* pMessageManager = g_pServerObject->GetMessageManager();
   if(NULL != pMessageManager)
   {
-    pMessageManager->AddClientCommand(COMMAND_BASE, &g_BaseCommand, g_szName);
+    pMessageManager->AddClientCommand(COMMAND_BASE, g_BaseCommand, g_szName);
 
 	//测试绑定指定的监听端口
 	//_ClientIPInfo objClientIPInfo;
@@ -60,9 +69,9 @@ int LoadModuleData(CServerObject* pServerObject)
 	//objClientIPInfo.m_nPort = 10002;
 	//pMessageManager->AddClientCommand(COMMAND_BASE, &g_BaseCommand, g_szName);
 
-    pMessageManager->AddClientCommand(CLIENT_LINK_CONNECT, &g_BaseCommand, g_szName);
-    pMessageManager->AddClientCommand(CLIENT_LINK_CDISCONNET, &g_BaseCommand, g_szName);
-	pMessageManager->AddClientCommand(CLINET_LINK_SENDTIMEOUT, &g_BaseCommand, g_szName);
+    pMessageManager->AddClientCommand(CLIENT_LINK_CONNECT, g_BaseCommand, g_szName);
+    pMessageManager->AddClientCommand(CLIENT_LINK_CDISCONNET, g_BaseCommand, g_szName);
+	pMessageManager->AddClientCommand(CLINET_LINK_SENDTIMEOUT, g_BaseCommand, g_szName);
   }
   else
   {
@@ -82,7 +91,7 @@ int LoadModuleData(CServerObject* pServerObject)
 
   OUR_DEBUG((LM_INFO, "[Base LoadModuleData] *********************************.\n"));
 
-  g_BaseCommand.ReadIniFile(pServerObject->GetModuleInfo()->GetModuleParam(g_szName));
+  g_BaseCommand->ReadIniFile(pServerObject->GetModuleInfo()->GetModuleParam(g_szName));
 
   OUR_DEBUG((LM_INFO, "[Base LoadModuleData] End.\n"));
 
@@ -97,12 +106,14 @@ int UnLoadModuleData()
     IMessageManager* pMessageManager = g_pServerObject->GetMessageManager();
     if(NULL != pMessageManager)
     {
-      pMessageManager->DelClientCommand(COMMAND_BASE, &g_BaseCommand);
-      pMessageManager->DelClientCommand(CLIENT_LINK_CONNECT, &g_BaseCommand);
-      pMessageManager->DelClientCommand(CLIENT_LINK_CDISCONNET, &g_BaseCommand);
-	  pMessageManager->DelClientCommand(CLINET_LINK_SENDTIMEOUT, &g_BaseCommand);
+      pMessageManager->DelClientCommand(COMMAND_BASE, g_BaseCommand);
+      pMessageManager->DelClientCommand(CLIENT_LINK_CONNECT, g_BaseCommand);
+      pMessageManager->DelClientCommand(CLIENT_LINK_CDISCONNET, g_BaseCommand);
+	  pMessageManager->DelClientCommand(CLINET_LINK_SENDTIMEOUT, g_BaseCommand);
       pMessageManager = NULL;
     }
+
+	SAFE_DELETE(g_BaseCommand);
   }
   OUR_DEBUG((LM_INFO, "[Base UnLoadModuleData] End.\n"));
   return 0;
