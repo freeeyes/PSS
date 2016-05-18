@@ -34,7 +34,7 @@ extern "C"
   DECLDIR bool GetModuleState(uint32& u4ErrorID);
 }
 
-static CBaseCommand* g_BaseCommand;
+static CBaseCommand* g_BaseCommand   = NULL;
 CServerObject*       g_pServerObject = NULL;
 
 int LoadModuleData(CServerObject* pServerObject)

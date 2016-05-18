@@ -33,16 +33,24 @@ extern "C"
 	DECLDIR bool GetModuleState(uint32& u4ErrorID);
 }
 
-static CBaseCommand g_BaseCommand;
+static CBaseCommand* g_BaseCommand  = NULL;
 CServerObject*      g_pServerObject = NULL;
 
 int LoadModuleData(CServerObject* pServerObject)
 {
 	g_pServerObject = pServerObject;
 	OUR_DEBUG((LM_INFO, "[Base LoadModuleData] Begin.\n"));
+
+	if(NULL != g_BaseCommand)
+	{
+		SAFE_DELETE(g_BaseCommand);
+	}
+
+	g_BaseCommand = new CBaseCommand();
+
 	if(g_pServerObject != NULL)
 	{
-		g_BaseCommand.SetServerObject(pServerObject);	
+		g_BaseCommand->SetServerObject(pServerObject);	
 	}
 	else
 	{
@@ -52,9 +60,9 @@ int LoadModuleData(CServerObject* pServerObject)
 	IMessageManager* pMessageManager = g_pServerObject->GetMessageManager();
 	if(NULL != pMessageManager)
 	{
-		pMessageManager->AddClientCommand(COMMAND_BASE, &g_BaseCommand, g_szName);
-		pMessageManager->AddClientCommand(CLIENT_LINK_CONNECT, &g_BaseCommand, g_szName);
-		pMessageManager->AddClientCommand(CLIENT_LINK_CDISCONNET, &g_BaseCommand, g_szName);
+		pMessageManager->AddClientCommand(COMMAND_BASE, g_BaseCommand, g_szName);
+		pMessageManager->AddClientCommand(CLIENT_LINK_CONNECT, g_BaseCommand, g_szName);
+		pMessageManager->AddClientCommand(CLIENT_LINK_CDISCONNET, g_BaseCommand, g_szName);
 	}
 	else
 	{
@@ -62,7 +70,7 @@ int LoadModuleData(CServerObject* pServerObject)
 	}
 
 	//在这里调用中间服务器链接初始化信息
-	g_BaseCommand.InitServer(g_szName);
+	g_BaseCommand->InitServer(g_szName);
 
 	OUR_DEBUG((LM_INFO, "[Base LoadModuleData] End.\n"));
 
@@ -77,11 +85,13 @@ int UnLoadModuleData()
 		IMessageManager* pMessageManager = g_pServerObject->GetMessageManager();
 		if(NULL != pMessageManager)
 		{
-			pMessageManager->DelClientCommand(COMMAND_BASE, &g_BaseCommand);
-			pMessageManager->DelClientCommand(CLIENT_LINK_CONNECT, &g_BaseCommand);
-			pMessageManager->DelClientCommand(CLIENT_LINK_CDISCONNET, &g_BaseCommand);
+			pMessageManager->DelClientCommand(COMMAND_BASE, g_BaseCommand);
+			pMessageManager->DelClientCommand(CLIENT_LINK_CONNECT, g_BaseCommand);
+			pMessageManager->DelClientCommand(CLIENT_LINK_CDISCONNET, g_BaseCommand);
 			pMessageManager = NULL;
 		}
+
+		SAFE_DELETE(g_BaseCommand);
 	}
 	OUR_DEBUG((LM_INFO, "[Base UnLoadModuleData] End.\n"));
 	return 0;
