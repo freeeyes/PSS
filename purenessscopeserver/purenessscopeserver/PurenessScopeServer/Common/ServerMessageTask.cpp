@@ -346,7 +346,7 @@ bool CServerMessageManager::CheckServerMessageThread(ACE_Time_Value tvNow)
 				OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::CheckServerMessageThread]kill return %d, %d\n", ret, GetLastError())); 
 			}
 #else
-			int ret = ACE_Thread_Manager::instance()->cancel_task(m_pServerMessageTask);
+			int ret = ACE_Thread_Manager::instance()->cancel_task(m_pServerMessageTask, 1);
 			OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::CheckServerMessageThread]kill return %d OK.\n", ret)); 
 #endif
 			m_pServerMessageTask->Close();

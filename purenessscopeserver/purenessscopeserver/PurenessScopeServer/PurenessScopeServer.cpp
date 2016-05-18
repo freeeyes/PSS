@@ -231,7 +231,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 		App_MainConfig::instance()->Display();
 	}
 
-	//隐式加载PacketParse
+	//显式加载PacketParse
 	bool blState = App_PacketParseLoader::instance()->LoadPacketInfo(App_MainConfig::instance()->GetPacketParseInfo()->m_szPacketParseName);
 	if(true == blState)
 	{
