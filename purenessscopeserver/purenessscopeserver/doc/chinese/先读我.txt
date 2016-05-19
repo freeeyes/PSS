@@ -77,7 +77,8 @@ export LD_LIBRARY_PATH
 #include "ace/config-linux.h"
 然后进入$ACE_ROOT/include/makeinclude
 新建 platform_macros.GNU，在platform_macros.GNU中加入一行如 下：
-include platform_linux.GNU
+include $(ACE_ROOT)/include/makeinclude/platform_linux.GNU
+
 然后回到ace目录
 make
 编译完成后，检查上一层lib文件夹下的libace.so是否存在，存在则编译成功。
