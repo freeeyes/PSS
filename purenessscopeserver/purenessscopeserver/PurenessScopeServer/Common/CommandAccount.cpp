@@ -79,11 +79,12 @@ bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint64 u8CommandCost, 
 			(uint32)u8CommandCost);
 	}
 
+	ACE_Date_Time dtNowTime(tvTime);
+	uint8 u1Minute = (uint8)dtNowTime.minute();
+
 	//如果流量开关打开，则记录流量(单位是分钟)
 	if(m_u1Flow == 1)
 	{
-		ACE_Date_Time dtNowTime(tvTime);
-		uint8 u1Minute = (uint8)dtNowTime.minute();
 		if(m_u1Minute != u1Minute)
 		{
 			m_u4PrvFlowIn  = m_u4FlowIn;
@@ -173,8 +174,6 @@ bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint64 u8CommandCost, 
 		{
 			if(m_vecCommandAlertData[i].m_u2CommandID == u2CommandID)
 			{
-				ACE_Date_Time dtNowTime(tvTime);
-				uint8 u1Minute = (uint8)dtNowTime.minute();
 				if(m_vecCommandAlertData[i].m_u1Minute != u1Minute)
 				{
 					m_vecCommandAlertData[i].m_u4CurrCount = 1;

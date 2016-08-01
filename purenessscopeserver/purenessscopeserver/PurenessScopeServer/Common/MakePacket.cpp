@@ -147,7 +147,7 @@ bool CMakePacket::Init()
 }
 
 
-bool CMakePacket::PutUDPMessageBlock(const ACE_INET_Addr& AddrRemote, uint8 u1Option, _MakePacket* pMakePacket)
+bool CMakePacket::PutUDPMessageBlock(const ACE_INET_Addr& AddrRemote, uint8 u1Option, _MakePacket* pMakePacket, ACE_Time_Value& tvNow)
 {
 	if(NULL == pMakePacket)
 	{
@@ -158,12 +158,12 @@ bool CMakePacket::PutUDPMessageBlock(const ACE_INET_Addr& AddrRemote, uint8 u1Op
 	pMakePacket->m_u1Option          = u1Option;
 	pMakePacket->m_AddrRemote        = AddrRemote;
 
-	ProcessMessageBlock(pMakePacket);
+	ProcessMessageBlock(pMakePacket, tvNow);
 
 	return true;
 }
 
-bool CMakePacket::PutMessageBlock(uint32 u4ConnectID, uint8 u1Option, _MakePacket* pMakePacket)
+bool CMakePacket::PutMessageBlock(uint32 u4ConnectID, uint8 u1Option, _MakePacket* pMakePacket, ACE_Time_Value& tvNow)
 {
 	if(NULL == pMakePacket)
 	{
@@ -175,12 +175,12 @@ bool CMakePacket::PutMessageBlock(uint32 u4ConnectID, uint8 u1Option, _MakePacke
 	pMakePacket->m_u1Option          = u1Option;
 	pMakePacket->m_PacketType        = PACKET_TCP;
 
-	ProcessMessageBlock(pMakePacket);
+	ProcessMessageBlock(pMakePacket, tvNow);
 
 	return true;
 }
 
-bool CMakePacket::ProcessMessageBlock(_MakePacket* pMakePacket)
+bool CMakePacket::ProcessMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& tvNow)
 {
 	if(NULL == pMakePacket)
 	{
@@ -207,33 +207,33 @@ bool CMakePacket::ProcessMessageBlock(_MakePacket* pMakePacket)
 			sprintf_safe(pMessage->GetMessageBase()->m_szListenIP, MAX_BUFF_20, "%s", pMakePacket->m_AddrListen.get_host_addr());
 			pMessage->GetMessageBase()->m_u4ListenPort = (uint32)pMakePacket->m_AddrListen.get_port_number(); 
 
-			SetMessage(pMakePacket->m_pPacketParse, pMakePacket->m_u4ConnectID, pMessage);
+			SetMessage(pMakePacket->m_pPacketParse, pMakePacket->m_u4ConnectID, pMessage, tvNow);
 		}
 		else
 		{
 			//UDP数据包处理方法
-			SetMessage(pMakePacket->m_pPacketParse, pMakePacket->m_AddrRemote, pMessage);
+			SetMessage(pMakePacket->m_pPacketParse, pMakePacket->m_AddrRemote, pMessage, tvNow);
 		}		
 	}
 	else if(pMakePacket->m_u1Option == PACKET_CONNECT)
 	{
-		SetMessageConnect(pMakePacket->m_u4ConnectID, pMessage);
+		SetMessageConnect(pMakePacket->m_u4ConnectID, pMessage, tvNow);
 	}
 	else if(pMakePacket->m_u1Option == PACKET_CDISCONNECT)
 	{
-		SetMessageCDisConnect(pMakePacket->m_u4ConnectID, pMessage);
+		SetMessageCDisConnect(pMakePacket->m_u4ConnectID, pMessage, tvNow);
 	}
 	else if(pMakePacket->m_u1Option == PACKET_SDISCONNECT)
 	{
-		SetMessageSDisConnect(pMakePacket->m_u4ConnectID, pMessage);
+		SetMessageSDisConnect(pMakePacket->m_u4ConnectID, pMessage, tvNow);
 	}
 	else if(pMakePacket->m_u1Option == PACKET_SEND_TIMEOUT)
 	{
-		SetMessageSendTimeout(pMakePacket->m_u4ConnectID, pMessage);
+		SetMessageSendTimeout(pMakePacket->m_u4ConnectID, pMessage, tvNow);
 	}
 	else if(pMakePacket->m_u1Option == PACKET_CHEK_TIMEOUT)
 	{
-		SetMessageSendTimeout(pMakePacket->m_u4ConnectID, pMessage);
+		SetMessageSendTimeout(pMakePacket->m_u4ConnectID, pMessage, tvNow);
 	}
 
 	//将要处理的消息放入消息处理线程
@@ -247,14 +247,14 @@ bool CMakePacket::ProcessMessageBlock(_MakePacket* pMakePacket)
 	return true;
 }
 
-void CMakePacket::SetMessage(CPacketParse* pPacketParse, uint32 u4ConnectID, CMessage* pMessage)
+void CMakePacket::SetMessage(CPacketParse* pPacketParse, uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow)
 {
 	if(NULL != pMessage->GetMessageBase())
 	{
 		//开始组装数据
 		pMessage->GetMessageBase()->m_u4ConnectID   = u4ConnectID;
 		pMessage->GetMessageBase()->m_u2Cmd         = pPacketParse->GetPacketCommandID();
-		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)ACE_OS::gettimeofday().sec();
+		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)tvNow.sec();
 		pMessage->GetMessageBase()->m_u4HeadSrcSize = pPacketParse->GetPacketHeadSrcLen();
 		pMessage->GetMessageBase()->m_u4BodySrcSize = pPacketParse->GetPacketBodySrcLen();
 
@@ -268,14 +268,14 @@ void CMakePacket::SetMessage(CPacketParse* pPacketParse, uint32 u4ConnectID, CMe
 	}
 }
 
-void CMakePacket::SetMessage(CPacketParse* pPacketParse, const ACE_INET_Addr& AddrRemote, CMessage* pMessage)
+void CMakePacket::SetMessage(CPacketParse* pPacketParse, const ACE_INET_Addr& AddrRemote, CMessage* pMessage, ACE_Time_Value& tvNow)
 {
 	if(NULL != pMessage->GetMessageBase())
 	{
 		//开始组装数据
 		pMessage->GetMessageBase()->m_u4ConnectID   = UDP_HANDER_ID;
 		pMessage->GetMessageBase()->m_u2Cmd         = pPacketParse->GetPacketCommandID();
-		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)ACE_OS::gettimeofday().sec();
+		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)tvNow.sec();
 		pMessage->GetMessageBase()->m_u4Port        = (uint32)AddrRemote.get_port_number();
 		pMessage->GetMessageBase()->m_u1PacketType  = PACKET_UDP;
 		pMessage->GetMessageBase()->m_u4HeadSrcSize = pPacketParse->GetPacketHeadSrcLen();
@@ -292,14 +292,14 @@ void CMakePacket::SetMessage(CPacketParse* pPacketParse, const ACE_INET_Addr& Ad
 	}
 }
 
-void CMakePacket::SetMessageConnect(uint32 u4ConnectID, CMessage* pMessage)
+void CMakePacket::SetMessageConnect(uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow)
 {
 	if(NULL != pMessage->GetMessageBase())
 	{
 		//开始组装数据
 		pMessage->GetMessageBase()->m_u4ConnectID   = u4ConnectID;
 		pMessage->GetMessageBase()->m_u2Cmd         = CLIENT_LINK_CONNECT;
-		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)ACE_OS::gettimeofday().sec();
+		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)tvNow.sec();
 		pMessage->GetMessageBase()->m_u4HeadSrcSize = 0;
 		pMessage->GetMessageBase()->m_u4BodySrcSize = 0;
 
@@ -313,14 +313,14 @@ void CMakePacket::SetMessageConnect(uint32 u4ConnectID, CMessage* pMessage)
 	}
 }
 
-void CMakePacket::SetMessageCDisConnect(uint32 u4ConnectID, CMessage* pMessage)
+void CMakePacket::SetMessageCDisConnect(uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow)
 {
 	if(NULL != pMessage->GetMessageBase())
 	{
 		//开始组装数据
 		pMessage->GetMessageBase()->m_u4ConnectID   = u4ConnectID;
 		pMessage->GetMessageBase()->m_u2Cmd         = CLIENT_LINK_CDISCONNET;
-		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)ACE_OS::gettimeofday().sec();
+		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)tvNow.sec();
 		pMessage->GetMessageBase()->m_u4HeadSrcSize = 0;
 		pMessage->GetMessageBase()->m_u4BodySrcSize = 0;
 
@@ -334,14 +334,14 @@ void CMakePacket::SetMessageCDisConnect(uint32 u4ConnectID, CMessage* pMessage)
 	}
 }
 
-void CMakePacket::SetMessageSDisConnect(uint32 u4ConnectID, CMessage* pMessage)
+void CMakePacket::SetMessageSDisConnect(uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow)
 {
 	if(NULL != pMessage->GetMessageBase())
 	{
 		//开始组装数据
 		pMessage->GetMessageBase()->m_u4ConnectID   = u4ConnectID;
 		pMessage->GetMessageBase()->m_u2Cmd         = CLIENT_LINK_SDISCONNET;
-		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)ACE_OS::gettimeofday().sec();
+		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)tvNow.sec();
 		pMessage->GetMessageBase()->m_u4HeadSrcSize = 0;
 		pMessage->GetMessageBase()->m_u4BodySrcSize = 0;
 
@@ -355,14 +355,14 @@ void CMakePacket::SetMessageSDisConnect(uint32 u4ConnectID, CMessage* pMessage)
 	}
 }
 
-void CMakePacket::SetMessageSendTimeout(uint32 u4ConnectID, CMessage* pMessage)
+void CMakePacket::SetMessageSendTimeout(uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow)
 {
 	if(NULL != pMessage->GetMessageBase())
 	{
 		//开始组装数据
 		pMessage->GetMessageBase()->m_u4ConnectID   = u4ConnectID;
 		pMessage->GetMessageBase()->m_u2Cmd         = CLINET_LINK_SENDTIMEOUT;
-		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)ACE_OS::gettimeofday().sec();
+		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)tvNow.sec();
 		pMessage->GetMessageBase()->m_u4HeadSrcSize = 0;
 		pMessage->GetMessageBase()->m_u4BodySrcSize = 0;
 
@@ -376,14 +376,14 @@ void CMakePacket::SetMessageSendTimeout(uint32 u4ConnectID, CMessage* pMessage)
 	}
 }
 
-void CMakePacket::SetMessageCheckTimeout(uint32 u4ConnectID, CMessage* pMessage)
+void CMakePacket::SetMessageCheckTimeout(uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow)
 {
 	if(NULL != pMessage->GetMessageBase())
 	{
 		//开始组装数据
 		pMessage->GetMessageBase()->m_u4ConnectID   = u4ConnectID;
 		pMessage->GetMessageBase()->m_u2Cmd         = CLINET_LINK_CHECKTIMEOUT;
-		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)ACE_OS::gettimeofday().sec();
+		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)tvNow.sec();
 		pMessage->GetMessageBase()->m_u4HeadSrcSize = 0;
 		pMessage->GetMessageBase()->m_u4BodySrcSize = 0;
 
@@ -398,14 +398,14 @@ void CMakePacket::SetMessageCheckTimeout(uint32 u4ConnectID, CMessage* pMessage)
 }
 
 
-void CMakePacket::SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, CMessage* pMessage)
+void CMakePacket::SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, CMessage* pMessage, ACE_Time_Value& tvNow)
 {
 	if(NULL != pMessage->GetMessageBase())
 	{
 		//开始组装数据
 		pMessage->GetMessageBase()->m_u4ConnectID   = u4ConnectID;
 		pMessage->GetMessageBase()->m_u2Cmd         = (uint16)CLINET_LINK_SENDERROR;
-		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)ACE_OS::gettimeofday().sec();
+		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)tvNow.sec();
 		pMessage->GetMessageBase()->m_u4HeadSrcSize = 0;
 		pMessage->GetMessageBase()->m_u4BodySrcSize = 0;
 
@@ -419,7 +419,7 @@ void CMakePacket::SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBo
 	}
 }
 
-bool CMakePacket::PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage)
+bool CMakePacket::PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, ACE_Time_Value& tvNow)
 {
 	CMessage* pMessage = App_MessageServiceGroup::instance()->CreateMessage(u4ConnectID, (uint8)PACKET_TCP);
 	if(NULL == pMessage)
@@ -429,7 +429,7 @@ bool CMakePacket::PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBo
 		return false;
 	}
 	
-	SetMessageSendError(u4ConnectID, pBodyMessage, pMessage);
+	SetMessageSendError(u4ConnectID, pBodyMessage, pMessage, tvNow);
 	if(NULL != pMessage)
 	{
 		//将要处理的消息放入消息处理线程

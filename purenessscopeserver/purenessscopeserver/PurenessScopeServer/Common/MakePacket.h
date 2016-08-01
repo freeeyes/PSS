@@ -80,21 +80,21 @@ public:
 
 	bool Init();
 
-	bool PutMessageBlock(uint32 u4ConnectID, uint8 u1Option, _MakePacket* pMakePacket);                          //处理TCP数据包
-	bool PutUDPMessageBlock(const ACE_INET_Addr& AddrRemote, uint8 u1Option, _MakePacket* pMakePacket);          //处理UDP数据包 
-	bool PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage);                               //发送失败消息回调 
+	bool PutMessageBlock(uint32 u4ConnectID, uint8 u1Option, _MakePacket* pMakePacket, ACE_Time_Value& tvNow);                 //处理TCP数据包
+	bool PutUDPMessageBlock(const ACE_INET_Addr& AddrRemote, uint8 u1Option, _MakePacket* pMakePacket, ACE_Time_Value& tvNow); //处理UDP数据包 
+	bool PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, ACE_Time_Value& tvNow);                      //发送失败消息回调 
 
 private:
-	void SetMessage(CPacketParse* pPacketParse, uint32 u4ConnectID, CMessage* pMessage);                         //一般数据包消息(TCP)
-	void SetMessage(CPacketParse* pPacketParse, const ACE_INET_Addr& AddrRemote, CMessage* pMessage);            //一般数据包消息(UDP)
-	void SetMessageConnect(uint32 u4ConnectID, CMessage* pMessage);                                              //用户链接数据包消息
-	void SetMessageCDisConnect(uint32 u4ConnectID, CMessage* pMessage);                                          //用户断开链接数据包消息
-	void SetMessageSDisConnect(uint32 u4ConnectID, CMessage* pMessage);                                          //服务器断开链接数据包消息
-	void SetMessageSendTimeout(uint32 u4ConnectID, CMessage* pMessage);                                          //服务器发送给客户端数据超时消息
-	void SetMessageCheckTimeout(uint32 u4ConnectID, CMessage* pMessage);                                         //服务器心跳超时消息 
-	void SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, CMessage* pMessage);           //服务发送失败回调数据包消息
+	void SetMessage(CPacketParse* pPacketParse, uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow);                         //一般数据包消息(TCP)
+	void SetMessage(CPacketParse* pPacketParse, const ACE_INET_Addr& AddrRemote, CMessage* pMessage, ACE_Time_Value& tvNow);            //一般数据包消息(UDP)
+	void SetMessageConnect(uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow);                                              //用户链接数据包消息
+	void SetMessageCDisConnect(uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow);                                          //用户断开链接数据包消息
+	void SetMessageSDisConnect(uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow);                                          //服务器断开链接数据包消息
+	void SetMessageSendTimeout(uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow);                                          //服务器发送给客户端数据超时消息
+	void SetMessageCheckTimeout(uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow);                                         //服务器心跳超时消息 
+	void SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, CMessage* pMessage, ACE_Time_Value& tvNow);           //服务发送失败回调数据包消息
 
-	bool ProcessMessageBlock(_MakePacket* pMakePacket);                                                          //组成队列消息
+	bool ProcessMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& tvNow);                                   //组成队列消息
 private:
 	CMakePacketPool                m_MakePacketPool;
 	ACE_Recursive_Thread_Mutex     m_ThreadWriteLock;

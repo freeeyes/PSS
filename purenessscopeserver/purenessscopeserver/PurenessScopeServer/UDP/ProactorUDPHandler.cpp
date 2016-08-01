@@ -235,6 +235,7 @@ _ClientConnectInfo CProactorUDPHandler::GetClientConnectInfo()
 
 bool CProactorUDPHandler::CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len)
 {
+	ACE_Time_Value tvCheck = ACE_OS::gettimeofday();
 	if(NULL == m_pPacketParse || NULL == pMbData)
 	{
 		return false;
@@ -309,7 +310,7 @@ bool CProactorUDPHandler::CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len)
 		objMakePacket.m_PacketType        = PACKET_UDP;
 
 		//UDP因为不是面向链接的
-		if(false == App_MakePacket::instance()->PutUDPMessageBlock(m_addrRemote, PACKET_PARSE, &objMakePacket))
+		if(false == App_MakePacket::instance()->PutUDPMessageBlock(m_addrRemote, PACKET_PARSE, &objMakePacket, tvCheck))
 		{
 			OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::SendMessage]PutMessageBlock is error.\n"));
 			App_PacketParsePool::instance()->Delete(m_pPacketParse);
@@ -337,7 +338,7 @@ bool CProactorUDPHandler::CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len)
 			objMakePacket.m_PacketType        = PACKET_UDP;
 
 			//UDP因为不是面向链接的
-			if(false == App_MakePacket::instance()->PutUDPMessageBlock(m_addrRemote, PACKET_PARSE, &objMakePacket))
+			if(false == App_MakePacket::instance()->PutUDPMessageBlock(m_addrRemote, PACKET_PARSE, &objMakePacket, tvCheck))
 			{
 				App_PacketParsePool::instance()->Delete(m_pPacketParse);
 				OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::SendMessage]PutMessageBlock is error.\n"));

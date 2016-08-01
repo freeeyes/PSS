@@ -96,7 +96,8 @@ bool CConnectHandler::Close(int nIOCount)
 		objMakePacket.m_pPacketParse      = NULL;
 
 		//发送客户端链接断开消息。
-		if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket))
+		ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+		if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket, tvNow))
 		{
 			OUR_DEBUG((LM_ERROR, "[CConnectHandler::Close] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 		}
@@ -160,7 +161,8 @@ bool CConnectHandler::ServerClose(EM_Client_Close_status emStatus, uint8 u1Optio
 		objMakePacket.m_pPacketParse      = NULL;
 
 		//发送客户端链接断开消息。
-		if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), u1OptionEvent, &objMakePacket))
+		ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+		if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), u1OptionEvent, &objMakePacket, tvNow))
 		{
 			OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 		}
@@ -347,7 +349,8 @@ int CConnectHandler::open(void*)
 	objMakePacket.m_pPacketParse      = NULL;
 
 	//发送链接建立消息。
-	if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CONNECT, &objMakePacket))
+	ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+	if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CONNECT, &objMakePacket, tvNow))
 	{
 		OUR_DEBUG((LM_ERROR, "[CConnectHandler::open] ConnectID=%d, PACKET_CONNECT is error.\n", GetConnectID()));
 	}
@@ -382,7 +385,8 @@ int CConnectHandler::handle_input(ACE_HANDLE fd)
 		objMakePacket.m_pPacketParse      = NULL;
 
 		//发送客户端链接断开消息。
-		if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket))
+		ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+		if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket, tvNow))
 		{
 			OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 		}
@@ -404,7 +408,8 @@ int CConnectHandler::handle_input(ACE_HANDLE fd)
 		objMakePacket.m_pPacketParse      = NULL;
 
 		//发送客户端链接断开消息。
-		if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket))
+		ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+		if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket, tvNow))
 		{
 			OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 		}
@@ -587,7 +592,8 @@ int CConnectHandler::RecvData()
 					objMakePacket.m_pPacketParse      = NULL;
 
 					//发送客户端链接断开消息。
-					if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket))
+					ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+					if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket, tvNow))
 					{
 						OUR_DEBUG((LM_ERROR, "[CProConnectHandle::RecvData] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 					}
@@ -689,7 +695,8 @@ int CConnectHandler::RecvData()
 				objMakePacket.m_pPacketParse      = NULL;
 
 				//发送客户端链接断开消息。
-				if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket))
+				ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+				if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket, tvNow))
 				{
 					OUR_DEBUG((LM_ERROR, "[CProConnectHandle::RecvData] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 				}
@@ -763,7 +770,8 @@ int CConnectHandler::RecvData()
 				objMakePacket.m_pPacketParse      = NULL;
 
 				//发送客户端链接断开消息。
-				if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket))
+				ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+				if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket, tvNow))
 				{
 					OUR_DEBUG((LM_ERROR, "[CProConnectHandle::RecvData] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 				}
@@ -790,7 +798,8 @@ int CConnectHandler::RecvData()
 			objMakePacket.m_pPacketParse      = NULL;
 
 			//发送客户端链接断开消息。
-			if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket))
+			ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+			if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket, tvNow))
 			{
 				OUR_DEBUG((LM_ERROR, "[CProConnectHandle::RecvData] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 			}
@@ -978,7 +987,8 @@ int CConnectHandler::RecvData_et()
 						objMakePacket.m_pPacketParse      = NULL;
 
 						//发送客户端链接断开消息。
-						if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket))
+						ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+						if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket, tvNow))
 						{
 							OUR_DEBUG((LM_ERROR, "[CProConnectHandle::RecvData_et] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 						}
@@ -1079,7 +1089,8 @@ int CConnectHandler::RecvData_et()
 					objMakePacket.m_pPacketParse      = NULL;
 
 					//发送客户端链接断开消息。
-					if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket))
+					ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+					if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket, tvNow))
 					{
 						OUR_DEBUG((LM_ERROR, "[CProConnectHandle::RecvData_et] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 					}
@@ -1152,7 +1163,8 @@ int CConnectHandler::RecvData_et()
 					objMakePacket.m_pPacketParse      = NULL;
 
 					//发送客户端链接断开消息。
-					if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket))
+					ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+					if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket, tvNow))
 					{
 						OUR_DEBUG((LM_ERROR, "[CProConnectHandle::RecvData_et] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 					}
@@ -1179,7 +1191,8 @@ int CConnectHandler::RecvData_et()
 				objMakePacket.m_pPacketParse      = NULL;
 
 				//发送客户端链接断开消息。
-				if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket))
+				ACE_Time_Value vtNow = ACE_OS::gettimeofday();
+				if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_CDISCONNECT, &objMakePacket, vtNow))
 				{
 					OUR_DEBUG((LM_ERROR, "[CProConnectHandle::RecvData_et] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 				}
@@ -1244,6 +1257,7 @@ bool CConnectHandler::SetSendQueueTimeCost(uint32 u4TimeCost)
 	//如果超过阀值，则记录到日志中去
 	if((uint32)(m_u8SendQueueTimeout) <= u4TimeCost)
 	{
+		ACE_Time_Value tvNow = ACE_OS::gettimeofday();
 		AppLogManager::instance()->WriteLog(LOG_SYSTEM_SENDQUEUEERROR, "[TCP]IP=%s,Prot=%d,m_u8SendQueueTimeout = [%d], Timeout=[%d].", GetClientIPInfo().m_szClientIP, GetClientIPInfo().m_nPort, (uint32)m_u8SendQueueTimeout, u4TimeCost);
 
 		//组织数据
@@ -1253,7 +1267,7 @@ bool CConnectHandler::SetSendQueueTimeCost(uint32 u4TimeCost)
 		objMakePacket.m_pPacketParse      = NULL;
 
 		//告诉插件连接发送超时阀值报警
-		if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_SEND_TIMEOUT, &objMakePacket))
+		if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_SEND_TIMEOUT, &objMakePacket, tvNow))
 		{
 			OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 		}
@@ -1540,7 +1554,7 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 			m_atvOutput      = ACE_OS::gettimeofday();
 
 			//错误消息回调
-			App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), pMbData);
+			App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), pMbData, m_atvOutput);
 			//App_MessageBlockManager::instance()->Close(pMbData);
 			
 			//关闭当前连接
@@ -1599,7 +1613,8 @@ bool CConnectHandler::CheckMessage()
 	//如果需要统计信息
 	//App_IPAccount::instance()->UpdateIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
 
-	ACE_Date_Time dtNow;
+	ACE_Time_Value tvCheck = ACE_OS::gettimeofday();
+	ACE_Date_Time dtNow(tvCheck);
 	if(false == m_TimeConnectInfo.RecvCheck((uint8)dtNow.minute(), 1, m_u4AllRecvSize))
 	{
 		//超过了限定的阀值，需要关闭链接，并记录日志
@@ -1635,7 +1650,7 @@ bool CConnectHandler::CheckMessage()
 	}
 
 	//将数据Buff放入消息体中
-	if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_PARSE, &objMakePacket))
+	if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), PACKET_PARSE, &objMakePacket, tvCheck))
 	{
 		App_PacketParsePool::instance()->Delete(m_pPacketParse);
 		m_pPacketParse = NULL;
