@@ -1901,9 +1901,9 @@ bool CConnectManager::CloseUnLock(uint32 u4ConnectID)
 
 bool CConnectManager::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status emStatus)
 {
-	OUR_DEBUG((LM_ERROR, "[CConnectManager::CloseConnect]ConnectID=%d Begin.\n", u4ConnectID));
+	//OUR_DEBUG((LM_ERROR, "[CConnectManager::CloseConnect]ConnectID=%d Begin.\n", u4ConnectID));
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
-	OUR_DEBUG((LM_ERROR, "[CConnectManager::CloseConnect]ConnectID=%d Begin 1.\n", u4ConnectID));
+	//OUR_DEBUG((LM_ERROR, "[CConnectManager::CloseConnect]ConnectID=%d Begin 1.\n", u4ConnectID));
 	mapConnectManager::iterator f = m_mapConnectManager.find(u4ConnectID);
 		
 	if(emStatus != CLIENT_CLOSE_IMMEDIATLY)
@@ -1925,7 +1925,7 @@ bool CConnectManager::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status em
 			App_ConnectAccount::instance()->AddDisConnect();
 		}
 		m_mapConnectManager.erase(f);
-		OUR_DEBUG((LM_ERROR, "[CConnectManager::CloseConnect]ConnectID=%d End.\n", u4ConnectID));
+		//OUR_DEBUG((LM_ERROR, "[CConnectManager::CloseConnect]ConnectID=%d End.\n", u4ConnectID));
 		return true;
 	}
 	else
