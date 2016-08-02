@@ -36,12 +36,16 @@ public:
 
 	const char* GetError();
 
+	ACE_Message_Block*  GetQueueMessage();
+
 private:
 	char          m_szError[MAX_BUFF_500];
 	_MessageBase* m_pMessageBase;
 
 	ACE_Message_Block* m_pmbHead;             //包头部分
 	ACE_Message_Block* m_pmbBody;             //包体部分
+
+	ACE_Message_Block*  m_pmbQueuePtr;        //消息队列指针块
 };
 
 

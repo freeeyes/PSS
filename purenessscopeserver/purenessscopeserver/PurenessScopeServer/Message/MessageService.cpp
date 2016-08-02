@@ -168,13 +168,14 @@ int CMessageService::svc(void)
         if(! msg)
         {
             OUR_DEBUG((LM_ERROR,"[CMessageService::svc] mb msg == NULL CurrthreadNo=[%d]!\n", m_u4ThreadID));
-            mb->release();
+            //mb->release();
             continue;
         }
 
         this->ProcessMessage(msg, m_u4ThreadID);
 
-        mb->release();
+		//使用内存池，这块内存不必再释放
+        //mb->release();
     }
 
     OUR_DEBUG((LM_INFO,"[CMessageService::svc] svc finish!\n"));
@@ -184,8 +185,9 @@ int CMessageService::svc(void)
 bool CMessageService::PutMessage(CMessage* pMessage)
 {
 
-    ACE_Message_Block* mb = NULL;
+    ACE_Message_Block* mb = pMessage->GetQueueMessage();
 
+	/*
     ACE_NEW_MALLOC_NORETURN(mb,
                             static_cast<ACE_Message_Block*>(_msg_service_mb_allocator.malloc(sizeof(ACE_Message_Block))),
                             ACE_Message_Block(sizeof(CMessage*), // size
@@ -200,12 +202,10 @@ bool CMessageService::PutMessage(CMessage* pMessage)
                                     &_msg_service_mb_allocator,
                                     &_msg_service_mb_allocator
                                              ));
+	*/
 
     if(NULL != mb)
     {
-        CMessage** ppMessage = (CMessage**)mb->base();
-        *ppMessage = pMessage;
-
         //判断队列是否是已经最大
         int nQueueCount = (int)msg_queue()->message_count();
 
