@@ -1,9 +1,132 @@
 #include "ServerMessageTask.h"
-//#include "ace/Sig_Handler.h"
 
-//ACE_Sig_Handler g_ServerMessageTask_Handler;
+CServerMessageInfoPool::CServerMessageInfoPool()
+{
 
-Mutex_Allocator _msg_server_message_mb_allocator; 
+}
+
+CServerMessageInfoPool::~CServerMessageInfoPool()
+{
+	OUR_DEBUG((LM_INFO, "[CMessagePool::~CMessagePool].\n"));
+	Close();
+	OUR_DEBUG((LM_INFO, "[CMessagePool::~CMessagePool]End.\n"));
+}
+
+void CServerMessageInfoPool::Init(uint32 u4PacketCount /*= MAX_SERVER_MESSAGE_INFO_COUNT*/)
+{
+	Close();
+
+	for(int i = 0; i < (int)u4PacketCount; i++)
+	{
+		_Server_Message_Info* pPacket = new _Server_Message_Info();
+		if(NULL != pPacket)
+		{
+			//添加到Free map里面
+			mapMessage::iterator f = m_mapMessageFree.find(pPacket);
+			if(f == m_mapMessageFree.end())
+			{
+				m_mapMessageFree.insert(mapMessage::value_type(pPacket, pPacket));
+			}
+		}
+	}
+}
+
+int CServerMessageInfoPool::GetUsedCount()
+{
+	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
+
+	return (int)m_mapMessageUsed.size();
+}
+
+int CServerMessageInfoPool::GetFreeCount()
+{
+	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
+
+	return (int)m_mapMessageFree.size();
+}
+
+_Server_Message_Info* CServerMessageInfoPool::Create()
+{
+	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
+
+	//如果free池中已经没有了，则添加到free池中。
+	if(m_mapMessageFree.size() <= 0)
+	{
+		_Server_Message_Info* pPacket = new _Server_Message_Info();
+
+		if(pPacket != NULL)
+		{
+			//添加到Free map里面
+			mapMessage::iterator f = m_mapMessageFree.find(pPacket);
+			if(f == m_mapMessageFree.end())
+			{
+				m_mapMessageFree.insert(mapMessage::value_type(pPacket, pPacket));
+			}
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+
+	//从free池中拿出一个,放入到used池中
+	mapMessage::iterator itorFreeB = m_mapMessageFree.begin();
+	_Server_Message_Info* pPacket = (_Server_Message_Info* )itorFreeB->second;
+	m_mapMessageFree.erase(itorFreeB);
+	//添加到used map里面
+	mapMessage::iterator f = m_mapMessageUsed.find(pPacket);
+	if(f == m_mapMessageUsed.end())
+	{
+		m_mapMessageUsed.insert(mapMessage::value_type(pPacket, pPacket));
+	}
+
+	return (_Server_Message_Info* )pPacket;
+}
+
+bool CServerMessageInfoPool::Delete(_Server_Message_Info* pBuffPacket)
+{
+	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
+
+	if(NULL == pBuffPacket)
+	{
+		return false;
+	}
+
+	mapMessage::iterator f = m_mapMessageUsed.find(pBuffPacket);
+	if(f != m_mapMessageUsed.end())
+	{
+		m_mapMessageUsed.erase(f);
+
+		//添加到Free map里面
+		mapMessage::iterator f = m_mapMessageFree.find(pBuffPacket);
+		if(f == m_mapMessageFree.end())
+		{
+			m_mapMessageFree.insert(mapMessage::value_type(pBuffPacket, pBuffPacket));
+		}
+	}
+
+	return true;
+}
+
+
+void CServerMessageInfoPool::Close()
+{
+	//清理所有已存在的指针
+	for(mapMessage::iterator itorFreeB = m_mapMessageFree.begin(); itorFreeB != m_mapMessageFree.end(); itorFreeB++)
+	{
+		_Server_Message_Info* pPacket = (_Server_Message_Info* )itorFreeB->second;
+		SAFE_DELETE(pPacket);
+	}
+
+	for(mapMessage::iterator itorUsedB = m_mapMessageUsed.begin(); itorUsedB != m_mapMessageUsed.end(); itorUsedB++)
+	{
+		_Server_Message_Info* pPacket = (_Server_Message_Info* )itorUsedB->second;
+		SAFE_DELETE(pPacket);
+	}
+
+	m_mapMessageFree.clear();
+	m_mapMessageUsed.clear();
+}
 
 CServerMessageTask::CServerMessageTask()
 {
@@ -109,13 +232,13 @@ int CServerMessageTask::svc(void)
 		if (! msg)
 		{
 			OUR_DEBUG((LM_ERROR,"[CMessageService::svc] mb msg == NULL CurrthreadNo=[%d]!\n", m_u4ThreadID));
-			mb->release();
+			//mb->release();
 			continue;
 		}
 
 		this->ProcessMessage(msg, m_u4ThreadID);
-
-		mb->release();
+		App_ServerMessageInfoPool::instance()->Delete(msg);
+		//mb->release();
 	}
 
 	OUR_DEBUG((LM_INFO,"[CServerMessageTask::svc] svc finish!\n"));
@@ -129,28 +252,10 @@ uint32 CServerMessageTask::GetThreadID()
 
 bool CServerMessageTask::PutMessage(_Server_Message_Info* pMessage)
 {
-	ACE_Message_Block* mb = NULL;
-
-	ACE_NEW_MALLOC_NORETURN(mb, 
-		static_cast<ACE_Message_Block*>( _msg_server_message_mb_allocator.malloc(sizeof(ACE_Message_Block))),
-		ACE_Message_Block(sizeof(_Server_Message_Info*), // size
-		ACE_Message_Block::MB_DATA, // type
-		0,
-		0,
-		&_msg_server_message_mb_allocator, // allocator_strategy
-		0, // locking strategy
-		ACE_DEFAULT_MESSAGE_BLOCK_PRIORITY, // priority
-		ACE_Time_Value::zero,
-		ACE_Time_Value::max_time,
-		&_msg_server_message_mb_allocator,
-		&_msg_server_message_mb_allocator
-		));
+	ACE_Message_Block* mb = pMessage->GetQueueMessage();
 
 	if(NULL != mb)
 	{
-		_Server_Message_Info** ppMessage = (_Server_Message_Info **)mb->base();
-		*ppMessage = pMessage;
-
 		//判断队列是否是已经最大
 		int nQueueCount = (int)msg_queue()->message_count();
 		if(nQueueCount >= (int)m_u4MaxQueue)
@@ -199,7 +304,6 @@ bool CServerMessageTask::ProcessMessage(_Server_Message_Info* pMessage, uint32 u
 	pMessage->m_pClientMessage->RecvData(pMessage->m_u2CommandID, pMessage->m_pRecvFinish, pMessage->m_objServerIPInfo);
 	//回收处理包
 	App_MessageBlockManager::instance()->Close(pMessage->m_pRecvFinish);
-	SAFE_DELETE(pMessage);
 	m_emState = SERVER_RECV_END;
 	return true;
 }

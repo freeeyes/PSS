@@ -12,7 +12,6 @@ CProServerManager::~CProServerManager(void)
 
 bool CProServerManager::Init()
 {
-	
 	if(App_MainConfig::instance()->GetDebugTrunOn() == 1)
 	{
 		m_pFrameLoggingStrategy = new Frame_Logging_Strategy();
@@ -99,6 +98,9 @@ bool CProServerManager::Init()
 
 	//初始化BuffPacket缓冲池.默认都是当前最大连接数的2倍
 	App_BuffPacketManager::instance()->Init(BUFFPACKET_MAX_COUNT, App_MainConfig::instance()->GetByteOrder());
+
+	//初始化服务器间异步接收队列
+	App_ServerMessageInfoPool::instance()->Init();
 
 	//初始化PacketParse对象池
 	App_PacketParsePool::instance()->Init(MAX_PACKET_PARSE);

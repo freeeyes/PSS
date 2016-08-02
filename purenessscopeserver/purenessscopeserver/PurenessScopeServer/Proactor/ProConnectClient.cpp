@@ -174,7 +174,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 					else
 					{
 						//异步消息处理
-						_Server_Message_Info* pServer_Message_Info = new _Server_Message_Info();
+						_Server_Message_Info* pServer_Message_Info = App_ServerMessageInfoPool::instance()->Create();
 						pServer_Message_Info->m_pClientMessage  = m_pClientMessage;
 						pServer_Message_Info->m_objServerIPInfo = objServerIPInfo;
 						pServer_Message_Info->m_pRecvFinish     = pRecvFinish;

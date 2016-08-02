@@ -12,6 +12,9 @@
 #include "IClientManager.h"
 #include "MessageBlockManager.h"
 
+#include <map>
+using namespace std;
+
 //处理服务器间接收数据包过程代码
 //如果服务器间线程处理挂起了，会尝试重启服务
 //add by freeeyes
@@ -27,13 +30,62 @@ struct _Server_Message_Info
 	ACE_Message_Block* m_pRecvFinish;
 	_ClientIPInfo      m_objServerIPInfo;
 
+	ACE_Message_Block* m_pmbQueuePtr;        //消息队列指针块
+
 	_Server_Message_Info()
 	{
 		m_u2CommandID    = 0;
 		m_pClientMessage = NULL;
 		m_pRecvFinish    = NULL;
+
+		//这里设置消息队列模块指针内容，这样就不必反复的new和delete，提升性能
+		//指针关系也可以在这里直接指定，不必使用的使用再指定
+		m_pmbQueuePtr  = new ACE_Message_Block(sizeof(_Server_Message_Info*));
+
+		_Server_Message_Info** ppMessage = (_Server_Message_Info**)m_pmbQueuePtr->base();
+		*ppMessage = this;
 	}
+
+	~_Server_Message_Info()
+	{
+		if(NULL != m_pmbQueuePtr)
+		{
+			m_pmbQueuePtr->release();
+			m_pmbQueuePtr = NULL;
+		}
+	}
+	
+	ACE_Message_Block* GetQueueMessage()
+	{
+		return m_pmbQueuePtr;
+	}
+
 };
+
+#define MAX_SERVER_MESSAGE_INFO_COUNT 100
+
+//_Server_Message_Info对象池
+class CServerMessageInfoPool
+{
+public:
+	CServerMessageInfoPool();
+	~CServerMessageInfoPool();
+
+	void Init(uint32 u4PacketCount = MAX_SERVER_MESSAGE_INFO_COUNT);
+	void Close();
+
+	_Server_Message_Info* Create();
+	bool Delete(_Server_Message_Info* pMakePacket);
+
+	int GetUsedCount();
+	int GetFreeCount();
+
+private:
+	typedef map<_Server_Message_Info*, _Server_Message_Info*> mapMessage;
+	mapMessage                  m_mapMessageUsed;                      //已使用的
+	mapMessage                  m_mapMessageFree;                      //没有使用的
+	ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;                     //控制多线程锁
+}; 
 
 //服务器间数据包消息队列处理过程
 class CServerMessageTask : public ACE_Task<ACE_MT_SYNCH>
@@ -103,4 +155,5 @@ private:
 
 
 typedef ACE_Singleton<CServerMessageManager, ACE_Recursive_Thread_Mutex> App_ServerMessageTask;
+typedef ACE_Singleton<CServerMessageInfoPool, ACE_Recursive_Thread_Mutex> App_ServerMessageInfoPool;
 #endif

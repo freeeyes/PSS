@@ -2530,28 +2530,13 @@ bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType,
 			continue;
 		}
 
-		ACE_Message_Block* mb = NULL;
+		//放入发送队列
+		_SendMessage* pSendMessage = m_SendMessagePool.Create();
 
-		ACE_NEW_MALLOC_NORETURN(mb, 
-			static_cast<ACE_Message_Block*>(_msg_send_mb_allocator.malloc(sizeof(ACE_Message_Block))),
-			ACE_Message_Block(sizeof(_SendMessage*), // size
-			ACE_Message_Block::MB_DATA, // type
-			0,
-			0,
-			&_msg_send_mb_allocator, // allocator_strategy
-			0, // locking strategy
-			ACE_DEFAULT_MESSAGE_BLOCK_PRIORITY, // priority
-			ACE_Time_Value::zero,
-			ACE_Time_Value::max_time,
-			&_msg_send_mb_allocator,
-			&_msg_send_mb_allocator
-			));
+		ACE_Message_Block* mb = pSendMessage->GetQueueMessage();
 
 		if(NULL != mb)
 		{
-			//放入发送队列
-			_SendMessage* pSendMessage = m_SendMessagePool.Create();
-
 			if(NULL == pSendMessage)
 			{
 				OUR_DEBUG((LM_ERROR,"[CConnectManager::PutMessage] new _SendMessage is error.\n"));
@@ -2569,9 +2554,6 @@ bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType,
 			pSendMessage->m_blDelete    = blDelete;
 			pSendMessage->m_blSendState = blSendState;
 			pSendMessage->m_tvSend      = ACE_OS::gettimeofday();
-
-			_SendMessage** ppSendMessage = (_SendMessage **)mb->base();
-			*ppSendMessage = pSendMessage;
 
 			//判断队列是否是已经最大
 			int nQueueCount = (int)msg_queue()->message_count();

@@ -160,12 +160,12 @@ int CLogManager::svc(void)
 		if (!pLogBlockInfo)
 		{
 			OUR_DEBUG((LM_ERROR,"[CLogManager::svc] CLogManager mb log == NULL!\n"));
-			mb->release();
+			//mb->release();
 			continue;
 		}
 
 		ProcessLog(pLogBlockInfo);
-		mb->release();
+		//mb->release();
 		//OUR_DEBUG((LM_ERROR,"[CLogManager::svc] delete pstrLogText BEGIN!\n"));
 		//回收日志块
 		m_objLogBlockPool.ReturnBlockInfo(pLogBlockInfo);
@@ -220,7 +220,7 @@ bool CLogManager::IsRun()
 
 int CLogManager::PutLog(_LogBlockInfo* pLogBlockInfo)
 {
-	ACE_Message_Block* mb = NULL;
+	ACE_Message_Block* mb = pLogBlockInfo->GetQueueMessage();
 
 	//如果正在重新加载
 	if(m_blIsNeedReset == true)
@@ -230,28 +230,8 @@ int CLogManager::PutLog(_LogBlockInfo* pLogBlockInfo)
 		return 0;
 	}
 
-	ACE_NEW_MALLOC_NORETURN (mb,
-		static_cast<ACE_Message_Block*>(_log_service_mb_allocator.malloc (sizeof (ACE_Message_Block))),
-		ACE_Message_Block
-		(	sizeof(ACE_TString *), // size
-		0,
-		0,
-		0,
-		&_log_service_mb_allocator, // allocator_strategy
-		0, // locking strategy
-		ACE_DEFAULT_MESSAGE_BLOCK_PRIORITY, // priority
-		ACE_Time_Value::zero,
-		ACE_Time_Value::max_time,
-		&_log_service_mb_allocator,
-		&_log_service_mb_allocator
-		)
-		);		
-
 	if(mb)
 	{
-		_LogBlockInfo** loadin = (_LogBlockInfo **)mb->base();
-		*loadin = pLogBlockInfo;
-
 		int msgcount = (int)msg_queue()->message_count();
 		if (msgcount >= m_nQueueMax) 
 		{
