@@ -1426,35 +1426,19 @@ bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
 bool CProConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, bool blSendState, bool blDelete)
 {
 	//OUR_DEBUG((LM_ERROR,"[CProConnectManager::PutMessage]BEGIN.\n"));
+	//放入发送队列
+	_SendMessage* pSendMessage = m_SendMessagePool.Create();
+
 	if(NULL == pBuffPacket)
 	{
 		OUR_DEBUG((LM_ERROR,"[CProConnectManager::PutMessage] pBuffPacket is NULL.\n"));
 		return false;
 	}
 
-	//ACE_Message_Block* mb = App_MessageBlockManager::instance()->Create(sizeof(_SendMessage*));
-	ACE_Message_Block* mb = NULL;
-
-	ACE_NEW_MALLOC_NORETURN(mb, 
-		static_cast<ACE_Message_Block*>(_msg_prosend_mb_allocator.malloc(sizeof(ACE_Message_Block))),
-		ACE_Message_Block(sizeof(_SendMessage*), // size
-		ACE_Message_Block::MB_DATA, // type
-		0,
-		0,
-		&_msg_prosend_mb_allocator, // allocator_strategy
-		0, // locking strategy
-		ACE_DEFAULT_MESSAGE_BLOCK_PRIORITY, // priority
-		ACE_Time_Value::zero,
-		ACE_Time_Value::max_time,
-		&_msg_prosend_mb_allocator,
-		&_msg_prosend_mb_allocator
-		));
+	ACE_Message_Block* mb = pSendMessage->GetQueueMessage();
 
 	if(NULL != mb)
 	{
-		//放入发送队列
-		_SendMessage* pSendMessage = m_SendMessagePool.Create();
-
 		if(NULL == pSendMessage)
 		{
 			OUR_DEBUG((LM_ERROR,"[CProConnectManager::PutMessage] new _SendMessage is error.\n"));
@@ -1472,9 +1456,6 @@ bool CProConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
 		pSendMessage->m_blSendState = blSendState;
 		pSendMessage->m_blDelete    = blDelete;
 		pSendMessage->m_tvSend      = ACE_OS::gettimeofday();
-
-		_SendMessage** ppSendMessage = (_SendMessage **)mb->base();
-		*ppSendMessage = pSendMessage;
 
 		//判断队列是否是已经最大
 		int nQueueCount = (int)msg_queue()->message_count();
@@ -1711,7 +1692,7 @@ int CProConnectManager::svc (void)
 		_SendMessage* msg = *((_SendMessage**)mb->base());
 		if (! msg)
 		{
-			mb->release();
+			//mb->release();
 			continue;
 		}
 
@@ -1719,7 +1700,7 @@ int CProConnectManager::svc (void)
 		SendMessage(msg->m_u4ConnectID, msg->m_pBuffPacket, msg->m_u2CommandID, msg->m_blSendState, msg->m_nEvents, msg->m_tvSend, msg->m_blDelete);
 		m_SendMessagePool.Delete(msg);
 
-		mb->release();
+		//mb->release();
 	}
 
 	OUR_DEBUG((LM_INFO,"[CProConnectManager::svc] svc finish!\n"));

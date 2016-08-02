@@ -2025,8 +2025,11 @@ bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
 	//OUR_DEBUG((LM_INFO, "[CConnectManager::PostMessage]Begin.\n"));
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
 	//OUR_DEBUG((LM_INFO, "[CConnectManager::PostMessage]Begin 1.\n"));
-	//ACE_Message_Block* mb = App_MessageBlockManager::instance()->Create(sizeof(_SendMessage*));
-	ACE_Message_Block* mb = NULL;
+
+	//放入发送队列
+	_SendMessage* pSendMessage = m_SendMessagePool.Create();
+
+	ACE_Message_Block* mb = pSendMessage->GetQueueMessage();
 
 	//判定是否达到了发送阀值，如果达到了，则直接断开连接。
 	mapConnectManager::iterator f = m_mapConnectManager.find(u4ConnectID);
@@ -2063,26 +2066,8 @@ bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
 		return false;
 	}
 
-	ACE_NEW_MALLOC_NORETURN(mb, 
-		static_cast<ACE_Message_Block*>(_msg_send_mb_allocator.malloc(sizeof(ACE_Message_Block))),
-		ACE_Message_Block(sizeof(_SendMessage*), // size
-		ACE_Message_Block::MB_DATA, // type
-		0,
-		0,
-		&_msg_send_mb_allocator, // allocator_strategy
-		0, // locking strategy
-		ACE_DEFAULT_MESSAGE_BLOCK_PRIORITY, // priority
-		ACE_Time_Value::zero,
-		ACE_Time_Value::max_time,
-		&_msg_send_mb_allocator,
-		&_msg_send_mb_allocator
-		));
-
 	if(NULL != mb)
 	{
-		//放入发送队列
-		_SendMessage* pSendMessage = m_SendMessagePool.Create();
-
 		if(NULL == pSendMessage)
 		{
 			OUR_DEBUG((LM_ERROR,"[CConnectManager::PutMessage] new _SendMessage is error.\n"));
@@ -2096,9 +2081,6 @@ bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
 		pSendMessage->m_blDelete    = blDelete;
 		pSendMessage->m_blSendState = blSendState;
 		pSendMessage->m_tvSend      = ACE_OS::gettimeofday();
-
-		_SendMessage** ppSendMessage = (_SendMessage **)mb->base();
-		*ppSendMessage = pSendMessage;
 
 		//判断队列是否是已经最大
 		int nQueueCount = (int)msg_queue()->message_count();
@@ -2373,7 +2355,7 @@ int CConnectManager::svc (void)
 		_SendMessage* msg = *((_SendMessage**)mb->base());
 		if (! msg)
 		{
-			mb->release();
+			//mb->release();
 			continue;
 		}
 
@@ -2382,7 +2364,7 @@ int CConnectManager::svc (void)
 
 		m_SendMessagePool.Delete(msg);
 
-		mb->release();
+		//mb->release();
 	}
 
 	OUR_DEBUG((LM_INFO,"[CConnectManager::svc] svc finish!\n"));

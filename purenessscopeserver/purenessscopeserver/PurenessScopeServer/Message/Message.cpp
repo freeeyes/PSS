@@ -115,6 +115,12 @@ void CMessage::Close()
 		m_pmbBody->release();
 		m_pmbBody = NULL;
 	}
+
+	if(NULL != m_pmbQueuePtr)
+	{
+		m_pmbQueuePtr->release();
+		m_pmbQueuePtr = NULL;
+	}
 }
 
 void CMessage::Clear()
