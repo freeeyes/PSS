@@ -6,8 +6,6 @@
 
 #include "MessageService.h"
 
-Mutex_Allocator _msg_service_mb_allocator;
-
 CMessageService::CMessageService()
 {
     m_u4ThreadID      = 0;
@@ -186,23 +184,6 @@ bool CMessageService::PutMessage(CMessage* pMessage)
 {
 
     ACE_Message_Block* mb = pMessage->GetQueueMessage();
-
-	/*
-    ACE_NEW_MALLOC_NORETURN(mb,
-                            static_cast<ACE_Message_Block*>(_msg_service_mb_allocator.malloc(sizeof(ACE_Message_Block))),
-                            ACE_Message_Block(sizeof(CMessage*), // size
-                                    ACE_Message_Block::MB_DATA, // type
-                                    0,
-                                    0,
-                                    &_msg_service_mb_allocator, // allocator_strategy
-                                    0, // locking strategy
-                                    ACE_DEFAULT_MESSAGE_BLOCK_PRIORITY, // priority
-                                    ACE_Time_Value::zero,
-                                    ACE_Time_Value::max_time,
-                                    &_msg_service_mb_allocator,
-                                    &_msg_service_mb_allocator
-                                             ));
-	*/
 
     if(NULL != mb)
     {

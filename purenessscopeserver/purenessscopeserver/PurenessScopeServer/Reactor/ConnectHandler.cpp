@@ -1,7 +1,5 @@
 #include "ConnectHandler.h"
 
-Mutex_Allocator _msg_send_mb_allocator;
-
 CConnectHandler::CConnectHandler(void)
 {
 	m_szError[0]          = '\0';

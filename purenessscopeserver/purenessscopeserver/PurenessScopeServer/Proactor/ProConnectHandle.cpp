@@ -1,7 +1,5 @@
 #include "ProConnectHandle.h"
 
-Mutex_Allocator _msg_prosend_mb_allocator;
-
 CProConnectHandle::CProConnectHandle(void)
 {
 	m_szError[0]          = '\0';
