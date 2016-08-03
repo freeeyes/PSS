@@ -366,7 +366,7 @@ bool CProConsoleHandle::PutSendPacket(ACE_Message_Block* pMbData)
 		if(0 != m_Writer.write(*pMbData, pMbData->length()))
 		{
 			OUR_DEBUG ((LM_ERROR, "[CConnectHandler::PutSendPacket] Connectid=%d mb=%d m_writer.write error(%d)!\n", GetConnectID(),  pMbData->length(), errno));
-			pMbData->release();
+			App_MessageBlockManager::instance()->Close(pMbData);
 			Close();
 			return false;
 		}
@@ -376,7 +376,6 @@ bool CProConsoleHandle::PutSendPacket(ACE_Message_Block* pMbData)
 			m_atvOutput      = ACE_OS::gettimeofday();
 			return true;
 		}
-		//pMbData->release();
 	}
 	else
 	{
@@ -401,12 +400,12 @@ bool CProConsoleHandle::RecvClinetPacket(uint32 u4PackeLen)
 		OUR_DEBUG((LM_ERROR, "[CProConsoleHandle::RecvClinetPacket] pmb new is NULL.\n"));
 		if(m_pPacketParse->GetMessageHead() != NULL)
 		{
-			m_pPacketParse->GetMessageHead()->release();
+			App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
 		}
 
 		if(m_pPacketParse->GetMessageBody() != NULL)
 		{
-			m_pPacketParse->GetMessageBody()->release();
+			App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
 		}
 		SAFE_DELETE(m_pPacketParse);
 		Close(2);
@@ -418,15 +417,16 @@ bool CProConsoleHandle::RecvClinetPacket(uint32 u4PackeLen)
 		//如果读失败，则关闭连接。
 		//AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount);
 		OUR_DEBUG((LM_ERROR, "[CProConsoleHandle::RecvClinetPacket] m_reader.read is error(%d)(%d).\n", GetConnectID(), errno));
-		pmb->release();
+		
+		App_MessageBlockManager::instance()->Close(pmb);
 		if(m_pPacketParse->GetMessageHead() != NULL)
 		{
-			m_pPacketParse->GetMessageHead()->release();
+			App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
 		}
 
 		if(m_pPacketParse->GetMessageBody() != NULL)
 		{
-			m_pPacketParse->GetMessageBody()->release();
+			App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
 		}
 		SAFE_DELETE(m_pPacketParse);
 		Close(2);

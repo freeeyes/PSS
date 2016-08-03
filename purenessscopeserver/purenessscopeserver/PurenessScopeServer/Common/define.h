@@ -474,6 +474,22 @@ inline void Print_Binary(const char* pData, int nLen)
 	}
 }
 
+//用于整合获取整数2次幂的函数(内存池应用)
+static inline uint32 is_pow_of_2(uint32 x) {
+		return !(x & (x-1));
+}
+
+static inline uint32 next_pow_of_2(uint32 x) {
+		if ( is_pow_of_2(x) )
+			return x;
+		x |= x>>1;
+		x |= x>>2;
+		x |= x>>4;
+		x |= x>>8;
+		x |= x>>16;
+		return x+1;
+}
+
 //标记VCHARS_TYPE的模式
 enum VCHARS_TYPE
 {

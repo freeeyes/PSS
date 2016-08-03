@@ -106,13 +106,13 @@ void CMessage::Close()
 
 	if(NULL != m_pmbHead)
 	{
-		m_pmbHead->release();
+		App_MessageBlockManager::instance()->Close(m_pmbHead);
 		m_pmbHead = NULL;
 	}
 
 	if(NULL != m_pmbBody)
 	{
-		m_pmbBody->release();
+		App_MessageBlockManager::instance()->Close(m_pmbBody);
 		m_pmbBody = NULL;
 	}
 

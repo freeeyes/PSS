@@ -312,7 +312,7 @@ bool CProConnectClient::SendData(ACE_Message_Block* pmblk)
 		if (m_Writer.write(*pmblk, pmblk->length()) == -1)
 		{
 			OUR_DEBUG((LM_DEBUG,"[CProConnectClient::SendData] Send Error(%d).\n", ACE_OS::last_error()));	
-			pmblk->release();
+			App_MessageBlockManager::instance()->Close(pmblk);
 			if(NULL != m_pClientMessage)
 			{
 				_ClientIPInfo objServerIPInfo;

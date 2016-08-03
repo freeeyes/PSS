@@ -160,12 +160,10 @@ int CLogManager::svc(void)
 		if (!pLogBlockInfo)
 		{
 			OUR_DEBUG((LM_ERROR,"[CLogManager::svc] CLogManager mb log == NULL!\n"));
-			//mb->release();
 			continue;
 		}
 
 		ProcessLog(pLogBlockInfo);
-		//mb->release();
 		//OUR_DEBUG((LM_ERROR,"[CLogManager::svc] delete pstrLogText BEGIN!\n"));
 		//回收日志块
 		m_objLogBlockPool.ReturnBlockInfo(pLogBlockInfo);
@@ -238,7 +236,6 @@ int CLogManager::PutLog(_LogBlockInfo* pLogBlockInfo)
 			OUR_DEBUG((LM_INFO,"[CLogManager::PutLog] CLogManager queue is full!\n"));
 			//回收日志块
 			m_objLogBlockPool.ReturnBlockInfo(pLogBlockInfo);
-			mb->release();
 			return 1;
 		}
 		ACE_Time_Value xtime;
@@ -248,7 +245,6 @@ int CLogManager::PutLog(_LogBlockInfo* pLogBlockInfo)
 			OUR_DEBUG((LM_ERROR,"[CLogManager::PutLog] CLogManager putq error(%s)!\n", pLogBlockInfo->m_pBlock));
 			//回收日志块
 			m_objLogBlockPool.ReturnBlockInfo(pLogBlockInfo);
-			mb->release();
 			return -1;
 		}
 		return 0;

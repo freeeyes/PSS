@@ -232,13 +232,11 @@ int CServerMessageTask::svc(void)
 		if (! msg)
 		{
 			OUR_DEBUG((LM_ERROR,"[CMessageService::svc] mb msg == NULL CurrthreadNo=[%d]!\n", m_u4ThreadID));
-			//mb->release();
 			continue;
 		}
 
 		this->ProcessMessage(msg, m_u4ThreadID);
 		App_ServerMessageInfoPool::instance()->Delete(msg);
-		//mb->release();
 	}
 
 	OUR_DEBUG((LM_INFO,"[CServerMessageTask::svc] svc finish!\n"));
@@ -261,7 +259,6 @@ bool CServerMessageTask::PutMessage(_Server_Message_Info* pMessage)
 		if(nQueueCount >= (int)m_u4MaxQueue)
 		{
 			OUR_DEBUG((LM_ERROR,"[CServerMessageTask::PutMessage] Queue is Full nQueueCount = [%d].\n", nQueueCount));
-			mb->release();
 			return false;
 		}
 
@@ -269,7 +266,6 @@ bool CServerMessageTask::PutMessage(_Server_Message_Info* pMessage)
 		if(this->putq(mb, &xtime) == -1)
 		{
 			OUR_DEBUG((LM_ERROR,"[CServerMessageTask::PutMessage] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
-			mb->release();
 			return false;
 		}
 	}

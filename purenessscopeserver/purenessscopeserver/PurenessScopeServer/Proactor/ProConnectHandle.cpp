@@ -1124,13 +1124,6 @@ bool CProConnectHandle::CheckMessage()
 		OUR_DEBUG((LM_ERROR, "[CProConnectHandle::CheckMessage] ConnectID = %d, m_pPacketParse is NULL.\n", GetConnectID()));
 	}
 
-	/*
-	//²âÊÔ´úÂë
-	m_pPacketParse->GetMessageHead()->release();
-	m_pPacketParse->GetMessageBody()->release();
-	App_PacketParsePool::instance()->Delete(m_pPacketParse);
-	*/
-
 	return true;
 }
 
@@ -1464,7 +1457,6 @@ bool CProConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
 			{
 				App_BuffPacketManager::instance()->Delete(pBuffPacket);
 			}
-			mb->release();
 			return false;
 		}
 
@@ -1476,7 +1468,6 @@ bool CProConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
 			{
 				App_BuffPacketManager::instance()->Delete(pBuffPacket);
 			}
-			mb->release();
 			return false;
 		}
 	}
@@ -1690,7 +1681,6 @@ int CProConnectManager::svc (void)
 		_SendMessage* msg = *((_SendMessage**)mb->base());
 		if (! msg)
 		{
-			//mb->release();
 			continue;
 		}
 
@@ -1698,7 +1688,6 @@ int CProConnectManager::svc (void)
 		SendMessage(msg->m_u4ConnectID, msg->m_pBuffPacket, msg->m_u2CommandID, msg->m_blSendState, msg->m_nEvents, msg->m_tvSend, msg->m_blDelete);
 		m_SendMessagePool.Delete(msg);
 
-		//mb->release();
 	}
 
 	OUR_DEBUG((LM_INFO,"[CProConnectManager::svc] svc finish!\n"));
@@ -1855,7 +1844,6 @@ bool CProConnectManager::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendT
 					App_BuffPacketManager::instance()->Delete(pBuffPacket);
 				}
 				m_SendMessagePool.Delete(pSendMessage);
-				mb->release();
 				return false;
 			}
 
@@ -1868,7 +1856,6 @@ bool CProConnectManager::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendT
 					App_BuffPacketManager::instance()->Delete(pBuffPacket);
 				}
 				m_SendMessagePool.Delete(pSendMessage);
-				mb->release();
 				return false;
 			}
 		}

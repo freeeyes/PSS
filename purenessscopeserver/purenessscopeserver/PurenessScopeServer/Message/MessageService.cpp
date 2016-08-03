@@ -166,14 +166,12 @@ int CMessageService::svc(void)
         if(! msg)
         {
             OUR_DEBUG((LM_ERROR,"[CMessageService::svc] mb msg == NULL CurrthreadNo=[%d]!\n", m_u4ThreadID));
-            //mb->release();
             continue;
         }
 
         this->ProcessMessage(msg, m_u4ThreadID);
 
 		//使用内存池，这块内存不必再释放
-        //mb->release();
     }
 
     OUR_DEBUG((LM_INFO,"[CMessageService::svc] svc finish!\n"));
@@ -193,7 +191,6 @@ bool CMessageService::PutMessage(CMessage* pMessage)
         if(nQueueCount >= (int)m_u4MaxQueue)
         {
             OUR_DEBUG((LM_ERROR,"[CMessageService::PutMessage] Queue is Full nQueueCount = [%d].\n", nQueueCount));
-            mb->release();
             return false;
         }
 
@@ -202,7 +199,6 @@ bool CMessageService::PutMessage(CMessage* pMessage)
         if(this->putq(mb, &xtime) == -1)
         {
             OUR_DEBUG((LM_ERROR,"[CMessageService::PutMessage] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
-            mb->release();
             return false;
         }
     }

@@ -81,7 +81,7 @@ bool CConnectHandler::Close(int nIOCount)
 		//删除对象缓冲的PacketParse
 		if(m_pCurrMessage != NULL)
 		{
-			m_pCurrMessage->release();
+			App_MessageBlockManager::instance()->Close(m_pCurrMessage);
 		}
 
 		//调用连接断开消息
@@ -450,7 +450,17 @@ int CConnectHandler::RecvData()
 		return -1;
 	}
 
-	int nCurrCount = (uint32)m_pCurrMessage->size() - m_u4CurrSize;
+	//计算应该接收的数据长度
+	int nCurrCount = 0;
+	if(m_pPacketParse->GetIsHandleHead())
+	{
+		nCurrCount = (uint32)m_pPacketParse->GetPacketHeadSrcLen() - m_u4CurrSize;
+	}
+	else
+	{
+		nCurrCount = (uint32)m_pPacketParse->GetPacketBodySrcLen() - m_u4CurrSize;
+	}
+
 	//这里需要对m_u4CurrSize进行检查。
 	if(nCurrCount < 0)
 	{
@@ -521,7 +531,7 @@ int CConnectHandler::RecvData()
 	if(m_pPacketParse->GetPacketMode() == PACKET_WITHHEAD)
 	{
 		//如果没有读完，短读
-		if(m_pCurrMessage->size() > m_u4CurrSize)
+		if(nCurrCount - nDataLen > 0)
 		{
 			Close();
 			return 0;
@@ -836,7 +846,17 @@ int CConnectHandler::RecvData_et()
 			return -1;
 		}
 
-		int nCurrCount = (uint32)m_pCurrMessage->size() - m_u4CurrSize;
+		//计算应该接收的数据长度
+		int nCurrCount = 0;
+		if(m_pPacketParse->GetIsHandleHead())
+		{
+			nCurrCount = (uint32)m_pPacketParse->GetPacketHeadSrcLen() - m_u4CurrSize;
+		}
+		else
+		{
+			nCurrCount = (uint32)m_pPacketParse->GetPacketBodySrcLen() - m_u4CurrSize;
+		}
+
 		//这里需要对m_u4CurrSize进行检查。
 		if(nCurrCount < 0)
 		{
@@ -916,7 +936,7 @@ int CConnectHandler::RecvData_et()
 		if(m_pPacketParse->GetPacketMode() == PACKET_WITHHEAD)
 		{
 			//如果没有读完，短读
-			if(m_pCurrMessage->size() > m_u4CurrSize)
+			if(nCurrCount - nDataLen > 0)
 			{
 				Close();
 				return 0;
@@ -1658,12 +1678,6 @@ bool CConnectHandler::CheckMessage()
 
 
 	App_PacketParsePool::instance()->Delete(m_pPacketParse);
-	/*
-	//测试代码
-	m_pPacketParse->GetMessageHead()->release();
-	m_pPacketParse->GetMessageBody()->release();
-	App_PacketParsePool::instance()->Delete(m_pPacketParse);
-	*/
 
 	return true;
 }
@@ -1726,17 +1740,17 @@ void CConnectHandler::ClearPacketParse()
 	{
 		if(m_pPacketParse->GetMessageHead() != NULL)
 		{
-			m_pPacketParse->GetMessageHead()->release();
+			App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
 		}
 	
 		if(m_pPacketParse->GetMessageBody() != NULL)
 		{
-			m_pPacketParse->GetMessageBody()->release();
+			App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
 		}
 	
 		if(m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageHead() != m_pCurrMessage)
 		{
-			m_pCurrMessage->release();
+			App_MessageBlockManager::instance()->Close(m_pCurrMessage);
 		}
 		m_pCurrMessage = NULL;
 	
@@ -1837,9 +1851,9 @@ void CConnectManager::CloseAll()
 
 bool CConnectManager::Close(uint32 u4ConnectID)
 {
-	OUR_DEBUG((LM_ERROR, "[CConnectManager::Close]ConnectID=%d Begin.\n", u4ConnectID));
+	//OUR_DEBUG((LM_ERROR, "[CConnectManager::Close]ConnectID=%d Begin.\n", u4ConnectID));
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
-	OUR_DEBUG((LM_ERROR, "[CConnectManager::Close]ConnectID=%d Begin 1.\n", u4ConnectID));
+	//OUR_DEBUG((LM_ERROR, "[CConnectManager::Close]ConnectID=%d Begin 1.\n", u4ConnectID));
 	mapConnectManager::iterator f = m_mapConnectManager.find(u4ConnectID);
 
 	if(f != m_mapConnectManager.end())
@@ -1856,7 +1870,7 @@ bool CConnectManager::Close(uint32 u4ConnectID)
 		//加入链接统计功能
 		App_ConnectAccount::instance()->AddDisConnect();
 
-		OUR_DEBUG((LM_ERROR, "[CConnectManager::Close]ConnectID=%d End.\n", u4ConnectID));
+		//OUR_DEBUG((LM_ERROR, "[CConnectManager::Close]ConnectID=%d End.\n", u4ConnectID));
 		return true;
 	}
 	else
@@ -1935,9 +1949,9 @@ bool CConnectManager::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status em
 
 bool CConnectManager::AddConnect(uint32 u4ConnectID, CConnectHandler* pConnectHandler)
 {
-	OUR_DEBUG((LM_ERROR, "[CConnectManager::AddConnect]ConnectID=%d Begin.\n", u4ConnectID));
+	//OUR_DEBUG((LM_ERROR, "[CConnectManager::AddConnect]ConnectID=%d Begin.\n", u4ConnectID));
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
-	OUR_DEBUG((LM_ERROR, "[CConnectManager::AddConnect]ConnectID=%d Begin 1.\n", u4ConnectID));
+	//OUR_DEBUG((LM_ERROR, "[CConnectManager::AddConnect]ConnectID=%d Begin 1.\n", u4ConnectID));
 
 	if(pConnectHandler == NULL)
 	{
@@ -1965,7 +1979,7 @@ bool CConnectManager::AddConnect(uint32 u4ConnectID, CConnectHandler* pConnectHa
 	//加入链接统计功能
 	App_ConnectAccount::instance()->AddConnect();
 
-	OUR_DEBUG((LM_ERROR, "[CConnectManager::AddConnect]ConnectID=%d End.\n", u4ConnectID));
+	//OUR_DEBUG((LM_ERROR, "[CConnectManager::AddConnect]ConnectID=%d End.\n", u4ConnectID));
 	return true;
 }
 
@@ -2090,7 +2104,6 @@ bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
 				App_BuffPacketManager::instance()->Delete(pBuffPacket);
 			}
 			m_SendMessagePool.Delete(pSendMessage);
-			mb->release();
 			return false;
 		}
 
@@ -2103,7 +2116,6 @@ bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
 				App_BuffPacketManager::instance()->Delete(pBuffPacket);
 			}
 			m_SendMessagePool.Delete(pSendMessage);
-			mb->release();
 			return false;
 		}
 	}
@@ -2353,7 +2365,6 @@ int CConnectManager::svc (void)
 		_SendMessage* msg = *((_SendMessage**)mb->base());
 		if (! msg)
 		{
-			//mb->release();
 			continue;
 		}
 
@@ -2362,7 +2373,6 @@ int CConnectManager::svc (void)
 
 		m_SendMessagePool.Delete(msg);
 
-		//mb->release();
 	}
 
 	OUR_DEBUG((LM_INFO,"[CConnectManager::svc] svc finish!\n"));
@@ -2563,7 +2573,6 @@ bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType,
 					App_BuffPacketManager::instance()->Delete(pBuffPacket);
 				}
 				m_SendMessagePool.Delete(pSendMessage);
-				mb->release();
 				return false;
 			}
 
@@ -2576,7 +2585,6 @@ bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType,
 					App_BuffPacketManager::instance()->Delete(pBuffPacket);
 				}
 				m_SendMessagePool.Delete(pSendMessage);
-				mb->release();
 				return false;
 			}
 		}
