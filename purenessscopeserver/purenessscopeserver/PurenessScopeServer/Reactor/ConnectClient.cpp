@@ -539,7 +539,7 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
     {
         OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetServerID()));
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectClient::SendData] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetServerID());
-        pmblk->release();
+		App_MessageBlockManager::instance()->Close(pmblk);
         return false;
     }
 
@@ -548,7 +548,7 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
     if (NULL == pData)
     {
         OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, pData is NULL.\n", GetServerID()));
-        pmblk->release();
+        App_MessageBlockManager::instance()->Close(pmblk);
         return false;
     }
 
@@ -561,7 +561,7 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
         if (nSendLen <= 0)
         {
             OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, nCurrSendSize error is %d.\n", GetServerID(), nSendLen));
-            pmblk->release();
+            App_MessageBlockManager::instance()->Close(pmblk);
             return false;
         }
 
@@ -585,13 +585,13 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
 			m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
 
             OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, error = %d.\n", GetServerID(), errno));
-            pmblk->release();
+            App_MessageBlockManager::instance()->Close(pmblk);
             return false;
         }
         else if (nDataLen + nIsSendSize >= nSendLen)  //当数据包全部发送完毕，清空。
         {
             //OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_output] ConnectID = %d, send (%d) OK.\n", GetConnectID(), msg_queue()->is_empty()));
-            pmblk->release();
+            App_MessageBlockManager::instance()->Close(pmblk);
             m_u4SendSize += (uint32)nSendLen;
             m_u4SendCount++;
             return true;

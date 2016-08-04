@@ -129,13 +129,11 @@ void CServerParse::Close()
 {
 	if(m_pmbHead != NULL)
 	{
-		m_pmbHead->release();
 		m_pmbHead = NULL;
 	}
 
 	if(m_pmbBody != NULL)
 	{
-		m_pmbBody->release();
 		m_pmbBody = NULL;
 	}
 

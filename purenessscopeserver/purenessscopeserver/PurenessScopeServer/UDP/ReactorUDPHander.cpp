@@ -134,7 +134,7 @@ bool CReactorUDPHander::SendMessage(const char* pMessage, uint32 u4Len, const ch
 			m_CommandAccount.SaveCommandData(u2CommandID, u4Cost, PACKET_UDP, (uint32)pMbData->length(), u4Len, COMMAND_TYPE_OUT);
 
 			//释放发送体
-			pMbData->release();
+			App_MessageBlockManager::instance()->Close(pMbData);
 
 			return true;
 		}
@@ -144,7 +144,7 @@ bool CReactorUDPHander::SendMessage(const char* pMessage, uint32 u4Len, const ch
 			SAFE_DELETE_ARRAY(pMessage);
 
 			//释放发送体
-			pMbData->release();
+			App_MessageBlockManager::instance()->Close(pMbData);
 
 			return false;
 		}
@@ -213,7 +213,7 @@ bool CReactorUDPHander::CheckMessage(const char* pData, uint32 u4Len)
 		bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo()->Parse_Packet_Head_Info(0, pMBHead, App_MessageBlockManager::instance(), &obj_Head_Info);
 		if(false == blStateHead)
 		{
-			pMBHead->release();
+			App_MessageBlockManager::instance()->Close(pMBHead);
 			App_PacketParsePool::instance()->Delete(m_pPacketParse);
 			return false;
 		}
@@ -231,7 +231,7 @@ bool CReactorUDPHander::CheckMessage(const char* pData, uint32 u4Len)
 
 		if(u4Len != m_pPacketParse->GetPacketHeadSrcLen() + m_pPacketParse->GetPacketBodySrcLen())
 		{
-			pMBHead->release();
+			App_MessageBlockManager::instance()->Close(pMBHead);
 			return false;
 		}
 
@@ -247,8 +247,8 @@ bool CReactorUDPHander::CheckMessage(const char* pData, uint32 u4Len)
 			bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo()->Parse_Packet_Body_Info(0, pMBBody, App_MessageBlockManager::instance(), &obj_Body_Info);
 			if(false  == blStateBody)
 			{
-				pMBHead->release();
-				pMBBody->release();
+				App_MessageBlockManager::instance()->Close(pMBHead);
+				App_MessageBlockManager::instance()->Close(pMBBody);
 				App_PacketParsePool::instance()->Delete(m_pPacketParse);
 				return false;
 			}

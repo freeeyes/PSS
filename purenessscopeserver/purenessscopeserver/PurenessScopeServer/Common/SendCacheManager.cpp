@@ -16,7 +16,7 @@ void CSendCacheManager::Init(uint32 u4CacheCount, uint32 u4CacheSize)
 {
 	for(uint32 i = 0; i < u4CacheCount; i++)
 	{
-		ACE_Message_Block* pCache = new ACE_Message_Block(u4CacheSize);	
+		ACE_Message_Block* pCache = App_MessageBlockManager::instance()->Create(u4CacheSize);
 		//OUR_DEBUG((LM_INFO, "[CSendCacheManager::Init](%d)pMessage=0x%08x.\n", i, pCache));
 		if(NULL != pCache)
 		{
@@ -33,7 +33,7 @@ void CSendCacheManager::Close()
 	for(mapUsedCache::iterator b = m_mapUsedCache.begin(); b != m_mapUsedCache.end(); b++)
 	{
 		ACE_Message_Block* pCache = (ACE_Message_Block* )b->second;
-		pCache->release();
+		App_MessageBlockManager::instance()->Close(pCache);
 	}
 	m_mapUsedCache.clear();
 
@@ -41,7 +41,7 @@ void CSendCacheManager::Close()
 	for(uint32 i = 0; i < u4CacheCount; i++)
 	{
 		ACE_Message_Block* pMessage = (ACE_Message_Block* )m_vecFreeCache[i];
-		pMessage->release();
+		App_MessageBlockManager::instance()->Close(pMessage);
 	}
 	m_vecFreeCache.clear();
 	

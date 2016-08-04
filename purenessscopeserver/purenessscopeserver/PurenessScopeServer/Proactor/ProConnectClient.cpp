@@ -244,11 +244,12 @@ bool CProConnectClient::GetTimeout(ACE_Time_Value tvNow)
 
 bool CProConnectClient::RecvData(uint32 u4PacketLen)
 {
-	ACE_NEW_NORETURN(m_mbRecv, ACE_Message_Block(u4PacketLen));
-	if(this->m_Reader.read(*m_mbRecv, m_mbRecv->space()) == -1)
+	//ACE_NEW_NORETURN(m_mbRecv, ACE_Message_Block(u4PacketLen));
+	m_mbRecv = App_MessageBlockManager::instance()->Create(u4PacketLen);
+	if(this->m_Reader.read(*m_mbRecv, u4PacketLen) == -1)
 	{
 		OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::open] m_reader is error(%d).\n", (int)ACE_OS::last_error()));	
-		m_mbRecv->release();
+		App_MessageBlockManager::instance()->Close(m_mbRecv);
 		if(NULL != m_pClientMessage)
 		{
 			_ClientIPInfo objServerIPInfo;

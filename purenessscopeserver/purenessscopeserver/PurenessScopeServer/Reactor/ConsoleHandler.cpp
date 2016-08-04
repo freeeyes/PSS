@@ -59,7 +59,7 @@ bool CConsoleHandler::Close(int nIOCount)
 		//É¾³ý¶ÔÏó»º³åµÄPacketParse
 		if (m_pCurrMessage != NULL)
 		{
-			m_pCurrMessage->release();
+			App_MessageBlockManager::instance()->Close(m_pCurrMessage);
 		}
 
 		//msg_queue()->deactivate();
@@ -205,17 +205,17 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
 
 		if (m_pPacketParse->GetMessageHead() != NULL)
 		{
-			m_pPacketParse->GetMessageHead()->release();
+			App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
 		}
 
 		if (m_pPacketParse->GetMessageBody() != NULL)
 		{
-			m_pPacketParse->GetMessageBody()->release();
+			App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
 		}
 
 		if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageHead() != m_pCurrMessage)
 		{
-			m_pCurrMessage->release();
+			App_MessageBlockManager::instance()->Close(m_pCurrMessage);
 		}
 		m_pCurrMessage = NULL;
 
@@ -233,19 +233,19 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
 
 		if (m_pPacketParse->GetMessageHead() != NULL)
 		{
-			m_pPacketParse->GetMessageHead()->release();
+			App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
 		}
 
 		if (m_pPacketParse->GetMessageBody() != NULL)
 		{
-			m_pPacketParse->GetMessageBody()->release();
+			App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
 		}
 
 		if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageHead() != m_pCurrMessage)
 		{
-			m_pCurrMessage->release();
-			m_pCurrMessage = NULL;
+			App_MessageBlockManager::instance()->Close(m_pCurrMessage);
 		}
+		m_pCurrMessage = NULL;
 
 		SAFE_DELETE(m_pPacketParse);
 		return -1;
@@ -262,19 +262,19 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
 
 		if (m_pPacketParse->GetMessageHead() != NULL)
 		{
-			m_pPacketParse->GetMessageHead()->release();
+			App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
 		}
 
 		if (m_pPacketParse->GetMessageBody() != NULL)
 		{
-			m_pPacketParse->GetMessageBody()->release();
+			App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
 		}
 
 		if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageHead() != m_pCurrMessage)
 		{
-			m_pCurrMessage->release();
-			m_pCurrMessage = NULL;
+			App_MessageBlockManager::instance()->Close(m_pCurrMessage);
 		}
+		m_pCurrMessage = NULL;
 
 		SAFE_DELETE(m_pPacketParse);
 		return -1;
@@ -303,12 +303,12 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
 
 			if (m_pPacketParse->GetMessageHead() != NULL)
 			{
-				m_pPacketParse->GetMessageHead()->release();
+				App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
 			}
 
 			if (m_pPacketParse->GetMessageBody() != NULL)
 			{
-				m_pPacketParse->GetMessageBody()->release();
+				App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
 			}
 
 			OUR_DEBUG((LM_INFO, "[CConsoleHandler::handle_read_stream]m_pCurrMessage=0x%08x, m_pPacketParse->GetMessageHead()=0x%08x.\n", 
@@ -316,7 +316,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
 			if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageHead() != m_pCurrMessage)
 			{
 				OUR_DEBUG((LM_INFO, "[CConsoleHandler::handle_read_stream]!!!.\n"));
-				m_pCurrMessage->release();
+				App_MessageBlockManager::instance()->Close(m_pCurrMessage);
 			}
 			m_pCurrMessage = NULL;
 
@@ -336,19 +336,19 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
 
 				if (m_pPacketParse->GetMessageHead() != NULL)
 				{
-					m_pPacketParse->GetMessageHead()->release();
+					App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
 				}
 
 				if (m_pPacketParse->GetMessageBody() != NULL)
 				{
-					m_pPacketParse->GetMessageBody()->release();
+					App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
 				}
 
 				if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageHead() != m_pCurrMessage)
 				{
-					m_pCurrMessage->release();
-					m_pCurrMessage = NULL;
+					App_MessageBlockManager::instance()->Close(m_pCurrMessage);
 				}
+				m_pCurrMessage = NULL;
 
 				SAFE_DELETE(m_pPacketParse);
 				return -1;
@@ -458,7 +458,7 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
 	{
 		OUR_DEBUG((LM_ERROR, "[CConsoleHandler::SendPacket] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetConnectID()));
 		sprintf_safe(m_szError, MAX_BUFF_500, "[CConsoleHandler::SendPacket] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetConnectID());
-		pMbData->release();
+		App_MessageBlockManager::instance()->Close(pMbData);
 		Close();
 		return false;
 	}
@@ -469,7 +469,7 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
 	if (NULL == pData)
 	{
 		OUR_DEBUG((LM_ERROR, "[CConsoleHandler::SendPacket] ConnectID = %d, pData is NULL.\n", GetConnectID()));
-		pMbData->release();
+		App_MessageBlockManager::instance()->Close(pMbData);
 		Close();
 		return false;
 	}
@@ -484,7 +484,7 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
 		if (nCurrSendSize <= 0)
 		{
 			OUR_DEBUG((LM_ERROR, "[CConsoleHandler::SendPacket] ConnectID = %d, nCurrSendSize error is %d.\n", GetConnectID(), nCurrSendSize));
-			pMbData->release();
+			App_MessageBlockManager::instance()->Close(pMbData);
 			return false;
 		}
 
@@ -503,7 +503,7 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
 			*/
 
 			OUR_DEBUG((LM_ERROR, "[CConsoleHandler::SendPacket] ConnectID = %d, error = %d.\n", GetConnectID(), errno));
-			pMbData->release();
+			App_MessageBlockManager::instance()->Close(pMbData);
 			m_atvOutput      = ACE_OS::gettimeofday();
 			Close();
 			return false;
@@ -513,7 +513,7 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
 			//OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_output] ConnectID = %d, send (%d) OK.\n", GetConnectID(), msg_queue()->is_empty()));
 			m_u4AllSendCount += 1;
 			m_u4AllSendSize  += (uint32)pMbData->length();
-			pMbData->release();
+			App_MessageBlockManager::instance()->Close(pMbData);
 			m_atvOutput      = ACE_OS::gettimeofday();
 			Close();
 			return true;

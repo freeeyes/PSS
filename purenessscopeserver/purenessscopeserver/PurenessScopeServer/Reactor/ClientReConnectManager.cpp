@@ -101,7 +101,7 @@ bool CReactorClientInfo::SendData(ACE_Message_Block* pmblk)
 
 			if (NULL != pmblk)
 			{
-				pmblk->release();
+				App_MessageBlockManager::instance()->Close(pmblk);
 			}
 
 			//如果消息有处理接口，则返回失败接口

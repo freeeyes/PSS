@@ -23,6 +23,8 @@ void CMessageBlockManager::Init()
 
 void CMessageBlockManager::Close()
 {
+	m_MenoryBlock_Pool.Close();
+
 	if(NULL != m_pmsgallocator)
 	{
 		delete m_pmsgallocator;

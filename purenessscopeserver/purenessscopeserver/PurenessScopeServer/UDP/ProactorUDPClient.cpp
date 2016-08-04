@@ -95,7 +95,7 @@ void CProactorUDPClient::handle_read_dgram(const ACE_Asynch_Read_Dgram::Result& 
 	{
 		//处理数据
 		CheckMessage(pMb, (uint32)nTran);
-		pMb->release();
+		App_MessageBlockManager::instance()->Close(pMb);
 
 		pMBBuff = App_MessageBlockManager::instance()->Create(MAX_UDP_PACKET_LEN);
 	}
