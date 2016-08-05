@@ -7,7 +7,12 @@ project(FtpTest):acelib{
   }
   specific (gnuace){
 		macros += __LINUX__   
-	} 
+		compile_flags += -Wno-deprecated
+	}
+	
+  specific(make) {
+    compile_flags += -fcheck-new
+  }
   
   libout = ./
   specific (prop:microsoft){
