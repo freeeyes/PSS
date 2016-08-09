@@ -223,7 +223,15 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
 		return -1;
 	}
 
-	int nCurrCount = (uint32)m_pCurrMessage->size() - m_u4CurrSize;
+	int nCurrCount = 0;
+	if(m_pPacketParse->GetIsHandleHead())
+	{
+		nCurrCount = (uint32)m_pPacketParse->GetPacketHeadSrcLen() - m_u4CurrSize;
+	}
+	else
+	{
+		nCurrCount = (uint32)m_pPacketParse->GetPacketBodySrcLen() - m_u4CurrSize;
+	}
 
 	//这里需要对m_u4CurrSize进行检查。
 	if (nCurrCount < 0)
@@ -284,7 +292,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
 	m_pCurrMessage->wr_ptr(nDataLen);
 
 	//如果没有读完，短读
-	if (m_pCurrMessage->size() > m_u4CurrSize)
+	if (nCurrCount - nDataLen > 0)
 	{
 		Close();
 		return 0;
