@@ -1416,7 +1416,7 @@ bool CConsoleMessage::DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffP
 
 		//返回服务器版本
 		strSTemp.text  = (char* )App_MainConfig::instance()->GetServerVersion();
-		strSTemp.u1Len = (uint8)ACE_OS::strlen(App_MainConfig::instance()->GetServerName());
+		strSTemp.u1Len = (uint8)ACE_OS::strlen(App_MainConfig::instance()->GetServerVersion());
 		(*pBuffPacket) << strSTemp;
 
 		//返回加载模块个数
