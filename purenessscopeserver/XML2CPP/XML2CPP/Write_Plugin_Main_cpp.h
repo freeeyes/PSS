@@ -135,26 +135,15 @@ void Gen_2_Cpp_Main(_Project_Info& objProjectInfo, vecClassInfo& objClassXmlInfo
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 	//添加注册函数
-	/*
-	for(int i = 0; i < (int)objvecXmlInfo.size(); i++)
+	for(int i = 0; i < (int)objProjectInfo.m_objCommandList.size(); i++)
 	{
-		if(objvecXmlInfo[i].m_emCommandType == COMMAND_IN)
+		if(strlen(objProjectInfo.m_objCommandList[i].m_szCommandInID) > 0)
 		{
-			if(strlen(objvecXmlInfo[i].m_szMacroName) > 0)
-			{
-				sprintf_safe(szTemp, 200, "\t\tpMessageManager->AddClientCommand((uint16)%s, g_pBaseCommand, g_szName);\n",
-					objvecXmlInfo[i].m_szMacroName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
-			else
-			{
-				sprintf_safe(szTemp, 200, "\t\tpMessageManager->AddClientCommand((uint16)%d, g_pBaseCommand, g_szName);\n",
-					objvecXmlInfo[i].m_nCommandID);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
+			sprintf_safe(szTemp, 200, "\t\tpMessageManager->AddClientCommand((uint16)%s, g_pBaseCommand, g_szName);\n",
+				objProjectInfo.m_objCommandList[i].m_szCommandInID);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		}
 	}
-	*/
 	sprintf_safe(szTemp, 200, "\t}\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\telse\n");
@@ -216,26 +205,15 @@ void Gen_2_Cpp_Main(_Project_Info& objProjectInfo, vecClassInfo& objClassXmlInfo
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 	//添加注销函数
-	/*
-	for(int i = 0; i < (int)objvecXmlInfo.size(); i++)
+	for(int i = 0; i < (int)objProjectInfo.m_objCommandList.size(); i++)
 	{
-		if(objvecXmlInfo[i].m_emCommandType == COMMAND_IN)
+		if(strlen(objProjectInfo.m_objCommandList[i].m_szCommandInID) > 0)
 		{
-			if(strlen(objvecXmlInfo[i].m_szMacroName) > 0)
-			{
-				sprintf_safe(szTemp, 200, "\t\t\tpMessageManager->DelClientCommand((uint16)%s, g_pBaseCommand);\n",
-					objvecXmlInfo[i].m_szMacroName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
-			else
-			{
-				sprintf_safe(szTemp, 200, "\t\t\tpMessageManager->DelClientCommand((uint16)%d, g_pBaseCommand);\n",
-					objvecXmlInfo[i].m_nCommandID);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
+			sprintf_safe(szTemp, 200, "\t\t\tpMessageManager->DelClientCommand((uint16)%s, g_pBaseCommand);\n",
+				objProjectInfo.m_objCommandList[i].m_szCommandInID);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		}
 	}
-	*/
 	sprintf_safe(szTemp, 200, "\t\t\tpMessageManager = NULL;\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t\t}\n");

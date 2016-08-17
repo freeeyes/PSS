@@ -56,7 +56,6 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	/*
 	//创建生成目录
 #ifdef WIN32
 	_mkdir(objProjectInfo.m_szProjectName);
@@ -65,16 +64,17 @@ int main(int argc, char* argv[])
 #endif
 
 	//写入主文件
-	Gen_2_Cpp_Main(objProjectInfo, objvecXmlInfo);
+	Gen_2_Cpp_Main(objProjectInfo, objvecClassInfo);
 
 	//写入数据包文件
-	Gen_2_Cpp_Packet(objProjectInfo.m_szProjectName, objvecXmlInfo);
+	Gen_2_Cpp_Packet(objProjectInfo, objvecClassInfo);
 
 	//写入Command头文件
-	Gen_2_Cpp_Command_H(objProjectInfo);
+	Gen_2_Cpp_Command_H(objProjectInfo, objvecClassInfo);
 
+	
 	//写入Command体文件
-	Gen_2_Cpp_Command_Cpp(objProjectInfo, objvecXmlInfo);
+	Gen_2_Cpp_Command_Cpp(objProjectInfo, objvecClassInfo);
 
 	//生成make文件
 	Gen_2_Make_define(objProjectInfo.m_szProjectName);
@@ -82,6 +82,7 @@ int main(int argc, char* argv[])
 	Gen_2_Mpc(objProjectInfo.m_szProjectName, objProjectInfo);
 	Gen_2_RunLinuxMake(objProjectInfo.m_szProjectName, objProjectInfo);
 	Gen_2_ZZZ(objProjectInfo.m_szProjectName);
+	/*
 	Gen_2_Cpp_Logic_H(objProjectInfo, objvecXmlInfo);
 	Gen_2_Cpp_Logic_Cpp(objProjectInfo, objvecXmlInfo);
 	*/

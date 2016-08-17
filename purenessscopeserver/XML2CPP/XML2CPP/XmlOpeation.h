@@ -118,7 +118,7 @@ struct _Property
 	_Stream_Type_Info Get_Stream_Info()
 	{
 		_Stream_Type_Info obj_Stream_Type_Info;
-		if(strcmp(m_szStreamLength, "all"))
+		if(strcmp(m_szStreamLength, "all") == 0)
 		{
 			obj_Stream_Type_Info.m_emType  = STREAM_TYPE_ALL;
 			obj_Stream_Type_Info.m_nLength = 0;

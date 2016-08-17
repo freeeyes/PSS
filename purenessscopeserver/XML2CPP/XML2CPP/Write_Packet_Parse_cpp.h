@@ -217,103 +217,110 @@ void Gen_2_Cpp_In_Stream(FILE* pFile, _Class_Info& obj_Class_Info)
 	{
 		if(obj_Class_Info.m_vecProperty[i].m_emType == PROPERTY_CHAR)
 		{
-			if(obj_Class_Info.m_vecProperty[i].m_nLength <= 255 && obj_Class_Info.m_vecProperty[i].m_nNeedHeadLength == 0)
+			if(obj_Class_Info.m_vecProperty[i].Get_Stream_Info().m_emType == STREAM_TYPE_STRING)
 			{
-				sprintf_safe(szTemp, 200, "\t_VCHARS_STR vs%s;\n", 
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
-			else if(obj_Class_Info.m_vecProperty[i].m_nLength <= 56635 && obj_Class_Info.m_vecProperty[i].m_nNeedHeadLength == 0)
-			{
-				sprintf_safe(szTemp, 200, "\t_VCHARM_STR vs%s;\n", 
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
-			else if(obj_Class_Info.m_vecProperty[i].m_nNeedHeadLength == 0)
-			{
-				sprintf_safe(szTemp, 200, "\t_VCHARB_STR vs%s;\n", 
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				//写入带长度的数据流
+				if(obj_Class_Info.m_vecProperty[i].m_nLength <= 255)
+				{
+					sprintf_safe(szTemp, 200, "\t_VCHARS_STR vs%s;\n", 
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				else if(obj_Class_Info.m_vecProperty[i].m_nLength <= 56635)
+				{
+					sprintf_safe(szTemp, 200, "\t_VCHARM_STR vs%s;\n", 
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				else if(obj_Class_Info.m_vecProperty[i].m_nNeedHeadLength == 0)
+				{
+					sprintf_safe(szTemp, 200, "\t_VCHARB_STR vs%s;\n", 
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
 			}
 		}
 	}
-
-	/*
-	//流入命令字
-	if(obj_Class_Info.m_nCommandID > 0)
-	{
-		sprintf_safe(szTemp, 200, "\tuint16 u2CommandID = (uint16)%d;\n", 
-			obj_Class_Info.m_nCommandID);
-		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\t(*pBuffPacket) << u2CommandID;\n");
-		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	}
-	*/
 
 	//处理所有写入流
 	for(int i = 0; i < (int)obj_Class_Info.m_vecProperty.size(); i++)
 	{
 		if(obj_Class_Info.m_vecProperty[i].m_emType == PROPERTY_CHAR)
 		{
-			if(obj_Class_Info.m_vecProperty[i].m_nLength < 255  && obj_Class_Info.m_vecProperty[i].m_nNeedHeadLength == 0)
+			_Stream_Type_Info obj_Stream_Type_Info = obj_Class_Info.m_vecProperty[i].Get_Stream_Info();
+			if(obj_Stream_Type_Info.m_emType == STREAM_TYPE_STRING)
 			{
-				sprintf_safe(szTemp, 200, "\tuint8 u1%sLen = (uint8)strlen(obj%s.m_sz%s);\n",
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName,
-					obj_Class_Info.m_szXMLName,
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\tvs%s.SetData(obj%s.m_sz%s, u1%sLen);\n",
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName,
-					obj_Class_Info.m_szXMLName,
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName,
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t(*pBuffPacket) << vs%s;\n",
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
-			else if(obj_Class_Info.m_vecProperty[i].m_nLength < 65535 && obj_Class_Info.m_vecProperty[i].m_nLength >= 255  && obj_Class_Info.m_vecProperty[i].m_nNeedHeadLength == 0)
-			{
-				sprintf_safe(szTemp, 200, "\tuint16 u2%sLen = (uint16)strlen(obj%s.m_sz%s);\n",
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName,
-					obj_Class_Info.m_szXMLName,
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\tvs%s.SetData(obj%s.m_sz%s, u2%sLen);\n",
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName,
-					obj_Class_Info.m_szXMLName,
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName,
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t(*pBuffPacket) << vs%s;\n",
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
-			else if(obj_Class_Info.m_vecProperty[i].m_nNeedHeadLength == 0)
-			{
-				sprintf_safe(szTemp, 200, "\tuint32 u4%sLen = (uint32)strlen(obj%s.m_sz%s);\n",
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName,
-					obj_Class_Info.m_szXMLName,
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\tvs%s.SetData(obj%s.m_sz%s, u4%sLen);\n",
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName,
-					obj_Class_Info.m_szXMLName,
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName,
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t(*pBuffPacket) << vs%s;\n",
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				if(obj_Class_Info.m_vecProperty[i].m_nLength < 255)
+				{
+					sprintf_safe(szTemp, 200, "\tuint8 u1%sLen = (uint8)strlen(obj%s.m_sz%s);\n",
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName,
+						obj_Class_Info.m_szXMLName,
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\tvs%s.SetData(obj%s.m_sz%s, u1%sLen);\n",
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName,
+						obj_Class_Info.m_szXMLName,
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName,
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t(*pBuffPacket) << vs%s;\n",
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				else if(obj_Class_Info.m_vecProperty[i].m_nLength < 65535)
+				{
+					sprintf_safe(szTemp, 200, "\tuint16 u2%sLen = (uint16)strlen(obj%s.m_sz%s);\n",
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName,
+						obj_Class_Info.m_szXMLName,
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\tvs%s.SetData(obj%s.m_sz%s, u2%sLen);\n",
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName,
+						obj_Class_Info.m_szXMLName,
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName,
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t(*pBuffPacket) << vs%s;\n",
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				else if(obj_Class_Info.m_vecProperty[i].m_nNeedHeadLength == 0)
+				{
+					sprintf_safe(szTemp, 200, "\tuint32 u4%sLen = (uint32)strlen(obj%s.m_sz%s);\n",
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName,
+						obj_Class_Info.m_szXMLName,
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\tvs%s.SetData(obj%s.m_sz%s, u4%sLen);\n",
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName,
+						obj_Class_Info.m_szXMLName,
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName,
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t(*pBuffPacket) << vs%s;\n",
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
 			}
 			else
 			{
-				sprintf_safe(szTemp, 200, "\tpBuffPacket->WriteStream(obj%s.m_sz%s, ACE_OS::strlen(obj%s.m_sz%s));\n",
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName,
-					obj_Class_Info.m_szXMLName,
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName,
-					obj_Class_Info.m_szXMLName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				if(obj_Stream_Type_Info.m_emType == STREAM_TYPE_ALL)
+				{
+					sprintf_safe(szTemp, 200, "\tpBuffPacket->WriteStream(obj%s.m_sz%s, ACE_OS::strlen(obj%s.m_sz%s));\n",
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName,
+						obj_Class_Info.m_szXMLName,
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName,
+						obj_Class_Info.m_szXMLName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				else
+				{
+					sprintf_safe(szTemp, 200, "\tpBuffPacket->WriteStream(obj%s.m_sz%s, %d);\n",
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName,
+						obj_Class_Info.m_szXMLName,
+						obj_Stream_Type_Info.m_nLength);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
 			}
 
 		}
@@ -509,23 +516,26 @@ void Gen_2_Cpp_Out_Stream(FILE* pFile, _Class_Info& obj_Class_Info)
 	{
 		if(obj_Class_Info.m_vecProperty[i].m_emType == PROPERTY_CHAR)
 		{
-			if(obj_Class_Info.m_vecProperty[i].m_nLength <= 255)
+			if(obj_Class_Info.m_vecProperty[i].Get_Stream_Info().m_emType == STREAM_TYPE_STRING)
 			{
-				sprintf_safe(szTemp, 200, "\t_VCHARS_STR vs%s;\n", 
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
-			else if(obj_Class_Info.m_vecProperty[i].m_nLength <= 56635)
-			{
-				sprintf_safe(szTemp, 200, "\t_VCHARM_STR vs%s;\n", 
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
-			else
-			{
-				sprintf_safe(szTemp, 200, "\t_VCHARB_STR vs%s;\n", 
-					obj_Class_Info.m_vecProperty[i].m_szPropertyName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				if(obj_Class_Info.m_vecProperty[i].m_nLength <= 255)
+				{
+					sprintf_safe(szTemp, 200, "\t_VCHARS_STR vs%s;\n", 
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				else if(obj_Class_Info.m_vecProperty[i].m_nLength <= 56635)
+				{
+					sprintf_safe(szTemp, 200, "\t_VCHARM_STR vs%s;\n", 
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				else
+				{
+					sprintf_safe(szTemp, 200, "\t_VCHARB_STR vs%s;\n", 
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
 			}
 		}
 		else if(obj_Class_Info.m_vecProperty[i].m_emType == PROPERTY_STRING)
@@ -536,31 +546,42 @@ void Gen_2_Cpp_Out_Stream(FILE* pFile, _Class_Info& obj_Class_Info)
 		}
 	}
 
-	/*
-	//流出命令字
-	if(obj_Class_Info.m_nCommandID > 0)
-	{
-		sprintf_safe(szTemp, 200, "\t//uint16 u2CommandID = 0;\n");
-		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\t//(*pBuffPacket) >> u2CommandID;\n");
-		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	}
-	*/
-
 	//处理所有读出流
 	for(int i = 0; i < (int)obj_Class_Info.m_vecProperty.size(); i++)
 	{
 		if(obj_Class_Info.m_vecProperty[i].m_emType == PROPERTY_CHAR)
 		{
-			sprintf_safe(szTemp, 200, "\t(*pBuffPacket) >> vs%s;\n",
-				obj_Class_Info.m_vecProperty[i].m_szPropertyName);
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			sprintf_safe(szTemp, 200, "\tsprintf_safe(obj%s.m_sz%s, %d, \"%%s\", vs%s.text);\n",
-				obj_Class_Info.m_szXMLName, 
-				obj_Class_Info.m_vecProperty[i].m_szPropertyName,
-				obj_Class_Info.m_vecProperty[i].m_nLength,
-				obj_Class_Info.m_vecProperty[i].m_szPropertyName);
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			_Stream_Type_Info obj_Stream_Type_Info = obj_Class_Info.m_vecProperty[i].Get_Stream_Info();
+			if(obj_Stream_Type_Info.m_emType == STREAM_TYPE_STRING)
+			{
+				sprintf_safe(szTemp, 200, "\t(*pBuffPacket) >> vs%s;\n",
+					obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\tsprintf_safe(obj%s.m_sz%s, %d, \"%%s\", vs%s.text);\n",
+					obj_Class_Info.m_szXMLName, 
+					obj_Class_Info.m_vecProperty[i].m_szPropertyName,
+					obj_Class_Info.m_vecProperty[i].m_nLength,
+					obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+			else
+			{
+				if(obj_Stream_Type_Info.m_emType == STREAM_TYPE_CHAR)
+				{
+					sprintf_safe(szTemp, 200, "\tpBuffPacket->ReadStream(obj%s.m_sz%s, %d);\n",
+						obj_Class_Info.m_szXMLName, 
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName,
+						obj_Stream_Type_Info.m_nLength);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				else
+				{
+					sprintf_safe(szTemp, 200, "\tpBuffPacket->ReadStream(obj%s.m_sz%s, pBuffPacket->GetReadLen());\n",
+						obj_Class_Info.m_szXMLName, 
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+			}
 
 		}
 		else if(obj_Class_Info.m_vecProperty[i].m_emType == PROPERTY_STRING)
@@ -773,12 +794,12 @@ void Gen_2_Cpp_Out_Stream(FILE* pFile, _Class_Info& obj_Class_Info)
 }
 
 //转化为CPP文件的方法
-void Gen_2_Cpp_Packet(const char* pPath, vecClassInfo& objvecClassInfo)
+void Gen_2_Cpp_Packet(_Project_Info& obj_Project_Info, vecClassInfo& objvecClassInfo)
 {
 	char szTemp[200]     = {'\0'};
 	char szPathFile[200] = {'\0'};
 
-	sprintf_safe(szPathFile, 200, "%s/%s", pPath, STRUCT_DATA_FILE);
+	sprintf_safe(szPathFile, 200, "%s/%s", obj_Project_Info.m_szProjectName, STRUCT_DATA_FILE);
 
 	//首先生成声明文件。
 	FILE* pFile = fopen(szPathFile, "w");
@@ -799,19 +820,17 @@ void Gen_2_Cpp_Packet(const char* pPath, vecClassInfo& objvecClassInfo)
 	sprintf_safe(szTemp, 200, "\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-	/*
 	//定义所有需要用到的命令宏
-	for(int i = 0; i < (int)objvecClassInfo.size(); i++)
+	for(int i = 0; i < (int)obj_Project_Info.m_objDefineInfoList.size(); i++)
 	{
-		if(strlen(objvecClassInfo[i].m_szMacroName) > 0)
+		if(strcmp(obj_Project_Info.m_objDefineInfoList[i].m_szType, "number") == 0)
 		{
-			sprintf_safe(szTemp, 200, "#define %s %d\n",
-				objvecClassInfo[i].m_szMacroName,
-				objvecClassInfo[i].m_nCommandID);
+			sprintf_safe(szTemp, 200, "#define %s %s\n",
+				obj_Project_Info.m_objDefineInfoList[i].m_szDefineName, 
+				obj_Project_Info.m_objDefineInfoList[i].m_szDefineValue);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		}
 	}
-	*/
 
 	sprintf_safe(szTemp, 200, "\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -831,7 +850,7 @@ void Gen_2_Cpp_Packet(const char* pPath, vecClassInfo& objvecClassInfo)
 	}
 	fclose(pFile);
 
-	sprintf_safe(szPathFile, 200, "%s/%s", pPath, PROTOCAL_DATA_FILE);
+	sprintf_safe(szPathFile, 200, "%s/%s", obj_Project_Info.m_szProjectName, PROTOCAL_DATA_FILE);
 
 	pFile = fopen(szPathFile, "w");
 	if(NULL == pFile)

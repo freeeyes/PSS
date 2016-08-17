@@ -399,7 +399,7 @@ bool CXmlOpeation::Parse_Plug_In_Project(const char* pFileName, _Project_Info& o
 				pTemp = (char* )pThreeElement->Attribute("class");
 				if(NULL != pTemp)
 				{
-					sprintf_safe(obj_Object_Info.m_szClassName, 100, "%s", pTemp);
+					sprintf_safe(obj_Object_Info.m_szClassName, 50, "%s", pTemp);
 				}
 				pTemp = (char* )pThreeElement->Attribute("PacketType");
 				if(NULL != pTemp)
@@ -408,11 +408,11 @@ bool CXmlOpeation::Parse_Plug_In_Project(const char* pFileName, _Project_Info& o
 					{
 						obj_Object_Info.m_emPacketType = PACKET_TYPE_HEAD;
 					}
-					else if(pTemp, "BODY")
+					else if(strcmp(pTemp, "BODY") == 0)
 					{
 						obj_Object_Info.m_emPacketType = PACKET_TYPE_BODY;
 					}
-					else if(pTemp, "RETURN")
+					else if(strcmp(pTemp, "RETURN") == 0)
 					{
 						obj_Object_Info.m_emPacketType = PACKET_TYPE_RETURN;
 					}
