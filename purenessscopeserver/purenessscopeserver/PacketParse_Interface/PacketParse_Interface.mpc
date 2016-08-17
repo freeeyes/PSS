@@ -5,7 +5,15 @@ project(PacketParse_Interface):acelib{
   Source_Files{
   	./*.cpp 
   }
-  macros += __LINUX__  
+  
+  specific(make) {
+    compile_flags += -fcheck-new
+  }
+
+  specific(gnuace) {
+	macros += __LINUX__  
+    compile_flags += -Wno-deprecated
+  }  
   
   libout = ./
   specific (prop:microsoft){
