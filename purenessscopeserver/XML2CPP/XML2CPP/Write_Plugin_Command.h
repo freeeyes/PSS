@@ -5,6 +5,7 @@
 
 void Gen_2_Cpp_Command_H(_Project_Info& objProjectInfo)
 {
+	/*
 	char szTemp[200]     = {'\0'};
 	char szPathFile[200] = {'\0'};
 
@@ -71,23 +72,27 @@ void Gen_2_Cpp_Command_H(_Project_Info& objProjectInfo)
 	sprintf_safe(szTemp, 200, "};\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	fclose(pFile);
+	*/
 }
 
-_Xml_Info* Find_Xml_StructInfo(int nCommandID, vecXmlInfo& objvecXmlInfo)
+_Class_Info* Find_Xml_StructInfo(int nCommandID, vecClassInfo& objvecClassInfo)
 {
-	for(int i = 0; i < (int)objvecXmlInfo.size(); i++)
+	/*
+	for(int i = 0; i < (int)objvecClassInfo.size(); i++)
 	{
-		if(objvecXmlInfo[i].m_nCommandID == nCommandID)
+		if(objvecClassInfo[i].m_nCommandID == nCommandID)
 		{
-			return &objvecXmlInfo[i];
+			return &objvecClassInfo[i];
 		}
 	}
+	*/
 
 	return NULL;
 }
 
-void Gen_2_Cpp_Command_Cpp(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlInfo)
+void Gen_2_Cpp_Command_Cpp(_Project_Info& objProjectInfo, vecClassInfo& objvecClassInfo)
 {
+	/*
 	char szTemp[200]     = {'\0'};
 	char szPathFile[200] = {'\0'};
 
@@ -329,8 +334,10 @@ void Gen_2_Cpp_Command_Cpp(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlI
 		sprintf_safe(szTemp, 200, "}\n\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	}
+	
 
 	fclose(pFile);
+	*/
 }
 
 #endif

@@ -12,22 +12,27 @@
 #include "Write_Plugin_Make.h"
 #include "Write_Plugin_Logic.h"
 
+#define PROJECT_FILE_NAME   "PlugInInfo.xml"
+#define PROTOCOL_FILE_NAME  "protocol.xml"
+
 int main(int argc, char* argv[])
 {
-	char szFileName[255] = {'\0'};
+	char szFilePath[255]   = {'\0'};
+	char szConfigFile[255] = {'\0'};
 
 	if(NULL == argv[1])
 	{
-		sprintf_safe(szFileName, 255, "protocol.xml");
+		sprintf_safe(szFilePath, 255, "./Conf/");
 	}
 	else
 	{
-		sprintf_safe(szFileName, 255, "%s", argv[1]);
+		sprintf_safe(szFilePath, 255, "%s", argv[1]);
 	}
 
 	//读取工程文件
 	_Project_Info objProjectInfo;
-	bool blState = Read_Project_File(PROJECT_FILE_NAME, objProjectInfo);
+	sprintf_safe(szConfigFile, 255, "%s%s", szFilePath, PROJECT_FILE_NAME);
+	bool blState = Read_Project_File(szConfigFile, objProjectInfo);
 	if(false == blState)
 	{
 		printf("[error]Project XML is error.\n");
@@ -35,8 +40,9 @@ int main(int argc, char* argv[])
 	}
 
 	//读取命令文件
-	vecXmlInfo objvecXmlInfo;
-	blState = Read_Command_File(szFileName, objvecXmlInfo);
+	vecClassInfo objvecClassInfo;
+	sprintf_safe(szConfigFile, 255, "%s%s", szFilePath, PROTOCOL_FILE_NAME);
+	blState = Read_Command_File(szConfigFile, objvecClassInfo);
 	if(false == blState)
 	{
 		printf("[error]Command XML is error.\n");
@@ -50,6 +56,7 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
+	/*
 	//创建生成目录
 #ifdef WIN32
 	_mkdir(objProjectInfo.m_szProjectName);
@@ -77,6 +84,7 @@ int main(int argc, char* argv[])
 	Gen_2_ZZZ(objProjectInfo.m_szProjectName);
 	Gen_2_Cpp_Logic_H(objProjectInfo, objvecXmlInfo);
 	Gen_2_Cpp_Logic_Cpp(objProjectInfo, objvecXmlInfo);
+	*/
 
 	printf("[success]OK.\n");
 	getchar();

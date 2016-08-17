@@ -3,15 +3,13 @@
 
 #include "XmlOpeation.h"
 
-#define PROJECT_FILE_NAME "PlugInInfo.xml"
-
 bool Read_Project_File(const char* pFileName, _Project_Info& objProjectInfo)
 {
 	CXmlOpeation objXmlOpeation;
-	return objXmlOpeation.Parse_XML_File_Project(pFileName, objProjectInfo);
+	return objXmlOpeation.Parse_Plug_In_Project(pFileName, objProjectInfo);
 }
 
-void Gen_2_Cpp_Main(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlInfo)
+void Gen_2_Cpp_Main(_Project_Info& objProjectInfo, vecClassInfo& objClassXmlInfo)
 {
 	char szTemp[200]     = {'\0'};
 	char szPathFile[200] = {'\0'};
@@ -135,6 +133,9 @@ void Gen_2_Cpp_Main(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlInfo)
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t{\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	//添加注册函数
+	/*
 	for(int i = 0; i < (int)objvecXmlInfo.size(); i++)
 	{
 		if(objvecXmlInfo[i].m_emCommandType == COMMAND_IN)
@@ -153,6 +154,7 @@ void Gen_2_Cpp_Main(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlInfo)
 			}
 		}
 	}
+	*/
 	sprintf_safe(szTemp, 200, "\t}\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\telse\n");
@@ -212,6 +214,9 @@ void Gen_2_Cpp_Main(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlInfo)
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t\t{\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	//添加注销函数
+	/*
 	for(int i = 0; i < (int)objvecXmlInfo.size(); i++)
 	{
 		if(objvecXmlInfo[i].m_emCommandType == COMMAND_IN)
@@ -230,6 +235,7 @@ void Gen_2_Cpp_Main(_Project_Info& objProjectInfo, vecXmlInfo& objvecXmlInfo)
 			}
 		}
 	}
+	*/
 	sprintf_safe(szTemp, 200, "\t\t\tpMessageManager = NULL;\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t\t}\n");

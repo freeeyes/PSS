@@ -140,148 +140,7 @@ char* CXmlOpeation::GetData_Text(const char* pName, TiXmlElement*& pNextTiXmlEle
 	return NULL;
 }
 
-bool CXmlOpeation::Parse_XML(char* pText, _Xml_Info& objxmlInfo)
-{
-	//解析字符串
-	Close();
-	m_pTiXmlDocument = new TiXmlDocument();
-	m_pTiXmlDocument->Parse(pText, 0, TIXML_DEFAULT_ENCODING); 
-
-	//获得根元素
-	m_pRootElement = m_pTiXmlDocument->RootElement();
-
-	//获得根元素的名称
-	sprintf_safe(objxmlInfo.m_szXMLName, 60, m_pRootElement->Value());
-	sprintf_safe(objxmlInfo.m_szDesc, 100, "%s", m_pRootElement->Attribute("desc"));
-	char* pCommandID = (char* )m_pRootElement->Attribute("CommandID");
-	if(NULL != pCommandID)
-	{
-		objxmlInfo.m_nCommandID =atoi(pCommandID);
-	}
-
-	//循环打印出每一个变量
-	if(NULL == m_pRootElement)
-	{
-		return false;
-	}
-
-	//printf("Root=%s.\n", m_pRootElement->Value());
-
-	TiXmlNode* pNode = NULL;
-
-	for(pNode = m_pRootElement->FirstChildElement();pNode;pNode=pNode->NextSiblingElement())
-	{
-		int nType = pNode->Type();
-		if(nType == TiXmlText::TINYXML_ELEMENT)
-		{
-			//printf("Name=%s,Values=%s.\n", pNode->Value(), pNode->ToElement()->GetText());
-			_Property objProperty;
-			sprintf_safe(objProperty.m_szPropertyName, 50, "%s", pNode->Value());
-			if(strcmp(pNode->ToElement()->GetText(), "char") == 0)
-			{
-				objProperty.m_emType = PROPERTY_CHAR;
-
-				//同时获得字符串最大长度
-				char* pLength = (char* )pNode->ToElement()->Attribute("length");
-				if(NULL != pLength)
-				{
-					objProperty.m_nLength = (int)atoi(pLength);
-				}
-				char* pNeedLength = (char* )pNode->ToElement()->Attribute("NeedHeadLength");
-				if(NULL != pNeedLength)
-				{
-					if(strcmp(pNeedLength, "NO") == 0)
-					{
-						objProperty.m_nNeedHeadLength = 1;
-					}
-				}
-			}
-			else if(strcmp(pNode->ToElement()->GetText(), "string") == 0)
-			{
-				objProperty.m_emType = PROPERTY_STRING;
-			}
-			else if(strcmp(pNode->ToElement()->GetText(), "uint8") == 0)
-			{
-				objProperty.m_emType = PROPERTY_UINT8;
-			}
-			else if(strcmp(pNode->ToElement()->GetText(), "uint16") == 0)
-			{
-				objProperty.m_emType = PROPERTY_UINT16;
-			}
-			else if(strcmp(pNode->ToElement()->GetText(), "uint32") == 0)
-			{
-				objProperty.m_emType = PROPERTY_UINT32;
-			}
-			else if(strcmp(pNode->ToElement()->GetText(), "uint64") == 0)
-			{
-				objProperty.m_emType = PROPERTY_UINT64;
-			}
-			else if(strcmp(pNode->ToElement()->GetText(), "int8") == 0)
-			{
-				objProperty.m_emType = PROPERTY_INT8;
-			}
-			else if(strcmp(pNode->ToElement()->GetText(), "int16") == 0)
-			{
-				objProperty.m_emType = PROPERTY_INT16;
-			}
-			else if(strcmp(pNode->ToElement()->GetText(), "int32") == 0)
-			{
-				objProperty.m_emType = PROPERTY_INT32;
-			}
-			else if(strcmp(pNode->ToElement()->GetText(), "float32") == 0)
-			{
-				objProperty.m_emType = PROPERTY_FLOAT32;
-			}
-			else if(strcmp(pNode->ToElement()->GetText(), "float64") == 0)
-			{
-				objProperty.m_emType = PROPERTY_FLOAT64;
-			}
-			else
-			{
-				objProperty.m_emType = PROPERTY_UNKNOW;
-				sprintf_safe(objProperty.m_szClassName, 100, "%s", pNode->ToElement()->GetText());
-			}
-
-			//查看参数类别
-			if(NULL != pNode->ToElement()->Attribute("class"))
-			{
-				if(strcmp(pNode->ToElement()->Attribute("class"), "vector") == 0)
-				{
-					objProperty.m_emClass = CLASS_VECTOR;
-				}
-				else if(strcmp(pNode->ToElement()->Attribute("class"), "map") == 0)
-				{
-					objProperty.m_emClass = CLASS_MAP;
-
-					//如果是map 则查看keyName和keyType
-					sprintf_safe(objProperty.m_szKeyName, 100, "%s", pNode->ToElement()->Attribute("keyName"));
-
-					if(strcmp(pNode->ToElement()->Attribute("KeyClass"), "string") == 0)
-					{
-						objProperty.m_emKeyType = PROPERTY_STRING;
-					}
-					else if(strcmp(pNode->ToElement()->Attribute("KeyClass"), "uint16") == 0)
-					{
-						objProperty.m_emKeyType = PROPERTY_UINT16;
-					}
-					else if(strcmp(pNode->ToElement()->Attribute("KeyClass"), "uint32") == 0)
-					{
-						objProperty.m_emKeyType = PROPERTY_UINT32;
-					}
-				}
-			}
-
-			sprintf_safe(objProperty.m_szDesc, 100, "%s", pNode->ToElement()->Attribute("desc"));
-
-			objxmlInfo.m_vecProperty.push_back(objProperty);
-		}
-	}
-
-	Close();
-	return true;
-}
-
-bool CXmlOpeation::Parse_XML_File(const char* pFileName, vecXmlInfo& objvecXmlInfo)
+bool CXmlOpeation::Parse_Class_File(const char* pFileName, vecClassInfo& objvecClassInfo)
 {
 	Close();
 	m_pTiXmlDocument = new TiXmlDocument(pFileName);
@@ -292,6 +151,7 @@ bool CXmlOpeation::Parse_XML_File(const char* pFileName, vecXmlInfo& objvecXmlIn
 
 	if(false == m_pTiXmlDocument->LoadFile())
 	{
+		Close();
 		return false;
 	}
 
@@ -308,7 +168,7 @@ bool CXmlOpeation::Parse_XML_File(const char* pFileName, vecXmlInfo& objvecXmlIn
 	//获得根元素的子元素
 	for(pMainNode = m_pRootElement->FirstChildElement();pMainNode;pMainNode=pMainNode->NextSiblingElement())
 	{
-		_Xml_Info objxmlInfo;
+		_Class_Info objClassInfo;
 
 		int nMainType = pMainNode->Type();
 
@@ -320,31 +180,8 @@ bool CXmlOpeation::Parse_XML_File(const char* pFileName, vecXmlInfo& objvecXmlIn
 		TiXmlElement* pMainElement = pMainNode->ToElement();
 
 		//获得元素的名称
-		sprintf_safe(objxmlInfo.m_szXMLName, 60, pMainElement->Value());
-		sprintf_safe(objxmlInfo.m_szDesc, 100, "%s", pMainElement->Attribute("desc"));
-		char* pCommandID = (char* )pMainElement->Attribute("CommandID");
-		if(NULL != pCommandID)
-		{
-			objxmlInfo.m_nCommandID =atoi(pCommandID);
-		}
-		char* pCommandType = (char* )pMainElement->Attribute("CommandType");
-		if(NULL != pCommandType)
-		{
-			if(strcmp(pCommandType, "in") == 0)
-			{
-				objxmlInfo.m_emCommandType = COMMAND_IN;
-			}
-			else if(strcmp(pCommandType, "out") == 0)
-			{
-				objxmlInfo.m_emCommandType = COMMAND_OUT;
-			}
-		}
-		//得到宏定义
-		char* pMacroName = (char* )pMainElement->Attribute("MacroName");
-		if(NULL != pMacroName)
-		{
-			sprintf_safe(objxmlInfo.m_szMacroName, 50, "%s", pMacroName);
-		}
+		sprintf_safe(objClassInfo.m_szXMLName, 60, pMainElement->Value());
+		sprintf_safe(objClassInfo.m_szDesc, 100, "%s", pMainElement->Attribute("desc"));
 
 		//printf("Root=%s.\n", m_pRootElement->Value());
 
@@ -368,13 +205,12 @@ bool CXmlOpeation::Parse_XML_File(const char* pFileName, vecXmlInfo& objvecXmlIn
 					{
 						objProperty.m_nLength = (int)atoi(pLength);
 					}
-					char* pNeedLength = (char* )pNode->ToElement()->Attribute("NeedHeadLength");
-					if(NULL != pNeedLength)
+
+					//获得Stream的指定长度
+					char* pStreamLength = (char* )pNode->ToElement()->Attribute("StreamLength");
+					if(NULL != pStreamLength)
 					{
-						if(strcmp(pNeedLength, "NO") == 0)
-						{
-							objProperty.m_nNeedHeadLength = 1;
-						}
+						sprintf_safe(objProperty.m_szStreamLength, 10, "%s", pStreamLength);
 					}
 				}
 				else if(strcmp(pNode->ToElement()->GetText(), "string") == 0)
@@ -455,18 +291,18 @@ bool CXmlOpeation::Parse_XML_File(const char* pFileName, vecXmlInfo& objvecXmlIn
 
 				//得到参数描述信息
 				sprintf_safe(objProperty.m_szDesc, 100, "%s", pNode->ToElement()->Attribute("desc"));
-				objxmlInfo.m_vecProperty.push_back(objProperty);
+				objClassInfo.m_vecProperty.push_back(objProperty);
 			}
 		}
 
-		objvecXmlInfo.push_back(objxmlInfo);
+		objvecClassInfo.push_back(objClassInfo);
 	}
 
 	Close();
 	return true;
 }
 
-bool CXmlOpeation::Parse_XML_File_Project(const char* pFileName, _Project_Info& objProjectInfo)
+bool CXmlOpeation::Parse_Plug_In_Project(const char* pFileName, _Project_Info& objProjectInfo)
 {
 	Close();
 	m_pTiXmlDocument = new TiXmlDocument(pFileName);
@@ -477,6 +313,7 @@ bool CXmlOpeation::Parse_XML_File_Project(const char* pFileName, _Project_Info& 
 
 	if(false == m_pTiXmlDocument->LoadFile())
 	{
+		Close();
 		return false;
 	}
 
@@ -491,58 +328,101 @@ bool CXmlOpeation::Parse_XML_File_Project(const char* pFileName, _Project_Info& 
 	}
 
 	//获得头元素
-	char* pName = GetData_Text("Name");
+	char* pName = (char* )m_pRootElement->Attribute("Name");
 	if(NULL != pName)
 	{
 		sprintf_safe(objProjectInfo.m_szProjectName, 100, "%s", pName);
 	}
 
-	char* pDesc = GetData("Name", "desc");
+	char* pDesc = (char* )m_pRootElement->Attribute("desc");
 	if(NULL != pDesc)
 	{
 		sprintf_safe(objProjectInfo.m_szProjectDesc, 200, "%s", pDesc);
 	}
 
-	char* pKeyID = GetData("Name", "keyID");
+	char* pKeyID = (char* )m_pRootElement->Attribute("keyID");
 	if(NULL != pKeyID)
 	{
 		sprintf_safe(objProjectInfo.m_szProjectKey, 100, "%s", pKeyID);
 	}
 
-	//循环获得当前关系图
-	TiXmlElement* pCommandElement    = NULL;
-	TiXmlElement* pCommandInElement  = NULL;
-	TiXmlElement* pCommandOutElement = NULL;
-
-	while(true)
+	//获得其中的数据体
+	TiXmlNode* pNode = NULL;
+	for(pNode = m_pRootElement->FirstChildElement();pNode;pNode=pNode->NextSiblingElement())
 	{
-		char* pCommandText = GetData_Text("Command", pCommandElement);
-		if(NULL == pCommandText)
+		TiXmlElement* pSecondElement = pNode->ToElement();
+		if(strcmp(pSecondElement->Value(), "Define") == 0)
 		{
-			break;
-		}
-
-		_Command_Relation_info objCommand;
-		sprintf_safe(objCommand.m_szCommandFuncName, 100, "%s", pCommandText);
-		char* pCommandIn = GetData("Command", "CommandIn", pCommandInElement);
-		if(NULL != pCommandIn)
-		{
-			objCommand.m_nCommandInID = (int)atoi(pCommandIn);
-		}
-		char* pCommandOut = GetData("Command", "CommandOut", pCommandOutElement);
-		if(NULL != pCommandOut)
-		{
-			objCommand.m_nCommandOutID = (int)atoi(pCommandOut);
-		}
-		char* pCommandOutPacket = GetData("Command", "OutPacket", pCommandOutElement);
-		if(NULL != pCommandOutPacket)
-		{
-			if(strcmp(pCommandOutPacket, "NO") == 0)
+			_Define_Info obj_Define_Info;
+			char* pTemp = (char* )pSecondElement->Attribute("DefName");
+			if(NULL != pTemp)
 			{
-				objCommand.m_nOutPcket = 1;
+				sprintf_safe(obj_Define_Info.m_szDefineName, 100, "%s", pTemp);
 			}
+			pTemp = (char* )pSecondElement->Attribute("type");
+			if(NULL != pTemp)
+			{
+				sprintf_safe(obj_Define_Info.m_szType, 20, "%s", pTemp);
+			}
+			pTemp = (char* )pSecondElement->Attribute("DefValue");
+			if(NULL != pTemp)
+			{
+				sprintf_safe(obj_Define_Info.m_szDefineValue, 100, "%s", pTemp);
+			}
+			objProjectInfo.m_objDefineInfoList.push_back(obj_Define_Info);
 		}
-		objProjectInfo.m_objCommandList.push_back(objCommand);
+		else if(strcmp(pSecondElement->Value(), "Command") == 0)
+		{
+			_Command_Info obj_Command_Info;
+			char* pTemp = (char* )pSecondElement->Attribute("CommandIn");
+			if(NULL != pTemp)
+			{
+				sprintf_safe(obj_Command_Info.m_szCommandInID, 50, "%s", pTemp);
+			}
+			pTemp = (char* )pSecondElement->Attribute("CommandOut");
+			if(NULL != pTemp)
+			{
+				sprintf_safe(obj_Command_Info.m_szCommandOutID, 50, "%s", pTemp);
+			}
+			pTemp = (char* )pSecondElement->Attribute("FuncName");
+			if(NULL != pTemp)
+			{
+				sprintf_safe(obj_Command_Info.m_szCommandFuncName, 100, "%s", pTemp);
+			}
+
+			TiXmlNode* pObjectNode = NULL;
+			for(pObjectNode = pSecondElement->FirstChildElement();pObjectNode;pObjectNode=pObjectNode->NextSiblingElement())
+			{
+				_Object_Info obj_Object_Info;
+				TiXmlElement* pThreeElement = pObjectNode->ToElement();
+
+				pTemp = (char* )pThreeElement->Attribute("class");
+				if(NULL != pTemp)
+				{
+					sprintf_safe(obj_Object_Info.m_szClassName, 100, "%s", pTemp);
+				}
+				pTemp = (char* )pThreeElement->Attribute("PacketType");
+				if(NULL != pTemp)
+				{
+					if(strcmp(pTemp, "HEAD") == 0)
+					{
+						obj_Object_Info.m_emPacketType = PACKET_TYPE_HEAD;
+					}
+					else if(pTemp, "BODY")
+					{
+						obj_Object_Info.m_emPacketType = PACKET_TYPE_BODY;
+					}
+					else if(pTemp, "RETURN")
+					{
+						obj_Object_Info.m_emPacketType = PACKET_TYPE_RETURN;
+					}
+				}
+
+				obj_Command_Info.m_vecObjectInfo.push_back(obj_Object_Info);
+			}
+
+			objProjectInfo.m_objCommandList.push_back(obj_Command_Info);
+		}
 	}
 
 	Close();

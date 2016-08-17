@@ -4,11 +4,7 @@
 #include "tinyxml.h"
 #include "tinystr.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdarg.h>
-#include <vector>
+#include "Common.h"
 
 using namespace std;
 
@@ -46,12 +42,57 @@ enum COMMAND_TYPE
 	COMMAND_OUT,
 };
 
+enum STREAM_TYPE
+{
+	STREAM_TYPE_STRING = 0,
+	STREAM_TYPE_CHAR,
+	STREAM_TYPE_ALL,
+};
+
+enum PACKET_TYPE
+{
+	PACKET_TYPE_HEAD = 0,
+	PACKET_TYPE_BODY,
+	PACKET_TYPE_RETURN,
+};
+
+//得到Stream类型
+struct _Stream_Type_Info
+{
+	STREAM_TYPE m_emType;
+	int m_nLength;
+
+	_Stream_Type_Info()
+	{
+		m_emType  = STREAM_TYPE_STRING;
+		m_nLength = 0;
+	}
+};
+
+//预定义结构体
+struct _Define_Info
+{
+	char m_szDefineName[100];
+	char m_szType[20];
+	char m_szDefineValue[100];
+
+	_Define_Info()
+	{
+		m_szDefineName[0]  = '\0';
+		m_szType[0]        = '\0';
+		m_szDefineValue[0] = '\0';
+	}
+};
+typedef vector<_Define_Info> vecDefineInfo;
+
+
 //属性信息
 struct _Property
 {
 	char           m_szPropertyName[50];   //参数名称
 	char           m_szClassName[50];      //对象类名
-	char           m_szDesc[100];          //描述信息  
+	char           m_szDesc[100];          //描述信息
+	char           m_szStreamLength[10];   //流数据长度 
 	PROPERTY_TYPE  m_emType;               //参数类型
 	PROPERTY_CLASS m_emClass;              //参数类别
 	int            m_nLength;              //长度
@@ -70,48 +111,83 @@ struct _Property
 		m_emClass           = CLASS_SINGLE;
 		m_nLength           = 0;
 		m_nNeedHeadLength   = 0;
+		
+		sprintf_safe(m_szStreamLength, 10, "0");
+	}
+
+	_Stream_Type_Info Get_Stream_Info()
+	{
+		_Stream_Type_Info obj_Stream_Type_Info;
+		if(strcmp(m_szStreamLength, "all"))
+		{
+			obj_Stream_Type_Info.m_emType  = STREAM_TYPE_ALL;
+			obj_Stream_Type_Info.m_nLength = 0;
+			return obj_Stream_Type_Info;
+		}
+		else
+		{
+			int n_Stream_Length = atoi(m_szStreamLength);
+			if(0 == n_Stream_Length)
+			{
+				obj_Stream_Type_Info.m_emType  = STREAM_TYPE_STRING;
+				obj_Stream_Type_Info.m_nLength = 0;
+				return obj_Stream_Type_Info;
+			}
+			else
+			{
+				obj_Stream_Type_Info.m_emType  = STREAM_TYPE_CHAR;
+				obj_Stream_Type_Info.m_nLength = n_Stream_Length;
+				return obj_Stream_Type_Info;
+			}
+		}
 	}
 };
-
 typedef vector<_Property> vecProperty;
 
 //类信息
-struct _Xml_Info
+struct _Class_Info
 {
 	char           m_szXMLName[60];
 	char           m_szDesc[100];
-	char           m_szMacroName[50];
-	int            m_nCommandID;
-	COMMAND_TYPE   m_emCommandType;        //命令类型 
 	vecProperty    m_vecProperty;
 
-	_Xml_Info()
+	_Class_Info()
 	{
-		m_nCommandID     = 0;
 		m_szXMLName[0]   = '\0';
 		m_szDesc[0]      = '\0';
-		m_szMacroName[0] = '\0';
-		m_emCommandType  = COMMAND_NONE;
 	}
 };
-typedef vector<_Xml_Info> vecXmlInfo;
+typedef vector<_Class_Info> vecClassInfo;
 
-struct _Command_Relation_info
+struct _Object_Info
+{
+	char m_szClassName[50];
+	PACKET_TYPE m_emPacketType;
+
+	_Object_Info()
+	{
+		m_szClassName[0] = '\0';
+		m_emPacketType   = PACKET_TYPE_HEAD;
+	}
+};
+typedef vector<_Object_Info> vecObjectInfo;
+
+struct _Command_Info
 {
 	char m_szCommandFuncName[100];
-	int  m_nCommandInID;
-	int  m_nCommandOutID;
-	int  m_nOutPcket;        //0为走PacketParse 1为直接发送  
+	char m_szCommandInID[50];
+	char m_szCommandOutID[50];
 
-	_Command_Relation_info()
+	vecObjectInfo m_vecObjectInfo;
+
+	_Command_Info()
 	{
 		m_szCommandFuncName[0] = '\0';
-		m_nCommandInID         = 0;
-		m_nCommandOutID        = 0;
-		m_nOutPcket            = 0;
+		m_szCommandInID[0]     = '\0';
+		m_szCommandOutID[0]    = '\0';
 	}
 };
-typedef vector<_Command_Relation_info> vecCommandRelationinfo;
+typedef vector<_Command_Info> vecCommandRelationinfo;
 
 struct _Project_Info
 {
@@ -119,7 +195,8 @@ struct _Project_Info
 	char m_szProjectDesc[200];   //工程描述
 	char m_szProjectKey[100];    //工程key
 
-	vecCommandRelationinfo m_objCommandList;    //命令关系
+	vecCommandRelationinfo m_objCommandList;     //命令关系
+	vecDefineInfo          m_objDefineInfoList;  //预定义信息 
 
 	_Project_Info()
 	{
@@ -127,22 +204,6 @@ struct _Project_Info
 		m_szProjectDesc[0] = '\0';
 		m_szProjectKey[0]  = '\0';
 	}
-};
-
-inline void sprintf_safe(char* szText, int nLen, const char* fmt ...)
-{
-	if(szText == NULL)
-	{
-		return;
-	}
-
-	va_list ap;
-	va_start(ap, fmt);
-
-	vsnprintf(szText, nLen, fmt, ap);
-	szText[nLen - 1] = '\0';
-
-	va_end(ap);
 };
 
 class CXmlOpeation
@@ -160,9 +221,8 @@ public:
   char* GetData_Text(const char* pName);
   char* GetData_Text(const char* pName, TiXmlElement*& pNextTiXmlElement);
 
-  bool Parse_XML(char* pText, _Xml_Info& objxmlInfo);
-  bool Parse_XML_File(const char* pFileName, vecXmlInfo& objvecXmlInfo);
-  bool Parse_XML_File_Project(const char* pFileName, _Project_Info& objProjectInfo);
+  bool Parse_Class_File(const char* pFileName, vecClassInfo& objvecClassInfo);
+  bool Parse_Plug_In_Project(const char* pFileName, _Project_Info& objProjectInfo);
 
   void Close();
 
