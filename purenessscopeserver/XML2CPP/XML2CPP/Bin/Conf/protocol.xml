@@ -40,10 +40,6 @@
 		<Frame_Head class="Frame_Head" desc="回应包头">Frame_Head</Frame_Head>
 	</Box_Logout_Ack>
 	
-	<Box_Logout desc="注销结构体">
-		<State desc="注销状态">uint8</State>
-	</Box_Logout>
-	
 	<Box_Trap desc="盒子上报消息">
 		<ModuleName length="20" StreamLength="16" desc="模块名称">char</ModuleName>
 		<MessageType desc="消息类型">uint8</MessageType>

@@ -307,17 +307,17 @@ void Gen_2_Cpp_In_Stream(FILE* pFile, _Class_Info& obj_Class_Info)
 				if(obj_Stream_Type_Info.m_emType == STREAM_TYPE_ALL)
 				{
 					sprintf_safe(szTemp, 200, "\tpBuffPacket->WriteStream(obj%s.m_sz%s, ACE_OS::strlen(obj%s.m_sz%s));\n",
-						obj_Class_Info.m_vecProperty[i].m_szPropertyName,
 						obj_Class_Info.m_szXMLName,
 						obj_Class_Info.m_vecProperty[i].m_szPropertyName,
-						obj_Class_Info.m_szXMLName);
+						obj_Class_Info.m_szXMLName,
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				}
 				else
 				{
 					sprintf_safe(szTemp, 200, "\tpBuffPacket->WriteStream(obj%s.m_sz%s, %d);\n",
-						obj_Class_Info.m_vecProperty[i].m_szPropertyName,
 						obj_Class_Info.m_szXMLName,
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName,
 						obj_Stream_Type_Info.m_nLength);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				}
@@ -568,16 +568,24 @@ void Gen_2_Cpp_Out_Stream(FILE* pFile, _Class_Info& obj_Class_Info)
 			{
 				if(obj_Stream_Type_Info.m_emType == STREAM_TYPE_CHAR)
 				{
-					sprintf_safe(szTemp, 200, "\tpBuffPacket->ReadStream(obj%s.m_sz%s, %d);\n",
+					sprintf_safe(szTemp, 200, "\tuint32 u4%sSize = %d;\n",
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName, 
+						obj_Stream_Type_Info.m_nLength);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\tpBuffPacket->ReadStream((char*& )obj%s.m_sz%s, u4%sSize);\n",
 						obj_Class_Info.m_szXMLName, 
 						obj_Class_Info.m_vecProperty[i].m_szPropertyName,
-						obj_Stream_Type_Info.m_nLength);
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				}
 				else
 				{
-					sprintf_safe(szTemp, 200, "\tpBuffPacket->ReadStream(obj%s.m_sz%s, pBuffPacket->GetReadLen());\n",
+					sprintf_safe(szTemp, 200, "\tuint32 u4%sSize = pBuffPacket->GetReadLen();\n",
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\tpBuffPacket->ReadStream((char*& )obj%s.m_sz%s, u4%sSize);\n",
 						obj_Class_Info.m_szXMLName, 
+						obj_Class_Info.m_vecProperty[i].m_szPropertyName,
 						obj_Class_Info.m_vecProperty[i].m_szPropertyName);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				}
@@ -809,6 +817,10 @@ void Gen_2_Cpp_Packet(_Project_Info& obj_Project_Info, vecClassInfo& objvecClass
 	}
 
 	//写入需要引入的头文件
+	sprintf_safe(szTemp, 200, "#ifndef DATA_FORMAT_H\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "#define DATA_FORMAT_H\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "#include \"define.h\"\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "#include <vector>\n");
@@ -848,6 +860,9 @@ void Gen_2_Cpp_Packet(_Project_Info& obj_Project_Info, vecClassInfo& objvecClass
 		sprintf_safe(szTemp, 200, "\n", objvecClassInfo[i].m_szDesc);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	}
+
+	sprintf_safe(szTemp, 200, "#endif\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	fclose(pFile);
 
 	sprintf_safe(szPathFile, 200, "%s/%s", obj_Project_Info.m_szProjectName, PROTOCAL_DATA_FILE);
@@ -858,6 +873,10 @@ void Gen_2_Cpp_Packet(_Project_Info& obj_Project_Info, vecClassInfo& objvecClass
 		return;
 	}
 
+	sprintf_safe(szTemp, 200, "#ifndef PROTOCAL_H\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "#define PROTOCAL_H\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "#include \"%s\"\n", STRUCT_DATA_FILE);
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "#include \"IBuffPacket.h\"\n");
@@ -880,6 +899,8 @@ void Gen_2_Cpp_Packet(_Project_Info& obj_Project_Info, vecClassInfo& objvecClass
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	}
 
+	sprintf_safe(szTemp, 200, "#endif\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	fclose(pFile);
 }
 

@@ -52,7 +52,7 @@ void Gen_2_Cpp_Command_H(_Project_Info& objProjectInfo, vecClassInfo& objvecClas
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\tvoid SetServerObject(CServerObject* pServerObject);\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "private:\n");
+	sprintf_safe(szTemp, 200, "public:\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	for(int i = 0; i < (int)objProjectInfo.m_objCommandList.size(); i++)
 	{
@@ -60,6 +60,25 @@ void Gen_2_Cpp_Command_H(_Project_Info& objProjectInfo, vecClassInfo& objvecClas
 		{
 			sprintf_safe(szTemp, 200, "\tint %s(IMessage* pMessage);\n", 
 				objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		}
+		else
+		{
+			char* pObjectRetun = NULL;
+			for(int j = 0; j < (int)objProjectInfo.m_objCommandList[i].m_vecObjectInfo.size(); j++)
+			{
+				if(objProjectInfo.m_objCommandList[i].m_vecObjectInfo[j].m_emPacketType == PACKET_TYPE_RETURN)
+				{
+					pObjectRetun = objProjectInfo.m_objCommandList[i].m_vecObjectInfo[j].m_szClassName;
+					break;
+				}
+			}
+
+			//只属于输出函数
+			sprintf_safe(szTemp, 200, "\tint %s(%s obj%s);\n",
+				objProjectInfo.m_objCommandList[i].m_szCommandFuncName,
+				pObjectRetun, 
+				pObjectRetun);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		}
 	}
@@ -165,14 +184,14 @@ void Gen_2_Cpp_Command_Cpp(_Project_Info& objProjectInfo, vecClassInfo& objvecCl
 
 	for(int i = 0; i < (int)objProjectInfo.m_objCommandList.size(); i++)
 	{
-		sprintf_safe(szTemp, 200, "int CBaseCommand::%s(IMessage* pMessage)\n",
-			objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
-		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "{\n");
-		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-
 		if(strlen(objProjectInfo.m_objCommandList[i].m_szCommandInID) > 0)
 		{
+			sprintf_safe(szTemp, 200, "int CBaseCommand::%s(IMessage* pMessage)\n",
+				objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "{\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 			//包头
 			sprintf_safe(szTemp, 200, "\tIBuffPacket* pHeadPacket = m_pServerObject->GetPacketManager()->Create();\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -186,6 +205,7 @@ void Gen_2_Cpp_Command_Cpp(_Project_Info& objProjectInfo, vecClassInfo& objvecCl
 			sprintf_safe(szTemp, 200, "\t\treturn -1;\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "\t}\n\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			//包体
 			sprintf_safe(szTemp, 200, "\tIBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();\n");
@@ -324,6 +344,27 @@ void Gen_2_Cpp_Command_Cpp(_Project_Info& objProjectInfo, vecClassInfo& objvecCl
 			sprintf_safe(szTemp, 200, "\t\treturn -1;\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "\t}\n\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		}
+		else
+		{
+			char* pObjectRetun = NULL;
+			for(int j = 0; j < (int)objProjectInfo.m_objCommandList[i].m_vecObjectInfo.size(); j++)
+			{
+				if(objProjectInfo.m_objCommandList[i].m_vecObjectInfo[j].m_emPacketType == PACKET_TYPE_RETURN)
+				{
+					pObjectRetun = objProjectInfo.m_objCommandList[i].m_vecObjectInfo[j].m_szClassName;
+					break;
+				}
+			}
+
+			//只属于输出函数
+			sprintf_safe(szTemp, 200, "int CBaseCommand::%s(%s obj%s)\n",
+				objProjectInfo.m_objCommandList[i].m_szCommandFuncName,
+				pObjectRetun, 
+				pObjectRetun);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "{\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		}
 

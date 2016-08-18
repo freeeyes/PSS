@@ -211,7 +211,7 @@ void Gen_2_ZZZ(const char* pPath)
 		return;
 	}
 
-	sprintf_safe(szTemp, 200, "%%ACE_ROOT%%/bin/mwc.pl -type vc9\n");
+	sprintf_safe(szTemp, 200, "%%ACE_ROOT%%/bin/mwc.pl -type vc11\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	fclose(pFile);
 }

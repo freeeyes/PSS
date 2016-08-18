@@ -71,7 +71,6 @@ int main(int argc, char* argv[])
 
 	//写入Command头文件
 	Gen_2_Cpp_Command_H(objProjectInfo, objvecClassInfo);
-
 	
 	//写入Command体文件
 	Gen_2_Cpp_Command_Cpp(objProjectInfo, objvecClassInfo);
@@ -82,10 +81,9 @@ int main(int argc, char* argv[])
 	Gen_2_Mpc(objProjectInfo.m_szProjectName, objProjectInfo);
 	Gen_2_RunLinuxMake(objProjectInfo.m_szProjectName, objProjectInfo);
 	Gen_2_ZZZ(objProjectInfo.m_szProjectName);
-	/*
-	Gen_2_Cpp_Logic_H(objProjectInfo, objvecXmlInfo);
-	Gen_2_Cpp_Logic_Cpp(objProjectInfo, objvecXmlInfo);
-	*/
+
+	Gen_2_Cpp_Logic_H(objProjectInfo, objvecClassInfo);
+	Gen_2_Cpp_Logic_Cpp(objProjectInfo, objvecClassInfo);
 
 	printf("[success]OK.\n");
 	getchar();

@@ -27,7 +27,6 @@ void Gen_2_Cpp_Logic_H(_Project_Info& objProjectInfo, vecClassInfo& objvecClassI
 		objProjectInfo.m_szProjectName, 
 		objProjectInfo.m_szProjectName);
 
-	/*
 	//首先生成声明文件。
 	FILE* pFile = fopen(szPathFile, "w");
 	if(NULL == pFile)
@@ -40,41 +39,79 @@ void Gen_2_Cpp_Logic_H(_Project_Info& objProjectInfo, vecClassInfo& objvecClassI
 
 	for(int i = 0; i < (int)objProjectInfo.m_objCommandList.size(); i++)
 	{
-		_Xml_Info* pXmlIn  = Find_Logic_StructInfo(objProjectInfo.m_objCommandList[i].m_nCommandInID, objvecXmlInfo);
-		_Xml_Info* pXmlOut = NULL;
-		if(objProjectInfo.m_objCommandList[i].m_nCommandOutID > 0)
+		if(strlen(objProjectInfo.m_objCommandList[i].m_szCommandInID) > 0)
 		{
-			pXmlOut = Find_Logic_StructInfo(objProjectInfo.m_objCommandList[i].m_nCommandOutID, objvecXmlInfo);
-		}
+			char* pHeadObjectName   = NULL;
+			char* pBodyObjectName   = NULL;
+			char* pReturnObjectName = NULL;
 
-		if(NULL != pXmlIn)
-		{
-			if(NULL != pXmlOut)
+			for(int j = 0; j < (int)objProjectInfo.m_objCommandList[i].m_vecObjectInfo.size(); j++)
 			{
-				//两边参数都有，写入函数
-				sprintf_safe(szTemp, 200, "bool Logic_%s(%s& obj%s, %s& obj%s);\n\n", 
-					pXmlIn->m_szXMLName,
-					pXmlIn->m_szXMLName,
-					pXmlIn->m_szXMLName,
-					pXmlOut->m_szXMLName,
-					pXmlOut->m_szXMLName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				if(objProjectInfo.m_objCommandList[i].m_vecObjectInfo[j].m_emPacketType == PACKET_TYPE_HEAD)
+				{
+					pHeadObjectName = objProjectInfo.m_objCommandList[i].m_vecObjectInfo[j].m_szClassName;
+				}
+				else if(objProjectInfo.m_objCommandList[i].m_vecObjectInfo[j].m_emPacketType == PACKET_TYPE_BODY)
+				{
+					pBodyObjectName = objProjectInfo.m_objCommandList[i].m_vecObjectInfo[j].m_szClassName;
+				}
+				else if(objProjectInfo.m_objCommandList[i].m_vecObjectInfo[j].m_emPacketType == PACKET_TYPE_RETURN)
+				{
+					pReturnObjectName = objProjectInfo.m_objCommandList[i].m_vecObjectInfo[j].m_szClassName;
+				}
 			}
-			else
+
+			bool bl_Is_Data = false;
+			//两边参数都有，写入函数
+			sprintf_safe(szTemp, 200, "bool Logic_%s(", 
+				objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			if(NULL != pHeadObjectName)
 			{
-				//两边参数都有，写入函数
-				sprintf_safe(szTemp, 200, "bool Logic_%s(%s& obj%s);\n\n", 
-					pXmlIn->m_szXMLName,
-					pXmlIn->m_szXMLName,
-					pXmlIn->m_szXMLName);
+				sprintf_safe(szTemp, 200, "%s& obj%s", 
+					pHeadObjectName, pHeadObjectName);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				bl_Is_Data = true;
 			}
+			if(NULL != pBodyObjectName)
+			{
+				if(true == bl_Is_Data)
+				{
+					sprintf_safe(szTemp, 200, ", %s& obj%s", 
+						pBodyObjectName, pBodyObjectName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				else
+				{
+					sprintf_safe(szTemp, 200, "%s& obj%s", 
+						pBodyObjectName, pBodyObjectName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					bl_Is_Data = true;
+				}
+			}
+			if(NULL != pReturnObjectName)
+			{
+				if(true == bl_Is_Data)
+				{
+					sprintf_safe(szTemp, 200, ", %s& obj%s", 
+						pReturnObjectName, pReturnObjectName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				else
+				{
+					sprintf_safe(szTemp, 200, "%s& obj%s", 
+						pReturnObjectName, pReturnObjectName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					bl_Is_Data = true;
+				}
+			}
+			sprintf_safe(szTemp, 200, ");\n\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		}
 	}
 	
 
 	fclose(pFile);
-	*/
 }
 
 
@@ -98,57 +135,86 @@ void Gen_2_Cpp_Logic_Cpp(_Project_Info& objProjectInfo, vecClassInfo& objvecClas
 		objProjectInfo.m_szProjectName);
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-	/*
 	for(int i = 0; i < (int)objProjectInfo.m_objCommandList.size(); i++)
 	{
-		_Xml_Info* pXmlIn  = Find_Logic_StructInfo(objProjectInfo.m_objCommandList[i].m_nCommandInID, objvecXmlInfo);
-		_Xml_Info* pXmlOut = NULL;
-		if(objProjectInfo.m_objCommandList[i].m_nCommandOutID > 0)
+		if(strlen(objProjectInfo.m_objCommandList[i].m_szCommandInID) > 0)
 		{
-			pXmlOut = Find_Logic_StructInfo(objProjectInfo.m_objCommandList[i].m_nCommandOutID, objvecXmlInfo);
-		}
+			char* pHeadObjectName   = NULL;
+			char* pBodyObjectName   = NULL;
+			char* pReturnObjectName = NULL;
 
-		if(NULL != pXmlIn)
-		{
-			if(NULL != pXmlOut)
+			for(int j = 0; j < (int)objProjectInfo.m_objCommandList[i].m_vecObjectInfo.size(); j++)
 			{
-				//两边参数都有，写入函数
-				sprintf_safe(szTemp, 200, "bool Logic_%s(%s& obj%s, %s& obj%s)\n", 
-					pXmlIn->m_szXMLName,
-					pXmlIn->m_szXMLName,
-					pXmlIn->m_szXMLName,
-					pXmlOut->m_szXMLName,
-					pXmlOut->m_szXMLName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "{\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t//add your dispose code at here.\n\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\treturn true;\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "}\n\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				if(objProjectInfo.m_objCommandList[i].m_vecObjectInfo[j].m_emPacketType == PACKET_TYPE_HEAD)
+				{
+					pHeadObjectName = objProjectInfo.m_objCommandList[i].m_vecObjectInfo[j].m_szClassName;
+				}
+				else if(objProjectInfo.m_objCommandList[i].m_vecObjectInfo[j].m_emPacketType == PACKET_TYPE_BODY)
+				{
+					pBodyObjectName = objProjectInfo.m_objCommandList[i].m_vecObjectInfo[j].m_szClassName;
+				}
+				else if(objProjectInfo.m_objCommandList[i].m_vecObjectInfo[j].m_emPacketType == PACKET_TYPE_RETURN)
+				{
+					pReturnObjectName = objProjectInfo.m_objCommandList[i].m_vecObjectInfo[j].m_szClassName;
+				}
 			}
-			else
+
+			//两边参数都有，写入函数
+			bool bl_Is_Data = false;
+			sprintf_safe(szTemp, 200, "bool Logic_%s(", 
+				objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			if(NULL != pHeadObjectName)
 			{
-				//两边参数都有，写入函数
-				sprintf_safe(szTemp, 200, "bool Logic_%s(%s& obj%s)\n", 
-					pXmlIn->m_szXMLName,
-					pXmlIn->m_szXMLName,
-					pXmlIn->m_szXMLName);
+				sprintf_safe(szTemp, 200, "%s& obj%s", 
+					pHeadObjectName, pHeadObjectName);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "{\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t//add your dispose code at here.\n\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\treturn true;\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "}\n\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				bl_Is_Data = true;
 			}
+			if(NULL != pBodyObjectName)
+			{
+				if(true == bl_Is_Data)
+				{
+					sprintf_safe(szTemp, 200, ", %s& obj%s", 
+						pBodyObjectName, pBodyObjectName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				else
+				{
+					sprintf_safe(szTemp, 200, "%s& obj%s", 
+						pBodyObjectName, pBodyObjectName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					bl_Is_Data = true;
+				}
+			}
+			if(NULL != pReturnObjectName)
+			{
+				if(true == bl_Is_Data)
+				{
+					sprintf_safe(szTemp, 200, ", %s& obj%s", 
+						pReturnObjectName, pReturnObjectName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				else
+				{
+					sprintf_safe(szTemp, 200, "%s& obj%s", 
+						pReturnObjectName, pReturnObjectName);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					bl_Is_Data = true;
+				}
+			}
+			sprintf_safe(szTemp, 200, ")\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "{\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\t//add your code at here.\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\treturn true;\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "}\n\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		}
 	}
-	*/
 
 	fclose(pFile);
 }
