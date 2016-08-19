@@ -12,8 +12,8 @@
 #include "Write_Plugin_Make.h"
 #include "Write_Plugin_Logic.h"
 
-#define PROJECT_FILE_NAME   "PlugInInfo.xml"
-#define PROTOCOL_FILE_NAME  "protocol.xml"
+#define PROJECT_FILE_NAME     "PlugInInfo.xml"
+#define DATASTRUCT_FILE_NAME  "DataStruct.xml"
 
 int main(int argc, char* argv[])
 {
@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
 
 	//读取命令文件
 	vecClassInfo objvecClassInfo;
-	sprintf_safe(szConfigFile, 255, "%s%s", szFilePath, PROTOCOL_FILE_NAME);
+	sprintf_safe(szConfigFile, 255, "%s%s", szFilePath, DATASTRUCT_FILE_NAME);
 	blState = Read_Command_File(szConfigFile, objvecClassInfo);
 	if(false == blState)
 	{
@@ -76,8 +76,8 @@ int main(int argc, char* argv[])
 	Gen_2_Cpp_Command_Cpp(objProjectInfo, objvecClassInfo);
 
 	//生成make文件
-	Gen_2_Make_define(objProjectInfo.m_szProjectName);
-	Gen_2_Make(objProjectInfo.m_szProjectName, objProjectInfo);
+	//Gen_2_Make_define(objProjectInfo.m_szProjectName);
+	//Gen_2_Make(objProjectInfo.m_szProjectName, objProjectInfo);
 	Gen_2_Mpc(objProjectInfo.m_szProjectName, objProjectInfo);
 	Gen_2_RunLinuxMake(objProjectInfo.m_szProjectName, objProjectInfo);
 	Gen_2_ZZZ(objProjectInfo.m_szProjectName);

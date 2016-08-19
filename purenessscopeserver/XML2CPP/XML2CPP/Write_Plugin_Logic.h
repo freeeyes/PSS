@@ -209,6 +209,19 @@ void Gen_2_Cpp_Logic_Cpp(_Project_Info& objProjectInfo, vecClassInfo& objvecClas
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "\t//add your code at here.\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			if(strlen(objProjectInfo.m_objCommandList[i].m_szCommandInID) > 0)
+			{
+				sprintf_safe(szTemp, 200, "\t//CommandiID in %s.\n", objProjectInfo.m_objCommandList[i].m_szCommandInID);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+
+			if(strlen(objProjectInfo.m_objCommandList[i].m_szCommandOutID) > 0)
+			{
+				sprintf_safe(szTemp, 200, "\t//CommandiID Out %s.\n", objProjectInfo.m_objCommandList[i].m_szCommandOutID);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+
 			sprintf_safe(szTemp, 200, "\treturn true;\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "}\n\n");

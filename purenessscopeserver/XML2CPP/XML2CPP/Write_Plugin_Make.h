@@ -126,11 +126,17 @@ void Gen_2_RunLinuxMake(const char* pPath, _Project_Info& objProjectInfo)
 		pPath);
 
 	//首先生成声明文件。
-	FILE* pFile = fopen(szPathFile, "w");
+	FILE* pFile = fopen(szPathFile, "wb");
 	if(NULL == pFile)
 	{
 		return;
 	}
+
+	//set ff=unix
+	sprintf_safe(szTemp, 200, "#!/bin/sh\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, ". ${HOME}/.bash_profile\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 	sprintf_safe(szTemp, 200, "mwc.pl -type gnuace\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -173,6 +179,8 @@ void Gen_2_Mpc(const char* pPath, _Project_Info& objProjectInfo)
 	sprintf_safe(szTemp, 200, "\tspecific (gnuace){\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t\tmacros += __LINUX__\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\tcompile_flags += -Wno-deprecated\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t}\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);

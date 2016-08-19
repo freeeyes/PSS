@@ -1,19 +1,19 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 
 <PlugIn desc="BoxFrame" keyID="BoxFrameID" Name="BoxFrame">
-	<Define DefName="LOGIN" type="number" DefValue="0x0001" />
+	<Define DefName="LOGIN" type="number" DefValue="0x1001" />
 	<Define DefName="LOGIN_ACK" type="number" DefValue="0x8001" />
-	<Define DefName="LOGOUT" type="number" DefValue="0x0002" />
+	<Define DefName="LOGOUT" type="number" DefValue="0x1002" />
 	<Define DefName="LOGOUT_ACK" type="number" DefValue="0x8002" />
-	<Define DefName="HEART_BEAT" type="number" DefValue="0x0003" />
+	<Define DefName="HEART_BEAT" type="number" DefValue="0x1003" />
 	<Define DefName="HEART_BEAT_ACK" type="number" DefValue="0x8003" />
-	<Define DefName="REGISTOR" type="number" DefValue="0x0004" />
+	<Define DefName="REGISTOR" type="number" DefValue="0x1004" />
 	<Define DefName="REGISTOR_ACK" type="number" DefValue="0x8004" />
-	<Define DefName="TRAP" type="number" DefValue="0x0005" />
+	<Define DefName="TRAP" type="number" DefValue="0x1005" />
 	<Define DefName="TRAP_ACK" type="number" DefValue="0x8005" />
-	<Define DefName="REMOTE_CTRL" type="number" DefValue="0x000B" />
+	<Define DefName="REMOTE_CTRL" type="number" DefValue="0x100B" />
 	<Define DefName="REMOTE_CTRL_ACK" type="number" DefValue="0x800B" />
-	<Define DefName="DOWNLOAD" type="number" DefValue="0x000C" />
+	<Define DefName="DOWNLOAD" type="number" DefValue="0x100C" />
 	<Define DefName="DOWNLOAD_ACK" type="number" DefValue="0x800C" />
 	
 	<Command CommandIn="LOGIN" CommandOut="LOGIN_ACK" FuncName="Do_Box_Login">
