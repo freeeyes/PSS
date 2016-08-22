@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<PlugIn Name="BoxFrame" desc="test BoxFrame" IP="172.18.48.102" Port="10002">
+	<Command CommandName="Login" Count="1" TimeCost="100">
+		<Packet_Send>
+			<short name="PacketLen">68</short>
+			<short name="CommandID">0x1001</short>
+			<int name="FlowNo">1</int>
+			<short name="Version">1</short>
+			<char name="BoxID" length="16" IsString="1">freeeyes</char>
+			<char name="Retain" length="16" IsString="1"></char>
+			<char name="CheckCode" length="16" IsString="1">49ba59abbe56e057</char>
+			<char name="TimeStamp" length="10" IsString="1">0822120000</char>
+		</Packet_Send>
+		<Packet_Recv>
+			<short name="PacketLen">43</short>
+			<short name="CommandID">0x8001</short>
+			<int name="FlowNo">1</int>
+			<short name="Version">1</short>
+			<char name="BoxID" length="16" IsString="1">freeeyes</char>
+			<char name="Retain" length="16" IsString="1"></char>
+			<char name="State" length="1" IsString="1">0</char>
+		</Packet_Recv>		
+	</Command>
+	
+	<Command CommandName="LOGOUT" Count="1" TimeCost="100">
+		<Packet_Send>
+			<short name="PacketLen">43</short>
+			<short name="CommandID">0x1002</short>
+			<int name="FlowNo">1</int>
+			<short name="Version">1</short>
+			<char name="BoxID" length="16" IsString="1">freeeyes</char>
+			<char name="Retain" length="16" IsString="1"></char>
+			<char name="CheckCode" length="1" IsString="1">0</char>
+		</Packet_Send>
+		<Packet_Recv>
+			<short name="PacketLen">42</short>
+			<short name="CommandID">0x8002</short>
+			<int name="FlowNo">1</int>
+			<short name="Version">1</short>
+			<char name="BoxID" length="16" IsString="1">freeeyes</char>
+			<char name="Retain" length="16" IsString="1"></char>
+		</Packet_Recv>
+	</Command>
+	
+	<Command CommandName="HEART_BEAT" Count="1" TimeCost="100">
+		<Packet_Send>
+			<short name="PacketLen">42</short>
+			<short name="CommandID">0x1003</short>
+			<int name="FlowNo">1</int>
+			<short name="Version">1</short>
+			<char name="BoxID" length="16" IsString="1">freeeyes</char>
+			<char name="Retain" length="16" IsString="1"></char>
+		</Packet_Send>
+		<Packet_Recv>
+			<short name="PacketLen">42</short>
+			<short name="CommandID">0x8003</short>
+			<int name="FlowNo">1</int>
+			<short name="Version">1</short>
+			<char name="BoxID" length="16" IsString="1">freeeyes</char>
+			<char name="Retain" length="16" IsString="1"></char>
+		</Packet_Recv>
+	</Command>
+	
+	<Command CommandName="REGISTOR" Count="1" TimeCost="100">
+		<Packet_Send>
+			<short name="PacketLen">42</short>
+			<short name="CommandID">0x1004</short>
+			<int name="FlowNo">1</int>
+			<short name="Version">1</short>
+			<char name="BoxID" length="16" IsString="1">freeeyes</char>
+			<char name="Retain" length="16" IsString="1"></char>
+		</Packet_Send>
+		<Packet_Recv>
+			<short name="PacketLen">43</short>
+			<short name="CommandID">0x8004</short>
+			<int name="FlowNo">1</int>
+			<short name="Version">1</short>
+			<char name="BoxID" length="16" IsString="1">freeeyes</char>
+			<char name="Retain" length="16" IsString="1"></char>
+			<char name="State" length="1" IsString="1">0</char>
+		</Packet_Recv>
+	</Command>
+	
+	<Command CommandName="TRAP" Count="1" TimeCost="100">
+		<Packet_Send>
+			<short name="PacketLen">74</short>
+			<short name="CommandID">0x1007</short>
+			<int name="FlowNo">1</int>
+			<short name="Version">1</short>
+			<char name="BoxID" length="16" IsString="1">freeeyes</char>
+			<char name="Retain" length="16" IsString="1"></char>
+			<char name="ModuleName" length="16" IsString="1">test</char>
+			<char name="State" length="1" IsString="1">0</char>
+			<char name="Json" IsString="1">{'Name':'test'}</char>
+		</Packet_Send>
+		<Packet_Recv>
+			<short name="PacketLen">59</short>
+			<short name="CommandID">0x8007</short>
+			<int name="FlowNo">1</int>
+			<short name="Version">1</short>
+			<char name="BoxID" length="16" IsString="1">freeeyes</char>
+			<char name="Retain" length="16" IsString="1"></char>
+			<char name="State" length="1" IsString="1">0</char>
+			<char name="State" length="16" IsString="1"></char>
+		</Packet_Recv>
+	</Command>
+</PlugIn>
