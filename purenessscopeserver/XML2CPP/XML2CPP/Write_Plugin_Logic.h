@@ -3,21 +3,6 @@
 
 #include "XmlOpeation.h"
 
-_Class_Info* Find_Logic_StructInfo(int nCommandID, vecClassInfo& objvecClassInfo)
-{
-	/*
-	for(int i = 0; i < (int)objvecClassInfo.size(); i++)
-	{
-		if(objvecXmlInfo[i].m_nCommandID == nCommandID)
-		{
-			return &objvecXmlInfo[i];
-		}
-	}
-	*/
-
-	return NULL;
-}
-
 void Gen_2_Cpp_Logic_H(_Project_Info& objProjectInfo, vecClassInfo& objvecClassInfo)
 {
 	char szTemp[200]     = {'\0'};
