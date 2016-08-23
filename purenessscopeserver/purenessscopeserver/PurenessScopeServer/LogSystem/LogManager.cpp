@@ -108,6 +108,7 @@ CLogManager::CLogManager(void)
 	m_nThreadCount  = 1;
 	m_nQueueMax     = MAX_MSG_THREADQUEUE;
 	m_pServerLogger = NULL;
+	m_blIsMail      = false;
 }
 
 CLogManager::~CLogManager(void)
@@ -185,10 +186,14 @@ int CLogManager::Close()
 	return 0;
 }
 
-void CLogManager::Init(int nThreadCount, int nQueueMax)
+void CLogManager::Init(int nThreadCount, int nQueueMax, uint32 u4MailID)
 {
 	m_nThreadCount = nThreadCount;
 	m_nQueueMax    = nQueueMax;
+	if(u4MailID > 0)
+	{
+		m_blIsMail = true;
+	}
 }
 
 int CLogManager::Start()
@@ -408,7 +413,15 @@ int CLogManager::WriteToMail( int nLogType, uint32 u4MailID, char* pTitle, const
 
 	pLogBlockInfo->m_u4Length = (uint32)strlen(pLogBlockInfo->m_pBlock);
 	pLogBlockInfo->m_u4LogID  = (uint32)nLogType;
-	pLogBlockInfo->m_u4MailID = u4MailID;
+	if(m_blIsMail == false)
+	{
+		pLogBlockInfo->m_u4MailID = 0;
+	}
+	else
+	{
+		pLogBlockInfo->m_u4MailID = u4MailID;
+	}
+	
 	ACE_OS::sprintf(pLogBlockInfo->m_szMailTitle, "%s", pTitle);
 
 	if (IsRun()) 

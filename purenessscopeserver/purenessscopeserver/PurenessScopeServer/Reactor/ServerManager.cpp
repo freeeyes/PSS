@@ -96,7 +96,7 @@ bool CServerManager::Init()
 	}
 
 	m_pFileLogger->Init();
-	AppLogManager::instance()->Init();
+	AppLogManager::instance()->Init(1, MAX_MSG_THREADQUEUE, App_MainConfig::instance()->GetConnectAlert()->m_u4MailID);
 
 	if (0 != AppLogManager::instance()->RegisterLog(m_pFileLogger))
 	{

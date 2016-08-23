@@ -255,9 +255,9 @@ bool CXmlOpeation::Parse_XML_Test_Assemble(const char* pFileName, _Test_Assemble
 							obj_Data_Info.m_blIsString = false;
 						}
 					}
-					if(NULL != (char* )pThreeElement->ToText())
+					if(NULL != (char* )pThreeElement->GetText())
 					{
-						obj_Data_Info.m_strValue = (string)((char* )pThreeElement->ToText());
+						obj_Data_Info.m_strValue = (string)((char* )pThreeElement->GetText());
 					}
 					obj_Command_Info.m_obj_Packet_Recv.m_obj_Data_Info_List.push_back(obj_Data_Info);
 				}

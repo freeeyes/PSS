@@ -46,7 +46,7 @@ public:
 	virtual int svc(void);
 	int Close();
 
-	void Init(int nThreadCount = 1, int nQueueMax = MAX_MSG_THREADQUEUE);
+	void Init(int nThreadCount = 1, int nQueueMax = MAX_MSG_THREADQUEUE, uint32 u4MailID = 0);
 	int Start();
 	int Stop();
 	bool IsRun();
@@ -81,6 +81,7 @@ private:
 private:
 	bool                              m_blRun;                    //日志系统是否启动
 	bool                              m_blIsNeedReset;            //日志模块等级升级重置标志
+	bool                              m_blIsMail;                 //是否可以发送邮件  
 	int                               m_nThreadCount;             //记录日志线程个数，目前默认是1
 	int                               m_nQueueMax;                //日志线程允许的最大队列个数 
 	CLogBlockPool                     m_objLogBlockPool;          //日志块池

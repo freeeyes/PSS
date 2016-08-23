@@ -75,7 +75,7 @@ void Gen_2_Cpp_Command_H(_Project_Info& objProjectInfo, vecClassInfo& objvecClas
 			}
 
 			//只属于输出函数
-			sprintf_safe(szTemp, 200, "\tint %s(%s obj%s);\n",
+			sprintf_safe(szTemp, 200, "\tint %s(uint32 u4ConnectID, %s obj%s);\n",
 				objProjectInfo.m_objCommandList[i].m_szCommandFuncName,
 				pObjectRetun, 
 				pObjectRetun);
@@ -359,7 +359,7 @@ void Gen_2_Cpp_Command_Cpp(_Project_Info& objProjectInfo, vecClassInfo& objvecCl
 			}
 
 			//只属于输出函数
-			sprintf_safe(szTemp, 200, "int CBaseCommand::%s(%s obj%s)\n",
+			sprintf_safe(szTemp, 200, "int CBaseCommand::%s(uint32 u4ConnectID, %s obj%s)\n",
 				objProjectInfo.m_objCommandList[i].m_szCommandFuncName,
 				pObjectRetun, 
 				pObjectRetun);
@@ -395,10 +395,18 @@ void Gen_2_Cpp_Command_Cpp(_Project_Info& objProjectInfo, vecClassInfo& objvecCl
 					sprintf_safe(szTemp, 200, "\tif(NULL != m_pServerObject->GetConnectManager())\n");
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					sprintf_safe(szTemp, 200, "\t{\n");
-					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);;
-					sprintf_safe(szTemp, 200, "\t\tm_pServerObject->GetConnectManager()->PostMessage((uint16)%s,\n",
-						objProjectInfo.m_objCommandList[i].m_szCommandOutID);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					if(strlen(objProjectInfo.m_objCommandList[i].m_szCommandInID) == 0)
+					{
+						sprintf_safe(szTemp, 200, "\t\tm_pServerObject->GetConnectManager()->PostMessage(u4ConnectID,\n");
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					}
+					else
+					{
+						sprintf_safe(szTemp, 200, "\t\tm_pServerObject->GetConnectManager()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID,\n");
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					}
+
 					sprintf_safe(szTemp, 200, "\t\t\tpSendPacket,\n");
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 

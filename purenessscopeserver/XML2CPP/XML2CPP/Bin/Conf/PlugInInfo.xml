@@ -9,8 +9,8 @@
 	<Define DefName="HEART_BEAT_ACK" type="number" DefValue="0x8003" />
 	<Define DefName="REGISTOR" type="number" DefValue="0x1004" />
 	<Define DefName="REGISTOR_ACK" type="number" DefValue="0x8004" />
-	<Define DefName="TRAP" type="number" DefValue="0x1005" />
-	<Define DefName="TRAP_ACK" type="number" DefValue="0x8005" />
+	<Define DefName="TRAP" type="number" DefValue="0x1007" />
+	<Define DefName="TRAP_ACK" type="number" DefValue="0x8007" />
 	<Define DefName="REMOTE_CTRL" type="number" DefValue="0x100B" />
 	<Define DefName="REMOTE_CTRL_ACK" type="number" DefValue="0x800B" />
 	<Define DefName="DOWNLOAD" type="number" DefValue="0x100C" />
@@ -18,13 +18,13 @@
 	
 	<Command CommandIn="LOGIN" CommandOut="LOGIN_ACK" FuncName="Do_Box_Login">
 		<Object class="Frame_Head" PacketType="HEAD" />
-		<Object class="Box_Regist_Ack" PacketType="RETURN" />
+		<Object class="Box_Login_Ack" PacketType="RETURN" />
 	</Command>
 	
 	<Command CommandIn="LOGOUT" CommandOut="LOGOUT_ACK" FuncName="Do_Box_Logout">
 		<Object class="Frame_Head" PacketType="HEAD" />
-		<Object class="Box_Login" PacketType="BODY" />
-		<Object class="Box_Login_Ack" PacketType="RETURN" />
+		<Object class="Box_Logout" PacketType="BODY" />
+		<Object class="Box_Logout_Ack" PacketType="RETURN" />
 	</Command>
 	
 	<Command CommandIn="HEART_BEAT" CommandOut="HEART_BEAT_ACK" FuncName="Do_Box_Heart_Beat">

@@ -16,6 +16,57 @@
 #include <vector>
 using namespace std;
 
+
+//支持memcpy的边界检查
+inline bool memcpy_safe(char* pSrc, int nSrcLen, char* pDes, int nDesLen)
+{
+	if(nSrcLen > nDesLen)
+	{
+		return false;
+	}
+	else
+	{
+#ifdef WIN32
+		memcpy_s((void* )pDes, nDesLen, (void* )pSrc, (size_t)nSrcLen);
+#else
+		memcpy((void* )pDes, (void* )pSrc, (size_t)nSrcLen);
+#endif
+		return true;
+	}
+}
+
+//重载sprintf
+static void sprintf_safe(char* szText, int nLen, const char* fmt ...)
+{
+	if(szText == NULL)
+	{
+		return;
+	}
+
+	va_list ap;
+	va_start(ap, fmt);
+
+	vsnprintf(szText, nLen, fmt, ap);
+	szText[nLen - 1] = '\0';
+
+	va_end(ap);
+};
+
+//将字符串转换为数字
+static int Char2Number(const char* pData)
+{
+	if(pData[0] == '0' && pData[1] == 'x')
+	{
+		//十六进制转换
+		return (int)strtol(pData, NULL, 16);
+	}
+	else
+	{
+		//十进制转换
+		return (int)atoi(pData);
+	}
+}
+
 typedef vector<string> vec_Xml_File_Name;
 
 #define MAX_BUFF_50  50
@@ -45,11 +96,204 @@ typedef vector<_Data_Info> vec_Data_Info;
 struct _Packet_Send
 {
 	vec_Data_Info m_obj_Data_Info_List;
+
+	int Get_Length()
+	{
+		int nSize = 0;
+		for(int i = 0; i < (int)m_obj_Data_Info_List.size(); i++)
+		{
+			if(strcmp(m_obj_Data_Info_List[i].m_szDataType, "short") == 0)
+			{
+				nSize += 2;
+			}
+			else if(strcmp(m_obj_Data_Info_List[i].m_szDataType, "int") == 0)
+			{
+				nSize += 4;
+			}
+			else if(strcmp(m_obj_Data_Info_List[i].m_szDataType, "char") == 0)
+			{
+				if(m_obj_Data_Info_List[i].m_nLength > 0)
+				{
+					nSize += m_obj_Data_Info_List[i].m_nLength;
+				}
+				else
+				{
+					nSize += (int)strlen(m_obj_Data_Info_List[i].m_strValue.c_str());
+				}
+			}
+		}
+
+		return nSize;
+	}
+
+	//输入成数据流
+	void In_Stream(char* pData, int nLen)
+	{
+		int nPos = 0;
+		for(int i = 0; i < (int)m_obj_Data_Info_List.size(); i++)
+		{
+			if(strcmp(m_obj_Data_Info_List[i].m_szDataType, "short") == 0)
+			{
+				short sData = (short)Char2Number(m_obj_Data_Info_List[i].m_strValue.c_str());
+				memcpy_safe((char* )&sData, 2, &pData[nPos], nLen - nPos);
+				nPos += 2;
+			}
+			else if(strcmp(m_obj_Data_Info_List[i].m_szDataType, "int") == 0)
+			{
+				int nData = (int)Char2Number(m_obj_Data_Info_List[i].m_strValue.c_str());
+				memcpy_safe((char* )&nData, 4, &pData[nPos], nLen - nPos);
+				nPos += 4;
+			}
+			else if(strcmp(m_obj_Data_Info_List[i].m_szDataType, "char") == 0)
+			{
+				if(m_obj_Data_Info_List[i].m_nLength > 0)
+				{
+					memcpy_safe((char* )m_obj_Data_Info_List[i].m_strValue.c_str(), m_obj_Data_Info_List[i].m_nLength, &pData[nPos], nLen - nPos);
+					nPos += m_obj_Data_Info_List[i].m_nLength;
+				}
+				else
+				{
+					memcpy_safe((char* )m_obj_Data_Info_List[i].m_strValue.c_str(), (int)strlen(m_obj_Data_Info_List[i].m_strValue.c_str()), &pData[nPos], nLen - nPos);
+					nPos += (int)strlen(m_obj_Data_Info_List[i].m_strValue.c_str());
+				}
+			}
+		}
+	}
 };
 
 struct _Packet_Recv
 {
 	vec_Data_Info m_obj_Data_Info_List;
+
+	int Get_Length()
+	{
+		int nSize = 0;
+		for(int i = 0; i < (int)m_obj_Data_Info_List.size(); i++)
+		{
+			if(strcmp(m_obj_Data_Info_List[i].m_szDataType, "short") == 0)
+			{
+				nSize += 2;
+			}
+			else if(strcmp(m_obj_Data_Info_List[i].m_szDataType, "int") == 0)
+			{
+				nSize += 4;
+			}
+			else if(strcmp(m_obj_Data_Info_List[i].m_szDataType, "char") == 0)
+			{
+				if(m_obj_Data_Info_List[i].m_nLength > 0)
+				{
+					nSize += m_obj_Data_Info_List[i].m_nLength;
+				}
+				else
+				{
+					nSize += (int)strlen(m_obj_Data_Info_List[i].m_strValue.c_str());
+				}
+			}
+
+		}
+		return nSize;
+	}
+
+	string Check_Stream(char* pData, int nLen)
+	{
+		string strRet = "接收数据包检测成功";
+		int nPos = 0;
+		for(int i = 0; i < (int)m_obj_Data_Info_List.size(); i++)
+		{
+			if(strcmp(m_obj_Data_Info_List[i].m_szDataType, "short") == 0)
+			{
+				short sData = 0;
+				memcpy_safe(&pData[nPos], 2, (char* )&sData, 2);
+				if(sData != (short)Char2Number(m_obj_Data_Info_List[i].m_strValue.c_str()))
+				{
+					char szError[MAX_BUFF_50] = {'\0'};
+					sprintf_safe(szError, MAX_BUFF_50, "错误字段[%s],期待数值[%d],实际数值[%d]", 
+						m_obj_Data_Info_List[i].m_szDataName, 
+						(short)atoi(m_obj_Data_Info_List[i].m_strValue.c_str()), 
+						sData);
+					return strRet; 
+				}
+				nPos += 2;
+			}
+			else if(strcmp(m_obj_Data_Info_List[i].m_szDataType, "int") == 0)
+			{
+				int nData = 0;
+				memcpy_safe(&pData[nPos], 4, (char* )&nData, 4);
+				if(nData != (int)Char2Number(m_obj_Data_Info_List[i].m_strValue.c_str()))
+				{
+					char szError[MAX_BUFF_50] = {'\0'};
+					sprintf_safe(szError, MAX_BUFF_50, "错误字段[%s],期待数值[%d],实际数值[%d]", 
+						m_obj_Data_Info_List[i].m_szDataName, 
+						(int)atoi(m_obj_Data_Info_List[i].m_strValue.c_str()), 
+						nData);
+					return strRet; 
+				}
+				nPos += 4;
+			}
+			else if(strcmp(m_obj_Data_Info_List[i].m_szDataType, "char") == 0)
+			{
+				if(m_obj_Data_Info_List[i].m_nLength > 1)
+				{
+					char* pObjectData = new char[m_obj_Data_Info_List[i].m_nLength + 1];
+					memcpy_safe(&pData[nPos], m_obj_Data_Info_List[i].m_nLength, (char* )pObjectData, m_obj_Data_Info_List[i].m_nLength);
+					pObjectData[m_obj_Data_Info_List[i].m_nLength] = '\0';
+					if(strcmp(pObjectData, m_obj_Data_Info_List[i].m_strValue.c_str()) != 0)
+					{
+						char szError[MAX_BUFF_500] = {'\0'};
+						sprintf_safe(szError, MAX_BUFF_50, "错误字段[%s],期待数值[%s],实际数值[%s]", 
+							m_obj_Data_Info_List[i].m_szDataName, 
+							m_obj_Data_Info_List[i].m_strValue.c_str(), 
+							pObjectData);
+						delete pObjectData;
+						return strRet; 
+					}
+
+					delete pObjectData;
+					nPos += m_obj_Data_Info_List[i].m_nLength;
+				}
+				else if(m_obj_Data_Info_List[i].m_nLength == 1)
+				{
+					//如果是一个字节，则直接认为是数字
+					char* pObjectData = new char[m_obj_Data_Info_List[i].m_nLength + 1];
+					memcpy_safe(&pData[nPos], m_obj_Data_Info_List[i].m_nLength, (char* )pObjectData, m_obj_Data_Info_List[i].m_nLength);
+					pObjectData[m_obj_Data_Info_List[i].m_nLength] = '\0';
+					if(atoi(pObjectData) != atoi(m_obj_Data_Info_List[i].m_strValue.c_str()))
+					{
+						char szError[MAX_BUFF_500] = {'\0'};
+						sprintf_safe(szError, MAX_BUFF_50, "错误字段[%s],期待数值[%s],实际数值[%s]", 
+							m_obj_Data_Info_List[i].m_szDataName, 
+							m_obj_Data_Info_List[i].m_strValue.c_str(), 
+							pObjectData);
+						delete pObjectData;
+						return strRet; 
+					}
+					delete pObjectData;
+					nPos += m_obj_Data_Info_List[i].m_nLength;
+				}
+				else
+				{
+					char* pObjectData = new char[nLen - nPos + 1];
+					memcpy_safe(&pData[nPos], nLen - nPos, (char* )pObjectData, nLen - nPos);
+					pObjectData[nLen - nPos] = '\0';
+					if(strcmp(pObjectData, m_obj_Data_Info_List[i].m_strValue.c_str()) != 0)
+					{
+						char szError[MAX_BUFF_500] = {'\0'};
+						sprintf_safe(szError, MAX_BUFF_50, "错误字段[%s],期待数值[%s],实际数值[%s]", 
+							m_obj_Data_Info_List[i].m_szDataName, 
+							m_obj_Data_Info_List[i].m_strValue.c_str(), 
+							pObjectData);
+						delete pObjectData;
+						return strRet; 
+					}
+
+					delete pObjectData;
+					nPos += (int)strlen(m_obj_Data_Info_List[i].m_strValue.c_str());
+				}
+			}
+
+		}
+		return strRet;
+	}
 };
 
 struct _Command_Info
@@ -86,24 +330,6 @@ struct _Test_Assemble
 	}
 };
 typedef vector<_Test_Assemble> vec_Test_Assemble;
-
-//重载sprintf
-static void sprintf_safe(char* szText, int nLen, const char* fmt ...)
-{
-	if(szText == NULL)
-	{
-		return;
-	}
-
-	va_list ap;
-	va_start(ap, fmt);
-
-	vsnprintf(szText, nLen, fmt, ap);
-	szText[nLen - 1] = '\0';
-
-	va_end(ap);
-};
-
 
 //遍历指定的目录，获得所有XML文件名
 static bool Read_Xml_Folder( string folderPath, vec_Xml_File_Name& obj_vec_Xml_File_Name)

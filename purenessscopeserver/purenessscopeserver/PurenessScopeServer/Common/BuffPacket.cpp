@@ -365,7 +365,7 @@ bool CBuffPacket::WriteStream(const char* pData, uint32 u4Len)
 	}
 }
 
-bool CBuffPacket::ReadStream(char*& pData, uint32& u4Len)
+bool CBuffPacket::ReadStream(char* pData, uint32& u4Len)
 {
 	//ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
 	if(pData == NULL || u4Len > m_u4PacketLen - m_u4ReadPtr)

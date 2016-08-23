@@ -185,6 +185,84 @@ void Gen_2_Cpp_Struct(FILE* pFile, _Class_Info& obj_Class_Info)
 			}
 		}
 	}
+
+	//添加构造函数
+	sprintf_safe(szTemp, 200, "\n\t%s()\n", obj_Class_Info.m_szXMLName);
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t{\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	for(int i = 0; i < (int)obj_Class_Info.m_vecProperty.size(); i++)
+	{
+		if(obj_Class_Info.m_vecProperty[i].m_emType == PROPERTY_CHAR)
+		{
+			sprintf_safe(szTemp, 200, "\t\tmemset(m_sz%s, 0, %d);\n", 
+				obj_Class_Info.m_vecProperty[i].m_szPropertyName, 
+				obj_Class_Info.m_vecProperty[i].m_nLength);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		}
+		else if(obj_Class_Info.m_vecProperty[i].m_emType == PROPERTY_STRING)
+		{
+			sprintf_safe(szTemp, 200, "\t\tm_str%s = "";\n", 
+				obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		}
+		else if(obj_Class_Info.m_vecProperty[i].m_emType == PROPERTY_UINT8)
+		{
+			sprintf_safe(szTemp, 200, "\t\tm_u1%s = 0;\n", 
+				obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		}
+		else if(obj_Class_Info.m_vecProperty[i].m_emType == PROPERTY_UINT16)
+		{
+			sprintf_safe(szTemp, 200, "\t\tm_u2%s = 0;\n", 
+				obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		}
+		else if(obj_Class_Info.m_vecProperty[i].m_emType == PROPERTY_UINT32)
+		{
+			sprintf_safe(szTemp, 200, "\t\tm_u4%s = 0;\n", 
+				obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		}
+		else if(obj_Class_Info.m_vecProperty[i].m_emType == PROPERTY_UINT64)
+		{
+			sprintf_safe(szTemp, 200, "\t\tm_u8%s = 0\n", 
+				obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		}
+		else if(obj_Class_Info.m_vecProperty[i].m_emType == PROPERTY_INT8)
+		{
+			sprintf_safe(szTemp, 200, "\t\tm_n1%s = 0;\n", 
+				obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		}
+		else if(obj_Class_Info.m_vecProperty[i].m_emType == PROPERTY_INT16)
+		{
+			sprintf_safe(szTemp, 200, "\t\tm_n2%s = 0;\n", 
+				obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		}
+		else if(obj_Class_Info.m_vecProperty[i].m_emType == PROPERTY_INT32)
+		{
+			sprintf_safe(szTemp, 200, "\t\tm_n4%s = 0;\n", 
+				obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		}
+		else if(obj_Class_Info.m_vecProperty[i].m_emType == PROPERTY_FLOAT32)
+		{
+			sprintf_safe(szTemp, 200, "\t\tm_f4%s = 0.0f;\n", 
+				obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		}
+		else if(obj_Class_Info.m_vecProperty[i].m_emType == PROPERTY_FLOAT64)
+		{
+			sprintf_safe(szTemp, 200, "\t\tm_f8%s = 0.0f\n", 
+				obj_Class_Info.m_vecProperty[i].m_szPropertyName);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		}
+	}
+	sprintf_safe(szTemp, 200, "\t}\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "};\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 }
@@ -572,7 +650,7 @@ void Gen_2_Cpp_Out_Stream(FILE* pFile, _Class_Info& obj_Class_Info)
 						obj_Class_Info.m_vecProperty[i].m_szPropertyName, 
 						obj_Stream_Type_Info.m_nLength);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-					sprintf_safe(szTemp, 200, "\tpBuffPacket->ReadStream((char*& )obj%s.m_sz%s, u4%sSize);\n",
+					sprintf_safe(szTemp, 200, "\tpBuffPacket->ReadStream((char* )obj%s.m_sz%s, u4%sSize);\n",
 						obj_Class_Info.m_szXMLName, 
 						obj_Class_Info.m_vecProperty[i].m_szPropertyName,
 						obj_Class_Info.m_vecProperty[i].m_szPropertyName);
@@ -583,7 +661,7 @@ void Gen_2_Cpp_Out_Stream(FILE* pFile, _Class_Info& obj_Class_Info)
 					sprintf_safe(szTemp, 200, "\tuint32 u4%sSize = pBuffPacket->GetReadLen();\n",
 						obj_Class_Info.m_vecProperty[i].m_szPropertyName);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-					sprintf_safe(szTemp, 200, "\tpBuffPacket->ReadStream((char*& )obj%s.m_sz%s, u4%sSize);\n",
+					sprintf_safe(szTemp, 200, "\tpBuffPacket->ReadStream((char* )obj%s.m_sz%s, u4%sSize);\n",
 						obj_Class_Info.m_szXMLName, 
 						obj_Class_Info.m_vecProperty[i].m_szPropertyName,
 						obj_Class_Info.m_vecProperty[i].m_szPropertyName);

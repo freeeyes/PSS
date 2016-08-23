@@ -277,7 +277,7 @@ void Gen_2_Cpp_Main(_Project_Info& objProjectInfo, vecClassInfo& objClassXmlInfo
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t\t\tu4ErrorID));\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\treturn 0;\n");
+	sprintf_safe(szTemp, 200, "\treturn true;\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "}\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);

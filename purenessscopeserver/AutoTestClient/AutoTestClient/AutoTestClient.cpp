@@ -17,12 +17,79 @@ void Run_Test(FILE* pFile, _Command_Info obj_Command_Info, const char* pIP, int 
 	bool blState = obj_ODSocket.Connect(pIP, nPort);
 	if(false == blState)
 	{
-		Create_TD_Content(pFile, "error", obj_Command_Info.m_szCommandName, "测试失败");
+		Create_TD_Content(pFile, "error", obj_Command_Info.m_szCommandName, "连接建立失败");
 	}
-	else
+
+	printf("[Run_Test]obj_Command_Info.m_szCommandName=%s.\n", obj_Command_Info.m_szCommandName);
+
+	if(strcmp(obj_Command_Info.m_szCommandName, "TRAP") == 0)
 	{
-		Create_TD_Content(pFile, "content", obj_Command_Info.m_szCommandName, "测试成功");
+		int a = 1;
 	}
+
+	for(int i = 0; i < obj_Command_Info.m_nCount; i++)
+	{
+		//开始发送数据
+		int nSendLen = obj_Command_Info.m_obj_Packet_Send.Get_Length();
+		char* pSend = new char[nSendLen];
+		obj_Command_Info.m_obj_Packet_Send.In_Stream(pSend, nSendLen);
+
+		bool blSendFlag = false;
+		int nCurrSend = 0;
+		while(true)
+		{	
+			int nDataLen = obj_ODSocket.Send(&pSend[nCurrSend], nSendLen - nCurrSend);
+			if(nDataLen < 0)
+			{
+				Create_TD_Content(pFile, "content", obj_Command_Info.m_szCommandName, "发送数据包失败");
+				break;
+			}
+			else if(nDataLen == nSendLen - nCurrSend)
+			{
+				blSendFlag = true;
+				break;
+			}
+			else
+			{
+				nCurrSend += nDataLen; 
+			}
+		}
+		delete pSend;
+
+		int nRecvLen = obj_Command_Info.m_obj_Packet_Recv.Get_Length();
+		if(nRecvLen > 0 && blSendFlag == true)
+		{
+			//需要接受返回验证数据包
+			char* pRecv = new char[nRecvLen];
+
+			int nCurrRecv = 0;
+			while(true)
+			{
+				int nDataLen = obj_ODSocket.Recv(&pRecv[nCurrRecv], nRecvLen - nCurrRecv);
+				if(nDataLen <= 0)
+				{
+					Create_TD_Content(pFile, "content", obj_Command_Info.m_szCommandName, "接收返回数据包失败");
+					break;
+				}
+				else if(nDataLen == nRecvLen - nCurrRecv)
+				{
+					//接受完成数据包
+					Create_TD_Content(pFile, "content", obj_Command_Info.m_szCommandName, 
+						obj_Command_Info.m_obj_Packet_Recv.Check_Stream(pRecv, nRecvLen).c_str());
+					break;
+				}
+				else
+				{
+					//继续收包
+					nCurrRecv += nDataLen;
+				}
+			}
+			delete pRecv;
+		}
+	}
+	
+
+	//Create_TD_Content(pFile, "content", obj_Command_Info.m_szCommandName, "测试成功");
 	obj_ODSocket.Close();
 }
 

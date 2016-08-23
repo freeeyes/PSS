@@ -77,7 +77,7 @@ bool CProServerManager::Init()
 	}
 
 	pFileLogger->Init();
-	AppLogManager::instance()->Init();
+	AppLogManager::instance()->Init(1, MAX_MSG_THREADQUEUE, App_MainConfig::instance()->GetConnectAlert()->m_u4MailID);
 	if(0 != AppLogManager::instance()->RegisterLog(pFileLogger))
 	{
 		OUR_DEBUG((LM_INFO, "[CProServerManager::Init]AppLogManager::instance()->RegisterLog error.\n"));
