@@ -8,7 +8,7 @@
 #define XML_FILE_RESULT "Auto_Test_Resault.html"
 
 //运行测试子集
-void Run_Test(FILE* pFile, _Command_Info obj_Command_Info, const char* pIP, int nPort)
+void Run_Test(FILE* pFile, _Command_Info obj_Command_Info, const char* pIP, int nPort, short sOrder)
 {
 	//连接远程测试
 	ODSocket obj_ODSocket;
@@ -22,17 +22,12 @@ void Run_Test(FILE* pFile, _Command_Info obj_Command_Info, const char* pIP, int 
 
 	printf("[Run_Test]obj_Command_Info.m_szCommandName=%s.\n", obj_Command_Info.m_szCommandName);
 
-	if(strcmp(obj_Command_Info.m_szCommandName, "TRAP") == 0)
-	{
-		int a = 1;
-	}
-
 	for(int i = 0; i < obj_Command_Info.m_nCount; i++)
 	{
 		//开始发送数据
 		int nSendLen = obj_Command_Info.m_obj_Packet_Send.Get_Length();
 		char* pSend = new char[nSendLen];
-		obj_Command_Info.m_obj_Packet_Send.In_Stream(pSend, nSendLen);
+		obj_Command_Info.m_obj_Packet_Send.In_Stream(pSend, nSendLen, sOrder);
 
 		bool blSendFlag = false;
 		int nCurrSend = 0;
@@ -75,7 +70,7 @@ void Run_Test(FILE* pFile, _Command_Info obj_Command_Info, const char* pIP, int 
 				{
 					//接受完成数据包
 					Create_TD_Content(pFile, "content", obj_Command_Info.m_szCommandName, 
-						obj_Command_Info.m_obj_Packet_Recv.Check_Stream(pRecv, nRecvLen).c_str());
+						obj_Command_Info.m_obj_Packet_Recv.Check_Stream(pRecv, nRecvLen, sOrder).c_str());
 					break;
 				}
 				else
@@ -110,11 +105,19 @@ void Run_Assemble_List(vec_Test_Assemble obj_Test_Assemble_List)
 	{
 		Create_TD_Title(pFile, obj_Test_Assemble_List[i].m_szTestAssembleName, obj_Test_Assemble_List[i].m_szDesc, 
 						obj_Test_Assemble_List[i].m_szIP, obj_Test_Assemble_List[i].m_nPort);
+
+		short sOrder = 0;
+		if(strcmp(obj_Test_Assemble_List[i].m_szOrder, "NET") == 0)
+		{
+			sOrder = 1;
+		}
+
 		for(int j = 0; j < (int)obj_Test_Assemble_List[i].m_obj_Command_Info_List.size(); j++)
 		{
 			Run_Test(pFile, obj_Test_Assemble_List[i].m_obj_Command_Info_List[j], 
 						obj_Test_Assemble_List[i].m_szIP,
-						obj_Test_Assemble_List[i].m_nPort);
+						obj_Test_Assemble_List[i].m_nPort,
+						sOrder);
 		}
 	}
 	Create_HTML_End(pFile);

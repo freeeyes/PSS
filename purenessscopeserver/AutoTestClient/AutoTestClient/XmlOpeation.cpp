@@ -171,6 +171,7 @@ bool CXmlOpeation::Parse_XML_Test_Assemble(const char* pFileName, _Test_Assemble
 	sprintf_safe(obj_Test_Assemble.m_szTestAssembleName, MAX_BUFF_50, "%s", (char* )m_pRootElement->Attribute("Name"));
 	sprintf_safe(obj_Test_Assemble.m_szDesc, MAX_BUFF_100, "%s", (char* )m_pRootElement->Attribute("desc"));
 	sprintf_safe(obj_Test_Assemble.m_szIP, MAX_BUFF_50, "%s", (char* )m_pRootElement->Attribute("IP"));
+	sprintf_safe(obj_Test_Assemble.m_szOrder, MAX_BUFF_50, "%s", (char* )m_pRootElement->Attribute("ORDER"));
 	obj_Test_Assemble.m_nPort = atoi((char* )m_pRootElement->Attribute("Port"));
 
 	//循环获取预定义信息

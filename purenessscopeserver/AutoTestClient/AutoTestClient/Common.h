@@ -11,6 +11,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #endif
+#include "winsock2.h"
 
 #include <string>
 #include <vector>
@@ -127,7 +128,7 @@ struct _Packet_Send
 	}
 
 	//输入成数据流
-	void In_Stream(char* pData, int nLen)
+	void In_Stream(char* pData, int nLen, short sOrder)
 	{
 		int nPos = 0;
 		for(int i = 0; i < (int)m_obj_Data_Info_List.size(); i++)
@@ -135,12 +136,22 @@ struct _Packet_Send
 			if(strcmp(m_obj_Data_Info_List[i].m_szDataType, "short") == 0)
 			{
 				short sData = (short)Char2Number(m_obj_Data_Info_List[i].m_strValue.c_str());
+				if(sOrder == 1)
+				{
+					//网序
+					sData = htons(sData);
+				}
 				memcpy_safe((char* )&sData, 2, &pData[nPos], nLen - nPos);
 				nPos += 2;
 			}
 			else if(strcmp(m_obj_Data_Info_List[i].m_szDataType, "int") == 0)
 			{
 				int nData = (int)Char2Number(m_obj_Data_Info_List[i].m_strValue.c_str());
+				if(sOrder == 1)
+				{
+					//网序
+					nData = htonl(nData);
+				}
 				memcpy_safe((char* )&nData, 4, &pData[nPos], nLen - nPos);
 				nPos += 4;
 			}
@@ -194,7 +205,7 @@ struct _Packet_Recv
 		return nSize;
 	}
 
-	string Check_Stream(char* pData, int nLen)
+	string Check_Stream(char* pData, int nLen, short sOrder)
 	{
 		string strRet = "接收数据包检测成功";
 		int nPos = 0;
@@ -204,6 +215,11 @@ struct _Packet_Recv
 			{
 				short sData = 0;
 				memcpy_safe(&pData[nPos], 2, (char* )&sData, 2);
+				if(sOrder == 1)
+				{
+					//网序
+					sData = ntohs(sData);
+				}
 				if(sData != (short)Char2Number(m_obj_Data_Info_List[i].m_strValue.c_str()))
 				{
 					char szError[MAX_BUFF_50] = {'\0'};
@@ -219,6 +235,11 @@ struct _Packet_Recv
 			{
 				int nData = 0;
 				memcpy_safe(&pData[nPos], 4, (char* )&nData, 4);
+				if(sOrder == 1)
+				{
+					//网序
+					nData = ntohl(nData);
+				}
 				if(nData != (int)Char2Number(m_obj_Data_Info_List[i].m_strValue.c_str()))
 				{
 					char szError[MAX_BUFF_50] = {'\0'};
@@ -318,6 +339,7 @@ struct _Test_Assemble
 	char m_szTestAssembleName[MAX_BUFF_50];
 	char m_szDesc[MAX_BUFF_100];
 	char m_szIP[MAX_BUFF_50];
+	char m_szOrder[MAX_BUFF_50];
 	int  m_nPort;
 	vec_Command_Info m_obj_Command_Info_List;
 
@@ -327,6 +349,7 @@ struct _Test_Assemble
 		m_szDesc[0]             = '\0';
 		m_szIP[0]               = '\0';
 		m_nPort                 = 0;
+		sprintf_safe(m_szOrder, MAX_BUFF_50,"HOST");
 	}
 };
 typedef vector<_Test_Assemble> vec_Test_Assemble;

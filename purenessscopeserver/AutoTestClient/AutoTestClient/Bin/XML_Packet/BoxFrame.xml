@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 
-<PlugIn Name="BoxFrame" desc="test BoxFrame" IP="172.18.48.102" Port="10002">
+<PlugIn Name="BoxFrame" desc="test BoxFrame" IP="172.18.48.102" Port="10002" ORDER="NET">
 	<Command CommandName="Login" Count="1" TimeCost="100">
 		<Packet_Send>
 			<short name="PacketLen">68</short>
