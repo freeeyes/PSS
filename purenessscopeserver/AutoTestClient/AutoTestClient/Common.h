@@ -5,13 +5,15 @@
 #include <stdarg.h>
 #ifdef _WIN32
 #include <io.h>
+#include "winsock2.h"
 #else
 #include <unistd.h>
 #include <stdio.h>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <arpa/inet.h>
+#include <time.h>
 #endif
-#include "winsock2.h"
 
 #include <string>
 #include <vector>
@@ -34,6 +36,19 @@ inline bool memcpy_safe(char* pSrc, int nSrcLen, char* pDes, int nDesLen)
 #endif
 		return true;
 	}
+}
+
+static unsigned long GetSystemTickCount()
+{
+#ifdef WIN32
+	return GetTickCount();
+#else
+	struct timespec ts;
+
+	clock_gettime(CLOCK_MONOTONIC, &ts);
+
+	return (ts.tv_sec * 1000 + ts.tv_nsec / 1000000);
+#endif
 }
 
 //重载sprintf
@@ -205,7 +220,7 @@ struct _Packet_Recv
 		return nSize;
 	}
 
-	string Check_Stream(char* pData, int nLen, short sOrder)
+	string Check_Stream(char* pData, int nLen, short sOrder, bool& blIsError)
 	{
 		string strRet = "接收数据包检测成功";
 		int nPos = 0;
@@ -227,6 +242,7 @@ struct _Packet_Recv
 						m_obj_Data_Info_List[i].m_szDataName, 
 						(short)atoi(m_obj_Data_Info_List[i].m_strValue.c_str()), 
 						sData);
+					blIsError = true;
 					return strRet; 
 				}
 				nPos += 2;
@@ -247,6 +263,7 @@ struct _Packet_Recv
 						m_obj_Data_Info_List[i].m_szDataName, 
 						(int)atoi(m_obj_Data_Info_List[i].m_strValue.c_str()), 
 						nData);
+					blIsError = true;
 					return strRet; 
 				}
 				nPos += 4;
@@ -266,6 +283,7 @@ struct _Packet_Recv
 							m_obj_Data_Info_List[i].m_strValue.c_str(), 
 							pObjectData);
 						delete pObjectData;
+						blIsError = true;
 						return strRet; 
 					}
 
@@ -286,6 +304,7 @@ struct _Packet_Recv
 							m_obj_Data_Info_List[i].m_strValue.c_str(), 
 							pObjectData);
 						delete pObjectData;
+						blIsError = true;
 						return strRet; 
 					}
 					delete pObjectData;
@@ -304,6 +323,7 @@ struct _Packet_Recv
 							m_obj_Data_Info_List[i].m_strValue.c_str(), 
 							pObjectData);
 						delete pObjectData;
+						blIsError = true;
 						return strRet; 
 					}
 
@@ -313,6 +333,8 @@ struct _Packet_Recv
 			}
 
 		}
+
+		blIsError = false;
 		return strRet;
 	}
 };
@@ -435,7 +457,7 @@ static void Create_HTML_Begin(FILE* pFile)
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, MAX_BUFF_500, "<body style='margin: 0; padding: 0;'>\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, MAX_BUFF_500, "<table border='1' cellpadding='0' cellspacing='0' width='600' align='center'>\n");
+	sprintf_safe(szTemp, MAX_BUFF_500, "<table border='1' cellpadding='0' cellspacing='0' width='800' align='center'>\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	fflush(pFile);
 }
@@ -446,14 +468,14 @@ static void Create_TD_Title(FILE* pFile, const char* pAssemableName, const char*
 
 	sprintf_safe(szTemp, MAX_BUFF_500, "<TR>\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, MAX_BUFF_500, "<td colspan='2' class='title' align='center'>%s:%s(%s:%d)</td>\n", pAssemableName, pDesc, pIP, nPort);
+	sprintf_safe(szTemp, MAX_BUFF_500, "<td colspan='3' class='title' align='center'>%s:%s(%s:%d)</td>\n", pAssemableName, pDesc, pIP, nPort);
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, MAX_BUFF_500, "</TR>\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	fflush(pFile);
 }
 
-static void Create_TD_Content(FILE* pFile, const char* pCssName, const char* pCommandName, const char* pContent)
+static void Create_TD_Content(FILE* pFile, const char* pCssName, const char* pCommandName, const char* pContent, const char* pTime)
 {
 	char szTemp[MAX_BUFF_500]     = {'\0'};
 
@@ -462,6 +484,8 @@ static void Create_TD_Content(FILE* pFile, const char* pCssName, const char* pCo
 	sprintf_safe(szTemp, MAX_BUFF_500, "<td  width='200' class='%s' align='center'>%s</td>\n", pCssName, pCommandName);
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, MAX_BUFF_500, "<td  width='400' class='%s' align='center'>%s</td>\n", pCssName, pContent);
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, MAX_BUFF_500, "<td  width='200' class='%s' align='center'>%s</td>\n", pCssName, pTime);
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, MAX_BUFF_500, "</TR>\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);

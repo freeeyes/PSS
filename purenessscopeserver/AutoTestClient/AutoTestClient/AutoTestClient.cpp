@@ -12,16 +12,22 @@ void Run_Test(FILE* pFile, _Command_Info obj_Command_Info, const char* pIP, int 
 {
 	//连接远程测试
 	ODSocket obj_ODSocket;
+	string strContent;
+	string strTime;
+
+	printf("[Run_Test]obj_Command_Info.m_szCommandName=%s.\n", obj_Command_Info.m_szCommandName);
+
 	obj_ODSocket.Init();
 	obj_ODSocket.Create(AF_INET, SOCK_STREAM, 0);
 	bool blState = obj_ODSocket.Connect(pIP, nPort);
 	if(false == blState)
 	{
-		Create_TD_Content(pFile, "error", obj_Command_Info.m_szCommandName, "连接建立失败");
+		Create_TD_Content(pFile, "error", obj_Command_Info.m_szCommandName, "连接建立失败", strTime.c_str());
+		return;
 	}
 
-	printf("[Run_Test]obj_Command_Info.m_szCommandName=%s.\n", obj_Command_Info.m_szCommandName);
-
+	bool blIsError = false;
+	unsigned long llBegin = GetSystemTickCount();
 	for(int i = 0; i < obj_Command_Info.m_nCount; i++)
 	{
 		//开始发送数据
@@ -36,7 +42,8 @@ void Run_Test(FILE* pFile, _Command_Info obj_Command_Info, const char* pIP, int 
 			int nDataLen = obj_ODSocket.Send(&pSend[nCurrSend], nSendLen - nCurrSend);
 			if(nDataLen < 0)
 			{
-				Create_TD_Content(pFile, "content", obj_Command_Info.m_szCommandName, "发送数据包失败");
+				strContent = "发送数据包失败";
+				blIsError = true;
 				break;
 			}
 			else if(nDataLen == nSendLen - nCurrSend)
@@ -51,6 +58,12 @@ void Run_Test(FILE* pFile, _Command_Info obj_Command_Info, const char* pIP, int 
 		}
 		delete pSend;
 
+		//判断是否存在问题
+		if(blIsError == true)
+		{
+			break;
+		}
+
 		int nRecvLen = obj_Command_Info.m_obj_Packet_Recv.Get_Length();
 		if(nRecvLen > 0 && blSendFlag == true)
 		{
@@ -63,28 +76,55 @@ void Run_Test(FILE* pFile, _Command_Info obj_Command_Info, const char* pIP, int 
 				int nDataLen = obj_ODSocket.Recv(&pRecv[nCurrRecv], nRecvLen - nCurrRecv);
 				if(nDataLen <= 0)
 				{
-					Create_TD_Content(pFile, "content", obj_Command_Info.m_szCommandName, "接收返回数据包失败");
+					strContent = "接收返回数据包失败";
+					blIsError = true;
 					break;
 				}
 				else if(nDataLen == nRecvLen - nCurrRecv)
 				{
 					//接受完成数据包
-					Create_TD_Content(pFile, "content", obj_Command_Info.m_szCommandName, 
-						obj_Command_Info.m_obj_Packet_Recv.Check_Stream(pRecv, nRecvLen, sOrder).c_str());
+					strContent = obj_Command_Info.m_obj_Packet_Recv.Check_Stream(pRecv, nRecvLen, sOrder, blIsError);
 					break;
 				}
 				else
 				{
-					//继续收包
+					//继续收包 
 					nCurrRecv += nDataLen;
 				}
 			}
 			delete pRecv;
 		}
-	}
-	
 
-	//Create_TD_Content(pFile, "content", obj_Command_Info.m_szCommandName, "测试成功");
+		//判断是否存在问题
+		if(blIsError == true)
+		{
+			break;
+		}
+	}
+
+	//计算时间消耗
+	unsigned long llEnd = GetSystemTickCount();
+	int nCostTime = (int)(llEnd - llBegin);
+
+	char szTimeContent[MAX_BUFF_500] = {'\0'};
+	if(nCostTime <= obj_Command_Info.m_nTimeCost)
+	{
+		sprintf_safe(szTimeContent, MAX_BUFF_500, "要求时间[%d]毫秒 实际消耗时间[%d]毫秒，正常", obj_Command_Info.m_nTimeCost, nCostTime);
+	}
+	else
+	{
+		sprintf_safe(szTimeContent, MAX_BUFF_500, "要求时间[%d]毫秒 实际消耗时间[%d]毫秒，异常", obj_Command_Info.m_nTimeCost, nCostTime);
+	}
+	strTime = szTimeContent;
+
+	if(blIsError == true)
+	{
+		Create_TD_Content(pFile, "error", obj_Command_Info.m_szCommandName, strContent.c_str(), strTime.c_str());
+	}
+	else
+	{
+		Create_TD_Content(pFile, "content", obj_Command_Info.m_szCommandName, strContent.c_str(), strTime.c_str());
+	}
 	obj_ODSocket.Close();
 }
 
