@@ -83,6 +83,157 @@ static int Char2Number(const char* pData)
 	}
 }
 
+//字符串转二进制相关API
+static bool Get_binary_Char(unsigned char cTag, unsigned char& cDes)
+{
+	if(cTag >='A'&&  cTag <='F')
+	{
+		cDes = cTag - 'A' + 10;
+		return true;
+	}
+	else if(cTag >='a'&&  cTag <='f')
+	{
+		cDes = cTag - 'a' + 10;
+		return true; 
+	}
+	else if(cTag >= '0'&& cTag<= '9')
+	{
+		cDes = cTag-'0';
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+static bool ConvertStr2char(const char* pData, unsigned char& cData)
+{
+	if(pData == NULL || strlen(pData) != 2)
+	{
+		return false;
+	}
+
+	char cFirst = pData[1];
+	unsigned char cTemp = 0;
+	bool blStste = Get_binary_Char(cFirst, cTemp);
+	if(false == blStste)
+	{
+		return false;
+	}
+	cData = cTemp;
+	char cSecond = pData[0];
+	blStste  = Get_binary_Char(cSecond, cTemp);
+	if(false == blStste)
+	{
+		return false;
+	}
+	cTemp = cTemp << 4;
+	cData = cData | cTemp;
+
+	return true;
+}
+
+//得到转换后的字符串长度
+static int GetBufferSize(const char* pData, int nSrcLen)
+{
+	char szData[3] = {'\0'};
+	int nPos         = 0;
+	int nCurrSize    = 0;
+	int nConvertSize = 0;
+	bool blState     = false;   //转换后的字符串是否有效
+	bool blSrcState  = true;    //元字符串是否有效
+	unsigned char cData;
+
+	while(nPos < nSrcLen)
+	{
+		if(pData[nPos] == '\r' || pData[nPos] == '\n' || pData[nPos] == ' ' || nPos == nSrcLen - 1)
+		{
+			if(nPos == nSrcLen - 1)
+			{
+				szData[nCurrSize++] = pData[nPos];
+			}
+
+			szData[nCurrSize] = '\0';
+			if(blSrcState == true)
+			{
+				blState = ConvertStr2char(szData, cData);
+				if(blState == true)
+				{
+					nConvertSize++;
+				}
+			}
+			nCurrSize  = 0;
+			blSrcState = true;
+			nPos++;
+		}
+		else
+		{
+			if(nCurrSize < 2)
+			{
+				szData[nCurrSize++] = pData[nPos];
+			}
+			else
+			{
+				blSrcState = false;
+			}
+			nPos++;
+		}
+	}
+
+	return nConvertSize;
+};
+
+//填充字符串转换为二进制串的代码
+static bool Convertstr2charArray(const char* pData, int nSrcLen, unsigned char* pDes, int& nMaxLen)
+{
+	char szData[3] = {'\0'};
+	int nPos         = 0;
+	int nCurrSize    = 0;
+	int nConvertSize = 0;
+	bool blState     = false;   //转换后的字符串是否有效
+	bool blSrcState  = true;    //元字符串是否有效
+
+	while(nPos < nSrcLen)
+	{
+		if(pData[nPos] == '\r' || pData[nPos] == '\n' || pData[nPos] == ' ' || nPos == nSrcLen - 1)
+		{
+			if(nPos == nSrcLen - 1)
+			{
+				szData[nCurrSize++] = pData[nPos];
+			}
+
+			szData[nCurrSize] = '\0';
+			if(nConvertSize < nMaxLen && blSrcState == true)
+			{
+				blState = ConvertStr2char(szData, pDes[nConvertSize]);
+				if(blState == true)
+				{
+					nConvertSize++;
+				}
+			}
+			nCurrSize  = 0;
+			blSrcState = true;
+			nPos++;
+		}
+		else
+		{
+			if(nCurrSize < 2)
+			{
+				szData[nCurrSize++] = pData[nPos];
+			}
+			else
+			{
+				blSrcState = false;
+			}
+			nPos++;
+		}
+	}
+
+	nMaxLen = nConvertSize;
+	return true;
+};
+
 typedef vector<string> vec_Xml_File_Name;
 
 #define MAX_BUFF_50  50
@@ -174,8 +325,21 @@ struct _Packet_Send
 			{
 				if(m_obj_Data_Info_List[i].m_nLength > 0)
 				{
-					memcpy_safe((char* )m_obj_Data_Info_List[i].m_strValue.c_str(), m_obj_Data_Info_List[i].m_nLength, &pData[nPos], nLen - nPos);
-					nPos += m_obj_Data_Info_List[i].m_nLength;
+					if(m_obj_Data_Info_List[i].m_blIsString == true)
+					{
+						memcpy_safe((char* )m_obj_Data_Info_List[i].m_strValue.c_str(), m_obj_Data_Info_List[i].m_nLength, &pData[nPos], nLen - nPos);
+						nPos += m_obj_Data_Info_List[i].m_nLength;
+					}
+					else
+					{
+						//二进制数据拼装
+						int nValueLen = GetBufferSize((char*)m_obj_Data_Info_List[i].m_strValue.c_str(), m_obj_Data_Info_List[i].m_strValue.length());
+						char* pValue  = new char[nValueLen];
+						Convertstr2charArray(m_obj_Data_Info_List[i].m_strValue.c_str(),  m_obj_Data_Info_List[i].m_strValue.length(), (unsigned char* )pValue, nValueLen);
+						memcpy_safe(pValue, nValueLen, &pData[nPos], nLen - nPos);
+						delete pValue;
+						nPos += m_obj_Data_Info_List[i].m_nLength;
+					}
 				}
 				else if(m_obj_Data_Info_List[i].m_nLength == 1)
 				{
@@ -185,8 +349,21 @@ struct _Packet_Send
 				}
 				else
 				{
-					memcpy_safe((char* )m_obj_Data_Info_List[i].m_strValue.c_str(), (int)strlen(m_obj_Data_Info_List[i].m_strValue.c_str()), &pData[nPos], nLen - nPos);
-					nPos += (int)strlen(m_obj_Data_Info_List[i].m_strValue.c_str());
+					if(m_obj_Data_Info_List[i].m_blIsString == true)
+					{
+						memcpy_safe((char* )m_obj_Data_Info_List[i].m_strValue.c_str(), (int)strlen(m_obj_Data_Info_List[i].m_strValue.c_str()), &pData[nPos], nLen - nPos);
+						nPos += (int)strlen(m_obj_Data_Info_List[i].m_strValue.c_str());
+					}
+					else
+					{
+						//二进制数据拼装
+						int nValueLen = GetBufferSize((char*)m_obj_Data_Info_List[i].m_strValue.c_str(), m_obj_Data_Info_List[i].m_strValue.length());
+						char* pValue  = new char[nValueLen];
+						Convertstr2charArray(m_obj_Data_Info_List[i].m_strValue.c_str(),  m_obj_Data_Info_List[i].m_strValue.length(), (unsigned char* )pValue, nValueLen);
+						memcpy_safe(pValue, nValueLen, &pData[nPos], nLen - nPos);
+						delete pValue;
+						nPos += nValueLen;
+					}
 				}
 			}
 		}
