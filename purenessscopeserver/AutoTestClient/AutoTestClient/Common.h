@@ -177,6 +177,12 @@ struct _Packet_Send
 					memcpy_safe((char* )m_obj_Data_Info_List[i].m_strValue.c_str(), m_obj_Data_Info_List[i].m_nLength, &pData[nPos], nLen - nPos);
 					nPos += m_obj_Data_Info_List[i].m_nLength;
 				}
+				else if(m_obj_Data_Info_List[i].m_nLength == 1)
+				{
+					short sData = (short)Char2Number(m_obj_Data_Info_List[i].m_strValue.c_str());
+					memcpy_safe((char* )&sData, 1, &pData[nPos], nLen - nPos);
+					nPos += m_obj_Data_Info_List[i].m_nLength;
+				}
 				else
 				{
 					memcpy_safe((char* )m_obj_Data_Info_List[i].m_strValue.c_str(), (int)strlen(m_obj_Data_Info_List[i].m_strValue.c_str()), &pData[nPos], nLen - nPos);

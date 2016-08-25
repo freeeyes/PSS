@@ -658,7 +658,7 @@ void Gen_2_Cpp_Out_Stream(FILE* pFile, _Class_Info& obj_Class_Info)
 				}
 				else
 				{
-					sprintf_safe(szTemp, 200, "\tuint32 u4%sSize = pBuffPacket->GetReadLen();\n",
+					sprintf_safe(szTemp, 200, "\tuint32 u4%sSize = pBuffPacket->GetWriteLen() - pBuffPacket->GetReadLen();\n",
 						obj_Class_Info.m_vecProperty[i].m_szPropertyName);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					sprintf_safe(szTemp, 200, "\tpBuffPacket->ReadStream((char* )obj%s.m_sz%s, u4%sSize);\n",
