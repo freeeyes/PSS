@@ -80,17 +80,82 @@ bool ODSocket::Create(int af, int type, int protocol)
     return true;  
 }  
   
-bool ODSocket::Connect(const char* ip, unsigned short port)  
-{  
+bool ODSocket::Connect(const char* ip, unsigned short port,int timeout)  
+{
+	fd_set set;
+	int error = -1;
+	int len = sizeof(int);
+
+	struct timeval timeo;
+	//设置超时时间
+	if(timeout != 0)
+	{
+		timeo.tv_sec = timeout;
+		timeo.tv_usec = 0;
+
+		//将connect设置成非阻塞
+		int nonblock = 1;
+#ifdef WIN32
+		ioctlsocket(m_sock, FIONBIO, (u_long FAR*)&nonblock);
+#else
+		ioctl (m_sock, FIONBIO, &nonblock);
+#endif
+	}
+
     struct sockaddr_in svraddr;  
     svraddr.sin_family = AF_INET;  
     svraddr.sin_addr.s_addr = inet_addr(ip);  
     svraddr.sin_port = htons(port);  
     int ret = connect(m_sock, (struct sockaddr*)&svraddr, sizeof(svraddr));  
-    if ( ret == SOCKET_ERROR ) {  
-        return false;  
-    }  
-    return true;  
+
+	if(timeout != 0)
+	{
+		//设置select等待
+		FD_ZERO(&set);
+		FD_SET(m_sock, &set);
+		int nSelectReturn = select(m_sock + 1, NULL, &set, NULL, &timeo);
+		if(nSelectReturn > 0)
+		{
+			getsockopt(m_sock, SOL_SOCKET, SO_ERROR, (char FAR * )&error, (socklen_t *)&len);
+			if(error == 0)
+			{
+				ret = 0;
+			}
+			else
+			{
+				ret = -1;
+			}
+		} 
+		else
+		{
+			ret = -1;
+		}
+
+		//重新设置成阻塞
+		int nonblock = 0;
+#ifdef WIN32
+		ioctlsocket(m_sock, FIONBIO, (u_long FAR*)&nonblock);
+#else
+		ioctl (m_sock, FIONBIO, &nonblock);
+#endif
+
+		//设置接收数据超时时间
+		//struct timeval tvRecv;//接收超时设置
+		//tvRecv.tv_sec = timeout;
+		//tvRecv.tv_usec = 0;
+		//setsockopt(m_sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&tvRecv, sizeof(struct timeval));
+	}
+
+
+
+	if(ret != 0)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }  
   
 int ODSocket::Send(const char* buf, int len, int flags)  

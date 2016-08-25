@@ -19,7 +19,7 @@ void Run_Test(FILE* pFile, _Command_Info obj_Command_Info, const char* pIP, int 
 
 	obj_ODSocket.Init();
 	obj_ODSocket.Create(AF_INET, SOCK_STREAM, 0);
-	bool blState = obj_ODSocket.Connect(pIP, nPort);
+	bool blState = obj_ODSocket.Connect(pIP, nPort, 5);
 	if(false == blState)
 	{
 		Create_TD_Content(pFile, "error", obj_Command_Info.m_szCommandName, "连接建立失败", strTime.c_str());

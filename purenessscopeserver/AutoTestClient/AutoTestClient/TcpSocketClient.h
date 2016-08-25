@@ -22,6 +22,7 @@
     #include <sys/stat.h>  
     #include <sys/types.h>  
     #include <arpa/inet.h>  
+	#include<sys/ioctl.h>
     typedef int             SOCKET;  
   
     //#pragma region define win32 const variable in linux  
@@ -41,7 +42,7 @@ public:
     bool Create(int af, int type, int protocol = 0);  
   
     // Connect socket  
-    bool Connect(const char* ip, unsigned short port);  
+    bool Connect(const char* ip, unsigned short port,int timeout = 0);  
       
     // Send socket  
     int Send(const char* buf, int len, int flags = 0);  
