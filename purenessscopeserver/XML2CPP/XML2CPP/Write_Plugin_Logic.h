@@ -48,12 +48,12 @@ void Gen_2_Cpp_Logic_H(_Project_Info& objProjectInfo, vecClassInfo& objvecClassI
 
 			bool bl_Is_Data = false;
 			//两边参数都有，写入函数
-			sprintf_safe(szTemp, 200, "bool Logic_%s(", 
+			sprintf_safe(szTemp, 200, "bool Logic_%s(uint32 u4ConnectID", 
 				objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			if(NULL != pHeadObjectName)
 			{
-				sprintf_safe(szTemp, 200, "%s& obj%s", 
+				sprintf_safe(szTemp, 200, ", %s& obj%s", 
 					pHeadObjectName, pHeadObjectName);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				bl_Is_Data = true;
@@ -68,7 +68,7 @@ void Gen_2_Cpp_Logic_H(_Project_Info& objProjectInfo, vecClassInfo& objvecClassI
 				}
 				else
 				{
-					sprintf_safe(szTemp, 200, "%s& obj%s", 
+					sprintf_safe(szTemp, 200, ", %s& obj%s", 
 						pBodyObjectName, pBodyObjectName);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					bl_Is_Data = true;
@@ -84,7 +84,7 @@ void Gen_2_Cpp_Logic_H(_Project_Info& objProjectInfo, vecClassInfo& objvecClassI
 				}
 				else
 				{
-					sprintf_safe(szTemp, 200, "%s& obj%s", 
+					sprintf_safe(szTemp, 200, ", %s& obj%s", 
 						pReturnObjectName, pReturnObjectName);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					bl_Is_Data = true;
@@ -146,12 +146,12 @@ void Gen_2_Cpp_Logic_Cpp(_Project_Info& objProjectInfo, vecClassInfo& objvecClas
 
 			//两边参数都有，写入函数
 			bool bl_Is_Data = false;
-			sprintf_safe(szTemp, 200, "bool Logic_%s(", 
+			sprintf_safe(szTemp, 200, "bool Logic_%s(uint32 u4ConnectID", 
 				objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			if(NULL != pHeadObjectName)
 			{
-				sprintf_safe(szTemp, 200, "%s& obj%s", 
+				sprintf_safe(szTemp, 200, ", %s& obj%s", 
 					pHeadObjectName, pHeadObjectName);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				bl_Is_Data = true;
@@ -166,7 +166,7 @@ void Gen_2_Cpp_Logic_Cpp(_Project_Info& objProjectInfo, vecClassInfo& objvecClas
 				}
 				else
 				{
-					sprintf_safe(szTemp, 200, "%s& obj%s", 
+					sprintf_safe(szTemp, 200, ", %s& obj%s", 
 						pBodyObjectName, pBodyObjectName);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					bl_Is_Data = true;
@@ -182,7 +182,7 @@ void Gen_2_Cpp_Logic_Cpp(_Project_Info& objProjectInfo, vecClassInfo& objvecClas
 				}
 				else
 				{
-					sprintf_safe(szTemp, 200, "%s& obj%s", 
+					sprintf_safe(szTemp, 200, ", %s& obj%s", 
 						pReturnObjectName, pReturnObjectName);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					bl_Is_Data = true;
@@ -191,6 +191,9 @@ void Gen_2_Cpp_Logic_Cpp(_Project_Info& objProjectInfo, vecClassInfo& objvecClas
 			sprintf_safe(szTemp, 200, ")\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "{\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\tOUR_DEBUG((LM_INFO, \"[Logic_%s]ConnectID=%%d\", u4ConnectID));\n", 
+				objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "\t//add your code at here.\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);

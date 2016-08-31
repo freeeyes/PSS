@@ -16,6 +16,12 @@
 	<Define DefName="DOWNLOAD" type="number" DefValue="0x100C" />
 	<Define DefName="DOWNLOAD_ACK" type="number" DefValue="0x800C" />
 	
+	<Command CommandIn="CLIENT_LINK_CONNECT" FuncName="Do_Connect">
+	</Command>		
+	
+	<Command CommandIn="CLIENT_LINK_CDISCONNET" FuncName="Do_DisConnect">
+	</Command>	
+	
 	<Command CommandIn="LOGIN" CommandOut="LOGIN_ACK" FuncName="Do_Box_Login">
 		<Object class="Frame_Head" PacketType="HEAD" />
 		<Object class="Box_Login_Ack" PacketType="RETURN" />
