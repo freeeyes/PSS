@@ -27,7 +27,9 @@ void Gen_2_Cpp_Logic_H(_Project_Info& objProjectInfo, vecClassInfo& objvecClassI
 	sprintf_safe(szTemp, 200, "#define _%s_LOGIC_H\n\n", szHText);
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-	sprintf_safe(szTemp, 200, "#include \"Protocol.h\"\n\n");
+	sprintf_safe(szTemp, 200, "#include \"Protocol.h\"\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "#include \"IObject.h\"\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 	for(int i = 0; i < (int)objProjectInfo.m_objCommandList.size(); i++)
@@ -56,7 +58,7 @@ void Gen_2_Cpp_Logic_H(_Project_Info& objProjectInfo, vecClassInfo& objvecClassI
 
 			bool bl_Is_Data = false;
 			//两边参数都有，写入函数
-			sprintf_safe(szTemp, 200, "bool Logic_%s(uint32 u4ConnectID", 
+			sprintf_safe(szTemp, 200, "bool Logic_%s(CServerObject* pServerObject, uint32 u4ConnectID", 
 				objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			if(NULL != pHeadObjectName)
@@ -155,7 +157,7 @@ void Gen_2_Cpp_Logic_Cpp(_Project_Info& objProjectInfo, vecClassInfo& objvecClas
 
 			//两边参数都有，写入函数
 			bool bl_Is_Data = false;
-			sprintf_safe(szTemp, 200, "bool Logic_%s(uint32 u4ConnectID", 
+			sprintf_safe(szTemp, 200, "bool Logic_%s(CServerObject* pServerObject, uint32 u4ConnectID", 
 				objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			if(NULL != pHeadObjectName)
@@ -201,8 +203,17 @@ void Gen_2_Cpp_Logic_Cpp(_Project_Info& objProjectInfo, vecClassInfo& objvecClas
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "{\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			sprintf_safe(szTemp, 200, "\tOUR_DEBUG((LM_INFO, \"[Logic_%s]ConnectID=%%d\", u4ConnectID));\n", 
+			sprintf_safe(szTemp, 200, "\tOUR_DEBUG((LM_INFO, \"[Logic_%s]ConnectID=%%d.\\n\", u4ConnectID));\n", 
 				objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\tif(NULL == pServerObject)\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\t{\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\t\tOUR_DEBUG((LM_INFO, \"Logic_%s]pServerObject is NULL.\\n\"));\n",
+				objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\t}\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "\t//add your code at here.\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
