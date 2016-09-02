@@ -29,7 +29,8 @@
 	
 	<!-- 允许插件设置个性化,可以多个,这里可以单独设置每个插件的不同参数,可以与Module设置同时生效,亦可不用此设置 -->
 	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="XMLParsed.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/> -->
-	<ModuleInfo ModuleSPath="./" ModuleSName="BoxFramed.dll" ModuleSParam="..\..\example-Module\LGLogic\LSServer.ini" Desc="ModuleParam为插件启动参数"/>
+	<ModuleInfo ModuleSPath="./" ModuleSName="BoxFramed.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/>
+	<ModuleInfo ModuleSPath="./" ModuleSName="Vediod.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/>
 	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="TcpTestd.dll" ModuleSParam="--DEBUG" Desc="ModuleParam为插件启动参数"/> -->
 	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="TimerTestd.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/> -->
 	

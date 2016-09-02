@@ -19,6 +19,14 @@ void Gen_2_Cpp_Logic_H(_Project_Info& objProjectInfo, vecClassInfo& objvecClassI
 		return;
 	}
 
+	//将类名转换成大写
+	char szHText[100] = {'\0'};
+	To_Upper_String(objProjectInfo.m_szProjectName, szHText);
+	sprintf_safe(szTemp, 200, "#ifndef _%s_LOGIC_H\n", szHText);
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "#define _%s_LOGIC_H\n\n", szHText);
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 	sprintf_safe(szTemp, 200, "#include \"Protocol.h\"\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
@@ -95,7 +103,8 @@ void Gen_2_Cpp_Logic_H(_Project_Info& objProjectInfo, vecClassInfo& objvecClassI
 		}
 	}
 	
-
+	sprintf_safe(szTemp, 200, "#endif\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	fclose(pFile);
 }
 

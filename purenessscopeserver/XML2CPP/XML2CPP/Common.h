@@ -23,5 +23,16 @@ inline void sprintf_safe(char* szText, int nLen, const char* fmt ...)
 	va_end(ap);
 };
 
+static void To_Upper_String(const char* pSrc, char* pRet)
+{
+	int nLen = (int)strlen(pSrc);
+
+	for(int i = 0; i < nLen; i++)
+	{
+		pRet[i] = toupper(pSrc[i]);
+	}
+	pRet[nLen] = '\0';
+}
+
 #endif
 

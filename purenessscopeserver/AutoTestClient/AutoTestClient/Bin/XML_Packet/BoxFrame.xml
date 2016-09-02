@@ -92,7 +92,7 @@
 			<char name="Retain" length="16" IsString="1"></char>
 			<char name="ModuleName" length="16" IsString="1">test</char>
 			<char name="State" length="1" IsString="1">0</char>
-			<char name="Json" IsString="1">{'Name':'test'}</char>
+			<char name="Json" IsString="1"><![CDATA[{"version":"1","id":"123456","type":"camContrl","action":"open"}]]></char>
 		</Packet_Send>
 		<Packet_Recv>
 			<short name="PacketLen">59</short>

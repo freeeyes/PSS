@@ -18,6 +18,14 @@ void Gen_2_Cpp_Command_H(_Project_Info& objProjectInfo, vecClassInfo& objvecClas
 		return;
 	}
 
+	//将类名转换成大写
+	char szHText[100] = {'\0'};
+	To_Upper_String(objProjectInfo.m_szProjectName, szHText);
+	sprintf_safe(szTemp, 200, "#ifndef _%s_COMMAND_H\n", szHText);
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "#define _%s_COMMAND_H\n\n", szHText);
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 	sprintf_safe(szTemp, 200, "#pragma once\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "#include \"%s_Logic.h\"\n",
@@ -91,6 +99,8 @@ void Gen_2_Cpp_Command_H(_Project_Info& objProjectInfo, vecClassInfo& objvecClas
 	sprintf_safe(szTemp, 200, "\tint            m_nCount;\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "};\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "#endif\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	fclose(pFile);
 }
