@@ -20,12 +20,24 @@ CLoadModule::~CLoadModule(void)
 void CLoadModule::Close()
 {
 	//存环关闭当前活跃模块
-	for(int i = 0; i < m_mapModuleInfo.GetSize(); i++)
+	//OUR_DEBUG((LM_INFO, "[CLoadModule::Close]m_mapModuleInfo.GetSize=%d.\n", m_mapModuleInfo.GetSize()));
+	int nSize = (int)m_mapModuleInfo.GetSize();
+
+	vector<string> obj_vecModuleName;
+	for(int i = 0; i < nSize; i++)
 	{
-		//卸载并删除当初new的module对象
-		UnLoadModule(m_mapModuleInfo.GetMapDataKey(i).c_str());
+		//OUR_DEBUG((LM_INFO, "[CLoadModule::Close]active name=%s.\n", m_mapModuleInfo.GetMapDataKey(i).c_str()));
+		obj_vecModuleName.push_back(m_mapModuleInfo.GetMapDataKey(i));
 	}
 
+	for(int i = 0; i < nSize; i++)
+	{
+		//卸载并删除当初new的module对象
+		//OUR_DEBUG((LM_INFO, "[CLoadModule::Close]name=%s.\n", obj_vecModuleName[i].c_str()));
+		UnLoadModule(obj_vecModuleName[i].c_str());
+	}
+
+	//OUR_DEBUG((LM_INFO, "[CLoadModule::Close]FINISH!!!!.\n"));
 	m_mapModuleInfo.Clear();
 }
 
