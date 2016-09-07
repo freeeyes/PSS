@@ -633,13 +633,15 @@ static void Create_HTML_Begin(FILE* pFile)
 
 	sprintf_safe(szTemp, MAX_BUFF_500, "<html xmlns='http://www.w3.org/1999/xhtml'>\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, MAX_BUFF_500, "<head><style type=¡®text/css¡¯> \
-									   .title { color: red; font-size: 15px; background-color:#D6D6D6; }\
-									   .content { color: blue; font-size: 15px; background-color:#C7EDCC; }\
-									   .error { color: black; font-size: 15px; background-color:yellow; }\
-									   </style>\
-									   </head>\n");
+	sprintf_safe(szTemp, MAX_BUFF_500, "<head><style>#ver-minimalist { \
+										font-family: \"Lucida Sans Unicode\", \"Lucida Grande\", Sans- Serif;\
+										font-size: 12px;margin: 45px;width: 480px;text-align: left; \
+										border-collapse: collapse;}#ver-minimalist th { padding: 8px 2px; font-weight: normal;");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, MAX_BUFF_500, "font-size: 14px;border-bottom: 2px solid #6678b1;border-right: 30px solid #fff;border-left: 30px solid #fff; \
+									   color: #039;}#ver-minimalist td { padding: 12px 2px 0px 2px; border-right: 30px solid #fff; border-left: 30px solid #fff; \
+									   color: #669;}</style></head>\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, MAX_BUFF_500, "<body style='margin: 0; padding: 0;'>\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, MAX_BUFF_500, "<table border='1' cellpadding='0' cellspacing='0' width='800' align='center'>\n");
