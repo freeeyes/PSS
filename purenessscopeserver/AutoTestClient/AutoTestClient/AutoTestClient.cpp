@@ -3,37 +3,125 @@
 
 #include "XmlOpeation.h"
 #include "TcpSocketClient.h"
+#ifdef WIN32
+#include <windows.h>
+#else
+#include <pthread.h>  
+#endif
 
 #define XML_PATH "XML_Packet"
 #define XML_FILE_RESULT "Auto_Test_Resault.html"
 
+#ifdef WIN32
+typedef HANDLE Thread_Mutex;
+#else
+typedef pthread_mutex_t Thread_Mutex
+#endif
+
+struct _Thread_Info
+{
+	FILE* pFile;
+	_Command_Info* p_Command_Info;
+	char szIP[MAX_BUFF_50];
+	int nPort;
+	short sOrder;
+	int nThreadID;
+	Thread_Mutex mutex;
+
+	_Thread_Info()
+	{
+		pFile          = NULL;
+		p_Command_Info = NULL;
+		memset(szIP, 0, MAX_BUFF_50);
+		nPort          = 0;
+		sOrder         = 0;
+		nThreadID      = 0;
+	}
+};
+
+//创建线程锁
+Thread_Mutex Create_Mutex()
+{
+	Thread_Mutex mutex;
+#ifdef WIN32
+		mutex = CreateMutex(NULL, FALSE, NULL);
+#else	
+		pthread_mutex_init(&mutex, NULL); 
+#endif
+		return mutex;
+}
+
+//销毁线程锁
+static void Close_Mutex(Thread_Mutex& mutex)
+{
+#ifdef WIN32
+	CloseHandle(mutex);
+#else	
+	pthread_mutex_destroy(&mutex, NULL); 
+#endif
+}
+
+//线程锁打开
+static void Lock(Thread_Mutex& mutex)
+{
+	if(NULL != mutex)
+	{
+#ifdef WIN32
+		WaitForSingleObject(mutex, INFINITE);
+#else	
+		pthread_mutex_lock(&mutex);
+#endif
+	}
+}
+
+//线程锁结束
+static void UnLock(Thread_Mutex& mutex)
+{
+	if(NULL != mutex)
+	{
+#ifdef WIN32
+		ReleaseMutex(mutex);
+#else	
+		pthread_mutex_unlock(&mutex);
+#endif
+	}
+}
+
 //运行测试子集
-void Run_Test(FILE* pFile, _Command_Info obj_Command_Info, const char* pIP, int nPort, short sOrder)
+#ifdef WIN32
+DWORD WINAPI Run_Test(LPVOID arg)
+#else
+void* Run_Test(void * arg)
+#endif
 {
 	//连接远程测试
 	ODSocket obj_ODSocket;
 	string strContent;
 	string strTime;
 
-	printf("[Run_Test]obj_Command_Info.m_szCommandName=%s.\n", obj_Command_Info.m_szCommandName);
+	_Thread_Info* p_Thread_Info = (_Thread_Info* )arg;
+
+	printf("[Run_Test]obj_Command_Info.m_szCommandName=%s.\n", p_Thread_Info->p_Command_Info->m_szCommandName);
 
 	obj_ODSocket.Init();
 	obj_ODSocket.Create(AF_INET, SOCK_STREAM, 0);
-	bool blState = obj_ODSocket.Connect(pIP, nPort, 5);
+	bool blState = obj_ODSocket.Connect(p_Thread_Info->szIP, p_Thread_Info->nPort, 5);
 	if(false == blState)
 	{
-		Create_TD_Content(pFile, "error", obj_Command_Info.m_szCommandName, "连接建立失败", strTime.c_str());
-		return;
+		Lock(p_Thread_Info->mutex);
+		Create_TD_Content(p_Thread_Info->pFile, "error", p_Thread_Info->p_Command_Info->m_szCommandName, "连接建立失败", strTime.c_str());
+		UnLock(p_Thread_Info->mutex);
+		return 0;
 	}
 
 	bool blIsError = false;
 	unsigned long llBegin = GetSystemTickCount();
-	for(int i = 0; i < obj_Command_Info.m_nCount; i++)
+	for(int i = 0; i < p_Thread_Info->p_Command_Info->m_nCount; i++)
 	{
 		//开始发送数据
-		int nSendLen = obj_Command_Info.m_obj_Packet_Send.Get_Length();
+		int nSendLen = p_Thread_Info->p_Command_Info->m_obj_Packet_Send.Get_Length();
 		char* pSend = new char[nSendLen];
-		obj_Command_Info.m_obj_Packet_Send.In_Stream(pSend, nSendLen, sOrder);
+		p_Thread_Info->p_Command_Info->m_obj_Packet_Send.In_Stream(pSend, nSendLen, p_Thread_Info->sOrder);
 
 		bool blSendFlag = false;
 		int nCurrSend = 0;
@@ -64,7 +152,7 @@ void Run_Test(FILE* pFile, _Command_Info obj_Command_Info, const char* pIP, int 
 			break;
 		}
 
-		int nRecvLen = obj_Command_Info.m_obj_Packet_Recv.Get_Length();
+		int nRecvLen = p_Thread_Info->p_Command_Info->m_obj_Packet_Recv.Get_Length();
 		if(nRecvLen > 0 && blSendFlag == true)
 		{
 			//需要接受返回验证数据包
@@ -83,7 +171,7 @@ void Run_Test(FILE* pFile, _Command_Info obj_Command_Info, const char* pIP, int 
 				else if(nDataLen == nRecvLen - nCurrRecv)
 				{
 					//接受完成数据包
-					strContent = obj_Command_Info.m_obj_Packet_Recv.Check_Stream(pRecv, nRecvLen, sOrder, blIsError);
+					strContent = p_Thread_Info->p_Command_Info->m_obj_Packet_Recv.Check_Stream(pRecv, nRecvLen, p_Thread_Info->sOrder, blIsError);
 					break;
 				}
 				else
@@ -107,25 +195,49 @@ void Run_Test(FILE* pFile, _Command_Info obj_Command_Info, const char* pIP, int 
 	int nCostTime = (int)(llEnd - llBegin);
 
 	char szTimeContent[MAX_BUFF_500] = {'\0'};
-	if(nCostTime <= obj_Command_Info.m_nTimeCost)
+	if(nCostTime <= p_Thread_Info->p_Command_Info->m_nTimeCost)
 	{
-		sprintf_safe(szTimeContent, MAX_BUFF_500, "要求时间[%d]毫秒 实际消耗时间[%d]毫秒，正常", obj_Command_Info.m_nTimeCost, nCostTime);
+		sprintf_safe(szTimeContent, MAX_BUFF_500, "要求时间[%d]毫秒 实际消耗时间[%d]毫秒，正常", p_Thread_Info->p_Command_Info->m_nTimeCost, nCostTime);
 	}
 	else
 	{
-		sprintf_safe(szTimeContent, MAX_BUFF_500, "要求时间[%d]毫秒 实际消耗时间[%d]毫秒，异常", obj_Command_Info.m_nTimeCost, nCostTime);
+		sprintf_safe(szTimeContent, MAX_BUFF_500, "要求时间[%d]毫秒 实际消耗时间[%d]毫秒，异常", p_Thread_Info->p_Command_Info->m_nTimeCost, nCostTime);
 	}
 	strTime = szTimeContent;
 
 	if(blIsError == true)
 	{
-		Create_TD_Content(pFile, "error", obj_Command_Info.m_szCommandName, strContent.c_str(), strTime.c_str());
+		Lock(p_Thread_Info->mutex);
+		if(p_Thread_Info->nThreadID == 0)
+		{
+			Create_TD_Content(p_Thread_Info->pFile, "error", p_Thread_Info->p_Command_Info->m_szCommandName, strContent.c_str(), strTime.c_str());
+		}
+		else
+		{
+			char szName[MAX_BUFF_100] = {'\0'};
+			sprintf_safe(szName, MAX_BUFF_100, "%s(线程ID:%d)",  p_Thread_Info->p_Command_Info->m_szCommandName, p_Thread_Info->nThreadID);
+			Create_TD_Content(p_Thread_Info->pFile, "error", szName, strContent.c_str(), strTime.c_str());
+		}
+		UnLock(p_Thread_Info->mutex);
 	}
 	else
 	{
-		Create_TD_Content(pFile, "content", obj_Command_Info.m_szCommandName, strContent.c_str(), strTime.c_str());
+		Lock(p_Thread_Info->mutex);
+		if(p_Thread_Info->nThreadID == 0)
+		{
+			Create_TD_Content(p_Thread_Info->pFile, "content", p_Thread_Info->p_Command_Info->m_szCommandName, strContent.c_str(), strTime.c_str());
+		}
+		else
+		{
+			char szName[MAX_BUFF_100] = {'\0'};
+			sprintf_safe(szName, MAX_BUFF_100, "%s(线程ID:%d)",  p_Thread_Info->p_Command_Info->m_szCommandName, p_Thread_Info->nThreadID);
+			Create_TD_Content(p_Thread_Info->pFile, "content", szName, strContent.c_str(), strTime.c_str());
+		}
+		UnLock(p_Thread_Info->mutex);
 	}
 	obj_ODSocket.Close();
+
+	return 0;
 }
 
 //运行测试集并获得结果
@@ -154,10 +266,75 @@ void Run_Assemble_List(vec_Test_Assemble obj_Test_Assemble_List)
 
 		for(int j = 0; j < (int)obj_Test_Assemble_List[i].m_obj_Command_Info_List.size(); j++)
 		{
-			Run_Test(pFile, obj_Test_Assemble_List[i].m_obj_Command_Info_List[j], 
-						obj_Test_Assemble_List[i].m_szIP,
-						obj_Test_Assemble_List[i].m_nPort,
-						sOrder);
+			Thread_Mutex objmutex = Create_Mutex();
+
+			//查看是否是需要多线程
+			if(obj_Test_Assemble_List[i].m_obj_Command_Info_List[j].m_nThreadCount == 1)
+			{
+				_Thread_Info* p_Thread_Info = new _Thread_Info();
+				p_Thread_Info->pFile          = pFile;
+				p_Thread_Info->p_Command_Info = &obj_Test_Assemble_List[i].m_obj_Command_Info_List[j];
+				sprintf_safe(p_Thread_Info->szIP, 50, "%s", obj_Test_Assemble_List[i].m_szIP);
+				p_Thread_Info->nPort          = obj_Test_Assemble_List[i].m_nPort;
+				p_Thread_Info->sOrder         = sOrder;
+				p_Thread_Info->mutex          = objmutex;
+
+				Run_Test((void* )p_Thread_Info);
+
+				delete p_Thread_Info;
+			}
+			else
+			{
+				//启动多线程测试
+#ifdef WIN32
+				_Thread_Info* threadinfoarray = new _Thread_Info[obj_Test_Assemble_List[i].m_obj_Command_Info_List[j].m_nThreadCount];
+				HANDLE* handleArray = new HANDLE[obj_Test_Assemble_List[i].m_obj_Command_Info_List[j].m_nThreadCount];
+				for(int k = 0; k < obj_Test_Assemble_List[i].m_obj_Command_Info_List[j].m_nThreadCount; k++)
+				{
+					threadinfoarray[k].pFile          = pFile;
+					threadinfoarray[k].p_Command_Info = &obj_Test_Assemble_List[i].m_obj_Command_Info_List[j];
+					sprintf_safe(threadinfoarray[k].szIP, MAX_BUFF_50, "%s", obj_Test_Assemble_List[i].m_szIP);
+					threadinfoarray[k].nPort          = obj_Test_Assemble_List[i].m_nPort;
+					threadinfoarray[k].sOrder         = sOrder;
+					threadinfoarray[k].mutex          = objmutex;
+					threadinfoarray[k].nThreadID      = k + 1;
+
+					DWORD ThID;
+					handleArray[k] = CreateThread(NULL, 0, Run_Test, (void* )&threadinfoarray[k], 0, &ThID);
+				}
+				
+				//等待所有线程结束
+				WaitForMultipleObjects(2, handleArray, TRUE, INFINITE);
+				delete[] handleArray;
+				delete[] threadinfoarray;
+#else
+				_Thread_Info* threadinfoarray = new _Thread_Info[obj_Test_Assemble_List[i].m_obj_Command_Info_List[j].m_nThreadCount];
+				pthread_t* handleArray = new pthread_t[obj_Test_Assemble_List[i].m_obj_Command_Info_List[j].m_nThreadCount];
+				for(int k = 1; k <= obj_Test_Assemble_List[i].m_obj_Command_Info_List[j].m_nThreadCount; k++)
+				{
+					threadinfoarray[k].pFile          = pFile;
+					threadinfoarray[k].p_Command_Info = &obj_Test_Assemble_List[i].m_obj_Command_Info_List[j];
+					sprintf_safe(threadinfoarray[k].szIP, MAX_BUFF_50, "%s", obj_Test_Assemble_List[i].m_szIP);
+					threadinfoarray[k].nPort          = obj_Test_Assemble_List[i].m_nPort;
+					threadinfoarray[k].sOrder         = sOrder;
+					threadinfoarray[k].mutex          = objmutex;
+					threadinfoarray[k].nThreadID      = k;
+
+					pthread_create(&handleArray[k], NULL, &Run_Test, (void* )&threadinfoarray[k]);
+				}
+
+				//等待所有线程结束
+				for(int k = 1; k <= obj_Test_Assemble_List[i].m_obj_Command_Info_List[j].m_nThreadCount; k++)
+				{
+					pthread_join(handleArray[k], NULL);
+				}
+
+				delete[] handleArray;
+				delete[] threadinfoarray;
+#endif
+
+			}
+			Close_Mutex(objmutex);
 		}
 	}
 	Create_HTML_End(pFile);

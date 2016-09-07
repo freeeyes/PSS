@@ -190,6 +190,10 @@ bool CXmlOpeation::Parse_XML_Test_Assemble(const char* pFileName, _Test_Assemble
 		sprintf_safe(obj_Command_Info.m_szCommandName, MAX_BUFF_50, "%s", (char* )pMainElement->Attribute("CommandName"));
 		obj_Command_Info.m_nCount    = atoi((char* )pMainElement->Attribute("Count"));
 		obj_Command_Info.m_nTimeCost = atoi((char* )pMainElement->Attribute("TimeCost"));
+		if(pMainElement->Attribute("ThreadCount") != NULL)
+		{
+			obj_Command_Info.m_nThreadCount = atoi((char* )pMainElement->Attribute("ThreadCount"));
+		}
 
 		for(pSecondNode = pMainElement->FirstChildElement();pSecondNode;pSecondNode = pSecondNode->NextSiblingElement())
 		{

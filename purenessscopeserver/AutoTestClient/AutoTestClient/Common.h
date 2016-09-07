@@ -527,6 +527,7 @@ struct _Command_Info
 	char m_szCommandName[MAX_BUFF_50];
 	int  m_nCount;
 	int  m_nTimeCost;   //单位是毫秒
+	int  m_nThreadCount; //测试线程数
 	_Packet_Send m_obj_Packet_Send;
 	_Packet_Recv m_obj_Packet_Recv;
 
@@ -535,6 +536,7 @@ struct _Command_Info
 		m_szCommandName[0] = '\0';
 		m_nCount           = 1;
 		m_nTimeCost        = 100;
+		m_nThreadCount     = 1;
 	}
 };
 typedef vector<_Command_Info> vec_Command_Info;

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 
 <PlugIn Name="BoxFrame" desc="test BoxFrame" IP="172.18.48.102" Port="10002" ORDER="NET">
-	<Command CommandName="Login" Count="1" TimeCost="100">
+	<Command CommandName="Login" Count="1" TimeCost="100" ThreadCount="5">
 		<Packet_Send>
 			<short name="PacketLen">68</short>
 			<short name="CommandID">0x1001</short>
