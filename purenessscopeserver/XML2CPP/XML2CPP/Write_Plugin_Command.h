@@ -350,7 +350,7 @@ void Gen_2_Cpp_Command_Cpp(_Project_Info& objProjectInfo, vecClassInfo& objvecCl
 					}
 					else
 					{
-						sprintf_safe(szTemp, 200, "\tblState = Logic_%sm_pServerObject, (pMessage->GetMessageBase()->m_u4ConnectID);\n", 
+						sprintf_safe(szTemp, 200, "\tblState = Logic_%s(m_pServerObject, pMessage->GetMessageBase()->m_u4ConnectID);\n", 
 							objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					}

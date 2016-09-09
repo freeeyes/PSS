@@ -203,9 +203,9 @@ void Gen_2_Cpp_Logic_Cpp(_Project_Info& objProjectInfo, vecClassInfo& objvecClas
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "{\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			sprintf_safe(szTemp, 200, "\tOUR_DEBUG((LM_INFO, \"[Logic_%s]ConnectID=%%d.\\n\", u4ConnectID));\n", 
-				objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			//sprintf_safe(szTemp, 200, "\tOUR_DEBUG((LM_INFO, \"[Logic_%s]ConnectID=%%d.\\n\", u4ConnectID));\n", 
+			//	objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
+			//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "\tif(NULL == pServerObject)\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "\t{\n");
@@ -213,8 +213,22 @@ void Gen_2_Cpp_Logic_Cpp(_Project_Info& objProjectInfo, vecClassInfo& objvecClas
 			sprintf_safe(szTemp, 200, "\t\tOUR_DEBUG((LM_INFO, \"Logic_%s]pServerObject is NULL.\\n\"));\n",
 				objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\t\treturn false;\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "\t}\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\tif(0 == u4ConnectID)\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\t{\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\t\tOUR_DEBUG((LM_INFO, \"Logic_%s]u4ConnectID is 0.\\n\"));\n",
+				objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\t\treturn false;\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\t}\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 			sprintf_safe(szTemp, 200, "\t//add your code at here.\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
