@@ -6,9 +6,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <vector>
-#ifdef WIN32
-#include "ctype.h"
-#endif
+#include <ctype.h>
 
 inline void sprintf_safe(char* szText, int nLen, const char* fmt ...)
 {
