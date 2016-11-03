@@ -212,10 +212,7 @@ public:
 		}
 		else
 		{
-			if(NULL != m_lpTable[nPos].m_pValue)
-			{
-				m_lpTable[nPos].m_pValue = pValue;
-			}
+			m_lpTable[nPos].m_pValue = pValue;
 			m_nUsed++;
 			return nPos;
 		}		
@@ -404,7 +401,7 @@ private:
 		unsigned long uHashB = HashString(lpszString, HASH_B);
 		unsigned long uHashStart = uHash % m_nCount, uHashPos = uHashStart;
 		
-		//printf("[GetHashTablePos]uHashPos=%d,m_nCount=%d,m_cExists=%d.\n", (int)uHashPos, m_nCount, (int)m_lpTable[uHashPos].m_cExists);
+		printf("[GetHashTablePos]uHashPos=%d,m_nCount=%d,m_cExists=%d.\n", (int)uHashPos, m_nCount, (int)m_lpTable[uHashPos].m_cExists);
 		
 		if (m_lpTable[uHashPos].m_cExists == 0)
 		{
@@ -421,6 +418,8 @@ private:
 					sprintf_s(m_lpTable[uHashPos].m_szKey, m_lpTable[uHashPos].m_nKeySize, "%s", lpszString);
 #endif
 				}
+
+				printf("[GetHashTablePos] return uHashPos=%d 1.\n", (int)uHashPos);
 				return (int)uHashPos;
 			}
 			else
@@ -432,11 +431,14 @@ private:
 		else if(m_lpTable[uHashPos].m_uHashA == uHashA && m_lpTable[uHashPos].m_uHashB == uHashB)	
 		{
 			//如果两次hash值相等，则直接返回
+			printf("[GetHashTablePos] return uHashPos=%d 2.\n", (int)uHashPos);
 			return (int)uHashPos;
 		}
 		else
 		{
-			return GetLastClashKey((int)uHashStart, lpszString, uHashA, uHashB, emHashState);
+			int nPos = GetLastClashKey((int)uHashStart, lpszString, uHashA, uHashB, emHashState);
+			printf("[GetHashTablePos] return uHashPos=%d 3.\n", (int)nPos);
+			return nPos;
 		}
 		
 		//printf("[GetHashTablePos]no find.\n");

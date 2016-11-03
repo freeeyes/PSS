@@ -326,7 +326,7 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 		OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 	}
 
-	OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::open] Open(%d) m_pPacketParse=0x%08x.\n", GetConnectID(), m_pPacketParse));
+	OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::open] Open(%d) [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
 
 	if(m_pPacketParse->GetPacketMode() == PACKET_WITHHEAD)
 	{
@@ -347,7 +347,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 	uint32 u4PacketLen = (uint32)result.bytes_transferred();
 	int nTran = (int)result.bytes_transferred();
 
-	//OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::handle_read_stream] Open(%d) m_pPacketParse=0x%08x.\n", GetConnectID(), m_pPacketParse));
+	//OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::handle_read_stream](%d)  bytes_transferred=%d, bytes_to_read=%d.\n", GetConnectID(),  result.bytes_transferred(), result.bytes_to_read()));
 
 	if(!result.success() || result.bytes_transferred() == 0)
 	{
@@ -487,7 +487,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 				//如果超过了最大包长度，为非法数据
 				if(u4PacketBodyLen >= m_u4MaxPacketSize)
 				{
-					OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_read_stream]u4PacketHeadLen(%d) more than %d.\n", u4PacketBodyLen, m_u4MaxPacketSize));
+					OUR_DEBUG((LM_ERROR, "[CProConnectHandle::handle_read_stream]u4PacketHeadLen(%d) more than %d.\n", u4PacketBodyLen, m_u4MaxPacketSize));
 
 					//清理PacketParse
 					ClearPacketParse(mb);
@@ -510,7 +510,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 			if(false == blStateBody)
 			{
 				//如果数据包体非法，断开连接
-				OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_read_stream]SetPacketBody is illegal.\n"));
+				OUR_DEBUG((LM_ERROR, "[CProConnectHandle::handle_read_stream]SetPacketBody is illegal.\n"));
 
 				//清理PacketParse
 				ClearPacketParse(mb);
@@ -590,7 +590,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 				m_pPacketParse = App_PacketParsePool::instance()->Create();
 				if(NULL == m_pPacketParse)
 				{
-					OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::handle_read_stream] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
+					OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::handle_read_stream](%d) m_pPacketParse new error.\n", GetConnectID()));
 
 					//组织数据
 					_MakePacket objMakePacket;
@@ -766,7 +766,7 @@ uint8 CProConnectHandle::GetSendBuffState()
 
 bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, bool blState, uint8 u1SendType, uint32& u4PacketSize, bool blDelete)
 {
-	//OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage]Connectid=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
+	OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage]Connectid=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);	
 	//OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage]Connectid=%d,m_nIOCount=%d 1.\n", GetConnectID(), m_nIOCount));
 
@@ -1015,6 +1015,7 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 		}
 		else
 		{
+			OUR_DEBUG ((LM_ERROR, "[CProConnectHandle::PutSendPacket](%s:%d) Send(%d) OK!\n", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), pMbData->length()));
 			m_u4AllSendCount += 1;
 			m_atvOutput      = ACE_OS::gettimeofday();
 			return true;
@@ -1115,6 +1116,8 @@ bool CProConnectHandle::CheckMessage()
 		{
 			OUR_DEBUG((LM_ERROR, "[CProConnectHandle::CheckMessage] ConnectID = %d, PutMessageBlock is error.\n", GetConnectID()));
 		}
+
+		//OUR_DEBUG((LM_ERROR, "[CProConnectHandle::CheckMessage] ConnectID = %d, put OK.\n", GetConnectID()));
 
 		//清理用完的m_pPacketParse
 		App_PacketParsePool::instance()->Delete(m_pPacketParse);
@@ -1383,6 +1386,8 @@ bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
 	CProConnectHandle* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data(szConnectID);
 	m_ThreadWriteLock.release();
 
+	OUR_DEBUG((LM_ERROR,"[CProConnectManager::SendMessage] (%d) Send Begin 1(0x%08x).\n", u4ConnectID, pConnectHandler));
+
 	uint32 u4CommandSize = pBuffPacket->GetPacketLen();
 
 	if(NULL != pConnectHandler)
@@ -1404,6 +1409,8 @@ bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
 bool CProConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, bool blSendState, bool blDelete)
 {
 	//OUR_DEBUG((LM_ERROR,"[CProConnectManager::PutMessage]BEGIN.\n"));
+	OUR_DEBUG((LM_ERROR,"[CProConnectManager::PutMessage] (%d) Send Begin.\n", u4ConnectID));
+
 	//放入发送队列
 	_SendMessage* pSendMessage = m_SendMessagePool.Create();
 
