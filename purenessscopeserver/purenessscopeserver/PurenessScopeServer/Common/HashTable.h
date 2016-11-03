@@ -359,7 +359,7 @@ private:
 #ifndef WIN32
 								sprintf(m_lpTable[i].m_szKey, "%s", lpszString);
 #else
-								sprintf_s(m_lpTable[uHashPos].m_szKey, m_lpTable[uHashPos].m_nKeySize, "%s", lpszString);
+								sprintf_s(m_lpTable[i].m_szKey, m_lpTable[i].m_nKeySize, "%s", lpszString);
 #endif
 							}	
 							//记录链表信息

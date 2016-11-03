@@ -23,6 +23,7 @@
 #include "ace/Asynch_Acceptor.h"
 #include "ace/Proactor.h"
 
+#include "HashTable.h"
 #include "AceProactorManager.h"
 #include "IConnectManager.h"
 #include "TimerManager.h"
@@ -185,20 +186,19 @@ private:
 	bool IsRun();
 
 private:
-	typedef HASHMAP_PREFIX::hash_map<uint32, CProConnectHandle*> mapConnectManager;
 	typedef vector<uint32> vecConnectManager;
-	mapConnectManager           m_mapConnectManager;     //当前已经存在并且激活的链接map
-	char                        m_szError[MAX_BUFF_500]; //错误信息描述
-	uint32                      m_u4TimeCheckID;         //定时器检查的TimerID
-	ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;       //用于循环监控和断开链接时候的数据锁
-	ACE_Time_Value              m_tvCheckConnect;        //定时器下一次检测链接时间
-	bool                        m_blRun;                 //线程是否在运行
-	CSendMessagePool            m_SendMessagePool;       //发送对象库
-	uint32                      m_u4SendQueuePutTime;    //发送队列入队超时时间
-	uint32                      m_u4TimeConnect;         //单位时间连接建立数
-	uint32                      m_u4TimeDisConnect;      //单位时间连接断开数
-	CCommandAccount             m_CommandAccount;        //当前线程命令统计数据  
-	CSendCacheManager           m_SendCacheManager;      //发送缓冲池  
+	CHashTable<CProConnectHandle>      m_objHashConnectList;    //记录当前已经连接的节点，使用固定内存结构
+	char                               m_szError[MAX_BUFF_500]; //错误信息描述
+	uint32                             m_u4TimeCheckID;         //定时器检查的TimerID
+	ACE_Recursive_Thread_Mutex         m_ThreadWriteLock;       //用于循环监控和断开链接时候的数据锁
+	ACE_Time_Value                     m_tvCheckConnect;        //定时器下一次检测链接时间
+	bool                               m_blRun;                 //线程是否在运行
+	CSendMessagePool                   m_SendMessagePool;       //发送对象库
+	uint32                             m_u4SendQueuePutTime;    //发送队列入队超时时间
+	uint32                             m_u4TimeConnect;         //单位时间连接建立数
+	uint32                             m_u4TimeDisConnect;      //单位时间连接断开数
+	CCommandAccount                    m_CommandAccount;        //当前线程命令统计数据  
+	CSendCacheManager                  m_SendCacheManager;      //发送缓冲池  
 };
 
 //链接ConnectHandler内存池
