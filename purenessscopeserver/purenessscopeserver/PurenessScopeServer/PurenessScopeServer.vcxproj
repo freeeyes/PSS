@@ -331,6 +331,7 @@
     <ClCompile Include="Mail\smtp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Common\HashTable.h" />
     <ClInclude Include="Common\ServerMessageTask.h" />
     <ClInclude Include="Encrypt\Aes.h" />
     <ClInclude Include="IObject\ClientCommand.h" />

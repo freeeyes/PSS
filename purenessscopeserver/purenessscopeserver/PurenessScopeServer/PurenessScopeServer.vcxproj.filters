@@ -632,6 +632,7 @@
       <Filter>IObject</Filter>
     </ClInclude>
     <ClInclude Include="Common\ServerMessageTask.h" />
+    <ClInclude Include="Common\HashTable.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Reactor\My_Dev_Poll_Reactor.inl">
