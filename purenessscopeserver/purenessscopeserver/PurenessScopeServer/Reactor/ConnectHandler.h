@@ -66,6 +66,7 @@ public:
 	bool Close(int nIOCount = 1);                                                                 //关闭当前连接
 	bool ServerClose(EM_Client_Close_status emStatus, uint8 u1OptionEvent = PACKET_SDISCONNECT);  //服务器关闭客户端链接方法
 
+	uint32      GetHandlerID();                                              //得到当前的handlerID
 	const char* GetError();                                                  //得到当前错误信息
 	void        SetConnectID(uint32 u4ConnectID);                            //设置当前链接ID
 	uint32      GetConnectID();                                              //得到当前链接ID
@@ -226,11 +227,10 @@ public:
 	int GetFreeCount();
 
 private:
-	typedef map<CConnectHandler*, CConnectHandler*> mapHandle;
-	mapHandle                   m_mapMessageUsed;                      //已使用的
-	mapHandle                   m_mapMessageFree;                      //没有使用的
+	CHashTable<CConnectHandler> m_objHashHandleList;                   //Hash管理表  
 	ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;                     //控制多线程锁
-	uint32                      m_u4CurrMaxCount;
+	uint32                      m_u4CurrMaxCount;                      //当前池里Handler总数
+	uint32                      m_u4CulationIndex;                     //当前循环到的位置 
 };
 
 //经过思考，想把发送对象分在几个线程内去做，提高性能。在这里尝试一下。(多线程模式，一个线程一个队列，这样保持并发能力)

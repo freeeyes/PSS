@@ -176,11 +176,6 @@ public:
 	//得到数组指定位置的数据
 	T* Get_Index(int nIndex)
 	{
-		if(11 == nIndex)
-		{
-			int a = 1;
-		}
-
 		if(nIndex < 0 || nIndex >= m_nCount - 1)
 		{
 			return NULL;
@@ -207,11 +202,6 @@ public:
 		{
 			//没有找到共享内存
 			return -1;
-		}
-
-		if(strcmp(pKey, "2767") == 0)
-		{
-			int a = 1;
 		}
 		
 		int nPos = GetHashTablePos(pKey, EM_INSERT);
@@ -432,13 +422,6 @@ private:
 		unsigned long uHashB = HashString(lpszString, HASH_B);
 		unsigned long uHashStart = uHash % m_nCount, uHashPos = uHashStart;
 
-		/*
-		if(EM_INSERT == emHashState && strcmp(lpszString, "7723") == 0)
-		{
-			int a = 1;
-		}
-		*/
-		
 		//printf("[GetHashTablePos]uHashPos=%d,m_nCount=%d,m_cExists=%d.\n", (int)uHashPos, m_nCount, (int)m_lpTable[uHashPos].m_cExists);
 		
 		if (m_lpTable[uHashPos].m_cExists == 0)

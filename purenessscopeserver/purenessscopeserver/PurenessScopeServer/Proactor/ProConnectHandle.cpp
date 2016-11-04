@@ -2030,7 +2030,8 @@ void CProConnectHandlerPool::Close()
 		SAFE_DELETE(pHandler);
 	}
 
-	m_u4CurrMaxCount = 1;
+	m_u4CurrMaxCount  = 1;
+	m_u4CulationIndex = 0;
 }
 
 int CProConnectHandlerPool::GetUsedCount()
@@ -2076,7 +2077,7 @@ CProConnectHandle* CProConnectHandlerPool::Create()
 			}
 			else
 			{
-				OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
+				//OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
 			}
 			m_u4CulationIndex = i;
 			return pHandler;
@@ -2121,7 +2122,7 @@ bool CProConnectHandlerPool::Delete(CProConnectHandle* pObject)
 	}
 	else
 	{
-		OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHandlerID, pObject, nPos));
+		//OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHandlerID, pObject, nPos));
 	}
 
 	return true;

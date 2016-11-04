@@ -126,13 +126,13 @@ bool CServerManager::Init()
 	App_PacketParsePool::instance()->Init(MAX_PACKET_PARSE);
 
 	//初始化ConnectHandler对象池
-	if (App_MainConfig::instance()->GetHandleCount() <= 0)
+	if (App_MainConfig::instance()->GetMaxHandlerCount() <= 0)
 	{
 		App_ConnectHandlerPool::instance()->Init(MAX_HANDLE_POOL);
 	}
 	else
 	{
-		App_ConnectHandlerPool::instance()->Init(App_MainConfig::instance()->GetHandleCount());
+		App_ConnectHandlerPool::instance()->Init(App_MainConfig::instance()->GetMaxHandlerCount());
 	}
 
 	//初始化链接管理器
