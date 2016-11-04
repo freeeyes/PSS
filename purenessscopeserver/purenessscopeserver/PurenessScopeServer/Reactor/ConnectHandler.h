@@ -194,7 +194,6 @@ private:
 	void CloseQueue();
 
 private:
-	typedef vector<uint32> vecConnectManager;
 	CHashTable<CConnectHandler>        m_objHashConnectList;    //记录当前已经连接的节点，使用固定内存结构
 	char                               m_szError[MAX_BUFF_500]; //错误信息描述
 	uint32                             m_u4TimeCheckID;         //定时器检查的TimerID

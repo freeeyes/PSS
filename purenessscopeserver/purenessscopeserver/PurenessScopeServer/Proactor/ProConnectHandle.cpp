@@ -60,6 +60,11 @@ void CProConnectHandle::Init(uint16 u2HandlerID)
 	m_emStatus           = CLIENT_CLOSE_NOTHING;
 }
 
+uint32 CProConnectHandle::GetHandlerID()
+{
+	return m_u4HandlerID;
+}
+
 const char* CProConnectHandle::GetError()
 {
 	return m_szError;
@@ -1978,101 +1983,123 @@ void CProConnectHandlerPool::Init(int nObjcetCount)
 {
 	Close();
 
+	//初始化HashTable
+	int nKeySize = 10;
+	size_t nArraySize = (sizeof(_Hash_Table_Cell<CProConnectHandle>) + nKeySize + sizeof(CProConnectHandle* )) * nObjcetCount;
+	char* pHashBase = new char[nArraySize];
+	m_objHashHandleList.Set_Base_Addr(pHashBase, (int)nObjcetCount);
+	m_objHashHandleList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<CProConnectHandle>) * nObjcetCount, 
+																	nKeySize * nObjcetCount, nKeySize);
+	m_objHashHandleList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<CProConnectHandle>) + nKeySize) * nObjcetCount, 
+																	sizeof(CProConnectHandle* ) * nObjcetCount, sizeof(CProConnectHandle* ));
+
 	for(int i = 0; i < nObjcetCount; i++)
 	{
-		CProConnectHandle* pPacket = new CProConnectHandle();
-		if(NULL != pPacket)
+		CProConnectHandle* pHandler = new CProConnectHandle();
+		if(NULL != pHandler)
 		{
-			//添加到Free map里面
-			mapHandle::iterator f = m_mapMessageFree.find(pPacket);
-			if(f == m_mapMessageFree.end())
-			{
-				pPacket->Init(m_u4CurrMaxCount);
-				m_mapMessageFree.insert(mapHandle::value_type(pPacket, pPacket));
-				m_u4CurrMaxCount++;
-			}
+			pHandler->Init(m_u4CurrMaxCount);
+
+			//将ID和Handler指针的关系存入hashTable
+			char szHandlerID[10] = {'\0'};
+			sprintf_safe(szHandlerID, 10, "%d", m_u4CurrMaxCount);
+			m_objHashHandleList.Add_Hash_Data(szHandlerID, pHandler);
+			m_u4CurrMaxCount++;
 		}
 	}
+
+	//检查是否所有的hash表都被填满了
+	for(int i = 0; i < m_objHashHandleList.Get_Count(); i++)
+	{
+		if(NULL == m_objHashHandleList.Get_Index(i))
+		{
+			OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Init]ERROR(%d) is NULL.\n", i));
+		}
+	}
+
+	//用户hash表的查找空余对象
+	m_u4CulationIndex = 0;
 }
 
 void CProConnectHandlerPool::Close()
 {
 	//清理所有已存在的指针
-	mapHandle::iterator itorFreeB = m_mapMessageFree.begin();
-	mapHandle::iterator itorFreeE = m_mapMessageFree.end();
-
-	for(itorFreeB; itorFreeB != itorFreeE; itorFreeB++)
+	for(int i = 0; i < m_objHashHandleList.Get_Count(); i++)
 	{
-		CProConnectHandle* pObject = (CProConnectHandle* )itorFreeB->second;
-		SAFE_DELETE(pObject);
+		CProConnectHandle* pHandler = m_objHashHandleList.Get_Index(i);
+		SAFE_DELETE(pHandler);
 	}
 
-	mapHandle::iterator itorUsedB = m_mapMessageUsed.begin();
-	mapHandle::iterator itorUsedE = m_mapMessageUsed.end();
-
-	for(itorUsedB; itorUsedB != itorUsedE; itorUsedB++)
-	{
-		CProConnectHandle* pPacket = (CProConnectHandle* )itorUsedB->second;
-		SAFE_DELETE(pPacket);
-	}
-
-	m_u4CurrMaxCount = 0;
-	m_mapMessageFree.clear();
-	m_mapMessageUsed.clear();
+	m_u4CurrMaxCount = 1;
 }
 
 int CProConnectHandlerPool::GetUsedCount()
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	return (int)m_mapMessageUsed.size();
+	return m_objHashHandleList.Get_Count() - m_objHashHandleList.Get_Used_Count();
 }
 
 int CProConnectHandlerPool::GetFreeCount()
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	return (int)m_mapMessageFree.size();
+	return (int)m_objHashHandleList.Get_Used_Count();
 }
 
 CProConnectHandle* CProConnectHandlerPool::Create()
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	//如果free池中已经没有了，则添加到free池中。
-	if(m_mapMessageFree.size() <= 0)
-	{
-		CProConnectHandle* pPacket = new CProConnectHandle();
+	CProConnectHandle* pHandler = NULL;
 
-		if(pPacket != NULL)
+	//在Hash表中弹出一个已使用的数据
+	//判断循环指针是否已经找到了尽头，如果是则从0开始继续
+	if(m_u4CulationIndex + 1 >= m_u4CurrMaxCount - 1)
+	{
+		m_u4CulationIndex = 0;
+	}
+
+	//第一次寻找，从当前位置往后找
+	for(int i = (int)m_u4CulationIndex; i < m_objHashHandleList.Get_Count(); i++)
+	{
+		pHandler = m_objHashHandleList.Get_Index(i);
+		if(NULL != pHandler)
 		{
-			//添加到Free map里面
-			mapHandle::iterator f = m_mapMessageFree.find(pPacket);
-			if(f == m_mapMessageFree.end())
+			//已经找到了，返回指针
+			char szHandlerID[10] = {'\0'};
+			sprintf_safe(szHandlerID, 10, "%d", pHandler->GetHandlerID());
+			int nDelPos = m_objHashHandleList.Del_Hash_Data(szHandlerID);
+			if(-1 == nDelPos)
 			{
-				pPacket->Init(m_u4CurrMaxCount);
-				m_mapMessageFree.insert(mapHandle::value_type(pPacket, pPacket));
-				m_u4CurrMaxCount++;
+				OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
 			}
-		}
-		else
-		{
-			return NULL;
+			else
+			{
+				OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
+			}
+			m_u4CulationIndex = i;
+			return pHandler;
 		}
 	}
 
-	//从free池中拿出一个,放入到used池中
-	mapHandle::iterator itorFreeB = m_mapMessageFree.begin();
-	CProConnectHandle* pPacket = (CProConnectHandle* )itorFreeB->second;
-	m_mapMessageFree.erase(itorFreeB);
-	//添加到used map里面
-	mapHandle::iterator f = m_mapMessageUsed.find(pPacket);
-	if(f == m_mapMessageUsed.end())
+	//第二次寻找，从0到当前位置
+	for(int i = 0; i < (int)m_u4CulationIndex; i++)
 	{
-		m_mapMessageUsed.insert(mapHandle::value_type(pPacket, pPacket));
+		pHandler = m_objHashHandleList.Get_Index(i);
+		if(NULL != pHandler)
+		{
+			//已经找到了，返回指针
+			char szHandlerID[10] = {'\0'};
+			sprintf_safe(szHandlerID, 10, "%d", pHandler->GetHandlerID());
+			m_objHashHandleList.Del_Hash_Data(szHandlerID);
+			m_u4CulationIndex = i;
+			return pHandler;
+		}
 	}
 
-	return (CProConnectHandle* )pPacket;
+	//没找到空余的
+	return pHandler;
 }
 
 bool CProConnectHandlerPool::Delete(CProConnectHandle* pObject)
@@ -2084,17 +2111,17 @@ bool CProConnectHandlerPool::Delete(CProConnectHandle* pObject)
 		return false;
 	}
 
-	mapHandle::iterator f = m_mapMessageUsed.find(pObject);
-	if(f != m_mapMessageUsed.end())
+	char szHandlerID[10] = {'\0'};
+	sprintf_safe(szHandlerID, 10, "%d", pObject->GetHandlerID());
+	int nPos = m_objHashHandleList.Add_Hash_Data(szHandlerID, pObject);
+	if(-1 == nPos)
 	{
-		m_mapMessageUsed.erase(f);
-
-		//添加到Free map里面
-		mapHandle::iterator f = m_mapMessageFree.find(pObject);
-		if(f == m_mapMessageFree.end())
-		{
-			m_mapMessageFree.insert(mapHandle::value_type(pObject, pObject));
-		}
+		OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHandlerID, pObject, nPos));
+		m_objHashHandleList.Add_Hash_Data(szHandlerID, pObject);
+	}
+	else
+	{
+		OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHandlerID, pObject, nPos));
 	}
 
 	return true;

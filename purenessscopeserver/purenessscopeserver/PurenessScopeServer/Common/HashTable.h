@@ -60,8 +60,8 @@ struct _Hash_Table_Cell
 		m_cExists       = 0;
 		m_uHashA        = 0;
 		m_uHashB        = 0;
-		m_nNextKeyIndex = -1;
-		m_nProvKeyIndex = -1;		
+		//m_nNextKeyIndex = -1;
+		//m_nProvKeyIndex = -1;		
 		if(NULL != m_szKey)	
 		{
 			memset(m_szKey, 0, m_nKeySize);		
@@ -176,7 +176,12 @@ public:
 	//得到数组指定位置的数据
 	T* Get_Index(int nIndex)
 	{
-		if(nIndex < 0 || nIndex >= m_nCount)
+		if(11 == nIndex)
+		{
+			int a = 1;
+		}
+
+		if(nIndex < 0 || nIndex >= m_nCount - 1)
 		{
 			return NULL;
 		}
@@ -202,6 +207,11 @@ public:
 		{
 			//没有找到共享内存
 			return -1;
+		}
+
+		if(strcmp(pKey, "2767") == 0)
+		{
+			int a = 1;
 		}
 		
 		int nPos = GetHashTablePos(pKey, EM_INSERT);
@@ -372,6 +382,27 @@ private:
 			}
 			else
 			{
+				//查看当前节点是否已经被释放
+				if(emHashState == EM_INSERT)
+				{
+					if(m_lpTable[nStartIndex].m_cExists == 0)
+					{
+						m_lpTable[nStartIndex].m_cExists = 1;
+						m_lpTable[nStartIndex].m_uHashA  = uHashA;
+						m_lpTable[nStartIndex].m_uHashB  = uHashB;
+						if(NULL != m_lpTable[nStartIndex].m_szKey)
+						{
+#ifndef WIN32
+							sprintf(m_lpTable[nStartIndex].m_szKey, "%s", lpszString);
+#else
+							sprintf_s(m_lpTable[nStartIndex].m_szKey, m_lpTable[nStartIndex].m_nKeySize, "%s", lpszString);
+#endif
+						}	
+
+						return nStartIndex;
+					}
+				}
+
 				//继续寻找
 				if(uHashA == m_lpTable[nStartIndex].m_uHashA && uHashB == m_lpTable[nStartIndex].m_uHashB)
 				{
@@ -400,8 +431,15 @@ private:
 		unsigned long uHashA = HashString(lpszString, HASH_A);
 		unsigned long uHashB = HashString(lpszString, HASH_B);
 		unsigned long uHashStart = uHash % m_nCount, uHashPos = uHashStart;
+
+		/*
+		if(EM_INSERT == emHashState && strcmp(lpszString, "7723") == 0)
+		{
+			int a = 1;
+		}
+		*/
 		
-		printf("[GetHashTablePos]uHashPos=%d,m_nCount=%d,m_cExists=%d.\n", (int)uHashPos, m_nCount, (int)m_lpTable[uHashPos].m_cExists);
+		//printf("[GetHashTablePos]uHashPos=%d,m_nCount=%d,m_cExists=%d.\n", (int)uHashPos, m_nCount, (int)m_lpTable[uHashPos].m_cExists);
 		
 		if (m_lpTable[uHashPos].m_cExists == 0)
 		{
@@ -419,25 +457,25 @@ private:
 #endif
 				}
 
-				printf("[GetHashTablePos] return uHashPos=%d 1.\n", (int)uHashPos);
+				//printf("[GetHashTablePos] return uHashPos=%d 1.\n", (int)uHashPos);
 				return (int)uHashPos;
 			}
 			else
 			{
-				return (int)-1;
+				return  GetLastClashKey((int)uHashStart, lpszString, uHashA, uHashB, emHashState);
 			}
 					
 		}
 		else if(m_lpTable[uHashPos].m_uHashA == uHashA && m_lpTable[uHashPos].m_uHashB == uHashB)	
 		{
 			//如果两次hash值相等，则直接返回
-			printf("[GetHashTablePos] return uHashPos=%d 2.\n", (int)uHashPos);
+			//printf("[GetHashTablePos] return uHashPos=%d 2.\n", (int)uHashPos);
 			return (int)uHashPos;
 		}
 		else
 		{
 			int nPos = GetLastClashKey((int)uHashStart, lpszString, uHashA, uHashB, emHashState);
-			printf("[GetHashTablePos] return uHashPos=%d 3.\n", (int)nPos);
+			//printf("[GetHashTablePos]key=%s (%d) -> (%d)  .\n", lpszString, uHashStart, nPos);
 			return nPos;
 		}
 		
@@ -454,6 +492,7 @@ private:
 		}
 		else
 		{
+			/*
 			if(-1 != m_lpTable[nPos].m_nProvKeyIndex)
 			{
 				m_lpTable[m_lpTable[nPos].m_nProvKeyIndex].m_nNextKeyIndex = m_lpTable[nPos].m_nNextKeyIndex;
@@ -463,6 +502,8 @@ private:
 			{
 				m_lpTable[m_lpTable[nPos].m_nNextKeyIndex].m_nProvKeyIndex = m_lpTable[nPos].m_nProvKeyIndex;
 			}
+			*/
+
 			m_lpTable[nPos].Clear();
 			if(m_nUsed >= 1)
 			{

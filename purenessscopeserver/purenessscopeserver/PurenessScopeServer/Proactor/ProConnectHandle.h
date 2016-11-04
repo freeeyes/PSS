@@ -61,6 +61,7 @@ public:
 	bool ServerClose(EM_Client_Close_status emStatus);                        //服务器关闭客户端链接的函数
 	void SetLocalIPInfo(const char* pLocalIP, uint32 u4LocalPort);            //设置监听IP和端口信息 
 
+	uint32             GetHandlerID();                                        //得到当前初始化的HanddlerID 
 	const char*        GetError();                                            //得到当前链接错误信息
 	void               SetConnectID(uint32 u4ConnectID);                      //设置当前链接的ID
 	uint32             GetConnectID();                                        //获得当前链接的ID
@@ -186,7 +187,6 @@ private:
 	bool IsRun();
 
 private:
-	typedef vector<uint32> vecConnectManager;
 	CHashTable<CProConnectHandle>      m_objHashConnectList;    //记录当前已经连接的节点，使用固定内存结构
 	char                               m_szError[MAX_BUFF_500]; //错误信息描述
 	uint32                             m_u4TimeCheckID;         //定时器检查的TimerID
@@ -218,11 +218,10 @@ public:
 	int GetFreeCount();
 
 private:
-	typedef map<CProConnectHandle*, CProConnectHandle*> mapHandle;
-	mapHandle                   m_mapMessageUsed;                      //已使用的
-	mapHandle                   m_mapMessageFree;                      //没有使用的
-	ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;                     //控制多线程锁
-	uint32                      m_u4CurrMaxCount;
+	ACE_Recursive_Thread_Mutex    m_ThreadWriteLock;                     //控制多线程锁
+	CHashTable<CProConnectHandle> m_objHashHandleList;                   //Hash管理表  
+	uint32                        m_u4CurrMaxCount;                      //当前池里Handler总数
+	uint32                        m_u4CulationIndex;                     //当前循环到的位置 
 };
 
 //经过思考，想把发送对象分在几个线程内去做，提高性能。在这里尝试一下。(多线程模式，一个线程一个队列，这样保持并发能力)
