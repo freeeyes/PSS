@@ -31,6 +31,7 @@ CConnectHandler::CConnectHandler(void)
 	m_u8SendQueueTimeCost = 0;
 	m_u4ReadSendSize      = 0;
 	m_u4SuccessSendSize   = 0;
+	m_nHashID             = 0;
 	m_u8SendQueueTimeout  = MAX_QUEUE_TIMEOUT * 1000 * 1000;  //目前因为记录的是纳秒
 	m_u8RecvQueueTimeout  = MAX_QUEUE_TIMEOUT * 1000 * 1000;  //目前因为记录的是纳秒
 	m_u2TcpNodelay        = TCP_NODELAY_ON;
@@ -1784,6 +1785,16 @@ bool CConnectHandler::GetIsLog()
 	return m_blIsLog;
 }
 
+void CConnectHandler::SetHashID(int nHashID)
+{
+	m_nHashID = nHashID;
+}
+
+int CConnectHandler::GetHashID()
+{
+	return m_nHashID;
+}
+
 void CConnectHandler::SetLocalIPInfo(const char* pLocalIP, uint32 u4LocalPort)
 {
 	sprintf_safe(m_szLocalIP, MAX_BUFF_50, "%s", pLocalIP);
@@ -2746,7 +2757,8 @@ CConnectHandler* CConnectHandlerPool::Create()
 			//已经找到了，返回指针
 			char szHandlerID[10] = {'\0'};
 			sprintf_safe(szHandlerID, 10, "%d", pHandler->GetHandlerID());
-			int nDelPos = m_objHashHandleList.Del_Hash_Data(szHandlerID);
+			//int nDelPos = m_objHashHandleList.Del_Hash_Data(szHandlerID);
+			int nDelPos = m_objHashHandleList.Set_Index_Clear(i);
 			if(-1 == nDelPos)
 			{
 				OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
@@ -2790,7 +2802,8 @@ bool CConnectHandlerPool::Delete(CConnectHandler* pObject)
 
 	char szHandlerID[10] = {'\0'};
 	sprintf_safe(szHandlerID, 10, "%d", pObject->GetHandlerID());
-	int nPos = m_objHashHandleList.Add_Hash_Data(szHandlerID, pObject);
+	//int nPos = m_objHashHandleList.Add_Hash_Data(szHandlerID, pObject);
+	int nPos = m_objHashHandleList.Set_Index(pObject->GetHashID(), szHandlerID, pObject);
 	if(-1 == nPos)
 	{
 		OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHandlerID, pObject, nPos));

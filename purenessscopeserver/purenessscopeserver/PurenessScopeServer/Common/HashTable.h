@@ -220,7 +220,7 @@ public:
 	//设置指定hash表中位置的数值
 	int Set_Index(int nIndex, char* lpszString, T* pT)
 	{
-		const int HASH_OFFSET = 0, HASH_A = 1, HASH_B = 2;
+		const int HASH_A = 1, HASH_B = 2;
 		if(nIndex < 0 || nIndex > m_nCount - 1)
 		{
 			return -1;
@@ -401,11 +401,6 @@ private:
 					for(int i = 0; i <= nStartIndex - 1; i++)
 					{
 						//记录链表信息
-						if(nStartIndex == 2 && i == 1)
-						{
-							int a = 1;
-						}
-
 						if(m_lpTable[i].m_cExists == 0)
 						{
 							m_lpTable[i].m_cExists = 1;

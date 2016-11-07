@@ -80,6 +80,8 @@ public:
 	char* GetConnectName();                                                  //得到别名
 	void SetIsLog(bool blIsLog);                                             //设置当前连接数据是否写入日志 
 	bool GetIsLog();                                                         //获得当前连接是否可以写入日志 
+	void SetHashID(int nHashID);                                             //设置Hash数组下标
+	int  GetHashID();                                                        //得到Hash数组下标
 	void SetSendCacheManager(CSendCacheManager* pSendCacheManager);
 
 private:
@@ -126,6 +128,7 @@ private:
 	int                        m_nBlockCount;                  //发生阻塞的次数
 	int                        m_nBlockMaxCount;               //阻塞允许发生的最大次数
 	int                        m_nBlockSize;                   //阻塞发生时缓冲区的大小
+	int                        m_nHashID;                      //对应的Pool的Hash数组下标
 
 	uint32                     m_u4ReadSendSize;               //准备发送的字节数（水位标）
 	uint32                     m_u4SuccessSendSize;            //实际客户端接收到的总字节数（水位标）
