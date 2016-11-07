@@ -46,6 +46,9 @@ public:
 	void SetBuffID(uint32 u4BuffID);            //设置BuffID
 	uint32 GetBuffID();                         //得到BuffID 
 
+	int GetHashID();                            //设置HashID
+	void SetHashID(int nHashID);                //得到HashID  
+
 private:
 	bool AddBuff(uint32 u4Size);
 	void ReadPtr(uint32 u4Size);
@@ -94,6 +97,7 @@ private:
 	uint32                    m_u4PacketLen;       //包总长度
 	uint32                    m_u4PacketCount;     //当前数据包的个数
 	bool                      m_blNetSort;         //字节序开启开关，false为不转换为主机字节序，true为转换为主机字节序
+	int                       m_nHashID;           //记录当前对象在Hash数组中的位置
 
 	uint32                    m_u4BuffID;          //Buffer对象名字，用于核对内存池数据使用，寻找内存泄露。
 

@@ -176,7 +176,7 @@ public:
 	//得到数组指定位置的数据
 	T* Get_Index(int nIndex)
 	{
-		if(nIndex < 0 || nIndex >= m_nCount - 1)
+		if(nIndex < 0 || nIndex > m_nCount - 1)
 		{
 			return NULL;
 		}
@@ -192,6 +192,60 @@ public:
 				//数据已经无效
 				return NULL;
 			}
+		}
+	}
+
+	int Set_Index_Clear(int nIndex)
+	{
+		if(nIndex < 0 || nIndex > m_nCount - 1)
+		{
+			return -1;
+		}
+
+		if(m_lpTable[nIndex].m_cExists == 0)
+		{
+			return -1;
+		}
+		else
+		{
+			m_lpTable[nIndex].Clear();
+			if(m_nUsed >= 1)
+			{
+				m_nUsed--;
+			}
+			return nIndex;
+		}
+	}
+
+	//设置指定hash表中位置的数值
+	int Set_Index(int nIndex, char* lpszString, T* pT)
+	{
+		const int HASH_OFFSET = 0, HASH_A = 1, HASH_B = 2;
+		if(nIndex < 0 || nIndex > m_nCount - 1)
+		{
+			return -1;
+		}
+
+		if(m_lpTable[nIndex].m_cExists == 1)
+		{
+			return -1;
+		}
+		else
+		{
+			m_lpTable[nIndex].m_cExists = 1;
+			if(NULL != m_lpTable[nIndex].m_szKey)
+			{
+#ifndef WIN32
+				sprintf(m_lpTable[nIndex].m_szKey, "%s", lpszString);
+#else
+				sprintf_s(m_lpTable[nIndex].m_szKey, m_lpTable[nIndex].m_nKeySize, "%s", lpszString);
+#endif
+			}
+			m_lpTable[nIndex].m_uHashA = HashString(lpszString, HASH_A);
+			m_lpTable[nIndex].m_uHashB = HashString(lpszString, HASH_B);
+			m_lpTable[nIndex].m_pValue = pT;
+			m_nUsed++;
+			return nIndex;
 		}
 	}
 	
@@ -320,7 +374,7 @@ private:
 					//找到了链表末尾
 					//开始寻找空余的位置
 					//向后找空余
-					for(int i = nStartIndex + 1; i < m_nCount; i++)
+					for(int i = nStartIndex; i < m_nCount; i++)
 					{
 						if(m_lpTable[i].m_cExists == 0)
 						{
@@ -346,6 +400,12 @@ private:
 					//向前找空余
 					for(int i = 0; i <= nStartIndex - 1; i++)
 					{
+						//记录链表信息
+						if(nStartIndex == 2 && i == 1)
+						{
+							int a = 1;
+						}
+
 						if(m_lpTable[i].m_cExists == 0)
 						{
 							m_lpTable[i].m_cExists = 1;
@@ -359,7 +419,7 @@ private:
 								sprintf_s(m_lpTable[i].m_szKey, m_lpTable[i].m_nKeySize, "%s", lpszString);
 #endif
 							}	
-							//记录链表信息
+
 							m_lpTable[nStartIndex].m_nNextKeyIndex = i;
 							m_lpTable[i].m_nProvKeyIndex           = nStartIndex;
 							//printf("[GetLastClashKey](%s) <--prov(%d) next(%d)-->.\n", lpszString, nStartIndex, i);
@@ -471,22 +531,11 @@ private:
 		int nPos = GetHashTablePos(lpszString, EM_SELECT);
 		if(-1 == nPos)
 		{
+			 GetHashTablePos(lpszString, EM_SELECT);
 			return -1;
 		}
 		else
 		{
-			/*
-			if(-1 != m_lpTable[nPos].m_nProvKeyIndex)
-			{
-				m_lpTable[m_lpTable[nPos].m_nProvKeyIndex].m_nNextKeyIndex = m_lpTable[nPos].m_nNextKeyIndex;
-			}
-			
-			if(-1 != m_lpTable[nPos].m_nNextKeyIndex)
-			{
-				m_lpTable[m_lpTable[nPos].m_nNextKeyIndex].m_nProvKeyIndex = m_lpTable[nPos].m_nProvKeyIndex;
-			}
-			*/
-
 			m_lpTable[nPos].Clear();
 			if(m_nUsed >= 1)
 			{

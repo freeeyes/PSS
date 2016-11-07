@@ -36,6 +36,7 @@ bool CBuffPacket::Init(int nSize)
 		m_u4ReadPtr       = 0;
 		m_u4WritePtr      = 0;
 		m_u4PacketCount   = 0;
+		m_nHashID         = 0;
 		m_u4PacketLen     = ((int)ceil((double)nSize/(double)DEFINE_PACKET_ADD))*DEFINE_PACKET_ADD;
 
 		m_szData          = (char *)App_ACEMemory::instance()->malloc(m_u4PacketLen);
@@ -101,7 +102,6 @@ bool CBuffPacket::Clear()
 	m_u4ReadPtr       = 0;
 	m_u4WritePtr      = 0;
 	m_u4PacketCount   = 0;
-	m_u4BuffID        = 0;
 
 	m_blNetSort       = false;
 
@@ -1182,4 +1182,15 @@ uint32 CBuffPacket::GetBuffID()
 {
 	return m_u4BuffID;
 }
+
+void CBuffPacket::SetHashID(int nHashID)
+{
+	m_nHashID = nHashID;
+}
+
+int CBuffPacket::GetHashID()
+{
+	return m_nHashID;
+}
+
 

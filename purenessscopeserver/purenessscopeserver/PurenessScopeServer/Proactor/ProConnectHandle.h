@@ -74,6 +74,8 @@ public:
 	char*              GetConnectName();                                      //得到别名
 	void               SetIsLog(bool blIsLog);                                //设置当前连接数据是否写入日志 
 	bool               GetIsLog();                                            //得到是否可以写日志
+	void               SetHashID(uint32 u4HashID);                            //设置HashID
+	uint32             GetHashID();                                           //得到当前HashID
 
 	bool SetRecvQueueTimeCost(uint32 u4TimeCost);                             //记录当前接收数据到模块处理完成的具体时间消耗
 	bool SetSendQueueTimeCost(uint32 u4TimeCost);                             //记录当前从发送队列到数据发送完成的具体时间消耗
@@ -120,6 +122,7 @@ private:
 	char               m_szConnectName[MAX_BUFF_100];  //连接名称，可以开放给逻辑插件去设置
 	bool               m_blIsLog;                      //是否写入日志，false为不写入，true为写入
 	uint8              m_u1IsActive;                   //连接是否为激活状态，0为否，1为是 
+	uint32             m_u4HashID;                     //对应Hash列表中的ID
 
 
 	char               m_szLocalIP[MAX_BUFF_50];       //本地监听IP
@@ -158,7 +161,7 @@ public:
 
 	void CloseAll();                                                                                         //关闭所有链接信息 
 	bool AddConnect(uint32 u4ConnectID, CProConnectHandle* pConnectHandler);                                 //添加一个新的链接信息
-	bool SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint16 u2CommandID, bool blSendState, uint8 u1SendType, ACE_Time_Value& tvSendBegin, bool blDelete);               //发送数据
+	bool SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint16 u2CommandID, bool blSendState, uint8 u1SendType, ACE_Time_Value& tvSendBegin, bool blDelete);             //发送数据
 	bool PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, bool blSendState = true, bool blDelete = true);    //异步发送
 	bool PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, bool blSendState = true, bool blDelete = true);                     //异步群发
 	bool Close(uint32 u4ConnectID);                                                                          //客户端关闭

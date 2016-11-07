@@ -29,6 +29,7 @@ CProConnectHandle::CProConnectHandle(void)
 	m_u2TcpNodelay        = TCP_NODELAY_ON;
 	m_emStatus            = CLIENT_CLOSE_NOTHING;
 	m_u4SendMaxBuffSize   = 5*1024;
+	m_u4HashID            = 0;
 }
 
 CProConnectHandle::~CProConnectHandle(void)
@@ -1223,6 +1224,16 @@ bool CProConnectHandle::GetIsLog()
 	return m_blIsLog;
 }
 
+void CProConnectHandle::SetHashID(uint32 u4HashID)
+{
+	m_u4HashID = u4HashID;
+}
+
+uint32 CProConnectHandle::GetHashID()
+{
+	return m_u4HashID;
+}
+
 void CProConnectHandle::SetLocalIPInfo(const char* pLocalIP, uint32 u4LocalPort)
 {
 	sprintf_safe(m_szLocalIP, MAX_BUFF_50, "%s", pLocalIP);
@@ -2003,7 +2014,11 @@ void CProConnectHandlerPool::Init(int nObjcetCount)
 			//将ID和Handler指针的关系存入hashTable
 			char szHandlerID[10] = {'\0'};
 			sprintf_safe(szHandlerID, 10, "%d", m_u4CurrMaxCount);
-			m_objHashHandleList.Add_Hash_Data(szHandlerID, pHandler);
+			int nHashPos = m_objHashHandleList.Add_Hash_Data(szHandlerID, pHandler);
+			if(-1 != nHashPos)
+			{
+				pHandler->SetHashID((uint32)nHashPos);
+			}
 			m_u4CurrMaxCount++;
 		}
 	}
@@ -2070,14 +2085,15 @@ CProConnectHandle* CProConnectHandlerPool::Create()
 			//已经找到了，返回指针
 			char szHandlerID[10] = {'\0'};
 			sprintf_safe(szHandlerID, 10, "%d", pHandler->GetHandlerID());
-			int nDelPos = m_objHashHandleList.Del_Hash_Data(szHandlerID);
+			//int nDelPos = m_objHashHandleList.Del_Hash_Data(szHandlerID);
+			int nDelPos = m_objHashHandleList.Set_Index_Clear(i);
 			if(-1 == nDelPos)
 			{
 				OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
 			}
 			else
 			{
-				//OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
+				OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
 			}
 			m_u4CulationIndex = i;
 			return pHandler;
@@ -2114,15 +2130,17 @@ bool CProConnectHandlerPool::Delete(CProConnectHandle* pObject)
 
 	char szHandlerID[10] = {'\0'};
 	sprintf_safe(szHandlerID, 10, "%d", pObject->GetHandlerID());
-	int nPos = m_objHashHandleList.Add_Hash_Data(szHandlerID, pObject);
+	//int nPos = m_objHashHandleList.Add_Hash_Data(szHandlerID, pObject);
+	//这里因为内存是固定的，直接写会Hash原有位置
+	int nPos = m_objHashHandleList.Set_Index((int)pObject->GetHashID(), szHandlerID, pObject);
 	if(-1 == nPos)
 	{
 		OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHandlerID, pObject, nPos));
-		m_objHashHandleList.Add_Hash_Data(szHandlerID, pObject);
+		//m_objHashHandleList.Add_Hash_Data(szHandlerID, pObject);
 	}
 	else
 	{
-		//OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHandlerID, pObject, nPos));
+		OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHandlerID, pObject, nPos));
 	}
 
 	return true;

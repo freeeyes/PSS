@@ -2794,7 +2794,6 @@ bool CConnectHandlerPool::Delete(CConnectHandler* pObject)
 	if(-1 == nPos)
 	{
 		OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHandlerID, pObject, nPos));
-		m_objHashHandleList.Add_Hash_Data(szHandlerID, pObject);
 	}
 	else
 	{

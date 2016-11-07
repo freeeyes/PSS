@@ -6,7 +6,7 @@
 //这里感谢freebird的测试客户端，正是因为它，我才能发现了这个问题。不要让关注你的人失望，这是必须的。
 //2010-06-03 freeeyes
 
-#include <map>
+#include "HashTable.h"
 #include "IPacketManager.h"
 #include "BuffPacket.h"
 
@@ -24,14 +24,13 @@ public:
 	uint32 GetBuffPacketUsedCount();
 	uint32 GetBuffPacketFreeCount();
 
-	IBuffPacket* Create(uint32 u4BuffID = 0);
+	IBuffPacket* Create();
 	bool Delete(IBuffPacket* pBuffPacket);
 
 private:
-	typedef map<CBuffPacket*, CBuffPacket*> mapPacket;
-	mapPacket                  m_mapPacketUsed;                       //已使用的
-	mapPacket                  m_mapPacketFree;                       //没有使用的
+	CHashTable<CBuffPacket>    m_objHashBuffPacketList;               //存储空闲BuffPacket指针的hash列表
 	bool                       m_blSortType;                          //字序规则，true为网序，false为主机序
+	uint32                     m_u4CulationIndex;                     //查找起始点
 	ACE_Recursive_Thread_Mutex m_ThreadWriteLock;
 };
 
