@@ -74,8 +74,8 @@ public:
 	char*              GetConnectName();                                      //得到别名
 	void               SetIsLog(bool blIsLog);                                //设置当前连接数据是否写入日志 
 	bool               GetIsLog();                                            //得到是否可以写日志
-	void               SetHashID(uint32 u4HashID);                            //设置HashID
-	uint32             GetHashID();                                           //得到当前HashID
+	void               SetHashID(int nHashID);                                //设置HashID
+	int                GetHashID();                                           //得到当前HashID
 
 	bool SetRecvQueueTimeCost(uint32 u4TimeCost);                             //记录当前接收数据到模块处理完成的具体时间消耗
 	bool SetSendQueueTimeCost(uint32 u4TimeCost);                             //记录当前从发送队列到数据发送完成的具体时间消耗
@@ -122,7 +122,7 @@ private:
 	char               m_szConnectName[MAX_BUFF_100];  //连接名称，可以开放给逻辑插件去设置
 	bool               m_blIsLog;                      //是否写入日志，false为不写入，true为写入
 	uint8              m_u1IsActive;                   //连接是否为激活状态，0为否，1为是 
-	uint32             m_u4HashID;                     //对应Hash列表中的ID
+	int                m_nHashID;                      //对应Hash列表中的ID
 
 
 	char               m_szLocalIP[MAX_BUFF_50];       //本地监听IP

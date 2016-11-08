@@ -29,7 +29,7 @@ CProConnectHandle::CProConnectHandle(void)
 	m_u2TcpNodelay        = TCP_NODELAY_ON;
 	m_emStatus            = CLIENT_CLOSE_NOTHING;
 	m_u4SendMaxBuffSize   = 5*1024;
-	m_u4HashID            = 0;
+	m_nHashID             = 0;
 }
 
 CProConnectHandle::~CProConnectHandle(void)
@@ -1224,14 +1224,14 @@ bool CProConnectHandle::GetIsLog()
 	return m_blIsLog;
 }
 
-void CProConnectHandle::SetHashID(uint32 u4HashID)
+void CProConnectHandle::SetHashID(int nHashID)
 {
-	m_u4HashID = u4HashID;
+	m_nHashID = nHashID;
 }
 
-uint32 CProConnectHandle::GetHashID()
+int CProConnectHandle::GetHashID()
 {
-	return m_u4HashID;
+	return m_nHashID;
 }
 
 void CProConnectHandle::SetLocalIPInfo(const char* pLocalIP, uint32 u4LocalPort)
@@ -2017,7 +2017,7 @@ void CProConnectHandlerPool::Init(int nObjcetCount)
 			int nHashPos = m_objHashHandleList.Add_Hash_Data(szHandlerID, pHandler);
 			if(-1 != nHashPos)
 			{
-				pHandler->SetHashID((uint32)nHashPos);
+				pHandler->SetHashID(nHashPos);
 			}
 			m_u4CurrMaxCount++;
 		}
@@ -2132,7 +2132,7 @@ bool CProConnectHandlerPool::Delete(CProConnectHandle* pObject)
 	sprintf_safe(szHandlerID, 10, "%d", pObject->GetHandlerID());
 	//int nPos = m_objHashHandleList.Add_Hash_Data(szHandlerID, pObject);
 	//这里因为内存是固定的，直接写会Hash原有位置
-	int nPos = m_objHashHandleList.Set_Index((int)pObject->GetHashID(), szHandlerID, pObject);
+	int nPos = m_objHashHandleList.Set_Index(pObject->GetHashID(), szHandlerID, pObject);
 	if(-1 == nPos)
 	{
 		OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHandlerID, pObject, nPos));
