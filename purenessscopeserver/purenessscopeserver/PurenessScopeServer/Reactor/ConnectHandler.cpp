@@ -2008,7 +2008,7 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
 	{
 		uint32 u4PacketSize = 0;
         //OUR_DEBUG((LM_ERROR, "[CConnectManager::SendMessage]ConnectID=%d Begin 1 pConnectHandler.\n", u4ConnectID));
-		pConnectHandler->SendMessage(u4ConnectID, pBuffPacket, blSendState, u1SendType, u4PacketSize, blDelete);
+		pConnectHandler->SendMessage(u2CommandID, pBuffPacket, blSendState, u1SendType, u4PacketSize, blDelete);
         //OUR_DEBUG((LM_ERROR, "[CConnectManager::SendMessage]ConnectID=%d End 1 pConnectHandler.\n", u4ConnectID));
 		//记录消息发送消耗时间
 		ACE_Time_Value tvInterval = ACE_OS::gettimeofday() - tvSendBegin;

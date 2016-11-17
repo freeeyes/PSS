@@ -1409,7 +1409,7 @@ bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
 	if(NULL != pConnectHandler)
 	{
 		uint32 u4PacketSize  = 0;
-		pConnectHandler->SendMessage(u4ConnectID, pBuffPacket, blSendState, u1SendType, u4PacketSize, blDelete);
+		pConnectHandler->SendMessage(u2CommandID, pBuffPacket, blSendState, u1SendType, u4PacketSize, blDelete);
 		m_CommandAccount.SaveCommandData(u2CommandID, (uint64)0, PACKET_TCP, u4PacketSize, u4CommandSize, COMMAND_TYPE_OUT);
 		return true;
 	}
