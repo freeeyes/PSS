@@ -18,6 +18,7 @@
 #include "PacketParsePool.h"
 #include "MessageService.h"
 #include "ProfileTime.h"
+#include "HashTable.h"
 
 #include <map>
 
@@ -32,12 +33,15 @@ struct _MakePacket
 	ACE_INET_Addr  m_AddrRemote;     //数据包的来源IP信息
 	ACE_INET_Addr  m_AddrListen;     //数据包来源监听IP信息 
 
+	int            m_nHashID;        //对应记录hash的ID
+
 	_MakePacket()
 	{
 		m_PacketType        = PACKET_TCP;  //0为TCP,1是UDP 默认是TCP
 		m_u4ConnectID       = 0;
 		m_u1Option          = 0;
 		m_pPacketParse      = NULL;
+		m_nHashID          = 0;
 	}
 
 	void Clear()
@@ -46,6 +50,16 @@ struct _MakePacket
 		m_u4ConnectID       = 0;
 		m_u1Option          = 0;
 		m_pPacketParse      = NULL;
+	}
+
+	void SetHashID(int nHashID)
+	{
+		m_nHashID = nHashID;
+	}
+
+	int GetHashID()
+	{
+		return m_nHashID;
 	}
 };
 
@@ -66,9 +80,8 @@ public:
 	int GetFreeCount();
 
 private:
-	typedef map<_MakePacket*, _MakePacket*> mapPacket;
-	mapPacket                  m_mapPacketUsed;                       //已使用的
-	mapPacket                  m_mapPacketFree;                       //没有使用的
+	CHashTable<_MakePacket>    m_objHashHandleList;
+	uint32                     m_u4CulationIndex; 
 	ACE_Recursive_Thread_Mutex m_ThreadWriteLock;                     //控制多线程锁
 };
 

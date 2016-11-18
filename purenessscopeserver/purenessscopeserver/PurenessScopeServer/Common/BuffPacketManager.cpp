@@ -41,7 +41,7 @@ IBuffPacket* CBuffPacketManager::Create()
 			}
 			else
 			{
-				OUR_DEBUG((LM_INFO, "[CBuffPacketManager::Create]szPacketID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szPacketID, i, nDelPos, pBuffPacket));
+				//OUR_DEBUG((LM_INFO, "[CBuffPacketManager::Create]szPacketID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szPacketID, i, nDelPos, pBuffPacket));
 			}
 			m_u4CulationIndex = i;
 			return (IBuffPacket* )pBuffPacket;
@@ -57,7 +57,15 @@ IBuffPacket* CBuffPacketManager::Create()
 			//已经找到了，返回指针
 			char szPacketID[10] = {'\0'};
 			sprintf_safe(szPacketID, 10, "%d", pBuffPacket->GetBuffID());
-			m_objHashBuffPacketList.Del_Hash_Data(szPacketID);
+			int nDelPos = m_objHashBuffPacketList.Set_Index_Clear(i);
+			if(-1 == nDelPos)
+			{
+				OUR_DEBUG((LM_INFO, "[CBuffPacketManager::Create]szPacketID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szPacketID, i, nDelPos, pBuffPacket));
+			}
+			else
+			{
+				//OUR_DEBUG((LM_INFO, "[CBuffPacketManager::Create]szPacketID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szPacketID, i, nDelPos, pBuffPacket));
+			}
 			m_u4CulationIndex = i;
 			return (IBuffPacket* )pBuffPacket;
 		}

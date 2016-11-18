@@ -2781,7 +2781,15 @@ CConnectHandler* CConnectHandlerPool::Create()
 			//已经找到了，返回指针
 			char szHandlerID[10] = {'\0'};
 			sprintf_safe(szHandlerID, 10, "%d", pHandler->GetHandlerID());
-			m_objHashHandleList.Del_Hash_Data(szHandlerID);
+			int nDelPos = m_objHashHandleList.Set_Index_Clear(i);
+			if(-1 == nDelPos)
+			{
+				OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
+			}
+			else
+			{
+				//OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
+			}
 			m_u4CulationIndex = i;
 			return pHandler;
 		}

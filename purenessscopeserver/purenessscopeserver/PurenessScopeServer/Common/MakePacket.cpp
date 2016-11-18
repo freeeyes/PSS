@@ -15,114 +15,135 @@ void CMakePacketPool::Init(uint32 u4PacketCount)
 {
 	Close();
 
+	//初始化HashTable
+	int nKeySize = 10;
+	size_t nArraySize = (sizeof(_Hash_Table_Cell<_MakePacket>) + nKeySize + sizeof(_MakePacket* )) * u4PacketCount;
+	char* pHashBase = new char[nArraySize];
+	m_objHashHandleList.Set_Base_Addr(pHashBase, (int)u4PacketCount);
+	m_objHashHandleList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<_MakePacket>) * u4PacketCount, 
+																	nKeySize * u4PacketCount, nKeySize);
+	m_objHashHandleList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<_MakePacket>) + nKeySize) * u4PacketCount, 
+																	sizeof(_MakePacket* ) * u4PacketCount, sizeof(_MakePacket* ));
+
 	for(int i = 0; i < (int)u4PacketCount; i++)
 	{
 		_MakePacket* pPacket = new _MakePacket();
 		if(NULL != pPacket)
 		{
-			//添加到Free map里面
-			mapPacket::iterator f = m_mapPacketFree.find(pPacket);
-			if(f == m_mapPacketFree.end())
-			{
-				m_mapPacketFree.insert(mapPacket::value_type(pPacket, pPacket));
-			}
+			//添加到Hash数组里面
+			pPacket->SetHashID(i);
+			char szPacketID[10] = {'\0'};
+			sprintf_safe(szPacketID, 10, "%d", i);
+			m_objHashHandleList.Add_Hash_Data(szPacketID, pPacket);
 		}
 	}
+	m_u4CulationIndex = 1;
 }
 
 void CMakePacketPool::Close()
 {
 	//清理所有已存在的指针
-	for(mapPacket::iterator itorFreeB = m_mapPacketFree.begin(); itorFreeB != m_mapPacketFree.end(); itorFreeB++)
+	for(int i = 0; i < m_objHashHandleList.Get_Count(); i++)
 	{
-		_MakePacket* pPacket = (_MakePacket* )itorFreeB->second;
+		_MakePacket* pPacket = m_objHashHandleList.Get_Index(i);
 		SAFE_DELETE(pPacket);
 	}
-
-	for(mapPacket::iterator itorUsedB = m_mapPacketUsed.begin(); itorUsedB != m_mapPacketUsed.end(); itorUsedB++)
-	{
-		_MakePacket* pPacket = (_MakePacket* )itorUsedB->second;
-		OUR_DEBUG((LM_ERROR, "[CMakePacketPool::Close]MakePacket has used!!memory address[0x%08x].\n", pPacket));
-		SAFE_DELETE(pPacket);
-	}
-
-	m_mapPacketFree.clear();
-	m_mapPacketUsed.clear();
+	m_u4CulationIndex = 1;
 }
 
 int CMakePacketPool::GetUsedCount()
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	return (int)m_mapPacketUsed.size();
+	return m_objHashHandleList.Get_Count() - m_objHashHandleList.Get_Used_Count();
 }
 
 int CMakePacketPool::GetFreeCount()
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	return (int)m_mapPacketFree.size();
+	return m_objHashHandleList.Get_Used_Count();
 }
 
 _MakePacket* CMakePacketPool::Create()
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	//如果free池中已经没有了，则添加到free池中。
-	if(m_mapPacketFree.size() <= 0)
-	{
-		_MakePacket* pPacket = new _MakePacket();
+	_MakePacket* pPacket = NULL;
 
-		if(pPacket != NULL)
+	//在Hash表中弹出一个已使用的数据
+	//判断循环指针是否已经找到了尽头，如果是则从0开始继续
+	if(m_u4CulationIndex >= (uint32)(m_objHashHandleList.Get_Count() - 1))
+	{
+		m_u4CulationIndex = 0;
+	}
+
+	//第一次寻找，从当前位置往后找
+	for(int i = (int)m_u4CulationIndex; i < m_objHashHandleList.Get_Count(); i++)
+	{
+		pPacket = m_objHashHandleList.Get_Index(i);
+		if(NULL != pPacket)
 		{
-			//添加到Free map里面
-			mapPacket::iterator f = m_mapPacketFree.find(pPacket);
-			if(f == m_mapPacketFree.end())
+			//已经找到了，返回指针
+			int nDelPos = m_objHashHandleList.Set_Index_Clear(i);
+			if(-1 == nDelPos)
 			{
-				m_mapPacketFree.insert(mapPacket::value_type(pPacket, pPacket));
+				OUR_DEBUG((LM_INFO, "[CMakePacketPool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", pPacket->GetHashID(), i, nDelPos, pPacket));
 			}
-		}
-		else
-		{
-			return NULL;
+			else
+			{
+				//OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
+			}
+			m_u4CulationIndex = i;
+			return pPacket;
 		}
 	}
 
-	//从free池中拿出一个,放入到used池中
-	mapPacket::iterator itorFreeB = m_mapPacketFree.begin();
-	_MakePacket* pPacket = (_MakePacket* )itorFreeB->second;
-	m_mapPacketFree.erase(itorFreeB);
-	//添加到used map里面
-	mapPacket::iterator f = m_mapPacketUsed.find(pPacket);
-	if(f == m_mapPacketUsed.end())
+	//第二次寻找，从0到当前位置
+	for(int i = 0; i < (int)m_u4CulationIndex; i++)
 	{
-		m_mapPacketUsed.insert(mapPacket::value_type(pPacket, pPacket));
+		pPacket = m_objHashHandleList.Get_Index(i);
+		if(NULL != pPacket)
+		{
+			//已经找到了，返回指针
+			int nDelPos = m_objHashHandleList.Set_Index_Clear(i);
+			if(-1 == nDelPos)
+			{
+				OUR_DEBUG((LM_INFO, "[CMakePacketPool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", pPacket->GetHashID(), i, nDelPos, pPacket));
+			}
+			else
+			{
+				//OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
+			}
+			m_u4CulationIndex = i;
+			return pPacket;
+		}
 	}
 
-	return (_MakePacket* )pPacket;
+	//没找到空余的
+	return pPacket;
 }
 
-bool CMakePacketPool::Delete(_MakePacket* pBuffPacket)
+bool CMakePacketPool::Delete(_MakePacket* pMakePacket)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	if(NULL == pBuffPacket)
+	if(NULL == pMakePacket)
 	{
 		return false;
 	}
-	pBuffPacket->Clear();
 
-	mapPacket::iterator f = m_mapPacketUsed.find(pBuffPacket);
-	if(f != m_mapPacketUsed.end())
+	char szHandlerID[10] = {'\0'};
+	sprintf_safe(szHandlerID, 10, "%d", pMakePacket->GetHashID());
+	//int nPos = m_objHashHandleList.Add_Hash_Data(szHandlerID, pObject);
+	int nPos = m_objHashHandleList.Set_Index(pMakePacket->GetHashID(), szHandlerID, pMakePacket);
+	if(-1 == nPos)
 	{
-		m_mapPacketUsed.erase(f);
-
-		//添加到Free map里面
-		mapPacket::iterator f = m_mapPacketFree.find(pBuffPacket);
-		if(f == m_mapPacketFree.end())
-		{
-			m_mapPacketFree.insert(mapPacket::value_type(pBuffPacket, pBuffPacket));
-		}
+		OUR_DEBUG((LM_INFO, "[CMakePacketPool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHandlerID, pMakePacket, nPos));
+	}
+	else
+	{
+		//OUR_DEBUG((LM_INFO, "[CMakePacketPool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHandlerID, pMakePacket, nPos));
 	}
 
 	return true;
