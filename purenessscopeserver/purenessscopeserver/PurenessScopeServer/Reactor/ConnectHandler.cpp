@@ -2697,12 +2697,14 @@ void CConnectHandlerPool::Init(int nObjcetCount)
 		CConnectHandler* pHandler = new CConnectHandler();
 		if(NULL != pHandler)
 		{
-			pHandler->Init(m_u4CurrMaxCount);
-
 			//将ID和Handler指针的关系存入hashTable
 			char szHandlerID[10] = {'\0'};
 			sprintf_safe(szHandlerID, 10, "%d", m_u4CurrMaxCount);
-			m_objHashHandleList.Add_Hash_Data(szHandlerID, pHandler);
+			int nHashPos = m_objHashHandleList.Add_Hash_Data(szHandlerID, pHandler);
+			if(-1 != nHashPos)
+			{
+				pHandler->Init(nHashPos);
+			}
 			m_u4CurrMaxCount++;
 		}
 	}

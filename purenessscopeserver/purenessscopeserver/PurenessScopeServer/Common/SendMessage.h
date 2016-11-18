@@ -3,7 +3,7 @@
 
 #include "define.h"
 #include "IBuffPacket.h"
-#include <map>
+#include "HashTable.h"
 
 using namespace std;
 
@@ -20,6 +20,8 @@ struct _SendMessage
 
 	ACE_Message_Block*  m_pmbQueuePtr;    //消息队列指针块
 
+	int                 m_nHashID;        //当前对象的HashID
+
 	_SendMessage()
 	{
 		m_blSendState = true;
@@ -28,6 +30,7 @@ struct _SendMessage
 		m_nEvents     = 0;
 		m_u2CommandID = 0;
 		m_blSendState = 0;
+		m_nHashID     = 0;
 
 		//这里设置消息队列模块指针内容，这样就不必反复的new和delete，提升性能
 		//指针关系也可以在这里直接指定，不必使用的使用再指定
@@ -51,6 +54,16 @@ struct _SendMessage
 	{
 		return m_pmbQueuePtr;
 	}
+
+	void SetHashID(int nHashID)
+	{
+		m_nHashID = nHashID;
+	}
+
+	int GetHashID()
+	{
+		return m_nHashID;
+	}
 };
 
 class CSendMessagePool
@@ -69,11 +82,9 @@ public:
 	int GetFreeCount();
 
 private:
-	typedef map<_SendMessage*, _SendMessage*> mapSendMessage;
-	mapSendMessage              m_mapMessageUsed;                      //已使用的
-	mapSendMessage              m_mapMessageFree;                      //没有使用的
+	CHashTable<_SendMessage>    m_objHashHandleList;
+	uint32                      m_u4CulationIndex;                     //当前正在使用的标签
 	ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;                     //控制多线程锁
-	uint32                      m_u4CurrMaxCount;
 };
 #endif
 

@@ -31,10 +31,13 @@ void CMakePacketPool::Init(uint32 u4PacketCount)
 		if(NULL != pPacket)
 		{
 			//添加到Hash数组里面
-			pPacket->SetHashID(i);
 			char szPacketID[10] = {'\0'};
 			sprintf_safe(szPacketID, 10, "%d", i);
-			m_objHashHandleList.Add_Hash_Data(szPacketID, pPacket);
+			int nHashPos = m_objHashHandleList.Add_Hash_Data(szPacketID, pPacket);
+			if(-1 != nHashPos)
+			{
+				pPacket->SetHashID(nHashPos);
+			}
 		}
 	}
 	m_u4CulationIndex = 1;

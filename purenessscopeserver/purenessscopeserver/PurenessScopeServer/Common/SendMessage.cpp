@@ -2,7 +2,7 @@
 
 CSendMessagePool::CSendMessagePool(void)
 {
-	m_u4CurrMaxCount = 0;
+	m_u4CulationIndex = 0;
 }
 
 CSendMessagePool::~CSendMessagePool(void)
@@ -16,80 +16,102 @@ void CSendMessagePool::Init(int nObjcetCount)
 {
 	Close();
 
+	//初始化HashTable
+	int nKeySize = 10;
+	size_t nArraySize = (sizeof(_Hash_Table_Cell<_SendMessage>) + nKeySize + sizeof(_SendMessage* )) * nObjcetCount;
+	char* pHashBase = new char[nArraySize];
+	m_objHashHandleList.Set_Base_Addr(pHashBase, (int)nObjcetCount);
+	m_objHashHandleList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<_SendMessage>) * nObjcetCount, 
+																	nKeySize * nObjcetCount, nKeySize);
+	m_objHashHandleList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<_SendMessage>) + nKeySize) * nObjcetCount, 
+																	sizeof(_SendMessage* ) * nObjcetCount, sizeof(_SendMessage* ));
+
 	for(int i = 0; i < nObjcetCount; i++)
 	{
-		_SendMessage* pPacket = new _SendMessage();
-		if(NULL != pPacket)
+		_SendMessage* pMessage = new _SendMessage();
+		if(NULL != pMessage)
 		{
 			//添加到Free map里面
-			mapSendMessage::iterator f = m_mapMessageFree.find(pPacket);
-			if(f == m_mapMessageFree.end())
+			char szMessageID[10] = {'\0'};
+			sprintf_safe(szMessageID, 10, "%d", i);
+			int nHashPos = m_objHashHandleList.Add_Hash_Data(szMessageID, pMessage);
+			if(-1 != nHashPos)
 			{
-				m_mapMessageFree.insert(mapSendMessage::value_type(pPacket, pPacket));
-				m_u4CurrMaxCount++;
+				pMessage->SetHashID(nHashPos);
 			}
 		}
 	}
+	m_u4CulationIndex = 1;
 }
 
 void CSendMessagePool::Close()
 {
 	//清理所有已存在的指针
-	for(mapSendMessage::iterator itorFreeB = m_mapMessageFree.begin(); itorFreeB != m_mapMessageFree.end(); itorFreeB++)
+	for(int i = 0; i < m_objHashHandleList.Get_Count(); i++)
 	{
-		_SendMessage* pObject = (_SendMessage* )itorFreeB->second;
-		SAFE_DELETE(pObject);
+		_SendMessage* pMessage = m_objHashHandleList.Get_Index(i);
+		SAFE_DELETE(pMessage);
 	}
-	
-	for(mapSendMessage::iterator itorUsedB = m_mapMessageUsed.begin(); itorUsedB != m_mapMessageUsed.end(); itorUsedB++)
-	{
-		_SendMessage* pPacket = (_SendMessage* )itorUsedB->second;
-		SAFE_DELETE(pPacket);
-	}
-
-	m_u4CurrMaxCount = 0;
-	m_mapMessageFree.clear();
-	m_mapMessageUsed.clear();
+	m_u4CulationIndex = 1;
 }
 
 _SendMessage* CSendMessagePool::Create()
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	//如果free池中已经没有了，则添加到free池中。
-	if(m_mapMessageFree.size() <= 0)
-	{
-		_SendMessage* pPacket = new _SendMessage();
+	_SendMessage* pMessage = NULL;
 
-		if(pPacket != NULL)
+	//在Hash表中弹出一个已使用的数据
+	//判断循环指针是否已经找到了尽头，如果是则从0开始继续
+	if(m_u4CulationIndex >= (uint32)(m_objHashHandleList.Get_Count() - 1))
+	{
+		m_u4CulationIndex = 0;
+	}
+
+	//第一次寻找，从当前位置往后找
+	for(int i = (int)m_u4CulationIndex; i < m_objHashHandleList.Get_Count(); i++)
+	{
+		pMessage = m_objHashHandleList.Get_Index(i);
+		if(NULL != pMessage)
 		{
-			//添加到Free map里面
-			mapSendMessage::iterator f = m_mapMessageFree.find(pPacket);
-			if(f == m_mapMessageFree.end())
+			//已经找到了，返回指针
+			int nDelPos = m_objHashHandleList.Set_Index_Clear(i);
+			if(-1 == nDelPos)
 			{
-				m_mapMessageFree.insert(mapSendMessage::value_type(pPacket, pPacket));
-				m_u4CurrMaxCount++;
+				OUR_DEBUG((LM_INFO, "[CSendMessagePool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", pMessage->GetHashID(), i, nDelPos, pMessage));
 			}
-		}
-		else
-		{
-			return NULL;
+			else
+			{
+				//OUR_DEBUG((LM_INFO, "[CSendMessagePool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
+			}
+			m_u4CulationIndex = i;
+			return pMessage;
 		}
 	}
 
-	//从free池中拿出一个,放入到used池中
-	mapSendMessage::iterator itorFreeB = m_mapMessageFree.begin();
-	_SendMessage* pPacket = (_SendMessage* )itorFreeB->second;
-	m_mapMessageFree.erase(itorFreeB);
-
-	//添加到used map里面
-	mapSendMessage::iterator f = m_mapMessageUsed.find(pPacket);
-	if(f == m_mapMessageUsed.end())
+	//第二次寻找，从0到当前位置
+	for(int i = 0; i < (int)m_u4CulationIndex; i++)
 	{
-		m_mapMessageUsed.insert(mapSendMessage::value_type(pPacket, pPacket));
+		pMessage = m_objHashHandleList.Get_Index(i);
+		if(NULL != pMessage)
+		{
+			//已经找到了，返回指针
+			int nDelPos = m_objHashHandleList.Set_Index_Clear(i);
+			if(-1 == nDelPos)
+			{
+				OUR_DEBUG((LM_INFO, "[CSendMessagePool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", pMessage->GetHashID(), i, nDelPos, pMessage));
+			}
+			else
+			{
+				//OUR_DEBUG((LM_INFO, "[CSendMessagePool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
+			}
+			m_u4CulationIndex = i;
+			return pMessage;
+		}
 	}
 
-	return (_SendMessage* )pPacket;
+	//没找到空余的
+	return pMessage;
 }
 
 bool CSendMessagePool::Delete(_SendMessage* pObject)
@@ -101,17 +123,17 @@ bool CSendMessagePool::Delete(_SendMessage* pObject)
 		return false;
 	}
 
-	mapSendMessage::iterator f = m_mapMessageUsed.find(pObject);
-	if(f != m_mapMessageUsed.end())
+	char szHandlerID[10] = {'\0'};
+	sprintf_safe(szHandlerID, 10, "%d", pObject->GetHashID());
+	//int nPos = m_objHashHandleList.Add_Hash_Data(szHandlerID, pObject);
+	int nPos = m_objHashHandleList.Set_Index(pObject->GetHashID(), szHandlerID, pObject);
+	if(-1 == nPos)
 	{
-		m_mapMessageUsed.erase(f);
-
-		//添加到Free map里面
-		mapSendMessage::iterator f = m_mapMessageFree.find(pObject);
-		if(f == m_mapMessageFree.end())
-		{
-			m_mapMessageFree.insert(mapSendMessage::value_type(pObject, pObject));
-		}
+		OUR_DEBUG((LM_INFO, "[CSendMessagePool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHandlerID, pObject, nPos));
+	}
+	else
+	{
+		//OUR_DEBUG((LM_INFO, "[CSendMessagePool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHandlerID, pObject, nPos));
 	}
 
 	return true;
@@ -121,14 +143,14 @@ int CSendMessagePool::GetUsedCount()
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	return (int)m_mapMessageUsed.size();
+	return m_objHashHandleList.Get_Count() - m_objHashHandleList.Get_Used_Count();
 }
 
 int CSendMessagePool::GetFreeCount()
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	return (int)m_mapMessageFree.size();
+	return m_objHashHandleList.Get_Used_Count();
 }
 
 
