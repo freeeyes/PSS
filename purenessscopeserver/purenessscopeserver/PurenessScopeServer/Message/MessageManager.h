@@ -191,7 +191,7 @@ public:
 	virtual uint32 GetWorkThreadByIndex(uint32 u4Index);
 
 private:
-	typedef HASHMAP_PREFIX::hash_map<uint16, CClientCommandList*> mapClientCommand;
+	typedef map<uint16, CClientCommandList*> mapClientCommand;
 
 	mapClientCommand            m_mapClientCommand;
 	mapModuleClient             m_mapModuleClient;
