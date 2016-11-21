@@ -17,8 +17,26 @@ CThreadInfo::~CThreadInfo(void)
 	OUR_DEBUG((LM_ERROR, "[CThreadInfo::~CThreadInfo]End.\n"));
 }
 
+void CThreadInfo::Init(int nCount)
+{
+	m_pAllThreadInfo = new _ThreadInfo*[nCount];
+	memset(m_pAllThreadInfo, 0, sizeof(_ThreadInfo*)*nCount);
+	m_nThreadCount   = nCount;
+}
+
 bool CThreadInfo::AddThreadInfo(uint32 u4ThreadID)
 {
+	if(u4ThreadID < 0 || u4ThreadID >= m_nThreadCount)
+	{
+		return false;
+	}
+
+	if(NULL != m_pAllThreadInfo[u4ThreadID])
+	{
+		OUR_DEBUG((LM_ERROR, "[CThreadInfo::AddThreadInfo] u4ThreadID = %d is exist.\n", u4ThreadID));
+		return false;
+	}
+
 	_ThreadInfo* pThreadInfo = new _ThreadInfo();
 
 	if(NULL == pThreadInfo)
@@ -29,98 +47,73 @@ bool CThreadInfo::AddThreadInfo(uint32 u4ThreadID)
 
 	pThreadInfo->m_u4ThreadID = u4ThreadID;
 
-	mapThreadInfo::iterator f = m_mapThreadInfo.find(u4ThreadID);
-	if(f != m_mapThreadInfo.end())
-	{
-		OUR_DEBUG((LM_ERROR, "[CThreadInfo::AddThreadInfo] u4ThreadID = %d is exist.\n", u4ThreadID));
-		return false;
-	}
-
-	m_mapThreadInfo.insert(mapThreadInfo::value_type(u4ThreadID, pThreadInfo));
+	m_pAllThreadInfo[u4ThreadID] = pThreadInfo;
 	return true;
 }
 
 bool CThreadInfo::AddThreadInfo(uint32 u4ThreadID, _ThreadInfo* pOrcThreadInfo)
 {
-	_ThreadInfo* pThreadInfo = new _ThreadInfo();
-
-	if(NULL == pThreadInfo)
+	if(u4ThreadID < 0 || u4ThreadID >= m_nThreadCount)
 	{
-		OUR_DEBUG((LM_ERROR, "[CThreadInfo::AddThreadInfo] pThreadInfo is NULL.\n"));
 		return false;
 	}
 
-	(*pThreadInfo) = (*pOrcThreadInfo);
-	pThreadInfo->m_u4ThreadID = u4ThreadID;
-
-	mapThreadInfo::iterator f = m_mapThreadInfo.find(u4ThreadID);
-	if(f != m_mapThreadInfo.end())
+	if(NULL != m_pAllThreadInfo[u4ThreadID])
 	{
 		OUR_DEBUG((LM_ERROR, "[CThreadInfo::AddThreadInfo] u4ThreadID = %d is exist.\n", u4ThreadID));
 		return false;
 	}
 
-	m_mapThreadInfo.insert(mapThreadInfo::value_type(u4ThreadID, pThreadInfo));
+	_ThreadInfo* pThreadInfo = new _ThreadInfo();
+
+	(*pThreadInfo) = (*pOrcThreadInfo);
+	pThreadInfo->m_u4ThreadID = u4ThreadID;
+
+	m_pAllThreadInfo[u4ThreadID] = pThreadInfo;
 	return true;
 }
 void CThreadInfo::Close()
 {
-	for(mapThreadInfo::iterator b = m_mapThreadInfo.begin(); b != m_mapThreadInfo.end(); b++)
+	for(int i = 0; i < m_nThreadCount; i++)
 	{
-		_ThreadInfo* pThreadInfo = (_ThreadInfo* )b->second;
+		_ThreadInfo* pThreadInfo = m_pAllThreadInfo[i];
 		if(NULL != pThreadInfo)
 		{
-			delete pThreadInfo;
-			pThreadInfo = NULL;
+			SAFE_DELETE(pThreadInfo);
 		}
 	}
+	SAFE_DELETE_ARRAY(m_pAllThreadInfo);
+	m_nThreadCount = NULL;
 
-	m_mapThreadInfo.clear();
 }
 
 _ThreadInfo* CThreadInfo::GetThreadInfo()
 {
 	//这里不再单独判断ThreadID，因为一个svc目前只有一个线程ID
-
-	mapThreadInfo::iterator f = m_mapThreadInfo.find(0);
-
-	if(f != m_mapThreadInfo.end())
-	{
-		_ThreadInfo* pThreadInfo = (_ThreadInfo* )f->second;
-		return pThreadInfo;
-	}
-	else
-	{
-		return NULL;
-	}
+	return m_pAllThreadInfo[0];
 }
 
 _ThreadInfo* CThreadInfo::GetThreadInfo(uint32 u4ThreadID)
 {
 	//这里不再单独判断ThreadID，因为一个svc目前只有一个线程ID
-
-	mapThreadInfo::iterator f = m_mapThreadInfo.find(u4ThreadID);
-
-	if(f != m_mapThreadInfo.end())
-	{
-		_ThreadInfo* pThreadInfo = (_ThreadInfo* )f->second;
-		return pThreadInfo;
-	}
-	else
+	if(u4ThreadID < 0 || u4ThreadID >= m_nThreadCount)
 	{
 		return NULL;
 	}
+
+	return m_pAllThreadInfo[u4ThreadID];
 }
 
 bool CThreadInfo::CloseThread(uint32 u4ThreadID)
 {
-	mapThreadInfo::iterator f = m_mapThreadInfo.find(u4ThreadID);
-
-	if(f != m_mapThreadInfo.end())
+	if(u4ThreadID < 0 || u4ThreadID >= m_nThreadCount)
 	{
-		_ThreadInfo* pThreadInfo = (_ThreadInfo* )f->second;
-		SAFE_DELETE(pThreadInfo);
-		m_mapThreadInfo.erase(f);
+		return false;
+	}
+
+	if(NULL != m_pAllThreadInfo[u4ThreadID])
+	{
+		SAFE_DELETE(m_pAllThreadInfo[u4ThreadID]);
 		return true;
 	}
 	else
@@ -131,5 +124,5 @@ bool CThreadInfo::CloseThread(uint32 u4ThreadID)
 
 int CThreadInfo::GetThreadCount()
 {
-	return (int)m_mapThreadInfo.size();
+	return m_nThreadCount;
 }

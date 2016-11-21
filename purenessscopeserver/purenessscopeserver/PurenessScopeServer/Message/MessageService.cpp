@@ -639,6 +639,8 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
     m_u4HighMask = u4HighMask;
     m_u4LowMask  = u4LowMask;
 
+	m_objAllThreadInfo.Init((int)u4ThreadCount);
+
     //初始化所有的Message对象
     for(uint32 i = 0; i < u4ThreadCount; i++)
     {

@@ -2,7 +2,6 @@
 #define _THREADINFO_H
 
 #include "define.h"
-#include <map>
 
 using namespace std;
 
@@ -44,13 +43,13 @@ struct _ThreadInfo
 	}
 };
 
-typedef map<uint32, _ThreadInfo*> mapThreadInfo;
-
 class CThreadInfo
 {
 public:
 	CThreadInfo(void);
 	~CThreadInfo(void);
+
+	void Init(int nCount);
 
 	bool AddThreadInfo(uint32 u4ThreadID);
 	bool AddThreadInfo(uint32 u4ThreadID, _ThreadInfo* pOrcThreadInfo);
@@ -61,6 +60,7 @@ public:
 	void Close();
 
 private:
-	mapThreadInfo m_mapThreadInfo;
+	_ThreadInfo** m_pAllThreadInfo;
+	int           m_nThreadCount;
 };
 #endif
