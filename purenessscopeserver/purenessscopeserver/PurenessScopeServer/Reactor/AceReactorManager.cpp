@@ -276,7 +276,6 @@ void CAceReactorManager::Close()
 		for (uint16 i = 0; i < m_u2RectorCount; i++)
 		{
 			CAceReactor* pAceReactor = m_pReactorList[i];
-
 			if (NULL != pAceReactor)
 			{
 				pAceReactor->Close();
@@ -285,7 +284,7 @@ void CAceReactorManager::Close()
 		}
 	}
 	SAFE_DELETE_ARRAY(m_pReactorList);
-	m_pReactorList = NULL;
+	m_u2RectorCount = 0;
 }
 
 void CAceReactorManager::Init(uint16 u2Count)
@@ -304,6 +303,12 @@ const char* CAceReactorManager::GetError()
 
 bool CAceReactorManager::AddNewReactor(int nReactorID, int nReactorType, int nThreadCount, int nMaxHandleCount)
 {
+	if(nReactorID < 0 || nReactorID > m_u2RectorCount)
+	{
+		sprintf_safe(m_szError, MAX_BUFF_500, "[CAceProactorManager::AddNewProactor]New CAceProactor is more than max Proactor list.");
+		return false;
+	}
+
     CAceReactor* pAceReactor = new CAceReactor();
 
     if (NULL == pAceReactor)

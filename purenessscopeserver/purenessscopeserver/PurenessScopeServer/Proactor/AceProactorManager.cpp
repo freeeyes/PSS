@@ -186,6 +186,8 @@ ACE_Proactor* CAceProactor::GetProactor()
 
 CAceProactorManager::CAceProactorManager(void)
 {
+	m_pAceProactorList = NULL;
+	m_u2ProactorCount  = 0;
 }
 
 CAceProactorManager::~CAceProactorManager(void)
@@ -195,17 +197,29 @@ CAceProactorManager::~CAceProactorManager(void)
 
 void CAceProactorManager::Close()
 {
-	mapAceProactor::iterator b = m_mapAceProactor.begin();
-	mapAceProactor::iterator e = m_mapAceProactor.end();
-
-	for(b; b!= e; b++)
+	if(NULL != m_pAceProactorList)
 	{
-		CAceProactor* pAceProactor = (CAceProactor* )b->second;
-		pAceProactor->Close();
-		SAFE_DELETE(pAceProactor);
+		for(uint16 i = 0; i < m_u2ProactorCount; i++)
+		{
+			CAceProactor* pAceProactor = m_pAceProactorList[i];
+			if(NULL != pAceProactor)
+			{
+				pAceProactor->Close();
+				SAFE_DELETE(pAceProactor);
+			}
+		}
 	}
+	SAFE_DELETE_ARRAY(m_pAceProactorList);
+	m_u2ProactorCount = 0;
+}
 
-	m_mapAceProactor.clear();
+void CAceProactorManager::Init(uint16 u2Count)
+{
+	Close();
+
+	m_pAceProactorList = new CAceProactor*[u2Count];
+	ACE_OS::memset(m_pAceProactorList, 0, sizeof(CAceProactor*)*u2Count);
+	m_u2ProactorCount  = u2Count;
 }
 
 const char* CAceProactorManager::GetError()
@@ -215,6 +229,12 @@ const char* CAceProactorManager::GetError()
 
 bool CAceProactorManager::AddNewProactor(int nProactorID, int nProactorType, int nThreadCount)
 {
+	if(nProactorID < 0 || nProactorID > m_u2ProactorCount)
+	{
+		sprintf_safe(m_szError, MAX_BUFF_500, "[CAceProactorManager::AddNewProactor]New CAceProactor is more than max Proactor list.");
+		return false;
+	}
+
 	CAceProactor* pAceProactor = new CAceProactor();
 	if(NULL == pAceProactor)
 	{
@@ -231,51 +251,27 @@ bool CAceProactorManager::AddNewProactor(int nProactorID, int nProactorType, int
 		return false;
 	}
 
-	mapAceProactor::iterator f = m_mapAceProactor.find(nProactorID);
-	if(f != m_mapAceProactor.end())
+	if(NULL != m_pAceProactorList[nProactorID])
 	{
 		sprintf_safe(m_szError, MAX_BUFF_500, "[CAceProactorManager::AddNewProactor]CAceProactor is exist[%d].", nProactorID);
 		SAFE_DELETE(pAceProactor);
 		return false;
 	}
 
-	m_mapAceProactor.insert(mapAceProactor::value_type(nProactorID, pAceProactor));
+	m_pAceProactorList[nProactorID] = pAceProactor;
 	OUR_DEBUG((LM_INFO, "[CAceProactorManager::AddNewProactor]New [%d] ProactorType = [%d] nThreadCount = [%d]. pAceProactor=[%@]\n", nProactorID, nProactorType, nThreadCount,pAceProactor));
 	return true;
 }
 
 bool CAceProactorManager::StartProactor()
 {
-	mapAceProactor::iterator b = m_mapAceProactor.begin();
-	mapAceProactor::iterator e = m_mapAceProactor.end();
-
 	//先启动非总的Rector
-	for(b; b!= e; b++)
+	for(uint16 i = 0; i < m_u2ProactorCount; i++)
 	{
-		CAceProactor* pAceProactor = (CAceProactor* )b->second;
-		if(NULL != pAceProactor)
+		if(NULL != m_pAceProactorList[i])
 		{
-			pAceProactor->Start();
+			m_pAceProactorList[i]->Start();
 		}
-	}
-
-	return true;
-}
-
-bool CAceProactorManager::StartProactorDefault()
-{
-	OUR_DEBUG((LM_INFO, "[CAceProactorManager::StartProactorDefault]..1. .\n"));
-	//启动默认的 Proactor
-	mapAceProactor::iterator f = m_mapAceProactor.find(REACTOR_CLIENTDEFINE);
-
-	if(f != m_mapAceProactor.end())
-	{
-		CAceProactor* pAceProactor = (CAceProactor* )f->second;
-		if(NULL != pAceProactor)
-		{
-			pAceProactor->Start();
-		}
-		OUR_DEBUG((LM_INFO, "[CAceProactorManager::StartProactorDefault]... 2.\n"));
 	}
 
 	return true;
@@ -283,13 +279,9 @@ bool CAceProactorManager::StartProactorDefault()
 
 bool CAceProactorManager::StopProactor()
 {
-	mapAceProactor::iterator b = m_mapAceProactor.begin();
-	mapAceProactor::iterator e = m_mapAceProactor.end();
-
-	for(b; b!= e; b++)
+	for(uint16 i = 0; i < m_u2ProactorCount; i++)
 	{
-		int nProactorID           = (int)b->first;
-		CAceProactor* pAceProactor = (CAceProactor* )b->second;
+		CAceProactor* pAceProactor = m_pAceProactorList[i];
 		if(NULL != pAceProactor)
 		{
 			pAceProactor->Stop();
@@ -302,60 +294,50 @@ bool CAceProactorManager::StopProactor()
 
 CAceProactor* CAceProactorManager::GetAceProactor(int nProactorID)
 {
-	mapAceProactor::iterator f = m_mapAceProactor.find(nProactorID);
-	if(f != m_mapAceProactor.end())
-	{
-		return (CAceProactor* )f->second;
-	}
-	else
+	if(nProactorID < 0 || nProactorID >= m_u2ProactorCount)
 	{
 		return NULL;
 	}
+
+	return m_pAceProactorList[nProactorID];
 }
 
 ACE_Proactor* CAceProactorManager::GetAce_Proactor(int nProactorID)
 {
-	mapAceProactor::iterator f = m_mapAceProactor.find(nProactorID);
-	if(f != m_mapAceProactor.end())
+	if(nProactorID < 0 || nProactorID >= m_u2ProactorCount)
 	{
-		CAceProactor* pAceProactor = (CAceProactor* )f->second;
-		if(NULL != pAceProactor)
-		{
-			//OUR_DEBUG((LM_INFO, "CAceProactorManager::GetAce_Proactor id=[%d] pAceProactor=[0x%@]\n",nProactorID, pAceProactor));
-			return pAceProactor->GetProactor();
-		}
-		else
-		{
-			return NULL;
-		}
+		return NULL;
+	}
+
+	//OUR_DEBUG((LM_INFO, "CAceProactorManager::GetAce_Proactor id=[%d] pAceProactor=[0x%@]\n",nProactorID, pAceProactor));
+	if(NULL != m_pAceProactorList[nProactorID])
+	{
+		return m_pAceProactorList[nProactorID]->GetProactor();
 	}
 	else
 	{
 		return NULL;
 	}
+
 }
 
 ACE_Proactor* CAceProactorManager::GetAce_Client_Proactor(int nProactorID)
 {
 	int nClientProactor = nProactorID + 3;
-	if(nClientProactor >= (int)m_mapAceProactor.size())
+
+	if(nProactorID < 0 || nProactorID >= m_u2ProactorCount)
+	{
+		return NULL;
+	}
+
+	if(nClientProactor >= (int)m_u2ProactorCount)
 	{
 		nClientProactor = REACTOR_CLIENTDEFINE;
 	}
 
-	mapAceProactor::iterator f = m_mapAceProactor.find(nClientProactor);
-	if(f != m_mapAceProactor.end())
+	if(NULL != m_pAceProactorList[nProactorID])
 	{
-		CAceProactor* pAceProactor = (CAceProactor* )f->second;
-		if(NULL != pAceProactor)
-		{
-			//OUR_DEBUG((LM_INFO, "CAceProactorManager::GetAce_Proactor id=[%d] pAceProactor=[0x%@]\n",nProactorID, pAceProactor));
-			return pAceProactor->GetProactor();
-		}
-		else
-		{
-			return NULL;
-		}
+		return m_pAceProactorList[nProactorID]->GetProactor();
 	}
 	else
 	{
@@ -365,7 +347,7 @@ ACE_Proactor* CAceProactorManager::GetAce_Client_Proactor(int nProactorID)
 
 uint32 CAceProactorManager::GetClientReactorCount()
 {
-	uint32 u4Count = (uint32)m_mapAceProactor.size();
+	uint32 u4Count = (uint32)m_u2ProactorCount;
 	if(u4Count > 3)
 	{
 		return u4Count - 3;

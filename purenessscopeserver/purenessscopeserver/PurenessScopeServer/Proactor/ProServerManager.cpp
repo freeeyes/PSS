@@ -45,6 +45,9 @@ bool CProServerManager::Init()
 		return false;
 	}
 
+	//初始化反应器集合
+	App_ProactorManager::instance()->Init((uint16)nReactorCount);
+
 	//初始化反应器
 	for(int i = 0 ; i < nReactorCount; i++)
 	{

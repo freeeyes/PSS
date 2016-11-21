@@ -10,8 +10,6 @@
 #include "ace/WIN32_Proactor.h" 
 #include "ace/POSIX_Proactor.h"
 
-#include <map>
-
 using namespace std;
 
 enum
@@ -59,12 +57,13 @@ public:
 	CAceProactorManager(void);
 	~CAceProactorManager(void);
 
+	void Init(uint16 u2Count);
+
 	bool AddNewProactor(int nProactorID, int nProactorType = Proactor_WIN32, int nThreadCount = 1);
 	void Close();
 	const char* GetError();
 
 	bool StartProactor();
-	bool StartProactorDefault();
 	bool StopProactor();
 
 	CAceProactor* GetAceProactor(int nProactorID);
@@ -73,8 +72,8 @@ public:
 	uint32 GetClientReactorCount();
 
 private:
-	typedef map<int, CAceProactor*> mapAceProactor;
-	mapAceProactor m_mapAceProactor;
+	CAceProactor** m_pAceProactorList;
+	uint16         m_u2ProactorCount;
 	char           m_szError[MAX_BUFF_500];
 };
 
