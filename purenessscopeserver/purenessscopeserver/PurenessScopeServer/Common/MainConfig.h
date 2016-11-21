@@ -297,6 +297,7 @@ public:
 	uint32 GetBlockCount();
 	uint8  GetServerClose();
 	uint32 GetMaxCommandCount();
+	uint32 GetServerConnectCount();
 
 	uint16 GetModuleInfoCount();
 	_ModuleConfig* GetModuleInfo(uint16 u2Index);
@@ -346,6 +347,7 @@ private:
 	uint16     m_u2HandleCount;                        //handle对象池的个数
 	uint16     m_u2MaxHanderCount;                     //最大同时处理Handler的数量
 	uint16     m_u2MaxConnectTime;                     //最长等待连接链接时间（此时间内，如果接收和发送都没有发生，则由服务器关闭这个链接）
+	uint32     m_u4ServerConnectCount;                 //服务器间连接缓冲对象个数 
 
 	uint16     m_u2RecvQueueTimeout;               //接收队列处理超时时间限定
 	uint16     m_u2SendQueueTimeout;               //发送队列处理超时时间限定

@@ -11,8 +11,8 @@
 
 #include "IClientManager.h"
 #include "MessageBlockManager.h"
+#include "HashTable.h"
 
-#include <map>
 using namespace std;
 
 //处理服务器间接收数据包过程代码
@@ -29,11 +29,13 @@ struct _Server_Message_Info
 	uint16             m_u2CommandID;
 	ACE_Message_Block* m_pRecvFinish;
 	_ClientIPInfo      m_objServerIPInfo;
+	int                m_nHashID;
 
 	ACE_Message_Block* m_pmbQueuePtr;        //消息队列指针块
 
 	_Server_Message_Info()
 	{
+		m_nHashID        = 0;
 		m_u2CommandID    = 0;
 		m_pClientMessage = NULL;
 		m_pRecvFinish    = NULL;
@@ -60,6 +62,16 @@ struct _Server_Message_Info
 		return m_pmbQueuePtr;
 	}
 
+	void SetHashID(int nHashID)
+	{
+		m_nHashID = nHashID;
+	}
+
+	int GetHashID()
+	{
+		return m_nHashID;
+	}
+
 };
 
 #define MAX_SERVER_MESSAGE_INFO_COUNT 100
@@ -81,10 +93,9 @@ public:
 	int GetFreeCount();
 
 private:
-	typedef map<_Server_Message_Info*, _Server_Message_Info*> mapMessage;
-	mapMessage                  m_mapMessageUsed;                      //已使用的
-	mapMessage                  m_mapMessageFree;                      //没有使用的
-	ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;                     //控制多线程锁
+	CHashTable<_Server_Message_Info> m_objServerMessageList;           //Server Message缓冲池
+	uint32                           m_u4CulationIndex;                //当前正在使用的标签
+	ACE_Recursive_Thread_Mutex       m_ThreadWriteLock;                //控制多线程锁
 }; 
 
 //服务器间数据包消息队列处理过程

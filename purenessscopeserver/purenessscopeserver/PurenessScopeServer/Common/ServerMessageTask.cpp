@@ -16,18 +16,30 @@ void CServerMessageInfoPool::Init(uint32 u4PacketCount /*= MAX_SERVER_MESSAGE_IN
 {
 	Close();
 
+	int nKeySize = 10;
+	size_t nArraySize = (sizeof(_Hash_Table_Cell<_Server_Message_Info>) + nKeySize + sizeof(_Server_Message_Info* )) * u4PacketCount;
+	char* pHashBase = new char[nArraySize];
+	m_objServerMessageList.Set_Base_Addr(pHashBase, (int)u4PacketCount);
+	m_objServerMessageList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<_Server_Message_Info>) * u4PacketCount, 
+																	nKeySize * u4PacketCount, nKeySize);
+	m_objServerMessageList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<_Server_Message_Info>) + nKeySize) * u4PacketCount, 
+																	sizeof(_Server_Message_Info* ) * u4PacketCount, sizeof(_Server_Message_Info* ));
+
 	for(int i = 0; i < (int)u4PacketCount; i++)
 	{
 		_Server_Message_Info* pPacket = new _Server_Message_Info();
 		if(NULL != pPacket)
 		{
 			//添加到Free map里面
-			mapMessage::iterator f = m_mapMessageFree.find(pPacket);
-			if(f == m_mapMessageFree.end())
+			char szMessageID[10] = {'\0'};
+			sprintf_safe(szMessageID, 10, "%d", i);
+			int nHashPos = m_objServerMessageList.Add_Hash_Data(szMessageID, pPacket);
+			if(-1 != nHashPos)
 			{
-				m_mapMessageFree.insert(mapMessage::value_type(pPacket, pPacket));
+				pPacket->SetHashID(nHashPos);
 			}
 		}
+		m_u4CulationIndex = 1;
 	}
 }
 
@@ -35,14 +47,14 @@ int CServerMessageInfoPool::GetUsedCount()
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	return (int)m_mapMessageUsed.size();
+	return m_objServerMessageList.Get_Count() - m_objServerMessageList.Get_Used_Count();
 }
 
 int CServerMessageInfoPool::GetFreeCount()
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	return (int)m_mapMessageFree.size();
+	return m_objServerMessageList.Get_Used_Count();
 }
 
 _Server_Message_Info* CServerMessageInfoPool::Create()
@@ -50,60 +62,83 @@ _Server_Message_Info* CServerMessageInfoPool::Create()
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
 	//如果free池中已经没有了，则添加到free池中。
-	if(m_mapMessageFree.size() <= 0)
-	{
-		_Server_Message_Info* pPacket = new _Server_Message_Info();
+	_Server_Message_Info* pMessage = NULL;
 
-		if(pPacket != NULL)
+	//在Hash表中弹出一个已使用的数据
+	//判断循环指针是否已经找到了尽头，如果是则从0开始继续
+	if(m_u4CulationIndex >= (uint32)(m_objServerMessageList.Get_Count() - 1))
+	{
+		m_u4CulationIndex = 0;
+	}
+
+	//第一次寻找，从当前位置往后找
+	for(int i = (int)m_u4CulationIndex; i < m_objServerMessageList.Get_Count(); i++)
+	{
+		pMessage = m_objServerMessageList.Get_Index(i);
+		if(NULL != pMessage)
 		{
-			//添加到Free map里面
-			mapMessage::iterator f = m_mapMessageFree.find(pPacket);
-			if(f == m_mapMessageFree.end())
+			//已经找到了，返回指针
+			int nDelPos = m_objServerMessageList.Set_Index_Clear(i);
+			if(-1 == nDelPos)
 			{
-				m_mapMessageFree.insert(mapMessage::value_type(pPacket, pPacket));
+				OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Create]szHashID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", pMessage->GetHashID(), i, nDelPos, pMessage));
 			}
-		}
-		else
-		{
-			return NULL;
+			else
+			{
+				//OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Create]szHashID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
+			}
+			m_u4CulationIndex = i;
+			return pMessage;
 		}
 	}
 
-	//从free池中拿出一个,放入到used池中
-	mapMessage::iterator itorFreeB = m_mapMessageFree.begin();
-	_Server_Message_Info* pPacket = (_Server_Message_Info* )itorFreeB->second;
-	m_mapMessageFree.erase(itorFreeB);
-	//添加到used map里面
-	mapMessage::iterator f = m_mapMessageUsed.find(pPacket);
-	if(f == m_mapMessageUsed.end())
+	//第二次寻找，从0到当前位置
+	for(int i = 0; i < (int)m_u4CulationIndex; i++)
 	{
-		m_mapMessageUsed.insert(mapMessage::value_type(pPacket, pPacket));
+		pMessage = m_objServerMessageList.Get_Index(i);
+		if(NULL != pMessage)
+		{
+			//已经找到了，返回指针
+			int nDelPos = m_objServerMessageList.Set_Index_Clear(i);
+			if(-1 == nDelPos)
+			{
+				OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Create]szHashID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", pMessage->GetHashID(), i, nDelPos, pMessage));
+			}
+			else
+			{
+				//OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Create]szHashID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
+			}
+			m_u4CulationIndex = i;
+			return pMessage;
+		}
 	}
 
-	return (_Server_Message_Info* )pPacket;
+	//没找到空余的
+	return pMessage;
 }
 
-bool CServerMessageInfoPool::Delete(_Server_Message_Info* pBuffPacket)
+bool CServerMessageInfoPool::Delete(_Server_Message_Info* pObject)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	if(NULL == pBuffPacket)
+	if(NULL == pObject)
 	{
 		return false;
 	}
 
-	mapMessage::iterator f = m_mapMessageUsed.find(pBuffPacket);
-	if(f != m_mapMessageUsed.end())
+	char szHashID[10] = {'\0'};
+	sprintf_safe(szHashID, 10, "%d", pObject->GetHashID());
+	//int nPos = m_objHashHandleList.Add_Hash_Data(szHandlerID, pObject);
+	int nPos = m_objServerMessageList.Set_Index(pObject->GetHashID(), szHashID, pObject);
+	if(-1 == nPos)
 	{
-		m_mapMessageUsed.erase(f);
-
-		//添加到Free map里面
-		mapMessage::iterator f = m_mapMessageFree.find(pBuffPacket);
-		if(f == m_mapMessageFree.end())
-		{
-			m_mapMessageFree.insert(mapMessage::value_type(pBuffPacket, pBuffPacket));
-		}
+		OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHashID, pObject, nPos));
 	}
+	else
+	{
+		//OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHashID, pObject, nPos));
+	}
+
 
 	return true;
 }
@@ -112,20 +147,14 @@ bool CServerMessageInfoPool::Delete(_Server_Message_Info* pBuffPacket)
 void CServerMessageInfoPool::Close()
 {
 	//清理所有已存在的指针
-	for(mapMessage::iterator itorFreeB = m_mapMessageFree.begin(); itorFreeB != m_mapMessageFree.end(); itorFreeB++)
+	for(int i = 0; i < m_objServerMessageList.Get_Count(); i++)
 	{
-		_Server_Message_Info* pPacket = (_Server_Message_Info* )itorFreeB->second;
-		SAFE_DELETE(pPacket);
+		_Server_Message_Info* pMessage = m_objServerMessageList.Get_Index(i);
+		SAFE_DELETE(pMessage);
 	}
 
-	for(mapMessage::iterator itorUsedB = m_mapMessageUsed.begin(); itorUsedB != m_mapMessageUsed.end(); itorUsedB++)
-	{
-		_Server_Message_Info* pPacket = (_Server_Message_Info* )itorUsedB->second;
-		SAFE_DELETE(pPacket);
-	}
-
-	m_mapMessageFree.clear();
-	m_mapMessageUsed.clear();
+	m_objServerMessageList.Close();
+	m_u4CulationIndex = 1;
 }
 
 CServerMessageTask::CServerMessageTask()

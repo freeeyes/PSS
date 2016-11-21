@@ -103,7 +103,7 @@ bool CProServerManager::Init()
 	App_BuffPacketManager::instance()->Init(BUFFPACKET_MAX_COUNT, App_MainConfig::instance()->GetByteOrder());
 
 	//初始化服务器间异步接收队列
-	App_ServerMessageInfoPool::instance()->Init();
+	App_ServerMessageInfoPool::instance()->Init(App_MainConfig::instance()->GetServerConnectCount());
 
 	//初始化PacketParse对象池
 	App_PacketParsePool::instance()->Init(MAX_PACKET_PARSE);

@@ -23,6 +23,7 @@ CMainConfig::CMainConfig(void)
 	m_u2MaxConnectTime        = 0;
 	m_u1CommandAccount        = 0;
 	m_u4MaxCommandCount       = 2000;
+	m_u4ServerConnectCount    = 100;
 	
 	m_u1ServerType            = 0;
 	m_u1Debug                 = DEBUG_OFF;
@@ -877,6 +878,12 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
 		m_u1ConnectServerRunType = (uint32)ACE_OS::atoi(pData);
 	}
 
+	pData = m_MainConfig.GetData("ConnectServer", "Count");
+	if(pData != NULL)
+	{
+		m_u4ServerConnectCount = (uint32)ACE_OS::atoi(pData);
+	}
+
 	//开始获得监控数据
 	pData = m_MainConfig.GetData("Monitor", "CpuAndMemory");
 	if(pData != NULL)
@@ -1587,4 +1594,9 @@ uint8 CMainConfig::GetServerClose()
 uint32 CMainConfig::GetMaxCommandCount()
 {
 	return m_u4MaxCommandCount;
+}
+
+uint32 CMainConfig::GetServerConnectCount()
+{
+	return m_u4ServerConnectCount;
 }
