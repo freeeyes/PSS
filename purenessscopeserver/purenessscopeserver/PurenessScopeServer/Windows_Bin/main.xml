@@ -6,7 +6,7 @@
 	<ServerType Type="0" name="Pss Service" displayname="PssService" Debug="0" IsClose="0" desc = "Type设置为0为当前启动，1为Linux后台执行，windows启动系统服务，Debug为0关闭debug日志，Debug为1为打开DEBUG日志,IsClose0为允许关闭，1为不允许。" />
 	<ServerID id="1001" desc="当前服务器的ID编号" />
 	<ServerName name="Freeeyes" desc="当前服务器的名称" />
-	<ServerVersion Version="0.97" desc="当前服务器版本" />
+	<ServerVersion Version="0.98" desc="当前服务器版本" />
 	<TCPServerIP ip="INADDR_ANY" port="10002" ipType="IPV4" desc="监听TCP服务器的IP和端口，可以是多个，要用多个" />
 	<!-- <TCPServerIP ip="fe80::d433:372b:d0ee:edc4%12" port="10002" ipType="IPV6" desc="监听TCP服务器的IP和端口，可以是多个(IPv6地址测试)" /> -->
 	<!-- <TCPServerIP ip="127.0.0.1" port="10003" ipType="IPV4" desc="监听TCP服务器的IP和端口，可以是多个，要用多个，只要多写几个这样的节点即可" /> -->
@@ -38,7 +38,7 @@
 	<CoreSetting CoreNeed="0" desc="是否需要打开Core文件支持，0为不需要，1为需要" />
 	
 	<!-- 命令包统计相关设置 -->
-	<CommandAccount Account="1" FlowAccount="1" desc="Account为1记录统计命令日志，0为不记录，FlowAccount为流量统计，1为开启，0为关闭" />
+	<CommandAccount Account="1" FlowAccount="1" MaxCommandCount="2000" desc="Account为1记录统计命令日志，0为不记录，FlowAccount为流量统计，1为开启，0为关闭" />
 	<!-- 接收数据包连接相关设置 -->
 	<RecvInfo RecvBuffSize="20480" RecvQueueTimeout="50" desc="接收客户端数据配置参数" />
 	<!-- 发送数据包连接相关设置 -->

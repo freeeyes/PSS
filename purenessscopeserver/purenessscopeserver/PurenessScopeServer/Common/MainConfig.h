@@ -296,6 +296,7 @@ public:
 	uint32 GetBlockSize();
 	uint32 GetBlockCount();
 	uint8  GetServerClose();
+	uint32 GetMaxCommandCount();
 
 	uint16 GetModuleInfoCount();
 	_ModuleConfig* GetModuleInfo(uint16 u2Index);
@@ -360,7 +361,7 @@ private:
 	uint8      m_u1ConsoleIPType;                  //Console的IPType
 
 	uint8      m_u1CommandFlow;                    //命令调用统计，0为不统计，1为统计
-	
+	uint32     m_u4MaxCommandCount;                //当前框架最大命令数量
 
 	uint32     m_u4ReactorCount;                   //系统中遇到的反应器的个数
 	uint32     m_u4ConnectServerTimerout;          //连接远程服务器间隔时间  

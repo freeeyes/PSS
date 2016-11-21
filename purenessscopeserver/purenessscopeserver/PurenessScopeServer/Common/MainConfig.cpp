@@ -22,6 +22,8 @@ CMainConfig::CMainConfig(void)
 	m_u2MaxHanderCount        = 0;
 	m_u2MaxConnectTime        = 0;
 	m_u1CommandAccount        = 0;
+	m_u4MaxCommandCount       = 2000;
+	
 	m_u1ServerType            = 0;
 	m_u1Debug                 = DEBUG_OFF;
 	m_u1Monitor               = 0;
@@ -907,6 +909,12 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
 		m_u1CommandFlow = (uint8)ACE_OS::atoi(pData);
 	}
 
+	pData = m_MainConfig.GetData("CommandAccount", "MaxCommandCount");
+	if(pData != NULL)
+	{
+		m_u4MaxCommandCount = (uint8)ACE_OS::atoi(pData);
+	}
+
 	//开始获得工作线程监控相关
 	pData = m_MainConfig.GetData("ThreadInfoAI", "AI");
 	if(pData != NULL)
@@ -1059,6 +1067,7 @@ void CMainConfig::Display()
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4TrackIPCount = %d.\n", m_u4TrackIPCount));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4BlockSize = %d.\n", m_u4BlockSize));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4SendBlockCount = %d.\n", m_u4SendBlockCount));
+	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4MaxCommandCount = %d.\n", m_u4MaxCommandCount));
 
 	for(int i = 0; i < (int)m_vecUDPServerInfo.size(); i++)
 	{
@@ -1573,4 +1582,9 @@ uint32 CMainConfig::GetBlockCount()
 uint8 CMainConfig::GetServerClose()
 {
 	return m_u1ServerClose;
+}
+
+uint32 CMainConfig::GetMaxCommandCount()
+{
+	return m_u4MaxCommandCount;
 }
