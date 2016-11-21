@@ -1863,6 +1863,9 @@ void CConnectManager::CloseAll()
 
 	//删除hash表空间
 	m_objHashConnectList.Close();
+
+	//删除缓冲对象
+	m_SendCacheManager.Close();
 }
 
 bool CConnectManager::Close(uint32 u4ConnectID)

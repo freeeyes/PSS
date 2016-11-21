@@ -1304,6 +1304,9 @@ void CProConnectManager::CloseAll()
 
 	//删除hash表空间
 	m_objHashConnectList.Close();
+
+	//删除缓冲对象
+	m_SendCacheManager.Close();
 }
 
 bool CProConnectManager::Close(uint32 u4ConnectID)

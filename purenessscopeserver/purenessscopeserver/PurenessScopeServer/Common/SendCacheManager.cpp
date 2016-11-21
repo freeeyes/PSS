@@ -30,7 +30,7 @@ void CSendCacheManager::Init(uint32 u4CacheCount, uint32 u4CacheSize)
 		//OUR_DEBUG((LM_INFO, "[CSendCacheManager::Init](%d)pMessage=0x%08x.\n", i, pCache));
 		char szHashID[10] = {'\0'};
 		sprintf_safe(szHashID, 10, "%d", i);
-		int nHashPos = m_objCacheHashList.Add_Hash_Data(szHashID, pCache);
+		m_objCacheHashList.Add_Hash_Data(szHashID, pCache);
 	}
 }
 
@@ -82,5 +82,9 @@ ACE_Message_Block* CSendCacheManager::GetCacheData(uint32 u4ConnectID)
 void CSendCacheManager::FreeCacheData(uint32 u4ConnectID)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
+	if(u4ConnectID > 100000000)
+	{
+		OUR_DEBUG((LM_INFO, "[CSendCacheManager::FreeCacheData](%s) is delete.\n", u4ConnectID));
+	}
 	m_u4UsedCount--;
 }

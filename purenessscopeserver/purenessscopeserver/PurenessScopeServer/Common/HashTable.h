@@ -104,6 +104,7 @@ public:
 			delete[] m_lpTable;
 			m_lpTable = NULL;
 		}
+		m_nCount = 0;
 	}
 	
 	//设置一个已知的内存数组块(必须初始化调用)

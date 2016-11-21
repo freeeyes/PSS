@@ -26,7 +26,7 @@ void CThreadInfo::Init(int nCount)
 
 bool CThreadInfo::AddThreadInfo(uint32 u4ThreadID)
 {
-	if(u4ThreadID < 0 || u4ThreadID >= m_nThreadCount)
+	if(u4ThreadID >= (uint32)m_nThreadCount)
 	{
 		return false;
 	}
@@ -53,7 +53,7 @@ bool CThreadInfo::AddThreadInfo(uint32 u4ThreadID)
 
 bool CThreadInfo::AddThreadInfo(uint32 u4ThreadID, _ThreadInfo* pOrcThreadInfo)
 {
-	if(u4ThreadID < 0 || u4ThreadID >= m_nThreadCount)
+	if(u4ThreadID >= (uint32)m_nThreadCount)
 	{
 		return false;
 	}
@@ -96,7 +96,7 @@ _ThreadInfo* CThreadInfo::GetThreadInfo()
 _ThreadInfo* CThreadInfo::GetThreadInfo(uint32 u4ThreadID)
 {
 	//这里不再单独判断ThreadID，因为一个svc目前只有一个线程ID
-	if(u4ThreadID < 0 || u4ThreadID >= m_nThreadCount)
+	if(u4ThreadID >= (uint32)m_nThreadCount)
 	{
 		return NULL;
 	}
@@ -106,7 +106,7 @@ _ThreadInfo* CThreadInfo::GetThreadInfo(uint32 u4ThreadID)
 
 bool CThreadInfo::CloseThread(uint32 u4ThreadID)
 {
-	if(u4ThreadID < 0 || u4ThreadID >= m_nThreadCount)
+	if(u4ThreadID >= (uint32)m_nThreadCount)
 	{
 		return false;
 	}
