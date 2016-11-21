@@ -3,9 +3,7 @@
 
 #include "ISendCacheManager.h"
 #include "MessageBlockManager.h"
-
-#include <map>
-using namespace std;
+#include "HashTable.h"
 
 //负责记录发送缓冲池，用于反复利用内存。
 //add by freeeyes
@@ -31,13 +29,9 @@ public:
 	void FreeCacheData(uint32 u4ConnectID);
 
 private:
-	typedef map<uint32, ACE_Message_Block*> mapUsedCache;
-	typedef vector<ACE_Message_Block*> vecFreeCache;
-
-	mapUsedCache               m_mapUsedCache;
-	vecFreeCache               m_vecFreeCache;
-	uint32                     m_u4CacheSize;
-	ACE_Recursive_Thread_Mutex m_ThreadLock;
+	CHashTable<ACE_Message_Block> m_objCacheHashList;
+	uint32                        m_u4UsedCount;
+	ACE_Recursive_Thread_Mutex    m_ThreadLock;
 };
 
 #endif

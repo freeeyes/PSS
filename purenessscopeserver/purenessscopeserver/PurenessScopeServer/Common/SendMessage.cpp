@@ -52,6 +52,8 @@ void CSendMessagePool::Close()
 		_SendMessage* pMessage = m_objHashHandleList.Get_Index(i);
 		SAFE_DELETE(pMessage);
 	}
+
+	m_objHashHandleList.Close();
 	m_u4CulationIndex = 1;
 }
 
