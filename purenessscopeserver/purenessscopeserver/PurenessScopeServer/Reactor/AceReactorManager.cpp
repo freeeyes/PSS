@@ -258,6 +258,8 @@ ACE_Reactor* CAceReactor::GetReactor()
 
 CAceReactorManager::CAceReactorManager(void)
 {
+	m_pReactorList  = NULL;
+	m_u2RectorCount = 0;
 }
 
 CAceReactorManager::~CAceReactorManager(void)
@@ -269,16 +271,30 @@ CAceReactorManager::~CAceReactorManager(void)
 
 void CAceReactorManager::Close()
 {
-    for (mapAceReactor::iterator b = m_mapAceReactor.begin(); b != m_mapAceReactor.end(); b++)
-    {
-        CAceReactor* pAceReactor = (CAceReactor*)b->second;
+	if(NULL != m_pReactorList)
+	{
+		for (uint16 i = 0; i < m_u2RectorCount; i++)
+		{
+			CAceReactor* pAceReactor = m_pReactorList[i];
 
-        if (NULL != pAceReactor)
-        {
-            pAceReactor->Close();
-            SAFE_DELETE(pAceReactor);
-        }
-    }
+			if (NULL != pAceReactor)
+			{
+				pAceReactor->Close();
+				SAFE_DELETE(pAceReactor);
+			}
+		}
+	}
+	SAFE_DELETE_ARRAY(m_pReactorList);
+	m_pReactorList = NULL;
+}
+
+void CAceReactorManager::Init(uint16 u2Count)
+{
+	Close();
+
+	m_pReactorList  = new CAceReactor*[u2Count];
+	ACE_OS::memset(m_pReactorList, 0, sizeof(CAceReactor*)*u2Count);
+	m_u2RectorCount = u2Count;
 }
 
 const char* CAceReactorManager::GetError()
@@ -313,9 +329,7 @@ bool CAceReactorManager::AddNewReactor(int nReactorID, int nReactorType, int nTh
         return false;
     }
 
-    mapAceReactor::iterator f = m_mapAceReactor.find(nReactorID);
-
-    if (f != m_mapAceReactor.end())
+	if(NULL != m_pReactorList[nReactorID])
     {
         sprintf_safe(m_szError, MAX_BUFF_500, "[CAceReactorManager::AddNewReactor]CAceReactor is exist[%d].", nReactorID);
         delete pAceReactor;
@@ -326,7 +340,7 @@ bool CAceReactorManager::AddNewReactor(int nReactorID, int nReactorType, int nTh
     //{
     //  ACE_Reactor::instance(pAceReactor->GetReactor(), false);
     //}
-    m_mapAceReactor.insert(mapAceReactor::value_type(nReactorID, pAceReactor));
+    m_pReactorList[nReactorID] = pAceReactor;
     OUR_DEBUG((LM_INFO, "[CAceReactorManager::AddNewReactor]New [%d] ReactorTxype = [%d] nThreadCount = [%d]. pAceReactor=[%@]\n", nReactorID, nReactorType, nThreadCount, pAceReactor));
     return true;
 }
@@ -334,10 +348,9 @@ bool CAceReactorManager::AddNewReactor(int nReactorID, int nReactorType, int nTh
 bool CAceReactorManager::StartReactor()
 {
     //先启动非总的Rector
-    for (mapAceReactor::iterator b = m_mapAceReactor.begin(); b != m_mapAceReactor.end(); b++)
+    for (uint16 i = 0; i < m_u2RectorCount; i++)
     {
-        //int nReactorID           = (int)b->first;
-        CAceReactor* pAceReactor = (CAceReactor*)b->second;
+        CAceReactor* pAceReactor = m_pReactorList[i];
 
         if (NULL != pAceReactor)
         {
@@ -348,34 +361,15 @@ bool CAceReactorManager::StartReactor()
     return true;
 }
 
-bool CAceReactorManager::StartReactorDefault()
-{
-    //启动默认的 Reactor
-    mapAceReactor::iterator f = m_mapAceReactor.find(REACTOR_CLIENTDEFINE);
-
-    if (f != m_mapAceReactor.end())
-    {
-        CAceReactor* pAceReactor = (CAceReactor*)f->second;
-
-        if (NULL != pAceReactor)
-        {
-            pAceReactor->Start();
-        }
-    }
-
-    return true;
-}
-
 bool CAceReactorManager::StopReactor()
 {
-    for (mapAceReactor::iterator b = m_mapAceReactor.begin(); b != m_mapAceReactor.end(); b++)
+	for (uint16 i = 0; i < m_u2RectorCount; i++)
     {
-    		int nReactorID           = (int)b->first;
-        CAceReactor* pAceReactor = (CAceReactor*)b->second;
-        OUR_DEBUG((LM_ERROR, "[CAceReactorManager::StopReactor]nReactorID=%d.\n", nReactorID));
+        CAceReactor* pAceReactor = m_pReactorList[i];
 
         if (NULL != pAceReactor)
         {
+			OUR_DEBUG((LM_ERROR, "[CAceReactorManager::StopReactor]nReactorID=%d.\n", pAceReactor->GetReactorID()));
             pAceReactor->Stop();
         }
     }
@@ -385,35 +379,25 @@ bool CAceReactorManager::StopReactor()
 
 CAceReactor* CAceReactorManager::GetAceReactor(int nReactorID)
 {
-    mapAceReactor::iterator f = m_mapAceReactor.find(nReactorID);
+	if(nReactorID < 0 || nReactorID >= m_u2RectorCount)
+	{
+		return NULL;
+	}
 
-    if (f != m_mapAceReactor.end())
-    {
-        return (CAceReactor*)f->second;
-    }
-    else
-    {
-        return NULL;
-    }
+	return m_pReactorList[nReactorID];
 }
 
 ACE_Reactor* CAceReactorManager::GetAce_Reactor(int nReactorID)
 {
-    mapAceReactor::iterator f = m_mapAceReactor.find(nReactorID);
+	if(nReactorID < 0 || nReactorID >= m_u2RectorCount)
+	{
+		return NULL;
+	}
 
-    if (f != m_mapAceReactor.end())
+    if (NULL != m_pReactorList[nReactorID])
     {
-        CAceReactor* pAceReactor = (CAceReactor*)f->second;
-
-        if (NULL != pAceReactor)
-        {
-            //OUR_DEBUG((LM_INFO, "CAceReactorManager::GetAce_Reactor id=[%d] pAceReactor=[0x%@]\n",nReactorID, pAceReactor));
-            return pAceReactor->GetReactor();
-        }
-        else
-        {
-            return NULL;
-        }
+        //OUR_DEBUG((LM_INFO, "CAceReactorManager::GetAce_Reactor id=[%d] pAceReactor=[0x%@]\n",nReactorID, pAceReactor));
+        return m_pReactorList[nReactorID]->GetReactor();
     }
     else
     {
@@ -426,36 +410,31 @@ ACE_Reactor* CAceReactorManager::GetAce_Client_Reactor(int nReactorID)
 	//这里返回客户端连接服务器需要用到的反应器
 	//这里的反应器必须是3个基础反应器之外的，如果只有三个基础反应器，则默认取得第一个。
 	int nClientReactor = nReactorID + 3;
-	if(nClientReactor >= (int)m_mapAceReactor.size())
+	if(nClientReactor >= (int)m_u2RectorCount)
 	{
 		nClientReactor = REACTOR_CLIENTDEFINE;
 	}
 
-	mapAceReactor::iterator f = m_mapAceReactor.find(nClientReactor);
-
-	if (f != m_mapAceReactor.end())
+	if(nReactorID < 0 || nReactorID >= m_u2RectorCount)
 	{
-		CAceReactor* pAceReactor = (CAceReactor*)f->second;
+		return NULL;
+	}
 
-		if (NULL != pAceReactor)
-		{
-			//OUR_DEBUG((LM_INFO, "CAceReactorManager::GetAce_Reactor id=[%d] pAceReactor=[0x%@]\n",nReactorID, pAceReactor));
-			return pAceReactor->GetReactor();
-		}
-		else
-		{
-			return NULL;
-		}
+	if (NULL != m_pReactorList[nReactorID])
+	{
+		//OUR_DEBUG((LM_INFO, "CAceReactorManager::GetAce_Reactor id=[%d] pAceReactor=[0x%@]\n",nReactorID, pAceReactor));
+		return m_pReactorList[nReactorID]->GetReactor();
 	}
 	else
 	{
 		return NULL;
 	}
+
 }
 
 uint32 CAceReactorManager::GetClientReactorCount()
 {
-	uint32 u4Count = (uint32)m_mapAceReactor.size();
+	uint32 u4Count = (uint32)m_u2RectorCount;
 	if(u4Count > 3)
 	{
 		return u4Count - 3;

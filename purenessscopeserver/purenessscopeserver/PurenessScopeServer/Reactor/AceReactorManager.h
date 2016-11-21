@@ -20,8 +20,6 @@
 
 #include "My_Dev_Poll_Reactor.h"
 
-#include <map>
-
 using namespace std;
 
 enum
@@ -72,12 +70,13 @@ public:
 	CAceReactorManager(void);
 	~CAceReactorManager(void);
 
+	void Init(uint16 u2Count);
+
 	bool AddNewReactor(int nReactorID, int nReactorType = Reactor_Select, int nThreadCount = 1, int nMaxHandleCount = 0);
 	void Close();
 	const char* GetError();
 
 	bool StartReactor();
-	bool StartReactorDefault();
 	bool StopReactor();
 
 	CAceReactor* GetAceReactor(int nReactorID);
@@ -86,9 +85,9 @@ public:
 	uint32 GetClientReactorCount();
 
 private:
-	typedef map<int, CAceReactor*> mapAceReactor;
-	mapAceReactor m_mapAceReactor;
-	char          m_szError[MAX_BUFF_500];
+	CAceReactor**  m_pReactorList;
+	uint16         m_u2RectorCount;
+	char           m_szError[MAX_BUFF_500];
 };
 
 typedef ACE_Singleton<CAceReactorManager, ACE_Null_Mutex> App_ReactorManager;

@@ -47,6 +47,9 @@ bool CServerManager::Init()
 
 	OUR_DEBUG((LM_INFO, "[CServerManager::Init]nReactorCount=%d.\n", nReactorCount));
 
+	//初始化反应器集合
+	App_ReactorManager::instance()->Init((uint16)nReactorCount);
+
 	//初始化反应器
 	for (int i = 0 ; i < nReactorCount; i++)
 	{
