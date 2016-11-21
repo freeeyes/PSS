@@ -27,7 +27,7 @@ int CProactorUDPHandler::OpenAddress(const ACE_INET_Addr& AddrLocal, ACE_Proacto
 	//按照线程初始化统计模块的名字
 	char szName[MAX_BUFF_50] = {'\0'};
 	sprintf_safe(szName, MAX_BUFF_50, "发送线程");
-	m_CommandAccount.InitName(szName);
+	m_CommandAccount.InitName(szName, App_MainConfig::instance()->GetMaxCommandCount());
 
 	//初始化统计模块功能
 	m_CommandAccount.Init(App_MainConfig::instance()->GetCommandAccount(), 
@@ -281,11 +281,11 @@ bool CProactorUDPHandler::CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len)
 		pMbData->rd_ptr(m_pPacketParse->GetPacketHeadSrcLen());
 
 		//如果包含包体
-		if(m_pPacketParse->GetPacketBodyLen() > 0)
+		if(m_pPacketParse->GetPacketBodySrcLen() > 0)
 		{
 			ACE_Message_Block* pMBBody = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketBodySrcLen());
 			memcpy_safe((char* )pMbData->rd_ptr(), m_pPacketParse->GetPacketBodySrcLen(), (char* )pMBBody->wr_ptr(), m_pPacketParse->GetPacketBodySrcLen());
-			pMBBody->wr_ptr(m_pPacketParse->GetPacketBodyLen());
+			pMBBody->wr_ptr(m_pPacketParse->GetPacketBodySrcLen());
 
 			_Body_Info obj_Body_Info;
 			bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo()->Parse_Packet_Body_Info(0, pMBBody, App_MessageBlockManager::instance(), &obj_Body_Info);

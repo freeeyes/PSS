@@ -60,7 +60,7 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
     //按照线程初始化统计模块的名字
     char szName[MAX_BUFF_50] = {'\0'};
     sprintf_safe(szName, MAX_BUFF_50, "工作线程(%d)", u4ThreadID);
-    m_CommandAccount.InitName(szName);
+	m_CommandAccount.InitName(szName, App_MainConfig::instance()->GetMaxCommandCount());
 
     //初始化统计模块功能
     m_CommandAccount.Init(App_MainConfig::instance()->GetCommandAccount(),

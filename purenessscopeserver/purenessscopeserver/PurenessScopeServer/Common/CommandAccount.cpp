@@ -1,4 +1,4 @@
-#include "CommandAccount.h"
+#include	 "CommandAccount.h"
 
 CCommandAccount::CCommandAccount()
 {
@@ -24,9 +24,19 @@ CCommandAccount::~CCommandAccount()
 	Close();
 }
 
-void CCommandAccount::InitName(const char* pName)
+void CCommandAccount::InitName(const char* pName, uint32 u4CommandCount)
 {
 	sprintf_safe(m_szName, MAX_BUFF_50, "%s", pName);
+
+	//初始化HashTable
+	int nKeySize = 10;
+	size_t nArraySize = (sizeof(_Hash_Table_Cell<_CommandData>) + nKeySize + sizeof(_CommandData* )) * u4CommandCount;
+	char* pHashBase = new char[nArraySize];
+	m_objCommandDataList.Set_Base_Addr(pHashBase, (int)u4CommandCount);
+	m_objCommandDataList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<_CommandData>) * u4CommandCount, 
+																	nKeySize * u4CommandCount, nKeySize);
+	m_objCommandDataList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<_CommandData>) + nKeySize) * u4CommandCount, 
+																	sizeof(_CommandData* ) * u4CommandCount, sizeof(_CommandData* ));
 }
 
 void CCommandAccount::Init(uint8 u1CommandAccount, uint8 u1Flow, uint16 u2PacketTimeout)
@@ -54,13 +64,16 @@ void CCommandAccount::AddCommandAlert(uint16 u2CommandID, uint32 u4Count, uint32
 
 void CCommandAccount::Close()
 {
-	for(mapCommandDataList::iterator itorFreeB = m_mapCommandDataList.begin(); itorFreeB != m_mapCommandDataList.end(); itorFreeB++)
+	for(int i = 0; i < m_objCommandDataList.Get_Count(); i++)
 	{
-		_CommandData* pCommandData = (_CommandData* )itorFreeB->second;
-		SAFE_DELETE(pCommandData);
+		_CommandData* pCommandData = m_objCommandDataList.Get_Index(i);
+		if(NULL != pCommandData)
+		{
+			SAFE_DELETE(pCommandData);
+		}
 	}
 
-	m_mapCommandDataList.clear();
+	m_objCommandDataList.Close();
 	m_u1CommandAccount = 0;
 }
 
@@ -123,25 +136,20 @@ bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint64 u8CommandCost, 
 	}
 	else
 	{
+		char szHashID[10] = {'\0'};
+		sprintf_safe(szHashID, 10, "%d", u2CommandID);
+
 		//查找并添加
-		mapCommandDataList::iterator f = m_mapCommandDataList.find(u2CommandID);
-		if(f != m_mapCommandDataList.end())
+		_CommandData* pCommandData = m_objCommandDataList.Get_Hash_Box_Data(szHashID);
+		if(NULL != pCommandData)
 		{
 			//如果已经存在，则直接添加
-			_CommandData* pCommandData = (_CommandData* )f->second;
-			if(pCommandData != NULL)
-			{
-				pCommandData->m_u4CommandCount++;
-				pCommandData->m_u8CommandCost += u8CommandCost;
-				pCommandData->m_u1PacketType  = u1PacketType;
-				pCommandData->m_u4PacketSize  += u4PacketSize;
-				pCommandData->m_u4CommandSize += u4CommandSize;
-				pCommandData->m_tvCommandTime = tvTime;
-			}
-			else
-			{
-				return false;
-			}
+			pCommandData->m_u4CommandCount++;
+			pCommandData->m_u8CommandCost += u8CommandCost;
+			pCommandData->m_u1PacketType  = u1PacketType;
+			pCommandData->m_u4PacketSize  += u4PacketSize;
+			pCommandData->m_u4CommandSize += u4CommandSize;
+			pCommandData->m_tvCommandTime = tvTime;
 		}
 		else
 		{
@@ -158,7 +166,7 @@ bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint64 u8CommandCost, 
 				pCommandData->m_u4CommandSize  += u4CommandSize;
 				pCommandData->m_tvCommandTime  = tvTime;
 
-				m_mapCommandDataList.insert(mapCommandDataList::value_type(u2CommandID, pCommandData));
+				m_objCommandDataList.Add_Hash_Data(szHashID, pCommandData);
 			}
 			else
 			{
@@ -213,9 +221,9 @@ bool CCommandAccount::SaveCommandDataLog()
 	}
 
 	AppLogManager::instance()->WriteLog(LOG_SYSTEM_COMMANDDATA, "<Command Data Account[%s]>", m_szName);
-	for(mapCommandDataList::iterator itorFreeB = m_mapCommandDataList.begin(); itorFreeB != m_mapCommandDataList.end(); itorFreeB++)
+	for(int i = 0; i < m_objCommandDataList.Get_Count(); i++)
 	{
-		_CommandData* pCommandData = (_CommandData* )itorFreeB->second;
+		_CommandData* pCommandData = m_objCommandDataList.Get_Index(i);
 		if(pCommandData != NULL)
 		{
 			ACE_Date_Time dtLastTime(pCommandData->m_tvCommandTime);
@@ -323,15 +331,10 @@ uint8 CCommandAccount::GetFLow()
 
 _CommandData* CCommandAccount::GetCommandData(uint16 u2CommandID)
 {
-	mapCommandDataList::iterator f = m_mapCommandDataList.find(u2CommandID);
-	if(f != m_mapCommandDataList.end())
-	{
-		return (_CommandData* )f->second;
-	}
-	else
-	{
-		return NULL;
-	}
+	char szHashID[10] = {'\0'};
+	sprintf_safe(szHashID, 10, "%d", u2CommandID);
+	_CommandData* pCommandData = m_objCommandDataList.Get_Hash_Box_Data(szHashID);
+	return pCommandData;
 }
 
 _CommandFlowAccount CCommandAccount::GetCommandFlowAccount()

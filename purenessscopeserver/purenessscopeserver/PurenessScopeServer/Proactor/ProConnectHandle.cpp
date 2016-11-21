@@ -1928,7 +1928,7 @@ void CProConnectManager::Init(uint16 u2Index)
 	//按照线程初始化统计模块的名字
 	char szName[MAX_BUFF_50] = {'\0'};
 	sprintf_safe(szName, MAX_BUFF_50, "发送线程(%d)", u2Index);
-	m_CommandAccount.InitName(szName);
+	m_CommandAccount.InitName(szName, App_MainConfig::instance()->GetMaxCommandCount());
 
 	//初始化统计模块功能
 	m_CommandAccount.Init(App_MainConfig::instance()->GetCommandAccount(), 

@@ -9,7 +9,7 @@
 #include "ace/Date_Time.h"
 #include "define.h"
 #include "LogManager.h"
-#include <map>
+#include "HashTable.h"
 
 using namespace std;
 
@@ -139,7 +139,7 @@ public:
 	CCommandAccount();
 	~CCommandAccount();
 
-	void InitName(const char* pName);
+	void InitName(const char* pName, uint32 u4CommandCount);
 	void Init(uint8 u1CommandAccount, uint8 u1Flow, uint16 u2RecvTimeout);
 	void AddCommandAlert(uint16 u2CommandID, uint32 u4Count, uint32 u4MailID);
 
@@ -161,10 +161,9 @@ public:
 	void Close();
 
 public:
-	typedef map<uint16, _CommandData*> mapCommandDataList;
+	CHashTable<_CommandData>    m_objCommandDataList;            //命令Hash映射列表  
 	char                        m_szName[MAX_BUFF_50];           //当前统计的名字             
 	vecCommandTimeOut           m_vecCommandTimeOut;             //处理超时命令列表
-	mapCommandDataList          m_mapCommandDataList;            //所有命令列表
 	uint8                       m_u1CommandAccount;              //是否开启命令统计，1是打开，0是关闭
 	uint8                       m_u1Flow;                        //是否打开流量统计，1是打开，0是关闭
 	uint8                       m_u1Minute;                      //当前分钟数
