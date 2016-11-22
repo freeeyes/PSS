@@ -6,8 +6,7 @@
 
 #include "PacketParse.h"
 #include "MainConfig.h"
-
-#include <map>
+#include "HashTable.h"
 
 using namespace std;
 
@@ -28,9 +27,8 @@ public:
 	int GetFreeCount();
 
 private:
-	typedef map<CPacketParse*, CPacketParse*> mapPacketParse;
-	mapPacketParse                  m_mapPacketUsed;                       //已使用的
-	mapPacketParse                  m_mapPacketFree;                       //没有使用的
+	CHashTable<CPacketParse>        m_objPacketParseList;                  //Hash内存池
+	uint32                          m_u4CulationIndex;                     //当前正在使用的标签
 	ACE_Recursive_Thread_Mutex      m_ThreadWriteLock;                     //控制多线程锁
 };
 

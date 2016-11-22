@@ -247,7 +247,7 @@ CMessage* CMessagePool::Create()
 			}
 			else
 			{
-				//OUR_DEBUG((LM_INFO, "[CSendMessagePool::Create]HashID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
+				//OUR_DEBUG((LM_INFO, "[CSendMessagePool::Create]HashID=%d, nPos=%d, nDelPos=%d, (0x%08x).\n", pMessage->GetHashID(), i, nDelPos, pHandler));
 			}
 			m_u4CulationIndex = i;
 			return pMessage;
@@ -268,7 +268,7 @@ CMessage* CMessagePool::Create()
 			}
 			else
 			{
-				//OUR_DEBUG((LM_INFO, "[CSendMessagePool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
+				//OUR_DEBUG((LM_INFO, "[CSendMessagePool::Create]HashID=%d, nPos=%d, nDelPos=%d, (0x%08x).\n", pMessage->GetHashID(), i, nDelPos, pHandler));
 			}
 			m_u4CulationIndex = i;
 			return pMessage;

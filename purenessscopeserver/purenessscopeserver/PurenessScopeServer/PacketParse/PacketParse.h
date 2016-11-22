@@ -22,6 +22,12 @@ public:
 
 	//≥ı ºªØPacketParsed
 	void Init();
+
+	void SetHashID(int nHashID);
+	int  GetHashID();
+
+private:
+	int m_nHashID;
 };
 
 #endif

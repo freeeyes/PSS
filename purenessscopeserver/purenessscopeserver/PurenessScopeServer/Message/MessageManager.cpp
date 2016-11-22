@@ -397,7 +397,7 @@ int CMessageManager::GetCommandCount()
 void CMessageManager::Close()
 {
 	//类关闭的清理工作
-	for(int i = 0; i < m_u4MaxCommandCount; i++)
+	for(int i = 0; i < (int)m_u4MaxCommandCount; i++)
 	{
 		 CClientCommandList* pClientCommandList = m_objClientCommandList[i];
 		 SAFE_DELETE(pClientCommandList);
