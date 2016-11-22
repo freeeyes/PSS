@@ -21,12 +21,37 @@ bool Delete_CommandInfo(_ClientCommandInfo* pClientCommandInfo)
 
 CMessageManager::CMessageManager(void)
 {
+	m_objClientCommandList = NULL;
+	m_u2MaxModuleCount     = 0;
+	m_u4MaxCommandCount    = 0;
+	m_u4CurrCommandCount   = 0;
 }
 
 CMessageManager::~CMessageManager(void)
 {
 	OUR_DEBUG((LM_INFO, "[CMessageManager::~CMessageManager].\n"));
 	//Close();
+}
+
+void CMessageManager::Init(uint16 u2MaxModuleCount, uint32 u4MaxCommandCount)
+{
+	//初始化对象数组
+	m_objClientCommandList = new CClientCommandList*[u4MaxCommandCount];
+	memset(m_objClientCommandList, 0, sizeof(CClientCommandList*)*u4MaxCommandCount);
+
+	//初始化HashTable
+	int nKeySize = 10;
+	size_t nArraySize = (sizeof(_Hash_Table_Cell<_ModuleClient>) + nKeySize + sizeof(_ModuleClient* )) * u2MaxModuleCount;
+	char* pHashBase = new char[nArraySize];
+	m_objModuleClientList.Set_Base_Addr(pHashBase, (int)u2MaxModuleCount);
+	m_objModuleClientList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<_ModuleClient>) * u2MaxModuleCount, 
+																	nKeySize * u2MaxModuleCount, nKeySize);
+	m_objModuleClientList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<_ModuleClient>) + nKeySize) * u2MaxModuleCount, 
+																	sizeof(_ModuleClient* ) * u2MaxModuleCount, sizeof(_ModuleClient* ));
+
+	m_u2MaxModuleCount  = u2MaxModuleCount;
+	m_u4MaxCommandCount = u4MaxCommandCount;
+
 }
 
 bool CMessageManager::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost, uint16& u2Count, bool& bDeleteFlag)
@@ -78,185 +103,168 @@ bool CMessageManager::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uin
 
 CClientCommandList* CMessageManager::GetClientCommandList(uint16 u2CommandID)
 {
-	mapClientCommand::iterator f = m_mapClientCommand.find(u2CommandID);
-	if(f != m_mapClientCommand.end())
+	if(NULL == m_objClientCommandList)
 	{
-		CClientCommandList* pClientCommandList = (CClientCommandList* )f->second;
-		return pClientCommandList;
-	}
-	else
-	{
-		//OUR_DEBUG((LM_ERROR, "[CMessageManager::GetClientCommand] u2CommandID = %d 0x%08x Add OK.\n", u2CommandID, &m_mapClientCommand));
 		return NULL;
 	}
+
+	int nIndex = u2CommandID % m_u4MaxCommandCount;
+	return m_objClientCommandList[nIndex];
 }
 
 bool CMessageManager::AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName)
 {
+	if(NULL == m_objClientCommandList)
+	{
+		return NULL;
+	}
+
 	if(NULL == pClientCommand)
 	{
 		OUR_DEBUG((LM_ERROR, "[CMessageManager::AddClientCommand] u2CommandID = %d pClientCommand is NULL.\n", u2CommandID));
 		return false;
 	}
 
-	mapClientCommand::iterator f = m_mapClientCommand.find(u2CommandID);
-	if(f != m_mapClientCommand.end())
-	{
-		CClientCommandList* pClientCommandList = (CClientCommandList* )f->second;
-		if(NULL != pClientCommandList)
-		{
-			_ClientCommandInfo* pClientCommandInfo = pClientCommandList->AddClientCommand(pClientCommand, pModuleName);
-			if(NULL != pClientCommandInfo) 
-			{
-				//设置命令绑定ID
-				pClientCommandInfo->m_u2CommandID = u2CommandID;
-				
-				//添加到模块里面
-				string strModule = pModuleName;
-				mapModuleClient::iterator f = m_mapModuleClient.find(strModule);
-				if(f == m_mapModuleClient.end())
-				{
-					//找不到，创建新的模块信息
-					_ModuleClient* pModuleClient = new _ModuleClient();
-					if(NULL != pModuleClient)
-					{
-						pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
-						m_mapModuleClient.insert(mapModuleClient::value_type(strModule, pModuleClient));
-					}
-				}
-				else
-				{
-					//找到了，添加进去
-					_ModuleClient* pModuleClient = (_ModuleClient* )f->second;
-					if(NULL != pModuleClient)
-					{
-						pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
-					}
-				}
-				OUR_DEBUG((LM_ERROR, "[CMessageManager::AddClientCommand] u2CommandID = %d Add OK***.\n", u2CommandID));
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		else
-		{
-			return false;
-		}
+	int nIndex = u2CommandID % m_u4MaxCommandCount;
+	CClientCommandList* pClientCommandList = m_objClientCommandList[nIndex];
 
-	}
-
-	//没有找到已有的命令，新建一个列表
-	CClientCommandList* pClientCommandList = new CClientCommandList();
-	if(NULL == pClientCommandList)
+	if(NULL != pClientCommandList)
 	{
-		return false;
-	}
-	else
-	{
+		//该命令已存在
 		_ClientCommandInfo* pClientCommandInfo = pClientCommandList->AddClientCommand(pClientCommand, pModuleName);
-		if(NULL != pClientCommandInfo)
+		if(NULL != pClientCommandInfo) 
 		{
 			//设置命令绑定ID
-			pClientCommandInfo->m_u2CommandID = u2CommandID;			
-			
+			pClientCommandInfo->m_u2CommandID = u2CommandID;
+				
 			//添加到模块里面
 			string strModule = pModuleName;
-			mapModuleClient::iterator f = m_mapModuleClient.find(strModule);
-			if(f == m_mapModuleClient.end())
+			_ModuleClient* pModuleClient = m_objModuleClientList.Get_Hash_Box_Data(strModule.c_str());
+			if(NULL == pModuleClient)
 			{
 				//找不到，创建新的模块信息
-				_ModuleClient* pModuleClient = new _ModuleClient();
+				pModuleClient = new _ModuleClient();
 				if(NULL != pModuleClient)
 				{
 					pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
-					m_mapModuleClient.insert(mapModuleClient::value_type(strModule, pModuleClient));
+					m_objModuleClientList.Add_Hash_Data(strModule.c_str(), pModuleClient);
 				}
 			}
 			else
 			{
 				//找到了，添加进去
-				_ModuleClient* pModuleClient = (_ModuleClient* )f->second;
-				if(NULL != pModuleClient)
-				{
-					pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
-				}
+				pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
 			}
+			OUR_DEBUG((LM_ERROR, "[CMessageManager::AddClientCommand] u2CommandID = %d Add OK***.\n", u2CommandID));
 		}
-
-		m_mapClientCommand.insert(mapClientCommand::value_type(u2CommandID, pClientCommandList));
-		OUR_DEBUG((LM_ERROR, "[CMessageManager::AddClientCommand] u2CommandID = %d Add OK***.\n", u2CommandID));
-		return true;
+		else
+		{
+			return false;
+		}
 	}
-}
-
-bool CMessageManager::AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, _ClientIPInfo objListenInfo)
-{
-	if(NULL == pClientCommand)
+	else
 	{
-		OUR_DEBUG((LM_ERROR, "[CMessageManager::AddClientCommand] u2CommandID = %d pClientCommand is NULL.\n", u2CommandID));
-		return false;
-	}
-
-	mapClientCommand::iterator f = m_mapClientCommand.find(u2CommandID);
-	if(f != m_mapClientCommand.end())
-	{
-		CClientCommandList* pClientCommandList = (CClientCommandList* )f->second;
+		//该命令尚未添加
+		pClientCommandList = new CClientCommandList();
 		if(NULL != pClientCommandList)
 		{
-			_ClientCommandInfo* pClientCommandInfo = pClientCommandList->AddClientCommand(pClientCommand, pModuleName, objListenInfo);
-			if(NULL != pClientCommandInfo) 
+			_ClientCommandInfo* pClientCommandInfo = pClientCommandList->AddClientCommand(pClientCommand, pModuleName);
+			if(NULL != pClientCommandInfo)
 			{
 				//设置命令绑定ID
-				pClientCommandInfo->m_u2CommandID = u2CommandID;
-
+				pClientCommandInfo->m_u2CommandID = u2CommandID;			
+			
 				//添加到模块里面
 				string strModule = pModuleName;
-				mapModuleClient::iterator f = m_mapModuleClient.find(strModule);
-				if(f == m_mapModuleClient.end())
+				_ModuleClient* pModuleClient = m_objModuleClientList.Get_Hash_Box_Data(strModule.c_str());
+				if(NULL == pModuleClient)
 				{
 					//找不到，创建新的模块信息
-					_ModuleClient* pModuleClient = new _ModuleClient();
+					pModuleClient = new _ModuleClient();
 					if(NULL != pModuleClient)
 					{
 						pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
-						m_mapModuleClient.insert(mapModuleClient::value_type(strModule, pModuleClient));
+						m_objModuleClientList.Add_Hash_Data(strModule.c_str(), pModuleClient);
 					}
 				}
 				else
 				{
 					//找到了，添加进去
-					_ModuleClient* pModuleClient = (_ModuleClient* )f->second;
-					if(NULL != pModuleClient)
-					{
-						pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
-					}
+					pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
 				}
+
+				m_objClientCommandList[nIndex] = pClientCommandList;
+				m_u4CurrCommandCount++;
 				OUR_DEBUG((LM_ERROR, "[CMessageManager::AddClientCommand] u2CommandID = %d Add OK***.\n", u2CommandID));
-				return true;
-			}
-			else
-			{
-				return false;
 			}
 		}
 		else
 		{
 			return false;
 		}
-
 	}
 
-	//没有找到已有的命令，新建一个列表
-	CClientCommandList* pClientCommandList = new CClientCommandList();
-	if(NULL == pClientCommandList)
+	return true;
+}
+
+bool CMessageManager::AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, _ClientIPInfo objListenInfo)
+{
+	if(NULL == m_objClientCommandList)
 	{
+		return NULL;
+	}
+
+	if(NULL == pClientCommand)
+	{
+		OUR_DEBUG((LM_ERROR, "[CMessageManager::AddClientCommand] u2CommandID = %d pClientCommand is NULL.\n", u2CommandID));
 		return false;
+	}
+
+	int nIndex = u2CommandID % m_u4MaxCommandCount;
+	CClientCommandList* pClientCommandList = m_objClientCommandList[nIndex];
+	if(NULL != pClientCommandList)
+	{
+		//该命令已存在
+		_ClientCommandInfo* pClientCommandInfo = pClientCommandList->AddClientCommand(pClientCommand, pModuleName, objListenInfo);
+		if(NULL != pClientCommandInfo) 
+		{
+			//设置命令绑定ID
+			pClientCommandInfo->m_u2CommandID = u2CommandID;
+
+			//添加到模块里面
+			string strModule = pModuleName;
+			_ModuleClient* pModuleClient = m_objModuleClientList.Get_Hash_Box_Data(strModule.c_str());
+			if(NULL == pModuleClient)
+			{
+				//找不到，创建新的模块信息
+				pModuleClient = new _ModuleClient();
+				if(NULL != pModuleClient)
+				{
+					pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
+					m_objModuleClientList.Add_Hash_Data(strModule.c_str(), pModuleClient);
+				}
+			}
+			else
+			{
+				//找到了，添加进去
+				pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
+			}
+			OUR_DEBUG((LM_ERROR, "[CMessageManager::AddClientCommand] u2CommandID = %d Add OK***.\n", u2CommandID));
+		}
+		else
+		{
+			return false;
+		}
 	}
 	else
 	{
+		//该命令尚未添加
+		pClientCommandList = new CClientCommandList();
+		if(NULL == pClientCommandList)
+		{
+			return false;
+		}
+
 		_ClientCommandInfo* pClientCommandInfo = pClientCommandList->AddClientCommand(pClientCommand, pModuleName, objListenInfo);
 		if(NULL != pClientCommandInfo)
 		{
@@ -265,49 +273,46 @@ bool CMessageManager::AddClientCommand(uint16 u2CommandID, CClientCommand* pClie
 
 			//添加到模块里面
 			string strModule = pModuleName;
-			mapModuleClient::iterator f = m_mapModuleClient.find(strModule);
-			if(f == m_mapModuleClient.end())
+			_ModuleClient* pModuleClient = m_objModuleClientList.Get_Hash_Box_Data(strModule.c_str());
+			if(NULL == pModuleClient)
 			{
 				//找不到，创建新的模块信息
-				_ModuleClient* pModuleClient = new _ModuleClient();
+				pModuleClient = new _ModuleClient();
 				if(NULL != pModuleClient)
 				{
 					pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
-					m_mapModuleClient.insert(mapModuleClient::value_type(strModule, pModuleClient));
+					m_objModuleClientList.Add_Hash_Data(strModule.c_str(), pModuleClient);
 				}
 			}
 			else
 			{
 				//找到了，添加进去
-				_ModuleClient* pModuleClient = (_ModuleClient* )f->second;
-				if(NULL != pModuleClient)
-				{
-					pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
-				}
+				pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
 			}
+			m_objClientCommandList[nIndex] = pClientCommandList;
+			m_u4CurrCommandCount++;
+			OUR_DEBUG((LM_ERROR, "[CMessageManager::AddClientCommand] u2CommandID = %d Add OK***.\n", u2CommandID));
 		}
-
-		m_mapClientCommand.insert(mapClientCommand::value_type(u2CommandID, pClientCommandList));
-		OUR_DEBUG((LM_ERROR, "[CMessageManager::AddClientCommand] u2CommandID = %d Add OK***.\n", u2CommandID));
-		return true;
+		else
+		{
+			return false;
+		}
 	}
+
+	return true;
 }
 
 bool CMessageManager::DelClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand)
 {
-	mapClientCommand::iterator f = m_mapClientCommand.find(u2CommandID);
-	if(f != m_mapClientCommand.end())
+	int nIndex = u2CommandID % m_u4MaxCommandCount;
+	CClientCommandList* pClientCommandList = m_objClientCommandList[nIndex];
+	if(NULL != pClientCommandList)
 	{
-		CClientCommandList* pClientCommandList = (CClientCommandList* )f->second;
-		if(NULL != pClientCommandList)
+		if(true == pClientCommandList->DelClientCommand(pClientCommand))
 		{
-			if(true == pClientCommandList->DelClientCommand(pClientCommand))
-			{
-				SAFE_DELETE(pClientCommandList);
-				m_mapClientCommand.erase(f);
-			}
+			SAFE_DELETE(pClientCommandList);
+			m_objClientCommandList[nIndex] = NULL;
 		}
-
 		OUR_DEBUG((LM_ERROR, "[CMessageManager::DelClientCommand] u2CommandID = %d Del OK.\n", u2CommandID));
 		return true;
 	}
@@ -322,94 +327,99 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1State
 {
 	string strModuleName = pModuleName;
 
-	mapModuleClient::iterator f = m_mapModuleClient.find(strModuleName);
-	if(f != m_mapModuleClient.end())
+	_ModuleClient* pModuleClient = m_objModuleClientList.Get_Hash_Box_Data(strModuleName.c_str());
+	if(NULL != pModuleClient)
 	{
-		//首先删除所有插件对应的Command映射
-		_ModuleClient* pModuleClient = (_ModuleClient* )f->second;
-		if(NULL != pModuleClient)
+		//从插件目前注册的命令里面找到所有该插件的信息，一个个释放
+		for(uint32 u4Index = 0; u4Index < (uint32)pModuleClient->m_vecClientCommandInfo.size(); u4Index++)
 		{
-			//从插件目前注册的命令里面找到所有该插件的信息，一个个释放
-			for(uint32 u4Index = 0; u4Index < (uint32)pModuleClient->m_vecClientCommandInfo.size(); u4Index++)
+			_ClientCommandInfo* pClientCommandInfo = pModuleClient->m_vecClientCommandInfo[u4Index];
+			if(NULL != pClientCommandInfo)
 			{
-				_ClientCommandInfo* pClientCommandInfo = pModuleClient->m_vecClientCommandInfo[u4Index];
-				if(NULL != pClientCommandInfo)
+				uint16 u2CommandID = pClientCommandInfo->m_u2CommandID;
+				CClientCommandList* pCClientCommandList = GetClientCommandList(u2CommandID);
+				if(NULL != pCClientCommandList)
 				{
-					uint16 u2CommandID = pClientCommandInfo->m_u2CommandID;
-					CClientCommandList* pCClientCommandList = GetClientCommandList(u2CommandID);
-					if(NULL != pCClientCommandList)
+					for(int i = 0; i < pCClientCommandList->GetCount(); i++)
 					{
-						for(int i = 0; i < pCClientCommandList->GetCount(); i++)
+						//找到那个唯一
+						if(pCClientCommandList->GetClientCommandIndex(i) == pClientCommandInfo)
 						{
-							//找到那个唯一
-							if(pCClientCommandList->GetClientCommandIndex(i) == pClientCommandInfo)
+							//找到了，释放之
+							pCClientCommandList->DelClientCommand(pClientCommandInfo->m_pClientCommand);
+
+							//如果该指令下的命令已经不存在，则删除之
+							if(pCClientCommandList->GetCount() == 0)
 							{
-								//找到了，释放之
-								pCClientCommandList->DelClientCommand(pClientCommandInfo->m_pClientCommand);
-								break;
+								int nIndex = u2CommandID % m_u4MaxCommandCount;
+								SAFE_DELETE(pCClientCommandList);
+								m_objClientCommandList[nIndex] = NULL;
+								m_u4CurrCommandCount--;
 							}
+							break;
 						}
 					}
 				}
 			}
-
-			//最后删除实际模块和CommandInfo的关系
-			SAFE_DELETE(pModuleClient);
-			m_mapModuleClient.erase(f);
-
-			//卸载插件信息
-			App_ModuleLoader::instance()->UnLoadModule(pModuleName);
 		}
 
-		//看看是否要重新加载
-		if(u1State == 2)
-		{
-			_ModuleInfo* pModuleInfo = App_ModuleLoader::instance()->GetModuleInfo(pModuleName);
-			if(NULL != pModuleInfo)
-			{
-				//获取对象信息
-				string strModuleN    = pModuleInfo->strModuleName;
-				string strModulePath = pModuleInfo->strModulePath;
+		//最后删除实际模块和CommandInfo的关系
+		SAFE_DELETE(pModuleClient);
+		m_objModuleClientList.Del_Hash_Data(strModuleName.c_str());
 
-				//重新加载
-				App_ModuleLoader::instance()->LoadModule(strModulePath.c_str(), strModuleN.c_str());
-			}
-		}
-
-		return true;
+		//卸载插件信息
+		App_ModuleLoader::instance()->UnLoadModule(pModuleName);
 	}
-	else
+
+	//看看是否要重新加载
+	if(u1State == 2)
 	{
-		return false;
+		_ModuleInfo* pModuleInfo = App_ModuleLoader::instance()->GetModuleInfo(pModuleName);
+		if(NULL != pModuleInfo)
+		{
+			//获取对象信息
+			string strModuleN    = pModuleInfo->strModuleName;
+			string strModulePath = pModuleInfo->strModulePath;
+
+			//重新加载
+			App_ModuleLoader::instance()->LoadModule(strModulePath.c_str(), strModuleN.c_str());
+		}
 	}
+
+	return true; 
 }
 
 int CMessageManager::GetCommandCount()
 {
-	return (int)m_mapClientCommand.size();
+	return (int)m_u4CurrCommandCount;
 }
 
 void CMessageManager::Close()
 {
 	//类关闭的清理工作
-	for(mapClientCommand::iterator b = m_mapClientCommand.begin(); b != m_mapClientCommand.end(); b++)
+	for(int i = 0; i < m_u4MaxCommandCount; i++)
 	{
-		 CClientCommandList* pClientCommandList = (CClientCommandList* )b->second;
+		 CClientCommandList* pClientCommandList = m_objClientCommandList[i];
 		 SAFE_DELETE(pClientCommandList);
 	}
+	SAFE_DELETE_ARRAY(m_objClientCommandList);
 
-	for(mapModuleClient::iterator Mb = m_mapModuleClient.begin(); Mb != m_mapModuleClient.end(); Mb++)
+	for(int i = 0; i < m_objModuleClientList.Get_Count(); i++)
 	{
-		_ModuleClient* pModuleClient = (_ModuleClient* )Mb->second;
+		_ModuleClient* pModuleClient = (_ModuleClient* )m_objModuleClientList.Get_Index(i);
 		SAFE_DELETE(pModuleClient);
 	}
 
-	m_mapClientCommand.clear();
+	m_objModuleClientList.Close();
+
+	m_u2MaxModuleCount  = 0;
+	m_u4MaxCommandCount = 0;
+
 }
 
-mapModuleClient* CMessageManager::GetModuleClient()
+CHashTable<_ModuleClient>* CMessageManager::GetModuleClient()
 {
-	return &m_mapModuleClient;
+	return &m_objModuleClientList;
 }
 
 uint32 CMessageManager::GetWorkThreadCount()

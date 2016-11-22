@@ -298,6 +298,7 @@ public:
 	uint8  GetServerClose();
 	uint32 GetMaxCommandCount();
 	uint32 GetServerConnectCount();
+	uint16 GetMaxModuleCount();
 
 	uint16 GetModuleInfoCount();
 	_ModuleConfig* GetModuleInfo(uint16 u2Index);
@@ -347,7 +348,7 @@ private:
 	uint16     m_u2HandleCount;                        //handle对象池的个数
 	uint16     m_u2MaxHanderCount;                     //最大同时处理Handler的数量
 	uint16     m_u2MaxConnectTime;                     //最长等待连接链接时间（此时间内，如果接收和发送都没有发生，则由服务器关闭这个链接）
-	uint32     m_u4ServerConnectCount;                 //服务器间连接缓冲对象个数 
+	uint32     m_u4ServerConnectCount;                 //服务器间连接缓冲对象个数
 
 	uint16     m_u2RecvQueueTimeout;               //接收队列处理超时时间限定
 	uint16     m_u2SendQueueTimeout;               //发送队列处理超时时间限定
@@ -364,6 +365,7 @@ private:
 
 	uint8      m_u1CommandFlow;                    //命令调用统计，0为不统计，1为统计
 	uint32     m_u4MaxCommandCount;                //当前框架最大命令数量
+	uint16     m_u2MaxModuleCount;                 //当前框架允许的最大模块数量 
 
 	uint32     m_u4ReactorCount;                   //系统中遇到的反应器的个数
 	uint32     m_u4ConnectServerTimerout;          //连接远程服务器间隔时间  

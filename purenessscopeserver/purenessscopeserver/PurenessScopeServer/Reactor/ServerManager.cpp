@@ -33,7 +33,12 @@ bool CServerManager::Init()
 
 	int nServerPortCount    = App_MainConfig::instance()->GetServerPortCount();
 	int nReactorCount       = App_MainConfig::instance()->GetReactorCount();
+
 	bool blState = false;
+
+	//初始化模块数组相关参数
+	App_MessageManager::instance()->Init(App_MainConfig::instance()->GetMaxModuleCount(), App_MainConfig::instance()->GetMaxCommandCount());
+
 	//初始化禁止IP列表
 	App_ForbiddenIP::instance()->Init(FORBIDDENIP_FILE);
 

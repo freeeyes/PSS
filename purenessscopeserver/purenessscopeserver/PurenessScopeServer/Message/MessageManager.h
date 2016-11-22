@@ -6,6 +6,7 @@
 #include "IMessageManager.h"
 #include "Message.h"
 #include "LoadModule.h"
+#include "HashTable.h"
 
 //这里修改一下，如果一个命令对应一个模块是有限制的。
 //这里改为一个信令可以对应任意数量的处理模块，这样就比较好了。
@@ -43,23 +44,6 @@ struct _ModuleClient
 {
 	vector<_ClientCommandInfo*> m_vecClientCommandInfo;    //一个模块所有对应命令列表
 };
-
-//hashmap的key hash生成算法
-struct str_Message_hash  
-{  
-	size_t operator()(const string &str) const    
-	{     
-		size_t  hash=0;  
-
-		for(size_t i=0;i!=str.length();++i)  
-			hash=((hash<<5)+hash)+(size_t)str[i];  
-
-		return hash;  
-	}     
-}; 
-
-//管理工具需要此数据结构，用于回传计算模块信息
-typedef map<string, _ModuleClient*> mapModuleClient;
 
 //一个消息可以对应一个CClientCommand*的数组，当消息到达的时候分发给这些订阅者
 class CClientCommandList
@@ -173,6 +157,8 @@ public:
 	CMessageManager(void);
 	~CMessageManager(void);
 
+	void Init(uint16 u2MaxModuleCount, uint32 u4MaxCommandCount);
+
 	bool DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost, uint16& u2Count, bool& bDeleteFlag);   //执行命令
 	void Close();
 
@@ -185,17 +171,18 @@ public:
 	int  GetCommandCount();                                            //得到当前注册命令的个数
 	CClientCommandList* GetClientCommandList(uint16 u2CommandID);      //得到当前命令的执行列表
 	
-	mapModuleClient* GetModuleClient();                                //返回所有模块绑定注册命令信息
+	CHashTable<_ModuleClient>* GetModuleClient();                      //返回所有模块绑定注册命令信息
 
 	virtual uint32 GetWorkThreadCount();
 	virtual uint32 GetWorkThreadByIndex(uint32 u4Index);
 
 private:
-	typedef map<uint16, CClientCommandList*> mapClientCommand;
-
-	mapClientCommand            m_mapClientCommand;
-	mapModuleClient             m_mapModuleClient;
-	ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;                     //用于控制计数器的增减
+	CClientCommandList**          m_objClientCommandList;              //命令持对应的数组
+	CHashTable<_ModuleClient>     m_objModuleClientList;               //加载模块对应的信息
+	uint16                        m_u2MaxModuleCount;                  //模块池里面的最大个数
+	uint32                        m_u4MaxCommandCount;                 //最大命令池中的数量
+	uint32                        m_u4CurrCommandCount;                //当前有效命令数 
+	ACE_Recursive_Thread_Mutex    m_ThreadWriteLock;                   //数据锁
 };
 
 typedef ACE_Singleton<CMessageManager, ACE_Null_Mutex> App_MessageManager; 

@@ -23,6 +23,7 @@ CMainConfig::CMainConfig(void)
 	m_u2MaxConnectTime        = 0;
 	m_u1CommandAccount        = 0;
 	m_u4MaxCommandCount       = 2000;
+	m_u2MaxModuleCount        = 100;
 	m_u4ServerConnectCount    = 100;
 	
 	m_u1ServerType            = 0;
@@ -613,6 +614,12 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
 	if(pData != NULL)
 	{
 		sprintf_safe(m_szResourceName, MAX_BUFF_200, "%s", pData);
+	}
+
+	pData = m_MainConfig.GetData("ModuleManager", "MaxCount");
+	if(pData != NULL)
+	{
+		m_u2MaxModuleCount = (uint16)ACE_OS::atoi(pData);
 	}
 
 	//开始获得单例模块相关参数
@@ -1599,4 +1606,9 @@ uint32 CMainConfig::GetMaxCommandCount()
 uint32 CMainConfig::GetServerConnectCount()
 {
 	return m_u4ServerConnectCount;
+}
+
+uint16 CMainConfig::GetMaxModuleCount()
+{
+	return m_u2MaxModuleCount;
 }

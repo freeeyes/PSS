@@ -1366,13 +1366,24 @@ bool CConsoleMessage::DoMessage_ShowAllCommandInfo(_CommandInfo& CommandInfo, IB
 {
 	if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
 	{
-		mapModuleClient* pmapModuleClient = App_MessageManager::instance()->GetModuleClient();
-		if(pmapModuleClient != NULL)
+		CHashTable<_ModuleClient>* pHashModuleClient = App_MessageManager::instance()->GetModuleClient();
+
+		//统计个数
+		uint32 u4Count = 0;
+		for(int i = 0; i < pHashModuleClient->Get_Count(); i++)
 		{
-			(*pBuffPacket) << (uint32)pmapModuleClient->size();
-			for(mapModuleClient::iterator b = pmapModuleClient->begin(); b != pmapModuleClient->end(); b++)
+			if(NULL != pHashModuleClient->Get_Index(i))
 			{
-				_ModuleClient* pModuleClient = (_ModuleClient* )b->second;
+				u4Count++;
+			}
+		}
+
+		if(pHashModuleClient != NULL)
+		{
+			(*pBuffPacket) << u4Count;
+			for(int i = 0; i < pHashModuleClient->Get_Count(); i++)
+			{
+				_ModuleClient* pModuleClient = pHashModuleClient->Get_Index(i);
 				if(NULL != pModuleClient)
 				{
 					(*pBuffPacket) << (uint32)pModuleClient->m_vecClientCommandInfo.size();
