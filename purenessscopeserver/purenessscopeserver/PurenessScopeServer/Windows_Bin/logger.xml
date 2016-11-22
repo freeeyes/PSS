@@ -6,6 +6,7 @@
 	<LogLevel CurrLevel="1" desc="当前日志输出级别，大于此等于级别的才会输出" />
 	<!-- logtype为1的文件会建立在Operation文件夹中 Operation为2的文件会建在ServerError文件夹中 -->
 	<!-- Display为0的会记录在文件中，Display为1的会输出在屏幕上 -->
+	<!-- logid必须连续，因为使用了固定数组映射，否则可能会造成日志写入不同的文件夹 -->
 	<LogInfo logid="1000" logtype="1" Display="0" Level="1" logname="ViewSystemLog" desc="系统日志，可以用于逻辑模块输出使用" />
 	<LogInfo logid="1001" logtype="2" Display="0" Level="1" logname="ViewSystemError" desc="系统错误日志，当框架发现错误的时候记录于此" />
 	<LogInfo logid="1002" logtype="1" Display="0" Level="1" logname="ViewConnect" desc="框架链接信息日志，记录来自客户端的链接请求和断开信息" />

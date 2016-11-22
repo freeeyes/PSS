@@ -309,9 +309,15 @@ int CLogManager::ProcessLog(_LogBlockInfo* pLogBlockInfo)
 int CLogManager::WriteLog(int nLogType, const char* fmt, ...)
 {
 	//从日志块池里面找到一块空余的日志块
+	//查看当前日志是否需要入库
+	if(GetLogInfoByLogLevel(nLogType) < m_pServerLogger->GetCurrLevel())
+	{
+		//低于当前日志等级的全部忽略
+		return 0;
+	}
+
 	m_Logger_Mutex.acquire();
 	_LogBlockInfo* pLogBlockInfo = m_objLogBlockPool.GetLogBlockInfo();
-
 
 	if(NULL == pLogBlockInfo)
 	{
@@ -345,6 +351,13 @@ int CLogManager::WriteLog(int nLogType, const char* fmt, ...)
 int CLogManager::WriteLogBinary(int nLogType, const char* pData, int nLen)
 {
 	int nRet = 0;
+	//查看当前日志是否需要入库
+	if(GetLogInfoByLogLevel(nLogType) < m_pServerLogger->GetCurrLevel())
+	{
+		//低于当前日志等级的全部忽略
+		return 0;
+	}
+
 	//从日志块池里面找到一块空余的日志块
 	m_Logger_Mutex.acquire();
 	_LogBlockInfo* pLogBlockInfo = m_objLogBlockPool.GetLogBlockInfo();
@@ -394,6 +407,13 @@ int CLogManager::WriteLogBinary(int nLogType, const char* pData, int nLen)
 
 int CLogManager::WriteToMail( int nLogType, uint32 u4MailID, char* pTitle, const char* fmt, ... )
 {
+	//查看当前日志是否需要入库
+	if(GetLogInfoByLogLevel(nLogType) < m_pServerLogger->GetCurrLevel())
+	{
+		//低于当前日志等级的全部忽略
+		return 0;
+	}
+
 	//从日志块池里面找到一块空余的日志块
 	m_Logger_Mutex.acquire();
 	_LogBlockInfo* pLogBlockInfo = m_objLogBlockPool.GetLogBlockInfo();
@@ -523,7 +543,19 @@ int CLogManager::GetLogInfoByLogDisplay(uint16 u2LogID)
 {
 	if(m_pServerLogger != NULL)
 	{
-		return m_pServerLogger->GetLogType(u2LogID);
+		return m_pServerLogger->GetLogInfoByLogDisplay(u2LogID);
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+uint16 CLogManager::GetLogInfoByLogLevel(uint16 u2LogID)
+{
+	if(m_pServerLogger != NULL)
+	{
+		return m_pServerLogger->GetLogInfoByLogLevel(u2LogID);
 	}
 	else
 	{

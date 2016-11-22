@@ -66,7 +66,6 @@ public:
 
 	virtual int DoLog(int nLogType, _LogBlockInfo* pLogBlockInfo) = 0;
 	virtual int GetLogTypeCount()                                 = 0;
-	virtual int GetLogType(int nIndex)                            = 0;
 
 	virtual uint32 GetBlockSize()                                 = 0;
 	virtual uint32 GetPoolCount()                                 = 0;
@@ -76,6 +75,7 @@ public:
 	virtual char*  GetLogInfoByServerName(uint16 u2LogID)         = 0;
 	virtual char*  GetLogInfoByLogName(uint16 u2LogID)            = 0;
 	virtual int    GetLogInfoByLogDisplay(uint16 u2LogID)         = 0;
+	virtual uint16 GetLogInfoByLogLevel(uint16 u2LogID)           = 0;
 	virtual bool   ReSet(uint32 u4CurrLogLevel)                   = 0;
 };
 #endif

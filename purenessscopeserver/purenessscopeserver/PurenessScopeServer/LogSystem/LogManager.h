@@ -64,9 +64,10 @@ public:
 	uint32 GetCurrLevel();
 
 	uint16 GetLogID(uint16 u2Index);
-	char* GetLogInfoByServerName(uint16 u2LogID);
-	char* GetLogInfoByLogName(uint16 u2LogID);
-	int   GetLogInfoByLogDisplay(uint16 u2LogID);
+	char*  GetLogInfoByServerName(uint16 u2LogID);
+	char*  GetLogInfoByLogName(uint16 u2LogID);
+	int    GetLogInfoByLogDisplay(uint16 u2LogID);
+	uint16 GetLogInfoByLogLevel(uint16 u2LogID);
 
 	//对外写日志的接口
 	int WriteLog(int nLogType, const char* fmt, ...);

@@ -11,11 +11,6 @@
 #include "ILogObject.h"
 #include "smtp.h"
 
-#include <map>
-#include <vector>
-
-using namespace std;
-
 #define MAX_CMD_NUM   100
 #define MAX_TIME_SIZE 100
 
@@ -25,14 +20,33 @@ using namespace std;
 
 #define FILELOG_CONFIG    "logger.xml"
 
+//从XML读取的日志文件信息
+struct _Log_File_Info
+{
+	uint16 m_u2LogID;
+	uint8  m_u1FileClass;
+	uint8  m_u1DisPlay;
+	uint16 m_u2LogLevel; 
+	char   m_szFileName[MAX_BUFF_100];
+
+	_Log_File_Info()
+	{
+		m_u2LogID       = 0;
+		m_u1FileClass   = 0;
+		m_u1DisPlay     = 0;
+		m_u2LogLevel    = 0;
+		m_szFileName[0] = '\0';
+	}
+};
+
 //单元模式日志类
 class CLogFile
 {
 public:
 	CLogFile(const char* pFileRoot, uint32 u4BufferSize)
 	{
+		m_u2LogID           = 0;
 		m_nDisplay          = 0;
-		m_nType             = 0;
 		m_StrServerName     = "";
 		m_StrlogType        = "ServerError";
 		m_pBuffer           = new char[u4BufferSize];   //这里是用于日志拼接时间所用
@@ -188,14 +202,24 @@ public:
 		m_StrlogName = szLoggerName;
     }
 
-	void SetLoggerType(int nType)
+	void SetLoggerID(uint16 u2LogID)
 	{
-		m_nType = nType;
+		m_u2LogID = u2LogID;
 	}
 
-	int GetLoggerType()
+	int GetLoggerID()
 	{
-		return m_nType;
+		return m_u2LogID;
+	}
+
+	void SetLevel(uint16 u2Level)
+	{
+		m_u2Level = u2Level;
+	}
+
+	uint16 GetLevel()
+	{
+		return m_u2Level;
 	}
 
 	void SetServerName(const char* szServerName)
@@ -263,7 +287,6 @@ private:
 	ACE_TString         m_StrlogType;         //日志类型
 	ACE_TString         m_StrServerName;      //服务器前缀
 	int                 m_nDisplay;           //显示还是记录文件    
-	int                 m_nType;              //模块ID
 	ACE_FILE_Connector  m_Connector;          //I/O操作连接器
 	ACE_FILE_IO         m_File;
 	ACE_FILE_Addr       m_FileAddr; 
@@ -271,6 +294,8 @@ private:
 	char                m_szFileRoot[MAX_BUFF_100];   //路径的主目录
 	char*               m_pBuffer;                   //日志缓冲指针
 	uint32              m_u4BufferSize;              //日志缓冲最大大小 
+	uint16              m_u2LogID;                   //日志编号
+	uint16              m_u2Level;                   //日志等级
 };
 
 class CFileLogger : public CServerLogger
@@ -281,11 +306,10 @@ public:
 
 	int DoLog(int nLogType, _LogBlockInfo* pLogBlockInfo);
 	int GetLogTypeCount();
-	int GetLogType(int nIndex);
 
 	bool Init();
 	bool ReSet(uint32 u4CurrLogLevel);
-	bool Close();
+	void Close();
 
 	uint32 GetBlockSize();
 	uint32 GetPoolCount();
@@ -293,15 +317,13 @@ public:
 	uint32 GetCurrLevel();
 
 	uint16 GetLogID(uint16 u2Index);
-	char* GetLogInfoByServerName(uint16 u2LogID);
-	char* GetLogInfoByLogName(uint16 u2LogID);
-	int   GetLogInfoByLogDisplay(uint16 u2LogID);
+	char*  GetLogInfoByServerName(uint16 u2LogID);
+	char*  GetLogInfoByLogName(uint16 u2LogID);
+	int    GetLogInfoByLogDisplay(uint16 u2LogID);
+	uint16 GetLogInfoByLogLevel(uint16 u2LogID);
 
 private:
-	typedef map<uint16, CLogFile*> mapLogFile;
-	typedef vector<uint16>         vecLogType; 
-	mapLogFile                     m_mapLogFile;
-	vecLogType                     m_vecLogType;
+	CLogFile**                     m_pLogFileList;
 	char                           m_szLogRoot[MAX_BUFF_100];	
 	int                            m_nCount;
 
