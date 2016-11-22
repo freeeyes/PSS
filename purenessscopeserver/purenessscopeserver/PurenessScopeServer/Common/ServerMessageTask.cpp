@@ -81,11 +81,11 @@ _Server_Message_Info* CServerMessageInfoPool::Create()
 			int nDelPos = m_objServerMessageList.Set_Index_Clear(i);
 			if(-1 == nDelPos)
 			{
-				OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Create]szHashID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", pMessage->GetHashID(), i, nDelPos, pMessage));
+				OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Create]szHashID=%d, nPos=%d, nDelPos=%d, (0x%08x).\n", pMessage->GetHashID(), i, nDelPos, pMessage));
 			}
 			else
 			{
-				//OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Create]szHashID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
+				//OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Create]szHashID=%d, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
 			}
 			m_u4CulationIndex = i;
 			return pMessage;
@@ -102,11 +102,11 @@ _Server_Message_Info* CServerMessageInfoPool::Create()
 			int nDelPos = m_objServerMessageList.Set_Index_Clear(i);
 			if(-1 == nDelPos)
 			{
-				OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Create]szHashID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", pMessage->GetHashID(), i, nDelPos, pMessage));
+				OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Create]szHashID=%d, nPos=%d, nDelPos=%d, (0x%08x).\n", pMessage->GetHashID(), i, nDelPos, pMessage));
 			}
 			else
 			{
-				//OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Create]szHashID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
+				//OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Create]szHashID=%d, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
 			}
 			m_u4CulationIndex = i;
 			return pMessage;

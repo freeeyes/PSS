@@ -80,7 +80,7 @@ _SendMessage* CSendMessagePool::Create()
 			int nDelPos = m_objHashHandleList.Set_Index_Clear(i);
 			if(-1 == nDelPos)
 			{
-				OUR_DEBUG((LM_INFO, "[CSendMessagePool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", pMessage->GetHashID(), i, nDelPos, pMessage));
+				OUR_DEBUG((LM_INFO, "[CSendMessagePool::Create]HashID=%d, nPos=%d, nDelPos=%d, (0x%08x).\n", pMessage->GetHashID(), i, nDelPos, pMessage));
 			}
 			else
 			{
@@ -101,7 +101,7 @@ _SendMessage* CSendMessagePool::Create()
 			int nDelPos = m_objHashHandleList.Set_Index_Clear(i);
 			if(-1 == nDelPos)
 			{
-				OUR_DEBUG((LM_INFO, "[CSendMessagePool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", pMessage->GetHashID(), i, nDelPos, pMessage));
+				OUR_DEBUG((LM_INFO, "[CSendMessagePool::Create]HashID=%d, nPos=%d, nDelPos=%d, (0x%08x).\n", pMessage->GetHashID(), i, nDelPos, pMessage));
 			}
 			else
 			{
@@ -125,17 +125,17 @@ bool CSendMessagePool::Delete(_SendMessage* pObject)
 		return false;
 	}
 
-	char szHandlerID[10] = {'\0'};
-	sprintf_safe(szHandlerID, 10, "%d", pObject->GetHashID());
+	char szHashID[10] = {'\0'};
+	sprintf_safe(szHashID, 10, "%d", pObject->GetHashID());
 	//int nPos = m_objHashHandleList.Add_Hash_Data(szHandlerID, pObject);
-	int nPos = m_objHashHandleList.Set_Index(pObject->GetHashID(), szHandlerID, pObject);
+	int nPos = m_objHashHandleList.Set_Index(pObject->GetHashID(), szHashID, pObject);
 	if(-1 == nPos)
 	{
-		OUR_DEBUG((LM_INFO, "[CSendMessagePool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHandlerID, pObject, nPos));
+		OUR_DEBUG((LM_INFO, "[CSendMessagePool::Delete]HashID=%s(0x%08x) nPos=%d.\n", szHashID, pObject, nPos));
 	}
 	else
 	{
-		//OUR_DEBUG((LM_INFO, "[CSendMessagePool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHandlerID, pObject, nPos));
+		//OUR_DEBUG((LM_INFO, "[CSendMessagePool::Delete]HashID=%s(0x%08x) nPos=%d.\n", szHashID, pObject, nPos));
 	}
 
 	return true;

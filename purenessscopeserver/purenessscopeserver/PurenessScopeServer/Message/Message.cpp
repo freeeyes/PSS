@@ -12,6 +12,7 @@ CMessage::CMessage(void)
 	m_pmbHead       = NULL;
 	m_pmbBody       = NULL;
 	m_szError[0]    = '\0';
+	m_nHashID       = 0;
 
 	m_pMessageBase = new _MessageBase();
 
@@ -28,6 +29,16 @@ CMessage::~CMessage(void)
 	//OUR_DEBUG((LM_INFO, "[CMessage::~CMessage].\n"));
 	Close();
 	//OUR_DEBUG((LM_INFO, "[CMessage::~CMessage]End.\n"));
+}
+
+void CMessage::SetHashID(int nHasnID)
+{
+	m_nHashID = nHasnID;
+}
+
+int CMessage::GetHashID()
+{
+	return m_nHashID;
 }
 
 const char* CMessage::GetError()
@@ -140,6 +151,7 @@ void CMessage::Clear()
 
 CMessagePool::CMessagePool()
 {
+	m_u4CulationIndex = 1;
 }
 
 CMessagePool::~CMessagePool()
@@ -153,114 +165,142 @@ void CMessagePool::Init(uint32 u4PacketCount)
 {
 	Close();
 
+	//初始化HashTable
+	int nKeySize = 10;
+	size_t nArraySize = (sizeof(_Hash_Table_Cell<CMessage>) + nKeySize + sizeof(CMessage* )) * u4PacketCount;
+	char* pHashBase = new char[nArraySize];
+	m_objHashMessageList.Set_Base_Addr(pHashBase, (int)u4PacketCount);
+	m_objHashMessageList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<CMessage>) * u4PacketCount, 
+																	nKeySize * u4PacketCount, nKeySize);
+	m_objHashMessageList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<CMessage>) + nKeySize) * u4PacketCount, 
+																	sizeof(CMessage* ) * u4PacketCount, sizeof(CMessage* ));
+
 	for(int i = 0; i < (int)u4PacketCount; i++)
 	{
 		CMessage* pPacket = new CMessage();
 		if(NULL != pPacket)
 		{
-			//添加到Free map里面
-			mapMessage::iterator f = m_mapMessageFree.find(pPacket);
-			if(f == m_mapMessageFree.end())
+			//添加到Hashmap里面
+			char szMessageID[10] = {'\0'};
+			sprintf_safe(szMessageID, 10, "%d", i);
+			int nHashPos = m_objHashMessageList.Add_Hash_Data(szMessageID, pPacket);
+			if(-1 != nHashPos)
 			{
-				m_mapMessageFree.insert(mapMessage::value_type(pPacket, pPacket));
+				pPacket->SetHashID(nHashPos);
 			}
 		}
 	}
+	m_u4CulationIndex = 1;
 }
 
 void CMessagePool::Close()
 {
 	//清理所有已存在的指针
-	for(mapMessage::iterator itorFreeB = m_mapMessageFree.begin(); itorFreeB != m_mapMessageFree.end(); itorFreeB++)
+	for(int i = 0; i < m_objHashMessageList.Get_Count(); i++)
 	{
-		CMessage* pPacket = (CMessage* )itorFreeB->second;
-		SAFE_DELETE(pPacket);
+		CMessage* pMessage = m_objHashMessageList.Get_Index(i);
+		SAFE_DELETE(pMessage);
 	}
 
-	for(mapMessage::iterator itorUsedB = m_mapMessageUsed.begin(); itorUsedB != m_mapMessageUsed.end(); itorUsedB++)
-	{
-		CMessage* pPacket = (CMessage* )itorUsedB->second;
-		SAFE_DELETE(pPacket);
-	}
-
-	m_mapMessageFree.clear();
-	m_mapMessageUsed.clear();
+	m_objHashMessageList.Close();
+	m_u4CulationIndex = 1;
 }
 
 int CMessagePool::GetUsedCount()
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	return (int)m_mapMessageUsed.size();
+	return m_objHashMessageList.Get_Count() - m_objHashMessageList.Get_Used_Count();
 }
 
 int CMessagePool::GetFreeCount()
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	return (int)m_mapMessageFree.size();
+	return m_objHashMessageList.Get_Used_Count();
 }
 
 CMessage* CMessagePool::Create()
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	//如果free池中已经没有了，则添加到free池中。
-	if(m_mapMessageFree.size() <= 0)
-	{
-		CMessage* pPacket = new CMessage();
+	CMessage* pMessage = NULL;
 
-		if(pPacket != NULL)
+	//在Hash表中弹出一个已使用的数据
+	//判断循环指针是否已经找到了尽头，如果是则从0开始继续
+	if(m_u4CulationIndex >= (uint32)(m_objHashMessageList.Get_Count() - 1))
+	{
+		m_u4CulationIndex = 0;
+	}
+
+	//第一次寻找，从当前位置往后找
+	for(int i = (int)m_u4CulationIndex; i < m_objHashMessageList.Get_Count(); i++)
+	{
+		pMessage = m_objHashMessageList.Get_Index(i);
+		if(NULL != pMessage)
 		{
-			//添加到Free map里面
-			mapMessage::iterator f = m_mapMessageFree.find(pPacket);
-			if(f == m_mapMessageFree.end())
+			//已经找到了，返回指针
+			int nDelPos = m_objHashMessageList.Set_Index_Clear(i);
+			if(-1 == nDelPos)
 			{
-				m_mapMessageFree.insert(mapMessage::value_type(pPacket, pPacket));
+				OUR_DEBUG((LM_INFO, "[CMessagePool::Create]HashID=%d, nPos=%d, nDelPos=%d, (0x%08x).\n", pMessage->GetHashID(), i, nDelPos, pMessage));
 			}
-		}
-		else
-		{
-			return NULL;
+			else
+			{
+				//OUR_DEBUG((LM_INFO, "[CSendMessagePool::Create]HashID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
+			}
+			m_u4CulationIndex = i;
+			return pMessage;
 		}
 	}
 
-	//从free池中拿出一个,放入到used池中
-	mapMessage::iterator itorFreeB = m_mapMessageFree.begin();
-	CMessage* pPacket = (CMessage* )itorFreeB->second;
-	m_mapMessageFree.erase(itorFreeB);
-	//添加到used map里面
-	mapMessage::iterator f = m_mapMessageUsed.find(pPacket);
-	if(f == m_mapMessageUsed.end())
+	//第二次寻找，从0到当前位置
+	for(int i = 0; i < (int)m_u4CulationIndex; i++)
 	{
-		m_mapMessageUsed.insert(mapMessage::value_type(pPacket, pPacket));
+		pMessage = m_objHashMessageList.Get_Index(i);
+		if(NULL != pMessage)
+		{
+			//已经找到了，返回指针
+			int nDelPos = m_objHashMessageList.Set_Index_Clear(i);
+			if(-1 == nDelPos)
+			{
+				OUR_DEBUG((LM_INFO, "[CMessagePool::Create]HashID=%d, nPos=%d, nDelPos=%d, (0x%08x).\n", pMessage->GetHashID(), i, nDelPos, pMessage));
+			}
+			else
+			{
+				//OUR_DEBUG((LM_INFO, "[CSendMessagePool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
+			}
+			m_u4CulationIndex = i;
+			return pMessage;
+		}
 	}
 
-	return (CMessage* )pPacket;
+	//没找到空余的
+	return pMessage;
 }
 
-bool CMessagePool::Delete(CMessage* pBuffPacket)
+bool CMessagePool::Delete(CMessage* pObject)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	if(NULL == pBuffPacket)
+	if(NULL == pObject)
 	{
 		return false;
 	}
 
-	pBuffPacket->Clear();
+	pObject->Clear();
 
-	mapMessage::iterator f = m_mapMessageUsed.find(pBuffPacket);
-	if(f != m_mapMessageUsed.end())
+	char szHashID[10] = {'\0'};
+	sprintf_safe(szHashID, 10, "%d", pObject->GetHashID());
+	//int nPos = m_objHashHandleList.Add_Hash_Data(szHandlerID, pObject);
+	int nPos = m_objHashMessageList.Set_Index(pObject->GetHashID(), szHashID, pObject);
+	if(-1 == nPos)
 	{
-		m_mapMessageUsed.erase(f);
-
-		//添加到Free map里面
-		mapMessage::iterator f = m_mapMessageFree.find(pBuffPacket);
-		if(f == m_mapMessageFree.end())
-		{
-			m_mapMessageFree.insert(mapMessage::value_type(pBuffPacket, pBuffPacket));
-		}
+		OUR_DEBUG((LM_INFO, "[CMessagePool::Delete]HashID=%s(0x%08x) nPos=%d.\n", szHashID, pObject, nPos));
+	}
+	else
+	{
+		//OUR_DEBUG((LM_INFO, "[CSendMessagePool::Delete]HashID=%s(0x%08x) nPos=%d.\n", szHashID, pObject, nPos));
 	}
 
 	return true;

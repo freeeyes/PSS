@@ -1,57 +1,81 @@
-ï»¿#ifndef _ILOGOBJECT
+#ifndef _ILOGOBJECT
 #define _ILOGOBJECT
 
 #include "ace/SString.h"
+#include "ace/Message_Block.h"
 
-//æ—¥å¿—å—æ•°æ®ç»“æž„
+//ÈÕÖ¾¿éÊý¾Ý½á¹¹
 struct _LogBlockInfo
 {
 public:
-    char*  m_pBlock;                     //å—æŒ‡é’ˆ
-    uint32 m_u4Length;                   //å—é•¿åº¦
-    bool   m_blIsUsed;                   //æ˜¯å¦æ­£åœ¨ä½¿ç”¨
-    uint32 m_u4LogID;                    //LogIDæ ‡è®°
-    uint32 m_u4MailID;                   //é‚®ä»¶å¯¹è±¡çš„IDåºå·
-    char   m_szMailTitle[MAX_BUFF_200];  //é‚®ä»¶å¯¹è±¡çš„æ ‡é¢˜
+	char*  m_pBlock;                     //¿éÖ¸Õë
+	uint32 m_u4Length;                   //¿é³¤¶È
+	bool   m_blIsUsed;                   //ÊÇ·ñÕýÔÚÊ¹ÓÃ
+	uint32 m_u4LogID;                    //LogID±ê¼Ç
+	uint32 m_u4MailID;                   //ÓÊ¼þ¶ÔÏóµÄIDÐòºÅ
+	char   m_szMailTitle[MAX_BUFF_200];  //ÓÊ¼þ¶ÔÏóµÄ±êÌâ
 
-    _LogBlockInfo()
-    {
-        m_pBlock         = NULL;
-        m_u4Length       = 0;
-        m_u4LogID        = 0;
-        m_blIsUsed       = false;
-        m_u4MailID       = 0;
-        m_szMailTitle[0] = '\0';
-    }
+	ACE_Message_Block*  m_pmbQueuePtr;   //ÏûÏ¢¶ÓÁÐÖ¸Õë¿é
 
-    void clear()
-    {
-        m_u4Length       = 0;
-        m_u4LogID        = 0;
-        m_blIsUsed       = false;
-        m_u4MailID       = 0;
-        m_szMailTitle[0] = '\0';
-    }
+	_LogBlockInfo()
+	{
+		m_pBlock         = NULL;
+		m_u4Length       = 0;
+		m_u4LogID        = 0;
+		m_blIsUsed       = false;
+		m_u4MailID       = 0;
+		m_szMailTitle[0] = '\0';
+
+		//ÕâÀïÉèÖÃÏûÏ¢¶ÓÁÐÄ£¿éÖ¸ÕëÄÚÈÝ£¬ÕâÑù¾Í²»±Ø·´¸´µÄnewºÍdelete£¬ÌáÉýÐÔÄÜ
+		//Ö¸Õë¹ØÏµÒ²¿ÉÒÔÔÚÕâÀïÖ±½ÓÖ¸¶¨£¬²»±ØÊ¹ÓÃµÄÊ¹ÓÃÔÙÖ¸¶¨
+		m_pmbQueuePtr  = new ACE_Message_Block(sizeof(_LogBlockInfo*));
+
+		_LogBlockInfo** ppMessage = (_LogBlockInfo**)m_pmbQueuePtr->base();
+		*ppMessage = this;
+	}
+
+	~_LogBlockInfo()
+	{
+		if(NULL != m_pmbQueuePtr)
+		{
+			m_pmbQueuePtr->release();
+			m_pmbQueuePtr = NULL;
+		}
+	}
+
+	ACE_Message_Block* GetQueueMessage()
+	{
+		return m_pmbQueuePtr;
+	}
+
+	void clear()
+	{
+		m_u4Length       = 0;
+		m_u4LogID        = 0;
+		m_blIsUsed       = false;
+		m_u4MailID       = 0;
+		m_szMailTitle[0] = '\0';
+	}
 };
 
-//æ—¥å¿—ç±»å¯¹è±¡(æ˜¯ä¸€ä¸ªè™šç±»ï¼Œç”±åˆ«çš„ç±»ç»§æ‰¿å®žçŽ°å†…éƒ¨)
-class CServerLogger
+//ÈÕÖ¾Àà¶ÔÏó(ÊÇÒ»¸öÐéÀà£¬ÓÉ±ðµÄÀà¼Ì³ÐÊµÏÖÄÚ²¿)
+class CServerLogger 
 {
 public:
     virtual ~CServerLogger() {}
 
-    virtual int DoLog(int nLogType, _LogBlockInfo* pLogBlockInfo) = 0;
-    virtual int GetLogTypeCount()                                 = 0;
-    virtual int GetLogType(int nIndex)                            = 0;
+	virtual int DoLog(int nLogType, _LogBlockInfo* pLogBlockInfo) = 0;
+	virtual int GetLogTypeCount()                                 = 0;
 
-    virtual uint32 GetBlockSize()                                 = 0;
-    virtual uint32 GetPoolCount()                                 = 0;
+	virtual uint32 GetBlockSize()                                 = 0;
+	virtual uint32 GetPoolCount()                                 = 0;
 
-    virtual uint32 GetCurrLevel()                                 = 0;
-    virtual uint16 GetLogID(uint16 u2Index)                       = 0;
-    virtual char*  GetLogInfoByServerName(uint16 u2LogID)         = 0;
-    virtual char*  GetLogInfoByLogName(uint16 u2LogID)            = 0;
-    virtual int    GetLogInfoByLogDisplay(uint16 u2LogID)         = 0;
-    virtual bool   ReSet(uint32 u4CurrLogLevel)                   = 0;
+	virtual uint32 GetCurrLevel()                                 = 0;
+	virtual uint16 GetLogID(uint16 u2Index)                       = 0;
+	virtual char*  GetLogInfoByServerName(uint16 u2LogID)         = 0;
+	virtual char*  GetLogInfoByLogName(uint16 u2LogID)            = 0;
+	virtual int    GetLogInfoByLogDisplay(uint16 u2LogID)         = 0;
+	virtual uint16 GetLogInfoByLogLevel(uint16 u2LogID)           = 0;
+	virtual bool   ReSet(uint32 u4CurrLogLevel)                   = 0;
 };
 #endif

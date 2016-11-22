@@ -3,12 +3,11 @@
 
 #include "ace/Singleton.h"
 #include "ace/Thread_Mutex.h"
+#include "HashTable.h"
 
 #include "../Common/MessageBlockManager.h"
 #include "../Common/BuffPacket.h"
 #include "../IObject/IMessage.h"
-
-#include <map>
 
 using namespace std;
 
@@ -20,6 +19,9 @@ public:
 
 	void Close();
 	void Clear();
+
+	void SetHashID(int nHasnID);
+	int  GetHashID();
 
 	void SetMessageBase(_MessageBase* pMessageBase);
 	bool SetRecvPacket(IBuffPacket* pRecvPacket);
@@ -39,6 +41,7 @@ public:
 	ACE_Message_Block*  GetQueueMessage();
 
 private:
+	int           m_nHashID;
 	char          m_szError[MAX_BUFF_500];
 	_MessageBase* m_pMessageBase;
 
@@ -66,9 +69,8 @@ public:
 	int GetFreeCount();
 
 private:
-	typedef map<CMessage*, CMessage*> mapMessage;
-	mapMessage                  m_mapMessageUsed;                      //已使用的
-	mapMessage                  m_mapMessageFree;                      //没有使用的
+	CHashTable<CMessage>        m_objHashMessageList;                  //Message对象池
+	uint32                      m_u4CulationIndex;                     //当前正在使用的标签
 	ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;                     //控制多线程锁
 }; 
 
