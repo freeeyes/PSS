@@ -12,12 +12,9 @@
 #include "ProAsynchConnect.h"
 #include "IClientManager.h"
 #include "ProactorUDPClient.h"
+#include "HashTable.h"
 
 #define PRO_CONNECT_SERVER_TIMEOUT 100*1000
-
-#include <map>
-
-using namespace std;
 
 #define WAIT_FOR_PROCONNECT_FINISH 5000
 
@@ -61,9 +58,9 @@ public:
 	~CClientProConnectManager(void);
 
 	bool Init(ACE_Proactor* pProactor);                                                                                        //初始化链接器
-	bool Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, IClientMessage* pClientMessage);                                                             //链接指定的服务器（TCP）
+	bool Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, IClientMessage* pClientMessage);                   //链接指定的服务器（TCP）
 	bool Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage);  //连接服务器(TCP)，指定本地地址
-	bool ConnectUDP(int nServerID, const char* pIP, int nPort, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage);                                                    //建立一个指向UDP的链接（UDP）
+	bool ConnectUDP(int nServerID, const char* pIP, int nPort, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage);                                //建立一个指向UDP的链接（UDP）
 	bool ReConnect(int nServerID);                                                                                             //重新连接一个指定的服务器(TCP)  
 	bool CloseByClient(int nServerID);                                                                                         //远程被动关闭(TCP)
 	bool Close(int nServerID, EM_s2s ems2s = S2S_INNEED_CALLBACK);                                                             //关闭连接（TCP）
@@ -88,18 +85,15 @@ public:
 	virtual int handle_timeout(const ACE_Time_Value &tv, const void *arg);                       //定时检测
 
 private:
-	typedef map<int, CProactorClientInfo*> mapProactorClientInfo;              //管理所有已经存在的客户端链接信息（TCP）
-	typedef map<int, CProactorUDPClient*>  mapProactorUDPClientInfo;           //管理所有已经存在的客户端链接信息（UDP）
-
-private:
-	CProAsynchConnect           m_ProAsynchConnect;
-	mapProactorClientInfo       m_mapClientInfo;               //TCP客户端链接
-	mapProactorUDPClientInfo    m_mapProactorUDPClientInfo;    //UDP客户端链接
-	ACE_Recursive_Thread_Mutex  m_ThreadWritrLock;             //线程锁
-	ActiveTimer                 m_ActiveTimer;                 //时间管理器
-	int                         m_nTaskID;                     //定时检测工具
-	bool                        m_blProactorFinish;            //Proactor是否已经注册 
-	uint32                      m_u4ConnectServerTimeout;      //连接间隔时间
+	CProAsynchConnect               m_ProAsynchConnect;  
+	CHashTable<CProactorClientInfo> m_objClientTCPList;            //TCP客户端链接
+	CHashTable<CProactorUDPClient>  m_objClientUDPList;            //UDP客户端链接
+	ACE_Recursive_Thread_Mutex      m_ThreadWritrLock;             //线程锁
+	ActiveTimer                     m_ActiveTimer;                 //时间管理器
+	int                             m_nTaskID;                     //定时检测工具
+	bool                            m_blProactorFinish;            //Proactor是否已经注册 
+	uint32                          m_u4ConnectServerTimeout;      //连接间隔时间
+	uint32                          m_u4MaxPoolCount;              //连接池的上限
 };
 
 typedef ACE_Singleton<CClientProConnectManager, ACE_Recursive_Thread_Mutex> App_ClientProConnectManager;
