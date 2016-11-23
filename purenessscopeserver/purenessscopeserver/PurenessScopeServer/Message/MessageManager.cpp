@@ -21,7 +21,6 @@ bool Delete_CommandInfo(_ClientCommandInfo* pClientCommandInfo)
 
 CMessageManager::CMessageManager(void)
 {
-	m_objClientCommandList = NULL;
 	m_u2MaxModuleCount     = 0;
 	m_u4MaxCommandCount    = 0;
 	m_u4CurrCommandCount   = 0;
@@ -36,13 +35,19 @@ CMessageManager::~CMessageManager(void)
 void CMessageManager::Init(uint16 u2MaxModuleCount, uint32 u4MaxCommandCount)
 {
 	//初始化对象数组
-	m_objClientCommandList = new CClientCommandList*[u4MaxCommandCount];
-	memset(m_objClientCommandList, 0, sizeof(CClientCommandList*)*u4MaxCommandCount);
+	int nKeySize = 10;
+	size_t nArraySize = (sizeof(_Hash_Table_Cell<CClientCommandList>) + nKeySize + sizeof(CClientCommandList* )) * u4MaxCommandCount;
+	char* pHashBase = new char[nArraySize];
+	m_objClientCommandList.Set_Base_Addr(pHashBase, (int)u4MaxCommandCount);
+	m_objClientCommandList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<CClientCommandList>) * u4MaxCommandCount, 
+																	nKeySize * u4MaxCommandCount, nKeySize);
+	m_objClientCommandList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<CClientCommandList>) + nKeySize) * u4MaxCommandCount, 
+																	sizeof(CClientCommandList* ) * u4MaxCommandCount, sizeof(CClientCommandList* ));
 
 	//初始化HashTable
-	int nKeySize = 10;
-	size_t nArraySize = (sizeof(_Hash_Table_Cell<_ModuleClient>) + nKeySize + sizeof(_ModuleClient* )) * u2MaxModuleCount;
-	char* pHashBase = new char[nArraySize];
+	nKeySize = 10;
+	nArraySize = (sizeof(_Hash_Table_Cell<_ModuleClient>) + nKeySize + sizeof(_ModuleClient* )) * u2MaxModuleCount;
+	pHashBase = new char[nArraySize];
 	m_objModuleClientList.Set_Base_Addr(pHashBase, (int)u2MaxModuleCount);
 	m_objModuleClientList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<_ModuleClient>) * u2MaxModuleCount, 
 																	nKeySize * u2MaxModuleCount, nKeySize);
@@ -103,21 +108,14 @@ bool CMessageManager::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uin
 
 CClientCommandList* CMessageManager::GetClientCommandList(uint16 u2CommandID)
 {
-	if(NULL == m_objClientCommandList)
-	{
-		return NULL;
-	}
-
-	int nIndex = u2CommandID % m_u4MaxCommandCount;
-	return m_objClientCommandList[nIndex];
+	char szCommandID[10] = {'\0'};
+	sprintf_safe(szCommandID, 10, "%d", u2CommandID);
+	return m_objClientCommandList.Get_Hash_Box_Data(szCommandID);
 }
 
 bool CMessageManager::AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName)
 {
-	if(NULL == m_objClientCommandList)
-	{
-		return NULL;
-	}
+
 
 	if(NULL == pClientCommand)
 	{
@@ -125,9 +123,9 @@ bool CMessageManager::AddClientCommand(uint16 u2CommandID, CClientCommand* pClie
 		return false;
 	}
 
-	int nIndex = u2CommandID % m_u4MaxCommandCount;
-	CClientCommandList* pClientCommandList = m_objClientCommandList[nIndex];
-
+	char szCommandID[10] = {'\0'};
+	sprintf_safe(szCommandID, 10, "%d", u2CommandID);
+	CClientCommandList* pClientCommandList = m_objClientCommandList.Get_Hash_Box_Data(szCommandID);
 	if(NULL != pClientCommandList)
 	{
 		//该命令已存在
@@ -193,7 +191,7 @@ bool CMessageManager::AddClientCommand(uint16 u2CommandID, CClientCommand* pClie
 					pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
 				}
 
-				m_objClientCommandList[nIndex] = pClientCommandList;
+				m_objClientCommandList.Add_Hash_Data(szCommandID, pClientCommandList);
 				m_u4CurrCommandCount++;
 				OUR_DEBUG((LM_ERROR, "[CMessageManager::AddClientCommand] u2CommandID = %d Add OK***.\n", u2CommandID));
 			}
@@ -209,19 +207,15 @@ bool CMessageManager::AddClientCommand(uint16 u2CommandID, CClientCommand* pClie
 
 bool CMessageManager::AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, _ClientIPInfo objListenInfo)
 {
-	if(NULL == m_objClientCommandList)
-	{
-		return NULL;
-	}
-
 	if(NULL == pClientCommand)
 	{
 		OUR_DEBUG((LM_ERROR, "[CMessageManager::AddClientCommand] u2CommandID = %d pClientCommand is NULL.\n", u2CommandID));
 		return false;
 	}
 
-	int nIndex = u2CommandID % m_u4MaxCommandCount;
-	CClientCommandList* pClientCommandList = m_objClientCommandList[nIndex];
+	char szCommandID[10] = {'\0'};
+	sprintf_safe(szCommandID, 10, "%d", u2CommandID);
+	CClientCommandList* pClientCommandList = m_objClientCommandList.Get_Hash_Box_Data(szCommandID);
 	if(NULL != pClientCommandList)
 	{
 		//该命令已存在
@@ -289,7 +283,7 @@ bool CMessageManager::AddClientCommand(uint16 u2CommandID, CClientCommand* pClie
 				//找到了，添加进去
 				pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
 			}
-			m_objClientCommandList[nIndex] = pClientCommandList;
+			m_objClientCommandList.Add_Hash_Data(szCommandID, pClientCommandList);
 			m_u4CurrCommandCount++;
 			OUR_DEBUG((LM_ERROR, "[CMessageManager::AddClientCommand] u2CommandID = %d Add OK***.\n", u2CommandID));
 		}
@@ -304,14 +298,15 @@ bool CMessageManager::AddClientCommand(uint16 u2CommandID, CClientCommand* pClie
 
 bool CMessageManager::DelClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand)
 {
-	int nIndex = u2CommandID % m_u4MaxCommandCount;
-	CClientCommandList* pClientCommandList = m_objClientCommandList[nIndex];
+	char szCommandID[10] = {'\0'};
+	sprintf_safe(szCommandID, 10, "%d", u2CommandID);
+	CClientCommandList* pClientCommandList = m_objClientCommandList.Get_Hash_Box_Data(szCommandID);
 	if(NULL != pClientCommandList)
 	{
 		if(true == pClientCommandList->DelClientCommand(pClientCommand))
 		{
 			SAFE_DELETE(pClientCommandList);
-			m_objClientCommandList[nIndex] = NULL;
+			m_objClientCommandList.Del_Hash_Data(szCommandID);
 		}
 		OUR_DEBUG((LM_ERROR, "[CMessageManager::DelClientCommand] u2CommandID = %d Del OK.\n", u2CommandID));
 		return true;
@@ -351,9 +346,10 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1State
 							//如果该指令下的命令已经不存在，则删除之
 							if(pCClientCommandList->GetCount() == 0)
 							{
-								int nIndex = u2CommandID % m_u4MaxCommandCount;
 								SAFE_DELETE(pCClientCommandList);
-								m_objClientCommandList[nIndex] = NULL;
+								char szCommandID[10] = {'\0'};
+								sprintf_safe(szCommandID, 10, "%d", u2CommandID);
+								m_objClientCommandList.Del_Hash_Data(szCommandID);
 								m_u4CurrCommandCount--;
 							}
 							break;
@@ -397,19 +393,18 @@ int CMessageManager::GetCommandCount()
 void CMessageManager::Close()
 {
 	//类关闭的清理工作
-	for(int i = 0; i < (int)m_u4MaxCommandCount; i++)
+	for(int i = 0; i < (int)m_objClientCommandList.Get_Count(); i++)
 	{
-		 CClientCommandList* pClientCommandList = m_objClientCommandList[i];
+		CClientCommandList* pClientCommandList = m_objClientCommandList.Get_Index(i);
 		 SAFE_DELETE(pClientCommandList);
 	}
-	SAFE_DELETE_ARRAY(m_objClientCommandList);
+	m_objClientCommandList.Close();
 
 	for(int i = 0; i < m_objModuleClientList.Get_Count(); i++)
 	{
 		_ModuleClient* pModuleClient = (_ModuleClient* )m_objModuleClientList.Get_Index(i);
 		SAFE_DELETE(pModuleClient);
 	}
-
 	m_objModuleClientList.Close();
 
 	m_u2MaxModuleCount  = 0;

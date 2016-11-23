@@ -317,17 +317,17 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, int nPort
 		return false;
 	}
 
-	//第一次开始链接
-	if(false == pClientInfo->Run(m_blProactorFinish, SERVER_CONNECT_FIRST))
+	//添加进hash
+	if(-1 == m_objClientTCPList.Add_Hash_Data(szServerID, pClientInfo))
 	{
+		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) add m_objClientTCPList is fail.\n", nServerID));
 		SAFE_DELETE(pClientInfo);
 		return false;
 	}
 
-	//链接已经建立，添加进hash
-	if(-1 == m_objClientTCPList.Add_Hash_Data(szServerID, pClientInfo))
+	//第一次开始链接
+	if(false == pClientInfo->Run(m_blProactorFinish, SERVER_CONNECT_FIRST))
 	{
-		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) add m_objClientTCPList is fail.\n", nServerID));
 		SAFE_DELETE(pClientInfo);
 		return false;
 	}
@@ -371,17 +371,17 @@ bool CClientProConnectManager::Connect( int nServerID, const char* pIP, int nPor
 	//设置本地IP和端口
 	pClientInfo->SetLocalAddr(pLocalIP, nLocalPort, u1LocalIPType);
 
-	//第一次开始链接
-	if(false == pClientInfo->Run(m_blProactorFinish, SERVER_CONNECT_FIRST))
+	//添加进hash
+	if(-1 == m_objClientTCPList.Add_Hash_Data(szServerID, pClientInfo))
 	{
+		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) add m_objClientTCPList is fail.\n", nServerID));
 		SAFE_DELETE(pClientInfo);
 		return false;
 	}
 
-	//链接已经建立，添加进hash
-	if(-1 == m_objClientTCPList.Add_Hash_Data(szServerID, pClientInfo))
+	//第一次开始链接
+	if(false == pClientInfo->Run(m_blProactorFinish, SERVER_CONNECT_FIRST))
 	{
-		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) add m_objClientTCPList is fail.\n", nServerID));
 		SAFE_DELETE(pClientInfo);
 		return false;
 	}

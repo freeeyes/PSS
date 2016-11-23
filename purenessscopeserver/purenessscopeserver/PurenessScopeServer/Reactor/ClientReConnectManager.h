@@ -8,13 +8,10 @@
 #include "IClientManager.h"
 #include "ConnectClient.h"
 #include "ReactorUDPClient.h"
+#include "HashTable.h"
 
 #define RE_CONNECT_SERVER_TIMEOUT 100*1000
 #define WAIT_FOR_RECONNECT_FINISH 5000
-
-#include <map>
-
-using namespace std;
 
 typedef ACE_Connector<CConnectClient, ACE_SOCK_CONNECTOR> CConnectClientConnector;
 
@@ -83,20 +80,17 @@ public:
 
 	virtual int handle_timeout(const ACE_Time_Value& current_time, const void* act = 0);               //定时器执行
 
-private:
-	typedef map<int, CReactorClientInfo*> mapReactorConnectInfo;
-	typedef map<int, CReactorUDPClient*>  mapReactorUDPConnectInfo;
-
 public:
-	mapReactorConnectInfo       m_mapConnectInfo;              //TCP连接对象管理器
-	mapReactorUDPConnectInfo    m_mapReactorUDPConnectInfo;    //UDP连接对象管理器
-	CConnectClientConnector     m_ReactorConnect;              //Reactor连接客户端对象
-	ACE_Recursive_Thread_Mutex  m_ThreadWritrLock;             //线程锁
-	ActiveTimer                 m_ActiveTimer;                 //时间管理器
-	int                         m_nTaskID;                     //定时检测工具
-	ACE_Reactor*                m_pReactor;                    //当前的反应器
-	bool                        m_blReactorFinish;             //Reactor是否已经注册
-	uint32                      m_u4ConnectServerTimeout;      //连接间隔时间
+	CHashTable<CReactorClientInfo> m_objClientTCPList;            //TCP客户端链接
+	CHashTable<CReactorUDPClient>  m_objClientUDPList;            //UDP客户端链接
+	CConnectClientConnector        m_ReactorConnect;              //Reactor连接客户端对象
+	ACE_Recursive_Thread_Mutex     m_ThreadWritrLock;             //线程锁
+	ActiveTimer                    m_ActiveTimer;                 //时间管理器
+	int                            m_nTaskID;                     //定时检测工具
+	ACE_Reactor*                   m_pReactor;                    //当前的反应器
+	bool                           m_blReactorFinish;             //Reactor是否已经注册
+	uint32                         m_u4ConnectServerTimeout;      //连接间隔时间
+	int32                          m_u4MaxPoolCount;              //连接池的上限
 };
 
 typedef ACE_Singleton<CClientReConnectManager, ACE_Recursive_Thread_Mutex> App_ClientReConnectManager;

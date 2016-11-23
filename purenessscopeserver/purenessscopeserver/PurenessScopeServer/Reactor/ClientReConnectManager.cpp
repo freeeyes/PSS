@@ -232,6 +232,29 @@ bool CClientReConnectManager::Init(ACE_Reactor* pReactor)
 		return false;
 	}
 
+	//记录缓冲池的最大上限
+	m_u4MaxPoolCount = App_MainConfig::instance()->GetServerConnectCount();
+
+	//初始化Hash数组(TCP)
+	int nKeySize = 10;
+	size_t nArraySize = (sizeof(_Hash_Table_Cell<CReactorClientInfo>) + nKeySize + sizeof(CReactorClientInfo* )) * m_u4MaxPoolCount;
+	char* pHashBase = new char[nArraySize];
+	m_objClientTCPList.Set_Base_Addr(pHashBase, (int)m_u4MaxPoolCount);
+	m_objClientTCPList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<CReactorClientInfo>) * m_u4MaxPoolCount, 
+																	nKeySize * m_u4MaxPoolCount, nKeySize);
+	m_objClientTCPList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<CReactorClientInfo>) + nKeySize) * m_u4MaxPoolCount, 
+																	sizeof(CReactorClientInfo* ) * m_u4MaxPoolCount, sizeof(CReactorClientInfo* ));
+
+	//初始化Hash数组(UDP)
+	nKeySize = 10;
+	nArraySize = (sizeof(_Hash_Table_Cell<CReactorUDPClient>) + nKeySize + sizeof(CReactorUDPClient* )) * m_u4MaxPoolCount;
+	pHashBase = new char[nArraySize];
+	m_objClientUDPList.Set_Base_Addr(pHashBase, (int)m_u4MaxPoolCount);
+	m_objClientUDPList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<CReactorUDPClient>) * m_u4MaxPoolCount, 
+																	nKeySize * m_u4MaxPoolCount, nKeySize);
+	m_objClientUDPList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<CReactorUDPClient>) + nKeySize) * m_u4MaxPoolCount, 
+																	sizeof(CReactorUDPClient* ) * m_u4MaxPoolCount, sizeof(CReactorUDPClient* ));
+
 	m_u4ConnectServerTimeout = App_MainConfig::instance()->GetConnectServerTimeout() * 1000; //转换为微妙
 
 	if (m_u4ConnectServerTimeout == 0)
@@ -247,26 +270,25 @@ bool CClientReConnectManager::Init(ACE_Reactor* pReactor)
 bool CClientReConnectManager::Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, IClientMessage* pClientMessage)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-	mapReactorConnectInfo::iterator f = m_mapConnectInfo.find(nServerID);
-
-	if (f != m_mapConnectInfo.end())
-	{
-		//如果这个链接已经存在，则不创建新的链接
-		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]nServerID =(%d) is exist.\n", nServerID));
-		return false;
-	}
-
-	//初始化链接信息
-	CReactorClientInfo* pClientInfo = new CReactorClientInfo();
-
+	//查找已有连接
+	char szServerID[10] = {'\0'};
+	sprintf_safe(szServerID, 10, "%d", nServerID);
+	CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 	if (NULL == pClientInfo)
 	{
 		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]pClientInfo is NULL.\n"));
 		return false;
 	}
 
-	//链接已经建立，添加进map
-	m_mapConnectInfo[nServerID] = pClientInfo;
+	//如果池已经满了，则不能在申请新连接
+	if(m_objClientTCPList.Get_Used_Count() == m_objClientTCPList.Get_Count())
+	{
+		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) m_objClientTCPList is full.\n", nServerID));
+		return false;
+	}
+
+	//新建Hash对象
+	pClientInfo = new CReactorClientInfo();
 
 	//添加有效的pClientMessage
 	App_ServerMessageTask::instance()->AddClientMessage(pClientMessage);
@@ -277,6 +299,14 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, int nPort,
 		delete pClientInfo;
 		pClientInfo = NULL;
 		Close(nServerID);
+		return false;
+	}
+
+	//添加进hash
+	if(-1 == m_objClientTCPList.Add_Hash_Data(szServerID, pClientInfo))
+	{
+		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) add m_objClientTCPList is fail.\n", nServerID));
+		SAFE_DELETE(pClientInfo);
 		return false;
 	}
 
@@ -297,26 +327,31 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, int nPort,
 bool CClientReConnectManager::Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-	mapReactorConnectInfo::iterator f = m_mapConnectInfo.find(nServerID);
-
-	if (f != m_mapConnectInfo.end())
-	{
-		//如果这个链接已经存在，则不创建新的链接
-		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]nServerID =(%d) is exist.\n", nServerID));
-		return false;
-	}
-
-	//初始化链接信息
-	CReactorClientInfo* pClientInfo = new CReactorClientInfo();
-
+	//查找已有连接
+	char szServerID[10] = {'\0'};
+	sprintf_safe(szServerID, 10, "%d", nServerID);
+	CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 	if (NULL == pClientInfo)
 	{
 		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]pClientInfo is NULL.\n"));
 		return false;
 	}
 
-	//链接已经建立，添加进map
-	m_mapConnectInfo[nServerID] = pClientInfo;
+	//如果池已经满了，则不能在申请新连接
+	if(m_objClientTCPList.Get_Used_Count() == m_objClientTCPList.Get_Count())
+	{
+		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) m_objClientTCPList is full.\n", nServerID));
+		return false;
+	}
+
+	//初始化链接信息
+	pClientInfo = new CReactorClientInfo();
+
+	if (NULL == pClientInfo)
+	{
+		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]pClientInfo is NULL.\n"));
+		return false;
+	}
 
 	//添加有效的pClientMessage
 	App_ServerMessageTask::instance()->AddClientMessage(pClientMessage);
@@ -332,6 +367,14 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, int nPort,
 
 	//设置本地IP和端口
 	pClientInfo->SetLocalAddr(pLocalIP, nLocalPort, u1LocalIPType);
+
+	//添加进hash
+	if(-1 == m_objClientTCPList.Add_Hash_Data(szServerID, pClientInfo))
+	{
+		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) add m_objClientTCPList is fail.\n", nServerID));
+		SAFE_DELETE(pClientInfo);
+		return false;
+	}
 
 	//开始链接
 	if (false == pClientInfo->Run(m_blReactorFinish, SERVER_CONNECT_FIRST))
@@ -350,16 +393,24 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, int nPort,
 bool CClientReConnectManager::ConnectUDP(int nServerID, const char* pIP, int nPort, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-	mapReactorUDPConnectInfo::iterator f = m_mapReactorUDPConnectInfo.find(nServerID);
-
-	if (f != m_mapReactorUDPConnectInfo.end())
+	//查找已有连接
+	char szServerID[10] = {'\0'};
+	sprintf_safe(szServerID, 10, "%d", nServerID);
+	CReactorUDPClient* pReactorUDPClient = m_objClientUDPList.Get_Hash_Box_Data(szServerID);
+	if (NULL == pReactorUDPClient)
 	{
-		//如果这个链接已经存在，则不创建新的链接
-		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::ConnectUDP]nServerID =(%d) is exist.\n", nServerID));
+		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]pClientInfo is NULL.\n"));
 		return false;
 	}
 
-	CReactorUDPClient* pReactorUDPClient = new CReactorUDPClient();
+	//如果池已经满了，则不能在申请新连接
+	if(m_objClientUDPList.Get_Used_Count() == m_objClientUDPList.Get_Count())
+	{
+		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) m_objClientTCPList is full.\n", nServerID));
+		return false;
+	}
+
+	pReactorUDPClient = new CReactorUDPClient();
 
 	if (NULL == pReactorUDPClient)
 	{
@@ -367,7 +418,6 @@ bool CClientReConnectManager::ConnectUDP(int nServerID, const char* pIP, int nPo
 		return false;
 	}
 
-	m_mapReactorUDPConnectInfo[nServerID] = pReactorUDPClient;
 	ACE_INET_Addr AddrLocal;
 	int nErr = 0;
 
@@ -396,6 +446,14 @@ bool CClientReConnectManager::ConnectUDP(int nServerID, const char* pIP, int nPo
 		return false;
 	}
 
+	//链接已经建立，添加进hash
+	if(-1 == m_objClientUDPList.Add_Hash_Data(szServerID, pReactorUDPClient))
+	{
+		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) add m_objClientTCPList is fail.\n", nServerID));
+		SAFE_DELETE(pReactorUDPClient);
+		return false;
+	}
+
 	if (0 != pReactorUDPClient->OpenAddress(AddrLocal, emType, App_ReactorManager::instance()->GetAce_Reactor(REACTOR_UDPDEFINE), pClientUDPMessage))
 	{
 		OUR_DEBUG((LM_INFO, "[CClientReConnectManager::ConnectUDP](%d)UDP OpenAddress error.\n", nServerID));
@@ -414,17 +472,17 @@ bool CClientReConnectManager::SetHandler(int nServerID, CConnectClient* pConnect
 		return false;
 	}
 
-	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-	mapReactorConnectInfo::iterator f = m_mapConnectInfo.find(nServerID);
-
-	if (f == m_mapConnectInfo.end())
+	//查找已有连接
+	char szServerID[10] = {'\0'};
+	sprintf_safe(szServerID, 10, "%d", nServerID);
+	CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
+	if (NULL == pClientInfo)
 	{
 		//如果这个链接已经存在，则不再添加到已经存在的客户端map管理中
 		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::SetHandler]nServerID =(%d) is not exist.\n", nServerID));
 		return false;
 	}
 
-	CReactorClientInfo* pClientInfo = (CReactorClientInfo* )f->second;
 	pClientInfo->SetConnectClient(pConnectClient);
 	return true;
 }
@@ -433,17 +491,10 @@ bool CClientReConnectManager::Close(int nServerID, EM_s2s ems2s)
 {
 	//如果是因为服务器断开，则只删除ProConnectClient的指针
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-	mapReactorConnectInfo::iterator f = m_mapConnectInfo.find(nServerID);
-
-	if (f == m_mapConnectInfo.end())
-	{
-		//如果这个链接已经存在，则不创建新的链接
-		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]nServerID =(%d) is not exist.\n", nServerID));
-		return false;
-	}
-
-	CReactorClientInfo* pClientInfo = (CReactorClientInfo*)f->second;
-
+	//查找已有连接
+	char szServerID[10] = {'\0'};
+	sprintf_safe(szServerID, 10, "%d", nServerID);
+	CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 	if (NULL == pClientInfo)
 	{
 		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]nServerID =(%d) pClientInfo is NULL.\n", nServerID));
@@ -459,16 +510,14 @@ bool CClientReConnectManager::Close(int nServerID, EM_s2s ems2s)
 	if(S2S_NEED_CALLBACK == ems2s)
 	{
 		SAFE_DELETE(pClientInfo);
-		//从map里面删除当前存在的对象
-		m_mapConnectInfo.erase(f);
 	}
 	else
 	{
 		pClientInfo->Close();
 		SAFE_DELETE(pClientInfo);
-		//从map里面删除当前存在的对象
-		m_mapConnectInfo.erase(f);
 	}
+	//从Hash里面删除当前存在的对象
+	m_objClientTCPList.Del_Hash_Data(szServerID);
 
 	return true;
 }
@@ -477,17 +526,10 @@ bool CClientReConnectManager::CloseUDP(int nServerID)
 {
 	//如果是因为服务器断开，则只删除ProConnectClient的指针
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-	mapReactorUDPConnectInfo::iterator f = m_mapReactorUDPConnectInfo.find(nServerID);
-
-	if (f == m_mapReactorUDPConnectInfo.end())
-	{
-		//如果这个链接已经存在，则不创建新的链接
-		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::CloseUDP]nServerID =(%d) is not exist.\n", nServerID));
-		return false;
-	}
-
-	CReactorUDPClient* pClientInfo = (CReactorUDPClient*)f->second;
-
+	//查找已有连接
+	char szServerID[10] = {'\0'};
+	sprintf_safe(szServerID, 10, "%d", nServerID);
+	CReactorUDPClient* pClientInfo = m_objClientUDPList.Get_Hash_Box_Data(szServerID);
 	if (NULL == pClientInfo)
 	{
 		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::CloseUDP]nServerID =(%d) pClientInfo is NULL.\n", nServerID));
@@ -496,49 +538,38 @@ bool CClientReConnectManager::CloseUDP(int nServerID)
 
 	pClientInfo->Close();
 	SAFE_DELETE(pClientInfo);
-	//从map里面删除当前存在的对象
+	//从hash里面删除当前存在的对象
+	m_objClientUDPList.Del_Hash_Data(szServerID);
 	return true;
 }
 
 bool CClientReConnectManager::ConnectErrorClose(int nServerID)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-	mapReactorConnectInfo::iterator f = m_mapConnectInfo.find(nServerID);
-
-	if (f == m_mapConnectInfo.end())
-	{
-		//如果这个链接已经存在，则不创建新的链接
-		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::ConnectErrorClose]nServerID =(%d) is not exist.\n", nServerID));
-		return false;
-	}
-
-	CReactorClientInfo* pClientInfo = (CReactorClientInfo*)f->second;
-
+	//查找已有连接
+	char szServerID[10] = {'\0'};
+	sprintf_safe(szServerID, 10, "%d", nServerID);
+	CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 	if (NULL == pClientInfo)
 	{
 		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::ConnectErrorClose]nServerID =(%d) pClientInfo is NULL.\n", nServerID));
 		return false;
 	}
 
-	//从map里面删除当前存在的对象
-	m_mapConnectInfo.erase(f);
+	//从Hash里面删除当前存在的对象
+	
 	SAFE_DELETE(pClientInfo);
+	m_objClientTCPList.Del_Hash_Data(szServerID);
 	return true;
 }
 
 IClientMessage* CClientReConnectManager::GetClientMessage(int nServerID)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-	mapReactorConnectInfo::iterator f = m_mapConnectInfo.find(nServerID);
-
-	if (f == m_mapConnectInfo.end())
-	{
-		//如果这个链接已经存在，则不创建新的链接
-		return NULL;
-	}
-
-	CReactorClientInfo* pClientInfo = (CReactorClientInfo*)f->second;
-
+	//查找已有连接
+	char szServerID[10] = {'\0'};
+	sprintf_safe(szServerID, 10, "%d", nServerID);
+	CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 	if (NULL != pClientInfo)
 	{
 		return pClientInfo->GetClientMessage();
@@ -550,9 +581,11 @@ IClientMessage* CClientReConnectManager::GetClientMessage(int nServerID)
 bool CClientReConnectManager::SendData(int nServerID, const char* pData, int nSize, bool blIsDelete)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-	mapReactorConnectInfo::iterator f = m_mapConnectInfo.find(nServerID);
-
-	if (f == m_mapConnectInfo.end())
+	//查找已有连接
+	char szServerID[10] = {'\0'};
+	sprintf_safe(szServerID, 10, "%d", nServerID);
+	CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
+	if (NULL == pClientInfo)
 	{
 		//如果这个链接已经存在，则不创建新的链接
 		OUR_DEBUG((LM_ERROR, "[CProConnectManager::SendData]nServerID =(%d) is not exist.\n", nServerID));
@@ -565,7 +598,6 @@ bool CClientReConnectManager::SendData(int nServerID, const char* pData, int nSi
 		return false;
 	}
 
-	CReactorClientInfo* pClientInfo = (CReactorClientInfo*)f->second;
 	ACE_Message_Block* pmblk = App_MessageBlockManager::instance()->Create(nSize);
 
 	if (NULL == pmblk)
@@ -595,9 +627,10 @@ bool CClientReConnectManager::SendData(int nServerID, const char* pData, int nSi
 bool CClientReConnectManager::SendDataUDP(int nServerID, const char* pIP, int nPort, const char* pMessage, uint32 u4Len, bool blIsDelete)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-	mapReactorUDPConnectInfo::iterator f = m_mapReactorUDPConnectInfo.find(nServerID);
-
-	if (f == m_mapReactorUDPConnectInfo.end())
+	char szServerID[10] = {'\0'};
+	sprintf_safe(szServerID, 10, "%d", nServerID);
+	CReactorUDPClient* pClientInfo = m_objClientUDPList.Get_Hash_Box_Data(szServerID);
+	if (NULL == pClientInfo)
 	{
 		//如果这个链接已经存在，则不创建新的链接
 		OUR_DEBUG((LM_ERROR, "[CProConnectManager::Close]nServerID =(%d) is not exist.\n", nServerID));
@@ -610,7 +643,6 @@ bool CClientReConnectManager::SendDataUDP(int nServerID, const char* pIP, int nP
 		return false;
 	}
 
-	CReactorUDPClient* pClientInfo = (CReactorUDPClient*)f->second;
 	//发送数据
 	bool blSendRet = pClientInfo->SendMessage(pMessage, u4Len, pIP, nPort);
 
@@ -655,22 +687,28 @@ void CClientReConnectManager::Close()
 	CancelConnectTask();
 
 	//关闭所有已存在的链接
-	for (mapReactorConnectInfo::iterator b = m_mapConnectInfo.begin(); b != m_mapConnectInfo.end(); b++)
+	for(int i = 0; i < m_objClientTCPList.Get_Count(); i++)
 	{
-		CReactorClientInfo* pClientInfo = (CReactorClientInfo*)b->second;
-		pClientInfo->Close();
-		SAFE_DELETE(pClientInfo);
+		CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Index(i);
+		if(NULL != pClientInfo)
+		{
+			pClientInfo->Close();
+			SAFE_DELETE(pClientInfo);
+		}
 	}
+	m_objClientTCPList.Close();
 
-	for (mapReactorUDPConnectInfo::iterator ub = m_mapReactorUDPConnectInfo.begin(); ub != m_mapReactorUDPConnectInfo.end(); ub++)
+	for(int i = 0; i < m_objClientUDPList.Get_Count(); i++)
 	{
-		CReactorUDPClient* pClientInfo = (CReactorUDPClient*)ub->second;
-		pClientInfo->Close();
-		SAFE_DELETE(pClientInfo);
+		CReactorUDPClient* pClientInfo = m_objClientUDPList.Get_Index(i);
+		if(NULL != pClientInfo)
+		{
+			pClientInfo->Close();
+			SAFE_DELETE(pClientInfo);
+		}
 	}
-
-	m_mapConnectInfo.clear();
-	m_mapReactorUDPConnectInfo.clear();
+	m_objClientUDPList.Close();
+	m_u4MaxPoolCount = 0;
 	m_ActiveTimer.deactivate();
 	OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]End.\n"));
 }
@@ -684,10 +722,10 @@ int CClientReConnectManager::handle_timeout(const ACE_Time_Value& tv, const void
 		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::handle_timeout] arg is not NULL, tv = %d.\n", tv.sec()));
 	}
 
-	for (mapReactorConnectInfo::iterator b = m_mapConnectInfo.begin(); b != m_mapConnectInfo.end(); b++)
+	for (int i = 0; i < m_objClientTCPList.Get_Count(); i++)
 	{
 		//int nServerID = (int)b->first;
-		CReactorClientInfo* pClientInfo = (CReactorClientInfo*)b->second;
+		CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Index(i);
 
 		if (NULL == pClientInfo->GetConnectClient())
 		{
@@ -716,9 +754,9 @@ void CClientReConnectManager::GetConnectInfo(vecClientConnectInfo& VecClientConn
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 	VecClientConnectInfo.clear();
 
-	for (mapReactorConnectInfo::iterator b = m_mapConnectInfo.begin(); b != m_mapConnectInfo.end(); b++)
+	for (int i = 0; i < m_objClientTCPList.Get_Count(); i++)
 	{
-		CReactorClientInfo* pClientInfo = (CReactorClientInfo*)b->second;
+		CReactorClientInfo* pClientInfo =  m_objClientTCPList.Get_Index(i);
 
 		if (NULL != pClientInfo)
 		{
@@ -743,9 +781,9 @@ void CClientReConnectManager::GetUDPConnectInfo(vecClientConnectInfo& VecClientC
 {
 	VecClientConnectInfo.clear();
 
-	for (mapReactorUDPConnectInfo::iterator b = m_mapReactorUDPConnectInfo.begin(); b != m_mapReactorUDPConnectInfo.end(); b++)
+	for (int i = 0; i < m_objClientUDPList.Get_Count(); i++)
 	{
-		CReactorUDPClient* pClientInfo = (CReactorUDPClient*)b->second;
+		CReactorUDPClient* pClientInfo = m_objClientUDPList.Get_Index(i);
 
 		if (NULL != pClientInfo)
 		{
@@ -759,17 +797,10 @@ bool CClientReConnectManager::CloseByClient(int nServerID)
 {
 	//如果是因为远程连接断开，则只删除ProConnectClient的指针
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-	mapReactorConnectInfo::iterator f = m_mapConnectInfo.find(nServerID);
+	char szServerID[10] = {'\0'};
+	sprintf_safe(szServerID, 10, "%d", nServerID);	
 
-	if (f == m_mapConnectInfo.end())
-	{
-		//如果这个链接已经存在，则不创建新的链接
-		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]nServerID =(%d) is exist.\n", nServerID));
-		return false;
-	}
-
-	CReactorClientInfo* pClientInfo = (CReactorClientInfo*)f->second;
-
+	CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 	if (NULL == pClientInfo)
 	{
 		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]nServerID =(%d) pClientInfo is NULL.\n", nServerID));
@@ -778,39 +809,34 @@ bool CClientReConnectManager::CloseByClient(int nServerID)
 
 	pClientInfo->SetConnectClient(NULL);
 	pClientInfo->SetServerConnectState(SERVER_CONNECT_FAIL);
+
 	return true;
 }
 
 EM_Server_Connect_State CClientReConnectManager::GetConnectState( int nServerID )
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-	mapReactorConnectInfo::iterator f = m_mapConnectInfo.find(nServerID);
+	char szServerID[10] = {'\0'};
+	sprintf_safe(szServerID, 10, "%d", nServerID);	
 
-	if (f == m_mapConnectInfo.end())
+	CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
+	if (NULL == pClientInfo)
 	{
 		//如果这个链接已经存在，则不创建新的链接
 		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::GetConnectState]nServerID =(%d) is not exist.\n", nServerID));
 		return SERVER_CONNECT_FAIL;
 	}
 
-	CReactorClientInfo* pClientInfo = (CReactorClientInfo*)f->second;
 	return pClientInfo->GetServerConnectState();
 }
 
 bool CClientReConnectManager::ReConnect(int nServerID)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-	mapReactorConnectInfo::iterator f = m_mapConnectInfo.find(nServerID);
+	char szServerID[10] = {'\0'};
+	sprintf_safe(szServerID, 10, "%d", nServerID);	
 
-	if (f == m_mapConnectInfo.end())
-	{
-		//如果这个链接不存在，则不创建新的链接
-		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]nServerID =(%d) is not exist.\n", nServerID));
-		return false;
-	}
-
-	CReactorClientInfo* pClientInfo = (CReactorClientInfo*)f->second;
-
+	CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 	if (NULL == pClientInfo)
 	{
 		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]nServerID =(%d) pClientInfo is NULL.\n", nServerID));
@@ -833,17 +859,18 @@ ACE_INET_Addr CClientReConnectManager::GetServerAddr(int nServerID)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 	ACE_INET_Addr remote_addr;
-	mapReactorConnectInfo::iterator f = m_mapConnectInfo.find(nServerID);
+	char szServerID[10] = {'\0'};
+	sprintf_safe(szServerID, 10, "%d", nServerID);	
 
-	if (f == m_mapConnectInfo.end())
+	CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
+	if (NULL == pClientInfo)
 	{
-		//如果这个链接已经存在，则不创建新的链接
-		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]nServerID =(%d) is exist.\n", nServerID));
+		//如果这个链接不存在，则不创建新的链接
+		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]nServerID =(%d) is not exist.\n", nServerID));
 		return remote_addr;
 	}
 	else
 	{
-		CReactorClientInfo* pClientInfo = (CReactorClientInfo*)f->second;
 		remote_addr = pClientInfo->GetServerAddr();
 		return remote_addr;
 	}
@@ -852,17 +879,18 @@ ACE_INET_Addr CClientReConnectManager::GetServerAddr(int nServerID)
 bool CClientReConnectManager::SetServerConnectState(int nServerID, EM_Server_Connect_State objState)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-	mapReactorConnectInfo::iterator f = m_mapConnectInfo.find(nServerID);
+	char szServerID[10] = {'\0'};
+	sprintf_safe(szServerID, 10, "%d", nServerID);	
 
-	if (f == m_mapConnectInfo.end())
+	CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
+	if (NULL == pClientInfo)
 	{
-		//如果这个链接已经存在，则不创建新的链接
-		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]nServerID =(%d) is exist.\n", nServerID));
+		//如果这个链接不存在，则不创建新的链接
+		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]nServerID =(%d) is not exist.\n", nServerID));
 		return false;
 	}
 	else
 	{
-		CReactorClientInfo* pClientInfo = (CReactorClientInfo*)f->second;
 		pClientInfo->SetServerConnectState(objState);
 		return true;
 	}
@@ -871,17 +899,18 @@ bool CClientReConnectManager::SetServerConnectState(int nServerID, EM_Server_Con
 bool CClientReConnectManager::GetServerIPInfo( int nServerID, _ClientIPInfo& objServerIPInfo )
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-	mapReactorConnectInfo::iterator f = m_mapConnectInfo.find(nServerID);
+	char szServerID[10] = {'\0'};
+	sprintf_safe(szServerID, 10, "%d", nServerID);	
 
-	if (f == m_mapConnectInfo.end())
+	CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
+	if (NULL == pClientInfo)
 	{
-		//如果这个链接已经存在，则不创建新的链接
-		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]nServerID =(%d) is exist.\n", nServerID));
+		//如果这个链接不存在，则不创建新的链接
+		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]nServerID =(%d) is not exist.\n", nServerID));
 		return false;
 	}
 	else
 	{
-		CReactorClientInfo* pClientInfo = (CReactorClientInfo*)f->second;
 		ACE_INET_Addr remote_addr = pClientInfo->GetServerAddr();
 		sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_50, remote_addr.get_host_addr());
 		objServerIPInfo.m_nPort = remote_addr.get_port_number();
@@ -897,9 +926,9 @@ bool CClientReConnectManager::DeleteIClientMessage(IClientMessage* pClientMessag
 	App_ServerMessageTask::instance()->DelClientMessage(pClientMessage);
 
 	//一一寻找与之对应的连接以及相关信息并删除之
-	for(mapReactorConnectInfo::iterator b = m_mapConnectInfo.begin(); b!= m_mapConnectInfo.end();)
+	for(int i = 0; i < m_objClientTCPList.Get_Count(); i++)
 	{
-		CReactorClientInfo* pClientInfo = (CReactorClientInfo*)b->second;
+		CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Index(i);
 
 		if(NULL != pClientInfo && pClientInfo->GetClientMessage() == pClientMessage)
 		{
@@ -911,12 +940,12 @@ bool CClientReConnectManager::DeleteIClientMessage(IClientMessage* pClientMessag
 				pClientInfo->GetConnectClient()->ClientClose(ems2s);
 			}
 
+			char szServerID[10] = {'\0'};
+			sprintf_safe(szServerID, 10, "%d", pClientInfo->GetServerID());
+
 			SAFE_DELETE(pClientInfo);
-			m_mapConnectInfo.erase(b++);
-		}
-		else
-		{
-			b++;
+			m_objClientTCPList.Del_Hash_Data(szServerID);
+			return true;	
 		}
 	}
 

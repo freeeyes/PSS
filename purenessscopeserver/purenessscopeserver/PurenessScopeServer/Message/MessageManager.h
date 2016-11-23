@@ -177,12 +177,12 @@ public:
 	virtual uint32 GetWorkThreadByIndex(uint32 u4Index);
 
 private:
-	CClientCommandList**          m_objClientCommandList;              //命令持对应的数组
-	CHashTable<_ModuleClient>     m_objModuleClientList;               //加载模块对应的信息
-	uint16                        m_u2MaxModuleCount;                  //模块池里面的最大个数
-	uint32                        m_u4MaxCommandCount;                 //最大命令池中的数量
-	uint32                        m_u4CurrCommandCount;                //当前有效命令数 
-	ACE_Recursive_Thread_Mutex    m_ThreadWriteLock;                   //数据锁
+	CHashTable<CClientCommandList> m_objClientCommandList;              //命令持对应的数组
+	CHashTable<_ModuleClient>      m_objModuleClientList;               //加载模块对应的信息
+	uint16                         m_u2MaxModuleCount;                  //模块池里面的最大个数
+	uint32                         m_u4MaxCommandCount;                 //最大命令池中的数量
+	uint32                         m_u4CurrCommandCount;                //当前有效命令数 
+	ACE_Recursive_Thread_Mutex     m_ThreadWriteLock;                   //数据锁
 };
 
 typedef ACE_Singleton<CMessageManager, ACE_Null_Mutex> App_MessageManager; 
