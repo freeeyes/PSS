@@ -234,6 +234,7 @@ public:
 	~CProConnectManagerGroup();
 
 	void Init(uint16 u2SendQueueCount);
+	void Close();
 
 	bool AddConnect(CProConnectHandle* pConnectHandler);
 	bool PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, bool blSendState = true, bool blDlete = true);                      //“Ï≤Ω∑¢ÀÕ

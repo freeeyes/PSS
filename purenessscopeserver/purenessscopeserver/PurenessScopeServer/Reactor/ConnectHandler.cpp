@@ -2832,26 +2832,40 @@ bool CConnectHandlerPool::Delete(CConnectHandler* pObject)
 //==============================================================
 CConnectManagerGroup::CConnectManagerGroup()
 {
-	m_u4CurrMaxCount     = 0;
-	m_u2ThreadQueueCount = SENDQUEUECOUNT;
+	m_objConnnectManagerList = NULL;
+	m_u4CurrMaxCount         = 0;
+	m_u2ThreadQueueCount     = SENDQUEUECOUNT;
 }
 
 CConnectManagerGroup::~CConnectManagerGroup()
 {
 	OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::~CConnectManagerGroup].\n"));
 
-	for(mapConnectManager::iterator b = m_mapConnectManager.begin(); b != m_mapConnectManager.end();b++)
-	{
-		CConnectManager* pConnectManager = (CConnectManager* )b->second;
-		SAFE_DELETE(pConnectManager);
-	}
+	Close();
+}
 
-	m_mapConnectManager.clear();
+void CConnectManagerGroup::Close()
+{
+	if(NULL != m_objConnnectManagerList)
+	{
+		for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
+		{
+			CConnectManager* pConnectManager = m_objConnnectManagerList[i];
+			SAFE_DELETE(pConnectManager);
+		}
+	}
+	SAFE_DELETE_ARRAY(m_objConnnectManagerList);
+	m_u2ThreadQueueCount = 0;
 }
 
 void CConnectManagerGroup::Init(uint16 u2SendQueueCount)
 {
-	for(int i = 0; i < u2SendQueueCount; i++)
+	Close();
+
+	m_objConnnectManagerList = new CConnectManager*[u2SendQueueCount];
+	memset(m_objConnnectManagerList, 0, sizeof(CConnectManager*)*u2SendQueueCount);
+
+	for(int i = 0; i < (int)u2SendQueueCount; i++)
 	{
 		CConnectManager* pConnectManager = new CConnectManager();
 		if(NULL != pConnectManager)	
@@ -2859,12 +2873,12 @@ void CConnectManagerGroup::Init(uint16 u2SendQueueCount)
 			//初始化统计器
 			pConnectManager->Init((uint16)i);
 			//加入map
-			m_mapConnectManager.insert(mapConnectManager::value_type(i, pConnectManager));
+			m_objConnnectManagerList[i] = pConnectManager;
 			OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::Init]Creat %d SendQueue OK.\n", i));
 		}
 	}
 
-	m_u2ThreadQueueCount = (uint16)m_mapConnectManager.size();
+	m_u2ThreadQueueCount = u2SendQueueCount;
 }
 
 uint32 CConnectManagerGroup::GetGroupIndex()
@@ -2884,14 +2898,7 @@ bool CConnectManagerGroup::AddConnect(CConnectHandler* pConnectHandler)
 	//判断命中到哪一个线程组里面去
 	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
-	mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
-	if(f == m_mapConnectManager.end())
-	{
-		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::AddConnect]Out of range Queue ID.\n"));
-		return false;
-	}
-
-	CConnectManager* pConnectManager = (CConnectManager* )f->second;
+	CConnectManager* pConnectManager = m_objConnnectManagerList[u2ThreadIndex];
 	if(NULL == pConnectManager)
 	{
 		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::AddConnect]No find send Queue object.\n"));
@@ -2908,14 +2915,7 @@ bool CConnectManagerGroup::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPac
 	//判断命中到哪一个线程组里面去
 	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
-	mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
-	if(f == m_mapConnectManager.end())
-	{
-		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::PostMessage]Out of range Queue ID.\n"));
-		return false;
-	}
-
-	CConnectManager* pConnectManager = (CConnectManager* )f->second;
+	CConnectManager* pConnectManager =  m_objConnnectManagerList[u2ThreadIndex];
 	if(NULL == pConnectManager)
 	{
 		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::PostMessage]No find send Queue object.\n"));
@@ -2932,20 +2932,7 @@ bool CConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char* pData, u
 	//判断命中到哪一个线程组里面去
 	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
-	mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
-	if(f == m_mapConnectManager.end())
-	{
-		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::PostMessage]Out of range Queue ID.\n"));
-
-		if(blDelete == true)
-		{
-			SAFE_DELETE_ARRAY(pData);
-		}
-
-		return false;
-	}
-
-	CConnectManager* pConnectManager = (CConnectManager* )f->second;
+	CConnectManager* pConnectManager =  m_objConnnectManagerList[u2ThreadIndex];
 	if(NULL == pConnectManager)
 	{
 		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::PostMessage]No find send Queue object.\n"));
@@ -2993,14 +2980,7 @@ bool CConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPacket
 		u4ConnectID = vecConnectID[i];
 		uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
-		mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
-		if(f == m_mapConnectManager.end())
-		{
-			//OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::PostMessage]Out of range Queue ID.\n"));
-			continue;
-		}
-
-		CConnectManager* pConnectManager = (CConnectManager* )f->second;
+		CConnectManager* pConnectManager =  m_objConnnectManagerList[u2ThreadIndex];
 		if(NULL == pConnectManager)
 		{
 			//OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::PostMessage]No find send Queue object.\n"));
@@ -3036,14 +3016,7 @@ bool CConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, const char*
 		u4ConnectID = vecConnectID[i];
 		uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
-		mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
-		if(f == m_mapConnectManager.end())
-		{
-			OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::PostMessage]Out of range Queue ID.\n"));
-			continue;
-		}
-
-		CConnectManager* pConnectManager = (CConnectManager* )f->second;
+		CConnectManager* pConnectManager = m_objConnnectManagerList[u2ThreadIndex];
 		if(NULL == pConnectManager)
 		{
 			OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::PostMessage]No find send Queue object.\n"));
@@ -3075,14 +3048,7 @@ bool CConnectManagerGroup::CloseConnect(uint32 u4ConnectID, EM_Client_Close_stat
 	//判断命中到哪一个线程组里面去
 	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
-	mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
-	if(f == m_mapConnectManager.end())
-	{
-		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnect]Out of range Queue ID.\n"));
-		return false;
-	}
-
-	CConnectManager* pConnectManager = (CConnectManager* )f->second;
+	CConnectManager* pConnectManager = m_objConnnectManagerList[u2ThreadIndex];
 	if(NULL == pConnectManager)
 	{
 		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnect]No find send Queue object.\n"));
@@ -3097,14 +3063,7 @@ bool CConnectManagerGroup::CloseConnectByClient(uint32 u4ConnectID)
 	//判断命中到哪一个线程组里面去
 	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
-	mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
-	if(f == m_mapConnectManager.end())
-	{
-		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnect]Out of range Queue ID.\n"));
-		return false;
-	}
-
-	CConnectManager* pConnectManager = (CConnectManager* )f->second;
+	CConnectManager* pConnectManager = m_objConnnectManagerList[u2ThreadIndex];
 	if(NULL == pConnectManager)
 	{
 		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnect]No find send Queue object.\n"));
@@ -3120,14 +3079,7 @@ _ClientIPInfo CConnectManagerGroup::GetClientIPInfo(uint32 u4ConnectID)
 	//判断命中到哪一个线程组里面去
 	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
-	mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
-	if(f == m_mapConnectManager.end())
-	{
-		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::GetClientIPInfo]Out of range Queue ID.\n"));
-		return objClientIPInfo;
-	}
-
-	CConnectManager* pConnectManager = (CConnectManager* )f->second;
+	CConnectManager* pConnectManager = m_objConnnectManagerList[u2ThreadIndex];
 	if(NULL == pConnectManager)
 	{
 		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::GetClientIPInfo]No find send Queue object.\n"));
@@ -3143,14 +3095,7 @@ _ClientIPInfo CConnectManagerGroup::GetLocalIPInfo(uint32 u4ConnectID)
 	//判断命中到哪一个线程组里面去
 	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
-	mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
-	if(f == m_mapConnectManager.end())
-	{
-		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::GetLocalIPInfo]Out of range Queue ID.\n"));
-		return objClientIPInfo;
-	}
-
-	CConnectManager* pConnectManager = (CConnectManager* )f->second;
+	CConnectManager* pConnectManager = m_objConnnectManagerList[u2ThreadIndex];
 	if(NULL == pConnectManager)
 	{
 		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::GetLocalIPInfo]No find send Queue object.\n"));
@@ -3163,9 +3108,9 @@ _ClientIPInfo CConnectManagerGroup::GetLocalIPInfo(uint32 u4ConnectID)
 
 void CConnectManagerGroup::GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo)
 {
-	for(mapConnectManager::iterator b = m_mapConnectManager.begin(); b != m_mapConnectManager.end(); b++)
+	for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
 	{
-		CConnectManager* pConnectManager = (CConnectManager* )b->second;
+		CConnectManager* pConnectManager = m_objConnnectManagerList[i];
 		if(NULL != pConnectManager)
 		{
 			pConnectManager->GetConnectInfo(VecClientConnectInfo);
@@ -3176,9 +3121,9 @@ void CConnectManagerGroup::GetConnectInfo(vecClientConnectInfo& VecClientConnect
 int CConnectManagerGroup::GetCount()
 {
 	uint32 u4Count = 0;
-	for(mapConnectManager::iterator b = m_mapConnectManager.begin(); b != m_mapConnectManager.end(); b++)
+	for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
 	{
-		CConnectManager* pConnectManager = (CConnectManager* )b->second;
+		CConnectManager* pConnectManager = m_objConnnectManagerList[i];
 		if(NULL != pConnectManager)
 		{
 			u4Count += pConnectManager->GetCount();
@@ -3190,9 +3135,9 @@ int CConnectManagerGroup::GetCount()
 
 void CConnectManagerGroup::CloseAll()
 {
-	for(mapConnectManager::iterator b = m_mapConnectManager.begin(); b != m_mapConnectManager.end(); b++)
+	for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
 	{
-		CConnectManager* pConnectManager = (CConnectManager* )b->second;
+		CConnectManager* pConnectManager = m_objConnnectManagerList[i];
 		if(NULL != pConnectManager)
 		{
 			pConnectManager->CloseAll();
@@ -3202,9 +3147,9 @@ void CConnectManagerGroup::CloseAll()
 
 bool CConnectManagerGroup::StartTimer()
 {
-	for(mapConnectManager::iterator b = m_mapConnectManager.begin(); b != m_mapConnectManager.end();b++)
+	for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
 	{
-		CConnectManager* pConnectManager = (CConnectManager* )b->second;
+		CConnectManager* pConnectManager = m_objConnnectManagerList[i];
 		if(NULL != pConnectManager)
 		{
 			pConnectManager->StartTimer();
@@ -3219,14 +3164,7 @@ bool CConnectManagerGroup::Close(uint32 u4ConnectID)
 	//判断命中到哪一个线程组里面去
 	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
-	mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
-	if(f == m_mapConnectManager.end())
-	{
-		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::GetClientIPInfo]Out of range Queue ID.\n"));
-		return false;
-	}
-
-	CConnectManager* pConnectManager = (CConnectManager* )f->second;
+	CConnectManager* pConnectManager = m_objConnnectManagerList[u2ThreadIndex];
 	if(NULL == pConnectManager)
 	{
 		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::GetClientIPInfo]No find send Queue object.\n"));
@@ -3241,14 +3179,7 @@ bool CConnectManagerGroup::CloseUnLock(uint32 u4ConnectID)
 	//判断命中到哪一个线程组里面去
 	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
-	mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
-	if(f == m_mapConnectManager.end())
-	{
-		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::GetClientIPInfo]Out of range Queue ID.\n"));
-		return false;
-	}
-
-	CConnectManager* pConnectManager = (CConnectManager* )f->second;
+	CConnectManager* pConnectManager = m_objConnnectManagerList[u2ThreadIndex];
 	if(NULL == pConnectManager)
 	{
 		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::GetClientIPInfo]No find send Queue object.\n"));
@@ -3268,14 +3199,7 @@ void CConnectManagerGroup::SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4Tim
 	//判断命中到哪一个线程组里面去
 	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
-	mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
-	if(f == m_mapConnectManager.end())
-	{
-		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::GetClientIPInfo]Out of range Queue ID.\n"));
-		return;
-	}
-
-	CConnectManager* pConnectManager = (CConnectManager* )f->second;
+	CConnectManager* pConnectManager = m_objConnnectManagerList[u2ThreadIndex];
 	if(NULL == pConnectManager)
 	{
 		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::GetClientIPInfo]No find send Queue object.\n"));
@@ -3288,9 +3212,9 @@ void CConnectManagerGroup::SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4Tim
 bool CConnectManagerGroup::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, bool blSendState, bool blDelete)
 {
 	//全部群发
-	for(mapConnectManager::iterator b = m_mapConnectManager.begin(); b != m_mapConnectManager.end(); b++)
+	for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
 	{
-		CConnectManager* pConnectManager = (CConnectManager* )b->second;
+		CConnectManager* pConnectManager = m_objConnnectManagerList[i];
 		if(NULL == pConnectManager)
 		{
 			OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::PostMessage]No find send Queue object.\n"));
@@ -3329,9 +3253,9 @@ bool CConnectManagerGroup::PostMessageAll( const char* pData, uint32 nDataLen, u
 	}
 
 	//全部群发
-	for(mapConnectManager::iterator b = m_mapConnectManager.begin(); b != m_mapConnectManager.end(); b++)
+	for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
 	{
-		CConnectManager* pConnectManager = (CConnectManager* )b->second;
+		CConnectManager* pConnectManager = m_objConnnectManagerList[i];
 		if(NULL == pConnectManager)
 		{
 			OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::PostMessage]No find send Queue object.\n"));
@@ -3357,14 +3281,7 @@ bool CConnectManagerGroup::SetConnectName(uint32 u4ConnectID, const char* pName)
 	//判断命中到哪一个线程组里面去
 	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
-	mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
-	if(f == m_mapConnectManager.end())
-	{
-		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnect]Out of range Queue ID.\n"));
-		return false;
-	}
-
-	CConnectManager* pConnectManager = (CConnectManager* )f->second;
+	CConnectManager* pConnectManager = m_objConnnectManagerList[u2ThreadIndex];
 	if(NULL == pConnectManager)
 	{
 		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnect]No find send Queue object.\n"));
@@ -3379,14 +3296,7 @@ bool CConnectManagerGroup::SetIsLog(uint32 u4ConnectID, bool blIsLog)
 	//判断命中到哪一个线程组里面去
 	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
-	mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
-	if(f == m_mapConnectManager.end())
-	{
-		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnect]Out of range Queue ID.\n"));
-		return false;
-	}
-
-	CConnectManager* pConnectManager = (CConnectManager* )f->second;
+	CConnectManager* pConnectManager = m_objConnnectManagerList[u2ThreadIndex];
 	if(NULL == pConnectManager)
 	{
 		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnect]No find send Queue object.\n"));
@@ -3400,9 +3310,9 @@ void CConnectManagerGroup::GetClientNameInfo(const char* pName, vecClientNameInf
 {
 	objClientNameInfo.clear();
 	//全部查找
-	for(mapConnectManager::iterator b = m_mapConnectManager.begin(); b != m_mapConnectManager.end(); b++)
+	for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
 	{
-		CConnectManager* pConnectManager = (CConnectManager* )b->second;
+		CConnectManager* pConnectManager = m_objConnnectManagerList[i];
 		if(NULL != pConnectManager)
 		{
 			pConnectManager->GetClientNameInfo(pName, objClientNameInfo);
@@ -3412,9 +3322,9 @@ void CConnectManagerGroup::GetClientNameInfo(const char* pName, vecClientNameInf
 
 void CConnectManagerGroup::GetCommandData( uint16 u2CommandID, _CommandData& objCommandData )
 {
-	for(mapConnectManager::iterator b = m_mapConnectManager.begin(); b != m_mapConnectManager.end(); b++)
+	for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
 	{
-		CConnectManager* pConnectManager = (CConnectManager* )b->second;
+		CConnectManager* pConnectManager = m_objConnnectManagerList[i];
 		if(NULL != pConnectManager)
 		{
 			_CommandData* pCommandData = pConnectManager->GetCommandData(u2CommandID);
@@ -3428,9 +3338,9 @@ void CConnectManagerGroup::GetCommandData( uint16 u2CommandID, _CommandData& obj
 
 void CConnectManagerGroup::GetCommandFlowAccount(_CommandFlowAccount& objCommandFlowAccount)
 {
-	for(mapConnectManager::iterator b = m_mapConnectManager.begin(); b != m_mapConnectManager.end(); b++)
+	for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
 	{
-		CConnectManager* pConnectManager = (CConnectManager* )b->second;
+		CConnectManager* pConnectManager = m_objConnnectManagerList[i];
 		if(NULL != pConnectManager)
 		{
 			uint32 u4FlowOut = pConnectManager->GetCommandFlowAccount();
@@ -3444,14 +3354,7 @@ EM_Client_Connect_status CConnectManagerGroup::GetConnectState(uint32 u4ConnectI
 	//判断命中到哪一个线程组里面去
 	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
-	mapConnectManager::iterator f = m_mapConnectManager.find(u2ThreadIndex);
-	if(f == m_mapConnectManager.end())
-	{
-		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnect]Out of range Queue ID.\n"));
-		return CLIENT_CONNECT_NO_EXIST;
-	}
-
-	CConnectManager* pConnectManager = (CConnectManager* )f->second;
+	CConnectManager* pConnectManager = m_objConnnectManagerList[u2ThreadIndex];
 	if(NULL == pConnectManager)
 	{
 		OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnect]No find send Queue object.\n"));

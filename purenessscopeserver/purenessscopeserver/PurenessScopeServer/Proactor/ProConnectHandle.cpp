@@ -2168,7 +2168,11 @@ CProConnectManagerGroup::CProConnectManagerGroup()
 CProConnectManagerGroup::~CProConnectManagerGroup()
 {
 	OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::~CProConnectManagerGroup].\n"));
+	Close();
+}
 
+void CProConnectManagerGroup::Close()
+{
 	if(NULL != m_objProConnnectManagerList)
 	{
 		for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
@@ -2178,10 +2182,13 @@ CProConnectManagerGroup::~CProConnectManagerGroup()
 		}
 	}
 	SAFE_DELETE_ARRAY(m_objProConnnectManagerList);
+	m_u2ThreadQueueCount = 0;
 }
 
 void CProConnectManagerGroup::Init(uint16 u2SendQueueCount)
 {
+	Close();
+
 	m_objProConnnectManagerList = new CProConnectManager*[u2SendQueueCount];
 	memset(m_objProConnnectManagerList, 0, sizeof(CProConnectManager*)*u2SendQueueCount);
 

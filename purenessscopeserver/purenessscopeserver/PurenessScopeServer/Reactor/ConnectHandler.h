@@ -39,10 +39,6 @@
 #include "netinet/tcp.h"
 #endif
 
-#include <map>
-
-using namespace std;
-
 class CConnectHandler : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>
 {
 public:
@@ -244,6 +240,7 @@ public:
 	~CConnectManagerGroup();
 
 	void Init(uint16 u2SendQueueCount);
+	void Close();
 
 	bool AddConnect(CConnectHandler* pConnectHandler);
 	bool PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, bool blSendState = true, bool blDelete = true);                      //异步发送
@@ -278,9 +275,8 @@ private:
 
 private:
 	ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;                                                           //控制多线程锁
-	typedef map<int, CConnectManager*> mapConnectManager;                                                    //所有链接管理者
+	CConnectManager** m_objConnnectManagerList;                                                              //所有链接管理者
 	uint16            m_u2ThreadQueueCount;                                                                  //当前发送线程队列个数
-	mapConnectManager m_mapConnectManager;                                                                   //管理当前所有发送线程池对象
 	uint32            m_u4CurrMaxCount;                                                                      //当前链接自增量
 };
 
