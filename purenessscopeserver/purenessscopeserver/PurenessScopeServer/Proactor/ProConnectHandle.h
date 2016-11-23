@@ -38,7 +38,6 @@
 #include "SendCacheManager.h"
 #include "LoadPacketParse.h"
 
-#include <map>
 #include <vector>
 
 class CProConnectHandle : public ACE_Service_Handler
@@ -267,9 +266,8 @@ private:
 
 private:
 	ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;                                                           //控制多线程锁
-	typedef map<int, CProConnectManager*> mapConnectManager;                                                 //所有链接管理者
+	CProConnectManager** m_objProConnnectManagerList;                                                        //所有链接管理者
 	uint16            m_u2ThreadQueueCount;                                                                  //当前发送线程队列个数
-	mapConnectManager m_mapConnectManager;                                                                   //管理当前所有发送线程池对象
 	uint32            m_u4CurrMaxCount;                                                                      //当前链接自增量
 };
 
