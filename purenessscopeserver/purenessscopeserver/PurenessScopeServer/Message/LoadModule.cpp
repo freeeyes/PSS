@@ -45,7 +45,6 @@ void CLoadModule::Close()
 		if(NULL != pModuleInfo)
 		{
 			obj_vecModuleName.push_back(pModuleInfo->strModuleName);
-			SAFE_DELETE(pModuleInfo);
 		}
 	}
 
@@ -108,7 +107,7 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pResourceName)
 			m_objHashModuleList.Del_Hash_Data(strModuleName.c_str());
 		}
 
-		//将注册成功的模块，加入到map中
+		//将注册成功的模块，加入到Hash数组中
 		if(false == m_objHashModuleList.Add_Hash_Data(strModuleName.c_str(), pModuleInfo))
 		{
 			OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] m_mapModuleInfo.AddMapData error!\n"));
@@ -170,7 +169,7 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, c
 		m_objHashModuleList.Del_Hash_Data(pModuleName);
 	}
 
-	//将注册成功的模块，加入到map中
+	//将注册成功的模块，加入到Hash数组中
 	if(-1 == m_objHashModuleList.Add_Hash_Data(pModuleName, pModuleInfo))
 	{
 		OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] m_mapModuleInfo.AddMapData error!\n"));

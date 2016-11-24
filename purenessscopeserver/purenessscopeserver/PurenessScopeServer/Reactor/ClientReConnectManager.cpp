@@ -726,22 +726,24 @@ int CClientReConnectManager::handle_timeout(const ACE_Time_Value& tv, const void
 	{
 		//int nServerID = (int)b->first;
 		CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Index(i);
-
-		if (NULL == pClientInfo->GetConnectClient())
+		if(NULL != pClientInfo)
 		{
-			//如果连接不存在，则重新建立连接
-			pClientInfo->Run(m_blReactorFinish, SERVER_CONNECT_RECONNECT);
-		}
-		else
-		{
-			//检查当前连接，是否已挂起或死锁
-			ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-			pClientInfo->GetConnectClient()->GetTimeout(tvNow);
-
-			//如果是异步模式，则需要检查处理线程是否被挂起
-			if(App_MainConfig::instance()->GetConnectServerRunType() == 1)
+			if (NULL == pClientInfo->GetConnectClient())
 			{
-				App_ServerMessageTask::instance()->CheckServerMessageThread(tvNow);
+				//如果连接不存在，则重新建立连接
+				pClientInfo->Run(m_blReactorFinish, SERVER_CONNECT_RECONNECT);
+			}
+			else
+			{
+				//检查当前连接，是否已挂起或死锁
+				ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+				pClientInfo->GetConnectClient()->GetTimeout(tvNow);
+	
+				//如果是异步模式，则需要检查处理线程是否被挂起
+				if(App_MainConfig::instance()->GetConnectServerRunType() == 1)
+				{
+					App_ServerMessageTask::instance()->CheckServerMessageThread(tvNow);
+				}
 			}
 		}
 	}
