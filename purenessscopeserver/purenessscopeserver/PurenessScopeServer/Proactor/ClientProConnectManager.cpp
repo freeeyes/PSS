@@ -488,7 +488,7 @@ bool CClientProConnectManager::SetHandler(int nServerID, CProConnectClient* pPro
 	}
 	else
 	{
-		//如果这个链接不存在，则不再添加到已经存在的客户端map管理中
+		//如果这个链接不存在
 		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::SetHandler]nServerID =(%d) is not exist.\n", nServerID));
 		return false;
 	}

@@ -31,7 +31,7 @@ void CSendMessagePool::Init(int nObjcetCount)
 		_SendMessage* pMessage = new _SendMessage();
 		if(NULL != pMessage)
 		{
-			//添加到Free map里面
+			//添加到hash数组里面
 			char szMessageID[10] = {'\0'};
 			sprintf_safe(szMessageID, 10, "%d", i);
 			int nHashPos = m_objHashHandleList.Add_Hash_Data(szMessageID, pMessage);

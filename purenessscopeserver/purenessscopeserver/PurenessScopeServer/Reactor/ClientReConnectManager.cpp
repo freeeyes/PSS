@@ -478,7 +478,7 @@ bool CClientReConnectManager::SetHandler(int nServerID, CConnectClient* pConnect
 	CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 	if (NULL == pClientInfo)
 	{
-		//如果这个链接已经存在，则不再添加到已经存在的客户端map管理中
+		//如果这个链接已经存在，则不再添加到已经存在的客户端Hash数组管理中
 		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::SetHandler]nServerID =(%d) is not exist.\n", nServerID));
 		return false;
 	}

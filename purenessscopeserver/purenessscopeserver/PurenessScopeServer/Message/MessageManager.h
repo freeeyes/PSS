@@ -10,7 +10,7 @@
 
 //这里修改一下，如果一个命令对应一个模块是有限制的。
 //这里改为一个信令可以对应任意数量的处理模块，这样就比较好了。
-//用hash map替换map可以获得累积更高的性能提升
+//用hash数组可以获得累积更高的性能提升
 //add by freeeyes
 
 using namespace std;
@@ -107,7 +107,7 @@ public:
 
     }
 
-	//如果返回为true，证明这个消息已经没有对应项，需要外围map中除去
+	//如果返回为true，证明这个消息已经没有对应项，需要外围Hash中除去
 	bool DelClientCommand(CClientCommand* pClientCommand)
 	{
 		for(vecClientCommandList::iterator b = m_vecClientCommandList.begin(); b!= m_vecClientCommandList.end(); b++)

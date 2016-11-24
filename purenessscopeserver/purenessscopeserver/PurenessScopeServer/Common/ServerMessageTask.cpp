@@ -30,7 +30,7 @@ void CServerMessageInfoPool::Init(uint32 u4PacketCount /*= MAX_SERVER_MESSAGE_IN
 		_Server_Message_Info* pPacket = new _Server_Message_Info();
 		if(NULL != pPacket)
 		{
-			//添加到Free map里面
+			//添加到Hash数组里面
 			char szMessageID[10] = {'\0'};
 			sprintf_safe(szMessageID, 10, "%d", i);
 			int nHashPos = m_objServerMessageList.Add_Hash_Data(szMessageID, pPacket);

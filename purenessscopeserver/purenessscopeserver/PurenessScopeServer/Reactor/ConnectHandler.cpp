@@ -1979,7 +1979,7 @@ bool CConnectManager::AddConnect(uint32 u4ConnectID, CConnectHandler* pConnectHa
 
 	pConnectHandler->SetConnectID(u4ConnectID);
 	pConnectHandler->SetSendCacheManager(&m_SendCacheManager);
-	//加入map
+	//加入Hash数组
 	m_objHashConnectList.Add_Hash_Data(szConnectID, pConnectHandler);
 	m_u4TimeConnect++;
 	
@@ -2872,7 +2872,7 @@ void CConnectManagerGroup::Init(uint16 u2SendQueueCount)
 		{
 			//初始化统计器
 			pConnectManager->Init((uint16)i);
-			//加入map
+			//加入数组
 			m_objConnnectManagerList[i] = pConnectManager;
 			OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::Init]Creat %d SendQueue OK.\n", i));
 		}
