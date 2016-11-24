@@ -39,6 +39,9 @@ bool CServerManager::Init()
 	//初始化模块数组相关参数
 	App_MessageManager::instance()->Init(App_MainConfig::instance()->GetMaxModuleCount(), App_MainConfig::instance()->GetMaxCommandCount());
 
+	//初始化加载模块的信息
+	App_ModuleLoader::instance()->Init(App_MainConfig::instance()->GetMaxModuleCount());
+
 	//初始化禁止IP列表
 	App_ForbiddenIP::instance()->Init(FORBIDDENIP_FILE);
 

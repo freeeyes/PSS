@@ -17,20 +17,39 @@ CLoadModule::~CLoadModule(void)
 	//Close();
 }
 
+void CLoadModule::Init(uint16 u2MaxModuleCount)
+{
+	Close();
+
+	//初始化HashTable
+	int nKeySize = 100;
+	size_t nArraySize = (sizeof(_Hash_Table_Cell<_ModuleInfo>) + nKeySize + sizeof(_ModuleInfo* )) * u2MaxModuleCount;
+	char* pHashBase = new char[nArraySize];
+	m_objHashModuleList.Set_Base_Addr(pHashBase, (int)u2MaxModuleCount);
+	m_objHashModuleList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<_ModuleInfo>) * u2MaxModuleCount, 
+																	nKeySize * u2MaxModuleCount, nKeySize);
+	m_objHashModuleList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<_ModuleInfo>) + nKeySize) * u2MaxModuleCount, 
+																	sizeof(_ModuleInfo* ) * u2MaxModuleCount, sizeof(_ModuleInfo* ));
+}
+
 void CLoadModule::Close()
 {
 	//存环关闭当前活跃模块
-	//OUR_DEBUG((LM_INFO, "[CLoadModule::Close]m_mapModuleInfo.GetSize=%d.\n", m_mapModuleInfo.GetSize()));
-	int nSize = (int)m_mapModuleInfo.GetSize();
+	//OUR_DEBUG((LM_INFO, "[CLoadModule::Close]m_mapModuleInfo.GetSize=%d.\n", m_mapModuleInfo.GetSize()))
 
 	vector<string> obj_vecModuleName;
-	for(int i = 0; i < nSize; i++)
+	for(int i = 0; i < m_objHashModuleList.Get_Count(); i++)
 	{
 		//OUR_DEBUG((LM_INFO, "[CLoadModule::Close]active name=%s.\n", m_mapModuleInfo.GetMapDataKey(i).c_str()));
-		obj_vecModuleName.push_back(m_mapModuleInfo.GetMapDataKey(i));
+		_ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Index(i);
+		if(NULL != pModuleInfo)
+		{
+			obj_vecModuleName.push_back(pModuleInfo->strModuleName);
+			SAFE_DELETE(pModuleInfo);
+		}
 	}
 
-	for(int i = 0; i < nSize; i++)
+	for(int i = 0; i < (int)obj_vecModuleName.size(); i++)
 	{
 		//卸载并删除当初new的module对象
 		//OUR_DEBUG((LM_INFO, "[CLoadModule::Close]name=%s.\n", obj_vecModuleName[i].c_str()));
@@ -38,7 +57,7 @@ void CLoadModule::Close()
 	}
 
 	//OUR_DEBUG((LM_INFO, "[CLoadModule::Close]FINISH!!!!.\n"));
-	m_mapModuleInfo.Clear();
+	m_objHashModuleList.Close();
 }
 
 bool CLoadModule::LoadModule(const char* pModulePath, const char* pResourceName)
@@ -57,7 +76,7 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pResourceName)
 		OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] Begin Load ModuleName[%s]!\n", strModuleName.c_str()));
 
 		//确定这个模块是否被注册过
-		_ModuleInfo* pCurr = m_mapModuleInfo.SearchMapData(strModuleName);
+		_ModuleInfo* pCurr = m_objHashModuleList.Get_Hash_Box_Data(strModuleName.c_str());
 		if(NULL != pCurr)
 		{
 			//如果被注册过，先卸载现有的，再重新装载
@@ -80,16 +99,17 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pResourceName)
 		}
 
 		//查找此模块是否已经被注册，有则把信息老信息清理
-		_ModuleInfo* pOldModuleInfo = m_mapModuleInfo.SearchMapData(strModuleName);
+		_ModuleInfo* pOldModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(strModuleName.c_str());
 		if(NULL != pOldModuleInfo)
 		{
 			//关闭副本
 			ACE_OS::dlclose(pOldModuleInfo->hModule);
-			m_mapModuleInfo.DelMapData(strModuleName, true);
+			SAFE_DELETE(pOldModuleInfo);
+			m_objHashModuleList.Del_Hash_Data(strModuleName.c_str());
 		}
 
 		//将注册成功的模块，加入到map中
-		if(false == m_mapModuleInfo.AddMapData(pModuleInfo->GetName(), pModuleInfo))
+		if(false == m_objHashModuleList.Add_Hash_Data(strModuleName.c_str(), pModuleInfo))
 		{
 			OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] m_mapModuleInfo.AddMapData error!\n"));
 			SAFE_DELETE(pModuleInfo);
@@ -115,7 +135,7 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, c
 	string strModuleName = (string)pModuleName;
 
 	//确定这个模块是否被注册过
-	_ModuleInfo* pCurr = m_mapModuleInfo.SearchMapData(strModuleName);
+	_ModuleInfo* pCurr = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
 	if(NULL != pCurr)
 	{
 		//如果被注册过，先卸载现有的，再重新装载
@@ -141,16 +161,17 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, c
 	}
 
 	//查找此模块是否已经被注册，有则把信息老信息清理
-	_ModuleInfo* pOldModuleInfo = m_mapModuleInfo.SearchMapData(strModuleName);
+	_ModuleInfo* pOldModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
 	if(NULL != pOldModuleInfo)
 	{
 		//关闭副本
 		ACE_OS::dlclose(pOldModuleInfo->hModule);
-		m_mapModuleInfo.DelMapData(strModuleName, true);
+		SAFE_DELETE(pOldModuleInfo);
+		m_objHashModuleList.Del_Hash_Data(pModuleName);
 	}
 
 	//将注册成功的模块，加入到map中
-	if(false == m_mapModuleInfo.AddMapData(pModuleInfo->GetName(), pModuleInfo))
+	if(-1 == m_objHashModuleList.Add_Hash_Data(pModuleName, pModuleInfo))
 	{
 		OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] m_mapModuleInfo.AddMapData error!\n"));
 		SAFE_DELETE(pModuleInfo);
@@ -174,7 +195,7 @@ bool CLoadModule::UnLoadModule(const char* szResourceName, bool blIsDelete)
 {
 	OUR_DEBUG((LM_ERROR, "[CLoadModule::UnLoadModule]szResourceName=%s.\n", szResourceName));
 	string strModuleName = szResourceName;
-	_ModuleInfo* pModuleInfo = m_mapModuleInfo.SearchMapData(strModuleName);
+	_ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(strModuleName.c_str());
 	if(NULL == pModuleInfo)
 	{
 		return false;
@@ -193,7 +214,8 @@ bool CLoadModule::UnLoadModule(const char* szResourceName, bool blIsDelete)
 
 		if(true == blIsDelete)
 		{
-			m_mapModuleInfo.DelMapData(strModuleName, true);
+			SAFE_DELETE(pModuleInfo);
+			m_objHashModuleList.Del_Hash_Data(strModuleName.c_str());
 		}
 
 		OUR_DEBUG((LM_ERROR, "[CLoadModule::UnLoadModule] Close Module=%s, nRet=%d!\n", strModuleName.c_str(), nRet));
@@ -204,18 +226,22 @@ bool CLoadModule::UnLoadModule(const char* szResourceName, bool blIsDelete)
 
 int CLoadModule::GetCurrModuleCount()
 {
-	return m_mapModuleInfo.GetSize();
+	return m_objHashModuleList.Get_Used_Count();
 }
 
 _ModuleInfo* CLoadModule::GetModuleIndex(int nIndex)
 {
-	return m_mapModuleInfo.GetMapData(nIndex);
+	if(nIndex < 0 || nIndex >= m_objHashModuleList.Get_Count())
+	{
+		return NULL;
+	}
+
+	return m_objHashModuleList.Get_Index(nIndex);
 }
 
 _ModuleInfo* CLoadModule::GetModuleInfo(const char* pModuleName)
 {
-	string strModuleName = pModuleName;
-	return m_mapModuleInfo.SearchMapData(strModuleName);
+	return m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
 }
 
 bool CLoadModule::ParseModule(const char* szResourceName, vector<string>& vecModuleName)
@@ -337,7 +363,7 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo,
 
 int CLoadModule::SendModuleMessage(const char* pModuleName, uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket)
 {
-	_ModuleInfo* pModuleInfo = m_mapModuleInfo.SearchMapData((string)pModuleName);
+	_ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
 	if(NULL != pModuleInfo)
 	{
 		pModuleInfo->DoModuleMessage(u2CommandID, pBuffPacket, pReturnBuffPacket);
@@ -348,7 +374,7 @@ int CLoadModule::SendModuleMessage(const char* pModuleName, uint16 u2CommandID, 
 
 bool CLoadModule::GetModuleExist(const char* pModuleName)
 {
-	_ModuleInfo* pModuleInfo = m_mapModuleInfo.SearchMapData((string)pModuleName);
+	_ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
 	if(NULL != pModuleInfo)
 	{
 		return true;
@@ -361,7 +387,7 @@ bool CLoadModule::GetModuleExist(const char* pModuleName)
 
 const char* CLoadModule::GetModuleParam(const char* pModuleName)
 {
-	_ModuleInfo* pModuleInfo = m_mapModuleInfo.SearchMapData((string)pModuleName);
+	_ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
 	if(NULL != pModuleInfo)
 	{
 		return pModuleInfo->strModuleParam.c_str();
@@ -374,7 +400,7 @@ const char* CLoadModule::GetModuleParam(const char* pModuleName)
 
 const char* CLoadModule::GetModuleFileName(const char* pModuleName)
 {
-	_ModuleInfo* pModuleInfo = m_mapModuleInfo.SearchMapData((string)pModuleName);
+	_ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
 	if(NULL != pModuleInfo)
 	{
 		return pModuleInfo->strModuleName.c_str();
@@ -387,7 +413,7 @@ const char* CLoadModule::GetModuleFileName(const char* pModuleName)
 
 const char* CLoadModule::GetModuleFilePath(const char* pModuleName)
 {
-	_ModuleInfo* pModuleInfo = m_mapModuleInfo.SearchMapData((string)pModuleName);
+	_ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
 	if(NULL != pModuleInfo)
 	{
 		return pModuleInfo->strModulePath.c_str();
@@ -400,7 +426,7 @@ const char* CLoadModule::GetModuleFilePath(const char* pModuleName)
 
 const char* CLoadModule::GetModuleFileDesc(const char* pModuleName)
 {
-	_ModuleInfo* pModuleInfo = m_mapModuleInfo.SearchMapData((string)pModuleName);
+	_ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
 	if(NULL != pModuleInfo)
 	{
 		return pModuleInfo->GetDesc();
@@ -413,17 +439,25 @@ const char* CLoadModule::GetModuleFileDesc(const char* pModuleName)
 
 uint16 CLoadModule::GetModuleCount()
 {
-	return (uint16)m_mapModuleInfo.GetSize();
+	return (uint16)m_objHashModuleList.Get_Used_Count();
 }
 
 const char* CLoadModule::GetModuleName(uint16 u2Index)
 {
-	if(u2Index >= (uint16)m_mapModuleInfo.GetSize())
+	if(u2Index >= (uint16)m_objHashModuleList.Get_Count())
 	{
 		return NULL;
 	}
 	else
 	{
-		return m_mapModuleInfo.GetMapDataKey((int)u2Index).c_str();
+		_ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Index((int)u2Index);
+		if(NULL != pModuleInfo)
+		{
+			return pModuleInfo->strModuleName.c_str();
+		}
+		else
+		{
+			return NULL;
+		}
 	}
 }

@@ -5,9 +5,8 @@
 #include "ace/Thread_Mutex.h"
 #include "ace/Singleton.h"
 #include "ace/OS_NS_dlfcn.h"
-
-#include "MapTemplate.h"
 #include "IObject.h"
+#include "HashTable.h"
 
 #include <string>
 #include <vector>
@@ -40,6 +39,8 @@ public:
 	CLoadModule(void);
 	virtual ~CLoadModule(void);
 
+	void Init(uint16 u2MaxModuleCount);
+
 	void Close();
 
 	bool LoadModule(const char* pModulePath, const char* pModuleName, const char* pModuleParam);
@@ -66,7 +67,7 @@ private:
 	bool LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo, const char* pModulePath);    //开始加载模块的接口和数据
 
 private:
-	CMapTemplate<string, _ModuleInfo>  m_mapModuleInfo;
+	CHashTable<_ModuleInfo>            m_objHashModuleList;
 	char                               m_szModulePath[MAX_BUFF_200];
 	ACE_Recursive_Thread_Mutex         m_tmModule;
 };
