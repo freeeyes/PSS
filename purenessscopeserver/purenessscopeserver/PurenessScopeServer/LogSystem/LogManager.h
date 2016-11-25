@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "define.h"
-#include "MapTemplate.h"
 #include "ILogObject.h"
 #include "ILogManager.h"
 
