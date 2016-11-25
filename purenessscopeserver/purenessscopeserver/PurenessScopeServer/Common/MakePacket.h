@@ -61,35 +61,13 @@ struct _MakePacket
 	}
 };
 
-//_MakePacket对象池，循环使用，不new数据。提升生成速度，应用于CMakePacket
-class CMakePacketPool
-{
-public:
-	CMakePacketPool();
-	~CMakePacketPool();
-
-	void Init(uint32 u4PacketCount);
-	void Close();
-
-	_MakePacket* Create();
-	bool Delete(_MakePacket* pMakePacket);
-
-	int GetUsedCount();
-	int GetFreeCount();
-
-private:
-	CHashTable<_MakePacket>    m_objHashHandleList;
-	uint32                     m_u4CulationIndex;                     //当前正在使用的标签
-	ACE_Recursive_Thread_Mutex m_ThreadWriteLock;                     //控制多线程锁
-};
-
 class CMakePacket
 {
 public:
 	CMakePacket(void);
 	~CMakePacket(void);
 
-	bool Init();
+	bool Init(int nMaxConnectCount);
 
 	bool PutMessageBlock(uint32 u4ConnectID, uint8 u1Option, _MakePacket* pMakePacket, ACE_Time_Value& tvNow);                 //处理TCP数据包
 	bool PutUDPMessageBlock(const ACE_INET_Addr& AddrRemote, uint8 u1Option, _MakePacket* pMakePacket, ACE_Time_Value& tvNow); //处理UDP数据包 
@@ -107,7 +85,6 @@ private:
 
 	bool ProcessMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& tvNow);                                   //组成队列消息
 private:
-	CMakePacketPool                m_MakePacketPool;
 	ACE_Recursive_Thread_Mutex     m_ThreadWriteLock;
 };
 typedef ACE_Singleton<CMakePacket, ACE_Null_Mutex> App_MakePacket; 
