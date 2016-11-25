@@ -402,7 +402,6 @@
     <ClInclude Include="Common\LinuxCPU.h" />
     <ClInclude Include="Common\MainConfig.h" />
     <ClInclude Include="Common\MakePacket.h" />
-    <ClInclude Include="Common\MapTemplate.h" />
     <ClInclude Include="Common\MessageBlockManager.h" />
     <ClInclude Include="Common\MyACELoggingStrategy.h" />
     <ClInclude Include="Common\ProfileTime.h" />

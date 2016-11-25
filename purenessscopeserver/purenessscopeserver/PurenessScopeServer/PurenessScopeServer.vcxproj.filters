@@ -532,9 +532,6 @@
     <ClInclude Include="Common\MakePacket.h">
       <Filter>Common\headfile</Filter>
     </ClInclude>
-    <ClInclude Include="Common\MapTemplate.h">
-      <Filter>Common\headfile</Filter>
-    </ClInclude>
     <ClInclude Include="Common\MessageBlockManager.h">
       <Filter>Common\headfile</Filter>
     </ClInclude>

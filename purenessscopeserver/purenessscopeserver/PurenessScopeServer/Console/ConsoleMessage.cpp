@@ -1687,7 +1687,7 @@ bool CConsoleMessage::DoMessage_SetTrackIP(_CommandInfo& CommandInfo, IBuffPacke
 	_ForbiddenIP ForbiddenIP;
 	if(GetTrackIP(CommandInfo.m_szCommandExp, ForbiddenIP) == true)
 	{
-		App_IPAccount::instance()->SetTrackIP(ForbiddenIP.m_szClientIP);
+		//设置追踪(此功能咱不提供)
 
 		(*pBuffPacket) << (uint8)0;   //追踪成功
 	}
@@ -1704,8 +1704,7 @@ bool CConsoleMessage::DoMessage_DelTrackIP(_CommandInfo& CommandInfo, IBuffPacke
 {
 	if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
 	{
-		//清除追踪
-		App_IPAccount::instance()->ClearTrackIP();
+		//清除追踪(此功能咱不提供)
 
 		(*pBuffPacket) << (uint8)0;	
 	}
@@ -1721,55 +1720,8 @@ bool CConsoleMessage::DoMessage_GetTrackIPInfo(_CommandInfo& CommandInfo, IBuffP
 
 	if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
 	{
-		//清除追踪
-		int nCount = App_IPAccount::instance()->GetTrackIPInfoCount();
-		_IPTrackInfo* pIPTrackInfo = App_IPAccount::instance()->GetBase();
-
-		//寻找所有合法的历史记录
-		uint16 u2HistoryCount = 0;
-		for(int i = 0; i < nCount; i++)
-		{
-			_IPTrackInfo* pCurrInfo = pIPTrackInfo + i;
-			if(ACE_OS::strlen(pCurrInfo->m_szClientIP) != 0)
-			{
-				u2HistoryCount++;
-			}
-		}
-
-		//记录总个数
-		(*pBuffPacket) << (uint16)u2HistoryCount;	
-
-		//传入历史记录
-		for(int i = 0; i < nCount; i++)
-		{
-			_IPTrackInfo* pCurrInfo = pIPTrackInfo + i;
-			if(ACE_OS::strlen(pCurrInfo->m_szClientIP) != 0)
-			{
-				VCHARS_STR strSName;
-				strSName.text  = pCurrInfo->m_szClientIP;
-				strSName.u1Len = (uint8)ACE_OS::strlen(pCurrInfo->m_szClientIP);
-
-				(*pBuffPacket) << strSName;                    //IP
-				(*pBuffPacket) << (uint32)pCurrInfo->m_nPort;  //端口
-
-				sprintf_safe(szTimeBegin, MAX_BUFF_100, "%04d-%02d-%02d %02d:%02d:%02d", pCurrInfo->m_dtConnectStart.year(), pCurrInfo->m_dtConnectStart.month(), pCurrInfo->m_dtConnectStart.day(), pCurrInfo->m_dtConnectStart.hour(), pCurrInfo->m_dtConnectStart.minute(), pCurrInfo->m_dtConnectStart.second());
-
-				strSName.text  = szTimeBegin;
-				strSName.u1Len = (uint8)ACE_OS::strlen(szTimeBegin);
-				(*pBuffPacket) << strSName;
-
-				sprintf_safe(szTimeEnd, MAX_BUFF_100, "%04d-%02d-%02d %02d:%02d:%02d", pCurrInfo->m_dtConnectEnd.year(), pCurrInfo->m_dtConnectEnd.month(), pCurrInfo->m_dtConnectEnd.day(), pCurrInfo->m_dtConnectEnd.hour(), pCurrInfo->m_dtConnectEnd.minute(), pCurrInfo->m_dtConnectEnd.second());
-
-				strSName.text  = szTimeEnd;
-				strSName.u1Len = (uint8)ACE_OS::strlen(szTimeBegin);
-				(*pBuffPacket) << strSName;
-
-				(*pBuffPacket) << (uint32)pCurrInfo->m_u4RecvByteSize;  //接收字节数
-				(*pBuffPacket) << (uint32)pCurrInfo->m_u4SendByteSize;  //发送字节数
-				(*pBuffPacket) << (uint8)pCurrInfo->m_u1State;          //状态位 
-
-			}
-		}
+		//记录总个数(此功能咱不提供)
+		(*pBuffPacket) << (uint16)0;	
 	}
 
 	u2ReturnCommandID = CONSOLE_COMMAND_GETTRACKIPINFO;
