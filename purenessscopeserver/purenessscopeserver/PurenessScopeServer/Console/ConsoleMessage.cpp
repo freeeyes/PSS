@@ -1715,8 +1715,8 @@ bool CConsoleMessage::DoMessage_DelTrackIP(_CommandInfo& CommandInfo, IBuffPacke
 
 bool CConsoleMessage::DoMessage_GetTrackIPInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-	char szTimeBegin[MAX_BUFF_100] = {'\0'};
-	char szTimeEnd[MAX_BUFF_100]   = {'\0'};
+	//char szTimeBegin[MAX_BUFF_100] = {'\0'};
+	//char szTimeEnd[MAX_BUFF_100]   = {'\0'};
 
 	if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
 	{

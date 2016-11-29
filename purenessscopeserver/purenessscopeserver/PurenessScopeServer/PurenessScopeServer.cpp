@@ -225,7 +225,6 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 	if(!App_MainConfig::instance()->Init())
 	{
 		OUR_DEBUG((LM_INFO, "[main]%s\n", App_MainConfig::instance()->GetError()));
-		App_MainConfig::instance()->Close();
 		return 0;
 	}
 	else
@@ -271,7 +270,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 		if(!App_ServerManager::instance()->Init())
 		{
 			OUR_DEBUG((LM_INFO, "[main]App_ServerManager::instance()->Init() error.\n"));
-			App_MainConfig::instance()->Close();
+			App_ServerManager::instance()->Close();
 			App_PacketParseLoader::instance()->Close();
 			return 0;
 		}
@@ -280,7 +279,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 		if(!App_ServerManager::instance()->Start())
 		{
 			OUR_DEBUG((LM_INFO, "[main]App_ServerManager::instance()->Start() error.\n"));
-			App_MainConfig::instance()->Close();
+			App_ServerManager::instance()->Close();
 			App_PacketParseLoader::instance()->Close();
 			return 0;
 		}
