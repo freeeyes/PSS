@@ -67,7 +67,7 @@ public:
 	CMakePacket(void);
 	~CMakePacket(void);
 
-	bool Init(int nMaxConnectCount);
+	bool Init();
 
 	bool PutMessageBlock(uint32 u4ConnectID, uint8 u1Option, _MakePacket* pMakePacket, ACE_Time_Value& tvNow);                 //处理TCP数据包
 	bool PutUDPMessageBlock(const ACE_INET_Addr& AddrRemote, uint8 u1Option, _MakePacket* pMakePacket, ACE_Time_Value& tvNow); //处理UDP数据包 

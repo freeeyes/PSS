@@ -9,7 +9,7 @@ CMakePacket::~CMakePacket(void)
 	OUR_DEBUG((LM_INFO, "[CMakePacket::~CMakePacket].\n"));
 }
 
-bool CMakePacket::Init(int nMaxConnectCount)
+bool CMakePacket::Init()
 {
 	return true;
 }
