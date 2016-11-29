@@ -18,11 +18,15 @@ static int ServerMain()
 	if(!App_ProServerManager::instance()->Init())
 	{
 		OUR_DEBUG((LM_INFO, "[main]App_ProServerManager::instance()->Init() error.\n"));
+		App_ProServerManager::instance()->Close();
+		return 0;
 	}
 
 	if(!App_ProServerManager::instance()->Start())
 	{
 		OUR_DEBUG((LM_INFO, "[main]App_ProServerManager::instance()->Start() error.\n"));
+		App_ProServerManager::instance()->Close();
+		return 0;
 	}
 
 	OUR_DEBUG((LM_INFO, "[main]Server Run is End.\n"));

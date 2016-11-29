@@ -438,14 +438,14 @@ bool CServerManager::Close()
 	OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_MessageManager OK.\n"));
 	App_ServerMessageTask::instance()->Close();
 	OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ServerMessageTask OK.\n"));
-	App_MessageManager::instance()->Close();
-	OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ConnectManager OK.\n"));
 	App_MessageServiceGroup::instance()->Close();
 	OUR_DEBUG((LM_INFO, "[App_MessageServiceGroup::Close]Close App_MessageServiceGroup OK.\n"));
 	App_ConnectManager::instance()->CloseAll();
 	OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ConnectManager OK.\n"));
 	AppLogManager::instance()->Close();
 	OUR_DEBUG((LM_INFO, "[CServerManager::Close]AppLogManager OK\n"));
+	App_MessageManager::instance()->Close();
+	OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_MessageManager OK.\n"));
 	App_BuffPacketManager::instance()->Close();
 	OUR_DEBUG((LM_INFO, "[CServerManager::Close]BuffPacketManager OK\n"));
 	App_ReactorManager::instance()->StopReactor();

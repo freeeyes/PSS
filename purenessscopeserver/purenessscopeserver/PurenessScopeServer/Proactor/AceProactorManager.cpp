@@ -29,7 +29,7 @@ void CAceProactor::Close()
 {
 	if (NULL != m_pProactor)
 	{
-		m_pProactor->close();
+		//m_pProactor->close();
 		SAFE_DELETE(m_pProactor);
 	}
 
