@@ -375,7 +375,7 @@ private:
 					//找到了链表末尾
 					//开始寻找空余的位置
 					//向后找空余
-					for(int i = nStartIndex; i < m_nCount; i++)
+					for(int i = nStartIndex + 1; i < m_nCount; i++)
 					{
 						if(m_lpTable[i].m_cExists == 0)
 						{
@@ -532,6 +532,17 @@ private:
 		}
 		else
 		{
+			if(-1 != m_lpTable[nPos].m_nProvKeyIndex)
+			{
+				m_lpTable[m_lpTable[nPos].m_nProvKeyIndex].m_nNextKeyIndex = m_lpTable[nPos].m_nNextKeyIndex;
+			}
+			
+			if(-1 != m_lpTable[nPos].m_nNextKeyIndex)
+			{
+				m_lpTable[m_lpTable[nPos].m_nNextKeyIndex].m_nProvKeyIndex = m_lpTable[nPos].m_nProvKeyIndex;
+			}
+
+
 			m_lpTable[nPos].Clear();
 			if(m_nUsed >= 1)
 			{
