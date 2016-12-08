@@ -32,7 +32,7 @@
 	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="XMLParsed.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/> -->
 	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="BoxFramed.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/> -->
 	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="Vediod.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/> -->
-	<ModuleInfo ModuleSPath="./" ModuleSName="UDPTest.dll" ModuleSParam="--DEBUG" Desc="ModuleParam为插件启动参数"/>
+	<ModuleInfo ModuleSPath="./" ModuleSName="TcpTest.dll" ModuleSParam="--DEBUG" Desc="ModuleParam为插件启动参数"/>
 	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="TimerTestd.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/> -->
 	
 	<!-- Linux Core Dump相关设置 -->
@@ -57,6 +57,6 @@
 	<!-- 屏幕输出相关设置 -->
 	<AceDebug TrunOn="0" DebugName="./serverdebug.log" ChkInterval="600" LogFileMaxSize="10240" LogFileMaxCnt="3" Level="" desc="ACEDEBUG文件输出配置，TrunOn=0为不使用，1为使用" />
 	
-	<UDPServerIP uip="127.0.0.1" uport="10003" uipType="IPV4" desc="监听UDP服务器的IP和端口，可以是多个" />
+	<!-- <UDPServerIP uip="127.0.0.1" uport="10003" uipType="IPV4" desc="监听UDP服务器的IP和端口，可以是多个" /> -->
 	
 </config>
