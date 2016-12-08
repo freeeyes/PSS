@@ -285,8 +285,6 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
         }
     }
 
-    //在包内设置工作线程ID
-    pMessage->GetMessageBase()->m_u4WorkThreadID = m_u4ThreadID;
     uint32 u4TimeCost     = 0;      //命令执行时间
     uint16 u2CommandCount = 0;      //命令被调用次数
     bool   blDeleteFlag   = true;   //用完是否删除，默认是删除
@@ -481,7 +479,9 @@ uint32 CMessageService::GetStepState()
 
 CMessage* CMessageService::CreateMessage()
 {
-    return m_MessagePool.Create();
+	CMessage* pMessage = m_MessagePool.Create();
+	pMessage->GetMessageBase()->m_u4WorkThreadID = GetThreadID();
+    return pMessage;
 }
 
 void CMessageService::DeleteMessage(CMessage* pMessage)
@@ -1036,7 +1036,7 @@ void CMessageServiceGroup::DeleteMessage(uint32 u4ConnectID, CMessage* pMessage)
 {
     int32 n4ThreadID  = 0;
     uint8 u1PacketType = PACKET_TCP;
-    n4ThreadID = GetWorkThreadID(u4ConnectID, u1PacketType);
+	n4ThreadID = pMessage->GetMessageBase()->m_u4WorkThreadID;
 
     if(-1 == n4ThreadID)
     {
