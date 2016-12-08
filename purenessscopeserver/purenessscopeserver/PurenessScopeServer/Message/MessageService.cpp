@@ -479,6 +479,7 @@ uint32 CMessageService::GetStepState()
 
 CMessage* CMessageService::CreateMessage()
 {
+	//OUR_DEBUG((LM_INFO, "[CMessageService::CreateMessage]GetThreadID=%d, m_MessagePool=0x%08x.\n", GetThreadID(), m_MessagePool));
 	CMessage* pMessage = m_MessagePool.Create();
 	pMessage->GetMessageBase()->m_u4WorkThreadID = GetThreadID();
     return pMessage;
@@ -486,6 +487,7 @@ CMessage* CMessageService::CreateMessage()
 
 void CMessageService::DeleteMessage(CMessage* pMessage)
 {
+	//OUR_DEBUG((LM_INFO, "[CMessageService::DeleteMessage]GetThreadID=%d, m_MessagePool=0x%08x.\n", GetThreadID(), m_MessagePool));
     m_MessagePool.Delete(pMessage);
 }
 
@@ -668,7 +670,7 @@ bool CMessageServiceGroup::PutMessage(CMessage* pMessage)
     int32 n4ThreadID = 0;
 
     //得到工作线程ID
-    n4ThreadID = GetWorkThreadID(pMessage->GetMessageBase()->m_u4ConnectID, pMessage->GetMessageBase()->m_u1PacketType);
+	n4ThreadID = pMessage->GetMessageBase()->m_u4WorkThreadID;
 
     if(-1 == n4ThreadID)
     {
@@ -1019,6 +1021,8 @@ CMessage* CMessageServiceGroup::CreateMessage(uint32 u4ConnectID, uint8 u1Packet
     {
         return NULL;
     }
+
+	//OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::CreateMessage]n4ThreadID=%d.\n", n4ThreadID));
 
     CMessageService* pMessageService = (CMessageService*)m_vecMessageService[(uint32)n4ThreadID];
 
