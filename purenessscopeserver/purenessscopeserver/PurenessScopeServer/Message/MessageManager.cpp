@@ -35,24 +35,14 @@ CMessageManager::~CMessageManager(void)
 void CMessageManager::Init(uint16 u2MaxModuleCount, uint32 u4MaxCommandCount)
 {
 	//初始化对象数组
-	int nKeySize = 10;
-	size_t nArraySize = (sizeof(_Hash_Table_Cell<CClientCommandList>) + nKeySize + sizeof(CClientCommandList* )) * u4MaxCommandCount;
+	size_t nArraySize = (sizeof(_Hash_Table_Cell<CClientCommandList>)) * u4MaxCommandCount;
 	char* pHashBase = new char[nArraySize];
-	m_objClientCommandList.Set_Base_Addr(pHashBase, (int)u4MaxCommandCount);
-	m_objClientCommandList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<CClientCommandList>) * u4MaxCommandCount, 
-																	nKeySize * u4MaxCommandCount, nKeySize);
-	m_objClientCommandList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<CClientCommandList>) + nKeySize) * u4MaxCommandCount, 
-																	sizeof(CClientCommandList* ) * u4MaxCommandCount, sizeof(CClientCommandList* ));
+	m_objClientCommandList.Init(pHashBase, (int)u4MaxCommandCount);
 
 	//初始化HashTable
-	nKeySize = 10;
-	nArraySize = (sizeof(_Hash_Table_Cell<_ModuleClient>) + nKeySize + sizeof(_ModuleClient* )) * u2MaxModuleCount;
+	nArraySize = (sizeof(_Hash_Table_Cell<_ModuleClient>)) * u2MaxModuleCount;
 	pHashBase = new char[nArraySize];
-	m_objModuleClientList.Set_Base_Addr(pHashBase, (int)u2MaxModuleCount);
-	m_objModuleClientList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<_ModuleClient>) * u2MaxModuleCount, 
-																	nKeySize * u2MaxModuleCount, nKeySize);
-	m_objModuleClientList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<_ModuleClient>) + nKeySize) * u2MaxModuleCount, 
-																	sizeof(_ModuleClient* ) * u2MaxModuleCount, sizeof(_ModuleClient* ));
+	m_objModuleClientList.Init(pHashBase, (int)u2MaxModuleCount);
 
 	m_u2MaxModuleCount  = u2MaxModuleCount;
 	m_u4MaxCommandCount = u4MaxCommandCount;

@@ -16,14 +16,9 @@ void CServerMessageInfoPool::Init(uint32 u4PacketCount /*= MAX_SERVER_MESSAGE_IN
 {
 	Close();
 
-	int nKeySize = 10;
-	size_t nArraySize = (sizeof(_Hash_Table_Cell<_Server_Message_Info>) + nKeySize + sizeof(_Server_Message_Info* )) * u4PacketCount;
+	size_t nArraySize = (sizeof(_Hash_Table_Cell<_Server_Message_Info>)) * u4PacketCount;
 	char* pHashBase = new char[nArraySize];
-	m_objServerMessageList.Set_Base_Addr(pHashBase, (int)u4PacketCount);
-	m_objServerMessageList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<_Server_Message_Info>) * u4PacketCount, 
-																	nKeySize * u4PacketCount, nKeySize);
-	m_objServerMessageList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<_Server_Message_Info>) + nKeySize) * u4PacketCount, 
-																	sizeof(_Server_Message_Info* ) * u4PacketCount, sizeof(_Server_Message_Info* ));
+	m_objServerMessageList.Init(pHashBase, (int)u4PacketCount);
 
 	for(int i = 0; i < (int)u4PacketCount; i++)
 	{

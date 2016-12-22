@@ -126,14 +126,9 @@ void CBuffPacketManager::Init(uint32 u4PacketCount, bool blByteOrder)
 	Close();
 
 	//≥ı ºªØHash±Ì
-	int nKeySize = 10;
-	size_t nArraySize = (sizeof(_Hash_Table_Cell<CBuffPacket>) + nKeySize + sizeof(CBuffPacket* )) * u4PacketCount;
+	size_t nArraySize = (sizeof(_Hash_Table_Cell<CBuffPacket>)) * u4PacketCount;
 	char* pHashBase = new char[nArraySize];
-	m_objHashBuffPacketList.Set_Base_Addr(pHashBase, (int)u4PacketCount);
-	m_objHashBuffPacketList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<CBuffPacket>) * u4PacketCount, 
-																	nKeySize * u4PacketCount, nKeySize);
-	m_objHashBuffPacketList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<CBuffPacket>) + nKeySize) * u4PacketCount, 
-																	sizeof(CBuffPacket* ) * u4PacketCount, sizeof(CBuffPacket* ));
+	m_objHashBuffPacketList.Init(pHashBase, (int)u4PacketCount);
 
 	for(int i = 0; i < m_objHashBuffPacketList.Get_Count(); i++)
 	{

@@ -1943,14 +1943,9 @@ void CProConnectManager::Init(uint16 u2Index)
 
 	//初始化Hash表
 	uint16 u2PoolSize = App_MainConfig::instance()->GetMaxHandlerCount();
-	int nKeySize = 10;
-	size_t nArraySize = (sizeof(_Hash_Table_Cell<CProConnectHandle>) + nKeySize + sizeof(CProConnectHandle* )) * u2PoolSize;
+	size_t nArraySize = (sizeof(_Hash_Table_Cell<CProConnectHandle>)) * u2PoolSize;
 	char* pHashBase = new char[nArraySize];
-	m_objHashConnectList.Set_Base_Addr(pHashBase, (int)u2PoolSize);
-	m_objHashConnectList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<CProConnectHandle>) * u2PoolSize, 
-																	nKeySize * u2PoolSize, nKeySize);
-	m_objHashConnectList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<CProConnectHandle>) + nKeySize) * u2PoolSize, 
-																	sizeof(CProConnectHandle* ) * u2PoolSize, sizeof(CProConnectHandle* ));
+	m_objHashConnectList.Init(pHashBase, (int)u2PoolSize);
 }
 
 _CommandData* CProConnectManager::GetCommandData(uint16 u2CommandID)
@@ -1998,14 +1993,9 @@ void CProConnectHandlerPool::Init(int nObjcetCount)
 	Close();
 
 	//初始化HashTable
-	int nKeySize = 10;
-	size_t nArraySize = (sizeof(_Hash_Table_Cell<CProConnectHandle>) + nKeySize + sizeof(CProConnectHandle* )) * nObjcetCount;
+	size_t nArraySize = (sizeof(_Hash_Table_Cell<CProConnectHandle>)) * nObjcetCount;
 	char* pHashBase = new char[nArraySize];
-	m_objHashHandleList.Set_Base_Addr(pHashBase, (int)nObjcetCount);
-	m_objHashHandleList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<CProConnectHandle>) * nObjcetCount, 
-																	nKeySize * nObjcetCount, nKeySize);
-	m_objHashHandleList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<CProConnectHandle>) + nKeySize) * nObjcetCount, 
-																	sizeof(CProConnectHandle* ) * nObjcetCount, sizeof(CProConnectHandle* ));
+	m_objHashHandleList.Init(pHashBase, (int)nObjcetCount);
 
 	for(int i = 0; i < nObjcetCount; i++)
 	{

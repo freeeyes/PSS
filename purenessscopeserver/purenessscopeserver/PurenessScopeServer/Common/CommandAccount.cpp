@@ -29,14 +29,9 @@ void CCommandAccount::InitName(const char* pName, uint32 u4CommandCount)
 	sprintf_safe(m_szName, MAX_BUFF_50, "%s", pName);
 
 	//≥ı ºªØHashTable
-	int nKeySize = 10;
-	size_t nArraySize = (sizeof(_Hash_Table_Cell<_CommandData>) + nKeySize + sizeof(_CommandData* )) * u4CommandCount;
+	size_t nArraySize = (sizeof(_Hash_Table_Cell<_CommandData>)) * u4CommandCount;
 	char* pHashBase = new char[nArraySize];
-	m_objCommandDataList.Set_Base_Addr(pHashBase, (int)u4CommandCount);
-	m_objCommandDataList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<_CommandData>) * u4CommandCount, 
-																	nKeySize * u4CommandCount, nKeySize);
-	m_objCommandDataList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<_CommandData>) + nKeySize) * u4CommandCount, 
-																	sizeof(_CommandData* ) * u4CommandCount, sizeof(_CommandData* ));
+	m_objCommandDataList.Init(pHashBase, (int)u4CommandCount);
 }
 
 void CCommandAccount::Init(uint8 u1CommandAccount, uint8 u1Flow, uint16 u2PacketTimeout)

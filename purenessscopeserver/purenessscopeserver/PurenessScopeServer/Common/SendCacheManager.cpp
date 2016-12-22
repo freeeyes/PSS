@@ -15,14 +15,9 @@ CSendCacheManager::~CSendCacheManager()
 void CSendCacheManager::Init(uint32 u4CacheCount, uint32 u4CacheSize)
 {
 	//≥ı ºªØHashTable
-	int nKeySize = 10;
-	size_t nArraySize = (sizeof(_Hash_Table_Cell<ACE_Message_Block>) + nKeySize + sizeof(ACE_Message_Block* )) * u4CacheCount;
+	size_t nArraySize = (sizeof(_Hash_Table_Cell<ACE_Message_Block>)) * u4CacheCount;
 	char* pHashBase = new char[nArraySize];
-	m_objCacheHashList.Set_Base_Addr(pHashBase, (int)u4CacheCount);
-	m_objCacheHashList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<ACE_Message_Block>) * u4CacheCount, 
-																	nKeySize * u4CacheCount, nKeySize);
-	m_objCacheHashList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<ACE_Message_Block>) + nKeySize) * u4CacheCount, 
-																	sizeof(ACE_Message_Block* ) * u4CacheCount, sizeof(ACE_Message_Block* ));
+	m_objCacheHashList.Init(pHashBase, (int)u4CacheCount);
 
 	for(uint32 i = 0; i < u4CacheCount; i++)
 	{

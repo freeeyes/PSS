@@ -17,14 +17,9 @@ void CSendMessagePool::Init(int nObjcetCount)
 	Close();
 
 	//≥ı ºªØHashTable
-	int nKeySize = 10;
-	size_t nArraySize = (sizeof(_Hash_Table_Cell<_SendMessage>) + nKeySize + sizeof(_SendMessage* )) * nObjcetCount;
+	size_t nArraySize = (sizeof(_Hash_Table_Cell<_SendMessage>)) * nObjcetCount;
 	char* pHashBase = new char[nArraySize];
 	m_objHashHandleList.Set_Base_Addr(pHashBase, (int)nObjcetCount);
-	m_objHashHandleList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<_SendMessage>) * nObjcetCount, 
-																	nKeySize * nObjcetCount, nKeySize);
-	m_objHashHandleList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<_SendMessage>) + nKeySize) * nObjcetCount, 
-																	sizeof(_SendMessage* ) * nObjcetCount, sizeof(_SendMessage* ));
 
 	for(int i = 0; i < nObjcetCount; i++)
 	{

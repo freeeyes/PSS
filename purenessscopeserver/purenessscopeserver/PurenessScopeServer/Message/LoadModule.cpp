@@ -22,14 +22,9 @@ void CLoadModule::Init(uint16 u2MaxModuleCount)
 	Close();
 
 	//≥ı ºªØHashTable
-	int nKeySize = 100;
-	size_t nArraySize = (sizeof(_Hash_Table_Cell<_ModuleInfo>) + nKeySize + sizeof(_ModuleInfo* )) * u2MaxModuleCount;
+	size_t nArraySize = (sizeof(_Hash_Table_Cell<_ModuleInfo>)) * u2MaxModuleCount;
 	char* pHashBase = new char[nArraySize];
-	m_objHashModuleList.Set_Base_Addr(pHashBase, (int)u2MaxModuleCount);
-	m_objHashModuleList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<_ModuleInfo>) * u2MaxModuleCount, 
-																	nKeySize * u2MaxModuleCount, nKeySize);
-	m_objHashModuleList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<_ModuleInfo>) + nKeySize) * u2MaxModuleCount, 
-																	sizeof(_ModuleInfo* ) * u2MaxModuleCount, sizeof(_ModuleInfo* ));
+	m_objHashModuleList.Init(pHashBase, (int)u2MaxModuleCount);
 }
 
 void CLoadModule::Close()

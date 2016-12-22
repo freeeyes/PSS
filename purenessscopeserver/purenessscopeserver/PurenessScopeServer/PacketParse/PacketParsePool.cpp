@@ -17,14 +17,9 @@ void CPacketParsePool::Init(uint32 u4PacketCount)
 	Close();
 
 	//≥ı ºªØHashTable
-	int nKeySize = 10;
-	size_t nArraySize = (sizeof(_Hash_Table_Cell<CPacketParse>) + nKeySize + sizeof(CPacketParse* )) * u4PacketCount;
+	size_t nArraySize = (sizeof(_Hash_Table_Cell<CPacketParse>)) * u4PacketCount;
 	char* pHashBase = new char[nArraySize];
 	m_objPacketParseList.Set_Base_Addr(pHashBase, (int)u4PacketCount);
-	m_objPacketParseList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<CPacketParse>) * u4PacketCount, 
-																	nKeySize * u4PacketCount, nKeySize);
-	m_objPacketParseList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<CPacketParse>) + nKeySize) * u4PacketCount, 
-																	sizeof(CPacketParse* ) * u4PacketCount, sizeof(CPacketParse* ));
 
 	for(int i = 0; i < (int)u4PacketCount; i++)
 	{

@@ -236,24 +236,14 @@ bool CClientReConnectManager::Init(ACE_Reactor* pReactor)
 	m_u4MaxPoolCount = App_MainConfig::instance()->GetServerConnectCount();
 
 	//初始化Hash数组(TCP)
-	int nKeySize = 10;
-	size_t nArraySize = (sizeof(_Hash_Table_Cell<CReactorClientInfo>) + nKeySize + sizeof(CReactorClientInfo* )) * m_u4MaxPoolCount;
+	size_t nArraySize = (sizeof(_Hash_Table_Cell<CReactorClientInfo>)) * m_u4MaxPoolCount;
 	char* pHashBase = new char[nArraySize];
-	m_objClientTCPList.Set_Base_Addr(pHashBase, (int)m_u4MaxPoolCount);
-	m_objClientTCPList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<CReactorClientInfo>) * m_u4MaxPoolCount, 
-																	nKeySize * m_u4MaxPoolCount, nKeySize);
-	m_objClientTCPList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<CReactorClientInfo>) + nKeySize) * m_u4MaxPoolCount, 
-																	sizeof(CReactorClientInfo* ) * m_u4MaxPoolCount, sizeof(CReactorClientInfo* ));
+	m_objClientTCPList.Init(pHashBase, (int)m_u4MaxPoolCount);
 
 	//初始化Hash数组(UDP)
-	nKeySize = 10;
-	nArraySize = (sizeof(_Hash_Table_Cell<CReactorUDPClient>) + nKeySize + sizeof(CReactorUDPClient* )) * m_u4MaxPoolCount;
+	nArraySize = (sizeof(_Hash_Table_Cell<CReactorUDPClient>)) * m_u4MaxPoolCount;
 	pHashBase = new char[nArraySize];
-	m_objClientUDPList.Set_Base_Addr(pHashBase, (int)m_u4MaxPoolCount);
-	m_objClientUDPList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<CReactorUDPClient>) * m_u4MaxPoolCount, 
-																	nKeySize * m_u4MaxPoolCount, nKeySize);
-	m_objClientUDPList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<CReactorUDPClient>) + nKeySize) * m_u4MaxPoolCount, 
-																	sizeof(CReactorUDPClient* ) * m_u4MaxPoolCount, sizeof(CReactorUDPClient* ));
+	m_objClientUDPList.Init(pHashBase, (int)m_u4MaxPoolCount);
 
 	m_u4ConnectServerTimeout = App_MainConfig::instance()->GetConnectServerTimeout() * 1000; //转换为微妙
 

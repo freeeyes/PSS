@@ -16,14 +16,11 @@ template <class T>
 struct _Hash_Table_Cell 
 {
 	char  m_cExists;                       //当前块是否已经使用,1已经使用，0没有被使用
-	char* m_szKey;                         //当前的key值，没有则为空
-	int   m_nKeySize;                      //当前key数据长度
 	int   m_nNextKeyIndex;                 //链表信息，如果主键有冲突,记录下一个冲突主键的位置
 	int   m_nProvKeyIndex;                 //链表信息，如果主键有冲突,记录上一个冲突主键的位置
 	unsigned long m_uHashA;                //第二次的hashkey值
 	unsigned long m_uHashB;                //第三次的hashkey值 
 	T*    m_pValue;                        //当前数据体指针
-	int   m_nValueSize;                    //当前数据体长度
 	
 	_Hash_Table_Cell()
 	{
@@ -33,26 +30,11 @@ struct _Hash_Table_Cell
 	void Init()
 	{
 		m_cExists       = 0;
-		m_nKeySize      = 0;
-		m_nValueSize    = 0;
 		m_uHashA        = 0;
 		m_uHashB        = 0;
 		m_nNextKeyIndex = -1;
 		m_nProvKeyIndex = -1;
-		m_szKey         = NULL;
 		m_pValue        = NULL;		
-	}
-	
-	void Set_Key(char* pKey, int nKeySize)
-	{
-		m_szKey         = pKey;
-		m_nKeySize      = nKeySize;
-	}
-	
-	void Set_Value(T* pValue, int nValueSize)
-	{
-		m_pValue        = pValue;
-		m_nValueSize    = nValueSize;
 	}
 	
 	void Clear()
@@ -62,10 +44,7 @@ struct _Hash_Table_Cell
 		m_uHashB        = 0;
 		//m_nNextKeyIndex = -1;
 		//m_nProvKeyIndex = -1;		
-		if(NULL != m_szKey)	
-		{
-			memset(m_szKey, 0, m_nKeySize);		
-		}
+
 		if(NULL != m_pValue)
 		{
 			m_pValue = NULL;
@@ -83,8 +62,6 @@ public:
 		m_lpTable    = NULL;
 		m_nCount     = 0;
 		m_nUsed      = 0;
-		m_nKeySize   = 0;
-		m_nValueSize = 0;
 		
 		memset(m_cryptTable, 0, sizeof(m_cryptTable));
 		
@@ -96,6 +73,11 @@ public:
 	{
 		Close();
 	}
+
+	void Init(char* pData, int nHashCount)
+	{
+		Set_Base_Addr(pData, nHashCount);	
+	}	
 
 	void Close()
 	{
@@ -116,44 +98,6 @@ public:
 		{
 			m_lpTable[i].Init();
 		}
-	}	
-	
-	//设置一个Hash Key的数组块(必须初始化调用)
-	void Set_Base_Key_Addr(char* pData, int nSize, int nKeySize)
-	{
-		m_nKeySize    = nKeySize;
-		int nCurrSize = 0;
-		for(int i = 0; i < m_nCount; i++)
-		{
-			nCurrSize = nKeySize * (i + 1);
-			if(nCurrSize <= nSize)
-			{
-				m_lpTable[i].Set_Key(pData + (nKeySize * i), nKeySize);
-			}
-			else
-			{
-				return;
-			}
-		}	
-	}
-	
-	//设置一组Hash Value的地址块(必须初始化调用)
-	void Set_Base_Value_Addr(char* pData, int nSize, int nValueSize)
-	{
-		m_nValueSize = nValueSize;
-		int nCurrSize = 0;
-		for(int i = 0; i < m_nCount; i++)
-		{
-			nCurrSize = nValueSize * (i + 1);
-			if(nCurrSize <= nSize)
-			{
-				m_lpTable[i].Set_Value((T* )(pData + (nValueSize * i)), nValueSize);
-			}
-			else
-			{
-				return;
-			}
-		}				
 	}
 	
 	//得到当前缓冲块总个数
@@ -234,14 +178,6 @@ public:
 		else
 		{
 			m_lpTable[nIndex].m_cExists = 1;
-			if(NULL != m_lpTable[nIndex].m_szKey)
-			{
-#ifndef WIN32
-				sprintf(m_lpTable[nIndex].m_szKey, "%s", lpszString);
-#else
-				sprintf_s(m_lpTable[nIndex].m_szKey, m_lpTable[nIndex].m_nKeySize, "%s", lpszString);
-#endif
-			}
 			m_lpTable[nIndex].m_uHashA = HashString(lpszString, HASH_A);
 			m_lpTable[nIndex].m_uHashB = HashString(lpszString, HASH_B);
 			m_lpTable[nIndex].m_pValue = pT;
@@ -341,7 +277,7 @@ private:
 	}
 	
 	//在已知的冲突链表中寻找最后一个
-	int GetLastClashKey(int nStartIndex, const char *lpszString, unsigned long uHashA, unsigned long uHashB, EM_HASH_STATE emHashState)
+	int GetLastClashKey(int nStartIndex, unsigned long uHashA, unsigned long uHashB, EM_HASH_STATE emHashState)
 	{
 		int nMaxIndex = m_nCount;
 		int nRunCount = 0;
@@ -382,14 +318,6 @@ private:
 							m_lpTable[i].m_cExists = 1;
 							m_lpTable[i].m_uHashA  = uHashA;
 							m_lpTable[i].m_uHashB  = uHashB;
-							if(NULL != m_lpTable[i].m_szKey)
-							{
-#ifndef WIN32
-								sprintf(m_lpTable[i].m_szKey, "%s", lpszString);
-#else
-								sprintf_s(m_lpTable[i].m_szKey, m_lpTable[i].m_nKeySize, "%s", lpszString);
-#endif
-							}
 							//记录链表信息
 							m_lpTable[nStartIndex].m_nNextKeyIndex = i;
 							m_lpTable[i].m_nProvKeyIndex           = nStartIndex;
@@ -407,15 +335,6 @@ private:
 							m_lpTable[i].m_cExists = 1;
 							m_lpTable[i].m_uHashA  = uHashA;
 							m_lpTable[i].m_uHashB  = uHashB;
-							if(NULL != m_lpTable[i].m_szKey)
-							{
-#ifndef WIN32
-								sprintf(m_lpTable[i].m_szKey, "%s", lpszString);
-#else
-								sprintf_s(m_lpTable[i].m_szKey, m_lpTable[i].m_nKeySize, "%s", lpszString);
-#endif
-							}	
-
 							m_lpTable[nStartIndex].m_nNextKeyIndex = i;
 							m_lpTable[i].m_nProvKeyIndex           = nStartIndex;
 							//printf("[GetLastClashKey](%s) <--prov(%d) next(%d)-->.\n", lpszString, nStartIndex, i);
@@ -436,14 +355,6 @@ private:
 						m_lpTable[nStartIndex].m_cExists = 1;
 						m_lpTable[nStartIndex].m_uHashA  = uHashA;
 						m_lpTable[nStartIndex].m_uHashB  = uHashB;
-						if(NULL != m_lpTable[nStartIndex].m_szKey)
-						{
-#ifndef WIN32
-							sprintf(m_lpTable[nStartIndex].m_szKey, "%s", lpszString);
-#else
-							sprintf_s(m_lpTable[nStartIndex].m_szKey, m_lpTable[nStartIndex].m_nKeySize, "%s", lpszString);
-#endif
-						}	
 
 						return nStartIndex;
 					}
@@ -487,21 +398,13 @@ private:
 				m_lpTable[uHashPos].m_cExists = 1;
 				m_lpTable[uHashPos].m_uHashA  = uHashA;
 				m_lpTable[uHashPos].m_uHashB  = uHashB;
-				if(NULL != m_lpTable[uHashPos].m_szKey)
-				{
-#ifndef WIN32
-					sprintf(m_lpTable[uHashPos].m_szKey, "%s", lpszString);
-#else
-					sprintf_s(m_lpTable[uHashPos].m_szKey, m_lpTable[uHashPos].m_nKeySize, "%s", lpszString);
-#endif
-				}
 
 				//printf("[GetHashTablePos] return uHashPos=%d 1.\n", (int)uHashPos);
 				return (int)uHashPos;
 			}
 			else
 			{
-				return  GetLastClashKey((int)uHashStart, lpszString, uHashA, uHashB, emHashState);
+				return  GetLastClashKey((int)uHashStart, uHashA, uHashB, emHashState);
 			}
 					
 		}
@@ -513,7 +416,7 @@ private:
 		}
 		else
 		{
-			int nPos = GetLastClashKey((int)uHashStart, lpszString, uHashA, uHashB, emHashState);
+			int nPos = GetLastClashKey((int)uHashStart, uHashA, uHashB, emHashState);
 			//printf("[GetHashTablePos]key=%s (%d) -> (%d)  .\n", lpszString, uHashStart, nPos);
 			return nPos;
 		}

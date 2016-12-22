@@ -1038,8 +1038,12 @@ CMessage* CMessageServiceGroup::CreateMessage(uint32 u4ConnectID, uint8 u1Packet
 
 void CMessageServiceGroup::DeleteMessage(uint32 u4ConnectID, CMessage* pMessage)
 {
+	if(u4ConnectID == 0)
+	{
+		OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::DeleteMessage]u4ConnectID=%d.\n", u4ConnectID));
+	}
+
     int32 n4ThreadID  = 0;
-    uint8 u1PacketType = PACKET_TCP;
 	n4ThreadID = pMessage->GetMessageBase()->m_u4WorkThreadID;
 
     if(-1 == n4ThreadID)

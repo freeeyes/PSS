@@ -102,14 +102,9 @@ public:
 		m_nMaxConnectCount = u4IPCount;
 
 		//≥ı ºªØHashTable
-		int nKeySize = 30;
-		size_t nArraySize = (sizeof(_Hash_Table_Cell<_IPAccount>) + nKeySize + sizeof(_IPAccount* )) * u4IPCount;
+		size_t nArraySize = (sizeof(_Hash_Table_Cell<_IPAccount>)) * u4IPCount;
 		char* pHashBase = new char[nArraySize];
-		m_objIPList.Set_Base_Addr(pHashBase, (int)u4IPCount);
-		m_objIPList.Set_Base_Key_Addr(pHashBase + sizeof(_Hash_Table_Cell<_IPAccount>) * u4IPCount, 
-																		nKeySize * u4IPCount, nKeySize);
-		m_objIPList.Set_Base_Value_Addr(pHashBase + (sizeof(_Hash_Table_Cell<_IPAccount>) + nKeySize) * u4IPCount, 
-																		sizeof(_IPAccount* ) * u4IPCount, sizeof(_IPAccount* ));
+		m_objIPList.Init(pHashBase, (int)u4IPCount);
 
 		ACE_Date_Time  dtNowTime;
 		m_u2CurrTime = (uint16)dtNowTime.minute();
