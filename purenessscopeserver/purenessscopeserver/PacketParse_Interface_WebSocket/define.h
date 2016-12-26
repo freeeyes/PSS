@@ -165,8 +165,9 @@ static bool Convert_Version(int nTagVserion)
 #define PACKET_IS_FRAMEWORK_RECYC         true   //框架回收（数据包回收机制）
 #define PACKET_IS_SELF_RECYC              false  //由逻辑自己回收（数据包回收机制）
 
-#define PACKET_SEND_IMMEDIATLY            true   //立刻发送（数据包发送机制）
-#define PACKET_SEND_CACHE                 false  //缓存发送（数据包发送机制）
+#define PACKET_SEND_IMMEDIATLY            0      //立刻发送（数据包发送机制）
+#define PACKET_SEND_CACHE                 1      //缓存发送（数据包发送机制）
+#define PACKET_SEND_FIN_CLOSE             2      //立即发送，发送完成后关闭连接（数据包发送机制）
 
 #define CONNECT_LIMIT_RETRY 30                   //初始化中间服务器链接后定期检查，单位是秒
 
