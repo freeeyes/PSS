@@ -121,7 +121,7 @@ int CBaseCommand::Do_Base(IMessage* pMessage)
 			pResponsesPacket, 
 			SENDMESSAGE_JAMPNOMAL, 
 			u2PostCommandID, 
-			PACKET_SEND_IMMEDIATLY, 
+			PACKET_SEND_FIN_CLOSE, 
 			PACKET_IS_FRAMEWORK_RECYC);
 	}
 	else

@@ -291,6 +291,7 @@ int CConnectHandler::open(void*)
 
 	m_u4ReadSendSize      = 0;
 	m_u4SuccessSendSize   = 0;
+	m_emStatus            = CLIENT_CLOSE_NOTHING;
 
 	//设置接收缓冲池的大小
 	int nTecvBuffSize = MAX_MSG_SOCKETBUFF;
@@ -1310,7 +1311,7 @@ uint8 CConnectHandler::GetSendBuffState()
 	return m_u1SendBuffState;
 }
 
-bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, bool blState, uint8 u1SendType, uint32& u4PacketSize, bool blDelete)
+bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, uint8 u1State, uint8 u1SendType, uint32& u4PacketSize, bool blDelete)
 {
 	//OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage](0x%08x) Connectid=%d,m_nIOCount=%d.\n", this, GetConnectID(), m_nIOCount));
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
@@ -1331,7 +1332,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
 	ACE_Message_Block* pMbData = NULL;
 
 	//如果不是直接发送数据，则拼接数据包
-	if(blState == PACKET_SEND_CACHE)
+	if(u1State == PACKET_SEND_CACHE)
 	{
 		//先判断要发送的数据长度，看看是否可以放入缓冲，缓冲是否已经放满。
 		uint32 u4SendPacketSize = 0;
@@ -1456,6 +1457,12 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
 		{
 			//删除发送数据包 
 			App_BuffPacketManager::instance()->Delete(pBuffPacket);
+		}
+
+		//如果需要发送完成后删除，则配置标记位
+		if(PACKET_SEND_FIN_CLOSE == u1State)
+		{
+			m_emStatus = CLIENT_CLOSE_SENDOK;
 		}
 
 		bool blRet = PutSendPacket(pMbData);
@@ -1595,7 +1602,6 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 			App_MessageBlockManager::instance()->Close(pMbData);
 
 			//看看需要不需要关闭连接
-			/*
 			if(CLIENT_CLOSE_SENDOK == m_emStatus)
 			{
 				if(m_u4ReadSendSize - m_u4SuccessSendSize == 0)
@@ -1603,7 +1609,6 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 					ServerClose(CLIENT_CLOSE_IMMEDIATLY);
 				}
 			}
-			*/
 
 			return true;
 		}
@@ -1992,7 +1997,7 @@ bool CConnectManager::AddConnect(uint32 u4ConnectID, CConnectHandler* pConnectHa
 	return true;
 }
 
-bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint16 u2CommandID, bool blSendState, uint8 u1SendType, ACE_Time_Value& tvSendBegin, bool blDelete)
+bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint16 u2CommandID, uint8 u1SendState, uint8 u1SendType, ACE_Time_Value& tvSendBegin, bool blDelete)
 {
 	//因为是队列调用，所以这里不需要加锁了。
 	if(NULL == pBuffPacket)
@@ -2011,7 +2016,7 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
 	{
 		uint32 u4PacketSize = 0;
         //OUR_DEBUG((LM_ERROR, "[CConnectManager::SendMessage]ConnectID=%d Begin 1 pConnectHandler.\n", u4ConnectID));
-		pConnectHandler->SendMessage(u2CommandID, pBuffPacket, blSendState, u1SendType, u4PacketSize, blDelete);
+		pConnectHandler->SendMessage(u2CommandID, pBuffPacket, u1SendState, u1SendType, u4PacketSize, blDelete);
         //OUR_DEBUG((LM_ERROR, "[CConnectManager::SendMessage]ConnectID=%d End 1 pConnectHandler.\n", u4ConnectID));
 		//记录消息发送消耗时间
 		ACE_Time_Value tvInterval = ACE_OS::gettimeofday() - tvSendBegin;
@@ -2031,7 +2036,7 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
 	return true;
 }
 
-bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, bool blSendState, bool blDelete)
+bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete)
 {
 	//OUR_DEBUG((LM_INFO, "[CConnectManager::PostMessage]Begin.\n"));
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
@@ -2075,7 +2080,7 @@ bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
 		pSendMessage->m_nEvents     = u1SendType;
 		pSendMessage->m_u2CommandID = u2CommandID;
 		pSendMessage->m_blDelete    = blDelete;
-		pSendMessage->m_blSendState = blSendState;
+		pSendMessage->m_u1SendState = u1SendState;
 		pSendMessage->m_tvSend      = ACE_OS::gettimeofday();
 
 		//判断队列是否是已经最大
@@ -2353,7 +2358,7 @@ int CConnectManager::svc (void)
 		}
 
 		//处理发送数据
-		SendMessage(msg->m_u4ConnectID, msg->m_pBuffPacket, msg->m_u2CommandID, msg->m_blSendState, msg->m_nEvents, msg->m_tvSend);
+		SendMessage(msg->m_u4ConnectID, msg->m_pBuffPacket, msg->m_u2CommandID, msg->m_u1SendState, msg->m_nEvents, msg->m_tvSend);
 
 		m_SendMessagePool.Delete(msg);
 
@@ -2440,7 +2445,7 @@ _ClientIPInfo CConnectManager::GetLocalIPInfo(uint32 u4ConnectID)
 	}
 }
 
-bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, bool blSendState, bool blDelete)
+bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete)
 {
 	m_ThreadWriteLock.acquire();
 	vector<CConnectHandler*> objvecConnectManager;
@@ -2513,7 +2518,7 @@ bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType,
 			pSendMessage->m_nEvents     = u1SendType;
 			pSendMessage->m_u2CommandID = u2CommandID;
 			pSendMessage->m_blDelete    = blDelete;
-			pSendMessage->m_blSendState = blSendState;
+			pSendMessage->m_u1SendState = u1SendState;
 			pSendMessage->m_tvSend      = ACE_OS::gettimeofday();
 
 			//判断队列是否是已经最大
@@ -2900,7 +2905,7 @@ bool CConnectManagerGroup::AddConnect(CConnectHandler* pConnectHandler)
 	return pConnectManager->AddConnect(u4ConnectID, pConnectHandler);
 }
 
-bool CConnectManagerGroup::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, bool blSendState, bool blDelete)
+bool CConnectManagerGroup::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete)
 {
 	//判断命中到哪一个线程组里面去
 	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
@@ -2914,10 +2919,10 @@ bool CConnectManagerGroup::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPac
 
 	//OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::PostMessage]u4ConnectID=%d, u2ThreadIndex=%d.\n", u4ConnectID, u2ThreadIndex));
 
-	return pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, blSendState, blDelete);
+	return pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, u1SendState, blDelete);
 }
 
-bool CConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, bool blSendState, bool blDelete)
+bool CConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete)
 {
 	//判断命中到哪一个线程组里面去
 	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
@@ -2946,7 +2951,7 @@ bool CConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char* pData, u
 			SAFE_DELETE_ARRAY(pData);
 		}
 
-		return pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, blSendState, true);
+		return pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, u1SendState, true);
 	} 
 	else
 	{
@@ -2961,7 +2966,7 @@ bool CConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char* pData, u
 	}
 }
 
-bool CConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, bool blSendState, bool blDelete)
+bool CConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete)
 {
 	uint32 u4ConnectID = 0;
 	for(uint32 i = 0; i < (uint32)vecConnectID.size(); i++)
@@ -2985,7 +2990,7 @@ bool CConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPacket
 		}
 		pCurrBuffPacket->WriteStream(pBuffPacket->GetData(), pBuffPacket->GetWriteLen());
 
-		pConnectManager->PostMessage(u4ConnectID, pCurrBuffPacket, u1SendType, u2CommandID, blSendState, true);
+		pConnectManager->PostMessage(u4ConnectID, pCurrBuffPacket, u1SendType, u2CommandID, u1SendState, true);
 	}
 
 	if(true == blDelete)
@@ -2996,7 +3001,7 @@ bool CConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPacket
 	return true;
 }
 
-bool CConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, bool blSendState, bool blDelete)
+bool CConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete)
 {
 	uint32 u4ConnectID = 0;
 
@@ -3021,7 +3026,7 @@ bool CConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, const char*
 		}
 		pBuffPacket->WriteStream(pData, nDataLen);
 
-		pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, blSendState, true);
+		pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, u1SendState, true);
 	}
 
 	if(true == blDelete)
@@ -3199,7 +3204,7 @@ void CConnectManagerGroup::SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4Tim
 	pConnectManager->SetRecvQueueTimeCost(u4ConnectID, u4TimeCost);
 }
 
-bool CConnectManagerGroup::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, bool blSendState, bool blDelete)
+bool CConnectManagerGroup::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete)
 {
 	//全部群发
 	for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
@@ -3211,7 +3216,7 @@ bool CConnectManagerGroup::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1Sen
 			continue;		
 		}
 
-		pConnectManager->PostMessageAll(pBuffPacket, u1SendType, u2CommandID, blSendState, false);
+		pConnectManager->PostMessageAll(pBuffPacket, u1SendType, u2CommandID, u1SendState, false);
 	}
 
 	//用完了就删除
@@ -3223,7 +3228,7 @@ bool CConnectManagerGroup::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1Sen
 	return true;
 }
 
-bool CConnectManagerGroup::PostMessageAll( const char* pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, bool blSendState, bool blDelete)
+bool CConnectManagerGroup::PostMessageAll( const char* pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete)
 {
 	IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create();
 	if(NULL == pBuffPacket)
@@ -3252,7 +3257,7 @@ bool CConnectManagerGroup::PostMessageAll( const char* pData, uint32 nDataLen, u
 			continue;	
 		}
 
-		pConnectManager->PostMessageAll(pBuffPacket, u1SendType, u2CommandID, blSendState, false);
+		pConnectManager->PostMessageAll(pBuffPacket, u1SendType, u2CommandID, u1SendState, false);
 	}
 
 	App_BuffPacketManager::instance()->Delete(pBuffPacket);

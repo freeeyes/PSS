@@ -12,10 +12,10 @@ struct _SendMessage
 {
 	uint32              m_u4ConnectID;    //要发送的远程ID
 	uint16              m_u2CommandID;    //要发送的命令ID，用于统计功能
-	bool                m_blSendState;    //要发送的状态，true是立即发送，false是先缓存不发送
+	uint8               m_u1SendState;    //要发送的状态，0是立即发送，1是先缓存不发送，2是立即发送后关闭
 	bool                m_blDelete;       //发送完成后是否删除，true是删除，false是不删除
 	IBuffPacket*        m_pBuffPacket;    //数据包内容
-	uint8               m_nEvents;        //发送类型，0：正常数据包发送，1：发送阻塞数据
+	uint8               m_nEvents;        //发送类型，0：使用PacketParse组织发送数据，1：不使用PacketParse组织数据
 	ACE_Time_Value      m_tvSend;         //数据包发送的时间戳
 
 	ACE_Message_Block*  m_pmbQueuePtr;    //消息队列指针块
@@ -24,12 +24,11 @@ struct _SendMessage
 
 	_SendMessage()
 	{
-		m_blSendState = true;
+		m_u1SendState = 0;
 		m_blDelete    = true;
 		m_u4ConnectID = 0;
 		m_nEvents     = 0;
 		m_u2CommandID = 0;
-		m_blSendState = 0;
 		m_nHashID     = 0;
 
 		//这里设置消息队列模块指针内容，这样就不必反复的new和delete，提升性能

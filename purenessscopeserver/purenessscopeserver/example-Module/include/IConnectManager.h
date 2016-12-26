@@ -1,4 +1,4 @@
-ï»¿#ifndef _ICONNECTMANAGER_H
+#ifndef _ICONNECTMANAGER_H
 #define _ICONNECTMANAGER_H
 
 #include "IBuffPacket.h"
@@ -6,49 +6,50 @@
 
 enum EM_Client_Connect_status
 {
-    CLIENT_CONNECT_EXIST = 0,
-    CLIENT_CONNECT_NO_EXIST,
+	CLIENT_CONNECT_EXIST = 0,
+	CLIENT_CONNECT_NO_EXIST,
 };
 
 enum EM_Client_Close_status
 {
-    CLIENT_CLOSE_NOTHING = 0,  //ä»€ä¹ˆéƒ½ä¸åš
-    CLIENT_CLOSE_IMMEDIATLY,   //ç«‹å³å…³é—­è¿æ¥
-    CLIENT_CLOSE_SENDOK,       //å‘é€å®Œæˆå…³é—­è¿æ¥
+	CLIENT_CLOSE_NOTHING = 0,  //Ê²Ã´¶¼²»×ö
+	CLIENT_CLOSE_IMMEDIATLY,   //Á¢¼´¹Ø±ÕÁ¬½Ó
+	CLIENT_CLOSE_SENDOK,       //·¢ËÍÍê³É¹Ø±ÕÁ¬½Ó  
 };
 
 class IConnectManager
 {
 public:
     virtual ~IConnectManager() {}
-    //å¼‚æ­¥å‘é€æŒ‡å®šçš„æ•°æ®åŒ…(ç»è¿‡PacketParseæ•´ç†å‘é€åŒ…) IBuffPacket ä¼šåœ¨å†…éƒ¨ç”¨å®Œè‡ªè¡Œé”€æ¯
-    virtual bool PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, bool blSendState = true, bool blDlete = true)                    = 0;
-    //å¼‚æ­¥å‘é€æŒ‡å®šçš„æ•°æ®åŒ…(ä¸ç»è¿‡PacketParseæ•´ç†å‘é€åŒ…) pDataåœ¨é‡Œé¢ä¸è´Ÿè´£é”€æ¯ï¼Œéœ€è¦åœ¨é€»è¾‘æ¨¡å—è‡ªè¡Œå¤„ç†
-    virtual bool PostMessage(uint32 u4ConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, bool blSendState = true, bool blDlete = true)          = 0;
-    //å¼‚æ­¥ç¾¤å‘æŒ‡å®šçš„æ•°æ®åŒ…(ç»è¿‡PacketParseæ•´ç†å‘é€åŒ…) IBuffPacket ä¼šåœ¨å†…éƒ¨ç”¨å®Œè‡ªè¡Œé”€æ¯
-    virtual bool PostMessage(vector<uint32> vecConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, bool blSendState = true, bool blDlete = true)           = 0;
-    //å¼‚æ­¥ç¾¤å‘æŒ‡å®šçš„æ•°æ®åŒ…(ä¸ç»è¿‡PacketParseæ•´ç†å‘é€åŒ…) pDataåœ¨é‡Œé¢ä¸è´Ÿè´£é”€æ¯ï¼Œéœ€è¦åœ¨é€»è¾‘æ¨¡å—è‡ªè¡Œå¤„ç†
-    virtual bool PostMessage(vector<uint32> vecConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, bool blSendState = true, bool blDlete = true) = 0;
-    //å¼‚æ­¥å…¨å‘æŒ‡å®šçš„æ•°æ®åŒ…(ç»è¿‡PacketParseæ•´ç†å‘é€åŒ…) IBuffPacket ä¼šåœ¨å†…éƒ¨ç”¨å®Œè‡ªè¡Œé”€æ¯
-    virtual bool PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, bool blSendState = true, bool blDlete = true)                                     = 0;
-    //å¼‚æ­¥å…¨å‘æŒ‡å®šçš„æ•°æ®åŒ…(ä¸ç»è¿‡PacketParseæ•´ç†å‘é€åŒ…) pDataåœ¨é‡Œé¢ä¸è´Ÿè´£é”€æ¯ï¼Œéœ€è¦åœ¨é€»è¾‘æ¨¡å—è‡ªè¡Œå¤„ç†
-    virtual bool PostMessageAll(const char* pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, bool blSendState = true, bool blDlete = true)                           = 0;
-    //æœåŠ¡å™¨å…³é—­è¿æ¥
-    virtual bool CloseConnect(uint32 u4ConnectID, EM_Client_Close_status emStatus = CLIENT_CLOSE_IMMEDIATLY)     = 0;
-    //å¾—åˆ°å½“å‰è¿æ¥ä¿¡æ¯IPå’Œç«¯å£
-    virtual _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID)                                                    = 0;
-    //å¾—åˆ°å½“å‰è¿æ¥ç›‘å¬IPå’Œç«¯å£
-    virtual _ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID)                                                     = 0;
-    //å¾—åˆ°å½“å‰è¿æ¥æ•°é‡
-    virtual int  GetCount()                                                                                      = 0;
-    //è®¾ç½®ç›¸å…³ConnectIDå’ŒNameçš„æ˜ å°„å…³ç³»
-    virtual bool SetConnectName(uint32 u4ConnectID, const char* pName)                                           = 0;
-    //è®¾ç½®ç›¸å…³ConnectIDæ˜¯å¦æ‰“å¼€æ—¥å¿—
-    virtual bool SetIsLog(uint32 u4ConnectID, bool blIsLog)                                                      = 0;
-    //å¾—åˆ°æŒ‡å®šNameçš„ç›¸å…³ConnectIDæ˜ å°„ä¿¡æ¯
-    virtual void GetClientNameInfo(const char* pName, vecClientNameInfo& objClientNameInfo)                      = 0;
-    //å¾—åˆ°æŒ‡å®šçš„å®¢æˆ·ç«¯è¿æ¥çŠ¶æ€,falseä¸ºé“¾æ¥ä¸å­˜åœ¨ï¼Œtrueä¸ºé“¾æ¥å­˜åœ¨
-    virtual EM_Client_Connect_status GetConnectState(uint32 u4ConnectID)                                         = 0;
+	//Òì²½·¢ËÍÖ¸¶¨µÄÊı¾İ°ü(¾­¹ıPacketParseÕûÀí·¢ËÍ°ü) IBuffPacket »áÔÚÄÚ²¿ÓÃÍê×ÔĞĞÏú»Ù
+	virtual bool PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDlete = true)                    = 0;  
+	//Òì²½·¢ËÍÖ¸¶¨µÄÊı¾İ°ü(²»¾­¹ıPacketParseÕûÀí·¢ËÍ°ü) pDataÔÚÀïÃæ²»¸ºÔğÏú»Ù£¬ĞèÒªÔÚÂß¼­Ä£¿é×ÔĞĞ´¦Àí
+	virtual bool PostMessage(uint32 u4ConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDlete = true)          = 0; 
+	//Òì²½Èº·¢Ö¸¶¨µÄÊı¾İ°ü(¾­¹ıPacketParseÕûÀí·¢ËÍ°ü) IBuffPacket »áÔÚÄÚ²¿ÓÃÍê×ÔĞĞÏú»Ù
+	virtual bool PostMessage(vector<uint32> vecConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDlete = true)           = 0;  
+	//Òì²½Èº·¢Ö¸¶¨µÄÊı¾İ°ü(²»¾­¹ıPacketParseÕûÀí·¢ËÍ°ü) pDataÔÚÀïÃæ²»¸ºÔğÏú»Ù£¬ĞèÒªÔÚÂß¼­Ä£¿é×ÔĞĞ´¦Àí
+	virtual bool PostMessage(vector<uint32> vecConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDlete = true) = 0;  
+	//Òì²½È«·¢Ö¸¶¨µÄÊı¾İ°ü(¾­¹ıPacketParseÕûÀí·¢ËÍ°ü) IBuffPacket »áÔÚÄÚ²¿ÓÃÍê×ÔĞĞÏú»Ù
+	virtual bool PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0,uint8 u1SendState = 0, bool blDlete = true)                                     = 0;  
+	//Òì²½È«·¢Ö¸¶¨µÄÊı¾İ°ü(²»¾­¹ıPacketParseÕûÀí·¢ËÍ°ü) pDataÔÚÀïÃæ²»¸ºÔğÏú»Ù£¬ĞèÒªÔÚÂß¼­Ä£¿é×ÔĞĞ´¦Àí
+	virtual bool PostMessageAll(const char* pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDlete = true)                           = 0;  
+	//·şÎñÆ÷¹Ø±ÕÁ¬½Ó
+	virtual bool CloseConnect(uint32 u4ConnectID, EM_Client_Close_status emStatus = CLIENT_CLOSE_IMMEDIATLY)     = 0;
+	//µÃµ½µ±Ç°Á¬½ÓĞÅÏ¢IPºÍ¶Ë¿Ú
+	virtual _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID)                                                    = 0;
+	//µÃµ½µ±Ç°Á¬½Ó¼àÌıIPºÍ¶Ë¿Ú
+	virtual _ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID)                                                     = 0;
+	//µÃµ½µ±Ç°Á¬½ÓÊıÁ¿
+	virtual int  GetCount()                                                                                      = 0;
+	//ÉèÖÃÏà¹ØConnectIDºÍNameµÄÓ³Éä¹ØÏµ
+	virtual bool SetConnectName(uint32 u4ConnectID, const char* pName)                                           = 0;
+	//ÉèÖÃÏà¹ØConnectIDÊÇ·ñ´ò¿ªÈÕÖ¾
+	virtual bool SetIsLog(uint32 u4ConnectID, bool blIsLog)                                                      = 0;
+	//µÃµ½Ö¸¶¨NameµÄÏà¹ØConnectIDÓ³ÉäĞÅÏ¢
+	virtual void GetClientNameInfo(const char* pName, vecClientNameInfo& objClientNameInfo)                      = 0;
+	//µÃµ½Ö¸¶¨µÄ¿Í»§¶ËÁ¬½Ó×´Ì¬,falseÎªÁ´½Ó²»´æÔÚ£¬trueÎªÁ´½Ó´æÔÚ
+	virtual EM_Client_Connect_status GetConnectState(uint32 u4ConnectID)                                         = 0;
 };
 
 #endif
+ 
