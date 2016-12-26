@@ -98,7 +98,7 @@ bool CBuffPacketManager::Delete(IBuffPacket* pBuffPacket)
 	}
 	else
 	{
-		OUR_DEBUG((LM_INFO, "[CBuffPacketManager::Delete]szPacketID=%s(0x%08x) nPos=%d.\n", szPacketID, pBuff, nPos));
+		//OUR_DEBUG((LM_INFO, "[CBuffPacketManager::Delete]szPacketID=%s(0x%08x) nPos=%d.\n", szPacketID, pBuff, nPos));
 	}
 
 	return true;
