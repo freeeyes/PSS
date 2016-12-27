@@ -223,6 +223,11 @@ int CLoadModule::GetCurrModuleCount()
 	return m_objHashModuleList.Get_Used_Count();
 }
 
+int CLoadModule::GetModulePoolCount()
+{
+	return m_objHashModuleList.Get_Count();
+}
+
 _ModuleInfo* CLoadModule::GetModuleIndex(int nIndex)
 {
 	if(nIndex < 0 || nIndex >= m_objHashModuleList.Get_Count())

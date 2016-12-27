@@ -50,6 +50,7 @@ public:
 	int  SendModuleMessage(const char* pModuleName, uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket);
 
 	int  GetCurrModuleCount();
+	int  GetModulePoolCount();
 	_ModuleInfo* GetModuleIndex(int nIndex);
 	_ModuleInfo* GetModuleInfo(const char* pModuleName);
 

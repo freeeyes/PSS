@@ -749,7 +749,7 @@ bool CConsoleMessage::DoMessage_ShowModule(_CommandInfo& CommandInfo, IBuffPacke
 			}
 		}
 
-		for(int i = 0; i < App_ModuleLoader::instance()->GetCurrModuleCount(); i++)
+		for(int i = 0; i < App_ModuleLoader::instance()->GetModulePoolCount(); i++)
 		{
 			_ModuleInfo* pModuleInfo = App_ModuleLoader::instance()->GetModuleIndex(i);
 			if(NULL != pModuleInfo)
