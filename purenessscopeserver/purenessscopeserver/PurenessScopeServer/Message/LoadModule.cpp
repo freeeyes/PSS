@@ -155,7 +155,7 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, c
 	}
 
 	//查找此模块是否已经被注册，有则把信息老信息清理
-	_ModuleInfo* pOldModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
+	_ModuleInfo* pOldModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(pModuleInfo->GetName());
 	if(NULL != pOldModuleInfo)
 	{
 		//关闭副本
@@ -165,7 +165,7 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, c
 	}
 
 	//将注册成功的模块，加入到Hash数组中
-	if(-1 == m_objHashModuleList.Add_Hash_Data(pModuleName, pModuleInfo))
+	if(-1 == m_objHashModuleList.Add_Hash_Data(pModuleInfo->GetName(), pModuleInfo))
 	{
 		OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] m_mapModuleInfo.AddMapData error!\n"));
 		SAFE_DELETE(pModuleInfo);
