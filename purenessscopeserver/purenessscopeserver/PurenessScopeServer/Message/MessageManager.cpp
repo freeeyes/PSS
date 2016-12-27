@@ -310,7 +310,20 @@ bool CMessageManager::DelClientCommand(uint16 u2CommandID, CClientCommand* pClie
 
 bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1State)
 {
-	string strModuleName = pModuleName;
+	string strModuleName  = pModuleName;
+	string strModuleN     = "";
+	string strModulePath  = "";
+	string strModuleParam = "";
+
+	//获得重载对象相关参数
+	_ModuleInfo* pModuleInfo = App_ModuleLoader::instance()->GetModuleInfo(pModuleName);
+	if(NULL != pModuleInfo)
+	{
+		//获取对象信息
+		strModuleN     = pModuleInfo->strModuleName;
+		strModulePath  = pModuleInfo->strModulePath;
+		strModuleParam = pModuleInfo->strModuleParam;
+	}
 
 	_ModuleClient* pModuleClient = m_objModuleClientList.Get_Hash_Box_Data(strModuleName.c_str());
 	if(NULL != pModuleClient)
@@ -349,26 +362,17 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1State
 			}
 		}
 
-		//最后删除实际模块和CommandInfo的关系
-		SAFE_DELETE(pModuleClient);
-		m_objModuleClientList.Del_Hash_Data(strModuleName.c_str());
-
 		//卸载插件信息
-		App_ModuleLoader::instance()->UnLoadModule(pModuleName);
+		App_ModuleLoader::instance()->UnLoadModule(pModuleName, true);
 	}
 
 	//看看是否要重新加载
 	if(u1State == 2)
 	{
-		_ModuleInfo* pModuleInfo = App_ModuleLoader::instance()->GetModuleInfo(pModuleName);
-		if(NULL != pModuleInfo)
+		if(strModulePath.length() > 0)
 		{
-			//获取对象信息
-			string strModuleN    = pModuleInfo->strModuleName;
-			string strModulePath = pModuleInfo->strModulePath;
-
 			//重新加载
-			App_ModuleLoader::instance()->LoadModule(strModulePath.c_str(), strModuleN.c_str());
+			App_ModuleLoader::instance()->LoadModule(strModulePath.c_str(), strModuleN.c_str(), strModuleParam.c_str());
 		}
 	}
 

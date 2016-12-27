@@ -69,14 +69,6 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pResourceName)
 		strModuleName = vecModuleName[i];
 		OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] Begin Load ModuleName[%s]!\n", strModuleName.c_str()));
 
-		//确定这个模块是否被注册过
-		_ModuleInfo* pCurr = m_objHashModuleList.Get_Hash_Box_Data(strModuleName.c_str());
-		if(NULL != pCurr)
-		{
-			//如果被注册过，先卸载现有的，再重新装载
-			UnLoadModule(strModuleName.c_str());
-		}
-
 		_ModuleInfo* pModuleInfo = new _ModuleInfo();
 
 		if(NULL == pModuleInfo)
