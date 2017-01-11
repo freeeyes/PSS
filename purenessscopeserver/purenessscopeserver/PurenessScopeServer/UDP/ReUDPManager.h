@@ -51,7 +51,7 @@ public:
 		}
 	}
 
-	bool SendMessage(int nConnectID, const char* pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead = true, uint16 u2CommandID = 0)
+	bool SendMessage(int nConnectID, const char* pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead = true, uint16 u2CommandID = 0, bool blDlete = true)
 	{
 		ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
 		if(nConnectID >= (int)m_vecReactorUDPHandler.size())
@@ -63,7 +63,7 @@ public:
 		CReactorUDPHander* pReactorUDPHandler = (CReactorUDPHander* )m_vecReactorUDPHandler[nConnectID];
 		if(NULL != pReactorUDPHandler)
 		{
-			return pReactorUDPHandler->SendMessage(pMessage, u4Len, szIP, nPort, blHead, u2CommandID);
+			return pReactorUDPHandler->SendMessage(pMessage, u4Len, szIP, nPort, blHead, u2CommandID, blDlete);
 		}
 		else
 		{

@@ -92,7 +92,7 @@ int CReactorUDPHander::handle_close(ACE_HANDLE handle, ACE_Reactor_Mask close_ma
 	return 0;
 }
 
-bool CReactorUDPHander::SendMessage(const char* pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead, uint16 u2CommandID)
+bool CReactorUDPHander::SendMessage(const char* pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead, uint16 u2CommandID, bool blDlete)
 {
 	ACE_hrtime_t m_tvBegin = ACE_OS::gethrtime();
 
@@ -101,7 +101,10 @@ bool CReactorUDPHander::SendMessage(const char* pMessage, uint32 u4Len, const ch
 	if(nErr != 0)
 	{
 		OUR_DEBUG((LM_INFO, "[CProactorUDPHandler::SendMessage]set_address error[%d].\n", errno));
-		SAFE_DELETE_ARRAY(pMessage);
+		if(true == blDlete)
+		{
+			SAFE_DELETE_ARRAY(pMessage);
+		}
 		return false;
 	}
 
@@ -115,7 +118,10 @@ bool CReactorUDPHander::SendMessage(const char* pMessage, uint32 u4Len, const ch
 		pMbData = App_MessageBlockManager::instance()->Create(u4SendLength);
 		if(NULL == pMbData)
 		{
-			SAFE_DELETE(pMessage);
+			if(true == blDlete)
+			{
+				SAFE_DELETE(pMessage);
+			}
 			return false;
 		}
 
@@ -127,7 +133,10 @@ bool CReactorUDPHander::SendMessage(const char* pMessage, uint32 u4Len, const ch
 			m_atvOutput = ACE_OS::gettimeofday();
 			m_u4SendSize += u4Len;
 			m_u4SendPacketCount++;
-			SAFE_DELETE_ARRAY(pMessage);
+			if(true == blDlete)
+			{
+				SAFE_DELETE_ARRAY(pMessage);
+			}
 
 			//统计发送信息
 			uint32 u4Cost = (uint32)(ACE_OS::gethrtime() - m_tvBegin);
@@ -141,7 +150,10 @@ bool CReactorUDPHander::SendMessage(const char* pMessage, uint32 u4Len, const ch
 		else
 		{
 			OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::SendMessage]send error(%d).\n", errno));
-			SAFE_DELETE_ARRAY(pMessage);
+			if(true == blDlete)
+			{
+				SAFE_DELETE_ARRAY(pMessage);
+			}
 
 			//释放发送体
 			App_MessageBlockManager::instance()->Close(pMbData);
