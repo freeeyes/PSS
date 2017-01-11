@@ -31,12 +31,15 @@ public:
 	_ClientConnectInfo GetClientConnectInfo();
 	void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);                                   //获得指定命令统计信息
 
+	void SetLocalAddr(const char* pIP, uint32 u4Port);
+
 private:
 	bool CheckMessage(const char* pData, uint32 u4Len);     //这里解析数据包并放入数据队列
 
 private:   
 	ACE_SOCK_Dgram          m_skRemote;
 	ACE_INET_Addr           m_addrRemote;                   //数据发送方的IP信息
+	ACE_INET_Addr           m_addrLocal;                    //监听方的IP信息
 	CPacketParse*           m_pPacketParse;                 //数据包解析类
 
 	ACE_Time_Value          m_atvInput;                     //接收包的时间

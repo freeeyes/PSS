@@ -252,6 +252,7 @@ bool CProServerManager::Start()
 		}
 		else
 		{
+			pProactorUDPHandler->SetLocalAddr(pServerInfo->m_szServerIP, (uint32)pServerInfo->m_nPort);
 			int nErr = 0;
 			if(pServerInfo->m_u1IPType == TYPE_IPV4)
 			{

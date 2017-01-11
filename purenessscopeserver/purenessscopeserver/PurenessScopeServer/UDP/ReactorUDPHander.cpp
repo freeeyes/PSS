@@ -13,6 +13,11 @@ CReactorUDPHander::~CReactorUDPHander(void)
 {
 }
 
+void CReactorUDPHander::SetLocalAddr(const char* pIP, uint32 u4Port)
+{
+	m_addrLocal.set(u4Port, pIP);
+}
+
 int CReactorUDPHander::OpenAddress(const ACE_INET_Addr& AddrRemote, ACE_Reactor* pReactor)
 {
 	if(m_skRemote.open(AddrRemote) == -1)
@@ -276,9 +281,11 @@ bool CReactorUDPHander::CheckMessage(const char* pData, uint32 u4Len)
 		objMakePacket.m_u4ConnectID       = UDP_HANDER_ID;
 		objMakePacket.m_pPacketParse      = m_pPacketParse;
 		objMakePacket.m_PacketType        = PACKET_UDP;
+		objMakePacket.m_AddrRemote        = m_addrRemote;
+		objMakePacket.m_AddrListen        = m_addrLocal;
 
 		//UDP因为不是面向链接的，所以这里ConnectID设置成-1
-		if(false == App_MakePacket::instance()->PutUDPMessageBlock(m_addrRemote, PACKET_PARSE, &objMakePacket, tvCheck))
+		if(false == App_MakePacket::instance()->PutUDPMessageBlock(PACKET_PARSE, &objMakePacket, tvCheck))
 		{
 			App_PacketParsePool::instance()->Delete(m_pPacketParse);
 			OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::SendMessage]PutMessageBlock is error.\n"));
@@ -308,9 +315,11 @@ bool CReactorUDPHander::CheckMessage(const char* pData, uint32 u4Len)
 			objMakePacket.m_u4ConnectID       = UDP_HANDER_ID;
 			objMakePacket.m_pPacketParse      = m_pPacketParse;
 			objMakePacket.m_PacketType        = PACKET_UDP;
+			objMakePacket.m_AddrRemote        = m_addrRemote;
+			objMakePacket.m_AddrListen        = m_addrLocal;
 
 			//UDP因为不是面向链接的
-			if(false == App_MakePacket::instance()->PutUDPMessageBlock(m_addrRemote, PACKET_PARSE, &objMakePacket, tvCheck))
+			if(false == App_MakePacket::instance()->PutUDPMessageBlock(PACKET_PARSE, &objMakePacket, tvCheck))
 			{
 				App_PacketParsePool::instance()->Delete(m_pPacketParse);
 				OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::SendMessage]PutMessageBlock is error.\n"));

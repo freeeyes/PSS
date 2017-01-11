@@ -15,7 +15,7 @@ bool CMakePacket::Init()
 }
 
 
-bool CMakePacket::PutUDPMessageBlock(const ACE_INET_Addr& AddrRemote, uint8 u1Option, _MakePacket* pMakePacket, ACE_Time_Value& tvNow)
+bool CMakePacket::PutUDPMessageBlock(uint8 u1Option, _MakePacket* pMakePacket, ACE_Time_Value& tvNow)
 {
 	if(NULL == pMakePacket)
 	{
@@ -24,7 +24,6 @@ bool CMakePacket::PutUDPMessageBlock(const ACE_INET_Addr& AddrRemote, uint8 u1Op
 	}
 
 	pMakePacket->m_u1Option          = u1Option;
-	pMakePacket->m_AddrRemote        = AddrRemote;
 
 	ProcessMessageBlock(pMakePacket, tvNow);
 
