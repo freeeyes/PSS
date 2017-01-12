@@ -2152,7 +2152,7 @@ bool CProConnectHandlerPool::Delete(CProConnectHandle* pObject)
 	}
 	else
 	{
-		OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHandlerID, pObject, nPos));
+		//OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHandlerID, pObject, nPos));
 	}
 
 	return true;

@@ -18,23 +18,6 @@ bool CMakePacket::PutMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& tvNo
 {
 	if(NULL == pMakePacket)
 	{
-		OUR_DEBUG((LM_ERROR, "[CMakePacket::PutMessageBlock] Get pMakePacket is NULL.\n"));
-		return false;
-	}
-
-	pMakePacket->m_u4ConnectID       = pMakePacket->m_u4ConnectID;
-	pMakePacket->m_u1Option          = pMakePacket->m_u1Option;
-	pMakePacket->m_PacketType        = pMakePacket->m_PacketType;
-
-	ProcessMessageBlock(pMakePacket, tvNow);
-
-	return true;
-}
-
-bool CMakePacket::ProcessMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& tvNow)
-{
-	if(NULL == pMakePacket)
-	{
 		OUR_DEBUG((LM_ERROR,"[CMakePacket::ProcessMessageBlock] pMakePacket is NULL.\n"));
 		return false;
 	}

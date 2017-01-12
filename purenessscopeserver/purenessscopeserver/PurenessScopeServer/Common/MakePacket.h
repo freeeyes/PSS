@@ -81,7 +81,6 @@ private:
 	void SetMessageCheckTimeout(uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow);                                         //服务器心跳超时消息 
 	void SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, CMessage* pMessage, ACE_Time_Value& tvNow);           //服务发送失败回调数据包消息
 
-	bool ProcessMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& tvNow);                                   //组成队列消息
 private:
 	ACE_Recursive_Thread_Mutex     m_ThreadWriteLock;
 };
