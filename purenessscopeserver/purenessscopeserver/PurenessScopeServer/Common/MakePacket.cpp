@@ -15,7 +15,7 @@ bool CMakePacket::Init()
 }
 
 
-bool CMakePacket::PutUDPMessageBlock(uint8 u1Option, _MakePacket* pMakePacket, ACE_Time_Value& tvNow)
+bool CMakePacket::PutUDPMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& tvNow)
 {
 	if(NULL == pMakePacket)
 	{
@@ -24,7 +24,7 @@ bool CMakePacket::PutUDPMessageBlock(uint8 u1Option, _MakePacket* pMakePacket, A
 	}
 
 	pMakePacket->m_u4ConnectID       = UDP_HANDER_ID;
-	pMakePacket->m_u1Option          = u1Option;
+	pMakePacket->m_u1Option          = pMakePacket->m_u1Option;
 	pMakePacket->m_PacketType        = PACKET_UDP;
 
 	ProcessMessageBlock(pMakePacket, tvNow);
@@ -32,7 +32,7 @@ bool CMakePacket::PutUDPMessageBlock(uint8 u1Option, _MakePacket* pMakePacket, A
 	return true;
 }
 
-bool CMakePacket::PutMessageBlock(uint32 u4ConnectID, uint8 u1Option, _MakePacket* pMakePacket, ACE_Time_Value& tvNow)
+bool CMakePacket::PutMessageBlock(uint32 u4ConnectID, _MakePacket* pMakePacket, ACE_Time_Value& tvNow)
 {
 	if(NULL == pMakePacket)
 	{
@@ -41,7 +41,7 @@ bool CMakePacket::PutMessageBlock(uint32 u4ConnectID, uint8 u1Option, _MakePacke
 	}
 
 	pMakePacket->m_u4ConnectID       = u4ConnectID;
-	pMakePacket->m_u1Option          = u1Option;
+	pMakePacket->m_u1Option          = pMakePacket->m_u1Option;
 	pMakePacket->m_PacketType        = PACKET_TCP;
 
 	ProcessMessageBlock(pMakePacket, tvNow);

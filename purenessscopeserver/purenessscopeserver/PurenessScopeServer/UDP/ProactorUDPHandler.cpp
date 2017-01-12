@@ -324,9 +324,10 @@ bool CProactorUDPHandler::CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len)
 		objMakePacket.m_PacketType        = PACKET_UDP;
 		objMakePacket.m_AddrRemote        = m_addrRemote;
 		objMakePacket.m_AddrListen        = m_addrLocal;
+		objMakePacket.m_u1Option          = PACKET_PARSE;
 
 		//UDP因为不是面向链接的
-		if(false == App_MakePacket::instance()->PutUDPMessageBlock(PACKET_PARSE, &objMakePacket, tvCheck))
+		if(false == App_MakePacket::instance()->PutUDPMessageBlock(&objMakePacket, tvCheck))
 		{
 			OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::SendMessage]PutMessageBlock is error.\n"));
 			App_PacketParsePool::instance()->Delete(m_pPacketParse);
@@ -354,9 +355,10 @@ bool CProactorUDPHandler::CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len)
 			objMakePacket.m_PacketType        = PACKET_UDP;
 			objMakePacket.m_AddrRemote        = m_addrRemote;
 			objMakePacket.m_AddrListen        = m_addrLocal;
+			objMakePacket.m_u1Option          = PACKET_PARSE;
 
 			//UDP因为不是面向链接的
-			if(false == App_MakePacket::instance()->PutUDPMessageBlock(PACKET_PARSE, &objMakePacket, tvCheck))
+			if(false == App_MakePacket::instance()->PutUDPMessageBlock(&objMakePacket, tvCheck))
 			{
 				App_PacketParsePool::instance()->Delete(m_pPacketParse);
 				OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::SendMessage]PutMessageBlock is error.\n"));
