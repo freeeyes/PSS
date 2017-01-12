@@ -74,7 +74,7 @@ public:
 	bool PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, ACE_Time_Value& tvNow);                      //发送失败消息回调 
 
 private:
-	void SetMessage(CPacketParse* pPacketParse, uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow, uint8 u1srcType);        //一般数据包消息(u1srcType指的是TCP,UDP)
+	void SetMessage(_MakePacket* pMakePacket, CMessage* pMessage, ACE_Time_Value& tvNow);                                              //一般数据包消息
 	void SetMessageConnect(uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow);                                              //用户链接数据包消息
 	void SetMessageCDisConnect(uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow);                                          //用户断开链接数据包消息
 	void SetMessageSDisConnect(uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow);                                          //服务器断开链接数据包消息

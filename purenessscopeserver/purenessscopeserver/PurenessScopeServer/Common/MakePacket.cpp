@@ -23,7 +23,9 @@ bool CMakePacket::PutUDPMessageBlock(uint8 u1Option, _MakePacket* pMakePacket, A
 		return false;
 	}
 
+	pMakePacket->m_u4ConnectID       = UDP_HANDER_ID;
 	pMakePacket->m_u1Option          = u1Option;
+	pMakePacket->m_PacketType        = PACKET_UDP;
 
 	ProcessMessageBlock(pMakePacket, tvNow);
 
@@ -65,27 +67,7 @@ bool CMakePacket::ProcessMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& 
 	
 	if(pMakePacket->m_u1Option == PACKET_PARSE)
 	{
-		if(pMakePacket->m_PacketType == PACKET_TCP)
-		{
-			//TCP数据包处理方法
-			//记录IP
-			sprintf_safe(pMessage->GetMessageBase()->m_szIP, MAX_BUFF_20, "%s", pMakePacket->m_AddrRemote.get_host_addr());
-			pMessage->GetMessageBase()->m_u4Port = (uint32)pMakePacket->m_AddrRemote.get_port_number(); 
-			sprintf_safe(pMessage->GetMessageBase()->m_szListenIP, MAX_BUFF_20, "%s", pMakePacket->m_AddrListen.get_host_addr());
-			pMessage->GetMessageBase()->m_u4ListenPort = (uint32)pMakePacket->m_AddrListen.get_port_number(); 
-
-			SetMessage(pMakePacket->m_pPacketParse, pMakePacket->m_u4ConnectID, pMessage, tvNow, PACKET_TCP);
-		}
-		else
-		{
-			sprintf_safe(pMessage->GetMessageBase()->m_szIP, MAX_BUFF_20, "%s", pMakePacket->m_AddrRemote.get_host_addr());
-			pMessage->GetMessageBase()->m_u4Port = (uint32)pMakePacket->m_AddrRemote.get_port_number(); 
-			sprintf_safe(pMessage->GetMessageBase()->m_szListenIP, MAX_BUFF_20, "%s", pMakePacket->m_AddrListen.get_host_addr());
-			pMessage->GetMessageBase()->m_u4ListenPort = (uint32)pMakePacket->m_AddrListen.get_port_number(); 
-
-			//UDP数据包处理方法
-			SetMessage(pMakePacket->m_pPacketParse, UDP_HANDER_ID, pMessage, tvNow, PACKET_UDP);
-		}		
+		SetMessage(pMakePacket, pMessage, tvNow);		
 	}
 	else if(pMakePacket->m_u1Option == PACKET_CONNECT)
 	{
@@ -119,24 +101,29 @@ bool CMakePacket::ProcessMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& 
 	return true;
 }
 
-void CMakePacket::SetMessage(CPacketParse* pPacketParse, uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow, uint8 u1srcType)
+void CMakePacket::SetMessage(_MakePacket* pMakePacket, CMessage* pMessage, ACE_Time_Value& tvNow)
 {
 	if(NULL != pMessage->GetMessageBase())
 	{
-		pMessage->GetMessageBase()->m_u4ConnectID   = u4ConnectID;
-		pMessage->GetMessageBase()->m_u2Cmd         = pPacketParse->GetPacketCommandID();
+		pMessage->GetMessageBase()->m_u4ConnectID   = pMakePacket->m_u4ConnectID;
+		pMessage->GetMessageBase()->m_u2Cmd         = pMakePacket->m_pPacketParse->GetPacketCommandID();
 		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)tvNow.sec();
-		pMessage->GetMessageBase()->m_u4HeadSrcSize = pPacketParse->GetPacketHeadSrcLen();
-		pMessage->GetMessageBase()->m_u4BodySrcSize = pPacketParse->GetPacketBodySrcLen();
-		pMessage->GetMessageBase()->m_u1PacketType  = u1srcType;
+		pMessage->GetMessageBase()->m_u4HeadSrcSize = pMakePacket->m_pPacketParse->GetPacketHeadSrcLen();
+		pMessage->GetMessageBase()->m_u4BodySrcSize = pMakePacket->m_pPacketParse->GetPacketBodySrcLen();
+		pMessage->GetMessageBase()->m_u1PacketType  = pMakePacket->m_PacketType;
+
+		sprintf_safe(pMessage->GetMessageBase()->m_szIP, MAX_BUFF_20, "%s", pMakePacket->m_AddrRemote.get_host_addr());
+		pMessage->GetMessageBase()->m_u4Port = (uint32)pMakePacket->m_AddrRemote.get_port_number(); 
+		sprintf_safe(pMessage->GetMessageBase()->m_szListenIP, MAX_BUFF_20, "%s", pMakePacket->m_AddrListen.get_host_addr());
+		pMessage->GetMessageBase()->m_u4ListenPort = (uint32)pMakePacket->m_AddrListen.get_port_number(); 
 
 		//将接受的数据缓冲放入CMessage对象
-		pMessage->SetPacketHead(pPacketParse->GetMessageHead());
-		pMessage->SetPacketBody(pPacketParse->GetMessageBody());
+		pMessage->SetPacketHead(pMakePacket->m_pPacketParse->GetMessageHead());
+		pMessage->SetPacketBody(pMakePacket->m_pPacketParse->GetMessageBody());
 	}
 	else
 	{
-		OUR_DEBUG((LM_ERROR, "[CProConnectHandle::SetMessage] ConnectID = %d, pMessage->GetMessageBase() is NULL.\n", u4ConnectID));
+		OUR_DEBUG((LM_ERROR, "[CProConnectHandle::SetMessage] ConnectID = %d, pMessage->GetMessageBase() is NULL.\n", pMakePacket->m_u4ConnectID));
 	}
 }
 
