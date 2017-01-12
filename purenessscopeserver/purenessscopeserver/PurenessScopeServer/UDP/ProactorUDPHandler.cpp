@@ -13,11 +13,6 @@ CProactorUDPHandler::~CProactorUDPHandler(void)
 {
 }
 
-void CProactorUDPHandler::SetLocalAddr(const char* pIP, uint32 u4Port)
-{
-	m_addrLocal.set(u4Port, pIP);
-}
-
 int CProactorUDPHandler::OpenAddress(const ACE_INET_Addr& AddrLocal, ACE_Proactor* pProactor)
 {
 	if(m_skRemote.open(AddrLocal) == -1)

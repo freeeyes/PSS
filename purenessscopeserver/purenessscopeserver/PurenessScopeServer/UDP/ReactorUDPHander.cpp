@@ -13,11 +13,6 @@ CReactorUDPHander::~CReactorUDPHander(void)
 {
 }
 
-void CReactorUDPHander::SetLocalAddr(const char* pIP, uint32 u4Port)
-{
-	m_addrLocal.set(u4Port, pIP);
-}
-
 int CReactorUDPHander::OpenAddress(const ACE_INET_Addr& AddrRemote, ACE_Reactor* pReactor)
 {
 	if(m_skRemote.open(AddrRemote) == -1)

@@ -31,8 +31,6 @@ public:
 	_ClientConnectInfo GetClientConnectInfo();
 	void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);                                   //获得指定命令统计信息
 
-	void SetLocalAddr(const char* pIP, uint32 u4Port);
-
 private:
 	bool CheckMessage(const char* pData, uint32 u4Len);     //这里解析数据包并放入数据队列
 
