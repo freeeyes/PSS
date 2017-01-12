@@ -69,8 +69,7 @@ public:
 
 	bool Init();
 
-	bool PutMessageBlock(uint32 u4ConnectID, _MakePacket* pMakePacket, ACE_Time_Value& tvNow);                 //处理TCP数据包
-	bool PutUDPMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& tvNow);                                  //处理UDP数据包 
+	bool PutMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& tvNow);                                                     //处理消息数据包
 	bool PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, ACE_Time_Value& tvNow);                      //发送失败消息回调 
 
 private:

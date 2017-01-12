@@ -123,7 +123,7 @@ bool CProConnectHandle::Close(int nIOCount, int nErrno)
 
 		//发送客户端链接断开消息。
 		ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-		if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), &objMakePacket, tvNow))
+		if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
 		{
 			OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 		}
@@ -168,7 +168,7 @@ bool CProConnectHandle::ServerClose(EM_Client_Close_status emStatus)
 
 		//发送服务器端链接断开消息。
 		ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-		if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), &objMakePacket, tvNow))
+		if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
 		{
 			OUR_DEBUG((LM_ERROR, "[CProConnectHandle::ServerClose]ConnectID = %d, PACKET_SDISCONNECT is error.\n", GetConnectID()));
 			return false;
@@ -330,7 +330,7 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 
 	//发送链接建立消息。
 	ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-	if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), &objMakePacket, tvNow))
+	if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
 	{
 		OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 	}
@@ -478,7 +478,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 					//因为是要关闭连接，所以要多关闭一次IO，对应Open设置的1的初始值
 					//发送服务器端链接断开消息。
 					ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-					if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), &objMakePacket, tvNow))
+					if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
 					{
 						OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 					}
@@ -560,7 +560,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 				//因为是要关闭连接，所以要多关闭一次IO，对应Open设置的1的初始值
 				//发送服务器端链接断开消息。
 				ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-				if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), &objMakePacket, tvNow))
+				if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
 				{
 					OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 				}
@@ -613,7 +613,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result 
 					//因为是要关闭连接，所以要多关闭一次IO，对应Open设置的1的初始值
 					//发送服务器端链接断开消息。
 					ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-					if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), &objMakePacket, tvNow))
+					if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
 					{
 						OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 					}
@@ -751,7 +751,7 @@ bool CProConnectHandle::SetSendQueueTimeCost(uint32 u4TimeCost)
 
 		//告诉插件连接发送超时阀值报警
 		ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-		if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), &objMakePacket, tvNow))
+		if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
 		{
 			OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 		}
@@ -1115,6 +1115,7 @@ bool CProConnectHandle::CheckMessage()
 		//组织数据
 		_MakePacket objMakePacket;
 
+		objMakePacket.m_u4ConnectID       = GetConnectID();
 		objMakePacket.m_pPacketParse      = m_pPacketParse;
 		if(ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
 		{
@@ -1128,7 +1129,7 @@ bool CProConnectHandle::CheckMessage()
 
 		//将数据Buff放入消息体中，传递给MakePacket处理。
 		ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-		if(false == App_MakePacket::instance()->PutMessageBlock(GetConnectID(), &objMakePacket, tvNow))
+		if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
 		{
 			OUR_DEBUG((LM_ERROR, "[CProConnectHandle::CheckMessage] ConnectID = %d, PutMessageBlock is error.\n", GetConnectID()));
 		}
