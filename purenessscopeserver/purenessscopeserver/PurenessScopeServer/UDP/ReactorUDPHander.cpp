@@ -28,6 +28,8 @@ int CReactorUDPHander::OpenAddress(const ACE_INET_Addr& AddrRemote, ACE_Reactor*
 
 	reactor(pReactor);
 
+	m_addrLocal = AddrRemote;
+
 	//按照线程初始化统计模块的名字
 	char szName[MAX_BUFF_50] = {'\0'};
 	sprintf_safe(szName, MAX_BUFF_50, "发送线程");

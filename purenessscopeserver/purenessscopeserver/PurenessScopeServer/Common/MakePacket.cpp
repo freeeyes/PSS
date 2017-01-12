@@ -65,7 +65,7 @@ bool CMakePacket::ProcessMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& 
 	
 	if(pMakePacket->m_u1Option == PACKET_PARSE)
 	{
-		if(pMakePacket->m_PacketType == 0)
+		if(pMakePacket->m_PacketType == PACKET_TCP)
 		{
 			//TCP数据包处理方法
 			//记录IP
@@ -74,7 +74,7 @@ bool CMakePacket::ProcessMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& 
 			sprintf_safe(pMessage->GetMessageBase()->m_szListenIP, MAX_BUFF_20, "%s", pMakePacket->m_AddrListen.get_host_addr());
 			pMessage->GetMessageBase()->m_u4ListenPort = (uint32)pMakePacket->m_AddrListen.get_port_number(); 
 
-			SetMessage(pMakePacket->m_pPacketParse, pMakePacket->m_u4ConnectID, pMessage, tvNow);
+			SetMessage(pMakePacket->m_pPacketParse, pMakePacket->m_u4ConnectID, pMessage, tvNow, PACKET_TCP);
 		}
 		else
 		{
@@ -84,7 +84,7 @@ bool CMakePacket::ProcessMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& 
 			pMessage->GetMessageBase()->m_u4ListenPort = (uint32)pMakePacket->m_AddrListen.get_port_number(); 
 
 			//UDP数据包处理方法
-			SetMessage(pMakePacket->m_pPacketParse, pMakePacket->m_AddrRemote, pMessage, tvNow);
+			SetMessage(pMakePacket->m_pPacketParse, UDP_HANDER_ID, pMessage, tvNow, PACKET_UDP);
 		}		
 	}
 	else if(pMakePacket->m_u1Option == PACKET_CONNECT)
@@ -119,16 +119,16 @@ bool CMakePacket::ProcessMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& 
 	return true;
 }
 
-void CMakePacket::SetMessage(CPacketParse* pPacketParse, uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow)
+void CMakePacket::SetMessage(CPacketParse* pPacketParse, uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow, uint8 u1srcType)
 {
 	if(NULL != pMessage->GetMessageBase())
 	{
-		//开始组装数据
 		pMessage->GetMessageBase()->m_u4ConnectID   = u4ConnectID;
 		pMessage->GetMessageBase()->m_u2Cmd         = pPacketParse->GetPacketCommandID();
 		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)tvNow.sec();
 		pMessage->GetMessageBase()->m_u4HeadSrcSize = pPacketParse->GetPacketHeadSrcLen();
 		pMessage->GetMessageBase()->m_u4BodySrcSize = pPacketParse->GetPacketBodySrcLen();
+		pMessage->GetMessageBase()->m_u1PacketType  = u1srcType;
 
 		//将接受的数据缓冲放入CMessage对象
 		pMessage->SetPacketHead(pPacketParse->GetMessageHead());
@@ -137,30 +137,6 @@ void CMakePacket::SetMessage(CPacketParse* pPacketParse, uint32 u4ConnectID, CMe
 	else
 	{
 		OUR_DEBUG((LM_ERROR, "[CProConnectHandle::SetMessage] ConnectID = %d, pMessage->GetMessageBase() is NULL.\n", u4ConnectID));
-	}
-}
-
-void CMakePacket::SetMessage(CPacketParse* pPacketParse, const ACE_INET_Addr& AddrRemote, CMessage* pMessage, ACE_Time_Value& tvNow)
-{
-	if(NULL != pMessage->GetMessageBase())
-	{
-		//开始组装数据
-		pMessage->GetMessageBase()->m_u4ConnectID   = UDP_HANDER_ID;
-		pMessage->GetMessageBase()->m_u2Cmd         = pPacketParse->GetPacketCommandID();
-		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)tvNow.sec();
-		pMessage->GetMessageBase()->m_u4Port        = (uint32)AddrRemote.get_port_number();
-		pMessage->GetMessageBase()->m_u1PacketType  = PACKET_UDP;
-		pMessage->GetMessageBase()->m_u4HeadSrcSize = pPacketParse->GetPacketHeadSrcLen();
-		pMessage->GetMessageBase()->m_u4BodySrcSize = pPacketParse->GetPacketBodySrcLen();
-		sprintf_safe(pMessage->GetMessageBase()->m_szIP, MAX_BUFF_20, "%s", AddrRemote.get_host_addr());
-
-		//将接受的数据缓冲放入CMessage对象
-		pMessage->SetPacketHead(pPacketParse->GetMessageHead());
-		pMessage->SetPacketBody(pPacketParse->GetMessageBody());
-	}
-	else
-	{
-		OUR_DEBUG((LM_ERROR, "[CProConnectHandle::SetMessage] UDP ConnectID, pMessage->GetMessageBase() is NULL.\n"));
 	}
 }
 

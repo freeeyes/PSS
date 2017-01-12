@@ -291,7 +291,6 @@ bool CServerManager::Start()
 			return false;
 		}
 
-		pReactorUDPHandler->SetLocalAddr(pServerInfo->m_szServerIP, (uint32)pServerInfo->m_nPort);
 		int nRet = pReactorUDPHandler->OpenAddress(listenAddr, App_ReactorManager::instance()->GetAce_Reactor(REACTOR_CLIENTDEFINE));
 
 		if (-1 == nRet)

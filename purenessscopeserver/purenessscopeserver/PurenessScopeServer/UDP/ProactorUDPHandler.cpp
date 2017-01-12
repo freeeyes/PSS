@@ -26,6 +26,8 @@ int CProactorUDPHandler::OpenAddress(const ACE_INET_Addr& AddrLocal, ACE_Proacto
 		return -1;
 	}
 
+	m_addrLocal = AddrLocal;
+
 	sprintf_safe(m_szCompletionkey, MAX_BUFF_20, "CompUDP");
 	sprintf_safe(m_szAct, MAX_BUFF_20, "ActUDP");
 
