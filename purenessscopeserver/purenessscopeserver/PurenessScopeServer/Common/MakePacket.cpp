@@ -30,30 +30,7 @@ bool CMakePacket::PutMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& tvNo
 		return false;
 	}
 	
-	if(pMakePacket->m_u1Option == PACKET_PARSE)
-	{
-		SetMessage(pMakePacket, pMessage, tvNow);		
-	}
-	else if(pMakePacket->m_u1Option == PACKET_CONNECT)
-	{
-		SetMessageConnect(pMakePacket->m_u4ConnectID, pMessage, tvNow);
-	}
-	else if(pMakePacket->m_u1Option == PACKET_CDISCONNECT)
-	{
-		SetMessageCDisConnect(pMakePacket->m_u4ConnectID, pMessage, tvNow);
-	}
-	else if(pMakePacket->m_u1Option == PACKET_SDISCONNECT)
-	{
-		SetMessageSDisConnect(pMakePacket->m_u4ConnectID, pMessage, tvNow);
-	}
-	else if(pMakePacket->m_u1Option == PACKET_SEND_TIMEOUT)
-	{
-		SetMessageSendTimeout(pMakePacket, pMessage, tvNow);
-	}
-	else if(pMakePacket->m_u1Option == PACKET_CHEK_TIMEOUT)
-	{
-		SetMessageSendTimeout(pMakePacket, pMessage, tvNow);
-	}
+	SetMessage(pMakePacket, pMessage, tvNow);		
 
 	//将要处理的消息放入消息处理线程
 	if(false == App_MessageServiceGroup::instance()->PutMessage(pMessage))
@@ -70,11 +47,43 @@ void CMakePacket::SetMessage(_MakePacket* pMakePacket, CMessage* pMessage, ACE_T
 {
 	if(NULL != pMessage->GetMessageBase())
 	{
+		if(PACKET_PARSE == pMakePacket->m_u1Option)
+		{
+			pMessage->GetMessageBase()->m_u2Cmd = pMakePacket->m_pPacketParse->GetPacketCommandID();
+		}
+		else if(pMakePacket->m_u1Option == PACKET_CONNECT)
+		{
+			pMessage->GetMessageBase()->m_u2Cmd  = CLIENT_LINK_CONNECT;
+		}
+		else if(pMakePacket->m_u1Option == PACKET_CDISCONNECT)
+		{
+			pMessage->GetMessageBase()->m_u2Cmd         = CLIENT_LINK_CDISCONNET;
+		}
+		else if(pMakePacket->m_u1Option == PACKET_SDISCONNECT)
+		{
+			pMessage->GetMessageBase()->m_u2Cmd         = CLIENT_LINK_SDISCONNET;
+		}
+		else if(pMakePacket->m_u1Option == PACKET_SEND_TIMEOUT)
+		{
+			pMessage->GetMessageBase()->m_u2Cmd         = CLINET_LINK_SENDTIMEOUT;
+		}
+		else if(pMakePacket->m_u1Option == PACKET_CHEK_TIMEOUT)
+		{
+			pMessage->GetMessageBase()->m_u2Cmd         = CLINET_LINK_CHECKTIMEOUT;
+		}
+
 		pMessage->GetMessageBase()->m_u4ConnectID   = pMakePacket->m_u4ConnectID;
-		pMessage->GetMessageBase()->m_u2Cmd         = pMakePacket->m_pPacketParse->GetPacketCommandID();
 		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)tvNow.sec();
-		pMessage->GetMessageBase()->m_u4HeadSrcSize = pMakePacket->m_pPacketParse->GetPacketHeadSrcLen();
-		pMessage->GetMessageBase()->m_u4BodySrcSize = pMakePacket->m_pPacketParse->GetPacketBodySrcLen();
+		if(NULL != pMakePacket->m_pPacketParse)
+		{
+			pMessage->GetMessageBase()->m_u4HeadSrcSize = pMakePacket->m_pPacketParse->GetPacketHeadSrcLen();
+			pMessage->GetMessageBase()->m_u4BodySrcSize = pMakePacket->m_pPacketParse->GetPacketBodySrcLen();
+		}
+		else
+		{
+			pMessage->GetMessageBase()->m_u4HeadSrcSize = 0;
+			pMessage->GetMessageBase()->m_u4BodySrcSize = 0;
+		}
 		pMessage->GetMessageBase()->m_u1PacketType  = pMakePacket->m_PacketType;
 
 		sprintf_safe(pMessage->GetMessageBase()->m_szIP, MAX_BUFF_20, "%s", pMakePacket->m_AddrRemote.get_host_addr());
@@ -83,129 +92,20 @@ void CMakePacket::SetMessage(_MakePacket* pMakePacket, CMessage* pMessage, ACE_T
 		pMessage->GetMessageBase()->m_u4ListenPort = (uint32)pMakePacket->m_AddrListen.get_port_number(); 
 
 		//将接受的数据缓冲放入CMessage对象
-		pMessage->SetPacketHead(pMakePacket->m_pPacketParse->GetMessageHead());
-		pMessage->SetPacketBody(pMakePacket->m_pPacketParse->GetMessageBody());
-	}
-	else
-	{
-		OUR_DEBUG((LM_ERROR, "[CProConnectHandle::SetMessage] ConnectID = %d, pMessage->GetMessageBase() is NULL.\n", pMakePacket->m_u4ConnectID));
-	}
-}
-
-void CMakePacket::SetMessageConnect(uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow)
-{
-	if(NULL != pMessage->GetMessageBase())
-	{
-		//开始组装数据
-		pMessage->GetMessageBase()->m_u4ConnectID   = u4ConnectID;
-		pMessage->GetMessageBase()->m_u2Cmd         = CLIENT_LINK_CONNECT;
-		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)tvNow.sec();
-		pMessage->GetMessageBase()->m_u4HeadSrcSize = 0;
-		pMessage->GetMessageBase()->m_u4BodySrcSize = 0;
-
-		//将接受的数据缓冲放入CMessage对象
-		pMessage->SetPacketHead(NULL);
-		pMessage->SetPacketBody(NULL);
-	}
-	else
-	{
-		OUR_DEBUG((LM_ERROR, "[CMakePacket::SetMessageConnect] ConnectID = %d, pMessage->GetMessageBase() is NULL.\n", u4ConnectID));
-	}
-}
-
-void CMakePacket::SetMessageCDisConnect(uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow)
-{
-	if(NULL != pMessage->GetMessageBase())
-	{
-		//开始组装数据
-		pMessage->GetMessageBase()->m_u4ConnectID   = u4ConnectID;
-		pMessage->GetMessageBase()->m_u2Cmd         = CLIENT_LINK_CDISCONNET;
-		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)tvNow.sec();
-		pMessage->GetMessageBase()->m_u4HeadSrcSize = 0;
-		pMessage->GetMessageBase()->m_u4BodySrcSize = 0;
-
-		//将接受的数据缓冲放入CMessage对象
-		pMessage->SetPacketHead(NULL);
-		pMessage->SetPacketBody(NULL);
-	}
-	else
-	{
-		OUR_DEBUG((LM_ERROR, "[CMakePacket::SetMessageCDisConnect] ConnectID = %d, pMessage->GetMessageBase() is NULL.\n", u4ConnectID));
-	}
-}
-
-void CMakePacket::SetMessageSDisConnect(uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow)
-{
-	if(NULL != pMessage->GetMessageBase())
-	{
-		//开始组装数据
-		pMessage->GetMessageBase()->m_u4ConnectID   = u4ConnectID;
-		pMessage->GetMessageBase()->m_u2Cmd         = CLIENT_LINK_SDISCONNET;
-		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)tvNow.sec();
-		pMessage->GetMessageBase()->m_u4HeadSrcSize = 0;
-		pMessage->GetMessageBase()->m_u4BodySrcSize = 0;
-
-		//将接受的数据缓冲放入CMessage对象
-		pMessage->SetPacketHead(NULL);
-		pMessage->SetPacketBody(NULL);
-	}
-	else
-	{
-		OUR_DEBUG((LM_ERROR, "[CMakePacket::SetMessageSDisConnect] ConnectID = %d, pMessage->GetMessageBase() is NULL.\n", u4ConnectID));
-	}
-}
-
-void CMakePacket::SetMessageSendTimeout(_MakePacket* pMakePacket, CMessage* pMessage, ACE_Time_Value& tvNow)
-{
-	if(NULL != pMessage->GetMessageBase())
-	{
-		//开始组装数据
-		pMessage->GetMessageBase()->m_u4ConnectID   = pMakePacket->m_u4ConnectID;
-		pMessage->GetMessageBase()->m_u2Cmd         = CLINET_LINK_SENDTIMEOUT;
-		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)tvNow.sec();
-		pMessage->GetMessageBase()->m_u4HeadSrcSize = 0;
-
-		//如果包含消息包体，则添加进消息
 		if(NULL != pMakePacket->m_pPacketParse)
 		{
-			pMessage->GetMessageBase()->m_u4HeadSrcSize = pMakePacket->m_pPacketParse->GetMessageBody()->length();
+			pMessage->SetPacketHead(pMakePacket->m_pPacketParse->GetMessageHead());
 			pMessage->SetPacketBody(pMakePacket->m_pPacketParse->GetMessageBody());
 		}
 		else
 		{
-			pMessage->GetMessageBase()->m_u4HeadSrcSize = 0;
+			pMessage->SetPacketHead(NULL);
 			pMessage->SetPacketBody(NULL);
 		}
-		pMessage->GetMessageBase()->m_u4BodySrcSize = 0;
-
-		//将接受的数据缓冲放入CMessage对象
-		pMessage->SetPacketHead(NULL);
-		//
 	}
 	else
 	{
-		OUR_DEBUG((LM_ERROR, "[CMakePacket::SetMessageSendTimeout] ConnectID = %d, pMessage->GetMessageBase() is NULL.\n", pMessage->GetMessageBase()->m_u4ConnectID));
-	}
-}
-
-void CMakePacket::SetMessageCheckTimeout(uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow)
-{
-	if(NULL != pMessage->GetMessageBase())
-	{
-		//开始组装数据
-		pMessage->GetMessageBase()->m_u4ConnectID   = u4ConnectID;
-		pMessage->GetMessageBase()->m_u2Cmd         = CLINET_LINK_CHECKTIMEOUT;
-		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)tvNow.sec();
-		pMessage->GetMessageBase()->m_u4HeadSrcSize = 0;
-		pMessage->GetMessageBase()->m_u4BodySrcSize = 0;
-
-		//将接受的数据缓冲放入CMessage对象
-		pMessage->SetPacketHead(NULL);
-		pMessage->SetPacketBody(NULL);
-	}
-	else
-	{
-		OUR_DEBUG((LM_ERROR, "[CMakePacket::SetMessageCheckTimeout] ConnectID = %d, pMessage->GetMessageBase() is NULL.\n", u4ConnectID));
+		OUR_DEBUG((LM_ERROR, "[CProConnectHandle::SetMessage] ConnectID = %d, pMessage->GetMessageBase() is NULL.\n", pMakePacket->m_u4ConnectID));
 	}
 }
 
