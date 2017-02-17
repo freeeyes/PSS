@@ -1009,9 +1009,6 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 	//异步发送方法
 	if(NULL != pMbData)
 	{
-		//记录水位标
-		m_u4ReadSendSize += pMbData->length();
-
 		//比较水位标，是否超过一定数值，也就是说发快收慢的时候，如果超过一定数值，断开连接
 		if(m_u4ReadSendSize - m_u4SuccessSendSize >= App_MainConfig::instance()->GetSendDataMask())
 		{
@@ -1030,6 +1027,8 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 		}
 		else
 		{
+			//记录水位标
+			m_u4ReadSendSize += pMbData->length();
 			OUR_DEBUG ((LM_ERROR, "[CProConnectHandle::PutSendPacket](%s:%d) Send(%d) OK!\n", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), pMbData->length()));
 			m_u4AllSendCount += 1;
 			m_atvOutput      = ACE_OS::gettimeofday();
