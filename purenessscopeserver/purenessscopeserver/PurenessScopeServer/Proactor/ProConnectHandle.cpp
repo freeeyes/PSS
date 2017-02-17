@@ -1014,7 +1014,30 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 		{
 			OUR_DEBUG ((LM_ERROR, "[CProConnectHandle::PutSendPacket]ConnectID = %d, SingleConnectMaxSendBuffer is more than(%d)!\n", GetConnectID(), m_u4ReadSendSize - m_u4SuccessSendSize));
 			AppLogManager::instance()->WriteLog(LOG_SYSTEM_SENDQUEUEERROR, "]Connection from [%s:%d], SingleConnectMaxSendBuffer is more than(%d)!.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4ReadSendSize - m_u4SuccessSendSize);
-			App_MessageBlockManager::instance()->Close(pMbData);
+			//App_MessageBlockManager::instance()->Close(pMbData);
+
+			//这里发送给插件一个消息，告知插件数据超过阈值
+			_MakePacket objMakePacket;
+
+			CPacketParse* pPacketParse  = App_PacketParsePool::instance()->Create();
+			if(NULL != pPacketParse)
+			{
+				pPacketParse->SetPacket_Body_Message(pMbData);
+				pPacketParse->SetPacket_Body_Curr_Length(pMbData->length());
+			}
+
+			objMakePacket.m_u4ConnectID       = GetConnectID();
+			objMakePacket.m_pPacketParse      = pPacketParse;
+			objMakePacket.m_u1Option          = PACKET_SEND_TIMEOUT;
+
+			//发送客户端链接断开消息。
+			ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+			if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
+			{
+				OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
+			}
+			App_PacketParsePool::instance()->Delete(m_pPacketParse);
+
 			return false;
 		}
 

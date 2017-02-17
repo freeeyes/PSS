@@ -48,6 +48,11 @@ bool CMakePacket::PutMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& tvNo
 	}
 	else if(pMakePacket->m_u1Option == PACKET_SEND_TIMEOUT)
 	{
+		//如果包含消息包体，则添加进消息
+		if(NULL != pMakePacket->m_pPacketParse)
+		{
+			pMessage->SetPacketBody(pMakePacket->m_pPacketParse->GetMessageBody());
+		}
 		SetMessageSendTimeout(pMakePacket->m_u4ConnectID, pMessage, tvNow);
 	}
 	else if(pMakePacket->m_u1Option == PACKET_CHEK_TIMEOUT)
@@ -168,7 +173,7 @@ void CMakePacket::SetMessageSendTimeout(uint32 u4ConnectID, CMessage* pMessage, 
 
 		//将接受的数据缓冲放入CMessage对象
 		pMessage->SetPacketHead(NULL);
-		pMessage->SetPacketBody(NULL);
+		//pMessage->SetPacketBody(NULL);
 	}
 	else
 	{
