@@ -48,16 +48,11 @@ bool CMakePacket::PutMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& tvNo
 	}
 	else if(pMakePacket->m_u1Option == PACKET_SEND_TIMEOUT)
 	{
-		//如果包含消息包体，则添加进消息
-		if(NULL != pMakePacket->m_pPacketParse)
-		{
-			pMessage->SetPacketBody(pMakePacket->m_pPacketParse->GetMessageBody());
-		}
-		SetMessageSendTimeout(pMakePacket->m_u4ConnectID, pMessage, tvNow);
+		SetMessageSendTimeout(pMakePacket, pMessage, tvNow);
 	}
 	else if(pMakePacket->m_u1Option == PACKET_CHEK_TIMEOUT)
 	{
-		SetMessageSendTimeout(pMakePacket->m_u4ConnectID, pMessage, tvNow);
+		SetMessageSendTimeout(pMakePacket, pMessage, tvNow);
 	}
 
 	//将要处理的消息放入消息处理线程
@@ -160,20 +155,32 @@ void CMakePacket::SetMessageSDisConnect(uint32 u4ConnectID, CMessage* pMessage, 
 	}
 }
 
-void CMakePacket::SetMessageSendTimeout(uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow)
+void CMakePacket::SetMessageSendTimeout(_MakePacket* pMakePacket, CMessage* pMessage, ACE_Time_Value& tvNow)
 {
 	if(NULL != pMessage->GetMessageBase())
 	{
 		//开始组装数据
-		pMessage->GetMessageBase()->m_u4ConnectID   = u4ConnectID;
+		pMessage->GetMessageBase()->m_u4ConnectID   = pMakePacket->m_u4ConnectID;
 		pMessage->GetMessageBase()->m_u2Cmd         = CLINET_LINK_SENDTIMEOUT;
 		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)tvNow.sec();
 		pMessage->GetMessageBase()->m_u4HeadSrcSize = 0;
+
+		//如果包含消息包体，则添加进消息
+		if(NULL != pMakePacket->m_pPacketParse)
+		{
+			pMessage->GetMessageBase()->m_u4HeadSrcSize = pMakePacket->m_pPacketParse->GetMessageBody()->length();
+			pMessage->SetPacketBody(pMakePacket->m_pPacketParse->GetMessageBody());
+		}
+		else
+		{
+			pMessage->GetMessageBase()->m_u4HeadSrcSize = 0;
+			pMessage->SetPacketBody(NULL);
+		}
 		pMessage->GetMessageBase()->m_u4BodySrcSize = 0;
 
 		//将接受的数据缓冲放入CMessage对象
 		pMessage->SetPacketHead(NULL);
-		//pMessage->SetPacketBody(NULL);
+		//
 	}
 	else
 	{

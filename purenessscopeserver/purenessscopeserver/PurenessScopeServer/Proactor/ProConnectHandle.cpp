@@ -1036,7 +1036,7 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 			{
 				OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 			}
-			App_PacketParsePool::instance()->Delete(m_pPacketParse);
+			App_PacketParsePool::instance()->Delete(pPacketParse);
 
 			return false;
 		}

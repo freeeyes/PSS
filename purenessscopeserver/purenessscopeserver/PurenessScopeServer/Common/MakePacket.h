@@ -77,7 +77,7 @@ private:
 	void SetMessageConnect(uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow);                                              //用户链接数据包消息
 	void SetMessageCDisConnect(uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow);                                          //用户断开链接数据包消息
 	void SetMessageSDisConnect(uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow);                                          //服务器断开链接数据包消息
-	void SetMessageSendTimeout(uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow);                                          //服务器发送给客户端数据超时消息
+	void SetMessageSendTimeout(_MakePacket* pMakePacket, CMessage* pMessage, ACE_Time_Value& tvNow);                                    //服务器发送给客户端数据超时消息
 	void SetMessageCheckTimeout(uint32 u4ConnectID, CMessage* pMessage, ACE_Time_Value& tvNow);                                         //服务器心跳超时消息 
 	void SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, CMessage* pMessage, ACE_Time_Value& tvNow);           //服务发送失败回调数据包消息
 
