@@ -78,11 +78,15 @@ void CMakePacket::SetMessage(_MakePacket* pMakePacket, CMessage* pMessage, ACE_T
 		{
 			pMessage->GetMessageBase()->m_u4HeadSrcSize = pMakePacket->m_pPacketParse->GetPacketHeadSrcLen();
 			pMessage->GetMessageBase()->m_u4BodySrcSize = pMakePacket->m_pPacketParse->GetPacketBodySrcLen();
+			pMessage->SetPacketHead(pMakePacket->m_pPacketParse->GetMessageHead());
+			pMessage->SetPacketBody(pMakePacket->m_pPacketParse->GetMessageBody());
 		}
 		else
 		{
 			pMessage->GetMessageBase()->m_u4HeadSrcSize = 0;
 			pMessage->GetMessageBase()->m_u4BodySrcSize = 0;
+			pMessage->SetPacketHead(NULL);
+			pMessage->SetPacketBody(NULL);
 		}
 		pMessage->GetMessageBase()->m_u1PacketType  = pMakePacket->m_PacketType;
 
@@ -90,18 +94,6 @@ void CMakePacket::SetMessage(_MakePacket* pMakePacket, CMessage* pMessage, ACE_T
 		pMessage->GetMessageBase()->m_u4Port = (uint32)pMakePacket->m_AddrRemote.get_port_number(); 
 		sprintf_safe(pMessage->GetMessageBase()->m_szListenIP, MAX_BUFF_20, "%s", pMakePacket->m_AddrListen.get_host_addr());
 		pMessage->GetMessageBase()->m_u4ListenPort = (uint32)pMakePacket->m_AddrListen.get_port_number(); 
-
-		//将接受的数据缓冲放入CMessage对象
-		if(NULL != pMakePacket->m_pPacketParse)
-		{
-			pMessage->SetPacketHead(pMakePacket->m_pPacketParse->GetMessageHead());
-			pMessage->SetPacketBody(pMakePacket->m_pPacketParse->GetMessageBody());
-		}
-		else
-		{
-			pMessage->SetPacketHead(NULL);
-			pMessage->SetPacketBody(NULL);
-		}
 	}
 	else
 	{

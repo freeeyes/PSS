@@ -1040,6 +1040,9 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 
 			return false;
 		}
+		
+		//记录水位标
+		m_u4ReadSendSize += pMbData->length();
 
 		//OUR_DEBUG ((LM_ERROR, "[CConnectHandler::PutSendPacket] Connectid=%d, length=%d!\n", GetConnectID(), pMbData->length()));
 		if(0 != m_Writer.write(*pMbData, pMbData->length()))
@@ -1050,8 +1053,6 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 		}
 		else
 		{
-			//记录水位标
-			m_u4ReadSendSize += pMbData->length();
 			OUR_DEBUG ((LM_ERROR, "[CProConnectHandle::PutSendPacket](%s:%d) Send(%d) OK!\n", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), pMbData->length()));
 			m_u4AllSendCount += 1;
 			m_atvOutput      = ACE_OS::gettimeofday();
