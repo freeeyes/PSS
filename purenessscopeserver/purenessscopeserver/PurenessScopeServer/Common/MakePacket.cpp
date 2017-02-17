@@ -184,7 +184,7 @@ void CMakePacket::SetMessageSendTimeout(_MakePacket* pMakePacket, CMessage* pMes
 	}
 	else
 	{
-		OUR_DEBUG((LM_ERROR, "[CMakePacket::SetMessageSendTimeout] ConnectID = %d, pMessage->GetMessageBase() is NULL.\n", u4ConnectID));
+		OUR_DEBUG((LM_ERROR, "[CMakePacket::SetMessageSendTimeout] ConnectID = %d, pMessage->GetMessageBase() is NULL.\n", pMessage->GetMessageBase()->m_u4ConnectID));
 	}
 }
 
