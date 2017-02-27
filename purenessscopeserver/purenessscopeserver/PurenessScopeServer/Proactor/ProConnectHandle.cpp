@@ -782,10 +782,18 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 	//如果当前连接已被别的线程关闭，则这里不做处理，直接退出
 	if(m_u1IsActive == 0)
 	{
+		//如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
+		ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
+		memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char* )pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+		pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
+		ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+		App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
+
 		if(blDelete == true)
-		{					
+		{
 			App_BuffPacketManager::instance()->Delete(pBuffPacket);
 		}
+
 		return false;
 	}
 
@@ -815,6 +823,12 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 		if(u4SendPacketSize + (uint32)m_pBlockMessage->length() >= m_u4SendMaxBuffSize)
 		{
 			OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage] Connectid=[%d] m_pBlockMessage is not enougth.\n", GetConnectID()));
+			//如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
+			ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
+			memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char* )pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+			pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
+			ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+			App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
 			if(blDelete = true)
 			{
 				App_BuffPacketManager::instance()->Delete(pBuffPacket);
@@ -876,6 +890,12 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 			if(u4SendPacketSize >= m_u4SendMaxBuffSize)
 			{
 				OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", GetConnectID(), u4SendPacketSize, m_u4SendMaxBuffSize));
+				//如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
+				ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
+				memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char* )pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+				pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
+				ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+				App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
 				if(blDelete == true)
 				{
 					//删除发送数据包 
@@ -899,7 +919,16 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 			if(NULL == pMbData)
 			{
 				OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage] Connectid=[%d] pMbData is NULL.\n", GetConnectID()));
-				App_BuffPacketManager::instance()->Delete(pBuffPacket);
+				//如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
+				ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
+				memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char* )pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+				pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
+				ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+				App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);				
+				if(blDelete == true)
+				{
+					App_BuffPacketManager::instance()->Delete(pBuffPacket);
+				}
 				return false;
 			}
 
@@ -1048,7 +1077,9 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 		if(0 != m_Writer.write(*pMbData, pMbData->length()))
 		{
 			OUR_DEBUG ((LM_ERROR, "[CProConnectHandle::PutSendPacket] Connectid=%d mb=%d m_writer.write error(%d)!\n", GetConnectID(),  pMbData->length(), errno));
-			App_MessageBlockManager::instance()->Close(pMbData);
+			//如果发送失败，在这里返回失败，回调给业务逻辑去处理
+			ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+			App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), pMbData, tvNow);
 			return false;
 		}
 		else
@@ -1453,7 +1484,17 @@ bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
 	else
 	{
 		sprintf_safe(m_szError, MAX_BUFF_500, "[CProConnectManager::SendMessage] ConnectID[%d] is not find.", u4ConnectID);
-		App_BuffPacketManager::instance()->Delete(pBuffPacket);
+		//如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
+		ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
+		memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char* )pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+		pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
+		ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+		App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
+		if(true == blDelete)
+		{
+			App_BuffPacketManager::instance()->Delete(pBuffPacket);
+		}
+
 		return true;
 	}
 	return true;

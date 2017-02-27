@@ -1334,6 +1334,11 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
 	//如果当前连接已被别的线程关闭，则这里不做处理，直接退出
 	if(m_u1IsActive == 0)
 	{
+		ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
+		memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char* )pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+		pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
+		ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+		App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
 		if(blDelete == true)
 		{					
 			App_BuffPacketManager::instance()->Delete(pBuffPacket);
@@ -1363,6 +1368,11 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
 		if(u4SendPacketSize + (uint32)m_pBlockMessage->length() >= m_u4SendMaxBuffSize)
 		{
 			OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage] Connectid=[%d] m_pBlockMessage is not enougth.\n", GetConnectID()));
+			ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
+			memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char* )pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+			pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
+			ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+			App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
 			if(blDelete == true)
 			{					
 				App_BuffPacketManager::instance()->Delete(pBuffPacket);
@@ -1409,6 +1419,11 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
 			if(u4SendPacketSize >= m_u4SendMaxBuffSize)
 			{
 				OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", GetConnectID(), u4SendPacketSize, m_u4SendMaxBuffSize));
+				ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
+				memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char* )pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+				pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
+				ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+				App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
 				if(blDelete == true)
 				{
 					//删除发送数据包 
@@ -1428,6 +1443,11 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
 			if(u4SendPacketSize >= m_u4SendMaxBuffSize)
 			{
 				OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", GetConnectID(), u4SendPacketSize, m_u4SendMaxBuffSize));
+				ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
+				memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char* )pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+				pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
+				ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+				App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
 				if(blDelete == true)
 				{
 					//删除发送数据包 
@@ -1452,6 +1472,11 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
 			if(NULL == pMbData)
 			{
 				OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage] Connectid=[%d] pMbData is NULL.\n", GetConnectID()));
+				ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
+				memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char* )pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+				pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
+				ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+				App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
 				if(blDelete == true)
 				{
 					//删除发送数据包 
@@ -1550,7 +1575,9 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 		App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), App_MainConfig::instance()->GetIPAlert()->m_u4IPTimeout);
 		OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, Send Data is more than limit.\n", GetConnectID()));
 
-		App_MessageBlockManager::instance()->Close(pMbData);
+		ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+		App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), pMbData, tvNow);
+		//App_MessageBlockManager::instance()->Close(pMbData);
 
 		return false;
 	}
@@ -1568,6 +1595,8 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 	{
 		OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetConnectID()));
 		sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::PutSendPacket] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetConnectID());
+		ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+		App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), pMbData, tvNow);
 		App_MessageBlockManager::instance()->Close(pMbData);
 		return false;
 	}
@@ -1601,6 +1630,10 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 			//错误消息回调
 			App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), pMbData, m_atvOutput);
 			//App_MessageBlockManager::instance()->Close(pMbData);
+
+			pMbData->rd_ptr((size_t)0);
+			ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+			App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), pMbData, tvNow);
 			
 			//关闭当前连接
 			App_ConnectManager::instance()->CloseUnLock(GetConnectID());
@@ -2044,7 +2077,16 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
 	else
 	{
 		sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectManager::SendMessage] ConnectID[%d] is not find.", u4ConnectID);
-		App_BuffPacketManager::instance()->Delete(pBuffPacket);
+		//如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
+		ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
+		memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char* )pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+		pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
+		ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+		App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
+		if(true == blDelete)
+		{
+			App_BuffPacketManager::instance()->Delete(pBuffPacket);
+		}
 		return true;
 	}
 

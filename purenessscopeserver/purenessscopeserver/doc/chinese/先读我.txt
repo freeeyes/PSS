@@ -76,7 +76,7 @@ export LD_LIBRARY_PATH
 添加如下代码
 #include "ace/config-linux.h"
 然后进入$ACE_ROOT/include/makeinclude
-新建 platform_macros.GNU，在platform_macros.GNU中加入一行如 下：
+新建 platform_macros.GNU，在中加入一行如 下：
 include $(ACE_ROOT)/include/makeinclude/platform_linux.GNU
 
 然后回到ace目录
@@ -101,10 +101,10 @@ export PATH你把这个加到你的文档中吧
 请配置/etc/security/limits.conf文件。
 
 在里面添加
-*        soft    noproc  6000
-*        hard    noproc  6000
-*        soft    nofile  6000
-*        hard    nofile  6000
+*        soft    noproc  10000
+*        hard    noproc  10000
+*        soft    nofile  10000
+*        hard    nofile  10000
 
 如果你要用默认的并行端口打开数，比如1024，那么请修改define.h里面的MAX_DEV_POLL_COUNT 为 1000
 
