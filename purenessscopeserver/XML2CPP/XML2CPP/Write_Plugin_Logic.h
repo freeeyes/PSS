@@ -80,7 +80,7 @@ void Gen_2_Cpp_Logic_H(_Project_Info& objProjectInfo, vecClassInfo& objvecClassI
 
 			bool bl_Is_Data = false;
 			//两边参数都有，写入函数
-			sprintf_safe(szTemp, 200, "bool Logic_%s(CServerObject* pServerObject, uint32 u4ConnectID", 
+			sprintf_safe(szTemp, 200, "bool Logic_%s(CServerObject* pServerObject, _MessageBase* pMessageBase", 
 				objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			if(NULL != pHeadObjectName)
@@ -183,7 +183,7 @@ void Gen_2_Cpp_Logic_Cpp(_Project_Info& objProjectInfo, vecClassInfo& objvecClas
 
 			//两边参数都有，写入函数
 			bool bl_Is_Data = false;
-			sprintf_safe(szTemp, 200, "bool Logic_%s(CServerObject* pServerObject, uint32 u4ConnectID", 
+			sprintf_safe(szTemp, 200, "bool Logic_%s(CServerObject* pServerObject, _MessageBase* pMessageBase", 
 				objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			if(NULL != pHeadObjectName)
@@ -251,7 +251,7 @@ void Gen_2_Cpp_Logic_Cpp(_Project_Info& objProjectInfo, vecClassInfo& objvecClas
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t}\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\tif(0 == u4ConnectID)\n");
+				sprintf_safe(szTemp, 200, "\tif(0 == pMessageBase->m_u4ConnectID)\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t{\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);

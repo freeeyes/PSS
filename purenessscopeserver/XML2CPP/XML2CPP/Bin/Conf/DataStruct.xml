@@ -4,74 +4,57 @@
 <!-- sport under type -->
 <!-- string(Need length),uint8,uint16,uint32,uint64,int8,int16,int32,float32,float64 -->
 <configer>
-	<Frame_Head desc="用户注册请求">
-		<PacketLen desc="数据包长度">uint16</PacketLen>
-		<CommandID desc="命令字ID">uint16</CommandID>
-		<FlowNumber desc="数据包流水号">uint32</FlowNumber>
-		<Version desc="数据包版本号">uint16</Version>
-		<BoxID length="20" StreamLength="16" desc="BoxID">char</BoxID>
-		<Retain length="20" StreamLength="16" desc="保留字">char</Retain>
+	<Frame_Head desc="智享单车上报信息头">
+		<StartCode desc="起始码">uint16</StartCode>
+		<FunctionCode desc="功能码">uint8</FunctionCode>
+		<BodyLength desc="包体长度">uint8</BodyLength>
 	</Frame_Head>
-	
-	<Box_Heart_Beat_Ack desc="心跳返回结构体">
+
+	<Smart_Share_Bicycle_Unlock desc="共享单车开锁">
 		<Frame_Head class="Frame_Head" desc="回应包头">Frame_Head</Frame_Head>
-	</Box_Heart_Beat_Ack>
-	
-	<Box_Regist_Ack desc="注册回应">
+		<OperationType desc="动作类型">uint8</OperationType>
+		<OperationOrder desc="动作指令">uint8</OperationOrder>
+		<OperationCondition desc="动作条件">uint8</OperationCondition>
+		<OperationTime desc="动作时间">uint32</OperationTime>
+		<OperationParam desc="动作参数">uint32</OperationParam>
+	</Smart_Share_Bicycle_Unlock>
+
+	<Smart_Share_Bicycle_Lock desc="共享单车关锁">
 		<Frame_Head class="Frame_Head" desc="回应包头">Frame_Head</Frame_Head>
-		<State desc="注册状态">uint8</State>
-	</Box_Regist_Ack>
-	
-	<Box_Login desc="登陆数据结构体">
-		<BoxID length="20" StreamLength="16" desc="BoxKey">char</BoxID>
-		<TimeStamp length="20" StreamLength="10" desc="时间戳">char</TimeStamp>
-	</Box_Login>
-	
-	<Box_Login_Ack desc="登陆返回结构体">
+		<OperationType desc="动作类型">uint8</OperationType>
+		<OperationOrder desc="动作指令">uint8</OperationOrder>
+		<OperationCondition desc="动作条件">uint8</OperationCondition>
+		<OperationTime desc="动作时间">uint32</OperationTime>
+		<OperationParam desc="动作参数">uint32</OperationParam>
+	</Smart_Share_Bicycle_Lock>
+
+	<Smart_Share_Bicycle_Param_Body desc="共享单车参数上报包体">
+		<IMEI length="10" StreamLength="8" desc="IMEI">char</IMEI>
+		<IMSI length="10" StreamLength="8" desc="IMSI">char</IMSI>
+		<RTC desc="RTC">uint32</RTC>
+		<Fireware_Version length="2" StringLength="2" desc="固件版本号">char</Fireware_Version>
+		<Hardware_Version desc="硬件版本号">uint8</Hardware_Version>
+		<Position length="8" StringLength="8" desc="经纬度">char</Position>
+		<Operation desc="锁动作">uint8</Operation>
+		<Voltage1 desc="电压1">uint8</Voltage1>
+		<Voltage2 desc="电压2">uint8</Voltage2>
+		<Temperature desc="温度">uint8</Temperature>
+		<StatusCode desc="状态码">uint8</StatusCode>
+		<ErrorCode desc="错误码">uint8</ErrorCode>
+	</Smart_Share_Bicycle_Param_Body>
+
+	<Smart_Share_Bicycle_Param desc="共享单车参数上报">
 		<Frame_Head class="Frame_Head" desc="回应包头">Frame_Head</Frame_Head>
-		<State desc="登陆状态">uint8</State>
-	</Box_Login_Ack>
-	
-	<Box_Logout desc="注销结构体">
-		<State desc="注销状态">uint8</State>
-	</Box_Logout>	
-	
-	<Box_Logout_Ack desc="注销返回结构体">
+		<Smart_Share_Bicycle_Param_Body class="Smart_Share_Bicycle_Param_Body" desc="共享单车参数上报包体">Smart_Share_Bicycle_Param_Body</Smart_Share_Bicycle_Param_Body>
+	</Smart_Share_Bicycle_Param>
+
+	<Smart_Share_Bicycle_Validation_Infomation_Body desc="智能单车验证信息上报包体">
+		<IMEI length="10" StreamLength="8" desc="IMEI">char</IMEI>
+		<Hardware_Version desc="硬件版本号">uint8</Hardware_Version>
+		<Fireware_Version length="2" StringLength="2" desc="固件版本号">char</Fireware_Version>
+	</Smart_Share_Bicycle_Validation_Infomation_Body>
+	<Smart_Share_Bicycle_Validation_Infomation desc="智能单车验证信息上报">
 		<Frame_Head class="Frame_Head" desc="回应包头">Frame_Head</Frame_Head>
-	</Box_Logout_Ack>
-	
-	<Box_Trap desc="盒子上报消息">
-		<ModuleName length="20" StreamLength="16" desc="模块名称">char</ModuleName>
-		<MessageType desc="消息类型">uint8</MessageType>
-		<Json length="2000" StreamLength="all" desc="Json字符串">char</Json>
-	</Box_Trap>	
-	
-	<Box_Trap_Ack desc="盒子上报消息">
-		<Frame_Head class="Frame_Head" desc="回应包头">Frame_Head</Frame_Head>
-		<State desc="上报消息结果">uint8</State>
-		<ErrMessage length="20" StreamLength="16" desc="模块名称">char</ErrMessage>
-	</Box_Trap_Ack>
-	
-	<Box_Remote_Ctrl desc="盒子回应控制消息">
-		<State desc="上报消息结果">uint8</State>
-		<ErrMessage length="20" StreamLength="16" desc="模块名称">char</ErrMessage>		
-	</Box_Remote_Ctrl>
-	
-	<Box_Remote_Ctrl_Ack desc="盒子下发控制消息">
-		<Frame_Head class="Frame_Head" desc="回应包头">Frame_Head</Frame_Head>
-		<ModuleName length="20" StreamLength="16" desc="模块名称">char</ModuleName>
-		<MessageType desc="消息类型">uint8</MessageType>
-		<Json length="2000" StreamLength="all" desc="Json字符串">char</Json>		
-	</Box_Remote_Ctrl_Ack>
-	
-	<Box_DownLoad desc="盒子回应下载">
-		<State desc="上报消息结果">uint8</State>
-		<ErrMessage length="20" StreamLength="16" desc="模块名称">char</ErrMessage>		
-	</Box_DownLoad>
-	
-	<Box_DownLoad_Ack desc="盒子回应下载">
-		<Frame_Head class="Frame_Head" desc="回应包头">Frame_Head</Frame_Head>
-		<ModuleName length="20" StreamLength="16" desc="模块名称">char</ModuleName>
-		<Url length="200" StreamLength="all" desc="下载Url">char</Url>		
-	</Box_DownLoad_Ack>
+		<Smart_Share_Bicycle_Validation_Infomation_Body class="Smart_Share_Bicycle_Validation_Infomation_Body" desc="智能单车验证信息上报包体">Smart_Share_Bicycle_Validation_Infomation_Body</Smart_Share_Bicycle_Validation_Infomation_Body>
+	</Smart_Share_Bicycle_Validation_Infomation>
 </configer>

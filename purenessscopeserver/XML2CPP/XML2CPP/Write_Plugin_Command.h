@@ -305,7 +305,7 @@ void Gen_2_Cpp_Command_Cpp(_Project_Info& objProjectInfo, vecClassInfo& objvecCl
 								objProjectInfo.m_objCommandList[i].m_vecObjectInfo[j].m_szClassName);
 							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, 200, "\tblState = Logic_%s(m_pServerObject, pMessage->GetMessageBase()->m_u4ConnectID, obj%s, obj%s, obj%s);\n",
+							sprintf_safe(szTemp, 200, "\tblState = Logic_%s(m_pServerObject, pMessage->GetMessageBase(), obj%s, obj%s, obj%s);\n",
 								objProjectInfo.m_objCommandList[i].m_szCommandFuncName, 
 								pHeadClassName,
 								pBodyClassName,
@@ -319,7 +319,7 @@ void Gen_2_Cpp_Command_Cpp(_Project_Info& objProjectInfo, vecClassInfo& objvecCl
 								objProjectInfo.m_objCommandList[i].m_vecObjectInfo[j].m_szClassName);
 							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, 200, "\tblState = Logic_%s(m_pServerObject, pMessage->GetMessageBase()->m_u4ConnectID, obj%s, obj%s);\n",
+							sprintf_safe(szTemp, 200, "\tblState = Logic_%s(m_pServerObject, pMessage->GetMessageBase(), obj%s, obj%s);\n",
 								objProjectInfo.m_objCommandList[i].m_szCommandFuncName,
 								pHeadClassName,
 								objProjectInfo.m_objCommandList[i].m_vecObjectInfo[j].m_szClassName);
@@ -333,7 +333,7 @@ void Gen_2_Cpp_Command_Cpp(_Project_Info& objProjectInfo, vecClassInfo& objvecCl
 			{
 				if(pHeadClassName != NULL && pBodyClassName != NULL)
 				{
-					sprintf_safe(szTemp, 200, "\tblState = Logic_%s(m_pServerObject, pMessage->GetMessageBase()->m_u4ConnectID, obj%s, obj%s);\n", 
+					sprintf_safe(szTemp, 200, "\tblState = Logic_%s(m_pServerObject, pMessage->GetMessageBase(), obj%s, obj%s);\n", 
 						objProjectInfo.m_objCommandList[i].m_szCommandFuncName,
 						pHeadClassName,
 						pBodyClassName);
@@ -343,14 +343,14 @@ void Gen_2_Cpp_Command_Cpp(_Project_Info& objProjectInfo, vecClassInfo& objvecCl
 				{
 					if(pHeadClassName != NULL)
 					{
-						sprintf_safe(szTemp, 200, "\tblState = Logic_%s(m_pServerObject, pMessage->GetMessageBase()->m_u4ConnectID, obj%s);\n", 
+						sprintf_safe(szTemp, 200, "\tblState = Logic_%s(m_pServerObject, pMessage->GetMessageBase(), obj%s);\n", 
 							objProjectInfo.m_objCommandList[i].m_szCommandFuncName,
 							pHeadClassName);
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					}
 					else
 					{
-						sprintf_safe(szTemp, 200, "\tblState = Logic_%s(m_pServerObject, pMessage->GetMessageBase()->m_u4ConnectID);\n", 
+						sprintf_safe(szTemp, 200, "\tblState = Logic_%s(m_pServerObject, pMessage->GetMessageBase());\n", 
 							objProjectInfo.m_objCommandList[i].m_szCommandFuncName);
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					}

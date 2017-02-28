@@ -1,20 +1,11 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 
-<PlugIn desc="BoxFrame" keyID="BoxFrameID" Name="BoxFrame">
-	<Define DefName="LOGIN" type="number" DefValue="0x1001" />
-	<Define DefName="LOGIN_ACK" type="number" DefValue="0x8001" />
-	<Define DefName="LOGOUT" type="number" DefValue="0x1002" />
-	<Define DefName="LOGOUT_ACK" type="number" DefValue="0x8002" />
-	<Define DefName="HEART_BEAT" type="number" DefValue="0x1003" />
-	<Define DefName="HEART_BEAT_ACK" type="number" DefValue="0x8003" />
-	<Define DefName="REGISTOR" type="number" DefValue="0x1004" />
-	<Define DefName="REGISTOR_ACK" type="number" DefValue="0x8004" />
-	<Define DefName="TRAP" type="number" DefValue="0x1007" />
-	<Define DefName="TRAP_ACK" type="number" DefValue="0x8007" />
-	<Define DefName="REMOTE_CTRL" type="number" DefValue="0x100B" />
-	<Define DefName="REMOTE_CTRL_ACK" type="number" DefValue="0x800B" />
-	<Define DefName="DOWNLOAD" type="number" DefValue="0x100C" />
-	<Define DefName="DOWNLOAD_ACK" type="number" DefValue="0x800C" />
+<PlugIn desc="SmartShareBicycleBasic" keyID="SmartShareBicycleBasicID" Name="SmartShareBicycleBasic">
+	<Define DefName="UNLOCK_DOWN" type="number" DefValue="0x81" />
+	<Define DefName="LOCK_DOWN" type="number" DefValue="0x82" />
+	<Define DefName="PARAM_REPORT" type="number" DefValue="0x87" />
+	<Define DefName="VALIDATION_INFO_REPORT" type="number" DefValue="0x8B" />
+
 	
 	<Command CommandIn="CLIENT_LINK_CONNECT" FuncName="Do_Connect">
 	</Command>		
@@ -22,48 +13,21 @@
 	<Command CommandIn="CLIENT_LINK_CDISCONNET" FuncName="Do_DisConnect">
 	</Command>	
 	
-	<Command CommandIn="LOGIN" CommandOut="LOGIN_ACK" FuncName="Do_Box_Login">
+	<Command CommandOut="UNLOCK_DOWN" FuncName="Do_Bicycle_Unlock">
+		<Object class="Smart_Share_Bicycle_Unlock" PacketType="RETURN" />
+	</Command>
+
+	<Command CommandOut="LOCK_DOWN" FuncName="Do_Bicycle_Lock">
+		<Object class="Smart_Share_Bicycle_Lock" PacketType="RETURN" />
+	</Command>
+
+	<Command CommandIn="PARAM_REPORT" FuncName="Do_Bicycle_Param_Report">
 		<Object class="Frame_Head" PacketType="HEAD" />
-		<Object class="Box_Login_Ack" PacketType="RETURN" />
+		<Object class="Smart_Share_Bicycle_Param_Body" PacketType="BODY" />
 	</Command>
-	
-	<Command CommandIn="LOGOUT" CommandOut="LOGOUT_ACK" FuncName="Do_Box_Logout">
+
+	<Command CommandIn="VALIDATION_INFO_REPORT" FuncName="Do_Bicycle_ValidationInfo_Report">
 		<Object class="Frame_Head" PacketType="HEAD" />
-		<Object class="Box_Logout" PacketType="BODY" />
-		<Object class="Box_Logout_Ack" PacketType="RETURN" />
-	</Command>
-	
-	<Command CommandIn="HEART_BEAT" CommandOut="HEART_BEAT_ACK" FuncName="Do_Box_Heart_Beat">
-		<Object class="Frame_Head" PacketType="HEAD" />
-		<Object class="Box_Heart_Beat_Ack" PacketType="RETURN" />
-	</Command>
-	
-	<Command CommandIn="REGISTOR" CommandOut="REGISTOR_ACK" FuncName="Do_Box_Registor">
-		<Object class="Frame_Head" PacketType="HEAD" />
-		<Object class="Box_Regist_Ack" PacketType="RETURN" />
-	</Command>
-	
-	<Command CommandIn="TRAP" CommandOut="TRAP_ACK" FuncName="Do_Box_Trap">
-		<Object class="Frame_Head" PacketType="HEAD" />
-		<Object class="Box_Trap" PacketType="BODY" />
-		<Object class="Box_Trap_Ack" PacketType="RETURN" />		
-	</Command>
-	
-	<Command CommandOut="REMOTE_CTRL_ACK" FuncName="Send_Box_Remote_Ctrl">
-		<Object class="Box_Remote_Ctrl_Ack" PacketType="RETURN" />	
-	</Command>
-	
-	<Command CommandIn="REMOTE_CTRL" FuncName="Do_Box_Remote_Ctrl">
-		<Object class="Frame_Head" PacketType="HEAD" />
-		<Object class="Box_Remote_Ctrl" PacketType="BODY" />		
-	</Command>
-	
-	<Command CommandOut="DOWNLOAD_ACK" FuncName="Send_Box_Download">
-		<Object class="Box_DownLoad_Ack" PacketType="RETURN" />	
-	</Command>
-	
-	<Command CommandIn="DOWNLOAD" FuncName="Do_Box_Download">
-		<Object class="Frame_Head" PacketType="HEAD" />
-		<Object class="Box_DownLoad" PacketType="BODY" />		
+		<Object class="Smart_Share_Bicycle_Validation_Infomation_Body" PacketType="BODY" />
 	</Command>
 </PlugIn>
