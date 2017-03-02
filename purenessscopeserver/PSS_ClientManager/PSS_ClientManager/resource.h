@@ -52,6 +52,7 @@
 #define IDC_BUTTON12                    1016
 #define IDC_EDIT11                      1017
 #define IDC_IPADDRESS1                  1018
+#define IDC_EDIT12                      1018
 #define IDC_COMBO1                      1019
 
 // Next default values for new objects

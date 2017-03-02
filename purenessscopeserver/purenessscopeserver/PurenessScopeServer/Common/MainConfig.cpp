@@ -63,8 +63,6 @@ CMainConfig::CMainConfig(void)
 	m_szServerName[0]         = '\0';
 	m_szServerVersion[0]      = '\0';
 	m_szPacketVersion[0]      = '\0';
-	m_szModulePath[0]         = '\0';
-	m_szResourceName[0]       = '\0';
 	m_szEncryptPass[0]        = '\0';
 
 	m_szWindowsServiceName[0] = '\0';
@@ -1044,8 +1042,6 @@ void CMainConfig::Display()
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4MsgLowMark = %d.\n", m_u4MsgLowMark));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4MsgThreadCount = %d.\n", m_u4MsgThreadCount));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4MsgMaxQueue = %d.\n", m_u4MsgMaxQueue));
-	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szModulePath = %s.\n", m_szModulePath));
-	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szResourceName = %s.\n", m_szResourceName));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_nEncryptFlag = %d.\n", m_nEncryptFlag));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szEncryptPass = %s.\n", m_szEncryptPass));
 	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_nEncryptOutFlag = %d.\n", m_nEncryptOutFlag));
@@ -1148,16 +1144,6 @@ uint32 CMainConfig::GetThreadCount()
 uint32 CMainConfig::GetMsgMaxQueue()
 {
 	return m_u4MsgMaxQueue;
-}
-
-const char* CMainConfig::GetModulePath()
-{
-	return m_szModulePath;
-}
-
-const char* CMainConfig::GetModuleString()
-{
-	return m_szResourceName;
 }
 
 int CMainConfig::GetEncryptFlag()

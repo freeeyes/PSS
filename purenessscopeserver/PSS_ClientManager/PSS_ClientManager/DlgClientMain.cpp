@@ -32,6 +32,7 @@ void CDlgClientMain::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT8, m_txtModuleFile);
 	DDX_Control(pDX, IDC_LIST3, m_lbConfig);
 	DDX_Control(pDX, IDC_EDIT11, m_txtModuleParam);
+	DDX_Control(pDX, IDC_EDIT12, m_txtModuleFileName);
 }
 
 
@@ -45,6 +46,7 @@ BEGIN_MESSAGE_MAP(CDlgClientMain, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON11, &CDlgClientMain::OnBnClickedButton11)
 	ON_LBN_SELCHANGE(IDC_LIST3, &CDlgClientMain::OnLbnSelchangeList3)
 	ON_BN_CLICKED(IDC_BUTTON12, &CDlgClientMain::OnBnClickedButton12)
+	ON_NOTIFY(NM_CLICK, IDC_LIST1, &CDlgClientMain::OnNMClickList1)
 END_MESSAGE_MAP()
 
 CString CDlgClientMain::GetPageTitle()
@@ -206,10 +208,16 @@ BOOL CDlgClientMain::OnInitDialog()
 
 	m_lcModuleList.InsertColumn(0, _T("当前已加载模块"), LVCFMT_CENTER, 120);
 	m_lcModuleList.InsertColumn(1, _T("模块名称"), LVCFMT_CENTER, 80);
-	m_lcModuleList.InsertColumn(2, _T("模块信息"), LVCFMT_CENTER, 80);
-	m_lcModuleList.InsertColumn(3, _T("加载时间"), LVCFMT_CENTER, 150);
-	m_lcModuleList.InsertColumn(4, _T("当前状态"), LVCFMT_CENTER, 80);
-	m_lcModuleList.InsertColumn(5, _T("状态ID"), LVCFMT_CENTER, 80);
+	m_lcModuleList.InsertColumn(2, _T("模块路径"), LVCFMT_CENTER, 80);
+	m_lcModuleList.InsertColumn(3, _T("模块参数"), LVCFMT_CENTER, 80);
+	m_lcModuleList.InsertColumn(4, _T("模块描述"), LVCFMT_CENTER, 80);
+	m_lcModuleList.InsertColumn(5, _T("加载时间"), LVCFMT_CENTER, 150);
+	m_lcModuleList.InsertColumn(6, _T("当前状态"), LVCFMT_CENTER, 80);
+	m_lcModuleList.InsertColumn(7, _T("状态ID"), LVCFMT_CENTER, 80);
+
+    DWORD dwStyle = m_lcModuleList.GetExtendedStyle();
+    dwStyle |= LVS_EX_FULLROWSELECT;//选中某行使整行高亮（只适用与report风格的listctrl）
+    m_lcModuleList.SetExtendedStyle(dwStyle); //设置扩展风格
 
 	return TRUE;
 }
@@ -266,6 +274,20 @@ void CDlgClientMain::OnBnClickedButton3()
 			memcpy_s(&nStrLen, sizeof(char), &szRecvBuff[nPos], sizeof(char));
 			nPos += sizeof(char);
 
+			memcpy_s(ModuleInfo.szModulePath, nStrLen, &szRecvBuff[nPos], nStrLen);
+			nPos += nStrLen;
+			ModuleInfo.szModulePath[nStrLen] = '\0';
+
+			memcpy_s(&nStrLen, sizeof(char), &szRecvBuff[nPos], sizeof(char));
+			nPos += sizeof(char);
+
+			memcpy_s(ModuleInfo.szModuleParam, nStrLen, &szRecvBuff[nPos], nStrLen);
+			nPos += nStrLen;
+			ModuleInfo.szModuleParam[nStrLen] = '\0';
+
+			memcpy_s(&nStrLen, sizeof(char), &szRecvBuff[nPos], sizeof(char));
+			nPos += sizeof(char);
+
 			memcpy_s(ModuleInfo.szModuleDesc, nStrLen, &szRecvBuff[nPos], nStrLen);
 			nPos += nStrLen;
 			ModuleInfo.szModuleDesc[nStrLen] = '\0';
@@ -286,6 +308,8 @@ void CDlgClientMain::OnBnClickedButton3()
 			//显示在桌面上
 			wchar_t szModuleFile[200]    = {'\0'};
 			wchar_t szModuleName[200]    = {'\0'};
+			wchar_t szModulePath[200]    = {'\0'};
+			wchar_t szModuleParam[200]   = {'\0'};
 			wchar_t szModuleDesc[200]    = {'\0'};
 			wchar_t szModuleTime[200]    = {'\0'};
 
@@ -295,6 +319,12 @@ void CDlgClientMain::OnBnClickedButton3()
 			nSrcLen = MultiByteToWideChar(CP_ACP, 0, ModuleInfo.szModuleName, -1, NULL, 0);
 			nDecLen = MultiByteToWideChar(CP_ACP, 0, ModuleInfo.szModuleName, -1, szModuleName, 200);
 
+			nSrcLen = MultiByteToWideChar(CP_ACP, 0, ModuleInfo.szModulePath, -1, NULL, 0);
+			nDecLen = MultiByteToWideChar(CP_ACP, 0, ModuleInfo.szModulePath, -1, szModulePath, 200);
+
+			nSrcLen = MultiByteToWideChar(CP_ACP, 0, ModuleInfo.szModuleParam, -1, NULL, 0);
+			nDecLen = MultiByteToWideChar(CP_ACP, 0, ModuleInfo.szModuleParam, -1, szModuleParam, 200);
+
 			nSrcLen = MultiByteToWideChar(CP_ACP, 0, ModuleInfo.szModuleDesc, -1, NULL, 0);
 			nDecLen = MultiByteToWideChar(CP_ACP, 0, ModuleInfo.szModuleDesc, -1, szModuleDesc, 200);
 
@@ -303,21 +333,23 @@ void CDlgClientMain::OnBnClickedButton3()
 
 			m_lcModuleList.InsertItem(i, szModuleFile);
 			m_lcModuleList.SetItemText(i, 1, szModuleName);
-			m_lcModuleList.SetItemText(i, 2, szModuleDesc);
-			m_lcModuleList.SetItemText(i, 3, szModuleTime);
+			m_lcModuleList.SetItemText(i, 2, szModulePath);
+			m_lcModuleList.SetItemText(i, 3, szModuleParam);
+			m_lcModuleList.SetItemText(i, 4, szModuleDesc);
+			m_lcModuleList.SetItemText(i, 5, szModuleTime);
 
 			CString strData;
 			if(ModuleInfo.nModuleState == 0)
 			{
-				m_lcModuleList.SetItemText(i, 4, _T("正常"));
+				m_lcModuleList.SetItemText(i, 6, _T("正常"));
 			}
 			else
 			{
-				m_lcModuleList.SetItemText(i, 4, _T("异常"));
+				m_lcModuleList.SetItemText(i, 6, _T("异常"));
 			}
 			
 			strData.Format(_T("%d"), ModuleInfo.nModuleID);
-			m_lcModuleList.SetItemText(i, 5, strData);
+			m_lcModuleList.SetItemText(i, 7, strData);
 
 			objvecModuleInfo.push_back(ModuleInfo);
 		}
@@ -442,7 +474,7 @@ void CDlgClientMain::OnBnClickedButton7()
 	char szModuleParam[200]       = {'\0'};
 
 	m_txtModuleFile.GetWindowText(strModulePath);
-	m_txtModuleName.GetWindowText(strModuleFile);
+	m_txtModuleFileName.GetWindowText(strModuleFile);
 	m_txtModuleParam.GetWindowText(strModuleParam);
 
 	int nSrcLen = WideCharToMultiByte(CP_ACP, 0, strModulePath, strModulePath.GetLength(), NULL, 0, NULL, NULL);
@@ -627,4 +659,30 @@ void CDlgClientMain::OnBnClickedButton12()
 		m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen + sizeof(int), (char*)szRecvBuff, nRecvLen);
 		MessageBox(_T(MESSAGE_IS_CLOSE_OVER), _T(MESSAGE_TITLE_INFO), MB_OK);
 	}
+}
+
+
+
+
+void CDlgClientMain::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+
+	POSITION ps = m_lcModuleList.GetFirstSelectedItemPosition();
+	int nIndex  = m_lcModuleList.GetNextSelectedItem(ps);
+
+	if(nIndex != -1)
+	{
+		CString strModulePath;
+		CString strModuleName;
+		CString strModuleFile;
+		CString strModuleParam;
+
+		m_txtModuleFile.SetWindowText(m_lcModuleList.GetItemText(nIndex, 2));
+		m_txtModuleFileName.SetWindowText(m_lcModuleList.GetItemText(nIndex, 0));
+		m_txtModuleName.SetWindowText(m_lcModuleList.GetItemText(nIndex, 1));
+		m_txtModuleParam.SetWindowText(m_lcModuleList.GetItemText(nIndex, 3));
+	}
+
+	*pResult = 0;
 }

@@ -225,9 +225,6 @@ public:
 	uint32 GetMsgMaxQueue();
 	uint16 GetHandleCount();
 
-	const char* GetModulePath();
-	const char* GetModuleString();
-
 	int GetEncryptFlag();
 	const char* GetEncryptPass();
 	int GetEncryptOutFlag();
@@ -331,9 +328,6 @@ private:
 	uint32     m_u4MsgThreadCount;                     //允许的工作线程个数
 	uint32     m_u4MsgMaxQueue;                        //消息队列的最大个数
 	uint8      m_u1Debug;                              //是否开启Debug模式，1是开启，0是关闭
-
-	char       m_szModulePath[MAX_BUFF_200];           //模块所在的路径
-	char       m_szResourceName[MAX_BUFF_1024];        //资源模块名称
 
 	int        m_nEncryptFlag;                         //0，加密方式关闭，1为加密方式开启
 	char       m_szEncryptPass[MAX_BUFF_9];            //最长8位的加密密码，3DES算法

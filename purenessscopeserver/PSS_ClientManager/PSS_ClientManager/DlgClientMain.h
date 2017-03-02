@@ -38,6 +38,8 @@ struct _ModuleInfo
 {
 	char szModuleName[200];
 	char szModuleFile[200];
+	char szModulePath[200];
+	char szModuleParam[200];
 	char szModuleDesc[200];
 	char szModuleCreateDate[200];
 	int  nModuleState;
@@ -47,6 +49,8 @@ struct _ModuleInfo
 	{
 		szModuleName[0]       = '\0';
 		szModuleFile[0]       = '\0';
+		szModulePath[0]       = '\0';
+		szModuleParam[0]      = '\0';
 		szModuleDesc[0]       = '\0';
 		szModuleCreateDate[0] = '\0';
 		nModuleState          = 0;
@@ -110,6 +114,8 @@ public:
 	CListCtrl m_lcModuleList;
 	CEdit m_txtKey;
 	CEdit m_txtModuleFile;
+	CEdit m_txtModuleParam;
+	CEdit m_txtModuleFileName;
 	CListBox m_lbConfig;
 	afx_msg void OnBnClickedButton1();
 	afx_msg void OnBnClickedButton2();
@@ -121,5 +127,6 @@ public:
 	afx_msg void OnBnClickedButton11();
 	afx_msg void OnLbnSelchangeList3();
 	afx_msg void OnBnClickedButton12();
-	CEdit m_txtModuleParam;
+	afx_msg void OnHdnItemclickList1(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult);
 };

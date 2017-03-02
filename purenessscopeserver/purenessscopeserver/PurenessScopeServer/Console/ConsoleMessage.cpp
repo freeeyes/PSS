@@ -774,6 +774,14 @@ bool CConsoleMessage::DoMessage_ShowModule(_CommandInfo& CommandInfo, IBuffPacke
 				strSModileFile.u1Len = (uint8)ACE_OS::strlen(pModuleInfo->strModuleName.c_str());
 				strSModileFile.text  = (char* )pModuleInfo->strModuleName.c_str();
 				(*pBuffPacket) << strSModileFile;
+				VCHARS_STR strSModilePath;
+				strSModilePath.u1Len = (uint8)ACE_OS::strlen(pModuleInfo->strModulePath.c_str());
+				strSModilePath.text  = (char* )pModuleInfo->strModulePath.c_str();
+				(*pBuffPacket) << strSModilePath;
+				VCHARS_STR strSModileParam;
+				strSModileParam.u1Len = (uint8)ACE_OS::strlen(pModuleInfo->strModuleParam.c_str());
+				strSModileParam.text  = (char* )pModuleInfo->strModuleParam.c_str();
+				(*pBuffPacket) << strSModileParam;
 				VCHARS_STR strSModileDesc;
 				strSModileDesc.u1Len = (uint8)ACE_OS::strlen(pModuleInfo->GetDesc());
 				strSModileDesc.text  = (char* )pModuleInfo->GetDesc();
