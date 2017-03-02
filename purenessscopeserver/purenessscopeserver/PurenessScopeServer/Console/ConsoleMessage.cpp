@@ -345,8 +345,7 @@ bool CConsoleMessage::GetFileInfo(const char* pFile, _FileInfo& FileInfo)
 	int nBegin    = 0;
 	int nEnd      = 0;
 	int nPosIndex = 0;
-	char szTemp[MAX_BUFF_200] = {'\0'};
-	int i = 0;
+
 	int nLen = (int)ACE_OS::strlen(pFile);
 
 	for(int i = 0; i < nLen; i++)
