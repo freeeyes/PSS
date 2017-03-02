@@ -31,6 +31,7 @@ void CDlgClientMain::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT6, m_txtKey);
 	DDX_Control(pDX, IDC_EDIT8, m_txtModuleFile);
 	DDX_Control(pDX, IDC_LIST3, m_lbConfig);
+	DDX_Control(pDX, IDC_EDIT11, m_txtModuleParam);
 }
 
 
@@ -432,19 +433,33 @@ void CDlgClientMain::OnBnClickedButton5()
 void CDlgClientMain::OnBnClickedButton7()
 {
 	//加载指定模块
+	CString strModulePath;
 	CString strModuleFile;
+	CString strModuleParam;
 
+	char szModulePath[100]        = {'\0'};
 	char szModuleFile[100]        = {'\0'};
+	char szModuleParam[200]       = {'\0'};
 
-	m_txtModuleFile.GetWindowText(strModuleFile);
+	m_txtModuleFile.GetWindowText(strModulePath);
+	m_txtModuleName.GetWindowText(strModuleFile);
+	m_txtModuleParam.GetWindowText(strModuleParam);
 
-	int nSrcLen = WideCharToMultiByte(CP_ACP, 0, strModuleFile, strModuleFile.GetLength(), NULL, 0, NULL, NULL);
-	int nDecLen = WideCharToMultiByte(CP_ACP, 0, strModuleFile, nSrcLen, szModuleFile, 100, NULL,NULL);
+	int nSrcLen = WideCharToMultiByte(CP_ACP, 0, strModulePath, strModulePath.GetLength(), NULL, 0, NULL, NULL);
+	int nDecLen = WideCharToMultiByte(CP_ACP, 0, strModulePath, nSrcLen, szModulePath, 100, NULL,NULL);
+	szModulePath[nDecLen] = '\0';
+
+	nSrcLen = WideCharToMultiByte(CP_ACP, 0, strModuleFile, strModuleFile.GetLength(), NULL, 0, NULL, NULL);
+	nDecLen = WideCharToMultiByte(CP_ACP, 0, strModuleFile, nSrcLen, szModuleFile, 100, NULL,NULL);
 	szModuleFile[nDecLen] = '\0';
+
+	nSrcLen = WideCharToMultiByte(CP_ACP, 0, strModuleParam, strModuleParam.GetLength(), NULL, 0, NULL, NULL);
+	nDecLen = WideCharToMultiByte(CP_ACP, 0, strModuleParam, nSrcLen, szModuleParam, 100, NULL,NULL);
+	szModuleParam[nDecLen] = '\0';
 
 	char szSendMessage[200] = {'\0'};
 	char szCommand[100]     = {'\0'};
-	sprintf_s(szCommand, 100, "%s LoadModule %s", m_pTcpClientConnect->GetKey(), szModuleFile);
+	sprintf_s(szCommand, 100, "%s LoadModule %s,%s,%s", m_pTcpClientConnect->GetKey(), szModulePath, szModuleFile, szModuleParam);
 	int nSendLen = (int)strlen(szCommand); 
 
 	memcpy_s(szSendMessage, 200, &nSendLen, sizeof(int));

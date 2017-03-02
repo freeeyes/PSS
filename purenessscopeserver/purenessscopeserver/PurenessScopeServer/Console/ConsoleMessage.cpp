@@ -341,30 +341,42 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
 
 bool CConsoleMessage::GetFileInfo(const char* pFile, _FileInfo& FileInfo)
 {
+	//按照逗号拆分
+	int nBegin    = 0;
+	int nEnd      = 0;
+	int nPosIndex = 0;
+	char szTemp[MAX_BUFF_200] = {'\0'};
 	int i = 0;
 	int nLen = (int)ACE_OS::strlen(pFile);
 
-	bool blFind = false;
-	for(i = nLen - 1; i >= 0; i--)
+	for(int i = 0; i < nLen; i++)
 	{
-		if(pFile[i] == '\\' || pFile[i] == '/')
+		if(pFile[i] == ',')
 		{
-			blFind = true;
-			break;
+			if(nPosIndex == 0)
+			{
+				//模块路径
+				nEnd = i;
+				memcpy_safe((char* )&pFile[nBegin], nEnd - nBegin, FileInfo.m_szFilePath, MAX_BUFF_100);
+				FileInfo.m_szFilePath[nEnd - nBegin] = '\0';
+				nBegin = i + 1;
+				nPosIndex++;
+			}
+			else if(nPosIndex == 1)
+			{
+				//模块文件名
+				nEnd = i;
+				memcpy_safe((char* )&pFile[nBegin], nEnd - nBegin, FileInfo.m_szFileName, MAX_BUFF_100);
+				FileInfo.m_szFileName[nEnd - nBegin] = '\0';
+				nBegin = i + 1;
+				//模块参数
+				nEnd = nLen;
+				memcpy_safe((char* )&pFile[nBegin], nEnd - nBegin, FileInfo.m_szFileParam, MAX_BUFF_200);
+				FileInfo.m_szFileParam[nEnd - nBegin] = '\0';
+				break;
+			}
 		}
 	}
-
-	if(false == blFind)
-	{
-		OUR_DEBUG((LM_ERROR, "[CConsoleMessage::GetFileInfo]No find file path.\n"));
-		return false;
-	}
-;
-	memcpy_safe((char* )(pFile + i + 1), (uint32)nLen - i - 1, (char* )FileInfo.m_szFileName, (uint32)MAX_BUFF_100);
-	FileInfo.m_szFileName[nLen - i - 1] = '\0';
-
-	memcpy_safe((char* )(pFile), (uint32)i + 1, (char* )FileInfo.m_szFilePath, (uint32)MAX_BUFF_100);
-	FileInfo.m_szFilePath[i + 1] = '\0';
 
 	return true;
 }
@@ -637,7 +649,7 @@ bool CConsoleMessage::DoMessage_LoadModule(_CommandInfo& CommandInfo, IBuffPacke
 		return false;
 	}
 
-	if(true == App_ModuleLoader::instance()->LoadModule(FileInfo.m_szFilePath, FileInfo.m_szFileName))
+	if(true == App_ModuleLoader::instance()->LoadModule(FileInfo.m_szFilePath, FileInfo.m_szFileName, FileInfo.m_szFileParam))
 	{
 		if(NULL != pBuffPacket)
 		{

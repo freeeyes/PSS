@@ -143,11 +143,13 @@ struct _FileInfo
 {
 	char m_szFilePath[MAX_BUFF_100];
 	char m_szFileName[MAX_BUFF_100];
+	char m_szFileParam[MAX_BUFF_200];
 
 	_FileInfo()
 	{
-		m_szFilePath[0] = '\0';
-		m_szFileName[0] = '\0';
+		m_szFilePath[0]  = '\0';
+		m_szFileName[0]  = '\0';
+		m_szFileParam[0] = '\0';
 	}
 };
 

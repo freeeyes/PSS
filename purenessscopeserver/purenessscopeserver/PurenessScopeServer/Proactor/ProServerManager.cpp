@@ -390,23 +390,13 @@ bool CProServerManager::Start()
 	App_ClientProConnectManager::instance()->StartConnectTask(App_MainConfig::instance()->GetConnectServerCheck());
 
 	//初始化模块加载，因为这里可能包含了中间服务器连接加载
-	if(ACE_OS::strlen(App_MainConfig::instance()->GetModuleString()) > 0)
-	{
-		blState = App_ModuleLoader::instance()->LoadModule(App_MainConfig::instance()->GetModulePath(), App_MainConfig::instance()->GetModuleString());
-		if(false == blState)
-		{
-			OUR_DEBUG((LM_INFO, "[CProServerManager::Start]LoadModule (%s)is error.\n", App_MainConfig::instance()->GetModuleString()));
-			return false;
-		}
-	}
-
 	uint16 u2ModuleVCount = App_MainConfig::instance()->GetModuleInfoCount();
 	for(uint16 i = 0; i < u2ModuleVCount; i++)
 	{
 		_ModuleConfig* pModuleConfig = App_MainConfig::instance()->GetModuleInfo(i);
 		if(NULL != pModuleConfig)
 		{
-			blState = App_ModuleLoader::instance()->LoadModule(pModuleConfig->m_szModulePath, 
+			bool blState = App_ModuleLoader::instance()->LoadModule(pModuleConfig->m_szModulePath, 
 				pModuleConfig->m_szModuleName, 
 				pModuleConfig->m_szModuleParam);
 

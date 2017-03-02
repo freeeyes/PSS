@@ -54,79 +54,9 @@ void CLoadModule::Close()
 	m_objHashModuleList.Close();
 }
 
-bool CLoadModule::LoadModule(const char* pModulePath, const char* pResourceName)
-{
-	vector<string> vecModuleName;
-	string strModuleName;
-
-	//将字符串数组解析成单一的模块名称
-	ParseModule(pResourceName, vecModuleName);
-
-	sprintf_safe(m_szModulePath, MAX_BUFF_200, "%s", pModulePath);
-
-	for(uint16 i = 0; i < (uint16)vecModuleName.size(); i++)
-	{
-		strModuleName = vecModuleName[i];
-		OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] Begin Load ModuleName[%s]!\n", strModuleName.c_str()));
-
-		_ModuleInfo* pModuleInfo = new _ModuleInfo();
-
-		if(NULL == pModuleInfo)
-		{
-			OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] new _ModuleInfo is error!\n"));
-			return false;
-		}
-
-		//开始注册模块函数
-		if(false == LoadModuleInfo(strModuleName, pModuleInfo, m_szModulePath))
-		{
-			SAFE_DELETE(pModuleInfo);
-			return false;
-		}
-
-		//查找此模块是否已经被注册，有则把信息老信息清理
-		_ModuleInfo* pOldModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(strModuleName.c_str());
-		if(NULL != pOldModuleInfo)
-		{
-			//关闭副本
-			ACE_OS::dlclose(pOldModuleInfo->hModule);
-			SAFE_DELETE(pOldModuleInfo);
-			m_objHashModuleList.Del_Hash_Data(strModuleName.c_str());
-		}
-
-		//将注册成功的模块，加入到Hash数组中
-		if(false == m_objHashModuleList.Add_Hash_Data(pModuleInfo->GetName(), pModuleInfo))
-		{
-			OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] m_mapModuleInfo.AddMapData error!\n"));
-			SAFE_DELETE(pModuleInfo);
-			return false;
-		}
-
-		//开始调用模块初始化动作
-		int nRet = pModuleInfo->LoadModuleData(App_ServerObject::instance());
-		if(nRet != 0)
-		{
-			OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Execute Function LoadModuleData is error!\n", strModuleName.c_str()));
-			return false;
-		}
-
-		OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] Begin Load ModuleName[%s] OK!\n", strModuleName.c_str()));
-	}
-
-	return true;
-}
-
 bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, const char* pModuleParam)
 {
 	string strModuleName = (string)pModuleName;
-
-	//确定这个模块是否被注册过
-	_ModuleInfo* pCurr = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
-	if(NULL != pCurr)
-	{
-		//如果被注册过，先卸载现有的，再重新装载
-		UnLoadModule(strModuleName.c_str());
-	}
 
 	_ModuleInfo* pModuleInfo = new _ModuleInfo();
 

@@ -25,7 +25,6 @@
 	<!-- <Module ModulePath="./" ModuleString="UDPTestd.dll" desc="模块加载配置相关参数，ModulePath是路径，ModuleString是模块名称，以逗号隔开"/> -->
 	
 	<!-- 测试Tcp插件加载流程的用例 -->
-	<!-- <Module ModulePath="./" ModuleString="" desc="模块加载配置相关参数，ModulePath是路径，ModuleString是模块名称，以逗号隔开"/> -->
 	<ModuleManager MaxCount="100" desc="框架支持的最大插件数量" />
 	
 	<!-- 允许插件设置个性化,可以多个,这里可以单独设置每个插件的不同参数,可以与Module设置同时生效,亦可不用此设置 -->

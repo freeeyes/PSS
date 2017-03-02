@@ -44,7 +44,6 @@ public:
 	void Close();
 
 	bool LoadModule(const char* pModulePath, const char* pModuleName, const char* pModuleParam);
-	bool LoadModule(const char* pModulePath, const char* pResourceName);
 	bool UnLoadModule(const char* szResourceName, bool blIsDelete = true);
 
 	int  SendModuleMessage(const char* pModuleName, uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket);
