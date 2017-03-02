@@ -39,7 +39,7 @@ void CLoadModule::Close()
 		_ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Index(i);
 		if(NULL != pModuleInfo)
 		{
-			obj_vecModuleName.push_back(pModuleInfo->strModuleName);
+			obj_vecModuleName.push_back(pModuleInfo->GetName());
 		}
 	}
 
@@ -95,7 +95,7 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pResourceName)
 		}
 
 		//将注册成功的模块，加入到Hash数组中
-		if(false == m_objHashModuleList.Add_Hash_Data(strModuleName.c_str(), pModuleInfo))
+		if(false == m_objHashModuleList.Add_Hash_Data(pModuleInfo->GetName(), pModuleInfo))
 		{
 			OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] m_mapModuleInfo.AddMapData error!\n"));
 			SAFE_DELETE(pModuleInfo);
