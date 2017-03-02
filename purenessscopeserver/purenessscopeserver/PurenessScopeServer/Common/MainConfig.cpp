@@ -604,18 +604,6 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
 	}
 
 	//开始获得加载模块参数
-	pData = m_MainConfig.GetData("Module", "ModulePath");
-	if(pData != NULL)
-	{
-		sprintf_safe(m_szModulePath, MAX_BUFF_200, "%s", pData);
-	}
-
-	pData = m_MainConfig.GetData("Module", "ModuleString");
-	if(pData != NULL)
-	{
-		sprintf_safe(m_szResourceName, MAX_BUFF_200, "%s", pData);
-	}
-
 	pData = m_MainConfig.GetData("ModuleManager", "MaxCount");
 	if(pData != NULL)
 	{

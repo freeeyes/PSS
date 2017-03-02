@@ -44,7 +44,7 @@ public:
 	void Close();
 
 	bool LoadModule(const char* pModulePath, const char* pModuleName, const char* pModuleParam);
-	bool UnLoadModule(const char* szResourceName, bool blIsDelete = true);
+	bool UnLoadModule(const char* szModuleName, bool blIsDelete = true);
 
 	int  SendModuleMessage(const char* pModuleName, uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket);
 
@@ -63,7 +63,6 @@ public:
 	const char* GetModuleName(uint16 u2Index);
 
 private:
-	bool ParseModule(const char* szResourceName, vector<string>& vecModuleName);                     //将字符串解析成数组
 	bool LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo, const char* pModulePath);    //开始加载模块的接口和数据
 
 private:

@@ -107,10 +107,10 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, c
 	return true;
 }
 
-bool CLoadModule::UnLoadModule(const char* szResourceName, bool blIsDelete)
+bool CLoadModule::UnLoadModule(const char* szModuleName, bool blIsDelete)
 {
-	OUR_DEBUG((LM_ERROR, "[CLoadModule::UnLoadModule]szResourceName=%s.\n", szResourceName));
-	string strModuleName = szResourceName;
+	OUR_DEBUG((LM_ERROR, "[CLoadModule::UnLoadModule]szResourceName=%s.\n", szModuleName));
+	string strModuleName = szModuleName;
 	_ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(strModuleName.c_str());
 	if(NULL == pModuleInfo)
 	{
@@ -163,39 +163,6 @@ _ModuleInfo* CLoadModule::GetModuleIndex(int nIndex)
 _ModuleInfo* CLoadModule::GetModuleInfo(const char* pModuleName)
 {
 	return m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
-}
-
-bool CLoadModule::ParseModule(const char* szResourceName, vector<string>& vecModuleName)
-{
-	char szResource[MAX_BUFF_1024]  = {'\0'};
-	char szModuleName[MAX_BUFF_100] = {'\0'};
-	int  nPos = 0;
-
-	if(szResourceName[ACE_OS::strlen(szResourceName) - 1] != ',')
-	{
-		sprintf_safe(szResource, MAX_BUFF_1024, "%s,", szResourceName);
-	}
-	else
-	{
-		sprintf_safe(szResource, MAX_BUFF_1024, "%s", szResourceName);
-	}
-
-	for(uint16 i = 0; i < (uint16)ACE_OS::strlen(szResource); i++)
-	{
-		if(szResource[i] == ',')
-		{
-			szModuleName[nPos] = '\0';
-			nPos = 0;
-			vecModuleName.push_back((string)szModuleName);
-		}
-		else
-		{
-			szModuleName[nPos] = szResource[i];
-			nPos++;
-		}
-	}
-
-	return true;
 }
 
 bool CLoadModule::LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo, const char* pModulePath)
