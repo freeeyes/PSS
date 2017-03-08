@@ -39,7 +39,7 @@ struct _MakePacket
 		m_u4ConnectID       = 0;
 		m_u1Option          = 0;
 		m_pPacketParse      = NULL;
-		m_nHashID          = 0;
+		m_nHashID           = 0;
 	}
 
 	void Clear()

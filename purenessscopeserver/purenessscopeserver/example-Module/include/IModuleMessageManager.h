@@ -1,4 +1,4 @@
-ï»¿#ifndef _IMODULEMESSAGEMANAGER_H
+#ifndef _IMODULEMESSAGEMANAGER_H
 #define _IMODULEMESSAGEMANAGER_H
 
 #include "IBuffPacket.h"
@@ -7,7 +7,8 @@ class IModuleMessageManager
 {
 public:
     virtual ~IModuleMessageManager() {}
-    virtual int SendModuleMessage(const char* pModuleName, uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket) = 0; //å¤„ç†æ¨¡å—é—´çš„è°ƒç”¨å…³ç³»
+	virtual int SendModuleMessage(const char* pModuleName, uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket) = 0; //´¦ÀíÄ£¿é¼äµÄµ÷ÓÃ¹ØÏµ
+	virtual int SendFrameMessage(uint16 u2CommandID, uint32 u4ConnectID, IBuffPacket* pHeadPacket, IBuffPacket* pBodyBuffPacket)         = 0;  //Ïò²å¼şÌí¼ÓÃüÁî£¬¿ÉÒÔ»Øµ÷µ½ÆäËû²å¼ş
 };
 
 #endif
