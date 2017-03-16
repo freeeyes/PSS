@@ -155,7 +155,7 @@ bool CProConnectHandle::Close(int nIOCount, int nErrno)
 	return false;
 }
 
-bool CProConnectHandle::ServerClose(EM_Client_Close_status emStatus)
+bool CProConnectHandle::ServerClose(EM_Client_Close_status emStatus, uint8 u1OptionEvent)
 {
 	if(CLIENT_CLOSE_IMMEDIATLY == emStatus)
 	{
@@ -164,7 +164,7 @@ bool CProConnectHandle::ServerClose(EM_Client_Close_status emStatus)
 
 		objMakePacket.m_u4ConnectID       = GetConnectID();
 		objMakePacket.m_pPacketParse      = NULL;
-		objMakePacket.m_u1Option          = PACKET_SDISCONNECT;
+		objMakePacket.m_u1Option          = u1OptionEvent;
 
 		//发送服务器端链接断开消息。
 		ACE_Time_Value tvNow = ACE_OS::gettimeofday();
@@ -700,7 +700,7 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
 			//查看是否所有字节都发送完毕，都发送完毕调用服务器关闭接口
 			if(m_u4ReadSendSize - m_u4SuccessSendSize == 0)
 			{
-				ServerClose(CLIENT_CLOSE_IMMEDIATLY);
+				ServerClose(CLIENT_CLOSE_IMMEDIATLY, PACKET_CHEK_TIMEOUT);
 			}
 		}
 
