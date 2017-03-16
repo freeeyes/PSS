@@ -1,7 +1,7 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PlugClient", "PlugClient\PlugClient.vcproj", "{B223B8DE-0548-413F-8FCC-F7A5E37FCE8A}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PSSPlugClient", "PlugClient\PlugClient.vcxproj", "{B223B8DE-0548-413F-8FCC-F7A5E37FCE8A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
