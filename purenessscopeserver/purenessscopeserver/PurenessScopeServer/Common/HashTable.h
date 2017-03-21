@@ -444,6 +444,7 @@ public:
 	//初始化Hash块
 	void Init(char* pData, int nHashCount, int nKeySize = DEF_HASH_KEY_SIZE)
 	{
+		memset(pData, 0, Get_Size(nHashCount, nKeySize));
 		int nPos = 0;
 		m_pBase  = pData;
 		m_objHashPool.Init(&pData[nPos], nHashCount, nKeySize);	
@@ -481,6 +482,11 @@ public:
 		}
 		else
 		{
+			if(NULL == m_lpTable[nIndex])
+			{
+				return NULL;
+			}
+
 			_Hash_Table_Cell<T>* pData = m_lpTable[nIndex]->m_pData;
 			if(NULL == pData)
 			{
@@ -528,7 +534,7 @@ public:
 			return -1;
 		}
 
-		if((short)strlen(lpszString) >= m_lpTable[nIndex].m_sKeyLen)
+		if((short)strlen(lpszString) >= m_lpTable[nIndex]->m_pData->m_sKeyLen)
 		{
 			return -1;
 		}
@@ -723,8 +729,8 @@ private:
 			while(NULL != pLastLink)
 			{
 				//printf("[CHashTable::GetHashTablePos]pLastLink->m_pData=0x%08x.\n", pLastLink->m_pData);
-				printf("[CHashTable::GetHashTablePos]pLastLink->m_pData->m_pKey=%s.\n", pLastLink->m_pData->m_pKey);
-				printf("[CHashTable::GetHashTablePos]lpszString=%s.\n", lpszString);
+				//printf("[CHashTable::GetHashTablePos]pLastLink->m_pData->m_pKey=%s.\n", pLastLink->m_pData->m_pKey);
+				//printf("[CHashTable::GetHashTablePos]lpszString=%s.\n", lpszString);
 				if(NULL != pLastLink->m_pData && strcmp(pLastLink->m_pData->m_pKey, lpszString) == 0)
 				{
 					//找到了对应的key,这个数据已经存在

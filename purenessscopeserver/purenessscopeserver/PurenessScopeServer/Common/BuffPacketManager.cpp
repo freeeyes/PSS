@@ -151,15 +151,6 @@ void CBuffPacketManager::Init(uint32 u4PacketCount, bool blByteOrder)
 		}
 	}
 
-	for(int i = 0; i < m_objHashBuffPacketList.Get_Count(); i++)
-	{
-		if(NULL == m_objHashBuffPacketList.Get_Index(i))
-		{
-			OUR_DEBUG((LM_INFO, "[CBuffPacketManager::Init]ERROR(%d).\n", i));
-			m_objHashBuffPacketList.Get_Index(i);
-		}
-	}
-
 	m_u4CulationIndex = 0;
 	//设定当前对象池的字序
 	m_blSortType = blByteOrder;
