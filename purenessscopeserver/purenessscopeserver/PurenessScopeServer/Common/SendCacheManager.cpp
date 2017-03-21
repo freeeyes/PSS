@@ -15,7 +15,7 @@ CSendCacheManager::~CSendCacheManager()
 void CSendCacheManager::Init(uint32 u4CacheCount, uint32 u4CacheSize)
 {
 	//≥ı ºªØHashTable
-	size_t nArraySize = (sizeof(_Hash_Table_Cell<ACE_Message_Block>)) * u4CacheCount;
+	size_t nArraySize = m_objCacheHashList.Get_Size(u4CacheCount);
 	char* pHashBase = new char[nArraySize];
 	m_objCacheHashList.Init(pHashBase, (int)u4CacheCount);
 

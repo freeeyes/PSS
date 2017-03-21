@@ -126,7 +126,7 @@ void CBuffPacketManager::Init(uint32 u4PacketCount, bool blByteOrder)
 	Close();
 
 	//≥ı ºªØHash±Ì
-	size_t nArraySize = (sizeof(_Hash_Table_Cell<CBuffPacket>)) * u4PacketCount;
+	size_t nArraySize = m_objHashBuffPacketList.Get_Size(u4PacketCount);
 	char* pHashBase = new char[nArraySize];
 	m_objHashBuffPacketList.Init(pHashBase, (int)u4PacketCount);
 

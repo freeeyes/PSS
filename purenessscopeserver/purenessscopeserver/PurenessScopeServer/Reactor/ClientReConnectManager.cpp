@@ -236,12 +236,12 @@ bool CClientReConnectManager::Init(ACE_Reactor* pReactor)
 	m_u4MaxPoolCount = App_MainConfig::instance()->GetServerConnectCount();
 
 	//初始化Hash数组(TCP)
-	size_t nArraySize = (sizeof(_Hash_Table_Cell<CReactorClientInfo>)) * m_u4MaxPoolCount;
+	size_t nArraySize = m_objClientTCPList.Get_Size(m_u4MaxPoolCount);
 	char* pHashBase = new char[nArraySize];
 	m_objClientTCPList.Init(pHashBase, (int)m_u4MaxPoolCount);
 
 	//初始化Hash数组(UDP)
-	nArraySize = (sizeof(_Hash_Table_Cell<CReactorUDPClient>)) * m_u4MaxPoolCount;
+	nArraySize = m_objClientUDPList.Get_Size(m_u4MaxPoolCount);
 	pHashBase = new char[nArraySize];
 	m_objClientUDPList.Init(pHashBase, (int)m_u4MaxPoolCount);
 

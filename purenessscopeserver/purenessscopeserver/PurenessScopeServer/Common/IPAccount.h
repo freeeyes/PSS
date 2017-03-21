@@ -102,7 +102,7 @@ public:
 		m_nMaxConnectCount = u4IPCount;
 
 		//≥ı ºªØHashTable
-		size_t nArraySize = (sizeof(_Hash_Table_Cell<_IPAccount>)) * u4IPCount;
+		size_t nArraySize = m_objIPList.Get_Size(u4IPCount);
 		char* pHashBase = new char[nArraySize];
 		m_objIPList.Init(pHashBase, (int)u4IPCount);
 
