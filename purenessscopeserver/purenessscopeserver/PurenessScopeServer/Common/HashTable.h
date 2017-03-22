@@ -46,11 +46,6 @@ struct _Hash_Table_Cell
 	//清理对象信息
 	void Clear()
 	{
-		if(m_nPosIndex == 3807)
-		{
-			int a = 1;
-		}
-
 		m_cExists       = 0;
 		if(NULL != m_pKey)
 		{
@@ -468,10 +463,6 @@ public:
 			m_lpTable[i] = NULL;
 		}
 		nPos += sizeof(_Hash_Link_Info<T>* ) * nHashCount;
-		if(nPos == 0)
-		{
-			int a = 1;
-		}
 		//printf("[Init]nPos=%d.\n", nPos);
 	}	
 

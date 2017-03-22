@@ -288,7 +288,7 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 	}
 
 	//写入连接日志
-	AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Connection from [%s:%d]To Server.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number());
+	AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Connection from [%s:%d]To Server GetHandlerID=%d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), GetHandlerID());
 
 	//ACE_Sig_Action writeAction((ACE_SignalHandler)SIG_IGN);
 	//writeAction.register_action(SIGPIPE, 0);
@@ -665,6 +665,8 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
 		int nErrno = errno;
 		OUR_DEBUG ((LM_DEBUG,"[CConnectHandler::handle_write_stream] Connectid=[%d] begin(%d)...\n",GetConnectID(), nErrno));
 
+		AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Send[%s:%d] pMbData=%d FAIL.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), result.message_block().length());
+
 		AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "WriteError [%s:%d] nErrno = %d  result.bytes_transferred() = %d, ",
 			m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), nErrno, 
 			result.bytes_transferred());
@@ -1038,6 +1040,12 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 	//异步发送方法
 	if(NULL != pMbData)
 	{
+		//因为是异步的，所以可能会接收到上次成功的数据包累计，这里需要注意一下。
+		if(m_u4SuccessSendSize > m_u4ReadSendSize)
+		{
+			m_u4SuccessSendSize = m_u4ReadSendSize;
+		}
+
 		//比较水位标，是否超过一定数值，也就是说发快收慢的时候，如果超过一定数值，断开连接
 		if(m_u4ReadSendSize - m_u4SuccessSendSize >= App_MainConfig::instance()->GetSendDataMask())
 		{
@@ -1076,6 +1084,7 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 		//OUR_DEBUG ((LM_ERROR, "[CConnectHandler::PutSendPacket] Connectid=%d, length=%d!\n", GetConnectID(), pMbData->length()));
 		if(0 != m_Writer.write(*pMbData, pMbData->length()))
 		{
+			
 			OUR_DEBUG ((LM_ERROR, "[CProConnectHandle::PutSendPacket] Connectid=%d mb=%d m_writer.write error(%d)!\n", GetConnectID(),  pMbData->length(), errno));
 			//如果发送失败，在这里返回失败，回调给业务逻辑去处理
 			ACE_Time_Value tvNow = ACE_OS::gettimeofday();
