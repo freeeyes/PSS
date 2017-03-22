@@ -46,6 +46,11 @@ struct _Hash_Table_Cell
 	//清理对象信息
 	void Clear()
 	{
+		if(m_nPosIndex == 3807)
+		{
+			int a = 1;
+		}
+
 		m_cExists       = 0;
 		if(NULL != m_pKey)
 		{
@@ -467,7 +472,7 @@ public:
 		{
 			int a = 1;
 		}
-		printf("[Init]nPos=%d.\n", nPos);
+		//printf("[Init]nPos=%d.\n", nPos);
 	}	
 
 	//得到当前对象总数
@@ -501,9 +506,8 @@ public:
 				pT         = m_lpTable[i]->m_pData->m_pValue;
 				char* pKey = m_lpTable[i]->m_pData->m_pKey;
 
-				//设置状态
-				 m_lpTable[i] = m_lpTable[i]->m_pNext;
-				 m_nCurrLinkIndex = i;
+				//printf("[Pop]1 pKey=%s.\n", pKey);
+
 				//回收数据
 				Del_Hash_Data(pKey);
 				return pT;
@@ -521,6 +525,9 @@ public:
 				//设置状态
 				m_lpTable[i] = m_lpTable[i]->m_pNext;
 				m_nCurrLinkIndex = i;
+
+				//printf("[Pop]2 pKey=%s.\n", pKey);
+
 				//回收数据
 				Del_Hash_Data(pKey);
 				return pT;
@@ -539,16 +546,14 @@ public:
 			return false;
 		}
 
+		//printf("[Push]pKey=%s.\n", pKey);
+
 		//根据key计算这个点的hash位置
 		unsigned long uHashStart = HashString(pKey, m_objHashPool.Get_Count());
 		
 		_Hash_Link_Info<T>* pLastLink = m_lpTable[uHashStart];
 		while(NULL != pLastLink)
 		{
-			if(pLastLink->m_pNext == NULL)
-			{
-				break;
-			}
 			pLastLink = pLastLink->m_pNext;
 		}
 
@@ -568,7 +573,14 @@ public:
 		pData->m_pValue    = pT;
 		pLink->m_pData     = pData;
 		pLink->m_pPerv     = pLastLink;
-		pLastLink->m_pNext = pLink;
+		if(pLastLink != NULL)
+		{
+			pLastLink->m_pNext = pLink;
+		}
+		else
+		{
+			m_lpTable[uHashStart] = pLink;
+		}
 
 		return true;
 	}
@@ -798,10 +810,18 @@ private:
 					if(pLastLink->m_pPerv == NULL)
 					{
 						m_lpTable[uHashStart] = pLastLink->m_pNext;
+						if(NULL != pLastLink->m_pNext)
+						{
+							pLastLink->m_pNext->m_pPerv = NULL;
+						}
 					}
 					else
 					{
 						pLastLink->m_pPerv->m_pNext = pLastLink->m_pNext;
+						if(NULL != pLastLink->m_pNext)
+						{
+							pLastLink->m_pNext->m_pPerv = pLastLink->m_pPerv;
+						}
 					}
 
 					//回收指针链表和对象
