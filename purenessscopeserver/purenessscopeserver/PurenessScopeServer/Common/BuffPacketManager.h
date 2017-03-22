@@ -30,7 +30,6 @@ public:
 private:
 	CHashTable<CBuffPacket>    m_objHashBuffPacketList;               //存储空闲BuffPacket指针的hash列表
 	bool                       m_blSortType;                          //字序规则，true为网序，false为主机序
-	uint32                     m_u4CulationIndex;                     //查找起始点
 	ACE_Recursive_Thread_Mutex m_ThreadWriteLock;
 };
 

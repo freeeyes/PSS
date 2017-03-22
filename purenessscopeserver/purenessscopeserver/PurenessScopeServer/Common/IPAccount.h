@@ -90,7 +90,7 @@ public:
 	{
 		for(int i = 0; i < m_objIPList.Get_Count(); i++)
 		{
-			_IPAccount* pIPAccount = m_objIPList.Get_Index(i);
+			_IPAccount* pIPAccount = m_objIPList.Pop();
 			SAFE_DELETE(pIPAccount);
 		}
 
@@ -125,15 +125,17 @@ public:
 		if(u2NowTime - m_u2CurrTime >= 10)
 		{
 			//清理Hash数组
-			for(int i = 0; i < m_objIPList.Get_Count(); i++)
+			vector<_IPAccount* > vecIPAccount;
+			m_objIPList.Get_All_Used(vecIPAccount);
+			for(int i = 0; i < (int)vecIPAccount.size(); i++)
 			{
-				_IPAccount* pIPAccount = m_objIPList.Get_Index(i);
+				_IPAccount* pIPAccount =vecIPAccount[i];
 				if(NULL != pIPAccount)
 				{
-					if(false == pIPAccount)
+					if(false == pIPAccount->Check(dtNowTime))
 					{
+						m_objIPList.Del_Hash_Data(pIPAccount->m_strIP.c_str());
 						SAFE_DELETE(pIPAccount);
-						m_objIPList.Set_Index_Clear(i);
 					}
 				}
 			}
@@ -196,9 +198,11 @@ public:
 	void GetInfo(vecIPAccount& VecIPAccount)
 	{
 		ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
-		for(int i = 0; i < m_objIPList.Get_Count(); i++)
+		vector<_IPAccount* > vecIPAccount;
+		m_objIPList.Get_All_Used(vecIPAccount);
+		for(int i = 0; i < (int)m_objIPList.Get_Count(); i++)
 		{
-			_IPAccount* pIPAccount = m_objIPList.Get_Index(i);
+			_IPAccount* pIPAccount = vecIPAccount[i];
 			if(NULL != pIPAccount)
 			{
 				VecIPAccount.push_back(*pIPAccount);

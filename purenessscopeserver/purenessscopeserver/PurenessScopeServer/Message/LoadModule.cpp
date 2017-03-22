@@ -33,10 +33,12 @@ void CLoadModule::Close()
 	//OUR_DEBUG((LM_INFO, "[CLoadModule::Close]m_mapModuleInfo.GetSize=%d.\n", m_mapModuleInfo.GetSize()))
 
 	vector<string> obj_vecModuleName;
-	for(int i = 0; i < m_objHashModuleList.Get_Count(); i++)
+	vector<_ModuleInfo*> vecModuleInfo;
+	m_objHashModuleList.Get_All_Used(vecModuleInfo);
+	for(int i = 0; i < (int)vecModuleInfo.size(); i++)
 	{
 		//OUR_DEBUG((LM_INFO, "[CLoadModule::Close]active name=%s.\n", m_mapModuleInfo.GetMapDataKey(i).c_str()));
-		_ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Index(i);
+		_ModuleInfo* pModuleInfo = vecModuleInfo[i];
 		if(NULL != pModuleInfo)
 		{
 			obj_vecModuleName.push_back(pModuleInfo->GetName());
@@ -148,16 +150,6 @@ int CLoadModule::GetCurrModuleCount()
 int CLoadModule::GetModulePoolCount()
 {
 	return m_objHashModuleList.Get_Count();
-}
-
-_ModuleInfo* CLoadModule::GetModuleIndex(int nIndex)
-{
-	if(nIndex < 0 || nIndex >= m_objHashModuleList.Get_Count())
-	{
-		return NULL;
-	}
-
-	return m_objHashModuleList.Get_Index(nIndex);
 }
 
 _ModuleInfo* CLoadModule::GetModuleInfo(const char* pModuleName)
@@ -330,22 +322,8 @@ uint16 CLoadModule::GetModuleCount()
 	return (uint16)m_objHashModuleList.Get_Used_Count();
 }
 
-const char* CLoadModule::GetModuleName(uint16 u2Index)
+void CLoadModule::GetAllModuleInfo(vector<_ModuleInfo*>& vecModeInfo)
 {
-	if(u2Index >= (uint16)m_objHashModuleList.Get_Count())
-	{
-		return NULL;
-	}
-	else
-	{
-		_ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Index((int)u2Index);
-		if(NULL != pModuleInfo)
-		{
-			return pModuleInfo->strModuleName.c_str();
-		}
-		else
-		{
-			return NULL;
-		}
-	}
+	m_objHashModuleList.Get_All_Used(vecModeInfo);
 }
+

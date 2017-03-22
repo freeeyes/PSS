@@ -50,7 +50,6 @@ public:
 
 	int  GetCurrModuleCount();
 	int  GetModulePoolCount();
-	_ModuleInfo* GetModuleIndex(int nIndex);
 	_ModuleInfo* GetModuleInfo(const char* pModuleName);
 
 	//插件接口提供相关功能
@@ -60,7 +59,7 @@ public:
 	const char* GetModuleFilePath(const char* pModuleName);
 	const char* GetModuleFileDesc(const char* pModuleName);
 	uint16 GetModuleCount();
-	const char* GetModuleName(uint16 u2Index);
+	void GetAllModuleInfo(vector<_ModuleInfo*>& vecModeInfo);
 
 private:
 	bool LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo, const char* pModulePath);    //开始加载模块的接口和数据

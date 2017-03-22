@@ -760,9 +760,11 @@ bool CConsoleMessage::DoMessage_ShowModule(_CommandInfo& CommandInfo, IBuffPacke
 			}
 		}
 
-		for(int i = 0; i < App_ModuleLoader::instance()->GetModulePoolCount(); i++)
+		vector<_ModuleInfo*> vecModeInfo;
+		App_ModuleLoader::instance()->GetAllModuleInfo(vecModeInfo);
+		for(int i = 0; i < (int)vecModeInfo.size(); i++)
 		{
-			_ModuleInfo* pModuleInfo = App_ModuleLoader::instance()->GetModuleIndex(i);
+			_ModuleInfo* pModuleInfo = vecModeInfo[i];
 			if(NULL != pModuleInfo)
 			{
 				VCHARS_STR strSName;
@@ -1389,20 +1391,16 @@ bool CConsoleMessage::DoMessage_ShowAllCommandInfo(_CommandInfo& CommandInfo, IB
 
 		//统计个数
 		uint32 u4Count = 0;
-		for(int i = 0; i < pHashModuleClient->Get_Count(); i++)
-		{
-			if(NULL != pHashModuleClient->Get_Index(i))
-			{
-				u4Count++;
-			}
-		}
+		vector<_ModuleClient*> vecModuleClient;
+		pHashModuleClient->Get_All_Used(vecModuleClient);
+		u4Count = (uint32)vecModuleClient.size();
 
 		if(pHashModuleClient != NULL)
 		{
 			(*pBuffPacket) << u4Count;
-			for(int i = 0; i < pHashModuleClient->Get_Count(); i++)
+			for(int i = 0; i < (int)vecModuleClient.size(); i++)
 			{
-				_ModuleClient* pModuleClient = pHashModuleClient->Get_Index(i);
+				_ModuleClient* pModuleClient = vecModuleClient[i];
 				if(NULL != pModuleClient)
 				{
 					(*pBuffPacket) << (uint32)pModuleClient->m_vecClientCommandInfo.size();

@@ -1,4 +1,4 @@
-ï»¿#ifndef _IMODULEINFO_H
+#ifndef _IMODULEINFO_H
 #define _IMODULEINFO_H
 
 #include "define.h"
@@ -7,13 +7,12 @@ class IModuleInfo
 {
 public:
     virtual ~IModuleInfo() {}
-    virtual bool GetModuleExist(const char* pModuleName)           = 0;   //æŒ‡å®šçš„æ¨¡å—æ˜¯å¦å­˜åœ¨
-    virtual const char* GetModuleParam(const char* pModuleName)    = 0;   //å¾—åˆ°æ¨¡å—åŠ è½½å‚æ•°
-    virtual const char* GetModuleFileName(const char* pModuleName) = 0;   //å¾—åˆ°æ¨¡å—æ–‡ä»¶å
-    virtual const char* GetModuleFilePath(const char* pModuleName) = 0;   //å¾—åˆ°æ¨¡å—åŠ è½½è·¯å¾„
-    virtual const char* GetModuleFileDesc(const char* pModuleName) = 0;   //å¾—åˆ°æ¨¡å—æè¿°ä¿¡æ¯
-    virtual uint16 GetModuleCount()                                = 0;   //å¾—åˆ°åŠ è½½æ¨¡å—ä¸ªæ•°
-    virtual const char* GetModuleName(uint16 u2Index)              = 0;   //æ ¹æ®Indexå¾—åˆ°æ¨¡å—çš„åç§°
+	virtual bool GetModuleExist(const char* pModuleName)             = 0;   //Ö¸¶¨µÄÄ£¿éÊÇ·ñ´æÔÚ
+	virtual const char* GetModuleParam(const char* pModuleName)      = 0;   //µÃµ½Ä£¿é¼ÓÔØ²ÎÊı
+	virtual const char* GetModuleFileName(const char* pModuleName)   = 0;   //µÃµ½Ä£¿éÎÄ¼şÃû
+	virtual const char* GetModuleFilePath(const char* pModuleName)   = 0;   //µÃµ½Ä£¿é¼ÓÔØÂ·¾¶
+	virtual const char* GetModuleFileDesc(const char* pModuleName)   = 0;   //µÃµ½Ä£¿éÃèÊöĞÅÏ¢
+	virtual uint16 GetModuleCount()                                  = 0;   //µÃµ½¼ÓÔØÄ£¿é¸öÊı
 };
 
 #endif

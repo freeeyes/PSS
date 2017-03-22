@@ -1895,9 +1895,10 @@ void CConnectManager::CloseAll()
 	KillTimer();
 
 	vector<CConnectHandler*> vecCloseConnectHandler;
-	for(int i = 0; i < m_objHashConnectList.Get_Count(); i++)
+	m_objHashConnectList.Get_All_Used(vecCloseConnectHandler);
+	for(int i = 0; i < (int)vecCloseConnectHandler.size(); i++)
 	{
-		CConnectHandler* pConnectHandler = m_objHashConnectList.Get_Index(i);
+		CConnectHandler* pConnectHandler = vecCloseConnectHandler[i];
 		if(pConnectHandler != NULL)
 		{
 			vecCloseConnectHandler.push_back(pConnectHandler);
@@ -2261,9 +2262,11 @@ int CConnectManager::handle_timeout(const ACE_Time_Value &tv, const void *arg)
 		if(m_objHashConnectList.Get_Used_Count() > 0)
 		{
 			m_ThreadWriteLock.acquire();
-			for(int i = 0; i < m_objHashConnectList.Get_Count(); i++)
+			vector<CConnectHandler*> vecConnectHandler;
+			m_objHashConnectList.Get_All_Used(vecConnectHandler);
+			for(int i = 0; i < (int)vecConnectHandler.size(); i++)
 			{
-				CConnectHandler* pConnectHandler = (CConnectHandler* )m_objHashConnectList.Get_Index(i);
+				CConnectHandler* pConnectHandler = (CConnectHandler* )vecConnectHandler[i];
 				if(pConnectHandler != NULL)
 				{
 					if(false == pConnectHandler->CheckAlive(tvNow))
@@ -2458,10 +2461,11 @@ void CConnectManager::SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4TimeCost
 void CConnectManager::GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo)
 {
 	//ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
-
-	for(int i = 0; i < m_objHashConnectList.Get_Count(); i++)
+	vector<CConnectHandler*> vecConnectHandler;
+	m_objHashConnectList.Get_All_Used(vecConnectHandler);
+	for(int i = 0; i < (int)vecConnectHandler.size(); i++)
 	{
-		CConnectHandler* pConnectHandler = m_objHashConnectList.Get_Index(i);
+		CConnectHandler* pConnectHandler = vecConnectHandler[i];
 		if(pConnectHandler != NULL)
 		{
 			VecClientConnectInfo.push_back(pConnectHandler->GetClientInfo());
@@ -2507,14 +2511,7 @@ bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType,
 {
 	m_ThreadWriteLock.acquire();
 	vector<CConnectHandler*> objvecConnectManager;
-	for(int i = 0; i < m_objHashConnectList.Get_Count(); i++)
-	{
-		CConnectHandler* pConnectHandler = m_objHashConnectList.Get_Index(i);
-		if(NULL != pConnectHandler)
-		{
-			objvecConnectManager.push_back(pConnectHandler);
-		}
-	}
+	m_objHashConnectList.Get_All_Used(objvecConnectManager);
 	m_ThreadWriteLock.release();
 
 	uint32 u4ConnectID = 0;
@@ -2654,9 +2651,11 @@ bool CConnectManager::SetIsLog(uint32 u4ConnectID, bool blIsLog)
 
 void CConnectManager::GetClientNameInfo(const char* pName, vecClientNameInfo& objClientNameInfo)
 {
-	for(int i = 0; i < m_objHashConnectList.Get_Count(); i++)
+	vector<CConnectHandler*> vecConnectHandler;
+	m_objHashConnectList.Get_All_Used(vecConnectHandler);
+	for(int i = 0; i < (int)vecConnectHandler.size(); i++)
 	{
-		CConnectHandler* pConnectHandler = m_objHashConnectList.Get_Index(i);
+		CConnectHandler* pConnectHandler = vecConnectHandler[i];
 		if(NULL != pConnectHandler && ACE_OS::strcmp(pConnectHandler->GetConnectName(), pName) == 0)
 		{
 			_ClientNameInfo ClientNameInfo;
@@ -2769,14 +2768,15 @@ void CConnectHandlerPool::Init(int nObjcetCount)
 void CConnectHandlerPool::Close()
 {
 	//清理所有已存在的指针
-	for(int i = 0; i < m_objHashHandleList.Get_Count(); i++)
+	vector<CConnectHandler*> vecConnectHandler;
+	m_objHashHandleList.Get_All_Used(vecConnectHandler);
+	for(int i = 0; i < (int)vecConnectHandler.size(); i++)
 	{
-		CConnectHandler* pHandler = m_objHashHandleList.Get_Index(i);
+		CConnectHandler* pHandler = vecConnectHandler[i];
 		SAFE_DELETE(pHandler);
 	}
 
 	m_u4CurrMaxCount  = 1;
-	m_u4CulationIndex = 0;
 }
 
 int CConnectHandlerPool::GetUsedCount()
@@ -2800,58 +2800,7 @@ CConnectHandler* CConnectHandlerPool::Create()
 	CConnectHandler* pHandler = NULL;
 
 	//在Hash表中弹出一个已使用的数据
-	//判断循环指针是否已经找到了尽头，如果是则从0开始继续
-	if(m_u4CulationIndex + 1 >= m_u4CurrMaxCount - 1)
-	{
-		m_u4CulationIndex = 0;
-	}
-
-	//第一次寻找，从当前位置往后找
-	for(int i = (int)m_u4CulationIndex; i < m_objHashHandleList.Get_Count(); i++)
-	{
-		pHandler = m_objHashHandleList.Get_Index(i);
-		if(NULL != pHandler)
-		{
-			//已经找到了，返回指针
-			char szHandlerID[10] = {'\0'};
-			sprintf_safe(szHandlerID, 10, "%d", pHandler->GetHandlerID());
-			//int nDelPos = m_objHashHandleList.Del_Hash_Data(szHandlerID);
-			int nDelPos = m_objHashHandleList.Set_Index_Clear(i);
-			if(-1 == nDelPos)
-			{
-				OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
-			}
-			else
-			{
-				//OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
-			}
-			m_u4CulationIndex = i;
-			return pHandler;
-		}
-	}
-
-	//第二次寻找，从0到当前位置
-	for(int i = 0; i < (int)m_u4CulationIndex; i++)
-	{
-		pHandler = m_objHashHandleList.Get_Index(i);
-		if(NULL != pHandler)
-		{
-			//已经找到了，返回指针
-			char szHandlerID[10] = {'\0'};
-			sprintf_safe(szHandlerID, 10, "%d", pHandler->GetHandlerID());
-			int nDelPos = m_objHashHandleList.Set_Index_Clear(i);
-			if(-1 == nDelPos)
-			{
-				OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
-			}
-			else
-			{
-				//OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
-			}
-			m_u4CulationIndex = i;
-			return pHandler;
-		}
-	}
+	pHandler = m_objHashHandleList.Pop();
 
 	//没找到空余的
 	return pHandler;
@@ -2868,11 +2817,10 @@ bool CConnectHandlerPool::Delete(CConnectHandler* pObject)
 
 	char szHandlerID[10] = {'\0'};
 	sprintf_safe(szHandlerID, 10, "%d", pObject->GetHandlerID());
-	//int nPos = m_objHashHandleList.Add_Hash_Data(szHandlerID, pObject);
-	int nPos = m_objHashHandleList.Set_Index(pObject->GetHashID(), szHandlerID, pObject);
-	if(-1 == nPos)
+	bool blState = m_objHashHandleList.Push(szHandlerID, pObject);
+	if(false == blState)
 	{
-		OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHandlerID, pObject, nPos));
+		OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Delete]szHandlerID=%s(0x%08x).\n", szHandlerID, pObject));
 	}
 	else
 	{

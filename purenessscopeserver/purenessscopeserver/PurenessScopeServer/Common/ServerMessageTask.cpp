@@ -34,7 +34,6 @@ void CServerMessageInfoPool::Init(uint32 u4PacketCount /*= MAX_SERVER_MESSAGE_IN
 				pPacket->SetHashID(nHashPos);
 			}
 		}
-		m_u4CulationIndex = 1;
 	}
 }
 
@@ -60,53 +59,7 @@ _Server_Message_Info* CServerMessageInfoPool::Create()
 	_Server_Message_Info* pMessage = NULL;
 
 	//在Hash表中弹出一个已使用的数据
-	//判断循环指针是否已经找到了尽头，如果是则从0开始继续
-	if(m_u4CulationIndex >= (uint32)(m_objServerMessageList.Get_Count() - 1))
-	{
-		m_u4CulationIndex = 0;
-	}
-
-	//第一次寻找，从当前位置往后找
-	for(int i = (int)m_u4CulationIndex; i < m_objServerMessageList.Get_Count(); i++)
-	{
-		pMessage = m_objServerMessageList.Get_Index(i);
-		if(NULL != pMessage)
-		{
-			//已经找到了，返回指针
-			int nDelPos = m_objServerMessageList.Set_Index_Clear(i);
-			if(-1 == nDelPos)
-			{
-				OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Create]szHashID=%d, nPos=%d, nDelPos=%d, (0x%08x).\n", pMessage->GetHashID(), i, nDelPos, pMessage));
-			}
-			else
-			{
-				//OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Create]szHashID=%d, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
-			}
-			m_u4CulationIndex = i;
-			return pMessage;
-		}
-	}
-
-	//第二次寻找，从0到当前位置
-	for(int i = 0; i < (int)m_u4CulationIndex; i++)
-	{
-		pMessage = m_objServerMessageList.Get_Index(i);
-		if(NULL != pMessage)
-		{
-			//已经找到了，返回指针
-			int nDelPos = m_objServerMessageList.Set_Index_Clear(i);
-			if(-1 == nDelPos)
-			{
-				OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Create]szHashID=%d, nPos=%d, nDelPos=%d, (0x%08x).\n", pMessage->GetHashID(), i, nDelPos, pMessage));
-			}
-			else
-			{
-				//OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Create]szHashID=%d, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
-			}
-			m_u4CulationIndex = i;
-			return pMessage;
-		}
-	}
+	pMessage = m_objServerMessageList.Pop();
 
 	//没找到空余的
 	return pMessage;
@@ -123,11 +76,10 @@ bool CServerMessageInfoPool::Delete(_Server_Message_Info* pObject)
 
 	char szHashID[10] = {'\0'};
 	sprintf_safe(szHashID, 10, "%d", pObject->GetHashID());
-	//int nPos = m_objHashHandleList.Add_Hash_Data(szHandlerID, pObject);
-	int nPos = m_objServerMessageList.Set_Index(pObject->GetHashID(), szHashID, pObject);
-	if(-1 == nPos)
+	bool blState = m_objServerMessageList.Push(szHashID, pObject);
+	if(false == blState)
 	{
-		OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHashID, pObject, nPos));
+		OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Delete]szHandlerID=%s(0x%08x).\n", szHashID, pObject));
 	}
 	else
 	{
@@ -142,14 +94,15 @@ bool CServerMessageInfoPool::Delete(_Server_Message_Info* pObject)
 void CServerMessageInfoPool::Close()
 {
 	//清理所有已存在的指针
-	for(int i = 0; i < m_objServerMessageList.Get_Count(); i++)
+	vector<_Server_Message_Info*> vecServerMessageInfo;
+	m_objServerMessageList.Get_All_Used(vecServerMessageInfo);
+	for(int i = 0; i < (int)vecServerMessageInfo.size(); i++)
 	{
-		_Server_Message_Info* pMessage = m_objServerMessageList.Get_Index(i);
+		_Server_Message_Info* pMessage = vecServerMessageInfo[i];
 		SAFE_DELETE(pMessage);
 	}
 
 	m_objServerMessageList.Close();
-	m_u4CulationIndex = 1;
 }
 
 CServerMessageTask::CServerMessageTask()

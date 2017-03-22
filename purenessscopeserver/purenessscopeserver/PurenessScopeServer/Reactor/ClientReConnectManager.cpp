@@ -677,9 +677,11 @@ void CClientReConnectManager::Close()
 	CancelConnectTask();
 
 	//关闭所有已存在的链接
-	for(int i = 0; i < m_objClientTCPList.Get_Count(); i++)
+	vector<CReactorClientInfo*> vecReactorClientInfo; 
+	m_objClientTCPList.Get_All_Used(vecReactorClientInfo);
+	for(int i = 0; i < (int)vecReactorClientInfo.size(); i++)
 	{
-		CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Index(i);
+		CReactorClientInfo* pClientInfo = vecReactorClientInfo[i];
 		if(NULL != pClientInfo)
 		{
 			pClientInfo->Close();
@@ -688,9 +690,11 @@ void CClientReConnectManager::Close()
 	}
 	m_objClientTCPList.Close();
 
-	for(int i = 0; i < m_objClientUDPList.Get_Count(); i++)
+	vector<CReactorUDPClient*> vecReactorUDPClient; 
+	m_objClientUDPList.Get_All_Used(vecReactorUDPClient);
+	for(int i = 0; i < (int)vecReactorUDPClient.size(); i++)
 	{
-		CReactorUDPClient* pClientInfo = m_objClientUDPList.Get_Index(i);
+		CReactorUDPClient* pClientInfo = vecReactorUDPClient[i];
 		if(NULL != pClientInfo)
 		{
 			pClientInfo->Close();
@@ -712,10 +716,12 @@ int CClientReConnectManager::handle_timeout(const ACE_Time_Value& tv, const void
 		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::handle_timeout] arg is not NULL, tv = %d.\n", tv.sec()));
 	}
 
-	for (int i = 0; i < m_objClientTCPList.Get_Count(); i++)
+	vector<CReactorClientInfo*> vecCReactorClientInfo;
+	m_objClientTCPList.Get_All_Used(vecCReactorClientInfo);
+	for (int i = 0; i < (int)vecCReactorClientInfo.size(); i++)
 	{
 		//int nServerID = (int)b->first;
-		CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Index(i);
+		CReactorClientInfo* pClientInfo = vecCReactorClientInfo[i];
 		if(NULL != pClientInfo)
 		{
 			if (NULL == pClientInfo->GetConnectClient())
@@ -745,10 +751,11 @@ void CClientReConnectManager::GetConnectInfo(vecClientConnectInfo& VecClientConn
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 	VecClientConnectInfo.clear();
-
-	for (int i = 0; i < m_objClientTCPList.Get_Count(); i++)
+	vector<CReactorClientInfo*> vecReactorClientInfo;
+	m_objClientTCPList.Get_All_Used(vecReactorClientInfo);
+	for (int i = 0; i < (int)vecReactorClientInfo.size(); i++)
 	{
-		CReactorClientInfo* pClientInfo =  m_objClientTCPList.Get_Index(i);
+		CReactorClientInfo* pClientInfo =  vecReactorClientInfo[i];
 
 		if (NULL != pClientInfo)
 		{
@@ -772,10 +779,12 @@ void CClientReConnectManager::GetConnectInfo(vecClientConnectInfo& VecClientConn
 void CClientReConnectManager::GetUDPConnectInfo(vecClientConnectInfo& VecClientConnectInfo)
 {
 	VecClientConnectInfo.clear();
+	vector<CReactorUDPClient*> vecReactorUDPClient;
+	m_objClientUDPList.Get_All_Used(vecReactorUDPClient);
 
-	for (int i = 0; i < m_objClientUDPList.Get_Count(); i++)
+	for (int i = 0; i < (int)vecReactorUDPClient.size(); i++)
 	{
-		CReactorUDPClient* pClientInfo = m_objClientUDPList.Get_Index(i);
+		CReactorUDPClient* pClientInfo = vecReactorUDPClient[i];
 
 		if (NULL != pClientInfo)
 		{
@@ -918,9 +927,11 @@ bool CClientReConnectManager::DeleteIClientMessage(IClientMessage* pClientMessag
 	App_ServerMessageTask::instance()->DelClientMessage(pClientMessage);
 
 	//一一寻找与之对应的连接以及相关信息并删除之
-	for(int i = 0; i < m_objClientTCPList.Get_Count(); i++)
+	vector<CReactorClientInfo*> vecReactorClientInfo;
+	m_objClientTCPList.Get_All_Used(vecReactorClientInfo);
+	for(int i = 0; i < (int)vecReactorClientInfo.size(); i++)
 	{
-		CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Index(i);
+		CReactorClientInfo* pClientInfo = vecReactorClientInfo[i];
 
 		if(NULL != pClientInfo && pClientInfo->GetClientMessage() == pClientMessage)
 		{

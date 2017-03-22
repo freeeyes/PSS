@@ -387,16 +387,20 @@ int CMessageManager::GetCommandCount()
 void CMessageManager::Close()
 {
 	//类关闭的清理工作
-	for(int i = 0; i < (int)m_objClientCommandList.Get_Count(); i++)
+	vector<CClientCommandList*> vecClientCommandList;
+	m_objClientCommandList.Get_All_Used(vecClientCommandList);
+	for(int i = 0; i < (int)vecClientCommandList.size(); i++)
 	{
-		CClientCommandList* pClientCommandList = m_objClientCommandList.Get_Index(i);
+		CClientCommandList* pClientCommandList =vecClientCommandList[i];
 		 SAFE_DELETE(pClientCommandList);
 	}
 	m_objClientCommandList.Close();
 
-	for(int i = 0; i < m_objModuleClientList.Get_Count(); i++)
+	vector<_ModuleClient*> vecModuleClient;
+	m_objModuleClientList.Get_All_Used(vecModuleClient);
+	for(int i = 0; i < (int)vecModuleClient.size(); i++)
 	{
-		_ModuleClient* pModuleClient = (_ModuleClient* )m_objModuleClientList.Get_Index(i);
+		_ModuleClient* pModuleClient = vecModuleClient[i];
 		SAFE_DELETE(pModuleClient);
 	}
 	m_objModuleClientList.Close();

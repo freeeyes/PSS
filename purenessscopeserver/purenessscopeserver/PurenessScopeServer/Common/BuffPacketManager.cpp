@@ -17,61 +17,7 @@ IBuffPacket* CBuffPacketManager::Create()
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 	CBuffPacket* pBuffPacket = NULL;
 
-	//如果free池中已经没有了，则添加到free池中。
-	//判断循环指针是否已经找到了尽头，如果是则从0开始继续
-	if(m_u4CulationIndex + 1 >= (uint32)m_objHashBuffPacketList.Get_Count() - 1)
-	{
-		m_u4CulationIndex = 0;
-	}
-
-	//第一次寻找，从当前位置往后找
-	for(int i = (int)m_u4CulationIndex; i < m_objHashBuffPacketList.Get_Count(); i++)
-	{
-		pBuffPacket = m_objHashBuffPacketList.Get_Index(i);
-		if(NULL != pBuffPacket)
-		{
-			//已经找到了，返回指针
-			char szPacketID[10] = {'\0'};
-			sprintf_safe(szPacketID, 10, "%d", pBuffPacket->GetBuffID());
-			//int nDelPos = m_objHashBuffPacketList.Del_Hash_Data(szPacketID);
-			int nDelPos = m_objHashBuffPacketList.Set_Index_Clear(i);
-			if(-1 == nDelPos)
-			{
-				OUR_DEBUG((LM_INFO, "[CBuffPacketManager::Create]szPacketID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szPacketID, i, nDelPos, pBuffPacket));
-			}
-			else
-			{
-				//OUR_DEBUG((LM_INFO, "[CBuffPacketManager::Create]szPacketID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szPacketID, i, nDelPos, pBuffPacket));
-			}
-			m_u4CulationIndex = i;
-			return (IBuffPacket* )pBuffPacket;
-		}
-	}
-
-	//第二次寻找，从0到当前位置
-	for(int i = 0; i < (int)m_u4CulationIndex; i++)
-	{
-		pBuffPacket = m_objHashBuffPacketList.Get_Index(i);
-		if(NULL != pBuffPacket)
-		{
-			//已经找到了，返回指针
-			char szPacketID[10] = {'\0'};
-			sprintf_safe(szPacketID, 10, "%d", pBuffPacket->GetBuffID());
-			int nDelPos = m_objHashBuffPacketList.Set_Index_Clear(i);
-			if(-1 == nDelPos)
-			{
-				OUR_DEBUG((LM_INFO, "[CBuffPacketManager::Create]szPacketID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szPacketID, i, nDelPos, pBuffPacket));
-			}
-			else
-			{
-				//OUR_DEBUG((LM_INFO, "[CBuffPacketManager::Create]szPacketID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szPacketID, i, nDelPos, pBuffPacket));
-			}
-			m_u4CulationIndex = i;
-			return (IBuffPacket* )pBuffPacket;
-		}
-	}
-	
-	m_objHashBuffPacketList.Get_Index(0);
+	pBuffPacket = m_objHashBuffPacketList.Pop();
 	return (IBuffPacket* )pBuffPacket;
 }
 
@@ -90,11 +36,10 @@ bool CBuffPacketManager::Delete(IBuffPacket* pBuffPacket)
 
 	char szPacketID[10] = {'\0'};
 	sprintf_safe(szPacketID, 10, "%d", pBuff->GetBuffID());
-	//int nPos = m_objHashBuffPacketList.Add_Hash_Data(szPacketID, pBuff);
-	int nPos = m_objHashBuffPacketList.Set_Index(pBuff->GetHashID(), szPacketID, pBuff);
-	if(-1 == nPos)
+	bool blState = m_objHashBuffPacketList.Push(szPacketID, pBuff);
+	if(false == blState)
 	{
-		OUR_DEBUG((LM_INFO, "[CBuffPacketManager::Delete]szPacketID=%s(0x%08x) nPos=%d.\n", szPacketID, pBuff, nPos));
+		OUR_DEBUG((LM_INFO, "[CBuffPacketManager::Delete]szPacketID=%s(0x%08x).\n", szPacketID, pBuff));
 	}
 	else
 	{
@@ -107,9 +52,11 @@ bool CBuffPacketManager::Delete(IBuffPacket* pBuffPacket)
 void CBuffPacketManager::Close()
 {
 	//清理所有已存在的指针
-	for(int i = 0; i < m_objHashBuffPacketList.Get_Count(); i++)
+	vector<CBuffPacket* > vecBuffPacket; 
+	m_objHashBuffPacketList.Get_All_Used(vecBuffPacket);
+	for(int i = 0; i < (int)vecBuffPacket.size(); i++)
 	{
-		CBuffPacket* pBuffPacket = m_objHashBuffPacketList.Get_Index(i);
+		CBuffPacket* pBuffPacket = vecBuffPacket[i];
 		if(NULL != pBuffPacket)
 		{
 			pBuffPacket->Close();
@@ -118,7 +65,6 @@ void CBuffPacketManager::Close()
 	}
 
 	m_objHashBuffPacketList.Close();
-	m_u4CulationIndex = 0;
 }
 
 void CBuffPacketManager::Init(uint32 u4PacketCount, bool blByteOrder)
@@ -151,7 +97,6 @@ void CBuffPacketManager::Init(uint32 u4PacketCount, bool blByteOrder)
 		}
 	}
 
-	m_u4CulationIndex = 0;
 	//设定当前对象池的字序
 	m_blSortType = blByteOrder;
 

@@ -56,7 +56,7 @@ struct _Hash_Table_Cell
 		{
 			m_pValue = NULL;
 		}
-	}  
+	}
 
 	//得到当前对象大小
 	int Get_Size(short sKeyLen)
@@ -138,6 +138,11 @@ public:
 	{
 		Set_Base_Addr(pData, nHashCount, sKeySize);	
 	}	
+
+	_Hash_Table_Cell<T>* Get_Index(int nIndex)
+	{
+		return &m_lpTable[nIndex];
+	}
 
 	void Close()
 	{
@@ -445,8 +450,9 @@ public:
 	void Init(char* pData, int nHashCount, int nKeySize = DEF_HASH_KEY_SIZE)
 	{
 		memset(pData, 0, Get_Size(nHashCount, nKeySize));
-		int nPos = 0;
-		m_pBase  = pData;
+		int nPos         = 0;
+		m_pBase          = pData;
+		m_nCurrLinkIndex = 0;
 		m_objHashPool.Init(&pData[nPos], nHashCount, nKeySize);	
 		nPos += m_objHashPool.Get_Size(nHashCount, nKeySize);
 		m_objHashLinkPool.Init(&pData[nPos], nHashCount);	
@@ -457,7 +463,10 @@ public:
 			m_lpTable[i] = NULL;
 		}
 		nPos += sizeof(_Hash_Link_Info<T>* ) * nHashCount;
-
+		if(nPos == 0)
+		{
+			int a = 1;
+		}
 		printf("[Init]nPos=%d.\n", nPos);
 	}	
 
@@ -473,96 +482,112 @@ public:
 		return m_objHashPool.Get_Used_Count();
 	}
 
-	//得到数组指定位置的数据
-	T* Get_Index(int nIndex)
+	//弹出一个在链表中的_Hash_Link_Info<T>* pT
+	T* Pop()
 	{
-		if(nIndex < 0 || nIndex > m_objHashPool.Get_Count() - 1)
+		T* pT = NULL;
+		if(NULL == m_lpTable)
 		{
-			return NULL;
+			//没有找到共享内存
+			return pT;
 		}
-		else
-		{
-			if(NULL == m_lpTable[nIndex])
-			{
-				return NULL;
-			}
 
-			_Hash_Table_Cell<T>* pData = m_lpTable[nIndex]->m_pData;
-			if(NULL == pData)
+		//寻找一个可以用的对象，弹出来。
+		for(int i = m_nCurrLinkIndex; i < m_objHashPool.Get_Count(); i++)
+		{
+			if(m_lpTable[i] != NULL)
 			{
-				return NULL;
-			}
-			else
-			{
-				//正在使用，返回数据
-				if(pData->m_cExists == 1)
-				{
-					return pData->m_pValue;
-				}
-				else
-				{
-					return NULL;
-				}
+				//取出当前的数据
+				pT         = m_lpTable[i]->m_pData->m_pValue;
+				char* pKey = m_lpTable[i]->m_pData->m_pKey;
+
+				//设置状态
+				 m_lpTable[i] = m_lpTable[i]->m_pNext;
+				 m_nCurrLinkIndex = i;
+				//回收数据
+				Del_Hash_Data(pKey);
+				return pT;
 			}
 		}
+
+		for(int i = 0; i < m_nCurrLinkIndex; i++)
+		{
+			if(m_lpTable[i] != NULL)
+			{
+				//取出当前的数据
+				pT = m_lpTable[i]->m_pData->m_pValue;
+				char* pKey = m_lpTable[i]->m_pData->m_pKey;
+
+				//设置状态
+				m_lpTable[i] = m_lpTable[i]->m_pNext;
+				m_nCurrLinkIndex = i;
+				//回收数据
+				Del_Hash_Data(pKey);
+				return pT;
+			}
+		}
+
+		return pT;
 	}
 
-	int Set_Index_Clear(int nIndex)
+	//将一个已经使用完成的对象，放回到链表
+	bool Push(const char* pKey, T* pT)
 	{
-		if(nIndex < 0 || nIndex > m_objHashPool.Get_Count() - 1)
+		if(NULL == m_lpTable)
 		{
-			return -1;
+			//没有找到共享内存
+			return false;
 		}
 
-		if(NULL == m_lpTable[nIndex]->m_pData)
+		//根据key计算这个点的hash位置
+		unsigned long uHashStart = HashString(pKey, m_objHashPool.Get_Count());
+		
+		_Hash_Link_Info<T>* pLastLink = m_lpTable[uHashStart];
+		while(NULL != pLastLink)
 		{
-			return -1;
+			if(pLastLink->m_pNext == NULL)
+			{
+				break;
+			}
+			pLastLink = pLastLink->m_pNext;
 		}
-		else
+
+		//从对象池中获取一个新对象
+		_Hash_Table_Cell<T>* pData = m_objHashPool.Create();
+		if(NULL == pData)
 		{
-			m_lpTable[nIndex]->m_pData->Clear();
-			return nIndex;
+			return false;
 		}
+		_Hash_Link_Info<T>* pLink = m_objHashLinkPool.Create();
+		if(NULL == pLink)
+		{
+			return false;		
+		}
+
+		sprintf_safe(pData->m_pKey, pData->m_sKeyLen, "%s", pKey);
+		pData->m_pValue    = pT;
+		pLink->m_pData     = pData;
+		pLink->m_pPerv     = pLastLink;
+		pLastLink->m_pNext = pLink;
+
+		return true;
 	}
 
-	//设置指定hash表中位置的数值
-	int Set_Index(int nIndex, char* lpszString, T* pT)
+	//得到所有正在使用的指针
+	void Get_All_Used(vector<T*>& vecList)
 	{
-		const int HASH_A = 1, HASH_B = 2;
-		if(nIndex < 0 || nIndex > m_objHashPool.Get_Count() - 1)
+		vecList.clear();
+		for(int i = 0; i < m_objHashPool.Get_Count(); i++)
 		{
-			return -1;
-		}
-
-		if((short)strlen(lpszString) >= m_lpTable[nIndex]->m_pData->m_sKeyLen)
-		{
-			return -1;
-		}
-
-		if(m_lpTable[nIndex]->m_pData->m_cExists == 1)
-		{
-			return -1;
-		}
-		else
-		{
-			//从对象池中获取一个新对象
-			_Hash_Table_Cell<T>* pData = m_objHashPool.Create();
-			if(NULL == pData)
+			if(NULL != m_lpTable[i])
 			{
-				return -1;
+				_Hash_Link_Info<T>* pLastLink = m_lpTable[i];
+				while(NULL != pLastLink)
+				{
+					vecList.push_back(m_lpTable[i]->m_pData->m_pValue);
+					pLastLink = pLastLink->m_pNext;
+				}
 			}
-			_Hash_Link_Info<T>* pLink = m_objHashLinkPool.Create();
-			if(NULL == pLink)
-			{
-				return -1;		
-			}
-
-			//把数据对象放入链表
-			sprintf_safe(pData->m_pKey, pData->m_sKeyLen, "%s", lpszString);
-			pData->m_pValue   = pT;
-			pLink->m_pData    = pData;
-			m_lpTable[nIndex] = pLink;
-			return nIndex;
 		}
 	}
 
@@ -796,6 +821,7 @@ private:
 	CHashPool<T>         m_objHashPool;      //Hash对象池
 	CHashLinkPool<T>     m_objHashLinkPool;  //Hash链表对象池
 	_Hash_Link_Info<T>** m_lpTable;	         //当前Hash对象数组
+	int                  m_nCurrLinkIndex;   //当前链表位置 
 	char*                m_pBase;            //内存块的基础地址
 };
 

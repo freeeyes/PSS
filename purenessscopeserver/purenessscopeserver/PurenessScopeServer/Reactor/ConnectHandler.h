@@ -229,7 +229,6 @@ private:
 	CHashTable<CConnectHandler> m_objHashHandleList;                   //Hash管理表  
 	ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;                     //控制多线程锁
 	uint32                      m_u4CurrMaxCount;                      //当前池里Handler总数
-	uint32                      m_u4CulationIndex;                     //当前循环到的位置 
 };
 
 //经过思考，想把发送对象分在几个线程内去做，提高性能。在这里尝试一下。(多线程模式，一个线程一个队列，这样保持并发能力)

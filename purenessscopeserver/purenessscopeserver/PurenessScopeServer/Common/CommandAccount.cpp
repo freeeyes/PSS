@@ -59,9 +59,11 @@ void CCommandAccount::AddCommandAlert(uint16 u2CommandID, uint32 u4Count, uint32
 
 void CCommandAccount::Close()
 {
-	for(int i = 0; i < m_objCommandDataList.Get_Count(); i++)
+	vector<_CommandData*> vecCommandData;
+	m_objCommandDataList.Get_All_Used(vecCommandData);
+	for(int i = 0; i < (int)vecCommandData.size(); i++)
 	{
-		_CommandData* pCommandData = m_objCommandDataList.Get_Index(i);
+		_CommandData* pCommandData = vecCommandData[i];
 		if(NULL != pCommandData)
 		{
 			SAFE_DELETE(pCommandData);
@@ -216,9 +218,11 @@ bool CCommandAccount::SaveCommandDataLog()
 	}
 
 	AppLogManager::instance()->WriteLog(LOG_SYSTEM_COMMANDDATA, "<Command Data Account[%s]>", m_szName);
-	for(int i = 0; i < m_objCommandDataList.Get_Count(); i++)
+	vector<_CommandData*> vecCommandData;
+	m_objCommandDataList.Get_All_Used(vecCommandData);
+	for(int i = 0; i < (int)vecCommandData.size(); i++)
 	{
-		_CommandData* pCommandData = m_objCommandDataList.Get_Index(i);
+		_CommandData* pCommandData = vecCommandData[i];
 		if(pCommandData != NULL)
 		{
 			ACE_Date_Time dtLastTime(pCommandData->m_tvCommandTime);

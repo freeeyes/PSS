@@ -1347,18 +1347,7 @@ void CProConnectManager::CloseAll()
 
 	KillTimer();
 	vector<CProConnectHandle*> vecCloseConnectHandler;
-	for(int i = 0; i < m_objHashConnectList.Get_Count(); i++)
-	{
-		CProConnectHandle* pConnectHandler = m_objHashConnectList.Get_Index(i);
-		if(pConnectHandler != NULL)
-		{
-			vecCloseConnectHandler.push_back(pConnectHandler);
-			m_u4TimeDisConnect++;
-
-			//加入链接统计功能
-			//App_ConnectAccount::instance()->AddDisConnect();
-		}
-	}
+	m_objHashConnectList.Get_All_Used(vecCloseConnectHandler);
 
 	//开始关闭所有连接
 	for(int i = 0; i < (int)vecCloseConnectHandler.size(); i++)
@@ -1625,9 +1614,11 @@ int CProConnectManager::handle_timeout(const ACE_Time_Value &tv, const void *arg
 	if(m_objHashConnectList.Get_Used_Count() != 0)
 	{
 		m_ThreadWriteLock.acquire();
-		for(int i = 0; i < m_objHashConnectList.Get_Count(); i++)
+		vector<CProConnectHandle*> vecProConnectHandle;
+		m_objHashConnectList.Get_All_Used(vecProConnectHandle);
+		for(int i = 0; i < (int)vecProConnectHandle.size(); i++)
 		{
-			CProConnectHandle* pConnectHandler = (CProConnectHandle* )m_objHashConnectList.Get_Index(i);
+			CProConnectHandle* pConnectHandler = (CProConnectHandle* )vecProConnectHandle[i];
 			if(pConnectHandler != NULL)
 			{
 				if(false == pConnectHandler->CheckAlive(tvNow))
@@ -1797,10 +1788,11 @@ int CProConnectManager::close(u_long)
 void CProConnectManager::GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
-
-	for(int i = 0; i < m_objHashConnectList.Get_Count(); i++)
+	vector<CProConnectHandle*> vecProConnectHandle;
+	m_objHashConnectList.Get_All_Used(vecProConnectHandle);
+	for(int i = 0; i < (int)vecProConnectHandle.size(); i++)
 	{
-		CProConnectHandle* pConnectHandler = (CProConnectHandle* )m_objHashConnectList.Get_Index(i);
+		CProConnectHandle* pConnectHandler = vecProConnectHandle[i];
 		if(pConnectHandler != NULL)
 		{
 			VecClientConnectInfo.push_back(pConnectHandler->GetClientInfo());
@@ -1859,14 +1851,7 @@ bool CProConnectManager::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendT
 {
 	m_ThreadWriteLock.acquire();
 	vector<CProConnectHandle*> objveCProConnectManager;
-	for(int i = 0; i < m_objHashConnectList.Get_Count(); i++)
-	{
-		CProConnectHandle* pProConnectHandle = m_objHashConnectList.Get_Index(i);
-		if(NULL != pProConnectHandle)
-		{
-			objveCProConnectManager.push_back(pProConnectHandle);
-		}
-	}
+	m_objHashConnectList.Get_All_Used(objveCProConnectManager);
 	m_ThreadWriteLock.release();
 
 	uint32 u4ConnectID = 0;
@@ -1977,9 +1962,11 @@ bool CProConnectManager::SetIsLog( uint32 u4ConnectID, bool blIsLog )
 
 void CProConnectManager::GetClientNameInfo(const char* pName, vecClientNameInfo& objClientNameInfo)
 {
-	for(int i = 0; i < m_objHashConnectList.Get_Count(); i++)
+	vector<CProConnectHandle*> vecProConnectHandle;
+	m_objHashConnectList.Get_All_Used(vecProConnectHandle);
+	for(int i = 0; i < (int)vecProConnectHandle.size(); i++)
 	{
-		CProConnectHandle* pConnectHandler = m_objHashConnectList.Get_Index(i);
+		CProConnectHandle* pConnectHandler = vecProConnectHandle[i];
 		if(NULL != pConnectHandler && ACE_OS::strcmp(pConnectHandler->GetConnectName(), pName) == 0)
 		{
 			_ClientNameInfo ClientNameInfo;
@@ -2090,31 +2077,20 @@ void CProConnectHandlerPool::Init(int nObjcetCount)
 			m_u4CurrMaxCount++;
 		}
 	}
-
-	//检查是否所有的hash表都被填满了
-	for(int i = 0; i < m_objHashHandleList.Get_Count(); i++)
-	{
-		if(NULL == m_objHashHandleList.Get_Index(i))
-		{
-			OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Init]ERROR(%d) is NULL.\n", i));
-		}
-	}
-
-	//用户hash表的查找空余对象
-	m_u4CulationIndex = 0;
 }
 
 void CProConnectHandlerPool::Close()
 {
 	//清理所有已存在的指针
-	for(int i = 0; i < m_objHashHandleList.Get_Count(); i++)
+	vector<CProConnectHandle*> vecProConnectHandle;
+	m_objHashHandleList.Get_All_Used(vecProConnectHandle);
+	for(int i = 0; i < (int)vecProConnectHandle.size(); i++)
 	{
-		CProConnectHandle* pHandler = m_objHashHandleList.Get_Index(i);
+		CProConnectHandle* pHandler = vecProConnectHandle[i];
 		SAFE_DELETE(pHandler);
 	}
 
 	m_u4CurrMaxCount  = 1;
-	m_u4CulationIndex = 0;
 }
 
 int CProConnectHandlerPool::GetUsedCount()
@@ -2138,58 +2114,7 @@ CProConnectHandle* CProConnectHandlerPool::Create()
 	CProConnectHandle* pHandler = NULL;
 
 	//在Hash表中弹出一个已使用的数据
-	//判断循环指针是否已经找到了尽头，如果是则从0开始继续
-	if(m_u4CulationIndex + 1 >= m_u4CurrMaxCount - 1)
-	{
-		m_u4CulationIndex = 0;
-	}
-
-	//第一次寻找，从当前位置往后找
-	for(int i = (int)m_u4CulationIndex; i < m_objHashHandleList.Get_Count(); i++)
-	{
-		pHandler = m_objHashHandleList.Get_Index(i);
-		if(NULL != pHandler)
-		{
-			//已经找到了，返回指针
-			char szHandlerID[10] = {'\0'};
-			sprintf_safe(szHandlerID, 10, "%d", pHandler->GetHandlerID());
-			//int nDelPos = m_objHashHandleList.Del_Hash_Data(szHandlerID);
-			int nDelPos = m_objHashHandleList.Set_Index_Clear(i);
-			if(-1 == nDelPos)
-			{
-				OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
-			}
-			else
-			{
-				//OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
-			}
-			m_u4CulationIndex = i;
-			return pHandler;
-		}
-	}
-
-	//第二次寻找，从0到当前位置
-	for(int i = 0; i < (int)m_u4CulationIndex; i++)
-	{
-		pHandler = m_objHashHandleList.Get_Index(i);
-		if(NULL != pHandler)
-		{
-			//已经找到了，返回指针
-			char szHandlerID[10] = {'\0'};
-			sprintf_safe(szHandlerID, 10, "%d", pHandler->GetHandlerID());
-			int nDelPos = m_objHashHandleList.Set_Index_Clear(i);
-			if(-1 == nDelPos)
-			{
-				OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
-			}
-			else
-			{
-				//OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Create]szHandlerID=%s, nPos=%d, nDelPos=%d, (0x%08x).\n", szHandlerID, i, nDelPos, pHandler));
-			}
-			m_u4CulationIndex = i;
-			return pHandler;
-		}
-	}
+	pHandler = m_objHashHandleList.Pop();
 
 	//没找到空余的
 	return pHandler;
@@ -2208,10 +2133,10 @@ bool CProConnectHandlerPool::Delete(CProConnectHandle* pObject)
 	sprintf_safe(szHandlerID, 10, "%d", pObject->GetHandlerID());
 	//int nPos = m_objHashHandleList.Add_Hash_Data(szHandlerID, pObject);
 	//这里因为内存是固定的，直接写会Hash原有位置
-	int nPos = m_objHashHandleList.Set_Index(pObject->GetHashID(), szHandlerID, pObject);
-	if(-1 == nPos)
+	bool blState = m_objHashHandleList.Push(szHandlerID, pObject);
+	if(false == blState)
 	{
-		OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHandlerID, pObject, nPos));
+		OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Delete]szHandlerID=%s(0x%08x).\n", szHandlerID, pObject));
 		//m_objHashHandleList.Add_Hash_Data(szHandlerID, pObject);
 	}
 	else

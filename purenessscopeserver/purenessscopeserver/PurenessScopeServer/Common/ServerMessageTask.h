@@ -94,7 +94,6 @@ public:
 
 private:
 	CHashTable<_Server_Message_Info> m_objServerMessageList;           //Server Message缓冲池
-	uint32                           m_u4CulationIndex;                //当前正在使用的标签
 	ACE_Recursive_Thread_Mutex       m_ThreadWriteLock;                //控制多线程锁
 }; 
 

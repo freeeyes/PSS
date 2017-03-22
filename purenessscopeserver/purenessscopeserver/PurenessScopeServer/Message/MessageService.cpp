@@ -605,9 +605,11 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* a
     }
 
     //检查所有插件状态
-    for(int i = 0; i < App_ModuleLoader::instance()->GetCurrModuleCount(); i++)
+	vector<_ModuleInfo*> vecModeInfo;
+	App_ModuleLoader::instance()->GetAllModuleInfo(vecModeInfo);
+    for(int i = 0; i < (int)vecModeInfo.size(); i++)
     {
-        _ModuleInfo* pModuleInfo = App_ModuleLoader::instance()->GetModuleIndex(i);
+        _ModuleInfo* pModuleInfo = vecModeInfo[i];
 
         if(NULL != pModuleInfo)
         {

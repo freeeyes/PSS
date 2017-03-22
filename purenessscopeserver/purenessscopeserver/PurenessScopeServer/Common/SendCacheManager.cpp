@@ -33,9 +33,11 @@ void CSendCacheManager::Close()
 {
 	//回收内存
 	//清理所有已存在的指针
-	for(int i = 0; i < m_objCacheHashList.Get_Count(); i++)
+	vector<ACE_Message_Block*> vecMb;
+	m_objCacheHashList.Get_All_Used(vecMb);
+	for(int i = 0; i < (int)vecMb.size(); i++)
 	{
-		ACE_Message_Block* pCache = m_objCacheHashList.Get_Index(i);
+		ACE_Message_Block* pCache = vecMb[i];
 		App_MessageBlockManager::instance()->Close(pCache);
 	}
 	m_objCacheHashList.Close();

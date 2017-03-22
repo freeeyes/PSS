@@ -680,9 +680,11 @@ void CClientProConnectManager::Close()
 	CancelConnectTask();
 
 	//关闭所有已存在的链接
-	for(int i = 0; i < m_objClientTCPList.Get_Count(); i++)
+	vector<CProactorClientInfo*> vecProactorClientInfo;
+	m_objClientTCPList.Get_All_Used(vecProactorClientInfo);
+	for(int i = 0; i < (int)vecProactorClientInfo.size(); i++)
 	{
-		CProactorClientInfo* pClientInfo = m_objClientTCPList.Get_Index(i);
+		CProactorClientInfo* pClientInfo = vecProactorClientInfo[i];
 		if(NULL != pClientInfo)
 		{
 			pClientInfo->Close();
@@ -691,9 +693,11 @@ void CClientProConnectManager::Close()
 	}
 	m_objClientTCPList.Close();
 
-	for(int i = 0; i < m_objClientUDPList.Get_Count(); i++)
+	vector<CProactorUDPClient*> vecProactorUDPClient;
+	m_objClientUDPList.Get_All_Used(vecProactorUDPClient);
+	for(int i = 0; i < (int)vecProactorUDPClient.size(); i++)
 	{
-		CProactorUDPClient* pClientInfo = m_objClientUDPList.Get_Index(i);
+		CProactorUDPClient* pClientInfo = vecProactorUDPClient[i];
 		if(NULL != pClientInfo)
 		{
 			pClientInfo->Close();
@@ -716,9 +720,11 @@ int CClientProConnectManager::handle_timeout(const ACE_Time_Value &tv, const voi
 		return 0;
 	}
 
-	for(int i = 0; i < m_objClientTCPList.Get_Count(); i++)
+	vector<CProactorClientInfo*> vecProactorClientInfo;
+	m_objClientTCPList.Get_All_Used(vecProactorClientInfo);
+	for(int i = 0; i < (int)vecProactorClientInfo.size(); i++)
 	{
-		CProactorClientInfo* pClientInfo = m_objClientTCPList.Get_Index(i);
+		CProactorClientInfo* pClientInfo = vecProactorClientInfo[i];
 		if(NULL != pClientInfo)
 		{
 			if(NULL == pClientInfo->GetProConnectClient())
@@ -750,10 +756,11 @@ void CClientProConnectManager::GetConnectInfo(vecClientConnectInfo& VecClientCon
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 
 	VecClientConnectInfo.clear();
-
-	for(int i = 0; i < m_objClientTCPList.Get_Count(); i++)
+	vector<CProactorClientInfo*> vecProactorClientInfo;
+	m_objClientTCPList.Get_All_Used(vecProactorClientInfo);
+	for(int i = 0; i < (int)vecProactorClientInfo.size(); i++)
 	{
-		CProactorClientInfo* pClientInfo = m_objClientTCPList.Get_Index(i);
+		CProactorClientInfo* pClientInfo = vecProactorClientInfo[i];
 		if(NULL != pClientInfo)
 		{
 			if(NULL != pClientInfo->GetProConnectClient())
@@ -778,9 +785,11 @@ void CClientProConnectManager::GetConnectInfo(vecClientConnectInfo& VecClientCon
 void CClientProConnectManager::GetUDPConnectInfo(vecClientConnectInfo& VecClientConnectInfo)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-	for(int i = 0; i < m_objClientUDPList.Get_Count(); i++)
+	vector<CProactorUDPClient*> vecProactorUDPClient;
+	m_objClientUDPList.Get_All_Used(vecProactorUDPClient);
+	for(int i = 0; i < (int)vecProactorUDPClient.size(); i++)
 	{
-		CProactorUDPClient* pClientInfo = m_objClientUDPList.Get_Index(i);
+		CProactorUDPClient* pClientInfo = vecProactorUDPClient[i];
 		if(NULL != pClientInfo)
 		{
 			_ClientConnectInfo ClientConnectInfo = pClientInfo->GetClientConnectInfo();
@@ -922,9 +931,11 @@ bool CClientProConnectManager::DeleteIClientMessage(IClientMessage* pClientMessa
 	App_ServerMessageTask::instance()->DelClientMessage(pClientMessage);
 
 	//一一寻找与之对应的连接以及相关信息并删除之
-	for(int i = 0; i < m_objClientTCPList.Get_Count(); i++)
+	vector<CProactorClientInfo*> vecProactorClientInfo;
+	m_objClientTCPList.Get_All_Used(vecProactorClientInfo);
+	for(int i = 0; i < (int)vecProactorClientInfo.size(); i++)
 	{
-		CProactorClientInfo* pClientInfo = m_objClientTCPList.Get_Index(i);
+		CProactorClientInfo* pClientInfo = vecProactorClientInfo[i];
 
 		if(NULL != pClientInfo && pClientInfo->GetClientMessage() == pClientMessage)
 		{

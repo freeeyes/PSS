@@ -2,7 +2,6 @@
 
 CPacketParsePool::CPacketParsePool()
 {
-	m_u4CulationIndex = 0;
 }
 
 CPacketParsePool::~CPacketParsePool()
@@ -39,20 +38,20 @@ void CPacketParsePool::Init(uint32 u4PacketCount)
 			}
 		}
 	}
-	m_u4CulationIndex = 1;
 }
 
 void CPacketParsePool::Close()
 {
 	//清理所有已存在的指针
-	for(int i = 0; i < m_objPacketParseList.Get_Count(); i++)
+	vector<CPacketParse*> vecPacketParse;
+	m_objPacketParseList.Get_All_Used(vecPacketParse);
+	for(int i = 0; i < (int)vecPacketParse.size(); i++)
 	{
-		CPacketParse* pPacket = m_objPacketParseList.Get_Index(i);
+		CPacketParse* pPacket = vecPacketParse[i];
 		SAFE_DELETE(pPacket);
 	}
 
 	m_objPacketParseList.Close();
-	m_u4CulationIndex = 1;
 }
 
 int CPacketParsePool::GetUsedCount()
@@ -77,55 +76,7 @@ CPacketParse* CPacketParsePool::Create()
 	CPacketParse* pPacket = NULL;
 
 	//在Hash表中弹出一个已使用的数据
-	//判断循环指针是否已经找到了尽头，如果是则从0开始继续
-	if(m_u4CulationIndex >= (uint32)(m_objPacketParseList.Get_Count() - 1))
-	{
-		m_u4CulationIndex = 0;
-	}
-
-	//第一次寻找，从当前位置往后找
-	for(int i = (int)m_u4CulationIndex; i < m_objPacketParseList.Get_Count(); i++)
-	{
-		pPacket = m_objPacketParseList.Get_Index(i);
-		if(NULL != pPacket)
-		{
-			//已经找到了，返回指针
-			int nDelPos = m_objPacketParseList.Set_Index_Clear(i);
-			if(-1 == nDelPos)
-			{
-				OUR_DEBUG((LM_INFO, "[CPacketParsePool::Create]HashID=%d, nPos=%d, nDelPos=%d, (0x%08x).\n", pPacket->GetHashID(), i, nDelPos, pPacket));
-			}
-			else
-			{
-				//OUR_DEBUG((LM_INFO, "[CPacketParsePool::Create]HashID=%d, nPos=%d, nDelPos=%d, (0x%08x).\n", pPacket->GetHashID(), i, nDelPos, pHandler));
-			}
-			m_u4CulationIndex = i;
-			pPacket->Init();
-			return pPacket;
-		}
-	}
-
-	//第二次寻找，从0到当前位置
-	for(int i = 0; i < (int)m_u4CulationIndex; i++)
-	{
-		pPacket = m_objPacketParseList.Get_Index(i);
-		if(NULL != pPacket)
-		{
-			//已经找到了，返回指针
-			int nDelPos = m_objPacketParseList.Set_Index_Clear(i);
-			if(-1 == nDelPos)
-			{
-				OUR_DEBUG((LM_INFO, "[CPacketParsePool::Create]HashID=%d, nPos=%d, nDelPos=%d, (0x%08x).\n", pPacket->GetHashID(), i, nDelPos, pPacket));
-			}
-			else
-			{
-				//OUR_DEBUG((LM_INFO, "[CPacketParsePool::Create]HashID=%d, nPos=%d, nDelPos=%d, (0x%08x).\n", pPacket->GetHashID(), i, nDelPos, pHandler));
-			}
-			m_u4CulationIndex = i;
-			pPacket->Init();
-			return pPacket;
-		}
-	}
+	pPacket = m_objPacketParseList.Pop();
 
 	return pPacket;
 }
@@ -144,11 +95,10 @@ bool CPacketParsePool::Delete(CPacketParse* pPacketParse)
 
 	char szHashID[10] = {'\0'};
 	sprintf_safe(szHashID, 10, "%d", pPacketParse->GetHashID());
-	//int nPos = m_objHashHandleList.Add_Hash_Data(szHandlerID, pObject);
-	int nPos = m_objPacketParseList.Set_Index(pPacketParse->GetHashID(), szHashID, pPacketParse);
-	if(-1 == nPos)
+	bool blState = m_objPacketParseList.Push(szHashID, pPacketParse);
+	if(false == blState)
 	{
-		OUR_DEBUG((LM_INFO, "[CPacketParsePool::Delete]HashID=%s(0x%08x) nPos=%d.\n", szHashID, pPacketParse, nPos));
+		OUR_DEBUG((LM_INFO, "[CPacketParsePool::Delete]HashID=%s(0x%08x).\n", szHashID, pPacketParse));
 	}
 	else
 	{

@@ -151,7 +151,6 @@ void CMessage::Clear()
 
 CMessagePool::CMessagePool()
 {
-	m_u4CulationIndex = 1;
 }
 
 CMessagePool::~CMessagePool()
@@ -185,20 +184,20 @@ void CMessagePool::Init(uint32 u4PacketCount)
 			}
 		}
 	}
-	m_u4CulationIndex = 1;
 }
 
 void CMessagePool::Close()
 {
 	//清理所有已存在的指针
-	for(int i = 0; i < m_objHashMessageList.Get_Count(); i++)
+	vector<CMessage*> vecMessage;
+	m_objHashMessageList.Get_All_Used(vecMessage);
+	for(int i = 0; i < (int)vecMessage.size(); i++)
 	{
-		CMessage* pMessage = m_objHashMessageList.Get_Index(i);
+		CMessage* pMessage = vecMessage[i];
 		SAFE_DELETE(pMessage);
 	}
 
 	m_objHashMessageList.Close();
-	m_u4CulationIndex = 1;
 }
 
 int CMessagePool::GetUsedCount()
@@ -222,53 +221,7 @@ CMessage* CMessagePool::Create()
 	CMessage* pMessage = NULL;
 
 	//在Hash表中弹出一个已使用的数据
-	//判断循环指针是否已经找到了尽头，如果是则从0开始继续
-	if(m_u4CulationIndex >= (uint32)(m_objHashMessageList.Get_Count() - 1))
-	{
-		m_u4CulationIndex = 0;
-	}
-
-	//第一次寻找，从当前位置往后找
-	for(int i = (int)m_u4CulationIndex; i < m_objHashMessageList.Get_Count(); i++)
-	{
-		pMessage = m_objHashMessageList.Get_Index(i);
-		if(NULL != pMessage)
-		{
-			//已经找到了，返回指针
-			int nDelPos = m_objHashMessageList.Set_Index_Clear(i);
-			if(-1 == nDelPos)
-			{
-				OUR_DEBUG((LM_INFO, "[CMessagePool::Create]HashID=%d, nPos=%d, nDelPos=%d, (0x%08x).\n", pMessage->GetHashID(), i, nDelPos, pMessage));
-			}
-			else
-			{
-				//OUR_DEBUG((LM_INFO, "[CSendMessagePool::Create]HashID=%d, nPos=%d, nDelPos=%d, (0x%08x).\n", pMessage->GetHashID(), i, nDelPos, pHandler));
-			}
-			m_u4CulationIndex = i;
-			return pMessage;
-		}
-	}
-
-	//第二次寻找，从0到当前位置
-	for(int i = 0; i < (int)m_u4CulationIndex; i++)
-	{
-		pMessage = m_objHashMessageList.Get_Index(i);
-		if(NULL != pMessage)
-		{
-			//已经找到了，返回指针
-			int nDelPos = m_objHashMessageList.Set_Index_Clear(i);
-			if(-1 == nDelPos)
-			{
-				OUR_DEBUG((LM_INFO, "[CMessagePool::Create]HashID=%d, nPos=%d, nDelPos=%d, (0x%08x).\n", pMessage->GetHashID(), i, nDelPos, pMessage));
-			}
-			else
-			{
-				//OUR_DEBUG((LM_INFO, "[CSendMessagePool::Create]HashID=%d, nPos=%d, nDelPos=%d, (0x%08x).\n", pMessage->GetHashID(), i, nDelPos, pHandler));
-			}
-			m_u4CulationIndex = i;
-			return pMessage;
-		}
-	}
+	pMessage = m_objHashMessageList.Pop();
 
 	//没找到空余的
 	return pMessage;
@@ -287,11 +240,10 @@ bool CMessagePool::Delete(CMessage* pObject)
 
 	char szHashID[10] = {'\0'};
 	sprintf_safe(szHashID, 10, "%d", pObject->GetHashID());
-	//int nPos = m_objHashHandleList.Add_Hash_Data(szHandlerID, pObject);
-	int nPos = m_objHashMessageList.Set_Index(pObject->GetHashID(), szHashID, pObject);
-	if(-1 == nPos)
+	bool blState = m_objHashMessageList.Push(szHashID, pObject);
+	if(false == blState)
 	{
-		OUR_DEBUG((LM_INFO, "[CMessagePool::Delete]HashID=%s(0x%08x) nPos=%d.\n", szHashID, pObject, nPos));
+		OUR_DEBUG((LM_INFO, "[CMessagePool::Delete]HashID=%s(0x%08x).\n", szHashID, pObject));
 	}
 	else
 	{

@@ -28,7 +28,6 @@ public:
 
 private:
 	CHashTable<CPacketParse>        m_objPacketParseList;                  //Hash内存池
-	uint32                          m_u4CulationIndex;                     //当前正在使用的标签
 	ACE_Recursive_Thread_Mutex      m_ThreadWriteLock;                     //控制多线程锁
 };
 
