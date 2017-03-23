@@ -320,7 +320,6 @@ public:
 		m_lpTable    = (_Hash_Link_Info<T>*)pData;
 		m_nCount     = nCount;
 		m_nCurrIndex = 0;
-		int nKeyPool = sizeof(_Hash_Link_Info<T>) * nCount;
 
 		for(int i = 0; i < m_nCount; i++)
 		{
@@ -541,7 +540,7 @@ public:
 
 		//根据key计算这个点的hash位置
 		unsigned long uHashStart = HashString(pKey, m_objHashPool.Get_Count());
-		
+
 		_Hash_Link_Info<T>* pLastLink = m_lpTable[uHashStart];
 		while(NULL != pLastLink)
 		{
@@ -579,6 +578,11 @@ public:
 	//得到所有正在使用的指针
 	void Get_All_Used(vector<T*>& vecList)
 	{
+		if(NULL == m_lpTable)
+		{
+			return;
+		}
+
 		vecList.clear();
 		for(int i = 0; i < m_objHashPool.Get_Count(); i++)
 		{
@@ -587,7 +591,7 @@ public:
 				_Hash_Link_Info<T>* pLastLink = m_lpTable[i];
 				while(NULL != pLastLink)
 				{
-					vecList.push_back(m_lpTable[i]->m_pData->m_pValue);
+					vecList.push_back(pLastLink->m_pData->m_pValue);
 					pLastLink = pLastLink->m_pNext;
 				}
 			}
