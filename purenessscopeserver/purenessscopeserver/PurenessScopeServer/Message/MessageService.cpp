@@ -481,7 +481,10 @@ CMessage* CMessageService::CreateMessage()
 {
 	//OUR_DEBUG((LM_INFO, "[CMessageService::CreateMessage]GetThreadID=%d, m_MessagePool=0x%08x.\n", GetThreadID(), m_MessagePool));
 	CMessage* pMessage = m_MessagePool.Create();
-	pMessage->GetMessageBase()->m_u4WorkThreadID = GetThreadID();
+	if(NULL != pMessage)
+	{
+		pMessage->GetMessageBase()->m_u4WorkThreadID = GetThreadID();
+	}
     return pMessage;
 }
 
