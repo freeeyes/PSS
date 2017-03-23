@@ -165,9 +165,7 @@ void CMessagePool::Init(uint32 u4PacketCount)
 	Close();
 
 	//≥ı ºªØHashTable
-	size_t nArraySize = m_objHashMessageList.Get_Size(u4PacketCount);
-	char* pHashBase = new char[nArraySize];
-	m_objHashMessageList.Init(pHashBase, (int)u4PacketCount);
+	m_objHashMessageList.Init((int)u4PacketCount);
 
 	for(int i = 0; i < (int)u4PacketCount; i++)
 	{

@@ -420,8 +420,9 @@ class CHashTable
 public:
 	CHashTable()
 	{
-		m_pBase   = NULL;
-		m_lpTable = NULL;		
+		m_pBase     = NULL;
+		m_lpTable   = NULL;	
+		m_cIsDelete = 0;
 	}	
 
 	~CHashTable()
@@ -440,18 +441,44 @@ public:
 	//关闭Hash块	
 	void Close()
 	{
-		delete[] m_pBase;
+		if(0 == m_cIsDelete)
+		{
+			delete[] m_pBase;
+		}
 		m_pBase   = NULL;
 		m_lpTable = NULL;
 	}
 
 	//初始化Hash块
-	void Init(char* pData, int nHashCount, int nKeySize = DEF_HASH_KEY_SIZE)
+	void Init(int nHashCount, int nKeySize = DEF_HASH_KEY_SIZE)
+	{
+		size_t stSize = Get_Size(nHashCount, nKeySize);
+		char* pData = new char[stSize];
+		memset(pData, 0, stSize);
+		int nPos         = 0;
+		m_pBase          = pData;
+		m_nCurrLinkIndex = 0;
+		m_cIsDelete      = 0;
+		m_objHashPool.Init(&pData[nPos], nHashCount, nKeySize);	
+		nPos += m_objHashPool.Get_Size(nHashCount, nKeySize);
+		m_objHashLinkPool.Init(&pData[nPos], nHashCount);	
+		nPos += m_objHashLinkPool.Get_Size(nHashCount);
+		m_lpTable = (_Hash_Link_Info<T>** )&pData[nPos];
+		for(int i = 0; i < nHashCount; i++)
+		{
+			m_lpTable[i] = NULL;
+		}
+		nPos += sizeof(_Hash_Link_Info<T>* ) * nHashCount;
+	}
+
+	//初始化Hash块(给定内存地址)
+	void Init_By_Memory(char* pData, int nHashCount, int nKeySize = DEF_HASH_KEY_SIZE, char cIsDelete = 0)
 	{
 		memset(pData, 0, Get_Size(nHashCount, nKeySize));
 		int nPos         = 0;
 		m_pBase          = pData;
 		m_nCurrLinkIndex = 0;
+		m_cIsDelete      = cIsDelete;
 		m_objHashPool.Init(&pData[nPos], nHashCount, nKeySize);	
 		nPos += m_objHashPool.Get_Size(nHashCount, nKeySize);
 		m_objHashLinkPool.Init(&pData[nPos], nHashCount);	
@@ -838,6 +865,7 @@ private:
 	_Hash_Link_Info<T>** m_lpTable;	         //当前Hash对象数组
 	int                  m_nCurrLinkIndex;   //当前链表位置 
 	char*                m_pBase;            //内存块的基础地址
+	char                 m_cIsDelete;        //当当前类析构的时候是否回收内存，0是回收，1是不回收。
 };
 
 

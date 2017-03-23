@@ -102,9 +102,7 @@ public:
 		m_nMaxConnectCount = u4IPCount;
 
 		//≥ı ºªØHashTable
-		size_t nArraySize = m_objIPList.Get_Size(u4IPCount);
-		char* pHashBase = new char[nArraySize];
-		m_objIPList.Init(pHashBase, (int)u4IPCount);
+		m_objIPList.Init((int)u4IPCount);
 
 		ACE_Date_Time  dtNowTime;
 		m_u2CurrTime = (uint16)dtNowTime.minute();

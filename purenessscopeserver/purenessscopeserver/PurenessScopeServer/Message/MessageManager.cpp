@@ -35,14 +35,10 @@ CMessageManager::~CMessageManager(void)
 void CMessageManager::Init(uint16 u2MaxModuleCount, uint32 u4MaxCommandCount)
 {
 	//初始化对象数组
-	size_t nArraySize = m_objClientCommandList.Get_Size(u4MaxCommandCount);
-	char* pHashBase = new char[nArraySize];
-	m_objClientCommandList.Init(pHashBase, (int)u4MaxCommandCount);
+	m_objClientCommandList.Init((int)u4MaxCommandCount);
 
 	//初始化HashTable
-	nArraySize =m_objModuleClientList.Get_Size(u2MaxModuleCount);
-	pHashBase = new char[nArraySize];
-	m_objModuleClientList.Init(pHashBase, (int)u2MaxModuleCount);
+	m_objModuleClientList.Init((int)u2MaxModuleCount);
 
 	m_u2MaxModuleCount  = u2MaxModuleCount;
 	m_u4MaxCommandCount = u4MaxCommandCount;

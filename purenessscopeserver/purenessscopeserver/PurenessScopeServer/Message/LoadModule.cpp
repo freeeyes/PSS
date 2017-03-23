@@ -22,9 +22,7 @@ void CLoadModule::Init(uint16 u2MaxModuleCount)
 	Close();
 
 	//≥ı ºªØHashTable
-	size_t nArraySize = m_objHashModuleList.Get_Size(u2MaxModuleCount);
-	char* pHashBase = new char[nArraySize];
-	m_objHashModuleList.Init(pHashBase, (int)u2MaxModuleCount);
+	m_objHashModuleList.Init((int)u2MaxModuleCount);
 }
 
 void CLoadModule::Close()

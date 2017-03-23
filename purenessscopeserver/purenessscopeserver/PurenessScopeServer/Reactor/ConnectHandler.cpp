@@ -2699,9 +2699,7 @@ void CConnectManager::Init( uint16 u2Index )
 
 	//初始化Hash表
 	uint16 u2PoolSize = App_MainConfig::instance()->GetMaxHandlerCount();
-	size_t nArraySize = m_objHashConnectList.Get_Size(u2PoolSize);
-	char* pHashBase = new char[nArraySize];
-	m_objHashConnectList.Init(pHashBase, (int)u2PoolSize);
+	m_objHashConnectList.Init((int)u2PoolSize);
 }
 
 uint32 CConnectManager::GetCommandFlowAccount()
@@ -2743,9 +2741,7 @@ void CConnectHandlerPool::Init(int nObjcetCount)
 	Close();
 
 	//初始化HashTable
-	size_t nArraySize = m_objHashHandleList.Get_Size((uint32)nObjcetCount);
-	char* pHashBase = new char[nArraySize];
-	m_objHashHandleList.Init(pHashBase, (int)nObjcetCount);
+	m_objHashHandleList.Init((int)nObjcetCount);
 
 	for(int i = 0; i < nObjcetCount; i++)
 	{

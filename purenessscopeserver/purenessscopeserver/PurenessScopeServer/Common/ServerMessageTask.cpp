@@ -16,9 +16,7 @@ void CServerMessageInfoPool::Init(uint32 u4PacketCount /*= MAX_SERVER_MESSAGE_IN
 {
 	Close();
 
-	size_t nArraySize = m_objServerMessageList.Get_Size(u4PacketCount);
-	char* pHashBase = new char[nArraySize];
-	m_objServerMessageList.Init(pHashBase, (int)u4PacketCount);
+	m_objServerMessageList.Init((int)u4PacketCount);
 
 	for(int i = 0; i < (int)u4PacketCount; i++)
 	{

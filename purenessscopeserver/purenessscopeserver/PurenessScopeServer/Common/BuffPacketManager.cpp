@@ -72,9 +72,7 @@ void CBuffPacketManager::Init(uint32 u4PacketCount, bool blByteOrder)
 	Close();
 
 	//≥ı ºªØHash±Ì
-	size_t nArraySize = m_objHashBuffPacketList.Get_Size(u4PacketCount);
-	char* pHashBase = new char[nArraySize];
-	m_objHashBuffPacketList.Init(pHashBase, (int)u4PacketCount);
+	m_objHashBuffPacketList.Init((int)u4PacketCount);
 
 	for(int i = 0; i < m_objHashBuffPacketList.Get_Count(); i++)
 	{
