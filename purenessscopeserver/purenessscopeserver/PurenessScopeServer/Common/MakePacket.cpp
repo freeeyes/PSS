@@ -27,15 +27,18 @@ bool CMakePacket::PutMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& tvNo
 	if(NULL == pMessage)
 	{
 		//回收PacketParse中的包头包体内存
-		if(NULL != pMakePacket->m_pPacketParse->GetMessageHead())
+		if(NULL != pMakePacket->m_pPacketParse)
 		{
-			App_MessageBlockManager::instance()->Close(pMakePacket->m_pPacketParse->GetMessageHead());
+			if(NULL != pMakePacket->m_pPacketParse->GetMessageHead())
+			{
+				App_MessageBlockManager::instance()->Close(pMakePacket->m_pPacketParse->GetMessageHead());
+			}
+			if(NULL != pMakePacket->m_pPacketParse->GetMessageBody())
+			{
+				App_MessageBlockManager::instance()->Close(pMakePacket->m_pPacketParse->GetMessageBody());
+			}
+			pMakePacket->m_pPacketParse->Clear();
 		}
-		if(NULL != pMakePacket->m_pPacketParse->GetMessageBody())
-		{
-			App_MessageBlockManager::instance()->Close(pMakePacket->m_pPacketParse->GetMessageBody());
-		}
-		pMakePacket->m_pPacketParse->Clear();
 		OUR_DEBUG((LM_ERROR,"[CMakePacket::ProcessMessageBlock] pMessage is NULL.\n"));
 		return false;
 	}
@@ -157,6 +160,7 @@ bool CMakePacket::PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBo
 	}
 	else
 	{
+		App_MessageBlockManager::instance()->Close(pBodyMessage);
 		return false;	
 	}
 
