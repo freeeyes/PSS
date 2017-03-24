@@ -84,6 +84,10 @@ void CMakePacket::SetMessage(_MakePacket* pMakePacket, CMessage* pMessage, ACE_T
 		{
 			pMessage->GetMessageBase()->m_u2Cmd         = CLINET_LINK_CHECKTIMEOUT;
 		}
+		else if(pMakePacket->m_u1Option == PACKET_SEND_OK)
+		{
+			pMessage->GetMessageBase()->m_u2Cmd         = CLIENT_LINK_SENDOK;
+		}
 
 		pMessage->GetMessageBase()->m_u4ConnectID   = pMakePacket->m_u4ConnectID;
 		pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)tvNow.sec();

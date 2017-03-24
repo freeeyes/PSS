@@ -665,8 +665,6 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
 		int nErrno = errno;
 		OUR_DEBUG ((LM_DEBUG,"[CConnectHandler::handle_write_stream] Connectid=[%d] begin(%d)...\n",GetConnectID(), nErrno));
 
-		AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Send[%s:%d] pMbData=%d FAIL.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), result.message_block().length());
-
 		AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "WriteError [%s:%d] nErrno = %d  result.bytes_transferred() = %d, ",
 			m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), nErrno, 
 			result.bytes_transferred());
@@ -686,11 +684,37 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
 		//发送成功
 		m_ThreadWriteLock.acquire();
 		m_atvOutput = ACE_OS::gettimeofday();
-		App_MessageBlockManager::instance()->Close(&result.message_block());
 		m_u4AllSendSize += (uint32)result.bytes_to_write();
 
-		//如果需要统计信息
-		//App_IPAccount::instance()->UpdateIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
+		int nMessageID = result.message_block().msg_type() - ACE_Message_Block::MB_USER;
+		if(nMessageID > 0)
+		{
+			//需要回调发送成功回执
+			_MakePacket objMakePacket;
+
+			CPacketParse objPacketParse;
+			ACE_Message_Block* pMbData = App_MessageBlockManager::instance()->Create(sizeof(int));
+			memcpy_safe((char* )&nMessageID, sizeof(int), pMbData->wr_ptr(), sizeof(int));
+			pMbData->wr_ptr(sizeof(int));
+			objPacketParse.SetPacket_Head_Message(pMbData);
+			objPacketParse.SetPacket_Head_Curr_Length(pMbData->length());
+
+			objMakePacket.m_u4ConnectID       = GetConnectID();
+			objMakePacket.m_pPacketParse      = &objPacketParse;
+			objMakePacket.m_u1Option          = PACKET_SEND_OK;
+
+			//发送客户端链接断开消息。
+			ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+			if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
+			{
+				OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
+			}
+
+			//还原消息类型
+			result.message_block().msg_type(ACE_Message_Block::MB_DATA);
+		}
+
+		App_MessageBlockManager::instance()->Close(&result.message_block());
 		m_ThreadWriteLock.release();
 
 		//记录发送字节数
@@ -775,7 +799,7 @@ uint8 CProConnectHandle::GetSendBuffState()
 	return m_u1SendBuffState;
 }
 
-bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, uint8 u1State, uint8 u1SendType, uint32& u4PacketSize, bool blDelete)
+bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, uint8 u1State, uint8 u1SendType, uint32& u4PacketSize, bool blDelete, int nMessageID)
 {
 	OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage]Connectid=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);	
@@ -951,6 +975,10 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 			m_emStatus = CLIENT_CLOSE_SENDOK;
 		}
 
+		//将消息ID放入MessageBlock
+		ACE_Message_Block::ACE_Message_Type  objType  = ACE_Message_Block::MB_USER + nMessageID;
+		pMbData->msg_type(objType);
+
 		return PutSendPacket(pMbData);
 	}
 }
@@ -1056,15 +1084,12 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 			//这里发送给插件一个消息，告知插件数据超过阈值
 			_MakePacket objMakePacket;
 
-			CPacketParse* pPacketParse  = App_PacketParsePool::instance()->Create();
-			if(NULL != pPacketParse)
-			{
-				pPacketParse->SetPacket_Body_Message(pMbData);
-				pPacketParse->SetPacket_Body_Curr_Length(pMbData->length());
-			}
+			CPacketParse objPacketParse;
+			objPacketParse.SetPacket_Body_Message(pMbData);
+			objPacketParse.SetPacket_Body_Curr_Length(pMbData->length());
 
 			objMakePacket.m_u4ConnectID       = GetConnectID();
-			objMakePacket.m_pPacketParse      = pPacketParse;
+			objMakePacket.m_pPacketParse      = &objPacketParse;
 			objMakePacket.m_u1Option          = PACKET_SEND_TIMEOUT;
 
 			//发送客户端链接断开消息。
@@ -1073,7 +1098,6 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 			{
 				OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
 			}
-			App_PacketParsePool::instance()->Delete(pPacketParse);
 
 			return false;
 		}
@@ -1460,7 +1484,7 @@ bool CProConnectManager::AddConnect(uint32 u4ConnectID, CProConnectHandle* pConn
 	return true;
 }
 
-bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint16 u2CommandID, uint8 u1SendState, uint8 u1SendType, ACE_Time_Value& tvSendBegin, bool blDelete)
+bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint16 u2CommandID, uint8 u1SendState, uint8 u1SendType, ACE_Time_Value& tvSendBegin, bool blDelete, int nMessageID)
 {
 	m_ThreadWriteLock.acquire();
 	char szConnectID[10] = {'\0'};
@@ -1498,7 +1522,7 @@ bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
 	return true;
 }
 
-bool CProConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete)
+bool CProConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
 	//OUR_DEBUG((LM_ERROR,"[CProConnectManager::PutMessage]BEGIN.\n"));
 	OUR_DEBUG((LM_ERROR,"[CProConnectManager::PutMessage] (%d) Send Begin.\n", u4ConnectID));
@@ -1532,6 +1556,7 @@ bool CProConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
 		pSendMessage->m_u2CommandID = u2CommandID;
 		pSendMessage->m_u1SendState = u1SendState;
 		pSendMessage->m_blDelete    = blDelete;
+		pSendMessage->m_nMessageID  = nMessageID;
 		pSendMessage->m_tvSend      = ACE_OS::gettimeofday();
 
 		//判断队列是否是已经最大
@@ -1773,7 +1798,7 @@ int CProConnectManager::svc (void)
 		}
 
 		//处理发送数据
-		SendMessage(msg->m_u4ConnectID, msg->m_pBuffPacket, msg->m_u2CommandID, msg->m_u1SendState, msg->m_nEvents, msg->m_tvSend, msg->m_blDelete);
+		SendMessage(msg->m_u4ConnectID, msg->m_pBuffPacket, msg->m_u2CommandID, msg->m_u1SendState, msg->m_nEvents, msg->m_tvSend, msg->m_blDelete, msg->m_nMessageID);
 		m_SendMessagePool.Delete(msg);
 
 	}
@@ -1856,7 +1881,7 @@ _ClientIPInfo CProConnectManager::GetLocalIPInfo(uint32 u4ConnectID)
 	}
 }
 
-bool CProConnectManager::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete)
+bool CProConnectManager::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
 	m_ThreadWriteLock.acquire();
 	vector<CProConnectHandle*> objveCProConnectManager;
@@ -1896,6 +1921,7 @@ bool CProConnectManager::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendT
 			pSendMessage->m_u2CommandID = u2CommandID;
 			pSendMessage->m_u1SendState = u1SendState;
 			pSendMessage->m_blDelete    = blDelete;
+			pSendMessage->m_nMessageID  = nMessageID;
 			pSendMessage->m_tvSend      = ACE_OS::gettimeofday();
 
 			//判断队列是否是已经最大
@@ -2251,7 +2277,7 @@ bool CProConnectManagerGroup::AddConnect(CProConnectHandle* pConnectHandler)
 	return false;
 }
 
-bool CProConnectManagerGroup::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete)
+bool CProConnectManagerGroup::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
 	//判断命中到哪一个线程组里面去
 	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
@@ -2265,10 +2291,10 @@ bool CProConnectManagerGroup::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuff
 
 	//OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::PostMessage]u4ConnectID=%d, u2ThreadIndex=%d.\n", u4ConnectID, u2ThreadIndex));
 
-	return pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, u1SendState, blDelete);
+	return pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, u1SendState, blDelete, nMessageID);
 }
 
-bool CProConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete)
+bool CProConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
 	//判断命中到哪一个线程组里面去
 	uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
@@ -2297,7 +2323,7 @@ bool CProConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char* pData
 			SAFE_DELETE_ARRAY(pData);
 		}
 
-		return pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, u1SendState, true);
+		return pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, u1SendState, true, nMessageID);
 	}
 	else
 	{
@@ -2313,7 +2339,7 @@ bool CProConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char* pData
 
 }
 
-bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete)
+bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
 	uint32 u4ConnectID = 0;
 	for(uint32 i = 0; i < (uint32)vecConnectID.size(); i++)
@@ -2337,7 +2363,7 @@ bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPac
 		}
 		pCurrBuffPacket->WriteStream(pBuffPacket->GetData(), pBuffPacket->GetWriteLen());
 
-		pConnectManager->PostMessage(u4ConnectID, pCurrBuffPacket, u1SendType, u2CommandID, u1SendState, true);
+		pConnectManager->PostMessage(u4ConnectID, pCurrBuffPacket, u1SendType, u2CommandID, u1SendState, true, nMessageID);
 	}
 
 	if(true == blDelete)
@@ -2349,7 +2375,7 @@ bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPac
 	return true;
 }
 
-bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete)
+bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
 	uint32 u4ConnectID = 0;
 
@@ -2374,7 +2400,7 @@ bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, const ch
 		}
 		pBuffPacket->WriteStream(pData, nDataLen);
 
-		pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, u1SendState, true);
+		pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, u1SendState, true, nMessageID);
 	}
 
 	if(true == blDelete)
@@ -2528,7 +2554,7 @@ void CProConnectManagerGroup::SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4
 	pConnectManager->SetRecvQueueTimeCost(u4ConnectID, u4TimeCost);
 }
 
-bool CProConnectManagerGroup::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete)
+bool CProConnectManagerGroup::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
 	//全部群发
 	for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
@@ -2540,7 +2566,7 @@ bool CProConnectManagerGroup::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1
 			continue;		
 		}
 
-		pConnectManager->PostMessageAll(pBuffPacket, u1SendType, u2CommandID, u1SendState, false);
+		pConnectManager->PostMessageAll(pBuffPacket, u1SendType, u2CommandID, u1SendState, false, nMessageID);
 	}
 
 	if(true == blDelete)
@@ -2552,7 +2578,7 @@ bool CProConnectManagerGroup::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1
 	return true;
 }
 
-bool CProConnectManagerGroup::PostMessageAll( const char* pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete)
+bool CProConnectManagerGroup::PostMessageAll( const char* pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
 	IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create();
 	if(NULL == pBuffPacket)
@@ -2581,7 +2607,7 @@ bool CProConnectManagerGroup::PostMessageAll( const char* pData, uint32 nDataLen
 			continue;
 		}
 
-		pConnectManager->PostMessageAll(pBuffPacket, u1SendType, u2CommandID, u1SendState, false);
+		pConnectManager->PostMessageAll(pBuffPacket, u1SendType, u2CommandID, u1SendState, false, nMessageID);
 	}
 
 	//用完了就删除

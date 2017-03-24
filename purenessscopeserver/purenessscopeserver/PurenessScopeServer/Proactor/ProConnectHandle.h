@@ -55,7 +55,7 @@ public:
 	void Init(uint16 u2HandlerID);                                            //Connect Pool初始化调用的函数
 
 	bool CheckAlive(ACE_Time_Value& tvNow);                                   //检测当前链接是否超时的函数
-	bool SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, uint8 u1State, uint8 u1SendType, uint32& u4PacketSize, bool blDelete);   //发送给客户端数据的函数
+	bool SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, uint8 u1State, uint8 u1SendType, uint32& u4PacketSize, bool blDelete, int nMessageID);   //发送给客户端数据的函数
 	bool Close(int nIOCount = 1, int nErrno = 0);                                                  //当前连接对象关闭
 	bool ServerClose(EM_Client_Close_status emStatus, uint8 u1OptionEvent = PACKET_SDISCONNECT);   //服务器关闭客户端链接的函数
 	void SetLocalIPInfo(const char* pLocalIP, uint32 u4LocalPort);            //设置监听IP和端口信息 
@@ -160,9 +160,11 @@ public:
 
 	void CloseAll();                                                                                         //关闭所有链接信息 
 	bool AddConnect(uint32 u4ConnectID, CProConnectHandle* pConnectHandler);                                 //添加一个新的链接信息
-	bool SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint16 u2CommandID, uint8 u1SendState, uint8 u1SendType, ACE_Time_Value& tvSendBegin, bool blDelete);          //发送数据
-	bool PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDelete = true);    //异步发送
-	bool PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDelete = true);                     //异步群发
+	bool SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint16 u2CommandID, uint8 u1SendState, uint8 u1SendType, ACE_Time_Value& tvSendBegin, bool blDelete, int nMessageID);          //发送数据
+	bool PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, 
+		uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDelete = true, int nMessageID = 0);    //异步发送
+	bool PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, 
+		uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDelete = true, int nMessageID = 0);    //异步群发
 	bool Close(uint32 u4ConnectID);                                                                          //客户端关闭
 	bool CloseConnect(uint32 u4ConnectID, EM_Client_Close_status emStatus);                                  //服务器关闭
 	void GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo);                                         //返回当前存活链接的信息
@@ -236,12 +238,18 @@ public:
 	void Close();
 
 	bool AddConnect(CProConnectHandle* pConnectHandler);
-	bool PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDlete = true);                      //异步发送
-	bool PostMessage(uint32 u4ConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDlete = true);            //异步发送
-	bool PostMessage(vector<uint32> vecConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDlete = true);             //异步群发指定的ID
-	bool PostMessage(vector<uint32> vecConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDlete = true);   //异步群发指定的ID
-	bool PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDlete = true);                                       //异步群发
-	bool PostMessageAll(const char* pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDlete = true);                             //异步群发
+	bool PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, 
+		uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDlete = true, int nMessageID = 0);    //异步发送
+	bool PostMessage(uint32 u4ConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL,
+		uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDlete = true, int nMessageID = 0);    //异步发送
+	bool PostMessage(vector<uint32> vecConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,
+		uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDlete = true, int nMessageID = 0);    //异步群发指定的ID
+	bool PostMessage(vector<uint32> vecConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL,
+		uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDlete = true, int nMessageID = 0);    //异步群发指定的ID
+	bool PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,
+		uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDlete = true, int nMessageID = 0);    //异步群发
+	bool PostMessageAll(const char* pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL,
+		uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDlete = true, int nMessageID = 0);    //异步群发
 	bool CloseConnect(uint32 u4ConnectID, EM_Client_Close_status emStatus = CLIENT_CLOSE_IMMEDIATLY);        //服务器关闭
 	_ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                                                       //得到指定链接信息
 	_ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID);                                                        //得到监听链接信息

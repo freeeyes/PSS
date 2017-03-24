@@ -16,6 +16,7 @@ struct _SendMessage
 	bool                m_blDelete;       //发送完成后是否删除，true是删除，false是不删除
 	IBuffPacket*        m_pBuffPacket;    //数据包内容
 	uint8               m_nEvents;        //发送类型，0：使用PacketParse组织发送数据，1：不使用PacketParse组织数据
+	int                 m_nMessageID;     //发送消息的ID
 	ACE_Time_Value      m_tvSend;         //数据包发送的时间戳
 
 	ACE_Message_Block*  m_pmbQueuePtr;    //消息队列指针块
@@ -30,6 +31,7 @@ struct _SendMessage
 		m_nEvents     = 0;
 		m_u2CommandID = 0;
 		m_nHashID     = 0;
+		m_nMessageID  = 0;
 
 		//这里设置消息队列模块指针内容，这样就不必反复的new和delete，提升性能
 		//指针关系也可以在这里直接指定，不必使用的使用再指定
