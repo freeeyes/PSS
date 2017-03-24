@@ -8,6 +8,7 @@
 #include <string>
 
 //定义客户端信令(TCP)
+//默认命令ID必须是CLIENT_LINK_USER以后的数字，之前的命令ID是保留字
 #define COMMAND_BASE            0x1000
 #define COMMAND_RETURN_ALIVE    0xf000
 
@@ -33,6 +34,7 @@ private:
 	int Do_DisConnect(IMessage* pMessage);
 	int Do_ClientSendTimeout(IMessage* pMessage);
 	int Do_Base(IMessage* pMessage);
+	int Do_ClientSendOk(IMessage* pMessage);
 
 
 private:

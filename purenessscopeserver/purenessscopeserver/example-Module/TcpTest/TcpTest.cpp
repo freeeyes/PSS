@@ -72,6 +72,7 @@ int LoadModuleData(CServerObject* pServerObject)
     pMessageManager->AddClientCommand(CLIENT_LINK_CONNECT, g_BaseCommand, g_szName);
     pMessageManager->AddClientCommand(CLIENT_LINK_CDISCONNET, g_BaseCommand, g_szName);
 	pMessageManager->AddClientCommand(CLINET_LINK_SENDTIMEOUT, g_BaseCommand, g_szName);
+	pMessageManager->AddClientCommand(CLIENT_LINK_SENDOK, g_BaseCommand, g_szName);
   }
   else
   {
@@ -110,6 +111,7 @@ int UnLoadModuleData()
       pMessageManager->DelClientCommand(CLIENT_LINK_CONNECT, g_BaseCommand);
       pMessageManager->DelClientCommand(CLIENT_LINK_CDISCONNET, g_BaseCommand);
 	  pMessageManager->DelClientCommand(CLINET_LINK_SENDTIMEOUT, g_BaseCommand);
+	  pMessageManager->DelClientCommand(CLIENT_LINK_SENDOK, g_BaseCommand);
       pMessageManager = NULL;
     }
 

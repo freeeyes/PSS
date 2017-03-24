@@ -43,6 +43,7 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 	MESSAGE_FUNCTION(CLIENT_LINK_CONNECT,     Do_Connect,           pMessage);
 	MESSAGE_FUNCTION(CLIENT_LINK_CDISCONNET,  Do_DisConnect,        pMessage);
 	MESSAGE_FUNCTION(CLINET_LINK_SENDTIMEOUT, Do_ClientSendTimeout, pMessage);
+	MESSAGE_FUNCTION(CLIENT_LINK_SENDOK,      Do_ClientSendOk,      pMessage);
 	MESSAGE_FUNCTION(COMMAND_BASE,            Do_Base,              pMessage);
 	MESSAGE_FUNCTION_END;
 
@@ -111,6 +112,7 @@ int CBaseCommand::Do_Base(IMessage* pMessage)
 
 	//(*pResponsesPacket) << u2PostCommandID;
 	//(*pResponsesPacket) << u8ClientTime;
+	int nMessageID = 1;
 
 	m_pServerObject->GetPacketManager()->Delete(pBodyPacket);
 
@@ -122,7 +124,8 @@ int CBaseCommand::Do_Base(IMessage* pMessage)
 			SENDMESSAGE_JAMPNOMAL, 
 			u2PostCommandID, 
 			PACKET_SEND_IMMEDIATLY, 
-			PACKET_IS_FRAMEWORK_RECYC);
+			PACKET_IS_FRAMEWORK_RECYC,
+			nMessageID);
 	}
 	else
 	{
@@ -137,38 +140,17 @@ int CBaseCommand::Do_Base(IMessage* pMessage)
 
 void CBaseCommand::ReadIniFile(const char* pIniFileName)
 {
-	/*
-	dictionary* pDictionary = NULL;
-	pDictionary = iniparser_load(pIniFileName);
-	if(NULL == pDictionary)
-	{
-		OUR_DEBUG((LM_ERROR, "[CBaseCommand::ReadIniFile](%s)Read Ini fail.\n", pIniFileName));
-		return;
-	}
-	else
-	{
-		//读取Ini文件内容
-		char* pData = iniparser_getstring(pDictionary, "PlugIn:Name", NULL);
-		if(NULL != pData)
-		{
-			OUR_DEBUG((LM_INFO, "[CBaseCommand::ReadIniFile]Name=%s.\n", pData));
-		}
-		else
-		{
-			OUR_DEBUG((LM_INFO, "[CBaseCommand::ReadIniFile]Name no find.\n"));
-		}
+}
 
-		int nData = iniparser_getint(pDictionary, "PlugIn:Number", 0);
-		if(0 != nData)
-		{
-			OUR_DEBUG((LM_INFO, "[CBaseCommand::ReadIniFile]Number=%d.\n", nData));
-		}
-		else
-		{
-			OUR_DEBUG((LM_INFO, "[CBaseCommand::ReadIniFile]Number no find.\n"));
-		}
+int CBaseCommand::Do_ClientSendOk(IMessage* pMessage)
+{
+	//接受数据发送成功事件
+	_PacketInfo HeadPacket;
+	pMessage->GetPacketHead(HeadPacket);
+	int nMessageID = 0;
+	memcpy_safe(HeadPacket.m_pData, sizeof(int),(char* )&nMessageID, sizeof(int));
 
-		iniparser_freedict(pDictionary);
-	}
-	*/
+	OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage]nMessageID=%d, ConnectID=%d.\n", nMessageID, pMessage->GetMessageBase()->m_u4ConnectID));
+
+	return 0;
 }
