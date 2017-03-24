@@ -288,7 +288,7 @@ public:
 		Close();
 	};
 
-	int Get_Size(int nHashCount, short sKeySize = DEF_HASH_KEY_SIZE)
+	int Get_Size(int nHashCount)
 	{
 		_Hash_Link_Info<T> objCell;
 		int nCellSize = objCell.Get_Size();
