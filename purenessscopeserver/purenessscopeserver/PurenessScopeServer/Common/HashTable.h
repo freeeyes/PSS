@@ -290,8 +290,8 @@ public:
 
 	int Get_Size(int nHashCount)
 	{
-		_Hash_Link_Info<T> objCell;
-		int nCellSize = objCell.Get_Size();
+		_Hash_Link_Info<T> objLink;
+		int nCellSize = objLink.Get_Size();
 		return nCellSize * nHashCount;
 	}
 
