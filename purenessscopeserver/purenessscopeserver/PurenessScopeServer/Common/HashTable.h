@@ -101,7 +101,7 @@ struct _Hash_Link_Info
 	}		
 
 	//得到当前对象大小
-	void GetSize()
+	int Get_Size()
 	{
 		return sizeof(_Hash_Link_Info);
 	}	
@@ -290,8 +290,8 @@ public:
 
 	int Get_Size(int nHashCount, short sKeySize = DEF_HASH_KEY_SIZE)
 	{
-		_Hash_Table_Cell<T> objCell;
-		int nCellSize = objCell.Get_Size(sKeySize);
+		_Hash_Link_Info<T> objCell;
+		int nCellSize = objCell.Get_Size();
 		return nCellSize * nHashCount;
 	}
 
