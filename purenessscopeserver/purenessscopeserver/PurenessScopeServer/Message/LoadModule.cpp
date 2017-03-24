@@ -322,6 +322,19 @@ uint16 CLoadModule::GetModuleCount()
 
 void CLoadModule::GetAllModuleInfo(vector<_ModuleInfo*>& vecModeInfo)
 {
+	vecModeInfo.clear();
 	m_objHashModuleList.Get_All_Used(vecModeInfo);
+}
+
+void CLoadModule::GetAllModuleName(vector<string> vecModuleName)
+{
+	vecModuleName.clear();
+	vector<_ModuleInfo*> vecModeInfo;
+	m_objHashModuleList.Get_All_Used(vecModeInfo);
+
+	for(int i = 0; i < (int)vecModeInfo.size(); i++)
+	{
+		vecModuleName.push_back((string)vecModeInfo[i]->GetName());
+	}
 }
 

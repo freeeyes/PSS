@@ -60,6 +60,7 @@ public:
 	const char* GetModuleFileDesc(const char* pModuleName);
 	uint16 GetModuleCount();
 	void GetAllModuleInfo(vector<_ModuleInfo*>& vecModeInfo);
+	void GetAllModuleName(vector<string> vecModuleName);
 
 private:
 	bool LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo, const char* pModulePath);    //开始加载模块的接口和数据
