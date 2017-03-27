@@ -500,6 +500,8 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 		//判断是否是需要以服务的状态启动
 		if(App_MainConfig::instance()->GetServerType() == 1)
 		{
+			App_Process::instance()->startprocesslog();
+
 			//以服务状态启动
 			//首先看有没有配置启动windows服务
 			App_Process::instance()->run(argc, argv);
@@ -514,6 +516,10 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 	//回收隐式加载PacketParse
 	App_PacketParseLoader::instance()->Close();
 
+	if(App_MainConfig::instance()->GetServerType() == 1)
+	{
+		App_Process::instance()->stopprocesslog();
+	}
 	return 0;
 }
 

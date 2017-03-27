@@ -9,33 +9,35 @@
 #include "ace/OS_NS_errno.h"
 
 #include "ProgramService.h"
-
-
+#include "Frame_Logging_Strategy.h"
 
 #define DEFAULT_SERVICE_INIT_STARTUP     SERVICE_AUTO_START
 
 class Process
 {
 public:
-	Process (void);
-	~Process (void);
+    Process (void);
+    ~Process (void);
 
-	int run(int argc, ACE_TCHAR* argv[]);
+    void startprocesslog();
+    int run(int argc, ACE_TCHAR* argv[]);
+    void stopprocesslog();
+private:
+    bool parse_args (int argc, ACE_TCHAR* argv[]);
+    void print_usage_and_die (void);
 
 private:
-	bool parse_args (int argc, ACE_TCHAR* argv[]);
-	void print_usage_and_die (void);
+    char m_szProgName[128];
 
-private:
-	char m_szProgName[128];
+    int m_nOptinstall;
+    int m_nOptremove;
+    int m_nOptstart;
+    int m_nOptkill;
+    int m_nOpttype;
+    int m_nOptdebug;
+    int m_nOptstartup;
 
-	int m_nOptinstall;
-	int m_nOptremove;
-	int m_nOptstart;
-	int m_nOptkill;
-	int m_nOpttype;
-	int m_nOptdebug;
-	int m_nOptstartup;
+    Frame_Logging_Strategy* m_pFrameLoggingStrategy; 
 };
 
 typedef ACE_Singleton<Process, ACE_Mutex> App_Process;
