@@ -684,6 +684,7 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
 		//发送成功
 		m_ThreadWriteLock.acquire();
 		m_atvOutput = ACE_OS::gettimeofday();
+
 		m_u4AllSendSize += (uint32)result.bytes_to_write();
 
 		int nMessageID = result.message_block().msg_type() - ACE_Message_Block::MB_USER;
@@ -718,7 +719,10 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
 		m_ThreadWriteLock.release();
 
 		//记录发送字节数
-		m_u4SuccessSendSize += (uint32)result.bytes_to_write();
+		if(m_u4ReadSendSize >= m_u4SuccessSendSize + (uint32)result.bytes_to_write())
+		{
+			m_u4SuccessSendSize += (uint32)result.bytes_to_write();
+		}
 
 		//查看是否需要关闭
 		if(CLIENT_CLOSE_SENDOK == m_emStatus)
