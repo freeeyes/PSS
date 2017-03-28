@@ -136,13 +136,15 @@ public:
 	ACE_Message_Block* Create(uint32 u4Size);
 	bool Close(ACE_Message_Block* pMessageBlock);
 
+	uint32 GetUsedSize();
+
 private:
 	ACE_Allocator * m_pmsgallocator;
 	ACE_Allocator * m_pdata_allocator;
 	ACE_Allocator * m_pbuff_allocator;
 
-	CMenoryBlock_Pool  m_MenoryBlock_Pool;                            //回收内存池
-
+	uint32                     m_u4UsedSize;                          //当前正在使用的内存大小  
+	CMenoryBlock_Pool          m_MenoryBlock_Pool;                    //回收内存池
 	ACE_Recursive_Thread_Mutex m_ThreadWriteLock;                     //控制多线程锁
 };
 

@@ -893,7 +893,7 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
 	pData = m_MainConfig.GetData("Monitor", "MemoryMax");
 	if(pData != NULL)
 	{
-		m_u4MaxMemory = (uint32)ACE_OS::atoi(pData);
+		m_u4MaxMemory = (uint32)ACE_OS::atoi(pData) * 1024 *1024;
 	}
 
 	//开始得到命令统计相关开关

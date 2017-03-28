@@ -594,17 +594,22 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* a
     {
 #ifdef WIN32
         uint32 u4CurrCpu    = (uint32)GetProcessCPU_Idel();
-        uint32 u4CurrMemory = (uint32)GetProcessMemorySize();
+        //uint32 u4CurrMemory = (uint32)GetProcessMemorySize();
 #else
         uint32 u4CurrCpu    = (uint32)GetProcessCPU_Idel_Linux();
-        uint32 u4CurrMemory = (uint32)GetProcessMemorySize_Linux();
+        //uint32 u4CurrMemory = (uint32)GetProcessMemorySize_Linux();
 #endif
 
-        if(u4CurrCpu > App_MainConfig::instance()->GetCpuMax() || u4CurrMemory > App_MainConfig::instance()->GetMemoryMax())
+		uint32 u4UsedSize = App_MessageBlockManager::instance()->GetUsedSize();
+        if(u4CurrCpu > App_MainConfig::instance()->GetCpuMax() || u4UsedSize > App_MainConfig::instance()->GetMemoryMax())
         {
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_MONITOR, "[Monitor] CPU Rote=%d,Memory=%d.", u4CurrCpu, u4CurrMemory);
+			OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::handle_timeout]CPU Rote=%d,Memory=%d ALERT.\n", u4CurrCpu, u4UsedSize));
+            AppLogManager::instance()->WriteLog(LOG_SYSTEM_MONITOR, "[Monitor] CPU Rote=%d,Memory=%d.", u4CurrCpu, u4UsedSize);
         }
-
+		else
+		{
+			OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::handle_timeout]CPU Rote=%d,Memory=%d OK.\n", u4CurrCpu, u4UsedSize));
+		}
     }
 
     //检查所有插件状态

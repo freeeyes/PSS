@@ -52,7 +52,7 @@
 	<!-- 服务器间连接相关设置 -->
 	<ConnectServer TimeInterval="500" TimeCheck="30" Recvbuff="1024" RunType="0" Count="100" desc="框架连接其它远程服务器相关参数，TimeInterval是连接每个服务器之间的保护时间，单位是毫秒,TimeCheck单位是秒,RunType 0是同步模式，1是异步模式" />
 	<!-- CPU&Memory监控相关设置 -->
-	<Monitor CpuAndMemory="0" CpuMax="50" MemoryMax="1000" desc="是否对CPU和内存定时监控，并输出日志，0为关闭监控，1是打开监控" />
+	<Monitor CpuAndMemory="1" CpuMax="50" MemoryMax="1000" desc="是否对CPU和内存定时监控，并输出日志，0为关闭监控，1是打开监控" />
 	<!-- 屏幕输出相关设置 -->
 	<AceDebug TrunOn="0" DebugName="./serverdebug.log" ChkInterval="600" LogFileMaxSize="10240" LogFileMaxCnt="3" Level="" desc="ACEDEBUG文件输出配置，TrunOn=0为不使用，1为使用" />
 	
