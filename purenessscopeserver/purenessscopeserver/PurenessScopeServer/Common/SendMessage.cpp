@@ -6,98 +6,102 @@ CSendMessagePool::CSendMessagePool(void)
 
 CSendMessagePool::~CSendMessagePool(void)
 {
-	OUR_DEBUG((LM_INFO, "[CSendMessagePool::~CSendMessagePool].\n"));
-	Close();
-	OUR_DEBUG((LM_INFO, "[CSendMessagePool::~CSendMessagePool] End.\n"));
+    OUR_DEBUG((LM_INFO, "[CSendMessagePool::~CSendMessagePool].\n"));
+    Close();
+    OUR_DEBUG((LM_INFO, "[CSendMessagePool::~CSendMessagePool] End.\n"));
 }
 
 void CSendMessagePool::Init(int nObjcetCount)
 {
-	Close();
+    Close();
 
-	//初始化HashTable
-	m_objHashHandleList.Init((int)nObjcetCount);
+    //初始化HashTable
+    m_objHashHandleList.Init((int)nObjcetCount);
 
-	for(int i = 0; i < nObjcetCount; i++)
-	{
-		_SendMessage* pMessage = new _SendMessage();
-		if(NULL != pMessage)
-		{
-			//添加到hash数组里面
-			char szMessageID[10] = {'\0'};
-			sprintf_safe(szMessageID, 10, "%d", i);
-			int nHashPos = m_objHashHandleList.Add_Hash_Data(szMessageID, pMessage);
-			if(-1 != nHashPos)
-			{
-				pMessage->SetHashID(nHashPos);
-			}
-		}
-	}
+    for(int i = 0; i < nObjcetCount; i++)
+    {
+        _SendMessage* pMessage = new _SendMessage();
+
+        if(NULL != pMessage)
+        {
+            //添加到hash数组里面
+            char szMessageID[10] = {'\0'};
+            sprintf_safe(szMessageID, 10, "%d", i);
+            int nHashPos = m_objHashHandleList.Add_Hash_Data(szMessageID, pMessage);
+
+            if(-1 != nHashPos)
+            {
+                pMessage->SetHashID(nHashPos);
+            }
+        }
+    }
 }
 
 void CSendMessagePool::Close()
 {
-	//清理所有已存在的指针
-	vector<_SendMessage*> vecSendMessage;
-	m_objHashHandleList.Get_All_Used(vecSendMessage);
-	for(int i = 0; i < (int)vecSendMessage.size(); i++)
-	{
-		_SendMessage* pMessage = vecSendMessage[i];
-		SAFE_DELETE(pMessage);
-	}
+    //清理所有已存在的指针
+    vector<_SendMessage*> vecSendMessage;
+    m_objHashHandleList.Get_All_Used(vecSendMessage);
 
-	m_objHashHandleList.Close();
+    for(int i = 0; i < (int)vecSendMessage.size(); i++)
+    {
+        _SendMessage* pMessage = vecSendMessage[i];
+        SAFE_DELETE(pMessage);
+    }
+
+    m_objHashHandleList.Close();
 }
 
 _SendMessage* CSendMessagePool::Create()
 {
-	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
+    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	_SendMessage* pMessage = NULL;
+    _SendMessage* pMessage = NULL;
 
-	//在Hash表中弹出一个已使用的数据
-	pMessage = m_objHashHandleList.Pop();
+    //在Hash表中弹出一个已使用的数据
+    pMessage = m_objHashHandleList.Pop();
 
-	//没找到空余的
-	return pMessage;
+    //没找到空余的
+    return pMessage;
 }
 
 bool CSendMessagePool::Delete(_SendMessage* pObject)
 {
-	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
+    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	if(NULL == pObject)
-	{
-		return false;
-	}
+    if(NULL == pObject)
+    {
+        return false;
+    }
 
-	char szHashID[10] = {'\0'};
-	sprintf_safe(szHashID, 10, "%d", pObject->GetHashID());
-	bool blState = m_objHashHandleList.Push(szHashID, pObject);
-	if(false == blState)
-	{
-		OUR_DEBUG((LM_INFO, "[CSendMessagePool::Delete]HashID=%s(0x%08x).\n", szHashID, pObject));
-	}
-	else
-	{
-		//OUR_DEBUG((LM_INFO, "[CSendMessagePool::Delete]HashID=%s(0x%08x) nPos=%d.\n", szHashID, pObject, nPos));
-	}
+    char szHashID[10] = {'\0'};
+    sprintf_safe(szHashID, 10, "%d", pObject->GetHashID());
+    bool blState = m_objHashHandleList.Push(szHashID, pObject);
 
-	return true;
+    if(false == blState)
+    {
+        OUR_DEBUG((LM_INFO, "[CSendMessagePool::Delete]HashID=%s(0x%08x).\n", szHashID, pObject));
+    }
+    else
+    {
+        //OUR_DEBUG((LM_INFO, "[CSendMessagePool::Delete]HashID=%s(0x%08x) nPos=%d.\n", szHashID, pObject, nPos));
+    }
+
+    return true;
 }
 
 int CSendMessagePool::GetUsedCount()
 {
-	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
+    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	return m_objHashHandleList.Get_Count() - m_objHashHandleList.Get_Used_Count();
+    return m_objHashHandleList.Get_Count() - m_objHashHandleList.Get_Used_Count();
 }
 
 int CSendMessagePool::GetFreeCount()
 {
-	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
+    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	return m_objHashHandleList.Get_Used_Count();
+    return m_objHashHandleList.Get_Used_Count();
 }
 
 

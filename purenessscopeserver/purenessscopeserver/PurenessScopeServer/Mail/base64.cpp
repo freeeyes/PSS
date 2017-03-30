@@ -41,19 +41,28 @@ static const unsigned char map2[] =
     0x2c, 0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x32, 0x33
 };
 
-int base64_decode(unsigned char *out, const char *in, int out_size)
+int base64_decode(unsigned char* out, const char* in, int out_size)
 {
     int i, v;
-    unsigned char *dst = out;
+    unsigned char* dst = out;
 
     v = 0;
-    for (i = 0; in[i] && in[i] != '='; i++) {
+
+    for (i = 0; in[i] && in[i] != '='; i++)
+    {
         unsigned int index= in[i]-43;
+
         if (index>=SIZEOF_ARRAY(map2) || map2[index] == 0xff)
+        {
             return -1;
+        }
+
         v = (v << 6) + map2[index];
-        if (i & 3) {
-            if (dst - out < out_size) {
+
+        if (i & 3)
+        {
+            if (dst - out < out_size)
+            {
                 *dst++ = v >> (6 - 2 * (i & 3));
             }
         }
@@ -68,31 +77,41 @@ int base64_decode(unsigned char *out, const char *in, int out_size)
 * Fixed edge cases and made it work from data (vs. strings) by Ryan.
 *****************************************************************************/
 
-char *base64_encode(char *out, int out_size, const unsigned char *in, int in_size)
+char* base64_encode(char* out, int out_size, const unsigned char* in, int in_size)
 {
     static const char b64[] =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    char *ret, *dst;
+    char* ret, *dst;
     unsigned i_bits = 0;
     int i_shift = 0;
     int bytes_remaining = in_size;
 
     if (out_size < BASE64_SIZE(in_size))
+    {
         return NULL;
-        
+    }
+
     ret = dst = out;
-    while (bytes_remaining) {
+
+    while (bytes_remaining)
+    {
         i_bits = (i_bits << 8) + *in++;
         bytes_remaining--;
         i_shift += 8;
 
-        do {
+        do
+        {
             *dst++ = b64[(i_bits << 6 >> i_shift) & 0x3f];
             i_shift -= 6;
-        } while (i_shift > 6 || (bytes_remaining == 0 && i_shift > 0));
+        }
+        while (i_shift > 6 || (bytes_remaining == 0 && i_shift > 0));
     }
+
     while ((dst - ret) & 3)
+    {
         *dst++ = '=';
+    }
+
     *dst = '\0';
 
     return ret;

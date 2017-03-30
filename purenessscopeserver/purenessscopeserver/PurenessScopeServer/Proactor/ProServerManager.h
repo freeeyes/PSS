@@ -26,17 +26,17 @@ class Frame_Logging_Strategy;
 class CProServerManager : public IServerManager
 {
 public:
-	CProServerManager(void);
-	~CProServerManager(void);
+    CProServerManager(void);
+    ~CProServerManager(void);
 
-	bool Init();
-	bool Start();
-	bool Close();
+    bool Init();
+    bool Start();
+    bool Close();
 
 private:
-	//CProConnectAcceptManager   m_ConnectAcceptorManager;         //用于关联客户端链接
-	CProConsoleConnectAcceptor m_ProConsoleConnectAcceptor;      //用于关联管理工具链接
-	Frame_Logging_Strategy*    m_pFrameLoggingStrategy;          //输出对象
+    //CProConnectAcceptManager   m_ConnectAcceptorManager;         //用于关联客户端链接
+    CProConsoleConnectAcceptor m_ProConsoleConnectAcceptor;      //用于关联管理工具链接
+    Frame_Logging_Strategy*    m_pFrameLoggingStrategy;          //输出对象
 };
 
 

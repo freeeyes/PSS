@@ -23,19 +23,19 @@
 class CServerObject
 {
 public:
-	CServerObject() 
-	{ 
-		m_pIMessageManager      = NULL;
-		m_pLogManager           = NULL;
-		m_pConnectManager       = NULL;
-		m_pPacketManager        = NULL;
-		m_pClientManager        = NULL;
-		m_pUDPConnectManager    = NULL;
-		m_pModuleMessageManager = NULL;
-		m_pContorlListen        = NULL;
-		m_pIServerManager       = NULL;
-		m_pMessageBlockManager  = NULL;
-	}
+    CServerObject()
+    {
+        m_pIMessageManager      = NULL;
+        m_pLogManager           = NULL;
+        m_pConnectManager       = NULL;
+        m_pPacketManager        = NULL;
+        m_pClientManager        = NULL;
+        m_pUDPConnectManager    = NULL;
+        m_pModuleMessageManager = NULL;
+        m_pContorlListen        = NULL;
+        m_pIServerManager       = NULL;
+        m_pMessageBlockManager  = NULL;
+    }
 
     virtual ~CServerObject() {}
     void SetMessageManager(IMessageManager* pIMessageManager)
@@ -78,14 +78,14 @@ public:
     {
         m_pIModuleInfo = pModuleInfo;
     }
-	void SetServerManager(IServerManager* pIServerManager)
-	{
-		m_pIServerManager = pIServerManager;
-	}
-	void SetMessageBlockManager(IMessageBlockManager* pMessageBlockManager)
-	{
-		m_pMessageBlockManager = pMessageBlockManager;
-	}
+    void SetServerManager(IServerManager* pIServerManager)
+    {
+        m_pIServerManager = pIServerManager;
+    }
+    void SetMessageBlockManager(IMessageBlockManager* pMessageBlockManager)
+    {
+        m_pMessageBlockManager = pMessageBlockManager;
+    }
 
     IMessageManager*       GetMessageManager()
     {
@@ -127,30 +127,30 @@ public:
     {
         return m_pIModuleInfo;
     }
-	IServerManager*        GetServerManager()
-	{
-		return m_pIServerManager;
-	}
-	IMessageBlockManager*  GetMessageBlockManager()
-	{
-		return m_pMessageBlockManager;
-	}
+    IServerManager*        GetServerManager()
+    {
+        return m_pIServerManager;
+    }
+    IMessageBlockManager*  GetMessageBlockManager()
+    {
+        return m_pMessageBlockManager;
+    }
 
 private:
-	IMessageManager*       m_pIMessageManager;
-	ILogManager*           m_pLogManager;
-	IConnectManager*       m_pConnectManager;
-	IPacketManager*        m_pPacketManager;
-	IClientManager*        m_pClientManager;
-	IUDPConnectManager*    m_pUDPConnectManager;
-	ActiveTimer*           m_pTimerManager;
-	IModuleMessageManager* m_pModuleMessageManager;
-	IControlListen*        m_pContorlListen;
-	IModuleInfo*           m_pIModuleInfo;
-	IServerManager*        m_pIServerManager;
-	IMessageBlockManager*  m_pMessageBlockManager;
+    IMessageManager*       m_pIMessageManager;
+    ILogManager*           m_pLogManager;
+    IConnectManager*       m_pConnectManager;
+    IPacketManager*        m_pPacketManager;
+    IClientManager*        m_pClientManager;
+    IUDPConnectManager*    m_pUDPConnectManager;
+    ActiveTimer*           m_pTimerManager;
+    IModuleMessageManager* m_pModuleMessageManager;
+    IControlListen*        m_pContorlListen;
+    IModuleInfo*           m_pIModuleInfo;
+    IServerManager*        m_pIServerManager;
+    IMessageBlockManager*  m_pMessageBlockManager;
 };
 
-typedef ACE_Singleton<CServerObject, ACE_Null_Mutex> App_ServerObject; 
+typedef ACE_Singleton<CServerObject, ACE_Null_Mutex> App_ServerObject;
 
 #endif

@@ -12,7 +12,7 @@ class ICheckPacket
 {
 public:
     virtual ~ICheckPacket() {}
-	virtual  IBuffPacket* CheckData(IBuffPacket* pRecvPacket, uint32 u4ConnectID, uint32& u4PacketLen) = 0;
+    virtual  IBuffPacket* CheckData(IBuffPacket* pRecvPacket, uint32 u4ConnectID, uint32& u4PacketLen) = 0;
 };
 
 #endif

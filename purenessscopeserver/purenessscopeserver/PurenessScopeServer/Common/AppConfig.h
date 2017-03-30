@@ -17,25 +17,25 @@
 class CAppConfig
 {
 public:
-	CAppConfig(void);
-	~CAppConfig(void);
+    CAppConfig(void);
+    ~CAppConfig(void);
 
-	void Close();
+    void Close();
 
-	bool ReadConfig(const char* szConfigname);
-	bool WriteConfig(const char* szConfigname);
-	bool WriteConfig();
+    bool ReadConfig(const char* szConfigname);
+    bool WriteConfig(const char* szConfigname);
+    bool WriteConfig();
 
-	bool GetValue(const char* szName, ACE_TString& strValue, const char* szRoot);
-	bool SetValue(const char* szName, ACE_TString& strValue, const char* szRoot);
+    bool GetValue(const char* szName, ACE_TString& strValue, const char* szRoot);
+    bool SetValue(const char* szName, ACE_TString& strValue, const char* szRoot);
 
-	const char* GetError();
+    const char* GetError();
 
 private:
-	ACE_Configuration_Heap* m_pConfig;
-	ACE_Ini_ImpExp*         m_pIniImp;
-	ACE_TString             m_strConfigName;
-	char                    m_szError[MAX_BUFF_500];
+    ACE_Configuration_Heap* m_pConfig;
+    ACE_Ini_ImpExp*         m_pIniImp;
+    ACE_TString             m_strConfigName;
+    char                    m_szError[MAX_BUFF_500];
 };
 
 #endif

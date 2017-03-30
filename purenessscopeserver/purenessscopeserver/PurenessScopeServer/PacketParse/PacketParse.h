@@ -17,17 +17,17 @@
 class CPacketParse : public CPacketParseBase
 {
 public:
-	CPacketParse(void);
-	virtual ~CPacketParse(void);
+    CPacketParse(void);
+    virtual ~CPacketParse(void);
 
-	//初始化PacketParsed
-	void Init();
+    //初始化PacketParsed
+    void Init();
 
-	void SetHashID(int nHashID);
-	int  GetHashID();
+    void SetHashID(int nHashID);
+    int  GetHashID();
 
 private:
-	int m_nHashID;
+    int m_nHashID;
 };
 
 #endif

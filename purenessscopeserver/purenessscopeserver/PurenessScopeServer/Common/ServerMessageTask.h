@@ -25,52 +25,52 @@ using namespace std;
 //服务器间通讯的数据结构（接收包）
 struct _Server_Message_Info
 {
-	IClientMessage*    m_pClientMessage;
-	uint16             m_u2CommandID;
-	ACE_Message_Block* m_pRecvFinish;
-	_ClientIPInfo      m_objServerIPInfo;
-	int                m_nHashID;
+    IClientMessage*    m_pClientMessage;
+    uint16             m_u2CommandID;
+    ACE_Message_Block* m_pRecvFinish;
+    _ClientIPInfo      m_objServerIPInfo;
+    int                m_nHashID;
 
-	ACE_Message_Block* m_pmbQueuePtr;        //消息队列指针块
+    ACE_Message_Block* m_pmbQueuePtr;        //消息队列指针块
 
-	_Server_Message_Info()
-	{
-		m_nHashID        = 0;
-		m_u2CommandID    = 0;
-		m_pClientMessage = NULL;
-		m_pRecvFinish    = NULL;
+    _Server_Message_Info()
+    {
+        m_nHashID        = 0;
+        m_u2CommandID    = 0;
+        m_pClientMessage = NULL;
+        m_pRecvFinish    = NULL;
 
-		//这里设置消息队列模块指针内容，这样就不必反复的new和delete，提升性能
-		//指针关系也可以在这里直接指定，不必使用的使用再指定
-		m_pmbQueuePtr  = new ACE_Message_Block(sizeof(_Server_Message_Info*));
+        //这里设置消息队列模块指针内容，这样就不必反复的new和delete，提升性能
+        //指针关系也可以在这里直接指定，不必使用的使用再指定
+        m_pmbQueuePtr  = new ACE_Message_Block(sizeof(_Server_Message_Info*));
 
-		_Server_Message_Info** ppMessage = (_Server_Message_Info**)m_pmbQueuePtr->base();
-		*ppMessage = this;
-	}
+        _Server_Message_Info** ppMessage = (_Server_Message_Info**)m_pmbQueuePtr->base();
+        *ppMessage = this;
+    }
 
-	~_Server_Message_Info()
-	{
-		if(NULL != m_pmbQueuePtr)
-		{
-			m_pmbQueuePtr->release();
-			m_pmbQueuePtr = NULL;
-		}
-	}
-	
-	ACE_Message_Block* GetQueueMessage()
-	{
-		return m_pmbQueuePtr;
-	}
+    ~_Server_Message_Info()
+    {
+        if(NULL != m_pmbQueuePtr)
+        {
+            m_pmbQueuePtr->release();
+            m_pmbQueuePtr = NULL;
+        }
+    }
 
-	void SetHashID(int nHashID)
-	{
-		m_nHashID = nHashID;
-	}
+    ACE_Message_Block* GetQueueMessage()
+    {
+        return m_pmbQueuePtr;
+    }
 
-	int GetHashID()
-	{
-		return m_nHashID;
-	}
+    void SetHashID(int nHashID)
+    {
+        m_nHashID = nHashID;
+    }
+
+    int GetHashID()
+    {
+        return m_nHashID;
+    }
 
 };
 
@@ -80,87 +80,87 @@ struct _Server_Message_Info
 class CServerMessageInfoPool
 {
 public:
-	CServerMessageInfoPool();
-	~CServerMessageInfoPool();
+    CServerMessageInfoPool();
+    ~CServerMessageInfoPool();
 
-	void Init(uint32 u4PacketCount = MAX_SERVER_MESSAGE_INFO_COUNT);
-	void Close();
+    void Init(uint32 u4PacketCount = MAX_SERVER_MESSAGE_INFO_COUNT);
+    void Close();
 
-	_Server_Message_Info* Create();
-	bool Delete(_Server_Message_Info* pMakePacket);
+    _Server_Message_Info* Create();
+    bool Delete(_Server_Message_Info* pMakePacket);
 
-	int GetUsedCount();
-	int GetFreeCount();
+    int GetUsedCount();
+    int GetFreeCount();
 
 private:
-	CHashTable<_Server_Message_Info> m_objServerMessageList;           //Server Message缓冲池
-	ACE_Recursive_Thread_Mutex       m_ThreadWriteLock;                //控制多线程锁
-}; 
+    CHashTable<_Server_Message_Info> m_objServerMessageList;           //Server Message缓冲池
+    ACE_Recursive_Thread_Mutex       m_ThreadWriteLock;                //控制多线程锁
+};
 
 //服务器间数据包消息队列处理过程
 class CServerMessageTask : public ACE_Task<ACE_MT_SYNCH>
 {
 public:
-	CServerMessageTask();
-	~CServerMessageTask();
+    CServerMessageTask();
+    ~CServerMessageTask();
 
-	virtual int open(void* args = 0);
-	virtual int svc (void);
+    virtual int open(void* args = 0);
+    virtual int svc (void);
 
-	virtual int handle_signal (int signum,
-		siginfo_t *  = 0,
-		ucontext_t * = 0);
+    virtual int handle_signal (int signum,
+                               siginfo_t*   = 0,
+                               ucontext_t* = 0);
 
-	bool Start();
-	int  Close();
-	bool IsRun();
+    bool Start();
+    int  Close();
+    bool IsRun();
 
-	uint32 GetThreadID();
+    uint32 GetThreadID();
 
-	bool PutMessage(_Server_Message_Info* pMessage);
+    bool PutMessage(_Server_Message_Info* pMessage);
 
-	bool CheckServerMessageThread(ACE_Time_Value tvNow);
+    bool CheckServerMessageThread(ACE_Time_Value tvNow);
 
-	void AddClientMessage(IClientMessage* pClientMessage);
+    void AddClientMessage(IClientMessage* pClientMessage);
 
-	void DelClientMessage(IClientMessage* pClientMessage);
-
-private:
-	bool CheckValidClientMessage(IClientMessage* pClientMessage);
-	bool ProcessMessage(_Server_Message_Info* pMessage, uint32 u4ThreadID);
+    void DelClientMessage(IClientMessage* pClientMessage);
 
 private:
-	uint32               m_u4ThreadID;  //当前线程ID
-	bool                 m_blRun;       //当前线程是否运行
-	uint32               m_u4MaxQueue;  //在队列中的数据最多个数
-	EM_Server_Recv_State m_emState;     //处理状态
-	ACE_Time_Value       m_tvDispose;   //接收数据包处理时间
+    bool CheckValidClientMessage(IClientMessage* pClientMessage);
+    bool ProcessMessage(_Server_Message_Info* pMessage, uint32 u4ThreadID);
 
-	//记录当前有效的IClientMessage，因为是异步的关系。
-	//这里必须保证回调的时候IClientMessage是合法的。
-	typedef vector<IClientMessage*> vecValidIClientMessage;
-	vecValidIClientMessage m_vecValidIClientMessage;
+private:
+    uint32               m_u4ThreadID;  //当前线程ID
+    bool                 m_blRun;       //当前线程是否运行
+    uint32               m_u4MaxQueue;  //在队列中的数据最多个数
+    EM_Server_Recv_State m_emState;     //处理状态
+    ACE_Time_Value       m_tvDispose;   //接收数据包处理时间
+
+    //记录当前有效的IClientMessage，因为是异步的关系。
+    //这里必须保证回调的时候IClientMessage是合法的。
+    typedef vector<IClientMessage*> vecValidIClientMessage;
+    vecValidIClientMessage m_vecValidIClientMessage;
 };
 
 class CServerMessageManager
 {
 public:
-	CServerMessageManager();
-	~CServerMessageManager();
+    CServerMessageManager();
+    ~CServerMessageManager();
 
-	void Init();
+    void Init();
 
-	bool Start();
-	int  Close();
-	bool PutMessage(_Server_Message_Info* pMessage);
-	bool CheckServerMessageThread(ACE_Time_Value tvNow);
+    bool Start();
+    int  Close();
+    bool PutMessage(_Server_Message_Info* pMessage);
+    bool CheckServerMessageThread(ACE_Time_Value tvNow);
 
-	void AddClientMessage(IClientMessage* pClientMessage);
-	void DelClientMessage(IClientMessage* pClientMessage);
+    void AddClientMessage(IClientMessage* pClientMessage);
+    void DelClientMessage(IClientMessage* pClientMessage);
 
 private:
-	CServerMessageTask*         m_pServerMessageTask;
-	ACE_Recursive_Thread_Mutex  m_ThreadWritrLock; 
+    CServerMessageTask*         m_pServerMessageTask;
+    ACE_Recursive_Thread_Mutex  m_ThreadWritrLock;
 };
 
 

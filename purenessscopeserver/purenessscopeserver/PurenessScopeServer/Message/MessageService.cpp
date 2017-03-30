@@ -60,7 +60,7 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
     //按照线程初始化统计模块的名字
     char szName[MAX_BUFF_50] = {'\0'};
     sprintf_safe(szName, MAX_BUFF_50, "工作线程(%d)", u4ThreadID);
-	m_CommandAccount.InitName(szName, App_MainConfig::instance()->GetMaxCommandCount());
+    m_CommandAccount.InitName(szName, App_MainConfig::instance()->GetMaxCommandCount());
 
     //初始化统计模块功能
     m_CommandAccount.Init(App_MainConfig::instance()->GetCommandAccount(),
@@ -171,7 +171,7 @@ int CMessageService::svc(void)
 
         this->ProcessMessage(msg, m_u4ThreadID);
 
-		//使用内存池，这块内存不必再释放
+        //使用内存池，这块内存不必再释放
     }
 
     OUR_DEBUG((LM_INFO,"[CMessageService::svc] svc finish!\n"));
@@ -479,36 +479,40 @@ uint32 CMessageService::GetStepState()
 
 CMessage* CMessageService::CreateMessage()
 {
-	//OUR_DEBUG((LM_INFO, "[CMessageService::CreateMessage]GetThreadID=%d, m_MessagePool=0x%08x.\n", GetThreadID(), m_MessagePool));
-	CMessage* pMessage = m_MessagePool.Create();
-	if(NULL != pMessage)
-	{
-		pMessage->GetMessageBase()->m_u4WorkThreadID = GetThreadID();
-	}
+    //OUR_DEBUG((LM_INFO, "[CMessageService::CreateMessage]GetThreadID=%d, m_MessagePool=0x%08x.\n", GetThreadID(), m_MessagePool));
+    CMessage* pMessage = m_MessagePool.Create();
+
+    if(NULL != pMessage)
+    {
+        pMessage->GetMessageBase()->m_u4WorkThreadID = GetThreadID();
+    }
+
     return pMessage;
 }
 
 void CMessageService::DeleteMessage(CMessage* pMessage)
 {
-	//OUR_DEBUG((LM_INFO, "[CMessageService::DeleteMessage]GetThreadID=%d, m_MessagePool=0x%08x.\n", GetThreadID(), m_MessagePool));
+    //OUR_DEBUG((LM_INFO, "[CMessageService::DeleteMessage]GetThreadID=%d, m_MessagePool=0x%08x.\n", GetThreadID(), m_MessagePool));
     m_MessagePool.Delete(pMessage);
 }
 
 int CMessageService::handle_signal (int signum,
-				   siginfo_t* siginfo,
-				   ucontext_t* ucontext)
+                                    siginfo_t* siginfo,
+                                    ucontext_t* ucontext)
 {
-	if (signum == SIGUSR1 + grp_id())
-	{
-		OUR_DEBUG((LM_INFO,"[CMessageService::handle_signal](%d) will be kill.\n", grp_id()));
-		if(NULL != siginfo && NULL != ucontext)
-		{
-			OUR_DEBUG((LM_INFO,"[CMessageService::handle_signal]siginfo is not null.\n"));
-		}
+    if (signum == SIGUSR1 + grp_id())
+    {
+        OUR_DEBUG((LM_INFO,"[CMessageService::handle_signal](%d) will be kill.\n", grp_id()));
 
-		ACE_Thread::exit();
-	}
-	return 0;
+        if(NULL != siginfo && NULL != ucontext)
+        {
+            OUR_DEBUG((LM_INFO,"[CMessageService::handle_signal]siginfo is not null.\n"));
+        }
+
+        ACE_Thread::exit();
+    }
+
+    return 0;
 }
 CMessageServiceGroup::CMessageServiceGroup()
 {
@@ -559,11 +563,11 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* a
 
                 //杀死当前工作线程
                 int ret = ACE_Thread_Manager::instance()->cancel_task(pMessageService, 1);
-								OUR_DEBUG((LM_DEBUG, "[CMessageServiceGroup::CheckServerMessageThread]kill return %d OK.\n", ret)); 
+                OUR_DEBUG((LM_DEBUG, "[CMessageServiceGroup::CheckServerMessageThread]kill return %d OK.\n", ret));
 
                 //需要重启工作线程，先关闭当前的工作线程
                 pMessageService->Close();
-								SAFE_DELETE(pMessageService);
+                SAFE_DELETE(pMessageService);
 
                 //创建一个新的工作线程，并赋值进去
                 pMessageService = new CMessageService();
@@ -572,11 +576,10 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* a
                 {
                     pMessageService->Init(u4ThreadID, m_u4MaxQueue, m_u4LowMask, m_u4HighMask);
                     pMessageService->Start();
-					
+
                     //m_ThreadWriteLock.acquire();
                     m_vecMessageService[i] = pMessageService;
                     //m_ThreadWriteLock.release();
-
                 }
                 else
                 {
@@ -600,21 +603,23 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* a
         //uint32 u4CurrMemory = (uint32)GetProcessMemorySize_Linux();
 #endif
 
-		uint32 u4UsedSize = App_MessageBlockManager::instance()->GetUsedSize();
+        uint32 u4UsedSize = App_MessageBlockManager::instance()->GetUsedSize();
+
         if(u4CurrCpu > App_MainConfig::instance()->GetCpuMax() || u4UsedSize > App_MainConfig::instance()->GetMemoryMax())
         {
-			OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::handle_timeout]CPU Rote=%d,Memory=%d ALERT.\n", u4CurrCpu, u4UsedSize));
+            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::handle_timeout]CPU Rote=%d,Memory=%d ALERT.\n", u4CurrCpu, u4UsedSize));
             AppLogManager::instance()->WriteLog(LOG_SYSTEM_MONITOR, "[Monitor] CPU Rote=%d,Memory=%d.", u4CurrCpu, u4UsedSize);
         }
-		else
-		{
-			OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::handle_timeout]CPU Rote=%d,Memory=%d OK.\n", u4CurrCpu, u4UsedSize));
-		}
+        else
+        {
+            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::handle_timeout]CPU Rote=%d,Memory=%d OK.\n", u4CurrCpu, u4UsedSize));
+        }
     }
 
     //检查所有插件状态
-	vector<_ModuleInfo*> vecModeInfo;
-	App_ModuleLoader::instance()->GetAllModuleInfo(vecModeInfo);
+    vector<_ModuleInfo*> vecModeInfo;
+    App_ModuleLoader::instance()->GetAllModuleInfo(vecModeInfo);
+
     for(int i = 0; i < (int)vecModeInfo.size(); i++)
     {
         _ModuleInfo* pModuleInfo = vecModeInfo[i];
@@ -651,7 +656,7 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
     m_u4HighMask = u4HighMask;
     m_u4LowMask  = u4LowMask;
 
-	m_objAllThreadInfo.Init((int)u4ThreadCount);
+    m_objAllThreadInfo.Init((int)u4ThreadCount);
 
     //初始化所有的Message对象
     for(uint32 i = 0; i < u4ThreadCount; i++)
@@ -680,7 +685,7 @@ bool CMessageServiceGroup::PutMessage(CMessage* pMessage)
     int32 n4ThreadID = 0;
 
     //得到工作线程ID
-	n4ThreadID = pMessage->GetMessageBase()->m_u4WorkThreadID;
+    n4ThreadID = pMessage->GetMessageBase()->m_u4WorkThreadID;
 
     if(-1 == n4ThreadID)
     {
@@ -730,6 +735,7 @@ bool CMessageServiceGroup::Start()
     for(uint32 i = 0; i < (uint32)m_vecMessageService.size(); i++)
     {
         CMessageService* pMessageService = (CMessageService*)m_vecMessageService[i];
+
         if(NULL != pMessageService)
         {
             pMessageService->Start();
@@ -1032,7 +1038,7 @@ CMessage* CMessageServiceGroup::CreateMessage(uint32 u4ConnectID, uint8 u1Packet
         return NULL;
     }
 
-	//OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::CreateMessage]n4ThreadID=%d.\n", n4ThreadID));
+    //OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::CreateMessage]n4ThreadID=%d.\n", n4ThreadID));
 
     CMessageService* pMessageService = (CMessageService*)m_vecMessageService[(uint32)n4ThreadID];
 
@@ -1048,13 +1054,13 @@ CMessage* CMessageServiceGroup::CreateMessage(uint32 u4ConnectID, uint8 u1Packet
 
 void CMessageServiceGroup::DeleteMessage(uint32 u4ConnectID, CMessage* pMessage)
 {
-	if(u4ConnectID == 0)
-	{
-		OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::DeleteMessage]u4ConnectID=%d.\n", u4ConnectID));
-	}
+    if(u4ConnectID == 0)
+    {
+        OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::DeleteMessage]u4ConnectID=%d.\n", u4ConnectID));
+    }
 
     int32 n4ThreadID  = 0;
-	n4ThreadID = pMessage->GetMessageBase()->m_u4WorkThreadID;
+    n4ThreadID = pMessage->GetMessageBase()->m_u4WorkThreadID;
 
     if(-1 == n4ThreadID)
     {

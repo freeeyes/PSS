@@ -12,10 +12,10 @@ using namespace std;
 class CProConsoleConnectAcceptor: public ACE_Asynch_Acceptor<CProConsoleHandle>
 {
 private:
-	virtual CProConsoleHandle *make_handler (void);
-	virtual int validate_connection (const ACE_Asynch_Accept::Result& result,
-		const ACE_INET_Addr &remote,
-		const ACE_INET_Addr& local);
+    virtual CProConsoleHandle* make_handler (void);
+    virtual int validate_connection (const ACE_Asynch_Accept::Result& result,
+                                     const ACE_INET_Addr& remote,
+                                     const ACE_INET_Addr& local);
 };
 
 #endif

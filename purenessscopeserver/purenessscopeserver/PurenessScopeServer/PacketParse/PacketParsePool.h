@@ -14,23 +14,23 @@ using namespace std;
 class CPacketParsePool
 {
 public:
-	CPacketParsePool();
-	~CPacketParsePool();
+    CPacketParsePool();
+    ~CPacketParsePool();
 
-	void Init(uint32 u4PacketParsePoolCount);
-	void Close();
+    void Init(uint32 u4PacketParsePoolCount);
+    void Close();
 
-	CPacketParse* Create();
-	bool Delete(CPacketParse* pPacketParse);
+    CPacketParse* Create();
+    bool Delete(CPacketParse* pPacketParse);
 
-	int GetUsedCount();
-	int GetFreeCount();
+    int GetUsedCount();
+    int GetFreeCount();
 
 private:
-	CHashTable<CPacketParse>        m_objPacketParseList;                  //Hash内存池
-	ACE_Recursive_Thread_Mutex      m_ThreadWriteLock;                     //控制多线程锁
+    CHashTable<CPacketParse>        m_objPacketParseList;                  //Hash内存池
+    ACE_Recursive_Thread_Mutex      m_ThreadWriteLock;                     //控制多线程锁
 };
 
-typedef ACE_Singleton<CPacketParsePool, ACE_Null_Mutex> App_PacketParsePool; 
+typedef ACE_Singleton<CPacketParsePool, ACE_Null_Mutex> App_PacketParsePool;
 
 #endif

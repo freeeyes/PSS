@@ -31,9 +31,9 @@
 //命令处理返回值类型定义
 enum
 {
-	CONSOLE_MESSAGE_SUCCESS = 0,
-	CONSOLE_MESSAGE_FAIL    = 1,
-	CONSOLE_MESSAGE_CLOSE   = 2,
+    CONSOLE_MESSAGE_SUCCESS = 0,
+    CONSOLE_MESSAGE_FAIL    = 1,
+    CONSOLE_MESSAGE_CLOSE   = 2,
 };
 
 //设置对应返回命令名称，用于接收端包解析
@@ -128,121 +128,121 @@ enum
 //命令处理参数
 struct _CommandInfo
 {
-	char m_szCommandTitle[MAX_BUFF_100];  //处理命令头
-	char m_szCommandExp[MAX_BUFF_100];    //处理命令扩展参数
+    char m_szCommandTitle[MAX_BUFF_100];  //处理命令头
+    char m_szCommandExp[MAX_BUFF_100];    //处理命令扩展参数
 
-	_CommandInfo()
-	{
-		m_szCommandTitle[0] = '\0';
-		m_szCommandExp[0]   = '\0';
-	}
+    _CommandInfo()
+    {
+        m_szCommandTitle[0] = '\0';
+        m_szCommandExp[0]   = '\0';
+    }
 };
 
 //文件名结构
 struct _FileInfo
 {
-	char m_szFilePath[MAX_BUFF_100];
-	char m_szFileName[MAX_BUFF_100];
-	char m_szFileParam[MAX_BUFF_200];
+    char m_szFilePath[MAX_BUFF_100];
+    char m_szFileName[MAX_BUFF_100];
+    char m_szFileParam[MAX_BUFF_200];
 
-	_FileInfo()
-	{
-		m_szFilePath[0]  = '\0';
-		m_szFileName[0]  = '\0';
-		m_szFileParam[0] = '\0';
-	}
+    _FileInfo()
+    {
+        m_szFilePath[0]  = '\0';
+        m_szFileName[0]  = '\0';
+        m_szFileParam[0] = '\0';
+    }
 };
 
 //监听端口信息
 struct _ListenInfo
 {
-	char   m_szListenIP[MAX_BUFF_20];
-	uint32 m_u4Port;
-	uint8  m_u1IPType;
+    char   m_szListenIP[MAX_BUFF_20];
+    uint32 m_u4Port;
+    uint8  m_u1IPType;
 
-	_ListenInfo()
-	{
-		m_szListenIP[0] = '\0';
-		m_u4Port        = 0;
-		m_u1IPType      = TYPE_IPV4;
-	}
+    _ListenInfo()
+    {
+        m_szListenIP[0] = '\0';
+        m_u4Port        = 0;
+        m_u1IPType      = TYPE_IPV4;
+    }
 };
 
 class CConsoleMessage
 {
 public:
-	CConsoleMessage();
-	~CConsoleMessage();
+    CConsoleMessage();
+    ~CConsoleMessage();
 
-	int Dispose(ACE_Message_Block* pmb, IBuffPacket* pBuffPacket);             //要处理的命令字解析, pBuffPacket为返回要发送给客户端的数据
+    int Dispose(ACE_Message_Block* pmb, IBuffPacket* pBuffPacket);             //要处理的命令字解析, pBuffPacket为返回要发送给客户端的数据
 
-	//初始化部分
-	bool SetConsoleKey(vecConsoleKey* pvecConsoleKey);       //添加验证允许的key值
+    //初始化部分
+    bool SetConsoleKey(vecConsoleKey* pvecConsoleKey);       //添加验证允许的key值
 
-	//公用数据部分
+    //公用数据部分
 private:
-	int ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket);                        //执行命令
-	bool GetCommandInfo(const char* pCommand, _CommandInfo& CommandInfo);                    //把命令切割成应该有的数据格式
-	bool GetFileInfo(const char* pFile, _FileInfo& FileInfo);                                //将一个全路径切分成文件名
-	bool GetForbiddenIP(const char* pCommand, _ForbiddenIP& ForbiddenIP);                    //得到禁止的IP列表
-	bool GetConnectServerID(const char* pCommand, int& nServerID);                           //得到一个指定的服务器ID
-	bool GetDebug(const char* pCommand, uint8& u1Debug);                                     //得到当前设置的BUDEG
-	bool CheckConsoleKey(const char* pKey);                                                  //验证key
-	bool GetTrackIP(const char* pCommand, _ForbiddenIP& ForbiddenIP);                        //得到设置的追踪IP
-	bool GetLogLevel(const char* pCommand, int& nLogLevel);                                  //得到日志等级
-	bool GetAIInfo(const char* pCommand, int& nAI, int& nDispose, int& nCheck, int& nStop);  //得到AI设置
-	bool GetNickName(const char* pCommand, char* pName);                                     //得到连接别名
-	bool GetConnectID(const char* pCommand, uint32& u4ConnectID, bool& blFlag);              //得到ConnectID
-	bool GetMaxConnectCount(const char* pCommand, uint16& u2MaxConnectCount);                //得到最大的连接总数
-	bool GetListenInfo(const char* pCommand, _ListenInfo& objListenInfo);                    //得到监听端口信息
+    int ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket);                        //执行命令
+    bool GetCommandInfo(const char* pCommand, _CommandInfo& CommandInfo);                    //把命令切割成应该有的数据格式
+    bool GetFileInfo(const char* pFile, _FileInfo& FileInfo);                                //将一个全路径切分成文件名
+    bool GetForbiddenIP(const char* pCommand, _ForbiddenIP& ForbiddenIP);                    //得到禁止的IP列表
+    bool GetConnectServerID(const char* pCommand, int& nServerID);                           //得到一个指定的服务器ID
+    bool GetDebug(const char* pCommand, uint8& u1Debug);                                     //得到当前设置的BUDEG
+    bool CheckConsoleKey(const char* pKey);                                                  //验证key
+    bool GetTrackIP(const char* pCommand, _ForbiddenIP& ForbiddenIP);                        //得到设置的追踪IP
+    bool GetLogLevel(const char* pCommand, int& nLogLevel);                                  //得到日志等级
+    bool GetAIInfo(const char* pCommand, int& nAI, int& nDispose, int& nCheck, int& nStop);  //得到AI设置
+    bool GetNickName(const char* pCommand, char* pName);                                     //得到连接别名
+    bool GetConnectID(const char* pCommand, uint32& u4ConnectID, bool& blFlag);              //得到ConnectID
+    bool GetMaxConnectCount(const char* pCommand, uint16& u2MaxConnectCount);                //得到最大的连接总数
+    bool GetListenInfo(const char* pCommand, _ListenInfo& objListenInfo);                    //得到监听端口信息
 
-	//命令具体实现部分
+    //命令具体实现部分
 private:
-	bool DoMessage_LoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_UnLoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_ReLoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_ClientMessageCount(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_ShowModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_CommandInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_WorkThreadState(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_ClientInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessgae_CloseClient(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_ForbiddenIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_ShowForbiddenList(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_LifedIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_UDPClientInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_ServerConnectTCP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_ServerConnectUDP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_ShowProcessInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_ShowClientHisTory(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_ShowAllCommandInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_ReConnectServer(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_CommandTimeout(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_CommandTimeoutclr(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_CommandDataLog(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_SetDebug(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_ShowDebug(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_SetTrackIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_DelTrackIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_GetTrackIPInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_GetConnectIPInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_GetLogLevelInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_SetLogLevelInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_GetThreadAI(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_GetWorkThreadTO(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_SetWorkThreadAI(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_GetNickNameInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_SetConnectLog(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_SetMaxConnectCount(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_AddListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_DelListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_ShowListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_MonitorInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-	bool DoMessage_ServerClose(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_LoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_UnLoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_ReLoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_ClientMessageCount(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_ShowModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_CommandInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_WorkThreadState(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_ClientInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessgae_CloseClient(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_ForbiddenIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_ShowForbiddenList(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_LifedIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_UDPClientInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_ServerConnectTCP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_ServerConnectUDP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_ShowProcessInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_ShowClientHisTory(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_ShowAllCommandInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_ReConnectServer(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_CommandTimeout(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_CommandTimeoutclr(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_CommandDataLog(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_SetDebug(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_ShowDebug(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_SetTrackIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_DelTrackIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_GetTrackIPInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_GetConnectIPInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_GetLogLevelInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_SetLogLevelInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_GetThreadAI(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_GetWorkThreadTO(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_SetWorkThreadAI(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_GetNickNameInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_SetConnectLog(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_SetMaxConnectCount(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_AddListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_DelListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_ShowListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_MonitorInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool DoMessage_ServerClose(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
 
 private:
-	vecConsoleKey* m_pvecConsoleKey;
+    vecConsoleKey* m_pvecConsoleKey;
 };
 
 #endif

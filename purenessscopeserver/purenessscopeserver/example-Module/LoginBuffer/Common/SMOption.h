@@ -24,35 +24,35 @@ typedef map<ID_t, _SMHeader*>         mapSMHeader;
 class CSMOption
 {
 public:
-	CSMOption(void);
-	~CSMOption(void);
+    CSMOption(void);
+    ~CSMOption(void);
 
-	bool Init(key_t key, uint32 u4Size, uint32 u4ObjectCount, bool& blIsCreate);
-	void Close();
-	uint16 GetCount();
+    bool Init(key_t key, uint32 u4Size, uint32 u4ObjectCount, bool& blIsCreate);
+    void Close();
+    uint16 GetCount();
 
-	_SMHeader* GetHeader(ID_t id);
-	void* GetBuffer(ID_t nIndex);
+    _SMHeader* GetHeader(ID_t id);
+    void* GetBuffer(ID_t nIndex);
 
-	void   SetMemoryState(uint8 u1State);        //设置当前共享内存状态
-	uint8  GetMemoryState();                     //得到当前共享内存状态
-	void   SetMemoryVersion(uint32 u4Version);   //设置当前共享内存版本
-	uint32 GetMemoryVersion();                   //得到当前共享内存版本
-
-private:
-	bool GetInitState();
-	bool Init_Memory();
+    void   SetMemoryState(uint8 u1State);        //设置当前共享内存状态
+    uint8  GetMemoryState();                     //得到当前共享内存状态
+    void   SetMemoryVersion(uint32 u4Version);   //设置当前共享内存版本
+    uint32 GetMemoryVersion();                   //得到当前共享内存版本
 
 private:
-	uint32                m_u4ObjectCount;
-	uint32                m_u4BufferSize;
-	char*                 m_pData;
+    bool GetInitState();
+    bool Init_Memory();
+
+private:
+    uint32                m_u4ObjectCount;
+    uint32                m_u4BufferSize;
+    char*                 m_pData;
 #ifdef WIN32
-	ACE_Shared_Memory_MM* m_pShareMemory;
+    ACE_Shared_Memory_MM* m_pShareMemory;
 #else
-	ACE_Shared_Memory_SV* m_pShareMemory;
+    ACE_Shared_Memory_SV* m_pShareMemory;
 #endif
-	mapSMHeader           m_mapSMHeader;
+    mapSMHeader           m_mapSMHeader;
 };
 #endif
 

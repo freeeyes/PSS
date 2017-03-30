@@ -29,191 +29,203 @@ class CConvertBuffer
 public:
     CConvertBuffer() {}
     ~CConvertBuffer() {}
-	int GetBufferSize(const char* pData, int nSrcLen)
-	{
-		char szData[3] = {'\0'};
-		int nPos         = 0;
-		int nCurrSize    = 0;
-		int nConvertSize = 0;
-		bool blState     = false;   //转换后的字符串是否有效
-		bool blSrcState  = true;    //元字符串是否有效
-		unsigned char cData;
+    int GetBufferSize(const char* pData, int nSrcLen)
+    {
+        char szData[3] = {'\0'};
+        int nPos         = 0;
+        int nCurrSize    = 0;
+        int nConvertSize = 0;
+        bool blState     = false;   //转换后的字符串是否有效
+        bool blSrcState  = true;    //元字符串是否有效
+        unsigned char cData;
 
-		while(nPos < nSrcLen)
-		{
-			if(pData[nPos] == '\r' || pData[nPos] == '\n' || pData[nPos] == ' ' || nPos == nSrcLen - 1)
-			{
-				if(nPos == nSrcLen - 1)
-				{
-					szData[nCurrSize++] = pData[nPos];
-				}
+        while(nPos < nSrcLen)
+        {
+            if(pData[nPos] == '\r' || pData[nPos] == '\n' || pData[nPos] == ' ' || nPos == nSrcLen - 1)
+            {
+                if(nPos == nSrcLen - 1)
+                {
+                    szData[nCurrSize++] = pData[nPos];
+                }
 
-				szData[nCurrSize] = '\0';
-				if(blSrcState == true)
-				{
-					blState = ConvertStr2char(szData, cData);
-					if(blState == true)
-					{
-						nConvertSize++;
-					}
-				}
-				nCurrSize  = 0;
-				blSrcState = true;
-				nPos++;
-			}
-			else
-			{
-				if(nCurrSize < 2)
-				{
-					szData[nCurrSize++] = pData[nPos];
-				}
-				else
-				{
-					blSrcState = false;
-				}
-				nPos++;
-			}
-		}
+                szData[nCurrSize] = '\0';
 
-		return nConvertSize;
+                if(blSrcState == true)
+                {
+                    blState = ConvertStr2char(szData, cData);
+
+                    if(blState == true)
+                    {
+                        nConvertSize++;
+                    }
+                }
+
+                nCurrSize  = 0;
+                blSrcState = true;
+                nPos++;
+            }
+            else
+            {
+                if(nCurrSize < 2)
+                {
+                    szData[nCurrSize++] = pData[nPos];
+                }
+                else
+                {
+                    blSrcState = false;
+                }
+
+                nPos++;
+            }
+        }
+
+        return nConvertSize;
     }
 
-	bool Convertstr2charArray(const char* pData, int nSrcLen, unsigned char* pDes, int& nMaxLen)
-	{
-		char szData[3] = {'\0'};
-		int nPos         = 0;
-		int nCurrSize    = 0;
-		int nConvertSize = 0;
-		bool blState     = false;   //转换后的字符串是否有效
-		bool blSrcState  = true;    //元字符串是否有效
+    bool Convertstr2charArray(const char* pData, int nSrcLen, unsigned char* pDes, int& nMaxLen)
+    {
+        char szData[3] = {'\0'};
+        int nPos         = 0;
+        int nCurrSize    = 0;
+        int nConvertSize = 0;
+        bool blState     = false;   //转换后的字符串是否有效
+        bool blSrcState  = true;    //元字符串是否有效
 
-		while(nPos < nSrcLen)
-		{
-			if(pData[nPos] == '\r' || pData[nPos] == '\n' || pData[nPos] == ' ' || nPos == nSrcLen - 1)
-			{
-				if(nPos == nSrcLen - 1)
-				{
-					szData[nCurrSize++] = pData[nPos];
-				}
+        while(nPos < nSrcLen)
+        {
+            if(pData[nPos] == '\r' || pData[nPos] == '\n' || pData[nPos] == ' ' || nPos == nSrcLen - 1)
+            {
+                if(nPos == nSrcLen - 1)
+                {
+                    szData[nCurrSize++] = pData[nPos];
+                }
 
-				szData[nCurrSize] = '\0';
-				if(nConvertSize < nMaxLen && blSrcState == true)
-				{
-					blState = ConvertStr2char(szData, pDes[nConvertSize]);
-					if(blState == true)
-					{
-						nConvertSize++;
-					}
-				}
-				nCurrSize  = 0;
-				blSrcState = true;
-				nPos++;
-			}
-			else
-			{
-				if(nCurrSize < 2)
-				{
-					szData[nCurrSize++] = pData[nPos];
-				}
-				else
-				{
-					blSrcState = false;
-				}
-				nPos++;
-			}
-		}
+                szData[nCurrSize] = '\0';
 
-		nMaxLen = nConvertSize;
-		return true;
+                if(nConvertSize < nMaxLen && blSrcState == true)
+                {
+                    blState = ConvertStr2char(szData, pDes[nConvertSize]);
+
+                    if(blState == true)
+                    {
+                        nConvertSize++;
+                    }
+                }
+
+                nCurrSize  = 0;
+                blSrcState = true;
+                nPos++;
+            }
+            else
+            {
+                if(nCurrSize < 2)
+                {
+                    szData[nCurrSize++] = pData[nPos];
+                }
+                else
+                {
+                    blSrcState = false;
+                }
+
+                nPos++;
+            }
+        }
+
+        nMaxLen = nConvertSize;
+        return true;
     }
 private:
-	bool Get_binary_Char(unsigned char cTag, unsigned char& cDes)
-	{
-		if(cTag >='A'&&  cTag <='F')
-		{
-			cDes = cTag - 'A' + 10;
-			return true;
-		}
-		else if(cTag >='a'&&  cTag <='f')
-		{
-			cDes = cTag - 'a' + 10;
-			return true; 
-		}
-		else if(cTag >= '0'&& cTag<= '9')
-		{
-			cDes = cTag-'0';
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
+    bool Get_binary_Char(unsigned char cTag, unsigned char& cDes)
+    {
+        if(cTag >='A'&&  cTag <='F')
+        {
+            cDes = cTag - 'A' + 10;
+            return true;
+        }
+        else if(cTag >='a'&&  cTag <='f')
+        {
+            cDes = cTag - 'a' + 10;
+            return true;
+        }
+        else if(cTag >= '0'&& cTag<= '9')
+        {
+            cDes = cTag-'0';
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
-	bool ConvertStr2char(const char* pData, unsigned char& cData)
-	{
-		if(pData == NULL || strlen(pData) != 2)
-		{
-			return false;
-		}
+    bool ConvertStr2char(const char* pData, unsigned char& cData)
+    {
+        if(pData == NULL || strlen(pData) != 2)
+        {
+            return false;
+        }
 
-		char cFirst = pData[1];
-		unsigned char cTemp = 0;
-		bool blStste = Get_binary_Char(cFirst, cTemp);
-		if(false == blStste)
-		{
-			return false;
-		}
-		cData = cTemp;
-		char cSecond = pData[0];
-		blStste  = Get_binary_Char(cSecond, cTemp);
-		if(false == blStste)
-		{
-			return false;
-		}
-		cTemp = cTemp << 4;
-		cData = cData | cTemp;
+        char cFirst = pData[1];
+        unsigned char cTemp = 0;
+        bool blStste = Get_binary_Char(cFirst, cTemp);
 
-		return true;
-	}
+        if(false == blStste)
+        {
+            return false;
+        }
+
+        cData = cTemp;
+        char cSecond = pData[0];
+        blStste  = Get_binary_Char(cSecond, cTemp);
+
+        if(false == blStste)
+        {
+            return false;
+        }
+
+        cTemp = cTemp << 4;
+        cData = cData | cTemp;
+
+        return true;
+    }
 };
 
 //相关参数设计
 struct _WorkThreadAIInfo
 {
-	uint32     m_u4ThreadID;                       //工作线程ID 
-	uint8      m_u1WTAI;                           //工作线程AI开关，0为关闭，1为打开
-	uint32     m_u4DisposeTime;                    //业务包处理超时时间
-	uint32     m_u4WTCheckTime;                    //工作线程超时包的时间范围，单位是秒
-	uint32     m_u4WTTimeoutCount;                 //工作线程超时包的单位时间内的超时次数上限
-	uint32     m_u4WTStopTime;                     //停止此命令服务的时间
+    uint32     m_u4ThreadID;                       //工作线程ID
+    uint8      m_u1WTAI;                           //工作线程AI开关，0为关闭，1为打开
+    uint32     m_u4DisposeTime;                    //业务包处理超时时间
+    uint32     m_u4WTCheckTime;                    //工作线程超时包的时间范围，单位是秒
+    uint32     m_u4WTTimeoutCount;                 //工作线程超时包的单位时间内的超时次数上限
+    uint32     m_u4WTStopTime;                     //停止此命令服务的时间
 
-	_WorkThreadAIInfo()
-	{
-		m_u4ThreadID       = 0;
-		m_u1WTAI           = 0;
-		m_u4DisposeTime    = 0;
-		m_u4WTCheckTime    = 0;
-		m_u4WTTimeoutCount = 0;
-		m_u4WTStopTime     = 0;
-	}
+    _WorkThreadAIInfo()
+    {
+        m_u4ThreadID       = 0;
+        m_u1WTAI           = 0;
+        m_u4DisposeTime    = 0;
+        m_u4WTCheckTime    = 0;
+        m_u4WTTimeoutCount = 0;
+        m_u4WTStopTime     = 0;
+    }
 };
 
 //超时命令单元
 struct _CommandTimeout
 {
-	uint32 m_u4ThreadID;        //工作线程ID
-	uint16 m_u2CommandID;       //超时的命令
-	uint32 m_u4Second;          //超时当前时间，以1970年以来开始计算的秒数
-	uint32 m_u4Timeout;         //命令执行时间，单位是毫秒  
+    uint32 m_u4ThreadID;        //工作线程ID
+    uint16 m_u2CommandID;       //超时的命令
+    uint32 m_u4Second;          //超时当前时间，以1970年以来开始计算的秒数
+    uint32 m_u4Timeout;         //命令执行时间，单位是毫秒
 
-	_CommandTimeout()
-	{
-		m_u4ThreadID  = 0;
-		m_u2CommandID = 0;
-		m_u4Second    = 0;
-		m_u4Timeout   = 0;
-	}
+    _CommandTimeout()
+    {
+        m_u4ThreadID  = 0;
+        m_u2CommandID = 0;
+        m_u4Second    = 0;
+        m_u4Timeout   = 0;
+    }
 };
 
 //这里用户回传相关查询信息
@@ -222,51 +234,51 @@ typedef vector<_CommandTimeout> vecCommandTimeout;
 class CWorkThreadAI
 {
 public:
-	CWorkThreadAI();
-	~CWorkThreadAI();
+    CWorkThreadAI();
+    ~CWorkThreadAI();
 
-	void Close();
+    void Close();
 
-	void Init(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTTimeoutCount, uint32 u4WTStopTime, uint8 u1WTReturnDataType, const char* pReturnData);
+    void Init(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTTimeoutCount, uint32 u4WTStopTime, uint8 u1WTReturnDataType, const char* pReturnData);
 
-	bool SaveTimeout(uint16 u2CommandID, uint32 u4TimeCost);
+    bool SaveTimeout(uint16 u2CommandID, uint32 u4TimeCost);
 
-	char* GetReturnData();
-	uint16 GetReturnDataLength();
+    char* GetReturnData();
+    uint16 GetReturnDataLength();
 
-	void GetAIInfo(_WorkThreadAIInfo& objWorkThreadAIInfo);
+    void GetAIInfo(_WorkThreadAIInfo& objWorkThreadAIInfo);
 
-	void ReSet(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime);
+    void ReSet(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime);
 
-	bool CheckCurrTimeout(uint16 u2CommandID, uint32 u4Now);
+    bool CheckCurrTimeout(uint16 u2CommandID, uint32 u4Now);
 
-	void GetAllTimeout(uint32 u4ThreadID, vecCommandTimeout& objTimeout);
-	void GetAllForbiden(uint32 u4ThreadID, vecCommandTimeout& objForbiden);
-
-private:
-	uint8      m_u1WTAI;                           //工作线程AI开关，0为关闭，1为打开
-	uint16     m_u4DisposeTime;                    //业务包处理超时时间
-	uint32     m_u4WTCheckTime;                    //工作线程超时包的时间范围，单位是秒
-	uint32     m_u4WTTimeoutCount;                 //工作线程超时包的单位时间内的超时次数上限
-	uint32     m_u4WTStopTime;                     //停止此命令服务的时间
-	uint8      m_u1WTReturnDataType;               //返回错误数据的类型，1为二进制，2为文本
-	char       m_szWTReturnData[MAX_BUFF_1024];    //返回的数据体，最多1K
-	uint16     m_u2ReturnDataLen;                  //返回数据体长度
+    void GetAllTimeout(uint32 u4ThreadID, vecCommandTimeout& objTimeout);
+    void GetAllForbiden(uint32 u4ThreadID, vecCommandTimeout& objForbiden);
 
 private:
-	//超时的命令集合
-	struct _CommandTime
-	{
-		uint16 m_u2CommandID;
-		CRingLink<_CommandTimeout> m_objTime;
+    uint8      m_u1WTAI;                           //工作线程AI开关，0为关闭，1为打开
+    uint16     m_u4DisposeTime;                    //业务包处理超时时间
+    uint32     m_u4WTCheckTime;                    //工作线程超时包的时间范围，单位是秒
+    uint32     m_u4WTTimeoutCount;                 //工作线程超时包的单位时间内的超时次数上限
+    uint32     m_u4WTStopTime;                     //停止此命令服务的时间
+    uint8      m_u1WTReturnDataType;               //返回错误数据的类型，1为二进制，2为文本
+    char       m_szWTReturnData[MAX_BUFF_1024];    //返回的数据体，最多1K
+    uint16     m_u2ReturnDataLen;                  //返回数据体长度
 
-		_CommandTime()
-		{
-			m_u2CommandID = 0;
-		}
-	};
+private:
+    //超时的命令集合
+    struct _CommandTime
+    {
+        uint16 m_u2CommandID;
+        CRingLink<_CommandTimeout> m_objTime;
 
-	vector<_CommandTime*>   m_vecCommandTime;
-	vector<_CommandTimeout> m_vecCommandTimeout;
+        _CommandTime()
+        {
+            m_u2CommandID = 0;
+        }
+    };
+
+    vector<_CommandTime*>   m_vecCommandTime;
+    vector<_CommandTimeout> m_vecCommandTimeout;
 };
 #endif

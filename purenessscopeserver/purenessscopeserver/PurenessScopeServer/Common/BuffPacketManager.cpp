@@ -2,110 +2,116 @@
 
 CBuffPacketManager::CBuffPacketManager(void)
 {
-	//默认为主机序
-	m_blSortType = false;
+    //默认为主机序
+    m_blSortType = false;
 }
 
 CBuffPacketManager::~CBuffPacketManager(void)
 {
-	OUR_DEBUG((LM_ERROR, "[CBuffPacketManager::~CBuffPacketManager].\n"));
-	//Close();
+    OUR_DEBUG((LM_ERROR, "[CBuffPacketManager::~CBuffPacketManager].\n"));
+    //Close();
 }
 
 IBuffPacket* CBuffPacketManager::Create()
 {
-	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
-	CBuffPacket* pBuffPacket = NULL;
+    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
+    CBuffPacket* pBuffPacket = NULL;
 
-	pBuffPacket = m_objHashBuffPacketList.Pop();
-	return (IBuffPacket* )pBuffPacket;
+    pBuffPacket = m_objHashBuffPacketList.Pop();
+    return (IBuffPacket* )pBuffPacket;
 }
 
 bool CBuffPacketManager::Delete(IBuffPacket* pBuffPacket)
 {
-	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
+    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	CBuffPacket* pBuff = (CBuffPacket* )pBuffPacket;
-	if(NULL == pBuff)
-	{
-		return false;
-	}
+    CBuffPacket* pBuff = (CBuffPacket* )pBuffPacket;
 
-	pBuff->Clear();
-	pBuff->SetNetSort(m_blSortType);
+    if(NULL == pBuff)
+    {
+        return false;
+    }
 
-	char szPacketID[10] = {'\0'};
-	sprintf_safe(szPacketID, 10, "%d", pBuff->GetBuffID());
-	bool blState = m_objHashBuffPacketList.Push(szPacketID, pBuff);
-	if(false == blState)
-	{
-		OUR_DEBUG((LM_INFO, "[CBuffPacketManager::Delete]szPacketID=%s(0x%08x).\n", szPacketID, pBuff));
-	}
-	else
-	{
-		//OUR_DEBUG((LM_INFO, "[CBuffPacketManager::Delete]szPacketID=%s(0x%08x) nPos=%d.\n", szPacketID, pBuff, nPos));
-	}
+    pBuff->Clear();
+    pBuff->SetNetSort(m_blSortType);
 
-	return true;
+    char szPacketID[10] = {'\0'};
+    sprintf_safe(szPacketID, 10, "%d", pBuff->GetBuffID());
+    bool blState = m_objHashBuffPacketList.Push(szPacketID, pBuff);
+
+    if(false == blState)
+    {
+        OUR_DEBUG((LM_INFO, "[CBuffPacketManager::Delete]szPacketID=%s(0x%08x).\n", szPacketID, pBuff));
+    }
+    else
+    {
+        //OUR_DEBUG((LM_INFO, "[CBuffPacketManager::Delete]szPacketID=%s(0x%08x) nPos=%d.\n", szPacketID, pBuff, nPos));
+    }
+
+    return true;
 }
 
 void CBuffPacketManager::Close()
 {
-	//清理所有已存在的指针
-	vector<CBuffPacket* > vecBuffPacket; 
-	m_objHashBuffPacketList.Get_All_Used(vecBuffPacket);
-	for(int i = 0; i < (int)vecBuffPacket.size(); i++)
-	{
-		CBuffPacket* pBuffPacket = vecBuffPacket[i];
-		if(NULL != pBuffPacket)
-		{
-			pBuffPacket->Close();
-			SAFE_DELETE(pBuffPacket);
-		}
-	}
+    //清理所有已存在的指针
+    vector<CBuffPacket* > vecBuffPacket;
+    m_objHashBuffPacketList.Get_All_Used(vecBuffPacket);
 
-	m_objHashBuffPacketList.Close();
+    for(int i = 0; i < (int)vecBuffPacket.size(); i++)
+    {
+        CBuffPacket* pBuffPacket = vecBuffPacket[i];
+
+        if(NULL != pBuffPacket)
+        {
+            pBuffPacket->Close();
+            SAFE_DELETE(pBuffPacket);
+        }
+    }
+
+    m_objHashBuffPacketList.Close();
 }
 
 void CBuffPacketManager::Init(uint32 u4PacketCount, bool blByteOrder)
 {
-	Close();
+    Close();
 
-	//初始化Hash表
-	m_objHashBuffPacketList.Init((int)u4PacketCount);
+    //初始化Hash表
+    m_objHashBuffPacketList.Init((int)u4PacketCount);
 
-	for(int i = 0; i < m_objHashBuffPacketList.Get_Count(); i++)
-	{
-		CBuffPacket* pBuffPacket = new CBuffPacket();
-		if(NULL != pBuffPacket)
-		{
-			//设置BuffPacket默认字序
-			pBuffPacket->SetNetSort(blByteOrder);
-			pBuffPacket->SetBuffID(i);
+    for(int i = 0; i < m_objHashBuffPacketList.Get_Count(); i++)
+    {
+        CBuffPacket* pBuffPacket = new CBuffPacket();
 
-			char szPacketID[10] = {'\0'};
-			sprintf_safe(szPacketID, 10, "%d", i);
+        if(NULL != pBuffPacket)
+        {
+            //设置BuffPacket默认字序
+            pBuffPacket->SetNetSort(blByteOrder);
+            pBuffPacket->SetBuffID(i);
 
-			//添加到Hash数组里面
-			int nHashPos = m_objHashBuffPacketList.Add_Hash_Data(szPacketID, pBuffPacket);
-			if(-1 != nHashPos)
-			{
-				pBuffPacket->SetHashID(nHashPos);
-			}
-		}
-	}
+            char szPacketID[10] = {'\0'};
+            sprintf_safe(szPacketID, 10, "%d", i);
 
-	//设定当前对象池的字序
-	m_blSortType = blByteOrder;
+            //添加到Hash数组里面
+            int nHashPos = m_objHashBuffPacketList.Add_Hash_Data(szPacketID, pBuffPacket);
+
+            if(-1 != nHashPos)
+            {
+                pBuffPacket->SetHashID(nHashPos);
+            }
+        }
+    }
+
+    //设定当前对象池的字序
+    m_blSortType = blByteOrder;
 
 }
 
 uint32 CBuffPacketManager::GetBuffPacketUsedCount()
 {
-	return (uint32)m_objHashBuffPacketList.Get_Count() - m_objHashBuffPacketList.Get_Used_Count();
+    return (uint32)m_objHashBuffPacketList.Get_Count() - m_objHashBuffPacketList.Get_Used_Count();
 }
 
 uint32 CBuffPacketManager::GetBuffPacketFreeCount()
 {
-	return (uint32)m_objHashBuffPacketList.Get_Used_Count();
+    return (uint32)m_objHashBuffPacketList.Get_Used_Count();
 }

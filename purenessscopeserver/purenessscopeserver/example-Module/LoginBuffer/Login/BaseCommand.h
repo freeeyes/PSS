@@ -45,313 +45,319 @@ typedef ACE_Singleton<CUserInfoManager, ACE_Null_Mutex> App_UserInfoManager;
 class CPostServerData : public IClientMessage
 {
 public:
-	CPostServerData() 
-	{ 
-		m_pServerObject    = NULL;
-		m_u2RecvBuffLength = 0;
-	};
+    CPostServerData()
+    {
+        m_pServerObject    = NULL;
+        m_u2RecvBuffLength = 0;
+    };
 
-	~CPostServerData() {};
+    ~CPostServerData() {};
 
-	void ReConnect(int nServerID)
-	{
-		OUR_DEBUG((LM_INFO, "[CPostServerData::ReConnect]nServerID=%d", nServerID));
-	}
+    void ReConnect(int nServerID)
+    {
+        OUR_DEBUG((LM_INFO, "[CPostServerData::ReConnect]nServerID=%d", nServerID));
+    }
 
-	bool Need_Send_Format()
-	{
-		return false;
-	};
+    bool Need_Send_Format()
+    {
+        return false;
+    };
 
-	bool Send_Format_data(char* pData, uint32 u4Len, IMessageBlockManager* pMessageBlockManager, ACE_Message_Block*& mbSend)
-	{
-		if(NULL != pData && NULL != pMessageBlockManager &&NULL == mbSend)
-		{
-			OUR_DEBUG((LM_INFO, "[CPostServerData::Send_Format_data]u4Len=%d", u4Len));
-		}
-		return false;
-	};
+    bool Send_Format_data(char* pData, uint32 u4Len, IMessageBlockManager* pMessageBlockManager, ACE_Message_Block*& mbSend)
+    {
+        if(NULL != pData && NULL != pMessageBlockManager &&NULL == mbSend)
+        {
+            OUR_DEBUG((LM_INFO, "[CPostServerData::Send_Format_data]u4Len=%d", u4Len));
+        }
 
-	bool Recv_Format_data(ACE_Message_Block* mbRecv, IMessageBlockManager* pMessageBlockManager, uint16& u2CommandID, ACE_Message_Block*& mbFinishRecv)
-	{
-		//判断返回数据块是否小于0
-		u2CommandID = 0;
-		uint32 u4SendPacketSize = (uint32)mbRecv->length();
-		if(u4SendPacketSize <= 0)
-		{
-			OUR_DEBUG((LM_INFO, "[CPostServerData::Recv_Format_data]Get Data(%d) error.\n", u4SendPacketSize));
-		}
+        return false;
+    };
 
-		if(m_u2RecvBuffLength + mbRecv->length() < 4 || mbRecv->length() >= RECV_BUFF_SIZE)
-		{
-			if(mbRecv->length() > 0)
-			{
-				memcpy_safe(&m_szRecvBuffData[m_u2RecvBuffLength], mbRecv->length(), mbRecv->rd_ptr(), mbRecv->length());
-				m_u2RecvBuffLength += mbRecv->length();
-				mbRecv->rd_ptr(mbRecv->length());
-			}
+    bool Recv_Format_data(ACE_Message_Block* mbRecv, IMessageBlockManager* pMessageBlockManager, uint16& u2CommandID, ACE_Message_Block*& mbFinishRecv)
+    {
+        //判断返回数据块是否小于0
+        u2CommandID = 0;
+        uint32 u4SendPacketSize = (uint32)mbRecv->length();
 
-			return false;
-		}
-		else
-		{
-			//统一贴入缓冲，再有缓冲切割发送数据
-			memcpy_safe(&m_szRecvBuffData[m_u2RecvBuffLength], mbRecv->length(), mbRecv->rd_ptr(), mbRecv->length());
-			m_u2RecvBuffLength += mbRecv->length();
-			mbRecv->rd_ptr(mbRecv->length());
+        if(u4SendPacketSize <= 0)
+        {
+            OUR_DEBUG((LM_INFO, "[CPostServerData::Recv_Format_data]Get Data(%d) error.\n", u4SendPacketSize));
+        }
 
-			//解析头四个字节获得当前包长度
-			int nPacketBodySize = 0;
-			memcpy_safe(m_szRecvBuffData, sizeof(int), (char* )&nPacketBodySize, sizeof(int));
+        if(m_u2RecvBuffLength + mbRecv->length() < 4 || mbRecv->length() >= RECV_BUFF_SIZE)
+        {
+            if(mbRecv->length() > 0)
+            {
+                memcpy_safe(&m_szRecvBuffData[m_u2RecvBuffLength], mbRecv->length(), mbRecv->rd_ptr(), mbRecv->length());
+                m_u2RecvBuffLength += mbRecv->length();
+                mbRecv->rd_ptr(mbRecv->length());
+            }
 
-			uint32 u4PacketSize = nPacketBodySize + sizeof(int);
+            return false;
+        }
+        else
+        {
+            //统一贴入缓冲，再有缓冲切割发送数据
+            memcpy_safe(&m_szRecvBuffData[m_u2RecvBuffLength], mbRecv->length(), mbRecv->rd_ptr(), mbRecv->length());
+            m_u2RecvBuffLength += mbRecv->length();
+            mbRecv->rd_ptr(mbRecv->length());
 
-			if(m_u2RecvBuffLength >= (uint16)u4PacketSize)
-			{
-				//这是一个完整的数据包
-				mbFinishRecv = pMessageBlockManager->Create(u4PacketSize);
+            //解析头四个字节获得当前包长度
+            int nPacketBodySize = 0;
+            memcpy_safe(m_szRecvBuffData, sizeof(int), (char* )&nPacketBodySize, sizeof(int));
 
-				memcpy_safe(m_szRecvBuffData, u4PacketSize, mbFinishRecv->wr_ptr(), u4PacketSize);
-				mbFinishRecv->wr_ptr(u4PacketSize);
+            uint32 u4PacketSize = nPacketBodySize + sizeof(int);
 
-				//数据缓冲向前移位
-				if(m_u2RecvBuffLength - u4PacketSize > 0)
-				{
-					memcpy_safe(&m_szRecvBuffData[u4PacketSize], m_u2RecvBuffLength - u4PacketSize, m_szRecvBuffData, m_u2RecvBuffLength - u4PacketSize);
-					m_u2RecvBuffLength -= (uint16)u4PacketSize;
-				}
-				else
-				{
-					m_u2RecvBuffLength = 0;
-				}
+            if(m_u2RecvBuffLength >= (uint16)u4PacketSize)
+            {
+                //这是一个完整的数据包
+                mbFinishRecv = pMessageBlockManager->Create(u4PacketSize);
 
-				return true;
-			}
-			else
-			{
-				//数据包不完整，继续等待
-				return false;
-			}
-		}
+                memcpy_safe(m_szRecvBuffData, u4PacketSize, mbFinishRecv->wr_ptr(), u4PacketSize);
+                mbFinishRecv->wr_ptr(u4PacketSize);
 
-	};
+                //数据缓冲向前移位
+                if(m_u2RecvBuffLength - u4PacketSize > 0)
+                {
+                    memcpy_safe(&m_szRecvBuffData[u4PacketSize], m_u2RecvBuffLength - u4PacketSize, m_szRecvBuffData, m_u2RecvBuffLength - u4PacketSize);
+                    m_u2RecvBuffLength -= (uint16)u4PacketSize;
+                }
+                else
+                {
+                    m_u2RecvBuffLength = 0;
+                }
 
-	bool RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv, _ClientIPInfo objServerIPInfo)
-	{
-		uint32 u4SendPacketSize = (uint32)mbRecv->length();
-		if(u4SendPacketSize <= 0)
-		{
-			OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData]Get Data(%d)(%s:%d) error.\n", u2CommandID, objServerIPInfo.m_szClientIP, objServerIPInfo.m_nPort));
-		}
+                return true;
+            }
+            else
+            {
+                //数据包不完整，继续等待
+                return false;
+            }
+        }
 
-		OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData]Get Data(%d).\n", u4SendPacketSize));
-		if(NULL != m_pServerObject)
-		{
-			//解析获得的数据
-			char* pData = new char[u4SendPacketSize];
-			ACE_OS::memcpy(pData, mbRecv->rd_ptr(), u4SendPacketSize);
+    };
 
-			uint16 u2WatchCommand = 0;
+    bool RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv, _ClientIPInfo objServerIPInfo)
+    {
+        uint32 u4SendPacketSize = (uint32)mbRecv->length();
 
-			//解析获得的数据块
-			//4字节包长+2字节名称长度+名称+ConnectID
-			uint32 u4PacketSize = 0;
-			int    nPos = 0;
-			ACE_OS::memcpy(&u4PacketSize, (char* )&pData[nPos], sizeof(uint32));
-			nPos += sizeof(uint32);
+        if(u4SendPacketSize <= 0)
+        {
+            OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData]Get Data(%d)(%s:%d) error.\n", u2CommandID, objServerIPInfo.m_szClientIP, objServerIPInfo.m_nPort));
+        }
 
-			//先解析出命令ID
-			ACE_OS::memcpy(&u2WatchCommand, (char* )&pData[nPos], sizeof(uint16));
-			nPos += sizeof(uint16);
+        OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData]Get Data(%d).\n", u4SendPacketSize));
 
-			if(u2WatchCommand == SERVER_COMMAND_USERVALID_R)
-			{
-				uint16 u2UserName = 0;
-				ACE_OS::memcpy(&u2UserName, (char* )&pData[nPos], sizeof(uint16));
-				nPos += sizeof(uint16);
-				char* pUserName = new char[u2UserName + 1];
-				ACE_OS::memset(pUserName, 0, u2UserName + 1);
-				ACE_OS::memcpy(pUserName, (char* )&pData[nPos], u2UserName);
-				nPos += u2UserName;
-				uint16 u2UserPass = 0;
-				ACE_OS::memcpy(&u2UserPass, (char* )&pData[nPos], sizeof(uint16));
-				nPos += sizeof(uint16);
-				char* pUserPass = new char[u2UserPass + 1];
-				ACE_OS::memset(pUserPass, 0, u2UserPass + 1);
-				ACE_OS::memcpy(pUserPass, (char* )&pData[nPos], u2UserPass);
-				nPos += u2UserPass;
-				uint8 u1Ret = 0;
-				ACE_OS::memcpy(&u1Ret, (char* )&pData[nPos], sizeof(uint8));
-				nPos += sizeof(uint8);
-				uint32 u4CacheIndex = 0;
-				ACE_OS::memcpy(&u4CacheIndex, (char* )&pData[nPos], sizeof(uint32));
-				nPos += sizeof(uint32);
-				uint32 u4ConnectID = 0;
-				ACE_OS::memcpy(&u4ConnectID, (char* )&pData[nPos], sizeof(uint32));
-				nPos += sizeof(uint32);
+        if(NULL != m_pServerObject)
+        {
+            //解析获得的数据
+            char* pData = new char[u4SendPacketSize];
+            ACE_OS::memcpy(pData, mbRecv->rd_ptr(), u4SendPacketSize);
 
-				if(u4CacheIndex == 0)
-				{
-					//重新加载一下缓冲
-					App_UserValidManager::instance()->GetFreeValid();
-				}
-				else
-				{
-					//Lru被触发，需要重新遍历一下内存
-					App_UserValidManager::instance()->Reload_Map_CacheMemory(u4CacheIndex);
-				}
+            uint16 u2WatchCommand = 0;
+
+            //解析获得的数据块
+            //4字节包长+2字节名称长度+名称+ConnectID
+            uint32 u4PacketSize = 0;
+            int    nPos = 0;
+            ACE_OS::memcpy(&u4PacketSize, (char* )&pData[nPos], sizeof(uint32));
+            nPos += sizeof(uint32);
+
+            //先解析出命令ID
+            ACE_OS::memcpy(&u2WatchCommand, (char* )&pData[nPos], sizeof(uint16));
+            nPos += sizeof(uint16);
+
+            if(u2WatchCommand == SERVER_COMMAND_USERVALID_R)
+            {
+                uint16 u2UserName = 0;
+                ACE_OS::memcpy(&u2UserName, (char* )&pData[nPos], sizeof(uint16));
+                nPos += sizeof(uint16);
+                char* pUserName = new char[u2UserName + 1];
+                ACE_OS::memset(pUserName, 0, u2UserName + 1);
+                ACE_OS::memcpy(pUserName, (char* )&pData[nPos], u2UserName);
+                nPos += u2UserName;
+                uint16 u2UserPass = 0;
+                ACE_OS::memcpy(&u2UserPass, (char* )&pData[nPos], sizeof(uint16));
+                nPos += sizeof(uint16);
+                char* pUserPass = new char[u2UserPass + 1];
+                ACE_OS::memset(pUserPass, 0, u2UserPass + 1);
+                ACE_OS::memcpy(pUserPass, (char* )&pData[nPos], u2UserPass);
+                nPos += u2UserPass;
+                uint8 u1Ret = 0;
+                ACE_OS::memcpy(&u1Ret, (char* )&pData[nPos], sizeof(uint8));
+                nPos += sizeof(uint8);
+                uint32 u4CacheIndex = 0;
+                ACE_OS::memcpy(&u4CacheIndex, (char* )&pData[nPos], sizeof(uint32));
+                nPos += sizeof(uint32);
+                uint32 u4ConnectID = 0;
+                ACE_OS::memcpy(&u4ConnectID, (char* )&pData[nPos], sizeof(uint32));
+                nPos += sizeof(uint32);
+
+                if(u4CacheIndex == 0)
+                {
+                    //重新加载一下缓冲
+                    App_UserValidManager::instance()->GetFreeValid();
+                }
+                else
+                {
+                    //Lru被触发，需要重新遍历一下内存
+                    App_UserValidManager::instance()->Reload_Map_CacheMemory(u4CacheIndex);
+                }
 
 
-				uint32 u4Ret = LOGIN_SUCCESS;
-				//在重新找一下
-				_UserValid* pUserValid = App_UserValidManager::instance()->GetUserValid(pUserName);
-				if(NULL != pUserValid)
-				{
-					//比较用户密码是否正确
-					if(ACE_OS::strcmp(pUserValid->m_szUserPass, pUserPass) == 0)
-					{
-						pUserValid->m_u4LoginCount++;
-						u4Ret = LOGIN_SUCCESS;
-					}
-					else
-					{
-						u4Ret = LOGIN_FAIL_PASSWORD;
-					}
-				}
-				else
-				{
-					u4Ret = LOGIN_FAIL_NOEXIST;
-				}
+                uint32 u4Ret = LOGIN_SUCCESS;
+                //在重新找一下
+                _UserValid* pUserValid = App_UserValidManager::instance()->GetUserValid(pUserName);
 
-				App_UserValidManager::instance()->Display();
+                if(NULL != pUserValid)
+                {
+                    //比较用户密码是否正确
+                    if(ACE_OS::strcmp(pUserValid->m_szUserPass, pUserPass) == 0)
+                    {
+                        pUserValid->m_u4LoginCount++;
+                        u4Ret = LOGIN_SUCCESS;
+                    }
+                    else
+                    {
+                        u4Ret = LOGIN_FAIL_PASSWORD;
+                    }
+                }
+                else
+                {
+                    u4Ret = LOGIN_FAIL_NOEXIST;
+                }
 
-				SAFE_DELETE_ARRAY(pUserPass);
-				SAFE_DELETE_ARRAY(pUserName);
-				
-				IBuffPacket* pResponsesPacket = m_pServerObject->GetPacketManager()->Create();
-				uint16 u2PostCommandID = COMMAND_RETURN_LOGIN;
+                App_UserValidManager::instance()->Display();
 
-				//返回验证结果
-				(*pResponsesPacket) << (uint16)u2PostCommandID;   //拼接应答命令ID
-				(*pResponsesPacket) << (uint32)u4Ret;
+                SAFE_DELETE_ARRAY(pUserPass);
+                SAFE_DELETE_ARRAY(pUserName);
 
-				if(NULL != m_pServerObject->GetConnectManager())
-				{
-					//发送全部数据
-					m_pServerObject->GetConnectManager()->PostMessage(u4ConnectID, pResponsesPacket, SENDMESSAGE_NOMAL, u2PostCommandID, true);
-				}
-				else
-				{
-					OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] m_pConnectManager = NULL"));
-					m_pServerObject->GetPacketManager()->Delete(pResponsesPacket);
-				}
-			}
-			else if(u2WatchCommand == SERVER_COMMAND_USERINFO_R)
-			{
-				uint32 u4Ret        = 0;
-				uint32 u4UserID     = 0;
-				uint32 u4CacheIndex = 0;
-				uint32 u4ConnectID  = 0;
+                IBuffPacket* pResponsesPacket = m_pServerObject->GetPacketManager()->Create();
+                uint16 u2PostCommandID = COMMAND_RETURN_LOGIN;
 
-				ACE_OS::memcpy(&u4Ret, (char* )&pData[nPos], sizeof(uint8));
-				nPos += sizeof(uint8);
-				ACE_OS::memcpy(&u4UserID, (char* )&pData[nPos], sizeof(uint32));
-				nPos += sizeof(uint32);
-				ACE_OS::memcpy(&u4CacheIndex, (char* )&pData[nPos], sizeof(uint32));
-				nPos += sizeof(uint32);
-				ACE_OS::memcpy(&u4ConnectID, (char* )&pData[nPos], sizeof(uint32));
-				nPos += sizeof(uint32);
+                //返回验证结果
+                (*pResponsesPacket) << (uint16)u2PostCommandID;   //拼接应答命令ID
+                (*pResponsesPacket) << (uint32)u4Ret;
 
-				if(u4CacheIndex == 0)
-				{
-					//重新加载一下缓冲
-					App_UserInfoManager::instance()->GetFreeUserInfo();
-				}
-				else
-				{
-					//Lru被触发，需要重新遍历一下内存
-					App_UserInfoManager::instance()->Reload_Map_CacheMemory(u4CacheIndex);
-				}
+                if(NULL != m_pServerObject->GetConnectManager())
+                {
+                    //发送全部数据
+                    m_pServerObject->GetConnectManager()->PostMessage(u4ConnectID, pResponsesPacket, SENDMESSAGE_NOMAL, u2PostCommandID, true);
+                }
+                else
+                {
+                    OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] m_pConnectManager = NULL"));
+                    m_pServerObject->GetPacketManager()->Delete(pResponsesPacket);
+                }
+            }
+            else if(u2WatchCommand == SERVER_COMMAND_USERINFO_R)
+            {
+                uint32 u4Ret        = 0;
+                uint32 u4UserID     = 0;
+                uint32 u4CacheIndex = 0;
+                uint32 u4ConnectID  = 0;
 
-				IBuffPacket* pResponsesPacket = m_pServerObject->GetPacketManager()->Create();
-				uint16 u2PostCommandID = SERVER_COMMAND_USERINFO_R;
-				u4Ret = LOGIN_SUCCESS;
-				//在重新找一下
-				_UserInfo* pUserInfo = App_UserInfoManager::instance()->GetUserInfo(u4UserID);
-				if(pUserInfo != NULL)
-				{
-					u4Ret = LOGIN_SUCCESS;
-					(*pResponsesPacket) << (uint16)u2PostCommandID;   //拼接应答命令ID
-					(*pResponsesPacket) << (uint32)u4Ret;
-					(*pResponsesPacket) << (uint32)pUserInfo->m_u4UserID;
-					(*pResponsesPacket) << (uint32)pUserInfo->m_u4Life;
-					(*pResponsesPacket) << (uint32)pUserInfo->m_u4Magic;
-				}
-				else
-				{
-					u4Ret = LOGIN_FAIL_NOEXIST;
-					(*pResponsesPacket) << (uint16)u2PostCommandID;   //拼接应答命令ID
-					(*pResponsesPacket) << (uint32)u4Ret;
-					(*pResponsesPacket) << (uint32)0;
-					(*pResponsesPacket) << (uint32)0;
-					(*pResponsesPacket) << (uint32)0;
-				}
+                ACE_OS::memcpy(&u4Ret, (char* )&pData[nPos], sizeof(uint8));
+                nPos += sizeof(uint8);
+                ACE_OS::memcpy(&u4UserID, (char* )&pData[nPos], sizeof(uint32));
+                nPos += sizeof(uint32);
+                ACE_OS::memcpy(&u4CacheIndex, (char* )&pData[nPos], sizeof(uint32));
+                nPos += sizeof(uint32);
+                ACE_OS::memcpy(&u4ConnectID, (char* )&pData[nPos], sizeof(uint32));
+                nPos += sizeof(uint32);
 
-				if(NULL != m_pServerObject->GetConnectManager())
-				{
-					//发送全部数据
-					m_pServerObject->GetConnectManager()->PostMessage(u4ConnectID, pResponsesPacket, SENDMESSAGE_NOMAL, u2PostCommandID, true);
-				}
-				else
-				{
-					OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] m_pConnectManager = NULL"));
-					m_pServerObject->GetPacketManager()->Delete(pResponsesPacket);
-				}
-			}
+                if(u4CacheIndex == 0)
+                {
+                    //重新加载一下缓冲
+                    App_UserInfoManager::instance()->GetFreeUserInfo();
+                }
+                else
+                {
+                    //Lru被触发，需要重新遍历一下内存
+                    App_UserInfoManager::instance()->Reload_Map_CacheMemory(u4CacheIndex);
+                }
 
-			SAFE_DELETE_ARRAY(pData);
-		}
+                IBuffPacket* pResponsesPacket = m_pServerObject->GetPacketManager()->Create();
+                uint16 u2PostCommandID = SERVER_COMMAND_USERINFO_R;
+                u4Ret = LOGIN_SUCCESS;
+                //在重新找一下
+                _UserInfo* pUserInfo = App_UserInfoManager::instance()->GetUserInfo(u4UserID);
 
-		return true;
-	};
+                if(pUserInfo != NULL)
+                {
+                    u4Ret = LOGIN_SUCCESS;
+                    (*pResponsesPacket) << (uint16)u2PostCommandID;   //拼接应答命令ID
+                    (*pResponsesPacket) << (uint32)u4Ret;
+                    (*pResponsesPacket) << (uint32)pUserInfo->m_u4UserID;
+                    (*pResponsesPacket) << (uint32)pUserInfo->m_u4Life;
+                    (*pResponsesPacket) << (uint32)pUserInfo->m_u4Magic;
+                }
+                else
+                {
+                    u4Ret = LOGIN_FAIL_NOEXIST;
+                    (*pResponsesPacket) << (uint16)u2PostCommandID;   //拼接应答命令ID
+                    (*pResponsesPacket) << (uint32)u4Ret;
+                    (*pResponsesPacket) << (uint32)0;
+                    (*pResponsesPacket) << (uint32)0;
+                    (*pResponsesPacket) << (uint32)0;
+                }
 
-	bool ConnectError(int nError, _ClientIPInfo objServerIPInfo)
-	{
-		OUR_DEBUG((LM_ERROR, "[CPostServerData::ConnectError]Get Error(%d)(%s:%d).\n", nError, objServerIPInfo.m_szClientIP, objServerIPInfo.m_nPort));
-		return true;
-	};
+                if(NULL != m_pServerObject->GetConnectManager())
+                {
+                    //发送全部数据
+                    m_pServerObject->GetConnectManager()->PostMessage(u4ConnectID, pResponsesPacket, SENDMESSAGE_NOMAL, u2PostCommandID, true);
+                }
+                else
+                {
+                    OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] m_pConnectManager = NULL"));
+                    m_pServerObject->GetPacketManager()->Delete(pResponsesPacket);
+                }
+            }
 
-	void SetServerObject(CServerObject* pServerObject)
-	{
-		m_pServerObject = pServerObject;
-	}
+            SAFE_DELETE_ARRAY(pData);
+        }
+
+        return true;
+    };
+
+    bool ConnectError(int nError, _ClientIPInfo objServerIPInfo)
+    {
+        OUR_DEBUG((LM_ERROR, "[CPostServerData::ConnectError]Get Error(%d)(%s:%d).\n", nError, objServerIPInfo.m_szClientIP, objServerIPInfo.m_nPort));
+        return true;
+    };
+
+    void SetServerObject(CServerObject* pServerObject)
+    {
+        m_pServerObject = pServerObject;
+    }
 
 private:
-	CServerObject* m_pServerObject;
-	char           m_szRecvBuffData[RECV_BUFF_SIZE];  //接收缓冲池
-	uint16         m_u2RecvBuffLength;                //接收缓冲长度
+    CServerObject* m_pServerObject;
+    char           m_szRecvBuffData[RECV_BUFF_SIZE];  //接收缓冲池
+    uint16         m_u2RecvBuffLength;                //接收缓冲长度
 };
 
 class CBaseCommand : public CClientCommand
 {
 public:
-  CBaseCommand(void);
-  ~CBaseCommand(void);
+    CBaseCommand(void);
+    ~CBaseCommand(void);
 
-  void InitUserList();
-  void ClearUserList();
-  int DoMessage(IMessage* pMessage, bool& bDeleteFlag);
-  void SetServerObject(CServerObject* pServerObject);
-
-private:
-	void Do_User_Login(IMessage* pMessage);        //处理登陆
-	void Do_User_Logout(IMessage* pMessage);       //处理登出
-	void Do_User_Info(IMessage* pMessage);         //获得用户信息
-	void Do_Set_User_Info(IMessage* pMessage);     //设置用户信息 
+    void InitUserList();
+    void ClearUserList();
+    int DoMessage(IMessage* pMessage, bool& bDeleteFlag);
+    void SetServerObject(CServerObject* pServerObject);
 
 private:
-  CServerObject*    m_pServerObject;
-  CPostServerData*  m_pPostServerData;
+    void Do_User_Login(IMessage* pMessage);        //处理登陆
+    void Do_User_Logout(IMessage* pMessage);       //处理登出
+    void Do_User_Info(IMessage* pMessage);         //获得用户信息
+    void Do_Set_User_Info(IMessage* pMessage);     //设置用户信息
+
+private:
+    CServerObject*    m_pServerObject;
+    CPostServerData*  m_pPostServerData;
 };
 
 

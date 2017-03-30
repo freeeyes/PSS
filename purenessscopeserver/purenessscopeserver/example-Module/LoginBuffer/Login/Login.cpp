@@ -9,9 +9,9 @@
 
 #include "ace/svc_export.h"
 
-static const char *g_szDesc      = "Login缓冲插件";       //模块的描述文字
-static const char *g_szName      = "Login缓冲插件";       //模块的名字
-static const char *g_szModuleKey = "BaseLogin";           //模块的Key
+static const char* g_szDesc      = "Login缓冲插件";       //模块的描述文字
+static const char* g_szName      = "Login缓冲插件";       //模块的名字
+static const char* g_szModuleKey = "BaseLogin";           //模块的Key
 
 #ifdef WIN32
 #ifdef TEST_TCP_BUILD_LOGIN_DLL
@@ -25,13 +25,13 @@ static const char *g_szModuleKey = "BaseLogin";           //模块的Key
 
 extern "C"
 {
-  DECLDIR int LoadModuleData(CServerObject* pServerObject);
-  DECLDIR int UnLoadModuleData();
-  DECLDIR const char* GetDesc();
-  DECLDIR const char* GetName();
-  DECLDIR const char* GetModuleKey();
-  DECLDIR int DoModuleMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket);
-  DECLDIR bool GetModuleState(uint32& u4ErrorID);
+    DECLDIR int LoadModuleData(CServerObject* pServerObject);
+    DECLDIR int UnLoadModuleData();
+    DECLDIR const char* GetDesc();
+    DECLDIR const char* GetName();
+    DECLDIR const char* GetModuleKey();
+    DECLDIR int DoModuleMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket);
+    DECLDIR bool GetModuleState(uint32& u4ErrorID);
 
 }
 
@@ -40,84 +40,88 @@ CServerObject*      g_pServerObject = NULL;
 
 int LoadModuleData(CServerObject* pServerObject)
 {
-  g_pServerObject = pServerObject;
-  OUR_DEBUG((LM_INFO, "[Base LoadModuleData] Begin.\n"));
-  if(g_pServerObject != NULL)
-  {
-    g_BaseCommand.SetServerObject(pServerObject);	
-  }
-  else
-  {
-    OUR_DEBUG((LM_INFO, "[Base LoadModuleData] pServerObject is NULL.\n"));
-  }
+    g_pServerObject = pServerObject;
+    OUR_DEBUG((LM_INFO, "[Base LoadModuleData] Begin.\n"));
 
-  IMessageManager* pMessageManager = g_pServerObject->GetMessageManager();
-  if(NULL != pMessageManager)
-  {
-    pMessageManager->AddClientCommand(COMMAND_LOGIN, &g_BaseCommand, g_szName);
-	pMessageManager->AddClientCommand(COMMAND_LOGOUT, &g_BaseCommand, g_szName);
-	pMessageManager->AddClientCommand(COMMAND_USERINFO, &g_BaseCommand, g_szName);
-	pMessageManager->AddClientCommand(COMMAND_SET_USERINFO, &g_BaseCommand, g_szName);
-    pMessageManager->AddClientCommand(CLIENT_LINK_CONNECT, &g_BaseCommand, g_szName);
-    pMessageManager->AddClientCommand(CLIENT_LINK_CDISCONNET, &g_BaseCommand, g_szName);
-  }
-  else
-  {
-    OUR_DEBUG((LM_INFO, "[Base LoadModuleData] pMessageManager = NULL.\n"));
-  }		
+    if(g_pServerObject != NULL)
+    {
+        g_BaseCommand.SetServerObject(pServerObject);
+    }
+    else
+    {
+        OUR_DEBUG((LM_INFO, "[Base LoadModuleData] pServerObject is NULL.\n"));
+    }
 
-  g_BaseCommand.InitUserList();
-  OUR_DEBUG((LM_INFO, "[Base LoadModuleData] End.\n"));
+    IMessageManager* pMessageManager = g_pServerObject->GetMessageManager();
 
-  return 0;
+    if(NULL != pMessageManager)
+    {
+        pMessageManager->AddClientCommand(COMMAND_LOGIN, &g_BaseCommand, g_szName);
+        pMessageManager->AddClientCommand(COMMAND_LOGOUT, &g_BaseCommand, g_szName);
+        pMessageManager->AddClientCommand(COMMAND_USERINFO, &g_BaseCommand, g_szName);
+        pMessageManager->AddClientCommand(COMMAND_SET_USERINFO, &g_BaseCommand, g_szName);
+        pMessageManager->AddClientCommand(CLIENT_LINK_CONNECT, &g_BaseCommand, g_szName);
+        pMessageManager->AddClientCommand(CLIENT_LINK_CDISCONNET, &g_BaseCommand, g_szName);
+    }
+    else
+    {
+        OUR_DEBUG((LM_INFO, "[Base LoadModuleData] pMessageManager = NULL.\n"));
+    }
+
+    g_BaseCommand.InitUserList();
+    OUR_DEBUG((LM_INFO, "[Base LoadModuleData] End.\n"));
+
+    return 0;
 }
 
 int UnLoadModuleData()
 {
-  OUR_DEBUG((LM_INFO, "[Base UnLoadModuleData] Begin.\n"));
-  if(g_pServerObject != NULL)
-  {
-    IMessageManager* pMessageManager = g_pServerObject->GetMessageManager();
-    if(NULL != pMessageManager)
-    {
-      pMessageManager->DelClientCommand(COMMAND_LOGIN, &g_BaseCommand);
-	  pMessageManager->DelClientCommand(COMMAND_LOGOUT, &g_BaseCommand);
-	  pMessageManager->DelClientCommand(COMMAND_USERINFO, &g_BaseCommand);
-	  pMessageManager->DelClientCommand(COMMAND_SET_USERINFO, &g_BaseCommand);
-      pMessageManager->DelClientCommand(CLIENT_LINK_CONNECT, &g_BaseCommand);
-      pMessageManager->DelClientCommand(CLIENT_LINK_CDISCONNET, &g_BaseCommand);
-      pMessageManager = NULL;
-    }
-  }
+    OUR_DEBUG((LM_INFO, "[Base UnLoadModuleData] Begin.\n"));
 
-  g_BaseCommand.ClearUserList();
-  OUR_DEBUG((LM_INFO, "[Base UnLoadModuleData] End.\n"));
-  return 0;
+    if(g_pServerObject != NULL)
+    {
+        IMessageManager* pMessageManager = g_pServerObject->GetMessageManager();
+
+        if(NULL != pMessageManager)
+        {
+            pMessageManager->DelClientCommand(COMMAND_LOGIN, &g_BaseCommand);
+            pMessageManager->DelClientCommand(COMMAND_LOGOUT, &g_BaseCommand);
+            pMessageManager->DelClientCommand(COMMAND_USERINFO, &g_BaseCommand);
+            pMessageManager->DelClientCommand(COMMAND_SET_USERINFO, &g_BaseCommand);
+            pMessageManager->DelClientCommand(CLIENT_LINK_CONNECT, &g_BaseCommand);
+            pMessageManager->DelClientCommand(CLIENT_LINK_CDISCONNET, &g_BaseCommand);
+            pMessageManager = NULL;
+        }
+    }
+
+    g_BaseCommand.ClearUserList();
+    OUR_DEBUG((LM_INFO, "[Base UnLoadModuleData] End.\n"));
+    return 0;
 }
 
 const char* GetDesc()
 {
-  return g_szDesc;
+    return g_szDesc;
 }
 
 const char* GetName()
 {
-  return g_szName;
+    return g_szName;
 }
 
 const char* GetModuleKey()
 {
-  return g_szModuleKey;
+    return g_szModuleKey;
 }
 
 //用于模块间的调用接口
 int DoModuleMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket)
 {
-	OUR_DEBUG((LM_INFO, "[DoModuleMessage] u2CommandID=%d, size=%d, return=%d.\n",
-		u2CommandID,
-		pBuffPacket->GetPacketLen(),
-		pReturnBuffPacket->GetPacketLen()));
-	return 0;
+    OUR_DEBUG((LM_INFO, "[DoModuleMessage] u2CommandID=%d, size=%d, return=%d.\n",
+               u2CommandID,
+               pBuffPacket->GetPacketLen(),
+               pReturnBuffPacket->GetPacketLen()));
+    return 0;
 }
 
 //交给框架使用，用于框架定时巡检插件状态
@@ -126,9 +130,9 @@ int DoModuleMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* p
 //框架会根据这个设置，发送邮件给指定的邮箱
 bool GetModuleState(uint32& u4ErrorID)
 {
-	OUR_DEBUG((LM_INFO, "[GetModuleState] u4ErrorID=%d.\n",
-		u4ErrorID));
-	return true;
+    OUR_DEBUG((LM_INFO, "[GetModuleState] u4ErrorID=%d.\n",
+               u4ErrorID));
+    return true;
 }
 
 

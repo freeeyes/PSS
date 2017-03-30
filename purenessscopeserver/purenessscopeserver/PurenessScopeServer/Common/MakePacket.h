@@ -24,61 +24,61 @@ using namespace std;
 
 struct _MakePacket
 {
-	uint8          m_PacketType;     //数据包类型 
-	uint32         m_u4ConnectID;    //链接ID
-	uint8          m_u1Option;       //操作类型
-	CPacketParse*  m_pPacketParse;   //数据包数据指针
-	ACE_INET_Addr  m_AddrRemote;     //数据包的来源IP信息
-	ACE_INET_Addr  m_AddrListen;     //数据包来源监听IP信息 
+    uint8          m_PacketType;     //数据包类型
+    uint32         m_u4ConnectID;    //链接ID
+    uint8          m_u1Option;       //操作类型
+    CPacketParse*  m_pPacketParse;   //数据包数据指针
+    ACE_INET_Addr  m_AddrRemote;     //数据包的来源IP信息
+    ACE_INET_Addr  m_AddrListen;     //数据包来源监听IP信息
 
-	int            m_nHashID;        //对应记录hash的ID
+    int            m_nHashID;        //对应记录hash的ID
 
-	_MakePacket()
-	{
-		m_PacketType        = PACKET_TCP;  //0为TCP,1是UDP 默认是TCP
-		m_u4ConnectID       = 0;
-		m_u1Option          = 0;
-		m_pPacketParse      = NULL;
-		m_nHashID           = 0;
-	}
+    _MakePacket()
+    {
+        m_PacketType        = PACKET_TCP;  //0为TCP,1是UDP 默认是TCP
+        m_u4ConnectID       = 0;
+        m_u1Option          = 0;
+        m_pPacketParse      = NULL;
+        m_nHashID           = 0;
+    }
 
-	void Clear()
-	{
-		m_PacketType        = PACKET_TCP;  //0为TCP,1是UDP 默认是TCP
-		m_u4ConnectID       = 0;
-		m_u1Option          = 0;
-		m_pPacketParse      = NULL;
-	}
+    void Clear()
+    {
+        m_PacketType        = PACKET_TCP;  //0为TCP,1是UDP 默认是TCP
+        m_u4ConnectID       = 0;
+        m_u1Option          = 0;
+        m_pPacketParse      = NULL;
+    }
 
-	void SetHashID(int nHashID)
-	{
-		m_nHashID = nHashID;
-	}
+    void SetHashID(int nHashID)
+    {
+        m_nHashID = nHashID;
+    }
 
-	int GetHashID()
-	{
-		return m_nHashID;
-	}
+    int GetHashID()
+    {
+        return m_nHashID;
+    }
 };
 
 class CMakePacket
 {
 public:
-	CMakePacket(void);
-	~CMakePacket(void);
+    CMakePacket(void);
+    ~CMakePacket(void);
 
-	bool Init();
+    bool Init();
 
-	bool PutMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& tvNow);                                                     //处理消息数据包
-	bool PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, ACE_Time_Value& tvNow);                      //发送失败消息回调 
-
-private:
-	void SetMessage(_MakePacket* pMakePacket, CMessage* pMessage, ACE_Time_Value& tvNow);                                      //一般数据包消息
-	void SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, CMessage* pMessage, ACE_Time_Value& tvNow);  //服务发送失败回调数据包消息
+    bool PutMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& tvNow);                                                     //处理消息数据包
+    bool PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, ACE_Time_Value& tvNow);                      //发送失败消息回调
 
 private:
-	ACE_Recursive_Thread_Mutex     m_ThreadWriteLock;
+    void SetMessage(_MakePacket* pMakePacket, CMessage* pMessage, ACE_Time_Value& tvNow);                                      //一般数据包消息
+    void SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, CMessage* pMessage, ACE_Time_Value& tvNow);  //服务发送失败回调数据包消息
+
+private:
+    ACE_Recursive_Thread_Mutex     m_ThreadWriteLock;
 };
-typedef ACE_Singleton<CMakePacket, ACE_Null_Mutex> App_MakePacket; 
+typedef ACE_Singleton<CMakePacket, ACE_Null_Mutex> App_MakePacket;
 
 #endif

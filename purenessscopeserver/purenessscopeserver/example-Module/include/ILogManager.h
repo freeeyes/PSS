@@ -1,4 +1,4 @@
-ï»¿#ifndef _ILOGMANAGER_H
+#ifndef _ILOGMANAGER_H
 #define _ILOGMANAGER_H
 
 #include "ILogObject.h"
@@ -7,11 +7,11 @@ class ILogManager
 {
 public:
     virtual ~ILogManager() {}
-    //æ–‡æœ¬æ—¥å¿—è®°å½•
+    //ÎÄ±¾ÈÕÖ¾¼ÇÂ¼
     virtual int WriteLog(int nLogType, const char* fmt, ...)              = 0;
-    //äºŒè¿›åˆ¶æ—¥å¿—è®°å½•
+    //¶ş½øÖÆÈÕÖ¾¼ÇÂ¼
     virtual int WriteLogBinary(int nLogType, const char* pData, int nLen) = 0;
-    //å‘é€é‚®ä»¶è®°å½•
+    //·¢ËÍÓÊ¼ş¼ÇÂ¼
     virtual int WriteToMail(int nLogType, uint32 u4MailID, char* pTitle, const char* fmt, ...) = 0;
 };
 

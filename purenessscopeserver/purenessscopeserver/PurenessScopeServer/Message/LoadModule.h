@@ -15,61 +15,61 @@ using namespace std;
 
 struct _ModuleInfo
 {
-	string           strModuleName;         //模块文件名称
-	string           strModulePath;         //模块路径
-	string           strModuleParam;        //模块启动参数 
-	ACE_Date_Time    dtCreateTime;          //模块创建时间
-	ACE_SHLIB_HANDLE hModule;
-	int (*LoadModuleData)(CServerObject* pServerObject);
-	int (*UnLoadModuleData)(void);
-	const char* (*GetDesc)(void);
-	const char* (*GetName)(void);
-	const char* (*GetModuleKey)(void);
-	int (*DoModuleMessage)(uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket);
-	bool (*GetModuleState)(uint32& u4AErrorID);
+    string           strModuleName;         //模块文件名称
+    string           strModulePath;         //模块路径
+    string           strModuleParam;        //模块启动参数
+    ACE_Date_Time    dtCreateTime;          //模块创建时间
+    ACE_SHLIB_HANDLE hModule;
+    int (*LoadModuleData)(CServerObject* pServerObject);
+    int (*UnLoadModuleData)(void);
+    const char* (*GetDesc)(void);
+    const char* (*GetName)(void);
+    const char* (*GetModuleKey)(void);
+    int (*DoModuleMessage)(uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket);
+    bool (*GetModuleState)(uint32& u4AErrorID);
 
-	_ModuleInfo()
-	{
-	}
+    _ModuleInfo()
+    {
+    }
 };
 
 class CLoadModule : public IModuleInfo
 {
 public:
-	CLoadModule(void);
-	virtual ~CLoadModule(void);
+    CLoadModule(void);
+    virtual ~CLoadModule(void);
 
-	void Init(uint16 u2MaxModuleCount);
+    void Init(uint16 u2MaxModuleCount);
 
-	void Close();
+    void Close();
 
-	bool LoadModule(const char* pModulePath, const char* pModuleName, const char* pModuleParam);
-	bool UnLoadModule(const char* szModuleName, bool blIsDelete = true);
+    bool LoadModule(const char* pModulePath, const char* pModuleName, const char* pModuleParam);
+    bool UnLoadModule(const char* szModuleName, bool blIsDelete = true);
 
-	int  SendModuleMessage(const char* pModuleName, uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket);
+    int  SendModuleMessage(const char* pModuleName, uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket);
 
-	int  GetCurrModuleCount();
-	int  GetModulePoolCount();
-	_ModuleInfo* GetModuleInfo(const char* pModuleName);
+    int  GetCurrModuleCount();
+    int  GetModulePoolCount();
+    _ModuleInfo* GetModuleInfo(const char* pModuleName);
 
-	//插件接口提供相关功能
-	bool GetModuleExist(const char* pModuleName);
-	const char* GetModuleParam(const char* pModuleName);
-	const char* GetModuleFileName(const char* pModuleName);
-	const char* GetModuleFilePath(const char* pModuleName);
-	const char* GetModuleFileDesc(const char* pModuleName);
-	uint16 GetModuleCount();
-	void GetAllModuleInfo(vector<_ModuleInfo*>& vecModeInfo);
-	void GetAllModuleName(vector<string> vecModuleName);
-
-private:
-	bool LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo, const char* pModulePath);    //开始加载模块的接口和数据
+    //插件接口提供相关功能
+    bool GetModuleExist(const char* pModuleName);
+    const char* GetModuleParam(const char* pModuleName);
+    const char* GetModuleFileName(const char* pModuleName);
+    const char* GetModuleFilePath(const char* pModuleName);
+    const char* GetModuleFileDesc(const char* pModuleName);
+    uint16 GetModuleCount();
+    void GetAllModuleInfo(vector<_ModuleInfo*>& vecModeInfo);
+    void GetAllModuleName(vector<string> vecModuleName);
 
 private:
-	CHashTable<_ModuleInfo>            m_objHashModuleList;
-	char                               m_szModulePath[MAX_BUFF_200];
-	ACE_Recursive_Thread_Mutex         m_tmModule;
+    bool LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo, const char* pModulePath);    //开始加载模块的接口和数据
+
+private:
+    CHashTable<_ModuleInfo>            m_objHashModuleList;
+    char                               m_szModulePath[MAX_BUFF_200];
+    ACE_Recursive_Thread_Mutex         m_tmModule;
 };
 
-typedef ACE_Singleton<CLoadModule, ACE_Null_Mutex> App_ModuleLoader; 
+typedef ACE_Singleton<CLoadModule, ACE_Null_Mutex> App_ModuleLoader;
 #endif

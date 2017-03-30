@@ -10,9 +10,9 @@
 
 
 
-static void *run_reactor (void *pReactor)
+static void* run_reactor (void* pReactor)
 {
-    ACE_Reactor *pLogReactor = (ACE_Reactor *)pReactor;
+    ACE_Reactor* pLogReactor = (ACE_Reactor*)pReactor;
 
     pLogReactor->owner(ACE_Thread_Manager::instance ()->thr_self());
     pLogReactor->run_reactor_event_loop ();
@@ -45,7 +45,7 @@ Logging_Config_Param::Logging_Config_Param()
 
 Logging_Config_Param::~Logging_Config_Param()
 {
-   ACE_DEBUG((LM_INFO, ACE_TEXT("(%P|%t) %M ~Logging_Config_Param[%N,%l]\n")));
+    ACE_DEBUG((LM_INFO, ACE_TEXT("(%P|%t) %M ~Logging_Config_Param[%N,%l]\n")));
 }
 
 //日志策略
@@ -57,25 +57,27 @@ Frame_Logging_Strategy::Frame_Logging_Strategy()
 
 Frame_Logging_Strategy::~Frame_Logging_Strategy()
 {
-	ACE_DEBUG((LM_INFO, ACE_TEXT("[Frame_Logging_Strategy::~Frame_Logging_Strategy]Begin\n")));
-  if (pLogStrategy != NULL)
-  {
-      pLogStrategy->reactor(NULL);
-      delete pLogStrategy;
-  }	
+    ACE_DEBUG((LM_INFO, ACE_TEXT("[Frame_Logging_Strategy::~Frame_Logging_Strategy]Begin\n")));
 
-  if(pLogStraReactor != NULL)
-  {
-			pLogStraReactor->close();
-      delete pLogStraReactor;
-  }
-  
-  ACE_DEBUG((LM_INFO, ACE_TEXT("[Frame_Logging_Strategy::~Frame_Logging_Strategy]End\n")));
+    if (pLogStrategy != NULL)
+    {
+        pLogStrategy->reactor(NULL);
+        delete pLogStrategy;
+    }
+
+    if(pLogStraReactor != NULL)
+    {
+        pLogStraReactor->close();
+        delete pLogStraReactor;
+    }
+
+    ACE_DEBUG((LM_INFO, ACE_TEXT("[Frame_Logging_Strategy::~Frame_Logging_Strategy]End\n")));
 }
 
-string Frame_Logging_Strategy::GetLogLevel(const string &strLogLevel)
+string Frame_Logging_Strategy::GetLogLevel(const string& strLogLevel)
 {
     string strOutLogLevel="";
+
     if(strLogLevel == "DEBUG")
     {
         strOutLogLevel = "DEBUG|INFO|NOTICE|WARNING|ERROR|CRITICAL|ALERT|EMERGENCY";
@@ -112,11 +114,12 @@ string Frame_Logging_Strategy::GetLogLevel(const string &strLogLevel)
     {
         strOutLogLevel = "DEBUG|INFO|WARNING|NOTICE|ERROR|CRITICAL|ALERT|EMERGENCY";
     }
+
     return strOutLogLevel;
 }
 
 //初始化日志策略
-int Frame_Logging_Strategy::InitLogStrategy(Logging_Config_Param &ConfigParam)
+int Frame_Logging_Strategy::InitLogStrategy(Logging_Config_Param& ConfigParam)
 {
     //Set Arg List
     char cmdline[1024] = {0};
@@ -143,12 +146,12 @@ int Frame_Logging_Strategy::InitLogStrategy(Logging_Config_Param &ConfigParam)
                         ConfigParam.m_iLogFileMaxCnt);
     }
 
-    ACE_Reactor_Impl * pImpl = 0;
+    ACE_Reactor_Impl* pImpl = 0;
 
     ACE_NEW_RETURN (pImpl, ACE_TP_Reactor, -1);
-    
 
-    ACE_NEW_RETURN(pLogStraReactor, ACE_Reactor(pImpl ,1), -1);
+
+    ACE_NEW_RETURN(pLogStraReactor, ACE_Reactor(pImpl,1), -1);
     //ACE_NEW_RETURN(pLogStraReactor, ACE_Reactor, -1);
     ACE_NEW_RETURN(pLogStrategy, My_ACE_Logging_Strategy, -1);
 
@@ -161,7 +164,7 @@ int Frame_Logging_Strategy::InitLogStrategy(Logging_Config_Param &ConfigParam)
 
     pLogStrategy->init(args.argc(),args.argv());
 
-    if (ACE_Thread_Manager::instance ()->spawn(ACE_THR_FUNC (run_reactor), (void *)pLogStraReactor) == -1)
+    if (ACE_Thread_Manager::instance ()->spawn(ACE_THR_FUNC (run_reactor), (void*)pLogStraReactor) == -1)
     {
         ACE_ERROR_RETURN ((LM_ERROR,"Spawning Reactor.\n"),-1);
     }
@@ -179,12 +182,13 @@ int Frame_Logging_Strategy::InitLogStrategy()
 //结束策略
 int Frame_Logging_Strategy::EndLogStrategy()
 {
-	if(NULL != pLogStrategy)
-	{
-		ACE_DEBUG((LM_INFO, ACE_TEXT("[Frame_Logging_Strategy::EndLogStrategy]Begin\n")));
-    	pLogStraReactor->end_reactor_event_loop();
-    	ACE_DEBUG((LM_INFO, ACE_TEXT("[Frame_Logging_Strategy::EndLogStrategy]End\n")));
+    if(NULL != pLogStrategy)
+    {
+        ACE_DEBUG((LM_INFO, ACE_TEXT("[Frame_Logging_Strategy::EndLogStrategy]Begin\n")));
+        pLogStraReactor->end_reactor_event_loop();
+        ACE_DEBUG((LM_INFO, ACE_TEXT("[Frame_Logging_Strategy::EndLogStrategy]End\n")));
     }
+
     return 0;
 }
 

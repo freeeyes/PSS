@@ -1,12 +1,12 @@
 #ifndef _LUADEFINE_H
 #define _LUADEFINE_H
 
-extern "C" 
+extern "C"
 {
-	#include "lua.h"
-	#include "lualib.h"
-	#include "lauxlib.h"
-	#include "tolua++.h"
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
+#include "tolua++.h"
 };
 
 #include <stdio.h>

@@ -11,12 +11,12 @@
 class CProSigHandle : public ACE_Event_Handler
 {
 public:
-	CProSigHandle(void);
-	~CProSigHandle(void);
+    CProSigHandle(void);
+    ~CProSigHandle(void);
 
-	virtual int handle_signal(int nSigNum, siginfo_t* pSigInfo = 0, ucontext_t* pContext = 0);
-	int RegisterSignal(ACE_Proactor* pProactor = NULL);
+    virtual int handle_signal(int nSigNum, siginfo_t* pSigInfo = 0, ucontext_t* pContext = 0);
+    int RegisterSignal(ACE_Proactor* pProactor = NULL);
 };
 
-typedef ACE_Singleton<CProSigHandle, ACE_Null_Mutex> App_ProSigHandler; 
+typedef ACE_Singleton<CProSigHandle, ACE_Null_Mutex> App_ProSigHandler;
 #endif

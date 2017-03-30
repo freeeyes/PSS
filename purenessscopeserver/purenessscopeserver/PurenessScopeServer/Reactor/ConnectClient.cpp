@@ -12,9 +12,9 @@ CConnectClient::CConnectClient(void)
     m_u4RecvCount       = 0;
     m_u4CostTime        = 0;
     m_u4MaxPacketSize   = MAX_MSG_PACKETLENGTH;
-	m_ems2s             = S2S_NEED_CALLBACK;
+    m_ems2s             = S2S_NEED_CALLBACK;
 
-	m_emRecvState       = SERVER_RECV_INIT;
+    m_emRecvState       = SERVER_RECV_INIT;
 }
 
 CConnectClient::~CConnectClient(void)
@@ -38,9 +38,9 @@ bool CConnectClient::Close()
         //msg_queue()->deactivate();
         shutdown();
         OUR_DEBUG((LM_ERROR, "[CConnectClient::Close]Close(%s:%d) OK.\n", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
-        
-		//删除链接对象
-		App_ClientReConnectManager::instance()->CloseByClient(m_nServerID);
+
+        //删除链接对象
+        App_ClientReConnectManager::instance()->CloseByClient(m_nServerID);
 
         //回归用过的指针
         delete this;
@@ -52,14 +52,14 @@ bool CConnectClient::Close()
 
 void CConnectClient::ClientClose(EM_s2s& ems2s)
 {
-	m_ems2s = ems2s;
+    m_ems2s = ems2s;
     //msg_queue()->deactivate();
 
-	//如果对象已经在外面释放，则不需要再次回调
-	if(ems2s == S2S_INNEED_CALLBACK)
-	{
-		SetClientMessage(NULL);
-	}
+    //如果对象已经在外面释放，则不需要再次回调
+    if(ems2s == S2S_INNEED_CALLBACK)
+    {
+        SetClientMessage(NULL);
+    }
 
     shutdown();
 }
@@ -121,9 +121,9 @@ int CConnectClient::open(void* p)
     m_pClientMessage = App_ClientReConnectManager::instance()->GetClientMessage(m_nServerID);
     OUR_DEBUG((LM_INFO, "[CConnectClient::open] Connection from [%s:%d]\n", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
 
-	this->reactor()->register_handler(this, ACE_Event_Handler::READ_MASK);
+    this->reactor()->register_handler(this, ACE_Event_Handler::READ_MASK);
 
-	return 0;
+    return 0;
 }
 
 int CConnectClient::handle_input(ACE_HANDLE fd)
@@ -135,14 +135,14 @@ int CConnectClient::handle_input(ACE_HANDLE fd)
 
         if (NULL != m_pClientMessage)
         {
-			_ClientIPInfo objServerIPInfo;
-			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-			objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+            _ClientIPInfo objServerIPInfo;
+            sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+            objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
 
-			if(S2S_NEED_CALLBACK == m_ems2s)
-			{
-				m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
-			}
+            if(S2S_NEED_CALLBACK == m_ems2s)
+            {
+                m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+            }
         }
 
         return -1;
@@ -157,33 +157,33 @@ int CConnectClient::handle_input(ACE_HANDLE fd)
 
         if (NULL != m_pClientMessage)
         {
-			_ClientIPInfo objServerIPInfo;
-			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-			objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+            _ClientIPInfo objServerIPInfo;
+            sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+            objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
 
-			if(S2S_NEED_CALLBACK == m_ems2s)
-			{
-				m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
-			}
+            if(S2S_NEED_CALLBACK == m_ems2s)
+            {
+                m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+            }
         }
 
         return -1;
     }
 
-		if(App_MainConfig::instance()->GetNetworkMode() != (uint8)NETWORKMODE_RE_EPOLL_ET)
-		{
-			return RecvData();
-		}
-		else
-		{
-			return RecvData_et();
-		}
+    if(App_MainConfig::instance()->GetNetworkMode() != (uint8)NETWORKMODE_RE_EPOLL_ET)
+    {
+        return RecvData();
+    }
+    else
+    {
+        return RecvData_et();
+    }
 }
 
 int CConnectClient::RecvData()
 {
-	ACE_Time_Value nowait(MAX_MSG_PACKETTIMEOUT);
-		 
+    ACE_Time_Value nowait(MAX_MSG_PACKETTIMEOUT);
+
     int nCurrCount = (uint32)m_pCurrMessage->size();
 
     if (nCurrCount < 0)
@@ -194,14 +194,14 @@ int CConnectClient::RecvData()
 
         if (NULL != m_pClientMessage)
         {
-			_ClientIPInfo objServerIPInfo;
-			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-			objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+            _ClientIPInfo objServerIPInfo;
+            sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+            objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
 
-			if(S2S_NEED_CALLBACK == m_ems2s)
-			{
-				m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
-			}
+            if(S2S_NEED_CALLBACK == m_ems2s)
+            {
+                m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+            }
         }
 
         return -1;
@@ -218,14 +218,14 @@ int CConnectClient::RecvData()
 
         if (NULL != m_pClientMessage)
         {
-			_ClientIPInfo objServerIPInfo;
-			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-			objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+            _ClientIPInfo objServerIPInfo;
+            sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+            objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
 
-			if(S2S_NEED_CALLBACK == m_ems2s)
-			{
-				m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
-			}
+            if(S2S_NEED_CALLBACK == m_ems2s)
+            {
+                m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+            }
         }
 
         return -1;
@@ -272,50 +272,52 @@ int CConnectClient::RecvData()
     if (NULL != m_pClientMessage)
     {
         //接收数据，返回给逻辑层，自己不处理整包完整性判定
-		_ClientIPInfo objServerIPInfo;
-		sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-		objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+        _ClientIPInfo objServerIPInfo;
+        sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+        objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
 
-		uint16 u2CommandID             = 0;
-		ACE_Message_Block* pRecvFinish = NULL;
+        uint16 u2CommandID             = 0;
+        ACE_Message_Block* pRecvFinish = NULL;
 
-		m_atvRecv     = ACE_OS::gettimeofday();
-		m_emRecvState = SERVER_RECV_BEGIN;
+        m_atvRecv     = ACE_OS::gettimeofday();
+        m_emRecvState = SERVER_RECV_BEGIN;
 
-		while(true)
-		{
-			bool blRet = m_pClientMessage->Recv_Format_data(m_pCurrMessage, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish);
-			if(true == blRet)
-			{
-				if(App_MainConfig::instance()->GetConnectServerRunType() == 0)
-				{
-					//调用数据包处理
-					m_pClientMessage->RecvData(u2CommandID, pRecvFinish, objServerIPInfo);
-					//回收处理包
-					App_MessageBlockManager::instance()->Close(pRecvFinish);
-				}
-				else
-				{
-					//异步消息处理
-					_Server_Message_Info* pServer_Message_Info = App_ServerMessageInfoPool::instance()->Create();
-					pServer_Message_Info->m_pClientMessage  = m_pClientMessage;
-					pServer_Message_Info->m_objServerIPInfo = objServerIPInfo;
-					pServer_Message_Info->m_pRecvFinish     = pRecvFinish;
-					pServer_Message_Info->m_u2CommandID     = u2CommandID;
-					App_ServerMessageTask::instance()->PutMessage(pServer_Message_Info);
-				}
-			}
-			else
-			{
-				break;
-			}
-		}
-		m_emRecvState = SERVER_RECV_END;
+        while(true)
+        {
+            bool blRet = m_pClientMessage->Recv_Format_data(m_pCurrMessage, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish);
+
+            if(true == blRet)
+            {
+                if(App_MainConfig::instance()->GetConnectServerRunType() == 0)
+                {
+                    //调用数据包处理
+                    m_pClientMessage->RecvData(u2CommandID, pRecvFinish, objServerIPInfo);
+                    //回收处理包
+                    App_MessageBlockManager::instance()->Close(pRecvFinish);
+                }
+                else
+                {
+                    //异步消息处理
+                    _Server_Message_Info* pServer_Message_Info = App_ServerMessageInfoPool::instance()->Create();
+                    pServer_Message_Info->m_pClientMessage  = m_pClientMessage;
+                    pServer_Message_Info->m_objServerIPInfo = objServerIPInfo;
+                    pServer_Message_Info->m_pRecvFinish     = pRecvFinish;
+                    pServer_Message_Info->m_u2CommandID     = u2CommandID;
+                    App_ServerMessageTask::instance()->PutMessage(pServer_Message_Info);
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        m_emRecvState = SERVER_RECV_END;
     }
 
     m_pCurrMessage->reset();
-    
-    return 0;	
+
+    return 0;
 }
 
 int CConnectClient::RecvData_et()
@@ -330,137 +332,139 @@ int CConnectClient::RecvData_et()
 
         if (NULL != m_pClientMessage)
         {
-			_ClientIPInfo objServerIPInfo;
-			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-			objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+            _ClientIPInfo objServerIPInfo;
+            sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+            objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
 
-			if(S2S_NEED_CALLBACK == m_ems2s)
-			{
-				m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
-			}
+            if(S2S_NEED_CALLBACK == m_ems2s)
+            {
+                m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+            }
         }
 
         return -1;
     }
 
-		while(true)
-		{
-	    int nDataLen = this->peer().recv(m_pCurrMessage->wr_ptr(), nCurrCount, MSG_NOSIGNAL);
-	
-	    if (nDataLen <= 0)
-	    {
-	        m_u4CurrSize = 0;
-	        uint32 u4Error = (uint32)errno;
-	        
-			if(nDataLen == -1 && u4Error == EAGAIN)
-			{
-					break;
-			}	        
-	        
-	        OUR_DEBUG((LM_ERROR, "[CConnectClient::handle_input] ConnectID = %d, recv data is error nDataLen = [%d] errno = [%d].\n", GetServerID(), nDataLen, u4Error));
-	        sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectClient::handle_input] ConnectID = %d, recv data is error[%d].\n", GetServerID(), nDataLen);
-	
-	        if (NULL != m_pClientMessage)
-	        {
-				_ClientIPInfo objServerIPInfo;
-				sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-				objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+    while(true)
+    {
+        int nDataLen = this->peer().recv(m_pCurrMessage->wr_ptr(), nCurrCount, MSG_NOSIGNAL);
 
-				if(S2S_NEED_CALLBACK == m_ems2s)
-				{
-					m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
-				}
-	        }
-	
-	        return -1;
-	    }
-	
-	    //如果是DEBUG状态，记录当前接受包的二进制数据
-	    if (App_MainConfig::instance()->GetDebug() == DEBUG_ON)
-	    {
-	        char szDebugData[MAX_BUFF_1024] = {'\0'};
-	        char szLog[10]  = {'\0'};
-	        int  nDebugSize = 0;
-	        bool blblMore   = false;
-	
-	        if (nDataLen >= MAX_BUFF_200)
-	        {
-	            nDebugSize = MAX_BUFF_200;
-	            blblMore   = true;
-	        }
-	        else
-	        {
-	            nDebugSize = nDataLen;
-	        }
-	
-	        char* pData = m_pCurrMessage->wr_ptr();
-	
-	        for (int i = 0; i < nDebugSize; i++)
-	        {
-	            sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
-	            sprintf_safe(szDebugData + 5 * i, MAX_BUFF_1024 - 5 * i, "%s", szLog);
-	        }
-	
-	        if (blblMore == true)
-	        {
-	            AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_SERVERRECV, "[%s:%d]%s.(数据包过长只记录前200字节)", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
-	        }
-	        else
-	        {
-	            AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_SERVERRECV, "[%s:%d]%s.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
-	        }
-	    }
-	
-	    m_pCurrMessage->wr_ptr(nDataLen);
-	
-	    if (NULL != m_pClientMessage)
-	    {
-	        //接收数据，返回给逻辑层，自己不处理整包完整性判定
-			_ClientIPInfo objServerIPInfo;
-			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-			objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+        if (nDataLen <= 0)
+        {
+            m_u4CurrSize = 0;
+            uint32 u4Error = (uint32)errno;
 
-			uint16 u2CommandID             = 0;
-			ACE_Message_Block* pRecvFinish = NULL;
+            if(nDataLen == -1 && u4Error == EAGAIN)
+            {
+                break;
+            }
 
-			m_atvRecv     = ACE_OS::gettimeofday();
-			m_emRecvState = SERVER_RECV_BEGIN;
+            OUR_DEBUG((LM_ERROR, "[CConnectClient::handle_input] ConnectID = %d, recv data is error nDataLen = [%d] errno = [%d].\n", GetServerID(), nDataLen, u4Error));
+            sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectClient::handle_input] ConnectID = %d, recv data is error[%d].\n", GetServerID(), nDataLen);
 
-			while(true)
-			{
-				bool blRet = m_pClientMessage->Recv_Format_data(m_pCurrMessage, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish);
-				if(true == blRet)
-				{
-					if(App_MainConfig::instance()->GetConnectServerRunType() == 0)
-					{
-						//调用数据包处理
-						m_pClientMessage->RecvData(u2CommandID, pRecvFinish, objServerIPInfo);
-						//回收处理包
-						App_MessageBlockManager::instance()->Close(pRecvFinish);
-					}
-					else
-					{
-						//异步消息处理
-						_Server_Message_Info* pServer_Message_Info = new _Server_Message_Info();
-						pServer_Message_Info->m_pClientMessage  = m_pClientMessage;
-						pServer_Message_Info->m_objServerIPInfo = objServerIPInfo;
-						pServer_Message_Info->m_pRecvFinish     = pRecvFinish;
-						pServer_Message_Info->m_u2CommandID     = u2CommandID;
-						App_ServerMessageTask::instance()->PutMessage(pServer_Message_Info);
-					}
-				}
-				else
-				{
-					break;
-				}
-			}
-			m_emRecvState = SERVER_RECV_END;
-	    }
-	
-	    m_pCurrMessage->reset();
-  	}
-    
-    return 0;		
+            if (NULL != m_pClientMessage)
+            {
+                _ClientIPInfo objServerIPInfo;
+                sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+                objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+
+                if(S2S_NEED_CALLBACK == m_ems2s)
+                {
+                    m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+                }
+            }
+
+            return -1;
+        }
+
+        //如果是DEBUG状态，记录当前接受包的二进制数据
+        if (App_MainConfig::instance()->GetDebug() == DEBUG_ON)
+        {
+            char szDebugData[MAX_BUFF_1024] = {'\0'};
+            char szLog[10]  = {'\0'};
+            int  nDebugSize = 0;
+            bool blblMore   = false;
+
+            if (nDataLen >= MAX_BUFF_200)
+            {
+                nDebugSize = MAX_BUFF_200;
+                blblMore   = true;
+            }
+            else
+            {
+                nDebugSize = nDataLen;
+            }
+
+            char* pData = m_pCurrMessage->wr_ptr();
+
+            for (int i = 0; i < nDebugSize; i++)
+            {
+                sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
+                sprintf_safe(szDebugData + 5 * i, MAX_BUFF_1024 - 5 * i, "%s", szLog);
+            }
+
+            if (blblMore == true)
+            {
+                AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_SERVERRECV, "[%s:%d]%s.(数据包过长只记录前200字节)", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
+            }
+            else
+            {
+                AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_SERVERRECV, "[%s:%d]%s.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
+            }
+        }
+
+        m_pCurrMessage->wr_ptr(nDataLen);
+
+        if (NULL != m_pClientMessage)
+        {
+            //接收数据，返回给逻辑层，自己不处理整包完整性判定
+            _ClientIPInfo objServerIPInfo;
+            sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+            objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+
+            uint16 u2CommandID             = 0;
+            ACE_Message_Block* pRecvFinish = NULL;
+
+            m_atvRecv     = ACE_OS::gettimeofday();
+            m_emRecvState = SERVER_RECV_BEGIN;
+
+            while(true)
+            {
+                bool blRet = m_pClientMessage->Recv_Format_data(m_pCurrMessage, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish);
+
+                if(true == blRet)
+                {
+                    if(App_MainConfig::instance()->GetConnectServerRunType() == 0)
+                    {
+                        //调用数据包处理
+                        m_pClientMessage->RecvData(u2CommandID, pRecvFinish, objServerIPInfo);
+                        //回收处理包
+                        App_MessageBlockManager::instance()->Close(pRecvFinish);
+                    }
+                    else
+                    {
+                        //异步消息处理
+                        _Server_Message_Info* pServer_Message_Info = new _Server_Message_Info();
+                        pServer_Message_Info->m_pClientMessage  = m_pClientMessage;
+                        pServer_Message_Info->m_objServerIPInfo = objServerIPInfo;
+                        pServer_Message_Info->m_pRecvFinish     = pRecvFinish;
+                        pServer_Message_Info->m_u2CommandID     = u2CommandID;
+                        App_ServerMessageTask::instance()->PutMessage(pServer_Message_Info);
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            m_emRecvState = SERVER_RECV_END;
+        }
+
+        m_pCurrMessage->reset();
+    }
+
+    return 0;
 }
 
 int CConnectClient::handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask)
@@ -539,7 +543,7 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
     {
         OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetServerID()));
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectClient::SendData] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetServerID());
-		App_MessageBlockManager::instance()->Close(pmblk);
+        App_MessageBlockManager::instance()->Close(pmblk);
         return false;
     }
 
@@ -569,7 +573,7 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
 
         if (nDataLen <= 0)
         {
-			/*
+            /*
             if (nErr == EWOULDBLOCK)
             {
                 //如果发送堵塞，则等10毫秒后再发送。
@@ -577,12 +581,12 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
                 ACE_OS::sleep(tvSleep);
                 continue;
             }
-			*/
+            */
 
-			_ClientIPInfo objServerIPInfo;
-			sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-			objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
-			m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+            _ClientIPInfo objServerIPInfo;
+            sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+            objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+            m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
 
             OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, error = %d.\n", GetServerID(), errno));
             App_MessageBlockManager::instance()->Close(pmblk);
@@ -624,18 +628,18 @@ _ClientConnectInfo CConnectClient::GetClientConnectInfo()
 
 bool CConnectClient::GetTimeout(ACE_Time_Value tvNow)
 {
-	ACE_Time_Value tvIntval(tvNow - m_atvRecv);
+    ACE_Time_Value tvIntval(tvNow - m_atvRecv);
 
-	if(m_emRecvState == SERVER_RECV_BEGIN && tvIntval.sec() > SERVER_RECV_TIMEOUT)
-	{
-		//接收数据处理已经超时，在这里打印出来
-		OUR_DEBUG((LM_DEBUG,"[CConnectClient::GetTimeout]***(%d)recv dispose is timeout(%d)!***.\n", m_nServerID, tvIntval.sec()));	
-		return false;
-	}
-	else
-	{
-		return true;
-	}
+    if(m_emRecvState == SERVER_RECV_BEGIN && tvIntval.sec() > SERVER_RECV_TIMEOUT)
+    {
+        //接收数据处理已经超时，在这里打印出来
+        OUR_DEBUG((LM_DEBUG,"[CConnectClient::GetTimeout]***(%d)recv dispose is timeout(%d)!***.\n", m_nServerID, tvIntval.sec()));
+        return false;
+    }
+    else
+    {
+        return true;
+    }
 }
 
 

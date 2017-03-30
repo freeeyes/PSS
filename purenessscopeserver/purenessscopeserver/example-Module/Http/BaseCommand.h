@@ -19,40 +19,45 @@ using namespace std;
 //用于规范化数据串，因为文本串可能会有左右的空格
 inline void TrimString(char* pOld, char* pNew)
 {
-	int len = ACE_OS::strlen(pOld);
-	int i = 0;
-	int j = 1;
-	while (*(pOld + i) == ' ')
-	{
-		i++;
-	}
-	while (*(pOld + len - j) == ' ')
-	{
-		j++;
-	}
-	len = len - i - j + 1;
+    int len = ACE_OS::strlen(pOld);
+    int i = 0;
+    int j = 1;
 
-	for (int p = 0; p < len; p++)
-	{
-		*(pNew + p) = *(pOld + i + p);
-	}
-	pNew[len] = '\0'; 
+    while (*(pOld + i) == ' ')
+    {
+        i++;
+    }
+
+    while (*(pOld + len - j) == ' ')
+    {
+        j++;
+    }
+
+    len = len - i - j + 1;
+
+    for (int p = 0; p < len; p++)
+    {
+        *(pNew + p) = *(pOld + i + p);
+    }
+
+    pNew[len] = '\0';
 }
 
 class CBaseCommand : public CClientCommand
 {
 public:
-  CBaseCommand(void);
-  ~CBaseCommand(void);
+    CBaseCommand(void);
+    ~CBaseCommand(void);
 
-  int DoMessage(IMessage* pMessage, bool& bDeleteFlag);
+    int DoMessage(IMessage* pMessage, bool& bDeleteFlag);
 
-  void SetServerObject(CServerObject* pServerObject);
-
-private:
-  int DoMessage_HttpData(IMessage* pMessage, bool& bDeleteFlag);
+    void SetServerObject(CServerObject* pServerObject);
 
 private:
-  CServerObject* m_pServerObject;
-  int            m_nCount;
+    int DoMessage_HttpData(IMessage* pMessage, bool& bDeleteFlag);
+
+private:
+    CServerObject* m_pServerObject;
+    int            m_nCount;
 };
+

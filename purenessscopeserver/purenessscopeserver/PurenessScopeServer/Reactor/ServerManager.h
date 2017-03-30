@@ -31,18 +31,18 @@ class Frame_Logging_Strategy;
 class CServerManager : public IServerManager
 {
 public:
-	CServerManager(void);
-	~CServerManager(void);
+    CServerManager(void);
+    ~CServerManager(void);
 
-	bool Init();
-	bool Start();
-	bool Close();
+    bool Init();
+    bool Start();
+    bool Close();
 
 private:
-	//CConnectAcceptorManager m_ConnectAcceptorManager;    //普通客户端链接
-	ConnectConsoleAcceptor  m_ConnectConsoleAcceptor;    //后台管理链接
-	CFileLogger*            m_pFileLogger;               //日志类型
-	Frame_Logging_Strategy* m_pFrameLoggingStrategy;   //输出对象
+    //CConnectAcceptorManager m_ConnectAcceptorManager;    //普通客户端链接
+    ConnectConsoleAcceptor  m_ConnectConsoleAcceptor;    //后台管理链接
+    CFileLogger*            m_pFileLogger;               //日志类型
+    Frame_Logging_Strategy* m_pFrameLoggingStrategy;   //输出对象
 };
 
 

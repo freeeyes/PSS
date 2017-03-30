@@ -12,39 +12,39 @@
 class CServerParse
 {
 public:
-	CServerParse(void);
-	~CServerParse(void);
+    CServerParse(void);
+    ~CServerParse(void);
 
-	void Init();
+    void Init();
 
-	uint32 GetPacketHeadLen();
-	uint32 GetPacketBodyLen();
-	uint16 GetPacketCommandID();
+    uint32 GetPacketHeadLen();
+    uint32 GetPacketBodyLen();
+    uint16 GetPacketCommandID();
 
     bool GetIsHandleHead();
 
-	ACE_Message_Block* GetMessageHead();
-	ACE_Message_Block* GetMessageBody();
-	bool SetMessageHead(ACE_Message_Block* pmbHead);
-	bool SetMessageBody(ACE_Message_Block* pmbBody);
+    ACE_Message_Block* GetMessageHead();
+    ACE_Message_Block* GetMessageBody();
+    bool SetMessageHead(ACE_Message_Block* pmbHead);
+    bool SetMessageBody(ACE_Message_Block* pmbBody);
 
-	bool SetPacketHead(char* pData, uint32 u4Len);
-	bool SetPacketBody(char* pData, uint32 u4Len);
+    bool SetPacketHead(char* pData, uint32 u4Len);
+    bool SetPacketBody(char* pData, uint32 u4Len);
 
-	//拼接数据返回包
-	bool MakePacket(const char* pData, uint32 u4Len, ACE_Message_Block* pMbData);
-	uint32 MakePacketLength(uint32 u4DataLen);
+    //拼接数据返回包
+    bool MakePacket(const char* pData, uint32 u4Len, ACE_Message_Block* pMbData);
+    uint32 MakePacketLength(uint32 u4DataLen);
 
-	void Close();
+    void Close();
 
 private:
-	uint32 m_u4PacketHead;
-	uint32 m_u4PacketData;
-	uint16 m_u2PacketCommandID;
+    uint32 m_u4PacketHead;
+    uint32 m_u4PacketData;
+    uint16 m_u2PacketCommandID;
     bool   m_blIsHandleHead;
 
-	ACE_Message_Block* m_pmbHead;   //包头部分
-	ACE_Message_Block* m_pmbBody;   //包体部分
+    ACE_Message_Block* m_pmbHead;   //包头部分
+    ACE_Message_Block* m_pmbBody;   //包体部分
 };
 
 #endif

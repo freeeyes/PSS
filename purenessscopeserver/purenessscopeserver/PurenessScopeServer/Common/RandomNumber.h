@@ -10,14 +10,14 @@
 class CRandomNumber
 {
 public:
-	CRandomNumber(void);
-	~CRandomNumber(void);
+    CRandomNumber(void);
+    ~CRandomNumber(void);
 
-	void SetRange(int nMinNumber, int nMaxNumber);
-	int GetRandom();
+    void SetRange(int nMinNumber, int nMaxNumber);
+    int GetRandom();
 
 private:
-	int m_nMinNumber;
-	int m_nMaxNumber;
+    int m_nMinNumber;
+    int m_nMaxNumber;
 };
 #endif

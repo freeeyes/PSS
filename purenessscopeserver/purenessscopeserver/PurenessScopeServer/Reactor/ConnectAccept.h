@@ -15,52 +15,52 @@ using namespace std;
 class ConnectAcceptor : public ACE_Acceptor<CConnectHandler, ACE_SOCK_ACCEPTOR>
 {
 public:
-	ConnectAcceptor();
+    ConnectAcceptor();
 
-	void InitClientReactor(uint32 u4ClientReactorCount);
+    void InitClientReactor(uint32 u4ClientReactorCount);
 
 protected:
-	virtual int make_svc_handler(CConnectHandler*& sh);
+    virtual int make_svc_handler(CConnectHandler*& sh);
 
 public:
-	//因为基础的open不能满足需求，所以在这里重载了一个open接口
-	//提供设置backlog的服务
-	int open2(ACE_INET_Addr& local_addr,
-		ACE_Reactor* reactor,
-		int flags,
-		int backlog);
+    //因为基础的open不能满足需求，所以在这里重载了一个open接口
+    //提供设置backlog的服务
+    int open2(ACE_INET_Addr& local_addr,
+              ACE_Reactor* reactor,
+              int flags,
+              int backlog);
 
-	char*  GetListenIP();
-	uint32 GetListenPort();
+    char*  GetListenIP();
+    uint32 GetListenPort();
 
 private:
-	char   m_szListenIP[MAX_BUFF_20];
-	uint32 m_u4Port;
-	uint32 m_u4AcceptCount;             //接收的总连接数 
-	uint32 m_u4ClientReactorCount;      //客户端反应器的个数
+    char   m_szListenIP[MAX_BUFF_20];
+    uint32 m_u4Port;
+    uint32 m_u4AcceptCount;             //接收的总连接数
+    uint32 m_u4ClientReactorCount;      //客户端反应器的个数
 };
 
 class CConnectAcceptorManager
 {
 public:
-	CConnectAcceptorManager(void);
-	~CConnectAcceptorManager(void);
+    CConnectAcceptorManager(void);
+    ~CConnectAcceptorManager(void);
 
-	bool InitConnectAcceptor(int nCount, uint32 u4ClientReactorCount);
-	void Close();
-	int GetCount();
-	ConnectAcceptor* GetConnectAcceptor(int nIndex);
-	ConnectAcceptor* GetNewConnectAcceptor();
-	const char* GetError();
+    bool InitConnectAcceptor(int nCount, uint32 u4ClientReactorCount);
+    void Close();
+    int GetCount();
+    ConnectAcceptor* GetConnectAcceptor(int nIndex);
+    ConnectAcceptor* GetNewConnectAcceptor();
+    const char* GetError();
 
-	bool Close(const char* pIP, uint32 n4Port);
-	bool CheckIPInfo(const char* pIP, uint32 n4Port);
+    bool Close(const char* pIP, uint32 n4Port);
+    bool CheckIPInfo(const char* pIP, uint32 n4Port);
 
 private:
-	typedef vector<ConnectAcceptor*> vecConnectAcceptor;
-	vecConnectAcceptor m_vecConnectAcceptor;
-	int                m_nAcceptorCount;
-	char               m_szError[MAX_BUFF_500];
+    typedef vector<ConnectAcceptor*> vecConnectAcceptor;
+    vecConnectAcceptor m_vecConnectAcceptor;
+    int                m_nAcceptorCount;
+    char               m_szError[MAX_BUFF_500];
 };
 
 

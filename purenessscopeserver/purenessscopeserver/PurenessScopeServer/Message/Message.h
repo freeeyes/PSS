@@ -14,41 +14,41 @@ using namespace std;
 class CMessage : public IMessage
 {
 public:
-	CMessage(void);
-	~CMessage(void);
+    CMessage(void);
+    ~CMessage(void);
 
-	void Close();
-	void Clear();
+    void Close();
+    void Clear();
 
-	void SetHashID(int nHasnID);
-	int  GetHashID();
+    void SetHashID(int nHasnID);
+    int  GetHashID();
 
-	void SetMessageBase(_MessageBase* pMessageBase);
-	bool SetRecvPacket(IBuffPacket* pRecvPacket);
+    void SetMessageBase(_MessageBase* pMessageBase);
+    bool SetRecvPacket(IBuffPacket* pRecvPacket);
 
-	ACE_Message_Block* GetMessageHead();
-	ACE_Message_Block* GetMessageBody();
+    ACE_Message_Block* GetMessageHead();
+    ACE_Message_Block* GetMessageBody();
 
-	_MessageBase* GetMessageBase();
+    _MessageBase* GetMessageBase();
 
-	bool GetPacketHead(_PacketInfo& PacketInfo);
-	bool GetPacketBody(_PacketInfo& PacketInfo);
-	bool SetPacketHead(ACE_Message_Block* pmbHead);
-	bool SetPacketBody(ACE_Message_Block* pmbBody);
+    bool GetPacketHead(_PacketInfo& PacketInfo);
+    bool GetPacketBody(_PacketInfo& PacketInfo);
+    bool SetPacketHead(ACE_Message_Block* pmbHead);
+    bool SetPacketBody(ACE_Message_Block* pmbBody);
 
-	const char* GetError();
+    const char* GetError();
 
-	ACE_Message_Block*  GetQueueMessage();
+    ACE_Message_Block*  GetQueueMessage();
 
 private:
-	int           m_nHashID;
-	char          m_szError[MAX_BUFF_500];
-	_MessageBase* m_pMessageBase;
+    int           m_nHashID;
+    char          m_szError[MAX_BUFF_500];
+    _MessageBase* m_pMessageBase;
 
-	ACE_Message_Block* m_pmbHead;             //包头部分
-	ACE_Message_Block* m_pmbBody;             //包体部分
+    ACE_Message_Block* m_pmbHead;             //包头部分
+    ACE_Message_Block* m_pmbBody;             //包体部分
 
-	ACE_Message_Block*  m_pmbQueuePtr;        //消息队列指针块
+    ACE_Message_Block*  m_pmbQueuePtr;        //消息队列指针块
 };
 
 
@@ -56,21 +56,21 @@ private:
 class CMessagePool
 {
 public:
-	CMessagePool();
-	~CMessagePool();
+    CMessagePool();
+    ~CMessagePool();
 
-	void Init(uint32 u4PacketCount);
-	void Close();
+    void Init(uint32 u4PacketCount);
+    void Close();
 
-	CMessage* Create();
-	bool Delete(CMessage* pMakePacket);
+    CMessage* Create();
+    bool Delete(CMessage* pMakePacket);
 
-	int GetUsedCount();
-	int GetFreeCount();
+    int GetUsedCount();
+    int GetFreeCount();
 
 private:
-	CHashTable<CMessage>        m_objHashMessageList;                  //Message对象池
-	ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;                     //控制多线程锁
-}; 
+    CHashTable<CMessage>        m_objHashMessageList;                  //Message对象池
+    ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;                     //控制多线程锁
+};
 
 #endif

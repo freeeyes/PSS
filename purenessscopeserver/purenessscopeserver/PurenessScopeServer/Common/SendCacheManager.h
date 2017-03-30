@@ -14,24 +14,24 @@
 class CSendCacheManager : public ISendCacheManager
 {
 public:
-	CSendCacheManager();
-	~CSendCacheManager();
+    CSendCacheManager();
+    ~CSendCacheManager();
 
-	void Init(uint32 u4CacheCount, uint32 u4CacheSize);
-	void Close();
+    void Init(uint32 u4CacheCount, uint32 u4CacheSize);
+    void Close();
 
-	uint32 GetFreeCount();
-	uint32 GetUsedCount();
+    uint32 GetFreeCount();
+    uint32 GetUsedCount();
 
-	//得到指定的一个连接的缓冲
-	ACE_Message_Block* GetCacheData(uint32 u4ConnectID);
-	//释放指定一个连接的缓冲
-	void FreeCacheData(uint32 u4ConnectID);
+    //得到指定的一个连接的缓冲
+    ACE_Message_Block* GetCacheData(uint32 u4ConnectID);
+    //释放指定一个连接的缓冲
+    void FreeCacheData(uint32 u4ConnectID);
 
 private:
-	CHashTable<ACE_Message_Block> m_objCacheHashList;
-	uint32                        m_u4UsedCount;
-	ACE_Recursive_Thread_Mutex    m_ThreadLock;
+    CHashTable<ACE_Message_Block> m_objCacheHashList;
+    uint32                        m_u4UsedCount;
+    ACE_Recursive_Thread_Mutex    m_ThreadLock;
 };
 
 #endif

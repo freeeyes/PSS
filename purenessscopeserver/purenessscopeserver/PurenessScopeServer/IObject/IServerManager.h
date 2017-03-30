@@ -6,8 +6,8 @@
 class IServerManager
 {
 public:
-	virtual ~IServerManager() {}
-	virtual bool Close() = 0;
+    virtual ~IServerManager() {}
+    virtual bool Close() = 0;
 };
 
 #endif

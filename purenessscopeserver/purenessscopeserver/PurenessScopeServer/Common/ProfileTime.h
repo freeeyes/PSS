@@ -12,19 +12,19 @@
 class CProfileTime
 {
 public:
-	CProfileTime(void);
-	~CProfileTime(void);
+    CProfileTime(void);
+    ~CProfileTime(void);
 
-	bool       Start();               //开始计时
-	uint64     Stop();                //结束计时，并返回处理时间，单位是纳秒
+    bool       Start();               //开始计时
+    uint64     Stop();                //结束计时，并返回处理时间，单位是纳秒
 
 private:
 #ifndef __LINUX__
-	LARGE_INTEGER m_liPerfFreq;    //CPU的滴答时间，仅仅是windows使用
-	LARGE_INTEGER m_liPerfStart;   //开始时间
-	LARGE_INTEGER m_liPerfStop;    //结束时间
+    LARGE_INTEGER m_liPerfFreq;    //CPU的滴答时间，仅仅是windows使用
+    LARGE_INTEGER m_liPerfStart;   //开始时间
+    LARGE_INTEGER m_liPerfStop;    //结束时间
 #else
-	ACE_High_Res_Timer m_HighResTimer;
+    ACE_High_Res_Timer m_HighResTimer;
 #endif
 
 };

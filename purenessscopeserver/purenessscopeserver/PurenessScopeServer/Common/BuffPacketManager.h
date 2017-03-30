@@ -15,23 +15,23 @@ using namespace std;
 class CBuffPacketManager : public IPacketManager
 {
 public:
-	CBuffPacketManager(void);
-	~CBuffPacketManager(void);
+    CBuffPacketManager(void);
+    ~CBuffPacketManager(void);
 
-	void Init(uint32 u4PacketCount, bool blByteOrder);
-	void Close();
-	
-	uint32 GetBuffPacketUsedCount();
-	uint32 GetBuffPacketFreeCount();
+    void Init(uint32 u4PacketCount, bool blByteOrder);
+    void Close();
 
-	IBuffPacket* Create();
-	bool Delete(IBuffPacket* pBuffPacket);
+    uint32 GetBuffPacketUsedCount();
+    uint32 GetBuffPacketFreeCount();
+
+    IBuffPacket* Create();
+    bool Delete(IBuffPacket* pBuffPacket);
 
 private:
-	CHashTable<CBuffPacket>    m_objHashBuffPacketList;               //存储空闲BuffPacket指针的hash列表
-	bool                       m_blSortType;                          //字序规则，true为网序，false为主机序
-	ACE_Recursive_Thread_Mutex m_ThreadWriteLock;
+    CHashTable<CBuffPacket>    m_objHashBuffPacketList;               //存储空闲BuffPacket指针的hash列表
+    bool                       m_blSortType;                          //字序规则，true为网序，false为主机序
+    ACE_Recursive_Thread_Mutex m_ThreadWriteLock;
 };
 
-typedef ACE_Singleton<CBuffPacketManager, ACE_Null_Mutex> App_BuffPacketManager; 
+typedef ACE_Singleton<CBuffPacketManager, ACE_Null_Mutex> App_BuffPacketManager;
 #endif

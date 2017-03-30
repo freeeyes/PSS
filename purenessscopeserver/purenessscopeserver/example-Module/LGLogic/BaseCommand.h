@@ -14,7 +14,7 @@
 //定时定时器时间间隔，单位秒
 #define MAX_TIMER_INTERVAL   30
 
-#define MESSAGE_FUNCTION_BEGIN(x) switch(x) { 
+#define MESSAGE_FUNCTION_BEGIN(x) switch(x) {
 #define MESSAGE_FUNCTION(x,y,z) case x: { y(z); break; }
 #define MESSAGE_FUNCTION_END }
 
@@ -23,32 +23,32 @@ using namespace std;
 class CBaseCommand : public CClientCommand, public ACE_Task<ACE_MT_SYNCH>
 {
 public:
-	CBaseCommand(void);
-	~CBaseCommand(void);
+    CBaseCommand(void);
+    ~CBaseCommand(void);
 
-	//发送心跳包
-	virtual int handle_timeout(const ACE_Time_Value &tv, const void *arg);
+    //发送心跳包
+    virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);
 
-	int DoMessage(IMessage* pMessage, bool& bDeleteFlag);
-	void SetServerObject(CServerObject* pServerObject);
+    int DoMessage(IMessage* pMessage, bool& bDeleteFlag);
+    void SetServerObject(CServerObject* pServerObject);
 
-	void Init(const char* pFileName);
-
-private:
-	int Do_Connect(IMessage* pMessage);
-	int Do_DisConnect(IMessage* pMessage);
-	int Do_ClientSendTimeout(IMessage* pMessage);
-	int Do_Logic_Client_Login(IMessage* pMessage);
-
-	void ReadIniFile(const char* pIniFileName);
+    void Init(const char* pFileName);
 
 private:
-	CServerObject*    m_pServerObject;
-	int               m_nCount;
-	CLSServerManager  m_objLSServer;
-	uint32            m_u4TimeID;
+    int Do_Connect(IMessage* pMessage);
+    int Do_DisConnect(IMessage* pMessage);
+    int Do_ClientSendTimeout(IMessage* pMessage);
+    int Do_Logic_Client_Login(IMessage* pMessage);
 
-	uint32            m_u4LSServerID;
-	char              m_szLSIP[50];
-	uint32            m_u4LSPort;
+    void ReadIniFile(const char* pIniFileName);
+
+private:
+    CServerObject*    m_pServerObject;
+    int               m_nCount;
+    CLSServerManager  m_objLSServer;
+    uint32            m_u4TimeID;
+
+    uint32            m_u4LSServerID;
+    char              m_szLSIP[50];
+    uint32            m_u4LSPort;
 };

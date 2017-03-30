@@ -1,4 +1,4 @@
-ï»¿#ifndef _ICONTROLLISTEN_H
+#ifndef _ICONTROLLISTEN_H
 #define _ICONTROLLISTEN_H
 
 #include "define.h"
@@ -21,10 +21,10 @@ class IControlListen
 {
 public:
     virtual ~IControlListen() {}
-    virtual bool   AddListen(const char* pListenIP, uint32 u4Port, uint8 u1IPType) = 0;  //æ‰“å¼€ä¸€ä¸ªæ–°çš„ç›‘å¬ç«¯å£
-    virtual bool   DelListen(const char* pListenIP, uint32 u4Port)                 = 0;  //å…³é—­ä¸€ä¸ªå·²çŸ¥çš„è¿æ¥
-    virtual void   ShowListen(vecControlInfo& objControlInfo)                      = 0;  //æŸ¥çœ‹å·²æ‰“å¼€çš„ç›‘å¬ç«¯å£
-    virtual uint32 GetServerID()                                                   = 0;  //å¾—åˆ°å½“å‰æœåŠ¡å™¨çš„ID
+    virtual bool   AddListen(const char* pListenIP, uint32 u4Port, uint8 u1IPType) = 0;  //´ò¿ªÒ»¸öĞÂµÄ¼àÌı¶Ë¿Ú
+    virtual bool   DelListen(const char* pListenIP, uint32 u4Port)                 = 0;  //¹Ø±ÕÒ»¸öÒÑÖªµÄÁ¬½Ó
+    virtual void   ShowListen(vecControlInfo& objControlInfo)                      = 0;  //²é¿´ÒÑ´ò¿ªµÄ¼àÌı¶Ë¿Ú
+    virtual uint32 GetServerID()                                                   = 0;  //µÃµ½µ±Ç°·şÎñÆ÷µÄID
 };
 
 #endif

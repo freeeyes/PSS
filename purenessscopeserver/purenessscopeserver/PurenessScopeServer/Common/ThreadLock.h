@@ -23,82 +23,83 @@
 class CThreadLock
 {
 public:
-	CThreadLock(void)
-	{
-		Init();
+    CThreadLock(void)
+    {
+        Init();
     }
 
-	~CThreadLock()
-	{
-		Close();
+    ~CThreadLock()
+    {
+        Close();
     }
 
-	void Init()
-	{
+    void Init()
+    {
 #ifdef _WIN32
-		InitializeCriticalSection(&m_lock);
+        InitializeCriticalSection(&m_lock);
 #else
-		pthread_mutex_init(&m_lock, NULL);
+        pthread_mutex_init(&m_lock, NULL);
 #endif
     }
 
-	void Close()
-	{
+    void Close()
+    {
 #ifdef _WIN32
-		DeleteCriticalSection(&m_lock);
+        DeleteCriticalSection(&m_lock);
 #else
-		pthread_mutex_destroy(&m_lock);
-#endif
-	}
-
-	void Lock()
-	{
-		m_Time = ACE_OS::gettimeofday();
-#ifdef _WIN32
-		EnterCriticalSection(&m_lock);
-#else
-		pthread_mutex_lock(&m_lock);
+        pthread_mutex_destroy(&m_lock);
 #endif
     }
 
-	void UnLock()
-	{
-		m_Time = ACE_OS::gettimeofday() - m_Time;
+    void Lock()
+    {
+        m_Time = ACE_OS::gettimeofday();
+#ifdef _WIN32
+        EnterCriticalSection(&m_lock);
+#else
+        pthread_mutex_lock(&m_lock);
+#endif
+    }
+
+    void UnLock()
+    {
+        m_Time = ACE_OS::gettimeofday() - m_Time;
 
 #ifdef _WIN32
-		LeaveCriticalSection(&m_lock);
+        LeaveCriticalSection(&m_lock);
 #else
-		pthread_mutex_unlock(&m_lock);
+        pthread_mutex_unlock(&m_lock);
 #endif
     }
 
 private:
-	LOCK_MUTEXT m_lock;
-	ACE_Time_Value m_Time;
+    LOCK_MUTEXT m_lock;
+    ACE_Time_Value m_Time;
 };
 
 //自动加锁的类
 class CAutoLock
 {
 public:
-	CAutoLock(CThreadLock* pThreadLock) 
-	{ 
-		m_pThreadLock = pThreadLock;
-		if(NULL != m_pThreadLock)
-		{
-			m_pThreadLock->Lock();
-		}
+    CAutoLock(CThreadLock* pThreadLock)
+    {
+        m_pThreadLock = pThreadLock;
+
+        if(NULL != m_pThreadLock)
+        {
+            m_pThreadLock->Lock();
+        }
     }
-	~CAutoLock() 
-	{
-		if(NULL != m_pThreadLock)
-		{
-			m_pThreadLock->UnLock();
-		}
+    ~CAutoLock()
+    {
+        if(NULL != m_pThreadLock)
+        {
+            m_pThreadLock->UnLock();
+        }
     }
 
 private:
-	CThreadLock* m_pThreadLock;
+    CThreadLock* m_pThreadLock;
 };
 
 #endif

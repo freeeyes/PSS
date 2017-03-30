@@ -66,129 +66,129 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 class My_ACE_Logging_Strategy : public ACE_Service_Object
 {
 public:
-	/// Constructor.
-	My_ACE_Logging_Strategy (void);
+    /// Constructor.
+    My_ACE_Logging_Strategy (void);
 
-	/// Destructor.
+    /// Destructor.
     virtual ~My_ACE_Logging_Strategy (void);
 
-	/// Dynamic linking initialization hook.
-	virtual int init (int argc, ACE_TCHAR *argv[]);
+    /// Dynamic linking initialization hook.
+    virtual int init (int argc, ACE_TCHAR* argv[]);
 
-	/// Dynamic linking termination hook.
-	virtual int fini (void);
+    /// Dynamic linking termination hook.
+    virtual int fini (void);
 
-	/**
-	* Timeout handler which tests logfile size.  If the current logfile
-	* size exceeds @c max_size_, the current logfile is closed, saved to
-	* logfile.old, and a new logfile is reopened.
-	*/
-	virtual int handle_timeout (const ACE_Time_Value& tv,
-		const void* arg);
+    /**
+    * Timeout handler which tests logfile size.  If the current logfile
+    * size exceeds @c max_size_, the current logfile is closed, saved to
+    * logfile.old, and a new logfile is reopened.
+    */
+    virtual int handle_timeout (const ACE_Time_Value& tv,
+                                const void* arg);
 
-	/**
-	* This function helps to cancel timer events for this logging strategy
-	* in reactor during shutdown.
-	*/
-	virtual int handle_close (ACE_HANDLE,
-		ACE_Reactor_Mask);
+    /**
+    * This function helps to cancel timer events for this logging strategy
+    * in reactor during shutdown.
+    */
+    virtual int handle_close (ACE_HANDLE,
+                              ACE_Reactor_Mask);
 
-	/**
-	* Reactor accessors. If reactor changes then we need remove this
-	* event handler from previous reactor and scheduler for timer events
-	* in a new one.
-	*/
-	virtual void reactor (ACE_Reactor *r);
+    /**
+    * Reactor accessors. If reactor changes then we need remove this
+    * event handler from previous reactor and scheduler for timer events
+    * in a new one.
+    */
+    virtual void reactor (ACE_Reactor* r);
 
-	virtual ACE_Reactor * reactor (void) const;
+    virtual ACE_Reactor* reactor (void) const;
 
-	/**
-	* Parse arguments provided in svc.conf file.
-	* @arg '-f' Pass in the flags (such as OSTREAM, STDERR, LOGGER, VERBOSE,
-	*           SILENT, VERBOSE_LITE) used to control logging.
-	* @arg '-i' The interval (in seconds) at which the logfile size is sampled
-	*           (default is 0, i.e., do not sample by default).
-	* @arg '-k' Set the logging key.
-	* @arg '-m' Maximum logfile size in Kbytes.
-	* @arg '-n' Set the program name for the %n format specifier.
-	* @arg '-N' The maximum number of logfiles that we want created.
-	* @arg '-o' Specifies that we want the no standard logfiles ordering
-	*           (fastest processing in handle_timeout()).  Default is not to
-	*           order logfiles.
-	* @arg '-p' Pass in the process-wide priorities to either enable (e.g.,
-	*           DEBUG, INFO, WARNING, NOTICE, ERROR, CRITICAL, ALERT,
-	*           EMERGENCY) or to disable (e.g., ~DEBUG, ~INFO, ~WARNING,
-	*           ~NOTICE, ~ERROR, ~CRITICAL, ~ALERT, ~EMERGENCY).
-	* @arg '-s' Ensure that the OSTREAM flag is set and log to the @a filename.
-	* @arg '-t' Pass in the thread-wide priorities to either enable (e.g.,
-	*           DEBUG, INFO, WARNING, NOTICE, ERROR, CRITICAL, ALERT,
-	*           EMERGENCY) or to disable (e.g., ~DEBUG, ~INFO, ~WARNING,
-	*           ~NOTICE, ~ERROR, ~CRITICAL, ~ALERT, ~EMERGENCY).
-	* @arg '-w' Cause the logfile to be wiped out, both on startup and on
-	*           reconfiguration.
-	*/
-	int parse_args (int argc, ACE_TCHAR *argv[]);
+    /**
+    * Parse arguments provided in svc.conf file.
+    * @arg '-f' Pass in the flags (such as OSTREAM, STDERR, LOGGER, VERBOSE,
+    *           SILENT, VERBOSE_LITE) used to control logging.
+    * @arg '-i' The interval (in seconds) at which the logfile size is sampled
+    *           (default is 0, i.e., do not sample by default).
+    * @arg '-k' Set the logging key.
+    * @arg '-m' Maximum logfile size in Kbytes.
+    * @arg '-n' Set the program name for the %n format specifier.
+    * @arg '-N' The maximum number of logfiles that we want created.
+    * @arg '-o' Specifies that we want the no standard logfiles ordering
+    *           (fastest processing in handle_timeout()).  Default is not to
+    *           order logfiles.
+    * @arg '-p' Pass in the process-wide priorities to either enable (e.g.,
+    *           DEBUG, INFO, WARNING, NOTICE, ERROR, CRITICAL, ALERT,
+    *           EMERGENCY) or to disable (e.g., ~DEBUG, ~INFO, ~WARNING,
+    *           ~NOTICE, ~ERROR, ~CRITICAL, ~ALERT, ~EMERGENCY).
+    * @arg '-s' Ensure that the OSTREAM flag is set and log to the @a filename.
+    * @arg '-t' Pass in the thread-wide priorities to either enable (e.g.,
+    *           DEBUG, INFO, WARNING, NOTICE, ERROR, CRITICAL, ALERT,
+    *           EMERGENCY) or to disable (e.g., ~DEBUG, ~INFO, ~WARNING,
+    *           ~NOTICE, ~ERROR, ~CRITICAL, ~ALERT, ~EMERGENCY).
+    * @arg '-w' Cause the logfile to be wiped out, both on startup and on
+    *           reconfiguration.
+    */
+    int parse_args (int argc, ACE_TCHAR* argv[]);
 
-	void log_msg (ACE_Log_Msg *log_msg);
+    void log_msg (ACE_Log_Msg* log_msg);
 
 protected:
-	/// Tokenize to set all the flags
-	void tokenize (ACE_TCHAR *flag_string);
+    /// Tokenize to set all the flags
+    void tokenize (ACE_TCHAR* flag_string);
 
-	/// Tokenize to set priorities (either process or thread one).
-	void priorities (ACE_TCHAR *priority_string,
-		ACE_Log_Msg::MASK_TYPE mask);
+    /// Tokenize to set priorities (either process or thread one).
+    void priorities (ACE_TCHAR* priority_string,
+                     ACE_Log_Msg::MASK_TYPE mask);
 
-	/// Current thread's priority mask set by @c priorities
-	u_long thread_priority_mask_;
+    /// Current thread's priority mask set by @c priorities
+    u_long thread_priority_mask_;
 
-	/// Process-wide priority mask set by @c priorities
-	u_long process_priority_mask_;
+    /// Process-wide priority mask set by @c priorities
+    u_long process_priority_mask_;
 
-	/// Flags we keep track of.
-	u_long flags_;
+    /// Flags we keep track of.
+    u_long flags_;
 
-	/// File name we're logging to.
-	ACE_TCHAR *filename_;
+    /// File name we're logging to.
+    ACE_TCHAR* filename_;
 
-	/// Logger key for distributed logging.
-	ACE_TCHAR *logger_key_;
+    /// Logger key for distributed logging.
+    ACE_TCHAR* logger_key_;
 
-	/// Program name to be used for %n format specifier.
-	ACE_TCHAR *program_name_;
+    /// Program name to be used for %n format specifier.
+    ACE_TCHAR* program_name_;
 
-	/// If true then wipeout the logfile, otherwise append to it.
-	/// Default value is false.
-	bool wipeout_logfile_;
+    /// If true then wipeout the logfile, otherwise append to it.
+    /// Default value is false.
+    bool wipeout_logfile_;
 
-	/// If true we have a maximum number of log files we can write.
-	/// Default value is false, i.e., no maximum number.
-	bool fixed_number_;
+    /// If true we have a maximum number of log files we can write.
+    /// Default value is false, i.e., no maximum number.
+    bool fixed_number_;
 
-	/// If true we order the files as we rotate them.  Default value
-	/// is false, i.e., we do not rotate files by default.
-	bool order_files_;
+    /// If true we order the files as we rotate them.  Default value
+    /// is false, i.e., we do not rotate files by default.
+    bool order_files_;
 
-	/// This tells us in what file we last wrote. It will be increased
-	/// to enable multiple log files
-	int count_;
+    /// This tells us in what file we last wrote. It will be increased
+    /// to enable multiple log files
+    int count_;
 
-	/// Tells us what is the maximum log file to write. We will write
-	/// @c max_file_number_ + 1 files (includes the current log file).
-	/// Default value is 1, i.e., 2 files by default.
-	int max_file_number_;
+    /// Tells us what is the maximum log file to write. We will write
+    /// @c max_file_number_ + 1 files (includes the current log file).
+    /// Default value is 1, i.e., 2 files by default.
+    int max_file_number_;
 
-	/// If non-zero, sampling interval (in secs) at which maximum logfile
-	/// size is checked, otherwise logfile size can grow indefinitely.
-	/// Default value is 0.
-	u_long interval_;
+    /// If non-zero, sampling interval (in secs) at which maximum logfile
+    /// size is checked, otherwise logfile size can grow indefinitely.
+    /// Default value is 0.
+    u_long interval_;
 
-	/// Maximum logfile size (in KB).  Default value is
-	/// ACE_DEFAULT_MAX_LOGFILE_SIZE.
-	u_long max_size_;
+    /// Maximum logfile size (in KB).  Default value is
+    /// ACE_DEFAULT_MAX_LOGFILE_SIZE.
+    u_long max_size_;
 
-	/// ACE_Log_Msg instance to work with
-	ACE_Log_Msg *log_msg_;
+    /// ACE_Log_Msg instance to work with
+    ACE_Log_Msg* log_msg_;
 };
 
 #endif

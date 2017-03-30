@@ -15,29 +15,29 @@ using namespace std;
 class CBaseCommand : public CClientCommand
 {
 public:
-  CBaseCommand(void);
-  ~CBaseCommand(void);
+    CBaseCommand(void);
+    ~CBaseCommand(void);
 
-  void Init(const char* pPath);
-  
-  void Fini();
+    void Init(const char* pPath);
 
-  int DoMessage(IMessage* pMessage, bool& bDeleteFlag);
+    void Fini();
 
-  void SetServerObject(CServerObject* pServerObject);
-  
-  void Run();
-  
-private:
-  int  Get_Log_File();
-  
-  void SetLogPath(const char* pPath);
+    int DoMessage(IMessage* pMessage, bool& bDeleteFlag);
+
+    void SetServerObject(CServerObject* pServerObject);
+
+    void Run();
 
 private:
-  CServerObject*             m_pServerObject;
-  int                        m_nCount;
-  CKafkaClient               m_KafkaClient;
-  char                       m_szLogPath[256];
-  int                        m_nComsumeIndex;
-  ACE_Recursive_Thread_Mutex m_ThreadWriteLock;
+    int  Get_Log_File();
+
+    void SetLogPath(const char* pPath);
+
+private:
+    CServerObject*             m_pServerObject;
+    int                        m_nCount;
+    CKafkaClient               m_KafkaClient;
+    char                       m_szLogPath[256];
+    int                        m_nComsumeIndex;
+    ACE_Recursive_Thread_Mutex m_ThreadWriteLock;
 };

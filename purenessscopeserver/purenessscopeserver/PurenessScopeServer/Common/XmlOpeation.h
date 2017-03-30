@@ -7,18 +7,18 @@
 class CXmlOpeation
 {
 public:
-  CXmlOpeation(void);
-  ~CXmlOpeation(void);
+    CXmlOpeation(void);
+    ~CXmlOpeation(void);
 
-  bool Init(const char* pFileName);
+    bool Init(const char* pFileName);
 
-  char* GetData(const char* pName, const char* pAttrName);
-  char* GetData(const char* pName, const char* pAttrName, TiXmlElement*& pNextTiXmlElement);
+    char* GetData(const char* pName, const char* pAttrName);
+    char* GetData(const char* pName, const char* pAttrName, TiXmlElement*& pNextTiXmlElement);
 
-  void Close();
+    void Close();
 
 private:
-  TiXmlDocument* m_pTiXmlDocument;
-  TiXmlElement*  m_pRootElement;
+    TiXmlDocument* m_pTiXmlDocument;
+    TiXmlElement*  m_pRootElement;
 };
 #endif

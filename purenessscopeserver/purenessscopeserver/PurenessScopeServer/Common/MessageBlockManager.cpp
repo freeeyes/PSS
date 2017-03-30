@@ -2,97 +2,98 @@
 
 CMessageBlockManager::CMessageBlockManager(void)
 {
-	m_pmsgallocator   = NULL;
-	m_pbuff_allocator = NULL;
-	m_pdata_allocator = NULL;
-	m_u4UsedSize      = 0;
+    m_pmsgallocator   = NULL;
+    m_pbuff_allocator = NULL;
+    m_pdata_allocator = NULL;
+    m_u4UsedSize      = 0;
 
-	Init();
+    Init();
 }
 
 CMessageBlockManager::~CMessageBlockManager(void)
 {
-	Close();
+    Close();
 }
 
 void CMessageBlockManager::Init()
 {
-	m_pmsgallocator   = new Mutex_Allocator();
-	m_pdata_allocator = new Mutex_Allocator();
-	m_pbuff_allocator = new Mutex_Allocator();
+    m_pmsgallocator   = new Mutex_Allocator();
+    m_pdata_allocator = new Mutex_Allocator();
+    m_pbuff_allocator = new Mutex_Allocator();
 }
 
 void CMessageBlockManager::Close()
 {
-	m_MenoryBlock_Pool.Close();
+    m_MenoryBlock_Pool.Close();
 
-	if(NULL != m_pmsgallocator)
-	{
-		delete m_pmsgallocator;
-		m_pmsgallocator = NULL;
-	}
+    if(NULL != m_pmsgallocator)
+    {
+        delete m_pmsgallocator;
+        m_pmsgallocator = NULL;
+    }
 
-	if(NULL != m_pdata_allocator)
-	{
-		delete m_pdata_allocator;
-		m_pdata_allocator = NULL;
-	}
+    if(NULL != m_pdata_allocator)
+    {
+        delete m_pdata_allocator;
+        m_pdata_allocator = NULL;
+    }
 
-	if(NULL != m_pbuff_allocator)
-	{
-		delete m_pbuff_allocator;
-		m_pbuff_allocator = NULL;
-	}
+    if(NULL != m_pbuff_allocator)
+    {
+        delete m_pbuff_allocator;
+        m_pbuff_allocator = NULL;
+    }
 }
 
 ACE_Message_Block* CMessageBlockManager::Create(uint32 u4Size)
 {
-	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
-	ACE_Message_Block* pmb = NULL;
+    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
+    ACE_Message_Block* pmb = NULL;
 
-	if(u4Size <= 0)
-	{
-		//如果申请的空间为0,则直接返回空。
-		return NULL;
-	}
+    if(u4Size <= 0)
+    {
+        //如果申请的空间为0,则直接返回空。
+        return NULL;
+    }
 
-	//获得内存2的整数倍空间
-	uint32 u4FormatSize = next_pow_of_2(u4Size);
+    //获得内存2的整数倍空间
+    uint32 u4FormatSize = next_pow_of_2(u4Size);
 
-	pmb = m_MenoryBlock_Pool.Get(u4FormatSize);
-	if(NULL == pmb)
-	{
-		ACE_NEW_MALLOC_NORETURN(pmb, 
-			static_cast<ACE_Message_Block*>(m_pmsgallocator->malloc(sizeof(ACE_Message_Block))),
-			ACE_Message_Block(u4FormatSize, // size
-			ACE_Message_Block::MB_DATA, // type
-			0,
-			0,
-			m_pbuff_allocator, // allocator_strategy
-			0, // locking strategy
-			ACE_DEFAULT_MESSAGE_BLOCK_PRIORITY, // priority
-			ACE_Time_Value::zero,
-			ACE_Time_Value::max_time,
-			m_pdata_allocator,
-			m_pmsgallocator
-			));
-	}
+    pmb = m_MenoryBlock_Pool.Get(u4FormatSize);
 
-	m_u4UsedSize += u4FormatSize;
-	return pmb;
+    if(NULL == pmb)
+    {
+        ACE_NEW_MALLOC_NORETURN(pmb,
+                                static_cast<ACE_Message_Block*>(m_pmsgallocator->malloc(sizeof(ACE_Message_Block))),
+                                ACE_Message_Block(u4FormatSize, // size
+                                        ACE_Message_Block::MB_DATA, // type
+                                        0,
+                                        0,
+                                        m_pbuff_allocator, // allocator_strategy
+                                        0, // locking strategy
+                                        ACE_DEFAULT_MESSAGE_BLOCK_PRIORITY, // priority
+                                        ACE_Time_Value::zero,
+                                        ACE_Time_Value::max_time,
+                                        m_pdata_allocator,
+                                        m_pmsgallocator
+                                                 ));
+    }
+
+    m_u4UsedSize += u4FormatSize;
+    return pmb;
 }
 
 bool CMessageBlockManager::Close(ACE_Message_Block* pMessageBlock)
 {
-	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
-	m_MenoryBlock_Pool.Set(pMessageBlock);
+    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
+    m_MenoryBlock_Pool.Set(pMessageBlock);
 
-	uint32 u4Size = pMessageBlock->size();
-	m_u4UsedSize -= u4Size;
-	return true;
+    uint32 u4Size = pMessageBlock->size();
+    m_u4UsedSize -= u4Size;
+    return true;
 }
 
 uint32 CMessageBlockManager::GetUsedSize()
 {
-	return m_u4UsedSize;
+    return m_u4UsedSize;
 }
