@@ -177,7 +177,7 @@ int CLogManager::svc(void)
 
     }
 
-    OUR_DEBUG((LM_INFO,"[CLogManager::svc] CLogManager::svc finish!\n"));
+    //OUR_DEBUG((LM_INFO,"[CLogManager::svc] CLogManager::svc finish!\n"));
     return 0;
 }
 

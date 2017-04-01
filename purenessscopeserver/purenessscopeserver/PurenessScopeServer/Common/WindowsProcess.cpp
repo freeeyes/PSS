@@ -92,7 +92,7 @@ int Process::run(int argc, ACE_TCHAR* argv[])
     }
     else
     {
-        ACE_DEBUG((LM_DEBUG, ACE_TEXT ("parse_args is .\n")));
+        ACE_DEBUG((LM_DEBUG, ACE_TEXT ("parse_args is false.\n")));
     }
 
     if(blStata == true)
