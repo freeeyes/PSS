@@ -50,7 +50,7 @@ public:
 
     virtual int open(void* args = 0);
     virtual int svc (void);
-    int Close ();
+    int Close();
 
     bool SaveThreadInfo();
 

@@ -133,10 +133,6 @@ int CMessageService::svc(void)
 {
     ACE_Message_Block* mb = NULL;
 
-    //稍微休息一下，等一下其他线程再如主循环
-    ACE_Time_Value tvSleep(0, MAX_MSG_SENDCHECKTIME*MAX_BUFF_1000);
-    ACE_OS::sleep(tvSleep);
-
     while(IsRun())
     {
         mb = NULL;
@@ -341,9 +337,9 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 
 int CMessageService::Close()
 {
-    m_blRun = false;
-    msg_queue()->deactivate();
-    msg_queue()->flush();
+    m_blRun         = false;
+	m_MessagePool.Close();
+    //msg_queue()->deactivate();
     OUR_DEBUG((LM_INFO, "[CMessageService::close] Close().\n"));
     return 0;
 }
