@@ -339,7 +339,7 @@ int CMessageService::Close()
 {
     m_blRun         = false;
 	m_MessagePool.Close();
-    //msg_queue()->deactivate();
+    msg_queue()->deactivate();
     OUR_DEBUG((LM_INFO, "[CMessageService::close] Close().\n"));
     return 0;
 }
