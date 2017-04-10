@@ -720,7 +720,7 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
             memcpy_safe((char* )&nMessageID, sizeof(int), pMbData->wr_ptr(), sizeof(int));
             pMbData->wr_ptr(sizeof(int));
             objPacketParse.SetPacket_Head_Message(pMbData);
-            objPacketParse.SetPacket_Head_Curr_Length(pMbData->length());
+            objPacketParse.SetPacket_Head_Curr_Length((uint32)pMbData->length());
 
             objMakePacket.m_u4ConnectID       = GetConnectID();
             objMakePacket.m_pPacketParse      = &objPacketParse;
@@ -972,7 +972,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
         }
 
         //如果之前有缓冲数据，则和缓冲数据一起发送
-        u4PacketSize = m_pBlockMessage->length();
+        u4PacketSize = (uint32)m_pBlockMessage->length();
 
         //如果之前有缓冲数据，则和缓冲数据一起发送
         if(m_pBlockMessage->length() > 0)
@@ -998,7 +998,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
                 return false;
             }
 
-            memcpy_safe(m_pBlockMessage->rd_ptr(), m_pBlockMessage->length(), pMbData->wr_ptr(), m_pBlockMessage->length());
+            memcpy_safe(m_pBlockMessage->rd_ptr(), (uint32)m_pBlockMessage->length(), pMbData->wr_ptr(), (uint32)m_pBlockMessage->length());
             pMbData->wr_ptr(m_pBlockMessage->length());
             //放入完成，则清空缓存数据，使命完成
             m_pBlockMessage->reset();
@@ -1088,7 +1088,7 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
     //统计发送数量
     ACE_Date_Time dtNow;
 
-    if(false == m_TimeConnectInfo.SendCheck((uint8)dtNow.minute(), 1, pMbData->length()))
+    if(false == m_TimeConnectInfo.SendCheck((uint8)dtNow.minute(), 1, (uint32)pMbData->length()))
     {
         //超过了限定的阀值，需要关闭链接，并记录日志
         AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECTABNORMAL,
@@ -1129,7 +1129,7 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 
             CPacketParse objPacketParse;
             objPacketParse.SetPacket_Body_Message(pMbData);
-            objPacketParse.SetPacket_Body_Curr_Length(pMbData->length());
+            objPacketParse.SetPacket_Body_Curr_Length((uint32)pMbData->length());
 
             objMakePacket.m_u4ConnectID       = GetConnectID();
             objMakePacket.m_pPacketParse      = &objPacketParse;
@@ -1147,7 +1147,7 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
         }
 
         //记录水位标
-        m_u4ReadSendSize += pMbData->length();
+        m_u4ReadSendSize += (uint32)pMbData->length();
 
         //OUR_DEBUG ((LM_ERROR, "[CConnectHandler::PutSendPacket] Connectid=%d, length=%d!\n", GetConnectID(), pMbData->length()));
         if(0 != m_Writer.write(*pMbData, pMbData->length()))

@@ -497,7 +497,7 @@ int CConnectHandler::RecvData()
         return -1;
     }
 
-    int nDataLen = this->peer().recv(m_pCurrMessage->wr_ptr(), nCurrCount, MSG_NOSIGNAL, &nowait);
+    int nDataLen = (int)this->peer().recv(m_pCurrMessage->wr_ptr(), nCurrCount, MSG_NOSIGNAL, &nowait);
 
     if(nDataLen <= 0)
     {
@@ -916,7 +916,7 @@ int CConnectHandler::RecvData_et()
             return -1;
         }
 
-        int nDataLen = this->peer().recv(m_pCurrMessage->wr_ptr(), nCurrCount, MSG_NOSIGNAL);
+        int nDataLen = (int)this->peer().recv(m_pCurrMessage->wr_ptr(), nCurrCount, MSG_NOSIGNAL);
 
         //OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input] ConnectID=%d, GetData=[%d],errno=[%d].\n", GetConnectID(), nDataLen, errno));
         if(nDataLen <= 0)
@@ -1520,7 +1520,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
         }
 
         //如果之前有缓冲数据，则和缓冲数据一起发送
-        u4PacketSize = m_pBlockMessage->length();
+        u4PacketSize = (uint32)m_pBlockMessage->length();
 
         //这里肯定会大于0
         if(m_pBlockMessage->length() > 0)
@@ -1547,7 +1547,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
             }
 
             //OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage] Connectid=[%d] m_pBlockMessage=0x%08x.\n", GetConnectID(), m_pBlockMessage));
-            memcpy_safe(m_pBlockMessage->rd_ptr(), m_pBlockMessage->length(), pMbData->wr_ptr(), m_pBlockMessage->length());
+            memcpy_safe(m_pBlockMessage->rd_ptr(), (uint32)m_pBlockMessage->length(), pMbData->wr_ptr(), (uint32)m_pBlockMessage->length());
             pMbData->wr_ptr(m_pBlockMessage->length());
             //放入完成，则清空缓存数据，使命完成
             m_pBlockMessage->reset();
@@ -1627,7 +1627,7 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
     //统计发送数量
     ACE_Date_Time dtNow;
 
-    if(false == m_TimeConnectInfo.SendCheck((uint8)dtNow.minute(), 1, pMbData->length()))
+    if(false == m_TimeConnectInfo.SendCheck((uint8)dtNow.minute(), 1, (uint32)pMbData->length()))
     {
         //超过了限定的阀值，需要关闭链接，并记录日志
         AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECTABNORMAL,
@@ -1683,7 +1683,7 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
             return false;
         }
 
-        int nDataLen = this->peer().send(pMbData->rd_ptr(), nSendPacketLen - nIsSendSize, &nowait);
+        int nDataLen = (int)this->peer().send(pMbData->rd_ptr(), nSendPacketLen - nIsSendSize, &nowait);
 
         if(nDataLen <= 0)
         {
@@ -1727,7 +1727,7 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
                 memcpy_safe((char* )&nMessageID, sizeof(int), pSendOKData->wr_ptr(), sizeof(int));
                 pSendOKData->wr_ptr(sizeof(int));
                 objPacketParse.SetPacket_Head_Message(pSendOKData);
-                objPacketParse.SetPacket_Head_Curr_Length(pSendOKData->length());
+                objPacketParse.SetPacket_Head_Curr_Length((uint32)pSendOKData->length());
 
                 objMakePacket.m_u4ConnectID       = GetConnectID();
                 objMakePacket.m_pPacketParse      = &objPacketParse;

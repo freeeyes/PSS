@@ -37,7 +37,7 @@ extern "C"
 
 		//这里可以添加你的代码
 		char* pData  = (char* )pmbHead->rd_ptr();
-		uint32 u4Len = pmbHead->length();
+		uint32 u4Len = (uint32)pmbHead->length();
 		uint32 u4Pos = 0;
 
 		uint32 u2Version     = 0;           //协议版本号
@@ -79,8 +79,8 @@ extern "C"
 		}
 
 		//填充返回给框架的包体信息
-		pBodyInfo->m_u4BodySrcLen  = pmbbody->length();
-		pBodyInfo->m_u4BodyCurrLen = pmbbody->length();
+		pBodyInfo->m_u4BodySrcLen  = (uint32)pmbbody->length();
+		pBodyInfo->m_u4BodyCurrLen = (uint32)pmbbody->length();
 		pBodyInfo->m_pmbBody       = pmbbody;
 
 		return true;

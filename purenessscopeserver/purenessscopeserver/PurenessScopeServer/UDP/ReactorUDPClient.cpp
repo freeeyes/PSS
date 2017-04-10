@@ -68,7 +68,7 @@ int CReactorUDPClient::handle_input(ACE_HANDLE fd)
 
     char szBuff[MAX_UDP_PACKET_LEN] = {'\0'};
 
-    int nDataLen = m_skRemote.recv(szBuff, MAX_UDP_PACKET_LEN, m_addrRemote);
+    int nDataLen = (int)m_skRemote.recv(szBuff, MAX_UDP_PACKET_LEN, m_addrRemote);
 
     if(nDataLen > 0)
     {

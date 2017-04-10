@@ -86,7 +86,7 @@ int CProactorUDPHandler::OpenAddress(const ACE_INET_Addr& AddrLocal, ACE_Proacto
 
     size_t stRecvLen = MAX_UDP_PACKET_LEN;
     //OUR_DEBUG((LM_INFO, "[CProactorUDPHandler::OpenAddress]pMBBuff=0x%08x.\n", pMBBuff));
-    int nRecvSize = m_Read.recv(pMBBuff, stRecvLen, 0, PF_INET, m_szAct);
+    int nRecvSize = (int)m_Read.recv(pMBBuff, stRecvLen, 0, PF_INET, m_szAct);
     return nRecvSize;
 }
 

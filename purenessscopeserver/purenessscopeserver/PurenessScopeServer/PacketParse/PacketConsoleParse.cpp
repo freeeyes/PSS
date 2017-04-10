@@ -33,7 +33,7 @@ bool CConsolePacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* p
     }
 
     //这里添加自己对包头的分析，主要分析出包长度。
-    uint32 u4Len = pmbHead->length();
+    uint32 u4Len = (uint32)pmbHead->length();
 
     SetPacket_Head_Curr_Length(u4Len);
 
@@ -62,7 +62,7 @@ bool CConsolePacketParse::SetPacketBody(uint32 u4ConnectID, ACE_Message_Block* p
         //UDP数据包，没有u4ConnectID
     }
 
-    uint32 u4Len = pmbBody->length();
+    uint32 u4Len = (uint32)pmbBody->length();
 
     SetPacket_Body_Src_Length(u4Len);
     SetPacket_Body_Curr_Length(u4Len);

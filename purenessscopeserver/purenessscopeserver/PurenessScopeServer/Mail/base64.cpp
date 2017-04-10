@@ -68,7 +68,7 @@ int base64_decode(unsigned char* out, const char* in, int out_size)
         }
     }
 
-    return dst - out;
+    return (int)(dst - out);
 }
 
 /*****************************************************************************

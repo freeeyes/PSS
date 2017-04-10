@@ -3,7 +3,6 @@
 #include "IBuffPacket.h"
 #include "ClientCommand.h"
 #include "IObject.h"
-#include "iniparser.h"
 
 #include <string>
 

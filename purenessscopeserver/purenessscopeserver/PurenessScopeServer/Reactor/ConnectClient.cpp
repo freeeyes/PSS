@@ -207,7 +207,7 @@ int CConnectClient::RecvData()
         return -1;
     }
 
-    int nDataLen = this->peer().recv(m_pCurrMessage->wr_ptr(), nCurrCount, MSG_NOSIGNAL, &nowait);
+    int nDataLen = (int)this->peer().recv(m_pCurrMessage->wr_ptr(), nCurrCount, MSG_NOSIGNAL, &nowait);
 
     if (nDataLen <= 0)
     {
@@ -347,7 +347,7 @@ int CConnectClient::RecvData_et()
 
     while(true)
     {
-        int nDataLen = this->peer().recv(m_pCurrMessage->wr_ptr(), nCurrCount, MSG_NOSIGNAL);
+        int nDataLen = (int)this->peer().recv(m_pCurrMessage->wr_ptr(), nCurrCount, MSG_NOSIGNAL);
 
         if (nDataLen <= 0)
         {
@@ -569,7 +569,7 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
             return false;
         }
 
-        int nDataLen = this->peer().send(pmblk->rd_ptr(), nSendLen - nIsSendSize, &nowait);
+        int nDataLen = (int)this->peer().send(pmblk->rd_ptr(), nSendLen - nIsSendSize, &nowait);
 
         if (nDataLen <= 0)
         {

@@ -48,7 +48,7 @@ int stringCut(const unsigned char* pcSrc, const char* start, const char* end, ch
         }
     }
 
-    len = posEnd - posStart;
+    len = (int)(posEnd - posStart);
 
     ACE_OS::strncpy((char* )pcDest, (char* )posStart, len);
 
@@ -85,12 +85,12 @@ int connectSmtp(ACE_HANDLE& socketFd, const unsigned char* smtpUrl, const unsign
 
 int safeRead(ACE_HANDLE socketFd, char* readData, int readLen)
 {
-    return ACE_OS::recv(socketFd, (char* )readData, readLen, 0);
+    return (int)ACE_OS::recv(socketFd, (char* )readData, readLen, 0);
 }
 
 int safeWrite(ACE_HANDLE socketFd, char* writeData, int writeLen)
 {
-    return ACE_OS::send(socketFd, (char* )writeData, writeLen, 0);
+    return (int)ACE_OS::send(socketFd, (char* )writeData, writeLen, 0);
 }
 
 /*
@@ -159,7 +159,7 @@ int authEmail(const ACE_HANDLE socketFd, const unsigned char* mailAddr, const un
     /* Send: EHLO */
     char szRELO[50] = {'\0'};
     ACE_OS::sprintf(szRELO, "EHLO Here\r\n");
-    safeWrite(socketFd, szRELO, ACE_OS::strlen("EHLO Here\r\n"));
+    safeWrite(socketFd, szRELO, (int)ACE_OS::strlen("EHLO Here\r\n"));
 
     /* Recv: EHLO */
     ACE_OS::memset(&readData, 0, SMTP_MTU);
@@ -171,7 +171,7 @@ int authEmail(const ACE_HANDLE socketFd, const unsigned char* mailAddr, const un
     /* Send: AUTH LOGIN */
     char szLOGIN[50] = {'\0'};
     ACE_OS::sprintf(szLOGIN, "AUTH LOGIN\r\n");
-    safeWrite(socketFd, szLOGIN, ACE_OS::strlen("AUTH LOGIN\r\n"));
+    safeWrite(socketFd, szLOGIN, (int)ACE_OS::strlen("AUTH LOGIN\r\n"));
 
     /* Recv: AUTH LOGIN */
     ACE_OS::memset(&readData, 0, SMTP_MTU);
@@ -185,10 +185,10 @@ int authEmail(const ACE_HANDLE socketFd, const unsigned char* mailAddr, const un
     ACE_OS::memset(&writeData, 0, SMTP_MTU);
     stringCut((unsigned char*)mailAddr, NULL, (char* )"@", userName);
 
-    outSize = BASE64_SIZE(strlen(userName));
-    base64_encode(writeData, outSize, (const unsigned char*)userName, strlen(userName));
+    outSize = (int)BASE64_SIZE(strlen(userName));
+    base64_encode(writeData, (int)outSize, (const unsigned char*)userName, (int)strlen(userName));
     ACE_OS::strcat(writeData, "\r\n");
-    safeWrite(socketFd, writeData, strlen(writeData));
+    safeWrite(socketFd, writeData, (int)strlen(writeData));
 
     /* Recv: username */
     ACE_OS::memset(&readData, 0, SMTP_MTU);
@@ -201,10 +201,10 @@ int authEmail(const ACE_HANDLE socketFd, const unsigned char* mailAddr, const un
     ACE_OS::memset(&userPasswd, 0, MAX_EMAIL_LEN);
     ACE_OS::strcpy((char* )userPasswd, (char* )mailPasswd);
     ACE_OS::memset(&writeData, 0, SMTP_MTU);
-    outSize = BASE64_SIZE(strlen(userPasswd));
-    base64_encode(writeData, outSize, (const unsigned char*)userPasswd, strlen(userPasswd));
+    outSize = (int)BASE64_SIZE(strlen(userPasswd));
+    base64_encode(writeData, (int)outSize, (const unsigned char*)userPasswd, (int)strlen(userPasswd));
     ACE_OS::strcat(writeData, "\r\n");
-    safeWrite(socketFd, writeData, strlen(writeData));
+    safeWrite(socketFd, writeData, (int)strlen(writeData));
 
     /* Recv: passwd */
     ACE_OS::memset(&readData, 0, SMTP_MTU);
@@ -225,7 +225,7 @@ int sendEmail(const ACE_HANDLE socketFd, const unsigned char* fromMail, const un
     /* Send: MAIL FROM */
     ACE_OS::memset(&writeData, 0, SMTP_MTU);
     ACE_OS::sprintf(writeData, "MAIL FROM: <%s>\r\n", fromMail);
-    safeWrite(socketFd, writeData, strlen(writeData));
+    safeWrite(socketFd, writeData, (int)strlen(writeData));
 
     /* Recv: MAIL FROM */
     ACE_OS::memset(&readData, 0, SMTP_MTU);
@@ -237,7 +237,7 @@ int sendEmail(const ACE_HANDLE socketFd, const unsigned char* fromMail, const un
     /* Send: RCPT TO */
     ACE_OS::memset(&writeData, 0, SMTP_MTU);
     ACE_OS::sprintf(writeData, "RCPT TO: <%s>\r\n", toMail);
-    safeWrite(socketFd, writeData, strlen(writeData));
+    safeWrite(socketFd, writeData, (int)strlen(writeData));
 
     /* Recv: RCPT TO */
     ACE_OS::memset(&readData, 0, SMTP_MTU);
@@ -250,7 +250,7 @@ int sendEmail(const ACE_HANDLE socketFd, const unsigned char* fromMail, const un
     ACE_OS::memset(&writeData, 0, SMTP_MTU);
     char szDATA[50] = {'\0'};
     ACE_OS::sprintf(szDATA, "DATA\r\n");
-    safeWrite(socketFd, szDATA, ACE_OS::strlen("DATA\r\n"));
+    safeWrite(socketFd, szDATA, (int)ACE_OS::strlen("DATA\r\n"));
 
     /* Recv: DATA */
     ACE_OS::memset(&readData, 0, SMTP_MTU);
@@ -273,7 +273,7 @@ int sendEmail(const ACE_HANDLE socketFd, const unsigned char* fromMail, const un
     ACE_OS::memset(&writeData, 0, SMTP_MTU);
     char szQUIT[50] = {'\0'};
     ACE_OS::sprintf(szQUIT, "QUIT\r\n");
-    safeWrite(socketFd, szQUIT, ACE_OS::strlen("QUIT\r\n"));
+    safeWrite(socketFd, szQUIT, (int)ACE_OS::strlen("QUIT\r\n"));
 
     /* Recv: QUIT */
     ACE_OS::memset(&readData, 0, SMTP_MTU);
@@ -299,10 +299,10 @@ int mailText(unsigned char** mail, const unsigned char* fromMail, const unsigned
         return -1;
     }
 
-    mailTextLen = ACE_OS::strlen((char* )fromMail) +
-                  ACE_OS::strlen((char* )toMail) +
-                  ACE_OS::strlen((char* )mailSubject) +
-                  ACE_OS::strlen((char* )mailBody) + 500;
+    mailTextLen = (int)ACE_OS::strlen((char* )fromMail) +
+				  (int)ACE_OS::strlen((char* )toMail) +
+		          (int)ACE_OS::strlen((char* )mailSubject) +
+		          (int)ACE_OS::strlen((char* )mailBody) + 500;
 
     szMailText = (char* )ACE_OS::calloc(mailTextLen, 1);
 
@@ -333,7 +333,7 @@ int mailText(unsigned char** mail, const unsigned char* fromMail, const unsigned
     free(szMailText);
 
     /* If I am in danger, let me konw, please */
-    return (mailTextLen - strlen((char* )*mail));
+    return (int)(mailTextLen - strlen((char* )*mail));
 }
 
 /* static attachmemt size */
@@ -376,7 +376,7 @@ int mailAttachment(unsigned char** mail, const unsigned char* filePath)
         return -1;
     }
 
-    headerSize = ACE_OS::strlen(contentType)+ACE_OS::strlen(contentEncode)+ACE_OS::strlen(contentDes)+200;
+    headerSize = (int)ACE_OS::strlen(contentType)+(int)ACE_OS::strlen(contentEncode)+(int)ACE_OS::strlen(contentDes)+200;
     attachHeader = (char* )calloc(headerSize, 1);
 
     if (NULL == attachHeader)
@@ -442,7 +442,7 @@ int mailEnd(unsigned char** mail)
     ACE_OS::memset(bodyEnd, 0, sizeof(bodyEnd));
     ACE_OS::sprintf(bodyEnd, "\r\n--%s--\r\n\r\n.\r\n", TEXT_BOUNDARY);
 
-    len = ACE_OS::strlen(bodyEnd);
+    len = (int)ACE_OS::strlen(bodyEnd);
 
     *mail = (unsigned char* )ACE_OS::realloc((char* )*mail, strlen((char* )*mail)+len+1);
 

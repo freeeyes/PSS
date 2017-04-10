@@ -460,7 +460,7 @@ bool CConsoleMessage::GetLogLevel(const char* pCommand, int& nLogLevel)
 
     if(NULL != pPosBegin)
     {
-        int nLen = ACE_OS::strlen(pCommand) - (int)(pPosBegin - pCommand) - 3;
+        int nLen = (int)ACE_OS::strlen(pCommand) - (int)(pPosBegin - pCommand) - 3;
         memcpy_safe(pPosBegin + 3, (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
         nLogLevel = ACE_OS::atoi(szTempData);
     }
@@ -518,7 +518,7 @@ bool CConsoleMessage::GetNickName(const char* pCommand, char* pName)
 
     if(NULL != pPosBegin)
     {
-        int nLen = ACE_OS::strlen(pCommand) - (int)(pPosBegin - pCommand) - 3;
+        int nLen = (int)ACE_OS::strlen(pCommand) - (int)(pPosBegin - pCommand) - 3;
         memcpy_safe((char* )(pPosBegin + 3), (uint32)nLen, pName, (uint32)MAX_BUFF_100);
         pName[nLen] = '\0';
     }
@@ -1755,7 +1755,7 @@ bool CConsoleMessage::GetDebug(const char* pCommand, uint8& u1Debug)
 {
     char szTempData[MAX_BUFF_100] = {'\0'};
 
-    int nCommandLen = ACE_OS::strlen(pCommand);
+    int nCommandLen = (int)ACE_OS::strlen(pCommand);
     //ªÒµ√IPµÿ÷∑
     char* pPosBegin = (char* )ACE_OS::strstr(pCommand, "-s ");
     int nLen = (int)(nCommandLen - (pPosBegin - pCommand) - 3);

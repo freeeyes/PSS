@@ -79,7 +79,7 @@ public:
         if(m_nDisplay == 0)
         {
             //计入日志
-            int nLen = m_File.send(m_pBuffer, strlen(m_pBuffer));
+            int nLen = (int)m_File.send(m_pBuffer, strlen(m_pBuffer));
 
             if(nLen != (int)strlen(m_pBuffer))
             {

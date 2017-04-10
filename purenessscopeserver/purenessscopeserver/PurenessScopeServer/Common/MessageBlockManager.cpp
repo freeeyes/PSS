@@ -88,7 +88,7 @@ bool CMessageBlockManager::Close(ACE_Message_Block* pMessageBlock)
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
     m_MenoryBlock_Pool.Set(pMessageBlock);
 
-    uint32 u4Size = pMessageBlock->size();
+    uint32 u4Size = (uint32)pMessageBlock->size();
     m_u4UsedSize -= u4Size;
     return true;
 }

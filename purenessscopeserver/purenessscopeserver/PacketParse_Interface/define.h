@@ -434,7 +434,7 @@ inline void Print_Binary(ACE_Message_Block* pMessageBlock)
 	if(NULL != pMessageBlock)
 	{
 		char* pData = pMessageBlock->rd_ptr();
-		int nLen = pMessageBlock->length();
+		int nLen = (int)pMessageBlock->length();
 		OUR_DEBUG((LM_INFO, "[Print_Binary]"));
 		for(int i = 0; i < nLen; i++)
 		{

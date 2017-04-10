@@ -123,7 +123,7 @@ bool CReactorClientInfo::SendData(ACE_Message_Block* pmblk)
     {
         //调用数据发送组装
         ACE_Message_Block* pSend = NULL;
-        bool blRet = m_pClientMessage->Send_Format_data(pmblk->rd_ptr(), pmblk->length(), App_MessageBlockManager::instance(), pSend);
+        bool blRet = m_pClientMessage->Send_Format_data(pmblk->rd_ptr(), (uint32)pmblk->length(), App_MessageBlockManager::instance(), pSend);
 
         if(false == blRet)
         {

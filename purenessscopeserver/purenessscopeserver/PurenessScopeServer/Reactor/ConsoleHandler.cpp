@@ -262,7 +262,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
         return -1;
     }
 
-    int nDataLen = this->peer().recv(m_pCurrMessage->wr_ptr(), nCurrCount, MSG_NOSIGNAL, &nowait);
+    int nDataLen = (int)this->peer().recv(m_pCurrMessage->wr_ptr(), nCurrCount, MSG_NOSIGNAL, &nowait);
 
     if (nDataLen <= 0)
     {
@@ -504,7 +504,7 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
             return false;
         }
 
-        int nDataLen = this->peer().send(pMbData->rd_ptr(), nCurrSendSize, &nowait);
+        int nDataLen = (int)this->peer().send(pMbData->rd_ptr(), nCurrSendSize, &nowait);
 
         if (nDataLen <= 0)
         {

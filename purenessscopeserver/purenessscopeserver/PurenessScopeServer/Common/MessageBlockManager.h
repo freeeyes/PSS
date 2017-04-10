@@ -97,7 +97,7 @@ public:
         if(NULL != pmb)
         {
             pmb->reset();
-            uint32 u4Size = pmb->size();
+            uint32 u4Size = (uint32)pmb->size();
             int nIndex = pow_2(u4Size);
 
             if(nIndex >= MAX_MEMORY_BLOCK_COUNT)
