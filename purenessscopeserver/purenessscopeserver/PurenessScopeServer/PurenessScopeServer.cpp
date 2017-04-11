@@ -102,7 +102,7 @@ bool SetAppPath()
         sprintf(pFilePath,"/proc/%d/exe",getpid());
 
         //从符号链接中获得当前文件全路径和文件名
-        readlink(pFilePath, szPath, MAX_BUFF_300 - 1);
+		ssize_t stPathSize = readlink(pFilePath, szPath, MAX_BUFF_300 - 1);
         delete[] pFilePath;
         pFilePath = NULL;
         //从szPath里面拆出当前路径
@@ -115,7 +115,7 @@ bool SetAppPath()
 
         szPath[nLen > 0 ? (nLen-1) : 0]= '\0';
 
-        chdir(szPath);
+        int nRet = chdir(szPath);
         OUR_DEBUG((LM_INFO, "[SetAppPath]Set work Path (%s) OK.\n", szPath));
 
         return true;
@@ -386,7 +386,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
     tsRqt.tv_nsec = 0;
 
     //获得当前路径
-    char szWorkDir[255] = {0};
+    char szWorkDir[MAX_BUFF_500] = {0};
 
     if(!getcwd(szWorkDir, 260))
     {
@@ -426,7 +426,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 
     for (int nIndex = 0; nIndex <= nNumChlid; nIndex++)
     {
-        write(fd_lock, &nIndex, sizeof(nIndex));
+		ssize_t stWrite = write(fd_lock, &nIndex, sizeof(nIndex));
     }
 
     if(App_MainConfig::instance()->GetServerType() == 1)
