@@ -250,7 +250,7 @@ public:
                         uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDlete = true, int nMessageID = 0);    //异步群发
     bool PostMessageAll(const char* pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL,
                         uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDlete = true, int nMessageID = 0);    //异步群发
-    bool CloseConnect(uint32 u4ConnectID, EM_Client_Close_status emStatus = CLIENT_CLOSE_IMMEDIATLY);        //服务器关闭
+    bool CloseConnect(uint32 u4ConnectID);                                                                   //服务器关闭
     _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                                                       //得到指定链接信息
     _ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID);                                                        //得到监听链接信息
     void GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo);                                         //返回当前存活链接的信息

@@ -2088,15 +2088,10 @@ bool CConnectManager::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status em
     //OUR_DEBUG((LM_ERROR, "[CConnectManager::CloseConnect]ConnectID=%d Begin.\n", u4ConnectID));
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
     //OUR_DEBUG((LM_ERROR, "[CConnectManager::CloseConnect]ConnectID=%d Begin 1.\n", u4ConnectID));
+
     char szConnectID[10] = {'\0'};
     sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
     CConnectHandler* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data(szConnectID);
-
-    if(emStatus != CLIENT_CLOSE_IMMEDIATLY)
-    {
-        return false;
-    }
-
     if(NULL != pConnectHandler)
     {
         //回收发送缓冲
@@ -3219,7 +3214,7 @@ bool CConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, const char*
     return true;
 }
 
-bool CConnectManagerGroup::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status emStatus)
+bool CConnectManagerGroup::CloseConnect(uint32 u4ConnectID)
 {
 
     //判断命中到哪一个线程组里面去
@@ -3233,7 +3228,7 @@ bool CConnectManagerGroup::CloseConnect(uint32 u4ConnectID, EM_Client_Close_stat
         return false;
     }
 
-    return pConnectManager->CloseConnect(u4ConnectID, emStatus);
+    return pConnectManager->CloseConnect(u4ConnectID, CLIENT_CLOSE_IMMEDIATLY);
 }
 
 bool CConnectManagerGroup::CloseConnectByClient(uint32 u4ConnectID)
@@ -3245,7 +3240,7 @@ bool CConnectManagerGroup::CloseConnectByClient(uint32 u4ConnectID)
 
     if(NULL == pConnectManager)
     {
-        OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnect]No find send Queue object.\n"));
+        OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnectByClient]No find send Queue object.\n"));
         return false;
     }
 
@@ -3477,7 +3472,7 @@ bool CConnectManagerGroup::SetConnectName(uint32 u4ConnectID, const char* pName)
 
     if(NULL == pConnectManager)
     {
-        OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnect]No find send Queue object.\n"));
+        OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::SetConnectName]No find send Queue object.\n"));
         return false;
     }
 
@@ -3493,7 +3488,7 @@ bool CConnectManagerGroup::SetIsLog(uint32 u4ConnectID, bool blIsLog)
 
     if(NULL == pConnectManager)
     {
-        OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnect]No find send Queue object.\n"));
+        OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::SetIsLog]No find send Queue object.\n"));
         return false;
     }
 
@@ -3557,7 +3552,7 @@ EM_Client_Connect_status CConnectManagerGroup::GetConnectState(uint32 u4ConnectI
 
     if(NULL == pConnectManager)
     {
-        OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::CloseConnect]No find send Queue object.\n"));
+        OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::GetConnectState]No find send Queue object.\n"));
         return CLIENT_CONNECT_NO_EXIST;
     }
 

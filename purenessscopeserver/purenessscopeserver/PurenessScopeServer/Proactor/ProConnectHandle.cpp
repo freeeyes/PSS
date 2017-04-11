@@ -2528,7 +2528,7 @@ bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, const ch
     return true;
 }
 
-bool CProConnectManagerGroup::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status emStatus)
+bool CProConnectManagerGroup::CloseConnect(uint32 u4ConnectID)
 {
     //判断命中到哪一个线程组里面去
     uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
@@ -2541,7 +2541,7 @@ bool CProConnectManagerGroup::CloseConnect(uint32 u4ConnectID, EM_Client_Close_s
         return false;
     }
 
-    return pConnectManager->CloseConnect(u4ConnectID, emStatus);
+    return pConnectManager->CloseConnect(u4ConnectID, CLIENT_CLOSE_IMMEDIATLY);
 }
 
 _ClientIPInfo CProConnectManagerGroup::GetClientIPInfo(uint32 u4ConnectID)

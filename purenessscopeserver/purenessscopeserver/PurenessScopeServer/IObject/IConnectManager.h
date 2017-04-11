@@ -50,7 +50,7 @@ public:
     virtual bool PostMessageAll(const char* pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL,
                                 uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDlete = true, int nMessageID = 0)   = 0;
     //服务器关闭连接
-    virtual bool CloseConnect(uint32 u4ConnectID, EM_Client_Close_status emStatus = CLIENT_CLOSE_IMMEDIATLY)     = 0;
+    virtual bool CloseConnect(uint32 u4ConnectID)                                                                = 0;
     //得到当前连接信息IP和端口
     virtual _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID)                                                    = 0;
     //得到当前连接监听IP和端口
