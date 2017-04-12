@@ -707,6 +707,7 @@ void CMessageServiceGroup::Close()
 {
     KillTimer();
 
+    ACE_Time_Value tvSleep(0, 1000);
     for(uint32 i = 0; i < (uint32)m_vecMessageService.size(); i++)
     {
         CMessageService* pMessageService = (CMessageService*)m_vecMessageService[i];
@@ -714,6 +715,7 @@ void CMessageServiceGroup::Close()
         if(NULL != pMessageService)
         {
             pMessageService->Close();
+            ACE_OS::sleep(tvSleep);
             SAFE_DELETE(pMessageService);
         }
     }
@@ -745,13 +747,13 @@ bool CMessageServiceGroup::Start()
 
 bool CMessageServiceGroup::StartTimer()
 {
-    OUR_DEBUG((LM_ERROR, "[CMessageService::StartTimer] begin....\n"));
+    OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::StartTimer] begin....\n"));
 
     m_u4TimerID = App_TimerManager::instance()->schedule(this, NULL, ACE_OS::gettimeofday() + ACE_Time_Value(MAX_MSG_STARTTIME), ACE_Time_Value(m_u2ThreadTimeCheck));
 
     if(0 == m_u4TimerID)
     {
-        OUR_DEBUG((LM_ERROR, "[CMessageService::StartTimer] Start thread time error.\n"));
+        OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::StartTimer] Start thread time error.\n"));
         return false;
     }
 
@@ -760,12 +762,13 @@ bool CMessageServiceGroup::StartTimer()
 
 bool CMessageServiceGroup::KillTimer()
 {
+    OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::KillTimer] begin....\n"));
     if(m_u4TimerID > 0)
     {
         App_TimerManager::instance()->cancel(m_u4TimerID);
         m_u4TimerID = 0;
     }
-
+    OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::KillTimer] end....\n"));
     return true;
 }
 
