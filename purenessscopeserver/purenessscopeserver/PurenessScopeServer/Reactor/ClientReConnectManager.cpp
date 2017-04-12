@@ -334,7 +334,6 @@ bool CClientReConnectManager::ConnectUDP(int nServerID, const char* pIP, int nPo
 		AddrLocal.set(nPort, (uint32)INADDR_ANY);
 	}
 
-
 	if (nErr != 0)
 	{
 		OUR_DEBUG((LM_INFO, "[CClientReConnectManager::ConnectUDP](%d)UDP set_address error[%d].\n", nServerID, errno));
