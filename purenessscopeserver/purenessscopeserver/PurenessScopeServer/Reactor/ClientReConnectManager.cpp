@@ -308,7 +308,7 @@ bool CClientReConnectManager::ConnectUDP(int nServerID, const char* pIP, int nPo
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 	CReactorUDPClient* pReactorUDPClient = NULL;
 	//初始化连接动作
-	if (false == ConnectUdpInit(nServerID, pIP, nPort, u1IPType, emType, pClientUDPMessage, pReactorUDPClient))
+	if (false == ConnectUdpInit(nServerID, pReactorUDPClient))
 	{
 		return false;
 	}
@@ -677,7 +677,7 @@ bool CClientReConnectManager::ConnectTcpInit(int nServerID, const char* pIP, int
 	return true;
 }
 
-bool CClientReConnectManager::ConnectUdpInit(int nServerID, const char* pIP, int nPort, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage, CReactorUDPClient*& pReactorUDPClient)
+bool CClientReConnectManager::ConnectUdpInit(int nServerID, CReactorUDPClient*& pReactorUDPClient)
 {
 	//查找已有连接
 	char szServerID[10] = { '\0' };

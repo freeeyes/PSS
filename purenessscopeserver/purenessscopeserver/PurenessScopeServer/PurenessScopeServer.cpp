@@ -103,10 +103,21 @@ bool SetAppPath()
 
         //从符号链接中获得当前文件全路径和文件名
 		ssize_t stPathSize = readlink(pFilePath, szPath, MAX_BUFF_300 - 1);
+		if (stPathSize <= 0)
+		{
+			OUR_DEBUG((LM_INFO, "[SetAppPath]no find work Path.\n", szPath));
+			return false;
+		}
+
         delete[] pFilePath;
         pFilePath = NULL;
         //从szPath里面拆出当前路径
         int nLen = strlen(szPath);
+		if (nLen <= 0)
+		{
+			OUR_DEBUG((LM_INFO, "[SetAppPath]no find szPath.\n", szPath));
+			return false;
+		}
 
         while(szPath[nLen - 1]!='/')
         {
@@ -401,7 +412,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 
     if (fd_lock < 0)
     {
-        printf("open the flock and exit, errno = %d.", errno);
+        printf("open the flock and exit, errno = %d.\n", errno);
         exit(1);
     }
 
@@ -410,14 +421,14 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 
     if (nRet == -1 || nRet == 2)
     {
-        printf("file is already exist!");
+        printf("file is already exist!\n");
         exit(1);
     }
 
     //如果文件锁没锁，则锁住当前文件锁
     if (AcquireWriteLock(fd_lock, 0, sizeof(int)) != 0)
     {
-        printf("lock the file failure and exit, idx = 0!.");
+        printf("lock the file failure and exit, idx = 0.\n");
         exit(1);
     }
 
@@ -427,6 +438,10 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
     for (int nIndex = 0; nIndex <= nNumChlid; nIndex++)
     {
 		ssize_t stWrite = write(fd_lock, &nIndex, sizeof(nIndex));
+		if (stWrite <= 0)
+		{
+			printf("lock write fail.\n");
+		}
     }
 
     if(App_MainConfig::instance()->GetServerType() == 1)

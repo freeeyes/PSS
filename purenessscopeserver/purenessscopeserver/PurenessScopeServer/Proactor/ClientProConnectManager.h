@@ -85,7 +85,7 @@ public:
 
 private:
 	bool ConnectTcpInit(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CProactorClientInfo*& pClientInfo);
-	bool ConnectUdpInit(int nServerID, const char* pIP, int nPort, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage, CProactorUDPClient*& pProactorUDPClient);
+	bool ConnectUdpInit(int nServerID, CProactorUDPClient*& pProactorUDPClient);
 
 private:
     CProAsynchConnect               m_ProAsynchConnect;

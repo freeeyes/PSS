@@ -79,7 +79,7 @@ public:
 
 private:
 	bool ConnectTcpInit(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CReactorClientInfo*& pClientInfo);
-	bool ConnectUdpInit(int nServerID, const char* pIP, int nPort, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage, CReactorUDPClient*& pReactorUDPClient);
+	bool ConnectUdpInit(int nServerID, CReactorUDPClient*& pReactorUDPClient);
 
     virtual int handle_timeout(const ACE_Time_Value& current_time, const void* act = 0);               //¶¨Ê±Æ÷Ö´ÐÐ
 

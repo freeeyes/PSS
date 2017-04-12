@@ -335,7 +335,7 @@ bool CClientProConnectManager::ConnectUDP(int nServerID, const char* pIP, int nP
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 	CProactorUDPClient* pProactorUDPClient = NULL;
 	//¡¥Ω”≥ı ºªØ
-	if (false == ConnectUdpInit(nServerID, pIP, nPort, u1IPType, emType, pClientUDPMessage, pProactorUDPClient))
+	if (false == ConnectUdpInit(nServerID, pProactorUDPClient))
 	{
 		return false;
 	}
@@ -743,7 +743,7 @@ bool CClientProConnectManager::ConnectTcpInit(int nServerID, const char* pIP, in
 	return true;
 }
 
-bool CClientProConnectManager::ConnectUdpInit(int nServerID, const char* pIP, int nPort, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage, CProactorUDPClient*& pProactorUDPClient)
+bool CClientProConnectManager::ConnectUdpInit(int nServerID, CProactorUDPClient*& pProactorUDPClient)
 {
 	char szServerID[10] = { '\0' };
 	sprintf_safe(szServerID, 10, "%d", nServerID);
