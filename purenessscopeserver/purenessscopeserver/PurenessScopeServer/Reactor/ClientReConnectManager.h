@@ -25,7 +25,6 @@ public:
     void SetLocalAddr(const char* pIP, int nPort, uint8 u1IPType);                         //绑定本地的IP和端口
     bool Run(bool blIsReady, EM_Server_Connect_State emState = SERVER_CONNECT_RECONNECT);  //开始链接
     bool SendData(ACE_Message_Block* pmblk);                                               //发送数据
-    bool ConnectError(int nError);                                                         //链接错误，报错
     int  GetServerID();                                                                    //得到服务器ID
     bool Close();                                                                          //关闭服务器链接
     void SetConnectClient(CConnectClient* pConnectClient);                                 //设置链接状态
@@ -77,6 +76,10 @@ public:
     void GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo);      //返回当前存活链接的信息（TCP）
     void GetUDPConnectInfo(vecClientConnectInfo& VecClientConnectInfo);   //返回当前存活链接的信息（UDP）
     EM_Server_Connect_State GetConnectState(int nServerID);               //得到一个当前连接状态
+
+private:
+	bool ConnectTcpInit(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CReactorClientInfo*& pClientInfo);
+	bool ConnectUdpInit(int nServerID, const char* pIP, int nPort, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage, CReactorUDPClient*& pReactorUDPClient);
 
     virtual int handle_timeout(const ACE_Time_Value& current_time, const void* act = 0);               //定时器执行
 

@@ -28,7 +28,6 @@ public:
     void SetLocalAddr(const char* pIP, int nPort, uint8 u1IPType);                             //设置本地IP和端口
     bool Run(bool blIsReadly, EM_Server_Connect_State emState = SERVER_CONNECT_RECONNECT);     //开始链接
     bool SendData(ACE_Message_Block* pmblk);                                                   //发送数据
-    bool ConnectError(int nError);                                                             //链接错误，报错
     int  GetServerID();                                                                        //得到服务器ID
     bool Close();                                                                              //关闭服务器链接
     void SetProConnectClient(CProConnectClient* pProConnectClient);                            //设置ProConnectClient指针
@@ -83,6 +82,9 @@ public:
     bool GetServerIPInfo(int nServerID, _ClientIPInfo& objServerIPInfo);  //得到一个nServerID对应的ServerIP信息
 
     virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);                       //定时检测
+
+private:
+
 
 private:
     CProAsynchConnect               m_ProAsynchConnect;
