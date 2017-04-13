@@ -1831,7 +1831,7 @@ int CProConnectManager::open(void* args)
 
     OUR_DEBUG((LM_INFO,"[CProConnectManager::open] m_u4HighMask = [%d] m_u4LowMask = [%d]\n", MAX_MSG_MASK, MAX_MSG_MASK));
 
-    if(activate(THR_NEW_LWP | THR_JOINABLE | THR_INHERIT_SCHED | THR_SUSPENDED, MAX_MSG_THREADCOUNT) == -1)
+    if(activate(THREAD_PARAM, MAX_MSG_THREADCOUNT) == -1)
     {
         OUR_DEBUG((LM_ERROR, "[CProConnectManager::open] activate error ThreadCount = [%d].", MAX_MSG_THREADCOUNT));
         m_blRun = false;

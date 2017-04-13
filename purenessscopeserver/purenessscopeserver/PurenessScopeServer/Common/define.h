@@ -43,6 +43,8 @@ using namespace std;
 #define MAX_BUFF_1000 1000
 #define MAX_BUFF_1024 1024
 
+#define THREAD_PARAM THR_NEW_LWP | THR_JOINABLE | THR_INHERIT_SCHED | THR_SUSPENDED
+
 /*
 //计算当前版本号是否与制定版本好一致
 static bool Convert_Version(int nTagVserion)

@@ -127,7 +127,7 @@ int CLogManager::open(void* args)
         OUR_DEBUG((LM_ERROR,"[CLogManager::open]args is not NULL.\n"));
     }
 
-    if(activate(THR_NEW_LWP | THR_DETACHED, m_nThreadCount) == -1)
+    if(activate(THREAD_PARAM, m_nThreadCount) == -1)
     {
         m_blRun = false;
         OUR_DEBUG((LM_ERROR,"[CLogManager::open] activate is error[%d].", errno));

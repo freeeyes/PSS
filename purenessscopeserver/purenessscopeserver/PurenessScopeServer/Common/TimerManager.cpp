@@ -129,7 +129,7 @@ int CTimerManagerTask::open(void* args)
 
     OUR_DEBUG((LM_ERROR, "[CTimerManagerTask::open] Begin.\n"));
 
-    if(activate(THR_NEW_LWP | THR_BOUND | THR_DETACHED, MAX_TIMERMANAGER_THREADCOUNT)  == -1)
+    if(activate(THREAD_PARAM, MAX_TIMERMANAGER_THREADCOUNT)  == -1)
     {
         OUR_DEBUG((LM_ERROR, "[CTimerManagerTask::open] CTimerManagerTask Start error!\n"));
         return -1;

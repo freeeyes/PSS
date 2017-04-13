@@ -174,7 +174,7 @@ int CAceReactor::open(void* args)
 
     OUR_DEBUG((LM_ERROR, "[CAceReactor::Open] Begin nReactorID= [%d].\n", m_u4ReactorID));
 
-    if (activate(THR_NEW_LWP | THR_BOUND | THR_JOINABLE | THR_INHERIT_SCHED, m_nThreadCount)  == -1)
+    if (activate(THREAD_PARAM, m_nThreadCount)  == -1)
     {
         OUR_DEBUG((LM_ERROR, "[CAceReactor::Open]activate error ReactorType = [%d] nThreadCount = [%d] Start!\n", m_nReactorType, m_nThreadCount));
         return -1;

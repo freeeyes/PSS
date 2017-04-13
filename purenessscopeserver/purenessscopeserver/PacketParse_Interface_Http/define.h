@@ -43,6 +43,8 @@ using namespace std;
 #define MAX_BUFF_1000 1000
 #define MAX_BUFF_1024 1024
 
+#define THREAD_PARAM THR_NEW_LWP | THR_JOINABLE | THR_INHERIT_SCHED | THR_SUSPENDED
+
 /*
 //计算当前版本号是否与制定版本好一致
 static bool Convert_Version(int nTagVserion)
@@ -117,6 +119,7 @@ static bool Convert_Version(int nTagVserion)
 #define PACKET_SEND_ERROR     5            //数据发送失败事件 
 #define PACKET_SEND_TIMEOUT   6            //服务器发送时间超过阀值的标志
 #define PACKET_CHEK_TIMEOUT   7            //服务器心跳检测超时事件
+#define PACKET_SEND_OK        8            //发送成功回执
 
 #define MAX_PACKET_PARSE      5000         //PACKETPARSE对象池个数
 #define MAX_MESSAGE_POOL      5000         //Message对象池个数
@@ -290,6 +293,8 @@ enum
 #define CLINET_LINK_SENDTIMEOUT    0x0004      //服务器发送客户端时间超过阀值
 #define CLINET_LINK_SENDERROR      0x0005      //客户端发送失败消息 
 #define CLINET_LINK_CHECKTIMEOUT   0x0006      //服务器心跳检测超时消息  
+#define CLIENT_LINK_SENDOK         0x0007      //服务器发送成功回执
+#define CLIENT_LINK_USER           0x0100      //用户信令开始序列头部
 //*****************************************************************
 
 //*****************************************************************

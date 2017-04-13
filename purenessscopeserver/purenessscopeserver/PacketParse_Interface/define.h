@@ -18,7 +18,7 @@
 #include "ace/OS_NS_unistd.h"
 #include "ace/OS_NS_string.h"
 #include "ace/High_Res_Timer.h"
-#include "ace/INET_Addr.h" 
+#include "ace/INET_Addr.h"
 #include <math.h>
 
 #include <vector>
@@ -43,23 +43,25 @@ using namespace std;
 #define MAX_BUFF_1000 1000
 #define MAX_BUFF_1024 1024
 
+#define THREAD_PARAM THR_NEW_LWP | THR_JOINABLE | THR_INHERIT_SCHED | THR_SUSPENDED
+
 /*
 //计算当前版本号是否与制定版本好一致
 static bool Convert_Version(int nTagVserion)
 {
-	int nCurrVserion = 0;
-	nCurrVserion += (int)ACE::major_version() * 1000;
-	nCurrVserion += (int)ACE::minor_version() * 100;
-	nCurrVserion += (int)ACE::beta_version();
+    int nCurrVserion = 0;
+    nCurrVserion += (int)ACE::major_version() * 1000;
+    nCurrVserion += (int)ACE::minor_version() * 100;
+    nCurrVserion += (int)ACE::beta_version();
 
-	if(nTagVserion >= nCurrVserion)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+    if(nTagVserion >= nCurrVserion)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 #define CONVERT_ACE_VERSION Convert_Version(6200)
@@ -117,6 +119,7 @@ static bool Convert_Version(int nTagVserion)
 #define PACKET_SEND_ERROR     5            //数据发送失败事件 
 #define PACKET_SEND_TIMEOUT   6            //服务器发送时间超过阀值的标志
 #define PACKET_CHEK_TIMEOUT   7            //服务器心跳检测超时事件
+#define PACKET_SEND_OK        8            //发送成功回执
 
 #define MAX_PACKET_PARSE      5000         //PACKETPARSE对象池个数
 #define MAX_MESSAGE_POOL      5000         //Message对象池个数
@@ -176,71 +179,71 @@ static bool Convert_Version(int nTagVserion)
 
 enum EM_UDP_TYPE
 {
-	UDP_SINGLE = 0,        //UDP单独连接
-	UDP_BROADCAST,         //UDP广播  
+    UDP_SINGLE = 0,        //UDP单独连接
+    UDP_BROADCAST,         //UDP广播
 };
 
 //对应当前框架支持的网络模式
 enum
 {
-	NETWORKMODE_PRO_IOCP    = 1,    //IOCP模式
-	NETWORKMODE_RE_SELECT   = 10,   //Select模式
-	NETWORKMODE_RE_TPSELECT = 11,   //TPSelect模式 
-	NETWORKMODE_RE_EPOLL    = 12,   //epolllt模式(水平触发)
-	NETWORKMODE_RE_EPOLL_ET = 13,   //epollet模式(边沿触发)
+    NETWORKMODE_PRO_IOCP    = 1,    //IOCP模式
+    NETWORKMODE_RE_SELECT   = 10,   //Select模式
+    NETWORKMODE_RE_TPSELECT = 11,   //TPSelect模式
+    NETWORKMODE_RE_EPOLL    = 12,   //epolllt模式(水平触发)
+    NETWORKMODE_RE_EPOLL_ET = 13,   //epollet模式(边沿触发)
 };
 
 //对应链接的状态，用于设置链接时候的状态
 enum
 {
-	CONNECT_INIT         = 0,
-	CONNECT_OPEN         = 1,
-	CONNECT_RECVGEGIN    = 2,
-	CONNECT_RECVGEND     = 3,
-	CONNECT_SENDBEGIN    = 4,
-	CONNECT_SENDEND      = 5,
-	CONNECT_CLOSEBEGIN   = 6,
-	CONNECT_CLOSEEND     = 7,
-	CONNECT_RECVERROR    = 8,
-	CONNECT_SENDERROR    = 9,
-	CONNECT_SENDBUFF     = 10,
-	CONNECT_SENDNON      = 11,
-	CONNECT_SERVER_CLOSE = 12,
+    CONNECT_INIT         = 0,
+    CONNECT_OPEN         = 1,
+    CONNECT_RECVGEGIN    = 2,
+    CONNECT_RECVGEND     = 3,
+    CONNECT_SENDBEGIN    = 4,
+    CONNECT_SENDEND      = 5,
+    CONNECT_CLOSEBEGIN   = 6,
+    CONNECT_CLOSEEND     = 7,
+    CONNECT_RECVERROR    = 8,
+    CONNECT_SENDERROR    = 9,
+    CONNECT_SENDBUFF     = 10,
+    CONNECT_SENDNON      = 11,
+    CONNECT_SERVER_CLOSE = 12,
 };
 
 //服务器间通讯，是否需要回调的枚举
 enum EM_s2s
 {
-	S2S_NEED_CALLBACK = 0,    //需要回调
-	S2S_INNEED_CALLBACK,      //不需要回调
+    S2S_NEED_CALLBACK = 0,    //需要回调
+    S2S_INNEED_CALLBACK,      //不需要回调
 };
 
 //对应处理线程的状态
 enum
 {
-	THREAD_INIT      = 0,   //线程初始化
-	THREAD_RUNBEGIN  = 1,   //开始处理线程
-	THREAD_RUNEND    = 2,   //处理数据结束
-	THREAD_BLOCK     = 3,   //线程阻塞
+    THREAD_INIT      = 0,   //线程初始化
+    THREAD_RUNBEGIN  = 1,   //开始处理线程
+    THREAD_RUNEND    = 2,   //处理数据结束
+    THREAD_BLOCK     = 3,   //线程阻塞
 };
 
 //对应服务器间通讯的传输状态
 enum EM_Server_Connect_State
 {
-	SERVER_CONNECT_READY = 0,
-	SERVER_CONNECT_FIRST,
-	SERVER_CONNECT_OK,
-	SERVER_CONNECT_FAIL,
-	SERVER_CONNECT_RECONNECT,
+    SERVER_CONNECT_READY = 0,
+    SERVER_CONNECT_FIRST,
+    SERVER_CONNECT_OK,
+    SERVER_CONNECT_FAIL,
+    SERVER_CONNECT_RECONNECT,
 };
 
 //服务器间通讯数据接收状态
 #define SERVER_RECV_TIMEOUT    20   //服务器间接收数据超时时间
 enum EM_Server_Recv_State
 {
-	SERVER_RECV_INIT = 0,     //未接收数据
-	SERVER_RECV_BEGIN,        //接收数据完成
-	SERVER_RECV_END,          //处理数据完成 
+    SERVER_RECV_INIT = 0,     //未接收数据
+    SERVER_RECV_BEGIN,        //接收数据完成
+    SERVER_RECV_END,          //处理数据完成
 };
 
 //日志编号声明
@@ -262,24 +265,24 @@ enum EM_Server_Recv_State
 #define LOG_SYSTEM_DEBUG_CLIENTSEND     1015
 #define LOG_SYSTEM_DEBUG_SERVERRECV     1016
 #define LOG_SYSTEM_DEBUG_SERVERSEND     1017
-#define LOG_SYSTEM_MONITOR              1018 
+#define LOG_SYSTEM_MONITOR              1018
 
 #define DEBUG_ON  1
 #define DEBUG_OFF 0
 
-#define OUR_DEBUG(X)  ACE_DEBUG((LM_INFO, "[%T|%t]")); ACE_DEBUG(X)
+#define OUR_DEBUG(X)  ACE_DEBUG((LM_INFO, "[%D %P|%t][%N,%l]")); ACE_DEBUG(X)
 
 enum
 {
-	REACTOR_CLIENTDEFINE  = 0,
-	REACTOR_POSTDEFINE    = 1,
-	REACTOR_UDPDEFINE     = 2,
+    REACTOR_CLIENTDEFINE  = 0,
+    REACTOR_POSTDEFINE    = 1,
+    REACTOR_UDPDEFINE     = 2,
 };
 
 //中间服务器的ID
 enum
 {
-	POSTSERVER_TEST    = 1,
+    POSTSERVER_TEST    = 1,
 };
 
 //*****************************************************************
@@ -290,6 +293,8 @@ enum
 #define CLINET_LINK_SENDTIMEOUT    0x0004      //服务器发送客户端时间超过阀值
 #define CLINET_LINK_SENDERROR      0x0005      //客户端发送失败消息 
 #define CLINET_LINK_CHECKTIMEOUT   0x0006      //服务器心跳检测超时消息  
+#define CLIENT_LINK_SENDOK         0x0007      //服务器发送成功回执
+#define CLIENT_LINK_USER           0x0100      //用户信令开始序列头部
 //*****************************************************************
 
 //*****************************************************************
@@ -355,388 +360,402 @@ typedef std::string _tstring;
 //定义一个函数，可以支持内存越界检查
 inline void sprintf_safe(char* szText, int nLen, const char* fmt ...)
 {
-	if(szText == NULL)
-	{
-		return;
-	}
+    if(szText == NULL)
+    {
+        return;
+    }
 
-	va_list ap;
-	va_start(ap, fmt);
+    va_list ap;
+    va_start(ap, fmt);
 
-	ACE_OS::vsnprintf(szText, nLen, fmt, ap);
-	szText[nLen - 1] = '\0';
+    ACE_OS::vsnprintf(szText, nLen, fmt, ap);
+    szText[nLen - 1] = '\0';
 
-	va_end(ap);
+    va_end(ap);
 };
 
 //支持memcpy的边界检查
 inline bool memcpy_safe(char* pSrc, uint32 u4SrcLen, char* pDes, uint32 u4DesLen)
 {
-	if(u4SrcLen > u4DesLen)
-	{
-		return false;
-	}
-	else
-	{
-		ACE_OS::memcpy((void* )pDes, (void* )pSrc, (size_t)u4SrcLen);
-		return true;
-	}
+    if(u4SrcLen > u4DesLen)
+    {
+        return false;
+    }
+    else
+    {
+        ACE_OS::memcpy((void* )pDes, (void* )pSrc, (size_t)u4SrcLen);
+        return true;
+    }
 }
 
 //支持strcpy边界检查
 inline bool strcpy_safe(const char* pSrc, char* pDes, int nDesLen)
 {
-	int nSrcLen = (int)ACE_OS::strlen(pSrc);
-	if(nSrcLen <= 0 || nDesLen <= 0 || nSrcLen > nDesLen)
-	{
-		return false;
-	}
-	else
-	{
-		ACE_OS::strcpy(pDes, (const char* )pSrc);
-		return true;
-	}
+    int nSrcLen = (int)ACE_OS::strlen(pSrc);
+
+    if(nSrcLen <= 0 || nDesLen <= 0 || nSrcLen > nDesLen)
+    {
+        return false;
+    }
+    else
+    {
+        ACE_OS::strcpy(pDes, (const char* )pSrc);
+        return true;
+    }
 }
 
 //支持strcat边界检查
 inline bool strcat_safe(const char* pSrc, char* pDes, int nDesLen)
 {
-	int nCurrSrcLen = (int)ACE_OS::strlen(pSrc);
-	int nCurrDesLen = (int)ACE_OS::strlen(pDes);
-	if(nDesLen <= 0 || nDesLen <= nCurrSrcLen + nCurrDesLen)
-	{
-		return false;
-	}
-	else
-	{
-		ACE_OS::strcat(pDes, (const char* )pSrc);
-		return true;
-	}
+    int nCurrSrcLen = (int)ACE_OS::strlen(pSrc);
+    int nCurrDesLen = (int)ACE_OS::strlen(pDes);
+
+    if(nDesLen <= 0 || nDesLen <= nCurrSrcLen + nCurrDesLen)
+    {
+        return false;
+    }
+    else
+    {
+        ACE_OS::strcat(pDes, (const char* )pSrc);
+        return true;
+    }
 }
 
 //支持memmove边界检查
 inline bool memmove_safe(char* pSrc, uint32 u4SrcLen, char* pDes, uint32 u4DesLen)
 {
-	if(u4SrcLen > u4DesLen)
-	{
-		return false;
-	}
-	else
-	{
-		ACE_OS::memmove((void* )pDes, (void* )pSrc, (size_t)u4SrcLen);
-		return true;
-	}	
+    if(u4SrcLen > u4DesLen)
+    {
+        return false;
+    }
+    else
+    {
+        ACE_OS::memmove((void* )pDes, (void* )pSrc, (size_t)u4SrcLen);
+        return true;
+    }
 }
 
 //打印指定的Messahe_Block中的信息到屏幕
 inline void Print_Binary(ACE_Message_Block* pMessageBlock)
 {
-	if(NULL != pMessageBlock)
-	{
-		char* pData = pMessageBlock->rd_ptr();
-		int nLen = (int)pMessageBlock->length();
-		OUR_DEBUG((LM_INFO, "[Print_Binary]"));
-		for(int i = 0; i < nLen; i++)
-		{
-			OUR_DEBUG((LM_INFO, " %02x", (unsigned char)pData[i]));
-		}
-		OUR_DEBUG((LM_INFO, "\n"));
-	}
-	else
-	{
-		OUR_DEBUG((LM_INFO, "[Print_Binary]pMessageBlock is NULL.\n"));
-	}
+    if(NULL != pMessageBlock)
+    {
+        char* pData = pMessageBlock->rd_ptr();
+        int nLen = (int)pMessageBlock->length();
+        OUR_DEBUG((LM_INFO, "[Print_Binary]"));
+
+        for(int i = 0; i < nLen; i++)
+        {
+            OUR_DEBUG((LM_INFO, " %02x", (unsigned char)pData[i]));
+        }
+
+        OUR_DEBUG((LM_INFO, "\n"));
+    }
+    else
+    {
+        OUR_DEBUG((LM_INFO, "[Print_Binary]pMessageBlock is NULL.\n"));
+    }
 }
 
 //打印指定的Messahe_Block中的信息到屏幕
 inline void Print_Binary(const char* pData, int nLen)
 {
-	if(NULL != pData)
-	{
-		OUR_DEBUG((LM_INFO, "[Print_Binary]"));
-		for(int i = 0; i < nLen; i++)
-		{
-			OUR_DEBUG((LM_INFO, " %02x", (unsigned char)pData[i]));
-		}
-		OUR_DEBUG((LM_INFO, "\n"));
-	}
-	else
-	{
-		OUR_DEBUG((LM_INFO, "[Print_Binary]pData is NULL.\n"));
-	}
+    if(NULL != pData)
+    {
+        OUR_DEBUG((LM_INFO, "[Print_Binary]"));
+
+        for(int i = 0; i < nLen; i++)
+        {
+            OUR_DEBUG((LM_INFO, " %02x", (unsigned char)pData[i]));
+        }
+
+        OUR_DEBUG((LM_INFO, "\n"));
+    }
+    else
+    {
+        OUR_DEBUG((LM_INFO, "[Print_Binary]pData is NULL.\n"));
+    }
 }
 
 //用于整合获取整数2次幂的函数(内存池应用)
-static inline uint32 is_pow_of_2(uint32 x) {
-		return !(x & (x-1));
+static inline uint32 is_pow_of_2(uint32 x)
+{
+    return !(x & (x-1));
 }
 
-static inline uint32 next_pow_of_2(uint32 x) {
-		if ( is_pow_of_2(x) )
-			return x;
-		x |= x>>1;
-		x |= x>>2;
-		x |= x>>4;
-		x |= x>>8;
-		x |= x>>16;
-		return x+1;
+static inline uint32 next_pow_of_2(uint32 x)
+{
+    if ( is_pow_of_2(x) )
+    {
+        return x;
+    }
+
+    x |= x>>1;
+    x |= x>>2;
+    x |= x>>4;
+    x |= x>>8;
+    x |= x>>16;
+    return x+1;
 }
 
 //标记VCHARS_TYPE的模式
 enum VCHARS_TYPE
 {
-	VCHARS_TYPE_TEXT = 0,      //文本模式
-	VCHARS_TYPE_BINARY,        //二进制模式
+    VCHARS_TYPE_TEXT = 0,      //文本模式
+    VCHARS_TYPE_BINARY,        //二进制模式
 };
 
 #ifndef VCHARS_STR
-typedef  struct _VCHARS_STR 
+typedef  struct _VCHARS_STR
 {
-	char*       text;            //数据指针
-	uint8       u1Len;           //数据长度
-	bool        blCopy;          //是否拷贝数据块，True是拷贝，默认是拷贝
-	bool        blNew;           //是否是new出来的数据
-	VCHARS_TYPE type;            //类型，类型定义见VCHARS_TYPE
+    char*       text;            //数据指针
+    uint8       u1Len;           //数据长度
+    bool        blCopy;          //是否拷贝数据块，True是拷贝，默认是拷贝
+    bool        blNew;           //是否是new出来的数据
+    VCHARS_TYPE type;            //类型，类型定义见VCHARS_TYPE
 
-	_VCHARS_STR(bool blIsCopy = true, VCHARS_TYPE ntype = VCHARS_TYPE_TEXT)
-	{
-		text   = NULL;
-		u1Len  = 0;
-		blCopy = blIsCopy;
-		type   = ntype;
-		blNew  = false;
-	}
+    _VCHARS_STR(bool blIsCopy = true, VCHARS_TYPE ntype = VCHARS_TYPE_TEXT)
+    {
+        text   = NULL;
+        u1Len  = 0;
+        blCopy = blIsCopy;
+        type   = ntype;
+        blNew  = false;
+    }
 
-	~_VCHARS_STR()
-	{
-		if(blNew == true)
-		{
-			delete text;
-		}
-	}
+    ~_VCHARS_STR()
+    {
+        if(blNew == true)
+        {
+            delete text;
+        }
+    }
 
-	void SetData(const char* pData, uint8& u1Length)
-	{
-		if(blCopy == true)
-		{
-			//如果是需要构建新内存，则在这里申请
-			if(blNew == true)
-			{
-				delete text;
-			}
+    void SetData(const char* pData, uint8& u1Length)
+    {
+        if(blCopy == true)
+        {
+            //如果是需要构建新内存，则在这里申请
+            if(blNew == true)
+            {
+                delete text;
+            }
 
-			if(type == VCHARS_TYPE_TEXT)
-			{
-				//文本模式
-				text = new char[u1Length + 1];
-				memcpy_safe((char* )pData, u1Length, text, u1Length);
-				text[u1Length] = '\0';
-				u1Len = u1Length + 1;
-			}
-			else
-			{
-				//二进制模式
-				text = new char[u1Length];
-				memcpy_safe((char* )pData, u1Length, text, u1Length);
-				u1Len = u1Length;
-			}
-			blNew = true;
-		}
-		else
-		{
-			text  = (char* )pData;
-			u1Len = u1Length;
-		}
-	}
+            if(type == VCHARS_TYPE_TEXT)
+            {
+                //文本模式
+                text = new char[u1Length + 1];
+                memcpy_safe((char* )pData, u1Length, text, u1Length);
+                text[u1Length] = '\0';
+                u1Len = u1Length + 1;
+            }
+            else
+            {
+                //二进制模式
+                text = new char[u1Length];
+                memcpy_safe((char* )pData, u1Length, text, u1Length);
+                u1Len = u1Length;
+            }
 
-}VCHARS_STR;
+            blNew = true;
+        }
+        else
+        {
+            text  = (char* )pData;
+            u1Len = u1Length;
+        }
+    }
+
+} VCHARS_STR;
 #endif
 
 #ifndef VCHARM_STR
-typedef  struct _VCHARM_STR 
+typedef  struct _VCHARM_STR
 {
-	char*       text;            //数据指针 
-	uint16      u2Len;           //数据长度
-	bool        blCopy;          //是否拷贝数据块，True是拷贝，默认是拷贝
-	bool        blNew;           //是否是new出来的数据
-	VCHARS_TYPE type;            //类型，类型定义见VCHARS_TYPE
+    char*       text;            //数据指针
+    uint16      u2Len;           //数据长度
+    bool        blCopy;          //是否拷贝数据块，True是拷贝，默认是拷贝
+    bool        blNew;           //是否是new出来的数据
+    VCHARS_TYPE type;            //类型，类型定义见VCHARS_TYPE
 
-	_VCHARM_STR(bool blIsCopy = true, VCHARS_TYPE ntype = VCHARS_TYPE_TEXT)
-	{
-		text   = NULL;
-		u2Len  = 0;
-		blCopy = blIsCopy;
-		type   = ntype;
-		blNew  = false;
-	}
+    _VCHARM_STR(bool blIsCopy = true, VCHARS_TYPE ntype = VCHARS_TYPE_TEXT)
+    {
+        text   = NULL;
+        u2Len  = 0;
+        blCopy = blIsCopy;
+        type   = ntype;
+        blNew  = false;
+    }
 
-	~_VCHARM_STR()
-	{
-		if(blNew == true)
-		{
-			delete text;
-		}
-	}
+    ~_VCHARM_STR()
+    {
+        if(blNew == true)
+        {
+            delete text;
+        }
+    }
 
-	void SetData(const char* pData, uint16& u2Length)
-	{
-		if(blCopy == true)
-		{
-			//如果是需要构建新内存，则在这里申请
-			if(blNew == true)
-			{
-				delete text;
-			}
+    void SetData(const char* pData, uint16& u2Length)
+    {
+        if(blCopy == true)
+        {
+            //如果是需要构建新内存，则在这里申请
+            if(blNew == true)
+            {
+                delete text;
+            }
 
-			if(type == VCHARS_TYPE_TEXT)
-			{
-				//文本模式
-				text = new char[u2Length + 1];
-				memcpy_safe((char* )pData, u2Length, text, u2Length);
-				text[u2Length] = '\0';
-				u2Len = u2Length + 1;
-			}
-			else
-			{
-				//二进制模式
-				text = new char[u2Length];
-				memcpy_safe((char* )pData, u2Length, text, u2Length);
-				u2Len = u2Length;
-			}
-			blNew = true;
-		}
-		else
-		{
-			text  = (char* )pData;
-			u2Len = u2Length;
-		}
-	}
+            if(type == VCHARS_TYPE_TEXT)
+            {
+                //文本模式
+                text = new char[u2Length + 1];
+                memcpy_safe((char* )pData, u2Length, text, u2Length);
+                text[u2Length] = '\0';
+                u2Len = u2Length + 1;
+            }
+            else
+            {
+                //二进制模式
+                text = new char[u2Length];
+                memcpy_safe((char* )pData, u2Length, text, u2Length);
+                u2Len = u2Length;
+            }
 
-}VCHARM_STR;
+            blNew = true;
+        }
+        else
+        {
+            text  = (char* )pData;
+            u2Len = u2Length;
+        }
+    }
+
+} VCHARM_STR;
 #endif
 
 #ifndef VCHARB_STR
-typedef  struct _VCHARB_STR 
+typedef  struct _VCHARB_STR
 {
-	char*       text;            //数据指针 
-	uint32      u4Len;           //数据长度
-	bool        blCopy;          //是否拷贝数据块，True是拷贝，默认是拷贝
-	bool        blNew;           //是否是new出来的数据
-	VCHARS_TYPE type;            //类型，类型定义见VCHARS_TYPE
+    char*       text;            //数据指针
+    uint32      u4Len;           //数据长度
+    bool        blCopy;          //是否拷贝数据块，True是拷贝，默认是拷贝
+    bool        blNew;           //是否是new出来的数据
+    VCHARS_TYPE type;            //类型，类型定义见VCHARS_TYPE
 
-	_VCHARB_STR(bool blIsCopy = true, VCHARS_TYPE ntype = VCHARS_TYPE_TEXT)
-	{
-		text   = NULL;
-		u4Len  = 0;
-		blCopy = blIsCopy;
-		type   = ntype;
-		blNew  = false;
-	}
+    _VCHARB_STR(bool blIsCopy = true, VCHARS_TYPE ntype = VCHARS_TYPE_TEXT)
+    {
+        text   = NULL;
+        u4Len  = 0;
+        blCopy = blIsCopy;
+        type   = ntype;
+        blNew  = false;
+    }
 
-	~_VCHARB_STR()
-	{
-		if(blNew == true)
-		{
-			delete text;
-		}
-	}
+    ~_VCHARB_STR()
+    {
+        if(blNew == true)
+        {
+            delete text;
+        }
+    }
 
-	void SetData(const char* pData, uint32& u4Length)
-	{
-		if(blCopy == true)
-		{
-			//如果是需要构建新内存，则在这里申请
-			if(blNew == true)
-			{
-				delete text;
-			}
+    void SetData(const char* pData, uint32& u4Length)
+    {
+        if(blCopy == true)
+        {
+            //如果是需要构建新内存，则在这里申请
+            if(blNew == true)
+            {
+                delete text;
+            }
 
-			if(type == VCHARS_TYPE_TEXT)
-			{
-				//文本模式
-				text = new char[u4Length + 1];
-				memcpy_safe((char* )pData, u4Length, text, u4Length);
-				text[u4Length] = '\0';
-				u4Len = u4Length + 1;
-			}
-			else
-			{
-				//二进制模式
-				text = new char[u4Length];
-				memcpy_safe((char* )pData, u4Length, text, u4Length);
-				u4Len = u4Length;
-			}
-			blNew = true;
-		}
-		else
-		{
-			text  = (char* )pData;
-			u4Len = u4Length;
-		}
-	}
+            if(type == VCHARS_TYPE_TEXT)
+            {
+                //文本模式
+                text = new char[u4Length + 1];
+                memcpy_safe((char* )pData, u4Length, text, u4Length);
+                text[u4Length] = '\0';
+                u4Len = u4Length + 1;
+            }
+            else
+            {
+                //二进制模式
+                text = new char[u4Length];
+                memcpy_safe((char* )pData, u4Length, text, u4Length);
+                u4Len = u4Length;
+            }
 
-}VCHARB_STR;
+            blNew = true;
+        }
+        else
+        {
+            text  = (char* )pData;
+            u4Len = u4Length;
+        }
+    }
+
+} VCHARB_STR;
 #endif
 
 //定义PacketParse的相关消息体
 //数据包头结构
 struct _Head_Info
 {
-	uint32             m_u4HeadSrcLen;       //原始数据包头长（解析前）
-	uint32	           m_u4HeadCurrLen;      //当前数据包长 （解析后）
-	uint16             m_u2PacketCommandID;  //CommandID
-	uint32             m_u4BodySrcLen;       //当前包体长度（解析前）
-	ACE_Message_Block* m_pmbHead;            //包头消息体
+    uint32             m_u4HeadSrcLen;       //原始数据包头长（解析前）
+    uint32             m_u4HeadCurrLen;      //当前数据包长 （解析后）
+    uint16             m_u2PacketCommandID;  //CommandID
+    uint32             m_u4BodySrcLen;       //当前包体长度（解析前）
+    ACE_Message_Block* m_pmbHead;            //包头消息体
 
-	_Head_Info()
-	{
-		m_u4HeadSrcLen      = 0;
-		m_u4HeadCurrLen     = 0;
-		m_u2PacketCommandID = 0;
-		m_pmbHead           = NULL;
-	}
+    _Head_Info()
+    {
+        m_u4HeadSrcLen      = 0;
+        m_u4HeadCurrLen     = 0;
+        m_u2PacketCommandID = 0;
+        m_pmbHead           = NULL;
+    }
 };
 
 //数据包体结构
 struct _Body_Info
 {
-	uint32             m_u4BodySrcLen;       //原始数据包体长（解析前）
-	uint32	           m_u4BodyCurrLen;      //当前数据包长 （解析后）
-	uint16             m_u2PacketCommandID;  //CommandID(如果有，则直接赋值，如果没有，则保持初始值不变)
-	ACE_Message_Block* m_pmbBody;            //包头消息体
+    uint32             m_u4BodySrcLen;       //原始数据包体长（解析前）
+    uint32             m_u4BodyCurrLen;      //当前数据包长 （解析后）
+    uint16             m_u2PacketCommandID;  //CommandID(如果有，则直接赋值，如果没有，则保持初始值不变)
+    ACE_Message_Block* m_pmbBody;            //包头消息体
 
-	_Body_Info()
-	{
-		m_u4BodySrcLen      = 0;
-		m_u4BodyCurrLen     = 0;
-		m_u2PacketCommandID = 0;
-		m_pmbBody           = NULL;
-	}
+    _Body_Info()
+    {
+        m_u4BodySrcLen      = 0;
+        m_u4BodyCurrLen     = 0;
+        m_u2PacketCommandID = 0;
+        m_pmbBody           = NULL;
+    }
 };
 
 //数据包完整结构
 struct _Packet_Info
 {
-	uint32             m_u4HeadSrcLen;       //原始数据包头长（解析钱）
-	uint32	           m_u4HeadCurrLen;      //当前数据包长 （解析后）
-	uint16             m_u2PacketCommandID;  //CommandID
-	ACE_Message_Block* m_pmbHead;            //包头消息体
+    uint32             m_u4HeadSrcLen;       //原始数据包头长（解析前）
+    uint32             m_u4HeadCurrLen;      //当前数据包长 （解析后）
+    uint16             m_u2PacketCommandID;  //CommandID
+    ACE_Message_Block* m_pmbHead;            //包头消息体
 
-	uint32             m_u4BodySrcLen;       //原始数据包头长（解析钱）
-	uint32	           m_u4BodyCurrLen;      //当前数据包长 （解析后）
-	ACE_Message_Block* m_pmbBody;            //包头消息体
+    uint32             m_u4BodySrcLen;       //原始数据包头长（解析前）
+    uint32             m_u4BodyCurrLen;      //当前数据包长 （解析后）
+    ACE_Message_Block* m_pmbBody;            //包头消息体
 
-	_Packet_Info()
-	{
-		m_u4HeadSrcLen      = 0;
-		m_u4HeadCurrLen     = 0;
-		m_u2PacketCommandID = 0;
-		m_pmbHead           = NULL;
+    _Packet_Info()
+    {
+        m_u4HeadSrcLen      = 0;
+        m_u4HeadCurrLen     = 0;
+        m_u2PacketCommandID = 0;
+        m_pmbHead           = NULL;
 
-		m_u4BodySrcLen      = 0;
-		m_u4BodyCurrLen     = 0;
-		m_pmbBody           = NULL;
-	}
+        m_u4BodySrcLen      = 0;
+        m_u4BodyCurrLen     = 0;
+        m_pmbBody           = NULL;
+    }
 };
 
 //用于记录数据包头信息
@@ -744,214 +763,214 @@ struct _Packet_Info
 class IPacketHeadInfo
 {
 public:
-	IPacketHeadInfo() {};
-	virtual ~IPacketHeadInfo() {};
+    IPacketHeadInfo() {};
+    virtual ~IPacketHeadInfo() {};
 };
 
 //定时监控数据包和流量的数据信息，用于链接有效性的逻辑判定
 struct _TimeConnectInfo
 {
-	uint8  m_u1Minutes;               //当前的分钟数
-	uint32 m_u4RecvPacketCount;       //当前接收包数量
-	uint32 m_u4RecvSize;              //当前接收数据量
-	uint32 m_u4SendPacketCount;       //当前发送包数量
-	uint32 m_u4SendSize;              //当前发送数据量
+    uint8  m_u1Minutes;               //当前的分钟数
+    uint32 m_u4RecvPacketCount;       //当前接收包数量
+    uint32 m_u4RecvSize;              //当前接收数据量
+    uint32 m_u4SendPacketCount;       //当前发送包数量
+    uint32 m_u4SendSize;              //当前发送数据量
 
-	uint32 m_u4ValidRecvPacketCount;  //单位时间可允许接收数据包的上限
-	uint32 m_u4ValidRecvSize;         //单位时间可允许的数据接收量
-	uint32 m_u4ValidSendPacketCount;  //单位时间可允许数据数据包的上限
-	uint32 m_u4ValidSendSize;         //单位时间可允许的数据发送量
+    uint32 m_u4ValidRecvPacketCount;  //单位时间可允许接收数据包的上限
+    uint32 m_u4ValidRecvSize;         //单位时间可允许的数据接收量
+    uint32 m_u4ValidSendPacketCount;  //单位时间可允许数据数据包的上限
+    uint32 m_u4ValidSendSize;         //单位时间可允许的数据发送量
 
-	_TimeConnectInfo()
-	{ 
-		m_u1Minutes              = 0;
-		m_u4RecvPacketCount      = 0;
-		m_u4RecvSize             = 0;
-		m_u4SendPacketCount      = 0;
-		m_u4SendSize             = 0;
+    _TimeConnectInfo()
+    {
+        m_u1Minutes              = 0;
+        m_u4RecvPacketCount      = 0;
+        m_u4RecvSize             = 0;
+        m_u4SendPacketCount      = 0;
+        m_u4SendSize             = 0;
 
-		m_u4ValidRecvPacketCount = 0;
-		m_u4ValidRecvSize        = 0;
-		m_u4ValidSendPacketCount = 0;
-		m_u4ValidSendSize        = 0;
-	}
+        m_u4ValidRecvPacketCount = 0;
+        m_u4ValidRecvSize        = 0;
+        m_u4ValidSendPacketCount = 0;
+        m_u4ValidSendSize        = 0;
+    }
 
-	void Init(uint32 u4RecvPacketCount, uint32 u4RecvSize, uint32 u4SendPacketCount, uint32 u4ValidSendSize)
-	{
-		m_u1Minutes              = 0;
-		m_u4RecvPacketCount      = 0;
-		m_u4RecvSize             = 0;
-		m_u4SendPacketCount      = 0;
-		m_u4SendSize             = 0;
+    void Init(uint32 u4RecvPacketCount, uint32 u4RecvSize, uint32 u4SendPacketCount, uint32 u4ValidSendSize)
+    {
+        m_u1Minutes              = 0;
+        m_u4RecvPacketCount      = 0;
+        m_u4RecvSize             = 0;
+        m_u4SendPacketCount      = 0;
+        m_u4SendSize             = 0;
 
-		m_u4ValidRecvPacketCount = u4RecvPacketCount;
-		m_u4ValidRecvSize        = u4RecvSize;
-		m_u4ValidSendPacketCount = u4SendPacketCount;
-		m_u4ValidSendSize        = u4ValidSendSize;
-	}
+        m_u4ValidRecvPacketCount = u4RecvPacketCount;
+        m_u4ValidRecvSize        = u4RecvSize;
+        m_u4ValidSendPacketCount = u4SendPacketCount;
+        m_u4ValidSendSize        = u4ValidSendSize;
+    }
 
-	bool RecvCheck(uint8 u1Minutes, uint16 u2PacketCount, uint32 u4RecvSize)
-	{
-		if(m_u1Minutes != u1Minutes)
-		{
-			m_u1Minutes         = u1Minutes;
-			m_u4RecvPacketCount = u2PacketCount;
-			m_u4RecvSize        = u4RecvSize;
-		}
-		else
-		{
-			m_u4RecvPacketCount += u2PacketCount;
-			m_u4RecvSize        += u4RecvSize;
-		}
+    bool RecvCheck(uint8 u1Minutes, uint16 u2PacketCount, uint32 u4RecvSize)
+    {
+        if(m_u1Minutes != u1Minutes)
+        {
+            m_u1Minutes         = u1Minutes;
+            m_u4RecvPacketCount = u2PacketCount;
+            m_u4RecvSize        = u4RecvSize;
+        }
+        else
+        {
+            m_u4RecvPacketCount += u2PacketCount;
+            m_u4RecvSize        += u4RecvSize;
+        }
 
-		if(m_u4ValidRecvPacketCount > 0)
-		{
-			//需要比较
-			if(m_u4RecvPacketCount > m_u4ValidRecvPacketCount)
-			{
-				return false;
-			}
-		}
+        if(m_u4ValidRecvPacketCount > 0)
+        {
+            //需要比较
+            if(m_u4RecvPacketCount > m_u4ValidRecvPacketCount)
+            {
+                return false;
+            }
+        }
 
-		if(m_u4ValidRecvSize > 0)
-		{
-			//需要比较
-			if(u4RecvSize > m_u4ValidRecvSize)
-			{
-				return false;
-			}
-		}
+        if(m_u4ValidRecvSize > 0)
+        {
+            //需要比较
+            if(u4RecvSize > m_u4ValidRecvSize)
+            {
+                return false;
+            }
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	bool SendCheck(uint8 u1Minutes, uint16 u2PacketCount, uint32 u4SendSize)
-	{
-		if(m_u1Minutes != u1Minutes)
-		{
-			m_u1Minutes         = u1Minutes;
-			m_u4SendPacketCount = u2PacketCount;
-			m_u4RecvSize        = u4SendSize;
-		}
-		else
-		{
-			m_u4SendPacketCount += u2PacketCount;
-			m_u4RecvSize        += u4SendSize;
-		}
+    bool SendCheck(uint8 u1Minutes, uint16 u2PacketCount, uint32 u4SendSize)
+    {
+        if(m_u1Minutes != u1Minutes)
+        {
+            m_u1Minutes         = u1Minutes;
+            m_u4SendPacketCount = u2PacketCount;
+            m_u4RecvSize        = u4SendSize;
+        }
+        else
+        {
+            m_u4SendPacketCount += u2PacketCount;
+            m_u4RecvSize        += u4SendSize;
+        }
 
-		if(m_u4ValidSendPacketCount > 0)
-		{
-			//需要比较
-			if(m_u4SendPacketCount > m_u4ValidSendPacketCount)
-			{
-				return false;
-			}
-		}
+        if(m_u4ValidSendPacketCount > 0)
+        {
+            //需要比较
+            if(m_u4SendPacketCount > m_u4ValidSendPacketCount)
+            {
+                return false;
+            }
+        }
 
-		if(m_u4ValidSendSize > 0)
-		{
-			//需要比较
-			if(u4SendSize > m_u4ValidSendSize)
-			{
-				return false;
-			}
-		}
+        if(m_u4ValidSendSize > 0)
+        {
+            //需要比较
+            if(u4SendSize > m_u4ValidSendSize)
+            {
+                return false;
+            }
+        }
 
-		return true;
-	}
+        return true;
+    }
 };
 
 //定时器参数的设置结构
-struct _TimerCheckID 
+struct _TimerCheckID
 {
-	uint16 m_u2TimerCheckID;
+    uint16 m_u2TimerCheckID;
 
-	_TimerCheckID()
-	{
-		m_u2TimerCheckID = 0;
-	}
+    _TimerCheckID()
+    {
+        m_u2TimerCheckID = 0;
+    }
 };
 
 //Message里面数据块结构体
 struct _PacketInfo
 {
-	char*   m_pData;            //解析后的数据头指针
-	int     m_nDataLen;         //解析后的数据长度
+    char*   m_pData;            //解析后的数据头指针
+    int     m_nDataLen;         //解析后的数据长度
 
-	_PacketInfo()
-	{
-		m_pData       = NULL;
-		m_nDataLen    = 0;
-	}
+    _PacketInfo()
+    {
+        m_pData       = NULL;
+        m_nDataLen    = 0;
+    }
 };
 
 //客户端链接信息数据结构
 struct _ClientConnectInfo
 {
-	bool          m_blValid;              //当前链接是否有效
-	uint32        m_u4ConnectID;          //链接ID
-	ACE_INET_Addr m_addrRemote;           //远程链接地址
-	uint32        m_u4RecvCount;          //接收包数量
-	uint32        m_u4SendCount;          //发送包数量
-	uint32        m_u4AllRecvSize;        //接收字节数
-	uint32        m_u4AllSendSize;        //发送字节数
-	uint32        m_u4BeginTime;          //链接建立时间
-	uint32        m_u4AliveTime;          //存活时间秒数
-	uint32        m_u4RecvQueueCount;     //接受逻辑处理包的个数
-	uint64        m_u8RecvQueueTimeCost;  //接受逻辑处理包总时间消耗
-	uint64        m_u8SendQueueTimeCost;  //发送数据总时间消耗
+    bool          m_blValid;              //当前链接是否有效
+    uint32        m_u4ConnectID;          //链接ID
+    ACE_INET_Addr m_addrRemote;           //远程链接地址
+    uint32        m_u4RecvCount;          //接收包数量
+    uint32        m_u4SendCount;          //发送包数量
+    uint32        m_u4AllRecvSize;        //接收字节数
+    uint32        m_u4AllSendSize;        //发送字节数
+    uint32        m_u4BeginTime;          //链接建立时间
+    uint32        m_u4AliveTime;          //存活时间秒数
+    uint32        m_u4RecvQueueCount;     //接受逻辑处理包的个数
+    uint64        m_u8RecvQueueTimeCost;  //接受逻辑处理包总时间消耗
+    uint64        m_u8SendQueueTimeCost;  //发送数据总时间消耗
 
-	_ClientConnectInfo()
-	{
-		m_blValid             = false;
-		m_u4ConnectID         = 0;
-		m_u4RecvCount         = 0;
-		m_u4SendCount         = 0;
-		m_u4AllRecvSize       = 0;
-		m_u4AllSendSize       = 0;
-		m_u4BeginTime         = 0;
-		m_u4AliveTime         = 0;
-		m_u4RecvQueueCount    = 0;
-		m_u8RecvQueueTimeCost = 0;
-		m_u8SendQueueTimeCost = 0;
-	}
+    _ClientConnectInfo()
+    {
+        m_blValid             = false;
+        m_u4ConnectID         = 0;
+        m_u4RecvCount         = 0;
+        m_u4SendCount         = 0;
+        m_u4AllRecvSize       = 0;
+        m_u4AllSendSize       = 0;
+        m_u4BeginTime         = 0;
+        m_u4AliveTime         = 0;
+        m_u4RecvQueueCount    = 0;
+        m_u8RecvQueueTimeCost = 0;
+        m_u8SendQueueTimeCost = 0;
+    }
 
-	_ClientConnectInfo& operator = (const _ClientConnectInfo& ar)
-	{
-		this->m_blValid             = ar.m_blValid;
-		this->m_u4ConnectID         = ar.m_u4ConnectID;
-		this->m_addrRemote          = ar.m_addrRemote;
-		this->m_u4RecvCount         = ar.m_u4RecvCount;
-		this->m_u4SendCount         = ar.m_u4SendCount;
-		this->m_u4AllRecvSize       = ar.m_u4AllRecvSize;
-		this->m_u4AllSendSize       = ar.m_u4AllSendSize;
-		this->m_u4BeginTime         = ar.m_u4BeginTime;
-		this->m_u4AliveTime         = ar.m_u4AliveTime;
-		this->m_u4RecvQueueCount    = ar.m_u4RecvQueueCount;
-		this->m_u8RecvQueueTimeCost = ar.m_u8RecvQueueTimeCost;
-		this->m_u8SendQueueTimeCost = ar.m_u8SendQueueTimeCost;
-		return *this;
-	}
+    _ClientConnectInfo& operator = (const _ClientConnectInfo& ar)
+    {
+        this->m_blValid             = ar.m_blValid;
+        this->m_u4ConnectID         = ar.m_u4ConnectID;
+        this->m_addrRemote          = ar.m_addrRemote;
+        this->m_u4RecvCount         = ar.m_u4RecvCount;
+        this->m_u4SendCount         = ar.m_u4SendCount;
+        this->m_u4AllRecvSize       = ar.m_u4AllRecvSize;
+        this->m_u4AllSendSize       = ar.m_u4AllSendSize;
+        this->m_u4BeginTime         = ar.m_u4BeginTime;
+        this->m_u4AliveTime         = ar.m_u4AliveTime;
+        this->m_u4RecvQueueCount    = ar.m_u4RecvQueueCount;
+        this->m_u8RecvQueueTimeCost = ar.m_u8RecvQueueTimeCost;
+        this->m_u8SendQueueTimeCost = ar.m_u8SendQueueTimeCost;
+        return *this;
+    }
 };
 typedef vector<_ClientConnectInfo> vecClientConnectInfo;
 
 //要连接的服务器信息
 struct _ServerConnectInfo
 {
-	uint32      m_u4ServerID;     //服务器的ID
-	ACE_TString m_strServerName;  //服务器的名称
-	ACE_TString m_strServerIP;    //服务器的IP
-	uint32      m_u4ServerPort;   //服务器的端口
-	uint32      m_u4MaxConn;      //服务器的最大线程连接数
-	uint32      m_u4TimeOut;      //服务器的链接超时时间
+    uint32      m_u4ServerID;     //服务器的ID
+    ACE_TString m_strServerName;  //服务器的名称
+    ACE_TString m_strServerIP;    //服务器的IP
+    uint32      m_u4ServerPort;   //服务器的端口
+    uint32      m_u4MaxConn;      //服务器的最大线程连接数
+    uint32      m_u4TimeOut;      //服务器的链接超时时间
 
-	_ServerConnectInfo()
-	{
-		m_u4ServerID   = 0;
-		m_u4ServerPort = 0;
-		m_u4MaxConn    = 0;
-		m_u4TimeOut    = 0;
-	}
+    _ServerConnectInfo()
+    {
+        m_u4ServerID   = 0;
+        m_u4ServerPort = 0;
+        m_u4MaxConn    = 0;
+        m_u4TimeOut    = 0;
+    }
 };
 
 #ifndef SAFE_DELETE
@@ -970,23 +989,23 @@ struct _ServerConnectInfo
 inline void __show__( const char* szTemp)
 {
 #ifdef WIN32
-	printf_s("[__show__]%s.\n", szTemp);
+    printf_s("[__show__]%s.\n", szTemp);
 #else
-	printf("[__show__]%s.\n", szTemp);
+    printf("[__show__]%s.\n", szTemp);
 #endif
 
-	FILE* f = ACE_OS::fopen(ASSERT_LOG_PATH, "a") ;
-	ACE_OS::fwrite( szTemp, strlen(szTemp), sizeof(char), f) ;
-	ACE_OS::fwrite( "\r\n", 1, 2*sizeof(char), f);
-	fclose(f);
+    FILE* f = ACE_OS::fopen(ASSERT_LOG_PATH, "a") ;
+    ACE_OS::fwrite( szTemp, strlen(szTemp), sizeof(char), f) ;
+    ACE_OS::fwrite( "\r\n", 1, 2*sizeof(char), f);
+    fclose(f);
 };
 
 inline void __assertspecial__(const char* file, int line, const char* func, const char* expr, const char* msg)
 {
-	char szTemp[2*MAX_BUFF_1024] = {0};
+    char szTemp[2*MAX_BUFF_1024] = {0};
 
-	sprintf_safe( szTemp, 2*MAX_BUFF_1024, "Alert[%s][%d][%s][%s][%s]", file, line, func, expr ,msg) ;
-	__show__(szTemp) ;
+    sprintf_safe( szTemp, 2*MAX_BUFF_1024, "Alert[%s][%d][%s][%s][%s]", file, line, func, expr,msg) ;
+    __show__(szTemp) ;
 };
 
 #if defined(WIN32)
@@ -1000,12 +1019,12 @@ inline void __assertspecial__(const char* file, int line, const char* func, cons
 #define __THROW_FUNCTION(msg) throw(msg)
 #define __LEAVE_FUNCTION() }catch(char* msg){AssertSpecial(false,msg); }}
 #define __LEAVE_FUNCTION_WITHRETURN(ret) }catch(char* msg){AssertSpecial(false,msg); return ret; }}
-#else	//linux
+#else   //linux
 #define __ENTER_FUNCTION() {try{
 #define __THROW_FUNCTION(msg) throw(msg)
 #define __LEAVE_FUNCTION() }catch(char* msg){AssertSpecial(false,msg);}}
 #define __LEAVE_FUNCTION_WITHRETURN(ret) }catch(char* msg){AssertSpecial(false,msg); return ret; }}
-#endif 
+#endif
 
 //************************************************************************
 
@@ -1016,68 +1035,70 @@ inline void __assertspecial__(const char* file, int line, const char* func, cons
 class CTimeCost
 {
 public:
-	CTimeCost(int nMillionSecond, const char* pFunctionName, const char* pFileName, int nLine) 
-	{
-		m_nMillionSecond = nMillionSecond;
-		sprintf_safe(m_szFunctionName, MAX_BUFF_100, "%s", pFunctionName);
-		sprintf_safe(m_szFileName, MAX_BUFF_300, "%s", pFileName);
-		m_nFileLine = nLine;
-		TimeBegin();
+    CTimeCost(int nMillionSecond, const char* pFunctionName, const char* pFileName, int nLine)
+    {
+        m_nMillionSecond = nMillionSecond;
+        sprintf_safe(m_szFunctionName, MAX_BUFF_100, "%s", pFunctionName);
+        sprintf_safe(m_szFileName, MAX_BUFF_300, "%s", pFileName);
+        m_nFileLine = nLine;
+        TimeBegin();
     }
 
-	~CTimeCost()
-	{
-		TimeEnd();
+    ~CTimeCost()
+    {
+        TimeEnd();
     }
 
-	void TimeBegin()
-	{
-		m_lBegin = GetSystemTickCount();
+    void TimeBegin()
+    {
+        m_lBegin = GetSystemTickCount();
     }
 
-	void TimeEnd()
-	{
-		m_lEnd = GetSystemTickCount();
-		long lTimeInterval = m_lEnd - m_lBegin;  //转换成毫秒
-		if(lTimeInterval >= (long)m_nMillionSecond)
-		{
-			char szLog[MAX_BUFF_1024];
-			//记录日志
-			FILE* pFile = ACE_OS::fopen(ASSERT_TIME_PATH, "a+");
-			if(pFile != NULL)
-			{
-				char szTimeNow[MAX_BUFF_50];
-				time_t tNow = time(NULL);
-				struct tm* tmNow = ACE_OS::localtime(&tNow);
-				sprintf_safe(szTimeNow, MAX_BUFF_50, "%04d-%02d-%02d %02d:%02d:%02d", tmNow->tm_year + 1900, tmNow->tm_mon + 1, tmNow->tm_mday, tmNow->tm_hour, tmNow->tm_min, tmNow->tm_sec);
-				sprintf_safe(szLog, MAX_BUFF_1024, "[%s]dbTimeInterval more than (%d) < (%d), File(%s):FunName(%s):Line(%d).\n", szTimeNow, m_nMillionSecond, lTimeInterval, m_szFileName, m_szFunctionName, m_nFileLine);
-				ACE_OS::fwrite(szLog, strlen(szLog), sizeof(char), pFile);
-				ACE_OS::fclose(pFile);
-			}
-		}
+    void TimeEnd()
+    {
+        m_lEnd = GetSystemTickCount();
+        long lTimeInterval = m_lEnd - m_lBegin;  //转换成毫秒
+
+        if(lTimeInterval >= (long)m_nMillionSecond)
+        {
+            char szLog[MAX_BUFF_1024];
+            //记录日志
+            FILE* pFile = ACE_OS::fopen(ASSERT_TIME_PATH, "a+");
+
+            if(pFile != NULL)
+            {
+                char szTimeNow[MAX_BUFF_50];
+                time_t tNow = time(NULL);
+                struct tm* tmNow = ACE_OS::localtime(&tNow);
+                sprintf_safe(szTimeNow, MAX_BUFF_50, "%04d-%02d-%02d %02d:%02d:%02d", tmNow->tm_year + 1900, tmNow->tm_mon + 1, tmNow->tm_mday, tmNow->tm_hour, tmNow->tm_min, tmNow->tm_sec);
+                sprintf_safe(szLog, MAX_BUFF_1024, "[%s]dbTimeInterval more than (%d) < (%d), File(%s):FunName(%s):Line(%d).\n", szTimeNow, m_nMillionSecond, lTimeInterval, m_szFileName, m_szFunctionName, m_nFileLine);
+                ACE_OS::fwrite(szLog, strlen(szLog), sizeof(char), pFile);
+                ACE_OS::fclose(pFile);
+            }
+        }
     }
 
 private:
-	unsigned long GetSystemTickCount()
-	{
+    unsigned long GetSystemTickCount()
+    {
 #ifdef WIN32
-		return GetTickCount();
+        return GetTickCount();
 #else
-		struct timespec ts;
+        struct timespec ts;
 
-		clock_gettime(CLOCK_MONOTONIC, &ts);
+        clock_gettime(CLOCK_MONOTONIC, &ts);
 
-		return (ts.tv_sec * 1000 + ts.tv_nsec / 1000000);
+        return (ts.tv_sec * 1000 + ts.tv_nsec / 1000000);
 #endif
-	}
+    }
 
 private:
-	long         m_lBegin;
-	long         m_lEnd;
-	unsigned int m_nMillionSecond;
-	char         m_szFunctionName[MAX_BUFF_100];
-	char         m_szFileName[MAX_BUFF_300];
-	int          m_nFileLine;
+    long         m_lBegin;
+    long         m_lEnd;
+    unsigned int m_nMillionSecond;
+    char         m_szFunctionName[MAX_BUFF_100];
+    char         m_szFileName[MAX_BUFF_300];
+    int          m_nFileLine;
 };
 
 #define __TIMECOST(cost) CTimeCost timecost(cost, __FUNCTION__, __FILE__, __LINE__);
@@ -1089,48 +1110,60 @@ private:
 //在框架里自己判定是否转换大小端
 enum
 {
-	O32_LITTLE_ENDIAN = 0x03020100ul,
-	O32_BIG_ENDIAN = 0x00010203ul,
-	O32_PDP_ENDIAN = 0x01000302ul
+    O32_LITTLE_ENDIAN = 0x03020100ul,
+    O32_BIG_ENDIAN = 0x00010203ul,
+    O32_PDP_ENDIAN = 0x01000302ul
 };
 
-static const union { unsigned char bytes[4]; uint32 value; } o32_host_order =
+static const union
+{
+    unsigned char bytes[4];
+    uint32 value;
+} o32_host_order =
 { { 0, 1, 2, 3 } };
 
 #define O32_HOST_ORDER (o32_host_order.value)
 
 //定义一个对64位长整形的网络字节序的转换
-inline uint64 hl64ton(uint64 u8Data)   
-{   
-	if(O32_HOST_ORDER == O32_LITTLE_ENDIAN)
-	{
-		union { uint32 lv[2]; uint64 llv; } u;  
-		u.lv[0] = htonl(u8Data >> 32);  
-		u.lv[1] = htonl(u8Data & 0xFFFFFFFFULL);  
-		return u.llv;   
-	}
-	else
-	{
-		//如果本身是大端就不理
-		return u8Data;
-	}
-  
+inline uint64 hl64ton(uint64 u8Data)
+{
+    if(O32_HOST_ORDER == O32_LITTLE_ENDIAN)
+    {
+        union
+        {
+            uint32 lv[2];
+            uint64 llv;
+        } u;
+        u.lv[0] = htonl(u8Data >> 32);
+        u.lv[1] = htonl(u8Data & 0xFFFFFFFFULL);
+        return u.llv;
+    }
+    else
+    {
+        //如果本身是大端就不理
+        return u8Data;
+    }
+
 }
 
 //定义一个队64位长整形的主机字节序的转换
-inline uint64 ntohl64(uint64 u8Data)   
-{   
-	if(O32_HOST_ORDER == O32_LITTLE_ENDIAN)
-	{
-		union { uint32 lv[2]; uint64 llv; } u;  
-		u.llv = u8Data;  
-		return ((uint64)ntohl(u.lv[0]) << 32) | (uint64)ntohl(u.lv[1]);
-	}
-	else
-	{
-		//如果本身是大端就不理
-		return u8Data;
-	}
+inline uint64 ntohl64(uint64 u8Data)
+{
+    if(O32_HOST_ORDER == O32_LITTLE_ENDIAN)
+    {
+        union
+        {
+            uint32 lv[2];
+            uint64 llv;
+        } u;
+        u.llv = u8Data;
+        return ((uint64)ntohl(u.lv[0]) << 32) | (uint64)ntohl(u.lv[1]);
+    }
+    else
+    {
+        //如果本身是大端就不理
+        return u8Data;
+    }
 }
 
 //定义一个函数，可支持字符串替换，目前先不考虑支持中文
@@ -1138,95 +1171,95 @@ inline bool Replace_String(char* pText, uint32 u4Len, const char* pOld, const ch
 {
     char* pTempSrc = new char[u4Len];
 
-	memcpy_safe(pText, u4Len, pTempSrc, u4Len);
-	pTempSrc[u4Len - 1] = '\0';
+    memcpy_safe(pText, u4Len, pTempSrc, u4Len);
+    pTempSrc[u4Len - 1] = '\0';
 
-	uint16 u2NewLen = (uint16)ACE_OS::strlen(pNew);
+    uint16 u2NewLen = (uint16)ACE_OS::strlen(pNew);
 
-	char* pPos = ACE_OS::strstr(pTempSrc, pOld); 
+    char* pPos = ACE_OS::strstr(pTempSrc, pOld);
 
-	while(pPos)
-	{
-		//计算出需要覆盖的字符串长度
-		uint32 u4PosLen = (uint32)(pPos - pTempSrc);
+    while(pPos)
+    {
+        //计算出需要覆盖的字符串长度
+        uint32 u4PosLen = (uint32)(pPos - pTempSrc);
 
-		//黏贴最前面的
-		memcpy_safe(pText, u4PosLen, pTempSrc, u4PosLen);
-		pText[u4PosLen] = '\0';
+        //黏贴最前面的
+        memcpy_safe(pText, u4PosLen, pTempSrc, u4PosLen);
+        pText[u4PosLen] = '\0';
 
-		if(u4PosLen + u2NewLen >= (uint32)u4Len)
-		{
-			//清理中间变量
-			delete[] pTempSrc;
-			return false;		
-		}
-		else
-		{
-			//黏贴新字符
-			memcpy_safe(pText, u2NewLen, &pText[u4PosLen], u2NewLen);
-			pText[u4PosLen + u2NewLen] = '\0';
+        if(u4PosLen + u2NewLen >= (uint32)u4Len)
+        {
+            //清理中间变量
+            delete[] pTempSrc;
+            return false;
+        }
+        else
+        {
+            //黏贴新字符
+            memcpy_safe(pText, u2NewLen, &pText[u4PosLen], u2NewLen);
+            pText[u4PosLen + u2NewLen] = '\0';
 
-			//指针向后移动	
-			pTempSrc = 	pTempSrc + u4PosLen;
+            //指针向后移动
+            pTempSrc =  pTempSrc + u4PosLen;
 
-			//寻找下一个相同的字符串
-			pPos = ACE_OS::strstr(pTempSrc, pOld); 
-		}
+            //寻找下一个相同的字符串
+            pPos = ACE_OS::strstr(pTempSrc, pOld);
+        }
 
-	}
+    }
 
-	//清理中间变量
-	delete[] pTempSrc;
-	return true;
+    //清理中间变量
+    delete[] pTempSrc;
+    return true;
 }
 
 //客户端IP信息
 struct _ClientIPInfo
 {
-	char m_szClientIP[MAX_BUFF_50];   //客户端的IP地址
-	int  m_nPort;                     //客户端的端口
+    char m_szClientIP[MAX_BUFF_50];   //客户端的IP地址
+    int  m_nPort;                     //客户端的端口
 
-	_ClientIPInfo()
-	{
-		m_szClientIP[0] = '\0';
-		m_nPort         = 0;
-	}
+    _ClientIPInfo()
+    {
+        m_szClientIP[0] = '\0';
+        m_nPort         = 0;
+    }
 
-	_ClientIPInfo& operator = (const _ClientIPInfo& ar)
-	{
-		sprintf_safe(this->m_szClientIP, MAX_BUFF_50, "%s", ar.m_szClientIP);
-		this->m_nPort = ar.m_nPort;
-		return *this;
-	}
+    _ClientIPInfo& operator = (const _ClientIPInfo& ar)
+    {
+        sprintf_safe(this->m_szClientIP, MAX_BUFF_50, "%s", ar.m_szClientIP);
+        this->m_nPort = ar.m_nPort;
+        return *this;
+    }
 };
 
 //链接别名映射信息(用于PSS_ClientManager管理)
 struct _ClientNameInfo
 {
-	char m_szName[MAX_BUFF_100];      //连接别名 
-	char m_szClientIP[MAX_BUFF_50];   //客户端的IP地址
-	int  m_nPort;                     //客户端的端口
-	int  m_nConnectID;                //连接ID  
-	int  m_nLog;                      //是否记录日志
+    char m_szName[MAX_BUFF_100];      //连接别名
+    char m_szClientIP[MAX_BUFF_50];   //客户端的IP地址
+    int  m_nPort;                     //客户端的端口
+    int  m_nConnectID;                //连接ID
+    int  m_nLog;                      //是否记录日志
 
-	_ClientNameInfo()
-	{
-		m_szName[0]     = '\0';
-		m_szClientIP[0] = '\0';
-		m_nPort         = 0;
-		m_nConnectID    = 0;
-		m_nLog          = 0;
-	}
+    _ClientNameInfo()
+    {
+        m_szName[0]     = '\0';
+        m_szClientIP[0] = '\0';
+        m_nPort         = 0;
+        m_nConnectID    = 0;
+        m_nLog          = 0;
+    }
 
-	_ClientNameInfo& operator = (const _ClientNameInfo& ar)
-	{
-		sprintf_safe(this->m_szName, MAX_BUFF_100, "%s", ar.m_szName);
-		sprintf_safe(this->m_szClientIP, MAX_BUFF_50, "%s", ar.m_szClientIP);
-		this->m_nPort      = ar.m_nPort;
-		this->m_nConnectID = ar.m_nConnectID;
-		this->m_nLog       = ar.m_nLog;
-		return *this;
-	}
+    _ClientNameInfo& operator = (const _ClientNameInfo& ar)
+    {
+        sprintf_safe(this->m_szName, MAX_BUFF_100, "%s", ar.m_szName);
+        sprintf_safe(this->m_szClientIP, MAX_BUFF_50, "%s", ar.m_szClientIP);
+        this->m_nPort      = ar.m_nPort;
+        this->m_nConnectID = ar.m_nConnectID;
+        this->m_nLog       = ar.m_nLog;
+        return *this;
+    }
 };
 typedef vector<_ClientNameInfo> vecClientNameInfo;
 

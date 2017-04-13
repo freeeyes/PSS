@@ -165,7 +165,7 @@ int CServerMessageTask::open(void* args /*= 0*/)
 
     m_blRun = true;
 
-    if(activate(THR_NEW_LWP | THR_JOINABLE | THR_INHERIT_SCHED | THR_SUSPENDED, MAX_MSG_THREADCOUNT) == -1)
+    if(activate(THREAD_PARAM, MAX_MSG_THREADCOUNT) == -1)
     {
         OUR_DEBUG((LM_ERROR, "[CServerMessageTask::open] activate error ThreadCount = [%d].", MAX_MSG_THREADCOUNT));
         m_blRun = false;

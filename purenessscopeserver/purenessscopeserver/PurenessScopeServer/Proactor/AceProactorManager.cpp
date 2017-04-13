@@ -113,7 +113,7 @@ int CAceProactor::open(void* args)
 {
     OUR_DEBUG((LM_ERROR, "CAceProactor::Open Begin nProactorID= [%d].\n", m_u4ProactorID));
 
-    if(activate(THR_NEW_LWP | THR_BOUND | THR_DETACHED, m_nThreadCount)  == -1)
+    if(activate(THREAD_PARAM, m_nThreadCount)  == -1)
     {
         m_blRun = false;
         OUR_DEBUG((LM_ERROR, "[CAceProactor::Open]activate error ProactorType = [%d] nThreadCount = [%d] Start!\n", m_nProactorType, m_nThreadCount));
