@@ -112,7 +112,8 @@ bool CProConnectAcceptManager::InitConnectAcceptor(int nCount, uint32 u4ClientPr
 
 void CProConnectAcceptManager::Close()
 {
-	ACE_Time_Value tvSleep(0, 10000);
+    ACE_Time_Value tvSleep(0, 10000);
+
     for(int i = 0; i < (int)m_vecConnectAcceptor.size(); i++)
     {
         ProConnectAcceptor* pConnectAcceptor = (ProConnectAcceptor* )m_vecConnectAcceptor[i];
@@ -120,7 +121,7 @@ void CProConnectAcceptManager::Close()
         if(NULL != pConnectAcceptor)
         {
             pConnectAcceptor->cancel();
-			ACE_OS::sleep(tvSleep);
+            ACE_OS::sleep(tvSleep);
             SAFE_DELETE(pConnectAcceptor);
         }
     }

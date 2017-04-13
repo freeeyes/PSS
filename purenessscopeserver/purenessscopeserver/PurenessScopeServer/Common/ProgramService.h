@@ -29,6 +29,12 @@ static int ServerMain()
         return 0;
     }
 
+    if(App_MainConfig::instance()->GetServerType() == 0)
+    {
+        //等待服务结束
+        ACE_Thread_Manager::instance()->wait();
+    }
+
     OUR_DEBUG((LM_INFO, "[main]Server Run is End.\n"));
 
     return 0;
@@ -45,6 +51,8 @@ public:
     virtual int  handle_exception (ACE_HANDLE h);
 
     virtual void handle_control (DWORD control_code);
+
+    virtual int handle_timeout (const ACE_Time_Value& tv,const void* arg = 0);
 
 private:
     typedef ACE_NT_Service inherited;

@@ -84,8 +84,8 @@ public:
     virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);                       //¶¨Ê±¼ì²â
 
 private:
-	bool ConnectTcpInit(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CProactorClientInfo*& pClientInfo);
-	bool ConnectUdpInit(int nServerID, CProactorUDPClient*& pProactorUDPClient);
+    bool ConnectTcpInit(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CProactorClientInfo*& pClientInfo);
+    bool ConnectUdpInit(int nServerID, CProactorUDPClient*& pProactorUDPClient);
 
 private:
     CProAsynchConnect               m_ProAsynchConnect;

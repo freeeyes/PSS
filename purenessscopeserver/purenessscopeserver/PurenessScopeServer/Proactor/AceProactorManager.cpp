@@ -129,7 +129,6 @@ int CAceProactor::open(void* args)
 
 int CAceProactor::svc()
 {
-
     if(NULL == m_pProactor)
     {
         OUR_DEBUG((LM_ERROR, "[CAceProactor::Svc]m_pProactor is NULL.\n", m_nProactorType, m_nThreadCount));
@@ -139,7 +138,7 @@ int CAceProactor::svc()
     {
         m_blRun = true;
         m_pProactor->proactor_run_event_loop();
-        OUR_DEBUG((LM_ERROR, "CAceProactor::Svc] (%P|%t) Begin nProactorID= [%d] end .... \n", m_u4ProactorID));
+        OUR_DEBUG((LM_ERROR, "[CAceProactor::Svc] (%P|%t) Begin nProactorID= [%d] end .... \n", m_u4ProactorID));
         return 0;
     }
 }
@@ -301,6 +300,7 @@ bool CAceProactorManager::StopProactor()
 
         if(NULL != pAceProactor)
         {
+            OUR_DEBUG((LM_ERROR, "[CAceProactorManager::StopProactor]ProactorID=%d.\n", pAceProactor->GetProactorID()));
             pAceProactor->Stop();
             //pAceProactor->wait();
         }

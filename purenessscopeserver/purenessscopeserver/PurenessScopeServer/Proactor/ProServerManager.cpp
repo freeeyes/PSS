@@ -381,15 +381,6 @@ bool CProServerManager::Start()
         AppLogManager::instance()->WriteLog(LOG_SYSTEM, "[CProServerManager::Init]AppLogManager is OK.");
     }
 
-    /*
-    //设置定时器策略(使用高精度定时器)
-    (void) ACE_High_Res_Timer::global_scale_factor ();
-    auto_ptr<ACE_Timer_Heap_Variable_Time_Source> tq(new ACE_Timer_Heap_Variable_Time_Source);
-    tq->set_time_policy(&ACE_High_Res_Timer::gettimeofday_hr);
-    App_TimerManager::instance()->timer_queue(tq);
-    tq.release();
-    */
-
     //启动定时器
     if(0 != App_TimerManager::instance()->activate())
     {
@@ -440,10 +431,6 @@ bool CProServerManager::Start()
 
     //开始启动链接发送定时器
     App_ProConnectManager::instance()->StartTimer();
-
-    //等待服务结束
-    ACE_Thread_Manager::instance()->wait();
-
     return true;
 }
 
@@ -451,30 +438,42 @@ bool CProServerManager::Close()
 {
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close begin....\n"));
     App_ProConnectAcceptManager::instance()->Close();
+    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ProConnectAcceptManager OK.\n"));
+
     m_ProConsoleConnectAcceptor.cancel();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_TimerManager OK.\n"));
     App_TimerManager::instance()->deactivate();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ReUDPManager OK.\n"));
+    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_TimerManager OK.\n"));
+
     App_ProUDPManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ModuleLoader OK.\n"));
+    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ProUDPManager OK.\n"));
+
     App_ClientProConnectManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ClientReConnectManager OK.\n"));
+    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ClientProConnectManager OK.\n"));
+
     App_ModuleLoader::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_MessageManager OK.\n"));
+    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ModuleLoader OK.\n"));
+
     App_ServerMessageTask::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ServerMessageTask OK.\n"));
+
     App_MessageServiceGroup::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_MessageServiceGroup OK.\n"));
+
     App_ProConnectManager::instance()->CloseAll();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ConnectManager OK.\n"));
+    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ProConnectManager OK.\n"));
+
     AppLogManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]AppLogManager OK\n"));
+    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close AppLogManager OK\n"));
+
     App_MessageManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_MessageManager OK.\n"));
+
     App_BuffPacketManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]BuffPacketManager OK\n"));
+    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_BuffPacketManager OK\n"));
+
     App_ProactorManager::instance()->StopProactor();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ReactorManager OK.\n"));
+
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close end....\n"));
 
     if(NULL != m_pFrameLoggingStrategy)

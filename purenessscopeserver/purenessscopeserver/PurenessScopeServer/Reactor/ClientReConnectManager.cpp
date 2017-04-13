@@ -258,12 +258,13 @@ bool CClientReConnectManager::Init(ACE_Reactor* pReactor)
 bool CClientReConnectManager::Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, IClientMessage* pClientMessage)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-	CReactorClientInfo* pClientInfo = NULL;
-	//连接初始化动作
-	if (false == ConnectTcpInit(nServerID, pIP, nPort, u1IPType, NULL, 0, u1IPType, pClientMessage, pClientInfo))
-	{
-		return false;
-	}
+    CReactorClientInfo* pClientInfo = NULL;
+
+    //连接初始化动作
+    if (false == ConnectTcpInit(nServerID, pIP, nPort, u1IPType, NULL, 0, u1IPType, pClientMessage, pClientInfo))
+    {
+        return false;
+    }
 
     //开始链接
     if (false == pClientInfo->Run(m_blReactorFinish, SERVER_CONNECT_FIRST))
@@ -282,12 +283,13 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, int nPort,
 bool CClientReConnectManager::Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-	CReactorClientInfo* pClientInfo = NULL;
-	//连接初始化动作
-	if (false == ConnectTcpInit(nServerID, pIP, nPort, u1IPType, pLocalIP, nLocalPort, u1LocalIPType, pClientMessage, pClientInfo))
-	{
-		return false;
-	}
+    CReactorClientInfo* pClientInfo = NULL;
+
+    //连接初始化动作
+    if (false == ConnectTcpInit(nServerID, pIP, nPort, u1IPType, pLocalIP, nLocalPort, u1LocalIPType, pClientMessage, pClientInfo))
+    {
+        return false;
+    }
 
     //开始链接
     if (false == pClientInfo->Run(m_blReactorFinish, SERVER_CONNECT_FIRST))
@@ -306,42 +308,43 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, int nPort,
 bool CClientReConnectManager::ConnectUDP(int nServerID, const char* pIP, int nPort, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-	CReactorUDPClient* pReactorUDPClient = NULL;
-	//初始化连接动作
-	if (false == ConnectUdpInit(nServerID, pReactorUDPClient))
-	{
-		return false;
-	}
+    CReactorUDPClient* pReactorUDPClient = NULL;
 
-	//初始化连接地址
-	ACE_INET_Addr AddrLocal;
-	int nErr = 0;
+    //初始化连接动作
+    if (false == ConnectUdpInit(nServerID, pReactorUDPClient))
+    {
+        return false;
+    }
 
-	if (emType != UDP_BROADCAST)
-	{
-		if (u1IPType == TYPE_IPV4)
-		{
-			nErr = AddrLocal.set(nPort, pIP);
-		}
-		else
-		{
-			nErr = AddrLocal.set(nPort, pIP, 1, PF_INET6);
-		}
-	}
-	else
-	{
-		//如果是UDP广播
-		AddrLocal.set(nPort, (uint32)INADDR_ANY);
-	}
+    //初始化连接地址
+    ACE_INET_Addr AddrLocal;
+    int nErr = 0;
 
-	if (nErr != 0)
-	{
-		OUR_DEBUG((LM_INFO, "[CClientReConnectManager::ConnectUDP](%d)UDP set_address error[%d].\n", nServerID, errno));
-		SAFE_DELETE(pReactorUDPClient);
-		return false;
-	}
+    if (emType != UDP_BROADCAST)
+    {
+        if (u1IPType == TYPE_IPV4)
+        {
+            nErr = AddrLocal.set(nPort, pIP);
+        }
+        else
+        {
+            nErr = AddrLocal.set(nPort, pIP, 1, PF_INET6);
+        }
+    }
+    else
+    {
+        //如果是UDP广播
+        AddrLocal.set(nPort, (uint32)INADDR_ANY);
+    }
 
-	//开始连接
+    if (nErr != 0)
+    {
+        OUR_DEBUG((LM_INFO, "[CClientReConnectManager::ConnectUDP](%d)UDP set_address error[%d].\n", nServerID, errno));
+        SAFE_DELETE(pReactorUDPClient);
+        return false;
+    }
+
+    //开始连接
     if (0 != pReactorUDPClient->OpenAddress(AddrLocal, emType, App_ReactorManager::instance()->GetAce_Reactor(REACTOR_UDPDEFINE), pClientUDPMessage))
     {
         OUR_DEBUG((LM_INFO, "[CClientReConnectManager::ConnectUDP](%d)UDP OpenAddress error.\n", nServerID));
@@ -621,99 +624,99 @@ void CClientReConnectManager::Close()
 
 bool CClientReConnectManager::ConnectTcpInit(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CReactorClientInfo*& pClientInfo)
 {
-	//查找已有连接
-	char szServerID[10] = { '\0' };
-	sprintf_safe(szServerID, 10, "%d", nServerID);
-	pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
+    //查找已有连接
+    char szServerID[10] = { '\0' };
+    sprintf_safe(szServerID, 10, "%d", nServerID);
+    pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 
-	if (NULL != pClientInfo)
-	{
-		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect](%d)pClientInfo is exist.\n", nServerID));
-		return false;
-	}
+    if (NULL != pClientInfo)
+    {
+        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect](%d)pClientInfo is exist.\n", nServerID));
+        return false;
+    }
 
-	//如果池已经满了，则不能在申请新连接
-	if (m_objClientTCPList.Get_Used_Count() == m_objClientTCPList.Get_Count())
-	{
-		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) m_objClientTCPList is full.\n", nServerID));
-		return false;
-	}
+    //如果池已经满了，则不能在申请新连接
+    if (m_objClientTCPList.Get_Used_Count() == m_objClientTCPList.Get_Count())
+    {
+        OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) m_objClientTCPList is full.\n", nServerID));
+        return false;
+    }
 
-	//初始化链接信息
-	pClientInfo = new CReactorClientInfo();
+    //初始化链接信息
+    pClientInfo = new CReactorClientInfo();
 
-	if (NULL == pClientInfo)
-	{
-		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]pClientInfo is NULL.\n"));
-		return false;
-	}
+    if (NULL == pClientInfo)
+    {
+        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]pClientInfo is NULL.\n"));
+        return false;
+    }
 
-	//添加有效的pClientMessage
-	App_ServerMessageTask::instance()->AddClientMessage(pClientMessage);
+    //添加有效的pClientMessage
+    App_ServerMessageTask::instance()->AddClientMessage(pClientMessage);
 
-	if (false == pClientInfo->Init(nServerID, pIP, nPort, u1IPType, &m_ReactorConnect, pClientMessage, m_pReactor))
-	{
-		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]pClientInfo Init Error.\n"));
-		delete pClientInfo;
-		pClientInfo = NULL;
-		Close(nServerID);
-		return false;
-	}
+    if (false == pClientInfo->Init(nServerID, pIP, nPort, u1IPType, &m_ReactorConnect, pClientMessage, m_pReactor))
+    {
+        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]pClientInfo Init Error.\n"));
+        delete pClientInfo;
+        pClientInfo = NULL;
+        Close(nServerID);
+        return false;
+    }
 
-	//设置本地IP和端口
-	if (NULL != pLocalIP && nLocalPort > 0)
-	{
-		pClientInfo->SetLocalAddr(pLocalIP, nLocalPort, u1LocalIPType);
-	}
+    //设置本地IP和端口
+    if (NULL != pLocalIP && nLocalPort > 0)
+    {
+        pClientInfo->SetLocalAddr(pLocalIP, nLocalPort, u1LocalIPType);
+    }
 
-	//添加进hash
-	if (-1 == m_objClientTCPList.Add_Hash_Data(szServerID, pClientInfo))
-	{
-		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) add m_objClientTCPList is fail.\n", nServerID));
-		SAFE_DELETE(pClientInfo);
-		return false;
-	}
+    //添加进hash
+    if (-1 == m_objClientTCPList.Add_Hash_Data(szServerID, pClientInfo))
+    {
+        OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) add m_objClientTCPList is fail.\n", nServerID));
+        SAFE_DELETE(pClientInfo);
+        return false;
+    }
 
-	return true;
+    return true;
 }
 
 bool CClientReConnectManager::ConnectUdpInit(int nServerID, CReactorUDPClient*& pReactorUDPClient)
 {
-	//查找已有连接
-	char szServerID[10] = { '\0' };
-	sprintf_safe(szServerID, 10, "%d", nServerID);
-	pReactorUDPClient = m_objClientUDPList.Get_Hash_Box_Data(szServerID);
+    //查找已有连接
+    char szServerID[10] = { '\0' };
+    sprintf_safe(szServerID, 10, "%d", nServerID);
+    pReactorUDPClient = m_objClientUDPList.Get_Hash_Box_Data(szServerID);
 
-	if (NULL != pReactorUDPClient)
-	{
-		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect](%d)pClientInfo is exist.\n", nServerID));
-		return false;
-	}
+    if (NULL != pReactorUDPClient)
+    {
+        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect](%d)pClientInfo is exist.\n", nServerID));
+        return false;
+    }
 
-	//如果池已经满了，则不能在申请新连接
-	if (m_objClientUDPList.Get_Used_Count() == m_objClientUDPList.Get_Count())
-	{
-		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) m_objClientTCPList is full.\n", nServerID));
-		return false;
-	}
+    //如果池已经满了，则不能在申请新连接
+    if (m_objClientUDPList.Get_Used_Count() == m_objClientUDPList.Get_Count())
+    {
+        OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) m_objClientTCPList is full.\n", nServerID));
+        return false;
+    }
 
-	pReactorUDPClient = new CReactorUDPClient();
+    pReactorUDPClient = new CReactorUDPClient();
 
-	if (NULL == pReactorUDPClient)
-	{
-		OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::ConnectUDP]nServerID =(%d) pProactorUDPClient is NULL.\n", nServerID));
-		return false;
-	}
+    if (NULL == pReactorUDPClient)
+    {
+        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::ConnectUDP]nServerID =(%d) pProactorUDPClient is NULL.\n", nServerID));
+        return false;
+    }
 
-	//链接已经建立，添加进hash
-	if (-1 == m_objClientUDPList.Add_Hash_Data(szServerID, pReactorUDPClient))
-	{
-		OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) add m_objClientTCPList is fail.\n", nServerID));
-		SAFE_DELETE(pReactorUDPClient);
-		return false;
-	}
+    //链接已经建立，添加进hash
+    if (-1 == m_objClientUDPList.Add_Hash_Data(szServerID, pReactorUDPClient))
+    {
+        OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) add m_objClientTCPList is fail.\n", nServerID));
+        SAFE_DELETE(pReactorUDPClient);
+        return false;
+    }
 
-	return true;
+    return true;
 }
 
 int CClientReConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)

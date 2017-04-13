@@ -510,6 +510,7 @@ int CMessageService::handle_signal (int signum,
 
     return 0;
 }
+
 CMessageServiceGroup::CMessageServiceGroup()
 {
     m_u4TimerID = 0;
@@ -528,7 +529,7 @@ CMessageServiceGroup::CMessageServiceGroup()
 
 CMessageServiceGroup::~CMessageServiceGroup()
 {
-    Close();
+    //Close();
 }
 
 int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* arg)

@@ -78,8 +78,8 @@ public:
     EM_Server_Connect_State GetConnectState(int nServerID);               //得到一个当前连接状态
 
 private:
-	bool ConnectTcpInit(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CReactorClientInfo*& pClientInfo);
-	bool ConnectUdpInit(int nServerID, CReactorUDPClient*& pReactorUDPClient);
+    bool ConnectTcpInit(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CReactorClientInfo*& pClientInfo);
+    bool ConnectUdpInit(int nServerID, CReactorUDPClient*& pReactorUDPClient);
 
     virtual int handle_timeout(const ACE_Time_Value& current_time, const void* act = 0);               //定时器执行
 
