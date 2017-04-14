@@ -124,7 +124,6 @@ static bool Convert_Version(int nTagVserion)
 #define MAX_PACKET_PARSE      5000         //PACKETPARSE对象池个数
 #define MAX_MESSAGE_POOL      5000         //Message对象池个数
 
-#define PACKET_HEAD           4            //包头长度
 #define BUFFPACKET_MAX_COUNT  5000         //初始化BuffPacket包缓冲池的个数
 #define SENDQUEUECOUNT        1            //默认发送线程队列的数量
 

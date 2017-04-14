@@ -12,6 +12,8 @@
 
 #include "PacketParseBase.h"
 
+#define PACKET_CONSOLE_HEAD           4            //Console包头长度
+
 class CConsolePacketParse : public CPacketParseBase
 {
 public:

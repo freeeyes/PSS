@@ -3,7 +3,7 @@
 CPacketParseBase::CPacketParseBase(void)
 {
     //在这里设置包头的长度，因为大部分的包头长度是固定的。包体长度是可变的。
-    m_u4PacketHead      = PACKET_HEAD;
+    m_u4PacketHead      = 0;
     m_u2PacketCommandID = 0;
     m_u4PacketBody      = 0;
     m_u4HeadSrcSize     = 0;

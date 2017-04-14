@@ -5,7 +5,7 @@ CConsolePacketParse::CConsolePacketParse(void)
 {
     //如果是包头模式，这里需要设置包头的长度
     SetPacket_Mode(PACKET_WITHHEAD);
-    SetPacket_Head_Src_Length(PACKET_HEAD);
+    SetPacket_Head_Src_Length(PACKET_CONSOLE_HEAD);
     SetPacket_IsHandleHead(true);
 }
 
