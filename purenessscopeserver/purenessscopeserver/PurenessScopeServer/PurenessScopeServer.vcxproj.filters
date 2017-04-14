@@ -256,9 +256,6 @@
     <ClCompile Include="Common\SendMessage.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="Common\ServerParse.cpp">
-      <Filter>Common\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="Common\ThreadInfo.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
@@ -554,9 +551,6 @@
       <Filter>Common\headfile</Filter>
     </ClInclude>
     <ClInclude Include="Common\SendMessage.h">
-      <Filter>Common\headfile</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\ServerParse.h">
       <Filter>Common\headfile</Filter>
     </ClInclude>
     <ClInclude Include="Common\ThreadInfo.h">

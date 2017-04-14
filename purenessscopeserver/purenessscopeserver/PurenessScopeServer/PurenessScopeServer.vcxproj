@@ -414,12 +414,6 @@
       <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
       <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
     </ClCompile>
-    <ClCompile Include="Common\ServerParse.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="Common\ThreadInfo.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
@@ -598,7 +592,6 @@
     <ClInclude Include="Common\Ring.h" />
     <ClInclude Include="Common\SendCacheManager.h" />
     <ClInclude Include="Common\SendMessage.h" />
-    <ClInclude Include="Common\ServerParse.h" />
     <ClInclude Include="Common\ThreadInfo.h" />
     <ClInclude Include="Common\ThreadLock.h" />
     <ClInclude Include="Common\TimerManager.h" />
