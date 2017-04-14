@@ -53,18 +53,10 @@ void CLogBlockPool::Close()
 {
     for(uint32 i = 0; i < m_u4PoolCount; i++)
     {
-        if((NULL != m_pLogBlockInfo)&&(NULL != m_pLogBlockInfo[i].m_pBlock))
-        {
-            SAFE_DELETE_ARRAY(m_pLogBlockInfo[i].m_pBlock);
-            m_pLogBlockInfo[i].m_pBlock = NULL;
-        }
+        SAFE_DELETE_ARRAY(m_pLogBlockInfo[i].m_pBlock);
     }
 
-    if(NULL != m_pLogBlockInfo)
-    {
-        SAFE_DELETE_ARRAY(m_pLogBlockInfo);
-        m_pLogBlockInfo = NULL;
-    }
+    SAFE_DELETE_ARRAY(m_pLogBlockInfo);
 }
 
 _LogBlockInfo* CLogBlockPool::GetLogBlockInfo()

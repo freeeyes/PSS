@@ -124,7 +124,7 @@ int CMessageService::open(void* args)
         return -1;
     }
 
-    resume();
+    //resume();
 
     return 0;
 }
