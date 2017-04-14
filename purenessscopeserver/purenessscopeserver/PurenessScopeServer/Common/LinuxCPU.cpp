@@ -18,6 +18,11 @@ int GetProcessCPU_Idel_Linux()
 
     fd = ACE_OS::fopen("aasnowy.txt","r");
     char* pReturn = fgets(szbuffer,sizeof(szbuffer),fd);
+	if (NULL == pReturn)
+	{
+		return -1;
+	}
+
     //切分出CPU数据
     bool blFlag = false;
     int nLen = (int)ACE_OS::strlen(szbuffer);
@@ -60,11 +65,19 @@ int GetProcessMemorySize_Linux()
     ACE_TString strMem = strcmd;
     strMem +="  |awk '{print $2,$6}' >> aasnowy.txt";
 	nRet = system(strMem.c_str()); //获取内存命令
+	if (-1 == nRet)
+	{
+		return -1;
+	}
 
     FILE* fd;
     char szbuffer[50];
     fd = ACE_OS::fopen("aasnowy.txt","r");
     char* pReturn = fgets(szbuffer,sizeof(szbuffer),fd);
+	if (NULL == pReturn)
+	{
+		return -1;
+	}
 
     //切分出内存数据
     bool blFlag = false;
