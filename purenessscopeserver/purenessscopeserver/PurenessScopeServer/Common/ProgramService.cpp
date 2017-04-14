@@ -68,7 +68,7 @@ int CProgramService::handle_timeout (const ACE_Time_Value& tv,const void*)
 {
     ACE_UNUSED_ARG (tv);
     MessageBeep (MB_OK);
-    OUR_DEBUG ((LM_DEBUG, ACE_TEXT ("%T (%t): Beep...\n")));
+    //OUR_DEBUG ((LM_DEBUG, ACE_TEXT ("%T (%t): Beep...\n")));
     return 0;
 }
 

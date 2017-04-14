@@ -29,7 +29,9 @@ void CAceProactor::Close()
 {
     if (NULL != m_pProactor)
     {
-        //m_pProactor->close();
+        ACE_Time_Value tvSleep(0, 1000);
+        m_pProactor->proactor_end_event_loop();
+        ACE_OS::sleep(tvSleep);
         SAFE_DELETE(m_pProactor);
     }
 

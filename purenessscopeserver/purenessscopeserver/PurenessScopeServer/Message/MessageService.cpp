@@ -338,7 +338,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 int CMessageService::Close()
 {
     m_blRun         = false;
-	m_MessagePool.Close();
+    m_MessagePool.Close();
     msg_queue()->deactivate();
     OUR_DEBUG((LM_INFO, "[CMessageService::close] Close().\n"));
     return 0;
@@ -709,6 +709,7 @@ void CMessageServiceGroup::Close()
     KillTimer();
 
     ACE_Time_Value tvSleep(0, 1000);
+
     for(uint32 i = 0; i < (uint32)m_vecMessageService.size(); i++)
     {
         CMessageService* pMessageService = (CMessageService*)m_vecMessageService[i];
@@ -764,11 +765,13 @@ bool CMessageServiceGroup::StartTimer()
 bool CMessageServiceGroup::KillTimer()
 {
     OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::KillTimer] begin....\n"));
+
     if(m_u4TimerID > 0)
     {
         App_TimerManager::instance()->cancel(m_u4TimerID);
         m_u4TimerID = 0;
     }
+
     OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::KillTimer] end....\n"));
     return true;
 }
