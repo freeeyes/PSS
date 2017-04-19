@@ -1212,6 +1212,75 @@ inline bool Replace_String(char* pText, uint32 u4Len, const char* pOld, const ch
     return true;
 }
 
+//写独占文件锁
+inline int AcquireWriteLock(int fd, int start, int len)
+{
+#ifndef WIN32
+	struct flock arg;
+	arg.l_type = F_WRLCK; // 加写锁
+	arg.l_whence = SEEK_SET;
+	arg.l_start = start;
+	arg.l_len = len;
+	arg.l_pid = getpid();
+
+	return fcntl(fd, F_SETLKW, &arg);
+#else
+	return -1;
+#endif
+}
+
+//释放独占文件锁
+inline int ReleaseLock(int fd, int start, int len)
+{
+#ifndef WIN32
+	struct flock arg;
+	arg.l_type = F_UNLCK; //  解锁
+	arg.l_whence = SEEK_SET;
+	arg.l_start = start;
+	arg.l_len = len;
+	arg.l_pid = getpid();
+
+	return fcntl(fd, F_SETLKW, &arg);
+#else
+	return -1;
+#endif
+}
+
+//查看写锁
+inline int SeeLock(int fd, int start, int len)
+{
+#ifndef WIN32
+	struct flock arg;
+	arg.l_type = F_WRLCK;
+	arg.l_whence = SEEK_SET;
+	arg.l_start = start;
+	arg.l_len = len;
+	arg.l_pid = getpid();
+
+	if (fcntl(fd, F_GETLK, &arg) != 0) // 获取锁
+	{
+		return -1; // 测试失败
+	}
+
+	if (arg.l_type == F_UNLCK)
+	{
+		return 0; // 无锁
+	}
+	else if (arg.l_type == F_RDLCK)
+	{
+		return 1; // 读锁
+	}
+	else if (arg.l_type == F_WRLCK)
+	{
+		return 2; // 写所
+	}
+
+	return 0;
+#else
+	return -1;
+#endif
+}
+
 //客户端IP信息
 struct _ClientIPInfo
 {

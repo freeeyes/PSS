@@ -6,7 +6,7 @@
 	<ServerType Type="0" name="Pss Service" displayname="PssService" Debug="0" IsClose="0" desc = "Type设置为0为当前启动，1为Linux后台执行，windows启动系统服务" />
 	<ServerID id="1" desc="当前服务器的ID编号" />
 	<ServerName name="Freeeyes" desc="当前服务器的名称" />
-	<ServerVersion Version="0.97" desc="当前服务器版本" />
+	<ServerVersion Version="0.98" desc="当前服务器版本" />
 	<TCPServerIP ip="INADDR_ANY" port="10002" ipType="IPV4" desc="监听TCP服务器的IP和端口，可以是多个" />
 	<!-- <TCPServerIP ip="fe80::d433:372b:d0ee:edc4%12" port="10002" ipType="IPV6" desc="监听TCP服务器的IP和端口，可以是多个(IPv6地址测试)" /> -->
 	<!-- <TCPServerIP ip="127.0.0.1" port="10003" ipType="IPV4" desc="监听TCP服务器的IP和端口，可以是多个，要用多个，只要多写几个这样的节点即可" /> -->
@@ -18,7 +18,7 @@
 	<ConsoleKey Key="guest" desc="维护端允许登录的Key值,可以是多个，key值中不能包含空格" />
 	<!-- <ConsoleClient cip="127.0.0.1" desc="维护端口可以访问的对应的客户端IP地址，可以支持多个" /> -->
 	
-	<Message Msg_High_mark="64000" Msg_Low_mark="64000" Msg_Thread="3" Msg_MaxQueue="10000" desc="消息处理线程相关参数设置，" />
+	<Message Msg_High_mark="64000" Msg_Low_mark="64000" Msg_Process="1" Msg_Thread="3" Msg_MaxQueue="10000" desc="消息处理线程相关参数设置，" />
 	<ModuleManager MaxCount="100" desc="框架支持的最大插件数量" />
 	<!-- <Module ModulePath="./" ModuleString="libAutoTest.so" desc="模块加载配置相关参数，ModulePath是路径，ModuleString是模块名称，以逗号隔开"/> -->
 	<ModuleInfo ModuleSPath="./" ModuleSName="libTcpTest.so" ModuleSParam="../../example-Module/TcpTest/TcpTest.ini" Desc="ModuleParam为插件启动参数"/>

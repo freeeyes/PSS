@@ -37,6 +37,7 @@ public:
     bool Init();
     bool Start();
     bool Close();
+	bool Run();
 
 private:
     //CConnectAcceptorManager m_ConnectAcceptorManager;    //普通客户端链接

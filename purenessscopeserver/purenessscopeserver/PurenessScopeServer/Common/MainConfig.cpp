@@ -8,6 +8,7 @@ CMainConfig::CMainConfig(void)
     m_u4MsgHighMark           = 0;
     m_u4MsgLowMark            = 0;
     m_u4MsgThreadCount        = 0;
+	m_u1MsgProcessCount       = 1;
     m_u4MsgMaxQueue           = 0;
     m_nEncryptFlag            = 0;
     m_nEncryptOutFlag         = 0;
@@ -612,6 +613,13 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
         m_u4ReactorCount   = m_u4ReactorCount + (uint32)ACE_OS::atoi(pData);
     }
 
+	pData = m_MainConfig.GetData("Message", "Msg_Process");
+
+	if (pData != NULL)
+	{
+		m_u1MsgProcessCount = (uint32)ACE_OS::atoi(pData);
+	}
+
     pData = m_MainConfig.GetData("Message", "Msg_MaxQueue");
 
     if(pData != NULL)
@@ -1191,6 +1199,7 @@ void CMainConfig::Display()
     OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4MsgHighMark = %d.\n", m_u4MsgHighMark));
     OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4MsgLowMark = %d.\n", m_u4MsgLowMark));
     OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4MsgThreadCount = %d.\n", m_u4MsgThreadCount));
+	OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u1MsgProcessCount = %d.\n", m_u1MsgProcessCount));
     OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4MsgMaxQueue = %d.\n", m_u4MsgMaxQueue));
     OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_nEncryptFlag = %d.\n", m_nEncryptFlag));
     OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szEncryptPass = %s.\n", m_szEncryptPass));
@@ -1291,6 +1300,11 @@ uint32 CMainConfig::GetMsgLowMark()
 uint32 CMainConfig::GetThreadCount()
 {
     return m_u4MsgThreadCount;
+}
+
+uint8 CMainConfig::GetProcessCount()
+{
+	return m_u1MsgProcessCount;
 }
 
 uint32 CMainConfig::GetMsgMaxQueue()

@@ -129,7 +129,14 @@ bool SetAppPath()
         szPath[nLen > 0 ? (nLen-1) : 0]= '\0';
 
         int nRet = chdir(szPath);
-        OUR_DEBUG((LM_INFO, "[SetAppPath]Set work Path (%s) OK.\n", szPath));
+		if (-1 == nRet)
+		{
+			OUR_DEBUG((LM_INFO, "[SetAppPath]Set work Path (%s) fail.\n", szPath));
+		}
+		else
+		{
+			OUR_DEBUG((LM_INFO, "[SetAppPath]Set work Path (%s) OK.\n", szPath));
+		}
 
         return true;
     }
@@ -189,63 +196,6 @@ int Checkfilelimit(int nMaxOpenFile)
             //OUR_DEBUG((LM_INFO, "[Checkfilelimit]rlim.rlim_cur=%d, nMaxOpenFile=%d, openfile is not enougth， please check [ulimit -a].\n", (int)rfilelimit.rlim_cur, nMaxOpenFile));
             return 0;
         }
-    }
-
-    return 0;
-}
-
-//写独占文件锁
-int AcquireWriteLock(int fd, int start, int len)
-{
-    struct flock arg;
-    arg.l_type = F_WRLCK; // 加写锁
-    arg.l_whence = SEEK_SET;
-    arg.l_start = start;
-    arg.l_len = len;
-    arg.l_pid = getpid();
-
-    return fcntl(fd, F_SETLKW, &arg);
-}
-
-//释放独占文件锁
-int ReleaseLock(int fd, int start, int len)
-{
-    struct flock arg;
-    arg.l_type = F_UNLCK; //  解锁
-    arg.l_whence = SEEK_SET;
-    arg.l_start = start;
-    arg.l_len = len;
-    arg.l_pid = getpid();
-
-    return fcntl(fd, F_SETLKW, &arg);
-}
-
-//查看写锁
-int SeeLock(int fd, int start, int len)
-{
-    struct flock arg;
-    arg.l_type = F_WRLCK;
-    arg.l_whence = SEEK_SET;
-    arg.l_start = start;
-    arg.l_len = len;
-    arg.l_pid = getpid();
-
-    if (fcntl(fd, F_GETLK, &arg) != 0) // 获取锁
-    {
-        return -1; // 测试失败
-    }
-
-    if (arg.l_type == F_UNLCK)
-    {
-        return 0; // 无锁
-    }
-    else if (arg.l_type == F_RDLCK)
-    {
-        return 1; // 读锁
-    }
-    else if (arg.l_type == F_WRLCK)
-    {
-        return 2; // 写所
     }
 
     return 0;
@@ -383,115 +333,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
         App_MainConfig::instance()->Display();
     }
 
-    //当前监控子线程个数
-    int nNumChlid = 1;
-
-    //检测时间间隔参数
-    struct timespec tsRqt;
-
-    //文件锁
-    int fd_lock = 0;
-
-    int nRet = 0;
-
-    //主进程检测时间间隔（设置每隔5秒一次）
-    tsRqt.tv_sec  = 5;
-    tsRqt.tv_nsec = 0;
-
-    //获得当前路径
-    char szWorkDir[MAX_BUFF_500] = {0};
-
-    if(!getcwd(szWorkDir, 260))
-    {
-        exit(1);
-    }
-
-    // 打开（创建）锁文件
-    char szFileName[200] = {'\0'};
-    memset(szFileName, 0, sizeof(flock));
-    sprintf(szFileName, "%s/lockwatch.lk", szWorkDir);
-    fd_lock = open(szFileName, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
-
-    if (fd_lock < 0)
-    {
-        printf("open the flock and exit, errno = %d.\n", errno);
-        exit(1);
-    }
-
-    //查看当前文件锁是否已锁
-    nRet = SeeLock(fd_lock, 0, sizeof(int));
-
-    if (nRet == -1 || nRet == 2)
-    {
-        printf("file is already exist!\n");
-        exit(1);
-    }
-
-    //如果文件锁没锁，则锁住当前文件锁
-    if (AcquireWriteLock(fd_lock, 0, sizeof(int)) != 0)
-    {
-        printf("lock the file failure and exit, idx = 0.\n");
-        exit(1);
-    }
-
-    //写入子进程锁信息
-    lseek(fd_lock, 0, SEEK_SET);
-
-    for (int nIndex = 0; nIndex <= nNumChlid; nIndex++)
-    {
-        ssize_t stWrite = write(fd_lock, &nIndex, sizeof(nIndex));
-
-        if (stWrite <= 0)
-        {
-            printf("lock write fail.\n");
-        }
-    }
-
-    if(App_MainConfig::instance()->GetServerType() == 1)
-    {
-        //添加监控守护进程
-        while (1)
-        {
-            for (int nChlidIndex = 1; nChlidIndex <= nNumChlid; nChlidIndex++)
-            {
-                //测试每个子进程的锁是否还存在
-                nRet = SeeLock(fd_lock, nChlidIndex * sizeof(int), sizeof(int));
-
-                if (nRet == -1 || nRet == 2)
-                {
-                    continue;
-                }
-
-                //如果文件锁没有被锁，则设置文件锁，并启动子进程
-                int npid = fork();
-
-                if (npid == 0)
-                {
-                    //上文件锁
-                    if(AcquireWriteLock(fd_lock, nChlidIndex * sizeof(int), sizeof(int)) != 0)
-                    {
-                        printf("child %d AcquireWriteLock failure.\n", nChlidIndex);
-                        exit(1);
-                    }
-
-                    //启动子进程
-                    Chlid_Run();
-
-                    //子进程在执行完任务后必须退出循环和释放锁
-                    ReleaseLock(fd_lock, nChlidIndex * sizeof(int), sizeof(int));
-                }
-            }
-
-            //printf("child count(%d) is ok.\n", nNumChlid);
-            //检查间隔
-            nanosleep(&tsRqt, NULL);
-        }
-    }
-    else
-    {
-        //直接运行
-        Chlid_Run();
-    }
+    Chlid_Run();
 
     return 0;
 }
