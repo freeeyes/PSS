@@ -48,7 +48,7 @@ public:
     {
         for(uint32 i = 0; i < MAX_MEMORY_BLOCK_COUNT; i++)
         {
-            m_MemoryBlock_List[i].m_u4ListSize = (uint32)pow((double)2, i);;
+            m_MemoryBlock_List[i].m_u4ListSize = (uint32)pow((double)2, (int32)i);;
         }
     }
 
