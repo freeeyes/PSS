@@ -55,7 +55,7 @@ bool CServerManager::Init()
 	OUR_DEBUG((LM_INFO, "[CServerManager::Init]nReactorCount=%d.\n", nReactorCount));
 
 	//为多进程做准备，针对epoll和epollet初始化不能在这里去做,因为在多进程里epoll_create必须在子进程里去声明
-	if (NETWORKMODE_RE_EPOLL != App_MainConfig::instance()->GetNetworkMode() || NETWORKMODE_RE_EPOLL_ET != App_MainConfig::instance()->GetNetworkMode())
+	if (NETWORKMODE_RE_EPOLL != App_MainConfig::instance()->GetNetworkMode() && NETWORKMODE_RE_EPOLL_ET != App_MainConfig::instance()->GetNetworkMode())
 	{
 		//初始化反应器集合
 		App_ReactorManager::instance()->Init((uint16)nReactorCount);		
