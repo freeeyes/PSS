@@ -294,9 +294,9 @@ void CAceReactorManager::Close()
 
 void CAceReactorManager::Init(uint16 u2Count)
 {
-    Close();
+    //Close();
 
-    m_pReactorList  = new CAceReactor*[u2Count];
+    m_pReactorList  = (CAceReactor** )new char[sizeof(CAceReactor*)*u2Count];;
     ACE_OS::memset(m_pReactorList, 0, sizeof(CAceReactor*)*u2Count);
     m_u2RectorCount = u2Count;
 }

@@ -37,6 +37,10 @@ public:
     bool Init();
     bool Start();
     bool Close();
+	
+
+private:
+	bool Init_Reactor(uint8 u1ReactorCount, uint8 u1NetMode);
 	bool Run();
 
 private:

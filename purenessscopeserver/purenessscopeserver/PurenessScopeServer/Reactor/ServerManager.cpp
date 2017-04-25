@@ -34,8 +34,6 @@ bool CServerManager::Init()
 	int nServerPortCount = App_MainConfig::instance()->GetServerPortCount();
 	int nReactorCount = App_MainConfig::instance()->GetReactorCount();
 
-	bool blState = false;
-
 	//初始化模块数组相关参数
 	App_MessageManager::instance()->Init(App_MainConfig::instance()->GetMaxModuleCount(), App_MainConfig::instance()->GetMaxCommandCount());
 
@@ -56,46 +54,14 @@ bool CServerManager::Init()
 
 	OUR_DEBUG((LM_INFO, "[CServerManager::Init]nReactorCount=%d.\n", nReactorCount));
 
-	//初始化反应器集合
-	App_ReactorManager::instance()->Init((uint16)nReactorCount);
-
-	//初始化反应器
-	for (int i = 0; i < nReactorCount; i++)
+	//为多进程做准备，针对epoll和epollet初始化不能在这里去做,因为在多进程里epoll_create必须在子进程里去声明
+	if (NETWORKMODE_RE_EPOLL != App_MainConfig::instance()->GetNetworkMode() || NETWORKMODE_RE_EPOLL_ET != App_MainConfig::instance()->GetNetworkMode())
 	{
-		OUR_DEBUG((LM_INFO, "[CServerManager::Init()]... i=[%d].\n", i));
-
-		if (App_MainConfig::instance()->GetNetworkMode() == NETWORKMODE_RE_SELECT)
-		{
-			blState = App_ReactorManager::instance()->AddNewReactor(i, Reactor_Select, 1);
-			OUR_DEBUG((LM_INFO, "[CServerManager::Init]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_Select.\n"));
-		}
-		else if (App_MainConfig::instance()->GetNetworkMode() == NETWORKMODE_RE_TPSELECT)
-		{
-			blState = App_ReactorManager::instance()->AddNewReactor(i, Reactor_TP, 1);
-			OUR_DEBUG((LM_INFO, "[CServerManager::Init]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_TP.\n"));
-		}
-		else if (App_MainConfig::instance()->GetNetworkMode() == NETWORKMODE_RE_EPOLL)
-		{
-			blState = App_ReactorManager::instance()->AddNewReactor(i, Reactor_DEV_POLL, 1, App_MainConfig::instance()->GetMaxHandlerCount());
-			OUR_DEBUG((LM_INFO, "[CServerManager::Init]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_DEV_POLL.\n"));
-		}
-		else if (App_MainConfig::instance()->GetNetworkMode() == NETWORKMODE_RE_EPOLL_ET)
-		{
-			blState = App_ReactorManager::instance()->AddNewReactor(i, Reactor_DEV_POLL_ET, 1, App_MainConfig::instance()->GetMaxHandlerCount());
-			OUR_DEBUG((LM_INFO, "[CServerManager::Init]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_DEV_POLL_ET.\n"));
-		}
-		else
-		{
-			OUR_DEBUG((LM_INFO, "[CServerManager::Init]AddNewProactor NETWORKMODE Error.\n"));
-			return false;
-		}
-
-		if (!blState)
-		{
-			OUR_DEBUG((LM_INFO, "[CServerManager::Init]AddNewReactor [%d] Error.\n", i));
-			OUR_DEBUG((LM_INFO, "[CServerManager::Init]Error=%s.\n", App_ReactorManager::instance()->GetError()));
-			return false;
-		}
+		//初始化反应器集合
+		App_ReactorManager::instance()->Init((uint16)nReactorCount);		
+		
+		OUR_DEBUG((LM_INFO, "[CServerManager::Init]****1*******.\n"));
+		Init_Reactor((uint8)nReactorCount, App_MainConfig::instance()->GetNetworkMode());
 	}
 
 	//初始化日志系统线程
@@ -170,7 +136,7 @@ bool CServerManager::Init()
 
 bool CServerManager::Start()
 {
-	//启动TCP监听
+	//启动TCP监听初始化
 	int nServerPortCount = App_MainConfig::instance()->GetServerPortCount();
 
 	for (int i = 0; i < nServerPortCount; i++)
@@ -226,7 +192,7 @@ bool CServerManager::Start()
 			return false;
 		}
 
-		int nRet = pConnectAcceptor->open2(listenAddr, App_ReactorManager::instance()->GetAce_Reactor(REACTOR_CLIENTDEFINE), ACE_NONBLOCK, (int)App_MainConfig::instance()->GetBacklog());
+		int nRet = pConnectAcceptor->Init_Open(listenAddr, 0, 1, 1, (int)App_MainConfig::instance()->GetBacklog());
 
 		if (-1 == nRet)
 		{
@@ -292,7 +258,7 @@ bool CServerManager::Start()
 			return false;
 		}
 
-		int nRet = pReactorUDPHandler->OpenAddress(listenAddr, App_ReactorManager::instance()->GetAce_Reactor(REACTOR_CLIENTDEFINE));
+		int nRet = pReactorUDPHandler->OpenAddress(listenAddr, ACE_Reactor::instance());
 
 		if (-1 == nRet)
 		{
@@ -338,7 +304,7 @@ bool CServerManager::Start()
 			return false;
 		}
 
-		int nRet = m_ConnectConsoleAcceptor.open(listenConsoleAddr, App_ReactorManager::instance()->GetAce_Reactor(REACTOR_CLIENTDEFINE), ACE_NONBLOCK);
+		int nRet = m_ConnectConsoleAcceptor.Init_Open(listenConsoleAddr);
 
 		if (-1 == nRet)
 		{
@@ -348,29 +314,9 @@ bool CServerManager::Start()
 		}
 	}
 
-	//启动日志服务线程
-	if (0 != AppLogManager::instance()->Start())
-	{
-		AppLogManager::instance()->WriteLog(LOG_SYSTEM, "[CServerManager::Init]AppLogManager is ERROR.");
-	}
-	else
-	{
-		AppLogManager::instance()->WriteLog(LOG_SYSTEM, "[CServerManager::Init]AppLogManager is OK.");
-	}
-
-	//启动定时器
-	if (0 != App_TimerManager::instance()->activate())
-	{
-		OUR_DEBUG((LM_INFO, "[CServerManager::Run]App_TimerManager::instance()->Start() is error.\n"));
-		return false;
-	}
-
-	//启动中间服务器链接管理器
-	App_ClientReConnectManager::instance()->Init(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_POSTDEFINE));
-	App_ClientReConnectManager::instance()->StartConnectTask(App_MainConfig::instance()->GetConnectServerCheck());
-
 	if (App_MainConfig::instance()->GetProcessCount() > 1)
 	{
+#ifndef WIN32
 		//当前监控子线程个数
 		int nNumChlid = App_MainConfig::instance()->GetProcessCount();
 
@@ -438,6 +384,10 @@ bool CServerManager::Start()
 		{
 			for (int nChlidIndex = 1; nChlidIndex <= nNumChlid; nChlidIndex++)
 			{
+				//休眠100ms
+				ACE_Time_Value tvSleep(0, 100000);
+				ACE_OS::sleep(tvSleep);				
+				
 				//测试每个子进程的锁是否还存在
 				nRet = SeeLock(fd_lock, nChlidIndex * sizeof(int), sizeof(int));
 				if (nRet == -1 || nRet == 2)
@@ -454,7 +404,7 @@ bool CServerManager::Start()
 						printf("child %d AcquireWriteLock failure.\n", nChlidIndex);
 						exit(1);
 					}
-
+					
 					//启动子进程
 					Run();
 
@@ -467,6 +417,7 @@ bool CServerManager::Start()
 			//检查间隔
 			ACE_OS::sleep(tvMonitorSleep);
 		}
+#endif
 	}
 	else
 	{
@@ -476,8 +427,95 @@ bool CServerManager::Start()
 	return true;
 }
 
+bool CServerManager::Init_Reactor(uint8 u1ReactorCount, uint8 u1NetMode)
+{
+	bool blState = true;
+	//初始化反应器
+	for (uint8 i = 0; i < u1ReactorCount; i++)
+	{
+		OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]... i=[%d].\n", i));
+
+		if (u1NetMode == NETWORKMODE_RE_SELECT)
+		{
+			blState = App_ReactorManager::instance()->AddNewReactor(i, Reactor_Select, 1);
+			OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_Select.\n"));
+		}
+		else if (u1NetMode == NETWORKMODE_RE_TPSELECT)
+		{
+			blState = App_ReactorManager::instance()->AddNewReactor(i, Reactor_TP, 1);
+			OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_TP.\n"));
+		}
+		else if (u1NetMode == NETWORKMODE_RE_EPOLL)
+		{
+			blState = App_ReactorManager::instance()->AddNewReactor(i, Reactor_DEV_POLL, 1, App_MainConfig::instance()->GetMaxHandlerCount());
+			OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_DEV_POLL.\n"));
+		}
+		else if (u1NetMode == NETWORKMODE_RE_EPOLL_ET)
+		{
+			blState = App_ReactorManager::instance()->AddNewReactor(i, Reactor_DEV_POLL_ET, 1, App_MainConfig::instance()->GetMaxHandlerCount());
+			OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_DEV_POLL_ET.\n"));
+		}
+		else
+		{
+			OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]AddNewProactor NETWORKMODE Error.\n"));
+			return false;
+		}
+
+		if (!blState)
+		{
+			OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]AddNewReactor [%d] Error.\n", i));
+			OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]Error=%s.\n", App_ReactorManager::instance()->GetError()));
+			return false;
+		}
+	}
+
+	return blState;
+}
+
 bool CServerManager::Run()
 {
+	//对应多进程，epoll必须在子进程里进行初始化
+	if (NETWORKMODE_RE_EPOLL == App_MainConfig::instance()->GetNetworkMode() || NETWORKMODE_RE_EPOLL_ET == App_MainConfig::instance()->GetNetworkMode())
+	{
+		//初始化反应器集合
+		App_ReactorManager::instance()->Init((uint16)App_MainConfig::instance()->GetReactorCount());				
+
+		Init_Reactor((uint8)App_MainConfig::instance()->GetReactorCount(), App_MainConfig::instance()->GetNetworkMode());
+	}
+	
+	int nServerPortCount = App_MainConfig::instance()->GetServerPortCount();
+
+	for (int i = 0; i < nServerPortCount; i++)
+	{
+		//得到接收器
+		ConnectAcceptor* pConnectAcceptor = App_ConnectAcceptorManager::instance()->GetConnectAcceptor(i);
+
+		//打开监听对应事件
+		pConnectAcceptor->Run_Open(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_CLIENTDEFINE));
+	}
+	m_ConnectConsoleAcceptor.Run_Open(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_CLIENTDEFINE));	
+	
+	//启动日志服务线程
+	if (0 != AppLogManager::instance()->Start())
+	{
+		AppLogManager::instance()->WriteLog(LOG_SYSTEM, "[CServerManager::Init]AppLogManager is ERROR.");
+	}
+	else
+	{
+		AppLogManager::instance()->WriteLog(LOG_SYSTEM, "[CServerManager::Init]AppLogManager is OK.");
+	}
+
+	//启动定时器
+	if (0 != App_TimerManager::instance()->activate())
+	{
+		OUR_DEBUG((LM_INFO, "[CServerManager::Run]App_TimerManager::instance()->Start() is error.\n"));
+		return false;
+	}
+
+	//启动中间服务器链接管理器
+	App_ClientReConnectManager::instance()->Init(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_POSTDEFINE));
+	App_ClientReConnectManager::instance()->StartConnectTask(App_MainConfig::instance()->GetConnectServerCheck());
+
 	//启动所有反应器
 	if (!App_ReactorManager::instance()->StartReactor())
 	{
