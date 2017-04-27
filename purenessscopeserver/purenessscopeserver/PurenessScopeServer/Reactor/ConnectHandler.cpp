@@ -2092,6 +2092,7 @@ bool CConnectManager::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status em
     char szConnectID[10] = {'\0'};
     sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
     CConnectHandler* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data(szConnectID);
+
     if(NULL != pConnectHandler)
     {
         //»ØÊÕ·¢ËÍ»º³å
@@ -3114,14 +3115,22 @@ bool CConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char* pData, u
 
     if(NULL != pBuffPacket)
     {
-        pBuffPacket->WriteStream(pData, nDataLen);
+        bool bWriteResult = false;
+        bWriteResult = pBuffPacket->WriteStream(pData, nDataLen);
 
         if(blDelete == true)
         {
             SAFE_DELETE_ARRAY(pData);
         }
 
-        return pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, u1SendState, true, nServerID);
+        if(bWriteResult)
+        {
+            return pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, u1SendState, true, nServerID);
+        }
+        else
+        {
+            return false;
+        }
     }
     else
     {

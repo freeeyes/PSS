@@ -2426,14 +2426,22 @@ bool CProConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char* pData
 
     if(NULL != pBuffPacket)
     {
-        pBuffPacket->WriteStream(pData, nDataLen);
-
+        bool bWriteResult = false;
+        bWriteResult = pBuffPacket->WriteStream(pData, nDataLen);
+        
         if(blDelete == true)
         {
             SAFE_DELETE_ARRAY(pData);
         }
 
-        return pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, u1SendState, true, nMessageID);
+        if(bWriteResult)
+        {
+            return pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, u1SendState, true, nMessageID);
+        }
+        else
+        {
+            return false;
+        }
     }
     else
     {
