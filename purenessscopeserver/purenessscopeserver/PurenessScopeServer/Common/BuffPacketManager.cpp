@@ -71,7 +71,7 @@ void CBuffPacketManager::Close()
     m_objHashBuffPacketList.Close();
 }
 
-void CBuffPacketManager::Init(uint32 u4PacketCount, bool blByteOrder)
+void CBuffPacketManager::Init(uint32 u4PacketCount, uint32 u4MaxBuffSize, bool blByteOrder)
 {
     Close();
 
@@ -80,7 +80,7 @@ void CBuffPacketManager::Init(uint32 u4PacketCount, bool blByteOrder)
 
     for(int i = 0; i < m_objHashBuffPacketList.Get_Count(); i++)
     {
-        CBuffPacket* pBuffPacket = new CBuffPacket();
+        CBuffPacket* pBuffPacket = new CBuffPacket(DEFINE_PACKET_SIZE, u4MaxBuffSize);
 
         if(NULL != pBuffPacket)
         {

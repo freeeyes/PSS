@@ -18,7 +18,7 @@ public:
     CBuffPacketManager(void);
     ~CBuffPacketManager(void);
 
-    void Init(uint32 u4PacketCount, bool blByteOrder);
+    void Init(uint32 u4PacketCount, uint32 u4MaxBuffSize, bool blByteOrder);
     void Close();
 
     uint32 GetBuffPacketUsedCount();

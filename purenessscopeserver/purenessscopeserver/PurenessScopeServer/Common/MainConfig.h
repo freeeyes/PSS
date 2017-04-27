@@ -221,6 +221,7 @@ public:
 
     uint32 GetMgsHighMark();
     uint32 GetMsgLowMark();
+	uint32 GetMsgMaxBuffSize();
     uint32 GetThreadCount();
 	uint8  GetProcessCount();
     uint32 GetMsgMaxQueue();
@@ -326,6 +327,7 @@ private:
 
     uint32     m_u4MsgHighMark;                        //消息的高水位阀值
     uint32     m_u4MsgLowMark;                         //消息的低水位阀值
+	uint32     m_u4MsgMaxBuffSize;                     //消息的最大大小
     uint32     m_u4MsgThreadCount;                     //允许的工作线程个数
 	uint8      m_u1MsgProcessCount;                    //当前的多进程数量(仅Linux支持)
     uint32     m_u4MsgMaxQueue;                        //消息队列的最大个数

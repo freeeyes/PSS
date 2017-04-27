@@ -9,6 +9,7 @@ CMainConfig::CMainConfig(void)
     m_u4MsgLowMark            = 0;
     m_u4MsgThreadCount        = 0;
 	m_u1MsgProcessCount       = 1;
+	m_u4MsgMaxBuffSize        = MAX_PACKET_SIZE;
     m_u4MsgMaxQueue           = 0;
     m_nEncryptFlag            = 0;
     m_nEncryptOutFlag         = 0;
@@ -604,6 +605,13 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
     {
         m_u4MsgLowMark = (uint32)ACE_OS::atoi(pData);
     }
+
+	pData = m_MainConfig.GetData("Message", "Msg_Buff_Max_Size");
+
+	if (pData != NULL)
+	{
+		m_u4MsgMaxBuffSize = (uint32)ACE_OS::atoi(pData);
+	}
 
     pData = m_MainConfig.GetData("Message", "Msg_Thread");
 
@@ -1295,6 +1303,11 @@ uint32 CMainConfig::GetMgsHighMark()
 uint32 CMainConfig::GetMsgLowMark()
 {
     return m_u4MsgLowMark;
+}
+
+uint32 CMainConfig::GetMsgMaxBuffSize()
+{
+	return m_u4MsgMaxBuffSize;
 }
 
 uint32 CMainConfig::GetThreadCount()

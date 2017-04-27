@@ -16,7 +16,6 @@ public:
     virtual uint32 GetHeadLen()         = 0;    //得到数据包头的长度
     virtual uint32 GetPacketCount()     = 0;    //得到缓存数据包的个数
 
-    virtual bool Init(int nSize)        = 0;
     virtual bool Close()                = 0;
     virtual bool Clear()                = 0;
 
