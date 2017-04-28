@@ -2208,6 +2208,12 @@ bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
     //OUR_DEBUG((LM_INFO, "[CConnectManager::PostMessage]Begin 1.\n"));
 
+    if(NULL == pBuffPacket)
+    {
+        OUR_DEBUG((LM_ERROR,"[CConnectManager::PutMessage] pBuffPacket is NULL.\n"));
+        return false;
+    }
+
     //放入发送队列
     _SendMessage* pSendMessage = m_SendMessagePool.Create();
 

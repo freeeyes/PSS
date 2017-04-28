@@ -1580,15 +1580,14 @@ bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
 bool CProConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
     //OUR_DEBUG((LM_ERROR,"[CProConnectManager::PutMessage]BEGIN.\n"));
-
-    //放入发送队列
-    _SendMessage* pSendMessage = m_SendMessagePool.Create();
-
     if(NULL == pBuffPacket)
     {
         OUR_DEBUG((LM_ERROR,"[CProConnectManager::PutMessage] pBuffPacket is NULL.\n"));
         return false;
     }
+    
+    //放入发送队列
+    _SendMessage* pSendMessage = m_SendMessagePool.Create();
 
     ACE_Message_Block* mb = pSendMessage->GetQueueMessage();
 
