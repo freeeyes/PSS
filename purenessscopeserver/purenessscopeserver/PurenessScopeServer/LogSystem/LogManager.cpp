@@ -253,8 +253,7 @@ int CLogManager::PutLog(_LogBlockInfo* pLogBlockInfo)
             return 1;
         }
 
-        ACE_Time_Value xtime;
-        xtime = ACE_OS::gettimeofday();
+        ACE_Time_Value xtime = ACE_OS::gettimeofday()+ACE_Time_Value(0, MAX_MSG_PUTTIMEOUT);
 
         if(this->putq(mb, &xtime) == -1)
         {
