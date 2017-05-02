@@ -25,7 +25,10 @@ public:
     virtual int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE);
     virtual int handle_close(ACE_HANDLE handle, ACE_Reactor_Mask close_mask);
 
+	int  OpenAddress(const ACE_INET_Addr& AddrRemote);
     int  OpenAddress(const ACE_INET_Addr& AddrRemote, ACE_Reactor* pReactor);
+
+	int  Run_Open(ACE_Reactor* pReactor);
     void Close();
     bool SendMessage(const char* pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead = true, uint16 u2CommandID = 0, bool blDlete = true);
     _ClientConnectInfo GetClientConnectInfo();

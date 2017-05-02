@@ -258,7 +258,7 @@ bool CServerManager::Start()
 			return false;
 		}
 
-		int nRet = pReactorUDPHandler->OpenAddress(listenAddr, ACE_Reactor::instance());
+		int nRet = pReactorUDPHandler->OpenAddress(listenAddr);
 
 		if (-1 == nRet)
 		{
@@ -485,6 +485,7 @@ bool CServerManager::Run()
 	
 	int nServerPortCount = App_MainConfig::instance()->GetServerPortCount();
 
+	//创建和启动TCP反应器
 	for (int i = 0; i < nServerPortCount; i++)
 	{
 		//得到接收器
@@ -493,7 +494,20 @@ bool CServerManager::Run()
 		//打开监听对应事件
 		pConnectAcceptor->Run_Open(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_CLIENTDEFINE));
 	}
-	m_ConnectConsoleAcceptor.Run_Open(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_CLIENTDEFINE));	
+	m_ConnectConsoleAcceptor.Run_Open(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_CLIENTDEFINE));
+
+	//创建和启动UDP反应器
+	int nUDPServerPortCount = App_MainConfig::instance()->GetUDPServerPortCount();
+
+	for (uint8 i = 0; i < nUDPServerPortCount; i++)
+	{
+		CReactorUDPHander* pReactorUDPHandler = App_ReUDPManager::instance()->GetUDPHandle(i);
+		if (NULL != pReactorUDPHandler)
+		{
+			pReactorUDPHandler->Run_Open(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_CLIENTDEFINE));
+		}
+	}
+	
 	
 	//启动日志服务线程
 	if (0 != AppLogManager::instance()->Start())
