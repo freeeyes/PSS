@@ -332,7 +332,7 @@ bool CServerManager::Start()
 		//获得当前路径
 		char szWorkDir[MAX_BUFF_500] = { 0 };
 
-		if (!ACE_OS::getcwd(szWorkDir, 260))
+		if (!ACE_OS::getcwd(szWorkDir, sizeof(szWorkDir)))
 		{
 			exit(1);
 		}
