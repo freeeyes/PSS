@@ -473,6 +473,11 @@ uint32 CMessageService::GetStepState()
     return m_ThreadInfo.m_u4State;
 }
 
+uint32 CMessageService::GetUsedMessageCount()
+{
+	return (uint32)m_MessagePool.GetUsedCount();
+}
+
 CMessage* CMessageService::CreateMessage()
 {
     //OUR_DEBUG((LM_INFO, "[CMessageService::CreateMessage]GetThreadID=%d, m_MessagePool=0x%08x.\n", GetThreadID(), m_MessagePool));
@@ -600,16 +605,19 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* a
         //uint32 u4CurrMemory = (uint32)GetProcessMemorySize_Linux();
 #endif
 
-        uint32 u4UsedSize = App_MessageBlockManager::instance()->GetUsedSize();
+		//获得相关Messageblock,BuffPacket,MessageCount,内存大小
+        uint32 u4MessageBlockUsedSize = App_MessageBlockManager::instance()->GetUsedSize();
+		uint32 u4BuffPacketCount = App_BuffPacketManager::instance()->GetBuffPacketUsedCount();
+		uint32 u4MessageCount = GetUsedMessageCount();
 
-        if(u4CurrCpu > App_MainConfig::instance()->GetCpuMax() || u4UsedSize > App_MainConfig::instance()->GetMemoryMax())
+        if(u4CurrCpu > App_MainConfig::instance()->GetCpuMax() || u4MessageBlockUsedSize > App_MainConfig::instance()->GetMemoryMax())
         {
-            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::handle_timeout]CPU Rote=%d,Memory=%d ALERT.\n", u4CurrCpu, u4UsedSize));
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_MONITOR, "[Monitor] CPU Rote=%d,Memory=%d.", u4CurrCpu, u4UsedSize);
+            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::handle_timeout]CPU Rote=%d,MessageBlock=%d,u4BuffPacketCount=%d,u4MessageCount=%d ALERT.\n", u4CurrCpu, u4MessageBlockUsedSize, u4BuffPacketCount, u4MessageCount));
+            AppLogManager::instance()->WriteLog(LOG_SYSTEM_MONITOR, "[Monitor] CPU Rote=%d,MessageBlock=%d,u4BuffPacketCount=%d,u4MessageCount=%d.", u4CurrCpu, u4MessageBlockUsedSize, u4BuffPacketCount, u4MessageCount);
         }
         else
         {
-            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::handle_timeout]CPU Rote=%d,Memory=%d OK.\n", u4CurrCpu, u4UsedSize));
+            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::handle_timeout]CPU Rote=%d,MessageBlock=%d,u4BuffPacketCount=%d,u4MessageCount=%d OK.\n", u4CurrCpu, u4MessageBlockUsedSize, u4BuffPacketCount, u4MessageCount));
         }
     }
 
@@ -796,6 +804,16 @@ CThreadInfo* CMessageServiceGroup::GetThreadInfo()
     }
 
     return &m_objAllThreadInfo;
+}
+
+uint32 CMessageServiceGroup::GetUsedMessageCount()
+{
+	uint32 u4Count = 0;
+	for (int i = 0; i < (int)m_vecMessageService.size(); i++)
+	{
+		u4Count += m_vecMessageService[i]->GetUsedMessageCount();
+	}
+	return u4Count;
 }
 
 uint32 CMessageServiceGroup::GetWorkThreadCount()

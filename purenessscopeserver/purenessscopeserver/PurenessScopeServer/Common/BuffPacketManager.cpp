@@ -115,3 +115,4 @@ uint32 CBuffPacketManager::GetBuffPacketFreeCount()
 {
     return (uint32)m_objHashBuffPacketList.Get_Used_Count();
 }
+
