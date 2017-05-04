@@ -65,8 +65,8 @@ void CProConnectClient::ClientClose(EM_s2s& ems2s)
         }
 
         ACE_OS::shutdown(this->handle(), SD_SEND);
-        ACE_OS::closesocket(this->handle());
-        this->handle(ACE_INVALID_HANDLE);
+        //ACE_OS::closesocket(this->handle());
+        //this->handle(ACE_INVALID_HANDLE);
     }
 }
 

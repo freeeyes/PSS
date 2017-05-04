@@ -325,7 +325,10 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, int nPort
     }
 
     //添加有效的pClientMessage
-    App_ServerMessageTask::instance()->AddClientMessage(pClientMessage);
+	if (App_MainConfig::instance()->GetConnectServerRunType() == 1)
+	{
+		App_ServerMessageTask::instance()->AddClientMessage(pClientMessage);
+	}
 
     OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) connect is OK.\n", nServerID));
 
@@ -414,6 +417,8 @@ bool CClientProConnectManager::SetHandler(int nServerID, CProConnectClient* pPro
 
 bool CClientProConnectManager::Close(int nServerID, EM_s2s ems2s)
 {
+	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
+
     //如果是因为服务器断开，则只删除ProConnectClient的指针
     char szServerID[10] = {'\0'};
     sprintf_safe(szServerID, 10, "%d", nServerID);
