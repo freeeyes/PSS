@@ -67,6 +67,8 @@ void CConnectClient::ClientClose(EM_s2s& ems2s)
 
 int CConnectClient::open(void* p)
 {
+	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadLock);
+
     //从配置文件获取数据
     m_u4MaxPacketSize  = App_MainConfig::instance()->GetRecvBuffSize();
 
