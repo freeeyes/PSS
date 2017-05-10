@@ -4,6 +4,7 @@
 #include "IMessage.h"
 
 //基础抽象类，处理命令的类继承它。
+using namespace PSS;
 
 class CClientCommand
 {

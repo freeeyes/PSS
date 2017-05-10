@@ -4,6 +4,8 @@
 #include "define.h"
 #include "ace/Message_Block.h"
 
+using namespace PSS;
+
 class IMessageBlockManager
 {
 public:

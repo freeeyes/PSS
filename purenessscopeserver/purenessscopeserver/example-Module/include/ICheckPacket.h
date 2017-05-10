@@ -8,6 +8,8 @@
 
 #include "IBuffPacket.h"
 
+using namespace PSS;
+
 class ICheckPacket
 {
 public:

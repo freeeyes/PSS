@@ -5,7 +5,6 @@
 //UDP不是面向链接的，也不必处理数据包的具体切割，所以这里完全可以把收到的数据交给用户自己处理。
 //add by freeeyes
 
-
 class IClientUDPMessage
 {
 public:
