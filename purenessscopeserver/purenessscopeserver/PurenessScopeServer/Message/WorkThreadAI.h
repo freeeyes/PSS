@@ -23,6 +23,8 @@
 
 #define COMMAND_RETURN_BUSY 0xffff
 
+using namespace PSS;
+
 //二进制换砖类，负责二进制的代码转换
 class CConvertBuffer
 {

@@ -29,6 +29,7 @@ using namespace std;
 #define NULL 0
 #endif
 
+namespace PSS {
 #define MAINCONFIG            "main.xml"
 #define ALERTCONFIG           "alert.xml"
 #define FORBIDDENIP_FILE      "forbiddenIP.xml"
@@ -1330,5 +1331,6 @@ struct _ClientNameInfo
     }
 };
 typedef vector<_ClientNameInfo> vecClientNameInfo;
+};
 
 #endif

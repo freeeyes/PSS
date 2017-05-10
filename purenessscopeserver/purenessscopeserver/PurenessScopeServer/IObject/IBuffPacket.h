@@ -3,6 +3,8 @@
 
 #include "define.h"
 
+using namespace PSS;
+
 //BuffPacket的接口类
 class IBuffPacket
 {

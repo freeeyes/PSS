@@ -3,6 +3,8 @@
 
 #include "define.h"
 
+using namespace PSS;
+
 class IModuleInfo
 {
 public:

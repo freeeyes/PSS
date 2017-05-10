@@ -15,6 +15,8 @@
 
 #define MAX_IP_SIZE 50
 
+using namespace PSS;
+
 struct _ForbiddenIP
 {
     char           m_szClientIP[MAX_IP_SIZE];   //±»½ûÖ¹µÄIP

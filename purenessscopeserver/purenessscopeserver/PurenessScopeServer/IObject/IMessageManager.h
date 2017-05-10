@@ -4,6 +4,8 @@
 #include "ClientCommand.h"
 #include "IMessage.h"
 
+using namespace PSS;
+
 class IMessageManager
 {
 public:

@@ -3,6 +3,8 @@
 
 #include "IBuffPacket.h"
 
+using namespace PSS;
+
 class IPacketManager
 {
 public:

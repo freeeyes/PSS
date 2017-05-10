@@ -7,6 +7,8 @@
 
 #include "define.h"
 
+using namespace PSS;
+
 class IPacketParse
 {
 public:

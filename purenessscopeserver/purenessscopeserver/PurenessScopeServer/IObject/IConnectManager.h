@@ -4,6 +4,8 @@
 #include "IBuffPacket.h"
 #include <vector>
 
+using namespace PSS;
+
 enum EM_Client_Connect_status
 {
     CLIENT_CONNECT_EXIST = 0,

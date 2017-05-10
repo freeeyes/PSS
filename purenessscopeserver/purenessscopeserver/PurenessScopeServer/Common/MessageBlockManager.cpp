@@ -1,5 +1,7 @@
 #include "MessageBlockManager.h"
 
+using namespace PSS;
+
 CMessageBlockManager::CMessageBlockManager(void)
 {
     m_pmsgallocator   = NULL;
@@ -17,9 +19,9 @@ CMessageBlockManager::~CMessageBlockManager(void)
 
 void CMessageBlockManager::Init()
 {
-    m_pmsgallocator   = new Mutex_Allocator();
-    m_pdata_allocator = new Mutex_Allocator();
-    m_pbuff_allocator = new Mutex_Allocator();
+    m_pmsgallocator   = new Mutex_MB_Allocator();
+    m_pdata_allocator = new Mutex_MB_Allocator();
+    m_pbuff_allocator = new Mutex_MB_Allocator();
 }
 
 void CMessageBlockManager::Close()

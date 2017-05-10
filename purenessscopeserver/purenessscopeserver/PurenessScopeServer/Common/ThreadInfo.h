@@ -4,6 +4,7 @@
 #include "define.h"
 
 using namespace std;
+using namespace PSS;
 
 struct _ThreadInfo
 {

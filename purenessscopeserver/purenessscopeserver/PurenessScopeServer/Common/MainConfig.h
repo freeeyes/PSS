@@ -9,12 +9,14 @@
 
 #include "PacketParse.h"
 
+using namespace PSS;
+
 //PacketParse相关信息
 struct _PacketParseInfo
 {
     char   m_szPacketParseName[MAX_BUFF_100];
     uint8  m_u1Type;
-    uint32 m_u4OrgLength;
+	uint32 m_u4OrgLength;
 
     _PacketParseInfo()
     {

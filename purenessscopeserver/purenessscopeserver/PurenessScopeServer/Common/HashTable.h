@@ -6,6 +6,8 @@
 #include <string.h>
 #include "define.h"
 
+using namespace PSS;
+
 enum EM_HASH_STATE
 {
     EM_SELECT = 0,
