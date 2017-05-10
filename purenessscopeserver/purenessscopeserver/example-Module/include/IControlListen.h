@@ -3,8 +3,6 @@
 
 #include "define.h"
 
-using namespace PSS;
-
 struct _ControlInfo
 {
     char m_szListenIP[MAX_BUFF_20];

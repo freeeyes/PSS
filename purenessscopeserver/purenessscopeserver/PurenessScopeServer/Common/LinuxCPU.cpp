@@ -2,7 +2,7 @@
 
 int GetProcessCPU_Idel_Linux()
 {
-	int nRet = 0;
+    int nRet = 0;
     ACE_TString strcmd ="ps -aux | grep ";
     char szbuffid[MAX_BUFF_20];
     ACE_TString strpid;
@@ -18,10 +18,11 @@ int GetProcessCPU_Idel_Linux()
 
     fd = ACE_OS::fopen("aasnowy.txt","r");
     char* pReturn = fgets(szbuffer,sizeof(szbuffer),fd);
-	if (NULL == pReturn)
-	{
-		return -1;
-	}
+
+    if (NULL == pReturn)
+    {
+        return -1;
+    }
 
     //切分出CPU数据
     bool blFlag = false;
@@ -48,14 +49,14 @@ int GetProcessCPU_Idel_Linux()
     float fcpu;
     fcpu = (float)atof(szTmp);
     fclose(fd);
-	nRet = system("rm -rf aasnowy.txt");
+    nRet = system("rm -rf aasnowy.txt");
 
     return (int)(fcpu*100);
 }
 
 int GetProcessMemorySize_Linux()
 {
-	int nRet = 0;
+    int nRet = 0;
     ACE_TString strcmd ="ps -aux | grep ";
     char szbuffid[MAX_BUFF_20];
     ACE_TString strpid;
@@ -64,20 +65,22 @@ int GetProcessMemorySize_Linux()
     strcmd += strpid;
     ACE_TString strMem = strcmd;
     strMem +="  |awk '{print $2,$6}' >> aasnowy.txt";
-	nRet = system(strMem.c_str()); //获取内存命令
-	if (-1 == nRet)
-	{
-		return -1;
-	}
+    nRet = system(strMem.c_str()); //获取内存命令
+
+    if (-1 == nRet)
+    {
+        return -1;
+    }
 
     FILE* fd;
     char szbuffer[50];
     fd = ACE_OS::fopen("aasnowy.txt","r");
     char* pReturn = fgets(szbuffer,sizeof(szbuffer),fd);
-	if (NULL == pReturn)
-	{
-		return -1;
-	}
+
+    if (NULL == pReturn)
+    {
+        return -1;
+    }
 
     //切分出内存数据
     bool blFlag = false;
@@ -104,7 +107,7 @@ int GetProcessMemorySize_Linux()
     int nMem = 0;
     nMem = atoi(szTmp);
     fclose(fd);
-	nRet = system("rm -rf aasnowy.txt");
+    nRet = system("rm -rf aasnowy.txt");
 
     return nMem * 1000;
 }

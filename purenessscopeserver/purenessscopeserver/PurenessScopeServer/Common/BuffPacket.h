@@ -96,7 +96,7 @@ private:
     uint32                    m_u4WritePtr;        //写包的位置
     uint32                    m_u4PacketLen;       //包总长度
     uint32                    m_u4PacketCount;     //当前数据包的个数
-	uint32                    m_u4MaxPacketSize;   //最大当前BuffPacket的容量
+    uint32                    m_u4MaxPacketSize;   //最大当前BuffPacket的容量
     bool                      m_blNetSort;         //字节序开启开关，false为不转换为主机字节序，true为转换为主机字节序
     int                       m_nHashID;           //记录当前对象在Hash数组中的位置
 

@@ -3,7 +3,6 @@
 #include <map>
 
 using namespace std;
-using namespace PSS;
 
 //这个类是记录所有的Http连接状态的
 //add by freeeyes

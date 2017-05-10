@@ -9,14 +9,12 @@
 
 #include "PacketParse.h"
 
-using namespace PSS;
-
 //PacketParse相关信息
 struct _PacketParseInfo
 {
     char   m_szPacketParseName[MAX_BUFF_100];
     uint8  m_u1Type;
-	uint32 m_u4OrgLength;
+    uint32 m_u4OrgLength;
 
     _PacketParseInfo()
     {
@@ -223,9 +221,9 @@ public:
 
     uint32 GetMgsHighMark();
     uint32 GetMsgLowMark();
-	uint32 GetMsgMaxBuffSize();
+    uint32 GetMsgMaxBuffSize();
     uint32 GetThreadCount();
-	uint8  GetProcessCount();
+    uint8  GetProcessCount();
     uint32 GetMsgMaxQueue();
     uint16 GetHandleCount();
 
@@ -329,9 +327,9 @@ private:
 
     uint32     m_u4MsgHighMark;                        //消息的高水位阀值
     uint32     m_u4MsgLowMark;                         //消息的低水位阀值
-	uint32     m_u4MsgMaxBuffSize;                     //消息的最大大小
+    uint32     m_u4MsgMaxBuffSize;                     //消息的最大大小
     uint32     m_u4MsgThreadCount;                     //允许的工作线程个数
-	uint8      m_u1MsgProcessCount;                    //当前的多进程数量(仅Linux支持)
+    uint8      m_u1MsgProcessCount;                    //当前的多进程数量(仅Linux支持)
     uint32     m_u4MsgMaxQueue;                        //消息队列的最大个数
     uint8      m_u1Debug;                              //是否开启Debug模式，1是开启，0是关闭
 

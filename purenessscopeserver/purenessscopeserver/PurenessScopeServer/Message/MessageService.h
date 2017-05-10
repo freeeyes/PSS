@@ -76,7 +76,7 @@ public:
     void SetThreadState(MESSAGE_SERVICE_THREAD_STATE emState);             //设置线程状态
     MESSAGE_SERVICE_THREAD_STATE GetThreadState();                         //得到当前线程状态
     uint32 GetStepState();                                                 //得到当前步数相关信息
-	uint32 GetUsedMessageCount();                                          //得到正在使用的Message对象个数 
+    uint32 GetUsedMessageCount();                                          //得到正在使用的Message对象个数
 
     uint32 GetThreadID();
 
@@ -124,7 +124,7 @@ public:
 
     bool Start();
     CThreadInfo* GetThreadInfo();
-	uint32 GetUsedMessageCount();
+    uint32 GetUsedMessageCount();
 
     uint32 GetWorkThreadCount();                                                              //得到当前工作线程的数量
     uint32 GetWorkThreadIDByIndex(uint32 u4Index);                                            //得到指定工作线程的线程ID

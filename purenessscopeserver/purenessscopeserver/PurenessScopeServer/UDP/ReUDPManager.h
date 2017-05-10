@@ -77,17 +77,17 @@ public:
         }
     }
 
-	CReactorUDPHander* GetUDPHandle(uint8 u1Index)
-	{
-		if(u1Index >= (uint8)m_vecReactorUDPHandler.size())
-		{ 
-			return NULL;
-		}
-		else
-		{
-			return m_vecReactorUDPHandler[u1Index];
-		}
-	}
+    CReactorUDPHander* GetUDPHandle(uint8 u1Index)
+    {
+        if(u1Index >= (uint8)m_vecReactorUDPHandler.size())
+        {
+            return NULL;
+        }
+        else
+        {
+            return m_vecReactorUDPHandler[u1Index];
+        }
+    }
 
 private:
     typedef vector<CReactorUDPHander*> vecReactorUDPHandler;

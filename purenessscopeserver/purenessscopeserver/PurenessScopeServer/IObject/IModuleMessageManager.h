@@ -3,8 +3,6 @@
 
 #include "IBuffPacket.h"
 
-using namespace PSS;
-
 class IModuleMessageManager
 {
 public:

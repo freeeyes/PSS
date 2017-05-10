@@ -52,7 +52,7 @@ bool CConnectClient::Close()
 
 void CConnectClient::ClientClose(EM_s2s& ems2s)
 {
-	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadLock);
+    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadLock);
     m_ems2s = ems2s;
     //msg_queue()->deactivate();
 
@@ -129,7 +129,7 @@ int CConnectClient::open(void* p)
 
 int CConnectClient::handle_input(ACE_HANDLE fd)
 {
-	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadLock);
+    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadLock);
 
     if (fd == ACE_INVALID_HANDLE)
     {

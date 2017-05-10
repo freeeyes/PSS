@@ -30,13 +30,13 @@ public:
               int flags,
               int backlog);
 
-	int Init_Open(const ACE_INET_Addr &local_addr,
-		int flags = 0,
-		int use_select = 1,
-		int reuse_addr = 1,
-		int backlog = ACE_DEFAULT_BACKLOG);
+    int Init_Open(const ACE_INET_Addr& local_addr,
+                  int flags = 0,
+                  int use_select = 1,
+                  int reuse_addr = 1,
+                  int backlog = ACE_DEFAULT_BACKLOG);
 
-	int Run_Open(ACE_Reactor *reactor);
+    int Run_Open(ACE_Reactor* reactor);
 
     char*  GetListenIP();
     uint32 GetListenPort();

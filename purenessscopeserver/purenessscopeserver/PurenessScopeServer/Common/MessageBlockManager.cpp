@@ -1,7 +1,5 @@
 #include "MessageBlockManager.h"
 
-using namespace PSS;
-
 CMessageBlockManager::CMessageBlockManager(void)
 {
     m_pmsgallocator   = NULL;

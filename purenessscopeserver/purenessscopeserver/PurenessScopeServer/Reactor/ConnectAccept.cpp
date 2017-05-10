@@ -16,7 +16,8 @@ void ConnectAcceptor::InitClientReactor(uint32 u4ClientReactorCount)
 
 int ConnectAcceptor::make_svc_handler(CConnectHandler*& sh)
 {
-		 OUR_DEBUG((LM_ERROR, "[ConnectAcceptor::make_svc_handler]Connect accept.\n"));
+    OUR_DEBUG((LM_ERROR, "[ConnectAcceptor::make_svc_handler]Connect accept.\n"));
+
     //如果正在处理的链接超过了服务器设定的数值，则不允许链接继续链接服务器
     if (App_ConnectHandlerPool::instance()->GetUsedCount() > App_MainConfig::instance()->GetMaxHandlerCount())
     {
@@ -97,43 +98,44 @@ int ConnectAcceptor::open2(ACE_INET_Addr& local_addr, ACE_Reactor* reactor, int 
     return result;
 }
 
-int ConnectAcceptor::Init_Open(const ACE_INET_Addr &local_addr, int flags, int use_select, int reuse_addr, int backlog)
+int ConnectAcceptor::Init_Open(const ACE_INET_Addr& local_addr, int flags, int use_select, int reuse_addr, int backlog)
 {
-	//添加记录监听服务器的IP和端口地址
-	sprintf_safe(m_szListenIP, MAX_BUFF_20, "%s", local_addr.get_host_addr());
-	m_u4Port = (uint32)local_addr.get_port_number();
+    //添加记录监听服务器的IP和端口地址
+    sprintf_safe(m_szListenIP, MAX_BUFF_20, "%s", local_addr.get_host_addr());
+    m_u4Port = (uint32)local_addr.get_port_number();
 
-	this->flags_ = flags;
-	this->use_select_ = use_select;
-	this->reuse_addr_ = reuse_addr;
-	this->peer_acceptor_addr_ = local_addr;
+    this->flags_ = flags;
+    this->use_select_ = use_select;
+    this->reuse_addr_ = reuse_addr;
+    this->peer_acceptor_addr_ = local_addr;
 
-	// Open the underlying PEER_ACCEPTOR.
-	if (this->peer_acceptor_.open(local_addr, 1, 0, backlog) == -1)
-	{
-		return -1;
-	}
+    // Open the underlying PEER_ACCEPTOR.
+    if (this->peer_acceptor_.open(local_addr, 1, 0, backlog) == -1)
+    {
+        return -1;
+    }
 
-	(void) this->peer_acceptor_.enable(ACE_NONBLOCK);
+    (void) this->peer_acceptor_.enable(ACE_NONBLOCK);
 
-	return 0;
+    return 0;
 }
 
-int ConnectAcceptor::Run_Open(ACE_Reactor *reactor)
+int ConnectAcceptor::Run_Open(ACE_Reactor* reactor)
 {
-	this->reactor(reactor);
-	int result = this->reactor()->register_handler(this,
-		ACE_Event_Handler::ACCEPT_MASK);
-	if (result != -1)
-	{
-		return result;
-	}
-	else
-	{
-		this->peer_acceptor_.close();
-	}
+    this->reactor(reactor);
+    int result = this->reactor()->register_handler(this,
+                 ACE_Event_Handler::ACCEPT_MASK);
 
-	return result;
+    if (result != -1)
+    {
+        return result;
+    }
+    else
+    {
+        this->peer_acceptor_.close();
+    }
+
+    return result;
 }
 
 char* ConnectAcceptor::GetListenIP()

@@ -4,8 +4,6 @@
 #include "ace/SString.h"
 #include "ace/Message_Block.h"
 
-using namespace PSS;
-
 //日志块数据结构
 struct _LogBlockInfo
 {

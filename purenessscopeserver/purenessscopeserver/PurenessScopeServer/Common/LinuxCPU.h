@@ -3,8 +3,6 @@
 
 #include "define.h"
 
-using namespace PSS;
-
 int GetProcessCPU_Idel_Linux();
 
 int GetProcessMemorySize_Linux();

@@ -1,8 +1,6 @@
 #ifndef _IUDPCONNECTMANAGER_H
 #define _IUDPCONNECTMANAGER_H
 
-using namespace PSS;
-
 class IUDPConnectManager
 {
 public:

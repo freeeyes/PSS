@@ -3,8 +3,6 @@
 
 #include "ILogObject.h"
 
-using namespace PSS;
-
 class ILogManager
 {
 public:

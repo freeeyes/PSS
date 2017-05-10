@@ -3,8 +3,6 @@
 
 #include "define.h"
 
-using namespace PSS;
-
 class IClientParse
 {
 public:

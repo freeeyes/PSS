@@ -47,47 +47,47 @@ int CReactorUDPHander::OpenAddress(const ACE_INET_Addr& AddrRemote, ACE_Reactor*
 
 int CReactorUDPHander::OpenAddress(const ACE_INET_Addr& AddrRemote)
 {
-	if (m_skRemote.open(AddrRemote) == -1)
-	{
-		OUR_DEBUG((LM_ERROR, "[CReactorUDPHander::OpenAddress]Open error(%d).\n", errno));
-		return -1;
-	}
+    if (m_skRemote.open(AddrRemote) == -1)
+    {
+        OUR_DEBUG((LM_ERROR, "[CReactorUDPHander::OpenAddress]Open error(%d).\n", errno));
+        return -1;
+    }
 
-	m_addrLocal = AddrRemote;
+    m_addrLocal = AddrRemote;
 
-	//按照线程初始化统计模块的名字
-	char szName[MAX_BUFF_50] = { '\0' };
-	sprintf_safe(szName, MAX_BUFF_50, "发送线程");
-	m_CommandAccount.InitName(szName, App_MainConfig::instance()->GetMaxCommandCount());
+    //按照线程初始化统计模块的名字
+    char szName[MAX_BUFF_50] = { '\0' };
+    sprintf_safe(szName, MAX_BUFF_50, "发送线程");
+    m_CommandAccount.InitName(szName, App_MainConfig::instance()->GetMaxCommandCount());
 
-	//初始化统计模块功能
-	m_CommandAccount.Init(App_MainConfig::instance()->GetCommandAccount(),
-		App_MainConfig::instance()->GetCommandFlow(),
-		App_MainConfig::instance()->GetPacketTimeOut());
+    //初始化统计模块功能
+    m_CommandAccount.Init(App_MainConfig::instance()->GetCommandAccount(),
+                          App_MainConfig::instance()->GetCommandFlow(),
+                          App_MainConfig::instance()->GetPacketTimeOut());
 
-	//设置发送超时时间（因为UDP如果客户端不存在的话，sendto会引起一个recv错误）
-	//在这里设置一个超时，让个recv不会无限等下去
-	struct timeval timeout = { MAX_RECV_UDP_TIMEOUT, 0 };
-	ACE_OS::setsockopt(m_skRemote.get_handle(), SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(timeout));
+    //设置发送超时时间（因为UDP如果客户端不存在的话，sendto会引起一个recv错误）
+    //在这里设置一个超时，让个recv不会无限等下去
+    struct timeval timeout = { MAX_RECV_UDP_TIMEOUT, 0 };
+    ACE_OS::setsockopt(m_skRemote.get_handle(), SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(timeout));
 
-	m_pPacketParse = App_PacketParsePool::instance()->Create();
+    m_pPacketParse = App_PacketParsePool::instance()->Create();
 
-	return 0;
+    return 0;
 }
 
 
 
 int CReactorUDPHander::Run_Open(ACE_Reactor* pReactor)
 {
-	reactor(pReactor);
+    reactor(pReactor);
 
-	if (-1 == this->reactor()->register_handler(this, ACE_Event_Handler::READ_MASK))
-	{
-		OUR_DEBUG((LM_ERROR, "[CReactorUDPHander::OpenAddress] Addr is register_handler error(%d).\n", errno));
-		return -1;
-	}
+    if (-1 == this->reactor()->register_handler(this, ACE_Event_Handler::READ_MASK))
+    {
+        OUR_DEBUG((LM_ERROR, "[CReactorUDPHander::OpenAddress] Addr is register_handler error(%d).\n", errno));
+        return -1;
+    }
 
-	return 0;
+    return 0;
 }
 
 void CReactorUDPHander::Close()

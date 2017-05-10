@@ -19,8 +19,6 @@
 
 #include "IMessageBlockManager.h"
 
-using namespace PSS;
-
 typedef  ACE_Malloc<ACE_LOCAL_MEMORY_POOL, ACE_SYNCH_MUTEX> MUTEX_MB_MALLOC;
 typedef ACE_Allocator_Adapter<MUTEX_MB_MALLOC> Mutex_MB_Allocator;
 

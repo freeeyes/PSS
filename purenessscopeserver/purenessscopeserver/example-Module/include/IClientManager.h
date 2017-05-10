@@ -4,8 +4,6 @@
 #include "ClientMessage.h"
 #include "ClientUDPMassage.h"
 
-using namespace PSS;
-
 //负责管理服务器间通讯的数据管理
 class IClientManager
 {

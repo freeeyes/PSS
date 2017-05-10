@@ -14,8 +14,6 @@
 #include "ace/Configuration.h"
 #include "ace/Configuration_Import_Export.h"
 
-using namespace PSS;
-
 class CAppConfig
 {
 public:

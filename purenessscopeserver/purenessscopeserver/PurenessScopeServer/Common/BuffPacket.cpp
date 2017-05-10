@@ -23,7 +23,7 @@ bool CBuffPacket::Init(int nSize, int nMaxBuffSize)
     try
     {
         m_szError[0]      = '\0';
-		m_u4MaxPacketSize = nMaxBuffSize;
+        m_u4MaxPacketSize = nMaxBuffSize;
 
         if(nSize >= (int)m_u4MaxPacketSize)
         {

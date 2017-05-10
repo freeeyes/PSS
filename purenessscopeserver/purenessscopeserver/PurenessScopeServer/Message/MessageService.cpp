@@ -475,7 +475,7 @@ uint32 CMessageService::GetStepState()
 
 uint32 CMessageService::GetUsedMessageCount()
 {
-	return (uint32)m_MessagePool.GetUsedCount();
+    return (uint32)m_MessagePool.GetUsedCount();
 }
 
 CMessage* CMessageService::CreateMessage()
@@ -605,10 +605,10 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* a
         //uint32 u4CurrMemory = (uint32)GetProcessMemorySize_Linux();
 #endif
 
-		//获得相关Messageblock,BuffPacket,MessageCount,内存大小
+        //获得相关Messageblock,BuffPacket,MessageCount,内存大小
         uint32 u4MessageBlockUsedSize = App_MessageBlockManager::instance()->GetUsedSize();
-		uint32 u4BuffPacketCount = App_BuffPacketManager::instance()->GetBuffPacketUsedCount();
-		uint32 u4MessageCount = GetUsedMessageCount();
+        uint32 u4BuffPacketCount = App_BuffPacketManager::instance()->GetBuffPacketUsedCount();
+        uint32 u4MessageCount = GetUsedMessageCount();
 
         if(u4CurrCpu > App_MainConfig::instance()->GetCpuMax() || u4MessageBlockUsedSize > App_MainConfig::instance()->GetMemoryMax())
         {
@@ -808,12 +808,14 @@ CThreadInfo* CMessageServiceGroup::GetThreadInfo()
 
 uint32 CMessageServiceGroup::GetUsedMessageCount()
 {
-	uint32 u4Count = 0;
-	for (int i = 0; i < (int)m_vecMessageService.size(); i++)
-	{
-		u4Count += m_vecMessageService[i]->GetUsedMessageCount();
-	}
-	return u4Count;
+    uint32 u4Count = 0;
+
+    for (int i = 0; i < (int)m_vecMessageService.size(); i++)
+    {
+        u4Count += m_vecMessageService[i]->GetUsedMessageCount();
+    }
+
+    return u4Count;
 }
 
 uint32 CMessageServiceGroup::GetWorkThreadCount()

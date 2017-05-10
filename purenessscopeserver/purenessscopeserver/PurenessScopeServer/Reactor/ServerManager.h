@@ -37,11 +37,11 @@ public:
     bool Init();
     bool Start();
     bool Close();
-	
+
 
 private:
-	bool Init_Reactor(uint8 u1ReactorCount, uint8 u1NetMode);
-	bool Run();
+    bool Init_Reactor(uint8 u1ReactorCount, uint8 u1NetMode);
+    bool Run();
 
 private:
     //CConnectAcceptorManager m_ConnectAcceptorManager;    //普通客户端链接

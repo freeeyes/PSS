@@ -54,7 +54,7 @@ void CProConnectClient::Close()
 
 void CProConnectClient::ClientClose(EM_s2s& ems2s)
 {
-	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
+    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 
     if(this->handle() != ACE_INVALID_HANDLE)
     {
@@ -119,7 +119,7 @@ void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
 
 void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result& result)
 {
-	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
+    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 
     ACE_Message_Block& mb = result.message_block();
     uint32 u4PacketLen = (uint32)result.bytes_transferred();

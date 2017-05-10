@@ -9,8 +9,6 @@
 #include "define.h"
 #include "ace/Profile_Timer.h"
 
-using namespace PSS;
-
 class CProfileTime
 {
 public:

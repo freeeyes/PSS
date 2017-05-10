@@ -25,11 +25,17 @@
 
 using namespace std;
 
+#define NAMESPACE PSS
+#define BEGIN_NAMESPACE namespace NAMESPACE{
+#define END_NAMESPACE }
+#define USING_NAMESPACE using namespace NAMESPACE;
+
+BEGIN_NAMESPACE
+
 #ifndef NULL
 #define NULL 0
 #endif
 
-namespace PSS {
 #define MAINCONFIG            "main.xml"
 #define ALERTCONFIG           "alert.xml"
 #define FORBIDDENIP_FILE      "forbiddenIP.xml"
@@ -1217,16 +1223,16 @@ inline bool Replace_String(char* pText, uint32 u4Len, const char* pOld, const ch
 inline int AcquireWriteLock(int fd, int start, int len)
 {
 #ifndef WIN32
-	struct flock arg;
-	arg.l_type = F_WRLCK; // ¼ÓÐ´Ëø
-	arg.l_whence = SEEK_SET;
-	arg.l_start = start;
-	arg.l_len = len;
-	arg.l_pid = getpid();
+    struct flock arg;
+    arg.l_type = F_WRLCK; // ¼ÓÐ´Ëø
+    arg.l_whence = SEEK_SET;
+    arg.l_start = start;
+    arg.l_len = len;
+    arg.l_pid = getpid();
 
-	return fcntl(fd, F_SETLKW, &arg);
+    return fcntl(fd, F_SETLKW, &arg);
 #else
-	return -1;
+    return -1;
 #endif
 }
 
@@ -1234,16 +1240,16 @@ inline int AcquireWriteLock(int fd, int start, int len)
 inline int ReleaseLock(int fd, int start, int len)
 {
 #ifndef WIN32
-	struct flock arg;
-	arg.l_type = F_UNLCK; //  ½âËø
-	arg.l_whence = SEEK_SET;
-	arg.l_start = start;
-	arg.l_len = len;
-	arg.l_pid = getpid();
+    struct flock arg;
+    arg.l_type = F_UNLCK; //  ½âËø
+    arg.l_whence = SEEK_SET;
+    arg.l_start = start;
+    arg.l_len = len;
+    arg.l_pid = getpid();
 
-	return fcntl(fd, F_SETLKW, &arg);
+    return fcntl(fd, F_SETLKW, &arg);
 #else
-	return -1;
+    return -1;
 #endif
 }
 
@@ -1251,34 +1257,34 @@ inline int ReleaseLock(int fd, int start, int len)
 inline int SeeLock(int fd, int start, int len)
 {
 #ifndef WIN32
-	struct flock arg;
-	arg.l_type = F_WRLCK;
-	arg.l_whence = SEEK_SET;
-	arg.l_start = start;
-	arg.l_len = len;
-	arg.l_pid = getpid();
+    struct flock arg;
+    arg.l_type = F_WRLCK;
+    arg.l_whence = SEEK_SET;
+    arg.l_start = start;
+    arg.l_len = len;
+    arg.l_pid = getpid();
 
-	if (fcntl(fd, F_GETLK, &arg) != 0) // »ñÈ¡Ëø
-	{
-		return -1; // ²âÊÔÊ§°Ü
-	}
+    if (fcntl(fd, F_GETLK, &arg) != 0) // »ñÈ¡Ëø
+    {
+        return -1; // ²âÊÔÊ§°Ü
+    }
 
-	if (arg.l_type == F_UNLCK)
-	{
-		return 0; // ÎÞËø
-	}
-	else if (arg.l_type == F_RDLCK)
-	{
-		return 1; // ¶ÁËø
-	}
-	else if (arg.l_type == F_WRLCK)
-	{
-		return 2; // Ð´Ëù
-	}
+    if (arg.l_type == F_UNLCK)
+    {
+        return 0; // ÎÞËø
+    }
+    else if (arg.l_type == F_RDLCK)
+    {
+        return 1; // ¶ÁËø
+    }
+    else if (arg.l_type == F_WRLCK)
+    {
+        return 2; // Ð´Ëù
+    }
 
-	return 0;
+    return 0;
 #else
-	return -1;
+    return -1;
 #endif
 }
 
@@ -1331,6 +1337,8 @@ struct _ClientNameInfo
     }
 };
 typedef vector<_ClientNameInfo> vecClientNameInfo;
-};
+
+END_NAMESPACE
+USING_NAMESPACE
 
 #endif

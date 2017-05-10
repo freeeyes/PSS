@@ -11,7 +11,6 @@
 #include "ace/POSIX_Proactor.h"
 
 using namespace std;
-using namespace PSS;
 
 enum
 {
