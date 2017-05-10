@@ -17,6 +17,8 @@
 #define DECLDIR ACE_Svc_Export
 #endif
 
+using namespace PSS;
+
 extern "C"
 {
 	DECLDIR bool Parse_Packet_Head_Info(uint32 u4ConnectID, ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager, _Head_Info* pHeadInfo);

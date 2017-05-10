@@ -22,6 +22,8 @@
 #define HTTP_HEAD_END    "\r\n\r\n"
 #define HTTP_BODY_LENGTH "Content-Length: "
 
+using namespace PSS;
+
 extern "C"
 {
     DECLDIR bool Parse_Packet_Head_Info(uint32 u4ConnectID, ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager, _Head_Info* pHeadInfo);

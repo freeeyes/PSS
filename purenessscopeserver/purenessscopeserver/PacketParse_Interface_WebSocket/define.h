@@ -29,6 +29,7 @@ using namespace std;
 #define NULL 0
 #endif
 
+namespace PSS {
 #define MAINCONFIG            "main.xml"
 #define ALERTCONFIG           "alert.xml"
 #define FORBIDDENIP_FILE      "forbiddenIP.xml"
@@ -43,7 +44,7 @@ using namespace std;
 #define MAX_BUFF_1000 1000
 #define MAX_BUFF_1024 1024
 
-#define THREAD_PARAM THR_NEW_LWP | THR_JOINABLE | THR_INHERIT_SCHED | THR_SUSPENDED
+#define THREAD_PARAM THR_NEW_LWP | THR_BOUND | THR_DETACHED
 
 /*
 //计算当前版本号是否与制定版本好一致
@@ -1212,6 +1213,75 @@ inline bool Replace_String(char* pText, uint32 u4Len, const char* pOld, const ch
     return true;
 }
 
+//写独占文件锁
+inline int AcquireWriteLock(int fd, int start, int len)
+{
+#ifndef WIN32
+	struct flock arg;
+	arg.l_type = F_WRLCK; // 加写锁
+	arg.l_whence = SEEK_SET;
+	arg.l_start = start;
+	arg.l_len = len;
+	arg.l_pid = getpid();
+
+	return fcntl(fd, F_SETLKW, &arg);
+#else
+	return -1;
+#endif
+}
+
+//释放独占文件锁
+inline int ReleaseLock(int fd, int start, int len)
+{
+#ifndef WIN32
+	struct flock arg;
+	arg.l_type = F_UNLCK; //  解锁
+	arg.l_whence = SEEK_SET;
+	arg.l_start = start;
+	arg.l_len = len;
+	arg.l_pid = getpid();
+
+	return fcntl(fd, F_SETLKW, &arg);
+#else
+	return -1;
+#endif
+}
+
+//查看写锁
+inline int SeeLock(int fd, int start, int len)
+{
+#ifndef WIN32
+	struct flock arg;
+	arg.l_type = F_WRLCK;
+	arg.l_whence = SEEK_SET;
+	arg.l_start = start;
+	arg.l_len = len;
+	arg.l_pid = getpid();
+
+	if (fcntl(fd, F_GETLK, &arg) != 0) // 获取锁
+	{
+		return -1; // 测试失败
+	}
+
+	if (arg.l_type == F_UNLCK)
+	{
+		return 0; // 无锁
+	}
+	else if (arg.l_type == F_RDLCK)
+	{
+		return 1; // 读锁
+	}
+	else if (arg.l_type == F_WRLCK)
+	{
+		return 2; // 写所
+	}
+
+	return 0;
+#else
+	return -1;
+#endif
+}
+
 //客户端IP信息
 struct _ClientIPInfo
 {
@@ -1261,5 +1331,6 @@ struct _ClientNameInfo
     }
 };
 typedef vector<_ClientNameInfo> vecClientNameInfo;
+};
 
 #endif

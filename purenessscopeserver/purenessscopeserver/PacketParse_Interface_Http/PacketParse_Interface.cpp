@@ -22,6 +22,8 @@
 #define HTTP_HEAD_END    "\r\n\r\n"
 #define HTTP_BODY_LENGTH "Content-Length: "
 
+using namespace PSS;
+
 extern "C"
 { 
 	DECLDIR bool Parse_Packet_Head_Info(uint32 u4ConnectID, ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager, _Head_Info* pHeadInfo);
@@ -117,7 +119,7 @@ extern "C"
 	uint8 HttpDispose(_HttpInfo* pHttpInfo, ACE_Message_Block* pCurrMessage, IMessageBlockManager* pMessageBlockManager, _Packet_Info* pPacketInfo)
 	{
 		char* pData   = pCurrMessage->rd_ptr();     //得到这个数据块的首字节
-		uint32 u4Data = pCurrMessage->length();     //得到这个数据块的长度
+		uint32 u4Data = (uint32)pCurrMessage->length();     //得到这个数据块的长度
 
 		//将收到的数据粘入缓冲等待做切包处理
 		if(pHttpInfo->m_u4DataLength + u4Data > MAX_DECRYPTLENGTH)
@@ -141,7 +143,7 @@ extern "C"
 			return PACKET_GET_NO_ENOUGTH;
 		}
 
-		uint32 u4HttpHeadLen = pHttpHead - pHttpInfo->m_szData - 4;
+		uint32 u4HttpHeadLen = (uint32)(pHttpHead - pHttpInfo->m_szData - 4);
 		//OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]u4HttpHeadLen=%d.\n", u4HttpHeadLen));
 
 		//找到了完整的包头
@@ -212,7 +214,7 @@ extern "C"
 	uint8 GetHttpBodyLen(char* pData, uint32 u4Len, uint32 u4HeadLen, uint32& u4BodyLen, _Packet_Info* pPacketInfo)
 	{
 		char szBodyLen[10] = {'\0'};
-		int nNameLen = ACE_OS::strlen(HTTP_BODY_LENGTH);
+		int nNameLen = (int)ACE_OS::strlen(HTTP_BODY_LENGTH);
 
 		//OUR_DEBUG((LM_ERROR, "[CPacketParse::GetHttpBodyLen]nNameLen=%d.\n", nNameLen));
 		//OUR_DEBUG((LM_ERROR, "[CPacketParse::GetHttpBodyLen]pData=%s.\n", pData));

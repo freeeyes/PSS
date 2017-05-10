@@ -3,6 +3,7 @@
 #include <map>
 
 using namespace std;
+using namespace PSS;
 
 //这个类是记录所有的websocket连接状态的
 //add by freeeyes
