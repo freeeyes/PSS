@@ -565,7 +565,14 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* a
 
                 //杀死当前工作线程
                 int ret = ACE_Thread_Manager::instance()->cancel_task(pMessageService, 1);
-                OUR_DEBUG((LM_DEBUG, "[CMessageServiceGroup::CheckServerMessageThread]kill return %d OK.\n", ret));
+				if (0 != ret)
+				{
+					OUR_DEBUG((LM_DEBUG, "[CMessageServiceGroup::CheckServerMessageThread]kill return %d fail(%d).\n", ret, errno));
+				}
+				else
+				{
+					OUR_DEBUG((LM_DEBUG, "[CMessageServiceGroup::CheckServerMessageThread]kill return OK.\n"));
+				}
 
                 //需要重启工作线程，先关闭当前的工作线程
                 pMessageService->Close();
