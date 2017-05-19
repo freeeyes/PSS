@@ -15,6 +15,8 @@ CCommandAccount::CCommandAccount()
     m_u4PrvFlowIn      = 0;
     m_u4PrvFlowOut     = 0;
 
+	m_szName[0]        = '\0';
+
     m_u8PacketTimeout  =  MAX_QUEUE_TIMEOUT * 1000;
 }
 

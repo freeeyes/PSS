@@ -25,7 +25,6 @@ struct _IPAccount
 
     _IPAccount()
     {
-        m_strIP      = "";
         m_nCount     = 0;
         m_nAllCount  = 0;
         m_dtLastTime.update();

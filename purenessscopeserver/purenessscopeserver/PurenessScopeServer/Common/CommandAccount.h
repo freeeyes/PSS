@@ -137,6 +137,13 @@ struct _CommandFlowAccount
         m_u4FlowOut = 0;
     }
 
+	_CommandFlowAccount(const _CommandFlowAccount& ar)
+	{
+		this->m_u1FLow = ar.m_u1FLow;
+		this->m_u4FlowIn = ar.m_u4FlowIn;
+		this->m_u4FlowOut = ar.m_u4FlowOut;
+	}
+
     _CommandFlowAccount& operator = (const _CommandFlowAccount& ar)
     {
         this->m_u1FLow    = ar.m_u1FLow;

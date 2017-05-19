@@ -12,7 +12,6 @@ CForbiddenIP::~CForbiddenIP()
 
 bool CForbiddenIP::Init(const char* szConfigPath)
 {
-    char* pData = NULL;
     OUR_DEBUG((LM_INFO, "[CForbiddenIP::Init]Filename = %s.\n", szConfigPath));
 
     if(!m_ForbiddenData.Init(szConfigPath))
@@ -33,7 +32,7 @@ bool CForbiddenIP::Init(const char* szConfigPath)
 
     while(true)
     {
-        pData = m_ForbiddenData.GetData("ForbiddenIP", "ip", pNextTiXmlElementIP);
+        char* pData = m_ForbiddenData.GetData("ForbiddenIP", "ip", pNextTiXmlElementIP);
 
         if(pData != NULL)
         {
