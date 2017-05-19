@@ -48,6 +48,28 @@ struct _Server_Message_Info
         *ppMessage = this;
     }
 
+	//¿½±´¹¹Ôìº¯Êý
+	_Server_Message_Info(const _Server_Message_Info& ar)
+	{
+		this->m_pClientMessage  = ar.m_pClientMessage;
+		this->m_u2CommandID     = ar.m_u2CommandID;
+		this->m_pRecvFinish     = ar.m_pRecvFinish;
+		this->m_objServerIPInfo = ar.m_objServerIPInfo;
+		this->m_nHashID         = ar.m_nHashID;
+		this->m_pmbQueuePtr     = ar.m_pmbQueuePtr;
+	}
+
+	_Server_Message_Info& operator = (const _Server_Message_Info& ar)
+	{
+		this->m_pClientMessage = ar.m_pClientMessage;
+		this->m_u2CommandID = ar.m_u2CommandID;
+		this->m_pRecvFinish = ar.m_pRecvFinish;
+		this->m_objServerIPInfo = ar.m_objServerIPInfo;
+		this->m_nHashID = ar.m_nHashID;
+		this->m_pmbQueuePtr = ar.m_pmbQueuePtr;
+		return *this;
+	}
+
     ~_Server_Message_Info()
     {
         if(NULL != m_pmbQueuePtr)

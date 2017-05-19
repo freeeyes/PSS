@@ -164,7 +164,7 @@ public:
     void Set_Base_Addr(char* pData, int nCount, short sKeySize)
     {
         m_pBase      = pData;
-        m_lpTable    = (_Hash_Table_Cell<T>*)pData;
+        m_lpTable    = reinterpret_cast<_Hash_Table_Cell<T>*>(pData);
         m_nCount     = nCount;
         m_sKeyLen    = sKeySize;
         m_nCurrIndex = 0;
@@ -323,7 +323,7 @@ public:
     void Set_Base_Addr(char* pData, int nCount)
     {
         m_pBase      = pData;
-        m_lpTable    = (_Hash_Link_Info<T>*)pData;
+        m_lpTable    = reinterpret_cast<_Hash_Link_Info<T>*>(pData);
         m_nCount     = nCount;
         m_nCurrIndex = 0;
 
@@ -429,9 +429,10 @@ class CHashTable
 public:
     CHashTable()
     {
-        m_pBase     = NULL;
-        m_lpTable   = NULL;
-        m_cIsDelete = 0;
+        m_pBase          = NULL;
+        m_lpTable        = NULL;
+        m_cIsDelete      = 0;
+		m_nCurrLinkIndex = 0;
     }
 
     ~CHashTable()
@@ -687,11 +688,13 @@ public:
                 {
                     return -1;
                 }
-
-                sprintf_safe(pData->m_pKey, pData->m_sKeyLen, "%s", pKey);
-                pData->m_pValue   = pValue;
-                pLink->m_pData    = pData;
-                m_lpTable[nPos]   = pLink;
+				else
+				{
+					sprintf_safe(pData->m_pKey, pData->m_sKeyLen, "%s", pKey);
+					pData->m_pValue = pValue;
+					pLink->m_pData = pData;
+					m_lpTable[nPos] = pLink;
+				}
             }
             else
             {
@@ -722,12 +725,17 @@ public:
                 {
                     return -1;
                 }
-
-                sprintf_safe(pData->m_pKey, pData->m_sKeyLen, "%s", pKey);
-                pData->m_pValue    = pValue;
-                pLink->m_pData     = pData;
-                pLink->m_pPerv     = pLastLink;
-                pLastLink->m_pNext = pLink;
+				else
+				{
+					sprintf_safe(pData->m_pKey, pData->m_sKeyLen, "%s", pKey);
+					pData->m_pValue = pValue;
+					pLink->m_pData = pData;
+					pLink->m_pPerv = pLastLink;
+					if (NULL != pLastLink)
+					{
+						pLastLink->m_pNext = pLink;
+					}
+				}
             }
 
             return nPos;

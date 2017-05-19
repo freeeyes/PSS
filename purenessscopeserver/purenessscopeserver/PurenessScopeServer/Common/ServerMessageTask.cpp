@@ -188,15 +188,13 @@ int CServerMessageTask::Close()
 
 int CServerMessageTask::svc(void)
 {
-    ACE_Message_Block* mb = NULL;
-
     //稍微休息一下，等一下其他线程再如主循环
     ACE_Time_Value tvSleep(0, MAX_MSG_SENDCHECKTIME*MAX_BUFF_1000);
     ACE_OS::sleep(tvSleep);
 
     while(IsRun())
     {
-        mb = NULL;
+		ACE_Message_Block* mb = NULL;
 
         //xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, MAX_MSG_PUTTIMEOUT);
         if(getq(mb, 0) == -1)

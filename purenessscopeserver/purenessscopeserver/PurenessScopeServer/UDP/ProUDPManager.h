@@ -62,7 +62,7 @@ public:
             return false;
         }
 
-        CProactorUDPHandler* pProactorUDPHandler = (CProactorUDPHandler* )m_vecProactorUDPHandler[nConnectID];
+        CProactorUDPHandler* pProactorUDPHandler = m_vecProactorUDPHandler[nConnectID];
 
         if(NULL != pProactorUDPHandler)
         {

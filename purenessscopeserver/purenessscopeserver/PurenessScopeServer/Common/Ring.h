@@ -11,10 +11,12 @@ class CRingLink
 public:
     CRingLink()
     {
+		m_nMaxCount = 0;
+		m_nIndex    = 0;
         m_pRingLink = NULL;
     }
 
-    CRingLink(int nMaxCount)
+    CRingLink(const int nMaxCount)
     {
         m_pRingLink = NULL;
         Init(nMaxCount);
@@ -50,7 +52,7 @@ public:
     {
         if(NULL != m_pRingLink)
         {
-            return (T* )(m_pRingLink + m_nIndex);
+            return reinterpret_cast<T*>(m_pRingLink + m_nIndex);
         }
         else
         {
@@ -90,7 +92,7 @@ public:
                 nCurrIndex = m_nMaxCount + nCurrIndex;
             }
 
-            return (T* )(m_pRingLink + nCurrIndex);
+            return reinterpret_cast<T*>(m_pRingLink + nCurrIndex);
         }
     }
 

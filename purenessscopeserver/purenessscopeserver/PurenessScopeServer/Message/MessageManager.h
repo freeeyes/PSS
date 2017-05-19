@@ -91,7 +91,7 @@ public:
 
     }
 
-    _ClientCommandInfo* AddClientCommand(CClientCommand* pClientCommand, const char* pMuduleName, _ClientIPInfo objListenInfo)
+    _ClientCommandInfo* AddClientCommand(CClientCommand* pClientCommand, const char* pMuduleName, const _ClientIPInfo objListenInfo)
     {
         _ClientCommandInfo* pClientCommandInfo = new _ClientCommandInfo();
 
@@ -150,7 +150,7 @@ public:
         }
         else
         {
-            return (_ClientCommandInfo* )m_vecClientCommandList[nIndex];
+            return m_vecClientCommandList[nIndex];
         }
     }
 };

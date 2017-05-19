@@ -91,13 +91,13 @@ int CheckCoreLimit(int nMaxCoreFile)
 //设置当前代码路径
 bool SetAppPath()
 {
-    char szPath[MAX_BUFF_300] = {'\0'};
     char* pFilePath = NULL;
 
     int nSize = pathconf(".",_PC_PATH_MAX);
 
     if((pFilePath = (char*)new char[nSize]) != NULL)
     {
+		char szPath[MAX_BUFF_300] = { '\0' };
         memset(pFilePath, 0, nSize);
         sprintf(pFilePath,"/proc/%d/exe",getpid());
 

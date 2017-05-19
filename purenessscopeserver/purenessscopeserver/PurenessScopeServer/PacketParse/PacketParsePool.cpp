@@ -74,19 +74,19 @@ CPacketParse* CPacketParsePool::Create()
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
     //如果free池中已经没有了，则添加到free池中。
-    CPacketParse* pPacket = NULL;
+    CPacketParse* pPacketParse = NULL;
 
     //在Hash表中弹出一个已使用的数据
-    pPacket = m_objPacketParseList.Pop();
+	pPacketParse = m_objPacketParseList.Pop();
 
-    return pPacket;
+    return pPacketParse;
 }
 
 bool CPacketParsePool::Delete(CPacketParse* pPacketParse)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-    CPacketParse* pBuff = (CPacketParse* )pPacketParse;
+    CPacketParse* pBuff = pPacketParse;
 
     if(NULL == pBuff)
     {

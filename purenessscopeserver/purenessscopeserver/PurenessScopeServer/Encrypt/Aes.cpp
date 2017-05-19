@@ -1,7 +1,12 @@
 #include "Aes.h"
 
-AES::AES(unsigned char* key)
+AES::AES(const unsigned char* szKey)
 {
+	if (NULL == szKey)
+	{
+		return;
+	}
+
     unsigned char sBox[] =
     {
         /*  0    1    2    3    4    5    6    7    8    9    a    b    c    d    e    f */
@@ -44,7 +49,7 @@ AES::AES(unsigned char* key)
     };
     memcpy(Sbox, sBox, 256);
     memcpy(InvSbox, invsBox, 256);
-    KeyExpansion(key, w);
+    KeyExpansion(szKey, w);
 }
 
 AES::~AES()

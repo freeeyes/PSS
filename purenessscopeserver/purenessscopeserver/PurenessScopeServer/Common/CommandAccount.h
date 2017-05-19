@@ -36,6 +36,19 @@ struct _CommandData
         m_u1CommandType  = COMMAND_TYPE_IN;
     }
 
+	//拷贝构造函数
+	_CommandData(const _CommandData& ar)
+	{
+		this->m_u2CommandID = ar.m_u2CommandID;
+		this->m_u4CommandCount = ar.m_u4CommandCount;
+		this->m_u8CommandCost = ar.m_u8CommandCost;
+		this->m_u1CommandType = ar.m_u1CommandType;
+		this->m_u4PacketSize = ar.m_u4PacketSize;
+		this->m_u4CommandSize = ar.m_u4CommandSize;
+		this->m_u1PacketType = ar.m_u1PacketType;
+		this->m_tvCommandTime = ar.m_tvCommandTime;
+	}
+
     _CommandData& operator = (const _CommandData& ar)
     {
         this->m_u2CommandID    = ar.m_u2CommandID;
@@ -79,6 +92,14 @@ struct _CommandTimeOut
         m_tvTime        = ACE_OS::gettimeofday();
         m_u4TimeOutTime = 0;
     }
+
+	//拷贝构造函数
+	_CommandTimeOut(const _CommandTimeOut& ar)
+	{
+		this->m_u2CommandID   = ar.m_u2CommandID;
+		this->m_tvTime        = ar.m_tvTime;
+		this->m_u4TimeOutTime = ar.m_u4TimeOutTime;
+	}
 };
 
 typedef vector<_CommandTimeOut> vecCommandTimeOut;   //记录所有超时命令的数组
