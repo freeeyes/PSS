@@ -4,8 +4,6 @@
 #include "IBuffPacket.h"
 #include "ProfileTime.h"
 
-using namespace PSS;
-
 //记录消息的一些参数
 struct _MessageBase
 {

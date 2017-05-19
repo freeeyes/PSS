@@ -134,8 +134,6 @@ int CMessageService::svc(void)
     // Cache our ACE_Thread_Manager pointer.
     ACE_Thread_Manager* mgr = this->thr_mgr ();
 
-    ACE_Message_Block* mb = NULL;
-
     while(IsRun())
     {
         if (mgr->testcancel(mgr->thr_self ()))
@@ -143,7 +141,7 @@ int CMessageService::svc(void)
             return 0;
         }
 
-        mb = NULL;
+        ACE_Message_Block* mb = NULL;
 
         //xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, MAX_MSG_PUTTIMEOUT);
         if(getq(mb, 0) == -1)
@@ -245,8 +243,6 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
     u2CommandID = pMessage->GetMessageBase()->m_u2Cmd;
 
     //抛出掉链接建立和断开，只计算逻辑数据包
-    bool blIsDead = false;
-
     if(pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CONNECT
        && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CDISCONNET
        && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_SDISCONNET
@@ -258,7 +254,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
         m_ThreadInfo.m_u4CurrPacketCount++;
         m_ThreadInfo.m_u2CommandID   = u2CommandID;
 
-        blIsDead = m_WorkThreadAI.CheckCurrTimeout(pMessage->GetMessageBase()->m_u2Cmd, (uint32)m_ThreadInfo.m_tvUpdateTime.sec());
+        bool blIsDead = m_WorkThreadAI.CheckCurrTimeout(pMessage->GetMessageBase()->m_u2Cmd, (uint32)m_ThreadInfo.m_tvUpdateTime.sec());
 
 
         if(blIsDead == true)
@@ -555,7 +551,7 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* a
     //检查所有工作线程
     for(uint32 i = 0; i < (uint32)m_vecMessageService.size(); i++)
     {
-        CMessageService* pMessageService = (CMessageService*)m_vecMessageService[i];
+        CMessageService* pMessageService = m_vecMessageService[i];
 
         if(NULL != pMessageService)
         {
@@ -716,7 +712,7 @@ bool CMessageServiceGroup::PutMessage(CMessage* pMessage)
     }
 
     //m_ThreadWriteLock.acquire();
-    CMessageService* pMessageService = (CMessageService*)m_vecMessageService[(uint32)n4ThreadID];
+    CMessageService* pMessageService = m_vecMessageService[(uint32)n4ThreadID];
 
     if(NULL != pMessageService)
     {
@@ -736,7 +732,7 @@ void CMessageServiceGroup::Close()
 
     for(uint32 i = 0; i < (uint32)m_vecMessageService.size(); i++)
     {
-        CMessageService* pMessageService = (CMessageService*)m_vecMessageService[i];
+        CMessageService* pMessageService = m_vecMessageService[i];
 
         if(NULL != pMessageService)
         {
@@ -758,7 +754,7 @@ bool CMessageServiceGroup::Start()
 
     for(uint32 i = 0; i < (uint32)m_vecMessageService.size(); i++)
     {
-        CMessageService* pMessageService = (CMessageService*)m_vecMessageService[i];
+        CMessageService* pMessageService = m_vecMessageService[i];
 
         if(NULL != pMessageService)
         {
@@ -806,7 +802,7 @@ CThreadInfo* CMessageServiceGroup::GetThreadInfo()
 
     for(uint32 i = 0; i < (uint32)m_vecMessageService.size(); i++)
     {
-        CMessageService* pMessageService = (CMessageService*)m_vecMessageService[i];
+        CMessageService* pMessageService = m_vecMessageService[i];
 
         if(NULL != pMessageService)
         {
@@ -858,7 +854,7 @@ void CMessageServiceGroup::GetWorkThreadAIInfo(vecWorkThreadAIInfo& objvecWorkTh
     for(int i = 0; i < (int)m_vecMessageService.size(); i++)
     {
         _WorkThreadAIInfo objWorkThreadAIInfo;
-        CMessageService* pMessageService = (CMessageService*)m_vecMessageService[i];
+        CMessageService* pMessageService = m_vecMessageService[i];
 
         if(NULL != pMessageService)
         {
@@ -876,7 +872,7 @@ void CMessageServiceGroup::GetAITO(vecCommandTimeout& objTimeout)
     for(int i = 0; i < (int)m_vecMessageService.size(); i++)
     {
         _WorkThreadAIInfo objWorkThreadAIInfo;
-        CMessageService* pMessageService = (CMessageService*)m_vecMessageService[i];
+        CMessageService* pMessageService = m_vecMessageService[i];
 
         if(NULL != pMessageService)
         {
@@ -891,7 +887,7 @@ void CMessageServiceGroup::GetAITF(vecCommandTimeout& objTimeout)
 
     for(int i = 0; i < (int)m_vecMessageService.size(); i++)
     {
-        CMessageService* pMessageService = (CMessageService*)m_vecMessageService[i];
+        CMessageService* pMessageService = m_vecMessageService[i];
 
         if(NULL != pMessageService)
         {
@@ -904,7 +900,7 @@ void CMessageServiceGroup::SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCh
 {
     for(int i = 0; i < (int)m_vecMessageService.size(); i++)
     {
-        CMessageService* pMessageService = (CMessageService*)m_vecMessageService[i];
+        CMessageService* pMessageService = m_vecMessageService[i];
 
         if(NULL != pMessageService)
         {
@@ -917,7 +913,7 @@ void CMessageServiceGroup::GetCommandData(uint16 u2CommandID, _CommandData& objC
 {
     for(int i = 0; i < (int)m_vecMessageService.size(); i++)
     {
-        CMessageService* pMessageService = (CMessageService*)m_vecMessageService[i];
+        CMessageService* pMessageService = m_vecMessageService[i];
 
         if(NULL != pMessageService)
         {
@@ -935,7 +931,7 @@ void CMessageServiceGroup::GetFlowInfo(_CommandFlowAccount& objCommandFlowAccoun
 {
     for(int i = 0; i < (int)m_vecMessageService.size(); i++)
     {
-        CMessageService* pMessageService = (CMessageService*)m_vecMessageService[i];
+        CMessageService* pMessageService = m_vecMessageService[i];
 
         if(NULL != pMessageService)
         {
@@ -949,7 +945,7 @@ void CMessageServiceGroup::GetCommandTimeOut(vecCommandTimeOut& CommandTimeOutLi
 {
     for(int i = 0; i < (int)m_vecMessageService.size(); i++)
     {
-        CMessageService* pMessageService = (CMessageService*)m_vecMessageService[i];
+        CMessageService* pMessageService = m_vecMessageService[i];
 
         if(NULL != pMessageService)
         {
@@ -962,7 +958,7 @@ void CMessageServiceGroup::GetCommandAlertData(vecCommandAlertData& CommandAlert
 {
     for(int i = 0; i < (int)m_vecMessageService.size(); i++)
     {
-        CMessageService* pMessageService = (CMessageService*)m_vecMessageService[i];
+        CMessageService* pMessageService = m_vecMessageService[i];
 
         if(NULL != pMessageService)
         {
@@ -975,7 +971,7 @@ void CMessageServiceGroup::ClearCommandTimeOut()
 {
     for(int i = 0; i < (int)m_vecMessageService.size(); i++)
     {
-        CMessageService* pMessageService = (CMessageService*)m_vecMessageService[i];
+        CMessageService* pMessageService = m_vecMessageService[i];
 
         if(NULL != pMessageService)
         {
@@ -988,7 +984,7 @@ void CMessageServiceGroup::SaveCommandDataLog()
 {
     for(int i = 0; i < (int)m_vecMessageService.size(); i++)
     {
-        CMessageService* pMessageService = (CMessageService*)m_vecMessageService[i];
+        CMessageService* pMessageService = m_vecMessageService[i];
 
         if(NULL != pMessageService)
         {
@@ -1003,7 +999,7 @@ bool CMessageServiceGroup::UnloadModule(const char* pModuleName, uint8 u1State)
 
     for(int i = 0; i < (int)m_vecMessageService.size(); i++)
     {
-        CMessageService* pMessageService = (CMessageService*)m_vecMessageService[i];
+        CMessageService* pMessageService = m_vecMessageService[i];
 
         if(NULL != pMessageService)
         {
@@ -1022,7 +1018,7 @@ bool CMessageServiceGroup::UnloadModule(const char* pModuleName, uint8 u1State)
 
         for(int i = 0; i < (int)m_vecMessageService.size(); i++)
         {
-            CMessageService* pMessageService = (CMessageService*)m_vecMessageService[i];
+            CMessageService* pMessageService = m_vecMessageService[i];
 
             if(NULL != pMessageService)
             {
@@ -1054,7 +1050,7 @@ bool CMessageServiceGroup::UnloadModule(const char* pModuleName, uint8 u1State)
     //重载结束，全部恢复线程工作
     for(int i = 0; i < (int)m_vecMessageService.size(); i++)
     {
-        CMessageService* pMessageService = (CMessageService*)m_vecMessageService[i];
+        CMessageService* pMessageService = m_vecMessageService[i];
 
         if(NULL != pMessageService)
         {
@@ -1079,7 +1075,7 @@ CMessage* CMessageServiceGroup::CreateMessage(uint32 u4ConnectID, uint8 u1Packet
 
     //OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::CreateMessage]n4ThreadID=%d.\n", n4ThreadID));
 
-    CMessageService* pMessageService = (CMessageService*)m_vecMessageService[(uint32)n4ThreadID];
+    CMessageService* pMessageService = m_vecMessageService[(uint32)n4ThreadID];
 
     if(NULL != pMessageService)
     {
@@ -1108,7 +1104,7 @@ void CMessageServiceGroup::DeleteMessage(uint32 u4ConnectID, CMessage* pMessage)
         return;
     }
 
-    CMessageService* pMessageService = (CMessageService*)m_vecMessageService[(uint32)n4ThreadID];
+    CMessageService* pMessageService = m_vecMessageService[(uint32)n4ThreadID];
 
     if(NULL != pMessageService)
     {
