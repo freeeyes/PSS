@@ -56,7 +56,10 @@ struct _Server_Message_Info
 		this->m_pRecvFinish     = ar.m_pRecvFinish;
 		this->m_objServerIPInfo = ar.m_objServerIPInfo;
 		this->m_nHashID         = ar.m_nHashID;
-		this->m_pmbQueuePtr     = ar.m_pmbQueuePtr;
+		this->m_pmbQueuePtr     = new ACE_Message_Block(sizeof(_Server_Message_Info*));
+
+		_Server_Message_Info** ppMessage = (_Server_Message_Info**)m_pmbQueuePtr->base();
+		*ppMessage = this;
 	}
 
 	_Server_Message_Info& operator = (const _Server_Message_Info& ar)
@@ -66,7 +69,6 @@ struct _Server_Message_Info
 		this->m_pRecvFinish = ar.m_pRecvFinish;
 		this->m_objServerIPInfo = ar.m_objServerIPInfo;
 		this->m_nHashID = ar.m_nHashID;
-		this->m_pmbQueuePtr = ar.m_pmbQueuePtr;
 		return *this;
 	}
 

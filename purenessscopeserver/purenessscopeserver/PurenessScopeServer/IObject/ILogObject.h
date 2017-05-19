@@ -41,8 +41,11 @@ public:
 		this->m_blIsUsed    = ar.m_blIsUsed;
 		this->m_u4LogID     = ar.m_u4LogID;
 		this->m_u4MailID    = ar.m_u4MailID;
-		this->m_pmbQueuePtr = new ACE_Message_Block(sizeof(_LogBlockInfo*));
+		this->m_pmbQueuePtr = new ACE_Message_Block(sizeof(_LogBlockInfo*));		
 		sprintf_safe(m_szMailTitle, MAX_BUFF_200, "%s", ar.m_szMailTitle);
+		
+        _LogBlockInfo** ppMessage = (_LogBlockInfo**)m_pmbQueuePtr->base();
+        *ppMessage = this;		
 	}
 	
     _LogBlockInfo& operator = (const _LogBlockInfo& ar)
@@ -52,6 +55,7 @@ public:
 		this->m_blIsUsed    = ar.m_blIsUsed;
 		this->m_u4LogID     = ar.m_u4LogID;
 		this->m_u4MailID    = ar.m_u4MailID;
+		sprintf_safe(m_szMailTitle, MAX_BUFF_200, "%s", ar.m_szMailTitle);
         return *this;
     }	
 

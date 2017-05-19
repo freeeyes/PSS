@@ -55,11 +55,8 @@ _Server_Message_Info* CServerMessageInfoPool::Create()
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-    //如果free池中已经没有了，则添加到free池中。
-    _Server_Message_Info* pMessage = NULL;
-
     //在Hash表中弹出一个已使用的数据
-    pMessage = m_objServerMessageList.Pop();
+	_Server_Message_Info* pMessage = m_objServerMessageList.Pop();
 
     //没找到空余的
     return pMessage;
@@ -322,9 +319,9 @@ void CServerMessageTask::AddClientMessage(IClientMessage* pClientMessage)
 void CServerMessageTask::DelClientMessage(IClientMessage* pClientMessage)
 {
     //先查找有效的列表中是否包含此指针
-    for(vecValidIClientMessage::iterator b = m_vecValidIClientMessage.begin(); b != m_vecValidIClientMessage.end(); b++)
+	for(int i = 0; i < (int)m_vecValidIClientMessage.size(); i++)
     {
-        if((IClientMessage* )*b == pClientMessage)
+        if(m_vecValidIClientMessage[i] == pClientMessage)
         {
             //找到了，什么都不做
             m_vecValidIClientMessage.erase(b);
