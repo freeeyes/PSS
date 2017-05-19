@@ -131,10 +131,18 @@ int CMessageService::open(void* args)
 
 int CMessageService::svc(void)
 {
+    // Cache our ACE_Thread_Manager pointer.
+    ACE_Thread_Manager* mgr = this->thr_mgr ();
+
     ACE_Message_Block* mb = NULL;
 
     while(IsRun())
     {
+        if (mgr->testcancel(mgr->thr_self ()))
+        {
+            return 0;
+        }
+
         mb = NULL;
 
         //xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, MAX_MSG_PUTTIMEOUT);
@@ -564,15 +572,16 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* a
                 uint32 u4ThreadID = pMessageService->GetThreadInfo()->m_u4ThreadID;
 
                 //杀死当前工作线程
-                int ret = ACE_Thread_Manager::instance()->cancel_task(pMessageService, 1);
-				if (0 != ret)
-				{
-					OUR_DEBUG((LM_DEBUG, "[CMessageServiceGroup::CheckServerMessageThread]kill return %d fail(%d).\n", ret, errno));
-				}
-				else
-				{
-					OUR_DEBUG((LM_DEBUG, "[CMessageServiceGroup::CheckServerMessageThread]kill return OK.\n"));
-				}
+                int ret = ACE_Thread_Manager::instance()->cancel_task(pMessageService);
+
+                if (0 != ret)
+                {
+                    OUR_DEBUG((LM_DEBUG, "[CMessageServiceGroup::CheckServerMessageThread]kill return %d fail(%d).\n", ret, errno));
+                }
+                else
+                {
+                    OUR_DEBUG((LM_DEBUG, "[CMessageServiceGroup::CheckServerMessageThread]kill return OK.\n"));
+                }
 
                 //需要重启工作线程，先关闭当前的工作线程
                 pMessageService->Close();
