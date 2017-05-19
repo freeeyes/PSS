@@ -106,6 +106,7 @@ uint32 CLogBlockPool::GetBlockSize()
 
 CLogManager::CLogManager(void)
 {
+	m_blIsNeedReset = false;
     m_blRun         = false;
     m_nThreadCount  = 1;
     m_nQueueMax     = MAX_MSG_THREADQUEUE;

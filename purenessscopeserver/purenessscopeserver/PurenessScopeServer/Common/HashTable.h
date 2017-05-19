@@ -481,7 +481,7 @@ public:
             m_lpTable[i] = NULL;
         }
 
-        nPos += sizeof(_Hash_Link_Info<T>* ) * nHashCount;
+        //nPos += sizeof(_Hash_Link_Info<T>* ) * nHashCount;
     }
 
     //初始化Hash块(给定内存地址)
@@ -503,7 +503,7 @@ public:
             m_lpTable[i] = NULL;
         }
 
-        nPos += sizeof(_Hash_Link_Info<T>* ) * nHashCount;
+        //nPos += sizeof(_Hash_Link_Info<T>* ) * nHashCount;
         //printf("[Init]nPos=%d.\n", nPos);
     }
 

@@ -8,6 +8,8 @@
 
 CThreadInfo::CThreadInfo(void)
 {
+	m_pAllThreadInfo = NULL;
+	m_nThreadCount = 0;
 }
 
 CThreadInfo::~CThreadInfo(void)
@@ -19,8 +21,13 @@ CThreadInfo::~CThreadInfo(void)
 
 void CThreadInfo::Init(int nCount)
 {
+	Close();
+	
     m_pAllThreadInfo = new _ThreadInfo*[nCount];
-    memset(m_pAllThreadInfo, 0, sizeof(_ThreadInfo*)*nCount);
+	if (NULL != m_pAllThreadInfo)
+	{
+		memset(m_pAllThreadInfo, 0, sizeof(_ThreadInfo*)*nCount);
+	}
     m_nThreadCount   = nCount;
 }
 

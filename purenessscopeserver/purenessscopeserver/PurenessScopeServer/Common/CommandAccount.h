@@ -100,6 +100,22 @@ struct _CommandTimeOut
 		this->m_tvTime        = ar.m_tvTime;
 		this->m_u4TimeOutTime = ar.m_u4TimeOutTime;
 	}
+
+	_CommandTimeOut& operator = (const _CommandTimeOut& ar)
+	{
+		this->m_u2CommandID   = ar.m_u2CommandID;
+		this->m_tvTime        = ar.m_tvTime;
+		this->m_u4TimeOutTime = ar.m_u4TimeOutTime;
+		return *this;
+	}
+	
+	_CommandTimeOut& operator += (const _CommandTimeOut& ar)
+    {
+        this->m_u2CommandID   = ar.m_u2CommandID;
+		this->m_tvTime        = ar.m_tvTime;
+		this->m_u4TimeOutTime = ar.m_u4TimeOutTime;
+        return *this;
+    }	
 };
 
 typedef vector<_CommandTimeOut> vecCommandTimeOut;   //记录所有超时命令的数组

@@ -35,6 +35,8 @@ public:
         m_pContorlListen        = NULL;
         m_pIServerManager       = NULL;
         m_pMessageBlockManager  = NULL;
+		m_pTimerManager         = NULL;
+		m_pIModuleInfo          = NULL;
     }
 
     virtual ~CServerObject() {}

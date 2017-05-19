@@ -453,13 +453,12 @@ bool CConsoleMessage::GetTrackIP(const char* pCommand, _ForbiddenIP& ForbiddenIP
 
 bool CConsoleMessage::GetLogLevel(const char* pCommand, int& nLogLevel)
 {
-    char szTempData[MAX_BUFF_100] = {'\0'};
-
     //获得日志等级
     char* pPosBegin = (char* )ACE_OS::strstr(pCommand, "-l ");
 
     if(NULL != pPosBegin)
     {
+		char szTempData[MAX_BUFF_100] = {'\0'};
         int nLen = (int)ACE_OS::strlen(pCommand) - (int)(pPosBegin - pCommand) - 3;
         memcpy_safe(pPosBegin + 3, (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
         nLogLevel = ACE_OS::atoi(szTempData);
@@ -921,11 +920,8 @@ bool CConsoleMessage::DoMessage_WorkThreadState(_CommandInfo& CommandInfo, IBuff
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-s") == 0)
     {
-        //获得当前加解密包线程状态
-        CThreadInfo* pThreadInfo = NULL;
-
         //获得当前工作线程状态
-        pThreadInfo = App_MessageServiceGroup::instance()->GetThreadInfo();
+        CThreadInfo* pThreadInfo = App_MessageServiceGroup::instance()->GetThreadInfo();
 
         if(NULL != pThreadInfo)
         {

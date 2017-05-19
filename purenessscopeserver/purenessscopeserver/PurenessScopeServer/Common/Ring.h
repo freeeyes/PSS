@@ -17,12 +17,11 @@ public:
     }
 
     CRingLink(const int nMaxCount)
-    {
-        m_pRingLink = NULL;
+    {	
         Init(nMaxCount);
     }
 
-    void Init(int nMaxCount)
+    void Init(const int nMaxCount)
     {
         Close();
 

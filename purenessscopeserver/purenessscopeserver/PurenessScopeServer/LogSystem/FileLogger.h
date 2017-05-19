@@ -51,6 +51,7 @@ public:
         m_StrlogType        = "ServerError";
         m_pBuffer           = new char[u4BufferSize];   //这里是用于日志拼接时间所用
         m_u4BufferSize      = u4BufferSize;
+		m_szLogTime[0]      = '\0';
         sprintf_safe(m_szFileRoot, MAX_BUFF_100, "%s", pFileRoot);
     }
 
@@ -112,8 +113,7 @@ public:
             return false;
         }
 
-        unsigned char* pMail = NULL;
-        pMail = (unsigned char* )ACE_OS::calloc(1, 1);
+        unsigned char* pMail = (unsigned char* )ACE_OS::calloc(1, 1);
 
         int nRet = 0;
         nRet = mailText(&pMail,
@@ -121,7 +121,19 @@ public:
                         (const unsigned char*)pMailAlert->m_szToMailAddr,
                         (const unsigned char*)pLogBlockInfo->m_szMailTitle,
                         (const unsigned char*)pLogBlockInfo->m_pBlock);
+        if(nRet != 0)
+        {
+            OUR_DEBUG((LM_ERROR, "[CLogFile::SendMail]MailID(%d) mailText error.\n", pLogBlockInfo->m_u4MailID));
+            free(pMail);
+            return false;
+        }						
         nRet = mailEnd(&pMail);
+        if(nRet != 0)
+        {
+            OUR_DEBUG((LM_ERROR, "[CLogFile::SendMail]MailID(%d) mailEnd error.\n", pLogBlockInfo->m_u4MailID));
+            free(pMail);
+            return false;
+        }			
 
         ACE_HANDLE fd;
 

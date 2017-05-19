@@ -52,6 +52,11 @@ AES::AES(const unsigned char* szKey)
     KeyExpansion(szKey, w);
 }
 
+AES::AES()
+{
+
+}
+
 AES::~AES()
 {
 

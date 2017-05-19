@@ -209,7 +209,7 @@ void CWorkThreadAI::Close()
 {
     for(uint16 i = 0; i < (uint16)m_vecCommandTime.size(); i++)
     {
-        _CommandTime* pCommandTime = (_CommandTime* )m_vecCommandTime[i];
+        _CommandTime* pCommandTime = m_vecCommandTime[i];
         SAFE_DELETE(pCommandTime);
     }
 
@@ -240,7 +240,7 @@ void CWorkThreadAI::GetAllTimeout(uint32 u4ThreadID, vecCommandTimeout& objTimeo
 
     for(int i = 0; i < (int)m_vecCommandTime.size(); i++)
     {
-        _CommandTime* pCommandTime = (_CommandTime* )m_vecCommandTime[i];
+        _CommandTime* pCommandTime = m_vecCommandTime[i];
 
         if(NULL != pCommandTime)
         {

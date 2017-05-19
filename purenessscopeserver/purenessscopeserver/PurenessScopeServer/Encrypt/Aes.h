@@ -9,6 +9,7 @@
 class AES
 {
 public:
+	AES();
     AES(const unsigned char* szKey);
     virtual ~AES();
     unsigned char* Cipher(unsigned char* input);
