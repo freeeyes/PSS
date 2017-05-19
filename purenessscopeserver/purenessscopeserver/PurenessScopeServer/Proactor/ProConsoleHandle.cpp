@@ -18,7 +18,7 @@ CProConsoleHandle::CProConsoleHandle(void)
     m_pPacketParse       = NULL;
 	m_blCanWrite         = false;
 	m_blTimeClose        = false;
-	:m_u4RecvPacketCount = 0;
+	m_u4RecvPacketCount  = 0;
 }
 
 CProConsoleHandle::~CProConsoleHandle(void)

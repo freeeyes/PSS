@@ -54,8 +54,7 @@ struct _SendMessage
         this->m_u2CommandID = ar.m_u2CommandID;
         this->m_nHashID     = ar.m_nHashID;
         this->m_nMessageID  = ar.m_nMessageID;
-		this->m_pmbQueuePtr  = new ACE_Message_Block(sizeof(_SendMessage*));
-		_SendMessage** ppMessage = (_SendMessage**)m_pmbQueuePtr->base();		
+		this->m_pmbQueuePtr  = new ACE_Message_Block(sizeof(_SendMessage*));	
 	}
 
 	_SendMessage& operator = (const _SendMessage& ar)
@@ -68,6 +67,7 @@ struct _SendMessage
 		this->m_u2CommandID = ar.m_u2CommandID;
 		this->m_nHashID     = ar.m_nHashID;
 		this->m_nMessageID  = ar.m_nMessageID;
+		this->m_pmbQueuePtr  = new ACE_Message_Block(sizeof(_SendMessage*));
 		return *this;
 	}
 

@@ -38,8 +38,7 @@ int CProAsynchConnect::validate_connection(const ACE_Asynch_Connect::Result& res
     {
         SetConnectState(false);
 
-		
-        _ProConnectState_Info* pProConnectStateInfo = reinterpret_cast<_ProConnectState_Info* >(result.act());
+		_ProConnectState_Info* pProConnectStateInfo = static_cast<_ProConnectState_Info* >(const_cast<void*>(result.act()));
 
         if(NULL != pProConnectStateInfo)
         {
@@ -55,7 +54,7 @@ int CProAsynchConnect::validate_connection(const ACE_Asynch_Connect::Result& res
         return 1;
     }
 
-    _ProConnectState_Info* pProConnectStateInfo = static_cast<_ProConnectState_Info* >(result.act());
+	_ProConnectState_Info* pProConnectStateInfo = static_cast<_ProConnectState_Info* >(const_cast<void*>(result.act()));
 
     if(NULL != pProConnectStateInfo)
     {
