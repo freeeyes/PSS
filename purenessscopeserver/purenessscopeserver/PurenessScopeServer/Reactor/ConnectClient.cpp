@@ -13,6 +13,8 @@ CConnectClient::CConnectClient(void)
     m_u4CostTime        = 0;
     m_u4MaxPacketSize   = MAX_MSG_PACKETLENGTH;
     m_ems2s             = S2S_NEED_CALLBACK;
+	m_szError[0]        = '\0';
+	m_pClientMessage    = NULL;
 
     m_emRecvState       = SERVER_RECV_INIT;
 }

@@ -339,8 +339,8 @@ bool CServerManager::Start()
 
         //在Linux下采用多进程的方式启动
         // 打开（创建）锁文件
-        char szFileName[200] = { '\0' };
-        memset(szFileName, 0, sizeof(szFileName));
+        char szFileName[200] = {'\0'};
+        //memset(szFileName, 0, sizeof(szFileName));
         sprintf(szFileName, "%s/lockwatch.lk", szWorkDir);
         fd_lock = open(szFileName, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 

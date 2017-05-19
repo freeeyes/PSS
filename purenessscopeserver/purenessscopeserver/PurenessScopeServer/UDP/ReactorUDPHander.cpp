@@ -159,9 +159,8 @@ bool CReactorUDPHander::SendMessage(const char* pMessage, uint32 u4Len, const ch
     {
         CPacketParse PacketParse;
 
-        ACE_Message_Block* pMbData = NULL;
         uint32 u4SendLength = App_PacketParseLoader::instance()->GetPacketParseInfo()->Make_Send_Packet_Length(0, u4Len, u2CommandID);
-        pMbData = App_MessageBlockManager::instance()->Create(u4SendLength);
+        ACE_Message_Block* pMbData = App_MessageBlockManager::instance()->Create(u4SendLength);
 
         if(NULL == pMbData)
         {

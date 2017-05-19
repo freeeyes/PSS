@@ -449,9 +449,8 @@ bool CConsoleHandler::SendMessage(IBuffPacket* pBuffPacket)
         return false;
     }
 
-    ACE_Message_Block* pMbData = NULL;
     int nSendLength = PacketParse.MakePacketLength(GetConnectID(), pBuffPacket->GetPacketLen());
-    pMbData = App_MessageBlockManager::instance()->Create(nSendLength);
+    ACE_Message_Block* pMbData = App_MessageBlockManager::instance()->Create(nSendLength);
     //这里组成返回数据包
     PacketParse.MakePacket(GetConnectID(), pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pMbData);
     App_BuffPacketManager::instance()->Delete(pBuffPacket);

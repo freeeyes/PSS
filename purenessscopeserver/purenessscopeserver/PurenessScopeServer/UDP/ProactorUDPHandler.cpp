@@ -2,11 +2,13 @@
 
 CProactorUDPHandler::CProactorUDPHandler(void)
 {
-    m_pPacketParse      = NULL;
-    m_u4RecvPacketCount = 0;
-    m_u4SendPacketCount = 0;
-    m_u4RecvSize        = 0;
-    m_u4SendSize        = 0;
+    m_pPacketParse       = NULL;
+    m_u4RecvPacketCount  = 0;
+    m_u4SendPacketCount  = 0;
+    m_u4RecvSize         = 0;
+    m_u4SendSize         = 0;
+	m_szCompletionkey[0] = '\0';
+	m_szAct[0]           = '\0';
 }
 
 CProactorUDPHandler::~CProactorUDPHandler(void)
@@ -161,9 +163,8 @@ bool CProactorUDPHandler::SendMessage(const char* pMessage, uint32 u4Len, const 
     {
         CPacketParse PacketParse;
 
-        ACE_Message_Block* pMbData = NULL;
         uint32 u4SendLength = App_PacketParseLoader::instance()->GetPacketParseInfo()->Make_Send_Packet_Length(0, u4Len, u2CommandID);
-        pMbData = App_MessageBlockManager::instance()->Create(u4SendLength);
+        ACE_Message_Block* pMbData = App_MessageBlockManager::instance()->Create(u4SendLength);
 
         if(NULL == pMbData)
         {

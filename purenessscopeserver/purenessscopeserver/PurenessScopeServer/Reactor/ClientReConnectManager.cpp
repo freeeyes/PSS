@@ -5,6 +5,7 @@ CReactorClientInfo::CReactorClientInfo()
     m_pConnectClient    = NULL;
     m_pClientMessage    = NULL;
     m_pReactorConnect   = NULL;
+	m_pReactor          = NULL;
     m_nServerID         = 0;
     m_emConnectState    = SERVER_CONNECT_READY;
     m_AddrLocal         = (ACE_INET_Addr&)ACE_Addr::sap_any;

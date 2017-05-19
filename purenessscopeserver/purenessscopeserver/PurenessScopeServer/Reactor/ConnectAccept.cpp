@@ -4,6 +4,8 @@ ConnectAcceptor::ConnectAcceptor()
 {
     m_u4AcceptCount        = 0;
     m_u4ClientReactorCount = 1;
+	m_szListenIP[0]        = '\0';
+	m_u4Port               = 0;
 }
 
 void ConnectAcceptor::InitClientReactor(uint32 u4ClientReactorCount)
@@ -195,7 +197,7 @@ void CConnectAcceptorManager::Close()
 {
     for (int i = 0; i < (int)m_vecConnectAcceptor.size(); i++)
     {
-        ConnectAcceptor* pConnectAcceptor = (ConnectAcceptor*)m_vecConnectAcceptor[i];
+        ConnectAcceptor* pConnectAcceptor = m_vecConnectAcceptor[i];
 
         if (NULL != pConnectAcceptor)
         {
@@ -244,7 +246,7 @@ ConnectAcceptor* CConnectAcceptorManager::GetConnectAcceptor(int nIndex)
         return NULL;
     }
 
-    return (ConnectAcceptor*)m_vecConnectAcceptor[nIndex];
+    return m_vecConnectAcceptor[nIndex];
 }
 
 const char* CConnectAcceptorManager::GetError()

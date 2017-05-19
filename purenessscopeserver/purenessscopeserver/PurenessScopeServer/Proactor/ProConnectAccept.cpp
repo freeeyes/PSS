@@ -2,6 +2,8 @@
 
 ProConnectAcceptor::ProConnectAcceptor()
 {
+	m_szListenIP[0]         = '\0';
+	m_u4Port                = 0;
     m_u4AcceptCount         = 0;
     m_u4ClientProactorCount = 1;
 }
@@ -116,7 +118,7 @@ void CProConnectAcceptManager::Close()
 
     for(int i = 0; i < (int)m_vecConnectAcceptor.size(); i++)
     {
-        ProConnectAcceptor* pConnectAcceptor = (ProConnectAcceptor* )m_vecConnectAcceptor[i];
+        ProConnectAcceptor* pConnectAcceptor = m_vecConnectAcceptor[i];
 
         if(NULL != pConnectAcceptor)
         {
@@ -165,7 +167,7 @@ ProConnectAcceptor* CProConnectAcceptManager::GetConnectAcceptor(int nIndex)
         return NULL;
     }
 
-    return (ProConnectAcceptor* )m_vecConnectAcceptor[nIndex];
+    return m_vecConnectAcceptor[nIndex];
 }
 
 const char* CProConnectAcceptManager::GetError()

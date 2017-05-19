@@ -30,6 +30,11 @@ CProConnectHandle::CProConnectHandle(void)
     m_emStatus            = CLIENT_CLOSE_NOTHING;
     m_u4SendMaxBuffSize   = 5*1024;
     m_nHashID             = 0;
+	m_szConnectName[0]    = '\0';
+	m_blIsLog             = false;
+	m_szLocalIP[0]        = '\0';
+	m_u4RecvPacketCount   = 0;
+
 }
 
 CProConnectHandle::~CProConnectHandle(void)
@@ -1179,14 +1184,12 @@ bool CProConnectHandle::RecvClinetPacket(uint32 u4PackeLen)
     m_nIOCount++;
     //OUR_DEBUG((LM_ERROR, "[CProConnectHandle::RecvClinetPacket]Connectid=%d, m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
 
-    ACE_Message_Block* pmb = NULL;
-    pmb = App_MessageBlockManager::instance()->Create(u4PackeLen);
+    ACE_Message_Block* pmb = App_MessageBlockManager::instance()->Create(u4PackeLen);
 
-    if(pmb == NULL)
+    if(NULL == pmb)
     {
         AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, RecvQueueCount=%d, RecvQueueTimeCost=%I64d, SendQueueTimeCost=%I64d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, m_u4RecvQueueCount, m_u8RecvQueueTimeCost, m_u8SendQueueTimeCost);
         OUR_DEBUG((LM_ERROR, "[CProConnectHandle::RecvClinetPacket] pmb new is NULL.\n"));
-        ClearPacketParse(*pmb);
         Close(2);
         return false;
     }
@@ -1487,8 +1490,9 @@ bool CProConnectManager::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status
 
         //加入链接统计功能
         App_ConnectAccount::instance()->AddDisConnect();
+		
+		m_objHashConnectList.Del_Hash_Data(szConnectID);
         return true;
-        m_objHashConnectList.Del_Hash_Data(szConnectID);
     }
     else
     {
@@ -1718,7 +1722,7 @@ int CProConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg
 
         for(int i = 0; i < (int)vecProConnectHandle.size(); i++)
         {
-            CProConnectHandle* pConnectHandler = (CProConnectHandle* )vecProConnectHandle[i];
+            CProConnectHandle* pConnectHandler = vecProConnectHandle[i];
 
             if(pConnectHandler != NULL)
             {
@@ -2242,13 +2246,11 @@ CProConnectHandle* CProConnectHandlerPool::Create()
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-    CProConnectHandle* pHandler = NULL;
-
     //在Hash表中弹出一个已使用的数据
-    pHandler = m_objHashHandleList.Pop();
+    CProConnectHandle* pHandlerpHandler = m_objHashHandleList.Pop();
 
     //没找到空余的
-    return pHandler;
+    return pHandlerpHandler;
 }
 
 bool CProConnectHandlerPool::Delete(CProConnectHandle* pObject)
@@ -2343,7 +2345,6 @@ uint32 CProConnectManagerGroup::GetGroupIndex()
 
 bool CProConnectManagerGroup::AddConnect(CProConnectHandle* pConnectHandler)
 {
-    bool blRet = false;
     int  nCount = 0;
 
     while(true)
@@ -2367,7 +2368,7 @@ bool CProConnectManagerGroup::AddConnect(CProConnectHandle* pConnectHandler)
             return false;
         }
 
-        blRet = pConnectManager->AddConnect(u4ConnectID, pConnectHandler);
+        bool blRet = pConnectManager->AddConnect(u4ConnectID, pConnectHandler);
 
         if(true == blRet)
         {
@@ -2425,8 +2426,7 @@ bool CProConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char* pData
 
     if(NULL != pBuffPacket)
     {
-        bool bWriteResult = false;
-        bWriteResult = pBuffPacket->WriteStream(pData, nDataLen);
+        bool bWriteResult = pBuffPacket->WriteStream(pData, nDataLen);
         
         if(blDelete == true)
         {

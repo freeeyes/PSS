@@ -37,6 +37,9 @@ CConnectHandler::CConnectHandler(void)
     m_u2TcpNodelay        = TCP_NODELAY_ON;
     m_emStatus            = CLIENT_CLOSE_NOTHING;
     m_u4SendMaxBuffSize   = 5*MAX_BUFF_1024;
+	m_szLocalIP[0]        = '\0';
+	m_szConnectName[0]    = '\0';
+	m_blIsLog             = false;
 }
 
 CConnectHandler::~CConnectHandler(void)
@@ -2395,7 +2398,7 @@ int CConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 
             for(int i = 0; i < (int)vecConnectHandler.size(); i++)
             {
-                CConnectHandler* pConnectHandler = (CConnectHandler* )vecConnectHandler[i];
+                CConnectHandler* pConnectHandler = vecConnectHandler[i];
 
                 if(pConnectHandler != NULL)
                 {
@@ -2961,10 +2964,8 @@ CConnectHandler* CConnectHandlerPool::Create()
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-    CConnectHandler* pHandler = NULL;
-
     //在Hash表中弹出一个已使用的数据
-    pHandler = m_objHashHandleList.Pop();
+    CConnectHandler* pHandler = m_objHashHandleList.Pop();
 
     //没找到空余的
     return pHandler;
@@ -3121,8 +3122,7 @@ bool CConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char* pData, u
 
     if(NULL != pBuffPacket)
     {
-        bool bWriteResult = false;
-        bWriteResult = pBuffPacket->WriteStream(pData, nDataLen);
+        bool bWriteResult = pBuffPacket->WriteStream(pData, nDataLen);
 
         if(blDelete == true)
         {

@@ -101,7 +101,7 @@ int recvStatus(const char* recvString)
 {
     char statusStr[4] = {0};
 
-    ACE_OS::memset(statusStr, 0, sizeof(statusStr));
+    //ACE_OS::memset(statusStr, 0, sizeof(statusStr));
     ACE_OS::strncpy(statusStr, (const char* )recvString, 3);
 
     //SMTP_Print6("[%s][%d] status = %d\r\n", __FILE__, __LINE__, atoi(statusStr));
@@ -339,7 +339,6 @@ int mailText(unsigned char** mail, const unsigned char* fromMail, const unsigned
 /* static attachmemt size */
 int mailAttachment(unsigned char** mail, const unsigned char* filePath)
 {
-    FILE* fp = NULL;
     int fileSize, base64Size, headerSize;
     char* attach = NULL, *base64Attach = NULL, *attachHeader = NULL;
     char fileName[MAX_EMAIL_LEN] = {0};
@@ -347,7 +346,7 @@ int mailAttachment(unsigned char** mail, const unsigned char* filePath)
     const char* contentEncode = "Content-Transfer-Encoding: base64";
     const char* contentDes = "Content-Disposition: attachment";
 
-    fp = ACE_OS::fopen((char* )filePath, "rb");
+    FILE* fp = ACE_OS::fopen((char* )filePath, "rb");
 
     if (NULL == fp)
     {
@@ -439,7 +438,7 @@ int mailEnd(unsigned char** mail)
     char bodyEnd[200] = {0};
     int len;
 
-    ACE_OS::memset(bodyEnd, 0, sizeof(bodyEnd));
+    //ACE_OS::memset(bodyEnd, 0, sizeof(bodyEnd));
     ACE_OS::sprintf(bodyEnd, "\r\n--%s--\r\n\r\n.\r\n", TEXT_BOUNDARY);
 
     len = (int)ACE_OS::strlen(bodyEnd);

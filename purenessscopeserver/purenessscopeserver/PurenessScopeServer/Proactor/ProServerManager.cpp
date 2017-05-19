@@ -29,7 +29,7 @@ bool CProServerManager::Init()
     }
 
     int nServerPortCount    = App_MainConfig::instance()->GetServerPortCount();
-    int nUDPServerPortCount = App_MainConfig::instance()->GetUDPServerPortCount();
+    //int nUDPServerPortCount = App_MainConfig::instance()->GetUDPServerPortCount();
     int nReactorCount       = App_MainConfig::instance()->GetReactorCount();
 
     bool blState = false;
@@ -160,7 +160,7 @@ bool CProServerManager::Start()
 
     //启动TCP监听
     int nServerPortCount = App_MainConfig::instance()->GetServerPortCount();
-    bool blState = false;
+    //bool blState = false;
 
     //初始化监听远程连接
     for(int i = 0 ; i < nServerPortCount; i++)

@@ -2,20 +2,23 @@
 
 CProConsoleHandle::CProConsoleHandle(void)
 {
-    m_szError[0]       = '\0';
-    m_u4ConnectID      = 0;
-    m_u4AllRecvCount   = 0;
-    m_u4AllSendCount   = 0;
-    m_u4AllRecvSize    = 0;
-    m_u4AllSendSize    = 0;
-    m_nIOCount         = 0;
-    m_u4HandlerID      = 0;
-    m_u2MaxConnectTime = 0;
-    m_u4SendThresHold  = MAX_MSG_SNEDTHRESHOLD;
-    m_u2SendQueueMax   = MAX_MSG_SENDPACKET;
-    m_u1ConnectState   = CONNECT_INIT;
-    m_u1SendBuffState  = CONNECT_SENDNON;
-    m_pPacketParse     = NULL;
+    m_szError[0]         = '\0';
+    m_u4ConnectID        = 0;
+    m_u4AllRecvCount     = 0;
+    m_u4AllSendCount     = 0;
+    m_u4AllRecvSize      = 0;
+    m_u4AllSendSize      = 0;
+    m_nIOCount           = 0;
+    m_u4HandlerID        = 0;
+    m_u2MaxConnectTime   = 0;
+    m_u4SendThresHold    = MAX_MSG_SNEDTHRESHOLD;
+    m_u2SendQueueMax     = MAX_MSG_SENDPACKET;
+    m_u1ConnectState     = CONNECT_INIT;
+    m_u1SendBuffState    = CONNECT_SENDNON;
+    m_pPacketParse       = NULL;
+	m_blCanWrite         = false;
+	m_blTimeClose        = false;
+	:m_u4RecvPacketCount = 0;
 }
 
 CProConsoleHandle::~CProConsoleHandle(void)
@@ -169,7 +172,7 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
 {
     ACE_Message_Block& mb = result.message_block();
     uint32 u4PacketLen = (uint32)result.bytes_transferred();
-    int nTran = (int)result.bytes_transferred();
+    //int nTran = (int)result.bytes_transferred();
 
     if(!result.success() || result.bytes_transferred() == 0)
     {
@@ -345,9 +348,8 @@ bool CProConsoleHandle::SendMessage(IBuffPacket* pBuffPacket)
         return false;
     }
 
-    ACE_Message_Block* pMbData = NULL;
     int nSendLength = PacketParse.MakePacketLength(GetConnectID(), pBuffPacket->GetPacketLen());
-    pMbData = App_MessageBlockManager::instance()->Create(nSendLength);
+    ACE_Message_Block* pMbData = App_MessageBlockManager::instance()->Create(nSendLength);
 
     //这里组成返回数据包
     PacketParse.MakePacket(GetConnectID(), pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pMbData);
@@ -360,7 +362,7 @@ bool CProConsoleHandle::SendMessage(IBuffPacket* pBuffPacket)
 
 bool CProConsoleHandle::PutSendPacket(ACE_Message_Block* pMbData)
 {
-    int nSendSize = m_u4AllSendSize;
+    //int nSendSize = m_u4AllSendSize;
 
     m_ThreadWriteLock.acquire();
     m_nIOCount++;
@@ -399,8 +401,7 @@ bool CProConsoleHandle::RecvClinetPacket(uint32 u4PackeLen)
     m_ThreadWriteLock.release();
     //OUR_DEBUG((LM_ERROR, "[CProConsoleHandle::RecvClinetPacket]Connectid=%d, m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
 
-    ACE_Message_Block* pmb = NULL;
-    pmb = App_MessageBlockManager::instance()->Create(u4PackeLen);
+    ACE_Message_Block* pmb = App_MessageBlockManager::instance()->Create(u4PackeLen);
 
     if(pmb == NULL)
     {

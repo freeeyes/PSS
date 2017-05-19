@@ -8,6 +8,7 @@ CAceProactor::CAceProactor()
     m_szError[0]    = '\0';
     m_blRun         = false;
     m_u4ProactorID  = 0;
+	ACE_OS::memset(m_szError, 0, MAX_BUFF_500);
 }
 
 CAceProactor::~CAceProactor()
@@ -201,6 +202,7 @@ CAceProactorManager::CAceProactorManager(void)
 {
     m_pAceProactorList = NULL;
     m_u2ProactorCount  = 0;
+	ACE_OS::memset(m_szError, 0, MAX_BUFF_500);
 }
 
 CAceProactorManager::~CAceProactorManager(void)
