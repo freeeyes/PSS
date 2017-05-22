@@ -178,8 +178,7 @@ const char* CProConnectAcceptManager::GetError()
 bool CProConnectAcceptManager::CheckIPInfo(const char* pIP, uint32 n4Port)
 {
     //找到符合条件指定的端口停止监听
-    for(vecProConnectAcceptor::iterator b = m_vecConnectAcceptor.begin(); b != m_vecConnectAcceptor.end(); b++)
-	for(int i = 0; i < (int)m_vecConnectAcceptor.size(); i++)
+    for(int i = 0; i < (int)m_vecConnectAcceptor.size(); i++)
     {
         if (NULL != m_vecConnectAcceptor[i])
         {
