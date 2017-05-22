@@ -91,7 +91,7 @@ public:
 
     }
 
-    _ClientCommandInfo* AddClientCommand(CClientCommand* pClientCommand, const char* pMuduleName, const _ClientIPInfo objListenInfo)
+    _ClientCommandInfo* AddClientCommand(CClientCommand* pClientCommand, const char* pMuduleName, const _ClientIPInfo& objListenInfo)
     {
         _ClientCommandInfo* pClientCommandInfo = new _ClientCommandInfo();
 

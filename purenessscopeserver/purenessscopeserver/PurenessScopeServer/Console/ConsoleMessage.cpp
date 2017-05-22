@@ -33,12 +33,12 @@ int CConsoleMessage::Dispose(ACE_Message_Block* pmb, IBuffPacket* pBuffPacket)
     //解析命令，把数据切割出来
     if(CONSOLE_MESSAGE_SUCCESS != ParseCommand(pCommand, pBuffPacket))
     {
-        SAFE_DELETE(pCommand);
+        SAFE_DELETE_ARRAY(pCommand);
         return CONSOLE_MESSAGE_FAIL;
     }
     else
     {
-        SAFE_DELETE(pCommand);
+        SAFE_DELETE_ARRAY(pCommand);
         return CONSOLE_MESSAGE_SUCCESS;
     }
 }
@@ -1466,7 +1466,7 @@ bool CConsoleMessage::DoMessage_ShowAllCommandInfo(_CommandInfo& CommandInfo, IB
 
                     for(int i = 0; i < (int)pModuleClient->m_vecClientCommandInfo.size(); i++)
                     {
-                        _ClientCommandInfo* pClientCommandInfo = (_ClientCommandInfo* )pModuleClient->m_vecClientCommandInfo[i];
+                        _ClientCommandInfo* pClientCommandInfo = pModuleClient->m_vecClientCommandInfo[i];
 
                         if(NULL != pClientCommandInfo)
                         {

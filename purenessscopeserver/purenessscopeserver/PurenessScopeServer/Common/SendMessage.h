@@ -42,34 +42,6 @@ struct _SendMessage
         *ppMessage = this;
 
     }
-	
-	//¿½±´¹¹Ôì
-	_SendMessage(const _SendMessage& ar)
-	{
-        this->m_u1SendState = ar.m_u1SendState;
-        this->m_blDelete    = ar.m_blDelete;
-		this->m_pBuffPacket = ar.m_pBuffPacket;
-        this->m_u4ConnectID = ar.m_u4ConnectID;
-        this->m_nEvents     = ar.m_nEvents;
-        this->m_u2CommandID = ar.m_u2CommandID;
-        this->m_nHashID     = ar.m_nHashID;
-        this->m_nMessageID  = ar.m_nMessageID;
-		this->m_pmbQueuePtr  = new ACE_Message_Block(sizeof(_SendMessage*));	
-	}
-
-	_SendMessage& operator = (const _SendMessage& ar)
-	{
-		this->m_u1SendState = ar.m_u1SendState;
-		this->m_blDelete    = ar.m_blDelete;
-		this->m_pBuffPacket = ar.m_pBuffPacket;
-		this->m_u4ConnectID = ar.m_u4ConnectID;
-		this->m_nEvents     = ar.m_nEvents;
-		this->m_u2CommandID = ar.m_u2CommandID;
-		this->m_nHashID     = ar.m_nHashID;
-		this->m_nMessageID  = ar.m_nMessageID;
-		this->m_pmbQueuePtr  = new ACE_Message_Block(sizeof(_SendMessage*));
-		return *this;
-	}
 
     ~_SendMessage()
     {

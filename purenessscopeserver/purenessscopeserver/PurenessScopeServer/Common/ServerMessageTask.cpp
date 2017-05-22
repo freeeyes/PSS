@@ -319,9 +319,9 @@ void CServerMessageTask::AddClientMessage(IClientMessage* pClientMessage)
 void CServerMessageTask::DelClientMessage(IClientMessage* pClientMessage)
 {
     //先查找有效的列表中是否包含此指针
-	for(int i = 0; i < (int)m_vecValidIClientMessage.size(); i++)
+	for (vecValidIClientMessage::iterator b = m_vecValidIClientMessage.begin(); b != m_vecValidIClientMessage.end(); b++)
     {
-        if(m_vecValidIClientMessage[i] == pClientMessage)
+        if(*b == pClientMessage)
         {
             //找到了，什么都不做
             m_vecValidIClientMessage.erase(b);

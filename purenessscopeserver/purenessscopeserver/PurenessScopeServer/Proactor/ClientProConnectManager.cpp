@@ -514,7 +514,7 @@ IClientMessage* CClientProConnectManager::GetClientMessage(int nServerID)
     return NULL;
 }
 
-bool CClientProConnectManager::SendData(int nServerID, const char* pData, int nSize, bool blIsDelete)
+bool CClientProConnectManager::SendData(int nServerID, char* pData, int nSize, bool blIsDelete)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     char szServerID[10] = {'\0'};
@@ -552,7 +552,7 @@ bool CClientProConnectManager::SendData(int nServerID, const char* pData, int nS
     memcpy_safe((char* )pData, (uint32)nSize, (char* )pmblk->wr_ptr(), (uint32)nSize);
     pmblk->wr_ptr(nSize);
 
-    if(true == blIsDelete)
+    if(true == blIsDelete && NULL != pData)
     {
         SAFE_DELETE_ARRAY(pData);
     }

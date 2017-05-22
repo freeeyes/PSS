@@ -179,13 +179,12 @@ bool CProConnectAcceptManager::CheckIPInfo(const char* pIP, uint32 n4Port)
 {
     //找到符合条件指定的端口停止监听
     for(vecProConnectAcceptor::iterator b = m_vecConnectAcceptor.begin(); b != m_vecConnectAcceptor.end(); b++)
+	for(int i = 0; i < (int)m_vecConnectAcceptor.size(); i++)
     {
-        ProConnectAcceptor* pConnectAcceptor = (ProConnectAcceptor*)(*b);
-
-        if (NULL != pConnectAcceptor)
+        if (NULL != m_vecConnectAcceptor[i])
         {
-            if(ACE_OS::strcmp(pConnectAcceptor->GetListenIP(), pIP) == 0
-               && pConnectAcceptor->GetListenPort() == n4Port)
+            if(ACE_OS::strcmp(m_vecConnectAcceptor[i]->GetListenIP(), pIP) == 0
+               && m_vecConnectAcceptor[i]->GetListenPort() == n4Port)
             {
                 return true;
             }

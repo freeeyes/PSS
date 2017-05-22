@@ -4,6 +4,7 @@
 CProgramService::CProgramService(void)
 {
     reactor (ACE_Reactor::instance ());
+	m_blsStop = false;
 }
 
 CProgramService::~CProgramService(void)

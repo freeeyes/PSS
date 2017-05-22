@@ -65,7 +65,7 @@ public:
     bool Close(int nServerID, EM_s2s ems2s = S2S_INNEED_CALLBACK);                                                             //关闭连接（TCP）
     bool CloseUDP(int nServerID);                                                                                              //关闭链接（UDP）
     bool ConnectErrorClose(int nServerID);                                                                                     //由内部错误引起的失败，由ProConnectClient调用
-    bool SendData(int nServerID, const char* pData, int nSize, bool blIsDelete = true);                                        //发送数据（TCP）
+    bool SendData(int nServerID, char* pData, int nSize, bool blIsDelete = true);                                              //发送数据（TCP）
     bool SendDataUDP(int nServerID,const char* pIP, int nPort, const char* pMessage, uint32 u4Len, bool blIsDelete = true);    //发送数据（UDP）
     bool SetHandler(int nServerID, CProConnectClient* pProConnectClient);                                                      //将指定的CProConnectClient*绑定给nServerID
     IClientMessage* GetClientMessage(int nServerID);                                                                           //获得ClientMessage对象

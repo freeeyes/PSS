@@ -476,7 +476,7 @@ IClientMessage* CClientReConnectManager::GetClientMessage(int nServerID)
     return NULL;
 }
 
-bool CClientReConnectManager::SendData(int nServerID, const char* pData, int nSize, bool blIsDelete)
+bool CClientReConnectManager::SendData(int nServerID, char* pData, int nSize, bool blIsDelete)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     //查找已有连接

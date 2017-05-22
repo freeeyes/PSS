@@ -9,11 +9,11 @@ int GetProcessCPU_Idel()
 {
     CpuUsage objCpu;
 
-    short u2CpuRote = objCpu.GetUsage();
+    int nCpuRoteBegin = objCpu.GetUsage();
     Sleep(1000);
-    u2CpuRote = objCpu.GetUsage();
+    int nCpuRoteEnd = objCpu.GetUsage();
 
-    return (int)u2CpuRote;
+    return (int)((nCpuRoteEnd - nCpuRoteBegin) / 2);
 }
 
 int GetProcessMemorySize()
