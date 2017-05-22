@@ -604,7 +604,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         while(true)
         {
             _Packet_Info obj_Packet_Info;
-            uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo()->Parse_Packet_Stream(GetConnectID(), &mb, (IMessageBlockManager* )App_MessageBlockManager::instance(), &obj_Packet_Info);
+            uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo()->Parse_Packet_Stream(GetConnectID(), &mb, reinterpret_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info);
 
             if(PACKET_GET_ENOUGTH == n1Ret)
             {
@@ -856,7 +856,6 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
         return false;
     }
 
-    ACE_Message_Block* pMbData = NULL;
 
     if(NULL == pBuffPacket)
     {
@@ -901,8 +900,6 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
         else
         {
             //添加进缓冲区
-            ACE_Message_Block* pMbBufferData = NULL;
-
             //SENDMESSAGE_NOMAL是需要包头的时候，否则，不组包直接发送
             if(u1SendType == SENDMESSAGE_NOMAL)
             {
@@ -927,7 +924,8 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
     else
     {
         //先判断是否要组装包头，如果需要，则组装在m_pBlockMessage中
-        uint32 u4SendPacketSize = 0;
+        uint32 u4SendPacketSize    = 0;
+		ACE_Message_Block* pMbData = NULL;
 
         if(u1SendType == SENDMESSAGE_NOMAL)
         {
@@ -1850,12 +1848,11 @@ int CProConnectManager::open(void* args)
 
 int CProConnectManager::svc (void)
 {
-    ACE_Message_Block* mb = NULL;
     ACE_Time_Value xtime;
 
     while(IsRun())
     {
-        mb = NULL;
+        ACE_Message_Block* mb = NULL;
 
         //xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, MAX_MSG_PUTTIMEOUT);
         if(getq(mb, 0) == -1)

@@ -65,7 +65,7 @@ public:
             return false;
         }
 
-        CReactorUDPHander* pReactorUDPHandler = (CReactorUDPHander* )m_vecReactorUDPHandler[nConnectID];
+        CReactorUDPHander* pReactorUDPHandler = m_vecReactorUDPHandler[nConnectID];
 
         if(NULL != pReactorUDPHandler)
         {

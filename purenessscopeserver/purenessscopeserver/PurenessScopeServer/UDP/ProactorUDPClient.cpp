@@ -110,8 +110,6 @@ void CProactorUDPClient::handle_read_dgram(const ACE_Asynch_Read_Dgram::Result& 
         pMBBuff = pMb;
     }
 
-    char* pAct = NULL;
-
     if(NULL == pMBBuff)
     {
         OUR_DEBUG((LM_INFO, "[CProactorUDPClient::handle_read_dgram]pMBBuff is NULL.\n"));
@@ -120,7 +118,7 @@ void CProactorUDPClient::handle_read_dgram(const ACE_Asynch_Read_Dgram::Result& 
     else
     {
         size_t stRecvLen = MAX_UDP_PACKET_LEN;
-        m_Read.recv(pMBBuff, stRecvLen, 0, PF_INET, pAct);
+        m_Read.recv(pMBBuff, stRecvLen, 0, PF_INET, NULL);
     }
 }
 

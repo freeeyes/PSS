@@ -134,17 +134,17 @@ bool CProServerManager::Init()
     App_MessageServiceGroup::instance()->Init(App_MainConfig::instance()->GetThreadCount(), App_MainConfig::instance()->GetMsgMaxQueue(), App_MainConfig::instance()->GetMgsHighMark(), App_MainConfig::instance()->GetMsgLowMark());
 
     //初始化给DLL的对象接口
-    App_ServerObject::instance()->SetMessageManager((IMessageManager* )App_MessageManager::instance());
-    App_ServerObject::instance()->SetLogManager((ILogManager*  )AppLogManager::instance());
-    App_ServerObject::instance()->SetConnectManager((IConnectManager* )App_ProConnectManager::instance());
-    App_ServerObject::instance()->SetPacketManager((IPacketManager* )App_BuffPacketManager::instance());
-    App_ServerObject::instance()->SetClientManager((IClientManager* )App_ClientProConnectManager::instance());
-    App_ServerObject::instance()->SetUDPConnectManager((IUDPConnectManager* )App_ProUDPManager::instance());
-    App_ServerObject::instance()->SetTimerManager((ActiveTimer* )App_TimerManager::instance());
-    App_ServerObject::instance()->SetModuleMessageManager((IModuleMessageManager* )App_ModuleMessageManager::instance());
-    App_ServerObject::instance()->SetControlListen((IControlListen* )App_ProControlListen::instance());
-    App_ServerObject::instance()->SetModuleInfo((IModuleInfo* )App_ModuleLoader::instance());
-    App_ServerObject::instance()->SetMessageBlockManager((IMessageBlockManager* )App_MessageBlockManager::instance());
+    App_ServerObject::instance()->SetMessageManager(reinterpret_cast<IMessageManager*>(App_MessageManager::instance()));
+    App_ServerObject::instance()->SetLogManager(reinterpret_cast<ILogManager*>(AppLogManager::instance()));
+    App_ServerObject::instance()->SetConnectManager(reinterpret_cast<IConnectManager*>(App_ProConnectManager::instance()));
+    App_ServerObject::instance()->SetPacketManager(reinterpret_cast<IPacketManager*>(App_BuffPacketManager::instance()));
+    App_ServerObject::instance()->SetClientManager(reinterpret_cast<IClientManager*>(App_ClientProConnectManager::instance()));
+    App_ServerObject::instance()->SetUDPConnectManager(reinterpret_cast<IUDPConnectManager*>(App_ProUDPManager::instance()));
+    App_ServerObject::instance()->SetTimerManager(reinterpret_cast<ActiveTimer*>(App_TimerManager::instance()));
+    App_ServerObject::instance()->SetModuleMessageManager(reinterpret_cast<IModuleMessageManager*>(App_ModuleMessageManager::instance()));
+    App_ServerObject::instance()->SetControlListen(reinterpret_cast<IControlListen*>(App_ProControlListen::instance()));
+    App_ServerObject::instance()->SetModuleInfo(reinterpret_cast<IModuleInfo*>(App_ModuleLoader::instance()));
+    App_ServerObject::instance()->SetMessageBlockManager(reinterpret_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()));
     App_ServerObject::instance()->SetServerManager(this);
 
     return true;

@@ -760,7 +760,7 @@ int CConnectHandler::RecvData()
         while(true)
         {
             _Packet_Info obj_Packet_Info;
-            uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo()->Parse_Packet_Stream(GetConnectID(), m_pCurrMessage, (IMessageBlockManager* )App_MessageBlockManager::instance(), &obj_Packet_Info);
+            uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo()->Parse_Packet_Stream(GetConnectID(), m_pCurrMessage,  reinterpret_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info);
 
             if(PACKET_GET_ENOUGTH == n1Ret)
             {
@@ -1186,7 +1186,7 @@ int CConnectHandler::RecvData_et()
             while(true)
             {
                 _Packet_Info obj_Packet_Info;
-                uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo()->Parse_Packet_Stream(GetConnectID(), m_pCurrMessage, (IMessageBlockManager* )App_MessageBlockManager::instance(), &obj_Packet_Info);
+                uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo()->Parse_Packet_Stream(GetConnectID(), m_pCurrMessage, reinterpret_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info);
 
                 if(PACKET_GET_ENOUGTH == n1Ret)
                 {
@@ -1400,8 +1400,6 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
 
     uint32 u4SendSuc = pBuffPacket->GetPacketLen();
 
-    ACE_Message_Block* pMbData = NULL;
-
     //如果不是直接发送数据，则拼接数据包
     if(u1State == PACKET_SEND_CACHE)
     {
@@ -1525,11 +1523,12 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
         //如果之前有缓冲数据，则和缓冲数据一起发送
         u4PacketSize = (uint32)m_pBlockMessage->length();
 
+		ACE_Message_Block* pMbData = NULL;
         //这里肯定会大于0
         if(m_pBlockMessage->length() > 0)
         {
             //因为是异步发送，发送的数据指针不可以立刻释放，所以需要在这里创建一个新的发送数据块，将数据考入
-            pMbData = App_MessageBlockManager::instance()->Create((uint32)m_pBlockMessage->length());
+			pMbData = App_MessageBlockManager::instance()->Create((uint32)m_pBlockMessage->length());
 
             if(NULL == pMbData)
             {
@@ -2534,12 +2533,11 @@ int CConnectManager::open(void* args)
 
 int CConnectManager::svc (void)
 {
-    ACE_Message_Block* mb = NULL;
     ACE_Time_Value xtime;
 
     while(IsRun())
     {
-        mb = NULL;
+        ACE_Message_Block* mb = NULL;
 
         if(getq(mb, 0) == -1)
         {

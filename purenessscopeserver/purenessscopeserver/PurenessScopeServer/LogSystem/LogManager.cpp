@@ -142,12 +142,11 @@ int CLogManager::open(void* args)
 int CLogManager::svc(void)
 {
     OUR_DEBUG((LM_INFO,"[CLogManager::svc] svc run.\n"));
-    ACE_Message_Block* mb = NULL;
 
     //ACE_Time_Value     xtime;
     while(m_blRun)
     {
-        mb = NULL;
+         ACE_Message_Block* mb = NULL;
 
         //xtime=ACE_OS::gettimeofday()+ACE_Time_Value(0, MAX_MSG_PUTTIMEOUT);
         if(getq(mb, 0) == -1)
