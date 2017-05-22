@@ -941,22 +941,22 @@ struct _ClientConnectInfo
         m_u8SendQueueTimeCost = 0;
     }
 
-	//拷贝构造函数
-	_ClientConnectInfo(const _ClientConnectInfo& ar)
-	{
-		this->m_blValid = ar.m_blValid;
-		this->m_u4ConnectID = ar.m_u4ConnectID;
-		this->m_addrRemote = ar.m_addrRemote;
-		this->m_u4RecvCount = ar.m_u4RecvCount;
-		this->m_u4SendCount = ar.m_u4SendCount;
-		this->m_u4AllRecvSize = ar.m_u4AllRecvSize;
-		this->m_u4AllSendSize = ar.m_u4AllSendSize;
-		this->m_u4BeginTime = ar.m_u4BeginTime;
-		this->m_u4AliveTime = ar.m_u4AliveTime;
-		this->m_u4RecvQueueCount = ar.m_u4RecvQueueCount;
-		this->m_u8RecvQueueTimeCost = ar.m_u8RecvQueueTimeCost;
-		this->m_u8SendQueueTimeCost = ar.m_u8SendQueueTimeCost;
-	}
+    //拷贝构造函数
+    _ClientConnectInfo(const _ClientConnectInfo& ar)
+    {
+        this->m_blValid = ar.m_blValid;
+        this->m_u4ConnectID = ar.m_u4ConnectID;
+        this->m_addrRemote = ar.m_addrRemote;
+        this->m_u4RecvCount = ar.m_u4RecvCount;
+        this->m_u4SendCount = ar.m_u4SendCount;
+        this->m_u4AllRecvSize = ar.m_u4AllRecvSize;
+        this->m_u4AllSendSize = ar.m_u4AllSendSize;
+        this->m_u4BeginTime = ar.m_u4BeginTime;
+        this->m_u4AliveTime = ar.m_u4AliveTime;
+        this->m_u4RecvQueueCount = ar.m_u4RecvQueueCount;
+        this->m_u8RecvQueueTimeCost = ar.m_u8RecvQueueTimeCost;
+        this->m_u8SendQueueTimeCost = ar.m_u8SendQueueTimeCost;
+    }
 
     _ClientConnectInfo& operator = (const _ClientConnectInfo& ar)
     {
@@ -997,11 +997,11 @@ struct _ServerConnectInfo
 };
 
 #ifndef SAFE_DELETE
-#define SAFE_DELETE(x) if( (x) != NULL ) { delete (x); (x) = NULL; }
+#define SAFE_DELETE(x) if( (x) != NULL ) {ACE_UNUSED_ARG(x); delete (x); (x) = NULL; }
 #endif
 
 #ifndef SAFE_DELETE_ARRAY
-#define SAFE_DELETE_ARRAY(x) if( (x) != NULL ) { delete[] (x); (x) = NULL; }
+#define SAFE_DELETE_ARRAY(x) if( (x) != NULL ) {ACE_UNUSED_ARG(x); delete[] (x); (x) = NULL; }
 #endif
 
 //为逻辑块提供一个Try catch的保护宏，用于调试，具体使用方法请参看TestTcp用例
@@ -1060,8 +1060,8 @@ class CTimeCost
 public:
     CTimeCost(int nMillionSecond, const char* pFunctionName, const char* pFileName, int nLine)
     {
-		m_lBegin         = 0;
-		m_lEnd           = 0;
+        m_lBegin         = 0;
+        m_lEnd           = 0;
         m_nMillionSecond = nMillionSecond;
         sprintf_safe(m_szFunctionName, MAX_BUFF_100, "%s", pFunctionName);
         sprintf_safe(m_szFileName, MAX_BUFF_300, "%s", pFileName);
@@ -1085,13 +1085,13 @@ public:
         long lTimeInterval = m_lEnd - m_lBegin;  //转换成毫秒
 
         if(lTimeInterval >= (long)m_nMillionSecond)
-        {	
+        {
             //记录日志
             FILE* pFile = ACE_OS::fopen(ASSERT_TIME_PATH, "a+");
 
             if(pFile != NULL)
             {
-				char szLog[MAX_BUFF_1024] = { '\0' };
+                char szLog[MAX_BUFF_1024] = { '\0' };
 
                 char szTimeNow[MAX_BUFF_50];
                 time_t tNow = time(NULL);
@@ -1320,12 +1320,12 @@ struct _ClientIPInfo
         m_nPort         = 0;
     }
 
-	//拷贝构造函数
-	_ClientIPInfo(const _ClientIPInfo& ar)
-	{
-		sprintf_safe(this->m_szClientIP, MAX_BUFF_50, "%s", ar.m_szClientIP);
-		this->m_nPort = ar.m_nPort;
-	}
+    //拷贝构造函数
+    _ClientIPInfo(const _ClientIPInfo& ar)
+    {
+        sprintf_safe(this->m_szClientIP, MAX_BUFF_50, "%s", ar.m_szClientIP);
+        this->m_nPort = ar.m_nPort;
+    }
 
     _ClientIPInfo& operator = (const _ClientIPInfo& ar)
     {
@@ -1353,15 +1353,15 @@ struct _ClientNameInfo
         m_nLog          = 0;
     }
 
-	//拷贝构造函数
-	_ClientNameInfo(const _ClientNameInfo& ar)
-	{
-		sprintf_safe(this->m_szName, MAX_BUFF_100, "%s", ar.m_szName);
-		sprintf_safe(this->m_szClientIP, MAX_BUFF_50, "%s", ar.m_szClientIP);
-		this->m_nPort = ar.m_nPort;
-		this->m_nConnectID = ar.m_nConnectID;
-		this->m_nLog = ar.m_nLog;
-	}
+    //拷贝构造函数
+    _ClientNameInfo(const _ClientNameInfo& ar)
+    {
+        sprintf_safe(this->m_szName, MAX_BUFF_100, "%s", ar.m_szName);
+        sprintf_safe(this->m_szClientIP, MAX_BUFF_50, "%s", ar.m_szClientIP);
+        this->m_nPort = ar.m_nPort;
+        this->m_nConnectID = ar.m_nConnectID;
+        this->m_nLog = ar.m_nLog;
+    }
 
     _ClientNameInfo& operator = (const _ClientNameInfo& ar)
     {
