@@ -64,6 +64,67 @@ public:
         OUR_DEBUG((LM_INFO,"[CLogFile::~CLogFile] End.\n"));
     }
 
+	//拷贝构造
+	CLogFile(CLogFile& ar)
+	{
+		this->SetLoggerID(ar.GetLoggerID());
+		this->SetLevel(ar.GetLevel());
+		this->SetLoggerName(ar.GetLoggerName().c_str());
+		this->SetServerName(ar.GetServerName().c_str());
+		this->SetLoggerClass(ar.GetLoggerClass());
+		this->SetBufferSize(ar.GetBufferSize());
+		this->SetLogTime(ar.GetLogTime());
+		this->SetDisplay(ar.GetDisPlay());
+		this->SetDisplay(ar.GetDisPlay());
+		this->SetFileRoot(ar.GetFileRoot());
+	}
+
+	CLogFile& operator = (CLogFile& ar)
+	{
+		this->SetLoggerID(ar.GetLoggerID());
+		this->SetLevel(ar.GetLevel());
+		this->SetLoggerName(ar.GetLoggerName().c_str());
+		this->SetServerName(ar.GetServerName().c_str());
+		this->SetLoggerClass(ar.GetLoggerClass());
+		this->SetBufferSize(ar.GetBufferSize());
+		this->SetLogTime(ar.GetLogTime());
+		this->SetDisplay(ar.GetDisPlay());
+		this->SetFileRoot(ar.GetFileRoot());
+		return *this;
+	}
+
+	void SetFileRoot(const char* pFileRoot)
+	{
+		sprintf_safe(m_szFileRoot, MAX_BUFF_100, "%s", pFileRoot);
+	}
+
+	char* GetFileRoot()
+	{
+		return m_szFileRoot;
+	}
+
+	void SetLogTime(const char* pLogTime)
+	{
+		sprintf_safe(m_szLogTime, MAX_TIME_SIZE, "%s", pLogTime);
+	}
+
+	char* GetLogTime()
+	{
+		return m_szLogTime;
+	}
+
+	void SetBufferSize(uint32 u4BufferSize)
+	{
+		SAFE_DELETE_ARRAY(m_pBuffer);
+		m_pBuffer = new char[u4BufferSize];   //这里是用于日志拼接时间所用
+		m_u4BufferSize = u4BufferSize;
+	}
+
+	uint32 GetBufferSize()
+	{
+		return m_u4BufferSize;
+	}
+
     virtual int doLog(_LogBlockInfo* pLogBlockInfo)
     {
         //每次自动检测
@@ -215,6 +276,18 @@ public:
         OUR_DEBUG((LM_INFO,"[ServerLogger](%d)m_StrlogType=%s.\n", nType, m_StrlogType.c_str()));
     }
 
+	int GetLoggerClass()
+	{
+		if (LOGTYPE_OPERATION == m_StrlogType)
+		{
+			return 1;
+		}
+		else
+		{
+			return 2;
+		}
+	}
+
     void SetLoggerName(const char* szLoggerName)
     {
         m_StrlogName = szLoggerName;
@@ -225,7 +298,7 @@ public:
         m_u2LogID = u2LogID;
     }
 
-    int GetLoggerID()
+    uint16 GetLoggerID()
     {
         return m_u2LogID;
     }
