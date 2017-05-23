@@ -12,6 +12,10 @@ int GetProcessCPU_Idel_Linux()
     ACE_TString strCPU = strcmd;
     strCPU +="  |awk '{print $2,$3}' >> aasnowy.txt";
     nRet = system(strCPU.c_str());   //ªÒ»°CPU√¸¡Ó
+	if (nRet != 0)
+	{
+		return 0;
+	}
 
     FILE* fd;
     char szbuffer[50];
