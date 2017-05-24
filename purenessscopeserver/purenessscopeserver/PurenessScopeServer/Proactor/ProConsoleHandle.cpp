@@ -16,9 +16,9 @@ CProConsoleHandle::CProConsoleHandle(void)
     m_u1ConnectState     = CONNECT_INIT;
     m_u1SendBuffState    = CONNECT_SENDNON;
     m_pPacketParse       = NULL;
-	m_blCanWrite         = false;
-	m_blTimeClose        = false;
-	m_u4RecvPacketCount  = 0;
+    m_blCanWrite         = false;
+    m_blTimeClose        = false;
+    m_u4RecvPacketCount  = 0;
 }
 
 CProConsoleHandle::~CProConsoleHandle(void)

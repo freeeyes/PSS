@@ -13,8 +13,8 @@ CConnectClient::CConnectClient(void)
     m_u4CostTime        = 0;
     m_u4MaxPacketSize   = MAX_MSG_PACKETLENGTH;
     m_ems2s             = S2S_NEED_CALLBACK;
-	m_szError[0]        = '\0';
-	m_pClientMessage    = NULL;
+    m_szError[0]        = '\0';
+    m_pClientMessage    = NULL;
 
     m_emRecvState       = SERVER_RECV_INIT;
 }
@@ -69,7 +69,7 @@ void CConnectClient::ClientClose(EM_s2s& ems2s)
 
 int CConnectClient::open(void* p)
 {
-	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadLock);
+    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadLock);
 
     //从配置文件获取数据
     m_u4MaxPacketSize  = App_MainConfig::instance()->GetRecvBuffSize();

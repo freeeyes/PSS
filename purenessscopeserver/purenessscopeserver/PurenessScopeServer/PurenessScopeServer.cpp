@@ -97,7 +97,7 @@ bool SetAppPath()
 
     if((pFilePath = (char*)new char[nSize]) != NULL)
     {
-		char szPath[MAX_BUFF_300] = { '\0' };
+        char szPath[MAX_BUFF_300] = { '\0' };
         memset(pFilePath, 0, nSize);
         sprintf(pFilePath,"/proc/%d/exe",getpid());
 
@@ -129,14 +129,15 @@ bool SetAppPath()
         szPath[nLen > 0 ? (nLen-1) : 0]= '\0';
 
         int nRet = chdir(szPath);
-		if (-1 == nRet)
-		{
-			OUR_DEBUG((LM_INFO, "[SetAppPath]Set work Path (%s) fail.\n", szPath));
-		}
-		else
-		{
-			OUR_DEBUG((LM_INFO, "[SetAppPath]Set work Path (%s) OK.\n", szPath));
-		}
+
+        if (-1 == nRet)
+        {
+            OUR_DEBUG((LM_INFO, "[SetAppPath]Set work Path (%s) fail.\n", szPath));
+        }
+        else
+        {
+            OUR_DEBUG((LM_INFO, "[SetAppPath]Set work Path (%s) OK.\n", szPath));
+        }
 
         return true;
     }

@@ -33,7 +33,6 @@ int CProactorUDPClient::OpenAddress(const ACE_INET_Addr& AddrLocal, EM_UDP_TYPE 
         ACE_OS::setsockopt(m_skRemote.get_handle(), SOL_SOCKET, SO_BROADCAST, (char*)&bOpt, sizeof(bOpt));
     }
 
-
 #ifdef WIN32
     //…Ë÷√wsaIoctl
     bool blBehavior = false;

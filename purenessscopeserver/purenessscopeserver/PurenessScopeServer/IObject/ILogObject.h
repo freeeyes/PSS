@@ -50,11 +50,11 @@ public:
 
     _LogBlockInfo& operator = (const _LogBlockInfo& ar)
     {
-		if(NULL != this->m_pBlock)
-		{
-			SAFE_DELETE(this->m_pBlock);
-		}
-	
+        if(NULL != this->m_pBlock)
+        {
+            SAFE_DELETE(this->m_pBlock);
+        }
+
         this->m_pBlock      = ar.m_pBlock;
         this->m_u4Length    = ar.m_u4Length;
         this->m_blIsUsed    = ar.m_blIsUsed;

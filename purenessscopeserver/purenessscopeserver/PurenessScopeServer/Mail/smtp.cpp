@@ -300,9 +300,9 @@ int mailText(unsigned char** mail, const unsigned char* fromMail, const unsigned
     }
 
     mailTextLen = (int)ACE_OS::strlen((char* )fromMail) +
-				  (int)ACE_OS::strlen((char* )toMail) +
-		          (int)ACE_OS::strlen((char* )mailSubject) +
-		          (int)ACE_OS::strlen((char* )mailBody) + 500;
+                  (int)ACE_OS::strlen((char* )toMail) +
+                  (int)ACE_OS::strlen((char* )mailSubject) +
+                  (int)ACE_OS::strlen((char* )mailBody) + 500;
 
     szMailText = (char* )ACE_OS::calloc(mailTextLen, 1);
 

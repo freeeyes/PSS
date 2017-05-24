@@ -12,10 +12,7 @@
 class CpuUsage
 {
 public:
-    CpuUsage()
-        :m_nCpuUsage(-1)
-        ,IsFirstRun(true)
-        ,m_lRunCount(0)
+    CpuUsage():m_nCpuUsage(-1),IsFirstRun(true),m_lRunCount(0)
     {
         ZeroMemory(&m_ftPrevSysKernel, sizeof(FILETIME));
         ZeroMemory(&m_ftPrevSysUser, sizeof(FILETIME));

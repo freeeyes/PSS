@@ -21,17 +21,17 @@ struct _Packet_Parse_Info
     bool (*Connect)(uint32 u4ConnectID, _ClientIPInfo objClientIPInfo, _ClientIPInfo objLocalIPInfo);
     void (*DisConnect)(uint32 u4ConnectID);
 
-	_Packet_Parse_Info()
-	{
-		hModule                 = NULL;
-		Parse_Packet_Head_Info  = NULL;
-		Parse_Packet_Body_Info  = NULL;
-		Parse_Packet_Stream     = NULL;
-		Make_Send_Packet        = NULL;
-		Make_Send_Packet_Length = NULL;
-		Connect                 = NULL;
-		DisConnect              = NULL;
-	}
+    _Packet_Parse_Info()
+    {
+        hModule                 = NULL;
+        Parse_Packet_Head_Info  = NULL;
+        Parse_Packet_Body_Info  = NULL;
+        Parse_Packet_Stream     = NULL;
+        Make_Send_Packet        = NULL;
+        Make_Send_Packet_Length = NULL;
+        Connect                 = NULL;
+        DisConnect              = NULL;
+    }
 };
 
 class CLoadPacketParse

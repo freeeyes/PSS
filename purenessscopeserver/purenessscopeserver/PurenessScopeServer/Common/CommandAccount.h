@@ -36,18 +36,18 @@ struct _CommandData
         m_u1CommandType  = COMMAND_TYPE_IN;
     }
 
-	//拷贝构造函数
-	_CommandData(const _CommandData& ar)
-	{
-		this->m_u2CommandID = ar.m_u2CommandID;
-		this->m_u4CommandCount = ar.m_u4CommandCount;
-		this->m_u8CommandCost = ar.m_u8CommandCost;
-		this->m_u1CommandType = ar.m_u1CommandType;
-		this->m_u4PacketSize = ar.m_u4PacketSize;
-		this->m_u4CommandSize = ar.m_u4CommandSize;
-		this->m_u1PacketType = ar.m_u1PacketType;
-		this->m_tvCommandTime = ar.m_tvCommandTime;
-	}
+    //拷贝构造函数
+    _CommandData(const _CommandData& ar)
+    {
+        this->m_u2CommandID = ar.m_u2CommandID;
+        this->m_u4CommandCount = ar.m_u4CommandCount;
+        this->m_u8CommandCost = ar.m_u8CommandCost;
+        this->m_u1CommandType = ar.m_u1CommandType;
+        this->m_u4PacketSize = ar.m_u4PacketSize;
+        this->m_u4CommandSize = ar.m_u4CommandSize;
+        this->m_u1PacketType = ar.m_u1PacketType;
+        this->m_tvCommandTime = ar.m_tvCommandTime;
+    }
 
     _CommandData& operator = (const _CommandData& ar)
     {
@@ -93,29 +93,29 @@ struct _CommandTimeOut
         m_u4TimeOutTime = 0;
     }
 
-	//拷贝构造函数
-	_CommandTimeOut(const _CommandTimeOut& ar)
-	{
-		this->m_u2CommandID   = ar.m_u2CommandID;
-		this->m_tvTime        = ar.m_tvTime;
-		this->m_u4TimeOutTime = ar.m_u4TimeOutTime;
-	}
-
-	_CommandTimeOut& operator = (const _CommandTimeOut& ar)
-	{
-		this->m_u2CommandID   = ar.m_u2CommandID;
-		this->m_tvTime        = ar.m_tvTime;
-		this->m_u4TimeOutTime = ar.m_u4TimeOutTime;
-		return *this;
-	}
-	
-	_CommandTimeOut& operator += (const _CommandTimeOut& ar)
+    //拷贝构造函数
+    _CommandTimeOut(const _CommandTimeOut& ar)
     {
         this->m_u2CommandID   = ar.m_u2CommandID;
-		this->m_tvTime        = ar.m_tvTime;
-		this->m_u4TimeOutTime = ar.m_u4TimeOutTime;
+        this->m_tvTime        = ar.m_tvTime;
+        this->m_u4TimeOutTime = ar.m_u4TimeOutTime;
+    }
+
+    _CommandTimeOut& operator = (const _CommandTimeOut& ar)
+    {
+        this->m_u2CommandID   = ar.m_u2CommandID;
+        this->m_tvTime        = ar.m_tvTime;
+        this->m_u4TimeOutTime = ar.m_u4TimeOutTime;
         return *this;
-    }	
+    }
+
+    _CommandTimeOut& operator += (const _CommandTimeOut& ar)
+    {
+        this->m_u2CommandID   = ar.m_u2CommandID;
+        this->m_tvTime        = ar.m_tvTime;
+        this->m_u4TimeOutTime = ar.m_u4TimeOutTime;
+        return *this;
+    }
 };
 
 typedef vector<_CommandTimeOut> vecCommandTimeOut;   //记录所有超时命令的数组
@@ -153,12 +153,12 @@ struct _CommandFlowAccount
         m_u4FlowOut = 0;
     }
 
-	_CommandFlowAccount(const _CommandFlowAccount& ar)
-	{
-		this->m_u1FLow = ar.m_u1FLow;
-		this->m_u4FlowIn = ar.m_u4FlowIn;
-		this->m_u4FlowOut = ar.m_u4FlowOut;
-	}
+    _CommandFlowAccount(const _CommandFlowAccount& ar)
+    {
+        this->m_u1FLow = ar.m_u1FLow;
+        this->m_u4FlowIn = ar.m_u4FlowIn;
+        this->m_u4FlowOut = ar.m_u4FlowOut;
+    }
 
     _CommandFlowAccount& operator = (const _CommandFlowAccount& ar)
     {

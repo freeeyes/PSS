@@ -106,7 +106,7 @@ uint32 CLogBlockPool::GetBlockSize()
 
 CLogManager::CLogManager(void)
 {
-	m_blIsNeedReset = false;
+    m_blIsNeedReset = false;
     m_blRun         = false;
     m_nThreadCount  = 1;
     m_nQueueMax     = MAX_MSG_THREADQUEUE;
@@ -146,7 +146,7 @@ int CLogManager::svc(void)
     //ACE_Time_Value     xtime;
     while(m_blRun)
     {
-         ACE_Message_Block* mb = NULL;
+        ACE_Message_Block* mb = NULL;
 
         //xtime=ACE_OS::gettimeofday()+ACE_Time_Value(0, MAX_MSG_PUTTIMEOUT);
         if(getq(mb, 0) == -1)

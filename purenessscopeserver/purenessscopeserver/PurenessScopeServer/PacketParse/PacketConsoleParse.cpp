@@ -11,9 +11,7 @@ CConsolePacketParse::CConsolePacketParse(void)
 
 CConsolePacketParse::~CConsolePacketParse(void)
 {
-
 }
-
 
 void CConsolePacketParse::Init()
 {

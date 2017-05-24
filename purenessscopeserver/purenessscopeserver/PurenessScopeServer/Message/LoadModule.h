@@ -30,13 +30,13 @@ struct _ModuleInfo
 
     _ModuleInfo()
     {
-		LoadModuleData    = NULL;
-		UnLoadModuleData  = NULL;
-		GetDesc           = NULL;
-		GetName           = NULL;
-		GetModuleKey      = NULL;
-		DoModuleMessage   = NULL;
-		GetModuleState    = NULL;
+        LoadModuleData    = NULL;
+        UnLoadModuleData  = NULL;
+        GetDesc           = NULL;
+        GetName           = NULL;
+        GetModuleKey      = NULL;
+        DoModuleMessage   = NULL;
+        GetModuleState    = NULL;
     }
 };
 

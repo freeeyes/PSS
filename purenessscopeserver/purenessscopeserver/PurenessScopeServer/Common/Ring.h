@@ -11,8 +11,8 @@ class CRingLink
 public:
     CRingLink()
     {
-		m_nMaxCount = 0;
-		m_nIndex    = 0;
+        m_nMaxCount = 0;
+        m_nIndex    = 0;
         m_pRingLink = NULL;
     }
 

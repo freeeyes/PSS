@@ -37,7 +37,7 @@ private:
     int m_nOptdebug;
     int m_nOptstartup;
 
-    Frame_Logging_Strategy* m_pFrameLoggingStrategy; 
+    Frame_Logging_Strategy* m_pFrameLoggingStrategy;
 };
 
 typedef ACE_Singleton<Process, ACE_Mutex> App_Process;
