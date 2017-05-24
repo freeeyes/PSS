@@ -50,12 +50,21 @@ public:
 
     _LogBlockInfo& operator = (const _LogBlockInfo& ar)
     {
+		if(NULL != this->m_pBlock)
+		{
+			SAFE_DELETE(this->m_pBlock);
+		}
+	
         this->m_pBlock      = ar.m_pBlock;
         this->m_u4Length    = ar.m_u4Length;
         this->m_blIsUsed    = ar.m_blIsUsed;
         this->m_u4LogID     = ar.m_u4LogID;
         this->m_u4MailID    = ar.m_u4MailID;
+        memcpy_safe((char* )ar.m_pmbQueuePtr->base(), (uint32)ar.m_pmbQueuePtr->length(), m_pmbQueuePtr->base(), (uint32)m_pmbQueuePtr->length());
         sprintf_safe(m_szMailTitle, MAX_BUFF_200, "%s", ar.m_szMailTitle);
+
+        _LogBlockInfo** ppMessage = (_LogBlockInfo**)m_pmbQueuePtr->base();
+        *ppMessage = this;
         return *this;
     }
 

@@ -10,8 +10,8 @@ class AES
 {
 public:
 	AES();
-    AES(const unsigned char* szKey);
     virtual ~AES();
+	bool SetKey(const unsigned char* szKey);
     unsigned char* Cipher(unsigned char* input);
     unsigned char* InvCipher(unsigned char* input);
     void* Cipher(void* input, int length=0);

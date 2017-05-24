@@ -16,11 +16,6 @@ public:
         m_pRingLink = NULL;
     }
 
-    CRingLink(int nMaxCount)
-    {	
-        Init(nMaxCount);
-    }
-
     void Init(int nMaxCount)
     {
         Close();
