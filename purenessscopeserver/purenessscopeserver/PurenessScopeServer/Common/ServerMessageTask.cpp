@@ -319,7 +319,7 @@ void CServerMessageTask::AddClientMessage(IClientMessage* pClientMessage)
 void CServerMessageTask::DelClientMessage(IClientMessage* pClientMessage)
 {
     //先查找有效的列表中是否包含此指针
-	for (vecValidIClientMessage::iterator b = m_vecValidIClientMessage.begin(); b != m_vecValidIClientMessage.end(); b++)
+	for (vecValidIClientMessage::iterator b = m_vecValidIClientMessage.begin(); b != m_vecValidIClientMessage.end(); ++b)
     {
         if(*b == pClientMessage)
         {

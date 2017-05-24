@@ -45,6 +45,7 @@ AES::AES()
 
 	memcpy(Sbox, sBox, 256);
 	memcpy(InvSbox, invsBox, 256);
+	memset(w, 0, sizeof(w));
 }
 
 bool AES::SetKey(const unsigned char* szKey)

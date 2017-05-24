@@ -214,7 +214,7 @@ void CConnectAcceptorManager::Close()
 bool CConnectAcceptorManager::Close(const char* pIP, uint32 n4Port)
 {
     //找到符合条件指定的端口停止监听
-    for(vecConnectAcceptor::iterator b = m_vecConnectAcceptor.begin(); b != m_vecConnectAcceptor.end(); b++)
+    for(vecConnectAcceptor::iterator b = m_vecConnectAcceptor.begin(); b != m_vecConnectAcceptor.end(); ++b)
     {
         ConnectAcceptor* pConnectAcceptor = (ConnectAcceptor*)(*b);
 
@@ -257,7 +257,7 @@ const char* CConnectAcceptorManager::GetError()
 bool CConnectAcceptorManager::CheckIPInfo(const char* pIP, uint32 n4Port)
 {
     //找到符合条件指定的端口停止监听
-    for(vecConnectAcceptor::iterator b = m_vecConnectAcceptor.begin(); b != m_vecConnectAcceptor.end(); b++)
+    for(vecConnectAcceptor::iterator b = m_vecConnectAcceptor.begin(); b != m_vecConnectAcceptor.end(); ++b)
     {
         ConnectAcceptor* pConnectAcceptor = (ConnectAcceptor*)(*b);
 

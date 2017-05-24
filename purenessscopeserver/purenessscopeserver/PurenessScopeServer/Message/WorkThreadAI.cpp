@@ -168,7 +168,7 @@ bool CWorkThreadAI::CheckCurrTimeout(uint16 u2CommandID, uint32 u4Now)
         //OUR_DEBUG((LM_INFO, "[CWorkThreadAI::CheckCurrTimeout]size=%d.\n", (int)m_vecCommandTimeout.size()));
 
         //如果需要检测才走循环
-        for(vector<_CommandTimeout>::iterator b = m_vecCommandTimeout.begin(); b != m_vecCommandTimeout.end(); b++)
+        for(vector<_CommandTimeout>::iterator b = m_vecCommandTimeout.begin(); b != m_vecCommandTimeout.end(); ++b)
         {
             _CommandTimeout objCommandTimeout = (_CommandTimeout)(*b);
 

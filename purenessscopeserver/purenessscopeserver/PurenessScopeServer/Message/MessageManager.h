@@ -113,7 +113,7 @@ public:
     //如果返回为true，证明这个消息已经没有对应项，需要外围Hash中除去
     bool DelClientCommand(CClientCommand* pClientCommand)
     {
-        for(vecClientCommandList::iterator b = m_vecClientCommandList.begin(); b!= m_vecClientCommandList.end(); b++)
+        for(vecClientCommandList::iterator b = m_vecClientCommandList.begin(); b!= m_vecClientCommandList.end(); ++b)
         {
             _ClientCommandInfo* pClientCommandInfo = (_ClientCommandInfo* )(*b);
 

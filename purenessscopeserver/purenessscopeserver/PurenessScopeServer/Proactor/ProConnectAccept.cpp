@@ -135,7 +135,7 @@ void CProConnectAcceptManager::Close()
 bool CProConnectAcceptManager::Close( const char* pIP, uint32 n4Port )
 {
     //找到符合条件指定的端口停止监听
-    for(vecProConnectAcceptor::iterator b = m_vecConnectAcceptor.begin(); b != m_vecConnectAcceptor.end(); b++)
+    for(vecProConnectAcceptor::iterator b = m_vecConnectAcceptor.begin(); b != m_vecConnectAcceptor.end(); ++b)
     {
         ProConnectAcceptor* pConnectAcceptor = (ProConnectAcceptor*)(*b);
 
