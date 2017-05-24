@@ -51,7 +51,7 @@ public:
         m_StrlogType        = "ServerError";
         m_pBuffer           = new char[u4BufferSize];   //这里是用于日志拼接时间所用
         m_u4BufferSize      = u4BufferSize;
-		m_szLogTime[0]      = '\0';
+        m_szLogTime[0]      = '\0';
         sprintf_safe(m_szFileRoot, MAX_BUFF_100, "%s", pFileRoot);
     }
 
@@ -64,66 +64,66 @@ public:
         OUR_DEBUG((LM_INFO,"[CLogFile::~CLogFile] End.\n"));
     }
 
-	//拷贝构造
-	CLogFile(CLogFile& ar)
-	{
-		this->SetLoggerID(ar.GetLoggerID());
-		this->SetLevel(ar.GetLevel());
-		this->SetLoggerName(ar.GetLoggerName().c_str());
-		this->SetServerName(ar.GetServerName().c_str());
-		this->SetLoggerClass(ar.GetLoggerClass());
-		this->SetBufferSize(ar.GetBufferSize());
-		this->SetLogTime(ar.GetLogTime());
-		this->SetDisplay(ar.GetDisPlay());
-		this->SetDisplay(ar.GetDisPlay());
-		this->SetFileRoot(ar.GetFileRoot());
-	}
+    //拷贝构造
+    CLogFile(CLogFile& ar)
+    {
+        this->SetLoggerID(ar.GetLoggerID());
+        this->SetLevel(ar.GetLevel());
+        this->SetLoggerName(ar.GetLoggerName().c_str());
+        this->SetServerName(ar.GetServerName().c_str());
+        this->SetLoggerClass(ar.GetLoggerClass());
+        this->SetBufferSize(ar.GetBufferSize());
+        this->SetLogTime(ar.GetLogTime());
+        this->SetDisplay(ar.GetDisPlay());
+        this->SetDisplay(ar.GetDisPlay());
+        this->SetFileRoot(ar.GetFileRoot());
+    }
 
-	CLogFile& operator = (CLogFile& ar)
-	{
-		this->SetLoggerID(ar.GetLoggerID());
-		this->SetLevel(ar.GetLevel());
-		this->SetLoggerName(ar.GetLoggerName().c_str());
-		this->SetServerName(ar.GetServerName().c_str());
-		this->SetLoggerClass(ar.GetLoggerClass());
-		this->SetBufferSize(ar.GetBufferSize());
-		this->SetLogTime(ar.GetLogTime());
-		this->SetDisplay(ar.GetDisPlay());
-		this->SetFileRoot(ar.GetFileRoot());
-		return *this;
-	}
+    CLogFile& operator = (CLogFile& ar)
+    {
+        this->SetLoggerID(ar.GetLoggerID());
+        this->SetLevel(ar.GetLevel());
+        this->SetLoggerName(ar.GetLoggerName().c_str());
+        this->SetServerName(ar.GetServerName().c_str());
+        this->SetLoggerClass(ar.GetLoggerClass());
+        this->SetBufferSize(ar.GetBufferSize());
+        this->SetLogTime(ar.GetLogTime());
+        this->SetDisplay(ar.GetDisPlay());
+        this->SetFileRoot(ar.GetFileRoot());
+        return *this;
+    }
 
-	void SetFileRoot(const char* pFileRoot)
-	{
-		sprintf_safe(m_szFileRoot, MAX_BUFF_100, "%s", pFileRoot);
-	}
+    void SetFileRoot(const char* pFileRoot)
+    {
+        sprintf_safe(m_szFileRoot, MAX_BUFF_100, "%s", pFileRoot);
+    }
 
-	char* GetFileRoot()
-	{
-		return m_szFileRoot;
-	}
+    char* GetFileRoot()
+    {
+        return m_szFileRoot;
+    }
 
-	void SetLogTime(const char* pLogTime)
-	{
-		sprintf_safe(m_szLogTime, MAX_TIME_SIZE, "%s", pLogTime);
-	}
+    void SetLogTime(const char* pLogTime)
+    {
+        sprintf_safe(m_szLogTime, MAX_TIME_SIZE, "%s", pLogTime);
+    }
 
-	char* GetLogTime()
-	{
-		return m_szLogTime;
-	}
+    char* GetLogTime()
+    {
+        return m_szLogTime;
+    }
 
-	void SetBufferSize(uint32 u4BufferSize)
-	{
-		SAFE_DELETE_ARRAY(m_pBuffer);
-		m_pBuffer = new char[u4BufferSize];   //这里是用于日志拼接时间所用
-		m_u4BufferSize = u4BufferSize;
-	}
+    void SetBufferSize(uint32 u4BufferSize)
+    {
+        SAFE_DELETE_ARRAY(m_pBuffer);
+        m_pBuffer = new char[u4BufferSize];   //这里是用于日志拼接时间所用
+        m_u4BufferSize = u4BufferSize;
+    }
 
-	uint32 GetBufferSize()
-	{
-		return m_u4BufferSize;
-	}
+    uint32 GetBufferSize()
+    {
+        return m_u4BufferSize;
+    }
 
     virtual int doLog(_LogBlockInfo* pLogBlockInfo)
     {
@@ -182,19 +182,22 @@ public:
                         (const unsigned char*)pMailAlert->m_szToMailAddr,
                         (const unsigned char*)pLogBlockInfo->m_szMailTitle,
                         (const unsigned char*)pLogBlockInfo->m_pBlock);
+
         if(nRet != 0)
         {
             OUR_DEBUG((LM_ERROR, "[CLogFile::SendMail]MailID(%d) mailText error.\n", pLogBlockInfo->m_u4MailID));
             free(pMail);
             return false;
-        }						
+        }
+
         nRet = mailEnd(&pMail);
+
         if(nRet != 0)
         {
             OUR_DEBUG((LM_ERROR, "[CLogFile::SendMail]MailID(%d) mailEnd error.\n", pLogBlockInfo->m_u4MailID));
             free(pMail);
             return false;
-        }			
+        }
 
         ACE_HANDLE fd;
 
@@ -276,17 +279,17 @@ public:
         OUR_DEBUG((LM_INFO,"[ServerLogger](%d)m_StrlogType=%s.\n", nType, m_StrlogType.c_str()));
     }
 
-	int GetLoggerClass()
-	{
-		if (LOGTYPE_OPERATION == m_StrlogType)
-		{
-			return 1;
-		}
-		else
-		{
-			return 2;
-		}
-	}
+    int GetLoggerClass()
+    {
+        if (LOGTYPE_OPERATION == m_StrlogType)
+        {
+            return 1;
+        }
+        else
+        {
+            return 2;
+        }
+    }
 
     void SetLoggerName(const char* szLoggerName)
     {

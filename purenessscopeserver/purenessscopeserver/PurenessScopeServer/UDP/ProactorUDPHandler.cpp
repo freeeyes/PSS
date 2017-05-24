@@ -7,8 +7,8 @@ CProactorUDPHandler::CProactorUDPHandler(void)
     m_u4SendPacketCount  = 0;
     m_u4RecvSize         = 0;
     m_u4SendSize         = 0;
-	m_szCompletionkey[0] = '\0';
-	m_szAct[0]           = '\0';
+    m_szCompletionkey[0] = '\0';
+    m_szAct[0]           = '\0';
 }
 
 CProactorUDPHandler::~CProactorUDPHandler(void)
@@ -139,7 +139,7 @@ void CProactorUDPHandler::handle_read_dgram(const ACE_Asynch_Read_Dgram::Result&
     }
 }
 
-bool CProactorUDPHandler::SendMessage(const char* pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead, uint16 u2CommandID, bool blDlete)
+bool CProactorUDPHandler::SendMessage(const char*& pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead, uint16 u2CommandID, bool blDlete)
 {
     ACE_Time_Value m_tvBegin = ACE_OS::gettimeofday();
 

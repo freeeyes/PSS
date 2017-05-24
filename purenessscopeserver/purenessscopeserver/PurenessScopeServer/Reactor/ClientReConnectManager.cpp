@@ -5,7 +5,7 @@ CReactorClientInfo::CReactorClientInfo()
     m_pConnectClient    = NULL;
     m_pClientMessage    = NULL;
     m_pReactorConnect   = NULL;
-	m_pReactor          = NULL;
+    m_pReactor          = NULL;
     m_nServerID         = 0;
     m_emConnectState    = SERVER_CONNECT_READY;
     m_AddrLocal         = (ACE_INET_Addr&)ACE_Addr::sap_any;
@@ -476,7 +476,7 @@ IClientMessage* CClientReConnectManager::GetClientMessage(int nServerID)
     return NULL;
 }
 
-bool CClientReConnectManager::SendData(int nServerID, char* pData, int nSize, bool blIsDelete)
+bool CClientReConnectManager::SendData(int nServerID, char*& pData, int nSize, bool blIsDelete)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     //查找已有连接
@@ -523,7 +523,7 @@ bool CClientReConnectManager::SendData(int nServerID, char* pData, int nSize, bo
     return pClientInfo->SendData(pmblk);
 }
 
-bool CClientReConnectManager::SendDataUDP(int nServerID, const char* pIP, int nPort, const char* pMessage, uint32 u4Len, bool blIsDelete)
+bool CClientReConnectManager::SendDataUDP(int nServerID, const char* pIP, int nPort, const char*& pMessage, uint32 u4Len, bool blIsDelete)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     char szServerID[10] = {'\0'};

@@ -135,7 +135,7 @@ int CReactorUDPHander::handle_close(ACE_HANDLE handle, ACE_Reactor_Mask close_ma
     return 0;
 }
 
-bool CReactorUDPHander::SendMessage(const char* pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead, uint16 u2CommandID, bool blDlete)
+bool CReactorUDPHander::SendMessage(const char*& pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead, uint16 u2CommandID, bool blDlete)
 {
     ACE_hrtime_t m_tvBegin = ACE_OS::gethrtime();
 

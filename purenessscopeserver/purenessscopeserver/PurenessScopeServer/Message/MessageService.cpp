@@ -261,9 +261,11 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
         {
             OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage]Command(%d) is Delele.\n", pMessage->GetMessageBase()->m_u2Cmd));
             //直接返回应急数据给客户端，不在到逻辑里去处理
+
+            const char* ptrReturnData = reinterpret_cast<const char*>(m_WorkThreadAI.GetReturnData());
 #ifdef WIN32
             App_ProConnectManager::instance()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID,
-                    m_WorkThreadAI.GetReturnData(),
+                    ptrReturnData,
                     m_WorkThreadAI.GetReturnDataLength(),
                     SENDMESSAGE_NOMAL,
                     (uint16)COMMAND_RETURN_BUSY,
@@ -271,7 +273,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
                     PACKET_IS_SELF_RECYC);
 #else
             App_ConnectManager::instance()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID,
-                    m_WorkThreadAI.GetReturnData(),
+                    ptrReturnData,
                     m_WorkThreadAI.GetReturnDataLength(),
                     SENDMESSAGE_NOMAL,
                     (uint16)COMMAND_RETURN_BUSY,

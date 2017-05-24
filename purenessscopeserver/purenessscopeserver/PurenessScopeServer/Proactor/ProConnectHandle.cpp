@@ -30,11 +30,10 @@ CProConnectHandle::CProConnectHandle(void)
     m_emStatus            = CLIENT_CLOSE_NOTHING;
     m_u4SendMaxBuffSize   = 5*1024;
     m_nHashID             = 0;
-	m_szConnectName[0]    = '\0';
-	m_blIsLog             = false;
-	m_szLocalIP[0]        = '\0';
-	m_u4RecvPacketCount   = 0;
-
+    m_szConnectName[0]    = '\0';
+    m_blIsLog             = false;
+    m_szLocalIP[0]        = '\0';
+    m_u4RecvPacketCount   = 0;
 }
 
 CProConnectHandle::~CProConnectHandle(void)
@@ -925,7 +924,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
     {
         //先判断是否要组装包头，如果需要，则组装在m_pBlockMessage中
         uint32 u4SendPacketSize    = 0;
-		ACE_Message_Block* pMbData = NULL;
+        ACE_Message_Block* pMbData = NULL;
 
         if(u1SendType == SENDMESSAGE_NOMAL)
         {
@@ -1488,8 +1487,8 @@ bool CProConnectManager::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status
 
         //加入链接统计功能
         App_ConnectAccount::instance()->AddDisConnect();
-		
-		m_objHashConnectList.Del_Hash_Data(szConnectID);
+
+        m_objHashConnectList.Del_Hash_Data(szConnectID);
         return true;
     }
     else
@@ -1587,7 +1586,7 @@ bool CProConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
         OUR_DEBUG((LM_ERROR,"[CProConnectManager::PutMessage] pBuffPacket is NULL.\n"));
         return false;
     }
-    
+
     //放入发送队列
     _SendMessage* pSendMessage = m_SendMessagePool.Create();
 
@@ -2381,7 +2380,7 @@ bool CProConnectManagerGroup::AddConnect(CProConnectHandle* pConnectHandler)
     return false;
 }
 
-bool CProConnectManagerGroup::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
+bool CProConnectManagerGroup::PostMessage(uint32 u4ConnectID, IBuffPacket*& pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
     //判断命中到哪一个线程组里面去
     uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
@@ -2399,7 +2398,7 @@ bool CProConnectManagerGroup::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuff
     return pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, u1SendState, blDelete, nMessageID);
 }
 
-bool CProConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
+bool CProConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char*& pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
     //判断命中到哪一个线程组里面去
     uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
@@ -2424,7 +2423,7 @@ bool CProConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char* pData
     if(NULL != pBuffPacket)
     {
         bool bWriteResult = pBuffPacket->WriteStream(pData, nDataLen);
-        
+
         if(blDelete == true)
         {
             SAFE_DELETE_ARRAY(pData);
@@ -2453,7 +2452,7 @@ bool CProConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char* pData
 
 }
 
-bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
+bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPacket*& pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
     uint32 u4ConnectID = 0;
 
@@ -2493,7 +2492,7 @@ bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPac
     return true;
 }
 
-bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
+bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, const char*& pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
     uint32 u4ConnectID = 0;
 
@@ -2684,7 +2683,7 @@ void CProConnectManagerGroup::SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4
     pConnectManager->SetRecvQueueTimeCost(u4ConnectID, u4TimeCost);
 }
 
-bool CProConnectManagerGroup::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
+bool CProConnectManagerGroup::PostMessageAll( IBuffPacket*& pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
     //全部群发
     for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
@@ -2709,7 +2708,7 @@ bool CProConnectManagerGroup::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1
     return true;
 }
 
-bool CProConnectManagerGroup::PostMessageAll( const char* pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
+bool CProConnectManagerGroup::PostMessageAll( const char*& pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
     IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create();
 

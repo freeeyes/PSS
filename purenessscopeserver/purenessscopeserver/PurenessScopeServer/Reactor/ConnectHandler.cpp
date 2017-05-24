@@ -3078,7 +3078,7 @@ bool CConnectManagerGroup::AddConnect(CConnectHandler* pConnectHandler)
     return pConnectManager->AddConnect(u4ConnectID, pConnectHandler);
 }
 
-bool CConnectManagerGroup::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nServerID)
+bool CConnectManagerGroup::PostMessage(uint32 u4ConnectID, IBuffPacket*& pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nServerID)
 {
     //判断命中到哪一个线程组里面去
     uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
@@ -3096,7 +3096,7 @@ bool CConnectManagerGroup::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPac
     return pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, u1SendState, blDelete, nServerID);
 }
 
-bool CConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nServerID)
+bool CConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char*& pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nServerID)
 {
     //判断命中到哪一个线程组里面去
     uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
@@ -3149,7 +3149,7 @@ bool CConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char* pData, u
     }
 }
 
-bool CConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nServerID)
+bool CConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPacket*& pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nServerID)
 {
     uint32 u4ConnectID = 0;
 
@@ -3188,7 +3188,7 @@ bool CConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPacket
     return true;
 }
 
-bool CConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nServerID)
+bool CConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, const char*& pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nServerID)
 {
     uint32 u4ConnectID = 0;
 
@@ -3406,7 +3406,7 @@ void CConnectManagerGroup::SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4Tim
     pConnectManager->SetRecvQueueTimeCost(u4ConnectID, u4TimeCost);
 }
 
-bool CConnectManagerGroup::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nServerID)
+bool CConnectManagerGroup::PostMessageAll( IBuffPacket*& pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nServerID)
 {
     //全部群发
     for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
@@ -3431,7 +3431,7 @@ bool CConnectManagerGroup::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1Sen
     return true;
 }
 
-bool CConnectManagerGroup::PostMessageAll( const char* pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nServerID)
+bool CConnectManagerGroup::PostMessageAll( const char*& pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nServerID)
 {
     IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create();
 

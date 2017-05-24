@@ -58,11 +58,11 @@ public:
     bool ConnectUDP(int nServerID, const char* pIP, int nPort, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage);                                                    //建立一个指向UDP的链接（UDP）
     bool ReConnect(int nServerID);                                                                                             //重新连接一个指定的服务器(TCP)
     bool CloseByClient(int nServerID);                                                                                         //远程被动关闭(TCP)
-    bool Close(int nServerID, EM_s2s ems2s = S2S_INNEED_CALLBACK);                                                             //关闭连接
+    bool Close(int nServerID, EM_s2s ems2s = S2S_INNEED_CALLBACK);                                                               //关闭连接
     bool CloseUDP(int nServerID);                                                                                              //关闭链接（UDP）
     bool ConnectErrorClose(int nServerID);                                                                                     //由内部错误引起的失败，由ProConnectClient调用
-    bool SendData(int nServerID, char* pData, int nSize, bool blIsDelete = true);                                              //发送数据
-    bool SendDataUDP(int nServerID, const char* pIP, int nPort, const char* pMessage, uint32 u4Len, bool blIsDelete = true);   //发送数据（UDP）
+    bool SendData(int nServerID, char*& pData, int nSize, bool blIsDelete = true);                                              //发送数据
+    bool SendDataUDP(int nServerID, const char* pIP, int nPort, const char*& pMessage, uint32 u4Len, bool blIsDelete = true);   //发送数据（UDP）
     bool SetHandler(int nServerID, CConnectClient* pConnectClient);                                                            //将指定的CProConnectClient*绑定给nServerID
     IClientMessage* GetClientMessage(int nServerID);                                                                           //获得ClientMessage对象
     bool StartConnectTask(int nIntervalTime = CONNECT_LIMIT_RETRY);                                                            //设置自动重连的定时器

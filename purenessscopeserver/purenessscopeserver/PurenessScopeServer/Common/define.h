@@ -997,11 +997,11 @@ struct _ServerConnectInfo
 };
 
 #ifndef SAFE_DELETE
-#define SAFE_DELETE(x) if( (x) != NULL ) {ACE_UNUSED_ARG(x); delete (x); (x) = NULL; }
+#define SAFE_DELETE(x) if( (x) != NULL ) {delete (x); (x) = NULL; }
 #endif
 
 #ifndef SAFE_DELETE_ARRAY
-#define SAFE_DELETE_ARRAY(x) if( (x) != NULL ) {ACE_UNUSED_ARG(x); delete[] (x); (x) = NULL; }
+#define SAFE_DELETE_ARRAY(x) if( (x) != NULL ) {delete[] (x); (x) = NULL; }
 #endif
 
 //为逻辑块提供一个Try catch的保护宏，用于调试，具体使用方法请参看TestTcp用例

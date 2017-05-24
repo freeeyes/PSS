@@ -242,17 +242,17 @@ public:
     void Close();
 
     bool AddConnect(CConnectHandler* pConnectHandler);
-    bool PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,
+    bool PostMessage(uint32 u4ConnectID, IBuffPacket*& pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,
                      uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nServerID = 0);                      //异步发送
-    bool PostMessage(uint32 u4ConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL,
+    bool PostMessage(uint32 u4ConnectID, const char*& pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL,
                      uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nServerID = 0);            //异步发送
-    bool PostMessage(vector<uint32> vecConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,
+    bool PostMessage(vector<uint32> vecConnectID, IBuffPacket*& pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,
                      uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nServerID = 0);             //异步群发指定的ID
-    bool PostMessage(vector<uint32> vecConnectID, const char* pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL,
+    bool PostMessage(vector<uint32> vecConnectID, const char*& pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL,
                      uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nServerID = 0);   //异步群发指定的ID
-    bool PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,
+    bool PostMessageAll(IBuffPacket*& pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,
                         uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nServerID = 0);
-    bool PostMessageAll(const char* pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL,
+    bool PostMessageAll(const char*& pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL,
                         uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nServerID = 0);
     bool CloseConnect(uint32 u4ConnectID);                                                                   //服务器关闭
     bool CloseConnectByClient(uint32 u4ConnectID);                                                           //客户端关闭
