@@ -58,7 +58,7 @@ extern "C"
         u4Pos += sizeof(char)*32;
 
         OUR_DEBUG((LM_INFO,"[CPacketParse::SetPacketHead]u4ConnectID=%d,m_u2Version=%d,m_u2CmdID=%d,m_u4BodyLen=%d.\n",
-				   u4ConnectID,
+                   u4ConnectID,
                    u2Version,
                    u2CmdID,
                    u4BodyLen));
@@ -96,7 +96,7 @@ extern "C"
         if(NULL == pCurrMessage || NULL == pMessageBlockManager || NULL == pPacketInfo || 0 == u4ConnectID)
         {
             return PACKET_GET_ERROR;
-        }		
+        }
 
         return PACKET_GET_ENOUGTH;
     }
@@ -121,10 +121,10 @@ extern "C"
     //得到返回数据包的长度
     uint32 Make_Send_Packet_Length(uint32 u4ConnectID, uint32 u4DataLen, uint16 u2CommandID)
     {
-		if (0 == u4ConnectID || 0 == u2CommandID)
-		{
-			return 0;
-		}
+        if (0 == u4ConnectID || 0 == u2CommandID)
+        {
+            return 0;
+        }
 
         return u4DataLen + sizeof(uint32);
     }
@@ -132,16 +132,16 @@ extern "C"
     //当连接第一次建立的时候，返回的接口用于你自己的处理。
     bool Connect(uint32 u4ConnectID, _ClientIPInfo objClientIPInfo, _ClientIPInfo objLocalIPInfo)
     {
-		if (0 == u4ConnectID)
-		{
-			OUR_DEBUG((LM_INFO, "[CPacketParse::Connect]u4ConnectID=%d,objClientIPInfo=(%s:%d),objLocalIPInfo=(%s:%d).\n",
-				u4ConnectID,
-				objClientIPInfo.m_szClientIP,
-				objClientIPInfo.m_nPort,
-				objLocalIPInfo.m_szClientIP,
-				objLocalIPInfo.m_nPort));
-			return false;
-		}
+        if (0 == u4ConnectID)
+        {
+            OUR_DEBUG((LM_INFO, "[CPacketParse::Connect]u4ConnectID=%d,objClientIPInfo=(%s:%d),objLocalIPInfo=(%s:%d).\n",
+                       u4ConnectID,
+                       objClientIPInfo.m_szClientIP,
+                       objClientIPInfo.m_nPort,
+                       objLocalIPInfo.m_szClientIP,
+                       objLocalIPInfo.m_nPort));
+            return false;
+        }
 
         return true;
     }
@@ -149,9 +149,9 @@ extern "C"
     //当连接断开的时候，返回你自己的处理
     void DisConnect(uint32 u4ConnectID)
     {
-		if (0 == u4ConnectID)
-		{
-			OUR_DEBUG((LM_INFO, "[CPacketParse::Connect]u4ConnectID=%d\n", u4ConnectID));
-		}
+        if (0 == u4ConnectID)
+        {
+            OUR_DEBUG((LM_INFO, "[CPacketParse::Connect]u4ConnectID=%d\n", u4ConnectID));
+        }
     }
 }

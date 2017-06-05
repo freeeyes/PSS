@@ -142,10 +142,10 @@ int CBaseCommand::Do_Base(IMessage* pMessage)
 
 void CBaseCommand::ReadIniFile(const char* pIniFileName)
 {
-	if(NULL == pIniFileName)
-	{
-		return;
-	}
+    if(NULL == pIniFileName)
+    {
+        return;
+    }
 }
 
 int CBaseCommand::Do_ClientSendOk(IMessage* pMessage)
