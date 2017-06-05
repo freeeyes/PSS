@@ -5,8 +5,8 @@ CProfileTime::CProfileTime(void)
     //在windows下，获得滴答的频率
 #ifndef __LINUX__
     ::QueryPerformanceFrequency(&m_liPerfFreq);
-	::QueryPerformanceFrequency(&m_liPerfStart);
-	::QueryPerformanceFrequency(&m_liPerfStop);
+    ::QueryPerformanceFrequency(&m_liPerfStart);
+    ::QueryPerformanceFrequency(&m_liPerfStop);
 #endif
 }
 

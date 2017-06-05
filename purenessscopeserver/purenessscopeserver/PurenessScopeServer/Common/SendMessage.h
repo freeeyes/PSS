@@ -27,7 +27,7 @@ struct _SendMessage
     {
         m_u1SendState = 0;
         m_blDelete    = true;
-		m_pBuffPacket = NULL;
+        m_pBuffPacket = NULL;
         m_u4ConnectID = 0;
         m_nEvents     = 0;
         m_u2CommandID = 0;
@@ -42,13 +42,13 @@ struct _SendMessage
         *ppMessage = this;
 
     }
-	
+
     //¿½±´¹¹Ôìº¯Êı
     _SendMessage(const _SendMessage& ar)
     {
-		this->m_u1SendState = ar.m_u1SendState;
+        this->m_u1SendState = ar.m_u1SendState;
         this->m_blDelete    = ar.m_blDelete;
-		this->m_pBuffPacket = ar.m_pBuffPacket;
+        this->m_pBuffPacket = ar.m_pBuffPacket;
         this->m_u4ConnectID = ar.m_u4ConnectID;
         this->m_nEvents     = ar.m_nEvents;
         this->m_u2CommandID = ar.m_u2CommandID;
@@ -62,12 +62,12 @@ struct _SendMessage
         _SendMessage** ppMessage = (_SendMessage**)m_pmbQueuePtr->base();
         *ppMessage = this;
     }
-	
-	_SendMessage& operator = (const _SendMessage& ar)
-	{
-		this->m_u1SendState = ar.m_u1SendState;
+
+    _SendMessage& operator = (const _SendMessage& ar)
+    {
+        this->m_u1SendState = ar.m_u1SendState;
         this->m_blDelete    = ar.m_blDelete;
-		this->m_pBuffPacket = ar.m_pBuffPacket;
+        this->m_pBuffPacket = ar.m_pBuffPacket;
         this->m_u4ConnectID = ar.m_u4ConnectID;
         this->m_nEvents     = ar.m_nEvents;
         this->m_u2CommandID = ar.m_u2CommandID;
@@ -79,7 +79,7 @@ struct _SendMessage
         _SendMessage** ppMessage = (_SendMessage**)m_pmbQueuePtr->base();
         *ppMessage = this;
         return *this;
-	}
+    }
 
     ~_SendMessage()
     {

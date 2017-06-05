@@ -89,7 +89,7 @@ int CProConnectClient::GetServerID()
 
 void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
 {
-	ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
+    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 
     //从配置文件获取数据
     m_u4MaxPacketSize  = App_MainConfig::instance()->GetRecvBuffSize();

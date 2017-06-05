@@ -56,7 +56,7 @@ _Server_Message_Info* CServerMessageInfoPool::Create()
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
     //在Hash表中弹出一个已使用的数据
-	_Server_Message_Info* pMessage = m_objServerMessageList.Pop();
+    _Server_Message_Info* pMessage = m_objServerMessageList.Pop();
 
     //没找到空余的
     return pMessage;
@@ -191,7 +191,7 @@ int CServerMessageTask::svc(void)
 
     while(IsRun())
     {
-		ACE_Message_Block* mb = NULL;
+        ACE_Message_Block* mb = NULL;
 
         //xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, MAX_MSG_PUTTIMEOUT);
         if(getq(mb, 0) == -1)
@@ -319,7 +319,7 @@ void CServerMessageTask::AddClientMessage(IClientMessage* pClientMessage)
 void CServerMessageTask::DelClientMessage(IClientMessage* pClientMessage)
 {
     //先查找有效的列表中是否包含此指针
-	for (vecValidIClientMessage::iterator b = m_vecValidIClientMessage.begin(); b != m_vecValidIClientMessage.end(); ++b)
+    for (vecValidIClientMessage::iterator b = m_vecValidIClientMessage.begin(); b != m_vecValidIClientMessage.end(); ++b)
     {
         if(*b == pClientMessage)
         {

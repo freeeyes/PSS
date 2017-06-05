@@ -74,7 +74,7 @@ CPacketParse* CPacketParsePool::Create()
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
     //在Hash表中弹出一个已使用的数据
-	CPacketParse* pPacketParse = m_objPacketParseList.Pop();
+    CPacketParse* pPacketParse = m_objPacketParseList.Pop();
 
     return pPacketParse;
 }

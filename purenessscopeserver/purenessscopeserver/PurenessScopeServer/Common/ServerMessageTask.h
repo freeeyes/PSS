@@ -48,33 +48,33 @@ struct _Server_Message_Info
         *ppMessage = this;
     }
 
-	//拷贝构造函数
-	_Server_Message_Info(const _Server_Message_Info& ar)
-	{
-		this->m_pClientMessage           = ar.m_pClientMessage;
-		this->m_u2CommandID              = ar.m_u2CommandID;
-		this->m_pRecvFinish              = ar.m_pRecvFinish;
-		sprintf_safe(this->m_objServerIPInfo.m_szClientIP, MAX_BUFF_50, "%s", ar.m_objServerIPInfo.m_szClientIP);
-		this->m_objServerIPInfo.m_nPort  = ar.m_objServerIPInfo.m_nPort;
-		this->m_nHashID                  = ar.m_nHashID;
-		this->m_pmbQueuePtr              = new ACE_Message_Block(sizeof(_Server_Message_Info*));
-		_Server_Message_Info** ppMessage = (_Server_Message_Info**)m_pmbQueuePtr->base();
-		*ppMessage = this;
-	}
+    //拷贝构造函数
+    _Server_Message_Info(const _Server_Message_Info& ar)
+    {
+        this->m_pClientMessage           = ar.m_pClientMessage;
+        this->m_u2CommandID              = ar.m_u2CommandID;
+        this->m_pRecvFinish              = ar.m_pRecvFinish;
+        sprintf_safe(this->m_objServerIPInfo.m_szClientIP, MAX_BUFF_50, "%s", ar.m_objServerIPInfo.m_szClientIP);
+        this->m_objServerIPInfo.m_nPort  = ar.m_objServerIPInfo.m_nPort;
+        this->m_nHashID                  = ar.m_nHashID;
+        this->m_pmbQueuePtr              = new ACE_Message_Block(sizeof(_Server_Message_Info*));
+        _Server_Message_Info** ppMessage = (_Server_Message_Info**)m_pmbQueuePtr->base();
+        *ppMessage = this;
+    }
 
-	_Server_Message_Info& operator = (const _Server_Message_Info& ar)
-	{
-		this->m_pClientMessage = ar.m_pClientMessage;
-		this->m_u2CommandID = ar.m_u2CommandID;
-		this->m_pRecvFinish = ar.m_pRecvFinish;
-		this->m_objServerIPInfo = ar.m_objServerIPInfo;
-		this->m_nHashID = ar.m_nHashID;
-		
-		memcpy_safe((char* )ar.m_pmbQueuePtr->base(), (uint32)ar.m_pmbQueuePtr->length(), m_pmbQueuePtr->base(), (uint32)m_pmbQueuePtr->length());
-		_Server_Message_Info** ppMessage = (_Server_Message_Info**)m_pmbQueuePtr->base();
-		*ppMessage = this;		
-		return *this;
-	}
+    _Server_Message_Info& operator = (const _Server_Message_Info& ar)
+    {
+        this->m_pClientMessage = ar.m_pClientMessage;
+        this->m_u2CommandID = ar.m_u2CommandID;
+        this->m_pRecvFinish = ar.m_pRecvFinish;
+        this->m_objServerIPInfo = ar.m_objServerIPInfo;
+        this->m_nHashID = ar.m_nHashID;
+
+        memcpy_safe((char* )ar.m_pmbQueuePtr->base(), (uint32)ar.m_pmbQueuePtr->length(), m_pmbQueuePtr->base(), (uint32)m_pmbQueuePtr->length());
+        _Server_Message_Info** ppMessage = (_Server_Message_Info**)m_pmbQueuePtr->base();
+        *ppMessage = this;
+        return *this;
+    }
 
     ~_Server_Message_Info()
     {

@@ -458,7 +458,7 @@ bool CConsoleMessage::GetLogLevel(const char* pCommand, int& nLogLevel)
 
     if(NULL != pPosBegin)
     {
-		char szTempData[MAX_BUFF_100] = {'\0'};
+        char szTempData[MAX_BUFF_100] = {'\0'};
         int nLen = (int)ACE_OS::strlen(pCommand) - (int)(pPosBegin - pCommand) - 3;
         memcpy_safe(pPosBegin + 3, (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
         nLogLevel = ACE_OS::atoi(szTempData);

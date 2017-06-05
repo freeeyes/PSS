@@ -3,7 +3,7 @@
 
 CPacketParse::CPacketParse(void)
 {
-	m_nHashID = 0;
+    m_nHashID = 0;
 }
 
 CPacketParse::~CPacketParse(void)

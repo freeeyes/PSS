@@ -11,15 +11,15 @@ Process::Process (void)
       m_nOpttype (0),
       m_nOptdebug (0),
       m_nOptstartup (0),
-	  m_pFrameLoggingStrategy(0)
+      m_pFrameLoggingStrategy(0)
 {
-	m_szProgName[0]         = '\0';
-	
+    m_szProgName[0]         = '\0';
+
 }
 
 Process::~Process (void)
 {
-	stopprocesslog();
+    stopprocesslog();
 }
 
 void
@@ -183,8 +183,8 @@ int Process::run(int argc, ACE_TCHAR* argv[])
 
 void Process::startprocesslog()
 {
-	stopprocesslog();
-	
+    stopprocesslog();
+
     m_pFrameLoggingStrategy = new Frame_Logging_Strategy();
 
     //是否打开ACE_DEBUG文件存储

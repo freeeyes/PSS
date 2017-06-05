@@ -2,8 +2,8 @@
 
 ProConnectAcceptor::ProConnectAcceptor()
 {
-	m_szListenIP[0]         = '\0';
-	m_u4Port                = 0;
+    m_szListenIP[0]         = '\0';
+    m_u4Port                = 0;
     m_u4AcceptCount         = 0;
     m_u4ClientProactorCount = 1;
 }

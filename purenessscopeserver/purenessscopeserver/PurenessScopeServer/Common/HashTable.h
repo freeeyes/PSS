@@ -432,7 +432,7 @@ public:
         m_pBase          = NULL;
         m_lpTable        = NULL;
         m_cIsDelete      = 0;
-		m_nCurrLinkIndex = 0;
+        m_nCurrLinkIndex = 0;
     }
 
     ~CHashTable()
@@ -688,13 +688,13 @@ public:
                 {
                     return -1;
                 }
-				else
-				{
-					sprintf_safe(pData->m_pKey, pData->m_sKeyLen, "%s", pKey);
-					pData->m_pValue = pValue;
-					pLink->m_pData = pData;
-					m_lpTable[nPos] = pLink;
-				}
+                else
+                {
+                    sprintf_safe(pData->m_pKey, pData->m_sKeyLen, "%s", pKey);
+                    pData->m_pValue = pValue;
+                    pLink->m_pData = pData;
+                    m_lpTable[nPos] = pLink;
+                }
             }
             else
             {
@@ -725,17 +725,18 @@ public:
                 {
                     return -1;
                 }
-				else
-				{
-					sprintf_safe(pData->m_pKey, pData->m_sKeyLen, "%s", pKey);
-					pData->m_pValue = pValue;
-					pLink->m_pData = pData;
-					pLink->m_pPerv = pLastLink;
-					if (NULL != pLastLink)
-					{
-						pLastLink->m_pNext = pLink;
-					}
-				}
+                else
+                {
+                    sprintf_safe(pData->m_pKey, pData->m_sKeyLen, "%s", pKey);
+                    pData->m_pValue = pValue;
+                    pLink->m_pData = pData;
+                    pLink->m_pPerv = pLastLink;
+
+                    if (NULL != pLastLink)
+                    {
+                        pLastLink->m_pNext = pLink;
+                    }
+                }
             }
 
             return nPos;

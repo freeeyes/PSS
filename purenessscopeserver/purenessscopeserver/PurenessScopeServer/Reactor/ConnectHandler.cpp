@@ -37,9 +37,9 @@ CConnectHandler::CConnectHandler(void)
     m_u2TcpNodelay        = TCP_NODELAY_ON;
     m_emStatus            = CLIENT_CLOSE_NOTHING;
     m_u4SendMaxBuffSize   = 5*MAX_BUFF_1024;
-	m_szLocalIP[0]        = '\0';
-	m_szConnectName[0]    = '\0';
-	m_blIsLog             = false;
+    m_szLocalIP[0]        = '\0';
+    m_szConnectName[0]    = '\0';
+    m_blIsLog             = false;
 }
 
 CConnectHandler::~CConnectHandler(void)
@@ -1523,12 +1523,13 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
         //如果之前有缓冲数据，则和缓冲数据一起发送
         u4PacketSize = (uint32)m_pBlockMessage->length();
 
-		ACE_Message_Block* pMbData = NULL;
+        ACE_Message_Block* pMbData = NULL;
+
         //这里肯定会大于0
         if(m_pBlockMessage->length() > 0)
         {
             //因为是异步发送，发送的数据指针不可以立刻释放，所以需要在这里创建一个新的发送数据块，将数据考入
-			pMbData = App_MessageBlockManager::instance()->Create((uint32)m_pBlockMessage->length());
+            pMbData = App_MessageBlockManager::instance()->Create((uint32)m_pBlockMessage->length());
 
             if(NULL == pMbData)
             {
