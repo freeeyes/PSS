@@ -87,12 +87,29 @@ bool CMessageManager::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uin
                 //记录命令被调用次数
                 u2Count++;
                 //OUR_DEBUG((LM_ERROR, "[CMessageManager::DoMessage]u2CommandID = %d End.\n", u2CommandID));
-
             }
         }
-    }
 
-    return true;
+		return true;
+    }
+	else
+	{
+		//没有找到对应的注册指令，如果不是define,h定义的异常，则记录异常命令日志
+		if (CLIENT_LINK_CONNECT != u2CommandID  && CLIENT_LINK_CDISCONNET != u2CommandID &&
+			CLIENT_LINK_SDISCONNET != u2CommandID  && CLINET_LINK_SENDTIMEOUT != u2CommandID &&
+			CLINET_LINK_SENDERROR != u2CommandID  && CLINET_LINK_CHECKTIMEOUT != u2CommandID &&
+			CLIENT_LINK_SENDOK != u2CommandID)
+		{
+			char szLog[MAX_BUFF_500] = { '\0' };
+			sprintf_safe(szLog, MAX_BUFF_500, "[CommandID=%d][HeadLen=%d][BodyLen=%d] is not plugin dispose.", 
+				u2CommandID, 
+				pMessage->GetMessageBase()->m_u4HeadSrcSize, 
+				pMessage->GetMessageBase()->m_u4BodySrcSize);
+			AppLogManager::instance()->WriteLog(LOG_SYSTEM_ERROR, szLog);
+		}
+	}
+	return false;
+    
 }
 
 CClientCommandList* CMessageManager::GetClientCommandList(uint16 u2CommandID)
