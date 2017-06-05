@@ -32,7 +32,7 @@ extern "C"
     //解析包头，需要填充pHeadInfo数据结构，完成后填充_Head_Info的数据结构
     bool Parse_Packet_Head_Info(uint32 u4ConnectID, ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager, _Head_Info* pHeadInfo)
     {
-        if(NULL == pHeadInfo || NULL == pMessageBlockManager)
+        if(NULL == pHeadInfo || NULL == pMessageBlockManager || 0 == u4ConnectID)
         {
             return false;
         }
@@ -57,7 +57,8 @@ extern "C"
         memcpy_safe((char* )&pData[u4Pos], (uint32)(sizeof(char)*32), (char* )&szSession, (uint32)(sizeof(char)*32));
         u4Pos += sizeof(char)*32;
 
-        OUR_DEBUG((LM_INFO,"[CPacketParse::SetPacketHead]m_u2Version=%d,m_u2CmdID=%d,m_u4BodyLen=%d.\n",
+        OUR_DEBUG((LM_INFO,"[CPacketParse::SetPacketHead]u4ConnectID=%d,m_u2Version=%d,m_u2CmdID=%d,m_u4BodyLen=%d.\n",
+				   u4ConnectID,
                    u2Version,
                    u2CmdID,
                    u4BodyLen));
@@ -75,7 +76,7 @@ extern "C"
     //解析包体，需要填充pBodyInfo数据结构，完成后填充_Body_Info的数据结构
     bool Parse_Packet_Body_Info(uint32 u4ConnectID, ACE_Message_Block* pmbbody, IMessageBlockManager* pMessageBlockManager, _Body_Info* pBodyInfo)
     {
-        if(NULL == pBodyInfo || NULL == pMessageBlockManager)
+        if(NULL == pBodyInfo || NULL == pMessageBlockManager || 0 == u4ConnectID)
         {
             return false;
         }
@@ -92,14 +93,18 @@ extern "C"
     uint8 Parse_Packet_Stream(uint32 u4ConnectID, ACE_Message_Block* pCurrMessage, IMessageBlockManager* pMessageBlockManager, _Packet_Info* pPacketInfo)
     {
         //这里可以添加你的代码
+        if(NULL == pCurrMessage || NULL == pMessageBlockManager || NULL == pPacketInfo || 0 == u4ConnectID)
+        {
+            return PACKET_GET_ERROR;
+        }		
 
-        return 0;
+        return PACKET_GET_ENOUGTH;
     }
 
     //拼接数据返回包，所有的返回数据包都会调用这个
     bool Make_Send_Packet(uint32 u4ConnectID, const char* pData, uint32 u4Len, ACE_Message_Block* pMbData, uint16 u2CommandID)
     {
-        if(pMbData == NULL && u2CommandID == 0)
+        if(NULL == pData || NULL == pMbData || 0 == u2CommandID || 0 == u4ConnectID)
         {
             return false;
         }
@@ -116,18 +121,37 @@ extern "C"
     //得到返回数据包的长度
     uint32 Make_Send_Packet_Length(uint32 u4ConnectID, uint32 u4DataLen, uint16 u2CommandID)
     {
+		if (0 == u4ConnectID || 0 == u2CommandID)
+		{
+			return 0;
+		}
+
         return u4DataLen + sizeof(uint32);
     }
 
     //当连接第一次建立的时候，返回的接口用于你自己的处理。
     bool Connect(uint32 u4ConnectID, _ClientIPInfo objClientIPInfo, _ClientIPInfo objLocalIPInfo)
     {
+		if (0 == u4ConnectID)
+		{
+			OUR_DEBUG((LM_INFO, "[CPacketParse::Connect]u4ConnectID=%d,objClientIPInfo=(%s:%d),objLocalIPInfo=(%s:%d).\n",
+				u4ConnectID,
+				objClientIPInfo.m_szClientIP,
+				objClientIPInfo.m_nPort,
+				objLocalIPInfo.m_szClientIP,
+				objLocalIPInfo.m_nPort));
+			return false;
+		}
+
         return true;
     }
 
     //当连接断开的时候，返回你自己的处理
     void DisConnect(uint32 u4ConnectID)
     {
-
+		if (0 == u4ConnectID)
+		{
+			OUR_DEBUG((LM_INFO, "[CPacketParse::Connect]u4ConnectID=%d\n", u4ConnectID));
+		}
     }
 }
