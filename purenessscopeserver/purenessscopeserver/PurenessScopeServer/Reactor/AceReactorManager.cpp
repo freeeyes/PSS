@@ -422,11 +422,6 @@ ACE_Reactor* CAceReactorManager::GetAce_Client_Reactor(int nReactorID)
     //这里的反应器必须是3个基础反应器之外的，如果只有三个基础反应器，则默认取得第一个。
     int nClientReactor = nReactorID + 3;
 
-    if(nClientReactor >= (int)m_u2RectorCount)
-    {
-        nClientReactor = REACTOR_CLIENTDEFINE;
-    }
-
     if(nClientReactor < 0 || nClientReactor >= m_u2RectorCount)
     {
         return NULL;

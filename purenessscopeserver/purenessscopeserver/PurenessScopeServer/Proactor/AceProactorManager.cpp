@@ -353,11 +353,6 @@ ACE_Proactor* CAceProactorManager::GetAce_Client_Proactor(int nProactorID)
         return NULL;
     }
 
-    if(nClientProactor >= (int)m_u2ProactorCount)
-    {
-        nClientProactor = REACTOR_CLIENTDEFINE;
-    }
-
     if(NULL != m_pAceProactorList[nClientProactor])
     {
         return m_pAceProactorList[nClientProactor]->GetProactor();
