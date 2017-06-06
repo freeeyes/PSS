@@ -117,19 +117,6 @@ bool CProConnectAcceptManager::InitConnectAcceptor(int nCount, uint32 u4ClientPr
     }
 }
 
-bool CProConnectAcceptManager::SetPacketParseInfoID(uint32 u4Index, uint32 u4PaccketParseInfoID)
-{
-	if (u4Index < (uint32)m_vecConnectAcceptor.size())
-	{
-		m_vecConnectAcceptor[u4Index]->SetPacketParseInfoID(u4PaccketParseInfoID);
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
 void CProConnectAcceptManager::Close()
 {
     ACE_Time_Value tvSleep(0, 10000);

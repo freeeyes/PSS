@@ -43,7 +43,6 @@ public:
     ~CProConnectAcceptManager(void);
 
     bool InitConnectAcceptor(int nCount, uint32 u4ClientProactorCount);
-	bool SetPacketParseInfoID(uint32 u4Index, uint32 u4PaccketParseInfoID);
     void Close();
     int GetCount();
     ProConnectAcceptor* GetConnectAcceptor(int nIndex);

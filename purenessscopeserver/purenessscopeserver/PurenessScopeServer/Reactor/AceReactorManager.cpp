@@ -420,24 +420,22 @@ ACE_Reactor* CAceReactorManager::GetAce_Client_Reactor(int nReactorID)
 {
     //这里返回客户端连接服务器需要用到的反应器
     //这里的反应器必须是3个基础反应器之外的，如果只有三个基础反应器，则默认取得第一个。
-    /*
     int nClientReactor = nReactorID + 3;
 
     if(nClientReactor >= (int)m_u2RectorCount)
     {
         nClientReactor = REACTOR_CLIENTDEFINE;
     }
-    */
 
-    if(nReactorID < 0 || nReactorID >= m_u2RectorCount)
+    if(nClientReactor < 0 || nClientReactor >= m_u2RectorCount)
     {
         return NULL;
     }
 
-    if (NULL != m_pReactorList[nReactorID])
+    if (NULL != m_pReactorList[nClientReactor])
     {
         //OUR_DEBUG((LM_INFO, "CAceReactorManager::GetAce_Reactor id=[%d] pAceReactor=[0x%@]\n",nReactorID, pAceReactor));
-        return m_pReactorList[nReactorID]->GetReactor();
+        return m_pReactorList[nClientReactor]->GetReactor();
     }
     else
     {

@@ -346,21 +346,21 @@ ACE_Proactor* CAceProactorManager::GetAce_Proactor(int nProactorID)
 
 ACE_Proactor* CAceProactorManager::GetAce_Client_Proactor(int nProactorID)
 {
-    //int nClientProactor = nProactorID + 3;
+    int nClientProactor = nProactorID + 3;
 
-    if(nProactorID < 0 || nProactorID >= m_u2ProactorCount)
+    if(nClientProactor < 0 || nClientProactor >= m_u2ProactorCount)
     {
         return NULL;
     }
 
-    //if(nClientProactor >= (int)m_u2ProactorCount)
-    //{
-    //    nClientProactor = REACTOR_CLIENTDEFINE;
-    //}
-
-    if(NULL != m_pAceProactorList[nProactorID])
+    if(nClientProactor >= (int)m_u2ProactorCount)
     {
-        return m_pAceProactorList[nProactorID]->GetProactor();
+        nClientProactor = REACTOR_CLIENTDEFINE;
+    }
+
+    if(NULL != m_pAceProactorList[nClientProactor])
+    {
+        return m_pAceProactorList[nClientProactor]->GetProactor();
     }
     else
     {
