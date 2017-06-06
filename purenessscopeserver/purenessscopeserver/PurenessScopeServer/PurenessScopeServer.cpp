@@ -253,11 +253,6 @@ int Chlid_Run()
 			//回收隐式加载PacketParse
 			App_PacketParseLoader::instance()->Close();
 
-			if (App_MainConfig::instance()->GetServerType() == 1)
-			{
-				App_Process::instance()->stopprocesslog();
-			}
-
 			pthread_exit(NULL);
 
 			return 0;

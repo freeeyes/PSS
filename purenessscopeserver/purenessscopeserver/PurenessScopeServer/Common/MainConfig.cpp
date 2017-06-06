@@ -573,10 +573,72 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
         m_vecServerInfo.push_back(serverinfo);
     }
 
+	//开始获得UDP服务器相关参数
+	m_vecUDPServerInfo.clear();
+	pNextTiXmlElementIP = NULL;
+	pNextTiXmlElementPort = NULL;
+	pNextTiXmlElementIpType = NULL;
+	pNextTiXmlElementPacketID = NULL;
+
+	while (true)
+	{
+		pData = m_MainConfig.GetData("UDPServerIP", "uip", pNextTiXmlElementIP);
+
+		if (pData != NULL)
+		{
+			sprintf_safe(serverinfo.m_szServerIP, MAX_BUFF_20, "%s", pData);
+		}
+		else
+		{
+			break;
+		}
+
+		pData = m_MainConfig.GetData("UDPServerIP", "uport", pNextTiXmlElementPort);
+
+		if (pData != NULL)
+		{
+			serverinfo.m_nPort = ACE_OS::atoi(pData);
+		}
+		else
+		{
+			break;
+		}
+
+		pData = m_MainConfig.GetData("UDPServerIP", "uipType", pNextTiXmlElementIpType);
+
+		if (pData != NULL)
+		{
+			if (ACE_OS::strcmp(pData, "IPV6") == 0)
+			{
+				serverinfo.m_u1IPType = TYPE_IPV6;
+			}
+			else
+			{
+				serverinfo.m_u1IPType = TYPE_IPV4;
+			}
+		}
+		else
+		{
+			break;
+		}
+
+		pData = m_MainConfig.GetData("UDPServerIP", "ParseID", pNextTiXmlElementPacketID);
+
+		if (pData != NULL)
+		{
+			serverinfo.m_u4PacketParseInfoID = (uint32)ACE_OS::atoi(pData);
+		}
+		else
+		{
+			serverinfo.m_u4PacketParseInfoID = 0;
+		}
+
+		m_vecUDPServerInfo.push_back(serverinfo);
+	}
+
 	//开始获得数据解析模块相关信息
 	_PacketParseInfo objPacketParseInfo;
 
-	m_vecServerInfo.clear();
 	TiXmlElement* pNextTiXmlElementPacketParseID    = NULL;
 	TiXmlElement* pNextTiXmlElementPacketParsePath  = NULL;
 	TiXmlElement* pNextTiXmlElementPacketParseName  = NULL;
@@ -649,12 +711,21 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
 		m_vecPacketParseInfo.push_back(objPacketParseInfo);
 	}
 
-	//开始设置默认PacketParseID
+	//开始设置默认PacketParseID(TCP)
 	for (int i = 0; i < (int)m_vecServerInfo.size(); i++)
 	{
 		if (m_vecServerInfo[i].m_u4PacketParseInfoID == 0)
 		{
 			m_vecServerInfo[i].m_u4PacketParseInfoID = m_vecPacketParseInfo[0].m_u4PacketID;
+		}
+	}
+
+	//开始设置默认PacketParseID(UDP)
+	for (int i = 0; i < (int)m_vecUDPServerInfo.size(); i++)
+	{
+		if (m_vecUDPServerInfo[i].m_u4PacketParseInfoID == 0)
+		{
+			m_vecUDPServerInfo[i].m_u4PacketParseInfoID = m_vecPacketParseInfo[0].m_u4PacketID;
 		}
 	}
 
@@ -700,69 +771,6 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
     if(pData != NULL)
     {
         m_u4MsgMaxQueue = (uint32)ACE_OS::atoi(pData);
-    }
-
-    //开始获得UDP服务器相关参数
-    m_vecUDPServerInfo.clear();
-    pNextTiXmlElementIP       = NULL;
-    pNextTiXmlElementPort     = NULL;
-    pNextTiXmlElementIpType   = NULL;
-	pNextTiXmlElementPacketID = NULL;
-
-    while(true)
-    {
-        pData = m_MainConfig.GetData("UDPServerIP", "uip", pNextTiXmlElementIP);
-
-        if(pData != NULL)
-        {
-            sprintf_safe(serverinfo.m_szServerIP, MAX_BUFF_20, "%s", pData);
-        }
-        else
-        {
-            break;
-        }
-
-        pData = m_MainConfig.GetData("UDPServerIP", "uport", pNextTiXmlElementPort);
-
-        if(pData != NULL)
-        {
-            serverinfo.m_nPort = ACE_OS::atoi(pData);
-        }
-        else
-        {
-            break;
-        }
-
-        pData = m_MainConfig.GetData("UDPServerIP", "uipType", pNextTiXmlElementIpType);
-
-        if(pData != NULL)
-        {
-            if(ACE_OS::strcmp(pData, "IPV6") == 0)
-            {
-                serverinfo.m_u1IPType = TYPE_IPV6;
-            }
-            else
-            {
-                serverinfo.m_u1IPType = TYPE_IPV4;
-            }
-        }
-        else
-        {
-            break;
-        }
-
-		pData = m_MainConfig.GetData("UDPServerIP", "ParseID", pNextTiXmlElementPacketID);
-
-		if (pData != NULL)
-		{
-			serverinfo.m_u4PacketParseInfoID = (uint32)ACE_OS::atoi(pData);
-		}
-		else
-		{
-			serverinfo.m_u4PacketParseInfoID = 0;
-		}
-
-        m_vecUDPServerInfo.push_back(serverinfo);
     }
 
     //开始获得加载模块参数

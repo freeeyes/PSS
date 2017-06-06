@@ -562,7 +562,7 @@ int CConnectHandler::RecvData()
 
     m_pCurrMessage->wr_ptr(nDataLen);
 
-    if(m_pPacketParse->GetPacketMode() == PACKET_WITHHEAD)
+    if(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
     {
         //如果没有读完，短读
         if(nCurrCount - nDataLen > 0)
@@ -570,7 +570,7 @@ int CConnectHandler::RecvData()
             Close();
             return 0;
         }
-        else if(m_pCurrMessage->length() == m_pPacketParse->GetPacketHeadSrcLen() && m_pPacketParse->GetIsHandleHead())
+        else if(m_pCurrMessage->length() == App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength && m_pPacketParse->GetIsHandleHead())
         {
             _Head_Info objHeadInfo;
             bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Head_Info(GetConnectID(), m_pCurrMessage, App_MessageBlockManager::instance(), &objHeadInfo);
@@ -989,7 +989,7 @@ int CConnectHandler::RecvData_et()
 
         m_pCurrMessage->wr_ptr(nDataLen);
 
-        if(m_pPacketParse->GetPacketMode() == PACKET_WITHHEAD)
+        if(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
         {
             //如果没有读完，短读
             if(nCurrCount - nDataLen > 0)
@@ -997,7 +997,7 @@ int CConnectHandler::RecvData_et()
                 Close();
                 return 0;
             }
-            else if(m_pCurrMessage->length() == m_pPacketParse->GetPacketHeadSrcLen() && m_pPacketParse->GetIsHandleHead())
+            else if(m_pCurrMessage->length() == App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength && m_pPacketParse->GetIsHandleHead())
             {
                 _Head_Info objHeadInfo;
                 bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Head_Info(GetConnectID(), m_pCurrMessage, App_MessageBlockManager::instance(), &objHeadInfo);

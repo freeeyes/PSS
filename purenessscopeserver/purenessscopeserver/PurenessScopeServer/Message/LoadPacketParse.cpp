@@ -100,7 +100,14 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
 	char szPacketID[10] = { '\0' };
 	sprintf_safe(szPacketID, 10, "%d", pPacketParseInfo->m_u4PacketParseID);
 	int nHashPos = m_objPacketParseList.Add_Hash_Data(szPacketID, pPacketParseInfo);
-    return true;
+	if (nHashPos < 0)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }
 
 _Packet_Parse_Info* CLoadPacketParse::GetPacketParseInfo(uint32 u4PacketParseID)
