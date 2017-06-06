@@ -350,9 +350,9 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 
     OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::open] Open(%d) [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
 
-    if(m_pPacketParse->GetPacketMode() == PACKET_WITHHEAD)
+    if(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
     {
-        RecvClinetPacket(m_pPacketParse->GetPacketHeadSrcLen());
+        RecvClinetPacket(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength);
     }
     else
     {
@@ -595,7 +595,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
             Close();
 
             //接受下一个数据包
-            RecvClinetPacket(m_pPacketParse->GetPacketHeadSrcLen());
+            RecvClinetPacket(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength);
         }
     }
     else

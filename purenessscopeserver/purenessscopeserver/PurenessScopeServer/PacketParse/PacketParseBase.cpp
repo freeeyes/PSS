@@ -11,10 +11,7 @@ CPacketParseBase::CPacketParseBase(void)
     m_u1Sort            = 0;
 
     //这里修改属于你的包解析版本号
-    sprintf_safe(m_szPacketVersion, MAX_BUFF_20, "0.96");
-
-    //这里设置你的包模式
-    m_u1PacketMode      = PACKET_WITHHEAD;
+    sprintf_safe(m_szPacketVersion, MAX_BUFF_20, "0.99");
 
     m_blIsHandleHead    = true;
 
@@ -61,11 +58,6 @@ void CPacketParseBase::Close()
 const char* CPacketParseBase::GetPacketVersion()
 {
     return m_szPacketVersion;
-}
-
-uint8 CPacketParseBase::GetPacketMode()
-{
-    return (uint8)m_u1PacketMode;
 }
 
 uint32 CPacketParseBase::GetPacketHeadLen()
@@ -215,9 +207,4 @@ void CPacketParseBase::SetPacket_Head_Message(ACE_Message_Block* pmbHead)
 void CPacketParseBase::SetPacket_Body_Message(ACE_Message_Block* pmbHead)
 {
     m_pmbBody = pmbHead;
-}
-
-void CPacketParseBase::SetPacket_Mode(uint8 u1PacketMode)
-{
-    m_u1PacketMode = u1PacketMode;
 }

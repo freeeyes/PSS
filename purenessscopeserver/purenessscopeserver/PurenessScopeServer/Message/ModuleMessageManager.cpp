@@ -44,8 +44,6 @@ int CModuleMessageManager::SendFrameMessage(uint16 u2CommandID, uint32 u4Connect
         objPacketParse.SetPacket_Body_Message(pMb);
     }
 
-    objPacketParse.SetPacket_Mode(PACKET_WITHHEAD);
-
     objMakePacket.m_PacketType   = PACKET_TCP;
     objMakePacket.m_u4ConnectID  = u4ConnectID;
     objMakePacket.m_pPacketParse = &objPacketParse;

@@ -273,7 +273,7 @@ bool CProactorUDPHandler::CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len)
         return false;
     }
 
-    if(m_pPacketParse->GetPacketMode() == PACKET_WITHHEAD)
+    if(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
     {
         if(u4Len < m_pPacketParse->GetPacketHeadLen())
         {

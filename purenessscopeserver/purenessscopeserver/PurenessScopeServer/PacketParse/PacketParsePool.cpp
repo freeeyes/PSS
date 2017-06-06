@@ -24,9 +24,6 @@ void CPacketParsePool::Init(uint32 u4PacketCount)
 
         if(NULL != pPacket)
         {
-            //设置默认为包头模式
-            pPacket->SetPacket_Mode(PACKET_WITHHEAD);
-            pPacket->SetPacket_Head_Src_Length(DEAULT_PACKET_LENGTH);
             //添加到HashPool里面
             char szPacketID[10] = {'\0'};
             sprintf_safe(szPacketID, 10, "%d", i);

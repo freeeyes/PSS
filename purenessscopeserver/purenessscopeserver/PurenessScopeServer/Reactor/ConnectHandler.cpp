@@ -334,9 +334,9 @@ int CConnectHandler::open(void*)
     }
 
     //申请头的大小对应的mb
-    if(m_pPacketParse->GetPacketMode() == PACKET_WITHHEAD)
+    if(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
     {
-        m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadSrcLen());
+        m_pCurrMessage = App_MessageBlockManager::instance()->Create(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength);
     }
     else
     {
@@ -733,7 +733,7 @@ int CConnectHandler::RecvData()
             }
 
             //申请头的大小对应的mb
-            m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadSrcLen());
+            m_pCurrMessage = App_MessageBlockManager::instance()->Create(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength);
 
             if(m_pCurrMessage == NULL)
             {
@@ -1159,7 +1159,7 @@ int CConnectHandler::RecvData_et()
                 }
 
                 //申请头的大小对应的mb
-                m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadSrcLen());
+                m_pCurrMessage = App_MessageBlockManager::instance()->Create(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength);
 
                 if(m_pCurrMessage == NULL)
                 {

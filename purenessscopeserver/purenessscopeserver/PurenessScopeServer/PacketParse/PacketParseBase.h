@@ -22,7 +22,6 @@ public:
     void Close();
 
     const char* GetPacketVersion();
-    uint8 GetPacketMode();
     uint32 GetPacketHeadLen();
     uint32 GetPacketBodyLen();
 
@@ -56,7 +55,6 @@ public:
     void SetPacket_IsHandleHead(bool blState);
     void SetPacket_Head_Message(ACE_Message_Block* pmbHead);
     void SetPacket_Body_Message(ACE_Message_Block* pmbHead);
-    void SetPacket_Mode(uint8 u1PacketMode);
 
 private:
     uint32 m_u4PacketHead;               //包头的长度
@@ -66,7 +64,6 @@ private:
     uint16 m_u2PacketCommandID;          //包命令
     bool   m_blIsHandleHead;
     char   m_szPacketVersion[MAX_BUFF_20];   //包解析器版本
-    uint8  m_u1PacketMode;                   //包解析模式
     uint8  m_u1Sort;                         //字节序规则，0为主机字节序，1为网络字节序
 
     IPacketHeadInfo*    m_pPacketHeadInfo;  //数据包头信息
