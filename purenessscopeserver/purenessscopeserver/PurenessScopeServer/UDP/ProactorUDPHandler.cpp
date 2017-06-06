@@ -2,17 +2,23 @@
 
 CProactorUDPHandler::CProactorUDPHandler(void)
 {
-    m_pPacketParse       = NULL;
-    m_u4RecvPacketCount  = 0;
-    m_u4SendPacketCount  = 0;
-    m_u4RecvSize         = 0;
-    m_u4SendSize         = 0;
-    m_szCompletionkey[0] = '\0';
-    m_szAct[0]           = '\0';
+    m_pPacketParse        = NULL;
+    m_u4RecvPacketCount   = 0;
+    m_u4SendPacketCount   = 0;
+    m_u4RecvSize          = 0;
+    m_u4SendSize          = 0;
+    m_szCompletionkey[0]  = '\0';
+    m_szAct[0]            = '\0';
+	m_u4PacketParseInfoID = 0;
 }
 
 CProactorUDPHandler::~CProactorUDPHandler(void)
 {
+}
+
+void CProactorUDPHandler::SetPacketParseInfoID(uint32 u4PacketParseInfoID)
+{
+	m_u4PacketParseInfoID = u4PacketParseInfoID;
 }
 
 int CProactorUDPHandler::OpenAddress(const ACE_INET_Addr& AddrLocal, ACE_Proactor* pProactor)
@@ -163,7 +169,7 @@ bool CProactorUDPHandler::SendMessage(const char*& pMessage, uint32 u4Len, const
     {
         CPacketParse PacketParse;
 
-        uint32 u4SendLength = App_PacketParseLoader::instance()->GetPacketParseInfo()->Make_Send_Packet_Length(0, u4Len, u2CommandID);
+        uint32 u4SendLength = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Make_Send_Packet_Length(0, u4Len, u2CommandID);
         ACE_Message_Block* pMbData = App_MessageBlockManager::instance()->Create(u4SendLength);
 
         if(NULL == pMbData)
@@ -176,7 +182,7 @@ bool CProactorUDPHandler::SendMessage(const char*& pMessage, uint32 u4Len, const
             return false;
         }
 
-        App_PacketParseLoader::instance()->GetPacketParseInfo()->Make_Send_Packet(0, pMessage, u4Len, pMbData, u2CommandID);
+        App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Make_Send_Packet(0, pMessage, u4Len, pMbData, u2CommandID);
 
         uint32 u4DataLen = (uint32)pMbData->length();
         int nSize = (int)m_skRemote.send(pMbData->rd_ptr(), u4DataLen, AddrRemote);
@@ -280,7 +286,7 @@ bool CProactorUDPHandler::CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len)
         pMBHead->wr_ptr(m_pPacketParse->GetPacketHeadSrcLen());
 
         _Head_Info obj_Head_Info;
-        bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo()->Parse_Packet_Head_Info(0, pMBHead, App_MessageBlockManager::instance(), &obj_Head_Info);
+        bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Head_Info(0, pMBHead, App_MessageBlockManager::instance(), &obj_Head_Info);
 
         if(false == blStateHead)
         {
@@ -315,7 +321,7 @@ bool CProactorUDPHandler::CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len)
             pMBBody->wr_ptr(m_pPacketParse->GetPacketBodySrcLen());
 
             _Body_Info obj_Body_Info;
-            bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo()->Parse_Packet_Body_Info(0, pMBBody, App_MessageBlockManager::instance(), &obj_Body_Info);
+            bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Body_Info(0, pMBBody, App_MessageBlockManager::instance(), &obj_Body_Info);
 
             if(false  == blStateBody)
             {
@@ -353,7 +359,7 @@ bool CProactorUDPHandler::CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len)
         //以数据流处理
         _Packet_Info obj_Packet_Info;
 
-        if(PACKET_GET_ENOUGTH == App_PacketParseLoader::instance()->GetPacketParseInfo()->Parse_Packet_Stream(0, pMbData, App_MessageBlockManager::instance(), &obj_Packet_Info))
+        if(PACKET_GET_ENOUGTH == App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Stream(0, pMbData, App_MessageBlockManager::instance(), &obj_Packet_Info))
         {
             m_pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
             m_pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);

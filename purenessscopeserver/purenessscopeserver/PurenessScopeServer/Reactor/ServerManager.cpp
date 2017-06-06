@@ -192,6 +192,7 @@ bool CServerManager::Start()
             return false;
         }
 
+		pConnectAcceptor->SetPacketParseInfoID(pServerInfo->m_u4PacketParseInfoID);
         int nRet = pConnectAcceptor->Init_Open(listenAddr, 0, 1, 1, (int)App_MainConfig::instance()->GetBacklog());
 
         if (-1 == nRet)
@@ -257,7 +258,7 @@ bool CServerManager::Start()
             OUR_DEBUG((LM_INFO, "[CServerManager::Start]UDP pReactorUDPHandler[%d] is NULL.\n", i));
             return false;
         }
-
+		pReactorUDPHandler->SetPacketParseInfoID(pServerInfo->m_u4PacketParseInfoID);
         int nRet = pReactorUDPHandler->OpenAddress(listenAddr);
 
         if (-1 == nRet)

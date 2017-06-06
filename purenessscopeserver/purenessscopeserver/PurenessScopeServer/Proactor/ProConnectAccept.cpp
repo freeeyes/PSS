@@ -6,17 +6,21 @@ ProConnectAcceptor::ProConnectAcceptor()
     m_u4Port                = 0;
     m_u4AcceptCount         = 0;
     m_u4ClientProactorCount = 1;
+	m_u4PacketParseInfoID   = 0;
 }
 
 void ProConnectAcceptor::InitClientProactor(uint32 u4ClientProactorCount)
 {
-    if(u4ClientProactorCount  > 0)
-    {
-        m_u4ClientProactorCount = u4ClientProactorCount;
-    }
+    m_u4ClientProactorCount = u4ClientProactorCount;
 }
 
-CProConnectHandle* ProConnectAcceptor::make_handler (void)
+
+void ProConnectAcceptor::SetPacketParseInfoID(uint32 u4PaccketParseInfoID)
+{
+	m_u4PacketParseInfoID = u4PaccketParseInfoID;
+}
+
+CProConnectHandle* ProConnectAcceptor::make_handler(void)
 {
     CProConnectHandle* pProConnectHandle = App_ProConnectHandlerPool::instance()->Create();
 
@@ -27,6 +31,7 @@ CProConnectHandle* ProConnectAcceptor::make_handler (void)
         int nIndex = (int)(m_u4AcceptCount % m_u4ClientProactorCount);
         ACE_Proactor* pProactor = App_ProactorManager::instance()->GetAce_Client_Proactor(nIndex);
         pProConnectHandle->proactor(pProactor);
+		pProConnectHandle->SetPacketParseInfoID(m_u4PacketParseInfoID);
         m_u4AcceptCount++;
     }
 
@@ -110,6 +115,19 @@ bool CProConnectAcceptManager::InitConnectAcceptor(int nCount, uint32 u4ClientPr
         sprintf_safe(m_szError, MAX_BUFF_500, "%s", szError);
         return false;
     }
+}
+
+bool CProConnectAcceptManager::SetPacketParseInfoID(uint32 u4Index, uint32 u4PaccketParseInfoID)
+{
+	if (u4Index < (uint32)m_vecConnectAcceptor.size())
+	{
+		m_vecConnectAcceptor[u4Index]->SetPacketParseInfoID(u4PaccketParseInfoID);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 void CProConnectAcceptManager::Close()

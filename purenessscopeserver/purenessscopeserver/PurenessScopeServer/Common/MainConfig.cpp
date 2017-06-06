@@ -513,9 +513,10 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
     _ServerInfo serverinfo;
 
     m_vecServerInfo.clear();
-    TiXmlElement* pNextTiXmlElementIP     = NULL;
-    TiXmlElement* pNextTiXmlElementPort   = NULL;
-    TiXmlElement* pNextTiXmlElementIpType = NULL;
+    TiXmlElement* pNextTiXmlElementIP       = NULL;
+    TiXmlElement* pNextTiXmlElementPort     = NULL;
+    TiXmlElement* pNextTiXmlElementIpType   = NULL;
+	TiXmlElement* pNextTiXmlElementPacketID = NULL;
 
     while(true)
     {
@@ -559,39 +560,103 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
             break;
         }
 
+		pData = m_MainConfig.GetData("TCPServerIP", "ParseID", pNextTiXmlElementPacketID);
+		if (pData != NULL)
+		{
+			serverinfo.m_u4PacketParseInfoID = (uint32)ACE_OS::atoi(pData);
+		}
+		else
+		{
+			serverinfo.m_u4PacketParseInfoID = 0;
+		}
+
         m_vecServerInfo.push_back(serverinfo);
     }
 
-    //开始获得数据解析模块相关信息
-    pData = m_MainConfig.GetData("PacketParse", "ModuleName");
+	//开始获得数据解析模块相关信息
+	_PacketParseInfo objPacketParseInfo;
 
-    if(pData != NULL)
-    {
-        sprintf_safe(m_PacketParseInfo.m_szPacketParseName, MAX_BUFF_100, "%s", pData);
-    }
+	m_vecServerInfo.clear();
+	TiXmlElement* pNextTiXmlElementPacketParseID    = NULL;
+	TiXmlElement* pNextTiXmlElementPacketParsePath  = NULL;
+	TiXmlElement* pNextTiXmlElementPacketParseName  = NULL;
+	TiXmlElement* pNextTiXmlElementPacketParseType  = NULL;
+	TiXmlElement* pNextTiXmlElementPacketParseLen   = NULL;
 
-    pData = m_MainConfig.GetData("PacketParse", "Type");
+	m_vecPacketParseInfo.clear();
 
-    if(pData != NULL)
-    {
-        if(ACE_OS::strcmp(pData, "STREAM") == 0)
-        {
-            //流模式
-            m_PacketParseInfo.m_u1Type = (uint8)PACKET_WITHSTREAM;
-        }
-        else
-        {
-            //数据头体模式
-            m_PacketParseInfo.m_u1Type = (uint8)PACKET_WITHHEAD;
-        }
-    }
+	while (true)
+	{
+		pData = m_MainConfig.GetData("PacketParse", "ParseID", pNextTiXmlElementPacketParseID);
+		if (pData != NULL)
+		{
+			objPacketParseInfo.m_u4PacketID = (uint32)atoi(pData);
+		}
+		else
+		{
+			break;
+		}
+		
+		pData = m_MainConfig.GetData("PacketParse", "ModulePath", pNextTiXmlElementPacketParsePath);
+		if (pData != NULL)
+		{
+			sprintf_safe(objPacketParseInfo.m_szPacketParsePath, MAX_BUFF_200, "%s", pData);
+		}
+		else
+		{
+			break;
+		}
 
-    pData = m_MainConfig.GetData("PacketParse", "OrgLength");
+		pData = m_MainConfig.GetData("PacketParse", "ModuleName", pNextTiXmlElementPacketParseName);
+		if (pData != NULL)
+		{
+			sprintf_safe(objPacketParseInfo.m_szPacketParseName, MAX_BUFF_100, "%s", pData);
+		}
+		else
+		{
+			break;
+		}
 
-    if(pData != NULL)
-    {
-        m_PacketParseInfo.m_u4OrgLength = (uint32)ACE_OS::atoi(pData);
-    }
+		pData = m_MainConfig.GetData("PacketParse", "Type", pNextTiXmlElementPacketParseType);
+		if (pData != NULL)
+		{
+			if (ACE_OS::strcmp(pData, "STREAM") == 0)
+			{
+				//流模式
+				objPacketParseInfo.m_u1Type = (uint8)PACKET_WITHSTREAM;
+			}
+			else
+			{
+				//数据头体模式
+				objPacketParseInfo.m_u1Type = (uint8)PACKET_WITHHEAD;
+			}
+		}
+		else
+		{
+			break;
+		}
+
+		pData = m_MainConfig.GetData("PacketParse", "OrgLength", pNextTiXmlElementPacketParseLen);
+		if (pData != NULL)
+		{
+			objPacketParseInfo.m_u4OrgLength = (uint32)ACE_OS::atoi(pData);
+		}
+		else
+		{
+			break;
+		}
+
+		m_vecPacketParseInfo.push_back(objPacketParseInfo);
+	}
+
+	//开始设置默认PacketParseID
+	for (int i = 0; i < (int)m_vecServerInfo.size(); i++)
+	{
+		if (m_vecServerInfo[i].m_u4PacketParseInfoID == 0)
+		{
+			m_vecServerInfo[i].m_u4PacketParseInfoID = m_vecPacketParseInfo[0].m_u4PacketID;
+		}
+	}
 
     //开始获得消息处理线程参数
     pData = m_MainConfig.GetData("Message", "Msg_High_mark");
@@ -639,9 +704,10 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
 
     //开始获得UDP服务器相关参数
     m_vecUDPServerInfo.clear();
-    pNextTiXmlElementIP     = NULL;
-    pNextTiXmlElementPort   = NULL;
-    pNextTiXmlElementIpType = NULL;
+    pNextTiXmlElementIP       = NULL;
+    pNextTiXmlElementPort     = NULL;
+    pNextTiXmlElementIpType   = NULL;
+	pNextTiXmlElementPacketID = NULL;
 
     while(true)
     {
@@ -685,6 +751,16 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
             break;
         }
 
+		pData = m_MainConfig.GetData("UDPServerIP", "ParseID", pNextTiXmlElementPacketID);
+
+		if (pData != NULL)
+		{
+			serverinfo.m_u4PacketParseInfoID = (uint32)ACE_OS::atoi(pData);
+		}
+		else
+		{
+			serverinfo.m_u4PacketParseInfoID = 0;
+		}
 
         m_vecUDPServerInfo.push_back(serverinfo);
     }
@@ -1262,9 +1338,15 @@ void CMainConfig::Display()
         OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szModuleParam%d = %s.\n", i, m_vecModuleConfig[i].m_szModuleParam));
     }
 
-    OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szPacketParseName = %s.\n", m_PacketParseInfo.m_szPacketParseName));
-    OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u1Type = %d.\n", m_PacketParseInfo.m_u1Type));
-    OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4OrgLength = %d.\n", m_PacketParseInfo.m_u4OrgLength));
+	for (int i = 0; i < (int)m_vecPacketParseInfo.size(); i++)
+	{
+		OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szPacketParseID = %d.\n", m_vecPacketParseInfo[i].m_u4PacketID));
+		OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szPacketParsePath = %s.\n", m_vecPacketParseInfo[i].m_szPacketParsePath));
+		OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szPacketParseName = %s.\n", m_vecPacketParseInfo[i].m_szPacketParseName));
+		OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u1Type = %d.\n", m_vecPacketParseInfo[i].m_u1Type));
+		OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4OrgLength = %d.\n", m_vecPacketParseInfo[i].m_u4OrgLength));
+	}
+
 }
 
 const char* CMainConfig::GetServerName()
@@ -1716,9 +1798,21 @@ _GroupListenInfo* CMainConfig::GetGroupListenInfo()
     return (_GroupListenInfo* )&m_GroupListenInfo;
 }
 
-_PacketParseInfo* CMainConfig::GetPacketParseInfo()
+_PacketParseInfo* CMainConfig::GetPacketParseInfo(uint8 u1Index)
 {
-    return (_PacketParseInfo* )&m_PacketParseInfo;
+	if(u1Index < (uint8)m_vecPacketParseInfo.size())
+	{ 
+		return &m_vecPacketParseInfo[u1Index];
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+uint8 CMainConfig::GetPacketParseCount()
+{
+	return (uint8)m_vecPacketParseInfo.size();
 }
 
 uint16 CMainConfig::GetModuleInfoCount()

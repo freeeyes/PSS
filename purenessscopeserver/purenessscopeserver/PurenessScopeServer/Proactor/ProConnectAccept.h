@@ -15,6 +15,7 @@ class ProConnectAcceptor : public ACE_Asynch_Acceptor<CProConnectHandle>
 public:
     ProConnectAcceptor();
     void InitClientProactor(uint32 u4ClientProactorCount);
+	void SetPacketParseInfoID(uint32 u4PaccketParseInfoID);
 
 private:
     virtual CProConnectHandle* make_handler (void);
@@ -32,6 +33,7 @@ private:
     uint32 m_u4Port;
     uint32 m_u4AcceptCount;             //接收的总连接数
     uint32 m_u4ClientProactorCount;     //客户端反应器的个数
+	uint32 m_u4PacketParseInfoID;       //处理包解析的模块ID
 };
 
 class CProConnectAcceptManager
@@ -41,6 +43,7 @@ public:
     ~CProConnectAcceptManager(void);
 
     bool InitConnectAcceptor(int nCount, uint32 u4ClientProactorCount);
+	bool SetPacketParseInfoID(uint32 u4Index, uint32 u4PaccketParseInfoID);
     void Close();
     int GetCount();
     ProConnectAcceptor* GetConnectAcceptor(int nIndex);

@@ -51,6 +51,7 @@ public:
     virtual int handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask);           //链接关闭事件
 
     void Init(uint16 u2HandlerID);                                           //Connect Pool初始化调用时候调用的方法
+	void SetPacketParseInfoID(uint32 u4PacketParseInfoID);                   //设置对应的m_u4PacketParseInfoID
 
     bool CheckSendMask(uint32 u4PacketLen);                                  //检测指定的连接发送数据是否超过阻塞阀值
     bool SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, uint8 u1State, uint8 u1SendType, uint32& u4PacketSize, bool blDelete, int nServerID);  //发送当前数据
@@ -145,6 +146,7 @@ private:
     _TimeConnectInfo           m_TimeConnectInfo;              //链接健康检测器
     char                       m_szConnectName[MAX_BUFF_100];  //连接名称，可以开放给逻辑插件去设置
     bool                       m_blIsLog;                      //是否写入日志，false为不写入，true为写入
+	uint32                     m_u4PacketParseInfoID;          //对应处理packetParse的模块ID  
 };
 
 //管理所有已经建立的链接

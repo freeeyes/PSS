@@ -12,12 +12,16 @@
 //PacketParse相关信息
 struct _PacketParseInfo
 {
+	uint32 m_u4PacketID;
+	char   m_szPacketParsePath[MAX_BUFF_200];
     char   m_szPacketParseName[MAX_BUFF_100];
     uint8  m_u1Type;
     uint32 m_u4OrgLength;
 
     _PacketParseInfo()
     {
+		m_u4PacketID           = 0;
+		m_szPacketParsePath[0] = '\0';
         m_szPacketParseName[0] = '\0';
         m_u1Type               = (uint8)PACKET_WITHHEAD;
         m_u4OrgLength          = 0;
@@ -28,15 +32,17 @@ struct _PacketParseInfo
 //增加对IPv4和IPv6的支持
 struct _ServerInfo
 {
-    char  m_szServerIP[MAX_BUFF_50];
-    int   m_nPort;
-    uint8 m_u1IPType;
+    char   m_szServerIP[MAX_BUFF_50];
+    int    m_nPort;
+    uint8  m_u1IPType;
+	uint32 m_u4PacketParseInfoID;
 
     _ServerInfo()
     {
-        m_szServerIP[0] = '\0';
-        m_nPort         = 0;
-        m_u1IPType      = TYPE_IPV4;
+        m_szServerIP[0]       = '\0';
+        m_nPort               = 0;
+        m_u1IPType            = TYPE_IPV4;
+		m_u4PacketParseInfoID = 0;
     }
 };
 
@@ -309,7 +315,8 @@ public:
     _CommandAlert*    GetCommandAlert(int nIndex);
     _MailAlert*       GetMailAlert(uint32 u4MailID);
     _GroupListenInfo* GetGroupListenInfo();
-    _PacketParseInfo* GetPacketParseInfo();
+    _PacketParseInfo* GetPacketParseInfo(uint8 u1Index = 0);
+	uint8             GetPacketParseCount();
 
 private:
     CXmlOpeation m_MainConfig;
@@ -406,7 +413,9 @@ private:
     _IPAlert         m_IPAlert;                    //IP告警阀值相关配置
     _ClientDataAlert m_ClientDataAlert;            //单链接客户端告警阀值相关配置
     _GroupListenInfo m_GroupListenInfo;            //集群相关服务器地址配置
-    _PacketParseInfo m_PacketParseInfo;            //数据解析模块相关信息
+
+	typedef vector<_PacketParseInfo> vecPacketParseInfo;
+	vecPacketParseInfo m_vecPacketParseInfo;
 
     ENUM_CHAR_ORDER m_u1CharOrder;                 //当前字节序
 

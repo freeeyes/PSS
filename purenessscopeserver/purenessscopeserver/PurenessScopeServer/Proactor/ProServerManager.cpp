@@ -46,11 +46,11 @@ bool CProServerManager::Init()
     //初始化连接器
     uint32 u4ClientProactorCount = (uint32)nReactorCount - 3;
 
-    if(!App_ProConnectAcceptManager::instance()->InitConnectAcceptor(nServerPortCount, u4ClientProactorCount))
-    {
-        OUR_DEBUG((LM_INFO, "[CProServerManager::Init]%s.\n", App_ProConnectAcceptManager::instance()->GetError()));
-        return false;
-    }
+	if (!App_ProConnectAcceptManager::instance()->InitConnectAcceptor(nServerPortCount, u4ClientProactorCount))
+	{
+		OUR_DEBUG((LM_INFO, "[CProServerManager::Init]%s.\n", App_ProConnectAcceptManager::instance()->GetError()));
+		return false;
+	}
 
     //初始化反应器集合
     App_ProactorManager::instance()->Init((uint16)nReactorCount);
@@ -209,7 +209,6 @@ bool CProServerManager::Start()
 
         //得到接收器
         ProConnectAcceptor* pConnectAcceptor = App_ProConnectAcceptManager::instance()->GetConnectAcceptor(i);
-
         if(NULL == pConnectAcceptor)
         {
             OUR_DEBUG((LM_INFO, "[CProServerManager::Start]pConnectAcceptor[%d] is NULL.\n", i));
@@ -217,6 +216,7 @@ bool CProServerManager::Start()
         }
 
         //设置监听IP信息
+		pConnectAcceptor->SetPacketParseInfoID(pServerInfo->m_u4PacketParseInfoID);
         pConnectAcceptor->SetListenInfo(pServerInfo->m_szServerIP, (uint32)pServerInfo->m_nPort);
 
         ACE_Proactor* pProactor = App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE);
@@ -256,7 +256,7 @@ bool CProServerManager::Start()
 
 
         CProactorUDPHandler* pProactorUDPHandler = App_ProUDPManager::instance()->Create();
-
+		pProactorUDPHandler->SetPacketParseInfoID(pServerInfo->m_u4PacketParseInfoID);
         if(NULL == pProactorUDPHandler)
         {
             OUR_DEBUG((LM_INFO, "[CProServerManager::Start] pProactorUDPHandler is NULL[%d] is error.\n", i));
