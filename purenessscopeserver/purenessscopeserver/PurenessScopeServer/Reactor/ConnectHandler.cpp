@@ -482,16 +482,7 @@ int CConnectHandler::RecvData()
     }
 
     //计算应该接收的数据长度
-    int nCurrCount = 0;
-
-    if(m_pPacketParse->GetIsHandleHead())
-    {
-        nCurrCount = (uint32)App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength - m_u4CurrSize;
-    }
-    else
-    {
-        nCurrCount = (uint32)App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength - m_u4CurrSize;
-    }
+    int nCurrCount = m_pCurrMessage->size() - m_u4CurrSize;
 
     //这里需要对m_u4CurrSize进行检查。
     if(nCurrCount < 0)
@@ -900,16 +891,7 @@ int CConnectHandler::RecvData_et()
         }
 
         //计算应该接收的数据长度
-        int nCurrCount = 0;
-
-        if(m_pPacketParse->GetIsHandleHead())
-        {
-            nCurrCount = (uint32)m_pPacketParse->GetPacketHeadSrcLen() - m_u4CurrSize;
-        }
-        else
-        {
-            nCurrCount = (uint32)App_MainConfig::instance()->GetServerRecvBuff() - m_u4CurrSize;
-        }
+        int nCurrCount = m_pCurrMessage->size() - m_u4CurrSize;
 
         //这里需要对m_u4CurrSize进行检查。
         if(nCurrCount < 0)
@@ -3565,7 +3547,7 @@ void CConnectManagerGroup::GetCommandFlowAccount(_CommandFlowAccount& objCommand
 
 EM_Client_Connect_status CConnectManagerGroup::GetConnectState(uint32 u4ConnectID)
 {
-    //判断命中到哪一个线程组里面去
+    //判断命中到哪一个线程组里面
     uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
     CConnectManager* pConnectManager = m_objConnnectManagerList[u2ThreadIndex];
