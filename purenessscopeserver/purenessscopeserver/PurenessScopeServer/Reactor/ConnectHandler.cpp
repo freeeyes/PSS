@@ -40,7 +40,7 @@ CConnectHandler::CConnectHandler(void)
     m_szLocalIP[0]        = '\0';
     m_szConnectName[0]    = '\0';
     m_blIsLog             = false;
-	m_u4PacketParseInfoID = 0;
+    m_u4PacketParseInfoID = 0;
 }
 
 CConnectHandler::~CConnectHandler(void)
@@ -158,7 +158,7 @@ void CConnectHandler::Init(uint16 u2HandlerID)
 
 void CConnectHandler::SetPacketParseInfoID(uint32 u4PacketParseInfoID)
 {
-	m_u4PacketParseInfoID = u4PacketParseInfoID;
+    m_u4PacketParseInfoID = u4PacketParseInfoID;
 }
 
 uint32 CConnectHandler::GetHandlerID()
@@ -486,11 +486,11 @@ int CConnectHandler::RecvData()
 
     if(m_pPacketParse->GetIsHandleHead())
     {
-        nCurrCount = (uint32)m_pPacketParse->GetPacketHeadSrcLen() - m_u4CurrSize;
+        nCurrCount = (uint32)App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength - m_u4CurrSize;
     }
     else
     {
-        nCurrCount = (uint32)m_pPacketParse->GetPacketBodySrcLen() - m_u4CurrSize;
+        nCurrCount = (uint32)App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength - m_u4CurrSize;
     }
 
     //这里需要对m_u4CurrSize进行检查。
