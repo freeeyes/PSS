@@ -908,7 +908,7 @@ int CConnectHandler::RecvData_et()
         }
         else
         {
-            nCurrCount = (uint32)m_pPacketParse->GetPacketBodySrcLen() - m_u4CurrSize;
+            nCurrCount = (uint32)App_MainConfig::instance()->GetServerRecvBuff() - m_u4CurrSize;
         }
 
         //这里需要对m_u4CurrSize进行检查。

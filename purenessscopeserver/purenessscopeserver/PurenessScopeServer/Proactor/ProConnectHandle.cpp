@@ -34,7 +34,7 @@ CProConnectHandle::CProConnectHandle(void)
     m_blIsLog             = false;
     m_szLocalIP[0]        = '\0';
     m_u4RecvPacketCount   = 0;
-	m_u4PacketParseInfoID = 0;
+    m_u4PacketParseInfoID = 0;
 }
 
 CProConnectHandle::~CProConnectHandle(void)
@@ -508,7 +508,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                 Close();
 
                 //接受下一个数据包
-                RecvClinetPacket(m_pPacketParse->GetPacketHeadSrcLen());
+                RecvClinetPacket(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength);
 
             }
             else
@@ -1406,7 +1406,7 @@ void CProConnectHandle::SetSendCacheManager(ISendCacheManager* pSendCacheManager
 
 void CProConnectHandle::SetPacketParseInfoID(uint32 u4PacketParseInfoID)
 {
-	m_u4PacketParseInfoID = u4PacketParseInfoID;
+    m_u4PacketParseInfoID = u4PacketParseInfoID;
 }
 
 //***************************************************************************
