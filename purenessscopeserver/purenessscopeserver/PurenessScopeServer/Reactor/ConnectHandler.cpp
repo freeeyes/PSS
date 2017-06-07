@@ -589,7 +589,6 @@ int CConnectHandler::RecvData()
             uint32 u4PacketBodyLen = m_pPacketParse->GetPacketBodySrcLen();
             m_u4CurrSize = 0;
 
-
             //这里添加只处理包头的数据
             //如果数据只有包头，不需要包体，在这里必须做一些处理，让数据只处理包头就扔到DoMessage()
             if(u4PacketBodyLen == 0)
@@ -614,7 +613,7 @@ int CConnectHandler::RecvData()
                 }
 
                 //申请头的大小对应的mb
-                m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadSrcLen());
+                m_pCurrMessage = App_MessageBlockManager::instance()->Create(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength);
 
                 if(m_pCurrMessage == NULL)
                 {
