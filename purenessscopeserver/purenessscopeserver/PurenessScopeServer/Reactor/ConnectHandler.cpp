@@ -482,7 +482,23 @@ int CConnectHandler::RecvData()
     }
 
     //计算应该接收的数据长度
-    int nCurrCount = m_pCurrMessage->size() - m_u4CurrSize;
+    int nCurrCount = 0;
+
+    if (App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
+    {
+        if (m_pPacketParse->GetIsHandleHead())
+        {
+            nCurrCount = (uint32)App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength - m_u4CurrSize;
+        }
+        else
+        {
+            nCurrCount = (uint32)m_pPacketParse->GetPacketBodySrcLen() - m_u4CurrSize;
+        }
+    }
+    else
+    {
+        nCurrCount = (uint32)App_MainConfig::instance()->GetServerRecvBuff() - m_u4CurrSize;
+    }
 
     //这里需要对m_u4CurrSize进行检查。
     if(nCurrCount < 0)
@@ -890,7 +906,23 @@ int CConnectHandler::RecvData_et()
         }
 
         //计算应该接收的数据长度
-        int nCurrCount = m_pCurrMessage->size() - m_u4CurrSize;
+        int nCurrCount = 0;
+
+        if (App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
+        {
+            if (m_pPacketParse->GetIsHandleHead())
+            {
+                nCurrCount = (uint32)App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength - m_u4CurrSize;
+            }
+            else
+            {
+                nCurrCount = (uint32)m_pPacketParse->GetPacketBodySrcLen() - m_u4CurrSize;
+            }
+        }
+        else
+        {
+            nCurrCount = (uint32)App_MainConfig::instance()->GetServerRecvBuff() - m_u4CurrSize;
+        }
 
         //这里需要对m_u4CurrSize进行检查。
         if(nCurrCount < 0)
