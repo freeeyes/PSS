@@ -1032,7 +1032,7 @@ int CConnectHandler::RecvData_et()
                     }
 
                     //申请头的大小对应的mb
-                    m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadSrcLen());
+                    m_pCurrMessage = App_MessageBlockManager::instance()->Create(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength);
 
                     if(m_pCurrMessage == NULL)
                     {
