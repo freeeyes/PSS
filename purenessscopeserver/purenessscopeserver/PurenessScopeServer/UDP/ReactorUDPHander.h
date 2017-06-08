@@ -25,7 +25,7 @@ public:
     virtual int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE);
     virtual int handle_close(ACE_HANDLE handle, ACE_Reactor_Mask close_mask);
 
-	void SetPacketParseInfoID(uint32 u4PacketParseInfoID);                    //设置对应的m_u4PacketParseInfoID
+    void SetPacketParseInfoID(uint32 u4PacketParseInfoID);                    //设置对应的m_u4PacketParseInfoID
     int  OpenAddress(const ACE_INET_Addr& AddrRemote);
     int  OpenAddress(const ACE_INET_Addr& AddrRemote, ACE_Reactor* pReactor);
 
@@ -51,6 +51,6 @@ private:
     uint32                  m_u4RecvSize;                   //接收数据的总大小
     uint32                  m_u4SendSize;                   //发送数据的总大小
     CCommandAccount         m_CommandAccount;               //数据包统计
-	uint32                  m_u4PacketParseInfoID;          //对应处理packetParse的模块ID  
+    uint32                  m_u4PacketParseInfoID;          //对应处理packetParse的模块ID
 };
 #endif

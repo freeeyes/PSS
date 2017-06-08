@@ -772,7 +772,7 @@ int CConnectHandler::RecvData()
         while(true)
         {
             _Packet_Info obj_Packet_Info;
-            uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Stream(GetConnectID(), m_pCurrMessage,  reinterpret_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info);
+            uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Stream(GetConnectID(), m_pCurrMessage, dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info);
 
             if(PACKET_GET_ENOUGTH == n1Ret)
             {
@@ -1205,7 +1205,7 @@ int CConnectHandler::RecvData_et()
             while(true)
             {
                 _Packet_Info obj_Packet_Info;
-                uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Stream(GetConnectID(), m_pCurrMessage, reinterpret_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info);
+                uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Stream(GetConnectID(), m_pCurrMessage, dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info);
 
                 if(PACKET_GET_ENOUGTH == n1Ret)
                 {

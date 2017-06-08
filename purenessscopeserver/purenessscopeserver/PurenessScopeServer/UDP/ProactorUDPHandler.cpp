@@ -9,7 +9,7 @@ CProactorUDPHandler::CProactorUDPHandler(void)
     m_u4SendSize          = 0;
     m_szCompletionkey[0]  = '\0';
     m_szAct[0]            = '\0';
-	m_u4PacketParseInfoID = 0;
+    m_u4PacketParseInfoID = 0;
 }
 
 CProactorUDPHandler::~CProactorUDPHandler(void)
@@ -18,7 +18,7 @@ CProactorUDPHandler::~CProactorUDPHandler(void)
 
 void CProactorUDPHandler::SetPacketParseInfoID(uint32 u4PacketParseInfoID)
 {
-	m_u4PacketParseInfoID = u4PacketParseInfoID;
+    m_u4PacketParseInfoID = u4PacketParseInfoID;
 }
 
 int CProactorUDPHandler::OpenAddress(const ACE_INET_Addr& AddrLocal, ACE_Proactor* pProactor)

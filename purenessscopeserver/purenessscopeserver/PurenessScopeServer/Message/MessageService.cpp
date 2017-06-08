@@ -182,7 +182,6 @@ int CMessageService::svc(void)
 
 bool CMessageService::PutMessage(CMessage* pMessage)
 {
-
     ACE_Message_Block* mb = pMessage->GetQueueMessage();
 
     if(NULL != mb)
@@ -255,7 +254,6 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
         m_ThreadInfo.m_u2CommandID   = u2CommandID;
 
         bool blIsDead = m_WorkThreadAI.CheckCurrTimeout(pMessage->GetMessageBase()->m_u2Cmd, (uint32)m_ThreadInfo.m_tvUpdateTime.sec());
-
 
         if(blIsDead == true)
         {

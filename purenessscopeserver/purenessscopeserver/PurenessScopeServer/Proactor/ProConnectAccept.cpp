@@ -6,7 +6,7 @@ ProConnectAcceptor::ProConnectAcceptor()
     m_u4Port                = 0;
     m_u4AcceptCount         = 0;
     m_u4ClientProactorCount = 1;
-	m_u4PacketParseInfoID   = 0;
+    m_u4PacketParseInfoID   = 0;
 }
 
 void ProConnectAcceptor::InitClientProactor(uint32 u4ClientProactorCount)
@@ -14,10 +14,9 @@ void ProConnectAcceptor::InitClientProactor(uint32 u4ClientProactorCount)
     m_u4ClientProactorCount = u4ClientProactorCount;
 }
 
-
 void ProConnectAcceptor::SetPacketParseInfoID(uint32 u4PaccketParseInfoID)
 {
-	m_u4PacketParseInfoID = u4PaccketParseInfoID;
+    m_u4PacketParseInfoID = u4PaccketParseInfoID;
 }
 
 CProConnectHandle* ProConnectAcceptor::make_handler(void)
@@ -31,7 +30,7 @@ CProConnectHandle* ProConnectAcceptor::make_handler(void)
         int nIndex = (int)(m_u4AcceptCount % m_u4ClientProactorCount);
         ACE_Proactor* pProactor = App_ProactorManager::instance()->GetAce_Client_Proactor(nIndex);
         pProConnectHandle->proactor(pProactor);
-		pProConnectHandle->SetPacketParseInfoID(m_u4PacketParseInfoID);
+        pProConnectHandle->SetPacketParseInfoID(m_u4PacketParseInfoID);
         m_u4AcceptCount++;
     }
 

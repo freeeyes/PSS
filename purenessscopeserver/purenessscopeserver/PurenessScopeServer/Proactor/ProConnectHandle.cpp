@@ -255,7 +255,6 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
         return;
     }
 
-
     //检查单位时间链接次数是否达到上限
     if(false == App_IPAccount::instance()->AddIP((string)m_addrRemote.get_host_addr()))
     {
@@ -509,7 +508,6 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
 
                 //接受下一个数据包
                 RecvClinetPacket(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength);
-
             }
             else
             {
@@ -604,7 +602,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         while(true)
         {
             _Packet_Info obj_Packet_Info;
-            uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Stream(GetConnectID(), &mb, reinterpret_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info);
+            uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Stream(GetConnectID(), &mb, dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info);
 
             if(PACKET_GET_ENOUGTH == n1Ret)
             {

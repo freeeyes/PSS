@@ -21,8 +21,8 @@
 #define PACKETPARSE_SHOW_LOG 0
 enum
 {
-	PACKETPARSE_SHOW_OFF = 0,
-	PACKETPARSE_SHOW_ON
+    PACKETPARSE_SHOW_OFF = 0,
+    PACKETPARSE_SHOW_ON
 };
 
 #define PACKETPARSE_SHOW_BEGIN if(PACKETPARSE_SHOW_LOG == PACKETPARSE_SHOW_ON) {
@@ -69,13 +69,13 @@ extern "C"
         memcpy_safe((char* )&pData[u4Pos], (uint32)(sizeof(char)*32), (char* )&szSession, (uint32)(sizeof(char)*32));
         u4Pos += sizeof(char)*32;
 
-		PACKETPARSE_SHOW_BEGIN
-			OUR_DEBUG((LM_INFO, "[CPacketParse::SetPacketHead]u4ConnectID=%d,m_u2Version=%d,m_u2CmdID=%d,m_u4BodyLen=%d.\n",
-				u4ConnectID,
-				u2Version,
-				u2CmdID,
-				u4BodyLen));
-		PACKETPARSE_SHOW_END
+        PACKETPARSE_SHOW_BEGIN
+        OUR_DEBUG((LM_INFO, "[CPacketParse::SetPacketHead]u4ConnectID=%d,m_u2Version=%d,m_u2CmdID=%d,m_u4BodyLen=%d.\n",
+                   u4ConnectID,
+                   u2Version,
+                   u2CmdID,
+                   u4BodyLen));
+        PACKETPARSE_SHOW_END
 
         //填充返回给框架的数据包头信息
         pHeadInfo->m_u4HeadSrcLen      = u4Len;
@@ -95,9 +95,9 @@ extern "C"
             return false;
         }
 
-		PACKETPARSE_SHOW_BEGIN
-			OUR_DEBUG((LM_INFO, "[CPacketParse::Parse_Packet_Body_Info]u4ConnectID=%d,pmbbody=%d.\n", u4ConnectID, pmbbody->length()));
-		PACKETPARSE_SHOW_END
+        PACKETPARSE_SHOW_BEGIN
+        OUR_DEBUG((LM_INFO, "[CPacketParse::Parse_Packet_Body_Info]u4ConnectID=%d,pmbbody=%d.\n", u4ConnectID, pmbbody->length()));
+        PACKETPARSE_SHOW_END
 
         //填充返回给框架的包体信息
         pBodyInfo->m_u4BodySrcLen  = (uint32)pmbbody->length();
@@ -116,9 +116,9 @@ extern "C"
             return PACKET_GET_ERROR;
         }
 
-		PACKETPARSE_SHOW_BEGIN
-			OUR_DEBUG((LM_INFO, "[CPacketParse::Parse_Packet_Stream]u4ConnectID=%d,pCurrMessage=%d.\n", u4ConnectID, pCurrMessage->length()));
-		PACKETPARSE_SHOW_END
+        PACKETPARSE_SHOW_BEGIN
+        OUR_DEBUG((LM_INFO, "[CPacketParse::Parse_Packet_Stream]u4ConnectID=%d,pCurrMessage=%d.\n", u4ConnectID, pCurrMessage->length()));
+        PACKETPARSE_SHOW_END
 
         return PACKET_GET_ENOUGTH;
     }
@@ -131,9 +131,9 @@ extern "C"
             return false;
         }
 
-		PACKETPARSE_SHOW_BEGIN
-			OUR_DEBUG((LM_INFO, "[CPacketParse::Make_Send_Packet]Make_Send_Packet=%d,u4Len=%d.\n", u4ConnectID, u4Len));
-		PACKETPARSE_SHOW_END
+        PACKETPARSE_SHOW_BEGIN
+        OUR_DEBUG((LM_INFO, "[CPacketParse::Make_Send_Packet]Make_Send_Packet=%d,u4Len=%d.\n", u4ConnectID, u4Len));
+        PACKETPARSE_SHOW_END
 
         //拼装数据包
         memcpy_safe((char* )&u4Len, (uint32)sizeof(uint32), pMbData->wr_ptr(), (uint32)sizeof(uint32));
@@ -152,9 +152,9 @@ extern "C"
             return 0;
         }
 
-		PACKETPARSE_SHOW_BEGIN
-			OUR_DEBUG((LM_INFO, "[CPacketParse::Make_Send_Packet_Length]Make_Send_Packet=%d,u4DataLen=%d.\n", u4ConnectID, u4DataLen));
-		PACKETPARSE_SHOW_END
+        PACKETPARSE_SHOW_BEGIN
+        OUR_DEBUG((LM_INFO, "[CPacketParse::Make_Send_Packet_Length]Make_Send_Packet=%d,u4DataLen=%d.\n", u4ConnectID, u4DataLen));
+        PACKETPARSE_SHOW_END
 
         return u4DataLen + sizeof(uint32);
     }
@@ -163,15 +163,15 @@ extern "C"
     bool Connect(uint32 u4ConnectID, _ClientIPInfo objClientIPInfo, _ClientIPInfo objLocalIPInfo)
     {
 
-		PACKETPARSE_SHOW_BEGIN
-            OUR_DEBUG((LM_INFO, "[CPacketParse::Connect]u4ConnectID=%d,objClientIPInfo=(%s:%d),objLocalIPInfo=(%s:%d).\n",
-                       u4ConnectID,
-                       objClientIPInfo.m_szClientIP,
-                       objClientIPInfo.m_nPort,
-                       objLocalIPInfo.m_szClientIP,
-                       objLocalIPInfo.m_nPort));
-            return false;
-		PACKETPARSE_SHOW_END
+        PACKETPARSE_SHOW_BEGIN
+        OUR_DEBUG((LM_INFO, "[CPacketParse::Connect]u4ConnectID=%d,objClientIPInfo=(%s:%d),objLocalIPInfo=(%s:%d).\n",
+                   u4ConnectID,
+                   objClientIPInfo.m_szClientIP,
+                   objClientIPInfo.m_nPort,
+                   objLocalIPInfo.m_szClientIP,
+                   objLocalIPInfo.m_nPort));
+        return false;
+        PACKETPARSE_SHOW_END
 
         return true;
     }
@@ -179,8 +179,8 @@ extern "C"
     //当连接断开的时候，返回你自己的处理
     void DisConnect(uint32 u4ConnectID)
     {
-		PACKETPARSE_SHOW_BEGIN
-            OUR_DEBUG((LM_INFO, "[CPacketParse::Connect]u4ConnectID=%d\n", u4ConnectID));
-		PACKETPARSE_SHOW_END
+        PACKETPARSE_SHOW_BEGIN
+        OUR_DEBUG((LM_INFO, "[CPacketParse::Connect]u4ConnectID=%d\n", u4ConnectID));
+        PACKETPARSE_SHOW_END
     }
 }

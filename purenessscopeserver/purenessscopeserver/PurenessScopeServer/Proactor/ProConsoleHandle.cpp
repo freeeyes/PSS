@@ -466,7 +466,7 @@ bool CProConsoleHandle::CheckMessage()
         {
             if(pBuffPacket->GetPacketLen() > 0)
             {
-                SendMessage(reinterpret_cast<IBuffPacket*>(pBuffPacket));
+                SendMessage(dynamic_cast<IBuffPacket*>(pBuffPacket));
             }
         }
         else if(CONSOLE_MESSAGE_FAIL == u4Return)

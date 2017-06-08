@@ -23,7 +23,7 @@ public:
     CProactorUDPHandler(void);
     ~CProactorUDPHandler(void);
 
-	void SetPacketParseInfoID(uint32 u4PacketParseInfoID);                    //设置对应的m_u4PacketParseInfoID
+    void SetPacketParseInfoID(uint32 u4PacketParseInfoID);                    //设置对应的m_u4PacketParseInfoID
     virtual void handle_read_dgram(const ACE_Asynch_Read_Dgram::Result& result);
 
     int  OpenAddress(const ACE_INET_Addr& AddrLocal, ACE_Proactor* pProactor);
@@ -53,6 +53,6 @@ private:
     char                    m_szAct[MAX_BUFF_20];           //动作
     _TimeConnectInfo        m_TimeConnectInfo;              //链接健康检测器
     CCommandAccount         m_CommandAccount;               //数据包统计
-	uint32                  m_u4PacketParseInfoID;          //对应处理packetParse的模块ID  
+    uint32                  m_u4PacketParseInfoID;          //对应处理packetParse的模块ID
 };
 #endif

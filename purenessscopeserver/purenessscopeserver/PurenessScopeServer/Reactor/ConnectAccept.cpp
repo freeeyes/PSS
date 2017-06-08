@@ -6,7 +6,7 @@ ConnectAcceptor::ConnectAcceptor()
     m_u4ClientReactorCount = 1;
     m_szListenIP[0]        = '\0';
     m_u4Port               = 0;
-	m_u4PacketParseInfoID  = 0;
+    m_u4PacketParseInfoID  = 0;
 }
 
 void ConnectAcceptor::InitClientReactor(uint32 u4ClientReactorCount)
@@ -19,7 +19,7 @@ void ConnectAcceptor::InitClientReactor(uint32 u4ClientReactorCount)
 
 void ConnectAcceptor::SetPacketParseInfoID(uint32 u4PaccketParseInfoID)
 {
-	m_u4PacketParseInfoID = u4PaccketParseInfoID;
+    m_u4PacketParseInfoID = u4PaccketParseInfoID;
 }
 
 int ConnectAcceptor::make_svc_handler(CConnectHandler*& sh)
@@ -47,7 +47,7 @@ int ConnectAcceptor::make_svc_handler(CConnectHandler*& sh)
             ACE_Reactor* pReactor = App_ReactorManager::instance()->GetAce_Client_Reactor(nIndex);
             //OUR_DEBUG((LM_ERROR, "[ConnectAcceptor::make_svc_handler]m_u4AcceptCount=%d, pReactor=0x%08x.\n", m_u4AcceptCount, pReactor));
             pConnectHandler->reactor(pReactor);
-			pConnectHandler->SetPacketParseInfoID(m_u4PacketParseInfoID);
+            pConnectHandler->SetPacketParseInfoID(m_u4PacketParseInfoID);
             m_u4AcceptCount++;
 
             sh = pConnectHandler;

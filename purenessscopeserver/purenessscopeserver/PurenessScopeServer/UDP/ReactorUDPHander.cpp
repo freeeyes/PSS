@@ -137,7 +137,7 @@ int CReactorUDPHander::handle_close(ACE_HANDLE handle, ACE_Reactor_Mask close_ma
 
 void CReactorUDPHander::SetPacketParseInfoID(uint32 u4PacketParseInfoID)
 {
-	m_u4PacketParseInfoID = u4PacketParseInfoID;
+    m_u4PacketParseInfoID = u4PacketParseInfoID;
 }
 
 bool CReactorUDPHander::SendMessage(const char*& pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead, uint16 u2CommandID, bool blDlete)

@@ -239,25 +239,27 @@ void Gdaemon()
 int Chlid_Run()
 {
     //显式加载PacketParse
-	App_PacketParseLoader::instance()->Init(App_MainConfig::instance()->GetPacketParseCount());
-	for (uint8 i = 0; i < App_MainConfig::instance()->GetPacketParseCount(); i++)
-	{
-		_PacketParseInfo* pPacketParseInfo = App_MainConfig::instance()->GetPacketParseInfo(i);
-		bool blState = App_PacketParseLoader::instance()->LoadPacketInfo(pPacketParseInfo->m_u4PacketID, 
-			pPacketParseInfo->m_u1Type,
-			pPacketParseInfo->m_u4OrgLength,
-			pPacketParseInfo->m_szPacketParsePath, 
-			pPacketParseInfo->m_szPacketParseName);
-		if (false == blState)
-		{
-			//回收隐式加载PacketParse
-			App_PacketParseLoader::instance()->Close();
+    App_PacketParseLoader::instance()->Init(App_MainConfig::instance()->GetPacketParseCount());
 
-			pthread_exit(NULL);
+    for (uint8 i = 0; i < App_MainConfig::instance()->GetPacketParseCount(); i++)
+    {
+        _PacketParseInfo* pPacketParseInfo = App_MainConfig::instance()->GetPacketParseInfo(i);
+        bool blState = App_PacketParseLoader::instance()->LoadPacketInfo(pPacketParseInfo->m_u4PacketID,
+                       pPacketParseInfo->m_u1Type,
+                       pPacketParseInfo->m_u4OrgLength,
+                       pPacketParseInfo->m_szPacketParsePath,
+                       pPacketParseInfo->m_szPacketParseName);
 
-			return 0;
-		}
-	}
+        if (false == blState)
+        {
+            //回收隐式加载PacketParse
+            App_PacketParseLoader::instance()->Close();
+
+            pthread_exit(NULL);
+
+            return 0;
+        }
+    }
 
     //判断是否是需要以服务的状态启动
     if(App_MainConfig::instance()->GetServerType() == 1)
@@ -388,28 +390,30 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
     }
 
     //隐式加载PacketParse
-	App_PacketParseLoader::instance()->Init(App_MainConfig::instance()->GetPacketParseCount());
-	for (uint8 i = 0; i < App_MainConfig::instance()->GetPacketParseCount(); i++)
-	{
-		_PacketParseInfo* pPacketParseInfo = App_MainConfig::instance()->GetPacketParseInfo(i);
-		bool blState = App_PacketParseLoader::instance()->LoadPacketInfo(pPacketParseInfo->m_u4PacketID, 
-			pPacketParseInfo->m_u1Type,
-			pPacketParseInfo->m_u4OrgLength,
-			pPacketParseInfo->m_szPacketParsePath, 
-			pPacketParseInfo->m_szPacketParseName);
-		if (false == blState)
-		{
-			//回收隐式加载PacketParse
-			App_PacketParseLoader::instance()->Close();
+    App_PacketParseLoader::instance()->Init(App_MainConfig::instance()->GetPacketParseCount());
 
-			if (App_MainConfig::instance()->GetServerType() == 1)
-			{
-				App_Process::instance()->stopprocesslog();
-			}
+    for (uint8 i = 0; i < App_MainConfig::instance()->GetPacketParseCount(); i++)
+    {
+        _PacketParseInfo* pPacketParseInfo = App_MainConfig::instance()->GetPacketParseInfo(i);
+        bool blState = App_PacketParseLoader::instance()->LoadPacketInfo(pPacketParseInfo->m_u4PacketID,
+                       pPacketParseInfo->m_u1Type,
+                       pPacketParseInfo->m_u4OrgLength,
+                       pPacketParseInfo->m_szPacketParsePath,
+                       pPacketParseInfo->m_szPacketParseName);
 
-			return 0;
-		}
-	}
+        if (false == blState)
+        {
+            //回收隐式加载PacketParse
+            App_PacketParseLoader::instance()->Close();
+
+            if (App_MainConfig::instance()->GetServerType() == 1)
+            {
+                App_Process::instance()->stopprocesslog();
+            }
+
+            return 0;
+        }
+    }
 
     //判断是否是需要以服务的状态启动
     if(App_MainConfig::instance()->GetServerType() == 1)

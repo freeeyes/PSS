@@ -18,14 +18,14 @@ IBuffPacket* CBuffPacketManager::Create()
     CBuffPacket* pBuffPacket = NULL;
 
     pBuffPacket = m_objHashBuffPacketList.Pop();
-    return reinterpret_cast<IBuffPacket*>(pBuffPacket);
+    return dynamic_cast<IBuffPacket*>(pBuffPacket);
 }
 
 bool CBuffPacketManager::Delete(IBuffPacket* pBuffPacket)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-    CBuffPacket* pBuff = reinterpret_cast<CBuffPacket*>(pBuffPacket);
+    CBuffPacket* pBuff = dynamic_cast<CBuffPacket*>(pBuffPacket);
 
     if(NULL == pBuff)
     {

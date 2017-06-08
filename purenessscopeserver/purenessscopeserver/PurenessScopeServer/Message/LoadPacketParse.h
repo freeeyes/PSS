@@ -12,9 +12,9 @@
 
 struct _Packet_Parse_Info
 {
-	uint32           m_u4PacketParseID;       //当前packetParseID
-	uint8            m_u1PacketParseType;     //包头包体或者流模式
-	uint32           m_u4OrgLength;           //数据包头长度
+    uint32           m_u4PacketParseID;       //当前packetParseID
+    uint8            m_u1PacketParseType;     //包头包体或者流模式
+    uint32           m_u4OrgLength;           //数据包头长度
     ACE_Date_Time    m_dtCreateTime;          //模块创建时间
     ACE_SHLIB_HANDLE m_hModule;
     bool (*Parse_Packet_Head_Info)(uint32 u4ConnectID, ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager, _Head_Info* pHeadInfo);
@@ -27,10 +27,10 @@ struct _Packet_Parse_Info
 
     _Packet_Parse_Info()
     {
-		m_u4PacketParseID       = 0;
-		m_u1PacketParseType     = PACKET_WITHHEAD;
-		m_u4OrgLength           = 0;
-		m_hModule               = NULL;
+        m_u4PacketParseID       = 0;
+        m_u1PacketParseType     = PACKET_WITHHEAD;
+        m_u4OrgLength           = 0;
+        m_hModule               = NULL;
         Parse_Packet_Head_Info  = NULL;
         Parse_Packet_Body_Info  = NULL;
         Parse_Packet_Stream     = NULL;
@@ -47,7 +47,7 @@ public:
     CLoadPacketParse();
     ~CLoadPacketParse();
 
-	void Init(int nCount);
+    void Init(int nCount);
 
     bool LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint32 u4HeadLen, const char* pPacketParsePath, const char* szPacketParseName);
 
@@ -57,7 +57,7 @@ public:
 
 private:
     //_Packet_Parse_Info m_Packet_Parse_Info;
-	CHashTable<_Packet_Parse_Info>        m_objPacketParseList;                  //Hash内存池
+    CHashTable<_Packet_Parse_Info>        m_objPacketParseList;                  //Hash内存池
 };
 
 typedef ACE_Singleton<CLoadPacketParse, ACE_Null_Mutex> App_PacketParseLoader;

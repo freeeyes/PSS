@@ -18,7 +18,7 @@ public:
     ConnectAcceptor();
 
     void InitClientReactor(uint32 u4ClientReactorCount);
-	void SetPacketParseInfoID(uint32 u4PaccketParseInfoID);
+    void SetPacketParseInfoID(uint32 u4PaccketParseInfoID);
 
 protected:
     virtual int make_svc_handler(CConnectHandler*& sh);
@@ -47,7 +47,7 @@ private:
     uint32 m_u4Port;
     uint32 m_u4AcceptCount;             //接收的总连接数
     uint32 m_u4ClientReactorCount;      //客户端反应器的个数
-	uint32 m_u4PacketParseInfoID;       //处理包解析的模块ID
+    uint32 m_u4PacketParseInfoID;       //处理包解析的模块ID
 };
 
 class CConnectAcceptorManager

@@ -124,7 +124,6 @@ void CMakePacket::SetMessage(_MakePacket* pMakePacket, CMessage* pMessage, ACE_T
     }
 }
 
-
 void CMakePacket::SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, CMessage* pMessage, ACE_Time_Value& tvNow)
 {
     if(NULL != pMessage->GetMessageBase())

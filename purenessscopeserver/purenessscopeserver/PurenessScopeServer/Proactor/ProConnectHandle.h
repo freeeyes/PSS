@@ -79,7 +79,7 @@ public:
     bool SetRecvQueueTimeCost(uint32 u4TimeCost);                             //记录当前接收数据到模块处理完成的具体时间消耗
     bool SetSendQueueTimeCost(uint32 u4TimeCost);                             //记录当前从发送队列到数据发送完成的具体时间消耗
     void SetSendCacheManager(ISendCacheManager* pSendCacheManager);           //设置发送缓冲接口
-	void SetPacketParseInfoID(uint32 u4PacketParseInfoID);                    //设置对应的m_u4PacketParseInfoID
+    void SetPacketParseInfoID(uint32 u4PacketParseInfoID);                    //设置对应的m_u4PacketParseInfoID
 
 private:
     bool RecvClinetPacket(uint32 u4PackeLen);                                 //接受数据包
@@ -140,7 +140,7 @@ private:
     EM_Client_Close_status m_emStatus;                  //当前服务器关闭标记
 
     CPacketParse        m_objSendPacketParse;           //发送数据包组织结构
-	uint32              m_u4PacketParseInfoID;          //对应处理packetParse的模块ID  
+    uint32              m_u4PacketParseInfoID;          //对应处理packetParse的模块ID
 
     Fast_Asynch_Read_Stream  m_Reader;
     Fast_Asynch_Write_Stream m_Writer;
