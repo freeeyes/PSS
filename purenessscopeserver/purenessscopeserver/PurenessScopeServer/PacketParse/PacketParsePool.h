@@ -10,8 +10,6 @@
 
 using namespace std;
 
-#define DEAULT_PACKET_LENGTH 40
-
 //CPacketParse∂‘œÛ≥ÿ
 class CPacketParsePool
 {

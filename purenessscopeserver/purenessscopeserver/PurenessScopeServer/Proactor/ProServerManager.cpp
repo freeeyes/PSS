@@ -46,11 +46,11 @@ bool CProServerManager::Init()
     //初始化连接器
     uint32 u4ClientProactorCount = (uint32)nReactorCount - 3;
 
-	if (!App_ProConnectAcceptManager::instance()->InitConnectAcceptor(nServerPortCount, u4ClientProactorCount))
-	{
-		OUR_DEBUG((LM_INFO, "[CProServerManager::Init]%s.\n", App_ProConnectAcceptManager::instance()->GetError()));
-		return false;
-	}
+    if (!App_ProConnectAcceptManager::instance()->InitConnectAcceptor(nServerPortCount, u4ClientProactorCount))
+    {
+        OUR_DEBUG((LM_INFO, "[CProServerManager::Init]%s.\n", App_ProConnectAcceptManager::instance()->GetError()));
+        return false;
+    }
 
     //初始化反应器集合
     App_ProactorManager::instance()->Init((uint16)nReactorCount);
@@ -134,17 +134,17 @@ bool CProServerManager::Init()
     App_MessageServiceGroup::instance()->Init(App_MainConfig::instance()->GetThreadCount(), App_MainConfig::instance()->GetMsgMaxQueue(), App_MainConfig::instance()->GetMgsHighMark(), App_MainConfig::instance()->GetMsgLowMark());
 
     //初始化给DLL的对象接口
-    App_ServerObject::instance()->SetMessageManager(reinterpret_cast<IMessageManager*>(App_MessageManager::instance()));
-    App_ServerObject::instance()->SetLogManager(reinterpret_cast<ILogManager*>(AppLogManager::instance()));
-    App_ServerObject::instance()->SetConnectManager(reinterpret_cast<IConnectManager*>(App_ProConnectManager::instance()));
-    App_ServerObject::instance()->SetPacketManager(reinterpret_cast<IPacketManager*>(App_BuffPacketManager::instance()));
-    App_ServerObject::instance()->SetClientManager(reinterpret_cast<IClientManager*>(App_ClientProConnectManager::instance()));
-    App_ServerObject::instance()->SetUDPConnectManager(reinterpret_cast<IUDPConnectManager*>(App_ProUDPManager::instance()));
+    App_ServerObject::instance()->SetMessageManager(dynamic_cast<IMessageManager*>(App_MessageManager::instance()));
+    App_ServerObject::instance()->SetLogManager(dynamic_cast<ILogManager*>(AppLogManager::instance()));
+    App_ServerObject::instance()->SetConnectManager(dynamic_cast<IConnectManager*>(App_ProConnectManager::instance()));
+    App_ServerObject::instance()->SetPacketManager(dynamic_cast<IPacketManager*>(App_BuffPacketManager::instance()));
+    App_ServerObject::instance()->SetClientManager(dynamic_cast<IClientManager*>(App_ClientProConnectManager::instance()));
+    App_ServerObject::instance()->SetUDPConnectManager(dynamic_cast<IUDPConnectManager*>(App_ProUDPManager::instance()));
     App_ServerObject::instance()->SetTimerManager(reinterpret_cast<ActiveTimer*>(App_TimerManager::instance()));
-    App_ServerObject::instance()->SetModuleMessageManager(reinterpret_cast<IModuleMessageManager*>(App_ModuleMessageManager::instance()));
-    App_ServerObject::instance()->SetControlListen(reinterpret_cast<IControlListen*>(App_ProControlListen::instance()));
-    App_ServerObject::instance()->SetModuleInfo(reinterpret_cast<IModuleInfo*>(App_ModuleLoader::instance()));
-    App_ServerObject::instance()->SetMessageBlockManager(reinterpret_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()));
+    App_ServerObject::instance()->SetModuleMessageManager(dynamic_cast<IModuleMessageManager*>(App_ModuleMessageManager::instance()));
+    App_ServerObject::instance()->SetControlListen(dynamic_cast<IControlListen*>(App_ProControlListen::instance()));
+    App_ServerObject::instance()->SetModuleInfo(dynamic_cast<IModuleInfo*>(App_ModuleLoader::instance()));
+    App_ServerObject::instance()->SetMessageBlockManager(dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()));
     App_ServerObject::instance()->SetServerManager(this);
 
     return true;
@@ -209,6 +209,7 @@ bool CProServerManager::Start()
 
         //得到接收器
         ProConnectAcceptor* pConnectAcceptor = App_ProConnectAcceptManager::instance()->GetConnectAcceptor(i);
+
         if(NULL == pConnectAcceptor)
         {
             OUR_DEBUG((LM_INFO, "[CProServerManager::Start]pConnectAcceptor[%d] is NULL.\n", i));
@@ -216,7 +217,7 @@ bool CProServerManager::Start()
         }
 
         //设置监听IP信息
-		pConnectAcceptor->SetPacketParseInfoID(pServerInfo->m_u4PacketParseInfoID);
+        pConnectAcceptor->SetPacketParseInfoID(pServerInfo->m_u4PacketParseInfoID);
         pConnectAcceptor->SetListenInfo(pServerInfo->m_szServerIP, (uint32)pServerInfo->m_nPort);
 
         ACE_Proactor* pProactor = App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE);
@@ -254,9 +255,9 @@ bool CProServerManager::Start()
             return false;
         }
 
-
         CProactorUDPHandler* pProactorUDPHandler = App_ProUDPManager::instance()->Create();
-		pProactorUDPHandler->SetPacketParseInfoID(pServerInfo->m_u4PacketParseInfoID);
+        pProactorUDPHandler->SetPacketParseInfoID(pServerInfo->m_u4PacketParseInfoID);
+
         if(NULL == pProactorUDPHandler)
         {
             OUR_DEBUG((LM_INFO, "[CProServerManager::Start] pProactorUDPHandler is NULL[%d] is error.\n", i));

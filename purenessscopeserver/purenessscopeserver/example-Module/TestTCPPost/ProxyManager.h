@@ -19,21 +19,21 @@ typedef vector<mapc2s*> vecc2sGroup;
 class CProxyManager
 {
 public:
-	CProxyManager();
-	~CProxyManager();
+    CProxyManager();
+    ~CProxyManager();
 
-	void Close();
-	void Init(int nCount);
+    void Close();
+    void Init(int nCount);
 
-	void AddClient2Server(uint32 u4ClientID, CServerObject* pServerObject);
-	void DelClient2Server(uint32 u4ClientID);
-	CPostServerData* GetClient2Server_ServerID(uint32 u4ClientID);
+    void AddClient2Server(uint32 u4ClientID, CServerObject* pServerObject);
+    void DelClient2Server(uint32 u4ClientID);
+    CPostServerData* GetClient2Server_ServerID(uint32 u4ClientID);
 
-	void Display(uint32 u4ClientID);
+    void Display(uint32 u4ClientID);
 
 private:
-	vecc2sGroup m_objc2sGroup;
-	uint16      m_u2WorkCount;
+    vecc2sGroup m_objc2sGroup;
+    uint16      m_u2WorkCount;
 };
 
 #endif

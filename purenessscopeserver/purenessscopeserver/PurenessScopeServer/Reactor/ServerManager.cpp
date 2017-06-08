@@ -118,17 +118,17 @@ bool CServerManager::Init()
     //初始化消息处理线程
     App_MessageServiceGroup::instance()->Init(App_MainConfig::instance()->GetThreadCount(), App_MainConfig::instance()->GetMsgMaxQueue(), App_MainConfig::instance()->GetMgsHighMark(), App_MainConfig::instance()->GetMsgLowMark());
     //初始化给DLL的对象接口
-    App_ServerObject::instance()->SetMessageManager(reinterpret_cast<IMessageManager*>(App_MessageManager::instance()));
-    App_ServerObject::instance()->SetLogManager(reinterpret_cast<ILogManager*>(AppLogManager::instance()));
-    App_ServerObject::instance()->SetConnectManager(reinterpret_cast<IConnectManager*>(App_ConnectManager::instance()));
-    App_ServerObject::instance()->SetPacketManager(reinterpret_cast<IPacketManager*>(App_BuffPacketManager::instance()));
-    App_ServerObject::instance()->SetClientManager(reinterpret_cast<IClientManager*>(App_ClientReConnectManager::instance()));
-    App_ServerObject::instance()->SetUDPConnectManager(reinterpret_cast<IUDPConnectManager*>(App_ReUDPManager::instance()));
+    App_ServerObject::instance()->SetMessageManager(dynamic_cast<IMessageManager*>(App_MessageManager::instance()));
+    App_ServerObject::instance()->SetLogManager(dynamic_cast<ILogManager*>(AppLogManager::instance()));
+    App_ServerObject::instance()->SetConnectManager(dynamic_cast<IConnectManager*>(App_ConnectManager::instance()));
+    App_ServerObject::instance()->SetPacketManager(dynamic_cast<IPacketManager*>(App_BuffPacketManager::instance()));
+    App_ServerObject::instance()->SetClientManager(dynamic_cast<IClientManager*>(App_ClientReConnectManager::instance()));
+    App_ServerObject::instance()->SetUDPConnectManager(dynamic_cast<IUDPConnectManager*>(App_ReUDPManager::instance()));
     App_ServerObject::instance()->SetTimerManager(reinterpret_cast<ActiveTimer*>(App_TimerManager::instance()));
-    App_ServerObject::instance()->SetModuleMessageManager(reinterpret_cast<IModuleMessageManager*>(App_ModuleMessageManager::instance()));
-    App_ServerObject::instance()->SetControlListen(reinterpret_cast<IControlListen*>(App_ControlListen::instance()));
-    App_ServerObject::instance()->SetModuleInfo(reinterpret_cast<IModuleInfo*>(App_ModuleLoader::instance()));
-    App_ServerObject::instance()->SetMessageBlockManager(reinterpret_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()));
+    App_ServerObject::instance()->SetModuleMessageManager(dynamic_cast<IModuleMessageManager*>(App_ModuleMessageManager::instance()));
+    App_ServerObject::instance()->SetControlListen(dynamic_cast<IControlListen*>(App_ControlListen::instance()));
+    App_ServerObject::instance()->SetModuleInfo(dynamic_cast<IModuleInfo*>(App_ModuleLoader::instance()));
+    App_ServerObject::instance()->SetMessageBlockManager(dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()));
     App_ServerObject::instance()->SetServerManager(this);
 
     return true;
@@ -192,7 +192,7 @@ bool CServerManager::Start()
             return false;
         }
 
-		pConnectAcceptor->SetPacketParseInfoID(pServerInfo->m_u4PacketParseInfoID);
+        pConnectAcceptor->SetPacketParseInfoID(pServerInfo->m_u4PacketParseInfoID);
         int nRet = pConnectAcceptor->Init_Open(listenAddr, 0, 1, 1, (int)App_MainConfig::instance()->GetBacklog());
 
         if (-1 == nRet)
@@ -258,7 +258,8 @@ bool CServerManager::Start()
             OUR_DEBUG((LM_INFO, "[CServerManager::Start]UDP pReactorUDPHandler[%d] is NULL.\n", i));
             return false;
         }
-		pReactorUDPHandler->SetPacketParseInfoID(pServerInfo->m_u4PacketParseInfoID);
+
+        pReactorUDPHandler->SetPacketParseInfoID(pServerInfo->m_u4PacketParseInfoID);
         int nRet = pReactorUDPHandler->OpenAddress(listenAddr);
 
         if (-1 == nRet)
