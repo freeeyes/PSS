@@ -120,13 +120,13 @@ bool CServerManager::Init()
     //初始化给DLL的对象接口
     App_ServerObject::instance()->SetMessageManager(dynamic_cast<IMessageManager*>(App_MessageManager::instance()));
     App_ServerObject::instance()->SetLogManager(dynamic_cast<ILogManager*>(AppLogManager::instance()));
-    App_ServerObject::instance()->SetConnectManager(dynamic_cast<IConnectManager*>(App_ConnectManager::instance()));
+    App_ServerObject::instance()->SetConnectManager(dynamic_cast<IConnectManager*>(App_ProConnectManager::instance()));
     App_ServerObject::instance()->SetPacketManager(dynamic_cast<IPacketManager*>(App_BuffPacketManager::instance()));
-    App_ServerObject::instance()->SetClientManager(dynamic_cast<IClientManager*>(App_ClientReConnectManager::instance()));
-    App_ServerObject::instance()->SetUDPConnectManager(dynamic_cast<IUDPConnectManager*>(App_ReUDPManager::instance()));
+    App_ServerObject::instance()->SetClientManager(dynamic_cast<IClientManager*>(App_ClientProConnectManager::instance()));
+    App_ServerObject::instance()->SetUDPConnectManager(dynamic_cast<IUDPConnectManager*>(App_ProUDPManager::instance()));
     App_ServerObject::instance()->SetTimerManager(reinterpret_cast<ActiveTimer*>(App_TimerManager::instance()));
     App_ServerObject::instance()->SetModuleMessageManager(dynamic_cast<IModuleMessageManager*>(App_ModuleMessageManager::instance()));
-    App_ServerObject::instance()->SetControlListen(dynamic_cast<IControlListen*>(App_ControlListen::instance()));
+    App_ServerObject::instance()->SetControlListen(dynamic_cast<IControlListen*>(App_ProControlListen::instance()));
     App_ServerObject::instance()->SetModuleInfo(dynamic_cast<IModuleInfo*>(App_ModuleLoader::instance()));
     App_ServerObject::instance()->SetMessageBlockManager(dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()));
     App_ServerObject::instance()->SetServerManager(this);
