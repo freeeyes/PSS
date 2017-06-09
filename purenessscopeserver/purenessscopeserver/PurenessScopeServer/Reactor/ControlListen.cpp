@@ -8,7 +8,7 @@ CControlListen::~CControlListen()
 {
 }
 
-bool CControlListen::AddListen( const char* pListenIP, uint32 u4Port, uint8 u1IPType )
+bool CControlListen::AddListen( const char* pListenIP, uint32 u4Port, uint8 u1IPType, int nPacketParseID)
 {
     bool blState = App_ConnectAcceptorManager::instance()->CheckIPInfo(pListenIP, u4Port);
 
@@ -47,6 +47,8 @@ bool CControlListen::AddListen( const char* pListenIP, uint32 u4Port, uint8 u1IP
         OUR_DEBUG((LM_INFO, "[CControlListen::AddListen](%s:%d)pConnectAcceptor is NULL.\n", pListenIP, u4Port));
         return false;
     }
+
+    pConnectAcceptor->SetPacketParseInfoID(nPacketParseID);
 
     int nRet = pConnectAcceptor->open2(listenAddr, App_ReactorManager::instance()->GetAce_Reactor(REACTOR_CLIENTDEFINE), ACE_NONBLOCK, (int)App_MainConfig::instance()->GetBacklog());
 

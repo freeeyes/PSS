@@ -8,7 +8,7 @@ CProControlListen::~CProControlListen()
 {
 }
 
-bool CProControlListen::AddListen( const char* pListenIP, uint32 u4Port, uint8 u1IPType )
+bool CProControlListen::AddListen( const char* pListenIP, uint32 u4Port, uint8 u1IPType, int nPacketParseID)
 {
     bool blState = App_ProConnectAcceptManager::instance()->CheckIPInfo(pListenIP, u4Port);
 
@@ -50,6 +50,7 @@ bool CProControlListen::AddListen( const char* pListenIP, uint32 u4Port, uint8 u
     //创建新的监听
     //设置监听IP信息
     pProConnectAcceptor->SetListenInfo(pListenIP, u4Port);
+    pProConnectAcceptor->SetPacketParseInfoID(nPacketParseID);
 
     ACE_Proactor* pProactor = App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE);
 
