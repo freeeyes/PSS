@@ -232,6 +232,13 @@ int CConnectHandler::open(void*)
     //重置缓冲区
     //m_pBlockMessage->reset();
 
+    if (NULL == App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID))
+    {
+        //如果解析器不存在，则直接断开连接
+        OUR_DEBUG((LM_ERROR, "[CConnectHandler::open](%s)can't find PacketParseInfo.\n", m_addrRemote.get_host_addr()));
+        return -1;
+    }
+
     //获得远程链接地址和端口
     if(this->peer().get_remote_addr(m_addrRemote) == -1)
     {

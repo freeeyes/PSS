@@ -248,24 +248,33 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
     m_szConnectName[0]    = '\0';
     m_u1IsActive          = 1;
 
+    if (NULL == App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID))
+    {
+        //如果解析器不存在，则直接断开连接
+        OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open](%s)can't find PacketParseInfo.\n", m_addrRemote.get_host_addr()));
+        Close();
+        return;
+    }
+
     if(App_ForbiddenIP::instance()->CheckIP(m_addrRemote.get_host_addr()) == false)
     {
         //在禁止列表中，不允许访问
-        OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]IP Forbidden(%s).\n", m_addrRemote.get_host_addr()));
+        OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open]IP Forbidden(%s).\n", m_addrRemote.get_host_addr()));
+        Close();
         return;
     }
 
     //检查单位时间链接次数是否达到上限
     if(false == App_IPAccount::instance()->AddIP((string)m_addrRemote.get_host_addr()))
     {
-        OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open]IP connect frequently.\n", m_addrRemote.get_host_addr()));
+        OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open]IP(%s) connect frequently.\n", m_addrRemote.get_host_addr()));
         App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), App_MainConfig::instance()->GetIPAlert()->m_u4IPTimeout);
 
         //发送告警邮件
         AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
                                                App_MainConfig::instance()->GetIPAlert()->m_u4MailID,
                                                "Alert IP",
-                                               "[CConnectHandler::open] IP is more than IP Max,");
+                                               "[CProConnectHandle::open] IP is more than IP Max,");
 
         Close();
         return;
@@ -447,7 +456,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
             if(false == blStateHead)
             {
                 //如果包头是非法的，则返回错误，断开连接。
-                OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_read_stream]PacketHead is illegal.\n"));
+                OUR_DEBUG((LM_ERROR, "[CProConnectHandle::handle_read_stream]PacketHead is illegal.\n"));
 
                 //清理PacketParse
                 ClearPacketParse(mb);
@@ -688,13 +697,13 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
     {
         //发送失败
         int nErrno = errno;
-        OUR_DEBUG ((LM_DEBUG,"[CConnectHandler::handle_write_stream] Connectid=[%d] begin(%d)...\n",GetConnectID(), nErrno));
+        OUR_DEBUG ((LM_DEBUG,"[CProConnectHandle::handle_write_stream] Connectid=[%d] begin(%d)...\n",GetConnectID(), nErrno));
 
         AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "WriteError [%s:%d] nErrno = %d  result.bytes_transferred() = %d, ",
                                             m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), nErrno,
                                             result.bytes_transferred());
 
-        OUR_DEBUG((LM_DEBUG,"[CConnectHandler::handle_write_stream] Connectid=[%d] finish ok...\n", GetConnectID()));
+        OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::handle_write_stream] Connectid=[%d] finish ok...\n", GetConnectID()));
         m_atvOutput = ACE_OS::gettimeofday();
         //App_MessageBlockManager::instance()->Close(&result.message_block());
         //错误消息回调
@@ -832,9 +841,9 @@ uint8 CProConnectHandle::GetSendBuffState()
 
 bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, uint8 u1State, uint8 u1SendType, uint32& u4PacketSize, bool blDelete, int nMessageID)
 {
-    //OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage]Connectid=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
+    //OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::SendMessage]Connectid=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
-    //OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage]Connectid=%d,m_nIOCount=%d 1.\n", GetConnectID(), m_nIOCount));
+    //OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::SendMessage]Connectid=%d,m_nIOCount=%d 1.\n", GetConnectID(), m_nIOCount));
 
     //如果当前连接已被别的线程关闭，则这里不做处理，直接退出
     if(m_u1IsActive == 0)
@@ -857,7 +866,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 
     if(NULL == pBuffPacket)
     {
-        OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage] Connectid=[%d] pBuffPacket is NULL.\n", GetConnectID()));
+        OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::SendMessage] Connectid=[%d] pBuffPacket is NULL.\n", GetConnectID()));
         return false;
     }
 
@@ -880,7 +889,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 
         if(u4SendPacketSize + (uint32)m_pBlockMessage->length() >= m_u4SendMaxBuffSize)
         {
-            OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage] Connectid=[%d] m_pBlockMessage is not enougth.\n", GetConnectID()));
+            OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::SendMessage] Connectid=[%d] m_pBlockMessage is not enougth.\n", GetConnectID()));
             //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
             ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
             memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char* )pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
@@ -931,7 +940,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 
             if(u4SendPacketSize >= m_u4SendMaxBuffSize)
             {
-                OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", GetConnectID(), u4SendPacketSize, m_u4SendMaxBuffSize));
+                OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", GetConnectID(), u4SendPacketSize, m_u4SendMaxBuffSize));
 
                 if(blDelete == true)
                 {
@@ -951,7 +960,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 
             if(u4SendPacketSize >= m_u4SendMaxBuffSize)
             {
-                OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", GetConnectID(), u4SendPacketSize, m_u4SendMaxBuffSize));
+                OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", GetConnectID(), u4SendPacketSize, m_u4SendMaxBuffSize));
                 //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
                 ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
                 memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char* )pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
@@ -983,7 +992,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
 
             if(NULL == pMbData)
             {
-                OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage] Connectid=[%d] pMbData is NULL.\n", GetConnectID()));
+                OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::SendMessage] Connectid=[%d] pMbData is NULL.\n", GetConnectID()));
                 //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
                 ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
                 memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char* )pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
@@ -1085,7 +1094,7 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
         }
     }
 
-    //OUR_DEBUG ((LM_ERROR, "[CConnectHandler::PutSendPacket] Connectid=%d, m_nIOCount=%d!\n", GetConnectID(), m_nIOCount));
+    //OUR_DEBUG ((LM_ERROR, "[CProConnectHandle::PutSendPacket] Connectid=%d, m_nIOCount=%d!\n", GetConnectID(), m_nIOCount));
     //统计发送数量
     ACE_Date_Time dtNow;
 
@@ -1150,7 +1159,7 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
         //记录水位标
         m_u4ReadSendSize += (uint32)pMbData->length();
 
-        //OUR_DEBUG ((LM_ERROR, "[CConnectHandler::PutSendPacket] Connectid=%d, length=%d!\n", GetConnectID(), pMbData->length()));
+        //OUR_DEBUG ((LM_ERROR, "[CProConnectHandle::PutSendPacket] Connectid=%d, length=%d!\n", GetConnectID(), pMbData->length()));
         if(0 != m_Writer.write(*pMbData, pMbData->length()))
         {
 

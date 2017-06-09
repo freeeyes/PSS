@@ -159,12 +159,14 @@ struct _ListenInfo
     char   m_szListenIP[MAX_BUFF_20];
     uint32 m_u4Port;
     uint8  m_u1IPType;
+    uint32 m_u4PacketParseID;
 
     _ListenInfo()
     {
-        m_szListenIP[0] = '\0';
-        m_u4Port        = 0;
-        m_u1IPType      = TYPE_IPV4;
+        m_szListenIP[0]   = '\0';
+        m_u4Port          = 0;
+        m_u1IPType        = TYPE_IPV4;
+        m_u4PacketParseID = 0;
     }
 };
 

@@ -656,6 +656,20 @@ bool CConsoleMessage::GetListenInfo(const char* pCommand, _ListenInfo& objListen
     memcpy_safe((char* )(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
     szTempData[nLen] = '\0';
     objListenInfo.m_u1IPType = ACE_OS::atoi(szTempData);
+
+    //»ñµÃPacketParseID
+    pPosBegin = (char*)ACE_OS::strstr(pCommand, "-n ");
+    pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
+    nLen = (int)(pPosEnd - pPosBegin - 3);
+
+    if (nLen >= MAX_BUFF_100 || nLen < 0)
+    {
+        return false;
+    }
+
+    memcpy_safe((char*)(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
+    szTempData[nLen] = '\0';
+    objListenInfo.m_u4PacketParseID = ACE_OS::atoi(szTempData);
     return true;
 }
 
@@ -2093,7 +2107,8 @@ bool CConsoleMessage::DoMessage_AddListen(_CommandInfo& CommandInfo, IBuffPacket
 #ifdef WIN32
         bool blState = App_ProControlListen::instance()->AddListen(objListenInfo.m_szListenIP,
                        objListenInfo.m_u4Port,
-                       objListenInfo.m_u1IPType);
+                       objListenInfo.m_u1IPType,
+                       objListenInfo.m_u4PacketParseID);
 
         if(true == blState)
         {
