@@ -70,6 +70,7 @@ END
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\PSS_ClientManager.ico"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
@@ -237,6 +238,8 @@ BEGIN
     COMBOBOX        IDC_COMBO1,272,186,66,50,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "添加新监听",IDC_BUTTON10,225,206,54,14
     PUSHBUTTON      "停止已有监听",IDC_BUTTON13,301,206,65,14
+    EDITTEXT        IDC_EDIT13,390,170,66,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "解析模块 ID",IDC_STATIC,343,172,42,8
 END
 
 IDD_DIALOG_FORBIDENIP DIALOGEX 0, 0, 472, 241
@@ -411,6 +414,18 @@ END
 //
 
 IDR_HTML_DLGCLIENTMODULE HTML                    "DlgClientModule.htm"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_DIALOG_SERVERCONNECT AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 #endif    // 中文(简体，中国) resources
 /////////////////////////////////////////////////////////////////////////////
 

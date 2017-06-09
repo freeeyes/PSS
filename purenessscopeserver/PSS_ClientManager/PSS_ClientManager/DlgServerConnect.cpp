@@ -29,6 +29,7 @@ void CDlgServerConnect::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_IPADDRESS1, m_txtListenIP);
     DDX_Control(pDX, IDC_EDIT4, m_txtListenPort);
     DDX_Control(pDX, IDC_COMBO1, m_cbListenType);
+    DDX_Control(pDX, IDC_EDIT13, m_txtPacketParseID);
 }
 
 
@@ -455,9 +456,13 @@ void CDlgServerConnect::OnBnClickedButton10()
         nType = 2;
     }
 
+    CString strPacketParseID;
+    m_txtPacketParseID.GetWindowText(strPacketParseID);
+    int nPacketParseID = _ttoi(strPacketParseID);
+
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s AddListen -i %s -p %d -t %d -n ", m_pTcpClientConnect->GetKey(), szIP, nPort, nType);
+    sprintf_s(szCommand, 100, "%s AddListen -i %s -p %d -t %d -n %d", m_pTcpClientConnect->GetKey(), szIP, nPort, nType, nPacketParseID);
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(szSendMessage, 200, &nSendLen, sizeof(int));
