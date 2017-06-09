@@ -1826,7 +1826,7 @@ bool CConnectHandler::CheckMessage()
                                                m_TimeConnectInfo.m_u4RecvPacketCount,
                                                m_TimeConnectInfo.m_u4RecvSize);
 
-        App_PacketParsePool::instance()->Delete(m_pPacketParse);
+        App_PacketParsePool::instance()->Delete(m_pPacketParse, true);
         m_pPacketParse = NULL;
 
         //设置封禁时间
@@ -1855,7 +1855,6 @@ bool CConnectHandler::CheckMessage()
     //将数据Buff放入消息体中
     if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvCheck))
     {
-        App_PacketParsePool::instance()->Delete(m_pPacketParse);
         m_pPacketParse = NULL;
 
         OUR_DEBUG((LM_ERROR, "[CConnectHandle::CheckMessage] ConnectID = %d, PutMessageBlock is error.\n", GetConnectID()));

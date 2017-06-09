@@ -1238,7 +1238,7 @@ bool CProConnectHandle::CheckMessage()
                                                    m_TimeConnectInfo.m_u4RecvSize);
 
 
-            App_PacketParsePool::instance()->Delete(m_pPacketParse);
+            App_PacketParsePool::instance()->Delete(m_pPacketParse, true);
             //ÉèÖÃ·â½ûÊ±¼ä
             App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), App_MainConfig::instance()->GetIPAlert()->m_u4IPTimeout);
             OUR_DEBUG((LM_ERROR, "[CProConnectHandle::CheckMessage] ConnectID = %d, PutMessageBlock is check invalid.\n", GetConnectID()));

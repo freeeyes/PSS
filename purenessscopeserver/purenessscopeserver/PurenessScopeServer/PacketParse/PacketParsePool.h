@@ -6,6 +6,7 @@
 
 #include "PacketParse.h"
 #include "MainConfig.h"
+#include "MessageBlockManager.h"
 #include "HashTable.h"
 
 using namespace std;
@@ -21,7 +22,7 @@ public:
     void Close();
 
     CPacketParse* Create();
-    bool Delete(CPacketParse* pPacketParse);
+    bool Delete(CPacketParse* pPacketParse, bool blDelete = false);
 
     int GetUsedCount();
     int GetFreeCount();

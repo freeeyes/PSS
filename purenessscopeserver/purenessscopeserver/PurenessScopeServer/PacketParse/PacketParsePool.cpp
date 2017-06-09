@@ -76,7 +76,7 @@ CPacketParse* CPacketParsePool::Create()
     return pPacketParse;
 }
 
-bool CPacketParsePool::Delete(CPacketParse* pPacketParse)
+bool CPacketParsePool::Delete(CPacketParse* pPacketParse, bool blDelete)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
@@ -85,6 +85,20 @@ bool CPacketParsePool::Delete(CPacketParse* pPacketParse)
     if(NULL == pBuff)
     {
         return false;
+    }
+
+    if (true == blDelete)
+    {
+        //清理包头和包体的内存
+        if (NULL != pPacketParse->GetMessageHead())
+        {
+            App_MessageBlockManager::instance()->Close(pPacketParse->GetMessageHead());
+        }
+
+        if (NULL != pPacketParse->GetMessageBody())
+        {
+            App_MessageBlockManager::instance()->Close(pPacketParse->GetMessageBody());
+        }
     }
 
     pPacketParse->Clear();
