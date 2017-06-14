@@ -648,6 +648,37 @@ public:
         }
     }
 
+    //清理当前Hash数组中的所有对象指针
+    void Clear()
+    {
+        vector<string> vecList;
+
+        if (NULL == m_lpTable)
+        {
+            return;
+        }
+
+        for (int i = 0; i < m_objHashPool.Get_Count(); i++)
+        {
+            if (NULL != m_lpTable[i])
+            {
+                _Hash_Link_Info<T>* pLastLink = m_lpTable[i];
+
+                while (NULL != pLastLink)
+                {
+                    vecList.push_back(pLastLink->m_pData->m_pKey);
+                    pLastLink = pLastLink->m_pNext;
+                }
+            }
+        }
+
+        //清理数据
+        for (int i = 0; i < (int)vecList.size(); i++)
+        {
+            Del_Hash_Data(vecList[i].c_str());
+        }
+    }
+
     //添加一个Hash数据块
     int Add_Hash_Data(const char* pKey, T* pValue)
     {
