@@ -549,116 +549,16 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* a
     }
 
     //检查所有工作线程
-    for(uint32 i = 0; i < (uint32)m_vecMessageService.size(); i++)
-    {
-        CMessageService* pMessageService = m_vecMessageService[i];
-
-        if(NULL != pMessageService)
-        {
-            bool blFlag = pMessageService->SaveThreadInfo();
-
-            if(false == blFlag)
-            {
-                //首先让对象失效
-                //m_ThreadWriteLock.acquire();
-                m_vecMessageService[i] = NULL;
-                //m_ThreadWriteLock.release();
-
-                //获得当前线程ID
-                uint32 u4ThreadID = pMessageService->GetThreadInfo()->m_u4ThreadID;
-
-                //杀死当前工作线程
-                int ret = ACE_Thread_Manager::instance()->cancel_task(pMessageService);
-
-                if (0 != ret)
-                {
-                    OUR_DEBUG((LM_DEBUG, "[CMessageServiceGroup::CheckServerMessageThread]kill return %d fail(%d).\n", ret, errno));
-                }
-                else
-                {
-                    OUR_DEBUG((LM_DEBUG, "[CMessageServiceGroup::CheckServerMessageThread]kill return OK.\n"));
-                }
-
-                //需要重启工作线程，先关闭当前的工作线程
-                pMessageService->Close();
-                SAFE_DELETE(pMessageService);
-
-                //创建一个新的工作线程，并赋值进去
-                pMessageService = new CMessageService();
-
-                if(NULL != pMessageService)
-                {
-                    pMessageService->Init(u4ThreadID, m_u4MaxQueue, m_u4LowMask, m_u4HighMask);
-                    pMessageService->Start();
-
-                    //m_ThreadWriteLock.acquire();
-                    m_vecMessageService[i] = pMessageService;
-                    //m_ThreadWriteLock.release();
-                }
-                else
-                {
-                    OUR_DEBUG((LM_ERROR,"[CMessageServiceGroup::handle_timeout] reset workthread is NULL (%d).\n", i));
-                }
-            }
-        }
-    }
+    CheckWorkThread();
 
     //记录PacketParse的统计过程
-    AppLogManager::instance()->WriteLog(LOG_SYSTEM_PACKETTHREAD, "[CMessageService::handle_timeout] UsedCount = %d, FreeCount= %d.", App_PacketParsePool::instance()->GetUsedCount(), App_PacketParsePool::instance()->GetFreeCount());
+    CheckPacketParsePool();
 
     //记录统计CPU和内存的使用
-    if(App_MainConfig::instance()->GetMonitor() == 1)
-    {
-#ifdef WIN32
-        uint32 u4CurrCpu    = (uint32)GetProcessCPU_Idel();
-        //uint32 u4CurrMemory = (uint32)GetProcessMemorySize();
-#else
-        uint32 u4CurrCpu    = (uint32)GetProcessCPU_Idel_Linux();
-        //uint32 u4CurrMemory = (uint32)GetProcessMemorySize_Linux();
-#endif
-
-        //获得相关Messageblock,BuffPacket,MessageCount,内存大小
-        uint32 u4MessageBlockUsedSize = App_MessageBlockManager::instance()->GetUsedSize();
-        uint32 u4BuffPacketCount = App_BuffPacketManager::instance()->GetBuffPacketUsedCount();
-        uint32 u4MessageCount = GetUsedMessageCount();
-
-        if(u4CurrCpu > App_MainConfig::instance()->GetCpuMax() || u4MessageBlockUsedSize > App_MainConfig::instance()->GetMemoryMax())
-        {
-            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::handle_timeout]CPU Rote=%d,MessageBlock=%d,u4BuffPacketCount=%d,u4MessageCount=%d ALERT.\n", u4CurrCpu, u4MessageBlockUsedSize, u4BuffPacketCount, u4MessageCount));
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_MONITOR, "[Monitor] CPU Rote=%d,MessageBlock=%d,u4BuffPacketCount=%d,u4MessageCount=%d.", u4CurrCpu, u4MessageBlockUsedSize, u4BuffPacketCount, u4MessageCount);
-        }
-        else
-        {
-            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::handle_timeout]CPU Rote=%d,MessageBlock=%d,u4BuffPacketCount=%d,u4MessageCount=%d OK.\n", u4CurrCpu, u4MessageBlockUsedSize, u4BuffPacketCount, u4MessageCount));
-        }
-    }
+    CheckCPUAndMemory();
 
     //检查所有插件状态
-    vector<_ModuleInfo*> vecModeInfo;
-    App_ModuleLoader::instance()->GetAllModuleInfo(vecModeInfo);
-
-    for(int i = 0; i < (int)vecModeInfo.size(); i++)
-    {
-        _ModuleInfo* pModuleInfo = vecModeInfo[i];
-
-        if(NULL != pModuleInfo)
-        {
-            uint32 u4ErrorID = 0;
-            bool blModuleState = pModuleInfo->GetModuleState(u4ErrorID);
-
-            if(false == blModuleState)
-            {
-                char szTitle[MAX_BUFF_50] = {'\0'};
-                sprintf_safe(szTitle, MAX_BUFF_50, "ModuleStateError");
-
-                //发送邮件
-                AppLogManager::instance()->WriteToMail(LOG_SYSTEM_MONITOR, 1,
-                                                       szTitle,
-                                                       "Module ErrorID=%d.\n",
-                                                       u4ErrorID);
-            }
-        }
-    }
+    CheckPlugInState();
 
     return 0;
 }
@@ -793,6 +693,133 @@ bool CMessageServiceGroup::KillTimer()
     }
 
     OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::KillTimer] end....\n"));
+    return true;
+}
+
+bool CMessageServiceGroup::CheckWorkThread()
+{
+    for (uint32 i = 0; i < (uint32)m_vecMessageService.size(); i++)
+    {
+        CMessageService* pMessageService = m_vecMessageService[i];
+
+        if (NULL != pMessageService)
+        {
+            bool blFlag = pMessageService->SaveThreadInfo();
+
+            if (false == blFlag)
+            {
+                //首先让对象失效
+                //m_ThreadWriteLock.acquire();
+                m_vecMessageService[i] = NULL;
+                //m_ThreadWriteLock.release();
+
+                //获得当前线程ID
+                uint32 u4ThreadID = pMessageService->GetThreadInfo()->m_u4ThreadID;
+
+                //杀死当前工作线程
+                int ret = ACE_Thread_Manager::instance()->cancel_task(pMessageService);
+
+                if (0 != ret)
+                {
+                    OUR_DEBUG((LM_DEBUG, "[CMessageServiceGroup::CheckServerMessageThread]kill return %d fail(%d).\n", ret, errno));
+                }
+                else
+                {
+                    OUR_DEBUG((LM_DEBUG, "[CMessageServiceGroup::CheckServerMessageThread]kill return OK.\n"));
+                }
+
+                //需要重启工作线程，先关闭当前的工作线程
+                pMessageService->Close();
+                SAFE_DELETE(pMessageService);
+
+                //创建一个新的工作线程，并赋值进去
+                pMessageService = new CMessageService();
+
+                if (NULL != pMessageService)
+                {
+                    pMessageService->Init(u4ThreadID, m_u4MaxQueue, m_u4LowMask, m_u4HighMask);
+                    pMessageService->Start();
+
+                    //m_ThreadWriteLock.acquire();
+                    m_vecMessageService[i] = pMessageService;
+                    //m_ThreadWriteLock.release();
+                }
+                else
+                {
+                    OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::handle_timeout] reset workthread is NULL (%d).\n", i));
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
+bool CMessageServiceGroup::CheckPacketParsePool()
+{
+    AppLogManager::instance()->WriteLog(LOG_SYSTEM_PACKETTHREAD, "[CMessageService::handle_timeout] UsedCount = %d, FreeCount= %d.", App_PacketParsePool::instance()->GetUsedCount(), App_PacketParsePool::instance()->GetFreeCount());
+    return true;
+}
+
+bool CMessageServiceGroup::CheckCPUAndMemory()
+{
+    if (App_MainConfig::instance()->GetMonitor() == 1)
+    {
+#ifdef WIN32
+        uint32 u4CurrCpu = (uint32)GetProcessCPU_Idel();
+        //uint32 u4CurrMemory = (uint32)GetProcessMemorySize();
+#else
+        uint32 u4CurrCpu = (uint32)GetProcessCPU_Idel_Linux();
+        //uint32 u4CurrMemory = (uint32)GetProcessMemorySize_Linux();
+#endif
+
+        //获得相关Messageblock,BuffPacket,MessageCount,内存大小
+        uint32 u4MessageBlockUsedSize = App_MessageBlockManager::instance()->GetUsedSize();
+        uint32 u4BuffPacketCount = App_BuffPacketManager::instance()->GetBuffPacketUsedCount();
+        uint32 u4MessageCount = GetUsedMessageCount();
+
+        if (u4CurrCpu > App_MainConfig::instance()->GetCpuMax() || u4MessageBlockUsedSize > App_MainConfig::instance()->GetMemoryMax())
+        {
+            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::handle_timeout]CPU Rote=%d,MessageBlock=%d,u4BuffPacketCount=%d,u4MessageCount=%d ALERT.\n", u4CurrCpu, u4MessageBlockUsedSize, u4BuffPacketCount, u4MessageCount));
+            AppLogManager::instance()->WriteLog(LOG_SYSTEM_MONITOR, "[Monitor] CPU Rote=%d,MessageBlock=%d,u4BuffPacketCount=%d,u4MessageCount=%d.", u4CurrCpu, u4MessageBlockUsedSize, u4BuffPacketCount, u4MessageCount);
+        }
+        else
+        {
+            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::handle_timeout]CPU Rote=%d,MessageBlock=%d,u4BuffPacketCount=%d,u4MessageCount=%d OK.\n", u4CurrCpu, u4MessageBlockUsedSize, u4BuffPacketCount, u4MessageCount));
+        }
+    }
+
+    return true;
+}
+
+bool CMessageServiceGroup::CheckPlugInState()
+{
+    vector<_ModuleInfo*> vecModeInfo;
+    App_ModuleLoader::instance()->GetAllModuleInfo(vecModeInfo);
+
+    for (int i = 0; i < (int)vecModeInfo.size(); i++)
+    {
+        _ModuleInfo* pModuleInfo = vecModeInfo[i];
+
+        if (NULL != pModuleInfo)
+        {
+            uint32 u4ErrorID = 0;
+            bool blModuleState = pModuleInfo->GetModuleState(u4ErrorID);
+
+            if (false == blModuleState)
+            {
+                char szTitle[MAX_BUFF_50] = { '\0' };
+                sprintf_safe(szTitle, MAX_BUFF_50, "ModuleStateError");
+
+                //发送邮件
+                AppLogManager::instance()->WriteToMail(LOG_SYSTEM_MONITOR, 1,
+                                                       szTitle,
+                                                       "Module ErrorID=%d.\n",
+                                                       u4ErrorID);
+            }
+        }
+    }
+
     return true;
 }
 

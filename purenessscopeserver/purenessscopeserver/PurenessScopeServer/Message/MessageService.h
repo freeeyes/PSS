@@ -150,6 +150,11 @@ private:
     bool StartTimer();
     bool KillTimer();
 
+    bool CheckWorkThread();                                                                  //检查所有的工作线程状态
+    bool CheckPacketParsePool();                                                             //检查正在使用的消息解析对象
+    bool CheckCPUAndMemory();                                                                //检查CPU和内存
+    bool CheckPlugInState();                                                                 //检查所有插件状态
+
     int32 GetWorkThreadID(uint32 u4ConnectID, uint8 u1PacketType);                           //根据操作类型和ConnectID计算出那个工作线程ID
 
 private:
