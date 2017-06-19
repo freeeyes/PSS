@@ -2122,7 +2122,8 @@ bool CConsoleMessage::DoMessage_AddListen(_CommandInfo& CommandInfo, IBuffPacket
 #else
         bool blState = App_ControlListen::instance()->AddListen(objListenInfo.m_szListenIP,
                        objListenInfo.m_u4Port,
-                       objListenInfo.m_u1IPType);
+                       objListenInfo.m_u1IPType,
+                       objListenInfo.m_u4PacketParseID);
 
         if(true == blState)
         {
