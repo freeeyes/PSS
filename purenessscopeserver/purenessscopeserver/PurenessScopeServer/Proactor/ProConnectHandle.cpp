@@ -2214,6 +2214,7 @@ void CProConnectHandlerPool::Init(int nObjcetCount)
 
             if(-1 != nHashPos)
             {
+                pHandler->Init(nHashPos);
                 pHandler->SetHashID(nHashPos);
             }
 
