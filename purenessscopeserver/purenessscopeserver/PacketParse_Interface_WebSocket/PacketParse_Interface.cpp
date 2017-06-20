@@ -33,6 +33,7 @@ extern "C"
     DECLDIR uint32 Make_Send_Packet_Length(uint32 u4ConnectID, uint32 u4DataLen, uint16 u2CommandID);
     DECLDIR bool Connect(uint32 u4ConnectID, _ClientIPInfo objClientIPInfo, _ClientIPInfo objLocalIPInfo);
     DECLDIR void DisConnect(uint32 u4ConnectID);
+    DECLDIR void Close();
 
     //用于WebSocket解析的内部函数
     uint8 WebSocketDisposeHandIn(_WebSocketInfo* pWebSocketInfo, ACE_Message_Block* pCurrMessage, IMessageBlockManager* pMessageBlockManager, _Packet_Info* pPacketInfo);
@@ -512,6 +513,12 @@ extern "C"
         else
         {
             return u1Ret;
+        }
+
+        //插件退出的时候调用
+        void Close()
+        {
+            OUR_DEBUG((LM_INFO, "[CPacketParse::Close]exit.\n"));
         }
 
     }

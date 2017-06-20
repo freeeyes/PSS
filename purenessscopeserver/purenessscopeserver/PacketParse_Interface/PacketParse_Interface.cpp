@@ -40,6 +40,7 @@ extern "C"
     DECLDIR uint32 Make_Send_Packet_Length(uint32 u4ConnectID, uint32 u4DataLen, uint16 u2CommandID);
     DECLDIR bool Connect(uint32 u4ConnectID, _ClientIPInfo objClientIPInfo, _ClientIPInfo objLocalIPInfo);
     DECLDIR void DisConnect(uint32 u4ConnectID);
+    DECLDIR void Close();
 
     //解析包头，需要填充pHeadInfo数据结构，完成后填充_Head_Info的数据结构
     bool Parse_Packet_Head_Info(uint32 u4ConnectID, ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager, _Head_Info* pHeadInfo)
@@ -182,5 +183,11 @@ extern "C"
         PACKETPARSE_SHOW_BEGIN
         OUR_DEBUG((LM_INFO, "[CPacketParse::Connect]u4ConnectID=%d\n", u4ConnectID));
         PACKETPARSE_SHOW_END
+    }
+
+    //插件退出的时候调用
+    void Close()
+    {
+        OUR_DEBUG((LM_INFO, "[CPacketParse::Close]exit.\n"));
     }
 }

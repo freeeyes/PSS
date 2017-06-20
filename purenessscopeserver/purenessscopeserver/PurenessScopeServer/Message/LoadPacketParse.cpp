@@ -97,6 +97,14 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
         return false;
     }
 
+    pPacketParseInfo->Close = (void(*)())ACE_OS::dlsym(pPacketParseInfo->m_hModule, "Close");
+
+    if (NULL == pPacketParseInfo->m_hModule || !pPacketParseInfo->Close)
+    {
+        OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function Close is error!\n", szPacketParseName));
+        return false;
+    }
+
     //添加到HashPool里面
     char szPacketID[10] = { '\0' };
     sprintf_safe(szPacketID, 10, "%d", pPacketParseInfo->m_u4PacketParseID);
@@ -139,6 +147,7 @@ void CLoadPacketParse::Close()
     {
         if (NULL != vecPacketParseList[i] && NULL != vecPacketParseList[i]->m_hModule)
         {
+            vecPacketParseList[i]->Close();
             int nRet = ACE_OS::dlclose(vecPacketParseList[i]->m_hModule);
             OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::Close]PacketID=%d, ret=%d.\n", vecPacketParseList[i]->m_u4PacketParseID, nRet));
         }

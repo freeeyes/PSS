@@ -24,6 +24,7 @@ struct _Packet_Parse_Info
     uint32 (*Make_Send_Packet_Length)(uint32 u4ConnectID, uint32 u4DataLen, uint16 u2CommandID);
     bool (*Connect)(uint32 u4ConnectID, _ClientIPInfo objClientIPInfo, _ClientIPInfo objLocalIPInfo);
     void (*DisConnect)(uint32 u4ConnectID);
+    void(*Close)();
 
     _Packet_Parse_Info()
     {
@@ -38,6 +39,7 @@ struct _Packet_Parse_Info
         Make_Send_Packet_Length = NULL;
         Connect                 = NULL;
         DisConnect              = NULL;
+        Close                   = NULL;
     }
 };
 
