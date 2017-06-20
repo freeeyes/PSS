@@ -163,7 +163,7 @@ void CProConsoleHandle::open(ACE_HANDLE h, ACE_Message_Block&)
         return;
     }
 
-    RecvClinetPacket(m_pPacketParse->GetPacketHeadLen());
+    RecvClinetPacket(MAX_CONSOLE_HEAD_LENGTH);
 
     return;
 }
@@ -239,7 +239,7 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         }
 
     }
-    else if(mb.length() == m_pPacketParse->GetPacketHeadLen() && m_pPacketParse->GetIsHandleHead())
+    else if(mb.length() == MAX_CONSOLE_HEAD_LENGTH && m_pPacketParse->GetIsHandleHead())
     {
         //判断头的合法性
         m_pPacketParse->SetPacketHead(GetConnectID(), &mb, App_MessageBlockManager::instance());
@@ -288,7 +288,7 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
             Close();
 
             //接受下一个数据包
-            RecvClinetPacket(m_pPacketParse->GetPacketHeadLen());
+            RecvClinetPacket(MAX_CONSOLE_HEAD_LENGTH);
         }
     }
 

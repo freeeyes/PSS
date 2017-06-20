@@ -155,7 +155,7 @@ int CConsoleHandler::open(void*)
     }
 
     //申请头的大小对应的mb
-    m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadLen());
+    m_pCurrMessage = App_MessageBlockManager::instance()->Create(MAX_CONSOLE_HEAD_LENGTH);
 
     if (m_pCurrMessage == NULL)
     {
@@ -301,7 +301,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
         Close();
         return 0;
     }
-    else if (m_pCurrMessage->length() == m_pPacketParse->GetPacketHeadLen() && m_pPacketParse->GetIsHandleHead())
+    else if (m_pCurrMessage->length() == MAX_CONSOLE_HEAD_LENGTH && m_pPacketParse->GetIsHandleHead())
     {
         m_pPacketParse->SetPacketHead(GetConnectID(), m_pCurrMessage, App_MessageBlockManager::instance());
         uint32 u4PacketBodyLen = m_pPacketParse->GetPacketBodyLen();
@@ -390,7 +390,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
             }
 
             //申请头的大小对应的mb
-            m_pCurrMessage = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadLen());
+            m_pCurrMessage = App_MessageBlockManager::instance()->Create(MAX_CONSOLE_HEAD_LENGTH);
 
             if (m_pCurrMessage == NULL)
             {
