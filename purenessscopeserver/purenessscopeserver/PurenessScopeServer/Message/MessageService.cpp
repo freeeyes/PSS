@@ -825,8 +825,6 @@ bool CMessageServiceGroup::CheckPlugInState()
 
 CThreadInfo* CMessageServiceGroup::GetThreadInfo()
 {
-    m_objAllThreadInfo.Close();
-
     for(uint32 i = 0; i < (uint32)m_vecMessageService.size(); i++)
     {
         CMessageService* pMessageService = m_vecMessageService[i];
