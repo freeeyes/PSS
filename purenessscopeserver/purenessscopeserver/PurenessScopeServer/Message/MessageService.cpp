@@ -165,7 +165,7 @@ int CMessageService::svc(void)
 
         CMessage* msg = *((CMessage**)mb->base());
 
-        if(! msg)
+        if(!msg)
         {
             OUR_DEBUG((LM_ERROR,"[CMessageService::svc] mb msg == NULL CurrthreadNo=[%d]!\n", m_u4ThreadID));
             continue;

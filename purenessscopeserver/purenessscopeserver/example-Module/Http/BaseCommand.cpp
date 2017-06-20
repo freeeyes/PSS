@@ -83,8 +83,17 @@ int CBaseCommand::DoMessage_HttpData(IMessage* pMessage, bool& bDeleteFlag)
     if(NULL != m_pServerObject->GetConnectManager())
     {
         //发送全部数据
-        m_pServerObject->GetConnectManager()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID, szReturnData,
-                (uint32)ACE_OS::strlen(szReturnData), SENDMESSAGE_JAMPNOMAL, u2PostCommandID, PACKET_SEND_IMMEDIATLY, PACKET_IS_SELF_RECYC);
+        //m_pServerObject->GetConnectManager()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID, szReturnData,
+        //        (uint32)ACE_OS::strlen(szReturnData), SENDMESSAGE_JAMPNOMAL, u2PostCommandID, PACKET_SEND_IMMEDIATLY, PACKET_IS_SELF_RECYC);
+
+        const char* ptrReturnData = reinterpret_cast<const char*>(szReturnData);
+        m_pServerObject->GetConnectManager()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID,
+                ptrReturnData,
+                (uint32)ACE_OS::strlen(szReturnData),
+                SENDMESSAGE_JAMPNOMAL,
+                u2PostCommandID,
+                PACKET_SEND_IMMEDIATLY,
+                PACKET_IS_SELF_RECYC);
     }
     else
     {

@@ -151,7 +151,7 @@ bool CProConnectHandle::Close(int nIOCount, int nErrno)
 
         m_ThreadWriteLock.release();
 
-        OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::Close] Close(%d) delete OK.\n", GetConnectID()));
+        OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close](0x%08x)Close(ConnectID=%d) OK.\n", this, GetConnectID()));
 
         //删除存在列表中的对象引用
         App_ProConnectManager::instance()->Close(GetConnectID());
@@ -356,7 +356,7 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
         OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
     }
 
-    OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::open] Open(%d) [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
+    OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::open]Open(%d) Connection from [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
 
     if(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
     {
@@ -2257,10 +2257,11 @@ CProConnectHandle* CProConnectHandlerPool::Create()
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
     //在Hash表中弹出一个已使用的数据
-    CProConnectHandle* pHandlerpHandler = m_objHashHandleList.Pop();
+    CProConnectHandle* pHandler = m_objHashHandleList.Pop();
+    //OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Create]pHandler(0x%08x)\n", pHandler));
 
     //没找到空余的
-    return pHandlerpHandler;
+    return pHandler;
 }
 
 bool CProConnectHandlerPool::Delete(CProConnectHandle* pObject)
@@ -2357,41 +2358,22 @@ bool CProConnectManagerGroup::AddConnect(CProConnectHandle* pConnectHandler)
 {
     int  nCount = 0;
 
-    while(true)
+    uint32 u4ConnectID = GetGroupIndex();
+
+    //判断命中到哪一个线程组里面去
+    uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
+
+    CProConnectManager* pConnectManager = m_objProConnnectManagerList[u2ThreadIndex];
+
+    if(NULL == pConnectManager)
     {
-        //最多循环5次，如果5次还找不到则返回false。
-        if(nCount >= 5)
-        {
-            return false;
-        }
-
-        uint32 u4ConnectID = GetGroupIndex();
-
-        //判断命中到哪一个线程组里面去
-        uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
-
-        CProConnectManager* pConnectManager = m_objProConnnectManagerList[u2ThreadIndex];
-
-        if(NULL == pConnectManager)
-        {
-            OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::AddConnect]No find send Queue object.\n"));
-            return false;
-        }
-
-        bool blRet = pConnectManager->AddConnect(u4ConnectID, pConnectHandler);
-
-        if(true == blRet)
-        {
-            return true;
-        }
-
-        nCount++;
+        OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::AddConnect]No find send Queue object.\n"));
+        return false;
     }
-
 
     //OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::Init]u4ConnectID=%d, u2ThreadIndex=%d.\n", u4ConnectID, u2ThreadIndex));
 
-    return false;
+    return pConnectManager->AddConnect(u4ConnectID, pConnectHandler);
 }
 
 bool CProConnectManagerGroup::PostMessage(uint32 u4ConnectID, IBuffPacket*& pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)

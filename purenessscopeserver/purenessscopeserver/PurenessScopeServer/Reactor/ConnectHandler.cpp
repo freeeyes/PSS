@@ -113,6 +113,8 @@ bool CConnectHandler::Close(int nIOCount)
         shutdown();
         AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %dws, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %dws.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, (uint32)m_u8RecvQueueTimeCost, m_u4RecvQueueCount, (uint32)m_u8SendQueueTimeCost);
 
+        OUR_DEBUG((LM_ERROR, "[CConnectHandler::Close](0x%08x)Close(ConnectID=%d) OK.\n", this, GetConnectID()));
+        
         //删除链接对象
         App_ConnectManager::instance()->CloseConnectByClient(GetConnectID());
 
@@ -120,7 +122,6 @@ bool CConnectHandler::Close(int nIOCount)
 
         //回归用过的指针
         App_ConnectHandlerPool::instance()->Delete(this);
-        OUR_DEBUG((LM_ERROR, "[CConnectHandler::Close](0x%08x)Close(ConnectID=%d) OK.\n", this, GetConnectID()));
         return true;
     }
 
@@ -296,7 +297,7 @@ int CConnectHandler::open(void*)
 
     //设置默认别名
     SetConnectName(m_addrRemote.get_host_addr());
-    OUR_DEBUG((LM_INFO, "[CConnectHandler::open] Connection from [%s:%d]\n",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
+    //OUR_DEBUG((LM_INFO, "[CConnectHandler::open] Connection from [%s:%d]\n",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
 
     //初始化当前链接的某些参数
     m_atvConnect          = ACE_OS::gettimeofday();
@@ -336,7 +337,7 @@ int CConnectHandler::open(void*)
 
     if(NULL == m_pPacketParse)
     {
-        OUR_DEBUG((LM_DEBUG,"[CConnectHandler::open] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
+        OUR_DEBUG((LM_DEBUG,"[CConnectHandler::open]Open(%d) m_pPacketParse new error.\n", GetConnectID()));
         return -1;
     }
 
@@ -353,7 +354,7 @@ int CConnectHandler::open(void*)
     if(m_pCurrMessage == NULL)
     {
         //AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %d, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, m_u8RecvQueueTimeCost, m_u4RecvQueueCount, m_u8SendQueueTimeCost);
-        OUR_DEBUG((LM_ERROR, "[CConnectHandler::open] pmb new is NULL.\n"));
+        OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]pmb new is NULL.\n"));
 
         App_ConnectManager::instance()->Close(GetConnectID());
         return -1;
@@ -386,6 +387,8 @@ int CConnectHandler::open(void*)
     {
         OUR_DEBUG((LM_ERROR, "[CConnectHandler::open] ConnectID=%d, PACKET_CONNECT is error.\n", GetConnectID()));
     }
+
+    OUR_DEBUG((LM_DEBUG,"[CConnectHandler::open]Open(%d) Connection from [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
 
     m_u1ConnectState = CONNECT_OPEN;
 
