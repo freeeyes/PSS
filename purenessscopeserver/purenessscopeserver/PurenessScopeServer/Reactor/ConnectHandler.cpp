@@ -45,6 +45,7 @@ CConnectHandler::CConnectHandler(void)
 
 CConnectHandler::~CConnectHandler(void)
 {
+    this->closing_ = true;
     //OUR_DEBUG((LM_INFO, "[CConnectHandler::~CConnectHandler].\n"));
     //OUR_DEBUG((LM_INFO, "[CConnectHandler::~CConnectHandler]End.\n"));
 }
@@ -114,7 +115,7 @@ bool CConnectHandler::Close(int nIOCount)
         AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %dws, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %dws.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, (uint32)m_u8RecvQueueTimeCost, m_u4RecvQueueCount, (uint32)m_u8SendQueueTimeCost);
 
         OUR_DEBUG((LM_ERROR, "[CConnectHandler::Close](0x%08x)Close(ConnectID=%d) OK.\n", this, GetConnectID()));
-        
+
         //É¾³ýÁ´½Ó¶ÔÏó
         App_ConnectManager::instance()->CloseConnectByClient(GetConnectID());
 
