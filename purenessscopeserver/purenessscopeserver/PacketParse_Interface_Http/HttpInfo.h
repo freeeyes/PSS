@@ -54,12 +54,12 @@ public:
                 }
             }
         }
-    };
+    }
 
     ~CHttpInfoPool()
     {
         Close();
-    };
+    }
 
     void Close()
     {
@@ -119,7 +119,7 @@ public:
         }
 
         return (_HttpInfo* )pHttpInfo;
-    };
+    }
 
     bool Delete(_HttpInfo* pHttpInfo)
     {
@@ -150,7 +150,7 @@ public:
         }
 
         return true;
-    };
+    }
 
 private:
     typedef map<_HttpInfo*, _HttpInfo*> mapPacket;
