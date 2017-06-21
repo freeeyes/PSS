@@ -1033,24 +1033,6 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
     }
 }
 
-bool CProConnectHandle::CheckAlive(ACE_Time_Value& tvNow)
-{
-    //ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-    ACE_Time_Value tvIntval(tvNow - m_atvInput);
-
-    if(tvIntval.sec() > m_u2MaxConnectTime)
-    {
-        //如果超过了最大时间，则服务器关闭链接
-        OUR_DEBUG ((LM_ERROR, "[CProConnectHandle::CheckAlive] Connectid=%d Server Close!\n", GetConnectID()));
-
-        return false;
-    }
-    else
-    {
-        return true;
-    }
-}
-
 bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 {
     if(NULL == pMbData)
@@ -1280,6 +1262,7 @@ bool CProConnectHandle::CheckMessage()
         }
 
         //OUR_DEBUG((LM_ERROR, "[CProConnectHandle::CheckMessage] ConnectID = %d, put OK.\n", GetConnectID()));
+        App_ProConnectManager::instance()->SetConnectTimeWheel(this);
 
         //清理用完的m_pPacketParse
         App_PacketParsePool::instance()->Delete(m_pPacketParse);
@@ -1466,8 +1449,11 @@ bool CProConnectManager::Close(uint32 u4ConnectID)
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
     //OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close](%d)Begin.\n", u4ConnectID));
 
-    char szConnectID[10] = {'\0'};
+    //从时间轮盘中清除
+    char szConnectID[10] = { '\0' };
     sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
+    App_ProConnectManager::instance()->DelConnectTimeWheel(m_objHashConnectList.Get_Hash_Box_Data(szConnectID));
+
     m_objHashConnectList.Del_Hash_Data(szConnectID);
     m_u4TimeDisConnect++;
 
@@ -1491,6 +1477,9 @@ bool CProConnectManager::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status
 
     if(pConnectHandler != NULL)
     {
+        //从时间轮盘中清除
+        App_ProConnectManager::instance()->DelConnectTimeWheel(m_objHashConnectList.Get_Hash_Box_Data(szConnectID));
+
         pConnectHandler->ServerClose(emStatus);
 
         m_u4TimeDisConnect++;
@@ -1544,10 +1533,25 @@ bool CProConnectManager::AddConnect(uint32 u4ConnectID, CProConnectHandle* pConn
     //加入链接统计功能
     App_ConnectAccount::instance()->AddConnect();
 
+    //加入时间轮盘
+    SetConnectTimeWheel(pConnectHandler);
+
     //m_ThreadWriteLock.release();
 
     //OUR_DEBUG((LM_ERROR, "[CProConnectHandle::AddConnect](%d)End.\n", u4ConnectID));
 
+    return true;
+}
+
+bool CProConnectManager::SetConnectTimeWheel(CProConnectHandle* pConnectHandler)
+{
+    m_TimeWheelLink.Add_TimeWheel_Object(pConnectHandler);
+    return true;
+}
+
+bool CProConnectManager::DelConnectTimeWheel(CProConnectHandle* pConnectHandler)
+{
+    m_TimeWheelLink.Add_TimeWheel_Object(pConnectHandler);
     return true;
 }
 
@@ -1721,39 +1725,9 @@ int CProConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg
 {
     //ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
     ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-    vector<CProConnectHandle*> vecDelProConnectHandle;
 
-    //为了防止多线程下的链接删除问题，先把所有的链接ID读出来，再做遍历操作，减少线程竞争的机会。
-    if(m_objHashConnectList.Get_Used_Count() != 0)
-    {
-        m_ThreadWriteLock.acquire();
-        vector<CProConnectHandle*> vecProConnectHandle;
-        m_objHashConnectList.Get_All_Used(vecProConnectHandle);
-
-        for(int i = 0; i < (int)vecProConnectHandle.size(); i++)
-        {
-            CProConnectHandle* pConnectHandler = vecProConnectHandle[i];
-
-            if(pConnectHandler != NULL)
-            {
-                if(false == pConnectHandler->CheckAlive(tvNow))
-                {
-                    vecDelProConnectHandle.push_back(pConnectHandler);
-                }
-            }
-        }
-
-        m_ThreadWriteLock.release();
-    }
-
-    for(uint32 i = 0; i < (uint32)vecDelProConnectHandle.size(); i++)
-    {
-        //关闭引用关系
-        Close(vecDelProConnectHandle[i]->GetConnectID());
-        //回收发送内存块
-        m_SendCacheManager.FreeCacheData(vecDelProConnectHandle[i]->GetConnectID());
-        vecDelProConnectHandle[i]->ServerClose(CLIENT_CLOSE_IMMEDIATLY);
-    }
+    //转动时间轮盘
+    m_TimeWheelLink.Tick();
 
     //判定是否应该记录链接日志
     ACE_Time_Value tvInterval(tvNow - m_tvCheckConnect);
@@ -2150,6 +2124,23 @@ void CProConnectManager::Init(uint16 u2Index)
     //初始化Hash表
     uint16 u2PoolSize = App_MainConfig::instance()->GetMaxHandlerCount();
     m_objHashConnectList.Init((int)u2PoolSize);
+
+    //初始化时间轮盘
+    m_TimeWheelLink.Init(App_MainConfig::instance()->GetMaxConnectTime(), App_MainConfig::instance()->GetCheckAliveTime(), (int)u2PoolSize, CProConnectManager::TimeWheel_Timeout_Callback, (void* )this);
+}
+
+void CProConnectManager::TimeWheel_Timeout_Callback(void* pArgsContext, vector<CProConnectHandle*> vecProConnectHandle)
+{
+    for (int i = 0; i < (int)vecProConnectHandle.size(); i++)
+    {
+        //断开超时的链接
+        CProConnectManager* pManager = (CProConnectManager*)pArgsContext;
+
+        if (NULL != pManager)
+        {
+            pManager->CloseConnect(vecProConnectHandle[i]->GetConnectID(), CLIENT_CLOSE_IMMEDIATLY);
+        }
+    }
 }
 
 _CommandData* CProConnectManager::GetCommandData(uint16 u2CommandID)
@@ -2177,6 +2168,11 @@ EM_Client_Connect_status CProConnectManager::GetConnectState(uint32 u4ConnectID)
     {
         return CLIENT_CONNECT_NO_EXIST;
     }
+}
+
+CSendCacheManager* CProConnectManager::GetSendCacheManager()
+{
+    return &m_SendCacheManager;
 }
 
 //*********************************************************************************
@@ -2374,6 +2370,46 @@ bool CProConnectManagerGroup::AddConnect(CProConnectHandle* pConnectHandler)
     //OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::Init]u4ConnectID=%d, u2ThreadIndex=%d.\n", u4ConnectID, u2ThreadIndex));
 
     return pConnectManager->AddConnect(u4ConnectID, pConnectHandler);
+}
+
+bool CProConnectManagerGroup::SetConnectTimeWheel(CProConnectHandle* pConnectHandler)
+{
+    int  nCount = 0;
+
+    uint32 u4ConnectID = GetGroupIndex();
+
+    //判断命中到哪一个线程组里面去
+    uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
+
+    CProConnectManager* pConnectManager = m_objProConnnectManagerList[u2ThreadIndex];
+
+    if (NULL == pConnectManager)
+    {
+        OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::AddConnect]No find send Queue object.\n"));
+        return false;
+    }
+
+    return pConnectManager->SetConnectTimeWheel(pConnectHandler);
+}
+
+bool CProConnectManagerGroup::DelConnectTimeWheel(CProConnectHandle* pConnectHandler)
+{
+    int  nCount = 0;
+
+    uint32 u4ConnectID = GetGroupIndex();
+
+    //判断命中到哪一个线程组里面去
+    uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
+
+    CProConnectManager* pConnectManager = m_objProConnnectManagerList[u2ThreadIndex];
+
+    if (NULL == pConnectManager)
+    {
+        OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::AddConnect]No find send Queue object.\n"));
+        return false;
+    }
+
+    return pConnectManager->DelConnectTimeWheel(pConnectHandler);
 }
 
 bool CProConnectManagerGroup::PostMessage(uint32 u4ConnectID, IBuffPacket*& pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)

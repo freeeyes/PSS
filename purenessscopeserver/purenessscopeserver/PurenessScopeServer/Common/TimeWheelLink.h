@@ -12,29 +12,30 @@ using namespace std;
 #define INVAILD_BLOCKID   -1  //无效的块号
 
 //函数指针模板
-template<class T, void(*Timeout_Callback)(vector<T*>)>
-void Timeout_Callback_Ex(vector<T*> a)
+template<class T, void(*Timeout_Callback)(void*, vector<T*>)>
+void Timeout_Callback_Ex(void* p, vector<T*> a)
 {
-    Timeout_Callback(a);
+    Timeout_Callback(p, a);
 }
 
 template <class T>
 class CTimeWheelLink
 {
 private:
-    typedef void(*Timeout_Callback)(vector<T*>);
+    typedef void(*Timeout_Callback)(void*, vector<T*>);
 
 public:
     CTimeWheelLink()
     {
-        m_nTimeInterval = 0;
-        m_nTimeCycle = 0;
-        m_nContainSize = 0;
-        m_nCurrBlockID = 0;
+        m_nTimeInterval       = 0;
+        m_nTimeCycle          = 0;
+        m_nContainSize        = 0;
+        m_nCurrBlockID        = 0;
         m_fn_Timeout_Callback = NULL;
-        m_pBlockIDList = NULL;
-        m_nBlockIDListIndex = 0;
-        m_nBlackCount = 0;
+        m_pBlockIDList        = NULL;
+        m_nBlockIDListIndex   = 0;
+        m_nBlackCount         = 0;
+        m_pArgContext         = NULL;
     };
 
     ~CTimeWheelLink()
@@ -43,14 +44,15 @@ public:
     };
 
     //初始化轮盘
-    void Init(int nTimeCycle, int nTimeInterval, int nContainSize, Timeout_Callback fn_Timeout_Callback)
+    void Init(int nTimeCycle, int nTimeInterval, int nContainSize, Timeout_Callback fn_Timeout_Callback, void* pArgContext)
     {
         Close();
 
-        m_nTimeInterval = nTimeInterval;
-        m_nTimeCycle = nTimeCycle;
-        m_nContainSize = nContainSize;
+        m_nTimeInterval       = nTimeInterval;
+        m_nTimeCycle          = nTimeCycle;
+        m_nContainSize        = nContainSize;
         m_fn_Timeout_Callback = fn_Timeout_Callback;
+        m_pArgContext         = pArgContext;
 
         //获得容器中块的总大小
         if (nTimeCycle % m_nTimeInterval != 0)
@@ -107,7 +109,7 @@ public:
     };
 
     //往轮盘里添加一个对象
-    bool Add_TimeWheel_Entey(T* pEntey)
+    bool Add_TimeWheel_Object(T* pEntey)
     {
         //首先判断该指针是否存在在某一个容器中
         char szKey[MAX_TIMEWHEEL_KEY] = { '\0' };
@@ -165,7 +167,7 @@ public:
     };
 
     //删除轮盘里面的一个对象
-    void Del_TimeWheel_Entey(T* pEntey)
+    void Del_TimeWheel_Object(T* pEntey)
     {
         char szKey[MAX_TIMEWHEEL_KEY] = { '\0' };
         sprintf_safe(szKey, MAX_TIMEWHEEL_KEY, "%16x", pEntey);
@@ -227,7 +229,7 @@ public:
 
         if (NULL != m_fn_Timeout_Callback)
         {
-            m_fn_Timeout_Callback(vecEntey);
+            m_fn_Timeout_Callback(m_pArgContext, vecEntey);
         }
 
         //OUR_DEBUG((LM_INFO, "[CTimeWheelLink::Tick]nLastBlockID=%d, m_nCurrBlockID=%d.\n", nLastBlockID, m_nCurrBlockID));
@@ -254,6 +256,7 @@ private:
     int              m_nBlackCount;                       //轮盘里指针块的数量
 
     Timeout_Callback m_fn_Timeout_Callback;               //回调函数接口
+    void*            m_pArgContext;                       //回调上下文参数指针
 };
 #endif
 

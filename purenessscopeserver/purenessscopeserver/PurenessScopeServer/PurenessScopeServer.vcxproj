@@ -515,6 +515,7 @@
   <ItemGroup>
     <ClInclude Include="Common\HashTable.h" />
     <ClInclude Include="Common\ServerMessageTask.h" />
+    <ClInclude Include="Common\TimeWheelLink.h" />
     <ClInclude Include="Encrypt\Aes.h" />
     <ClInclude Include="IObject\ClientCommand.h" />
     <ClInclude Include="IObject\IBuffPacket.h" />

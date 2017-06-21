@@ -624,6 +624,7 @@
     </ClInclude>
     <ClInclude Include="Common\ServerMessageTask.h" />
     <ClInclude Include="Common\HashTable.h" />
+    <ClInclude Include="Common\TimeWheelLink.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Reactor\My_Dev_Poll_Reactor.inl">

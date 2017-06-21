@@ -37,6 +37,7 @@
 #include "CommandAccount.h"
 #include "SendCacheManager.h"
 #include "LoadPacketParse.h"
+#include "TimeWheelLink.h"
 
 #include <vector>
 
@@ -54,7 +55,6 @@ public:
 
     void Init(uint16 u2HandlerID);                                            //Connect Pool初始化调用的函数
 
-    bool CheckAlive(ACE_Time_Value& tvNow);                                   //检测当前链接是否超时的函数
     bool SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, uint8 u1State, uint8 u1SendType, uint32& u4PacketSize, bool blDelete, int nMessageID);   //发送给客户端数据的函数
     bool Close(int nIOCount = 1, int nErrno = 0);                                                  //当前连接对象关闭
     bool ServerClose(EM_Client_Close_status emStatus, uint8 u1OptionEvent = PACKET_SDISCONNECT);   //服务器关闭客户端链接的函数
@@ -155,6 +155,8 @@ public:
 
     void Init(uint16 u2Index);
 
+    static void TimeWheel_Timeout_Callback(void* pArgsContext, vector<CProConnectHandle*> vecProConnectHandle);
+
     virtual int open(void* args = 0);
     virtual int svc (void);
     virtual int close (u_long);
@@ -162,6 +164,8 @@ public:
 
     void CloseAll();                                                                                         //关闭所有链接信息
     bool AddConnect(uint32 u4ConnectID, CProConnectHandle* pConnectHandler);                                 //添加一个新的链接信息
+    bool SetConnectTimeWheel(CProConnectHandle* pConnectHandler);                                            //设置消息轮盘
+    bool DelConnectTimeWheel(CProConnectHandle* pConnectHandler);                                            //删除消息轮盘
     bool SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint16 u2CommandID, uint8 u1SendState, uint8 u1SendType, ACE_Time_Value& tvSendBegin, bool blDelete, int nMessageID);          //发送数据
     bool PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,
                      uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDelete = true, int nMessageID = 0);    //异步发送
@@ -181,7 +185,7 @@ public:
     _ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID);                                                        //得到监听链接信息
     uint32 GetCommandFlowAccount();                                                                          //得到出口流量信息
     EM_Client_Connect_status GetConnectState(uint32 u4ConnectID);                                            //得到指定的连接状态
-
+    CSendCacheManager* GetSendCacheManager();                                                                //得到内存块管理器
 
     bool StartTimer();
     bool KillTimer();
@@ -205,6 +209,7 @@ private:
     uint32                             m_u4TimeDisConnect;      //单位时间连接断开数
     CCommandAccount                    m_CommandAccount;        //当前线程命令统计数据
     CSendCacheManager                  m_SendCacheManager;      //发送缓冲池
+    CTimeWheelLink<CProConnectHandle>  m_TimeWheelLink;         //连接时间轮盘
 };
 
 //链接ConnectHandler内存池
@@ -240,6 +245,10 @@ public:
     void Close();
 
     bool AddConnect(CProConnectHandle* pConnectHandler);
+
+    bool SetConnectTimeWheel(CProConnectHandle* pConnectHandler);                                            //设置消息轮盘
+    bool DelConnectTimeWheel(CProConnectHandle* pConnectHandler);                                            //删除消息轮盘
+
     bool PostMessage(uint32 u4ConnectID, IBuffPacket*& pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,
                      uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDlete = true, int nMessageID = 0);    //异步发送
     bool PostMessage(uint32 u4ConnectID, const char*& pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL,
