@@ -36,12 +36,12 @@ public:
         m_nBlockIDListIndex   = 0;
         m_nBlackCount         = 0;
         m_pArgContext         = NULL;
-    };
+    }
 
     ~CTimeWheelLink()
     {
         Close();
-    };
+    }
 
     //初始化轮盘
     void Init(int nTimeCycle, int nTimeInterval, int nContainSize, Timeout_Callback fn_Timeout_Callback, void* pArgContext)
@@ -86,7 +86,7 @@ public:
         m_nBlockIDListIndex = 0;
 
         m_nCurrBlockID = 0;
-    };
+    }
 
     //清理轮盘
     void Close()
@@ -106,7 +106,7 @@ public:
 
         m_nBlockIDListIndex = 0;
         m_nBlackCount = 0;
-    };
+    }
 
     //往轮盘里添加一个对象
     bool Add_TimeWheel_Object(T* pEntey)
@@ -150,7 +150,6 @@ public:
             *pCurrBlockListID = INVAILD_BLOCKID;
             m_htIndexList.Del_Hash_Data(szKey);
 
-
             if (0 > m_vecHashContain[m_nCurrBlockID]->Add_Hash_Data(szKey, pEntey))
             {
                 return false;
@@ -164,7 +163,7 @@ public:
                 return true;
             }
         }
-    };
+    }
 
     //删除轮盘里面的一个对象
     void Del_TimeWheel_Object(T* pEntey)
@@ -179,7 +178,7 @@ public:
             // 删除这个指针在旧容器里面的数据，将这个数据放在最新的容器中。
             m_vecHashContain[*pCurrBlockListID]->Del_Hash_Data(szKey);
         }
-    };
+    }
 
     //得到一个空闲的m_pBlockIDList位置
     int* Get_BlockIDList_Cell()
@@ -205,7 +204,7 @@ public:
         }
 
         return NULL;
-    };
+    }
 
     //轮盘转动
     void Tick()
@@ -240,7 +239,7 @@ public:
 
         m_vecHashContain[nLastBlockID]->Clear();
         m_nCurrBlockID = nLastBlockID;
-    };
+    }
 private:
     typedef vector<CHashTable<T>*> vecHashContain;
 

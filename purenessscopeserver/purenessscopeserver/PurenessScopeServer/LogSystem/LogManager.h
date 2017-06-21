@@ -34,7 +34,6 @@ private:
     uint32         m_u4CurrIndex;         //日志池中当前已用到的日志块ID
 };
 
-
 class CLogManager : public ACE_Task<ACE_MT_SYNCH>, public ILogManager
 {
 public:
@@ -89,8 +88,6 @@ private:
     CServerLogger*                    m_pServerLogger;            //日志模块指针
 };
 
-
 typedef ACE_Singleton<CLogManager, ACE_Recursive_Thread_Mutex> AppLogManager;
-
 
 #endif
