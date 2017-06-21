@@ -1262,6 +1262,7 @@ bool CProConnectHandle::CheckMessage()
         }
 
         //OUR_DEBUG((LM_ERROR, "[CProConnectHandle::CheckMessage] ConnectID = %d, put OK.\n", GetConnectID()));
+        //更新时间轮盘
         App_ProConnectManager::instance()->SetConnectTimeWheel(this);
 
         //清理用完的m_pPacketParse
@@ -1452,7 +1453,8 @@ bool CProConnectManager::Close(uint32 u4ConnectID)
     //从时间轮盘中清除
     char szConnectID[10] = { '\0' };
     sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
-    App_ProConnectManager::instance()->DelConnectTimeWheel(m_objHashConnectList.Get_Hash_Box_Data(szConnectID));
+    //连接关闭，清除时间轮盘
+    DelConnectTimeWheel(m_objHashConnectList.Get_Hash_Box_Data(szConnectID));
 
     m_objHashConnectList.Del_Hash_Data(szConnectID);
     m_u4TimeDisConnect++;
@@ -1478,7 +1480,7 @@ bool CProConnectManager::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status
     if(pConnectHandler != NULL)
     {
         //从时间轮盘中清除
-        App_ProConnectManager::instance()->DelConnectTimeWheel(m_objHashConnectList.Get_Hash_Box_Data(szConnectID));
+        DelConnectTimeWheel(m_objHashConnectList.Get_Hash_Box_Data(szConnectID));
 
         pConnectHandler->ServerClose(emStatus);
 

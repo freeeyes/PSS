@@ -1871,6 +1871,8 @@ bool CConnectHandler::CheckMessage()
         OUR_DEBUG((LM_ERROR, "[CConnectHandle::CheckMessage] ConnectID = %d, PutMessageBlock is error.\n", GetConnectID()));
     }
 
+    //更新时间轮盘
+    App_ConnectManager::instance()->SetConnectTimeWheel(this);
 
     App_PacketParsePool::instance()->Delete(m_pPacketParse);
 
@@ -2069,6 +2071,8 @@ bool CConnectManager::Close(uint32 u4ConnectID)
     //OUR_DEBUG((LM_ERROR, "[CConnectManager::Close]ConnectID=%d Begin 1.\n", u4ConnectID));
     char szConnectID[10] = {'\0'};
     sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
+    DelConnectTimeWheel(m_objHashConnectList.Get_Hash_Box_Data(szConnectID));
+
     int nPos = m_objHashConnectList.Del_Hash_Data(szConnectID);
 
     if(0 < nPos)
@@ -2094,6 +2098,9 @@ bool CConnectManager::CloseUnLock(uint32 u4ConnectID)
 {
     char szConnectID[10] = {'\0'};
     sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
+    //连接关闭，清除时间轮盘
+    DelConnectTimeWheel(m_objHashConnectList.Get_Hash_Box_Data(szConnectID));
+
     int nPos = m_objHashConnectList.Del_Hash_Data(szConnectID);
 
     if(0 < nPos)
@@ -2127,6 +2134,9 @@ bool CConnectManager::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status em
 
     if(NULL != pConnectHandler)
     {
+        //连接关闭，清除时间轮盘
+        DelConnectTimeWheel(pConnectHandler);
+
         //回收发送缓冲
         m_SendCacheManager.FreeCacheData(u4ConnectID);
         pConnectHandler->ServerClose(emStatus);
@@ -2180,7 +2190,22 @@ bool CConnectManager::AddConnect(uint32 u4ConnectID, CConnectHandler* pConnectHa
     //加入链接统计功能
     App_ConnectAccount::instance()->AddConnect();
 
+    //加入时间轮盘
+    SetConnectTimeWheel(pConnectHandler);
+
     //OUR_DEBUG((LM_ERROR, "[CConnectManager::AddConnect]ConnectID=%d End.\n", u4ConnectID));
+    return true;
+}
+
+bool CConnectManager::SetConnectTimeWheel(CConnectHandler* pConnectHandler)
+{
+    m_TimeWheelLink.Add_TimeWheel_Object(pConnectHandler);
+    return true;
+}
+
+bool CConnectManager::DelConnectTimeWheel(CConnectHandler* pConnectHandler)
+{
+    m_TimeWheelLink.Add_TimeWheel_Object(pConnectHandler);
     return true;
 }
 
@@ -2419,36 +2444,7 @@ int CConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
     //定时检测发送，这里将定时记录链接信息放入其中，减少一个定时器
     if(pTimerCheckID->m_u2TimerCheckID == PARM_CONNECTHANDLE_CHECK)
     {
-        if(m_objHashConnectList.Get_Used_Count() > 0)
-        {
-            m_ThreadWriteLock.acquire();
-            vector<CConnectHandler*> vecConnectHandler;
-            m_objHashConnectList.Get_All_Used(vecConnectHandler);
-
-            for(int i = 0; i < (int)vecConnectHandler.size(); i++)
-            {
-                CConnectHandler* pConnectHandler = vecConnectHandler[i];
-
-                if(pConnectHandler != NULL)
-                {
-                    if(false == pConnectHandler->CheckAlive(tvNow))
-                    {
-                        vecDelConnectHandler.push_back(pConnectHandler);
-                    }
-                }
-            }
-
-            m_ThreadWriteLock.release();
-        }
-
-        for(uint32 i= 0; i < vecDelConnectHandler.size(); i++)
-        {
-            //关闭引用关系
-            Close(vecDelConnectHandler[i]->GetConnectID());
-
-            //服务器关闭连接
-            vecDelConnectHandler[i]->ServerClose(CLIENT_CLOSE_IMMEDIATLY, PACKET_CHEK_TIMEOUT);
-        }
+        m_TimeWheelLink.Tick();
 
         //判定是否应该记录链接日志
         ACE_Time_Value tvNow = ACE_OS::gettimeofday();
@@ -2526,6 +2522,20 @@ int CConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
     }
 
     return 0;
+}
+
+void CConnectManager::TimeWheel_Timeout_Callback(void* pArgsContext, vector<CConnectHandler*> vecConnectHandle)
+{
+    for (int i = 0; i < (int)vecConnectHandle.size(); i++)
+    {
+        //断开超时的链接
+        CConnectManager* pManager = (CConnectManager*)pArgsContext;
+
+        if (NULL != pManager)
+        {
+            pManager->CloseConnect(vecConnectHandle[i]->GetConnectID(), CLIENT_CLOSE_IMMEDIATLY);
+        }
+    }
 }
 
 int CConnectManager::GetCount()
@@ -2894,6 +2904,9 @@ void CConnectManager::Init( uint16 u2Index )
     //初始化Hash表
     uint16 u2PoolSize = App_MainConfig::instance()->GetMaxHandlerCount();
     m_objHashConnectList.Init((int)u2PoolSize);
+
+    //初始化时间轮盘
+    m_TimeWheelLink.Init(App_MainConfig::instance()->GetMaxConnectTime(), App_MainConfig::instance()->GetCheckAliveTime(), (int)u2PoolSize, CConnectManager::TimeWheel_Timeout_Callback, (void*)this);
 }
 
 uint32 CConnectManager::GetCommandFlowAccount()
@@ -3107,6 +3120,50 @@ bool CConnectManagerGroup::AddConnect(CConnectHandler* pConnectHandler)
     //OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::Init]u4ConnectID=%d, u2ThreadIndex=%d.\n", u4ConnectID, u2ThreadIndex));
 
     return pConnectManager->AddConnect(u4ConnectID, pConnectHandler);
+}
+
+bool CConnectManagerGroup::SetConnectTimeWheel(CConnectHandler* pConnectHandler)
+{
+    ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
+
+    uint32 u4ConnectID = GetGroupIndex();
+
+    //判断命中到哪一个线程组里面去
+    uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
+
+    CConnectManager* pConnectManager = m_objConnnectManagerList[u2ThreadIndex];
+
+    if (NULL == pConnectManager)
+    {
+        OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::AddConnect]No find send Queue object.\n"));
+        return false;
+    }
+
+    //OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::Init]u4ConnectID=%d, u2ThreadIndex=%d.\n", u4ConnectID, u2ThreadIndex));
+
+    return pConnectManager->SetConnectTimeWheel(pConnectHandler);
+}
+
+bool CConnectManagerGroup::DelConnectTimeWheel(CConnectHandler* pConnectHandler)
+{
+    ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
+
+    uint32 u4ConnectID = GetGroupIndex();
+
+    //判断命中到哪一个线程组里面去
+    uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
+
+    CConnectManager* pConnectManager = m_objConnnectManagerList[u2ThreadIndex];
+
+    if (NULL == pConnectManager)
+    {
+        OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::AddConnect]No find send Queue object.\n"));
+        return false;
+    }
+
+    //OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::Init]u4ConnectID=%d, u2ThreadIndex=%d.\n", u4ConnectID, u2ThreadIndex));
+
+    return pConnectManager->DelConnectTimeWheel(pConnectHandler);
 }
 
 bool CConnectManagerGroup::PostMessage(uint32 u4ConnectID, IBuffPacket*& pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nServerID)

@@ -34,6 +34,7 @@
 #include "CommandAccount.h"
 #include "SendCacheManager.h"
 #include "LoadPacketParse.h"
+#include "TimeWheelLink.h"
 
 #ifdef __LINUX__
 #include "netinet/tcp.h"
@@ -158,6 +159,8 @@ public:
 
     virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);   //定时器检查
 
+    static void TimeWheel_Timeout_Callback(void* pArgsContext, vector<CConnectHandler*> vecConnectHandle);
+
     virtual int open(void* args = 0);
     virtual int svc(void);
     virtual int close(u_long);
@@ -166,6 +169,8 @@ public:
 
     void CloseAll();
     bool AddConnect(uint32 u4ConnectID, CConnectHandler* pConnectHandler);
+    bool SetConnectTimeWheel(CConnectHandler* pConnectHandler);                                            //设置消息轮盘
+    bool DelConnectTimeWheel(CConnectHandler* pConnectHandler);                                            //删除消息轮盘
     bool SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket,  uint16 u2CommandID, uint8 u1SendState, uint8 u1SendType, ACE_Time_Value& tvSendBegin, bool blDelete = true, int nServerID = 0);  //同步发送                                                                     //发送缓冲数据
     bool PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nServerID = 0); //异步发送
     bool PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nServerID = 0);                  //异步群发
@@ -209,6 +214,7 @@ private:
     uint32                             m_u4TimeDisConnect;      //单位时间连接断开数
     CCommandAccount                    m_CommandAccount;        //当前线程命令统计数据
     CSendCacheManager                  m_SendCacheManager;      //发送缓冲管理
+    CTimeWheelLink<CConnectHandler>    m_TimeWheelLink;         //连接时间轮盘
 };
 
 //链接ConnectHandler内存池
@@ -244,6 +250,8 @@ public:
     void Close();
 
     bool AddConnect(CConnectHandler* pConnectHandler);
+    bool SetConnectTimeWheel(CConnectHandler* pConnectHandler);                                            //设置消息轮盘
+    bool DelConnectTimeWheel(CConnectHandler* pConnectHandler);                                            //删除消息轮盘
     bool PostMessage(uint32 u4ConnectID, IBuffPacket*& pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,
                      uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nServerID = 0);                      //异步发送
     bool PostMessage(uint32 u4ConnectID, const char*& pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL,
