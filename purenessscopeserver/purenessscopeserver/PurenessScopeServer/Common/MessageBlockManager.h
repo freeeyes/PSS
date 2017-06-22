@@ -41,10 +41,10 @@ struct _MemoryBlock_List
     }
 };
 
-class CMenoryBlock_Pool
+class CMemoryBlock_Pool
 {
 public:
-    CMenoryBlock_Pool()
+    CMemoryBlock_Pool()
     {
         for(uint32 i = 0; i < MAX_MEMORY_BLOCK_COUNT; i++)
         {
@@ -52,7 +52,7 @@ public:
         }
     }
 
-    ~CMenoryBlock_Pool()
+    ~CMemoryBlock_Pool()
     {
         Close();
     }
@@ -150,7 +150,7 @@ private:
     ACE_Allocator* m_pbuff_allocator;
 
     uint32                     m_u4UsedSize;                          //当前正在使用的内存大小
-    CMenoryBlock_Pool          m_MenoryBlock_Pool;                    //回收内存池
+    CMemoryBlock_Pool          m_MemoryBlock_Pool;                    //回收内存池
     ACE_Recursive_Thread_Mutex m_ThreadWriteLock;                     //控制多线程锁
 };
 

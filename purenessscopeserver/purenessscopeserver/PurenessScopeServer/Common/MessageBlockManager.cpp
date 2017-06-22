@@ -24,7 +24,7 @@ void CMessageBlockManager::Init()
 
 void CMessageBlockManager::Close()
 {
-    m_MenoryBlock_Pool.Close();
+    m_MemoryBlock_Pool.Close();
 
     if(NULL != m_pmsgallocator)
     {
@@ -59,7 +59,7 @@ ACE_Message_Block* CMessageBlockManager::Create(uint32 u4Size)
     //获得内存2的整数倍空间
     uint32 u4FormatSize = next_pow_of_2(u4Size);
 
-    pmb = m_MenoryBlock_Pool.Get(u4FormatSize);
+    pmb = m_MemoryBlock_Pool.Get(u4FormatSize);
 
     if(NULL == pmb)
     {
@@ -86,7 +86,7 @@ ACE_Message_Block* CMessageBlockManager::Create(uint32 u4Size)
 bool CMessageBlockManager::Close(ACE_Message_Block* pMessageBlock)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
-    m_MenoryBlock_Pool.Set(pMessageBlock);
+    m_MemoryBlock_Pool.Set(pMessageBlock);
 
     uint32 u4Size = (uint32)pMessageBlock->size();
     m_u4UsedSize -= u4Size;
