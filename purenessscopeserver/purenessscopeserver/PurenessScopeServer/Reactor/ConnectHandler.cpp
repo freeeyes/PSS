@@ -2571,7 +2571,7 @@ void CConnectManager::TimeWheel_Timeout_Callback(void* pArgsContext, vector<CCon
     for (int i = 0; i < (int)vecConnectHandle.size(); i++)
     {
         //断开超时的链接
-        CConnectManager* pManager = dynamic_cast<CConnectManager*>pArgsContext;
+        CConnectManager* pManager = reinterpret_cast<CConnectManager*>(pArgsContext);
 
         if (NULL != pManager)
         {
@@ -3168,7 +3168,7 @@ bool CConnectManagerGroup::SetConnectTimeWheel(CConnectHandler* pConnectHandler)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
 
-    uint32 u4ConnectID = GetGroupIndex();
+    uint32 u4ConnectID = pConnectHandler->GetConnectID();
 
     //判断命中到哪一个线程组里面去
     uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
