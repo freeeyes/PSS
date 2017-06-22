@@ -232,10 +232,6 @@ public:
         }
 
         //OUR_DEBUG((LM_INFO, "[CTimeWheelLink::Tick]nLastBlockID=%d, m_nCurrBlockID=%d.\n", nLastBlockID, m_nCurrBlockID));
-        if (nLastBlockID == 0)
-        {
-            int a = 1;
-        }
 
         m_vecHashContain[nLastBlockID]->Clear();
         m_nCurrBlockID = nLastBlockID;

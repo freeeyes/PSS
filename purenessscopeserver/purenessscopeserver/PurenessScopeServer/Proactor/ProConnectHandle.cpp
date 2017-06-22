@@ -2136,7 +2136,7 @@ void CProConnectManager::TimeWheel_Timeout_Callback(void* pArgsContext, vector<C
     for (int i = 0; i < (int)vecProConnectHandle.size(); i++)
     {
         //断开超时的链接
-        CProConnectManager* pManager = (CProConnectManager*)pArgsContext;
+        CProConnectManager* pManager = dynamic_cast<CProConnectManager*>pArgsContext;
 
         if (NULL != pManager)
         {
@@ -2354,8 +2354,6 @@ uint32 CProConnectManagerGroup::GetGroupIndex()
 
 bool CProConnectManagerGroup::AddConnect(CProConnectHandle* pConnectHandler)
 {
-    int  nCount = 0;
-
     uint32 u4ConnectID = GetGroupIndex();
 
     //判断命中到哪一个线程组里面去
@@ -2376,8 +2374,6 @@ bool CProConnectManagerGroup::AddConnect(CProConnectHandle* pConnectHandler)
 
 bool CProConnectManagerGroup::SetConnectTimeWheel(CProConnectHandle* pConnectHandler)
 {
-    int  nCount = 0;
-
     uint32 u4ConnectID = GetGroupIndex();
 
     //判断命中到哪一个线程组里面去
@@ -2396,8 +2392,6 @@ bool CProConnectManagerGroup::SetConnectTimeWheel(CProConnectHandle* pConnectHan
 
 bool CProConnectManagerGroup::DelConnectTimeWheel(CProConnectHandle* pConnectHandler)
 {
-    int  nCount = 0;
-
     uint32 u4ConnectID = GetGroupIndex();
 
     //判断命中到哪一个线程组里面去

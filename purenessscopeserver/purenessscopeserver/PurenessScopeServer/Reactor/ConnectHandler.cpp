@@ -2571,7 +2571,7 @@ void CConnectManager::TimeWheel_Timeout_Callback(void* pArgsContext, vector<CCon
     for (int i = 0; i < (int)vecConnectHandle.size(); i++)
     {
         //断开超时的链接
-        CConnectManager* pManager = (CConnectManager*)pArgsContext;
+        CConnectManager* pManager = dynamic_cast<CConnectManager*>pArgsContext;
 
         if (NULL != pManager)
         {
