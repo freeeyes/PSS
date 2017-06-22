@@ -2375,7 +2375,7 @@ bool CProConnectManagerGroup::AddConnect(CProConnectHandle* pConnectHandler)
 bool CProConnectManagerGroup::SetConnectTimeWheel(CProConnectHandle* pConnectHandler)
 {
     uint32 u4ConnectID = pConnectHandler->GetConnectID();
-
+    DelConnectTimeWheel
     //判断命中到哪一个线程组里面去
     uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
@@ -2392,7 +2392,7 @@ bool CProConnectManagerGroup::SetConnectTimeWheel(CProConnectHandle* pConnectHan
 
 bool CProConnectManagerGroup::DelConnectTimeWheel(CProConnectHandle* pConnectHandler)
 {
-    uint32 u4ConnectID = GetGroupIndex();
+    uint32 u4ConnectID = pConnectHandler->GetConnectID();
 
     //判断命中到哪一个线程组里面去
     uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;

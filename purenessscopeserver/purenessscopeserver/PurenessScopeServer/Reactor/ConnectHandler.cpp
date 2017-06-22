@@ -3190,7 +3190,7 @@ bool CConnectManagerGroup::DelConnectTimeWheel(CConnectHandler* pConnectHandler)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
 
-    uint32 u4ConnectID = GetGroupIndex();
+    uint32 u4ConnectID = pConnectHandler->GetConnectID();
 
     //判断命中到哪一个线程组里面去
     uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
