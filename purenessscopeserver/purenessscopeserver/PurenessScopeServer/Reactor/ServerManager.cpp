@@ -517,7 +517,6 @@ bool CServerManager::Run()
         }
     }
 
-
     //启动日志服务线程
     if (0 != AppLogManager::instance()->Start())
     {

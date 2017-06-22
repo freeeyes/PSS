@@ -73,6 +73,5 @@ private:
     char               m_szError[MAX_BUFF_500];
 };
 
-
 typedef ACE_Singleton<CConnectAcceptorManager, ACE_Null_Mutex> App_ConnectAcceptorManager;
 #endif
