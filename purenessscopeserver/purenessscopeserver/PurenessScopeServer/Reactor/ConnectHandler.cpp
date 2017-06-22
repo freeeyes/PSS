@@ -393,8 +393,10 @@ int CConnectHandler::open(void*)
 
     m_u1ConnectState = CONNECT_OPEN;
 
-    nRet = this->reactor()->register_handler(this, ACE_Event_Handler::READ_MASK);
+    nRet = this->reactor()->register_handler(this, ACE_Event_Handler::READ_MASK|ACE_Event_Handler::WRITE_MASK);
     //OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]ConnectID=%d, nRet=%d.\n", GetConnectID(), nRet));
+
+    reactor()->cancel_wakeup(this, ACE_Event_Handler::WRITE_MASK);
 
     return nRet;
 }
@@ -467,6 +469,51 @@ int CConnectHandler::handle_input(ACE_HANDLE fd)
     {
         return RecvData_et();
     }
+}
+
+int CConnectHandler::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
+{
+    if (fd == ACE_INVALID_HANDLE)
+    {
+        m_u4CurrSize = 0;
+        OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input]fd == ACE_INVALID_HANDLE.\n"));
+        sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::handle_input]fd == ACE_INVALID_HANDLE.");
+
+        //组织数据
+        _MakePacket objMakePacket;
+
+        objMakePacket.m_u4ConnectID = GetConnectID();
+        objMakePacket.m_pPacketParse = NULL;
+        objMakePacket.m_u1Option = PACKET_CDISCONNECT;
+
+        //发送客户端链接断开消息。
+        ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+
+        if (false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
+        {
+            OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
+        }
+
+        return -1;
+    }
+
+    ACE_Message_Block* pmbSendData = NULL;
+    ACE_Time_Value nowait(ACE_OS::gettimeofday());
+
+    while (-1 != this->getq(pmbSendData, &nowait))
+    {
+        uint32 u4SendSuc = (uint32)pmbSendData->length();
+        bool blRet = PutSendPacket(pmbSendData);
+
+        if (true == blRet)
+        {
+            //记录成功发送字节
+            m_u4SuccessSendSize += u4SendSuc;
+        }
+    }
+
+    reactor()->cancel_wakeup(this, ACE_Event_Handler::WRITE_MASK);
+    return 0;
 }
 
 //剥离接收数据代码
@@ -1428,7 +1475,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
         return false;
     }
 
-    uint32 u4SendSuc = pBuffPacket->GetPacketLen();
+    //uint32 u4SendSuc = pBuffPacket->GetPacketLen();
 
     //如果不是直接发送数据，则拼接数据包
     if(u1State == PACKET_SEND_CACHE)
@@ -1602,15 +1649,10 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
         ACE_Message_Block::ACE_Message_Type  objType  = ACE_Message_Block::MB_USER + nMessageID;
         pMbData->msg_type(objType);
 
-        bool blRet = PutSendPacket(pMbData);
+        //将消息放入队列，让output在反应器线程发送。
+        this->putq(pMbData);
 
-        if(true == blRet)
-        {
-            //记录成功发送字节
-            m_u4SuccessSendSize += u4SendSuc;
-        }
-
-        return blRet;
+        return reactor()->schedule_wakeup(this, ACE_Event_Handler::WRITE_MASK);
     }
 }
 

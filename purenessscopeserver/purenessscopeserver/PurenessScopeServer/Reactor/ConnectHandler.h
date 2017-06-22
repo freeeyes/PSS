@@ -49,6 +49,7 @@ public:
     //重写继承方法
     virtual int open(void*);                                                 //用户建立一个链接
     virtual int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE);            //接受客户端收到的数据块
+    virtual int handle_output(ACE_HANDLE fd = ACE_INVALID_HANDLE);           //发送客户端数据
     virtual int handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask);           //链接关闭事件
 
     void Init(uint16 u2HandlerID);                                           //Connect Pool初始化调用时候调用的方法
