@@ -26,15 +26,7 @@ struct _SendMessage
 
     _SendMessage()
     {
-        m_u1SendState = 0;
-        m_blDelete    = true;
-        m_pBuffPacket = NULL;
-        m_u4ConnectID = 0;
-        m_nEvents     = 0;
-        m_u2CommandID = 0;
-        m_nHashID     = 0;
-        m_nMessageID  = 0;
-        m_u1Type      = 0;
+        Clear();
 
         //这里设置消息队列模块指针内容，这样就不必反复的new和delete，提升性能
         //指针关系也可以在这里直接指定，不必使用的使用再指定
@@ -90,6 +82,19 @@ struct _SendMessage
             m_pmbQueuePtr->release();
             m_pmbQueuePtr = NULL;
         }
+    }
+
+    void Clear()
+    {
+        m_u1SendState = 0;
+        m_blDelete    = true;
+        m_pBuffPacket = NULL;
+        m_u4ConnectID = 0;
+        m_nEvents     = 0;
+        m_u2CommandID = 0;
+        m_nHashID     = 0;
+        m_nMessageID  = 0;
+        m_u1Type      = 0;
     }
 
     ACE_Message_Block* GetQueueMessage()

@@ -76,6 +76,7 @@ bool CSendMessagePool::Delete(_SendMessage* pObject)
 
     char szHashID[10] = {'\0'};
     sprintf_safe(szHashID, 10, "%d", pObject->GetHashID());
+    pObject->Clear();
     bool blState = m_objHashHandleList.Push(szHashID, pObject);
 
     if(false == blState)
