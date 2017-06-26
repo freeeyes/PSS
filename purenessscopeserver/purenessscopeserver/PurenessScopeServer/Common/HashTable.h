@@ -648,6 +648,31 @@ public:
         }
     }
 
+    //得到所有正在使用的key
+    void Get_All_Used_Key(vector<string>& vecList)
+    {
+        if (NULL == m_lpTable)
+        {
+            return;
+        }
+
+        vecList.clear();
+
+        for (int i = 0; i < m_objHashPool.Get_Count(); i++)
+        {
+            if (NULL != m_lpTable[i])
+            {
+                _Hash_Link_Info<T>* pLastLink = m_lpTable[i];
+
+                while (NULL != pLastLink)
+                {
+                    vecList.push_back(pLastLink->m_pData->m_pKey);
+                    pLastLink = pLastLink->m_pNext;
+                }
+            }
+        }
+    }
+
     //清理当前Hash数组中的所有对象指针
     void Clear()
     {
