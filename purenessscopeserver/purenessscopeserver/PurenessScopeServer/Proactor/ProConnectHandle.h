@@ -173,6 +173,7 @@ public:
                         uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDelete = true, int nMessageID = 0);    //异步群发
     bool Close(uint32 u4ConnectID);                                                                          //客户端关闭
     bool CloseConnect(uint32 u4ConnectID, EM_Client_Close_status emStatus);                                  //服务器关闭
+    bool CloseConnect_By_Queue(uint32 u4ConnectID);                                                          //服务器关闭(主动关闭送到消息队列中关闭)
     void GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo);                                         //返回当前存活链接的信息
     void SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4TimeCost);                                        //记录指定链接数据处理时间
 

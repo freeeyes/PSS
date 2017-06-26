@@ -1502,6 +1502,59 @@ bool CProConnectManager::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status
     }
 }
 
+bool CProConnectManager::CloseConnect_By_Queue(uint32 u4ConnectID)
+{
+    //放入发送队列
+    _SendMessage* pSendMessage = m_SendMessagePool.Create();
+
+    ACE_Message_Block* mb = pSendMessage->GetQueueMessage();
+
+    if (NULL != mb)
+    {
+        if (NULL == pSendMessage)
+        {
+            OUR_DEBUG((LM_ERROR, "[CProConnectManager::CloseConnect_By_Queue] new _SendMessage is error.\n"));
+            return false;
+        }
+
+        //组装关闭连接指令
+        pSendMessage->m_u4ConnectID = u4ConnectID;
+        pSendMessage->m_pBuffPacket = NULL;
+        pSendMessage->m_nEvents     = 0;
+        pSendMessage->m_u2CommandID = 0;
+        pSendMessage->m_u1SendState = 0;
+        pSendMessage->m_blDelete    = false;
+        pSendMessage->m_nMessageID  = 0;
+        pSendMessage->m_u1Type      = 1;
+        pSendMessage->m_tvSend      = ACE_OS::gettimeofday();
+
+        //判断队列是否是已经最大
+        int nQueueCount = (int)msg_queue()->message_count();
+
+        if (nQueueCount >= (int)MAX_MSG_THREADQUEUE)
+        {
+            OUR_DEBUG((LM_ERROR, "[CProConnectManager::CloseConnect_By_Queue] Queue is Full nQueueCount = [%d].\n", nQueueCount));
+
+            return false;
+        }
+
+        ACE_Time_Value xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, m_u4SendQueuePutTime);
+
+        if (this->putq(mb, &xtime) == -1)
+        {
+            OUR_DEBUG((LM_ERROR, "[CProConnectManager::CloseConnect_By_Queue] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
+            return false;
+        }
+    }
+    else
+    {
+        OUR_DEBUG((LM_ERROR, "[CMessageService::CloseConnect_By_Queue] mb new error.\n"));
+        return false;
+    }
+
+    return true;
+}
+
 bool CProConnectManager::AddConnect(uint32 u4ConnectID, CProConnectHandle* pConnectHandler)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
@@ -1632,6 +1685,7 @@ bool CProConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
         pSendMessage->m_u1SendState = u1SendState;
         pSendMessage->m_blDelete    = blDelete;
         pSendMessage->m_nMessageID  = nMessageID;
+        pSendMessage->m_u1Type      = 0;
         pSendMessage->m_tvSend      = ACE_OS::gettimeofday();
 
         //判断队列是否是已经最大
@@ -1862,8 +1916,17 @@ int CProConnectManager::svc (void)
             continue;
         }
 
-        //处理发送数据
-        SendMessage(msg->m_u4ConnectID, msg->m_pBuffPacket, msg->m_u2CommandID, msg->m_u1SendState, msg->m_nEvents, msg->m_tvSend, msg->m_blDelete, msg->m_nMessageID);
+        if (0 == msg->m_u1Type)
+        {
+            //处理发送数据
+            SendMessage(msg->m_u4ConnectID, msg->m_pBuffPacket, msg->m_u2CommandID, msg->m_u1SendState, msg->m_nEvents, msg->m_tvSend, msg->m_blDelete, msg->m_nMessageID);
+        }
+        else if (1 == msg->m_u1Type)
+        {
+            //处理连接服务器主动关闭
+            CloseConnect(msg->m_u4ConnectID, CLIENT_CLOSE_IMMEDIATLY);
+        }
+
         m_SendMessagePool.Delete(msg);
 
     }
@@ -1994,6 +2057,7 @@ bool CProConnectManager::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendT
             pSendMessage->m_u1SendState = u1SendState;
             pSendMessage->m_blDelete    = blDelete;
             pSendMessage->m_nMessageID  = nMessageID;
+            pSendMessage->m_u1Type      = 0;
             pSendMessage->m_tvSend      = ACE_OS::gettimeofday();
 
             //判断队列是否是已经最大
@@ -2572,7 +2636,8 @@ bool CProConnectManagerGroup::CloseConnect(uint32 u4ConnectID)
         return false;
     }
 
-    return pConnectManager->CloseConnect(u4ConnectID, CLIENT_CLOSE_IMMEDIATLY);
+    //通过消息队列去实现关闭
+    return pConnectManager->CloseConnect_By_Queue(u4ConnectID);
 }
 
 _ClientIPInfo CProConnectManagerGroup::GetClientIPInfo(uint32 u4ConnectID)
