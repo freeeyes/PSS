@@ -956,6 +956,12 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
     if(pData != NULL)
     {
         m_u2MaxConnectTime = (uint16)ACE_OS::atoi((char*)pData);
+
+        //这里增加一个判定，如果最大超时时间小于等于时间间隔参数，自动设置为时间间隔的2倍。
+        if (m_u2MaxConnectTime <= m_u2SendAliveTime)
+        {
+            m_u2MaxConnectTime = m_u2SendAliveTime * 2;
+        }
     }
 
     pData = m_MainConfig.GetData("ClientInfo", "MaxBuffRecv");
