@@ -2300,7 +2300,7 @@ bool CConnectManager::SetConnectTimeWheel(CConnectHandler* pConnectHandler)
 
 bool CConnectManager::DelConnectTimeWheel(CConnectHandler* pConnectHandler)
 {
-    m_TimeWheelLink.Add_TimeWheel_Object(pConnectHandler);
+    m_TimeWheelLink.Del_TimeWheel_Object(pConnectHandler);
     return true;
 }
 
@@ -2622,14 +2622,17 @@ int CConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 
 void CConnectManager::TimeWheel_Timeout_Callback(void* pArgsContext, vector<CConnectHandler*> vecConnectHandle)
 {
+    OUR_DEBUG((LM_INFO, "[CConnectManager::TimeWheel_Timeout_Callback]Timeout Count(%d).\n", vecConnectHandle.size()));
+
     for (int i = 0; i < (int)vecConnectHandle.size(); i++)
     {
         //断开超时的链接
         CConnectManager* pManager = reinterpret_cast<CConnectManager*>(pArgsContext);
+        OUR_DEBUG((LM_INFO, "[CConnectManager::TimeWheel_Timeout_Callback]ConnectID(%d).\n", vecConnectHandle[i]->GetConnectID()));
 
         if (NULL != pManager)
         {
-            pManager->CloseConnect(vecConnectHandle[i]->GetConnectID(), CLIENT_CLOSE_IMMEDIATLY);
+            pManager->CloseConnect_By_Queue(vecConnectHandle[i]->GetConnectID());
         }
     }
 }

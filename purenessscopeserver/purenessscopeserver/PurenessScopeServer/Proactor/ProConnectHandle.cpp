@@ -1455,6 +1455,7 @@ bool CProConnectManager::Close(uint32 u4ConnectID)
     sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
     //连接关闭，清除时间轮盘
     DelConnectTimeWheel(m_objHashConnectList.Get_Hash_Box_Data(szConnectID));
+    OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close]DelConnectTimeWheel ConnectID=%d.\n", u4ConnectID));
 
     m_objHashConnectList.Del_Hash_Data(szConnectID);
     m_u4TimeDisConnect++;
@@ -1606,7 +1607,7 @@ bool CProConnectManager::SetConnectTimeWheel(CProConnectHandle* pConnectHandler)
 
 bool CProConnectManager::DelConnectTimeWheel(CProConnectHandle* pConnectHandler)
 {
-    m_TimeWheelLink.Add_TimeWheel_Object(pConnectHandler);
+    m_TimeWheelLink.Del_TimeWheel_Object(pConnectHandler);
     return true;
 }
 
@@ -2197,14 +2198,17 @@ void CProConnectManager::Init(uint16 u2Index)
 
 void CProConnectManager::TimeWheel_Timeout_Callback(void* pArgsContext, vector<CProConnectHandle*> vecProConnectHandle)
 {
+    OUR_DEBUG((LM_INFO, "[CProConnectManager::TimeWheel_Timeout_Callback]Timeout Count(%d).\n", vecProConnectHandle.size()));
+
     for (int i = 0; i < (int)vecProConnectHandle.size(); i++)
     {
         //断开超时的链接
         CProConnectManager* pManager = reinterpret_cast<CProConnectManager*>(pArgsContext);
+        OUR_DEBUG((LM_INFO, "[CProConnectManager::TimeWheel_Timeout_Callback]ConnectID(%d).\n", vecProConnectHandle[i]->GetConnectID()));
 
         if (NULL != pManager)
         {
-            pManager->CloseConnect(vecProConnectHandle[i]->GetConnectID(), CLIENT_CLOSE_IMMEDIATLY);
+            pManager->CloseConnect_By_Queue(vecProConnectHandle[i]->GetConnectID());
         }
     }
 }

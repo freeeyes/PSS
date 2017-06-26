@@ -224,7 +224,15 @@ public:
         //得到最后一次需要清除的对象信息
         vector<T*> vecEntey;
         m_vecHashContain[nLastBlockID]->Get_All_Used(vecEntey);
-        OUR_DEBUG((LM_INFO, "[CTimeWheelLink::Tick]nLastBlockID=%d, vecEntey=%d.\n", nLastBlockID, vecEntey.size()));
+        //OUR_DEBUG((LM_INFO, "[CTimeWheelLink::Tick]nLastBlockID=%d, vecEntey=%d.\n", nLastBlockID, vecEntey.size()));
+
+        //测试代码
+        /*
+        vector<T*> vecEntey1;
+        vector<T*> vecEntey2;
+        m_vecHashContain[0]->Get_All_Used(vecEntey1);
+        m_vecHashContain[1]->Get_All_Used(vecEntey2);
+        */
 
         if (NULL != m_fn_Timeout_Callback)
         {
