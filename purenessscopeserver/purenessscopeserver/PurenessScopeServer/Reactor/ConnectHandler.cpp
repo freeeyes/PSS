@@ -476,8 +476,8 @@ int CConnectHandler::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
     if (fd == ACE_INVALID_HANDLE)
     {
         m_u4CurrSize = 0;
-        OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input]fd == ACE_INVALID_HANDLE.\n"));
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::handle_input]fd == ACE_INVALID_HANDLE.");
+        OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_output]fd == ACE_INVALID_HANDLE.\n"));
+        sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::handle_output]fd == ACE_INVALID_HANDLE.");
 
         //组织数据
         _MakePacket objMakePacket;
@@ -491,7 +491,7 @@ int CConnectHandler::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
 
         if (false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
         {
-            OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
+            OUR_DEBUG((LM_ERROR, "CConnectHandler::handle_output] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
         }
 
         return -1;
@@ -507,8 +507,12 @@ int CConnectHandler::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
 
         if (true == blRet)
         {
-            //记录成功发送字节
-            m_u4SuccessSendSize += u4SendSuc;
+            if (m_u4ReadSendSize >= m_u4SuccessSendSize + u4SendSuc)
+            {
+                //OUR_DEBUG((LM_INFO, "[CConnectHandler::handle_output]ConnectID=%d, m_u4SuccessSendSize=%d, u4SendSuc=%d.\n", GetConnectID(), m_u4SuccessSendSize, u4SendSuc));
+                //记录成功发送字节
+                m_u4SuccessSendSize += u4SendSuc;
+            }
         }
     }
 
@@ -1645,6 +1649,18 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
             m_emStatus = CLIENT_CLOSE_SENDOK;
         }
 
+        //判断是否超过阈值
+        if (false == CheckSendMask(pMbData->length()))
+        {
+            if (blDelete == true)
+            {
+                App_BuffPacketManager::instance()->Delete(pBuffPacket);
+                App_MessageBlockManager::instance()->Close(pMbData);
+            }
+
+            return false;
+        }
+
         //将消息ID放入MessageBlock
         ACE_Message_Block::ACE_Message_Type  objType  = ACE_Message_Block::MB_USER + nMessageID;
         pMbData->msg_type(objType);
@@ -1950,12 +1966,13 @@ _ClientIPInfo  CConnectHandler::GetLocalIPInfo()
 
 bool CConnectHandler::CheckSendMask(uint32 u4PacketLen)
 {
+    //OUR_DEBUG((LM_ERROR, "[CConnectHandler::CheckSendMask]ConnectID=%d, m_u4ReadSendSize=%d, u4PacketLen=%d.\n", GetConnectID(), m_u4ReadSendSize, u4PacketLen));
     m_u4ReadSendSize += u4PacketLen;
 
     //OUR_DEBUG ((LM_ERROR, "[CConnectHandler::CheckSendMask]GetSendDataMask = %d, m_u4ReadSendSize=%d, m_u4SuccessSendSize=%d.\n", App_MainConfig::instance()->GetSendDataMask(), m_u4ReadSendSize, m_u4SuccessSendSize));
     if(m_u4ReadSendSize - m_u4SuccessSendSize >= App_MainConfig::instance()->GetSendDataMask())
     {
-        OUR_DEBUG ((LM_ERROR, "[CConnectHandler::CheckSendMask]ConnectID = %d, SingleConnectMaxSendBuffer is more than(%d)!\n", GetConnectID(), m_u4ReadSendSize - m_u4SuccessSendSize));
+        OUR_DEBUG ((LM_ERROR, "[CConnectHandler::CheckSendMask]ConnectID = %d, SingleConnectMaxSendBuffer is more than DataMask(%d)(%d:%d)!\n", GetConnectID(), App_MainConfig::instance()->GetSendDataMask(), m_u4ReadSendSize, m_u4SuccessSendSize));
         AppLogManager::instance()->WriteLog(LOG_SYSTEM_SENDQUEUEERROR, "]Connection from [%s:%d], SingleConnectMaxSendBuffer is more than(%d)!.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4ReadSendSize - m_u4SuccessSendSize);
         return false;
     }
@@ -2361,28 +2378,6 @@ bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
     _SendMessage* pSendMessage = m_SendMessagePool.Create();
 
     ACE_Message_Block* mb = pSendMessage->GetQueueMessage();
-
-    char szConnectID[10] = {'\0'};
-    sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
-    CConnectHandler* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data(szConnectID);
-
-    if(NULL != pConnectHandler)
-    {
-        bool blState = pConnectHandler->CheckSendMask(pBuffPacket->GetPacketLen());
-
-        if(false == blState)
-        {
-            //超过了阀值，则关闭连接
-            if(blDelete == true)
-            {
-                App_BuffPacketManager::instance()->Delete(pBuffPacket);
-            }
-
-            pConnectHandler->ServerClose(CLIENT_CLOSE_IMMEDIATLY);
-            m_objHashConnectList.Del_Hash_Data(szConnectID);
-            return false;
-        }
-    }
 
     if(NULL != mb)
     {
@@ -2816,28 +2811,6 @@ bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType,
         }
 
         pCurrBuffPacket->WriteStream(pBuffPacket->GetData(), pBuffPacket->GetPacketLen());
-
-        CConnectHandler* pConnectHandler = objvecConnectManager[i];
-        //检查是否超过了单位时间发送数据上限阈值
-        bool blState = pConnectHandler->CheckSendMask(pBuffPacket->GetPacketLen());
-
-        if(false == blState)
-        {
-            //超过了阀值，则关闭连接
-            if(blDelete == true)
-            {
-                App_BuffPacketManager::instance()->Delete(pBuffPacket);
-            }
-
-            //服务器主动关闭连接
-            pConnectHandler->ServerClose(CLIENT_CLOSE_IMMEDIATLY);
-            char szConnectID[10] = {'\0'};
-            sprintf_safe(szConnectID, 10, "%d", pConnectHandler->GetConnectID());
-
-            m_objHashConnectList.Del_Hash_Data(szConnectID);
-            continue;
-        }
-
 
         //放入发送队列
         _SendMessage* pSendMessage = m_SendMessagePool.Create();
