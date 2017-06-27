@@ -759,16 +759,6 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
             m_u4SuccessSendSize += (uint32)result.bytes_to_write();
         }
 
-        //查看是否需要关闭
-        if(CLIENT_CLOSE_SENDOK == m_emStatus)
-        {
-            //查看是否所有字节都发送完毕，都发送完毕调用服务器关闭接口
-            if(m_u4ReadSendSize - m_u4SuccessSendSize == 0)
-            {
-                ServerClose(CLIENT_CLOSE_IMMEDIATLY, PACKET_CHEK_TIMEOUT);
-            }
-        }
-
         return;
     }
 }

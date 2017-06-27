@@ -1822,15 +1822,6 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 
             App_MessageBlockManager::instance()->Close(pMbData);
 
-            //看看需要不需要关闭连接
-            if(CLIENT_CLOSE_SENDOK == m_emStatus)
-            {
-                if(m_u4ReadSendSize - m_u4SuccessSendSize == 0)
-                {
-                    ServerClose(CLIENT_CLOSE_IMMEDIATLY);
-                }
-            }
-
             return true;
         }
         else
