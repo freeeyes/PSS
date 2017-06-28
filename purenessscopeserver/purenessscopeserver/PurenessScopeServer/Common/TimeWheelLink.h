@@ -232,7 +232,9 @@ public:
         //清理索引信息
         for (int i = 0; i < (int)vecEntey.size(); i++)
         {
-            m_htIndexList.Del_Hash_Data(vecEntey[i].c_str());
+            char szKey[MAX_TIMEWHEEL_KEY] = { '\0' };
+            sprintf_safe(szKey, MAX_TIMEWHEEL_KEY, "%16x", vecEntey[i]);
+            m_htIndexList.Del_Hash_Data(szKey);
         }
 
         if (NULL != m_fn_Timeout_Callback)
