@@ -256,12 +256,15 @@ public:
     //释放一个正在使用的缓冲块
     void Delete(_Hash_Table_Cell<T>* pData)
     {
-        int nIndex = pData->m_nPosIndex;
-
-        if(nIndex >= 0 && nIndex < m_nCount && pData->m_cExists == 1)
+        if (NULL != pData)
         {
-            m_nUsedCount--;
-            pData->Clear();
+            int nIndex = pData->m_nPosIndex;
+
+            if (nIndex >= 0 && nIndex < m_nCount && pData->m_cExists == 1)
+            {
+                m_nUsedCount--;
+                pData->Clear();
+            }
         }
     }
 
@@ -405,12 +408,15 @@ public:
     //释放一个正在使用的缓冲块
     void Delete(_Hash_Link_Info<T>* pData)
     {
-        int nIndex = pData->m_nPosIndex;
-
-        if(nIndex >= 0 && nIndex < m_nCount && pData->m_cExists == 1)
+        if (NULL != pData)
         {
-            m_nUsedCount--;
-            pData->Clear();
+            int nIndex = pData->m_nPosIndex;
+
+            if (nIndex >= 0 && nIndex < m_nCount && pData->m_cExists == 1)
+            {
+                m_nUsedCount--;
+                pData->Clear();
+            }
         }
     }
 

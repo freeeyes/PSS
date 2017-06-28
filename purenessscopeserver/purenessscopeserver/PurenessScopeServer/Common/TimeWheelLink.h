@@ -178,6 +178,9 @@ public:
             // 删除这个指针在旧容器里面的数据，将这个数据放在最新的容器中。
             m_vecHashContain[*pCurrBlockListID]->Del_Hash_Data(szKey);
         }
+
+        //清理索引信息
+        m_htIndexList.Del_Hash_Data(szKey);
     }
 
     //得到一个空闲的m_pBlockIDList位置
@@ -226,13 +229,11 @@ public:
         m_vecHashContain[nLastBlockID]->Get_All_Used(vecEntey);
         //OUR_DEBUG((LM_INFO, "[CTimeWheelLink::Tick]nLastBlockID=%d, vecEntey=%d.\n", nLastBlockID, vecEntey.size()));
 
-        //测试代码
-        /*
-        vector<T*> vecEntey1;
-        vector<T*> vecEntey2;
-        m_vecHashContain[0]->Get_All_Used(vecEntey1);
-        m_vecHashContain[1]->Get_All_Used(vecEntey2);
-        */
+        //清理索引信息
+        for (int i = 0; i < (int)vecEntey.size(); i++)
+        {
+            m_htIndexList.Del_Hash_Data(vecEntey[i].c_str());
+        }
 
         if (NULL != m_fn_Timeout_Callback)
         {
@@ -240,7 +241,6 @@ public:
         }
 
         //OUR_DEBUG((LM_INFO, "[CTimeWheelLink::Tick]nLastBlockID=%d, m_nCurrBlockID=%d.\n", nLastBlockID, m_nCurrBlockID));
-
         m_vecHashContain[nLastBlockID]->Clear();
         m_nCurrBlockID = nLastBlockID;
     }
