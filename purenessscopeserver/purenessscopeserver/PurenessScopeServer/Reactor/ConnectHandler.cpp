@@ -502,6 +502,12 @@ int CConnectHandler::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
 
     while (-1 != this->getq(pmbSendData, &nowait))
     {
+        if (NULL == pmbSendData)
+        {
+            OUR_DEBUG((LM_INFO, "[CConnectHandler::handle_output]ConnectID=%d pmbSendData is NULL.\n", GetConnectID()));
+            break;
+        }
+
         uint32 u4SendSuc = (uint32)pmbSendData->length();
         bool blRet = PutSendPacket(pmbSendData);
 
@@ -514,9 +520,17 @@ int CConnectHandler::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
                 m_u4SuccessSendSize += u4SendSuc;
             }
         }
+        else
+        {
+            OUR_DEBUG((LM_INFO, "[CConnectHandler::handle_output]ConnectID=%d write is close.\n", GetConnectID()));
+            return -1;
+        }
+
+        //OUR_DEBUG((LM_INFO, "[CConnectHandler::handle_output]ConnectID=%d send finish.\n", GetConnectID()));
     }
 
     reactor()->cancel_wakeup(this, ACE_Event_Handler::WRITE_MASK);
+    //OUR_DEBUG((LM_INFO, "[CConnectHandler::handle_output]ConnectID=%d,cancel_wakeup.\n", GetConnectID()));
     return 0;
 }
 
@@ -1784,18 +1798,15 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
             AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "WriteError [%s:%d] nErrno = %d  result.bytes_transferred() = %d, ",
                                                 m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), nErrno,
                                                 nIsSendSize);
-            m_atvOutput      = ACE_OS::gettimeofday();
 
             //错误消息回调
-            App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), pMbData, m_atvOutput);
-            //App_MessageBlockManager::instance()->Close(pMbData);
-
             pMbData->rd_ptr((size_t)0);
             ACE_Time_Value tvNow = ACE_OS::gettimeofday();
             App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), pMbData, tvNow);
 
+            OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID=%d send cancel.\n", GetConnectID()));
             //关闭当前连接
-            App_ConnectManager::instance()->CloseUnLock(GetConnectID());
+            //App_ConnectManager::instance()->CloseUnLock(GetConnectID());
 
             return false;
         }
