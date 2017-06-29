@@ -1473,7 +1473,7 @@ uint8 CConnectHandler::GetSendBuffState()
 bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, uint8 u1State, uint8 u1SendType, uint32& u4PacketSize, bool blDelete, int nMessageID)
 {
     //OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage](0x%08x) Connectid=%d,m_nIOCount=%d.\n", this, GetConnectID(), m_nIOCount));
-    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
+    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     //OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage]222 Connectid=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
 
     //如果当前连接已被别的线程关闭，则这里不做处理，直接退出
@@ -1671,6 +1671,8 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
                 App_BuffPacketManager::instance()->Delete(pBuffPacket);
                 App_MessageBlockManager::instance()->Close(pMbData);
             }
+
+
 
             return false;
         }
