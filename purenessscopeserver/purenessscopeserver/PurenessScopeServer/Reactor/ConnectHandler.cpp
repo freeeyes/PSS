@@ -1400,7 +1400,8 @@ int CConnectHandler::handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask)
     //OUR_DEBUG((LM_DEBUG,"[CConnectHandler::handle_close]Connectid=[%d] begin(%d)...\n",GetConnectID(), errno));
     //App_ConnectManager::instance()->Close(GetConnectID());
     //OUR_DEBUG((LM_DEBUG,"[CConnectHandler::handle_close] Connectid=[%d] finish ok...\n", GetConnectID()));
-    Close(2);
+    //Close(2);
+    App_ConnectManager::instance()->CloseConnect(GetConnectID());
 
     return 0;
 }
@@ -1473,7 +1474,7 @@ uint8 CConnectHandler::GetSendBuffState()
 bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, uint8 u1State, uint8 u1SendType, uint32& u4PacketSize, bool blDelete, int nMessageID)
 {
     //OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage](0x%08x) Connectid=%d,m_nIOCount=%d.\n", this, GetConnectID(), m_nIOCount));
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
+    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     //OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage]222 Connectid=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
 
     //如果当前连接已被别的线程关闭，则这里不做处理，直接退出
@@ -1682,9 +1683,19 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
         pMbData->msg_type(objType);
 
         //将消息放入队列，让output在反应器线程发送。
-        this->putq(pMbData);
+        ACE_Time_Value xtime = ACE_OS::gettimeofday();
 
-        return reactor()->schedule_wakeup(this, ACE_Event_Handler::WRITE_MASK);
+        if (this->putq(pMbData, &xtime) == -1)
+        {
+            OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendMessage] Connectid=%d,putq output errno = [%d].\n", GetConnectID(), errno));
+            App_MessageBlockManager::instance()->Close(pMbData);
+        }
+        else
+        {
+            reactor()->schedule_wakeup(this, ACE_Event_Handler::WRITE_MASK);
+        }
+
+        return true;
     }
 }
 
@@ -2378,7 +2389,7 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
 bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nServerID)
 {
     //OUR_DEBUG((LM_INFO, "[CConnectManager::PostMessage]Begin.\n"));
-    ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
+    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
     //OUR_DEBUG((LM_INFO, "[CConnectManager::PostMessage]Begin 1.\n"));
 
     if(NULL == pBuffPacket)
