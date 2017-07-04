@@ -199,8 +199,10 @@ public:
     EM_Client_Connect_status GetConnectState(uint32 u4ConnectID);                                //得到指定的连接状态
 
 private:
-    bool IsRun();
+    //bool IsRun();
     void CloseQueue();
+
+    virtual int put(ACE_Message_Block* mblk, ACE_Time_Value* = 0);
 
 private:
     CHashTable<CConnectHandler>        m_objHashConnectList;    //记录当前已经连接的节点，使用固定内存结构
@@ -209,7 +211,7 @@ private:
     ACE_Recursive_Thread_Mutex         m_ThreadWriteLock;       //用于循环监控和断开链接时候的数据锁
     _TimerCheckID*                     m_pTCTimeSendCheck;      //定时器的参数结构体，用于一个定时器执行不同的事件
     ACE_Time_Value                     m_tvCheckConnect;        //定时器下一次检测链接时间
-    bool                               m_blRun;                 //线程是否在运行
+    //bool                               m_blRun;                 //线程是否在运行
     CSendMessagePool                   m_SendMessagePool;       //发送消息体
     uint32                             m_u4SendQueuePutTime;    //发送队列入队超时时间
     uint32                             m_u4TimeConnect;         //单位时间连接建立数
@@ -289,14 +291,12 @@ public:
 
 private:
     uint32 GetGroupIndex();                                                                                  //得到当前链接的ID自增量
-
 private:
     ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;                                                           //控制多线程锁
     CConnectManager** m_objConnnectManagerList;                                                              //所有链接管理者
     uint16            m_u2ThreadQueueCount;                                                                  //当前发送线程队列个数
     uint32            m_u4CurrMaxCount;                                                                      //当前链接自增量
 };
-
 
 typedef ACE_Singleton<CConnectManagerGroup, ACE_Recursive_Thread_Mutex> App_ConnectManager;
 typedef ACE_Singleton<CConnectHandlerPool, ACE_Null_Mutex> App_ConnectHandlerPool;

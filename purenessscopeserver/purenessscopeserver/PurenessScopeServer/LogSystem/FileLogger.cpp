@@ -230,10 +230,8 @@ bool CFileLogger::Init()
         m_pLogFileList[nPos] = pLogFile;
     }
 
-
     return true;
 }
-
 
 bool CFileLogger::ReSet(uint32 u4CurrLogLevel)
 {
