@@ -76,7 +76,7 @@ public:
 
 private:
     int ProcessLog(_LogBlockInfo* pLogBlockInfo);
-
+    virtual int put(ACE_Message_Block* mblk, ACE_Time_Value* = 0);
 private:
     bool                              m_blRun;                    //日志系统是否启动
     bool                              m_blIsNeedReset;            //日志模块等级升级重置标志

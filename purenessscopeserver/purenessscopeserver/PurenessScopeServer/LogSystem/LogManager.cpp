@@ -144,39 +144,48 @@ int CLogManager::svc(void)
     OUR_DEBUG((LM_INFO,"[CLogManager::svc] svc run.\n"));
 
     //ACE_Time_Value     xtime;
-    while(m_blRun)
+    while(true)
     {
         ACE_Message_Block* mb = NULL;
+        ACE_OS::last_error(0);
 
         //xtime=ACE_OS::gettimeofday()+ACE_Time_Value(0, MAX_MSG_PUTTIMEOUT);
         if(getq(mb, 0) == -1)
         {
-            OUR_DEBUG((LM_ERROR,"[CLogManager::svc] get error errno = [%d].\n", errno));
+            OUR_DEBUG((LM_ERROR,"[CLogManager::svc] get error errno = [%d].\n", ACE_OS::last_error()));
             m_blRun = false;
             break;
         }
-
-        if (mb == NULL)
+        else
         {
-            continue;
+            if (mb == NULL)
+            {
+                continue;
+            }
+
+            if ((0 == mb->size ()) && (mb->msg_type () == ACE_Message_Block::MB_STOP))
+            {
+                mb->release ();
+                break;
+            }
+
+            _LogBlockInfo* pLogBlockInfo = *((_LogBlockInfo**)mb->base());
+
+            if (!pLogBlockInfo)
+            {
+                OUR_DEBUG((LM_ERROR,"[CLogManager::svc] CLogManager mb log == NULL!\n"));
+                continue;
+            }
+
+            ProcessLog(pLogBlockInfo);
+            //OUR_DEBUG((LM_ERROR,"[CLogManager::svc] delete pstrLogText BEGIN!\n"));
+            //回收日志块
+            m_objLogBlockPool.ReturnBlockInfo(pLogBlockInfo);
+            //OUR_DEBUG((LM_ERROR,"[CLogManager::svc] delete pstrLogText END!\n"));
         }
-
-        _LogBlockInfo* pLogBlockInfo = *((_LogBlockInfo**)mb->base());
-
-        if (!pLogBlockInfo)
-        {
-            OUR_DEBUG((LM_ERROR,"[CLogManager::svc] CLogManager mb log == NULL!\n"));
-            continue;
-        }
-
-        ProcessLog(pLogBlockInfo);
-        //OUR_DEBUG((LM_ERROR,"[CLogManager::svc] delete pstrLogText BEGIN!\n"));
-        //回收日志块
-        m_objLogBlockPool.ReturnBlockInfo(pLogBlockInfo);
-        //OUR_DEBUG((LM_ERROR,"[CLogManager::svc] delete pstrLogText END!\n"));
-
     }
 
+    this->msg_queue ()->deactivate ();
     //OUR_DEBUG((LM_INFO,"[CLogManager::svc] CLogManager::svc finish!\n"));
     return 0;
 }
@@ -185,10 +194,14 @@ int CLogManager::Close()
 {
     if(m_blRun == true)
     {
-        msg_queue()->deactivate();
-        msg_queue()->flush();
+        //msg_queue()->deactivate();
+        //msg_queue()->flush();
         m_blRun = false;
     }
+
+    ACE_Message_Block* shutdown_message = 0;
+    ACE_NEW_NORETURN(shutdown_message,ACE_Message_Block (0, ACE_Message_Block::MB_STOP));
+    this->put(shutdown_message);
 
     return 0;
 }
@@ -215,7 +228,6 @@ int CLogManager::Start()
         SetReset(false);
         return open();
     }
-
 }
 
 int CLogManager::Stop()
@@ -357,7 +369,6 @@ int CLogManager::WriteLog(int nLogType, const char* fmt, ...)
     m_Logger_Mutex.release();
     return 0;
 }
-
 
 int CLogManager::WriteLogBinary(int nLogType, const char* pData, int nLen)
 {
@@ -577,3 +588,33 @@ uint16 CLogManager::GetLogInfoByLogLevel(uint16 u2LogID)
         return 0;
     }
 }
+
+int CLogManager::put(ACE_Message_Block* mblk,ACE_Time_Value* tm)
+{
+    // We can choose to process the message or to differ it into the message
+    // queue, and process them into the svc() method. Chose the last option.
+    int retval;
+
+    // If queue is full, flush it before block in while
+    if (msg_queue ()->is_full())
+    {
+        if ((retval=msg_queue ()->flush()) == -1)
+        {
+            OUR_DEBUG((LM_ERROR, "[CLogManager::put]put error flushing queue\n"));
+            return -1;
+        }
+    }
+
+    while ((retval = putq (mblk, tm)) == -1)
+    {
+        if (msg_queue ()->state () != ACE_Message_Queue_Base::PULSED)
+        {
+            OUR_DEBUG((LM_ERROR,ACE_TEXT("[CLogManager::put]put Queue not activated.\n")));
+            break;
+        }
+    }
+
+    return retval;
+}
+
+

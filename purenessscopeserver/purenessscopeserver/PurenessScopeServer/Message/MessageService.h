@@ -84,14 +84,15 @@ public:
     void DeleteMessage(CMessage* pMessage);
 
 private:
-    bool IsRun();
+    //bool IsRun();
     bool ProcessMessage(CMessage* pMessage, uint32 u4ThreadID);
     bool SaveThreadInfoData();
 
+    virtual int put(ACE_Message_Block* mblk, ACE_Time_Value* = 0);
 private:
     uint32                         m_u4ThreadID;          //当前线程ID
     uint32                         m_u4MaxQueue;          //线程中最大消息对象个数
-    bool                           m_blRun;               //线程是否在运行
+    //bool                           m_blRun;               //线程是否在运行
     uint32                         m_u4HighMask;
     uint32                         m_u4LowMask;
     uint16                         m_u2ThreadTimeOut;
