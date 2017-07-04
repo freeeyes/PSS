@@ -1685,7 +1685,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
 
         if (this->putq(pMbData, &xtime) == -1)
         {
-            OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendMessage] Connectid=%d,putq output errno = [%d].\n", GetConnectID(), errno));
+            OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendMessage] Connectid=%d,putq(%d) output errno = [%d].\n", GetConnectID(), msg_queue()->message_count(), errno));
             App_MessageBlockManager::instance()->Close(pMbData);
         }
         else
