@@ -139,7 +139,7 @@ public:
 
     bool Start();
     int  Close();
-    //bool IsRun();
+    bool IsRun();
 
     uint32 GetThreadID();
 
@@ -155,11 +155,9 @@ private:
     bool CheckValidClientMessage(IClientMessage* pClientMessage);
     bool ProcessMessage(_Server_Message_Info* pMessage, uint32 u4ThreadID);
 
-    virtual int put(ACE_Message_Block* mblk, ACE_Time_Value* = 0);
-
 private:
     uint32               m_u4ThreadID;  //当前线程ID
-    //bool                 m_blRun;       //当前线程是否运行
+    bool                 m_blRun;       //当前线程是否运行
     uint32               m_u4MaxQueue;  //在队列中的数据最多个数
     EM_Server_Recv_State m_emState;     //处理状态
     ACE_Time_Value       m_tvDispose;   //接收数据包处理时间

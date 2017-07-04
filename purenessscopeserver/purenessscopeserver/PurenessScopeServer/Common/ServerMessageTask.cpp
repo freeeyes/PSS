@@ -107,7 +107,7 @@ void CServerMessageInfoPool::Close()
 CServerMessageTask::CServerMessageTask()
 {
     m_u4ThreadID = 0;
-    //m_blRun      = false;
+    m_blRun      = false;
     m_u4MaxQueue = MAX_SERVER_MESSAGE_QUEUE;
     m_emState    = SERVER_RECV_INIT;
 }
@@ -117,13 +117,12 @@ CServerMessageTask::~CServerMessageTask()
     OUR_DEBUG((LM_INFO, "[CServerMessageTask::~CServerMessageTask].\n"));
 }
 
-/*
 bool CServerMessageTask::IsRun()
 {
     //ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_RunMutex);
+
     return m_blRun;
 }
-*/
 
 bool CServerMessageTask::Start()
 {
@@ -161,12 +160,12 @@ int CServerMessageTask::open(void* args /*= 0*/)
         OUR_DEBUG((LM_INFO,"[CServerMessageTask::open]args is not NULL.\n"));
     }
 
-    //m_blRun = true;
+    m_blRun = true;
 
     if(activate(THREAD_PARAM, MAX_MSG_THREADCOUNT) == -1)
     {
         OUR_DEBUG((LM_ERROR, "[CServerMessageTask::open] activate error ThreadCount = [%d].", MAX_MSG_THREADCOUNT));
-        //m_blRun = false;
+        m_blRun = false;
         return -1;
     }
 
@@ -177,13 +176,9 @@ int CServerMessageTask::open(void* args /*= 0*/)
 
 int CServerMessageTask::Close()
 {
-    //m_blRun = false;
-    //msg_queue()->deactivate();
-    //msg_queue()->flush();
-    ACE_Message_Block* shutdown_message = 0;
-    ACE_NEW_NORETURN(shutdown_message,ACE_Message_Block (0, ACE_Message_Block::MB_STOP));
-    this->put(shutdown_message);
-
+    m_blRun = false;
+    msg_queue()->deactivate();
+    msg_queue()->flush();
     OUR_DEBUG((LM_INFO, "[CServerMessageTask::Close] Close().\n"));
     return 0;
 }
@@ -194,45 +189,35 @@ int CServerMessageTask::svc(void)
     ACE_Time_Value tvSleep(0, MAX_MSG_SENDCHECKTIME*MAX_BUFF_1000);
     ACE_OS::sleep(tvSleep);
 
-    while(true)
+    while(IsRun())
     {
         ACE_Message_Block* mb = NULL;
-        ACE_OS::last_error(0);
 
         //xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, MAX_MSG_PUTTIMEOUT);
         if(getq(mb, 0) == -1)
         {
-            OUR_DEBUG((LM_ERROR,"[CMessageService::svc] PutMessage error errno = [%d].\n", ACE_OS::last_error()));
-            //m_blRun = false;
+            OUR_DEBUG((LM_ERROR,"[CMessageService::svc] PutMessage error errno = [%d].\n", errno));
+            m_blRun = false;
             break;
         }
-        else
+
+        if (mb == NULL)
         {
-            if (mb == NULL)
-            {
-                continue;
-            }
-
-            if ((0 == mb->size ()) && (mb->msg_type () == ACE_Message_Block::MB_STOP))
-            {
-                mb->release ();
-                break;
-            }
-
-            _Server_Message_Info* msg = *((_Server_Message_Info**)mb->base());
-
-            if (! msg)
-            {
-                OUR_DEBUG((LM_ERROR,"[CMessageService::svc] mb msg == NULL CurrthreadNo=[%d]!\n", m_u4ThreadID));
-                continue;
-            }
-
-            this->ProcessMessage(msg, m_u4ThreadID);
-            App_ServerMessageInfoPool::instance()->Delete(msg);
+            continue;
         }
+
+        _Server_Message_Info* msg = *((_Server_Message_Info**)mb->base());
+
+        if (! msg)
+        {
+            OUR_DEBUG((LM_ERROR,"[CMessageService::svc] mb msg == NULL CurrthreadNo=[%d]!\n", m_u4ThreadID));
+            continue;
+        }
+
+        this->ProcessMessage(msg, m_u4ThreadID);
+        App_ServerMessageInfoPool::instance()->Delete(msg);
     }
 
-    this->msg_queue ()->deactivate ();
     OUR_DEBUG((LM_INFO,"[CServerMessageTask::svc] svc finish!\n"));
     return 0;
 }
@@ -356,34 +341,6 @@ bool CServerMessageTask::CheckValidClientMessage(IClientMessage* pClientMessage)
     }
 
     return false;
-}
-
-int CServerMessageTask::put(ACE_Message_Block* mblk,ACE_Time_Value* tm)
-{
-    // We can choose to process the message or to differ it into the message
-    // queue, and process them into the svc() method. Chose the last option.
-    int retval;
-
-    // If queue is full, flush it before block in while
-    if (msg_queue ()->is_full())
-    {
-        if ((retval=msg_queue ()->flush()) == -1)
-        {
-            OUR_DEBUG((LM_ERROR, "[CServerMessageTask::put]put error flushing queue\n"));
-            return -1;
-        }
-    }
-
-    while ((retval = putq (mblk, tm)) == -1)
-    {
-        if (msg_queue ()->state () != ACE_Message_Queue_Base::PULSED)
-        {
-            OUR_DEBUG((LM_ERROR,ACE_TEXT("[CServerMessageTask::put]put Queue not activated.\n")));
-            break;
-        }
-    }
-
-    return retval;
 }
 
 //************************************************

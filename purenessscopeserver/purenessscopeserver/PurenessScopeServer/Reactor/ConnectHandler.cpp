@@ -2082,7 +2082,7 @@ CConnectManager::CConnectManager(void)
 
     m_pTCTimeSendCheck   = NULL;
     m_tvCheckConnect     = ACE_OS::gettimeofday();
-    //m_blRun              = false;
+    m_blRun              = false;
 
     m_u4TimeConnect      = 0;
     m_u4TimeDisConnect   = 0;
@@ -2101,10 +2101,7 @@ CConnectManager::~CConnectManager(void)
 void CConnectManager::CloseAll()
 {
     //ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
-    //msg_queue()->deactivate();
-    ACE_Message_Block* shutdown_message = 0;
-    ACE_NEW_NORETURN(shutdown_message,ACE_Message_Block (0, ACE_Message_Block::MB_STOP));
-    this->put(shutdown_message);
+    msg_queue()->deactivate();
 
     KillTimer();
 
@@ -2661,7 +2658,7 @@ int CConnectManager::open(void* args)
         OUR_DEBUG((LM_INFO,"[CConnectManager::open]args is not NULL.\n"));
     }
 
-    //m_blRun = true;
+    m_blRun = true;
     msg_queue()->high_water_mark(MAX_MSG_MASK);
     msg_queue()->low_water_mark(MAX_MSG_MASK);
 
@@ -2670,7 +2667,7 @@ int CConnectManager::open(void* args)
     if(activate(THREAD_PARAM, MAX_MSG_THREADCOUNT) == -1)
     {
         OUR_DEBUG((LM_ERROR, "[CConnectManager::open] activate error ThreadCount = [%d].", MAX_MSG_THREADCOUNT));
-        //m_blRun = false;
+        m_blRun = false;
         return -1;
     }
 
@@ -2685,63 +2682,51 @@ int CConnectManager::svc (void)
 {
     ACE_Time_Value xtime;
 
-    while(true)
+    while(IsRun())
     {
         ACE_Message_Block* mb = NULL;
-        ACE_OS::last_error(0);
 
         if(getq(mb, 0) == -1)
         {
-            OUR_DEBUG((LM_ERROR,"[CConnectManager::svc] get error errno = [%d].\n", ACE_OS::last_error()));
+            OUR_DEBUG((LM_ERROR,"[CConnectManager::svc] get error errno = [%d].\n", errno));
+            m_blRun = false;
             break;
+        }
+
+        if (mb == NULL)
+        {
+            continue;
+        }
+
+        _SendMessage* msg = *((_SendMessage**)mb->base());
+
+        if (! msg)
+        {
+            continue;
+        }
+
+        if (0 == msg->m_u1Type)
+        {
+            //处理发送数据
+            SendMessage(msg->m_u4ConnectID, msg->m_pBuffPacket, msg->m_u2CommandID, msg->m_u1SendState, msg->m_nEvents, msg->m_tvSend, msg->m_blDelete, msg->m_nMessageID);
         }
         else
         {
-            if (mb == NULL)
-            {
-                continue;
-            }
-
-            if ((0 == mb->size ()) && (mb->msg_type () == ACE_Message_Block::MB_STOP))
-            {
-                mb->release ();
-                break;
-            }
-
-            _SendMessage* msg = *((_SendMessage**)mb->base());
-
-            if (! msg)
-            {
-                continue;
-            }
-
-            if (0 == msg->m_u1Type)
-            {
-                //处理发送数据
-                SendMessage(msg->m_u4ConnectID, msg->m_pBuffPacket, msg->m_u2CommandID, msg->m_u1SendState, msg->m_nEvents, msg->m_tvSend, msg->m_blDelete, msg->m_nMessageID);
-            }
-            else
-            {
-                //处理连接服务器主动关闭
-                CloseConnect(msg->m_u4ConnectID, CLIENT_CLOSE_IMMEDIATLY);
-            }
-
-            m_SendMessagePool.Delete(msg);
+            //处理连接服务器主动关闭
+            CloseConnect(msg->m_u4ConnectID, CLIENT_CLOSE_IMMEDIATLY);
         }
-    }
 
-    this->msg_queue ()->deactivate ();
+        m_SendMessagePool.Delete(msg);
+    }
 
     OUR_DEBUG((LM_INFO,"[CConnectManager::svc] svc finish!\n"));
     return 0;
 }
 
-/*
 bool CConnectManager::IsRun()
 {
     return m_blRun;
 }
-*/
 
 void CConnectManager::CloseQueue()
 {
@@ -2750,7 +2735,7 @@ void CConnectManager::CloseQueue()
 
 int CConnectManager::close(u_long)
 {
-    //m_blRun = false;
+    m_blRun = false;
     OUR_DEBUG((LM_INFO,"[CConnectManager::close] close().\n"));
     return 0;
 }
@@ -3035,34 +3020,6 @@ EM_Client_Connect_status CConnectManager::GetConnectState(uint32 u4ConnectID)
     {
         return CLIENT_CONNECT_EXIST;
     }
-}
-
-int CConnectManager::put(ACE_Message_Block* mblk,ACE_Time_Value* tm)
-{
-    // We can choose to process the message or to differ it into the message
-    // queue, and process them into the svc() method. Chose the last option.
-    int retval;
-
-    // If queue is full, flush it before block in while
-    if (msg_queue ()->is_full())
-    {
-        if ((retval=msg_queue ()->flush()) == -1)
-        {
-            OUR_DEBUG((LM_ERROR, "[CConnectManager::put]put error flushing queue\n"));
-            return -1;
-        }
-    }
-
-    while ((retval = putq (mblk, tm)) == -1)
-    {
-        if (msg_queue ()->state () != ACE_Message_Queue_Base::PULSED)
-        {
-            OUR_DEBUG((LM_ERROR,ACE_TEXT("[CConnectManager::put]put Queue not activated.\n")));
-            break;
-        }
-    }
-
-    return retval;
 }
 
 //*********************************************************************************
