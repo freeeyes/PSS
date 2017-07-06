@@ -1683,6 +1683,14 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
         //将消息放入队列，让output在反应器线程发送。
         ACE_Time_Value xtime = ACE_OS::gettimeofday();
 
+        //队列已满，不能再放进去了,就不放进去了
+        if (msg_queue()->is_full() == true)
+        {
+            OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendMessage] Connectid=%d,putq is full(%d).\n", GetConnectID(), msg_queue()->message_count()));
+            App_MessageBlockManager::instance()->Close(pMbData);
+            return false;
+        }
+
         if (this->putq(pMbData, &xtime) == -1)
         {
             OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendMessage] Connectid=%d,putq(%d) output errno = [%d].\n", GetConnectID(), msg_queue()->message_count(), errno));
