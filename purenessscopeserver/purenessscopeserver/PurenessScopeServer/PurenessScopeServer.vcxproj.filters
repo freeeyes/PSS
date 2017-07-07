@@ -322,7 +322,9 @@
     <ClCompile Include="Mail\smtp.cpp">
       <Filter>Mail\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="Common\ServerMessageTask.cpp" />
+    <ClCompile Include="Common\ServerMessageTask.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Encrypt\Aes.h">
@@ -622,9 +624,15 @@
     <ClInclude Include="IObject\IServerManager.h">
       <Filter>IObject</Filter>
     </ClInclude>
-    <ClInclude Include="Common\ServerMessageTask.h" />
-    <ClInclude Include="Common\HashTable.h" />
-    <ClInclude Include="Common\TimeWheelLink.h" />
+    <ClInclude Include="Common\HashTable.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\TimeWheelLink.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\ServerMessageTask.h">
+      <Filter>Common\headfile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Reactor\My_Dev_Poll_Reactor.inl">
@@ -632,6 +640,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
+    <Text Include="ReadMe.txt">
+      <Filter>Common\headfile</Filter>
+    </Text>
   </ItemGroup>
 </Project>
