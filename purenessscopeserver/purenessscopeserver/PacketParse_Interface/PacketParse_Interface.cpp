@@ -148,7 +148,7 @@ extern "C"
     //得到返回数据包的长度
     uint32 Make_Send_Packet_Length(uint32 u4ConnectID, uint32 u4DataLen, uint16 u2CommandID)
     {
-        if (0 == u4ConnectID || 0 == u2CommandID)
+        if (0 == u2CommandID)
         {
             return 0;
         }

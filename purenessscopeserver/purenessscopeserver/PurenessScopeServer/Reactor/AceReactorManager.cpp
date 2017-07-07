@@ -196,9 +196,14 @@ int CAceReactor::svc()
     else
     {
         m_blRun = true;
+
         //OUR_DEBUG((LM_ERROR, "CAceReactor::Svc] (%P|%t) Begin nReactorID= [%d] begin.... \n", m_u4ReactorID));
-        m_pReactor->owner(ACE_OS::thr_self());
-        m_pReactor->run_reactor_event_loop();
+        while (m_pReactor->reactor_event_loop_done() == 0)
+        {
+            m_pReactor->owner(ACE_OS::thr_self());
+            m_pReactor->run_reactor_event_loop();
+        }
+
         OUR_DEBUG((LM_ERROR, "CAceReactor::Svc]Begin nReactorID= [%d] end .... \n", m_u4ReactorID));
         return 0;
     }
