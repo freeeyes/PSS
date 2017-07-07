@@ -545,7 +545,9 @@ public:
                 pT         = m_lpTable[i]->m_pData->m_pValue;
                 char* pKey = m_lpTable[i]->m_pData->m_pKey;
 
-                //printf("[Pop]1 pKey=%s.\n", pKey);
+                //设置状态
+                m_lpTable[i] = m_lpTable[i]->m_pNext;
+                m_nCurrLinkIndex = i;
 
                 //回收数据
                 Del_Hash_Data(pKey);
