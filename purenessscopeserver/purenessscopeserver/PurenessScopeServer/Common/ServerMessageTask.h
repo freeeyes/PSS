@@ -194,7 +194,6 @@ private:
     ACE_Recursive_Thread_Mutex  m_ThreadWritrLock;
 };
 
-
 typedef ACE_Singleton<CServerMessageManager, ACE_Recursive_Thread_Mutex> App_ServerMessageTask;
 typedef ACE_Singleton<CServerMessageInfoPool, ACE_Recursive_Thread_Mutex> App_ServerMessageInfoPool;
 #endif

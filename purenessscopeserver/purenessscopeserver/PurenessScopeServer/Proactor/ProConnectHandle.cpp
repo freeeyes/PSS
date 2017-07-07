@@ -1901,7 +1901,7 @@ int CProConnectManager::svc (void)
         if(getq(mb, 0) == -1)
         {
             OUR_DEBUG((LM_INFO,"[CProConnectManager::svc] getq is error[%d]!\n", ACE_OS::last_error()));
-            //m_blRun = false;
+            m_blRun = false;
             break;
         }
         else

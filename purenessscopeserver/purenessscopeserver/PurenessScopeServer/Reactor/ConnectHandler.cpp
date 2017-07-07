@@ -2707,6 +2707,7 @@ int CConnectManager::svc (void)
         if(getq(mb, 0) == -1)
         {
             OUR_DEBUG((LM_ERROR,"[CConnectManager::svc] get error errno = [%d].\n", ACE_OS::last_error()));
+			m_blRun = false;
             break;
         }
         else

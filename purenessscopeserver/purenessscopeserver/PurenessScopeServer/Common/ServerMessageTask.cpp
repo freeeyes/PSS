@@ -197,7 +197,7 @@ int CServerMessageTask::svc(void)
         if(getq(mb, 0) == -1)
         {
             OUR_DEBUG((LM_ERROR,"[CMessageService::svc] PutMessage error errno = [%d].\n", ACE_OS::last_error()));
-            //m_blRun = false;
+            m_blRun = false;
             break;
         }
         else
