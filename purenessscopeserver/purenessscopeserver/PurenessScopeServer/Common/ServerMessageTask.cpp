@@ -84,7 +84,6 @@ bool CServerMessageInfoPool::Delete(_Server_Message_Info* pObject)
         //OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHashID, pObject, nPos));
     }
 
-
     return true;
 }
 
@@ -104,7 +103,7 @@ void CServerMessageInfoPool::Close()
     m_objServerMessageList.Close();
 }
 
-CServerMessageTask::CServerMessageTask()
+CServerMessageTask::CServerMessageTask():m_mutex(), m_cond(m_mutex)
 {
     m_u4ThreadID = 0;
     m_blRun      = false;
@@ -117,13 +116,6 @@ CServerMessageTask::~CServerMessageTask()
     OUR_DEBUG((LM_INFO, "[CServerMessageTask::~CServerMessageTask].\n"));
 }
 
-bool CServerMessageTask::IsRun()
-{
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_RunMutex);
-
-    return m_blRun;
-}
-
 bool CServerMessageTask::Start()
 {
     if(0 != open())
@@ -134,9 +126,7 @@ bool CServerMessageTask::Start()
     return true;
 }
 
-int CServerMessageTask::handle_signal (int signum,
-                                       siginfo_t* siginfo,
-                                       ucontext_t* ucontext)
+int CServerMessageTask::handle_signal (int signum,siginfo_t* siginfo,ucontext_t* ucontext)
 {
     if (signum == SIGUSR1 + grp_id())
     {
@@ -170,16 +160,25 @@ int CServerMessageTask::open(void* args /*= 0*/)
     }
 
     resume();
-
     return 0;
 }
 
 int CServerMessageTask::Close()
 {
-    m_blRun = false;
-    msg_queue()->deactivate();
-    msg_queue()->flush();
-    OUR_DEBUG((LM_INFO, "[CServerMessageTask::Close] Close().\n"));
+    if (m_blRun)
+    {
+        m_blRun = false;
+        ACE_Message_Block* shutdown_message = 0;
+        ACE_NEW_NORETURN(shutdown_message,ACE_Message_Block (0, ACE_Message_Block::MB_STOP));
+        this->CloseMsgQueue(shutdown_message);
+    }
+    else
+    {
+        m_blRun = false;
+        msg_queue()->deactivate();
+        msg_queue()->flush();
+    }
+
     return 0;
 }
 
@@ -189,33 +188,46 @@ int CServerMessageTask::svc(void)
     ACE_Time_Value tvSleep(0, MAX_MSG_SENDCHECKTIME*MAX_BUFF_1000);
     ACE_OS::sleep(tvSleep);
 
-    while(IsRun())
+    while(true)
     {
         ACE_Message_Block* mb = NULL;
+        ACE_OS::last_error(0);
 
         //xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, MAX_MSG_PUTTIMEOUT);
         if(getq(mb, 0) == -1)
         {
-            OUR_DEBUG((LM_ERROR,"[CMessageService::svc] PutMessage error errno = [%d].\n", errno));
-            m_blRun = false;
+            OUR_DEBUG((LM_ERROR,"[CMessageService::svc] PutMessage error errno = [%d].\n", ACE_OS::last_error()));
+            //m_blRun = false;
             break;
         }
-
-        if (mb == NULL)
+        else
         {
-            continue;
+            if (mb == NULL)
+            {
+                continue;
+            }
+
+            if ((0 == mb->size ()) && (mb->msg_type () == ACE_Message_Block::MB_STOP))
+            {
+                m_mutex.acquire();
+                mb->release ();
+                this->msg_queue ()->deactivate ();
+                m_cond.signal();
+                m_mutex.release();
+                break;
+            }
+
+            _Server_Message_Info* msg = *((_Server_Message_Info**)mb->base());
+
+            if (! msg)
+            {
+                OUR_DEBUG((LM_ERROR,"[CMessageService::svc] mb msg == NULL CurrthreadNo=[%d]!\n", m_u4ThreadID));
+                continue;
+            }
+
+            this->ProcessMessage(msg, m_u4ThreadID);
+            App_ServerMessageInfoPool::instance()->Delete(msg);
         }
-
-        _Server_Message_Info* msg = *((_Server_Message_Info**)mb->base());
-
-        if (! msg)
-        {
-            OUR_DEBUG((LM_ERROR,"[CMessageService::svc] mb msg == NULL CurrthreadNo=[%d]!\n", m_u4ThreadID));
-            continue;
-        }
-
-        this->ProcessMessage(msg, m_u4ThreadID);
-        App_ServerMessageInfoPool::instance()->Delete(msg);
     }
 
     OUR_DEBUG((LM_INFO,"[CServerMessageTask::svc] svc finish!\n"));
@@ -297,7 +309,6 @@ bool CServerMessageTask::CheckServerMessageThread(ACE_Time_Value tvNow)
     {
         return true;
     }
-
 }
 
 void CServerMessageTask::AddClientMessage(IClientMessage* pClientMessage)
@@ -341,6 +352,38 @@ bool CServerMessageTask::CheckValidClientMessage(IClientMessage* pClientMessage)
     }
 
     return false;
+}
+
+int CServerMessageTask::CloseMsgQueue(ACE_Message_Block* mblk,ACE_Time_Value* tm)
+{
+    // We can choose to process the message or to differ it into the message
+    // queue, and process them into the svc() method. Chose the last option.
+    int retval;
+
+    // If queue is full, flush it before block in while
+    if (msg_queue ()->is_full())
+    {
+        if ((retval=msg_queue ()->flush()) == -1)
+        {
+            OUR_DEBUG((LM_ERROR, "[CServerMessageTask::CloseMsgQueue]put error flushing queue\n"));
+            return -1;
+        }
+    }
+
+    m_mutex.acquire();
+
+    while ((retval = putq (mblk, tm)) == -1)
+    {
+        if (msg_queue ()->state () != ACE_Message_Queue_Base::PULSED)
+        {
+            OUR_DEBUG((LM_ERROR,("[CServerMessageTask::CloseMsgQueue]put Queue not activated.\n")));
+            break;
+        }
+    }
+
+    m_cond.wait();
+    m_mutex.release();
+    return retval;
 }
 
 //************************************************

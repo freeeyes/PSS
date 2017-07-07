@@ -139,7 +139,6 @@ public:
 
     bool Start();
     int  Close();
-    bool IsRun();
 
     uint32 GetThreadID();
 
@@ -155,6 +154,12 @@ private:
     bool CheckValidClientMessage(IClientMessage* pClientMessage);
     bool ProcessMessage(_Server_Message_Info* pMessage, uint32 u4ThreadID);
 
+    virtual int CloseMsgQueue(ACE_Message_Block* mblk, ACE_Time_Value* = 0);
+
+private:
+    //关闭消息队列条件变量
+    ACE_Thread_Mutex m_mutex;
+    ACE_Condition<ACE_Thread_Mutex> m_cond;
 private:
     uint32               m_u4ThreadID;  //当前线程ID
     bool                 m_blRun;       //当前线程是否运行

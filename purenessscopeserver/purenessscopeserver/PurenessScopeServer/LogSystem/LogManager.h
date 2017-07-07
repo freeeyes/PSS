@@ -76,7 +76,12 @@ public:
 
 private:
     int ProcessLog(_LogBlockInfo* pLogBlockInfo);
+    virtual int CloseMsgQueue(ACE_Message_Block* mblk, ACE_Time_Value* = 0);
 
+private:
+    //关闭消息队列条件变量
+    ACE_Thread_Mutex m_mutex;
+    ACE_Condition<ACE_Thread_Mutex> m_cond;
 private:
     bool                              m_blRun;                    //日志系统是否启动
     bool                              m_blIsNeedReset;            //日志模块等级升级重置标志

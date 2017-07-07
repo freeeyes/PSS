@@ -1391,7 +1391,7 @@ void CProConnectHandle::SetPacketParseInfoID(uint32 u4PacketParseInfoID)
 }
 
 //***************************************************************************
-CProConnectManager::CProConnectManager(void)
+CProConnectManager::CProConnectManager(void):m_mutex(), m_cond(m_mutex)
 {
     m_u4TimeCheckID      = 0;
     m_szError[0]         = '\0';
@@ -1414,7 +1414,16 @@ void CProConnectManager::CloseAll()
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
 
-    msg_queue()->deactivate();
+    if(m_blRun)
+    {
+        ACE_Message_Block* shutdown_message = 0;
+        ACE_NEW_NORETURN(shutdown_message,ACE_Message_Block (0, ACE_Message_Block::MB_STOP));
+        this->CloseMsgQueue(shutdown_message);
+    }
+    else
+    {
+        msg_queue()->deactivate();
+    }
 
     KillTimer();
     vector<CProConnectHandle*> vecCloseConnectHandler;
@@ -1883,52 +1892,59 @@ int CProConnectManager::svc (void)
 {
     ACE_Time_Value xtime;
 
-    while(IsRun())
+    while(true)
     {
         ACE_Message_Block* mb = NULL;
+        ACE_OS::last_error(0);
 
         //xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, MAX_MSG_PUTTIMEOUT);
         if(getq(mb, 0) == -1)
         {
-            OUR_DEBUG((LM_INFO,"[CProConnectManager::svc] getq is error[%d]!\n", errno));
-            m_blRun = false;
+            OUR_DEBUG((LM_INFO,"[CProConnectManager::svc] getq is error[%d]!\n", ACE_OS::last_error()));
+            //m_blRun = false;
             break;
         }
-
-        if (mb == NULL)
+        else
         {
-            continue;
+            if (mb == NULL)
+            {
+                continue;
+            }
+
+            if ((0 == mb->size ()) && (mb->msg_type () == ACE_Message_Block::MB_STOP))
+            {
+                m_mutex.acquire();
+                mb->release ();
+                this->msg_queue ()->deactivate ();
+                m_cond.signal();
+                m_mutex.release();
+                break;
+            }
+
+            _SendMessage* msg = *((_SendMessage**)mb->base());
+
+            if (!msg)
+            {
+                continue;
+            }
+
+            if (0 == msg->m_u1Type)
+            {
+                //处理发送数据
+                SendMessage(msg->m_u4ConnectID, msg->m_pBuffPacket, msg->m_u2CommandID, msg->m_u1SendState, msg->m_nEvents, msg->m_tvSend, msg->m_blDelete, msg->m_nMessageID);
+            }
+            else if (1 == msg->m_u1Type)
+            {
+                //处理连接服务器主动关闭
+                CloseConnect(msg->m_u4ConnectID, CLIENT_CLOSE_IMMEDIATLY);
+            }
+
+            m_SendMessagePool.Delete(msg);
         }
-
-        _SendMessage* msg = *((_SendMessage**)mb->base());
-
-        if (! msg)
-        {
-            continue;
-        }
-
-        if (0 == msg->m_u1Type)
-        {
-            //处理发送数据
-            SendMessage(msg->m_u4ConnectID, msg->m_pBuffPacket, msg->m_u2CommandID, msg->m_u1SendState, msg->m_nEvents, msg->m_tvSend, msg->m_blDelete, msg->m_nMessageID);
-        }
-        else if (1 == msg->m_u1Type)
-        {
-            //处理连接服务器主动关闭
-            CloseConnect(msg->m_u4ConnectID, CLIENT_CLOSE_IMMEDIATLY);
-        }
-
-        m_SendMessagePool.Delete(msg);
-
     }
 
     OUR_DEBUG((LM_INFO,"[CProConnectManager::svc] svc finish!\n"));
     return 0;
-}
-
-bool CProConnectManager::IsRun()
-{
-    return m_blRun;
 }
 
 int CProConnectManager::close(u_long)
@@ -2232,6 +2248,39 @@ EM_Client_Connect_status CProConnectManager::GetConnectState(uint32 u4ConnectID)
 CSendCacheManager* CProConnectManager::GetSendCacheManager()
 {
     return &m_SendCacheManager;
+}
+
+int CProConnectManager::CloseMsgQueue(ACE_Message_Block* mblk,ACE_Time_Value* tm)
+{
+    // We can choose to process the message or to differ it into the message
+    // queue, and process them into the svc() method. Chose the last option.
+    int retval;
+
+    // If queue is full, flush it before block in while
+    if (msg_queue ()->is_full())
+    {
+        if ((retval=msg_queue ()->flush()) == -1)
+        {
+            OUR_DEBUG((LM_ERROR, "[CProConnectManager::CloseMsgQueue]put error flushing queue\n"));
+            return -1;
+        }
+    }
+
+    m_mutex.acquire();
+
+    while ((retval = putq (mblk, tm)) == -1)
+    {
+        if (msg_queue ()->state () != ACE_Message_Queue_Base::PULSED)
+        {
+            OUR_DEBUG((LM_ERROR,ACE_TEXT("[CProConnectManager::CloseMsgQueue]put Queue not activated.\n")));
+            break;
+        }
+    }
+
+    m_cond.wait();
+    m_mutex.release();
+
+    return retval;
 }
 
 //*********************************************************************************

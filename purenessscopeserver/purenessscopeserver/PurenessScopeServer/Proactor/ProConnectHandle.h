@@ -195,8 +195,12 @@ public:
     const char* GetError();
 
 private:
-    bool IsRun();
+    virtual int CloseMsgQueue(ACE_Message_Block* mblk, ACE_Time_Value* = 0);
 
+private:
+    //关闭消息队列条件变量
+    ACE_Thread_Mutex m_mutex;
+    ACE_Condition<ACE_Thread_Mutex> m_cond;
 private:
     CHashTable<CProConnectHandle>      m_objHashConnectList;    //记录当前已经连接的节点，使用固定内存结构
     char                               m_szError[MAX_BUFF_500]; //错误信息描述

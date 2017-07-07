@@ -84,10 +84,15 @@ public:
     void DeleteMessage(CMessage* pMessage);
 
 private:
-    bool IsRun();
     bool ProcessMessage(CMessage* pMessage, uint32 u4ThreadID);
     bool SaveThreadInfoData();
 
+    virtual int CloseMsgQueue(ACE_Message_Block* mblk, ACE_Time_Value* = 0);
+
+private:
+    //关闭消息队列条件变量
+    ACE_Thread_Mutex m_mutex;
+    ACE_Condition<ACE_Thread_Mutex> m_cond;
 private:
     uint32                         m_u4ThreadID;          //当前线程ID
     uint32                         m_u4MaxQueue;          //线程中最大消息对象个数
@@ -171,7 +176,6 @@ public:
     CRandomNumber              m_objRandomNumber;     //随机数，仅UDP使用
     //ACE_Recursive_Thread_Mutex m_ThreadWriteLock;     //当前线程锁
 };
-
 
 typedef ACE_Singleton<CMessageServiceGroup,ACE_Null_Mutex> App_MessageServiceGroup;
 #endif

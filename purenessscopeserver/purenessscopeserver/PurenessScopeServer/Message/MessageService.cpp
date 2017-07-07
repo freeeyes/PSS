@@ -6,7 +6,7 @@
 
 #include "MessageService.h"
 
-CMessageService::CMessageService()
+CMessageService::CMessageService():m_mutex(), m_cond(m_mutex)
 {
     m_u4ThreadID      = 0;
     m_u4MaxQueue      = MAX_MSG_THREADQUEUE;
@@ -97,13 +97,6 @@ bool CMessageService::Start()
     return true;
 }
 
-bool CMessageService::IsRun()
-{
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_RunMutex);
-
-    return m_blRun;
-}
-
 int CMessageService::open(void* args)
 {
     if(args != NULL)
@@ -124,7 +117,7 @@ int CMessageService::open(void* args)
         return -1;
     }
 
-    //resume();
+    resume();
 
     return 0;
 }
@@ -134,7 +127,7 @@ int CMessageService::svc(void)
     // Cache our ACE_Thread_Manager pointer.
     ACE_Thread_Manager* mgr = this->thr_mgr ();
 
-    while(IsRun())
+    while(true)
     {
         if (mgr->testcancel(mgr->thr_self ()))
         {
@@ -142,36 +135,49 @@ int CMessageService::svc(void)
         }
 
         ACE_Message_Block* mb = NULL;
+        ACE_OS::last_error(0);
 
         //xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, MAX_MSG_PUTTIMEOUT);
         if(getq(mb, 0) == -1)
         {
-            OUR_DEBUG((LM_ERROR,"[CMessageService::svc] PutMessage error errno = [%d].\n", errno));
-            m_blRun = false;
+            OUR_DEBUG((LM_ERROR,"[CMessageService::svc] PutMessage error errno = [%d].\n", ACE_OS::last_error()));
+            //m_blRun = false;
             break;
         }
-
-        if(mb == NULL)
+        else
         {
-            continue;
+            if(mb == NULL)
+            {
+                continue;
+            }
+
+            if ((0 == mb->size ()) && (mb->msg_type () == ACE_Message_Block::MB_STOP))
+            {
+                m_mutex.acquire();
+                mb->release ();
+                this->msg_queue ()->deactivate ();
+                m_cond.signal();
+                m_mutex.release();
+                break;
+            }
+
+            while(m_emThreadState != THREAD_RUN)
+            {
+                //如果模块正在卸载或者重载，线程在这里等加载完毕（等1ms）。
+                ACE_Time_Value tvsleep(0, 1000);
+                ACE_OS::sleep(tvsleep);
+            }
+
+            CMessage* msg = *((CMessage**)mb->base());
+
+            if(!msg)
+            {
+                OUR_DEBUG((LM_ERROR,"[CMessageService::svc] mb msg == NULL CurrthreadNo=[%d]!\n", m_u4ThreadID));
+                continue;
+            }
+
+            this->ProcessMessage(msg, m_u4ThreadID);
         }
-
-        while(m_emThreadState != THREAD_RUN)
-        {
-            //如果模块正在卸载或者重载，线程在这里等加载完毕（等1ms）。
-            ACE_Time_Value tvsleep(0, 1000);
-            ACE_OS::sleep(tvsleep);
-        }
-
-        CMessage* msg = *((CMessage**)mb->base());
-
-        if(!msg)
-        {
-            OUR_DEBUG((LM_ERROR,"[CMessageService::svc] mb msg == NULL CurrthreadNo=[%d]!\n", m_u4ThreadID));
-            continue;
-        }
-
-        this->ProcessMessage(msg, m_u4ThreadID);
 
         //使用内存池，这块内存不必再释放
     }
@@ -341,9 +347,20 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 
 int CMessageService::Close()
 {
-    m_blRun         = false;
+    if(m_blRun)
+    {
+        m_blRun = false;
+        ACE_Message_Block* shutdown_message = 0;
+        ACE_NEW_NORETURN(shutdown_message,ACE_Message_Block (0, ACE_Message_Block::MB_STOP));
+        this->CloseMsgQueue(shutdown_message);
+    }
+    else
+    {
+        m_blRun = false;
+        msg_queue()->deactivate();
+    }
+
     m_MessagePool.Close();
-    msg_queue()->deactivate();
     OUR_DEBUG((LM_INFO, "[CMessageService::close] Close().\n"));
     return 0;
 }
@@ -516,6 +533,38 @@ int CMessageService::handle_signal (int signum,siginfo_t* siginfo,ucontext_t* uc
     }
 
     return 0;
+}
+
+int CMessageService::CloseMsgQueue(ACE_Message_Block* mblk,ACE_Time_Value* tm)
+{
+    // We can choose to process the message or to differ it into the message
+    // queue, and process them into the svc() method. Chose the last option.
+    int retval;
+
+    // If queue is full, flush it before block in while
+    if (msg_queue ()->is_full())
+    {
+        if ((retval=msg_queue ()->flush()) == -1)
+        {
+            OUR_DEBUG((LM_ERROR, "[CMessageService::CloseMsgQueue]put error flushing queue\n"));
+            return -1;
+        }
+    }
+
+    m_mutex.acquire();
+
+    while ((retval = putq (mblk, tm)) == -1)
+    {
+        if (msg_queue ()->state () != ACE_Message_Queue_Base::PULSED)
+        {
+            OUR_DEBUG((LM_ERROR,ACE_TEXT("[CMessageService::CloseMsgQueue]put Queue not activated.\n")));
+            break;
+        }
+    }
+
+    m_cond.wait();
+    m_mutex.release();
+    return retval;
 }
 
 CMessageServiceGroup::CMessageServiceGroup()
@@ -723,7 +772,7 @@ bool CMessageServiceGroup::CheckWorkThread()
                 }
                 else
                 {
-                    OUR_DEBUG((LM_DEBUG, "[CMessageServiceGroup::CheckServerMessageThread]kill return OK.\n"));
+                    OUR_DEBUG((LM_DEBUG, "[CMessageServiceGroup::CheckServerMessageThread]kill Thread:%d return OK.\n",u4ThreadID));
                 }
 
                 //需要重启工作线程，先关闭当前的工作线程

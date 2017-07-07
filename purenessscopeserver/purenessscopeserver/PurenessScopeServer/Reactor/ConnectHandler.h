@@ -199,8 +199,12 @@ public:
     EM_Client_Connect_status GetConnectState(uint32 u4ConnectID);                                //得到指定的连接状态
 
 private:
-    bool IsRun();
-    void CloseQueue();
+    virtual int CloseMsgQueue(ACE_Message_Block* mblk, ACE_Time_Value* = 0);
+
+private:
+    //关闭消息队列条件变量
+    ACE_Thread_Mutex m_mutex;
+    ACE_Condition<ACE_Thread_Mutex> m_cond;
 
 private:
     CHashTable<CConnectHandler>        m_objHashConnectList;    //记录当前已经连接的节点，使用固定内存结构
