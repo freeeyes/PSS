@@ -349,9 +349,7 @@ int CMessageService::Close()
     if(m_blRun)
     {
         m_blRun = false;
-        ACE_Message_Block* shutdown_message = 0;
-        ACE_NEW_NORETURN(shutdown_message,ACE_Message_Block (0, ACE_Message_Block::MB_STOP));
-        this->CloseMsgQueue(shutdown_message);
+        this->CloseMsgQueue();
     }
     else
     {
@@ -534,11 +532,14 @@ int CMessageService::handle_signal (int signum,siginfo_t* siginfo,ucontext_t* uc
     return 0;
 }
 
-int CMessageService::CloseMsgQueue(ACE_Message_Block* mblk,ACE_Time_Value* tm)
+int CMessageService::CloseMsgQueue()
 {
     // We can choose to process the message or to differ it into the message
     // queue, and process them into the svc() method. Chose the last option.
     int retval;
+
+    ACE_Message_Block* mblk = 0;
+    ACE_NEW_RETURN(mblk,ACE_Message_Block (0, ACE_Message_Block::MB_STOP),-1);
 
     // If queue is full, flush it before block in while
     if (msg_queue ()->is_full())
@@ -552,7 +553,7 @@ int CMessageService::CloseMsgQueue(ACE_Message_Block* mblk,ACE_Time_Value* tm)
 
     m_mutex.acquire();
 
-    while ((retval = putq (mblk, tm)) == -1)
+    while ((retval = putq (mblk)) == -1)
     {
         if (msg_queue ()->state () != ACE_Message_Queue_Base::PULSED)
         {

@@ -195,7 +195,7 @@ public:
     const char* GetError();
 
 private:
-    virtual int CloseMsgQueue(ACE_Message_Block* mblk, ACE_Time_Value* = 0);
+    virtual int CloseMsgQueue();
 
 private:
     //关闭消息队列条件变量

@@ -87,7 +87,7 @@ private:
     bool ProcessMessage(CMessage* pMessage, uint32 u4ThreadID);
     bool SaveThreadInfoData();
 
-    virtual int CloseMsgQueue(ACE_Message_Block* mblk, ACE_Time_Value* = 0);
+    virtual int CloseMsgQueue();
 
 private:
     //关闭消息队列条件变量

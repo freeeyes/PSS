@@ -1416,9 +1416,7 @@ void CProConnectManager::CloseAll()
 
     if(m_blRun)
     {
-        ACE_Message_Block* shutdown_message = 0;
-        ACE_NEW_NORETURN(shutdown_message,ACE_Message_Block (0, ACE_Message_Block::MB_STOP));
-        this->CloseMsgQueue(shutdown_message);
+        this->CloseMsgQueue();
     }
     else
     {
@@ -2250,11 +2248,13 @@ CSendCacheManager* CProConnectManager::GetSendCacheManager()
     return &m_SendCacheManager;
 }
 
-int CProConnectManager::CloseMsgQueue(ACE_Message_Block* mblk,ACE_Time_Value* tm)
+int CProConnectManager::CloseMsgQueue()
 {
     // We can choose to process the message or to differ it into the message
     // queue, and process them into the svc() method. Chose the last option.
     int retval;
+    ACE_Message_Block* mblk = 0;
+    ACE_NEW_RETURN(mblk,ACE_Message_Block (0, ACE_Message_Block::MB_STOP),-1);
 
     // If queue is full, flush it before block in while
     if (msg_queue ()->is_full())
@@ -2268,7 +2268,7 @@ int CProConnectManager::CloseMsgQueue(ACE_Message_Block* mblk,ACE_Time_Value* tm
 
     m_mutex.acquire();
 
-    while ((retval = putq (mblk, tm)) == -1)
+    while ((retval = putq (mblk)) == -1)
     {
         if (msg_queue ()->state () != ACE_Message_Queue_Base::PULSED)
         {

@@ -2111,9 +2111,7 @@ void CConnectManager::CloseAll()
     //ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
     if(m_blRun)
     {
-        ACE_Message_Block* shutdown_message = 0;
-        ACE_NEW_NORETURN(shutdown_message,ACE_Message_Block (0, ACE_Message_Block::MB_STOP));
-        this->CloseMsgQueue(shutdown_message);
+        this->CloseMsgQueue();
     }
     else
     {
@@ -2707,7 +2705,7 @@ int CConnectManager::svc (void)
         if(getq(mb, 0) == -1)
         {
             OUR_DEBUG((LM_ERROR,"[CConnectManager::svc] get error errno = [%d].\n", ACE_OS::last_error()));
-            m_blRun = false;
+			m_blRun = false;
             break;
         }
         else
@@ -3042,11 +3040,14 @@ EM_Client_Connect_status CConnectManager::GetConnectState(uint32 u4ConnectID)
     }
 }
 
-int CConnectManager::CloseMsgQueue(ACE_Message_Block* mblk,ACE_Time_Value* tm)
+int CConnectManager::CloseMsgQueue()
 {
     // We can choose to process the message or to differ it into the message
     // queue, and process them into the svc() method. Chose the last option.
     int retval;
+
+    ACE_Message_Block* mblk = 0;
+    ACE_NEW_RETURN(mblk,ACE_Message_Block (0, ACE_Message_Block::MB_STOP),-1);
 
     // If queue is full, flush it before block in while
     if (msg_queue ()->is_full())
@@ -3060,7 +3061,7 @@ int CConnectManager::CloseMsgQueue(ACE_Message_Block* mblk,ACE_Time_Value* tm)
 
     m_mutex.acquire();
 
-    while ((retval = putq (mblk, tm)) == -1)
+    while ((retval = putq (mblk)) == -1)
     {
         if (msg_queue ()->state () != ACE_Message_Queue_Base::PULSED)
         {

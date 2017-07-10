@@ -199,7 +199,7 @@ public:
     EM_Client_Connect_status GetConnectState(uint32 u4ConnectID);                                //得到指定的连接状态
 
 private:
-    virtual int CloseMsgQueue(ACE_Message_Block* mblk, ACE_Time_Value* = 0);
+    virtual int CloseMsgQueue();
 
 private:
     //关闭消息队列条件变量

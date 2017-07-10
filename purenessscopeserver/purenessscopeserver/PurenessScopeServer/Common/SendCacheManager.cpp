@@ -89,3 +89,4 @@ void CSendCacheManager::FreeCacheData(uint32 u4ConnectID)
 
     m_u4UsedCount--;
 }
+

@@ -154,7 +154,7 @@ private:
     bool CheckValidClientMessage(IClientMessage* pClientMessage);
     bool ProcessMessage(_Server_Message_Info* pMessage, uint32 u4ThreadID);
 
-    virtual int CloseMsgQueue(ACE_Message_Block* mblk, ACE_Time_Value* = 0);
+    virtual int CloseMsgQueue();
 
 private:
     //关闭消息队列条件变量
