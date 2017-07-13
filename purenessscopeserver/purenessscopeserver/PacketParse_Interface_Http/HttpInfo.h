@@ -8,9 +8,9 @@ using namespace std;
 //add by freeeyes
 
 //最大未解密包的长度,以及缓冲块的大小，如果长度比这个大，请修改这里
-#define MAX_ENCRYPTLENGTH 5*MAX_BUFF_1024
+#define MAX_ENCRYPTLENGTH 50*MAX_BUFF_1024
 //最大解密数据包长度，如果最大数据包比这个大，则扩展这个值
-#define MAX_DECRYPTLENGTH 5*MAX_BUFF_1024
+#define MAX_DECRYPTLENGTH 50*MAX_BUFF_1024
 
 //记录websokcet的连接状态，如果是初次连接，则设置为WEBSOCKET_STATE_HANDIN
 struct _HttpInfo

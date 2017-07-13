@@ -24,7 +24,6 @@ IBuffPacket* CBuffPacketManager::Create()
 bool CBuffPacketManager::Delete(IBuffPacket* pBuffPacket)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
-
     CBuffPacket* pBuff = dynamic_cast<CBuffPacket*>(pBuffPacket);
 
     if(NULL == pBuff)

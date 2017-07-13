@@ -546,7 +546,6 @@ public:
                 char* pKey = m_lpTable[i]->m_pData->m_pKey;
 
                 //设置状态
-                m_lpTable[i] = m_lpTable[i]->m_pNext;
                 m_nCurrLinkIndex = i;
 
                 //回收数据
@@ -564,7 +563,6 @@ public:
                 char* pKey = m_lpTable[i]->m_pData->m_pKey;
 
                 //设置状态
-                m_lpTable[i] = m_lpTable[i]->m_pNext;
                 m_nCurrLinkIndex = i;
 
                 //printf("[Pop]2 pKey=%s.\n", pKey);
