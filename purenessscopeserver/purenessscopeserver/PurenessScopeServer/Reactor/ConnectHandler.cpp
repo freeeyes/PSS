@@ -1034,7 +1034,7 @@ int CConnectHandler::RecvData_et()
             if(nDataLen == -1 && u4Error == EAGAIN)
             {
                 Close();
-                break;
+                return 0;
             }
 
             OUR_DEBUG((LM_ERROR, "[CConnectHandler::RecvData_et] ConnectID = %d, recv data is error nDataLen = [%d] errno = [%d] EAGAIN=[%d].\n", GetConnectID(), nDataLen, u4Error, EAGAIN));
