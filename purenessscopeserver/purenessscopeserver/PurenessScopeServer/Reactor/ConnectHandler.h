@@ -91,6 +91,8 @@ private:
     int RecvData();                                                          //接收数据，正常模式
     int RecvData_et();                                                       //接收数据，et模式
 
+    int Dispose_Recv_Data();                                                 //处理接收数据
+
 private:
     char                       m_szError[MAX_BUFF_500];        //错误信息描述文字
     ACE_INET_Addr              m_addrRemote;                   //远程链接客户端地址
