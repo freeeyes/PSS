@@ -595,12 +595,14 @@ int CConnectHandler::RecvData()
     {
         m_u4CurrSize = 0;
         uint32 u4Error = (uint32)errno;
+
         //如果是-1 且为11的错误，忽略之
         if(nDataLen == -1 && u4Error == EAGAIN)
         {
             Close();
             return 0;
         }
+
         OUR_DEBUG((LM_ERROR, "[CConnectHandler::RecvData] ConnectID=%d, recv data is error nDataLen = [%d] errno = [%d].\n", GetConnectID(), nDataLen, u4Error));
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::RecvData] ConnectID = %d, recv data is error[%d].\n", GetConnectID(), nDataLen);
 
@@ -1031,6 +1033,7 @@ int CConnectHandler::RecvData_et()
             //如果是-1 且为11的错误，忽略之
             if(nDataLen == -1 && u4Error == EAGAIN)
             {
+                Close();
                 break;
             }
 
