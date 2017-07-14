@@ -1866,6 +1866,12 @@ bool CConnectManager::CloseConnect_By_Queue(uint32 u4ConnectID)
     //放入发送队列
     _SendMessage* pSendMessage = m_SendMessagePool.Create();
 
+    if (NULL == pSendMessage)
+    {
+        OUR_DEBUG((LM_ERROR, "[CConnectManager::CloseConnect_By_Queue]pSendMessage is NULL.\n"));
+        return false;
+    }
+
     ACE_Message_Block* mb = pSendMessage->GetQueueMessage();
 
     if (NULL != mb)
