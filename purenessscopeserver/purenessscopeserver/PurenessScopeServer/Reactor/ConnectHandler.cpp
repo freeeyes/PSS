@@ -170,6 +170,7 @@ uint32 CConnectHandler::GetHandlerID()
 
 bool CConnectHandler::ServerClose(EM_Client_Close_status emStatus, uint8 u1OptionEvent)
 {
+    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     OUR_DEBUG((LM_ERROR, "[CConnectHandler::ServerClose]Close(%d) OK.\n", GetConnectID()));
     //AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %d, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, m_u8RecvQueueTimeCost, m_u4RecvQueueCount, m_u8SendQueueTimeCost);
 
