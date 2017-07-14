@@ -479,6 +479,7 @@ int CConnectHandler::handle_input(ACE_HANDLE fd)
 
 int CConnectHandler::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
 {
+    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     if (fd == ACE_INVALID_HANDLE)
     {
         m_u4CurrSize = 0;
@@ -1292,7 +1293,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
         }
 
         //将消息ID放入MessageBlock
-        ACE_Message_Block::ACE_Message_Type  objType  = ACE_Message_Block::MB_USER + nMessageID;
+        ACE_Message_Block::ACE_Message_Type objType  = ACE_Message_Block::MB_USER + nMessageID;
         pMbData->msg_type(objType);
 
         //将消息放入队列，让output在反应器线程发送。
@@ -3089,7 +3090,6 @@ bool CConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, const char*
 
 bool CConnectManagerGroup::CloseConnect(uint32 u4ConnectID)
 {
-
     //判断命中到哪一个线程组里面去
     uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
