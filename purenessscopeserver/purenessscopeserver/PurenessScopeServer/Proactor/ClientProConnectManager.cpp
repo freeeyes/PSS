@@ -192,11 +192,11 @@ IClientMessage* CProactorClientInfo::GetClientMessage()
     //这里增加是否是连接重练的判定以及是否是第一次连接的回调
     if((m_emConnectState == SERVER_CONNECT_RECONNECT || m_emConnectState == SERVER_CONNECT_FIRST) && NULL != m_pClientMessage)
     {
+        m_emConnectState = SERVER_CONNECT_OK;
         //通知上层某一个连接已经恢复或者已建立
         m_pClientMessage->ReConnect(m_nServerID);
     }
 
-    m_emConnectState = SERVER_CONNECT_OK;
     return m_pClientMessage;
 }
 
