@@ -63,7 +63,7 @@ public:
     bool SetSendQueueTimeCost(uint32 u4TimeCost);                            //记录当前从发送队列到数据发送完成的具体时间消耗
     void SetLocalIPInfo(const char* pLocalIP, uint32 u4LocalPort);           //设置监听IP和端口信息
 
-    bool Close(int nIOCount = 1);                                                                 //关闭当前连接
+    bool Close();                                                            //关闭当前连接
 
     uint32      GetHandlerID();                                              //得到当前的handlerID
     const char* GetError();                                                  //得到当前错误信息
@@ -122,7 +122,6 @@ private:
 
     uint32                     m_u4SendThresHold;              //发送阀值(消息包的个数)
     uint32                     m_u4SendCheckTime;              //发送检测时间的阀值
-    int                        m_nIOCount;                     //当前IO操作的个数
     bool                       m_blBlockState;                 //是否处于阻塞状态 false为不在阻塞状态，true为在阻塞状态
     int                        m_nBlockCount;                  //发生阻塞的次数
     int                        m_nBlockMaxCount;               //阻塞允许发生的最大次数
