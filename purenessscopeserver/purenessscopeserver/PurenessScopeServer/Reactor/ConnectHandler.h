@@ -57,6 +57,7 @@ public:
 
     bool CheckSendMask(uint32 u4PacketLen);                                  //检测指定的连接发送数据是否超过阻塞阀值
     bool SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, uint8 u1State, uint8 u1SendType, uint32& u4PacketSize, bool blDelete, int nServerID);  //发送当前数据
+    bool SendCloseMessage();                                                 //发送连接关闭消息
 
     bool SetRecvQueueTimeCost(uint32 u4TimeCost);                            //记录当前接收数据到模块处理完成的具体时间消耗
     bool SetSendQueueTimeCost(uint32 u4TimeCost);                            //记录当前从发送队列到数据发送完成的具体时间消耗
@@ -179,7 +180,7 @@ public:
     bool PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nServerID = 0);                  //异步群发
     bool Close(uint32 u4ConnectID);                                                                          //客户单关闭
     bool CloseUnLock(uint32 u4ConnectID);                                                                    //关闭连接，不上锁版本
-    bool CloseConnect(uint32 u4ConnectID, EM_Client_Close_status emStatus);                                  //服务器关闭
+    bool CloseConnect(uint32 u4ConnectID);                                                                   //服务器关闭
     bool CloseConnect_By_Queue(uint32 u4ConnectID);                                                          //服务器关闭(主动关闭送到消息队列中关闭)
     void GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo);                                         //返回当前存活链接的信息
     void SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4TimeCost);                                        //记录指定链接数据处理时间

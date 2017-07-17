@@ -480,6 +480,7 @@ int CConnectHandler::handle_input(ACE_HANDLE fd)
 int CConnectHandler::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
+
     if (fd == ACE_INVALID_HANDLE)
     {
         m_u4CurrSize = 0;
@@ -513,6 +514,14 @@ int CConnectHandler::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
         {
             OUR_DEBUG((LM_INFO, "[CConnectHandler::handle_output]ConnectID=%d pmbSendData is NULL.\n", GetConnectID()));
             break;
+        }
+
+        //如果是断开指令，则执行连接断开操作
+        if (pmbSendData->msg_type() == ACE_Message_Block::MB_STOP)
+        {
+            App_MessageBlockManager::instance()->Close(pmbSendData);
+            Close(2);
+            return 0;
         }
 
         uint32 u4SendSuc = (uint32)pmbSendData->length();
@@ -1013,11 +1022,7 @@ int CConnectHandler::handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask)
         OUR_DEBUG((LM_DEBUG,"[CConnectHandler::handle_close] h is NULL mask=%d.\n", (int)mask));
     }
 
-    //OUR_DEBUG((LM_DEBUG,"[CConnectHandler::handle_close]Connectid=[%d] begin(%d)...\n",GetConnectID(), errno));
-    //App_ConnectManager::instance()->Close(GetConnectID());
-    //OUR_DEBUG((LM_DEBUG,"[CConnectHandler::handle_close] Connectid=[%d] finish ok...\n", GetConnectID()));
-    //Close(2);
-    App_ConnectManager::instance()->CloseConnect(GetConnectID());
+    Close(2);
 
     return 0;
 }
@@ -1110,7 +1115,22 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
         return false;
     }
 
-    //uint32 u4SendSuc = pBuffPacket->GetPacketLen();
+    if (CONNECT_CLOSEEND == m_u1ConnectState)
+    {
+        //在队列里已经存在关闭连接指令，之后的所有数据写请求全部不予发送。
+        ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
+        memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+        pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
+        ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+        App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
+
+        if (blDelete == true)
+        {
+            App_BuffPacketManager::instance()->Delete(pBuffPacket);
+        }
+
+        return false;
+    }
 
     //如果不是直接发送数据，则拼接数据包
     if(u1State == PACKET_SEND_CACHE)
@@ -1324,6 +1344,50 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
 
         return true;
     }
+}
+
+bool CConnectHandler::SendCloseMessage()
+{
+    //将连接消息断开放在output去执行，这样就不需要同步加锁了。
+    ACE_Message_Block* pMbData = App_MessageBlockManager::instance()->Create(sizeof(int));
+
+    if (NULL == pMbData)
+    {
+        OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendCloseMessage] Connectid=%d, pMbData is NULL.\n", GetConnectID()));
+        return false;
+    }
+
+    ACE_Message_Block::ACE_Message_Type objType = ACE_Message_Block::MB_STOP;
+    pMbData->msg_type(objType);
+
+    //将消息放入队列，让output在反应器线程发送。
+    ACE_Time_Value xtime = ACE_OS::gettimeofday();
+
+    //队列已满，不能再放进去了,就不放进去了
+    if (msg_queue()->is_full() == true)
+    {
+        OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendCloseMessage] Connectid=%d,putq is full(%d).\n", GetConnectID(), msg_queue()->message_count()));
+        App_MessageBlockManager::instance()->Close(pMbData);
+        return false;
+    }
+
+    if (this->putq(pMbData, &xtime) == -1)
+    {
+        OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendCloseMessage] Connectid=%d,putq(%d) output errno = [%d].\n", GetConnectID(), msg_queue()->message_count(), errno));
+        App_MessageBlockManager::instance()->Close(pMbData);
+    }
+    else
+    {
+        m_u1ConnectState = CONNECT_CLOSEEND;
+        int nWakeupRet = reactor()->schedule_wakeup(this, ACE_Event_Handler::WRITE_MASK);
+
+        if (-1 == nWakeupRet)
+        {
+            OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendCloseMessage] Connectid=%d, nWakeupRet(%d) output errno = [%d].\n", GetConnectID(), nWakeupRet, errno));
+        }
+    }
+
+    return true;
 }
 
 bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
@@ -1830,30 +1894,18 @@ bool CConnectManager::CloseUnLock(uint32 u4ConnectID)
     }
 }
 
-bool CConnectManager::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status emStatus)
+bool CConnectManager::CloseConnect(uint32 u4ConnectID)
 {
-    //OUR_DEBUG((LM_ERROR, "[CConnectManager::CloseConnect]ConnectID=%d Begin.\n", u4ConnectID));
-    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
-    //OUR_DEBUG((LM_ERROR, "[CConnectManager::CloseConnect]ConnectID=%d Begin 1.\n", u4ConnectID));
-
-    char szConnectID[10] = {'\0'};
+    m_ThreadWriteLock.acquire();
+    char szConnectID[10] = { '\0' };
     sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
     CConnectHandler* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data(szConnectID);
+    m_ThreadWriteLock.release();
 
     if(NULL != pConnectHandler)
     {
-        //连接关闭，清除时间轮盘
-        DelConnectTimeWheel(pConnectHandler);
-
-        //回收发送缓冲
-        m_SendCacheManager.FreeCacheData(u4ConnectID);
-        pConnectHandler->ServerClose(emStatus);
-        m_u4TimeDisConnect++;
-
-        m_objHashConnectList.Del_Hash_Data(szConnectID);
-
-        //加入链接统计功能
-        App_ConnectAccount::instance()->AddDisConnect();
+        //放到反应器线程里去做
+        pConnectHandler->SendCloseMessage();
         return true;
     }
     else
@@ -2367,7 +2419,7 @@ int CConnectManager::svc (void)
             else
             {
                 //处理连接服务器主动关闭
-                CloseConnect(msg->m_u4ConnectID, CLIENT_CLOSE_IMMEDIATLY);
+                CloseConnect(msg->m_u4ConnectID);
             }
 
             m_SendMessagePool.Delete(msg);
