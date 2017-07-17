@@ -64,7 +64,6 @@ public:
     void SetLocalIPInfo(const char* pLocalIP, uint32 u4LocalPort);           //设置监听IP和端口信息
 
     bool Close(int nIOCount = 1);                                                                 //关闭当前连接
-    bool ServerClose(EM_Client_Close_status emStatus, uint8 u1OptionEvent = PACKET_SDISCONNECT);  //服务器关闭客户端链接方法
 
     uint32      GetHandlerID();                                              //得到当前的handlerID
     const char* GetError();                                                  //得到当前错误信息
@@ -120,8 +119,6 @@ private:
     uint64                     m_u8SendQueueTimeout;           //发送超时时间，超过这个时间的都会被记录到日志中
     uint64                     m_u8RecvQueueTimeout;           //接受超时时间，超过这个时间的都会被记录到日志中
     uint32                     m_u4SendMaxBuffSize;            //发送数据最大缓冲长度
-
-    ACE_Recursive_Thread_Mutex m_ThreadLock;
 
     uint32                     m_u4SendThresHold;              //发送阀值(消息包的个数)
     uint32                     m_u4SendCheckTime;              //发送检测时间的阀值

@@ -57,8 +57,6 @@ const char* CConnectHandler::GetError()
 
 bool CConnectHandler::Close(int nIOCount)
 {
-    m_ThreadLock.acquire();
-
     if(nIOCount > m_nIOCount)
     {
         m_nIOCount = 0;
@@ -73,8 +71,6 @@ bool CConnectHandler::Close(int nIOCount)
     {
         m_u1IsActive = 0;
     }
-
-    m_ThreadLock.release();
 
     //OUR_DEBUG((LM_ERROR, "[CConnectHandler::Close]ConnectID=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
 
@@ -168,47 +164,6 @@ uint32 CConnectHandler::GetHandlerID()
     return m_u4HandlerID;
 }
 
-bool CConnectHandler::ServerClose(EM_Client_Close_status emStatus, uint8 u1OptionEvent)
-{
-    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
-    OUR_DEBUG((LM_ERROR, "[CConnectHandler::ServerClose]Close(%d) OK.\n", GetConnectID()));
-    //AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %d, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, m_u8RecvQueueTimeCost, m_u4RecvQueueCount, m_u8SendQueueTimeCost);
-
-    if(CLIENT_CLOSE_IMMEDIATLY == emStatus)
-    {
-        //组织数据
-        _MakePacket objMakePacket;
-
-        objMakePacket.m_u4ConnectID       = GetConnectID();
-        objMakePacket.m_pPacketParse      = NULL;
-        objMakePacket.m_u1Option          = u1OptionEvent;
-
-        //发送客户端链接断开消息。
-        ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-        if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-        {
-            OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
-        }
-
-        //msg_queue()->deactivate();
-        shutdown();
-
-        ClearPacketParse();
-
-        m_u4ConnectID = 0;
-
-        //回归用过的指针
-        App_ConnectHandlerPool::instance()->Delete(this);
-    }
-    else
-    {
-        m_emStatus = emStatus;
-    }
-
-    return true;
-}
-
 void CConnectHandler::SetConnectID(uint32 u4ConnectID)
 {
     m_u4ConnectID = u4ConnectID;
@@ -222,7 +177,6 @@ uint32 CConnectHandler::GetConnectID()
 int CConnectHandler::open(void*)
 {
     //OUR_DEBUG((LM_ERROR, "[CConnectHandler::open](0x%08x),m_nIOCount=%d.\n", this, m_nIOCount));
-    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
 
     m_nIOCount            = 1;
     m_blBlockState        = false;
@@ -411,7 +365,6 @@ int CConnectHandler::open(void*)
 int CConnectHandler::handle_input(ACE_HANDLE fd)
 {
     //OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input](0x%08x)ConnectID=%d,m_nIOCount=%d.\n", this, GetConnectID(), m_nIOCount));
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     //OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input]ConnectID=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
 
     m_atvInput = ACE_OS::gettimeofday();
@@ -479,8 +432,6 @@ int CConnectHandler::handle_input(ACE_HANDLE fd)
 
 int CConnectHandler::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
 {
-    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
-
     if (fd == ACE_INVALID_HANDLE)
     {
         m_u4CurrSize = 0;
@@ -559,9 +510,7 @@ int CConnectHandler::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
 //剥离接收数据代码
 int CConnectHandler::RecvData()
 {
-    m_ThreadLock.acquire();
     m_nIOCount++;
-    m_ThreadLock.release();
 
     return Dispose_Recv_Data();
 }
@@ -569,9 +518,7 @@ int CConnectHandler::RecvData()
 //et模式接收数据
 int CConnectHandler::RecvData_et()
 {
-    m_ThreadLock.acquire();
     m_nIOCount++;
-    m_ThreadLock.release();
 
     while(true)
     {
@@ -1095,7 +1042,6 @@ uint8 CConnectHandler::GetSendBuffState()
 bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, uint8 u1State, uint8 u1SendType, uint32& u4PacketSize, bool blDelete, int nMessageID)
 {
     //OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage](0x%08x) Connectid=%d,m_nIOCount=%d.\n", this, GetConnectID(), m_nIOCount));
-    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     //OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage]222 Connectid=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
 
     //如果当前连接已被别的线程关闭，则这里不做处理，直接退出

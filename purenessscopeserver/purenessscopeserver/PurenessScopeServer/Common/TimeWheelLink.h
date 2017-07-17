@@ -177,6 +177,7 @@ public:
         {
             // 删除这个指针在旧容器里面的数据，将这个数据放在最新的容器中。
             m_vecHashContain[*pCurrBlockListID]->Del_Hash_Data(szKey);
+            *pCurrBlockListID = INVAILD_BLOCKID;
         }
 
         //清理索引信息
