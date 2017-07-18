@@ -1876,6 +1876,12 @@ bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
     //放入发送队列
     _SendMessage* pSendMessage = m_SendMessagePool.Create();
 
+    if (NULL == pSendMessage)
+    {
+        OUR_DEBUG((LM_ERROR, "[CConnectManager::PutMessage](%d)pSendMessage is NULL(free=%d).\n", u4ConnectID, m_SendMessagePool.GetFreeCount()));
+        return false;
+    }
+
     ACE_Message_Block* mb = pSendMessage->GetQueueMessage();
 
     if(NULL != mb)
