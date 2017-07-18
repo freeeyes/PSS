@@ -73,7 +73,17 @@ bool CConnectHandler::Close()
 
     objMakePacket.m_u4ConnectID       = GetConnectID();
     objMakePacket.m_pPacketParse      = NULL;
-    objMakePacket.m_u1Option          = PACKET_CDISCONNECT;
+
+    if (CONNECT_CLOSEEND == m_u1ConnectState)
+    {
+        //服务器主动断开
+        objMakePacket.m_u1Option = PACKET_SDISCONNECT;
+    }
+    else
+    {
+        //客户端连接断开
+        objMakePacket.m_u1Option = PACKET_CDISCONNECT;
+    }
 
     //发送客户端链接断开消息。
     ACE_Time_Value tvNow = ACE_OS::gettimeofday();
@@ -282,8 +292,6 @@ int CConnectHandler::open(void*)
     {
         //AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %d, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, m_u8RecvQueueTimeCost, m_u4RecvQueueCount, m_u8SendQueueTimeCost);
         OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]pmb new is NULL.\n"));
-
-        App_ConnectManager::instance()->Close(GetConnectID());
         return -1;
     }
 
@@ -343,21 +351,6 @@ int CConnectHandler::handle_input(ACE_HANDLE fd)
         OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input]fd == ACE_INVALID_HANDLE.\n"));
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::handle_input]fd == ACE_INVALID_HANDLE.");
 
-        //组织数据
-        _MakePacket objMakePacket;
-
-        objMakePacket.m_u4ConnectID       = GetConnectID();
-        objMakePacket.m_pPacketParse      = NULL;
-        objMakePacket.m_u1Option          = PACKET_CDISCONNECT;
-
-        //发送客户端链接断开消息。
-        ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-        if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-        {
-            OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
-        }
-
         return -1;
     }
 
@@ -367,21 +360,6 @@ int CConnectHandler::handle_input(ACE_HANDLE fd)
         m_u4CurrSize = 0;
         OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input]ConnectID=%d, m_pPacketParse == NULL.\n", GetConnectID()));
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::handle_input]m_pPacketParse == NULL.");
-
-        //组织数据
-        _MakePacket objMakePacket;
-
-        objMakePacket.m_u4ConnectID       = GetConnectID();
-        objMakePacket.m_pPacketParse      = NULL;
-        objMakePacket.m_u1Option          = PACKET_CDISCONNECT;
-
-        //发送客户端链接断开消息。
-        ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-        if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-        {
-            OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
-        }
 
         return -1;
     }
@@ -405,21 +383,6 @@ int CConnectHandler::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
         m_u4CurrSize = 0;
         OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_output]fd == ACE_INVALID_HANDLE.\n"));
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::handle_output]fd == ACE_INVALID_HANDLE.");
-
-        //组织数据
-        _MakePacket objMakePacket;
-
-        objMakePacket.m_u4ConnectID = GetConnectID();
-        objMakePacket.m_pPacketParse = NULL;
-        objMakePacket.m_u1Option = PACKET_CDISCONNECT;
-
-        //发送客户端链接断开消息。
-        ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-        if (false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-        {
-            OUR_DEBUG((LM_ERROR, "CConnectHandler::handle_output] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
-        }
 
         return -1;
     }
@@ -669,22 +632,6 @@ int CConnectHandler::Dispose_Recv_Data()
                 {
                     AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %dws, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %dws.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, (uint32)m_u8RecvQueueTimeCost, m_u4RecvQueueCount, (uint32)m_u8SendQueueTimeCost);
                     OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvData] pmb new is NULL.\n"));
-
-                    //组织数据
-                    _MakePacket objMakePacket;
-
-                    objMakePacket.m_u4ConnectID = GetConnectID();
-                    objMakePacket.m_pPacketParse = NULL;
-                    objMakePacket.m_u1Option = PACKET_CDISCONNECT;
-
-                    //发送客户端链接断开消息。
-                    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-                    if (false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-                    {
-                        OUR_DEBUG((LM_ERROR, "[CProConnectHandle::RecvData] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
-                    }
-
                     return -1;
                 }
             }
@@ -773,22 +720,6 @@ int CConnectHandler::Dispose_Recv_Data()
             {
                 AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %dws, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %dws.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, (uint32)m_u8RecvQueueTimeCost, m_u4RecvQueueCount, (uint32)m_u8SendQueueTimeCost);
                 OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvData] pmb new is NULL.\n"));
-
-                //组织数据
-                _MakePacket objMakePacket;
-
-                objMakePacket.m_u4ConnectID = GetConnectID();
-                objMakePacket.m_pPacketParse = NULL;
-                objMakePacket.m_u1Option = PACKET_CDISCONNECT;
-
-                //发送客户端链接断开消息。
-                ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-                if (false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-                {
-                    OUR_DEBUG((LM_ERROR, "[CProConnectHandle::RecvData] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
-                }
-
                 return -1;
             }
         }
@@ -849,22 +780,6 @@ int CConnectHandler::Dispose_Recv_Data()
 
                 AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %dws, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %dws.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, (uint32)m_u8RecvQueueTimeCost, m_u4RecvQueueCount, (uint32)m_u8SendQueueTimeCost);
                 OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvData] pmb new is NULL.\n"));
-
-                //组织数据
-                _MakePacket objMakePacket;
-
-                objMakePacket.m_u4ConnectID = GetConnectID();
-                objMakePacket.m_pPacketParse = NULL;
-                objMakePacket.m_u1Option = PACKET_CDISCONNECT;
-
-                //发送客户端链接断开消息。
-                ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-                if (false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-                {
-                    OUR_DEBUG((LM_ERROR, "[CProConnectHandle::RecvData] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
-                }
-
                 return -1;
             }
         }
@@ -879,22 +794,6 @@ int CConnectHandler::Dispose_Recv_Data()
         {
             AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %dws, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %dws.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, (uint32)m_u8RecvQueueTimeCost, m_u4RecvQueueCount, (uint32)m_u8SendQueueTimeCost);
             OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvData] pmb new is NULL.\n"));
-
-            //组织数据
-            _MakePacket objMakePacket;
-
-            objMakePacket.m_u4ConnectID = GetConnectID();
-            objMakePacket.m_pPacketParse = NULL;
-            objMakePacket.m_u1Option = PACKET_CDISCONNECT;
-
-            //发送客户端链接断开消息。
-            ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-            if (false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-            {
-                OUR_DEBUG((LM_ERROR, "[CProConnectHandle::RecvData] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
-            }
-
             return -1;
         }
     }
