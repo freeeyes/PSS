@@ -63,6 +63,7 @@ ACE_Message_Block* CMessageBlockManager::Create(uint32 u4Size)
 
     if(NULL == pmb)
     {
+        ACE_OS::last_error(0);
         ACE_NEW_MALLOC_NORETURN(pmb,
                                 static_cast<ACE_Message_Block*>(m_pmsgallocator->malloc(sizeof(ACE_Message_Block))),
                                 ACE_Message_Block(u4FormatSize, // size
@@ -77,6 +78,11 @@ ACE_Message_Block* CMessageBlockManager::Create(uint32 u4Size)
                                         m_pdata_allocator,
                                         m_pmsgallocator
                                                  ));
+
+        if(0 != ACE_OS::last_error())
+        {
+            OUR_DEBUG((LM_ERROR,"[CMessageBlockManager::Create]New ACE_Message_Block error errno = [%d].\n", ACE_OS::last_error()));
+        }
     }
 
     m_u4UsedSize += u4FormatSize;
