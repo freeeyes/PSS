@@ -647,7 +647,11 @@ public:
 
                 while(NULL != pLastLink)
                 {
-                    vecList.push_back(pLastLink->m_pData->m_pValue);
+                    if (NULL != pLastLink->m_pData)
+                    {
+                        vecList.push_back(pLastLink->m_pData->m_pValue);
+                    }
+
                     pLastLink = pLastLink->m_pNext;
                 }
             }
