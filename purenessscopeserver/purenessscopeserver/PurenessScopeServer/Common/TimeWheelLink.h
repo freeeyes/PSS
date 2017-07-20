@@ -230,27 +230,28 @@ public:
         {
             vector<T*> vecEntey;
             m_vecHashContain[nLastBlockID]->Get_All_Used(vecEntey);
+
+            //清理索引信息
+            for (int i = 0; i < (int)vecEntey.size(); i++)
+            {
+                char szKey[MAX_TIMEWHEEL_KEY] = { '\0' };
+                sprintf_safe(szKey, MAX_TIMEWHEEL_KEY, "%16x", vecEntey[i]);
+                m_htIndexList.Del_Hash_Data(szKey);
+            }
+
+            if (NULL != m_fn_Timeout_Callback)
+            {
+                m_fn_Timeout_Callback(m_pArgContext, vecEntey);
+            }
+
+            //OUR_DEBUG((LM_INFO, "[CTimeWheelLink::Tick]nLastBlockID=%d, m_nCurrBlockID=%d.\n", nLastBlockID, m_nCurrBlockID));
+            m_vecHashContain[nLastBlockID]->Clear();
         }
         else
         {
             OUR_DEBUG((LM_INFO, "[CTimeWheelLink::Tick]m_vecHashContain is NULL,nLastBlockID=%d.\n", nLastBlockID));
         }
 
-        //清理索引信息
-        for (int i = 0; i < (int)vecEntey.size(); i++)
-        {
-            char szKey[MAX_TIMEWHEEL_KEY] = { '\0' };
-            sprintf_safe(szKey, MAX_TIMEWHEEL_KEY, "%16x", vecEntey[i]);
-            m_htIndexList.Del_Hash_Data(szKey);
-        }
-
-        if (NULL != m_fn_Timeout_Callback)
-        {
-            m_fn_Timeout_Callback(m_pArgContext, vecEntey);
-        }
-
-        //OUR_DEBUG((LM_INFO, "[CTimeWheelLink::Tick]nLastBlockID=%d, m_nCurrBlockID=%d.\n", nLastBlockID, m_nCurrBlockID));
-        m_vecHashContain[nLastBlockID]->Clear();
         m_nCurrBlockID = nLastBlockID;
     }
 private:
