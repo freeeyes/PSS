@@ -1776,7 +1776,7 @@ bool CProConnectManager::KillTimer()
 
 int CProConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
+    ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
     ACE_Time_Value tvNow = ACE_OS::gettimeofday();
 
     //转动时间轮盘
@@ -2205,12 +2205,15 @@ void CProConnectManager::TimeWheel_Timeout_Callback(void* pArgsContext, vector<C
     for (int i = 0; i < (int)vecProConnectHandle.size(); i++)
     {
         //断开超时的链接
-        CProConnectManager* pManager = reinterpret_cast<CProConnectManager*>(pArgsContext);
-        OUR_DEBUG((LM_INFO, "[CProConnectManager::TimeWheel_Timeout_Callback]ConnectID(%d).\n", vecProConnectHandle[i]->GetConnectID()));
-
-        if (NULL != pManager)
+        if (NULL != vecProConnectHandle[i])
         {
-            pManager->CloseConnect_By_Queue(vecProConnectHandle[i]->GetConnectID());
+            CProConnectManager* pManager = reinterpret_cast<CProConnectManager*>(pArgsContext);
+            OUR_DEBUG((LM_INFO, "[CProConnectManager::TimeWheel_Timeout_Callback]ConnectID(%d).\n", vecProConnectHandle[i]->GetConnectID()));
+
+            if (NULL != pManager)
+            {
+                pManager->CloseConnect_By_Queue(vecProConnectHandle[i]->GetConnectID());
+            }
         }
     }
 }
