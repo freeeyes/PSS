@@ -99,7 +99,7 @@ void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
 
     if(this->m_Reader.open(*this, h, 0, App_ProactorManager::instance()->GetAce_Proactor(REACTOR_POSTDEFINE)) == -1||this->m_Writer.open(*this, h,  0, App_ProactorManager::instance()->GetAce_Proactor(REACTOR_POSTDEFINE)) == -1)
     {
-        OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::open] m_reader or m_reader == 0.\n"));
+        OUR_DEBUG((LM_DEBUG,"[CProConnectClient::open] m_reader or m_reader == 0.\n"));
         Close();
         return;
     }
@@ -111,7 +111,7 @@ void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
     m_u4CostTime        = 0;
     m_atvBegin          = ACE_OS::gettimeofday();
 
-    OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::open] m_nServerID=%d, this=0x%08x.\n", m_nServerID, this));
+    OUR_DEBUG((LM_DEBUG,"[CProConnectClient::open] m_nServerID=%d, this=0x%08x.\n", m_nServerID, this));
     App_ClientProConnectManager::instance()->SetHandler(m_nServerID, this);
     m_pClientMessage = App_ClientProConnectManager::instance()->GetClientMessage(m_nServerID);
 
@@ -265,7 +265,7 @@ bool CProConnectClient::RecvData(uint32 u4PacketLen)
 
     if(this->m_Reader.read(*m_mbRecv, u4PacketLen) == -1)
     {
-        OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::open] m_reader is error(%d).\n", (int)ACE_OS::last_error()));
+        OUR_DEBUG((LM_DEBUG,"[CProConnectClient::open] m_reader is error(%d).\n", (int)ACE_OS::last_error()));
         App_MessageBlockManager::instance()->Close(m_mbRecv);
 
         if(NULL != m_pClientMessage)

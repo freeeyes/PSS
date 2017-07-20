@@ -18,7 +18,7 @@ bool CMakePacket::PutMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& tvNo
 {
     if(NULL == pMakePacket)
     {
-        OUR_DEBUG((LM_ERROR,"[CMakePacket::ProcessMessageBlock] pMakePacket is NULL.\n"));
+        OUR_DEBUG((LM_ERROR,"[CMakePacket::PutMessageBlock] pMakePacket is NULL.\n"));
         return false;
     }
 
@@ -43,7 +43,7 @@ bool CMakePacket::PutMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& tvNo
             pMakePacket->m_pPacketParse->Clear();
         }
 
-        OUR_DEBUG((LM_ERROR,"[CMakePacket::ProcessMessageBlock] pMessage is NULL.\n"));
+        OUR_DEBUG((LM_ERROR,"[CMakePacket::PutMessageBlock] pMessage is NULL.\n"));
         return false;
     }
 
@@ -120,7 +120,7 @@ void CMakePacket::SetMessage(_MakePacket* pMakePacket, CMessage* pMessage, ACE_T
     }
     else
     {
-        OUR_DEBUG((LM_ERROR, "[CProConnectHandle::SetMessage] ConnectID = %d, pMessage->GetMessageBase() is NULL.\n", pMakePacket->m_u4ConnectID));
+        OUR_DEBUG((LM_ERROR, "[CMakePacket::SetMessage] ConnectID = %d, pMessage->GetMessageBase() is NULL.\n", pMakePacket->m_u4ConnectID));
     }
 }
 

@@ -862,7 +862,7 @@ bool CConnectHandler::SetSendQueueTimeCost(uint32 u4TimeCost)
         //告诉插件连接发送超时阀值报警
         if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
         {
-            OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
+            OUR_DEBUG((LM_ERROR, "[CProConnectHandle::SetSendQueueTimeCost] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
         }
     }
 

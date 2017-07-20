@@ -651,6 +651,10 @@ public:
                     {
                         vecList.push_back(pLastLink->m_pData->m_pValue);
                     }
+                    else
+                    {
+                        OUR_DEBUG((LM_INFO, "[CHashTable::Get_All_Used]pLastLink->m_pData is NULL.\n"));
+                    }
 
                     pLastLink = pLastLink->m_pNext;
                 }
@@ -701,7 +705,15 @@ public:
 
                 while (NULL != pLastLink)
                 {
-                    vecList.push_back(pLastLink->m_pData->m_pKey);
+                    if (NULL != pLastLink->m_pData)
+                    {
+                        vecList.push_back(pLastLink->m_pData->m_pKey);
+                    }
+                    else
+                    {
+                        OUR_DEBUG((LM_INFO, "[CHashTable::Clear]pLastLink->m_pData is NULL.\n"));
+                    }
+
                     pLastLink = pLastLink->m_pNext;
                 }
             }
