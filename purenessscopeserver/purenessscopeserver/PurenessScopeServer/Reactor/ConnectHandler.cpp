@@ -1700,6 +1700,8 @@ bool CConnectManager::CloseConnect(uint32 u4ConnectID)
 
 bool CConnectManager::CloseConnect_By_Queue(uint32 u4ConnectID)
 {
+    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
+
     //放入发送队列
     _SendMessage* pSendMessage = m_SendMessagePool.Create();
 

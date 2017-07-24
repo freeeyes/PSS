@@ -573,6 +573,7 @@ public:
             }
         }
 
+        OUR_DEBUG((LM_INFO, "[HashTable::Pop]pT is NULL, m_objHashPool.Get_Count()=%d, m_nCurrLinkIndex=%d.\n", m_objHashPool.Get_Count(), m_nCurrLinkIndex))
         return pT;
     }
 
