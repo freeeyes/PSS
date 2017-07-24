@@ -1715,12 +1715,6 @@ bool CConnectManager::CloseConnect_By_Queue(uint32 u4ConnectID)
 
     if (NULL != mb)
     {
-        if (NULL == pSendMessage)
-        {
-            OUR_DEBUG((LM_ERROR, "[CConnectManager::CloseConnect_By_Queue] new _SendMessage is error.\n"));
-            return false;
-        }
-
         //组装关闭连接指令
         pSendMessage->m_u4ConnectID = u4ConnectID;
         pSendMessage->m_pBuffPacket = NULL;
@@ -1738,7 +1732,7 @@ bool CConnectManager::CloseConnect_By_Queue(uint32 u4ConnectID)
         if (nQueueCount >= (int)MAX_MSG_THREADQUEUE)
         {
             OUR_DEBUG((LM_ERROR, "[CConnectManager::CloseConnect_By_Queue] Queue is Full nQueueCount = [%d].\n", nQueueCount));
-
+            m_SendMessagePool.Delete(pSendMessage);
             return false;
         }
 
@@ -1747,12 +1741,14 @@ bool CConnectManager::CloseConnect_By_Queue(uint32 u4ConnectID)
         if (this->putq(mb, &xtime) == -1)
         {
             OUR_DEBUG((LM_ERROR, "[CConnectManager::CloseConnect_By_Queue] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
+            m_SendMessagePool.Delete(pSendMessage);
             return false;
         }
     }
     else
     {
         OUR_DEBUG((LM_ERROR, "[CConnectManager::CloseConnect_By_Queue] mb new error.\n"));
+        m_SendMessagePool.Delete(pSendMessage);
         return false;
     }
 
@@ -1944,6 +1940,7 @@ bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
             App_BuffPacketManager::instance()->Delete(pBuffPacket);
         }
 
+        m_SendMessagePool.Delete(pSendMessage);
         return false;
     }
 
