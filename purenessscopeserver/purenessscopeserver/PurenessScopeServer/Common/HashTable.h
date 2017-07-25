@@ -681,7 +681,14 @@ public:
 
                 while (NULL != pLastLink)
                 {
-                    vecList.push_back(pLastLink->m_pData->m_pKey);
+                    if (NULL != pLastLink->m_pData)
+                    {
+                        vecList.push_back(pLastLink->m_pData->m_pKey);
+                    }
+                    else
+                    {
+                        OUR_DEBUG((LM_INFO, "[CHashTable::Get_All_Used_Key]pLastLink->m_pData is NULL.\n"));
+                    }
                     pLastLink = pLastLink->m_pNext;
                 }
             }
