@@ -1799,8 +1799,14 @@ bool CConnectManager::AddConnect(uint32 u4ConnectID, CConnectHandler* pConnectHa
 
 bool CConnectManager::SetConnectTimeWheel(CConnectHandler* pConnectHandler)
 {
-    m_TimeWheelLink.Add_TimeWheel_Object(pConnectHandler);
-    return true;
+    bool bAddResult = m_TimeWheelLink.Add_TimeWheel_Object(pConnectHandler);
+
+    if(!bAddResult)
+    {
+        OUR_DEBUG((LM_ERROR,"[CConnectManager::SetConnectTimeWheel]Fail to set pConnectHandler(0x%08x).\n", pConnectHandler));
+    }
+
+    return bAddResult;
 }
 
 bool CConnectManager::DelConnectTimeWheel(CConnectHandler* pConnectHandler)
@@ -2321,22 +2327,22 @@ bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType,
         //放入发送队列
         _SendMessage* pSendMessage = m_SendMessagePool.Create();
 
+        if(NULL == pSendMessage)
+        {
+            OUR_DEBUG((LM_ERROR,"[CConnectManager::PutMessage] new _SendMessage is error.\n"));
+
+            if(blDelete == true)
+            {
+                App_BuffPacketManager::instance()->Delete(pBuffPacket);
+            }
+
+            return false;
+        }
+
         ACE_Message_Block* mb = pSendMessage->GetQueueMessage();
 
         if(NULL != mb)
         {
-            if(NULL == pSendMessage)
-            {
-                OUR_DEBUG((LM_ERROR,"[CConnectManager::PutMessage] new _SendMessage is error.\n"));
-
-                if(blDelete == true)
-                {
-                    App_BuffPacketManager::instance()->Delete(pBuffPacket);
-                }
-
-                return false;
-            }
-
             pSendMessage->m_u4ConnectID = u4ConnectID;
             pSendMessage->m_pBuffPacket = pCurrBuffPacket;
             pSendMessage->m_nEvents     = u1SendType;
@@ -2387,6 +2393,7 @@ bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType,
                 App_BuffPacketManager::instance()->Delete(pBuffPacket);
             }
 
+            m_SendMessagePool.Delete(pSendMessage);
             return false;
         }
     }

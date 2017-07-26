@@ -54,6 +54,11 @@ public:
         m_fn_Timeout_Callback = fn_Timeout_Callback;
         m_pArgContext         = pArgContext;
 
+        if(m_nTimeInterval < 1)
+        {
+            m_nTimeInterval = 1;
+        }
+
         //获得容器中块的总大小
         if (nTimeCycle % m_nTimeInterval != 0)
         {
@@ -134,9 +139,17 @@ public:
             {
                 //添加索引表
                 int* pBlockID = Get_BlockIDList_Cell();
-                *pBlockID = m_nCurrBlockID;
-                m_htIndexList.Add_Hash_Data(szKey, pBlockID);
-                return true;
+
+                if(NULL != pBlockID)
+                {
+                    *pBlockID = m_nCurrBlockID;
+                    m_htIndexList.Add_Hash_Data(szKey, pBlockID);
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
         }
         else
@@ -158,9 +171,17 @@ public:
             {
                 //添加索引表
                 int* pBlockID = Get_BlockIDList_Cell();
-                *pBlockID = m_nCurrBlockID;
-                m_htIndexList.Add_Hash_Data(szKey, pBlockID);
-                return true;
+                
+                if(NULL != pBlockID)
+                {
+                    *pBlockID = m_nCurrBlockID;
+                    m_htIndexList.Add_Hash_Data(szKey, pBlockID);
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
         }
     }
@@ -193,7 +214,15 @@ public:
         {
             if (m_pBlockIDList[i] == INVAILD_BLOCKID)
             {
-                m_nBlockIDListIndex++;
+                if(i == nListSize -1)
+                {
+                    m_nBlockIDListIndex = 0;
+                }
+                else
+                {
+                    m_nBlockIDListIndex = i + 1;
+                }
+
                 return &m_pBlockIDList[i];
             }
         }
@@ -202,7 +231,7 @@ public:
         {
             if (m_pBlockIDList[i] == INVAILD_BLOCKID)
             {
-                m_nBlockIDListIndex++;
+                m_nBlockIDListIndex = i + 1;
                 return &m_pBlockIDList[i];
             }
         }

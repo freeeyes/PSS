@@ -292,3 +292,4 @@ ConnectAcceptor* CConnectAcceptorManager::GetNewConnectAcceptor()
     m_vecConnectAcceptor.push_back(pConnectAcceptor);
     return pConnectAcceptor;
 }
+

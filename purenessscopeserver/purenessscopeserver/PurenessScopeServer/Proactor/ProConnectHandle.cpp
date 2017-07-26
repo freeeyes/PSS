@@ -1504,16 +1504,16 @@ bool CProConnectManager::CloseConnect_By_Queue(uint32 u4ConnectID)
     //放入发送队列
     _SendMessage* pSendMessage = m_SendMessagePool.Create();
 
+    if (NULL == pSendMessage)
+    {
+        OUR_DEBUG((LM_ERROR, "[CProConnectManager::CloseConnect_By_Queue] new _SendMessage is error.\n"));
+        return false;
+    }
+
     ACE_Message_Block* mb = pSendMessage->GetQueueMessage();
 
     if (NULL != mb)
     {
-        if (NULL == pSendMessage)
-        {
-            OUR_DEBUG((LM_ERROR, "[CProConnectManager::CloseConnect_By_Queue] new _SendMessage is error.\n"));
-            return false;
-        }
-
         //组装关闭连接指令
         pSendMessage->m_u4ConnectID = u4ConnectID;
         pSendMessage->m_pBuffPacket = NULL;
@@ -1531,7 +1531,7 @@ bool CProConnectManager::CloseConnect_By_Queue(uint32 u4ConnectID)
         if (nQueueCount >= (int)MAX_MSG_THREADQUEUE)
         {
             OUR_DEBUG((LM_ERROR, "[CProConnectManager::CloseConnect_By_Queue] Queue is Full nQueueCount = [%d].\n", nQueueCount));
-
+            m_SendMessagePool.Delete(pSendMessage);
             return false;
         }
 
@@ -1540,12 +1540,14 @@ bool CProConnectManager::CloseConnect_By_Queue(uint32 u4ConnectID)
         if (this->putq(mb, &xtime) == -1)
         {
             OUR_DEBUG((LM_ERROR, "[CProConnectManager::CloseConnect_By_Queue] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
+            m_SendMessagePool.Delete(pSendMessage);
             return false;
         }
     }
     else
     {
         OUR_DEBUG((LM_ERROR, "[CMessageService::CloseConnect_By_Queue] mb new error.\n"));
+        m_SendMessagePool.Delete(pSendMessage);
         return false;
     }
 
@@ -1571,7 +1573,7 @@ bool CProConnectManager::AddConnect(uint32 u4ConnectID, CProConnectHandle* pConn
     if(NULL != pCurrConnectHandler)
     {
         sprintf_safe(m_szError, MAX_BUFF_500, "[CProConnectManager::AddConnect] ConnectID[%d] is exist.", u4ConnectID);
-        m_ThreadWriteLock.release();
+        //m_ThreadWriteLock.release();
         return false;
     }
 
@@ -1597,12 +1599,20 @@ bool CProConnectManager::AddConnect(uint32 u4ConnectID, CProConnectHandle* pConn
 
 bool CProConnectManager::SetConnectTimeWheel(CProConnectHandle* pConnectHandler)
 {
-    m_TimeWheelLink.Add_TimeWheel_Object(pConnectHandler);
-    return true;
+    ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
+    bool bAddResult = m_TimeWheelLink.Add_TimeWheel_Object(pConnectHandler);
+
+    if(!bAddResult)
+    {
+        OUR_DEBUG((LM_ERROR,"[CProConnectManager::SetConnectTimeWheel]Fail to set pConnectHandler(0x%08x).\n", pConnectHandler));
+    }
+
+    return bAddResult;
 }
 
 bool CProConnectManager::DelConnectTimeWheel(CProConnectHandle* pConnectHandler)
 {
+    ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
     m_TimeWheelLink.Del_TimeWheel_Object(pConnectHandler);
     return true;
 }
@@ -1659,22 +1669,22 @@ bool CProConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
     //放入发送队列
     _SendMessage* pSendMessage = m_SendMessagePool.Create();
 
+    if(NULL == pSendMessage)
+    {
+        OUR_DEBUG((LM_ERROR,"[CProConnectManager::PutMessage] new _SendMessage is error.\n"));
+
+        if(blDelete == true)
+        {
+            App_BuffPacketManager::instance()->Delete(pBuffPacket);
+        }
+
+        return false;
+    }
+
     ACE_Message_Block* mb = pSendMessage->GetQueueMessage();
 
     if(NULL != mb)
     {
-        if(NULL == pSendMessage)
-        {
-            OUR_DEBUG((LM_ERROR,"[CProConnectManager::PutMessage] new _SendMessage is error.\n"));
-
-            if(blDelete == true)
-            {
-                App_BuffPacketManager::instance()->Delete(pBuffPacket);
-            }
-
-            return false;
-        }
-
         pSendMessage->m_u4ConnectID = u4ConnectID;
         pSendMessage->m_pBuffPacket = pBuffPacket;
         pSendMessage->m_nEvents     = u1SendType;
@@ -1697,6 +1707,7 @@ bool CProConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
                 App_BuffPacketManager::instance()->Delete(pBuffPacket);
             }
 
+            m_SendMessagePool.Delete(pSendMessage);
             return false;
         }
 
@@ -1711,6 +1722,7 @@ bool CProConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
                 App_BuffPacketManager::instance()->Delete(pBuffPacket);
             }
 
+            m_SendMessagePool.Delete(pSendMessage);
             return false;
         }
     }
@@ -1723,6 +1735,7 @@ bool CProConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
             App_BuffPacketManager::instance()->Delete(pBuffPacket);
         }
 
+        m_SendMessagePool.Delete(pSendMessage);
         return false;
     }
 
@@ -2042,17 +2055,17 @@ bool CProConnectManager::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendT
         //放入发送队列
         _SendMessage* pSendMessage = m_SendMessagePool.Create();
 
+        if(NULL == pSendMessage)
+        {
+            OUR_DEBUG((LM_ERROR,"[CProConnectManager::PutMessage] new _SendMessage is error.\n"));
+            App_BuffPacketManager::instance()->Delete(pBuffPacket);
+            return false;
+        }
+
         ACE_Message_Block* mb = pSendMessage->GetQueueMessage();
 
         if(NULL != mb)
         {
-            if(NULL == pSendMessage)
-            {
-                OUR_DEBUG((LM_ERROR,"[CProConnectManager::PutMessage] new _SendMessage is error.\n"));
-                App_BuffPacketManager::instance()->Delete(pBuffPacket);
-                return false;
-            }
-
             pSendMessage->m_u4ConnectID = objveCProConnectManager[i]->GetConnectID();
             pSendMessage->m_pBuffPacket = pCurrBuffPacket;
             pSendMessage->m_nEvents     = u1SendType;
@@ -2102,7 +2115,7 @@ bool CProConnectManager::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendT
             {
                 App_BuffPacketManager::instance()->Delete(pBuffPacket);
             }
-
+            m_SendMessagePool.Delete(pSendMessage);
             return false;
         }
     }
