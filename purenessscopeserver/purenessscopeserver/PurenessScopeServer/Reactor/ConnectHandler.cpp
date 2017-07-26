@@ -1087,12 +1087,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
         //ÅÐ¶ÏÊÇ·ñ³¬¹ýãÐÖµ
         if (false == CheckSendMask((uint32)pMbData->length()))
         {
-            if (blDelete == true)
-            {
-                App_BuffPacketManager::instance()->Delete(pBuffPacket);
-                App_MessageBlockManager::instance()->Close(pMbData);
-            }
-
+            App_MessageBlockManager::instance()->Close(pMbData);
             return false;
         }
 
