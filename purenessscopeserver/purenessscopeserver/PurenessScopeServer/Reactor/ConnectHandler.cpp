@@ -761,6 +761,7 @@ int CConnectHandler::Dispose_Recv_Data()
                 //看看是否接收完成了
                 if (m_pCurrMessage->length() == 0)
                 {
+                    App_MessageBlockManager::instance()->Close(m_pCurrMessage);
                     break;
                 }
                 else
@@ -768,7 +769,6 @@ int CConnectHandler::Dispose_Recv_Data()
                     //还有数据，继续分析
                     continue;
                 }
-
             }
             else if (PACKET_GET_NO_ENOUGTH == n1Ret)
             {
@@ -780,6 +780,7 @@ int CConnectHandler::Dispose_Recv_Data()
 
                 AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %dws, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %dws.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, (uint32)m_u8RecvQueueTimeCost, m_u4RecvQueueCount, (uint32)m_u8SendQueueTimeCost);
                 OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvData] pmb new is NULL.\n"));
+                App_MessageBlockManager::instance()->Close(m_pCurrMessage);
                 return -1;
             }
         }

@@ -85,6 +85,7 @@ ACE_Message_Block* CMessageBlockManager::Create(uint32 u4Size)
         }
     }
 
+
     m_u4UsedSize += u4FormatSize;
     return pmb;
 }
