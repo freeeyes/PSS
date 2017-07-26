@@ -445,7 +445,6 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                 Close(2, errno);
                 return;
             }
-
         }
         else if(mb.length() == App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength && m_pPacketParse->GetIsHandleHead())
         {
@@ -659,7 +658,8 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                 //看看是否接收完成了
                 if(mb.length() == 0)
                 {
-                    mb.release();
+                    //OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] length = %d.\n",mb.length()));
+                    App_MessageBlockManager::instance()->Close(&mb);
                     break;
                 }
                 else
@@ -670,11 +670,15 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
             }
             else if(PACKET_GET_NO_ENOUGTH == n1Ret)
             {
+                //OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open]error n1Ret = %d.\n",n1Ret));
+                App_MessageBlockManager::instance()->Close(&mb);
                 //接收的数据不完整，需要继续接收
                 break;
             }
             else
             {
+                //OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open]error n1Ret = %d.\n",n1Ret));
+                App_MessageBlockManager::instance()->Close(&mb);
                 //数据包为错误包，丢弃处理
                 m_pPacketParse->Clear();
 
