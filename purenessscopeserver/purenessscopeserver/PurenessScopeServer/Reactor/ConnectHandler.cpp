@@ -234,7 +234,7 @@ int CConnectHandler::open(void*)
 
     //设置默认别名
     SetConnectName(m_addrRemote.get_host_addr());
-    //OUR_DEBUG((LM_INFO, "[CConnectHandler::open] Connection from [%s:%d]\n",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
+    //OUR_DEBUG((LM_INFO, "[CConnectHandler::open]Connection from [%s:%d]\n",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
 
     //初始化当前链接的某些参数
     m_atvConnect          = ACE_OS::gettimeofday();

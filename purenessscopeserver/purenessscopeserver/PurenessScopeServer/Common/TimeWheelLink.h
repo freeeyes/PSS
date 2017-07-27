@@ -4,6 +4,7 @@
 //时间轮盘
 //add by freeeyes
 #include "HashTable.h"
+#include "define.h"
 #include <vector>
 
 using namespace std;
@@ -77,10 +78,10 @@ public:
             m_vecHashContain.push_back(pHashContainer);
         }
 
-        //初始化对象和时间块的映射表
-        m_htIndexList.Init(nTimeCycle, MAX_TIMEWHEEL_KEY);
-
         int nListSize = m_nBlackCount * m_nContainSize;
+        //初始化对象和时间块的映射表
+        m_htIndexList.Init(nListSize, MAX_TIMEWHEEL_KEY);
+
         m_pBlockIDList = new int[nListSize];
 
         for (int i = 0; i < nListSize; i++)
@@ -124,7 +125,7 @@ public:
             return false;
         }
 
-        sprintf_safe(szKey, MAX_TIMEWHEEL_KEY, "%16x", pEntey);
+        sprintf_safe(szKey, MAX_TIMEWHEEL_KEY, "0x%08x", pEntey);
 
         int* pCurrBlockListID = m_htIndexList.Get_Hash_Box_Data(szKey);
 
@@ -143,7 +144,14 @@ public:
                 if(NULL != pBlockID)
                 {
                     *pBlockID = m_nCurrBlockID;
-                    m_htIndexList.Add_Hash_Data(szKey, pBlockID);
+                    int n4Result = m_htIndexList.Add_Hash_Data(szKey, pBlockID);
+
+                    if(-1 == n4Result)
+                    {
+                        OUR_DEBUG ((LM_INFO, "[Add_TimeWheel_Object](%s)(%d)\n", szKey,n4Result));
+                        return false;
+                    }
+
                     return true;
                 }
                 else
@@ -155,32 +163,46 @@ public:
         else
         {
             //已经存在于指定的容器
-
-            //删除指定时间块中的数据指针
-            m_vecHashContain[*pCurrBlockListID]->Del_Hash_Data(szKey);
-
-            //删除对应在时间索引中的数据
-            *pCurrBlockListID = INVAILD_BLOCKID;
-            m_htIndexList.Del_Hash_Data(szKey);
-
-            if (0 > m_vecHashContain[m_nCurrBlockID]->Add_Hash_Data(szKey, pEntey))
+            //如果在最新容器中，则什么也不做。
+            if(*pCurrBlockListID == m_nCurrBlockID)
             {
-                return false;
+                return true;
             }
             else
             {
-                //添加索引表
-                int* pBlockID = Get_BlockIDList_Cell();
-                
-                if(NULL != pBlockID)
+                //删除指定时间块中的数据指针
+                m_vecHashContain[*pCurrBlockListID]->Del_Hash_Data(szKey);
+
+                //删除对应在时间索引中的数据
+                *pCurrBlockListID = INVAILD_BLOCKID;
+                m_htIndexList.Del_Hash_Data(szKey);
+
+                if (0 > m_vecHashContain[m_nCurrBlockID]->Add_Hash_Data(szKey, pEntey))
                 {
-                    *pBlockID = m_nCurrBlockID;
-                    m_htIndexList.Add_Hash_Data(szKey, pBlockID);
-                    return true;
+                    return false;
                 }
                 else
                 {
-                    return false;
+                    //添加索引表
+                    int* pBlockID = Get_BlockIDList_Cell();
+
+                    if(NULL != pBlockID)
+                    {
+                        *pBlockID = m_nCurrBlockID;
+                        int n4Result = m_htIndexList.Add_Hash_Data(szKey, pBlockID);
+
+                        if(-1 == n4Result)
+                        {
+                            OUR_DEBUG ((LM_INFO, "[Add_TimeWheel_Object](%s)(%d)\n", szKey,n4Result));
+                            return false;
+                        }
+
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
             }
         }
@@ -190,7 +212,7 @@ public:
     void Del_TimeWheel_Object(T* pEntey)
     {
         char szKey[MAX_TIMEWHEEL_KEY] = { '\0' };
-        sprintf_safe(szKey, MAX_TIMEWHEEL_KEY, "%16x", pEntey);
+        sprintf_safe(szKey, MAX_TIMEWHEEL_KEY, "0x%08x", pEntey);
 
         int* pCurrBlockListID = m_htIndexList.Get_Hash_Box_Data(szKey);
 
@@ -264,7 +286,7 @@ public:
             for (int i = 0; i < (int)vecEntey.size(); i++)
             {
                 char szKey[MAX_TIMEWHEEL_KEY] = { '\0' };
-                sprintf_safe(szKey, MAX_TIMEWHEEL_KEY, "%16x", vecEntey[i]);
+                sprintf_safe(szKey, MAX_TIMEWHEEL_KEY, "0x%08x", vecEntey[i]);
                 m_htIndexList.Del_Hash_Data(szKey);
             }
 
