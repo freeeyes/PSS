@@ -1586,20 +1586,6 @@ void CConnectManager::CloseAll()
     vector<CConnectHandler*> vecCloseConnectHandler;
     m_objHashConnectList.Get_All_Used(vecCloseConnectHandler);
 
-    for(int i = 0; i < (int)vecCloseConnectHandler.size(); i++)
-    {
-        CConnectHandler* pConnectHandler = vecCloseConnectHandler[i];
-
-        if(pConnectHandler != NULL)
-        {
-            vecCloseConnectHandler.push_back(pConnectHandler);
-            m_u4TimeDisConnect++;
-
-            //加入链接统计功能
-            //App_ConnectAccount::instance()->AddDisConnect();
-        }
-    }
-
     //开始关闭所有连接
     for(int i = 0; i < (int)vecCloseConnectHandler.size(); i++)
     {
