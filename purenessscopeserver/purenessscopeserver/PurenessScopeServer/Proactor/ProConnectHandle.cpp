@@ -2119,6 +2119,7 @@ bool CProConnectManager::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendT
             {
                 App_BuffPacketManager::instance()->Delete(pBuffPacket);
             }
+
             m_SendMessagePool.Delete(pSendMessage);
             return false;
         }

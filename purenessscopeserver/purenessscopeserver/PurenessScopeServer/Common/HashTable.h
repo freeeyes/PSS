@@ -573,7 +573,7 @@ public:
             }
         }
 
-        //OUR_DEBUG((LM_INFO, "[HashTable::Pop]pT is NULL, m_objHashPool.Get_Count()=%d, m_nCurrLinkIndex=%d.\n", m_objHashPool.Get_Count(), m_nCurrLinkIndex));
+        OUR_DEBUG((LM_INFO, "[HashTable::Pop]pT is NULL, m_objHashPool.Get_Count()=%d, m_nCurrLinkIndex=%d.\n", m_objHashPool.Get_Count(), m_nCurrLinkIndex));
         return pT;
     }
 
@@ -689,6 +689,7 @@ public:
                     {
                         OUR_DEBUG((LM_INFO, "[CHashTable::Get_All_Used_Key]pLastLink->m_pData is NULL.\n"));
                     }
+
                     pLastLink = pLastLink->m_pNext;
                 }
             }

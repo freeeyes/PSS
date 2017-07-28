@@ -514,13 +514,11 @@ extern "C"
         {
             return u1Ret;
         }
-
-        //插件退出的时候调用
-        void Close()
-        {
-            OUR_DEBUG((LM_INFO, "[CPacketParse::Close]exit.\n"));
-        }
-
     }
 
+    //插件退出的时候调用
+    void Close()
+    {
+        OUR_DEBUG((LM_INFO, "[CPacketParse::Close]exit.\n"));
+    }
 }
