@@ -21,6 +21,14 @@
 #include "WaitQuitSignal.h"
 #include "ServerManager.h"
 
+#include "ace/Thread.h"
+#include "ace/Synch.h"
+
+//关闭消息队列条件变量
+ACE_Thread_Mutex g_mutex;
+ACE_Condition<ACE_Thread_Mutex> g_cond(g_mutex);
+
+
 //监控信号量线程
 void* thread_Monitor(void* arg)
 {
@@ -38,6 +46,9 @@ void* thread_Monitor(void* arg)
         sleep(1);
     }
 
+    g_cond.signal();
+    g_mutex.release();
+                
     OUR_DEBUG((LM_INFO, "[thread_Monitor]exit.\n"));
     pthread_exit(0);
 }
@@ -312,8 +323,7 @@ int Chlid_Run()
 
     OUR_DEBUG((LM_INFO, "[main]Server Run is End.\n"));
 
-    ACE_Time_Value tvSleep(2, 0);
-    ACE_OS::sleep(tvSleep);
+    g_mutex.acquire();
 
     OUR_DEBUG((LM_INFO, "[main]Server Exit.\n"));
 

@@ -568,7 +568,7 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
         }
         else
         {
-            serverinfo.m_u4PacketParseInfoID = 0;
+            serverinfo.m_u4PacketParseInfoID = 1;
         }
 
         m_vecServerInfo.push_back(serverinfo);

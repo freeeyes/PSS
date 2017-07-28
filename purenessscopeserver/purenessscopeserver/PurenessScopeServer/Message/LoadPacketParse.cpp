@@ -131,7 +131,7 @@ _Packet_Parse_Info* CLoadPacketParse::GetPacketParseInfo(uint32 u4PacketParseID)
     if(NULL == pPacketParseInfo)
     {
         //这里打印输出错误
-        OUR_DEBUG((LM_INFO, "[CLoadPacketParse::GetPacketParseInfo]can't find u4PacketParseID（%d）.\n", u4PacketParseID));
+        OUR_DEBUG((LM_INFO, "[CLoadPacketParse::GetPacketParseInfo]can't find u4PacketParseID(%d).\n", u4PacketParseID));
     }
 
     return pPacketParseInfo;
