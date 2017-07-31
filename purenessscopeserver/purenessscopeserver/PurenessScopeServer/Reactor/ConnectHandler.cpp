@@ -1871,12 +1871,6 @@ bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
 
     if(NULL != mb)
     {
-        if(NULL == pSendMessage)
-        {
-            OUR_DEBUG((LM_ERROR,"[CConnectManager::PutMessage] new _SendMessage is error.\n"));
-            return false;
-        }
-
         pSendMessage->m_u4ConnectID = u4ConnectID;
         pSendMessage->m_pBuffPacket = pBuffPacket;
         pSendMessage->m_nEvents     = u1SendType;
