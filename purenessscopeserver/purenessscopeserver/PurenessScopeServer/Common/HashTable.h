@@ -562,12 +562,17 @@ public:
                 //设置状态
                 m_nCurrLinkIndex = i;
 
+                if (HASH_DEBUG_ON == m_emHashDebug)
+                {
+                    OUR_DEBUG((LM_INFO, "[Pop]1 pKey = %s.\n", pKey));
+                }
+
                 //回收数据
                 int nRet = Del_Hash_Data(pKey);
 
                 if (HASH_DEBUG_ON == m_emHashDebug)
                 {
-                    OUR_DEBUG((LM_INFO, "[Pop]1 index=%d, Del_Hash_Data(%s)(%d), Currused=%d pT=0x%08x.\n", m_nCurrLinkIndex, pKey, nRet, Get_Used_Count(), pT));
+                    OUR_DEBUG((LM_INFO, "[Pop]1 index=%d, Del_Hash_Data(%d), Currused=%d pT=0x%08x.\n", m_nCurrLinkIndex, nRet, Get_Used_Count(), pT));
                 }
 
                 return pT;
@@ -582,6 +587,11 @@ public:
                 pT = m_lpTable[i]->m_pData->m_pValue;
                 char* pKey = m_lpTable[i]->m_pData->m_pKey;
 
+                if (HASH_DEBUG_ON == m_emHashDebug)
+                {
+                    OUR_DEBUG((LM_INFO, "[Pop]2 pKey = %s.\n", pKey));
+                }
+
                 //设置状态
                 m_nCurrLinkIndex = i;
 
@@ -590,7 +600,7 @@ public:
 
                 if (HASH_DEBUG_ON == m_emHashDebug)
                 {
-                    OUR_DEBUG((LM_INFO, "[Pop]2 index=%d, Del_Hash_Data(%s)(%d), Currused=%d, pT=0x%08x.\n", m_nCurrLinkIndex, pKey, nRet, Get_Used_Count(), pT));
+                    OUR_DEBUG((LM_INFO, "[Pop]2 index=%d, Del_Hash_Data(%d), Currused=%d, pT=0x%08x.\n", m_nCurrLinkIndex, nRet, Get_Used_Count(), pT));
                 }
 
                 return pT;

@@ -92,7 +92,6 @@ struct _SendMessage
         m_u4ConnectID = 0;
         m_nEvents     = 0;
         m_u2CommandID = 0;
-        m_nHashID     = 0;
         m_nMessageID  = 0;
         m_u1Type      = 0;
     }
