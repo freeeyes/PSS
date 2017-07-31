@@ -12,6 +12,12 @@ enum EM_HASH_STATE
     EM_INSERT,
 };
 
+enum EM_HASH_DEBUG
+{
+    HASH_DEBUG_ON = 0,
+    HASH_DEBUG_OFF,
+};
+
 #define DEF_HASH_KEY_SIZE 20           //默认的Hash key长度
 
 //hash表结构
@@ -439,6 +445,7 @@ public:
         m_lpTable        = NULL;
         m_cIsDelete      = 0;
         m_nCurrLinkIndex = 0;
+        m_emHashDebug    = HASH_DEBUG_OFF; //默认DEBUG是关闭。
     }
 
     ~CHashTable()
@@ -467,7 +474,7 @@ public:
     }
 
     //初始化Hash块
-    void Init(int nHashCount, int nKeySize = DEF_HASH_KEY_SIZE)
+    void Init(int nHashCount, int nKeySize = DEF_HASH_KEY_SIZE, EM_HASH_DEBUG emHashDebug = HASH_DEBUG_OFF)
     {
         size_t stSize = Get_Size(nHashCount, nKeySize);
         char* pData = new char[stSize];
@@ -487,11 +494,12 @@ public:
             m_lpTable[i] = NULL;
         }
 
+        m_emHashDebug = emHashDebug;
         //nPos += sizeof(_Hash_Link_Info<T>* ) * nHashCount;
     }
 
     //初始化Hash块(给定内存地址)
-    void Init_By_Memory(char* pData, int nHashCount, int nKeySize = DEF_HASH_KEY_SIZE, char cIsDelete = 0)
+    void Init_By_Memory(char* pData, int nHashCount, int nKeySize = DEF_HASH_KEY_SIZE, EM_HASH_DEBUG emHashDebug = HASH_DEBUG_OFF, char cIsDelete = 0)
     {
         memset(pData, 0, Get_Size(nHashCount, nKeySize));
         int nPos         = 0;
@@ -509,6 +517,7 @@ public:
             m_lpTable[i] = NULL;
         }
 
+        m_emHashDebug = emHashDebug;
         //nPos += sizeof(_Hash_Link_Info<T>* ) * nHashCount;
         //printf("[Init]nPos=%d.\n", nPos);
     }
@@ -533,30 +542,18 @@ public:
         if(NULL == m_lpTable)
         {
             //没有找到共享内存
+            if (HASH_DEBUG_ON == m_emHashDebug)
+            {
+                OUR_DEBUG((LM_INFO, "[Pop]m_lpTable is NULL.\n"));
+            }
+
             return pT;
         }
 
         //寻找一个可以用的对象，弹出来。
         for(int i = m_nCurrLinkIndex; i < m_objHashPool.Get_Count(); i++)
         {
-            if(m_lpTable[i] != NULL)
-            {
-                //取出当前的数据
-                pT         = m_lpTable[i]->m_pData->m_pValue;
-                char* pKey = m_lpTable[i]->m_pData->m_pKey;
-
-                //设置状态
-                m_nCurrLinkIndex = i;
-
-                //回收数据
-                Del_Hash_Data(pKey);
-                return pT;
-            }
-        }
-
-        for(int i = 0; i < m_nCurrLinkIndex; i++)
-        {
-            if(m_lpTable[i] != NULL)
+            if (m_lpTable[i] != NULL)
             {
                 //取出当前的数据
                 pT = m_lpTable[i]->m_pData->m_pValue;
@@ -565,15 +562,46 @@ public:
                 //设置状态
                 m_nCurrLinkIndex = i;
 
-                //printf("[Pop]2 pKey=%s.\n", pKey);
-
                 //回收数据
-                Del_Hash_Data(pKey);
+                int nRet = Del_Hash_Data(pKey);
+
+                if (HASH_DEBUG_ON == m_emHashDebug)
+                {
+                    OUR_DEBUG((LM_INFO, "[Pop]1 index=%d, Del_Hash_Data(%s)(%d), Currused=%d pT=0x%08x.\n", m_nCurrLinkIndex, pKey, nRet, Get_Used_Count(), pT));
+                }
+
                 return pT;
             }
         }
 
-        OUR_DEBUG((LM_INFO, "[HashTable::Pop]pT is NULL, m_objHashPool.Get_Count()=%d, m_nCurrLinkIndex=%d.\n", m_objHashPool.Get_Count(), m_nCurrLinkIndex));
+        for(int i = 0; i < m_nCurrLinkIndex; i++)
+        {
+            if (m_lpTable[i] != NULL)
+            {
+                //取出当前的数据
+                pT = m_lpTable[i]->m_pData->m_pValue;
+                char* pKey = m_lpTable[i]->m_pData->m_pKey;
+
+                //设置状态
+                m_nCurrLinkIndex = i;
+
+                //回收数据
+                int nRet = Del_Hash_Data(pKey);
+
+                if (HASH_DEBUG_ON == m_emHashDebug)
+                {
+                    OUR_DEBUG((LM_INFO, "[Pop]2 index=%d, Del_Hash_Data(%s)(%d), Currused=%d, pT=0x%08x.\n", m_nCurrLinkIndex, pKey, nRet, Get_Used_Count(), pT));
+                }
+
+                return pT;
+            }
+        }
+
+        if (HASH_DEBUG_ON == m_emHashDebug)
+        {
+            OUR_DEBUG((LM_INFO, "[Pop]2 index=%d, no Find, Currused=%d.\n", m_nCurrLinkIndex, Get_Used_Count()));
+        }
+
         return pT;
     }
 
@@ -586,10 +614,13 @@ public:
             return false;
         }
 
-        //printf("[Push]pKey=%s.\n", pKey);
-
         //根据key计算这个点的hash位置
         unsigned long uHashStart = HashString(pKey, m_objHashPool.Get_Count());
+
+        if (HASH_DEBUG_ON == m_emHashDebug)
+        {
+            OUR_DEBUG((LM_INFO, "[Push] index =%d, pKey=%s, pT=0x%08x.\n", m_emHashDebug, pKey, pT));
+        }
 
         _Hash_Link_Info<T>* pLastLink = m_lpTable[uHashStart];
 
@@ -603,6 +634,11 @@ public:
 
         if(NULL == pData)
         {
+            if (HASH_DEBUG_ON == m_emHashDebug)
+            {
+                OUR_DEBUG((LM_INFO, "[Push]m_objHashPool pData = NULL.\n"));
+            }
+
             return false;
         }
 
@@ -610,6 +646,11 @@ public:
 
         if(NULL == pLink)
         {
+            if (HASH_DEBUG_ON == m_emHashDebug)
+            {
+                OUR_DEBUG((LM_INFO, "[Push]m_objHashLinkPool pData = NULL.\n"));
+            }
+
             return false;
         }
 
@@ -625,6 +666,11 @@ public:
         else
         {
             m_lpTable[uHashStart] = pLink;
+        }
+
+        if (HASH_DEBUG_ON == m_emHashDebug)
+        {
+            OUR_DEBUG((LM_INFO, "[Push] index =%d, pKey=%s, Currused=%d, pT=0x%08x OK.\n", m_emHashDebug, pKey, Get_Used_Count(), pT));
         }
 
         return true;
@@ -706,6 +752,11 @@ public:
             return;
         }
 
+        if (HASH_DEBUG_ON == m_emHashDebug)
+        {
+            OUR_DEBUG((LM_INFO, "[Clear](%d)Data is Clear.\n", Get_Used_Count()));
+        }
+
         for (int i = 0; i < m_objHashPool.Get_Count(); i++)
         {
             if (NULL != m_lpTable[i])
@@ -741,12 +792,22 @@ public:
         if(NULL == m_lpTable)
         {
             //没有找到共享内存
+            if (HASH_DEBUG_ON == m_emHashDebug)
+            {
+                OUR_DEBUG((LM_INFO, "[Add_Hash_Data]m_lpTable is NULL.\n"));
+            }
+
             return -1;
         }
 
         if((short)strlen(pKey) >= m_objHashPool.Get_Key_Length())
         {
             //当前key的长度超过了HashTable的key长度。
+            if (HASH_DEBUG_ON == m_emHashDebug)
+            {
+                OUR_DEBUG((LM_INFO, "[Add_Hash_Data](short)strlen(pKey) >= m_objHashPool.Get_Key_Length().\n"));
+            }
+
             return -1;
         }
 
@@ -755,6 +816,11 @@ public:
         if(-1 == nPos)
         {
             //内存已满，或者数据已经存在
+            if (HASH_DEBUG_ON == m_emHashDebug)
+            {
+                OUR_DEBUG((LM_INFO, "[Add_Hash_Data]GetHashTablePos is -1.\n", nPos));
+            }
+
             return -1;
         }
         else
@@ -1006,6 +1072,7 @@ private:
     int                  m_nCurrLinkIndex;   //当前链表位置
     char*                m_pBase;            //内存块的基础地址
     char                 m_cIsDelete;        //当前类析构的时候是否回收内存，0是回收，1是不回收。
+    EM_HASH_DEBUG        m_emHashDebug;  //是否开启DEBUG开关
 };
 
 
