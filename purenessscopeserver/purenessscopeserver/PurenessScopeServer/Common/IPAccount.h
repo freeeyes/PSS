@@ -207,7 +207,7 @@ public:
         vector<_IPAccount* > vecIPAccount;
         m_objIPList.Get_All_Used(vecIPAccount);
 
-        for(int i = 0; i < (int)m_objIPList.Get_Count(); i++)
+        for(int i = 0; i < (int)vecIPAccount.size(); i++)
         {
             _IPAccount* pIPAccount = vecIPAccount[i];
 
