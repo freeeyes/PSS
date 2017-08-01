@@ -31,6 +31,7 @@ public:
     virtual int open(void*);
     virtual int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE);
     virtual int handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask);
+    virtual int handle_output(ACE_HANDLE fd = ACE_INVALID_HANDLE);
 
     void SetClientMessage(IClientMessage* pClientMessage); //设置消息接收处理类
     void SetServerID(int nServerID);                       //设置当前的ServerID
