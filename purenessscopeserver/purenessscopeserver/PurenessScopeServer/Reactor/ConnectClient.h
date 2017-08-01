@@ -61,6 +61,7 @@ public:
     int                        m_nServerID;                    //服务器ID
     uint32                     m_u4CurrSize;                   //当前接收到的字节数
     uint32                     m_u4MaxPacketSize;              //最大接收包长
+    uint8                      m_u1ConnectState;               //连接状态
 
     ACE_Time_Value              m_atvBegin;          //链接建立时间
     uint32                      m_u4SendSize;        //发送字节数

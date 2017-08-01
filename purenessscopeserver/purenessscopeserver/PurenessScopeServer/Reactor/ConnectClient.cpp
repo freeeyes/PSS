@@ -55,16 +55,44 @@ bool CConnectClient::Close()
 void CConnectClient::ClientClose(EM_s2s& ems2s)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadLock);
-    m_ems2s = ems2s;
-    //msg_queue()->deactivate();
+    //将连接消息断开放在output去执行，这样就不需要同步加锁了。
+    ACE_Message_Block* pMbData = App_MessageBlockManager::instance()->Create(sizeof(int));
 
-    //如果对象已经在外面释放，则不需要再次回调
-    if(ems2s == S2S_INNEED_CALLBACK)
+    if (NULL == pMbData)
     {
-        SetClientMessage(NULL);
+        OUR_DEBUG((LM_ERROR, "[CConnectClient::ClientClose] Connectid=%d, pMbData is NULL.\n", GetServerID()));
+        return;
     }
 
-    shutdown();
+    ACE_Message_Block::ACE_Message_Type objType = ACE_Message_Block::MB_STOP;
+    pMbData->msg_type(objType);
+
+    //将消息放入队列，让output在反应器线程发送。
+    ACE_Time_Value xtime = ACE_OS::gettimeofday();
+
+    //队列已满，不能再放进去了,就不放进去了
+    if (msg_queue()->is_full() == true)
+    {
+        OUR_DEBUG((LM_ERROR, "[CConnectClient::ClientClose] Connectid=%d,putq is full(%d).\n", GetServerID(), msg_queue()->message_count()));
+        App_MessageBlockManager::instance()->Close(pMbData);
+        return;
+    }
+
+    if (this->putq(pMbData, &xtime) == -1)
+    {
+        OUR_DEBUG((LM_ERROR, "[CConnectClient::ClientClose] Connectid=%d,putq(%d) output errno = [%d].\n", GetServerID(), msg_queue()->message_count(), errno));
+        App_MessageBlockManager::instance()->Close(pMbData);
+    }
+    else
+    {
+        m_u1ConnectState = CONNECT_CLOSEEND;
+        int nWakeupRet = reactor()->schedule_wakeup(this, ACE_Event_Handler::WRITE_MASK);
+
+        if (-1 == nWakeupRet)
+        {
+            OUR_DEBUG((LM_ERROR, "CConnectClient::ClientClose] Connectid=%d, nWakeupRet(%d) output errno = [%d].\n", GetServerID(), nWakeupRet, errno));
+        }
+    }
 }
 
 int CConnectClient::open(void* p)
@@ -121,6 +149,8 @@ int CConnectClient::open(void* p)
         OUR_DEBUG((LM_ERROR, "[CConnectClient::RecvClinetPacket] pmb new is NULL.\n"));
         return -1;
     }
+
+    m_u1ConnectState = CONNECT_OPEN;
 
     App_ClientReConnectManager::instance()->SetHandler(m_nServerID, this);
     m_pClientMessage = App_ClientReConnectManager::instance()->GetClientMessage(m_nServerID);
@@ -599,6 +629,15 @@ int CConnectClient::GetServerID()
 
 bool CConnectClient::SendData(ACE_Message_Block* pmblk)
 {
+    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadLock);
+
+    if (CONNECT_CLOSEEND == m_u1ConnectState)
+    {
+        //连接已经进入关闭流程，不在接受发送数据。
+        App_MessageBlockManager::instance()->Close(pmblk);
+        return false;
+    }
+
     //如果是DEBUG状态，记录当前接受包的二进制数据
     if (App_MainConfig::instance()->GetDebug() == DEBUG_ON)
     {
