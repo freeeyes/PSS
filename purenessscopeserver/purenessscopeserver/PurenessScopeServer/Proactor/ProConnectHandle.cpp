@@ -839,6 +839,12 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
     //OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::SendMessage]Connectid=%d,m_nIOCount=%d 1.\n", GetConnectID(), m_nIOCount));
 
+    if(NULL == pBuffPacket)
+    {
+        OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::SendMessage] Connectid=[%d] pBuffPacket is NULL.\n", GetConnectID()));
+        return false;
+    }
+
     //如果当前连接已被别的线程关闭，则这里不做处理，直接退出
     if(m_u1IsActive == 0)
     {
@@ -854,12 +860,6 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
             App_BuffPacketManager::instance()->Delete(pBuffPacket);
         }
 
-        return false;
-    }
-
-    if(NULL == pBuffPacket)
-    {
-        OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::SendMessage] Connectid=[%d] pBuffPacket is NULL.\n", GetConnectID()));
         return false;
     }
 
