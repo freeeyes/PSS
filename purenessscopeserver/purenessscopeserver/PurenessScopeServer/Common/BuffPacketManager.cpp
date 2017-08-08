@@ -95,7 +95,7 @@ void CBuffPacketManager::Init(uint32 u4PacketCount, uint32 u4MaxBuffSize, bool b
 
             if(-1 != nHashPos)
             {
-                pBuffPacket->SetHashID(nHashPos);
+                pBuffPacket->SetHashID(i);
             }
         }
     }

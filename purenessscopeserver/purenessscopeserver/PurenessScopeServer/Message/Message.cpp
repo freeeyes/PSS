@@ -180,7 +180,7 @@ void CMessagePool::Init(uint32 u4PacketCount)
 
             if(-1 != nHashPos)
             {
-                pPacket->SetHashID(nHashPos);
+                pPacket->SetHashID(i);
             }
         }
     }

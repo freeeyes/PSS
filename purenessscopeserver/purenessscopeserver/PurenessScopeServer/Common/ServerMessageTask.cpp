@@ -31,7 +31,7 @@ void CServerMessageInfoPool::Init(uint32 u4PacketCount /*= MAX_SERVER_MESSAGE_IN
 
             if(-1 != nHashPos)
             {
-                pPacket->SetHashID(nHashPos);
+                pPacket->SetHashID(i);
             }
         }
     }

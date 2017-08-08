@@ -31,7 +31,7 @@ void CSendMessagePool::Init(int nObjcetCount)
 
             if(-1 != nHashPos)
             {
-                pMessage->SetHashID(nHashPos);
+                pMessage->SetHashID(i);
             }
         }
     }

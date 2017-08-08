@@ -2338,8 +2338,8 @@ void CProConnectHandlerPool::Init(int nObjcetCount)
 
             if(-1 != nHashPos)
             {
-                pHandler->Init(nHashPos);
-                pHandler->SetHashID(nHashPos);
+                pHandler->Init(i);
+                pHandler->SetHashID(i);
             }
 
             m_u4CurrMaxCount++;
