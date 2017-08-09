@@ -466,6 +466,11 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
             }
             else
             {
+                if (NULL == objHeadInfo.m_pmbHead)
+                {
+                    OUR_DEBUG((LM_ERROR, "[CProConnectHandle::RecvData]ConnectID=%d, objHeadInfo.m_pmbHead is NULL.\n", GetConnectID()));
+                }
+
                 m_pPacketParse->SetPacket_IsHandleHead(false);
                 m_pPacketParse->SetPacket_Head_Message(objHeadInfo.m_pmbHead);
                 m_pPacketParse->SetPacket_Head_Curr_Length(objHeadInfo.m_u4HeadCurrLen);

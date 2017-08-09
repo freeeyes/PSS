@@ -594,6 +594,11 @@ int CConnectHandler::Dispose_Recv_Data()
             }
             else
             {
+                if (NULL == objHeadInfo.m_pmbHead)
+                {
+                    OUR_DEBUG((LM_ERROR, "[CConnectHandler::RecvData]ConnectID=%d, objHeadInfo.m_pmbHead is NULL.\n", GetConnectID()));
+                }
+
                 m_pPacketParse->SetPacket_IsHandleHead(false);
                 m_pPacketParse->SetPacket_Head_Message(objHeadInfo.m_pmbHead);
                 m_pPacketParse->SetPacket_Head_Curr_Length(objHeadInfo.m_u4HeadCurrLen);
