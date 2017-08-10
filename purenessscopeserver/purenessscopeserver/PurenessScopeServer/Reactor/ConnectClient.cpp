@@ -52,7 +52,7 @@ bool CConnectClient::Close()
     return false;
 }
 
-void CConnectClient::ClientClose(EM_s2s& ems2s)
+void CConnectClient::ClientClose()
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadLock);
     //将连接消息断开放在output去执行，这样就不需要同步加锁了。

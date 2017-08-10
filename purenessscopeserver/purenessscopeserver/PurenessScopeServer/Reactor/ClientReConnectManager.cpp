@@ -380,7 +380,7 @@ bool CClientReConnectManager::SetHandler(int nServerID, CConnectClient* pConnect
     return true;
 }
 
-bool CClientReConnectManager::Close(int nServerID, EM_s2s ems2s)
+bool CClientReConnectManager::Close(int nServerID)
 {
     //如果是因为服务器断开，则只删除ProConnectClient的指针
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
@@ -398,17 +398,7 @@ bool CClientReConnectManager::Close(int nServerID, EM_s2s ems2s)
     //关闭链接对象
     if (NULL != pClientInfo->GetConnectClient())
     {
-        pClientInfo->GetConnectClient()->ClientClose(ems2s);
-    }
-
-    if(S2S_NEED_CALLBACK == ems2s)
-    {
-        SAFE_DELETE(pClientInfo);
-    }
-    else
-    {
-        pClientInfo->Close();
-        SAFE_DELETE(pClientInfo);
+        pClientInfo->GetConnectClient()->ClientClose();
     }
 
     //从Hash里面删除当前存在的对象
@@ -962,8 +952,7 @@ bool CClientReConnectManager::DeleteIClientMessage(IClientMessage* pClientMessag
             //关闭链接对象
             if (NULL != pClientInfo->GetConnectClient())
             {
-                EM_s2s ems2s = S2S_INNEED_CALLBACK;
-                pClientInfo->GetConnectClient()->ClientClose(ems2s);
+                pClientInfo->GetConnectClient()->ClientClose();
             }
 
             char szServerID[10] = {'\0'};

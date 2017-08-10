@@ -41,7 +41,7 @@ public:
 
     bool GetTimeout(ACE_Time_Value tvNow);                 //获得当前数据处理是否超时
 
-    void ClientClose(EM_s2s& ems2s);                       //主动关闭
+    void ClientClose();                                    //主动关闭
     _ClientConnectInfo GetClientConnectInfo();             //得到当前链接信息
 
 private:

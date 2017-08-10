@@ -415,7 +415,7 @@ bool CClientProConnectManager::SetHandler(int nServerID, CProConnectClient* pPro
     return true;
 }
 
-bool CClientProConnectManager::Close(int nServerID, EM_s2s ems2s)
+bool CClientProConnectManager::Close(int nServerID)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 
@@ -430,6 +430,8 @@ bool CClientProConnectManager::Close(int nServerID, EM_s2s ems2s)
         OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Close]nServerID =(%d) pClientInfo is NULL.\n", nServerID));
         return false;
     }
+
+    EM_s2s ems2s = S2S_INNEED_CALLBACK;
 
     //关闭链接对象
     if(NULL != pClientInfo->GetProConnectClient())
