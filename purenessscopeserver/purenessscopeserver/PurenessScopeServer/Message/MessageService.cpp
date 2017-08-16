@@ -751,14 +751,13 @@ bool CMessageServiceGroup::CheckWorkThread()
 
         if (NULL != pMessageService)
         {
-            bool blFlag = pMessageService->SaveThreadInfo();
-
+            pMessageService->SaveThreadInfo();
+            //目前在工作线程发生阻塞的时候不在杀死工程线程，杀了工作线程会导致一些内存问题。
+            /*
             if (false == blFlag)
             {
                 //首先让对象失效
-                //m_ThreadWriteLock.acquire();
                 m_vecMessageService[i] = NULL;
-                //m_ThreadWriteLock.release();
 
                 //获得当前线程ID
                 uint32 u4ThreadID = pMessageService->GetThreadInfo()->m_u4ThreadID;
@@ -796,6 +795,7 @@ bool CMessageServiceGroup::CheckWorkThread()
                     OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::handle_timeout] reset workthread is NULL (%d).\n", i));
                 }
             }
+            */
         }
     }
 
