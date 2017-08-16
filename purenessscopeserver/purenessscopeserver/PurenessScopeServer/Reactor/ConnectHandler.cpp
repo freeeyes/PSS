@@ -132,7 +132,6 @@ void CConnectHandler::Init(uint16 u2HandlerID)
         m_u8RecvQueueTimeout = MAX_QUEUE_TIMEOUT * 1000 * 1000;
     }
 
-    msg_queue()->high_water_mark(App_MainConfig::instance()->GetSendQueueMax());
     m_u4SendMaxBuffSize  = App_MainConfig::instance()->GetBlockSize();
     //m_pBlockMessage      = new ACE_Message_Block(m_u4SendMaxBuffSize);
     m_pBlockMessage      = NULL;
@@ -527,6 +526,18 @@ int CConnectHandler::Dispose_Recv_Data()
 
         //关闭当前的PacketParse
         ClearPacketParse();
+
+        //设置发送消息队列不能再发送任何消息
+        m_u1ConnectState = CONNECT_CLOSEEND;
+
+        //读取发送队列内部的所有数据，标记为无效并回收内存
+        ACE_Message_Block* pmbSendData = NULL;
+        ACE_Time_Value nowait(ACE_OS::gettimeofday());
+
+        while (-1 != this->getq(pmbSendData, &nowait))
+        {
+            App_MessageBlockManager::instance()->Close(pmbSendData);
+        }
 
         return -1;
     }
