@@ -527,18 +527,6 @@ int CConnectHandler::Dispose_Recv_Data()
         //关闭当前的PacketParse
         ClearPacketParse();
 
-        //设置发送消息队列不能再发送任何消息
-        m_u1ConnectState = CONNECT_CLOSEEND;
-
-        //读取发送队列内部的所有数据，标记为无效并回收内存
-        ACE_Message_Block* pmbSendData = NULL;
-        ACE_Time_Value nowait(ACE_OS::gettimeofday());
-
-        while (-1 != this->getq(pmbSendData, &nowait))
-        {
-            App_MessageBlockManager::instance()->Close(pmbSendData);
-        }
-
         return -1;
     }
 
@@ -824,6 +812,18 @@ int CConnectHandler::handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask)
     if(h == ACE_INVALID_HANDLE)
     {
         OUR_DEBUG((LM_DEBUG,"[CConnectHandler::handle_close] h is NULL mask=%d.\n", (int)mask));
+    }
+
+    //设置发送消息队列不能再发送任何消息
+    m_u1ConnectState = CONNECT_CLOSEEND;
+
+    //读取发送队列内部的所有数据，标记为无效并回收内存
+    ACE_Message_Block* pmbSendData = NULL;
+    ACE_Time_Value nowait(ACE_OS::gettimeofday());
+
+    while (-1 != this->getq(pmbSendData, &nowait))
+    {
+        App_MessageBlockManager::instance()->Close(pmbSendData);
     }
 
     Close();
