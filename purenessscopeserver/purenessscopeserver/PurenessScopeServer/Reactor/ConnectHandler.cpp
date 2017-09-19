@@ -484,16 +484,16 @@ int CConnectHandler::Dispose_Recv_Data()
     {
         if (m_pPacketParse->GetIsHandleHead())
         {
-            nCurrCount = (uint32)App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength - m_u4CurrSize;
+            nCurrCount = (uint32)App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength - m_pCurrMessage->length();
         }
         else
         {
-            nCurrCount = (uint32)m_pPacketParse->GetPacketBodySrcLen() - m_u4CurrSize;
+            nCurrCount = (uint32)m_pPacketParse->GetPacketBodySrcLen() - m_pCurrMessage->length();
         }
     }
     else
     {
-        nCurrCount = (uint32)App_MainConfig::instance()->GetServerRecvBuff() - m_u4CurrSize;
+        nCurrCount = (uint32)App_MainConfig::instance()->GetServerRecvBuff() - m_pCurrMessage->length();
     }
 
     //这里需要对m_u4CurrSize进行检查。
@@ -513,10 +513,10 @@ int CConnectHandler::Dispose_Recv_Data()
         uint32 u4Error = (uint32)errno;
 
         //如果是-1 且为11的错误，忽略之
-        if (nDataLen == -1 && u4Error == EAGAIN)
-        {
-            return 0;
-        }
+        //if (nDataLen == -1 && u4Error == EAGAIN)
+        //{
+        //    return 0;
+        //}
 
         OUR_DEBUG((LM_ERROR, "[CConnectHandler::RecvData] ConnectID=%d, recv data is error nDataLen = [%d] errno = [%d].\n", GetConnectID(), nDataLen, u4Error));
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::RecvData] ConnectID = %d, recv data is error[%d].\n", GetConnectID(), nDataLen);
@@ -569,9 +569,11 @@ int CConnectHandler::Dispose_Recv_Data()
         //如果没有读完，短读
         if (nCurrCount - nDataLen > 0)
         {
+            //没读完，继续读
             return 0;
         }
-        else if (m_pCurrMessage->length() == App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength && m_pPacketParse->GetIsHandleHead())
+
+        if (m_pCurrMessage->length() == App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength && m_pPacketParse->GetIsHandleHead())
         {
             _Head_Info objHeadInfo;
             bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Head_Info(GetConnectID(), m_pCurrMessage, App_MessageBlockManager::instance(), &objHeadInfo);
@@ -1346,6 +1348,12 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 
 bool CConnectHandler::CheckMessage()
 {
+    if (m_pPacketParse->GetMessageHead() == NULL)
+    {
+        OUR_DEBUG((LM_ERROR, "[CConnectHandler::CheckMessage](%d)head is NULL.\n", GetConnectID()));
+        return false;
+    }
+
     if(m_pPacketParse->GetMessageBody() == NULL)
     {
         m_u4AllRecvSize += (uint32)m_pPacketParse->GetMessageHead()->length();
@@ -1478,12 +1486,12 @@ void CConnectHandler::ClearPacketParse()
 {
     if(NULL != m_pPacketParse)
     {
-        if(m_pPacketParse->GetMessageHead() != NULL)
+        if (m_pPacketParse->GetMessageHead() != NULL)
         {
             App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
         }
 
-        if(m_pPacketParse->GetMessageBody() != NULL)
+        if (m_pPacketParse->GetMessageBody() != NULL)
         {
             App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
         }
