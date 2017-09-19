@@ -123,7 +123,7 @@ public:
 
     virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);
 
-    bool Init(uint32 u4ThreadCount = MAX_MSG_THREADCOUNT, uint32 u4MaxQueue = MAX_MSG_THREADQUEUE, uint32 u4LowMask = MAX_MSG_MASK, uint32 u4HighMask = MAX_MSG_MASK);
+    bool Init(uint32 u4ThreadCount = MAX_MSG_THREADCOUNT, uint32 u4MaxQueue = MAX_MSG_THREADQUEUE, uint32 u4LowMask = MAX_MSG_MASK, uint32 u4HighMask = MAX_MSG_MASK, uint8 u1ServiceType = 0);
     bool PutMessage(CMessage* pMessage);
     void Close();
 
@@ -174,7 +174,7 @@ public:
     uint32                     m_u4HighMask;          //线程高水位
     uint32                     m_u4LowMask;           //线程低水位
     CRandomNumber              m_objRandomNumber;     //随机数，仅UDP使用
-    //ACE_Recursive_Thread_Mutex m_ThreadWriteLock;     //当前线程锁
+    uint8                      m_u1ServiceType;       //当前的服务类型，是保持时序的队列模式，还是随机的actor模式。
 };
 
 typedef ACE_Singleton<CMessageServiceGroup,ACE_Null_Mutex> App_MessageServiceGroup;

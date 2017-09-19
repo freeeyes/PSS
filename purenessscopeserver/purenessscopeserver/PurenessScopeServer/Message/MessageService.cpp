@@ -610,31 +610,43 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* a
     return 0;
 }
 
-bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 u4LowMask, uint32 u4HighMask)
+bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 u4LowMask, uint32 u4HighMask, uint8 u1ServiceType)
 {
     //删除以前的所有CMessageService对象
     Close();
 
     //记录当前设置
-    m_u4MaxQueue = u4MaxQueue;
-    m_u4HighMask = u4HighMask;
-    m_u4LowMask  = u4LowMask;
+    m_u4MaxQueue    = u4MaxQueue;
+    m_u4HighMask    = u4HighMask;
+    m_u4LowMask     = u4LowMask;
+    m_u1ServiceType = u1ServiceType;
 
     m_objAllThreadInfo.Init((int)u4ThreadCount);
 
-    //初始化所有的Message对象
-    for(uint32 i = 0; i < u4ThreadCount; i++)
+    if (0 == m_u1ServiceType)
     {
-        CMessageService* pMessageService = new CMessageService();
+        //时序模式开启
+        OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Init]Timing sequence Start.\n"));
 
-        if(NULL == pMessageService)
+        //初始化所有的Message对象
+        for (uint32 i = 0; i < u4ThreadCount; i++)
         {
-            OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::Init](%d)pMessageService is NULL.\n", i));
-            return false;
-        }
+            CMessageService* pMessageService = new CMessageService();
 
-        pMessageService->Init(i, u4MaxQueue, u4LowMask, u4HighMask);
-        m_vecMessageService.push_back(pMessageService);
+            if (NULL == pMessageService)
+            {
+                OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::Init](%d)pMessageService is NULL.\n", i));
+                return false;
+            }
+
+            pMessageService->Init(i, u4MaxQueue, u4LowMask, u4HighMask);
+            m_vecMessageService.push_back(pMessageService);
+        }
+    }
+    else
+    {
+        //随机模式开启
+        OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Init]random model Start.\n"));
     }
 
     //初始化随机范围，仅UDP协议包需要

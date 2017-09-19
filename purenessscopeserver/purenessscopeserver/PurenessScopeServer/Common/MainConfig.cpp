@@ -55,6 +55,7 @@ CMainConfig::CMainConfig(void)
     m_u2Backlog             = (uint16)MAX_ASYNCH_BACKLOG;
     m_u4TrackIPCount        = (uint32)MAX_ASYNCH_BACKLOG;
     m_u4SendBlockCount      = 10;
+    m_u1ServiceType         = 0;
 
     //默认的CPU监控和内存监控的上限
     m_u4MaxCpu              = 90;
@@ -748,6 +749,13 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
     if(pData != NULL)
     {
         m_u4MsgLowMark = (uint32)ACE_OS::atoi(pData);
+    }
+
+    pData = m_MainConfig.GetData("Message", "Service_Type");
+
+    if (pData != NULL)
+    {
+        m_u1ServiceType = (uint8)ACE_OS::atoi(pData);
     }
 
     pData = m_MainConfig.GetData("Message", "Msg_Buff_Max_Size");
@@ -1831,6 +1839,11 @@ _PacketParseInfo* CMainConfig::GetPacketParseInfo(uint8 u1Index)
 uint8 CMainConfig::GetPacketParseCount()
 {
     return (uint8)m_vecPacketParseInfo.size();
+}
+
+uint8 CMainConfig::GetServiceType()
+{
+    return m_u1ServiceType;
 }
 
 uint16 CMainConfig::GetModuleInfoCount()

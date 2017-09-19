@@ -116,7 +116,12 @@ bool CServerManager::Init()
     //初始化链接管理器
     App_ConnectManager::instance()->Init(App_MainConfig::instance()->GetSendQueueCount());
     //初始化消息处理线程
-    App_MessageServiceGroup::instance()->Init(App_MainConfig::instance()->GetThreadCount(), App_MainConfig::instance()->GetMsgMaxQueue(), App_MainConfig::instance()->GetMgsHighMark(), App_MainConfig::instance()->GetMsgLowMark());
+    App_MessageServiceGroup::instance()->Init(App_MainConfig::instance()->GetThreadCount(),
+            App_MainConfig::instance()->GetMsgMaxQueue(),
+            App_MainConfig::instance()->GetMgsHighMark(),
+            App_MainConfig::instance()->GetMsgLowMark(),
+            App_MainConfig::instance()->GetServiceType());
+
     //初始化给DLL的对象接口
     App_ServerObject::instance()->SetMessageManager(dynamic_cast<IMessageManager*>(App_MessageManager::instance()));
     App_ServerObject::instance()->SetLogManager(dynamic_cast<ILogManager*>(AppLogManager::instance()));

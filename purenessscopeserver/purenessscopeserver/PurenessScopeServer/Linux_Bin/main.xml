@@ -18,7 +18,8 @@
 	<ConsoleKey Key="guest" desc="维护端允许登录的Key值,可以是多个，key值中不能包含空格" />
 	<!-- <ConsoleClient cip="127.0.0.1" desc="维护端口可以访问的对应的客户端IP地址，可以支持多个" /> -->
 	
-	<Message Msg_High_mark="64000" Msg_Low_mark="64000" Msg_Buff_Max_Size="20480" Msg_Process="1" Msg_Thread="3" Msg_MaxQueue="10000" desc="消息处理线程相关参数设置，" />
+	<!-- Service_Type属性,0是时序线程模式，1是随机线程模式 -->
+	<Message Msg_High_mark="64000" Msg_Low_mark="64000" Service_Type="0" Msg_Buff_Max_Size="20480" Msg_Process="1" Msg_Thread="3" Msg_MaxQueue="10000" desc="消息处理线程相关参数设置，" />
 	<ModuleManager MaxCount="100" desc="框架支持的最大插件数量" />
 	<!-- <Module ModulePath="./" ModuleString="libAutoTest.so" desc="模块加载配置相关参数，ModulePath是路径，ModuleString是模块名称，以逗号隔开"/> -->
 	<ModuleInfo ModuleSPath="./" ModuleSName="libTcpTest.so" ModuleSParam="../../example-Module/TcpTest/TcpTest.ini" Desc="ModuleParam为插件启动参数"/>

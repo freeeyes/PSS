@@ -317,6 +317,7 @@ public:
     _GroupListenInfo* GetGroupListenInfo();
     _PacketParseInfo* GetPacketParseInfo(uint8 u1Index = 0);
     uint8             GetPacketParseCount();
+    uint8             GetServiceType();
 
 private:
     CXmlOpeation m_MainConfig;
@@ -338,6 +339,7 @@ private:
     uint32     m_u4MsgThreadCount;                     //允许的工作线程个数
     uint8      m_u1MsgProcessCount;                    //当前的多进程数量(仅Linux支持)
     uint32     m_u4MsgMaxQueue;                        //消息队列的最大个数
+    uint8      m_u1ServiceType;                        //工作线程状态，0是时序线程，1是随机处理线程
     uint8      m_u1Debug;                              //是否开启Debug模式，1是开启，0是关闭
 
     int        m_nEncryptFlag;                         //0，加密方式关闭，1为加密方式开启
