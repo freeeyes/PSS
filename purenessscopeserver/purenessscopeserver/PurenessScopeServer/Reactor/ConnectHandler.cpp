@@ -399,7 +399,6 @@ int CConnectHandler::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
         if (pmbSendData->msg_type() == ACE_Message_Block::MB_STOP)
         {
             App_MessageBlockManager::instance()->Close(pmbSendData);
-            ClearPacketParse();
             return -1;
         }
 
