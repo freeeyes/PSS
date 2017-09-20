@@ -509,10 +509,10 @@ int CConnectHandler::Dispose_Recv_Data()
         uint32 u4Error = (uint32)errno;
 
         //如果是-1 且为11的错误，忽略之
-        //if (nDataLen == -1 && u4Error == EAGAIN)
-        //{
-        //    return 0;
-        //}
+        if (nDataLen == -1 && u4Error == EAGAIN)
+        {
+            return 0;
+        }
 
         OUR_DEBUG((LM_ERROR, "[CConnectHandler::RecvData] ConnectID=%d, recv data is error nDataLen = [%d] errno = [%d].\n", GetConnectID(), nDataLen, u4Error));
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::RecvData] ConnectID = %d, recv data is error[%d].\n", GetConnectID(), nDataLen);
