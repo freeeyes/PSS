@@ -59,12 +59,6 @@ bool CConnectHandler::Close()
     //查看是否是IP追踪信息，是则记录
     //App_IPAccount::instance()->CloseIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
 
-    //删除对象缓冲的PacketParse
-    if(m_pCurrMessage != NULL)
-    {
-        App_MessageBlockManager::instance()->Close(m_pCurrMessage);
-    }
-
     //调用连接断开消息
     App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->DisConnect(GetConnectID());
 
@@ -405,6 +399,7 @@ int CConnectHandler::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
         if (pmbSendData->msg_type() == ACE_Message_Block::MB_STOP)
         {
             App_MessageBlockManager::instance()->Close(pmbSendData);
+            ClearPacketParse();
             return -1;
         }
 
@@ -519,7 +514,6 @@ int CConnectHandler::Dispose_Recv_Data()
         //{
         //    return 0;
         //}
-        App_MessageBlockManager::instance()->Close(m_pCurrMessage);
 
         OUR_DEBUG((LM_ERROR, "[CConnectHandler::RecvData] ConnectID=%d, recv data is error nDataLen = [%d] errno = [%d].\n", GetConnectID(), nDataLen, u4Error));
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::RecvData] ConnectID = %d, recv data is error[%d].\n", GetConnectID(), nDataLen);
@@ -771,12 +765,10 @@ int CConnectHandler::Dispose_Recv_Data()
 
                 AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %dws, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %dws.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, (uint32)m_u8RecvQueueTimeCost, m_u4RecvQueueCount, (uint32)m_u8SendQueueTimeCost);
                 OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvData] pmb new is NULL.\n"));
-                App_MessageBlockManager::instance()->Close(m_pCurrMessage);
                 return -1;
             }
         }
 
-        App_MessageBlockManager::instance()->Close(m_pCurrMessage);
         m_u4CurrSize = 0;
 
         //申请头的大小对应的mb
