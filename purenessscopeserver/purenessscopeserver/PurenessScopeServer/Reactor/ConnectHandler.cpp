@@ -449,10 +449,12 @@ int CConnectHandler::RecvData()
 //et模式接收数据
 int CConnectHandler::RecvData_et()
 {
+    int nRet = 0;
+
     while(true)
     {
         //判断缓冲是否为NULL
-        int nRet = Dispose_Recv_Data();
+        nRet = Dispose_Recv_Data();
 
         if (0 != nRet)
         {
@@ -460,7 +462,7 @@ int CConnectHandler::RecvData_et()
         }
     }
 
-    return 0;
+    return nRet;
 }
 
 int CConnectHandler::Dispose_Recv_Data()
@@ -517,6 +519,7 @@ int CConnectHandler::Dispose_Recv_Data()
         //{
         //    return 0;
         //}
+        App_MessageBlockManager::instance()->Close(m_pCurrMessage);
 
         OUR_DEBUG((LM_ERROR, "[CConnectHandler::RecvData] ConnectID=%d, recv data is error nDataLen = [%d] errno = [%d].\n", GetConnectID(), nDataLen, u4Error));
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::RecvData] ConnectID = %d, recv data is error[%d].\n", GetConnectID(), nDataLen);
