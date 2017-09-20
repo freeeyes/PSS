@@ -768,6 +768,7 @@ int CConnectHandler::Dispose_Recv_Data()
             }
         }
 
+        App_MessageBlockManager::instance()->Close(m_pCurrMessage);
         m_u4CurrSize = 0;
 
         //申请头的大小对应的mb
