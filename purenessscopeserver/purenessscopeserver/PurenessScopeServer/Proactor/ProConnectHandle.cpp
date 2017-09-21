@@ -630,6 +630,8 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                 //已经接收了完整数据包，扔给工作线程去处理
                 if(false == CheckMessage())
                 {
+                    App_MessageBlockManager::instance()->Close(&mb);
+
                     Close(2);
                     return;
                 }
@@ -655,6 +657,8 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                     {
                         OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
                     }
+
+                    App_MessageBlockManager::instance()->Close(&mb);
 
                     Close(2);
                     return;
