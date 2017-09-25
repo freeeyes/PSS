@@ -532,28 +532,28 @@ int CConnectHandler::Dispose_Recv_Data()
     if (App_MainConfig::instance()->GetDebug() == DEBUG_ON || m_blIsLog == true)
     {
         char szLog[10] = { '\0' };
-        int  nDebugSize = 0;
+        uint32 u4DebugSize = 0;
         bool blblMore = false;
 
         if (nDataLen >= m_u4PacketDebugSize)
         {
-            nDebugSize = m_u4PacketDebugSize - 1;
+            u4DebugSize = m_u4PacketDebugSize - 1;
             blblMore = true;
         }
         else
         {
-            nDebugSize = nDataLen;
+            u4DebugSize = nDataLen;
         }
 
         char* pData = m_pCurrMessage->wr_ptr();
 
-        for (int i = 0; i < nDebugSize; i++)
+        for (uint32 i = 0; i < u4DebugSize; i++)
         {
             sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
             sprintf_safe(m_pPacketDebugData + 5 * i, MAX_BUFF_1024 - 5 * i, "%s", szLog);
         }
 
-        m_pPacketDebugData[5 * nDebugSize] = '\0';
+        m_pPacketDebugData[5 * u4DebugSize] = '\0';
 
         if (blblMore == true)
         {
