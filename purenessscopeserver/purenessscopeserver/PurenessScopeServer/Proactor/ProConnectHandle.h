@@ -142,6 +142,9 @@ private:
     CPacketParse        m_objSendPacketParse;           //发送数据包组织结构
     uint32              m_u4PacketParseInfoID;          //对应处理packetParse的模块ID
 
+    char*               m_pPacketDebugData;             //记录数据包的Debug缓冲字符串
+    uint32              m_u4PacketDebugSize;            //记录能存二进制数据包的最大字节
+
     Fast_Asynch_Read_Stream  m_Reader;
     Fast_Asynch_Write_Stream m_Writer;
 };

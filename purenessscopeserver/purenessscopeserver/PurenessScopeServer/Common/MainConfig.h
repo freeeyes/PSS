@@ -271,6 +271,7 @@ public:
     uint16 GetWorkQueuePutTime();
     uint8  GetServerType();
     uint8  GetDebug();
+    uint32 GetDebugSize();
     void   SetDebug(uint8 u1Debug);
     uint8  GetNetworkMode();
     uint32 GetConnectServerRecvBuffer();
@@ -341,6 +342,7 @@ private:
     uint32     m_u4MsgMaxQueue;                        //消息队列的最大个数
     uint8      m_u1ServiceType;                        //工作线程状态，0是时序线程，1是随机处理线程
     uint8      m_u1Debug;                              //是否开启Debug模式，1是开启，0是关闭
+    uint32     m_u4DebugSize;                          //设置当前记录数据包长度的最大缓冲大小
 
     int        m_nEncryptFlag;                         //0，加密方式关闭，1为加密方式开启
     char       m_szEncryptPass[MAX_BUFF_9];            //最长8位的加密密码，3DES算法

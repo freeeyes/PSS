@@ -32,6 +32,7 @@ CMainConfig::CMainConfig(void)
 
     m_u1ServerType            = 0;
     m_u1Debug                 = DEBUG_OFF;
+    m_u4DebugSize             = MAX_BUFF_1024;
     m_u1Monitor               = 0;
     m_u4SendDatamark          = MAX_BLOCK_SIZE;
     m_u4BlockSize             = MAX_BLOCK_SIZE;
@@ -466,6 +467,13 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
     if(NULL != pData)
     {
         m_u1Debug = (uint8)ACE_OS::atoi(pData);
+    }
+
+    pData = m_MainConfig.GetData("ServerType", "DebugSize");
+
+    if (NULL != pData)
+    {
+        m_u4DebugSize = (uint32)ACE_OS::atoi(pData);
     }
 
     pData = m_MainConfig.GetData("ServerType", "IsClose");
@@ -1627,6 +1635,11 @@ const char* CMainConfig::GetDisplayServiceName()
 uint8 CMainConfig::GetDebug()
 {
     return m_u1Debug;
+}
+
+NAMESPACE::uint32 CMainConfig::GetDebugSize()
+{
+    return m_u4DebugSize;
 }
 
 void CMainConfig::SetDebug(uint8 u1Debug)

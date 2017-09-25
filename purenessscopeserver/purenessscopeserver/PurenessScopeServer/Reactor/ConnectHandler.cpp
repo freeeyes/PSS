@@ -480,16 +480,16 @@ int CConnectHandler::Dispose_Recv_Data()
     {
         if (m_pPacketParse->GetIsHandleHead())
         {
-            nCurrCount = (uint32)App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength - m_pCurrMessage->length();
+            nCurrCount = (uint32)App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength - (uint32)m_pCurrMessage->length();
         }
         else
         {
-            nCurrCount = (uint32)m_pPacketParse->GetPacketBodySrcLen() - m_pCurrMessage->length();
+            nCurrCount = (uint32)m_pPacketParse->GetPacketBodySrcLen() - (uint32)m_pCurrMessage->length();
         }
     }
     else
     {
-        nCurrCount = (uint32)App_MainConfig::instance()->GetServerRecvBuff() - m_pCurrMessage->length();
+        nCurrCount = (uint32)App_MainConfig::instance()->GetServerRecvBuff() - (uint32)m_pCurrMessage->length();
     }
 
     //这里需要对m_u4CurrSize进行检查。
