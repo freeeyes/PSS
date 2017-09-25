@@ -148,6 +148,8 @@ private:
     char                       m_szConnectName[MAX_BUFF_100];  //连接名称，可以开放给逻辑插件去设置
     bool                       m_blIsLog;                      //是否写入日志，false为不写入，true为写入
     uint32                     m_u4PacketParseInfoID;          //对应处理packetParse的模块ID
+    char*                      m_pPacketDebugData;             //记录数据包的Debug缓冲字符串
+    uint32                     m_u4PacketDebugSize;            //记录能存二进制数据包的最大字节
 };
 
 //管理所有已经建立的链接

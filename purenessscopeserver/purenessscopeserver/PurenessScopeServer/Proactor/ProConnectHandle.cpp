@@ -35,12 +35,15 @@ CProConnectHandle::CProConnectHandle(void)
     m_szLocalIP[0]        = '\0';
     m_u4RecvPacketCount   = 0;
     m_u4PacketParseInfoID = 0;
+    m_u4PacketDebugSize   = 0;
+    m_pPacketDebugData    = NULL;
 }
 
 CProConnectHandle::~CProConnectHandle(void)
 {
     SAFE_DELETE(m_pPacketDebugData);
-    m_pPacketDebugData = NULL;
+    m_pPacketDebugData  = NULL;
+    m_u4PacketDebugSize = 0;
 }
 
 void CProConnectHandle::Init(uint16 u2HandlerID)
@@ -69,8 +72,8 @@ void CProConnectHandle::Init(uint16 u2HandlerID)
     m_u4SendMaxBuffSize  = App_MainConfig::instance()->GetBlockSize();
     m_emStatus           = CLIENT_CLOSE_NOTHING;
 
-    m_pPacketDebugData  = new char[App_MainConfig::instance()->GetDebugSize()];
-    m_u4PacketDebugSize = App_MainConfig::instance()->GetDebugSize() / 5;
+    m_pPacketDebugData   = new char[App_MainConfig::instance()->GetDebugSize()];
+    m_u4PacketDebugSize  = App_MainConfig::instance()->GetDebugSize() / 5;
 }
 
 uint32 CProConnectHandle::GetHandlerID()
@@ -407,7 +410,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
 
         if(mb.length() >= m_u4PacketDebugSize)
         {
-            nDebugSize = m_u4PacketDebugSize;
+            nDebugSize = m_u4PacketDebugSize - 1;
             blblMore   = true;
         }
         else
@@ -422,6 +425,8 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
             sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
             sprintf_safe(m_pPacketDebugData + 5*i, MAX_BUFF_1024 - 5*i, "%s", szLog);
         }
+
+        m_pPacketDebugData[5 * nDebugSize] = '\0';
 
         if(blblMore == true)
         {
@@ -1055,7 +1060,7 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
 
         if(pMbData->length() >= m_u4PacketDebugSize)
         {
-            nDebugSize = m_u4PacketDebugSize;
+            nDebugSize = m_u4PacketDebugSize - 1;
             blblMore   = true;
         }
         else
@@ -1070,6 +1075,8 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
             sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
             sprintf_safe(m_pPacketDebugData + 5*i, MAX_BUFF_1024 -  5*i, "0x%02X ", (unsigned char)pData[i]);
         }
+
+        m_pPacketDebugData[5 * nDebugSize] = '\0';
 
         if(blblMore == true)
         {
