@@ -191,6 +191,13 @@ enum EM_UDP_TYPE
     UDP_BROADCAST,         //UDP广播
 };
 
+//对Handler接收数据入口类型的定义
+enum EM_IO_TYPE
+{
+    NET_INPUT = 0,      //网络入口
+    FILE_INPUT,         //文件入口
+};
+
 //对应当前框架支持的网络模式
 enum
 {

@@ -53,6 +53,9 @@ public:
     virtual void handle_write_stream(const ACE_Asynch_Write_Stream::Result& result);                 //处理发送到用户数据完成的事件
     virtual void addresses(const ACE_INET_Addr& remote_address, const ACE_INET_Addr& local_address); //获得当前远程客户端的IP地址信息
 
+    uint32 file_open();                                                                      //文件入口打开接口
+    int handle_write_file_stream(const char* pData, uint32 u4Size, uint8 u1ParseID);         //文件接口模拟数据包入口
+
     void Init(uint16 u2HandlerID);                                            //Connect Pool初始化调用的函数
 
     bool SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, uint8 u1State, uint8 u1SendType, uint32& u4PacketSize, bool blDelete, int nMessageID);   //发送给客户端数据的函数
@@ -145,6 +148,8 @@ private:
     char*               m_pPacketDebugData;             //记录数据包的Debug缓冲字符串
     uint32              m_u4PacketDebugSize;            //记录能存二进制数据包的最大字节
 
+    EM_IO_TYPE          m_emIOType;                     //当前IO入口类型
+
     Fast_Asynch_Read_Stream  m_Reader;
     Fast_Asynch_Write_Stream m_Writer;
 };
@@ -193,6 +198,9 @@ public:
 
     bool StartTimer();
     bool KillTimer();
+
+    uint32 file_open();                                                                                      //文件入口打开接口
+    int handle_write_file_stream(uint32 u4ConnectID, const char* pData, uint32 u4Size, uint8 u1ParseID);     //文件接口模拟数据包入口
 
     int         GetCount();
     const char* GetError();
@@ -287,6 +295,9 @@ public:
     void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);                                   //获得指定命令统计信息
     void GetCommandFlowAccount(_CommandFlowAccount& objCommandFlowAccount);                                  //得到出口流量信息
     EM_Client_Connect_status GetConnectState(uint32 u4ConnectID);                                            //得到连接状态
+
+    uint32 file_open();                                                                                      //文件入口打开接口
+    int handle_write_file_stream(uint32 u4ConnectID, const char* pData, uint32 u4Size, uint8 u1ParseID);     //文件接口模拟数据包入口
 
 private:
     uint32 GetGroupIndex();                                                                                  //得到当前链接的ID自增量
