@@ -36,7 +36,7 @@ private:
     uint32 m_u4PacketParseInfoID;       //处理包解析的模块ID
 };
 
-class CProConnectAcceptManager
+class CProConnectAcceptManager : public ACE_Task<ACE_MT_SYNCH>
 {
 public:
     CProConnectAcceptManager(void);
@@ -57,6 +57,20 @@ private:
     vecProConnectAcceptor m_vecConnectAcceptor;
     int                   m_nAcceptorCount;
     char                  m_szError[MAX_BUFF_500];
+
+public:
+    //文件测试方法
+    void FileTestStart(uint32 u4Second);      //开始文件测试
+    void FileTestEnd();                     //结束文件测试
+private:
+    bool LoadXmlCfg();
+
+    virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);   //定时器检查
+private:
+    //文件测试变量
+    bool m_bFileTesting;          //是否正在进行文件测试
+    bool m_bLoadCfgFile;          //是否已经加载配置文件
+    uint32 m_u4TimerID;           //定时器ID
 };
 
 typedef ACE_Singleton<CProConnectAcceptManager, ACE_Null_Mutex> App_ProConnectAcceptManager;

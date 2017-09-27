@@ -293,3 +293,24 @@ ConnectAcceptor* CConnectAcceptorManager::GetNewConnectAcceptor()
     return pConnectAcceptor;
 }
 
+void CConnectAcceptorManager::FileTestStart(uint32 u4Second)
+{
+    return;
+}
+
+void CConnectAcceptorManager::FileTestEnd()
+{
+    return;
+}
+
+bool CConnectAcceptorManager::LoadXmlCfg()
+{
+    return true;
+}
+
+int CConnectAcceptorManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
+{
+    return 0;
+}
+
+

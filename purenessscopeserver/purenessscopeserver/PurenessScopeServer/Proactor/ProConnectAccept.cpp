@@ -203,3 +203,25 @@ ProConnectAcceptor* CProConnectAcceptManager::GetNewConnectAcceptor()
     m_vecConnectAcceptor.push_back(pConnectAcceptor);
     return pConnectAcceptor;
 }
+
+void CProConnectAcceptManager::FileTestStart(uint32 u4Second)
+{
+    return;
+}
+
+void CProConnectAcceptManager::FileTestEnd()
+{
+    return;
+}
+
+bool CProConnectAcceptManager::LoadXmlCfg()
+{
+    return true;
+}
+
+int CProConnectAcceptManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
+{
+    return 0;
+}
+
+
