@@ -199,7 +199,6 @@ public:
     bool StartTimer();
     bool KillTimer();
 
-    uint32 file_open();                                                                                      //文件入口打开接口
     int handle_write_file_stream(uint32 u4ConnectID, const char* pData, uint32 u4Size, uint8 u1ParseID);     //文件接口模拟数据包入口
 
     int         GetCount();
@@ -296,7 +295,6 @@ public:
     void GetCommandFlowAccount(_CommandFlowAccount& objCommandFlowAccount);                                  //得到出口流量信息
     EM_Client_Connect_status GetConnectState(uint32 u4ConnectID);                                            //得到连接状态
 
-    uint32 file_open();                                                                                      //文件入口打开接口
     int handle_write_file_stream(uint32 u4ConnectID, const char* pData, uint32 u4Size, uint8 u1ParseID);     //文件接口模拟数据包入口
 
 private:

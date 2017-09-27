@@ -2050,21 +2050,6 @@ bool CProConnectManager::KillTimer()
     return true;
 }
 
-uint32 CProConnectManager::file_open()
-{
-    CProConnectHandle* pProConnectHandle = App_ProConnectHandlerPool::instance()->Create();
-
-    if (NULL == pProConnectHandle)
-    {
-        OUR_DEBUG((LM_INFO, "[CProConnectManager::file_open]pProConnectHandle is NULL.\n"));
-        return 0;
-    }
-    else
-    {
-        return pProConnectHandle->file_open();
-    }
-}
-
 int CProConnectManager::handle_write_file_stream(uint32 u4ConnectID, const char* pData, uint32 u4Size, uint8 u1ParseID)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
@@ -3297,26 +3282,10 @@ EM_Client_Connect_status CProConnectManagerGroup::GetConnectState(uint32 u4Conne
     return pConnectManager->GetConnectState(u4ConnectID);
 }
 
-uint32 CProConnectManagerGroup::file_open()
-{
-    //文件入口 指定一个线程组
-    uint16 u2ThreadIndex = 0;
-
-    CProConnectManager* pConnectManager = m_objProConnnectManagerList[u2ThreadIndex];
-
-    if (NULL == pConnectManager)
-    {
-        OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::file_open]No find.\n"));
-        return 0;
-    }
-
-    return pConnectManager->file_open();
-}
-
 int CProConnectManagerGroup::handle_write_file_stream(uint32 u4ConnectID, const char* pData, uint32 u4Size, uint8 u1ParseID)
 {
     //文件入口 指定一个线程组
-    uint16 u2ThreadIndex = 0;
+    uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
     CProConnectManager* pConnectManager = m_objProConnnectManagerList[u2ThreadIndex];
 

@@ -437,8 +437,8 @@ void CDlgClientConnect::OnBnClickedButton14()
         {
             CString strTxt;
             int nData = 0;
-            char szTemp[1024] = { '\0' };
-            char szData[1024] = { '\0' };
+            char szTemp[1024]        = { '\0' };
+            char szCommandDesc[1024] = { '\0' };
             memcpy_s(&nData, sizeof(int), &szRecvBuff[nPos], sizeof(int));
             nPos += sizeof(int);
             sprintf_s(szTemp, 1024, "TimeInterval:[%d]\n", nData);
@@ -447,11 +447,26 @@ void CDlgClientConnect::OnBnClickedButton14()
             nPos += sizeof(int);
             sprintf_s(szTemp, 1024, "ProcolCount:[%d]\n", nData);
             strTxt += szTemp;
-            MessageBox(strTxt, _T(MESSAGE_TITLE_ERROR), MB_OK);
+            memcpy_s(&nData, sizeof(short), &szRecvBuff[nPos], sizeof(short));
+            nPos += sizeof(short);
+            int nCount = nData;
+
+            for (int i = 0; i < nCount; i++)
+            {
+                memcpy_s(&nData, sizeof(int), &szRecvBuff[nPos], sizeof(int));
+                nPos += sizeof(int);
+                memcpy_s(&szCommandDesc, nData, &szRecvBuff[nPos], nData);
+                szCommandDesc[nData] = '\0';
+                nPos += nData;
+                sprintf_s(szTemp, 1024, "CommandDesc:[%s]\n", szCommandDesc);
+                strTxt += szTemp;
+            }
+
+            MessageBox(strTxt, _T(MESSAGE_TITLE_SUCCESS), MB_OK);
         }
         else
         {
-            MessageBox(_T(MESSAGE_RESULT_FAIL), _T(MESSAGE_TITLE_SUCCESS), MB_OK);
+            MessageBox(_T(MESSAGE_RESULT_FAIL), _T(MESSAGE_TITLE_ERROR), MB_OK);
         }
     }
 }

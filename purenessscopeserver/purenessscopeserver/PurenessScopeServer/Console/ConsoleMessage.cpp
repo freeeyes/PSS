@@ -687,7 +687,7 @@ bool CConsoleMessage::GetTestFileName(const char* pCommand, char* pFileName)
     char* pPosBegin = (char*)ACE_OS::strstr(pCommand, "-f ");
     uint16 u2Len = (uint16)(nCommandSize - (int(pPosBegin - pCommand) + 3));
 
-    if (nCommandSize < MAX_BUFF_200)
+    if (u2Len < MAX_BUFF_200 && u2Len > 0)
     {
         memcpy_safe((char*)(pPosBegin + 3), (uint32)u2Len, pFileName, (uint32)MAX_BUFF_200);
         pFileName[u2Len] = '\0';
@@ -695,7 +695,7 @@ bool CConsoleMessage::GetTestFileName(const char* pCommand, char* pFileName)
     }
     else
     {
-        OUR_DEBUG((LM_INFO, "[CConsoleMessage::GetTestFileName]nCommandSize=%d is more than MAX_BUFF_200.\n", nCommandSize));
+        OUR_DEBUG((LM_INFO, "[CConsoleMessage::GetTestFileName]nCommandSize=%d is more than MAX_BUFF_200 or is zero.\n", u2Len));
         return false;
     }
 }
@@ -2317,6 +2317,14 @@ bool CConsoleMessage::Do_Message_TestFileStart(_CommandInfo& CommandInfo, IBuffP
         u2ReturnCommandID = CONSOLE_COMMAND_FILE_TEST_START;
 
         FileTestResultInfoSt objFileResult;
+        /*
+        //²âÊÔ´úÂë
+        objFileResult.n4Result = 0;
+        objFileResult.n4TimeInterval = 2000;
+        objFileResult.n4ProNum = 10;
+        objFileResult.vecProFileDesc.push_back((string)"Test freeeyes");
+        objFileResult.vecProFileDesc.push_back((string)"Test liuchao");
+        */
         objFileResult = App_ProConnectAcceptManager::instance()->FileTestStart((string)szFileName);
         (*pBuffPacket) << objFileResult.n4Result;
         (*pBuffPacket) << objFileResult.n4TimeInterval;
@@ -2327,6 +2335,11 @@ bool CConsoleMessage::Do_Message_TestFileStart(_CommandInfo& CommandInfo, IBuffP
         {
             (*pBuffPacket) << objFileResult.vecProFileDesc[i];
         }
+    }
+    else
+    {
+        u2ReturnCommandID = CONSOLE_COMMAND_FILE_TEST_START;
+        (*pBuffPacket) << (int)-1;
     }
 
     return true;
