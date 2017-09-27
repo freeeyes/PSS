@@ -214,12 +214,13 @@ ProConnectAcceptor* CProConnectAcceptManager::GetNewConnectAcceptor()
     return pConnectAcceptor;
 }
 
-FileTestResultInfoSt& CProConnectAcceptManager::FileTestStart(string strXmlCfg)
+FileTestResultInfoSt CProConnectAcceptManager::FileTestStart(string strXmlCfg)
 {
     FileTestResultInfoSt objFileTestResult;
     if(m_bFileTesting)
     {
         OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]当前状态已经处于文件测试状态.\n"));
+        objFileTestResult.n4Result = RESULT_ERR_TESTING;
         return objFileTestResult;
     }
     else 
@@ -230,11 +231,15 @@ FileTestResultInfoSt& CProConnectAcceptManager::FileTestStart(string strXmlCfg)
         }
         else 
         {
-            if(!LoadXmlCfg(strXmlCfg))
+            int n4Result = LoadXmlCfg(strXmlCfg);
+            if(1 == n4Result)
             {
                 OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]加载测试配置文件错误,文件:%s.\n",strXmlCfg.c_str()));
             }
-
+            else if(2 == n4Result)
+            {
+                OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]加载测试协议文件错误,文件:%s.\n",strXmlCfg.c_str()));
+            }
             
         }
     }
@@ -248,9 +253,9 @@ int CProConnectAcceptManager::FileTestEnd()
     return 0;
 }
 
-bool CProConnectAcceptManager::LoadXmlCfg(string strXmlCfg)
+int CProConnectAcceptManager::LoadXmlCfg(string strXmlCfg)
 {
-    return true;
+    return 0;
 }
 
 int CProConnectAcceptManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)

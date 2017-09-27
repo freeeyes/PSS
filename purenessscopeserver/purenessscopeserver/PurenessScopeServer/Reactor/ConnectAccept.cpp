@@ -293,7 +293,7 @@ ConnectAcceptor* CConnectAcceptorManager::GetNewConnectAcceptor()
     return pConnectAcceptor;
 }
 
-FileTestResultInfoSt& CConnectAcceptorManager::FileTestStart(string strXmlCfg)
+FileTestResultInfoSt CConnectAcceptorManager::FileTestStart(string strXmlCfg)
 {
     FileTestResultInfoSt objFileTestResult;
     return objFileTestResult;
@@ -304,9 +304,9 @@ int CConnectAcceptorManager::FileTestEnd()
     return 0;
 }
 
-bool CConnectAcceptorManager::LoadXmlCfg(string strXmlCfg)
+int CConnectAcceptorManager::LoadXmlCfg(string strXmlCfg)
 {
-    return true;
+    return 0;
 }
 
 int CConnectAcceptorManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)

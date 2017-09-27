@@ -203,6 +203,7 @@ enum FILE_TEST_RESULT
 {
     RESULT_ERR_UNKOWN = -1,   //未知错误
     RESULT_OK = 0,            //启动成功
+    RESULT_ERR_TESTING,       //正在测试
     RESULT_ERR_CFGFILE,       //配置文件错误
     RESULT_ERR_PROFILE,       //协议文件错误
 };

@@ -60,10 +60,10 @@ private:
 
 public:
     //文件测试方法
-    FileTestResultInfoSt& FileTestStart(string strXmlCfg);      //开始文件测试
+    FileTestResultInfoSt FileTestStart(string strXmlCfg);      //开始文件测试
     int FileTestEnd();        //结束文件测试
 private:
-    bool LoadXmlCfg(string strXmlCfg);
+    int LoadXmlCfg(string strXmlCfg);
 
     virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);   //定时器检查
 private:
