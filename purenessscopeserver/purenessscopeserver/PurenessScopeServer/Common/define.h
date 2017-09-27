@@ -529,6 +529,7 @@ typedef struct FILETESTRESULTINFO
     int n4Result;                   //启动测试结果信息
     int n4TimeInterval;             //启动测试时间间隔
     int n4ProNum;                   //启动测试协议条数
+    int n4ConnectNum;               //模拟连接数
     vector<string> vecProFileDesc;  //协议文件描述
 
     FILETESTRESULTINFO()
@@ -536,6 +537,7 @@ typedef struct FILETESTRESULTINFO
         n4Result = -1;
         n4TimeInterval = 0;
         n4ProNum = 0;
+        n4ConnectNum = 0;
         vecProFileDesc.clear();
     }
 
@@ -544,6 +546,7 @@ typedef struct FILETESTRESULTINFO
         n4Result = -1;
         n4TimeInterval = 0;
         n4ProNum = 0;
+        n4ConnectNum = 0;
         vecProFileDesc.clear();
     }
 
@@ -552,6 +555,7 @@ typedef struct FILETESTRESULTINFO
         this->n4Result = ar.n4Result;
         this->n4TimeInterval = ar.n4TimeInterval;
         this->n4ProNum = ar.n4ProNum;
+        this->n4ConnectNum = ar.n4ConnectNum;
         this->vecProFileDesc.assign(ar.vecProFileDesc.begin(), ar.vecProFileDesc.end());
         return *this;
     }

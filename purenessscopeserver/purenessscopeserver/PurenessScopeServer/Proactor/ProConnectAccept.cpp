@@ -302,6 +302,8 @@ bool CProConnectAcceptManager::LoadXmlCfg(string strXmlCfg,FileTestResultInfoSt&
     if(NULL != pData)
     {
         m_n4TimeInterval = (uint8)ACE_OS::atoi(pData);
+        objFileTestResult.n4TimeInterval = m_n4TimeInterval;
+        OUR_DEBUG((LM_INFO, "[CProConnectAcceptManager::LoadXmlCfg]m_n4TimeInterval = %d.\n", m_n4TimeInterval));
     }
     else
     {
@@ -313,6 +315,8 @@ bool CProConnectAcceptManager::LoadXmlCfg(string strXmlCfg,FileTestResultInfoSt&
     if(NULL != pData)
     {
         m_n4ConnectCount = (uint8)ACE_OS::atoi(pData);
+        objFileTestResult.n4ConnectNum = m_n4ConnectCount;
+        OUR_DEBUG((LM_INFO, "[CProConnectAcceptManager::LoadXmlCfg]m_n4ConnectCount = %d.\n", m_n4ConnectCount));
     }
     else
     {
@@ -349,9 +353,7 @@ bool CProConnectAcceptManager::LoadXmlCfg(string strXmlCfg,FileTestResultInfoSt&
         }
         else
         {
-            OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]File Read FileName Error = %s.\n", strXmlCfg.c_str()));
-            objFileTestResult.n4Result = RESULT_ERR_PROFILE;
-            return false;
+            break;
         }
 
         pData = m_MainConfig.GetData("FileInfo", "Desc", pNextTiXmlElementDesc);
@@ -363,9 +365,7 @@ bool CProConnectAcceptManager::LoadXmlCfg(string strXmlCfg,FileTestResultInfoSt&
         }
         else
         {
-            OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]File Read Desc Error = %s.\n", strXmlCfg.c_str()));
-            objFileTestResult.n4Result = RESULT_ERR_PROFILE;
-            return false;
+            break;
         }
 
         ACE_FILE_Connector fConnector;
@@ -406,16 +406,18 @@ bool CProConnectAcceptManager::LoadXmlCfg(string strXmlCfg,FileTestResultInfoSt&
             }
             else
             {
-                // Make sure to NUL-terminate this turkey!
                 objFileTestDataInfo.m_szData[u4Size] = '\0';
                 objFileTestDataInfo.m_u4DataLength = static_cast<uint32>(u4Size);
+                OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]u4Size:%d\n", u4Size));
+                OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]m_szData:%s\n", objFileTestDataInfo.m_szData));
             }
         }
 
         m_vecFileTestDataInfoSt.push_back(objFileTestDataInfo);
     }
-
     m_MainConfig.Close();
+
+    objFileTestResult.n4ProNum = static_cast<int>(m_vecFileTestDataInfoSt.size());
     return true;
 }
 
