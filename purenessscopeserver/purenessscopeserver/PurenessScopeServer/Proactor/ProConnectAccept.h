@@ -8,6 +8,11 @@ using namespace std;
 #include "ForbiddenIP.h"
 #include "ProConnectHandle.h"
 #include "AceProactorManager.h"
+#include "XmlOpeation.h"
+
+#include "ace/FILE_Addr.h"
+#include "ace/FILE_Connector.h"
+#include "ace/FILE_IO.h"
 
 //平常客户端的Acceptor
 class ProConnectAcceptor : public ACE_Asynch_Acceptor<CProConnectHandle>
@@ -16,6 +21,7 @@ public:
     ProConnectAcceptor();
     void InitClientProactor(uint32 u4ClientProactorCount);
     void SetPacketParseInfoID(uint32 u4PaccketParseInfoID);
+    uint32 GetPacketParseInfoID();
 
 private:
     virtual CProConnectHandle* make_handler (void);
@@ -63,14 +69,22 @@ public:
     FileTestResultInfoSt FileTestStart(string strXmlCfg);      //开始文件测试
     int FileTestEnd();        //结束文件测试
 private:
-    int LoadXmlCfg(string strXmlCfg);
+    bool LoadXmlCfg(string strXmlCfg,FileTestResultInfoSt& objFileTestResult);
 
     virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);   //定时器检查
 private:
     //文件测试变量
     bool m_bFileTesting;          //是否正在进行文件测试
     bool m_bLoadCfgFile;          //是否已经加载配置文件
-    uint32 m_u4TimerID;           //定时器ID
+    int32 m_n4TimerID;            //定时器ID
+
+    CXmlOpeation m_MainConfig;
+    string m_strProFilePath;
+    int m_n4TimeInterval;      //定时器事件间隔
+    int m_n4ConnectCount;      //模拟连接数
+
+    typedef vector<FileTestDataInfoSt> vecFileTestDataInfoSt;
+    vecFileTestDataInfoSt m_vecFileTestDataInfoSt;
 };
 
 typedef ACE_Singleton<CProConnectAcceptManager, ACE_Null_Mutex> App_ProConnectAcceptManager;
