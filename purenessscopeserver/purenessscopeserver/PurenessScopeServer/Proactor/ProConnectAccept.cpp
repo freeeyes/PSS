@@ -87,7 +87,6 @@ CProConnectAcceptManager::CProConnectAcceptManager(void)
     m_szError[0]     = '\0';
 
     m_bFileTesting = false;
-    m_bLoadCfgFile = false;
     m_n4TimerID = 0;
     m_n4ConnectCount = 0;
     m_u4ParseID = 0;
@@ -238,30 +237,24 @@ FileTestResultInfoSt CProConnectAcceptManager::FileTestStart(string strXmlCfg)
     }
     else
     {
-        if(m_bLoadCfgFile)
+        if(!LoadXmlCfg(strXmlCfg,objFileTestResult))
         {
-            OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]m_bLoadCfgFile:%d.\n",m_bLoadCfgFile));
+            OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]Loading config file error filename:%s.\n",strXmlCfg.c_str()));
         }
         else
         {
-            if(!LoadXmlCfg(strXmlCfg,objFileTestResult))
+            m_n4TimerID = App_TimerManager::instance()->schedule(this, (void*)NULL, ACE_OS::gettimeofday() + ACE_Time_Value(m_n4TimeInterval), ACE_Time_Value(m_n4TimeInterval));
+
+            if(-1 == m_n4TimerID)
             {
-                OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]Loading config file error filename:%s.\n",strXmlCfg.c_str()));
+                OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]Start timer error\n"));
+                objFileTestResult.n4Result = RESULT_ERR_UNKOWN;
             }
             else
             {
-                m_n4TimerID = App_TimerManager::instance()->schedule(this, (void*)NULL, ACE_OS::gettimeofday() + ACE_Time_Value(m_n4TimeInterval), ACE_Time_Value(m_n4TimeInterval));
-
-                if(-1 == m_n4TimerID)
-                {
-                    OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]Start timer error\n"));
-                    objFileTestResult.n4Result = RESULT_ERR_UNKOWN;
-                }
-                else
-                {
-                    OUR_DEBUG((LM_ERROR, "[CMainConfig::LoadXmlCfg]Start timer OK.\n"));
-                    objFileTestResult.n4Result = RESULT_OK;
-                }
+                OUR_DEBUG((LM_ERROR, "[CMainConfig::LoadXmlCfg]Start timer OK.\n"));
+                objFileTestResult.n4Result = RESULT_OK;
+                m_bFileTesting = true;
             }
         }
     }
@@ -271,6 +264,13 @@ FileTestResultInfoSt CProConnectAcceptManager::FileTestStart(string strXmlCfg)
 
 int CProConnectAcceptManager::FileTestEnd()
 {
+    if(m_n4TimerID > 0)
+    {
+        App_TimerManager::instance()->cancel(m_n4TimerID);
+        m_n4TimerID = 0;
+        m_bFileTesting = false;
+    }
+    
     return 0;
 }
 

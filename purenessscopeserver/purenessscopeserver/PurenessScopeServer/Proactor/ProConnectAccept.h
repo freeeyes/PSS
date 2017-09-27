@@ -75,7 +75,6 @@ private:
 private:
     //文件测试变量
     bool m_bFileTesting;          //是否正在进行文件测试
-    bool m_bLoadCfgFile;          //是否已经加载配置文件
     int32 m_n4TimerID;            //定时器ID
 
     CXmlOpeation m_MainConfig;
