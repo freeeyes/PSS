@@ -562,7 +562,6 @@ typedef struct FILETESTDATAINFO
 {
     char                    m_szData[MAX_BUFF_10240];        //当前缓冲中数据的长度
     uint32                  m_u4DataLength;                  //当前缓冲块中的数据长度
-    uint32                  m_u4ParseID;                     //链接的ID
 
     FILETESTDATAINFO()
     {
@@ -573,7 +572,6 @@ typedef struct FILETESTDATAINFO
     {
         ACE_OS::memset(m_szData, 0, MAX_BUFF_10240);
         m_u4DataLength     = 0;
-        m_u4ParseID = 0;
     }
 
     ~FILETESTDATAINFO()
@@ -585,7 +583,6 @@ typedef struct FILETESTDATAINFO
     {
         memcpy_safe(const_cast<char*>(ar.m_szData), MAX_BUFF_10240, const_cast<char*>(this->m_szData), MAX_BUFF_10240);
         this->m_u4DataLength = ar.m_u4DataLength;
-        this->m_u4ParseID = ar.m_u4ParseID;
         return *this;
     }
 }FileTestDataInfoSt;

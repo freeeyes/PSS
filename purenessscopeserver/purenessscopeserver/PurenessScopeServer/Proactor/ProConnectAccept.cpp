@@ -24,6 +24,11 @@ uint32 ProConnectAcceptor::GetPacketParseInfoID()
     return m_u4PacketParseInfoID;
 }
 
+CProConnectHandle* ProConnectAcceptor::file_test_make_handler(void)
+{
+    return this->make_handler();
+}
+
 CProConnectHandle* ProConnectAcceptor::make_handler(void)
 {
     CProConnectHandle* pProConnectHandle = App_ProConnectHandlerPool::instance()->Create();
@@ -85,6 +90,7 @@ CProConnectAcceptManager::CProConnectAcceptManager(void)
     m_bLoadCfgFile = false;
     m_n4TimerID = 0;
     m_n4ConnectCount = 0;
+    m_u4ParseID = 0;
 }
 
 CProConnectAcceptManager::~CProConnectAcceptManager(void)
@@ -226,7 +232,7 @@ FileTestResultInfoSt CProConnectAcceptManager::FileTestStart(string strXmlCfg)
 
     if(m_bFileTesting)
     {
-        OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]当前状态已经处于文件测试状态.\n"));
+        OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]m_bFileTesting:%d.\n",m_bFileTesting));
         objFileTestResult.n4Result = RESULT_ERR_TESTING;
         return objFileTestResult;
     }
@@ -234,13 +240,13 @@ FileTestResultInfoSt CProConnectAcceptManager::FileTestStart(string strXmlCfg)
     {
         if(m_bLoadCfgFile)
         {
-            OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]测试配置文件已经加载,发生未知错误.\n"));
+            OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]m_bLoadCfgFile:%d.\n",m_bLoadCfgFile));
         }
         else
         {
             if(!LoadXmlCfg(strXmlCfg,objFileTestResult))
             {
-                OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]加载测试配置文件错误,文件:%s.\n",strXmlCfg.c_str()));
+                OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]Loading config file error filename:%s.\n",strXmlCfg.c_str()));
             }
             else
             {
@@ -248,12 +254,12 @@ FileTestResultInfoSt CProConnectAcceptManager::FileTestStart(string strXmlCfg)
 
                 if(-1 == m_n4TimerID)
                 {
-                    OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]启动定时器错误\n"));
+                    OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]Start timer error\n"));
                     objFileTestResult.n4Result = RESULT_ERR_UNKOWN;
                 }
                 else
                 {
-                    OUR_DEBUG((LM_ERROR, "[CMainConfig::LoadXmlCfg]Start thread time OK.\n"));
+                    OUR_DEBUG((LM_ERROR, "[CMainConfig::LoadXmlCfg]Start timer OK.\n"));
                     objFileTestResult.n4Result = RESULT_OK;
                 }
             }
@@ -313,10 +319,20 @@ bool CProConnectAcceptManager::LoadXmlCfg(string strXmlCfg,FileTestResultInfoSt&
         m_n4ConnectCount = 100;
     }
 
+    pData = m_MainConfig.GetData("FileTestConfig", "ParseID");
+
+    if(NULL != pData)
+    {
+        m_u4ParseID = (uint8)ACE_OS::atoi(pData);
+    }
+    else
+    {
+        m_u4ParseID = 1;
+    }
+
     //命令监控相关配置
     m_vecFileTestDataInfoSt.clear();
     TiXmlElement* pNextTiXmlElementFileName     = NULL;
-    TiXmlElement* pNextTiXmlElementParseID       = NULL;
     TiXmlElement* pNextTiXmlElementDesc      = NULL;
 
     while(true)
@@ -338,19 +354,6 @@ bool CProConnectAcceptManager::LoadXmlCfg(string strXmlCfg,FileTestResultInfoSt&
             return false;
         }
 
-        pData = m_MainConfig.GetData("FileInfo", "ParseID", pNextTiXmlElementParseID);
-
-        if(pData != NULL)
-        {
-            objFileTestDataInfo.m_u4ParseID = (uint32)ACE_OS::atoi(pData);
-        }
-        else
-        {
-            OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]File Read ParseID Error = %s.\n", strXmlCfg.c_str()));
-            objFileTestResult.n4Result = RESULT_ERR_PROFILE;
-            return false;
-        }
-
         pData = m_MainConfig.GetData("FileInfo", "Desc", pNextTiXmlElementDesc);
 
         if(pData != NULL)
@@ -365,48 +368,47 @@ bool CProConnectAcceptManager::LoadXmlCfg(string strXmlCfg,FileTestResultInfoSt&
             return false;
         }
 
-        ACE_FILE_Connector connector;
-        ACE_FILE_IO file;
-        ACE_FILE_Addr file_addr(strFileName.c_str());
+        ACE_FILE_Connector fConnector;
+        ACE_FILE_IO ioFile;
+        ACE_FILE_Addr fAddr(strFileName.c_str());
 
-        if (connector.connect(file, file_addr) == -1)
+        if (fConnector.connect(ioFile, fAddr) == -1)
         {
-            OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]Open FileName:%s Error.\n", strFileName.c_str()));
+            OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]Open filename:%s Error.\n", strFileName.c_str()));
             objFileTestResult.n4Result = RESULT_ERR_PROFILE;
             return false;
         }
 
-        ACE_FILE_Info info;
+        ACE_FILE_Info fInfo;
 
-        if (file.get_info (info) == -1)
+        if (ioFile.get_info (fInfo) == -1)
         {
-            OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]Get File Info FileName:%s Error.\n", strFileName.c_str()));
+            OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]Get file info filename:%s Error.\n", strFileName.c_str()));
             objFileTestResult.n4Result = RESULT_ERR_PROFILE;
             return false;
         }
 
-        if(MAX_BUFF_10240 - 1 < info.size_)
+        if(MAX_BUFF_10240 - 1 < fInfo.size_)
         {
-            OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]协议文件内容过大 FileName:%s Error.\n", strFileName.c_str()));
+            OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]Protocol file too larger filename:%s.\n", strFileName.c_str()));
             objFileTestResult.n4Result = RESULT_ERR_PROFILE;
             return false;
         }
         else
         {
-            // Read the file into the buffer.
-            ssize_t size = file.recv (objFileTestDataInfo.m_szData,info.size_);
+            ssize_t u4Size = ioFile.recv (objFileTestDataInfo.m_szData,fInfo.size_);
 
-            if (size != info.size_)
+            if (u4Size != fInfo.size_)
             {
-                OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]读取协议文件错误 FileName:%s Error.\n", strFileName.c_str()));
+                OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]Read protocol file error filename:%s Error.\n", strFileName.c_str()));
                 objFileTestResult.n4Result = RESULT_ERR_PROFILE;
                 return false;
             }
             else
             {
                 // Make sure to NUL-terminate this turkey!
-                objFileTestDataInfo.m_szData[size] = '\0';
-                objFileTestDataInfo.m_u4DataLength = size;
+                objFileTestDataInfo.m_szData[u4Size] = '\0';
+                objFileTestDataInfo.m_u4DataLength = static_cast<uint32>(u4Size);
             }
         }
 
@@ -417,10 +419,66 @@ bool CProConnectAcceptManager::LoadXmlCfg(string strXmlCfg,FileTestResultInfoSt&
     return true;
 }
 
-
 int CProConnectAcceptManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 {
-    
+    int n4AcceptCount = GetCount();
+    ProConnectAcceptor* ptrProConnectAcceptor = NULL;
+
+    for(int iLoop = 0; iLoop < n4AcceptCount; iLoop++)
+    {
+        ptrProConnectAcceptor = GetConnectAcceptor(iLoop);
+        if(NULL != ptrProConnectAcceptor)
+        {
+            if(m_u4ParseID == ptrProConnectAcceptor->GetPacketParseInfoID())
+            {
+                break;
+            }
+            else 
+            {
+                ptrProConnectAcceptor = NULL;
+            }
+        }
+    }
+
+    if(NULL != ptrProConnectAcceptor)
+    {
+        vector<uint32> vecu4ConnectID;
+        CProConnectHandle* ptrProConnectHandle = NULL;
+        for(int iLoop = 0; iLoop < m_n4ConnectCount; iLoop++)
+        {
+            ptrProConnectHandle = ptrProConnectAcceptor->file_test_make_handler();
+
+            if(NULL != ptrProConnectHandle)
+            {
+                uint32 u4ConnectID = ptrProConnectHandle->file_open();
+                if(0 != u4ConnectID)
+                {
+                    vecu4ConnectID.push_back(u4ConnectID);
+                }
+                else
+                {
+                    OUR_DEBUG((LM_INFO, "[CMainConfig::handle_timeout]file_open error\n"));
+                }
+            }
+        }
+
+        for(int iLoop = 0; iLoop < m_vecFileTestDataInfoSt.size(); iLoop++)
+        {
+            FileTestDataInfoSt& objFileTestDataInfo = m_vecFileTestDataInfoSt[iLoop];
+
+            for(int jLoop = 0; jLoop < vecu4ConnectID.size(); jLoop++)
+            {
+                uint32 u4ConnectID = vecu4ConnectID[jLoop];
+                App_ProConnectManager::instance()->handle_write_file_stream(u4ConnectID,objFileTestDataInfo.m_szData, objFileTestDataInfo.m_u4DataLength, m_u4ParseID);
+            }
+        }
+
+        for(int jLoop = 0; jLoop < vecu4ConnectID.size(); jLoop++)
+        {
+            uint32 u4ConnectID = vecu4ConnectID[jLoop];
+            App_ProConnectManager::instance()->Close(u4ConnectID);
+        }
+    }
 
     return 0;
 }

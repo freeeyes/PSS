@@ -22,7 +22,7 @@ public:
     void InitClientProactor(uint32 u4ClientProactorCount);
     void SetPacketParseInfoID(uint32 u4PaccketParseInfoID);
     uint32 GetPacketParseInfoID();
-
+    CProConnectHandle* file_test_make_handler(void);
 private:
     virtual CProConnectHandle* make_handler (void);
     virtual int validate_connection (const ACE_Asynch_Accept::Result& result,
@@ -80,8 +80,9 @@ private:
 
     CXmlOpeation m_MainConfig;
     string m_strProFilePath;
-    int m_n4TimeInterval;      //定时器事件间隔
-    int m_n4ConnectCount;      //模拟连接数
+    int    m_n4TimeInterval;      //定时器事件间隔
+    int    m_n4ConnectCount;      //模拟连接数
+    uint32 m_u4ParseID;           //解析包ID
 
     typedef vector<FileTestDataInfoSt> vecFileTestDataInfoSt;
     vecFileTestDataInfoSt m_vecFileTestDataInfoSt;
