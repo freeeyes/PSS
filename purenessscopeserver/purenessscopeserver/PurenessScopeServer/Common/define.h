@@ -210,15 +210,17 @@ enum FILE_TEST_RESULT
 
 typedef struct FILETESTRESULTINFO
 {
-    int n4Result;             //启动测试结果信息
-    int n4TimeInterval;       //启动测试时间间隔
-    int n4ProNum;             //启动测试协议条数
+    int n4Result;                   //启动测试结果信息
+    int n4TimeInterval;             //启动测试时间间隔
+    int n4ProNum;                   //启动测试协议条数
+    vector<string> vecProFileDesc;  //协议文件描述
 
     FILETESTRESULTINFO()
     {
         n4Result = -1;
         n4TimeInterval = 0;
         n4ProNum = 0;
+        vecProFileDesc.clear();
     }
 
     ~FILETESTRESULTINFO()
@@ -226,6 +228,7 @@ typedef struct FILETESTRESULTINFO
         n4Result = -1;
         n4TimeInterval = 0;
         n4ProNum = 0;
+        vecProFileDesc.clear();
     }
 
     FILETESTRESULTINFO& operator= (const FILETESTRESULTINFO& ar)
@@ -233,6 +236,7 @@ typedef struct FILETESTRESULTINFO
         this->n4Result = ar.n4Result;
         this->n4TimeInterval = ar.n4TimeInterval;
         this->n4ProNum = ar.n4ProNum;
+        this->vecProFileDesc.assign(ar.vecProFileDesc.begin(), ar.vecProFileDesc.end());
         return *this;
     }
 } FileTestResultInfoSt;
