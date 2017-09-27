@@ -210,9 +210,9 @@ enum FILE_TEST_RESULT
 
 typedef struct FILETESTRESULTINFO
 {
-    int n4Result;
-    int n4TimeInterval;
-    int n4ProNum;
+    int n4Result;             //启动测试结果信息
+    int n4TimeInterval;       //启动测试时间间隔
+    int n4ProNum;             //启动测试协议条数
 
     FILETESTRESULTINFO()
     {
