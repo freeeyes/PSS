@@ -74,8 +74,8 @@ private:
 
 public:
     //文件测试方法
-    void FileTestStart(uint32 u4Second);      //开始文件测试
-    void FileTestEnd();                       //结束文件测试
+    void FileTestStart();      //开始文件测试
+    void FileTestEnd();        //结束文件测试
 private:
     bool LoadXmlCfg();
 

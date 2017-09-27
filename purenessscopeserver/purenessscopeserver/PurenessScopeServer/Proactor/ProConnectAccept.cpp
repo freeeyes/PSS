@@ -75,6 +75,10 @@ CProConnectAcceptManager::CProConnectAcceptManager(void)
 {
     m_nAcceptorCount = 0;
     m_szError[0]     = '\0';
+
+    m_bFileTesting = false;
+    m_bLoadCfgFile = false;
+    m_u4TimerID = 0;
 }
 
 CProConnectAcceptManager::~CProConnectAcceptManager(void)
@@ -99,6 +103,12 @@ bool CProConnectAcceptManager::InitConnectAcceptor(int nCount, uint32 u4ClientPr
 
             pConnectAcceptor->InitClientProactor(u4ClientProactorCount);
             m_vecConnectAcceptor.push_back(pConnectAcceptor);
+        }
+
+        if(m_u4TimerID > 0)
+        {
+            App_TimerManager::instance()->cancel(m_u4TimerID);
+            m_u4TimerID = 0;
         }
 
         return true;
@@ -204,8 +214,30 @@ ProConnectAcceptor* CProConnectAcceptManager::GetNewConnectAcceptor()
     return pConnectAcceptor;
 }
 
-void CProConnectAcceptManager::FileTestStart(uint32 u4Second)
+void CProConnectAcceptManager::FileTestStart()
 {
+    if(m_bFileTesting)
+    {
+        OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]当前状态已经处于文件测试状态.\n"));
+        return;
+    }
+    else 
+    {
+        if(m_bLoadCfgFile)
+        {
+            OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]测试配置文件已经加载.\n"));
+        }
+        else 
+        {
+            if(!LoadXmlCfg(FILETESTCONFIG))
+            {
+                OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]加载测试配置文件错误,文件:%s.\n",FILETESTCONFIG));
+            }
+            
+        }
+    }
+    
+    
     return;
 }
 
@@ -214,7 +246,7 @@ void CProConnectAcceptManager::FileTestEnd()
     return;
 }
 
-bool CProConnectAcceptManager::LoadXmlCfg()
+bool CProConnectAcceptManager::LoadXmlCfg(string strXmlCfg)
 {
     return true;
 }

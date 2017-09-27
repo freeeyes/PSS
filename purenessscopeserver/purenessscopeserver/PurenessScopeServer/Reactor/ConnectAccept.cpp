@@ -293,7 +293,7 @@ ConnectAcceptor* CConnectAcceptorManager::GetNewConnectAcceptor()
     return pConnectAcceptor;
 }
 
-void CConnectAcceptorManager::FileTestStart(uint32 u4Second)
+void CConnectAcceptorManager::FileTestStart()
 {
     return;
 }
