@@ -80,6 +80,8 @@ enum
 #define CONSOLE_COMMAND_SHOW_LISTEN        0x1028
 #define CONSOLE_COMMAND_MONITOR_INFO       0x1029
 #define CONSOLE_COMMAND_CLOSE_SERVER       0x1030
+#define CONSOLE_COMMAND_FILE_TEST_START    0x1031
+#define CONSOLE_COMMAND_FILE_TEST_STOP     0x1032
 
 //目前支持的命令
 #define CONSOLEMESSAHE_LOADMOUDLE         "LoadModule"          //加载模块
@@ -124,6 +126,8 @@ enum
 #define CONSOLEMESSATE_SHOW_LISTEN        "ShowListen"          //查看正在打开的监听端口 
 #define CONSOLEMESSATE_MONITOR_INFO       "Monitor"             //监控相关运行参数接口
 #define CONSOLEMESSATE_SERVER_CLOSE       "ServerClose"         //关闭当前服务器
+#define CONSOLEMESSATE_FILE_TEST_START    "TestFileStart"       //启动服务器文件测试用例
+#define CONSOLEMESSATE_FILE_TEST_STOP     "TestFileStop"        //停止服务器文件测试用例
 
 //命令处理参数
 struct _CommandInfo
@@ -197,6 +201,7 @@ private:
     bool GetConnectID(const char* pCommand, uint32& u4ConnectID, bool& blFlag);              //得到ConnectID
     bool GetMaxConnectCount(const char* pCommand, uint16& u2MaxConnectCount);                //得到最大的连接总数
     bool GetListenInfo(const char* pCommand, _ListenInfo& objListenInfo);                    //得到监听端口信息
+    bool GetTestFileName(const char* pCommand, char* pFileName);                             //获得加载测试文件名
 
     //命令具体实现部分
 private:
@@ -242,6 +247,8 @@ private:
     bool DoMessage_ShowListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
     bool DoMessage_MonitorInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
     bool DoMessage_ServerClose(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool Do_Message_TestFileStart(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    bool Do_Message_TestFileStop(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
 
 private:
     vecConsoleKey* m_pvecConsoleKey;

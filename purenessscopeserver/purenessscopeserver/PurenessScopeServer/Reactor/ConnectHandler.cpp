@@ -535,7 +535,7 @@ int CConnectHandler::Dispose_Recv_Data()
         uint32 u4DebugSize = 0;
         bool blblMore = false;
 
-        if (nDataLen >= m_u4PacketDebugSize)
+        if ((uint32)nDataLen >= m_u4PacketDebugSize)
         {
             u4DebugSize = m_u4PacketDebugSize - 1;
             blblMore = true;
@@ -1187,7 +1187,7 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
         int  nDebugSize = 0;
         bool blblMore   = false;
 
-        if(pMbData->length() >= m_u4PacketDebugSize)
+        if((uint32)pMbData->length() >= m_u4PacketDebugSize)
         {
             nDebugSize = m_u4PacketDebugSize - 1;
             blblMore   = true;
@@ -1976,15 +1976,16 @@ bool CConnectManager::StartTimer()
     }
 
     m_pTCTimeSendCheck->m_u2TimerCheckID = PARM_CONNECTHANDLE_CHECK;
-    m_u4TimeCheckID = pReactor->schedule_timer(this, (const void*)m_pTCTimeSendCheck, ACE_Time_Value(App_MainConfig::instance()->GetCheckAliveTime(), 0), ACE_Time_Value(App_MainConfig::instance()->GetCheckAliveTime(), 0));
+    long lTimeCheckID = pReactor->schedule_timer(this, (const void*)m_pTCTimeSendCheck, ACE_Time_Value(App_MainConfig::instance()->GetCheckAliveTime(), 0), ACE_Time_Value(App_MainConfig::instance()->GetCheckAliveTime(), 0));
 
-    if(0 == m_u4TimeCheckID)
+    if(-1 == lTimeCheckID)
     {
         OUR_DEBUG((LM_ERROR, "CConnectManager::StartTimer()--> Start thread m_u4TimeCheckID error.\n"));
         return false;
     }
     else
     {
+        m_u4TimeCheckID = (uint32)lTimeCheckID;
         OUR_DEBUG((LM_ERROR, "CConnectManager::StartTimer()--> Start thread time OK.\n"));
         return true;
     }

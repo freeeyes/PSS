@@ -312,6 +312,14 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
     {
         DoMessage_MonitorInfo(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSATE_FILE_TEST_START) == 0)
+    {
+        Do_Message_TestFileStart(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
+    }
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSATE_FILE_TEST_STOP) == 0)
+    {
+        Do_Message_TestFileStop(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
+    }
     else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSATE_SERVER_CLOSE) == 0)
     {
         //特殊指令，关闭服务器信息，所以要先清理一下内存。
@@ -671,6 +679,25 @@ bool CConsoleMessage::GetListenInfo(const char* pCommand, _ListenInfo& objListen
     szTempData[nLen] = '\0';
     objListenInfo.m_u4PacketParseID = ACE_OS::atoi(szTempData);
     return true;
+}
+
+bool CConsoleMessage::GetTestFileName(const char* pCommand, char* pFileName)
+{
+    int nCommandSize = (int)ACE_OS::strlen(pCommand);
+    char* pPosBegin = (char*)ACE_OS::strstr(pCommand, "-f ");
+    uint16 u2Len = (uint16)(nCommandSize - (int(pPosBegin - pCommand) + 3));
+
+    if (nCommandSize < MAX_BUFF_200)
+    {
+        memcpy_safe((char*)(pPosBegin + 3), (uint32)u2Len, pFileName, (uint32)MAX_BUFF_200);
+        pFileName[u2Len] = '\0';
+        return true;
+    }
+    else
+    {
+        OUR_DEBUG((LM_INFO, "[CConsoleMessage::GetTestFileName]nCommandSize=%d is more than MAX_BUFF_200.\n", nCommandSize));
+        return false;
+    }
 }
 
 bool CConsoleMessage::DoMessage_LoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
@@ -2277,6 +2304,38 @@ bool CConsoleMessage::DoMessage_ServerClose(_CommandInfo& CommandInfo, IBuffPack
         App_ServerObject::instance()->GetServerManager()->Close();
     }
 
+    return true;
+}
+
+bool CConsoleMessage::Do_Message_TestFileStart(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+{
+    char szFileName[MAX_BUFF_200] = { '\0' };
+
+    if (GetTestFileName(CommandInfo.m_szCommandExp, szFileName) == true)
+    {
+        OUR_DEBUG((LM_INFO, "[CConsoleMessage::Do_Message_TestFileStart]file=%s.\n", szFileName));
+        u2ReturnCommandID = CONSOLE_COMMAND_FILE_TEST_START;
+
+        FileTestResultInfoSt objFileResult;
+        objFileResult = App_ProConnectAcceptManager::instance()->FileTestStart((string)szFileName);
+        (*pBuffPacket) << objFileResult.n4Result;
+        (*pBuffPacket) << objFileResult.n4TimeInterval;
+        (*pBuffPacket) << objFileResult.n4ProNum;
+        (*pBuffPacket) << (uint16)objFileResult.vecProFileDesc.size();
+
+        for (uint16 i = 0; i < (uint16)objFileResult.vecProFileDesc.size(); i++)
+        {
+            (*pBuffPacket) << objFileResult.vecProFileDesc[i];
+        }
+    }
+
+    return true;
+}
+
+bool CConsoleMessage::Do_Message_TestFileStop(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+{
+    int nRet = App_ProConnectAcceptManager::instance()->FileTestEnd();
+    (*pBuffPacket) << (uint32)nRet;
     return true;
 }
 
