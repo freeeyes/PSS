@@ -39,7 +39,6 @@ BEGIN_NAMESPACE
 #define MAINCONFIG            "main.xml"
 #define ALERTCONFIG           "alert.xml"
 #define FORBIDDENIP_FILE      "forbiddenIP.xml"
-#define FILETESTCONFIG        "filetest.xml"
 
 #define MAX_BUFF_9    9
 #define MAX_BUFF_20   20
@@ -198,6 +197,44 @@ enum EM_IO_TYPE
     NET_INPUT = 0,      //网络入口
     FILE_INPUT,         //文件入口
 };
+
+//启动文件测试结果的定义
+enum FILE_TEST_RESULT
+{
+    RESULT_ERR_UNKOWN = -1,   //未知错误
+    RESULT_OK = 0,            //启动成功
+    RESULT_ERR_CFGFILE,       //配置文件错误
+    RESULT_ERR_PROFILE,       //协议文件错误
+};
+
+typedef struct FILETESTRESULTINFO
+{
+    int n4Result;
+    int n4TimeInterval;
+    int n4ProNum;
+
+    FILETESTRESULTINFO()
+    {
+        n4Result = -1;
+        n4TimeInterval = 0;
+        n4ProNum = 0;
+    }
+
+    ~FILETESTRESULTINFO()
+    {
+        n4Result = -1;
+        n4TimeInterval = 0;
+        n4ProNum = 0;
+    }
+
+    FILETESTRESULTINFO& operator= (const FILETESTRESULTINFO& ar)
+    {
+        this->n4Result = ar.n4Result;
+        this->n4TimeInterval = ar.n4TimeInterval;
+        this->n4ProNum = ar.n4ProNum;
+        return *this;
+    }
+} FileTestResultInfoSt;
 
 //对应当前框架支持的网络模式
 enum

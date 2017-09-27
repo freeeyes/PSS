@@ -214,12 +214,13 @@ ProConnectAcceptor* CProConnectAcceptManager::GetNewConnectAcceptor()
     return pConnectAcceptor;
 }
 
-void CProConnectAcceptManager::FileTestStart()
+FileTestResultInfoSt& CProConnectAcceptManager::FileTestStart(string strXmlCfg)
 {
+    FileTestResultInfoSt objFileTestResult;
     if(m_bFileTesting)
     {
         OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]当前状态已经处于文件测试状态.\n"));
-        return;
+        return objFileTestResult;
     }
     else 
     {
@@ -229,21 +230,22 @@ void CProConnectAcceptManager::FileTestStart()
         }
         else 
         {
-            if(!LoadXmlCfg(FILETESTCONFIG))
+            if(!LoadXmlCfg(strXmlCfg))
             {
-                OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]加载测试配置文件错误,文件:%s.\n",FILETESTCONFIG));
+                OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]加载测试配置文件错误,文件:%s.\n",strXmlCfg.c_str()));
             }
+
             
         }
     }
     
     
-    return;
+    return objFileTestResult;
 }
 
-void CProConnectAcceptManager::FileTestEnd()
+int CProConnectAcceptManager::FileTestEnd()
 {
-    return;
+    return 0;
 }
 
 bool CProConnectAcceptManager::LoadXmlCfg(string strXmlCfg)

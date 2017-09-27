@@ -293,17 +293,18 @@ ConnectAcceptor* CConnectAcceptorManager::GetNewConnectAcceptor()
     return pConnectAcceptor;
 }
 
-void CConnectAcceptorManager::FileTestStart()
+FileTestResultInfoSt& CConnectAcceptorManager::FileTestStart(string strXmlCfg)
 {
-    return;
+    FileTestResultInfoSt objFileTestResult;
+    return objFileTestResult;
 }
 
-void CConnectAcceptorManager::FileTestEnd()
+int CConnectAcceptorManager::FileTestEnd()
 {
-    return;
+    return 0;
 }
 
-bool CConnectAcceptorManager::LoadXmlCfg()
+bool CConnectAcceptorManager::LoadXmlCfg(string strXmlCfg)
 {
     return true;
 }
