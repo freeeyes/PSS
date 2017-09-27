@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<!-- 文件测试相关设置 -->
+	<FileTestConfig Path="./FileTest" TimeInterval="1" ConnectCount="100" ParseID="1" Desc="是否需要打开Core文件支持，0为不需要，1为需要" />
+
+	<!-- 协议文件信息,协议文件需要按照业务逻辑先后顺序配置,其中FileName是包含协议内容的文件名, ParseID是解析协议的解析包ID(参考main.xml配置)-->
+	<FileInfo FileName="1.txt" Desc="协议文件1.txt内容描述"/>
+	<FileInfo FileName="2.txt" Desc="协议文件2.txt内容描述"/>
+</Config>
