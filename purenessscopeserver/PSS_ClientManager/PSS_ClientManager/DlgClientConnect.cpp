@@ -404,6 +404,12 @@ void CDlgClientConnect::OnBnClickedButton14()
     CString strPacketFileName;
     m_txtPacketFileName.GetWindowText(strPacketFileName);
 
+    if (strPacketFileName.GetLength() == 0)
+    {
+        MessageBox(_T("请输出文件路径以及文件名"), _T(MESSAGE_TITLE_ERROR), MB_OK);
+        return;
+    }
+
     int nSrcLen = WideCharToMultiByte(CP_ACP, 0, strPacketFileName, strPacketFileName.GetLength(), NULL, 0, NULL, NULL);
     int nDecLen = WideCharToMultiByte(CP_ACP, 0, strPacketFileName, nSrcLen, szPacketFileName, 20, NULL, NULL);
     szPacketFileName[nDecLen] = '\0';
