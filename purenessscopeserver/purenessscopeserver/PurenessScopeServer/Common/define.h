@@ -49,6 +49,7 @@ BEGIN_NAMESPACE
 #define MAX_BUFF_500  500
 #define MAX_BUFF_1000 1000
 #define MAX_BUFF_1024 1024
+#define MAX_BUFF_10240 10240
 
 #define THREAD_PARAM THR_NEW_LWP | THR_BOUND | THR_DETACHED
 
@@ -197,49 +198,6 @@ enum EM_IO_TYPE
     NET_INPUT = 0,      //网络入口
     FILE_INPUT,         //文件入口
 };
-
-//启动文件测试结果的定义
-enum FILE_TEST_RESULT
-{
-    RESULT_ERR_UNKOWN = -1,   //未知错误
-    RESULT_OK = 0,            //启动成功
-    RESULT_ERR_TESTING,       //正在测试
-    RESULT_ERR_CFGFILE,       //配置文件错误
-    RESULT_ERR_PROFILE,       //协议文件错误
-};
-
-typedef struct FILETESTRESULTINFO
-{
-    int n4Result;                   //启动测试结果信息
-    int n4TimeInterval;             //启动测试时间间隔
-    int n4ProNum;                   //启动测试协议条数
-    vector<string> vecProFileDesc;  //协议文件描述
-
-    FILETESTRESULTINFO()
-    {
-        n4Result = -1;
-        n4TimeInterval = 0;
-        n4ProNum = 0;
-        vecProFileDesc.clear();
-    }
-
-    ~FILETESTRESULTINFO()
-    {
-        n4Result = -1;
-        n4TimeInterval = 0;
-        n4ProNum = 0;
-        vecProFileDesc.clear();
-    }
-
-    FILETESTRESULTINFO& operator= (const FILETESTRESULTINFO& ar)
-    {
-        this->n4Result = ar.n4Result;
-        this->n4TimeInterval = ar.n4TimeInterval;
-        this->n4ProNum = ar.n4ProNum;
-        this->vecProFileDesc.assign(ar.vecProFileDesc.begin(), ar.vecProFileDesc.end());
-        return *this;
-    }
-} FileTestResultInfoSt;
 
 //对应当前框架支持的网络模式
 enum
@@ -555,6 +513,82 @@ static inline uint32 next_pow_of_2(uint32 x)
     x |= x>>16;
     return x+1;
 }
+
+//启动文件测试结果的定义
+enum FILE_TEST_RESULT
+{
+    RESULT_ERR_UNKOWN = -1,   //未知错误
+    RESULT_OK = 0,            //启动成功
+    RESULT_ERR_TESTING,       //正在测试
+    RESULT_ERR_CFGFILE,       //配置文件错误
+    RESULT_ERR_PROFILE,       //协议文件错误
+};
+
+typedef struct FILETESTRESULTINFO
+{
+    int n4Result;                   //启动测试结果信息
+    int n4TimeInterval;             //启动测试时间间隔
+    int n4ProNum;                   //启动测试协议条数
+    vector<string> vecProFileDesc;  //协议文件描述
+
+    FILETESTRESULTINFO()
+    {
+        n4Result = -1;
+        n4TimeInterval = 0;
+        n4ProNum = 0;
+        vecProFileDesc.clear();
+    }
+
+    ~FILETESTRESULTINFO()
+    {
+        n4Result = -1;
+        n4TimeInterval = 0;
+        n4ProNum = 0;
+        vecProFileDesc.clear();
+    }
+
+    FILETESTRESULTINFO& operator= (const FILETESTRESULTINFO& ar)
+    {
+        this->n4Result = ar.n4Result;
+        this->n4TimeInterval = ar.n4TimeInterval;
+        this->n4ProNum = ar.n4ProNum;
+        this->vecProFileDesc.assign(ar.vecProFileDesc.begin(), ar.vecProFileDesc.end());
+        return *this;
+    }
+} FileTestResultInfoSt;
+
+//文件测试数据信息
+typedef struct FILETESTDATAINFO
+{
+    char                    m_szData[MAX_BUFF_10240];        //当前缓冲中数据的长度
+    uint32                  m_u4DataLength;                  //当前缓冲块中的数据长度
+    uint32                  m_u4ParseID;                     //链接的ID
+
+    FILETESTDATAINFO()
+    {
+        Init();
+    }
+
+    void Init()
+    {
+        ACE_OS::memset(m_szData, 0, MAX_BUFF_10240);
+        m_u4DataLength     = 0;
+        m_u4ParseID = 0;
+    }
+
+    ~FILETESTDATAINFO()
+    {
+        Init();
+    }
+
+    FILETESTDATAINFO& operator= (const FILETESTDATAINFO& ar)
+    {
+        memcpy_safe(const_cast<char*>(ar.m_szData), MAX_BUFF_10240, const_cast<char*>(this->m_szData), MAX_BUFF_10240);
+        this->m_u4DataLength = ar.m_u4DataLength;
+        this->m_u4ParseID = ar.m_u4ParseID;
+        return *this;
+    }
+}FileTestDataInfoSt;
 
 //标记VCHARS_TYPE的模式
 enum VCHARS_TYPE
