@@ -2325,7 +2325,7 @@ bool CConsoleMessage::Do_Message_TestFileStart(_CommandInfo& CommandInfo, IBuffP
         objFileResult.vecProFileDesc.push_back((string)"Test freeeyes");
         objFileResult.vecProFileDesc.push_back((string)"Test liuchao");
         */
-        objFileResult = App_ProConnectAcceptManager::instance()->FileTestStart((string)szFileName);
+        objFileResult = App_ProConnectAcceptManager::instance()->FileTestStart(szFileName);
         (*pBuffPacket) << objFileResult.n4Result;
         (*pBuffPacket) << objFileResult.n4TimeInterval;
         (*pBuffPacket) << objFileResult.n4ProNum;

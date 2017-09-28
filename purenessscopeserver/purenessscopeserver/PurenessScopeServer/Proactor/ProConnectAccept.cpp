@@ -225,7 +225,7 @@ ProConnectAcceptor* CProConnectAcceptManager::GetNewConnectAcceptor()
     return pConnectAcceptor;
 }
 
-FileTestResultInfoSt CProConnectAcceptManager::FileTestStart(string strXmlCfg)
+FileTestResultInfoSt CProConnectAcceptManager::FileTestStart(const char* szXmlFileTestName)
 {
     FileTestResultInfoSt objFileTestResult;
 
@@ -237,7 +237,7 @@ FileTestResultInfoSt CProConnectAcceptManager::FileTestStart(string strXmlCfg)
     }
     else
     {
-        if(!LoadXmlCfg(strXmlCfg,objFileTestResult))
+        if(!LoadXmlCfg(szXmlFileTestName, objFileTestResult))
         {
             OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]Loading config file error filename:%s.\n",strXmlCfg.c_str()));
         }
@@ -270,16 +270,16 @@ int CProConnectAcceptManager::FileTestEnd()
         m_n4TimerID = 0;
         m_bFileTesting = false;
     }
-    
+
     return 0;
 }
 
-bool CProConnectAcceptManager::LoadXmlCfg(string strXmlCfg,FileTestResultInfoSt& objFileTestResult)
+bool CProConnectAcceptManager::LoadXmlCfg(const char* szXmlFileTestName, FileTestResultInfoSt& objFileTestResult)
 {
     char* pData = NULL;
     OUR_DEBUG((LM_INFO, "[CProConnectAcceptManager::LoadXmlCfg]Filename = %s.\n", strXmlCfg.c_str()));
 
-    if(false == m_MainConfig.Init(strXmlCfg.c_str()))
+    if(false == m_MainConfig.Init(szXmlFileTestName))
     {
         OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]File Read Error = %s.\n", strXmlCfg.c_str()));
         objFileTestResult.n4Result = RESULT_ERR_CFGFILE;
@@ -415,6 +415,7 @@ bool CProConnectAcceptManager::LoadXmlCfg(string strXmlCfg,FileTestResultInfoSt&
 
         m_vecFileTestDataInfoSt.push_back(objFileTestDataInfo);
     }
+
     m_MainConfig.Close();
 
     objFileTestResult.n4ProNum = static_cast<int>(m_vecFileTestDataInfoSt.size());
@@ -429,13 +430,14 @@ int CProConnectAcceptManager::handle_timeout(const ACE_Time_Value& tv, const voi
     for(int iLoop = 0; iLoop < n4AcceptCount; iLoop++)
     {
         ptrProConnectAcceptor = GetConnectAcceptor(iLoop);
+
         if(NULL != ptrProConnectAcceptor)
         {
             if(m_u4ParseID == ptrProConnectAcceptor->GetPacketParseInfoID())
             {
                 break;
             }
-            else 
+            else
             {
                 ptrProConnectAcceptor = NULL;
             }
@@ -446,6 +448,7 @@ int CProConnectAcceptManager::handle_timeout(const ACE_Time_Value& tv, const voi
     {
         vector<uint32> vecu4ConnectID;
         CProConnectHandle* ptrProConnectHandle = NULL;
+
         for(int iLoop = 0; iLoop < m_n4ConnectCount; iLoop++)
         {
             ptrProConnectHandle = ptrProConnectAcceptor->file_test_make_handler();
@@ -453,6 +456,7 @@ int CProConnectAcceptManager::handle_timeout(const ACE_Time_Value& tv, const voi
             if(NULL != ptrProConnectHandle)
             {
                 uint32 u4ConnectID = ptrProConnectHandle->file_open();
+
                 if(0 != u4ConnectID)
                 {
                     vecu4ConnectID.push_back(u4ConnectID);
