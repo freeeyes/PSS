@@ -589,7 +589,7 @@ typedef struct FILETESTDATAINFO
         this->m_u4DataLength = ar.m_u4DataLength;
         return *this;
     }
-}FileTestDataInfoSt;
+} FileTestDataInfoSt;
 
 //标记VCHARS_TYPE的模式
 enum VCHARS_TYPE

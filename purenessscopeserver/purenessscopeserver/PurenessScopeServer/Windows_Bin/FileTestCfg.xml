@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<!-- 文件测试相关设置 -->
-	<FileTestConfig Path="./FileTest/" TimeInterval="1" ConnectCount="100" ParseID="1" Desc="文件测试相关设置" />
+	<FileTestConfig Path="./FileTest/" TimeInterval="1" ConnectCount="1" ParseID="1" Desc="文件测试相关设置" />
 	<!-- 协议文件信息,协议文件需要按照业务逻辑先后顺序配置,其中FileName是包含协议内容的文件名-->
-	<FileInfo FileName="1.txt" Desc="PSS内部测试协议" />
+	<!-- FileInfo可以是多个，ContentType=1是二进制协议，ContentType=0是文本协议 -->
+	<!-- 单一数据包目前大小不能超过10K -->
+	<FileInfo FileName="1.txt" ContentType="1" Desc="PSS内部测试协议" />
 </Config>

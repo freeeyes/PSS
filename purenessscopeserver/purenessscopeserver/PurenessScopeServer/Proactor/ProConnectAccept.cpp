@@ -239,7 +239,7 @@ FileTestResultInfoSt CProConnectAcceptManager::FileTestStart(const char* szXmlFi
     {
         if(!LoadXmlCfg(szXmlFileTestName, objFileTestResult))
         {
-            OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]Loading config file error filename:%s.\n",strXmlCfg.c_str()));
+            OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]Loading config file error filename:%s.\n", szXmlFileTestName));
         }
         else
         {
@@ -277,11 +277,11 @@ int CProConnectAcceptManager::FileTestEnd()
 bool CProConnectAcceptManager::LoadXmlCfg(const char* szXmlFileTestName, FileTestResultInfoSt& objFileTestResult)
 {
     char* pData = NULL;
-    OUR_DEBUG((LM_INFO, "[CProConnectAcceptManager::LoadXmlCfg]Filename = %s.\n", strXmlCfg.c_str()));
+    OUR_DEBUG((LM_INFO, "[CProConnectAcceptManager::LoadXmlCfg]Filename = %s.\n", szXmlFileTestName));
 
     if(false == m_MainConfig.Init(szXmlFileTestName))
     {
-        OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]File Read Error = %s.\n", strXmlCfg.c_str()));
+        OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]File Read Error = %s.\n", szXmlFileTestName));
         objFileTestResult.n4Result = RESULT_ERR_CFGFILE;
         return false;
     }
@@ -337,19 +337,32 @@ bool CProConnectAcceptManager::LoadXmlCfg(const char* szXmlFileTestName, FileTes
     //命令监控相关配置
     m_vecFileTestDataInfoSt.clear();
     TiXmlElement* pNextTiXmlElementFileName     = NULL;
-    TiXmlElement* pNextTiXmlElementDesc      = NULL;
+    TiXmlElement* pNextTiXmlElementDesc         = NULL;
+    TiXmlElement* pNextTiXmlElementContentType  = NULL;
 
     while(true)
     {
         FileTestDataInfoSt objFileTestDataInfo;
         string strFileName;
         string strFileDesc;
+        int    nContentType = 1; //默认是二进制协议
 
         pData = m_MainConfig.GetData("FileInfo", "FileName", pNextTiXmlElementFileName);
 
         if(pData != NULL)
         {
             strFileName = m_strProFilePath + pData;
+        }
+        else
+        {
+            break;
+        }
+
+        pData = m_MainConfig.GetData("FileInfo", "ContentType", pNextTiXmlElementContentType);
+
+        if (pData != NULL)
+        {
+            nContentType = ACE_OS::atoi(pData);
         }
         else
         {
@@ -368,58 +381,85 @@ bool CProConnectAcceptManager::LoadXmlCfg(const char* szXmlFileTestName, FileTes
             break;
         }
 
-        ACE_FILE_Connector fConnector;
-        ACE_FILE_IO ioFile;
-        ACE_FILE_Addr fAddr(strFileName.c_str());
+        //读取数据包文件内容
+        int nReadFileRet = ReadTestFile(strFileName.c_str(), nContentType, objFileTestDataInfo);
 
-        if (fConnector.connect(ioFile, fAddr) == -1)
+        if(RESULT_OK == nReadFileRet)
         {
-            OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]Open filename:%s Error.\n", strFileName.c_str()));
-            objFileTestResult.n4Result = RESULT_ERR_PROFILE;
-            return false;
-        }
-
-        ACE_FILE_Info fInfo;
-
-        if (ioFile.get_info (fInfo) == -1)
-        {
-            OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]Get file info filename:%s Error.\n", strFileName.c_str()));
-            objFileTestResult.n4Result = RESULT_ERR_PROFILE;
-            return false;
-        }
-
-        if(MAX_BUFF_10240 - 1 < fInfo.size_)
-        {
-            OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]Protocol file too larger filename:%s.\n", strFileName.c_str()));
-            objFileTestResult.n4Result = RESULT_ERR_PROFILE;
-            return false;
+            m_vecFileTestDataInfoSt.push_back(objFileTestDataInfo);
         }
         else
         {
-            ssize_t u4Size = ioFile.recv (objFileTestDataInfo.m_szData,fInfo.size_);
-
-            if (u4Size != fInfo.size_)
-            {
-                OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]Read protocol file error filename:%s Error.\n", strFileName.c_str()));
-                objFileTestResult.n4Result = RESULT_ERR_PROFILE;
-                return false;
-            }
-            else
-            {
-                objFileTestDataInfo.m_szData[u4Size] = '\0';
-                objFileTestDataInfo.m_u4DataLength = static_cast<uint32>(u4Size);
-                OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]u4Size:%d\n", u4Size));
-                OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]m_szData:%s\n", objFileTestDataInfo.m_szData));
-            }
+            objFileTestResult.n4Result = nReadFileRet;
+            return false;
         }
-
-        m_vecFileTestDataInfoSt.push_back(objFileTestDataInfo);
     }
 
     m_MainConfig.Close();
 
     objFileTestResult.n4ProNum = static_cast<int>(m_vecFileTestDataInfoSt.size());
     return true;
+}
+
+int CProConnectAcceptManager::ReadTestFile(const char* pFileName, int nType, FileTestDataInfoSt& objFileTestDataInfo)
+{
+    ACE_FILE_Connector fConnector;
+    ACE_FILE_IO ioFile;
+    ACE_FILE_Addr fAddr(pFileName);
+
+    if (fConnector.connect(ioFile, fAddr) == -1)
+    {
+        OUR_DEBUG((LM_INFO, "[CMainConfig::ReadTestFile]Open filename:%s Error.\n", pFileName));
+        return RESULT_ERR_PROFILE;
+    }
+
+    ACE_FILE_Info fInfo;
+
+    if (ioFile.get_info(fInfo) == -1)
+    {
+        OUR_DEBUG((LM_INFO, "[CMainConfig::ReadTestFile]Get file info filename:%s Error.\n", pFileName));
+        return RESULT_ERR_PROFILE;
+    }
+
+    if (MAX_BUFF_10240 - 1 < fInfo.size_)
+    {
+        OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]Protocol file too larger filename:%s.\n", pFileName));
+        return RESULT_ERR_PROFILE;
+    }
+    else
+    {
+        char szFileContent[MAX_BUFF_10240] = { '\0' };
+        ssize_t u4Size = ioFile.recv(szFileContent, fInfo.size_);
+
+        if (u4Size != fInfo.size_)
+        {
+            OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]Read protocol file error filename:%s Error.\n", pFileName));
+            return RESULT_ERR_PROFILE;
+        }
+        else
+        {
+            if (nType == 0)
+            {
+                //如果是文本协议
+                memcpy_safe(szFileContent, static_cast<uint32>(u4Size), objFileTestDataInfo.m_szData, static_cast<uint32>(u4Size));
+                objFileTestDataInfo.m_szData[u4Size] = '\0';
+                objFileTestDataInfo.m_u4DataLength = static_cast<uint32>(u4Size);
+                OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]u4Size:%d\n", u4Size));
+                OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]m_szData:%s\n", objFileTestDataInfo.m_szData));
+            }
+            else
+            {
+                //如果是二进制协议
+                CConvertBuffer objConvertBuffer;
+                //将数据串转换成二进制串
+                int nDataSize = MAX_BUFF_10240;
+                objConvertBuffer.Convertstr2charArray(szFileContent, static_cast<int>(u4Size), (unsigned char*)objFileTestDataInfo.m_szData, nDataSize);
+                objFileTestDataInfo.m_u4DataLength = static_cast<uint32>(nDataSize);
+            }
+        }
+    }
+
+    return RESULT_OK;
 }
 
 int CProConnectAcceptManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
