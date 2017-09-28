@@ -83,7 +83,8 @@ private:
     int    m_n4TimeInterval;      //定时器事件间隔
     int    m_n4ConnectCount;      //模拟连接数
     uint32 m_u4ParseID;           //解析包ID
-
+    int    m_n4ContentType;       //协议数据类型,1是二进制协议,0是文本协议
+    
     typedef vector<FileTestDataInfoSt> vecFileTestDataInfoSt;
     vecFileTestDataInfoSt m_vecFileTestDataInfoSt;
 };

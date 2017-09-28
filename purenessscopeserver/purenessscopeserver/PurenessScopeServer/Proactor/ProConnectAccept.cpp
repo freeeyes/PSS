@@ -307,7 +307,7 @@ bool CProConnectAcceptManager::LoadXmlCfg(const char* szXmlFileTestName, FileTes
     }
     else
     {
-        m_n4TimeInterval = 1;
+        m_n4TimeInterval = 10;
     }
 
     pData = m_MainConfig.GetData("FileTestConfig", "ConnectCount");
@@ -320,7 +320,7 @@ bool CProConnectAcceptManager::LoadXmlCfg(const char* szXmlFileTestName, FileTes
     }
     else
     {
-        m_n4ConnectCount = 100;
+        m_n4ConnectCount = 10;
     }
 
     pData = m_MainConfig.GetData("FileTestConfig", "ParseID");
@@ -334,35 +334,33 @@ bool CProConnectAcceptManager::LoadXmlCfg(const char* szXmlFileTestName, FileTes
         m_u4ParseID = 1;
     }
 
+    pData = m_MainConfig.GetData("FileTestConfig", "ConnectCount");
+
+    if(NULL != pData)
+    {
+        m_n4ContentType = (uint8)ACE_OS::atoi(pData);
+    }
+    else
+    {
+        m_n4ContentType = 1; //默认是二进制协议
+    }
+
     //命令监控相关配置
     m_vecFileTestDataInfoSt.clear();
     TiXmlElement* pNextTiXmlElementFileName     = NULL;
     TiXmlElement* pNextTiXmlElementDesc         = NULL;
-    TiXmlElement* pNextTiXmlElementContentType  = NULL;
 
     while(true)
     {
         FileTestDataInfoSt objFileTestDataInfo;
         string strFileName;
         string strFileDesc;
-        int    nContentType = 1; //默认是二进制协议
 
         pData = m_MainConfig.GetData("FileInfo", "FileName", pNextTiXmlElementFileName);
 
         if(pData != NULL)
         {
             strFileName = m_strProFilePath + pData;
-        }
-        else
-        {
-            break;
-        }
-
-        pData = m_MainConfig.GetData("FileInfo", "ContentType", pNextTiXmlElementContentType);
-
-        if (pData != NULL)
-        {
-            nContentType = ACE_OS::atoi(pData);
         }
         else
         {
@@ -382,7 +380,7 @@ bool CProConnectAcceptManager::LoadXmlCfg(const char* szXmlFileTestName, FileTes
         }
 
         //读取数据包文件内容
-        int nReadFileRet = ReadTestFile(strFileName.c_str(), nContentType, objFileTestDataInfo);
+        int nReadFileRet = ReadTestFile(strFileName.c_str(), m_n4ContentType, objFileTestDataInfo);
 
         if(RESULT_OK == nReadFileRet)
         {
