@@ -464,7 +464,12 @@ void CDlgClientConnect::OnBnClickedButton14()
                 memcpy_s(&szCommandDesc, nData, &szRecvBuff[nPos], nData);
                 szCommandDesc[nData] = '\0';
                 nPos += nData;
-                sprintf_s(szTemp, 1024, "CommandDesc:[%s]\n", szCommandDesc);
+                wchar_t szDesc[1024] = { '\0' };
+
+                int nSrcLen = MultiByteToWideChar(CP_ACP, 0, szCommandDesc, -1, NULL, 0);
+                int nDecLen = MultiByteToWideChar(CP_ACP, 0, szCommandDesc, -1, szDesc, 200);
+
+                sprintf_s(szTemp, 1024, "CommandDesc:[%s]\n", szDesc);
                 strTxt += szTemp;
             }
 
