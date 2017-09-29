@@ -93,7 +93,8 @@ ACE_Message_Block* CMessageBlockManager::Create(uint32 u4Size)
 bool CMessageBlockManager::Close(ACE_Message_Block* pMessageBlock)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
-    pMessageBlock->msg_type(ACE_Message_Block::MB_DATA);
+    ACE_OS::memset(pMessageBlock->base(), 0, pMessageBlock->capacity());
+    pMessageBlock->reset();
     m_MemoryBlock_Pool.Set(pMessageBlock);
 
     uint32 u4Size = (uint32)pMessageBlock->size();
