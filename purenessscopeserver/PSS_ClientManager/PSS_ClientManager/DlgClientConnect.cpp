@@ -171,6 +171,8 @@ BOOL CDlgClientConnect::OnInitDialog()
     m_lcClientConnectHistory.InsertColumn(2, _T("总链接数"), LVCFMT_CENTER, 100);
     m_lcClientConnectHistory.InsertColumn(3, _T("最后链接时间"), LVCFMT_CENTER, 200);
 
+    m_txtPacketFileName.SetWindowText(_T("FileTestCfg.xml"));
+
     return TRUE;
 }
 
@@ -443,15 +445,15 @@ void CDlgClientConnect::OnBnClickedButton14()
         {
             CString strTxt;
             int nData = 0;
-            char szTemp[1024]        = { '\0' };
+            wchar_t szTemp[1024]        = { '\0' };
             char szCommandDesc[1024] = { '\0' };
             memcpy_s(&nData, sizeof(int), &szRecvBuff[nPos], sizeof(int));
             nPos += sizeof(int);
-            sprintf_s(szTemp, 1024, "TimeInterval:[%d]\n", nData);
+            wsprintf(szTemp, _T("TimeInterval:[%d]\n"), nData);
             strTxt += szTemp;
             memcpy_s(&nData, sizeof(int), &szRecvBuff[nPos], sizeof(int));
             nPos += sizeof(int);
-            sprintf_s(szTemp, 1024, "ProcolCount:[%d]\n", nData);
+            wsprintf(szTemp, _T("ProcolCount:[%d]\n"), nData);
             strTxt += szTemp;
             memcpy_s(&nData, sizeof(short), &szRecvBuff[nPos], sizeof(short));
             nPos += sizeof(short);
@@ -467,9 +469,9 @@ void CDlgClientConnect::OnBnClickedButton14()
                 wchar_t szDesc[1024] = { '\0' };
 
                 int nSrcLen = MultiByteToWideChar(CP_ACP, 0, szCommandDesc, -1, NULL, 0);
-                int nDecLen = MultiByteToWideChar(CP_ACP, 0, szCommandDesc, -1, szDesc, 200);
+                int nDecLen = MultiByteToWideChar(CP_ACP, 0, szCommandDesc, -1, szDesc, 1024);
 
-                sprintf_s(szTemp, 1024, "CommandDesc:[%s]\n", szDesc);
+                wsprintf(szTemp, _T("CommandDesc:[%s]\n"), szDesc);
                 strTxt += szTemp;
             }
 

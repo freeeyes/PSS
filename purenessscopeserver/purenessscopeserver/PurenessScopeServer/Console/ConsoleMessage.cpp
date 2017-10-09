@@ -2347,6 +2347,7 @@ bool CConsoleMessage::Do_Message_TestFileStart(_CommandInfo& CommandInfo, IBuffP
 
 bool CConsoleMessage::Do_Message_TestFileStop(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
+    u2ReturnCommandID = CONSOLE_COMMAND_FILE_TEST_STOP;
     int nRet = App_ProConnectAcceptManager::instance()->FileTestEnd();
     (*pBuffPacket) << (uint32)nRet;
     return true;

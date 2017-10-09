@@ -4,5 +4,5 @@
 	<FileTestConfig Path="./FileTest/" TimeInterval="10" ConnectCount="1" ParseID="1" ContentType="1" Desc="文件测试相关设置" />
 	<!-- 协议文件信息,协议文件需要按照业务逻辑先后顺序配置,其中FileName是包含协议内容的文件名-->
 	<!-- FileInfo可以是多个，单一数据包目前大小不能超过10K -->
-	<FileInfo FileName="1.txt" Desc="PSS内部测试协议" />
+	<FileInfo FileName="1.txt" Desc="PSS 测试" />
 </Config>
