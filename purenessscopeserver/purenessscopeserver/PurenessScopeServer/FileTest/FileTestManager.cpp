@@ -90,13 +90,14 @@ void CFileTestManager::HandlerServerResponse(uint32 u4ConnectID)
             {
                 //应答时间超过期望时间限制
                 OUR_DEBUG((LM_INFO, "[CFileTestManager::HandlerServerResponse]Response time too long m_n4ExpectTime:%d.\n",m_n4ExpectTime));
-#ifndef WIN32
-                App_ConnectAcceptorManager::instance()->Close(u4ConnectID);
-#else
-                App_ProConnectManager::instance()->Close(u4ConnectID);
-#endif
-                m_mapResponseRecordSt.erase(iter->first);
             }
+
+#ifndef WIN32
+            App_ConnectAcceptorManager::instance()->Close(u4ConnectID);
+#else
+            App_ProConnectManager::instance()->Close(u4ConnectID);
+#endif
+            m_mapResponseRecordSt.erase(iter->first);
         }
         else
         {
