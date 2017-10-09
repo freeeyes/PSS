@@ -468,8 +468,8 @@ void CDlgClientConnect::OnBnClickedButton14()
                 nPos += nData;
                 wchar_t szDesc[1024] = { '\0' };
 
-                int nSrcLen = MultiByteToWideChar(CP_ACP, 0, szCommandDesc, -1, NULL, 0);
-                int nDecLen = MultiByteToWideChar(CP_ACP, 0, szCommandDesc, -1, szDesc, 1024);
+                int nSrcLen = MultiByteToWideChar(CP_UTF8, 0, szCommandDesc, -1, NULL, 0);
+                int nDecLen = MultiByteToWideChar(CP_UTF8, 0, szCommandDesc, -1, szDesc, 1024);
 
                 wsprintf(szTemp, _T("CommandDesc:[%s]\n"), szDesc);
                 strTxt += szTemp;
