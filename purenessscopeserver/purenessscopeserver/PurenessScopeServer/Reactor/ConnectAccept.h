@@ -20,7 +20,7 @@ public:
     void InitClientReactor(uint32 u4ClientReactorCount);
     void SetPacketParseInfoID(uint32 u4PaccketParseInfoID);
     uint32 GetPacketParseInfoID();
-
+    int file_test_make_svc_handler(CConnectHandler*& sh);
 protected:
     virtual int make_svc_handler(CConnectHandler*& sh);
 
@@ -51,7 +51,7 @@ private:
     uint32 m_u4PacketParseInfoID;       //处理包解析的模块ID
 };
 
-class CConnectAcceptorManager : public ACE_Task<ACE_MT_SYNCH>
+class CConnectAcceptorManager
 {
 public:
     CConnectAcceptorManager(void);
@@ -72,21 +72,6 @@ private:
     vecConnectAcceptor m_vecConnectAcceptor;
     int                m_nAcceptorCount;
     char               m_szError[MAX_BUFF_500];
-
-public:
-    //文件测试方法
-    FileTestResultInfoSt FileTestStart(string strXmlCfg);      //开始文件测试
-    int FileTestEnd();        //结束文件测试
-private:
-    int LoadXmlCfg(string strXmlCfg);
-
-    virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);   //定时器检查
-private:
-    //文件测试变量
-    bool m_bFileTesting;          //是否正在进行文件测试
-    bool m_bLoadCfgFile;          //是否已经加载配置文件
-    uint32 m_u4TimerID;           //定时器ID
-
 };
 
 typedef ACE_Singleton<CConnectAcceptorManager, ACE_Null_Mutex> App_ConnectAcceptorManager;

@@ -110,6 +110,9 @@
     <Filter Include="Mail\hfile">
       <UniqueIdentifier>{a7ecfde7-aabc-457a-8401-4f899c76b1ef}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FileTest">
+      <UniqueIdentifier>{f15494b1-1963-4db5-9993-6e6f3f75f0ea}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PurenessScopeServer.cpp">
@@ -324,6 +327,9 @@
     </ClCompile>
     <ClCompile Include="Common\ServerMessageTask.cpp">
       <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="FileTest\FileTestManager.cpp">
+      <Filter>FileTest</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -632,6 +638,8 @@
     </ClInclude>
     <ClInclude Include="Common\ServerMessageTask.h">
       <Filter>Common\headfile</Filter>
+    <ClInclude Include="FileTest\FileTestManager.h">
+      <Filter>FileTest</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

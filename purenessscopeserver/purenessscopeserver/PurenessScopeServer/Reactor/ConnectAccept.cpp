@@ -27,6 +27,11 @@ uint32 ConnectAcceptor::GetPacketParseInfoID()
     return m_u4PacketParseInfoID;
 }
 
+int ConnectAcceptor::file_test_make_svc_handler(CConnectHandler*& sh)
+{
+    return this->make_svc_handler(sh);
+}
+
 int ConnectAcceptor::make_svc_handler(CConnectHandler*& sh)
 {
     OUR_DEBUG((LM_ERROR, "[ConnectAcceptor::make_svc_handler]Connect accept.\n"));
@@ -297,26 +302,4 @@ ConnectAcceptor* CConnectAcceptorManager::GetNewConnectAcceptor()
     m_vecConnectAcceptor.push_back(pConnectAcceptor);
     return pConnectAcceptor;
 }
-
-FileTestResultInfoSt CConnectAcceptorManager::FileTestStart(string strXmlCfg)
-{
-    FileTestResultInfoSt objFileTestResult;
-    return objFileTestResult;
-}
-
-int CConnectAcceptorManager::FileTestEnd()
-{
-    return 0;
-}
-
-int CConnectAcceptorManager::LoadXmlCfg(string strXmlCfg)
-{
-    return 0;
-}
-
-int CConnectAcceptorManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
-{
-    return 0;
-}
-
 

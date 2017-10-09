@@ -13,6 +13,7 @@
 #include "ace/Message_Block.h"
 #include "IPAccount.h"
 #include "IObject.h"
+#include "FileTestManager.h"
 
 #ifdef WIN32
 #include "ProConnectHandle.h"

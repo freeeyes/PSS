@@ -2325,7 +2325,7 @@ bool CConsoleMessage::Do_Message_TestFileStart(_CommandInfo& CommandInfo, IBuffP
         objFileResult.vecProFileDesc.push_back((string)"Test freeeyes");
         objFileResult.vecProFileDesc.push_back((string)"Test liuchao");
         */
-        objFileResult = App_ProConnectAcceptManager::instance()->FileTestStart(szFileName);
+        objFileResult = App_FileTestManager::instance()->FileTestStart(szFileName);
         (*pBuffPacket) << objFileResult.n4Result;
         (*pBuffPacket) << objFileResult.n4TimeInterval;
         (*pBuffPacket) << objFileResult.n4ProNum;
@@ -2348,7 +2348,7 @@ bool CConsoleMessage::Do_Message_TestFileStart(_CommandInfo& CommandInfo, IBuffP
 bool CConsoleMessage::Do_Message_TestFileStop(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     u2ReturnCommandID = CONSOLE_COMMAND_FILE_TEST_STOP;
-    int nRet = App_ProConnectAcceptManager::instance()->FileTestEnd();
+    int nRet = App_FileTestManager::instance()->FileTestEnd();
     (*pBuffPacket) << (uint32)nRet;
     return true;
 }

@@ -84,6 +84,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>.\Windows_Bin</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -155,13 +156,14 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ACE_ROOT);./Common;./Encrypt;./IObject;./LogSystem;./Message;./PacketParse;./Proactor;./Reactor;./UDP;./Console;./TinyXML;./Mail;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ACE_ROOT);./Common;./LogSystem;./Encrypt;./IObject;./Message;./PacketParse;./Proactor;./Reactor;./UDP;./Console;./TinyXML;./Mail;./FileTest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4091;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ace.lib;DbgHelp.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -185,6 +187,7 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Encrypt\Aes.cpp" />
+    <ClCompile Include="FileTest\FileTestManager.cpp" />
     <ClCompile Include="PacketParse\PacketConsoleParse.cpp" />
     <ClCompile Include="PacketParse\PacketParse.cpp" />
     <ClCompile Include="PacketParse\PacketParseBase.cpp" />
@@ -517,6 +520,7 @@
     <ClInclude Include="Common\ServerMessageTask.h" />
     <ClInclude Include="Common\TimeWheelLink.h" />
     <ClInclude Include="Encrypt\Aes.h" />
+    <ClInclude Include="FileTest\FileTestManager.h" />
     <ClInclude Include="IObject\ClientCommand.h" />
     <ClInclude Include="IObject\IBuffPacket.h" />
     <ClInclude Include="IObject\ICheckPacket.h" />

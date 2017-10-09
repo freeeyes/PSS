@@ -118,7 +118,6 @@ void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
     RecvData(App_MainConfig::instance()->GetConnectServerRecvBuffer());
 }
 
-
 void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result& result)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
