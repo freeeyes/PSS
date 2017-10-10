@@ -321,124 +321,84 @@ int CFileTestManager::ReadTestFile(const char* pFileName, int nType, FileTestDat
 int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 {
 #ifndef WIN32
-    int n4AcceptCount = App_ConnectAcceptorManager::instance()->GetCount();
-    ConnectAcceptor* ptrConnectAcceptor = NULL;
+    vector<uint32> vecu4ConnectID;
+    CConnectHandler* pConnectHandler = NULL;
 
-    for(int iLoop = 0; iLoop < n4AcceptCount; iLoop++)
+    for (int iLoop = 0; iLoop < m_n4ConnectCount; iLoop++)
     {
-        ptrConnectAcceptor = App_ConnectAcceptorManager::instance()->GetConnectAcceptor(iLoop);
+        pConnectHandler = App_ConnectHandlerPool::instance()->Create();
+        //文件数据包测试不需要用到pProactor对象，因为不需要实际发送数据，所以这里可以直接设置一个固定的pProactor
+        ACE_Reactor* pReactor = App_ReactorManager::instance()->GetAce_Client_Reactor(0);
+        pConnectHandler->proactor(pReactor);
 
-        if(NULL != ptrConnectAcceptor)
+        if (-1 != n4Result)
         {
-            if(m_u4ParseID == ptrConnectAcceptor->GetPacketParseInfoID())
+            uint32 u4ConnectID = pConnectHandler->file_open(dynamic_cast<IFileTestManager*>(this));
+
+            if (0 != u4ConnectID)
             {
-                break;
+                vecu4ConnectID.push_back(u4ConnectID);
+                ResponseRecordSt objResponseRecord;
+                objResponseRecord.m_u1ResponseCount = 0;
+                objResponseRecord.m_u8StartTime = tv.get_msec();
+                m_mapResponseRecordSt.insert(mapResponseRecordSt::value_type(u4ConnectID, objResponseRecord));
             }
             else
             {
-                ptrConnectAcceptor = NULL;
+                OUR_DEBUG((LM_INFO, "[CMainConfig::handle_timeout]file_open error\n"));
             }
         }
     }
 
-    if(NULL != ptrConnectAcceptor)
+    for (int iLoop = 0; iLoop < m_vecFileTestDataInfoSt.size(); iLoop++)
     {
-        vector<uint32> vecu4ConnectID;
-        CConnectHandler* ptrConnectHandler = NULL;
+        FileTestDataInfoSt& objFileTestDataInfo = m_vecFileTestDataInfoSt[iLoop];
 
-        for(int iLoop = 0; iLoop < m_n4ConnectCount; iLoop++)
+        for (int jLoop = 0; jLoop < vecu4ConnectID.size(); jLoop++)
         {
-            int n4Result = ptrConnectAcceptor->file_test_make_svc_handler(ptrConnectHandler);
-
-            if(-1 != n4Result)
-            {
-                uint32 u4ConnectID = ptrConnectHandler->file_open();
-
-                if(0 != u4ConnectID)
-                {
-                    vecu4ConnectID.push_back(u4ConnectID);
-                    ResponseRecordSt objResponseRecord;
-                    objResponseRecord.m_u1ResponseCount = 0;
-                    objResponseRecord.m_u8StartTime = tv.get_msec();
-                    m_mapResponseRecordSt.insert(mapResponseRecordSt::value_type(u4ConnectID,objResponseRecord));
-                }
-                else
-                {
-                    OUR_DEBUG((LM_INFO, "[CMainConfig::handle_timeout]file_open error\n"));
-                }
-            }
-        }
-
-        for(int iLoop = 0; iLoop < m_vecFileTestDataInfoSt.size(); iLoop++)
-        {
-            FileTestDataInfoSt& objFileTestDataInfo = m_vecFileTestDataInfoSt[iLoop];
-
-            for(int jLoop = 0; jLoop < vecu4ConnectID.size(); jLoop++)
-            {
-                uint32 u4ConnectID = vecu4ConnectID[jLoop];
-                App_ConnectAcceptorManager::instance()->handle_write_file_stream(u4ConnectID,objFileTestDataInfo.m_szData, objFileTestDataInfo.m_u4DataLength, m_u4ParseID);
-            }
+            uint32 u4ConnectID = vecu4ConnectID[jLoop];
+            App_ConnectAcceptorManager::instance()->handle_write_file_stream(u4ConnectID, objFileTestDataInfo.m_szData, objFileTestDataInfo.m_u4DataLength, m_u4ParseID);
         }
     }
 
 #else
-    int n4AcceptCount = App_ProConnectAcceptManager::instance()->GetCount();
-    ProConnectAcceptor* ptrProConnectAcceptor = NULL;
+    vector<uint32> vecu4ConnectID;
+    CProConnectHandle* ptrProConnectHandle = NULL;
 
-    for(int iLoop = 0; iLoop < n4AcceptCount; iLoop++)
+    for (int iLoop = 0; iLoop < m_n4ConnectCount; iLoop++)
     {
-        ptrProConnectAcceptor = App_ProConnectAcceptManager::instance()->GetConnectAcceptor(iLoop);
+        ptrProConnectHandle = App_ProConnectHandlerPool::instance()->Create();
+        //文件数据包测试不需要用到pProactor对象，因为不需要实际发送数据，所以这里可以直接设置一个固定的pProactor
+        ACE_Proactor* pPractor = App_ProactorManager::instance()->GetAce_Client_Proactor(0);
+        ptrProConnectHandle->proactor(pPractor);
 
-        if(NULL != ptrProConnectAcceptor)
+        if (NULL != ptrProConnectHandle)
         {
-            if(m_u4ParseID == ptrProConnectAcceptor->GetPacketParseInfoID())
+            uint32 u4ConnectID = ptrProConnectHandle->file_open(dynamic_cast<IFileTestManager*>(this));
+
+            if (0 != u4ConnectID)
             {
-                break;
+                vecu4ConnectID.push_back(u4ConnectID);
+                ResponseRecordSt objResponseRecord;
+                objResponseRecord.m_u1ResponseCount = 0;
+                objResponseRecord.m_u8StartTime = tv.get_msec();
+                m_mapResponseRecordSt.insert(mapResponseRecordSt::value_type(u4ConnectID, objResponseRecord));
             }
             else
             {
-                ptrProConnectAcceptor = NULL;
+                OUR_DEBUG((LM_INFO, "[CMainConfig::handle_timeout]file_open error\n"));
             }
         }
     }
 
-    if(NULL != ptrProConnectAcceptor)
+    for (int iLoop = 0; iLoop < m_vecFileTestDataInfoSt.size(); iLoop++)
     {
-        vector<uint32> vecu4ConnectID;
-        CProConnectHandle* ptrProConnectHandle = NULL;
+        FileTestDataInfoSt& objFileTestDataInfo = m_vecFileTestDataInfoSt[iLoop];
 
-        for(int iLoop = 0; iLoop < m_n4ConnectCount; iLoop++)
+        for (int jLoop = 0; jLoop < vecu4ConnectID.size(); jLoop++)
         {
-            ptrProConnectHandle = ptrProConnectAcceptor->file_test_make_handler();
-
-            if(NULL != ptrProConnectHandle)
-            {
-                uint32 u4ConnectID = ptrProConnectHandle->file_open();
-
-                if(0 != u4ConnectID)
-                {
-                    vecu4ConnectID.push_back(u4ConnectID);
-                    ResponseRecordSt objResponseRecord;
-                    objResponseRecord.m_u1ResponseCount = 0;
-                    objResponseRecord.m_u8StartTime = tv.get_msec();
-                    m_mapResponseRecordSt.insert(mapResponseRecordSt::value_type(u4ConnectID,objResponseRecord));
-                }
-                else
-                {
-                    OUR_DEBUG((LM_INFO, "[CMainConfig::handle_timeout]file_open error\n"));
-                }
-            }
-        }
-
-        for(int iLoop = 0; iLoop < m_vecFileTestDataInfoSt.size(); iLoop++)
-        {
-            FileTestDataInfoSt& objFileTestDataInfo = m_vecFileTestDataInfoSt[iLoop];
-
-            for(int jLoop = 0; jLoop < vecu4ConnectID.size(); jLoop++)
-            {
-                uint32 u4ConnectID = vecu4ConnectID[jLoop];
-                App_ProConnectManager::instance()->handle_write_file_stream(u4ConnectID,objFileTestDataInfo.m_szData, objFileTestDataInfo.m_u4DataLength, m_u4ParseID);
-            }
+            uint32 u4ConnectID = vecu4ConnectID[jLoop];
+            App_ProConnectManager::instance()->handle_write_file_stream(u4ConnectID, objFileTestDataInfo.m_szData, objFileTestDataInfo.m_u4DataLength, m_u4ParseID);
         }
     }
 

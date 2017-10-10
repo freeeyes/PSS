@@ -38,6 +38,7 @@
 #include "SendCacheManager.h"
 #include "LoadPacketParse.h"
 #include "TimeWheelLink.h"
+#include "FileTest.h"
 
 #include <vector>
 
@@ -53,7 +54,7 @@ public:
     virtual void handle_write_stream(const ACE_Asynch_Write_Stream::Result& result);                 //处理发送到用户数据完成的事件
     virtual void addresses(const ACE_INET_Addr& remote_address, const ACE_INET_Addr& local_address); //获得当前远程客户端的IP地址信息
 
-    uint32 file_open();                                                                      //文件入口打开接口
+    uint32 file_open(IFileTestManager* pFileTest);                                           //文件入口打开接口
     int handle_write_file_stream(const char* pData, uint32 u4Size, uint8 u1ParseID);         //文件接口模拟数据包入口
 
     void Init(uint16 u2HandlerID);                                            //Connect Pool初始化调用的函数
@@ -149,6 +150,7 @@ private:
     uint32              m_u4PacketDebugSize;            //记录能存二进制数据包的最大字节
 
     EM_IO_TYPE          m_emIOType;                     //当前IO入口类型
+    IFileTestManager*   m_pFileTest;                    //文件测试接口入口
 
     Fast_Asynch_Read_Stream  m_Reader;
     Fast_Asynch_Write_Stream m_Writer;

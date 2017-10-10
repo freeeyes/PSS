@@ -520,6 +520,7 @@
     <ClInclude Include="Common\ServerMessageTask.h" />
     <ClInclude Include="Common\TimeWheelLink.h" />
     <ClInclude Include="Encrypt\Aes.h" />
+    <ClInclude Include="FileTest\FileTest.h" />
     <ClInclude Include="FileTest\FileTestManager.h" />
     <ClInclude Include="IObject\ClientCommand.h" />
     <ClInclude Include="IObject\IBuffPacket.h" />

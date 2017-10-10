@@ -38,6 +38,7 @@ CProConnectHandle::CProConnectHandle(void)
     m_u4PacketDebugSize   = 0;
     m_pPacketDebugData    = NULL;
     m_emIOType            = NET_INPUT;
+    m_pFileTest           = NULL;
 }
 
 CProConnectHandle::~CProConnectHandle(void)
@@ -234,7 +235,7 @@ void CProConnectHandle::addresses (const ACE_INET_Addr& remote_address, const AC
     m_addrRemote = remote_address;
 }
 
-uint32 CProConnectHandle::file_open()
+uint32 CProConnectHandle::file_open(IFileTestManager* pFileTest)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
@@ -290,6 +291,7 @@ uint32 CProConnectHandle::file_open()
     }
 
     OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::file_open]Open(%d) Connection from [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
+    m_pFileTest = pFileTest;
 
     return GetConnectID();
 }

@@ -17,7 +17,7 @@ public:
     void InitClientProactor(uint32 u4ClientProactorCount);
     void SetPacketParseInfoID(uint32 u4PaccketParseInfoID);
     uint32 GetPacketParseInfoID();
-    CProConnectHandle* file_test_make_handler(void);
+
 private:
     virtual CProConnectHandle* make_handler (void);
     virtual int validate_connection (const ACE_Asynch_Accept::Result& result,

@@ -6,10 +6,10 @@
 using namespace std;
 
 #ifndef WIN32
-#include "ConnectAccept.h"
+#include "ConnectHandler.h"
 #else
 //如果是windows
-#include "ProConnectAccept.h"
+#include "ProConnectHandle.h"
 #endif
 
 #include "XmlOpeation.h"
@@ -17,24 +17,25 @@ using namespace std;
 #include "ace/FILE_Addr.h"
 #include "ace/FILE_Connector.h"
 #include "ace/FILE_IO.h"
+#include "FileTest.h"
 
-class CFileTestManager : public ACE_Task<ACE_MT_SYNCH>
+class CFileTestManager : public ACE_Task<ACE_MT_SYNCH>, public IFileTestManager
 {
 public:
     CFileTestManager(void);
-    ~CFileTestManager(void);
+    virtual ~CFileTestManager(void);
 public:
     //文件测试方法
     FileTestResultInfoSt FileTestStart(const char* szXmlFileTestName);      //开始文件测试
     int FileTestEnd();                                                      //结束文件测试
-    void HandlerServerResponse(uint32 u4ConnectID);
+    void HandlerServerResponse(uint32 u4ConnectID);                         //当前连接发送数据包的回调方法
 private:
     bool LoadXmlCfg(const char* szXmlFileTestName, FileTestResultInfoSt& objFileTestResult);        //读取测试配置文件
     int  ReadTestFile(const char* pFileName, int nType, FileTestDataInfoSt& objFileTestDataInfo);   //将消息包文件读入数据结构
 
     virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);   //定时器检查
 private:
-    ACE_Recursive_Thread_Mutex  m_ThreadWriteLock; 
+    ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;
     ACE_Time_Value m_atvLastCheck;
     //文件测试变量
     bool m_bFileTesting;          //是否正在进行文件测试

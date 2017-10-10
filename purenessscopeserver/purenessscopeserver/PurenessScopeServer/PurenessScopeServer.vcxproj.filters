@@ -528,6 +528,9 @@
     <ClInclude Include="Mail\base64.h">
       <Filter>Encrypt\hfile</Filter>
     </ClInclude>
+    <ClInclude Include="FileTest\FileTest.h">
+      <Filter>FileTest\hfile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

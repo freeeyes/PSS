@@ -24,11 +24,6 @@ uint32 ProConnectAcceptor::GetPacketParseInfoID()
     return m_u4PacketParseInfoID;
 }
 
-CProConnectHandle* ProConnectAcceptor::file_test_make_handler(void)
-{
-    return this->make_handler();
-}
-
 CProConnectHandle* ProConnectAcceptor::make_handler(void)
 {
     CProConnectHandle* pProConnectHandle = App_ProConnectHandlerPool::instance()->Create();
