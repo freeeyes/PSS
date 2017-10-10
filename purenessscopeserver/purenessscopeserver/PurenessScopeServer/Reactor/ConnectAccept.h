@@ -20,7 +20,7 @@ public:
     void InitClientReactor(uint32 u4ClientReactorCount);
     void SetPacketParseInfoID(uint32 u4PaccketParseInfoID);
     uint32 GetPacketParseInfoID();
-    int file_test_make_svc_handler(CConnectHandler*& sh);
+    
 protected:
     virtual int make_svc_handler(CConnectHandler*& sh);
 

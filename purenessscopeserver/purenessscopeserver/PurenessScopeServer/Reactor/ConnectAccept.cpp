@@ -27,11 +27,6 @@ uint32 ConnectAcceptor::GetPacketParseInfoID()
     return m_u4PacketParseInfoID;
 }
 
-int ConnectAcceptor::file_test_make_svc_handler(CConnectHandler*& sh)
-{
-    return this->make_svc_handler(sh);
-}
-
 int ConnectAcceptor::make_svc_handler(CConnectHandler*& sh)
 {
     OUR_DEBUG((LM_ERROR, "[ConnectAcceptor::make_svc_handler]Connect accept.\n"));
