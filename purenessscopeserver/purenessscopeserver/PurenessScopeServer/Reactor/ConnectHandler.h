@@ -35,6 +35,7 @@
 #include "SendCacheManager.h"
 #include "LoadPacketParse.h"
 #include "TimeWheelLink.h"
+#include "FileTest.h"
 
 #ifdef __LINUX__
 #include "netinet/tcp.h"
@@ -51,6 +52,9 @@ public:
     virtual int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE);            //接受客户端收到的数据块
     virtual int handle_output(ACE_HANDLE fd = ACE_INVALID_HANDLE);           //发送客户端数据
     virtual int handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask);           //链接关闭事件
+
+    uint32 file_open(IFileTestManager* pFileTest);                                           //文件入口打开接口
+    int handle_write_file_stream(const char* pData, uint32 u4Size, uint8 u1ParseID);         //文件接口模拟数据包入口
 
     void Init(uint16 u2HandlerID);                                           //Connect Pool初始化调用时候调用的方法
     void SetPacketParseInfoID(uint32 u4PacketParseInfoID);                   //设置对应的m_u4PacketParseInfoID
@@ -150,6 +154,9 @@ private:
     uint32                     m_u4PacketParseInfoID;          //对应处理packetParse的模块ID
     char*                      m_pPacketDebugData;             //记录数据包的Debug缓冲字符串
     uint32                     m_u4PacketDebugSize;            //记录能存二进制数据包的最大字节
+
+    EM_IO_TYPE                 m_emIOType;                     //当前IO入口类型
+    IFileTestManager*          m_pFileTest;                    //文件测试接口入口
 };
 
 //管理所有已经建立的链接
@@ -195,9 +202,11 @@ public:
     int         GetCount();
     const char* GetError();
 
-    bool SetConnectName(uint32 u4ConnectID, const char* pName);                                  //设置当前连接名称
-    bool SetIsLog(uint32 u4ConnectID, bool blIsLog);                                             //设置当前连接数据是否写入日志
-    EM_Client_Connect_status GetConnectState(uint32 u4ConnectID);                                //得到指定的连接状态
+    bool SetConnectName(uint32 u4ConnectID, const char* pName);                                              //设置当前连接名称
+    bool SetIsLog(uint32 u4ConnectID, bool blIsLog);                                                         //设置当前连接数据是否写入日志
+    EM_Client_Connect_status GetConnectState(uint32 u4ConnectID);                                            //得到指定的连接状态
+
+    int handle_write_file_stream(uint32 u4ConnectID, const char* pData, uint32 u4Size, uint8 u1ParseID);     //文件接口模拟数据包入口
 
 private:
     virtual int CloseMsgQueue();
@@ -291,6 +300,8 @@ public:
     const char* GetError();
     void GetCommandFlowAccount(_CommandFlowAccount& objCommandFlowAccount);                                  //得到出口流量信息
     EM_Client_Connect_status GetConnectState(uint32 u4ConnectID);
+
+    int handle_write_file_stream(uint32 u4ConnectID, const char* pData, uint32 u4Size, uint8 u1ParseID);     //文件接口模拟数据包入口
 
 private:
     uint32 GetGroupIndex();                                                                                  //得到当前链接的ID自增量
