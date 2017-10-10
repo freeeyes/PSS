@@ -318,6 +318,7 @@ int CProConnectHandle::handle_write_file_stream(const char* pData, uint32 u4Size
         }
 
         memcpy_safe((char*)pData, u4PacketHead, pMbHead->wr_ptr(), u4PacketHead);
+        pMbHead->wr_ptr(u4PacketHead);
 
         //解析消息头
         _Head_Info objHeadInfo;
@@ -346,6 +347,7 @@ int CProConnectHandle::handle_write_file_stream(const char* pData, uint32 u4Size
         }
 
         memcpy_safe((char*)&pData[u4PacketHead], u4Size - u4PacketHead, pMbBody->wr_ptr(), u4Size - u4PacketHead);
+        pMbBody->wr_ptr(u4Size - u4PacketHead);
 
         //解析数据包体
         _Body_Info obj_Body_Info;
@@ -1285,6 +1287,11 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
         if (NULL != m_pFileTest)
         {
             m_pFileTest->HandlerServerResponse(GetConnectID());
+        }
+
+        if (blDelete = true)
+        {
+            App_BuffPacketManager::instance()->Delete(pBuffPacket);
         }
 
         return true;
