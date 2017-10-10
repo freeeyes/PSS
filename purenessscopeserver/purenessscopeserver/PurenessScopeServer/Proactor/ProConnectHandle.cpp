@@ -1281,6 +1281,12 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
             AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTSEND, "[(%s)%s:%d]%s.", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_pPacketDebugData);
         }
 
+        //回调测试文件管理接口
+        if (NULL != m_pFileTest)
+        {
+            m_pFileTest->HandlerServerResponse(GetConnectID());
+        }
+
         return true;
     }
 }

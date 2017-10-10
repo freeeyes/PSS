@@ -329,7 +329,8 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
         pConnectHandler = App_ConnectHandlerPool::instance()->Create();
         //文件数据包测试不需要用到pProactor对象，因为不需要实际发送数据，所以这里可以直接设置一个固定的pProactor
         ACE_Reactor* pReactor = App_ReactorManager::instance()->GetAce_Client_Reactor(0);
-        pConnectHandler->proactor(pReactor);
+        pConnectHandler->reactor(pReactor);
+        pConnectHandler->SetPacketParseInfoID(m_u4ParseID);
 
         if (-1 != n4Result)
         {
@@ -371,6 +372,7 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
         //文件数据包测试不需要用到pProactor对象，因为不需要实际发送数据，所以这里可以直接设置一个固定的pProactor
         ACE_Proactor* pPractor = App_ProactorManager::instance()->GetAce_Client_Proactor(0);
         ptrProConnectHandle->proactor(pPractor);
+        ptrProConnectHandle->SetPacketParseInfoID(m_u4ParseID);
 
         if (NULL != ptrProConnectHandle)
         {
