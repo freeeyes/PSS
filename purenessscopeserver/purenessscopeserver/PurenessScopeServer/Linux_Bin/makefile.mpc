@@ -11,9 +11,10 @@ project(PurenessScopeServer):aceexe{
   ../UDP/*.cpp
   ../TinyXML/*.cpp
   ../Mail/*.cpp
+  ../FileTest/*.cpp
   ../*.cpp
  }
- includes += ../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../IObject ../TinyXML ../Mail
+ includes += ../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../IObject ../TinyXML ../Mail ../FileTest
  macros += __LINUX__
 
   specific(make) {

@@ -80,20 +80,20 @@ void CFileTestManager::HandlerServerResponse(uint32 u4ConnectID)
 
     if(iter != m_mapResponseRecordSt.end())
     {
-        ResponseRecordSt& objResponseRecord = (ResponseRecordSt)iter->second;
+        ResponseRecordSt& objResponseRecord = (ResponseRecordSt&)iter->second;
 
         if(objResponseRecord.m_u1ResponseCount + 1 == m_n4ResponseCount)
         {
             ACE_Time_Value atvResponse = ACE_OS::gettimeofday();
 
-            if(m_n4ExpectTime <= atvResponse.get_msec() - objResponseRecord.m_u8StartTime)
+            if(m_n4ExpectTime <= (int)((uint64)atvResponse.get_msec() - objResponseRecord.m_u8StartTime))
             {
                 //应答时间超过期望时间限制
                 OUR_DEBUG((LM_INFO, "[CFileTestManager::HandlerServerResponse]Response time too long m_n4ExpectTime:%d.\n",m_n4ExpectTime));
             }
 
 #ifndef WIN32
-            App_ConnectAcceptorManager::instance()->Close(u4ConnectID);
+            App_ConnectManager::instance()->Close(u4ConnectID);
 #else
             App_ProConnectManager::instance()->Close(u4ConnectID);
 #endif
@@ -320,6 +320,11 @@ int CFileTestManager::ReadTestFile(const char* pFileName, int nType, FileTestDat
 
 int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 {
+    if (NULL != arg)
+    {
+        OUR_DEBUG((LM_INFO, "[CFileTestManager::handle_timeout]arg is not NULL.\n"));
+    }
+
 #ifndef WIN32
     vector<uint32> vecu4ConnectID;
     CConnectHandler* pConnectHandler = NULL;
@@ -327,13 +332,14 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
     for (int iLoop = 0; iLoop < m_n4ConnectCount; iLoop++)
     {
         pConnectHandler = App_ConnectHandlerPool::instance()->Create();
-        //文件数据包测试不需要用到pProactor对象，因为不需要实际发送数据，所以这里可以直接设置一个固定的pProactor
-        ACE_Reactor* pReactor = App_ReactorManager::instance()->GetAce_Client_Reactor(0);
-        pConnectHandler->reactor(pReactor);
-        pConnectHandler->SetPacketParseInfoID(m_u4ParseID);
 
-        if (-1 != n4Result)
+        if (NULL != pConnectHandler)
         {
+            //文件数据包测试不需要用到pProactor对象，因为不需要实际发送数据，所以这里可以直接设置一个固定的pProactor
+            ACE_Reactor* pReactor = App_ReactorManager::instance()->GetAce_Client_Reactor(0);
+            pConnectHandler->reactor(pReactor);
+            pConnectHandler->SetPacketParseInfoID(m_u4ParseID);
+
             uint32 u4ConnectID = pConnectHandler->file_open(dynamic_cast<IFileTestManager*>(this));
 
             if (0 != u4ConnectID)
@@ -351,14 +357,14 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
         }
     }
 
-    for (int iLoop = 0; iLoop < m_vecFileTestDataInfoSt.size(); iLoop++)
+    for (int iLoop = 0; iLoop < (int)m_vecFileTestDataInfoSt.size(); iLoop++)
     {
         FileTestDataInfoSt& objFileTestDataInfo = m_vecFileTestDataInfoSt[iLoop];
 
-        for (int jLoop = 0; jLoop < vecu4ConnectID.size(); jLoop++)
+        for (int jLoop = 0; jLoop < (int)vecu4ConnectID.size(); jLoop++)
         {
             uint32 u4ConnectID = vecu4ConnectID[jLoop];
-            App_ConnectAcceptorManager::instance()->handle_write_file_stream(u4ConnectID, objFileTestDataInfo.m_szData, objFileTestDataInfo.m_u4DataLength, m_u4ParseID);
+            App_ConnectManager::instance()->handle_write_file_stream(u4ConnectID, objFileTestDataInfo.m_szData, objFileTestDataInfo.m_u4DataLength, m_u4ParseID);
         }
     }
 
@@ -369,13 +375,14 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
     for (int iLoop = 0; iLoop < m_n4ConnectCount; iLoop++)
     {
         ptrProConnectHandle = App_ProConnectHandlerPool::instance()->Create();
-        //文件数据包测试不需要用到pProactor对象，因为不需要实际发送数据，所以这里可以直接设置一个固定的pProactor
-        ACE_Proactor* pPractor = App_ProactorManager::instance()->GetAce_Client_Proactor(0);
-        ptrProConnectHandle->proactor(pPractor);
-        ptrProConnectHandle->SetPacketParseInfoID(m_u4ParseID);
 
         if (NULL != ptrProConnectHandle)
         {
+            //文件数据包测试不需要用到pProactor对象，因为不需要实际发送数据，所以这里可以直接设置一个固定的pProactor
+            ACE_Proactor* pPractor = App_ProactorManager::instance()->GetAce_Client_Proactor(0);
+            ptrProConnectHandle->proactor(pPractor);
+            ptrProConnectHandle->SetPacketParseInfoID(m_u4ParseID);
+
             uint32 u4ConnectID = ptrProConnectHandle->file_open(dynamic_cast<IFileTestManager*>(this));
 
             if (0 != u4ConnectID)
@@ -393,11 +400,11 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
         }
     }
 
-    for (int iLoop = 0; iLoop < m_vecFileTestDataInfoSt.size(); iLoop++)
+    for (int iLoop = 0; iLoop < (int)m_vecFileTestDataInfoSt.size(); iLoop++)
     {
         FileTestDataInfoSt& objFileTestDataInfo = m_vecFileTestDataInfoSt[iLoop];
 
-        for (int jLoop = 0; jLoop < vecu4ConnectID.size(); jLoop++)
+        for (int jLoop = 0; jLoop < (int)vecu4ConnectID.size(); jLoop++)
         {
             uint32 u4ConnectID = vecu4ConnectID[jLoop];
             App_ProConnectManager::instance()->handle_write_file_stream(u4ConnectID, objFileTestDataInfo.m_szData, objFileTestDataInfo.m_u4DataLength, m_u4ParseID);
@@ -414,9 +421,9 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 
         for(mapResponseRecordSt::iterator iter= m_mapResponseRecordSt.begin(); iter!=m_mapResponseRecordSt.end(); iter++)
         {
-            ResponseRecordSt& objResponseRecord = (ResponseRecordSt)iter->second;
+            ResponseRecordSt& objResponseRecord = (ResponseRecordSt&)iter->second;
 
-            if(m_n4ExpectTime <= tv.get_msec() - objResponseRecord.m_u8StartTime)
+            if(m_n4ExpectTime <= (int)((uint64)tv.get_msec() - objResponseRecord.m_u8StartTime))
             {
                 //应答时间超过期望时间限制
                 OUR_DEBUG((LM_INFO, "[CFileTestManager::handle_timeout]Response time too long m_n4ExpectTime:%d.\n",m_n4ExpectTime));

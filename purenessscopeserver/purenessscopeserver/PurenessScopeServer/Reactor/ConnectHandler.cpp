@@ -847,7 +847,6 @@ uint32 CConnectHandler::file_open(IFileTestManager* pFileTest)
                            App_MainConfig::instance()->GetClientDataAlert()->m_u4SendPacketCount,
                            App_MainConfig::instance()->GetClientDataAlert()->m_u4SendDataMax);
 
-    int nRet = 0;
     /*
     int nRet = ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>::open();
     if(nRet != 0)
@@ -997,7 +996,7 @@ int CConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Size, 
         if (false == blStateHead)
         {
             OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::handle_write_file_stream](%d) Parse_Packet_Head_Info is illegal.\n", GetConnectID()));
-            ClearPacketParse(*pMbHead);
+            ClearPacketParse();
             return -1;
         }
 
@@ -1029,7 +1028,7 @@ int CConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Size, 
             OUR_DEBUG((LM_ERROR, "[CProConnectHandle::handle_write_file_stream]Parse_Packet_Body_Info is illegal.\n"));
 
             //清理PacketParse
-            ClearPacketParse(*pMbBody);
+            ClearPacketParse();
             return -1;
         }
         else
@@ -1087,13 +1086,13 @@ int CConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Size, 
         {
             OUR_DEBUG((LM_ERROR, "[CProConnectHandle::handle_write_file_stream]Parse_Packet_Stream is PACKET_GET_NO_ENOUGTH.\n"));
             //接收的数据不完整
-            ClearPacketParse(*pMbStream);
+            ClearPacketParse();
             return -1;
         }
         else
         {
             OUR_DEBUG((LM_ERROR, "[CProConnectHandle::handle_write_file_stream]Parse_Packet_Stream is PACKET_GET_ERROR.\n"));
-            ClearPacketParse(*pMbStream);
+            ClearPacketParse();
             return -1;
         }
     }
@@ -1454,7 +1453,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
             m_pFileTest->HandlerServerResponse(GetConnectID());
         }
 
-        if (blDelete = true)
+        if (blDelete == true)
         {
             App_BuffPacketManager::instance()->Delete(pBuffPacket);
         }

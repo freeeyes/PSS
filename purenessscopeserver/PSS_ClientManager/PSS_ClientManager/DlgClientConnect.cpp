@@ -490,7 +490,7 @@ void CDlgClientConnect::OnBnClickedButton15()
     //Í£Ö¹²âÊÔ
     char szSendMessage[200] = { '\0' };
     char szCommand[100] = { '\0' };
-    sprintf_s(szCommand, 100, "%s TestFileStop", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s TestFileStop -a", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(szSendMessage, 200, &nSendLen, sizeof(int));

@@ -1289,7 +1289,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
             m_pFileTest->HandlerServerResponse(GetConnectID());
         }
 
-        if (blDelete = true)
+        if (blDelete == true)
         {
             App_BuffPacketManager::instance()->Delete(pBuffPacket);
         }
