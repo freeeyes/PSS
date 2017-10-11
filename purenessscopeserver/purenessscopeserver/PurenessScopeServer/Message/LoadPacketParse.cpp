@@ -123,10 +123,9 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
 _Packet_Parse_Info* CLoadPacketParse::GetPacketParseInfo(uint32 u4PacketParseID)
 {
     char szPacketID[10] = { '\0' };
-    _Packet_Parse_Info* pPacketParseInfo = NULL;
     sprintf_safe(szPacketID, 10, "%d", u4PacketParseID);
 
-    pPacketParseInfo = m_objPacketParseList.Get_Hash_Box_Data(szPacketID);
+    _Packet_Parse_Info* pPacketParseInfo = m_objPacketParseList.Get_Hash_Box_Data(szPacketID);
 
     if(NULL == pPacketParseInfo)
     {
