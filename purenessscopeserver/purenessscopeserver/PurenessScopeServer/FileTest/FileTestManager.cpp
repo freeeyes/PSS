@@ -2,13 +2,14 @@
 
 CFileTestManager::CFileTestManager(void)
 {
-    m_bFileTesting = false;
-    m_n4TimerID = 0;
-    m_n4ConnectCount = 0;
-    m_u4ParseID = 0;
-
-    m_n4ResponseCount = 0;
-    m_n4ExpectTime = 1000;
+    m_bFileTesting     = false;
+    m_n4TimerID        = 0;
+    m_n4ConnectCount   = 0;
+    m_u4ParseID        = 0;
+    m_n4ResponseCount  = 0;
+    m_n4ExpectTime     = 1000;
+    m_n4ContentType    = 1;
+    m_n4TimeInterval   = 0;
     m_mapResponseRecordSt.clear();
 }
 
@@ -419,7 +420,7 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
         ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
         m_atvLastCheck = tv;
 
-        for(mapResponseRecordSt::iterator iter= m_mapResponseRecordSt.begin(); iter!=m_mapResponseRecordSt.end(); iter++)
+        for(mapResponseRecordSt::iterator iter= m_mapResponseRecordSt.begin(); iter!=m_mapResponseRecordSt.end(); ++iter)
         {
             ResponseRecordSt& objResponseRecord = (ResponseRecordSt&)iter->second;
 

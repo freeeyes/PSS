@@ -34,7 +34,7 @@ struct _SendMessage
 
         _SendMessage** ppMessage = (_SendMessage**)m_pmbQueuePtr->base();
         *ppMessage = this;
-
+        m_nHashID  = 0;
     }
 
     //¿½±´¹¹Ôìº¯Êý
