@@ -74,8 +74,7 @@ static bool Convert_Version(int nTagVserion)
 
 #define CONVERT_ACE_VERSION Convert_Version(6200)
 */
-
-#define MAX_CONSOLE_HEAD_LENGTH 4   //声明console的数据包头大小
+#define CONSOLE_PACKET_MAX_SIZE  200 //声明console的数据包大小
 
 //根据不同的操作系统，定义不同的recv接收参数类型
 #ifdef WIN32

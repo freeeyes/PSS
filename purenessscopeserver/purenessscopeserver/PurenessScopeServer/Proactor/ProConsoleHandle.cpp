@@ -258,15 +258,25 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
             m_pPacketParse->SetPacketBody(GetConnectID(), &mb, App_MessageBlockManager::instance());
 
             CheckMessage();
-            SAFE_DELETE(m_pPacketParse);
-            m_pPacketParse = new CConsolePacketParse();
-
-            Close();
-
-            //接受下一个数据包
-            RecvClinetPacket(MAX_CONSOLE_HEAD_LENGTH);
-
         }
+
+        if (m_pPacketParse->GetMessageHead() != NULL)
+        {
+            App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
+        }
+
+        if (m_pPacketParse->GetMessageBody() != NULL)
+        {
+            App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
+        }
+
+        SAFE_DELETE(m_pPacketParse);
+        m_pPacketParse = new CConsolePacketParse();
+
+        Close();
+
+        //接受下一个数据包
+        RecvClinetPacket(CONSOLE_PACKET_MAX_SIZE);
     }
 
     return;
