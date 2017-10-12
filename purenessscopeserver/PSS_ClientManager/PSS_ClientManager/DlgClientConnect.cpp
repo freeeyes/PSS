@@ -64,15 +64,14 @@ void CDlgClientConnect::OnBnClickedButton1()
     // TODO: Add your control notification handler code here
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s ClientCount -cp", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s ClientCount -cp\n", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
-    memcpy_s(szSendMessage, 200, &nSendLen, sizeof(int));
-    memcpy_s(&szSendMessage[4], 200, &szCommand, nSendLen);
+    memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
 
     char szRecvBuff[10 * 1024] = {'\0'};
     int nRecvLen = 10 * 1024;
-    bool blState = m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen + sizeof(int), (char*)szRecvBuff, nRecvLen);
+    bool blState = m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen, (char*)szRecvBuff, nRecvLen);
 
     if(blState == false)
     {
@@ -101,14 +100,13 @@ void CDlgClientConnect::OnBnClickedButton1()
     }
 
     //获得CPU和内存占用量
-    sprintf_s(szCommand, 100, "%s ShowCurrProcessInfo -a", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s ShowCurrProcessInfo -a\n", m_pTcpClientConnect->GetKey());
     nSendLen = (int)strlen(szCommand);
 
-    memcpy_s(szSendMessage, 200, &nSendLen, sizeof(int));
-    memcpy_s(&szSendMessage[4], 200, &szCommand, nSendLen);
+    memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
 
     nRecvLen = 10 * 1024;
-    blState = m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen + sizeof(int), (char*)szRecvBuff, nRecvLen);
+    blState = m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen, (char*)szRecvBuff, nRecvLen);
 
     if(blState == false)
     {
@@ -182,15 +180,14 @@ void CDlgClientConnect::OnBnClickedButton6()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s ShowConnectHistory -a", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s ShowConnectHistory -a\n", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
-    memcpy_s(szSendMessage, 200, &nSendLen, sizeof(int));
-    memcpy_s(&szSendMessage[4], 200, &szCommand, nSendLen);
+    memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
 
     char szRecvBuff[100 * 1024] = {'\0'};
     int nRecvLen = 100 * 1024;
-    bool blState = m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen + sizeof(int), (char*)szRecvBuff, nRecvLen);
+    bool blState = m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen, (char*)szRecvBuff, nRecvLen);
 
     if(blState == false)
     {
@@ -263,15 +260,14 @@ void CDlgClientConnect::OnBnClickedButton5()
     //获得DEBUG状态
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s ShowDebug -a", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s ShowDebug -a\n", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
-    memcpy_s(szSendMessage, 200, &nSendLen, sizeof(int));
-    memcpy_s(&szSendMessage[4], 200, &szCommand, nSendLen);
+    memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
 
     char szRecvBuff[10 * 1024] = {'\0'};
     int nRecvLen = 10 * 1024;
-    bool blState = m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen + sizeof(int), (char*)szRecvBuff, nRecvLen);
+    bool blState = m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen, (char*)szRecvBuff, nRecvLen);
 
     if(blState == false)
     {
@@ -314,15 +310,14 @@ void CDlgClientConnect::OnBnClickedButton4()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s SetDebug -s %d ", m_pTcpClientConnect->GetKey(), nType);
+    sprintf_s(szCommand, 100, "%s SetDebug -s %d \n", m_pTcpClientConnect->GetKey(), nType);
     int nSendLen = (int)strlen(szCommand);
 
-    memcpy_s(szSendMessage, 200, &nSendLen, sizeof(int));
-    memcpy_s(&szSendMessage[4], 200, &szCommand, nSendLen);
+    memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
 
     char szRecvBuff[10 * 1024] = {'\0'};
     int nRecvLen = 10 * 1024;
-    bool blState = m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen + sizeof(int), (char*)szRecvBuff, nRecvLen);
+    bool blState = m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen, (char*)szRecvBuff, nRecvLen);
 
     if(blState == false)
     {
@@ -364,15 +359,14 @@ void CDlgClientConnect::OnBnClickedButton12()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s SetMaxConnectCount -n %d ", m_pTcpClientConnect->GetKey(), nMaxConnectCount);
+    sprintf_s(szCommand, 100, "%s SetMaxConnectCount -n %d \n", m_pTcpClientConnect->GetKey(), nMaxConnectCount);
     int nSendLen = (int)strlen(szCommand);
 
-    memcpy_s(szSendMessage, 200, &nSendLen, sizeof(int));
-    memcpy_s(&szSendMessage[4], 200, &szCommand, nSendLen);
+    memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
 
     char szRecvBuff[100 * 1024] = {'\0'};
     int nRecvLen = 100 * 1024;
-    bool blState = m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen + sizeof(int), (char*)szRecvBuff, nRecvLen);
+    bool blState = m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen, (char*)szRecvBuff, nRecvLen);
 
     if(blState == false)
     {
@@ -418,15 +412,14 @@ void CDlgClientConnect::OnBnClickedButton14()
 
     char szSendMessage[200] = { '\0' };
     char szCommand[100] = { '\0' };
-    sprintf_s(szCommand, 100, "%s TestFileStart -f %s", m_pTcpClientConnect->GetKey(), szPacketFileName);
+    sprintf_s(szCommand, 100, "%s TestFileStart -f %s\n", m_pTcpClientConnect->GetKey(), szPacketFileName);
     int nSendLen = (int)strlen(szCommand);
 
-    memcpy_s(szSendMessage, 200, &nSendLen, sizeof(int));
-    memcpy_s(&szSendMessage[4], 200, &szCommand, nSendLen);
+    memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
 
     char szRecvBuff[100 * 1024] = { '\0' };
     int nRecvLen = 100 * 1024;
-    bool blState = m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen + sizeof(int), (char*)szRecvBuff, nRecvLen);
+    bool blState = m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen, (char*)szRecvBuff, nRecvLen);
 
     if (blState == false)
     {
@@ -490,15 +483,14 @@ void CDlgClientConnect::OnBnClickedButton15()
     //停止测试
     char szSendMessage[200] = { '\0' };
     char szCommand[100] = { '\0' };
-    sprintf_s(szCommand, 100, "%s TestFileStop -a", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s TestFileStop -a\n", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
-    memcpy_s(szSendMessage, 200, &nSendLen, sizeof(int));
-    memcpy_s(&szSendMessage[4], 200, &szCommand, nSendLen);
+    memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
 
     char szRecvBuff[100 * 1024] = { '\0' };
     int nRecvLen = 100 * 1024;
-    bool blState = m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen + sizeof(int), (char*)szRecvBuff, nRecvLen);
+    bool blState = m_pTcpClientConnect->SendConsoleMessage(szSendMessage, nSendLen, (char*)szRecvBuff, nRecvLen);
 
     if (blState == false)
     {
