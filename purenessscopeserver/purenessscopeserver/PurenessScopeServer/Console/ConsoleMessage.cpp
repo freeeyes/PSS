@@ -26,9 +26,9 @@ int CConsoleMessage::Dispose(ACE_Message_Block* pmb, IBuffPacket* pBuffPacket)
         return CONSOLE_MESSAGE_FAIL;
     }
 
-    pCommand[(uint32)pmb->length()] = '\0';
+    pCommand[(uint32)pmb->length() - 1] = '\0';
 
-    memcpy_safe((char* )pmb->rd_ptr(), (uint32)pmb->length(), pCommand, (uint32)pmb->length() + 1);
+    memcpy_safe((char* )pmb->rd_ptr(), (uint32)pmb->length() - 1, pCommand, (uint32)pmb->length() - 1);
 
     //解析命令，把数据切割出来
     if(CONSOLE_MESSAGE_SUCCESS != ParseCommand(pCommand, pBuffPacket))

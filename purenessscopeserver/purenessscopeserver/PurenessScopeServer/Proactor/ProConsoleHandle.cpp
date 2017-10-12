@@ -163,7 +163,7 @@ void CProConsoleHandle::open(ACE_HANDLE h, ACE_Message_Block&)
         return;
     }
 
-    RecvClinetPacket(MAX_CONSOLE_HEAD_LENGTH);
+    RecvClinetPacket(CONSOLE_PACKET_MAX_SIZE);
 
     return;
 }
@@ -206,6 +206,70 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
 
     m_atvInput = ACE_OS::gettimeofday();
 
+
+    const char* pData = mb.rd_ptr();
+    uint32 u4Len = (uint32)mb.length();
+
+    //判断命令最后一个是不是一个\n
+    if (pData[u4Len - 1] != '\n')
+    {
+        //短读 继续读
+        int nRead = (int)result.bytes_to_read() - (int)result.bytes_transferred();
+
+        if (-1 == m_Reader.read(mb, nRead))
+        {
+            if (m_pPacketParse->GetMessageHead() != NULL)
+            {
+                App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
+            }
+
+            if (m_pPacketParse->GetMessageBody() != NULL)
+            {
+                App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
+            }
+
+            if (&mb != m_pPacketParse->GetMessageHead() && &mb != m_pPacketParse->GetMessageBody())
+            {
+                App_MessageBlockManager::instance()->Close(&mb);
+            }
+
+            SAFE_DELETE(m_pPacketParse);
+
+            OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_read_stream]Read Shoter error(%d).", errno));
+            //AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount);
+            //因为是要关闭连接，所以要多关闭一次IO，对应Open设置的1的初始值
+
+            Close(2);
+            return;
+        }
+    }
+    else
+    {
+        //完整命令包
+        ACE_Message_Block* pmbHead = App_MessageBlockManager::instance()->Create(sizeof(int));
+
+        if (NULL != pmbHead)
+        {
+            //组装包头
+            memcpy_safe(pmbHead->wr_ptr(), sizeof(int), (char* )&u4Len, sizeof(int));
+            pmbHead->wr_ptr(sizeof(int));
+            m_pPacketParse->SetPacketHead(GetConnectID(), pmbHead, App_MessageBlockManager::instance());
+            //组装包体
+            m_pPacketParse->SetPacketBody(GetConnectID(), &mb, App_MessageBlockManager::instance());
+
+            CheckMessage();
+            SAFE_DELETE(m_pPacketParse);
+            m_pPacketParse = new CConsolePacketParse();
+
+            Close();
+
+            //接受下一个数据包
+            RecvClinetPacket(MAX_CONSOLE_HEAD_LENGTH);
+
+        }
+    }
+
+    /*
     if(result.bytes_transferred() < result.bytes_to_read())
     {
         //短读，继续读
@@ -291,6 +355,7 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
             RecvClinetPacket(MAX_CONSOLE_HEAD_LENGTH);
         }
     }
+    */
 
     return;
 }

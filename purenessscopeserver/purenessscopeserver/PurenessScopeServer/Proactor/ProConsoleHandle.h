@@ -21,6 +21,8 @@
 #include "Fast_Asynch_Read_Stream.h"
 #include "MessageBlockManager.h"
 
+#define CONSOLE_PACKET_MAX_SIZE  200
+
 class CProConsoleHandle : public ACE_Service_Handler
 {
 public:
