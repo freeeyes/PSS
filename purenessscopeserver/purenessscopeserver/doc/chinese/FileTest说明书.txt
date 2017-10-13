@@ -1,0 +1,27 @@
+FileTest使用说明书
+
+设计初衷：
+由于PurenessScopeServer框架本身有时候会有新的功能开发或者优化，以及基于PurenessScopeServer框架的逻辑动态库也会有新的功能开发或者优化，
+这时候的改动有可能会影响到旧的代码逻辑，为了能够验证旧有的逻辑是否正确，PurenessScopeServer框架实现了一套模拟正常通讯协议通讯流程的
+FileTest回归测试逻辑，以便使用者能对已有的改动做个简单的回归测试验证是否有问题。
+
+如何使用：
+如果想使用以上实现的FileTest回归测试逻辑，你需要获取到你的一套独立的逻辑协议的所有请求协议，开发者可以通过打开PurenessScopeServer框架
+的debug日志开关抓取到的请求协议二进制内容,或者直接保存协议文本内容(是二进制协议还是文本协议这取决于你的协议解析模块的实现，比如你自定义
+包含包头包体的协议可能要用到二进制内容，而流模式协议如http可能要使用文本协议)。获取到的协议内容按照协议逻辑每条请求单独的保存到一个文本
+里面。然后你需要参照FileTestCfg.xml文件来配置的FileTest文件测试配置信息，内容如下：
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<!-- 文件测试相关设置 ContentType=1是二进制协议,0是文本协议,ResponseCount表示整组协议期望的应答条数,ExpectTime期望测试时总的耗时(单位毫秒)-->
+	<FileTestConfig Path="./FileTest/" TimeInterval="10" ConnectCount="1" ResponseCount="1" ExpectTime="500" ParseID="1" ContentType="1" Desc="文件测试相关设置" />
+	<!-- 协议文件信息,协议文件需要按照业务逻辑先后顺序配置,其中FileName是包含协议内容的文件名-->
+	<!-- FileInfo可以是多个，单一数据包目前大小不能超过10K -->
+	<FileInfo FileName="1.txt" Desc="PSS 测试" />
+</Config>
+配置好对应的一组逻辑测试协议配置文件后放到对应的PurenessScopeServer二进制文件所在的目录里面，然后通过启动PSS_ClientManager管理工具在客户端连
+接管理标签页下面数据包文件路径文本框输入你自己配置的文件测试配置文件名称，接着点击启动文件按钮，如果测试配置文件配置没有问题的话此时filetest
+流程正常启动，如需停止的话直接点击停止文件按钮即可。
+
+结果查看：
+可以再启动文件测试功能按钮运行一段时间后查看框架输出的日志文件，如果日志中出现"Response time too long m_n4ExpectTime"等日志内容说明程序出现问了问题。
+可能的原因是1、某一组协议的执行时间过长超过了期望的时间;2、程序执行异常没有收到期望的对应条数的应答。此时需要使用者去跟踪定位原因解决对应的问题。
