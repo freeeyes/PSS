@@ -9,7 +9,7 @@ CConsoleMessage::~CConsoleMessage()
 {
 }
 
-int CConsoleMessage::Dispose(ACE_Message_Block* pmb, IBuffPacket* pBuffPacket)
+int CConsoleMessage::Dispose(ACE_Message_Block* pmb, IBuffPacket* pBuffPacket, uint8& u1OutputType)
 {
     //处理命令
     if(NULL == pmb)
@@ -41,7 +41,7 @@ int CConsoleMessage::Dispose(ACE_Message_Block* pmb, IBuffPacket* pBuffPacket)
     }
 
     //解析命令，把数据切割出来
-    if(CONSOLE_MESSAGE_SUCCESS != ParseCommand(pCommand, pBuffPacket))
+    if(CONSOLE_MESSAGE_SUCCESS != ParseCommand(pCommand, pBuffPacket, u1OutputType))
     {
         SAFE_DELETE_ARRAY(pCommand);
         return CONSOLE_MESSAGE_FAIL;
@@ -117,17 +117,17 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
         return false;
     }
 
-    memcpy_safe(pCommandBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), (int)(pParamBegin - pCommandBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING)), (char*)CommandInfo.m_szCommandTitle, (int)(pParamBegin - pCommandBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING)));
+    memcpy_safe(pCommandBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), (int)(pParamBegin - pCommandBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING)), (char*)CommandInfo.m_szCommandTitle, (int)(pParamBegin - pCommandBegin - (int)ACE_OS::strlen(COMMAND_SPLIT_STRING)));
     CommandInfo.m_szCommandTitle[(int)(pParamBegin - pCommandBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING))] = '\0';
 
     //获得扩展参数
-    memcpy_safe(pParamBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), (nLen - (pParamBegin - pCommand - ACE_OS::strlen(COMMAND_SPLIT_STRING)) + 1), (char*)CommandInfo.m_szCommandExp, (nLen - (pParamBegin - pCommand - ACE_OS::strlen(COMMAND_SPLIT_STRING)) + 1));
+    memcpy_safe(pParamBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), (nLen - (pParamBegin - pCommand - ACE_OS::strlen(COMMAND_SPLIT_STRING)) + 1), (char*)CommandInfo.m_szCommandExp, (nLen - (pParamBegin - pCommand - (int)ACE_OS::strlen(COMMAND_SPLIT_STRING)) + 1));
     CommandInfo.m_szCommandExp[(nLen - (pParamBegin - pCommand - ACE_OS::strlen(COMMAND_SPLIT_STRING)) + 1)] = '\0';
 
     return true;
 }
 
-int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket)
+int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket, uint8& u1OutputType)
 {
     _CommandInfo CommandInfo;
     uint16       u2ReturnCommandID = CONSOLE_COMMAND_UNKNOW;
@@ -145,6 +145,8 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
         OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]pCommand format is error.\n"));
         return CONSOLE_MESSAGE_FAIL;
     }
+
+    u1OutputType = CommandInfo.m_u1OutputType;
 
     if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_LOADMOUDLE) == 0)
     {
@@ -344,8 +346,15 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
         return CONSOLE_MESSAGE_FAIL;
     }
 
-    (*pBuffPacket) << u2ReturnCommandID;
-    pBuffPacket->WriteStream(pCurrBuffPacket->GetData(), pCurrBuffPacket->GetPacketLen());
+    if (CommandInfo.m_u1OutputType == 0)
+    {
+        (*pBuffPacket) << u2ReturnCommandID;
+        pBuffPacket->WriteStream(pCurrBuffPacket->GetData(), pCurrBuffPacket->GetPacketLen());
+    }
+    else
+    {
+        pBuffPacket->WriteStream(pCurrBuffPacket->GetData(), pCurrBuffPacket->GetPacketLen());
+    }
 
     //释放临时数据包体
     App_BuffPacketManager::instance()->Delete(pCurrBuffPacket);
@@ -1610,7 +1619,7 @@ bool CConsoleMessage::DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffP
                          App_MainConfig::instance()->GetServerVersion(),
                          szCharOrder);
 
-            pBuffPacket->WriteStream(szConsoleOutput, ACE_OS::strlen(szConsoleOutput));
+            pBuffPacket->WriteStream(szConsoleOutput, (uint32)ACE_OS::strlen(szConsoleOutput));
         }
     }
 

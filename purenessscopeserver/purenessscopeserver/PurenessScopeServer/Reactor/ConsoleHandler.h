@@ -32,7 +32,7 @@ public:
     virtual int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE);
     virtual int handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask);
 
-    bool SendMessage(IBuffPacket* pBuffPacket);
+    bool SendMessage(IBuffPacket* pBuffPacket, uint8 u1OutputType);
 
     bool Close(int nIOCount = 1);
     bool ServerClose();

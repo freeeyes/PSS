@@ -11,158 +11,169 @@ CTcpClientConnect::~CTcpClientConnect(void)
 
 void CTcpClientConnect::Init( const char* pIp, int nPort, const char* pKey )
 {
-	sprintf_s(m_szServerIP, 20, "%s", pIp);
-	sprintf_s(m_szConsoleKey, 50, "%s", pKey);
-	m_nServerPort = nPort;
+    sprintf_s(m_szServerIP, 20, "%s", pIp);
+    sprintf_s(m_szConsoleKey, 50, "%s", pKey);
+    m_nServerPort = nPort;
 }
 
 bool CTcpClientConnect::SendConsoleMessage( const char* pMessage, int nMessageLen, char* pRevBuff, int& nRecvLen )
 {
-	SOCKET sckClient;
-	char szBodyBuff[10*1024] = {'\0'};
-	int nPacketLen = 0;
+    SOCKET sckClient;
+    char szBodyBuff[10*1024] = {'\0'};
+    int nPacketLen = 0;
 
-	//socket创建的准备工作
-	struct sockaddr_in sockaddr;
+    //socket创建的准备工作
+    struct sockaddr_in sockaddr;
 
-	memset(&sockaddr, 0, sizeof(sockaddr));
-	sockaddr.sin_family = AF_INET;
-	sockaddr.sin_port   = htons(m_nServerPort);
-	sockaddr.sin_addr.S_un.S_addr = inet_addr(m_szServerIP);
+    char szSendData[500] = { '\0' };
+    sprintf_s(szSendData, 500, "b %s", pMessage);
+    int nSendDataLen = strlen(szSendData);
 
-	sckClient = socket(AF_INET, SOCK_STREAM, 0);
+    memset(&sockaddr, 0, sizeof(sockaddr));
+    sockaddr.sin_family = AF_INET;
+    sockaddr.sin_port   = htons(m_nServerPort);
+    sockaddr.sin_addr.S_un.S_addr = inet_addr(m_szServerIP);
 
-	//连接远程服务器
-	int nErr = connect(sckClient, (SOCKADDR*)&sockaddr, sizeof(SOCKADDR));
-	if(0 != nErr)
-	{
-		closesocket(sckClient);
-		return false;
-	}
+    sckClient = socket(AF_INET, SOCK_STREAM, 0);
 
-	int nTotalRecvLen = nRecvLen;
-	int nTotalSendLen = nMessageLen;
-	int nBeginSend    = 0;
-	int nCurrSendLen  = 0;
-	int nFinishRecv   = 0;
-	bool blSendFlag   = false;
+    //连接远程服务器
+    int nErr = connect(sckClient, (SOCKADDR*)&sockaddr, sizeof(SOCKADDR));
 
-	while(true)
-	{
-		nCurrSendLen = send(sckClient, pMessage + nBeginSend, nTotalSendLen - nBeginSend, 0);
-		if(nCurrSendLen <= 0)
-		{
-			closesocket(sckClient);
-			return false;
-		}
-		else
-		{
-			nTotalSendLen -= nCurrSendLen;
-			if(nTotalSendLen == 0)
-			{
-				//发送完成
-				blSendFlag = true;
-				break;
-			}
-			else
-			{
-				nBeginSend += nCurrSendLen;
-			}
-		}
-	}
+    if(0 != nErr)
+    {
+        closesocket(sckClient);
+        return false;
+    }
 
-	int nCurrRecvLen = 0;
-	int nBodyLen     = 0;
+    int nTotalRecvLen = nRecvLen;
+    int nTotalSendLen = nSendDataLen;
+    int nBeginSend    = 0;
+    int nCurrSendLen  = 0;
+    int nFinishRecv   = 0;
+    bool blSendFlag   = false;
 
-	//接收数据
-	if(blSendFlag == true)
-	{
-		//首先接收六字节数据头
-		char szHeadData[6] = {'\0'};
-		int nHeadLen = sizeof(int) + sizeof(short);
+    while(true)
+    {
+        nCurrSendLen = send(sckClient, szSendData + nBeginSend, nSendDataLen - nBeginSend, 0);
 
-		while(true)
-		{
-			int nLen = recv(sckClient, (char* )&szHeadData[nCurrRecvLen], nHeadLen - nCurrRecvLen, 0);
-			if(nLen <= 0)
-			{
-				closesocket(sckClient);
-				return false;
-			}
-			else
-			{
-				if(nLen + nCurrRecvLen >= nHeadLen)
-				{
-					break;
-				}
-				else
-				{
-					//接收未完成，继续接收
-					nCurrRecvLen += nLen;
-				}
-			}
-		}
+        if(nCurrSendLen <= 0)
+        {
+            closesocket(sckClient);
+            return false;
+        }
+        else
+        {
+            nTotalSendLen -= nCurrSendLen;
 
-		//获得数据包长度
-		memcpy_s(&nBodyLen, sizeof(int), szHeadData, sizeof(int));
-		if(nBodyLen <= 0 || nBodyLen >= 1024*1024)
-		{
-			closesocket(sckClient);
-			return false;
-		}
+            if(nTotalSendLen == 0)
+            {
+                //发送完成
+                blSendFlag = true;
+                break;
+            }
+            else
+            {
+                nBeginSend += nCurrSendLen;
+            }
+        }
+    }
 
-		//去掉命令头2字节的 CommandID
-		nBodyLen = nBodyLen - 2;
+    int nCurrRecvLen = 0;
+    int nBodyLen     = 0;
 
-		//开始接收数据体
-		nCurrRecvLen = 0;
-		while(true)
-		{
-			int nLen = recv(sckClient, (char* )&szBodyBuff[nCurrRecvLen], nBodyLen - nCurrRecvLen, 0);
-			if(nLen <= 0)
-			{
-				closesocket(sckClient);
-				return false;
-			}
-			else
-			{
-				if(nLen + nCurrRecvLen >= nBodyLen)
-				{
-					break;
-				}
-				else
-				{
-					//接收未完成，继续接收
-					nCurrRecvLen += nLen;
-				}
-			}
-		}
+    //接收数据
+    if(blSendFlag == true)
+    {
+        //首先接收六字节数据头
+        char szHeadData[6] = {'\0'};
+        int nHeadLen = sizeof(int) + sizeof(short);
 
-	}
+        while(true)
+        {
+            int nLen = recv(sckClient, (char* )&szHeadData[nCurrRecvLen], nHeadLen - nCurrRecvLen, 0);
 
-	memcpy_s(pRevBuff, nBodyLen, szBodyBuff, nBodyLen);
-	nRecvLen = nBodyLen;
+            if(nLen <= 0)
+            {
+                closesocket(sckClient);
+                return false;
+            }
+            else
+            {
+                if(nLen + nCurrRecvLen >= nHeadLen)
+                {
+                    break;
+                }
+                else
+                {
+                    //接收未完成，继续接收
+                    nCurrRecvLen += nLen;
+                }
+            }
+        }
 
-	closesocket(sckClient);
-	return true;
+        //获得数据包长度
+        memcpy_s(&nBodyLen, sizeof(int), szHeadData, sizeof(int));
+
+        if(nBodyLen <= 0 || nBodyLen >= 1024*1024)
+        {
+            closesocket(sckClient);
+            return false;
+        }
+
+        //去掉命令头2字节的 CommandID
+        nBodyLen = nBodyLen - 2;
+
+        //开始接收数据体
+        nCurrRecvLen = 0;
+
+        while(true)
+        {
+            int nLen = recv(sckClient, (char* )&szBodyBuff[nCurrRecvLen], nBodyLen - nCurrRecvLen, 0);
+
+            if(nLen <= 0)
+            {
+                closesocket(sckClient);
+                return false;
+            }
+            else
+            {
+                if(nLen + nCurrRecvLen >= nBodyLen)
+                {
+                    break;
+                }
+                else
+                {
+                    //接收未完成，继续接收
+                    nCurrRecvLen += nLen;
+                }
+            }
+        }
+
+    }
+
+    memcpy_s(pRevBuff, nBodyLen, szBodyBuff, nBodyLen);
+    nRecvLen = nBodyLen;
+
+    closesocket(sckClient);
+    return true;
 }
 
 char* CTcpClientConnect::GetKey()
 {
-	return m_szConsoleKey;
+    return m_szConsoleKey;
 }
 
 char* CTcpClientConnect::GetServerIP()
 {
-	return m_szServerIP;
+    return m_szServerIP;
 }
 
 int CTcpClientConnect::GetServerPort()
 {
-	return m_nServerPort;
+    return m_nServerPort;
 }
 
 char* CTcpClientConnect::GetServerKey()
 {
-	return m_szConsoleKey;
+    return m_szConsoleKey;
 }

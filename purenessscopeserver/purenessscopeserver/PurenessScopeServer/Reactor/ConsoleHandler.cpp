@@ -63,6 +63,7 @@ bool CConsoleHandler::Close(int nIOCount)
         }
 
         //msg_queue()->deactivate();
+        SAFE_DELETE(m_pPacketParse);
         shutdown();
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::Close]Close(%d) OK.\n", GetConnectID()));
         //AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount);
@@ -289,7 +290,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
     const char* pData = m_pCurrMessage->rd_ptr();
     uint32 u4Len = (uint32)m_pCurrMessage->length();
 
-    OUR_DEBUG((LM_INFO, "[CConsoleHandler::handle_input]<%d>Data is(%s).\n", nDataLen, pData));
+    //OUR_DEBUG((LM_INFO, "[CConsoleHandler::handle_input]<%d>Data is(%s).\n", nDataLen, pData));
     OUR_DEBUG((LM_INFO, "[CConsoleHandler::handle_input]End is(0x%02x).\n", pData[nDataLen - 1]));
 
     //如果没有读完，短读
@@ -372,7 +373,7 @@ uint8 CConsoleHandler::GetIsClosing()
     return m_u1IsClosing;
 }
 
-bool CConsoleHandler::SendMessage(IBuffPacket* pBuffPacket)
+bool CConsoleHandler::SendMessage(IBuffPacket* pBuffPacket, uint8 u1OutputType)
 {
     m_ThreadLock.acquire();
     m_nIOCount++;
@@ -387,10 +388,23 @@ bool CConsoleHandler::SendMessage(IBuffPacket* pBuffPacket)
         return false;
     }
 
-    int nSendLength = PacketParse.MakePacketLength(GetConnectID(), pBuffPacket->GetPacketLen());
-    ACE_Message_Block* pMbData = App_MessageBlockManager::instance()->Create(nSendLength);
-    //这里组成返回数据包
-    PacketParse.MakePacket(GetConnectID(), pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pMbData);
+    ACE_Message_Block* pMbData = NULL;
+
+    if (0 == u1OutputType)
+    {
+        int nSendLength = PacketParse.MakePacketLength(GetConnectID(), pBuffPacket->GetPacketLen());
+        pMbData = App_MessageBlockManager::instance()->Create(nSendLength);
+
+        //这里组成返回数据包
+        PacketParse.MakePacket(GetConnectID(), pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pMbData);
+    }
+    else
+    {
+        pMbData = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
+        memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pMbData->wr_ptr(), pBuffPacket->GetPacketLen());
+        pMbData->wr_ptr(pBuffPacket->GetPacketLen());
+    }
+
     App_BuffPacketManager::instance()->Delete(pBuffPacket);
     PutSendPacket(pMbData);
     return true;
@@ -491,13 +505,14 @@ bool CConsoleHandler::CheckMessage()
     IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create();
     //将数据Buff放入消息体中
     //将数据Buff放入消息体中，传递给处理类。
-    uint32 u4Return = (uint32)m_ConsoleMessage.Dispose(m_pPacketParse->GetMessageBody(), pBuffPacket);
+    uint8 u1Output = 0;
+    uint32 u4Return = (uint32)m_ConsoleMessage.Dispose(m_pPacketParse->GetMessageBody(), pBuffPacket, u1Output);
 
     if (CONSOLE_MESSAGE_SUCCESS == u4Return)
     {
         if (pBuffPacket->GetPacketLen() > 0)
         {
-            SendMessage(dynamic_cast<IBuffPacket*>(pBuffPacket));
+            SendMessage(dynamic_cast<IBuffPacket*>(pBuffPacket), u1Output);
         }
     }
     else if(CONSOLE_MESSAGE_FAIL == u4Return)

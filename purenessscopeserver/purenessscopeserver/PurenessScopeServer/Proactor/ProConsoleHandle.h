@@ -32,7 +32,7 @@ public:
     virtual void handle_write_stream(const ACE_Asynch_Write_Stream::Result& result);
     virtual void addresses(const ACE_INET_Addr& remote_address, const ACE_INET_Addr& local_address);
 
-    bool SendMessage(IBuffPacket* pBuffPacket);
+    bool SendMessage(IBuffPacket* pBuffPacket, uint8 u1OutputType);
     bool Close(int nIOCount = 1);
     bool ServerClose();
 
