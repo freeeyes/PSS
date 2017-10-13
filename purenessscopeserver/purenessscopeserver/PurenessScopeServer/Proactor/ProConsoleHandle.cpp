@@ -210,8 +210,11 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
     const char* pData = mb.rd_ptr();
     uint32 u4Len = (uint32)mb.length();
 
+    OUR_DEBUG((LM_INFO, "[CProConsoleHandle::handle_input]<%d>Data is(%s).\n", nDataLen, pData));
+    OUR_DEBUG((LM_INFO, "[CProConsoleHandle::handle_input]End is(0x%02x).\n", pData[nDataLen - 1]));
+
     //判断命令最后一个是不是一个\n
-    if (pData[u4Len - 1] != '\n')
+    if (pData[u4Len - 1] != '&' && pData[u4Len - 1] != 0x0d && pData[u4Len - 1] != 0x0a)
     {
         //短读 继续读
         int nRead = (int)result.bytes_to_read() - (int)result.bytes_transferred();

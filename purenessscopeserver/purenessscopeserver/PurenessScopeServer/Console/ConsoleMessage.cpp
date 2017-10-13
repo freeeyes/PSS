@@ -28,7 +28,17 @@ int CConsoleMessage::Dispose(ACE_Message_Block* pmb, IBuffPacket* pBuffPacket)
 
     pCommand[(uint32)pmb->length() - 1] = '\0';
 
-    memcpy_safe((char* )pmb->rd_ptr(), (uint32)pmb->length() - 1, pCommand, (uint32)pmb->length() - 1);
+    memcpy_safe((char* )pmb->rd_ptr(), (uint32)pmb->length(), pCommand, (uint32)pmb->length());
+
+    //去除数据尾部的终止符
+    if (pCommand[pmb->length() - 1] == '&')
+    {
+        pCommand[pmb->length() - 1] = '\0';
+    }
+    else
+    {
+        pCommand[pmb->length() - 3] = '\0';
+    }
 
     //解析命令，把数据切割出来
     if(CONSOLE_MESSAGE_SUCCESS != ParseCommand(pCommand, pBuffPacket))
@@ -45,7 +55,6 @@ int CConsoleMessage::Dispose(ACE_Message_Block* pmb, IBuffPacket* pBuffPacket)
 
 bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& CommandInfo)
 {
-    int i = 0;
     int nLen = (int)ACE_OS::strlen(pCommand);
     char szKey[MAX_BUFF_100] = {'\0'};
 
@@ -1592,7 +1601,7 @@ bool CConsoleMessage::DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffP
 
 
             char szConsoleOutput[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szConsoleOutput, MAX_BUFF_1024, "ServerID:%d\nServerName:%s\nServerVersion:%s\nServerModuleCount=%d\nWorkthreadCount:%d\nServerProtocol:%s\nCharOrder:%d\n",
+            sprintf_safe(szConsoleOutput, MAX_BUFF_1024, "ServerID:%d\nServerName:%s\nServerVersion:%s\nServerModuleCount=%d\nWorkthreadCount:%d\nServerProtocol:%s\nCharOrder:%s\n",
                          App_MainConfig::instance()->GetServerID(),
                          App_MainConfig::instance()->GetServerName(),
                          App_MainConfig::instance()->GetServerVersion(),

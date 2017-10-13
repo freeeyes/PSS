@@ -107,7 +107,7 @@ void CDlgClientMain::OnBnClickedButton2()
     // TODO: Add your control notification handler code here
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "b %s ShowServerInfo -a\n", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "b %s ShowServerInfo -a&", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -233,7 +233,7 @@ void CDlgClientMain::OnBnClickedButton3()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s ShowModule -a\n", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s ShowModule -a&", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -380,7 +380,7 @@ void CDlgClientMain::OnBnClickedButton4()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s UnLoadModule %s\n", m_pTcpClientConnect->GetKey(), szModuleName);
+    sprintf_s(szCommand, 100, "%s UnLoadModule %s&", m_pTcpClientConnect->GetKey(), szModuleName);
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -430,7 +430,7 @@ void CDlgClientMain::OnBnClickedButton5()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s ReLoadModule %s\n", m_pTcpClientConnect->GetKey(), szModuleName);
+    sprintf_s(szCommand, 100, "%s ReLoadModule %s&", m_pTcpClientConnect->GetKey(), szModuleName);
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -494,7 +494,7 @@ void CDlgClientMain::OnBnClickedButton7()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s LoadModule %s,%s,%s\n", m_pTcpClientConnect->GetKey(), szModulePath, szModuleFile, szModuleParam);
+    sprintf_s(szCommand, 100, "%s LoadModule %s,%s,%s&", m_pTcpClientConnect->GetKey(), szModulePath, szModuleFile, szModuleParam);
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -656,7 +656,7 @@ void CDlgClientMain::OnBnClickedButton12()
     {
         char szSendMessage[200] = {'\0'};
         char szCommand[100]     = {'\0'};
-        sprintf_s(szCommand, 100, "%s ServerClose -a\n", m_pTcpClientConnect->GetKey());
+        sprintf_s(szCommand, 100, "%s ServerClose -a&", m_pTcpClientConnect->GetKey());
         int nSendLen = (int)strlen(szCommand);
 
         memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);

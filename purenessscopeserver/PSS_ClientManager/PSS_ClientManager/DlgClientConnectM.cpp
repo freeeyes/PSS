@@ -63,7 +63,7 @@ void CDlgClientConnectM::OnBnClickedButton1()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s CloseClient %d\n", m_pTcpClientConnect->GetKey(), (int)atoi(szScoketFD));
+    sprintf_s(szCommand, 100, "%s CloseClient %d&", m_pTcpClientConnect->GetKey(), (int)atoi(szScoketFD));
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -106,7 +106,7 @@ void CDlgClientConnectM::OnBnClickedButton2()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s ConnectClient -a\n", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s ConnectClient -a&", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -267,7 +267,7 @@ void CDlgClientConnectM::OnBnClickedButton8()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s SetLogLevel -l %d\n", m_pTcpClientConnect->GetKey(), nLevel);
+    sprintf_s(szCommand, 100, "%s SetLogLevel -l %d&", m_pTcpClientConnect->GetKey(), nLevel);
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -304,7 +304,7 @@ void CDlgClientConnectM::OnBnClickedButton9()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s GetLogInfo -a\n", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s GetLogInfo -a&", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);

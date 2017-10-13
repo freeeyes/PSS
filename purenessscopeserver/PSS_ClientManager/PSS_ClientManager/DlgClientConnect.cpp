@@ -64,7 +64,7 @@ void CDlgClientConnect::OnBnClickedButton1()
     // TODO: Add your control notification handler code here
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s ClientCount -cp\n", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s ClientCount -cp&", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -100,7 +100,7 @@ void CDlgClientConnect::OnBnClickedButton1()
     }
 
     //获得CPU和内存占用量
-    sprintf_s(szCommand, 100, "%s ShowCurrProcessInfo -a\n", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s ShowCurrProcessInfo -a&", m_pTcpClientConnect->GetKey());
     nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -180,7 +180,7 @@ void CDlgClientConnect::OnBnClickedButton6()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s ShowConnectHistory -a\n", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s ShowConnectHistory -a&", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -260,7 +260,7 @@ void CDlgClientConnect::OnBnClickedButton5()
     //获得DEBUG状态
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s ShowDebug -a\n", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s ShowDebug -a&", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -310,7 +310,7 @@ void CDlgClientConnect::OnBnClickedButton4()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s SetDebug -s %d \n", m_pTcpClientConnect->GetKey(), nType);
+    sprintf_s(szCommand, 100, "%s SetDebug -s %d &", m_pTcpClientConnect->GetKey(), nType);
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -359,7 +359,7 @@ void CDlgClientConnect::OnBnClickedButton12()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s SetMaxConnectCount -n %d \n", m_pTcpClientConnect->GetKey(), nMaxConnectCount);
+    sprintf_s(szCommand, 100, "%s SetMaxConnectCount -n %d &", m_pTcpClientConnect->GetKey(), nMaxConnectCount);
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -412,7 +412,7 @@ void CDlgClientConnect::OnBnClickedButton14()
 
     char szSendMessage[200] = { '\0' };
     char szCommand[100] = { '\0' };
-    sprintf_s(szCommand, 100, "%s TestFileStart -f %s\n", m_pTcpClientConnect->GetKey(), szPacketFileName);
+    sprintf_s(szCommand, 100, "%s TestFileStart -f %s&", m_pTcpClientConnect->GetKey(), szPacketFileName);
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -442,11 +442,11 @@ void CDlgClientConnect::OnBnClickedButton14()
             char szCommandDesc[1024] = { '\0' };
             memcpy_s(&nData, sizeof(int), &szRecvBuff[nPos], sizeof(int));
             nPos += sizeof(int);
-            wsprintf(szTemp, _T("TimeInterval:[%d]\n"), nData);
+            wsprintf(szTemp, _T("TimeInterval:[%d]&"), nData);
             strTxt += szTemp;
             memcpy_s(&nData, sizeof(int), &szRecvBuff[nPos], sizeof(int));
             nPos += sizeof(int);
-            wsprintf(szTemp, _T("ProcolCount:[%d]\n"), nData);
+            wsprintf(szTemp, _T("ProcolCount:[%d]&"), nData);
             strTxt += szTemp;
             memcpy_s(&nData, sizeof(short), &szRecvBuff[nPos], sizeof(short));
             nPos += sizeof(short);
@@ -464,7 +464,7 @@ void CDlgClientConnect::OnBnClickedButton14()
                 int nSrcLen = MultiByteToWideChar(CP_UTF8, 0, szCommandDesc, -1, NULL, 0);
                 int nDecLen = MultiByteToWideChar(CP_UTF8, 0, szCommandDesc, -1, szDesc, 1024);
 
-                wsprintf(szTemp, _T("CommandDesc:[%s]\n"), szDesc);
+                wsprintf(szTemp, _T("CommandDesc:[%s]&"), szDesc);
                 strTxt += szTemp;
             }
 
@@ -483,7 +483,7 @@ void CDlgClientConnect::OnBnClickedButton15()
     //停止测试
     char szSendMessage[200] = { '\0' };
     char szCommand[100] = { '\0' };
-    sprintf_s(szCommand, 100, "%s TestFileStop -a\n", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s TestFileStop -a&", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);

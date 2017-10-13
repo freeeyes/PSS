@@ -58,7 +58,7 @@ void CDlgWorkThreadAI::OnBnClickedButton1()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s GetWorkThreadAI -a\n", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s GetWorkThreadAI -a&", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(szSendMessage, 200, &szCommand, nSendLen);
@@ -177,7 +177,7 @@ void CDlgWorkThreadAI::OnBnClickedButton2()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s GetWorkThreadTO -a\n", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s GetWorkThreadTO -a&", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -315,7 +315,7 @@ void CDlgWorkThreadAI::OnBnClickedButton3()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s SetWorkThreadAI -i %d,%d,%d,%d\n", m_pTcpClientConnect->GetKey(), nAI, nDisposeTime, nCheckTime, nStopTime);
+    sprintf_s(szCommand, 100, "%s SetWorkThreadAI -i %d,%d,%d,%d&", m_pTcpClientConnect->GetKey(), nAI, nDisposeTime, nCheckTime, nStopTime);
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);

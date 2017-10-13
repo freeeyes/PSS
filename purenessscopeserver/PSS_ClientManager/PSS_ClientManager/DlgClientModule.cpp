@@ -49,7 +49,7 @@ void CDlgClientModule::OnBnClickedButton2()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s ShowAllCommand -a\n", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s ShowAllCommand -a&", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -154,7 +154,7 @@ void CDlgClientModule::OnBnClickedButton1()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s CommandInfo %s\n", m_pTcpClientConnect->GetKey(), szCommandID);
+    sprintf_s(szCommand, 100, "%s CommandInfo %s&", m_pTcpClientConnect->GetKey(), szCommandID);
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -261,7 +261,7 @@ void CDlgClientModule::OnBnClickedButton8()
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
     char szCommandID[100]   = {'\0'};
-    sprintf_s(szCommand, 100, "%s CommandTimeout -a\n", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s CommandTimeout -a&", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -339,7 +339,7 @@ void CDlgClientModule::OnBnClickedButton9()
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
     char szCommandID[100]   = {'\0'};
-    sprintf_s(szCommand, 100, "%s CommandTimeoutclr -a\n", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s CommandTimeoutclr -a&", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -365,7 +365,7 @@ void CDlgClientModule::OnBnClickedButton10()
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
     char szCommandID[100]   = {'\0'};
-    sprintf_s(szCommand, 100, "%s CommandDataLog -a\n", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s CommandDataLog -a&", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);

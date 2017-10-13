@@ -56,7 +56,7 @@ void CDlgServerConnect::OnBnClickedButton2()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s ServerConnectTCP -a\n", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s ServerConnectTCP -a&", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -231,7 +231,7 @@ void CDlgServerConnect::OnBnClickedButton1()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s ReConnectServer -s %s\n", m_pTcpClientConnect->GetKey(), szServerIP);
+    sprintf_s(szCommand, 100, "%s ReConnectServer -s %s&", m_pTcpClientConnect->GetKey(), szServerIP);
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -371,7 +371,7 @@ void CDlgServerConnect::OnBnClickedButton8()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s ShowListen -a\n", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s ShowListen -a&", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -459,7 +459,7 @@ void CDlgServerConnect::OnBnClickedButton10()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s AddListen -i %s -p %d -t %d -n %d\n", m_pTcpClientConnect->GetKey(), szIP, nPort, nType, nPacketParseID);
+    sprintf_s(szCommand, 100, "%s AddListen -i %s -p %d -t %d -n %d&", m_pTcpClientConnect->GetKey(), szIP, nPort, nType, nPacketParseID);
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -522,7 +522,7 @@ void CDlgServerConnect::OnBnClickedButton13()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s DelListen -i %s -p %d -t %d \n", m_pTcpClientConnect->GetKey(), szIP, nPort, nType);
+    sprintf_s(szCommand, 100, "%s DelListen -i %s -p %d -t %d &", m_pTcpClientConnect->GetKey(), szIP, nPort, nType);
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);

@@ -88,7 +88,7 @@ void CDlgForbidenIP::OnBnClickedButton1()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s ForbiddenIP -c %s -t %d -s %s \n", m_pTcpClientConnect->GetKey(), szIP, nType, szSeconds);
+    sprintf_s(szCommand, 100, "%s ForbiddenIP -c %s -t %d -s %s &", m_pTcpClientConnect->GetKey(), szIP, nType, szSeconds);
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -141,7 +141,7 @@ void CDlgForbidenIP::OnBnClickedButton2()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s LiftedIP %s\n", m_pTcpClientConnect->GetKey(), szIP);
+    sprintf_s(szCommand, 100, "%s LiftedIP %s&", m_pTcpClientConnect->GetKey(), szIP);
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -207,7 +207,7 @@ void CDlgForbidenIP::OnBnClickedButton3()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s ShowForbiddenIP -a\n", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s ShowForbiddenIP -a&", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -345,7 +345,7 @@ void CDlgForbidenIP::OnBnClickedButton7()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s GetNickNameInfo -n %s\n", m_pTcpClientConnect->GetKey(), szNickName);
+    sprintf_s(szCommand, 100, "%s GetNickNameInfo -n %s&", m_pTcpClientConnect->GetKey(), szNickName);
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -436,11 +436,11 @@ bool CDlgForbidenIP::SendSetLog( int nConnectID, bool blFlag )
 
     if(blFlag == false)
     {
-        sprintf_s(szCommand, 100, "%s SetConnectLog -n %d -f 0 \n", m_pTcpClientConnect->GetKey(), nConnectID);
+        sprintf_s(szCommand, 100, "%s SetConnectLog -n %d -f 0 &", m_pTcpClientConnect->GetKey(), nConnectID);
     }
     else
     {
-        sprintf_s(szCommand, 100, "%s SetConnectLog -n %d -f 1 \n", m_pTcpClientConnect->GetKey(), nConnectID);
+        sprintf_s(szCommand, 100, "%s SetConnectLog -n %d -f 1 &", m_pTcpClientConnect->GetKey(), nConnectID);
     }
 
     int nSendLen = (int)strlen(szCommand);

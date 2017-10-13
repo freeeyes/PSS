@@ -89,7 +89,7 @@ void CDlgTrackIP::OnBnClickedButton1()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s SetTrackIP -c %s \n", m_pTcpClientConnect->GetKey(), szIP);
+    sprintf_s(szCommand, 100, "%s SetTrackIP -c %s &", m_pTcpClientConnect->GetKey(), szIP);
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -127,7 +127,7 @@ void CDlgTrackIP::OnBnClickedButton2()
     //È¡Ïû¸ú×ÙIP
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s DelTrackIP -a\n", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s DelTrackIP -a&", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -166,7 +166,7 @@ void CDlgTrackIP::OnBnClickedButton8()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s GetTrackIPInfo -a\n", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "%s GetTrackIPInfo -a&", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
@@ -302,7 +302,7 @@ void CDlgTrackIP::OnBnClickedButton6()
 
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s GetConnectIPInfo -s %d\n", m_pTcpClientConnect->GetKey(), nConnectID);
+    sprintf_s(szCommand, 100, "%s GetConnectIPInfo -s %d&", m_pTcpClientConnect->GetKey(), nConnectID);
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);
