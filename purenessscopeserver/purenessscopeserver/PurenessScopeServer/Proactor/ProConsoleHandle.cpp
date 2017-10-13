@@ -458,7 +458,7 @@ bool CProConsoleHandle::CheckMessage()
         }
         else if(CONSOLE_MESSAGE_FAIL == u4Return)
         {
-            SAFE_DELETE(m_pPacketParse);
+            return false;
         }
         else
         {

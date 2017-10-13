@@ -107,7 +107,7 @@ void CDlgClientMain::OnBnClickedButton2()
     // TODO: Add your control notification handler code here
     char szSendMessage[200] = {'\0'};
     char szCommand[100]     = {'\0'};
-    sprintf_s(szCommand, 100, "%s ShowServerInfo -a\n", m_pTcpClientConnect->GetKey());
+    sprintf_s(szCommand, 100, "b %s ShowServerInfo -a\n", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
     memcpy_s(&szSendMessage, 200, &szCommand, nSendLen);

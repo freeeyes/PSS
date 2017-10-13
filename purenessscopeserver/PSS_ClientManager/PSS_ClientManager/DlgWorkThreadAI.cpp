@@ -61,7 +61,7 @@ void CDlgWorkThreadAI::OnBnClickedButton1()
     sprintf_s(szCommand, 100, "%s GetWorkThreadAI -a\n", m_pTcpClientConnect->GetKey());
     int nSendLen = (int)strlen(szCommand);
 
-    memcpy_s(&szSendMessages, 200, &szCommand, nSendLen);
+    memcpy_s(szSendMessage, 200, &szCommand, nSendLen);
 
     char szRecvBuff[100 * 1024] = {'\0'};
     int nRecvLen = 100 * 1024;

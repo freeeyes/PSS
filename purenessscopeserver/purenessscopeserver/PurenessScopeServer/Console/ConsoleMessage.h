@@ -37,6 +37,8 @@ enum
     CONSOLE_MESSAGE_CLOSE   = 2,
 };
 
+#define COMMAND_SPLIT_STRING " "
+
 //设置对应返回命令名称，用于接收端包解析
 #define CONSOLE_COMMAND_UNKNOW             0x1000
 #define CONSOLE_COMMAND_LOADMOUDLE         0x1001
@@ -103,7 +105,7 @@ enum
 #define CONSOLEMESSAHE_LIFTED             "LiftedIP"            //解禁某IP
 #define CONSOLEMESSAHE_SERVERCONNECT_TCP  "ServerConnectTCP"    //服务器间通讯(TCP)
 #define CONSOLEMESSAHE_SERVERCONNECT_UDP  "ServerConnectUDP"    //服务器间通讯(UDP)
-#define CONSOLEMESSAGE_PROCESSINFO        "ShowCurrProcessInfo" //查看当前服务器的运行状态
+#define CONSOLEMESSAGE_PROCESSINFO        "ShowCurrProcessInfo" //查看当前服务器的运行状态ShowServerInfo
 #define CONSOLEMESSAGE_CLIENTHISTORY      "ShowConnectHistory"  //查看服务器历史链接状态
 #define CONSOLEMESSAGE_ALLCOMMANDINFO     "ShowAllCommand"      //查看服务器所有注册模块信令信息
 #define CONSOLEMESSAGE_SERVERINFO         "ShowServerInfo"      //查看服务器基本信息
@@ -133,11 +135,13 @@ enum
 //命令处理参数
 struct _CommandInfo
 {
+    uint8 m_u1OutputType;                 //输出类型，0为二进制，1为文本
     char m_szCommandTitle[MAX_BUFF_100];  //处理命令头
     char m_szCommandExp[MAX_BUFF_100];    //处理命令扩展参数
 
     _CommandInfo()
     {
+        m_u1OutputType      = 0;
         m_szCommandTitle[0] = '\0';
         m_szCommandExp[0]   = '\0';
     }

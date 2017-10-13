@@ -57,33 +57,40 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
         return false;
     }
 
-    //获得key值
-    int nKeyEnd = 0;
-    bool blFind = false;
 
-    for(nKeyEnd = 0; nKeyEnd < nLen; nKeyEnd++)
+    //获得输出模式
+    char szOutputType[MAX_BUFF_100] = { '\0' };
+    char* pKeyBegin = ACE_OS::strstr((char*)pCommand, COMMAND_SPLIT_STRING);
+
+    if (NULL == pKeyBegin)
     {
-        if(nKeyEnd >= MAX_BUFF_100 - 1)
-        {
-            OUR_DEBUG((LM_ERROR, "[CConsoleMessage::GetCommandInfo]pCommand key is too long.\n"));
-            return false;
-        }
-
-        if(pCommand[nKeyEnd] == ' ')
-        {
-            blFind = true;
-            break;
-        }
-    }
-
-    if(blFind == false)
-    {
-        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::GetCommandInfo]No find command.\n"));
+        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::GetCommandInfo]OutputType is no find.\n"));
         return false;
     }
 
-    memcpy_safe((char* )pCommand, (uint32)nKeyEnd, szKey, (uint32)MAX_BUFF_100);
-    szKey[nKeyEnd] = '\0';
+    memcpy_safe((char*)pCommand, (int)(pKeyBegin - pCommand), szOutputType, (int)(pKeyBegin - pCommand));
+    szOutputType[(int)(pKeyBegin - pCommand)] = '\0';
+
+    if (ACE_OS::strcmp(szOutputType, "b") == 0)
+    {
+        CommandInfo.m_u1OutputType = 0;
+    }
+    else
+    {
+        CommandInfo.m_u1OutputType = 1;
+    }
+
+    //获得key值
+    char* pCommandBegin = ACE_OS::strstr((char*)pKeyBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), COMMAND_SPLIT_STRING);
+
+    if (NULL == pCommandBegin)
+    {
+        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::GetCommandInfo]CommandBegin is no find.\n"));
+        return false;
+    }
+
+    memcpy_safe((char* )pKeyBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), (int)(pCommandBegin - pKeyBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING)), szKey, (int)(pCommandBegin - pKeyBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING)));
+    szKey[(int)(pCommandBegin - pKeyBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING))] = '\0';
 
     if(false == CheckConsoleKey(szKey))
     {
@@ -93,33 +100,20 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
 
 
     //获得命令头
-    for(i = nKeyEnd + 1; i < nLen; i++)
-    {
-        if(i >= MAX_BUFF_100 - 1)
-        {
-            OUR_DEBUG((LM_ERROR, "[CConsoleMessage::GetCommandInfo]pCommand m_szCommandTitle is too long.\n"));
-            return false;
-        }
+    char* pParamBegin = ACE_OS::strstr((char*)pCommandBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), COMMAND_SPLIT_STRING);
 
-        if(pCommand[i] == ' ')
-        {
-            blFind = true;
-            break;
-        }
-    }
-
-    if(blFind == false)
+    if (NULL == pParamBegin)
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::GetCommandInfo]No find command.\n"));
+        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::GetCommandInfo]ParamBegin is no find.\n"));
         return false;
     }
 
-    memcpy_safe((char*)(pCommand + nKeyEnd + 1), (uint32)(i - nKeyEnd - 1), (char*)CommandInfo.m_szCommandTitle, (uint32)MAX_BUFF_100);
-    CommandInfo.m_szCommandTitle[i - nKeyEnd - 1] = '\0';
+    memcpy_safe(pCommandBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), (int)(pParamBegin - pCommandBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING)), (char*)CommandInfo.m_szCommandTitle, (int)(pParamBegin - pCommandBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING)));
+    CommandInfo.m_szCommandTitle[(int)(pParamBegin - pCommandBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING))] = '\0';
 
     //获得扩展参数
-    memcpy_safe((char*)(pCommand + i + 1), (uint32)(nLen - i + 1), (char*)CommandInfo.m_szCommandExp, (uint32)MAX_BUFF_100);
-    CommandInfo.m_szCommandExp[nLen - i + 1] = '\0';
+    memcpy_safe(pParamBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), (nLen - (pParamBegin - pCommand - ACE_OS::strlen(COMMAND_SPLIT_STRING)) + 1), (char*)CommandInfo.m_szCommandExp, (nLen - (pParamBegin - pCommand - ACE_OS::strlen(COMMAND_SPLIT_STRING)) + 1));
+    CommandInfo.m_szCommandExp[(nLen - (pParamBegin - pCommand - ACE_OS::strlen(COMMAND_SPLIT_STRING)) + 1)] = '\0';
 
     return true;
 }
@@ -1533,53 +1527,82 @@ bool CConsoleMessage::DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffP
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
-        VCHARS_STR strSTemp;
-
-        //返回服务器ID
-        uint16 u2SerevrID = (uint32)App_MainConfig::instance()->GetServerID();
-        (*pBuffPacket) << u2SerevrID;
-
-        //返回服务器名称
-        strSTemp.text  = (char* )App_MainConfig::instance()->GetServerName();
-        strSTemp.u1Len = (uint8)ACE_OS::strlen(App_MainConfig::instance()->GetServerName());
-        (*pBuffPacket) << strSTemp;
-
-        //返回服务器版本
-        strSTemp.text  = (char* )App_MainConfig::instance()->GetServerVersion();
-        strSTemp.u1Len = (uint8)ACE_OS::strlen(App_MainConfig::instance()->GetServerVersion());
-        (*pBuffPacket) << strSTemp;
-
-        //返回加载模块个数
-        (*pBuffPacket) << (uint16)App_ModuleLoader::instance()->GetCurrModuleCount();
-
-        //返回工作线程个数
-        (*pBuffPacket) << (uint16)App_MessageServiceGroup::instance()->GetThreadInfo()->GetThreadCount();
-
-        //返回当前协议包的版本号
-        strSTemp.text  = (char* )App_MainConfig::instance()->GetServerVersion();
-        strSTemp.u1Len = (uint8)ACE_OS::strlen(App_MainConfig::instance()->GetPacketVersion());
-        (*pBuffPacket) << strSTemp;
-
-        //返回当前服务器是大端还是小端
-        if(App_MainConfig::instance()->GetCharOrder() == SYSTEM_LITTLE_ORDER)
+        if (CommandInfo.m_u1OutputType == 0)
         {
-            (*pBuffPacket) << (uint8)0;     //小端
+            VCHARS_STR strSTemp;
+
+            //返回服务器ID
+            uint16 u2SerevrID = (uint32)App_MainConfig::instance()->GetServerID();
+            (*pBuffPacket) << u2SerevrID;
+
+            //返回服务器名称
+            strSTemp.text = (char*)App_MainConfig::instance()->GetServerName();
+            strSTemp.u1Len = (uint8)ACE_OS::strlen(App_MainConfig::instance()->GetServerName());
+            (*pBuffPacket) << strSTemp;
+
+            //返回服务器版本
+            strSTemp.text = (char*)App_MainConfig::instance()->GetServerVersion();
+            strSTemp.u1Len = (uint8)ACE_OS::strlen(App_MainConfig::instance()->GetServerVersion());
+            (*pBuffPacket) << strSTemp;
+
+            //返回加载模块个数
+            (*pBuffPacket) << (uint16)App_ModuleLoader::instance()->GetCurrModuleCount();
+
+            //返回工作线程个数
+            (*pBuffPacket) << (uint16)App_MessageServiceGroup::instance()->GetThreadInfo()->GetThreadCount();
+
+            //返回当前协议包的版本号
+            strSTemp.text = (char*)App_MainConfig::instance()->GetServerVersion();
+            strSTemp.u1Len = (uint8)ACE_OS::strlen(App_MainConfig::instance()->GetPacketVersion());
+            (*pBuffPacket) << strSTemp;
+
+            //返回当前服务器是大端还是小端
+            if (App_MainConfig::instance()->GetCharOrder() == SYSTEM_LITTLE_ORDER)
+            {
+                (*pBuffPacket) << (uint8)0;     //小端
+            }
+            else
+            {
+                (*pBuffPacket) << (uint8)1;     //大端
+            }
+
+            //返回当前网络包字序规则
+            if (App_MainConfig::instance()->GetByteOrder() == false)
+            {
+                (*pBuffPacket) << (uint8)0;   //主机字序
+            }
+            else
+            {
+                (*pBuffPacket) << (uint8)1;   //网络字序
+            }
         }
         else
         {
-            (*pBuffPacket) << (uint8)1;     //大端
-        }
+            //文本输出
+            char szCharOrder[MAX_BUFF_20] = { '\0' };
 
-        //返回当前网络包字序规则
-        if(App_MainConfig::instance()->GetByteOrder() == false)
-        {
-            (*pBuffPacket) << (uint8)0;   //主机字序
-        }
-        else
-        {
-            (*pBuffPacket) << (uint8)1;   //网络字序
-        }
+            if (App_MainConfig::instance()->GetByteOrder() == false)
+            {
+                sprintf_safe(szCharOrder, MAX_BUFF_20, "HostOrder");   //主机字序
+            }
+            else
+            {
+                sprintf_safe(szCharOrder, MAX_BUFF_20, "NetOrder");    //网络字序
+            }
 
+
+            char szConsoleOutput[MAX_BUFF_1024] = { '\0' };
+            sprintf_safe(szConsoleOutput, MAX_BUFF_1024, "ServerID:%d\nServerName:%s\nServerVersion:%s\nServerModuleCount=%d\nWorkthreadCount:%d\nServerProtocol:%s\nCharOrder:%d\n",
+                         App_MainConfig::instance()->GetServerID(),
+                         App_MainConfig::instance()->GetServerName(),
+                         App_MainConfig::instance()->GetServerVersion(),
+                         App_ModuleLoader::instance()->GetCurrModuleCount(),
+                         App_MessageServiceGroup::instance()->GetThreadInfo()->GetThreadCount(),
+                         App_MainConfig::instance()->GetServerVersion(),
+                         szCharOrder);
+
+            pBuffPacket->WriteStream(szConsoleOutput, ACE_OS::strlen(szConsoleOutput));
+        }
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_SERVERINFO;
