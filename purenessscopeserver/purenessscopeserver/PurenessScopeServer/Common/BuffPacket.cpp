@@ -8,7 +8,10 @@
 
 CBuffPacket::CBuffPacket(int nSize, int nMaxBuffSize)
 {
-    Init(nSize, nMaxBuffSize);
+    if (false == Init(nSize, nMaxBuffSize))
+    {
+        OUR_DEBUG((LM_INFO, "[CBuffPacket::CBuffPacket]Error(%s).\n", m_szError));
+    }
 }
 
 CBuffPacket::~CBuffPacket(void)
