@@ -372,6 +372,14 @@ typedef ifstream _tifstream;
 typedef std::string _tstring;
 #endif // UNICODE
 
+#ifndef SAFE_DELETE
+#define SAFE_DELETE(x) if( (x) != NULL ) {delete (x); (x) = NULL; }
+#endif
+
+#ifndef SAFE_DELETE_ARRAY
+#define SAFE_DELETE_ARRAY(x) if( (x) != NULL ) {delete[] (x); (x) = NULL; }
+#endif
+
 //定义一个函数，可以支持内存越界检查
 inline void sprintf_safe(char* szText, int nLen, const char* fmt ...)
 {
@@ -533,6 +541,7 @@ typedef struct FILETESTRESULTINFO
 
     FILETESTRESULTINFO(const FILETESTRESULTINFO& ar)
     {
+        vecProFileDesc.clear();
         this->n4Result = ar.n4Result;
         this->n4TimeInterval = ar.n4TimeInterval;
         this->n4ProNum = ar.n4ProNum;
@@ -577,16 +586,23 @@ typedef struct FILETESTDATAINFO
 
     FILETESTDATAINFO()
     {
-        Init();
+        ACE_OS::memset(m_szData, 0, MAX_BUFF_10240);
+        m_u4DataLength = 0;
     }
 
     FILETESTDATAINFO(const FILETESTDATAINFO& ar)
     {
-        memcpy_safe(const_cast<char*>(ar.m_szData), MAX_BUFF_10240, const_cast<char*>(this->m_szData), MAX_BUFF_10240);
+        ACE_OS::memset(m_szData, 0, MAX_BUFF_10240);
+
+        if (false == memcpy_safe(const_cast<char*>(ar.m_szData), MAX_BUFF_10240, const_cast<char*>(this->m_szData), MAX_BUFF_10240))
+        {
+            OUR_DEBUG((LM_INFO, "[FILETESTDATAINFO::FILETESTDATAINFO]memcpy_safe error.\n"));
+        }
+
         this->m_u4DataLength = ar.m_u4DataLength;
     }
 
-    void Init()
+    void Close()
     {
         ACE_OS::memset(m_szData, 0, MAX_BUFF_10240);
         m_u4DataLength     = 0;
@@ -594,12 +610,16 @@ typedef struct FILETESTDATAINFO
 
     ~FILETESTDATAINFO()
     {
-        Init();
+        Close();
     }
 
     FILETESTDATAINFO& operator= (const FILETESTDATAINFO& ar)
     {
-        memcpy_safe(const_cast<char*>(ar.m_szData), MAX_BUFF_10240, const_cast<char*>(this->m_szData), MAX_BUFF_10240);
+        if (false == memcpy_safe(const_cast<char*>(ar.m_szData), MAX_BUFF_10240, const_cast<char*>(this->m_szData), MAX_BUFF_10240))
+        {
+            OUR_DEBUG((LM_INFO, "[FILETESTDATAINFO::FILETESTDATAINFO]operator= error.\n"));
+        }
+
         this->m_u4DataLength = ar.m_u4DataLength;
         return *this;
     }
@@ -616,9 +636,9 @@ enum VCHARS_TYPE
 typedef  struct _VCHARS_STR
 {
     char*       text;            //数据指针
-    uint8       u1Len;           //数据长度
     bool        blCopy;          //是否拷贝数据块，True是拷贝，默认是拷贝
     bool        blNew;           //是否是new出来的数据
+    uint8       u1Len;           //数据长度
     VCHARS_TYPE type;            //类型，类型定义见VCHARS_TYPE
 
     _VCHARS_STR(bool blIsCopy = true, VCHARS_TYPE ntype = VCHARS_TYPE_TEXT)
@@ -645,14 +665,21 @@ typedef  struct _VCHARS_STR
             //如果是需要构建新内存，则在这里申请
             if(blNew == true)
             {
-                delete text;
+                SAFE_DELETE(text);
             }
 
             if(type == VCHARS_TYPE_TEXT)
             {
                 //文本模式
                 text = new char[u1Length + 1];
-                memcpy_safe((char* )pData, u1Length, text, u1Length);
+
+                if (false == memcpy_safe((char*)pData, u1Length, text, u1Length))
+                {
+                    OUR_DEBUG((LM_INFO, "[_VCHARS_STR::SetData]memcpy_safe error.\n"));
+                    SAFE_DELETE(text);
+                    return;
+                }
+
                 text[u1Length] = '\0';
                 u1Len = u1Length + 1;
             }
@@ -660,7 +687,14 @@ typedef  struct _VCHARS_STR
             {
                 //二进制模式
                 text = new char[u1Length];
-                memcpy_safe((char* )pData, u1Length, text, u1Length);
+
+                if (false == memcpy_safe((char*)pData, u1Length, text, u1Length))
+                {
+                    OUR_DEBUG((LM_INFO, "[_VCHARS_STR::SetData]binary memcpy_safe error.\n"));
+                    SAFE_DELETE(text);
+                    return;
+                }
+
                 u1Len = u1Length;
             }
 
@@ -709,14 +743,21 @@ typedef  struct _VCHARM_STR
             //如果是需要构建新内存，则在这里申请
             if(blNew == true)
             {
-                delete text;
+                SAFE_DELETE(text);
             }
 
             if(type == VCHARS_TYPE_TEXT)
             {
                 //文本模式
                 text = new char[u2Length + 1];
-                memcpy_safe((char* )pData, u2Length, text, u2Length);
+
+                if (false == memcpy_safe((char*)pData, u2Length, text, u2Length))
+                {
+                    OUR_DEBUG((LM_INFO, "[_VCHARM_STR::SetData]memcpy_safe error.\n"));
+                    SAFE_DELETE(text);
+                    return;
+                }
+
                 text[u2Length] = '\0';
                 u2Len = u2Length + 1;
             }
@@ -724,7 +765,14 @@ typedef  struct _VCHARM_STR
             {
                 //二进制模式
                 text = new char[u2Length];
-                memcpy_safe((char* )pData, u2Length, text, u2Length);
+
+                if (false == memcpy_safe((char*)pData, u2Length, text, u2Length))
+                {
+                    OUR_DEBUG((LM_INFO, "[_VCHARM_STR::SetData]binary memcpy_safe error.\n"));
+                    SAFE_DELETE(text);
+                    return;
+                }
+
                 u2Len = u2Length;
             }
 
@@ -773,14 +821,21 @@ typedef  struct _VCHARB_STR
             //如果是需要构建新内存，则在这里申请
             if(blNew == true)
             {
-                delete text;
+                SAFE_DELETE(text);
             }
 
             if(type == VCHARS_TYPE_TEXT)
             {
                 //文本模式
                 text = new char[u4Length + 1];
-                memcpy_safe((char* )pData, u4Length, text, u4Length);
+
+                if (false == memcpy_safe((char*)pData, u4Length, text, u4Length))
+                {
+                    OUR_DEBUG((LM_INFO, "[_VCHARB_STR::SetData]memcpy_safe error.\n"));
+                    SAFE_DELETE(text);
+                    return;
+                }
+
                 text[u4Length] = '\0';
                 u4Len = u4Length + 1;
             }
@@ -788,7 +843,14 @@ typedef  struct _VCHARB_STR
             {
                 //二进制模式
                 text = new char[u4Length];
-                memcpy_safe((char* )pData, u4Length, text, u4Length);
+
+                if (false == memcpy_safe((char*)pData, u4Length, text, u4Length))
+                {
+                    OUR_DEBUG((LM_INFO, "[_VCHARB_STR::SetData]binary memcpy_safe error.\n"));
+                    SAFE_DELETE(text);
+                    return;
+                }
+
                 u4Len = u4Length;
             }
 
@@ -810,14 +872,15 @@ struct _Head_Info
 {
     uint32             m_u4HeadSrcLen;       //原始数据包头长（解析前）
     uint32             m_u4HeadCurrLen;      //当前数据包长 （解析后）
-    uint16             m_u2PacketCommandID;  //CommandID
     uint32             m_u4BodySrcLen;       //当前包体长度（解析前）
+    uint16             m_u2PacketCommandID;  //CommandID
     ACE_Message_Block* m_pmbHead;            //包头消息体
 
     _Head_Info()
     {
         m_u4HeadSrcLen      = 0;
         m_u4HeadCurrLen     = 0;
+        m_u4BodySrcLen      = 0;
         m_u2PacketCommandID = 0;
         m_pmbHead           = NULL;
     }
@@ -845,11 +908,10 @@ struct _Packet_Info
 {
     uint32             m_u4HeadSrcLen;       //原始数据包头长（解析前）
     uint32             m_u4HeadCurrLen;      //当前数据包长 （解析后）
-    uint16             m_u2PacketCommandID;  //CommandID
-    ACE_Message_Block* m_pmbHead;            //包头消息体
-
     uint32             m_u4BodySrcLen;       //原始数据包头长（解析前）
     uint32             m_u4BodyCurrLen;      //当前数据包长 （解析后）
+    uint16             m_u2PacketCommandID;  //CommandID
+    ACE_Message_Block* m_pmbHead;            //包头消息体
     ACE_Message_Block* m_pmbBody;            //包头消息体
 
     _Packet_Info()
@@ -877,16 +939,15 @@ public:
 //定时监控数据包和流量的数据信息，用于链接有效性的逻辑判定
 struct _TimeConnectInfo
 {
-    uint8  m_u1Minutes;               //当前的分钟数
     uint32 m_u4RecvPacketCount;       //当前接收包数量
     uint32 m_u4RecvSize;              //当前接收数据量
     uint32 m_u4SendPacketCount;       //当前发送包数量
     uint32 m_u4SendSize;              //当前发送数据量
-
     uint32 m_u4ValidRecvPacketCount;  //单位时间可允许接收数据包的上限
     uint32 m_u4ValidRecvSize;         //单位时间可允许的数据接收量
     uint32 m_u4ValidSendPacketCount;  //单位时间可允许数据数据包的上限
     uint32 m_u4ValidSendSize;         //单位时间可允许的数据发送量
+    uint8  m_u1Minutes;               //当前的分钟数
 
     _TimeConnectInfo()
     {
@@ -1014,9 +1075,9 @@ struct _PacketInfo
 //客户端链接信息数据结构
 struct _ClientConnectInfo
 {
-    bool          m_blValid;              //当前链接是否有效
+    uint64        m_u8RecvQueueTimeCost;  //接受逻辑处理包总时间消耗
+    uint64        m_u8SendQueueTimeCost;  //发送数据总时间消耗
     uint32        m_u4ConnectID;          //链接ID
-    ACE_INET_Addr m_addrRemote;           //远程链接地址
     uint32        m_u4RecvCount;          //接收包数量
     uint32        m_u4SendCount;          //发送包数量
     uint32        m_u4AllRecvSize;        //接收字节数
@@ -1024,8 +1085,8 @@ struct _ClientConnectInfo
     uint32        m_u4BeginTime;          //链接建立时间
     uint32        m_u4AliveTime;          //存活时间秒数
     uint32        m_u4RecvQueueCount;     //接受逻辑处理包的个数
-    uint64        m_u8RecvQueueTimeCost;  //接受逻辑处理包总时间消耗
-    uint64        m_u8SendQueueTimeCost;  //发送数据总时间消耗
+    bool          m_blValid;              //当前链接是否有效
+    ACE_INET_Addr m_addrRemote;           //远程链接地址
 
     _ClientConnectInfo()
     {
@@ -1082,11 +1143,11 @@ typedef vector<_ClientConnectInfo> vecClientConnectInfo;
 struct _ServerConnectInfo
 {
     uint32      m_u4ServerID;     //服务器的ID
-    ACE_TString m_strServerName;  //服务器的名称
-    ACE_TString m_strServerIP;    //服务器的IP
     uint32      m_u4ServerPort;   //服务器的端口
     uint32      m_u4MaxConn;      //服务器的最大线程连接数
     uint32      m_u4TimeOut;      //服务器的链接超时时间
+    ACE_TString m_strServerName;  //服务器的名称
+    ACE_TString m_strServerIP;    //服务器的IP
 
     _ServerConnectInfo()
     {
@@ -1096,14 +1157,6 @@ struct _ServerConnectInfo
         m_u4TimeOut    = 0;
     }
 };
-
-#ifndef SAFE_DELETE
-#define SAFE_DELETE(x) if( (x) != NULL ) {delete (x); (x) = NULL; }
-#endif
-
-#ifndef SAFE_DELETE_ARRAY
-#define SAFE_DELETE_ARRAY(x) if( (x) != NULL ) {delete[] (x); (x) = NULL; }
-#endif
 
 //为逻辑块提供一个Try catch的保护宏，用于调试，具体使用方法请参看TestTcp用例
 //目前最多支持一条2K的日志
@@ -1159,7 +1212,7 @@ inline void __assertspecial__(const char* file, int line, const char* func, cons
 class CTimeCost
 {
 public:
-    CTimeCost(int nMillionSecond, const char* pFunctionName, const char* pFileName, int nLine)
+    CTimeCost(unsigned int nMillionSecond, const char* pFunctionName, const char* pFileName, int nLine)
     {
         m_lBegin         = 0;
         m_lEnd           = 0;
@@ -1222,10 +1275,10 @@ private:
 private:
     long         m_lBegin;
     long         m_lEnd;
+    int          m_nFileLine;
     unsigned int m_nMillionSecond;
     char         m_szFunctionName[MAX_BUFF_100];
     char         m_szFileName[MAX_BUFF_300];
-    int          m_nFileLine;
 };
 
 #define __TIMECOST(cost) CTimeCost timecost(cost, __FUNCTION__, __FILE__, __LINE__);
@@ -1298,7 +1351,11 @@ inline bool Replace_String(char* pText, uint32 u4Len, const char* pOld, const ch
 {
     char* pTempSrc = new char[u4Len];
 
-    memcpy_safe(pText, u4Len, pTempSrc, u4Len);
+    if (false == memcpy_safe(pText, u4Len, pTempSrc, u4Len))
+    {
+        return false;
+    }
+
     pTempSrc[u4Len - 1] = '\0';
 
     uint16 u2NewLen = (uint16)ACE_OS::strlen(pNew);
@@ -1311,7 +1368,11 @@ inline bool Replace_String(char* pText, uint32 u4Len, const char* pOld, const ch
         uint32 u4PosLen = (uint32)(pPos - pTempSrc);
 
         //黏贴最前面的
-        memcpy_safe(pText, u4PosLen, pTempSrc, u4PosLen);
+        if (false == memcpy_safe(pText, u4PosLen, pTempSrc, u4PosLen))
+        {
+            return false;
+        }
+
         pText[u4PosLen] = '\0';
 
         if(u4PosLen + u2NewLen >= (uint32)u4Len)
@@ -1323,7 +1384,11 @@ inline bool Replace_String(char* pText, uint32 u4Len, const char* pOld, const ch
         else
         {
             //黏贴新字符
-            memcpy_safe(pText, u2NewLen, &pText[u4PosLen], u2NewLen);
+            if (false == memcpy_safe(pText, u2NewLen, &pText[u4PosLen], u2NewLen))
+            {
+                return false;
+            }
+
             pText[u4PosLen + u2NewLen] = '\0';
 
             //指针向后移动
@@ -1439,11 +1504,11 @@ struct _ClientIPInfo
 //链接别名映射信息(用于PSS_ClientManager管理)
 struct _ClientNameInfo
 {
-    char m_szName[MAX_BUFF_100];      //连接别名
-    char m_szClientIP[MAX_BUFF_50];   //客户端的IP地址
     int  m_nPort;                     //客户端的端口
     int  m_nConnectID;                //连接ID
     int  m_nLog;                      //是否记录日志
+    char m_szName[MAX_BUFF_100];      //连接别名
+    char m_szClientIP[MAX_BUFF_50];   //客户端的IP地址
 
     _ClientNameInfo()
     {

@@ -199,7 +199,7 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
     }
     else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_COLSECLIENT) == 0)
     {
-        DoMessgae_CloseClient(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
+        DoMessage_CloseClient(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
     else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_UDPCONNECTINFO) == 0)
     {
@@ -319,11 +319,11 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
     }
     else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSATE_FILE_TEST_START) == 0)
     {
-        Do_Message_TestFileStart(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
+        DoMessage_TestFileStart(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
     else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSATE_FILE_TEST_STOP) == 0)
     {
-        Do_Message_TestFileStop(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
+        DoMessage_TestFileStop(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
     else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSATE_SERVER_CLOSE) == 0)
     {
@@ -340,7 +340,7 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
     //拼接返回数据包内容
     uint32 u4PacketSize = pCurrBuffPacket->GetPacketLen();
 
-    if(u4PacketSize <= 0 || CONSOLE_COMMAND_UNKNOW == u2ReturnCommandID)
+    if(u4PacketSize == 0 || CONSOLE_COMMAND_UNKNOW == u2ReturnCommandID)
     {
         u2ReturnCommandID = CONSOLE_COMMAND_UNKNOW;
         return CONSOLE_MESSAGE_FAIL;
@@ -712,7 +712,7 @@ bool CConsoleMessage::GetTestFileName(const char* pCommand, char* pFileName)
     }
 }
 
-bool CConsoleMessage::DoMessage_LoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_LoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     _FileInfo FileInfo;
 
@@ -731,8 +731,6 @@ bool CConsoleMessage::DoMessage_LoadModule(_CommandInfo& CommandInfo, IBuffPacke
                 pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
             }
         }
-
-        return false;
     }
 
     if(true == App_ModuleLoader::instance()->LoadModule(FileInfo.m_szFilePath, FileInfo.m_szFileName, FileInfo.m_szFileParam))
@@ -769,10 +767,9 @@ bool CConsoleMessage::DoMessage_LoadModule(_CommandInfo& CommandInfo, IBuffPacke
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_LOADMOUDLE;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_UnLoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_UnLoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(true == App_MessageServiceGroup::instance()->UnloadModule(CommandInfo.m_szCommandExp, (uint8)1))
     {
@@ -808,10 +805,9 @@ bool CConsoleMessage::DoMessage_UnLoadModule(_CommandInfo& CommandInfo, IBuffPac
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_UNLOADMOUDLE;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_ReLoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_ReLoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(true == App_MessageServiceGroup::instance()->UnloadModule(CommandInfo.m_szCommandExp, (uint8)2))
     {
@@ -847,10 +843,9 @@ bool CConsoleMessage::DoMessage_ReLoadModule(_CommandInfo& CommandInfo, IBuffPac
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_RELOADMOUDLE;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_ClientMessageCount(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_ClientMessageCount(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-c") == 0)
     {
@@ -926,10 +921,9 @@ bool CConsoleMessage::DoMessage_ClientMessageCount(_CommandInfo& CommandInfo, IB
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_CLIENTCOUNT;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_ShowModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_ShowModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -948,18 +942,15 @@ bool CConsoleMessage::DoMessage_ShowModule(_CommandInfo& CommandInfo, IBuffPacke
         }
         else
         {
-            if(NULL != pBuffPacket)
+            if (CommandInfo.m_u1OutputType == 0)
             {
-                if (CommandInfo.m_u1OutputType == 0)
-                {
-                    (*pBuffPacket) << (uint32)0;
-                }
-                else
-                {
-                    char szTemp[MAX_BUFF_1024] = { '\0' };
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleCount(%d)\n", App_ModuleLoader::instance()->GetCurrModuleCount());
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                }
+                (*pBuffPacket) << (uint32)0;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleCount(%d)\n", App_ModuleLoader::instance()->GetCurrModuleCount());
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
             }
         }
 
@@ -1053,15 +1044,10 @@ bool CConsoleMessage::DoMessage_ShowModule(_CommandInfo& CommandInfo, IBuffPacke
         }
 
         u2ReturnCommandID = CONSOLE_COMMAND_SHOWMOUDLE;
-        return true;
-    }
-    else
-    {
-        return false;
     }
 }
 
-bool CConsoleMessage::DoMessage_CommandInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_CommandInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     uint16 u2CommandID = (uint16)ACE_OS::strtol(CommandInfo.m_szCommandExp, NULL, 16);
 
@@ -1123,8 +1109,6 @@ bool CConsoleMessage::DoMessage_CommandInfo(_CommandInfo& CommandInfo, IBuffPack
                 sprintf_safe(szTemp, MAX_BUFF_1024, "CommandCost(%d)\n", objCommandData.m_u8CommandCost);
                 pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
             }
-
-            return true;
         }
         else
         {
@@ -1145,16 +1129,11 @@ bool CConsoleMessage::DoMessage_CommandInfo(_CommandInfo& CommandInfo, IBuffPack
             }
 
             u2ReturnCommandID = CONSOLE_COMMAND_COMMANDINFO;
-            return true;
         }
-    }
-    else
-    {
-        return true;
     }
 }
 
-bool CConsoleMessage::DoMessage_WorkThreadState(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_WorkThreadState(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-s") == 0)
     {
@@ -1204,20 +1183,11 @@ bool CConsoleMessage::DoMessage_WorkThreadState(_CommandInfo& CommandInfo, IBuff
             }
 
             u2ReturnCommandID = CONSOLE_COMMAND_THREADINFO;
-            return true;
         }
-        else
-        {
-            return false;
-        }
-    }
-    else
-    {
-        return false;
     }
 }
 
-bool CConsoleMessage::DoMessage_ClientInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_ClientInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -1366,10 +1336,9 @@ bool CConsoleMessage::DoMessage_ClientInfo(_CommandInfo& CommandInfo, IBuffPacke
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_CLIENTINFO;
-    return true;
 }
 
-bool CConsoleMessage::DoMessgae_CloseClient(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_CloseClient(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     uint32 u4ConnectID = (uint32)ACE_OS::atoi(CommandInfo.m_szCommandExp);
 #ifdef WIN32
@@ -1403,10 +1372,9 @@ bool CConsoleMessage::DoMessgae_CloseClient(_CommandInfo& CommandInfo, IBuffPack
 #endif
 
     u2ReturnCommandID = CONSOLE_COMMAND_COLSECLIENT;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_ForbiddenIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_ForbiddenIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     _ForbiddenIP ForbiddenIP;
 
@@ -1449,10 +1417,9 @@ bool CConsoleMessage::DoMessage_ForbiddenIP(_CommandInfo& CommandInfo, IBuffPack
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_FORBIDDENIP;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_ShowForbiddenList(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_ShowForbiddenList(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -1461,7 +1428,7 @@ bool CConsoleMessage::DoMessage_ShowForbiddenList(_CommandInfo& CommandInfo, IBu
 
         if(pForeverForbiddenIP == NULL || pTempForbiddenIP == NULL)
         {
-            return false;
+            return;
         }
 
         uint32 u4Count = (uint32)pForeverForbiddenIP->size() + (uint32)pTempForbiddenIP->size();
@@ -1533,10 +1500,9 @@ bool CConsoleMessage::DoMessage_ShowForbiddenList(_CommandInfo& CommandInfo, IBu
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_FORBIDDENIPSHOW;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_LifedIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_LifedIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     App_ForbiddenIP::instance()->DelForeverIP(CommandInfo.m_szCommandExp);
     App_ForbiddenIP::instance()->DelTempIP(CommandInfo.m_szCommandExp);
@@ -1553,10 +1519,9 @@ bool CConsoleMessage::DoMessage_LifedIP(_CommandInfo& CommandInfo, IBuffPacket* 
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_LIFTED;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_UDPClientInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_UDPClientInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -1697,10 +1662,9 @@ bool CConsoleMessage::DoMessage_UDPClientInfo(_CommandInfo& CommandInfo, IBuffPa
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_UDPCONNECTINFO;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_ServerConnectTCP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_ServerConnectTCP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -1877,10 +1841,9 @@ bool CConsoleMessage::DoMessage_ServerConnectTCP(_CommandInfo& CommandInfo, IBuf
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_SERVERCONNECT_TCP;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_ServerConnectUDP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_ServerConnectUDP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -2021,10 +1984,9 @@ bool CConsoleMessage::DoMessage_ServerConnectUDP(_CommandInfo& CommandInfo, IBuf
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_SERVERCONNECT_UDP;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_ShowProcessInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_ShowProcessInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -2098,10 +2060,9 @@ bool CConsoleMessage::DoMessage_ShowProcessInfo(_CommandInfo& CommandInfo, IBuff
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_PROCESSINFO;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_ShowClientHisTory(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_ShowClientHisTory(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -2158,23 +2119,22 @@ bool CConsoleMessage::DoMessage_ShowClientHisTory(_CommandInfo& CommandInfo, IBu
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_CLIENTHISTORY;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_ShowAllCommandInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_ShowAllCommandInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
         CHashTable<_ModuleClient>* pHashModuleClient = App_MessageManager::instance()->GetModuleClient();
 
-        //统计个数
-        uint32 u4Count = 0;
-        vector<_ModuleClient*> vecModuleClient;
-        pHashModuleClient->Get_All_Used(vecModuleClient);
-        u4Count = (uint32)vecModuleClient.size();
-
         if(pHashModuleClient != NULL)
         {
+            //统计个数
+            uint32 u4Count = 0;
+            vector<_ModuleClient*> vecModuleClient;
+            pHashModuleClient->Get_All_Used(vecModuleClient);
+            u4Count = (uint32)vecModuleClient.size();
+
             if (CommandInfo.m_u1OutputType == 0)
             {
                 (*pBuffPacket) << u4Count;
@@ -2203,9 +2163,9 @@ bool CConsoleMessage::DoMessage_ShowAllCommandInfo(_CommandInfo& CommandInfo, IB
                         pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
                     }
 
-                    for(int i = 0; i < (int)pModuleClient->m_vecClientCommandInfo.size(); i++)
+                    for(int j = 0; j < (int)pModuleClient->m_vecClientCommandInfo.size(); j++)
                     {
-                        _ClientCommandInfo* pClientCommandInfo = pModuleClient->m_vecClientCommandInfo[i];
+                        _ClientCommandInfo* pClientCommandInfo = pModuleClient->m_vecClientCommandInfo[j];
 
                         if(NULL != pClientCommandInfo)
                         {
@@ -2239,10 +2199,9 @@ bool CConsoleMessage::DoMessage_ShowAllCommandInfo(_CommandInfo& CommandInfo, IB
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_ALLCOMMANDINFO;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -2325,10 +2284,9 @@ bool CConsoleMessage::DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffP
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_SERVERINFO;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_ReConnectServer(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_ReConnectServer(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     int nSerevrID = 0;
 
@@ -2513,10 +2471,9 @@ bool CConsoleMessage::DoMessage_ReConnectServer(_CommandInfo& CommandInfo, IBuff
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_SERVERRECONNECT;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_CommandTimeout(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_CommandTimeout(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -2557,10 +2514,9 @@ bool CConsoleMessage::DoMessage_CommandTimeout(_CommandInfo& CommandInfo, IBuffP
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_COMMANDTIMEOUT;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_CommandTimeoutclr(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_CommandTimeoutclr(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -2579,10 +2535,9 @@ bool CConsoleMessage::DoMessage_CommandTimeoutclr(_CommandInfo& CommandInfo, IBu
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_COMMANDTIMEOUTCLR;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_CommandDataLog(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_CommandDataLog(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -2603,10 +2558,9 @@ bool CConsoleMessage::DoMessage_CommandDataLog(_CommandInfo& CommandInfo, IBuffP
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_COMMANDDATALOG;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_SetDebug(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_SetDebug(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     uint8 u1Debug = 0;
 
@@ -2634,10 +2588,9 @@ bool CConsoleMessage::DoMessage_SetDebug(_CommandInfo& CommandInfo, IBuffPacket*
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_SETDEBUG;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_ShowDebug(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_ShowDebug(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -2657,7 +2610,6 @@ bool CConsoleMessage::DoMessage_ShowDebug(_CommandInfo& CommandInfo, IBuffPacket
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_SHOWDEBUG;
-    return true;
 }
 
 bool CConsoleMessage::SetConsoleKey(vecConsoleKey* pvecConsoleKey)
@@ -2706,7 +2658,7 @@ bool CConsoleMessage::GetDebug(const char* pCommand, uint8& u1Debug)
     return true;
 }
 
-bool CConsoleMessage::DoMessage_SetTrackIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_SetTrackIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     _ForbiddenIP ForbiddenIP;
 
@@ -2722,10 +2674,9 @@ bool CConsoleMessage::DoMessage_SetTrackIP(_CommandInfo& CommandInfo, IBuffPacke
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_SETTRACKIP;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_DelTrackIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_DelTrackIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -2735,10 +2686,9 @@ bool CConsoleMessage::DoMessage_DelTrackIP(_CommandInfo& CommandInfo, IBuffPacke
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_DELTRACKIP;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_GetTrackIPInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_GetTrackIPInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     //char szTimeBegin[MAX_BUFF_100] = {'\0'};
     //char szTimeEnd[MAX_BUFF_100]   = {'\0'};
@@ -2750,10 +2700,9 @@ bool CConsoleMessage::DoMessage_GetTrackIPInfo(_CommandInfo& CommandInfo, IBuffP
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_GETTRACKIPINFO;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_GetConnectIPInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_GetConnectIPInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     int nConnectID = 0;
 
@@ -2786,10 +2735,9 @@ bool CConsoleMessage::DoMessage_GetConnectIPInfo(_CommandInfo& CommandInfo, IBuf
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_GETCONNECTIPINFO;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_GetLogLevelInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_GetLogLevelInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -2807,7 +2755,7 @@ bool CConsoleMessage::DoMessage_GetLogLevelInfo(_CommandInfo& CommandInfo, IBuff
             if(NULL == pServerName)
             {
                 //如果服务器名称为空则直接返回
-                return true;
+                return;
             }
 
             VCHARS_STR strSName;
@@ -2821,7 +2769,7 @@ bool CConsoleMessage::DoMessage_GetLogLevelInfo(_CommandInfo& CommandInfo, IBuff
             if(NULL == pLogName)
             {
                 //如果服务器名称为空则直接返回
-                return true;
+                return;
             }
 
             strSName.text  = pLogName;
@@ -2836,10 +2784,9 @@ bool CConsoleMessage::DoMessage_GetLogLevelInfo(_CommandInfo& CommandInfo, IBuff
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_GETLOGINFO;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_SetLogLevelInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_SetLogLevelInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     int nLogLevel = 1;
 
@@ -2851,10 +2798,9 @@ bool CConsoleMessage::DoMessage_SetLogLevelInfo(_CommandInfo& CommandInfo, IBuff
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_SETLOGLEVEL;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_GetThreadAI(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_GetThreadAI(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -2876,10 +2822,9 @@ bool CConsoleMessage::DoMessage_GetThreadAI(_CommandInfo& CommandInfo, IBuffPack
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_GETWTAI;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_GetWorkThreadTO(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_GetWorkThreadTO(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -2912,10 +2857,9 @@ bool CConsoleMessage::DoMessage_GetWorkThreadTO(_CommandInfo& CommandInfo, IBuff
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_GETWTTIMEOUT;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_SetWorkThreadAI(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_SetWorkThreadAI(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     int nAI      = 0;
     int nDispose = 0;
@@ -2943,10 +2887,9 @@ bool CConsoleMessage::DoMessage_SetWorkThreadAI(_CommandInfo& CommandInfo, IBuff
     (*pBuffPacket) << (uint32)0;
 
     u2ReturnCommandID = CONSOLE_COMMAND_SETWTAI;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_GetNickNameInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_GetNickNameInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     char szNickName[MAX_BUFF_100] = {'\0'};
     vecClientNameInfo objClientNameInfo;
@@ -2981,10 +2924,9 @@ bool CConsoleMessage::DoMessage_GetNickNameInfo(_CommandInfo& CommandInfo, IBuff
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_GETNICKNAMEINFO;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_SetConnectLog(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_SetConnectLog(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     uint32 u4ConnectID = 0;
     bool blIsLog       = false;
@@ -3001,10 +2943,9 @@ bool CConsoleMessage::DoMessage_SetConnectLog(_CommandInfo& CommandInfo, IBuffPa
     (*pBuffPacket) << (uint32)0;
 
     u2ReturnCommandID = CONSOLE_COMMAND_SETCONNECTLOG;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_SetMaxConnectCount(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_SetMaxConnectCount(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     uint16 u2MaxConnectHandler = 0;
 
@@ -3019,10 +2960,9 @@ bool CConsoleMessage::DoMessage_SetMaxConnectCount(_CommandInfo& CommandInfo, IB
     (*pBuffPacket) << (uint32)0;
 
     u2ReturnCommandID = CONSOLE_COMMAND_SETMAXCONNECTCOUNT;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_AddListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_AddListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     _ListenInfo objListenInfo;
 
@@ -3062,10 +3002,9 @@ bool CConsoleMessage::DoMessage_AddListen(_CommandInfo& CommandInfo, IBuffPacket
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_ADD_LISTEN;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_DelListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_DelListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     _ListenInfo objListenInfo;
 
@@ -3101,10 +3040,9 @@ bool CConsoleMessage::DoMessage_DelListen(_CommandInfo& CommandInfo, IBuffPacket
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_DEL_LISTEN;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_ShowListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_ShowListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -3144,10 +3082,9 @@ bool CConsoleMessage::DoMessage_ShowListen(_CommandInfo& CommandInfo, IBuffPacke
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_SHOW_LISTEN;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_MonitorInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_MonitorInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -3185,14 +3122,13 @@ bool CConsoleMessage::DoMessage_MonitorInfo(_CommandInfo& CommandInfo, IBuffPack
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_MONITOR_INFO;
-    return true;
 }
 
-bool CConsoleMessage::DoMessage_ServerClose(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_ServerClose(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if(NULL == pBuffPacket)
     {
-        return false;
+        return;
     }
 
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0 && App_MainConfig::instance()->GetServerClose() == 0)
@@ -3200,11 +3136,9 @@ bool CConsoleMessage::DoMessage_ServerClose(_CommandInfo& CommandInfo, IBuffPack
         u2ReturnCommandID = CONSOLE_COMMAND_CLOSE_SERVER;
         App_ServerObject::instance()->GetServerManager()->Close();
     }
-
-    return true;
 }
 
-bool CConsoleMessage::Do_Message_TestFileStart(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_TestFileStart(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     char szFileName[MAX_BUFF_200] = { '\0' };
 
@@ -3238,11 +3172,9 @@ bool CConsoleMessage::Do_Message_TestFileStart(_CommandInfo& CommandInfo, IBuffP
         u2ReturnCommandID = CONSOLE_COMMAND_FILE_TEST_START;
         (*pBuffPacket) << (int)-1;
     }
-
-    return true;
 }
 
-bool CConsoleMessage::Do_Message_TestFileStop(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_TestFileStop(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -3250,7 +3182,5 @@ bool CConsoleMessage::Do_Message_TestFileStop(_CommandInfo& CommandInfo, IBuffPa
         int nRet = App_FileTestManager::instance()->FileTestEnd();
         (*pBuffPacket) << (uint32)nRet;
     }
-
-    return true;
 }
 

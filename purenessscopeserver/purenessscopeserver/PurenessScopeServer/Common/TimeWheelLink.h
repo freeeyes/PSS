@@ -323,13 +323,12 @@ private:
     int              m_nTimeCycle;                        //轮盘总时间周期
     int              m_nTimeInterval;                     //轮盘检查时间间隔
     int              m_nContainSize;                      //每个子集容器大小
-    vecHashContain   m_vecHashContain;                    //每个块的容器，里面包含若干个CEntey对象
     int              m_nCurrBlockID;                      //当前vector容器的下标
-    CHashTable<int>  m_htIndexList;                       //记录当前引用映射
     int*             m_pBlockIDList;                      //记录BlockID对应的数组
     int              m_nBlockIDListIndex;                 //记录BlockID数组的当前位置
     int              m_nBlackCount;                       //轮盘里指针块的数量
-
+    CHashTable<int>  m_htIndexList;                       //记录当前引用映射
+    vecHashContain   m_vecHashContain;                    //每个块的容器，里面包含若干个CEntey对象
     Timeout_Callback m_fn_Timeout_Callback;               //回调函数接口
     void*            m_pArgContext;                       //回调上下文参数指针
 };

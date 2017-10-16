@@ -40,6 +40,7 @@ struct _ThreadInfo
         this->m_u2CommandID          = ar.m_u2CommandID;
         this->m_u2PacketTime         = ar.m_u2PacketTime;
         this->m_u4CurrPacketCount    = ar.m_u4CurrPacketCount;
+        this->m_u4ThreadID           = ar.m_u4ThreadID;
     }
 
     _ThreadInfo& operator = (const _ThreadInfo& ar)
