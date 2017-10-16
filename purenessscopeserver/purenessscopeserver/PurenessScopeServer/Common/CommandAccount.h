@@ -16,13 +16,13 @@ using namespace std;
 //Í³¼ÆĞÅÏ¢£¬ÀïÃæÓĞÒªÍ³¼ÆµÄÃüÁîĞÅÏ¢¶¨Òå
 struct _CommandData
 {
-    uint16 m_u2CommandID;                  //ÃüÁîµÄID
-    uint32 m_u4CommandCount;               //ÃüÁîµÄ×Üµ÷ÓÃ´ÎÊı
     uint64 m_u8CommandCost;                //ÃüÁîµÄÖ´ĞĞºÄ·Ñ×ÜÊ±¼ä
-    uint8  m_u1CommandType;                //ÃüÁîµÄÀàĞÍ£¬0ÊÇÊÕµ½µÄÃüÁî£¬1ÊÇ·¢³öµÄÃüÁî
+    uint32 m_u4CommandCount;               //ÃüÁîµÄ×Üµ÷ÓÃ´ÎÊı
     uint32 m_u4PacketSize;                 //ÃüÁî²úÉúµÄ×ÜÁ÷Á¿(Î´½âÃÜ)
     uint32 m_u4CommandSize;                //ÃüÁî²úÉúµÄ×ÜÁ÷Á¿(½âÃÜ)
+    uint16 m_u2CommandID;                  //ÃüÁîµÄID
     uint8  m_u1PacketType;                 //Êı¾İ°üÀ´Ô´ÀàĞÍ
+    uint8  m_u1CommandType;                //ÃüÁîµÄÀàĞÍ£¬0ÊÇÊÕµ½µÄÃüÁî£¬1ÊÇ·¢³öµÄÃüÁî
     ACE_Time_Value m_tvCommandTime;        //ÃüÁîµÄ×îºó´¦ÀíÊ±¼ä
 
     _CommandData()
@@ -82,9 +82,9 @@ struct _CommandData
 
 struct _CommandTimeOut
 {
+    uint32         m_u4TimeOutTime;                //³¬Ê±Ê±¼ä
     uint16         m_u2CommandID;                  //ÃüÁîµÄID
     ACE_Time_Value m_tvTime;                       //·¢ÉúÊ±¼ä
-    uint32         m_u4TimeOutTime;                //³¬Ê±Ê±¼ä
 
     _CommandTimeOut()
     {
@@ -122,10 +122,10 @@ typedef vector<_CommandTimeOut> vecCommandTimeOut;   //¼ÇÂ¼ËùÓĞ³¬Ê±ÃüÁîµÄÊı×é
 
 struct _CommandAlertData
 {
-    uint16 m_u2CommandID;
     uint32 m_u4CommandCount;
     uint32 m_u4MailID;
     uint32 m_u4CurrCount;
+    uint16 m_u2CommandID;
     uint8  m_u1Minute;
 
     _CommandAlertData()
@@ -142,9 +142,9 @@ typedef vector<_CommandAlertData> vecCommandAlertData;   //¼ÇÂ¼ËùÓĞµÄ¸æ¾¯¼à¿Ø·§Ö
 //Á÷Á¿Á÷ÈëºÍÁ÷³öĞÅÏ¢Í³¼Æ¡£
 struct _CommandFlowAccount
 {
-    uint8  m_u1FLow;
     uint32 m_u4FlowIn;
     uint32 m_u4FlowOut;
+    uint8  m_u1FLow;
 
     _CommandFlowAccount()
     {
@@ -205,17 +205,17 @@ public:
     void Close();
 
 public:
-    CHashTable<_CommandData>    m_objCommandDataList;            //ÃüÁîHashÓ³ÉäÁĞ±í
-    char                        m_szName[MAX_BUFF_50];           //µ±Ç°Í³¼ÆµÄÃû×Ö
-    vecCommandTimeOut           m_vecCommandTimeOut;             //´¦Àí³¬Ê±ÃüÁîÁĞ±í
-    uint8                       m_u1CommandAccount;              //ÊÇ·ñ¿ªÆôÃüÁîÍ³¼Æ£¬1ÊÇ´ò¿ª£¬0ÊÇ¹Ø±Õ
-    uint8                       m_u1Flow;                        //ÊÇ·ñ´ò¿ªÁ÷Á¿Í³¼Æ£¬1ÊÇ´ò¿ª£¬0ÊÇ¹Ø±Õ
-    uint8                       m_u1Minute;                      //µ±Ç°·ÖÖÓÊı
+    uint64                      m_u8PacketTimeout;               //°ü´¦Àí³¬Ê±Ê±¼ä
     uint32                      m_u4FlowIn;                      //µ±Ç°½øÈëÁ÷Á¿Í³¼Æ(µ¥Î»£¬·ÖÖÓ)
     uint32                      m_u4FlowOut;                     //µ±Ç°Á÷³öÁ÷Á¿Í³¼Æ(µ¥Î»£¬·ÖÖÓ)
     uint32                      m_u4PrvFlowIn;                   //ÉÏÒ»·ÖÖÓ½øÈëÁ÷Á¿Í³¼Æ(µ¥Î»£¬·ÖÖÓ)
     uint32                      m_u4PrvFlowOut;                  //ÉÏÒ»·ÖÖÓÁ÷³öÁ÷Á¿Í³¼Æ(µ¥Î»£¬·ÖÖÓ)
-    uint64                      m_u8PacketTimeout;               //°ü´¦Àí³¬Ê±Ê±¼ä
+    uint8                       m_u1CommandAccount;              //ÊÇ·ñ¿ªÆôÃüÁîÍ³¼Æ£¬1ÊÇ´ò¿ª£¬0ÊÇ¹Ø±Õ
+    uint8                       m_u1Flow;                        //ÊÇ·ñ´ò¿ªÁ÷Á¿Í³¼Æ£¬1ÊÇ´ò¿ª£¬0ÊÇ¹Ø±Õ
+    uint8                       m_u1Minute;                      //µ±Ç°·ÖÖÓÊı
+    char                        m_szName[MAX_BUFF_50];           //µ±Ç°Í³¼ÆµÄÃû×Ö
+    CHashTable<_CommandData>    m_objCommandDataList;            //ÃüÁîHashÓ³ÉäÁĞ±í
+    vecCommandTimeOut           m_vecCommandTimeOut;             //´¦Àí³¬Ê±ÃüÁîÁĞ±í
     vecCommandAlertData         m_vecCommandAlertData;           //¸æ¾¯·§ÖµÊı×é
 };
 

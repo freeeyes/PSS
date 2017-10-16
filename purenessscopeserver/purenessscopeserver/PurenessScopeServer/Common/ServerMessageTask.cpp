@@ -168,7 +168,11 @@ int CServerMessageTask::Close()
     if (m_blRun)
     {
         m_blRun = false;
-        this->CloseMsgQueue();
+
+        if (-1 == this->CloseMsgQueue())
+        {
+            OUR_DEBUG((LM_INFO, "[CServerMessageTask::Close]CloseMsgQueue error.\n"));
+        }
     }
     else
     {
@@ -223,8 +227,15 @@ int CServerMessageTask::svc(void)
                 continue;
             }
 
-            this->ProcessMessage(msg, m_u4ThreadID);
-            App_ServerMessageInfoPool::instance()->Delete(msg);
+            if (false == this->ProcessMessage(msg, m_u4ThreadID))
+            {
+                OUR_DEBUG((LM_INFO, "[CServerMessageTask::svc]ProcessMessage error.\n"));
+            }
+
+            if (false == App_ServerMessageInfoPool::instance()->Delete(msg))
+            {
+                OUR_DEBUG((LM_INFO, "[CServerMessageTask::svc]Delete error.\n"));
+            }
         }
     }
 
@@ -425,7 +436,11 @@ int CServerMessageManager::Close()
 {
     if(NULL != m_pServerMessageTask)
     {
-        m_pServerMessageTask->Close();
+        if (0 != m_pServerMessageTask->Close())
+        {
+            OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::Close]Close error.\n"));
+        }
+
         OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::Close]SAFE_DELETE Begin.\n"));
         SAFE_DELETE(m_pServerMessageTask);
         OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::Close]SAFE_DELETE End.\n"));
@@ -479,12 +494,21 @@ bool CServerMessageManager::CheckServerMessageThread(ACE_Time_Value tvNow)
             int ret = ACE_Thread_Manager::instance()->cancel_task(m_pServerMessageTask, 1);
             OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::CheckServerMessageThread]kill return %d OK.\n", ret));
 #endif
-            m_pServerMessageTask->Close();
+
+            if (0 != m_pServerMessageTask->Close())
+            {
+                OUR_DEBUG((LM_INFO, "[CServerMessageManager::CheckServerMessageThread]m_pServerMessageTask Close error.\n"));
+            }
+
             SAFE_DELETE(m_pServerMessageTask);
 
             //重建并重启相应线程
             Init();
-            Start();
+
+            if (false == Start())
+            {
+                OUR_DEBUG((LM_INFO, "[CServerMessageManager::CheckServerMessageThread]Start error.\n"));
+            }
         }
 
         return false;

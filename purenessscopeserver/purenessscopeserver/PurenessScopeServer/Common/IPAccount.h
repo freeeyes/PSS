@@ -17,10 +17,10 @@
 //IP访问统计模块
 struct _IPAccount
 {
-    string         m_strIP;              //当前链接地址
     int            m_nCount;             //当前链接次数
     int            m_nAllCount;          //指定IP链接次数总和
     int            m_nMinute;            //当前分钟数
+    string         m_strIP;              //当前链接地址
     ACE_Date_Time  m_dtLastTime;         //最后链接时间
 
     _IPAccount()
@@ -77,7 +77,8 @@ class CIPAccount
 public:
     CIPAccount()
     {
-        m_nMaxConnectCount = 100;  //默认每秒最高100次
+        m_u4MaxConnectCount = 100;  //默认每秒最高100次
+        m_u2CurrTime        = 0;
     }
 
     ~CIPAccount()
@@ -100,7 +101,7 @@ public:
 
     void Init(uint32 u4IPCount)
     {
-        m_nMaxConnectCount = u4IPCount;
+        m_u4MaxConnectCount = u4IPCount;
 
         //初始化HashTable
         m_objIPList.Init((int)u4IPCount);
@@ -117,7 +118,7 @@ public:
         ACE_Date_Time  dtNowTime;
         uint16 u2NowTime = (uint16)dtNowTime.minute();
 
-        if(u2NowTime - m_u2CurrTime  < 0)
+        if((int)(u2NowTime - m_u2CurrTime)  < 0)
         {
             u2NowTime += 60;
         }
@@ -136,7 +137,11 @@ public:
                 {
                     if(false == pIPAccount->Check(dtNowTime))
                     {
-                        m_objIPList.Del_Hash_Data(pIPAccount->m_strIP.c_str());
+                        if (-1 == m_objIPList.Del_Hash_Data(pIPAccount->m_strIP.c_str()))
+                        {
+                            OUR_DEBUG((LM_INFO, "[CIPAccount::AddIP]Del_Hash_Data(%s) is error.\n", pIPAccount->m_strIP.c_str()));
+                        }
+
                         SAFE_DELETE(pIPAccount);
                     }
                 }
@@ -146,7 +151,7 @@ public:
         bool blRet = false;
 
         //看看需要不需要判定，如果需要，则进行IP统计
-        if(m_nMaxConnectCount > 0)
+        if(m_u4MaxConnectCount > 0)
         {
             _IPAccount* pIPAccount = m_objIPList.Get_Hash_Box_Data(strIP.c_str());
 
@@ -172,7 +177,10 @@ public:
                     }
                     else
                     {
-                        m_objIPList.Add_Hash_Data(strIP.c_str(), pIPAccount);
+                        if (-1 == m_objIPList.Add_Hash_Data(strIP.c_str(), pIPAccount))
+                        {
+                            OUR_DEBUG((LM_INFO, "[CIPAccount::AddIP]Add_Hash_Data(%s) is error.\n", strIP.c_str()));
+                        }
                     }
                 }
             }
@@ -180,7 +188,7 @@ public:
             {
                 pIPAccount->Add(dtNowTime);
 
-                if(pIPAccount->m_nCount >= m_nMaxConnectCount)
+                if((uint32)pIPAccount->m_nCount >= m_u4MaxConnectCount)
                 {
                     blRet = false;
                 }
@@ -219,9 +227,9 @@ public:
     }
 
 private:
-    CHashTable<_IPAccount>           m_objIPList;                          //IP统计信息
-    int                              m_nMaxConnectCount;                   //每秒允许的最大连接数，前提是m_nNeedCheck = 0;才会生效
+    uint32                           m_u4MaxConnectCount;                  //每秒允许的最大连接数，前提是m_nNeedCheck = 0;才会生效
     uint16                           m_u2CurrTime;                         //当前时间
+    CHashTable<_IPAccount>           m_objIPList;                          //IP统计信息
     ACE_Recursive_Thread_Mutex       m_ThreadLock;                         //多线程锁
 };
 
@@ -239,6 +247,7 @@ public:
         m_u4DisConnectMax  = 0;
         m_u4CurrConnect    = 0;
         m_u4CurrDisConnect = 0;
+        m_u1Minute         = 0;
     }
 
     ~CConnectAccount()

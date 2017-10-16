@@ -17,11 +17,11 @@
 
 struct _ForbiddenIP
 {
-    char           m_szClientIP[MAX_IP_SIZE];   //被禁止的IP
-    uint8          m_u1Type;                    //禁止的类型，0为永久禁止，1为时段禁止。
-    ACE_Time_Value m_tvBegin;                   //时段禁止开始时间
     uint32         m_u4Second;                  //禁止的秒数
     uint8          m_u1ConnectType;             //链接的类型，0为TCP，1为UDP
+    uint8          m_u1Type;                    //禁止的类型，0为永久禁止，1为时段禁止。
+    char           m_szClientIP[MAX_IP_SIZE];   //被禁止的IP
+    ACE_Time_Value m_tvBegin;                   //时段禁止开始时间
 
     _ForbiddenIP()
     {

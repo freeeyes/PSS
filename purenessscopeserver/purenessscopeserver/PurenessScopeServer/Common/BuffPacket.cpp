@@ -7,6 +7,7 @@
 #include "BuffPacket.h"
 
 CBuffPacket::CBuffPacket(int nSize, int nMaxBuffSize)
+    :m_szData(NULL), m_u4ReadPtr(0), m_u4WritePtr(0), m_u4PacketLen(0), m_u4PacketCount(0), m_u4MaxPacketSize(0), m_u4BuffID(0), m_nHashID(0), m_blNetSort(false)
 {
     if (false == Init(nSize, nMaxBuffSize))
     {
@@ -590,7 +591,7 @@ CBuffPacket& CBuffPacket::operator >> (VCHARS_STR& str)
 {
     //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     uint8 u1Len = 0;
-    operator >> (u1Len);
+    (*this) >> (u1Len);
 
     if(u1Len && m_u4ReadPtr <= m_u4WritePtr - u1Len)
     {
@@ -610,7 +611,7 @@ CBuffPacket& CBuffPacket::operator >> (VCHARM_STR& str)
 {
     //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     uint16 u2Len = 0;
-    operator >> (u2Len);
+    (*this) >> (u2Len);
 
     if(u2Len && m_u4ReadPtr <= m_u4WritePtr - u2Len)
     {
@@ -630,7 +631,7 @@ CBuffPacket& CBuffPacket::operator >> (VCHARB_STR& str)
 {
     //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     uint32 u4Len = 0;
-    operator >> (u4Len);
+    (*this) >> (u4Len);
 
     if(u4Len && m_u4ReadPtr <= m_u4WritePtr - u4Len)
     {
@@ -650,7 +651,7 @@ CBuffPacket& CBuffPacket::operator >> (string& str)
 {
     //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     uint32 u4Len = 0;
-    operator >> (u4Len);
+    (*this) >> (u4Len);
 
     if(u4Len && m_u4ReadPtr <= m_u4WritePtr - u4Len)
     {

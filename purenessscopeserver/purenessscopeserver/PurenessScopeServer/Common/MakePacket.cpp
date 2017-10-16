@@ -66,7 +66,10 @@ void CMakePacket::SetMessage(_MakePacket* pMakePacket, CMessage* pMessage, ACE_T
     {
         if(PACKET_PARSE == pMakePacket->m_u1Option)
         {
-            pMessage->GetMessageBase()->m_u2Cmd = pMakePacket->m_pPacketParse->GetPacketCommandID();
+            if (NULL != pMakePacket->m_pPacketParse)
+            {
+                pMessage->GetMessageBase()->m_u2Cmd = pMakePacket->m_pPacketParse->GetPacketCommandID();
+            }
         }
         else if(pMakePacket->m_u1Option == PACKET_CONNECT)
         {

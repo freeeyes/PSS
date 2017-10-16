@@ -28,6 +28,7 @@ CMainConfig::CMainConfig(void)
     m_u2MaxModuleCount        = 100;
     m_u4ServerConnectCount    = 100;
     m_nServerID               = 0;
+    m_u2SendQueueMax          = 0;
     m_szConsoleIP[0]          = '\0';
 
     m_u1ServerType            = 0;

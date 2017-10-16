@@ -85,9 +85,6 @@
     <ClCompile Include="Message\Message.cpp">
       <Filter>Message\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="Common\MessageBlockManager.cpp">
-      <Filter>Message\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="Message\MessageService.cpp">
       <Filter>Message\cppfile</Filter>
     </ClCompile>
@@ -216,6 +213,9 @@
     </ClCompile>
     <ClCompile Include="Mail\base64.cpp">
       <Filter>Encrypt\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\MessageBlockManager.cpp">
+      <Filter>Common\cppfile</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -384,9 +384,6 @@
     <ClInclude Include="Message\Message.h">
       <Filter>Message\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="Common\MessageBlockManager.h">
-      <Filter>Message\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="Message\MessageManager.h">
       <Filter>Message\hfile</Filter>
     </ClInclude>
@@ -530,6 +527,9 @@
     </ClInclude>
     <ClInclude Include="FileTest\FileTest.h">
       <Filter>FileTest\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\MessageBlockManager.h">
+      <Filter>Common\hfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

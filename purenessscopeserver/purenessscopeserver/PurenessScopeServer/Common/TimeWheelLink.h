@@ -175,7 +175,11 @@ public:
 
                 //删除对应在时间索引中的数据
                 *pCurrBlockListID = INVAILD_BLOCKID;
-                m_htIndexList.Del_Hash_Data(szKey);
+
+                if (-1 == m_htIndexList.Del_Hash_Data(szKey))
+                {
+                    OUR_DEBUG((LM_INFO, "[CTimeWheelLink::Add_TimeWheel_Object]Deltet(%s) error.\n", szKey));
+                }
 
                 if (0 > m_vecHashContain[m_nCurrBlockID]->Add_Hash_Data(szKey, pEntey))
                 {
@@ -224,7 +228,10 @@ public:
         }
 
         //清理索引信息
-        m_htIndexList.Del_Hash_Data(szKey);
+        if (-1 == m_htIndexList.Del_Hash_Data(szKey))
+        {
+            OUR_DEBUG((LM_INFO, "[CTimeWheelLink::Del_TimeWheel_Object]Deltet(%s) error.\n", szKey));
+        }
     }
 
     //得到一个空闲的m_pBlockIDList位置
@@ -287,7 +294,11 @@ public:
             {
                 char szKey[MAX_TIMEWHEEL_KEY] = { '\0' };
                 sprintf_safe(szKey, MAX_TIMEWHEEL_KEY, "0x%08x", vecEntey[i]);
-                m_htIndexList.Del_Hash_Data(szKey);
+
+                if (-1 == m_htIndexList.Del_Hash_Data(szKey))
+                {
+                    OUR_DEBUG((LM_INFO, "[CTimeWheelLink::Tick]Delete(%s) error.\n", szKey));
+                }
             }
 
             if (NULL != m_fn_Timeout_Callback)

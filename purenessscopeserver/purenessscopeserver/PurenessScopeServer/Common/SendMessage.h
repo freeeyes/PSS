@@ -11,18 +11,16 @@ using namespace std;
 struct _SendMessage
 {
     uint32              m_u4ConnectID;    //要发送的远程ID
+    int                 m_nMessageID;     //发送消息的ID
+    int                 m_nHashID;        //当前对象的HashID
     uint16              m_u2CommandID;    //要发送的命令ID，用于统计功能
     uint8               m_u1SendState;    //要发送的状态，0是立即发送，1是先缓存不发送，2是立即发送后关闭
+    uint8               m_nEvents;        //发送类型，0：使用PacketParse组织发送数据，1：不使用PacketParse组织数据
+    uint8               m_u1Type;         //数据包的类型，0:数据包，1:主动关闭行为
     bool                m_blDelete;       //发送完成后是否删除，true是删除，false是不删除
     IBuffPacket*        m_pBuffPacket;    //数据包内容
-    uint8               m_nEvents;        //发送类型，0：使用PacketParse组织发送数据，1：不使用PacketParse组织数据
-    int                 m_nMessageID;     //发送消息的ID
-    uint8               m_u1Type;         //数据包的类型，0:数据包，1:主动关闭行为
     ACE_Time_Value      m_tvSend;         //数据包发送的时间戳
-
     ACE_Message_Block*  m_pmbQueuePtr;    //消息队列指针块
-
-    int                 m_nHashID;        //当前对象的HashID
 
     _SendMessage()
     {
@@ -34,7 +32,6 @@ struct _SendMessage
 
         _SendMessage** ppMessage = (_SendMessage**)m_pmbQueuePtr->base();
         *ppMessage = this;
-        m_nHashID  = 0;
     }
 
     //拷贝构造函数
@@ -48,6 +45,8 @@ struct _SendMessage
         this->m_u2CommandID = ar.m_u2CommandID;
         this->m_nHashID     = ar.m_nHashID;
         this->m_nMessageID  = ar.m_nMessageID;
+        this->m_u1Type      = ar.m_u1Type;
+        this->m_tvSend      = ar.m_tvSend;
 
         //这里设置消息队列模块指针内容，这样就不必反复的new和delete，提升性能
         //指针关系也可以在这里直接指定，不必使用的使用再指定
@@ -67,6 +66,8 @@ struct _SendMessage
         this->m_u2CommandID = ar.m_u2CommandID;
         this->m_nHashID     = ar.m_nHashID;
         this->m_nMessageID  = ar.m_nMessageID;
+        this->m_u1Type      = ar.m_u1Type;
+        this->m_tvSend      = ar.m_tvSend;
 
         memcpy_safe((char* )ar.m_pmbQueuePtr->base(), (uint32)ar.m_pmbQueuePtr->length(), m_pmbQueuePtr->base(), (uint32)m_pmbQueuePtr->length());
 
@@ -94,6 +95,8 @@ struct _SendMessage
         m_u2CommandID = 0;
         m_nMessageID  = 0;
         m_u1Type      = 0;
+        m_nHashID     = 0;
+        m_tvSend      = 0;
     }
 
     ACE_Message_Block* GetQueueMessage()

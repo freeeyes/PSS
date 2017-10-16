@@ -356,11 +356,25 @@ My_ACE_Logging_Strategy::~My_ACE_Logging_Strategy (void)
 int
 My_ACE_Logging_Strategy::fini (void)
 {
-    delete [] this->filename_;
+    if (NULL != this->filename_)
+    {
+        delete[] this->filename_;
+    }
+
     this->filename_ = 0; // Avoid double deletions.
 
-    delete [] this->logger_key_;
-    delete [] this->program_name_;
+    if (NULL != this->logger_key_)
+    {
+        delete[] this->logger_key_;
+    }
+
+    if (NULL != this->program_name_)
+    {
+        delete[] this->program_name_;
+    }
+
+    this->logger_key_ = 0;
+    this->program_name_ = 0;
 
     if (this->reactor ()
         && this->interval_ > 0 && this->max_size_ > 0)
@@ -385,7 +399,10 @@ My_ACE_Logging_Strategy::init (int argc, ACE_TCHAR* argv[])
         this->log_msg_->priority_mask (ACE_Log_Msg::THREAD);
 
     // Use the options hook to parse the command line arguments.
-    this->parse_args (argc, argv);
+    if (0 != this->parse_args(argc, argv))
+    {
+        return -1;
+    }
 
     // Setup priorities (to original if not specified on command line)
 

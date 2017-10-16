@@ -13,10 +13,10 @@
 struct _PacketParseInfo
 {
     uint32 m_u4PacketID;
+    uint32 m_u4OrgLength;
+    uint8  m_u1Type;
     char   m_szPacketParsePath[MAX_BUFF_200];
     char   m_szPacketParseName[MAX_BUFF_100];
-    uint8  m_u1Type;
-    uint32 m_u4OrgLength;
 
     _PacketParseInfo()
     {
@@ -32,10 +32,10 @@ struct _PacketParseInfo
 //增加对IPv4和IPv6的支持
 struct _ServerInfo
 {
-    char   m_szServerIP[MAX_BUFF_50];
+    uint32 m_u4PacketParseInfoID;
     int    m_nPort;
     uint8  m_u1IPType;
-    uint32 m_u4PacketParseInfoID;
+    char   m_szServerIP[MAX_BUFF_50];
 
     _ServerInfo()
     {
@@ -146,9 +146,9 @@ struct _ClientDataAlert
 //命令行告警阀值计算
 struct _CommandAlert
 {
-    uint16 m_u2CommandID;
     uint32 m_u4CommandCount;
     uint32 m_u4MailID;
+    uint16 m_u2CommandID;
 
     _CommandAlert()
     {
@@ -162,12 +162,12 @@ typedef vector<_CommandAlert> vecCommandAlert;
 //邮件配置相关信息
 struct _MailAlert
 {
+    uint32 m_u4MailPort;
     uint32 m_u4MailID;
     char   m_szFromMailAddr[MAX_BUFF_200];
     char   m_szToMailAddr[MAX_BUFF_200];
     char   m_szMailPass[MAX_BUFF_200];
     char   m_szMailUrl[MAX_BUFF_200];
-    uint32 m_u4MailPort;
 
     _MailAlert()
     {
@@ -184,10 +184,10 @@ typedef vector<_MailAlert> vecMailAlert;
 //集群配置相关信息
 struct _GroupListenInfo
 {
-    uint8  m_u1GroupNeed;
-    char   m_szGroupIP[MAX_BUFF_50];
     uint32 m_u4GroupPort;
+    uint8  m_u1GroupNeed;
     uint8  m_u1IPType;
+    char   m_szGroupIP[MAX_BUFF_50];
 
     _GroupListenInfo()
     {
@@ -321,34 +321,37 @@ public:
     uint8             GetServiceType();
 
 private:
-    CXmlOpeation m_MainConfig;
-    char       m_szError[MAX_BUFF_500];
-
-    int        m_nServerID;                            //服务器ID
-    char       m_szServerName[MAX_BUFF_20];            //服务器名称
-    char       m_szServerVersion[MAX_BUFF_20];         //服务器版本
-    uint8      m_u1ServerClose;                        //服务器是否允许远程关闭
-
-    char       m_szWindowsServiceName[MAX_BUFF_50];    //windows服务名称
-    char       m_szDisplayServiceName[MAX_BUFF_50];    //windows服务显示名称
-
-    char       m_szPacketVersion[MAX_BUFF_20];         //数据解析包模块的版本号
-
     uint32     m_u4MsgHighMark;                        //消息的高水位阀值
     uint32     m_u4MsgLowMark;                         //消息的低水位阀值
     uint32     m_u4MsgMaxBuffSize;                     //消息的最大大小
     uint32     m_u4MsgThreadCount;                     //允许的工作线程个数
-    uint8      m_u1MsgProcessCount;                    //当前的多进程数量(仅Linux支持)
     uint32     m_u4MsgMaxQueue;                        //消息队列的最大个数
-    uint8      m_u1ServiceType;                        //工作线程状态，0是时序线程，1是随机处理线程
-    uint8      m_u1Debug;                              //是否开启Debug模式，1是开启，0是关闭
     uint32     m_u4DebugSize;                          //设置当前记录数据包长度的最大缓冲大小
-
-    int        m_nEncryptFlag;                         //0，加密方式关闭，1为加密方式开启
-    char       m_szEncryptPass[MAX_BUFF_9];            //最长8位的加密密码，3DES算法
-    int        m_nEncryptOutFlag;                      //回应数据包，0，为不加密，1为加密
     uint32     m_u4SendTimeout;                        //发送超时时间
     uint32     m_u4RecvBuffSize;                       //接收数据缓冲池的大小
+    uint32     m_u4ServerConnectCount;                 //服务器间连接缓冲对象个数
+    uint32     m_u4MaxCommandCount;                    //当前框架最大命令数量
+    uint32     m_u4ReactorCount;                       //系统中遇到的反应器的个数
+    uint32     m_u4ConnectServerTimerout;              //连接远程服务器间隔时间
+    uint32     m_u4ConnectServerRecvBuff;              //服务器间的数据包接收缓冲大小
+    uint32     m_u4ServerRecvBuff;                     //接收从客户端到达的数据块的最大大小，只有PacketPrase流模式才会生效
+    uint32     m_u4SendDatamark;                       //发送差值的水位标（目前只有Proactor模式用这个）
+    uint32     m_u4BlockSize;                          //发送缓冲块大小设置
+    uint32     m_u4CoreFileSize;                       //Core文件的尺寸大小
+    uint32     m_u4TrackIPCount;                       //监控IP的最大历史记录数
+    uint32     m_u4SendBlockCount;                     //初始化发送缓冲个数
+    uint32     m_u4MaxCpu;                             //监控CPU的最高阀值
+    uint32     m_u4MaxMemory;                          //监控内存的峰值
+    uint32     m_u4WTCheckTime;                        //工作线程超时包的时间范围，单位是秒
+    uint32     m_u4WTTimeoutCount;                     //工作线程超时包的单位时间内的超时次数上限
+    uint32     m_u4WTStopTime;                         //停止此命令服务的时间
+    uint32     m_u4ChkInterval;                        //检测文件时间
+    uint32     m_u4LogFileMaxSize;                     //输出文件最大尺寸
+    uint32     m_u4LogFileMaxCnt;                      //输出文件最大个数，当达到最大个数自动循环
+    int        m_nServerID;                            //服务器ID
+    int        m_nEncryptFlag;                         //0，加密方式关闭，1为加密方式开启
+    int        m_nEncryptOutFlag;                      //回应数据包，0，为不加密，1为加密
+    int        m_nConsolePort;                         //Console服务器的端口
     uint16     m_u2SendQueueMax;                       //发送队列中最长的数据包个数
     uint16     m_u2ThreadTimuOut;                      //线程超时时间判定
     uint16     m_u2ThreadTimeCheck;                    //线程自检时间
@@ -357,60 +360,42 @@ private:
     uint16     m_u2HandleCount;                        //handle对象池的个数
     uint16     m_u2MaxHanderCount;                     //最大同时处理Handler的数量
     uint16     m_u2MaxConnectTime;                     //最长等待连接链接时间（此时间内，如果接收和发送都没有发生，则由服务器关闭这个链接）
-    uint32     m_u4ServerConnectCount;                 //服务器间连接缓冲对象个数
-
-    uint16     m_u2RecvQueueTimeout;               //接收队列处理超时时间限定
-    uint16     m_u2SendQueueTimeout;               //发送队列处理超时时间限定
-    uint16     m_u2SendQueueCount;                 //框架发送线程数
-    uint8      m_u1CommandAccount;                 //是否需要统计命令出入服务器的信息，0是关闭，1是打开。打开后会生成相应的报表
-    uint16     m_u2SendQueuePutTime;               //设置发送队列的入队超时时间
-    uint16     m_u2WorkQueuePutTime;               //设置工作队列的入队超时时间
-    uint8      m_u1ServerType;                     //设置服务器工作状态
-
-    uint8      m_u1ConsoleSupport;                 //是否支持Console服务，如果是1则是支持，0是不支持
-    char       m_szConsoleIP[MAX_BUFF_100];        //Console服务器IP
-    int        m_nConsolePort;                     //Console服务器的端口
+    uint16     m_u2RecvQueueTimeout;                   //接收队列处理超时时间限定
+    uint16     m_u2SendQueueTimeout;                   //发送队列处理超时时间限定
+    uint16     m_u2SendQueueCount;                     //框架发送线程数
+    uint16     m_u2SendQueuePutTime;                   //设置发送队列的入队超时时间
+    uint16     m_u2WorkQueuePutTime;                   //设置工作队列的入队超时时间
+    uint16     m_u2MaxModuleCount;                     //当前框架允许的最大模块数量
+    uint16     m_u2ConnectServerCheck;                 //服务器间连接单位检查时间
+    uint16     m_u2TcpNodelay;                         //TCP的Nagle算法开关，0为打开，1为关闭
+    uint16     m_u2Backlog;                            //设置的Backlog值
+    uint8      m_u1MsgProcessCount;                    //当前的多进程数量(仅Linux支持)
+    uint8      m_u1ServiceType;                        //工作线程状态，0是时序线程，1是随机处理线程
+    uint8      m_u1Debug;                              //是否开启Debug模式，1是开启，0是关闭
+    uint8      m_u1ServerClose;                        //服务器是否允许远程关闭
+    uint8      m_u1CommandAccount;                     //是否需要统计命令出入服务器的信息，0是关闭，1是打开。打开后会生成相应的报表
+    uint8      m_u1ServerType;                         //设置服务器工作状态
+    uint8      m_u1ConsoleSupport;                     //是否支持Console服务，如果是1则是支持，0是不支持
     uint8      m_u1ConsoleIPType;                  //Console的IPType
-
     uint8      m_u1CommandFlow;                    //命令调用统计，0为不统计，1为统计
-    uint32     m_u4MaxCommandCount;                //当前框架最大命令数量
-    uint16     m_u2MaxModuleCount;                 //当前框架允许的最大模块数量
-
-    uint32     m_u4ReactorCount;                   //系统中遇到的反应器的个数
-    uint32     m_u4ConnectServerTimerout;          //连接远程服务器间隔时间
-    uint16     m_u2ConnectServerCheck;             //服务器间连接单位检查时间
-    uint32     m_u4ConnectServerRecvBuff;          //服务器间的数据包接收缓冲大小
     uint8      m_u1ConnectServerRunType;           //服务器间返回包处理模式，0为同步，1为异步
-    uint32     m_u4ServerRecvBuff;                 //接收从客户端到达的数据块的最大大小，只有PacketPrase流模式才会生效
-    uint32     m_u4SendDatamark;                   //发送差值的水位标（目前只有Proactor模式用这个）
-    uint32     m_u4BlockSize;                      //发送缓冲块大小设置
-    uint16     m_u2TcpNodelay;                     //TCP的Nagle算法开关，0为打开，1为关闭
-
     uint8      m_u1NetworkMode;                    //当前可以设置的网络模式
     uint8      m_u1Monitor;                        //设置当前的监控开关是否打开，0是关闭，1是打开
-    uint32     m_u4CoreFileSize;                   //Core文件的尺寸大小
-    uint16     m_u2Backlog;                        //设置的Backlog值
-    uint32     m_u4TrackIPCount;                   //监控IP的最大历史记录数
-    uint32     m_u4SendBlockCount;                 //初始化发送缓冲个数
-
-    uint32     m_u4MaxCpu;                         //监控CPU的最高阀值
-    uint32     m_u4MaxMemory;                      //监控内存的峰值
-
-    //工作线程AI相关参数
     uint8      m_u1WTAI;                           //工作线程AI开关，0为关闭，1为打开
-    uint32     m_u4WTCheckTime;                    //工作线程超时包的时间范围，单位是秒
-    uint32     m_u4WTTimeoutCount;                 //工作线程超时包的单位时间内的超时次数上限
-    uint32     m_u4WTStopTime;                     //停止此命令服务的时间
     uint8      m_u1WTReturnDataType;               //返回错误数据的类型，1为二进制，2为文本
-    char       m_szWTReturnData[MAX_BUFF_1024];    //返回的数据体，最多1K
-    bool       m_blByteOrder;                      //当前框架使用字序，false为主机序，true为网络序
-
-    //ACE_DEBUG相关设置
     uint8      m_u1DebugTrunOn;                    //ACE_DEBUG文件输出开关，0为关闭，1为打开
+    bool       m_blByteOrder;                      //当前框架使用字序，false为主机序，true为网络序
+    CXmlOpeation m_MainConfig;
+    char       m_szError[MAX_BUFF_500];
+    char       m_szServerName[MAX_BUFF_20];            //服务器名称
+    char       m_szServerVersion[MAX_BUFF_20];         //服务器版本
+    char       m_szWindowsServiceName[MAX_BUFF_50];    //windows服务名称
+    char       m_szDisplayServiceName[MAX_BUFF_50];    //windows服务显示名称
+    char       m_szPacketVersion[MAX_BUFF_20];         //数据解析包模块的版本号
+    char       m_szEncryptPass[MAX_BUFF_9];            //最长8位的加密密码，3DES算法
+    char       m_szConsoleIP[MAX_BUFF_100];        //Console服务器IP
+    char       m_szWTReturnData[MAX_BUFF_1024];    //返回的数据体，最多1K
     char       m_szDeubgFileName[MAX_BUFF_100];    //输出文件名
-    uint32     m_u4ChkInterval;                    //检测文件时间
-    uint32     m_u4LogFileMaxSize;                 //输出文件最大尺寸
-    uint32     m_u4LogFileMaxCnt;                  //输出文件最大个数，当达到最大个数自动循环
     char       m_szDebugLevel[MAX_BUFF_100];       //输出文件级别
 
     _ConnectAlert    m_ConnectAlert;               //连接告警相关配置信息

@@ -23,7 +23,11 @@ void CSendCacheManager::Init(uint32 u4CacheCount, uint32 u4CacheSize)
         //OUR_DEBUG((LM_INFO, "[CSendCacheManager::Init](%d)pMessage=0x%08x.\n", i, pCache));
         char szHashID[10] = {'\0'};
         sprintf_safe(szHashID, 10, "%d", i);
-        m_objCacheHashList.Add_Hash_Data(szHashID, pCache);
+
+        if (-1 == m_objCacheHashList.Add_Hash_Data(szHashID, pCache))
+        {
+            OUR_DEBUG((LM_INFO, "[CSendCacheManager::Init]szHashID=%d Add_Hash_Data error.\n"));
+        }
     }
 }
 

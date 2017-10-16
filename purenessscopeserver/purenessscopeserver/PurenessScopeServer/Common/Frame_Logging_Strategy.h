@@ -17,9 +17,6 @@ public:
     Logging_Config_Param();
     ~Logging_Config_Param();
 
-    //日志文件，全路径
-    char m_strLogFile[256];
-
     //文件大小检测时间(Secs)
     int m_iChkInterval;
 
@@ -32,7 +29,11 @@ public:
     //是否向终端发送
     int m_bSendTerminal;
 
+    //日志等级描述
     char m_strLogLevel[128];
+
+    //日志文件，全路径
+    char m_strLogFile[256];
 };
 
 class Frame_Logging_Strategy

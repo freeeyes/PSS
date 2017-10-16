@@ -50,7 +50,7 @@ ACE_Message_Block* CMessageBlockManager::Create(uint32 u4Size)
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
     ACE_Message_Block* pmb = NULL;
 
-    if(u4Size <= 0)
+    if(u4Size == 0)
     {
         //如果申请的空间为0,则直接返回空。
         return NULL;

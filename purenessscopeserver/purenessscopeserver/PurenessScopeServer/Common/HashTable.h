@@ -24,11 +24,11 @@ enum EM_HASH_DEBUG
 template <class T>
 struct _Hash_Table_Cell
 {
-    char  m_cExists;                       //当前块是否已经使用,1已经使用，0没有被使用
-    char* m_pKey;                          //当前的key值
     int   m_nPosIndex;                     //当前对象在对象数组的下标
-    short m_sKeyLen;                       //当前的key长度
+    char* m_pKey;                          //当前的key值
     T*    m_pValue;                        //当前数据体指针
+    short m_sKeyLen;                       //当前的key长度
+    char  m_cExists;                       //当前块是否已经使用,1已经使用，0没有被使用
 
     _Hash_Table_Cell()
     {
@@ -792,7 +792,10 @@ public:
         //清理数据
         for (int i = 0; i < (int)vecList.size(); i++)
         {
-            Del_Hash_Data(vecList[i].c_str());
+            if (-1 == Del_Hash_Data(vecList[i].c_str()))
+            {
+                OUR_DEBUG((LM_INFO, "[CHashTable::Clear](%s) is Delete error.\n", vecList[i].c_str()));
+            }
         }
     }
 
