@@ -152,50 +152,102 @@ int authEmail(const ACE_HANDLE socketFd, const unsigned char* mailAddr, const un
     char userPasswd[MAX_EMAIL_LEN] = {0};
 
     ACE_OS::memset(&readData, 0, SMTP_MTU);
-    safeRead(socketFd, readData, SMTP_MTU);
+
+    if (0 >= safeRead(socketFd, readData, SMTP_MTU))
+    {
+        ACE_DEBUG((LM_INFO, "[authEmail]safeRead error.\n"));
+        return -1;
+    }
 
     //SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
 
     /* Send: EHLO */
     char szRELO[50] = {'\0'};
     ACE_OS::sprintf(szRELO, "EHLO Here\r\n");
-    safeWrite(socketFd, szRELO, (int)ACE_OS::strlen("EHLO Here\r\n"));
+
+    if (0 >= safeWrite(socketFd, szRELO, (int)ACE_OS::strlen("EHLO Here\r\n")))
+    {
+        ACE_DEBUG((LM_INFO, "[authEmail]EHLO safeWrite error.\n"));
+        return -1;
+    }
 
     /* Recv: EHLO */
     ACE_OS::memset(&readData, 0, SMTP_MTU);
-    safeRead(socketFd, readData, SMTP_MTU);
+
+    if (0 >= safeRead(socketFd, readData, SMTP_MTU))
+    {
+        ACE_DEBUG((LM_INFO, "[authEmail]EHLO safeRead error.\n"));
+        return -1;
+    }
 
     //SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
-    recvStatus(readData);
+    if (0 > recvStatus(readData))
+    {
+        ACE_DEBUG((LM_INFO, "[authEmail]EHLO recvStatus error.\n"));
+        return -1;
+    }
 
     /* Send: AUTH LOGIN */
     char szLOGIN[50] = {'\0'};
     ACE_OS::sprintf(szLOGIN, "AUTH LOGIN\r\n");
-    safeWrite(socketFd, szLOGIN, (int)ACE_OS::strlen("AUTH LOGIN\r\n"));
+
+    if (0 >= safeWrite(socketFd, szLOGIN, (int)ACE_OS::strlen("AUTH LOGIN\r\n")))
+    {
+        ACE_DEBUG((LM_INFO, "[authEmail]AUTH safeWrite error.\n"));
+        return -1;
+    }
 
     /* Recv: AUTH LOGIN */
     ACE_OS::memset(&readData, 0, SMTP_MTU);
-    safeRead(socketFd, readData, SMTP_MTU);
+
+    if (0 >= safeRead(socketFd, readData, SMTP_MTU))
+    {
+        ACE_DEBUG((LM_INFO, "[authEmail]AUTH safeRead error.\n"));
+        return -1;
+    }
 
     //SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
-    recvStatus(readData);
+    if (0 > recvStatus(readData))
+    {
+        ACE_DEBUG((LM_INFO, "[authEmail]AUTH recvStatus error.\n"));
+        return -1;
+    }
 
     /* Send: username */
     ACE_OS::memset(&userName, 0, MAX_EMAIL_LEN);
     ACE_OS::memset(&writeData, 0, SMTP_MTU);
-    stringCut((unsigned char*)mailAddr, NULL, (char* )"@", userName);
+
+    if (0 > stringCut((unsigned char*)mailAddr, NULL, (char*)"@", userName))
+    {
+        ACE_DEBUG((LM_INFO, "[authEmail]stringCut error.\n"));
+        return -1;
+    }
 
     outSize = (int)BASE64_SIZE(strlen(userName));
     base64_encode(writeData, (int)outSize, (const unsigned char*)userName, (int)strlen(userName));
     ACE_OS::strcat(writeData, "\r\n");
-    safeWrite(socketFd, writeData, (int)strlen(writeData));
+
+    if (0 >= safeWrite(socketFd, writeData, (int)strlen(writeData)))
+    {
+        ACE_DEBUG((LM_INFO, "[authEmail]@ safeWrite error.\n"));
+        return -1;
+    }
 
     /* Recv: username */
     ACE_OS::memset(&readData, 0, SMTP_MTU);
-    safeRead(socketFd, readData, SMTP_MTU);
+
+    if (0 >= safeRead(socketFd, readData, SMTP_MTU))
+    {
+        ACE_DEBUG((LM_INFO, "[authEmail]@ safeRead error.\n"));
+        return -1;
+    }
 
     //SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
-    recvStatus(readData);
+    if (0 > recvStatus(readData))
+    {
+        ACE_DEBUG((LM_INFO, "[authEmail]@ recvStatus error.\n"));
+        return -1;
+    }
 
     /* Send: passwd */
     ACE_OS::memset(&userPasswd, 0, MAX_EMAIL_LEN);
@@ -204,14 +256,28 @@ int authEmail(const ACE_HANDLE socketFd, const unsigned char* mailAddr, const un
     outSize = (int)BASE64_SIZE(strlen(userPasswd));
     base64_encode(writeData, (int)outSize, (const unsigned char*)userPasswd, (int)strlen(userPasswd));
     ACE_OS::strcat(writeData, "\r\n");
-    safeWrite(socketFd, writeData, (int)strlen(writeData));
+
+    if (0 >= safeWrite(socketFd, writeData, (int)strlen(writeData)))
+    {
+        ACE_DEBUG((LM_INFO, "[authEmail]SMTP_MTU safeWrite error.\n"));
+        return -1;
+    }
 
     /* Recv: passwd */
     ACE_OS::memset(&readData, 0, SMTP_MTU);
-    safeRead(socketFd, readData, SMTP_MTU);
+
+    if (0 >= safeRead(socketFd, readData, SMTP_MTU))
+    {
+        ACE_DEBUG((LM_INFO, "[authEmail]SMTP_MTU safeRead error.\n"));
+        return -1;
+    }
 
     //SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
-    recvStatus(readData);
+    if (0 > recvStatus(readData))
+    {
+        ACE_DEBUG((LM_INFO, "[authEmail]SMTP_MTU recvStatus error.\n"));
+        return -1;
+    }
 
     return 0;
 }
@@ -225,61 +291,130 @@ int sendEmail(const ACE_HANDLE socketFd, const unsigned char* fromMail, const un
     /* Send: MAIL FROM */
     ACE_OS::memset(&writeData, 0, SMTP_MTU);
     ACE_OS::sprintf(writeData, "MAIL FROM: <%s>\r\n", fromMail);
-    safeWrite(socketFd, writeData, (int)strlen(writeData));
+
+    if (0 >= safeWrite(socketFd, writeData, (int)strlen(writeData)))
+    {
+        ACE_DEBUG((LM_INFO, "[sendEmail]MAIL FROM safeWrite error.\n"));
+        return -1;
+    }
 
     /* Recv: MAIL FROM */
     ACE_OS::memset(&readData, 0, SMTP_MTU);
-    safeRead(socketFd, readData, SMTP_MTU);
+
+    if (0 >= safeRead(socketFd, readData, SMTP_MTU))
+    {
+        ACE_DEBUG((LM_INFO, "[sendEmail]MAIL FROM safeRead error.\n"));
+        return -1;
+    }
 
     //SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
-    recvStatus(readData);
+    if (0 > recvStatus(readData))
+    {
+        ACE_DEBUG((LM_INFO, "[sendEmail]MAIL FROM recvStatus error.\n"));
+        return -1;
+    }
 
     /* Send: RCPT TO */
     ACE_OS::memset(&writeData, 0, SMTP_MTU);
     ACE_OS::sprintf(writeData, "RCPT TO: <%s>\r\n", toMail);
-    safeWrite(socketFd, writeData, (int)strlen(writeData));
+
+    if (0 >= safeWrite(socketFd, writeData, (int)strlen(writeData)))
+    {
+        ACE_DEBUG((LM_INFO, "[sendEmail]RCPT TO safeWrite error.\n"));
+        return -1;
+    }
 
     /* Recv: RCPT TO */
     ACE_OS::memset(&readData, 0, SMTP_MTU);
-    safeRead(socketFd, readData, SMTP_MTU);
+
+    if (0 >= safeRead(socketFd, readData, SMTP_MTU))
+    {
+        ACE_DEBUG((LM_INFO, "[sendEmail]RCPT TO safeRead error.\n"));
+        return -1;
+    }
 
     //SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
-    recvStatus(readData);
+    if (0 > recvStatus(readData))
+    {
+        ACE_DEBUG((LM_INFO, "[sendEmail]RCPT TO recvStatus error.\n"));
+        return -1;
+    }
 
     /* Send: DATA */
     ACE_OS::memset(&writeData, 0, SMTP_MTU);
     char szDATA[50] = {'\0'};
     ACE_OS::sprintf(szDATA, "DATA\r\n");
-    safeWrite(socketFd, szDATA, (int)ACE_OS::strlen("DATA\r\n"));
+
+    if (0 >= safeWrite(socketFd, szDATA, (int)ACE_OS::strlen("DATA\r\n")))
+    {
+        ACE_DEBUG((LM_INFO, "[sendEmail]DATA safeWrite error.\n"));
+        return -1;
+    }
 
     /* Recv: DATA */
     ACE_OS::memset(&readData, 0, SMTP_MTU);
-    safeRead(socketFd, readData, SMTP_MTU);
+
+    if (0 >= safeRead(socketFd, readData, SMTP_MTU))
+    {
+        ACE_DEBUG((LM_INFO, "[sendEmail]SMTP_MTU safeRead error.\n"));
+        return -1;
+    }
 
     //SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
-    recvStatus(readData);
+    if (0 > recvStatus(readData))
+    {
+        ACE_DEBUG((LM_INFO, "[sendEmail]SMTP_MTU recvStatus error.\n"));
+        return -1;
+    }
 
     /* Send: MAIL TEXT */
-    safeWrite(socketFd, (char* )textMail, textLen);
+    if (0 >= safeWrite(socketFd, (char*)textMail, textLen))
+    {
+        ACE_DEBUG((LM_INFO, "[sendEmail]SMTP_MTU safeWrite error.\n"));
+        return -1;
+    }
 
     /* Recv: MAIL TEXT */
     ACE_OS::memset(&readData, 0, SMTP_MTU);
-    safeRead(socketFd, readData, SMTP_MTU);
+
+    if (0 >= safeRead(socketFd, readData, SMTP_MTU))
+    {
+        ACE_DEBUG((LM_INFO, "[sendEmail]SMTP_MTU safeRead error.\n"));
+        return -1;
+    }
 
     //SMTP_Print6("[%s][%d]recv: %s\r\n", __FILE__, __LINE__, readData);
-    recvStatus(readData);
+    if (0 > recvStatus(readData))
+    {
+        ACE_DEBUG((LM_INFO, "[sendEmail]SMTP_MTU recvStatus error.\n"));
+        return -1;
+    }
 
     /* Send: QUIT */
     ACE_OS::memset(&writeData, 0, SMTP_MTU);
     char szQUIT[50] = {'\0'};
     ACE_OS::sprintf(szQUIT, "QUIT\r\n");
-    safeWrite(socketFd, szQUIT, (int)ACE_OS::strlen("QUIT\r\n"));
+
+    if (0 >= safeWrite(socketFd, szQUIT, (int)ACE_OS::strlen("QUIT\r\n")))
+    {
+        ACE_DEBUG((LM_INFO, "[sendEmail]SMTP_MTU safeWrite error.\n"));
+        return -1;
+    }
 
     /* Recv: QUIT */
     ACE_OS::memset(&readData, 0, SMTP_MTU);
-    safeRead(socketFd, readData, SMTP_MTU);
 
-    recvStatus(readData);
+    if (0 >= safeRead(socketFd, readData, SMTP_MTU))
+    {
+        ACE_DEBUG((LM_INFO, "[sendEmail]SMTP_MTU safeRead error.\n"));
+        return -1;
+    }
+
+    if (0 > recvStatus(readData))
+    {
+        ACE_DEBUG((LM_INFO, "[sendEmail]SMTP_MTU recvStatus error.\n"));
+        return -1;
+    }
 
     return 0;
 }
@@ -313,10 +448,20 @@ int mailText(unsigned char** mail, const unsigned char* fromMail, const unsigned
     }
 
     ACE_OS::memset(&fromName, 0, MAX_EMAIL_LEN);
-    stringCut(fromMail, NULL, "@", fromName);
+
+    if (-1 == stringCut(fromMail, NULL, "@", fromName))
+    {
+        ACE_DEBUG((LM_ERROR, "[mailText]stringCut fromMail fail!\n"));
+        return -1;
+    }
 
     ACE_OS::memset(&toName, 0, MAX_EMAIL_LEN);
-    stringCut(toMail, NULL, "@", toName);
+
+    if (-1 == stringCut(toMail, NULL, "@", toName))
+    {
+        ACE_DEBUG((LM_ERROR, "[mailText]stringCut toMail fail!\n"));
+        return -1;
+    }
 
     ACE_OS::snprintf(szMailText, mailTextLen, "From: \"%s\"<%s>\r\nTo: \"%s\"<%s>\r\nSubject: %s\r\nMIME-Version:1.0\r\nContent-Type:multipart/mixed;boundary=\"%s\"\r\n\r\n--%s\r\nContent-Type: text/plain; charset=\"gb2312\"\r\n\r\n%s\r\n\r\n--%s\r\n", fromName, fromMail, toName, toMail, mailSubject, TEXT_BOUNDARY, TEXT_BOUNDARY, mailBody, TEXT_BOUNDARY);
 
@@ -387,7 +532,14 @@ int mailAttachment(unsigned char** mail, const unsigned char* filePath)
     }
 
     /* attachment header */
-    stringCut(filePath, "/", NULL, fileName);
+    if (-1 == stringCut(filePath, "/", NULL, fileName))
+    {
+        ACE_DEBUG((LM_INFO, "[mailAttachment]stringCut filePath fail.\n"));
+        ACE_OS::fclose(fp);
+        free(attachHeader);
+        free(attach);
+        return -1;
+    }
 
     ACE_OS::sprintf(attachHeader, "%s;name=\"%s\"\r\n%s\r\n%s;filename=\"%s\"\r\n\r\n", contentType, fileName, contentEncode, contentDes, fileName);
 

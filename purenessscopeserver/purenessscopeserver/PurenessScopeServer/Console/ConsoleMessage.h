@@ -165,10 +165,10 @@ struct _FileInfo
 //¼àÌý¶Ë¿ÚÐÅÏ¢
 struct _ListenInfo
 {
-    char   m_szListenIP[MAX_BUFF_20];
     uint32 m_u4Port;
-    uint8  m_u1IPType;
     uint32 m_u4PacketParseID;
+    uint8  m_u1IPType;
+    char   m_szListenIP[MAX_BUFF_20];
 
     _ListenInfo()
     {

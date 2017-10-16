@@ -18,14 +18,14 @@ using namespace std;
 //命令订阅者者的格式
 struct _ClientCommandInfo
 {
-    CClientCommand* m_pClientCommand;              //当前命令指针
-    uint16          m_u2CommandID;                 //当前命令对应的ID
     uint32          m_u4Count;                     //当前命令被调用的次数
     uint32          m_u4TimeCost;                  //当前命令总时间消耗
+    uint32          m_u4CurrUsedCount;             //当前正在使用的引用次数
+    CClientCommand* m_pClientCommand;              //当前命令指针
+    uint16          m_u2CommandID;                 //当前命令对应的ID
+    uint8           m_u1State;                     //当前命令的状态，0为正常，1为正在关闭
     char            m_szModuleName[MAX_BUFF_100];  //所属模块名称
     ACE_Date_Time   m_dtLoadTime;                  //当前命令加载时间
-    uint32          m_u4CurrUsedCount;             //当前正在使用的引用次数
-    uint8           m_u1State;                     //当前命令的状态，0为正常，1为正在关闭
     _ClientIPInfo   m_objListenIPInfo;             //当前允许的IP和端口入口，默认是所有当前端口
 
     _ClientCommandInfo()
@@ -36,6 +36,7 @@ struct _ClientCommandInfo
         m_szModuleName[0] = '\0';
         m_u4CurrUsedCount = 0;
         m_u1State         = 0;
+        m_u2CommandID     = 0;
     }
 };
 
@@ -181,11 +182,11 @@ public:
     virtual uint32 GetWorkThreadByIndex(uint32 u4Index);
 
 private:
-    CHashTable<CClientCommandList> m_objClientCommandList;              //命令持对应的数组
-    CHashTable<_ModuleClient>      m_objModuleClientList;               //加载模块对应的信息
-    uint16                         m_u2MaxModuleCount;                  //模块池里面的最大个数
     uint32                         m_u4MaxCommandCount;                 //最大命令池中的数量
     uint32                         m_u4CurrCommandCount;                //当前有效命令数
+    uint16                         m_u2MaxModuleCount;                  //模块池里面的最大个数
+    CHashTable<CClientCommandList> m_objClientCommandList;              //命令持对应的数组
+    CHashTable<_ModuleClient>      m_objModuleClientList;               //加载模块对应的信息
     ACE_Recursive_Thread_Mutex     m_ThreadWriteLock;                   //数据锁
 };
 

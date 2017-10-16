@@ -8,11 +8,11 @@
 struct _LogBlockInfo
 {
 public:
-    char*  m_pBlock;                     //块指针
-    uint32 m_u4Length;                   //块长度
-    bool   m_blIsUsed;                   //是否正在使用
     uint32 m_u4LogID;                    //LogID标记
     uint32 m_u4MailID;                   //邮件对象的ID序号
+    uint32 m_u4Length;                   //块长度
+    char*  m_pBlock;                     //块指针
+    bool   m_blIsUsed;                   //是否正在使用
     char   m_szMailTitle[MAX_BUFF_200];  //邮件对象的标题
 
     ACE_Message_Block*  m_pmbQueuePtr;   //消息队列指针块
@@ -50,11 +50,11 @@ public:
 
     _LogBlockInfo& operator = (const _LogBlockInfo& ar)
     {
-		if(NULL != this->m_pBlock)
-		{
-			SAFE_DELETE(this->m_pBlock);
-		}
-	
+        if(NULL != this->m_pBlock)
+        {
+            SAFE_DELETE(this->m_pBlock);
+        }
+
         this->m_pBlock      = ar.m_pBlock;
         this->m_u4Length    = ar.m_u4Length;
         this->m_blIsUsed    = ar.m_blIsUsed;

@@ -225,7 +225,11 @@ bool CFileLogger::Init()
         pLogFile->SetLevel(objvecLogFileInfo[i].m_u2LogLevel);
         pLogFile->SetServerName(szServerName);
         pLogFile->SetDisplay(objvecLogFileInfo[i].m_u1DisPlay);
-        pLogFile->Run();
+
+        if (false == pLogFile->Run())
+        {
+            OUR_DEBUG((LM_INFO, "[CFileLogger::Init]Run error.\n"));
+        }
 
         m_pLogFileList[nPos] = pLogFile;
     }

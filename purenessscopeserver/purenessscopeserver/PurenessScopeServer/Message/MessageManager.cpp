@@ -386,7 +386,10 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1State
                         if(pCClientCommandList->GetClientCommandIndex(i) == pClientCommandInfo)
                         {
                             //找到了，释放之
-                            pCClientCommandList->DelClientCommand(pClientCommandInfo->m_pClientCommand);
+                            if (false == pCClientCommandList->DelClientCommand(pClientCommandInfo->m_pClientCommand))
+                            {
+                                OUR_DEBUG((LM_INFO, "[CMessageManager::UnloadModuleCommand]DelClientCommand(%d) is fail.\n", pClientCommandInfo->m_u2CommandID));
+                            }
 
                             //如果该指令下的命令已经不存在，则删除之
                             if(pCClientCommandList->GetCount() == 0)

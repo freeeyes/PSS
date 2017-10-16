@@ -7,18 +7,18 @@
 //记录消息的一些参数
 struct _MessageBase
 {
-    uint8          m_u1PacketType;              //数据包来源类型
-    uint32         m_u4ConnectID;               //消息链接ConnectID，如果是UDP则这个值无效
-    uint32         m_u4PacketID;                //数据包的ID
-    uint16         m_u2Cmd;                     //命令字的ID
     uint32         m_u4HeadSrcSize;             //包头原始长度
     uint32         m_u4BodySrcSize;             //包体原始长度
     uint32         m_u4MsgTime;                 //消息接收到的时间
-    char           m_szIP[MAX_BUFF_20];         //客户端IP
+    uint32         m_u4ConnectID;               //消息链接ConnectID，如果是UDP则这个值无效
+    uint32         m_u4PacketID;                //数据包的ID
     uint32         m_u4Port;                    //客户端端口
-    char           m_szListenIP[MAX_BUFF_20];   //监听IP
     uint32         m_u4ListenPort;              //监听端口
     uint32         m_u4WorkThreadID;            //工作线程ID
+    uint16         m_u2Cmd;                     //命令字的ID
+    uint8          m_u1PacketType;              //数据包来源类型
+    char           m_szIP[MAX_BUFF_20];         //客户端IP
+    char           m_szListenIP[MAX_BUFF_20];   //监听IP
     CProfileTime   m_ProfileTime;               //消息到达时间
 
     _MessageBase()

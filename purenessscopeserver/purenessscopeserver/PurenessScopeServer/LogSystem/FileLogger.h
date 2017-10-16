@@ -48,6 +48,7 @@ public:
         m_u2LogID           = 0;
         m_nDisplay          = 0;
         m_StrServerName     = "";
+        m_u2Level           = 0;
         m_StrlogType        = "ServerError";
         m_pBuffer           = new char[u4BufferSize];   //这里是用于日志拼接时间所用
         m_u4BufferSize      = u4BufferSize;
@@ -77,6 +78,9 @@ public:
         this->SetDisplay(ar.GetDisPlay());
         this->SetDisplay(ar.GetDisPlay());
         this->SetFileRoot(ar.GetFileRoot());
+        this->SetFileAddr(ar.GetFileAddr());
+        this->SetConnector(ar.GetConnector());
+        this->SetFileIO(ar.GetFileIO());
     }
 
     CLogFile& operator = (CLogFile& ar)
@@ -90,6 +94,9 @@ public:
         this->SetLogTime(ar.GetLogTime());
         this->SetDisplay(ar.GetDisPlay());
         this->SetFileRoot(ar.GetFileRoot());
+        this->SetFileAddr(ar.GetFileAddr());
+        this->SetConnector(ar.GetConnector());
+        this->SetFileIO(ar.GetFileIO());
         return *this;
     }
 
@@ -101,6 +108,36 @@ public:
     char* GetFileRoot()
     {
         return m_szFileRoot;
+    }
+
+    void SetFileAddr(ACE_FILE_Addr& objFileAddr)
+    {
+        m_FileAddr = objFileAddr;
+    }
+
+    ACE_FILE_Addr& GetFileAddr()
+    {
+        return m_FileAddr;
+    }
+
+    void SetConnector(ACE_FILE_Connector& objConnector)
+    {
+        m_Connector = objConnector;
+    }
+
+    ACE_FILE_Connector& GetConnector()
+    {
+        return m_Connector;
+    }
+
+    void SetFileIO(ACE_FILE_IO& objFile)
+    {
+        m_File = objFile;
+    }
+
+    ACE_FILE_IO& GetFileIO()
+    {
+        return m_File;
     }
 
     void SetLogTime(const char* pLogTime)
@@ -157,7 +194,10 @@ public:
         //查看是否要发送邮件
         if(pLogBlockInfo->m_u4MailID > 0)
         {
-            SendMail(pLogBlockInfo);
+            if (false == SendMail(pLogBlockInfo))
+            {
+                OUR_DEBUG((LM_INFO, "[CLogFile::doLog](%s)Send mail fail.\n", m_StrlogName.c_str()));
+            }
         }
 
         return 0;
@@ -360,7 +400,10 @@ public:
 
         if(ACE_OS::strcmp(szDate, m_szLogTime) != 0)
         {
-            Run();
+            if (false == Run())
+            {
+                OUR_DEBUG((LM_INFO, "[ServerLogger](%s)Run fail.\n", m_StrlogName.c_str()));
+            }
         }
     }
 
@@ -378,19 +421,19 @@ public:
     }
 
 private:
-    ACE_TString         m_StrlogName;         //模块名字
-    ACE_TString         m_StrlogType;         //日志类型
-    ACE_TString         m_StrServerName;      //服务器前缀
-    int                 m_nDisplay;           //显示还是记录文件
-    ACE_FILE_Connector  m_Connector;          //I/O操作连接器
+    uint32              m_u4BufferSize;               //日志缓冲最大大小
+    uint16              m_u2LogID;                    //日志编号
+    uint16              m_u2Level;                    //日志等级
+    int                 m_nDisplay;                   //显示还是记录文件
+    char*               m_pBuffer;                    //日志缓冲指针
+    char                m_szLogTime[MAX_TIME_SIZE];   //Log当前时间
+    char                m_szFileRoot[MAX_BUFF_100];   //路径的主目录
+    ACE_TString         m_StrlogName;                 //模块名字
+    ACE_TString         m_StrlogType;                 //日志类型
+    ACE_TString         m_StrServerName;              //服务器前缀
+    ACE_FILE_Connector  m_Connector;                  //I/O操作连接器
     ACE_FILE_IO         m_File;
     ACE_FILE_Addr       m_FileAddr;
-    char                m_szLogTime[MAX_TIME_SIZE];
-    char                m_szFileRoot[MAX_BUFF_100];   //路径的主目录
-    char*               m_pBuffer;                   //日志缓冲指针
-    uint32              m_u4BufferSize;              //日志缓冲最大大小
-    uint16              m_u2LogID;                   //日志编号
-    uint16              m_u2Level;                   //日志等级
 };
 
 class CFileLogger : public CServerLogger

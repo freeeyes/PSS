@@ -181,7 +181,11 @@ int CLogManager::svc(void)
                 continue;
             }
 
-            ProcessLog(pLogBlockInfo);
+            if (false == ProcessLog(pLogBlockInfo))
+            {
+                OUR_DEBUG((LM_ERROR, "[CLogManager::svc] ProcessLog is false.\n"));
+            }
+
             //OUR_DEBUG((LM_ERROR,"[CLogManager::svc] delete pstrLogText BEGIN!\n"));
             //回收日志块
             m_objLogBlockPool.ReturnBlockInfo(pLogBlockInfo);
@@ -197,7 +201,10 @@ int CLogManager::Close()
 {
     if(m_blRun)
     {
-        this->CloseMsgQueue();
+        if (false == this->CloseMsgQueue())
+        {
+            OUR_DEBUG((LM_ERROR, "[CLogManager::Close] CloseMsgQueue is false.\n"));
+        }
     }
     else
     {
@@ -265,7 +272,7 @@ int CLogManager::PutLog(_LogBlockInfo* pLogBlockInfo)
             OUR_DEBUG((LM_INFO,"[CLogManager::PutLog] CLogManager queue is full!\n"));
             //回收日志块
             m_objLogBlockPool.ReturnBlockInfo(pLogBlockInfo);
-            return 1;
+            return -1;
         }
 
         ACE_Time_Value xtime = ACE_OS::gettimeofday()+ACE_Time_Value(0, MAX_MSG_PUTTIMEOUT);
@@ -362,7 +369,10 @@ int CLogManager::WriteLog(int nLogType, const char* fmt, ...)
 
     if (IsRun())
     {
-        PutLog(pLogBlockInfo);
+        if (0 != PutLog(pLogBlockInfo))
+        {
+            OUR_DEBUG((LM_INFO, "[CLogManager::WriteLog]PutLog error.\n"));
+        }
     }
     else
     {
@@ -475,7 +485,10 @@ int CLogManager::WriteToMail( int nLogType, uint32 u4MailID, char* pTitle, const
 
     if (IsRun())
     {
-        PutLog(pLogBlockInfo);
+        if (false == PutLog(pLogBlockInfo))
+        {
+            OUR_DEBUG((LM_INFO, "[CLogManager::WriteToMail]PutLog error.\n"));
+        }
     }
     else
     {
