@@ -115,7 +115,10 @@ void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
     App_ClientProConnectManager::instance()->SetHandler(m_nServerID, this);
     m_pClientMessage = App_ClientProConnectManager::instance()->GetClientMessage(m_nServerID);
 
-    RecvData(App_MainConfig::instance()->GetConnectServerRecvBuffer());
+    if (false == RecvData(App_MainConfig::instance()->GetConnectServerRecvBuffer()))
+    {
+        OUR_DEBUG((LM_DEBUG, "[CProConnectClient::open](%d)GetConnectServerRecvBuffer is error.\n", m_nServerID));
+    }
 }
 
 void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result& result)
@@ -206,7 +209,10 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
 
 
         //接受下一个数据包
-        RecvData(App_MainConfig::instance()->GetConnectServerRecvBuffer());
+        if (false == RecvData(App_MainConfig::instance()->GetConnectServerRecvBuffer()))
+        {
+            OUR_DEBUG((LM_INFO, "[CProConnectClient::handle_read_stream](%d)RecvData is fail.\n", m_nServerID));
+        }
     }
 }
 
@@ -327,29 +333,26 @@ bool CProConnectClient::SendData(ACE_Message_Block* pmblk)
     }
 
     //发送信息
-    if(NULL != pmblk)
+    int nLen = (int)pmblk->length();
+
+    if (m_Writer.write(*pmblk, pmblk->length()) == -1)
     {
-        int nLen = (int)pmblk->length();
+        OUR_DEBUG((LM_DEBUG,"[CProConnectClient::SendData] Send Error(%d).\n", ACE_OS::last_error()));
+        App_MessageBlockManager::instance()->Close(pmblk);
 
-        if (m_Writer.write(*pmblk, pmblk->length()) == -1)
+        if(NULL != m_pClientMessage)
         {
-            OUR_DEBUG((LM_DEBUG,"[CProConnectClient::SendData] Send Error(%d).\n", ACE_OS::last_error()));
-            App_MessageBlockManager::instance()->Close(pmblk);
-
-            if(NULL != m_pClientMessage)
-            {
-                _ClientIPInfo objServerIPInfo;
-                sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_AddrRemote.get_host_addr());
-                objServerIPInfo.m_nPort = m_AddrRemote.get_port_number();
-                m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
-            }
-
-            return false;
+            _ClientIPInfo objServerIPInfo;
+            sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_AddrRemote.get_host_addr());
+            objServerIPInfo.m_nPort = m_AddrRemote.get_port_number();
+            m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
         }
 
-        m_u4SendSize += (uint32)nLen;
-        m_u4SendCount++;
+        return false;
     }
+
+    m_u4SendSize += (uint32)nLen;
+    m_u4SendCount++;
 
     return true;
 }

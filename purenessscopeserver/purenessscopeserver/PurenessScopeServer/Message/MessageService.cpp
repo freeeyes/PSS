@@ -6,7 +6,7 @@
 
 #include "MessageService.h"
 
-CMessageService::CMessageService():m_mutex(), m_cond(m_mutex)
+CMessageService::CMessageService():m_mutex(), m_cond(m_mutex), m_u2ThreadTimeCheck(0), m_u4WorkQueuePutTime(0)
 {
     m_u4ThreadID      = 0;
     m_u4MaxQueue      = MAX_MSG_THREADQUEUE;
@@ -19,7 +19,7 @@ CMessageService::CMessageService():m_mutex(), m_cond(m_mutex)
 
     uint16 u2ThreadTimeOut = App_MainConfig::instance()->GetThreadTimuOut();
 
-    if(u2ThreadTimeOut <= 0)
+    if(u2ThreadTimeOut == 0)
     {
         m_u2ThreadTimeOut = MAX_MSG_THREADTIMEOUT;
     }
@@ -175,7 +175,10 @@ int CMessageService::svc(void)
                 continue;
             }
 
-            this->ProcessMessage(msg, m_u4ThreadID);
+            if (false == this->ProcessMessage(msg, m_u4ThreadID))
+            {
+                OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)ProcessMessage is false!\n", m_u4ThreadID));
+            }
         }
 
         //使用内存池，这块内存不必再释放
@@ -351,7 +354,11 @@ int CMessageService::Close()
     if(m_blRun)
     {
         m_blRun = false;
-        this->CloseMsgQueue();
+
+        if (false == this->CloseMsgQueue())
+        {
+            OUR_DEBUG((LM_INFO, "[CMessageService::Close]CloseMsgQueue is fail.\n"));
+        }
     }
     else
     {
@@ -570,7 +577,7 @@ int CMessageService::CloseMsgQueue()
 }
 
 //==========================================================
-CRandomMessageService::CRandomMessageService() :m_mutex(), m_cond(m_mutex)
+CRandomMessageService::CRandomMessageService() :m_mutex(), m_cond(m_mutex), m_u2ThreadTimeCheck(0), m_u4WorkQueuePutTime(0)
 {
     m_u4MaxQueue = MAX_MSG_THREADQUEUE;
     m_blRun = false;
@@ -581,9 +588,10 @@ CRandomMessageService::CRandomMessageService() :m_mutex(), m_cond(m_mutex)
     m_emThreadState = THREAD_STOP;
     m_u4ThreadCount = 1;
 
+
     uint16 u2ThreadTimeOut = App_MainConfig::instance()->GetThreadTimuOut();
 
-    if (u2ThreadTimeOut <= 0)
+    if (u2ThreadTimeOut == 0)
     {
         m_u2ThreadTimeOut = MAX_MSG_THREADTIMEOUT;
     }
@@ -765,7 +773,10 @@ int CRandomMessageService::svc(void)
                 continue;
             }
 
-            this->ProcessMessage(msg, u4ThreadID);
+            if (false == this->ProcessMessage(msg, u4ThreadID))
+            {
+                OUR_DEBUG((LM_ERROR, "[CRandomMessageService::svc] (%d)ProcessMessage is fail!\n", u4ThreadID));
+            }
         }
 
         //使用内存池，这块内存不必再释放
@@ -814,18 +825,19 @@ bool CRandomMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID
     char szThreadID[MAX_BUFF_20] = { '\0' };
     ACE_OS::sprintf(szThreadID, "%d", u4ThreadID);
     _ThreadInfo* pThreadInfo = m_objThreadInfoList.Get_Hash_Box_Data(szThreadID);
+
+    if (NULL == pMessage)
+    {
+        OUR_DEBUG((LM_ERROR, "[CRandomMessageService::ProcessMessage] [%d]pMessage is NULL.\n", u4ThreadID));
+        return false;
+    }
+
     pMessage->GetMessageBase()->m_u4WorkThreadID = u4ThreadID;
 
     if (NULL == pThreadInfo)
     {
         //没有找到工作线程信息
         OUR_DEBUG((LM_INFO, "[CRandomMessageService::ProcessMessage]ThreadInfo(%d) is NULL.\n", u4ThreadID));
-        return false;
-    }
-
-    if (NULL == pMessage)
-    {
-        OUR_DEBUG((LM_ERROR, "[CRandomMessageService::ProcessMessage] [%d]pMessage is NULL.\n", u4ThreadID));
         return false;
     }
 
@@ -952,7 +964,11 @@ int CRandomMessageService::Close()
     if (m_blRun)
     {
         m_blRun = false;
-        this->CloseMsgQueue();
+
+        if (false == this->CloseMsgQueue())
+        {
+            OUR_DEBUG((LM_INFO, "[CRandomMessageService::Close]CloseMsgQueue fail.\n"));
+        }
     }
     else
     {
@@ -1173,11 +1189,15 @@ NAMESPACE::uint32 CRandomMessageService::GetThreadCount()
 //==========================================================
 CMessageServiceGroup::CMessageServiceGroup()
 {
-    m_u4TimerID = 0;
+    m_u4TimerID     = 0;
+    m_u4MaxQueue    = 0;
+    m_u4HighMask    = 0;
+    m_u4LowMask     = 0;
+    m_u1ServiceType = 0;
 
     uint16 u2ThreadTimeCheck = App_MainConfig::instance()->GetThreadTimeCheck();
 
-    if(u2ThreadTimeCheck <= 0)
+    if(u2ThreadTimeCheck == 0)
     {
         m_u2ThreadTimeCheck = MAX_MSG_TIMEDELAYTIME;
     }
@@ -1196,20 +1216,32 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* a
 {
     if(arg != NULL)
     {
-        OUR_DEBUG((LM_ERROR,"[CMessageServiceGroup::handle_timeout] arg is not NULL, time is (%d).\n", tv.sec()));
+        OUR_DEBUG((LM_ERROR,"[CMessageServiceGroup::handle_timeout]arg is not NULL, time is (%d).\n", tv.sec()));
     }
 
     //检查所有工作线程
-    CheckWorkThread();
+    if (false == CheckWorkThread())
+    {
+        OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::handle_timeout]CheckWorkThread is fail.\n"));
+    }
 
     //记录PacketParse的统计过程
-    CheckPacketParsePool();
+    if (false == CheckPacketParsePool())
+    {
+        OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::handle_timeout]CheckPacketParsePool is fail.\n"));
+    }
 
     //记录统计CPU和内存的使用
-    CheckCPUAndMemory();
+    if (false == CheckCPUAndMemory())
+    {
+        OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::handle_timeout]CheckCPUAndMemory is fail.\n"));
+    }
 
     //检查所有插件状态
-    CheckPlugInState();
+    if (false == CheckPlugInState())
+    {
+        OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::handle_timeout]CheckPlugInState is fail.\n"));
+    }
 
     return 0;
 }
@@ -1281,13 +1313,19 @@ bool CMessageServiceGroup::PutMessage(CMessage* pMessage)
 
         if (NULL != pMessageService)
         {
-            pMessageService->PutMessage(pMessage);
+            if (false == pMessageService->PutMessage(pMessage))
+            {
+                OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::PutMessage](%d)pMessageService fail.\n", pMessageService->GetThreadID()));
+            }
         }
 
     }
     else
     {
-        m_RandomMessageService.PutMessage(pMessage);
+        if (false == m_RandomMessageService.PutMessage(pMessage))
+        {
+            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::PutMessage]pMessageService fail.\n"));
+        }
     }
 
     return true;
@@ -1295,7 +1333,11 @@ bool CMessageServiceGroup::PutMessage(CMessage* pMessage)
 
 void CMessageServiceGroup::Close()
 {
-    KillTimer();
+    if (false == KillTimer())
+    {
+        OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Close]KillTimer error.\n"));
+    }
+
     ACE_Time_Value tvSleep(0, 1000);
 
     if (0 == m_u1ServiceType)
@@ -1304,19 +1346,24 @@ void CMessageServiceGroup::Close()
         {
             CMessageService* pMessageService = m_vecMessageService[i];
 
-            if (NULL != pMessageService)
+            if (NULL != pMessageService && 0 != pMessageService->Close())
             {
-                pMessageService->Close();
-                ACE_OS::sleep(tvSleep);
-                SAFE_DELETE(pMessageService);
+                OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Close](%d)pMessageService fail.\n", pMessageService->GetThreadID()));
             }
+
+            ACE_OS::sleep(tvSleep);
+            SAFE_DELETE(pMessageService);
         }
 
         m_vecMessageService.clear();
     }
     else
     {
-        m_RandomMessageService.Close();
+        if (0 != m_RandomMessageService.Close())
+        {
+            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Close]m_RandomMessageService fail.\n"));
+        }
+
         ACE_OS::sleep(tvSleep);
     }
 }
@@ -1334,9 +1381,10 @@ bool CMessageServiceGroup::Start()
         {
             CMessageService* pMessageService = m_vecMessageService[i];
 
-            if (NULL != pMessageService)
+            if (NULL != pMessageService && false == pMessageService->Start())
             {
-                pMessageService->Start();
+                OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Start](%d)WorkThread is fail.\n", i));
+                return false;
             }
 
             OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Start](%d)WorkThread is OK.\n", i));
@@ -1344,7 +1392,11 @@ bool CMessageServiceGroup::Start()
     }
     else
     {
-        m_RandomMessageService.Start();
+        if (false == m_RandomMessageService.Start())
+        {
+            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Start]m_RandomMessageService is fail.\n"));
+            return false;
+        }
     }
 
     return true;
@@ -1387,16 +1439,20 @@ bool CMessageServiceGroup::CheckWorkThread()
         {
             CMessageService* pMessageService = m_vecMessageService[i];
 
-            if (NULL != pMessageService)
+            if (NULL != pMessageService && false == pMessageService->SaveThreadInfo())
             {
-                pMessageService->SaveThreadInfo();
-                //目前在工作线程发生阻塞的时候不在杀死工程线程，杀了工作线程会导致一些内存问题。
+                OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::CheckWorkThread]SaveThreadInfo error.\n"));
             }
+
+            //目前在工作线程发生阻塞的时候不在杀死工程线程，杀了工作线程会导致一些内存问题。
         }
     }
     else
     {
-        m_RandomMessageService.SaveThreadInfo();
+        if (false == m_RandomMessageService.SaveThreadInfo())
+        {
+            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::CheckWorkThread]m_RandomMessageService error.\n"));
+        }
     }
 
     return true;

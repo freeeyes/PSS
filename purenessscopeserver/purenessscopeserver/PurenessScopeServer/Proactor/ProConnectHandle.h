@@ -60,7 +60,7 @@ public:
     void Init(uint16 u2HandlerID);                                            //Connect Pool初始化调用的函数
 
     bool SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, uint8 u1State, uint8 u1SendType, uint32& u4PacketSize, bool blDelete, int nMessageID);   //发送给客户端数据的函数
-    bool Close(int nIOCount = 1, int nErrno = 0);                                                  //当前连接对象关闭
+    void Close(int nIOCount = 1, int nErrno = 0);                                                  //当前连接对象关闭
     bool ServerClose(EM_Client_Close_status emStatus, uint8 u1OptionEvent = PACKET_SDISCONNECT);   //服务器关闭客户端链接的函数
     void SetLocalIPInfo(const char* pLocalIP, uint32 u4LocalPort);            //设置监听IP和端口信息
 

@@ -102,6 +102,9 @@ bool CAceProactor::Init(int nProactorType, int nThreadCount)
             }
 
 #endif
+
+        default:
+            return false;
         }
 
         m_nThreadCount = nThreadCount;
@@ -307,7 +310,12 @@ bool CAceProactorManager::StopProactor()
         if(NULL != pAceProactor)
         {
             OUR_DEBUG((LM_ERROR, "[CAceProactorManager::StopProactor]ProactorID=%d.\n", pAceProactor->GetProactorID()));
-            pAceProactor->Stop();
+
+            if (false == pAceProactor->Stop())
+            {
+                OUR_DEBUG((LM_ERROR, "[CAceProactorManager::StopProactor]ProactorID=%d stop error.\n", pAceProactor->GetProactorID()));
+            }
+
             //pAceProactor->wait();
         }
     }

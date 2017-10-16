@@ -33,7 +33,11 @@ void CWorkThreadAI::Init(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime,
 
         int nSize = MAX_BUFF_1024;
         m_u2ReturnDataLen = objConvertBuffer.GetBufferSize(pReturnData, (int)strlen(pReturnData));
-        objConvertBuffer.Convertstr2charArray(pReturnData, (int)strlen(pReturnData), (unsigned char*)m_szWTReturnData, nSize);
+
+        if (false == objConvertBuffer.Convertstr2charArray(pReturnData, (int)strlen(pReturnData), (unsigned char*)m_szWTReturnData, nSize))
+        {
+            OUR_DEBUG((LM_INFO, "[CWorkThreadAI::Init]Convertstr2charArray error.\n"));
+        }
     }
     else
     {

@@ -119,7 +119,7 @@ uint8 CConsolePacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block
     }
     else
     {
-        return PACKET_GET_ERROR;
+        return PACKET_GET_ENOUGTH;
     }
 }
 

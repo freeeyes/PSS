@@ -88,7 +88,7 @@ const char* CProConnectHandle::GetError()
     return m_szError;
 }
 
-bool CProConnectHandle::Close(int nIOCount, int nErrno)
+void CProConnectHandle::Close(int nIOCount, int nErrno)
 {
     m_ThreadWriteLock.acquire();
 
@@ -168,11 +168,7 @@ bool CProConnectHandle::Close(int nIOCount, int nErrno)
 
         //将对象指针放入空池中
         App_ProConnectHandlerPool::instance()->Delete(this);
-
-        return true;
     }
-
-    return false;
 }
 
 bool CProConnectHandle::ServerClose(EM_Client_Close_status emStatus, uint8 u1OptionEvent)
@@ -1667,7 +1663,7 @@ void CProConnectHandle::SetPacketParseInfoID(uint32 u4PacketParseInfoID)
 }
 
 //***************************************************************************
-CProConnectManager::CProConnectManager(void):m_mutex(), m_cond(m_mutex)
+CProConnectManager::CProConnectManager(void):m_mutex(), m_cond(m_mutex), m_u4SendQueuePutTime(0)
 {
     m_u4TimeCheckID      = 0;
     m_szError[0]         = '\0';
@@ -1692,14 +1688,21 @@ void CProConnectManager::CloseAll()
 
     if(m_blRun)
     {
-        this->CloseMsgQueue();
+        if (false == this->CloseMsgQueue())
+        {
+            OUR_DEBUG((LM_INFO, "[CProConnectManager::CloseAll]CloseMsgQueue fail.\n"));
+        }
     }
     else
     {
         msg_queue()->deactivate();
     }
 
-    KillTimer();
+    if (false == KillTimer())
+    {
+        OUR_DEBUG((LM_INFO, "[CProConnectManager::CloseAll]KillTimer fail.\n"));
+    }
+
     vector<CProConnectHandle*> vecCloseConnectHandler;
     m_objHashConnectList.Get_All_Used(vecCloseConnectHandler);
 
@@ -1726,9 +1729,16 @@ bool CProConnectManager::Close(uint32 u4ConnectID)
     //从时间轮盘中清除
     char szConnectID[10] = { '\0' };
     sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
+
     //连接关闭，清除时间轮盘
-    DelConnectTimeWheel(m_objHashConnectList.Get_Hash_Box_Data(szConnectID));
-    OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close]DelConnectTimeWheel ConnectID=%d.\n", u4ConnectID));
+    if (false == DelConnectTimeWheel(m_objHashConnectList.Get_Hash_Box_Data(szConnectID)))
+    {
+        OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close]DelConnectTimeWheel ConnectID=%d fail.\n", u4ConnectID));
+    }
+    else
+    {
+        OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close]DelConnectTimeWheel ConnectID=%d.\n", u4ConnectID));
+    }
 
     m_objHashConnectList.Del_Hash_Data(szConnectID);
     m_u4TimeDisConnect++;
@@ -1754,7 +1764,10 @@ bool CProConnectManager::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status
     if(pConnectHandler != NULL)
     {
         //从时间轮盘中清除
-        DelConnectTimeWheel(m_objHashConnectList.Get_Hash_Box_Data(szConnectID));
+        if (false == DelConnectTimeWheel(m_objHashConnectList.Get_Hash_Box_Data(szConnectID)))
+        {
+            OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close]DelConnectTimeWheel ConnectID=%d fail.\n", u4ConnectID));
+        }
 
         pConnectHandler->ServerClose(emStatus);
 
@@ -1764,9 +1777,16 @@ bool CProConnectManager::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status
         m_SendCacheManager.FreeCacheData(u4ConnectID);
 
         //加入链接统计功能
-        App_ConnectAccount::instance()->AddDisConnect();
+        if (false == App_ConnectAccount::instance()->AddDisConnect())
+        {
+            OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close]AddDisConnect ConnectID=%d fail.\n", u4ConnectID));
+        }
 
-        m_objHashConnectList.Del_Hash_Data(szConnectID);
+        if (-1 == m_objHashConnectList.Del_Hash_Data(szConnectID))
+        {
+            OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close]Del_Hash_Data ConnectID=%d fail.\n", u4ConnectID));
+        }
+
         return true;
     }
     else
@@ -1865,7 +1885,10 @@ bool CProConnectManager::AddConnect(uint32 u4ConnectID, CProConnectHandle* pConn
     App_ConnectAccount::instance()->AddConnect();
 
     //加入时间轮盘
-    SetConnectTimeWheel(pConnectHandler);
+    if (false == SetConnectTimeWheel(pConnectHandler))
+    {
+        OUR_DEBUG((LM_INFO, "[CProConnectHandle::AddConnect](%d)SetConnectTimeWheel is fail", u4ConnectID));
+    }
 
     //m_ThreadWriteLock.release();
 

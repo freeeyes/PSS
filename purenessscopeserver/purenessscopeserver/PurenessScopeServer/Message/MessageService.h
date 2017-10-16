@@ -91,20 +91,16 @@ private:
     virtual int CloseMsgQueue();
 
 private:
-    //关闭消息队列条件变量
-    ACE_Thread_Mutex m_mutex;
-    ACE_Condition<ACE_Thread_Mutex> m_cond;
-private:
+    uint64                         m_u8TimeCost;          //Put到队列信息的数据处理时间
     uint32                         m_u4ThreadID;          //当前线程ID
     uint32                         m_u4MaxQueue;          //线程中最大消息对象个数
-    bool                           m_blRun;               //线程是否在运行
     uint32                         m_u4HighMask;
     uint32                         m_u4LowMask;
-    uint16                         m_u2ThreadTimeOut;
-    uint16                         m_u2ThreadTimeCheck;
-    uint64                         m_u8TimeCost;          //Put到队列信息的数据处理时间
     uint32                         m_u4Count;             //消息队列接受个数
     uint32                         m_u4WorkQueuePutTime;  //入队超时时间
+    uint16                         m_u2ThreadTimeOut;
+    uint16                         m_u2ThreadTimeCheck;
+    bool                           m_blRun;               //线程是否在运行
 
     MESSAGE_SERVICE_THREAD_STATE   m_emThreadState;       //当前工作线程状态
 
@@ -112,6 +108,9 @@ private:
     CWorkThreadAI                  m_WorkThreadAI;        //线程自我监控的AI逻辑
     CCommandAccount                m_CommandAccount;      //当前线程命令统计数据
     CMessagePool                   m_MessagePool;         //消息池
+
+    ACE_Thread_Mutex m_mutex;
+    ACE_Condition<ACE_Thread_Mutex> m_cond;
 };
 
 //工作线程随机模式
@@ -166,20 +165,16 @@ private:
     virtual int CloseMsgQueue();
 
 private:
-    //关闭消息队列条件变量
-    ACE_Thread_Mutex m_mutex;
-    ACE_Condition<ACE_Thread_Mutex> m_cond;
-private:
+    uint64                         m_u8TimeCost;          //Put到队列信息的数据处理时间
     uint32                         m_u4ThreadCount;       //工作线程个数
     uint32                         m_u4MaxQueue;          //线程中最大消息对象个数
-    bool                           m_blRun;               //线程是否在运行
+    uint32                         m_u4Count;             //消息队列接受个数
+    uint32                         m_u4WorkQueuePutTime;  //入队超时时间
     uint32                         m_u4HighMask;
     uint32                         m_u4LowMask;
     uint16                         m_u2ThreadTimeOut;
     uint16                         m_u2ThreadTimeCheck;
-    uint64                         m_u8TimeCost;          //Put到队列信息的数据处理时间
-    uint32                         m_u4Count;             //消息队列接受个数
-    uint32                         m_u4WorkQueuePutTime;  //入队超时时间
+    bool                           m_blRun;               //线程是否在运行
 
     MESSAGE_SERVICE_THREAD_STATE   m_emThreadState;       //当前工作线程状态
 
@@ -187,6 +182,9 @@ private:
     CCommandAccount                m_CommandAccount;      //当前线程命令统计数据
     CMessagePool                   m_MessagePool;         //消息池
     CHashTable<_ThreadInfo>        m_objThreadInfoList;   //线程列表信息
+
+    ACE_Thread_Mutex m_mutex;
+    ACE_Condition<ACE_Thread_Mutex> m_cond;
 };
 
 //add by freeeyes
@@ -244,14 +242,14 @@ private:
     CRandomMessageService m_RandomMessageService;
 
 public:
-    CThreadInfo                m_objAllThreadInfo;    //当前所有线程信息
-    uint32                     m_u4TimerID;           //定时器ID
-    uint16                     m_u2ThreadTimeCheck;   //线程自检时间
     uint32                     m_u4MaxQueue;          //线程中最大消息对象个数
     uint32                     m_u4HighMask;          //线程高水位
     uint32                     m_u4LowMask;           //线程低水位
-    CRandomNumber              m_objRandomNumber;     //随机数，仅UDP使用
+    uint32                     m_u4TimerID;           //定时器ID
+    uint16                     m_u2ThreadTimeCheck;   //线程自检时间
     uint8                      m_u1ServiceType;       //当前的服务类型，是保持时序的队列模式，还是随机的actor模式。
+    CThreadInfo                m_objAllThreadInfo;    //当前所有线程信息
+    CRandomNumber              m_objRandomNumber;     //随机数，仅UDP使用
 };
 
 typedef ACE_Singleton<CMessageServiceGroup,ACE_Null_Mutex> App_MessageServiceGroup;

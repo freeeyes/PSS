@@ -106,7 +106,10 @@ bool CProactorClientInfo::SendData(ACE_Message_Block* pmblk)
             if(SERVER_CONNECT_FIRST != m_emConnectState && SERVER_CONNECT_RECONNECT != m_emConnectState)
             {
                 //如果连接不存在，则建立链接。
-                Run(true, SERVER_CONNECT_RECONNECT);
+                if (false == Run(true, SERVER_CONNECT_RECONNECT))
+                {
+                    OUR_DEBUG((LM_INFO, "[CProactorClientInfo::SendData]Run error.\n"));
+                }
             }
 
             if(NULL != pmblk)
@@ -229,9 +232,10 @@ void CProactorClientInfo::SetLocalAddr( const char* pIP, int nPort, uint8 u1IPTy
 
 CClientProConnectManager::CClientProConnectManager(void)
 {
-    m_nTaskID          = -1;
-    m_blProactorFinish = false;
-    m_u4MaxPoolCount   = 0;
+    m_nTaskID                = -1;
+    m_blProactorFinish       = false;
+    m_u4MaxPoolCount         = 0;
+    m_u4ConnectServerTimeout = 0;
 }
 
 CClientProConnectManager::~CClientProConnectManager(void)
@@ -447,7 +451,11 @@ bool CClientProConnectManager::Close(int nServerID)
     }
     else
     {
-        pClientInfo->Close();
+        if (false == pClientInfo->Close())
+        {
+            OUR_DEBUG((LM_INFO, "[CClientProConnectManager::Close]pClientInfo->Close fail.\n"));
+        }
+
         SAFE_DELETE(pClientInfo);
     }
 
@@ -637,7 +645,11 @@ void CClientProConnectManager::Close()
 
         if(NULL != pClientInfo)
         {
-            pClientInfo->Close();
+            if (false == pClientInfo->Close())
+            {
+                OUR_DEBUG((LM_INFO, "[CClientProConnectManager::Close]pClientInfo->Close is fail.\n"));
+            }
+
             SAFE_DELETE(pClientInfo);
         }
     }
@@ -686,7 +698,10 @@ int CClientProConnectManager::handle_timeout(const ACE_Time_Value& tv, const voi
             if(NULL == pClientInfo->GetProConnectClient())
             {
                 //如果连接不存在，则重新建立连接
-                pClientInfo->Run(m_blProactorFinish, SERVER_CONNECT_RECONNECT);
+                if (false == pClientInfo->Run(m_blProactorFinish, SERVER_CONNECT_RECONNECT))
+                {
+                    OUR_DEBUG((LM_DEBUG, "[CClientProConnectManager::handle_timeout]Run is fail.\n"));
+                }
             }
             else
             {
@@ -902,7 +917,12 @@ bool CClientProConnectManager::ReConnect(int nServerID)
     if(NULL == pClientInfo->GetProConnectClient())
     {
         //如果连接不存在，则重新建立连接
-        pClientInfo->Run(m_blProactorFinish, SERVER_CONNECT_RECONNECT);
+        if (false == pClientInfo->Run(m_blProactorFinish, SERVER_CONNECT_RECONNECT))
+        {
+            OUR_DEBUG((LM_INFO, "[CClientProConnectManager::ReConnect]Run is fail.\n"));
+            return false;
+        }
+
         return true;
     }
     else
