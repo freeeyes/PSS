@@ -167,7 +167,10 @@ bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint64 u8CommandCost, 
                 pCommandData->m_u4CommandSize  += u4CommandSize;
                 pCommandData->m_tvCommandTime  = tvTime;
 
-                m_objCommandDataList.Add_Hash_Data(szHashID, pCommandData);
+                if (-1 == m_objCommandDataList.Add_Hash_Data(szHashID, pCommandData))
+                {
+                    OUR_DEBUG((LM_INFO, "[CCommandAccount::SaveCommandData]szHashID=%s Add Hash Data Error.\n", szHashID));
+                }
             }
             else
             {

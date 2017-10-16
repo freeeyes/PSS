@@ -104,7 +104,11 @@ bool CForbiddenIP::AddForeverIP(const char* pIP, uint8 u1ConnectType)
     sprintf_safe(ForbiddenIP.m_szClientIP, MAX_IP_SIZE, "%s", pIP);
     ForbiddenIP.m_u1ConnectType = u1ConnectType;
     m_VecForeverForbiddenIP.push_back(ForbiddenIP);
-    SaveConfig();
+
+    if (false == SaveConfig())
+    {
+        OUR_DEBUG((LM_INFO, "[CForbiddenIP::AddForeverIP]SaveConfig is error.\n"));
+    }
 
     return true;
 }
@@ -129,7 +133,12 @@ bool CForbiddenIP::DelForeverIP(const char* pIP, uint8 u1ConnectType)
         if(ACE_OS::strcmp(pIP, (*b).m_szClientIP) == 0 && (*b).m_u1ConnectType == u1ConnectType)
         {
             m_VecForeverForbiddenIP.erase(b);
-            SaveConfig();
+
+            if (false == SaveConfig())
+            {
+                OUR_DEBUG((LM_INFO, "[CForbiddenIP::DelForeverIP]SaveConfig is error.\n"));
+            }
+
             return true;
         }
     }

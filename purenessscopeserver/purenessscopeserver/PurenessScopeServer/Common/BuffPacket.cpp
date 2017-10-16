@@ -17,7 +17,10 @@ CBuffPacket::CBuffPacket(int nSize, int nMaxBuffSize)
 CBuffPacket::~CBuffPacket(void)
 {
     //OUR_DEBUG((LM_ERROR, "[CBuffPacket::~CBuffPacket].\n"));
-    Close();
+    if (false == Close())
+    {
+        OUR_DEBUG((LM_INFO, "[CBuffPacket::~CBuffPacket]Close error(%s).\n", m_szError));
+    }
 }
 
 bool CBuffPacket::Init(int nSize, int nMaxBuffSize)
@@ -26,7 +29,7 @@ bool CBuffPacket::Init(int nSize, int nMaxBuffSize)
     try
     {
         m_szError[0]      = '\0';
-        m_u4MaxPacketSize = nMaxBuffSize;
+        m_u4MaxPacketSize = (uint32)nMaxBuffSize;
 
         if(nSize >= (int)m_u4MaxPacketSize)
         {
@@ -36,13 +39,12 @@ bool CBuffPacket::Init(int nSize, int nMaxBuffSize)
             throw szError;
         }
 
-
         //初始化包数据结构
         m_u4ReadPtr       = 0;
         m_u4WritePtr      = 0;
         m_u4PacketCount   = 0;
         m_nHashID         = 0;
-        m_u4PacketLen     = ((int)ceil((double)nSize/(double)DEFINE_PACKET_ADD))*DEFINE_PACKET_ADD;
+        m_u4PacketLen     = (uint32)((int)ceil((double)nSize/(double)DEFINE_PACKET_ADD))*DEFINE_PACKET_ADD;
 
         m_szData          = (char*)App_ACEMemory::instance()->malloc(m_u4PacketLen);
         m_u4BuffID        = 0;
