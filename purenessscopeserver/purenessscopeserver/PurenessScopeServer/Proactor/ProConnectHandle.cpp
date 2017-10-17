@@ -1,6 +1,6 @@
 #include "ProConnectHandle.h"
 
-CProConnectHandle::CProConnectHandle(void)
+CProConnectHandle::CProConnectHandle(void) : m_u4LocalPort(0), m_u4SendCheckTime(0)
 {
     m_szError[0]          = '\0';
     m_u4ConnectID         = 0;
@@ -66,7 +66,7 @@ void CProConnectHandle::Init(uint16 u2HandlerID)
 
     m_u2RecvQueueTimeout = App_MainConfig::instance()->GetRecvQueueTimeout() * 1000;
 
-    if(m_u2RecvQueueTimeout <= 0)
+    if(m_u2RecvQueueTimeout == 0)
     {
         m_u2RecvQueueTimeout = MAX_QUEUE_TIMEOUT * 1000;
     }
@@ -566,11 +566,17 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 
     if(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
     {
-        RecvClinetPacket(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength);
+        if (false == RecvClinetPacket(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength))
+        {
+            OUR_DEBUG((LM_INFO, "[CProConnectHandle::open](%d)RecvClinetPacket error.\n", GetConnectID()));
+        }
     }
     else
     {
-        RecvClinetPacket(App_MainConfig::instance()->GetServerRecvBuff());
+        if (false == RecvClinetPacket(App_MainConfig::instance()->GetServerRecvBuff()))
+        {
+            OUR_DEBUG((LM_INFO, "[CProConnectHandle::open](%d)RecvClinetPacket error.\n", GetConnectID()));
+        }
     }
 
     return;
@@ -727,7 +733,10 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                 Close();
 
                 //接受下一个数据包
-                RecvClinetPacket(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength);
+                if (false == RecvClinetPacket(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength))
+                {
+                    OUR_DEBUG((LM_INFO, "[CProConnectHandle::handle_read_stream](%d) RecvClinetPacket error.\n", GetConnectID()));
+                }
             }
             else
             {
@@ -745,7 +754,11 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                 else
                 {
                     Close();
-                    RecvClinetPacket(u4PacketBodyLen);
+
+                    if (false == RecvClinetPacket(u4PacketBodyLen))
+                    {
+                        OUR_DEBUG((LM_INFO, "[CProConnectHandle::handle_read_stream](%d) RecvClinetPacket u4PacketBodyLen error.\n", GetConnectID()));
+                    }
                 }
             }
         }
@@ -813,7 +826,10 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
             Close();
 
             //接受下一个数据包
-            RecvClinetPacket(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength);
+            if (false == RecvClinetPacket(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength))
+            {
+                OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open](%d)RecvClinetPacket error.\n", GetConnectID()));
+            }
         }
     }
     else
@@ -904,8 +920,12 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         }
 
         Close();
+
         //接受下一个数据包
-        RecvClinetPacket(App_MainConfig::instance()->GetServerRecvBuff());
+        if (false == RecvClinetPacket(App_MainConfig::instance()->GetServerRecvBuff()))
+        {
+            OUR_DEBUG((LM_INFO, "[CProConnectHandle::open](%d)RecvClinetPacket error.\n", GetConnectID()));
+        }
     }
 
     return;
@@ -983,7 +1003,7 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
     }
 }
 
-bool CProConnectHandle::SetRecvQueueTimeCost(uint32 u4TimeCost)
+void CProConnectHandle::SetRecvQueueTimeCost(uint32 u4TimeCost)
 {
     m_ThreadWriteLock.acquire();
     m_nIOCount++;
@@ -1003,10 +1023,9 @@ bool CProConnectHandle::SetRecvQueueTimeCost(uint32 u4TimeCost)
     //m_u8RecvQueueTimeCost += u4TimeCost;
 
     Close();
-    return true;
 }
 
-bool CProConnectHandle::SetSendQueueTimeCost(uint32 u4TimeCost)
+void CProConnectHandle::SetSendQueueTimeCost(uint32 u4TimeCost)
 {
     m_ThreadWriteLock.acquire();
     m_nIOCount++;
@@ -1036,7 +1055,6 @@ bool CProConnectHandle::SetSendQueueTimeCost(uint32 u4TimeCost)
     //m_u8SendQueueTimeCost += u4TimeCost;
 
     Close();
-    return true;
 }
 
 uint8 CProConnectHandle::GetConnectState()
@@ -1932,8 +1950,17 @@ bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
     if(NULL != pConnectHandler)
     {
         uint32 u4PacketSize  = 0;
-        pConnectHandler->SendMessage(u2CommandID, pBuffPacket, u1SendState, u1SendType, u4PacketSize, blDelete, nMessageID);
-        m_CommandAccount.SaveCommandData(u2CommandID, (uint64)0, PACKET_TCP, u4PacketSize, u4CommandSize, COMMAND_TYPE_OUT);
+
+        if (false == pConnectHandler->SendMessage(u2CommandID, pBuffPacket, u1SendState, u1SendType, u4PacketSize, blDelete, nMessageID))
+        {
+            OUR_DEBUG((LM_INFO, "[CProConnectManager::SendMessage]ConnectID=%d, CommandID=%d, SendMessage error.\n", u4ConnectID, u2CommandID));
+        }
+
+        if (false == m_CommandAccount.SaveCommandData(u2CommandID, (uint64)0, PACKET_TCP, u4PacketSize, u4CommandSize, COMMAND_TYPE_OUT))
+        {
+            OUR_DEBUG((LM_INFO, "[CProConnectManager::SendMessage]ConnectID=%d, CommandID=%d, SaveCommandData error.\n", u4ConnectID, u2CommandID));
+        }
+
         return true;
     }
     else
@@ -1944,7 +1971,11 @@ bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
         memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char* )pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
         pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
         ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-        App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
+
+        if (false == App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow))
+        {
+            OUR_DEBUG((LM_INFO, "[CProConnectManager::SendMessage]ConnectID=%d, CommandID=%d, PutSendErrorMessage error.\n", u4ConnectID, u2CommandID));
+        }
 
         if(true == blDelete)
         {
@@ -2057,7 +2088,12 @@ bool CProConnectManager::StartTimer()
     }
 
     //避免定时器重复启动
-    KillTimer();
+    if (false == KillTimer())
+    {
+        OUR_DEBUG((LM_ERROR, "[CProConnectManager::StartTimer]KillTimer() is error.\n"));
+        return false;
+    }
+
     OUR_DEBUG((LM_ERROR, "CProConnectManager::StartTimer()-->begin....\n"));
 
     //检测链接发送存活包数
@@ -2260,12 +2296,18 @@ int CProConnectManager::svc (void)
             if (0 == msg->m_u1Type)
             {
                 //处理发送数据
-                SendMessage(msg->m_u4ConnectID, msg->m_pBuffPacket, msg->m_u2CommandID, msg->m_u1SendState, msg->m_nEvents, msg->m_tvSend, msg->m_blDelete, msg->m_nMessageID);
+                if (false == SendMessage(msg->m_u4ConnectID, msg->m_pBuffPacket, msg->m_u2CommandID, msg->m_u1SendState, msg->m_nEvents, msg->m_tvSend, msg->m_blDelete, msg->m_nMessageID))
+                {
+                    OUR_DEBUG((LM_INFO, "[CProConnectManager::svc]ConnectID=%d, m_u2CommandID=%d, SendMessage error.\n", msg->m_u4ConnectID, msg->m_u2CommandID));
+                }
             }
             else if (1 == msg->m_u1Type)
             {
                 //处理连接服务器主动关闭
-                CloseConnect(msg->m_u4ConnectID, CLIENT_CLOSE_IMMEDIATLY);
+                if (false == CloseConnect(msg->m_u4ConnectID, CLIENT_CLOSE_IMMEDIATLY))
+                {
+                    OUR_DEBUG((LM_INFO, "[CProConnectManager::svc]ConnectID=%d CloseConnect error.\n", msg->m_u4ConnectID));
+                }
             }
 
             m_SendMessagePool.Delete(msg);
@@ -2545,7 +2587,10 @@ void CProConnectManager::TimeWheel_Timeout_Callback(void* pArgsContext, vector<C
 
             if (NULL != pManager)
             {
-                pManager->CloseConnect_By_Queue(vecProConnectHandle[i]->GetConnectID());
+                if (false == pManager->CloseConnect_By_Queue(vecProConnectHandle[i]->GetConnectID()))
+                {
+                    OUR_DEBUG((LM_INFO, "[CProConnectManager::TimeWheel_Timeout_Callback]CloseConnect_By_Queue error.\n"));
+                }
             }
         }
     }
@@ -2949,7 +2994,10 @@ bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPac
 
         pCurrBuffPacket->WriteStream(pBuffPacket->GetData(), pBuffPacket->GetWriteLen());
 
-        pConnectManager->PostMessage(u4ConnectID, pCurrBuffPacket, u1SendType, u2CommandID, u1SendState, true, nMessageID);
+        if (false == pConnectManager->PostMessage(u4ConnectID, pCurrBuffPacket, u1SendType, u2CommandID, u1SendState, true, nMessageID))
+        {
+            OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::PostMessage]PostMessage(%d) is error.\n", u4ConnectID));
+        }
     }
 
     if(true == blDelete)
@@ -2989,7 +3037,10 @@ bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, const ch
 
         pBuffPacket->WriteStream(pData, nDataLen);
 
-        pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, u1SendState, true, nMessageID);
+        if (false == PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, u1SendState, true, nMessageID))
+        {
+            OUR_DEBUG((LM_INFO, "[ CProConnectManagerGroup::PostMessage]PostMessage(%d) error.\n", u4ConnectID));
+        }
     }
 
     if(true == blDelete)
@@ -3109,7 +3160,10 @@ bool CProConnectManagerGroup::StartTimer()
 
         if(NULL != pConnectManager)
         {
-            pConnectManager->StartTimer();
+            if (false == pConnectManager->StartTimer())
+            {
+                OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::StartTimer]StartTimer error.\n"));
+            }
         }
     }
 
@@ -3166,7 +3220,10 @@ bool CProConnectManagerGroup::PostMessageAll( IBuffPacket*& pBuffPacket, uint8 u
             continue;
         }
 
-        pConnectManager->PostMessageAll(pBuffPacket, u1SendType, u2CommandID, u1SendState, false, nMessageID);
+        if (false == pConnectManager->PostMessageAll(pBuffPacket, u1SendType, u2CommandID, u1SendState, false, nMessageID))
+        {
+            OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::PostMessageAll]PostMessageAll error.\n"));
+        }
     }
 
     if(true == blDelete)
@@ -3209,7 +3266,10 @@ bool CProConnectManagerGroup::PostMessageAll( const char*& pData, uint32 nDataLe
             continue;
         }
 
-        pConnectManager->PostMessageAll(pBuffPacket, u1SendType, u2CommandID, u1SendState, false, nMessageID);
+        if (false == pConnectManager->PostMessageAll(pBuffPacket, u1SendType, u2CommandID, u1SendState, false, nMessageID))
+        {
+            OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::PostMessageAll]PostMessageAll error.\n"));
+        }
     }
 
     //用完了就删除

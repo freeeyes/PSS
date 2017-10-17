@@ -80,8 +80,8 @@ public:
     void               SetHashID(int nHashID);                                //设置HashID
     int                GetHashID();                                           //得到当前HashID
 
-    bool SetRecvQueueTimeCost(uint32 u4TimeCost);                             //记录当前接收数据到模块处理完成的具体时间消耗
-    bool SetSendQueueTimeCost(uint32 u4TimeCost);                             //记录当前从发送队列到数据发送完成的具体时间消耗
+    void SetRecvQueueTimeCost(uint32 u4TimeCost);                             //记录当前接收数据到模块处理完成的具体时间消耗
+    void SetSendQueueTimeCost(uint32 u4TimeCost);                             //记录当前从发送队列到数据发送完成的具体时间消耗
     void SetSendCacheManager(ISendCacheManager* pSendCacheManager);           //设置发送缓冲接口
     void SetPacketParseInfoID(uint32 u4PacketParseInfoID);                    //设置对应的m_u4PacketParseInfoID
 
@@ -93,61 +93,56 @@ private:
     void PutSendPacketError(ACE_Message_Block* pMbData);                      //发送失败回调
 
 private:
-    char             m_szError[MAX_BUFF_500];          //错误信息描述文字
-    ACE_INET_Addr    m_addrRemote;                     //远程链接客户端地址
-    ACE_Time_Value   m_atvConnect;                     //当前链接建立时间
-    ACE_Time_Value   m_atvInput;                       //最后一次接收数据时间
-    ACE_Time_Value   m_atvOutput;                      //最后一次发送数据时间
-    ACE_Time_Value   m_atvSendAlive;                   //链接存活时间
-
-    CBuffPacket        m_AlivePacket;                  //服务器生存包
-    uint8              m_u1ConnectState;               //目前链接处理状态
-    uint8              m_u1SendBuffState;              //目前缓冲器是否有等待发送的数据
-    uint16             m_u2SendQueueMax;               //发送队列最大长度
-    uint16             m_u2MaxConnectTime;             //最大链接时间判定
-    uint32             m_u4MaxPacketSize;              //单个数据包的最大长度
     uint64             m_u8RecvQueueTimeCost;          //成功接收数据到数据处理完成（未发送）花费的时间总和
-    uint32             m_u4RecvQueueCount;             //当前链接被处理的数据包数
     uint64             m_u8SendQueueTimeCost;          //成功发送数据到数据处理完成（只发送）花费的时间总和
-    uint16             m_u2SendQueueTimeout;           //发送超时时间,超过这个时间的都会被记录到日志中
-    uint16             m_u2RecvQueueTimeout;           //接受超时时间，超过这个时间的都会被记录到日志中
+    uint32             m_u4MaxPacketSize;              //单个数据包的最大长度
+    uint32             m_u4RecvQueueCount;             //当前链接被处理的数据包数
     uint32             m_u4HandlerID;                  //此Hander生成时的ID
     uint32             m_u4ConnectID;                  //当前Connect的流水号
     uint32             m_u4AllRecvCount;               //当前链接接收数据包的个数
     uint32             m_u4AllSendCount;               //当前链接发送数据包的个数
     uint32             m_u4AllRecvSize;                //当前链接接收字节总数
     uint32             m_u4AllSendSize;                //当前链接发送字节总数
-    CPacketParse*      m_pPacketParse;                 //数据包解析类
-    uint16             m_u2TcpNodelay;                 //Nagle算法开关
     uint32             m_u4SendMaxBuffSize;            //发送数据最大缓冲长度
-
     uint32             m_u4ReadSendSize;               //准备发送的字节数（水位标）
     uint32             m_u4SuccessSendSize;            //实际客户端接收到的总字节数（水位标）
-    char               m_szConnectName[MAX_BUFF_100];  //连接名称，可以开放给逻辑插件去设置
-    bool               m_blIsLog;                      //是否写入日志，false为不写入，true为写入
-    uint8              m_u1IsActive;                   //连接是否为激活状态，0为否，1为是
-    int                m_nHashID;                      //对应Hash列表中的ID
-
-
-    char               m_szLocalIP[MAX_BUFF_50];       //本地监听IP
     uint32             m_u4LocalPort;                  //本地监听端口
+    uint32             m_u4SendThresHold;              //发送阀值(消息包的个数)
+    uint32             m_u4SendCheckTime;              //发送检测时间的阀值
+    uint32             m_u4PacketParseInfoID;          //对应处理packetParse的模块ID
+    uint32             m_u4PacketDebugSize;            //记录能存二进制数据包的最大字节
+    int                m_nHashID;                      //对应Hash列表中的ID
+    int                m_u4RecvPacketCount;            //接受包的个数
+    int                m_nIOCount;                     //当前IO操作的个数
+    uint16             m_u2SendQueueMax;               //发送队列最大长度
+    uint16             m_u2MaxConnectTime;             //最大链接时间判定
+    uint16             m_u2SendQueueTimeout;           //发送超时时间,超过这个时间的都会被记录到日志中
+    uint16             m_u2RecvQueueTimeout;           //接受超时时间，超过这个时间的都会被记录到日志中
+    uint16             m_u2TcpNodelay;                 //Nagle算法开关
+    uint8              m_u1ConnectState;               //目前链接处理状态
+    uint8              m_u1SendBuffState;              //目前缓冲器是否有等待发送的数据
+    uint8              m_u1IsActive;                   //连接是否为激活状态，0为否，1为是
+    bool               m_blIsLog;                      //是否写入日志，false为不写入，true为写入
+
+    ACE_INET_Addr      m_addrRemote;                   //远程链接客户端地址
+    ACE_Time_Value     m_atvConnect;                   //当前链接建立时间
+    ACE_Time_Value     m_atvInput;                     //最后一次接收数据时间
+    ACE_Time_Value     m_atvOutput;                    //最后一次发送数据时间
+    ACE_Time_Value     m_atvSendAlive;                 //链接存活时间
+    CBuffPacket        m_AlivePacket;                  //服务器生存包
+    CPacketParse*      m_pPacketParse;                 //数据包解析类
+    char               m_szConnectName[MAX_BUFF_100];  //连接名称，可以开放给逻辑插件去设置
+    char               m_szError[MAX_BUFF_500];        //错误信息描述文字
+    char               m_szLocalIP[MAX_BUFF_50];       //本地监听IP
+
 
     ACE_Recursive_Thread_Mutex m_ThreadWriteLock;
-
-    uint32              m_u4SendThresHold;              //发送阀值(消息包的个数)
-    uint32              m_u4SendCheckTime;              //发送检测时间的阀值
-
-    int                 m_u4RecvPacketCount;            //接受包的个数
-    int                 m_nIOCount;                     //当前IO操作的个数
     _TimeConnectInfo    m_TimeConnectInfo;              //链接健康检测器
     ACE_Message_Block*  m_pBlockMessage;                //当前发送缓冲等待数据块
     EM_Client_Close_status m_emStatus;                  //当前服务器关闭标记
 
     CPacketParse        m_objSendPacketParse;           //发送数据包组织结构
-    uint32              m_u4PacketParseInfoID;          //对应处理packetParse的模块ID
-
     char*               m_pPacketDebugData;             //记录数据包的Debug缓冲字符串
-    uint32              m_u4PacketDebugSize;            //记录能存二进制数据包的最大字节
 
     EM_IO_TYPE          m_emIOType;                     //当前IO入口类型
     IFileTestManager*   m_pFileTest;                    //文件测试接口入口
@@ -214,16 +209,16 @@ private:
     ACE_Thread_Mutex m_mutex;
     ACE_Condition<ACE_Thread_Mutex> m_cond;
 private:
-    CHashTable<CProConnectHandle>      m_objHashConnectList;    //记录当前已经连接的节点，使用固定内存结构
-    char                               m_szError[MAX_BUFF_500]; //错误信息描述
-    uint32                             m_u4TimeCheckID;         //定时器检查的TimerID
-    ACE_Recursive_Thread_Mutex         m_ThreadWriteLock;       //用于循环监控和断开链接时候的数据锁
-    ACE_Time_Value                     m_tvCheckConnect;        //定时器下一次检测链接时间
-    bool                               m_blRun;                 //线程是否在运行
-    CSendMessagePool                   m_SendMessagePool;       //发送对象库
     uint32                             m_u4SendQueuePutTime;    //发送队列入队超时时间
     uint32                             m_u4TimeConnect;         //单位时间连接建立数
     uint32                             m_u4TimeDisConnect;      //单位时间连接断开数
+    uint32                             m_u4TimeCheckID;         //定时器检查的TimerID
+    bool                               m_blRun;                 //线程是否在运行
+    char                               m_szError[MAX_BUFF_500]; //错误信息描述
+    CHashTable<CProConnectHandle>      m_objHashConnectList;    //记录当前已经连接的节点，使用固定内存结构
+    ACE_Recursive_Thread_Mutex         m_ThreadWriteLock;       //用于循环监控和断开链接时候的数据锁
+    ACE_Time_Value                     m_tvCheckConnect;        //定时器下一次检测链接时间
+    CSendMessagePool                   m_SendMessagePool;       //发送对象库
     CCommandAccount                    m_CommandAccount;        //当前线程命令统计数据
     CSendCacheManager                  m_SendCacheManager;      //发送缓冲池
     CTimeWheelLink<CProConnectHandle>  m_TimeWheelLink;         //连接时间轮盘
