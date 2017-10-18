@@ -19,6 +19,7 @@ CProConsoleHandle::CProConsoleHandle(void)
     m_blCanWrite         = false;
     m_blTimeClose        = false;
     m_u4RecvPacketCount  = 0;
+    m_u4SendCheckTime    = 0;
 }
 
 CProConsoleHandle::~CProConsoleHandle(void)
@@ -30,7 +31,7 @@ const char* CProConsoleHandle::GetError()
     return m_szError;
 }
 
-bool CProConsoleHandle::Close(int nIOCount)
+void CProConsoleHandle::Close(int nIOCount)
 {
     m_ThreadWriteLock.acquire();
 
@@ -66,10 +67,7 @@ bool CProConsoleHandle::Close(int nIOCount)
         OUR_DEBUG((LM_DEBUG,"[CProConsoleHandle::Close] Close(%d) delete OK.\n", GetConnectID()));
 
         delete this;
-        return true;
     }
-
-    return false;
 }
 
 bool CProConsoleHandle::ServerClose()
@@ -163,7 +161,10 @@ void CProConsoleHandle::open(ACE_HANDLE h, ACE_Message_Block&)
         return;
     }
 
-    RecvClinetPacket(CONSOLE_PACKET_MAX_SIZE);
+    if (false == RecvClinetPacket(CONSOLE_PACKET_MAX_SIZE))
+    {
+        OUR_DEBUG((LM_INFO, "[CProConsoleHandle::open]RecvClinetPacket error.\n"));
+    }
 
     return;
 }
@@ -238,7 +239,7 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
 
             SAFE_DELETE(m_pPacketParse);
 
-            OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_read_stream]Read Shoter error(%d).", errno));
+            OUR_DEBUG((LM_ERROR, "[CProConsoleHandle::handle_input]Read Shoter error(%d).", errno));
             //AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount);
             //因为是要关闭连接，所以要多关闭一次IO，对应Open设置的1的初始值
 
@@ -260,7 +261,10 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
             //组装包体
             m_pPacketParse->SetPacketBody(GetConnectID(), &mb, App_MessageBlockManager::instance());
 
-            CheckMessage();
+            if (false == CheckMessage())
+            {
+                OUR_DEBUG((LM_INFO, "[CProConsoleHandle::handle_input]CheckMessage error.\n"));
+            }
         }
 
         if (m_pPacketParse->GetMessageHead() != NULL)
@@ -279,7 +283,10 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         Close();
 
         //接受下一个数据包
-        RecvClinetPacket(CONSOLE_PACKET_MAX_SIZE);
+        if (false == RecvClinetPacket(CONSOLE_PACKET_MAX_SIZE))
+        {
+            OUR_DEBUG((LM_INFO, "[CProConsoleHandle::handle_read_stream]RecvClinetPacket error.\n"));
+        }
     }
 
     return;
@@ -356,7 +363,11 @@ bool CProConsoleHandle::SendMessage(IBuffPacket* pBuffPacket, uint8 u1OutputType
     }
 
     App_BuffPacketManager::instance()->Delete(pBuffPacket);
-    PutSendPacket(pMbData);
+
+    if (false == PutSendPacket(pMbData))
+    {
+        OUR_DEBUG((LM_INFO, "[CProConsoleHandle::SendMessage]PutSendPacket error.\n"));
+    }
 
     return true;
 }
@@ -468,11 +479,15 @@ bool CProConsoleHandle::CheckMessage()
         {
             if(pBuffPacket->GetPacketLen() > 0)
             {
-                SendMessage(dynamic_cast<IBuffPacket*>(pBuffPacket), u1Output);
+                if (false == SendMessage(dynamic_cast<IBuffPacket*>(pBuffPacket), u1Output))
+                {
+                    OUR_DEBUG((LM_INFO, "[CProConsoleHandle::CheckMessage]SendMessage error.\n"));
+                }
             }
         }
         else if(CONSOLE_MESSAGE_FAIL == u4Return)
         {
+            OUR_DEBUG((LM_INFO, "[CProConsoleHandle::CheckMessage]Dispose CONSOLE_MESSAGE_FAIL.\n"));
             return false;
         }
         else

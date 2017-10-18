@@ -48,7 +48,7 @@ void* thread_Monitor(void* arg)
 
     g_cond.signal();
     g_mutex.release();
-                
+
     OUR_DEBUG((LM_INFO, "[thread_Monitor]exit.\n"));
     pthread_exit(0);
 }
@@ -348,7 +348,10 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
     }
 
     //首先设置当前工作路径
-    SetAppPath();
+    if (false == SetAppPath())
+    {
+        OUR_DEBUG((LM_INFO, "[main]SetAppPath error.\n"));
+    }
 
     //读取配置文件
     if(!App_MainConfig::instance()->Init())
@@ -361,7 +364,10 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
         App_MainConfig::instance()->Display();
     }
 
-    Chlid_Run();
+    if (0 != Chlid_Run())
+    {
+        OUR_DEBUG((LM_INFO, "[main]Chlid_Run error.\n"));
+    }
 
     return 0;
 }

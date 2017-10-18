@@ -260,7 +260,6 @@ bool CProServerManager::Start()
         }
 
         CProactorUDPHandler* pProactorUDPHandler = App_ProUDPManager::instance()->Create();
-        pProactorUDPHandler->SetPacketParseInfoID(pServerInfo->m_u4PacketParseInfoID);
 
         if(NULL == pProactorUDPHandler)
         {
@@ -269,6 +268,7 @@ bool CProServerManager::Start()
         }
         else
         {
+            pProactorUDPHandler->SetPacketParseInfoID(pServerInfo->m_u4PacketParseInfoID);
             int nErr = 0;
 
             if(pServerInfo->m_u1IPType == TYPE_IPV4)

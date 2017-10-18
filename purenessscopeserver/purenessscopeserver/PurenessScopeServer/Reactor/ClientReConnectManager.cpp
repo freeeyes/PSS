@@ -2,13 +2,13 @@
 
 CReactorClientInfo::CReactorClientInfo()
 {
-    m_pConnectClient    = NULL;
-    m_pClientMessage    = NULL;
-    m_pReactorConnect   = NULL;
-    m_pReactor          = NULL;
-    m_nServerID         = 0;
-    m_emConnectState    = SERVER_CONNECT_READY;
-    m_AddrLocal         = (ACE_INET_Addr&)ACE_Addr::sap_any;
+    m_pConnectClient         = NULL;
+    m_pClientMessage         = NULL;
+    m_pReactorConnect        = NULL;
+    m_pReactor               = NULL;
+    m_nServerID              = 0;
+    m_emConnectState         = SERVER_CONNECT_READY;
+    m_AddrLocal              = (ACE_INET_Addr&)ACE_Addr::sap_any;
 }
 
 CReactorClientInfo::~CReactorClientInfo()
@@ -98,7 +98,10 @@ bool CReactorClientInfo::SendData(ACE_Message_Block* pmblk)
             if(SERVER_CONNECT_FIRST != m_emConnectState && SERVER_CONNECT_RECONNECT != m_emConnectState)
             {
                 //如果连接不存在，则建立链接。
-                Run(true, SERVER_CONNECT_RECONNECT);
+                if (false == Run(true, SERVER_CONNECT_RECONNECT))
+                {
+                    OUR_DEBUG((LM_INFO, "[CReactorClientInfo::SendData]Run error.\n"));
+                }
             }
 
             if (NULL != pmblk)
@@ -216,9 +219,11 @@ void CReactorClientInfo::SetLocalAddr( const char* pIP, int nPort, uint8 u1IPTyp
 
 CClientReConnectManager::CClientReConnectManager(void)
 {
-    m_nTaskID         = -1;
-    m_pReactor        = NULL;
-    m_blReactorFinish = false;
+    m_nTaskID                = -1;
+    m_pReactor               = NULL;
+    m_blReactorFinish        = false;
+    m_u4ConnectServerTimeout = 0;
+    m_u4MaxPoolCount         = 0;
 }
 
 CClientReConnectManager::~CClientReConnectManager(void)
@@ -273,7 +278,12 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, int nPort,
         OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]Run Error.\n"));
         delete pClientInfo;
         pClientInfo = NULL;
-        Close(nServerID);
+
+        if (false == Close(nServerID))
+        {
+            OUR_DEBUG((LM_INFO, "[CClientReConnectManager::Connect]Close Error"));
+        }
+
         return false;
     }
 
@@ -298,7 +308,12 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, int nPort,
         OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]Run Error.\n"));
         delete pClientInfo;
         pClientInfo = NULL;
-        Close(nServerID);
+
+        if (false == Close(nServerID))
+        {
+            OUR_DEBUG((LM_INFO, "[CClientReConnectManager::Connect]Close Error.\n"));
+        }
+
         return false;
     }
 
@@ -586,7 +601,11 @@ void CClientReConnectManager::Close()
 
         if(NULL != pClientInfo)
         {
-            pClientInfo->Close();
+            if (false == pClientInfo->Close())
+            {
+                OUR_DEBUG((LM_INFO, "[CClientReConnectManager::Close]Close error.\n"));
+            }
+
             SAFE_DELETE(pClientInfo);
         }
     }
@@ -650,7 +669,12 @@ bool CClientReConnectManager::ConnectTcpInit(int nServerID, const char* pIP, int
         OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]pClientInfo Init Error.\n"));
         delete pClientInfo;
         pClientInfo = NULL;
-        Close(nServerID);
+
+        if (false == Close(nServerID))
+        {
+            OUR_DEBUG((LM_INFO, "[CClientReConnectManager::ConnectTcpInit]Close error.\n"));
+        }
+
         return false;
     }
 
@@ -732,7 +756,10 @@ int CClientReConnectManager::handle_timeout(const ACE_Time_Value& tv, const void
             if (NULL == pClientInfo->GetConnectClient())
             {
                 //如果连接不存在，则重新建立连接
-                pClientInfo->Run(m_blReactorFinish, SERVER_CONNECT_RECONNECT);
+                if (false == pClientInfo->Run(m_blReactorFinish, SERVER_CONNECT_RECONNECT))
+                {
+                    OUR_DEBUG((LM_INFO, "[CClientReConnectManager::handle_timeout]Run error.\n"));
+                }
             }
             else
             {
@@ -856,7 +883,11 @@ bool CClientReConnectManager::ReConnect(int nServerID)
     if (NULL == pClientInfo->GetConnectClient())
     {
         //如果连接不存在，则重新建立连接
-        pClientInfo->Run(m_blReactorFinish, SERVER_CONNECT_RECONNECT);
+        if (false == pClientInfo->Run(m_blReactorFinish, SERVER_CONNECT_RECONNECT))
+        {
+            OUR_DEBUG((LM_INFO, "[CClientReConnectManager::Close]Run error.\n"));
+        }
+
         return true;
     }
     else

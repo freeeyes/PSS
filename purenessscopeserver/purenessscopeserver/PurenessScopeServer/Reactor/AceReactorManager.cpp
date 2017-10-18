@@ -153,6 +153,12 @@ bool CAceReactor::Init(int nReactorType, int nThreadCount, int nMaxHandleCount)
             }
 
 #endif
+
+        default:
+            {
+                OUR_DEBUG((LM_INFO, "[CAceReactor::Init]Unknow nReactorType(%d).\n", nReactorType));
+                return false;
+            }
         }
 
         m_nThreadCount = nThreadCount;
@@ -371,7 +377,10 @@ bool CAceReactorManager::StartReactor()
 
         if (NULL != pAceReactor)
         {
-            pAceReactor->Start();
+            if (false == pAceReactor->Start())
+            {
+                OUR_DEBUG((LM_INFO, "[CAceReactorManager::AddNewReactor]Start error.\n"));
+            }
         }
     }
 
@@ -387,7 +396,11 @@ bool CAceReactorManager::StopReactor()
         if (NULL != pAceReactor)
         {
             OUR_DEBUG((LM_ERROR, "[CAceReactorManager::StopReactor]nReactorID=%d.\n", pAceReactor->GetReactorID()));
-            pAceReactor->Stop();
+
+            if (false == pAceReactor->Stop())
+            {
+                OUR_DEBUG((LM_ERROR, "[CAceReactorManager::StopReactor]pAceReactor Stop.\n"));
+            }
         }
     }
 

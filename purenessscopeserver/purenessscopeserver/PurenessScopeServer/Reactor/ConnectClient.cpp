@@ -15,6 +15,8 @@ CConnectClient::CConnectClient(void)
     m_ems2s             = S2S_NEED_CALLBACK;
     m_szError[0]        = '\0';
     m_pClientMessage    = NULL;
+    m_u4CurrSize        = 0;
+    m_u1ConnectState    = 0;
 
     m_emRecvState       = SERVER_RECV_INIT;
 }
@@ -23,7 +25,7 @@ CConnectClient::~CConnectClient(void)
 {
 }
 
-bool CConnectClient::Close()
+void CConnectClient::Close()
 {
     m_ThreadLock.acquire();
 
@@ -46,10 +48,8 @@ bool CConnectClient::Close()
 
         //回归用过的指针
         delete this;
-        return true;
     }
 
-    return false;
 }
 
 void CConnectClient::ClientClose()
@@ -638,6 +638,12 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
         return false;
     }
 
+    if (NULL == pmblk)
+    {
+        OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetServerID()));
+        return false;
+    }
+
     //如果是DEBUG状态，记录当前接受包的二进制数据
     if (App_MainConfig::instance()->GetDebug() == DEBUG_ON)
     {
@@ -675,12 +681,6 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
     }
 
     ACE_Time_Value     nowait(MAX_MSG_PACKETTIMEOUT);
-
-    if (NULL == pmblk)
-    {
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetServerID()));
-        return false;
-    }
 
     if (get_handle() == ACE_INVALID_HANDLE)
     {

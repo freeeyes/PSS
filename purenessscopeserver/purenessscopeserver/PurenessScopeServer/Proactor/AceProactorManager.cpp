@@ -104,7 +104,10 @@ bool CAceProactor::Init(int nProactorType, int nThreadCount)
 #endif
 
         default:
-            return false;
+            {
+                OUR_DEBUG((LM_INFO, "[CAceReactor::Init]Unknow nReactorType(%d).\n", nProactorType));
+                return false;
+            }
         }
 
         m_nThreadCount = nThreadCount;
