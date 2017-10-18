@@ -2,11 +2,12 @@
 
 CReactorUDPHander::CReactorUDPHander(void)
 {
-    m_pPacketParse      = NULL;
-    m_u4RecvPacketCount = 0;
-    m_u4SendPacketCount = 0;
-    m_u4RecvSize        = 0;
-    m_u4SendSize        = 0;
+    m_pPacketParse        = NULL;
+    m_u4RecvPacketCount   = 0;
+    m_u4SendPacketCount   = 0;
+    m_u4RecvSize          = 0;
+    m_u4SendSize          = 0;
+    m_u4PacketParseInfoID = 0;
 }
 
 CReactorUDPHander::~CReactorUDPHander(void)
@@ -116,7 +117,10 @@ int CReactorUDPHander::handle_input(ACE_HANDLE fd)
 
     if(nDataLen > 0)
     {
-        CheckMessage(szBuff, (uint32)nDataLen);
+        if (false == CheckMessage(szBuff, (uint32)nDataLen))
+        {
+            OUR_DEBUG((LM_INFO, "[CReactorUDPHander::handle_input]CheckMessage fail.\n"));
+        }
 
         m_pPacketParse = App_PacketParsePool::instance()->Create();
     }

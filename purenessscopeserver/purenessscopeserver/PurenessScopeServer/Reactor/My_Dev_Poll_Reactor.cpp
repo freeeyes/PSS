@@ -825,23 +825,26 @@ My_ACE_Dev_Poll_Reactor::open (size_t size,
 
 #endif  /* ACE_HAS_EVENT_POLL */
 
-    if (result != -1 && this->handler_rep_.open (size) == -1)
+    if (0 != this->notify_handler_)
     {
-        result = -1;
-    }
+        if (result != -1 && this->handler_rep_.open(size) == -1)
+        {
+            result = -1;
+        }
 
-    // Registration of the notification handler must be done after the
-    // /dev/poll device has been fully initialized.
-    else if (this->notify_handler_->open (this,
-                                          0,
-                                          disable_notify_pipe) == -1
-             || (disable_notify_pipe == 0
-                 && this->register_handler_i (
-                     this->notify_handler_->notify_handle (),
-                     this->notify_handler_,
-                     ACE_Event_Handler::READ_MASK) == -1))
-    {
-        result = -1;
+        // Registration of the notification handler must be done after the
+        // /dev/poll device has been fully initialized.
+        else if (this->notify_handler_->open(this,
+                                             0,
+                                             disable_notify_pipe) == -1
+                 || (disable_notify_pipe == 0
+                     && this->register_handler_i(
+                         this->notify_handler_->notify_handle(),
+                         this->notify_handler_,
+                         ACE_Event_Handler::READ_MASK) == -1))
+        {
+            result = -1;
+        }
     }
 
     if (result != -1)
@@ -1557,11 +1560,19 @@ My_ACE_Dev_Poll_Reactor::register_handler_i (ACE_HANDLE handle,
 
         Event_Tuple* info = this->handler_rep_.find (handle);
 
+        if (0 == info)
+        {
+            return -1;
+        }
+
         struct epoll_event epev;
+
         ACE_OS::memset (&epev, 0, sizeof (epev));
+
         static const int op = EPOLL_CTL_ADD;
 
         epev.data.fd = handle;
+
         epev.events  = this->reactor_mask_to_poll_event (mask);
 
         // All but the notify handler get registered with oneshot to facilitate
@@ -1751,27 +1762,44 @@ My_ACE_Dev_Poll_Reactor::remove_handler_i (ACE_HANDLE handle,
         }
 
         handle_reg_changed = false;
-        eh = info->event_handler;
+
+        if (info != 0)
+        {
+            eh = info->event_handler;
+        }
     }
 
     // Check for ref counting now - handle_close () may delete eh.
-    bool const requires_reference_counting =
-        eh->reference_counting_policy ().value () ==
-        ACE_Event_Handler::Reference_Counting_Policy::ENABLED;
+    bool requires_reference_counting = false;
+
+    if (0 != eh)
+    {
+        requires_reference_counting =
+            eh->reference_counting_policy().value() ==
+            ACE_Event_Handler::Reference_Counting_Policy::ENABLED;
+    }
 
     if (ACE_BIT_DISABLED (mask, ACE_Event_Handler::DONT_CALL))
     {
         // It would be great if ACE_Reverse_Lock worked with the Guard.
         repo_guard.release ();
-        eh->handle_close (handle, mask);
+
+        if (0 != eh)
+        {
+            eh->handle_close(handle, mask);
+        }
+
         repo_guard.acquire ();
     }
 
     // If there are no longer any outstanding events on the given handle
     // then remove it from the handler repository.
-    if (!handle_reg_changed && info->mask == ACE_Event_Handler::NULL_MASK)
+    if (0 != info)
     {
-        this->handler_rep_.unbind (handle, requires_reference_counting);
+        if (!handle_reg_changed && info->mask == ACE_Event_Handler::NULL_MASK)
+        {
+            this->handler_rep_.unbind(handle, requires_reference_counting);
+        }
     }
 
     return 0;

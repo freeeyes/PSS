@@ -99,7 +99,11 @@ void CProactorUDPClient::handle_read_dgram(const ACE_Asynch_Read_Dgram::Result& 
     {
         //处理数据
         //OUR_DEBUG((LM_INFO, "[CProactorUDPHandler::handle_read_dgram]CProactorUDPClient::handle_read_dgram.\n"));
-        CheckMessage(pMb, (uint32)nTran);
+        if (false == CheckMessage(pMb, (uint32)nTran))
+        {
+            OUR_DEBUG((LM_INFO, "[CProactorUDPClient::handle_read_dgram]CheckMessage error.\n"));
+        }
+
         App_MessageBlockManager::instance()->Close(pMb);
 
         pMBBuff = App_MessageBlockManager::instance()->Create(MAX_UDP_PACKET_LEN);

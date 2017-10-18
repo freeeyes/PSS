@@ -121,7 +121,11 @@ void CProactorUDPHandler::handle_read_dgram(const ACE_Asynch_Read_Dgram::Result&
     if(nTran != 0)
     {
         //处理数据
-        CheckMessage(pMb, (uint32)nTran);
+        if (false == CheckMessage(pMb, (uint32)nTran))
+        {
+            OUR_DEBUG((LM_INFO, "[CProactorUDPHandler::handle_read_dgram]CheckMessage error.\n"));
+        }
+
         m_pPacketParse = App_PacketParsePool::instance()->Create();
     }
     else

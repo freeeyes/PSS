@@ -181,7 +181,7 @@ int CLogManager::svc(void)
                 continue;
             }
 
-            if (false == ProcessLog(pLogBlockInfo))
+            if (0 != ProcessLog(pLogBlockInfo))
             {
                 OUR_DEBUG((LM_ERROR, "[CLogManager::svc] ProcessLog is false.\n"));
             }

@@ -72,7 +72,10 @@ int CReactorUDPClient::handle_input(ACE_HANDLE fd)
 
     if(nDataLen > 0)
     {
-        CheckMessage(szBuff, (uint32)nDataLen);
+        if (false == CheckMessage(szBuff, (uint32)nDataLen))
+        {
+            OUR_DEBUG((LM_INFO, "[CReactorUDPClient::handle_inpu]CheckMessage error.\n"));
+        }
     }
 
     return 0;

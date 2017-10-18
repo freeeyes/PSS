@@ -416,7 +416,11 @@ bool CServerManager::Start()
                     }
 
                     //启动子进程
-                    Run();
+                    if (false == Run())
+                    {
+                        printf("child %d Run failure.\n", nChlidIndex);
+                        exit(1);
+                    }
 
                     //子进程在执行完任务后必须退出循环和释放锁
                     ReleaseLock(fd_lock, nChlidIndex * sizeof(int), sizeof(int));
@@ -432,7 +436,11 @@ bool CServerManager::Start()
     }
     else
     {
-        Run();
+        if (false == Run())
+        {
+            printf("child Run failure.\n");
+            return false;
+        }
     }
 
     return true;
@@ -492,7 +500,11 @@ bool CServerManager::Run()
         //初始化反应器集合
         App_ReactorManager::instance()->Init((uint16)App_MainConfig::instance()->GetReactorCount());
 
-        Init_Reactor((uint8)App_MainConfig::instance()->GetReactorCount(), App_MainConfig::instance()->GetNetworkMode());
+        if (false == Init_Reactor((uint8)App_MainConfig::instance()->GetReactorCount(), App_MainConfig::instance()->GetNetworkMode()))
+        {
+            OUR_DEBUG((LM_INFO, "[CServerManager::Run]Init_Reactor Error.\n"));
+            return false;
+        }
     }
 
     int nServerPortCount = App_MainConfig::instance()->GetServerPortCount();
@@ -510,9 +522,9 @@ bool CServerManager::Run()
     m_ConnectConsoleAcceptor.Run_Open(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_CLIENTDEFINE));
 
     //创建和启动UDP反应器
-    int nUDPServerPortCount = App_MainConfig::instance()->GetUDPServerPortCount();
+    uint16 u2UDPServerPortCount = App_MainConfig::instance()->GetUDPServerPortCount();
 
-    for (uint8 i = 0; i < nUDPServerPortCount; i++)
+    for (uint16 i = 0; i < u2UDPServerPortCount; i++)
     {
         CReactorUDPHander* pReactorUDPHandler = App_ReUDPManager::instance()->GetUDPHandle(i);
 

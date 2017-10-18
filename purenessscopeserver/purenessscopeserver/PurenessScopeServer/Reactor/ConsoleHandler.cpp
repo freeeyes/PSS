@@ -21,6 +21,7 @@ CConsoleHandler::CConsoleHandler(void)
     m_u4CurrSize       = 0;
     m_u4HandlerID      = 0;
     m_u2MaxConnectTime = 0;
+    m_u4SendCheckTime  = 0;
 }
 
 CConsoleHandler::~CConsoleHandler(void)
@@ -35,7 +36,7 @@ const char* CConsoleHandler::GetError()
     return m_szError;
 }
 
-bool CConsoleHandler::Close(int nIOCount)
+void CConsoleHandler::Close(int nIOCount)
 {
     m_ThreadLock.acquire();
 
@@ -68,10 +69,7 @@ bool CConsoleHandler::Close(int nIOCount)
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::Close]Close(%d) OK.\n", GetConnectID()));
         //AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount);
         delete this;
-        return true;
     }
-
-    return false;
 }
 
 bool CConsoleHandler::ServerClose()
@@ -313,7 +311,11 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
             //组装包体
             m_pPacketParse->SetPacketBody(GetConnectID(), m_pCurrMessage, App_MessageBlockManager::instance());
 
-            CheckMessage();
+            if (false == CheckMessage())
+            {
+                OUR_DEBUG((LM_INFO, "[CConsoleHandler::handle_input]CheckMessage error.\n"));
+            }
+
         }
 
         if (m_pPacketParse->GetMessageHead() != NULL)
@@ -406,7 +408,12 @@ bool CConsoleHandler::SendMessage(IBuffPacket* pBuffPacket, uint8 u1OutputType)
     }
 
     App_BuffPacketManager::instance()->Delete(pBuffPacket);
-    PutSendPacket(pMbData);
+
+    if (false == PutSendPacket(pMbData))
+    {
+        OUR_DEBUG((LM_INFO, "[CConsoleHandler::SendMessage]PutSendPacket error.\n"));
+    }
+
     return true;
 }
 
@@ -512,11 +519,15 @@ bool CConsoleHandler::CheckMessage()
     {
         if (pBuffPacket->GetPacketLen() > 0)
         {
-            SendMessage(dynamic_cast<IBuffPacket*>(pBuffPacket), u1Output);
+            if (false == SendMessage(dynamic_cast<IBuffPacket*>(pBuffPacket), u1Output))
+            {
+                OUR_DEBUG((LM_INFO, "[CConsoleHandler::CheckMessage]SendMessage error.\n"));
+            }
         }
     }
     else if(CONSOLE_MESSAGE_FAIL == u4Return)
     {
+        OUR_DEBUG((LM_INFO, "[CConsoleHandler::CheckMessage]u4Return CONSOLE_MESSAGE_FAIL.\n"));
         return false;
     }
     else
