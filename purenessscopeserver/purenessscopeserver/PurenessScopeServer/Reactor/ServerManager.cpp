@@ -526,7 +526,7 @@ bool CServerManager::Run()
 
     for (uint16 i = 0; i < u2UDPServerPortCount; i++)
     {
-        CReactorUDPHander* pReactorUDPHandler = App_ReUDPManager::instance()->GetUDPHandle(i);
+        CReactorUDPHander* pReactorUDPHandler = App_ReUDPManager::instance()->GetUDPHandle((uint8)i);
 
         if (NULL != pReactorUDPHandler)
         {

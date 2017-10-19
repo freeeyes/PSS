@@ -85,7 +85,7 @@ void CConnectClient::ClientClose()
     }
     else
     {
-        m_u1ConnectState = CONNECT_CLOSEEND;
+        m_u1ConnectState = CONNECT_CLIENT_CLOSE;
         int nWakeupRet = reactor()->schedule_wakeup(this, ACE_Event_Handler::WRITE_MASK);
 
         if (-1 == nWakeupRet)
@@ -631,7 +631,7 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadLock);
 
-    if (CONNECT_CLOSEEND == m_u1ConnectState)
+    if (CONNECT_CLIENT_CLOSE == m_u1ConnectState || CONNECT_SERVER_CLOSE == m_u1ConnectState)
     {
         //连接已经进入关闭流程，不在接受发送数据。
         App_MessageBlockManager::instance()->Close(pmblk);

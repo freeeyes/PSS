@@ -77,7 +77,7 @@ void CConnectHandler::Close()
     objMakePacket.m_u4ConnectID       = GetConnectID();
     objMakePacket.m_pPacketParse      = NULL;
 
-    if (CONNECT_CLOSEEND == m_u1ConnectState)
+    if (CONNECT_SERVER_CLOSE == m_u1ConnectState)
     {
         //服务器主动断开
         objMakePacket.m_u1Option = PACKET_SDISCONNECT;
@@ -807,7 +807,10 @@ int CConnectHandler::handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask)
     }
 
     //设置发送消息队列不能再发送任何消息
-    m_u1ConnectState = CONNECT_CLOSEEND;
+    if(m_u1ConnectState != CONNECT_SERVER_CLOSE)
+    {
+        m_u1ConnectState = CONNECT_CLIENT_CLOSE;
+    }
 
     //读取发送队列内部的所有数据，标记为无效并回收内存
     ACE_Message_Block* pmbSendData = NULL;
@@ -1183,7 +1186,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
 
     if (NET_INPUT == m_emIOType)
     {
-        if (CONNECT_CLOSEEND == m_u1ConnectState)
+        if (CONNECT_SERVER_CLOSE == m_u1ConnectState || CONNECT_CLIENT_CLOSE == m_u1ConnectState)
         {
             //在队列里已经存在关闭连接指令，之后的所有数据写请求全部不予发送。
             ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
@@ -1493,7 +1496,7 @@ bool CConnectHandler::SendCloseMessage()
         }
         else
         {
-            m_u1ConnectState = CONNECT_CLOSEEND;
+            m_u1ConnectState = CONNECT_SERVER_CLOSE;
             int nWakeupRet = reactor()->schedule_wakeup(this, ACE_Event_Handler::WRITE_MASK);
 
             if (-1 == nWakeupRet)
