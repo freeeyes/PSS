@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<!-- 可以在这里配置各个命令的用户支持，User可以是多个，中间用,隔开, -->
+	<!-- 如果对应命令没有配置这个用户，则该用户无法使用这个指令 -->
+	<!-- User对应main.xml里面的ConsoleKey->Key -->
+	<CommandInfo CommandName="LoadModule" User="freeeyes" desc="加载模块" />
+	<CommandInfo CommandName="UnLoadModule" User="freeeyes" desc="卸载模块" />
+	<CommandInfo CommandName="ReLoadModule" User="freeeyes" desc="重新加载模块" />
+	<CommandInfo CommandName="ShowModule" User="freeeyes" desc="重新加载模块" />
+	<CommandInfo CommandName="ClientCount" User="freeeyes" desc="当前客户端连接数" />
+	<CommandInfo CommandName="CommandInfo" User="freeeyes" desc="当前某一个信令的状态信息" />
+	<CommandInfo CommandName="CommandTimeout" User="freeeyes" desc="所有超时的信令列表" />
+	<CommandInfo CommandName="CommandTimeoutclr" User="freeeyes" desc="清除超时的信令列表" />
+	<CommandInfo CommandName="CommandDataLog" User="freeeyes" desc="存储CommandDataLog" />
+	<CommandInfo CommandName="WorkThreadState" User="freeeyes" desc="当前解析线程和工作线程状态" />
+	<CommandInfo CommandName="ConnectClient" User="freeeyes" desc="当前客户端链接的信息" />
+	<CommandInfo CommandName="UDPConnectClient" User="freeeyes" desc="当前UDP客户端的链接信息" />
+	<CommandInfo CommandName="CloseClient" User="freeeyes" desc="关闭指定客户端" />
+	<CommandInfo CommandName="ForbiddenIP" User="freeeyes" desc="禁止IP访问" />
+	<CommandInfo CommandName="ShowForbiddenIP" User="freeeyes" desc="查看禁止访问IP列表" />
+	<CommandInfo CommandName="LiftedIP" User="freeeyes" desc="LiftedIP" />
+	<CommandInfo CommandName="ServerConnectTCP" User="freeeyes" desc="服务器间通讯(TCP)" />
+	<CommandInfo CommandName="ServerConnectUDP" User="freeeyes" desc="服务器间通讯(UDP)" />
+	<CommandInfo CommandName="ShowCurrProcessInfo" User="freeeyes" desc="查看当前服务器的运行状态" />
+	<CommandInfo CommandName="ShowConnectHistory" User="freeeyes" desc="查看服务器历史链接状态" />
+	<CommandInfo CommandName="ShowAllCommand" User="freeeyes" desc="查看服务器所有注册模块信令信息" />
+	<CommandInfo CommandName="ShowServerInfo" User="freeeyes" desc="查看服务器基本信息" />
+	<CommandInfo CommandName="ReConnectServer" User="freeeyes" desc="远端控制重练某一个远端服务器" />
+	<CommandInfo CommandName="SetDebug" User="freeeyes" desc="设置当前DEBUG状态" />
+	<CommandInfo CommandName="ShowDebug" User="freeeyes" desc="查看当前DEBUG状态" />
+	<CommandInfo CommandName="SetTrackIP" User="freeeyes" desc="设置要监控的IP" />
+	<CommandInfo CommandName="DelTrackIP" User="freeeyes" desc="删除要监控的IP" />
+	<CommandInfo CommandName="GetTrackIPInfo" User="freeeyes" desc="得到监控IP的历史记录" />
+	<CommandInfo CommandName="GetConnectIPInfo" User="freeeyes" desc="通过ConnectID获得相关的IP信息" />
+	<CommandInfo CommandName="GetLogInfo" User="freeeyes" desc="得到日志等级" />
+	<CommandInfo CommandName="SetLogLevel" User="freeeyes" desc="设置日志等级" />
+	<CommandInfo CommandName="GetWorkThreadAI" User="freeeyes" desc="得到Thread的AI配置信息" />
+	<CommandInfo CommandName="GetWorkThreadTO" User="freeeyes" desc="得到Thread的所有超时数据包信息" />
+	<CommandInfo CommandName="SetWorkThreadAI" User="freeeyes" desc="设置ThreadAI的配置信息" />
+	<CommandInfo CommandName="GetNickNameInfo" User="freeeyes" desc="得到别名信息" />
+	<CommandInfo CommandName="SetConnectLog" User="freeeyes" desc="设置连接日志开启状态" />
+	<CommandInfo CommandName="SetMaxConnectCount" User="freeeyes" desc="设置最大连接数" />
+	<CommandInfo CommandName="AddListen" User="freeeyes" desc="添加一个新的监听端口" />
+	<CommandInfo CommandName="DelListen" User="freeeyes" desc="删除一个新的监听端口" />
+	<CommandInfo CommandName="ShowListen" User="freeeyes" desc="查看正在打开的监听端口" />
+	<CommandInfo CommandName="Monitor" User="freeeyes" desc="监控相关运行参数接口" />
+	<CommandInfo CommandName="ServerClose" User="freeeyes" desc="关闭当前服务器" />
+	<CommandInfo CommandName="TestFileStart" User="freeeyes" desc="启动服务器文件测试用例" />
+	<CommandInfo CommandName="TestFileStop" User="freeeyes" desc="停止服务器文件测试用例" />
+</config>

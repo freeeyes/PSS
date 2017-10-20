@@ -115,7 +115,7 @@ enum
 #define CONSOLEMESSAGE_SETTRACKIP         "SetTrackIP"          //设置要监控的IP
 #define CONSOLEMESSAGE_DELTRACKIP         "DelTrackIP"          //删除要监控的IP
 #define CONSOLEMESSAGE_GETTRACKIPINFO     "GetTrackIPInfo"      //得到监控IP的历史记录
-#define CONSOLEMESSAGE_GETCONNECTIPINFO   "GetConnectIPInfo"    //通过COnnectID获得相关的IP信息
+#define CONSOLEMESSAGE_GETCONNECTIPINFO   "GetConnectIPInfo"    //通过ConnectID获得相关的IP信息
 #define CONSOLEMESSAGE_GETLOGINFO         "GetLogInfo"          //得到日志等级
 #define CONSOLEMESSAGE_SETLOGLEVEL        "SetLogLevel"         //设置日志等级
 #define CONSOLEMESSAGE_GETWTAI            "GetWorkThreadAI"     //得到Thread的AI配置信息

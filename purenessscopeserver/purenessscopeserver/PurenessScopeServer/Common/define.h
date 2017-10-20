@@ -39,6 +39,7 @@ BEGIN_NAMESPACE
 #define MAINCONFIG            "main.xml"
 #define ALERTCONFIG           "alert.xml"
 #define FORBIDDENIP_FILE      "forbiddenIP.xml"
+#define CONSOLECONFIG         "ConsoleCommand.xml"
 
 #define MAX_BUFF_9    9
 #define MAX_BUFF_20   20

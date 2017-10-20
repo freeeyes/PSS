@@ -217,6 +217,9 @@
     <ClCompile Include="Common\MessageBlockManager.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="Console\ConsolePromiss .cpp">
+      <Filter>Console\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\ACEMemory.h">
@@ -530,6 +533,9 @@
     </ClInclude>
     <ClInclude Include="Common\MessageBlockManager.h">
       <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Console\ConsolePromiss.h">
+      <Filter>Console\hfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
