@@ -221,7 +221,34 @@ BOOL CDlgClientMain::OnInitDialog()
     dwStyle |= LVS_EX_FULLROWSELECT;//选中某行使整行高亮（只适用与report风格的listctrl）
     m_lcModuleList.SetExtendedStyle(dwStyle); //设置扩展风格
 
-    OnBnClickedButton1();
+    CString strServerIP;
+    CString strServerPort;
+    CString strConsoleKey;
+
+    char szSeverIP[20] = { '\0' };
+    char szServerPort[20] = { '\0' };
+    char szConsoleKey[100] = { '\0' };
+
+    m_txtServerIP.GetWindowText(strServerIP);
+    m_txtServerPort.GetWindowText(strServerPort);
+    m_txtKey.GetWindowText(strConsoleKey);
+
+    int nSrcLen = WideCharToMultiByte(CP_ACP, 0, strServerIP, strServerIP.GetLength(), NULL, 0, NULL, NULL);
+    int nDecLen = WideCharToMultiByte(CP_ACP, 0, strServerIP, nSrcLen, szSeverIP, 20, NULL, NULL);
+    szSeverIP[nDecLen] = '\0';
+
+    nSrcLen = WideCharToMultiByte(CP_ACP, 0, strServerPort, strServerPort.GetLength(), NULL, 0, NULL, NULL);
+    nDecLen = WideCharToMultiByte(CP_ACP, 0, strServerPort, nSrcLen, szServerPort, 20, NULL, NULL);
+    szServerPort[nDecLen] = '\0';
+
+    nSrcLen = WideCharToMultiByte(CP_ACP, 0, strConsoleKey, strConsoleKey.GetLength(), NULL, 0, NULL, NULL);
+    nDecLen = WideCharToMultiByte(CP_ACP, 0, strConsoleKey, nSrcLen, szConsoleKey, 100, NULL, NULL);
+    szConsoleKey[nDecLen] = '\0';
+
+    int nPort = atoi(szServerPort);
+
+    m_pTcpClientConnect->Init(szSeverIP, nPort, szConsoleKey);
+
 
     return TRUE;
 }

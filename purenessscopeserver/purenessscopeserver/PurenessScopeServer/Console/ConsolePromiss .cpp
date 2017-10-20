@@ -115,14 +115,14 @@ int CConsolePromissions::Check_Split_User(const char* pUser, const char* pUserLi
         if (pUserList == pPromissPosBegin)
         {
             //只有一个
-            u4NameLen = ACE_OS::strlen(pUserList);
+            u4NameLen = (uint32)ACE_OS::strlen(pUserList);
             memcpy_safe(pPromissPosBegin, u4NameLen, szTempUser, u4NameLen);
             szTempUser[u4NameLen] = '\0';
         }
         else
         {
             //最后一个
-            u4NameLen = (uint32)strlen(pUserList) - (pPromissPosBegin - pUserList - 1);
+            u4NameLen = (uint32)strlen(pUserList) - (uint32)(pPromissPosBegin - pUserList - 1);
             memcpy_safe(pPromissPosBegin, u4NameLen, szTempUser, u4NameLen);
             szTempUser[u4NameLen] = '\0';
         }
