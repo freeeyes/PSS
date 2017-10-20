@@ -6,16 +6,18 @@
 
 #include "MessageService.h"
 
-CMessageService::CMessageService():m_mutex(), m_cond(m_mutex), m_u2ThreadTimeCheck(0), m_u4WorkQueuePutTime(0)
+CMessageService::CMessageService():m_mutex(), m_cond(m_mutex)
 {
-    m_u4ThreadID      = 0;
-    m_u4MaxQueue      = MAX_MSG_THREADQUEUE;
-    m_blRun           = false;
-    m_u4HighMask      = 0;
-    m_u4LowMask       = 0;
-    m_u8TimeCost      = 0;
-    m_u4Count         = 0;
-    m_emThreadState   = THREAD_STOP;
+    m_u4ThreadID         = 0;
+    m_u4MaxQueue         = MAX_MSG_THREADQUEUE;
+    m_blRun              = false;
+    m_u4HighMask         = 0;
+    m_u4LowMask          = 0;
+    m_u8TimeCost         = 0;
+    m_u4Count            = 0;
+    m_emThreadState      = THREAD_STOP;
+    m_u2ThreadTimeCheck  = 0;
+    m_u4WorkQueuePutTime = 0;
 
     uint16 u2ThreadTimeOut = App_MainConfig::instance()->GetThreadTimuOut();
 
@@ -577,7 +579,7 @@ int CMessageService::CloseMsgQueue()
 }
 
 //==========================================================
-CRandomMessageService::CRandomMessageService() :m_mutex(), m_cond(m_mutex), m_u2ThreadTimeCheck(0), m_u4WorkQueuePutTime(0)
+CRandomMessageService::CRandomMessageService() :m_mutex(), m_cond(m_mutex)
 {
     m_u4MaxQueue = MAX_MSG_THREADQUEUE;
     m_blRun = false;
@@ -587,7 +589,8 @@ CRandomMessageService::CRandomMessageService() :m_mutex(), m_cond(m_mutex), m_u2
     m_u4Count = 0;
     m_emThreadState = THREAD_STOP;
     m_u4ThreadCount = 1;
-
+    m_u2ThreadTimeCheck = 0;
+    m_u4WorkQueuePutTime = 0;
 
     uint16 u2ThreadTimeOut = App_MainConfig::instance()->GetThreadTimuOut();
 

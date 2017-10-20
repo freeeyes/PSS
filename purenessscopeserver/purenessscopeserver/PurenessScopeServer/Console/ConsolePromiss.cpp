@@ -108,7 +108,7 @@ int CConsolePromissions::Check_Split_User(const char* pUser, const char* pUserLi
     }
 
     //判断最后一个User
-    if ((int)(pPromissPosBegin - pUserList) < ACE_OS::strlen(pUserList))
+    if ((uint32)(pPromissPosBegin - pUserList) < (uint32)ACE_OS::strlen(pUserList))
     {
         uint32 u4NameLen = 0;
 

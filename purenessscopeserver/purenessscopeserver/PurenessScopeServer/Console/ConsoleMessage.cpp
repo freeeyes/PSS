@@ -928,7 +928,7 @@ void CConsoleMessage::DoMessage_ClientMessageCount(_CommandInfo& CommandInfo, IB
         else
         {
             char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "ActiveClient(%d).\PoolClient(%d).\MaxHandlerCount(%d).\n", nActiveClient, nPoolClient, App_MainConfig::instance()->GetMaxHandlerCount());
+            sprintf_safe(szTemp, MAX_BUFF_1024, "ActiveClient(%d).\nPoolClient(%d).\nMaxHandlerCount(%d).\n", nActiveClient, nPoolClient, App_MainConfig::instance()->GetMaxHandlerCount());
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
         }
 
