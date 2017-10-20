@@ -221,6 +221,8 @@ BOOL CDlgClientMain::OnInitDialog()
     dwStyle |= LVS_EX_FULLROWSELECT;//选中某行使整行高亮（只适用与report风格的listctrl）
     m_lcModuleList.SetExtendedStyle(dwStyle); //设置扩展风格
 
+    OnBnClickedButton1();
+
     return TRUE;
 }
 
