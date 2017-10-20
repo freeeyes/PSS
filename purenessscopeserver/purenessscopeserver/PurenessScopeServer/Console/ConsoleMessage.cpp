@@ -3,6 +3,7 @@
 CConsoleMessage::CConsoleMessage()
 {
     m_pvecConsoleKey = NULL;
+    m_objConsolePromissions.Init(CONSOLECONFIG);
 }
 
 CConsoleMessage::~CConsoleMessage()
@@ -101,6 +102,11 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
     memcpy_safe((char* )pKeyBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), (int)(pCommandBegin - pKeyBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING)), szKey, (int)(pCommandBegin - pKeyBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING)));
     szKey[(int)(pCommandBegin - pKeyBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING))] = '\0';
 
+    if (true == memcpy_safe(szKey, (uint32)ACE_OS::strlen(szKey), CommandInfo.m_szUser, MAX_BUFF_50))
+    {
+        CommandInfo.m_szUser[ACE_OS::strlen(szKey)] = '\0';
+    }
+
     if(false == CheckConsoleKey(szKey))
     {
         OUR_DEBUG((LM_ERROR, "[CConsoleMessage::GetCommandInfo]szKey is invalid.\n"));
@@ -144,6 +150,18 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
     {
         OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]pCommand format is error.\n"));
         return CONSOLE_MESSAGE_FAIL;
+    }
+
+    //判断当前命令是否可以执行
+    int nPromission = m_objConsolePromissions.Check_Promission(CommandInfo.m_szCommandTitle, CommandInfo.m_szUser);
+
+    if (-1 == nPromission)
+    {
+        return CONSOLE_MESSAGE_FAIL;
+    }
+    else if(-2 == nPromission)
+    {
+
     }
 
     u1OutputType = CommandInfo.m_u1OutputType;
@@ -355,9 +373,6 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
     {
         pBuffPacket->WriteStream(pCurrBuffPacket->GetData(), pCurrBuffPacket->GetPacketLen());
     }
-
-    //释放临时数据包体
-    App_BuffPacketManager::instance()->Delete(pCurrBuffPacket);
 
     return CONSOLE_MESSAGE_SUCCESS;
 }

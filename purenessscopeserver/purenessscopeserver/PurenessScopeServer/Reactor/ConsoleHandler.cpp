@@ -314,6 +314,26 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
             if (false == CheckMessage())
             {
                 OUR_DEBUG((LM_INFO, "[CConsoleHandler::handle_input]CheckMessage error.\n"));
+
+                if (m_pPacketParse->GetMessageHead() != NULL)
+                {
+                    App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
+                }
+
+                if (m_pPacketParse->GetMessageBody() != NULL)
+                {
+                    App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
+                }
+
+                if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageHead() != m_pCurrMessage)
+                {
+                    App_MessageBlockManager::instance()->Close(m_pCurrMessage);
+                }
+
+                m_pCurrMessage = NULL;
+
+                SAFE_DELETE(m_pPacketParse);
+                return -1;
             }
 
         }
@@ -528,12 +548,15 @@ bool CConsoleHandler::CheckMessage()
     else if(CONSOLE_MESSAGE_FAIL == u4Return)
     {
         OUR_DEBUG((LM_INFO, "[CConsoleHandler::CheckMessage]u4Return CONSOLE_MESSAGE_FAIL.\n"));
+        App_BuffPacketManager::instance()->Delete(pBuffPacket);
         return false;
     }
     else
     {
+        App_BuffPacketManager::instance()->Delete(pBuffPacket);
         return false;
     }
+
 
     return true;
 }

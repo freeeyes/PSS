@@ -14,6 +14,7 @@
 #include "IPAccount.h"
 #include "IObject.h"
 #include "FileTestManager.h"
+#include "ConsolePromiss.h"
 
 #ifdef WIN32
 #include "ProConnectHandle.h"
@@ -138,12 +139,14 @@ struct _CommandInfo
     uint8 m_u1OutputType;                 //输出类型，0为二进制，1为文本
     char m_szCommandTitle[MAX_BUFF_100];  //处理命令头
     char m_szCommandExp[MAX_BUFF_100];    //处理命令扩展参数
+    char m_szUser[MAX_BUFF_50];           //用户信息
 
     _CommandInfo()
     {
         m_u1OutputType      = 0;
         m_szCommandTitle[0] = '\0';
         m_szCommandExp[0]   = '\0';
+        m_szUser[0]         = '\0';
     }
 };
 
@@ -256,7 +259,8 @@ private:
     void DoMessage_TestFileStop(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
 
 private:
-    vecConsoleKey* m_pvecConsoleKey;
+    vecConsoleKey*      m_pvecConsoleKey;
+    CConsolePromissions m_objConsolePromissions;
 };
 
 #endif

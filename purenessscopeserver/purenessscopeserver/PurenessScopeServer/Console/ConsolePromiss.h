@@ -31,10 +31,10 @@ public:
     void Init(const char* pFileName);
     void Close();
 
-    bool Check_Promission(const char* pCommandName, const char* pUser);
+    int Check_Promission(const char* pCommandName, const char* pUser);
 
 private:
-    bool Check_Split_User(const char* pUser, const char* pUserList);
+    int Check_Split_User(const char* pUser, const char* pUserList);
 
 private:
     CHashTable<_Console_Command_Info> m_objHashCommandList;
