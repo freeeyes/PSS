@@ -80,6 +80,46 @@ bool CConsolePromissions::Check_Promission(const char* pCommandName, const char*
 
 bool CConsolePromissions::Check_Split_User(const char* pUser, const char* pUserList)
 {
-    return true;
+    char szTempUser[MAX_BUFF_50] = { '\0' };
+    char* pPromissPosBegin = (char* )pUserList;
+    char* pPromissPos = ACE_OS::strstr((char* )pUserList, ",");
+
+    while (NULL == pPromissPos)
+    {
+        uint32 u4NameLen = (uint32)(pPromissPos - pPromissPosBegin);
+
+        if (u4NameLen > MAX_BUFF_50)
+        {
+            pPromissPosBegin = pPromissPos + 1;
+            pPromissPos = ACE_OS::strstr((char*)pUserList, ",");
+            continue;
+        }
+
+        memcpy_safe(pPromissPosBegin, u4NameLen, szTempUser, u4NameLen);
+        szTempUser[u4NameLen] = '\0';
+
+        if (0 == ACE_OS::strcmp(szTempUser, pUser))
+        {
+            return true;
+        }
+
+        pPromissPosBegin = pPromissPos + 1;
+        pPromissPos = ACE_OS::strstr((char*)pUserList, ",");
+    }
+
+    //判断最后一个User
+    if ((int)(pPromissPosBegin - pUserList) < ACE_OS::strlen(pUserList))
+    {
+        uint32 u4NameLen = (uint32)(pPromissPos - pPromissPosBegin - 1);
+        memcpy_safe(pPromissPosBegin, u4NameLen, szTempUser, u4NameLen);
+        szTempUser[u4NameLen] = '\0';
+
+        if (0 == ACE_OS::strcmp(szTempUser, pUser))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
