@@ -15,18 +15,24 @@
 
 using namespace std;
 
+enum EM_COMMAND_OPEN_STATE
+{
+    EM_COMMAND_OPEN = 0,         //命令有效
+    EM_COMMAND_CLOSE             //命令无效
+};
+
 //命令订阅者者的格式
 struct _ClientCommandInfo
 {
-    uint32          m_u4Count;                     //当前命令被调用的次数
-    uint32          m_u4TimeCost;                  //当前命令总时间消耗
-    uint32          m_u4CurrUsedCount;             //当前正在使用的引用次数
-    CClientCommand* m_pClientCommand;              //当前命令指针
-    uint16          m_u2CommandID;                 //当前命令对应的ID
-    uint8           m_u1State;                     //当前命令的状态，0为正常，1为正在关闭
-    char            m_szModuleName[MAX_BUFF_100];  //所属模块名称
-    ACE_Date_Time   m_dtLoadTime;                  //当前命令加载时间
-    _ClientIPInfo   m_objListenIPInfo;             //当前允许的IP和端口入口，默认是所有当前端口
+    uint32          m_u4Count;                          //当前命令被调用的次数
+    uint32          m_u4TimeCost;                       //当前命令总时间消耗
+    uint32          m_u4CurrUsedCount;                  //当前正在使用的引用次数
+    CClientCommand* m_pClientCommand;                   //当前命令指针
+    uint16          m_u2CommandID;                      //当前命令对应的ID
+    uint8           m_u1OpenState;                      //当前命令的状态，0为正常，1为正在关闭
+    char            m_szModuleName[MAX_BUFF_100];       //所属模块名称
+    ACE_Date_Time   m_dtLoadTime;                       //当前命令加载时间
+    _ClientIPInfo   m_objListenIPInfo;                  //当前允许的IP和端口入口，默认是所有当前端口
 
     _ClientCommandInfo()
     {
@@ -35,8 +41,8 @@ struct _ClientCommandInfo
         m_u4TimeCost      = 0;
         m_szModuleName[0] = '\0';
         m_u4CurrUsedCount = 0;
-        m_u1State         = 0;
         m_u2CommandID     = 0;
+        m_u1OpenState     = (uint8)EM_COMMAND_OPEN;
     }
 };
 
@@ -171,7 +177,7 @@ public:
     bool AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName);   //注册命令
     bool DelClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand);                            //卸载命令
 
-    bool UnloadModuleCommand(const char* pModuleName, uint8 u1State);  //卸载指定模块事件，u1State= 1 卸载，2 重载
+    bool UnloadModuleCommand(const char* pModuleName, uint8 u1LoadState);  //卸载指定模块事件，u1State= 1 卸载，2 重载
 
     int  GetCommandCount();                                            //得到当前注册命令的个数
     CClientCommandList* GetClientCommandList(uint16 u2CommandID);      //得到当前命令的执行列表

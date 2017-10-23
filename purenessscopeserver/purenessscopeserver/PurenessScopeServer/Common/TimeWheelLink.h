@@ -230,7 +230,7 @@ public:
         //清理索引信息
         if (-1 == m_htIndexList.Del_Hash_Data(szKey))
         {
-            OUR_DEBUG((LM_INFO, "[CTimeWheelLink::Del_TimeWheel_Object]Deltet(%s) error.\n", szKey));
+            OUR_DEBUG((LM_INFO, "[CTimeWheelLink::Del_TimeWheel_Object]Delete(%s) no exist.\n", szKey));
         }
     }
 

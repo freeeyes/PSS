@@ -66,7 +66,7 @@ bool CMessageManager::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uin
         {
             _ClientCommandInfo* pClientCommandInfo = pClientCommandList->GetClientCommandIndex(i);
 
-            if(NULL != pClientCommandInfo && pClientCommandInfo->m_u1State == 0)
+            if(NULL != pClientCommandInfo && pClientCommandInfo->m_u1OpenState == EM_COMMAND_OPEN)
             {
                 //判断当前消息是否有指定的监听端口
                 if(pClientCommandInfo->m_objListenIPInfo.m_nPort > 0)
@@ -78,9 +78,10 @@ bool CMessageManager::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uin
                     }
                 }
 
-                //OUR_DEBUG((LM_ERROR, "[CMessageManager::DoMessage]u2CommandID = %d Begin.\n", u2CommandID));
-                //这里指记录处理毫秒数
+                //标记当前命令运行状态
                 pClientCommandInfo->m_pClientCommand->DoMessage(pMessage, bDeleteFlag);
+
+                //这里指记录处理毫秒数
                 ACE_Time_Value tvCost =  ACE_OS::gettimeofday() - tvBegin;
                 u4TimeCost =  (uint32)tvCost.msec();
 
@@ -346,7 +347,7 @@ bool CMessageManager::DelClientCommand(uint16 u2CommandID, CClientCommand* pClie
     }
 }
 
-bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1State)
+bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1LoadState)
 {
     string strModuleName  = pModuleName;
     string strModuleN     = "";
@@ -385,6 +386,7 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1State
                         //找到那个唯一
                         if(pCClientCommandList->GetClientCommandIndex(i) == pClientCommandInfo)
                         {
+                            /*
                             //找到了，释放之
                             if (false == pCClientCommandList->DelClientCommand(pClientCommandInfo->m_pClientCommand))
                             {
@@ -400,6 +402,9 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1State
                                 m_objClientCommandList.Del_Hash_Data(szCommandID);
                                 m_u4CurrCommandCount--;
                             }
+                            */
+                            //设置关闭状态
+                            pClientCommandInfo->m_u1OpenState = EM_COMMAND_CLOSE;
 
                             break;
                         }
@@ -409,11 +414,11 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1State
         }
 
         //卸载插件信息
-        App_ModuleLoader::instance()->UnLoadModule(pModuleName, true);
+        //App_ModuleLoader::instance()->UnLoadModule(pModuleName, true);
     }
 
     //看看是否要重新加载
-    if(u1State == 2)
+    if(u1LoadState == 2)
     {
         if(strModulePath.length() > 0)
         {

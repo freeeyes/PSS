@@ -678,7 +678,7 @@ void CClientProConnectManager::Close()
 
 int CClientProConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 {
-    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
+    //ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 
     //OUR_DEBUG((LM_DEBUG, "[CClientProConnectManager::handle_timeout]Begin.\n"));
     if(m_ProAsynchConnect.GetConnectState() == true)
@@ -686,8 +686,10 @@ int CClientProConnectManager::handle_timeout(const ACE_Time_Value& tv, const voi
         return 0;
     }
 
+    m_ThreadWritrLock.acquire();
     vector<CProactorClientInfo*> vecProactorClientInfo;
     m_objClientTCPList.Get_All_Used(vecProactorClientInfo);
+    m_ThreadWritrLock.release();
 
     for(int i = 0; i < (int)vecProactorClientInfo.size(); i++)
     {
@@ -707,12 +709,15 @@ int CClientProConnectManager::handle_timeout(const ACE_Time_Value& tv, const voi
             {
                 //检查当前连接，是否已挂起或死锁
                 ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-                pClientInfo->GetProConnectClient()->GetTimeout(tvNow);
 
                 //如果是异步模式，则需要检查处理线程是否被挂起
                 if(App_MainConfig::instance()->GetConnectServerRunType() == 1)
                 {
                     App_ServerMessageTask::instance()->CheckServerMessageThread(tvNow);
+                }
+                else
+                {
+                    pClientInfo->GetProConnectClient()->GetTimeout(tvNow);
                 }
             }
         }
