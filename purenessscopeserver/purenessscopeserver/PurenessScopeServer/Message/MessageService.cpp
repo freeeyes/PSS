@@ -69,6 +69,12 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
                           App_MainConfig::instance()->GetCommandFlow(),
                           App_MainConfig::instance()->GetPacketTimeOut());
 
+    //初始化本地信令列表副本
+    m_objClientCommandList.Init(App_MessageManager::instance()->GetMaxCommandCount());
+
+    //拷贝信令列表副本
+    CopyMessageManagerList();
+
     //初始化CommandID告警阀值相关
     for(int i = 0; i < (int)App_MainConfig::instance()->GetCommandAlertCount(); i++)
     {
@@ -300,7 +306,8 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
     uint16 u2CommandCount = 0;      //命令被调用次数
     bool   blDeleteFlag   = true;   //用完是否删除，默认是删除
 
-    App_MessageManager::instance()->DoMessage(m_ThreadInfo.m_tvUpdateTime, pMessage, u2CommandID, u4TimeCost, u2CommandCount, blDeleteFlag);
+    //App_MessageManager::instance()->DoMessage(m_ThreadInfo.m_tvUpdateTime, pMessage, u2CommandID, u4TimeCost, u2CommandCount, blDeleteFlag);
+    DoMessage(m_ThreadInfo.m_tvUpdateTime, pMessage, u2CommandID, u4TimeCost, u2CommandCount, blDeleteFlag);
 
     if(true == blDeleteFlag)
     {
@@ -369,6 +376,11 @@ int CMessageService::Close()
     }
 
     m_MessagePool.Close();
+
+    CloseCommandList();
+
+    m_objClientCommandList.Close();
+
     OUR_DEBUG((LM_INFO, "[CMessageService::close] Close().\n"));
     return 0;
 }
@@ -427,6 +439,93 @@ bool CMessageService::SaveThreadInfoData()
     return true;
 }
 
+void CMessageService::CloseCommandList()
+{
+    //清理当前信令列表
+    vector<CClientCommandList*> vecClientCommandList;
+    m_objClientCommandList.Get_All_Used(vecClientCommandList);
+
+    for (int i = 0; i < (int)vecClientCommandList.size(); i++)
+    {
+        CClientCommandList* pClientCommandList = vecClientCommandList[i];
+        SAFE_DELETE(pClientCommandList);
+    }
+}
+
+CClientCommandList* CMessageService::GetClientCommandList(uint16 u2CommandID)
+{
+    char szCommandID[10] = { '\0' };
+    sprintf_safe(szCommandID, 10, "%d", u2CommandID);
+    return m_objClientCommandList.Get_Hash_Box_Data(szCommandID);
+}
+
+bool CMessageService::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost, uint16& u2Count, bool& bDeleteFlag)
+{
+    if (NULL == pMessage)
+    {
+        OUR_DEBUG((LM_ERROR, "[CMessageService::DoMessage] pMessage is NULL.\n"));
+        return false;
+    }
+
+    //放给需要继承的ClientCommand类去处理
+    CClientCommandList* pClientCommandList = GetClientCommandList(u2CommandID);
+
+    if (pClientCommandList != NULL)
+    {
+        int nCount = pClientCommandList->GetCount();
+
+        for (int i = 0; i < nCount; i++)
+        {
+            _ClientCommandInfo* pClientCommandInfo = pClientCommandList->GetClientCommandIndex(i);
+
+            if (NULL != pClientCommandInfo && pClientCommandInfo->m_u1OpenState == EM_COMMAND_OPEN)
+            {
+                //判断当前消息是否有指定的监听端口
+                if (pClientCommandInfo->m_objListenIPInfo.m_nPort > 0)
+                {
+                    if (ACE_OS::strcmp(pClientCommandInfo->m_objListenIPInfo.m_szClientIP, pMessage->GetMessageBase()->m_szListenIP) != 0 ||
+                        (uint32)pClientCommandInfo->m_objListenIPInfo.m_nPort != pMessage->GetMessageBase()->m_u4ListenPort)
+                    {
+                        continue;
+                    }
+                }
+
+                //标记当前命令运行状态
+                pClientCommandInfo->m_pClientCommand->DoMessage(pMessage, bDeleteFlag);
+
+                //这里指记录处理毫秒数
+                ACE_Time_Value tvCost = ACE_OS::gettimeofday() - tvBegin;
+                u4TimeCost = (uint32)tvCost.msec();
+
+                //记录命令被调用次数
+                u2Count++;
+                //OUR_DEBUG((LM_ERROR, "[CMessageManager::DoMessage]u2CommandID = %d End.\n", u2CommandID));
+
+            }
+        }
+
+        return true;
+    }
+    else
+    {
+        //没有找到对应的注册指令，如果不是define.h定义的异常，则记录异常命令日志
+        if (CLIENT_LINK_CONNECT != u2CommandID  && CLIENT_LINK_CDISCONNET != u2CommandID &&
+            CLIENT_LINK_SDISCONNET != u2CommandID  && CLINET_LINK_SENDTIMEOUT != u2CommandID &&
+            CLINET_LINK_SENDERROR != u2CommandID  && CLINET_LINK_CHECKTIMEOUT != u2CommandID &&
+            CLIENT_LINK_SENDOK != u2CommandID)
+        {
+            char szLog[MAX_BUFF_500] = { '\0' };
+            sprintf_safe(szLog, MAX_BUFF_500, "[CommandID=%d][HeadLen=%d][BodyLen=%d] is not plugin dispose.",
+                         u2CommandID,
+                         pMessage->GetMessageBase()->m_u4HeadSrcSize,
+                         pMessage->GetMessageBase()->m_u4BodySrcSize);
+            AppLogManager::instance()->WriteLog(LOG_SYSTEM_ERROR, szLog);
+        }
+    }
+
+    return false;
+}
+
 _ThreadInfo* CMessageService::GetThreadInfo()
 {
     return &m_ThreadInfo;
@@ -440,6 +539,42 @@ void CMessageService::GetAIInfo(_WorkThreadAIInfo& objAIInfo)
 uint32 CMessageService::GetThreadID()
 {
     return m_u4ThreadID;
+}
+
+void CMessageService::CopyMessageManagerList()
+{
+    CloseCommandList();
+
+    CHashTable<CClientCommandList>* pClientCommandList = App_MessageManager::instance()->GetHashCommandList();
+
+    if (NULL != pClientCommandList)
+    {
+        vector<CClientCommandList*> vecClientCommandList;
+        pClientCommandList->Get_All_Used(vecClientCommandList);
+
+        for (int i = 0; i < (int)vecClientCommandList.size(); i++)
+        {
+            CClientCommandList* pClientCommandList = vecClientCommandList[i];
+
+            if (NULL != pClientCommandList)
+            {
+                CClientCommandList* pCurrClientCommandList = new CClientCommandList();
+
+                for (int j = 0; j < pClientCommandList->GetCount(); j++)
+                {
+                    pCurrClientCommandList->AddClientCommand(vecClientCommandList[i]->GetClientCommandIndex(j)->m_pClientCommand, vecClientCommandList[i]->GetClientCommandIndex(j)->m_szModuleName);
+                }
+
+                char szCommandID[10] = { '\0' };
+                sprintf_safe(szCommandID, 10, "%d", vecClientCommandList[i]->GetCommandID());
+
+                if (false == m_objClientCommandList.Add_Hash_Data(szCommandID, pClientCommandList))
+                {
+                    OUR_DEBUG((LM_INFO, "[CMessageService::CopyMessageManagerList]CommandID=%s add error.\n", szCommandID));
+                }
+            }
+        }
+    }
 }
 
 void CMessageService::GetAITO(vecCommandTimeout& objTimeout)

@@ -176,7 +176,7 @@ bool CMessageManager::AddClientCommand(uint16 u2CommandID, CClientCommand* pClie
     else
     {
         //¸ÃÃüÁîÉÐÎ´Ìí¼Ó
-        pClientCommandList = new CClientCommandList();
+        pClientCommandList = new CClientCommandList(u2CommandID);
 
         if(NULL != pClientCommandList)
         {
@@ -275,7 +275,7 @@ bool CMessageManager::AddClientCommand(uint16 u2CommandID, CClientCommand* pClie
     else
     {
         //¸ÃÃüÁîÉÐÎ´Ìí¼Ó
-        pClientCommandList = new CClientCommandList();
+        pClientCommandList = new CClientCommandList(u2CommandID);
 
         if(NULL == pClientCommandList)
         {
@@ -478,5 +478,15 @@ uint32 CMessageManager::GetWorkThreadCount()
 uint32 CMessageManager::GetWorkThreadByIndex(uint32 u4Index)
 {
     return App_MessageServiceGroup::instance()->GetWorkThreadIDByIndex(u4Index);
+}
+
+NAMESPACE::uint16 CMessageManager::GetMaxCommandCount()
+{
+    return m_u4MaxCommandCount;
+}
+
+CHashTable<CClientCommandList>* CMessageManager::GetHashCommandList()
+{
+    return &m_objClientCommandList;
 }
 

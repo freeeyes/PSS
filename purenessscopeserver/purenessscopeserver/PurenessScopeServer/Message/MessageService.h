@@ -81,33 +81,40 @@ public:
 
     uint32 GetThreadID();
 
+    void CopyMessageManagerList();                                         //从MessageManager中获得信令列表副本
+
     CMessage* CreateMessage();
     void DeleteMessage(CMessage* pMessage);
 
 private:
     bool ProcessMessage(CMessage* pMessage, uint32 u4ThreadID);
     bool SaveThreadInfoData();
+    void CloseCommandList();                                                //清理当前信令列表副本
+    CClientCommandList* GetClientCommandList(uint16 u2CommandID);
+    bool DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost, uint16& u2Count, bool& bDeleteFlag);
 
     virtual int CloseMsgQueue();
 
 private:
-    uint64                         m_u8TimeCost;          //Put到队列信息的数据处理时间
-    uint32                         m_u4ThreadID;          //当前线程ID
-    uint32                         m_u4MaxQueue;          //线程中最大消息对象个数
+    uint64                         m_u8TimeCost;           //Put到队列信息的数据处理时间
+    uint32                         m_u4ThreadID;           //当前线程ID
+    uint32                         m_u4MaxQueue;           //线程中最大消息对象个数
     uint32                         m_u4HighMask;
     uint32                         m_u4LowMask;
-    uint32                         m_u4Count;             //消息队列接受个数
-    uint32                         m_u4WorkQueuePutTime;  //入队超时时间
+    uint32                         m_u4Count;              //消息队列接受个数
+    uint32                         m_u4WorkQueuePutTime;   //入队超时时间
     uint16                         m_u2ThreadTimeOut;
     uint16                         m_u2ThreadTimeCheck;
-    bool                           m_blRun;               //线程是否在运行
+    bool                           m_blRun;                //线程是否在运行
 
-    MESSAGE_SERVICE_THREAD_STATE   m_emThreadState;       //当前工作线程状态
+    MESSAGE_SERVICE_THREAD_STATE   m_emThreadState;        //当前工作线程状态
 
-    _ThreadInfo                    m_ThreadInfo;          //当前线程信息
-    CWorkThreadAI                  m_WorkThreadAI;        //线程自我监控的AI逻辑
-    CCommandAccount                m_CommandAccount;      //当前线程命令统计数据
-    CMessagePool                   m_MessagePool;         //消息池
+    _ThreadInfo                    m_ThreadInfo;           //当前线程信息
+    CWorkThreadAI                  m_WorkThreadAI;         //线程自我监控的AI逻辑
+    CCommandAccount                m_CommandAccount;       //当前线程命令统计数据
+    CMessagePool                   m_MessagePool;          //消息池
+
+    CHashTable<CClientCommandList> m_objClientCommandList; //可执行的信令列表
 
     ACE_Thread_Mutex m_mutex;
     ACE_Condition<ACE_Thread_Mutex> m_cond;

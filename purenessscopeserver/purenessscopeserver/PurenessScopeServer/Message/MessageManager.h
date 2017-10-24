@@ -56,17 +56,29 @@ struct _ModuleClient
 class CClientCommandList
 {
 private:
+    uint16 m_u2CommandID;
     typedef vector<_ClientCommandInfo*> vecClientCommandList;
     vecClientCommandList m_vecClientCommandList;
 
 public:
     CClientCommandList()
     {
+        m_u2CommandID = 0;
+    }
+
+    CClientCommandList(uint16 u2CommandID)
+    {
+        m_u2CommandID = u2CommandID;
     }
 
     ~CClientCommandList()
     {
         Close();
+    }
+
+    uint16 GetCommandID()
+    {
+        return m_u2CommandID;
     }
 
     void Close()
@@ -186,6 +198,10 @@ public:
 
     virtual uint32 GetWorkThreadCount();
     virtual uint32 GetWorkThreadByIndex(uint32 u4Index);
+
+    uint16 GetMaxCommandCount();
+
+    CHashTable<CClientCommandList>* GetHashCommandList();              //得到当前HashCommandList的副本
 
 private:
     uint32                         m_u4MaxCommandCount;                 //最大命令池中的数量

@@ -115,12 +115,6 @@ bool CServerManager::Init()
 
     //初始化链接管理器
     App_ConnectManager::instance()->Init(App_MainConfig::instance()->GetSendQueueCount());
-    //初始化消息处理线程
-    App_MessageServiceGroup::instance()->Init(App_MainConfig::instance()->GetThreadCount(),
-            App_MainConfig::instance()->GetMsgMaxQueue(),
-            App_MainConfig::instance()->GetMgsHighMark(),
-            App_MainConfig::instance()->GetMsgLowMark(),
-            App_MainConfig::instance()->GetServiceType());
 
     //初始化给DLL的对象接口
     App_ServerObject::instance()->SetMessageManager(dynamic_cast<IMessageManager*>(App_MessageManager::instance()));
@@ -135,6 +129,34 @@ bool CServerManager::Init()
     App_ServerObject::instance()->SetModuleInfo(dynamic_cast<IModuleInfo*>(App_ModuleLoader::instance()));
     App_ServerObject::instance()->SetMessageBlockManager(dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()));
     App_ServerObject::instance()->SetServerManager(this);
+
+    //初始化模块加载，因为这里可能包含了中间服务器连接加载
+    uint16 u2ModuleVCount = App_MainConfig::instance()->GetModuleInfoCount();
+
+    for (uint16 i = 0; i < u2ModuleVCount; i++)
+    {
+        _ModuleConfig* pModuleConfig = App_MainConfig::instance()->GetModuleInfo(i);
+
+        if (NULL != pModuleConfig)
+        {
+            bool blState = App_ModuleLoader::instance()->LoadModule(pModuleConfig->m_szModulePath,
+                           pModuleConfig->m_szModuleName,
+                           pModuleConfig->m_szModuleParam);
+
+            if (false == blState)
+            {
+                OUR_DEBUG((LM_INFO, "[CServerManager::Run]LoadModule (%s)is error.\n", pModuleConfig->m_szModuleName));
+                return false;
+            }
+        }
+    }
+
+    //初始化消息处理线程
+    App_MessageServiceGroup::instance()->Init(App_MainConfig::instance()->GetThreadCount(),
+            App_MainConfig::instance()->GetMsgMaxQueue(),
+            App_MainConfig::instance()->GetMgsHighMark(),
+            App_MainConfig::instance()->GetMsgLowMark(),
+            App_MainConfig::instance()->GetServiceType());
 
     return true;
 }
@@ -560,27 +582,6 @@ bool CServerManager::Run()
     {
         OUR_DEBUG((LM_INFO, "[CServerManager::Run]App_ReactorManager::instance()->StartReactor is error.\n"));
         return false;
-    }
-
-    //初始化模块加载，因为这里可能包含了中间服务器连接加载
-    uint16 u2ModuleVCount = App_MainConfig::instance()->GetModuleInfoCount();
-
-    for (uint16 i = 0; i < u2ModuleVCount; i++)
-    {
-        _ModuleConfig* pModuleConfig = App_MainConfig::instance()->GetModuleInfo(i);
-
-        if (NULL != pModuleConfig)
-        {
-            bool blState = App_ModuleLoader::instance()->LoadModule(pModuleConfig->m_szModulePath,
-                           pModuleConfig->m_szModuleName,
-                           pModuleConfig->m_szModuleParam);
-
-            if (false == blState)
-            {
-                OUR_DEBUG((LM_INFO, "[CServerManager::Run]LoadModule (%s)is error.\n", pModuleConfig->m_szModuleName));
-                return false;
-            }
-        }
     }
 
     //开始消息处理线程
