@@ -160,6 +160,7 @@ int CMessageService::svc(void)
 
             if ((mb->msg_type() == ACE_Message_Block::MB_USER))
             {
+                OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)CopyMessageManagerList.\n", m_ThreadInfo.m_u4ThreadID));
                 //需要重载所有的信令列表
                 CopyMessageManagerList();
                 mb->release();
@@ -601,19 +602,24 @@ void CMessageService::CopyMessageManagerList()
 
                 for (int j = 0; j < pClientCommandList->GetCount(); j++)
                 {
-                    pCurrClientCommandList->AddClientCommand(vecClientCommandList[i]->GetClientCommandIndex(j)->m_pClientCommand, vecClientCommandList[i]->GetClientCommandIndex(j)->m_szModuleName);
+                    pCurrClientCommandList->AddClientCommand(pClientCommandList->GetClientCommandIndex(j)->m_pClientCommand, pClientCommandList->GetClientCommandIndex(j)->m_szModuleName);
                 }
 
                 char szCommandID[10] = { '\0' };
-                sprintf_safe(szCommandID, 10, "%d", vecClientCommandList[i]->GetCommandID());
+                sprintf_safe(szCommandID, 10, "%d", pClientCommandList->GetCommandID());
 
-                if (false == m_objClientCommandList.Add_Hash_Data(szCommandID, pClientCommandList))
+                if (false == m_objClientCommandList.Add_Hash_Data(szCommandID, pCurrClientCommandList))
                 {
                     OUR_DEBUG((LM_INFO, "[CMessageService::CopyMessageManagerList]CommandID=%s add error.\n", szCommandID));
                 }
             }
         }
     }
+
+    vector<CClientCommandList*> vecClientCommandList;
+    m_objClientCommandList.Get_All_Used(vecClientCommandList);
+
+    int nSize = (int)vecClientCommandList.size();
 }
 
 void CMessageService::GetAITO(vecCommandTimeout& objTimeout)
@@ -1250,76 +1256,6 @@ void CMessageServiceGroup::SaveCommandDataLog()
             pMessageService->SaveCommandDataLog();
         }
     }
-}
-
-bool CMessageServiceGroup::UnloadModule(const char* pModuleName, uint8 u1State)
-{
-    OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::UnloadModule] Begin.\n"));
-
-    for (int i = 0; i < (int)m_vecMessageService.size(); i++)
-    {
-        CMessageService* pMessageService = m_vecMessageService[i];
-
-        if (NULL != pMessageService)
-        {
-            pMessageService->SetThreadState(THREAD_MODULE_UNLOAD);
-        }
-    }
-
-    OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::UnloadModule] SET THREAD_MODULE_UNLOAD.\n"));
-
-    //等待所有进程执行结果
-    bool blWait = true;
-
-    while (blWait)
-    {
-        blWait = false;
-
-        for (int i = 0; i < (int)m_vecMessageService.size(); i++)
-        {
-            CMessageService* pMessageService = m_vecMessageService[i];
-
-            if (NULL != pMessageService)
-            {
-                uint32 u4State = pMessageService->GetStepState();
-
-                if (THREAD_RUNBEGIN == u4State || THREAD_BLOCK == u4State)
-                {
-                    //不是所有线程都执行完了，继续等
-                    blWait = true;
-                    break;
-                }
-            }
-        }
-
-        if (blWait == true)
-        {
-            ACE_Time_Value tvSleep(0, 1000);
-            ACE_OS::sleep(tvSleep);
-        }
-    }
-
-    OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::UnloadModule] THREAD_MODULE_UNLOAD OVER.\n"));
-
-    //等待结束，开始重载
-    App_MessageManager::instance()->UnloadModuleCommand(pModuleName, u1State);
-
-    OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::UnloadModule] UnloadModuleCommand OK.\n"));
-
-    //重载结束，全部恢复线程工作
-    for (int i = 0; i < (int)m_vecMessageService.size(); i++)
-    {
-        CMessageService* pMessageService = m_vecMessageService[i];
-
-        if (NULL != pMessageService)
-        {
-            pMessageService->SetThreadState(THREAD_RUN);
-        }
-    }
-
-    OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::UnloadModule] End.\n"));
-
-    return true;
 }
 
 CMessage* CMessageServiceGroup::CreateMessage(uint32 u4ConnectID, uint8 u1PacketType)

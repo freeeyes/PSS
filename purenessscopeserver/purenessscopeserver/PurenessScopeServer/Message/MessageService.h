@@ -158,8 +158,6 @@ public:
     CMessage* CreateMessage(uint32 u4ConnectID, uint8 u1PacketType);                          //从子线程中获取一个Message对象
     void DeleteMessage(uint32 u4ConnectID, CMessage* pMessage);                               //从子线程中回收一个Message对象
 
-    bool UnloadModule(const char* pModuleName, uint8 u1State);                                //卸载或者重载指定的模块名
-
 private:
     bool StartTimer();
     bool KillTimer();

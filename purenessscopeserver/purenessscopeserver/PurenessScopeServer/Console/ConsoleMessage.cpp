@@ -789,7 +789,7 @@ void CConsoleMessage::DoMessage_LoadModule(_CommandInfo& CommandInfo, IBuffPacke
 
 void CConsoleMessage::DoMessage_UnLoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if(true == App_MessageServiceGroup::instance()->UnloadModule(CommandInfo.m_szCommandExp, (uint8)1) &&
+    if(true == App_MessageManager::instance()->UnloadModuleCommand(CommandInfo.m_szCommandExp, (uint8)1) &&
        true == App_MessageServiceGroup::instance()->PutUpdateCommandMessage())
     {
         if(NULL != pBuffPacket)
@@ -828,7 +828,7 @@ void CConsoleMessage::DoMessage_UnLoadModule(_CommandInfo& CommandInfo, IBuffPac
 
 void CConsoleMessage::DoMessage_ReLoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if(true == App_MessageServiceGroup::instance()->UnloadModule(CommandInfo.m_szCommandExp, (uint8)2) &&
+    if(true == App_MessageManager::instance()->UnloadModuleCommand(CommandInfo.m_szCommandExp, (uint8)2) &&
        true == App_MessageServiceGroup::instance()->PutUpdateCommandMessage())
     {
         if(NULL != pBuffPacket)
