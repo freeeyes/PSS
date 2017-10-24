@@ -386,7 +386,6 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1LoadS
                         //找到那个唯一
                         if(pCClientCommandList->GetClientCommandIndex(i) == pClientCommandInfo)
                         {
-                            /*
                             //找到了，释放之
                             if (false == pCClientCommandList->DelClientCommand(pClientCommandInfo->m_pClientCommand))
                             {
@@ -402,9 +401,6 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1LoadS
                                 m_objClientCommandList.Del_Hash_Data(szCommandID);
                                 m_u4CurrCommandCount--;
                             }
-                            */
-                            //设置关闭状态
-                            pClientCommandInfo->m_u1OpenState = EM_COMMAND_CLOSE;
 
                             break;
                         }
@@ -414,7 +410,7 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1LoadS
         }
 
         //卸载插件信息
-        //App_ModuleLoader::instance()->UnLoadModule(pModuleName, true);
+        App_ModuleLoader::instance()->UnLoadModule(pModuleName, true);
     }
 
     //看看是否要重新加载

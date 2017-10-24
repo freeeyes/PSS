@@ -62,6 +62,16 @@ void CMessage::SetMessageBase(_MessageBase* pMessageBase)
     m_pMessageBase = pMessageBase;
 }
 
+ACE_Message_Block* CMessage::GetMessageHead()
+{
+    return m_pmbHead;
+}
+
+ACE_Message_Block* CMessage::GetMessageBody()
+{
+    return m_pmbBody;
+}
+
 _MessageBase* CMessage::GetMessageBase()
 {
     return m_pMessageBase;

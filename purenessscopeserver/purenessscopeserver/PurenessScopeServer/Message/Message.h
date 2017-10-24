@@ -24,7 +24,6 @@ public:
     int  GetHashID();
 
     void SetMessageBase(_MessageBase* pMessageBase);
-    bool SetRecvPacket(IBuffPacket* pRecvPacket);
 
     ACE_Message_Block* GetMessageHead();
     ACE_Message_Block* GetMessageBody();

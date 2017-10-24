@@ -370,7 +370,6 @@ private:
     uint16     m_u2TcpNodelay;                         //TCP的Nagle算法开关，0为打开，1为关闭
     uint16     m_u2Backlog;                            //设置的Backlog值
     uint8      m_u1MsgProcessCount;                    //当前的多进程数量(仅Linux支持)
-    uint8      m_u1ServiceType;                        //工作线程状态，0是时序线程，1是随机处理线程
     uint8      m_u1Debug;                              //是否开启Debug模式，1是开启，0是关闭
     uint8      m_u1ServerClose;                        //服务器是否允许远程关闭
     uint8      m_u1CommandAccount;                     //是否需要统计命令出入服务器的信息，0是关闭，1是打开。打开后会生成相应的报表

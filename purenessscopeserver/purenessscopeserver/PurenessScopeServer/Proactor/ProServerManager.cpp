@@ -169,8 +169,7 @@ bool CProServerManager::Init()
     App_MessageServiceGroup::instance()->Init(App_MainConfig::instance()->GetThreadCount(),
             App_MainConfig::instance()->GetMsgMaxQueue(),
             App_MainConfig::instance()->GetMgsHighMark(),
-            App_MainConfig::instance()->GetMsgLowMark(),
-            App_MainConfig::instance()->GetServiceType());
+            App_MainConfig::instance()->GetMsgLowMark());
 
     return true;
 }
