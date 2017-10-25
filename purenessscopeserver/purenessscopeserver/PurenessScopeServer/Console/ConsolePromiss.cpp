@@ -95,8 +95,10 @@ int CConsolePromissions::Check_Split_User(const char* pUser, const char* pUserLi
             continue;
         }
 
-        memcpy_safe(pPromissPosBegin, u4NameLen, szTempUser, u4NameLen);
-        szTempUser[u4NameLen] = '\0';
+        if (true == memcpy_safe(pPromissPosBegin, u4NameLen, szTempUser, u4NameLen))
+        {
+            szTempUser[u4NameLen] = '\0';
+        }
 
         if (0 == ACE_OS::strcmp(szTempUser, pUser))
         {

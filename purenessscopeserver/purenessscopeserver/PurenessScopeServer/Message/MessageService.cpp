@@ -627,8 +627,10 @@ void CMessageService::CopyMessageManagerList()
 
                 for (int j = 0; j < pClientCommandList->GetCount(); j++)
                 {
-                    //OUR_DEBUG((LM_INFO, "[CMessageService::CopyMessageManagerList]<%d>(%d)Add(0x%08x) OK.\n", m_u4ThreadID, pClientCommandList->GetClientCommandIndex(j)->m_u2CommandID, pCurrClientCommandList));
-                    pCurrClientCommandList->AddClientCommand(pClientCommandList->GetClientCommandIndex(j)->m_pClientCommand, pClientCommandList->GetClientCommandIndex(j)->m_szModuleName);
+                    if (false == pCurrClientCommandList->AddClientCommand(pClientCommandList->GetClientCommandIndex(j)->m_pClientCommand, pClientCommandList->GetClientCommandIndex(j)->m_szModuleName))
+                    {
+                        OUR_DEBUG((LM_INFO, "[CMessageService::CopyMessageManagerList]<%s>CommandID=%d add error.\n", pClientCommandList->GetClientCommandIndex(j)->m_szModuleName, pClientCommandList->GetCommandID()));
+                    }
                 }
 
                 char szCommandID[10] = { '\0' };
@@ -870,6 +872,7 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
         }
 
         pMessageService->Init(i, u4MaxQueue, u4LowMask, u4HighMask);
+
         m_vecMessageService.push_back(pMessageService);
     }
 

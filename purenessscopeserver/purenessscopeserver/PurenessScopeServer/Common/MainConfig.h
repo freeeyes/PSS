@@ -318,7 +318,6 @@ public:
     _GroupListenInfo* GetGroupListenInfo();
     _PacketParseInfo* GetPacketParseInfo(uint8 u1Index = 0);
     uint8             GetPacketParseCount();
-    uint8             GetServiceType();
 
 private:
     uint32     m_u4MsgHighMark;                        //消息的高水位阀值
