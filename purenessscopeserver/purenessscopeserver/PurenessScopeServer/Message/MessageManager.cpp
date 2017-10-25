@@ -24,6 +24,7 @@ CMessageManager::CMessageManager(void)
     m_u2MaxModuleCount     = 0;
     m_u4MaxCommandCount    = 0;
     m_u4CurrCommandCount   = 0;
+    m_u4UpdateIndex        = 0;
 }
 
 CMessageManager::~CMessageManager(void)
@@ -42,7 +43,7 @@ void CMessageManager::Init(uint16 u2MaxModuleCount, uint32 u4MaxCommandCount)
 
     m_u2MaxModuleCount  = u2MaxModuleCount;
     m_u4MaxCommandCount = u4MaxCommandCount;
-
+    m_u4UpdateIndex     = 0;
 }
 
 CClientCommandList* CMessageManager::GetClientCommandList(uint16 u2CommandID)
@@ -54,8 +55,6 @@ CClientCommandList* CMessageManager::GetClientCommandList(uint16 u2CommandID)
 
 bool CMessageManager::AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName)
 {
-
-
     if(NULL == pClientCommand)
     {
         OUR_DEBUG((LM_ERROR, "[CMessageManager::AddClientCommand] u2CommandID = %d pClientCommand is NULL.\n", u2CommandID));
@@ -278,7 +277,7 @@ bool CMessageManager::DelClientCommand(uint16 u2CommandID, CClientCommand* pClie
     }
 }
 
-bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1LoadState)
+bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1LoadState, uint32 u4ThreadCount)
 {
     string strModuleName  = pModuleName;
     string strModuleN     = "";
@@ -340,8 +339,13 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1LoadS
             }
         }
 
-        //卸载插件信息
-        App_ModuleLoader::instance()->UnLoadModule(pModuleName, true);
+        m_u4UpdateIndex++;
+
+        //卸载插件信息(不在这里卸载，在定时器检测所有工作线程都处理完了，再卸载指定的模块,先将需要卸载的模块放入需要卸载的队列)
+        if (false == App_ModuleLoader::instance()->MoveUnloadList(pModuleName, m_u4UpdateIndex, u4ThreadCount))
+        {
+            OUR_DEBUG((LM_ERROR, "[CMessageManager::UnloadModuleCommand]MoveUnloadList error(%s).\n", pModuleName));
+        }
     }
 
     //看看是否要重新加载
@@ -410,6 +414,11 @@ uint32 CMessageManager::GetWorkThreadByIndex(uint32 u4Index)
 NAMESPACE::uint16 CMessageManager::GetMaxCommandCount()
 {
     return m_u4MaxCommandCount;
+}
+
+uint32 CMessageManager::GetUpdateIndex()
+{
+    return m_u4UpdateIndex;
 }
 
 CHashTable<CClientCommandList>* CMessageManager::GetHashCommandList()

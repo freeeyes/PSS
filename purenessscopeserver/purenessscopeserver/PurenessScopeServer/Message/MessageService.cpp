@@ -160,7 +160,15 @@ int CMessageService::svc(void)
 
             if ((mb->msg_type() == ACE_Message_Block::MB_USER))
             {
-                OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)CopyMessageManagerList.\n", m_ThreadInfo.m_u4ThreadID));
+                uint32 u4UpdateIndex = 0;
+                memcpy_safe(mb->rd_ptr(), sizeof(int), (char* )&u4UpdateIndex, sizeof(int));
+                OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)<UpDateIndex=%d>CopyMessageManagerList.\n", m_ThreadInfo.m_u4ThreadID, u4UpdateIndex));
+
+                if (u4UpdateIndex > 0)
+                {
+                    App_ModuleLoader::instance()->UnloadListUpdate(u4UpdateIndex);
+                }
+
                 //需要重载所有的信令列表
                 CopyMessageManagerList();
                 mb->release();
@@ -237,7 +245,7 @@ bool CMessageService::PutMessage(CMessage* pMessage)
     return true;
 }
 
-bool CMessageService::PutUpdateCommandMessage()
+bool CMessageService::PutUpdateCommandMessage(uint32 u4UpdateIndex)
 {
     ACE_Message_Block* mblk = new ACE_Message_Block(sizeof(int));
 
@@ -245,6 +253,9 @@ bool CMessageService::PutUpdateCommandMessage()
     {
         return false;
     }
+
+    memcpy_safe((char* )&u4UpdateIndex, sizeof(int), mblk->wr_ptr(), sizeof(int));
+    mblk->wr_ptr(sizeof(int));
 
     mblk->msg_type(ACE_Message_Block::MB_USER);
 
@@ -488,8 +499,21 @@ void CMessageService::CloseCommandList()
     for (int i = 0; i < (int)vecClientCommandList.size(); i++)
     {
         CClientCommandList* pClientCommandList = vecClientCommandList[i];
+
+        /*
+        OUR_DEBUG((LM_INFO, "[CMessageService::CloseCommandList]<%d>(%d) GetCount.\n", m_u4ThreadID, pClientCommandList->GetCount()));
+
+        for (int j = 0; j < pClientCommandList->GetCount(); j++)
+        {
+            OUR_DEBUG((LM_INFO, "[CMessageService::CloseCommandList]<%d>(%d) Delete(0x%08x)).\n", m_u4ThreadID, pClientCommandList->GetClientCommandIndex(j)->m_u2CommandID, pClientCommandList->GetClientCommandIndex(j)));
+        }
+        */
+
         SAFE_DELETE(pClientCommandList);
     }
+
+    m_objClientCommandList.Clear();
+    vecClientCommandList.clear();
 }
 
 CClientCommandList* CMessageService::GetClientCommandList(uint16 u2CommandID)
@@ -518,7 +542,7 @@ bool CMessageService::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uin
         {
             _ClientCommandInfo* pClientCommandInfo = pClientCommandList->GetClientCommandIndex(i);
 
-            if (NULL != pClientCommandInfo && pClientCommandInfo->m_u1OpenState == EM_COMMAND_OPEN)
+            if (NULL != pClientCommandInfo)
             {
                 //判断当前消息是否有指定的监听端口
                 if (pClientCommandInfo->m_objListenIPInfo.m_nPort > 0)
@@ -599,9 +623,11 @@ void CMessageService::CopyMessageManagerList()
             if (NULL != pClientCommandList)
             {
                 CClientCommandList* pCurrClientCommandList = new CClientCommandList();
+                pCurrClientCommandList->SetCommandID(pClientCommandList->GetCommandID());
 
                 for (int j = 0; j < pClientCommandList->GetCount(); j++)
                 {
+                    //OUR_DEBUG((LM_INFO, "[CMessageService::CopyMessageManagerList]<%d>(%d)Add(0x%08x) OK.\n", m_u4ThreadID, pClientCommandList->GetClientCommandIndex(j)->m_u2CommandID, pCurrClientCommandList));
                     pCurrClientCommandList->AddClientCommand(pClientCommandList->GetClientCommandIndex(j)->m_pClientCommand, pClientCommandList->GetClientCommandIndex(j)->m_szModuleName);
                 }
 
@@ -881,7 +907,7 @@ bool CMessageServiceGroup::PutMessage(CMessage* pMessage)
     return true;
 }
 
-bool CMessageServiceGroup::PutUpdateCommandMessage()
+bool CMessageServiceGroup::PutUpdateCommandMessage(uint32 u4UpdateIndex)
 {
     //向所有工作线程群发副本更新消息
 
@@ -891,7 +917,7 @@ bool CMessageServiceGroup::PutUpdateCommandMessage()
 
         if (NULL != pMessageService)
         {
-            if (false == pMessageService->PutUpdateCommandMessage())
+            if (false == pMessageService->PutUpdateCommandMessage(u4UpdateIndex))
             {
                 OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::PutMessage](%d)pMessageService fail.\n", pMessageService->GetThreadID()));
                 return false;

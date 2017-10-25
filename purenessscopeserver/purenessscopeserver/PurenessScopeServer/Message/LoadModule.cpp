@@ -83,10 +83,10 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, c
 
     if(NULL != pOldModuleInfo)
     {
-        //关闭副本
+        //卸载旧的插件
         ACE_OS::dlclose(pOldModuleInfo->hModule);
         SAFE_DELETE(pOldModuleInfo);
-        m_objHashModuleList.Del_Hash_Data(pModuleName);
+        m_objHashModuleList.Del_Hash_Data(pModuleInfo->GetName());
     }
 
     //将注册成功的模块，加入到Hash数组中
@@ -114,8 +114,7 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, c
 bool CLoadModule::UnLoadModule(const char* szModuleName, bool blIsDelete)
 {
     OUR_DEBUG((LM_ERROR, "[CLoadModule::UnLoadModule]szResourceName=%s.\n", szModuleName));
-    string strModuleName = szModuleName;
-    _ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(strModuleName.c_str());
+    _ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(szModuleName);
 
     if(NULL == pModuleInfo)
     {
@@ -136,12 +135,70 @@ bool CLoadModule::UnLoadModule(const char* szModuleName, bool blIsDelete)
         if(true == blIsDelete)
         {
             SAFE_DELETE(pModuleInfo);
-            m_objHashModuleList.Del_Hash_Data(strModuleName.c_str());
+            m_objHashModuleList.Del_Hash_Data(szModuleName);
         }
 
-        OUR_DEBUG((LM_ERROR, "[CLoadModule::UnLoadModule] Close Module=%s, nRet=%d!\n", strModuleName.c_str(), nRet));
+        OUR_DEBUG((LM_ERROR, "[CLoadModule::UnLoadModule] Close Module=%s, nRet=%d!\n", szModuleName, nRet));
 
         return true;
+    }
+}
+
+bool CLoadModule::MoveUnloadList(const char* szModuleName, uint32 u4UpdateIndex, uint32 u4ThreadCount)
+{
+    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_tmModule);
+    OUR_DEBUG((LM_ERROR, "[CLoadModule::MoveUnloadList]szResourceName=%s.\n", szModuleName));
+    _ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(szModuleName);
+
+    if (NULL == pModuleInfo)
+    {
+        return false;
+    }
+    else
+    {
+        //放入等待清理的线程列表
+        _WaitUnloadModule objWaitUnloadModule;
+        sprintf_safe((char* )szModuleName, MAX_BUFF_100, objWaitUnloadModule.m_szModuleName, MAX_BUFF_100);
+        objWaitUnloadModule.m_u4UpdateIndex = u4UpdateIndex;
+        objWaitUnloadModule.m_hModule = pModuleInfo->hModule;
+        objWaitUnloadModule.m_u4ThreadCurrEndCount = u4ThreadCount;
+        m_vecWaitUnloadModule.push_back(objWaitUnloadModule);
+
+        //删除存在m_objHashModuleList的插件信息
+        m_objHashModuleList.Del_Hash_Data(pModuleInfo->GetName());
+        SAFE_DELETE(pModuleInfo);
+        OUR_DEBUG((LM_ERROR, "[CLoadModule::MoveUnloadList]szResourceName=%s Move Finish.\n", szModuleName));
+        return true;
+    }
+}
+
+void CLoadModule::UnloadListUpdate(uint32 u4UpdateIndex)
+{
+    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_tmModule);
+    vector<_WaitUnloadModule>::iterator itr = m_vecWaitUnloadModule.begin();
+
+    while (itr != m_vecWaitUnloadModule.end())
+    {
+        if ((*itr).m_u4UpdateIndex == u4UpdateIndex)
+        {
+            if ((*itr).m_u4UpdateIndex > 0)
+            {
+                (*itr).m_u4UpdateIndex--;
+            }
+
+            if ((*itr).m_u4UpdateIndex == 0)
+            {
+                //回收插件端口资源
+                OUR_DEBUG((LM_ERROR, "[CLoadModule::UnloadListUpdate]szResourceName=%s UnLoad.\n", (*itr).m_szModuleName));
+                ACE_OS::dlclose((*itr).m_hModule);
+
+                //清理vector中的这个对象
+                m_vecWaitUnloadModule.erase(itr);
+                break;
+            }
+        }
+
+        ++itr;
     }
 }
 

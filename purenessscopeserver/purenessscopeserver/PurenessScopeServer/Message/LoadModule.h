@@ -40,6 +40,21 @@ struct _ModuleInfo
     }
 };
 
+struct _WaitUnloadModule
+{
+    uint32           m_u4UpdateIndex;
+    uint32           m_u4ThreadCurrEndCount;
+    char             m_szModuleName[MAX_BUFF_100];
+    ACE_SHLIB_HANDLE m_hModule;
+
+    _WaitUnloadModule()
+    {
+        m_u4ThreadCurrEndCount = 0;
+        m_u4UpdateIndex        = 0;
+        m_szModuleName[0]      = '\0';
+    }
+};
+
 class CLoadModule : public IModuleInfo
 {
 public:
@@ -52,6 +67,8 @@ public:
 
     bool LoadModule(const char* pModulePath, const char* pModuleName, const char* pModuleParam);
     bool UnLoadModule(const char* szModuleName, bool blIsDelete = true);
+    bool MoveUnloadList(const char* szModuleName, uint32 u4UpdateIndex, uint32 u4ThreadCount);   //将要卸载的插件放入缓冲列表
+    void UnloadListUpdate(uint32 u4UpdateIndex);                                                 //工程线程回调接口，当所有工作线程回调结束，释放插件端口
 
     int  SendModuleMessage(const char* pModuleName, uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket);
 
@@ -75,6 +92,7 @@ private:
 private:
     CHashTable<_ModuleInfo>            m_objHashModuleList;
     char                               m_szModulePath[MAX_BUFF_200];
+    vector<_WaitUnloadModule>          m_vecWaitUnloadModule;
     ACE_Recursive_Thread_Mutex         m_tmModule;
 };
 

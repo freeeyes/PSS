@@ -751,7 +751,7 @@ void CConsoleMessage::DoMessage_LoadModule(_CommandInfo& CommandInfo, IBuffPacke
     //加载文件MessageManager
     //消息所有的工作线程同步更新一下各自的消息列表副本
     if (true == App_ModuleLoader::instance()->LoadModule(FileInfo.m_szFilePath, FileInfo.m_szFileName, FileInfo.m_szFileParam) &&
-        true == App_MessageServiceGroup::instance()->PutUpdateCommandMessage())
+        true == App_MessageServiceGroup::instance()->PutUpdateCommandMessage(0))
     {
         if(NULL != pBuffPacket)
         {
@@ -789,8 +789,8 @@ void CConsoleMessage::DoMessage_LoadModule(_CommandInfo& CommandInfo, IBuffPacke
 
 void CConsoleMessage::DoMessage_UnLoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if(true == App_MessageManager::instance()->UnloadModuleCommand(CommandInfo.m_szCommandExp, (uint8)1) &&
-       true == App_MessageServiceGroup::instance()->PutUpdateCommandMessage())
+    if(true == App_MessageManager::instance()->UnloadModuleCommand(CommandInfo.m_szCommandExp, (uint8)1, App_MessageServiceGroup::instance()->GetWorkThreadCount()) &&
+       true == App_MessageServiceGroup::instance()->PutUpdateCommandMessage(App_MessageManager::instance()->GetUpdateIndex()))
     {
         if(NULL != pBuffPacket)
         {
@@ -828,8 +828,8 @@ void CConsoleMessage::DoMessage_UnLoadModule(_CommandInfo& CommandInfo, IBuffPac
 
 void CConsoleMessage::DoMessage_ReLoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if(true == App_MessageManager::instance()->UnloadModuleCommand(CommandInfo.m_szCommandExp, (uint8)2) &&
-       true == App_MessageServiceGroup::instance()->PutUpdateCommandMessage())
+    if(true == App_MessageManager::instance()->UnloadModuleCommand(CommandInfo.m_szCommandExp, (uint8)2, App_MessageServiceGroup::instance()->GetWorkThreadCount()) &&
+       true == App_MessageServiceGroup::instance()->PutUpdateCommandMessage(App_MessageManager::instance()->GetUpdateIndex()))
     {
         if(NULL != pBuffPacket)
         {

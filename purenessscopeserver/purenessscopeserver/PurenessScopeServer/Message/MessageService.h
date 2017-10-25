@@ -60,7 +60,7 @@ public:
     bool Start();
 
     bool PutMessage(CMessage* pMessage);
-    bool PutUpdateCommandMessage();
+    bool PutUpdateCommandMessage(uint32 u4UpdateIndex);
 
     _ThreadInfo* GetThreadInfo();
 
@@ -133,7 +133,7 @@ public:
 
     bool Init(uint32 u4ThreadCount = MAX_MSG_THREADCOUNT, uint32 u4MaxQueue = MAX_MSG_THREADQUEUE, uint32 u4LowMask = MAX_MSG_MASK, uint32 u4HighMask = MAX_MSG_MASK);
     bool PutMessage(CMessage* pMessage);                                                     //发送到相应的线程去处理
-    bool PutUpdateCommandMessage();                                                          //发送消息同步所有的工作线程命令副本
+    bool PutUpdateCommandMessage(uint32 u4UpdateIndex);                                      //发送消息同步所有的工作线程命令副本
     void Close();
 
     bool Start();
