@@ -643,11 +643,6 @@ void CMessageService::CopyMessageManagerList()
             }
         }
     }
-
-    vector<CClientCommandList*> vecClientCommandList;
-    m_objClientCommandList.Get_All_Used(vecClientCommandList);
-
-    int nSize = (int)vecClientCommandList.size();
 }
 
 void CMessageService::GetAITO(vecCommandTimeout& objTimeout)

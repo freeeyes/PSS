@@ -368,22 +368,23 @@ private:
     uint16     m_u2ConnectServerCheck;                 //服务器间连接单位检查时间
     uint16     m_u2TcpNodelay;                         //TCP的Nagle算法开关，0为打开，1为关闭
     uint16     m_u2Backlog;                            //设置的Backlog值
+    bool       m_blByteOrder;                          //当前框架使用字序，false为主机序，true为网络序
     uint8      m_u1MsgProcessCount;                    //当前的多进程数量(仅Linux支持)
     uint8      m_u1Debug;                              //是否开启Debug模式，1是开启，0是关闭
     uint8      m_u1ServerClose;                        //服务器是否允许远程关闭
     uint8      m_u1CommandAccount;                     //是否需要统计命令出入服务器的信息，0是关闭，1是打开。打开后会生成相应的报表
     uint8      m_u1ServerType;                         //设置服务器工作状态
     uint8      m_u1ConsoleSupport;                     //是否支持Console服务，如果是1则是支持，0是不支持
-    uint8      m_u1ConsoleIPType;                  //Console的IPType
-    uint8      m_u1CommandFlow;                    //命令调用统计，0为不统计，1为统计
-    uint8      m_u1ConnectServerRunType;           //服务器间返回包处理模式，0为同步，1为异步
-    uint8      m_u1NetworkMode;                    //当前可以设置的网络模式
-    uint8      m_u1Monitor;                        //设置当前的监控开关是否打开，0是关闭，1是打开
-    uint8      m_u1WTAI;                           //工作线程AI开关，0为关闭，1为打开
-    uint8      m_u1WTReturnDataType;               //返回错误数据的类型，1为二进制，2为文本
-    uint8      m_u1DebugTrunOn;                    //ACE_DEBUG文件输出开关，0为关闭，1为打开
-    bool       m_blByteOrder;                      //当前框架使用字序，false为主机序，true为网络序
-    CXmlOpeation m_MainConfig;
+    uint8      m_u1ConsoleIPType;                      //Console的IPType
+    uint8      m_u1CommandFlow;                        //命令调用统计，0为不统计，1为统计
+    uint8      m_u1ConnectServerRunType;               //服务器间返回包处理模式，0为同步，1为异步
+    uint8      m_u1NetworkMode;                        //当前可以设置的网络模式
+    uint8      m_u1Monitor;                            //设置当前的监控开关是否打开，0是关闭，1是打开
+    uint8      m_u1WTAI;                               //工作线程AI开关，0为关闭，1为打开
+    uint8      m_u1WTReturnDataType;                   //返回错误数据的类型，1为二进制，2为文本
+    uint8      m_u1DebugTrunOn;                        //ACE_DEBUG文件输出开关，0为关闭，1为打开
+
+
     char       m_szError[MAX_BUFF_500];
     char       m_szServerName[MAX_BUFF_20];            //服务器名称
     char       m_szServerVersion[MAX_BUFF_20];         //服务器版本
@@ -391,15 +392,16 @@ private:
     char       m_szDisplayServiceName[MAX_BUFF_50];    //windows服务显示名称
     char       m_szPacketVersion[MAX_BUFF_20];         //数据解析包模块的版本号
     char       m_szEncryptPass[MAX_BUFF_9];            //最长8位的加密密码，3DES算法
-    char       m_szConsoleIP[MAX_BUFF_100];        //Console服务器IP
-    char       m_szWTReturnData[MAX_BUFF_1024];    //返回的数据体，最多1K
-    char       m_szDeubgFileName[MAX_BUFF_100];    //输出文件名
-    char       m_szDebugLevel[MAX_BUFF_100];       //输出文件级别
+    char       m_szConsoleIP[MAX_BUFF_100];            //Console服务器IP
+    char       m_szWTReturnData[MAX_BUFF_1024];        //返回的数据体，最多1K
+    char       m_szDeubgFileName[MAX_BUFF_100];        //输出文件名
+    char       m_szDebugLevel[MAX_BUFF_100];           //输出文件级别
 
-    _ConnectAlert    m_ConnectAlert;               //连接告警相关配置信息
-    _IPAlert         m_IPAlert;                    //IP告警阀值相关配置
-    _ClientDataAlert m_ClientDataAlert;            //单链接客户端告警阀值相关配置
-    _GroupListenInfo m_GroupListenInfo;            //集群相关服务器地址配置
+    CXmlOpeation     m_MainConfig;
+    _ConnectAlert    m_ConnectAlert;                   //连接告警相关配置信息
+    _IPAlert         m_IPAlert;                        //IP告警阀值相关配置
+    _ClientDataAlert m_ClientDataAlert;                //单链接客户端告警阀值相关配置
+    _GroupListenInfo m_GroupListenInfo;                //集群相关服务器地址配置
 
     typedef vector<_PacketParseInfo> vecPacketParseInfo;
     vecPacketParseInfo m_vecPacketParseInfo;
