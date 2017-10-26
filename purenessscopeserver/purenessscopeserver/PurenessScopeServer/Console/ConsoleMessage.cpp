@@ -2800,6 +2800,7 @@ void CConsoleMessage::DoMessage_GetLogLevelInfo(_CommandInfo& CommandInfo, IBuff
             uint8 u1LogType = (uint8)AppLogManager::instance()->GetLogInfoByLogDisplay(u2LogID);
 
             (*pBuffPacket) << u1LogType;
+            (*pBuffPacket) << AppLogManager::instance()->GetLogInfoByLogLevel(i);
         }
     }
 

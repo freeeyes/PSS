@@ -391,6 +391,7 @@ b freeeyes ShowServerInfo -a&
 				<th>uint8</th><th>日志名称长度</th></tr>
 				<th>char</th><th>日志名称</th></tr>
 				<th>uint8</th><th>日志输出类型 0 写文件 1 写屏幕</th></tr>
+				<th>uint16</th><th>当前日志等级</th></tr>
 				</table>
 			</th>
         </tr>

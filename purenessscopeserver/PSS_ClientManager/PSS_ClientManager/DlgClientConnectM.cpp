@@ -247,7 +247,7 @@ BOOL CDlgClientConnectM::OnInitDialog()
     m_lcLogInfo.InsertColumn(1, _T("日志前缀"), LVCFMT_CENTER, 100);
     m_lcLogInfo.InsertColumn(2, _T("日志名称"), LVCFMT_CENTER, 100);
     m_lcLogInfo.InsertColumn(3, _T("打印or写文件"), LVCFMT_CENTER, 100);
-    m_lcLogInfo.InsertColumn(4, _T("运行状态"), LVCFMT_CENTER, 100);
+    m_lcLogInfo.InsertColumn(4, _T("日志等级"), LVCFMT_CENTER, 100);
 
     DWORD dwStyle = m_lcLogInfo.GetExtendedStyle();
     dwStyle |= LVS_EX_FULLROWSELECT;//选中某行使整行高亮（只适用与report风格的listctrl）
@@ -343,6 +343,7 @@ void CDlgClientConnectM::OnBnClickedButton9()
             char szServerName[300] = {'\0'};
             char szLogName[300]    = {'\0'};
             int  nDisplay          = 0;
+            int  nLogLevel         = 0;
             memcpy_s(&nLogID, sizeof(short), &szRecvBuff[nPos], sizeof(short));
             nPos += sizeof(short);
 
@@ -387,7 +388,10 @@ void CDlgClientConnectM::OnBnClickedButton9()
                 m_lcLogInfo.SetItemText(i, 3, _T("写屏幕"));
             }
 
-            m_lcLogInfo.SetItemText(i, 4, _T("正在运行"));
+            memcpy_s(&nLogLevel, sizeof(short), &szRecvBuff[nPos], sizeof(short));
+            nPos += sizeof(short);
+            strData.Format(_T("%d"), nLogLevel);
+            m_lcLogInfo.SetItemText(i, 4, strData);
         }
     }
 
