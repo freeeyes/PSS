@@ -209,6 +209,53 @@ int CServerMessageTask::svc(void)
                 continue;
             }
 
+            //处理ClientMessage对象添加
+            if (mb->msg_type() == ADD_SERVER_CLIENT)
+            {
+                IClientMessage* pClientMessage = NULL;
+                memcpy_safe(mb->rd_ptr(), sizeof(IClientMessage*), (char* )pClientMessage, sizeof(IClientMessage*));
+
+                if (NULL != pClientMessage)
+                {
+                    for (int i = 0; i < (int)m_vecValidIClientMessage.size(); i++)
+                    {
+                        if (m_vecValidIClientMessage[i] == pClientMessage)
+                        {
+                            //找到了，什么都不做
+                            return;
+                        }
+                    }
+
+                    m_vecValidIClientMessage.push_back(pClientMessage);
+                }
+
+                App_MessageBlockManager::instance()->Close(mb);
+                continue;
+            }
+
+            if (mb->msg_type() == DEL_SERVER_CLIENT)
+            {
+                IClientMessage* pClientMessage = NULL;
+                memcpy_safe(mb->rd_ptr(), sizeof(IClientMessage*), (char*)pClientMessage, sizeof(IClientMessage*));
+
+                if (NULL != pClientMessage)
+                {
+                    //先查找有效的列表中是否包含此指针
+                    for (vecValidIClientMessage::iterator b = m_vecValidIClientMessage.begin(); b != m_vecValidIClientMessage.end(); ++b)
+                    {
+                        if (*b == pClientMessage)
+                        {
+                            //找到了，清除
+                            m_vecValidIClientMessage.erase(b);
+                            break;
+                        }
+                    }
+                }
+
+                App_MessageBlockManager::instance()->Close(mb);
+                continue;
+            }
+
             if ((0 == mb->size ()) && (mb->msg_type () == ACE_Message_Block::MB_STOP))
             {
                 m_mutex.acquire();
@@ -280,6 +327,74 @@ bool CServerMessageTask::PutMessage(_Server_Message_Info* pMessage)
     return true;
 }
 
+bool CServerMessageTask::PutMessage_Add_Client(IClientMessage* pClientMessage)
+{
+    ACE_Message_Block* pmb = App_MessageBlockManager::instance()->Create(sizeof(IClientMessage*));
+
+    if (NULL == pmb)
+    {
+        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::PutMessage_Add_Client] ACE_Message_Block is NULL.\n"));
+        return false;
+    }
+
+    sprintf_safe((char* )pClientMessage, sizeof(IClientMessage*), pmb->wr_ptr(), sizeof(IClientMessage*));
+    pmb->wr_ptr(sizeof(IClientMessage*));
+    pmb->msg_type(ADD_SERVER_CLIENT);
+
+    //判断队列是否是已经最大
+    int nQueueCount = (int)msg_queue()->message_count();
+
+    if (nQueueCount >= (int)m_u4MaxQueue)
+    {
+        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::PutMessage_Add_Client] Queue is Full nQueueCount = [%d].\n", nQueueCount));
+        return false;
+    }
+
+    ACE_Time_Value xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, 100000);
+
+    if (this->putq(pmb, &xtime) == -1)
+    {
+        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::PutMessage_Add_Client] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
+        return false;
+    }
+
+    return true;
+}
+
+bool CServerMessageTask::PutMessage_Del_Client(IClientMessage* pClientMessage)
+{
+    ACE_Message_Block* pmb = App_MessageBlockManager::instance()->Create(sizeof(IClientMessage*));
+
+    if (NULL == pmb)
+    {
+        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::PutMessage_Add_Client] ACE_Message_Block is NULL.\n"));
+        return false;
+    }
+
+    sprintf_safe((char*)pClientMessage, sizeof(IClientMessage*), pmb->wr_ptr(), sizeof(IClientMessage*));
+    pmb->wr_ptr(sizeof(IClientMessage*));
+    pmb->msg_type(DEL_SERVER_CLIENT);
+
+    //判断队列是否是已经最大
+    int nQueueCount = (int)msg_queue()->message_count();
+
+    if (nQueueCount >= (int)m_u4MaxQueue)
+    {
+        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::PutMessage_Add_Client] Queue is Full nQueueCount = [%d].\n", nQueueCount));
+        return false;
+    }
+
+    ACE_Time_Value xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, 100000);
+
+    if (this->putq(pmb, &xtime) == -1)
+    {
+        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::PutMessage_Add_Client] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
+        return false;
+    }
+
+    return true;
+}
+
 bool CServerMessageTask::ProcessMessage(_Server_Message_Info* pMessage, uint32 u4ThreadID)
 {
     if(NULL == pMessage)
@@ -317,36 +432,6 @@ bool CServerMessageTask::CheckServerMessageThread(ACE_Time_Value tvNow)
     else
     {
         return true;
-    }
-}
-
-void CServerMessageTask::AddClientMessage(IClientMessage* pClientMessage)
-{
-    //先查找有效的列表中是否包含此指针
-    for(int i = 0; i < (int)m_vecValidIClientMessage.size(); i++)
-    {
-        if(m_vecValidIClientMessage[i] == pClientMessage)
-        {
-            //找到了，什么都不做
-            return;
-        }
-    }
-
-    m_vecValidIClientMessage.push_back(pClientMessage);
-
-}
-
-void CServerMessageTask::DelClientMessage(IClientMessage* pClientMessage)
-{
-    //先查找有效的列表中是否包含此指针
-    for (vecValidIClientMessage::iterator b = m_vecValidIClientMessage.begin(); b != m_vecValidIClientMessage.end(); ++b)
-    {
-        if(*b == pClientMessage)
-        {
-            //找到了，什么都不做
-            m_vecValidIClientMessage.erase(b);
-            return;
-        }
     }
 }
 
@@ -454,8 +539,6 @@ int CServerMessageManager::Close()
 
 bool CServerMessageManager::PutMessage(_Server_Message_Info* pMessage)
 {
-    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-
     if(NULL != m_pServerMessageTask)
     {
         return m_pServerMessageTask->PutMessage(pMessage);
@@ -468,8 +551,6 @@ bool CServerMessageManager::PutMessage(_Server_Message_Info* pMessage)
 
 bool CServerMessageManager::CheckServerMessageThread(ACE_Time_Value tvNow)
 {
-    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-
     if(NULL != m_pServerMessageTask)
     {
         bool blRet = m_pServerMessageTask->CheckServerMessageThread(tvNow);
@@ -477,9 +558,10 @@ bool CServerMessageManager::CheckServerMessageThread(ACE_Time_Value tvNow)
         if(false == blRet)
         {
             OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::CheckServerMessageThread]***App_ServerMessageTask Thread is DEAD***.\n"));
-
+            return false;
+            /*
             //如果发现已经可能死亡，尝试重启线程
-#ifdef WIN32
+            #ifdef WIN32
             ACE_hthread_t hthread = 0;
             int grp_id = m_pServerMessageTask->grp_id();
 
@@ -490,10 +572,10 @@ bool CServerMessageManager::CheckServerMessageThread(ACE_Time_Value tvNow)
                 OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::CheckServerMessageThread]kill return %d, %d\n", ret, GetLastError()));
             }
 
-#else
+            #else
             int ret = ACE_Thread_Manager::instance()->cancel_task(m_pServerMessageTask, 1);
             OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::CheckServerMessageThread]kill return %d OK.\n", ret));
-#endif
+            #endif
 
             if (0 != m_pServerMessageTask->Close())
             {
@@ -509,9 +591,10 @@ bool CServerMessageManager::CheckServerMessageThread(ACE_Time_Value tvNow)
             {
                 OUR_DEBUG((LM_INFO, "[CServerMessageManager::CheckServerMessageThread]Start error.\n"));
             }
+            */
         }
 
-        return false;
+        return true;
     }
     else
     {
@@ -519,22 +602,22 @@ bool CServerMessageManager::CheckServerMessageThread(ACE_Time_Value tvNow)
     }
 }
 
-void CServerMessageManager::AddClientMessage(IClientMessage* pClientMessage)
+bool CServerMessageManager::AddClientMessage(IClientMessage* pClientMessage)
 {
-    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-
     if(NULL != m_pServerMessageTask)
     {
-        return m_pServerMessageTask->AddClientMessage(pClientMessage);
+        return m_pServerMessageTask->PutMessage_Add_Client(pClientMessage);
     }
+
+    return false;
 }
 
-void CServerMessageManager::DelClientMessage(IClientMessage* pClientMessage)
+bool CServerMessageManager::DelClientMessage(IClientMessage* pClientMessage)
 {
-    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-
     if(NULL != m_pServerMessageTask)
     {
-        return m_pServerMessageTask->DelClientMessage(pClientMessage);
+        return m_pServerMessageTask->PutMessage_Del_Client(pClientMessage);
     }
+
+    return false;
 }

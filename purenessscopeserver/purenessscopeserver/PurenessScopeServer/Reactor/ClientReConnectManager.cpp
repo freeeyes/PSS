@@ -667,8 +667,7 @@ bool CClientReConnectManager::ConnectTcpInit(int nServerID, const char* pIP, int
     if (false == pClientInfo->Init(nServerID, pIP, nPort, u1IPType, &m_ReactorConnect, pClientMessage, m_pReactor))
     {
         OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]pClientInfo Init Error.\n"));
-        delete pClientInfo;
-        pClientInfo = NULL;
+        SAFE_DELETE(pClientInfo);
 
         if (false == Close(nServerID))
         {

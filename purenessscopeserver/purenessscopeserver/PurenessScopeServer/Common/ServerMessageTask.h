@@ -22,6 +22,9 @@ using namespace std;
 #define MAX_SERVER_MESSAGE_QUEUE 1000    //允许最大队列长度
 #define MAX_DISPOSE_TIMEOUT      30      //允许最大等待处理时间  
 
+#define ADD_SERVER_CLIENT  ACE_Message_Block::MB_USER + 1    //添加ClientMessage异步对象
+#define DEL_SERVER_CLIENT  ACE_Message_Block::MB_USER + 2    //删除ClientMessage异步对象
+
 //服务器间通讯的数据结构（接收包）
 struct _Server_Message_Info
 {
@@ -144,11 +147,11 @@ public:
 
     bool PutMessage(_Server_Message_Info* pMessage);
 
+    bool PutMessage_Add_Client(IClientMessage* pClientMessage);
+
+    bool PutMessage_Del_Client(IClientMessage* pClientMessage);
+
     bool CheckServerMessageThread(ACE_Time_Value tvNow);
-
-    void AddClientMessage(IClientMessage* pClientMessage);
-
-    void DelClientMessage(IClientMessage* pClientMessage);
 
 private:
     bool CheckValidClientMessage(IClientMessage* pClientMessage);
@@ -186,8 +189,8 @@ public:
     bool PutMessage(_Server_Message_Info* pMessage);
     bool CheckServerMessageThread(ACE_Time_Value tvNow);
 
-    void AddClientMessage(IClientMessage* pClientMessage);
-    void DelClientMessage(IClientMessage* pClientMessage);
+    bool AddClientMessage(IClientMessage* pClientMessage);
+    bool DelClientMessage(IClientMessage* pClientMessage);
 
 private:
     CServerMessageTask*         m_pServerMessageTask;

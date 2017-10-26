@@ -94,6 +94,7 @@ bool CMessageBlockManager::Close(ACE_Message_Block* pMessageBlock)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
     //ACE_OS::memset(pMessageBlock->base(), 0, pMessageBlock->capacity());
+    pMessageBlock->msg_type(ACE_Message_Block::MB_DATA);
     pMessageBlock->reset();
     m_MemoryBlock_Pool.Set(pMessageBlock);
 
