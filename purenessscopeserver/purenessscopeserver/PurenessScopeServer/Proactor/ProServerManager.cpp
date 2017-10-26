@@ -144,6 +144,12 @@ bool CProServerManager::Init()
     App_ServerObject::instance()->SetMessageBlockManager(dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()));
     App_ServerObject::instance()->SetServerManager(this);
 
+    //初始化消息处理线程
+    App_MessageServiceGroup::instance()->Init(App_MainConfig::instance()->GetThreadCount(),
+            App_MainConfig::instance()->GetMsgMaxQueue(),
+            App_MainConfig::instance()->GetMgsHighMark(),
+            App_MainConfig::instance()->GetMsgLowMark());
+
     //初始化模块加载，因为这里可能包含了中间服务器连接加载
     uint16 u2ModuleVCount = App_MainConfig::instance()->GetModuleInfoCount();
 
@@ -165,11 +171,8 @@ bool CProServerManager::Init()
         }
     }
 
-    //初始化消息处理线程
-    App_MessageServiceGroup::instance()->Init(App_MainConfig::instance()->GetThreadCount(),
-            App_MainConfig::instance()->GetMsgMaxQueue(),
-            App_MainConfig::instance()->GetMgsHighMark(),
-            App_MainConfig::instance()->GetMsgLowMark());
+    //让所有的线程拷同步副本
+    App_MessageServiceGroup::instance()->CopyMessageManagerList();
 
     return true;
 }

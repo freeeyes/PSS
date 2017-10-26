@@ -158,6 +158,8 @@ public:
     CMessage* CreateMessage(uint32 u4ConnectID, uint8 u1PacketType);                          //从子线程中获取一个Message对象
     void DeleteMessage(uint32 u4ConnectID, CMessage* pMessage);                               //从子线程中回收一个Message对象
 
+    void CopyMessageManagerList();                                                            //从MessageManager中获得信令列表副本
+
 private:
     bool StartTimer();
     bool KillTimer();

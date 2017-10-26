@@ -72,9 +72,6 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
     //初始化本地信令列表副本
     m_objClientCommandList.Init(App_MessageManager::instance()->GetMaxCommandCount());
 
-    //拷贝信令列表副本
-    CopyMessageManagerList();
-
     //初始化CommandID告警阀值相关
     for(int i = 0; i < (int)App_MainConfig::instance()->GetCommandAlertCount(); i++)
     {
@@ -1328,6 +1325,22 @@ void CMessageServiceGroup::DeleteMessage(uint32 u4ConnectID, CMessage* pMessage)
     if (NULL != pMessageService)
     {
         pMessageService->DeleteMessage(pMessage);
+    }
+}
+
+void CMessageServiceGroup::CopyMessageManagerList()
+{
+    //初始化所有的Message对象
+    for (uint32 i = 0; i < (uint32)m_vecMessageService.size(); i++)
+    {
+        CMessageService* pMessageService = m_vecMessageService[i];
+
+        if (NULL == pMessageService)
+        {
+            OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::CopyMessageManagerList](%d)pMessageService is NULL.\n", i));
+        }
+
+        pMessageService->CopyMessageManagerList();
     }
 }
 
