@@ -215,18 +215,24 @@ int CServerMessageTask::svc(void)
                 IClientMessage* pClientMessage = NULL;
                 memcpy_safe(mb->rd_ptr(), sizeof(IClientMessage*), (char* )pClientMessage, sizeof(IClientMessage*));
 
+                bool blIsFind = false;
+
                 if (NULL != pClientMessage)
                 {
                     for (int i = 0; i < (int)m_vecValidIClientMessage.size(); i++)
                     {
                         if (m_vecValidIClientMessage[i] == pClientMessage)
                         {
-                            //找到了，什么都不做
-                            return;
+                            //找到了
+                            blIsFind = true;
+                            break;
                         }
                     }
 
-                    m_vecValidIClientMessage.push_back(pClientMessage);
+                    if (false == blIsFind)
+                    {
+                        m_vecValidIClientMessage.push_back(pClientMessage);
+                    }
                 }
 
                 App_MessageBlockManager::instance()->Close(mb);
