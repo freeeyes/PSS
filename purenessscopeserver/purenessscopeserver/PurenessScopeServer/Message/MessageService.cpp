@@ -169,9 +169,9 @@ int CMessageService::svc(void)
                     App_ModuleLoader::instance()->UnloadListUpdate(u4UpdateIndex);
                 }
 
-                //需要重载所有的信令列表
+                //同步信令列表
                 CopyMessageManagerList();
-                mb->release();
+                App_MessageBlockManager::instance()->Close(mb);
                 continue;
             }
 
@@ -247,7 +247,7 @@ bool CMessageService::PutMessage(CMessage* pMessage)
 
 bool CMessageService::PutUpdateCommandMessage(uint32 u4UpdateIndex)
 {
-    ACE_Message_Block* mblk = new ACE_Message_Block(sizeof(int));
+    ACE_Message_Block* mblk = App_MessageBlockManager::instance()->Create(sizeof(int));
 
     if (NULL == mblk)
     {
