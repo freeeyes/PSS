@@ -213,7 +213,6 @@ int CServerMessageTask::svc(void)
             if (mb->msg_type() == ADD_SERVER_CLIENT)
             {
                 IClientMessage* pClientMessage = NULL;
-                pClientMessage =  (IClientMessage* )mb->rd_ptr();
                 memcpy_safe(mb->rd_ptr(), sizeof(IClientMessage*), (char* )&pClientMessage, sizeof(IClientMessage*));
 
                 bool blIsFind = false;
