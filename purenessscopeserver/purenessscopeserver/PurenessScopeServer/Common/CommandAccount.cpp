@@ -258,7 +258,7 @@ bool CCommandAccount::SaveCommandDataLog()
                 strPacketType = "UDP";
             }
 
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_COMMANDDATA, "CommandID=%d, CommandType=%s, CommandCount=%d, CommandCost=%lldns, PacketType=%s, PacketSize=%d, CommandSize=%d, CommandLastTime=%04d-%02d-%02d %02d:%02d:%02d%",
+            AppLogManager::instance()->WriteLog(LOG_SYSTEM_COMMANDDATA, "CommandID=0x%04x, CommandType=%s, CommandCount=%d, CommandCost=%lldns, PacketType=%s, PacketSize=%d, CommandSize=%d, CommandLastTime=%04d-%02d-%02d %02d:%02d:%02d%",
                                                 (int)pCommandData->m_u2CommandID,
                                                 strCommandType.c_str(),
                                                 (int)pCommandData->m_u4CommandCount,

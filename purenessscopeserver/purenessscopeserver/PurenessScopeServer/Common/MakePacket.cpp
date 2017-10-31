@@ -97,7 +97,7 @@ void CMakePacket::SetMessage(_MakePacket* pMakePacket, CMessage* pMessage, ACE_T
         }
 
         pMessage->GetMessageBase()->m_u4ConnectID   = pMakePacket->m_u4ConnectID;
-        pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)tvNow.sec();
+        pMessage->GetMessageBase()->m_tvRecvTime    = tvNow;
 
         if(NULL != pMakePacket->m_pPacketParse)
         {
@@ -134,7 +134,7 @@ void CMakePacket::SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBo
         //开始组装数据
         pMessage->GetMessageBase()->m_u4ConnectID   = u4ConnectID;
         pMessage->GetMessageBase()->m_u2Cmd         = (uint16)CLINET_LINK_SENDERROR;
-        pMessage->GetMessageBase()->m_u4MsgTime     = (uint32)tvNow.sec();
+        pMessage->GetMessageBase()->m_tvRecvTime    = tvNow;
         pMessage->GetMessageBase()->m_u4HeadSrcSize = 0;
         pMessage->GetMessageBase()->m_u4BodySrcSize = 0;
 

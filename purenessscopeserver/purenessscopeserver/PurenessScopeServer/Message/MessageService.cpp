@@ -298,6 +298,16 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
     m_ThreadInfo.m_tvUpdateTime = ACE_OS::gettimeofday();
     m_ThreadInfo.m_u4State = THREAD_RUNBEGIN;
 
+    //判断队列处理时间是否超过了数据入队列的时间
+    ACE_Time_Value tvQueueDispose(m_ThreadInfo.m_tvUpdateTime - pMessage->GetMessageBase()->m_tvRecvTime);
+
+    if (tvQueueDispose.msec() > (uint32)App_MainConfig::instance()->GetPacketTimeOut())
+    {
+        AppLogManager::instance()->WriteLog(LOG_SYSTEM_COMMANDDATA, "[CMessageService::ProcessMessage]CommandID=0x%04x, Queue put dispose time interval(%d).\n",
+                                            (int)pMessage->GetMessageBase()->m_u2Cmd,
+                                            tvQueueDispose.msec());
+    }
+
     //OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage]1 [%d],m_u4State=%d, commandID=%d.\n", u4ThreadID, m_ThreadInfo.m_u4State,  pMessage->GetMessageBase()->m_u2Cmd));
 
     //将要处理的数据放到逻辑处理的地方去
@@ -354,7 +364,6 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
     uint16 u2CommandCount = 0;      //命令被调用次数
     bool   blDeleteFlag   = true;   //用完是否删除，默认是删除
 
-    //App_MessageManager::instance()->DoMessage(m_ThreadInfo.m_tvUpdateTime, pMessage, u2CommandID, u4TimeCost, u2CommandCount, blDeleteFlag);
     DoMessage(m_ThreadInfo.m_tvUpdateTime, pMessage, u2CommandID, u4TimeCost, u2CommandCount, blDeleteFlag);
 
     if(true == blDeleteFlag)

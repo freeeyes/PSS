@@ -9,7 +9,6 @@ struct _MessageBase
 {
     uint32         m_u4HeadSrcSize;             //包头原始长度
     uint32         m_u4BodySrcSize;             //包体原始长度
-    uint32         m_u4MsgTime;                 //消息接收到的时间
     uint32         m_u4ConnectID;               //消息链接ConnectID，如果是UDP则这个值无效
     uint32         m_u4PacketID;                //数据包的ID
     uint32         m_u4Port;                    //客户端端口
@@ -20,6 +19,7 @@ struct _MessageBase
     char           m_szIP[MAX_BUFF_20];         //客户端IP
     char           m_szListenIP[MAX_BUFF_20];   //监听IP
     CProfileTime   m_ProfileTime;               //消息到达时间
+    ACE_Time_Value m_tvRecvTime;                //消息接收时间
 
     _MessageBase()
     {
@@ -27,7 +27,6 @@ struct _MessageBase
         m_u4ConnectID    = 0;
         m_u4PacketID     = 0;
         m_u2Cmd          = 0;
-        m_u4MsgTime      = 0;
         m_u4HeadSrcSize  = 0;
         m_u4BodySrcSize  = 0;
         m_u4WorkThreadID = 0;
