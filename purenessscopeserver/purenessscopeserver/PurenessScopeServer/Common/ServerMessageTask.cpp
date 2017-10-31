@@ -213,7 +213,8 @@ int CServerMessageTask::svc(void)
             if (mb->msg_type() == ADD_SERVER_CLIENT)
             {
                 IClientMessage* pClientMessage = NULL;
-                memcpy_safe(mb->rd_ptr(), sizeof(IClientMessage*), (char* )pClientMessage, sizeof(IClientMessage*));
+                pClientMessage =  (IClientMessage* )mb->rd_ptr();
+                memcpy_safe(mb->rd_ptr(), sizeof(IClientMessage*), (char* )&pClientMessage, sizeof(IClientMessage*));
 
                 bool blIsFind = false;
 
@@ -343,7 +344,7 @@ bool CServerMessageTask::PutMessage_Add_Client(IClientMessage* pClientMessage)
         return false;
     }
 
-    sprintf_safe((char* )pClientMessage, sizeof(IClientMessage*), pmb->wr_ptr(), sizeof(IClientMessage*));
+    sprintf_safe((char* )&pClientMessage, sizeof(IClientMessage*), pmb->wr_ptr(), sizeof(IClientMessage*));
     pmb->wr_ptr(sizeof(IClientMessage*));
     pmb->msg_type(ADD_SERVER_CLIENT);
 
@@ -377,7 +378,7 @@ bool CServerMessageTask::PutMessage_Del_Client(IClientMessage* pClientMessage)
         return false;
     }
 
-    sprintf_safe((char*)pClientMessage, sizeof(IClientMessage*), pmb->wr_ptr(), sizeof(IClientMessage*));
+    sprintf_safe((char*)&pClientMessage, sizeof(IClientMessage*), pmb->wr_ptr(), sizeof(IClientMessage*));
     pmb->wr_ptr(sizeof(IClientMessage*));
     pmb->msg_type(DEL_SERVER_CLIENT);
 
