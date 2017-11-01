@@ -1348,8 +1348,10 @@ void CMessageServiceGroup::CopyMessageManagerList()
         {
             OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::CopyMessageManagerList](%d)pMessageService is NULL.\n", i));
         }
-
-        pMessageService->CopyMessageManagerList();
+        else
+        {
+            pMessageService->CopyMessageManagerList();
+        }
     }
 }
 
