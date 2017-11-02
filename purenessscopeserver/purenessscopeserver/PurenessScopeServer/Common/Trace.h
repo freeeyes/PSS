@@ -176,23 +176,24 @@ inline void sprintf_trace_safe(char* szText, int nLen, const char* fmt ...)
 //创建一个TRACE_ID
 inline TRACE_ID CreateTraceID(const char* pIP, short sPort, short sCommandID)
 {
-    TRACE_ID n16TraceID;
+    TRACE_ID objTraceID;
 
     //组成规则 时间 + PID + TID + IP
-    n16TraceID.m_nTime = GetSysTimeMicros();
+    objTraceID.m_nTime = GetSysTimeMicros();
+    printf("[CreateTraceID]%lld.\n", objTraceID.m_nTime);
 
 #if defined(_WIN32)
-    n16TraceID.m_nPID = (int)_getpid();
-    n16TraceID.m_nTID = GetCurrentThreadId();
+    objTraceID.m_nPID = (int)_getpid();
+    objTraceID.m_nTID = GetCurrentThreadId();
 #else
-    n16TraceID.m_nPID = (int)getpid();
-    n16TraceID.m_nTID = (int)gettid();
+    objTraceID.m_nPID = (int)getpid();
+    objTraceID.m_nTID = (int)gettid();
 #endif
 
-    n16TraceID.m_nIP         = GetValueByIP(pIP);
-    n16TraceID.m_sPort       = sPort;
-    n16TraceID.m_sCommandID = sCommandID;
-    return n16TraceID ;
+    objTraceID.m_nIP         = GetValueByIP(pIP);
+    objTraceID.m_sPort       = sPort;
+    objTraceID.m_sCommandID = sCommandID;
+    return objTraceID ;
 }
 
 //创建一条traceID日志
@@ -225,24 +226,67 @@ inline void WriteTrace(const char* pFilePath, const char* pTraceID, const char* 
     }
 }
 
+//将TraceID对象转换成string
 inline string Convert_TraceID_To_char(const char* pIP, short sPort, short sCommandID)
 {
-    TRACE_ID n16TraceID = CreateTraceID(pIP, sPort, sCommandID);
+    TRACE_ID objTraceID = CreateTraceID(pIP, sPort, sCommandID);
 
     char pTraceID[100] = { '\0' };
     sprintf_trace_safe(pTraceID, 100, "%016llx%08x%08x%08x%04x%04x",
-                       n16TraceID.m_nTime,
-                       n16TraceID.m_nPID,
-                       n16TraceID.m_nTID,
-                       n16TraceID.m_nIP,
-                       n16TraceID.m_sPort,
-                       n16TraceID.m_sCommandID);
+                       objTraceID.m_nTime,
+                       objTraceID.m_nPID,
+                       objTraceID.m_nTID,
+                       objTraceID.m_nIP,
+                       objTraceID.m_sPort,
+                       objTraceID.m_sCommandID);
     return (string)pTraceID;
+}
+
+//分拆traceID的信息
+inline void ShowKey(const char* pTraceID)
+{
+    char szTime[50]      = { '\0' };
+    char szPID[50]       = { '\0' };
+    char szTID[50]       = { '\0' };
+    char szIP[50]        = { '\0' };
+    char szPort[50]      = { '\0' };
+    char szCommandID[50] = { '\0' };
+
+    //将traceID的信息展现出来
+    if (NULL == pTraceID || strlen(pTraceID) != 48)
+    {
+        return;
+    }
+
+    memcpy(szTime, (char*)pTraceID, 16);
+    int64_t n8Time = strtoull(szTime, NULL, 16);
+    printf("[ShowKey]Time=%lld.\n", n8Time);
+
+    memcpy(szPID, (char*)&pTraceID[16], 8);
+    int nPID = (int)strtoul(szPID, NULL, 16);
+    printf("[ShowKey]PTD=%d.\n", nPID);
+
+    memcpy(szTID, (char*)&pTraceID[24], 8);
+    int nTID = (int)strtoul(szTID, NULL, 16);
+    printf("[ShowKey]PTD=%d.\n", nTID);
+
+    memcpy(szIP, (char*)&pTraceID[32], 8);
+    int nIP = (int)strtoul(szIP, NULL, 16);
+    printf("[ShowKey]PTD=%d.\n", nIP);
+
+    memcpy(szPort, (char*)&pTraceID[40], 4);
+    int nPort = (int)strtoul(szPort, NULL, 16);
+    printf("[ShowKey]PTD=%d.\n", nPort);
+
+    memcpy(szCommandID, (char*)&pTraceID[44], 4);
+    int nCommandID = (int)strtoul(szCommandID, NULL, 16);
+    printf("[ShowKey]PTD=0x%04x.\n", nCommandID);
 }
 
 //设置宏
 #define CREATE_TRACE(x,y,z) Convert_TraceID_To_char(x,y, z);
 #define DO_TRACE(x, y) WriteTrace(x, y, __FILE__, __LINE__);
+#define SHOW_TRACE_ID(x) ShowKey(x)
 
 #endif
 
