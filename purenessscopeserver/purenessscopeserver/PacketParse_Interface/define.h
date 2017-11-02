@@ -39,6 +39,7 @@ BEGIN_NAMESPACE
 #define MAINCONFIG            "main.xml"
 #define ALERTCONFIG           "alert.xml"
 #define FORBIDDENIP_FILE      "forbiddenIP.xml"
+#define CONSOLECONFIG         "ConsoleCommand.xml"
 
 #define MAX_BUFF_9    9
 #define MAX_BUFF_20   20
@@ -51,16 +52,18 @@ BEGIN_NAMESPACE
 #define MAX_BUFF_1024 1024
 #define MAX_BUFF_10240 10240
 
+#define INT32 int32_t
+
 #define THREAD_PARAM THR_NEW_LWP | THR_BOUND | THR_DETACHED
 
 /*
 //计算当前版本号是否与制定版本好一致
-static bool Convert_Version(int nTagVserion)
+static bool Convert_Version(INT32 nTagVserion)
 {
-    int nCurrVserion = 0;
-    nCurrVserion += (int)ACE::major_version() * 1000;
-    nCurrVserion += (int)ACE::minor_version() * 100;
-    nCurrVserion += (int)ACE::beta_version();
+    INT32 nCurrVserion = 0;
+    nCurrVserion += (INT32)ACE::major_version() * 1000;
+    nCurrVserion += (INT32)ACE::minor_version() * 100;
+    nCurrVserion += (INT32)ACE::beta_version();
 
     if(nTagVserion >= nCurrVserion)
     {
@@ -217,13 +220,12 @@ enum
     CONNECT_RECVGEND     = 3,
     CONNECT_SENDBEGIN    = 4,
     CONNECT_SENDEND      = 5,
-    CONNECT_CLOSEBEGIN   = 6,
-    CONNECT_CLOSEEND     = 7,
+    CONNECT_SERVER_CLOSE = 6,
+    CONNECT_CLIENT_CLOSE = 7,
     CONNECT_RECVERROR    = 8,
     CONNECT_SENDERROR    = 9,
     CONNECT_SENDBUFF     = 10,
     CONNECT_SENDNON      = 11,
-    CONNECT_SERVER_CLOSE = 12,
 };
 
 //服务器间通讯，是否需要回调的枚举
@@ -314,10 +316,10 @@ enum
 
 //*****************************************************************
 //位操作运算符
-#define BIT_SET(a,b) if((int)(sizeof(a)) * 8 > b && b >= 0) { ((a) |= ((long long)1<<(b))); }
-#define BIT_CLEAR(a,b) if((int)(sizeof(a)) * 8 > b && b >= 0) { ((a) &= ~((long long)1<<(b))); }
-#define BIT_FLIP(a,b) if((int)(sizeof(a)) * 8 > b && b >= 0) { ((a) ^= ((long long)1<<(b))); }
-#define BIT_CHECK(a,b)  if((int)(sizeof(a)) * 8 > b && b >= 0) { ((a) & ((long long)1<<(b))); }
+#define BIT_SET(a,b) if((INT32)(sizeof(a)) * 8 > b && b >= 0) { ((a) |= ((long long)1<<(b))); }
+#define BIT_CLEAR(a,b) if((INT32)(sizeof(a)) * 8 > b && b >= 0) { ((a) &= ~((long long)1<<(b))); }
+#define BIT_FLIP(a,b) if((INT32)(sizeof(a)) * 8 > b && b >= 0) { ((a) ^= ((long long)1<<(b))); }
+#define BIT_CHECK(a,b)  if((INT32)(sizeof(a)) * 8 > b && b >= 0) { ((a) & ((long long)1<<(b))); }
 //*****************************************************************
 
 //*****************************************************************
@@ -351,7 +353,7 @@ typedef short int16;
 #endif
 
 #ifndef int32
-typedef int int32;
+typedef INT32 int32;
 #endif
 
 #ifndef float32
@@ -381,7 +383,7 @@ typedef std::string _tstring;
 #endif
 
 //定义一个函数，可以支持内存越界检查
-inline void sprintf_safe(char* szText, int nLen, const char* fmt ...)
+inline void sprintf_safe(char* szText, INT32 nLen, const char* fmt ...)
 {
     if(szText == NULL)
     {
@@ -412,9 +414,9 @@ inline bool memcpy_safe(char* pSrc, uint32 u4SrcLen, char* pDes, uint32 u4DesLen
 }
 
 //支持strcpy边界检查
-inline bool strcpy_safe(const char* pSrc, char* pDes, int nDesLen)
+inline bool strcpy_safe(const char* pSrc, char* pDes, INT32 nDesLen)
 {
-    int nSrcLen = (int)ACE_OS::strlen(pSrc);
+    INT32 nSrcLen = (INT32)ACE_OS::strlen(pSrc);
 
     if(nSrcLen <= 0 || nDesLen <= 0 || nSrcLen > nDesLen)
     {
@@ -428,10 +430,10 @@ inline bool strcpy_safe(const char* pSrc, char* pDes, int nDesLen)
 }
 
 //支持strcat边界检查
-inline bool strcat_safe(const char* pSrc, char* pDes, int nDesLen)
+inline bool strcat_safe(const char* pSrc, char* pDes, INT32 nDesLen)
 {
-    int nCurrSrcLen = (int)ACE_OS::strlen(pSrc);
-    int nCurrDesLen = (int)ACE_OS::strlen(pDes);
+    INT32 nCurrSrcLen = (INT32)ACE_OS::strlen(pSrc);
+    INT32 nCurrDesLen = (INT32)ACE_OS::strlen(pDes);
 
     if(nDesLen <= 0 || nDesLen <= nCurrSrcLen + nCurrDesLen)
     {
@@ -464,10 +466,10 @@ inline void Print_Binary(ACE_Message_Block* pMessageBlock)
     if(NULL != pMessageBlock)
     {
         char* pData = pMessageBlock->rd_ptr();
-        int nLen = (int)pMessageBlock->length();
+        INT32 nLen = (INT32)pMessageBlock->length();
         OUR_DEBUG((LM_INFO, "[Print_Binary]"));
 
-        for(int i = 0; i < nLen; i++)
+        for(INT32 i = 0; i < nLen; i++)
         {
             OUR_DEBUG((LM_INFO, " %02x", (unsigned char)pData[i]));
         }
@@ -481,13 +483,13 @@ inline void Print_Binary(ACE_Message_Block* pMessageBlock)
 }
 
 //打印指定的Messahe_Block中的信息到屏幕
-inline void Print_Binary(const char* pData, int nLen)
+inline void Print_Binary(const char* pData, INT32 nLen)
 {
     if(NULL != pData)
     {
         OUR_DEBUG((LM_INFO, "[Print_Binary]"));
 
-        for(int i = 0; i < nLen; i++)
+        for(INT32 i = 0; i < nLen; i++)
         {
             OUR_DEBUG((LM_INFO, " %02x", (unsigned char)pData[i]));
         }
@@ -533,10 +535,10 @@ enum FILE_TEST_RESULT
 
 typedef struct FILETESTRESULTINFO
 {
-    int n4Result;                   //启动测试结果信息
-    int n4TimeInterval;             //启动测试时间间隔
-    int n4ProNum;                   //启动测试协议条数
-    int n4ConnectNum;               //模拟连接数
+    INT32 n4Result;                   //启动测试结果信息
+    INT32 n4TimeInterval;             //启动测试时间间隔
+    INT32 n4ProNum;                   //启动测试协议条数
+    INT32 n4ConnectNum;               //模拟连接数
     vector<string> vecProFileDesc;  //协议文件描述
 
     FILETESTRESULTINFO(const FILETESTRESULTINFO& ar)
@@ -1063,7 +1065,7 @@ struct _TimerCheckID
 struct _PacketInfo
 {
     char*   m_pData;            //解析后的数据头指针
-    int     m_nDataLen;         //解析后的数据长度
+    INT32   m_nDataLen;         //解析后的数据长度
 
     _PacketInfo()
     {
@@ -1177,7 +1179,7 @@ inline void __show__( const char* szTemp)
     fclose(f);
 };
 
-inline void __assertspecial__(const char* file, int line, const char* func, const char* expr, const char* msg)
+inline void __assertspecial__(const char* file, INT32 line, const char* func, const char* expr, const char* msg)
 {
     char szTemp[2*MAX_BUFF_1024] = {0};
 
@@ -1212,7 +1214,7 @@ inline void __assertspecial__(const char* file, int line, const char* func, cons
 class CTimeCost
 {
 public:
-    CTimeCost(unsigned int nMillionSecond, const char* pFunctionName, const char* pFileName, int nLine)
+    CTimeCost(unsigned INT32 nMillionSecond, const char* pFunctionName, const char* pFileName, INT32 nLine)
     {
         m_lBegin         = 0;
         m_lEnd           = 0;
@@ -1275,8 +1277,8 @@ private:
 private:
     long         m_lBegin;
     long         m_lEnd;
-    int          m_nFileLine;
-    unsigned int m_nMillionSecond;
+    INT32        m_nFileLine;
+    uint32       m_nMillionSecond;
     char         m_szFunctionName[MAX_BUFF_100];
     char         m_szFileName[MAX_BUFF_300];
 };
@@ -1406,7 +1408,7 @@ inline bool Replace_String(char* pText, uint32 u4Len, const char* pOld, const ch
 }
 
 //写独占文件锁
-inline int AcquireWriteLock(int fd, int start, int len)
+inline INT32 AcquireWriteLock(INT32 fd, INT32 start, INT32 len)
 {
 #ifndef WIN32
     struct flock arg;
@@ -1423,7 +1425,7 @@ inline int AcquireWriteLock(int fd, int start, int len)
 }
 
 //释放独占文件锁
-inline int ReleaseLock(int fd, int start, int len)
+inline INT32 ReleaseLock(INT32 fd, INT32 start, INT32 len)
 {
 #ifndef WIN32
     struct flock arg;
@@ -1440,7 +1442,7 @@ inline int ReleaseLock(int fd, int start, int len)
 }
 
 //查看写锁
-inline int SeeLock(int fd, int start, int len)
+inline INT32 SeeLock(INT32 fd, INT32 start, INT32 len)
 {
 #ifndef WIN32
     struct flock arg;
@@ -1477,8 +1479,8 @@ inline int SeeLock(int fd, int start, int len)
 //客户端IP信息
 struct _ClientIPInfo
 {
-    char m_szClientIP[MAX_BUFF_50];   //客户端的IP地址
-    int  m_nPort;                     //客户端的端口
+    char  m_szClientIP[MAX_BUFF_50];   //客户端的IP地址
+    INT32 m_nPort;                     //客户端的端口
 
     _ClientIPInfo()
     {
@@ -1504,11 +1506,11 @@ struct _ClientIPInfo
 //链接别名映射信息(用于PSS_ClientManager管理)
 struct _ClientNameInfo
 {
-    int  m_nPort;                     //客户端的端口
-    int  m_nConnectID;                //连接ID
-    int  m_nLog;                      //是否记录日志
-    char m_szName[MAX_BUFF_100];      //连接别名
-    char m_szClientIP[MAX_BUFF_50];   //客户端的IP地址
+    INT32  m_nPort;                     //客户端的端口
+    INT32  m_nConnectID;                //连接ID
+    INT32  m_nLog;                      //是否记录日志
+    char   m_szName[MAX_BUFF_100];      //连接别名
+    char   m_szClientIP[MAX_BUFF_50];   //客户端的IP地址
 
     _ClientNameInfo()
     {

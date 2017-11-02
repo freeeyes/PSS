@@ -230,7 +230,7 @@ bool CCommandAccount::SaveCommandDataLog()
     vector<_CommandData*> vecCommandData;
     m_objCommandDataList.Get_All_Used(vecCommandData);
 
-    for(int i = 0; i < (int)vecCommandData.size(); i++)
+    for(int i = 0; i < (int32_t)vecCommandData.size(); i++)
     {
         _CommandData* pCommandData = vecCommandData[i];
 
