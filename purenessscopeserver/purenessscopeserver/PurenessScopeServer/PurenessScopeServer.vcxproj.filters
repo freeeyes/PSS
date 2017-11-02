@@ -537,6 +537,9 @@
     <ClInclude Include="Console\ConsolePromiss.h">
       <Filter>Console\hfile</Filter>
     </ClInclude>
+    <ClInclude Include="Common\Trace.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

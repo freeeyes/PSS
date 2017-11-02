@@ -6,7 +6,7 @@
 
 #include "BuffPacket.h"
 
-CBuffPacket::CBuffPacket(int nSize, int nMaxBuffSize)
+CBuffPacket::CBuffPacket(INT32 nSize, INT32 nMaxBuffSize)
     :m_szData(NULL), m_u4ReadPtr(0), m_u4WritePtr(0), m_u4PacketLen(0), m_u4PacketCount(0), m_u4MaxPacketSize(0), m_u4BuffID(0), m_nHashID(0), m_blNetSort(false)
 {
     if (false == Init(nSize, nMaxBuffSize))
@@ -24,7 +24,7 @@ CBuffPacket::~CBuffPacket(void)
     }
 }
 
-bool CBuffPacket::Init(int nSize, int nMaxBuffSize)
+bool CBuffPacket::Init(INT32 nSize, INT32 nMaxBuffSize)
 {
     //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     try
@@ -32,7 +32,7 @@ bool CBuffPacket::Init(int nSize, int nMaxBuffSize)
         m_szError[0]      = '\0';
         m_u4MaxPacketSize = (uint32)nMaxBuffSize;
 
-        if(nSize >= (int)m_u4MaxPacketSize)
+        if(nSize >= (INT32)m_u4MaxPacketSize)
         {
             OUR_DEBUG((LM_ERROR, "[CBuffPacket::Init] nSize [%d] is more than m_u4MaxPacketSize.\n", nSize));
             char szError[MAX_BUFF_500] = {'\0'};
@@ -45,7 +45,7 @@ bool CBuffPacket::Init(int nSize, int nMaxBuffSize)
         m_u4WritePtr      = 0;
         m_u4PacketCount   = 0;
         m_nHashID         = 0;
-        m_u4PacketLen     = (uint32)((int)ceil((double)nSize/(double)DEFINE_PACKET_ADD))*DEFINE_PACKET_ADD;
+        m_u4PacketLen     = (uint32)((INT32)ceil((double)nSize/(double)DEFINE_PACKET_ADD))*DEFINE_PACKET_ADD;
 
         m_szData          = (char*)App_ACEMemory::instance()->malloc(m_u4PacketLen);
         m_u4BuffID        = 0;
@@ -135,7 +135,7 @@ bool CBuffPacket::AddBuffPacket(uint32 u4Size)
         uint32 u4OldPacketLen = m_u4PacketLen;
 
         //格式化新创建的内存大小
-        u4Size = (uint32)(((int)ceil((double)u4Size/(double)DEFINE_PACKET_ADD))*DEFINE_PACKET_ADD);
+        u4Size = (uint32)(((INT32)ceil((double)u4Size/(double)DEFINE_PACKET_ADD))*DEFINE_PACKET_ADD);
         m_u4PacketLen += u4Size;
 
         szNewData = (char*)App_ACEMemory::instance()->malloc(m_u4PacketLen);
@@ -192,7 +192,7 @@ bool CBuffPacket::AddBuff(uint32 u4Size)
         uint32 u4OldPacketLen = m_u4PacketLen;
 
         //格式化新创建的内存大小
-        u4Size = (uint32)(((int)ceil((double)u4Size/(double)DEFINE_PACKET_ADD))*DEFINE_PACKET_ADD);
+        u4Size = (uint32)(((INT32)ceil((double)u4Size/(double)DEFINE_PACKET_ADD))*DEFINE_PACKET_ADD);
         m_u4PacketLen += u4Size;
 
         szNewData = (char*)App_ACEMemory::instance()->malloc(m_u4PacketLen);
@@ -1212,12 +1212,12 @@ uint32 CBuffPacket::GetBuffID()
     return m_u4BuffID;
 }
 
-void CBuffPacket::SetHashID(int nHashID)
+void CBuffPacket::SetHashID(INT32 nHashID)
 {
     m_nHashID = nHashID;
 }
 
-int CBuffPacket::GetHashID()
+INT32 CBuffPacket::GetHashID()
 {
     return m_nHashID;
 }

@@ -520,6 +520,7 @@
     <ClInclude Include="Common\HashTable.h" />
     <ClInclude Include="Common\ServerMessageTask.h" />
     <ClInclude Include="Common\TimeWheelLink.h" />
+    <ClInclude Include="Common\Trace.h" />
     <ClInclude Include="Console\ConsolePromiss.h" />
     <ClInclude Include="Encrypt\Aes.h" />
     <ClInclude Include="FileTest\FileTest.h" />

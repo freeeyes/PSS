@@ -727,7 +727,7 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
     }
 
     //开始设置默认PacketParseID(TCP)
-    for (int i = 0; i < (int)m_vecServerInfo.size(); i++)
+    for (INT32 i = 0; i < (INT32)m_vecServerInfo.size(); i++)
     {
         if (m_vecServerInfo[i].m_u4PacketParseInfoID == 0)
         {
@@ -736,7 +736,7 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
     }
 
     //开始设置默认PacketParseID(UDP)
-    for (int i = 0; i < (int)m_vecUDPServerInfo.size(); i++)
+    for (INT32 i = 0; i < (INT32)m_vecUDPServerInfo.size(); i++)
     {
         if (m_vecUDPServerInfo[i].m_u4PacketParseInfoID == 0)
         {
@@ -854,7 +854,7 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
 
     if(pData != NULL)
     {
-        m_u4SendTimeout = (int)ACE_OS::atoi(pData);
+        m_u4SendTimeout = (INT32)ACE_OS::atoi(pData);
     }
 
     pData = m_MainConfig.GetData("SendInfo", "TcpNodelay");
@@ -871,7 +871,7 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
 
     if(pData != NULL)
     {
-        m_u4RecvBuffSize = (int)ACE_OS::atoi(pData);
+        m_u4RecvBuffSize = (INT32)ACE_OS::atoi(pData);
     }
 
     pData = m_MainConfig.GetData("SendInfo", "SendQueueMax");
@@ -919,13 +919,13 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
     //pData = m_MainConfig.GetData("SendInfo", "MaxSendMask");
     //if(pData != NULL)
     //{
-    //  m_u4SendDatamark = (int)ACE_OS::atoi(pData);
+    //  m_u4SendDatamark = (INT32)ACE_OS::atoi(pData);
     //}
     pData = m_MainConfig.GetData("SendInfo", "MaxBlockSize");
 
     if(pData != NULL)
     {
-        m_u4BlockSize    = (int)ACE_OS::atoi(pData);
+        m_u4BlockSize    = (INT32)ACE_OS::atoi(pData);
         //保持m_u4SendDatamark和m_u4BlockSize一致，不必在单独分开
         m_u4SendDatamark = m_u4BlockSize;
     }
@@ -1028,7 +1028,7 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
 
     if(pData != NULL)
     {
-        m_nConsolePort = (int)ACE_OS::atoi(pData);
+        m_nConsolePort = (INT32)ACE_OS::atoi(pData);
     }
 
     pData = m_MainConfig.GetData("Console", "sipType");
@@ -1304,7 +1304,7 @@ void CMainConfig::Display()
     OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u1Debug = %d.\n", m_u1Debug));
     OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u1ServerClose = %d.\n", m_u1ServerClose));
 
-    for(int i = 0; i < (int)m_vecServerInfo.size(); i++)
+    for(INT32 i = 0; i < (INT32)m_vecServerInfo.size(); i++)
     {
         OUR_DEBUG((LM_INFO, "[CMainConfig::Display]ServerIP%d = %s.\n", i, m_vecServerInfo[i].m_szServerIP));
         OUR_DEBUG((LM_INFO, "[CMainConfig::Display]ServerPort%d = %d.\n", i, m_vecServerInfo[i].m_nPort));
@@ -1340,7 +1340,7 @@ void CMainConfig::Display()
     OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4SendBlockCount = %d.\n", m_u4SendBlockCount));
     OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4MaxCommandCount = %d.\n", m_u4MaxCommandCount));
 
-    for(int i = 0; i < (int)m_vecUDPServerInfo.size(); i++)
+    for(INT32 i = 0; i < (INT32)m_vecUDPServerInfo.size(); i++)
     {
         OUR_DEBUG((LM_INFO, "[CMainConfig::Display]ServerIP%d = %s.\n", i, m_vecUDPServerInfo[i].m_szServerIP));
         OUR_DEBUG((LM_INFO, "[CMainConfig::Display]ServerPort%d = %d.\n", i, m_vecUDPServerInfo[i].m_nPort));
@@ -1359,14 +1359,14 @@ void CMainConfig::Display()
     OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u4CoreFileSize = %d.\n", m_u4CoreFileSize));
     OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_u2Backlog = %d.\n", m_u2Backlog));
 
-    for(int i = 0; i < (int)m_vecModuleConfig.size(); i++)
+    for(INT32 i = 0; i < (INT32)m_vecModuleConfig.size(); i++)
     {
         OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szModuleName%d = %s.\n", i, m_vecModuleConfig[i].m_szModuleName));
         OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szModulePath%d = %s.\n", i, m_vecModuleConfig[i].m_szModulePath));
         OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szModuleParam%d = %s.\n", i, m_vecModuleConfig[i].m_szModuleParam));
     }
 
-    for (int i = 0; i < (int)m_vecPacketParseInfo.size(); i++)
+    for (INT32 i = 0; i < (INT32)m_vecPacketParseInfo.size(); i++)
     {
         OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szPacketParseID = %d.\n", m_vecPacketParseInfo[i].m_u4PacketID));
         OUR_DEBUG((LM_INFO, "[CMainConfig::Display]m_szPacketParsePath = %s.\n", m_vecPacketParseInfo[i].m_szPacketParsePath));
@@ -1396,7 +1396,7 @@ uint16 CMainConfig::GetHandleCount()
     return m_u2HandleCount;
 }
 
-_ServerInfo* CMainConfig::GetServerPort(int nIndex)
+_ServerInfo* CMainConfig::GetServerPort(INT32 nIndex)
 {
     if(nIndex > (uint16)m_vecServerInfo.size())
     {
@@ -1436,7 +1436,7 @@ uint32 CMainConfig::GetMsgMaxQueue()
     return m_u4MsgMaxQueue;
 }
 
-int CMainConfig::GetEncryptFlag()
+INT32 CMainConfig::GetEncryptFlag()
 {
     return m_nEncryptFlag;
 }
@@ -1446,7 +1446,7 @@ const char* CMainConfig::GetEncryptPass()
     return m_szEncryptPass;
 }
 
-int CMainConfig::GetEncryptOutFlag()
+INT32 CMainConfig::GetEncryptOutFlag()
 {
     return m_nEncryptOutFlag;
 }
@@ -1461,7 +1461,7 @@ uint16 CMainConfig::GetUDPServerPortCount()
     return (uint16)m_vecUDPServerInfo.size();
 }
 
-_ServerInfo* CMainConfig::GetUDPServerPort(int nIndex)
+_ServerInfo* CMainConfig::GetUDPServerPort(INT32 nIndex)
 {
     if(nIndex > (uint16)m_vecUDPServerInfo.size())
     {
@@ -1521,7 +1521,7 @@ uint8 CMainConfig::GetConsoleSupport()
     return m_u1ConsoleSupport;
 }
 
-int CMainConfig::GetConsolePort()
+INT32 CMainConfig::GetConsolePort()
 {
     return m_nConsolePort;
 }
@@ -1549,12 +1549,12 @@ uint16 CMainConfig::GetSendQueueCount()
 bool CMainConfig::CompareConsoleClinetIP(const char* pConsoleClientIP)
 {
     //如果没有配置IP，则默认全部可以
-    if((int)m_vecConsoleClientIP.size() == 0)
+    if((INT32)m_vecConsoleClientIP.size() == 0)
     {
         return true;
     }
 
-    for(int i = 0; i < (int)m_vecConsoleClientIP.size(); i++)
+    for(INT32 i = 0; i < (INT32)m_vecConsoleClientIP.size(); i++)
     {
         if(ACE_OS::strcmp(m_vecConsoleClientIP[i].m_szServerIP, pConsoleClientIP) == 0)
         {
@@ -1790,9 +1790,9 @@ _ClientDataAlert* CMainConfig::GetClientDataAlert()
     return &m_ClientDataAlert;
 }
 
-_CommandAlert* CMainConfig::GetCommandAlert(int nIndex)
+_CommandAlert* CMainConfig::GetCommandAlert(INT32 nIndex)
 {
-    if(nIndex < 0 || nIndex >= (int)m_vecCommandAlert.size())
+    if(nIndex < 0 || nIndex >= (INT32)m_vecCommandAlert.size())
     {
         return NULL;
     }

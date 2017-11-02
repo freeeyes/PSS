@@ -11,8 +11,8 @@ using namespace std;
 struct _SendMessage
 {
     uint32              m_u4ConnectID;    //要发送的远程ID
-    int                 m_nMessageID;     //发送消息的ID
-    int                 m_nHashID;        //当前对象的HashID
+    INT32               m_nMessageID;     //发送消息的ID
+    INT32               m_nHashID;        //当前对象的HashID
     uint16              m_u2CommandID;    //要发送的命令ID，用于统计功能
     uint8               m_u1SendState;    //要发送的状态，0是立即发送，1是先缓存不发送，2是立即发送后关闭
     uint8               m_nEvents;        //发送类型，0：使用PacketParse组织发送数据，1：不使用PacketParse组织数据
@@ -104,12 +104,12 @@ struct _SendMessage
         return m_pmbQueuePtr;
     }
 
-    void SetHashID(int nHashID)
+    void SetHashID(INT32 nHashID)
     {
         m_nHashID = nHashID;
     }
 
-    int GetHashID()
+    INT32 GetHashID()
     {
         return m_nHashID;
     }
@@ -121,14 +121,14 @@ public:
     CSendMessagePool(void);
     ~CSendMessagePool(void);
 
-    void Init(int nObjcetCount = MAX_MSG_THREADQUEUE);
+    void Init(INT32 nObjcetCount = MAX_MSG_THREADQUEUE);
     void Close();
 
     _SendMessage* Create();
     bool Delete(_SendMessage* pObject);
 
-    int GetUsedCount();
-    int GetFreeCount();
+    INT32 GetUsedCount();
+    INT32 GetFreeCount();
 
 private:
     CHashTable<_SendMessage>    m_objHashHandleList;

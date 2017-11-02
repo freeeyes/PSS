@@ -11,14 +11,14 @@ CSendMessagePool::~CSendMessagePool(void)
     OUR_DEBUG((LM_INFO, "[CSendMessagePool::~CSendMessagePool] End.\n"));
 }
 
-void CSendMessagePool::Init(int nObjcetCount)
+void CSendMessagePool::Init(INT32 nObjcetCount)
 {
     Close();
 
     //初始化HashTable
-    m_objHashHandleList.Init((int)nObjcetCount);
+    m_objHashHandleList.Init((INT32)nObjcetCount);
 
-    for(int i = 0; i < nObjcetCount; i++)
+    for(INT32 i = 0; i < nObjcetCount; i++)
     {
         _SendMessage* pMessage = new _SendMessage();
 
@@ -27,7 +27,7 @@ void CSendMessagePool::Init(int nObjcetCount)
             //添加到hash数组里面
             char szMessageID[10] = {'\0'};
             sprintf_safe(szMessageID, 10, "%d", i);
-            int nHashPos = m_objHashHandleList.Add_Hash_Data(szMessageID, pMessage);
+            INT32 nHashPos = m_objHashHandleList.Add_Hash_Data(szMessageID, pMessage);
 
             if(-1 != nHashPos)
             {
@@ -43,7 +43,7 @@ void CSendMessagePool::Close()
     vector<_SendMessage*> vecSendMessage;
     m_objHashHandleList.Get_All_Used(vecSendMessage);
 
-    for(int i = 0; i < (int)vecSendMessage.size(); i++)
+    for(INT32 i = 0; i < (INT32)vecSendMessage.size(); i++)
     {
         _SendMessage* pMessage = vecSendMessage[i];
         SAFE_DELETE(pMessage);
@@ -91,14 +91,14 @@ bool CSendMessagePool::Delete(_SendMessage* pObject)
     return true;
 }
 
-int CSendMessagePool::GetUsedCount()
+INT32 CSendMessagePool::GetUsedCount()
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
     return m_objHashHandleList.Get_Count() - m_objHashHandleList.Get_Used_Count();
 }
 
-int CSendMessagePool::GetFreeCount()
+INT32 CSendMessagePool::GetFreeCount()
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 

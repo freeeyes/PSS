@@ -17,14 +17,12 @@ void CAppConfig::Close()
 {
     if(NULL != m_pConfig)
     {
-        delete m_pConfig;
-        m_pConfig = NULL;
+        SAFE_DELETE(m_pConfig);
     }
 
     if(NULL != m_pIniImp)
     {
-        delete m_pIniImp;
-        m_pIniImp = NULL;
+        SAFE_DELETE(m_pIniImp);
     }
 
     m_strConfigName = "";
@@ -59,7 +57,7 @@ bool CAppConfig::ReadConfig(const char* szConfigname)
             throw "[CAppConfig::ReadConfig]New ACE_Ini_ImpExp error.";
         }
 
-        int nRet = m_pIniImp->import_config((ACE_TCHAR*)m_strConfigName.c_str());
+        INT32 nRet = (INT32)m_pIniImp->import_config((ACE_TCHAR*)m_strConfigName.c_str());
 
         if(0 != nRet)
         {
@@ -91,7 +89,7 @@ bool CAppConfig::WriteConfig(const char* szConfigname)
             throw "[CAppConfig::WriteConfig]m_pIniImp is NULL.";
         }
 
-        int nRet = m_pIniImp->export_config((ACE_TCHAR*)szConfigname);
+        INT32 nRet = (INT32)m_pIniImp->export_config((ACE_TCHAR*)szConfigname);
 
         if(0 != nRet)
         {
@@ -123,7 +121,7 @@ bool CAppConfig::WriteConfig()
             throw "[CAppConfig::WriteConfig]m_pIniImp is NULL.";
         }
 
-        int nRet = m_pIniImp->export_config((ACE_TCHAR*)m_strConfigName.c_str());
+        INT32 nRet = (INT32)m_pIniImp->export_config((ACE_TCHAR*)m_strConfigName.c_str());
 
         if(0 != nRet)
         {
@@ -156,7 +154,7 @@ bool CAppConfig::GetValue(const char* szName, ACE_TString& strValue, const char*
             m_pConfig->expand_path(m_pConfig->root_section(), (ACE_TCHAR* )szRoot, key, 0);
         }
 
-        int nRet = m_pConfig->get_string_value(key, (ACE_TCHAR* )szName, strValue);
+        INT32 nRet = (INT32)m_pConfig->get_string_value(key, (ACE_TCHAR* )szName, strValue);
 
         if(0 != nRet)
         {
@@ -189,7 +187,7 @@ bool CAppConfig::SetValue(const char* szName, ACE_TString& strValue, const char*
             m_pConfig->expand_path(m_pConfig->root_section(), (ACE_TCHAR* )szRoot, key, 0);
         }
 
-        int nRet = m_pConfig->set_string_value(key, (ACE_TCHAR* )szName, strValue);
+        INT32 nRet = (INT32)m_pConfig->set_string_value(key, (ACE_TCHAR* )szName, strValue);
 
         if(0 != nRet)
         {

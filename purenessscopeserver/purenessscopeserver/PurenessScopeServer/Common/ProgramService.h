@@ -12,7 +12,7 @@
 #include "ProServerManager.h"
 #include <tchar.h>
 
-static int ServerMain()
+static INT32 ServerMain()
 {
     //启动主服务器监控
     if(!App_ProServerManager::instance()->Init())

@@ -25,7 +25,7 @@ using namespace std;
 struct _MakePacket
 {
     uint32         m_u4ConnectID;    //链接ID
-    int            m_nHashID;        //对应记录hash的ID
+    INT32          m_nHashID;        //对应记录hash的ID
     CPacketParse*  m_pPacketParse;   //数据包数据指针
     uint8          m_PacketType;     //数据包类型
     uint8          m_u1Option;       //操作类型
@@ -49,12 +49,12 @@ struct _MakePacket
         m_pPacketParse      = NULL;
     }
 
-    void SetHashID(int nHashID)
+    void SetHashID(INT32 nHashID)
     {
         m_nHashID = nHashID;
     }
 
-    int GetHashID()
+    INT32 GetHashID()
     {
         return m_nHashID;
     }

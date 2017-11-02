@@ -17,9 +17,9 @@
 //IP访问统计模块
 struct _IPAccount
 {
-    int            m_nCount;             //当前链接次数
-    int            m_nAllCount;          //指定IP链接次数总和
-    int            m_nMinute;            //当前分钟数
+    INT32          m_nCount;             //当前链接次数
+    INT32          m_nAllCount;          //指定IP链接次数总和
+    INT32          m_nMinute;            //当前分钟数
     string         m_strIP;              //当前链接地址
     ACE_Date_Time  m_dtLastTime;         //最后链接时间
 
@@ -28,7 +28,7 @@ struct _IPAccount
         m_nCount     = 0;
         m_nAllCount  = 0;
         m_dtLastTime.update();
-        m_nMinute    = (int)m_dtLastTime.minute();
+        m_nMinute    = (INT32)m_dtLastTime.minute();
     }
 
     void Add(ACE_Date_Time dtNowTime)
@@ -37,7 +37,7 @@ struct _IPAccount
 
         if(m_dtLastTime.minute() != m_nMinute)
         {
-            m_nMinute  = (int)m_dtLastTime.minute();
+            m_nMinute  = (INT32)m_dtLastTime.minute();
             m_nCount   = 1;
             m_nAllCount++;
         }
@@ -90,7 +90,7 @@ public:
 
     void Close()
     {
-        for(int i = 0; i < m_objIPList.Get_Count(); i++)
+        for(INT32 i = 0; i < m_objIPList.Get_Count(); i++)
         {
             _IPAccount* pIPAccount = m_objIPList.Pop();
             SAFE_DELETE(pIPAccount);
@@ -104,7 +104,7 @@ public:
         m_u4MaxConnectCount = u4IPCount;
 
         //初始化HashTable
-        m_objIPList.Init((int)u4IPCount);
+        m_objIPList.Init((INT32)u4IPCount);
 
         ACE_Date_Time  dtNowTime;
         m_u2CurrTime = (uint16)dtNowTime.minute();
@@ -118,7 +118,7 @@ public:
         ACE_Date_Time  dtNowTime;
         uint16 u2NowTime = (uint16)dtNowTime.minute();
 
-        if((int)(u2NowTime - m_u2CurrTime)  < 0)
+        if((INT32)(u2NowTime - m_u2CurrTime)  < 0)
         {
             u2NowTime += 60;
         }
@@ -129,7 +129,7 @@ public:
             vector<_IPAccount* > vecIPAccount;
             m_objIPList.Get_All_Used(vecIPAccount);
 
-            for(int i = 0; i < (int)vecIPAccount.size(); i++)
+            for(INT32 i = 0; i < (INT32)vecIPAccount.size(); i++)
             {
                 _IPAccount* pIPAccount =vecIPAccount[i];
 
@@ -204,7 +204,7 @@ public:
         return blRet;
     }
 
-    int GetCount()
+    INT32 GetCount()
     {
         return m_objIPList.Get_Used_Count();
     }
@@ -215,7 +215,7 @@ public:
         vector<_IPAccount* > vecIPAccount;
         m_objIPList.Get_All_Used(vecIPAccount);
 
-        for(int i = 0; i < (int)vecIPAccount.size(); i++)
+        for(INT32 i = 0; i < (INT32)vecIPAccount.size(); i++)
         {
             _IPAccount* pIPAccount = vecIPAccount[i];
 
@@ -346,7 +346,7 @@ public:
         }
     }
 
-    int CheckConnectCount()
+    INT32 CheckConnectCount()
     {
         if(m_u4ConnectMax > 0)
         {
@@ -371,7 +371,7 @@ public:
         return 0;
     }
 
-    int CheckDisConnectCount()
+    INT32 CheckDisConnectCount()
     {
         if(m_u4DisConnectMax > 0)
         {

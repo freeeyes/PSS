@@ -1214,7 +1214,7 @@ inline void __assertspecial__(const char* file, INT32 line, const char* func, co
 class CTimeCost
 {
 public:
-    CTimeCost(unsigned INT32 nMillionSecond, const char* pFunctionName, const char* pFileName, INT32 nLine)
+    CTimeCost(unsigned int nMillionSecond, const char* pFunctionName, const char* pFileName, INT32 nLine)
     {
         m_lBegin         = 0;
         m_lEnd           = 0;
