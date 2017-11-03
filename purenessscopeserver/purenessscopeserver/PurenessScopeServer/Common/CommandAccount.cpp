@@ -31,7 +31,7 @@ void CCommandAccount::InitName(const char* pName, uint32 u4CommandCount)
     sprintf_safe(m_szName, MAX_BUFF_50, "%s", pName);
 
     //初始化HashTable
-    m_objCommandDataList.Init((INT32)u4CommandCount);
+    m_objCommandDataList.Init((int32)u4CommandCount);
 }
 
 void CCommandAccount::Init(uint8 u1CommandAccount, uint8 u1Flow, uint16 u2PacketTimeout)
@@ -62,7 +62,7 @@ void CCommandAccount::Close()
     vector<_CommandData*> vecCommandData;
     m_objCommandDataList.Get_All_Used(vecCommandData);
 
-    for(INT32 i = 0; i < (INT32)vecCommandData.size(); i++)
+    for(int32 i = 0; i < (int32)vecCommandData.size(); i++)
     {
         _CommandData* pCommandData = vecCommandData[i];
 
@@ -182,7 +182,7 @@ bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint64 u8CommandCost, 
     //判定是否存在告警阀值计算
     if(m_vecCommandAlertData.size() > 0)
     {
-        for(INT32 i = 0 ; i < (INT32)m_vecCommandAlertData.size(); i++)
+        for(int32 i = 0 ; i < (int32)m_vecCommandAlertData.size(); i++)
         {
             if(m_vecCommandAlertData[i].m_u2CommandID == u2CommandID)
             {
@@ -230,7 +230,7 @@ bool CCommandAccount::SaveCommandDataLog()
     vector<_CommandData*> vecCommandData;
     m_objCommandDataList.Get_All_Used(vecCommandData);
 
-    for(INT32 i = 0; i < (int32_t)vecCommandData.size(); i++)
+    for(int32 i = 0; i < (int32_t)vecCommandData.size(); i++)
     {
         _CommandData* pCommandData = vecCommandData[i];
 
@@ -259,9 +259,9 @@ bool CCommandAccount::SaveCommandDataLog()
             }
 
             AppLogManager::instance()->WriteLog(LOG_SYSTEM_COMMANDDATA, "CommandID=0x%04x, CommandType=%s, CommandCount=%d, CommandCost=%lldns, PacketType=%s, PacketSize=%d, CommandSize=%d, CommandLastTime=%04d-%02d-%02d %02d:%02d:%02d%",
-                                                (INT32)pCommandData->m_u2CommandID,
+                                                (int32)pCommandData->m_u2CommandID,
                                                 strCommandType.c_str(),
-                                                (INT32)pCommandData->m_u4CommandCount,
+                                                (int32)pCommandData->m_u4CommandCount,
                                                 (uint64)pCommandData->m_u8CommandCost,
                                                 strPacketType.c_str(),
                                                 (uint32)pCommandData->m_u4PacketSize,

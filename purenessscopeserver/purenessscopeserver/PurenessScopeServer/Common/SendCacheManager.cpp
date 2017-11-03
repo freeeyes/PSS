@@ -15,7 +15,7 @@ CSendCacheManager::~CSendCacheManager()
 void CSendCacheManager::Init(uint32 u4CacheCount, uint32 u4CacheSize)
 {
     //≥ı ºªØHashTable
-    m_objCacheHashList.Init((INT32)u4CacheCount);
+    m_objCacheHashList.Init((int32)u4CacheCount);
 
     for(uint32 i = 0; i < u4CacheCount; i++)
     {
@@ -38,7 +38,7 @@ void CSendCacheManager::Close()
     vector<ACE_Message_Block*> vecMb;
     m_objCacheHashList.Get_All_Used(vecMb);
 
-    for(INT32 i = 0; i < (INT32)vecMb.size(); i++)
+    for(int32 i = 0; i < (int32)vecMb.size(); i++)
     {
         ACE_Message_Block* pCache = vecMb[i];
         App_MessageBlockManager::instance()->Close(pCache);

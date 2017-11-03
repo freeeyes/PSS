@@ -57,7 +57,7 @@ bool CAppConfig::ReadConfig(const char* szConfigname)
             throw "[CAppConfig::ReadConfig]New ACE_Ini_ImpExp error.";
         }
 
-        INT32 nRet = (INT32)m_pIniImp->import_config((ACE_TCHAR*)m_strConfigName.c_str());
+        int32 nRet = (int32)m_pIniImp->import_config((ACE_TCHAR*)m_strConfigName.c_str());
 
         if(0 != nRet)
         {
@@ -89,7 +89,7 @@ bool CAppConfig::WriteConfig(const char* szConfigname)
             throw "[CAppConfig::WriteConfig]m_pIniImp is NULL.";
         }
 
-        INT32 nRet = (INT32)m_pIniImp->export_config((ACE_TCHAR*)szConfigname);
+        int32 nRet = (int32)m_pIniImp->export_config((ACE_TCHAR*)szConfigname);
 
         if(0 != nRet)
         {
@@ -121,7 +121,7 @@ bool CAppConfig::WriteConfig()
             throw "[CAppConfig::WriteConfig]m_pIniImp is NULL.";
         }
 
-        INT32 nRet = (INT32)m_pIniImp->export_config((ACE_TCHAR*)m_strConfigName.c_str());
+        int32 nRet = (int32)m_pIniImp->export_config((ACE_TCHAR*)m_strConfigName.c_str());
 
         if(0 != nRet)
         {
@@ -154,7 +154,7 @@ bool CAppConfig::GetValue(const char* szName, ACE_TString& strValue, const char*
             m_pConfig->expand_path(m_pConfig->root_section(), (ACE_TCHAR* )szRoot, key, 0);
         }
 
-        INT32 nRet = (INT32)m_pConfig->get_string_value(key, (ACE_TCHAR* )szName, strValue);
+        int32 nRet = (int32)m_pConfig->get_string_value(key, (ACE_TCHAR* )szName, strValue);
 
         if(0 != nRet)
         {
@@ -187,7 +187,7 @@ bool CAppConfig::SetValue(const char* szName, ACE_TString& strValue, const char*
             m_pConfig->expand_path(m_pConfig->root_section(), (ACE_TCHAR* )szRoot, key, 0);
         }
 
-        INT32 nRet = (INT32)m_pConfig->set_string_value(key, (ACE_TCHAR* )szName, strValue);
+        int32 nRet = (int32)m_pConfig->set_string_value(key, (ACE_TCHAR* )szName, strValue);
 
         if(0 != nRet)
         {

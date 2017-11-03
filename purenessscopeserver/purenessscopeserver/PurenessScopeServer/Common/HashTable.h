@@ -24,7 +24,7 @@ enum EM_HASH_DEBUG
 template <class T>
 struct _Hash_Table_Cell
 {
-    INT32 m_nPosIndex;                     //当前对象在对象数组的下标
+    int32 m_nPosIndex;                     //当前对象在对象数组的下标
     char* m_pKey;                          //当前的key值
     T*    m_pValue;                        //当前数据体指针
     short m_sKeyLen;                       //当前的key长度
@@ -40,7 +40,7 @@ struct _Hash_Table_Cell
     }
 
     //初始化对象
-    void Init(char* pKey, INT32 nKeyLen, INT32 nIndex)
+    void Init(char* pKey, int32 nKeyLen, int32 nIndex)
     {
         m_cExists       = 0;
         m_pKey          = pKey;
@@ -66,7 +66,7 @@ struct _Hash_Table_Cell
     }
 
     //得到当前对象大小
-    INT32 Get_Size(short sKeyLen)
+    int32 Get_Size(short sKeyLen)
     {
         return sizeof(_Hash_Table_Cell) + sKeyLen * sizeof(char);
     }
@@ -76,8 +76,8 @@ struct _Hash_Table_Cell
 template <class T>
 struct _Hash_Link_Info
 {
-    INT32   m_cExists;                          //当前块是否已经使用,1已经使用，0没有被使用
-    INT32   m_nPosIndex;                        //当前对象在对象数组的下标
+    int32   m_cExists;                          //当前块是否已经使用,1已经使用，0没有被使用
+    int32   m_nPosIndex;                        //当前对象在对象数组的下标
     _Hash_Table_Cell<T>* m_pData;             //当前数据
     _Hash_Link_Info*     m_pNext;             //下一个对象指针(用于链表)
     _Hash_Link_Info*     m_pPerv;             //上一个对象指针(用于链表)
@@ -92,7 +92,7 @@ struct _Hash_Link_Info
     }
 
     //初始化对象
-    void Init(INT32 nIndex)
+    void Init(int32 nIndex)
     {
         m_cExists   = 0;
         m_nPosIndex = nIndex;
@@ -108,7 +108,7 @@ struct _Hash_Link_Info
     }
 
     //得到当前对象大小
-    INT32 Get_Size()
+    int32 Get_Size()
     {
         return sizeof(_Hash_Link_Info);
     }
@@ -134,19 +134,19 @@ public:
         Close();
     }
 
-    INT32 Get_Size(INT32 nHashCount, short sKeySize = DEF_HASH_KEY_SIZE)
+    int32 Get_Size(int32 nHashCount, short sKeySize = DEF_HASH_KEY_SIZE)
     {
         _Hash_Table_Cell<T> objCell;
-        INT32 nCellSize = objCell.Get_Size(sKeySize);
+        int32 nCellSize = objCell.Get_Size(sKeySize);
         return nCellSize * nHashCount;
     }
 
-    void Init(char* pData, INT32 nHashCount, short sKeySize = DEF_HASH_KEY_SIZE)
+    void Init(char* pData, int32 nHashCount, short sKeySize = DEF_HASH_KEY_SIZE)
     {
         Set_Base_Addr(pData, nHashCount, sKeySize);
     }
 
-    _Hash_Table_Cell<T>* Get_Index(INT32 nIndex)
+    _Hash_Table_Cell<T>* Get_Index(int32 nIndex)
     {
         return &m_lpTable[nIndex];
     }
@@ -167,16 +167,16 @@ public:
     }
 
     //设置一个已知的内存数组块(必须初始化调用)
-    void Set_Base_Addr(char* pData, INT32 nCount, short sKeySize)
+    void Set_Base_Addr(char* pData, int32 nCount, short sKeySize)
     {
         m_pBase      = pData;
         m_lpTable    = reinterpret_cast<_Hash_Table_Cell<T>*>(pData);
         m_nCount     = nCount;
         m_sKeyLen    = sKeySize;
         m_nCurrIndex = 0;
-        INT32 nKeyPool = sizeof(_Hash_Table_Cell<T>) * nCount;
+        int32 nKeyPool = sizeof(_Hash_Table_Cell<T>) * nCount;
 
-        for(INT32 i = 0; i < m_nCount; i++)
+        for(int32 i = 0; i < m_nCount; i++)
         {
             char* pKey = pData + nKeyPool + i * sKeySize;
             m_lpTable[i].Init(pKey, sKeySize, i);
@@ -190,13 +190,13 @@ public:
     }
 
     //得到当前缓冲块总个数
-    INT32 Get_Count()
+    int32 Get_Count()
     {
         return m_nCount;
     }
 
     //得到目前正在使用的对象个数
-    INT32 Get_Used_Count()
+    int32 Get_Used_Count()
     {
         return m_nUsedCount;
     }
@@ -212,7 +212,7 @@ public:
         }
 
         //首先从当前点往后找
-        for(INT32 i = m_nCurrIndex; i < m_nCount; i++)
+        for(int32 i = m_nCurrIndex; i < m_nCount; i++)
         {
             //printf("[CHashPool::Create]i=%d, m_nCurrIndex=%d, m_nCount=%d.\n", i, m_nCurrIndex, m_nCount);
             if(m_lpTable[i].m_cExists == 1)
@@ -239,7 +239,7 @@ public:
         }
 
         //如果没找到，从0到当前点
-        for(INT32 i = 0; i < m_nCurrIndex; i++)
+        for(int32 i = 0; i < m_nCurrIndex; i++)
         {
             if(m_lpTable[i].m_cExists == 1)
             {
@@ -264,7 +264,7 @@ public:
     {
         if (NULL != pData)
         {
-            INT32 nIndex = pData->m_nPosIndex;
+            int32 nIndex = pData->m_nPosIndex;
 
             if (nIndex >= 0 && nIndex < m_nCount && pData->m_cExists == 1)
             {
@@ -277,9 +277,9 @@ public:
 private:
     char*                m_pBase;        //当前内存起始位置
     _Hash_Table_Cell<T>* m_lpTable;      //当前Hash对象数组
-    INT32                m_nCount;       //当前Hash数组个数
-    INT32                m_nUsedCount;   //当前已使用的Hash对象
-    INT32                m_nCurrIndex;   //已经运行到的当前Hash数组位置
+    int32                m_nCount;       //当前Hash数组个数
+    int32                m_nUsedCount;   //当前已使用的Hash对象
+    int32                m_nCurrIndex;   //已经运行到的当前Hash数组位置
     short                m_sKeyLen;      //当前key的长度
 };
 
@@ -302,14 +302,14 @@ public:
         Close();
     }
 
-    INT32 Get_Size(INT32 nHashCount)
+    int32 Get_Size(int32 nHashCount)
     {
         _Hash_Link_Info<T> objLink;
-        INT32 nLinkSize = objLink.Get_Size();
+        int32 nLinkSize = objLink.Get_Size();
         return nLinkSize * nHashCount;
     }
 
-    void Init(char* pData, INT32 nHashCount)
+    void Init(char* pData, int32 nHashCount)
     {
         Set_Base_Addr(pData, nHashCount);
     }
@@ -329,27 +329,27 @@ public:
     }
 
     //设置一个已知的内存数组块(必须初始化调用)
-    void Set_Base_Addr(char* pData, INT32 nCount)
+    void Set_Base_Addr(char* pData, int32 nCount)
     {
         m_pBase      = pData;
         m_lpTable    = reinterpret_cast<_Hash_Link_Info<T>*>(pData);
         m_nCount     = nCount;
         m_nCurrIndex = 0;
 
-        for(INT32 i = 0; i < m_nCount; i++)
+        for(int32 i = 0; i < m_nCount; i++)
         {
             m_lpTable[i].Init(i);
         }
     }
 
     //得到当前缓冲块总个数
-    INT32 Get_Count()
+    int32 Get_Count()
     {
         return m_nCount;
     }
 
     //得到目前正在使用的对象个数
-    INT32 Get_Used_Count()
+    int32 Get_Used_Count()
     {
         return m_nUsedCount;
     }
@@ -365,7 +365,7 @@ public:
         }
 
         //首先从当前点往后找
-        for(INT32 i = m_nCurrIndex; i < m_nCount; i++)
+        for(int32 i = m_nCurrIndex; i < m_nCount; i++)
         {
             if(m_lpTable[i].m_cExists == 1)
             {
@@ -391,7 +391,7 @@ public:
         }
 
         //如果没找到，从0到当前点
-        for(INT32 i = 0; i < m_nCurrIndex; i++)
+        for(int32 i = 0; i < m_nCurrIndex; i++)
         {
             if(m_lpTable[i].m_cExists == 1)
             {
@@ -416,7 +416,7 @@ public:
     {
         if (NULL != pData)
         {
-            INT32 nIndex = pData->m_nPosIndex;
+            int32 nIndex = pData->m_nPosIndex;
 
             if (nIndex >= 0 && nIndex < m_nCount && pData->m_cExists == 1)
             {
@@ -429,9 +429,9 @@ public:
 private:
     char*                m_pBase;        //当前内存起始位置
     _Hash_Link_Info<T>*  m_lpTable;      //当前Hash对象数组
-    INT32                m_nCount;       //当前Hash数组个数
-    INT32                m_nUsedCount;   //当前已使用的Hash对象
-    INT32                m_nCurrIndex;   //已经运行到的当前Hash数组位置
+    int32                m_nCount;       //当前Hash数组个数
+    int32                m_nUsedCount;   //当前已使用的Hash对象
+    int32                m_nCurrIndex;   //已经运行到的当前Hash数组位置
 };
 
 //hashTable类
@@ -456,8 +456,8 @@ public:
     //得到整体数据内存大小
     size_t Get_Size(uint32 u4HashCount, short sKeySize = DEF_HASH_KEY_SIZE)
     {
-        return m_objHashPool.Get_Size((INT32)u4HashCount, sKeySize)
-               + m_objHashLinkPool.Get_Size((INT32)u4HashCount)
+        return m_objHashPool.Get_Size((int32)u4HashCount, sKeySize)
+               + m_objHashLinkPool.Get_Size((int32)u4HashCount)
                + sizeof(_Hash_Link_Info<T>* ) * u4HashCount;
     }
 
@@ -474,12 +474,12 @@ public:
     }
 
     //初始化Hash块
-    void Init(INT32 nHashCount, INT32 nKeySize = DEF_HASH_KEY_SIZE, EM_HASH_DEBUG emHashDebug = HASH_DEBUG_OFF)
+    void Init(int32 nHashCount, int32 nKeySize = DEF_HASH_KEY_SIZE, EM_HASH_DEBUG emHashDebug = HASH_DEBUG_OFF)
     {
         size_t stSize = Get_Size(nHashCount, nKeySize);
         char* pData = new char[stSize];
         memset(pData, 0, stSize);
-        INT32 nPos         = 0;
+        int32 nPos         = 0;
         m_pBase          = pData;
         m_nCurrLinkIndex = 0;
         m_cIsDelete      = 0;
@@ -489,7 +489,7 @@ public:
         nPos += m_objHashLinkPool.Get_Size(nHashCount);
         m_lpTable = (_Hash_Link_Info<T>** )&pData[nPos];
 
-        for(INT32 i = 0; i < nHashCount; i++)
+        for(int32 i = 0; i < nHashCount; i++)
         {
             m_lpTable[i] = NULL;
         }
@@ -499,10 +499,10 @@ public:
     }
 
     //初始化Hash块(给定内存地址)
-    void Init_By_Memory(char* pData, INT32 nHashCount, INT32 nKeySize = DEF_HASH_KEY_SIZE, EM_HASH_DEBUG emHashDebug = HASH_DEBUG_OFF, char cIsDelete = 0)
+    void Init_By_Memory(char* pData, int32 nHashCount, int32 nKeySize = DEF_HASH_KEY_SIZE, EM_HASH_DEBUG emHashDebug = HASH_DEBUG_OFF, char cIsDelete = 0)
     {
         memset(pData, 0, Get_Size(nHashCount, nKeySize));
-        INT32 nPos         = 0;
+        int32 nPos         = 0;
         m_pBase          = pData;
         m_nCurrLinkIndex = 0;
         m_cIsDelete      = cIsDelete;
@@ -512,7 +512,7 @@ public:
         nPos += m_objHashLinkPool.Get_Size(nHashCount);
         m_lpTable = (_Hash_Link_Info<T>** )&pData[nPos];
 
-        for(INT32 i = 0; i < nHashCount; i++)
+        for(int32 i = 0; i < nHashCount; i++)
         {
             m_lpTable[i] = NULL;
         }
@@ -523,13 +523,13 @@ public:
     }
 
     //得到当前对象总数
-    INT32 Get_Count()
+    int32 Get_Count()
     {
         return m_objHashPool.Get_Count();
     }
 
     //得到数据中正在使用的个数
-    INT32 Get_Used_Count()
+    int32 Get_Used_Count()
     {
         return m_objHashPool.Get_Used_Count();
     }
@@ -551,7 +551,7 @@ public:
         }
 
         //寻找一个可以用的对象，弹出来。
-        for(INT32 i = m_nCurrLinkIndex; i < m_objHashPool.Get_Count(); i++)
+        for(int32 i = m_nCurrLinkIndex; i < m_objHashPool.Get_Count(); i++)
         {
             if (m_lpTable[i] != NULL)
             {
@@ -568,7 +568,7 @@ public:
                 }
 
                 //回收数据
-                INT32 nRet = Del_Hash_Data(pKey);
+                int32 nRet = Del_Hash_Data(pKey);
 
                 if (HASH_DEBUG_ON == m_emHashDebug)
                 {
@@ -579,7 +579,7 @@ public:
             }
         }
 
-        for(INT32 i = 0; i < m_nCurrLinkIndex; i++)
+        for(int32 i = 0; i < m_nCurrLinkIndex; i++)
         {
             if (m_lpTable[i] != NULL)
             {
@@ -596,7 +596,7 @@ public:
                 m_nCurrLinkIndex = i;
 
                 //回收数据
-                INT32 nRet = Del_Hash_Data(pKey);
+                int32 nRet = Del_Hash_Data(pKey);
 
                 if (HASH_DEBUG_ON == m_emHashDebug)
                 {
@@ -696,7 +696,7 @@ public:
 
         vecList.clear();
 
-        for(INT32 i = 0; i < m_objHashPool.Get_Count(); i++)
+        for(int32 i = 0; i < m_objHashPool.Get_Count(); i++)
         {
             if(NULL != m_lpTable[i])
             {
@@ -729,7 +729,7 @@ public:
 
         vecList.clear();
 
-        for (INT32 i = 0; i < m_objHashPool.Get_Count(); i++)
+        for (int32 i = 0; i < m_objHashPool.Get_Count(); i++)
         {
             if (NULL != m_lpTable[i])
             {
@@ -767,7 +767,7 @@ public:
             OUR_DEBUG((LM_INFO, "[Clear](%d)Data is Clear.\n", Get_Used_Count()));
         }
 
-        for (INT32 i = 0; i < m_objHashPool.Get_Count(); i++)
+        for (int32 i = 0; i < m_objHashPool.Get_Count(); i++)
         {
             if (NULL != m_lpTable[i])
             {
@@ -790,7 +790,7 @@ public:
         }
 
         //清理数据
-        for (INT32 i = 0; i < (INT32)vecList.size(); i++)
+        for (int32 i = 0; i < (int32)vecList.size(); i++)
         {
             if (-1 == Del_Hash_Data(vecList[i].c_str()))
             {
@@ -800,7 +800,7 @@ public:
     }
 
     //添加一个Hash数据块
-    INT32 Add_Hash_Data(const char* pKey, T* pValue)
+    int32 Add_Hash_Data(const char* pKey, T* pValue)
     {
         if(NULL == m_lpTable)
         {
@@ -824,7 +824,7 @@ public:
             return -1;
         }
 
-        INT32 nPos = GetHashTablePos(pKey, EM_INSERT);
+        int32 nPos = GetHashTablePos(pKey, EM_INSERT);
 
         if(-1 == nPos)
         {
@@ -918,7 +918,7 @@ public:
             return NULL;
         }
 
-        INT32 nPos = GetHashTablePos(pKey, EM_SELECT);
+        int32 nPos = GetHashTablePos(pKey, EM_SELECT);
 
         if(-1 == nPos)
         {
@@ -950,14 +950,14 @@ public:
     }
 
     //清理一个hash数据块
-    INT32 Del_Hash_Data(const char* pKey)
+    int32 Del_Hash_Data(const char* pKey)
     {
         return DelHashTablePos(pKey);
     }
 
 private:
     //计算key对应的hash数值
-    unsigned long HashString(const char* pKey, INT32 nCount)
+    unsigned long HashString(const char* pKey, int32 nCount)
     {
         unsigned char* pukey = (unsigned char*)pKey;
         uint32 seed = 131; /* 31 131 1313 13131 131313 etc..*/
@@ -981,7 +981,7 @@ private:
     }
 
     //得到hash指定的位置
-    INT32 GetHashTablePos(const char* lpszString, EM_HASH_STATE emHashState)
+    int32 GetHashTablePos(const char* lpszString, EM_HASH_STATE emHashState)
     {
         unsigned long uHashStart = HashString(lpszString, m_objHashPool.Get_Count());
 
@@ -1028,7 +1028,7 @@ private:
     }
 
     //删除指定的数据
-    INT32 DelHashTablePos(const char* lpszString)
+    int32 DelHashTablePos(const char* lpszString)
     {
         unsigned long uHashStart = HashString(lpszString, m_objHashPool.Get_Count());
 
@@ -1082,7 +1082,7 @@ private:
     CHashPool<T>         m_objHashPool;      //Hash对象池
     CHashLinkPool<T>     m_objHashLinkPool;  //Hash链表对象池
     _Hash_Link_Info<T>** m_lpTable;          //当前Hash对象数组
-    INT32                m_nCurrLinkIndex;   //当前链表位置
+    int32                m_nCurrLinkIndex;   //当前链表位置
     char*                m_pBase;            //内存块的基础地址
     char                 m_cIsDelete;        //当前类析构的时候是否回收内存，0是回收，1是不回收。
     EM_HASH_DEBUG        m_emHashDebug;  //是否开启DEBUG开关

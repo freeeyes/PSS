@@ -68,7 +68,7 @@ public:
     //从内存池里找找看有没有匹配的回收内存
     ACE_Message_Block* Get(uint32 uSize)
     {
-        INT32 nIndex = pow_2(uSize);
+        int32 nIndex = pow_2(uSize);
 
         if(nIndex >= MAX_MEMORY_BLOCK_COUNT)
         {
@@ -98,7 +98,7 @@ public:
         {
             pmb->reset();
             uint32 u4Size = (uint32)pmb->size();
-            INT32 nIndex = pow_2(u4Size);
+            int32 nIndex = pow_2(u4Size);
 
             if(nIndex >= MAX_MEMORY_BLOCK_COUNT)
             {
@@ -114,7 +114,7 @@ public:
 
 private:
     //获得一个数是2的几次幂
-    INT32 pow_2(INT32 x)
+    int32 pow_2(int32 x)
     {
         if(x==1)
         {

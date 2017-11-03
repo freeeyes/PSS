@@ -14,7 +14,7 @@
 class CBuffPacket : public IBuffPacket
 {
 public:
-    CBuffPacket(INT32 nSize = DEFINE_PACKET_SIZE, INT32 nMaxBuffSize = MAX_PACKET_SIZE);
+    CBuffPacket(int32 nSize = DEFINE_PACKET_SIZE, int32 nMaxBuffSize = MAX_PACKET_SIZE);
     ~CBuffPacket(void);
 
     uint32 GetPacketSize();    //得到数据包的格式化长度
@@ -25,7 +25,7 @@ public:
     uint32 GetPacketCount();   //得到缓存数据包的个数
     const char* GetData();     //得到当前数据指针
 
-    bool Init(INT32 nSize, INT32 nMaxBuffSize);
+    bool Init(int32 nSize, int32 nMaxBuffSize);
     bool Close();              //删除已经使用的内存
     bool Clear();              //清除所有的标志位，并不删除内存。
 
@@ -46,8 +46,8 @@ public:
     void SetBuffID(uint32 u4BuffID);            //设置BuffID
     uint32 GetBuffID();                         //得到BuffID
 
-    INT32 GetHashID();                            //设置HashID
-    void SetHashID(INT32 nHashID);                //得到HashID
+    int32 GetHashID();                            //设置HashID
+    void SetHashID(int32 nHashID);                //得到HashID
 
 private:
     bool AddBuff(uint32 u4Size);
@@ -98,7 +98,7 @@ private:
     uint32                     m_u4PacketCount;     //当前数据包的个数
     uint32                     m_u4MaxPacketSize;   //最大当前BuffPacket的容量
     uint32                     m_u4BuffID;          //Buffer对象名字，用于核对内存池数据使用，寻找内存泄露。
-    INT32                      m_nHashID;           //记录当前对象在Hash数组中的位置
+    int32                      m_nHashID;           //记录当前对象在Hash数组中的位置
     bool                       m_blNetSort;         //字节序开启开关，false为不转换为主机字节序，true为转换为主机字节序
     char                       m_szError[MAX_BUFF_500];
     ACE_Recursive_Thread_Mutex m_ThreadLock;

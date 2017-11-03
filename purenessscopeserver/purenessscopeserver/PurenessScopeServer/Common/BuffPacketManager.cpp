@@ -56,7 +56,7 @@ void CBuffPacketManager::Close()
     vector<CBuffPacket* > vecBuffPacket;
     m_objHashBuffPacketList.Get_All_Used(vecBuffPacket);
 
-    for(INT32 i = 0; i < (INT32)vecBuffPacket.size(); i++)
+    for(int32 i = 0; i < (int32)vecBuffPacket.size(); i++)
     {
         CBuffPacket* pBuffPacket = vecBuffPacket[i];
 
@@ -75,9 +75,9 @@ void CBuffPacketManager::Init(uint32 u4PacketCount, uint32 u4MaxBuffSize, bool b
     Close();
 
     //初始化Hash表
-    m_objHashBuffPacketList.Init((INT32)u4PacketCount);
+    m_objHashBuffPacketList.Init((int32)u4PacketCount);
 
-    for(INT32 i = 0; i < m_objHashBuffPacketList.Get_Count(); i++)
+    for(int32 i = 0; i < m_objHashBuffPacketList.Get_Count(); i++)
     {
         CBuffPacket* pBuffPacket = new CBuffPacket(DEFINE_PACKET_SIZE, u4MaxBuffSize);
 
@@ -91,7 +91,7 @@ void CBuffPacketManager::Init(uint32 u4PacketCount, uint32 u4MaxBuffSize, bool b
             sprintf_safe(szPacketID, 10, "%d", i);
 
             //添加到Hash数组里面
-            INT32 nHashPos = m_objHashBuffPacketList.Add_Hash_Data(szPacketID, pBuffPacket);
+            int32 nHashPos = m_objHashBuffPacketList.Add_Hash_Data(szPacketID, pBuffPacket);
 
             if(-1 != nHashPos)
             {

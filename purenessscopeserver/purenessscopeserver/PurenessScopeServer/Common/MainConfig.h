@@ -33,7 +33,7 @@ struct _PacketParseInfo
 struct _ServerInfo
 {
     uint32 m_u4PacketParseInfoID;
-    INT32    m_nPort;
+    int32    m_nPort;
     uint8  m_u1IPType;
     char   m_szServerIP[MAX_BUFF_50];
 
@@ -223,7 +223,7 @@ public:
     const char* GetDisplayServiceName();
     uint16 GetServerID();
     uint16 GetServerPortCount();
-    _ServerInfo* GetServerPort(INT32 nIndex);
+    _ServerInfo* GetServerPort(int32 nIndex);
 
     uint32 GetMgsHighMark();
     uint32 GetMsgLowMark();
@@ -233,9 +233,9 @@ public:
     uint32 GetMsgMaxQueue();
     uint16 GetHandleCount();
 
-    INT32 GetEncryptFlag();
+    int32 GetEncryptFlag();
     const char* GetEncryptPass();
-    INT32 GetEncryptOutFlag();
+    int32 GetEncryptOutFlag();
 
     uint32 GetSendTimeout();
 
@@ -249,7 +249,7 @@ public:
     void   SetMaxHandlerCount(uint16 u2MaxHandlerCount);
     uint16 GetMaxConnectTime();
     uint8  GetConsoleSupport();
-    INT32    GetConsolePort();
+    int32    GetConsolePort();
     uint8  GetConsoleIPType();
     const char* GetConsoleIP();
     vecConsoleKey* GetConsoleKey();
@@ -259,7 +259,7 @@ public:
 
     bool CompareConsoleClinetIP(const char* pConsoleClientIP);
 
-    _ServerInfo* GetUDPServerPort(INT32 nIndex);
+    _ServerInfo* GetUDPServerPort(int32 nIndex);
 
     uint16 GetUDPServerPortCount();
     uint32 GetReactorCount();
@@ -313,7 +313,7 @@ public:
     _IPAlert*         GetIPAlert();
     _ClientDataAlert* GetClientDataAlert();
     uint32            GetCommandAlertCount();
-    _CommandAlert*    GetCommandAlert(INT32 nIndex);
+    _CommandAlert*    GetCommandAlert(int32 nIndex);
     _MailAlert*       GetMailAlert(uint32 u4MailID);
     _GroupListenInfo* GetGroupListenInfo();
     _PacketParseInfo* GetPacketParseInfo(uint8 u1Index = 0);
@@ -347,10 +347,10 @@ private:
     uint32     m_u4ChkInterval;                        //检测文件时间
     uint32     m_u4LogFileMaxSize;                     //输出文件最大尺寸
     uint32     m_u4LogFileMaxCnt;                      //输出文件最大个数，当达到最大个数自动循环
-    INT32      m_nServerID;                            //服务器ID
-    INT32      m_nEncryptFlag;                         //0，加密方式关闭，1为加密方式开启
-    INT32      m_nEncryptOutFlag;                      //回应数据包，0，为不加密，1为加密
-    INT32      m_nConsolePort;                         //Console服务器的端口
+    int32      m_nServerID;                            //服务器ID
+    int32      m_nEncryptFlag;                         //0，加密方式关闭，1为加密方式开启
+    int32      m_nEncryptOutFlag;                      //回应数据包，0，为不加密，1为加密
+    int32      m_nConsolePort;                         //Console服务器的端口
     uint16     m_u2SendQueueMax;                       //发送队列中最长的数据包个数
     uint16     m_u2ThreadTimuOut;                      //线程超时时间判定
     uint16     m_u2ThreadTimeCheck;                    //线程自检时间

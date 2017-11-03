@@ -58,12 +58,12 @@ BEGIN_NAMESPACE
 
 /*
 //计算当前版本号是否与制定版本好一致
-static bool Convert_Version(INT32 nTagVserion)
+static bool Convert_Version(int nTagVserion)
 {
-    INT32 nCurrVserion = 0;
-    nCurrVserion += (INT32)ACE::major_version() * 1000;
-    nCurrVserion += (INT32)ACE::minor_version() * 100;
-    nCurrVserion += (INT32)ACE::beta_version();
+    int nCurrVserion = 0;
+    nCurrVserion += (int)ACE::major_version() * 1000;
+    nCurrVserion += (int)ACE::minor_version() * 100;
+    nCurrVserion += (int)ACE::beta_version();
 
     if(nTagVserion >= nCurrVserion)
     {
@@ -316,10 +316,10 @@ enum
 
 //*****************************************************************
 //位操作运算符
-#define BIT_SET(a,b) if((INT32)(sizeof(a)) * 8 > b && b >= 0) { ((a) |= ((long long)1<<(b))); }
-#define BIT_CLEAR(a,b) if((INT32)(sizeof(a)) * 8 > b && b >= 0) { ((a) &= ~((long long)1<<(b))); }
-#define BIT_FLIP(a,b) if((INT32)(sizeof(a)) * 8 > b && b >= 0) { ((a) ^= ((long long)1<<(b))); }
-#define BIT_CHECK(a,b)  if((INT32)(sizeof(a)) * 8 > b && b >= 0) { ((a) & ((long long)1<<(b))); }
+#define BIT_SET(a,b) if((int)(sizeof(a)) * 8 > b && b >= 0) { ((a) |= ((long long)1<<(b))); }
+#define BIT_CLEAR(a,b) if((int)(sizeof(a)) * 8 > b && b >= 0) { ((a) &= ~((long long)1<<(b))); }
+#define BIT_FLIP(a,b) if((int)(sizeof(a)) * 8 > b && b >= 0) { ((a) ^= ((long long)1<<(b))); }
+#define BIT_CHECK(a,b)  if((int)(sizeof(a)) * 8 > b && b >= 0) { ((a) & ((long long)1<<(b))); }
 //*****************************************************************
 
 //*****************************************************************
@@ -466,10 +466,10 @@ inline void Print_Binary(ACE_Message_Block* pMessageBlock)
     if(NULL != pMessageBlock)
     {
         char* pData = pMessageBlock->rd_ptr();
-        INT32 nLen = (INT32)pMessageBlock->length();
+        int32 nLen = (int32)pMessageBlock->length();
         OUR_DEBUG((LM_INFO, "[Print_Binary]"));
 
-        for(INT32 i = 0; i < nLen; i++)
+        for(int32 i = 0; i < nLen; i++)
         {
             OUR_DEBUG((LM_INFO, " %02x", (unsigned char)pData[i]));
         }
@@ -489,7 +489,7 @@ inline void Print_Binary(const char* pData, int nLen)
     {
         OUR_DEBUG((LM_INFO, "[Print_Binary]"));
 
-        for(INT32 i = 0; i < nLen; i++)
+        for(int32 i = 0; i < nLen; i++)
         {
             OUR_DEBUG((LM_INFO, " %02x", (unsigned char)pData[i]));
         }
@@ -535,10 +535,10 @@ enum FILE_TEST_RESULT
 
 typedef struct FILETESTRESULTINFO
 {
-    INT32 n4Result;                   //启动测试结果信息
-    INT32 n4TimeInterval;             //启动测试时间间隔
-    INT32 n4ProNum;                   //启动测试协议条数
-    INT32 n4ConnectNum;               //模拟连接数
+    int32 n4Result;                   //启动测试结果信息
+    int32 n4TimeInterval;             //启动测试时间间隔
+    int32 n4ProNum;                   //启动测试协议条数
+    int32 n4ConnectNum;               //模拟连接数
     vector<string> vecProFileDesc;  //协议文件描述
 
     FILETESTRESULTINFO(const FILETESTRESULTINFO& ar)
@@ -1065,7 +1065,7 @@ struct _TimerCheckID
 struct _PacketInfo
 {
     char*   m_pData;            //解析后的数据头指针
-    INT32   m_nDataLen;         //解析后的数据长度
+    int32   m_nDataLen;         //解析后的数据长度
 
     _PacketInfo()
     {
@@ -1179,7 +1179,7 @@ inline void __show__( const char* szTemp)
     fclose(f);
 };
 
-inline void __assertspecial__(const char* file, INT32 line, const char* func, const char* expr, const char* msg)
+inline void __assertspecial__(const char* file, int32 line, const char* func, const char* expr, const char* msg)
 {
     char szTemp[2*MAX_BUFF_1024] = {0};
 
@@ -1214,7 +1214,7 @@ inline void __assertspecial__(const char* file, INT32 line, const char* func, co
 class CTimeCost
 {
 public:
-    CTimeCost(unsigned int nMillionSecond, const char* pFunctionName, const char* pFileName, INT32 nLine)
+    CTimeCost(unsigned int nMillionSecond, const char* pFunctionName, const char* pFileName, int32 nLine)
     {
         m_lBegin         = 0;
         m_lEnd           = 0;
@@ -1277,7 +1277,7 @@ private:
 private:
     long         m_lBegin;
     long         m_lEnd;
-    INT32        m_nFileLine;
+    int32        m_nFileLine;
     uint32       m_nMillionSecond;
     char         m_szFunctionName[MAX_BUFF_100];
     char         m_szFileName[MAX_BUFF_300];
@@ -1408,7 +1408,7 @@ inline bool Replace_String(char* pText, uint32 u4Len, const char* pOld, const ch
 }
 
 //写独占文件锁
-inline INT32 AcquireWriteLock(INT32 fd, INT32 start, INT32 len)
+inline int32 AcquireWriteLock(int32 fd, int32 start, int32 len)
 {
 #ifndef WIN32
     struct flock arg;
@@ -1425,7 +1425,7 @@ inline INT32 AcquireWriteLock(INT32 fd, INT32 start, INT32 len)
 }
 
 //释放独占文件锁
-inline INT32 ReleaseLock(INT32 fd, INT32 start, INT32 len)
+inline int32 ReleaseLock(int32 fd, int32 start, int32 len)
 {
 #ifndef WIN32
     struct flock arg;
@@ -1442,7 +1442,7 @@ inline INT32 ReleaseLock(INT32 fd, INT32 start, INT32 len)
 }
 
 //查看写锁
-inline INT32 SeeLock(INT32 fd, INT32 start, INT32 len)
+inline int32 SeeLock(int32 fd, int32 start, int32 len)
 {
 #ifndef WIN32
     struct flock arg;
@@ -1480,7 +1480,7 @@ inline INT32 SeeLock(INT32 fd, INT32 start, INT32 len)
 struct _ClientIPInfo
 {
     char  m_szClientIP[MAX_BUFF_50];   //客户端的IP地址
-    INT32 m_nPort;                     //客户端的端口
+    int32 m_nPort;                     //客户端的端口
 
     _ClientIPInfo()
     {
@@ -1506,9 +1506,9 @@ struct _ClientIPInfo
 //链接别名映射信息(用于PSS_ClientManager管理)
 struct _ClientNameInfo
 {
-    INT32  m_nPort;                     //客户端的端口
-    INT32  m_nConnectID;                //连接ID
-    INT32  m_nLog;                      //是否记录日志
+    int32  m_nPort;                     //客户端的端口
+    int32  m_nConnectID;                //连接ID
+    int32  m_nLog;                      //是否记录日志
     char   m_szName[MAX_BUFF_100];      //连接别名
     char   m_szClientIP[MAX_BUFF_50];   //客户端的IP地址
 

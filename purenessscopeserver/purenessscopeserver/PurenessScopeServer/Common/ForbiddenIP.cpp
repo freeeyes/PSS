@@ -69,7 +69,7 @@ bool CForbiddenIP::Init(const char* szConfigPath)
 
 bool CForbiddenIP::CheckIP(const char* pIP, uint8 u1ConnectType)
 {
-    for(INT32 i = 0; i < (INT32)m_VecForeverForbiddenIP.size(); i++)
+    for(int32 i = 0; i < (int32)m_VecForeverForbiddenIP.size(); i++)
     {
         if(m_VecForeverForbiddenIP[i].m_u1ConnectType == u1ConnectType
            && CompareIP(m_VecForeverForbiddenIP[i].m_szClientIP, (char* )pIP) == true)
@@ -184,7 +184,7 @@ bool CForbiddenIP::SaveConfig()
         return false;
     }
 
-    for(INT32 i = 0; i < (INT32)m_VecForeverForbiddenIP.size(); i++)
+    for(int32 i = 0; i < (int32)m_VecForeverForbiddenIP.size(); i++)
     {
         if(m_VecForeverForbiddenIP[i].m_u1ConnectType == CONNECT_TCP)
         {
@@ -248,9 +248,9 @@ bool CForbiddenIP::CompareIP(char* pTargetIP, char* pClientIP)
         }
 
         memcpy_safe(pTargetPos, (uint32)(pTargetTPos - pTargetPos), szTarget, (uint32)MAX_IP_SIZE);
-        szTarget[(INT32)(pTargetTPos - pTargetPos)] = '\0';
+        szTarget[(int32)(pTargetTPos - pTargetPos)] = '\0';
         memcpy_safe(pClientPos, (uint32)(pClientTPos - pClientPos), szClient, (uint32)MAX_IP_SIZE);
-        szClient[(INT32)(pClientTPos - pClientPos)] = '\0';
+        szClient[(int32)(pClientTPos - pClientPos)] = '\0';
 
         if(strcmp(szTarget, "*") != 0)
         {
