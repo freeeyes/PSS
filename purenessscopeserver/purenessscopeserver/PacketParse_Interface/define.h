@@ -383,7 +383,7 @@ typedef std::string _tstring;
 #endif
 
 //定义一个函数，可以支持内存越界检查
-inline void sprintf_safe(char* szText, INT32 nLen, const char* fmt ...)
+inline void sprintf_safe(char* szText, int nLen, const char* fmt ...)
 {
     if(szText == NULL)
     {
@@ -414,9 +414,9 @@ inline bool memcpy_safe(char* pSrc, uint32 u4SrcLen, char* pDes, uint32 u4DesLen
 }
 
 //支持strcpy边界检查
-inline bool strcpy_safe(const char* pSrc, char* pDes, INT32 nDesLen)
+inline bool strcpy_safe(const char* pSrc, char* pDes, int nDesLen)
 {
-    INT32 nSrcLen = (INT32)ACE_OS::strlen(pSrc);
+    int nSrcLen = (int)ACE_OS::strlen(pSrc);
 
     if(nSrcLen <= 0 || nDesLen <= 0 || nSrcLen > nDesLen)
     {
@@ -430,10 +430,10 @@ inline bool strcpy_safe(const char* pSrc, char* pDes, INT32 nDesLen)
 }
 
 //支持strcat边界检查
-inline bool strcat_safe(const char* pSrc, char* pDes, INT32 nDesLen)
+inline bool strcat_safe(const char* pSrc, char* pDes, int nDesLen)
 {
-    INT32 nCurrSrcLen = (INT32)ACE_OS::strlen(pSrc);
-    INT32 nCurrDesLen = (INT32)ACE_OS::strlen(pDes);
+    int nCurrSrcLen = (int)ACE_OS::strlen(pSrc);
+    int nCurrDesLen = (int)ACE_OS::strlen(pDes);
 
     if(nDesLen <= 0 || nDesLen <= nCurrSrcLen + nCurrDesLen)
     {
@@ -483,7 +483,7 @@ inline void Print_Binary(ACE_Message_Block* pMessageBlock)
 }
 
 //打印指定的Messahe_Block中的信息到屏幕
-inline void Print_Binary(const char* pData, INT32 nLen)
+inline void Print_Binary(const char* pData, int nLen)
 {
     if(NULL != pData)
     {
@@ -1214,7 +1214,7 @@ inline void __assertspecial__(const char* file, INT32 line, const char* func, co
 class CTimeCost
 {
 public:
-    CTimeCost(unsigned INT32 nMillionSecond, const char* pFunctionName, const char* pFileName, INT32 nLine)
+    CTimeCost(unsigned int nMillionSecond, const char* pFunctionName, const char* pFileName, INT32 nLine)
     {
         m_lBegin         = 0;
         m_lEnd           = 0;
