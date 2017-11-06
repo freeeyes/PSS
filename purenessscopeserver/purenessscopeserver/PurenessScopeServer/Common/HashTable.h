@@ -621,6 +621,11 @@ public:
         if(NULL == m_lpTable)
         {
             //没有找到共享内存
+            if (HASH_DEBUG_ON == m_emHashDebug)
+            {
+                OUR_DEBUG((LM_INFO, "[Push] m_lpTable is NULL, pKey=%s, pT=0x%08x.\n", pKey, pT));
+            }
+
             return false;
         }
 
@@ -629,7 +634,7 @@ public:
 
         if (HASH_DEBUG_ON == m_emHashDebug)
         {
-            OUR_DEBUG((LM_INFO, "[Push] index =%d, pKey=%s, pT=0x%08x.\n", m_emHashDebug, pKey, pT));
+            OUR_DEBUG((LM_INFO, "[Push] index =%d, pKey=%s, pT=0x%08x.\n", uHashStart, pKey, pT));
         }
 
         _Hash_Link_Info<T>* pLastLink = m_lpTable[uHashStart];
