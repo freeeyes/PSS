@@ -1,0 +1,46 @@
+sudo: false         # 开启基于容器的Travis CI任务，让编译效率更高。
+language: cpp
+os:
+  - linux
+
+compiler:
+  - gcc
+
+env:
+  matrix:
+    - ACE=1
+  global:
+    - CURPATH=$(pwd)
+    - ACEDIR=$HOME/Tools
+    - ACE_ROOT=$ACEDIR/ACE_wrappers
+    - LD_LIBRARY_PATH=$ACE_ROOT/lib:$LD_LIBRARY_PATH
+    - COMPILER=g++-7
+
+before_install:
+  - mkdir -p $ACEDIR
+  - cd $ACEDIR
+  - wget http://download.dre.vanderbilt.edu/previous_versions/ACE-6.4.0.tar.gz
+  - tar zxf ACE-6.4.0.tar.gz
+
+before_script:
+  - export
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then 
+      echo -e "#include \"ace/config-linux.h\"" >> $ACE_ROOT/ace/config.h; 
+      echo -e "#define ACE_HAS_EVENT_POLL" >> $ACE_ROOT/ace/config.h; 
+    fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+      if [ "$CXX" == "g++" ]; then
+        echo -e "include \$(ACE_ROOT)/include/makeinclude/platform_linux.GNU" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU;
+      else
+        echo -e "include \$(ACE_ROOT)/include/makeinclude/platform_linux_clang.GNU" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU;
+      fi
+    fi
+
+  - cd $ACE_ROOT
+  - $ACE_ROOT/bin/mwc.pl -type gnuace ACE.mwc
+  - make ACE > /dev/null 2>&1
+  - ls $ACE_ROOT/lib/
+script:
+  - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
+  - $ACE_ROOT/bin/mwc.pl -type gnuace
+  - make -j 6
