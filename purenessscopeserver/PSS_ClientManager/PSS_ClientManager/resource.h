@@ -33,6 +33,7 @@
 #define IDC_EDIT7                       1007
 #define IDC_BUTTON4                     1008
 #define IDC_BUTTON13                    1008
+#define IDC_EDIT15                      1008
 #define IDC_BUTTON5                     1009
 #define IDC_EDIT13                      1009
 #define IDC_LIST1                       1010
@@ -40,6 +41,7 @@
 #define IDC_EDIT6                       1011
 #define IDC_LIST2                       1011
 #define IDC_EDIT9                       1011
+#define IDC_EDIT16                      1011
 #define IDC_RADIO2                      1012
 #define IDC_BUTTON11                    1012
 #define IDC_LIST4                       1012
@@ -63,7 +65,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        141
+#define _APS_NEXT_RESOURCE_VALUE        142
 #define _APS_NEXT_COMMAND_VALUE         32771
 #define _APS_NEXT_CONTROL_VALUE         1020
 #define _APS_NEXT_SYMED_VALUE           104
