@@ -114,8 +114,6 @@ void CProConnectHandle::Close(int nIOCount, int nErrno)
     if(m_nIOCount == 0)
     {
         m_ThreadWriteLock.acquire();
-        //查看是否是IP追踪信息，是则记录
-        //App_IPAccount::instance()->CloseIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
 
         //调用连接断开消息，通知PacketParse接口
         App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->DisConnect(GetConnectID());
@@ -1489,10 +1487,6 @@ bool CProConnectHandle::CheckMessage()
         }
 
         m_u4AllRecvCount++;
-
-        //如果有需要监控的IP，则记录字节流信息
-        //App_IPAccount::instance()->UpdateIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
-        //m_ThreadWriteLock.release();
 
         ACE_Date_Time dtNow;
 

@@ -65,9 +65,6 @@ const char* CConnectHandler::GetError()
 
 void CConnectHandler::Close()
 {
-    //查看是否是IP追踪信息，是则记录
-    //App_IPAccount::instance()->CloseIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
-
     //调用连接断开消息
     App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->DisConnect(GetConnectID());
 
@@ -1713,9 +1710,6 @@ bool CConnectHandler::CheckMessage()
     //OUR_DEBUG((LM_ERROR, "[CConnectHandler::CheckMessage]body length=%d.\n", m_pPacketParse->GetMessageBody()->length()));
 
     m_u4AllRecvCount++;
-
-    //如果需要统计信息
-    //App_IPAccount::instance()->UpdateIP((string)m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllSendSize);
 
     ACE_Time_Value tvCheck = ACE_OS::gettimeofday();
     ACE_Date_Time dtNow(tvCheck);

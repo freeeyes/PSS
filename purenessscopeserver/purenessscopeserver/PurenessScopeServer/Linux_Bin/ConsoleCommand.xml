@@ -24,13 +24,13 @@
 	<CommandInfo CommandName="ShowCurrProcessInfo" User="freeeyes" desc="查看当前服务器的运行状态" />
 	<CommandInfo CommandName="ShowConnectHistory" User="freeeyes" desc="查看服务器历史链接状态" />
 	<CommandInfo CommandName="ShowAllCommand" User="freeeyes" desc="查看服务器所有注册模块信令信息" />
-	<CommandInfo CommandName="ShowServerInfo" User="freeeyes" desc="查看服务器基本信息" />
+	<CommandInfo CommandName="ShowServerInfo" User="freeeyes,guest" desc="查看服务器基本信息" />
 	<CommandInfo CommandName="ReConnectServer" User="freeeyes" desc="远端控制重练某一个远端服务器" />
 	<CommandInfo CommandName="SetDebug" User="freeeyes" desc="设置当前DEBUG状态" />
 	<CommandInfo CommandName="ShowDebug" User="freeeyes" desc="查看当前DEBUG状态" />
-	<CommandInfo CommandName="SetTrackIP" User="freeeyes" desc="设置要监控的IP" />
-	<CommandInfo CommandName="DelTrackIP" User="freeeyes" desc="删除要监控的IP" />
-	<CommandInfo CommandName="GetTrackIPInfo" User="freeeyes" desc="得到监控IP的历史记录" />
+	<CommandInfo CommandName="SetTrackIP" User="freeeyes" desc="设置IP数据染色" />
+	<CommandInfo CommandName="SetTrackCommand" User="freeeyes" desc="设置命令数据染色" />
+	<CommandInfo CommandName="GetTrackCommandInfo" User="freeeyes" desc="得到命令染色列表信息" />
 	<CommandInfo CommandName="GetConnectIPInfo" User="freeeyes" desc="通过ConnectID获得相关的IP信息" />
 	<CommandInfo CommandName="GetLogInfo" User="freeeyes" desc="得到日志等级" />
 	<CommandInfo CommandName="SetLogLevel" User="freeeyes" desc="设置日志等级" />
