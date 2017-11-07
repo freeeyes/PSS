@@ -1515,6 +1515,7 @@ bool CProConnectHandle::CheckMessage()
 
         objMakePacket.m_u4ConnectID       = GetConnectID();
         objMakePacket.m_pPacketParse      = m_pPacketParse;
+        objMakePacket.m_AddrRemote        = m_addrRemote;
 
         if(ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
         {

@@ -26,6 +26,8 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
     //如果函数不返回任何变量，你可以使用__LEAVE_FUNCTION即可。
     __ENTER_FUNCTION();
 
+    DO_TRACE("./", pMessage->GetMessageBase()->m_szTraceID);
+
     if(m_pServerObject == NULL)
     {
         OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL(%d).\n", bDeleteFlag));
@@ -99,8 +101,8 @@ int CBaseCommand::Do_Base(IMessage* pMessage)
     _PacketInfo BodyPacket;
     pMessage->GetPacketBody(BodyPacket);
 
-    //pBodyPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
-
+    //消息染色测试
+    DO_TRACE("./", pMessage->GetMessageBase()->m_szTraceID);
 
     //测试记录二进制日志
     //m_pServerObject->GetLogManager()->WriteLogBinary(LOG_SYSTEM, BodyPacket.m_pData, BodyPacket.m_nDataLen);
