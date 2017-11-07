@@ -80,7 +80,7 @@ inline int64_t GetSysTimeMicros()
 }
 
 //验证一个IP
-bool effective(const char* pIP)//检查ip地址的有效性
+static bool effective(const char* pIP)//检查ip地址的有效性
 {
     int cnt = 0;
     char* ip = (char*)pIP;
@@ -111,7 +111,7 @@ bool effective(const char* pIP)//检查ip地址的有效性
 }
 
 //将一个IP转换为整数
-unsigned int GetValueByIP(const char* pIP)
+static unsigned int GetValueByIP(const char* pIP)
 {
     if (!effective(pIP))
     {

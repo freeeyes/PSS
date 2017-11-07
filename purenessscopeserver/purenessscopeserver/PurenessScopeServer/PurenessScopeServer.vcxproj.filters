@@ -220,6 +220,9 @@
     <ClCompile Include="Console\ConsolePromiss.cpp">
       <Filter>Console\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="Message\MessageDyeingManager.cpp">
+      <Filter>Message\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\ACEMemory.h">
@@ -539,6 +542,9 @@
     </ClInclude>
     <ClInclude Include="Common\Trace.h">
       <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Message\MessageDyeingManager.h">
+      <Filter>Message\hfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
