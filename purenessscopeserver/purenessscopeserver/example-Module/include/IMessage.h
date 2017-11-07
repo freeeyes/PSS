@@ -18,6 +18,7 @@ struct _MessageBase
     uint8          m_u1PacketType;              //数据包来源类型
     char           m_szIP[MAX_BUFF_20];         //客户端IP
     char           m_szListenIP[MAX_BUFF_20];   //监听IP
+    char           m_szTraceID[MAX_BUFF_50];    //TraceID
     CProfileTime   m_ProfileTime;               //消息到达时间
     ACE_Time_Value m_tvRecvTime;                //消息接收时间
 
@@ -30,10 +31,11 @@ struct _MessageBase
         m_u4HeadSrcSize  = 0;
         m_u4BodySrcSize  = 0;
         m_u4WorkThreadID = 0;
-        m_szIP[0]        = '\0';
-        m_u4Port         = 0;
-        m_szListenIP[0]  = '\0';
         m_u4ListenPort   = 0;
+        m_u4Port         = 0;
+        m_szIP[0]        = '\0';
+        m_szListenIP[0]  = '\0';
+        m_szTraceID[0]   = '\0';
     }
 };
 

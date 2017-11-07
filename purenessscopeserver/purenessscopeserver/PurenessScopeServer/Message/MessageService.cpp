@@ -885,6 +885,17 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
 
 bool CMessageServiceGroup::PutMessage(CMessage* pMessage)
 {
+    //判断是否需要数据染色
+    string strTraceID = m_objMessageDyeingManager.GetTraceID(pMessage->GetMessageBase()->m_szIP,
+                        (short)pMessage->GetMessageBase()->m_u4Port,
+                        pMessage->GetMessageBase()->m_u2Cmd);
+
+    if (strTraceID.length() > 0)
+    {
+        //需要染色，生成TraceID
+        sprintf_safe(pMessage->GetMessageBase()->m_szTraceID, MAX_BUFF_50, "%s", strTraceID.c_str());
+    }
+
     //判断是否为TCP包，如果是则按照ConnectID区分。UDP则随机分配一个
     int32 n4ThreadID = 0;
 
