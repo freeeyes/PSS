@@ -92,7 +92,7 @@ static bool effective(const char* pIP)//检查ip地址的有效性
             cnt++;
         }
 
-        if (*ip >= '0' && *ip <= '9' || *ip == '.')
+        if ((*ip >= '0' && *ip <= '9') || *ip == '.')
         {
             ip++;
         }
@@ -119,7 +119,6 @@ static unsigned int GetValueByIP(const char* pIP)
     }
 
     unsigned int res = 0;
-    char resIp[12] = { 0 };
 
     unsigned char value[4] = { 0 };//存放IP地址的四个数字
     char word[10] = { 0 };
@@ -180,7 +179,7 @@ inline TRACE_ID CreateTraceID(const char* pIP, short sPort, short sCommandID)
 
     //组成规则 时间 + PID + TID + IP
     objTraceID.m_nTime = GetSysTimeMicros();
-    printf("[CreateTraceID]%lld.\n", objTraceID.m_nTime);
+    printf("[CreateTraceID]%lld.\n", (long long int)objTraceID.m_nTime);
 
 #if defined(_WIN32)
     objTraceID.m_nPID = (int)_getpid();
@@ -260,7 +259,7 @@ inline void ShowKey(const char* pTraceID)
 
     memcpy(szTime, (char*)pTraceID, 16);
     int64_t n8Time = strtoull(szTime, NULL, 16);
-    printf("[ShowKey]Time=%lld.\n", n8Time);
+    printf("[ShowKey]Time=%lld.\n", (long long int)n8Time);
 
     memcpy(szPID, (char*)&pTraceID[16], 8);
     int nPID = (int)strtoul(szPID, NULL, 16);
