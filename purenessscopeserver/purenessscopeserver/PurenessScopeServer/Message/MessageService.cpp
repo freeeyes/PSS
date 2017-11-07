@@ -1105,6 +1105,21 @@ bool CMessageServiceGroup::CheckPlugInState()
     return true;
 }
 
+void CMessageServiceGroup::AddDyringIP(const char* pClientIP, uint16 u2MaxCount)
+{
+    return m_objMessageDyeingManager.AddDyringIP(pClientIP, u2MaxCount);
+}
+
+bool CMessageServiceGroup::AddDyeingCommand(uint16 u2CommandID, uint16 u2MaxCount)
+{
+    return m_objMessageDyeingManager.AddDyeingCommand(u2CommandID, u2MaxCount);
+}
+
+void CMessageServiceGroup::GetDyeingCommand(vec_Dyeing_Command_list& objList)
+{
+    m_objMessageDyeingManager.GetDyeingCommand(objList);
+}
+
 CThreadInfo* CMessageServiceGroup::GetThreadInfo()
 {
     for (uint32 i = 0; i < (uint32)m_vecMessageService.size(); i++)

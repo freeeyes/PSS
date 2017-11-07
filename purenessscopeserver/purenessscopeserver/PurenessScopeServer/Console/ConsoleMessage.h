@@ -68,8 +68,8 @@ enum
 #define CONSOLE_COMMAND_SETDEBUG           0x1018
 #define CONSOLE_COMMAND_SHOWDEBUG          0x1019
 #define CONSOLE_COMMAND_SETTRACKIP         0x101A
-#define CONSOLE_COMMAND_DELTRACKIP         0x101B
-#define CONSOLE_COMMAND_GETTRACKIPINFO     0x101C
+#define CONSOLE_COMMAND_SETTRACECOMMAND    0x101B
+#define CONSOLE_COMMAND_GETTRACKCOMMAND    0x101C
 #define CONSOLE_COMMAND_GETCONNECTIPINFO   0x101D
 #define CONSOLE_COMMAND_GETLOGINFO         0x101E
 #define CONSOLE_COMMAND_SETLOGLEVEL        0x101F
@@ -113,9 +113,9 @@ enum
 #define CONSOLEMESSAGE_SERVERRECONNECT    "ReConnectServer"     //远端控制重练某一个远端服务器
 #define CONSOLEMESSAGE_SETDEBUG           "SetDebug"            //设置当前DEBUG状态
 #define CONSOLEMESSAGE_SHOWDEBUG          "ShowDebug"           //查看当前DEBUG状态
-#define CONSOLEMESSAGE_SETTRACKIP         "SetTrackIP"          //设置要监控的IP
-#define CONSOLEMESSAGE_DELTRACKIP         "DelTrackIP"          //删除要监控的IP
-#define CONSOLEMESSAGE_GETTRACKIPINFO     "GetTrackIPInfo"      //得到监控IP的历史记录
+#define CONSOLEMESSAGE_SETTRACKIP         "SetTrackIP"          //设置要染色的IP
+#define CONSOLEMESSAGE_SETTRACECOMMAND    "SetTrackCommand"     //设置要染色的CommandID
+#define CONSOLEMESSAGE_GETTRACKIPINFO     "GetTrackCommandInfo" //得到染色的CommandID信息
 #define CONSOLEMESSAGE_GETCONNECTIPINFO   "GetConnectIPInfo"    //通过ConnectID获得相关的IP信息
 #define CONSOLEMESSAGE_GETLOGINFO         "GetLogInfo"          //得到日志等级
 #define CONSOLEMESSAGE_SETLOGLEVEL        "SetLogLevel"         //设置日志等级
@@ -182,6 +182,20 @@ struct _ListenInfo
     }
 };
 
+//染色IP信息
+struct _DyeIPInfo
+{
+    char   m_szClientIP[MAX_BUFF_20];   //染色客户端IP
+    uint16 m_u2MaxCount;                //最大数量
+};
+
+//染色的CommandID
+struct _DyeCommandInfo
+{
+    uint16 m_u2CommandID;               //染色客户端命令
+    uint16 m_u2MaxCount;                //最大数量
+};
+
 class CConsoleMessage
 {
 public:
@@ -210,6 +224,8 @@ private:
     bool GetMaxConnectCount(const char* pCommand, uint16& u2MaxConnectCount);                //得到最大的连接总数
     bool GetListenInfo(const char* pCommand, _ListenInfo& objListenInfo);                    //得到监听端口信息
     bool GetTestFileName(const char* pCommand, char* pFileName);                             //获得加载测试文件名
+    bool GetDyeingIP(const char* pCommand, _DyeIPInfo& objDyeIPInfo);                        //获得染色IP的相关信息
+    bool GetDyeingCommand(const char* pCommand, _DyeCommandInfo& objDyeCommandInfo);         //获得染色Command的相关信息
 
     //命令具体实现部分
 private:
@@ -239,8 +255,8 @@ private:
     void DoMessage_SetDebug(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
     void DoMessage_ShowDebug(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
     void DoMessage_SetTrackIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-    void DoMessage_DelTrackIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-    void DoMessage_GetTrackIPInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    void DoMessage_SetTraceCommand(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    void DoMessage_GetTrackCommand(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
     void DoMessage_GetConnectIPInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
     void DoMessage_GetLogLevelInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
     void DoMessage_SetLogLevelInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);

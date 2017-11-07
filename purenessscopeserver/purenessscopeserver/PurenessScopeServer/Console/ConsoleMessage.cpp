@@ -275,13 +275,13 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
     {
         DoMessage_SetTrackIP(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_DELTRACKIP) == 0)
+    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SETTRACECOMMAND) == 0)
     {
-        DoMessage_DelTrackIP(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
+        DoMessage_SetTraceCommand(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
     else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_GETTRACKIPINFO) == 0)
     {
-        DoMessage_GetTrackIPInfo(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
+        DoMessage_GetTrackCommand(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
     else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_GETCONNECTIPINFO) == 0)
     {
@@ -662,7 +662,7 @@ bool CConsoleMessage::GetListenInfo(const char* pCommand, _ListenInfo& objListen
 
     memcpy_safe((char* )(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
     szTempData[nLen] = '\0';
-    sprintf_safe(objListenInfo.m_szListenIP, 20, szTempData);
+    sprintf_safe(objListenInfo.m_szListenIP, MAX_BUFF_20, szTempData);
 
     //获得Port
     pPosBegin = (char* )ACE_OS::strstr(pCommand, "-p ");
@@ -725,6 +725,88 @@ bool CConsoleMessage::GetTestFileName(const char* pCommand, char* pFileName)
         OUR_DEBUG((LM_INFO, "[CConsoleMessage::GetTestFileName]nCommandSize=%d is more than MAX_BUFF_200 or is zero.\n", u2Len));
         return false;
     }
+}
+
+bool CConsoleMessage::GetDyeingIP(const char* pCommand, _DyeIPInfo& objDyeIPInfo)
+{
+    char szTempData[MAX_BUFF_100] = { '\0' };
+
+    //获得IP地址
+    char* pPosBegin = (char*)ACE_OS::strstr(pCommand, "-i ");
+    char* pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
+    int nLen = (int)(pPosEnd - pPosBegin - 3);
+
+    if (nLen >= MAX_BUFF_100 || nLen < 0)
+    {
+        return false;
+    }
+
+    memcpy_safe((char*)(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
+    szTempData[nLen] = '\0';
+    sprintf_safe(objDyeIPInfo.m_szClientIP, MAX_BUFF_20, szTempData);
+
+    //获得当前个数
+    pPosBegin = (char*)ACE_OS::strstr(pCommand, "-c ");
+    pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
+    nLen = (int)(pPosEnd - pPosBegin - 3);
+
+    if (nLen >= MAX_BUFF_100 || nLen < 0)
+    {
+        return false;
+    }
+
+    memcpy_safe((char*)(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
+    szTempData[nLen] = '\0';
+    objDyeIPInfo.m_u2MaxCount = ACE_OS::atoi(szTempData);
+
+    return true;
+}
+
+bool CConsoleMessage::GetDyeingCommand(const char* pCommand, _DyeCommandInfo& objDyeCommandInfo)
+{
+    char szCommandID[MAX_BUFF_20] = { '\0' };
+    char szTempData[MAX_BUFF_100] = { '\0' };
+
+    //获得CommandID
+    char* pPosBegin = (char*)ACE_OS::strstr(pCommand, "-i ");
+    char* pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
+    int nLen = (int)(pPosEnd - pPosBegin - 3);
+
+    if (nLen >= MAX_BUFF_100 || nLen < 0)
+    {
+        return false;
+    }
+
+    memcpy_safe((char*)(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
+    szTempData[nLen] = '\0';
+
+    if (szTempData[0] != '0' && szTempData[1] != 'x')
+    {
+        return false;
+    }
+
+    if (false == memcpy_safe(&szTempData[2], (uint32)(ACE_OS::strlen(szTempData) - 2), szCommandID, MAX_BUFF_20))
+    {
+        return false;
+    }
+
+    objDyeCommandInfo.m_u2CommandID = (uint16)ACE_OS::strtol(szCommandID, NULL, 16);
+
+    //获得当前个数
+    pPosBegin = (char*)ACE_OS::strstr(pCommand, "-c ");
+    pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
+    nLen = (int)(pPosEnd - pPosBegin - 3);
+
+    if (nLen >= MAX_BUFF_100 || nLen < 0)
+    {
+        return false;
+    }
+
+    memcpy_safe((char*)(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
+    szTempData[nLen] = '\0';
+    objDyeCommandInfo.m_u2MaxCount = ACE_OS::atoi(szTempData);
+
+    return true;
 }
 
 void CConsoleMessage::DoMessage_LoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
@@ -2680,12 +2762,12 @@ bool CConsoleMessage::GetDebug(const char* pCommand, uint8& u1Debug)
 
 void CConsoleMessage::DoMessage_SetTrackIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    _ForbiddenIP ForbiddenIP;
+    _DyeIPInfo objDyeIPInfo;
 
-    if(GetTrackIP(CommandInfo.m_szCommandExp, ForbiddenIP) == true)
+    if(true == GetDyeingIP(CommandInfo.m_szCommandExp, objDyeIPInfo))
     {
-        //设置追踪(此功能咱不提供)
-
+        //设置IP染色
+        App_MessageServiceGroup::instance()->AddDyringIP(objDyeIPInfo.m_szClientIP, objDyeIPInfo.m_u2MaxCount);
         (*pBuffPacket) << (uint8)0;   //追踪成功
     }
     else
@@ -2696,30 +2778,50 @@ void CConsoleMessage::DoMessage_SetTrackIP(_CommandInfo& CommandInfo, IBuffPacke
     u2ReturnCommandID = CONSOLE_COMMAND_SETTRACKIP;
 }
 
-void CConsoleMessage::DoMessage_DelTrackIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_SetTraceCommand(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
+    _DyeCommandInfo objDyeCommandInfo;
+
+    if(true == GetDyeingCommand(CommandInfo.m_szCommandExp, objDyeCommandInfo))
     {
         //清除追踪(此功能咱不提供)
+        if (true == App_MessageServiceGroup::instance()->AddDyeingCommand(objDyeCommandInfo.m_u2CommandID, objDyeCommandInfo.m_u2MaxCount))
+        {
+            (*pBuffPacket) << (uint8)0;
+        }
+        else
+        {
+            (*pBuffPacket) << (uint8)1;   //设置失败
+        }
 
-        (*pBuffPacket) << (uint8)0;
+    }
+    else
+    {
+        (*pBuffPacket) << (uint8)1;   //设置失败
     }
 
-    u2ReturnCommandID = CONSOLE_COMMAND_DELTRACKIP;
+    u2ReturnCommandID = CONSOLE_COMMAND_SETTRACECOMMAND;
 }
 
-void CConsoleMessage::DoMessage_GetTrackIPInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void CConsoleMessage::DoMessage_GetTrackCommand(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    //char szTimeBegin[MAX_BUFF_100] = {'\0'};
-    //char szTimeEnd[MAX_BUFF_100]   = {'\0'};
+    vec_Dyeing_Command_list objList;
 
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
         //记录总个数(此功能咱不提供)
-        (*pBuffPacket) << (uint16)0;
+        App_MessageServiceGroup::instance()->GetDyeingCommand(objList);
+        (*pBuffPacket) << (uint8)objList.size();
+
+        for (int i = 0; i < (int)objList.size(); i++)
+        {
+            (*pBuffPacket) << (uint16)objList[i].m_u2CommandID;
+            (*pBuffPacket) << (uint16)objList[i].m_u2CurrCount;
+            (*pBuffPacket) << (uint16)objList[i].m_u2MaxCount;
+        }
     }
 
-    u2ReturnCommandID = CONSOLE_COMMAND_GETTRACKIPINFO;
+    u2ReturnCommandID = CONSOLE_COMMAND_GETTRACKCOMMAND;
 }
 
 void CConsoleMessage::DoMessage_GetConnectIPInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)

@@ -161,6 +161,10 @@ public:
 
     void CopyMessageManagerList();                                                            //从MessageManager中获得信令列表副本
 
+    void AddDyringIP(const char* pClientIP, uint16 u2MaxCount);                               //染色指定的IP
+    bool AddDyeingCommand(uint16 u2CommandID, uint16 u2MaxCount);                             //染色指定的CommandID
+    void GetDyeingCommand(vec_Dyeing_Command_list& objList);                                  //获得当前命令染色状态
+
 private:
     bool StartTimer();
     bool KillTimer();
@@ -169,7 +173,6 @@ private:
     bool CheckPacketParsePool();                                                             //检查正在使用的消息解析对象
     bool CheckCPUAndMemory();                                                                //检查CPU和内存
     bool CheckPlugInState();                                                                 //检查所有插件状态
-
     int32 GetWorkThreadID(uint32 u4ConnectID, uint8 u1PacketType);                           //根据操作类型和ConnectID计算出那个工作线程ID
 
 private:
