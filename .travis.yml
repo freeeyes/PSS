@@ -53,7 +53,7 @@ before_script:
   - ls $ACE_ROOT/lib/
 script:
   - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
-  - $ACE_ROOT/bin/mpc.pl -type gnuace makefile4codecov.mpc
+  - $ACE_ROOT/bin/mwc.pl -type gnuace pss4codecov.mwc
   - make -j 6
   #Codecov
   - ./.get_code_cov.sh
