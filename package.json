@@ -1,19 +1,17 @@
 {
-    "name": "pss",
-    "version": "0.9.9-beta",
-    "private": true,
-    "description": "pss - a plugin logic Tcp/Udp service platform",
-    "homepage": "https://github.com/freeeyes/PSS",
-    "bugs": "https://github.com/freeeyes/PSS/issues",
-    "license": "MIT",
-    "engines": {
-        "ACE": ">=6.0.0 <6.5.0"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/freeeyes/PSS.git"
-    },
-    "dependencies": {
-        "ACE": "6.4.0"
-    }
+  "name": "PSS",
+  "version": "0.9.8",
+  "description": "pss - a plugin logic Tcp/Udp service platform",
+  "homepage": "https://github.com/freeeyes/PSS",
+  "authors": [
+    "freeeyes"
+  ],
+  "main": "src/index.js",
+  "keywords": [
+    "PSS"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "ACE": "6.0.0"
+  }
 }
