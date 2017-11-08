@@ -1,1 +1,1 @@
-mwc.pl -type gnuace
+mwc.pl -type gnuace pss.mwc
