@@ -21,7 +21,7 @@ before_install:
   - sudo apt-get -qq update
   #Codecov
   - sudo pip install codecov
-  - chmod +x .get_code_cov.sh
+  - chmod +x .get_code_cov_pss.sh
 
   - mkdir -p $ACEDIR
   - cd $ACEDIR
@@ -56,7 +56,7 @@ script:
   - $ACE_ROOT/bin/mwc.pl -type gnuace pss4codecov.mwc
   - make -j 6
   #Codecov
-  - ./.get_code_cov.sh
+  - ../../../../.get_code_cov_pss.sh
 
 after_success: 
   - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
