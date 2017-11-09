@@ -2766,13 +2766,31 @@ void CConsoleMessage::DoMessage_SetTrackIP(_CommandInfo& CommandInfo, IBuffPacke
 
     if(true == GetDyeingIP(CommandInfo.m_szCommandExp, objDyeIPInfo))
     {
-        //设置IP染色
-        App_MessageServiceGroup::instance()->AddDyringIP(objDyeIPInfo.m_szClientIP, objDyeIPInfo.m_u2MaxCount);
-        (*pBuffPacket) << (uint8)0;   //追踪成功
+        if (CommandInfo.m_u1OutputType == 0)
+        {
+            //设置IP染色
+            App_MessageServiceGroup::instance()->AddDyringIP(objDyeIPInfo.m_szClientIP, objDyeIPInfo.m_u2MaxCount);
+            (*pBuffPacket) << (uint8)0;   //追踪成功
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_1024] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_1024, "State(OK)\n");
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        }
     }
     else
     {
-        (*pBuffPacket) << (uint8)1;   //追踪失败
+        if (CommandInfo.m_u1OutputType == 0)
+        {
+            (*pBuffPacket) << (uint8)1;   //追踪失败
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_1024] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_1024, "State(FAIL)\n");
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        }
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_SETTRACKIP;
@@ -2787,17 +2805,44 @@ void CConsoleMessage::DoMessage_SetTraceCommand(_CommandInfo& CommandInfo, IBuff
         //清除追踪(此功能咱不提供)
         if (true == App_MessageServiceGroup::instance()->AddDyeingCommand(objDyeCommandInfo.m_u2CommandID, objDyeCommandInfo.m_u2MaxCount))
         {
-            (*pBuffPacket) << (uint8)0;
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << (uint8)0;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "State(OK)\n");
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
         }
         else
         {
-            (*pBuffPacket) << (uint8)1;   //设置失败
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << (uint8)1;   //设置失败
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "State(FAIL)\n");
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
         }
 
     }
     else
     {
-        (*pBuffPacket) << (uint8)1;   //设置失败
+        if (CommandInfo.m_u1OutputType == 0)
+        {
+            (*pBuffPacket) << (uint8)1;   //设置失败
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_1024] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_1024, "State(FAIL)\n");
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        }
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_SETTRACECOMMAND;
@@ -2811,13 +2856,36 @@ void CConsoleMessage::DoMessage_GetTrackCommand(_CommandInfo& CommandInfo, IBuff
     {
         //记录总个数(此功能咱不提供)
         App_MessageServiceGroup::instance()->GetDyeingCommand(objList);
-        (*pBuffPacket) << (uint8)objList.size();
+
+        if (CommandInfo.m_u1OutputType == 0)
+        {
+            (*pBuffPacket) << (uint8)objList.size();
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_1024] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_1024, "CommandID Count(%d)\n", objList.size());
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        }
 
         for (int i = 0; i < (int)objList.size(); i++)
         {
-            (*pBuffPacket) << (uint16)objList[i].m_u2CommandID;
-            (*pBuffPacket) << (uint16)objList[i].m_u2CurrCount;
-            (*pBuffPacket) << (uint16)objList[i].m_u2MaxCount;
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << (uint16)objList[i].m_u2CommandID;
+                (*pBuffPacket) << (uint16)objList[i].m_u2CurrCount;
+                (*pBuffPacket) << (uint16)objList[i].m_u2MaxCount;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "CommandID ID(%d)\n", objList[i].m_u2CommandID);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                sprintf_safe(szTemp, MAX_BUFF_1024, "CurrCount ID(%d)\n", objList[i].m_u2CurrCount);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                sprintf_safe(szTemp, MAX_BUFF_1024, "MaxCount ID(%d)\n", objList[i].m_u2MaxCount);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
         }
     }
 
