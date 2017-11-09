@@ -535,5 +535,38 @@ b freeeyes ShowServerInfo -a&
 				</table>
 			</th>
         </tr>
+        <tr>
+            <th>SetTrackIP -i 127.0.0.1 -c 5 &</th>
+            <th>给指定客户端IP的数据染色，-i是客户端的IP，-c是染色数据包数</th>
+            <th>
+				<table width="100%" border="1" cellpadding="0" cellspacing="0">
+				<tr><th>类型</th><th>说明</th></tr>
+				<th>uint8</th><th>执行状态 0 成功</th></tr>
+				</table>
+			</th>
+        </tr>
+        <tr>
+            <th>SetTrackCommand -i 127.0.0.1 -c 5 &</th>
+            <th>给指定信令ID的数据染色，-i信令ID，格式是0xXXXX，-c是染色数据包数</th>
+            <th>
+				<table width="100%" border="1" cellpadding="0" cellspacing="0">
+				<tr><th>类型</th><th>说明</th></tr>
+				<th>uint8</th><th>执行状态 0 成功，1 失败</th></tr>
+				</table>
+			</th>
+        </tr>
+        <tr>
+            <th>GetTrackCommandInfo -a&</th>
+            <th>查看当前染色的信令执行信息</th>
+            <th>
+				<table width="100%" border="1" cellpadding="0" cellspacing="0">
+				<tr><th>类型</th><th>说明</th></tr>
+				<th>uint8</th><th>当前信令个数</th></tr>
+				<th>uint16</th><th>信令ID</th></tr>
+				<th>uint16</th><th>信令当前已染色个数(已处理)</th></tr>
+				<th>uint16</th><th>信令需要染色总数</th></tr>
+				</table>
+			</th>
+        </tr>
 </table>
 
