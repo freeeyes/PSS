@@ -55,6 +55,9 @@ script:
   - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
   - $ACE_ROOT/bin/mwc.pl -type gnuace pss4codecov.mwc
   - make -j 8
+  - sh runpss.sh
+  - sleep 10
+  - sh killp
   #Codecov
   - ../../../../.get_code_cov_pss.sh
 
