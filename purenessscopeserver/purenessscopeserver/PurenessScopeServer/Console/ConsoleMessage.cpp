@@ -54,6 +54,16 @@ int CConsoleMessage::Dispose(ACE_Message_Block* pmb, IBuffPacket* pBuffPacket, u
     }
 }
 
+int CConsoleMessage::ParsePlugInCommand(const char* pCommand, IBuffPacket* pBuffPacket)
+{
+    uint8 u1OutputType = 0;
+
+    //拼接插件调用完整指令
+    char szPluginCommand[MAX_BUFF_200] = { '\0' };
+    sprintf_safe(szPluginCommand, MAX_BUFF_200, "b plugin %s", pCommand);
+    return ParseCommand_Plugin(szPluginCommand, pBuffPacket, u1OutputType);
+}
+
 bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& CommandInfo)
 {
     int nLen = (int)ACE_OS::strlen(pCommand);
@@ -66,7 +76,6 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
         OUR_DEBUG((LM_ERROR, "[CConsoleMessage::GetCommandInfo]pCommand is too long.\n"));
         return false;
     }
-
 
     //获得输出模式
     char szOutputType[MAX_BUFF_100] = { '\0' };
@@ -133,10 +142,33 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
     return true;
 }
 
+int CConsoleMessage::ParseCommand_Plugin(const char* pCommand, IBuffPacket* pBuffPacket, uint8& u1OutputType)
+{
+    _CommandInfo CommandInfo;
+
+    IBuffPacket* pCurrBuffPacket = App_BuffPacketManager::instance()->Create();
+
+    if (NULL == pCurrBuffPacket)
+    {
+        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]pCurrBuffPacket is NULL.\n"));
+        return CONSOLE_MESSAGE_FAIL;
+    }
+
+    if (false == GetCommandInfo(pCommand, CommandInfo))
+    {
+        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]pCommand format is error.\n"));
+        return CONSOLE_MESSAGE_FAIL;
+    }
+
+    u1OutputType = CommandInfo.m_u1OutputType;
+
+    //执行命令
+    return DoCommand(CommandInfo, pCurrBuffPacket, pBuffPacket);
+}
+
 int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket, uint8& u1OutputType)
 {
     _CommandInfo CommandInfo;
-    uint16       u2ReturnCommandID = CONSOLE_COMMAND_UNKNOW;
 
     IBuffPacket* pCurrBuffPacket = App_BuffPacketManager::instance()->Create();
 
@@ -155,183 +187,188 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
     //判断当前命令是否可以执行
     int nPromission = m_objConsolePromissions.Check_Promission(CommandInfo.m_szCommandTitle, CommandInfo.m_szUser);
 
-    if (-1 == nPromission)
+    if (0 != nPromission)
     {
+        App_BuffPacketManager::instance()->Delete(pCurrBuffPacket);
         return CONSOLE_MESSAGE_FAIL;
-    }
-    else if(-2 == nPromission)
-    {
-
     }
 
     u1OutputType = CommandInfo.m_u1OutputType;
 
-    if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_LOADMOUDLE) == 0)
+    //执行命令
+    return DoCommand(CommandInfo, pCurrBuffPacket, pBuffPacket);
+}
+
+int CConsoleMessage::DoCommand(_CommandInfo& CommandInfo, IBuffPacket* pCurrBuffPacket, IBuffPacket* pReturnBuffPacket)
+{
+    uint16 u2ReturnCommandID = CONSOLE_COMMAND_UNKNOW;
+
+    if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_LOADMOUDLE) == 0)
     {
         //处理添加模块的命令（支持重载）
         DoMessage_LoadModule(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_UNLOADMOUDLE) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_UNLOADMOUDLE) == 0)
     {
         //处理卸载模块的命令
         DoMessage_UnLoadModule(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_RELOADMOUDLE) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_RELOADMOUDLE) == 0)
     {
         //处理卸载模块的命令
         DoMessage_ReLoadModule(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_CLIENTCOUNT) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_CLIENTCOUNT) == 0)
     {
         //处理获得当前连接数的命令
         DoMessage_ClientMessageCount(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_SHOWMOUDLE) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_SHOWMOUDLE) == 0)
     {
         //处理显示所有当前已经加载的模块名称和文件名
         DoMessage_ShowModule(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_COMMANDINFO) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_COMMANDINFO) == 0)
     {
         DoMessage_CommandInfo(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_THREADINFO) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_THREADINFO) == 0)
     {
         DoMessage_WorkThreadState(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_CLIENTINFO) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_CLIENTINFO) == 0)
     {
         DoMessage_ClientInfo(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_FORBIDDENIP) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_FORBIDDENIP) == 0)
     {
         DoMessage_ForbiddenIP(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_FORBIDDENIPSHOW) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_FORBIDDENIPSHOW) == 0)
     {
         DoMessage_ShowForbiddenList(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_LIFTED) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_LIFTED) == 0)
     {
         DoMessage_LifedIP(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_COLSECLIENT) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_COLSECLIENT) == 0)
     {
         DoMessage_CloseClient(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_UDPCONNECTINFO) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_UDPCONNECTINFO) == 0)
     {
         DoMessage_UDPClientInfo(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_SERVERCONNECT_TCP) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_SERVERCONNECT_TCP) == 0)
     {
         DoMessage_ServerConnectTCP(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_SERVERCONNECT_UDP) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_SERVERCONNECT_UDP) == 0)
     {
         DoMessage_ServerConnectUDP(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_PROCESSINFO) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_PROCESSINFO) == 0)
     {
         DoMessage_ShowProcessInfo(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_CLIENTHISTORY) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_CLIENTHISTORY) == 0)
     {
         DoMessage_ShowClientHisTory(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_ALLCOMMANDINFO) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_ALLCOMMANDINFO) == 0)
     {
         DoMessage_ShowAllCommandInfo(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SERVERINFO) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SERVERINFO) == 0)
     {
         DoMessage_ShowServerInfo(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SERVERRECONNECT) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SERVERRECONNECT) == 0)
     {
         DoMessage_ReConnectServer(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_COMMANDTIMEOUT) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_COMMANDTIMEOUT) == 0)
     {
         DoMessage_CommandTimeout(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_COMMANDTIMEOUTCLR) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAHE_COMMANDTIMEOUTCLR) == 0)
     {
         DoMessage_CommandTimeoutclr(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_COMMANDDATALOG) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_COMMANDDATALOG) == 0)
     {
         DoMessage_CommandDataLog(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SETDEBUG) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SETDEBUG) == 0)
     {
         DoMessage_SetDebug(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SHOWDEBUG) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SHOWDEBUG) == 0)
     {
         DoMessage_ShowDebug(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SETTRACKIP) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SETTRACKIP) == 0)
     {
         DoMessage_SetTrackIP(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SETTRACECOMMAND) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SETTRACECOMMAND) == 0)
     {
         DoMessage_SetTraceCommand(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_GETTRACKIPINFO) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_GETTRACKIPINFO) == 0)
     {
         DoMessage_GetTrackCommand(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_GETCONNECTIPINFO) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_GETCONNECTIPINFO) == 0)
     {
         DoMessage_GetConnectIPInfo(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_GETLOGINFO) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_GETLOGINFO) == 0)
     {
         DoMessage_GetLogLevelInfo(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SETLOGLEVEL) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SETLOGLEVEL) == 0)
     {
         DoMessage_SetLogLevelInfo(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_GETWTAI) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_GETWTAI) == 0)
     {
         DoMessage_GetThreadAI(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_GETWTTIMEOUT) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_GETWTTIMEOUT) == 0)
     {
         DoMessage_GetWorkThreadTO(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SETWTAI) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SETWTAI) == 0)
     {
         DoMessage_SetWorkThreadAI(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_GETNICKNAMEINFO) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_GETNICKNAMEINFO) == 0)
     {
         DoMessage_GetNickNameInfo(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SETCONNECTLOG) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SETCONNECTLOG) == 0)
     {
         DoMessage_SetConnectLog(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SETMAXCONNECTCOUNT) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_SETMAXCONNECTCOUNT) == 0)
     {
         DoMessage_SetMaxConnectCount(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_ADD_LISTEN) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_ADD_LISTEN) == 0)
     {
         DoMessage_AddListen(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_DEL_LISTEN) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSAGE_DEL_LISTEN) == 0)
     {
         DoMessage_DelListen(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSATE_SHOW_LISTEN) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSATE_SHOW_LISTEN) == 0)
     {
         DoMessage_ShowListen(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSATE_MONITOR_INFO) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSATE_MONITOR_INFO) == 0)
     {
         DoMessage_MonitorInfo(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
@@ -343,35 +380,40 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
     {
         DoMessage_TestFileStop(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
-    else if(ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSATE_SERVER_CLOSE) == 0)
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSATE_SERVER_CLOSE) == 0)
     {
         //特殊指令，关闭服务器信息，所以要先清理一下内存。
         DoMessage_ServerClose(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
+        App_BuffPacketManager::instance()->Delete(pCurrBuffPacket);
         return CONSOLE_MESSAGE_CLOSE;
     }
     else
     {
         u2ReturnCommandID = CONSOLE_COMMAND_UNKNOW;
+        App_BuffPacketManager::instance()->Delete(pCurrBuffPacket);
         return CONSOLE_MESSAGE_FAIL;
     }
 
     //拼接返回数据包内容
     uint32 u4PacketSize = pCurrBuffPacket->GetPacketLen();
 
-    if(u4PacketSize == 0 || CONSOLE_COMMAND_UNKNOW == u2ReturnCommandID)
+    if (u4PacketSize == 0 || CONSOLE_COMMAND_UNKNOW == u2ReturnCommandID)
     {
         u2ReturnCommandID = CONSOLE_COMMAND_UNKNOW;
+        App_BuffPacketManager::instance()->Delete(pCurrBuffPacket);
         return CONSOLE_MESSAGE_FAIL;
     }
 
     if (CommandInfo.m_u1OutputType == 0)
     {
-        (*pBuffPacket) << u2ReturnCommandID;
-        pBuffPacket->WriteStream(pCurrBuffPacket->GetData(), pCurrBuffPacket->GetPacketLen());
+        (*pReturnBuffPacket) << u2ReturnCommandID;
+        pReturnBuffPacket->WriteStream(pCurrBuffPacket->GetData(), pCurrBuffPacket->GetPacketLen());
+        App_BuffPacketManager::instance()->Delete(pCurrBuffPacket);
     }
     else
     {
-        pBuffPacket->WriteStream(pCurrBuffPacket->GetData(), pCurrBuffPacket->GetPacketLen());
+        pReturnBuffPacket->WriteStream(pCurrBuffPacket->GetData(), pCurrBuffPacket->GetPacketLen());
+        App_BuffPacketManager::instance()->Delete(pCurrBuffPacket);
     }
 
     return CONSOLE_MESSAGE_SUCCESS;

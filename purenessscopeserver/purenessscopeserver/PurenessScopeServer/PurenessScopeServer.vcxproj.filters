@@ -223,6 +223,9 @@
     <ClCompile Include="Message\MessageDyeingManager.cpp">
       <Filter>Message\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="Console\FrameCommand.cpp">
+      <Filter>Console\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\ACEMemory.h">
@@ -545,6 +548,12 @@
     </ClInclude>
     <ClInclude Include="Message\MessageDyeingManager.h">
       <Filter>Message\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject\IFrameCommand.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Console\FrameCommand.h">
+      <Filter>Console\hfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
