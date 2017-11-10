@@ -203,29 +203,32 @@ public:
     ~CConsoleMessage();
 
     int Dispose(ACE_Message_Block* pmb, IBuffPacket* pBuffPacket, uint8& u1OutputType);     //要处理的命令字解析, pBuffPacket为返回要发送给客户端的数据
+    int ParsePlugInCommand(const char* pCommand, IBuffPacket* pBuffPacket);                 //执行命令
 
     //初始化部分
     bool SetConsoleKey(vecConsoleKey* pvecConsoleKey);       //添加验证允许的key值
 
     //公用数据部分
 private:
-    int ParseCommand(const char* pCommand, IBuffPacket* pBuffPackett, uint8& u1OutputType);  //执行命令
-    bool GetCommandInfo(const char* pCommand, _CommandInfo& CommandInfo);                    //把命令切割成应该有的数据格式
-    bool GetFileInfo(const char* pFile, _FileInfo& FileInfo);                                //将一个全路径切分成文件名
-    bool GetForbiddenIP(const char* pCommand, _ForbiddenIP& ForbiddenIP);                    //得到禁止的IP列表
-    bool GetConnectServerID(const char* pCommand, int& nServerID);                           //得到一个指定的服务器ID
-    bool GetDebug(const char* pCommand, uint8& u1Debug);                                     //得到当前设置的BUDEG
-    bool CheckConsoleKey(const char* pKey);                                                  //验证key
-    bool GetTrackIP(const char* pCommand, _ForbiddenIP& ForbiddenIP);                        //得到设置的追踪IP
-    bool GetLogLevel(const char* pCommand, int& nLogLevel);                                  //得到日志等级
-    bool GetAIInfo(const char* pCommand, int& nAI, int& nDispose, int& nCheck, int& nStop);  //得到AI设置
-    bool GetNickName(const char* pCommand, char* pName);                                     //得到连接别名
-    bool GetConnectID(const char* pCommand, uint32& u4ConnectID, bool& blFlag);              //得到ConnectID
-    bool GetMaxConnectCount(const char* pCommand, uint16& u2MaxConnectCount);                //得到最大的连接总数
-    bool GetListenInfo(const char* pCommand, _ListenInfo& objListenInfo);                    //得到监听端口信息
-    bool GetTestFileName(const char* pCommand, char* pFileName);                             //获得加载测试文件名
-    bool GetDyeingIP(const char* pCommand, _DyeIPInfo& objDyeIPInfo);                        //获得染色IP的相关信息
-    bool GetDyeingCommand(const char* pCommand, _DyeCommandInfo& objDyeCommandInfo);         //获得染色Command的相关信息
+    int ParseCommand_Plugin(const char* pCommand, IBuffPacket* pBuffPacket, uint8& u1OutputType);             //执行命令(插件内部调用)
+    int ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket, uint8& u1OutputType);                    //执行命令
+    int  DoCommand(_CommandInfo& CommandInfo, IBuffPacket* pCurrBuffPacket, IBuffPacket* pReturnBuffPacket);  //处理命令数据
+    bool GetCommandInfo(const char* pCommand, _CommandInfo& CommandInfo);                                     //把命令切割成应该有的数据格式
+    bool GetFileInfo(const char* pFile, _FileInfo& FileInfo);                                                 //将一个全路径切分成文件名
+    bool GetForbiddenIP(const char* pCommand, _ForbiddenIP& ForbiddenIP);                                     //得到禁止的IP列表
+    bool GetConnectServerID(const char* pCommand, int& nServerID);                                            //得到一个指定的服务器ID
+    bool GetDebug(const char* pCommand, uint8& u1Debug);                                                      //得到当前设置的BUDEG
+    bool CheckConsoleKey(const char* pKey);                                                                   //验证key
+    bool GetTrackIP(const char* pCommand, _ForbiddenIP& ForbiddenIP);                                         //得到设置的追踪IP
+    bool GetLogLevel(const char* pCommand, int& nLogLevel);                                                   //得到日志等级
+    bool GetAIInfo(const char* pCommand, int& nAI, int& nDispose, int& nCheck, int& nStop);                   //得到AI设置
+    bool GetNickName(const char* pCommand, char* pName);                                                      //得到连接别名
+    bool GetConnectID(const char* pCommand, uint32& u4ConnectID, bool& blFlag);                               //得到ConnectID
+    bool GetMaxConnectCount(const char* pCommand, uint16& u2MaxConnectCount);                                 //得到最大的连接总数
+    bool GetListenInfo(const char* pCommand, _ListenInfo& objListenInfo);                                     //得到监听端口信息
+    bool GetTestFileName(const char* pCommand, char* pFileName);                                              //获得加载测试文件名
+    bool GetDyeingIP(const char* pCommand, _DyeIPInfo& objDyeIPInfo);                                         //获得染色IP的相关信息
+    bool GetDyeingCommand(const char* pCommand, _DyeCommandInfo& objDyeCommandInfo);                          //获得染色Command的相关信息
 
     //命令具体实现部分
 private:

@@ -19,6 +19,7 @@
 #include "IModuleInfo.h"
 #include "IServerManager.h"
 #include "IMessageBlockManager.h"
+#include "IFrameCommand.h"
 
 class CServerObject
 {
@@ -37,6 +38,7 @@ public:
         m_pMessageBlockManager  = NULL;
         m_pTimerManager         = NULL;
         m_pIModuleInfo          = NULL;
+        m_pFrameCommand         = NULL;
     }
 
     virtual ~CServerObject() {}
@@ -89,6 +91,11 @@ public:
         m_pMessageBlockManager = pMessageBlockManager;
     }
 
+    void SetFrameCommand(IFrameCommand* pFrameCommand)
+    {
+        m_pFrameCommand = pFrameCommand;
+    }
+
     IMessageManager*       GetMessageManager()
     {
         return m_pIMessageManager;
@@ -138,6 +145,11 @@ public:
         return m_pMessageBlockManager;
     }
 
+    IFrameCommand* GetFrameCommand()
+    {
+        return m_pFrameCommand;
+    }
+
 private:
     IMessageManager*       m_pIMessageManager;
     ILogManager*           m_pLogManager;
@@ -151,6 +163,7 @@ private:
     IModuleInfo*           m_pIModuleInfo;
     IServerManager*        m_pIServerManager;
     IMessageBlockManager*  m_pMessageBlockManager;
+    IFrameCommand*         m_pFrameCommand;
 };
 
 typedef ACE_Singleton<CServerObject, ACE_Null_Mutex> App_ServerObject;

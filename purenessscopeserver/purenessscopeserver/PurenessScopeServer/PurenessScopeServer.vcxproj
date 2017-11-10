@@ -181,6 +181,7 @@
   <ItemGroup>
     <ClCompile Include="Common\ServerMessageTask.cpp" />
     <ClCompile Include="Console\ConsolePromiss.cpp" />
+    <ClCompile Include="Console\FrameCommand.cpp" />
     <ClCompile Include="Message\MessageDyeingManager.cpp" />
     <ClCompile Include="PurenessScopeServer.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -523,6 +524,7 @@
     <ClInclude Include="Common\TimeWheelLink.h" />
     <ClInclude Include="Common\Trace.h" />
     <ClInclude Include="Console\ConsolePromiss.h" />
+    <ClInclude Include="Console\FrameCommand.h" />
     <ClInclude Include="Encrypt\Aes.h" />
     <ClInclude Include="FileTest\FileTest.h" />
     <ClInclude Include="FileTest\FileTestManager.h" />
@@ -533,6 +535,7 @@
     <ClInclude Include="IObject\IClientParse.h" />
     <ClInclude Include="IObject\IConnectManager.h" />
     <ClInclude Include="IObject\IControlListen.h" />
+    <ClInclude Include="IObject\IFrameCommand.h" />
     <ClInclude Include="IObject\ILogManager.h" />
     <ClInclude Include="IObject\ILogObject.h" />
     <ClInclude Include="IObject\IMessage.h" />
