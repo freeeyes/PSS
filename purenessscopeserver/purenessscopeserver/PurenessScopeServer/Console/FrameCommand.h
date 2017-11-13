@@ -11,9 +11,6 @@ public:
     virtual ~CFrameCommand();
 
     int DoFrameCommand(const char* pCommand, IBuffPacket* pBuffPacket);
-
-private:
-    CConsoleMessage m_ConsoleMessage;
 };
 
 #endif

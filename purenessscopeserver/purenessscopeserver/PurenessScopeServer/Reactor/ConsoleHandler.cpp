@@ -96,7 +96,7 @@ int CConsoleHandler::open(void*)
 {
     m_nIOCount = 1;
     //初始化key值列表
-    m_ConsoleMessage.SetConsoleKey(App_MainConfig::instance()->GetConsoleKey());
+    App_ConsoleManager::instance()->SetConsoleKey(App_MainConfig::instance()->GetConsoleKey());
     int nRet = ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>::open();
 
     if (nRet != 0)
@@ -533,7 +533,7 @@ bool CConsoleHandler::CheckMessage()
     //将数据Buff放入消息体中
     //将数据Buff放入消息体中，传递给处理类。
     uint8 u1Output = 0;
-    uint32 u4Return = (uint32)m_ConsoleMessage.Dispose(m_pPacketParse->GetMessageBody(), pBuffPacket, u1Output);
+    uint32 u4Return = (uint32)App_ConsoleManager::instance()->Dispose(m_pPacketParse->GetMessageBody(), pBuffPacket, u1Output);
 
     if (CONSOLE_MESSAGE_SUCCESS == u4Return)
     {

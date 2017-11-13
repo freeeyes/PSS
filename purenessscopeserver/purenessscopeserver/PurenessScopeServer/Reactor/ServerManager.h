@@ -25,6 +25,7 @@
 #include "CommandAccount.h"
 #include "ModuleMessageManager.h"
 #include "ControlListen.h"
+#include "FrameCommand.h"
 
 class Frame_Logging_Strategy;
 
@@ -44,10 +45,10 @@ private:
     bool Run();
 
 private:
-    //CConnectAcceptorManager m_ConnectAcceptorManager;    //普通客户端链接
     ConnectConsoleAcceptor  m_ConnectConsoleAcceptor;    //后台管理链接
     CFileLogger*            m_pFileLogger;               //日志类型
-    Frame_Logging_Strategy* m_pFrameLoggingStrategy;   //输出对象
+    Frame_Logging_Strategy* m_pFrameLoggingStrategy;     //输出对象
+    CFrameCommand           m_objFrameCommand;           //框架命令
 };
 
 
