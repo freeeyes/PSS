@@ -282,4 +282,5 @@ private:
     CConsolePromissions m_objConsolePromissions;
 };
 
+typedef ACE_Singleton<CConsoleMessage, ACE_Null_Mutex> App_ConsoleManager;
 #endif

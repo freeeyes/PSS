@@ -142,6 +142,7 @@ bool CProServerManager::Init()
     App_ServerObject::instance()->SetControlListen(dynamic_cast<IControlListen*>(App_ProControlListen::instance()));
     App_ServerObject::instance()->SetModuleInfo(dynamic_cast<IModuleInfo*>(App_ModuleLoader::instance()));
     App_ServerObject::instance()->SetMessageBlockManager(dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()));
+    App_ServerObject::instance()->SetFrameCommand(dynamic_cast<IFrameCommand*>(&m_objFrameCommand));
     App_ServerObject::instance()->SetServerManager(this);
 
     //初始化消息处理线程

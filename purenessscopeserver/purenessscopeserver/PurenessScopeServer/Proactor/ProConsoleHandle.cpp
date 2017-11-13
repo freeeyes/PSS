@@ -108,7 +108,7 @@ void CProConsoleHandle::open(ACE_HANDLE h, ACE_Message_Block&)
     ACE_Time_Value tvOpenBegin(ACE_OS::gettimeofday());
 
     //初始化key值列表
-    m_ConsoleMessage.SetConsoleKey(App_MainConfig::instance()->GetConsoleKey());
+    App_ConsoleManager::instance()->SetConsoleKey(App_MainConfig::instance()->GetConsoleKey());
 
     //OUR_DEBUG((LM_INFO, "[CProConsoleHandle::open] [0x%08x]Connection from [%s:%d]\n", this, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
 
@@ -493,7 +493,7 @@ bool CProConsoleHandle::CheckMessage()
 
         //将数据Buff放入消息体中，传递给处理类。
         uint8 u1Output = 0;
-        uint32 u4Return = (uint32)m_ConsoleMessage.Dispose(m_pPacketParse->GetMessageBody(), pBuffPacket, u1Output);
+        uint32 u4Return = (uint32)App_ConsoleManager::instance()->Dispose(m_pPacketParse->GetMessageBody(), pBuffPacket, u1Output);
 
         if(CONSOLE_MESSAGE_SUCCESS == u4Return)
         {

@@ -4,7 +4,6 @@
 
 CServerManager::CServerManager(void)
 {
-    m_pFileLogger = NULL;
     m_pFrameLoggingStrategy = NULL;
 }
 
@@ -65,18 +64,18 @@ bool CServerManager::Init()
     }
 
     //初始化日志系统线程
-    m_pFileLogger = new CFileLogger();
+    CFileLogger* pFileLogger = new CFileLogger();
 
-    if (NULL == m_pFileLogger)
+    if (NULL == pFileLogger)
     {
         OUR_DEBUG((LM_INFO, "[CServerManager::Init]pFileLogger new is NULL.\n"));
         return false;
     }
 
-    m_pFileLogger->Init();
+    pFileLogger->Init();
     AppLogManager::instance()->Init(1, MAX_MSG_THREADQUEUE, App_MainConfig::instance()->GetConnectAlert()->m_u4MailID);
 
-    if (0 != AppLogManager::instance()->RegisterLog(m_pFileLogger))
+    if (0 != AppLogManager::instance()->RegisterLog(pFileLogger))
     {
         OUR_DEBUG((LM_INFO, "[CServerManager::Init]AppLogManager::instance()->RegisterLog error.\n"));
         return false;
@@ -128,6 +127,7 @@ bool CServerManager::Init()
     App_ServerObject::instance()->SetControlListen(dynamic_cast<IControlListen*>(App_ControlListen::instance()));
     App_ServerObject::instance()->SetModuleInfo(dynamic_cast<IModuleInfo*>(App_ModuleLoader::instance()));
     App_ServerObject::instance()->SetMessageBlockManager(dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()));
+    App_ServerObject::instance()->SetFrameCommand(dynamic_cast<IFrameCommand*>(&m_objFrameCommand));
     App_ServerObject::instance()->SetServerManager(this);
 
     //初始化消息处理线程

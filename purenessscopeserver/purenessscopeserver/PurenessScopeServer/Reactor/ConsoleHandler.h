@@ -76,7 +76,6 @@ private:
     CBuffPacket                m_AlivePacket;                  //服务器生存包
     CConsolePacketParse*       m_pPacketParse;                 //数据包解析类
     ACE_Message_Block*         m_pCurrMessage;                 //当前的MB对象
-    CConsoleMessage            m_ConsoleMessage;               //管理消息处理类
 };
 
 #endif
