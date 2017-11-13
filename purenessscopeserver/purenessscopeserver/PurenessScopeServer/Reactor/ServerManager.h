@@ -46,7 +46,6 @@ private:
 
 private:
     ConnectConsoleAcceptor  m_ConnectConsoleAcceptor;    //后台管理链接
-    CFileLogger*            m_pFileLogger;               //日志类型
     Frame_Logging_Strategy* m_pFrameLoggingStrategy;     //输出对象
     CFrameCommand           m_objFrameCommand;           //框架命令
 };
