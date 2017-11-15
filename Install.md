@@ -22,10 +22,10 @@
 > 另外，如果在linux下使用epoll模型的话  
 > 请配置/etc/security/limits.conf文件。  
 > 在里面添加  
-> *        soft    noproc  10000  
-> *        hard    noproc  10000  
-> *        soft    nofile  10000  
-> *        hard    nofile  10000   
+> `*        soft    noproc  10000`  
+> `*        hard    noproc  10000`  
+> `*        soft    nofile  10000`  
+> `*        hard    nofile  10000`   
 ## (2)PSS的编译安装(以Linux为例，Windows本身请安装V2015,程序有专门的工程文件，打开编译即可)
 > 下载PSS并解压，在PurenessScopeServer/Linux_Bin路径下。  
 > 首先设置脚本运行权限
