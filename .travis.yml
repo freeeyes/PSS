@@ -17,21 +17,10 @@ env:
     - COMPILER=g++-7
 
 before_install:
-  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-  - sudo apt-get -qq update
-  #Codecov
-  - sudo pip install codecov
-  - chmod +x .get_code_cov_pss.sh
-
   - mkdir -p $ACEDIR
   - cd $ACEDIR
   - wget http://download.dre.vanderbilt.edu/previous_versions/ACE-6.4.0.tar.gz
   - tar zxf ACE-6.4.0.tar.gz
-
-install:
-  #Codecov
-  #- sudo apt-get install -qq g++-5
-  - sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-5 90
 
 before_script:
   - export
@@ -55,11 +44,4 @@ script:
   - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
   - $ACE_ROOT/bin/mwc.pl -type gnuace pss4codecov.mwc
   - make -j 8
-  - sh runpss.sh
-  - sleep 10
-  - sh killp
-  #Codecov
-  - ../../../../.get_code_cov_pss.sh
 
-after_success: 
-  - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
