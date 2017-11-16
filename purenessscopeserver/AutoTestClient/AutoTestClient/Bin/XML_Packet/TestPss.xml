@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ORDER:传输数据的格式 主机序是 -->
+<PlugIn Name="TcpTest" desc="TcpTest" IP="127.0.0.1" Port="10002" ORDER="HOST">
+	<Command CommandName="Login" Count="1" TimeCost="100" ThreadCount="1">
+		<Packet_Send>
+			<short name="Version">1</short>
+			<short name="CommandID">0x1000</short>
+			<int name="PacketBodyLen">8</int>
+			<char name="SessionID" length="32" IsString="1">freeeyes</char>
+			<char name="Data" length="8" IsString="1">Hello</char>
+		</Packet_Send>
+		<Packet_Recv>
+			<int name="PacketLen">8</int>
+			<char name="Data" length="8" IsString="1">Hello</char>
+		</Packet_Recv>		
+	</Command>
+</PlugIn>
