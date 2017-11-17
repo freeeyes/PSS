@@ -96,8 +96,9 @@ void CMakePacket::SetMessage(_MakePacket* pMakePacket, CMessage* pMessage, ACE_T
             pMessage->GetMessageBase()->m_u2Cmd         = CLIENT_LINK_SENDOK;
         }
 
-        pMessage->GetMessageBase()->m_u4ConnectID   = pMakePacket->m_u4ConnectID;
-        pMessage->GetMessageBase()->m_tvRecvTime    = tvNow;
+        pMessage->GetMessageBase()->m_u4ConnectID     = pMakePacket->m_u4ConnectID;
+        pMessage->GetMessageBase()->m_tvRecvTime      = tvNow;
+        pMessage->GetMessageBase()->m_u4PacketParseID = pMakePacket->m_u4PacketParseID;
 
         if(NULL != pMakePacket->m_pPacketParse)
         {

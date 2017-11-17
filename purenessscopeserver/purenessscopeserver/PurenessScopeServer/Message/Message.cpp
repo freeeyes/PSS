@@ -119,12 +119,6 @@ bool CMessage::SetPacketBody(ACE_Message_Block* pmbBody)
 
 void CMessage::Close()
 {
-    if(NULL != m_pMessageBase)
-    {
-        delete m_pMessageBase;
-        m_pMessageBase = NULL;
-    }
-
     if(NULL != m_pmbHead)
     {
         App_MessageBlockManager::instance()->Close(m_pmbHead);
@@ -142,6 +136,8 @@ void CMessage::Close()
         m_pmbQueuePtr->release();
         m_pmbQueuePtr = NULL;
     }
+
+    SAFE_DELETE(m_pMessageBase);
 }
 
 void CMessage::Clear()
@@ -156,6 +152,11 @@ void CMessage::Clear()
     {
         App_MessageBlockManager::instance()->Close(m_pmbBody);
         m_pmbBody = NULL;
+    }
+
+    if (NULL != m_pMessageBase)
+    {
+        m_pMessageBase->Clear();
     }
 }
 

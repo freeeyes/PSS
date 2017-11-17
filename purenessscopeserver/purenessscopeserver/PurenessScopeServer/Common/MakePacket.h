@@ -24,13 +24,14 @@ using namespace std;
 
 struct _MakePacket
 {
-    uint32         m_u4ConnectID;    //链接ID
-    int32          m_nHashID;        //对应记录hash的ID
-    CPacketParse*  m_pPacketParse;   //数据包数据指针
-    uint8          m_PacketType;     //数据包类型
-    uint8          m_u1Option;       //操作类型
-    ACE_INET_Addr  m_AddrRemote;     //数据包的来源IP信息
-    ACE_INET_Addr  m_AddrListen;     //数据包来源监听IP信息
+    uint32         m_u4ConnectID;       //链接ID
+    uint32         m_u4PacketParseID;   //对应ConnectID的PacketParseID
+    int32          m_nHashID;           //对应记录hash的ID
+    CPacketParse*  m_pPacketParse;      //数据包数据指针
+    uint8          m_PacketType;        //数据包类型
+    uint8          m_u1Option;          //操作类型
+    ACE_INET_Addr  m_AddrRemote;        //数据包的来源IP信息
+    ACE_INET_Addr  m_AddrListen;        //数据包来源监听IP信息
 
     _MakePacket()
     {
@@ -39,6 +40,7 @@ struct _MakePacket
         m_u1Option          = 0;
         m_pPacketParse      = NULL;
         m_nHashID           = 0;
+        m_u4PacketParseID   = 0;
     }
 
     void Clear()
@@ -47,6 +49,7 @@ struct _MakePacket
         m_u4ConnectID       = 0;
         m_u1Option          = 0;
         m_pPacketParse      = NULL;
+        m_u4PacketParseID   = 0;
     }
 
     void SetHashID(int32 nHashID)

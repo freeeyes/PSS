@@ -58,6 +58,8 @@ public:
 
     void Init(uint16 u2HandlerID);                                           //Connect Pool初始化调用时候调用的方法
     void SetPacketParseInfoID(uint32 u4PacketParseInfoID);                   //设置对应的m_u4PacketParseInfoID
+    uint32 GetPacketParseInfoID();                                           //获得相应的m_u4PacketParseInfoID
+
 
     bool CheckSendMask(uint32 u4PacketLen);                                  //检测指定的连接发送数据是否超过阻塞阀值
     bool SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, uint8 u1State, uint8 u1SendType, uint32& u4PacketSize, bool blDelete, int nServerID);  //发送当前数据

@@ -14,6 +14,7 @@ struct _MessageBase
     uint32         m_u4Port;                    //客户端端口
     uint32         m_u4ListenPort;              //监听端口
     uint32         m_u4WorkThreadID;            //工作线程ID
+    uint32         m_u4PacketParseID;           //与ConnectID对应的解析器ID
     uint16         m_u2Cmd;                     //命令字的ID
     uint8          m_u1PacketType;              //数据包来源类型
     char           m_szIP[MAX_BUFF_20];         //客户端IP
@@ -24,18 +25,36 @@ struct _MessageBase
 
     _MessageBase()
     {
-        m_u1PacketType   = PACKET_TCP;   //默认为TCP
-        m_u4ConnectID    = 0;
-        m_u4PacketID     = 0;
-        m_u2Cmd          = 0;
-        m_u4HeadSrcSize  = 0;
-        m_u4BodySrcSize  = 0;
-        m_u4WorkThreadID = 0;
-        m_u4ListenPort   = 0;
-        m_u4Port         = 0;
-        m_szIP[0]        = '\0';
-        m_szListenIP[0]  = '\0';
-        m_szTraceID[0]   = '\0';
+        m_u1PacketType    = PACKET_TCP;   //默认为TCP
+        m_u4ConnectID     = 0;
+        m_u4PacketID      = 0;
+        m_u2Cmd           = 0;
+        m_u4HeadSrcSize   = 0;
+        m_u4BodySrcSize   = 0;
+        m_u4WorkThreadID  = 0;
+        m_u4PacketParseID = 0;
+        m_u4ListenPort    = 0;
+        m_u4Port          = 0;
+        m_szIP[0]         = '\0';
+        m_szListenIP[0]   = '\0';
+        m_szTraceID[0]    = '\0';
+    }
+
+    void Clear()
+    {
+        m_u1PacketType    = PACKET_TCP;   //默认为TCP
+        m_u4ConnectID     = 0;
+        m_u4PacketID      = 0;
+        m_u2Cmd           = 0;
+        m_u4HeadSrcSize   = 0;
+        m_u4BodySrcSize   = 0;
+        m_u4WorkThreadID  = 0;
+        m_u4PacketParseID = 0;
+        m_u4ListenPort    = 0;
+        m_u4Port          = 0;
+        m_szIP[0]         = '\0';
+        m_szListenIP[0]   = '\0';
+        m_szTraceID[0]    = '\0';
     }
 };
 

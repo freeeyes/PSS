@@ -84,6 +84,7 @@ public:
     void SetSendQueueTimeCost(uint32 u4TimeCost);                             //记录当前从发送队列到数据发送完成的具体时间消耗
     void SetSendCacheManager(ISendCacheManager* pSendCacheManager);           //设置发送缓冲接口
     void SetPacketParseInfoID(uint32 u4PacketParseInfoID);                    //设置对应的m_u4PacketParseInfoID
+    uint32 GetPacketParseInfoID();                                            //获得相应的m_u4PacketParseInfoID
 
 private:
     bool RecvClinetPacket(uint32 u4PackeLen);                                 //接受数据包

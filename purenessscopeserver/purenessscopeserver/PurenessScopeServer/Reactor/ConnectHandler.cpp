@@ -148,6 +148,11 @@ void CConnectHandler::SetPacketParseInfoID(uint32 u4PacketParseInfoID)
     m_u4PacketParseInfoID = u4PacketParseInfoID;
 }
 
+uint32 CConnectHandler::GetPacketParseInfoID()
+{
+    return m_u4PacketParseInfoID;
+}
+
 uint32 CConnectHandler::GetHandlerID()
 {
     return m_u4HandlerID;
@@ -1741,6 +1746,7 @@ bool CConnectHandler::CheckMessage()
     objMakePacket.m_u4ConnectID       = GetConnectID();
     objMakePacket.m_pPacketParse      = m_pPacketParse;
     objMakePacket.m_AddrRemote        = m_addrRemote;
+    objMakePacket.m_u4PacketParseID   = GetPacketParseInfoID();
 
     if(ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
     {
