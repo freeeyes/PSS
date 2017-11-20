@@ -73,6 +73,16 @@ void CConnectHandler::Close()
 
     objMakePacket.m_u4ConnectID       = GetConnectID();
     objMakePacket.m_pPacketParse      = NULL;
+    objMakePacket.m_AddrRemote        = m_addrRemote;
+
+    if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
+    {
+        objMakePacket.m_AddrListen.set(m_u4LocalPort);
+    }
+    else
+    {
+        objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
+    }
 
     if (CONNECT_SERVER_CLOSE == m_u1ConnectState)
     {
@@ -324,6 +334,16 @@ int CConnectHandler::open(void*)
     objMakePacket.m_u4ConnectID       = GetConnectID();
     objMakePacket.m_pPacketParse      = NULL;
     objMakePacket.m_u1Option          = PACKET_CONNECT;
+    objMakePacket.m_AddrRemote        = m_addrRemote;
+
+    if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
+    {
+        objMakePacket.m_AddrListen.set(m_u4LocalPort);
+    }
+    else
+    {
+        objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
+    }
 
     //发送链接建立消息。
     ACE_Time_Value tvNow = ACE_OS::gettimeofday();
@@ -950,9 +970,19 @@ uint32 CConnectHandler::file_open(IFileTestManager* pFileTest)
     //组织数据
     _MakePacket objMakePacket;
 
-    objMakePacket.m_u4ConnectID = GetConnectID();
+    objMakePacket.m_u4ConnectID  = GetConnectID();
     objMakePacket.m_pPacketParse = NULL;
-    objMakePacket.m_u1Option = PACKET_CONNECT;
+    objMakePacket.m_u1Option     = PACKET_CONNECT;
+    objMakePacket.m_AddrRemote   = m_addrRemote;
+
+    if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
+    {
+        objMakePacket.m_AddrListen.set(m_u4LocalPort);
+    }
+    else
+    {
+        objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
+    }
 
     //发送链接建立消息。
     ACE_Time_Value tvNow = ACE_OS::gettimeofday();
@@ -1148,6 +1178,16 @@ void CConnectHandler::SetSendQueueTimeCost(uint32 u4TimeCost)
         objMakePacket.m_u4ConnectID       = GetConnectID();
         objMakePacket.m_pPacketParse      = NULL;
         objMakePacket.m_u1Option          = PACKET_SEND_TIMEOUT;
+        objMakePacket.m_AddrRemote        = m_addrRemote;
+
+        if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
+        {
+            objMakePacket.m_AddrListen.set(m_u4LocalPort);
+        }
+        else
+        {
+            objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
+        }
 
         //告诉插件连接发送超时阀值报警
         if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
@@ -1665,6 +1705,16 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
                 objMakePacket.m_u4ConnectID       = GetConnectID();
                 objMakePacket.m_pPacketParse      = &objPacketParse;
                 objMakePacket.m_u1Option          = PACKET_SEND_OK;
+                objMakePacket.m_AddrRemote        = m_addrRemote;
+
+                if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
+                {
+                    objMakePacket.m_AddrListen.set(m_u4LocalPort);
+                }
+                else
+                {
+                    objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
+                }
 
                 //发送客户端链接断开消息。
                 ACE_Time_Value tvNow = ACE_OS::gettimeofday();
