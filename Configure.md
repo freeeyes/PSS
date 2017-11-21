@@ -235,11 +235,184 @@
 </table>
 
 ## logger.xml(框架日志配置信息)  
-
+<table width="100%" border="1" cellpadding="0" cellspacing="0">
+        <tr>
+            <th>标签</th>
+			<th>标签说明</th>
+            <th colspan="2">属性信息</th>
+        </tr>
+        <tr>
+            <th rowspan="3">ServerLogHead</th>
+            <th rowspan="3">服务器日志文件统一标头</th>
+            <th>属性</th>
+            <th>说明</th>
+        </tr>
+		<tr><th>Text</th><th>日志统一标头</th></tr>
+		<tr><th>desc</th><th>当前标签描述信息</th></tr>
+        <tr>
+            <th rowspan="3">LogPath</th>
+            <th rowspan="3">日志文件夹路径</th>
+            <th>属性</th>
+            <th>说明</th>
+        </tr>
+		<tr><th>Path</th><th>日志文件夹路径</th></tr>
+		<tr><th>desc</th><th>当前标签描述信息</th></tr>
+        <tr>
+            <th rowspan="4">LogPool</th>
+            <th rowspan="4">日志记录缓冲池相关配置</th>
+            <th>属性</th>
+            <th>说明</th>
+        </tr>
+		<tr><th>BlockSize</th><th>单个日志块大小</th></tr>
+		<tr><th>PoolCount</th><th>日志缓冲池个数</th></tr>
+		<tr><th>desc</th><th>当前标签描述信息</th></tr>
+        <tr>
+            <th rowspan="3">LogLevel</th>
+            <th rowspan="3">日志等级相关配置</th>
+            <th>属性</th>
+            <th>说明</th>
+        </tr>
+		<tr><th>CurrLevel</th><th>当然日志等级，只有大于此等级的日志会被记录，低于此等级的日志不会被记录</th></tr>
+		<tr><th>desc</th><th>当前标签描述信息</th></tr>
+        <tr>
+            <th rowspan="7">LogInfo</th>
+            <th rowspan="7">具体日志信息(可以是多个)</th>
+            <th>属性</th>
+            <th>说明</th>
+        </tr>
+		<tr><th>logid</th><th>当前Log日志的ID，必须唯一</th></tr>
+		<tr><th>logtype</th><th>日志类型，1为Operation文件夹日志，2为ServerError日志</th></tr>
+		<tr><th>Display</th><th>是否显示输出，如果是选择显示，则不再输出到文件中，0为否，1为是</th></tr>
+		<tr><th>Level</th><th>当前日志等级，可以按需要任意设定，和CurrLevel对应</th></tr>
+		<tr><th>logname</th><th>日志名称，会一天生成一个</th></tr>
+		<tr><th>desc</th><th>当前标签描述信息</th></tr>
+</table>
 ## forbiddenIP.xml(IP禁用配置信息)  
-
+<table width="100%" border="1" cellpadding="0" cellspacing="0">
+        <tr>
+            <th>标签</th>
+			<th>标签说明</th>
+            <th colspan="2">属性信息</th>
+        </tr>
+        <tr>
+            <th rowspan="4">ForbiddenIP</th>
+            <th rowspan="4">禁止访问的客户端IP列表(可以是多个)</th>
+            <th>属性</th>
+            <th>说明</th>
+        </tr>
+		<tr><th>ip</th><th>要禁止连接的客户端IP</th></tr>
+		<tr><th>type</th><th>连接类型,TCP或者UDP</th></tr>
+		<tr><th>desc</th><th>当前标签描述信息</th></tr>
+</table>
 ## alert.xml(框架报警配置信息)  
-
+<table width="100%" border="1" cellpadding="0" cellspacing="0">
+        <tr>
+            <th>标签</th>
+			<th>标签说明</th>
+            <th colspan="2">属性信息</th>
+        </tr>
+        <tr>
+            <th rowspan="7">AlertConnect</th>
+            <th rowspan="7">连接信息告警配置</th>
+            <th>属性</th>
+            <th>说明</th>
+        </tr>
+		<tr><th>ConnectMin</th><th>当前最小连接数(1分钟内)，如果是0，则不监控,超过这个数字则报警邮件</th></tr>
+		<tr><th>ConnectMax</th><th>当前最大连接数(1分钟内)，如果是0，则不监控,超过这个数字则报警邮件</th></tr>
+		<tr><th>DisConnectMin</th><th>当前最小断开连接数(1分钟内)，如果是0，则不监控,超过这个数字则报警邮件</th></tr>
+		<tr><th>DisConnectMax</th><th>当前最大断开连接数(1分钟内)，如果是0，则不监控,超过这个数字则报警邮件</th></tr>
+		<tr><th>ConnectAlert</th><th>当前存有的最大连接数，超过这个数字则报警邮件</th></tr>
+		<tr><th>desc</th><th>当前标签描述信息</th></tr>
+        <tr>
+            <th rowspan="4">IP</th>
+            <th rowspan="4">客户端IP连接数监控报警</th>
+            <th>属性</th>
+            <th>说明</th>
+        </tr>
+		<tr><th>IPMax</th><th>同一个客户端IP连接的最大数量(单位时间内)，超过这个数字则报警邮件</th></tr>
+		<tr><th>Timeout</th><th>检测周期，单位时间时长，单位是秒</th></tr>
+		<tr><th>desc</th><th>当前标签描述信息</th></tr>
+        <tr>
+            <th rowspan="7">ClientData</th>
+            <th rowspan="7">单位时间，单个连接接收发送数据监控配置</th>
+            <th>属性</th>
+            <th>说明</th>
+        </tr>
+		<tr><th>RecvPacketCount</th><th>1分钟内接收单个连接的数据包个数最大阈值，超过这个数字则报警邮件</th></tr>
+		<tr><th>RecvDataMax</th><th>1分钟内接收单个连接的数据包总大小最大阈值，超过这个数字则报警邮件</th></tr>
+		<tr><th>SendPacketCount</th><th1分钟内发送单个连接的数据包个数最大阈值，超过这个数字则报警邮件</th></tr>
+		<tr><th>SendDataMax</th><th>1分钟内发送单个连接的数据包总大小最大阈值，超过这个数字则报警邮件</th></tr>
+		<tr><th>MailID</th><th>对应发送邮件信息的ID</th></tr>
+		<tr><th>desc</th><th>当前标签描述信息</th></tr>
+        <tr>
+            <th rowspan="5">CommandInfo</th>
+            <th rowspan="5">信令监控配置信息(可以是多个)</th>
+            <th>属性</th>
+            <th>说明</th>
+        </tr>
+		<tr><th>CommandID</th><th>需要监控的信令ID/th></tr>
+		<tr><th>CommandCount</th><th>1分钟内处理该信令的最大数字，如果是0则不监控，超过这个数字则报警邮件</th></tr>
+		<tr><th>MailID</th><th>对应发送邮件信息的ID</th></tr>
+		<tr><th>desc</th><th>当前标签描述信息</th></tr>
+        <tr>
+            <th rowspan="8">Mail</th>
+            <th rowspan="8">报警邮件相关配置(可以是多个)</th>
+            <th>属性</th>
+            <th>说明</th>
+        </tr>
+		<tr><th>MailID</th><th>报警邮件ID/th></tr>
+		<tr><th>fromMailAddr</th><th>设置邮件发送者</th></tr>
+		<tr><th>toMailAddr</th><th>设置邮件接受者</th></tr>
+		<tr><th>MailPass</th><th>邮箱密码</th></tr>
+		<tr><th>MailUrl</th><th>邮箱smtp地址</th></tr>
+		<tr><th>MailPort</th><th>邮箱的smtp端口</th></tr>
+		<tr><th>desc</th><th>当前标签描述信息</th></tr>
+</table>
 ## ConsoleCommand.xml(框架控制指令权限配置信息)  
-
+<table width="100%" border="1" cellpadding="0" cellspacing="0">
+        <tr>
+            <th>标签</th>
+			<th>标签说明</th>
+            <th colspan="2">属性信息</th>
+        </tr>
+        <tr>
+            <th rowspan="4">CommandInfo</th>
+            <th rowspan="4">PSS框架的后台命令权限配置(可以是多个)</th>
+            <th>属性</th>
+            <th>说明</th>
+        </tr>
+		<tr><th>CommandName</th><th>命令名称</th></tr>
+		<tr><th>User</th><th>允许的用户信息，多个用户用逗号隔开</th></tr>
+		<tr><th>desc</th><th>当前标签描述信息</th></tr>
+</table>
 ## FileTestCfg.xml(文件测试接口配置信息)  
+<table width="100%" border="1" cellpadding="0" cellspacing="0">
+        <tr>
+            <th>标签</th>
+			<th>标签说明</th>
+            <th colspan="2">属性信息</th>
+        </tr>
+        <tr>
+            <th rowspan="10">FileTestConfig</th>
+            <th rowspan="10">测试文件接口录入数据包配置</th>
+            <th>属性</th>
+            <th>说明</th>
+        </tr>
+		<tr><th>Path</th><th>测试文件数据包路径</th></tr>
+		<tr><th>TimeInterval</th><th>测试时间周期，单位是秒</th></tr>
+		<tr><th>ConnectCount</th><th>单位周期连接建立数量</th></tr>
+		<tr><th>ResponseCount</th><th>单位周期数据包处理返回数量</th></tr>
+		<tr><th>ExpectTime</th><th>期待测试总耗时，单位是毫秒</th></tr>
+		<tr><th>ParseID</th><th>需要配合框架的解析器插件ID</th></tr>
+		<tr><th>ContentType</th><th>连接类型，1是二进制数据包,0是文本数据包</th></tr>
+		<tr><th>ContentType</th><th>连接类型，1是TCP,2是UDP</th></tr>
+		<tr><th>desc</th><th>当前标签描述信息</th></tr>
+        <tr>
+            <th rowspan="3">FileInfo</th>
+            <th rowspan="3">测试文件包配置(可以是多个)</th>
+            <th>属性</th>
+            <th>说明</th>
+        </tr>
+		<tr><th>FileName</th><th>测试数据包文件名</th></tr>
+		<tr><th>desc</th><th>当前标签描述信息</th></tr>
+</table>
