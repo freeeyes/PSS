@@ -89,20 +89,20 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, c
         m_objHashModuleList.Del_Hash_Data(pModuleInfo->GetName());
     }
 
-    //将注册成功的模块，加入到Hash数组中
-    if (-1 == m_objHashModuleList.Add_Hash_Data(pModuleInfo->GetName(), pModuleInfo))
-    {
-        OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] m_mapModuleInfo.AddMapData error!\n"));
-        SAFE_DELETE(pModuleInfo);
-        return false;
-    }
-
     //开始调用模块初始化动作
     int nRet = pModuleInfo->LoadModuleData(App_ServerObject::instance());
 
     if(nRet != 0)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] strModuleName = %s, Execute Function LoadModuleData is error!\n", strModuleName.c_str()));
+        SAFE_DELETE(pModuleInfo);
+        return false;
+    }
+
+    //将注册成功的模块，加入到Hash数组中
+    if (-1 == m_objHashModuleList.Add_Hash_Data(pModuleInfo->GetName(), pModuleInfo))
+    {
+        OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] m_mapModuleInfo.AddMapData error!\n"));
         SAFE_DELETE(pModuleInfo);
         return false;
     }
