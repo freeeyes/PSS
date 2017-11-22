@@ -42,6 +42,6 @@ before_script:
   - ls $ACE_ROOT/lib/
 script:
   - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
-  - $ACE_ROOT/bin/mwc.pl -type gnuace pss4codecov.mwc
+  - $ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc
   - make -j 8
 
