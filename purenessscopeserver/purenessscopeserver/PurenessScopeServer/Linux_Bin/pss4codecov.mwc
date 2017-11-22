@@ -1,4 +1,0 @@
-workspace(PSS) {
-  makefile4codecov.mpc
-  cmdline += -include $PWD
-}

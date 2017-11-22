@@ -283,6 +283,7 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1LoadS
     string strModuleN     = "";
     string strModulePath  = "";
     string strModuleParam = "";
+    uint32 u4TmpUpdateIndex = 0;
 
     //获得重载对象相关参数
     _ModuleInfo* pModuleInfo = App_ModuleLoader::instance()->GetModuleInfo(pModuleName);
@@ -321,9 +322,11 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1LoadS
                             {
                                 OUR_DEBUG((LM_INFO, "[CMessageManager::UnloadModuleCommand]DelClientCommand(%d) is fail.\n", pClientCommandInfo->m_u2CommandID));
                             }
-
-                            OUR_DEBUG((LM_INFO, "[CMessageManager::UnloadModuleCommand]DelClientCommand(%d) is OK.\n", pClientCommandInfo->m_u2CommandID));
-
+                            else
+                            {
+                                OUR_DEBUG((LM_INFO, "[CMessageManager::UnloadModuleCommand]DelClientCommand(%d) is OK.\n", pClientCommandInfo->m_u2CommandID));
+                            }
+                            
                             //如果该指令下的命令已经不存在，则删除之
                             if(pCClientCommandList->GetCount() == 0)
                             {
@@ -341,15 +344,16 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1LoadS
             }
         }
 
-        m_u4UpdateIndex++;
+        u4TmpUpdateIndex++;
 
         //卸载插件信息(不在这里卸载，在定时器检测所有工作线程都处理完了，再卸载指定的模块,先将需要卸载的模块放入需要卸载的队列)
-        if (false == App_ModuleLoader::instance()->MoveUnloadList(pModuleName, m_u4UpdateIndex, u4ThreadCount, u1LoadState, strModulePath, strModuleN, strModuleParam))
+        if (false == App_ModuleLoader::instance()->MoveUnloadList(pModuleName, u4TmpUpdateIndex, u4ThreadCount, u1LoadState, strModulePath, strModuleN, strModuleParam))
         {
             OUR_DEBUG((LM_ERROR, "[CMessageManager::UnloadModuleCommand]MoveUnloadList error(%s).\n", pModuleName));
         }
     }
 
+    m_u4UpdateIndex = u4TmpUpdateIndex;
     return true;
 }
 

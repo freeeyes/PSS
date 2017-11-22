@@ -122,7 +122,6 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
         return false;
     }
 
-
     //»ñµÃÃüÁîÍ·
     char* pParamBegin = ACE_OS::strstr((char*)pCommandBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), COMMAND_SPLIT_STRING);
 
@@ -181,6 +180,7 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
     if(false == GetCommandInfo(pCommand, CommandInfo))
     {
         OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]pCommand format is error.\n"));
+        App_BuffPacketManager::instance()->Delete(pCurrBuffPacket);
         return CONSOLE_MESSAGE_FAIL;
     }
 
