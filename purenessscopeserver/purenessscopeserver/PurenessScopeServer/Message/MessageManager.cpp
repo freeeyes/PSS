@@ -322,6 +322,8 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1LoadS
                                 OUR_DEBUG((LM_INFO, "[CMessageManager::UnloadModuleCommand]DelClientCommand(%d) is fail.\n", pClientCommandInfo->m_u2CommandID));
                             }
 
+                            OUR_DEBUG((LM_INFO, "[CMessageManager::UnloadModuleCommand]DelClientCommand(%d) is OK.\n", pClientCommandInfo->m_u2CommandID));
+
                             //如果该指令下的命令已经不存在，则删除之
                             if(pCClientCommandList->GetCount() == 0)
                             {
@@ -342,19 +344,9 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1LoadS
         m_u4UpdateIndex++;
 
         //卸载插件信息(不在这里卸载，在定时器检测所有工作线程都处理完了，再卸载指定的模块,先将需要卸载的模块放入需要卸载的队列)
-        if (false == App_ModuleLoader::instance()->MoveUnloadList(pModuleName, m_u4UpdateIndex, u4ThreadCount))
+        if (false == App_ModuleLoader::instance()->MoveUnloadList(pModuleName, m_u4UpdateIndex, u4ThreadCount, u1LoadState, strModulePath, strModuleN, strModuleParam))
         {
             OUR_DEBUG((LM_ERROR, "[CMessageManager::UnloadModuleCommand]MoveUnloadList error(%s).\n", pModuleName));
-        }
-    }
-
-    //看看是否要重新加载
-    if(u1LoadState == 2)
-    {
-        if(strModulePath.length() > 0)
-        {
-            //重新加载
-            App_ModuleLoader::instance()->LoadModule(strModulePath.c_str(), strModuleN.c_str(), strModuleParam.c_str());
         }
     }
 

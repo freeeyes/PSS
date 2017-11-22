@@ -163,11 +163,18 @@ int CMessageService::svc(void)
 
                 if (u4UpdateIndex > 0)
                 {
-                    App_ModuleLoader::instance()->UnloadListUpdate(u4UpdateIndex);
+                    int nReload = App_ModuleLoader::instance()->UnloadListUpdate(u4UpdateIndex);
+
+                    if (1 == nReload)
+                    {
+                        //需要通知大家再更新一下副本(让新的加载生效)
+                        App_MessageServiceGroup::instance()->PutUpdateCommandMessage(App_MessageManager::instance()->GetUpdateIndex());
+                    }
+
+                    //同步信令列表
+                    CopyMessageManagerList();
                 }
 
-                //同步信令列表
-                CopyMessageManagerList();
                 App_MessageBlockManager::instance()->Close(mb);
                 continue;
             }

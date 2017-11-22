@@ -42,16 +42,23 @@ struct _ModuleInfo
 
 struct _WaitUnloadModule
 {
-    uint32           m_u4UpdateIndex;
-    uint32           m_u4ThreadCurrEndCount;
-    char             m_szModuleName[MAX_BUFF_100];
-    ACE_SHLIB_HANDLE m_hModule;
+    uint32           m_u4UpdateIndex;                //工作线程总数
+    uint32           m_u4ThreadCurrEndCount;         //当前已经结束的工作线程个数
+    uint8            m_u1UnloadState;                //重载状态，1为卸载，2为重载
+    char             m_szModuleName[MAX_BUFF_100];   //插件名称
+    ACE_SHLIB_HANDLE m_hModule;                      //插件的指针
+    int (*UnLoadModuleData)(void);                   //卸载插件的函数指针
+    string           m_strModuleName;                //模块文件名称
+    string           m_strModulePath;                //模块路径
+    string           m_strModuleParam;               //模块启动参数
 
     _WaitUnloadModule()
     {
+        m_u1UnloadState        = 0;
         m_u4ThreadCurrEndCount = 0;
         m_u4UpdateIndex        = 0;
         m_szModuleName[0]      = '\0';
+        UnLoadModuleData       = NULL;
     }
 };
 
@@ -67,8 +74,9 @@ public:
 
     bool LoadModule(const char* pModulePath, const char* pModuleName, const char* pModuleParam);
     bool UnLoadModule(const char* szModuleName, bool blIsDelete = true);
-    bool MoveUnloadList(const char* szModuleName, uint32 u4UpdateIndex, uint32 u4ThreadCount);   //将要卸载的插件放入缓冲列表
-    void UnloadListUpdate(uint32 u4UpdateIndex);                                                 //工程线程回调接口，当所有工作线程回调结束，释放插件端口
+    bool MoveUnloadList(const char* szModuleName, uint32 u4UpdateIndex, uint32 u4ThreadCount, uint8 u1UnLoadState,
+                        string strModulePath, string strModuleName, string strModuleParam);                           //将要卸载的插件放入缓冲列表
+    int  UnloadListUpdate(uint32 u4UpdateIndex);                                                                      //工程线程回调接口，当所有工作线程回调结束，释放插件端口，这里返回0则什么都不做，返回1则是需要重新加载副本
 
     int  SendModuleMessage(const char* pModuleName, uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket);
 
