@@ -700,6 +700,7 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
     if (msg_queue()->is_full() == true)
     {
         OUR_DEBUG((LM_ERROR, "[CConnectClient::SendMessage] Connectid=%d,putq is full(%d).\n", GetServerID(), msg_queue()->message_count()));
+        msg_queue()->dump();
         App_MessageBlockManager::instance()->Close(pmblk);
         return false;
     }
