@@ -7,6 +7,7 @@
 
 ## [PSS框架如何编译](Install.md) 
 ## [PSS框架配置说明](Configure.md)
+## [PSS逻辑插件用例说明](examples.md)
 ## [后台指令集合](PSSFrameCommand.md) 
 ## [数据染色功能](Dyeing.md)
 
