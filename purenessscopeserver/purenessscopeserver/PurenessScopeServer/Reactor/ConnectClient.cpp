@@ -99,6 +99,9 @@ int CConnectClient::open(void* p)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadLock);
 
+    msg_queue()->high_water_mark(MAX_MSG_MASK);
+    msg_queue()->low_water_mark(MAX_MSG_MASK);
+
     //从配置文件获取数据
     m_u4MaxPacketSize  = App_MainConfig::instance()->GetRecvBuffSize();
 
