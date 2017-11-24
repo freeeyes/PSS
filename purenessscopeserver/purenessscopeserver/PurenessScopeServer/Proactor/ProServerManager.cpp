@@ -43,41 +43,6 @@ bool CProServerManager::Init()
     //初始化禁止IP列表
     App_ForbiddenIP::instance()->Init(FORBIDDENIP_FILE);
 
-    //初始化连接器
-    uint32 u4ClientProactorCount = (uint32)nReactorCount - 3;
-
-    if (!App_ProConnectAcceptManager::instance()->InitConnectAcceptor(nServerPortCount, u4ClientProactorCount))
-    {
-        OUR_DEBUG((LM_INFO, "[CProServerManager::Init]%s.\n", App_ProConnectAcceptManager::instance()->GetError()));
-        return false;
-    }
-
-    //初始化反应器集合
-    App_ProactorManager::instance()->Init((uint16)nReactorCount);
-
-    //初始化反应器
-    for(int i = 0 ; i < nReactorCount; i++)
-    {
-        OUR_DEBUG((LM_INFO, "[CProServerManager::Init()]... i=[%d].\n",i));
-
-        if(App_MainConfig::instance()->GetNetworkMode() == NETWORKMODE_PRO_IOCP)
-        {
-            blState = App_ProactorManager::instance()->AddNewProactor(i, Proactor_WIN32, 1);
-            OUR_DEBUG((LM_INFO, "[CProServerManager::Init]AddNewProactor NETWORKMODE = Proactor_WIN32.\n"));
-        }
-        else
-        {
-            OUR_DEBUG((LM_INFO, "[CProServerManager::Init]AddNewProactor NETWORKMODE Error.\n"));
-            return false;
-        }
-
-        if(!blState)
-        {
-            OUR_DEBUG((LM_INFO, "[CProServerManager::Init]AddNewProactor [%d] Error.\n", i));
-            return false;
-        }
-    }
-
     //初始化日志系统线程
     CFileLogger* pFileLogger = new CFileLogger();
 
@@ -174,6 +139,41 @@ bool CProServerManager::Init()
 
     //让所有的线程拷同步副本
     App_MessageServiceGroup::instance()->CopyMessageManagerList();
+
+    //初始化连接器
+    uint32 u4ClientProactorCount = (uint32)nReactorCount - 3;
+
+    if (!App_ProConnectAcceptManager::instance()->InitConnectAcceptor(nServerPortCount, u4ClientProactorCount))
+    {
+        OUR_DEBUG((LM_INFO, "[CProServerManager::Init]%s.\n", App_ProConnectAcceptManager::instance()->GetError()));
+        return false;
+    }
+
+    //初始化反应器集合
+    App_ProactorManager::instance()->Init((uint16)nReactorCount);
+
+    //初始化反应器
+    for (int i = 0; i < nReactorCount; i++)
+    {
+        OUR_DEBUG((LM_INFO, "[CProServerManager::Init()]... i=[%d].\n", i));
+
+        if (App_MainConfig::instance()->GetNetworkMode() == NETWORKMODE_PRO_IOCP)
+        {
+            blState = App_ProactorManager::instance()->AddNewProactor(i, Proactor_WIN32, 1);
+            OUR_DEBUG((LM_INFO, "[CProServerManager::Init]AddNewProactor NETWORKMODE = Proactor_WIN32.\n"));
+        }
+        else
+        {
+            OUR_DEBUG((LM_INFO, "[CProServerManager::Init]AddNewProactor NETWORKMODE Error.\n"));
+            return false;
+        }
+
+        if (!blState)
+        {
+            OUR_DEBUG((LM_INFO, "[CProServerManager::Init]AddNewProactor [%d] Error.\n", i));
+            return false;
+        }
+    }
 
     return true;
 }

@@ -42,15 +42,6 @@ bool CServerManager::Init()
     //初始化禁止IP列表
     App_ForbiddenIP::instance()->Init(FORBIDDENIP_FILE);
 
-    //初始化连接器
-    uint32 u4ClientReactorCount = (uint32)nReactorCount - 3;
-
-    if (!App_ConnectAcceptorManager::instance()->InitConnectAcceptor(nServerPortCount, u4ClientReactorCount))
-    {
-        OUR_DEBUG((LM_INFO, "[CServerManager::Init]%s.\n", App_ConnectAcceptorManager::instance()->GetError()));
-        return false;
-    }
-
     OUR_DEBUG((LM_INFO, "[CServerManager::Init]nReactorCount=%d.\n", nReactorCount));
 
     //为多进程做准备，针对epoll和epollet初始化不能在这里去做,因为在多进程里epoll_create必须在子进程里去声明
@@ -159,6 +150,15 @@ bool CServerManager::Init()
 
     //让所有的线程拷同步副本
     App_MessageServiceGroup::instance()->CopyMessageManagerList();
+
+    //初始化连接器
+    uint32 u4ClientReactorCount = (uint32)nReactorCount - 3;
+
+    if (!App_ConnectAcceptorManager::instance()->InitConnectAcceptor(nServerPortCount, u4ClientReactorCount))
+    {
+        OUR_DEBUG((LM_INFO, "[CServerManager::Init]%s.\n", App_ConnectAcceptorManager::instance()->GetError()));
+        return false;
+    }
 
     return true;
 }

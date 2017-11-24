@@ -81,6 +81,15 @@ int LoadModuleData(CServerObject* pServerObject)
         OUR_DEBUG((LM_INFO, "[Base LoadModuleData] pMessageManager = NULL.\n"));
     }
 
+    //显示监听端口信息
+    vecControlInfo objListenList;
+    pServerObject->GetControlListen()->ShowListen(objListenList);
+
+    for (int i = 0; i < (int)objListenList.size(); i++)
+    {
+        OUR_DEBUG((LM_INFO, "[Base LoadModuleData] Listen IP=%s, Pord=%d.\n", objListenList[i].m_szListenIP, objListenList[i].m_u4Port));
+    }
+
     //显示框架工作线程ID
     OUR_DEBUG((LM_INFO, "[Base LoadModuleData] *********************************.\n"));
 
