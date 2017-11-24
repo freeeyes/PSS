@@ -91,17 +91,37 @@ void CProControlListen::ShowListen(vecControlInfo& objProControlInfo)
 {
     objProControlInfo.clear();
 
-    for(int i = 0; i < App_ProConnectAcceptManager::instance()->GetCount(); i++)
+    if (0 == App_ProConnectAcceptManager::instance()->GetCount())
     {
-        ProConnectAcceptor* pProConnectAcceptor = App_ProConnectAcceptManager::instance()->GetConnectAcceptor(i);
+        //监控尚未启动，需要从配置文件中获取
+        int nServerPortCount = App_MainConfig::instance()->GetServerPortCount();
 
-        if(NULL != pProConnectAcceptor)
+        for (int i = 0; i < nServerPortCount; i++)
         {
             _ControlInfo objInfo;
+
+            _ServerInfo* pServerInfo = App_MainConfig::instance()->GetServerPort(i);
+
             sprintf_safe(objInfo.m_szListenIP,
-                         MAX_BUFF_20, "%s", pProConnectAcceptor->GetListenIP());
-            objInfo.m_u4Port = pProConnectAcceptor->GetListenPort();
+                         MAX_BUFF_20, "%s", pServerInfo->m_szServerIP);
+            objInfo.m_u4Port = pServerInfo->m_nPort;
             objProControlInfo.push_back(objInfo);
+        }
+    }
+    else
+    {
+        for (int i = 0; i < App_ProConnectAcceptManager::instance()->GetCount(); i++)
+        {
+            ProConnectAcceptor* pProConnectAcceptor = App_ProConnectAcceptManager::instance()->GetConnectAcceptor(i);
+
+            if (NULL != pProConnectAcceptor)
+            {
+                _ControlInfo objInfo;
+                sprintf_safe(objInfo.m_szListenIP,
+                             MAX_BUFF_20, "%s", pProConnectAcceptor->GetListenIP());
+                objInfo.m_u4Port = pProConnectAcceptor->GetListenPort();
+                objProControlInfo.push_back(objInfo);
+            }
         }
     }
 }
