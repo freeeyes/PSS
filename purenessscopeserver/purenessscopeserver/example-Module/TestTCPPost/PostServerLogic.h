@@ -126,7 +126,9 @@ public:
             ACE_OS::memcpy(&pData[sizeof(uint32)], m_szRecvBuffData, u4PacketLength);
 
             uint32 u4SendLength = u4PacketLength + sizeof(uint32);
-            m_pServerObject->GetConnectManager()->PostMessage(m_u4ConnectID, pData, u4SendLength, SENDMESSAGE_JAMPNOMAL, u2RetCommand, PACKET_SEND_IMMEDIATLY, PACKET_IS_FRAMEWORK_RECYC);
+
+            const char* ptrReturnData = reinterpret_cast<const char*>(pData);
+            m_pServerObject->GetConnectManager()->PostMessage(m_u4ConnectID,ptrReturnData,(uint32)u4SendLength, SENDMESSAGE_JAMPNOMAL, u2RetCommand, PACKET_SEND_IMMEDIATLY, PACKET_IS_SELF_RECYC);
             OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData](%d)Send Data(%d) OK.\n", m_u4ConnectID, u4SendLength));
         }
         else
@@ -157,7 +159,9 @@ public:
             //发送数据
             OUR_DEBUG((LM_ERROR, "[CPostServerData::SendData](%d) Send [%d] Begin.\n", m_u4ServerID, m_u2SendBuffLength));
 
-            if(false == m_pServerObject->GetClientManager()->SendData((int)m_u4ServerID, m_szSendBuffData, m_u2SendBuffLength, false))
+            char* ptrReturnData = const_cast<char*>(m_szSendBuffData);
+
+            if(false == m_pServerObject->GetClientManager()->SendData((int)m_u4ServerID, ptrReturnData, m_u2SendBuffLength, false))
             {
                 //发送失败，缓冲
                 OUR_DEBUG((LM_ERROR, "[CPostServerData::SendData](%d) Send [%d] End 1.\n", m_u4ServerID, m_u2SendBuffLength));
@@ -184,7 +188,7 @@ public:
     //关闭远程服务
     bool Close(EM_s2s ems2s)
     {
-        m_pServerObject->GetClientManager()->Close(m_u4ServerID, ems2s);
+        m_pServerObject->GetClientManager()->Close(m_u4ServerID);
         m_u4ServerID = 0;
         return true;
     }
@@ -203,8 +207,10 @@ public:
 
         if(m_u2SendBuffLength > 0)
         {
+            char* ptrReturnData = const_cast<char*>(m_szSendBuffData);
+
             //发送数据
-            if(true == m_pServerObject->GetClientManager()->SendData((int)m_u4ServerID, m_szSendBuffData, m_u2SendBuffLength, false))
+            if(true == m_pServerObject->GetClientManager()->SendData((int)m_u4ServerID, ptrReturnData, m_u2SendBuffLength, false))
             {
                 //发送成功，清理缓冲
                 m_u2SendBuffLength = 0;
