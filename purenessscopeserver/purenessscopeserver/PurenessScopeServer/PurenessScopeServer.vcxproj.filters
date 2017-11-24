@@ -226,6 +226,9 @@
     <ClCompile Include="Console\FrameCommand.cpp">
       <Filter>Console\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="..\Common\Threading.cpp">
+      <Filter>IObject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\ACEMemory.h">
@@ -246,20 +249,11 @@
     <ClInclude Include="Common\BuffPacketManager.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="IObject\ClientCommand.h">
-      <Filter>IObject</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\ClientMessage.h">
-      <Filter>IObject</Filter>
-    </ClInclude>
     <ClInclude Include="Proactor\ClientProConnectManager.h">
       <Filter>Proactor\hfile</Filter>
     </ClInclude>
     <ClInclude Include="Reactor\ClientReConnectManager.h">
       <Filter>Reactor\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\ClientUDPMassage.h">
-      <Filter>IObject</Filter>
     </ClInclude>
     <ClInclude Include="Common\CommandAccount.h">
       <Filter>Common\hfile</Filter>
@@ -288,9 +282,6 @@
     <ClInclude Include="Reactor\ControlListen.h">
       <Filter>Reactor\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="Common\define.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="Common\Fast_Asynch_Read_Stream.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
@@ -309,68 +300,8 @@
     <ClInclude Include="Common\HashTable.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="IObject\IBuffPacket.h">
-      <Filter>IObject</Filter>
-    </ClInclude>
-    <ClInclude Include="IObject\ICheckPacket.h">
-      <Filter>IObject</Filter>
-    </ClInclude>
-    <ClInclude Include="IObject\IClientManager.h">
-      <Filter>IObject</Filter>
-    </ClInclude>
-    <ClInclude Include="IObject\IClientParse.h">
-      <Filter>IObject</Filter>
-    </ClInclude>
-    <ClInclude Include="IObject\IConnectManager.h">
-      <Filter>IObject</Filter>
-    </ClInclude>
-    <ClInclude Include="IObject\IControlListen.h">
-      <Filter>IObject</Filter>
-    </ClInclude>
-    <ClInclude Include="IObject\ILogManager.h">
-      <Filter>IObject</Filter>
-    </ClInclude>
-    <ClInclude Include="IObject\ILogObject.h">
-      <Filter>IObject</Filter>
-    </ClInclude>
-    <ClInclude Include="IObject\IMessage.h">
-      <Filter>IObject</Filter>
-    </ClInclude>
-    <ClInclude Include="IObject\IMessageBlockManager.h">
-      <Filter>IObject</Filter>
-    </ClInclude>
-    <ClInclude Include="IObject\IMessageManager.h">
-      <Filter>IObject</Filter>
-    </ClInclude>
-    <ClInclude Include="IObject\IModuleInfo.h">
-      <Filter>IObject</Filter>
-    </ClInclude>
-    <ClInclude Include="IObject\IModuleMessageManager.h">
-      <Filter>IObject</Filter>
-    </ClInclude>
-    <ClInclude Include="IObject\IObject.h">
-      <Filter>IObject</Filter>
-    </ClInclude>
     <ClInclude Include="Common\IPAccount.h">
       <Filter>Common\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="IObject\IPacketManager.h">
-      <Filter>IObject</Filter>
-    </ClInclude>
-    <ClInclude Include="IObject\IPacketParse.h">
-      <Filter>IObject</Filter>
-    </ClInclude>
-    <ClInclude Include="IObject\ISendCacheManager.h">
-      <Filter>IObject</Filter>
-    </ClInclude>
-    <ClInclude Include="IObject\IServerManager.h">
-      <Filter>IObject</Filter>
-    </ClInclude>
-    <ClInclude Include="IObject\ITimerManager.h">
-      <Filter>IObject</Filter>
-    </ClInclude>
-    <ClInclude Include="IObject\IUDPConnectManager.h">
-      <Filter>IObject</Filter>
     </ClInclude>
     <ClInclude Include="Common\LinuxCPU.h">
       <Filter>Common\hfile</Filter>
@@ -543,17 +474,92 @@
     <ClInclude Include="Console\ConsolePromiss.h">
       <Filter>Console\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Trace.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="Message\MessageDyeingManager.h">
       <Filter>Message\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="IObject\IFrameCommand.h">
-      <Filter>IObject</Filter>
-    </ClInclude>
     <ClInclude Include="Console\FrameCommand.h">
       <Filter>Console\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\define.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Trace.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ClientCommand.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ClientMessage.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ClientUDPMassage.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\IBuffPacket.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ICheckPacket.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\IClientManager.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\IClientParse.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\IConnectManager.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\IControlListen.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\IFrameCommand.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ILogManager.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ILogObject.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\IMessage.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\IMessageBlockManager.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\IMessageManager.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\IModuleInfo.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\IModuleMessageManager.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\IObject.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\IPacketManager.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\IPacketParse.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ISendCacheManager.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\IServerManager.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ITimerManager.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\IUDPConnectManager.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Threading.h">
+      <Filter>IObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

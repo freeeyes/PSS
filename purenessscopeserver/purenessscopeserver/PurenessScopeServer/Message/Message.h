@@ -5,9 +5,9 @@
 #include "ace/Thread_Mutex.h"
 #include "HashTable.h"
 
-#include "../Common/MessageBlockManager.h"
-#include "../Common/BuffPacket.h"
-#include "../IObject/IMessage.h"
+#include "MessageBlockManager.h"
+#include "BuffPacket.h"
+#include "IMessage.h"
 
 using namespace std;
 

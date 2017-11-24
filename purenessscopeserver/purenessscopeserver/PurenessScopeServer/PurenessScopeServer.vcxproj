@@ -89,7 +89,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ACE_ROOT);./Common;./Encrypt;./IObject;./LogSystem;./Message;./PacketParse;./Proactor;./Reactor;./UDP;./Console;./TinyXML;./Mail;./FileTest;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ACE_ROOT);../Common;./Common;./Encrypt;./LogSystem;./Message;./PacketParse;./Proactor;./Reactor;./UDP;./Console;./TinyXML;./Mail;./FileTest</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -112,7 +112,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ACE_ROOT);./Common;./Encrypt;./IObject;./LogSystem;./Message;./PacketParse;./Proactor;./Reactor;./UDP;./Console;./TinyXML;./Mail;./FileTest;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ACE_ROOT);../Common;./Common;./Encrypt;./LogSystem;./Message;./PacketParse;./Proactor;./Reactor;./UDP;./Console;./TinyXML;./Mail;./FileTest</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -179,6 +179,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Common\Threading.cpp" />
     <ClCompile Include="Common\ServerMessageTask.cpp" />
     <ClCompile Include="Console\ConsolePromiss.cpp" />
     <ClCompile Include="Console\FrameCommand.cpp" />
@@ -519,37 +520,41 @@
     <ClCompile Include="Mail\smtp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Common\ClientCommand.h" />
+    <ClInclude Include="..\Common\ClientMessage.h" />
+    <ClInclude Include="..\Common\ClientUDPMassage.h" />
+    <ClInclude Include="..\Common\define.h" />
+    <ClInclude Include="..\Common\IBuffPacket.h" />
+    <ClInclude Include="..\Common\ICheckPacket.h" />
+    <ClInclude Include="..\Common\IClientManager.h" />
+    <ClInclude Include="..\Common\IClientParse.h" />
+    <ClInclude Include="..\Common\IConnectManager.h" />
+    <ClInclude Include="..\Common\IControlListen.h" />
+    <ClInclude Include="..\Common\IFrameCommand.h" />
+    <ClInclude Include="..\Common\ILogManager.h" />
+    <ClInclude Include="..\Common\ILogObject.h" />
+    <ClInclude Include="..\Common\IMessage.h" />
+    <ClInclude Include="..\Common\IMessageBlockManager.h" />
+    <ClInclude Include="..\Common\IMessageManager.h" />
+    <ClInclude Include="..\Common\IModuleInfo.h" />
+    <ClInclude Include="..\Common\IModuleMessageManager.h" />
+    <ClInclude Include="..\Common\IObject.h" />
+    <ClInclude Include="..\Common\IPacketManager.h" />
+    <ClInclude Include="..\Common\IPacketParse.h" />
+    <ClInclude Include="..\Common\ISendCacheManager.h" />
+    <ClInclude Include="..\Common\IServerManager.h" />
+    <ClInclude Include="..\Common\ITimerManager.h" />
+    <ClInclude Include="..\Common\IUDPConnectManager.h" />
+    <ClInclude Include="..\Common\Threading.h" />
+    <ClInclude Include="..\Common\Trace.h" />
     <ClInclude Include="Common\HashTable.h" />
     <ClInclude Include="Common\ServerMessageTask.h" />
     <ClInclude Include="Common\TimeWheelLink.h" />
-    <ClInclude Include="Common\Trace.h" />
     <ClInclude Include="Console\ConsolePromiss.h" />
     <ClInclude Include="Console\FrameCommand.h" />
     <ClInclude Include="Encrypt\Aes.h" />
     <ClInclude Include="FileTest\FileTest.h" />
     <ClInclude Include="FileTest\FileTestManager.h" />
-    <ClInclude Include="IObject\ClientCommand.h" />
-    <ClInclude Include="IObject\IBuffPacket.h" />
-    <ClInclude Include="IObject\ICheckPacket.h" />
-    <ClInclude Include="IObject\IClientManager.h" />
-    <ClInclude Include="IObject\IClientParse.h" />
-    <ClInclude Include="IObject\IConnectManager.h" />
-    <ClInclude Include="IObject\IControlListen.h" />
-    <ClInclude Include="IObject\IFrameCommand.h" />
-    <ClInclude Include="IObject\ILogManager.h" />
-    <ClInclude Include="IObject\ILogObject.h" />
-    <ClInclude Include="IObject\IMessage.h" />
-    <ClInclude Include="IObject\IMessageBlockManager.h" />
-    <ClInclude Include="IObject\IMessageManager.h" />
-    <ClInclude Include="IObject\IModuleInfo.h" />
-    <ClInclude Include="IObject\IModuleMessageManager.h" />
-    <ClInclude Include="IObject\IObject.h" />
-    <ClInclude Include="IObject\IPacketManager.h" />
-    <ClInclude Include="IObject\IPacketParse.h" />
-    <ClInclude Include="IObject\ISendCacheManager.h" />
-    <ClInclude Include="IObject\IServerManager.h" />
-    <ClInclude Include="IObject\ITimerManager.h" />
-    <ClInclude Include="IObject\IUDPConnectManager.h" />
     <ClInclude Include="Message\MessageDyeingManager.h" />
     <ClInclude Include="PacketParse\PacketConsoleParse.h" />
     <ClInclude Include="PacketParse\PacketParse.h" />
@@ -586,11 +591,8 @@
     <ClInclude Include="Common\AppConfig.h" />
     <ClInclude Include="Common\BuffPacket.h" />
     <ClInclude Include="Common\BuffPacketManager.h" />
-    <ClInclude Include="Common\ClientMessage.h" />
-    <ClInclude Include="Common\ClientUDPMassage.h" />
     <ClInclude Include="Common\CommandAccount.h" />
     <ClInclude Include="Common\CommonData.h" />
-    <ClInclude Include="Common\define.h" />
     <ClInclude Include="Common\Fast_Asynch_Read_Stream.h" />
     <ClInclude Include="Common\ForbiddenIP.h" />
     <ClInclude Include="Common\Frame_Logging_Strategy.h" />

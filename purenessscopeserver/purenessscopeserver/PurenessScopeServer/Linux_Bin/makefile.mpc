@@ -2,6 +2,7 @@ project(PurenessScopeServer):aceexe{
  	exename = PurenessScopeServer
 
  Source_Files{
+  ../../Common/*.cpp	
   ../Common/*.cpp
   ../Console/*.cpp
   ../LogSystem/*.cpp
@@ -14,7 +15,7 @@ project(PurenessScopeServer):aceexe{
   ../FileTest/*.cpp
   ../*.cpp
  }
- includes += ../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../IObject ../TinyXML ../Mail ../FileTest
+ includes += ../Common ../../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../TinyXML ../Mail ../FileTest
  macros += __LINUX__
 
   specific(make) {
