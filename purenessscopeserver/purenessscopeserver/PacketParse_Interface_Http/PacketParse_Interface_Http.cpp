@@ -163,7 +163,7 @@ extern "C"
         }
 
         //OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]http:\n%s", pHttpInfo->m_szData));
-        uint32 u4HttpHeadLen = pHttpHead - pHttpInfo->m_szData + 4;
+        uint32 u4HttpHeadLen = (uint32)(pHttpHead - pHttpInfo->m_szData + 4);
         //OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]u4HttpHeadLen=%d.\n", u4HttpHeadLen));
 
         //找到了完整的包头
@@ -229,7 +229,7 @@ extern "C"
     {
         ACE_UNUSED_ARG(pPacketInfo);
         char szBodyLen[10] = {'\0'};
-        int nNameLen = ACE_OS::strlen(HTTP_BODY_LENGTH);
+        int nNameLen = (int)ACE_OS::strlen(HTTP_BODY_LENGTH);
 
         //OUR_DEBUG((LM_ERROR, "[CPacketParse::GetHttpBodyLen]nNameLen=%d.\n", nNameLen));
         //OUR_DEBUG((LM_ERROR, "[CPacketParse::GetHttpBodyLen]pData=%s.\n", pData));

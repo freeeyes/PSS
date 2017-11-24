@@ -3,8 +3,11 @@ project(PacketParse_Interface):acelib{
   dynamicflags += TEST_TCP_BUILD_DLL
   
   Source_Files{
+	../Common	
   	./*.cpp 
   }
+  
+  includes += ../Common
   
   specific(make) {
     compile_flags += -fcheck-new

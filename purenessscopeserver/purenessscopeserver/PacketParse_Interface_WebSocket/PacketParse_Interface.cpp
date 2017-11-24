@@ -313,8 +313,8 @@ extern "C"
     uint8 WebSocketDisposeHandIn(_WebSocketInfo* pWebSocketInfo, ACE_Message_Block* pCurrMessage, IMessageBlockManager* pMessageBlockManager, _Packet_Info* pPacketInfo)
     {
         //处理握手包
-        char* pData   = pCurrMessage->rd_ptr();     //得到这个数据块的首字节
-        uint32 u4Data = pCurrMessage->length();     //得到这个数据块的长度
+        char* pData   = (char* )pCurrMessage->rd_ptr();     //得到这个数据块的首字节
+        uint32 u4Data = (uint32)pCurrMessage->length();     //得到这个数据块的长度
 
         //将收到的数据粘入缓冲等待做切包处理
         if(pWebSocketInfo->m_u4DataLength + u4Data > MAX_DECRYPTLENGTH)
@@ -385,8 +385,8 @@ extern "C"
     uint8 WebSocketDisposeDataIn(_WebSocketInfo* pWebSocketInfo, ACE_Message_Block* pCurrMessage, IMessageBlockManager* pMessageBlockManager, _Packet_Info* pPacketInfo)
     {
         //处理数据包
-        char* pData   = pCurrMessage->rd_ptr();     //得到这个数据块的首字节
-        uint32 u4Data = pCurrMessage->length();     //得到这个数据块的长度
+        char* pData   = (char* )pCurrMessage->rd_ptr();     //得到这个数据块的首字节
+        uint32 u4Data = (uint32)pCurrMessage->length();     //得到这个数据块的长度
         uint32 u4PacketLen = 0;
         uint8 u1Ret        = (uint8)PACKET_GET_ERROR;
 

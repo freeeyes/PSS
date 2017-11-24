@@ -20,13 +20,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="define.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="IMessageBlockManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="WebSocketInfo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\define.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
