@@ -20,7 +20,7 @@ project(LuaTest):acelib{
   } else {
 	dllout = ../../PurenessScopeServer/Linux_Bin
   }
-  includes += . ../include ./LuaBase ./Lua 
+  includes += . ../../Common ./LuaBase ./Lua 
   
   libs += ./Lua/Lua
 }

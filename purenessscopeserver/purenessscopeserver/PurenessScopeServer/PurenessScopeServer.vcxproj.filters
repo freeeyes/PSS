@@ -378,9 +378,6 @@
     <ClInclude Include="Proactor\ProControlListen.h">
       <Filter>Proactor\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="Common\ProfileTime.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="Common\ProgramService.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
@@ -560,6 +557,9 @@
     </ClInclude>
     <ClInclude Include="..\Common\Threading.h">
       <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ProfileTime.h">
+      <Filter>Common\hfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

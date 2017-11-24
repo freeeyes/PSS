@@ -22,5 +22,5 @@ project(Login):acelib{
 	dllout = ../../../PurenessScopeServer/Linux_Bin
   }
   includes += .
-  includes += ../../include ../Common
+  includes += ../../../Common ../Common
 }

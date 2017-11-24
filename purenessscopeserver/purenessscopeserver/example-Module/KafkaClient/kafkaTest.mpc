@@ -21,7 +21,7 @@ project(KafkaTest):acelib{
 	dllout = ../../PurenessScopeServer/Linux_Bin
   }
   includes += .
-  includes += ../include
+  includes += ../../Common
   includes += /usr/local/include/librdkafka
   libs += rdkafka
   libpaths += /usr/local/lib

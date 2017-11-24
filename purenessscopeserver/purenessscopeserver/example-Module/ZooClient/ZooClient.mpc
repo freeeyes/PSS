@@ -21,7 +21,7 @@ project(ZooClient):acelib{
 	dllout = ../../PurenessScopeServer/Linux_Bin
   }
   includes += .
-  includes += ../include
+  includes += ../../Common
   includes += /usr/local/include/zookeeper
   libs += zookeeper_mt
   libpaths += /usr/local/lib

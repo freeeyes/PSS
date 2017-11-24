@@ -545,6 +545,7 @@
     <ClInclude Include="..\Common\IServerManager.h" />
     <ClInclude Include="..\Common\ITimerManager.h" />
     <ClInclude Include="..\Common\IUDPConnectManager.h" />
+    <ClInclude Include="..\Common\ProfileTime.h" />
     <ClInclude Include="..\Common\Threading.h" />
     <ClInclude Include="..\Common\Trace.h" />
     <ClInclude Include="Common\HashTable.h" />
@@ -602,7 +603,6 @@
     <ClInclude Include="Common\MakePacket.h" />
     <ClInclude Include="Common\MessageBlockManager.h" />
     <ClInclude Include="Common\MyACELoggingStrategy.h" />
-    <ClInclude Include="Common\ProfileTime.h" />
     <ClInclude Include="Common\ProgramService.h" />
     <ClInclude Include="Common\RandomNumber.h" />
     <ClInclude Include="Common\Ring.h" />

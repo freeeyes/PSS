@@ -22,5 +22,5 @@ project(LSLogic):acelib{
 	dllout = ../../PurenessScopeServer/Linux_Bin
   }
   includes += .
-  includes += ../include ./IniRead
+  includes += ../../Common ./IniRead
 }
