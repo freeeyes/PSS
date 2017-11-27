@@ -6,6 +6,10 @@ os:
 compiler:
   - gcc
 
+branches:
+  only:
+  - master
+
 env:
   matrix:
     - ACE=1
@@ -15,12 +19,14 @@ env:
     - ACE_ROOT=$ACEDIR/ACE_wrappers
     - LD_LIBRARY_PATH=$ACE_ROOT/lib:$LD_LIBRARY_PATH
     - COMPILER=g++-7
+    - secure: "fZjOkLkM1R6U/PvdRPbsf3r8p53h6q4Znh8wmDYedg0rkOUz/mgzYy4oCOLDwYNID9uEAfll/xutAmy/3pcqTrgncLtptXjqvwJK7wVOu2mKU6amjhICD0y2pps9mjRBWORZo3Cd/Wa39KCHwS8SFxfYme3AwJTK4xmEZNgHLru7LMMeFuXKIGNTpE7wNZ9zf1hGZBFVcCz2IBUXcYYaT4scUFO0LWA3GbbcKOMuKHGP0s/rGv9bUJgWS7ys0fMRdV11BDx3hhkkzwzHmbxNUbPgaRd630H2CzeauymtNfmqObrQMkwu0La4gsnEGRDJHt5vFZXFXe6Xi9i0Yrm4ERbgLRLH5xXUWGGuAdGdL3XcPXBegbhCcShGGvTSFF5a3QX6z2iEuse7lyO5t5bXK8NZxkJVkuvaI/2yTQczYakQlg9d6CCMUQRkQjXaHG2edhvVDYrPAHTJsSEgZuLHqHw9XH2egQvyt0aBC7UlxZBMAnKcSVJ+ETzKKeW/va8JZLEBTbyO/lhkZNQwHKGh+m9IaTNylG7VIODVtJlfPVSF+Feb9AkyipRUoN7IN+dO8bE24V/s3RouQpTzdTL/B5q6nYgOphutpzezJpLZy7VYxEXoFwP0rM3Odq26eN+L5+c2up5GuaPDeq372W6rprDPkUsiyiw1DRXzi589Y14="
 
 before_install:
   - mkdir -p $ACEDIR
   - cd $ACEDIR
   - wget http://download.dre.vanderbilt.edu/previous_versions/ACE-6.4.0.tar.gz
   - tar zxf ACE-6.4.0.tar.gz
+  - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
 
 before_script:
   - export
@@ -40,8 +46,20 @@ before_script:
   - $ACE_ROOT/bin/mwc.pl -type gnuace ACE.mwc
   - make ACE > /dev/null 2>&1
   - ls $ACE_ROOT/lib/
-script:
-  - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
-  - $ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc
-  - make -j 8
 
+script: 
+  - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then 
+    cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
+    $ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc
+    make -j 8
+  fi
+
+addons:
+  coverity_scan:
+    project:
+      name: "freeeyes/PSS"
+      description: "Build submitted via Travis CI"
+    notification_email: liuchao412@foxmail.com
+    build_command_prepend: "./configure; make clean"
+    build_command:   "make -j 4"
+    branch_pattern: master
