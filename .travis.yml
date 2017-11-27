@@ -48,11 +48,12 @@ before_script:
   - ls $ACE_ROOT/lib/
 
 script: 
-  if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then 
-    cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
-    $ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc
-    make -j 4
-  fi
+  - export
+  - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then 
+      cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
+      $ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc
+      make -j 4
+    fi
 
 addons:
   coverity_scan:
