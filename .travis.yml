@@ -60,6 +60,6 @@ addons:
       name: "freeeyes/PSS"
       description: "Build submitted via Travis CI"
     notification_email: liuchao412@foxmail.com
-    build_command_prepend: "make clean"
+    build_command_prepend: "cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin;$ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc;make clean"
     build_command:   "make -j 4"
     branch_pattern: master
