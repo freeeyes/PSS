@@ -251,6 +251,13 @@ public:
             return false;
         }
 
+        if (fd == ACE_INVALID_HANDLE)
+        {
+            OUR_DEBUG((LM_ERROR, "[CLogFile::SendMail]MailID(%d) connectSmtp error.\n", pLogBlockInfo->m_u4MailID));
+            free(pMail);
+            return -1;
+        }
+
         nRet = authEmail(fd,
                          (const unsigned char*)pMailAlert->m_szFromMailAddr,
                          (const unsigned char*)pMailAlert->m_szMailPass);
@@ -271,10 +278,12 @@ public:
         {
             OUR_DEBUG((LM_ERROR, "[CLogFile::SendMail]MailID(%d) sendEmail error.\n", pLogBlockInfo->m_u4MailID));
             free(pMail);
+            ACE_OS::close(fd);
             return false;
         }
 
         free(pMail);
+        ACE_OS::close(fd);
         return true;
     }
 
@@ -409,15 +418,31 @@ public:
 
     void CreatePath()
     {
+        int n4Return = -1;
         char szPath[MAX_CMD_NUM] = {'\0'};
         sprintf_safe(szPath, MAX_CMD_NUM, "%s/Log/", m_szFileRoot);
-        ACE_OS::mkdir(szPath);
+        n4Return = ACE_OS::mkdir(szPath);
+
+        if(-1 == n4Return)
+        {
+            OUR_DEBUG((LM_INFO, "[ServerLogger](%s)CreatePath fail.\n", szPath));
+        }
 
         sprintf_safe(szPath, MAX_CMD_NUM, "%s/Log/%s/", m_szFileRoot, m_StrlogType.c_str());
-        ACE_OS::mkdir(szPath);
+        n4Return = ACE_OS::mkdir(szPath);
+
+        if(-1 == n4Return)
+        {
+            OUR_DEBUG((LM_INFO, "[ServerLogger](%s)CreatePath fail.\n", szPath));
+        }
 
         sprintf_safe(szPath, MAX_CMD_NUM, "%s/Log/%s/%s", m_szFileRoot, m_StrlogType.c_str(), m_StrlogName.c_str());
-        ACE_OS::mkdir(szPath);
+        n4Return = ACE_OS::mkdir(szPath);
+
+        if(-1 == n4Return)
+        {
+            OUR_DEBUG((LM_INFO, "[ServerLogger](%s)CreatePath fail.\n", szPath));
+        }
     }
 
 private:

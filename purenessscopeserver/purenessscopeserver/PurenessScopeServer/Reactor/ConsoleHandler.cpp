@@ -145,13 +145,14 @@ int CConsoleHandler::open(void*)
     //int nOverTime = MAX_MSG_SENDTIMEOUT;
     //ACE_OS::setsockopt(this->get_handle(), SOL_SOCKET, SO_SNDTIMEO, (char* )&nOverTime, sizeof(nOverTime));
     m_pPacketParse = new CConsolePacketParse();
-    m_pPacketParse->Init();
 
     if (NULL == m_pPacketParse)
     {
         OUR_DEBUG((LM_DEBUG, "[%t|CConnectHandle::open] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
         return -1;
     }
+
+    m_pPacketParse->Init();
 
     //申请头的大小对应的mb
     m_pCurrMessage = App_MessageBlockManager::instance()->Create(CONSOLE_PACKET_MAX_SIZE);

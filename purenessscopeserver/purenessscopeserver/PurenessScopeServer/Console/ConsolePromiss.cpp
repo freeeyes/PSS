@@ -39,6 +39,8 @@ void CConsolePromissions::Init(const char* pFileName)
         }
         else
         {
+            OUR_DEBUG((LM_INFO, "[CConsolePromissions::Init]Get CommandName error.\n"));
+            SAFE_DELETE(pConsole_Command_Info);
             break;
         }
 
@@ -50,11 +52,14 @@ void CConsolePromissions::Init(const char* pFileName)
         }
         else
         {
+            OUR_DEBUG((LM_INFO, "[CConsolePromissions::Init]Get User error.\n"));
+            SAFE_DELETE(pConsole_Command_Info);
             break;
         }
 
         if (-1 == m_objHashCommandList.Add_Hash_Data(pConsole_Command_Info->m_szCommand, pConsole_Command_Info))
         {
+            SAFE_DELETE(pConsole_Command_Info);
             OUR_DEBUG((LM_INFO, "[CConsolePromissions::Init](%s)Add error.\n", pConsole_Command_Info->m_szCommand));
         }
     }

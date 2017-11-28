@@ -207,13 +207,21 @@ void CReactorClientInfo::SetServerConnectState(EM_Server_Connect_State objState)
 
 void CReactorClientInfo::SetLocalAddr( const char* pIP, int nPort, uint8 u1IPType )
 {
-    if(u1IPType == TYPE_IPV4)
+    int nRet = 0;
+
+    if (u1IPType == TYPE_IPV4)
     {
-        m_AddrLocal.set(nPort, pIP);
+        nRet = m_AddrLocal.set(nPort, pIP);
     }
     else
     {
-        m_AddrLocal.set(nPort, pIP, 1, PF_INET6);
+        nRet = m_AddrLocal.set(nPort, pIP, 1, PF_INET6);
+    }
+
+    if (-1 == nRet)
+    {
+        OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::SetLocalAddr]AddrLocal(%s:%d) error.\n", pIP, nPort));
+        return;
     }
 }
 

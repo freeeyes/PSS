@@ -30,6 +30,7 @@ struct _ModuleInfo
 
     _ModuleInfo()
     {
+        hModule           = NULL;
         LoadModuleData    = NULL;
         UnLoadModuleData  = NULL;
         GetDesc           = NULL;
@@ -54,6 +55,7 @@ struct _WaitUnloadModule
 
     _WaitUnloadModule()
     {
+        m_hModule              = 0;
         m_u1UnloadState        = 0;
         m_u4ThreadCurrEndCount = 0;
         m_u4UpdateIndex        = 0;

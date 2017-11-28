@@ -6,7 +6,9 @@
 ThreadPriority::ThreadPriority()
 {
     for (int i = Idle; i < MAXPRIORITYNUM; ++i)
+    {
         m_priority[i] = ACE_THR_PRI_OTHER_DEF;
+    }
 
     m_priority[Idle] = ACE_Sched_Params::priority_min(ACE_SCHED_OTHER);
     m_priority[Realtime] = ACE_Sched_Params::priority_max(ACE_SCHED_OTHER);
@@ -27,6 +29,7 @@ ThreadPriority::ThreadPriority()
         const size_t max_pos = _tmp.size();
         size_t min_pos = 1;
         size_t norm_pos = 0;
+
         for (size_t i = 0; i < max_pos; ++i)
         {
             if (_tmp[i] == ACE_THR_PRI_OTHER_DEF)
@@ -42,8 +45,11 @@ ThreadPriority::ThreadPriority()
         //into ?piesces
         const size_t _divider = 4;
         size_t _div = (norm_pos - min_pos) / _divider;
+
         if (_div == 0)
+        {
             _div = 1;
+        }
 
         min_pos = (norm_pos - 1);
 
@@ -51,8 +57,11 @@ ThreadPriority::ThreadPriority()
         m_priority[Lowest] = _tmp[min_pos -= _div ];
 
         _div = (max_pos - norm_pos) / _divider;
+
         if (_div == 0)
+        {
             _div = 1;
+        }
 
         min_pos = norm_pos - 1;
 
@@ -64,10 +73,14 @@ ThreadPriority::ThreadPriority()
 int ThreadPriority::getPriority(Priority p) const
 {
     if (p < Idle)
+    {
         p = Idle;
+    }
 
     if (p > Realtime)
+    {
         p = Realtime;
+    }
 
     return m_priority[p];
 }
@@ -83,7 +96,9 @@ Thread::Thread(Runnable* instance): m_iThreadId(0), m_hThreadHandle(0), m_task(i
 {
     // register reference to m_task to prevent it deeltion until destructor
     if (m_task)
+    {
         m_task->incReference();
+    }
 
     bool _start = start();
 }
@@ -91,7 +106,9 @@ Thread::Thread(Runnable* instance): m_iThreadId(0), m_hThreadHandle(0), m_task(i
 Thread::~Thread()
 {
     if (m_task)
+    {
         m_task->decReference();
+    }
 }
 
 Thread::ThreadStorage Thread::m_ThreadStorage;
@@ -100,12 +117,16 @@ ThreadPriority Thread::m_TpEnum;
 bool Thread::start()
 {
     if (m_task == 0 || m_iThreadId != 0)
+    {
         return false;
+    }
 
     bool res = (ACE_Thread::spawn(&Thread::ThreadTask, (void*)m_task, THREADFLAG, &m_iThreadId, &m_hThreadHandle) == 0);
 
     if (res)
+    {
         m_task->incReference();
+    }
 
     return res;
 }
@@ -113,7 +134,9 @@ bool Thread::start()
 bool Thread::wait()
 {
     if (!m_hThreadHandle || !m_task)
+    {
         return false;
+    }
 
     ACE_THR_FUNC_RETURN _value = ACE_THR_FUNC_RETURN(-1);
     int _res = ACE_Thread::join(m_hThreadHandle, &_value);
@@ -127,10 +150,14 @@ bool Thread::wait()
 void Thread::destroy()
 {
     if (!m_iThreadId || !m_task)
+    {
         return;
+    }
 
     if (ACE_Thread::kill(m_iThreadId, -1) != 0)
+    {
         return;
+    }
 
     m_iThreadId = 0;
     m_hThreadHandle = 0;
@@ -149,7 +176,7 @@ void Thread::resume()
     ACE_Thread::resume(m_hThreadHandle);
 }
 
-ACE_THR_FUNC_RETURN Thread::ThreadTask(void * param)
+ACE_THR_FUNC_RETURN Thread::ThreadTask(void* param)
 {
     Runnable* _task = (Runnable*)param;
     _task->run();
@@ -173,18 +200,22 @@ ACE_hthread_t Thread::currentHandle()
     return _handle;
 }
 
-Thread * Thread::current()
+Thread* Thread::current()
 {
-    Thread * _thread = m_ThreadStorage.ts_object();
+    Thread* _thread = m_ThreadStorage.ts_object();
+
     if (!_thread)
     {
         _thread = new Thread();
         _thread->m_iThreadId = Thread::currentId();
         _thread->m_hThreadHandle = Thread::currentHandle();
 
-        Thread * _oldValue = m_ThreadStorage.ts_object(_thread);
+        Thread* _oldValue = m_ThreadStorage.ts_object(_thread);
+
         if (_oldValue)
+        {
             delete _oldValue;
+        }
     }
 
     return _thread;

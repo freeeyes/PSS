@@ -118,26 +118,20 @@ bool SetAppPath()
         if (stPathSize <= 0)
         {
             OUR_DEBUG((LM_INFO, "[SetAppPath]no find work Path.\n", szPath));
+            SAFE_DELETE_ARRAY(pFilePath);
             return false;
         }
-
-        delete[] pFilePath;
-        pFilePath = NULL;
-        //从szPath里面拆出当前路径
-        int nLen = strlen(szPath);
-
-        if (nLen <= 0)
+        else
         {
-            OUR_DEBUG((LM_INFO, "[SetAppPath]no find szPath.\n", szPath));
-            return false;
+            SAFE_DELETE_ARRAY(pFilePath);
         }
 
-        while(szPath[nLen - 1]!='/')
+        while(szPath[stPathSize - 1]!='/')
         {
-            nLen--;
+            stPathSize--;
         }
 
-        szPath[nLen > 0 ? (nLen-1) : 0]= '\0';
+        szPath[stPathSize > 0 ? (stPathSize-1) : 0]= '\0';
 
         int nRet = chdir(szPath);
 

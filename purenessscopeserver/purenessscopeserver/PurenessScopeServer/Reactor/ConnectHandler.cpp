@@ -130,14 +130,14 @@ void CConnectHandler::Init(uint16 u2HandlerID)
     m_u4MaxPacketSize  = App_MainConfig::instance()->GetRecvBuffSize();
     m_u2TcpNodelay     = App_MainConfig::instance()->GetTcpNodelay();
 
-    m_u8SendQueueTimeout = App_MainConfig::instance()->GetSendQueueTimeout() * 1000 * 1000;
+    m_u8SendQueueTimeout = (uint64)(App_MainConfig::instance()->GetSendQueueTimeout()) * 1000 * 1000;
 
     if(m_u8SendQueueTimeout == 0)
     {
         m_u8SendQueueTimeout = MAX_QUEUE_TIMEOUT * 1000 * 1000;
     }
 
-    m_u8RecvQueueTimeout = App_MainConfig::instance()->GetRecvQueueTimeout() * 1000 * 1000;
+    m_u8RecvQueueTimeout = (uint64)(App_MainConfig::instance()->GetRecvQueueTimeout()) * 1000 * 1000;
 
     if(m_u8RecvQueueTimeout == 0)
     {

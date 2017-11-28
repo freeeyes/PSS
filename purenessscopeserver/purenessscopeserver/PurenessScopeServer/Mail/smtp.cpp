@@ -73,6 +73,11 @@ int connectSmtp(ACE_HANDLE& socketFd, const unsigned char* smtpUrl, const unsign
 
     socketFd = ACE_OS::socket(PF_INET, SOCK_STREAM, 0);
 
+    if (socketFd == ACE_INVALID_HANDLE)
+    {
+        return -1;
+    }
+
     if(0 > ACE_OS::connect(socketFd, (struct sockaddr*)&smtpAddr, sizeof(struct sockaddr)))
     {
         ACE_OS::close(socketFd);
@@ -555,7 +560,15 @@ int mailAttachment(unsigned char** mail, const unsigned char* filePath)
         return -1;
     }
 
-    ACE_OS::fread(attach, sizeof(char), fileSize, fp);
+    size_t u4Read = ACE_OS::fread(attach, sizeof(char), fileSize, fp);
+    if (u4Read <= 0)
+    {
+        //ACE_DEBUG((LM_ERROR, "[mailAttachment]fp realloc base64Size fail.\n"));
+        ACE_OS::fclose(fp);
+        free(attach);
+        free(attachHeader);
+        return -1;
+    }
 
     //SMTP_Print6("[%s][%d] %s size = %d, base64Size = %d \r\n",__FILE__, __LINE__, filePath, fileSize, base64Size);
 

@@ -162,20 +162,12 @@ bool CMakePacket::PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBo
 
     SetMessageSendError(u4ConnectID, pBodyMessage, pMessage, tvNow);
 
-    if(NULL != pMessage)
+    //将要处理的消息放入消息处理线程
+    if(false == App_MessageServiceGroup::instance()->PutMessage(pMessage))
     {
-        //将要处理的消息放入消息处理线程
-        if(false == App_MessageServiceGroup::instance()->PutMessage(pMessage))
-        {
-            OUR_DEBUG((LM_ERROR, "[CMakePacket::PutSendErrorMessage] App_MessageServiceGroup::instance()->PutMessage Error.\n"));
-            App_MessageBlockManager::instance()->Close(pBodyMessage);
-            App_MessageServiceGroup::instance()->DeleteMessage(u4ConnectID, pMessage);
-            return false;
-        }
-    }
-    else
-    {
+        OUR_DEBUG((LM_ERROR, "[CMakePacket::PutSendErrorMessage] App_MessageServiceGroup::instance()->PutMessage Error.\n"));
         App_MessageBlockManager::instance()->Close(pBodyMessage);
+        App_MessageServiceGroup::instance()->DeleteMessage(u4ConnectID, pMessage);
         return false;
     }
 

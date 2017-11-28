@@ -18,14 +18,20 @@ int32 GetProcessCPU_Idel_Linux()
         return 0;
     }
 
-    FILE* fd;
     char szbuffer[50];
 
-    fd = ACE_OS::fopen("aasnowy.txt","r");
+    FILE* fd = ACE_OS::fopen("aasnowy.txt","r");
+
+    if (NULL == fd)
+    {
+        return -1;
+    }
+
     char* pReturn = fgets(szbuffer,sizeof(szbuffer),fd);
 
     if (NULL == pReturn)
     {
+        fclose(fd);
         return -1;
     }
 
@@ -77,13 +83,19 @@ int32 GetProcessMemorySize_Linux()
         return -1;
     }
 
-    FILE* fd;
     char szbuffer[50];
-    fd = ACE_OS::fopen("aasnowy.txt","r");
+    FILE* fd = ACE_OS::fopen("aasnowy.txt","r");
+
+    if (NULL == fd)
+    {
+        return -1;
+    }
+
     char* pReturn = fgets(szbuffer,sizeof(szbuffer),fd);
 
     if (NULL == pReturn)
     {
+        fclose(fd);
         return -1;
     }
 

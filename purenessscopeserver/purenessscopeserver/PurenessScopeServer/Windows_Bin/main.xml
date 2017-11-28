@@ -2,8 +2,8 @@
 <config>
 	<!-- ByteOrder表明当前使用的是网络字序还是主机字序，NET_ORDER是网络字序，HOST_ORDER为主机字节序 -->
 	<!-- ByteOrder会指定当前所有的使用的BuffPacket，在流入数据的时候，自动转换成你需要的字序，完全不用你写额外的代码-->
-	<NetWorkMode Mode="Iocp" BackLog="100" ByteOrder="HOST_ORDER" desc = "设置框架使用的网络模型,windows下mode支持Iocp。Linux下支持Select,Poll和Epoll，如果需要更换修改Mode参数，否则不用改"/>
-	<ServerType Type="0" name="Pss Service" displayname="PssService" Debug="0" DebugSize="1000" IsClose="0" desc = "Type设置为0为当前启动，1为Linux后台执行，windows启动系统服务，Debug为0关闭debug日志，Debug为1为打开DEBUG日志,IsClose0为允许关闭，1为不允许。" />
+	<NetWorkMode Mode="Iocp" BackLog="100" ByteOrder="HOST_ORDER" desc="设置框架使用的网络模型,windows下mode支持Iocp。Linux下支持Select,Poll和Epoll，如果需要更换修改Mode参数，否则不用改"/>
+	<ServerType Type="0" name="Pss Service" displayname="PssService" Debug="0" DebugSize="1000" IsClose="0" desc="Type设置为0为当前启动，1为Linux后台执行，windows启动系统服务，Debug为0关闭debug日志，Debug为1为打开DEBUG日志,IsClose0为允许关闭，1为不允许。" />
 	<ServerID id="1001" desc="当前服务器的ID编号" />
 	<ServerName name="Freeeyes" desc="当前服务器的名称" />
 	<ServerVersion Version="0.99" desc="当前服务器版本" />
@@ -45,9 +45,9 @@
 	<!-- 接收数据包连接相关设置 -->
 	<RecvInfo RecvBuffSize="20480" RecvQueueTimeout="50" desc="接收客户端数据配置参数" />
 	<!-- 发送数据包连接相关设置 -->
-	<SendInfo SendQueueMax="100" TcpNodelay="0" MaxBlockSize="5120" BlockCount="10" SendTimeout="50" SendQueueTimeout="50" SendQueueCount="1" PutQueueTimeout = "100" desc="发送到客户端需要配置的参数" />
+	<SendInfo SendQueueMax="100" TcpNodelay="0" MaxBlockSize="5120" BlockCount="10" SendTimeout="50" SendQueueTimeout="50" SendQueueCount="1" PutQueueTimeout="100" desc="发送到客户端需要配置的参数" />
 	<!-- 监控线程相关设置 -->
-	<ThreadInfo ThreadTimeout="30" ThreadTimeCheck="120" DisposeTimeout="40" PutQueueTimeout = "100" desc="工作线程相关参数" />
+	<ThreadInfo ThreadTimeout="30" ThreadTimeCheck="120" DisposeTimeout="40" PutQueueTimeout="100" desc="工作线程相关参数" />
 	<!-- 监控线程AI相关设置 -->
 	<ThreadInfoAI AI="0" CheckTime="30" TimeoutCount="1" StopTime="30" ReturnDataType="1" ReturnData="ff ff" desc="工作线程负载自我监控相关设置，AI=0关闭，1打开" />
 	<!-- 客户端连接池相关设置 -->

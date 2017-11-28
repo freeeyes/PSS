@@ -242,7 +242,7 @@ int CServerMessageTask::svc(void)
             if (mb->msg_type() == DEL_SERVER_CLIENT)
             {
                 IClientMessage* pClientMessage = NULL;
-                memcpy_safe(mb->rd_ptr(), sizeof(IClientMessage*), (char*)pClientMessage, sizeof(IClientMessage*));
+                memcpy_safe(mb->rd_ptr(), sizeof(IClientMessage*), (char*)&pClientMessage, sizeof(IClientMessage*));
 
                 if (NULL != pClientMessage)
                 {
