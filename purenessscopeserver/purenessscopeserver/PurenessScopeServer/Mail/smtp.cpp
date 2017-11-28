@@ -567,6 +567,7 @@ int mailAttachment(unsigned char** mail, const unsigned char* filePath)
         ACE_OS::fclose(fp);
         free(attach);
         free(attachHeader);
+        free(base64Attach);
         return -1;
     }
 
@@ -584,6 +585,7 @@ int mailAttachment(unsigned char** mail, const unsigned char* filePath)
         //ACE_DEBUG((LM_ERROR, "[mailAttachment]fp realloc base64Size fail.\n"));
         ACE_OS::fclose(fp);
         free(attachHeader);
+        free(base64Attach);
         return -1;
     }
 

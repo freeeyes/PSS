@@ -173,6 +173,7 @@ public:
                     if(m_objIPList.Get_Count() == m_objIPList.Get_Used_Count())
                     {
                         //暂时不处理
+                        SAFE_DELETE(pIPAccount);
                         return true;
                     }
                     else
