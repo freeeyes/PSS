@@ -266,6 +266,7 @@ public:
         {
             OUR_DEBUG((LM_ERROR, "[CLogFile::SendMail]MailID(%d) authEmail error.\n", pLogBlockInfo->m_u4MailID));
             free(pMail);
+            ACE_OS::close(fd);
             return false;
         }
 
