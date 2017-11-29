@@ -11,6 +11,7 @@
 ## [PSS逻辑插件用例说明](examples.md)
 ## [后台指令集合](PSSFrameCommand.md) 
 ## [数据染色功能](Dyeing.md)
+## [如何开发一个逻辑插件](LogicPlugin.md)  
 
 >从0.91起，开始提供版本更新日志
 ```
