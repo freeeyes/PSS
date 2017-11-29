@@ -130,3 +130,5 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
     IMessageBlockManager*  m_pMessageBlockManager;  //MessageBlock管理类(对象池)
     IFrameCommand*         m_pFrameCommand;         //支持控制框架的命令，具体可以参考PSSFrameCommand.md
 ```
+
+具体使用方法，请参考对应的example实例。
