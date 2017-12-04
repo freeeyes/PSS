@@ -12,7 +12,7 @@
 ## [后台指令集合](PSSFrameCommand.md) 
 ## [数据染色功能](Dyeing.md)
 ## [如何开发一个逻辑插件](LogicPlugin.md) 
-## [如何开发一个逻辑插件](PacketParsePlugin.md) 
+## [如何开发一个解析插件](PacketParsePlugin.md) 
 ## [更新日志](Changelog.md)
 
 >##提供几个压测数据（TcpPass工具，可从PSS开源工具包中获得）
