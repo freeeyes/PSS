@@ -100,7 +100,7 @@ Thread::Thread(Runnable* instance): m_iThreadId(0), m_hThreadHandle(0), m_task(i
         m_task->incReference();
     }
 
-    bool _start = start();
+    start();
 }
 
 Thread::~Thread()
@@ -154,7 +154,7 @@ void Thread::destroy()
         return;
     }
 
-    if (ACE_Thread::kill(m_iThreadId, -1) != 0)
+    if (ACE_Thread::kill(m_iThreadId, SIGABRT) != 0)
     {
         return;
     }

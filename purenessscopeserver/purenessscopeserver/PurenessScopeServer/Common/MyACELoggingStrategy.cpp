@@ -650,7 +650,11 @@ My_ACE_Logging_Strategy::handle_timeout (const ACE_Time_Value&,
 
             // Rename the current log file to the name of the backup log
             // file.
-            ACE_OS::rename (this->filename_, backup);
+            if (0 != ACE_OS::rename(this->filename_, backup, -1))
+            {
+                ACELIB_ERROR((LM_ERROR,
+                              ACE_TEXT("(%s -> %s)rename file error; ", this->filename_, backup)));
+            }
         }
         else
             ACELIB_ERROR ((LM_ERROR,

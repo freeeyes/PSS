@@ -102,11 +102,11 @@ int CheckCoreLimit(int nMaxCoreFile)
 //设置当前代码路径
 bool SetAppPath()
 {
-    char* pFilePath = NULL;
+    int nSize = (int)pathconf(".",_PC_PATH_MAX);
 
-    int nSize = pathconf(".",_PC_PATH_MAX);
+    char* pFilePath = new char[nSize];
 
-    if((pFilePath = (char*)new char[nSize]) != NULL)
+    if(NULL != pFilePath)
     {
         char szPath[MAX_BUFF_300] = { '\0' };
         memset(pFilePath, 0, nSize);

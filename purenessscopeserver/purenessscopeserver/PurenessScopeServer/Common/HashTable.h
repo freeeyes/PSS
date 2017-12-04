@@ -641,7 +641,16 @@ public:
 
         while(NULL != pLastLink)
         {
-            pLastLink = pLastLink->m_pNext;
+            _Hash_Link_Info<T>* pTempLink = pLastLink->m_pNext;
+
+            if (NULL != pTempLink)
+            {
+                pLastLink = pTempLink;
+            }
+            else
+            {
+                break;
+            }
         }
 
         //从对象池中获取一个新对象
