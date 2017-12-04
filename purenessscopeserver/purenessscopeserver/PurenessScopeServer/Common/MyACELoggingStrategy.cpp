@@ -653,7 +653,7 @@ My_ACE_Logging_Strategy::handle_timeout (const ACE_Time_Value&,
             if (0 != ACE_OS::rename(this->filename_, backup, -1))
             {
                 ACELIB_ERROR((LM_ERROR,
-                              ACE_TEXT("(%s -> %s)rename file error; ", this->filename_, backup)));
+                              ACE_TEXT("(%s -> %s)rename file error;\n"), this->filename_, backup));
             }
         }
         else
