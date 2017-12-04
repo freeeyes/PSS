@@ -43,12 +43,19 @@ public:
         {
             if(pData[nPos] == '\r' || pData[nPos] == '\n' || pData[nPos] == ' ' || nPos == nSrcLen - 1)
             {
-                if(nPos == nSrcLen - 1)
+                if(nPos == nSrcLen - 1 && nCurrSize < 2)
                 {
                     szData[nCurrSize++] = pData[nPos];
                 }
 
-                szData[nCurrSize] = '\0';
+                if (nCurrSize < 3)
+                {
+                    szData[nCurrSize] = '\0';
+                }
+                else
+                {
+                    blSrcState = false;
+                }
 
                 if(blSrcState == true)
                 {
@@ -95,12 +102,19 @@ public:
         {
             if(pData[nPos] == '\r' || pData[nPos] == '\n' || pData[nPos] == ' ' || nPos == nSrcLen - 1)
             {
-                if(nPos == nSrcLen - 1)
+                if(nPos == nSrcLen - 1 && nCurrSize < 2)
                 {
                     szData[nCurrSize++] = pData[nPos];
                 }
 
-                szData[nCurrSize] = '\0';
+                if (nCurrSize < 3)
+                {
+                    szData[nCurrSize] = '\0';
+                }
+                else
+                {
+                    blSrcState = false;
+                }
 
                 if(nConvertSize < nMaxLen && blSrcState == true)
                 {
