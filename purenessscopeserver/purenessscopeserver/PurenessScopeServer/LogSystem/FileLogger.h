@@ -255,7 +255,7 @@ public:
         {
             OUR_DEBUG((LM_ERROR, "[CLogFile::SendMail]MailID(%d) connectSmtp error.\n", pLogBlockInfo->m_u4MailID));
             free(pMail);
-            return -1;
+            return false;
         }
 
         nRet = authEmail(fd,

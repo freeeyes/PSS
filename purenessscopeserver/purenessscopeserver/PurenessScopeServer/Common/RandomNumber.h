@@ -5,7 +5,14 @@
 //给出指定范围，产生出随机数。
 
 #include <stdlib.h>
-#include <time.h>
+
+#ifdef WIN32
+#include "windows.h"
+#include "wincrypt.h"
+#else
+#include <unistd.h>
+#include <fcntl.h>
+#endif
 
 class CRandomNumber
 {
@@ -15,6 +22,9 @@ public:
 
     void SetRange(int nMinNumber, int nMaxNumber);
     int GetRandom();
+
+private:
+    int GetRandomSeed();
 
 private:
     int m_nMinNumber;
