@@ -1397,8 +1397,11 @@ My_ACE_Dev_Poll_Reactor::dispatch_io_event (Token_Guard& guard)
         if (eh == this->notify_handler_)
         {
             ACE_Notification_Buffer b;
-            status =
-                dynamic_cast<My_ACE_Dev_Poll_Reactor_Notify*>(this->notify_handler_)->dequeue_one (b);
+
+            if (NULL != this->notify_handler_)
+            {
+                status = dynamic_cast<My_ACE_Dev_Poll_Reactor_Notify*>(this->notify_handler_)->dequeue_one(b);
+            }
 
             if (status == -1)
             {
