@@ -1375,31 +1375,31 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
             {
                 //因为是异步发送，发送的数据指针不可以立刻释放，所以需要在这里创建一个新的发送数据块，将数据考入
                 pMbData = App_MessageBlockManager::instance()->Create((uint32)m_pBlockMessage->length());
+            }
 
-                if (NULL == pMbData)
+            if (NULL == pMbData)
+            {
+                OUR_DEBUG((LM_DEBUG, "[CConnectHandler::SendMessage] Connectid=[%d] pMbData is NULL.\n", GetConnectID()));
+                ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
+                memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+                pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
+                ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+                App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
+
+                if (blDelete == true)
                 {
-                    OUR_DEBUG((LM_DEBUG, "[CConnectHandler::SendMessage] Connectid=[%d] pMbData is NULL.\n", GetConnectID()));
-                    ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
-                    memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
-                    pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
-                    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-                    App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
-
-                    if (blDelete == true)
-                    {
-                        //删除发送数据包
-                        App_BuffPacketManager::instance()->Delete(pBuffPacket);
-                    }
-
-                    return false;
+                    //删除发送数据包
+                    App_BuffPacketManager::instance()->Delete(pBuffPacket);
                 }
 
-                //OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage] Connectid=[%d] m_pBlockMessage=0x%08x.\n", GetConnectID(), m_pBlockMessage));
-                memcpy_safe(m_pBlockMessage->rd_ptr(), (uint32)m_pBlockMessage->length(), pMbData->wr_ptr(), (uint32)m_pBlockMessage->length());
-                pMbData->wr_ptr(m_pBlockMessage->length());
-                //放入完成，则清空缓存数据，使命完成
-                m_pBlockMessage->reset();
+                return false;
             }
+
+            //OUR_DEBUG((LM_DEBUG,"[CConnectHandler::SendMessage] Connectid=[%d] m_pBlockMessage=0x%08x.\n", GetConnectID(), m_pBlockMessage));
+            memcpy_safe(m_pBlockMessage->rd_ptr(), (uint32)m_pBlockMessage->length(), pMbData->wr_ptr(), (uint32)m_pBlockMessage->length());
+            pMbData->wr_ptr(m_pBlockMessage->length());
+            //放入完成，则清空缓存数据，使命完成
+            m_pBlockMessage->reset();
 
             if (blDelete == true)
             {

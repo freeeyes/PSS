@@ -104,6 +104,12 @@ bool SetAppPath()
 {
     int nSize = (int)pathconf(".",_PC_PATH_MAX);
 
+    if (nSize <= 0)
+    {
+        OUR_DEBUG((LM_INFO, "[SetAppPath]pathconf is error(%d).\n", nSize));
+        return false;
+    }
+
     char* pFilePath = new char[nSize];
 
     if(NULL != pFilePath)

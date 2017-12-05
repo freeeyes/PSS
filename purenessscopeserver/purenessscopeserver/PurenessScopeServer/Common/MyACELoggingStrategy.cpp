@@ -526,18 +526,18 @@ My_ACE_Logging_Strategy::handle_timeout (const ACE_Time_Value&,
 
     if ((size_t) ACE_OS::ftell (this->log_msg_->msg_ostream ()) > this->max_size_)
 #else
-    if ((size_t) this->log_msg_->msg_ostream ()->tellp () > this->max_size_)
+    if ((size_t) this->log_msg_->msg_ostream()->tellp() > this->max_size_)
 #endif /* ACE_LACKS_IOSTREAM_TOTALLY */
     {
         // Close the current ostream.
 #if defined (ACE_LACKS_IOSTREAM_TOTALLY)
-        FILE* output_file = (FILE*) this->log_msg_->msg_ostream ();
-        ACE_OS::fclose (output_file);
+        FILE* output_file = (FILE*) this->log_msg_->msg_ostream();
+        ACE_OS::fclose(output_file);
         // We'll call msg_ostream() modifier later.
 #else
         ofstream* output_file =
-            (ofstream*) this->log_msg_->msg_ostream ();
-        output_file->close ();
+            (ofstream*) this->log_msg_->msg_ostream();
+        output_file->close();
 #endif /* ACE_LACKS_IOSTREAM_TOTALLY */
 
         // Save current logfile to logfile.old analyze if it was set any
@@ -547,26 +547,26 @@ My_ACE_Logging_Strategy::handle_timeout (const ACE_Time_Value&,
             if (max_file_number_ < 1) //we only want one file
             {
                 // Just unlink the file.
-                ACE_OS::unlink (this->filename_);
+                ACE_OS::unlink(this->filename_);
 
                 // Open a new log file with the same name.
 #if defined (ACE_LACKS_IOSTREAM_TOTALLY)
-                output_file = ACE_OS::fopen (this->filename_,
-                                             ACE_TEXT ("wt"));
+                output_file = ACE_OS::fopen(this->filename_,
+                                            ACE_TEXT("wt"));
 
                 if (output_file == 0)
                 {
                     return -1;
                 }
 
-                this->log_msg_->msg_ostream (output_file);
+                this->log_msg_->msg_ostream(output_file);
 #else
-                output_file->open (ACE_TEXT_ALWAYS_CHAR (this->filename_),
-                                   ios::out);
+                output_file->open(ACE_TEXT_ALWAYS_CHAR(this->filename_),
+                                  ios::out);
 #endif /* ACE_LACKS_IOSTREAM_TOTALLY */
 
                 // Release the lock previously acquired.
-                this->log_msg_->release ();
+                this->log_msg_->release();
                 return 0;
             }
         }
@@ -576,20 +576,20 @@ My_ACE_Logging_Strategy::handle_timeout (const ACE_Time_Value&,
         // Set the number of digits of the log_files labels.
         int digits = 1, res = count_;
 
-        while((res = (res / 10))>0)
+        while ((res = (res / 10)) > 0)
         {
             digits++;
         }
 
-        if (ACE_OS::strlen (this->filename_) + digits <= MAXPATHLEN)
+        if (ACE_OS::strlen(this->filename_) + digits <= MAXPATHLEN)
         {
-            ACE_TCHAR backup[MAXPATHLEN+1];
+            ACE_TCHAR backup[MAXPATHLEN + 1];
 
             // analyse if it was chosen the mode which will order the
             // log_files
             if (order_files_)
             {
-                ACE_TCHAR to_backup[MAXPATHLEN+1];
+                ACE_TCHAR to_backup[MAXPATHLEN + 1];
 
                 // reorder the logs starting at the oldest (the biggest
                 // number) watch if we reached max_file_number_.
@@ -607,24 +607,28 @@ My_ACE_Logging_Strategy::handle_timeout (const ACE_Time_Value&,
                     max_num = count_;
                 }
 
-                for (int i = max_num ; i > 1 ; i--)
+                for (int i = max_num; i > 1; i--)
                 {
-                    ACE_OS::sprintf (backup,
-                                     ACE_TEXT ("%s.%d"),
-                                     this->filename_,
-                                     i);
-                    ACE_OS::sprintf (to_backup,
-                                     ACE_TEXT ("%s.%d"),
-                                     this->filename_,
-                                     i - 1);
+                    ACE_OS::sprintf(backup,
+                                    ACE_TEXT("%s.%d"),
+                                    this->filename_,
+                                    i);
+                    ACE_OS::sprintf(to_backup,
+                                    ACE_TEXT("%s.%d"),
+                                    this->filename_,
+                                    i - 1);
 
                     // Remove any existing old file; ignore error as
                     // file may not exist.
-                    ACE_OS::unlink (backup);
+                    ACE_OS::unlink(backup);
 
                     // Rename the current log file to the name of the
                     // backup log file.
-                    ACE_OS::rename (to_backup, backup);
+                    if(0 != ACE_OS::rename(to_backup, backup, -1))
+                    {
+                        ACELIB_ERROR((LM_ERROR,
+                                      ACE_TEXT("(%s -> %s)rename file error;\n"), this->filename_, backup));
+                    }
                 }
 
                 ACE_OS::sprintf (backup,

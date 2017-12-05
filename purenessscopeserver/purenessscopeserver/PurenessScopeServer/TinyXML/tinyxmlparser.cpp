@@ -1555,14 +1555,6 @@ const char* TiXmlUnknown::Parse( const char* p, TiXmlParsingData* data, TiXmlEnc
         ++p;
     }
 
-    if ( !p )
-    {
-        if ( document )
-        {
-            document->SetError( TIXML_ERROR_PARSING_UNKNOWN, 0, 0, encoding );
-        }
-    }
-
     if ( p && *p == '>' )
     {
         return p+1;

@@ -76,9 +76,18 @@ My_ACE_Dev_Poll_Reactor_Notify::open (ACE_Reactor_Impl* r,
         }
 
 #if defined (F_SETFD)
+
         // close-on-exec
-        ACE_OS::fcntl (this->notification_pipe_.read_handle (), F_SETFD, 1);
-        ACE_OS::fcntl (this->notification_pipe_.write_handle (), F_SETFD, 1);
+        if (0 != ACE_OS::fcntl(this->notification_pipe_.read_handle(), F_SETFD, 1))
+        {
+            return -1;
+        }
+
+        if (0 != ACE_OS::fcntl(this->notification_pipe_.write_handle(), F_SETFD, 1))
+        {
+            return -1;
+        }
+
 #endif /* F_SETFD */
 
 #if defined (ACE_HAS_REACTOR_NOTIFICATION_QUEUE)
@@ -1389,7 +1398,7 @@ My_ACE_Dev_Poll_Reactor::dispatch_io_event (Token_Guard& guard)
         {
             ACE_Notification_Buffer b;
             status =
-                dynamic_cast<My_ACE_Dev_Poll_Reactor_Notify*>(notify_handler_)->dequeue_one (b);
+                dynamic_cast<My_ACE_Dev_Poll_Reactor_Notify*>(this->notify_handler_)->dequeue_one (b);
 
             if (status == -1)
             {
@@ -1416,7 +1425,10 @@ My_ACE_Dev_Poll_Reactor::dispatch_io_event (Token_Guard& guard)
             // returns the number of notfies dispatched, not an indication of
             // re-callback requested). If anything other than the notify, come
             // back with either 0 or < 0.
-            status = this->upcall (eh, callback, handle);
+            if (NULL != callback)
+            {
+                status = this->upcall(eh, callback, handle);
+            }
 
             // If the callback returned 0, epoll-based needs to resume the
             // suspended handler but dev/poll doesn't.
