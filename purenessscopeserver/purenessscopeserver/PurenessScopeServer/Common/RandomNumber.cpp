@@ -18,8 +18,15 @@ void CRandomNumber::SetRange(int nMinNumber, int nMaxNumber)
 
 int CRandomNumber::GetRandom()
 {
-    int nRandom = (int)(m_nMinNumber + GetRandomSeed() % (m_nMaxNumber - m_nMinNumber));
-    return nRandom;
+    unsigned int uRandom = (unsigned int)(m_nMinNumber + GetRandomSeed() % (m_nMaxNumber - m_nMinNumber));
+
+    //保证算出的数字不能是负数
+    if (uRandom > 2147483647)
+    {
+        uRandom = 0;
+    }
+
+    return (int)uRandom;
 }
 
 int CRandomNumber::GetRandomSeed()
@@ -38,8 +45,8 @@ int CRandomNumber::GetRandomSeed()
 
     if (fd != -1)
     {
-        (void)read(fd, (void*)&rnum, sizeof(int));
-        (void)close(fd);
+        read(fd, (void*)&rnum, sizeof(int));
+        close(fd);
     }
 
 #endif
