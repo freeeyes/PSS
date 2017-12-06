@@ -18,15 +18,13 @@ void CRandomNumber::SetRange(int nMinNumber, int nMaxNumber)
 
 int CRandomNumber::GetRandom()
 {
-    unsigned int uRandom = (unsigned int)(m_nMinNumber + GetRandomSeed() % (m_nMaxNumber - m_nMinNumber));
-
     //保证算出的数字不能是负数
-    if (uRandom > 2147483647)
+    if (m_nMaxNumber <= m_nMinNumber || m_nMaxNumber < 0 || m_nMinNumber < 0 || m_nMinNumber == 2147483647)
     {
-        uRandom = 0;
+        return 0;
     }
 
-    return (int)uRandom;
+    return m_nMinNumber + GetRandomSeed() % (m_nMaxNumber - m_nMinNumber);
 }
 
 int CRandomNumber::GetRandomSeed()
@@ -45,7 +43,14 @@ int CRandomNumber::GetRandomSeed()
 
     if (fd != -1)
     {
-        read(fd, (void*)&rnum, sizeof(int));
+        size_t stReadLen = read(fd, (void*)&rnum, sizeof(int));
+
+        if (stReadLen != sizeof(int))
+        {
+            //读取文件失败
+            rnum = 0;
+        }
+
         close(fd);
     }
 
