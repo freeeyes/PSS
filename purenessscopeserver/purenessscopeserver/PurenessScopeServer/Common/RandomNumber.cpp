@@ -18,7 +18,8 @@ void CRandomNumber::SetRange(int nMinNumber, int nMaxNumber)
 
 int CRandomNumber::GetRandom()
 {
-    return m_nMinNumber + (int)GetRandomSeed()%(m_nMaxNumber - m_nMinNumber);
+    int nRandom = (int)(m_nMinNumber + GetRandomSeed() % (m_nMaxNumber - m_nMinNumber));
+    return nRandom;
 }
 
 int CRandomNumber::GetRandomSeed()
