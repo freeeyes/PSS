@@ -112,14 +112,6 @@ int CConnectClient::open(void* p)
 
     ACE_Time_Value nowait(MAX_MSG_PACKETTIMEOUT);
     m_nIOCount = 1;
-    int nRet = Super::open();
-
-    if (nRet != 0)
-    {
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::open]ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>::open() error [%d].\n", nRet));
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectClient::open]ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>::open() error [%d].", nRet);
-        return -1;
-    }
 
     //设置链接为非阻塞模式
     if (this->peer().enable(ACE_NONBLOCK) == -1)
@@ -159,7 +151,7 @@ int CConnectClient::open(void* p)
     m_pClientMessage = App_ClientReConnectManager::instance()->GetClientMessage(m_nServerID);
     OUR_DEBUG((LM_INFO, "[CConnectClient::open] Connection from [%s:%d]\n", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
 
-    nRet = this->reactor()->register_handler(this, ACE_Event_Handler::READ_MASK | ACE_Event_Handler::WRITE_MASK);
+    int nRet = this->reactor()->register_handler(this, ACE_Event_Handler::READ_MASK | ACE_Event_Handler::WRITE_MASK);
 
     int nWakeupRet = reactor()->cancel_wakeup(this, ACE_Event_Handler::WRITE_MASK);
 
