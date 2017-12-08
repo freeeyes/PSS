@@ -445,7 +445,15 @@ My_ACE_Dev_Poll_Reactor_Notify::dequeue_one (ACE_Notification_Buffer& nb)
 {
     nb.eh_ = 0;
     nb.mask_ = 0;
-    return this->read_notify_pipe (this->notify_handle (), nb);
+
+    if (NULL != this->notify_handle())
+    {
+        return this->read_notify_pipe(this->notify_handle(), nb);
+    }
+    else
+    {
+        return -1;
+    }
 }
 
 
@@ -1398,14 +1406,11 @@ My_ACE_Dev_Poll_Reactor::dispatch_io_event (Token_Guard& guard)
         {
             ACE_Notification_Buffer b;
 
-            if (NULL != dynamic_cast<My_ACE_Dev_Poll_Reactor_Notify*>(this->notify_handler_))
-            {
-                status = dynamic_cast<My_ACE_Dev_Poll_Reactor_Notify*>(this->notify_handler_)->dequeue_one(b);
+            status = dynamic_cast<My_ACE_Dev_Poll_Reactor_Notify*>(this->notify_handler_)->dequeue_one(b);
 
-                if (status == -1)
-                {
-                    return status;
-                }
+            if (status == -1)
+            {
+                return status;
             }
 
             guard.release_token ();
