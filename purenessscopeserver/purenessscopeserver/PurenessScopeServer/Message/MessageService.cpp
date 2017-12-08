@@ -117,7 +117,7 @@ int CMessageService::open(void* args)
 
     if(activate(THREAD_PARAM, MAX_MSG_THREADCOUNT) == -1)
     {
-        OUR_DEBUG((LM_ERROR, "[CMessageService::open] activate error ThreadCount = [%d].", MAX_MSG_THREADCOUNT));
+        OUR_DEBUG((LM_ERROR, "[CMessageService::open] activate error ThreadCount = [%d].\n", MAX_MSG_THREADCOUNT));
         m_blRun = false;
         return -1;
     }

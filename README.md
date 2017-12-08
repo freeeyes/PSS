@@ -56,10 +56,7 @@
 freeeyes
 
 框架贡献者:
-凹凸man,w1w,乔戈,Bobo
+凹凸man,w1w,乔戈,Bobo,弄香花满衣,崔,kz
 
 QQ框架技术讨论群: 260862613
 
-<pre><code>
-如需编译帮助，请阅读doc文件夹下的先读我.txt
-</code></pre>
