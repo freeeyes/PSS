@@ -3,8 +3,8 @@ project(PacketParse_Interface):acelib{
   dynamicflags += TEST_TCP_BUILD_DLL
   
   Source_Files{
-	../Common	
-  	./*.cpp 
+    ../Common/*.cpp  
+    ./*.cpp 
   }
   
   includes += ../Common
@@ -14,15 +14,15 @@ project(PacketParse_Interface):acelib{
   }
 
   specific(gnuace) {
-	macros += __LINUX__  
+  macros += __LINUX__  
     compile_flags += -Wno-deprecated
   }  
   
   libout = ./
   specific (prop:microsoft){
-	dllout = ../PurenessScopeServer/Windows_Bin
+    dllout = ../PurenessScopeServer/Windows_Bin
   } else {
-	dllout = ../PurenessScopeServer/Linux_Bin
+    dllout = ../PurenessScopeServer/Linux_Bin
   }
   includes += .
 }
