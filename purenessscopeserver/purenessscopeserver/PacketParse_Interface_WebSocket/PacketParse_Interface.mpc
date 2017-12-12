@@ -13,5 +13,5 @@ project(PacketParse_Interface_WebSocket):acelib{
   } else {
 	dllout = ../PurenessScopeServer/Linux_Bin
   }
-  includes += .
+  includes += ../Common
 }
