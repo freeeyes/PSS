@@ -78,7 +78,7 @@ class My_ACE_Dev_Poll_Reactor_Notify : public ACE_Reactor_Notify
 public:
 
     /// Constructor
-    My_ACE_Dev_Poll_Reactor_Notify(void) {};
+    My_ACE_Dev_Poll_Reactor_Notify(void);
 
     /**
     * @name Initialization and Termination Methods
