@@ -1402,7 +1402,7 @@ My_ACE_Dev_Poll_Reactor::dispatch_io_event (Token_Guard& guard)
         // notification then releases the token prior to dispatching it.
         // NOTE: If notify_handler_->dispatch_one() returns a fail condition
         // it has not releases the guard. Else, it has.
-        if (eh == this->notify_handler_)
+        if ((eh != NULL)&&(eh == this->notify_handler_))
         {
             ACE_Notification_Buffer b;
 
