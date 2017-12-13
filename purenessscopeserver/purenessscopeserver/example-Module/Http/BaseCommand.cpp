@@ -75,7 +75,7 @@ int CBaseCommand::DoMessage_HttpData(IMessage* pMessage, bool& bDeleteFlag)
 
     int nLength = ACE_OS::strlen(RETURN_HTTP_HTML);
 
-    sprintf_safe(szReturnData, MAX_BUFF_500, "HTTP /1.1 200 OK\r\nServer: PSS\r\nContent-Length: %d\r\nContent-Type: text/html\r\n\r\n%s", nLength, RETURN_HTTP_HTML);
+    sprintf_safe(szReturnData, MAX_BUFF_500, "HTTP/1.1 200 OK\r\nServer: PSS\r\nContent-Length: %d\r\nContent-Type: text/html\r\n\r\n%s", nLength, RETURN_HTTP_HTML);
 
     uint16 u2PostCommandID = COMMAND_RETURN_HTTP_DATA;
 
