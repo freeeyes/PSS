@@ -446,7 +446,7 @@ My_ACE_Dev_Poll_Reactor_Notify::dequeue_one (ACE_Notification_Buffer& nb)
     nb.eh_ = 0;
     nb.mask_ = 0;
 
-    if (NULL != this->notify_handle())
+    if (ACE_INVALID_HANDLE != this->notify_handle())
     {
         return this->read_notify_pipe(this->notify_handle(), nb);
     }
