@@ -1,6 +1,6 @@
 sudo: required
 dist: trusty
-group: deprecated-2017Q3
+group: deprecated-2017Q4
 language: cpp
 os:
   - linux
