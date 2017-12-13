@@ -1,4 +1,7 @@
-sudo: false         # 开启基于容器的Travis CI任务，让编译效率更高。
+sudo: required
+dist: trusty
+group: deprecated-2017Q4
+
 language: cpp
 os:
   - linux
