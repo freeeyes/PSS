@@ -55,6 +55,13 @@ int CRandomNumber::GetRandomSeed()
     }
 
 #endif
+
+    //随机种子不能产生负数
+    if (rnum < 0)
+    {
+        rnum = 0 - rnum;
+    }
+
     return rnum;
 }
 
