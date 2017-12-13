@@ -1402,19 +1402,28 @@ My_ACE_Dev_Poll_Reactor::dispatch_io_event (Token_Guard& guard)
         // notification then releases the token prior to dispatching it.
         // NOTE: If notify_handler_->dispatch_one() returns a fail condition
         // it has not releases the guard. Else, it has.
-        if ((eh != NULL)&&(eh == this->notify_handler_))
+        if (eh == this->notify_handler_)
         {
             ACE_Notification_Buffer b;
 
-            status = dynamic_cast<My_ACE_Dev_Poll_Reactor_Notify*>(this->notify_handler_)->dequeue_one(b);
+            My_ACE_Dev_Poll_Reactor_Notify* ptrReactorNotify = dynamic_cast<My_ACE_Dev_Poll_Reactor_Notify*>(this->notify_handler_);
 
-            if (status == -1)
+            if(NULL == ptrReactorNotify)
             {
-                return status;
+                return -1;
             }
+            else
+            {
+                status = ptrReactorNotify->dequeue_one(b);
 
-            guard.release_token ();
-            return notify_handler_->dispatch_notify (b);
+                if (status == -1)
+                {
+                    return status;
+                }
+
+                guard.release_token ();
+                return notify_handler_->dispatch_notify (b);
+            }
         }
 
         {
