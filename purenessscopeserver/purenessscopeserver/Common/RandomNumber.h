@@ -21,7 +21,7 @@ public:
     ~CRandomNumber(void);
 
     void SetRange(int nMinNumber, int nMaxNumber);
-    int GetRandom(int nRandType = 0);
+    int GetRandom(int nRandType = 0);                //随机算法，0默认是伪随机，1是真随机
 
 private:
     int GetRandomSeed_Pseudo();

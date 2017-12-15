@@ -797,10 +797,11 @@ int CMessageService::CloseMsgQueue()
 //==========================================================
 CMessageServiceGroup::CMessageServiceGroup()
 {
-    m_u4TimerID     = 0;
-    m_u4MaxQueue    = 0;
-    m_u4HighMask    = 0;
-    m_u4LowMask     = 0;
+    m_u4TimerID      = 0;
+    m_u4MaxQueue     = 0;
+    m_u4HighMask     = 0;
+    m_u4LowMask      = 0;
+    m_u2CurrThreadID = 0;
 
     uint16 u2ThreadTimeCheck = App_MainConfig::instance()->GetThreadTimeCheck();
 
@@ -859,9 +860,10 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
     //Close();
 
     //记录当前设置
-    m_u4MaxQueue    = u4MaxQueue;
-    m_u4HighMask    = u4HighMask;
-    m_u4LowMask     = u4LowMask;
+    m_u4MaxQueue     = u4MaxQueue;
+    m_u4HighMask     = u4HighMask;
+    m_u4LowMask      = u4LowMask;
+    m_u2CurrThreadID = 0;
 
     m_objAllThreadInfo.Init((int)u4ThreadCount);
 
@@ -883,9 +885,6 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
 
         m_vecMessageService.push_back(pMessageService);
     }
-
-    //初始化随机范围，仅UDP协议包需要
-    m_objRandomNumber.SetRange(0, u4ThreadCount - 1);
 
     return true;
 }
@@ -1403,8 +1402,21 @@ int32 CMessageServiceGroup::GetWorkThreadID(uint32 u4ConnectID, uint8 u1PackeTyp
     }
     else if(u1PackeType == PACKET_UDP)
     {
-        //如果是UDP协议，则获取当前随机数值
-        n4ThreadID = m_objRandomNumber.GetRandom();
+        //如果是UDP协议，则记录当前线程的位置，直接+1，调用随机数速度比较慢（因为要读文件）
+        m_ThreadLock.acquire();
+        n4ThreadID = m_u2CurrThreadID;
+
+        //当前m_u2CurrThreadID指向下一个线程ID
+        if (m_u2CurrThreadID >= m_objAllThreadInfo.GetThreadCount() - 1)
+        {
+            m_u2CurrThreadID = 0;
+        }
+        else
+        {
+            m_u2CurrThreadID++;
+        }
+
+        m_ThreadLock.release();
     }
 
     return n4ThreadID;

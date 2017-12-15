@@ -16,7 +16,6 @@
 #include "BuffPacket.h"
 #include "MainConfig.h"
 #include "TimerManager.h"
-#include "RandomNumber.h"
 #include "WorkThreadAI.h"
 #include "CommandAccount.h"
 #include "MessageDyeingManager.h"
@@ -186,9 +185,10 @@ public:
     uint32                     m_u4TimerID;               //定时器ID
     uint16                     m_u2ThreadTimeCheck;       //线程自检时间
     CThreadInfo                m_objAllThreadInfo;        //当前所有线程信息
-    CRandomNumber              m_objRandomNumber;         //随机数，仅UDP使用
     CMessageDyeingManager      m_objMessageDyeingManager; //数据染色类
+    uint16                     m_u2CurrThreadID;          //当前轮询到的线程ID
+    ACE_Recursive_Thread_Mutex m_ThreadLock;              //用于线程操作的线程锁，保证CurrThreadID的数据正常
 };
 
-typedef ACE_Singleton<CMessageServiceGroup,ACE_Null_Mutex> App_MessageServiceGroup;
+typedef ACE_Singleton<CMessageServiceGroup, ACE_Null_Mutex> App_MessageServiceGroup;
 #endif
