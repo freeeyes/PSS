@@ -1,21 +1,21 @@
-# 如何开发一个逻辑插件  
-## （1）设计一个插件的入口  
-> 首先，你需要新建一个插件入口的代码文件，这个文件的有几个函数是必须实现的，这样便于框架对插件的加载。  
+# How to develop a logical plug-in  
+## （1）Design a plug-in entry  
+> First, you need to create a new plug-in entry code file, this file has several functions must be implemented, so that the framework to plug-in load.  
 
 ```cpp
 #include "BaseCommand.h"    
 #include "IObject.h"  
 #include "ace/svc_export.h"
   
-static const char* g_szDesc      = "样例TCP模块";       //模块的描述文字  
-static const char* g_szName      = "TCP测试";           //模块的名字  
-static const char* g_szModuleKey = "BaseTCP";           //模块的Key  
+static const char* g_szDesc      = "Tcp desc";       //Module description text  
+static const char* g_szName      = "TCP test";       //Name of the module  
+static const char* g_szModuleKey = "BaseTCP";        //Module's key  
 ```
 
-> 在一开始，你必须声明你的插件的g_szModuleKey，g_szName和g_szDesc。  
-> g_szModuleKey是插件的key，这个用于插件间或者框架加载使用。  
-> g_szName是插件的名字信息。  
-> g_szDesc是插件的描述信息。  
+> In the beginning, you must declare your plug-in g_szModuleKey，g_szName and g_szDesc。  
+> g_szmodulekey is the key of the plug - in, which is used between plug-ins or for frame loading.  
+> g_szName is the name information of the plug-in.  
+> g_szDesc is the plug-in description information.  
 
 ```cpp
 extern "C"
@@ -30,26 +30,26 @@ extern "C"
 }
 ```
 
-> 这里是需要适时的添加你自己实现的代码。  
-> LoadModuleData() 当插件第一次加载，或者重载的时候，框架会调用此方法。实现插件的初始化。  
-> 在这里，你需要注册插件的信令，注册指令为  
-> pMessageManager->AddClientCommand(COMMAND_BASE, g_BaseCommand, g_szName);  
-> COMMAND_BASE为你要需要处理的信令ID。  
-> g_BaseCommand为对应COMMAND_BASE处理的类函数。  
-> 这里请注意，如果需要，一个g_BaseCommand类是可以实现多个信令的处理。  
-> 在收到数据的时候，需要你自己在DoMessage()去分别处理。  
-> UnLoadModuleData() 当插件卸载的时候，会调用这个接口，实现插件的卸载。  
-> DoModuleMessage() 这个提供了插件间调用的接口。  
-> 如果你的插件支持别的插件可以访问你的入口，在这里添加你的代码。  
-> u2CommandID是其他插件传入的命令ID，你可以根据这个ID来决定你的插件行为。  
-> pBuffPacket是别的插件调用你的参数入口，你可以根据你的需要解析这个IBuffPacket对象(具体看example代码)。  
-> pReturnBuffPacket是你需要返回给其他插件的结果，你可以组织你的IBuffPacket对象数据格式。  
-> GetModuleState()这个函数是框架定时调用接口，用于检查插件的运行状态，你在这里可以返回你的插件状态。  
-> u4ErrorID就是你要返回的状态，如果是0则框架认为是正常的，是其他数值，框架会记录当前插件插件。  
+> here is the need to add your own implementation of the code in a timely manner.  
+> loadmoduledata() this method is called by the framework when the plug-in is first loaded or reloaded. The initialization of the plug-in is realized.  
+> here, you need to register the plug-in signaling, registration instructions for  
+> pmessagemanager->addclientcommand(command_base, g_basecommand, g_szname);  
+> command_base is the signaling id you need to process.  
+> g_basecommand is a class function that corresponds to command _ base processing.  
+> here, note that if desired, a g_basecommand class is a process that enables multiple signaling.  
+> when you receive data, you need to deal with it separately in domessage ( ).  
+> unloadmoduledata() when the plug-in uninstall, will call this interface, realize the plug-in uninstall.  
+> domodulemessage() this provides an interface for calls between plug - ins.  
+> if your plug-in supports other plug-ins to access your portal, add your code here.  
+> u2command id is the command id passed in by other plug - ins, and you can determine your plug-in behavior based on this id.  
+> pbuffpacket is another plug-in call your parameter entry, you can according to your needs to parse the ibuffpacket object ( see example code ).  
+> return buffer is the result of you need to return to other plug - ins, you can organize your ibuffpacket object data format.  
+> getmodulestate() this function is the frame timing call interface, used to check the plug-in running status, you can return to your plug-in status here.  
+> U4 error id is the state you want to return, if it is 0, the framework is considered normal, is other values, the framework will record the current plug - in.   
 
-## （2）设计一个信令  
-> 你首先需要设计一个命令类，继承框架的信令类
-> 例如： 
+## （2）Design a command  
+> You first need to design a command class that inherits the framework 's command class
+> example： 
 
 ```cpp  
 class CBaseCommand : public CClientCommand
@@ -76,7 +76,7 @@ private:
     int            m_nCount;
 };
 ```
-> 在这里，你需要实现DoMessage()的内容，当框架收到指定的消息，会调用这里实现消息的处理。  
+> Here, you need to implement the content of the Domessage(), when the framework receives the specified message, will call here to implement the processing of the message.  
 
 ```cpp 
 int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
@@ -97,7 +97,7 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
         return -1;
     }
 
-    //处理链接建立信息
+    //dispose message
     MESSAGE_FUNCTION_BEGIN(pMessage->GetMessageBase()->m_u2Cmd);
     MESSAGE_FUNCTION(COMMAND_BASE,            Do_Base,              pMessage);
     MESSAGE_FUNCTION_END;
@@ -108,27 +108,26 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 }
 ```  
 
-> 在这里，MESSAGE_FUNCTION()实现对注册的命令映射。  
-> 你只要实现Do_Base()函数即可。  
-> 这里要说一下，m_pServerObject是框架对象的指针集合。  
-> 在这里你可以使用框架的一系列指令。  
-> 它们包括：
-
+> here, message_function() implements a command mapping for registration.  
+> you just implement the do_base() function.  
+> here, m_pserverobject is a collection of pointers to frame objects.
+> here you can use the framework of a series of instructions.
+> they include:  
 
 ```cpp
-    IMessageManager*       m_pIMessageManager;      //信令注册注销
-    ILogManager*           m_pLogManager;           //日志的记录
-    IConnectManager*       m_pConnectManager;       //客户端连接，用于数据的发送 
-    IPacketManager*        m_pPacketManager;        //IBuffPacket管理类（对象池）
-    IClientManager*        m_pClientManager;        //服务器间调用
-    IUDPConnectManager*    m_pUDPConnectManager;    //UDP管理类，可以用于发送UDP数据
-    ActiveTimer*           m_pTimerManager;         //定时器类 
-    IModuleMessageManager* m_pModuleMessageManager; //提供模块间调用方法 
-    IControlListen*        m_pContorlListen;        //可以让框架开启，关闭指定的监听TCP端口
-    IModuleInfo*           m_pIModuleInfo;          //获得当前框架加载的模块信息
-    IServerManager*        m_pIServerManager;       //控制框架启动和关闭
-    IMessageBlockManager*  m_pMessageBlockManager;  //MessageBlock管理类(对象池)
-    IFrameCommand*         m_pFrameCommand;         //支持控制框架的命令，具体可以参考PSSFrameCommand.md
+    IMessageManager*       m_pIMessageManager;      //message registration deregistration
+    ILogManager*           m_pLogManager;           //Log records
+    IConnectManager*       m_pConnectManager;       //Client connection for data transmission 
+    IPacketManager*        m_pPacketManager;        //IBuffPacket manager (object pool)  
+    IClientManager*        m_pClientManager;        //Inter - server call
+    IUDPConnectManager*    m_pUDPConnectManager;    //UDP manager，Can be used to send UDP data
+    ActiveTimer*           m_pTimerManager;         //Timer
+    IModuleMessageManager* m_pModuleMessageManager; //Provides an inter-module call method 
+    IControlListen*        m_pContorlListen;        //Allows the framework to open and close the specified listening TCP port
+    IModuleInfo*           m_pIModuleInfo;          //Gets the module information loaded by the current frame
+    IServerManager*        m_pIServerManager;       //Control frame start and close
+    IMessageBlockManager*  m_pMessageBlockManager;  //MessageBlock manager(object pool)
+    IFrameCommand*         m_pFrameCommand;         //Support control framework commands, specific reference (here)[PSSFrameCommand.md]
 ```
 
-具体使用方法，请参考对应的example实例。
+For specific usage, refer to the corresponding example instance.

@@ -1,13 +1,13 @@
-# 如何开发一个解析插件  
-## 开发插件的文件说明  
-> 解析插件和逻辑插件不同，解析插件不提供数据包的处理。  
-> 它提供的是数据包的加解密服务，以及数据包的完整性验证服务。  
-> 你可以在这里实现它，添加你的代码。  
-> 通过此插件的数据，将会最终流到逻辑插件中去处理。  
-> 解析插件目前实现了三个样例：  
-> PacketParse_Interface 普通数据包的解析。  
-> PacketParse_Interface_Http http数据包的解析  
-> PacketParse_Interface_WebSocket websocket数据包的解析
+# how to develop a parsing plug - in  
+## documentation for development plug - ins  
+> parsing plug-ins and logical plug - ins, parsing plug-ins do not provide packet processing.  
+> it provides encryption and decryption services for packets and integrity verification services for packets.  
+> you can implement it here, add your code.  
+> data from this plug-in will eventually flow to the logical plug - in for processing.  
+> the parsing plug-in currently implements three samples:    
+> PacketParse_Interface parsing of normal packets。  
+> PacketParse_Interface_Http http parsing of data packets  
+> PacketParse_Interface_WebSocket websocket parsing of data packets  
 
 ```cpp
     DECLDIR bool Parse_Packet_Head_Info(uint32 u4ConnectID, ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager, _Head_Info* pHeadInfo);
@@ -19,25 +19,25 @@
     DECLDIR void DisConnect(uint32 u4ConnectID);
     DECLDIR void Close();
 ```
-> Parse_Packet_Head_Info()实现处理数据包头的验证，在这里添加你的代码。(此函数对应main.xml配置H&B模式)  
-> Parse_Packet_Body_Info()实现处理数据包体的验证，在这里添加你的代码。(此函数对应main.xml配置H&B模式)  
-> Parse_Packet_Stream()实现对流数据的处理，在这个模式下，需要你自己按照自己的规则拆解数据包头和包体。
-> Make_Send_Packet_Length()获得一个发送数据包的长度。  
-> Make_Send_Packet()处理发送数据的组包逻辑，在这里添加你的代码。
-> Connect() 当客户端连接建立的时候，你可以在这里处理一些客户端连接的初始化逻辑。  
-> DisConnect() 当客户端连接断开的时候，你可以在这里处理一些客户端连接断开逻辑。  
-> Close() 当解析插件被关闭的时候，这里可以添加你的代码做一些内存清理动作。  
+> Parse_Packet_Head_Info()Implement validation for processing packet headers, add your code here。(This function corresponds to main.xml configuration H&B mode)  
+> Parse_Packet_Body_Info()Implement validation to process the packet body, add your code here.(This function corresponds to main.xml configuration H&B mode)  
+> Parse_Packet_Stream() In this mode, you need to disassemble the packet header and the packet body according to your own rules.  
+> Make_Send_Packet_Length() Gets the length of a send packet。  
+> Make_Send_Packet() The grouping logic that handles sending data, add your code here.  
+> Connect() When a client connection is established, you can handle some of the client connection initialization logic here.    
+> DisConnect() When the client connection is disconnected, you can handle some client connection disconnection logic here.  
+> Close() When the parsing plug-in is turned off, here you can add your code to do some memory cleanup.    
 
 ```cpp
-//定义PacketParse的相关消息体
-//数据包头结构
+//define PacketParse message
+//packet head
 struct _Head_Info
 {
-    uint32             m_u4HeadSrcLen;       //原始数据包头长（解析前）
-    uint32             m_u4HeadCurrLen;      //当前数据包长 （解析后）
-    uint32             m_u4BodySrcLen;       //当前包体长度（解析前）
+    uint32             m_u4HeadSrcLen;       //Original packet header length（Before parsing）
+    uint32             m_u4HeadCurrLen;      //Current packet header length （After parsing）
+    uint32             m_u4BodySrcLen;       //Current inclusion length（Before parsing）
     uint16             m_u2PacketCommandID;  //CommandID
-    ACE_Message_Block* m_pmbHead;            //包头消息体
+    ACE_Message_Block* m_pmbHead;            //Header message block
 
     _Head_Info()
     {
@@ -49,13 +49,13 @@ struct _Head_Info
     }
 };
 
-//数据包体结构
+//Packet body structure
 struct _Body_Info
 {
-    uint32             m_u4BodySrcLen;       //原始数据包体长（解析前）
-    uint32             m_u4BodyCurrLen;      //当前数据包长 （解析后）
-    uint16             m_u2PacketCommandID;  //CommandID(如果有，则直接赋值，如果没有，则保持初始值不变)
-    ACE_Message_Block* m_pmbBody;            //包头消息体
+    uint32             m_u4BodySrcLen;       //Original packet body length（Before parsing）
+    uint32             m_u4BodyCurrLen;      //Current packet body length （After parsing）
+    uint16             m_u2PacketCommandID;  //CommandID
+    ACE_Message_Block* m_pmbBody;            //body message block
 
     _Body_Info()
     {
@@ -66,16 +66,16 @@ struct _Body_Info
     }
 };
 
-//数据包完整结构
+//stream Packet complete structure
 struct _Packet_Info
 {
-    uint32             m_u4HeadSrcLen;       //原始数据包头长（解析前）
-    uint32             m_u4HeadCurrLen;      //当前数据包长 （解析后）
-    uint32             m_u4BodySrcLen;       //原始数据包头长（解析前）
-    uint32             m_u4BodyCurrLen;      //当前数据包长 （解析后）
+    uint32             m_u4HeadSrcLen;       //Original packet header length（Before parsing）
+    uint32             m_u4HeadCurrLen;      //Current packet header length （After parsing）
+    uint32             m_u4BodySrcLen;       //Original packet body length（Before parsing）
+    uint32             m_u4BodyCurrLen;      //Current packet body length （After parsing）
     uint16             m_u2PacketCommandID;  //CommandID
-    ACE_Message_Block* m_pmbHead;            //包头消息体
-    ACE_Message_Block* m_pmbBody;            //包头消息体
+    ACE_Message_Block* m_pmbHead;            //Header message block
+    ACE_Message_Block* m_pmbBody;            //body message block
 
     _Packet_Info()
     {

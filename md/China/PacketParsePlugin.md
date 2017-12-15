@@ -53,9 +53,9 @@ struct _Head_Info
 struct _Body_Info
 {
     uint32             m_u4BodySrcLen;       //原始数据包体长（解析前）
-    uint32             m_u4BodyCurrLen;      //当前数据包长 （解析后）
+    uint32             m_u4BodyCurrLen;      //当前数据包体长（解析后）
     uint16             m_u2PacketCommandID;  //CommandID(如果有，则直接赋值，如果没有，则保持初始值不变)
-    ACE_Message_Block* m_pmbBody;            //包头消息体
+    ACE_Message_Block* m_pmbBody;            //包体消息体
 
     _Body_Info()
     {
@@ -70,12 +70,12 @@ struct _Body_Info
 struct _Packet_Info
 {
     uint32             m_u4HeadSrcLen;       //原始数据包头长（解析前）
-    uint32             m_u4HeadCurrLen;      //当前数据包长 （解析后）
-    uint32             m_u4BodySrcLen;       //原始数据包头长（解析前）
-    uint32             m_u4BodyCurrLen;      //当前数据包长 （解析后）
+    uint32             m_u4HeadCurrLen;      //当前数据包头长 （解析后）
+    uint32             m_u4BodySrcLen;       //原始数据包体长（解析前）
+    uint32             m_u4BodyCurrLen;      //当前数据包体长 （解析后）
     uint16             m_u2PacketCommandID;  //CommandID
     ACE_Message_Block* m_pmbHead;            //包头消息体
-    ACE_Message_Block* m_pmbBody;            //包头消息体
+    ACE_Message_Block* m_pmbBody;            //包体消息体
 
     _Packet_Info()
     {
