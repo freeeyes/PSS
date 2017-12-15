@@ -179,6 +179,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Common\RandomNumber.cpp" />
     <ClCompile Include="..\Common\Threading.cpp" />
     <ClCompile Include="Common\ServerMessageTask.cpp" />
     <ClCompile Include="Console\ConsolePromiss.cpp" />
@@ -400,12 +401,6 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Common\ProgramService.cpp" />
-    <ClCompile Include="Common\RandomNumber.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="Common\SendCacheManager.cpp" />
     <ClCompile Include="Common\SendMessage.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)</ObjectFileName>
@@ -546,6 +541,7 @@
     <ClInclude Include="..\Common\ITimerManager.h" />
     <ClInclude Include="..\Common\IUDPConnectManager.h" />
     <ClInclude Include="..\Common\ProfileTime.h" />
+    <ClInclude Include="..\Common\RandomNumber.h" />
     <ClInclude Include="..\Common\Threading.h" />
     <ClInclude Include="..\Common\Trace.h" />
     <ClInclude Include="Common\HashTable.h" />
@@ -604,7 +600,6 @@
     <ClInclude Include="Common\MessageBlockManager.h" />
     <ClInclude Include="Common\MyACELoggingStrategy.h" />
     <ClInclude Include="Common\ProgramService.h" />
-    <ClInclude Include="Common\RandomNumber.h" />
     <ClInclude Include="Common\Ring.h" />
     <ClInclude Include="Common\SendCacheManager.h" />
     <ClInclude Include="Common\SendMessage.h" />

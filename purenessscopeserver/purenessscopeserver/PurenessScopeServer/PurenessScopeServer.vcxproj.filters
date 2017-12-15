@@ -151,9 +151,6 @@
     <ClCompile Include="PurenessScopeServer.cpp">
       <Filter>Main</Filter>
     </ClCompile>
-    <ClCompile Include="Common\RandomNumber.cpp">
-      <Filter>Common\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="UDP\ReactorUDPClient.cpp">
       <Filter>Reactor\cppfile</Filter>
     </ClCompile>
@@ -228,6 +225,9 @@
     </ClCompile>
     <ClCompile Include="..\Common\Threading.cpp">
       <Filter>IObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\RandomNumber.cpp">
+      <Filter>Common\cppfile</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -389,9 +389,6 @@
     </ClInclude>
     <ClInclude Include="UDP\ProUDPManager.h">
       <Filter>Proactor\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\RandomNumber.h">
-      <Filter>Common\hfile</Filter>
     </ClInclude>
     <ClInclude Include="UDP\ReactorUDPClient.h">
       <Filter>Reactor\hfile</Filter>
@@ -559,6 +556,9 @@
       <Filter>IObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\ProfileTime.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\RandomNumber.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
   </ItemGroup>

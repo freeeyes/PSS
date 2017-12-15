@@ -21,9 +21,10 @@ public:
     ~CRandomNumber(void);
 
     void SetRange(int nMinNumber, int nMaxNumber);
-    int GetRandom();
+    int GetRandom(int nRandType = 0);
 
 private:
+    int GetRandomSeed_Pseudo();
     int GetRandomSeed();
 
 private:
