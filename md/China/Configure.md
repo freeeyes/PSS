@@ -340,7 +340,7 @@
         </tr>
 		<tr><th>RecvPacketCount</th><th>1分钟内接收单个连接的数据包个数最大阈值，超过这个数字则报警邮件</th></tr>
 		<tr><th>RecvDataMax</th><th>1分钟内接收单个连接的数据包总大小最大阈值，超过这个数字则报警邮件</th></tr>
-		<tr><th>SendPacketCount</th><th1分钟内发送单个连接的数据包个数最大阈值，超过这个数字则报警邮件</th></tr>
+		<tr><th>SendPacketCount</th>1分钟内发送单个连接的数据包个数最大阈值，超过这个数字则报警邮件</th></tr>
 		<tr><th>SendDataMax</th><th>1分钟内发送单个连接的数据包总大小最大阈值，超过这个数字则报警邮件</th></tr>
 		<tr><th>MailID</th><th>对应发送邮件信息的ID</th></tr>
 		<tr><th>desc</th><th>当前标签描述信息</th></tr>
@@ -350,7 +350,7 @@
             <th>属性</th>
             <th>说明</th>
         </tr>
-		<tr><th>CommandID</th><th>需要监控的信令ID/th></tr>
+		<tr><th>CommandID</th><th>需要监控的信令ID</th></tr>
 		<tr><th>CommandCount</th><th>1分钟内处理该信令的最大数字，如果是0则不监控，超过这个数字则报警邮件</th></tr>
 		<tr><th>MailID</th><th>对应发送邮件信息的ID</th></tr>
 		<tr><th>desc</th><th>当前标签描述信息</th></tr>
@@ -360,7 +360,7 @@
             <th>属性</th>
             <th>说明</th>
         </tr>
-		<tr><th>MailID</th><th>报警邮件ID/th></tr>
+		<tr><th>MailID</th><th>报警邮件ID</th></tr>
 		<tr><th>fromMailAddr</th><th>设置邮件发送者</th></tr>
 		<tr><th>toMailAddr</th><th>设置邮件接受者</th></tr>
 		<tr><th>MailPass</th><th>邮箱密码</th></tr>

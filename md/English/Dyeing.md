@@ -1,37 +1,37 @@
-# 在PSS中使用数据染色  
-## 1.Trace功能的设计目的  
-> 考虑到在实际使用中，我们经常遇到有些用户抱怨服务器响应速度慢。  
-> 对于这些问题，运维一般是直接转手研发去处理。研发最多能做的也就是根据日志去分析用户行为。  
-> 这种查找模式效率低下。从实际来讲，如果每个功能都追加日志，会整体拖慢程序的运行速度。  
-> 尤其在高性能场景下，这种设计是有很大隐患的。   
-> 但是，不加日志，当系统出了问题，就比较难排查。   
-> 那么能不能在问题反映给运维的时候，由运维发起这种自我的检查呢？  
-> 这就是我设计数据染色的目的，研发在实际插件开发过程中，在自己的代码关键地方埋入一些必要的"桩"。  
-> 在正常运行过程中，"桩"不会记录任何东西（默认是关闭的），也不会影响程序的运行。  
-> 当一些这类事件发生，运维可以通过后台工具唤醒这些"桩"，输出运行时间，执行代码位置，所在进程，线程等等信息。  
-> "桩"的唤醒，依赖于一个key的生成，当一个key生成并输入到"桩"里面，"桩"就会执行记录代码。  
-> 这样做，就能在最小代价下，为快速查找问题提供了一种方法。  
-> 这些"桩"是可以跨进程，跨线程，甚至跨机器的。  
-> 同一个key所走过的"桩"将会都写入到一个文件中。这些文件将会展现数据流的方向，位置，以及过程。  
-> Trace.h是提供给插件使用的一组功能，包括三个宏组成  
-> (1) CREATE_TRACE(x,y,z) 创建一个key, x是客户端IP,y是端口,z是当前信令ID(key是由48个字符组成的字符串)  
-> (2) DO_TRACE(x,y) "桩"，这个代码可以加在插件代码里的任意地方，x是输出文件的路径，y是key，如果key为空，"桩"不做任何操作。  
-> (3) SHOW_TRACE_ID(x) 展现一个key里面的所有信息，包括key的生成时间,IP,端口,进程ID,线程ID,信令ID  
+# using data staining in PSS  
+# # 1. trace features are designed for  
+> considering that in actual use, we often encounter some users complain that the server response is slow.  
+> for these problems, operation and maintenance is generally a direct hand r & d to deal with. Research and development can do most is to analyze user behavior according to the log.  
+> this lookup mode is inefficient. In practice, if each feature appends a log, it slows down the program as a whole.  
+> especially in high performance scenarios, this design is a big hidden danger.  
+> however, without logging, when there is something wrong with the system, it is more difficult to troubleshoot.  
+> so can the problem reflected in the operation and maintenance, by the operation and maintenance of this kind of self - examination?  
+> this is the purpose of my design data dyeing, r & d in the process of actual plug-in development, in the key parts of their own code embedded some necessary " pile".  
+> in the normal operation process, " pile" will not record anything ( the default is closed ), also won 't affect the operation of the program.  
+> when some of these events occur, operation and maintenance can wake up these " pile" through the background tool, output runtime, execution code location, process, thread, and so on.  
+> " pile" awakening, depends on the generation of a key, when a key generated and input into the" pile", the " pile" will execute the record code.  
+> doing so provides a way to quickly find problems at minimal cost.  
+> these " piles" can span processes, threads, and even machines.  
+> the same key through the " pile" will be written to a file. These files will show the direction, location, and process of the data flow.  
+> trace.h is a set of features provided to plug-ins and consists of three macros  
+> ( 1 ) create_trace( x, y, z ) creates a key, x is the client IP, y is the port, z is the current signaling id ( key is a string of 48 characters )  
+> ( 2 ) do_trace( x, y ) " pile", this code can be added anywhere in the plug-in code, x is the path to the output file, y is key, if key is empty," pile" do nothing.  
+> ( 3 ) show_trace_id( x ) shows all the information in a key, including key generation time, IP, port, process id, thread id, signaling id  
 
-## 2.Trace功能的使用
-> 你可以在你需要的时候，生成一个key。这个可以在你的插件逻辑代码中决定。  
-> 当你的key生成以后，只要在每个函数调用"桩"的地方输入这个key，"桩"就会执行记录。  
-> 例如，你在插件的DoMessage()函数里面，接收到某一个指令，你可以  
-> string strKey = CREATE_TRACE(Clinet.IP, Client.port, Client.Command);  
-> 然后在你的一系列数据处理过程中，添加  
+# # 2. use of trace functionality  
+> you can generate a key when you need it. This can be determined in your plug-in logic code.  
+> when your key is generated, just enter the key where each function calls " pile" and the" pile" will execute the record.  
+> for example, you in the plug-in domessage ( ) function, received a command, you can  
+> string strKey = CREATE_TRACE(Clinet.IP, Client.port, Client.Command);    
+> And then in your series of data processing process, add  
 > DO_TRACE("./", strKey.c_str());  
-> 在一些情况下，我们需要对数据进行运行时间的统计。  
-> 你可以输出这个key的生成时间。  
+> In some cases, we need to run time statistics on the data.  
+> You can output the generation time of this key.  
 > SHOW_TRACE_ID(strKey.c_str());  
 
-## 3.运维如何使用PSS框架，动态数据染色？
-> 根据以上原理，框架支持两种数据染色机制。  
-> (1)针对某一个客户端IP来源的数据包进行染色。（需要指定染色的数据包总数，数据包从该指令下发候开始计算，达到总数既停止）  
-> 具体方式是，在PSS_ClientManager或者Telnet下，调用SetTrackIP向PSS框架发出指令。[具体操作文档看这里](PSSFrameCommand.md)  
-> (2)针对某个信令进行染色。（需要指定染色的数据包总数，数据包从该指令下发候开始计算，达到总数既停止）  
-> 具体方式是，在PSS_ClientManager或者Telnet下，调用SetTrackIP向PSS框架发出指令。[具体操作文档看这里](PSSFrameCommand.md)  
+# # 3. how does ops use PSS framework, dynamic data staining?
+> according to the above principles, the framework supports two data dyeing mechanisms.
+> ( 1 ) dye packets from a client IP source. ( specifies the total number of dyed packets, which are counted from the time the instruction is issued to stop )
+> specifically, under PSS _ client manager or telnet, call settrackip to issue instructions to the PSS framework. [see here for specific operation documents](pssframecommand.md)
+> ( 2 ) staining for a signaling. ( specifies the total number of dyed packets, which are counted from the time the instruction is issued to stop )
+> specifically, under PSS _ client manager or telnet, call settrackip to issue instructions to the PSS framework. [see here for specific operation documents](pssframecommand.md) 

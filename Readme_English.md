@@ -17,19 +17,19 @@
 > hope to be able to step by step with you to improve the system, really do a valuable framework. My goal is, you use cool, is to succeed. And I hope you like it more and more.  
 > in addition, the latest code will be released on the SVN, if you have a SVN, it is best to download directly from the SVN, I will regularly play version package in download to provide download.  
 
-## [How does the PSS framework compile](Install.md) 
-## [Pss framework configuration instructions](Configure.md)
-## [Pss logical plug - in use case description](examples.md)
-## [Pss Background commands instruction](PSSFrameCommand.md) 
-## [How to Data dyeing](Dyeing.md)
-## [How to develop a logical plugin](LogicPlugin.md) 
-## [How to develop a parsing plugin](PacketParsePlugin.md) 
+## [How does the PSS framework compile](./md/English/Install.md) 
+## [Pss framework configuration instructions](./md/English/Configure.md)
+## [Pss logical plug - in use case description](./md/English/examples.md)
+## [Pss Background commands instruction](./md/English/PSSFrameCommand.md) 
+## [How to Data dyeing](./md/English/Dyeing.md)
+## [How to develop a logical plugin](./md/English/LogicPlugin.md) 
+## [How to develop a parsing plugin](./md/English/PacketParsePlugin.md) 
 
 >##Provides several piezometric data ( TCP pass tool available from PSS open source kit ) 
 
 * * *  
 > ###Windows  
-> Test PSS IP:172.21.1.200, Port:10002. (Windows10 x64 DEBUG）  
+> Test PSS IP:172.21.1.200, Port:10002. (Windows7 x64 DEBUG）  
 * Test IO protocal:TCP  
 * Begin Time: 2013-09-18 11:07:42  
 * End Time: 2013-09-18 12:06:00  

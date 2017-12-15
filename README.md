@@ -4,7 +4,7 @@
 [![coverity](https://scan.coverity.com/projects/14425/badge.svg)](https://scan.coverity.com/projects/freeeyes-pss)
 [![Platform](https://img.shields.io/badge/platform-Linux,%20Windows-green.svg?style=flat)](https://github.com/freeeyes/PSS)
  
-## [English Introduction](./md/English/Readme_English.md)  
+## [English Introduction](Readme_English.md)  
  
 > 这是一个服务器框架。支持开发者使用插件(so或者dll)的方式，  
 > 开发相关TCP和UDP的逻辑服务。 本服务框架基于ACE，可以在windows和linux下自适应编译运行。 
@@ -32,7 +32,7 @@
 
 * * *  
 > ###Windows平台
-压测IP:172.21.1.200, 压测端口:10002.（Linux ContOS6 DEBUG）
+压测IP:172.21.1.200, 压测端口:10002.（Win7 DEBUG）
 * 压测类型:TCP
 * 压测开始时间为: 2013-09-18 11:07:42
 * 压测结束时间为: 2013-09-18 12:06:00
@@ -49,7 +49,7 @@
 
 * * * 
 > ###Linux平台
-* 压测IP:172.21.1.68, 压测端口:10002.（Windows7 DEBUG）
+* 压测IP:172.21.1.68, 压测端口:10002.（Linux ContOS6 DEBUG）
 * 压测类型:TCP
 * 压测开始时间为: 2013-09-16 09:55:58
 * 压测结束时间为: 2013-09-16 10:38:09
