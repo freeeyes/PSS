@@ -1,449 +1,448 @@
-# PSS框架命令指令集  
-## 1.命令组成  
-PSS框架支持对框架内部运行状态操作的指令集。    
-这些指令包括框架的插件管理，工作线程状态管理，框架基本参数查询，连接数列表，服务器端口管理，IP管理等等。
+# Pss framework console command group   
+## 1.command struct  
+The PSS framework supports instruction sets that operate on the internal health of the framework.    
+These instructions include framework plug-in management, worker thread state management, framework basic parameter query, connection number list, server port management, IP management, and so on.  
 
-命令格式为:  
-<命令输出格式> <用户名> <命令字> <参数><命令结束符>  
-例如:  
+Command format:  
+<Command output type> <user name> <command name> <command params><Command terminator>  
+ezample:  
 b freeeyes ShowServerInfo -a&  
-**b**: 输出结果以二进制结果输出，如果想以文本结构输出，这里可以使用 **i** (比如在telnet下)  
-**freeeyes**: 用户名，这个是必须的，PSS框架会对用户进行校验，具体校验设置在**main.xml**  （设置用户名）和**ConsoleCommand.xml**  （设置对应的权限）有权限才能被执行。    
-**ShowServerInfo**: 命令的名称.  
-**-a**: 命令的参数部分。  
-**&**: 命令结束符，是必须的。
+**b**: The output is output as a binary result, and if you want to output as a text structure, you can use **( for example, under telnet )  
+**freeeyes**: Username, this is required, the PSS framework will verify the user, specific verification settings in **main.xml **(set username) and **consolecommand.xml **( set corresponding permissions ) have permissions to be executed.    
+**ShowServerInfo**: Command name.  
+**-a**: Command params.  
+**&**: Command terminator is required.
 
-##2.命令说明(以二进制结果输出返回)   
+##2.Support command introduction (Returns as a binary result output)   
 <table width="100%" border="1" cellpadding="0" cellspacing="0">
         <tr>
-            <th width="20%">命令样例</th>
-			<th width="20%">说明</th>
-            <th width="60%" colspan="2">返回数据结构</th>
+            <th width="20%">Command sample</th>
+			<th width="20%">Explain</th>
+            <th width="60%" colspan="2">Returns the data structure</th>
         </tr>
         <tr>
             <th rowspan="11">ShowServerInfo -a</th>
-            <th rowspan="11">获得框架基本运行参数</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="11">Obtain the basic operating parameters of the framework</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-		<tr><th>uint16</th><th>服务器ID</th></tr>
-		<tr><th>uint8</th><th>服务器名称字符串长度</th></tr>
-		<tr><th>char</th><th>服务器名称</th></tr>
-		<tr><th>uint8</th><th>服务版本字符串长度</th></tr>
-		<tr><th>char</th><th>服务器版本</th></tr>
-		<tr><th>uint16</th><th>服务器插件个数</th></tr>
-		<tr><th>uint16</th><th>服务器工作线程个数</th></tr>
-		<tr><th>uint16</th><th>服务器协议包版本号</th></tr>
-		<tr><th>uint8</th><th>服务器字序大端还是小段，0小端 1大端</th></tr>
-		<tr><th>uint8</th><th>服务器字序 0 主机序 1 网络序</th></tr>
+		<tr><th>uint16</th><th>Server ID</th></tr>
+		<tr><th>uint8</th><th>Server name length</th></tr>
+		<tr><th>char</th><th>Server name</th></tr>
+		<tr><th>uint8</th><th>Server version code length</th></tr>
+		<tr><th>char</th><th>Server version code</th></tr>
+		<tr><th>uint16</th><th>Server logic plugin count</th></tr>
+		<tr><th>uint16</th><th>Server work thread count</th></tr>
+		<tr><th>uint16</th><th>Server packet version</th></tr>
+		<tr><th>uint8</th><th>Server word order large or small, 0 small 1 large</th></tr>
+		<tr><th>uint8</th><th>Server word sequence 0 host sequence 1 network sequence</th></tr>
         <tr>
             <th rowspan="16">ShowModule -a</th>
-            <th rowspan="16">查看所有框架正在运行的插件</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="16">View all the plug-ins that the framework is running</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-		<tr><th>uint32</th><th>当前运行插件个数</th></tr>
-		<tr><th>uint8</th><th>插件文件名长度</th></tr>
-		<tr><th>char</th><th>插件文件名</th></tr>
-		<tr><th>uint8</th><th>插件名称长度</th></tr>
-		<tr><th>char</th><th>插件名称</th></tr>
-		<tr><th>uint8</th><th>插件路径长度</th></tr>
-		<tr><th>char</th><th>插件路径</th></tr>
-		<tr><th>uint8</th><th>插件启动参数长度</th></tr>
-		<tr><th>char</th><th>插件启动参数</th></tr>
-		<tr><th>uint8</th><th>插件描述长度</th></tr>
-		<tr><th>char</th><th>插件描述</th></tr>
-		<tr><th>uint8</th><th>插件加载时间长度</th></tr>
-		<tr><th>char</th><th>插件加载时间</th></tr>
-		<tr><th>uint8</th><th>插件当前运行状态字 0 为正常</th></tr>
-		<tr><th>uint32</th><th>插件当前运行错误码 0 为正常</th></tr>
+		<tr><th>uint32</th><th>Number of plug-ins currently running</th></tr>
+		<tr><th>uint8</th><th>Plug - in filename length</th></tr>
+		<tr><th>char</th><th>Plug - in file name</th></tr>
+		<tr><th>uint8</th><th>Plug - in name length</th></tr>
+		<tr><th>char</th><th>Plug - in name</th></tr>
+		<tr><th>uint8</th><th>Plug - in path length</th></tr>
+		<tr><th>char</th><th>Plug - in path</th></tr>
+		<tr><th>uint8</th><th>Plug - in startup parameter length</th></tr>
+		<tr><th>char</th><th>Plug - in startup parameter</th></tr>
+		<tr><th>uint8</th><th>Plug - in description length</th></tr>
+		<tr><th>char</th><th>Plug - in description</th></tr>
+		<tr><th>uint8</th><th>Plug - in load time length</th></tr>
+		<tr><th>char</th><th>Plug - in load time</th></tr>
+		<tr><th>uint8</th><th>Plug - in current running status word 0 is ok</th></tr>
+		<tr><th>uint32</th><th>Plug - in currently running error code 0 is ok</th></tr>
         <tr>
             <th rowspan="2">LoadModule TcpTest.so,./,Param&</th>
-            <th rowspan="2">加载一个插件,TcpTest.so是文件名,./是插件在服务器上的路径，Param是插件启动参数</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="2">Load a plug - in, tcptest.so is the file name,. / is the path of the plug-in on the server, param is the plug-in startup parameter</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint8</th><th>插件启动结果 0 成功 1 失败</th></tr>
+        <tr><th>uint8</th><th>Plugin startup result 0 succeeded 1 failed</th></tr>
         <tr>
             <th rowspan="2">UnLoadModule TestTcp&</th>
-            <th rowspan="2">卸载一个插件，TestTcp是插件自己的名字(注意不是文件名,是设置在插件内的名称)</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="2">Uninstall a plug - in, testtcp is the plug-in 's own name ( note that it is not a file name, it is a name set inside the plug - in )</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint8</th><th>插件启动结果 0 成功 1 失败</th></tr>
+        <tr><th>uint8</th><th>Plugin startup result 0 succeeded 1 failed</th></tr>
         <tr>
             <th rowspan="2">ReLoadModule TestTcp&</th>
-            <th rowspan="2">重载一个插件，TestTcp是插件自己的名字(注意不是文件名,是设置在插件内的名称)</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="2">Reload a plug - in, testtcp is the plug-in 's own name ( note that it is not a file name, it is a name set inside the plug - in )</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint8</th><th>插件启动结果 0 成功 1 失败</th></tr>
+        <tr><th>uint8</th><th>Plugin startup result 0 succeeded 1 failed</th></tr>
         <tr>
             <th rowspan="4">ClientCount -cp&</th>
-            <th rowspan="4">当前客户端连接数</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="4">Current number of client connections</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-		<tr><th>uint32</th><th>当前客户端连接总数</th></tr>
-		<tr><th>uint32</th><th>当前客户端连接池剩余总数</th></tr>
-		<tr><th>uint32</th><th>当前客户端连接池总数</th></tr>
+		<tr><th>uint32</th><th>Total number of current client connections</th></tr>
+		<tr><th>uint32</th><th>Current total number of client connection pool remaining</th></tr>
+		<tr><th>uint32</th><th>Total number of current client connection pools</th></tr>
         <tr>
             <th rowspan="6">CommandInfo 0x1000&</th>
-            <th rowspan="6">查询指定信令信息, 0x1000为信令十六进制ID</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="6">Query the specified message information, 0x1000 for message hexadecimal id</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-		<tr><th>uint32</th><th>信令个数</th></tr>
-		<tr><th>uint16</th><th>当前信令个数</th></tr>
-		<tr><th>uint16</th><th>信令ID</th></tr>
-		<tr><th>uint32</th><th>信令已执行次数</th></tr>
-		<tr><th>uint64</th><th>信令已执行总分时间，单位毫秒</th></tr>
+		<tr><th>uint32</th><th>Number of message</th></tr>
+		<tr><th>uint16</th><th>Current number of message</th></tr>
+		<tr><th>uint16</th><th>Message id</th></tr>
+		<tr><th>uint32</th><th>Message execute counts</th></tr>
+		<tr><th>uint64</th><th>Total time that Message has been performed,In seconds</th></tr>
         <tr>
             <th rowspan="5">CommandTimeout -a&</th>
-            <th rowspan="5">查询所有超时信令列表</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="5">Query all timeout message lists</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-		<tr><th>uint32</th><th>超时信令个数</th></tr>
-		<tr><th>uint16</th><th>超时信令ID</th></tr>
-		<tr><th>uint32</th><th>超时信令发生时间</th></tr>
-		<tr><th>uint32</th><th>运行时间，单位是秒</th></tr>
+		<tr><th>uint32</th><th>Timeout message count</th></tr>
+		<tr><th>uint16</th><th>Timeout message ID</th></tr>
+		<tr><th>uint32</th><th>Timeout message occurrence</th></tr>
+		<tr><th>uint32</th><th>Timeout message run times</th></tr>
         <tr>
             <th rowspan="2">CommandTimeoutclr -a&</th>
-            <th rowspan="2">清空超时信令列表</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="2">Clear the timeout message list</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint8</th><th>执行状态 0 成功</th></tr>
+        <tr><th>uint8</th><th>Execution state 0 succeeded</th></tr>
         <tr>
             <th rowspan="2">CommandDataLog -a&</th>
-            <th rowspan="2">存储CommandDataLog</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="2">save CommandDataLog</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint8</th><th>执行状态 0 成功</th></tr>
+        <tr><th>uint8</th><th>Execution state 0 succeeded</th></tr>
         <tr>
             <th rowspan="10">WorkThreadState -s&</th>
-            <th rowspan="10">查看工作线程状态</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="10">View worker thread status</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-		<tr><th>uint8</th><th>工作线程个数</th></tr>
-		<tr><th>uint8</th><th>工作线程ID</th></tr>
-		<tr><th>uint32</th><th>工作线程最后运行时间，格式为1970-01-01到现在的秒值</th></tr>
-		<tr><th>uint32</th><th>工作线程启动时间，格式为1970-01-01到现在的秒值</th></tr>
-		<tr><th>uint8</th><th>工作线程当前状态</th></tr>
-		<tr><th>uint32</th><th>工作线程当前处理数据包总数</th></tr>
-		<tr><th>uint16</th><th>工作线程当前运行信令ID</th></tr>
-		<tr><th>uint16</th><th>工作线程平均包处理时间,单位是毫秒</th></tr>
-		<tr><th>uint16</th><th>工作线程最近一分钟处理的数据包数量</th></tr>
+		<tr><th>uint8</th><th>Work thread count</th></tr>
+		<tr><th>uint8</th><th>Work thread ID</th></tr>
+		<tr><th>uint32</th><th>The last run time of the worker thread, in the format 1970-01-01 to the current second value</th></tr>
+		<tr><th>uint32</th><th>Worker thread start time, in the format 1970-01-01 to the current seconds</th></tr>
+		<tr><th>uint8</th><th>Current state of worker thread</th></tr>
+		<tr><th>uint32</th><th>工Total number packets currently processed by work thread</th></tr>
+		<tr><th>uint16</th><th>The message id that that worker thread is currently run</th></tr>
+		<tr><th>uint16</th><th>Average packet processing time, in milliseconds, for worker threads</th></tr>
+		<tr><th>uint16</th><th>Number of packets processed by worker threads in the last minute</th></tr>
         <tr>
             <th rowspan="14">ConnectClient -a&</th>
-            <th rowspan="14">当前TCP客户端链接的信息</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="14">Information for the current TCP client link</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint32</th><th>当前连接数总数</th></tr>
-		<tr><th>uint8</th><th>连接名称字符串长度</th></tr>
-		<tr><th>char</th><th>连接名称字符串，默认是连接的客户端IP,也可以自己设置</th></tr>
-		<tr><th>uint32</th><th>连接ID</th></tr>
-		<tr><th>uint32</th><th>连接接收包总数</th></tr>
-		<tr><th>uint32</th><th>连接发送包总数</th></tr>
-		<tr><th>uint32</th><th>连接接收包总字节</th></tr>
-		<tr><th>uint32</th><th>连接发送包总字节</th></tr>
-		<tr><th>uint32</th><th>连接创建时间,格式为1970-01-01到现在的秒值</th></tr>
-		<tr><th>uint32</th><th>连接活跃时间,单位是秒值</th></tr>
-		<tr><th>uint32</th><th>连接接收队列数据包总数</th></tr>
-		<tr><th>uint64</th><th>连接接收总消耗时间</th></tr>
-		<tr><th>uint64</th><th>连接发送总消耗时间</th></tr>
+        <tr><th>uint32</th><th>Total number of current connections</th></tr>
+		<tr><th>uint8</th><th>Connection name string length</th></tr>
+		<tr><th>char</th><th>Connection name string, the default is the connection of the client IP, can also be set</th></tr>
+		<tr><th>uint32</th><th>Connect ID</th></tr>
+		<tr><th>uint32</th><th>Connect recv packet counts</th></tr>
+		<tr><th>uint32</th><th>Connect send packet counts</th></tr>
+		<tr><th>uint32</th><th>Connect recv packet sizes</th></tr>
+		<tr><th>uint32</th><th>Connect send packet sizes</th></tr>
+		<tr><th>uint32</th><th>Connection creation time, in the format 1970-01-01 to the current second value</th></tr>
+		<tr><th>uint32</th><th>Connection active time in seconds</th></tr>
+		<tr><th>uint32</th><th>Total number of connection receive queue packets</th></tr>
+		<tr><th>uint64</th><th>Total connection reception elapsed time</th></tr>
+		<tr><th>uint64</th><th>Total elapsed time for connection transmission</th></tr>
         <tr>
             <th rowspan="14">UDPConnectClient -a&</th>
-            <th rowspan="14">当前UDP客户端链接的信息</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="14">Information for the current UDP client link</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint32</th><th>当前连接数总数</th></tr>
-		<tr><th>uint8</th><th>连接名称字符串长度</th></tr>
-		<tr><th>char</th><th>连接名称字符串，默认是连接的客户端IP,也可以自己设置</th></tr>
-		<tr><th>uint32</th><th>连接ID</th></tr>
-		<tr><th>uint32</th><th>连接接收包总数</th></tr>
-		<tr><th>uint32</th><th>连接发送包总数</th></tr>
-		<tr><th>uint32</th><th>连接接收包总字节</th></tr>
-		<tr><th>uint32</th><th>连接发送包总字节</th></tr>
-		<tr><th>uint32</th><th>连接创建时间,格式为1970-01-01到现在的秒值</th></tr>
-		<tr><th>uint32</th><th>连接活跃时间,单位是秒值</th></tr>
-		<tr><th>uint32</th><th>连接接收队列数据包总数</th></tr>
-		<tr><th>uint64</th><th>连接接收总消耗时间</th></tr>
-		<tr><th>uint64</th><th>连接发送总消耗时间</th></tr>
+        <tr><th>uint32</th><th>Total number of current connections</th></tr>
+		<tr><th>uint8</th><th>Connection name string length</th></tr>
+		<tr><th>char</th><th>Connection name string, the default is the connection of the client IP, can also be set</th></tr>
+		<tr><th>uint32</th><th>Connect ID</th></tr>
+		<tr><th>uint32</th><th>Connect recv packet counts</th></tr>
+		<tr><th>uint32</th><th>Connect send packet counts</th></tr>
+		<tr><th>uint32</th><th>Connect recv packet sizes</th></tr>
+		<tr><th>uint32</th><th>Connect send packet sizes</th></tr>
+		<tr><th>uint32</th><th>Connection creation time, in the format 1970-01-01 to the current second value</th></tr>
+		<tr><th>uint32</th><th>Connection active time in seconds</th></tr>
+		<tr><th>uint32</th><th>Total number of connection receive queue packets</th></tr>
+		<tr><th>uint64</th><th>Total connection reception elapsed time</th></tr>
+		<tr><th>uint64</th><th>Total elapsed time for connection transmission</th></tr>
         <tr>
             <th rowspan="2">CloseClient 1&</th>
-            <th rowspan="2">关闭指定的ConnectID的客户端连接 1 为连接ID</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="2">The client connection 1 that closes the specified connectid is connectid</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint8</th><th>执行状态 0 成功</th></tr>
+        <tr><th>uint8</th><th>Execution state 0 succeeded</th></tr>
         <tr>
             <th rowspan="2">ForbiddenIP -c 127.0.0.2 -t 1 -s 30 &</th>
-            <th rowspan="2">禁止指定的IP连接服务器，-c 是IP，-t 是类型 0 暂时 1 永久 -s 是封禁时长,单位是秒</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="2">Disable the specified IP connection server, - c is IP, - t is type0 temporary 1 permanent - s is the blocking time, in seconds</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint8</th><th>执行状态 0 成功</th></tr>
+        <tr><th>uint8</th><th>Execution state 0 succeeded</th></tr>
         <tr>
             <th rowspan="7">ShowForbiddenIP -a&</th>
-            <th rowspan="7">查看封禁IP列表</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="7">View the banned IP list</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint32</th><th>封禁IP个数</th></tr>
-		<tr><th>uint8</th><th>封禁IP长度</th></tr>
-		<tr><th>char</th><th>封禁IP</th></tr>
-		<tr><th>uint8</th><th>封禁类型 0 暂时 1 永久</th></tr>
-		<tr><th>uint32</th><th>封禁开始时间,格式为1970-01-01到现在的秒值</th></tr>
-		<tr><th>uint32</th><th>封禁秒数</th></tr>
+        <tr><th>uint32</th><th>banned IP counts</th></tr>
+		<tr><th>uint8</th><th>banned IP length</th></tr>
+		<tr><th>char</th><th>banned IP</th></tr>
+		<tr><th>uint8</th><th>banned IP type 0 temporary 1 permanent</th></tr>
+		<tr><th>uint32</th><th>Block start time, in the format 1970-01-01 to the current seconds</th></tr>
+		<tr><th>uint32</th><th>Blocked seconds</th></tr>
         <tr>
             <th rowspan="2">LiftedIP 127.0.0.2&</th>
-            <th rowspan="2">解除封禁IP</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="2">Unblock IP</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-		<tr><th>uint8</th><th>执行状态 0 成功</th></tr>
+		<tr><th>uint8</th><th>Execution state 0 succeeded</th></tr>
         <tr>
             <th rowspan="15">ServerConnectTCP -a&</th>
-            <th rowspan="15">服务器间通讯(TCP)</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="15">Inter - server communication ( TCP )</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint32</th><th>服务器间连接总数</th></tr>
-		<tr><th>uint8</th><th>远端服务器IP长度</th></tr>
-		<tr><th>char</th><th>远端服务器IP</th></tr>
-		<tr><th>uint8</th><th>连接当前状态 0已连接 1 未连接</th></tr>
-		<tr><th>uint32</th><th>连接ID</th></tr>
-		<tr><th>uint32</th><th>连接接收包总数</th></tr>
-		<tr><th>uint32</th><th>连接发送包总数</th></tr>
-		<tr><th>uint32</th><th>连接接收包总字节</th></tr>
-		<tr><th>uint32</th><th>连接发送包总字节</th></tr>
-		<tr><th>uint32</th><th>连接创建时间,格式为1970-01-01到现在的秒值</th></tr>
-		<tr><th>uint32</th><th>连接活跃时间,单位是秒值</th></tr>
-		<tr><th>uint32</th><th>连接接收队列数据包总数</th></tr>
-		<tr><th>uint64</th><th>连接接收总消耗时间</th></tr>
-		<tr><th>uint64</th><th>连接发送总消耗时间</th></tr>
+        <tr><th>uint32</th><th>Total number of connections between servers</th></tr>
+		<tr><th>uint8</th><th>Remote server IP length</th></tr>
+		<tr><th>char</th><th>Remote server IP</th></tr>
+		<tr><th>uint8</th><th>Connection current state 0 is connected 1 is not connected</th></tr>
+		<tr><th>uint32</th><th>Connect ID</th></tr>
+		<tr><th>uint32</th><th>Connect recv packet counts</th></tr>
+		<tr><th>uint32</th><th>Connect send packet counts</th></tr>
+		<tr><th>uint32</th><th>Connect recv packet sizes</th></tr>
+		<tr><th>uint32</th><th>Connect send packet sizes</th></tr>
+		<tr><th>uint32</th><th>Connection creation time, in the format 1970-01-01 to the current second value</th></tr>
+		<tr><th>uint32</th><th>Connection active time in seconds</th></tr>
+		<tr><th>uint32</th><th>Total number of connection receive queue packets</th></tr>
+		<tr><th>uint64</th><th>Total connection reception elapsed time</th></tr>
+		<tr><th>uint64</th><th>Total elapsed time for connection transmission</th></tr>
         <tr>
             <th rowspan="15">ServerConnectUDP -a&</th>
-            <th rowspan="15">服务器间通讯(UDP)</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="15">Inter - server communication ( UDP )</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint32</th><th>服务器间连接总数</th></tr>
-		<tr><th>uint8</th><th>远端服务器IP长度</th></tr>
-		<tr><th>char</th><th>远端服务器IP</th></tr>
-		<tr><th>uint8</th><th>连接当前状态 0已连接 1 未连接</th></tr>
-		<tr><th>uint32</th><th>连接ID</th></tr>
-		<tr><th>uint32</th><th>连接接收包总数</th></tr>
-		<tr><th>uint32</th><th>连接发送包总数</th></tr>
-		<tr><th>uint32</th><th>连接接收包总字节</th></tr>
-		<tr><th>uint32</th><th>连接发送包总字节</th></tr>
-		<tr><th>uint32</th><th>连接创建时间,格式为1970-01-01到现在的秒值</th></tr>
-		<tr><th>uint32</th><th>连接活跃时间,单位是秒值</th></tr>
-		<tr><th>uint32</th><th>连接接收队列数据包总数</th></tr>
-		<tr><th>uint64</th><th>连接接收总消耗时间</th></tr>
-		<tr><th>uint64</th><th>连接发送总消耗时间</th></tr>
+        <tr><th>uint32</th><th>Total number of connections between servers</th></tr>
+		<tr><th>uint8</th><th>Remote server IP length</th></tr>
+		<tr><th>char</th><th>Remote server IP</th></tr>
+		<tr><th>uint8</th><th>Connection current state 0 is connected 1 is not connected</th></tr>
+		<tr><th>uint32</th><th>Connect ID</th></tr>
+		<tr><th>uint32</th><th>Connect recv packet counts</th></tr>
+		<tr><th>uint32</th><th>Connect send packet counts</th></tr>
+		<tr><th>uint32</th><th>Connect recv packet sizes</th></tr>
+		<tr><th>uint32</th><th>Connect send packet sizes</th></tr>
+		<tr><th>uint32</th><th>Connection creation time, in the format 1970-01-01 to the current second value</th></tr>
+		<tr><th>uint32</th><th>Connection active time in seconds</th></tr>
+		<tr><th>uint32</th><th>Total number of connection receive queue packets</th></tr>
+		<tr><th>uint64</th><th>Total connection reception elapsed time</th></tr>
+		<tr><th>uint64</th><th>Total elapsed time for connection transmission</th></tr>
         <tr>
             <th rowspan="6">ShowCurrProcessInfo -a&</th>
-            <th rowspan="6">查看服务器框架当前CPU,内存和网络运行状态</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="6">View the current CPU, memory, and network health status of the server framework</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
         <tr><th>uint32</th><th>CPU运行比例</th></tr>
-		<tr><th>uint32</th><th>当前占用内存字节数</th></tr>
-		<tr><th>uint32</th><th>当前一分钟服务器网络吞吐</th></tr>
-		<tr><th>uint32</th><th>当前一分钟服务器网络吞吐(入)</th></tr>
-		<tr><th>uint32</th><th>当前一分钟服务器网络吞吐(出)</th></tr>
+		<tr><th>uint32</th><th>Current number of memory bytes occupied</th></tr>
+		<tr><th>uint32</th><th>Server network throughput for the current minute</th></tr>
+		<tr><th>uint32</th><th>Server network throughput for the current minute(in)</th></tr>
+		<tr><th>uint32</th><th>Server network throughput for the current minute(out)</th></tr>
         <tr>
             <th rowspan="7">ShowAllCommand -a&</th>
-            <th rowspan="7">查看所有信令运行信息</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="7">View all message run information</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint32</th><th>信令总数</th></tr>
-		<tr><th>uint8</th><th>模块名称长度</th></tr>
-		<tr><th>char</th><th>模块名称</th></tr>
-		<tr><th>uint16</th><th>信令ID</th></tr>
-		<tr><th>uint32</th><th>当前信令处理总数</th></tr>
-		<tr><th>uint32</th><th>当前信令处理总时间,单位毫秒</th></tr>
+        <tr><th>uint32</th><th>Total number of message</th></tr>
+		<tr><th>uint8</th><th>Module name length</th></tr>
+		<tr><th>char</th><th>Module name</th></tr>
+		<tr><th>uint16</th><th>Message ID</th></tr>
+		<tr><th>uint32</th><th>Total current message processing</th></tr>
+		<tr><th>uint32</th><th>Total current message processing time, in milliseconds</th></tr>
         <tr>
             <th rowspan="2">ReConnectServer -s 172.0.10.1&</th>
-            <th rowspan="2">重连远程连接 -s 远程服务器的IP地址</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="2">Reconnect remote connection - s IP address of the remote server</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint8</th><th>执行状态 0 成功</th></tr>
+        <tr><th>uint8</th><th>Execution state 0 succeeded</th></tr>
         <tr>
             <th rowspan="2">SetDebug -s 0 &</th>
-            <th rowspan="2">设置DEBUG文件输出状态 -s 0 打开 1 关闭</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="2">Set debug file output status -s 0 on 1 off</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint8</th><th>执行状态 0 成功</th></tr>
+        <tr><th>uint8</th><th>Execution state 0 succeeded</th></tr>
         <tr>
             <th rowspan="2">ShowDebug -a&</th>
-            <th rowspan="2">查询DEBUG文件输出状态 -s 0 打开 1 关闭</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="2">Query debug file output status -s 0 on 1 off</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
         <tr><th>uint8</th><th>0 打开 1 关闭</th></tr>
         <tr>
             <th rowspan="5">GetConnectIPInfo -s 1&</th>
-            <th rowspan="5">通过ConnectID获得相关的IP信息 1为ConnectID</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="5">The relevant IP information 1 obtain through that connectid is the connectid</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint16</th><th>0 找到了对应IP信息 1 没 找到了对应IP信息</th></tr>
-		<tr><th>uint8</th><th>当前IP描述长度</th></tr>
-		<tr><th>char</th><th>当前IP描述</th></tr>
-		<tr><th>uint32</th><th>IP端口</th></tr>
+        <tr><th>uint16</th><th>0The corresponding IP information 1 was found and no corresponding IP information was found</th></tr>
+		<tr><th>uint8</th><th>Current IP description length</th></tr>
+		<tr><th>char</th><th>Current IP description</th></tr>
+		<tr><th>uint32</th><th>IP port</th></tr>
         <tr>
-            <th rowspan="10">GetLogInfo -a&</th>
-            <th rowspan="10">得到当前日志信息</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="9">GetLogInfo -a&</th>
+            <th rowspan="9">Get current log information</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint32</th><th>日志的个数</th></tr>
-		<tr><th>uint32</th><th>当前日志等级</th></tr>
+        <tr><th>uint32</th><th>Number of logs</th></tr>
+		<tr><th>uint32</th><th>Current log level</th></tr>
 		<tr><th>uint16</th><th>日志ID</th></tr>
-		<tr><th>uint8</th><th>服务器名称长度</th></tr>
-		<tr><th>char</th><th>服务器名称</th></tr>
-		<tr><th>uint8</th><th>日志名称长度</th></tr>
-		<tr><th>char</th><th>日志名称</th></tr>
-		<tr><th>uint8</th><th>日志输出类型 0 写文件 1 写屏幕</th></tr>
-		<tr><th>uint16</th><th>当前日志等级</th></tr>
+		<tr><th>uint8</th><th>Server name length</th></tr>
+		<tr><th>char</th><th>Server name</th></tr>
+		<tr><th>uint8</th><th>Log name length</th></tr>
+		<tr><th>char</th><th>Log name</th></tr>
+		<tr><th>uint8</th><th>Log output type 0 write file 1 write screen</th></tr>
         <tr>
             <th rowspan="2">SetLogLevel -l 1&</th>
-            <th rowspan="2">设置日志等级 -l 为 1级以上日志全部不输出</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="2">Set the log level -1 for level 1 or higher logs are not output</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint8</th><th>执行状态 0 成功</th></tr>
+        <tr><th>uint8</th><th>Execution state 0 succeeded</th></tr>
         <tr>
             <th rowspan="8">GetWorkThreadAI -a&</th>
-            <th rowspan="8">得到Thread的AI配置信息</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="8">Get AI configuration information for thread</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint16</th><th>当前线程个数</th></tr>
-		<tr><th>uint32</th><th>工作线程ID</th></tr>
-		<tr><th>uint8</th><th>AI开关 0 关闭 1 打开</th></tr>
-		<tr><th>uint32</th><th>业务包处理超时时间</th></tr>
-		<tr><th>uint32</th><th>工作线程超时包的时间范围，单位是秒</th></tr>
-		<tr><th>uint32</th><th>工作线程超时包的单位时间内的超时次数上限</th></tr>
-		<tr><th>uint32</th><th>停止此命令服务的时间</th></tr>
+        <tr><th>uint16</th><th>Current number of threads</th></tr>
+		<tr><th>uint32</th><th>Work thread ID</th></tr>
+		<tr><th>uint8</th><th>AI status 0 close 1 open</th></tr>
+		<tr><th>uint32</th><th>Message packet dispose timeout seconds</th></tr>
+		<tr><th>uint32</th><th>work thread timeout,in seconds</th></tr>
+		<tr><th>uint32</th><th>work thread timeout counts limited</th></tr>
+		<tr><th>uint32</th><th>stop message dispose time,in second</th></tr>
         <tr>
             <th rowspan="6">GetWorkThreadTO -a&</th>
-            <th rowspan="6">得到Thread的所有超时数据包信息</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="6">Gets all timeout packet information for thread</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint16</th><th>当前线程个数</th></tr>
-		<tr><th>uint32</th><th>工作线程ID</th></tr>
-		<tr><th>uint16</th><th>超时的信令ID</th></tr>
-		<tr><th>uint32</th><th>超时当前时间，以1970-01-01以来开始计算的秒数</th></tr>
-		<tr><th>uint32</th><th>命令执行时间，单位是毫秒</th></tr>
+        <tr><th>uint16</th><th>Current number of threads</th></tr>
+		<tr><th>uint32</th><th>Work thread ID</th></tr>
+		<tr><th>uint16</th><th>timeout message ID</th></tr>
+		<tr><th>uint32</th><th>Timeout current time, in seconds since 1970-01-01</th></tr>
+		<tr><th>uint32</th><th>Command execution time, in milliseconds</th></tr>
         <tr>
             <th rowspan="2">SetWorkThreadAI -i 1,1000,2000,10</th>
-            <th rowspan="2">设置ThreadAI的配置信息,1为开启,1000处理时限 2000检查时限 10停止需要到达的次数</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="2">Set the configuration information for threadai, 1 to on, 1000 processing time limit 2000 check time limit 10 times to stop</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint8</th><th>执行状态 0 成功</th></tr>
+        <tr><th>uint8</th><th>Execution state 0 succeeded</th></tr>
         <tr>
             <th rowspan="9">GetNickNameInfo -n 127.0.0.1&</th>
-            <th rowspan="9">通过IP别名获得客户端IP信息</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="9">Obtain client IP information through IP alias</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint32</th><th>获得IP的个数</th></tr>
-		<tr><th>uint32</th><th>对应的CommandID</th></tr>
-		<tr><th>uint8</th><th>IP的长度</th></tr>
+        <tr><th>uint32</th><th>IP counts</th></tr>
+		<tr><th>uint32</th><th>Corresponding commandid</th></tr>
+		<tr><th>uint8</th><th>IP length</th></tr>
 		<tr><th>char</th><th>IP</th></tr>
-		<tr><th>uint32</th><th>IP端口</th></tr>
-		<tr><th>uint8</th><th>别名长度</th></tr>
-		<tr><th>char</th><th>别名</th></tr>
-		<tr><th>uint8</th><th>当前连接是否日志打开 0 未开启 1 开启</th></tr>
+		<tr><th>uint32</th><th>IP port</th></tr>
+		<tr><th>uint8</th><th>Alias length</th></tr>
+		<tr><th>char</th><th>Alias</th></tr>
+		<tr><th>uint8</th><th>Does the front connection log open 0 not open 1 open</th></tr>
         <tr>
             <th rowspan="2">SetConnectLog -n 1 -f 0 &</th>
-            <th rowspan="2">设置连接日志开启状态 -n是 ConnectID -f是 0 开启 1 关闭</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="2">Set connection log on state - n is connectid - f is 0 on 1 off</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint8</th><th>执行状态 0 成功</th></tr>
+        <tr><th>uint8</th><th>Execution state 0 succeeded</th></tr>
         <tr>
             <th rowspan="2">SetMaxConnectCount -n 20000 &</th>
-            <th rowspan="2">设置当前服务器允许的最大连接数 -n 是连接数</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="2">Sets the maximum number of connections allowed for the current server - n is the number of connections</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint8</th><th>执行状态 0 成功</th></tr>
+        <tr><th>uint8</th><th>Execution state 0 succeeded</th></tr>
         <tr>
             <th rowspan="2">AddListen -i 127.0.0.1 -p 10003 -t 1 -n 1&</th>
-            <th rowspan="2">动态在服务器打开一个新的监听端口 -i IP -p 端口 -t 1 TCP 2 UDP -n 对应的PacketParseID</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="2">Dynamically open a new listening port -i ip -p port -t 1 tcp 2 udp -n corresponding packet parseid on the server</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint8</th><th>执行状态 0 成功</th></tr>
+        <tr><th>uint8</th><th>Execution state 0 succeeded</th></tr>
         <tr>
             <th rowspan="2">DelListen -i 127.0.0.1 -p 10003 -t 1 &</th>
-            <th rowspan="2">动态在服务器关闭监听端口 -i IP -p 端口 -t 1 TCP 2 UDP</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="2">Dynamically shut down the listening port -i ip -p port -t 1 tcp 2 udp on the server</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint8</th><th>执行状态 0 成功</th></tr>
+        <tr><th>uint8</th><th>Execution state 0 succeeded</th></tr>
         <tr>
             <th rowspan="5">ShowListen -a&</th>
-            <th rowspan="5">查看现有打开的服务器端口信息</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="5">View existing open server port information</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint32</th><th>监听的个数</th></tr>
-		<tr><th>uint8</th><th>IP的长度</th></tr>
+        <tr><th>uint32</th><th>Number of listeners</th></tr>
+		<tr><th>uint8</th><th>IP length</th></tr>
 		<tr><th>char</th><th>IP</th></tr>
-		<tr><th>uint32</th><th>IP端口</th></tr>
+		<tr><th>uint32</th><th>IP port</th></tr>
         <tr>
             <th rowspan="2">TestFileStart -f a.xml&</th>
-            <th rowspan="2">执行文件压测指令 -f 指定压测文件名</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="2">Execute file pressure measurement instruction - f specifies the pressure measurement file name</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint8</th><th>执行状态 0 成功</th></tr>
+        <tr><th>uint8</th><th>Execution state 0 succeeded</th></tr>
         <tr>
             <th rowspan="2">TestFileStop -a&</th>
-            <th rowspan="2">停止文件压测</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="2">Stop file pressure measurement</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint8</th><th>执行状态 0 成功</th></tr>
+        <tr><th>uint8</th><th>Execution state 0 succeeded</th></tr>
         <tr>
             <th rowspan="2">SetTrackIP -i 127.0.0.1 -c 5 &</th>
-            <th rowspan="2">给指定客户端IP的数据染色，-i是客户端的IP，-c是染色数据包数</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="2">Dyes the data for the specified client IP, -i is the client IP, -c is the number of dyed packets</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint8</th><th>执行状态 0 成功</th></tr>
+        <tr><th>uint8</th><th>Execution state 0 succeeded</th></tr>
         <tr>
             <th rowspan="2">SetTrackCommand -i 127.0.0.1 -c 5 &</th>
-            <th rowspan="2">给指定信令ID的数据染色，-i信令ID，格式是0xXXXX，-c是染色数据包数</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="2">Dyes the data for the specified message id, -i message id in the format 0xxxxxx, -c is the number of dyed packets</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint8</th><th>执行状态 0 成功，1 失败</th></tr>
+        <tr><th>uint8</th><th>Execution state 0 succeeded，1 失败</th></tr>
         <tr>
             <th rowspan="5">GetTrackCommandInfo -a&</th>
-            <th rowspan="5">查看当前染色的信令执行信息</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th rowspan="5">View the message execution information for the current dye</th>
+            <th>Type</th>
+            <th>Explain</th>
         </tr>
-        <tr><th>uint8</th><th>当前信令个数</th></tr>
-		<tr><th>uint16</th><th>信令ID</th></tr>
-		<tr><th>uint16</th><th>信令当前已染色个数(已处理)</th></tr>
-		<tr><th>uint16</th><th>信令需要染色总数</th></tr>
+        <tr><th>uint8</th><th>Current number of message</th></tr>
+		<tr><th>uint16</th><th>messageID</th></tr>
+		<tr><th>uint16</th><th>Number of currently dyed message ( processed )</th></tr>
+		<tr><th>uint16</th><th>Total number of dyes required for message</th></tr>
 </table>
 
