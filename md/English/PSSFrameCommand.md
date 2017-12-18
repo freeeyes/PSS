@@ -254,7 +254,7 @@ b freeeyes ShowServerInfo -a&
             <th>Type</th>
             <th>Explain</th>
         </tr>
-        <tr><th>uint32</th><th>CPU运行比例</th></tr>
+        <tr><th>uint32</th><th>Cpu operation ratio</th></tr>
 		<tr><th>uint32</th><th>Current number of memory bytes occupied</th></tr>
 		<tr><th>uint32</th><th>Server network throughput for the current minute</th></tr>
 		<tr><th>uint32</th><th>Server network throughput for the current minute(in)</th></tr>
@@ -291,7 +291,7 @@ b freeeyes ShowServerInfo -a&
             <th>Type</th>
             <th>Explain</th>
         </tr>
-        <tr><th>uint8</th><th>0 打开 1 关闭</th></tr>
+        <tr><th>uint8</th><th>0 open 1 close</th></tr>
         <tr>
             <th rowspan="5">GetConnectIPInfo -s 1&</th>
             <th rowspan="5">The relevant IP information 1 obtain through that connectid is the connectid</th>
@@ -310,7 +310,7 @@ b freeeyes ShowServerInfo -a&
         </tr>
         <tr><th>uint32</th><th>Number of logs</th></tr>
 		<tr><th>uint32</th><th>Current log level</th></tr>
-		<tr><th>uint16</th><th>日志ID</th></tr>
+		<tr><th>uint16</th><th>Log ID</th></tr>
 		<tr><th>uint8</th><th>Server name length</th></tr>
 		<tr><th>char</th><th>Server name</th></tr>
 		<tr><th>uint8</th><th>Log name length</th></tr>
@@ -433,7 +433,7 @@ b freeeyes ShowServerInfo -a&
             <th>Type</th>
             <th>Explain</th>
         </tr>
-        <tr><th>uint8</th><th>Execution state 0 succeeded，1 失败</th></tr>
+        <tr><th>uint8</th><th>Execution state 0 succeeded，1 failed</th></tr>
         <tr>
             <th rowspan="5">GetTrackCommandInfo -a&</th>
             <th rowspan="5">View the message execution information for the current dye</th>
