@@ -121,12 +121,13 @@
 		<tr><th>ModuleSParam</th><th>逻辑插件启动参数</th></tr>
 		<tr><th>desc</th><th>当前标签描述信息</th></tr>
         <tr>
-            <th rowspan="3">CoreSetting</th>
-            <th rowspan="3">Coredump文件生成配置(只适用于Linux)</th>
+            <th rowspan="4">CoreSetting</th>
+            <th rowspan="4">Coredump文件生成配置(只适用于Linux)</th>
             <th>属性</th>
             <th>说明</th>
         </tr>
 		<tr><th>CoreNeed</th><th>0是关闭，1是打开</th></tr>
+        <tr><th>Script</th><th>当程序发送崩溃的以后，如果这里设置了脚本路径和文件，会自动调用此脚本执行。</th></tr>
 		<tr><th>desc</th><th>当前标签描述信息</th></tr>
         <tr>
             <th rowspan="5">CommandAccount</th>

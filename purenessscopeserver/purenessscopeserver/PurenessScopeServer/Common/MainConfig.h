@@ -318,6 +318,7 @@ public:
     _GroupListenInfo* GetGroupListenInfo();
     _PacketParseInfo* GetPacketParseInfo(uint8 u1Index = 0);
     uint8             GetPacketParseCount();
+    char*             GetCoreScript();
 
 private:
     uint32     m_u4MsgHighMark;                        //消息的高水位阀值
@@ -396,6 +397,7 @@ private:
     char       m_szWTReturnData[MAX_BUFF_1024];        //返回的数据体，最多1K
     char       m_szDeubgFileName[MAX_BUFF_100];        //输出文件名
     char       m_szDebugLevel[MAX_BUFF_100];           //输出文件级别
+    char       m_szCoreScript[MAX_BUFF_200];           //当程序Core掉的时候，调用的执行脚本位置
 
     CXmlOpeation     m_MainConfig;
     _ConnectAlert    m_ConnectAlert;                   //连接告警相关配置信息

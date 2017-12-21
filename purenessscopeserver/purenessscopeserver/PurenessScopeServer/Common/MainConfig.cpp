@@ -38,6 +38,7 @@ CMainConfig::CMainConfig(void)
     m_u4SendDatamark          = MAX_BLOCK_SIZE;
     m_u4BlockSize             = MAX_BLOCK_SIZE;
     m_u4CoreFileSize          = 0;
+    m_szCoreScript[0]         = '\0';
     m_u2TcpNodelay            = TCP_NODELAY_ON;
 
     m_u1ConsoleSupport        = 0;
@@ -847,6 +848,13 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
     if(NULL != pData)
     {
         m_u4CoreFileSize = (uint16)ACE_OS::atoi(pData);
+    }
+
+    pData = m_MainConfig.GetData("CoreSetting", "Script");
+
+    if (NULL != pData)
+    {
+        sprintf_safe(m_szCoreScript, MAX_BUFF_200, "%s", pData);
     }
 
     //开始获得发送和接受阀值
@@ -1845,6 +1853,11 @@ _PacketParseInfo* CMainConfig::GetPacketParseInfo(uint8 u1Index)
 uint8 CMainConfig::GetPacketParseCount()
 {
     return (uint8)m_vecPacketParseInfo.size();
+}
+
+char* CMainConfig::GetCoreScript()
+{
+    return m_szCoreScript;
 }
 
 uint16 CMainConfig::GetModuleInfoCount()

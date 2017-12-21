@@ -121,12 +121,13 @@
 		<tr><th>ModuleSParam</th><th>Logical plug - in startup parameters</th></tr>
 		<tr><th>desc</th><th>Current label description information</th></tr>
         <tr>
-            <th rowspan="3">CoreSetting</th>
-            <th rowspan="3">Coredump file generation configuration ( Linux only )</th>
+            <th rowspan="4">CoreSetting</th>
+            <th rowspan="4">Coredump file generation configuration ( Linux only )</th>
             <th>Attribute</th>
             <th>information</th>
         </tr>
 		<tr><th>CoreNeed</th><th>0 is off and 1 is on</th></tr>
+		<tr><th>Script</th><th>When a program sends a crash, if a script path and file are set here, the script is automatically called for execution.</th></tr>
 		<tr><th>desc</th><th>Current label description information</th></tr>
         <tr>
             <th rowspan="5">CommandAccount</th>
