@@ -131,40 +131,45 @@ void CProConnectHandle::Close(int nIOCount, int nErrno)
                                             m_u8RecvQueueTimeCost,
                                             m_u8SendQueueTimeCost);
 
-        //组织数据
-        _MakePacket objMakePacket;
 
-        objMakePacket.m_u4ConnectID       = GetConnectID();
-        objMakePacket.m_pPacketParse      = NULL;
-        objMakePacket.m_AddrRemote        = m_addrRemote;
-        objMakePacket.m_u1Option          = PACKET_CDISCONNECT;
-
-        if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
+        //如果是服务器关闭，则不理，因为连接已经清理掉了
+        if (CONNECT_SERVER_CLOSE != m_u1ConnectState)
         {
-            objMakePacket.m_AddrListen.set(m_u4LocalPort);
-        }
-        else
-        {
-            objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
-        }
+            //组织数据
+            _MakePacket objMakePacket;
 
-        //发送客户端链接断开消息。
-        ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+            objMakePacket.m_u4ConnectID = GetConnectID();
+            objMakePacket.m_pPacketParse = NULL;
+            objMakePacket.m_AddrRemote = m_addrRemote;
+            objMakePacket.m_u1Option = PACKET_CDISCONNECT;
 
-        if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-        {
-            OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
-        }
+            if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
+            {
+                objMakePacket.m_AddrListen.set(m_u4LocalPort);
+            }
+            else
+            {
+                objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
+            }
 
-        m_Reader.cancel();
-        m_Writer.cancel();
+            //发送客户端链接断开消息。
+            ACE_Time_Value tvNow = ACE_OS::gettimeofday();
 
-        ACE_OS::shutdown(this->handle(), SD_BOTH);
+            if (false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
+            {
+                OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
+            }
 
-        if(this->handle() != ACE_INVALID_HANDLE)
-        {
-            ACE_OS::closesocket(this->handle());
-            this->handle(ACE_INVALID_HANDLE);
+            m_Reader.cancel();
+            m_Writer.cancel();
+
+            ACE_OS::shutdown(this->handle(), SD_BOTH);
+
+            if (this->handle() != ACE_INVALID_HANDLE)
+            {
+                ACE_OS::closesocket(this->handle());
+                this->handle(ACE_INVALID_HANDLE);
+            }
         }
 
         m_ThreadWriteLock.release();
@@ -187,6 +192,15 @@ bool CProConnectHandle::ServerClose(EM_Client_Close_status emStatus, uint8 u1Opt
         {
             //组织数据
             _MakePacket objMakePacket;
+
+            if (PACKET_SDISCONNECT == u1OptionEvent)
+            {
+                OUR_DEBUG((LM_ERROR, "[CProConnectHandle::ServerClose]ConnectID = %d, u1OptionEvent = PACKET_SDISCONNECT.\n", GetConnectID()));
+            }
+            else
+            {
+                OUR_DEBUG((LM_ERROR, "[CProConnectHandle::ServerClose]ConnectID = %d, u1OptionEvent = PACKET_CDISCONNECT.\n", GetConnectID()));
+            }
 
             objMakePacket.m_u4ConnectID  = GetConnectID();
             objMakePacket.m_pPacketParse = NULL;
