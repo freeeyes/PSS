@@ -73,7 +73,7 @@ public:
             if(mbRecv->length() > 0)
             {
                 ACE_OS::memcpy(&m_szRecvBuffData[m_u2RecvBuffLength], mbRecv->rd_ptr(), mbRecv->length());
-                m_u2RecvBuffLength += mbRecv->length();
+                m_u2RecvBuffLength += (uint16)mbRecv->length();
                 mbRecv->rd_ptr(mbRecv->length());
             }
 
@@ -84,7 +84,7 @@ public:
         {
             //统一贴入缓冲，再有缓冲切割发送数据
             ACE_OS::memcpy(&m_szRecvBuffData[m_u2RecvBuffLength], mbRecv->rd_ptr(), mbRecv->length());
-            m_u2RecvBuffLength += mbRecv->length();
+            m_u2RecvBuffLength += (uint16)mbRecv->length();
             mbRecv->rd_ptr(mbRecv->length());
         }
 
@@ -127,7 +127,7 @@ public:
 
             uint32 u4SendLength = u4PacketLength + sizeof(uint32);
 
-            const char* ptrReturnData = reinterpret_cast<const char*>(pData);
+            char* ptrReturnData = reinterpret_cast<char*>(pData);
             m_pServerObject->GetConnectManager()->PostMessage(m_u4ConnectID,ptrReturnData,(uint32)u4SendLength, SENDMESSAGE_JAMPNOMAL, u2RetCommand, PACKET_SEND_IMMEDIATLY, PACKET_IS_SELF_RECYC);
             OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData](%d)Send Data(%d) OK.\n", m_u4ConnectID, u4SendLength));
         }
