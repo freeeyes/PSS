@@ -127,7 +127,7 @@ public:
 
             uint32 u4SendLength = u4PacketLength + sizeof(uint32);
 
-            char* ptrReturnData = reinterpret_cast<char*>(pData);
+            const char* ptrReturnData = reinterpret_cast<const char*>(pData);
             m_pServerObject->GetConnectManager()->PostMessage(m_u4ConnectID,ptrReturnData,(uint32)u4SendLength, SENDMESSAGE_JAMPNOMAL, u2RetCommand, PACKET_SEND_IMMEDIATLY, PACKET_IS_SELF_RECYC);
             OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData](%d)Send Data(%d) OK.\n", m_u4ConnectID, u4SendLength));
         }
