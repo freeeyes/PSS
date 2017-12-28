@@ -1,12 +1,11 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CommonTCPClient", "CommonTCPClient\CommonTCPClient.vcproj", "{C3460AB9-2AEC-4B04-A26C-5C55BBB022A0}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CommonTCPClient", "CommonTCPClient\CommonTCPClient.vcxproj", "{C3460AB9-2AEC-4B04-A26C-5C55BBB022A0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CommonTcpTest", "CommonTcpTest\CommonTcpTest.vcproj", "{5C8A5873-5D6B-4700-B6F6-4F7D74610094}"
-	ProjectSection(ProjectDependencies) = postProject
-		{C3460AB9-2AEC-4B04-A26C-5C55BBB022A0} = {C3460AB9-2AEC-4B04-A26C-5C55BBB022A0}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CommonTcpTest", "CommonTcpTest\CommonTcpTest.vcxproj", "{5C8A5873-5D6B-4700-B6F6-4F7D74610094}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
