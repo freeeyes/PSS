@@ -42,15 +42,25 @@ struct _ClientInfo
 //输出结果集
 struct _ResultInfo
 {
-	char m_szTestName[MAX_BUFF_300];     //测试集名称
-	char m_szResult[MAX_BUFF_1024];      //测试结果描述 
-	int  m_nRet;                         //测试结果 0 成功 1 失败  
+	char  m_szTestName[MAX_BUFF_300];     //测试集名称
+	char  m_szResult[MAX_BUFF_1024];      //测试结果描述 
+	int   m_nRet;                         //测试结果 0 成功 1 失败
+	float m_fMilliseconds;                //消耗时间      
 	
 	_ResultInfo()
 	{
 		m_szTestName[0] = '\0';
 		m_szResult[0]   = '\0';
 		m_nRet          = 0;
+		m_fMilliseconds = 0.0f;
+	}
+	
+	void Display()
+	{
+		printf("[_ResultInfo::Display]m_szTestName=%s.\n", m_szTestName);
+		printf("[_ResultInfo::Display]m_nRet=%d.\n", m_nRet);
+		printf("[_ResultInfo::Display]m_szResult=%s.\n", m_szResult);
+		printf("[_ResultInfo::Display]m_fMilliseconds=%fms.\n", m_fMilliseconds);
 	}
 };
 #endif

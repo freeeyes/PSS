@@ -77,6 +77,12 @@ extern "C"
                    u2CmdID,
                    u4BodyLen));
         PACKETPARSE_SHOW_END
+		
+		//如果命令ID为0，则为错误包
+        if(0 == u2CmdID)
+        {
+        	return false;	
+        }		
 
         //填充返回给框架的数据包头信息
         pHeadInfo->m_u4HeadSrcLen      = u4Len;

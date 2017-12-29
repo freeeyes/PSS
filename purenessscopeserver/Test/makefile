@@ -2,9 +2,9 @@ include makefile.define
 
 default:all
 
-PATS1 = test_linux.o
+PATS1 = test_linux.o testcase.o
 
-LIB_BASE_OBJS1 = test_linux.o
+LIB_BASE_OBJS1 = test_linux.o testcase.o
 
 LIB_BASE1 = Test_Pss
 
