@@ -106,6 +106,9 @@ bool CServerManager::Init()
     //初始化链接管理器
     App_ConnectManager::instance()->Init(App_MainConfig::instance()->GetSendQueueCount());
 
+    //启动中间服务器链接管理器
+    App_ClientReConnectManager::instance()->Init(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_POSTDEFINE));
+
     //初始化给DLL的对象接口
     App_ServerObject::instance()->SetMessageManager(dynamic_cast<IMessageManager*>(App_MessageManager::instance()));
     App_ServerObject::instance()->SetLogManager(dynamic_cast<ILogManager*>(AppLogManager::instance()));
@@ -568,16 +571,19 @@ bool CServerManager::Run()
         AppLogManager::instance()->WriteLog(LOG_SYSTEM, "[CServerManager::Init]AppLogManager is OK.");
     }
 
+    //启动服务器间检查线程
+    if (false == App_ClientReConnectManager::instance()->StartConnectTask(App_MainConfig::instance()->GetConnectServerCheck()))
+    {
+        OUR_DEBUG((LM_INFO, "[CServerManager::Run]StartConnectTask error.\n"));
+        return false;
+    }
+
     //启动定时器
     if (0 != App_TimerManager::instance()->activate())
     {
         OUR_DEBUG((LM_INFO, "[CServerManager::Run]App_TimerManager::instance()->Start() is error.\n"));
         return false;
     }
-
-    //启动中间服务器链接管理器
-    App_ClientReConnectManager::instance()->Init(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_POSTDEFINE));
-    App_ClientReConnectManager::instance()->StartConnectTask(App_MainConfig::instance()->GetConnectServerCheck());
 
     //启动所有反应器
     if (!App_ReactorManager::instance()->StartReactor())

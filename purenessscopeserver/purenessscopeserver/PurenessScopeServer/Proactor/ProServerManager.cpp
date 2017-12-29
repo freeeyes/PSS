@@ -95,6 +95,9 @@ bool CProServerManager::Init()
     //初始化链接管理器
     App_ProConnectManager::instance()->Init(App_MainConfig::instance()->GetSendQueueCount());
 
+    //初始化服务器间通讯类
+    App_ClientProConnectManager::instance()->Init(App_ProactorManager::instance()->GetAce_Proactor(REACTOR_POSTDEFINE));
+
     //初始化给DLL的对象接口
     App_ServerObject::instance()->SetMessageManager(dynamic_cast<IMessageManager*>(App_MessageManager::instance()));
     App_ServerObject::instance()->SetLogManager(dynamic_cast<ILogManager*>(AppLogManager::instance()));
@@ -424,8 +427,7 @@ bool CProServerManager::Start()
         return false;
     }
 
-    //启动中间服务器链接管理器
-    App_ClientProConnectManager::instance()->Init(App_ProactorManager::instance()->GetAce_Proactor(REACTOR_POSTDEFINE));
+    //启动中间服务器链接管理器定时器
     App_ClientProConnectManager::instance()->StartConnectTask(App_MainConfig::instance()->GetConnectServerCheck());
 
     //开始消息处理线程

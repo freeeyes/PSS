@@ -69,6 +69,8 @@ bool CReactorClientInfo::Run(bool blIsReady, EM_Server_Connect_State emState)
 
     if (blIsReady == true && SERVER_CONNECT_FIRST != m_emConnectState && SERVER_CONNECT_RECONNECT != m_emConnectState)
     {
+        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]AAAAAAA.\n"));
+
         if (m_pReactorConnect->connect(m_pConnectClient, m_AddrServer, ACE_Synch_Options::defaults, m_AddrLocal) == -1)
         {
             m_emConnectState = SERVER_CONNECT_FAIL;
@@ -265,7 +267,6 @@ bool CClientReConnectManager::Init(ACE_Reactor* pReactor)
     }
 
     m_pReactor        = pReactor;
-    m_blReactorFinish = true;
     return true;
 }
 
@@ -579,6 +580,7 @@ bool CClientReConnectManager::StartConnectTask(int nIntervalTime)
     }
 
     m_ActiveTimer.activate();
+    m_blReactorFinish = true;
     return true;
 }
 
