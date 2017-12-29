@@ -63,7 +63,8 @@ public:
     void Close();
     const char* GetError();
 
-    bool StartProactor();
+    bool StartOtherProactor();
+    bool StartClientProactor();
     bool StopProactor();
 
     CAceProactor* GetAceProactor(int nProactorID);

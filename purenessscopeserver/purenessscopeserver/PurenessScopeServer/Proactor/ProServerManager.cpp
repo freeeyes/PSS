@@ -420,10 +420,17 @@ bool CProServerManager::Start()
         return false;
     }
 
-    //启动反应器
-    if(!App_ProactorManager::instance()->StartProactor())
+    //启动反应器(其他的反应器，因为插件第三方需要)
+    if(!App_ProactorManager::instance()->StartOtherProactor())
     {
-        OUR_DEBUG((LM_INFO, "[CProServerManager::Start]App_ProactorManager::instance()->StartProactor is error.\n"));
+        OUR_DEBUG((LM_INFO, "[CProServerManager::Start]App_ProactorManager::instance()->StartOtherProactor is error.\n"));
+        return false;
+    }
+
+    //加载所有的插件初始化动作
+    if (false == App_ModuleLoader::instance()->InitModule())
+    {
+        OUR_DEBUG((LM_INFO, "[CServerManager::Run]App_ModuleLoader::instance()->InitModule() is error.\n"));
         return false;
     }
 
@@ -441,6 +448,14 @@ bool CProServerManager::Start()
 
     //开始启动链接发送定时器
     App_ProConnectManager::instance()->StartTimer();
+
+    //开闸，让客户端数据进来
+    if (!App_ProactorManager::instance()->StartClientProactor())
+    {
+        OUR_DEBUG((LM_INFO, "[CProServerManager::Start]App_ProactorManager::instance()->StartClientProactor is error.\n"));
+        return false;
+    }
+
     return true;
 }
 

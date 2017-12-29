@@ -236,6 +236,28 @@ _ModuleInfo* CLoadModule::GetModuleInfo(const char* pModuleName)
     return m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
 }
 
+bool CLoadModule::InitModule()
+{
+    bool blRet = true;
+    vector<_ModuleInfo*> vecModeInfo;
+    m_objHashModuleList.Get_All_Used(vecModeInfo);
+
+    //执行所有的插件数据进入前的准备
+    for (int i = 0; i < (int)vecModeInfo.size(); i++)
+    {
+        if (NULL != vecModeInfo[i]->InitModule)
+        {
+            if (0 != vecModeInfo[i]->InitModule(App_ServerObject::instance()))
+            {
+                blRet = false;
+                break;
+            }
+        }
+    }
+
+    return blRet;
+}
+
 bool CLoadModule::LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo, const char* pModulePath)
 {
     char szModuleFile[MAX_BUFF_200] = {'\0'};
@@ -263,7 +285,7 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo,
 
     pModuleInfo->LoadModuleData = (int(*)(CServerObject*))ACE_OS::dlsym(pModuleInfo->hModule, "LoadModuleData");
 
-    if(NULL == pModuleInfo->LoadModuleData || !pModuleInfo->LoadModuleData)
+    if(NULL == pModuleInfo->LoadModuleData)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Function LoadMoudle is error!\n", strModuleName.c_str()));
         m_tmModule.release();
@@ -272,7 +294,7 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo,
 
     pModuleInfo->UnLoadModuleData = (int(*)())ACE_OS::dlsym(pModuleInfo->hModule, "UnLoadModuleData");
 
-    if(NULL == pModuleInfo->UnLoadModuleData || !pModuleInfo->UnLoadModuleData)
+    if(NULL == pModuleInfo->UnLoadModuleData)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Function UnloadModule is error!\n", strModuleName.c_str()));
         m_tmModule.release();
@@ -281,7 +303,7 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo,
 
     pModuleInfo->GetDesc = (const char* (*)())ACE_OS::dlsym(pModuleInfo->hModule, "GetDesc");
 
-    if(NULL == pModuleInfo->GetDesc || !pModuleInfo->GetDesc)
+    if(NULL == pModuleInfo->GetDesc)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Function GetDesc is error!\n", strModuleName.c_str()));
         m_tmModule.release();
@@ -290,7 +312,7 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo,
 
     pModuleInfo->GetName = (const char* (*)())ACE_OS::dlsym(pModuleInfo->hModule, "GetName");
 
-    if(NULL == pModuleInfo->GetName || !pModuleInfo->GetName)
+    if(NULL == pModuleInfo->GetName)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Function GetName is error!\n", strModuleName.c_str()));
         m_tmModule.release();
@@ -299,7 +321,7 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo,
 
     pModuleInfo->GetModuleKey = (const char* (*)())ACE_OS::dlsym(pModuleInfo->hModule, "GetModuleKey");
 
-    if(NULL == pModuleInfo->GetModuleKey || !pModuleInfo->GetModuleKey)
+    if(NULL == pModuleInfo->GetModuleKey)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Function GetModuleKey is error!\n", strModuleName.c_str()));
         m_tmModule.release();
@@ -308,7 +330,7 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo,
 
     pModuleInfo->DoModuleMessage = (int(*)(uint16, IBuffPacket*, IBuffPacket*))ACE_OS::dlsym(pModuleInfo->hModule, "DoModuleMessage");
 
-    if(NULL == pModuleInfo->DoModuleMessage || !pModuleInfo->DoModuleMessage)
+    if(NULL == pModuleInfo->DoModuleMessage)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Function DoModuleMessage is error(%d)!\n", strModuleName.c_str(), errno));
         m_tmModule.release();
@@ -317,12 +339,15 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo,
 
     pModuleInfo->GetModuleState = (bool(*)(uint32&))ACE_OS::dlsym(pModuleInfo->hModule, "GetModuleState");
 
-    if(NULL == pModuleInfo->DoModuleMessage || !pModuleInfo->DoModuleMessage)
+    if(NULL == pModuleInfo->GetModuleState)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Function GetModuleState is error(%d)!\n", strModuleName.c_str(), errno));
         m_tmModule.release();
         return false;
     }
+
+    //这个可以为空，当为空的时候初始化不调用
+    pModuleInfo->InitModule = (int(*)(CServerObject*))ACE_OS::dlsym(pModuleInfo->hModule, "InitModule");
 
     pModuleInfo->strModuleName = strModuleName;
     m_tmModule.release();

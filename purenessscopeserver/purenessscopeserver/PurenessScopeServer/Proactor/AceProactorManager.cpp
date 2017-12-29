@@ -290,10 +290,10 @@ bool CAceProactorManager::AddNewProactor(int nProactorID, int nProactorType, int
     return true;
 }
 
-bool CAceProactorManager::StartProactor()
+bool CAceProactorManager::StartOtherProactor()
 {
     //先启动非总的Rector
-    for(uint16 i = 0; i < m_u2ProactorCount; i++)
+    for(uint16 i = 1; i < m_u2ProactorCount; i++)
     {
         if(NULL != m_pAceProactorList[i])
         {
@@ -302,6 +302,11 @@ bool CAceProactorManager::StartProactor()
     }
 
     return true;
+}
+
+bool CAceProactorManager::StartClientProactor()
+{
+    return m_pAceProactorList[0]->Start();
 }
 
 bool CAceProactorManager::StopProactor()

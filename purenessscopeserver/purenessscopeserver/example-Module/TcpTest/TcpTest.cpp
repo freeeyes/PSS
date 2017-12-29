@@ -27,6 +27,7 @@ extern "C"
 {
     DECLDIR int LoadModuleData(CServerObject* pServerObject);
     DECLDIR int UnLoadModuleData();
+    DECLDIR int InitModule(CServerObject* pServerObject);
     DECLDIR const char* GetDesc();
     DECLDIR const char* GetName();
     DECLDIR const char* GetModuleKey();
@@ -118,6 +119,12 @@ int UnLoadModuleData()
     SAFE_DELETE(g_BaseCommand);
 
     OUR_DEBUG((LM_INFO, "[Base UnLoadModuleData] End.\n"));
+    return 0;
+}
+
+int InitModule(CServerObject* pServerObject)
+{
+    OUR_DEBUG((LM_INFO, "[InitModule] Begin.\n"));
     return 0;
 }
 

@@ -585,10 +585,17 @@ bool CServerManager::Run()
         return false;
     }
 
-    //启动所有反应器
-    if (!App_ReactorManager::instance()->StartReactor())
+    //启动所有反应器(不是客户端接收的反应器，在这里不能启动)
+    if (!App_ReactorManager::instance()->StartOtherReactor())
     {
-        OUR_DEBUG((LM_INFO, "[CServerManager::Run]App_ReactorManager::instance()->StartReactor is error.\n"));
+        OUR_DEBUG((LM_INFO, "[CServerManager::Run]App_ReactorManager::instance()->StartOtherReactor is error.\n"));
+        return false;
+    }
+
+    //加载所有的插件初始化动作
+    if (false == App_ModuleLoader::instance()->InitModule())
+    {
+        OUR_DEBUG((LM_INFO, "[CServerManager::Run]App_ModuleLoader::instance()->InitModule() is error.\n"));
         return false;
     }
 
@@ -603,6 +610,13 @@ bool CServerManager::Run()
 
     //开始启动链接发送定时器
     App_ConnectManager::instance()->StartTimer();
+
+    //最后开闸，启动客户端反应器，让客户端数据进来
+    if (!App_ReactorManager::instance()->StartClientReactor())
+    {
+        OUR_DEBUG((LM_INFO, "[CServerManager::Run]App_ReactorManager::instance()->StartClientReactor is error.\n"));
+        return false;
+    }
 
     ACE_Thread_Manager::instance()->wait();
 

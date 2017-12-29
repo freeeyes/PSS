@@ -368,10 +368,10 @@ bool CAceReactorManager::AddNewReactor(int nReactorID, int nReactorType, int nTh
     return true;
 }
 
-bool CAceReactorManager::StartReactor()
+bool CAceReactorManager::StartOtherReactor()
 {
     //先启动非总的Rector
-    for (uint16 i = 0; i < m_u2RectorCount; i++)
+    for (uint16 i = 1; i < m_u2RectorCount; i++)
     {
         CAceReactor* pAceReactor = m_pReactorList[i];
 
@@ -385,6 +385,12 @@ bool CAceReactorManager::StartReactor()
     }
 
     return true;
+}
+
+
+bool CAceReactorManager::StartClientReactor()
+{
+    return m_pReactorList[0]->Start();
 }
 
 bool CAceReactorManager::StopReactor()

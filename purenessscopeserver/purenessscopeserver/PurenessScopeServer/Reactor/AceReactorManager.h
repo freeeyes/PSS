@@ -76,7 +76,8 @@ public:
     void Close();
     const char* GetError();
 
-    bool StartReactor();
+    bool StartOtherReactor();
+    bool StartClientReactor();
     bool StopReactor();
 
     CAceReactor* GetAceReactor(int nReactorID);

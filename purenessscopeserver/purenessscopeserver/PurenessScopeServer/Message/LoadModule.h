@@ -21,6 +21,7 @@ struct _ModuleInfo
     ACE_Date_Time    dtCreateTime;          //模块创建时间
     ACE_SHLIB_HANDLE hModule;
     int (*LoadModuleData)(CServerObject* pServerObject);
+    int (*InitModule)(CServerObject* pServerObject);
     int (*UnLoadModuleData)(void);
     const char* (*GetDesc)(void);
     const char* (*GetName)(void);
@@ -38,6 +39,7 @@ struct _ModuleInfo
         GetModuleKey      = NULL;
         DoModuleMessage   = NULL;
         GetModuleState    = NULL;
+        InitModule        = NULL;
     }
 };
 
@@ -85,6 +87,9 @@ public:
     int  GetCurrModuleCount();
     int  GetModulePoolCount();
     _ModuleInfo* GetModuleInfo(const char* pModuleName);
+
+    //反应器启动完毕后，开始加载插件。
+    bool InitModule();
 
     //插件接口提供相关功能
     bool GetModuleExist(const char* pModuleName);
