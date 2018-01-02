@@ -20,6 +20,33 @@
 
 #define COMMAND_AUTOTEST_HEAD 0x1000
 
+#define HTML_REPORT "<html>\n \
+<head>\n \
+<style type=\"text/css\">\n \
+.normal{background-color:#C1FFC1;color:Black;}\n \
+.error{background-color:#CD5C5C;color:Black;}\n \
+</style>\n \
+<title>Test Result</title>\n \
+</head>\n \
+\n \
+<body>\n \
+<table border=\"1\" cellpadding=\"10\">\n \
+  <tr>\n \
+    <th>TestName</th>\n \
+    <th>test result</th>\n \
+	<th>test info</th>\n \
+	<th>time cost(ms)</th>\n \
+  </tr>\n \
+  %s \
+</table>\n \
+</body>\n \
+</html>"
+
+#define TO_SUCCESS_TR "<tr class=\"normal\">\n<td>%s</td>\n<td>%d</td>\n<td>%s</td>\n<td>%fms</td>\n"
+#define TO_ERROR_TR "<tr class=\"error\">\n<td>%s</td>\n<td>%d</td>\n<td>%s</td>\n<td>%fms</td>\n"
+
+#define HTML_NAME "result.html"
+
 //测试数据集
 struct _ClientInfo
 {
@@ -62,6 +89,18 @@ struct _ResultInfo
 		printf("[_ResultInfo::Display]m_szResult=%s.\n", m_szResult);
 		printf("[_ResultInfo::Display]m_fMilliseconds=%fms.\n", m_fMilliseconds);
 	}
+	
+	void To_Html(char* pText)
+	{
+		if(0 == m_nRet)
+		{
+			sprintf(pText, TO_SUCCESS_TR, m_szTestName, m_nRet, m_szResult, m_fMilliseconds);
+		}
+		else
+		{
+			sprintf(pText, TO_ERROR_TR, m_szTestName, m_nRet, m_szResult, m_fMilliseconds);
+		}
+	}
 };
 
 //多线程测试参数
@@ -78,5 +117,7 @@ struct _ThreadParam
 		m_Barrier     = NULL;
 	}
 };
+
+
 
 #endif
