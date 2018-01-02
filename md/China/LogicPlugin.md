@@ -22,7 +22,7 @@ extern "C"
 {
     DECLDIR int LoadModuleData(CServerObject* pServerObject);
     DECLDIR int UnLoadModuleData();
-	DECLDIR int InitModule(CServerObject* pServerObject);
+    DECLDIR int InitModule(CServerObject* pServerObject);
     DECLDIR const char* GetDesc();
     DECLDIR const char* GetName();
     DECLDIR const char* GetModuleKey();
