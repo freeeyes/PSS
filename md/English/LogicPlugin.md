@@ -39,6 +39,7 @@ extern "C"
 > here, note that if desired, a g_basecommand class is a process that enables multiple signaling.  
 > when you receive data, you need to deal with it separately in domessage ( ).  
 > unloadmoduledata() when the plug-in uninstall, will call this interface, realize the plug-in uninstall.  
+> InitModule() This event is designed to connect to a third-party interface, initialization needs to do, here is the plug-in after the completion of the load, need to complete the third-party server connection and validation, add code here.  
 > domodulemessage() this provides an interface for calls between plug - ins.  
 > if your plug-in supports other plug-ins to access your portal, add your code here.  
 > u2command id is the command id passed in by other plug - ins, and you can determine your plug-in behavior based on this id.  

@@ -22,6 +22,7 @@ extern "C"
 {
     DECLDIR int LoadModuleData(CServerObject* pServerObject);
     DECLDIR int UnLoadModuleData();
+	DECLDIR int InitModule(CServerObject* pServerObject);
     DECLDIR const char* GetDesc();
     DECLDIR const char* GetName();
     DECLDIR const char* GetModuleKey();
@@ -38,7 +39,8 @@ extern "C"
 > g_BaseCommand为对应COMMAND_BASE处理的类函数。  
 > 这里请注意，如果需要，一个g_BaseCommand类是可以实现多个信令的处理。  
 > 在收到数据的时候，需要你自己在DoMessage()去分别处理。  
-> UnLoadModuleData() 当插件卸载的时候，会调用这个接口，实现插件的卸载。  
+> UnLoadModuleData() 当插件卸载的时候，会调用这个接口，实现插件的卸载。
+> InitModule() 这个事件专门针对连接第三方接口，初始化需要做的工作，这里主要是需要插件在加载完成后，需要完成第三方服务器连接和验证，在这里添加代码。   
 > DoModuleMessage() 这个提供了插件间调用的接口。  
 > 如果你的插件支持别的插件可以访问你的入口，在这里添加你的代码。  
 > u2CommandID是其他插件传入的命令ID，你可以根据这个ID来决定你的插件行为。  
