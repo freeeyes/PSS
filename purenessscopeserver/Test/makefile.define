@@ -2,7 +2,7 @@ CC = g++
 AR = ar
 CFLAGS = -g -O2 -D__LINUX__
 INCLUDES = -I./ -I../ -I/usr/include 
-LIBS = -L/usr/lib64 -L/usr/local/lib64 -L/usr/local/lib -ldl  
+LIBS = -L/usr/lib64 -L/usr/local/lib64 -L/usr/local/lib -ldl -lpthread
 # *****************************
 # ????
 # *****************************

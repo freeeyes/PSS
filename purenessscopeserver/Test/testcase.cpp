@@ -589,7 +589,7 @@ bool CheckTcpHalfPacket(_ClientInfo& objClientInfo, _ResultInfo& objResultInfo)
 	
 	gettimeofday(&ttStart, NULL);
 	
-	sprintf(objResultInfo.m_szTestName, "single packet test");
+	sprintf(objResultInfo.m_szTestName, "helf packet test");
 	sprintf(szSession, "FREEEYES");
 
 	//socket创建的准备工作
@@ -754,4 +754,73 @@ bool CheckTcpHalfPacket(_ClientInfo& objClientInfo, _ResultInfo& objResultInfo)
 	close(sckClient);
 
 	return true;	
+}
+
+void* Thread_CheckTcpPacket(void* arg)
+{
+	_ThreadParam* pThreadParam = (_ThreadParam* )arg;
+
+	if(NULL != pThreadParam)
+	{
+		CheckTcpPacket(*pThreadParam->m_pClientInfo, *pThreadParam->m_pResultInfo);
+	}
+	
+	pthread_barrier_wait(pThreadParam->m_Barrier);	
+}
+
+bool CheckTcpMulipleThreadPacket(int nCount, _ClientInfo& objClientInfo, _ResultInfo& objResultInfo)
+{
+	struct timeval ttStart, ttEnd;
+	int sckClient;
+	char szSession[32]      = {'\0'}; 
+	int nSrcLen = 0;
+	int nDecLen = 0;
+	
+	gettimeofday(&ttStart, NULL);
+	
+	sprintf(objResultInfo.m_szTestName, "Muliple connect packet test");
+	
+	_ResultInfo* pResultInfoList   = new _ResultInfo[nCount];
+	_ThreadParam* pThreadParamList = new _ThreadParam[nCount];
+	
+	memset(pResultInfoList, 0, sizeof(pResultInfoList));
+	memset(pThreadParamList, 0, sizeof(pThreadParamList));
+	
+	pthread_barrier_t barrier;
+	
+	//初始化栅栏
+	pthread_barrier_init(&barrier, NULL, 1 + nCount);
+	
+	for(int i = 0; i < nCount; i++)
+	{
+		pthread_t pid;
+		
+		_ThreadParam* pThreadParam  = &pThreadParamList[i];
+		pThreadParam->m_pClientInfo = &objClientInfo;
+		pThreadParam->m_pResultInfo = &pResultInfoList[i];
+		pThreadParam->m_Barrier     = &barrier;
+
+		pthread_create(&pid, NULL, &Thread_CheckTcpPacket, (void* )pThreadParam);
+	}
+	
+	pthread_barrier_wait(&barrier);
+  pthread_barrier_destroy(&barrier);
+  
+	for(int i = 0; i < nCount; i++)
+	{
+		if(pResultInfoList[i].m_nRet == 1)
+		{
+			sprintf(objResultInfo.m_szResult, "[e][%s:%d]error(Connect ID %d).", objClientInfo.m_szServerIP, objClientInfo.m_nPort, i);
+			objResultInfo.m_nRet = 1;			
+		}
+	}  
+	
+	sprintf(objResultInfo.m_szResult, "[s][%s:%d]success.", objClientInfo.m_szServerIP, objClientInfo.m_nPort);
+	gettimeofday(&ttEnd, NULL);
+	objResultInfo.m_nRet = 0;
+	objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;	
+	
+	delete [] pThreadParamList;
+	delete [] pResultInfoList;
+	return true;
 }

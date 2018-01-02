@@ -63,4 +63,20 @@ struct _ResultInfo
 		printf("[_ResultInfo::Display]m_fMilliseconds=%fms.\n", m_fMilliseconds);
 	}
 };
+
+//多线程测试参数
+struct _ThreadParam
+{
+	_ClientInfo*       m_pClientInfo;
+	_ResultInfo*       m_pResultInfo;
+	pthread_barrier_t* m_Barrier;
+	
+	_ThreadParam()
+	{
+		m_pClientInfo = NULL;
+		m_pResultInfo = NULL;
+		m_Barrier     = NULL;
+	}
+};
+
 #endif

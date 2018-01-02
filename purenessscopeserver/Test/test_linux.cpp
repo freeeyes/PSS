@@ -32,5 +32,8 @@ int main()
 	CheckTcpHalfPacket(objClientInfo, objResultInfo);
 	objResultInfo.Display();		
 	
+	CheckTcpMulipleThreadPacket(10, objClientInfo, objResultInfo);
+	objResultInfo.Display();
+	
 	return 0;
 }
