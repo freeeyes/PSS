@@ -205,7 +205,10 @@ int CLoadModule::UnloadListUpdate(uint32 u4UpdateIndex)
                 if(2 == (*itr).m_u1UnloadState)
                 {
                     //重新加载
-                    App_ModuleLoader::instance()->LoadModule((*itr).m_strModulePath.c_str(), (*itr).m_strModuleName.c_str(), (*itr).m_strModuleParam.c_str());
+                    LoadModule((*itr).m_strModulePath.c_str(), (*itr).m_strModuleName.c_str(), (*itr).m_strModuleParam.c_str());
+
+                    //重新加载启动事件
+                    InitModule((*itr).m_strModuleName.c_str());
                     nRet = 1;
                 }
 
@@ -256,6 +259,18 @@ bool CLoadModule::InitModule()
     }
 
     return blRet;
+}
+
+bool CLoadModule::InitModule(const char* pModuleName)
+{
+    _ModuleInfo* pModule = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
+
+    if (NULL != pModule)
+    {
+        pModule->InitModule(App_ServerObject::instance());
+    }
+
+    return true;
 }
 
 bool CLoadModule::LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo, const char* pModulePath)

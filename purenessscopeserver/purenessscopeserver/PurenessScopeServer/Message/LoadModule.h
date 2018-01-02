@@ -88,8 +88,8 @@ public:
     int  GetModulePoolCount();
     _ModuleInfo* GetModuleInfo(const char* pModuleName);
 
-    //反应器启动完毕后，开始加载插件。
-    bool InitModule();
+    bool InitModule();                             //反应器启动完毕后，开始加载插件。
+    bool InitModule(const char* pModuleName);      //插件热加载，当插件重新加载后，启动Init方法。
 
     //插件接口提供相关功能
     bool GetModuleExist(const char* pModuleName);
