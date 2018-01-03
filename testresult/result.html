@@ -1,0 +1,50 @@
+<html>
+ <head>
+ <style type="text/css">
+ .normal{background-color:#C1FFC1;color:Black;}
+ .error{background-color:#CD5C5C;color:Black;}
+ </style>
+ <title>Test Result</title>
+ </head>
+ 
+ <body>
+ <table border="1" cellpadding="10">
+   <tr>
+     <th>TestName</th>
+     <th>test result</th>
+ 	<th>test info</th>
+ 	<th>time cost(ms)</th>
+   </tr>
+   <tr class="normal">
+<td>single packet test</td>
+<td>0</td>
+<td>[s][127.0.0.1:10002]success.</td>
+<td>1.938000ms</td>
+<tr class="normal">
+<td>multiple packet test(10)</td>
+<td>0</td>
+<td>[s][127.0.0.1:10002]success.</td>
+<td>12.834000ms</td>
+<tr class="normal">
+<td>multiple connect test(10)</td>
+<td>0</td>
+<td>[s][127.0.0.1:10002]success.</td>
+<td>25.253000ms</td>
+<tr class="normal">
+<td>unvaild packet test</td>
+<td>0</td>
+<td>[s][127.0.0.1:10002]success.[Connection reset by peer]</td>
+<td>0.400000ms</td>
+<tr class="normal">
+<td>helf packet test</td>
+<td>0</td>
+<td>[s][127.0.0.1:10002]success.</td>
+<td>2.597000ms</td>
+<tr class="normal">
+<td>Muliple connect packet test</td>
+<td>0</td>
+<td>[s][127.0.0.1:10002]success.</td>
+<td>13.728000ms</td>
+ </table>
+ </body>
+ </html>

@@ -45,7 +45,7 @@
 #define TO_SUCCESS_TR "<tr class=\"normal\">\n<td>%s</td>\n<td>%d</td>\n<td>%s</td>\n<td>%fms</td>\n"
 #define TO_ERROR_TR "<tr class=\"error\">\n<td>%s</td>\n<td>%d</td>\n<td>%s</td>\n<td>%fms</td>\n"
 
-#define HTML_NAME "result.html"
+#define HTML_NAME "../../testresult/result.html"
 
 //≤‚ ‘ ˝æ›ºØ
 struct _ClientInfo
