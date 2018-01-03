@@ -13,6 +13,21 @@ int main()
 	_ResultInfo objResultInfo;
 	_ClientInfo objClientInfo;
 	
+	//获得当前测试运行时间
+	time_t ttCurrentTime;  
+	time(&ttCurrentTime); 
+	struct tm * pTime; 
+	pTime = localtime(&ttCurrentTime);  
+	char szTimeNow[50] = {'\0'};
+	sprintf(szTimeNow, "[Test run time] %04d-%02d-%02d %02d:%02d:%02d", 
+					pTime->tm_year + 1900,
+					pTime->tm_mon + 1,
+					pTime->tm_mday,
+					pTime->tm_hour,
+					pTime->tm_min,
+					pTime->tm_sec);
+	
+	//开始测试用例
 	char szBuff[20] = {'\0'};
 	sprintf(szBuff, "freeeyes");
 	
@@ -62,7 +77,7 @@ int main()
 	char* pHtmlFile = new char[nTestCount*MAX_BUFF_1024];
 	memset(pHtmlFile, 0, nTestCount*MAX_BUFF_1024);
 	
-	sprintf(pHtmlFile, HTML_REPORT, strResultInfo.c_str());
+	sprintf(pHtmlFile, HTML_REPORT, szTimeNow, strResultInfo.c_str());
 	
 	FILE* pFile = fopen(HTML_NAME, "w");
 	if(NULL != pFile)

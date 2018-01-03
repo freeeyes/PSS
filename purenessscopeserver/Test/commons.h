@@ -37,6 +37,9 @@
 	<th>test info</th>\n \
 	<th>time cost(ms)</th>\n \
   </tr>\n \
+   <tr>\n \
+     <td colspan=\"4\">%s</td>\n \
+   </tr>\n \
   %s \
 </table>\n \
 </body>\n \
