@@ -615,6 +615,7 @@ int CConnectHandler::Dispose_Recv_Data()
                 }
 
                 m_pPacketParse->SetPacket_IsHandleHead(false);
+                m_pPacketParse->SetPacket_Head_Curr_Length(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength);
                 m_pPacketParse->SetPacket_Head_Message(objHeadInfo.m_pmbHead);
                 m_pPacketParse->SetPacket_Head_Curr_Length(objHeadInfo.m_u4HeadCurrLen);
                 m_pPacketParse->SetPacket_Body_Src_Length(objHeadInfo.m_u4BodySrcLen);
@@ -750,7 +751,7 @@ int CConnectHandler::Dispose_Recv_Data()
                 m_pPacketParse->SetPacket_CommandID(obj_Packet_Info.m_u2PacketCommandID);
                 m_pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4HeadSrcLen);
                 m_pPacketParse->SetPacket_Head_Curr_Length(obj_Packet_Info.m_u4HeadCurrLen);
-                m_pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4BodySrcLen);
+                m_pPacketParse->SetPacket_Body_Src_Length(obj_Packet_Info.m_u4BodySrcLen);
                 m_pPacketParse->SetPacket_Body_Curr_Length(obj_Packet_Info.m_u4BodyCurrLen);
 
                 if (false == CheckMessage())
@@ -1098,7 +1099,7 @@ int CConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Size, 
             m_pPacketParse->SetPacket_CommandID(obj_Packet_Info.m_u2PacketCommandID);
             m_pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4HeadSrcLen);
             m_pPacketParse->SetPacket_Head_Curr_Length(obj_Packet_Info.m_u4HeadCurrLen);
-            m_pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4BodySrcLen);
+            m_pPacketParse->SetPacket_Body_Src_Length(obj_Packet_Info.m_u4BodySrcLen);
             m_pPacketParse->SetPacket_Body_Curr_Length(obj_Packet_Info.m_u4BodyCurrLen);
 
             //已经接收了完整数据包，扔给工作线程去处理

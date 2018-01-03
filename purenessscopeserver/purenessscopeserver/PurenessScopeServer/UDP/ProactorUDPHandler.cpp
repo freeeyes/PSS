@@ -301,7 +301,7 @@ bool CProactorUDPHandler::CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len)
         else
         {
             m_pPacketParse->SetPacket_IsHandleHead(false);
-            m_pPacketParse->SetPacket_Head_Src_Length(obj_Head_Info.m_u4HeadCurrLen);
+            m_pPacketParse->SetPacket_Head_Src_Length(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength);
             m_pPacketParse->SetPacket_Head_Curr_Length(obj_Head_Info.m_u4HeadCurrLen);
             m_pPacketParse->SetPacket_Body_Src_Length(obj_Head_Info.m_u4BodySrcLen);
             m_pPacketParse->SetPacket_CommandID(obj_Head_Info.m_u2PacketCommandID);
