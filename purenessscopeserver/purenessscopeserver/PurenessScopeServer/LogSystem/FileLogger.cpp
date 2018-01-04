@@ -236,7 +236,7 @@ bool CFileLogger::Init()
         pLogFile->SetLevel(objvecLogFileInfo[i].m_u2LogLevel);
         pLogFile->SetServerName(szServerName);
         pLogFile->SetDisplay(objvecLogFileInfo[i].m_u1DisPlay);
-        int nRet = pLogFile->Init();
+        pLogFile->Init();
 
         if (false == pLogFile->Run())
         {

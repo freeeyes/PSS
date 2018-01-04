@@ -59,11 +59,10 @@ public:
         sprintf_safe(m_szFileRoot, MAX_BUFF_100, "%s", pFileRoot);
     }
 
-    int Init()
+    void Init()
     {
         //在这里初始化读取当前文件夹的文件最大序号和文件大小
         ACE_Date_Time dt;
-        char szLogFileName[MAX_BUFF_200]  = { '\0' };
         char szDateBuff[MAX_TIME_SIZE]    = { '\0' };
 
         //首先判断文件是否存在
@@ -90,27 +89,27 @@ public:
                 else
                 {
                     m_u4CurrFileSize = u4FileSize;
-                    return 1;
+                    return;
                 }
             }
             else
             {
                 int nError = errno;
 
-                if(EACCES == nError)
+                if(EACCES == nError || ENOENT == nError)
                 {
                     //找到了不存在的文件
-                    return 0;
+                    return;
                 }
                 else
                 {
                     OUR_DEBUG((LM_INFO, "[CLogFile::Init]File(%s) access error(%d).\n", strLogName.c_str(), nError));
-                    return 0;
+                    return;
                 }
             }
         }
 
-        return 0;
+        return;
     }
 
     virtual ~CLogFile()
