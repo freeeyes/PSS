@@ -43,17 +43,74 @@ struct _Log_File_Info
 class CLogFile
 {
 public:
-    CLogFile(const char* pFileRoot, uint32 u4BufferSize)
+    CLogFile(const char* pFileRoot, uint32 u4BufferSize, uint32 u4FileMaxSize)
     {
+        m_u2CurrFileIndex   = 1;
         m_u2LogID           = 0;
         m_nDisplay          = 0;
+        m_u4CurrFileSize    = 0;
         m_StrServerName     = "";
         m_u2Level           = 0;
         m_StrlogType        = "ServerError";
         m_pBuffer           = new char[u4BufferSize];   //这里是用于日志拼接时间所用
         m_u4BufferSize      = u4BufferSize;
+        m_u4FileMaxSize     = u4FileMaxSize * 1024 * 1024;
         m_szLogTime[0]      = '\0';
         sprintf_safe(m_szFileRoot, MAX_BUFF_100, "%s", pFileRoot);
+    }
+
+    int Init()
+    {
+        //在这里初始化读取当前文件夹的文件最大序号和文件大小
+        ACE_Date_Time dt;
+        char szLogFileName[MAX_BUFF_200]  = { '\0' };
+        char szDateBuff[MAX_TIME_SIZE]    = { '\0' };
+
+        //首先判断文件是否存在
+        while (true)
+        {
+            sprintf_safe(szDateBuff, MAX_TIME_SIZE, "_%04d-%02d-%02d_%d.log", dt.year(), dt.month(), dt.day(), m_u2CurrFileIndex);
+            ACE_TString strLogModulePath = m_szFileRoot;
+            ACE_TString strLogName = strLogModulePath + "/Log/" + m_StrlogType + "/" + m_StrlogName + "/" + m_StrServerName + m_StrlogName + szDateBuff;
+
+            int nRet = ACE_OS::access(strLogName.c_str(), R_OK);
+
+            if (0 == nRet)
+            {
+                //如果文件已存在，判断文件长度是否超过阈值
+                FILE* fp = ACE_OS::fopen(strLogName.c_str(), "r");
+                fseek(fp, 0L, SEEK_END);
+                uint32 u4FileSize = ftell(fp);
+                fclose(fp);
+
+                if (u4FileSize >= m_u4FileMaxSize)
+                {
+                    m_u2CurrFileIndex++;
+                }
+                else
+                {
+                    m_u4CurrFileSize = u4FileSize;
+                    return 1;
+                }
+            }
+            else
+            {
+                int nError = errno;
+
+                if(EACCES == nError)
+                {
+                    //找到了不存在的文件
+                    return 0;
+                }
+                else
+                {
+                    OUR_DEBUG((LM_INFO, "[CLogFile::Init]File(%s) access error(%d).\n", strLogName.c_str(), nError));
+                    return 0;
+                }
+            }
+        }
+
+        return 0;
     }
 
     virtual ~CLogFile()
@@ -167,6 +224,9 @@ public:
         //每次自动检测
         CheckTime();
 
+        //记录当前文件写入长度
+        m_u4CurrFileSize += pLogBlockInfo->m_u4Length;
+
         ACE_Date_Time dt;
         char szDateBuff[MAX_TIME_SIZE] = {'\0'};
 
@@ -199,6 +259,9 @@ public:
                 OUR_DEBUG((LM_INFO, "[CLogFile::doLog](%s)Send mail fail.\n", m_StrlogName.c_str()));
             }
         }
+
+        //检查是否超过了文件块，如果超过了，创建一个新日志文件。
+        CheckLogFileBlock();
 
         return 0;
     }
@@ -380,7 +443,7 @@ public:
 
         CreatePath();       //如果目录不存在则创建目录
 
-        sprintf_safe(szDateBuff, MAX_TIME_SIZE, "_%04d-%02d-%02d.log", dt.year(), dt.month(), dt.day());
+        sprintf_safe(szDateBuff, MAX_TIME_SIZE, "_%04d-%02d-%02d_%d.log", dt.year(), dt.month(), dt.day(), m_u2CurrFileIndex);
         sprintf_safe(m_szLogTime, MAX_TIME_SIZE, "%04d-%02d-%02d", dt.year(), dt.month(), dt.day());
 
         ACE_TString strLogModulePath = m_szFileRoot;
@@ -417,30 +480,49 @@ public:
         }
     }
 
+    void CheckLogFileBlock()
+    {
+        //查看文件是否超过了最大限制
+        if (m_u4CurrFileSize >= m_u4FileMaxSize)
+        {
+            //创建新文件
+            m_u2CurrFileIndex++;
+
+            if (false == Run())
+            {
+                OUR_DEBUG((LM_INFO, "[ServerLogger](%s)Run fail.\n", m_StrlogName.c_str()));
+            }
+        }
+    }
+
     void CreatePath()
     {
         int n4Return = -1;
+        int nError   = 0;
         char szPath[MAX_CMD_NUM] = {'\0'};
         sprintf_safe(szPath, MAX_CMD_NUM, "%s/Log/", m_szFileRoot);
         n4Return = ACE_OS::mkdir(szPath);
+        nError = errno;
 
-        if(-1 == n4Return)
+        if(-1 == n4Return && nError != nError)
         {
             OUR_DEBUG((LM_INFO, "[ServerLogger](%s)CreatePath fail.\n", szPath));
         }
 
         sprintf_safe(szPath, MAX_CMD_NUM, "%s/Log/%s/", m_szFileRoot, m_StrlogType.c_str());
         n4Return = ACE_OS::mkdir(szPath);
+        nError = errno;
 
-        if(-1 == n4Return)
+        if(-1 == n4Return && nError != nError)
         {
             OUR_DEBUG((LM_INFO, "[ServerLogger](%s)CreatePath fail.\n", szPath));
         }
 
         sprintf_safe(szPath, MAX_CMD_NUM, "%s/Log/%s/%s", m_szFileRoot, m_StrlogType.c_str(), m_StrlogName.c_str());
         n4Return = ACE_OS::mkdir(szPath);
+        nError = errno;
 
-        if(-1 == n4Return)
+        if(-1 == n4Return && nError != nError)
         {
             OUR_DEBUG((LM_INFO, "[ServerLogger](%s)CreatePath fail.\n", szPath));
         }
@@ -448,6 +530,9 @@ public:
 
 private:
     uint32              m_u4BufferSize;               //日志缓冲最大大小
+    uint32              m_u4CurrFileSize;             //记录当前文件大小
+    uint32              m_u4FileMaxSize;              //单个日志文件的最大大小
+    uint16              m_u2CurrFileIndex;            //当前日志块序号
     uint16              m_u2LogID;                    //日志编号
     uint16              m_u2Level;                    //日志等级
     int                 m_nDisplay;                   //显示还是记录文件

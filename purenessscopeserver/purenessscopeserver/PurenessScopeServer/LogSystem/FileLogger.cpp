@@ -59,10 +59,13 @@ int CFileLogger::GetLogTypeCount()
 bool CFileLogger::Init()
 {
     CXmlOpeation objXmlOpeation;
+
+    //默认单个文件最大是8M
+    uint32 u4FileMaxSize            = 8 * MAX_BUFF_1024 * MAX_BUFF_1024;
     uint16 u2LogID                  = 0;
+    uint16 u2LogLevel               = 0;
     uint8  u1FileClass              = 0;
     uint8  u1DisPlay                = 0;
-    uint16 u2LogLevel               = 0;
     char szFile[MAX_BUFF_1024]      = {'\0'};
     char szFileName[MAX_BUFF_100]   = {'\0'};
     char szServerName[MAX_BUFF_100] = {'\0'};
@@ -85,6 +88,14 @@ bool CFileLogger::Init()
     if(pData != NULL)
     {
         sprintf_safe(szServerName, MAX_BUFF_100, "%s", pData);
+    }
+
+    //得到单个日志最大大小
+    pData = objXmlOpeation.GetData("ServerLogHead", "LogFileMaxSize");
+
+    if (pData != NULL)
+    {
+        u4FileMaxSize = (uint32)ACE_OS::atoi(pData);
     }
 
     OUR_DEBUG((LM_ERROR, "[CFileLogger::readConfig]strServerName=%s\n", szServerName));
@@ -217,7 +228,7 @@ bool CFileLogger::Init()
     for(int i = 0; i < (int)objvecLogFileInfo.size(); i++)
     {
         int nPos = objvecLogFileInfo[i].m_u2LogID % m_nCount;
-        CLogFile* pLogFile = new CLogFile(m_szLogRoot, m_u4BlockSize);
+        CLogFile* pLogFile = new CLogFile(m_szLogRoot, m_u4BlockSize, u4FileMaxSize);
 
         pLogFile->SetLoggerName(objvecLogFileInfo[i].m_szFileName);
         pLogFile->SetLoggerID(objvecLogFileInfo[i].m_u2LogID);
@@ -225,6 +236,7 @@ bool CFileLogger::Init()
         pLogFile->SetLevel(objvecLogFileInfo[i].m_u2LogLevel);
         pLogFile->SetServerName(szServerName);
         pLogFile->SetDisplay(objvecLogFileInfo[i].m_u1DisPlay);
+        int nRet = pLogFile->Init();
 
         if (false == pLogFile->Run())
         {

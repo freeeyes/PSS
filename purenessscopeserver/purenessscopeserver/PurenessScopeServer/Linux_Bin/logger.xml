@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <config>
-	<ServerLogHead Text="127_"  desc="日志前缀的名称，所有日志生成都会添加此前缀" />
+	<ServerLogHead Text="127_" LogFileMaxSize="1024" desc="日志前缀的名称，所有日志生成都会添加此前缀" />
 	<LogPath Path="./" desc="日志生成的主路径" />
 	<LogPool BlockSize="8192" PoolCount="100" desc="日志块大小相关设置，以及日志块池个数设置" />
 	<LogLevel CurrLevel="1" desc="当前日志输出级别，大于此等于级别的才会输出" />
