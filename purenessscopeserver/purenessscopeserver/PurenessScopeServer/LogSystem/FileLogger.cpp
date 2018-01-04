@@ -61,7 +61,7 @@ bool CFileLogger::Init()
     CXmlOpeation objXmlOpeation;
 
     //默认单个文件最大是8M
-    uint32 u4FileMaxSize            = MAX_BUFF_500 * MAX_BUFF_1024 * MAX_BUFF_1024;
+    uint32 u4FileMaxSize            = MAX_BUFF_500;
     uint16 u2LogID                  = 0;
     uint16 u2LogLevel               = 0;
     uint8  u1FileClass              = 0;

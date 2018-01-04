@@ -54,7 +54,7 @@ public:
         m_StrlogType        = "ServerError";
         m_pBuffer           = new char[u4BufferSize];   //这里是用于日志拼接时间所用
         m_u4BufferSize      = u4BufferSize;
-        m_u4FileMaxSize     = u4FileMaxSize * 1024 * 1024;
+        m_u4FileMaxSize     = u4FileMaxSize * MAX_BUFF_1024 * MAX_BUFF_1024;
         m_szLogTime[0]      = '\0';
         sprintf_safe(m_szFileRoot, MAX_BUFF_100, "%s", pFileRoot);
     }
