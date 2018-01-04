@@ -78,6 +78,13 @@ public:
             {
                 //如果文件已存在，判断文件长度是否超过阈值
                 FILE* fp = ACE_OS::fopen(strLogName.c_str(), "r");
+
+                if (NULL == fp)
+                {
+                    OUR_DEBUG((LM_INFO, "[CLogFile::Init]File(%s) fopen error.\n", strLogName.c_str()));
+                    return;
+                }
+
                 fseek(fp, 0L, SEEK_END);
                 uint32 u4FileSize = ftell(fp);
                 fclose(fp);
@@ -503,7 +510,7 @@ public:
         n4Return = ACE_OS::mkdir(szPath);
         nError = errno;
 
-        if(-1 == n4Return && nError != nError)
+        if(-1 == n4Return && EEXIST != nError)
         {
             OUR_DEBUG((LM_INFO, "[ServerLogger](%s)CreatePath fail.\n", szPath));
         }
@@ -512,7 +519,7 @@ public:
         n4Return = ACE_OS::mkdir(szPath);
         nError = errno;
 
-        if(-1 == n4Return && nError != nError)
+        if(-1 == n4Return && EEXIST != nError)
         {
             OUR_DEBUG((LM_INFO, "[ServerLogger](%s)CreatePath fail.\n", szPath));
         }
@@ -521,7 +528,7 @@ public:
         n4Return = ACE_OS::mkdir(szPath);
         nError = errno;
 
-        if(-1 == n4Return && nError != nError)
+        if(-1 == n4Return && EEXIST != nError)
         {
             OUR_DEBUG((LM_INFO, "[ServerLogger](%s)CreatePath fail.\n", szPath));
         }
