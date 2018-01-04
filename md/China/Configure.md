@@ -249,6 +249,7 @@
             <th>说明</th>
         </tr>
 		<tr><th>Text</th><th>日志统一标头</th></tr>
+		<tr><th>LogFileMaxSize</th><th>单个日志块的最大大小,单位是mb</th></tr>
 		<tr><th>desc</th><th>当前标签描述信息</th></tr>
         <tr>
             <th rowspan="3">LogPath</th>

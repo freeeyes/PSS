@@ -243,12 +243,13 @@
             <th colspan="2">Attribute information</th>
         </tr>
         <tr>
-            <th rowspan="3">ServerLogHead</th>
-            <th rowspan="3">Server log file header</th>
+            <th rowspan="4">ServerLogHead</th>
+            <th rowspan="4">Server log file header</th>
             <th>Attribute</th>
             <th>information</th>
         </tr>
 		<tr><th>Text</th><th>Server log file header</th></tr>
+		<tr><th>LogFileMaxSize</th><th>Maximum size of a single log block in mb</th></tr>
 		<tr><th>desc</th><th>Current label description information</th></tr>
         <tr>
             <th rowspan="3">LogPath</th>
