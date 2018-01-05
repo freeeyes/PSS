@@ -101,6 +101,6 @@ matrix:
       - git init
       - git config user.name "freeeyes"
       - git config user.email "freeeyes@163.com"
-      - git add -u ./testresult/result.html
-      - git commit -m "[ci skip]Update result.html"
+      - git add -u ./testresult/result.md
+      - git commit -m "[ci skip]Travis CI Update result.md"
       - git push -f "https://${GH_TOKEN}@${GH_REF}" HEAD:master
