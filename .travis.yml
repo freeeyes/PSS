@@ -4,14 +4,11 @@ group: deprecated-2017Q4
 language: cpp
 os:
   - linux
-
 compiler:
   - gcc
-
 branches:
   only:
   - master
-
 env:
   matrix:
     - ACE=1
@@ -21,15 +18,12 @@ env:
     - ACE_ROOT=$ACEDIR/ACE_wrappers
     - LD_LIBRARY_PATH=$ACE_ROOT/lib:$LD_LIBRARY_PATH
     - COMPILER=g++-7
-    - GH_REF: github.com/freeeyes/PSS.git
-    - secure: "fZjOkLkM1R6U/PvdRPbsf3r8p53h6q4Znh8wmDYedg0rkOUz/mgzYy4oCOLDwYNID9uEAfll/xutAmy/3pcqTrgncLtptXjqvwJK7wVOu2mKU6amjhICD0y2pps9mjRBWORZo3Cd/Wa39KCHwS8SFxfYme3AwJTK4xmEZNgHLru7LMMeFuXKIGNTpE7wNZ9zf1hGZBFVcCz2IBUXcYYaT4scUFO0LWA3GbbcKOMuKHGP0s/rGv9bUJgWS7ys0fMRdV11BDx3hhkkzwzHmbxNUbPgaRd630H2CzeauymtNfmqObrQMkwu0La4gsnEGRDJHt5vFZXFXe6Xi9i0Yrm4ERbgLRLH5xXUWGGuAdGdL3XcPXBegbhCcShGGvTSFF5a3QX6z2iEuse7lyO5t5bXK8NZxkJVkuvaI/2yTQczYakQlg9d6CCMUQRkQjXaHG2edhvVDYrPAHTJsSEgZuLHqHw9XH2egQvyt0aBC7UlxZBMAnKcSVJ+ETzKKeW/va8JZLEBTbyO/lhkZNQwHKGh+m9IaTNylG7VIODVtJlfPVSF+Feb9AkyipRUoN7IN+dO8bE24V/s3RouQpTzdTL/B5q6nYgOphutpzezJpLZy7VYxEXoFwP0rM3Odq26eN+L5+c2up5GuaPDeq372W6rprDPkUsiyiw1DRXzi589Y14="
 
 before_install:
   - mkdir -p $ACEDIR
   - cd $ACEDIR
   - wget http://download.dre.vanderbilt.edu/previous_versions/ACE-6.4.0.tar.gz
   - tar zxf ACE-6.4.0.tar.gz
-  - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
 
 before_script:
   - export
@@ -49,37 +43,70 @@ before_script:
   - $ACE_ROOT/bin/mwc.pl -type gnuace ACE.mwc
   - make ACE > /dev/null 2>&1
   - ls $ACE_ROOT/lib/
+#
+# Build Matrix
+#
+matrix:
+  include:
 
-script: 
-  - export
-  - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then 
-      cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin;
-      $ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc;
-      make -j 4;
-    fi
+  #
+  # Build and scan
+  #
+  - os: linux
+    compiler:
+      - gcc
 
-after_script:
-  - export
-  - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
-  - ./PurenessScopeServer&
-  - cd $TRAVIS_BUILD_DIR/purenessscopeserver/Test
-  - make
-  - ./Test_Pss
-  - killall -9 PurenessScopeServer
-  - cd $TRAVIS_BUILD_DIR
-  - git init
-  - git config user.name "freeeyes"
-  - git config user.email "freeeyes@163.com"
-  - git add -u ./testresult/result.html
-  - git commit -m "[ci skip]Update result.html"
-  - git push -f "https://${GH_TOKEN}@${GH_REF}" HEAD:master
+    branches:
+      only:
+      - master
 
-addons:
-  coverity_scan:
-    project:
-      name: "freeeyes/PSS"
-      description: "Build submitted via Travis CI"
-    notification_email: freeeyes@163.com;liuchao412@foxmail.com
-    build_command_prepend: "cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin;$ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc;make clean"
-    build_command: "make -j 4"
-    branch_pattern: master
+    env:
+      - CURPATH=$(pwd)
+      - ACEDIR=$HOME/Tools
+      - ACE_ROOT=$ACEDIR/ACE_wrappers
+      - LD_LIBRARY_PATH=$ACE_ROOT/lib:$LD_LIBRARY_PATH
+      - COMPILER=g++-7
+      - GH_REF: github.com/freeeyes/PSS.git
+      - secure: "fZjOkLkM1R6U/PvdRPbsf3r8p53h6q4Znh8wmDYedg0rkOUz/mgzYy4oCOLDwYNID9uEAfll/xutAmy/3pcqTrgncLtptXjqvwJK7wVOu2mKU6amjhICD0y2pps9mjRBWORZo3Cd/Wa39KCHwS8SFxfYme3AwJTK4xmEZNgHLru7LMMeFuXKIGNTpE7wNZ9zf1hGZBFVcCz2IBUXcYYaT4scUFO0LWA3GbbcKOMuKHGP0s/rGv9bUJgWS7ys0fMRdV11BDx3hhkkzwzHmbxNUbPgaRd630H2CzeauymtNfmqObrQMkwu0La4gsnEGRDJHt5vFZXFXe6Xi9i0Yrm4ERbgLRLH5xXUWGGuAdGdL3XcPXBegbhCcShGGvTSFF5a3QX6z2iEuse7lyO5t5bXK8NZxkJVkuvaI/2yTQczYakQlg9d6CCMUQRkQjXaHG2edhvVDYrPAHTJsSEgZuLHqHw9XH2egQvyt0aBC7UlxZBMAnKcSVJ+ETzKKeW/va8JZLEBTbyO/lhkZNQwHKGh+m9IaTNylG7VIODVtJlfPVSF+Feb9AkyipRUoN7IN+dO8bE24V/s3RouQpTzdTL/B5q6nYgOphutpzezJpLZy7VYxEXoFwP0rM3Odq26eN+L5+c2up5GuaPDeq372W6rprDPkUsiyiw1DRXzi589Y14="
+
+    script: 
+      - export
+      - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+      - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then 
+          cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin;
+          $ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc;
+          make -j 4;
+        fi
+
+    addons:
+      coverity_scan:
+        project:
+          name: "freeeyes/PSS"
+          description: "Build submitted via Travis CI"
+        notification_email: freeeyes@163.com;liuchao412@foxmail.com
+        build_command_prepend: "cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin;$ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc;make clean"
+        build_command: "make -j 4"
+        branch_pattern: master
+
+  #
+  # Update Report
+  #
+  - os: linux
+    env:
+      - GH_REF: github.com/freeeyes/PSS.git
+      - secure: "p3Ycp+iwi2N52fYC99LGE3FKrtaQDOJRxSyFWaFLQKwFVX5VI58gS6S69Wr6TQCKMkbpcXWc/poEkhWm7QlDeoRsW1PyA/RvunFEO4YyZr0IR7Orsuo/fLmKUZBalSMnDa6dZyi2jS6PPPGwCOP3kJ7Cj0hLj66fVg0TKWhOWKDPoJ8wk8sBcZTlNIQRN5axgyqmWnBO7CRaUEF6QHHz4Z8Nzl5cQZZHmqfaXa2j3NlEjoy3Cyz1CWV1pXtlpD6aMy9xIyQIwPOOwyUwK/BFwdNQG37yPgTIxsYGTb4GOFYUM0Br3V+TgA+gy5QLDhE5JVqUmIl2tbB5J99BgbVDLJyoR6AFyNYMKQhwNkKmSq+ShVBaFTcMjeOiMcWDnQ8Q+79EUZaEI451mLn9e8PczRJKPPNy+Osrp+EvL9ielcHXb4lDw92+2DIz4LxKSJ0y+IwcwxxZiXCqugys5mxL+2port+bYTReS60m4u/xU6CDfOfmm+ZwnkLY0K7Fv23mVXmRPw4JigXmUNFsVlJWUHvTPQVninar2/xEy4GDnl3A/DSAPGXjaVVyrsrKe33JVmm2paBvodj2lBX/WD0ogq6UP6M12cB+lX1QbMy6BZnVELECFCQKUt95idz9OdPZHztpmwu+zJZl9W7BC665ma9diUJdJY43DLIaPvBMkUE="
+    script:
+      - export
+      - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
+      - ./PurenessScopeServer&
+      - cd $TRAVIS_BUILD_DIR/purenessscopeserver/Test
+      - make
+      - ./Test_Pss
+      - killall -9 PurenessScopeServer
+      - cd $TRAVIS_BUILD_DIR
+      - git init
+      - git config user.name "freeeyes"
+      - git config user.email "freeeyes@163.com"
+      - git add -u ./testresult/result.html
+      - git commit -m "[ci skip]Update result.html"
+      - git push -f "https://${GH_TOKEN}@${GH_REF}" HEAD:master
