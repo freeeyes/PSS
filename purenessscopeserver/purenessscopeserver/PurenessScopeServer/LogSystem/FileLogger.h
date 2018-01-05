@@ -465,6 +465,9 @@ public:
             return false;
         }
 
+        //设置当前文件大小是0
+        m_u4CurrFileSize = 0;
+
         OUR_DEBUG((LM_INFO,"[ServerLogger]Create file ok[%s].\n", strLogName.c_str()));
         //m_File.truncate(0);
         return true;
