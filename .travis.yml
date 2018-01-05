@@ -91,9 +91,10 @@ matrix:
       - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
       - $ACE_ROOT/bin/mwc.pl -type gnuace
       - make -j 4
-      - ./PurenessScopeServer&
+      - ./PurenessScopeServer& > /dev/null 2>&1
+      - sleep 10
       - cd $TRAVIS_BUILD_DIR/purenessscopeserver/Test
-      - make
+      - make -j 4
       - ./Test_Pss
       - killall -9 PurenessScopeServer
       - cd $TRAVIS_BUILD_DIR

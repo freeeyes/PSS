@@ -125,6 +125,7 @@ int UnLoadModuleData()
 int InitModule(CServerObject* pServerObject)
 {
     OUR_DEBUG((LM_INFO, "[InitModule] Begin.\n"));
+    ACE_UNUSED_ARG(pServerObject);
     return 0;
 }
 
