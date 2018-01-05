@@ -97,7 +97,15 @@ matrix:
       - secure: "p3Ycp+iwi2N52fYC99LGE3FKrtaQDOJRxSyFWaFLQKwFVX5VI58gS6S69Wr6TQCKMkbpcXWc/poEkhWm7QlDeoRsW1PyA/RvunFEO4YyZr0IR7Orsuo/fLmKUZBalSMnDa6dZyi2jS6PPPGwCOP3kJ7Cj0hLj66fVg0TKWhOWKDPoJ8wk8sBcZTlNIQRN5axgyqmWnBO7CRaUEF6QHHz4Z8Nzl5cQZZHmqfaXa2j3NlEjoy3Cyz1CWV1pXtlpD6aMy9xIyQIwPOOwyUwK/BFwdNQG37yPgTIxsYGTb4GOFYUM0Br3V+TgA+gy5QLDhE5JVqUmIl2tbB5J99BgbVDLJyoR6AFyNYMKQhwNkKmSq+ShVBaFTcMjeOiMcWDnQ8Q+79EUZaEI451mLn9e8PczRJKPPNy+Osrp+EvL9ielcHXb4lDw92+2DIz4LxKSJ0y+IwcwxxZiXCqugys5mxL+2port+bYTReS60m4u/xU6CDfOfmm+ZwnkLY0K7Fv23mVXmRPw4JigXmUNFsVlJWUHvTPQVninar2/xEy4GDnl3A/DSAPGXjaVVyrsrKe33JVmm2paBvodj2lBX/WD0ogq6UP6M12cB+lX1QbMy6BZnVELECFCQKUt95idz9OdPZHztpmwu+zJZl9W7BC665ma9diUJdJY43DLIaPvBMkUE="
     script:
       - export
+      - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PacketParse_Interface
+      - $ACE_ROOT/bin/mwc.pl -type gnuace
+      - make -j 4
+      - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/example-Module/TcpTest
+      - $ACE_ROOT/bin/mwc.pl -type gnuace
+      - make -j 4
       - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
+      - $ACE_ROOT/bin/mwc.pl -type gnuace
+      - make -j 4
       - ./PurenessScopeServer&
       - cd $TRAVIS_BUILD_DIR/purenessscopeserver/Test
       - make
