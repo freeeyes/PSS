@@ -106,9 +106,6 @@ bool CServerManager::Init()
     //初始化链接管理器
     App_ConnectManager::instance()->Init(App_MainConfig::instance()->GetSendQueueCount());
 
-    //启动中间服务器链接管理器
-    App_ClientReConnectManager::instance()->Init(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_POSTDEFINE));
-
     //初始化给DLL的对象接口
     App_ServerObject::instance()->SetMessageManager(dynamic_cast<IMessageManager*>(App_MessageManager::instance()));
     App_ServerObject::instance()->SetLogManager(dynamic_cast<ILogManager*>(AppLogManager::instance()));
@@ -533,6 +530,9 @@ bool CServerManager::Run()
             return false;
         }
     }
+
+    //启动中间服务器链接管理器
+    App_ClientReConnectManager::instance()->Init(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_POSTDEFINE));
 
     int nServerPortCount = App_MainConfig::instance()->GetServerPortCount();
 
