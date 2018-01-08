@@ -1345,6 +1345,17 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
                 //放入完成，则清空缓存数据，使命完成
                 m_pBlockMessage->reset();
             }
+            else
+            {
+                OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::SendMessage] Connectid=[%d](m_pBlockMessage->length() error(%d).\n", GetConnectID(), m_pBlockMessage->length()));
+
+                if (blDelete = true)
+                {
+                    App_BuffPacketManager::instance()->Delete(pBuffPacket);
+                }
+
+                return false;
+            }
 
             if (blDelete = true)
             {
