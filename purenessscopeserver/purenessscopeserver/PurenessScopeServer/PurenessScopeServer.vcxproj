@@ -519,6 +519,7 @@
     <ClInclude Include="..\Common\ClientMessage.h" />
     <ClInclude Include="..\Common\ClientUDPMassage.h" />
     <ClInclude Include="..\Common\define.h" />
+    <ClInclude Include="..\Common\HashTable.h" />
     <ClInclude Include="..\Common\IBuffPacket.h" />
     <ClInclude Include="..\Common\ICheckPacket.h" />
     <ClInclude Include="..\Common\IClientManager.h" />
@@ -543,10 +544,9 @@
     <ClInclude Include="..\Common\ProfileTime.h" />
     <ClInclude Include="..\Common\RandomNumber.h" />
     <ClInclude Include="..\Common\Threading.h" />
+    <ClInclude Include="..\Common\TimeWheelLink.h" />
     <ClInclude Include="..\Common\Trace.h" />
-    <ClInclude Include="Common\HashTable.h" />
     <ClInclude Include="Common\ServerMessageTask.h" />
-    <ClInclude Include="Common\TimeWheelLink.h" />
     <ClInclude Include="Console\ConsolePromiss.h" />
     <ClInclude Include="Console\FrameCommand.h" />
     <ClInclude Include="Encrypt\Aes.h" />

@@ -297,9 +297,6 @@
     <ClInclude Include="Common\Frame_Logging_Strategy.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="Common\HashTable.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="Common\IPAccount.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
@@ -424,9 +421,6 @@
       <Filter>Common\hfile</Filter>
     </ClInclude>
     <ClInclude Include="Common\TimerManager.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\TimeWheelLink.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
     <ClInclude Include="TinyXML\tinystr.h">
@@ -559,6 +553,12 @@
       <Filter>Common\hfile</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\RandomNumber.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\HashTable.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\TimeWheelLink.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
   </ItemGroup>
