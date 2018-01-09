@@ -19,7 +19,49 @@ int CMonitorCommand::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 
     if(MONITOR_STATE_LOGINED == m_emMonitorState)
     {
-        //发送同步数据
+        uint32 u4ConnectCount = 0;
+        //获得当前连接信息
+        IBuffPacket* pBuffPacket = m_pServerObject->GetPacketManager()->Create();
+        m_pServerObject->GetFrameCommand()->DoFrameCommand(FRAME_CONNECT_INFO, pBuffPacket);
+        (*pBuffPacket) >> u4ConnectCount;
+        m_pServerObject->GetPacketManager()->Delete(pBuffPacket);
+
+        //获得当前数据吞吐字节数
+        uint32 u4CpuRote     = 0;
+        uint32 u4MemorySize  = 0;
+        uint32 u4DataInSize  = 0;
+        uint32 u4DataOutSize = 0;
+        m_pServerObject->GetFrameCommand()->DoFrameCommand(FRAME_CONNECT_TRAFFIC, pBuffPacket);
+        (*pBuffPacket) >> u4CpuRote;
+        (*pBuffPacket) >> u4MemorySize;
+        (*pBuffPacket) >> u4DataInSize;
+        (*pBuffPacket) >> u4DataOutSize;
+
+        //组装发送数据包
+        char szSendBuff[MAX_BUFF_100] = { '\0' };
+        int nPos = 0;
+        uint16 u2CommandID = COMMAND_MONITOR_DATA;
+        uint16 u2IPLength = (uint16)ACE_OS::strlen(m_objMonitorPara.m_szLocalIP);
+        uint32 u4PacketSize = sizeof(uint16) + sizeof(uint32) + sizeof(uint32) + sizeof(uint32);
+
+        memcpy_safe((char*)&u4PacketSize, sizeof(uint32), &szSendBuff[nPos], sizeof(uint32));
+        nPos += sizeof(uint32);
+        memcpy_safe((char*)&u2CommandID, sizeof(uint16), &szSendBuff[nPos], sizeof(uint16));
+        nPos += sizeof(uint16);
+        memcpy_safe((char*)&u4ConnectCount, sizeof(uint32), &szSendBuff[nPos], sizeof(uint32));
+        nPos += sizeof(uint32);
+        memcpy_safe((char*)&u4DataInSize, sizeof(uint32), &szSendBuff[nPos], sizeof(uint32));
+        nPos += sizeof(uint32);
+        memcpy_safe((char*)&u4DataOutSize, sizeof(uint32), &szSendBuff[nPos], sizeof(uint32));
+        nPos += sizeof(uint32);
+
+        char* ptrSendData = const_cast<char*>(szSendBuff);
+
+        if (false == m_pServerObject->GetClientManager()->SendData(MONITER_SERVER_ID, ptrSendData, nPos, false))
+        {
+            OUR_DEBUG((LM_INFO, "[CMonitorCommand::Monitor_Server_Login] GetClientManager Send Login error.\n"));
+            return -1;
+        }
     }
 
     return 0;
@@ -108,6 +150,10 @@ int CMonitorCommand::Monitor_Server_Login()
         int nPos                      = 0;
         uint16 u2CommandID            = COMMAND_MONITOR_LOGIN;
         uint16 u2IPLength             = (uint16)ACE_OS::strlen(m_objMonitorPara.m_szLocalIP);
+        uint32 u4PacketSize           = sizeof(uint16) + sizeof(uint16) + u2IPLength;
+
+        memcpy_safe((char*)&u4PacketSize, sizeof(uint32), &szSendBuff[nPos], sizeof(uint32));
+        nPos += sizeof(uint32);
         memcpy_safe((char*)&u2CommandID, sizeof(uint16), &szSendBuff[nPos], sizeof(uint16));
         nPos += sizeof(uint16);
         memcpy_safe((char*)&u2IPLength, sizeof(uint16), &szSendBuff[nPos], sizeof(uint16));

@@ -6,6 +6,9 @@
 #include "PostMonitorData.h"
 #include "cJSON.h"
 
+#define FRAME_CONNECT_INFO    "ClientCount -cp&"           //查看连接数
+#define FRAME_CONNECT_TRAFFIC "ShowCurrProcessInfo -a&"    //查看连接流量
+
 //提交监控服务器参数
 struct _MonitorPara
 {

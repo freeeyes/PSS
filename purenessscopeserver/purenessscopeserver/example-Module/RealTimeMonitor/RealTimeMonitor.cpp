@@ -82,6 +82,8 @@ int InitModule(CServerObject* pServerObject)
     OUR_DEBUG((LM_INFO, "[InitModule] Begin.\n"));
     ACE_UNUSED_ARG(pServerObject);
 
+    //连接远程服务器
+    g_MonitorCommand->SetState(MONITOR_STATE_CONNECT);
     return 0;
 }
 

@@ -48,6 +48,10 @@ bool CPostServerData::RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv, _C
     if (mbRecv->length() == sizeof(uint16) + sizeof(uint32))
     {
         char szTemp[MAX_BUFF_50] = { '\0' };
+        memcpy_safe(mbRecv->rd_ptr(), sizeof(uint32), szTemp, sizeof(uint32));
+        szTemp[sizeof(uint32)] = '\0';
+        mbRecv->rd_ptr(sizeof(uint32));
+        uint32 u4PacketLength = ACE_OS::atoi(szTemp);
         memcpy_safe(mbRecv->rd_ptr(), sizeof(uint16), szTemp, sizeof(uint16));
         szTemp[sizeof(uint16)] = '\0';
         mbRecv->rd_ptr(sizeof(uint16));
