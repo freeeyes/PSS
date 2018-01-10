@@ -48,6 +48,10 @@ int CMonitorCommand::handle_timeout(const ACE_Time_Value& tv, const void* arg)
         nPos += sizeof(uint32);
         memcpy_safe((char*)&u2CommandID, sizeof(uint16), &szSendBuff[nPos], sizeof(uint16));
         nPos += sizeof(uint16);
+        memcpy_safe((char*)&u4CpuRote, sizeof(uint32), &szSendBuff[nPos], sizeof(uint32));
+        nPos += sizeof(uint32);
+        memcpy_safe((char*)&u4MemorySize, sizeof(uint32), &szSendBuff[nPos], sizeof(uint32));
+        nPos += sizeof(uint32);
         memcpy_safe((char*)&u4ConnectCount, sizeof(uint32), &szSendBuff[nPos], sizeof(uint32));
         nPos += sizeof(uint32);
         memcpy_safe((char*)&u4DataInSize, sizeof(uint32), &szSendBuff[nPos], sizeof(uint32));
