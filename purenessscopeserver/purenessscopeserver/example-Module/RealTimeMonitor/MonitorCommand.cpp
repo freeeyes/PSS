@@ -42,12 +42,19 @@ int CMonitorCommand::handle_timeout(const ACE_Time_Value& tv, const void* arg)
         int nPos = 0;
         uint16 u2CommandID = COMMAND_MONITOR_DATA;
         uint16 u2IPLength = (uint16)ACE_OS::strlen(m_objMonitorPara.m_szLocalIP);
-        uint32 u4PacketSize = sizeof(uint16) + sizeof(uint32) + sizeof(uint32) + sizeof(uint32);
+        uint32 u4PacketSize = sizeof(uint32) + sizeof(uint32) + sizeof(uint32) + sizeof(uint32) + sizeof(uint32);
 
-        memcpy_safe((char*)&u4PacketSize, sizeof(uint32), &szSendBuff[nPos], sizeof(uint32));
-        nPos += sizeof(uint32);
+        uint16 u2Version = 1;
+        char szSession[32] = { '\0' };
+        memcpy_safe((char*)&u2Version, sizeof(uint16), &szSendBuff[nPos], sizeof(uint16));
+        nPos += sizeof(uint16);
         memcpy_safe((char*)&u2CommandID, sizeof(uint16), &szSendBuff[nPos], sizeof(uint16));
         nPos += sizeof(uint16);
+        memcpy_safe((char*)&u4PacketSize, sizeof(uint32), &szSendBuff[nPos], sizeof(uint32));
+        nPos += sizeof(uint32);
+        memcpy_safe((char*)szSession, sizeof(char)*32, &szSendBuff[nPos], sizeof(char) * 32);
+        nPos += sizeof(char) * 32;
+
         memcpy_safe((char*)&u4CpuRote, sizeof(uint32), &szSendBuff[nPos], sizeof(uint32));
         nPos += sizeof(uint32);
         memcpy_safe((char*)&u4MemorySize, sizeof(uint32), &szSendBuff[nPos], sizeof(uint32));
@@ -154,12 +161,19 @@ int CMonitorCommand::Monitor_Server_Login()
         int nPos                      = 0;
         uint16 u2CommandID            = COMMAND_MONITOR_LOGIN;
         uint16 u2IPLength             = (uint16)ACE_OS::strlen(m_objMonitorPara.m_szLocalIP);
-        uint32 u4PacketSize           = sizeof(uint16) + sizeof(uint16) + u2IPLength;
+        uint32 u4PacketSize           = sizeof(uint16) + u2IPLength;
 
-        memcpy_safe((char*)&u4PacketSize, sizeof(uint32), &szSendBuff[nPos], sizeof(uint32));
-        nPos += sizeof(uint32);
+        uint16 u2Version = 1;
+        char szSession[32] = { '\0' };
+        memcpy_safe((char*)&u2Version, sizeof(uint16), &szSendBuff[nPos], sizeof(uint16));
+        nPos += sizeof(uint16);
         memcpy_safe((char*)&u2CommandID, sizeof(uint16), &szSendBuff[nPos], sizeof(uint16));
         nPos += sizeof(uint16);
+        memcpy_safe((char*)&u4PacketSize, sizeof(uint32), &szSendBuff[nPos], sizeof(uint32));
+        nPos += sizeof(uint32);
+        memcpy_safe((char*)szSession, sizeof(char) * 32, &szSendBuff[nPos], sizeof(char) * 32);
+        nPos += sizeof(char) * 32;
+
         memcpy_safe((char*)&u2IPLength, sizeof(uint16), &szSendBuff[nPos], sizeof(uint16));
         nPos += sizeof(uint16);
         memcpy_safe((char*)m_objMonitorPara.m_szLocalIP, u2IPLength, &szSendBuff[nPos], u2IPLength);
