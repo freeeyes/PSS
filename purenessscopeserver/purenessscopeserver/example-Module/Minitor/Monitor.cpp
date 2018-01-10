@@ -51,6 +51,15 @@ int LoadModuleData(CServerObject* pServerObject)
 
     OUR_DEBUG((LM_INFO, "[Base LoadModuleData] Begin.\n"));
 
+    if (g_pServerObject != NULL)
+    {
+        g_MonitorCommand->SetServerObject(pServerObject);
+    }
+    else
+    {
+        OUR_DEBUG((LM_INFO, "[Base LoadModuleData] pServerObject is NULL.\n"));
+    }
+
     //×¢²áÃüÁî
     IMessageManager* pMessageManager = g_pServerObject->GetMessageManager();
 

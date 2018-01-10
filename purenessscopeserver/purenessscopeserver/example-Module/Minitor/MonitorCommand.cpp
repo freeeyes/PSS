@@ -97,7 +97,8 @@ int CPSSMonitorCommand::Do_Pss_Login(IMessage* pMessage)
 
     m_pServerObject->GetConnectManager()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID,
             pSendBuffPacket,
-            SENDMESSAGE_NOMAL,
+            SENDMESSAGE_JAMPNOMAL,
+            u2PostCommandID,
             PACKET_SEND_IMMEDIATLY,
             PACKET_IS_FRAMEWORK_RECYC,
             0);
@@ -168,7 +169,8 @@ int CPSSMonitorCommand::Do_Pss_Monitor_Data(IMessage* pMessage)
 
     m_pServerObject->GetConnectManager()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID,
             pSendBuffPacket,
-            SENDMESSAGE_NOMAL,
+            SENDMESSAGE_JAMPNOMAL,
+            u2PostCommandID,
             PACKET_SEND_IMMEDIATLY,
             PACKET_IS_FRAMEWORK_RECYC,
             0);

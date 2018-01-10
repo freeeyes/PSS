@@ -6,8 +6,8 @@
 #include "PostMonitorData.h"
 #include "cJSON.h"
 
-#define FRAME_CONNECT_INFO    "ClientCount -cp&"           //查看连接数
-#define FRAME_CONNECT_TRAFFIC "ShowCurrProcessInfo -a&"    //查看连接流量
+#define FRAME_CONNECT_INFO    "ClientCount -cp"           //查看连接数
+#define FRAME_CONNECT_TRAFFIC "ShowCurrProcessInfo -a"    //查看连接流量
 
 //提交监控服务器参数
 struct _MonitorPara
@@ -37,6 +37,8 @@ public:
 
     int Init(const char* pJson, CServerObject* pServerObject);
 
+    int Connect_Monitor();
+
     void SetState(EM_MONITOR_STATE em_monitor_state);
 private:
     int Monitor_Server_Login();
@@ -48,6 +50,7 @@ private:
     _MonitorPara      m_objMonitorPara;        //监听服务器设置参数
     EM_MONITOR_STATE  m_emMonitorState;        //当前连接中间服务器状态
     int32             m_n4TimerID;             //当前定时器ID
+    CPostServerData*  m_pPostServerData;       //连接服务器的返回数据接收对象
 };
 
 #endif

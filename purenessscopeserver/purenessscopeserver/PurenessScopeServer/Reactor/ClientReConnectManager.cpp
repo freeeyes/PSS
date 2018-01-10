@@ -784,7 +784,7 @@ int CClientReConnectManager::handle_timeout(const ACE_Time_Value& tv, const void
                 }
                 else
                 {
-                    pClientInfo->GetConnectClient()->GetTimeout(tvNow);
+                    //pClientInfo->GetConnectClient()->GetTimeout(tvNow);
                 }
             }
         }

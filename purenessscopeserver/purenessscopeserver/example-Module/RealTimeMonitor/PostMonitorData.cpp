@@ -45,21 +45,18 @@ void CPostServerData::ReConnect(int nServerID)
 bool CPostServerData::RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv, _ClientIPInfo objServerIPInfo)
 {
     //处理数据返回包
-    if (mbRecv->length() == sizeof(uint16) + sizeof(uint32))
+    if (mbRecv->length() == sizeof(uint32) + sizeof(uint16) + sizeof(uint32))
     {
-        char szTemp[MAX_BUFF_50] = { '\0' };
-        memcpy_safe(mbRecv->rd_ptr(), sizeof(uint32), szTemp, sizeof(uint32));
-        szTemp[sizeof(uint32)] = '\0';
+        uint32 u4PacketLength = 0;
+        uint16 u2CommandID    = 0;
+        uint32 u4State        = 0;
+
+        memcpy_safe(mbRecv->rd_ptr(), sizeof(uint32), (char* )&u4PacketLength, sizeof(uint32));
         mbRecv->rd_ptr(sizeof(uint32));
-        uint32 u4PacketLength = ACE_OS::atoi(szTemp);
-        memcpy_safe(mbRecv->rd_ptr(), sizeof(uint16), szTemp, sizeof(uint16));
-        szTemp[sizeof(uint16)] = '\0';
+        memcpy_safe(mbRecv->rd_ptr(), sizeof(uint16), (char* )&u2CommandID, sizeof(uint16));
         mbRecv->rd_ptr(sizeof(uint16));
-        uint16 u2CommandID = ACE_OS::atoi(szTemp);
-        memcpy_safe(mbRecv->rd_ptr(), sizeof(uint32), szTemp, sizeof(uint32));
-        szTemp[sizeof(uint32)] = '\0';
+        memcpy_safe(mbRecv->rd_ptr(), sizeof(uint32), (char*)&u4State, sizeof(uint32));
         mbRecv->rd_ptr(sizeof(uint32));
-        uint32 u4State = ACE_OS::atoi(szTemp);
 
         if (COMMAND_MONITOR_LOGIN_ACK == u2CommandID)
         {

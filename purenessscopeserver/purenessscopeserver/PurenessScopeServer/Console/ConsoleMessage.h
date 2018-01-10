@@ -213,7 +213,7 @@ private:
     int  ParseCommand_Plugin(const char* pCommand, IBuffPacket* pBuffPacket, uint8& u1OutputType);            //执行命令(插件内部调用)
     int  ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket, uint8& u1OutputType);                   //执行命令
     int  DoCommand(_CommandInfo& CommandInfo, IBuffPacket* pCurrBuffPacket, IBuffPacket* pReturnBuffPacket);  //处理命令数据
-    bool GetCommandInfo(const char* pCommand, _CommandInfo& CommandInfo);                                     //把命令切割成应该有的数据格式
+    bool GetCommandInfo(const char* pCommand, _CommandInfo& CommandInfo, bool blCheck = true);                //把命令切割成应该有的数据格式
     bool GetFileInfo(const char* pFile, _FileInfo& FileInfo);                                                 //将一个全路径切分成文件名
     bool GetForbiddenIP(const char* pCommand, _ForbiddenIP& ForbiddenIP);                                     //得到禁止的IP列表
     bool GetConnectServerID(const char* pCommand, int& nServerID);                                            //得到一个指定的服务器ID

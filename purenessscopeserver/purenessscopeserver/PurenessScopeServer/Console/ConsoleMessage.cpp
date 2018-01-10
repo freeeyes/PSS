@@ -64,7 +64,7 @@ int CConsoleMessage::ParsePlugInCommand(const char* pCommand, IBuffPacket* pBuff
     return ParseCommand_Plugin(szPluginCommand, pBuffPacket, u1OutputType);
 }
 
-bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& CommandInfo)
+bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& CommandInfo, bool blCheck)
 {
     int nLen = (int)ACE_OS::strlen(pCommand);
     char szKey[MAX_BUFF_100] = {'\0'};
@@ -116,10 +116,13 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
         CommandInfo.m_szUser[ACE_OS::strlen(szKey)] = '\0';
     }
 
-    if(false == CheckConsoleKey(szKey))
+    if (true == blCheck)
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::GetCommandInfo]szKey is invalid.\n"));
-        return false;
+        if (false == CheckConsoleKey(szKey))
+        {
+            OUR_DEBUG((LM_ERROR, "[CConsoleMessage::GetCommandInfo]szKey is invalid.\n"));
+            return false;
+        }
     }
 
     //ªÒµ√√¸¡ÓÕ∑
@@ -153,7 +156,7 @@ int CConsoleMessage::ParseCommand_Plugin(const char* pCommand, IBuffPacket* pBuf
         return CONSOLE_MESSAGE_FAIL;
     }
 
-    if (false == GetCommandInfo(pCommand, CommandInfo))
+    if (false == GetCommandInfo(pCommand, CommandInfo, false))
     {
         OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]pCommand format is error.\n"));
         return CONSOLE_MESSAGE_FAIL;

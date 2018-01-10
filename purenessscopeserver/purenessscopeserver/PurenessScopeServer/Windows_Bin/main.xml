@@ -14,7 +14,7 @@
 	
 	<!-- "H&B"指的是包头包体模式，"STREAM"是流模式 OrgLength在H&B是包头默认长度 -->
 	<!-- 第一个ParseParse是默认ParseID，如果TCPServerIP或者UDPServerIP没有指定，则默认采用这个ParseID，ParseID必须大于0 -->
-	<PacketParse ParseID="1" ModulePath="./" ModuleName="PacketParse_Interface.dll" Type="H&B" OrgLength="40" />
+	<PacketParse ParseID="1" ModulePath="./" ModuleName="PacketParse_Interface.dll" Type="HB" OrgLength="40" />
 
 	<Console support="1" sip="INADDR_ANY" sport="10010" sipType="IPV4" desc="维护端口是否开启，support为1是开启，0是关闭，后面对应IP和端口" />
 	<ConsoleKey Key="freeeyes" desc="维护端允许登录的Key值,可以是多个，key值中不能包含空格" />
@@ -25,16 +25,14 @@
 	<Message Msg_High_mark="64000" Msg_Low_mark="64000" Msg_Buff_Max_Size="20480" Msg_Thread="5" Msg_MaxQueue="10000" desc="消息处理线程相关参数设置，" />
 	
 	<!-- 测试UDP模块加载流程的用例 -->
-	<!-- <Module ModulePath="./" ModuleString="UDPTestd.dll" desc="模块加载配置相关参数，ModulePath是路径，ModuleString是模块名称，以逗号隔开"/> -->
+	<!-- <Module ModuleSPath="./" ModuleSName="UDPTestd.dll" ModuleSParam="" desc="模块加载配置相关参数，ModulePath是路径，ModuleString是模块名称，以逗号隔开"/> -->
 	
 	<!-- 测试Tcp插件加载流程的用例 -->
 	<ModuleManager MaxCount="100" desc="框架支持的最大插件数量" />
 	
 	<!-- 允许插件设置个性化,可以多个,这里可以单独设置每个插件的不同参数,可以与Module设置同时生效,亦可不用此设置 -->
-	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="XMLParsed.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/> -->
-	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="BoxFramed.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/> -->
-	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="Vediod.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/> -->
-	<ModuleInfo ModuleSPath="./" ModuleSName="TcpTest.dll" ModuleSParam="--DEBUG" Desc="ModuleParam为插件启动参数"/>
+	<ModuleInfo ModuleSPath="./" ModuleSName="Monitord.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/>
+	<ModuleInfo ModuleSPath="./" ModuleSName="RealTimeMonitord.dll" ModuleSParam="{&quot;MonitorIP&quot;:&quot;127.0.0.1&quot;,&quot;MonitorPort&quot;:&quot;10002&quot;,&quot;LocalIP&quot;:&quot;127.0.0.1&quot;,&quot;TimeInterval&quot;:&quot;60&quot;}" Desc="ModuleParam为插件启动参数"/>
 	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="TimerTestd.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/> -->
 	
 	<!-- Linux Core Dump相关设置 -->

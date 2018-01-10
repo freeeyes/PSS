@@ -3,12 +3,13 @@
 
 CMonitorCommand::CMonitorCommand()
 {
-    m_emMonitorState = MONITOR_STATE_DISCONNECT;
+    m_emMonitorState  = MONITOR_STATE_DISCONNECT;
+    m_pPostServerData = NULL;
 }
 
 CMonitorCommand::~CMonitorCommand()
 {
-
+    SAFE_DELETE(m_pPostServerData);
 }
 
 int CMonitorCommand::handle_timeout(const ACE_Time_Value& tv, const void* arg)
@@ -141,51 +142,57 @@ int CMonitorCommand::Init(const char* pJson, CServerObject* pServerObject)
     return 0;
 }
 
-int CMonitorCommand::Monitor_Server_Login()
+
+
+int CMonitorCommand::Connect_Monitor()
 {
-    CPostServerData* pPostServerData = new CPostServerData();
-    bool blRest = m_pServerObject->GetClientManager()->Connect(MONITER_SERVER_ID, "127.0.0.1", 10040, TYPE_IPV4, (IClientMessage*)pPostServerData);
+    m_pPostServerData = new CPostServerData();
+    m_pPostServerData->Init((IMonitorCommand*)this);
+    bool blRest = m_pServerObject->GetClientManager()->Connect(MONITER_SERVER_ID, m_objMonitorPara.m_szMonitorIP, m_objMonitorPara.m_u2MonitorPort, TYPE_IPV4, (IClientMessage*)m_pPostServerData);
 
     if (false == blRest)
     {
-        OUR_DEBUG((LM_INFO, "[CMonitorCommand::Monitor_Server_Login] GetClientManager Connect error.\n"));
+        OUR_DEBUG((LM_INFO, "[CMonitorCommand::Connect_Monitor] GetClientManager Connect error.\n"));
         m_emMonitorState = MONITOR_STATE_DISCONNECT;
         return -1;
     }
-    else
+
+    return 0;
+}
+
+int CMonitorCommand::Monitor_Server_Login()
+{
+    m_emMonitorState = MONITOR_STATE_CONNECT;
+
+    //发送注册数据
+    char szSendBuff[MAX_BUFF_100] = { '\0' };
+    int nPos                      = 0;
+    uint16 u2CommandID            = COMMAND_MONITOR_LOGIN;
+    uint16 u2IPLength             = (uint16)ACE_OS::strlen(m_objMonitorPara.m_szLocalIP);
+    uint32 u4PacketSize           = sizeof(uint16) + u2IPLength;
+
+    uint16 u2Version = 1;
+    char szSession[32] = { '\0' };
+    memcpy_safe((char*)&u2Version, sizeof(uint16), &szSendBuff[nPos], sizeof(uint16));
+    nPos += sizeof(uint16);
+    memcpy_safe((char*)&u2CommandID, sizeof(uint16), &szSendBuff[nPos], sizeof(uint16));
+    nPos += sizeof(uint16);
+    memcpy_safe((char*)&u4PacketSize, sizeof(uint32), &szSendBuff[nPos], sizeof(uint32));
+    nPos += sizeof(uint32);
+    memcpy_safe((char*)szSession, sizeof(char) * 32, &szSendBuff[nPos], sizeof(char) * 32);
+    nPos += sizeof(char) * 32;
+
+    memcpy_safe((char*)&u2IPLength, sizeof(uint16), &szSendBuff[nPos], sizeof(uint16));
+    nPos += sizeof(uint16);
+    memcpy_safe((char*)m_objMonitorPara.m_szLocalIP, u2IPLength, &szSendBuff[nPos], u2IPLength);
+    nPos += u2IPLength;
+
+    char* ptrSendData = const_cast<char*>(szSendBuff);
+
+    if (false == m_pServerObject->GetClientManager()->SendData(MONITER_SERVER_ID, ptrSendData, nPos, false))
     {
-        m_emMonitorState = MONITOR_STATE_CONNECT;
-
-        //发送注册数据
-        char szSendBuff[MAX_BUFF_100] = { '\0' };
-        int nPos                      = 0;
-        uint16 u2CommandID            = COMMAND_MONITOR_LOGIN;
-        uint16 u2IPLength             = (uint16)ACE_OS::strlen(m_objMonitorPara.m_szLocalIP);
-        uint32 u4PacketSize           = sizeof(uint16) + u2IPLength;
-
-        uint16 u2Version = 1;
-        char szSession[32] = { '\0' };
-        memcpy_safe((char*)&u2Version, sizeof(uint16), &szSendBuff[nPos], sizeof(uint16));
-        nPos += sizeof(uint16);
-        memcpy_safe((char*)&u2CommandID, sizeof(uint16), &szSendBuff[nPos], sizeof(uint16));
-        nPos += sizeof(uint16);
-        memcpy_safe((char*)&u4PacketSize, sizeof(uint32), &szSendBuff[nPos], sizeof(uint32));
-        nPos += sizeof(uint32);
-        memcpy_safe((char*)szSession, sizeof(char) * 32, &szSendBuff[nPos], sizeof(char) * 32);
-        nPos += sizeof(char) * 32;
-
-        memcpy_safe((char*)&u2IPLength, sizeof(uint16), &szSendBuff[nPos], sizeof(uint16));
-        nPos += sizeof(uint16);
-        memcpy_safe((char*)m_objMonitorPara.m_szLocalIP, u2IPLength, &szSendBuff[nPos], u2IPLength);
-        nPos += u2IPLength;
-
-        char* ptrSendData = const_cast<char*>(szSendBuff);
-
-        if (false == m_pServerObject->GetClientManager()->SendData(MONITER_SERVER_ID, ptrSendData, nPos, false))
-        {
-            OUR_DEBUG((LM_INFO, "[CMonitorCommand::Monitor_Server_Login] GetClientManager Send Login error.\n"));
-            return -1;
-        }
+        OUR_DEBUG((LM_INFO, "[CMonitorCommand::Monitor_Server_Login] GetClientManager Send Login error.\n"));
+        return -1;
     }
 
     return 0;
@@ -233,7 +240,7 @@ void CMonitorCommand::SetState(EM_MONITOR_STATE em_monitor_state)
     else
     {
         //收到注册回应包成功
-
+        Monitor_Server_Timer();
     }
 
     m_emMonitorState = em_monitor_state;

@@ -31,6 +31,7 @@ CProConnectClient* CProAsynchConnect::make_handler()
 int CProAsynchConnect::validate_connection(const ACE_Asynch_Connect::Result& result, const ACE_INET_Addr& remote, const ACE_INET_Addr& local)
 {
     //异步检验链接是否有效，如果有效
+    int nError   = result.error();
     int nRet     = result.success ();
     ACE_HANDLE h = result.connect_handle();
 
@@ -48,7 +49,7 @@ int CProAsynchConnect::validate_connection(const ACE_Asynch_Connect::Result& res
 
         ACE_INET_Addr remoteaddr = App_ClientProConnectManager::instance()->GetServerAddr(m_nServerID);
         App_ClientProConnectManager::instance()->SetServerConnectState(m_nServerID, SERVER_CONNECT_FAIL);
-        OUR_DEBUG((LM_ERROR, "[CProAsynchConnect::validate_connection](%s:%d) connection fails(ServerID=%d).\n", remoteaddr.get_host_addr(), remoteaddr.get_port_number(), m_nServerID));
+        OUR_DEBUG((LM_ERROR, "[CProAsynchConnect::validate_connection](%s:%d) connection fails,error=%d(ServerID=%d).\n", remoteaddr.get_host_addr(), remoteaddr.get_port_number(), nError, m_nServerID));
         m_nServerID = 0;
 
         return 1;
