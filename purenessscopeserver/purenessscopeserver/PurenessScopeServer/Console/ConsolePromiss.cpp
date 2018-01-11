@@ -39,7 +39,7 @@ void CConsolePromissions::Init(const char* pFileName)
         }
         else
         {
-            OUR_DEBUG((LM_INFO, "[CConsolePromissions::Init]Get CommandName error.\n"));
+            //OUR_DEBUG((LM_INFO, "[CConsolePromissions::Init]Get CommandName error.\n"));
             SAFE_DELETE(pConsole_Command_Info);
             break;
         }

@@ -256,7 +256,7 @@ b freeeyes ShowServerInfo -a&
         </tr>
         <tr><th>uint32</th><th>CPU运行比例</th></tr>
 		<tr><th>uint32</th><th>当前占用内存字节数</th></tr>
-		<tr><th>uint32</th><th>当前一分钟服务器网络吞吐</th></tr>
+		<tr><th>uint8</th><th>流量开关状态，0是关闭，1是打开</th></tr>
 		<tr><th>uint32</th><th>当前一分钟服务器网络吞吐(入)</th></tr>
 		<tr><th>uint32</th><th>当前一分钟服务器网络吞吐(出)</th></tr>
         <tr>

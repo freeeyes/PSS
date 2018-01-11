@@ -256,7 +256,7 @@ b freeeyes ShowServerInfo -a&
         </tr>
         <tr><th>uint32</th><th>Cpu operation ratio</th></tr>
 		<tr><th>uint32</th><th>Current number of memory bytes occupied</th></tr>
-		<tr><th>uint32</th><th>Server network throughput for the current minute</th></tr>
+		<tr><th>uint8</th><th>Flow switch status, 0 is off, 1 is on</th></tr>
 		<tr><th>uint32</th><th>Server network throughput for the current minute(in)</th></tr>
 		<tr><th>uint32</th><th>Server network throughput for the current minute(out)</th></tr>
         <tr>

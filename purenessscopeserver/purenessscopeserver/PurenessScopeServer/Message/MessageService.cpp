@@ -981,6 +981,8 @@ bool CMessageServiceGroup::Start()
         return false;
     }
 
+    OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Start]Work thread count=%d.\n", m_vecMessageService.size()));
+
     for (uint32 i = 0; i < (uint32)m_vecMessageService.size(); i++)
     {
         CMessageService* pMessageService = m_vecMessageService[i];

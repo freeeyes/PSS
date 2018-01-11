@@ -32,8 +32,21 @@ bool CPostServerData::Send_Format_data(char* pData, uint32 u4Len, IMessageBlockM
 
 bool CPostServerData::Recv_Format_data(ACE_Message_Block* mbRecv, IMessageBlockManager* pMessageBlockManager, uint16& u2CommandID, ACE_Message_Block*& mbFinishRecv)
 {
-    mbFinishRecv = mbRecv;
-    return true;
+    //这里必须把内存拷贝出来，因为mbRecv不在pMessageBlockManager里面。
+    ACE_Message_Block* pmb = pMessageBlockManager->Create((uint32)mbRecv->length());
+
+    if (NULL != pmb)
+    {
+        memcpy_safe(mbRecv->rd_ptr(), (uint32)mbRecv->length(), pmb->wr_ptr(), (uint32)mbRecv->length());
+        pmb->wr_ptr(mbRecv->length());
+        mbFinishRecv = pmb;
+        return true;
+    }
+    else
+    {
+        OUR_DEBUG((LM_INFO, "[CPostServerData::Recv_Format_data]pMessageBlockManager Create NULL.\n"));
+        return false;
+    }
 }
 
 void CPostServerData::ReConnect(int nServerID)
@@ -57,6 +70,8 @@ bool CPostServerData::RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv, _C
         mbRecv->rd_ptr(sizeof(uint16));
         memcpy_safe(mbRecv->rd_ptr(), sizeof(uint32), (char*)&u4State, sizeof(uint32));
         mbRecv->rd_ptr(sizeof(uint32));
+
+        OUR_DEBUG((LM_INFO, "[CPostServerData::RecvDat]Get Recv u2CommandID=0x%04x.\n", u2CommandID));
 
         if (COMMAND_MONITOR_LOGIN_ACK == u2CommandID)
         {

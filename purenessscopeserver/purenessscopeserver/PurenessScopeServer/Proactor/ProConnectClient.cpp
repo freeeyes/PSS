@@ -172,33 +172,27 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
             m_atvRecv     = ACE_OS::gettimeofday();
             m_emRecvState = SERVER_RECV_BEGIN;
 
-            while(true)
-            {
-                bool blRet = m_pClientMessage->Recv_Format_data(&mb, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish);
+            bool blRet = m_pClientMessage->Recv_Format_data(&mb, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish);
 
-                if(true == blRet)
+            if(true == blRet)
+            {
+                //有数据需要处理，则处理
+                if(App_MainConfig::instance()->GetConnectServerRunType() == 0)
                 {
-                    if(App_MainConfig::instance()->GetConnectServerRunType() == 0)
-                    {
-                        //调用数据包处理
-                        m_pClientMessage->RecvData(u2CommandID, pRecvFinish, objServerIPInfo);
-                        //回收处理包
-                        App_MessageBlockManager::instance()->Close(pRecvFinish);
-                    }
-                    else
-                    {
-                        //异步消息处理
-                        _Server_Message_Info* pServer_Message_Info = App_ServerMessageInfoPool::instance()->Create();
-                        pServer_Message_Info->m_pClientMessage  = m_pClientMessage;
-                        pServer_Message_Info->m_objServerIPInfo = objServerIPInfo;
-                        pServer_Message_Info->m_pRecvFinish     = pRecvFinish;
-                        pServer_Message_Info->m_u2CommandID     = u2CommandID;
-                        App_ServerMessageTask::instance()->PutMessage(pServer_Message_Info);
-                    }
+                    //调用数据包处理
+                    m_pClientMessage->RecvData(u2CommandID, pRecvFinish, objServerIPInfo);
+                    //回收处理包
+                    App_MessageBlockManager::instance()->Close(pRecvFinish);
                 }
                 else
                 {
-                    break;
+                    //异步消息处理
+                    _Server_Message_Info* pServer_Message_Info = App_ServerMessageInfoPool::instance()->Create();
+                    pServer_Message_Info->m_pClientMessage  = m_pClientMessage;
+                    pServer_Message_Info->m_objServerIPInfo = objServerIPInfo;
+                    pServer_Message_Info->m_pRecvFinish     = pRecvFinish;
+                    pServer_Message_Info->m_u2CommandID     = u2CommandID;
+                    App_ServerMessageTask::instance()->PutMessage(pServer_Message_Info);
                 }
             }
 

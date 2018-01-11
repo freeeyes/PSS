@@ -85,7 +85,6 @@ ACE_Message_Block* CMessageBlockManager::Create(uint32 u4Size)
         }
     }
 
-
     m_u4UsedSize += u4FormatSize;
     return pmb;
 }
@@ -99,7 +98,16 @@ bool CMessageBlockManager::Close(ACE_Message_Block* pMessageBlock)
     m_MemoryBlock_Pool.Set(pMessageBlock);
 
     uint32 u4Size = (uint32)pMessageBlock->size();
-    m_u4UsedSize -= u4Size;
+
+    if (u4Size <= m_u4UsedSize)
+    {
+        m_u4UsedSize -= u4Size;
+    }
+    else
+    {
+        OUR_DEBUG((LM_ERROR, "[CMessageBlockManager::{]m_u4UsedSize = [%d],u4FormatSize=[%d] realse Error!\n", m_u4UsedSize, u4Size));
+    }
+
     return true;
 }
 

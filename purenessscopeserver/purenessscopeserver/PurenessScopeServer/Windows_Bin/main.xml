@@ -31,8 +31,7 @@
 	<ModuleManager MaxCount="100" desc="框架支持的最大插件数量" />
 	
 	<!-- 允许插件设置个性化,可以多个,这里可以单独设置每个插件的不同参数,可以与Module设置同时生效,亦可不用此设置 -->
-	<ModuleInfo ModuleSPath="./" ModuleSName="Monitord.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/>
-	<ModuleInfo ModuleSPath="./" ModuleSName="RealTimeMonitord.dll" ModuleSParam="{&quot;MonitorIP&quot;:&quot;127.0.0.1&quot;,&quot;MonitorPort&quot;:&quot;10002&quot;,&quot;LocalIP&quot;:&quot;127.0.0.1&quot;,&quot;TimeInterval&quot;:&quot;60&quot;}" Desc="ModuleParam为插件启动参数"/>
+	<ModuleInfo ModuleSPath="./" ModuleSName="RealTimeMonitord.dll" ModuleSParam="{&quot;MonitorIP&quot;:&quot;127.0.0.1&quot;,&quot;MonitorPort&quot;:&quot;10050&quot;,&quot;LocalIP&quot;:&quot;127.0.0.1&quot;,&quot;TimeInterval&quot;:&quot;60&quot;}" Desc="ModuleParam为插件启动参数"/>
 	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="TimerTestd.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/> -->
 	
 	<!-- Linux Core Dump相关设置 -->

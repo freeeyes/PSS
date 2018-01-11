@@ -20,23 +20,31 @@ int CMonitorCommand::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 
     if(MONITOR_STATE_LOGINED == m_emMonitorState)
     {
-        uint32 u4ConnectCount = 0;
+        uint16 u2ReturnCommandID = 0;
+        uint32 u4ConnectCount    = 0;
+
         //获得当前连接信息
         IBuffPacket* pBuffPacket = m_pServerObject->GetPacketManager()->Create();
         m_pServerObject->GetFrameCommand()->DoFrameCommand(FRAME_CONNECT_INFO, pBuffPacket);
+        (*pBuffPacket) >> u2ReturnCommandID;
         (*pBuffPacket) >> u4ConnectCount;
         m_pServerObject->GetPacketManager()->Delete(pBuffPacket);
 
         //获得当前数据吞吐字节数
         uint32 u4CpuRote     = 0;
         uint32 u4MemorySize  = 0;
+        uint8  u1Switch      = 0;
         uint32 u4DataInSize  = 0;
         uint32 u4DataOutSize = 0;
+        pBuffPacket = m_pServerObject->GetPacketManager()->Create();
         m_pServerObject->GetFrameCommand()->DoFrameCommand(FRAME_CONNECT_TRAFFIC, pBuffPacket);
+        (*pBuffPacket) >> u2ReturnCommandID;
         (*pBuffPacket) >> u4CpuRote;
         (*pBuffPacket) >> u4MemorySize;
+        (*pBuffPacket) >> u1Switch;
         (*pBuffPacket) >> u4DataInSize;
         (*pBuffPacket) >> u4DataOutSize;
+        m_pServerObject->GetPacketManager()->Delete(pBuffPacket);
 
         //组装发送数据包
         char szSendBuff[MAX_BUFF_100] = { '\0' };
@@ -71,9 +79,11 @@ int CMonitorCommand::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 
         if (false == m_pServerObject->GetClientManager()->SendData(MONITER_SERVER_ID, ptrSendData, nPos, false))
         {
-            OUR_DEBUG((LM_INFO, "[CMonitorCommand::Monitor_Server_Login] GetClientManager Send Login error.\n"));
+            OUR_DEBUG((LM_INFO, "[CMonitorCommand::handle_timeout] GetClientManager Send Login error.\n"));
             return -1;
         }
+
+        OUR_DEBUG((LM_INFO, "[CMonitorCommand::handle_timeout] Send COMMAND_MONITOR_DATA OK.\n"));
     }
 
     return 0;
@@ -195,6 +205,7 @@ int CMonitorCommand::Monitor_Server_Login()
         return -1;
     }
 
+    OUR_DEBUG((LM_INFO, "[CMonitorCommand::Monitor_Server_Login] Send COMMAND_MONITOR_LOGIN OK.\n"));
     return 0;
 }
 
