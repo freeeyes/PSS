@@ -202,7 +202,7 @@ inline void WriteTrace(const char* pFilePath, const char* pTraceID, const char* 
     char szFileLog[400] = { '\0' };
     char szTemp[1024] = { '\0' };
 
-    if (NULL != pTraceID)
+    if (NULL != pTraceID && 0 < strlen(pTraceID))
     {
         sprintf_trace_safe(szFileLog, 200, "%s/%s.xml", pFilePath, pTraceID);
 #if defined(_WIN32)
