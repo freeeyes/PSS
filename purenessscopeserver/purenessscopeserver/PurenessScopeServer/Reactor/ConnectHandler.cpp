@@ -1210,7 +1210,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
         ACE_Time_Value tvNow = ACE_OS::gettimeofday();
         App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
 
-        if (blDelete == true)
+        if (true == blDelete)
         {
             App_BuffPacketManager::instance()->Delete(pBuffPacket);
         }
@@ -1229,7 +1229,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
             ACE_Time_Value tvNow = ACE_OS::gettimeofday();
             App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
 
-            if (blDelete == true)
+            if (true == blDelete)
             {
                 App_BuffPacketManager::instance()->Delete(pBuffPacket);
             }
@@ -1263,7 +1263,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
                 ACE_Time_Value tvNow = ACE_OS::gettimeofday();
                 App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
 
-                if (blDelete == true)
+                if (true == blDelete)
                 {
                     App_BuffPacketManager::instance()->Delete(pBuffPacket);
                 }
@@ -1289,7 +1289,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
                 }
             }
 
-            if (blDelete == true)
+            if (true == blDelete)
             {
                 //删除发送数据包
                 App_BuffPacketManager::instance()->Delete(pBuffPacket);
@@ -1317,7 +1317,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
                     ACE_Time_Value tvNow = ACE_OS::gettimeofday();
                     App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
 
-                    if (blDelete == true)
+                    if (true == blDelete)
                     {
                         //删除发送数据包
                         App_BuffPacketManager::instance()->Delete(pBuffPacket);
@@ -1343,7 +1343,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
                     ACE_Time_Value tvNow = ACE_OS::gettimeofday();
                     App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
 
-                    if (blDelete == true)
+                    if (true == blDelete)
                     {
                         //删除发送数据包
                         App_BuffPacketManager::instance()->Delete(pBuffPacket);
@@ -1378,7 +1378,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
                 ACE_Time_Value tvNow = ACE_OS::gettimeofday();
                 App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
 
-                if (blDelete == true)
+                if (true == blDelete)
                 {
                     //删除发送数据包
                     App_BuffPacketManager::instance()->Delete(pBuffPacket);
@@ -1393,7 +1393,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
             //放入完成，则清空缓存数据，使命完成
             m_pBlockMessage->reset();
 
-            if (blDelete == true)
+            if (true == blDelete)
             {
                 //删除发送数据包
                 App_BuffPacketManager::instance()->Delete(pBuffPacket);
@@ -1487,7 +1487,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
             m_pFileTest->HandlerServerResponse(GetConnectID());
         }
 
-        if (blDelete == true)
+        if (true == blDelete)
         {
             App_BuffPacketManager::instance()->Delete(pBuffPacket);
         }
@@ -2311,7 +2311,7 @@ bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
         {
             OUR_DEBUG((LM_ERROR,"[CConnectManager::PutMessage] Queue is Full nQueueCount = [%d].\n", nQueueCount));
 
-            if(blDelete == true)
+            if(true == blDelete)
             {
                 App_BuffPacketManager::instance()->Delete(pBuffPacket);
             }
@@ -2326,7 +2326,7 @@ bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
         {
             OUR_DEBUG((LM_ERROR,"[CConnectManager::PutMessage] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
 
-            if(blDelete == true)
+            if(true == blDelete)
             {
                 App_BuffPacketManager::instance()->Delete(pBuffPacket);
             }
@@ -2339,7 +2339,7 @@ bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
     {
         OUR_DEBUG((LM_ERROR,"[CMessageService::PutMessage] mb new error.\n"));
 
-        if(blDelete == true)
+        if(true == blDelete)
         {
             App_BuffPacketManager::instance()->Delete(pBuffPacket);
         }
@@ -2726,7 +2726,7 @@ bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType,
         {
             OUR_DEBUG((LM_INFO, "[CConnectManager::PostMessage]pCurrBuffPacket is NULL.\n"));
 
-            if(blDelete == true)
+            if(true == blDelete)
             {
                 App_BuffPacketManager::instance()->Delete(pBuffPacket);
             }
@@ -2743,7 +2743,7 @@ bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType,
         {
             OUR_DEBUG((LM_ERROR,"[CConnectManager::PutMessage] new _SendMessage is error.\n"));
 
-            if(blDelete == true)
+            if(true == blDelete)
             {
                 App_BuffPacketManager::instance()->Delete(pBuffPacket);
             }
@@ -2772,7 +2772,7 @@ bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType,
             {
                 OUR_DEBUG((LM_ERROR,"[CConnectManager::PutMessage] Queue is Full nQueueCount = [%d].\n", nQueueCount));
 
-                if(blDelete == true)
+                if(true == blDelete)
                 {
                     App_BuffPacketManager::instance()->Delete(pBuffPacket);
                 }
@@ -2787,7 +2787,7 @@ bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType,
             {
                 OUR_DEBUG((LM_ERROR,"[CConnectManager::PutMessage] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
 
-                if(blDelete == true)
+                if(true == blDelete)
                 {
                     App_BuffPacketManager::instance()->Delete(pBuffPacket);
                 }
@@ -2800,7 +2800,7 @@ bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType,
         {
             OUR_DEBUG((LM_ERROR,"[CMessageService::PutMessage] mb new error.\n"));
 
-            if(blDelete == true)
+            if(true == blDelete)
             {
                 App_BuffPacketManager::instance()->Delete(pBuffPacket);
             }
@@ -3243,7 +3243,7 @@ bool CConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char*& pData, 
     {
         OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::PostMessage]No find send Queue object.\n"));
 
-        if(blDelete == true)
+        if(true == blDelete)
         {
             SAFE_DELETE_ARRAY(pData);
         }
@@ -3258,7 +3258,7 @@ bool CConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char*& pData, 
     {
         bool bWriteResult = pBuffPacket->WriteStream(pData, nDataLen);
 
-        if(blDelete == true)
+        if(true == blDelete)
         {
             SAFE_DELETE_ARRAY(pData);
         }
@@ -3276,7 +3276,7 @@ bool CConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char*& pData, 
     {
         OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::PostMessage]pBuffPacket is NULL.\n"));
 
-        if(blDelete == true)
+        if(true == blDelete)
         {
             SAFE_DELETE_ARRAY(pData);
         }
@@ -3587,7 +3587,7 @@ bool CConnectManagerGroup::PostMessageAll( const char*& pData, uint32 nDataLen, 
     {
         OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::PostMessageAll]pBuffPacket is NULL.\n"));
 
-        if(blDelete == true)
+        if(true == blDelete)
         {
             SAFE_DELETE_ARRAY(pData);
         }
