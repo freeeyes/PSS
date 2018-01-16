@@ -405,7 +405,7 @@ CBuffPacket& CBuffPacket::operator >> (uint8& u1Data)
     //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     u1Data = 0;
 
-    if(m_u4ReadPtr <= m_u4WritePtr - sizeof(u1Data))
+    if(m_u4WritePtr - m_u4ReadPtr >= sizeof(u1Data))
     {
         u1Data = *(uint8*)ReadPtr();
         ReadPtr((uint32)sizeof(u1Data));
@@ -419,7 +419,7 @@ CBuffPacket& CBuffPacket::operator >> (uint16& u2Data)
     //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     u2Data = 0;
 
-    if(m_u4ReadPtr <= m_u4WritePtr - (uint32)sizeof(u2Data))
+    if(m_u4WritePtr - m_u4ReadPtr >= (uint32)sizeof(u2Data))
     {
         //把网络字节序，转换为主机字节序
         uint16 n2Net = 0;
@@ -445,7 +445,7 @@ CBuffPacket& CBuffPacket::operator >> (uint32& u4Data)
     //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     u4Data = 0;
 
-    if(m_u4ReadPtr <= m_u4WritePtr - (uint32)sizeof(u4Data))
+    if(m_u4WritePtr - m_u4ReadPtr >= (uint32)sizeof(u4Data))
     {
         //把网络字节序，转换为主机字节序
         //uint32 n4Net = *(uint32 *)ReadPtr();
@@ -472,7 +472,7 @@ CBuffPacket& CBuffPacket::operator >> (uint64& u8Data)
     //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     u8Data = 0;
 
-    if(m_u4ReadPtr <= m_u4WritePtr - (uint32)sizeof(u8Data))
+    if(m_u4WritePtr - m_u4ReadPtr >= (uint32)sizeof(u8Data))
     {
         //uint64 u8Net = *(uint64 *)ReadPtr();
         uint64 u8Net = 0;
@@ -497,7 +497,7 @@ CBuffPacket& CBuffPacket::operator >> (int8& n1Data)
     //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     n1Data = 0;
 
-    if(m_u4ReadPtr <= m_u4WritePtr - sizeof(n1Data))
+    if(m_u4WritePtr - m_u4ReadPtr >= sizeof(n1Data))
     {
         n1Data = *(int8*)ReadPtr();
         ReadPtr((uint32)sizeof(n1Data));
@@ -511,7 +511,7 @@ CBuffPacket& CBuffPacket::operator >> (int16& n2Data)
     //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     n2Data = 0;
 
-    if(m_u4ReadPtr <= m_u4WritePtr - sizeof(n2Data))
+    if(m_u4WritePtr - m_u4ReadPtr >= sizeof(n2Data))
     {
         int16 n2Net = 0;
         memcpy_safe(ReadPtr(), (uint32)sizeof(int16), (char* )&n2Net, (uint32)sizeof(int16));
@@ -535,7 +535,7 @@ CBuffPacket& CBuffPacket::operator >> (int32& n4Data)
     //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     n4Data = 0;
 
-    if(m_u4ReadPtr <= m_u4WritePtr - sizeof(n4Data))
+    if(m_u4WritePtr - m_u4ReadPtr >= sizeof(n4Data))
     {
         //n4Data = *(int32 *)ReadPtr();
         //ReadPtr((uint32)sizeof(n4Data));
@@ -562,7 +562,7 @@ CBuffPacket& CBuffPacket::operator >> (float32& f4Data)
     //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     f4Data = 0;
 
-    if(m_u4ReadPtr <= m_u4WritePtr - (uint32)sizeof(f4Data))
+    if(m_u4WritePtr - m_u4ReadPtr >= (uint32)sizeof(f4Data))
     {
         //浮点型不需要字序转换
         memcpy_safe(ReadPtr(), (uint32)sizeof(float32), (char* )&f4Data, (uint32)sizeof(float32));
@@ -577,7 +577,7 @@ CBuffPacket& CBuffPacket::operator >> (float64& f8Data)
     //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     f8Data = 0;
 
-    if(m_u4ReadPtr <= m_u4WritePtr - (uint32)sizeof(f8Data))
+    if(m_u4WritePtr - m_u4ReadPtr >= (uint32)sizeof(f8Data))
     {
         //浮点型不需要字序转换
         memcpy_safe(ReadPtr(), (uint32)sizeof(float64), (char* )&f8Data, (uint32)sizeof(float64));
@@ -593,7 +593,7 @@ CBuffPacket& CBuffPacket::operator >> (VCHARS_STR& str)
     uint8 u1Len = 0;
     (*this) >> (u1Len);
 
-    if(u1Len && m_u4ReadPtr <= m_u4WritePtr - u1Len)
+    if(u1Len && m_u4WritePtr - m_u4ReadPtr >= u1Len)
     {
         str.SetData((char* )ReadPtr(), u1Len);
         ReadPtr((uint32)u1Len);
@@ -613,7 +613,7 @@ CBuffPacket& CBuffPacket::operator >> (VCHARM_STR& str)
     uint16 u2Len = 0;
     (*this) >> (u2Len);
 
-    if(u2Len && m_u4ReadPtr <= m_u4WritePtr - u2Len)
+    if(u2Len && m_u4WritePtr - m_u4ReadPtr >= u2Len)
     {
         str.SetData((char* )ReadPtr(), u2Len);
         ReadPtr((uint32)u2Len);
@@ -633,7 +633,7 @@ CBuffPacket& CBuffPacket::operator >> (VCHARB_STR& str)
     uint32 u4Len = 0;
     (*this) >> (u4Len);
 
-    if(u4Len && m_u4ReadPtr <= m_u4WritePtr - u4Len)
+    if(u4Len && m_u4WritePtr - m_u4ReadPtr >= u4Len)
     {
         str.SetData((char* )ReadPtr(), u4Len);
         ReadPtr((uint32)u4Len);
@@ -653,7 +653,7 @@ CBuffPacket& CBuffPacket::operator >> (string& str)
     uint32 u4Len = 0;
     (*this) >> (u4Len);
 
-    if(u4Len && m_u4ReadPtr <= m_u4WritePtr - u4Len)
+    if(u4Len && m_u4WritePtr - m_u4ReadPtr >= u4Len)
     {
         str = string((char* )ReadPtr(), u4Len);
         ReadPtr((uint32)u4Len);
