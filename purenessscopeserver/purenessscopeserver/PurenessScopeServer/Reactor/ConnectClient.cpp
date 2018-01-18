@@ -67,6 +67,9 @@ void CConnectClient::ClientClose()
     ACE_Message_Block::ACE_Message_Type objType = ACE_Message_Block::MB_STOP;
     pMbData->msg_type(objType);
 
+    //这里主动关闭，不在要求回调连接断开消息
+    SetClientMessage(NULL);
+
     //将消息放入队列，让output在反应器线程发送。
     ACE_Time_Value xtime = ACE_OS::gettimeofday();
 
