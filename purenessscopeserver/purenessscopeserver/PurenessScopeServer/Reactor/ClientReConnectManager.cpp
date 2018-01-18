@@ -850,14 +850,11 @@ bool CClientReConnectManager::CloseByClient(int nServerID)
 
     CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 
-    if (NULL == pClientInfo)
+    if (NULL != pClientInfo)
     {
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]nServerID =(%d) pClientInfo is NULL.\n", nServerID));
-        return false;
+        pClientInfo->SetConnectClient(NULL);
+        pClientInfo->SetServerConnectState(SERVER_CONNECT_FAIL);
     }
-
-    pClientInfo->SetConnectClient(NULL);
-    pClientInfo->SetServerConnectState(SERVER_CONNECT_FAIL);
 
     return true;
 }

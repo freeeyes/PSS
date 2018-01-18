@@ -873,14 +873,11 @@ bool CClientProConnectManager::CloseByClient(int nServerID)
 
     CProactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 
-    if(NULL == pClientInfo)
+    if(NULL != pClientInfo)
     {
-        OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::CloseByClient]nServerID =(%d) pClientInfo is NULL.\n", nServerID));
-        return false;
+        pClientInfo->SetProConnectClient(NULL);
+        pClientInfo->SetServerConnectState(SERVER_CONNECT_FAIL);
     }
-
-    pClientInfo->SetProConnectClient(NULL);
-    pClientInfo->SetServerConnectState(SERVER_CONNECT_FAIL);
 
     return true;
 }
