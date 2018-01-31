@@ -33,7 +33,7 @@ struct _PacketParseInfo
 struct _ServerInfo
 {
     uint32 m_u4PacketParseInfoID;
-    int32    m_nPort;
+    int32  m_nPort;
     uint8  m_u1IPType;
     char   m_szServerIP[MAX_BUFF_50];
 
