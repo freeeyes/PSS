@@ -14,12 +14,7 @@ CFileTestManager::CFileTestManager(void)
 
 CFileTestManager::~CFileTestManager(void)
 {
-    if(m_n4TimerID > 0)
-    {
-        App_TimerManager::instance()->cancel(m_n4TimerID);
-        m_n4TimerID = 0;
-        m_bFileTesting = false;
-    }
+    Close();
 
     return;
 }
@@ -111,6 +106,36 @@ void CFileTestManager::HandlerServerResponse(uint32 u4ConnectID)
         pResponseRecord->m_u1ResponseCount += 1;
     }
 
+}
+
+void CFileTestManager::Close()
+{
+    //关闭定时器
+    if (m_n4TimerID > 0)
+    {
+        App_TimerManager::instance()->cancel(m_n4TimerID);
+        m_n4TimerID = 0;
+        m_bFileTesting = false;
+    }
+
+    //清理m_objResponseRecordList
+    vector<ResponseRecordSt*> vecList;
+    m_objResponseRecordList.Get_All_Used(vecList);
+
+    int nUsedSize = (int)vecList.size();
+
+    if (nUsedSize > 0)
+    {
+        for (int i = 0; i < nUsedSize; i++)
+        {
+            char szConnectID[10] = { '\0' };
+            sprintf_safe(szConnectID, 10, "%d", vecList[i]->m_u4ConnectID);
+            m_objResponseRecordList.Del_Hash_Data(szConnectID);
+            SAFE_DELETE(vecList[i]);
+        }
+    }
+
+    m_objResponseRecordList.Close();
 }
 
 bool CFileTestManager::LoadXmlCfg(const char* szXmlFileTestName, FileTestResultInfoSt& objFileTestResult)
@@ -356,19 +381,24 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
             {
                 //超过了执行范围时间
                 OUR_DEBUG((LM_INFO, "[CFileTestManager::handle_timeout]Response time too long m_n4ExpectTime:%d.\n", m_n4ExpectTime));
+                AppLogManager::instance()->WriteLog(LOG_SYSTEM_ERROR, "[CFileTestManager::handle_timeout]Response time too long connectID=%d, m_n4ExpectTime=%d.",
+                                                    vecList[i]->m_u4ConnectID,
+                                                    m_n4TimeInterval);
             }
             else
             {
                 //超过了定时器时间
                 OUR_DEBUG((LM_INFO, "[CFileTestManager::handle_timeout]Response time too long m_n4TimeInterval:%d.\n", m_n4TimeInterval));
+                //写入错误日志
+                AppLogManager::instance()->WriteLog(LOG_SYSTEM_ERROR, "[CFileTestManager::handle_timeout]Response time too long connectID=%d, m_n4TimeInterval=%d.",
+                                                    vecList[i]->m_u4ConnectID,
+                                                    m_n4TimeInterval);
             }
 
             char szConnectID[10] = { '\0' };
             sprintf_safe(szConnectID, 10, "%d", vecList[i]->m_u4ConnectID);
             m_objResponseRecordList.Del_Hash_Data(szConnectID);
-
-            //写入错误日志
-
+            SAFE_DELETE(vecList[i]);
         }
     }
 

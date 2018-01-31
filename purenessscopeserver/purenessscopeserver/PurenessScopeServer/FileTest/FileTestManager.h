@@ -29,10 +29,12 @@ public:
     FileTestResultInfoSt FileTestStart(const char* szXmlFileTestName);      //开始文件测试
     int FileTestEnd();                                                      //结束文件测试
     void HandlerServerResponse(uint32 u4ConnectID);                         //当前连接发送数据包的回调方法
+    void Close();                                                           //清理
+
 private:
     bool LoadXmlCfg(const char* szXmlFileTestName, FileTestResultInfoSt& objFileTestResult);        //读取测试配置文件
     int  ReadTestFile(const char* pFileName, int nType, FileTestDataInfoSt& objFileTestDataInfo);   //将消息包文件读入数据结构
-    int  ResponseRecordList();
+    int  ResponseRecordList();                                                                      //初始化ResponseRecord
 
     virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);   //定时器检查
 private:
