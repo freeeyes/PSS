@@ -142,7 +142,7 @@ extern "C"
         //将收到的数据粘入缓冲等待做切包处理
         if(pHttpInfo->m_u4DataLength + u4Data > MAX_DECRYPTLENGTH)
         {
-            OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]pWebSocketInfo is full.\n"));
+            OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]pHttpInfo is full.\n"));
             return PACKET_GET_ERROR;
         }
 
@@ -159,6 +159,7 @@ extern "C"
 
         if(NULL == pHttpHead)
         {
+            OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]pHttpHead is NULL.\n"));
             return PACKET_GET_NO_ENOUGTH;
         }
 
@@ -189,6 +190,7 @@ extern "C"
 
         if(u1Ret != PACKET_GET_ENOUGTH)
         {
+            OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]u1Ret:%d.\n",u1Ret));
             return u1Ret;
         }
 
@@ -207,7 +209,7 @@ extern "C"
 
             if(NULL == pPacketInfo->m_pmbBody)
             {
-                OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]m_pmbBody is NULL.\n"));
+                OUR_DEBUG((LM_ERROR, "[HttpDispose]m_pmbBody is NULL.\n"));
                 return PACKET_GET_ERROR;
             }
 
@@ -221,7 +223,7 @@ extern "C"
         //处理完的数据从池中移除
         pCurrMessage->rd_ptr(u4Data);
 
-        pHttpInfo->Init();
+        pHttpInfo->Clear();
         return (uint8)PACKET_GET_ENOUGTH;
     }
 
