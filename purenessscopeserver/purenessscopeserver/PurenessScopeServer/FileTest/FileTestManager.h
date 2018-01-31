@@ -2,7 +2,6 @@
 #define _FILETESTMANAGER_H_
 
 #include <vector>
-#include <map>
 using namespace std;
 
 #ifndef WIN32
@@ -12,6 +11,7 @@ using namespace std;
 #include "ProConnectHandle.h"
 #endif
 
+#include "HashTable.h"
 #include "XmlOpeation.h"
 
 #include "ace/FILE_Addr.h"
@@ -32,6 +32,7 @@ public:
 private:
     bool LoadXmlCfg(const char* szXmlFileTestName, FileTestResultInfoSt& objFileTestResult);        //读取测试配置文件
     int  ReadTestFile(const char* pFileName, int nType, FileTestDataInfoSt& objFileTestDataInfo);   //将消息包文件读入数据结构
+    int  ResponseRecordList();
 
     virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);   //定时器检查
 private:
@@ -56,7 +57,8 @@ private:
     typedef struct RESPONSERECORD
     {
         uint64 m_u8StartTime;
-        uint8 m_u1ResponseCount;
+        uint8  m_u1ResponseCount;
+        uint32 m_u4ConnectID;
 
         RESPONSERECORD()
         {
@@ -73,6 +75,7 @@ private:
         {
             m_u8StartTime      = 0;
             m_u1ResponseCount  = 0;
+            m_u4ConnectID      = 0;
         }
 
         RESPONSERECORD& operator= (const RESPONSERECORD& ar)
@@ -83,8 +86,9 @@ private:
         }
     } ResponseRecordSt;
 
-    typedef map<uint32,ResponseRecordSt> mapResponseRecordSt;
-    mapResponseRecordSt m_mapResponseRecordSt;
+    //定义接收参数
+    CHashTable<ResponseRecordSt> m_objResponseRecordList;
+
 };
 
 typedef ACE_Singleton<CFileTestManager, ACE_Null_Mutex> App_FileTestManager;

@@ -27,8 +27,7 @@ void CLoadModule::Init(uint16 u2MaxModuleCount)
 
 void CLoadModule::Close()
 {
-    //存环关闭当前活跃模块
-    //OUR_DEBUG((LM_INFO, "[CLoadModule::Close]m_mapModuleInfo.GetSize=%d.\n", m_mapModuleInfo.GetSize()))
+    //关闭当前活跃模块
 
     vector<string> obj_vecModuleName;
     vector<_ModuleInfo*> vecModuleInfo;
@@ -36,7 +35,6 @@ void CLoadModule::Close()
 
     for(int i = 0; i < (int)vecModuleInfo.size(); i++)
     {
-        //OUR_DEBUG((LM_INFO, "[CLoadModule::Close]active name=%s.\n", m_mapModuleInfo.GetMapDataKey(i).c_str()));
         _ModuleInfo* pModuleInfo = vecModuleInfo[i];
 
         if(NULL != pModuleInfo)
@@ -92,7 +90,7 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, c
     //将注册成功的模块，加入到Hash数组中
     if (-1 == m_objHashModuleList.Add_Hash_Data(pModuleInfo->GetName(), pModuleInfo))
     {
-        OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] m_mapModuleInfo.AddMapData error!\n"));
+        OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] m_objHashModuleList.Add_Hash_Data error!\n"));
         SAFE_DELETE(pModuleInfo);
         return false;
     }

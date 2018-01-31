@@ -184,7 +184,7 @@ void CMessagePool::Init(uint32 u4PacketCount)
 
         if(NULL != pPacket)
         {
-            //添加到Hashmap里面
+            //添加到Hash里面
             char szMessageID[10] = {'\0'};
             sprintf_safe(szMessageID, 10, "%d", i);
             int nHashPos = m_objHashMessageList.Add_Hash_Data(szMessageID, pPacket);
