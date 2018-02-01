@@ -21,8 +21,11 @@ enum
 //反应器对象
 class CAceProactor : public ACE_Task<ACE_MT_SYNCH>
 {
-public:
+private:
     CAceProactor();
+    friend class CAceProactorManager;
+
+public:
     ~CAceProactor();
 
     void Close();

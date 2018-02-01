@@ -9,7 +9,7 @@ CProactorClientInfo::CProactorClientInfo()
     m_nPort             = 0;
     m_nServerID         = 0;
     m_emConnectState    = SERVER_CONNECT_READY;
-    m_AddrLocal         = (ACE_INET_Addr&)ACE_Addr::sap_any;
+    m_blIsLocal         = false;
 }
 
 CProactorClientInfo::~CProactorClientInfo()
@@ -81,10 +81,21 @@ bool CProactorClientInfo::Run(bool blIsReadly, EM_Server_Connect_State emState)
 
         m_emConnectState = emState;
 
-        if(m_pProAsynchConnect->connect(m_AddrServer, (const ACE_INET_Addr&)m_AddrLocal, 1, (const void*)pProConnectInfo) == -1)
+        if (true == m_blIsLocal)
         {
-            OUR_DEBUG((LM_ERROR, "[CProactorClientInfo::Run]m_pAsynchConnect open error(%d).\n", ACE_OS::last_error()));
-            return false;
+            if (m_pProAsynchConnect->connect(m_AddrServer, (const ACE_INET_Addr&)m_AddrLocal, 1, (const void*)pProConnectInfo) == -1)
+            {
+                OUR_DEBUG((LM_ERROR, "[CProactorClientInfo::Run]m_pAsynchConnect open error(%d).\n", ACE_OS::last_error()));
+                return false;
+            }
+        }
+        else
+        {
+            if (m_pProAsynchConnect->connect(m_AddrServer, (ACE_INET_Addr&)ACE_Addr::sap_any, 1, (const void*)pProConnectInfo) == -1)
+            {
+                OUR_DEBUG((LM_ERROR, "[CProactorClientInfo::Run]m_pAsynchConnect open error(%d).\n", ACE_OS::last_error()));
+                return false;
+            }
         }
     }
 
@@ -228,6 +239,8 @@ void CProactorClientInfo::SetLocalAddr( const char* pIP, int nPort, uint8 u1IPTy
     {
         m_AddrLocal.set(nPort, pIP, 1, PF_INET6);
     }
+
+    m_blIsLocal = true;
 }
 
 CClientProConnectManager::CClientProConnectManager(void)
