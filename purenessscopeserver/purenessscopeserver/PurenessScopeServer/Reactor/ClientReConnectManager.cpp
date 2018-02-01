@@ -745,12 +745,8 @@ bool CClientReConnectManager::ConnectUdpInit(int nServerID, CReactorUDPClient*& 
 
 int CClientReConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-
-    if (arg != NULL)
-    {
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::handle_timeout] arg is not NULL, tv = %d.\n", tv.sec()));
-    }
+    ACE_UNUSED_ARG(arg);
+    ACE_UNUSED_ARG(tv);
 
     m_ThreadWritrLock.acquire();
     vector<CReactorClientInfo*> vecCReactorClientInfo;

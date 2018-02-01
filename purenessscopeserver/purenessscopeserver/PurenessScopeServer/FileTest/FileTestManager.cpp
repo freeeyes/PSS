@@ -361,10 +361,8 @@ int CFileTestManager::ResponseRecordList()
 
 int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 {
-    if (NULL != arg)
-    {
-        OUR_DEBUG((LM_INFO, "[CFileTestManager::handle_timeout]arg is not NULL.\n"));
-    }
+    ACE_UNUSED_ARG(arg);
+    ACE_UNUSED_ARG(tv);
 
     //首先遍历上一次定时器的执行数据对象是否已经全部释放
     vector<ResponseRecordSt*> vecList;

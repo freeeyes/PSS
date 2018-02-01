@@ -677,7 +677,8 @@ void CClientProConnectManager::Close()
 
 int CClientProConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
+    ACE_UNUSED_ARG(arg);
+    ACE_UNUSED_ARG(tv);
 
     //OUR_DEBUG((LM_DEBUG, "[CClientProConnectManager::handle_timeout]Begin.\n"));
     if(m_ProAsynchConnect.GetConnectState() == true)

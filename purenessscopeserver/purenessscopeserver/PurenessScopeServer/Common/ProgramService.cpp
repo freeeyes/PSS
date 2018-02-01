@@ -65,9 +65,11 @@ int CProgramService::handle_exception( ACE_HANDLE h )
     return 0;
 }
 
-int CProgramService::handle_timeout (const ACE_Time_Value& tv,const void*)
+int CProgramService::handle_timeout (const ACE_Time_Value& tv,const void* arg)
 {
-    ACE_UNUSED_ARG (tv);
+    ACE_UNUSED_ARG(arg);
+    ACE_UNUSED_ARG(tv);
+
     MessageBeep (MB_OK);
     //OUR_DEBUG ((LM_DEBUG, ACE_TEXT ("%T (%t): Beep...\n")));
     return 0;

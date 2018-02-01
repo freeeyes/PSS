@@ -2420,7 +2420,9 @@ bool CConnectManager::KillTimer()
 
 int CConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
+    ACE_UNUSED_ARG(arg);
+    ACE_UNUSED_ARG(tv);
+
     ACE_Time_Value tvNow = ACE_OS::gettimeofday();
     vector<CConnectHandler*> vecDelConnectHandler;
 

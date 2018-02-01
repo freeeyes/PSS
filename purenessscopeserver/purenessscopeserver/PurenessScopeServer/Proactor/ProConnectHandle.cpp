@@ -2272,6 +2272,10 @@ int CProConnectManager::handle_write_file_stream(uint32 u4ConnectID, const char*
 int CProConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
+
+    ACE_UNUSED_ARG(arg);
+    ACE_UNUSED_ARG(tv);
+
     ACE_Time_Value tvNow = ACE_OS::gettimeofday();
 
     //转动时间轮盘

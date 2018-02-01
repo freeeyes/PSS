@@ -822,10 +822,8 @@ CMessageServiceGroup::~CMessageServiceGroup()
 
 int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 {
-    if(arg != NULL)
-    {
-        OUR_DEBUG((LM_ERROR,"[CMessageServiceGroup::handle_timeout]arg is not NULL, time is (%d).\n", tv.sec()));
-    }
+    ACE_UNUSED_ARG(arg);
+    ACE_UNUSED_ARG(tv);
 
     //检查所有工作线程
     if (false == CheckWorkThread())
