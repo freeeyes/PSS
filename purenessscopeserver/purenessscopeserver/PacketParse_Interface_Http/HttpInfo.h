@@ -12,6 +12,8 @@ using namespace std;
 #define MAX_ENCRYPTLENGTH 50*MAX_BUFF_1024
 //最大解密数据包长度，如果最大数据包比这个大，则扩展这个值
 #define MAX_DECRYPTLENGTH 50*MAX_BUFF_1024
+//Http接口对象数量
+#define MAX_HTTPINFO_COUNT 1000
 
 //记录websokcet的连接状态，如果是初次连接，则设置为WEBSOCKET_STATE_HANDIN
 struct _HttpInfo
@@ -28,17 +30,17 @@ struct _HttpInfo
 
     void Init()
     {
-        m_u4ConnectID = 0;
-        ACE_OS::memset(m_szData, 0, MAX_DECRYPTLENGTH);
+        m_u4ConnectID      = 0;
         m_u4DataLength     = 0;
         m_u2Index          = 0;
+        ACE_OS::memset(m_szData, 0, MAX_DECRYPTLENGTH);
     }
 
     void Clear()
     {
-        m_u4ConnectID = 0;
-        ACE_OS::memset(m_szData, 0, MAX_DECRYPTLENGTH);
+        m_u4ConnectID  = 0;
         m_u4DataLength = 0;
+        ACE_OS::memset(m_szData, 0, MAX_DECRYPTLENGTH);
     }
 };
 
@@ -48,7 +50,17 @@ class CHttpInfoManager
 public:
     CHttpInfoManager()
     {
-        m_u4Count = 1000;
+        Init();
+    }
+
+    ~CHttpInfoManager()
+    {
+        Close();
+    }
+
+    void Init(uint32 u4InfoCount = MAX_HTTPINFO_COUNT)
+    {
+        m_u4Count = u4InfoCount;
 
         //初始化_HttpInfo HashTable
         m_objHttpInfoUsedList.Init(m_u4Count);
@@ -56,7 +68,7 @@ public:
         //初始化HashTable
         m_objHttpInfoFreeList.Init(m_u4Count);
 
-        for(int i = 0; i < (int)m_u4Count; i++)
+        for (int i = 0; i < (int)m_u4Count; i++)
         {
             _HttpInfo* ptrHttpInfo = new _HttpInfo();
 
@@ -65,18 +77,19 @@ public:
                 ptrHttpInfo->m_u2Index = i;
                 char szHandlerID[10] = { '\0' };
                 sprintf_safe(szHandlerID, 10, "%d", i);
-                m_objHttpInfoFreeList.Add_Hash_Data(szHandlerID, ptrHttpInfo);
+
+                if (-1 == m_objHttpInfoFreeList.Add_Hash_Data(szHandlerID, ptrHttpInfo))
+                {
+                    OUR_DEBUG((LM_INFO, "[Init]ptrHttpInfo Add_Hash_Data is error.\n"));
+                    SAFE_DELETE(ptrHttpInfo);
+                }
             }
             else
             {
+                OUR_DEBUG((LM_INFO, "[Init]ptrHttpInfo new error.\n"));
                 return;
             }
         }
-    }
-
-    ~CHttpInfoManager()
-    {
-        Close();
     }
 
     void Close()
@@ -86,12 +99,7 @@ public:
 
         for(int i = 0; i < (int)vecHttpInfo.size(); i++)
         {
-            _HttpInfo* ptrHttpInfo = vecHttpInfo[i];
-
-            if(NULL != ptrHttpInfo)
-            {
-                SAFE_DELETE(ptrHttpInfo);
-            }
+            SAFE_DELETE(vecHttpInfo[i]);
         }
 
         m_objHttpInfoFreeList.Close();
@@ -100,12 +108,7 @@ public:
 
         for(int i = 0; i < (int)vecHttpInfo.size(); i++)
         {
-            _HttpInfo* ptrHttpInfo = vecHttpInfo[i];
-
-            if(NULL != ptrHttpInfo)
-            {
-                SAFE_DELETE(ptrHttpInfo);
-            }
+            SAFE_DELETE(vecHttpInfo[i]);
         }
 
         m_objHttpInfoUsedList.Close();
@@ -115,17 +118,23 @@ public:
     bool Insert(uint32 u4ConnectID)
     {
         uint32 u4Index = u4ConnectID;
-        char szIndex[10];
-        sprintf(szIndex, "%d", u4Index);
-        //查找并添加
-        _HttpInfo* ptrHttpInfo = Create();
+        char szIndex[DEF_HASH_KEY_SIZE];
+        sprintf_safe(szIndex, DEF_HASH_KEY_SIZE, "%d", u4Index);
+        //从空余的HttpInfo对象列表中找到一个空余的对象
+        _HttpInfo* ptrHttpInfo = Get_Free_List();
 
         if(NULL != ptrHttpInfo)
         {
-            //如果已经存在
-            m_objHttpInfoUsedList.Add_Hash_Data(szIndex, ptrHttpInfo);
-            ptrHttpInfo->Clear();
-            return true;
+            //讲对象添加到已使用对象列表
+            if (-1 == m_objHttpInfoUsedList.Add_Hash_Data(szIndex, ptrHttpInfo))
+            {
+                OUR_DEBUG((LM_INFO, "[Init]m_objHttpInfoUsedList Add_Hash_Data is error.\n"));
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
         else
         {
@@ -138,9 +147,9 @@ public:
     void Delete(uint32 u4ConnectID)
     {
         uint32 u4Index = u4ConnectID;
-        char szIndex[10];
-        sprintf(szIndex, "%d", u4Index);
-        //查找并添加
+        char szIndex[DEF_HASH_KEY_SIZE];
+        sprintf_safe(szIndex, DEF_HASH_KEY_SIZE, "%d", u4Index);
+        //查找是否存在当前已有正在使用的对象
         _HttpInfo* ptrHttpInfo = m_objHttpInfoUsedList.Get_Hash_Box_Data(szIndex);
 
         if(NULL != ptrHttpInfo)
@@ -151,8 +160,14 @@ public:
             }
 
             ptrHttpInfo->Clear();
-            Delete(ptrHttpInfo);
+
+            //回归到空余列表对象
+            Set_Free_List(ptrHttpInfo);
             return;
+        }
+        else
+        {
+            OUR_DEBUG((LM_ERROR, "[Delete]ConnectID=%d is no find.\n", szIndex));
         }
     }
 
@@ -161,8 +176,8 @@ public:
     {
         ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
         uint32 u4Index = u4ConnectID;
-        char szIndex[10];
-        sprintf(szIndex, "%d", u4Index);
+        char szIndex[DEF_HASH_KEY_SIZE];
+        sprintf_safe(szIndex, DEF_HASH_KEY_SIZE, "%d", u4Index);
         //查找并添加
         _HttpInfo* ptrHttpInfo = m_objHttpInfoUsedList.Get_Hash_Box_Data(szIndex);
 
@@ -177,7 +192,7 @@ public:
     }
 
 private:
-    _HttpInfo* Create()
+    _HttpInfo* Get_Free_List()
     {
         ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
@@ -186,7 +201,7 @@ private:
         return ptrHttpInfo;
     }
 
-    bool Delete(_HttpInfo* ptrHttpInfo)
+    bool Set_Free_List(_HttpInfo* ptrHttpInfo)
     {
         ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
