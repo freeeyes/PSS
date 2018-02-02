@@ -9,6 +9,7 @@ CReactorClientInfo::CReactorClientInfo()
     m_nServerID              = 0;
     m_emConnectState         = SERVER_CONNECT_READY;
     m_AddrLocal              = (ACE_INET_Addr&)ACE_Addr::sap_any;
+    m_blIsLocal              = false;
 }
 
 CReactorClientInfo::~CReactorClientInfo()
@@ -71,12 +72,27 @@ bool CReactorClientInfo::Run(bool blIsReady, EM_Server_Connect_State emState)
     {
         OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]AAAAAAA.\n"));
 
-        if (m_pReactorConnect->connect(m_pConnectClient, m_AddrServer, ACE_Synch_Options::defaults, m_AddrLocal) == -1)
+        if (true == m_blIsLocal)
         {
-            m_emConnectState = SERVER_CONNECT_FAIL;
-            OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::Run](%s:%d) connection fails(ServerID=%d) error(%d).\n", m_AddrServer.get_host_addr(), m_AddrServer.get_port_number(), m_nServerID, ACE_OS::last_error()));
-            //这里设置为True，为了让自动重试起作用
-            return true;
+            //需要指定接入端口
+            if (m_pReactorConnect->connect(m_pConnectClient, m_AddrServer, ACE_Synch_Options::defaults, m_AddrLocal) == -1)
+            {
+                m_emConnectState = SERVER_CONNECT_FAIL;
+                OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::Run](%s:%d) connection fails(ServerID=%d) error(%d).\n", m_AddrServer.get_host_addr(), m_AddrServer.get_port_number(), m_nServerID, ACE_OS::last_error()));
+                //这里设置为True，为了让自动重试起作用
+                return true;
+            }
+        }
+        else
+        {
+            //不需要指定接入端口
+            if (m_pReactorConnect->connect(m_pConnectClient, m_AddrServer) == -1)
+            {
+                m_emConnectState = SERVER_CONNECT_FAIL;
+                OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::Run](%s:%d) connection fails(ServerID=%d) error(%d).\n", m_AddrServer.get_host_addr(), m_AddrServer.get_port_number(), m_nServerID, ACE_OS::last_error()));
+                //这里设置为True，为了让自动重试起作用
+                return true;
+            }
         }
 
         m_emConnectState = SERVER_CONNECT_OK;
@@ -166,6 +182,7 @@ bool CReactorClientInfo::Close()
         SetConnectClient(NULL);
     }
 
+    m_blIsLocal = false;
     return true;
 }
 
@@ -225,6 +242,8 @@ void CReactorClientInfo::SetLocalAddr( const char* pIP, int nPort, uint8 u1IPTyp
         OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::SetLocalAddr]AddrLocal(%s:%d) error.\n", pIP, nPort));
         return;
     }
+
+    m_blIsLocal = true;
 }
 
 CClientReConnectManager::CClientReConnectManager(void)

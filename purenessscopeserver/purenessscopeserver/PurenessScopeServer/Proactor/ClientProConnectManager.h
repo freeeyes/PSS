@@ -43,9 +43,7 @@ private:
     CProConnectClient*        m_pProConnectClient;        //当前链接对象
     CProAsynchConnect*        m_pProAsynchConnect;        //异步链接对象
     IClientMessage*           m_pClientMessage;           //回调函数类，回调返回错误和返回数据方法
-    char                      m_szServerIP[MAX_BUFF_20];  //远端服务器地址
     bool                      m_blIsLocal;                //是否需要制定本地端口
-    int                       m_nPort;                    //远端服务器端口
     int                       m_nServerID;                //服务器ID，由用户起名，用于区别连接
     EM_Server_Connect_State   m_emConnectState;           //连接状态
 };

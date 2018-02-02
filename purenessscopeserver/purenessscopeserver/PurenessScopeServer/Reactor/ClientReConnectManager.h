@@ -40,8 +40,9 @@ private:
     CConnectClient*            m_pConnectClient;         //当前链接对象
     CConnectClientConnector*   m_pReactorConnect;        //Connector链接对象
     IClientMessage*            m_pClientMessage;         //回调函数类，回调返回错误和返回数据方法
-    int                        m_nServerID;              //远程服务器的ID
     ACE_Reactor*               m_pReactor;               //记录使用的反应器
+    bool                       m_blIsLocal;              //是否需要制定本地端口
+    int                        m_nServerID;              //远程服务器的ID
     EM_Server_Connect_State    m_emConnectState;         //连接状态
 };
 

@@ -5,8 +5,6 @@ CProactorClientInfo::CProactorClientInfo()
     m_pProConnectClient = NULL;
     m_pProAsynchConnect = NULL;
     m_pClientMessage    = NULL;
-    m_szServerIP[0]     = '\0';
-    m_nPort             = 0;
     m_nServerID         = 0;
     m_emConnectState    = SERVER_CONNECT_READY;
     m_blIsLocal         = false;
@@ -40,9 +38,6 @@ bool CProactorClientInfo::Init(const char* pIP, int nPort, uint8 u1IPType, int n
     m_pProAsynchConnect = pProAsynchConnect;
     m_pClientMessage    = pClientMessage;
     m_nServerID         = nServerID;
-
-    sprintf_safe(m_szServerIP, MAX_BUFF_20, "%s", pIP);
-    m_nPort = nPort;
 
     return true;
 }
