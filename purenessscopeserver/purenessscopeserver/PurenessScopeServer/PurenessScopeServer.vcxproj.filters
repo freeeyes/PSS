@@ -91,9 +91,6 @@
     <ClCompile Include="Message\ModuleMessageManager.cpp">
       <Filter>Message\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="Reactor\My_Dev_Poll_Reactor.cpp">
-      <Filter>Reactor\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="Common\MyACELoggingStrategy.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
@@ -329,9 +326,6 @@
     </ClInclude>
     <ClInclude Include="Message\ModuleMessageManager.h">
       <Filter>Message\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="Reactor\My_Dev_Poll_Reactor.h">
-      <Filter>Reactor\hfile</Filter>
     </ClInclude>
     <ClInclude Include="Common\MyACELoggingStrategy.h">
       <Filter>Common\hfile</Filter>
@@ -671,10 +665,5 @@
     <Filter Include="Reactor\cppfile">
       <UniqueIdentifier>{2c263c1d-404b-43bd-95c7-725b3199c8f8}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Reactor\My_Dev_Poll_Reactor.inl">
-      <Filter>Reactor\cppfile</Filter>
-    </None>
   </ItemGroup>
 </Project>

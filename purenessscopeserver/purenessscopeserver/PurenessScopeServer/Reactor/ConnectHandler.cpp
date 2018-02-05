@@ -386,16 +386,8 @@ int CConnectHandler::handle_input(ACE_HANDLE fd)
         return -1;
     }
 
-    //感谢玉白石的建议
-    //这里考虑代码的et模式的支持
-    if(App_MainConfig::instance()->GetNetworkMode() != (uint8)NETWORKMODE_RE_EPOLL_ET)
-    {
-        return RecvData();
-    }
-    else
-    {
-        return RecvData_et();
-    }
+    return RecvData();
+
 }
 
 int CConnectHandler::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
@@ -463,25 +455,6 @@ int CConnectHandler::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
 int CConnectHandler::RecvData()
 {
     return Dispose_Recv_Data();
-}
-
-//et模式接收数据
-int CConnectHandler::RecvData_et()
-{
-    int nRet = 0;
-
-    while(true)
-    {
-        //判断缓冲是否为NULL
-        nRet = Dispose_Recv_Data();
-
-        if (0 != nRet)
-        {
-            break;
-        }
-    }
-
-    return nRet;
 }
 
 int CConnectHandler::Dispose_Recv_Data()

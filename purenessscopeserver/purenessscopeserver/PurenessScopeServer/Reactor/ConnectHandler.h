@@ -95,7 +95,6 @@ private:
     void ClearPacketParse();                                                 //清理正在使用的PacketParse
 
     int RecvData();                                                          //接收数据，正常模式
-    int RecvData_et();                                                       //接收数据，et模式
 
     int Dispose_Recv_Data();                                                 //处理接收数据
 

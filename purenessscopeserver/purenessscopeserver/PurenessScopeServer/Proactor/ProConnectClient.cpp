@@ -242,9 +242,6 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         }
 
         mb.release();
-
-        //接受下一个数据包
-
     }
 }
 

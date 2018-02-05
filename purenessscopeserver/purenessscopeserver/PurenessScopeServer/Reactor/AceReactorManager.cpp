@@ -134,7 +134,7 @@ bool CAceReactor::Init(int nReactorType, int nThreadCount, int nMaxHandleCount)
 
         case Reactor_DEV_POLL_ET:
             {
-                My_ACE_Dev_Poll_Reactor* devreactor = new My_ACE_Dev_Poll_Reactor(nMaxHandleCount);
+                ACE_Dev_Poll_Reactor* devreactor = new ACE_Dev_Poll_Reactor(nMaxHandleCount);
 
                 if (NULL == devreactor)
                 {
@@ -148,7 +148,7 @@ bool CAceReactor::Init(int nReactorType, int nThreadCount, int nMaxHandleCount)
                     throw "[CAceReactor::Init]New m_pReactor Error[ACE_Dev_Poll_Reactor].";
                 }
 
-                m_nReactorType = Reactor_DEV_POLL_ET;
+                m_nReactorType = Reactor_DEV_POLL;
                 break;
             }
 
