@@ -116,7 +116,7 @@ void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
     App_ClientProConnectManager::instance()->SetHandler(m_nServerID, this);
     m_pClientMessage = App_ClientProConnectManager::instance()->GetClientMessage(m_nServerID);
 
-    if (false == RecvData(App_MainConfig::instance()->GetConnectServerRecvBuffer()))
+    if (false == RecvData(App_MainConfig::instance()->GetConnectServerRecvBuffer(), NULL))
     {
         OUR_DEBUG((LM_DEBUG, "[CProConnectClient::open](%d)GetConnectServerRecvBuffer is error.\n", m_nServerID));
     }
@@ -216,13 +216,35 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         }
 
         m_emRecvState = SERVER_RECV_END;
+
+        //如果有剩余数据，放入数据包里面去
+        if (mb.length() > 0)
+        {
+            ACE_Message_Block* pmbSave = App_MessageBlockManager::instance()->Create((uint32)mb.length());
+
+            if (NULL != pmbSave)
+            {
+                memcpy_safe(pmbSave->wr_ptr(), (uint32)mb.length(), mb.rd_ptr(), (uint32)mb.length());
+                pmbSave->wr_ptr(mb.length());
+
+                if (false == RecvData(App_MainConfig::instance()->GetConnectServerRecvBuffer(), pmbSave))
+                {
+                    OUR_DEBUG((LM_INFO, "[CProConnectClient::handle_read_stream](%d)RecvData is fail.\n", m_nServerID));
+                }
+            }
+        }
+        else
+        {
+            if (false == RecvData(App_MainConfig::instance()->GetConnectServerRecvBuffer(), NULL))
+            {
+                OUR_DEBUG((LM_INFO, "[CProConnectClient::handle_read_stream](%d)RecvData is fail.\n", m_nServerID));
+            }
+        }
+
         mb.release();
 
         //接受下一个数据包
-        if (false == RecvData(App_MainConfig::instance()->GetConnectServerRecvBuffer()))
-        {
-            OUR_DEBUG((LM_INFO, "[CProConnectClient::handle_read_stream](%d)RecvData is fail.\n", m_nServerID));
-        }
+
     }
 }
 
@@ -273,10 +295,18 @@ bool CProConnectClient::GetTimeout(ACE_Time_Value tvNow)
     }
 }
 
-bool CProConnectClient::RecvData(uint32 u4PacketLen)
+bool CProConnectClient::RecvData(uint32 u4PacketLen, ACE_Message_Block* pmbSave)
 {
     //ACE_NEW_NORETURN(m_mbRecv, ACE_Message_Block(u4PacketLen));
     m_mbRecv = App_MessageBlockManager::instance()->Create(u4PacketLen);
+
+    if (NULL != pmbSave && 0 < pmbSave->length())
+    {
+        //如果有剩余数据，则直接加进去。
+        memcpy_safe(m_mbRecv->wr_ptr(), (uint32)pmbSave->length(), pmbSave->rd_ptr(), (uint32)pmbSave->length());
+        m_mbRecv->wr_ptr(pmbSave->length());
+        App_MessageBlockManager::instance()->Close(pmbSave);
+    }
 
     if(this->m_Reader.read(*m_mbRecv, u4PacketLen) == -1)
     {

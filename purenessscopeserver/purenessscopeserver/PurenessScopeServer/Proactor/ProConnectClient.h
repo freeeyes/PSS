@@ -44,7 +44,7 @@ public:
     _ClientConnectInfo GetClientConnectInfo();             //得到当前链接信息
 
 private:
-    bool RecvData(uint32 u4PacketLen);                                    //接收数据
+    bool RecvData(uint32 u4PacketLen, ACE_Message_Block* pmbSave);        //接收数据
     int SendMessageGroup(uint16 u2CommandID, ACE_Message_Block* pmblk);   //将接收的数据包发给框架消息处理模块
 
 private:
