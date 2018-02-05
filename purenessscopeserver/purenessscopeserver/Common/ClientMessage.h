@@ -7,6 +7,13 @@
 
 #include "IMessageBlockManager.h"
 
+//收到的数据包数据回路
+enum EM_PACKET_ROUTE
+{
+    PACKET_ROUTE_SELF = 0,   //数据包回路，需要m_pClientMessage自己去处理
+    PACKET_ROUTE_CLIENT_MESSAHE,   //数据包回路，回应到CMessageService去处理
+};
+
 class IClientMessage
 {
 public:
@@ -17,7 +24,8 @@ public:
     //发送组包函数
     virtual bool Send_Format_data(char* pData, uint32 u4Len, IMessageBlockManager* pMessageBlockManager, ACE_Message_Block*& mbSend)                             = 0;    //处理数据包发送接口
     //接收组包函数
-    virtual bool Recv_Format_data(ACE_Message_Block* mbRecv, IMessageBlockManager* pMessageBlockManager, uint16& u2CommandID, ACE_Message_Block*& mbFinishRecv)  = 0;    //处理数据包接收接口
+    virtual bool Recv_Format_data(ACE_Message_Block* mbRecv, IMessageBlockManager* pMessageBlockManager, uint16& u2CommandID,
+                                  ACE_Message_Block*& mbFinishRecv, EM_PACKET_ROUTE& emPacketRoute)  = 0;    //处理数据包接收接口
 
     //链接重连成功回调函数
     virtual void ReConnect(int nServerID)                                                               = 0;    //连接重连成功接口

@@ -16,6 +16,7 @@
 #include "AceProactorManager.h"
 #include "LogManager.h"
 #include "ServerMessageTask.h"
+#include "MessageService.h"
 
 #define MAX_BUFF_1024 1024
 #define MAX_IP_LEN    16
@@ -43,7 +44,8 @@ public:
     _ClientConnectInfo GetClientConnectInfo();             //得到当前链接信息
 
 private:
-    bool RecvData(uint32 u4PacketLen);              //接收数据
+    bool RecvData(uint32 u4PacketLen);                                    //接收数据
+    int SendMessageGroup(uint16 u2CommandID, ACE_Message_Block* pmblk);   //将接收的数据包发给框架消息处理模块
 
 private:
     ACE_INET_Addr               m_AddrRemote;        //链接远程服务器的地址

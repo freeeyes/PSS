@@ -173,35 +173,50 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
             m_atvRecv     = ACE_OS::gettimeofday();
             m_emRecvState = SERVER_RECV_BEGIN;
 
-            bool blRet = m_pClientMessage->Recv_Format_data(&mb, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish);
-
-            if(true == blRet)
+            while (true)
             {
-                //有数据需要处理，则处理
-                if(App_MainConfig::instance()->GetConnectServerRunType() == 0)
+                EM_PACKET_ROUTE em_PacketRoute = PACKET_ROUTE_SELF;
+                bool blRet = m_pClientMessage->Recv_Format_data(&mb, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish, em_PacketRoute);
+
+                if (true == blRet)
                 {
-                    //调用数据包处理
-                    m_pClientMessage->RecvData(u2CommandID, pRecvFinish, objServerIPInfo);
-                    //回收处理包
-                    App_MessageBlockManager::instance()->Close(pRecvFinish);
+                    if (PACKET_ROUTE_SELF == em_PacketRoute)
+                    {
+                        //有数据需要处理，则处理
+                        if (App_MainConfig::instance()->GetConnectServerRunType() == 0)
+                        {
+                            //调用数据包处理
+                            m_pClientMessage->RecvData(u2CommandID, pRecvFinish, objServerIPInfo);
+                            //回收处理包
+                            App_MessageBlockManager::instance()->Close(pRecvFinish);
+                        }
+                        else
+                        {
+                            //异步消息处理
+                            _Server_Message_Info* pServer_Message_Info = App_ServerMessageInfoPool::instance()->Create();
+                            pServer_Message_Info->m_pClientMessage = m_pClientMessage;
+                            pServer_Message_Info->m_objServerIPInfo = objServerIPInfo;
+                            pServer_Message_Info->m_pRecvFinish = pRecvFinish;
+                            pServer_Message_Info->m_u2CommandID = u2CommandID;
+                            App_ServerMessageTask::instance()->PutMessage(pServer_Message_Info);
+                        }
+                    }
+                    else
+                    {
+                        //将数据放回到消息线程
+                        SendMessageGroup(u2CommandID, pRecvFinish);
+                    }
                 }
                 else
                 {
-                    //异步消息处理
-                    _Server_Message_Info* pServer_Message_Info = App_ServerMessageInfoPool::instance()->Create();
-                    pServer_Message_Info->m_pClientMessage  = m_pClientMessage;
-                    pServer_Message_Info->m_objServerIPInfo = objServerIPInfo;
-                    pServer_Message_Info->m_pRecvFinish     = pRecvFinish;
-                    pServer_Message_Info->m_u2CommandID     = u2CommandID;
-                    App_ServerMessageTask::instance()->PutMessage(pServer_Message_Info);
+                    break;
                 }
             }
 
         }
 
-        mb.release();
         m_emRecvState = SERVER_RECV_END;
-
+        mb.release();
 
         //接受下一个数据包
         if (false == RecvData(App_MainConfig::instance()->GetConnectServerRecvBuffer()))
@@ -285,6 +300,58 @@ bool CProConnectClient::RecvData(uint32 u4PacketLen)
     }
 
     return true;
+}
+
+int CProConnectClient::SendMessageGroup(uint16 u2CommandID, ACE_Message_Block* pmblk)
+{
+    //组织数据
+    CMessage* pMessage = App_MessageServiceGroup::instance()->CreateMessage(GetServerID(), PACKET_TCP);
+
+    if (NULL == pMessage)
+    {
+        //放入消息框架失败
+        OUR_DEBUG((LM_ERROR, "[CProConnectClient::SendMessageGroup] ConnectID = %d CreateMessage fail.\n", GetServerID()));
+        App_MessageBlockManager::instance()->Close(pmblk);
+        return -1;
+    }
+    else
+    {
+        ACE_Message_Block* pMBBHead = App_MessageBlockManager::instance()->Create(sizeof(uint32));
+
+        if (NULL == pMBBHead)
+        {
+            OUR_DEBUG((LM_ERROR, "[CProConnectClient::SendMessageGroup] ConnectID = %d pMBBHead fail.\n", GetServerID()));
+            App_MessageBlockManager::instance()->Close(pmblk);
+            return -1;
+        }
+
+        //添加消息包头
+        uint32 u4PacketLen = (uint32)pmblk->length();
+        memcpy_safe((char*)&u4PacketLen, sizeof(uint32), pMBBHead->wr_ptr(), sizeof(uint32));
+        pMBBHead->wr_ptr(sizeof(uint32));
+
+        sprintf_safe(pMessage->GetMessageBase()->m_szListenIP, MAX_BUFF_20, "%s", m_AddrRemote.get_host_addr());
+        sprintf_safe(pMessage->GetMessageBase()->m_szIP, MAX_BUFF_20, "127.0.0.1");
+        pMessage->GetMessageBase()->m_u2Cmd = u2CommandID;
+        pMessage->GetMessageBase()->m_u4ConnectID   = GetServerID();
+        pMessage->GetMessageBase()->m_u4ListenPort  = (uint32)m_AddrRemote.get_port_number();
+        pMessage->GetMessageBase()->m_tvRecvTime    = ACE_OS::gettimeofday();
+        pMessage->GetMessageBase()->m_u1ResouceType = RESOUCE_FROM_SERVER;
+        pMessage->GetMessageBase()->m_u4HeadSrcSize = sizeof(uint32);
+        pMessage->GetMessageBase()->m_u4BodySrcSize = u4PacketLen;
+        pMessage->SetPacketHead(pMBBHead);
+        pMessage->SetPacketBody(pmblk);
+
+        //将要处理的消息放入消息处理线程
+        if (false == App_MessageServiceGroup::instance()->PutMessage(pMessage))
+        {
+            OUR_DEBUG((LM_ERROR, "[CProConnectClient::SendMessageGroup] App_MessageServiceGroup::instance()->PutMessage Error.\n"));
+            App_MessageServiceGroup::instance()->DeleteMessage(GetServerID(), pMessage);
+            return false;
+        }
+    }
+
+    return 0;
 }
 
 bool CProConnectClient::SendData(ACE_Message_Block* pmblk)

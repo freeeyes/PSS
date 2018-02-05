@@ -212,14 +212,7 @@ int CConnectClient::handle_input(ACE_HANDLE fd)
         return -1;
     }
 
-    if(App_MainConfig::instance()->GetNetworkMode() != (uint8)NETWORKMODE_RE_EPOLL_ET)
-    {
-        return RecvData();
-    }
-    else
-    {
-        return RecvData_et();
-    }
+    return RecvData();
 }
 
 int CConnectClient::RecvData()
@@ -324,153 +317,17 @@ int CConnectClient::RecvData()
         m_atvRecv     = ACE_OS::gettimeofday();
         m_emRecvState = SERVER_RECV_BEGIN;
 
-        bool blRet = m_pClientMessage->Recv_Format_data(m_pCurrMessage, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish);
-
-        if(true == blRet)
+        while (true)
         {
-            //有数据需要处理，则处理
-            if(App_MainConfig::instance()->GetConnectServerRunType() == 0)
+            EM_PACKET_ROUTE em_PacketRoute = PACKET_ROUTE_SELF;
+            bool blRet = m_pClientMessage->Recv_Format_data(m_pCurrMessage, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish, em_PacketRoute);
+
+            if (true == blRet)
             {
-                //调用数据包处理
-                m_pClientMessage->RecvData(u2CommandID, pRecvFinish, objServerIPInfo);
-                //回收处理包
-                App_MessageBlockManager::instance()->Close(pRecvFinish);
-            }
-            else
-            {
-                //异步消息处理
-                _Server_Message_Info* pServer_Message_Info = App_ServerMessageInfoPool::instance()->Create();
-                pServer_Message_Info->m_pClientMessage  = m_pClientMessage;
-                pServer_Message_Info->m_objServerIPInfo = objServerIPInfo;
-                pServer_Message_Info->m_pRecvFinish     = pRecvFinish;
-                pServer_Message_Info->m_u2CommandID     = u2CommandID;
-                App_ServerMessageTask::instance()->PutMessage(pServer_Message_Info);
-            }
-        }
-
-        m_emRecvState = SERVER_RECV_END;
-    }
-
-    m_pCurrMessage->reset();
-
-    return 0;
-}
-
-int CConnectClient::RecvData_et()
-{
-    int nCurrCount = (uint32)m_pCurrMessage->size();
-
-    if (nCurrCount < 0)
-    {
-        //如果剩余字节为负，说明程序出了问题
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::handle_input][%d] nCurrCount < 0 m_u4CurrSize = %d.\n", GetServerID(), m_u4CurrSize));
-        m_u4CurrSize = 0;
-
-        if (NULL != m_pClientMessage)
-        {
-            _ClientIPInfo objServerIPInfo;
-            sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-            objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
-
-            if(S2S_NEED_CALLBACK == m_ems2s)
-            {
-                m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
-            }
-        }
-
-        return -1;
-    }
-
-    while(true)
-    {
-        int nDataLen = (int)this->peer().recv(m_pCurrMessage->wr_ptr(), nCurrCount, MSG_NOSIGNAL);
-
-        if (nDataLen <= 0)
-        {
-            m_u4CurrSize = 0;
-            uint32 u4Error = (uint32)errno;
-
-            if(nDataLen == -1 && u4Error == EAGAIN)
-            {
-                break;
-            }
-
-            OUR_DEBUG((LM_ERROR, "[CConnectClient::handle_input] ConnectID = %d, recv data is error nDataLen = [%d] errno = [%d].\n", GetServerID(), nDataLen, u4Error));
-            sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectClient::handle_input] ConnectID = %d, recv data is error[%d].\n", GetServerID(), nDataLen);
-
-            if (NULL != m_pClientMessage)
-            {
-                _ClientIPInfo objServerIPInfo;
-                sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-                objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
-
-                if(S2S_NEED_CALLBACK == m_ems2s)
+                if (PACKET_ROUTE_SELF == em_PacketRoute)
                 {
-                    m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
-                }
-            }
-
-            return -1;
-        }
-
-        //如果是DEBUG状态，记录当前接受包的二进制数据
-        if (App_MainConfig::instance()->GetDebug() == DEBUG_ON)
-        {
-            char szDebugData[MAX_BUFF_1024] = {'\0'};
-            char szLog[10]  = {'\0'};
-            int  nDebugSize = 0;
-            bool blblMore   = false;
-
-            if (nDataLen >= MAX_BUFF_200)
-            {
-                nDebugSize = MAX_BUFF_200;
-                blblMore   = true;
-            }
-            else
-            {
-                nDebugSize = nDataLen;
-            }
-
-            char* pData = m_pCurrMessage->wr_ptr();
-
-            for (int i = 0; i < nDebugSize; i++)
-            {
-                sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
-                sprintf_safe(szDebugData + 5 * i, MAX_BUFF_1024 - 5 * i, "%s", szLog);
-            }
-
-            if (blblMore == true)
-            {
-                AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_SERVERRECV, "[%s:%d]%s.(数据包过长只记录前200字节)", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
-            }
-            else
-            {
-                AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_SERVERRECV, "[%s:%d]%s.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
-            }
-        }
-
-        m_pCurrMessage->wr_ptr(nDataLen);
-
-        if (NULL != m_pClientMessage)
-        {
-            //接收数据，返回给逻辑层，自己不处理整包完整性判定
-            _ClientIPInfo objServerIPInfo;
-            sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-            objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
-
-            uint16 u2CommandID             = 0;
-            ACE_Message_Block* pRecvFinish = NULL;
-
-            m_atvRecv     = ACE_OS::gettimeofday();
-            m_emRecvState = SERVER_RECV_BEGIN;
-
-            while(true)
-            {
-                bool blRet = m_pClientMessage->Recv_Format_data(m_pCurrMessage, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish);
-
-                if(true == blRet)
-                {
-                    if(App_MainConfig::instance()->GetConnectServerRunType() == 0)
+                    //有数据需要处理，则处理
+                    if (App_MainConfig::instance()->GetConnectServerRunType() == 0)
                     {
                         //调用数据包处理
                         m_pClientMessage->RecvData(u2CommandID, pRecvFinish, objServerIPInfo);
@@ -480,24 +337,80 @@ int CConnectClient::RecvData_et()
                     else
                     {
                         //异步消息处理
-                        _Server_Message_Info* pServer_Message_Info = new _Server_Message_Info();
-                        pServer_Message_Info->m_pClientMessage  = m_pClientMessage;
+                        _Server_Message_Info* pServer_Message_Info = App_ServerMessageInfoPool::instance()->Create();
+                        pServer_Message_Info->m_pClientMessage = m_pClientMessage;
                         pServer_Message_Info->m_objServerIPInfo = objServerIPInfo;
-                        pServer_Message_Info->m_pRecvFinish     = pRecvFinish;
-                        pServer_Message_Info->m_u2CommandID     = u2CommandID;
+                        pServer_Message_Info->m_pRecvFinish = pRecvFinish;
+                        pServer_Message_Info->m_u2CommandID = u2CommandID;
                         App_ServerMessageTask::instance()->PutMessage(pServer_Message_Info);
                     }
                 }
                 else
                 {
-                    break;
+                    //将数据放回到消息线程
+                    SendMessageGroup(u2CommandID, pRecvFinish);
                 }
             }
+            else
+            {
+                break;
+            }
+        }
+    }
 
-            m_emRecvState = SERVER_RECV_END;
+    m_emRecvState = SERVER_RECV_END;
+    m_pCurrMessage->reset();
+
+    return 0;
+}
+
+int CConnectClient::SendMessageGroup(uint16 u2CommandID, ACE_Message_Block* pmblk)
+{
+    //组织数据
+    CMessage* pMessage = App_MessageServiceGroup::instance()->CreateMessage(GetServerID(), PACKET_TCP);
+
+    if (NULL == pMessage)
+    {
+        //放入消息框架失败
+        OUR_DEBUG((LM_ERROR, "[CConnectClient::SendMessageGroup] ConnectID = %d CreateMessage fail.\n", GetServerID()));
+        App_MessageBlockManager::instance()->Close(pmblk);
+        return -1;
+    }
+    else
+    {
+        ACE_Message_Block* pMBBHead = App_MessageBlockManager::instance()->Create(sizeof(uint32));
+
+        if (NULL == pMBBHead)
+        {
+            OUR_DEBUG((LM_ERROR, "[CConnectClient::SendMessageGroup] ConnectID = %d pMBBHead fail.\n", GetServerID()));
+            App_MessageBlockManager::instance()->Close(pmblk);
+            return -1;
         }
 
-        m_pCurrMessage->reset();
+        //添加消息包头
+        uint32 u4PacketLen = (uint32)pmblk->length();
+        memcpy_safe((char* )&u4PacketLen, sizeof(uint32), pMBBHead->wr_ptr(), sizeof(uint32));
+        pMBBHead->wr_ptr(sizeof(uint32));
+
+        sprintf_safe(pMessage->GetMessageBase()->m_szListenIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+        sprintf_safe(pMessage->GetMessageBase()->m_szIP, MAX_BUFF_20, "127.0.0.1");
+        pMessage->GetMessageBase()->m_u2Cmd         = u2CommandID;
+        pMessage->GetMessageBase()->m_u4ConnectID   = GetServerID();
+        pMessage->GetMessageBase()->m_u4ListenPort  = (uint32)m_addrRemote.get_port_number();
+        pMessage->GetMessageBase()->m_tvRecvTime    = ACE_OS::gettimeofday();
+        pMessage->GetMessageBase()->m_u1ResouceType = RESOUCE_FROM_SERVER;
+        pMessage->GetMessageBase()->m_u4HeadSrcSize = sizeof(uint32);
+        pMessage->GetMessageBase()->m_u4BodySrcSize = u4PacketLen;
+        pMessage->SetPacketHead(pMBBHead);
+        pMessage->SetPacketBody(pmblk);
+
+        //将要处理的消息放入消息处理线程
+        if (false == App_MessageServiceGroup::instance()->PutMessage(pMessage))
+        {
+            OUR_DEBUG((LM_ERROR, "[CConnectClient::SendMessageGroup] App_MessageServiceGroup::instance()->PutMessage Error.\n"));
+            App_MessageServiceGroup::instance()->DeleteMessage(GetServerID(), pMessage);
+            return false;
+        }
     }
 
     return 0;

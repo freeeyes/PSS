@@ -21,6 +21,7 @@
 #include "AceReactorManager.h"
 #include "LogManager.h"
 #include "ServerMessageTask.h"
+#include "MessageService.h"
 
 class CConnectClient : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>
 {
@@ -45,8 +46,8 @@ public:
     _ClientConnectInfo GetClientConnectInfo();             //得到当前链接信息
 
 private:
-    int RecvData();                                        //接收数据，正常模式
-    int RecvData_et();                                     //接收数据，et模式
+    int RecvData();                                                       //接收数据，正常模式
+    int SendMessageGroup(uint16 u2CommandID, ACE_Message_Block* pmblk);   //将接收的数据包发给框架消息处理模块
 
 public:
     uint32                      m_u4SendSize;           //发送字节数

@@ -158,6 +158,9 @@ static bool Convert_Version(int nTagVserion)
 #define PACKET_TCP                        0      //数据包来源类型TCP
 #define PACKET_UDP                        1      //数据包来源类型UDP
 
+#define RESOUCE_FROM_CLIENT               0      //客户端数据包
+#define RESOUCE_FROM_SERVER               1      //服务器间数据包
+
 #define CONNECT_TCP                       0      //链接类型为TCP
 #define CONNECT_UDP                       1      //链接类型为UDP
 

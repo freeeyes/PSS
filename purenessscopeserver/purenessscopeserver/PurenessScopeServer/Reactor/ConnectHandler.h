@@ -135,7 +135,7 @@ private:
     bool                       m_blBlockState;                 //是否处于阻塞状态 false为不在阻塞状态，true为在阻塞状态
     bool                       m_blIsLog;                      //是否写入日志，false为不写入，true为写入
     char                       m_szError[MAX_BUFF_500];        //错误信息描述文字
-    char                       m_szLocalIP[MAX_BUFF_50];       //监听的IP地址
+    char                       m_szLocalIP[MAX_BUFF_50];       //本地的IP端口
     char                       m_szConnectName[MAX_BUFF_100];  //连接名称，可以开放给逻辑插件去设置
     ACE_INET_Addr              m_addrRemote;                   //远程链接客户端地址
     ACE_Time_Value             m_atvConnect;                   //当前链接建立时间
