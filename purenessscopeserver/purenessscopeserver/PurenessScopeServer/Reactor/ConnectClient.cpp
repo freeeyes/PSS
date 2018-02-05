@@ -359,7 +359,31 @@ int CConnectClient::RecvData()
     }
 
     m_emRecvState = SERVER_RECV_END;
-    m_pCurrMessage->reset();
+
+    if (m_pCurrMessage->length() > 0)
+    {
+        //将缓冲没处理的数据，放入下次缓冲
+        ACE_Message_Block* pmbSave = App_MessageBlockManager::instance()->Create(m_pCurrMessage->length());
+
+        if (NULL != pmbSave)
+        {
+            memcpy_safe(pmbSave->wr_ptr(), m_pCurrMessage->length(), m_pCurrMessage->rd_ptr(), m_pCurrMessage->length());
+            pmbSave->wr_ptr(m_pCurrMessage->length());
+            m_pCurrMessage->reset();
+            memcpy_safe(m_pCurrMessage->wr_ptr(), pmbSave->length(), pmbSave->rd_ptr(), pmbSave->length());
+            m_pCurrMessage->wr_ptr(pmbSave->length());
+            App_MessageBlockManager::instance()->Close(pmbSave);
+        }
+        else
+        {
+            m_pCurrMessage->reset();
+        }
+    }
+    else
+    {
+        m_pCurrMessage->reset();
+    }
+
 
     return 0;
 }

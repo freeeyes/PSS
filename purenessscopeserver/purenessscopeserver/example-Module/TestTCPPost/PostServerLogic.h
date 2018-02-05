@@ -63,10 +63,10 @@ public:
     }
 
     //这里提供接受数据拼包算法，组成完整数据包后会调用RecvData方法
-    bool Recv_Format_data(ACE_Message_Block* mbRecv, IMessageBlockManager* pMessageBlockManager, uint16& u2CommandID, ACE_Message_Block*& mbFinishRecv)
+    bool Recv_Format_data(ACE_Message_Block* mbRecv, IMessageBlockManager* pMessageBlockManager, uint16& u2CommandID, ACE_Message_Block*& mbFinishRecv, EM_PACKET_ROUTE& emPacketRoute)
     {
-        //OUR_DEBUG((LM_INFO, "[CPostServerData::Recv_Format_data]u4Len=%d.\n", mbRecv->length()));
-        //OUR_DEBUG((LM_INFO, "[CPostServerData::Recv_Format_data]m_u2RecvBuffLength=%d.\n", m_u2RecvBuffLength));
+        ACE_UNUSED_ARG(emPacketRoute);
+
         //判断返回数据块是否小于8或者超过最大缓冲大小
         if(m_u2RecvBuffLength + mbRecv->length() < 8 || mbRecv->length() >= RECV_BUFF_SIZE)
         {
