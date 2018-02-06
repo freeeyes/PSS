@@ -130,7 +130,6 @@ private:
     ACE_Time_Value     m_atvInput;                     //最后一次接收数据时间
     ACE_Time_Value     m_atvOutput;                    //最后一次发送数据时间
     ACE_Time_Value     m_atvSendAlive;                 //链接存活时间
-    CBuffPacket        m_AlivePacket;                  //服务器生存包
     CPacketParse*      m_pPacketParse;                 //数据包解析类
     char               m_szConnectName[MAX_BUFF_100];  //连接名称，可以开放给逻辑插件去设置
     char               m_szError[MAX_BUFF_500];        //错误信息描述文字

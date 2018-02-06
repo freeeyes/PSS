@@ -71,7 +71,6 @@ private:
     ACE_Time_Value   m_atvInput;
     ACE_Time_Value   m_atvOutput;
     ACE_Time_Value   m_atvSendAlive;
-    CBuffPacket      m_AlivePacket;                  //服务器生存包
 
     CConsolePacketParse* m_pPacketParse;             //数据包解析类
 
