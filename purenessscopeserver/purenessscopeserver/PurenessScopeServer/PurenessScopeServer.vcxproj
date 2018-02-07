@@ -588,7 +588,6 @@
     <ClInclude Include="Common\BuffPacket.h" />
     <ClInclude Include="Common\BuffPacketManager.h" />
     <ClInclude Include="Common\CommandAccount.h" />
-    <ClInclude Include="Common\CommonData.h" />
     <ClInclude Include="Common\Fast_Asynch_Read_Stream.h" />
     <ClInclude Include="Common\ForbiddenIP.h" />
     <ClInclude Include="Common\Frame_Logging_Strategy.h" />

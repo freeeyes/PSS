@@ -255,9 +255,6 @@
     <ClInclude Include="Common\CommandAccount.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="Common\CommonData.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="Reactor\ConnectAccept.h">
       <Filter>Reactor\hfile</Filter>
     </ClInclude>
