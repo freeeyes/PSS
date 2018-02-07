@@ -2139,13 +2139,17 @@ void CConsoleMessage::DoMessage_ShowProcessInfo(_CommandInfo& CommandInfo, IBuff
     {
         _CommandFlowAccount objCommandFlowIn;
         _CommandFlowAccount objCommandFlowOut;
+        _CommandFlowAccount objCommandFlowUdpOut;
 
         //得到入口的所有流量统计
         App_MessageServiceGroup::instance()->GetFlowInfo(objCommandFlowIn);
 
 #ifdef WIN32  //如果是windows
-        //得到所有出口流量统计
+        //得到所有TCP出口流量统计
         App_ProConnectManager::instance()->GetCommandFlowAccount(objCommandFlowOut);
+
+        //得到多有UDP出口流量统计
+        App_ProUDPManager::instance()->GetCommandFlowAccount(objCommandFlowUdpOut);
 
         int nCPU = GetProcessCPU_Idel();
         int nMemorySize = GetProcessMemorySize();
@@ -2156,7 +2160,7 @@ void CConsoleMessage::DoMessage_ShowProcessInfo(_CommandInfo& CommandInfo, IBuff
             (*pBuffPacket) << (uint32)nMemorySize;
             (*pBuffPacket) << (uint8)objCommandFlowIn.m_u1FLow;
             (*pBuffPacket) << (uint32)objCommandFlowIn.m_u4FlowIn;
-            (*pBuffPacket) << (uint32)objCommandFlowOut.m_u4FlowOut;
+            (*pBuffPacket) << (uint32)objCommandFlowOut.m_u4FlowOut + objCommandFlowUdpOut.m_u4FlowOut;
         }
         else
         {
@@ -2175,7 +2179,11 @@ void CConsoleMessage::DoMessage_ShowProcessInfo(_CommandInfo& CommandInfo, IBuff
 
 
 #else   //如果是linux
+        //得到所有TCP出口流量统计
         App_ConnectManager::instance()->GetCommandFlowAccount(objCommandFlowOut);
+
+        //得到多有UDP出口流量统计
+        App_ReUDPManager::instance()->GetCommandFlowAccount(objCommandFlowUdpOut);
 
         int nCPU = GetProcessCPU_Idel_Linux();
         int nMemorySize = GetProcessMemorySize_Linux();
@@ -2186,7 +2194,7 @@ void CConsoleMessage::DoMessage_ShowProcessInfo(_CommandInfo& CommandInfo, IBuff
             (*pBuffPacket) << (uint32)nMemorySize;
             (*pBuffPacket) << (uint8)objCommandFlowIn.m_u1FLow;
             (*pBuffPacket) << (uint32)objCommandFlowIn.m_u4FlowIn;
-            (*pBuffPacket) << (uint32)objCommandFlowOut.m_u4FlowOut;
+            (*pBuffPacket) << (uint32)objCommandFlowOut.m_u4FlowOut + objCommandFlowUdpOut.m_u4FlowOut;
         }
         else
         {

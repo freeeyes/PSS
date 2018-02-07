@@ -30,7 +30,8 @@ public:
     void Close();
     bool SendMessage(const char*& pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead = true, uint16 u2CommandID = 0, bool blDlete = true);
     _ClientConnectInfo GetClientConnectInfo();
-    void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);                                   //获得指定命令统计信息
+    void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);    //获得指定命令统计信息
+    uint32 GetFlowOut();                                                      //得到所有的出口流量
 
 private:
     bool CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len);     //这里解析数据包并放入数据队列
@@ -55,4 +56,5 @@ private:
     CCommandAccount         m_CommandAccount;               //数据包统计
     uint32                  m_u4PacketParseInfoID;          //对应处理packetParse的模块ID
 };
+
 #endif

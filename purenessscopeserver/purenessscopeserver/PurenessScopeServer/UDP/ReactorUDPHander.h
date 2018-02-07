@@ -33,7 +33,8 @@ public:
     void Close();
     bool SendMessage(const char*& pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead = true, uint16 u2CommandID = 0, bool blDlete = true);
     _ClientConnectInfo GetClientConnectInfo();
-    void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);                                   //获得指定命令统计信息
+    void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);    //获得指定命令统计信息
+    uint32 GetFlowOut();                                                      //得到所有的出口流量
 
 private:
     bool CheckMessage(const char* pData, uint32 u4Len);     //这里解析数据包并放入数据队列

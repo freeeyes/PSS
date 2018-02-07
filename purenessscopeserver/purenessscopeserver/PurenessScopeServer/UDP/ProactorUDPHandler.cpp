@@ -417,3 +417,8 @@ void CProactorUDPHandler::GetCommandData( uint16 u2CommandID, _CommandData& objC
         objCommandData += (*pCommandData);
     }
 }
+
+uint32 CProactorUDPHandler::GetFlowOut()
+{
+    return m_CommandAccount.GetFlowOut();
+}

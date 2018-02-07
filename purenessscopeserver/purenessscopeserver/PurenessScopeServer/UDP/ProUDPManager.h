@@ -52,6 +52,22 @@ public:
         }
     }
 
+    void GetCommandFlowAccount(_CommandFlowAccount& objCommandFlow)
+    {
+        //得到当前所有UDP的出口流量之和
+        ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
+
+        for (int i = 0; i < (int)m_vecProactorUDPHandler.size(); i++)
+        {
+            CProactorUDPHandler* pProactotUDPHandler = m_vecProactorUDPHandler[i];
+
+            if (NULL != pProactotUDPHandler)
+            {
+                objCommandFlow.m_u4FlowOut += pProactotUDPHandler->GetFlowOut();
+            }
+        }
+    }
+
     bool SendMessage(int nConnectID, const char* pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead = true, uint16 u2CommandID = 0, bool blDlete = true)
     {
         ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);

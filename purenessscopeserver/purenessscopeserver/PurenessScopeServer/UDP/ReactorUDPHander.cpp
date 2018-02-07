@@ -414,3 +414,8 @@ void CReactorUDPHander::GetCommandData( uint16 u2CommandID, _CommandData& objCom
         objCommandData += (*pCommandData);
     }
 }
+
+uint32 CReactorUDPHander::GetFlowOut()
+{
+    return m_CommandAccount.GetFlowOut();
+}
