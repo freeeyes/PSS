@@ -3,6 +3,9 @@
 
 #include "define.h"
 
+const char szVmRSS[] = "VmRSS:";
+const char szVmSize[] = "VmSize:";
+
 int32 GetProcessCPU_Idel_Linux();
 
 int32 GetProcessMemorySize_Linux();
