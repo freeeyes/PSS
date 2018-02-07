@@ -2,11 +2,11 @@
 #define _WINDOWSCPU_H
 
 #ifdef WIN32
-
-#include  <windows.h>
-#include  <Psapi.h>
-#include  <conio.h>
-#include  <stdio.h>
+#include "define.h"
+#include <windows.h>
+#include <Psapi.h>
+#include <conio.h>
+#include <stdio.h>
 
 //在windows下获得CPU使用率的方法
 class CpuUsage
@@ -101,7 +101,7 @@ private:
 };
 
 int GetProcessCPU_Idel();
-int GetProcessMemorySize();
+uint32 GetProcessMemorySize();
 
 #endif
 
