@@ -373,11 +373,6 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 
     DoMessage(m_ThreadInfo.m_tvUpdateTime, pMessage, u2CommandID, u4TimeCost, u2CommandCount, blDeleteFlag);
 
-    if(true == blDeleteFlag)
-    {
-        DeleteMessage(pMessage);
-    }
-
     if(pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CONNECT
        && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CDISCONNET
        && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_SDISCONNET
@@ -404,6 +399,11 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
                                          pMessage->GetMessageBase()->m_u4HeadSrcSize + pMessage->GetMessageBase()->m_u4BodySrcSize,
                                          (uint32)(pMessage->GetMessageBase()->m_u4HeadSrcSize + pMessage->GetMessageBase()->m_u4BodySrcSize),
                                          COMMAND_TYPE_IN);
+    }
+
+    if (true == blDeleteFlag)
+    {
+        DeleteMessage(pMessage);
     }
 
     m_ThreadInfo.m_u4State = THREAD_RUNEND;
