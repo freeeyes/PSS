@@ -383,6 +383,10 @@ int CConsoleMessage::DoCommand(_CommandInfo& CommandInfo, IBuffPacket* pCurrBuff
     {
         DoMessage_TestFileStop(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSATE_PORT_FLOW) == 0)
+    {
+        DoMessage_PortList(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
+    }
     else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSATE_SERVER_CLOSE) == 0)
     {
         //特殊指令，关闭服务器信息，所以要先清理一下内存。
@@ -2632,8 +2636,7 @@ void CConsoleMessage::DoMessage_CommandTimeout(_CommandInfo& CommandInfo, IBuffP
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
-        vecCommandTimeOut CommandTimeOutList;
-        uint32 u4Count = (uint32)CommandTimeOutList.size();
+        uint32 u4Count = 0;
 
         if (CommandInfo.m_u1OutputType == 0)
         {
@@ -2644,26 +2647,6 @@ void CConsoleMessage::DoMessage_CommandTimeout(_CommandInfo& CommandInfo, IBuffP
             char szTemp[MAX_BUFF_1024] = { '\0' };
             sprintf_safe(szTemp, MAX_BUFF_1024, "CommandTimeoutCount(%d)\n", u4Count);
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-        }
-
-        for(uint32 i = 0; i < u4Count; i++)
-        {
-            if (CommandInfo.m_u1OutputType == 0)
-            {
-                (*pBuffPacket) << CommandTimeOutList[i].m_u2CommandID;
-                (*pBuffPacket) << (uint32)CommandTimeOutList[i].m_tvTime.sec();
-                (*pBuffPacket) << (uint32)CommandTimeOutList[i].m_u4TimeOutTime;
-            }
-            else
-            {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "CommandID(%d)\n", CommandTimeOutList[i].m_u2CommandID);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "Time(%d)\n", CommandTimeOutList[i].m_tvTime.sec());
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "TimeOutTime(%d)\n", CommandTimeOutList[i].m_u4TimeOutTime);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            }
         }
     }
 
@@ -3422,6 +3405,29 @@ void CConsoleMessage::DoMessage_TestFileStop(_CommandInfo& CommandInfo, IBuffPac
         u2ReturnCommandID = CONSOLE_COMMAND_FILE_TEST_STOP;
         int nRet = App_FileTestManager::instance()->FileTestEnd();
         (*pBuffPacket) << (uint32)nRet;
+    }
+}
+
+void CConsoleMessage::DoMessage_PortList(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+{
+    if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
+    {
+        u2ReturnCommandID = CONSOLE_COMMAND_PORT_FLOW;
+
+        vector<_Port_Data_Account> vec_Port_Data_Account;
+        App_MessageServiceGroup::instance()->GetFlowPortList(vec_Port_Data_Account);
+
+        uint32 u4Count = (uint32)vec_Port_Data_Account.size();
+
+        (*pBuffPacket) << u4Count;
+
+        for (uint32 i = 0; i < u4Count; i++)
+        {
+            (*pBuffPacket) << vec_Port_Data_Account[i].m_u1Type;
+            (*pBuffPacket) << vec_Port_Data_Account[i].m_u4Port;
+            (*pBuffPacket) << vec_Port_Data_Account[i].m_u4FlowIn;
+            (*pBuffPacket) << vec_Port_Data_Account[i].m_u4FlowOut;
+        }
     }
 }
 

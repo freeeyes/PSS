@@ -38,13 +38,13 @@ struct _CommandData
     //拷贝构造函数
     _CommandData(const _CommandData& ar)
     {
-        this->m_u2CommandID = ar.m_u2CommandID;
+        this->m_u2CommandID    = ar.m_u2CommandID;
         this->m_u4CommandCount = ar.m_u4CommandCount;
-        this->m_u8CommandCost = ar.m_u8CommandCost;
-        this->m_u1CommandType = ar.m_u1CommandType;
-        this->m_u4PacketSize = ar.m_u4PacketSize;
-        this->m_u1PacketType = ar.m_u1PacketType;
-        this->m_tvCommandTime = ar.m_tvCommandTime;
+        this->m_u8CommandCost  = ar.m_u8CommandCost;
+        this->m_u1CommandType  = ar.m_u1CommandType;
+        this->m_u4PacketSize   = ar.m_u4PacketSize;
+        this->m_u1PacketType   = ar.m_u1PacketType;
+        this->m_tvCommandTime  = ar.m_tvCommandTime;
     }
 
     _CommandData& operator = (const _CommandData& ar)
@@ -75,46 +75,6 @@ struct _CommandData
         return *this;
     }
 };
-
-struct _CommandTimeOut
-{
-    uint32         m_u4TimeOutTime;                //超时时间
-    uint16         m_u2CommandID;                  //命令的ID
-    ACE_Time_Value m_tvTime;                       //发生时间
-
-    _CommandTimeOut()
-    {
-        m_u2CommandID   = 0;
-        m_tvTime        = ACE_OS::gettimeofday();
-        m_u4TimeOutTime = 0;
-    }
-
-    //拷贝构造函数
-    _CommandTimeOut(const _CommandTimeOut& ar)
-    {
-        this->m_u2CommandID   = ar.m_u2CommandID;
-        this->m_tvTime        = ar.m_tvTime;
-        this->m_u4TimeOutTime = ar.m_u4TimeOutTime;
-    }
-
-    _CommandTimeOut& operator = (const _CommandTimeOut& ar)
-    {
-        this->m_u2CommandID   = ar.m_u2CommandID;
-        this->m_tvTime        = ar.m_tvTime;
-        this->m_u4TimeOutTime = ar.m_u4TimeOutTime;
-        return *this;
-    }
-
-    _CommandTimeOut& operator += (const _CommandTimeOut& ar)
-    {
-        this->m_u2CommandID   = ar.m_u2CommandID;
-        this->m_tvTime        = ar.m_tvTime;
-        this->m_u4TimeOutTime = ar.m_u4TimeOutTime;
-        return *this;
-    }
-};
-
-typedef vector<_CommandTimeOut> vecCommandTimeOut;   //记录所有超时命令的数组
 
 struct _CommandAlertData
 {
@@ -188,6 +148,27 @@ struct _Port_Data_Account
         m_u4FlowIn     = 0;
         m_u4FlowOut    = 0;
         m_u1Minute     = 0;
+    }
+
+    _Port_Data_Account& operator = (const _Port_Data_Account& ar)
+    {
+        this->m_u1Type    = ar.m_u1Type;
+        this->m_u4Port    = ar.m_u4Port;
+        this->m_u4FlowIn  = ar.m_u4FlowIn;
+        this->m_u4FlowOut = ar.m_u4FlowOut;
+        this->m_u1Minute  = ar.m_u1Minute;
+        return *this;
+    }
+
+    _Port_Data_Account& operator += (const _Port_Data_Account& ar)
+    {
+        if ((this->m_u4Port == ar.m_u4Port) && (this->m_u1Minute == ar.m_u1Minute))
+        {
+            this->m_u4FlowIn += ar.m_u4FlowIn;
+            this->m_u4FlowOut += ar.m_u4FlowOut;
+        }
+
+        return *this;
     }
 
     //初始化数据
@@ -269,6 +250,35 @@ struct _Port_Data_Account
         }
     }
 };
+typedef vector<_Port_Data_Account> vecPortDataAccount;
+
+static void Combo_Port_List(vecPortDataAccount& vec_Port_Data_Account, vecPortDataAccount& vec_Port_Data_All_Account)
+{
+    int n4PartSize = (int)vec_Port_Data_Account.size();
+
+    for (int iLoop = 0; iLoop < n4PartSize; iLoop++)
+    {
+        int n4AllSize = (int)vec_Port_Data_All_Account.size();
+        bool bFound = false;
+
+        for (int jLoop = 0; jLoop < n4AllSize; jLoop++)
+        {
+            if (vec_Port_Data_Account[iLoop].m_u4Port == vec_Port_Data_All_Account[jLoop].m_u4Port)
+            {
+                vec_Port_Data_All_Account[jLoop] += vec_Port_Data_Account[iLoop];
+                bFound = true;
+                break;
+            }
+        }
+
+        if (false == bFound)
+        {
+            vec_Port_Data_All_Account.push_back(vec_Port_Data_Account[iLoop]);
+        }
+    }
+
+    return;
+}
 
 //格式化一个ACE Hash类
 template<class EXT_ID, class INT_ID>
@@ -300,6 +310,8 @@ public:
 
     _CommandFlowAccount GetCommandFlowAccount();                         //得到流量相关信息
     void GetCommandAlertData(vecCommandAlertData& CommandAlertDataList); //得到所有的告警命令信息
+
+    void GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_Account);    //根据不同的监听端口，获得当前的端口对应的出入口数据信息
 
     void Close();
 

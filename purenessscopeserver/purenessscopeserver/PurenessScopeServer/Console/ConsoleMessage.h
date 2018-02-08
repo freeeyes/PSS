@@ -86,6 +86,7 @@ enum
 #define CONSOLE_COMMAND_CLOSE_SERVER       0x1030
 #define CONSOLE_COMMAND_FILE_TEST_START    0x1031
 #define CONSOLE_COMMAND_FILE_TEST_STOP     0x1032
+#define CONSOLE_COMMAND_PORT_FLOW          0x1033
 
 //目前支持的命令
 #define CONSOLEMESSAHE_LOADMOUDLE         "LoadModule"          //加载模块
@@ -132,6 +133,7 @@ enum
 #define CONSOLEMESSATE_SERVER_CLOSE       "ServerClose"         //关闭当前服务器
 #define CONSOLEMESSATE_FILE_TEST_START    "TestFileStart"       //启动服务器文件测试用例
 #define CONSOLEMESSATE_FILE_TEST_STOP     "TestFileStop"        //停止服务器文件测试用例
+#define CONSOLEMESSATE_PORT_FLOW          "PortFlow"            //得到当前时间的端口流量数据  
 
 //命令处理参数
 struct _CommandInfo
@@ -276,6 +278,7 @@ private:
     void DoMessage_ServerClose(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
     void DoMessage_TestFileStart(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
     void DoMessage_TestFileStop(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    void DoMessage_PortList(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
 
 private:
     vecConsoleKey*      m_pvecConsoleKey;

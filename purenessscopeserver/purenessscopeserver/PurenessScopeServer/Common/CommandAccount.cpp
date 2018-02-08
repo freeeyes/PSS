@@ -340,3 +340,21 @@ void CCommandAccount::GetCommandAlertData(vecCommandAlertData& CommandAlertDataL
 {
     CommandAlertDataList.insert(CommandAlertDataList.end(), m_vecCommandAlertData.begin(), m_vecCommandAlertData.end());
 }
+
+void CCommandAccount::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_Account)
+{
+    vec_Port_Data_Account.clear();
+    _Port_Data_Account obj_Port_Data_Account;
+
+    for (ACE_Hash_Map<uint32, _Port_Data_Account*>::iterator iter = m_objectPortAccount.begin();
+         iter != m_objectPortAccount.end(); iter++)
+    {
+        _Port_Data_Account* p_Port_Data_Account = (*iter).int_id_;
+
+        if (NULL != p_Port_Data_Account)
+        {
+            obj_Port_Data_Account = *p_Port_Data_Account;
+            vec_Port_Data_Account.push_back(obj_Port_Data_Account);
+        }
+    }
+}

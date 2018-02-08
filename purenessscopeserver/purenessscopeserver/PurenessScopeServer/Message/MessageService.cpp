@@ -731,7 +731,12 @@ void CMessageService::DeleteMessage(CMessage* pMessage)
     m_MessagePool.Delete(pMessage);
 }
 
-int CMessageService::handle_signal (int signum,siginfo_t* siginfo,ucontext_t* ucontext)
+void CMessageService::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_Account)
+{
+    m_CommandAccount.GetFlowPortList(vec_Port_Data_Account);
+}
+
+int CMessageService::handle_signal(int signum, siginfo_t* siginfo, ucontext_t* ucontext)
 {
     if (signum == SIGUSR1 + grp_id())
     {
@@ -1113,6 +1118,24 @@ bool CMessageServiceGroup::AddDyeingCommand(uint16 u2CommandID, uint16 u2MaxCoun
 void CMessageServiceGroup::GetDyeingCommand(vec_Dyeing_Command_list& objList)
 {
     m_objMessageDyeingManager.GetDyeingCommand(objList);
+}
+
+void CMessageServiceGroup::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_Account)
+{
+    vec_Port_Data_Account.clear();
+    vector<_Port_Data_Account> vec_Service_Port_Data_Account;
+
+    for (int i = 0; i < (int)m_vecMessageService.size(); i++)
+    {
+        CMessageService* pMessageService = m_vecMessageService[i];
+
+        if (NULL != pMessageService)
+        {
+            pMessageService->GetFlowPortList(vec_Service_Port_Data_Account);
+
+            Combo_Port_List(vec_Service_Port_Data_Account, vec_Port_Data_Account);
+        }
+    }
 }
 
 CThreadInfo* CMessageServiceGroup::GetThreadInfo()

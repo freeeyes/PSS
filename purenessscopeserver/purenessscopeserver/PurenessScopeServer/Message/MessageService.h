@@ -85,6 +85,8 @@ public:
     CMessage* CreateMessage();
     void DeleteMessage(CMessage* pMessage);
 
+    void GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_Account);  //得到当前列表描述信息
+
 private:
     bool ProcessMessage(CMessage* pMessage, uint32 u4ThreadID);
     bool SaveThreadInfoData();
@@ -159,6 +161,8 @@ public:
     void AddDyringIP(const char* pClientIP, uint16 u2MaxCount);                               //染色指定的IP
     bool AddDyeingCommand(uint16 u2CommandID, uint16 u2MaxCount);                             //染色指定的CommandID
     void GetDyeingCommand(vec_Dyeing_Command_list& objList);                                  //获得当前命令染色状态
+
+    void GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_Account);                  //得到当前列表描述信息
 
 private:
     bool StartTimer();
