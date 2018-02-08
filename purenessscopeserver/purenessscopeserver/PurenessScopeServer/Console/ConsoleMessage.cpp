@@ -2633,7 +2633,6 @@ void CConsoleMessage::DoMessage_CommandTimeout(_CommandInfo& CommandInfo, IBuffP
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
         vecCommandTimeOut CommandTimeOutList;
-        App_MessageServiceGroup::instance()->GetCommandTimeOut(CommandTimeOutList);
         uint32 u4Count = (uint32)CommandTimeOutList.size();
 
         if (CommandInfo.m_u1OutputType == 0)
@@ -2675,8 +2674,6 @@ void CConsoleMessage::DoMessage_CommandTimeoutclr(_CommandInfo& CommandInfo, IBu
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
-        App_MessageServiceGroup::instance()->ClearCommandTimeOut();
-
         if (CommandInfo.m_u1OutputType == 0)
         {
             (*pBuffPacket) << (uint8)0;

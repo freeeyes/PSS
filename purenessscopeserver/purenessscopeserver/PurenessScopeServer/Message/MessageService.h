@@ -71,9 +71,7 @@ public:
 
     _CommandData* GetCommandData(uint16 u2CommandID);                      //得到命令相关信息
     _CommandFlowAccount GetCommandFlowAccount();                           //得到流量相关信息
-    void GetCommandTimeOut(vecCommandTimeOut& CommandTimeOutList);         //得到所有超时命令
     void GetCommandAlertData(vecCommandAlertData& CommandAlertDataList);   //得到所有超过告警阀值的命令
-    void ClearCommandTimeOut();                                            //清除所有的超时告警
     void SaveCommandDataLog();                                             //存储统计日志
     void SetThreadState(MESSAGE_SERVICE_THREAD_STATE emState);             //设置线程状态
     MESSAGE_SERVICE_THREAD_STATE GetThreadState();                         //得到当前线程状态
@@ -150,9 +148,7 @@ public:
     void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);                    //获得指定命令统计信息
     void GetFlowInfo(_CommandFlowAccount& objCommandFlowAccount);                             //获得指定流量相关信息
 
-    void GetCommandTimeOut(vecCommandTimeOut& CommandTimeOutList);                            //得到所有超时命令
     void GetCommandAlertData(vecCommandAlertData& CommandAlertDataList);                      //得到所有超过告警阀值的命令
-    void ClearCommandTimeOut();                                                               //清理所有的超时告警
     void SaveCommandDataLog();                                                                //存储统计日志
 
     CMessage* CreateMessage(uint32 u4ConnectID, uint8 u1PacketType);                          //从子线程中获取一个Message对象

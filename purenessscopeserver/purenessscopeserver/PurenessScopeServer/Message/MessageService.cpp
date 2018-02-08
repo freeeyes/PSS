@@ -394,7 +394,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 
         //添加统计信息
         m_CommandAccount.SaveCommandData(u2CommandID,
-                                         (uint64)u4TimeCost,
+                                         pMessage->GetMessageBase()->m_u4ListenPort,
                                          pMessage->GetMessageBase()->m_u1PacketType,
                                          pMessage->GetMessageBase()->m_u4HeadSrcSize + pMessage->GetMessageBase()->m_u4BodySrcSize,
                                          COMMAND_TYPE_IN);
@@ -682,19 +682,9 @@ _CommandFlowAccount CMessageService::GetCommandFlowAccount()
     return m_CommandAccount.GetCommandFlowAccount();
 }
 
-void CMessageService::GetCommandTimeOut(vecCommandTimeOut& CommandTimeOutList)
-{
-    m_CommandAccount.GetCommandTimeOut(CommandTimeOutList);
-}
-
 void CMessageService::GetCommandAlertData(vecCommandAlertData& CommandAlertDataList)
 {
     m_CommandAccount.GetCommandAlertData(CommandAlertDataList);
-}
-
-void CMessageService::ClearCommandTimeOut()
-{
-    m_CommandAccount.ClearTimeOut();
 }
 
 void CMessageService::SaveCommandDataLog()
@@ -1267,18 +1257,6 @@ void CMessageServiceGroup::GetFlowInfo(_CommandFlowAccount& objCommandFlowAccoun
     }
 }
 
-void CMessageServiceGroup::GetCommandTimeOut(vecCommandTimeOut& CommandTimeOutList)
-{
-    for (int i = 0; i < (int)m_vecMessageService.size(); i++)
-    {
-        CMessageService* pMessageService = m_vecMessageService[i];
-
-        if (NULL != pMessageService)
-        {
-            pMessageService->GetCommandTimeOut(CommandTimeOutList);
-        }
-    }
-}
 
 void CMessageServiceGroup::GetCommandAlertData(vecCommandAlertData& CommandAlertDataList)
 {
@@ -1289,19 +1267,6 @@ void CMessageServiceGroup::GetCommandAlertData(vecCommandAlertData& CommandAlert
         if (NULL != pMessageService)
         {
             pMessageService->GetCommandAlertData(CommandAlertDataList);
-        }
-    }
-}
-
-void CMessageServiceGroup::ClearCommandTimeOut()
-{
-    for (int i = 0; i < (int)m_vecMessageService.size(); i++)
-    {
-        CMessageService* pMessageService = m_vecMessageService[i];
-
-        if (NULL != pMessageService)
-        {
-            pMessageService->ClearCommandTimeOut();
         }
     }
 }
