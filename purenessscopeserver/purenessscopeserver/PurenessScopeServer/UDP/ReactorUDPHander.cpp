@@ -198,7 +198,7 @@ bool CReactorUDPHander::SendMessage(const char*& pMessage, uint32 u4Len, const c
 
             //统计发送信息
             uint32 u4Cost = (uint32)(ACE_OS::gethrtime() - m_tvBegin);
-            m_CommandAccount.SaveCommandData(u2CommandID, u4Cost, PACKET_UDP, (uint32)pMbData->length(), u4Len, COMMAND_TYPE_OUT);
+            m_CommandAccount.SaveCommandData(u2CommandID, u4Cost, PACKET_UDP, u4Len, COMMAND_TYPE_OUT);
 
             //释放发送体
             App_MessageBlockManager::instance()->Close(pMbData);
@@ -233,7 +233,7 @@ bool CReactorUDPHander::SendMessage(const char*& pMessage, uint32 u4Len, const c
 
             //统计发送信息
             uint32 u4Cost = (uint32)(ACE_OS::gethrtime() - m_tvBegin);
-            m_CommandAccount.SaveCommandData(u2CommandID, u4Cost, PACKET_UDP, u4Len, u4Len, COMMAND_TYPE_OUT);
+            m_CommandAccount.SaveCommandData(u2CommandID, u4Cost, PACKET_UDP, u4Len, COMMAND_TYPE_OUT);
 
             return true;
         }

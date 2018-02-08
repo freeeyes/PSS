@@ -76,7 +76,7 @@ void CCommandAccount::Close()
     m_u1CommandAccount = 0;
 }
 
-bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint64 u8CommandCost, uint8 u1PacketType, uint32 u4PacketSize, uint32 u4CommandSize, uint8 u1CommandType, ACE_Time_Value tvTime)
+bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint64 u8CommandCost, uint8 u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value tvTime)
 {
     //统计数据到达时间，是否已经超越了限定的阀值，如果超越了，写入日志。
     if(m_u8PacketTimeout < u8CommandCost)
@@ -148,7 +148,6 @@ bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint64 u8CommandCost, 
             pCommandData->m_u8CommandCost += u8CommandCost;
             pCommandData->m_u1PacketType  = u1PacketType;
             pCommandData->m_u4PacketSize  += u4PacketSize;
-            pCommandData->m_u4CommandSize += u4CommandSize;
             pCommandData->m_tvCommandTime = tvTime;
         }
         else
@@ -164,7 +163,6 @@ bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint64 u8CommandCost, 
                 pCommandData->m_u8CommandCost  = u8CommandCost;
                 pCommandData->m_u1PacketType   = u1PacketType;
                 pCommandData->m_u4PacketSize   += u4PacketSize;
-                pCommandData->m_u4CommandSize  += u4CommandSize;
                 pCommandData->m_tvCommandTime  = tvTime;
 
                 if (-1 == m_objCommandDataList.Add_Hash_Data(szHashID, pCommandData))
@@ -258,14 +256,13 @@ bool CCommandAccount::SaveCommandDataLog()
                 strPacketType = "UDP";
             }
 
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_COMMANDDATA, "CommandID=0x%04x, CommandType=%s, CommandCount=%d, CommandCost=%lldns, PacketType=%s, PacketSize=%d, CommandSize=%d, CommandLastTime=%04d-%02d-%02d %02d:%02d:%02d%",
+            AppLogManager::instance()->WriteLog(LOG_SYSTEM_COMMANDDATA, "CommandID=0x%04x, CommandType=%s, CommandCount=%d, CommandCost=%lldns, PacketType=%s, PacketSize=%d, CommandLastTime=%04d-%02d-%02d %02d:%02d:%02d%",
                                                 (int32)pCommandData->m_u2CommandID,
                                                 strCommandType.c_str(),
                                                 (int32)pCommandData->m_u4CommandCount,
                                                 (uint64)pCommandData->m_u8CommandCost,
                                                 strPacketType.c_str(),
                                                 (uint32)pCommandData->m_u4PacketSize,
-                                                (uint32)pCommandData->m_u4CommandSize,
                                                 dtLastTime.year(), dtLastTime.month(), dtLastTime.day(), dtLastTime.hour(), dtLastTime.minute(), dtLastTime.second());
 
         }

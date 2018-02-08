@@ -2083,7 +2083,7 @@ bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
             OUR_DEBUG((LM_INFO, "[CProConnectManager::SendMessage]ConnectID=%d, CommandID=%d, SendMessage error.\n", u4ConnectID, u2CommandID));
         }
 
-        if (false == m_CommandAccount.SaveCommandData(u2CommandID, (uint64)0, PACKET_TCP, u4PacketSize, u4CommandSize, COMMAND_TYPE_OUT))
+        if (false == m_CommandAccount.SaveCommandData(u2CommandID, (uint64)0, PACKET_TCP, u4CommandSize, COMMAND_TYPE_OUT))
         {
             OUR_DEBUG((LM_INFO, "[CProConnectManager::SendMessage]ConnectID=%d, CommandID=%d, SaveCommandData error.\n", u4ConnectID, u2CommandID));
         }

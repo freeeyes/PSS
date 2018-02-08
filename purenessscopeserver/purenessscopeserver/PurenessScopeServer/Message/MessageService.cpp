@@ -397,7 +397,6 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
                                          (uint64)u4TimeCost,
                                          pMessage->GetMessageBase()->m_u1PacketType,
                                          pMessage->GetMessageBase()->m_u4HeadSrcSize + pMessage->GetMessageBase()->m_u4BodySrcSize,
-                                         (uint32)(pMessage->GetMessageBase()->m_u4HeadSrcSize + pMessage->GetMessageBase()->m_u4BodySrcSize),
                                          COMMAND_TYPE_IN);
     }
 

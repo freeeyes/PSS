@@ -18,8 +18,7 @@ struct _CommandData
 {
     uint64 m_u8CommandCost;                //命令的执行耗费总时间
     uint32 m_u4CommandCount;               //命令的总调用次数
-    uint32 m_u4PacketSize;                 //命令产生的总流量(未解密)
-    uint32 m_u4CommandSize;                //命令产生的总流量(解密)
+    uint32 m_u4PacketSize;                 //命令产生的总流量
     uint16 m_u2CommandID;                  //命令的ID
     uint8  m_u1PacketType;                 //数据包来源类型
     uint8  m_u1CommandType;                //命令的类型，0是收到的命令，1是发出的命令
@@ -31,7 +30,6 @@ struct _CommandData
         m_u4CommandCount = 0;
         m_u8CommandCost  = 0;
         m_u4PacketSize   = 0;
-        m_u4CommandSize  = 0;
         m_u1PacketType   = PACKET_TCP;
         m_u1CommandType  = COMMAND_TYPE_IN;
     }
@@ -44,7 +42,6 @@ struct _CommandData
         this->m_u8CommandCost = ar.m_u8CommandCost;
         this->m_u1CommandType = ar.m_u1CommandType;
         this->m_u4PacketSize = ar.m_u4PacketSize;
-        this->m_u4CommandSize = ar.m_u4CommandSize;
         this->m_u1PacketType = ar.m_u1PacketType;
         this->m_tvCommandTime = ar.m_tvCommandTime;
     }
@@ -56,7 +53,6 @@ struct _CommandData
         this->m_u8CommandCost  = ar.m_u8CommandCost;
         this->m_u1CommandType  = ar.m_u1CommandType;
         this->m_u4PacketSize   = ar.m_u4PacketSize;
-        this->m_u4CommandSize  = ar.m_u4CommandSize;
         this->m_u1PacketType   = ar.m_u1PacketType;
         this->m_tvCommandTime  = ar.m_tvCommandTime;
         return *this;
@@ -73,7 +69,6 @@ struct _CommandData
         this->m_u8CommandCost  += ar.m_u8CommandCost;
         this->m_u1CommandType  += ar.m_u1CommandType;
         this->m_u4PacketSize   += ar.m_u4PacketSize;
-        this->m_u4CommandSize  += ar.m_u4CommandSize;
         this->m_u1PacketType   += ar.m_u1PacketType;
         this->m_tvCommandTime  += ar.m_tvCommandTime;
         return *this;
@@ -187,7 +182,9 @@ public:
     void Init(uint8 u1CommandAccount, uint8 u1Flow, uint16 u2RecvTimeout);
     void AddCommandAlert(uint16 u2CommandID, uint32 u4Count, uint32 u4MailID);
 
-    bool   SaveCommandData(uint16 u2CommandID, uint64 u8CommandCost, uint8 u1PacketType = PACKET_TCP, uint32 u4PacketSize = 0, uint32 u4CommandSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN, ACE_Time_Value tvTime = ACE_OS::gettimeofday());   //记录命令执行信息
+    bool   SaveCommandData(uint16 u2CommandID, uint64 u8CommandCost, uint8 u1PacketType = PACKET_TCP,
+                           uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,
+                           ACE_Time_Value tvTime = ACE_OS::gettimeofday());   //记录命令执行信息
     bool   SaveCommandDataLog();                       //存储命令执行信息的日志
     void   ClearTimeOut();                             //清理超时时间的命令日志
     uint32 GetTimeoutCount();                          //得到超时命令日志个数

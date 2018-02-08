@@ -2217,7 +2217,7 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
         ACE_Time_Value tvInterval = ACE_OS::gettimeofday() - tvSendBegin;
         uint32 u4SendCost = (uint32)(tvInterval.msec());
         pConnectHandler->SetSendQueueTimeCost(u4SendCost);
-        m_CommandAccount.SaveCommandData(u2CommandID, (uint64)u4SendCost, PACKET_TCP, u4PacketSize, u4PacketSize, COMMAND_TYPE_OUT);
+        m_CommandAccount.SaveCommandData(u2CommandID, (uint64)u4SendCost, PACKET_TCP, u4PacketSize, COMMAND_TYPE_OUT);
         return true;
     }
     else
