@@ -5,6 +5,7 @@
 #include "ace/Thread_Mutex.h"
 #include "HashTable.h"
 
+#include "ObjectArrayList.h"
 #include "MessageBlockManager.h"
 #include "BuffPacket.h"
 #include "IMessage.h"
@@ -69,6 +70,7 @@ public:
 
 private:
     CHashTable<CMessage>        m_objHashMessageList;                  //Message对象池
+    CObjectArrayList<CMessage>  m_objMessageList;                      //数组对象
     ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;                     //控制多线程锁
 };
 

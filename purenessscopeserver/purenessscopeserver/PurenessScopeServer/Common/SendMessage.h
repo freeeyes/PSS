@@ -4,6 +4,7 @@
 #include "define.h"
 #include "IBuffPacket.h"
 #include "HashTable.h"
+#include "ObjectArrayList.h"
 
 using namespace std;
 
@@ -131,8 +132,9 @@ public:
     int32 GetFreeCount();
 
 private:
-    CHashTable<_SendMessage>    m_objHashHandleList;
-    ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;                     //控制多线程锁
+    CHashTable<_SendMessage>        m_objHashHandleList;
+    CObjectArrayList<_SendMessage>  m_objSendMessageList;
+    ACE_Recursive_Thread_Mutex      m_ThreadWriteLock;                     //控制多线程锁
 };
 #endif
 

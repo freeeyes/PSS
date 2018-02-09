@@ -176,11 +176,12 @@ void CMessagePool::Init(uint32 u4PacketCount)
     Close();
 
     //初始化HashTable
+    m_objMessageList.Init(u4PacketCount);
     m_objHashMessageList.Init((int)u4PacketCount);
 
     for(int i = 0; i < (int)u4PacketCount; i++)
     {
-        CMessage* pPacket = new CMessage();
+        CMessage* pPacket = m_objMessageList.GetObject(i);
 
         if(NULL != pPacket)
         {
@@ -200,15 +201,6 @@ void CMessagePool::Init(uint32 u4PacketCount)
 void CMessagePool::Close()
 {
     //清理所有已存在的指针
-    vector<CMessage*> vecMessage;
-    m_objHashMessageList.Get_All_Used(vecMessage);
-
-    for(int i = 0; i < (int)vecMessage.size(); i++)
-    {
-        CMessage* pMessage = vecMessage[i];
-        SAFE_DELETE(pMessage);
-    }
-
     m_objHashMessageList.Close();
 }
 

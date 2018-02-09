@@ -16,11 +16,12 @@ void CSendMessagePool::Init(int32 nObjcetCount)
     Close();
 
     //初始化HashTable
+    m_objSendMessageList.Init((uint32)nObjcetCount);
     m_objHashHandleList.Init((int32)nObjcetCount);
 
     for(int32 i = 0; i < nObjcetCount; i++)
     {
-        _SendMessage* pMessage = new _SendMessage();
+        _SendMessage* pMessage = m_objSendMessageList.GetObject(i);
 
         if(NULL != pMessage)
         {
@@ -40,15 +41,6 @@ void CSendMessagePool::Init(int32 nObjcetCount)
 void CSendMessagePool::Close()
 {
     //清理所有已存在的指针
-    vector<_SendMessage*> vecSendMessage;
-    m_objHashHandleList.Get_All_Used(vecSendMessage);
-
-    for(int32 i = 0; i < (int32)vecSendMessage.size(); i++)
-    {
-        _SendMessage* pMessage = vecSendMessage[i];
-        SAFE_DELETE(pMessage);
-    }
-
     m_objHashHandleList.Close();
 }
 

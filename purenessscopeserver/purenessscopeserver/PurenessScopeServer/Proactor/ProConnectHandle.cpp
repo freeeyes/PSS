@@ -2815,7 +2815,7 @@ void CProConnectHandlerPool::Init(int nObjcetCount)
     Close();
 
     //初始化HashTable
-    m_objHandlerList.Init((int)nObjcetCount);
+    m_objHandlerList.Init((uint32)nObjcetCount);
     m_objHashHandleList.Init((int)nObjcetCount);
 
     for(int i = 0; i < nObjcetCount; i++)
@@ -2845,9 +2845,6 @@ void CProConnectHandlerPool::Init(int nObjcetCount)
 void CProConnectHandlerPool::Close()
 {
     //清理所有已存在的指针
-    vector<CProConnectHandle*> vecProConnectHandle;
-    m_objHashHandleList.Get_All_Used(vecProConnectHandle);
-
     m_u4CurrMaxCount  = 1;
 }
 

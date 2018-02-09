@@ -2975,7 +2975,7 @@ void CConnectHandlerPool::Init(int nObjcetCount)
     Close();
 
     //初始化HashTable
-    m_objHandlerList.Init((int)nObjcetCount);
+    m_objHandlerList.Init((uint32)nObjcetCount);
     m_objHashHandleList.Init((int)nObjcetCount);
 
     for(int i = 0; i < nObjcetCount; i++)
@@ -3003,9 +3003,6 @@ void CConnectHandlerPool::Init(int nObjcetCount)
 void CConnectHandlerPool::Close()
 {
     //清理所有已存在的指针
-    vector<CConnectHandler*> vecConnectHandler;
-    m_objHashHandleList.Get_All_Used(vecConnectHandler);
-
     m_u4CurrMaxCount  = 1;
 }
 
