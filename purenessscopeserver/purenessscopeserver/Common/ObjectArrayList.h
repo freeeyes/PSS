@@ -30,7 +30,7 @@ public:
     {
         if (u4Index < m_u4Count)
         {
-            return &m_pMemonyList[u4Index];
+            return m_pMemonyList + u4Index;
         }
         else
         {
