@@ -52,18 +52,22 @@ public:
         }
     }
 
-    void GetCommandFlowAccount(_CommandFlowAccount& objCommandFlow)
+    void GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut)
     {
         //得到当前所有UDP的出口流量之和
         ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
 
         for (int i = 0; i < (int)m_vecProactorUDPHandler.size(); i++)
         {
+            uint32 u4UDPFlowIn  = 0;
+            uint32 u4UDPFlowOut = 0;
             CProactorUDPHandler* pProactotUDPHandler = m_vecProactorUDPHandler[i];
 
             if (NULL != pProactotUDPHandler)
             {
-                objCommandFlow.m_u4FlowOut += pProactotUDPHandler->GetFlowOut();
+                pProactotUDPHandler->GetFlowInfo(u4UDPFlowIn, u4UDPFlowOut);
+                u4FlowIn  += u4UDPFlowIn;
+                u4FlowOut += u4UDPFlowOut;
             }
         }
     }

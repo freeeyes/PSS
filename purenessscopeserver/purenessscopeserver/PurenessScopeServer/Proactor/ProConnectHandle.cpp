@@ -2734,9 +2734,10 @@ _CommandData* CProConnectManager::GetCommandData(uint16 u2CommandID)
     return m_CommandAccount.GetCommandData(u2CommandID);
 }
 
-uint32 CProConnectManager::GetCommandFlowAccount()
+void CProConnectManager::GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut)
 {
-    return m_CommandAccount.GetFlowOut();
+    u4FlowIn  = m_CommandAccount.GetFlowIn();
+    u4FlowOut = m_CommandAccount.GetFlowOut();
 }
 
 EM_Client_Connect_status CProConnectManager::GetConnectState(uint32 u4ConnectID)
@@ -3483,7 +3484,7 @@ void CProConnectManagerGroup::GetCommandData(uint16 u2CommandID, _CommandData& o
     }
 }
 
-void CProConnectManagerGroup::GetCommandFlowAccount(_CommandFlowAccount& objCommandFlowAccount)
+void CProConnectManagerGroup::GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut)
 {
     for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
     {
@@ -3491,8 +3492,7 @@ void CProConnectManagerGroup::GetCommandFlowAccount(_CommandFlowAccount& objComm
 
         if(NULL != pConnectManager)
         {
-            uint32 u4FlowOut =  pConnectManager->GetCommandFlowAccount();
-            objCommandFlowAccount.m_u4FlowOut += u4FlowOut;
+            pConnectManager->GetFlowInfo(u4FlowIn, u4FlowOut);
         }
     }
 }

@@ -70,7 +70,7 @@ public:
     void SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime);  //设置AI
 
     _CommandData* GetCommandData(uint16 u2CommandID);                      //得到命令相关信息
-    _CommandFlowAccount GetCommandFlowAccount();                           //得到流量相关信息
+    void GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut);                 //得到流量相关信息
     void GetCommandAlertData(vecCommandAlertData& CommandAlertDataList);   //得到所有超过告警阀值的命令
     void SaveCommandDataLog();                                             //存储统计日志
     void SetThreadState(MESSAGE_SERVICE_THREAD_STATE emState);             //设置线程状态
@@ -148,7 +148,7 @@ public:
     void SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime);  //设置AI
 
     void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);                    //获得指定命令统计信息
-    void GetFlowInfo(_CommandFlowAccount& objCommandFlowAccount);                             //获得指定流量相关信息
+    void GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut);                                    //获得指定流量相关信息
 
     void GetCommandAlertData(vecCommandAlertData& CommandAlertDataList);                      //得到所有超过告警阀值的命令
     void SaveCommandDataLog();                                                                //存储统计日志

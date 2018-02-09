@@ -2141,64 +2141,63 @@ void CConsoleMessage::DoMessage_ShowProcessInfo(_CommandInfo& CommandInfo, IBuff
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
-        _CommandFlowAccount objCommandFlowIn;
-        _CommandFlowAccount objCommandFlowOut;
-        _CommandFlowAccount objCommandFlowUdpOut;
+        int nCPU         = 0;
+        int nMemorySize  = 0;
+        uint8 u1Flow     = App_MainConfig::instance()->GetCommandFlow();      //流量统计标记位
+        uint32 u4FlowIn  = 0;      //总流量流入字节
+        uint32 u4FlowOut = 0;      //总流量流出字节
+
 
         //得到入口的所有流量统计
-        App_MessageServiceGroup::instance()->GetFlowInfo(objCommandFlowIn);
+        uint32 u4MessageFlowIn  = 0;
+        uint32 u4MessageFlowOut = 0;
+        App_MessageServiceGroup::instance()->GetFlowInfo(u4MessageFlowIn, u4MessageFlowOut);
+        u4FlowIn  += u4MessageFlowIn;
+        u4FlowOut += u4MessageFlowOut;
 
 #ifdef WIN32  //如果是windows
         //得到所有TCP出口流量统计
-        App_ProConnectManager::instance()->GetCommandFlowAccount(objCommandFlowOut);
+        uint32 u4ConnectFlowIn  = 0;
+        uint32 u4ConnectFlowOut = 0;
+        App_ProConnectManager::instance()->GetFlowInfo(u4ConnectFlowIn, u4ConnectFlowOut);
+        u4FlowIn  += u4ConnectFlowIn;
+        u4FlowOut += u4ConnectFlowOut;
 
         //得到多有UDP出口流量统计
-        App_ProUDPManager::instance()->GetCommandFlowAccount(objCommandFlowUdpOut);
+        uint32 u4UdpFlowIn  = 0;
+        uint32 u4UdpFlowOut = 0;
+        App_ProUDPManager::instance()->GetFlowInfo(u4UdpFlowIn, u4UdpFlowOut);
+        u4FlowIn  += u4UdpFlowIn;
+        u4FlowOut += u4UdpFlowOut;
 
-        int nCPU = GetProcessCPU_Idel();
-        int nMemorySize = GetProcessMemorySize();
-
-        if (CommandInfo.m_u1OutputType == 0)
-        {
-            (*pBuffPacket) << (uint32)nCPU;
-            (*pBuffPacket) << (uint32)nMemorySize;
-            (*pBuffPacket) << (uint8)objCommandFlowIn.m_u1FLow;
-            (*pBuffPacket) << (uint32)objCommandFlowIn.m_u4FlowIn;
-            (*pBuffPacket) << (uint32)objCommandFlowOut.m_u4FlowOut + objCommandFlowUdpOut.m_u4FlowOut;
-        }
-        else
-        {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "CPUUsedRote(%d%%)\n", nCPU);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "MemorySize(%d Byte)\n", nMemorySize);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "FLowSize(%d)\n", objCommandFlowIn.m_u1FLow);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "FlowIn(%d)\n", objCommandFlowIn.m_u4FlowIn);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "FlowOut(%d)\n", objCommandFlowIn.m_u4FlowOut);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-        }
-
-
+        nCPU = GetProcessCPU_Idel();
+        nMemorySize = GetProcessMemorySize();
 #else   //如果是linux
         //得到所有TCP出口流量统计
-        App_ConnectManager::instance()->GetCommandFlowAccount(objCommandFlowOut);
+        uint32 u4ConnectFlowIn = 0;
+        uint32 u4ConnectFlowOut = 0;
+        App_ConnectManager::instance()->GetFlowInfo(u4ConnectFlowIn, u4ConnectFlowOut);
+        u4FlowIn  += u4MessageFlowIn;
+        u4FlowOut += u4MessageFlowOut;
 
         //得到多有UDP出口流量统计
-        App_ReUDPManager::instance()->GetCommandFlowAccount(objCommandFlowUdpOut);
+        uint32 u4UdpFlowIn = 0;
+        uint32 u4UdpFlowOut = 0;
+        App_ReUDPManager::instance()->GetFlowInfo(u4UdpFlowIn, u4UdpFlowOut);
+        u4FlowIn  += u4UdpFlowIn;
+        u4FlowOut += u4UdpFlowOut;
 
-        int nCPU = GetProcessCPU_Idel_Linux();
-        int nMemorySize = GetProcessMemorySize_Linux();
+        nCPU = GetProcessCPU_Idel_Linux();
+        nMemorySize = GetProcessMemorySize_Linux();
+#endif
 
         if (CommandInfo.m_u1OutputType == 0)
         {
             (*pBuffPacket) << (uint32)nCPU;
             (*pBuffPacket) << (uint32)nMemorySize;
-            (*pBuffPacket) << (uint8)objCommandFlowIn.m_u1FLow;
-            (*pBuffPacket) << (uint32)objCommandFlowIn.m_u4FlowIn;
-            (*pBuffPacket) << (uint32)objCommandFlowOut.m_u4FlowOut + objCommandFlowUdpOut.m_u4FlowOut;
+            (*pBuffPacket) << u1Flow;
+            (*pBuffPacket) << u4FlowIn;
+            (*pBuffPacket) << u4FlowOut;
         }
         else
         {
@@ -2207,15 +2206,13 @@ void CConsoleMessage::DoMessage_ShowProcessInfo(_CommandInfo& CommandInfo, IBuff
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
             sprintf_safe(szTemp, MAX_BUFF_1024, "MemorySize(%d Byte)\n", nMemorySize);
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "FLowSize(%d)\n", objCommandFlowIn.m_u1FLow);
+            sprintf_safe(szTemp, MAX_BUFF_1024, "FLowSize(%d)\n", u1Flow);
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "FlowIn(%d)\n", objCommandFlowIn.m_u4FlowIn);
+            sprintf_safe(szTemp, MAX_BUFF_1024, "FlowIn(%d)\n", u4FlowIn);
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "FlowOut(%d)\n", objCommandFlowIn.m_u4FlowOut);
+            sprintf_safe(szTemp, MAX_BUFF_1024, "FlowOut(%d)\n", u4FlowOut);
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
         }
-
-#endif
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_PROCESSINFO;
@@ -3312,15 +3309,26 @@ void CConsoleMessage::DoMessage_MonitorInfo(_CommandInfo& CommandInfo, IBuffPack
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
-        _CommandFlowAccount objCommandFlowIn;
-        _CommandFlowAccount objCommandFlowOut;
+        uint32 u4FlowIn  = 0;
+        uint32 u4FlowOut = 0;
 
         //得到入口的所有流量统计
-        App_MessageServiceGroup::instance()->GetFlowInfo(objCommandFlowIn);
+        App_MessageServiceGroup::instance()->GetFlowInfo(u4FlowIn, u4FlowOut);
 
 #if WIN32
-        //得到所有出口流量统计
-        App_ProConnectManager::instance()->GetCommandFlowAccount(objCommandFlowOut);
+        //得到所有Connect流量统计
+        uint32 u4ConnectFlowIn  = 0;
+        uint32 u4ConnectFlowOut = 0;
+        App_ProConnectManager::instance()->GetFlowInfo(u4ConnectFlowIn, u4ConnectFlowOut);
+        u4FlowIn  += u4ConnectFlowIn;
+        u4FlowOut += u4ConnectFlowOut;
+
+        //得到所有UDP的流量统计
+        uint32 u4UdpFlowIn = 0;
+        uint32 u4UdpFlowOut = 0;
+        App_ProUDPManager::instance()->GetFlowInfo(u4UdpFlowIn, u4UdpFlowOut);
+        u4FlowIn  += u4UdpFlowIn;
+        u4FlowOut += u4UdpFlowOut;
 
         int nActiveClient = App_ProConnectManager::instance()->GetCount();
         int nPoolClient   = App_ProConnectHandlerPool::instance()->GetFreeCount();
@@ -3328,11 +3336,22 @@ void CConsoleMessage::DoMessage_MonitorInfo(_CommandInfo& CommandInfo, IBuffPack
         (*pBuffPacket) << (uint32)nPoolClient;
         (*pBuffPacket) << (uint16)App_MainConfig::instance()->GetMaxHandlerCount();
         (*pBuffPacket) << (uint16)App_ConnectAccount::instance()->GetCurrConnect();
-        (*pBuffPacket) << objCommandFlowIn.m_u4FlowIn;
-        (*pBuffPacket) << objCommandFlowOut.m_u4FlowOut;
+        (*pBuffPacket) << u4FlowIn;
+        (*pBuffPacket) << u4FlowOut;
 #else
         //得到所有出口流量统计
-        App_ConnectManager::instance()->GetCommandFlowAccount(objCommandFlowOut);
+        uint32 u4ConnectFlowIn = 0;
+        uint32 u4ConnectFlowOut = 0;
+        App_ConnectManager::instance()->GetFlowInfo(u4ConnectFlowIn, u4ConnectFlowOut);
+        u4FlowIn += u4ConnectFlowIn;
+        u4FlowOut += u4ConnectFlowOut;
+
+        //得到所有UDP的流量统计
+        uint32 u4UdpFlowIn = 0;
+        uint32 u4UdpFlowOut = 0;
+        App_ReUDPManager::instance()->GetFlowInfo(u4UdpFlowIn, u4UdpFlowOut);
+        u4FlowIn += u4UdpFlowIn;
+        u4FlowOut += u4UdpFlowOut;
 
         int nActiveClient = App_ConnectManager::instance()->GetCount();
         int nPoolClient   = App_ConnectHandlerPool::instance()->GetFreeCount();
@@ -3340,8 +3359,8 @@ void CConsoleMessage::DoMessage_MonitorInfo(_CommandInfo& CommandInfo, IBuffPack
         (*pBuffPacket) << (uint32)nPoolClient;
         (*pBuffPacket) << (uint16)App_MainConfig::instance()->GetMaxHandlerCount();
         (*pBuffPacket) << (uint16)App_ConnectAccount::instance()->GetCurrConnect();
-        (*pBuffPacket) << objCommandFlowIn.m_u4FlowIn;
-        (*pBuffPacket) << objCommandFlowOut.m_u4FlowOut;
+        (*pBuffPacket) << u4FlowIn;
+        (*pBuffPacket) << u4FlowOut;
 #endif
     }
 

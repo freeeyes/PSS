@@ -190,7 +190,7 @@ public:
     bool StartTimer();                                                                                       //开启定时器
     bool KillTimer();                                                                                        //关闭定时器
     _CommandData* GetCommandData(uint16 u2CommandID);                                                        //得到命令相关信息
-    uint32 GetCommandFlowAccount();                                                                          //得到出口流量信息
+    void GetFlowInfo(uint32& u4UdpFlowIn, uint32& u4UdpFlowOut);                                             //得到流量信息
 
     int         GetCount();
     const char* GetError();
@@ -291,7 +291,7 @@ public:
 
     bool StartTimer();                                                                                       //开启定时器
     const char* GetError();
-    void GetCommandFlowAccount(_CommandFlowAccount& objCommandFlowAccount);                                  //得到出口流量信息
+    void GetFlowInfo(uint32& u4UdpFlowIn, uint32& u4UdpFlowOut);                                             //得到流量信息
     EM_Client_Connect_status GetConnectState(uint32 u4ConnectID);
 
     int handle_write_file_stream(uint32 u4ConnectID, const char* pData, uint32 u4Size, uint8 u1ParseID);     //文件接口模拟数据包入口

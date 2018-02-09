@@ -2883,9 +2883,10 @@ void CConnectManager::Init( uint16 u2Index )
     m_TimeWheelLink.Init(App_MainConfig::instance()->GetMaxConnectTime(), App_MainConfig::instance()->GetCheckAliveTime(), (int)u2PoolSize, CConnectManager::TimeWheel_Timeout_Callback, (void*)this);
 }
 
-uint32 CConnectManager::GetCommandFlowAccount()
+void CConnectManager::GetFlowInfo(uint32& u4UdpFlowIn, uint32& u4UdpFlowOut)
 {
-    return m_CommandAccount.GetFlowOut();
+    u4UdpFlowIn  = m_CommandAccount.GetFlowIn();
+    u4UdpFlowOut = m_CommandAccount.GetFlowOut();
 }
 
 EM_Client_Connect_status CConnectManager::GetConnectState(uint32 u4ConnectID)
@@ -3670,16 +3671,19 @@ void CConnectManagerGroup::GetCommandData( uint16 u2CommandID, _CommandData& obj
     }
 }
 
-void CConnectManagerGroup::GetCommandFlowAccount(_CommandFlowAccount& objCommandFlowAccount)
+void CConnectManagerGroup::GetFlowInfo(uint32& u4UdpFlowIn, uint32& u4UdpFlowOut)
 {
     for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
     {
+        uint32 u4ConnectFlowIn  = 0;
+        uint32 u4ConnectFlowOut = 0;
         CConnectManager* pConnectManager = m_objConnnectManagerList[i];
 
         if(NULL != pConnectManager)
         {
-            uint32 u4FlowOut = pConnectManager->GetCommandFlowAccount();
-            objCommandFlowAccount.m_u4FlowOut += u4FlowOut;
+            pConnectManager->GetFlowInfo(u4ConnectFlowIn, u4ConnectFlowOut);
+            u4UdpFlowIn  += u4ConnectFlowIn;
+            u4UdpFlowOut += u4ConnectFlowOut;
         }
     }
 }

@@ -677,9 +677,10 @@ _CommandData* CMessageService::GetCommandData(uint16 u2CommandID)
     return m_CommandAccount.GetCommandData(u2CommandID);
 }
 
-_CommandFlowAccount CMessageService::GetCommandFlowAccount()
+void CMessageService::GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut)
 {
-    return m_CommandAccount.GetCommandFlowAccount();
+    u4FlowIn  = m_CommandAccount.GetFlowIn();
+    u4FlowOut = m_CommandAccount.GetFlowOut();
 }
 
 void CMessageService::GetCommandAlertData(vecCommandAlertData& CommandAlertDataList)
@@ -1266,16 +1267,19 @@ void CMessageServiceGroup::GetCommandData(uint16 u2CommandID, _CommandData& objC
     }
 }
 
-void CMessageServiceGroup::GetFlowInfo(_CommandFlowAccount& objCommandFlowAccount)
+void CMessageServiceGroup::GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut)
 {
     for (int i = 0; i < (int)m_vecMessageService.size(); i++)
     {
+        uint32 u4CurrFlowIn  = 0;
+        uint32 u4CurrFlowOut = 0;
         CMessageService* pMessageService = m_vecMessageService[i];
 
         if (NULL != pMessageService)
         {
-            _CommandFlowAccount CommandFlowAccount = pMessageService->GetCommandFlowAccount();
-            objCommandFlowAccount += CommandFlowAccount;
+            pMessageService->GetFlowInfo(u4CurrFlowIn, u4CurrFlowOut);
+            u4FlowIn  += u4CurrFlowIn;
+            u4FlowOut += u4CurrFlowOut;
         }
     }
 }

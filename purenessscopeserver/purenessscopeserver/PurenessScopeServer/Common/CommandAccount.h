@@ -95,43 +95,6 @@ struct _CommandAlertData
 };
 typedef vector<_CommandAlertData> vecCommandAlertData;   //记录所有的告警监控阀值
 
-//流量流入和流出信息统计。
-struct _CommandFlowAccount
-{
-    uint32 m_u4FlowIn;
-    uint32 m_u4FlowOut;
-    uint8  m_u1FLow;
-
-    _CommandFlowAccount()
-    {
-        m_u1FLow    = 0;
-        m_u4FlowIn  = 0;
-        m_u4FlowOut = 0;
-    }
-
-    _CommandFlowAccount(const _CommandFlowAccount& ar)
-    {
-        this->m_u1FLow = ar.m_u1FLow;
-        this->m_u4FlowIn = ar.m_u4FlowIn;
-        this->m_u4FlowOut = ar.m_u4FlowOut;
-    }
-
-    _CommandFlowAccount& operator = (const _CommandFlowAccount& ar)
-    {
-        this->m_u1FLow    = ar.m_u1FLow;
-        this->m_u4FlowIn  = ar.m_u4FlowIn;
-        this->m_u4FlowOut = ar.m_u4FlowOut;
-        return *this;
-    }
-
-    _CommandFlowAccount& operator += (const _CommandFlowAccount& ar)
-    {
-        this->m_u4FlowIn  += ar.m_u4FlowIn;
-        this->m_u4FlowOut += ar.m_u4FlowOut;
-        return *this;
-    }
-};
-
 //对应端口数据接收信息
 struct _Port_Data_Account
 {
@@ -252,33 +215,8 @@ struct _Port_Data_Account
 };
 typedef vector<_Port_Data_Account> vecPortDataAccount;
 
-static void Combo_Port_List(vecPortDataAccount& vec_Port_Data_Account, vecPortDataAccount& vec_Port_Data_All_Account)
-{
-    int n4PartSize = (int)vec_Port_Data_Account.size();
-
-    for (int iLoop = 0; iLoop < n4PartSize; iLoop++)
-    {
-        int n4AllSize = (int)vec_Port_Data_All_Account.size();
-        bool bFound = false;
-
-        for (int jLoop = 0; jLoop < n4AllSize; jLoop++)
-        {
-            if (vec_Port_Data_Account[iLoop].m_u4Port == vec_Port_Data_All_Account[jLoop].m_u4Port)
-            {
-                vec_Port_Data_All_Account[jLoop] += vec_Port_Data_Account[iLoop];
-                bFound = true;
-                break;
-            }
-        }
-
-        if (false == bFound)
-        {
-            vec_Port_Data_All_Account.push_back(vec_Port_Data_Account[iLoop]);
-        }
-    }
-
-    return;
-}
+//合并结果集
+void Combo_Port_List(vecPortDataAccount& vec_Port_Data_Account, vecPortDataAccount& vec_Port_Data_All_Account);
 
 //格式化一个ACE Hash类
 template<class EXT_ID, class INT_ID>
@@ -308,7 +246,6 @@ public:
     uint32 GetFlowOut();                               //得到党委时间流出流量
     uint8  GetFLow();                                  //得到当前流量开关状态
 
-    _CommandFlowAccount GetCommandFlowAccount();                         //得到流量相关信息
     void GetCommandAlertData(vecCommandAlertData& CommandAlertDataList); //得到所有的告警命令信息
 
     void GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_Account);    //根据不同的监听端口，获得当前的端口对应的出入口数据信息

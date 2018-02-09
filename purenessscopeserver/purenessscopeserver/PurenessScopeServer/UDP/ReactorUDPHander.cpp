@@ -197,7 +197,6 @@ bool CReactorUDPHander::SendMessage(const char*& pMessage, uint32 u4Len, const c
             }
 
             //统计发送信息
-            uint32 u4Cost = (uint32)(ACE_OS::gethrtime() - m_tvBegin);
             m_CommandAccount.SaveCommandData(u2CommandID, (uint32)nPort, PACKET_UDP, u4Len, COMMAND_TYPE_OUT);
 
             //释放发送体
@@ -232,7 +231,6 @@ bool CReactorUDPHander::SendMessage(const char*& pMessage, uint32 u4Len, const c
             SAFE_DELETE_ARRAY(pMessage);
 
             //统计发送信息
-            uint32 u4Cost = (uint32)(ACE_OS::gethrtime() - m_tvBegin);
             m_CommandAccount.SaveCommandData(u2CommandID, (uint32)nPort, PACKET_UDP, u4Len, COMMAND_TYPE_OUT);
 
             return true;
@@ -415,7 +413,8 @@ void CReactorUDPHander::GetCommandData( uint16 u2CommandID, _CommandData& objCom
     }
 }
 
-uint32 CReactorUDPHander::GetFlowOut()
+void CReactorUDPHander::GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut)
 {
-    return m_CommandAccount.GetFlowOut();
+    u4FlowIn  = m_CommandAccount.GetFlowIn();
+    u4FlowOut = m_CommandAccount.GetFlowOut();
 }

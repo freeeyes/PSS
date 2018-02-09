@@ -31,7 +31,7 @@ public:
     bool SendMessage(const char*& pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead = true, uint16 u2CommandID = 0, bool blDlete = true);
     _ClientConnectInfo GetClientConnectInfo();
     void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);    //获得指定命令统计信息
-    uint32 GetFlowOut();                                                      //得到所有的出口流量
+    void GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut);                    //得到所有的流量信息
 
 private:
     bool CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len);     //这里解析数据包并放入数据队列

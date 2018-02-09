@@ -203,8 +203,6 @@ bool CProactorUDPHandler::SendMessage(const char*& pMessage, uint32 u4Len, const
             }
 
             //统计发送信息
-            ACE_Time_Value tvInterval = ACE_OS::gettimeofday() - m_tvBegin;
-            uint32 u4SendCost = (uint32)(tvInterval.msec());
             m_CommandAccount.SaveCommandData(u2CommandID, (uint32)nPort, PACKET_UDP, u4DataLen, COMMAND_TYPE_OUT);
 
             //释放发送体
@@ -239,8 +237,6 @@ bool CProactorUDPHandler::SendMessage(const char*& pMessage, uint32 u4Len, const
             SAFE_DELETE_ARRAY(pMessage);
 
             //统计发送信息
-            ACE_Time_Value tvInterval = ACE_OS::gettimeofday() - m_tvBegin;
-            uint32 u4SendCost = (uint32)(tvInterval.msec());
             m_CommandAccount.SaveCommandData(u2CommandID, (uint32)nPort, PACKET_UDP, u4Len, COMMAND_TYPE_OUT);
 
             return true;
@@ -418,7 +414,8 @@ void CProactorUDPHandler::GetCommandData( uint16 u2CommandID, _CommandData& objC
     }
 }
 
-uint32 CProactorUDPHandler::GetFlowOut()
+void CProactorUDPHandler::GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut)
 {
-    return m_CommandAccount.GetFlowOut();
+    u4FlowIn  = m_CommandAccount.GetFlowIn();
+    u4FlowOut = m_CommandAccount.GetFlowOut();
 }

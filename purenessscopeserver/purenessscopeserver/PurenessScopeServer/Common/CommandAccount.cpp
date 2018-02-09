@@ -66,8 +66,10 @@ void CCommandAccount::Close()
     m_u1CommandAccount = 0;
 }
 
-bool CCommandAccount::Save_Flow(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType /*= PACKET_TCP*/, uint32 u4PacketSize /*= 0*/, uint8 u1CommandType /*= COMMAND_TYPE_IN*/, ACE_Time_Value tvTime /*= ACE_OS::gettimeofday()*/)
+bool CCommandAccount::Save_Flow(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value tvTime)
 {
+    ACE_UNUSED_ARG(u2CommandID);
+
     if (m_u1Flow == 1)
     {
         //在hashMap中查找是否已存在端口信息
@@ -92,8 +94,10 @@ bool CCommandAccount::Save_Flow(uint16 u2CommandID, uint32 u4Port, uint8 u1Packe
     return true;
 }
 
-bool CCommandAccount::Save_Command(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType /*= PACKET_TCP*/, uint32 u4PacketSize /*= 0*/, uint8 u1CommandType /*= COMMAND_TYPE_IN*/, ACE_Time_Value tvTime /*= ACE_OS::gettimeofday()*/)
+bool CCommandAccount::Save_Command(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value tvTime)
 {
+    ACE_UNUSED_ARG(u4Port);
+
     if (m_u1CommandAccount == 0)
     {
         return true;
@@ -143,8 +147,13 @@ bool CCommandAccount::Save_Command(uint16 u2CommandID, uint32 u4Port, uint8 u1Pa
     return true;
 }
 
-bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType /*= PACKET_TCP*/, uint32 u4PacketSize /*= 0*/, uint8 u1CommandType /*= COMMAND_TYPE_IN*/, ACE_Time_Value tvTime /*= ACE_OS::gettimeofday()*/)
+bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value tvTime)
 {
+    ACE_UNUSED_ARG(u4Port);
+    ACE_UNUSED_ARG(u1PacketType);
+    ACE_UNUSED_ARG(u4PacketSize);
+    ACE_UNUSED_ARG(u1CommandType);
+
     ACE_Date_Time dtNowTime(tvTime);
     uint8 u1Minute = (uint8)dtNowTime.minute();
 
@@ -324,18 +333,6 @@ _CommandData* CCommandAccount::GetCommandData(uint16 u2CommandID)
     return pCommandData;
 }
 
-_CommandFlowAccount CCommandAccount::GetCommandFlowAccount()
-{
-    _CommandFlowAccount objCommandFlowAccount;
-
-    objCommandFlowAccount.m_u1FLow    = GetFLow();
-    objCommandFlowAccount.m_u4FlowIn  = GetFlowIn();
-    objCommandFlowAccount.m_u4FlowOut = GetFlowOut();
-
-    return objCommandFlowAccount;
-
-}
-
 void CCommandAccount::GetCommandAlertData(vecCommandAlertData& CommandAlertDataList)
 {
     CommandAlertDataList.insert(CommandAlertDataList.end(), m_vecCommandAlertData.begin(), m_vecCommandAlertData.end());
@@ -357,4 +354,32 @@ void CCommandAccount::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_
             vec_Port_Data_Account.push_back(obj_Port_Data_Account);
         }
     }
+}
+
+void Combo_Port_List(vecPortDataAccount& vec_Port_Data_Account, vecPortDataAccount& vec_Port_Data_All_Account)
+{
+    int n4PartSize = (int)vec_Port_Data_Account.size();
+
+    for (int iLoop = 0; iLoop < n4PartSize; iLoop++)
+    {
+        int n4AllSize = (int)vec_Port_Data_All_Account.size();
+        bool bFound = false;
+
+        for (int jLoop = 0; jLoop < n4AllSize; jLoop++)
+        {
+            if (vec_Port_Data_Account[iLoop].m_u4Port == vec_Port_Data_All_Account[jLoop].m_u4Port)
+            {
+                vec_Port_Data_All_Account[jLoop] += vec_Port_Data_Account[iLoop];
+                bFound = true;
+                break;
+            }
+        }
+
+        if (false == bFound)
+        {
+            vec_Port_Data_All_Account.push_back(vec_Port_Data_Account[iLoop]);
+        }
+    }
+
+    return;
 }
