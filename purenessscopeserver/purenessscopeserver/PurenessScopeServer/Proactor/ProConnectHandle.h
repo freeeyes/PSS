@@ -23,6 +23,7 @@
 #include "ace/Asynch_Acceptor.h"
 #include "ace/Proactor.h"
 
+#include "ObjectArrayList.h"
 #include "HashTable.h"
 #include "AceProactorManager.h"
 #include "IConnectManager.h"
@@ -241,9 +242,10 @@ public:
     int GetFreeCount();
 
 private:
-    ACE_Recursive_Thread_Mutex    m_ThreadWriteLock;                     //控制多线程锁
-    CHashTable<CProConnectHandle> m_objHashHandleList;                   //Hash管理表
-    uint32                        m_u4CurrMaxCount;                      //当前池里Handler总数
+    ACE_Recursive_Thread_Mutex          m_ThreadWriteLock;                     //控制多线程锁
+    CHashTable<CProConnectHandle>       m_objHashHandleList;                   //Hash管理表
+    CObjectArrayList<CProConnectHandle> m_objHandlerList;                      //数据列表对象
+    uint32                              m_u4CurrMaxCount;                      //当前池里Handler总数
 };
 
 //经过思考，想把发送对象分在几个线程内去做，提高性能。在这里尝试一下。(多线程模式，一个线程一个队列，这样保持并发能力)

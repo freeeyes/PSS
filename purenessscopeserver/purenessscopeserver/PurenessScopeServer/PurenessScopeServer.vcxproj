@@ -179,6 +179,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Common\ACEMemory.cpp" />
     <ClCompile Include="..\Common\RandomNumber.cpp" />
     <ClCompile Include="..\Common\Threading.cpp" />
     <ClCompile Include="Common\ServerMessageTask.cpp" />
@@ -327,12 +328,6 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="UDP\ReactorUDPHander.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Common\ACEMemory.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -514,6 +509,7 @@
     <ClCompile Include="Mail\smtp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Common\ACEMemory.h" />
     <ClInclude Include="..\Common\ClientCommand.h" />
     <ClInclude Include="..\Common\ClientMessage.h" />
     <ClInclude Include="..\Common\ClientUDPMassage.h" />
@@ -540,6 +536,7 @@
     <ClInclude Include="..\Common\IServerManager.h" />
     <ClInclude Include="..\Common\ITimerManager.h" />
     <ClInclude Include="..\Common\IUDPConnectManager.h" />
+    <ClInclude Include="..\Common\ObjectArrayList.h" />
     <ClInclude Include="..\Common\ProfileTime.h" />
     <ClInclude Include="..\Common\RandomNumber.h" />
     <ClInclude Include="..\Common\Threading.h" />
@@ -583,7 +580,6 @@
     <ClInclude Include="UDP\ReactorUDPClient.h" />
     <ClInclude Include="UDP\ReactorUDPHander.h" />
     <ClInclude Include="UDP\ReUDPManager.h" />
-    <ClInclude Include="Common\ACEMemory.h" />
     <ClInclude Include="Common\AppConfig.h" />
     <ClInclude Include="Common\BuffPacket.h" />
     <ClInclude Include="Common\BuffPacketManager.h" />

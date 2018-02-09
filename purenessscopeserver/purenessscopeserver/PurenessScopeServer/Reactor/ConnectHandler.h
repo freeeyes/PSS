@@ -19,6 +19,7 @@
 #include "ace/SOCK_Acceptor.h"
 #include "ace/Reactor_Notification_Strategy.h"
 
+#include "ObjectArrayList.h"
 #include "HashTable.h"
 #include "AceReactorManager.h"
 #include "MessageService.h"
@@ -243,9 +244,10 @@ public:
     int GetFreeCount();
 
 private:
-    uint32                      m_u4CurrMaxCount;                      //当前池里Handler总数
-    CHashTable<CConnectHandler> m_objHashHandleList;                   //Hash管理表
-    ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;                     //控制多线程锁
+    ACE_Recursive_Thread_Mutex        m_ThreadWriteLock;                     //控制多线程锁
+    CHashTable<CConnectHandler>       m_objHashHandleList;                   //Hash管理表
+    CObjectArrayList<CConnectHandler> m_objHandlerList;                      //数据列表对象
+    uint32                            m_u4CurrMaxCount;                      //当前池里Handler总数
 };
 
 //经过思考，想把发送对象分在几个线程内去做，提高性能。在这里尝试一下。(多线程模式，一个线程一个队列，这样保持并发能力)

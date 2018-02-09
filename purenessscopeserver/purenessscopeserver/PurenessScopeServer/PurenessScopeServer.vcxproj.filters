@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Common\ACEMemory.cpp">
-      <Filter>Common\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="Common\AppConfig.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
@@ -226,11 +223,11 @@
     <ClCompile Include="..\Common\RandomNumber.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="..\Common\ACEMemory.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Common\ACEMemory.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="Common\AppConfig.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
@@ -550,6 +547,12 @@
       <Filter>Common\hfile</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\TimeWheelLink.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ObjectArrayList.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ACEMemory.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
   </ItemGroup>

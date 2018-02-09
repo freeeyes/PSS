@@ -146,8 +146,6 @@ void CReactorUDPHander::SetPacketParseInfoID(uint32 u4PacketParseInfoID)
 
 bool CReactorUDPHander::SendMessage(const char*& pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead, uint16 u2CommandID, bool blDlete)
 {
-    ACE_hrtime_t m_tvBegin = ACE_OS::gethrtime();
-
     ACE_INET_Addr AddrRemote;
     int nErr = AddrRemote.set(nPort, szIP);
 

@@ -2815,11 +2815,12 @@ void CProConnectHandlerPool::Init(int nObjcetCount)
     Close();
 
     //初始化HashTable
+    m_objHandlerList.Init((int)nObjcetCount);
     m_objHashHandleList.Init((int)nObjcetCount);
 
     for(int i = 0; i < nObjcetCount; i++)
     {
-        CProConnectHandle* pHandler = new CProConnectHandle();
+        CProConnectHandle* pHandler = m_objHandlerList.GetObject(i);
 
         if(NULL != pHandler)
         {
@@ -2846,12 +2847,6 @@ void CProConnectHandlerPool::Close()
     //清理所有已存在的指针
     vector<CProConnectHandle*> vecProConnectHandle;
     m_objHashHandleList.Get_All_Used(vecProConnectHandle);
-
-    for(int i = 0; i < (int)vecProConnectHandle.size(); i++)
-    {
-        CProConnectHandle* pHandler = vecProConnectHandle[i];
-        SAFE_DELETE(pHandler);
-    }
 
     m_u4CurrMaxCount  = 1;
 }
