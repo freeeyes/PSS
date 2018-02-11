@@ -93,10 +93,10 @@ public:
 };
 
 //日志类对象(是一个虚类，由别的类继承实现内部)
-class CServerLogger
+class IServerLogger
 {
 public:
-    virtual ~CServerLogger() {}
+    virtual ~IServerLogger() {}
 
     virtual int DoLog(int nLogType, _LogBlockInfo* pLogBlockInfo) = 0;
     virtual int GetLogTypeCount()                                 = 0;

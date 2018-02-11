@@ -556,7 +556,7 @@ private:
     ACE_FILE_Addr       m_FileAddr;
 };
 
-class CFileLogger : public CServerLogger
+class CFileLogger : public IServerLogger
 {
 public:
     CFileLogger();

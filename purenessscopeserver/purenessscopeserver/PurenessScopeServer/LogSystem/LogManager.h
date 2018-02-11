@@ -50,7 +50,7 @@ public:
     bool IsRun();
 
     int PutLog(_LogBlockInfo* pLogBlockInfo);
-    int RegisterLog(CServerLogger* pServerLogger);
+    int RegisterLog(IServerLogger* pServerLogger);
     int UnRegisterLog();
 
     void SetReset(bool blReset);
@@ -90,7 +90,7 @@ private:
     int                               m_nQueueMax;                //日志线程允许的最大队列个数
     CLogBlockPool                     m_objLogBlockPool;          //日志块池
     ACE_Recursive_Thread_Mutex        m_Logger_Mutex;             //线程锁
-    CServerLogger*                    m_pServerLogger;            //日志模块指针
+    IServerLogger*                    m_pServerLogger;            //日志模块指针
 };
 
 typedef ACE_Singleton<CLogManager, ACE_Recursive_Thread_Mutex> AppLogManager;

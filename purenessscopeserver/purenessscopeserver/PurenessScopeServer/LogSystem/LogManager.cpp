@@ -292,7 +292,7 @@ int CLogManager::PutLog(_LogBlockInfo* pLogBlockInfo)
     return -1;
 }
 
-int CLogManager::RegisterLog(CServerLogger* pServerLogger)
+int CLogManager::RegisterLog(IServerLogger* pServerLogger)
 {
     if(pServerLogger == NULL)
     {
