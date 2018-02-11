@@ -53,8 +53,7 @@ CConnectHandler::~CConnectHandler(void)
     this->closing_ = true;
     //OUR_DEBUG((LM_INFO, "[CConnectHandler::~CConnectHandler].\n"));
     //OUR_DEBUG((LM_INFO, "[CConnectHandler::~CConnectHandler]End.\n"));
-    SAFE_DELETE(m_pPacketDebugData);
-    m_pPacketDebugData  = NULL;
+    SAFE_DELETE_ARRAY(m_pPacketDebugData);
     m_u4PacketDebugSize = 0;
 }
 

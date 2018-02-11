@@ -16,11 +16,12 @@ void CPacketParsePool::Init(uint32 u4PacketCount)
     Close();
 
     //初始化HashTable
+    m_objPacketList.Init(u4PacketCount);
     m_objPacketParseList.Init((int)u4PacketCount);
 
-    for(int i = 0; i < (int)u4PacketCount; i++)
+    for(uint32 i = 0; i < u4PacketCount; i++)
     {
-        CPacketParse* pPacket = new CPacketParse();
+        CPacketParse* pPacket = m_objPacketList.GetObject(i);
 
         if(NULL != pPacket)
         {
@@ -40,15 +41,6 @@ void CPacketParsePool::Init(uint32 u4PacketCount)
 void CPacketParsePool::Close()
 {
     //清理所有已存在的指针
-    vector<CPacketParse*> vecPacketParse;
-    m_objPacketParseList.Get_All_Used(vecPacketParse);
-
-    for(int i = 0; i < (int)vecPacketParse.size(); i++)
-    {
-        CPacketParse* pPacket = vecPacketParse[i];
-        SAFE_DELETE(pPacket);
-    }
-
     m_objPacketParseList.Close();
 }
 

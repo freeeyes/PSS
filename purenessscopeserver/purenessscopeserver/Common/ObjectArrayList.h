@@ -68,9 +68,11 @@ private:
 
     void DestroyMemony()
     {
+        //先执行对象数据析构
+        CallDestructor();
+
         if (m_u4Count != 0)
         {
-            //m_pMem->free((void* )m_pMemonyList);
             SAFE_DELETE_ARRAY(m_pMemonyList);
             m_u4Count = 0;
         }

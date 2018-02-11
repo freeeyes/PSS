@@ -43,8 +43,7 @@ CProConnectHandle::CProConnectHandle(void) : m_u4LocalPort(0), m_u4SendCheckTime
 
 CProConnectHandle::~CProConnectHandle(void)
 {
-    SAFE_DELETE(m_pPacketDebugData);
-    m_pPacketDebugData  = NULL;
+    SAFE_DELETE_ARRAY(m_pPacketDebugData);
     m_u4PacketDebugSize = 0;
 }
 
