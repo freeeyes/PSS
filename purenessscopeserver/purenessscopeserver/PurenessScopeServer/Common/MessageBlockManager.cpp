@@ -26,23 +26,10 @@ void CMessageBlockManager::Close()
 {
     m_MemoryBlock_Pool.Close();
 
-    if(NULL != m_pmsgallocator)
-    {
-        delete m_pmsgallocator;
-        m_pmsgallocator = NULL;
-    }
+    SAFE_DELETE(m_pmsgallocator)
+    SAFE_DELETE(m_pdata_allocator);
+    SAFE_DELETE(m_pbuff_allocator);
 
-    if(NULL != m_pdata_allocator)
-    {
-        delete m_pdata_allocator;
-        m_pdata_allocator = NULL;
-    }
-
-    if(NULL != m_pbuff_allocator)
-    {
-        delete m_pbuff_allocator;
-        m_pbuff_allocator = NULL;
-    }
 }
 
 ACE_Message_Block* CMessageBlockManager::Create(uint32 u4Size)

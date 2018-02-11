@@ -14,7 +14,7 @@
 class CBuffPacket : public IBuffPacket
 {
 public:
-    CBuffPacket(int32 nSize = DEFINE_PACKET_SIZE, int32 nMaxBuffSize = MAX_PACKET_SIZE);
+    CBuffPacket();
     ~CBuffPacket(void);
 
     uint32 GetPacketSize();    //得到数据包的格式化长度
@@ -25,7 +25,7 @@ public:
     uint32 GetPacketCount();   //得到缓存数据包的个数
     const char* GetData();     //得到当前数据指针
 
-    bool Init(int32 nSize, int32 nMaxBuffSize);
+    bool Init(int32 nSize = DEFINE_PACKET_SIZE, int32 nMaxBuffSize = MAX_PACKET_SIZE);
     bool Close();              //删除已经使用的内存
     bool Clear();              //清除所有的标志位，并不删除内存。
 

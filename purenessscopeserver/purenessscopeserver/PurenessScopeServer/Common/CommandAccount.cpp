@@ -62,6 +62,16 @@ void CCommandAccount::Close()
         }
     }
 
+    //回收端口统计内存
+    for (ACE_Hash_Map<uint32, _Port_Data_Account*>::iterator iter = m_objectPortAccount.begin();
+         iter != m_objectPortAccount.end(); iter++)
+    {
+        _Port_Data_Account* p_Port_Data_Account = (*iter).int_id_;
+        SAFE_DELETE(p_Port_Data_Account);
+    }
+
+    m_objectPortAccount.close();
+
     m_objCommandDataList.Close();
     m_u1CommandAccount = 0;
 }

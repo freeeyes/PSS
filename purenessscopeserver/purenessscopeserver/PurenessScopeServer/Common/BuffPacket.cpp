@@ -6,13 +6,9 @@
 
 #include "BuffPacket.h"
 
-CBuffPacket::CBuffPacket(int32 nSize, int32 nMaxBuffSize)
+CBuffPacket::CBuffPacket()
     :m_szData(NULL), m_u4ReadPtr(0), m_u4WritePtr(0), m_u4PacketLen(0), m_u4PacketCount(0), m_u4MaxPacketSize(0), m_u4BuffID(0), m_nHashID(0), m_blNetSort(false)
 {
-    if (false == Init(nSize, nMaxBuffSize))
-    {
-        OUR_DEBUG((LM_INFO, "[CBuffPacket::CBuffPacket]Error(%s).\n", m_szError));
-    }
 }
 
 CBuffPacket::~CBuffPacket(void)

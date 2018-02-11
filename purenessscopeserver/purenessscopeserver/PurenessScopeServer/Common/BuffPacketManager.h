@@ -6,6 +6,7 @@
 //这里感谢freebird的测试客户端，正是因为它，我才能发现了这个问题。不要让关注你的人失望，这是必须的。
 //2010-06-03 freeeyes
 
+#include "ObjectArrayList.h"
 #include "HashTable.h"
 #include "IPacketManager.h"
 #include "BuffPacket.h"
@@ -28,9 +29,10 @@ public:
     bool Delete(IBuffPacket* pBuffPacket);
 
 private:
-    CHashTable<CBuffPacket>    m_objHashBuffPacketList;               //存储空闲BuffPacket指针的hash列表
-    bool                       m_blSortType;                          //字序规则，true为网序，false为主机序
-    ACE_Recursive_Thread_Mutex m_ThreadWriteLock;
+    CObjectArrayList<CBuffPacket>  m_objBuffPacketList;                   //BuffPacket对象数组
+    CHashTable<CBuffPacket>        m_objHashBuffPacketList;               //存储空闲BuffPacket指针的hash列表
+    bool                           m_blSortType;                          //字序规则，true为网序，false为主机序
+    ACE_Recursive_Thread_Mutex     m_ThreadWriteLock;
 };
 
 typedef ACE_Singleton<CBuffPacketManager, ACE_Null_Mutex> App_BuffPacketManager;

@@ -75,15 +75,17 @@ void CBuffPacketManager::Init(uint32 u4PacketCount, uint32 u4MaxBuffSize, bool b
     Close();
 
     //初始化Hash表
+    m_objBuffPacketList.Init(u4PacketCount);
     m_objHashBuffPacketList.Init((int32)u4PacketCount);
 
-    for(int32 i = 0; i < m_objHashBuffPacketList.Get_Count(); i++)
+    for(uint32 i = 0; i < (uint32)m_objHashBuffPacketList.Get_Count(); i++)
     {
-        CBuffPacket* pBuffPacket = new CBuffPacket(DEFINE_PACKET_SIZE, u4MaxBuffSize);
+        CBuffPacket* pBuffPacket = m_objBuffPacketList.GetObject(i);
 
         if(NULL != pBuffPacket)
         {
             //设置BuffPacket默认字序
+            pBuffPacket->Init(DEFINE_PACKET_SIZE, u4MaxBuffSize);
             pBuffPacket->SetNetSort(blByteOrder);
             pBuffPacket->SetBuffID(i);
 
