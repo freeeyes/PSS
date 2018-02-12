@@ -51,14 +51,13 @@ void CCommandAccount::Close()
 {
     vector<_CommandData*> vecCommandData;
     m_objCommandDataList.Get_All_Used(vecCommandData);
-
-    for(int32 i = 0; i < (int32)vecCommandData.size(); i++)
+	
+	int32 size = (int32)vecCommandData.size();
+    for(int32 i = 0; i < size; i++)
     {
-        _CommandData* pCommandData = vecCommandData[i];
-
-        if(NULL != pCommandData)
+        if(NULL != vecCommandData[i])
         {
-            SAFE_DELETE(pCommandData);
+            SAFE_DELETE(vecCommandData[i]);
         }
     }
 
@@ -167,7 +166,8 @@ bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint32 u4Port, uint8 u1Pack
     ACE_Date_Time dtNowTime(tvTime);
     uint8 u1Minute = (uint8)dtNowTime.minute();
 
-    for (int32 i = 0; i < (int32)m_vecCommandAlertData.size(); i++)
+	int32 size = (int32)m_vecCommandAlertData.size();
+    for (int32 i = 0; i < size; i++)
     {
         if (m_vecCommandAlertData[i].m_u2CommandID == u2CommandID)
         {
@@ -193,7 +193,6 @@ bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint32 u4Port, uint8 u1Pack
                                                             (uint32)m_vecCommandAlertData[i].m_u4CommandCount);
                 }
             }
-
             break;
         }
     }
