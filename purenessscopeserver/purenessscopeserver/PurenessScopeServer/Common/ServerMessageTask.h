@@ -12,6 +12,7 @@
 #include "IClientManager.h"
 #include "MessageBlockManager.h"
 #include "HashTable.h"
+#include "ObjectArrayList.h"
 
 using namespace std;
 
@@ -124,6 +125,7 @@ public:
     int GetFreeCount();
 
 private:
+	CObjectArrayList<_Server_Message_Info> m_objArrayList;				//
     CHashTable<_Server_Message_Info> m_objServerMessageList;           //Server Message缓冲池
     ACE_Recursive_Thread_Mutex       m_ThreadWriteLock;                //控制多线程锁
 };
