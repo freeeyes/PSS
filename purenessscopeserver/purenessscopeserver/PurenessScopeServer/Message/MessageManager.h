@@ -80,10 +80,10 @@ public:
 
     void Close()
     {
-        for(int i = 0; i < (int)m_vecClientCommandList.size(); i++)
+		int32 size = (int32)m_vecClientCommandList.size();
+        for(int32 i = 0; i < size; i++)
         {
-            _ClientCommandInfo* pClientCommandInfo = m_vecClientCommandList[i];
-            SAFE_DELETE(pClientCommandInfo);
+            SAFE_DELETE(m_vecClientCommandList[i]);
         }
 
         m_vecClientCommandList.clear();

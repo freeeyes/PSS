@@ -177,9 +177,9 @@ void CMessagePool::Init(uint32 u4PacketCount)
 
     //≥ı ºªØHashTable
     m_objMessageList.Init(u4PacketCount);
-    m_objHashMessageList.Init((int)u4PacketCount);
+    m_objHashMessageList.Init((int32)u4PacketCount);
 
-    for(int i = 0; i < (int)u4PacketCount; i++)
+    for(uint32 i = 0; i < u4PacketCount; i++)
     {
         CMessage* pPacket = m_objMessageList.GetObject(i);
 

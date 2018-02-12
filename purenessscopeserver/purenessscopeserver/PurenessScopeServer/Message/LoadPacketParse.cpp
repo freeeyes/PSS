@@ -167,8 +167,9 @@ void CLoadPacketParse::Close()
     //清理所有已存在的指针
     vector<_Packet_Parse_Info*> vecPacketParseList;
     m_objPacketParseList.Get_All_Used(vecPacketParseList);
-
-    for (int i = 0; i < (int)vecPacketParseList.size(); i++)
+	
+	int32 size = (int32)vecPacketParseList.size();
+    for (int32 i = 0; i < size; i++)
     {
         if (NULL != vecPacketParseList[i] && NULL != vecPacketParseList[i]->m_hModule)
         {
