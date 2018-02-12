@@ -41,7 +41,6 @@ private:
     {
         try
         {
-            //m_pMemonyList = (T*)(m_pMem->malloc(sizeof(T) * u4Count));
             m_pMemonyList = new T[u4Count];
         }
         catch (...)
@@ -49,7 +48,7 @@ private:
             if (m_pMemonyList == NULL)
             {
                 //³ÌÐò´íÎóÍË³öÃ¶¾Ù
-                OUR_DEBUG((LM_INFO, "[CreateMemony]Create List(%d) error.\n", u4Count));
+                OUR_DEBUG((LM_INFO, "[CreateMemony::CreateMemony]Create List(%d) error.\n", u4Count));
             }
         }
 
