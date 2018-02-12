@@ -213,3 +213,18 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+*.db
+/.vs/ProjectSettings.json
+/purenessscopeserver/purenessscopeserver/.vs/config/applicationhost.config
+/purenessscopeserver/purenessscopeserver/.vs/PurenessScopeServer/v15/Browse.VC.opendb
+/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Windows_Bin/TcpTest.dll
+/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Windows_Bin/PurenessScopeServer_D.exe
+/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Windows_Bin/PacketParse_Interface.lib
+/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Windows_Bin/PacketParse_Interface.exp
+/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Windows_Bin/PacketParse_Interface.dll
+/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Windows_Bin/ACEd.dll
+/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Windows_Bin/ACE.dll
+/purenessscopeserver/purenessscopeserver/PurenessScopeServer/ClassDiagram.cd
+/purenessscopeserver/purenessscopeserver/example-Module/TcpTest/TcpTestd.lib
+/purenessscopeserver/purenessscopeserver/example-Module/TcpTest/TcpTestd.exp
+/purenessscopeserver/purenessscopeserver/ClassDiagram.png
