@@ -228,3 +228,13 @@ pip-log.txt
 /purenessscopeserver/purenessscopeserver/example-Module/TcpTest/TcpTestd.lib
 /purenessscopeserver/purenessscopeserver/example-Module/TcpTest/TcpTestd.exp
 /purenessscopeserver/purenessscopeserver/ClassDiagram.png
+/.vs
+/.vs/*.sqlite
+/purenessscopeserver/purenessscopeserver/*.sln
+/purenessscopeserver/purenessscopeserver/PacketParse_Interface/*.filters
+/purenessscopeserver/purenessscopeserver/PacketParse_Interface/*.vcxproj
+/purenessscopeserver/purenessscopeserver/.vs/PurenessScopeServer/v15/Solution.VC.db-wal
+/purenessscopeserver/purenessscopeserver/.vs/PurenessScopeServer/v15/Solution.VC.db-shm
+/purenessscopeserver/purenessscopeserver/PurenessScopeServer/PurenessScopeServer.vcxproj.filters
+/purenessscopeserver/purenessscopeserver/PurenessScopeServer/PurenessScopeServer.vcproj
+/purenessscopeserver/purenessscopeserver/PurenessScopeServer/PurenessScopeServer.vcxproj

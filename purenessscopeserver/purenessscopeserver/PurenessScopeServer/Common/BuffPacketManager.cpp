@@ -15,10 +15,8 @@ CBuffPacketManager::~CBuffPacketManager(void)
 IBuffPacket* CBuffPacketManager::Create()
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
-    CBuffPacket* pBuffPacket = NULL;
-
-    pBuffPacket = m_objHashBuffPacketList.Pop();
-    return dynamic_cast<IBuffPacket*>(pBuffPacket);
+	IBuffPacket* pBuffPacket = dynamic_cast<IBuffPacket*>(m_objHashBuffPacketList.Pop());
+    return pBuffPacket;
 }
 
 bool CBuffPacketManager::Delete(IBuffPacket* pBuffPacket)
@@ -56,7 +54,8 @@ void CBuffPacketManager::Close()
     vector<CBuffPacket* > vecBuffPacket;
     m_objHashBuffPacketList.Get_All_Used(vecBuffPacket);
 
-    for(int32 i = 0; i < (int32)vecBuffPacket.size(); i++)
+	int32 size = (int32)vecBuffPacket.size();
+    for(int32 i = 0; i < size; i++)
     {
         CBuffPacket* pBuffPacket = vecBuffPacket[i];
 
@@ -78,7 +77,8 @@ void CBuffPacketManager::Init(uint32 u4PacketCount, uint32 u4MaxBuffSize, bool b
     m_objBuffPacketList.Init(u4PacketCount);
     m_objHashBuffPacketList.Init((int32)u4PacketCount);
 
-    for(uint32 i = 0; i < (uint32)m_objHashBuffPacketList.Get_Count(); i++)
+	uint32 size = (uint32)m_objHashBuffPacketList.Get_Count();
+    for(uint32 i = 0; i < size; i++)
     {
         CBuffPacket* pBuffPacket = m_objBuffPacketList.GetObject(i);
 
