@@ -167,37 +167,34 @@ bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint32 u4Port, uint8 u1Pack
     ACE_Date_Time dtNowTime(tvTime);
     uint8 u1Minute = (uint8)dtNowTime.minute();
 
-    if (m_vecCommandAlertData.size() > 0)
+    for (int32 i = 0; i < (int32)m_vecCommandAlertData.size(); i++)
     {
-        for (int32 i = 0; i < (int32)m_vecCommandAlertData.size(); i++)
+        if (m_vecCommandAlertData[i].m_u2CommandID == u2CommandID)
         {
-            if (m_vecCommandAlertData[i].m_u2CommandID == u2CommandID)
+            if (m_vecCommandAlertData[i].m_u1Minute != u1Minute)
             {
-                if (m_vecCommandAlertData[i].m_u1Minute != u1Minute)
-                {
-                    m_vecCommandAlertData[i].m_u4CurrCount = 1;
-                    m_vecCommandAlertData[i].m_u1Minute = u1Minute;
-                }
-                else
-                {
-                    m_vecCommandAlertData[i].m_u4CurrCount++;
-
-                    if (m_vecCommandAlertData[i].m_u4CurrCount >= m_vecCommandAlertData[i].m_u4CommandCount)
-                    {
-                        //如果大于阀值，则记录日志，并且归零当前计数器
-                        m_vecCommandAlertData[i].m_u4CurrCount = 0;
-
-                        AppLogManager::instance()->WriteToMail(LOG_SYSTEM_PACKETTIME,
-                                                               m_vecCommandAlertData[i].m_u4MailID,
-                                                               (char*)"Alert",
-                                                               "u2CommandID=%d, m_u4CommandCount more than [%d].",
-                                                               u2CommandID,
-                                                               (uint32)m_vecCommandAlertData[i].m_u4CommandCount);
-                    }
-                }
-
-                break;
+                m_vecCommandAlertData[i].m_u4CurrCount = 1;
+                m_vecCommandAlertData[i].m_u1Minute = u1Minute;
             }
+            else
+            {
+                m_vecCommandAlertData[i].m_u4CurrCount++;
+
+                if (m_vecCommandAlertData[i].m_u4CurrCount >= m_vecCommandAlertData[i].m_u4CommandCount)
+                {
+                    //如果大于阀值，则记录日志，并且归零当前计数器
+                    m_vecCommandAlertData[i].m_u4CurrCount = 0;
+
+                    AppLogManager::instance()->WriteToMail(LOG_SYSTEM_PACKETTIME,
+                                                            m_vecCommandAlertData[i].m_u4MailID,
+                                                            (char*)"Alert",
+                                                            "u2CommandID=%d, m_u4CommandCount more than [%d].",
+                                                            u2CommandID,
+                                                            (uint32)m_vecCommandAlertData[i].m_u4CommandCount);
+                }
+            }
+
+            break;
         }
     }
 
@@ -247,7 +244,8 @@ bool CCommandAccount::SaveCommandDataLog()
     vector<_CommandData*> vecCommandData;
     m_objCommandDataList.Get_All_Used(vecCommandData);
 
-    for(int32 i = 0; i < (int32_t)vecCommandData.size(); i++)
+	int32 size = (int32_t)vecCommandData.size();
+    for(int32 i = 0; i < size; i++)
     {
         _CommandData* pCommandData = vecCommandData[i];
 
