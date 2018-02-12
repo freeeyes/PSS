@@ -213,3 +213,28 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+*.db
+/.vs/ProjectSettings.json
+/purenessscopeserver/purenessscopeserver/.vs/config/applicationhost.config
+/purenessscopeserver/purenessscopeserver/.vs/PurenessScopeServer/v15/Browse.VC.opendb
+/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Windows_Bin/TcpTest.dll
+/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Windows_Bin/PurenessScopeServer_D.exe
+/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Windows_Bin/PacketParse_Interface.lib
+/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Windows_Bin/PacketParse_Interface.exp
+/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Windows_Bin/PacketParse_Interface.dll
+/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Windows_Bin/ACEd.dll
+/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Windows_Bin/ACE.dll
+/purenessscopeserver/purenessscopeserver/PurenessScopeServer/ClassDiagram.cd
+/purenessscopeserver/purenessscopeserver/example-Module/TcpTest/TcpTestd.lib
+/purenessscopeserver/purenessscopeserver/example-Module/TcpTest/TcpTestd.exp
+/purenessscopeserver/purenessscopeserver/ClassDiagram.png
+/.vs
+/.vs/*.sqlite
+/purenessscopeserver/purenessscopeserver/*.sln
+/purenessscopeserver/purenessscopeserver/PacketParse_Interface/*.filters
+/purenessscopeserver/purenessscopeserver/PacketParse_Interface/*.vcxproj
+/purenessscopeserver/purenessscopeserver/.vs/PurenessScopeServer/v15/Solution.VC.db-wal
+/purenessscopeserver/purenessscopeserver/.vs/PurenessScopeServer/v15/Solution.VC.db-shm
+/purenessscopeserver/purenessscopeserver/PurenessScopeServer/PurenessScopeServer.vcxproj.filters
+/purenessscopeserver/purenessscopeserver/PurenessScopeServer/PurenessScopeServer.vcproj
+/purenessscopeserver/purenessscopeserver/PurenessScopeServer/PurenessScopeServer.vcxproj
