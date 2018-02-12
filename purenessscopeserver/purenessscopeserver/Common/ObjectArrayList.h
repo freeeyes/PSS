@@ -2,7 +2,7 @@
 #define _OBJECTARRAYLIST_H
 
 #include "define.h"
-
+#include <new.h>
 //数组对象内存管理
 //add by ruiqi
 
@@ -37,15 +37,6 @@ public:
             return NULL;
         }
     }
-
-    //基本类型不需要调用析构
-    void CallDestructor()
-    {
-        for (size_t i = 0; i < m_u4Count; i++)
-        {
-            m_pMemonyList[i].~T();
-        }
-    }
 private:
     void CreateMemony(uint32 u4Count)
     {
@@ -68,9 +59,6 @@ private:
 
     void DestroyMemony()
     {
-        //先执行对象数据析构
-        CallDestructor();
-
         if (m_u4Count != 0)
         {
             SAFE_DELETE_ARRAY(m_pMemonyList);
