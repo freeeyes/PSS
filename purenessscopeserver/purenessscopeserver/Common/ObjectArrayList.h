@@ -2,7 +2,6 @@
 #define _OBJECTARRAYLIST_H
 
 #include "define.h"
-#include <new.h>
 //数组对象内存管理
 //add by ruiqi
 
