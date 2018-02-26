@@ -17,19 +17,19 @@ public:
 
     ~CObjectArrayList(void)
     {
-        DestroyMemony();
+        DestroyMemory();
     }
 
     void Init(uint32 u4Count)
     {
-        CreateMemony(u4Count);
+        CreateMemory(u4Count);
     }
 
     inline T* GetObject(uint32 u4Index)
     {
         if (u4Index < m_u4Count)
         {
-            return m_pMemonyList + u4Index;
+            return m_pMemoryList + u4Index;
         }
         else
         {
@@ -37,35 +37,35 @@ public:
         }
     }
 private:
-    void CreateMemony(uint32 u4Count)
+    void CreateMemory(uint32 u4Count)
     {
         try
         {
-            m_pMemonyList = new T[u4Count];
+            m_pMemoryList = new T[u4Count];
         }
         catch (...)
         {
-            if (m_pMemonyList == NULL)
+            if (m_pMemoryList == NULL)
             {
                 //程序错误退出枚举
-                OUR_DEBUG((LM_INFO, "[CreateMemony::CreateMemony]Create List(%d) error.\n", u4Count));
+                OUR_DEBUG((LM_INFO, "[CreateMemory::CreateMemory]Create List(%d) error.\n", u4Count));
             }
         }
 
         m_u4Count = u4Count;
     }
 
-    void DestroyMemony()
+    void DestroyMemory()
     {
         if (m_u4Count != 0)
         {
-            SAFE_DELETE_ARRAY(m_pMemonyList);
+            SAFE_DELETE_ARRAY(m_pMemoryList);
             m_u4Count = 0;
         }
     }
 private:
     uint32      m_u4Count;     //对象个数
-    T*          m_pMemonyList; //对象头指针
+    T*          m_pMemoryList; //对象头指针
 };
 
 #endif
