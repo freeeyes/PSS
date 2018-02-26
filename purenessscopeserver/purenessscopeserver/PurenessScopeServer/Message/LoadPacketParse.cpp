@@ -168,8 +168,8 @@ void CLoadPacketParse::Close()
     vector<_Packet_Parse_Info*> vecPacketParseList;
     m_objPacketParseList.Get_All_Used(vecPacketParseList);
 	
-	int32 size = (int32)vecPacketParseList.size();
-    for (int32 i = 0; i < size; i++)
+	uint32 u4Size = vecPacketParseList.size();
+    for (uint32 i = 0; i < u4Size; i++)
     {
         if (NULL != vecPacketParseList[i] && NULL != vecPacketParseList[i]->m_hModule)
         {

@@ -31,7 +31,7 @@ public:
 private:
     CHashTable<CPacketParse>        m_objPacketParseList;                  //Hash内存池
     ACE_Recursive_Thread_Mutex      m_ThreadWriteLock;                     //控制多线程锁
-    CObjectArrayList<CPacketParse>  m_objPacketList;                       //Packet对象数组
+    CObjectArrayList<CPacketParse>  m_objPacketList;                       //CPacketParse对象数组
 };
 
 typedef ACE_Singleton<CPacketParsePool, ACE_Null_Mutex> App_PacketParsePool;

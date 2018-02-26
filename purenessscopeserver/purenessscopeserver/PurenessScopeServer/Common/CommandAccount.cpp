@@ -52,8 +52,8 @@ void CCommandAccount::Close()
     vector<_CommandData*> vecCommandData;
     m_objCommandDataList.Get_All_Used(vecCommandData);
 	
-	int32 size = (int32)vecCommandData.size();
-    for(int32 i = 0; i < size; i++)
+	uint32 u4Size = vecCommandData.size();
+    for(uint32 i = 0; i < u4Size; i++)
     {
         if(NULL != vecCommandData[i])
         {
@@ -243,8 +243,8 @@ bool CCommandAccount::SaveCommandDataLog()
     vector<_CommandData*> vecCommandData;
     m_objCommandDataList.Get_All_Used(vecCommandData);
 
-	int32 size = (int32_t)vecCommandData.size();
-    for(int32 i = 0; i < size; i++)
+	uint32 u4Size = vecCommandData.size();
+    for(uint32 i = 0; i < u4Size; i++)
     {
         _CommandData* pCommandData = vecCommandData[i];
 

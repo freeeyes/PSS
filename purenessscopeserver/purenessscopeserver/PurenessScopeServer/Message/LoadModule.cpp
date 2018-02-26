@@ -33,8 +33,8 @@ void CLoadModule::Close()
     vector<_ModuleInfo*> vecModuleInfo;
     m_objHashModuleList.Get_All_Used(vecModuleInfo);
 
-	int32 size = (int32)vecModuleInfo.size();
-    for (int32 i = 0; i < size; i++)
+	uint32 u4Size = vecModuleInfo.size();
+    for (uint32 i = 0; i < u4Size; i++)
     {
         _ModuleInfo* pModuleInfo = vecModuleInfo[i];
 
@@ -44,8 +44,8 @@ void CLoadModule::Close()
         }
     }
 
-	size = (int32)obj_vecModuleName.size();
-    for (int32 i = 0; i < size; i++)
+	u4Size = obj_vecModuleName.size();
+    for (uint32 i = 0; i < u4Size; i++)
     {
         //卸载并删除当初new的module对象
         //OUR_DEBUG((LM_INFO, "[CLoadModule::Close]name=%s.\n", obj_vecModuleName[i].c_str()));
@@ -246,8 +246,8 @@ bool CLoadModule::InitModule()
     m_objHashModuleList.Get_All_Used(vecModeInfo);
 
     //执行所有的插件数据进入前的准备
-	int32 size = (int32)vecModeInfo.size();
-    for (int32 i = 0; i < size; i++)
+	uint32 u4Size = vecModeInfo.size();
+    for (uint32 i = 0; i < u4Size; i++)
     {
         if (NULL != vecModeInfo[i]->InitModule)
         {
@@ -469,8 +469,8 @@ void CLoadModule::GetAllModuleName(vector<string> vecModuleName)
     vector<_ModuleInfo*> vecModeInfo;
     m_objHashModuleList.Get_All_Used(vecModeInfo);
 
-	int32 size = (int32)vecModeInfo.size();
-    for(int32 i = 0; i < size; i++)
+	uint32 u4Size = vecModeInfo.size();
+    for(uint32 i = 0; i < u4Size; i++)
     {
         vecModuleName.push_back((string)vecModeInfo[i]->GetName());
     }

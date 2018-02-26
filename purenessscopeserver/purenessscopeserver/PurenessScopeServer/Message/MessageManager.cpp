@@ -368,8 +368,8 @@ void CMessageManager::Close()
     vector<CClientCommandList*> vecClientCommandList;
     m_objClientCommandList.Get_All_Used(vecClientCommandList);
 
-	int32 size = (int32)vecClientCommandList.size();
-    for (int32 i = 0; i < size; i++)
+	uint32 u4Size = vecClientCommandList.size();
+    for (uint32 i = 0; i < u4Size; i++)
     {
         SAFE_DELETE(vecClientCommandList[i]);
     }
@@ -379,8 +379,8 @@ void CMessageManager::Close()
     vector<_ModuleClient*> vecModuleClient;
     m_objModuleClientList.Get_All_Used(vecModuleClient);
 
-	size = (int32)vecModuleClient.size();
-    for (int32 i = 0; i < size; i++)
+	u4Size = vecModuleClient.size();
+    for (uint32 i = 0; i < u4Size; i++)
     {
         SAFE_DELETE(vecModuleClient[i]);
     }

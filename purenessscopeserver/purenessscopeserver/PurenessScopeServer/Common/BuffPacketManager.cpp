@@ -54,8 +54,8 @@ void CBuffPacketManager::Close()
     vector<CBuffPacket* > vecBuffPacket;
     m_objHashBuffPacketList.Get_All_Used(vecBuffPacket);
 
-	int32 size = (int32)vecBuffPacket.size();
-    for(int32 i = 0; i < size; i++)
+	uint32 u4Size = vecBuffPacket.size();
+    for(uint32 i = 0; i < u4Size; i++)
     {
         CBuffPacket* pBuffPacket = vecBuffPacket[i];
 
@@ -77,8 +77,8 @@ void CBuffPacketManager::Init(uint32 u4PacketCount, uint32 u4MaxBuffSize, bool b
     m_objBuffPacketList.Init(u4PacketCount);
     m_objHashBuffPacketList.Init((int32)u4PacketCount);
 
-	uint32 size = (uint32)m_objHashBuffPacketList.Get_Count();
-    for(uint32 i = 0; i < size; i++)
+	uint32 u4Size = m_objHashBuffPacketList.Get_Count();
+    for(uint32 i = 0; i < u4Size; i++)
     {
         CBuffPacket* pBuffPacket = m_objBuffPacketList.GetObject(i);
 

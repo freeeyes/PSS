@@ -211,8 +211,8 @@ uint16 CWorkThreadAI::GetReturnDataLength()
 
 void CWorkThreadAI::Close()
 {
-	uint16 size = (uint16)m_vecCommandTime.size();
-    for(uint16 i = 0; i < size; i++)
+	uint32 u4Size = m_vecCommandTime.size();
+    for(uint32 i = 0; i < u4Size; i++)
     {
         SAFE_DELETE(m_vecCommandTime[i]);
     }
@@ -242,8 +242,8 @@ void CWorkThreadAI::GetAllTimeout(uint32 u4ThreadID, vecCommandTimeout& objTimeo
 {
     //objTimeout.clear();
 
-	int32 size = (int32)m_vecCommandTime.size();
-    for(int32 i = 0; i < size; i++)
+	uint32 u4Size = m_vecCommandTime.size();
+    for(uint32 i = 0; i < u4Size; i++)
     {
         _CommandTime* pCommandTime = m_vecCommandTime[i];
 
@@ -270,8 +270,8 @@ void CWorkThreadAI::GetAllForbiden(uint32 u4ThreadID, vecCommandTimeout& objForb
 {
     //objForbiden.clear();
 
-	int32 size = (int32)m_vecCommandTimeout.size();
-    for(int32 i = 0; i < size; i++)
+	uint32 u4Size = m_vecCommandTimeout.size();
+    for(uint32 i = 0; i < u4Size; i++)
     {
         _CommandTimeout objData;
         objData.m_u4ThreadID  = u4ThreadID;

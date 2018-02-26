@@ -95,8 +95,8 @@ void CServerMessageInfoPool::Close()
     vector<_Server_Message_Info*> vecServerMessageInfo;
     m_objServerMessageList.Get_All_Used(vecServerMessageInfo);
 
-	int32 size = (int32)vecServerMessageInfo.size();
-    for(int32 i = 0; i < size; i++)
+	uint32 u4Size = vecServerMessageInfo.size();
+    for(uint32 i = 0; i < u4Size; i++)
     {
         SAFE_DELETE(vecServerMessageInfo[i]);
     }
@@ -444,8 +444,8 @@ bool CServerMessageTask::CheckServerMessageThread(ACE_Time_Value tvNow)
 
 bool CServerMessageTask::CheckValidClientMessage(IClientMessage* pClientMessage)
 {
-	int32 size = m_vecValidIClientMessage.size();
-    for(int32 i = 0; i < size; i++)
+	uint32 u4Size = m_vecValidIClientMessage.size();
+    for(uint32 i = 0; i < u4Size; i++)
     {
         if(m_vecValidIClientMessage[i] == pClientMessage)
         {

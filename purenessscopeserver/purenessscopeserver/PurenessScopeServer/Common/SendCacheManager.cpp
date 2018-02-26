@@ -38,8 +38,8 @@ void CSendCacheManager::Close()
     vector<ACE_Message_Block*> vecMb;
     m_objCacheHashList.Get_All_Used(vecMb);
 
-	int32 size = (int32)vecMb.size();
-    for(int32 i = 0; i < size; i++)
+	uint32 u4Size = vecMb.size();
+    for(uint32 i = 0; i < u4Size; i++)
     {
         App_MessageBlockManager::instance()->Close(vecMb[i]);
     }
