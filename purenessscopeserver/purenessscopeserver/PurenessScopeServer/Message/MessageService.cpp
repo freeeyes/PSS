@@ -508,7 +508,8 @@ void CMessageService::CloseCommandList()
     vector<CClientCommandList*> vecClientCommandList;
     m_objClientCommandList.Get_All_Used(vecClientCommandList);
 
-	uint32 u4Size = vecClientCommandList.size();
+    uint32 u4Size = (uint32)vecClientCommandList.size();
+
     for (uint32 i = 0; i < u4Size; i++)
     {
         SAFE_DELETE(vecClientCommandList[i]);
@@ -617,8 +618,9 @@ void CMessageService::CopyMessageManagerList()
         vector<CClientCommandList*> vecClientCommandList;
         pClientCommandList->Get_All_Used(vecClientCommandList);
 
-		uint32 u4Size = vecClientCommandList.size();
-        for (uint i = 0; i < u4Size; i++)
+        uint32 u4Size = (uint32)vecClientCommandList.size();
+
+        for (uint32 i = 0; i < u4Size; i++)
         {
             CClientCommandList* pClientCommandList = vecClientCommandList[i];
 
@@ -719,10 +721,10 @@ CMessage* CMessageService::CreateMessage()
 void CMessageService::DeleteMessage(CMessage* pMessage)
 {
     //OUR_DEBUG((LM_INFO, "[CMessageService::DeleteMessage]GetThreadID=%d, m_MessagePool=0x%08x.\n", GetThreadID(), m_MessagePool));
-	if (false == m_MessagePool.Delete(pMessage))
-	{
-		OUR_DEBUG((LM_INFO, "[CMessageService::DeleteMessage]pMessage == NULL.\n"));
-	}
+    if (false == m_MessagePool.Delete(pMessage))
+    {
+        OUR_DEBUG((LM_INFO, "[CMessageService::DeleteMessage]pMessage == NULL.\n"));
+    }
 }
 
 void CMessageService::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_Account)
@@ -856,17 +858,18 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
     //时序模式开启
     OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Init]Timing sequence Start.\n"));
 
-	CMessageService* pMessageService = new CMessageService[u4ThreadCount];
+    CMessageService* pMessageService = new CMessageService[u4ThreadCount];
+
     //初始化所有的Message对象
     for (uint32 i = 0; i < u4ThreadCount; i++)
     {
-		/* CMessageService* pMessageService = new CMessageService();
+        /* CMessageService* pMessageService = new CMessageService();
 
-		 if (NULL == pMessageService)
-		 {
-			 OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::Init](%d)pMessageService is NULL.\n", i));
-			 return false;
-		 }*/
+         if (NULL == pMessageService)
+         {
+             OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::Init](%d)pMessageService is NULL.\n", i));
+             return false;
+         }*/
 
         (pMessageService + i)->Init(i, u4MaxQueue, u4LowMask, u4HighMask);
 
@@ -919,8 +922,9 @@ bool CMessageServiceGroup::PutUpdateCommandMessage(uint32 u4UpdateIndex)
 {
     //向所有工作线程群发副本更新消息
 
-	uint32 u4Size = m_vecMessageService.size();
-    for (uint i = 0; i < u4Size; i++)
+    uint32 u4Size = (uint32)m_vecMessageService.size();
+
+    for (uint32 i = 0; i < u4Size; i++)
     {
         CMessageService* pMessageService = m_vecMessageService[i];
 
@@ -946,7 +950,8 @@ void CMessageServiceGroup::Close()
 
     ACE_Time_Value tvSleep(0, 1000);
 
-	uint32 u4Size = m_vecMessageService.size();
+    uint32 u4Size = (uint32)m_vecMessageService.size();
+
     for (uint32 i = 0; i < u4Size; i++)
     {
         CMessageService* pMessageService = m_vecMessageService[i];
@@ -972,7 +977,8 @@ bool CMessageServiceGroup::Start()
 
     OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Start]Work thread count=%d.\n", m_vecMessageService.size()));
 
-	uint32 u4Size = m_vecMessageService.size();
+    uint32 u4Size = (uint32)m_vecMessageService.size();
+
     for (uint32 i = 0; i < u4Size; i++)
     {
         CMessageService* pMessageService = m_vecMessageService[i];
@@ -982,6 +988,7 @@ bool CMessageServiceGroup::Start()
             OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Start](%d)WorkThread is fail.\n", i));
             return false;
         }
+
         OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Start](%d)WorkThread is OK.\n", i));
     }
 
@@ -1019,7 +1026,8 @@ bool CMessageServiceGroup::KillTimer()
 
 bool CMessageServiceGroup::CheckWorkThread()
 {
-	uint32 u4Size = m_vecMessageService.size();
+    uint32 u4Size = (uint32)m_vecMessageService.size();
+
     for (uint32 i = 0; i < u4Size; i++)
     {
         CMessageService* pMessageService = m_vecMessageService[i];
@@ -1077,7 +1085,8 @@ bool CMessageServiceGroup::CheckPlugInState()
     vector<_ModuleInfo*> vecModeInfo;
     App_ModuleLoader::instance()->GetAllModuleInfo(vecModeInfo);
 
-	uint32 u4Size = vecModeInfo.size();
+    uint32 u4Size = (uint32)vecModeInfo.size();
+
     for (uint32 i = 0; i < u4Size; i++)
     {
         _ModuleInfo* pModuleInfo = vecModeInfo[i];
@@ -1124,7 +1133,8 @@ void CMessageServiceGroup::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_
     vec_Port_Data_Account.clear();
     vector<_Port_Data_Account> vec_Service_Port_Data_Account;
 
-	uint32 u4Size = m_vecMessageService.size();
+    uint32 u4Size = (uint32)m_vecMessageService.size();
+
     for (uint32 i = 0; i < u4Size; i++)
     {
         CMessageService* pMessageService = m_vecMessageService[i];
@@ -1140,7 +1150,8 @@ void CMessageServiceGroup::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_
 
 CThreadInfo* CMessageServiceGroup::GetThreadInfo()
 {
-	uint32 u4Size = m_vecMessageService.size();
+    uint32 u4Size = (uint32)m_vecMessageService.size();
+
     for (uint32 i = 0; i < u4Size; i++)
     {
         CMessageService* pMessageService = m_vecMessageService[i];
@@ -1163,7 +1174,8 @@ uint32 CMessageServiceGroup::GetUsedMessageCount()
 {
     uint32 u4Count = 0;
 
-	uint32 u4Size = m_vecMessageService.size();
+    uint32 u4Size = (uint32)m_vecMessageService.size();
+
     for (uint32 i = 0; i < u4Size; i++)
     {
         u4Count += m_vecMessageService[i]->GetUsedMessageCount();
@@ -1193,7 +1205,8 @@ void CMessageServiceGroup::GetWorkThreadAIInfo(vecWorkThreadAIInfo& objvecWorkTh
 {
     objvecWorkThreadAIInfo.clear();
 
-	uint32 u4Size = m_vecMessageService.size();
+    uint32 u4Size = (uint32)m_vecMessageService.size();
+
     for (uint32 i = 0; i < u4Size; i++)
     {
         _WorkThreadAIInfo objWorkThreadAIInfo;
@@ -1212,7 +1225,8 @@ void CMessageServiceGroup::GetAITO(vecCommandTimeout& objTimeout)
 {
     objTimeout.clear();
 
-	uint32 u4Size = m_vecMessageService.size();
+    uint32 u4Size = (uint32)m_vecMessageService.size();
+
     for (uint32 i = 0; i < u4Size; i++)
     {
         CMessageService* pMessageService = m_vecMessageService[i];
@@ -1228,7 +1242,8 @@ void CMessageServiceGroup::GetAITF(vecCommandTimeout& objTimeout)
 {
     objTimeout.clear();
 
-	uint32 u4Size = m_vecMessageService.size();
+    uint32 u4Size = (uint32)m_vecMessageService.size();
+
     for (uint32 i = 0; i < u4Size; i++)
     {
         CMessageService* pMessageService = m_vecMessageService[i];
@@ -1242,7 +1257,8 @@ void CMessageServiceGroup::GetAITF(vecCommandTimeout& objTimeout)
 
 void CMessageServiceGroup::SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime)
 {
-	uint32 u4Size = m_vecMessageService.size();
+    uint32 u4Size = (uint32)m_vecMessageService.size();
+
     for (uint32 i = 0; i < u4Size; i++)
     {
         CMessageService* pMessageService = m_vecMessageService[i];
@@ -1256,7 +1272,8 @@ void CMessageServiceGroup::SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCh
 
 void CMessageServiceGroup::GetCommandData(uint16 u2CommandID, _CommandData& objCommandData)
 {
-	uint32 u4Size = m_vecMessageService.size();
+    uint32 u4Size = (uint32)m_vecMessageService.size();
+
     for (uint32 i = 0; i < u4Size; i++)
     {
         CMessageService* pMessageService = m_vecMessageService[i];
@@ -1275,7 +1292,8 @@ void CMessageServiceGroup::GetCommandData(uint16 u2CommandID, _CommandData& objC
 
 void CMessageServiceGroup::GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut)
 {
-	uint32 u4Size = m_vecMessageService.size();
+    uint32 u4Size = (uint32)m_vecMessageService.size();
+
     for (uint32 i = 0; i < u4Size; i++)
     {
         uint32 u4CurrFlowIn  = 0;
@@ -1293,7 +1311,8 @@ void CMessageServiceGroup::GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut)
 
 void CMessageServiceGroup::GetCommandAlertData(vecCommandAlertData& CommandAlertDataList)
 {
-	uint32 u4Size = m_vecMessageService.size();
+    uint32 u4Size = (uint32)m_vecMessageService.size();
+
     for (uint32 i = 0; i < u4Size; i++)
     {
         CMessageService* pMessageService = m_vecMessageService[i];
@@ -1307,7 +1326,8 @@ void CMessageServiceGroup::GetCommandAlertData(vecCommandAlertData& CommandAlert
 
 void CMessageServiceGroup::SaveCommandDataLog()
 {
-	uint32 u4Size = m_vecMessageService.size();
+    uint32 u4Size = (uint32)m_vecMessageService.size();
+
     for (uint32 i = 0; i < u4Size; i++)
     {
         CMessageService* pMessageService = m_vecMessageService[i];
@@ -1368,7 +1388,8 @@ void CMessageServiceGroup::DeleteMessage(uint32 u4ConnectID, CMessage* pMessage)
 void CMessageServiceGroup::CopyMessageManagerList()
 {
     //初始化所有的Message对象
-	uint32 u4Size = m_vecMessageService.size();
+    uint32 u4Size = (uint32)m_vecMessageService.size();
+
     for (uint32 i = 0; i < u4Size; i++)
     {
         CMessageService* pMessageService = m_vecMessageService[i];

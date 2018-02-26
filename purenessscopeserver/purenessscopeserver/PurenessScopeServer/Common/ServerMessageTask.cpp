@@ -17,7 +17,7 @@ void CServerMessageInfoPool::Init(uint32 u4PacketCount /*= MAX_SERVER_MESSAGE_IN
     Close();
 
     m_objServerMessageList.Init((int)u4PacketCount);
-	m_objArrayList.Init(u4PacketCount);
+    m_objArrayList.Init(u4PacketCount);
 
     for(uint32 i = 0; i < u4PacketCount; i++)
     {
@@ -95,7 +95,8 @@ void CServerMessageInfoPool::Close()
     vector<_Server_Message_Info*> vecServerMessageInfo;
     m_objServerMessageList.Get_All_Used(vecServerMessageInfo);
 
-	uint32 u4Size = vecServerMessageInfo.size();
+    uint32 u4Size = (uint32)vecServerMessageInfo.size();
+
     for(uint32 i = 0; i < u4Size; i++)
     {
         SAFE_DELETE(vecServerMessageInfo[i]);
@@ -444,7 +445,8 @@ bool CServerMessageTask::CheckServerMessageThread(ACE_Time_Value tvNow)
 
 bool CServerMessageTask::CheckValidClientMessage(IClientMessage* pClientMessage)
 {
-	uint32 u4Size = m_vecValidIClientMessage.size();
+    uint32 u4Size = (uint32)m_vecValidIClientMessage.size();
+
     for(uint32 i = 0; i < u4Size; i++)
     {
         if(m_vecValidIClientMessage[i] == pClientMessage)

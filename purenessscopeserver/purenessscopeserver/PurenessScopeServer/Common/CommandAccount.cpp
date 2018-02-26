@@ -51,8 +51,9 @@ void CCommandAccount::Close()
 {
     vector<_CommandData*> vecCommandData;
     m_objCommandDataList.Get_All_Used(vecCommandData);
-	
-	uint32 u4Size = vecCommandData.size();
+
+    uint32 u4Size = (uint32)vecCommandData.size();
+
     for(uint32 i = 0; i < u4Size; i++)
     {
         if(NULL != vecCommandData[i])
@@ -166,7 +167,8 @@ bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint32 u4Port, uint8 u1Pack
     ACE_Date_Time dtNowTime(tvTime);
     uint8 u1Minute = (uint8)dtNowTime.minute();
 
-	int32 size = (int32)m_vecCommandAlertData.size();
+    int32 size = (int32)m_vecCommandAlertData.size();
+
     for (int32 i = 0; i < size; i++)
     {
         if (m_vecCommandAlertData[i].m_u2CommandID == u2CommandID)
@@ -186,13 +188,14 @@ bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint32 u4Port, uint8 u1Pack
                     m_vecCommandAlertData[i].m_u4CurrCount = 0;
 
                     AppLogManager::instance()->WriteToMail(LOG_SYSTEM_PACKETTIME,
-                                                            m_vecCommandAlertData[i].m_u4MailID,
-                                                            (char*)"Alert",
-                                                            "u2CommandID=%d, m_u4CommandCount more than [%d].",
-                                                            u2CommandID,
-                                                            (uint32)m_vecCommandAlertData[i].m_u4CommandCount);
+                                                           m_vecCommandAlertData[i].m_u4MailID,
+                                                           (char*)"Alert",
+                                                           "u2CommandID=%d, m_u4CommandCount more than [%d].",
+                                                           u2CommandID,
+                                                           (uint32)m_vecCommandAlertData[i].m_u4CommandCount);
                 }
             }
+
             break;
         }
     }
@@ -243,7 +246,8 @@ bool CCommandAccount::SaveCommandDataLog()
     vector<_CommandData*> vecCommandData;
     m_objCommandDataList.Get_All_Used(vecCommandData);
 
-	uint32 u4Size = vecCommandData.size();
+    uint32 u4Size = (uint32)vecCommandData.size();
+
     for(uint32 i = 0; i < u4Size; i++)
     {
         _CommandData* pCommandData = vecCommandData[i];

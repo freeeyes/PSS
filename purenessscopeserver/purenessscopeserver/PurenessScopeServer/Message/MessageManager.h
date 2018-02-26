@@ -80,7 +80,8 @@ public:
 
     void Close()
     {
-		uint32 u4Size = m_vecClientCommandList.size();
+        uint32 u4Size = (uint32)m_vecClientCommandList.size();
+
         for(uint32 i = 0; i < u4Size; i++)
         {
             SAFE_DELETE(m_vecClientCommandList[i]);

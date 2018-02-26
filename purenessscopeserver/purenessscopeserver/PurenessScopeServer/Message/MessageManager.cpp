@@ -326,7 +326,7 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1LoadS
                             {
                                 OUR_DEBUG((LM_INFO, "[CMessageManager::UnloadModuleCommand]DelClientCommand(%d) is OK.\n", pClientCommandInfo->m_u2CommandID));
                             }
-                            
+
                             //如果该指令下的命令已经不存在，则删除之
                             if(pCClientCommandList->GetCount() == 0)
                             {
@@ -368,7 +368,8 @@ void CMessageManager::Close()
     vector<CClientCommandList*> vecClientCommandList;
     m_objClientCommandList.Get_All_Used(vecClientCommandList);
 
-	uint32 u4Size = vecClientCommandList.size();
+    uint32 u4Size = (uint32)vecClientCommandList.size();
+
     for (uint32 i = 0; i < u4Size; i++)
     {
         SAFE_DELETE(vecClientCommandList[i]);
@@ -379,7 +380,8 @@ void CMessageManager::Close()
     vector<_ModuleClient*> vecModuleClient;
     m_objModuleClientList.Get_All_Used(vecModuleClient);
 
-	u4Size = vecModuleClient.size();
+    u4Size = (uint32)vecModuleClient.size();
+
     for (uint32 i = 0; i < u4Size; i++)
     {
         SAFE_DELETE(vecModuleClient[i]);
