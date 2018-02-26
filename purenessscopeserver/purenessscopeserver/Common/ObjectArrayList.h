@@ -11,7 +11,7 @@ class CObjectArrayList
 public:
     CObjectArrayList()
     {
-        m_pMemonyList = NULL;
+        m_pMemoryList = NULL;
         m_u4Count     = 0;
     }
 
