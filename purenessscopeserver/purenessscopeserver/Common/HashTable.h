@@ -813,6 +813,107 @@ public:
         }
     }
 
+    //添加一个Hash数据块(key为一个数字)
+    //最所以独立出来，是为了减少将数字转化为字符串在做Hsah的这个步骤。
+    //直接采用key做Hash计算的下标
+    int32 Add_Hash_Data_By_Key_Unit32(uint32 u4Key, T* pValue)
+    {
+        if (NULL == m_lpTable)
+        {
+            //没有找到共享内存
+            if (HASH_DEBUG_ON == m_emHashDebug)
+            {
+                OUR_DEBUG((LM_INFO, "[Add_Hash_Data]m_lpTable is NULL.\n"));
+            }
+
+            return -1;
+        }
+
+        int32 nPos = GetHashTablePos_By_HashIndex((unsigned long)u4Key, EM_INSERT);
+
+        if (-1 == nPos)
+        {
+            //内存已满，或者数据已经存在
+            if (HASH_DEBUG_ON == m_emHashDebug)
+            {
+                OUR_DEBUG((LM_INFO, "[Add_Hash_Data]GetHashTablePos is -1.\n", nPos));
+            }
+
+            return -1;
+        }
+        else
+        {
+            if (NULL == m_lpTable[nPos])
+            {
+                //从对象池中获取一个新对象
+                _Hash_Table_Cell<T>* pData = m_objHashPool.Create();
+
+                if (NULL == pData)
+                {
+                    return -1;
+                }
+
+                _Hash_Link_Info<T>* pLink = m_objHashLinkPool.Create();
+
+                if (NULL == pLink)
+                {
+                    return -1;
+                }
+                else
+                {
+                    sprintf_safe(pData->m_pKey, pData->m_sKeyLen, "%d", u4Key);
+                    pData->m_pValue = pValue;
+                    pLink->m_pData = pData;
+                    m_lpTable[nPos] = pLink;
+                }
+            }
+            else
+            {
+                //如果已经存在对象，则找到当前链表中最后一个，添加之
+                _Hash_Link_Info<T>* pLastLink = m_lpTable[nPos];
+
+                while (NULL != pLastLink)
+                {
+                    if (pLastLink->m_pNext == NULL)
+                    {
+                        break;
+                    }
+
+                    pLastLink = pLastLink->m_pNext;
+                }
+
+                //从对象池中获取一个新对象
+                _Hash_Table_Cell<T>* pData = m_objHashPool.Create();
+
+                if (NULL == pData)
+                {
+                    return -1;
+                }
+
+                _Hash_Link_Info<T>* pLink = m_objHashLinkPool.Create();
+
+                if (NULL == pLink)
+                {
+                    return -1;
+                }
+                else
+                {
+                    sprintf_safe(pData->m_pKey, pData->m_sKeyLen, "%d", u4Key);
+                    pData->m_pValue = pValue;
+                    pLink->m_pData = pData;
+                    pLink->m_pPerv = pLastLink;
+
+                    if (NULL != pLastLink)
+                    {
+                        pLastLink->m_pNext = pLink;
+                    }
+                }
+            }
+
+            return nPos;
+        }
+    }
+
     //添加一个Hash数据块
     int32 Add_Hash_Data(const char* pKey, T* pValue)
     {
@@ -963,6 +1064,12 @@ public:
         }
     }
 
+    //清理一个Hash数据块，根据Unit32
+    int32 Del_Hash_Data_By_Unit32(uint32 u4Key)
+    {
+        return DelHashTablePos_By_HashIndex((unsigned long)u4Key);
+    }
+
     //清理一个hash数据块
     int32 Del_Hash_Data(const char* pKey)
     {
@@ -994,15 +1101,16 @@ private:
         }
     }
 
-    //得到hash指定的位置
-    int32 GetHashTablePos(const char* lpszString, EM_HASH_STATE emHashState)
+    //根据提供的下标，寻找数组中指定的Hash数据
+    int32 GetHashTablePos_By_HashIndex(unsigned long uHashStart, EM_HASH_STATE emHashState)
     {
-        unsigned long uHashStart = HashString(lpszString, m_objHashPool.Get_Count());
+        char szCurrKey[DEF_HASH_KEY_SIZE] = { '\0' };
+        sprintf_safe(szCurrKey, DEF_HASH_KEY_SIZE, "%d", uHashStart);
 
         //获取链表，并比对
-        if(NULL == m_lpTable[uHashStart])
+        if (NULL == m_lpTable[uHashStart])
         {
-            if(EM_INSERT == emHashState)
+            if (EM_INSERT == emHashState)
             {
                 return uHashStart;
             }
@@ -1015,15 +1123,15 @@ private:
         {
             _Hash_Link_Info<T>* pLastLink = m_lpTable[uHashStart];
 
-            while(NULL != pLastLink)
+            while (NULL != pLastLink)
             {
                 //printf("[CHashTable::GetHashTablePos]pLastLink->m_pData=0x%08x.\n", pLastLink->m_pData);
                 //printf("[CHashTable::GetHashTablePos]pLastLink->m_pData->m_pKey=%s.\n", pLastLink->m_pData->m_pKey);
                 //printf("[CHashTable::GetHashTablePos]lpszString=%s.\n", lpszString);
-                if(NULL != pLastLink->m_pData && strcmp(pLastLink->m_pData->m_pKey, lpszString) == 0)
+                if (NULL != pLastLink->m_pData && strcmp(pLastLink->m_pData->m_pKey, szCurrKey) == 0)
                 {
                     //找到了对应的key,这个数据已经存在
-                    if(EM_INSERT == emHashState)
+                    if (EM_INSERT == emHashState)
                     {
                         return -1;
                     }
@@ -1038,16 +1146,24 @@ private:
 
             return uHashStart;
         }
-
     }
 
-    //删除指定的数据
-    int32 DelHashTablePos(const char* lpszString)
+    //得到hash指定的位置
+    int32 GetHashTablePos(const char* lpszString, EM_HASH_STATE emHashState)
     {
         unsigned long uHashStart = HashString(lpszString, m_objHashPool.Get_Count());
 
+        return GetHashTablePos_By_HashIndex(uHashStart, emHashState);
+    }
+
+    //根据提供的下标，删除数组中指定的Hash数据
+    int32 DelHashTablePos_By_HashIndex(unsigned long uHashStart)
+    {
+        char szCurrKey[DEF_HASH_KEY_SIZE] = { '\0' };
+        sprintf_safe(szCurrKey, DEF_HASH_KEY_SIZE, "%d", uHashStart);
+
         //获取链表，并比对
-        if(NULL == m_lpTable[uHashStart])
+        if (NULL == m_lpTable[uHashStart])
         {
             return -1;
         }
@@ -1055,16 +1171,16 @@ private:
         {
             _Hash_Link_Info<T>* pLastLink = m_lpTable[uHashStart];
 
-            while(NULL != pLastLink)
+            while (NULL != pLastLink)
             {
-                if(NULL != pLastLink->m_pData && strcmp(pLastLink->m_pData->m_pKey, lpszString) == 0)
+                if (NULL != pLastLink->m_pData && strcmp(pLastLink->m_pData->m_pKey, szCurrKey) == 0)
                 {
                     //找到了对应的key,这个数据已经存在
-                    if(pLastLink->m_pPerv == NULL)
+                    if (pLastLink->m_pPerv == NULL)
                     {
                         m_lpTable[uHashStart] = pLastLink->m_pNext;
 
-                        if(NULL != pLastLink->m_pNext)
+                        if (NULL != pLastLink->m_pNext)
                         {
                             pLastLink->m_pNext->m_pPerv = NULL;
                         }
@@ -1073,7 +1189,7 @@ private:
                     {
                         pLastLink->m_pPerv->m_pNext = pLastLink->m_pNext;
 
-                        if(NULL != pLastLink->m_pNext)
+                        if (NULL != pLastLink->m_pNext)
                         {
                             pLastLink->m_pNext->m_pPerv = pLastLink->m_pPerv;
                         }
@@ -1087,9 +1203,60 @@ private:
 
                 pLastLink = pLastLink->m_pNext;
             }
-        }
 
-        return 0;
+            return -1;
+        }
+    }
+
+    //删除指定的数据
+    int32 DelHashTablePos(const char* lpszString)
+    {
+        unsigned long uHashStart = HashString(lpszString, m_objHashPool.Get_Count());
+
+        //获取链表，并比对
+        if (NULL == m_lpTable[uHashStart])
+        {
+            return -1;
+        }
+        else
+        {
+            _Hash_Link_Info<T>* pLastLink = m_lpTable[uHashStart];
+
+            while (NULL != pLastLink)
+            {
+                if (NULL != pLastLink->m_pData && strcmp(pLastLink->m_pData->m_pKey, lpszString) == 0)
+                {
+                    //找到了对应的key,这个数据已经存在
+                    if (pLastLink->m_pPerv == NULL)
+                    {
+                        m_lpTable[uHashStart] = pLastLink->m_pNext;
+
+                        if (NULL != pLastLink->m_pNext)
+                        {
+                            pLastLink->m_pNext->m_pPerv = NULL;
+                        }
+                    }
+                    else
+                    {
+                        pLastLink->m_pPerv->m_pNext = pLastLink->m_pNext;
+
+                        if (NULL != pLastLink->m_pNext)
+                        {
+                            pLastLink->m_pNext->m_pPerv = pLastLink->m_pPerv;
+                        }
+                    }
+
+                    //回收指针链表和对象
+                    m_objHashPool.Delete(pLastLink->m_pData);
+                    m_objHashLinkPool.Delete(pLastLink);
+                    return 0;
+                }
+
+                pLastLink = pLastLink->m_pNext;
+            }
+
+            return -1;
+        }
     }
 
 private:
