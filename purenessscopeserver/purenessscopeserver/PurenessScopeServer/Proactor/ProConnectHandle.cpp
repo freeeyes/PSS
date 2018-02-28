@@ -27,7 +27,7 @@ CProConnectHandle::CProConnectHandle(void) : m_u4LocalPort(0), m_u4SendCheckTime
     m_u2SendQueueTimeout  = MAX_QUEUE_TIMEOUT * 1000;  //目前因为记录的是微秒，所以这里相应的扩大1000倍
     m_u2RecvQueueTimeout  = MAX_QUEUE_TIMEOUT * 1000;  //目前因为记录的是微秒，所以这里相应的扩大1000倍
     m_u2TcpNodelay        = TCP_NODELAY_ON;
-    m_emStatus            = CLIENT_CLOSE_NOTHING;
+    //m_emStatus            = CLIENT_CLOSE_NOTHING;
     m_u4SendMaxBuffSize   = 5*1024;
     m_nHashID             = 0;
     m_szConnectName[0]    = '\0';
@@ -71,7 +71,7 @@ void CProConnectHandle::Init(uint16 u2HandlerID)
     }
 
     m_u4SendMaxBuffSize  = App_MainConfig::instance()->GetBlockSize();
-    m_emStatus           = CLIENT_CLOSE_NOTHING;
+    //m_emStatus           = CLIENT_CLOSE_NOTHING;
 
     m_pPacketDebugData   = new char[App_MainConfig::instance()->GetDebugSize()];
     m_u4PacketDebugSize  = App_MainConfig::instance()->GetDebugSize() / 5;
@@ -238,10 +238,6 @@ bool CProConnectHandle::ServerClose(EM_Client_Close_status emStatus, uint8 u1Opt
             m_u1ConnectState = CONNECT_SERVER_CLOSE;
 
         }
-        else
-        {
-            m_emStatus = emStatus;
-        }
     }
 
     return true;
@@ -282,7 +278,7 @@ uint32 CProConnectHandle::file_open(IFileTestManager* pFileTest)
     m_u8SendQueueTimeCost = 0;
     m_u4SuccessSendSize = 0;
     m_u4ReadSendSize = 0;
-    m_emStatus = CLIENT_CLOSE_NOTHING;
+    //m_emStatus = CLIENT_CLOSE_NOTHING;
     m_blIsLog = false;
     m_szConnectName[0] = '\0';
     m_u1IsActive = 1;
@@ -489,7 +485,7 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
     m_u8SendQueueTimeCost = 0;
     m_u4SuccessSendSize   = 0;
     m_u4ReadSendSize      = 0;
-    m_emStatus            = CLIENT_CLOSE_NOTHING;
+    //m_emStatus            = CLIENT_CLOSE_NOTHING;
     m_blIsLog             = false;
     m_szConnectName[0]    = '\0';
     m_u1IsActive          = 1;
@@ -1362,16 +1358,16 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
             }
 
             //判断是否发送完成后关闭连接
-            if (PACKET_SEND_FIN_CLOSE == u1State)
-            {
-                m_emStatus = CLIENT_CLOSE_SENDOK;
-            }
+            //if (PACKET_SEND_FIN_CLOSE == u1State)
+            //{
+            //    m_emStatus = CLIENT_CLOSE_SENDOK;
+            //}
 
             //将消息ID放入MessageBlock
-            ACE_Message_Block::ACE_Message_Type  objType = ACE_Message_Block::MB_USER + nMessageID;
+            ACE_Message_Block::ACE_Message_Type objType = ACE_Message_Block::MB_USER + nMessageID;
             pMbData->msg_type(objType);
 
-            return PutSendPacket(pMbData);
+            return PutSendPacket(pMbData,u1State);
         }
     }
     else
@@ -1425,7 +1421,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
     }
 }
 
-bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
+bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State)
 {
     if(NULL == pMbData)
     {
@@ -1559,6 +1555,11 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData)
             //OUR_DEBUG ((LM_ERROR, "[CProConnectHandle::PutSendPacket](%s:%d) Send(%d) OK!\n", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), pMbData->length()));
             m_u4AllSendCount += 1;
             m_atvOutput      = ACE_OS::gettimeofday();
+
+            if (PACKET_SEND_FIN_CLOSE == u1State)
+            {
+                this->ServerClose(CLIENT_CLOSE_IMMEDIATLY);
+            }
             return true;
         }
     }

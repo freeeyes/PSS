@@ -90,7 +90,7 @@ public:
 private:
     bool RecvClinetPacket(uint32 u4PackeLen);                                 //接受数据包
     bool CheckMessage();                                                      //处理接收的数据
-    bool PutSendPacket(ACE_Message_Block* pMbData);                           //将发送数据放入队列
+    bool PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State);            //将发送数据放入队列
     void ClearPacketParse(ACE_Message_Block& mbCurrBlock);                    //清理正在使用的PacketParse
     void PutSendPacketError(ACE_Message_Block* pMbData);                      //发送失败回调
 
@@ -140,7 +140,7 @@ private:
     ACE_Recursive_Thread_Mutex m_ThreadWriteLock;
     _TimeConnectInfo    m_TimeConnectInfo;              //链接健康检测器
     ACE_Message_Block*  m_pBlockMessage;                //当前发送缓冲等待数据块
-    EM_Client_Close_status m_emStatus;                  //当前服务器关闭标记
+    //EM_Client_Close_status m_emStatus;                  //当前服务器关闭标记
 
     CPacketParse        m_objSendPacketParse;           //发送数据包组织结构
     char*               m_pPacketDebugData;             //记录数据包的Debug缓冲字符串
