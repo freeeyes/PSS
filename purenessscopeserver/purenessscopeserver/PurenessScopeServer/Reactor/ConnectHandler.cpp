@@ -1409,7 +1409,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
                     if (NULL == pMbData)
                     {
                         OUR_DEBUG((LM_DEBUG, "[CConnectHandler::SendMessage] Connectid=[%d] pMbData is NULL.\n", GetConnectID()));
-                        return;
+                        return false;
                     }
 
                     ACE_Message_Block::ACE_Message_Type objType = ACE_Message_Block::MB_STOP;
