@@ -1153,7 +1153,42 @@ private:
     {
         unsigned long uHashStart = HashString(lpszString, m_objHashPool.Get_Count());
 
-        return GetHashTablePos_By_HashIndex(uHashStart, emHashState);
+        //获取链表，并比对
+        if (NULL == m_lpTable[uHashStart])
+        {
+            if (EM_INSERT == emHashState)
+            {
+                return uHashStart;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        else
+        {
+            _Hash_Link_Info<T>* pLastLink = m_lpTable[uHashStart];
+
+            while (NULL != pLastLink)
+            {
+                if (NULL != pLastLink->m_pData && strcmp(pLastLink->m_pData->m_pKey, lpszString) == 0)
+                {
+                    //找到了对应的key,这个数据已经存在
+                    if (EM_INSERT == emHashState)
+                    {
+                        return -1;
+                    }
+                    else
+                    {
+                        return uHashStart;
+                    }
+                }
+
+                pLastLink = pLastLink->m_pNext;
+            }
+
+            return uHashStart;
+        }
     }
 
     //根据提供的下标，删除数组中指定的Hash数据
