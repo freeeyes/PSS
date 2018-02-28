@@ -829,7 +829,8 @@ public:
             return -1;
         }
 
-        int32 nPos = GetHashTablePos_By_HashIndex((unsigned long)u4Key, EM_INSERT);
+        T* pT = NULL;
+        int32 nPos = GetHashTablePos_By_HashIndex((unsigned long)u4Key, EM_INSERT, pT);
 
         if (-1 == nPos)
         {
@@ -939,7 +940,8 @@ public:
             return -1;
         }
 
-        int32 nPos = GetHashTablePos(pKey, EM_INSERT);
+        T* pT = NULL;
+        int32 nPos = GetHashTablePos(pKey, EM_INSERT, pT);
 
         if(-1 == nPos)
         {
@@ -1033,7 +1035,8 @@ public:
             return NULL;
         }
 
-        int32 nPos = GetHashTablePos(pKey, EM_SELECT);
+        T* pT = NULL;
+        int32 nPos = GetHashTablePos(pKey, EM_SELECT, pT);
 
         if(-1 == nPos)
         {
@@ -1042,24 +1045,28 @@ public:
         }
         else
         {
-            T* pT = NULL;
-            _Hash_Link_Info<T>* pLastLink = m_lpTable[nPos];
+            return pT;
+        }
+    }
 
-            while(NULL != pLastLink)
-            {
-                if(NULL != pLastLink->m_pData && strcmp(pLastLink->m_pData->m_pKey, pKey) == 0)
-                {
-                    pT = pLastLink->m_pData->m_pValue;
-                }
+    T* Get_Hash_Box_Data_By_Uint32(uint32 u4Key)
+    {
+        if (NULL == m_lpTable)
+        {
+            //没有找到共享内存
+            return NULL;
+        }
 
-                if(pLastLink->m_pNext == NULL)
-                {
-                    break;
-                }
+        T* pT = NULL;
+        int32 nPos = GetHashTablePos_By_HashIndex(u4Key, EM_SELECT, pT);
 
-                pLastLink = pLastLink->m_pNext;
-            }
-
+        if (-1 == nPos)
+        {
+            //没有找到
+            return NULL;
+        }
+        else
+        {
             return pT;
         }
     }
@@ -1102,13 +1109,16 @@ private:
     }
 
     //根据提供的下标，寻找数组中指定的Hash数据
-    int32 GetHashTablePos_By_HashIndex(unsigned long uHashStart, EM_HASH_STATE emHashState)
+    int32 GetHashTablePos_By_HashIndex(unsigned long uHashStart, EM_HASH_STATE emHashState, T*& pT)
     {
         char szCurrKey[DEF_HASH_KEY_SIZE] = { '\0' };
         sprintf_safe(szCurrKey, DEF_HASH_KEY_SIZE, "%d", uHashStart);
 
+        //把当前数字对当前Hash数组总数取余
+        unsigned long uHashPos = uHashStart % m_objHashPool.Get_Count();
+
         //获取链表，并比对
-        if (NULL == m_lpTable[uHashStart])
+        if (NULL == m_lpTable[uHashPos])
         {
             if (EM_INSERT == emHashState)
             {
@@ -1121,7 +1131,7 @@ private:
         }
         else
         {
-            _Hash_Link_Info<T>* pLastLink = m_lpTable[uHashStart];
+            _Hash_Link_Info<T>* pLastLink = m_lpTable[uHashPos];
 
             while (NULL != pLastLink)
             {
@@ -1137,19 +1147,20 @@ private:
                     }
                     else
                     {
-                        return uHashStart;
+                        pT = pLastLink->m_pData->m_pValue;
+                        return uHashPos;
                     }
                 }
 
                 pLastLink = pLastLink->m_pNext;
             }
 
-            return uHashStart;
+            return uHashPos;
         }
     }
 
     //得到hash指定的位置
-    int32 GetHashTablePos(const char* lpszString, EM_HASH_STATE emHashState)
+    int32 GetHashTablePos(const char* lpszString, EM_HASH_STATE emHashState, T*& pT)
     {
         unsigned long uHashStart = HashString(lpszString, m_objHashPool.Get_Count());
 
@@ -1180,6 +1191,7 @@ private:
                     }
                     else
                     {
+                        pT = pLastLink->m_pData->m_pValue;
                         return uHashStart;
                     }
                 }
@@ -1197,14 +1209,17 @@ private:
         char szCurrKey[DEF_HASH_KEY_SIZE] = { '\0' };
         sprintf_safe(szCurrKey, DEF_HASH_KEY_SIZE, "%d", uHashStart);
 
+        //把当前数字对当前Hash数组总数取余
+        unsigned long uHashPos = uHashStart % m_objHashPool.Get_Count();
+
         //获取链表，并比对
-        if (NULL == m_lpTable[uHashStart])
+        if (NULL == m_lpTable[uHashPos])
         {
             return -1;
         }
         else
         {
-            _Hash_Link_Info<T>* pLastLink = m_lpTable[uHashStart];
+            _Hash_Link_Info<T>* pLastLink = m_lpTable[uHashPos];
 
             while (NULL != pLastLink)
             {
