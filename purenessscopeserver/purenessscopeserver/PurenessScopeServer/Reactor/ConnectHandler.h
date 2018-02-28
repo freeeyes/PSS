@@ -142,7 +142,7 @@ private:
     ACE_Time_Value             m_atvInput;                     //最后一次接收数据时间
     ACE_Time_Value             m_atvOutput;                    //最后一次发送数据时间
     ACE_Time_Value             m_atvSendAlive;                 //链接存活时间
-    EM_Client_Close_status     m_emStatus;                     //服务器关闭标记位
+    //EM_Client_Close_status     m_emStatus;                     //服务器关闭标记位
     CPacketParse*              m_pPacketParse;                 //数据包解析类
     ACE_Message_Block*         m_pCurrMessage;                 //当前的MB对象
     ACE_Message_Block*         m_pBlockMessage;                //当前发送缓冲等待数据块

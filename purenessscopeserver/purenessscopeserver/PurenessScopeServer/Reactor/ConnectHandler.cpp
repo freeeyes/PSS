@@ -34,7 +34,7 @@ CConnectHandler::CConnectHandler(void)
     m_u8SendQueueTimeout  = MAX_QUEUE_TIMEOUT * 1000 * 1000;  //目前因为记录的是纳秒
     m_u8RecvQueueTimeout  = MAX_QUEUE_TIMEOUT * 1000 * 1000;  //目前因为记录的是纳秒
     m_u2TcpNodelay        = TCP_NODELAY_ON;
-    m_emStatus            = CLIENT_CLOSE_NOTHING;
+    //m_emStatus            = CLIENT_CLOSE_NOTHING;
     m_u4SendMaxBuffSize   = 5*MAX_BUFF_1024;
     m_szLocalIP[0]        = '\0';
     m_szConnectName[0]    = '\0';
@@ -146,7 +146,7 @@ void CConnectHandler::Init(uint16 u2HandlerID)
     m_u4SendMaxBuffSize  = App_MainConfig::instance()->GetBlockSize();
     //m_pBlockMessage      = new ACE_Message_Block(m_u4SendMaxBuffSize);
     m_pBlockMessage      = NULL;
-    m_emStatus           = CLIENT_CLOSE_NOTHING;
+    //m_emStatus           = CLIENT_CLOSE_NOTHING;
 
     m_pPacketDebugData   = new char[App_MainConfig::instance()->GetDebugSize()];
     m_u4PacketDebugSize  = App_MainConfig::instance()->GetDebugSize() / 5;
@@ -263,7 +263,7 @@ int CConnectHandler::open(void*)
 
     m_u4ReadSendSize      = 0;
     m_u4SuccessSendSize   = 0;
-    m_emStatus            = CLIENT_CLOSE_NOTHING;
+    //m_emStatus            = CLIENT_CLOSE_NOTHING;
 
     //设置接收缓冲池的大小
     int nTecvBuffSize = MAX_MSG_SOCKETBUFF;
@@ -876,7 +876,7 @@ uint32 CConnectHandler::file_open(IFileTestManager* pFileTest)
 
     m_u4ReadSendSize = 0;
     m_u4SuccessSendSize = 0;
-    m_emStatus = CLIENT_CLOSE_NOTHING;
+    //m_emStatus = CLIENT_CLOSE_NOTHING;
 
     //设置接收缓冲池的大小
     int nTecvBuffSize = MAX_MSG_SOCKETBUFF;
@@ -1371,12 +1371,6 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
                 App_BuffPacketManager::instance()->Delete(pBuffPacket);
             }
 
-            //如果需要发送完成后删除，则配置标记位
-            if (PACKET_SEND_FIN_CLOSE == u1State)
-            {
-                m_emStatus = CLIENT_CLOSE_SENDOK;
-            }
-
             //判断是否超过阈值
             if (false == CheckSendMask((uint32)pMbData->length()))
             {
@@ -1406,6 +1400,39 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
             }
             else
             {
+                //如果需要发送完成后删除，则配置标记位
+                if (PACKET_SEND_FIN_CLOSE == u1State)
+                {
+                    m_u1ConnectState = CONNECT_SERVER_CLOSE;
+                    ACE_Message_Block* pMbData = App_MessageBlockManager::instance()->Create(sizeof(int));
+
+                    if (NULL == pMbData)
+                    {
+                        OUR_DEBUG((LM_DEBUG, "[CConnectHandler::SendMessage] Connectid=[%d] pMbData is NULL.\n", GetConnectID()));
+                        return;
+                    }
+
+                    ACE_Message_Block::ACE_Message_Type objType = ACE_Message_Block::MB_STOP;
+                    pMbData->msg_type(objType);
+
+                    //将消息放入队列，让output在反应器线程发送。
+                    ACE_Time_Value xtime = ACE_OS::gettimeofday();
+
+                    //队列已满，不能再放进去了,就不放进去了
+                    if (msg_queue()->is_full() == true)
+                    {
+                        OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendMessage] Connectid=%d,putq is full(%d).\n", GetConnectID(), msg_queue()->message_count()));
+                        App_MessageBlockManager::instance()->Close(pMbData);
+                        return false;
+                    }
+
+                    if (this->putq(pMbData, &xtime) == -1)
+                    {
+                        OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendMessage] Connectid=%d,putq(%d) output errno = [%d].\n", GetConnectID(), msg_queue()->message_count(), errno));
+                        App_MessageBlockManager::instance()->Close(pMbData);
+                    }
+                }
+
                 int nWakeupRet = reactor()->schedule_wakeup(this, ACE_Event_Handler::WRITE_MASK);
 
                 if (-1 == nWakeupRet)
