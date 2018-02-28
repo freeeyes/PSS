@@ -125,7 +125,7 @@ public:
         m_lpTable    = NULL;
         m_nCount     = 0;
         m_nUsedCount = 0;
-        m_sKeyLen    = 0;
+        m_sKeyLen    = DEF_HASH_KEY_SIZE;
         m_nCurrIndex = 0;
     }
 
@@ -234,6 +234,7 @@ public:
                 }
 
                 m_nUsedCount++;
+
                 return pCurrCell;
             }
         }
@@ -251,6 +252,7 @@ public:
                 pCurrCell->m_cExists = 1;
                 m_nCurrIndex = i + 1;
                 m_nUsedCount++;
+
                 return pCurrCell;
             }
         }
@@ -977,6 +979,11 @@ public:
                     pData->m_pValue = pValue;
                     pLink->m_pData = pData;
                     m_lpTable[nPos] = pLink;
+
+                    if (HASH_DEBUG_ON == m_emHashDebug)
+                    {
+                        OUR_DEBUG((LM_INFO, "[Test]Add 1 pKey=%s, pData->m_pKey=%s.\n", pKey, pData->m_pKey));
+                    }
                 }
             }
             else
@@ -1014,6 +1021,11 @@ public:
                     pData->m_pValue = pValue;
                     pLink->m_pData = pData;
                     pLink->m_pPerv = pLastLink;
+
+                    if (HASH_DEBUG_ON == m_emHashDebug)
+                    {
+                        OUR_DEBUG((LM_INFO, "[Test]Add 2 pKey=%s, pData->m_pKey=%s.\n", pKey, pData->m_pKey));
+                    }
 
                     if (NULL != pLastLink)
                     {
@@ -1122,7 +1134,7 @@ private:
         {
             if (EM_INSERT == emHashState)
             {
-                return uHashStart;
+                return uHashPos;
             }
             else
             {
@@ -1228,7 +1240,7 @@ private:
                     //找到了对应的key,这个数据已经存在
                     if (pLastLink->m_pPerv == NULL)
                     {
-                        m_lpTable[uHashStart] = pLastLink->m_pNext;
+                        m_lpTable[uHashPos] = pLastLink->m_pNext;
 
                         if (NULL != pLastLink->m_pNext)
                         {
@@ -1274,6 +1286,11 @@ private:
 
             while (NULL != pLastLink)
             {
+                if (HASH_DEBUG_ON == m_emHashDebug)
+                {
+                    OUR_DEBUG((LM_INFO, "[Test]lpszString=%s, pLastLink->m_pData->m_pKey=%s.\n", lpszString, pLastLink->m_pData->m_pKey));
+                }
+
                 if (NULL != pLastLink->m_pData && strcmp(pLastLink->m_pData->m_pKey, lpszString) == 0)
                 {
                     //找到了对应的key,这个数据已经存在

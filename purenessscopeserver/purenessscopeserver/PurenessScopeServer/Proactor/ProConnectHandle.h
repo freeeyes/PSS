@@ -90,7 +90,7 @@ public:
 private:
     bool RecvClinetPacket(uint32 u4PackeLen);                                 //接受数据包
     bool CheckMessage();                                                      //处理接收的数据
-    bool PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State);            //将发送数据放入队列
+    bool PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State);            //将发送数据发送出去
     void ClearPacketParse(ACE_Message_Block& mbCurrBlock);                    //清理正在使用的PacketParse
     void PutSendPacketError(ACE_Message_Block* pMbData);                      //发送失败回调
 

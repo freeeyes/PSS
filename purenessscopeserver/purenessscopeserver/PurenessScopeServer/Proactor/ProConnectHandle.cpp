@@ -1560,6 +1560,7 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State)
             {
                 this->ServerClose(CLIENT_CLOSE_IMMEDIATLY);
             }
+
             return true;
         }
     }
@@ -1871,12 +1872,8 @@ bool CProConnectManager::Close(uint32 u4ConnectID)
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
     //OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close](%d)Begin.\n", u4ConnectID));
 
-    //从时间轮盘中清除
-    char szConnectID[10] = { '\0' };
-    sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
-
     //连接关闭，清除时间轮盘
-    if (false == DelConnectTimeWheel(m_objHashConnectList.Get_Hash_Box_Data(szConnectID)))
+    if (false == DelConnectTimeWheel(m_objHashConnectList.Get_Hash_Box_Data_By_Uint32(u4ConnectID)))
     {
         OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close]DelConnectTimeWheel ConnectID=%d fail.\n", u4ConnectID));
     }
@@ -1885,7 +1882,7 @@ bool CProConnectManager::Close(uint32 u4ConnectID)
         OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close]DelConnectTimeWheel ConnectID=%d.\n", u4ConnectID));
     }
 
-    m_objHashConnectList.Del_Hash_Data(szConnectID);
+    m_objHashConnectList.Del_Hash_Data_By_Unit32(u4ConnectID);
     m_u4TimeDisConnect++;
 
     //回收发送内存块
@@ -1902,14 +1899,12 @@ bool CProConnectManager::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
     //服务器关闭
-    char szConnectID[10] = {'\0'};
-    sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
-    CProConnectHandle* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data(szConnectID);
+    CProConnectHandle* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data_By_Uint32(u4ConnectID);
 
     if(pConnectHandler != NULL)
     {
         //从时间轮盘中清除
-        if (false == DelConnectTimeWheel(m_objHashConnectList.Get_Hash_Box_Data(szConnectID)))
+        if (false == DelConnectTimeWheel(pConnectHandler))
         {
             OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close]DelConnectTimeWheel ConnectID=%d fail.\n", u4ConnectID));
         }
@@ -1927,7 +1922,7 @@ bool CProConnectManager::CloseConnect(uint32 u4ConnectID, EM_Client_Close_status
             OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close]AddDisConnect ConnectID=%d fail.\n", u4ConnectID));
         }
 
-        if (-1 == m_objHashConnectList.Del_Hash_Data(szConnectID))
+        if (-1 == m_objHashConnectList.Del_Hash_Data_By_Unit32(u4ConnectID))
         {
             OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close]Del_Hash_Data ConnectID=%d fail.\n", u4ConnectID));
         }
@@ -2007,10 +2002,7 @@ bool CProConnectManager::AddConnect(uint32 u4ConnectID, CProConnectHandle* pConn
         return false;
     }
 
-    //m_ThreadWriteLock.acquire();
-    char szConnectID[10] = {'\0'};
-    sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
-    CProConnectHandle* pCurrConnectHandler = m_objHashConnectList.Get_Hash_Box_Data(szConnectID);
+    CProConnectHandle* pCurrConnectHandler = m_objHashConnectList.Get_Hash_Box_Data_By_Uint32(u4ConnectID);
 
     if(NULL != pCurrConnectHandler)
     {
@@ -2023,7 +2015,7 @@ bool CProConnectManager::AddConnect(uint32 u4ConnectID, CProConnectHandle* pConn
     pConnectHandler->SetSendCacheManager((ISendCacheManager* )&m_SendCacheManager);
 
     //加入Hash数组
-    m_objHashConnectList.Add_Hash_Data(szConnectID, pConnectHandler);
+    m_objHashConnectList.Add_Hash_Data_By_Key_Unit32(u4ConnectID, pConnectHandler);
     m_u4TimeConnect++;
 
     //加入链接统计功能
@@ -2065,9 +2057,7 @@ bool CProConnectManager::DelConnectTimeWheel(CProConnectHandle* pConnectHandler)
 bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint16 u2CommandID, uint8 u1SendState, uint8 u1SendType, ACE_Time_Value& tvSendBegin, bool blDelete, int nMessageID)
 {
     m_ThreadWriteLock.acquire();
-    char szConnectID[10] = {'\0'};
-    sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
-    CProConnectHandle* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data(szConnectID);
+    CProConnectHandle* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data_By_Uint32(u4ConnectID);
     m_ThreadWriteLock.release();
 
     //OUR_DEBUG((LM_ERROR,"[CProConnectManager::SendMessage] (%d) Send Begin 1(0x%08x).\n", u4ConnectID, pConnectHandler));
@@ -2256,9 +2246,7 @@ bool CProConnectManager::KillTimer()
 int CProConnectManager::handle_write_file_stream(uint32 u4ConnectID, const char* pData, uint32 u4Size, uint8 u1ParseID)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
-    char szConnectID[10] = { '\0' };
-    sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
-    CProConnectHandle* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data(szConnectID);
+    CProConnectHandle* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data_By_Uint32(u4ConnectID);
 
     if (NULL != pConnectHandler)
     {
@@ -2478,9 +2466,7 @@ void CProConnectManager::GetConnectInfo(vecClientConnectInfo& VecClientConnectIn
 void CProConnectManager::SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4TimeCost)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
-    char szConnectID[10] = {'\0'};
-    sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
-    CProConnectHandle* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data(szConnectID);
+    CProConnectHandle* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data_By_Uint32(u4ConnectID);
 
     if(NULL != pConnectHandler)
     {
@@ -2491,9 +2477,7 @@ void CProConnectManager::SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4TimeC
 _ClientIPInfo CProConnectManager::GetClientIPInfo(uint32 u4ConnectID)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
-    char szConnectID[10] = {'\0'};
-    sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
-    CProConnectHandle* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data(szConnectID);
+    CProConnectHandle* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data_By_Uint32(u4ConnectID);
 
     if(NULL != pConnectHandler)
     {
@@ -2509,9 +2493,7 @@ _ClientIPInfo CProConnectManager::GetClientIPInfo(uint32 u4ConnectID)
 _ClientIPInfo CProConnectManager::GetLocalIPInfo(uint32 u4ConnectID)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
-    char szConnectID[10] = {'\0'};
-    sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
-    CProConnectHandle* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data(szConnectID);
+    CProConnectHandle* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data_By_Uint32(u4ConnectID);
 
     if(NULL != pConnectHandler)
     {
@@ -2620,9 +2602,7 @@ bool CProConnectManager::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendT
 
 bool CProConnectManager::SetConnectName( uint32 u4ConnectID, const char* pName )
 {
-    char szConnectID[10] = {'\0'};
-    sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
-    CProConnectHandle* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data(szConnectID);
+    CProConnectHandle* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data_By_Uint32(u4ConnectID);
 
     if(NULL != pConnectHandler)
     {
@@ -2637,9 +2617,7 @@ bool CProConnectManager::SetConnectName( uint32 u4ConnectID, const char* pName )
 
 bool CProConnectManager::SetIsLog( uint32 u4ConnectID, bool blIsLog )
 {
-    char szConnectID[10] = {'\0'};
-    sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
-    CProConnectHandle* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data(szConnectID);
+    CProConnectHandle* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data_By_Uint32(u4ConnectID);
 
     if(NULL != pConnectHandler)
     {
@@ -2743,9 +2721,7 @@ void CProConnectManager::GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut)
 EM_Client_Connect_status CProConnectManager::GetConnectState(uint32 u4ConnectID)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
-    char szConnectID[10] = {'\0'};
-    sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
-    CProConnectHandle* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data(szConnectID);
+    CProConnectHandle* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data_By_Uint32(u4ConnectID);
 
     if(NULL != pConnectHandler)
     {
