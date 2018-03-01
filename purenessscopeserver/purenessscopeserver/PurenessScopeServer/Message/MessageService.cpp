@@ -520,9 +520,7 @@ void CMessageService::CloseCommandList()
 
 CClientCommandList* CMessageService::GetClientCommandList(uint16 u2CommandID)
 {
-    char szCommandID[10] = { '\0' };
-    sprintf_safe(szCommandID, 10, "%d", u2CommandID);
-    return m_objClientCommandList.Get_Hash_Box_Data(szCommandID);
+    return m_objClientCommandList.Get_Hash_Box_Data_By_Uint32((uint32)u2CommandID);
 }
 
 bool CMessageService::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost, uint16& u2Count, bool& bDeleteFlag)
@@ -637,12 +635,9 @@ void CMessageService::CopyMessageManagerList()
                     }
                 }
 
-                char szCommandID[10] = { '\0' };
-                sprintf_safe(szCommandID, 10, "%d", pClientCommandList->GetCommandID());
-
-                if (false == m_objClientCommandList.Add_Hash_Data(szCommandID, pCurrClientCommandList))
+                if (false == m_objClientCommandList.Add_Hash_Data_By_Key_Unit32((uint32)pClientCommandList->GetCommandID(), pCurrClientCommandList))
                 {
-                    OUR_DEBUG((LM_INFO, "[CMessageService::CopyMessageManagerList]CommandID=%s add error.\n", szCommandID));
+                    OUR_DEBUG((LM_INFO, "[CMessageService::CopyMessageManagerList]CommandID=%d add error.\n", pClientCommandList->GetCommandID()));
                 }
             }
         }
