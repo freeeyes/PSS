@@ -92,16 +92,6 @@ bool CServerMessageInfoPool::Delete(_Server_Message_Info* pObject)
 void CServerMessageInfoPool::Close()
 {
     //清理所有已存在的指针
-    vector<_Server_Message_Info*> vecServerMessageInfo;
-    m_objServerMessageList.Get_All_Used(vecServerMessageInfo);
-
-    uint32 u4Size = (uint32)vecServerMessageInfo.size();
-
-    for(uint32 i = 0; i < u4Size; i++)
-    {
-        SAFE_DELETE(vecServerMessageInfo[i]);
-    }
-
     m_objServerMessageList.Close();
 }
 
