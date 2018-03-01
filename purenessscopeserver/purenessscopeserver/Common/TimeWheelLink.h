@@ -74,7 +74,7 @@ public:
         for (int i = 0; i < m_nBlackCount; i++)
         {
             CHashTable<T>* pHashContainer = new CHashTable<T>();
-            pHashContainer->Init(m_nContainSize, MAX_TIMEWHEEL_KEY, HASH_DEBUG_ON);
+            pHashContainer->Init(m_nContainSize, MAX_TIMEWHEEL_KEY);
             m_vecHashContain.push_back(pHashContainer);
         }
 
