@@ -51,22 +51,6 @@ bool CBuffPacketManager::Delete(IBuffPacket* pBuffPacket)
 void CBuffPacketManager::Close()
 {
     //清理所有已存在的指针
-    vector<CBuffPacket* > vecBuffPacket;
-    m_objHashBuffPacketList.Get_All_Used(vecBuffPacket);
-
-    uint32 u4Size = (uint32)vecBuffPacket.size();
-
-    for(uint32 i = 0; i < u4Size; i++)
-    {
-        CBuffPacket* pBuffPacket = vecBuffPacket[i];
-
-        if(NULL != pBuffPacket)
-        {
-            pBuffPacket->Close();
-            SAFE_DELETE(pBuffPacket);
-        }
-    }
-
     m_objHashBuffPacketList.Close();
 }
 
