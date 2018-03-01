@@ -858,22 +858,20 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
     //时序模式开启
     OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Init]Timing sequence Start.\n"));
 
-    CMessageService* pMessageService = new CMessageService[u4ThreadCount];
-
     //初始化所有的Message对象
     for (uint32 i = 0; i < u4ThreadCount; i++)
     {
-        /* CMessageService* pMessageService = new CMessageService();
+        CMessageService* pMessageService = new CMessageService();
 
-         if (NULL == pMessageService)
-         {
-             OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::Init](%d)pMessageService is NULL.\n", i));
-             return false;
-         }*/
+        if (NULL == pMessageService)
+        {
+            OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::Init](%d)pMessageService is NULL.\n", i));
+            return false;
+        }
 
-        (pMessageService + i)->Init(i, u4MaxQueue, u4LowMask, u4HighMask);
+        pMessageService->Init(i, u4MaxQueue, u4LowMask, u4HighMask);
 
-        m_vecMessageService.push_back(pMessageService + i);
+        m_vecMessageService.push_back(pMessageService);
     }
 
     return true;
