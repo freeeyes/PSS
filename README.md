@@ -19,7 +19,6 @@
 > 希望能和大家一步步完善这个体系，真正做到有价值的框架。 我的目标是，你用的爽，就是成功。也希望大家越来越喜欢它。 
 > 另外最新代码会发布在SVN上，如果你有SVN，最好从SVN上直接下载，我会定时打版本包放在download里面提供下载。
 
-<iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;width:525px; height:245px;" src="https://www.processon.com/embed/5a6ae014e4b0d1c5b5b1e6f7"></iframe>
 
 ## [Tarvis CI自动提交最新测试报告信息](./testresult/result.md)
 ## [PSS框架如何编译](./md/China/Install.md) 
