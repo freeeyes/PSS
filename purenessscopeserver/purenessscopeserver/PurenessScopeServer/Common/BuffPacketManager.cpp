@@ -12,10 +12,16 @@ CBuffPacketManager::~CBuffPacketManager(void)
     //Close();
 }
 
-IBuffPacket* CBuffPacketManager::Create()
+IBuffPacket* CBuffPacketManager::Create(const char* pFileName, uint32 u4Line)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
     IBuffPacket* pBuffPacket = dynamic_cast<IBuffPacket*>(m_objHashBuffPacketList.Pop());
+
+    if (NULL != pBuffPacket)
+    {
+        pBuffPacket->SetCreateInfo(pFileName, u4Line);
+    }
+
     return pBuffPacket;
 }
 

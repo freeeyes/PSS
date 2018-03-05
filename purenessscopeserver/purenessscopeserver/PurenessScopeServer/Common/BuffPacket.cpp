@@ -7,8 +7,9 @@
 #include "BuffPacket.h"
 
 CBuffPacket::CBuffPacket()
-    :m_szData(NULL), m_u4ReadPtr(0), m_u4WritePtr(0), m_u4PacketLen(0), m_u4PacketCount(0), m_u4MaxPacketSize(0), m_u4BuffID(0), m_nHashID(0), m_blNetSort(false)
+    :m_szData(NULL), m_u4ReadPtr(0), m_u4WritePtr(0), m_u4PacketLen(0), m_u4PacketCount(0), m_u4MaxPacketSize(0), m_u4BuffID(0), m_nHashID(0), m_blNetSort(false), m_u4UsedLine(0)
 {
+    ACE_OS::memset(m_szUsedFileName, 0, MAX_BUFF_100);
 }
 
 CBuffPacket::~CBuffPacket(void)
@@ -103,12 +104,14 @@ bool CBuffPacket::Close()
 
 bool CBuffPacket::Clear()
 {
-    m_u4ReadPtr       = 0;
-    m_u4WritePtr      = 0;
-    m_u4PacketCount   = 0;
+    m_u4ReadPtr         = 0;
+    m_u4WritePtr        = 0;
+    m_u4PacketCount     = 0;
 
-    m_blNetSort       = false;
+    m_blNetSort         = false;
 
+    m_szUsedFileName[0] = '\0';
+    m_u4UsedLine        = 0;
     return true;
 }
 
@@ -1211,6 +1214,22 @@ uint32 CBuffPacket::GetBuffID()
 void CBuffPacket::SetHashID(int32 nHashID)
 {
     m_nHashID = nHashID;
+}
+
+void CBuffPacket::SetCreateInfo(const char* pFileName, uint32 u4Line)
+{
+    sprintf_safe(m_szUsedFileName, MAX_BUFF_100, "%s", pFileName);
+    m_u4UsedLine = u4Line;
+}
+
+char* CBuffPacket::GetCreateFileName()
+{
+    return m_szUsedFileName;
+}
+
+uint32 CBuffPacket::GetCreateLine()
+{
+    return m_u4UsedLine;
 }
 
 int32 CBuffPacket::GetHashID()

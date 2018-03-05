@@ -146,9 +146,9 @@ public:
 
 private:
     uint32                     m_u4UsedSize;                          //当前正在使用的内存大小
-    ACE_Allocator* m_pmsgallocator;
-    ACE_Allocator* m_pdata_allocator;
-    ACE_Allocator* m_pbuff_allocator;
+    ACE_Allocator*             m_pmsgallocator;
+    ACE_Allocator*             m_pdata_allocator;
+    ACE_Allocator*             m_pbuff_allocator;
     CMemoryBlock_Pool          m_MemoryBlock_Pool;                    //回收内存池
     ACE_Recursive_Thread_Mutex m_ThreadWriteLock;                     //控制多线程锁
 };

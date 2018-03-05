@@ -49,6 +49,11 @@ public:
     int32 GetHashID();                            //设置HashID
     void SetHashID(int32 nHashID);                //得到HashID
 
+    void SetCreateInfo(const char* pFileName, uint32 u4Line);    //设置创建时候的信息参数
+
+    char* GetCreateFileName();
+    uint32 GetCreateLine();
+
 private:
     bool AddBuff(uint32 u4Size);
     void ReadPtr(uint32 u4Size);
@@ -91,16 +96,18 @@ public:
     CBuffPacket& operator << (string& str);
 
 private:
-    char*                      m_szData;            //数据指针
-    uint32                     m_u4ReadPtr;         //读包的位置
-    uint32                     m_u4WritePtr;        //写包的位置
-    uint32                     m_u4PacketLen;       //包总长度
-    uint32                     m_u4PacketCount;     //当前数据包的个数
-    uint32                     m_u4MaxPacketSize;   //最大当前BuffPacket的容量
-    uint32                     m_u4BuffID;          //Buffer对象名字，用于核对内存池数据使用，寻找内存泄露。
-    int32                      m_nHashID;           //记录当前对象在Hash数组中的位置
-    bool                       m_blNetSort;         //字节序开启开关，false为不转换为主机字节序，true为转换为主机字节序
-    char                       m_szError[MAX_BUFF_500];
+    char*                      m_szData;                       //数据指针
+    uint32                     m_u4ReadPtr;                    //读包的位置
+    uint32                     m_u4WritePtr;                   //写包的位置
+    uint32                     m_u4PacketLen;                  //包总长度
+    uint32                     m_u4PacketCount;                //当前数据包的个数
+    uint32                     m_u4MaxPacketSize;              //最大当前BuffPacket的容量
+    uint32                     m_u4BuffID;                     //Buffer对象名字，用于核对内存池数据使用，寻找内存泄露。
+    int32                      m_nHashID;                      //记录当前对象在Hash数组中的位置
+    bool                       m_blNetSort;                    //字节序开启开关，false为不转换为主机字节序，true为转换为主机字节序
+    char                       m_szError[MAX_BUFF_500];        //错误信息
+    char                       m_szUsedFileName[MAX_BUFF_100]; //创建此对象的文件名
+    uint32                     m_u4UsedLine;                   //创建此对象的行号
     ACE_Recursive_Thread_Mutex m_ThreadLock;
 
 public:

@@ -25,7 +25,7 @@ public:
     uint32 GetBuffPacketUsedCount();
     uint32 GetBuffPacketFreeCount();
 
-    IBuffPacket* Create();
+    IBuffPacket* Create(const char* pFileName = __FILE__, uint32 u4Line = __LINE__);
     bool Delete(IBuffPacket* pBuffPacket);
 
 private:
