@@ -28,7 +28,7 @@ public:
     IBuffPacket* Create(const char* pFileName = __FILE__, uint32 u4Line = __LINE__);
     bool Delete(IBuffPacket* pBuffPacket);
 
-    void GetCreateInfoList(vector<_Packet_Create_Info> objCreateList);
+    void GetCreateInfoList(vector<_Packet_Create_Info>& objCreateList);
 
 private:
     CObjectArrayList<CBuffPacket>  m_objBuffPacketList;                   //BuffPacket对象数组

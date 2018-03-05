@@ -54,7 +54,7 @@ bool CBuffPacketManager::Delete(IBuffPacket* pBuffPacket)
     return true;
 }
 
-void CBuffPacketManager::GetCreateInfoList(vector<_Packet_Create_Info> objCreateList)
+void CBuffPacketManager::GetCreateInfoList(vector<_Packet_Create_Info>& objCreateList)
 {
     objCreateList.clear();
 

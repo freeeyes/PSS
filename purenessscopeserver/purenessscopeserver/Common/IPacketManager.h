@@ -28,7 +28,7 @@ public:
 
     virtual IBuffPacket* Create(const char* pFileName = __FILE__, uint32 u4Line = __LINE__) = 0;
     virtual bool Delete(IBuffPacket* pBuffPacket)     = 0;
-    virtual void GetCreateInfoList(vector<_Packet_Create_Info> objCreateList) = 0;
+    virtual void GetCreateInfoList(vector<_Packet_Create_Info>& objCreateList) = 0;
 };
 
 #endif
