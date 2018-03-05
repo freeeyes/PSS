@@ -36,6 +36,12 @@ public:
             return NULL;
         }
     }
+
+    inline uint32 GetCount()
+    {
+        return m_u4Count;
+    }
+
 private:
     void CreateMemory(uint32 u4Count)
     {

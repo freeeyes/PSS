@@ -37,7 +37,6 @@ public:
 
     virtual void SetCreateInfo(const char* pFileName, uint32 u4Line)     = 0;    //记录创建此对象时候的调用位置
     virtual char* GetCreateFileName()                                    = 0;    //返回创建此对象的文件名
-    virtual char* GetCreateFuncName()                                    = 0;    //返回创建此对象的函数名
     virtual uint32 GetCreateLine()                                       = 0;    //返回创建此对象的行数
 
     //读取

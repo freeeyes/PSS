@@ -54,6 +54,48 @@ bool CBuffPacketManager::Delete(IBuffPacket* pBuffPacket)
     return true;
 }
 
+void CBuffPacketManager::GetCreateInfoList(vector<_Packet_Create_Info> objCreateList)
+{
+    objCreateList.clear();
+
+    //输出所有正在使用的对象创建信息
+    uint32 u4Count = m_objBuffPacketList.GetCount();
+
+    for (uint32 i = 0; i < u4Count; i++)
+    {
+        CBuffPacket* pBuffPacket = m_objBuffPacketList.GetObject(i);
+
+        int nCreateLine       = pBuffPacket->GetCreateLine();
+        char* pCreateFileName = pBuffPacket->GetCreateFileName();
+
+        if (strlen(pCreateFileName) > 0 && nCreateLine > 0)
+        {
+            bool blIsFind = false;
+
+            //正在使用的对象，进行统计
+            for (int j = 0; j < (int)objCreateList.size(); j++)
+            {
+                if (0 == ACE_OS::strcmp(pCreateFileName, objCreateList[j].m_szCreateFileName)
+                    && nCreateLine == objCreateList[j].m_u4Line)
+                {
+                    blIsFind = true;
+                    objCreateList[j].m_u4Count++;
+                    break;
+                }
+            }
+
+            if (false == blIsFind)
+            {
+                _Packet_Create_Info obj_Packet_Create_Info;
+                sprintf_safe(obj_Packet_Create_Info.m_szCreateFileName, MAX_BUFF_100, "%s", pCreateFileName);
+                obj_Packet_Create_Info.m_u4Line  = nCreateLine;
+                obj_Packet_Create_Info.m_u4Count = 1;
+                objCreateList.push_back(obj_Packet_Create_Info);
+            }
+        }
+    }
+}
+
 void CBuffPacketManager::Close()
 {
     //清理所有已存在的指针
