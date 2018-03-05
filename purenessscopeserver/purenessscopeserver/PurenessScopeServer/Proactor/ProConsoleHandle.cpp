@@ -489,7 +489,7 @@ bool CProConsoleHandle::CheckMessage()
         m_u4AllRecvCount++;
 
         //发送回复信息
-        IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create();
+        IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
         //将数据Buff放入消息体中，传递给处理类。
         uint8 u1Output = 0;

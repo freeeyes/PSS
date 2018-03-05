@@ -2517,7 +2517,7 @@ bool CProConnectManager::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendT
 
     for(uint32 i = 0; i < (uint32)objveCProConnectManager.size(); i++)
     {
-        IBuffPacket* pCurrBuffPacket = App_BuffPacketManager::instance()->Create();
+        IBuffPacket* pCurrBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
         if(NULL == pCurrBuffPacket)
         {
@@ -3034,7 +3034,7 @@ bool CProConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char*& pDat
     }
 
     //OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::PostMessage]u4ConnectID=%d, u2ThreadIndex=%d.\n", u4ConnectID, u2ThreadIndex));
-    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create();
+    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     if(NULL != pBuffPacket)
     {
@@ -3087,7 +3087,7 @@ bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPac
         }
 
         //为每一个Connect设置发送对象数据包
-        IBuffPacket* pCurrBuffPacket = App_BuffPacketManager::instance()->Create();
+        IBuffPacket* pCurrBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
         if(NULL == pCurrBuffPacket)
         {
@@ -3130,7 +3130,7 @@ bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, const ch
         }
 
         //为每一个Connect设置发送对象数据包
-        IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create();
+        IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
         if(NULL == pBuffPacket)
         {
@@ -3339,7 +3339,7 @@ bool CProConnectManagerGroup::PostMessageAll( IBuffPacket*& pBuffPacket, uint8 u
 
 bool CProConnectManagerGroup::PostMessageAll( const char*& pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
-    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create();
+    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     if(NULL == pBuffPacket)
     {

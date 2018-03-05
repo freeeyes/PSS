@@ -148,7 +148,7 @@ int CConsoleMessage::ParseCommand_Plugin(const char* pCommand, IBuffPacket* pBuf
 {
     _CommandInfo CommandInfo;
 
-    IBuffPacket* pCurrBuffPacket = App_BuffPacketManager::instance()->Create();
+    IBuffPacket* pCurrBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     if (NULL == pCurrBuffPacket)
     {
@@ -172,7 +172,7 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
 {
     _CommandInfo CommandInfo;
 
-    IBuffPacket* pCurrBuffPacket = App_BuffPacketManager::instance()->Create();
+    IBuffPacket* pCurrBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     if(NULL == pCurrBuffPacket)
     {
