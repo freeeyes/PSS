@@ -387,6 +387,10 @@ int CConsoleMessage::DoCommand(_CommandInfo& CommandInfo, IBuffPacket* pCurrBuff
     {
         DoMessage_PortList(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSATE_PACKET_STATE) == 0)
+    {
+        Do_Message_BuffPacket(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
+    }
     else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSATE_SERVER_CLOSE) == 0)
     {
         //特殊指令，关闭服务器信息，所以要先清理一下内存。
@@ -2938,19 +2942,37 @@ void CConsoleMessage::DoMessage_GetConnectIPInfo(_CommandInfo& CommandInfo, IBuf
         if(ACE_OS::strlen(objClientIPInfo.m_szClientIP) == 0)
         {
             //没有找到对应的IP信息
-            (*pBuffPacket) << (uint16)1;
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << (uint16)1;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "IP not find\n");
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
         }
         else
         {
-            //找到了对应的IP信息
-            (*pBuffPacket) << (uint16)0;
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                //找到了对应的IP信息
+                (*pBuffPacket) << (uint16)0;
 
-            VCHARS_STR strSName;
-            strSName.text  = objClientIPInfo.m_szClientIP;
-            strSName.u1Len = (uint8)ACE_OS::strlen(objClientIPInfo.m_szClientIP);
+                VCHARS_STR strSName;
+                strSName.text = objClientIPInfo.m_szClientIP;
+                strSName.u1Len = (uint8)ACE_OS::strlen(objClientIPInfo.m_szClientIP);
 
-            (*pBuffPacket) << strSName;                         //IP
-            (*pBuffPacket) << (uint32)objClientIPInfo.m_nPort;  //端口
+                (*pBuffPacket) << strSName;                         //IP
+                (*pBuffPacket) << (uint32)objClientIPInfo.m_nPort;  //端口
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "ClientIP=%s,Port=%d.\n", objClientIPInfo.m_szClientIP, objClientIPInfo.m_nPort);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
         }
     }
 
@@ -2961,14 +2983,32 @@ void CConsoleMessage::DoMessage_GetLogLevelInfo(_CommandInfo& CommandInfo, IBuff
 {
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
-        (*pBuffPacket) << AppLogManager::instance()->GetLogCount();
-        (*pBuffPacket) << AppLogManager::instance()->GetCurrLevel();
+        if (CommandInfo.m_u1OutputType == 0)
+        {
+            (*pBuffPacket) << AppLogManager::instance()->GetLogCount();
+            (*pBuffPacket) << AppLogManager::instance()->GetCurrLevel();
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_1024] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_1024, "LogCount=%d,LogLevel=%d.\n", AppLogManager::instance()->GetLogCount(), (*pBuffPacket) << AppLogManager::instance()->GetCurrLevel());
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        }
 
         for(uint16 i = 0; i < (uint16)AppLogManager::instance()->GetLogCount(); i++)
         {
             uint16 u2LogID = AppLogManager::instance()->GetLogID(i);
 
-            (*pBuffPacket) << u2LogID;
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << u2LogID;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "m_u1OutputType=%d.\n", u2LogID);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
 
             char* pServerName = AppLogManager::instance()->GetLogInfoByServerName(u2LogID);
 
@@ -2982,7 +3022,16 @@ void CConsoleMessage::DoMessage_GetLogLevelInfo(_CommandInfo& CommandInfo, IBuff
             strSName.text  = pServerName;
             strSName.u1Len = (uint8)ACE_OS::strlen(pServerName);
 
-            (*pBuffPacket) << strSName;
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << strSName;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "pServerName=%d.\n", pServerName);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
 
             char* pLogName = AppLogManager::instance()->GetLogInfoByLogName(u2LogID);
 
@@ -2995,12 +3044,30 @@ void CConsoleMessage::DoMessage_GetLogLevelInfo(_CommandInfo& CommandInfo, IBuff
             strSName.text  = pLogName;
             strSName.u1Len = (uint8)ACE_OS::strlen(pLogName);
 
-            (*pBuffPacket) << strSName;
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << strSName;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "pLogName=%d.\n", pLogName);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
 
             uint8 u1LogType = (uint8)AppLogManager::instance()->GetLogInfoByLogDisplay(u2LogID);
 
-            (*pBuffPacket) << u1LogType;
-            (*pBuffPacket) << AppLogManager::instance()->GetLogInfoByLogLevel(i);
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << u1LogType;
+                (*pBuffPacket) << AppLogManager::instance()->GetLogInfoByLogLevel(i);
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "u1LogType=%d,GetLogInfoByLogLevel=%d.\n", u1LogType, AppLogManager::instance()->GetLogInfoByLogLevel(i));
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
         }
     }
 
@@ -3015,7 +3082,16 @@ void CConsoleMessage::DoMessage_SetLogLevelInfo(_CommandInfo& CommandInfo, IBuff
     {
         AppLogManager::instance()->ResetLogData(nLogLevel);
 
-        (*pBuffPacket) << (uint32)0;
+        if (CommandInfo.m_u1OutputType == 0)
+        {
+            (*pBuffPacket) << (uint32)0;
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_1024] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_1024, "OK.\n");
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        }
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_SETLOGLEVEL;
@@ -3029,16 +3105,38 @@ void CConsoleMessage::DoMessage_GetThreadAI(_CommandInfo& CommandInfo, IBuffPack
         App_MessageServiceGroup::instance()->GetWorkThreadAIInfo(objvecWorkThreadAIInfo);
 
         uint16 u2ThreadCount = (uint16)objvecWorkThreadAIInfo.size();
-        (*pBuffPacket) << (uint16)u2ThreadCount;
+
+        if (CommandInfo.m_u1OutputType == 0)
+        {
+            (*pBuffPacket) << (uint16)u2ThreadCount;
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_1024] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_1024, "u2ThreadCount=%d.\n", u2ThreadCount);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        }
 
         for(uint16 i = 0; i < u2ThreadCount; i++)
         {
-            (*pBuffPacket) << objvecWorkThreadAIInfo[i].m_u4ThreadID;
-            (*pBuffPacket) << objvecWorkThreadAIInfo[i].m_u1WTAI;
-            (*pBuffPacket) << objvecWorkThreadAIInfo[i].m_u4DisposeTime;
-            (*pBuffPacket) << objvecWorkThreadAIInfo[i].m_u4WTCheckTime;
-            (*pBuffPacket) << objvecWorkThreadAIInfo[i].m_u4WTTimeoutCount;
-            (*pBuffPacket) << objvecWorkThreadAIInfo[i].m_u4WTStopTime;
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << objvecWorkThreadAIInfo[i].m_u4ThreadID;
+                (*pBuffPacket) << objvecWorkThreadAIInfo[i].m_u1WTAI;
+                (*pBuffPacket) << objvecWorkThreadAIInfo[i].m_u4DisposeTime;
+                (*pBuffPacket) << objvecWorkThreadAIInfo[i].m_u4WTCheckTime;
+                (*pBuffPacket) << objvecWorkThreadAIInfo[i].m_u4WTTimeoutCount;
+                (*pBuffPacket) << objvecWorkThreadAIInfo[i].m_u4WTStopTime;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "m_u4ThreadID=%d,m_u1WTAI=%d,m_u4WTTimeoutCount=%d.\n",
+                             objvecWorkThreadAIInfo[i].m_u4ThreadID,
+                             objvecWorkThreadAIInfo[i].m_u1WTAI,
+                             objvecWorkThreadAIInfo[i].m_u4WTTimeoutCount);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
         }
     }
 
@@ -3054,26 +3152,71 @@ void CConsoleMessage::DoMessage_GetWorkThreadTO(_CommandInfo& CommandInfo, IBuff
         App_MessageServiceGroup::instance()->GetAITO(objTimeout);
 
         uint16 u2ThreadCount = (uint16)objTimeout.size();
-        (*pBuffPacket) << (uint16)u2ThreadCount;
+
+        if (CommandInfo.m_u1OutputType == 0)
+        {
+            (*pBuffPacket) << (uint16)u2ThreadCount;
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_1024] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_1024, "u2ThreadCount=%d.\n", u2ThreadCount);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        }
 
         for(uint16 i = 0; i < u2ThreadCount; i++)
         {
-            (*pBuffPacket) << objTimeout[i].m_u4ThreadID;
-            (*pBuffPacket) << objTimeout[i].m_u2CommandID;
-            (*pBuffPacket) << objTimeout[i].m_u4Second;
-            (*pBuffPacket) << objTimeout[i].m_u4Timeout;
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << objTimeout[i].m_u4ThreadID;
+                (*pBuffPacket) << objTimeout[i].m_u2CommandID;
+                (*pBuffPacket) << objTimeout[i].m_u4Second;
+                (*pBuffPacket) << objTimeout[i].m_u4Timeout;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "m_u4ThreadID=%d,m_u2CommandID=%d,m_u4Second=%d,m_u4Timeout=%d.\n",
+                             objTimeout[i].m_u4ThreadID,
+                             objTimeout[i].m_u2CommandID,
+                             objTimeout[i].m_u4Second,
+                             objTimeout[i].m_u4Timeout);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
         }
 
         App_MessageServiceGroup::instance()->GetAITF(objTimeoutF);
 
         u2ThreadCount = (uint16)objTimeoutF.size();
-        (*pBuffPacket) << (uint16)u2ThreadCount;
+
+        if (CommandInfo.m_u1OutputType == 0)
+        {
+            (*pBuffPacket) << (uint16)u2ThreadCount;
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_1024] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_1024, "u2ThreadCount=%d.\n", u2ThreadCount);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        }
 
         for(uint16 i = 0; i < u2ThreadCount; i++)
         {
-            (*pBuffPacket) << objTimeoutF[i].m_u4ThreadID;
-            (*pBuffPacket) << objTimeoutF[i].m_u2CommandID;
-            (*pBuffPacket) << objTimeoutF[i].m_u4Second;
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << objTimeoutF[i].m_u4ThreadID;
+                (*pBuffPacket) << objTimeoutF[i].m_u2CommandID;
+                (*pBuffPacket) << objTimeoutF[i].m_u4Second;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "m_u4ThreadID=%d,m_u2CommandID=%d,m_u4Second=%d.\n",
+                             objTimeoutF[i].m_u4ThreadID,
+                             objTimeoutF[i].m_u2CommandID,
+                             objTimeoutF[i].m_u4Second);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
         }
     }
 
@@ -3105,7 +3248,16 @@ void CConsoleMessage::DoMessage_SetWorkThreadAI(_CommandInfo& CommandInfo, IBuff
         }
     }
 
-    (*pBuffPacket) << (uint32)0;
+    if (CommandInfo.m_u1OutputType == 0)
+    {
+        (*pBuffPacket) << (uint32)0;
+    }
+    else
+    {
+        char szTemp[MAX_BUFF_1024] = { '\0' };
+        sprintf_safe(szTemp, MAX_BUFF_1024, "OK.\n");
+        pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+    }
 
     u2ReturnCommandID = CONSOLE_COMMAND_SETWTAI;
 }
@@ -3124,7 +3276,16 @@ void CConsoleMessage::DoMessage_GetNickNameInfo(_CommandInfo& CommandInfo, IBuff
 #endif
 
         //返回信息列表
-        (*pBuffPacket) << (uint32)objClientNameInfo.size();
+        if (CommandInfo.m_u1OutputType == 0)
+        {
+            (*pBuffPacket) << (uint32)objClientNameInfo.size();
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_1024] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_1024, "objClientNameInfo size=%d.\n", objClientNameInfo.size());
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        }
 
         for(uint32 i = 0; i < objClientNameInfo.size(); i++)
         {
@@ -3136,11 +3297,25 @@ void CConsoleMessage::DoMessage_GetNickNameInfo(_CommandInfo& CommandInfo, IBuff
             strName.text  = objClientNameInfo[i].m_szName;
             strName.u1Len = (uint8)ACE_OS::strlen(objClientNameInfo[i].m_szName);
 
-            (*pBuffPacket) << (uint32)objClientNameInfo[i].m_nConnectID;
-            (*pBuffPacket) << strIP;
-            (*pBuffPacket) << (uint32)objClientNameInfo[i].m_nPort;
-            (*pBuffPacket) << strName;
-            (*pBuffPacket) << (uint8)objClientNameInfo[i].m_nLog;
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << (uint32)objClientNameInfo[i].m_nConnectID;
+                (*pBuffPacket) << strIP;
+                (*pBuffPacket) << (uint32)objClientNameInfo[i].m_nPort;
+                (*pBuffPacket) << strName;
+                (*pBuffPacket) << (uint8)objClientNameInfo[i].m_nLog;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "m_nConnectID=%d,strIP=%s,m_nPort=%d,strName=%s,m_nLog=%d.\n",
+                             objClientNameInfo[i].m_nConnectID,
+                             objClientNameInfo[i].m_szClientIP,
+                             objClientNameInfo[i].m_nPort,
+                             objClientNameInfo[i].m_szName,
+                             objClientNameInfo[i].m_nLog);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
         }
     }
 
@@ -3161,7 +3336,16 @@ void CConsoleMessage::DoMessage_SetConnectLog(_CommandInfo& CommandInfo, IBuffPa
 #endif
     }
 
-    (*pBuffPacket) << (uint32)0;
+    if (CommandInfo.m_u1OutputType == 0)
+    {
+        (*pBuffPacket) << (uint32)0;
+    }
+    else
+    {
+        char szTemp[MAX_BUFF_1024] = { '\0' };
+        sprintf_safe(szTemp, MAX_BUFF_1024, "OK.\n");
+        pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+    }
 
     u2ReturnCommandID = CONSOLE_COMMAND_SETCONNECTLOG;
 }
@@ -3178,7 +3362,16 @@ void CConsoleMessage::DoMessage_SetMaxConnectCount(_CommandInfo& CommandInfo, IB
         }
     }
 
-    (*pBuffPacket) << (uint32)0;
+    if (CommandInfo.m_u1OutputType == 0)
+    {
+        (*pBuffPacket) << (uint32)0;
+    }
+    else
+    {
+        char szTemp[MAX_BUFF_1024] = { '\0' };
+        sprintf_safe(szTemp, MAX_BUFF_1024, "OK.\n");
+        pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+    }
 
     u2ReturnCommandID = CONSOLE_COMMAND_SETMAXCONNECTCOUNT;
 }
@@ -3197,11 +3390,29 @@ void CConsoleMessage::DoMessage_AddListen(_CommandInfo& CommandInfo, IBuffPacket
 
         if(true == blState)
         {
-            (*pBuffPacket) << (uint32)0;
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << (uint32)0;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "OK.\n");
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
         }
         else
         {
-            (*pBuffPacket) << (uint32)1;
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << (uint32)1;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "Fail.\n");
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
         }
 
 #else
@@ -3212,11 +3423,29 @@ void CConsoleMessage::DoMessage_AddListen(_CommandInfo& CommandInfo, IBuffPacket
 
         if(true == blState)
         {
-            (*pBuffPacket) << (uint32)0;
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << (uint32)0;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "OK.\n");
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
         }
         else
         {
-            (*pBuffPacket) << (uint32)1;
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << (uint32)1;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "OK.\n");
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
         }
 
 #endif
@@ -3237,11 +3466,29 @@ void CConsoleMessage::DoMessage_DelListen(_CommandInfo& CommandInfo, IBuffPacket
 
         if(true == blState)
         {
-            (*pBuffPacket) << (uint32)0;
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << (uint32)0;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "OK.\n");
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
         }
         else
         {
-            (*pBuffPacket) << (uint32)1;
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << (uint32)1;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "Fail.\n");
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
         }
 
 #else
@@ -3250,11 +3497,29 @@ void CConsoleMessage::DoMessage_DelListen(_CommandInfo& CommandInfo, IBuffPacket
 
         if(true == blState)
         {
-            (*pBuffPacket) << (uint32)0;
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << (uint32)0;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "OK.\n");
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
         }
         else
         {
-            (*pBuffPacket) << (uint32)1;
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << (uint32)1;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "Fail.\n");
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
         }
 
 #endif
@@ -3271,7 +3536,16 @@ void CConsoleMessage::DoMessage_ShowListen(_CommandInfo& CommandInfo, IBuffPacke
         vecControlInfo objControlInfo;
         App_ProControlListen::instance()->ShowListen(objControlInfo);
 
-        (*pBuffPacket) << (uint32)objControlInfo.size();
+        if (CommandInfo.m_u1OutputType == 0)
+        {
+            (*pBuffPacket) << (uint32)objControlInfo.size();
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_1024] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_1024, "objControlInfo Count=%d.\n", objControlInfo.size());
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        }
 
         for(uint32 i = 0; i < (uint32)objControlInfo.size(); i++)
         {
@@ -3279,15 +3553,35 @@ void CConsoleMessage::DoMessage_ShowListen(_CommandInfo& CommandInfo, IBuffPacke
             strIP.text  = objControlInfo[i].m_szListenIP;
             strIP.u1Len = (uint8)ACE_OS::strlen(objControlInfo[i].m_szListenIP);
 
-            (*pBuffPacket) << strIP;
-            (*pBuffPacket) << objControlInfo[i].m_u4Port;
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << strIP;
+                (*pBuffPacket) << objControlInfo[i].m_u4Port;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "strIP=%s,m_u4Port=%d.\n",
+                             objControlInfo[i].m_szListenIP,
+                             objControlInfo[i].m_u4Port);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
         }
 
 #else
         vecControlInfo objControlInfo;
         App_ControlListen::instance()->ShowListen(objControlInfo);
 
-        (*pBuffPacket) << (uint32)objControlInfo.size();
+        if (CommandInfo.m_u1OutputType == 0)
+        {
+            (*pBuffPacket) << (uint32)objControlInfo.size();
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_1024] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_1024, "objControlInfo Count=%d.\n", objControlInfo.size());
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        }
 
         for(uint32 i = 0; i < (uint32)objControlInfo.size(); i++)
         {
@@ -3295,8 +3589,19 @@ void CConsoleMessage::DoMessage_ShowListen(_CommandInfo& CommandInfo, IBuffPacke
             strIP.text  = objControlInfo[i].m_szListenIP;
             strIP.u1Len = (uint8)ACE_OS::strlen(objControlInfo[i].m_szListenIP);
 
-            (*pBuffPacket) << strIP;
-            (*pBuffPacket) << objControlInfo[i].m_u4Port;
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << strIP;
+                (*pBuffPacket) << objControlInfo[i].m_u4Port;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "strIP=%s,m_u4Port=%d.\n",
+                             objControlInfo[i].m_szListenIP,
+                             objControlInfo[i].m_u4Port);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
         }
 
 #endif
@@ -3332,12 +3637,29 @@ void CConsoleMessage::DoMessage_MonitorInfo(_CommandInfo& CommandInfo, IBuffPack
 
         int nActiveClient = App_ProConnectManager::instance()->GetCount();
         int nPoolClient   = App_ProConnectHandlerPool::instance()->GetFreeCount();
-        (*pBuffPacket) << (uint32)nActiveClient;
-        (*pBuffPacket) << (uint32)nPoolClient;
-        (*pBuffPacket) << (uint16)App_MainConfig::instance()->GetMaxHandlerCount();
-        (*pBuffPacket) << (uint16)App_ConnectAccount::instance()->GetCurrConnect();
-        (*pBuffPacket) << u4FlowIn;
-        (*pBuffPacket) << u4FlowOut;
+
+        if (CommandInfo.m_u1OutputType == 0)
+        {
+            (*pBuffPacket) << (uint32)nActiveClient;
+            (*pBuffPacket) << (uint32)nPoolClient;
+            (*pBuffPacket) << (uint16)App_MainConfig::instance()->GetMaxHandlerCount();
+            (*pBuffPacket) << (uint16)App_ConnectAccount::instance()->GetCurrConnect();
+            (*pBuffPacket) << u4FlowIn;
+            (*pBuffPacket) << u4FlowOut;
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_1024] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_1024, "nActiveClient=%d,nPoolClient=%d,MaxHandlerCoun=%d,CurrConnect=%d,u4FlowIn=%d,u4FlowOut=%d.\n",
+                         nActiveClient,
+                         nPoolClient,
+                         App_MainConfig::instance()->GetMaxHandlerCount(),
+                         App_ConnectAccount::instance()->GetCurrConnect(),
+                         u4FlowIn,
+                         u4FlowOut);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        }
+
 #else
         //得到所有出口流量统计
         uint32 u4ConnectFlowIn = 0;
@@ -3355,12 +3677,29 @@ void CConsoleMessage::DoMessage_MonitorInfo(_CommandInfo& CommandInfo, IBuffPack
 
         int nActiveClient = App_ConnectManager::instance()->GetCount();
         int nPoolClient   = App_ConnectHandlerPool::instance()->GetFreeCount();
-        (*pBuffPacket) << (uint32)nActiveClient;
-        (*pBuffPacket) << (uint32)nPoolClient;
-        (*pBuffPacket) << (uint16)App_MainConfig::instance()->GetMaxHandlerCount();
-        (*pBuffPacket) << (uint16)App_ConnectAccount::instance()->GetCurrConnect();
-        (*pBuffPacket) << u4FlowIn;
-        (*pBuffPacket) << u4FlowOut;
+
+        if (CommandInfo.m_u1OutputType == 0)
+        {
+            (*pBuffPacket) << (uint32)nActiveClient;
+            (*pBuffPacket) << (uint32)nPoolClient;
+            (*pBuffPacket) << (uint16)App_MainConfig::instance()->GetMaxHandlerCount();
+            (*pBuffPacket) << (uint16)App_ConnectAccount::instance()->GetCurrConnect();
+            (*pBuffPacket) << u4FlowIn;
+            (*pBuffPacket) << u4FlowOut;
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_1024] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_1024, "nActiveClient=%d,nPoolClient=%d,MaxHandlerCoun=%d,CurrConnect=%d,u4FlowIn=%d,u4FlowOut=%d.\n",
+                         nActiveClient,
+                         nPoolClient,
+                         App_MainConfig::instance()->GetMaxHandlerCount(),
+                         App_ConnectAccount::instance()->GetCurrConnect(),
+                         u4FlowIn,
+                         u4FlowOut);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        }
+
 #endif
     }
 
@@ -3400,20 +3739,54 @@ void CConsoleMessage::DoMessage_TestFileStart(_CommandInfo& CommandInfo, IBuffPa
         objFileResult.vecProFileDesc.push_back((string)"Test liuchao");
         */
         objFileResult = App_FileTestManager::instance()->FileTestStart(szFileName);
-        (*pBuffPacket) << objFileResult.n4Result;
-        (*pBuffPacket) << objFileResult.n4TimeInterval;
-        (*pBuffPacket) << objFileResult.n4ProNum;
-        (*pBuffPacket) << (uint16)objFileResult.vecProFileDesc.size();
+
+        if (CommandInfo.m_u1OutputType == 0)
+        {
+            (*pBuffPacket) << objFileResult.n4Result;
+            (*pBuffPacket) << objFileResult.n4TimeInterval;
+            (*pBuffPacket) << objFileResult.n4ProNum;
+            (*pBuffPacket) << (uint16)objFileResult.vecProFileDesc.size();
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_1024] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_1024, "n4Result=%d,n4TimeInterval=%d,n4ProNum=%d,vecProFileDesc=%d.\n",
+                         objFileResult.n4Result,
+                         objFileResult.n4TimeInterval,
+                         objFileResult.n4ProNum,
+                         objFileResult.vecProFileDesc.size());
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        }
 
         for (uint16 i = 0; i < (uint16)objFileResult.vecProFileDesc.size(); i++)
         {
-            (*pBuffPacket) << objFileResult.vecProFileDesc[i];
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << objFileResult.vecProFileDesc[i];
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "vecProFileDesc=%s.\n",
+                             objFileResult.vecProFileDesc[i].c_str());
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
         }
     }
     else
     {
         u2ReturnCommandID = CONSOLE_COMMAND_FILE_TEST_START;
-        (*pBuffPacket) << (int)-1;
+
+        if (CommandInfo.m_u1OutputType == 0)
+        {
+            (*pBuffPacket) << (int)-1;
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_1024] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_1024, "Fail.\n");
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        }
     }
 }
 
@@ -3423,7 +3796,17 @@ void CConsoleMessage::DoMessage_TestFileStop(_CommandInfo& CommandInfo, IBuffPac
     {
         u2ReturnCommandID = CONSOLE_COMMAND_FILE_TEST_STOP;
         int nRet = App_FileTestManager::instance()->FileTestEnd();
-        (*pBuffPacket) << (uint32)nRet;
+
+        if (CommandInfo.m_u1OutputType == 0)
+        {
+            (*pBuffPacket) << (uint32)nRet;
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_1024] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_1024, "Ret=%d.\n", nRet);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        }
     }
 }
 
@@ -3438,14 +3821,83 @@ void CConsoleMessage::DoMessage_PortList(_CommandInfo& CommandInfo, IBuffPacket*
 
         uint32 u4Count = (uint32)vec_Port_Data_Account.size();
 
-        (*pBuffPacket) << u4Count;
+        if (CommandInfo.m_u1OutputType == 0)
+        {
+            (*pBuffPacket) << u4Count;
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_1024] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_1024, "u4Count=%d.\n", u4Count);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        }
 
         for (uint32 i = 0; i < u4Count; i++)
         {
-            (*pBuffPacket) << vec_Port_Data_Account[i].m_u1Type;
-            (*pBuffPacket) << vec_Port_Data_Account[i].m_u4Port;
-            (*pBuffPacket) << vec_Port_Data_Account[i].m_u4FlowIn;
-            (*pBuffPacket) << vec_Port_Data_Account[i].m_u4FlowOut;
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << vec_Port_Data_Account[i].m_u1Type;
+                (*pBuffPacket) << vec_Port_Data_Account[i].m_u4Port;
+                (*pBuffPacket) << vec_Port_Data_Account[i].m_u4FlowIn;
+                (*pBuffPacket) << vec_Port_Data_Account[i].m_u4FlowOut;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "m_u1Type=%d,m_u4Port=%d,m_u4FlowIn=%d,m_u4FlowOut=%d.\n",
+                             vec_Port_Data_Account[i].m_u1Type,
+                             vec_Port_Data_Account[i].m_u4Port,
+                             vec_Port_Data_Account[i].m_u4FlowIn,
+                             vec_Port_Data_Account[i].m_u4FlowOut);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
+        }
+    }
+}
+
+void CConsoleMessage::Do_Message_BuffPacket(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+{
+    if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
+    {
+        u2ReturnCommandID = CONSOLE_COMMAND_PACKET_STATE;
+
+        vector<_Packet_Create_Info> objCreateList;
+        App_BuffPacketManager::instance()->GetCreateInfoList(objCreateList);
+
+        uint32 u4Count = (uint32)objCreateList.size();
+
+        if (CommandInfo.m_u1OutputType == 0)
+        {
+            (*pBuffPacket) << u4Count;
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_1024] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_1024, "u4Count=%d.\n", u4Count);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        }
+
+        for (uint32 i = 0; i < u4Count; i++)
+        {
+            VCHARS_STR strFileName;
+            strFileName.text = objCreateList[i].m_szCreateFileName;
+            strFileName.u1Len = (uint8)ACE_OS::strlen(objCreateList[i].m_szCreateFileName);
+
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << strFileName;
+                (*pBuffPacket) << objCreateList[i].m_u4Line;
+                (*pBuffPacket) << objCreateList[i].m_u4Count;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "strFileName=%s,m_u4Line=%d,m_u4Count=%d.\n",
+                             objCreateList[i].m_szCreateFileName,
+                             objCreateList[i].m_u4Line,
+                             objCreateList[i].m_u4Count);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
         }
     }
 }
