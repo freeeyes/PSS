@@ -47,4 +47,5 @@
 	<CommandInfo CommandName="ServerClose" User="freeeyes" desc="关闭当前服务器" />
 	<CommandInfo CommandName="TestFileStart" User="freeeyes" desc="启动服务器文件测试用例" />
 	<CommandInfo CommandName="TestFileStop" User="freeeyes" desc="停止服务器文件测试用例" />
+	<CommandInfo CommandName="BuffPacketState" User="freeeyes" desc="获得当前BuffPacket使用情况" />
 </config>
