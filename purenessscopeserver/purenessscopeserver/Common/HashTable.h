@@ -536,6 +536,87 @@ public:
         return m_objHashPool.Get_Used_Count();
     }
 
+    //弹出第一个正在HashTable中的pt
+    T* Pop_Uint32()
+    {
+        T* pT = NULL;
+
+        if (NULL == m_lpTable)
+        {
+            //没有找到共享内存
+            if (HASH_DEBUG_ON == m_emHashDebug)
+            {
+                OUR_DEBUG((LM_INFO, "[Pop]m_lpTable is NULL.\n"));
+            }
+
+            return pT;
+        }
+
+        //寻找一个可以用的对象，弹出来。
+        for (int32 i = m_nCurrLinkIndex; i < m_objHashPool.Get_Count(); i++)
+        {
+            if (m_lpTable[i] != NULL)
+            {
+                //取出当前的数据
+                pT = m_lpTable[i]->m_pData->m_pValue;
+                char* pKey = m_lpTable[i]->m_pData->m_pKey;
+
+                //设置状态
+                m_nCurrLinkIndex = i;
+
+                if (HASH_DEBUG_ON == m_emHashDebug)
+                {
+                    OUR_DEBUG((LM_INFO, "[Pop]1 pKey = %s.\n", pKey));
+                }
+
+                //回收数据
+                int32 nRet = Del_Hash_Data_By_Unit32(i);
+
+                if (HASH_DEBUG_ON == m_emHashDebug)
+                {
+                    OUR_DEBUG((LM_INFO, "[Pop]1 index=%d, Del_Hash_Data(%d), Currused=%d pT=0x%08x.\n", m_nCurrLinkIndex, nRet, Get_Used_Count(), pT));
+                }
+
+                return pT;
+            }
+        }
+
+        for (int32 i = 0; i < m_nCurrLinkIndex; i++)
+        {
+            if (m_lpTable[i] != NULL)
+            {
+                //取出当前的数据
+                pT = m_lpTable[i]->m_pData->m_pValue;
+                char* pKey = m_lpTable[i]->m_pData->m_pKey;
+
+                if (HASH_DEBUG_ON == m_emHashDebug)
+                {
+                    OUR_DEBUG((LM_INFO, "[Pop]2 pKey = %s.\n", pKey));
+                }
+
+                //设置状态
+                m_nCurrLinkIndex = i;
+
+                //回收数据
+                int32 nRet = Del_Hash_Data_By_Unit32(i);
+
+                if (HASH_DEBUG_ON == m_emHashDebug)
+                {
+                    OUR_DEBUG((LM_INFO, "[Pop]2 index=%d, Del_Hash_Data(%d), Currused=%d, pT=0x%08x.\n", m_nCurrLinkIndex, nRet, Get_Used_Count(), pT));
+                }
+
+                return pT;
+            }
+        }
+
+        if (HASH_DEBUG_ON == m_emHashDebug)
+        {
+            OUR_DEBUG((LM_INFO, "[Pop]2 index=%d, no Find, Currused=%d.\n", m_nCurrLinkIndex, Get_Used_Count()));
+        }
+
+        return pT;
+    }
+
     //弹出一个在链表中的_Hash_Link_Info<T>* pT
     T* Pop()
     {
@@ -615,6 +696,12 @@ public:
         }
 
         return pT;
+    }
+
+    //将一个对象还给HashTable
+    int32 Push_Uint32(uint32 u4Pos, T* pT)
+    {
+        return Add_Hash_Data_By_Key_Unit32(u4Pos, pT);
     }
 
     //将一个已经使用完成的对象，放回到链表

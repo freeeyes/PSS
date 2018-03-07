@@ -15,7 +15,7 @@ CBuffPacketManager::~CBuffPacketManager(void)
 IBuffPacket* CBuffPacketManager::Create(const char* pFileName, uint32 u4Line)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
-    IBuffPacket* pBuffPacket = dynamic_cast<IBuffPacket*>(m_objHashBuffPacketList.Pop());
+    IBuffPacket* pBuffPacket = dynamic_cast<IBuffPacket*>(m_objHashBuffPacketList.Pop_Uint32());
 
     if (NULL != pBuffPacket)
     {
@@ -38,17 +38,11 @@ bool CBuffPacketManager::Delete(IBuffPacket* pBuffPacket)
     pBuff->Clear();
     pBuff->SetNetSort(m_blSortType);
 
-    char szPacketID[10] = {'\0'};
-    sprintf_safe(szPacketID, 10, "%d", pBuff->GetBuffID());
-    bool blState = m_objHashBuffPacketList.Push(szPacketID, pBuff);
+    int32 nPos = m_objHashBuffPacketList.Push_Uint32(pBuff->GetBuffID(), pBuff);
 
-    if(false == blState)
+    if(-1 == nPos)
     {
-        OUR_DEBUG((LM_INFO, "[CBuffPacketManager::Delete]szPacketID=%s(0x%08x).\n", szPacketID, pBuff));
-    }
-    else
-    {
-        //OUR_DEBUG((LM_INFO, "[CBuffPacketManager::Delete]szPacketID=%s(0x%08x) nPos=%d.\n", szPacketID, pBuff, nPos));
+        OUR_DEBUG((LM_INFO, "[CBuffPacketManager::Delete]szPacketID=%d(0x%08x).\n", pBuff->GetBuffID(), pBuff));
     }
 
     return true;
@@ -123,11 +117,8 @@ void CBuffPacketManager::Init(uint32 u4PacketCount, uint32 u4MaxBuffSize, bool b
             pBuffPacket->SetNetSort(blByteOrder);
             pBuffPacket->SetBuffID(i);
 
-            char szPacketID[10] = {'\0'};
-            sprintf_safe(szPacketID, 10, "%d", i);
-
             //添加到Hash数组里面
-            int32 nHashPos = m_objHashBuffPacketList.Add_Hash_Data(szPacketID, pBuffPacket);
+            int32 nHashPos = m_objHashBuffPacketList.Add_Hash_Data_By_Key_Unit32(pBuffPacket->GetBuffID(), pBuffPacket);
 
             if(-1 != nHashPos)
             {
