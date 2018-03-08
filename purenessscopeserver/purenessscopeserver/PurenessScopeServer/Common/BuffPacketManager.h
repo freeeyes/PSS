@@ -10,31 +10,22 @@
 #include "HashTable.h"
 #include "IPacketManager.h"
 #include "BuffPacket.h"
+#include "ObjectPoolManager.h"
+#include "MainConfig.h"
 
 using namespace std;
 
-class CBuffPacketManager : public IPacketManager
+class CBuffPacketManager : public CObjectPoolManager<CBuffPacket, ACE_Recursive_Thread_Mutex>, public IPacketManager
 {
 public:
-    CBuffPacketManager(void);
-    ~CBuffPacketManager(void);
-
-    void Init(uint32 u4PacketCount, uint32 u4MaxBuffSize, bool blByteOrder);
-    void Close();
+    static void Init_Callback(int nIndex, CBuffPacket* pBuffPacket);
 
     uint32 GetBuffPacketUsedCount();
     uint32 GetBuffPacketFreeCount();
 
     IBuffPacket* Create(const char* pFileName = __FILE__, uint32 u4Line = __LINE__);
     bool Delete(IBuffPacket* pBuffPacket);
-
     void GetCreateInfoList(vector<_Packet_Create_Info>& objCreateList);
-
-private:
-    CObjectArrayList<CBuffPacket>  m_objBuffPacketList;                   //BuffPacket对象数组
-    CHashTable<CBuffPacket>        m_objHashBuffPacketList;               //存储空闲BuffPacket指针的hash列表
-    bool                           m_blSortType;                          //字序规则，true为网序，false为主机序
-    ACE_Recursive_Thread_Mutex     m_ThreadWriteLock;
 };
 
 typedef ACE_Singleton<CBuffPacketManager, ACE_Null_Mutex> App_BuffPacketManager;

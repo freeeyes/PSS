@@ -35,10 +35,6 @@ public:
 
     virtual void SetNetSort(bool blState)                                = 0;    //设置是否开启主机字节序，false为不开启，true为开启
 
-    virtual void SetCreateInfo(const char* pFileName, uint32 u4Line)     = 0;    //记录创建此对象时候的调用位置
-    virtual char* GetCreateFileName()                                    = 0;    //返回创建此对象的文件名
-    virtual uint32 GetCreateLine()                                       = 0;    //返回创建此对象的行数
-
     //读取
     virtual IBuffPacket& operator >> (uint8& u1Data)   = 0;        //读出一个uint8的1字节无符号整数
     virtual IBuffPacket& operator >> (uint16& u2Data)  = 0;        //读出一个uint16的2字节无符号整数

@@ -85,7 +85,7 @@ bool CServerManager::Init()
                                          App_MainConfig::instance()->GetConnectAlert()->m_u4DisConnectMax);
 
     //初始化BuffPacket缓冲池.默认都是当前最大连接数的2倍
-    App_BuffPacketManager::instance()->Init(BUFFPACKET_MAX_COUNT, App_MainConfig::instance()->GetMsgMaxBuffSize(), App_MainConfig::instance()->GetByteOrder());
+    App_BuffPacketManager::instance()->Init(BUFFPACKET_MAX_COUNT, CBuffPacketManager::Init_Callback);
 
     //初始化服务器间异步接收队列
     App_ServerMessageInfoPool::instance()->Init(App_MainConfig::instance()->GetServerConnectCount());

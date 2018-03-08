@@ -537,7 +537,7 @@ public:
     }
 
     //弹出第一个正在HashTable中的pt
-    T* Pop_Uint32()
+    T* Pop_Uint32(uint32& u4Pos)
     {
         T* pT = NULL;
 
@@ -577,6 +577,7 @@ public:
                     OUR_DEBUG((LM_INFO, "[Pop]1 index=%d, Del_Hash_Data(%d), Currused=%d pT=0x%08x.\n", m_nCurrLinkIndex, nRet, Get_Used_Count(), pT));
                 }
 
+                u4Pos = i;
                 return pT;
             }
         }
@@ -605,6 +606,7 @@ public:
                     OUR_DEBUG((LM_INFO, "[Pop]2 index=%d, Del_Hash_Data(%d), Currused=%d, pT=0x%08x.\n", m_nCurrLinkIndex, nRet, Get_Used_Count(), pT));
                 }
 
+                u4Pos = i;
                 return pT;
             }
         }

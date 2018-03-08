@@ -513,6 +513,7 @@
     <ClInclude Include="..\Common\ClientCommand.h" />
     <ClInclude Include="..\Common\ClientMessage.h" />
     <ClInclude Include="..\Common\ClientUDPMassage.h" />
+    <ClInclude Include="..\Common\CreateInfo.h" />
     <ClInclude Include="..\Common\define.h" />
     <ClInclude Include="..\Common\HashTable.h" />
     <ClInclude Include="..\Common\IBuffPacket.h" />
@@ -537,6 +538,7 @@
     <ClInclude Include="..\Common\ITimerManager.h" />
     <ClInclude Include="..\Common\IUDPConnectManager.h" />
     <ClInclude Include="..\Common\ObjectArrayList.h" />
+    <ClInclude Include="..\Common\ObjectPoolManager.h" />
     <ClInclude Include="..\Common\ProfileTime.h" />
     <ClInclude Include="..\Common\RandomNumber.h" />
     <ClInclude Include="..\Common\Threading.h" />
