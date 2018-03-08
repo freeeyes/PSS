@@ -91,6 +91,17 @@ public:
         }
         else
         {
+            vector<_Packet_Create_Info> objCreateList;
+            GetCreateInfoList(objCreateList);
+
+            for (int i = 0; i < (int)objCreateList.size(); i++)
+            {
+                OUR_DEBUG((LM_INFO, "[CObjectPoolManager::Create]FileName=%s,m_u4Line=%d,m_u4Count=%d.\n",
+                           objCreateList[i].m_szCreateFileName,
+                           objCreateList[i].m_u4Line,
+                           objCreateList[i].m_u4Count);
+            }
+
             return NULL;
         }
     }
@@ -116,37 +127,40 @@ public:
         ACE_Guard<ACE_LOCK> WGuard(m_ThreadLock);
         objCreateList.clear();
 
-        //输出所有正在使用的对象创建信息
-        uint32 u4Count = m_objCreateInfoList.GetCount();
-
-        for (uint32 i = 0; i < u4Count; i++)
+        if (true == m_blTagCreateInfo)
         {
-            uint32 u4CreateLine   = m_objCreateInfoList.GetObject(i)->GetCreateLine();
-            char* pCreateFileName = m_objCreateInfoList.GetObject(i)->GetCreateFileName();
+            //输出所有正在使用的对象创建信息
+            uint32 u4Count = m_objCreateInfoList.GetCount();
 
-            if (strlen(pCreateFileName) > 0 && u4CreateLine > 0)
+            for (uint32 i = 0; i < u4Count; i++)
             {
-                bool blIsFind = false;
+                uint32 u4CreateLine = m_objCreateInfoList.GetObject(i)->GetCreateLine();
+                char* pCreateFileName = m_objCreateInfoList.GetObject(i)->GetCreateFileName();
 
-                //正在使用的对象，进行统计
-                for (int j = 0; j < (int)objCreateList.size(); j++)
+                if (strlen(pCreateFileName) > 0 && u4CreateLine > 0)
                 {
-                    if (0 == ACE_OS::strcmp(pCreateFileName, objCreateList[j].m_szCreateFileName)
-                        && u4CreateLine == objCreateList[j].m_u4Line)
+                    bool blIsFind = false;
+
+                    //正在使用的对象，进行统计
+                    for (int j = 0; j < (int)objCreateList.size(); j++)
                     {
-                        blIsFind = true;
-                        objCreateList[j].m_u4Count++;
-                        break;
+                        if (0 == ACE_OS::strcmp(pCreateFileName, objCreateList[j].m_szCreateFileName)
+                            && u4CreateLine == objCreateList[j].m_u4Line)
+                        {
+                            blIsFind = true;
+                            objCreateList[j].m_u4Count++;
+                            break;
+                        }
                     }
-                }
 
-                if (false == blIsFind)
-                {
-                    _Packet_Create_Info obj_Packet_Create_Info;
-                    sprintf_safe(obj_Packet_Create_Info.m_szCreateFileName, MAX_BUFF_100, "%s", pCreateFileName);
-                    obj_Packet_Create_Info.m_u4Line  = u4CreateLine;
-                    obj_Packet_Create_Info.m_u4Count = 1;
-                    objCreateList.push_back(obj_Packet_Create_Info);
+                    if (false == blIsFind)
+                    {
+                        _Packet_Create_Info obj_Packet_Create_Info;
+                        sprintf_safe(obj_Packet_Create_Info.m_szCreateFileName, MAX_BUFF_100, "%s", pCreateFileName);
+                        obj_Packet_Create_Info.m_u4Line = u4CreateLine;
+                        obj_Packet_Create_Info.m_u4Count = 1;
+                        objCreateList.push_back(obj_Packet_Create_Info);
+                    }
                 }
             }
         }
