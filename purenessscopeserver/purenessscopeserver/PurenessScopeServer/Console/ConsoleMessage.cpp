@@ -2991,7 +2991,7 @@ void CConsoleMessage::DoMessage_GetLogLevelInfo(_CommandInfo& CommandInfo, IBuff
         else
         {
             char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "LogCount=%d,LogLevel=%d.\n", AppLogManager::instance()->GetLogCount(), (*pBuffPacket) << AppLogManager::instance()->GetCurrLevel());
+            sprintf_safe(szTemp, MAX_BUFF_1024, "LogCount=%d,LogLevel=%d.\n", AppLogManager::instance()->GetLogCount(), AppLogManager::instance()->GetCurrLevel());
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
         }
 

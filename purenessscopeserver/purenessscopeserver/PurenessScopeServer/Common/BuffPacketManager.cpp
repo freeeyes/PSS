@@ -59,10 +59,10 @@ void CBuffPacketManager::GetCreateInfoList(vector<_Packet_Create_Info>& objCreat
     {
         CBuffPacket* pBuffPacket = m_objBuffPacketList.GetObject(i);
 
-        int nCreateLine       = pBuffPacket->GetCreateLine();
+        uint32 u4CreateLine   = pBuffPacket->GetCreateLine();
         char* pCreateFileName = pBuffPacket->GetCreateFileName();
 
-        if (strlen(pCreateFileName) > 0 && nCreateLine > 0)
+        if (strlen(pCreateFileName) > 0 && u4CreateLine > 0)
         {
             bool blIsFind = false;
 
@@ -70,7 +70,7 @@ void CBuffPacketManager::GetCreateInfoList(vector<_Packet_Create_Info>& objCreat
             for (int j = 0; j < (int)objCreateList.size(); j++)
             {
                 if (0 == ACE_OS::strcmp(pCreateFileName, objCreateList[j].m_szCreateFileName)
-                    && nCreateLine == objCreateList[j].m_u4Line)
+                    && u4CreateLine == objCreateList[j].m_u4Line)
                 {
                     blIsFind = true;
                     objCreateList[j].m_u4Count++;
@@ -82,7 +82,7 @@ void CBuffPacketManager::GetCreateInfoList(vector<_Packet_Create_Info>& objCreat
             {
                 _Packet_Create_Info obj_Packet_Create_Info;
                 sprintf_safe(obj_Packet_Create_Info.m_szCreateFileName, MAX_BUFF_100, "%s", pCreateFileName);
-                obj_Packet_Create_Info.m_u4Line  = nCreateLine;
+                obj_Packet_Create_Info.m_u4Line  = u4CreateLine;
                 obj_Packet_Create_Info.m_u4Count = 1;
                 objCreateList.push_back(obj_Packet_Create_Info);
             }
