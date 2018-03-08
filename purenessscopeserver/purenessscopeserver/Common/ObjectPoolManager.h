@@ -99,7 +99,7 @@ public:
                 OUR_DEBUG((LM_INFO, "[CObjectPoolManager::Create]FileName=%s,m_u4Line=%d,m_u4Count=%d.\n",
                            objCreateList[i].m_szCreateFileName,
                            objCreateList[i].m_u4Line,
-                           objCreateList[i].m_u4Count);
+                           objCreateList[i].m_u4Count));
             }
 
             return NULL;
