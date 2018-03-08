@@ -14,7 +14,7 @@ uint32 CBuffPacketManager::GetBuffPacketUsedCount()
     return CObjectPoolManager::GetUsedCount();
 }
 
-NAMESPACE::uint32 CBuffPacketManager::GetBuffPacketFreeCount()
+uint32 CBuffPacketManager::GetBuffPacketFreeCount()
 {
     return CObjectPoolManager::GetFreeCount();
 }
