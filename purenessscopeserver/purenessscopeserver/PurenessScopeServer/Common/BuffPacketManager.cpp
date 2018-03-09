@@ -19,6 +19,11 @@ uint32 CBuffPacketManager::GetBuffPacketFreeCount()
     return CObjectPoolManager::GetFreeCount();
 }
 
+void CBuffPacketManager::OutputCreateInfo()
+{
+    CObjectPoolManager::OutputCreateInfo();
+}
+
 IBuffPacket* CBuffPacketManager::Create(const char* pFileName, uint32 u4Line)
 {
     return dynamic_cast<IBuffPacket*>(CObjectPoolManager::Create(pFileName, u4Line));

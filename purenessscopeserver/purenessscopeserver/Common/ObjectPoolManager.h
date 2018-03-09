@@ -4,6 +4,9 @@
 #include "ObjectArrayList.h"
 #include "HashTable.h"
 #include "CreateInfo.h"
+#include "ace/FILE_Addr.h"
+#include "ace/FILE_Connector.h"
+#include "ace/FILE_IO.h"
 
 template<class TYPE, class ACE_LOCK>
 class CObjectPoolManager
@@ -14,16 +17,16 @@ private:
 public:
     CObjectPoolManager(void)
     {
-        m_blTagCreateInfo = false;
+        m_blTagCreateInfo = true;
     }
 
     virtual ~CObjectPoolManager(void)
     {
     }
 
-    void SetCreateFlag(bool bRecord)
+    void SetCreateFlag(bool blTagCreateInfo)
     {
-        m_blTagCreateInfo = bRecord;
+        m_blTagCreateInfo = blTagCreateInfo;
     }
 
     void Init(uint32 u4Count, Init_Callback fn_Init_Callback)
@@ -94,7 +97,9 @@ public:
             vector<_Packet_Create_Info> objCreateList;
             GetCreateInfoList(objCreateList);
 
-            for (int i = 0; i < (int)objCreateList.size(); i++)
+            int n4Size = (int)objCreateList.size();
+
+            for (int i = 0; i < n4Size; i++)
             {
                 OUR_DEBUG((LM_INFO, "[CObjectPoolManager::Create]FileName=%s,m_u4Line=%d,m_u4Count=%d.\n",
                            objCreateList[i].m_szCreateFileName,
@@ -162,6 +167,90 @@ public:
                         objCreateList.push_back(obj_Packet_Create_Info);
                     }
                 }
+            }
+        }
+    }
+
+    void OutputCreateInfo()
+    {
+        vector<_Packet_Create_Info> objCreateList;
+        GetCreateInfoList(objCreateList);
+        int n4Size = (int)objCreateList.size();
+        string strFileName;
+        string strClassInfo = typeid(TYPE).name();
+
+#ifndef WIN32
+        char* pTmp = (char*)strClassInfo.c_str();
+
+        if(('4' == pTmp[0])||('7' == pTmp[0]))
+        {
+            strClassInfo = strClassInfo.erase(0,1);
+        }
+        else if(('P' == pTmp[0])&&(('4' == pTmp[1])||('7' == pTmp[1])))
+        {
+            strClassInfo = strClassInfo.erase(0,2);
+        }
+        else if(('S' == pTmp[0])&&('t' == pTmp[1])&&('9' == pTmp[2]))
+        {
+            strClassInfo = strClassInfo.erase(0,3);
+        }
+        else
+        {
+            strClassInfo = strClassInfo;
+        }
+
+        strFileName = strClassInfo + "_CreateInfo.log";
+#else
+        if(0 == strClassInfo.find("class ", 0))
+        {
+            strClassInfo = strClassInfo.erase(0,strlen("class "));
+        }
+
+        if((strClassInfo.size()-1) == strClassInfo.find_last_of("*"))
+        {
+            strClassInfo = strClassInfo.erase(strClassInfo.size()-2,2);
+        }
+
+        strFileName = strClassInfo + "_CreateInfo.log";
+#endif
+
+        if(n4Size > 0)
+        {
+            ACE_FILE_Connector fConnector;
+            ACE_FILE_IO ioFile;
+            ACE_FILE_Addr fAddr(strFileName.c_str());
+
+            if (fConnector.connect(ioFile, fAddr) != -1)
+            {
+                time_t tNow = time(NULL);
+                struct tm* tmNow = ACE_OS::localtime(&tNow);
+
+                for (int i = 0; i < n4Size; i++)
+                {
+                    char szLog[MAX_BUFF_1024] = { '\0' };
+
+                    sprintf_safe(szLog,
+                                 MAX_BUFF_1024,
+                                 "[%04d-%02d-%02d %02d:%02d:%02d]FileName=%s,m_u4Line=%d,m_u4Count=%d",
+                                 tmNow->tm_year + 1900,
+                                 tmNow->tm_mon + 1,
+                                 tmNow->tm_mday,
+                                 tmNow->tm_hour,
+                                 tmNow->tm_min,
+                                 tmNow->tm_sec,
+                                 objCreateList[i].m_szCreateFileName,
+                                 objCreateList[i].m_u4Line,
+                                 objCreateList[i].m_u4Count);
+                    if (ioFile.send (szLog, strlen(szLog)) != strlen(szLog))
+                    {
+                        OUR_DEBUG((LM_INFO, "[CObjectPoolManager::OutputCreateInfo]Write filename:%s Error.\n",strFileName.c_str()));
+                    }
+                }
+                ioFile.close();
+            }
+            else
+            {
+                OUR_DEBUG((LM_INFO, "[CObjectPoolManager::OutputCreateInfo]Open filename:%s Error.\n",strFileName.c_str()));
             }
         }
     }

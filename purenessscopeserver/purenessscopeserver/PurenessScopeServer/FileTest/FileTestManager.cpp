@@ -306,12 +306,14 @@ int CFileTestManager::ReadTestFile(const char* pFileName, int nType, FileTestDat
     if (ioFile.get_info(fInfo) == -1)
     {
         OUR_DEBUG((LM_INFO, "[CMainConfig::ReadTestFile]Get file info filename:%s Error.\n", pFileName));
+        ioFile.close();
         return RESULT_ERR_PROFILE;
     }
 
     if (MAX_BUFF_10240 - 1 < fInfo.size_)
     {
         OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]Protocol file too larger filename:%s.\n", pFileName));
+        ioFile.close();
         return RESULT_ERR_PROFILE;
     }
     else
@@ -322,6 +324,7 @@ int CFileTestManager::ReadTestFile(const char* pFileName, int nType, FileTestDat
         if (u4Size != fInfo.size_)
         {
             OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]Read protocol file error filename:%s Error.\n", pFileName));
+            ioFile.close();
             return RESULT_ERR_PROFILE;
         }
         else
@@ -345,6 +348,7 @@ int CFileTestManager::ReadTestFile(const char* pFileName, int nType, FileTestDat
                 objFileTestDataInfo.m_u4DataLength = static_cast<uint32>(nDataSize);
             }
         }
+        ioFile.close();
     }
 
     return RESULT_OK;
