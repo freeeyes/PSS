@@ -583,6 +583,22 @@ typedef struct FILETESTRESULTINFO
     }
 } FileTestResultInfoSt;
 
+//对象创建参数
+//对象创建信息
+struct _Object_Create_Info
+{
+    char   m_szCreateFileName[MAX_BUFF_100];   //声明文件
+    uint32 m_u4Line;                           //声明行数位置
+    uint32 m_u4Count;                          //对象个数
+
+    _Object_Create_Info()
+    {
+        m_szCreateFileName[0] = '\0';
+        m_u4Line = 0;
+        m_u4Count = 0;
+    }
+};
+
 //文件测试数据信息
 typedef struct FILETESTDATAINFO
 {

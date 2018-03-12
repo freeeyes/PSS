@@ -3,12 +3,10 @@
 
 #include "ace/Singleton.h"
 #include "ace/Thread_Mutex.h"
-#include "HashTable.h"
-
-#include "ObjectArrayList.h"
 #include "MessageBlockManager.h"
 #include "BuffPacket.h"
 #include "IMessage.h"
+#include "ObjectPoolManager.h"
 
 using namespace std;
 
@@ -53,14 +51,13 @@ private:
 
 
 //Message对象池
-class CMessagePool
+class CMessagePool : public CObjectPoolManager<CMessage, ACE_Recursive_Thread_Mutex>
 {
 public:
     CMessagePool();
     ~CMessagePool();
 
-    void Init(uint32 u4PacketCount);
-    void Close();
+    static void Init_Callback(int nIndex, CMessage* pMessage);
 
     CMessage* Create();
     bool Delete(CMessage* pMakePacket);
@@ -68,10 +65,7 @@ public:
     int GetUsedCount();
     int GetFreeCount();
 
-private:
-    CHashTable<CMessage>        m_objHashMessageList;                  //Message对象池
-    CObjectArrayList<CMessage>  m_objMessageList;                      //数组对象
-    ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;                     //控制多线程锁
+    void GetCreateInfoList(vector<_Object_Create_Info>& objCreateList);
 };
 
 #endif

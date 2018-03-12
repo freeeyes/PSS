@@ -6,8 +6,6 @@
 //这里感谢freebird的测试客户端，正是因为它，我才能发现了这个问题。不要让关注你的人失望，这是必须的。
 //2010-06-03 freeeyes
 
-#include "ObjectArrayList.h"
-#include "HashTable.h"
 #include "IPacketManager.h"
 #include "BuffPacket.h"
 #include "ObjectPoolManager.h"
@@ -18,6 +16,9 @@ using namespace std;
 class CBuffPacketManager : public CObjectPoolManager<CBuffPacket, ACE_Recursive_Thread_Mutex>, public IPacketManager
 {
 public:
+    CBuffPacketManager();
+    ~CBuffPacketManager();
+
     static void Init_Callback(int nIndex, CBuffPacket* pBuffPacket);
 
     uint32 GetBuffPacketUsedCount();
@@ -26,7 +27,7 @@ public:
 
     IBuffPacket* Create(const char* pFileName = __FILE__, uint32 u4Line = __LINE__);
     bool Delete(IBuffPacket* pBuffPacket);
-    void GetCreateInfoList(vector<_Packet_Create_Info>& objCreateList);
+    void GetCreateInfoList(vector<_Object_Create_Info>& objCreateList);
 };
 
 typedef ACE_Singleton<CBuffPacketManager, ACE_Null_Mutex> App_BuffPacketManager;

@@ -86,7 +86,7 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
     }
 
     //…Ë÷√œ˚œ¢≥ÿ
-    m_MessagePool.Init(MAX_MESSAGE_POOL);
+    m_MessagePool.Init(MAX_MESSAGE_POOL, CMessagePool::Init_Callback);
 }
 
 bool CMessageService::Start()

@@ -17,7 +17,7 @@ private:
 public:
     CObjectPoolManager(void)
     {
-        m_blTagCreateInfo = true;
+        m_blTagCreateInfo = false;
     }
 
     virtual ~CObjectPoolManager(void)
@@ -94,7 +94,7 @@ public:
         }
         else
         {
-            vector<_Packet_Create_Info> objCreateList;
+            vector<_Object_Create_Info> objCreateList;
             GetCreateInfoList(objCreateList);
 
             int n4Size = (int)objCreateList.size();
@@ -127,7 +127,7 @@ public:
         return true;
     }
 
-    void GetCreateInfoList(vector<_Packet_Create_Info>& objCreateList)
+    void GetCreateInfoList(vector<_Object_Create_Info>& objCreateList)
     {
         ACE_Guard<ACE_LOCK> WGuard(m_ThreadLock);
         objCreateList.clear();
@@ -160,7 +160,7 @@ public:
 
                     if (false == blIsFind)
                     {
-                        _Packet_Create_Info obj_Packet_Create_Info;
+                        _Object_Create_Info obj_Packet_Create_Info;
                         sprintf_safe(obj_Packet_Create_Info.m_szCreateFileName, MAX_BUFF_100, "%s", pCreateFileName);
                         obj_Packet_Create_Info.m_u4Line = u4CreateLine;
                         obj_Packet_Create_Info.m_u4Count = 1;
@@ -173,7 +173,7 @@ public:
 
     void OutputCreateInfo()
     {
-        vector<_Packet_Create_Info> objCreateList;
+        vector<_Object_Create_Info> objCreateList;
         GetCreateInfoList(objCreateList);
         int n4Size = (int)objCreateList.size();
         string strFileName;
@@ -201,6 +201,7 @@ public:
 
         strFileName = strClassInfo + "_CreateInfo.log";
 #else
+
         if(0 == strClassInfo.find("class ", 0))
         {
             strClassInfo = strClassInfo.erase(0,strlen("class "));
@@ -241,11 +242,13 @@ public:
                                  objCreateList[i].m_szCreateFileName,
                                  objCreateList[i].m_u4Line,
                                  objCreateList[i].m_u4Count);
+
                     if (ioFile.send (szLog, strlen(szLog)) != strlen(szLog))
                     {
                         OUR_DEBUG((LM_INFO, "[CObjectPoolManager::OutputCreateInfo]Write filename:%s Error.\n",strFileName.c_str()));
                     }
                 }
+
                 ioFile.close();
             }
             else

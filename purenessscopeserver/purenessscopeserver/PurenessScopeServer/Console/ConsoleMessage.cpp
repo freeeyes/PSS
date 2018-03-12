@@ -3861,7 +3861,7 @@ void CConsoleMessage::Do_Message_BuffPacket(_CommandInfo& CommandInfo, IBuffPack
     {
         u2ReturnCommandID = CONSOLE_COMMAND_PACKET_STATE;
 
-        vector<_Packet_Create_Info> objCreateList;
+        vector<_Object_Create_Info> objCreateList;
         App_BuffPacketManager::instance()->GetCreateInfoList(objCreateList);
 
         uint32 u4Count = (uint32)objCreateList.size();

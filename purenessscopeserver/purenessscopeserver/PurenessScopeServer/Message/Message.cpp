@@ -167,92 +167,50 @@ CMessagePool::CMessagePool()
 CMessagePool::~CMessagePool()
 {
     OUR_DEBUG((LM_INFO, "[CMessagePool::~CMessagePool].\n"));
-    Close();
+    CObjectPoolManager::Close();
     OUR_DEBUG((LM_INFO, "[CMessagePool::~CMessagePool]End.\n"));
 }
 
-void CMessagePool::Init(uint32 u4PacketCount)
+void CMessagePool::Init_Callback(int nIndex, CMessage* pMessage)
 {
-    Close();
-
-    //初始化HashTable
-    m_objMessageList.Init(u4PacketCount);
-    m_objHashMessageList.Init((int32)u4PacketCount);
-
-    for(uint32 i = 0; i < u4PacketCount; i++)
-    {
-        CMessage* pPacket = m_objMessageList.GetObject(i);
-
-        if(NULL != pPacket)
-        {
-            //添加到Hash里面
-            char szMessageID[10] = {'\0'};
-            sprintf_safe(szMessageID, 10, "%d", i);
-            int nHashPos = m_objHashMessageList.Add_Hash_Data(szMessageID, pPacket);
-
-            if(-1 != nHashPos)
-            {
-                pPacket->SetHashID(i);
-            }
-        }
-    }
-}
-
-void CMessagePool::Close()
-{
-    //清理所有已存在的指针
-    m_objHashMessageList.Close();
+    pMessage->SetHashID(nIndex);
 }
 
 int CMessagePool::GetUsedCount()
 {
-    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
-
-    return m_objHashMessageList.Get_Count() - m_objHashMessageList.Get_Used_Count();
+    return CObjectPoolManager::GetUsedCount();
 }
 
 int CMessagePool::GetFreeCount()
 {
-    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
+    return CObjectPoolManager::GetFreeCount();
+}
 
-    return m_objHashMessageList.Get_Used_Count();
+void CMessagePool::GetCreateInfoList(vector<_Object_Create_Info>& objCreateList)
+{
+    return CObjectPoolManager::GetCreateInfoList(objCreateList);
 }
 
 CMessage* CMessagePool::Create()
 {
-    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
-
-    CMessage* pMessage = NULL;
-
-    //在Hash表中弹出一个已使用的数据
-    pMessage = m_objHashMessageList.Pop();
-
-    //没找到空余的
-    return pMessage;
+    return dynamic_cast<CMessage*>(CObjectPoolManager::Create(__FILE__, __LINE__));;
 }
 
-bool CMessagePool::Delete(CMessage* pObject)
+bool CMessagePool::Delete(CMessage* pMessage)
 {
-    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
-
-    if(NULL == pObject)
+    if(NULL == pMessage)
     {
         return false;
     }
 
-    pObject->Clear();
+    pMessage->Clear();
 
-    char szHashID[10] = {'\0'};
-    sprintf_safe(szHashID, 10, "%d", pObject->GetHashID());
-    bool blState = m_objHashMessageList.Push(szHashID, pObject);
+    //bool blState = m_objHashMessageList.Push(szHashID, pObject);
+    bool blState = CObjectPoolManager::Delete(pMessage->GetHashID(), pMessage);
 
     if(false == blState)
     {
-        OUR_DEBUG((LM_INFO, "[CMessagePool::Delete]HashID=%s(0x%08x).\n", szHashID, pObject));
-    }
-    else
-    {
-        //OUR_DEBUG((LM_INFO, "[CSendMessagePool::Delete]HashID=%s(0x%08x) nPos=%d.\n", szHashID, pObject, nPos));
+        OUR_DEBUG((LM_INFO, "[CMessagePool::Delete]HashID=%d(0x%08x).\n", pMessage->GetHashID(), pMessage));
     }
 
     return true;

@@ -1,5 +1,15 @@
 #include "BuffPacketManager.h"
 
+CBuffPacketManager::CBuffPacketManager()
+{
+
+}
+
+CBuffPacketManager::~CBuffPacketManager()
+{
+    OUR_DEBUG((LM_INFO, "[CBuffPacketManager::~CBuffPacketManager]Begin.\n"));
+}
+
 void CBuffPacketManager::Init_Callback(int nIndex, CBuffPacket* pBuffPacket)
 {
     //ÉèÖÃBuffPacketÄ¬ÈÏ×ÖÐò
@@ -36,7 +46,7 @@ bool CBuffPacketManager::Delete(IBuffPacket* pBuffPacket)
     return CObjectPoolManager::Delete(pBuff->GetBuffID(), pBuff);
 }
 
-void CBuffPacketManager::GetCreateInfoList(vector<_Packet_Create_Info>& objCreateList)
+void CBuffPacketManager::GetCreateInfoList(vector<_Object_Create_Info>& objCreateList)
 {
     return CObjectPoolManager::GetCreateInfoList(objCreateList);
 }
