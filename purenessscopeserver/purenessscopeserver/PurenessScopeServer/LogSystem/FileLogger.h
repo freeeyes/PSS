@@ -144,6 +144,9 @@ public:
         this->SetFileAddr(ar.GetFileAddr());
         this->SetConnector(ar.GetConnector());
         this->SetFileIO(ar.GetFileIO());
+        this->SetCurrFileIndex(ar.GetCurrFileIndex());
+        this->SetFileMaxSize(ar.GetFileMaxSize());
+        this->SetCurrFileSize(ar.GetCurrFileSize());
     }
 
     CLogFile& operator = (CLogFile& ar)
@@ -160,6 +163,9 @@ public:
         this->SetFileAddr(ar.GetFileAddr());
         this->SetConnector(ar.GetConnector());
         this->SetFileIO(ar.GetFileIO());
+        this->SetCurrFileIndex(ar.GetCurrFileIndex());
+        this->SetFileMaxSize(ar.GetFileMaxSize());
+        this->SetCurrFileSize(ar.GetCurrFileSize());
         return *this;
     }
 
@@ -220,9 +226,39 @@ public:
         m_u4BufferSize = u4BufferSize;
     }
 
+    void SetFileMaxSize(uint32 u4FileMaxSize)
+    {
+        m_u4FileMaxSize = u4FileMaxSize;
+    }
+
+    void SetCurrFileIndex(uint16 u2CurrFileIndex)
+    {
+        m_u2CurrFileIndex = u2CurrFileIndex;
+    }
+
+    void SetCurrFileSize(uint32 u4CirrFileSize)
+    {
+        m_u4CurrFileSize = u4CirrFileSize;
+    }
+
     uint32 GetBufferSize()
     {
         return m_u4BufferSize;
+    }
+
+    uint32 GetFileMaxSize()
+    {
+        return m_u4FileMaxSize;
+    }
+
+    uint16 GetCurrFileIndex()
+    {
+        return m_u2CurrFileIndex;
+    }
+
+    uint32 GetCurrFileSize()
+    {
+        return m_u4CurrFileSize;
     }
 
     virtual int doLog(_LogBlockInfo* pLogBlockInfo)

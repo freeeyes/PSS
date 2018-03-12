@@ -4,6 +4,7 @@ CCommandAccount::CCommandAccount()
 {
     m_u1CommandAccount = 0;
     m_u1Flow           = 0;
+    m_u1Minute         = 0;
 
     m_szName[0]        = '\0';
 

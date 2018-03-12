@@ -9,6 +9,7 @@
 CBuffPacket::CBuffPacket()
     :m_szData(NULL), m_u4ReadPtr(0), m_u4WritePtr(0), m_u4PacketLen(0), m_u4PacketCount(0), m_u4MaxPacketSize(0), m_u4BuffID(0), m_nHashID(0), m_blNetSort(false)
 {
+    m_szError[0] = '\0';
 }
 
 CBuffPacket::~CBuffPacket(void)

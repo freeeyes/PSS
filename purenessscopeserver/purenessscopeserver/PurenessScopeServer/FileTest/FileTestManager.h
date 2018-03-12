@@ -69,8 +69,9 @@ private:
 
         RESPONSERECORD(const RESPONSERECORD& ar)
         {
-            this->m_u8StartTime = ar.m_u8StartTime;
+            this->m_u8StartTime     = ar.m_u8StartTime;
             this->m_u1ResponseCount = ar.m_u1ResponseCount;
+            this->m_u4ConnectID     = ar.m_u4ConnectID;
         }
 
         void Init()
