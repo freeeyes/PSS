@@ -88,6 +88,7 @@ enum
 #define CONSOLE_COMMAND_FILE_TEST_STOP     0x1032
 #define CONSOLE_COMMAND_PORT_FLOW          0x1033
 #define CONSOLE_COMMAND_PACKET_STATE       0x1034
+#define CONSOLE_COMMAND_POOL_SET           0x1035
 
 //目前支持的命令
 #define CONSOLEMESSAHE_LOADMOUDLE         "LoadModule"          //加载模块
@@ -136,6 +137,7 @@ enum
 #define CONSOLEMESSATE_FILE_TEST_STOP     "TestFileStop"        //停止服务器文件测试用例
 #define CONSOLEMESSATE_PORT_FLOW          "PortFlow"            //得到当前时间的端口流量数据  
 #define CONSOLEMESSATE_PACKET_STATE       "BuffPacketState"     //获得当前正在使用的BuffPacket情况
+#define CONSOLEMESSATE_POOL_SET           "PoolSet"             //设置内存池创建信息标记位是否开启
 
 //命令处理参数
 struct _CommandInfo
@@ -200,6 +202,12 @@ struct _DyeCommandInfo
     uint16 m_u2MaxCount;                //最大数量
 };
 
+struct _PoolName
+{
+    char   m_szPoolName[MAX_BUFF_50];   //内存池名字
+    bool   m_blState;                   //当前内存池创建信息状态
+};
+
 class CConsoleMessage
 {
 public:
@@ -233,6 +241,7 @@ private:
     bool GetTestFileName(const char* pCommand, char* pFileName);                                              //获得加载测试文件名
     bool GetDyeingIP(const char* pCommand, _DyeIPInfo& objDyeIPInfo);                                         //获得染色IP的相关信息
     bool GetDyeingCommand(const char* pCommand, _DyeCommandInfo& objDyeCommandInfo);                          //获得染色Command的相关信息
+    bool GetPoolSet(const char* pCommand, _PoolName& objPoolName);                                            //获得内存池的名字
 
     //命令具体实现部分
 private:
@@ -282,6 +291,7 @@ private:
     void DoMessage_TestFileStop(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
     void DoMessage_PortList(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
     void Do_Message_BuffPacket(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    void Do_Message_PoolSet(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
 
 private:
     vecConsoleKey*      m_pvecConsoleKey;

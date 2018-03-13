@@ -34,9 +34,7 @@ int CPacketParsePool::GetFreeCount()
 
 CPacketParse* CPacketParsePool::Create(const char* pFileName, uint32 u4Line)
 {
-    CPacketParse* pPacketParse = CObjectPoolManager::Create(pFileName, u4Line);
-
-    return pPacketParse;
+    return CObjectPoolManager::Create(pFileName, u4Line);
 }
 
 bool CPacketParsePool::Delete(CPacketParse* pPacketParse, bool blDelete)

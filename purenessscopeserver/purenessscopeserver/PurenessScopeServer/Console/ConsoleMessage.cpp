@@ -391,6 +391,10 @@ int CConsoleMessage::DoCommand(_CommandInfo& CommandInfo, IBuffPacket* pCurrBuff
     {
         Do_Message_BuffPacket(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
+    else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSATE_POOL_SET) == 0)
+    {
+        Do_Message_PoolSet(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
+    }
     else if (ACE_OS::strcmp(CommandInfo.m_szCommandTitle, CONSOLEMESSATE_SERVER_CLOSE) == 0)
     {
         //特殊指令，关闭服务器信息，所以要先清理一下内存。
@@ -858,6 +862,50 @@ bool CConsoleMessage::GetDyeingCommand(const char* pCommand, _DyeCommandInfo& ob
     memcpy_safe((char*)(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
     szTempData[nLen] = '\0';
     objDyeCommandInfo.m_u2MaxCount = ACE_OS::atoi(szTempData);
+
+    return true;
+}
+
+bool CConsoleMessage::GetPoolSet(const char* pCommand, _PoolName& objPoolName)
+{
+    char szTempData[MAX_BUFF_100] = { '\0' };
+
+    //获得内存池创建设置
+    char* pPosBegin = (char*)ACE_OS::strstr(pCommand, "-n ");
+    char* pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
+    int nLen = (int)(pPosEnd - pPosBegin - 3);
+
+    if (nLen >= MAX_BUFF_100 || nLen < 0)
+    {
+        return false;
+    }
+
+    memcpy_safe((char*)(pPosBegin + 3), (uint32)nLen, objPoolName.m_szPoolName, (uint32)MAX_BUFF_50);
+    objPoolName.m_szPoolName[nLen] = '\0';
+
+    //获得当前个数
+    pPosBegin = (char*)ACE_OS::strstr(pCommand, "-b ");
+    pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
+    nLen = (int)(pPosEnd - pPosBegin - 3);
+
+    if (nLen >= MAX_BUFF_100 || nLen < 0)
+    {
+        return false;
+    }
+
+    memcpy_safe((char*)(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
+    szTempData[nLen] = '\0';
+
+    if (ACE_OS::strcmp(szTempData, "true") == 0)
+    {
+        objPoolName.m_blState = true;
+    }
+    else
+    {
+        objPoolName.m_blState = false;
+    }
+
+    return true;
 
     return true;
 }
@@ -3896,6 +3944,47 @@ void CConsoleMessage::Do_Message_BuffPacket(_CommandInfo& CommandInfo, IBuffPack
                              objCreateList[i].m_szCreateFileName,
                              objCreateList[i].m_u4Line,
                              objCreateList[i].m_u4Count);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
+        }
+    }
+}
+
+void CConsoleMessage::Do_Message_PoolSet(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+{
+    _PoolName objPoolName;
+
+    if (GetPoolSet(CommandInfo.m_szCommandExp, objPoolName) == true)
+    {
+        u2ReturnCommandID = CONSOLE_COMMAND_POOL_SET;
+
+        if (ACE_OS::strcmp(objPoolName.m_szPoolName, "BuffPacket") == 0)
+        {
+            App_BuffPacketManager::instance()->SetCreateFlag(objPoolName.m_blState);
+
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << (uint8)0;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "Set ok.\n");
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
+        }
+        else if (ACE_OS::strcmp(objPoolName.m_szPoolName, "PacketParse") == 0)
+        {
+            App_PacketParsePool::instance()->SetCreateFlag(objPoolName.m_blState);
+
+            if (CommandInfo.m_u1OutputType == 0)
+            {
+                (*pBuffPacket) << (uint8)0;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "Set ok.\n");
                 pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
             }
         }
