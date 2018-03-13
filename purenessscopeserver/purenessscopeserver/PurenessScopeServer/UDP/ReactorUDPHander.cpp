@@ -41,7 +41,7 @@ int CReactorUDPHander::OpenAddress(const ACE_INET_Addr& AddrRemote, ACE_Reactor*
     struct timeval timeout = {MAX_RECV_UDP_TIMEOUT, 0};
     ACE_OS::setsockopt(m_skRemote.get_handle(), SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(timeout));
 
-    m_pPacketParse = App_PacketParsePool::instance()->Create();
+    m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
 
     return 0;
 }
@@ -71,7 +71,7 @@ int CReactorUDPHander::OpenAddress(const ACE_INET_Addr& AddrRemote)
     struct timeval timeout = { MAX_RECV_UDP_TIMEOUT, 0 };
     ACE_OS::setsockopt(m_skRemote.get_handle(), SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(timeout));
 
-    m_pPacketParse = App_PacketParsePool::instance()->Create();
+    m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
 
     return 0;
 }
@@ -122,7 +122,7 @@ int CReactorUDPHander::handle_input(ACE_HANDLE fd)
             OUR_DEBUG((LM_INFO, "[CReactorUDPHander::handle_input]CheckMessage fail.\n"));
         }
 
-        m_pPacketParse = App_PacketParsePool::instance()->Create();
+        m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
     }
 
     return 0;

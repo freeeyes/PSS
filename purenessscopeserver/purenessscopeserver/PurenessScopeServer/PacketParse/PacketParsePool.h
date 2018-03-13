@@ -7,31 +7,25 @@
 #include "PacketParse.h"
 #include "MainConfig.h"
 #include "MessageBlockManager.h"
-#include "HashTable.h"
-#include "ObjectArrayList.h"
+#include "ObjectPoolManager.h"
 
 using namespace std;
 
 //CPacketParse对象池
-class CPacketParsePool
+class CPacketParsePool : public CObjectPoolManager<CPacketParse, ACE_Recursive_Thread_Mutex>
 {
 public:
     CPacketParsePool();
     ~CPacketParsePool();
 
-    void Init(uint32 u4PacketParsePoolCount);
+    static void Init_Callback(int nIndex, CPacketParse* pPacketParse);
     void Close();
 
-    CPacketParse* Create();
+    CPacketParse* Create(const char* pFileName, uint32 u4Line);
     bool Delete(CPacketParse* pPacketParse, bool blDelete = false);
 
     int GetUsedCount();
     int GetFreeCount();
-
-private:
-    CHashTable<CPacketParse>        m_objPacketParseList;                  //Hash内存池
-    ACE_Recursive_Thread_Mutex      m_ThreadWriteLock;                     //控制多线程锁
-    CObjectArrayList<CPacketParse>  m_objPacketList;                       //CPacketParse对象数组
 };
 
 typedef ACE_Singleton<CPacketParsePool, ACE_Null_Mutex> App_PacketParsePool;

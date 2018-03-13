@@ -331,7 +331,7 @@ uint32 CProConnectHandle::file_open(IFileTestManager* pFileTest)
 
 int CProConnectHandle::handle_write_file_stream(const char* pData, uint32 u4Size, uint8 u1ParseID)
 {
-    m_pPacketParse = App_PacketParsePool::instance()->Create();
+    m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
 
     if (NULL == m_pPacketParse)
     {
@@ -572,7 +572,7 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 
     //OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::open] Open(%d).\n", GetConnectID()));
 
-    m_pPacketParse = App_PacketParsePool::instance()->Create();
+    m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
 
     if(NULL == m_pPacketParse)
     {
@@ -752,7 +752,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                     return;
                 }
 
-                m_pPacketParse = App_PacketParsePool::instance()->Create();
+                m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
 
                 if(NULL == m_pPacketParse)
                 {
@@ -855,7 +855,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                 return;
             }
 
-            m_pPacketParse = App_PacketParsePool::instance()->Create();
+            m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
 
             if(NULL == m_pPacketParse)
             {
@@ -927,7 +927,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                     return;
                 }
 
-                m_pPacketParse = App_PacketParsePool::instance()->Create();
+                m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
 
                 if(NULL == m_pPacketParse)
                 {
@@ -1580,7 +1580,16 @@ bool CProConnectHandle::RecvClinetPacket(uint32 u4PackeLen)
 
     if(NULL == pmb)
     {
-        AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, RecvQueueCount=%d, RecvQueueTimeCost=%I64d, SendQueueTimeCost=%I64d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, m_u4RecvQueueCount, m_u8RecvQueueTimeCost, m_u8SendQueueTimeCost);
+        AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, RecvQueueCount=%d, RecvQueueTimeCost=%I64d, SendQueueTimeCost=%I64d.",
+                                            m_addrRemote.get_host_addr(),
+                                            m_addrRemote.get_port_number(),
+                                            m_u4AllRecvSize,
+                                            m_u4AllRecvCount,
+                                            m_u4AllSendSize,
+                                            m_u4AllSendCount,
+                                            m_u4RecvQueueCount,
+                                            m_u8RecvQueueTimeCost,
+                                            m_u8SendQueueTimeCost);
         OUR_DEBUG((LM_ERROR, "[CProConnectHandle::RecvClinetPacket] pmb new is NULL.\n"));
         Close(2);
         return false;
@@ -1589,8 +1598,17 @@ bool CProConnectHandle::RecvClinetPacket(uint32 u4PackeLen)
     if(m_Reader.read(*pmb, u4PackeLen) == -1)
     {
         //如果读失败，则关闭连接。
-        AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, RecvQueueCount=%d, RecvQueueTimeCost=%I64d, SendQueueTimeCost=%I64d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, m_u4RecvQueueCount, m_u8RecvQueueTimeCost, m_u8SendQueueTimeCost);
         OUR_DEBUG((LM_ERROR, "[CProConnectHandle::RecvClinetPacket] m_reader.read is error(%d)(%d).\n", GetConnectID(), errno));
+        AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, RecvQueueCount=%d, RecvQueueTimeCost=%I64d, SendQueueTimeCost=%I64d.",
+                                            m_addrRemote.get_host_addr(),
+                                            m_addrRemote.get_port_number(),
+                                            m_u4AllRecvSize,
+                                            m_u4AllRecvCount,
+                                            m_u4AllSendSize,
+                                            m_u4AllSendCount,
+                                            m_u4RecvQueueCount,
+                                            m_u8RecvQueueTimeCost,
+                                            m_u8SendQueueTimeCost);
         ClearPacketParse(*pmb);
         Close(2);
         return false;

@@ -80,7 +80,7 @@ bool CProServerManager::Init()
     App_ServerMessageInfoPool::instance()->Init(App_MainConfig::instance()->GetServerConnectCount());
 
     //初始化PacketParse对象池
-    App_PacketParsePool::instance()->Init(MAX_PACKET_PARSE);
+    App_PacketParsePool::instance()->Init(MAX_PACKET_PARSE, CPacketParsePool::Init_Callback);
 
     //初始化ProConnectHandler对象池
     if(App_MainConfig::instance()->GetMaxHandlerCount() <= 0)

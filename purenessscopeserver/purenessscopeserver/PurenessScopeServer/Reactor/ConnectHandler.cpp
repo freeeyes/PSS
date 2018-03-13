@@ -280,7 +280,7 @@ int CConnectHandler::open(void*)
     //int nOverTime = MAX_MSG_SENDTIMEOUT;
     //ACE_OS::setsockopt(this->get_handle(), SOL_SOCKET, SO_SNDTIMEO, (char* )&nOverTime, sizeof(nOverTime));
 
-    m_pPacketParse = App_PacketParsePool::instance()->Create();
+    m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
 
     if(NULL == m_pPacketParse)
     {
@@ -610,7 +610,7 @@ int CConnectHandler::Dispose_Recv_Data()
                 m_u4CurrSize = 0;
 
                 //申请新的包
-                m_pPacketParse = App_PacketParsePool::instance()->Create();
+                m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
 
                 if (NULL == m_pPacketParse)
                 {
@@ -689,7 +689,7 @@ int CConnectHandler::Dispose_Recv_Data()
             m_u4CurrSize = 0;
 
             //申请新的包
-            m_pPacketParse = App_PacketParsePool::instance()->Create();
+            m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
 
             if (NULL == m_pPacketParse)
             {
@@ -734,7 +734,7 @@ int CConnectHandler::Dispose_Recv_Data()
                 m_u4CurrSize = 0;
 
                 //申请新的包
-                m_pPacketParse = App_PacketParsePool::instance()->Create();
+                m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
 
                 if (NULL == m_pPacketParse)
                 {
@@ -893,7 +893,7 @@ uint32 CConnectHandler::file_open(IFileTestManager* pFileTest)
     //int nOverTime = MAX_MSG_SENDTIMEOUT;
     //ACE_OS::setsockopt(this->get_handle(), SOL_SOCKET, SO_SNDTIMEO, (char* )&nOverTime, sizeof(nOverTime));
 
-    m_pPacketParse = App_PacketParsePool::instance()->Create();
+    m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
 
     if (NULL == m_pPacketParse)
     {
@@ -967,7 +967,7 @@ uint32 CConnectHandler::file_open(IFileTestManager* pFileTest)
 
 int CConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Size, uint8 u1ParseID)
 {
-    m_pPacketParse = App_PacketParsePool::instance()->Create();
+    m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
 
     if (NULL == m_pPacketParse)
     {

@@ -90,7 +90,7 @@ int CProactorUDPHandler::OpenAddress(const ACE_INET_Addr& AddrLocal, ACE_Proacto
                            App_MainConfig::instance()->GetClientDataAlert()->m_u4SendPacketCount,
                            App_MainConfig::instance()->GetClientDataAlert()->m_u4SendDataMax);
 
-    m_pPacketParse = App_PacketParsePool::instance()->Create();
+    m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
 
     size_t stRecvLen = MAX_UDP_PACKET_LEN;
     //OUR_DEBUG((LM_INFO, "[CProactorUDPHandler::OpenAddress]pMBBuff=0x%08x.\n", pMBBuff));
@@ -126,7 +126,7 @@ void CProactorUDPHandler::handle_read_dgram(const ACE_Asynch_Read_Dgram::Result&
             OUR_DEBUG((LM_INFO, "[CProactorUDPHandler::handle_read_dgram]CheckMessage error.\n"));
         }
 
-        m_pPacketParse = App_PacketParsePool::instance()->Create();
+        m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
     }
     else
     {
