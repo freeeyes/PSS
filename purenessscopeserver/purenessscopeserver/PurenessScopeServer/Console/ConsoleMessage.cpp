@@ -875,7 +875,7 @@ bool CConsoleMessage::GetPoolSet(const char* pCommand, _PoolName& objPoolName)
     char* pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
     int nLen = (int)(pPosEnd - pPosBegin - 3);
 
-    if (nLen >= MAX_BUFF_100 || nLen < 0)
+    if (nLen >= MAX_BUFF_50 || nLen < 0)
     {
         return false;
     }
@@ -888,7 +888,7 @@ bool CConsoleMessage::GetPoolSet(const char* pCommand, _PoolName& objPoolName)
     pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
     nLen = (int)(pPosEnd - pPosBegin - 3);
 
-    if (nLen >= MAX_BUFF_100 || nLen < 0)
+    if (nLen >= MAX_BUFF_50 || nLen < 0)
     {
         return false;
     }
@@ -904,8 +904,6 @@ bool CConsoleMessage::GetPoolSet(const char* pCommand, _PoolName& objPoolName)
     {
         objPoolName.m_blState = false;
     }
-
-    return true;
 
     return true;
 }
