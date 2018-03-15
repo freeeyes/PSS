@@ -3004,6 +3004,9 @@ void CConnectHandlerPool::Close()
 {
     //清理所有已存在的指针
     m_u4CurrMaxCount  = 1;
+    
+    //删除hash表空间
+    m_objHashHandleList.Close();
 }
 
 int CConnectHandlerPool::GetUsedCount()
