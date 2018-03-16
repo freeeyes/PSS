@@ -14,6 +14,7 @@ public:
     {
         m_u4Max = 0;
         m_u4Index = 0;
+        m_blIsFull = false;
     }
 
     virtual ~CObjectContainerManager(void)
@@ -34,6 +35,7 @@ public:
         if (m_u4Index == m_u4Max)
         {
             m_u4Index = 0;
+            m_blIsFull = true;
         }
     }
 
@@ -42,14 +44,24 @@ public:
         vecObject.clear();
         ACE_Guard<ACE_LOCK> WGuard(m_ThreadLock);
 
-        for(int32 iLoop = m_u4Index; 0 < iLoop; iLoop--)
+        if(true == m_blIsFull)
         {
-            vecObject.push_back(m_vecObject[iLoop-1]);
-        }
+            for(int32 iLoop = m_u4Index; 0 < iLoop; iLoop--)
+            {
+                vecObject.push_back(m_vecObject[iLoop-1]);
+            }
 
-        for(int32 iLoop = m_u4Max; m_u4Index < iLoop; iLoop--)
+            for(int32 iLoop = m_u4Max; m_u4Index < iLoop; iLoop--)
+            {
+                vecObject.push_back(m_vecObject[iLoop-1]);
+            }
+        }
+        else
         {
-            vecObject.push_back(m_vecObject[iLoop-1]);
+            for(int32 iLoop = m_u4Index; 0 < iLoop; iLoop--)
+            {
+                vecObject.push_back(m_vecObject[iLoop-1]);
+            }
         }
     }
 
@@ -58,6 +70,7 @@ private:
     vector<TYPE>  m_vecObject; 
     uint32        m_u4Max;
     uint32        m_u4Index;
+    bool          m_blIsFull;
 };
 
 #endif //_OBJECTCONTAINERMANAGER_H_
