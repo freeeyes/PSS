@@ -7,7 +7,7 @@ CPacketParsePool::CPacketParsePool()
 CPacketParsePool::~CPacketParsePool()
 {
     OUR_DEBUG((LM_INFO, "[CPacketParsePool::~CPacketParsePool].\n"));
-    CObjectPoolManager::Close();
+    Close();
     OUR_DEBUG((LM_INFO, "[CPacketParsePool::~CPacketParsePool] End.\n"));
 }
 

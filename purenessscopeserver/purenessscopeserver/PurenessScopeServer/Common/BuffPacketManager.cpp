@@ -8,6 +8,7 @@ CBuffPacketManager::CBuffPacketManager()
 CBuffPacketManager::~CBuffPacketManager()
 {
     OUR_DEBUG((LM_INFO, "[CBuffPacketManager::~CBuffPacketManager]Begin.\n"));
+    CObjectPoolManager::Close();
 }
 
 void CBuffPacketManager::Init_Callback(int nIndex, CBuffPacket* pBuffPacket)
