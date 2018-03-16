@@ -85,6 +85,9 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
         }
     }
 
+    //初始化工作线程历史记录
+    m_objThreadInfoHistory.Init(MAX_THREAD_HISTORY_COUNT);
+
     //设置消息池
     m_MessagePool.Init(MAX_MESSAGE_POOL, CMessagePool::Init_Callback);
 }
@@ -448,11 +451,6 @@ int CMessageService::Close()
     return 0;
 }
 
-bool CMessageService::SaveThreadInfo()
-{
-    return SaveThreadInfoData();
-}
-
 bool CMessageService::SaveThreadInfoData()
 {
     //这里进行线程自检
@@ -497,6 +495,22 @@ bool CMessageService::SaveThreadInfoData()
 
         m_ThreadInfo.m_u4CurrPacketCount = 0;
         return true;
+    }
+
+    //添加到线程信息历史数据表
+    m_objThreadInfoHistory.Add(m_ThreadInfo);
+
+    SaveThreadInfoJson();
+
+    return true;
+}
+
+bool CMessageService::SaveThreadInfoJson()
+{
+    //将数据输出成Json格式数据
+    for (int i = 0; i < m_objThreadInfoHistory.GetCount(); i++)
+    {
+
     }
 
     return true;
@@ -1025,7 +1039,7 @@ bool CMessageServiceGroup::CheckWorkThread()
     {
         CMessageService* pMessageService = m_vecMessageService[i];
 
-        if (NULL != pMessageService && false == pMessageService->SaveThreadInfo())
+        if (NULL != pMessageService && false == pMessageService->SaveThreadInfoData())
         {
             OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::CheckWorkThread]SaveThreadInfo error.\n"));
         }

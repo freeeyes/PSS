@@ -910,6 +910,13 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
         m_u2PacketTimeOut = (uint16)ACE_OS::atoi(pData);
     }
 
+    pData = m_MainConfig.GetData("ThreadInfo", "JsonFile");
+
+    if (pData != NULL)
+    {
+        sprintf_safe(m_szThreadJson, MAX_BUFF_200, "%s", pData);
+    }
+
     pData = m_MainConfig.GetData("ClientInfo", "CheckAliveTime");
 
     if(pData != NULL)
@@ -1858,6 +1865,11 @@ uint8 CMainConfig::GetPacketParseCount()
 char* CMainConfig::GetCoreScript()
 {
     return m_szCoreScript;
+}
+
+char* CMainConfig::GetThreadJson()
+{
+    return m_szThreadJson;
 }
 
 uint16 CMainConfig::GetModuleInfoCount()

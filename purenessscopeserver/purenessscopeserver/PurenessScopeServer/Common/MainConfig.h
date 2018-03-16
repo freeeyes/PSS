@@ -319,6 +319,7 @@ public:
     _PacketParseInfo* GetPacketParseInfo(uint8 u1Index = 0);
     uint8             GetPacketParseCount();
     char*             GetCoreScript();
+    char*             GetThreadJson();
 
 private:
     uint32     m_u4MsgHighMark;                        //消息的高水位阀值
@@ -398,6 +399,7 @@ private:
     char       m_szDeubgFileName[MAX_BUFF_100];        //输出文件名
     char       m_szDebugLevel[MAX_BUFF_100];           //输出文件级别
     char       m_szCoreScript[MAX_BUFF_200];           //当程序Core掉的时候，调用的执行脚本位置
+    char       m_szThreadJson[MAX_BUFF_200];           //工作线程输出Json格式
 
     CXmlOpeation     m_MainConfig;
     _ConnectAlert    m_ConnectAlert;                   //连接告警相关配置信息

@@ -225,6 +225,9 @@ struct _WorkThreadAIInfo
     }
 };
 
+//AI配置信息表
+typedef vector<_WorkThreadAIInfo> vecWorkThreadAIInfo;
+
 //超时命令单元
 struct _CommandTimeout
 {

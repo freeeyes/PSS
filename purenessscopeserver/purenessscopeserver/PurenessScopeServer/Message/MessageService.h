@@ -19,6 +19,7 @@
 #include "WorkThreadAI.h"
 #include "CommandAccount.h"
 #include "MessageDyeingManager.h"
+#include "Ring.h"
 
 #ifdef WIN32
 #include "ProConnectHandle.h"
@@ -28,8 +29,9 @@
 #include "LinuxCPU.h"
 #endif
 
-//AI配置信息表
-typedef vector<_WorkThreadAIInfo> vecWorkThreadAIInfo;
+//输出json的内容
+#define MAX_THREAD_HISTORY_COUNT 5   //最大历史记录记录条数
+#define OUTPUT_THREAD_INFO "{\"name\":\"%s\",\"type\": \"line\",\"smooth\": \"true\",\"data\": [%s]}\\n"
 
 enum MESSAGE_SERVICE_THREAD_STATE
 {
@@ -53,8 +55,6 @@ public:
     virtual int svc (void);
     int Close();
 
-    bool SaveThreadInfo();
-
     void Init(uint32 u4ThreadID, uint32 u4MaxQueue = MAX_MSG_THREADQUEUE, uint32 u4LowMask = MAX_MSG_MASK, uint32 u4HighMask = MAX_MSG_MASK);
 
     bool Start();
@@ -63,6 +63,7 @@ public:
     bool PutUpdateCommandMessage(uint32 u4UpdateIndex);
 
     _ThreadInfo* GetThreadInfo();
+    bool SaveThreadInfoData();                              //记录当前工作线程状态信息日志
 
     void GetAIInfo(_WorkThreadAIInfo& objAIInfo);           //得到所有工作线程的AI配置
     void GetAITO(vecCommandTimeout& objTimeout);            //得到所有的AI超时数据包信息
@@ -89,7 +90,7 @@ public:
 
 private:
     bool ProcessMessage(CMessage* pMessage, uint32 u4ThreadID);
-    bool SaveThreadInfoData();
+    bool SaveThreadInfoJson();                                              //将结果存为echart的json格式
     void CloseCommandList();                                                //清理当前信令列表副本
     CClientCommandList* GetClientCommandList(uint16 u2CommandID);
     bool DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost, uint16& u2Count, bool& bDeleteFlag);
@@ -116,6 +117,7 @@ private:
     CMessagePool                   m_MessagePool;          //消息池
 
     CHashTable<CClientCommandList> m_objClientCommandList; //可执行的信令列表
+    CRingLink<_ThreadInfo>         m_objThreadInfoHistory; //工作线程历史列表
 
     ACE_Thread_Mutex m_mutex;
     ACE_Condition<ACE_Thread_Mutex> m_cond;
