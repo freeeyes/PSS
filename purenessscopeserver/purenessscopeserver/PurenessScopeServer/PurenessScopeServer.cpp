@@ -376,6 +376,41 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 //如果是windows
 #include "WindowsProcess.h"
 #include "WindowsDump.h"
+#include <windows.h>
+
+bool ctrlhandler(DWORD fdwctrltype)
+{
+    switch (fdwctrltype)
+    {
+    // handle the ctrl-c signal.
+    case CTRL_C_EVENT:
+        printf("ctrl-c event\n\n");
+        return(true);
+
+    // ctrl-close: confirm that the user wants to exit.
+    case CTRL_CLOSE_EVENT:
+        printf("ctrl-close event\n\n");
+        App_ProServerManager::instance()->Close();
+        return(true);
+
+    // pass other signals to the next handler.
+    case CTRL_BREAK_EVENT:
+        printf("ctrl-break event\n\n");
+        return false;
+
+    case CTRL_LOGOFF_EVENT:
+        printf("ctrl-logoff event\n\n");
+        return false;
+
+    case CTRL_SHUTDOWN_EVENT:
+        printf("ctrl-shutdown event\n\n");
+        App_ProServerManager::instance()->Close();
+        return false;
+
+    default:
+        return false;
+    }
+}
 
 int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 {
@@ -394,6 +429,9 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 
     //添加Dump文件
     SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)ApplicationCrashHandler);
+
+    //添加对Console
+    SetConsoleCtrlHandler((PHANDLER_ROUTINE)ctrlhandler, true);
 
     //第一步，读取配置文件
     if(!App_MainConfig::instance()->Init())
