@@ -86,7 +86,6 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
     }
 
     //初始化工作线程历史记录
-    m_objThreadInfoHistory.Init(MAX_THREAD_HISTORY_COUNT);
 
     //设置消息池
     m_MessagePool.Init(MAX_MESSAGE_POOL, CMessagePool::Init_Callback);
@@ -498,7 +497,6 @@ bool CMessageService::SaveThreadInfoData()
     }
 
     //添加到线程信息历史数据表
-    m_objThreadInfoHistory.Add(m_ThreadInfo);
 
     SaveThreadInfoJson();
 
@@ -508,10 +506,7 @@ bool CMessageService::SaveThreadInfoData()
 bool CMessageService::SaveThreadInfoJson()
 {
     //将数据输出成Json格式数据
-    for (int i = 0; i < m_objThreadInfoHistory.GetCount(); i++)
-    {
 
-    }
 
     return true;
 }

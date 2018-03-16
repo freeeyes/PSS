@@ -19,7 +19,6 @@
 #include "WorkThreadAI.h"
 #include "CommandAccount.h"
 #include "MessageDyeingManager.h"
-#include "Ring.h"
 
 #ifdef WIN32
 #include "ProConnectHandle.h"
@@ -117,7 +116,6 @@ private:
     CMessagePool                   m_MessagePool;          //消息池
 
     CHashTable<CClientCommandList> m_objClientCommandList; //可执行的信令列表
-    CRingLink<_ThreadInfo>         m_objThreadInfoHistory; //工作线程历史列表
 
     ACE_Thread_Mutex m_mutex;
     ACE_Condition<ACE_Thread_Mutex> m_cond;
