@@ -1,5 +1,5 @@
-#ifndef _MEMORYMANAGER_H_
-#define _MEMORYMANAGER_H_
+#ifndef _OBJECTPOOLMANAGER_H_
+#define _OBJECTPOOLMANAGER_H_
 
 #include "ObjectArrayList.h"
 #include "HashTable.h"
@@ -266,4 +266,4 @@ private:
     bool                          m_blTagCreateInfo;        //是否记录创建信息
 };
 
-#endif //_MEMORYMANAGER_H_
+#endif //_OBJECTPOOLMANAGER_H_
