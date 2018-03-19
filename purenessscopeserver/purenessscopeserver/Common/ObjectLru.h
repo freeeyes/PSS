@@ -1,5 +1,5 @@
-#ifndef _OBJECTCONTAINERMANAGER_H_
-#define _OBJECTCONTAINERMANAGER_H_
+#ifndef _OBJECTLRULIST_H_
+#define _OBJECTLRULIST_H_
 
 #include "define.h"
 #include <list>
@@ -46,21 +46,21 @@ public:
 
         if(true == m_blIsFull)
         {
-            for(uint32 iLoop = m_u4Index; 0 < iLoop; iLoop--)
+            for(uint32 iLoop = m_u4Index; iLoop < m_u4Max; iLoop++)
             {
-                vecObject.push_back(m_vecObject[iLoop-1]);
+                vecObject.push_back(m_vecObject[iLoop]);
             }
 
-            for(uint32 iLoop = m_u4Max; m_u4Index < iLoop; iLoop--)
+            for(int32 iLoop = 0; iLoop < m_u4Index; iLoop++)
             {
-                vecObject.push_back(m_vecObject[iLoop-1]);
+                vecObject.push_back(m_vecObject[iLoop]);
             }
         }
         else
         {
-            for(int32 iLoop = m_u4Index; 0 < iLoop; iLoop--)
+            for(int32 iLoop = 0; iLoop < m_u4Index; iLoop++)
             {
-                vecObject.push_back(m_vecObject[iLoop-1]);
+                vecObject.push_back(m_vecObject[iLoop]);
             }
         }
     }
@@ -73,4 +73,4 @@ private:
     bool          m_blIsFull;
 };
 
-#endif //_OBJECTCONTAINERMANAGER_H_
+#endif //_OBJECTLRULIST_H_
