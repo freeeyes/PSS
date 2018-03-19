@@ -456,6 +456,9 @@ bool CMessageService::SaveThreadInfoData()
     ACE_Time_Value tvNow(ACE_OS::gettimeofday());
     ACE_Date_Time dt(m_ThreadInfo.m_tvUpdateTime);
 
+    //添加到线程信息历史数据表
+    m_objThreadHistoryList.AddObject(m_ThreadInfo);
+
     //开始查看线程是否超时
     //OUR_DEBUG((LM_INFO, "[CMessageService::SaveThreadInfoData]ID=%d,m_u4State=%d,m_u2ThreadTimeOut=%d,cost=%d.\n", m_ThreadInfo.m_u4ThreadID, m_ThreadInfo.m_u4State, m_u2ThreadTimeOut, tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec()));
     if(m_ThreadInfo.m_u4State == THREAD_RUNBEGIN && tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec() > m_u2ThreadTimeOut)
@@ -495,18 +498,61 @@ bool CMessageService::SaveThreadInfoData()
         m_ThreadInfo.m_u4CurrPacketCount = 0;
         return true;
     }
+}
 
-    //添加到线程信息历史数据表
+bool CMessageService::GetThreadInfoJson(char* pJson, uint32 u4Len)
+{
+    //将数据输出成Json格式数据
+    char szDataInfo[MAX_BUFF_200] = { '\0' };
+    vector<_ThreadInfo> objVecHistoryList;
+    m_objThreadHistoryList.GetAllSavingObject(objVecHistoryList);
 
-    SaveThreadInfoJson();
+    for(int i = 0; i < (int)objVecHistoryList.size(); i++)
+    {
+        if (0 == i)
+        {
+            sprintf_safe(szDataInfo, MAX_BUFF_200, "%d", objVecHistoryList[i].m_u4CurrPacketCount);
+        }
+        else
+        {
+            sprintf_safe(szDataInfo, MAX_BUFF_200, "%s,%d", szDataInfo, objVecHistoryList[i].m_u4CurrPacketCount);
+        }
+    }
+
+    sprintf_safe(pJson, u4Len, OUTPUT_THREAD_INFO, m_u4ThreadID, szDataInfo);
 
     return true;
 }
 
-bool CMessageService::SaveThreadInfoJson()
+bool CMessageService::GetThreadInfoTimeJson(char* pJson, uint32 u4Len)
 {
     //将数据输出成Json格式数据
+    char szDataInfo[MAX_BUFF_200] = { '\0' };
+    vector<_ThreadInfo> objVecHistoryList;
+    m_objThreadHistoryList.GetAllSavingObject(objVecHistoryList);
 
+    for (int i = 0; i < (int)objVecHistoryList.size(); i++)
+    {
+        ACE_Date_Time dtThreadTime(objVecHistoryList[i].m_tvUpdateTime);
+
+        if (0 == i)
+        {
+            sprintf_safe(szDataInfo, MAX_BUFF_200, "\"%02d-%02d-%02d\"",
+                         dtThreadTime.hour(),
+                         dtThreadTime.minute(),
+                         dtThreadTime.second());
+        }
+        else
+        {
+            sprintf_safe(szDataInfo, MAX_BUFF_200, "%s,\"%02d-%02d-%02d\"",
+                         szDataInfo,
+                         dtThreadTime.hour(),
+                         dtThreadTime.minute(),
+                         dtThreadTime.second());
+        }
+    }
+
+    sprintf_safe(pJson, u4Len, OUTPUT_THREAD_INFO, m_u4ThreadID, szDataInfo);
 
     return true;
 }
@@ -843,6 +889,9 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* a
         OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::handle_timeout]CheckPlugInState is fail.\n"));
     }
 
+    //存入Json图表
+    SaveThreadInfoJson();
+
     return 0;
 }
 
@@ -1023,6 +1072,56 @@ bool CMessageServiceGroup::KillTimer()
     }
 
     OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::KillTimer] end....\n"));
+    return true;
+}
+
+bool CMessageServiceGroup::SaveThreadInfoJson()
+{
+    char  szJsonContent[MAX_BUFF_1024] = { '\0' };
+    char  szYLineData[MAX_BUFF_100]    = { '\0' };
+    char  szYLinesData[MAX_BUFF_500]   = { '\0' };
+    char  szXLinesName[MAX_BUFF_200]   = { '\0' };
+
+    char* pJsonFile = App_MainConfig::instance()->GetThreadJson();
+
+    //获得当前线程数量
+    uint32 u4Size = (uint32)m_vecMessageService.size();
+
+    if (NULL != pJsonFile && 0 < ACE_OS::strlen(pJsonFile) && u4Size > 0)
+    {
+        //得到X轴描述
+        m_vecMessageService[0]->GetThreadInfoTimeJson(szXLinesName, MAX_BUFF_200);
+
+        //获得Y轴描述
+        for (uint32 i = 0; i < u4Size; i++)
+        {
+            CMessageService* pMessageService = m_vecMessageService[i];
+
+            if (NULL != pMessageService)
+            {
+                pMessageService->GetThreadInfoJson(szYLineData, MAX_BUFF_500);
+            }
+
+            if (0 == i)
+            {
+                sprintf_safe(szYLinesData, MAX_BUFF_500, "%s", szYLineData);
+            }
+            else
+            {
+                sprintf_safe(szYLinesData, MAX_BUFF_500, "%s,%s", szYLinesData, szYLineData);
+            }
+        }
+
+        sprintf_safe(szJsonContent, MAX_BUFF_1024, OUTPUT_THREAD_JSON, szXLinesName, szYLinesData);
+        FILE* pFile = ACE_OS::fopen(pJsonFile, "w");
+
+        if (NULL != pFile)
+        {
+            ACE_OS::fwrite(szJsonContent, sizeof(char), strlen(szJsonContent), pFile);
+            ACE_OS::fclose(pFile);
+        }
+    }
+
     return true;
 }
 

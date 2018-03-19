@@ -7,17 +7,17 @@
 using namespace std;
 
 template<class TYPE, class ACE_LOCK>
-class CObjectContainerManager
+class CObjectLruList
 {
 public:
-    CObjectContainerManager(void)
+    CObjectLruList(void)
     {
         m_u4Max = 0;
         m_u4Index = 0;
         m_blIsFull = false;
     }
 
-    virtual ~CObjectContainerManager(void)
+    virtual ~CObjectLruList(void)
     {
     }
 
@@ -46,12 +46,12 @@ public:
 
         if(true == m_blIsFull)
         {
-            for(int32 iLoop = m_u4Index; 0 < iLoop; iLoop--)
+            for(uint32 iLoop = m_u4Index; 0 < iLoop; iLoop--)
             {
                 vecObject.push_back(m_vecObject[iLoop-1]);
             }
 
-            for(int32 iLoop = m_u4Max; m_u4Index < iLoop; iLoop--)
+            for(uint32 iLoop = m_u4Max; m_u4Index < iLoop; iLoop--)
             {
                 vecObject.push_back(m_vecObject[iLoop-1]);
             }
@@ -67,7 +67,7 @@ public:
 
 private:
     ACE_LOCK      m_ThreadLock;
-    vector<TYPE>  m_vecObject; 
+    vector<TYPE>  m_vecObject;
     uint32        m_u4Max;
     uint32        m_u4Index;
     bool          m_blIsFull;

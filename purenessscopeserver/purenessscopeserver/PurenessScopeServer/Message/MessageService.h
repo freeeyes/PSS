@@ -19,6 +19,7 @@
 #include "WorkThreadAI.h"
 #include "CommandAccount.h"
 #include "MessageDyeingManager.h"
+#include "ObjectLru.h"
 
 #ifdef WIN32
 #include "ProConnectHandle.h"
@@ -30,7 +31,9 @@
 
 //输出json的内容
 #define MAX_THREAD_HISTORY_COUNT 5   //最大历史记录记录条数
-#define OUTPUT_THREAD_INFO "{\"name\":\"%s\",\"type\": \"line\",\"smooth\": \"true\",\"data\": [%s]}\\n"
+#define OUTPUT_THREAD_INFO "{\"name\":\"%d\",\"type\": \"line\",\"smooth\": \"true\",\"data\": [%s]}\n"
+#define OUTPUT_THREAD_JSON "{\"title\": {\"text\": \"PSS Thread Info\"},\"tooltip\" : {}, \
+\"legend\" : {\"data\":[\"time\"]},\"xAxis\" : {\"data\": [%s]},\"yAxis\" : {}, \"series\": [%s]}"
 
 enum MESSAGE_SERVICE_THREAD_STATE
 {
@@ -87,9 +90,11 @@ public:
 
     void GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_Account);  //得到当前列表描述信息
 
+    bool GetThreadInfoJson(char* pJson, uint32 u4Len);                       //工作线程的echart的json格式(数据列表)
+    bool GetThreadInfoTimeJson(char* pJson, uint32 u4Len);                   //工作线程的echart的json格式(时间列表)
+
 private:
     bool ProcessMessage(CMessage* pMessage, uint32 u4ThreadID);
-    bool SaveThreadInfoJson();                                              //将结果存为echart的json格式
     void CloseCommandList();                                                //清理当前信令列表副本
     CClientCommandList* GetClientCommandList(uint16 u2CommandID);
     bool DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost, uint16& u2Count, bool& bDeleteFlag);
@@ -115,7 +120,8 @@ private:
     CCommandAccount                m_CommandAccount;       //当前线程命令统计数据
     CMessagePool                   m_MessagePool;          //消息池
 
-    CHashTable<CClientCommandList> m_objClientCommandList; //可执行的信令列表
+    CHashTable<CClientCommandList>              m_objClientCommandList; //可执行的信令列表
+    CObjectLruList<_ThreadInfo, ACE_Null_Mutex> m_objThreadHistoryList; //工作线程历史信息记录
 
     ACE_Thread_Mutex m_mutex;
     ACE_Condition<ACE_Thread_Mutex> m_cond;
@@ -168,6 +174,7 @@ private:
     bool StartTimer();
     bool KillTimer();
 
+    bool SaveThreadInfoJson();                                                               //是否记录Json结果
     bool CheckWorkThread();                                                                  //检查所有的工作线程状态
     bool CheckPacketParsePool();                                                             //检查正在使用的消息解析对象
     bool CheckCPUAndMemory();                                                                //检查CPU和内存
