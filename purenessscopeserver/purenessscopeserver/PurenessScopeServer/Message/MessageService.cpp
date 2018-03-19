@@ -86,6 +86,7 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
     }
 
     //初始化工作线程历史记录
+    m_objThreadHistoryList.Init(MAX_THREAD_HISTORY_COUNT);
 
     //设置消息池
     m_MessagePool.Init(MAX_MESSAGE_POOL, CMessagePool::Init_Callback);
@@ -537,14 +538,14 @@ bool CMessageService::GetThreadInfoTimeJson(char* pJson, uint32 u4Len)
 
         if (0 == i)
         {
-            sprintf_safe(szDataInfo, MAX_BUFF_200, "\"%02d-%02d-%02d\"",
+            sprintf_safe(szDataInfo, MAX_BUFF_200, "\"%02d:%02d:%02d\"",
                          dtThreadTime.hour(),
                          dtThreadTime.minute(),
                          dtThreadTime.second());
         }
         else
         {
-            sprintf_safe(szDataInfo, MAX_BUFF_200, "%s,\"%02d-%02d-%02d\"",
+            sprintf_safe(szDataInfo, MAX_BUFF_200, "%s,\"%02d:%02d:%02d\"",
                          szDataInfo,
                          dtThreadTime.hour(),
                          dtThreadTime.minute(),
