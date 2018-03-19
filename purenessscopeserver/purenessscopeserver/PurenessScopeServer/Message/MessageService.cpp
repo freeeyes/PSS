@@ -458,7 +458,9 @@ bool CMessageService::SaveThreadInfoData()
     ACE_Date_Time dt(m_ThreadInfo.m_tvUpdateTime);
 
     //添加到线程信息历史数据表
-    m_objThreadHistoryList.AddObject(m_ThreadInfo);
+    _ThreadInfo objCurrThreadInfo    = m_ThreadInfo;
+    objCurrThreadInfo.m_tvUpdateTime = ACE_OS::gettimeofday();
+    m_objThreadHistoryList.AddObject(objCurrThreadInfo);
 
     //开始查看线程是否超时
     //OUR_DEBUG((LM_INFO, "[CMessageService::SaveThreadInfoData]ID=%d,m_u4State=%d,m_u2ThreadTimeOut=%d,cost=%d.\n", m_ThreadInfo.m_u4ThreadID, m_ThreadInfo.m_u4State, m_u2ThreadTimeOut, tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec()));
@@ -520,7 +522,7 @@ bool CMessageService::GetThreadInfoJson(char* pJson, uint32 u4Len)
         }
     }
 
-    sprintf_safe(pJson, u4Len, OUTPUT_THREAD_INFO, m_u4ThreadID, szDataInfo);
+    sprintf_safe(pJson, u4Len, OUTPUT_THREAD_Y, m_u4ThreadID, szDataInfo);
 
     return true;
 }
@@ -553,7 +555,7 @@ bool CMessageService::GetThreadInfoTimeJson(char* pJson, uint32 u4Len)
         }
     }
 
-    sprintf_safe(pJson, u4Len, OUTPUT_THREAD_INFO, m_u4ThreadID, szDataInfo);
+    sprintf_safe(pJson, u4Len, OUTPUT_THREAD_X, szDataInfo);
 
     return true;
 }
