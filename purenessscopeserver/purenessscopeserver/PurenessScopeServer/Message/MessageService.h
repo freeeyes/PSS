@@ -114,8 +114,9 @@ private:
     CCommandAccount                m_CommandAccount;       //当前线程命令统计数据
     CMessagePool                   m_MessagePool;          //消息池
 
-    CHashTable<CClientCommandList>              m_objClientCommandList; //可执行的信令列表
-    CObjectLruList<_ThreadInfo, ACE_Null_Mutex> m_objThreadHistoryList; //工作线程历史信息记录
+    CHashTable<CClientCommandList>                      m_objClientCommandList;  //可执行的信令列表
+    CObjectLruList<_ThreadInfo, ACE_Null_Mutex>         m_objThreadHistoryList;  //工作线程历史信息记录
+    CObjectLruList<_Connect_Chart_Info, ACE_Null_Mutex> m_objConnectHistoryList; //连接信息历史信息记录
 
     ACE_Thread_Mutex m_mutex;
     ACE_Condition<ACE_Thread_Mutex> m_cond;
@@ -169,6 +170,7 @@ private:
     bool KillTimer();
 
     bool SaveThreadInfoJson();                                                               //是否记录Json结果
+    bool SaveConnectJson();                                                                  //存储连接信息json结果
     bool CheckWorkThread();                                                                  //检查所有的工作线程状态
     bool CheckPacketParsePool();                                                             //检查正在使用的消息解析对象
     bool CheckCPUAndMemory();                                                                //检查CPU和内存

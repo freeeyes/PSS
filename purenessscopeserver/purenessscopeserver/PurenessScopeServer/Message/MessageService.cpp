@@ -91,6 +91,12 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
         m_objThreadHistoryList.Init(App_MainConfig::instance()->GetWorkThreadChart()->m_u2Count);
     }
 
+    //初始化连接信息历史记录
+    if (true == App_MainConfig::instance()->GetConnectChart()->m_blJsonOutput)
+    {
+        m_objConnectHistoryList.Init(App_MainConfig::instance()->GetConnectChart()->m_u2Count);
+    }
+
     //设置消息池
     m_MessagePool.Init(MAX_MESSAGE_POOL, CMessagePool::Init_Callback);
 }
@@ -895,8 +901,11 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* a
         OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::handle_timeout]CheckPlugInState is fail.\n"));
     }
 
-    //存入Json图表
+    //存入工作线程Json图表
     SaveThreadInfoJson();
+
+    //存储当前连接Json图标
+
 
     return 0;
 }

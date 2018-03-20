@@ -52,8 +52,8 @@ matrix:
   #
   - os: linux
     env:
-      - secure: "NiuFHWUuzOg8+X9dSm9/b7sMd3Kmgf5WZOGLj1DDbnPZPEoSWfwSgUnfUJxu7RwSsjeLFr8m14y5ZaBHQVWKwh1u/ojeIYqicEF4+HaKnvTZjqdIUTLYpC3DyCiVvezyzq5Bm78/YdCekJck/pLJZge8LF9Lrxvwt5eTjCXekym1NvCrhs3R13RO9+nzfl3Hus76q0qLdKt9MlZ/w7TLZz5Q72xMX8r0dZW2ZlzenVab/MlpuQiSRuVIJ675Oy2IKb6lSiX9IZAejnwnL0+1+Y+vytLAKCtsN/chzjhS2yln5bgfoxiBnfrZpizFDaZhnAaiVLwPrwRwLR+OqoyHEHVz8IMnj7LeKaI+JZRO8DqNnXtXHVQwkN4Hrjw0CyMNMLzCKnTIm2A0wzUwKD5pZWt+QZT9dnakds9kcEHa0kobnGrbqCCp0oamVRJ1nQWUrnpVVk2bA2/msT63gBBbGL3A8G6an1gOT+dbPv/whLlsR3nkfde3CWxPeCH39NSa3DSetXEbNBnEdn9qo56Lc/S15oc05LRPDcO13JHn1hzVx4oOoCZs1Ksv+SldeINXNYUlwXku8tVrRwAM/iWKv7dXpWq4DSc5UcoF3TcDEuOJNx+stsHS6GTN+X+PapluRLJqtJJ05n6RWGEHhW+vMFI7q9Ur/l2tqZqgCCXKs74="
-
+      - secure: "CSlkfiPjBX/tku2LfxjRyDU9Rgoz21X9uGboifwGjsDow/26u6wyHjHVh9nmJfRX8l19tjTJ4+qCtdtGun9C4Wg6H394U14FpMkt6z4wDTf6P9OXJ4okzSZ2LmeaYCGMj5oxhdaogk5hIdzNDuRMin8BPn2CcyiTpJkXj+fuLYXPbDLmfjjIIq/Vg0Ry7IQS/poxT1dlz6beTXMe7A+EKbEZnodRf9C15P/bMAcxe3bE0pLewCCVCSxglP0r+bIfJ8VmwTxyVuvBjigUKqtMaodwMivy5hK9FGjs+6lPT+HS4rmrl5UEQrWwQz+EHuMJGwzVCAT8THq7DfUipaIqLZphhzxJnJnH7MIFYIGRSkFSVlUUIvid1wbFym+SpB8zPLvHMgAyacwHQqOFlZE7cb9yJmX+0EgS5j3aYKxV/3lBNVUaj1xcbwqLVWh08SsQSsFaSdJdnhUIEybqV3CpuWDCTPtTBqaFjP4PGKhshYK/VQfJYgMnqwF6UYQQJOf/RthGkfiohdqGMIXUmfFtzWj6urM8141MHQFZv4gO1fjI9LGFjED3xPkbl6qRyxD6SOHobvg75FGn5o0QrbAOWfg6GgGxrYeb52TAMdTjLQhaDrrcC2AucKXVPEjMgd1eCA14Zi1I2mMoVhCiec4AN5Da2sW2NkvU7Z2bThInLBk="
+      
     script: 
       - export
       - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-

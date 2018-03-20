@@ -589,7 +589,6 @@ typedef struct FILETESTRESULTINFO
     }
 } FileTestResultInfoSt;
 
-//对象创建参数
 //对象创建信息
 struct _Object_Create_Info
 {
@@ -602,6 +601,18 @@ struct _Object_Create_Info
         m_szCreateFileName[0] = '\0';
         m_u4Line = 0;
         m_u4Count = 0;
+    }
+};
+
+//客户端连接活跃信息
+struct _Connect_Chart_Info
+{
+    uint32 m_n4ConnectCount;
+    ACE_Time_Value m_tvConnectTime;
+
+    _Connect_Chart_Info()
+    {
+        m_n4ConnectCount = 0;
     }
 };
 
