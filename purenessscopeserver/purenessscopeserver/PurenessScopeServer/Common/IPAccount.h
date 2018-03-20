@@ -77,8 +77,13 @@ class CIPAccount
 public:
     CIPAccount()
     {
-        m_u4MaxConnectCount = 100;  //默认每秒最高100次
-        m_u2CurrTime        = 0;
+        m_u4MaxConnectCount  = 100;  //默认每秒最高100次
+        m_u4CurrConnectCount = 0;
+        m_u4LastConnectCount = 0;
+        m_u2CurrTime         = 0;
+
+        ACE_Date_Time  dtNowTime;
+        m_u1Minute           = (uint8)dtNowTime.minute();
     }
 
     ~CIPAccount()
@@ -117,6 +122,18 @@ public:
         //检查当前时间，10分钟清理一轮当前Hash数组
         ACE_Date_Time  dtNowTime;
         uint16 u2NowTime = (uint16)dtNowTime.minute();
+
+        //检查当前时间连接总数
+        if (m_u1Minute == (uint8)u2NowTime)
+        {
+            m_u4CurrConnectCount++;
+        }
+        else
+        {
+            m_u4LastConnectCount = m_u4CurrConnectCount;
+            m_u4CurrConnectCount = 1;
+            m_u1Minute           = (uint8)u2NowTime;
+        }
 
         if((int32)(u2NowTime - m_u2CurrTime)  < 0)
         {
@@ -210,6 +227,11 @@ public:
         return m_objIPList.Get_Used_Count();
     }
 
+    uint32 GetLastConnectCount()
+    {
+        return m_u4LastConnectCount;
+    }
+
     void GetInfo(vecIPAccount& VecIPAccount)
     {
         ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
@@ -229,7 +251,10 @@ public:
 
 private:
     uint32                           m_u4MaxConnectCount;                  //每秒允许的最大连接数，前提是m_nNeedCheck = 0;才会生效
+    uint32                           m_u4CurrConnectCount;                 //当前连接总数
+    uint32                           m_u4LastConnectCount;                 //之前一分钟的连接总数记录
     uint16                           m_u2CurrTime;                         //当前时间
+    uint8                            m_u1Minute;                           //当前分钟数
     CHashTable<_IPAccount>           m_objIPList;                          //IP统计信息
     ACE_Recursive_Thread_Mutex       m_ThreadLock;                         //多线程锁
 };

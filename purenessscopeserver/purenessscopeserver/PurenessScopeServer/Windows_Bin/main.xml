@@ -45,7 +45,7 @@
 	<!-- 发送数据包连接相关设置 -->
 	<SendInfo SendQueueMax="100" TcpNodelay="0" MaxBlockSize="5120" BlockCount="10" SendTimeout="50" SendQueueTimeout="50" SendQueueCount="1" PutQueueTimeout="100" desc="发送到客户端需要配置的参数" />
 	<!-- 监控线程相关设置 -->
-	<ThreadInfo ThreadTimeout="30" ThreadTimeCheck="120" DisposeTimeout="40" PutQueueTimeout="100" desc="工作线程相关参数" />
+	<ThreadInfo ThreadTimeout="30" ThreadTimeCheck="60" DisposeTimeout="40" PutQueueTimeout="100" desc="工作线程相关参数" />
 	<!-- 监控线程AI相关设置 -->
 	<ThreadInfoAI AI="0" CheckTime="30" TimeoutCount="1" StopTime="30" ReturnDataType="1" ReturnData="ff ff" desc="工作线程负载自我监控相关设置，AI=0关闭，1打开" />
 	<!-- 客户端连接池相关设置 -->

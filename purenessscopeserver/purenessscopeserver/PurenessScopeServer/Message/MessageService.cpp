@@ -1149,18 +1149,22 @@ bool CMessageServiceGroup::SaveConnectJson(ACE_Time_Value tvNow)
 {
     _Connect_Chart_Info obj_Connect_Chart_Info;
 #ifdef WIN32
-    obj_Connect_Chart_Info.m_n4ConnectCount = App_ProConnectManager::instance()->GetCount();
-    obj_Connect_Chart_Info.m_tvConnectTime = tvNow;
+    obj_Connect_Chart_Info.m_n4ConnectCount     = App_ProConnectManager::instance()->GetCount();
+    obj_Connect_Chart_Info.m_tvConnectTime      = tvNow;
+    obj_Connect_Chart_Info.m_u4LastConnectCount = App_IPAccount::instance()->GetLastConnectCount();
 #else
-    obj_Connect_Chart_Info.m_n4ConnectCount = App_ConnectManager::instance()->GetCount();
-    obj_Connect_Chart_Info.m_tvConnectTime = tvNow;
+    obj_Connect_Chart_Info.m_n4ConnectCount     = App_ConnectManager::instance()->GetCount();
+    obj_Connect_Chart_Info.m_tvConnectTime      = tvNow;
+    obj_Connect_Chart_Info.m_u4LastConnectCount = App_IPAccount::instance()->GetLastConnectCount();
 #endif
     m_objConnectHistoryList.AddObject(obj_Connect_Chart_Info);
 
     //写入文件
     char  szJsonContent[MAX_BUFF_1024] = { '\0' };
-    char  szYLineData[MAX_BUFF_200] = { '\0' };
-    char  szXLinesName[MAX_BUFF_200] = { '\0' };
+    char  szYLineData[MAX_BUFF_200]    = { '\0' };
+    char  szYLineDataC[MAX_BUFF_200]   = { '\0' };
+    char  szYLinesData[MAX_BUFF_500]   = { '\0' };
+    char  szXLinesName[MAX_BUFF_200]   = { '\0' };
 
     if (false == App_MainConfig::instance()->GetConnectChart()->m_blJsonOutput)
     {
@@ -1174,10 +1178,15 @@ bool CMessageServiceGroup::SaveConnectJson(ACE_Time_Value tvNow)
         //得到X轴描述
         GetConnectTimeJson(szXLinesName, MAX_BUFF_200);
 
-        //得到Y轴描述
+        //得到Y轴描述(当前活跃连接数)
         GetConnectJson(szYLineData, MAX_BUFF_200);
 
-        sprintf_safe(szJsonContent, MAX_BUFF_1024, OUTPUT_CHART_JSON, "PSS Connect", szXLinesName, szYLineData);
+        //得到Y轴描述(当前每分钟连接数)
+        GetCurrConnectJson(szYLineDataC, MAX_BUFF_200);
+
+        sprintf_safe(szYLinesData, MAX_BUFF_500, "%s,%s", szYLineData, szYLineDataC);
+
+        sprintf_safe(szJsonContent, MAX_BUFF_1024, OUTPUT_CHART_JSON, "PSS Connect", szXLinesName, szYLinesData);
         FILE* pFile = ACE_OS::fopen(pJsonFile, "w");
 
         if (NULL != pFile)
@@ -1337,6 +1346,33 @@ bool CMessageServiceGroup::GetConnectJson(char* pJson, uint32 u4Len)
     }
 
     sprintf_safe(pJson, u4Len, OUTPUT_CHART_JSON_Y, 0, szDataInfo);
+
+    return true;
+}
+
+bool CMessageServiceGroup::GetCurrConnectJson(char* pJson, uint32 u4Len)
+{
+    //将数据输出成Json格式数据
+    char szDataInfo[MAX_BUFF_200] = { '\0' };
+    vector<_Connect_Chart_Info> objVecHistoryList;
+    m_objConnectHistoryList.GetAllSavingObject(objVecHistoryList);
+
+    for (int i = 0; i < (int)objVecHistoryList.size(); i++)
+    {
+        if (0 == i)
+        {
+            sprintf_safe(szDataInfo, MAX_BUFF_200, "%d",
+                         objVecHistoryList[i].m_u4LastConnectCount);
+        }
+        else
+        {
+            sprintf_safe(szDataInfo, MAX_BUFF_200, "%s, %d",
+                         szDataInfo,
+                         objVecHistoryList[i].m_u4LastConnectCount);
+        }
+    }
+
+    sprintf_safe(pJson, u4Len, OUTPUT_CHART_JSON_Y, 1, szDataInfo);
 
     return true;
 }

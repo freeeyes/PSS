@@ -607,12 +607,14 @@ struct _Object_Create_Info
 //客户端连接活跃信息
 struct _Connect_Chart_Info
 {
-    uint32 m_n4ConnectCount;
+    uint32 m_n4ConnectCount;        //当前活跃连接数
+    uint32 m_u4LastConnectCount;    //之前一分钟的连接建立数
     ACE_Time_Value m_tvConnectTime;
 
     _Connect_Chart_Info()
     {
-        m_n4ConnectCount = 0;
+        m_n4ConnectCount     = 0;
+        m_u4LastConnectCount = 0;
     }
 };
 
