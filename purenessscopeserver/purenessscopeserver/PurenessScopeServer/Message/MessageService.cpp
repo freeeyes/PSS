@@ -1159,7 +1159,7 @@ bool CMessageServiceGroup::SaveConnectJson(ACE_Time_Value tvNow)
 
     //写入文件
     char  szJsonContent[MAX_BUFF_1024] = { '\0' };
-    char  szYLineData[MAX_BUFF_100] = { '\0' };
+    char  szYLineData[MAX_BUFF_200] = { '\0' };
     char  szXLinesName[MAX_BUFF_200] = { '\0' };
 
     if (false == App_MainConfig::instance()->GetConnectChart()->m_blJsonOutput)
@@ -1167,7 +1167,25 @@ bool CMessageServiceGroup::SaveConnectJson(ACE_Time_Value tvNow)
         return true;
     }
 
+    char* pJsonFile = App_MainConfig::instance()->GetConnectChart()->m_szJsonFile;
 
+    if (NULL != pJsonFile && 0 < ACE_OS::strlen(pJsonFile))
+    {
+        //得到X轴描述
+        GetConnectTimeJson(szXLinesName, MAX_BUFF_200);
+
+        //得到Y轴描述
+        GetConnectJson(szYLineData, MAX_BUFF_200);
+
+        sprintf_safe(szJsonContent, MAX_BUFF_1024, OUTPUT_CHART_JSON, "PSS Connect", szXLinesName, szYLineData);
+        FILE* pFile = ACE_OS::fopen(pJsonFile, "w");
+
+        if (NULL != pFile)
+        {
+            ACE_OS::fwrite(szJsonContent, sizeof(char), strlen(szJsonContent), pFile);
+            ACE_OS::fclose(pFile);
+        }
+    }
 
     return true;
 }
@@ -1294,6 +1312,66 @@ void CMessageServiceGroup::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_
             Combo_Port_List(vec_Service_Port_Data_Account, vec_Port_Data_Account);
         }
     }
+}
+
+bool CMessageServiceGroup::GetConnectJson(char* pJson, uint32 u4Len)
+{
+    //将数据输出成Json格式数据
+    char szDataInfo[MAX_BUFF_200] = { '\0' };
+    vector<_Connect_Chart_Info> objVecHistoryList;
+    m_objConnectHistoryList.GetAllSavingObject(objVecHistoryList);
+
+    for (int i = 0; i < (int)objVecHistoryList.size(); i++)
+    {
+        if (0 == i)
+        {
+            sprintf_safe(szDataInfo, MAX_BUFF_200, "%d",
+                         objVecHistoryList[i].m_n4ConnectCount);
+        }
+        else
+        {
+            sprintf_safe(szDataInfo, MAX_BUFF_200, "%s, %d",
+                         szDataInfo,
+                         objVecHistoryList[i].m_n4ConnectCount);
+        }
+    }
+
+    sprintf_safe(pJson, u4Len, OUTPUT_CHART_JSON_Y, 0, szDataInfo);
+
+    return true;
+}
+
+bool CMessageServiceGroup::GetConnectTimeJson(char* pJson, uint32 u4Len)
+{
+    //将数据输出成Json格式数据
+    char szDataInfo[MAX_BUFF_200] = { '\0' };
+    vector<_Connect_Chart_Info> objVecHistoryList;
+    m_objConnectHistoryList.GetAllSavingObject(objVecHistoryList);
+
+    for (int i = 0; i < (int)objVecHistoryList.size(); i++)
+    {
+        ACE_Date_Time dtThreadTime(objVecHistoryList[i].m_tvConnectTime);
+
+        if (0 == i)
+        {
+            sprintf_safe(szDataInfo, MAX_BUFF_200, "\"%02d:%02d:%02d\"",
+                         dtThreadTime.hour(),
+                         dtThreadTime.minute(),
+                         dtThreadTime.second());
+        }
+        else
+        {
+            sprintf_safe(szDataInfo, MAX_BUFF_200, "%s,\"%02d:%02d:%02d\"",
+                         szDataInfo,
+                         dtThreadTime.hour(),
+                         dtThreadTime.minute(),
+                         dtThreadTime.second());
+        }
+    }
+
+    sprintf_safe(pJson, u4Len, OUTPUT_CHART_JSON_X, szDataInfo);
+
+    return true;
 }
 
 CThreadInfo* CMessageServiceGroup::GetThreadInfo()

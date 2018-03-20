@@ -164,6 +164,9 @@ public:
 
     void GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_Account);                  //得到当前列表描述信息
 
+    bool GetConnectJson(char* pJson, uint32 u4Len);                                           //连接数的echart的json格式(数据列表)
+    bool GetConnectTimeJson(char* pJson, uint32 u4Len);                                       //连接数的echart的json格式(时间列表)
+
 private:
     bool StartTimer();
     bool KillTimer();

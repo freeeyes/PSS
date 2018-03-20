@@ -301,9 +301,9 @@ private:
 
 private:
     ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;                                                           //控制多线程锁
-    CProConnectManager** m_objProConnnectManagerList;                                                        //所有链接管理者
-    uint16            m_u2ThreadQueueCount;                                                                  //当前发送线程队列个数
-    uint32            m_u4CurrMaxCount;                                                                      //当前链接自增量
+    CProConnectManager**        m_objProConnnectManagerList;                                                        //所有链接管理者
+    uint16                      m_u2ThreadQueueCount;                                                                  //当前发送线程队列个数
+    uint32                      m_u4CurrMaxCount;                                                                      //当前链接自增量
 };
 
 

@@ -1300,7 +1300,7 @@ private:
     unsigned long GetSystemTickCount()
     {
 #ifdef WIN32
-        return GetTickCount();
+        return (unsigned long)GetTickCount();
 #else
         struct timespec ts;
 
