@@ -51,14 +51,14 @@ public:
                 vecObject.push_back(m_vecObject[iLoop]);
             }
 
-            for(int32 iLoop = 0; iLoop < m_u4Index; iLoop++)
+            for(uint32 iLoop = 0; iLoop < m_u4Index; iLoop++)
             {
                 vecObject.push_back(m_vecObject[iLoop]);
             }
         }
         else
         {
-            for(int32 iLoop = 0; iLoop < m_u4Index; iLoop++)
+            for(uint32 iLoop = 0; iLoop < m_u4Index; iLoop++)
             {
                 vecObject.push_back(m_vecObject[iLoop]);
             }

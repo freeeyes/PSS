@@ -91,12 +91,6 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
         m_objThreadHistoryList.Init(App_MainConfig::instance()->GetWorkThreadChart()->m_u2Count);
     }
 
-    //初始化连接信息历史记录
-    if (true == App_MainConfig::instance()->GetConnectChart()->m_blJsonOutput)
-    {
-        m_objConnectHistoryList.Init(App_MainConfig::instance()->GetConnectChart()->m_u2Count);
-    }
-
     //设置消息池
     m_MessagePool.Init(MAX_MESSAGE_POOL, CMessagePool::Init_Callback);
 }
@@ -905,7 +899,7 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* a
     SaveThreadInfoJson();
 
     //存储当前连接Json图标
-
+    SaveConnectJson(tv);
 
     return 0;
 }
@@ -940,6 +934,12 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
         pMessageService->Init(i, u4MaxQueue, u4LowMask, u4HighMask);
 
         m_vecMessageService.push_back(pMessageService);
+    }
+
+    //初始化连接信息历史记录
+    if (true == App_MainConfig::instance()->GetConnectChart()->m_blJsonOutput)
+    {
+        m_objConnectHistoryList.Init(App_MainConfig::instance()->GetConnectChart()->m_u2Count);
     }
 
     return true;
@@ -1141,6 +1141,33 @@ bool CMessageServiceGroup::SaveThreadInfoJson()
             ACE_OS::fclose(pFile);
         }
     }
+
+    return true;
+}
+
+bool CMessageServiceGroup::SaveConnectJson(ACE_Time_Value tvNow)
+{
+    _Connect_Chart_Info obj_Connect_Chart_Info;
+#ifdef WIN32
+    obj_Connect_Chart_Info.m_n4ConnectCount = App_ProConnectManager::instance()->GetCount();
+    obj_Connect_Chart_Info.m_tvConnectTime = tvNow;
+#else
+    obj_Connect_Chart_Info.m_n4ConnectCount = App_ConnectManager::instance()->GetCount();
+    obj_Connect_Chart_Info.m_tvConnectTime = tvNow;
+#endif
+    m_objConnectHistoryList.AddObject(obj_Connect_Chart_Info);
+
+    //写入文件
+    char  szJsonContent[MAX_BUFF_1024] = { '\0' };
+    char  szYLineData[MAX_BUFF_100] = { '\0' };
+    char  szXLinesName[MAX_BUFF_200] = { '\0' };
+
+    if (false == App_MainConfig::instance()->GetConnectChart()->m_blJsonOutput)
+    {
+        return true;
+    }
+
+
 
     return true;
 }
