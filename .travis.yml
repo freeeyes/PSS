@@ -52,10 +52,11 @@ matrix:
   #
   - os: linux
     env:
-      - secure: "QI2lF2Fr299l+N+vcA86wXiIEa71B7iWgCaafHSNvXJ9OI/S5Nsz4lW3qLMre/IQ3dpo/oRETwZ/Xkqu1t508BasqS0mYlanZqBT1hq9lDwRohzypyH6EDCMZ2ElAhiDPtnayoz9xsHQgLgJUEe+6FOWRMd5jLkAHU+Oro7Y9MMChNSW20wgDW27sJTLQn5/VjfEFdT2LmsqkD+J5hgpBaSeg5TTL/p19AmNVMWsn77DmA6yoDIWUWUE9uZtMfBeDofIYwXc/4SkQHauR466qDhFBfPwTTWjGKGsbbkHeFmbCAPY3bv6dCSU2ZA6Xa/3xPApYDyZoq/Me+3ahVBwyWDtzyhOchU2J4Avlupe6ggxEnESiMqzHtZ/+sytAE8lS1uuWVTS0SsfV2xcAbUWq2ZmcZYBxSPdFqdLhHCSIy29LWY31WtBHs0VwzynC6Dz6TIbbUt/4Fbi1cYUUyJ7+LMUEBiC9jodE8zj/zTe0nhAwUn7GR6jD0lyOChy1eJspXatWVVA/KmN4q3bkOrowrRN4YCiDA1kNgNv6pxQej6rpftpqTfBTIVY7AK4c6d5V0cgIMa4RQyuspvPvvqlE2a0T3Sb7oDB88R7cPB3LMjVid7xdI9iil4/WOygiZqm9Na7S1j2yRmpatrPMD3Xg4AE9PMTELJQYCwS0m8SfcE="
+      - secure: "RifUpBGiP0q/4UyUsOzjx5BNL5hZjiOX+8OE1tgMghDxRz+yUp4/J7Et74Xvgy2YomLVIm8lwR9ty2Uo/Cw6vJTYCWd87OXC0TnG98CeSTNWtWDUNgjP//dxX3qEr0IKJ48suabapK37KOgAnrjHm8QwjWdmG3OxSbCrDlc+hs4mb741vNJk/XSegQzrzNVCQB5Q6iHDTCJqP/0cQs0nOepyuSu4mqa78z7cZV7uisET5scyRrjOd9eC0oxVEQ0gT+ci40sH8h8AyRKTHctQFOfbo76cwP05xK97Bi131mFiqMEIHOlsUrF40EMD4o6yG+Mutpv3YEYrKHY0xabj2KhibgkLiXFK2nH/ydtaPQa0hikfttZE1/MRy1xXz2eZ5U1UKZA+MWVD6uBYc2hXi+lRyRFdL8y/t0ijNWYy9OdnhyKNdAFgC4btgq4W8eXX0EgRO2UEK6Ya1ZBHmSLspaU2Bp9IZ/5MIjIxgjSUGgUOMdtpssdiwtUf/MBTqLz6jgNaWooddWLUKfssTFtqjFUsQu7Eiqd1ECy1sI4osbDz1wgn9rbA8x+RD4/La/pBXVDcOd/yW8QAgjBKsjPqR99UoPKFWOl1VhH7W9eWvQk0e5SmXaXoHKUwSrrkc8AutLEVCDJlhDG65FMzad8+ZWTuruh8G/rxTSf2JaoNlBo="
+      
     script: 
       - export
-      - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+      - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
       - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then 
           cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin;
           $ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc;
