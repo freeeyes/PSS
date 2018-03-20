@@ -191,6 +191,12 @@ static bool Convert_Version(int nTagVserion)
 #define TCP_NODELAY_ON      0                    //TCP Nagle算法开关开关打开
 #define TCP_NODELAY_OFF     1                    //TCP Nagle算法开关开关关闭
 
+//输出json的内容
+#define OUTPUT_CHART_JSON_X "{\"type\": \"category\",\"data\": [%s]}\n"
+#define OUTPUT_CHART_JSON_Y "{\"name\":\"%d\",\"type\": \"line\",\"smooth\": \"true\",\"data\": [%s]}\n"
+#define OUTPUT_CHART_JSON "{\"title\": {\"text\": \"%s\"},\"tooltip\" : {}, \
+\"legend\" : {\"data\":[\"time\"]},\"xAxis\" : %s,\"yAxis\" : {\"type\":\"value\"}, \"series\": [%s]}"
+
 enum EM_UDP_TYPE
 {
     UDP_SINGLE = 0,        //UDP单独连接

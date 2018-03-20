@@ -86,7 +86,10 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
     }
 
     //初始化工作线程历史记录
-    m_objThreadHistoryList.Init(MAX_THREAD_HISTORY_COUNT);
+    if (true == App_MainConfig::instance()->GetWorkThreadChart()->m_blJsonOutput)
+    {
+        m_objThreadHistoryList.Init(App_MainConfig::instance()->GetWorkThreadChart()->m_u2Count);
+    }
 
     //设置消息池
     m_MessagePool.Init(MAX_MESSAGE_POOL, CMessagePool::Init_Callback);
@@ -522,7 +525,7 @@ bool CMessageService::GetThreadInfoJson(char* pJson, uint32 u4Len)
         }
     }
 
-    sprintf_safe(pJson, u4Len, OUTPUT_THREAD_Y, m_u4ThreadID, szDataInfo);
+    sprintf_safe(pJson, u4Len, OUTPUT_CHART_JSON_Y, m_u4ThreadID, szDataInfo);
 
     return true;
 }
@@ -555,7 +558,7 @@ bool CMessageService::GetThreadInfoTimeJson(char* pJson, uint32 u4Len)
         }
     }
 
-    sprintf_safe(pJson, u4Len, OUTPUT_THREAD_X, szDataInfo);
+    sprintf_safe(pJson, u4Len, OUTPUT_CHART_JSON_X, szDataInfo);
 
     return true;
 }
@@ -1085,7 +1088,12 @@ bool CMessageServiceGroup::SaveThreadInfoJson()
     char  szYLinesData[MAX_BUFF_500]   = { '\0' };
     char  szXLinesName[MAX_BUFF_200]   = { '\0' };
 
-    char* pJsonFile = App_MainConfig::instance()->GetThreadJson();
+    if (false == App_MainConfig::instance()->GetWorkThreadChart()->m_blJsonOutput)
+    {
+        return true;
+    }
+
+    char* pJsonFile = App_MainConfig::instance()->GetWorkThreadChart()->m_szJsonFile;
 
     //获得当前线程数量
     uint32 u4Size = (uint32)m_vecMessageService.size();
@@ -1115,7 +1123,7 @@ bool CMessageServiceGroup::SaveThreadInfoJson()
             }
         }
 
-        sprintf_safe(szJsonContent, MAX_BUFF_1024, OUTPUT_THREAD_JSON, szXLinesName, szYLinesData);
+        sprintf_safe(szJsonContent, MAX_BUFF_1024, OUTPUT_CHART_JSON, "PSS Work Thread", szXLinesName, szYLinesData);
         FILE* pFile = ACE_OS::fopen(pJsonFile, "w");
 
         if (NULL != pFile)

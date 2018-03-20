@@ -29,13 +29,6 @@
 #include "LinuxCPU.h"
 #endif
 
-//输出json的内容
-#define MAX_THREAD_HISTORY_COUNT 5   //最大历史记录记录条数
-#define OUTPUT_THREAD_X "{\"type\": \"category\",\"data\": [%s]}\n"
-#define OUTPUT_THREAD_Y "{\"name\":\"%d\",\"type\": \"line\",\"smooth\": \"true\",\"data\": [%s]}\n"
-#define OUTPUT_THREAD_JSON "{\"title\": {\"text\": \"PSS Thread Info\"},\"tooltip\" : {}, \
-\"legend\" : {\"data\":[\"time\"]},\"xAxis\" : %s,\"yAxis\" : {\"type\":\"value\"}, \"series\": [%s]}"
-
 enum MESSAGE_SERVICE_THREAD_STATE
 {
     THREAD_RUN = 0,               //线程正常运行

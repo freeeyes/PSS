@@ -198,6 +198,23 @@ struct _GroupListenInfo
     }
 };
 
+//输出图表信息
+struct _ChartInfo
+{
+    bool   m_blJsonOutput;
+    uint16 m_u2Count;
+    uint32 m_u4CommandID;
+    char   m_szJsonFile[MAX_BUFF_200];
+
+    _ChartInfo()
+    {
+        m_blJsonOutput  = false;
+        m_u2Count       = 0;
+        m_u4CommandID   = 0;
+        m_szJsonFile[0] = '\0';
+    }
+};
+
 enum ENUM_CHAR_ORDER
 {
     SYSTEM_LITTLE_ORDER = 0,   //小端字序
@@ -319,7 +336,10 @@ public:
     _PacketParseInfo* GetPacketParseInfo(uint8 u1Index = 0);
     uint8             GetPacketParseCount();
     char*             GetCoreScript();
-    char*             GetThreadJson();
+    _ChartInfo*       GetWorkThreadChart();
+    _ChartInfo*       GetConnectChart();
+    uint32            GetCommandChartCount();
+    _ChartInfo*       GetCommandChart(uint32 u4Index);
 
 private:
     uint32     m_u4MsgHighMark;                        //消息的高水位阀值
@@ -399,13 +419,17 @@ private:
     char       m_szDeubgFileName[MAX_BUFF_100];        //输出文件名
     char       m_szDebugLevel[MAX_BUFF_100];           //输出文件级别
     char       m_szCoreScript[MAX_BUFF_200];           //当程序Core掉的时候，调用的执行脚本位置
-    char       m_szThreadJson[MAX_BUFF_200];           //工作线程输出Json格式
 
     CXmlOpeation     m_MainConfig;
     _ConnectAlert    m_ConnectAlert;                   //连接告警相关配置信息
     _IPAlert         m_IPAlert;                        //IP告警阀值相关配置
     _ClientDataAlert m_ClientDataAlert;                //单链接客户端告警阀值相关配置
     _GroupListenInfo m_GroupListenInfo;                //集群相关服务器地址配置
+    _ChartInfo       m_WorkThreadChart;                //工作线程图表信息
+    _ChartInfo       m_ConnectChart;                   //客户端连接图表信息
+
+    typedef vector<_ChartInfo> vecCommandChart;       //信令图表信息
+    vecCommandChart m_vecCommandChart;                //命令图表信息
 
     typedef vector<_PacketParseInfo> vecPacketParseInfo;
     vecPacketParseInfo m_vecPacketParseInfo;

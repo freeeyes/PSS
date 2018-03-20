@@ -381,8 +381,116 @@ bool CMainConfig::Init_Alert(const char* szConfigPath)
         m_vecMailAlert.push_back(objMailAlert);
     }
 
-    m_MainConfig.Close();
+    //读取工作线程配置图表信息
+    pData = m_MainConfig.GetData("WorkThreadChart", "JsonOutput");
 
+    if (NULL != pData)
+    {
+        if (1 == (uint32)ACE_OS::atoi(pData))
+        {
+            m_WorkThreadChart.m_blJsonOutput = true;
+        }
+    }
+
+    pData = m_MainConfig.GetData("WorkThreadChart", "Count");
+
+    if (NULL != pData)
+    {
+        m_WorkThreadChart.m_u2Count = (uint16)ACE_OS::atoi(pData);
+    }
+
+    pData = m_MainConfig.GetData("WorkThreadChart", "File");
+
+    if (NULL != pData)
+    {
+        sprintf_safe(m_WorkThreadChart.m_szJsonFile, MAX_BUFF_200, "%s", pData);
+    }
+
+    //读取客户端连接信息
+    pData = m_MainConfig.GetData("ConnectChart", "JsonOutput");
+
+    if (NULL != pData)
+    {
+        if (1 == (uint32)ACE_OS::atoi(pData))
+        {
+            m_ConnectChart.m_blJsonOutput = true;
+        }
+    }
+
+    pData = m_MainConfig.GetData("ConnectChart", "Count");
+
+    if (NULL != pData)
+    {
+        m_ConnectChart.m_u2Count = (uint16)ACE_OS::atoi(pData);
+    }
+
+    pData = m_MainConfig.GetData("ConnectChart", "File");
+
+    if (NULL != pData)
+    {
+        sprintf_safe(m_ConnectChart.m_szJsonFile, MAX_BUFF_200, "%s", pData);
+    }
+
+    //读取命令参数图标信息
+    TiXmlElement* pNextTiXmlElementChartJsonOutput = NULL;
+    TiXmlElement* pNextTiXmlElementChartCount      = NULL;
+    TiXmlElement* pNextTiXmlElementChartCommand    = NULL;
+    TiXmlElement* pNextTiXmlElementChartFile       = NULL;
+    _ChartInfo objChartInfo;
+
+    while (true)
+    {
+        pData = m_MainConfig.GetData("CommandChart", "JsonOutput", pNextTiXmlElementChartJsonOutput);
+
+        if (NULL != pData)
+        {
+            if (1 == (uint32)ACE_OS::atoi(pData))
+            {
+                objChartInfo.m_blJsonOutput = true;
+            }
+        }
+        else
+        {
+            break;
+        }
+
+        pData = m_MainConfig.GetData("CommandChart", "CommandID", pNextTiXmlElementChartCommand);
+
+        if (NULL != pData)
+        {
+            objChartInfo.m_u4CommandID = (uint16)ACE_OS::atoi(pData);
+        }
+        else
+        {
+            break;
+        }
+
+        pData = m_MainConfig.GetData("CommandChart", "Count", pNextTiXmlElementChartCount);
+
+        if (NULL != pData)
+        {
+            objChartInfo.m_u2Count = (uint16)ACE_OS::atoi(pData);
+        }
+        else
+        {
+            break;
+        }
+
+        pData = m_MainConfig.GetData("CommandChart", "File", pNextTiXmlElementChartCommand);
+
+        if (NULL != pData)
+        {
+            sprintf_safe(objChartInfo.m_szJsonFile, MAX_BUFF_200, "%s", pData);
+        }
+        else
+        {
+            break;
+        }
+
+        m_vecCommandChart.push_back(objChartInfo);
+    }
+
+    m_MainConfig.Close();
     return true;
 }
 
@@ -908,13 +1016,6 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
     if(pData != NULL)
     {
         m_u2PacketTimeOut = (uint16)ACE_OS::atoi(pData);
-    }
-
-    pData = m_MainConfig.GetData("ThreadInfo", "JsonFile");
-
-    if (pData != NULL)
-    {
-        sprintf_safe(m_szThreadJson, MAX_BUFF_200, "%s", pData);
     }
 
     pData = m_MainConfig.GetData("ClientInfo", "CheckAliveTime");
@@ -1867,9 +1968,31 @@ char* CMainConfig::GetCoreScript()
     return m_szCoreScript;
 }
 
-char* CMainConfig::GetThreadJson()
+_ChartInfo* CMainConfig::GetWorkThreadChart()
 {
-    return m_szThreadJson;
+    return &m_WorkThreadChart;
+}
+
+_ChartInfo* CMainConfig::GetConnectChart()
+{
+    return &m_ConnectChart;
+}
+
+uint32 CMainConfig::GetCommandChartCount()
+{
+    return (uint32)m_vecCommandChart.size();
+}
+
+_ChartInfo* CMainConfig::GetCommandChart(uint32 u4Index)
+{
+    if (u4Index < (uint32)m_vecCommandChart.size())
+    {
+        return &m_vecCommandChart[u4Index];
+    }
+    else
+    {
+        return NULL;
+    }
 }
 
 uint16 CMainConfig::GetModuleInfoCount()
