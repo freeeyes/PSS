@@ -229,6 +229,17 @@ public:
 
     uint32 GetLastConnectCount()
     {
+        ACE_Date_Time  dtNowTime;
+        uint16 u2NowTime = (uint16)dtNowTime.minute();
+
+        //检查当前时间连接总数
+        if (m_u1Minute != (uint8)u2NowTime)
+        {
+            m_u4LastConnectCount = m_u4CurrConnectCount;
+            m_u4CurrConnectCount = 0;
+            m_u1Minute = (uint8)u2NowTime;
+        }
+
         return m_u4LastConnectCount;
     }
 
