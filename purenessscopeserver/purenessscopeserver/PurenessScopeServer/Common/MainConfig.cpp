@@ -476,7 +476,7 @@ bool CMainConfig::Init_Alert(const char* szConfigPath)
             break;
         }
 
-        pData = m_MainConfig.GetData("CommandChart", "File", pNextTiXmlElementChartCommand);
+        pData = m_MainConfig.GetData("CommandChart", "File", pNextTiXmlElementChartFile);
 
         if (NULL != pData)
         {

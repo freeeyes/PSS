@@ -521,7 +521,9 @@ bool CMessageService::GetThreadInfoJson(char* pJson, uint32 u4Len)
         }
         else
         {
-            sprintf_safe(szDataInfo, MAX_BUFF_200, "%s,%d", szDataInfo, objVecHistoryList[i].m_u4CurrPacketCount);
+            char szTemp[MAX_BUFF_500] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_500, "%s", szDataInfo);
+            sprintf_safe(szDataInfo, MAX_BUFF_200, "%s,%d", szTemp, objVecHistoryList[i].m_u4CurrPacketCount);
         }
     }
 
@@ -533,7 +535,7 @@ bool CMessageService::GetThreadInfoJson(char* pJson, uint32 u4Len)
 bool CMessageService::GetThreadInfoTimeJson(char* pJson, uint32 u4Len)
 {
     //将数据输出成Json格式数据
-    char szDataInfo[MAX_BUFF_200] = { '\0' };
+    char szDataInfo[MAX_BUFF_500] = { '\0' };
     vector<_ThreadInfo> objVecHistoryList;
     m_objThreadHistoryList.GetAllSavingObject(objVecHistoryList);
 
@@ -543,15 +545,17 @@ bool CMessageService::GetThreadInfoTimeJson(char* pJson, uint32 u4Len)
 
         if (0 == i)
         {
-            sprintf_safe(szDataInfo, MAX_BUFF_200, "\"%02d:%02d:%02d\"",
+            sprintf_safe(szDataInfo, MAX_BUFF_500, "\"%02d:%02d:%02d\"",
                          dtThreadTime.hour(),
                          dtThreadTime.minute(),
                          dtThreadTime.second());
         }
         else
         {
-            sprintf_safe(szDataInfo, MAX_BUFF_200, "%s,\"%02d:%02d:%02d\"",
-                         szDataInfo,
+            char szTemp[MAX_BUFF_500] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_500, "%s", szDataInfo);
+            sprintf_safe(szDataInfo, MAX_BUFF_500, "%s,\"%02d:%02d:%02d\"",
+                         szTemp,
                          dtThreadTime.hour(),
                          dtThreadTime.minute(),
                          dtThreadTime.second());
@@ -1095,7 +1099,7 @@ bool CMessageServiceGroup::SaveThreadInfoJson()
     char  szJsonContent[MAX_BUFF_1024] = { '\0' };
     char  szYLineData[MAX_BUFF_100]    = { '\0' };
     char  szYLinesData[MAX_BUFF_500]   = { '\0' };
-    char  szXLinesName[MAX_BUFF_200]   = { '\0' };
+    char  szXLinesName[MAX_BUFF_500]   = { '\0' };
 
     if (false == App_MainConfig::instance()->GetWorkThreadChart()->m_blJsonOutput)
     {
@@ -1110,7 +1114,7 @@ bool CMessageServiceGroup::SaveThreadInfoJson()
     if (NULL != pJsonFile && 0 < ACE_OS::strlen(pJsonFile) && u4Size > 0)
     {
         //得到X轴描述
-        m_vecMessageService[0]->GetThreadInfoTimeJson(szXLinesName, MAX_BUFF_200);
+        m_vecMessageService[0]->GetThreadInfoTimeJson(szXLinesName, MAX_BUFF_500);
 
         //获得Y轴描述
         for (uint32 i = 0; i < u4Size; i++)
@@ -1128,7 +1132,9 @@ bool CMessageServiceGroup::SaveThreadInfoJson()
             }
             else
             {
-                sprintf_safe(szYLinesData, MAX_BUFF_500, "%s,%s", szYLinesData, szYLineData);
+                char szTemp[MAX_BUFF_500] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_500, "%s", szYLinesData);
+                sprintf_safe(szYLinesData, MAX_BUFF_500, "%s,%s", szTemp, szYLineData);
             }
         }
 
@@ -1164,7 +1170,7 @@ bool CMessageServiceGroup::SaveConnectJson(ACE_Time_Value tvNow)
     char  szYLineData[MAX_BUFF_200]    = { '\0' };
     char  szYLineDataC[MAX_BUFF_200]   = { '\0' };
     char  szYLinesData[MAX_BUFF_500]   = { '\0' };
-    char  szXLinesName[MAX_BUFF_200]   = { '\0' };
+    char  szXLinesName[MAX_BUFF_500]   = { '\0' };
 
     if (false == App_MainConfig::instance()->GetConnectChart()->m_blJsonOutput)
     {
@@ -1176,7 +1182,7 @@ bool CMessageServiceGroup::SaveConnectJson(ACE_Time_Value tvNow)
     if (NULL != pJsonFile && 0 < ACE_OS::strlen(pJsonFile))
     {
         //得到X轴描述
-        GetConnectTimeJson(szXLinesName, MAX_BUFF_200);
+        GetConnectTimeJson(szXLinesName, MAX_BUFF_500);
 
         //得到Y轴描述(当前活跃连接数)
         GetConnectJson(szYLineData, MAX_BUFF_200);
@@ -1339,8 +1345,10 @@ bool CMessageServiceGroup::GetConnectJson(char* pJson, uint32 u4Len)
         }
         else
         {
+            char szTemp[MAX_BUFF_200] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_200, "%s", szDataInfo);
             sprintf_safe(szDataInfo, MAX_BUFF_200, "%s, %d",
-                         szDataInfo,
+                         szTemp,
                          objVecHistoryList[i].m_n4ConnectCount);
         }
     }
@@ -1366,8 +1374,10 @@ bool CMessageServiceGroup::GetCurrConnectJson(char* pJson, uint32 u4Len)
         }
         else
         {
+            char szTemp[MAX_BUFF_200] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_200, "%s", szDataInfo);
             sprintf_safe(szDataInfo, MAX_BUFF_200, "%s, %d",
-                         szDataInfo,
+                         szTemp,
                          objVecHistoryList[i].m_u4LastConnectCount);
         }
     }
@@ -1380,7 +1390,7 @@ bool CMessageServiceGroup::GetCurrConnectJson(char* pJson, uint32 u4Len)
 bool CMessageServiceGroup::GetConnectTimeJson(char* pJson, uint32 u4Len)
 {
     //将数据输出成Json格式数据
-    char szDataInfo[MAX_BUFF_200] = { '\0' };
+    char szDataInfo[MAX_BUFF_500] = { '\0' };
     vector<_Connect_Chart_Info> objVecHistoryList;
     m_objConnectHistoryList.GetAllSavingObject(objVecHistoryList);
 
@@ -1390,15 +1400,17 @@ bool CMessageServiceGroup::GetConnectTimeJson(char* pJson, uint32 u4Len)
 
         if (0 == i)
         {
-            sprintf_safe(szDataInfo, MAX_BUFF_200, "\"%02d:%02d:%02d\"",
+            sprintf_safe(szDataInfo, MAX_BUFF_500, "\"%02d:%02d:%02d\"",
                          dtThreadTime.hour(),
                          dtThreadTime.minute(),
                          dtThreadTime.second());
         }
         else
         {
-            sprintf_safe(szDataInfo, MAX_BUFF_200, "%s,\"%02d:%02d:%02d\"",
-                         szDataInfo,
+            char szTemp[MAX_BUFF_500] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_500, "%s", szDataInfo);
+            sprintf_safe(szDataInfo, MAX_BUFF_500, "%s,\"%02d:%02d:%02d\"",
+                         szTemp,
                          dtThreadTime.hour(),
                          dtThreadTime.minute(),
                          dtThreadTime.second());
