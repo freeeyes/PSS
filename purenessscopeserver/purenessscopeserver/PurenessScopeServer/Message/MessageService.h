@@ -172,6 +172,7 @@ private:
     bool StartTimer();
     bool KillTimer();
 
+    bool SaveCommandChart(ACE_Time_Value tvNow);                                             //保存指定命令信息图表
     bool SaveThreadInfoJson();                                                               //是否记录Json结果
     bool SaveConnectJson(ACE_Time_Value tvNow);                                              //存储连接信息json结果
     bool CheckWorkThread();                                                                  //检查所有的工作线程状态
@@ -195,6 +196,9 @@ public:
     CMessageDyeingManager                               m_objMessageDyeingManager; //数据染色类
     CObjectLruList<_Connect_Chart_Info, ACE_Null_Mutex> m_objConnectHistoryList;   //连接信息历史信息记录
     ACE_Recursive_Thread_Mutex                          m_ThreadLock;              //用于线程操作的线程锁，保证CurrThreadID的数据正常
+
+    typedef vector<CObjectLruList<_Command_Chart_Info, ACE_Null_Mutex>> vec_Command_Chart_Info;   //命令信息历史信息记录
+    vec_Command_Chart_Info                              m_vec_Command_Chart_Info;                 //命令历史信息列表
 };
 
 typedef ACE_Singleton<CMessageServiceGroup, ACE_Null_Mutex> App_MessageServiceGroup;

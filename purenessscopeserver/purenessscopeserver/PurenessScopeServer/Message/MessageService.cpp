@@ -902,8 +902,11 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* a
     //存入工作线程Json图表
     SaveThreadInfoJson();
 
-    //存储当前连接Json图标
+    //存储当前连接Json图表
     SaveConnectJson(tv);
+
+    //存储命令Json图表
+    SaveCommandChart(tv);
 
     return 0;
 }
@@ -944,6 +947,16 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
     if (true == App_MainConfig::instance()->GetConnectChart()->m_blJsonOutput)
     {
         m_objConnectHistoryList.Init(App_MainConfig::instance()->GetConnectChart()->m_u2Count);
+    }
+
+    //初始化命令图表记录
+    uint32 u4Count = App_MainConfig::instance()->GetCommandChartCount();
+
+    for (uint32 i = 0; i < u4Count; i++)
+    {
+        CObjectLruList<_Command_Chart_Info, ACE_Null_Mutex> obj_Command_Chart_Info;
+        obj_Command_Chart_Info.Init(App_MainConfig::instance()->GetCommandChart(i)->m_u2Count);
+        m_vec_Command_Chart_Info.push_back(obj_Command_Chart_Info);
     }
 
     return true;
@@ -1091,6 +1104,80 @@ bool CMessageServiceGroup::KillTimer()
     }
 
     OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::KillTimer] end....\n"));
+    return true;
+}
+
+bool CMessageServiceGroup::SaveCommandChart(ACE_Time_Value tvNow)
+{
+    char szDataXInfo[MAX_BUFF_500]  = { '\0' };
+    char szDataYInfo[MAX_BUFF_200]  = { '\0' };
+    char szDataXLine[MAX_BUFF_200]  = { '\0' };
+    char szDataYLine[MAX_BUFF_500]  = { '\0' };
+    char szDataJson[MAX_BUFF_1024]  = { '\0' };
+    uint32 u4Count = App_MainConfig::instance()->GetCommandChartCount();
+
+    for (uint32 i = 0; i < u4Count; i++)
+    {
+        _Command_Chart_Info obj_Command_Chart_Info;
+        _CommandData objCommandData;
+
+        obj_Command_Chart_Info.m_u2CommandID    = App_MainConfig::instance()->GetCommandChart(i)->m_u4CommandID;
+        obj_Command_Chart_Info.m_tvCommandTime  = tvNow;
+        GetCommandData(obj_Command_Chart_Info.m_u2CommandID, objCommandData);
+        obj_Command_Chart_Info.m_u4CommandCount = objCommandData.m_u4CommandCount;
+        m_vec_Command_Chart_Info[i].AddObject(obj_Command_Chart_Info);
+
+        //输出成图表数据
+        //生成X轴和Y轴
+        vector<_Command_Chart_Info> objVecHistoryList;
+        m_vec_Command_Chart_Info[i].GetAllSavingObject(objVecHistoryList);
+
+        for (int j = 0; j < (int)objVecHistoryList.size(); j++)
+        {
+            ACE_Date_Time dtThreadTime(objVecHistoryList[j].m_tvCommandTime);
+
+            if (0 == j)
+            {
+                sprintf_safe(szDataXInfo, MAX_BUFF_500, "\"%02d:%02d:%02d\"",
+                             dtThreadTime.hour(),
+                             dtThreadTime.minute(),
+                             dtThreadTime.second());
+
+                sprintf_safe(szDataYInfo, MAX_BUFF_200, "%d",
+                             objVecHistoryList[i].m_u4CommandCount);
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_500] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_500, "%s", szDataXInfo);
+                sprintf_safe(szDataXInfo, MAX_BUFF_500, "%s,\"%02d:%02d:%02d\"",
+                             szTemp,
+                             dtThreadTime.hour(),
+                             dtThreadTime.minute(),
+                             dtThreadTime.second());
+                sprintf_safe(szTemp, MAX_BUFF_200, "%s", szDataYInfo);
+                sprintf_safe(szDataYInfo, MAX_BUFF_200, "%s, %d",
+                             szTemp,
+                             objVecHistoryList[i].m_u4CommandCount);
+            }
+
+            sprintf_safe(szDataXLine, MAX_BUFF_200, OUTPUT_CHART_JSON_X, szDataXInfo);
+            sprintf_safe(szDataYLine, MAX_BUFF_500, OUTPUT_CHART_JSON_Y, objVecHistoryList[i].m_u2CommandID, szDataYInfo);
+        }
+
+        //拼接成数据
+        char szTableName[MAX_BUFF_200] = { '\0' };
+        sprintf_safe(szTableName, MAX_BUFF_200, "Pss Command(0x%04x)", obj_Command_Chart_Info.m_u2CommandID);
+        sprintf_safe(szDataJson, MAX_BUFF_1024, OUTPUT_CHART_JSON, szTableName, szDataXLine, szDataYLine);
+        FILE* pFile = ACE_OS::fopen(App_MainConfig::instance()->GetCommandChart(i)->m_szJsonFile, "w");
+
+        if (NULL != pFile)
+        {
+            ACE_OS::fwrite(szDataJson, sizeof(char), strlen(szDataJson), pFile);
+            ACE_OS::fclose(pFile);
+        }
+    }
+
     return true;
 }
 

@@ -609,12 +609,26 @@ struct _Connect_Chart_Info
 {
     uint32 m_n4ConnectCount;        //当前活跃连接数
     uint32 m_u4LastConnectCount;    //之前一分钟的连接建立数
-    ACE_Time_Value m_tvConnectTime;
+    ACE_Time_Value m_tvConnectTime; //收集数据的时间
 
     _Connect_Chart_Info()
     {
         m_n4ConnectCount     = 0;
         m_u4LastConnectCount = 0;
+    }
+};
+
+//指定命令信息
+struct _Command_Chart_Info
+{
+    uint16 m_u2CommandID;               //命令ID
+    uint32 m_u4CommandCount;            //单位时间数
+    ACE_Time_Value m_tvCommandTime;     //手机数据的时间
+
+    _Command_Chart_Info()
+    {
+        m_u2CommandID    = 0;
+        m_u4CommandCount = 0;
     }
 };
 
