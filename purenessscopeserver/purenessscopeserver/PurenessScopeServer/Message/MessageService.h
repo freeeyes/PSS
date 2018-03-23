@@ -197,7 +197,7 @@ public:
     CObjectLruList<_Connect_Chart_Info, ACE_Null_Mutex> m_objConnectHistoryList;   //连接信息历史信息记录
     ACE_Recursive_Thread_Mutex                          m_ThreadLock;              //用于线程操作的线程锁，保证CurrThreadID的数据正常
 
-    typedef vector<CObjectLruList<_Command_Chart_Info, ACE_Null_Mutex>> vec_Command_Chart_Info;   //命令信息历史信息记录
+    typedef vector<CObjectLruList<_Command_Chart_Info, ACE_Null_Mutex> > vec_Command_Chart_Info;  //命令信息历史信息记录
     vec_Command_Chart_Info                              m_vec_Command_Chart_Info;                 //命令历史信息列表
 };
 
