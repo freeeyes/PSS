@@ -22,6 +22,7 @@
     <ProjectGuid>{6C2026BE-FECA-1BAD-2246-D8260000002E}</ProjectGuid>
     <RootNamespace>TcpTest</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
