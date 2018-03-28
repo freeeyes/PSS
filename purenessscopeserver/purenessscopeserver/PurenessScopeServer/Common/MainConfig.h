@@ -340,6 +340,7 @@ public:
     _ChartInfo*       GetConnectChart();
     uint32            GetCommandChartCount();
     _ChartInfo*       GetCommandChart(uint32 u4Index);
+    uint32            GetBuffPacketPoolCount();
 
 private:
     uint32     m_u4MsgHighMark;                        //消息的高水位阀值
@@ -369,6 +370,7 @@ private:
     uint32     m_u4ChkInterval;                        //检测文件时间
     uint32     m_u4LogFileMaxSize;                     //输出文件最大尺寸
     uint32     m_u4LogFileMaxCnt;                      //输出文件最大个数，当达到最大个数自动循环
+    uint32     m_u4BuffPacketPoolCount;                //BuffPacket内存池大小
     int32      m_nServerID;                            //服务器ID
     int32      m_nEncryptFlag;                         //0，加密方式关闭，1为加密方式开启
     int32      m_nEncryptOutFlag;                      //回应数据包，0，为不加密，1为加密

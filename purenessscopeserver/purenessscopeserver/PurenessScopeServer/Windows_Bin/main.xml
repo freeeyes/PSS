@@ -7,6 +7,7 @@
 	<ServerID id="1001" desc="当前服务器的ID编号" />
 	<ServerName name="Freeeyes" desc="当前服务器的名称" />
 	<ServerVersion Version="1.00" desc="当前服务器版本" />
+	<BuffPacket Count="5000" desc="设置BuffPacket内存池的大小" />
 	<!-- 如果框架都使用默认的ParseID，则这里可以不需要输入ParseID参数 否则，给出指定的ParseID是谁，比如ParseID="1" -->
 	<TCPServerIP ip="INADDR_ANY" port="10002" ipType="IPV4" desc="监听TCP服务器的IP和端口，可以是多个，要用多个" />
 	<!-- <TCPServerIP ip="fe80::d433:372b:d0ee:edc4%12" port="10002" ipType="IPV6" desc="监听TCP服务器的IP和端口，可以是多个(IPv6地址测试)" /> -->
