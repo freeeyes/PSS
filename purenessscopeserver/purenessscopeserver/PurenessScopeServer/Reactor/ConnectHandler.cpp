@@ -2753,7 +2753,7 @@ bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType,
             pSendMessage->m_pBuffPacket = pCurrBuffPacket;
             pSendMessage->m_nEvents     = u1SendType;
             pSendMessage->m_u2CommandID = u2CommandID;
-            pSendMessage->m_blDelete    = blDelete;
+            pSendMessage->m_blDelete    = PACKET_IS_FRAMEWORK_RECYC;
             pSendMessage->m_u1SendState = u1SendState;
             pSendMessage->m_nMessageID  = nServerID;
             pSendMessage->m_u1Type      = 0;

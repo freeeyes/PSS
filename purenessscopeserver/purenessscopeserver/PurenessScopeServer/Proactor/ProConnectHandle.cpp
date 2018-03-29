@@ -2573,7 +2573,7 @@ bool CProConnectManager::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendT
             pSendMessage->m_nEvents     = u1SendType;
             pSendMessage->m_u2CommandID = u2CommandID;
             pSendMessage->m_u1SendState = u1SendState;
-            pSendMessage->m_blDelete    = blDelete;
+            pSendMessage->m_blDelete    = PACKET_IS_FRAMEWORK_RECYC;
             pSendMessage->m_nMessageID  = nMessageID;
             pSendMessage->m_u1Type      = 0;
             pSendMessage->m_tvSend      = ACE_OS::gettimeofday();
