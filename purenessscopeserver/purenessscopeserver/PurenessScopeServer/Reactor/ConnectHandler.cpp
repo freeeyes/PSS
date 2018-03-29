@@ -2242,6 +2242,14 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectManager::SendMessage] ConnectID[%d] is not find.", u4ConnectID);
         //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
         ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
+
+        if (NULL == pSendMessage)
+        {
+            OUR_DEBUG((LM_INFO, "[CConnectManager::SendMessage] ConnectID[%d] Create ACE_Message_Block(%d) fail.\n", u4ConnectID, pBuffPacket->GetPacketLen()));
+            App_BuffPacketManager::instance()->Delete(pBuffPacket);
+            return false;
+        }
+
         memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char* )pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
         pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
         ACE_Time_Value tvNow = ACE_OS::gettimeofday();
@@ -3004,7 +3012,7 @@ void CConnectHandlerPool::Close()
 {
     //清理所有已存在的指针
     m_u4CurrMaxCount  = 1;
-    
+
     //删除hash表空间
     m_objHashHandleList.Close();
 }
