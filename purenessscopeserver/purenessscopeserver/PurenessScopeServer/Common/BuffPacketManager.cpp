@@ -35,6 +35,11 @@ void CBuffPacketManager::OutputCreateInfo()
     CObjectPoolManager::OutputCreateInfo();
 }
 
+void CBuffPacketManager::SetCreateFlag(bool blTagCreateInfo)
+{
+    CObjectPoolManager::SetCreateFlag(blTagCreateInfo);
+}
+
 IBuffPacket* CBuffPacketManager::Create(const char* pFileName, uint32 u4Line)
 {
     return dynamic_cast<IBuffPacket*>(CObjectPoolManager::Create(pFileName, u4Line));

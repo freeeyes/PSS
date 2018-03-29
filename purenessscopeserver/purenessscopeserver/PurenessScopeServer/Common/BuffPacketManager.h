@@ -24,6 +24,7 @@ public:
     uint32 GetBuffPacketUsedCount();
     uint32 GetBuffPacketFreeCount();
     void OutputCreateInfo();
+    void SetCreateFlag(bool blTagCreateInfo);
 
     IBuffPacket* Create(const char* pFileName = __FILE__, uint32 u4Line = __LINE__);
     bool Delete(IBuffPacket* pBuffPacket);
