@@ -12,7 +12,6 @@ CProConnectHandle::CProConnectHandle(void) : m_u4LocalPort(0), m_u4SendCheckTime
     m_u4HandlerID         = 0;
     m_u2MaxConnectTime    = 0;
     m_u4SendThresHold     = MAX_MSG_SNEDTHRESHOLD;
-    m_u2SendQueueMax      = MAX_MSG_SENDPACKET;
     m_u1ConnectState      = CONNECT_INIT;
     m_u1SendBuffState     = CONNECT_SENDNON;
     m_pPacketParse        = NULL;
@@ -52,7 +51,6 @@ void CProConnectHandle::Init(uint16 u2HandlerID)
     m_u4HandlerID      = u2HandlerID;
     m_u2MaxConnectTime = App_MainConfig::instance()->GetMaxConnectTime();
     m_u4SendThresHold  = App_MainConfig::instance()->GetSendTimeout();
-    m_u2SendQueueMax   = App_MainConfig::instance()->GetSendQueueMax();
     m_u4MaxPacketSize  = App_MainConfig::instance()->GetRecvBuffSize();
     m_u2TcpNodelay     = App_MainConfig::instance()->GetTcpNodelay();
 
@@ -1836,6 +1834,8 @@ CProConnectManager::CProConnectManager(void):m_mutex(), m_cond(m_mutex), m_u4Sen
     m_u4TimeConnect      = 0;
     m_u4TimeDisConnect   = 0;
 
+    m_u2SendQueueMax     = MAX_MSG_SENDPACKET;
+
     m_tvCheckConnect     = ACE_OS::gettimeofday();
 
     m_SendMessagePool.Init();
@@ -2174,7 +2174,7 @@ bool CProConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
         //判断队列是否是已经最大
         int nQueueCount = (int)msg_queue()->message_count();
 
-        if(nQueueCount >= (int)MAX_MSG_THREADQUEUE)
+        if(nQueueCount >= (int)m_u2SendQueueMax)
         {
             OUR_DEBUG((LM_ERROR,"[CProConnectManager::PutMessage] Queue is Full nQueueCount = [%d].\n", nQueueCount));
 
@@ -2581,7 +2581,7 @@ bool CProConnectManager::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendT
             //判断队列是否是已经最大
             int nQueueCount = (int)msg_queue()->message_count();
 
-            if(nQueueCount >= (int)MAX_MSG_THREADQUEUE)
+            if(nQueueCount >= (int)m_u2SendQueueMax)
             {
                 OUR_DEBUG((LM_ERROR,"[CProConnectManager::PutMessage] Queue is Full nQueueCount = [%d].\n", nQueueCount));
 
@@ -2698,6 +2698,9 @@ void CProConnectManager::Init(uint16 u2Index)
     m_CommandAccount.Init(App_MainConfig::instance()->GetCommandAccount(),
                           App_MainConfig::instance()->GetCommandFlow(),
                           App_MainConfig::instance()->GetPacketTimeOut());
+
+    //初始化队列最大发送缓冲数量
+    m_u2SendQueueMax = App_MainConfig::instance()->GetSendQueueMax();
 
     //初始化发送缓冲池
     m_SendCacheManager.Init(App_MainConfig::instance()->GetBlockCount(), App_MainConfig::instance()->GetBlockSize());
