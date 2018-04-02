@@ -125,7 +125,6 @@ private:
     int                        m_nBlockMaxCount;               //阻塞允许发生的最大次数
     int                        m_nBlockSize;                   //阻塞发生时缓冲区的大小
     int                        m_nHashID;                      //对应的Pool的Hash数组下标
-    uint16                     m_u2SendQueueMax;               //发送队列最大长度
     uint16                     m_u2SendCount;                  //当前数据包的个数
     uint16                     m_u2MaxConnectTime;             //最大时间链接判定
     uint16                     m_u2TcpNodelay;                 //Nagle算法开关
@@ -215,6 +214,7 @@ private:
     uint32                             m_u4SendQueuePutTime;    //发送队列入队超时时间
     uint32                             m_u4TimeConnect;         //单位时间连接建立数
     uint32                             m_u4TimeDisConnect;      //单位时间连接断开数
+    uint16                             m_u2SendQueueMax;        //发送队列最大长度
     bool                               m_blRun;                 //线程是否在运行
     char                               m_szError[MAX_BUFF_500]; //错误信息描述
     CHashTable<CConnectHandler>        m_objHashConnectList;    //记录当前已经连接的节点，使用固定内存结构

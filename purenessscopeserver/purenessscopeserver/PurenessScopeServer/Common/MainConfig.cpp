@@ -49,6 +49,7 @@ CMainConfig::CMainConfig(void)
     m_u4ConnectServerRecvBuff = MAX_BUFF_1024;
     m_u1ConnectServerRunType  = 0;
     m_u4ServerRecvBuff        = MAX_BUFF_1024;
+    m_u4BuffPacketPoolCount   = BUFFPACKET_MAX_COUNT;
 
     m_u2RecvQueueTimeout    = MAX_QUEUE_TIMEOUT;
     m_u2SendQueueTimeout    = MAX_QUEUE_TIMEOUT;
@@ -625,6 +626,13 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
     if(NULL != pData)
     {
         sprintf_safe(m_szServerVersion, MAX_BUFF_20, "%s", pData);
+    }
+
+    pData = m_MainConfig.GetData("BuffPacket", "Count");
+
+    if (NULL != pData)
+    {
+        m_u4BuffPacketPoolCount = ACE_OS::atoi(pData);
     }
 
     //获得监听端口信息
@@ -1993,6 +2001,11 @@ _ChartInfo* CMainConfig::GetCommandChart(uint32 u4Index)
     {
         return NULL;
     }
+}
+
+uint32 CMainConfig::GetBuffPacketPoolCount()
+{
+    return m_u4BuffPacketPoolCount;
 }
 
 uint16 CMainConfig::GetModuleInfoCount()

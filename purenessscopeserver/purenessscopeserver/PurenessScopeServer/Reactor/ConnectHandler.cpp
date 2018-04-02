@@ -10,7 +10,6 @@ CConnectHandler::CConnectHandler(void)
     m_u4AllRecvSize       = 0;
     m_u4AllSendSize       = 0;
     m_u4SendThresHold     = MAX_MSG_SNEDTHRESHOLD;
-    m_u2SendQueueMax      = MAX_MSG_SENDPACKET;
     m_u1ConnectState      = CONNECT_INIT;
     m_u1SendBuffState     = CONNECT_SENDNON;
     m_pCurrMessage        = NULL;
@@ -125,7 +124,6 @@ void CConnectHandler::Init(uint16 u2HandlerID)
     m_u4HandlerID      = u2HandlerID;
     m_u2MaxConnectTime = App_MainConfig::instance()->GetMaxConnectTime();
     m_u4SendThresHold  = App_MainConfig::instance()->GetSendTimeout();
-    m_u2SendQueueMax   = App_MainConfig::instance()->GetSendQueueMax();
     m_u4MaxPacketSize  = App_MainConfig::instance()->GetRecvBuffSize();
     m_u2TcpNodelay     = App_MainConfig::instance()->GetTcpNodelay();
 
@@ -1953,6 +1951,7 @@ CConnectManager::CConnectManager(void):m_mutex(), m_cond(m_mutex)
     m_u4TimeConnect      = 0;
     m_u4TimeDisConnect   = 0;
     m_u4SendQueuePutTime = 0;
+    m_u2SendQueueMax     = MAX_MSG_SENDPACKET;
 
     //初始化发送对象池
     m_SendMessagePool.Init();
@@ -2242,6 +2241,14 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectManager::SendMessage] ConnectID[%d] is not find.", u4ConnectID);
         //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
         ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
+
+        if (NULL == pSendMessage)
+        {
+            OUR_DEBUG((LM_INFO, "[CConnectManager::SendMessage] ConnectID[%d] Create ACE_Message_Block(%d) fail.\n", u4ConnectID, pBuffPacket->GetPacketLen()));
+            App_BuffPacketManager::instance()->Delete(pBuffPacket);
+            return false;
+        }
+
         memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char* )pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
         pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
         ACE_Time_Value tvNow = ACE_OS::gettimeofday();
@@ -2297,7 +2304,7 @@ bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
         //判断队列是否是已经最大
         int nQueueCount = (int)msg_queue()->message_count();
 
-        if(nQueueCount >= (int)MAX_MSG_THREADQUEUE)
+        if(nQueueCount >= (int)m_u2SendQueueMax)
         {
             OUR_DEBUG((LM_ERROR,"[CConnectManager::PutMessage] Queue is Full nQueueCount = [%d].\n", nQueueCount));
 
@@ -2745,7 +2752,7 @@ bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType,
             pSendMessage->m_pBuffPacket = pCurrBuffPacket;
             pSendMessage->m_nEvents     = u1SendType;
             pSendMessage->m_u2CommandID = u2CommandID;
-            pSendMessage->m_blDelete    = blDelete;
+            pSendMessage->m_blDelete    = PACKET_IS_FRAMEWORK_RECYC;
             pSendMessage->m_u1SendState = u1SendState;
             pSendMessage->m_nMessageID  = nServerID;
             pSendMessage->m_u1Type      = 0;
@@ -2754,7 +2761,7 @@ bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType,
             //判断队列是否是已经最大
             int nQueueCount = (int)msg_queue()->message_count();
 
-            if(nQueueCount >= (int)MAX_MSG_THREADQUEUE)
+            if(nQueueCount >= (int)m_u2SendQueueMax)
             {
                 OUR_DEBUG((LM_ERROR,"[CConnectManager::PutMessage] Queue is Full nQueueCount = [%d].\n", nQueueCount));
 
@@ -2876,6 +2883,9 @@ void CConnectManager::Init( uint16 u2Index )
     m_CommandAccount.Init(App_MainConfig::instance()->GetCommandAccount(),
                           App_MainConfig::instance()->GetCommandFlow(),
                           App_MainConfig::instance()->GetPacketTimeOut());
+
+    //初始化最大消息发送队列长度
+    m_u2SendQueueMax = App_MainConfig::instance()->GetSendQueueMax();
 
     //初始化发送缓冲
     m_SendCacheManager.Init(App_MainConfig::instance()->GetBlockCount(), App_MainConfig::instance()->GetBlockSize());
@@ -3004,7 +3014,7 @@ void CConnectHandlerPool::Close()
 {
     //清理所有已存在的指针
     m_u4CurrMaxCount  = 1;
-    
+
     //删除hash表空间
     m_objHashHandleList.Close();
 }

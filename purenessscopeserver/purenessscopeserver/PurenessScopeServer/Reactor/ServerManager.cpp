@@ -85,21 +85,22 @@ bool CServerManager::Init()
                                          App_MainConfig::instance()->GetConnectAlert()->m_u4DisConnectMax);
 
     //初始化BuffPacket缓冲池.默认都是当前最大连接数的2倍
-    App_BuffPacketManager::instance()->Init(BUFFPACKET_MAX_COUNT, CBuffPacketManager::Init_Callback);
+    App_BuffPacketManager::instance()->Init(App_MainConfig::instance()->GetBuffPacketPoolCount(), CBuffPacketManager::Init_Callback);
 
     //初始化服务器间异步接收队列
     App_ServerMessageInfoPool::instance()->Init(App_MainConfig::instance()->GetServerConnectCount());
 
-    //初始化PacketParse对象池
-    App_PacketParsePool::instance()->Init(MAX_PACKET_PARSE, CPacketParsePool::Init_Callback);
-
     //初始化ConnectHandler对象池
     if (App_MainConfig::instance()->GetMaxHandlerCount() <= 0)
     {
+        //初始化PacketParse对象池
+        App_PacketParsePool::instance()->Init(MAX_HANDLE_POOL, CPacketParsePool::Init_Callback);
         App_ConnectHandlerPool::instance()->Init(MAX_HANDLE_POOL);
     }
     else
     {
+        //初始化PacketParse对象池
+        App_PacketParsePool::instance()->Init(App_MainConfig::instance()->GetMaxHandlerCount(), CPacketParsePool::Init_Callback);
         App_ConnectHandlerPool::instance()->Init(App_MainConfig::instance()->GetMaxHandlerCount());
     }
 

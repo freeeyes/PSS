@@ -116,7 +116,6 @@ private:
     int                m_nHashID;                      //对应Hash列表中的ID
     int                m_u4RecvPacketCount;            //接受包的个数
     int                m_nIOCount;                     //当前IO操作的个数
-    uint16             m_u2SendQueueMax;               //发送队列最大长度
     uint16             m_u2MaxConnectTime;             //最大链接时间判定
     uint16             m_u2SendQueueTimeout;           //发送超时时间,超过这个时间的都会被记录到日志中
     uint16             m_u2RecvQueueTimeout;           //接受超时时间，超过这个时间的都会被记录到日志中
@@ -214,6 +213,7 @@ private:
     uint32                             m_u4TimeConnect;         //单位时间连接建立数
     uint32                             m_u4TimeDisConnect;      //单位时间连接断开数
     uint32                             m_u4TimeCheckID;         //定时器检查的TimerID
+    uint16                             m_u2SendQueueMax;        //发送队列最大长度
     bool                               m_blRun;                 //线程是否在运行
     char                               m_szError[MAX_BUFF_500]; //错误信息描述
     CHashTable<CProConnectHandle>      m_objHashConnectList;    //记录当前已经连接的节点，使用固定内存结构

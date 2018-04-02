@@ -238,3 +238,8 @@ pip-log.txt
 /purenessscopeserver/purenessscopeserver/PurenessScopeServer/PurenessScopeServer.vcxproj.filters
 /purenessscopeserver/purenessscopeserver/PurenessScopeServer/PurenessScopeServer.vcproj
 /purenessscopeserver/purenessscopeserver/PurenessScopeServer/PurenessScopeServer.vcxproj
+*.sln
+*.vcxproj
+*.vcxproj
+*.vcxproj
+*.filters
