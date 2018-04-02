@@ -234,7 +234,10 @@ bool CProactorUDPHandler::SendMessage(const char*& pMessage, uint32 u4Len, const
             m_atvOutput = ACE_OS::gettimeofday();
             m_u4SendSize += u4Len;
             m_u4SendPacketCount++;
-            SAFE_DELETE_ARRAY(pMessage);
+			if (true == blDlete)
+			{
+				SAFE_DELETE_ARRAY(pMessage);
+			}
 
             //统计发送信息
             m_CommandAccount.SaveCommandData(u2CommandID, (uint32)nPort, PACKET_UDP, u4Len, COMMAND_TYPE_OUT);
@@ -244,10 +247,13 @@ bool CProactorUDPHandler::SendMessage(const char*& pMessage, uint32 u4Len, const
         else
         {
             OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::SendMessage]send error(%d).\n", errno));
-            SAFE_DELETE_ARRAY(pMessage);
+			if (true == blDlete)
+			{
+				SAFE_DELETE_ARRAY(pMessage);
+			}
             return false;
         }
-    }
+    }//end if(blHead == true)
 }
 
 _ClientConnectInfo CProactorUDPHandler::GetClientConnectInfo()
