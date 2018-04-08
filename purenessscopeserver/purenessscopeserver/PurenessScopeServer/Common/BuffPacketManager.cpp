@@ -8,7 +8,7 @@ CBuffPacketManager::CBuffPacketManager()
 CBuffPacketManager::~CBuffPacketManager()
 {
     OUR_DEBUG((LM_INFO, "[CBuffPacketManager::~CBuffPacketManager]Begin.\n"));
-    CObjectPoolManager::Close();
+    CObjectPoolManager<CBuffPacket, ACE_Recursive_Thread_Mutex>::Close();
 }
 
 void CBuffPacketManager::Init_Callback(int nIndex, CBuffPacket* pBuffPacket)
@@ -22,37 +22,37 @@ void CBuffPacketManager::Init_Callback(int nIndex, CBuffPacket* pBuffPacket)
 
 uint32 CBuffPacketManager::GetBuffPacketUsedCount()
 {
-    return CObjectPoolManager::GetUsedCount();
+    return CObjectPoolManager<CBuffPacket, ACE_Recursive_Thread_Mutex>::GetUsedCount();
 }
 
 uint32 CBuffPacketManager::GetBuffPacketFreeCount()
 {
-    return CObjectPoolManager::GetFreeCount();
+    return CObjectPoolManager<CBuffPacket, ACE_Recursive_Thread_Mutex>::GetFreeCount();
 }
 
 void CBuffPacketManager::OutputCreateInfo()
 {
-    CObjectPoolManager::OutputCreateInfo();
+    CObjectPoolManager<CBuffPacket, ACE_Recursive_Thread_Mutex>::OutputCreateInfo();
 }
 
 void CBuffPacketManager::SetCreateFlag(bool blTagCreateInfo)
 {
-    CObjectPoolManager::SetCreateFlag(blTagCreateInfo);
+    CObjectPoolManager<CBuffPacket, ACE_Recursive_Thread_Mutex>::SetCreateFlag(blTagCreateInfo);
 }
 
 IBuffPacket* CBuffPacketManager::Create(const char* pFileName, uint32 u4Line)
 {
-    return dynamic_cast<IBuffPacket*>(CObjectPoolManager::Create(pFileName, u4Line));
+    return dynamic_cast<IBuffPacket*>(CObjectPoolManager<CBuffPacket, ACE_Recursive_Thread_Mutex>::Create(pFileName, u4Line));
 }
 
 bool CBuffPacketManager::Delete(IBuffPacket* pBuffPacket)
 {
     CBuffPacket* pBuff = dynamic_cast<CBuffPacket*>(pBuffPacket);
     pBuff->Clear();
-    return CObjectPoolManager::Delete(pBuff->GetBuffID(), pBuff);
+    return CObjectPoolManager<CBuffPacket, ACE_Recursive_Thread_Mutex>::Delete(pBuff->GetBuffID(), pBuff);
 }
 
 void CBuffPacketManager::GetCreateInfoList(vector<_Object_Create_Info>& objCreateList)
 {
-    return CObjectPoolManager::GetCreateInfoList(objCreateList);
+    return CObjectPoolManager<CBuffPacket, ACE_Recursive_Thread_Mutex>::GetCreateInfoList(objCreateList);
 }

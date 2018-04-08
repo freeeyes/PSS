@@ -19,22 +19,22 @@ void CPacketParsePool::Init_Callback(int nIndex, CPacketParse* pPacketParse)
 void CPacketParsePool::Close()
 {
     //清理所有已存在的指针
-    CObjectPoolManager::Close();
+    CObjectPoolManager<CPacketParse, ACE_Recursive_Thread_Mutex>::Close();
 }
 
 int CPacketParsePool::GetUsedCount()
 {
-    return CObjectPoolManager::GetUsedCount();
+    return CObjectPoolManager<CPacketParse, ACE_Recursive_Thread_Mutex>::GetUsedCount();
 }
 
 int CPacketParsePool::GetFreeCount()
 {
-    return  CObjectPoolManager::GetFreeCount();
+    return  CObjectPoolManager<CPacketParse, ACE_Recursive_Thread_Mutex>::GetFreeCount();
 }
 
 CPacketParse* CPacketParsePool::Create(const char* pFileName, uint32 u4Line)
 {
-    return CObjectPoolManager::Create(pFileName, u4Line);
+    return CObjectPoolManager<CPacketParse, ACE_Recursive_Thread_Mutex>::Create(pFileName, u4Line);
 }
 
 bool CPacketParsePool::Delete(CPacketParse* pPacketParse, bool blDelete)
@@ -55,5 +55,5 @@ bool CPacketParsePool::Delete(CPacketParse* pPacketParse, bool blDelete)
 
     pPacketParse->Clear();
 
-    return CObjectPoolManager::Delete(pPacketParse->GetHashID(), pPacketParse);
+    return CObjectPoolManager<CPacketParse, ACE_Recursive_Thread_Mutex>::Delete(pPacketParse->GetHashID(), pPacketParse);
 }

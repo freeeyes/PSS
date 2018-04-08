@@ -167,7 +167,7 @@ CMessagePool::CMessagePool()
 CMessagePool::~CMessagePool()
 {
     OUR_DEBUG((LM_INFO, "[CMessagePool::~CMessagePool].\n"));
-    CObjectPoolManager::Close();
+    CObjectPoolManager<CMessage, ACE_Recursive_Thread_Mutex>::Close();
     OUR_DEBUG((LM_INFO, "[CMessagePool::~CMessagePool]End.\n"));
 }
 
@@ -178,22 +178,22 @@ void CMessagePool::Init_Callback(int nIndex, CMessage* pMessage)
 
 int CMessagePool::GetUsedCount()
 {
-    return CObjectPoolManager::GetUsedCount();
+    return CObjectPoolManager<CMessage, ACE_Recursive_Thread_Mutex>::GetUsedCount();
 }
 
 int CMessagePool::GetFreeCount()
 {
-    return CObjectPoolManager::GetFreeCount();
+    return CObjectPoolManager<CMessage, ACE_Recursive_Thread_Mutex>::GetFreeCount();
 }
 
 void CMessagePool::GetCreateInfoList(vector<_Object_Create_Info>& objCreateList)
 {
-    return CObjectPoolManager::GetCreateInfoList(objCreateList);
+    return CObjectPoolManager<CMessage, ACE_Recursive_Thread_Mutex>::GetCreateInfoList(objCreateList);
 }
 
 CMessage* CMessagePool::Create()
 {
-    return dynamic_cast<CMessage*>(CObjectPoolManager::Create(__FILE__, __LINE__));;
+    return dynamic_cast<CMessage*>(CObjectPoolManager<CMessage, ACE_Recursive_Thread_Mutex>::Create(__FILE__, __LINE__));;
 }
 
 bool CMessagePool::Delete(CMessage* pMessage)
@@ -206,7 +206,7 @@ bool CMessagePool::Delete(CMessage* pMessage)
     pMessage->Clear();
 
     //bool blState = m_objHashMessageList.Push(szHashID, pObject);
-    bool blState = CObjectPoolManager::Delete(pMessage->GetHashID(), pMessage);
+    bool blState = CObjectPoolManager<CMessage, ACE_Recursive_Thread_Mutex>::Delete(pMessage->GetHashID(), pMessage);
 
     if(false == blState)
     {
