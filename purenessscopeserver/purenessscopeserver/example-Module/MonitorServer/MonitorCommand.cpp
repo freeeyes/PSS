@@ -46,11 +46,20 @@ void CPSSMonitorCommand::SetServerObject(CServerObject* pServerObject)
 
 int CPSSMonitorCommand::Do_Pss_Login(IMessage* pMessage)
 {
+    OUR_DEBUG((LM_INFO, "[CPSSMonitorCommand::Do_Pss_Login]=====.\n"));
+    /*
     IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();
 
     if (NULL == pBodyPacket)
     {
         OUR_DEBUG((LM_ERROR, "[CPSSMonitorCommand::Do_Pss_Login] pBodyPacket is NULL.\n"));
+        return -1;
+    }
+    */
+
+    if (NULL == pMessage)
+    {
+        OUR_DEBUG((LM_ERROR, "[CPSSMonitorCommand::Do_Pss_Login] pMessage is NULL.\n"));
         return -1;
     }
 
@@ -108,11 +117,20 @@ int CPSSMonitorCommand::Do_Pss_Login(IMessage* pMessage)
 
 int CPSSMonitorCommand::Do_Pss_Monitor_Data(IMessage* pMessage)
 {
+    OUR_DEBUG((LM_INFO, "[CPSSMonitorCommand::Do_Pss_Monitor_Data]=====.\n"));
+    /*
     IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();
 
     if (NULL == pBodyPacket)
     {
         OUR_DEBUG((LM_ERROR, "CPSSMonitorCommand::Do_Pss_Monitor_Data] pBodyPacket is NULL.\n"));
+        return -1;
+    }
+    */
+
+    if (NULL == pMessage)
+    {
+        OUR_DEBUG((LM_ERROR, "CPSSMonitorCommand::Do_Pss_Monitor_Data] pMessage is NULL.\n"));
         return -1;
     }
 
@@ -126,7 +144,7 @@ int CPSSMonitorCommand::Do_Pss_Monitor_Data(IMessage* pMessage)
 
     if (NULL == pBodyBuffPacket)
     {
-        OUR_DEBUG((LM_INFO, "[CPSSMonitorCommand::Do_Pss_Login]pBodyBuffPacket is NULL.\n"));
+        OUR_DEBUG((LM_INFO, "[CPSSMonitorCommand::Do_Pss_Monitor_Data]pBodyBuffPacket is NULL.\n"));
         return -1;
     }
 
@@ -143,7 +161,7 @@ int CPSSMonitorCommand::Do_Pss_Monitor_Data(IMessage* pMessage)
     (*pBodyBuffPacket) >> u4DataIn;
     (*pBodyBuffPacket) >> u4DataOut;
 
-    OUR_DEBUG((LM_INFO, "[CPSSMonitorCommand::Do_Pss_Login]u4Cpu=%d, u4MemorySize=%d, u4ConnectCount=%d, u4DataIn=%d, u4DataOut=%d.\n",
+    OUR_DEBUG((LM_INFO, "[CPSSMonitorCommand::Do_Pss_Monitor_Data]u4Cpu=%d, u4MemorySize=%d, u4ConnectCount=%d, u4DataIn=%d, u4DataOut=%d.\n",
                u4Cpu,
                u4MemorySize,
                u4ConnectCount,
@@ -174,7 +192,6 @@ int CPSSMonitorCommand::Do_Pss_Monitor_Data(IMessage* pMessage)
             PACKET_SEND_IMMEDIATLY,
             PACKET_IS_FRAMEWORK_RECYC,
             0);
-
 
     return 0;
 }

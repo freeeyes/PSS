@@ -70,7 +70,7 @@ int UnLoadModuleData()
 {
     //卸载插件，会自动调用插件回收，不需要在手动pMessageManager->DelClientCommand
     OUR_DEBUG((LM_INFO, "[Base UnLoadModuleData] Begin.\n"));
-
+    g_MonitorCommand->Close();
     SAFE_DELETE(g_MonitorCommand);
 
     OUR_DEBUG((LM_INFO, "[Base UnLoadModuleData] End.\n"));

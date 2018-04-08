@@ -1,5 +1,5 @@
 project(Monitor):acelib{
-  sharedname=Monitor
+  sharedname=MonitorServer
   dynamicflags += TEST_TCP_BUILD_DLL
   
   Source_Files{

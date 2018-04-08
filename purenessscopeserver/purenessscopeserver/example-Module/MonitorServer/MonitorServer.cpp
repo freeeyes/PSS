@@ -9,9 +9,9 @@
 
 #include "ace/svc_export.h"
 
-static const char* g_szDesc      = "Monitor";           //模块的描述文字
-static const char* g_szName      = "Monitor";           //模块的名字
-static const char* g_szModuleKey = "Monitor";           //模块的Key
+static const char* g_szDesc      = "MonitorServer";           //模块的描述文字
+static const char* g_szName      = "MonitorServer";           //模块的名字
+static const char* g_szModuleKey = "MonitorServer";           //模块的Key
 
 #ifdef WIN32
 #ifdef TEST_TCP_BUILD_DLL

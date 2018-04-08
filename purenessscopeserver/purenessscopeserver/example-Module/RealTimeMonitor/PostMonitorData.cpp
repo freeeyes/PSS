@@ -30,21 +30,32 @@ bool CPostServerData::Send_Format_data(char* pData, uint32 u4Len, IMessageBlockM
     return true;
 }
 
-bool CPostServerData::Recv_Format_data(ACE_Message_Block* mbRecv, IMessageBlockManager* pMessageBlockManager, uint16& u2CommandID, ACE_Message_Block*& mbFinishRecv)
+bool CPostServerData::Recv_Format_data(ACE_Message_Block* mbRecv, IMessageBlockManager* pMessageBlockManager, uint16& u2CommandID, ACE_Message_Block*& mbFinishRecv, EM_PACKET_ROUTE& emPacketRoute)
 {
-    //这里必须把内存拷贝出来，因为mbRecv不在pMessageBlockManager里面。
-    ACE_Message_Block* pmb = pMessageBlockManager->Create((uint32)mbRecv->length());
+    OUR_DEBUG((LM_INFO, "[CPostServerData::Recv_Format_data]=====.\n"));
+    ACE_UNUSED_ARG(emPacketRoute);
 
-    if (NULL != pmb)
+    if (mbRecv->length() > 0)
     {
-        memcpy_safe(mbRecv->rd_ptr(), (uint32)mbRecv->length(), pmb->wr_ptr(), (uint32)mbRecv->length());
-        pmb->wr_ptr(mbRecv->length());
-        mbFinishRecv = pmb;
-        return true;
+        //这里必须把内存拷贝出来，因为mbRecv不在pMessageBlockManager里面。
+        ACE_Message_Block* pmb = pMessageBlockManager->Create((uint32)mbRecv->length());
+        if (NULL != pmb)
+        {
+            memcpy_safe(mbRecv->rd_ptr(), (uint32)mbRecv->length(), pmb->wr_ptr(), (uint32)mbRecv->length());
+            pmb->wr_ptr(mbRecv->length());
+            mbRecv->rd_ptr(mbRecv->length());
+            mbFinishRecv = pmb;
+            return true;
+        }
+        else
+        {
+            OUR_DEBUG((LM_INFO, "[CPostServerData::Recv_Format_data]pMessageBlockManager Create NULL.\n"));
+            return false;
+        }
     }
     else
     {
-        OUR_DEBUG((LM_INFO, "[CPostServerData::Recv_Format_data]pMessageBlockManager Create NULL.\n"));
+        OUR_DEBUG((LM_INFO, "[CPostServerData::Recv_Format_data]mbRecv->length() is 0.\n"));
         return false;
     }
 }

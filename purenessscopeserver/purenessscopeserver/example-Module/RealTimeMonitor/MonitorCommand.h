@@ -37,13 +37,11 @@ public:
 
     int Init(const char* pJson, CServerObject* pServerObject);
 
+    void Close();
+
     int Connect_Monitor();
 
     void SetState(EM_MONITOR_STATE em_monitor_state);
-private:
-    int Monitor_Server_Login();
-    int Monitor_Server_Disconnect();
-    int Monitor_Server_Timer();
 
 private:
     CServerObject*    m_pServerObject;
