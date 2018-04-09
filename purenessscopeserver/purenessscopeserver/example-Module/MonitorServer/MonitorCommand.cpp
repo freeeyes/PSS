@@ -47,15 +47,6 @@ void CPSSMonitorCommand::SetServerObject(CServerObject* pServerObject)
 int CPSSMonitorCommand::Do_Pss_Login(IMessage* pMessage)
 {
     OUR_DEBUG((LM_INFO, "[CPSSMonitorCommand::Do_Pss_Login]=====.\n"));
-    /*
-    IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();
-
-    if (NULL == pBodyPacket)
-    {
-        OUR_DEBUG((LM_ERROR, "[CPSSMonitorCommand::Do_Pss_Login] pBodyPacket is NULL.\n"));
-        return -1;
-    }
-    */
 
     if (NULL == pMessage)
     {
