@@ -36,7 +36,7 @@ void CDataManager::make_index_html()
 //生成detail html文件
 void CDataManager::make_detail_html()
 {
-    
+
 }
 
 CDataManager* CDataManager::GetInstance()
@@ -47,4 +47,10 @@ CDataManager* CDataManager::GetInstance()
     }
 
     return m_pInstance;
+}
+
+//获取保存数据时间间隔
+uint32 CDataManager::GetTimeInterval()
+{
+    return 0;
 }

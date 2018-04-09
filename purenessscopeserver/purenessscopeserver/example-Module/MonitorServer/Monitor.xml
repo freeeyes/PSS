@@ -1,11 +1,14 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <config>
-	<!-- 设置htmlindex文件的路径 以及不在列表中的数据连接最大历史记录数 -->
-	<htmlIndex path="../" name="index.html" defaulthistorymaxcount="10">
+	<!-- 设置htmlindex文件的路径 -->
+	<htmlIndex path="../" name="index.html"/>
 	<!-- 设置html细节页面路径，插件会把详细信息存放在这个页面下 -->
-	<htmldetail path="../" >
+	<htmldetail path="../" />
 	<!-- 设置Json细节页面路径，插件会把详细信息存放在这个页面下 -->
-	<htmlJsondetail path="../" >
+	<htmlJsondetail path="../" />
+
+	<!-- 不在列表中的数据连接最大历史记录数 和 保存数据间隔时间 -->
+	<defaultcfg historymaxcount="10" timeinterval="10" />
 
 	<!-- group分组设置，可以多个 -->
 	<group name="test">

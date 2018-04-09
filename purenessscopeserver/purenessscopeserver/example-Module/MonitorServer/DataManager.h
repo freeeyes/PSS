@@ -26,9 +26,13 @@ private:
     CDataManager();
 public:
     static CDataManager* GetInstance();
+
+    //获取保存数据时间间隔
+    uint32 GetTimeInterval();
 private:
     static CDataManager* m_pInstance;
 
+    
 
 };
 
