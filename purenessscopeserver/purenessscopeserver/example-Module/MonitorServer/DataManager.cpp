@@ -1,12 +1,18 @@
 #include "DataManager.h"
 
+CDataManager* CDataManager::m_pInstance = NULL;
+
 CDataManager::CDataManager()
 {
 
 }
 CDataManager::~CDataManager()
 {
-
+    if (NULL != m_pInstance)
+    {
+        delete m_pInstance;
+        m_pInstance = NULL;
+    }
 }
 
 //½âÎöxmlÅäÖÃÎÄ¼ş
@@ -31,4 +37,14 @@ void CDataManager::make_index_html()
 void CDataManager::make_detail_html()
 {
     
+}
+
+CDataManager* CDataManager::GetInstance()
+{
+    if (NULL == m_pInstance)
+    {
+        m_pInstance = new CDataManager();
+    }
+
+    return m_pInstance;
 }

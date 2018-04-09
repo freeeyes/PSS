@@ -5,10 +5,9 @@
 #include "tinyxml.h"
 #include "tinystr.h"
 
-class CDataManager 
+class CDataManager
 {
 public:
-    CDataManager();
     ~CDataManager();
 
     //½âÎöxmlÅäÖÃÎÄ¼ş
@@ -24,6 +23,12 @@ public:
     void make_detail_html();
 
 private:
+    CDataManager();
+public:
+    static CDataManager* GetInstance();
+private:
+    static CDataManager* m_pInstance;
+
 
 };
 
