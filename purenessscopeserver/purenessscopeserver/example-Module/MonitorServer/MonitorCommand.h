@@ -5,6 +5,7 @@
 #include "ClientCommand.h"
 #include "IObject.h"
 #include "Trace.h"
+#include "DataManager.h"
 
 #define COMMAND_MONITOR_LOGIN      0x2001    //发送注册命令
 #define COMMAND_MONITOR_DATA       0x2002    //发送心跳当前数据吞吐命令

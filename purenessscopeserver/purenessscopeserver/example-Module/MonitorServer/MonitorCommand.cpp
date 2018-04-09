@@ -150,6 +150,14 @@ int CPSSMonitorCommand::Do_Pss_Monitor_Data(IMessage* pMessage)
                u4DataIn,
                u4DataOut));
 
+    //写入当前信息
+    CDataManager::GetInstance()->AddNodeDate(pMessage->GetMessageBase()->m_szIP,
+            u4Cpu,
+            u4MemorySize,
+            u4ConnectCount,
+            u4DataIn,
+            u4DataOut);
+
     m_pServerObject->GetPacketManager()->Delete(pBodyBuffPacket);
 
     //返回相应消息

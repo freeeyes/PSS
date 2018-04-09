@@ -92,7 +92,27 @@ int UnLoadModuleData()
 int InitModule(CServerObject* pServerObject)
 {
     OUR_DEBUG((LM_INFO, "[InitModule] Begin.\n"));
-    ACE_UNUSED_ARG(pServerObject);
+    //ACE_UNUSED_ARG(pServerObject);
+
+    //初始化读取对象
+    char* pParamData = (char* )pServerObject->GetModuleInfo()->GetModuleParam(g_szName);
+
+    if (ACE_OS::strlen(pParamData) > 0)
+    {
+        if (false == CDataManager::GetInstance()->ParseXmlFile(pParamData))
+        {
+            OUR_DEBUG((LM_ERROR, "[InitModule]DataManager::GetInstance()->ParseXmlFile(%s) error.\n", pParamData));
+        }
+        else
+        {
+            //初始化定时器
+            //pServerObject->GetTimerManager()->schedule();
+        }
+    }
+    else
+    {
+        OUR_DEBUG((LM_ERROR, "[InitModule]pParamData is NULL.\n"));
+    }
 
     return 0;
 }
