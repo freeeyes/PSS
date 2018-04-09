@@ -118,15 +118,6 @@ int CPSSMonitorCommand::Do_Pss_Login(IMessage* pMessage)
 int CPSSMonitorCommand::Do_Pss_Monitor_Data(IMessage* pMessage)
 {
     OUR_DEBUG((LM_INFO, "[CPSSMonitorCommand::Do_Pss_Monitor_Data]=====.\n"));
-    /*
-    IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();
-
-    if (NULL == pBodyPacket)
-    {
-        OUR_DEBUG((LM_ERROR, "CPSSMonitorCommand::Do_Pss_Monitor_Data] pBodyPacket is NULL.\n"));
-        return -1;
-    }
-    */
 
     if (NULL == pMessage)
     {
