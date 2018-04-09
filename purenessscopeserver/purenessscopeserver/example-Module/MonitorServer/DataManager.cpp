@@ -22,9 +22,9 @@ bool CDataManager::ParseXmlFile(const char* pXmlFile)
 }
 
 //增加节点数据
-void CDataManager::AddNodeDate(const char* pIP,uint32 u4Cpu,uint32 u4MemorySize,uint32 u4ConnectCount,uint32 u4DataIn,uint32 u4DataOut)
+void CDataManager::AddNodeDate(uint32 u4ConnectId,uint32 u4Cpu,uint32 u4MemorySize,uint32 u4ConnectCount,uint32 u4DataIn,uint32 u4DataOut)
 {
-
+    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 }
 
 //生成index html文件
