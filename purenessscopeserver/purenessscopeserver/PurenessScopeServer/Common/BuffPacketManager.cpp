@@ -52,7 +52,23 @@ bool CBuffPacketManager::Delete(IBuffPacket* pBuffPacket)
     return CObjectPoolManager<CBuffPacket, ACE_Recursive_Thread_Mutex>::Delete(pBuff->GetBuffID(), pBuff);
 }
 
-void CBuffPacketManager::GetCreateInfoList(vector<_Object_Create_Info>& objCreateList)
+
+uint32 CBuffPacketManager::GetCreateInfoCount()
 {
-    return CObjectPoolManager<CBuffPacket, ACE_Recursive_Thread_Mutex>::GetCreateInfoList(objCreateList);
+    m_objCreateList.clear();
+
+    CObjectPoolManager<CBuffPacket, ACE_Recursive_Thread_Mutex>::GetCreateInfoList(m_objCreateList);
+
+    return (uint32)m_objCreateList.size();
+}
+
+bool CBuffPacketManager::GetCreateInfoList(uint32 u4Index, _Object_Create_Info& objCreateInfo)
+{
+    if (u4Index >= (uint32)m_objCreateList.size())
+    {
+        return false;
+    }
+
+    objCreateInfo = m_objCreateList[u4Index];
+    return true;
 }

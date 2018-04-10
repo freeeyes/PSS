@@ -28,7 +28,10 @@ public:
 
     IBuffPacket* Create(const char* pFileName = __FILE__, uint32 u4Line = __LINE__);
     bool Delete(IBuffPacket* pBuffPacket);
-    void GetCreateInfoList(vector<_Object_Create_Info>& objCreateList);
+    uint32 GetCreateInfoCount();
+    bool GetCreateInfoList(uint32 u4Index, _Object_Create_Info& objCreateInfo);
+private:
+    vector<_Object_Create_Info> m_objCreateList;
 };
 
 typedef ACE_Singleton<CBuffPacketManager, ACE_Null_Mutex> App_BuffPacketManager;
