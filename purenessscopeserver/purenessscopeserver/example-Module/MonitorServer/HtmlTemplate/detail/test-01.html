@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>detail</title>
+    <script src="../js/echarts.min.js"></script>
+	<script src="../js/jquery-1.8.3.min.js"></script> 
+</head>
+<script type="text/javascript">
+	//读取WorkThread Json文件
+	$.getJSON("../json/test-01_cpu.json", function(strJson){
+		// 基于准备好的dom，初始化echarts实例
+		var myChartWK = echarts.init(document.getElementById('Cpu'));
+		
+		// 指定图表的配置项和数据
+		var option = strJson;
+		
+		// 使用刚指定的配置项和数据显示图表。
+		myChartWK.setOption(option);
+	});
+	
+	//读取Connect Json文件
+	$.getJSON("../json/test-01_memory.json", function(strJson){
+		// 基于准备好的dom，初始化echarts实例
+		var myChartC = echarts.init(document.getElementById('Memory'));
+		
+		// 指定图表的配置项和数据
+		var option = strJson;
+		
+		// 使用刚指定的配置项和数据显示图表。
+		myChartC.setOption(option);	
+	});	
+	
+	//读取Connect Json文件
+	$.getJSON("../json/test-01_connect.json", function(strJson){
+		// 基于准备好的dom，初始化echarts实例
+		var myChartC = echarts.init(document.getElementById('Connect'));
+		
+		// 指定图表的配置项和数据
+		var option = strJson;
+		
+		// 使用刚指定的配置项和数据显示图表。
+		myChartC.setOption(option);	
+	});		
+	
+	//读取Connect Json文件
+	$.getJSON("../json/test-01_flow.json", function(strJson){
+		// 基于准备好的dom，初始化echarts实例
+		var myChartC = echarts.init(document.getElementById('Flow'));
+		
+		// 指定图表的配置项和数据
+		var option = strJson;
+		
+		// 使用刚指定的配置项和数据显示图表。
+		myChartC.setOption(option);	
+	});			
+</script>
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="Cpu" style="position: relative; overflow: hidden; width: 600px; height: 400px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;">
+    </div>
+    <div id="Memory" style="position: relative; overflow: hidden; width: 600px; height: 400px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;">
+    </div>
+    <div id="Connect" style="position: relative; overflow: hidden; width: 600px; height: 400px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;">
+    </div>
+    <div id="Flow" style="position: relative; overflow: hidden; width: 600px; height: 400px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;">
+    </div>		
+</body>
+</html>

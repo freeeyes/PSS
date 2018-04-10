@@ -1,0 +1,7 @@
+{"title": {"text": "PSS Work Thread"},"tooltip" : {}, "legend" : {"data":["time"]},"xAxis" : {"type": "category","data": ["09:54:12"]}
+,"yAxis" : {"type":"value"}, "series": [{"name":"0","type": "line","smooth": "true","data": [0]}
+,{"name":"1","type": "line","smooth": "true","data": [0]}
+,{"name":"2","type": "line","smooth": "true","data": [0]}
+,{"name":"3","type": "line","smooth": "true","data": [0]}
+,{"name":"4","type": "line","smooth": "true","data": [0]}
+]}
