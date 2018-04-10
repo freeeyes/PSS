@@ -99,7 +99,7 @@ public:
     const char* GetModuleFileDesc(const char* pModuleName);
     uint16 GetModuleCount();
     void GetAllModuleInfo(vector<_ModuleInfo*>& vecModeInfo);
-    void GetAllModuleName(vector<string> vecModuleName);
+    bool GetAllModuleName(uint32 u4Index, char* pName, uint16 nLen);
 
 private:
     bool LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo, const char* pModulePath);    //开始加载模块的接口和数据
@@ -109,6 +109,7 @@ private:
     char                               m_szModulePath[MAX_BUFF_200];
     vector<_WaitUnloadModule>          m_vecWaitUnloadModule;
     ACE_Recursive_Thread_Mutex         m_tmModule;
+    vector<string>                     m_vecModuleNameList;               //当前插件名称列表
 };
 
 typedef ACE_Singleton<CLoadModule, ACE_Null_Mutex> App_ModuleLoader;

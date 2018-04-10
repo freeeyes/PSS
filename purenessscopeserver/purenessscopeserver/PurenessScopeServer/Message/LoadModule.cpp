@@ -464,19 +464,33 @@ void CLoadModule::GetAllModuleInfo(vector<_ModuleInfo*>& vecModeInfo)
 {
     vecModeInfo.clear();
     m_objHashModuleList.Get_All_Used(vecModeInfo);
-}
 
-void CLoadModule::GetAllModuleName(vector<string> vecModuleName)
-{
-    vecModuleName.clear();
-    vector<_ModuleInfo*> vecModeInfo;
-    m_objHashModuleList.Get_All_Used(vecModeInfo);
+    m_vecModuleNameList.clear();
 
     uint32 u4Size = (uint32)vecModeInfo.size();
 
-    for(uint32 i = 0; i < u4Size; i++)
+    for (uint32 i = 0; i < u4Size; i++)
     {
-        vecModuleName.push_back((string)vecModeInfo[i]->GetName());
+        m_vecModuleNameList.push_back((string)vecModeInfo[i]->GetName());
     }
+}
+
+bool CLoadModule::GetAllModuleName(uint32 u4Index, char* pName, uint16 nLen)
+{
+    if (u4Index >= m_vecModuleNameList.size())
+    {
+        return false;
+    }
+
+    if (nLen <= m_vecModuleNameList[u4Index].length())
+    {
+        OUR_DEBUG((LM_INFO, "[CLoadModule::GetAllModuleName]pName len(%d) is more than(%d).\n",
+                   m_vecModuleNameList[u4Index].length(),
+                   nLen));
+        return false;
+    }
+
+    sprintf_safe(pName, nLen, "%s", m_vecModuleNameList[u4Index].c_str());
+    return true;
 }
 
