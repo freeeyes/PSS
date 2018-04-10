@@ -3911,10 +3911,7 @@ void CConsoleMessage::Do_Message_BuffPacket(_CommandInfo& CommandInfo, IBuffPack
     {
         u2ReturnCommandID = CONSOLE_COMMAND_PACKET_STATE;
 
-        vector<_Object_Create_Info> objCreateList;
-        App_BuffPacketManager::instance()->GetCreateInfoList(objCreateList);
-
-        uint32 u4Count = (uint32)objCreateList.size();
+        uint32 u4Count = App_BuffPacketManager::instance()->GetCreateInfoCount();
 
         if (CommandInfo.m_u1OutputType == 0)
         {
@@ -3929,23 +3926,26 @@ void CConsoleMessage::Do_Message_BuffPacket(_CommandInfo& CommandInfo, IBuffPack
 
         for (uint32 i = 0; i < u4Count; i++)
         {
+            _Object_Create_Info objCreateInfo;
+            App_BuffPacketManager::instance()->GetCreateInfoList(i, objCreateInfo);
+
             VCHARS_STR strFileName;
-            strFileName.text = objCreateList[i].m_szCreateFileName;
-            strFileName.u1Len = (uint8)ACE_OS::strlen(objCreateList[i].m_szCreateFileName);
+            strFileName.text = objCreateInfo.m_szCreateFileName;
+            strFileName.u1Len = (uint8)ACE_OS::strlen(objCreateInfo.m_szCreateFileName);
 
             if (CommandInfo.m_u1OutputType == 0)
             {
                 (*pBuffPacket) << strFileName;
-                (*pBuffPacket) << objCreateList[i].m_u4Line;
-                (*pBuffPacket) << objCreateList[i].m_u4Count;
+                (*pBuffPacket) << objCreateInfo.m_u4Line;
+                (*pBuffPacket) << objCreateInfo.m_u4Count;
             }
             else
             {
                 char szTemp[MAX_BUFF_1024] = { '\0' };
                 sprintf_safe(szTemp, MAX_BUFF_1024, "strFileName=%s,m_u4Line=%d,m_u4Count=%d.\n",
-                             objCreateList[i].m_szCreateFileName,
-                             objCreateList[i].m_u4Line,
-                             objCreateList[i].m_u4Count);
+                             objCreateInfo.m_szCreateFileName,
+                             objCreateInfo.m_u4Line,
+                             objCreateInfo.m_u4Count);
                 pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
             }
         }
