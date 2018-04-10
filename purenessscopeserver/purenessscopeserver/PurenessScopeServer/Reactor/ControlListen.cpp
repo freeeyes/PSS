@@ -77,9 +77,9 @@ bool CControlListen::DelListen( const char* pListenIP, uint32 u4Port )
     return App_ConnectAcceptorManager::instance()->Close(pListenIP, u4Port);
 }
 
-void CControlListen::ShowListen( vecControlInfo& objControlInfo )
+NAMESPACE::uint32 CControlListen::GetListenCount()
 {
-    objControlInfo.clear();
+    m_vecListenList.clear();
 
     if (0 == App_ConnectAcceptorManager::instance()->GetCount())
     {
@@ -95,7 +95,7 @@ void CControlListen::ShowListen( vecControlInfo& objControlInfo )
             sprintf_safe(objInfo.m_szListenIP,
                          MAX_BUFF_20, "%s", pServerInfo->m_szServerIP);
             objInfo.m_u4Port = pServerInfo->m_nPort;
-            objControlInfo.push_back(objInfo);
+            m_vecListenList.push_back(objInfo);
         }
     }
     else
@@ -110,10 +110,23 @@ void CControlListen::ShowListen( vecControlInfo& objControlInfo )
                 sprintf_safe(objInfo.m_szListenIP,
                              MAX_BUFF_20, "%s", pConnectAcceptor->GetListenIP());
                 objInfo.m_u4Port = pConnectAcceptor->GetListenPort();
-                objControlInfo.push_back(objInfo);
+                m_vecListenList.push_back(objInfo);
             }
         }
     }
+
+    return (uint32)m_vecListenList.size();
+}
+
+bool CControlListen::ShowListen(uint32 u4Index, _ControlInfo& objControlInfo)
+{
+    if (u4Index >= m_vecListenList.size())
+    {
+        return false;
+    }
+
+    objControlInfo = m_vecListenList[u4Index];
+    return true;
 }
 
 uint32 CControlListen::GetServerID()

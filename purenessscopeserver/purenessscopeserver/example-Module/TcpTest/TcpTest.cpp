@@ -83,12 +83,13 @@ int LoadModuleData(CServerObject* pServerObject)
     }
 
     //显示监听端口信息
-    vecControlInfo objListenList;
-    pServerObject->GetControlListen()->ShowListen(objListenList);
+    uint32 u4ListenCount = pServerObject->GetControlListen()->GetListenCount();
 
-    for (int i = 0; i < (int)objListenList.size(); i++)
+    for (uint32 i = 0; i < u4ListenCount; i++)
     {
-        OUR_DEBUG((LM_INFO, "[Base LoadModuleData] Listen IP=%s, Pord=%d.\n", objListenList[i].m_szListenIP, objListenList[i].m_u4Port));
+        _ControlInfo objControlInfo;
+        pServerObject->GetControlListen()->ShowListen(i, objControlInfo);
+        OUR_DEBUG((LM_INFO, "[Base LoadModuleData] Listen IP=%s, Pord=%d.\n", objControlInfo.m_szListenIP, objControlInfo.m_u4Port));
     }
 
     //显示框架工作线程ID

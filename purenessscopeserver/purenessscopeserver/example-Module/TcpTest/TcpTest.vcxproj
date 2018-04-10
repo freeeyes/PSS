@@ -227,13 +227,9 @@
   <ItemGroup>
     <ClCompile Include="BaseCommand.cpp" />
     <ClCompile Include="TcpTest.cpp" />
-    <ClCompile Include="IniRead\dictionary.c" />
-    <ClCompile Include="IniRead\iniparser.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseCommand.h" />
-    <ClInclude Include="IniRead\dictionary.h" />
-    <ClInclude Include="IniRead\iniparser.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="TcpTest.mpc">

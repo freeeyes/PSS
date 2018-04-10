@@ -3579,73 +3579,77 @@ void CConsoleMessage::DoMessage_ShowListen(_CommandInfo& CommandInfo, IBuffPacke
     if(ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
 #ifdef WIN32
-        vecControlInfo objControlInfo;
-        App_ProControlListen::instance()->ShowListen(objControlInfo);
+        uint32 u4ListenCount = App_ProControlListen::instance()->GetListenCount();
 
         if (CommandInfo.m_u1OutputType == 0)
         {
-            (*pBuffPacket) << (uint32)objControlInfo.size();
+            (*pBuffPacket) << u4ListenCount;
         }
         else
         {
             char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "objControlInfo Count=%d.\n", objControlInfo.size());
+            sprintf_safe(szTemp, MAX_BUFF_1024, "objControlInfo Count=%d.\n", u4ListenCount);
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
         }
 
-        for(uint32 i = 0; i < (uint32)objControlInfo.size(); i++)
+        for(uint32 i = 0; i < u4ListenCount; i++)
         {
+            _ControlInfo obj_ControlInfo;
+            App_ProControlListen::instance()->ShowListen(i, obj_ControlInfo);
+
             VCHARS_STR strIP;
-            strIP.text  = objControlInfo[i].m_szListenIP;
-            strIP.u1Len = (uint8)ACE_OS::strlen(objControlInfo[i].m_szListenIP);
+            strIP.text  = obj_ControlInfo.m_szListenIP;
+            strIP.u1Len = (uint8)ACE_OS::strlen(obj_ControlInfo.m_szListenIP);
 
             if (CommandInfo.m_u1OutputType == 0)
             {
                 (*pBuffPacket) << strIP;
-                (*pBuffPacket) << objControlInfo[i].m_u4Port;
+                (*pBuffPacket) << obj_ControlInfo.m_u4Port;
             }
             else
             {
                 char szTemp[MAX_BUFF_1024] = { '\0' };
                 sprintf_safe(szTemp, MAX_BUFF_1024, "strIP=%s,m_u4Port=%d.\n",
-                             objControlInfo[i].m_szListenIP,
-                             objControlInfo[i].m_u4Port);
+                             obj_ControlInfo.m_szListenIP,
+                             obj_ControlInfo.m_u4Port);
                 pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
             }
         }
 
 #else
-        vecControlInfo objControlInfo;
-        App_ControlListen::instance()->ShowListen(objControlInfo);
+        uint32 u4ListenCount = App_ControlListen::instance()->GetListenCount();
 
         if (CommandInfo.m_u1OutputType == 0)
         {
-            (*pBuffPacket) << (uint32)objControlInfo.size();
+            (*pBuffPacket) << u4ListenCount;
         }
         else
         {
             char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "objControlInfo Count=%d.\n", objControlInfo.size());
+            sprintf_safe(szTemp, MAX_BUFF_1024, "objControlInfo Count=%d.\n", u4ListenCount);
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
         }
 
-        for(uint32 i = 0; i < (uint32)objControlInfo.size(); i++)
+        for(uint32 i = 0; i < u4ListenCount; i++)
         {
+            _ControlInfo obj_ControlInfo;
+            App_ControlListen::instance()->ShowListen(i, obj_ControlInfo);
+
             VCHARS_STR strIP;
-            strIP.text  = objControlInfo[i].m_szListenIP;
-            strIP.u1Len = (uint8)ACE_OS::strlen(objControlInfo[i].m_szListenIP);
+            strIP.text  = obj_ControlInfo.m_szListenIP;
+            strIP.u1Len = (uint8)ACE_OS::strlen(obj_ControlInfo.m_szListenIP);
 
             if (CommandInfo.m_u1OutputType == 0)
             {
                 (*pBuffPacket) << strIP;
-                (*pBuffPacket) << objControlInfo[i].m_u4Port;
+                (*pBuffPacket) << obj_ControlInfo.m_u4Port;
             }
             else
             {
                 char szTemp[MAX_BUFF_1024] = { '\0' };
                 sprintf_safe(szTemp, MAX_BUFF_1024, "strIP=%s,m_u4Port=%d.\n",
-                             objControlInfo[i].m_szListenIP,
-                             objControlInfo[i].m_u4Port);
+                             obj_ControlInfo.m_szListenIP,
+                             obj_ControlInfo.m_u4Port);
                 pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
             }
         }

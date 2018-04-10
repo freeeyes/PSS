@@ -16,9 +16,6 @@
     <Filter Include="Documentation">
       <UniqueIdentifier>{296cea86-dcb3-4676-a318-ffae8215e6e4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="IniRead">
-      <UniqueIdentifier>{9b91f967-f053-4b7c-849d-e04a52f3e702}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BaseCommand.cpp">
@@ -27,22 +24,10 @@
     <ClCompile Include="TcpTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IniRead\dictionary.c">
-      <Filter>IniRead</Filter>
-    </ClCompile>
-    <ClCompile Include="IniRead\iniparser.c">
-      <Filter>IniRead</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseCommand.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IniRead\dictionary.h">
-      <Filter>IniRead</Filter>
-    </ClInclude>
-    <ClInclude Include="IniRead\iniparser.h">
-      <Filter>IniRead</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

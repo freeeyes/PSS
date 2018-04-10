@@ -87,9 +87,9 @@ bool CProControlListen::DelListen(const char* pListenIP, uint32 u4Port)
     return App_ProConnectAcceptManager::instance()->Close(pListenIP, u4Port);
 }
 
-void CProControlListen::ShowListen(vecControlInfo& objProControlInfo)
+uint32 CProControlListen::GetListenCount()
 {
-    objProControlInfo.clear();
+    m_vecListenList.clear();
 
     if (0 == App_ProConnectAcceptManager::instance()->GetCount())
     {
@@ -105,7 +105,7 @@ void CProControlListen::ShowListen(vecControlInfo& objProControlInfo)
             sprintf_safe(objInfo.m_szListenIP,
                          MAX_BUFF_20, "%s", pServerInfo->m_szServerIP);
             objInfo.m_u4Port = pServerInfo->m_nPort;
-            objProControlInfo.push_back(objInfo);
+            m_vecListenList.push_back(objInfo);
         }
     }
     else
@@ -120,10 +120,23 @@ void CProControlListen::ShowListen(vecControlInfo& objProControlInfo)
                 sprintf_safe(objInfo.m_szListenIP,
                              MAX_BUFF_20, "%s", pProConnectAcceptor->GetListenIP());
                 objInfo.m_u4Port = pProConnectAcceptor->GetListenPort();
-                objProControlInfo.push_back(objInfo);
+                m_vecListenList.push_back(objInfo);
             }
         }
     }
+
+    return (uint32)m_vecListenList.size();
+}
+
+bool CProControlListen::ShowListen(uint32 u4Index, _ControlInfo& objControlInfo)
+{
+    if (u4Index >= m_vecListenList.size())
+    {
+        return false;
+    }
+
+    objControlInfo = m_vecListenList[u4Index];
+    return true;
 }
 
 uint32 CProControlListen::GetServerID()
