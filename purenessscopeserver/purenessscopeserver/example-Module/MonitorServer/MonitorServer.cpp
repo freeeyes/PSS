@@ -4,6 +4,7 @@
 //add by freeeyes
 //2011-09-20
 
+#include "TimeEvent.h"
 #include "MonitorCommand.h"
 #include "IObject.h"
 
@@ -37,6 +38,8 @@ extern "C"
 
 CPSSMonitorCommand*     g_MonitorCommand = NULL;
 CServerObject*          g_pServerObject  = NULL;
+ACE_Event_Handler*      g_pTimeEventTask = NULL;
+long                    g_lTimeEventID   = 0;
 
 int LoadModuleData(CServerObject* pServerObject)
 {
@@ -83,6 +86,13 @@ int UnLoadModuleData()
     //卸载插件，会自动调用插件回收，不需要在手动pMessageManager->DelClientCommand
     OUR_DEBUG((LM_INFO, "[Base UnLoadModuleData] Begin.\n"));
 
+    //停止定时器
+    g_MonitorCommand->GetServerObject()->GetTimerManager()->cancel(g_lTimeEventID, NULL);
+
+    //删除对象
+    SAFE_DELETE(g_pTimeEventTask);
+
+    //清除Message对象
     SAFE_DELETE(g_MonitorCommand);
 
     OUR_DEBUG((LM_INFO, "[Base UnLoadModuleData] End.\n"));
@@ -106,7 +116,15 @@ int InitModule(CServerObject* pServerObject)
         else
         {
             //初始化定时器
-            //pServerObject->GetTimerManager()->schedule();
+
+            ACE_NEW_RETURN(g_pTimeEventTask, CTimeEventTask, 0);
+
+            uint32 u4IntervalSecond = CDataManager::GetInstance()->GetTimeInterval();
+
+            g_lTimeEventID = pServerObject->GetTimerManager()->schedule(g_pTimeEventTask,
+                             NULL,
+                             ACE_OS::gettimeofday() + ACE_Time_Value(u4IntervalSecond),
+                             ACE_Time_Value(u4IntervalSecond));
         }
     }
     else

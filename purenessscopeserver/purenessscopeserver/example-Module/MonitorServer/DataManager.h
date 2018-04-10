@@ -56,7 +56,7 @@ typedef struct PSSNODEINFO
         this->m_tvRecvTime = ar.m_tvRecvTime;
         return *this;
     }
-}PssNodeInfoSt;
+} PssNodeInfoSt;
 
 class CDataManager
 {
@@ -69,7 +69,7 @@ public:
     bool ParseXmlFile(const char* pXmlFile);
 
     //增加节点数据
-    void AddNodeDate(uint32 u4ConnectId,uint32 u4Cpu,uint32 u4MemorySize,uint32 u4ConnectCount,uint32 u4DataIn,uint32 u4DataOut);
+    void AddNodeDate(const char* pIP, uint32 u4Cpu,uint32 u4MemorySize,uint32 u4ConnectCount,uint32 u4DataIn,uint32 u4DataOut);
 
     //生成index html文件
     void make_index_html();

@@ -3,6 +3,7 @@ project(Monitor):acelib{
   dynamicflags += TEST_TCP_BUILD_DLL
   
   Source_Files{
+	./TinyXML/*.cpp
   	./*.cpp 
   }
   specific (gnuace){
@@ -17,5 +18,5 @@ project(Monitor):acelib{
 	dllout = ../../PurenessScopeServer/Linux_Bin
   }
   includes += .
-  includes += ../../Common ./IniRead
+  includes += ../../Common ./TinyXML
 }

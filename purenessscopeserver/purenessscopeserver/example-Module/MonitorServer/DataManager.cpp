@@ -19,7 +19,7 @@ void CDataManager::Close()
         m_pTiXmlDocument = NULL;
         m_pRootElement   = NULL;
     }
-    
+
     if (NULL != m_pInstance)
     {
         delete m_pInstance;
@@ -49,7 +49,7 @@ bool CDataManager::ParseXmlFile(const char* pXmlFile)
 }
 
 //增加节点数据
-void CDataManager::AddNodeDate(uint32 u4ConnectId,uint32 u4Cpu,uint32 u4MemorySize,uint32 u4ConnectCount,uint32 u4DataIn,uint32 u4DataOut)
+void CDataManager::AddNodeDate(const char* pIP, uint32 u4Cpu,uint32 u4MemorySize,uint32 u4ConnectCount,uint32 u4DataIn,uint32 u4DataOut)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 }

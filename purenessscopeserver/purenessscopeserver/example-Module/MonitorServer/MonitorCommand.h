@@ -24,6 +24,7 @@ public:
 
     int DoMessage(IMessage* pMessage, bool& bDeleteFlag);
     void SetServerObject(CServerObject* pServerObject);
+    CServerObject* GetServerObject();
 
 private:
     int Do_Pss_Login(IMessage* pMessage);

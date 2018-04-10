@@ -44,6 +44,11 @@ void CPSSMonitorCommand::SetServerObject(CServerObject* pServerObject)
     m_pServerObject = pServerObject;
 }
 
+CServerObject* CPSSMonitorCommand::GetServerObject()
+{
+    return m_pServerObject;
+}
+
 int CPSSMonitorCommand::Do_Pss_Login(IMessage* pMessage)
 {
     OUR_DEBUG((LM_INFO, "[CPSSMonitorCommand::Do_Pss_Login]=====.\n"));
