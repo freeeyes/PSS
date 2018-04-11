@@ -139,7 +139,7 @@ int CMonitorCommand::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 int CMonitorCommand::Init(const char* pJson, CServerObject* pServerObject)
 {
     //测试Json
-    //{"MonitorIP":"127.0.0.1","MonitorPort":"10050","MonitorIP":"127.0.0.1","TimeInterval":"60"}
+    //{"MonitorIP":"127.0.0.1","MonitorPort":"10050","LocalIP":"127.0.0.1","TimeInterval":"60"}
 
     //接收配置的Json参数
     cJSON* pJsonParse = cJSON_Parse(pJson);
