@@ -224,14 +224,6 @@ bool CDataManager::ParseXmlFile(const char* pXmlFile)
     }
 
     mapIP2NodeData objMapIP2NodeData;
-    PssNodeInfoList* pNodeInfo = new PssNodeInfoList;
-
-    if(pNodeInfo != NULL)
-    {
-        pNodeInfo->Init(m_u4HistoryMaxCount);
-        objMapIP2NodeData.insert(std::make_pair("UnkownHost", pNodeInfo));
-    }
-
     m_mapGroupNodeData.insert(std::make_pair("UnkownGroup", objMapIP2NodeData));
 
     /*
@@ -275,16 +267,6 @@ void CDataManager::AddNodeDate(const char* pIP, uint32 u4Cpu,uint32 u4MemorySize
                 objPssNodeInfoSt.m_tvRecvTime = ACE_OS::gettimeofday();
                 pNodeInfo->AddObject(objPssNodeInfoSt);
             }
-            else
-            {
-                //δ֪IP
-                OUR_DEBUG((LM_INFO, "[CDataManager::AddNodeDate]pIP:%s is not found.\n",pIP));
-            }
-        }
-        else
-        {
-            //δ֪IP
-            OUR_DEBUG((LM_INFO, "[CDataManager::AddNodeDate]strGroupName:%s is not found.\n",strGroupName.c_str()));
         }
     }
     else
@@ -295,24 +277,35 @@ void CDataManager::AddNodeDate(const char* pIP, uint32 u4Cpu,uint32 u4MemorySize
 
         if (itGroupNodeData != m_mapGroupNodeData.end())
         {
+            PssNodeInfoSt objPssNodeInfoSt;
+            sprintf_safe(objPssNodeInfoSt.m_szClientIP, MAX_BUFF_50, "%s", pIP);
+            objPssNodeInfoSt.m_u4Cpu = u4Cpu;
+            objPssNodeInfoSt.m_u4MemorySize = u4MemorySize;
+            objPssNodeInfoSt.m_u4ConnectCount = u4ConnectCount;
+            objPssNodeInfoSt.m_u4DataIn = u4DataIn;
+            objPssNodeInfoSt.m_u4DataOut = u4DataOut;
+            objPssNodeInfoSt.m_tvRecvTime = ACE_OS::gettimeofday();
+
             mapIP2NodeData& objMapIP2NodeData = (mapIP2NodeData)itGroupNodeData->second;
-            mapIP2NodeData::iterator itIP2Node = objMapIP2NodeData.find("UnkownHost");
+            mapIP2NodeData::iterator itIP2Node = objMapIP2NodeData.find(pIP);
 
             if (itIP2Node != objMapIP2NodeData.end())
             {
                 PssNodeInfoList* pNodeInfo = (PssNodeInfoList*)itIP2Node->second;
-                PssNodeInfoSt objPssNodeInfoSt;
-                sprintf_safe(objPssNodeInfoSt.m_szClientIP, MAX_BUFF_50, "%s", pIP);
-                objPssNodeInfoSt.m_u4Cpu = u4Cpu;
-                objPssNodeInfoSt.m_u4MemorySize = u4MemorySize;
-                objPssNodeInfoSt.m_u4ConnectCount = u4ConnectCount;
-                objPssNodeInfoSt.m_u4DataIn = u4DataIn;
-                objPssNodeInfoSt.m_u4DataOut = u4DataOut;
-                objPssNodeInfoSt.m_tvRecvTime = ACE_OS::gettimeofday();
                 pNodeInfo->AddObject(objPssNodeInfoSt);
             }
+            else
+            {
+                PssNodeInfoList* pNodeInfo = new PssNodeInfoList;
+
+                if(pNodeInfo != NULL)
+                {
+                    pNodeInfo->Init(m_u4HistoryMaxCount);
+                    pNodeInfo->AddObject(objPssNodeInfoSt);
+                    objMapIP2NodeData.insert(std::make_pair(pIP, pNodeInfo));
+                }
+            }
         }
-        
     }
 }
 
