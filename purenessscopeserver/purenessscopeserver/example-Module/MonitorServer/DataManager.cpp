@@ -23,16 +23,16 @@ void CDataManager::Close()
     for (mapGroupNodeData::iterator itGroupNodeData = m_mapGroupNodeData.begin();
          itGroupNodeData != m_mapGroupNodeData.end(); itGroupNodeData++)
     {
-        mapIP2NodeData& objMapIP2NodeData = (mapIP2NodeData)itGroupNodeData->second;
+        mapIP2NodeData* pMapIP2NodeData = (mapIP2NodeData*)(&itGroupNodeData->second);
 
-        for (mapIP2NodeData::iterator itIP2Node = objMapIP2NodeData.begin();
-             itIP2Node != objMapIP2NodeData.end(); )
+        for (mapIP2NodeData::iterator itIP2Node = pMapIP2NodeData->begin();
+             itIP2Node != pMapIP2NodeData->end(); )
         {
             PssNodeInfoList* pNodeInfo = (PssNodeInfoList*)itIP2Node->second;
             delete pNodeInfo;
             pNodeInfo = NULL;
 
-            objMapIP2NodeData.erase(itIP2Node++);
+            pMapIP2NodeData->erase(itIP2Node++);
         }
     }
 
@@ -242,7 +242,7 @@ bool CDataManager::ParseXmlFile(const char* pXmlFile)
 void CDataManager::AddNodeDate(const char* pIP, uint32 u4Cpu,uint32 u4MemorySize,uint32 u4ConnectCount,uint32 u4DataIn,uint32 u4DataOut)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
-    mapIP2GroupName::iterator itIP2Group = m_mapIP2GroupName.find(pIP);
+    mapIP2GroupName::iterator itIP2Group = m_mapIP2GroupName.find(string(pIP));
 
     if (itIP2Group != m_mapIP2GroupName.end())
     {
@@ -251,10 +251,10 @@ void CDataManager::AddNodeDate(const char* pIP, uint32 u4Cpu,uint32 u4MemorySize
 
         if (itGroupNodeData != m_mapGroupNodeData.end())
         {
-            mapIP2NodeData& objMapIP2NodeData = (mapIP2NodeData)itGroupNodeData->second;
-            mapIP2NodeData::iterator itIP2Node = objMapIP2NodeData.find(pIP);
+            mapIP2NodeData* pMapIP2NodeData = (mapIP2NodeData*)(&itGroupNodeData->second);
+            mapIP2NodeData::iterator itIP2Node = pMapIP2NodeData->find(string(pIP));
 
-            if (itIP2Node != objMapIP2NodeData.end())
+            if (itIP2Node != pMapIP2NodeData->end())
             {
                 PssNodeInfoList* pNodeInfo = (PssNodeInfoList*)itIP2Node->second;
                 PssNodeInfoSt objPssNodeInfoSt;
@@ -286,10 +286,10 @@ void CDataManager::AddNodeDate(const char* pIP, uint32 u4Cpu,uint32 u4MemorySize
             objPssNodeInfoSt.m_u4DataOut = u4DataOut;
             objPssNodeInfoSt.m_tvRecvTime = ACE_OS::gettimeofday();
 
-            mapIP2NodeData& objMapIP2NodeData = (mapIP2NodeData)itGroupNodeData->second;
-            mapIP2NodeData::iterator itIP2Node = objMapIP2NodeData.find(pIP);
+            mapIP2NodeData* pMapIP2NodeData = (mapIP2NodeData*)(&itGroupNodeData->second);
+            mapIP2NodeData::iterator itIP2Node = pMapIP2NodeData->find(string(pIP));
 
-            if (itIP2Node != objMapIP2NodeData.end())
+            if (itIP2Node != pMapIP2NodeData->end())
             {
                 PssNodeInfoList* pNodeInfo = (PssNodeInfoList*)itIP2Node->second;
                 pNodeInfo->AddObject(objPssNodeInfoSt);
@@ -302,7 +302,7 @@ void CDataManager::AddNodeDate(const char* pIP, uint32 u4Cpu,uint32 u4MemorySize
                 {
                     pNodeInfo->Init(m_u4HistoryMaxCount);
                     pNodeInfo->AddObject(objPssNodeInfoSt);
-                    objMapIP2NodeData.insert(std::make_pair(pIP, pNodeInfo));
+                    pMapIP2NodeData->insert(std::make_pair(pIP, pNodeInfo));
                 }
             }
         }
