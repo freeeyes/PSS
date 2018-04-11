@@ -13,6 +13,6 @@
 	<!-- group分组设置，可以多个 -->
 	<group name="test">
 		<!-- ServerInfo设置，可以多个 -->
-		<ServerInfo name="test-01" ip="127.0.0.1" hsitorymaxcount="10"/>
-	</Group>
+		<ServerInfo name="test-01" ip="127.0.0.1" historymaxcount="10"/>
+	</group>
 </config>

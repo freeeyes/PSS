@@ -80,8 +80,8 @@ public:
 private:
     CDataManager();
 
-    char* GetData(const char* pName, const char* pAttrName);
-    char* GetData(const char* pName, const char* pAttrName, TiXmlElement*& pNextTiXmlElement);
+    char* GetData(TiXmlElement* pRootElement,const char* pName, const char* pAttrName);
+    char* GetData(TiXmlElement* pRootElement,const char* pName, const char* pAttrName, TiXmlElement*& pNextTiXmlElement);
 public:
     static CDataManager* GetInstance();
 
@@ -94,12 +94,9 @@ private:
     ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;
 
     typedef CObjectLruList<PssNodeInfoSt, ACE_Null_Mutex> PssNodeInfoList;
-    typedef map<uint32,string> mapConnectId2IP;
     typedef map<string,string> mapIP2GroupName;
-    typedef map<string,map<string,PssNodeInfoList*> > mapGroupNodeData;
-
-    //连接id到IP的映射关系
-    mapConnectId2IP m_mapConnectId2IP;
+    typedef map<string,PssNodeInfoList*> mapIP2NodeData;
+    typedef map<string,mapIP2NodeData > mapGroupNodeData;
 
     //ip到组名的映射
     mapIP2GroupName m_mapIP2GroupName;
@@ -108,6 +105,13 @@ private:
     mapGroupNodeData m_mapGroupNodeData;
 
 private:
+    string m_strHtmlIndexPath;      //htmlindex文件的路径
+    string m_strHtmlIndexName;      //htmlindex文件的名称
+    string m_strHtmlDetailPath;     //htmldetail文件的路径
+    string m_strHtmlJsonPath;       //htmlJson文件的路径
+    uint32 m_u4HistoryMaxCount;
+    uint32 m_u4TimeInterval;
+    
     TiXmlDocument* m_pTiXmlDocument;
     TiXmlElement*  m_pRootElement;
 };
