@@ -31,7 +31,7 @@ void CDataManager::Close()
             PssNodeInfoList* pNodeInfo = (PssNodeInfoList*)itIP2Node->second;
             delete pNodeInfo;
             pNodeInfo = NULL;
-            
+
             objMapIP2NodeData.erase(itIP2Node++);
         }
     }
@@ -255,7 +255,7 @@ void CDataManager::AddNodeDate(const char* pIP, uint32 u4Cpu,uint32 u4MemorySize
     if (itIP2Group != m_mapIP2GroupName.end())
     {
         string strGroupName = itIP2Group->second;
-        mapGroupNodeData::iterator itGroupNodeData = m_mapGroupNodeData.find(pIP);
+        mapGroupNodeData::iterator itGroupNodeData = m_mapGroupNodeData.find(strGroupName);
 
         if (itGroupNodeData != m_mapGroupNodeData.end())
         {
@@ -291,6 +291,28 @@ void CDataManager::AddNodeDate(const char* pIP, uint32 u4Cpu,uint32 u4MemorySize
     {
         //δ֪IP
         OUR_DEBUG((LM_INFO, "[CDataManager::AddNodeDate]pIP:%s is not found.\n",pIP));
+        mapGroupNodeData::iterator itGroupNodeData = m_mapGroupNodeData.find("UnkownGroup");
+
+        if (itGroupNodeData != m_mapGroupNodeData.end())
+        {
+            mapIP2NodeData& objMapIP2NodeData = (mapIP2NodeData)itGroupNodeData->second;
+            mapIP2NodeData::iterator itIP2Node = objMapIP2NodeData.find("UnkownHost");
+
+            if (itIP2Node != objMapIP2NodeData.end())
+            {
+                PssNodeInfoList* pNodeInfo = (PssNodeInfoList*)itIP2Node->second;
+                PssNodeInfoSt objPssNodeInfoSt;
+                sprintf_safe(objPssNodeInfoSt.m_szClientIP, MAX_BUFF_50, "%s", pIP);
+                objPssNodeInfoSt.m_u4Cpu = u4Cpu;
+                objPssNodeInfoSt.m_u4MemorySize = u4MemorySize;
+                objPssNodeInfoSt.m_u4ConnectCount = u4ConnectCount;
+                objPssNodeInfoSt.m_u4DataIn = u4DataIn;
+                objPssNodeInfoSt.m_u4DataOut = u4DataOut;
+                objPssNodeInfoSt.m_tvRecvTime = ACE_OS::gettimeofday();
+                pNodeInfo->AddObject(objPssNodeInfoSt);
+            }
+        }
+        
     }
 }
 
