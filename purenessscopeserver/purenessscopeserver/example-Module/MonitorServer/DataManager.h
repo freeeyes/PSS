@@ -3,13 +3,21 @@
 
 #include "define.h"
 #include "ObjectLru.h"
+#include "HtmlPraseDoc.h"
 #include "ace/Date_Time.h"
 
 #include "tinyxml.h"
 #include "tinystr.h"
 
+#ifndef WIN32
+#include <iconv.h>
+#endif
+
+#include <stdio.h>
+#include <stdlib.h>
 #include <vector>
 #include <map>
+#include <iostream>
 using namespace std;
 
 //PSS节点监控信息
@@ -25,13 +33,13 @@ typedef struct PSSNODEINFO
 
     PSSNODEINFO()
     {
-        m_szClientIP[0]  = '\0';
-        m_u4Cpu          = 0;
-        m_u4MemorySize   = 0;
-        m_u4ConnectCount = 0;
-        m_u4DataIn       = 0;
-        m_u4DataOut      = 0;
-        m_tvRecvTime     = 0;
+        m_szClientIP[0]   = '\0';
+        m_u4Cpu           = 0;
+        m_u4MemorySize    = 0;
+        m_u4ConnectCount  = 0;
+        m_u4DataIn        = 0;
+        m_u4DataOut       = 0;
+        m_tvRecvTime      = 0;
     }
 
     //拷贝构造函数
@@ -152,12 +160,16 @@ private:
     typedef map<string,string> mapIP2GroupName;
     typedef map<string, PssNodeInfoList*> mapIP2NodeData;
     typedef map<string, mapIP2NodeData> mapGroupNodeData;
+    typedef map<string,string> mapIP2ServerName;
 
     //ip到组名的映射
     mapIP2GroupName m_mapIP2GroupName;
 
     //组到对应的节点信息的映射
     mapGroupNodeData m_mapGroupNodeData;
+
+    //ip到servername的映射
+    mapIP2ServerName m_mapIP2ServerName;
 
 private:
     string m_strHtmlIndexPath;      //htmlindex文件的路径
@@ -170,6 +182,45 @@ private:
 
     TiXmlDocument* m_pTiXmlDocument;
     TiXmlElement*  m_pRootElement;
+
+private:
+#ifndef WIN32
+    string code_convert(char* source_charset, char* to_charset, const string& sourceStr) //sourceStr是源编码字符串
+    {
+        iconv_t cd = iconv_open(to_charset, source_charset);//获取转换句柄，void*类型
+
+        if (cd == 0)
+        {
+            return "";
+        }
+
+        size_t inlen = sourceStr.size();
+        size_t outlen = 255;
+        char* inbuf = (char*)sourceStr.c_str();
+        char outbuf[255];
+        memset(outbuf, 0, outlen);
+
+        char* poutbuf = outbuf; //多加这个转换是为了避免iconv这个函数出现char(*)[255]类型的实参与char**类型的形参不兼容
+
+        if (iconv(cd, &inbuf, &inlen, &poutbuf, &outlen) == -1)
+        {
+            return "";
+        }
+
+        string strTemp(outbuf);//此时的strTemp为转换编码之后的字符串
+        iconv_close(cd);
+        return strTemp;
+    }
+#endif
+
+    string GbkToUtf8(const string& strGbk)// 传入的strGbk是GBK编码
+    {
+#ifndef WIN32
+        return code_convert("gb2312", "utf-8", strGbk);
+#else
+        return strGbk;
+#endif
+    }
 };
 
 #endif //_DATAMANAGER_H_

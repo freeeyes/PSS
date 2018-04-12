@@ -212,13 +212,14 @@ bool CDataManager::ParseXmlFile(const char* pXmlFile)
                     break;
                 }
 
-                m_mapIP2GroupName.insert(std::make_pair(strName, strGroupName));
+                m_mapIP2ServerName.insert(make_pair(strIP, strName));
+                m_mapIP2GroupName.insert(make_pair(strName, strGroupName));
                 PssNodeInfoList* pNodeInfo = new PssNodeInfoList;
 
                 if(pNodeInfo != NULL)
                 {
                     pNodeInfo->Init(u4Count);
-                    objMapIP2NodeData.insert(std::make_pair(strIP, pNodeInfo));
+                    objMapIP2NodeData.insert(make_pair(strIP, pNodeInfo));
                 }
                 else
                 {
@@ -227,7 +228,7 @@ bool CDataManager::ParseXmlFile(const char* pXmlFile)
                 }
             }
 
-            m_mapGroupNodeData.insert(std::make_pair(strGroupName, objMapIP2NodeData));
+            m_mapGroupNodeData.insert(make_pair(strGroupName, objMapIP2NodeData));
         }
         else
         {
@@ -236,7 +237,7 @@ bool CDataManager::ParseXmlFile(const char* pXmlFile)
     }
 
     mapIP2NodeData objMapIP2NodeData;
-    m_mapGroupNodeData.insert(std::make_pair("UnkownGroup", objMapIP2NodeData));
+    m_mapGroupNodeData.insert(make_pair("UnkownGroup", objMapIP2NodeData));
 
     /*
     OUR_DEBUG((LM_INFO, "[CDataManager::ParseXmlFile]m_strHtmlIndexPath:%s\n",m_strHtmlIndexPath.c_str()));
@@ -324,13 +325,146 @@ void CDataManager::AddNodeDate(const char* pIP, uint32 u4Cpu,uint32 u4MemorySize
 //生成index html文件
 void CDataManager::make_index_html()
 {
+    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
+    HtmlDocument doc;
+    // Generate a document structure.
+    HtmlDocument::Element* head = doc.root()->AddChild("head");
+    HtmlDocument::Element* meta = head->AddChild("meta");
+    meta->AddAttribute("charset", "utf-8");
+    HtmlDocument::Element* title = head->AddChild("title");
+    string strTitle = GbkToUtf8("Pss集群监控中心");
+    title->AddTextChild(strTitle);
 
+    // Generate a document structure.
+    HtmlDocument::Element* body = doc.root()->AddChild("body");
+    HtmlDocument::Element* div = body->AddChild("div");
+    div->AddAttribute("id","Group");
+    div->AddAttribute("style", "position:relative;overflow:hidden;width:800px;height:400px;padding:0px;margin:0px;border-width:0px;cursor:default;");
+    HtmlDocument::Element* span1 = div->AddChild("span");
+    HtmlDocument::Element* span2 = span1->AddChild("span");
+    span2->AddAttribute("style", "font-weight:400;");
+    HtmlDocument::Element* strong = span2->AddChild("strong");
+    string strGroupName =  GbkToUtf8("分组名称");
+    strong->AddTextChild(strGroupName);
+    HtmlDocument::Element* br = div->AddChild("br");
+    HtmlDocument::Element* table = div->AddChild("table");
+    table->AddAttribute("style", "width:100%;");
+    table->AddAttribute("cellpadding", "0");
+    table->AddAttribute("cellspacing", "0");
+    table->AddAttribute("border", "1");
+    table->AddAttribute("bordercolor", "#000000");
+
+    //标题栏
+    HtmlDocument::Element* tr = table->AddChild("tr");
+    HtmlDocument::Element* td1 = tr->AddChild("td");
+    string strServerName =  GbkToUtf8("机组名");
+    td1->AddTextChild(strServerName);
+
+    HtmlDocument::Element* td2 = tr->AddChild("td");
+    string strHostIp =  GbkToUtf8("主机IP");
+    td2->AddTextChild(strHostIp);
+
+    HtmlDocument::Element* td3 = tr->AddChild("td");
+    string strServerConnect =  GbkToUtf8("连接数");
+    td3->AddTextChild(strServerConnect);
+
+    HtmlDocument::Element* td4 = tr->AddChild("td");
+    td4->AddTextChild("Cpu");
+
+    HtmlDocument::Element* td5 = tr->AddChild("td");
+    string strServerMemory =  GbkToUtf8("内存");
+    td5->AddTextChild(strServerMemory);
+
+    HtmlDocument::Element* td6 = tr->AddChild("td");
+    string strServerFlowIn =  GbkToUtf8("单位时间数据流入(字节)");
+    td6->AddTextChild(strServerFlowIn);
+
+    HtmlDocument::Element* td7 = tr->AddChild("td");
+    string strServerFlowOut =  GbkToUtf8("单位时间数据流出(字节)");
+    td7->AddTextChild(strServerFlowOut);
+
+    HtmlDocument::Element* td8 = tr->AddChild("td");
+    string strServerDetail =  GbkToUtf8("详细信息");
+    td8->AddTextChild(strServerDetail);
+
+    //具体数据
+    for (mapGroupNodeData::iterator itGroupNodeData = m_mapGroupNodeData.begin();
+         itGroupNodeData != m_mapGroupNodeData.end(); itGroupNodeData++)
+    {
+        mapIP2NodeData* pMapIP2NodeData = (mapIP2NodeData*)(&itGroupNodeData->second);
+
+        for (mapIP2NodeData::iterator itIP2Node = pMapIP2NodeData->begin();
+             itIP2Node != pMapIP2NodeData->end(); itIP2Node++)
+        {
+            char szTmp[32] = {0};
+            PssNodeInfoList* pNodeInfo = (PssNodeInfoList*)itIP2Node->second;
+            vector<PssNodeInfoSt> vecObject;
+            pNodeInfo->GetAllSavingObject(vecObject);
+
+            HtmlDocument::Element* tr = table->AddChild("tr");
+            HtmlDocument::Element* td1 = tr->AddChild("td");
+            string strServerName =  GbkToUtf8(itGroupNodeData->first);
+            td1->AddTextChild(strServerName);
+
+            HtmlDocument::Element* td2 = tr->AddChild("td");
+            td2->AddTextChild(vecObject[0].m_szClientIP);
+
+            HtmlDocument::Element* td3 = tr->AddChild("td");
+            sprintf(szTmp, "%d", vecObject[0].m_u4ConnectCount);
+            td3->AddTextChild(szTmp);
+
+            HtmlDocument::Element* td4 = tr->AddChild("td");
+            sprintf(szTmp, "%d", vecObject[0].m_u4Cpu);
+            td4->AddTextChild(szTmp);
+
+            HtmlDocument::Element* td5 = tr->AddChild("td");
+            sprintf(szTmp, "%d", vecObject[0].m_u4MemorySize);
+            td5->AddTextChild(szTmp);
+
+            HtmlDocument::Element* td6 = tr->AddChild("td");
+            sprintf(szTmp, "%d", vecObject[0].m_u4DataIn);
+            td6->AddTextChild(szTmp);
+
+            HtmlDocument::Element* td7 = tr->AddChild("td");
+            sprintf(szTmp, "%d", vecObject[0].m_u4DataOut);
+            td7->AddTextChild(szTmp);
+
+            HtmlDocument::Element* td8 = tr->AddChild("td");
+            HtmlDocument::Element* td8a = td8->AddChild("a");
+            string strUrl;
+            mapIP2ServerName::iterator itIP2ServerName = m_mapIP2ServerName.find(vecObject[0].m_szClientIP);
+
+            if (itIP2ServerName != m_mapIP2ServerName.end())
+            {
+                strUrl =  string("detail/") + string(itIP2ServerName->second) + string(".html");
+            }
+            else
+            {
+                strUrl =  string("detail/") + string(vecObject[0].m_szClientIP) + string(".html");
+            }
+
+            td8a->AddAttribute("href", strUrl);
+            td8a->AddAttribute("target", "_blank");
+            string strServerDetail =  GbkToUtf8("详细信息");
+            td8->AddTextChild(strServerDetail);
+        }
+    }
+
+    // Convert the document to an HTML formatted string.
+    string html_string;
+    doc.GetHTML(html_string);
+    string strIndexFile = m_strHtmlIndexPath + m_strHtmlIndexName;
+    FILE* pFile = fopen(strIndexFile.c_str(), "w");
+
+    fwrite(html_string.c_str(), sizeof(char), html_string.length(), pFile);
+
+    fclose(pFile);
+    return ;
 }
 
 //生成detail html文件
 void CDataManager::make_detail_html()
 {
-
 }
 
 void CDataManager::Serialization()
