@@ -70,7 +70,7 @@ bool CReactorClientInfo::Run(bool blIsReady, EM_Server_Connect_State emState)
 
     if (blIsReady == true && SERVER_CONNECT_FIRST != m_emConnectState && SERVER_CONNECT_RECONNECT != m_emConnectState)
     {
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]AAAAAAA.\n"));
+        //OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]AAAAAAA.\n"));
 
         if (true == m_blIsLocal)
         {
