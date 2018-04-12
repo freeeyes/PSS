@@ -135,6 +135,18 @@ bool CDataManager::ParseXmlFile(const char* pXmlFile)
         return false;
     }
 
+    pData = this->GetData(m_pRootElement, "serializationfile", "filepath");
+
+    if (NULL != pData)
+    {
+        m_strSerializationFile = pData;
+    }
+    else
+    {
+        OUR_DEBUG((LM_INFO, "[CDataManager::ParseXmlFile]serializationfile filepath is Invalid!!, please check monitor.xml.\n"));
+        return false;
+    }
+
     TiXmlElement* pNextGroupName = NULL;
     TiXmlElement* pSubElement = NULL;
 
@@ -321,7 +333,59 @@ void CDataManager::make_detail_html()
 
 }
 
-char* CDataManager::GetData(TiXmlElement* pRootElement,const char* pName, const char* pAttrName)
+void CDataManager::Serialization()
+{
+    if (m_strSerializationFile.length() == 0)
+    {
+        OUR_DEBUG((LM_INFO, "[CDataManager::Serialization]no find Serialization.\n"));
+        return;
+    }
+
+    FILE* pFile = ACE_OS::fopen(m_strSerializationFile.c_str(), "w");
+
+    if (NULL == pFile)
+    {
+        OUR_DEBUG((LM_INFO, "[CDataManager::Serialization]can't create Serialization(%s).\n", m_strSerializationFile.c_str()));
+        return;
+    }
+
+    //序列化当前的文件
+    for (mapIP2GroupName::iterator b = m_mapIP2GroupName.begin(); b != m_mapIP2GroupName.end(); ++b)
+    {
+        string strGroupName = (string)b->second;
+
+        mapGroupNodeData::iterator f = m_mapGroupNodeData.find(strGroupName);
+
+        if (f != m_mapGroupNodeData.end())
+        {
+            PssNodeInfoList* pPssNodeInfoList = (PssNodeInfoList* )f->second;
+
+            if (NULL != pPssNodeInfoList)
+            {
+                vector<PssNodeInfoSt> vecPssNodeInfoList;
+                pPssNodeInfoList->GetAllSavingObject(vecPssNodeInfoList);
+
+                for (int i = 0; i < (int)vecPssNodeInfoList.size(); i++)
+                {
+                    char szSData[MAX_BUFF_1024] = { '\0' };
+                    int nSize = MAX_BUFF_1024;
+
+                    vecPssNodeInfoList[i].Serialization(szSData, nSize);
+                    ACE_OS::fwrite(szSData, sizeof(char), ACE_OS::strlen(szSData), pFile);
+                }
+            }
+        }
+    }
+
+    ACE_OS::fclose(pFile);
+}
+
+void CDataManager::UnSerialization()
+{
+
+}
+
+char* CDataManager::GetData(TiXmlElement* pRootElement, const char* pName, const char* pAttrName)
 {
     if(pRootElement == NULL)
     {

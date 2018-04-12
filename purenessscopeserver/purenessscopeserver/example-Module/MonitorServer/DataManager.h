@@ -3,6 +3,7 @@
 
 #include "define.h"
 #include "ObjectLru.h"
+#include "ace/Date_Time.h"
 
 #include "tinyxml.h"
 #include "tinystr.h"
@@ -56,6 +57,54 @@ typedef struct PSSNODEINFO
         this->m_tvRecvTime = ar.m_tvRecvTime;
         return *this;
     }
+
+    void Serialization(char* pData, int nSize)
+    {
+        sprintf_safe(pData, nSize, "%s,%d,%d,%d,%d,%d,%d,%04d,%ld,\n",
+                     m_szClientIP,
+                     m_u4Cpu,
+                     m_u4MemorySize,
+                     m_u4ConnectCount,
+                     m_u4DataIn,
+                     m_u4DataOut,
+                     m_tvRecvTime.sec());
+    }
+
+    void UnSerialization(char* pData, int nSize)
+    {
+        vector<string> vecData;
+        SplitData(pData, vecData);
+
+        if (vecData.size() == 7)
+        {
+            sprintf_safe(m_szClientIP, MAX_BUFF_50, "%s", vecData[0].c_str());
+            m_u4Cpu = atoi(vecData[1].c_str());
+            m_u4MemorySize = atoi(vecData[2].c_str());
+            m_u4ConnectCount = atoi(vecData[3].c_str());
+            m_u4DataIn = atoi(vecData[4].c_str());
+            m_u4DataOut = atoi(vecData[5].c_str());
+
+            //获得时间
+            m_tvRecvTime.sec((time_t)atol(vecData[6].c_str()));
+        }
+    }
+
+private:
+    void SplitData(char* pData, vector<string>& vecData)
+    {
+        vecData.clear();
+        const char* d = ",";
+        char* p = NULL;
+        p = strtok(pData, d);
+
+        while (p)
+        {
+            string strData = p;
+            vecData.push_back(strData);
+            p = strtok(NULL, d);
+        }
+    }
+
 } PssNodeInfoSt;
 
 class CDataManager
@@ -77,6 +126,12 @@ public:
     //生成detail html文件
     void make_detail_html();
 
+    //生成序列化文件
+    void Serialization();
+
+    //反序化
+    void UnSerialization();
+
 private:
     CDataManager();
 
@@ -95,8 +150,8 @@ private:
 
     typedef CObjectLruList<PssNodeInfoSt, ACE_Null_Mutex> PssNodeInfoList;
     typedef map<string,string> mapIP2GroupName;
-    typedef map<string,PssNodeInfoList*> mapIP2NodeData;
-    typedef map<string,mapIP2NodeData > mapGroupNodeData;
+    typedef map<string, PssNodeInfoList*> mapIP2NodeData;
+    typedef map<string, mapIP2NodeData> mapGroupNodeData;
 
     //ip到组名的映射
     mapIP2GroupName m_mapIP2GroupName;
@@ -109,9 +164,10 @@ private:
     string m_strHtmlIndexName;      //htmlindex文件的名称
     string m_strHtmlDetailPath;     //htmldetail文件的路径
     string m_strHtmlJsonPath;       //htmlJson文件的路径
+    string m_strSerializationFile;  //序列化存储文件位置
     uint32 m_u4HistoryMaxCount;
     uint32 m_u4TimeInterval;
-    
+
     TiXmlDocument* m_pTiXmlDocument;
     TiXmlElement*  m_pRootElement;
 };
