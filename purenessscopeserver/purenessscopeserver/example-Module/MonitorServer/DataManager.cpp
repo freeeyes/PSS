@@ -350,28 +350,37 @@ void CDataManager::Serialization()
     }
 
     //序列化当前的文件
+
+    //获得所有的群组
     for (mapIP2GroupName::iterator b = m_mapIP2GroupName.begin(); b != m_mapIP2GroupName.end(); ++b)
     {
         string strGroupName = (string)b->second;
 
+        //根据群组名字获得当前群组对象
         mapGroupNodeData::iterator f = m_mapGroupNodeData.find(strGroupName);
 
         if (f != m_mapGroupNodeData.end())
         {
-            PssNodeInfoList* pPssNodeInfoList = (PssNodeInfoList* )f->second;
+            mapIP2NodeData& objmapIP2NodeData = (mapIP2NodeData& )f->second;
 
-            if (NULL != pPssNodeInfoList)
+            //遍历群组列表
+            for (mapIP2NodeData::iterator nb = objmapIP2NodeData.begin(); nb != objmapIP2NodeData.end(); ++nb)
             {
-                vector<PssNodeInfoSt> vecPssNodeInfoList;
-                pPssNodeInfoList->GetAllSavingObject(vecPssNodeInfoList);
+                PssNodeInfoList* pPssNodeInfoList = (PssNodeInfoList*)nb->second;
 
-                for (int i = 0; i < (int)vecPssNodeInfoList.size(); i++)
+                if (NULL != pPssNodeInfoList)
                 {
-                    char szSData[MAX_BUFF_1024] = { '\0' };
-                    int nSize = MAX_BUFF_1024;
+                    vector<PssNodeInfoSt> vecPssNodeInfoList;
+                    pPssNodeInfoList->GetAllSavingObject(vecPssNodeInfoList);
 
-                    vecPssNodeInfoList[i].Serialization(szSData, nSize);
-                    ACE_OS::fwrite(szSData, sizeof(char), ACE_OS::strlen(szSData), pFile);
+                    for (int i = 0; i < (int)vecPssNodeInfoList.size(); i++)
+                    {
+                        char szSData[MAX_BUFF_1024] = { '\0' };
+                        int nSize = MAX_BUFF_1024;
+
+                        vecPssNodeInfoList[i].Serialization(szSData, nSize);
+                        ACE_OS::fwrite(szSData, sizeof(char), ACE_OS::strlen(szSData), pFile);
+                    }
                 }
             }
         }
