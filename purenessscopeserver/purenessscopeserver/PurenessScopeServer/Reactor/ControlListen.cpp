@@ -77,7 +77,7 @@ bool CControlListen::DelListen( const char* pListenIP, uint32 u4Port )
     return App_ConnectAcceptorManager::instance()->Close(pListenIP, u4Port);
 }
 
-NAMESPACE::uint32 CControlListen::GetListenCount()
+uint32 CControlListen::GetListenCount()
 {
     m_vecListenList.clear();
 

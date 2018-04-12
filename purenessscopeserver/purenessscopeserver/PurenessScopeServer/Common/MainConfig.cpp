@@ -533,13 +533,13 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
         }
         else
         {
-            OUR_DEBUG((LM_INFO, "[CMainConfig::Init_Main]NetworkMode is Invalid!!, please read main.xml desc.\n", szConfigPath));
+            OUR_DEBUG((LM_INFO, "[CMainConfig::Init_Main]NetworkMode is Invalid!!, please read main.xml desc.\n"));
             return false;
         }
     }
     else
     {
-        OUR_DEBUG((LM_INFO, "[CMainConfig::Init_Main]NetworkMode is Invalid!!, please read main.xml desc.\n", szConfigPath));
+        OUR_DEBUG((LM_INFO, "[CMainConfig::Init_Main]NetworkMode is Invalid!!, please read main.xml desc.\n"));
         return false;
     }
 
