@@ -195,45 +195,6 @@ private:
 
     TiXmlDocument* m_pTiXmlDocument;
     TiXmlElement*  m_pRootElement;
-
-private:
-#ifndef WIN32
-    string code_convert(char* source_charset, char* to_charset, const string& sourceStr) //sourceStr是源编码字符串
-    {
-        iconv_t cd = iconv_open(to_charset, source_charset);//获取转换句柄，void*类型
-
-        if (cd == 0)
-        {
-            return "";
-        }
-
-        size_t inlen = sourceStr.size();
-        size_t outlen = 255;
-        char* inbuf = (char*)sourceStr.c_str();
-        char outbuf[255];
-        memset(outbuf, 0, outlen);
-
-        char* poutbuf = outbuf; //多加这个转换是为了避免iconv这个函数出现char(*)[255]类型的实参与char**类型的形参不兼容
-
-        if (iconv(cd, &inbuf, &inlen, &poutbuf, &outlen) == -1)
-        {
-            return "";
-        }
-
-        string strTemp(outbuf);//此时的strTemp为转换编码之后的字符串
-        iconv_close(cd);
-        return strTemp;
-    }
-#endif
-
-    string GbkToUtf8(const string& strGbk)// 传入的strGbk是GBK编码
-    {
-#ifndef WIN32
-        return code_convert("gb2312", "utf-8", strGbk);
-#else
-        return strGbk;
-#endif
-    }
 };
 
 #endif //_DATAMANAGER_H_

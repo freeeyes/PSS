@@ -18,5 +18,5 @@ project(Monitor):acelib{
 	dllout = ../../PurenessScopeServer/Linux_Bin
   }
   includes += .
-  includes += ../../Common ./TinyXML
+  includes += ../../Common ./TinyXML ./EncodeConvert
 }

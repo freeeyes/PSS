@@ -356,7 +356,7 @@ void CDataManager::make_index_html()
     HtmlDocument::Element* meta = head->AddChild("meta");
     meta->AddAttribute("charset", "utf-8");
     HtmlDocument::Element* title = head->AddChild("title");
-    string strTitle = GbkToUtf8("Pss集群监控中心");
+    string strTitle = ConvertGBKToUtf8("Pss集群监控中心");
     title->AddTextChild(strTitle);
 
     // Generate a document structure.
@@ -368,7 +368,7 @@ void CDataManager::make_index_html()
     HtmlDocument::Element* span2 = span1->AddChild("span");
     span2->AddAttribute("style", "font-weight:400;");
     HtmlDocument::Element* strong = span2->AddChild("strong");
-    string strGroupName = GbkToUtf8("分组名称");
+    string strGroupName = ConvertGBKToUtf8("分组名称");
     strong->AddTextChild(strGroupName);
     HtmlDocument::Element* br = div->AddChild("br");
     HtmlDocument::Element* table = div->AddChild("table");
@@ -381,34 +381,34 @@ void CDataManager::make_index_html()
     //标题栏
     HtmlDocument::Element* tr = table->AddChild("tr");
     HtmlDocument::Element* td1 = tr->AddChild("td");
-    string strServerName = GbkToUtf8("机组名");
+    string strServerName = ConvertGBKToUtf8("机组名");
     td1->AddTextChild(strServerName);
 
     HtmlDocument::Element* td2 = tr->AddChild("td");
-    string strHostIp = GbkToUtf8("主机IP");
+    string strHostIp = ConvertGBKToUtf8("主机IP");
     td2->AddTextChild(strHostIp);
 
     HtmlDocument::Element* td3 = tr->AddChild("td");
-    string strServerConnect = GbkToUtf8("连接数");
+    string strServerConnect = ConvertGBKToUtf8("连接数");
     td3->AddTextChild(strServerConnect);
 
     HtmlDocument::Element* td4 = tr->AddChild("td");
     td4->AddTextChild("Cpu");
 
     HtmlDocument::Element* td5 = tr->AddChild("td");
-    string strServerMemory = GbkToUtf8("内存");
+    string strServerMemory = ConvertGBKToUtf8("内存");
     td5->AddTextChild(strServerMemory);
 
     HtmlDocument::Element* td6 = tr->AddChild("td");
-    string strServerFlowIn = GbkToUtf8("单位时间数据流入(字节)");
+    string strServerFlowIn = ConvertGBKToUtf8("单位时间数据流入(字节)");
     td6->AddTextChild(strServerFlowIn);
 
     HtmlDocument::Element* td7 = tr->AddChild("td");
-    string strServerFlowOut = GbkToUtf8("单位时间数据流出(字节)");
+    string strServerFlowOut = ConvertGBKToUtf8("单位时间数据流出(字节)");
     td7->AddTextChild(strServerFlowOut);
 
     HtmlDocument::Element* td8 = tr->AddChild("td");
-    string strServerDetail = GbkToUtf8("详细信息");
+    string strServerDetail = ConvertGBKToUtf8("详细信息");
     td8->AddTextChild(strServerDetail);
 
     //具体数据
@@ -427,7 +427,7 @@ void CDataManager::make_index_html()
 
             HtmlDocument::Element* tr = table->AddChild("tr");
             HtmlDocument::Element* td1 = tr->AddChild("td");
-            string strServerName = GbkToUtf8(itGroupNodeData->first);
+            string strServerName = ConvertGBKToUtf8(itGroupNodeData->first);
             td1->AddTextChild(strServerName);
 
             HtmlDocument::Element* td2 = tr->AddChild("td");
@@ -469,7 +469,7 @@ void CDataManager::make_index_html()
 
             td8a->AddAttribute("href", strUrl);
             td8a->AddAttribute("target", "_blank");
-            string strServerDetail = GbkToUtf8("详细信息");
+            string strServerDetail = ConvertGBKToUtf8("详细信息");
             td8->AddTextChild(strServerDetail);
         }
     }
@@ -662,7 +662,7 @@ bool CDataManager::Save_Detail_Html(string strServerName, string strFilePath)
     HtmlDocument::Element* meta = head->AddChild("meta");
     meta->AddAttribute("charset", "utf-8");
     HtmlDocument::Element* title = head->AddChild("title");
-    string strTitle = GbkToUtf8(strServerName);
+    string strTitle = ConvertGBKToUtf8(strServerName);
     title->AddTextChild(strTitle);
 
     //添加JS代码
@@ -807,11 +807,12 @@ bool CDataManager::Save_Json_Data(string strServerName, vector<PssNodeInfoSt>& v
         }
     }
 
-    strYCpu = (string)"{\"name\":\"" + (string)"cpu" + "\",\"type\": \"line\",\"smooth\": \"true\",\"data\": [" + strYCpu + (string)"]";
-    strYMemory = (string)"{\"name\":\"" + (string)"memory" + "\",\"type\": \"line\",\"smooth\": \"true\",\"data\": [" + strYMemory + (string)"]";
-    strYConnect = (string)"{\"name\":\"" + (string)"connect" + "\",\"type\": \"line\",\"smooth\": \"true\",\"data\": [" + strYConnect + (string)"]";
-    strYFlowIn = (string)"{\"name\":\"" + (string)"flowin" + "\",\"type\": \"line\",\"smooth\": \"true\",\"data\": [" + strYFlowIn + (string)"]";
-    strYFlowOut = (string)"{\"name\":\"" + (string)"flowout" + "\",\"type\": \"line\",\"smooth\": \"true\",\"data\": [" + strYFlowOut + (string)"]";
+    strXTime = (string)"{\"type\": \"category\",\"data\": [" + strXTime + (string)"]}";
+    strYCpu = (string)"{\"name\":\"" + (string)"cpu" + "\",\"type\": \"line\",\"smooth\": \"true\",\"data\": [" + strYCpu + (string)"]}";
+    strYMemory = (string)"{\"name\":\"" + (string)"memory" + "\",\"type\": \"line\",\"smooth\": \"true\",\"data\": [" + strYMemory + (string)"]}";
+    strYConnect = (string)"{\"name\":\"" + (string)"connect" + "\",\"type\": \"line\",\"smooth\": \"true\",\"data\": [" + strYConnect + (string)"]}";
+    strYFlowIn = (string)"{\"name\":\"" + (string)"flowin" + "\",\"type\": \"line\",\"smooth\": \"true\",\"data\": [" + strYFlowIn + (string)"]}";
+    strYFlowOut = (string)"{\"name\":\"" + (string)"flowout" + "\",\"type\": \"line\",\"smooth\": \"true\",\"data\": [" + strYFlowOut + (string)"]}";
 
     //将图表数据写入文件
     FILE* pFile = NULL;
@@ -878,21 +879,21 @@ string CDataManager::Make_detail_JS_Code(string strServerName)
 
     //memory
     strJSCode += "$.getJSON(\"" + m_strHtmlJsonPath + "/" + strServerName + "_memory.json\", function(strJson){\n";
-    strJSCode += "\tvar myChartmemory = echarts.init(document.getElementById('Cpu'));\n";
+    strJSCode += "\tvar myChartmemory = echarts.init(document.getElementById('Memory'));\n";
     strJSCode += "\tvar option = strJson;\n";
     strJSCode += "\tmyChartmemory.setOption(option);\n";
     strJSCode += "\t});\n\n";
 
     //connect
     strJSCode += "$.getJSON(\"" + m_strHtmlJsonPath + "/" + strServerName + "_connect.json\", function(strJson){\n";
-    strJSCode += "\tvar myChartconnect = echarts.init(document.getElementById('Cpu'));\n";
+    strJSCode += "\tvar myChartconnect = echarts.init(document.getElementById('Connect'));\n";
     strJSCode += "\tvar option = strJson;\n";
     strJSCode += "\tmyChartconnect.setOption(option);\n";
     strJSCode += "\t});\n\n";
 
     //flow
     strJSCode += "$.getJSON(\"" + m_strHtmlJsonPath + "/" + strServerName + "_flow.json\", function(strJson){\n";
-    strJSCode += "\tvar myChartflow = echarts.init(document.getElementById('Cpu'));\n";
+    strJSCode += "\tvar myChartflow = echarts.init(document.getElementById('Flow'));\n";
     strJSCode += "\tvar option = strJson;\n";
     strJSCode += "\tmyChartflow.setOption(option);\n";
     strJSCode += "\t});\n\n";
