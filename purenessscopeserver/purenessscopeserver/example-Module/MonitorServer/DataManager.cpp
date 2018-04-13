@@ -486,35 +486,27 @@ void CDataManager::Serialization()
     //序列化当前的文件
 
     //获得所有的群组
-    for (mapIP2GroupName::iterator b = m_mapIP2GroupName.begin(); b != m_mapIP2GroupName.end(); ++b)
+    for (mapGroupNodeData::iterator b = m_mapGroupNodeData.begin(); b != m_mapGroupNodeData.end(); ++b)
     {
-        string strGroupName = (string)b->second;
+        mapIP2NodeData& objmapIP2NodeData = (mapIP2NodeData& )b->second;
 
-        //根据群组名字获得当前群组对象
-        mapGroupNodeData::iterator f = m_mapGroupNodeData.find(strGroupName);
-
-        if (f != m_mapGroupNodeData.end())
+        //遍历群组列表
+        for (mapIP2NodeData::iterator nb = objmapIP2NodeData.begin(); nb != objmapIP2NodeData.end(); ++nb)
         {
-            mapIP2NodeData& objmapIP2NodeData = (mapIP2NodeData& )f->second;
+            PssNodeInfoList* pPssNodeInfoList = (PssNodeInfoList*)nb->second;
 
-            //遍历群组列表
-            for (mapIP2NodeData::iterator nb = objmapIP2NodeData.begin(); nb != objmapIP2NodeData.end(); ++nb)
+            if (NULL != pPssNodeInfoList)
             {
-                PssNodeInfoList* pPssNodeInfoList = (PssNodeInfoList*)nb->second;
+                vector<PssNodeInfoSt> vecPssNodeInfoList;
+                pPssNodeInfoList->GetAllSavingObject(vecPssNodeInfoList);
 
-                if (NULL != pPssNodeInfoList)
+                for (int i = 0; i < (int)vecPssNodeInfoList.size(); i++)
                 {
-                    vector<PssNodeInfoSt> vecPssNodeInfoList;
-                    pPssNodeInfoList->GetAllSavingObject(vecPssNodeInfoList);
+                    char szSData[MAX_BUFF_1024] = { '\0' };
+                    int nSize = MAX_BUFF_1024;
 
-                    for (int i = 0; i < (int)vecPssNodeInfoList.size(); i++)
-                    {
-                        char szSData[MAX_BUFF_1024] = { '\0' };
-                        int nSize = MAX_BUFF_1024;
-
-                        vecPssNodeInfoList[i].Serialization(szSData, nSize);
-                        ACE_OS::fwrite(szSData, sizeof(char), ACE_OS::strlen(szSData), pFile);
-                    }
+                    vecPssNodeInfoList[i].Serialization(szSData, nSize);
+                    ACE_OS::fwrite(szSData, sizeof(char), ACE_OS::strlen(szSData), pFile);
                 }
             }
         }

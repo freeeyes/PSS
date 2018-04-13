@@ -70,7 +70,7 @@ typedef struct PSSNODEINFO
 
     void Serialization(char* pData, int nSize)
     {
-        sprintf_safe(pData, nSize, "%s,%d,%d,%d,%d,%d,%d,%04d,%ld,\n",
+        sprintf_safe(pData, nSize, "%s,%d,%d,%d,%d,%d,%ld,\n",
                      m_szClientIP,
                      m_u4Cpu,
                      m_u4MemorySize,
@@ -95,7 +95,7 @@ typedef struct PSSNODEINFO
             m_u4DataOut = atoi(vecData[5].c_str());
 
             //获得时间
-            m_tvRecvTime.sec((time_t)atol(vecData[6].c_str()));
+            m_tvRecvTime = ACE_Time_Value(((time_t)atol(vecData[6].c_str())));
         }
     }
 
