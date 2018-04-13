@@ -1,4 +1,4 @@
-{"title": {"text": "PSS Connect"},"tooltip" : {}, "legend" : {"data":["time"]},"xAxis" : {"type": "category","data": ["10:13:57"]}
+{"title": {"text": "PSS Connect"},"tooltip" : {}, "legend" : {"data":["time"]},"xAxis" : {"type": "category","data": ["15:28:05"]}
 ,"yAxis" : {"type":"value"}, "series": [{"name":"0","type": "line","smooth": "true","data": [0]}
 ,{"name":"1","type": "line","smooth": "true","data": [0]}
 ]}

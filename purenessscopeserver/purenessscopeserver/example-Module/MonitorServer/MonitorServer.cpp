@@ -115,6 +115,7 @@ int InitModule(CServerObject* pServerObject)
         }
         else
         {
+            /*
             //初始化定时器
             ACE_NEW_RETURN(g_pTimeEventTask, CTimeEventTask, 0);
 
@@ -125,15 +126,20 @@ int InitModule(CServerObject* pServerObject)
                              ACE_OS::gettimeofday() + ACE_Time_Value(u4IntervalSecond),
                              ACE_Time_Value(u4IntervalSecond));
 
-            /*
+            */
+
             //测试序列和反序代码
+            ACE_Time_Value tvSleep(1);
             CDataManager::GetInstance()->AddNodeDate("127.0.0.1", 0, 1024, 10, 100, 100);
+            ACE_OS::sleep(tvSleep);
+            CDataManager::GetInstance()->AddNodeDate("127.0.0.1", 10, 1024, 20, 120, 120);
             CDataManager::GetInstance()->AddNodeDate("127.0.0.2", 0, 1024, 10, 100, 100);
 
-            CDataManager::GetInstance()->Serialization();
+            CDataManager::GetInstance()->make_index_html();
+            CDataManager::GetInstance()->make_detail_html();
 
-            CDataManager::GetInstance()->UnSerialization();
-            */
+            //CDataManager::GetInstance()->Serialization();
+            //CDataManager::GetInstance()->UnSerialization();
         }
     }
     else
