@@ -4,7 +4,6 @@
 #include "define.h"
 #include "ObjectLru.h"
 #include "HtmlPraseDoc.h"
-#include "ace/Date_Time.h"
 
 #include "tinyxml.h"
 #include "tinystr.h"
@@ -15,6 +14,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
+#include <sstream>
+#include <fstream>
 #include <vector>
 #include <map>
 #include <iostream>

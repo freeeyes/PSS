@@ -115,8 +115,8 @@ int InitModule(CServerObject* pServerObject)
         }
         else
         {
+            /*
             //初始化定时器
-
             ACE_NEW_RETURN(g_pTimeEventTask, CTimeEventTask, 0);
 
             uint32 u4IntervalSecond = CDataManager::GetInstance()->GetTimeInterval();
@@ -125,6 +125,11 @@ int InitModule(CServerObject* pServerObject)
                              NULL,
                              ACE_OS::gettimeofday() + ACE_Time_Value(u4IntervalSecond),
                              ACE_Time_Value(u4IntervalSecond));
+            */
+            CDataManager::GetInstance()->AddNodeDate("127.0.0.1", 0, 1024, 10, 100, 100);
+            CDataManager::GetInstance()->AddNodeDate("127.0.0.2", 0, 1024, 10, 100, 100);
+
+            CDataManager::GetInstance()->Serialization();
         }
     }
     else

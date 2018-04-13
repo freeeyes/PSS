@@ -525,7 +525,28 @@ void CDataManager::Serialization()
 
 void CDataManager::UnSerialization()
 {
+    if (m_strSerializationFile.length() == 0)
+    {
+        OUR_DEBUG((LM_INFO, "[CDataManager::UnSerialization]no find Serialization.\n"));
+        return;
+    }
 
+    std::ifstream fin(m_strSerializationFile.c_str(), std::ios::in);
+
+    char szLine[1024] = { 0 };
+
+    //按行读取配置文件
+    while (fin.getline(szLine, sizeof(szLine)))
+    {
+        PssNodeInfoSt objPssNodeInfoSt;
+
+        objPssNodeInfoSt.UnSerialization(szLine, (int)ACE_OS::strlen(szLine));
+
+        //插入到当前内存中
+    }
+
+    fin.clear();
+    fin.close();
 }
 
 char* CDataManager::GetData(TiXmlElement* pRootElement, const char* pName, const char* pAttrName)
