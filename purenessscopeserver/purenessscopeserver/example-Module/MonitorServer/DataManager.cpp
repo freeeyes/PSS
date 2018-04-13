@@ -339,7 +339,7 @@ void CDataManager::AddNodeDate(const char* pIP, uint32 u4Cpu, uint32 u4MemorySiz
                 {
                     pNodeInfo->Init(m_u4HistoryMaxCount);
                     pNodeInfo->AddObject(objPssNodeInfoSt);
-                    pMapIP2NodeData->insert(std::make_pair(pIP, pNodeInfo));
+                    pMapIP2NodeData->insert(make_pair(pIP, pNodeInfo));
                 }
             }
         }
@@ -420,57 +420,60 @@ void CDataManager::make_index_html()
         for (mapIP2NodeData::iterator itIP2Node = pMapIP2NodeData->begin();
              itIP2Node != pMapIP2NodeData->end(); itIP2Node++)
         {
-            char szTmp[32] = { 0 };
+            char szTmp[32] = {0};
             PssNodeInfoList* pNodeInfo = (PssNodeInfoList*)itIP2Node->second;
             vector<PssNodeInfoSt> vecObject;
             pNodeInfo->GetAllSavingObject(vecObject);
 
-            HtmlDocument::Element* tr = table->AddChild("tr");
-            HtmlDocument::Element* td1 = tr->AddChild("td");
-            string strServerName = ConvertGBKToUtf8(itGroupNodeData->first);
-            td1->AddTextChild(strServerName);
-
-            HtmlDocument::Element* td2 = tr->AddChild("td");
-            td2->AddTextChild(vecObject[0].m_szClientIP);
-
-            HtmlDocument::Element* td3 = tr->AddChild("td");
-            sprintf(szTmp, "%d", vecObject[0].m_u4ConnectCount);
-            td3->AddTextChild(szTmp);
-
-            HtmlDocument::Element* td4 = tr->AddChild("td");
-            sprintf(szTmp, "%d", vecObject[0].m_u4Cpu);
-            td4->AddTextChild(szTmp);
-
-            HtmlDocument::Element* td5 = tr->AddChild("td");
-            sprintf(szTmp, "%d", vecObject[0].m_u4MemorySize);
-            td5->AddTextChild(szTmp);
-
-            HtmlDocument::Element* td6 = tr->AddChild("td");
-            sprintf(szTmp, "%d", vecObject[0].m_u4DataIn);
-            td6->AddTextChild(szTmp);
-
-            HtmlDocument::Element* td7 = tr->AddChild("td");
-            sprintf(szTmp, "%d", vecObject[0].m_u4DataOut);
-            td7->AddTextChild(szTmp);
-
-            HtmlDocument::Element* td8 = tr->AddChild("td");
-            HtmlDocument::Element* td8a = td8->AddChild("a");
-            string strUrl;
-            mapIP2ServerName::iterator itIP2ServerName = m_mapIP2ServerName.find(vecObject[0].m_szClientIP);
-
-            if (itIP2ServerName != m_mapIP2ServerName.end())
+            if(vecObject.size() >0 )
             {
-                strUrl = m_strHtmlDetailPath + string(itIP2ServerName->second) + string(".html");
-            }
-            else
-            {
-                strUrl = m_strHtmlDetailPath + string(vecObject[0].m_szClientIP) + string(".html");
-            }
+                HtmlDocument::Element* tr = table->AddChild("tr");
+                HtmlDocument::Element* td1 = tr->AddChild("td");
+                string strServerName =  ConvertGBKToUtf8(itGroupNodeData->first);
+                td1->AddTextChild(strServerName);
 
-            td8a->AddAttribute("href", strUrl);
-            td8a->AddAttribute("target", "_blank");
-            string strServerDetail = ConvertGBKToUtf8("详细信息");
-            td8->AddTextChild(strServerDetail);
+                HtmlDocument::Element* td2 = tr->AddChild("td");
+                td2->AddTextChild(vecObject[0].m_szClientIP);
+
+                HtmlDocument::Element* td3 = tr->AddChild("td");
+                sprintf(szTmp, "%d", vecObject[0].m_u4ConnectCount);
+                td3->AddTextChild(szTmp);
+
+                HtmlDocument::Element* td4 = tr->AddChild("td");
+                sprintf(szTmp, "%d", vecObject[0].m_u4Cpu);
+                td4->AddTextChild(szTmp);
+
+                HtmlDocument::Element* td5 = tr->AddChild("td");
+                sprintf(szTmp, "%d", vecObject[0].m_u4MemorySize);
+                td5->AddTextChild(szTmp);
+
+                HtmlDocument::Element* td6 = tr->AddChild("td");
+                sprintf(szTmp, "%d", vecObject[0].m_u4DataIn);
+                td6->AddTextChild(szTmp);
+
+                HtmlDocument::Element* td7 = tr->AddChild("td");
+                sprintf(szTmp, "%d", vecObject[0].m_u4DataOut);
+                td7->AddTextChild(szTmp);
+
+                HtmlDocument::Element* td8 = tr->AddChild("td");
+                HtmlDocument::Element* td8a = td8->AddChild("a");
+                string strUrl;
+                mapIP2ServerName::iterator itIP2ServerName = m_mapIP2ServerName.find(vecObject[0].m_szClientIP);
+
+                if (itIP2ServerName != m_mapIP2ServerName.end())
+                {
+                    strUrl =  m_strHtmlDetailPath + string(itIP2ServerName->second) + string(".html");
+                }
+                else
+                {
+                    strUrl =  m_strHtmlDetailPath + string(vecObject[0].m_szClientIP) + string(".html");
+                }
+
+                td8a->AddAttribute("href", strUrl);
+                td8a->AddAttribute("target", "_blank");
+                string strServerDetail =  ConvertGBKToUtf8("详细信息");
+                td8->AddTextChild(strServerDetail);
+            }
         }
     }
 
