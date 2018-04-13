@@ -4,6 +4,7 @@
 #include "define.h"
 #include "ObjectLru.h"
 #include "HtmlPraseDoc.h"
+#include "ace/Date_Time.h"
 #include "GBKtoUTF8.h"
 
 #include "tinyxml.h"
@@ -23,6 +24,8 @@
 #include <iostream>
 using namespace std;
 
+#define ECHART_JSON_SIZE MAX_BUFF_1024*2
+
 //PSS节点监控信息
 typedef struct PSSNODEINFO
 {
@@ -36,20 +39,20 @@ typedef struct PSSNODEINFO
 
     PSSNODEINFO()
     {
-        m_szClientIP[0]   = '\0';
-        m_u4Cpu           = 0;
-        m_u4MemorySize    = 0;
-        m_u4ConnectCount  = 0;
-        m_u4DataIn        = 0;
-        m_u4DataOut       = 0;
-        m_tvRecvTime      = 0;
+        m_szClientIP[0] = '\0';
+        m_u4Cpu = 0;
+        m_u4MemorySize = 0;
+        m_u4ConnectCount = 0;
+        m_u4DataIn = 0;
+        m_u4DataOut = 0;
+        m_tvRecvTime = 0;
     }
 
     //拷贝构造函数
     PSSNODEINFO(const PSSNODEINFO& ar)
     {
         sprintf_safe(this->m_szClientIP, MAX_BUFF_50, "%s", ar.m_szClientIP);
-        this->m_u4Cpu        = ar.m_u4Cpu;
+        this->m_u4Cpu = ar.m_u4Cpu;
         this->m_u4MemorySize = ar.m_u4MemorySize;
         this->m_u4ConnectCount = ar.m_u4ConnectCount;
         this->m_u4DataIn = ar.m_u4DataIn;
@@ -60,7 +63,7 @@ typedef struct PSSNODEINFO
     PSSNODEINFO& operator = (const PSSNODEINFO& ar)
     {
         sprintf_safe(this->m_szClientIP, MAX_BUFF_50, "%s", ar.m_szClientIP);
-        this->m_u4Cpu        = ar.m_u4Cpu;
+        this->m_u4Cpu = ar.m_u4Cpu;
         this->m_u4MemorySize = ar.m_u4MemorySize;
         this->m_u4ConnectCount = ar.m_u4ConnectCount;
         this->m_u4DataIn = ar.m_u4DataIn;
@@ -129,7 +132,7 @@ public:
     bool ParseXmlFile(const char* pXmlFile);
 
     //增加节点数据
-    void AddNodeDate(const char* pIP, uint32 u4Cpu,uint32 u4MemorySize,uint32 u4ConnectCount,uint32 u4DataIn,uint32 u4DataOut);
+    void AddNodeDate(const char* pIP, uint32 u4Cpu, uint32 u4MemorySize, uint32 u4ConnectCount, uint32 u4DataIn, uint32 u4DataOut);
 
     //生成index html文件
     void make_index_html();
@@ -144,26 +147,16 @@ public:
     void UnSerialization();
 
 private:
-    CDataManager();
-
-    char* GetData(TiXmlElement* pRootElement,const char* pName, const char* pAttrName);
-    char* GetData(TiXmlElement* pRootElement,const char* pName, const char* pAttrName, TiXmlElement*& pNextTiXmlElement);
-public:
-    static CDataManager* GetInstance();
-
-    //获取保存数据时间间隔
-    uint32 GetTimeInterval();
-private:
     static CDataManager* m_pInstance;
 
     //控制多线程锁
     ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;
 
     typedef CObjectLruList<PssNodeInfoSt, ACE_Null_Mutex> PssNodeInfoList;
-    typedef map<string,string> mapIP2GroupName;
+    typedef map<string, string> mapIP2GroupName;
     typedef map<string, PssNodeInfoList*> mapIP2NodeData;
     typedef map<string, mapIP2NodeData> mapGroupNodeData;
-    typedef map<string,string> mapIP2ServerName;
+    typedef map<string, string> mapIP2ServerName;
 
     //ip到组名的映射
     mapIP2GroupName m_mapIP2GroupName;
@@ -175,16 +168,72 @@ private:
     mapIP2ServerName m_mapIP2ServerName;
 
 private:
+    CDataManager();
+
+    char* GetData(TiXmlElement* pRootElement, const char* pName, const char* pAttrName);
+    char* GetData(TiXmlElement* pRootElement, const char* pName, const char* pAttrName, TiXmlElement*& pNextTiXmlElement);
+
+    bool Save_Detail_Html(string strServerName, string strFilePath);
+    bool Save_Json_Data(string strServerName, vector<PssNodeInfoSt>& vecPssNodeInfoList);
+    string Make_detail_JS_Code(string strServerName);
+
+public:
+    static CDataManager* GetInstance();
+
+    //获取保存数据时间间隔
+    uint32 GetTimeInterval();
+private:
     string m_strHtmlIndexPath;      //htmlindex文件的路径
     string m_strHtmlIndexName;      //htmlindex文件的名称
     string m_strHtmlDetailPath;     //htmldetail文件的路径
     string m_strHtmlJsonPath;       //htmlJson文件的路径
     string m_strSerializationFile;  //序列化存储文件位置
+    string m_strJSEchart;           //JS路径
+    string m_strJSJQuery;           //JS路径
     uint32 m_u4HistoryMaxCount;
     uint32 m_u4TimeInterval;
 
     TiXmlDocument* m_pTiXmlDocument;
     TiXmlElement*  m_pRootElement;
+
+private:
+#ifndef WIN32
+    string code_convert(char* source_charset, char* to_charset, const string& sourceStr) //sourceStr是源编码字符串
+    {
+        iconv_t cd = iconv_open(to_charset, source_charset);//获取转换句柄，void*类型
+
+        if (cd == 0)
+        {
+            return "";
+        }
+
+        size_t inlen = sourceStr.size();
+        size_t outlen = 255;
+        char* inbuf = (char*)sourceStr.c_str();
+        char outbuf[255];
+        memset(outbuf, 0, outlen);
+
+        char* poutbuf = outbuf; //多加这个转换是为了避免iconv这个函数出现char(*)[255]类型的实参与char**类型的形参不兼容
+
+        if (iconv(cd, &inbuf, &inlen, &poutbuf, &outlen) == -1)
+        {
+            return "";
+        }
+
+        string strTemp(outbuf);//此时的strTemp为转换编码之后的字符串
+        iconv_close(cd);
+        return strTemp;
+    }
+#endif
+
+    string GbkToUtf8(const string& strGbk)// 传入的strGbk是GBK编码
+    {
+#ifndef WIN32
+        return code_convert("gb2312", "utf-8", strGbk);
+#else
+        return strGbk;
+#endif
+    }
 };
 
 #endif //_DATAMANAGER_H_
