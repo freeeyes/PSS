@@ -213,7 +213,7 @@ bool CDataManager::ParseXmlFile(const char* pXmlFile)
                 }
 
                 m_mapIP2ServerName.insert(make_pair(strIP, strName));
-                m_mapIP2GroupName.insert(make_pair(strName, strGroupName));
+                m_mapIP2GroupName.insert(make_pair(strIP, strGroupName));
                 PssNodeInfoList* pNodeInfo = new PssNodeInfoList;
 
                 if(pNodeInfo != NULL)
