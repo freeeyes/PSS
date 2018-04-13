@@ -315,7 +315,7 @@ void CDataManager::AddNodeDate(const char* pIP, uint32 u4Cpu,uint32 u4MemorySize
                 {
                     pNodeInfo->Init(m_u4HistoryMaxCount);
                     pNodeInfo->AddObject(objPssNodeInfoSt);
-                    pMapIP2NodeData->insert(std::make_pair(pIP, pNodeInfo));
+                    pMapIP2NodeData->insert(make_pair(pIP, pNodeInfo));
                 }
             }
         }
@@ -332,7 +332,7 @@ void CDataManager::make_index_html()
     HtmlDocument::Element* meta = head->AddChild("meta");
     meta->AddAttribute("charset", "utf-8");
     HtmlDocument::Element* title = head->AddChild("title");
-    string strTitle = GbkToUtf8("Pss集群监控中心");
+    string strTitle = ConvertGBKToUtf8("Pss集群监控中心");
     title->AddTextChild(strTitle);
 
     // Generate a document structure.
@@ -344,7 +344,7 @@ void CDataManager::make_index_html()
     HtmlDocument::Element* span2 = span1->AddChild("span");
     span2->AddAttribute("style", "font-weight:400;");
     HtmlDocument::Element* strong = span2->AddChild("strong");
-    string strGroupName =  GbkToUtf8("分组名称");
+    string strGroupName =  ConvertGBKToUtf8("分组名称");
     strong->AddTextChild(strGroupName);
     HtmlDocument::Element* br = div->AddChild("br");
     HtmlDocument::Element* table = div->AddChild("table");
@@ -357,34 +357,34 @@ void CDataManager::make_index_html()
     //标题栏
     HtmlDocument::Element* tr = table->AddChild("tr");
     HtmlDocument::Element* td1 = tr->AddChild("td");
-    string strServerName =  GbkToUtf8("机组名");
+    string strServerName =  ConvertGBKToUtf8("机组名");
     td1->AddTextChild(strServerName);
 
     HtmlDocument::Element* td2 = tr->AddChild("td");
-    string strHostIp =  GbkToUtf8("主机IP");
+    string strHostIp =  ConvertGBKToUtf8("主机IP");
     td2->AddTextChild(strHostIp);
 
     HtmlDocument::Element* td3 = tr->AddChild("td");
-    string strServerConnect =  GbkToUtf8("连接数");
+    string strServerConnect =  ConvertGBKToUtf8("连接数");
     td3->AddTextChild(strServerConnect);
 
     HtmlDocument::Element* td4 = tr->AddChild("td");
     td4->AddTextChild("Cpu");
 
     HtmlDocument::Element* td5 = tr->AddChild("td");
-    string strServerMemory =  GbkToUtf8("内存");
+    string strServerMemory =  ConvertGBKToUtf8("内存");
     td5->AddTextChild(strServerMemory);
 
     HtmlDocument::Element* td6 = tr->AddChild("td");
-    string strServerFlowIn =  GbkToUtf8("单位时间数据流入(字节)");
+    string strServerFlowIn =  ConvertGBKToUtf8("单位时间数据流入(字节)");
     td6->AddTextChild(strServerFlowIn);
 
     HtmlDocument::Element* td7 = tr->AddChild("td");
-    string strServerFlowOut =  GbkToUtf8("单位时间数据流出(字节)");
+    string strServerFlowOut =  ConvertGBKToUtf8("单位时间数据流出(字节)");
     td7->AddTextChild(strServerFlowOut);
 
     HtmlDocument::Element* td8 = tr->AddChild("td");
-    string strServerDetail =  GbkToUtf8("详细信息");
+    string strServerDetail =  ConvertGBKToUtf8("详细信息");
     td8->AddTextChild(strServerDetail);
 
     //具体数据
@@ -401,52 +401,55 @@ void CDataManager::make_index_html()
             vector<PssNodeInfoSt> vecObject;
             pNodeInfo->GetAllSavingObject(vecObject);
 
-            HtmlDocument::Element* tr = table->AddChild("tr");
-            HtmlDocument::Element* td1 = tr->AddChild("td");
-            string strServerName =  GbkToUtf8(itGroupNodeData->first);
-            td1->AddTextChild(strServerName);
-
-            HtmlDocument::Element* td2 = tr->AddChild("td");
-            td2->AddTextChild(vecObject[0].m_szClientIP);
-
-            HtmlDocument::Element* td3 = tr->AddChild("td");
-            sprintf(szTmp, "%d", vecObject[0].m_u4ConnectCount);
-            td3->AddTextChild(szTmp);
-
-            HtmlDocument::Element* td4 = tr->AddChild("td");
-            sprintf(szTmp, "%d", vecObject[0].m_u4Cpu);
-            td4->AddTextChild(szTmp);
-
-            HtmlDocument::Element* td5 = tr->AddChild("td");
-            sprintf(szTmp, "%d", vecObject[0].m_u4MemorySize);
-            td5->AddTextChild(szTmp);
-
-            HtmlDocument::Element* td6 = tr->AddChild("td");
-            sprintf(szTmp, "%d", vecObject[0].m_u4DataIn);
-            td6->AddTextChild(szTmp);
-
-            HtmlDocument::Element* td7 = tr->AddChild("td");
-            sprintf(szTmp, "%d", vecObject[0].m_u4DataOut);
-            td7->AddTextChild(szTmp);
-
-            HtmlDocument::Element* td8 = tr->AddChild("td");
-            HtmlDocument::Element* td8a = td8->AddChild("a");
-            string strUrl;
-            mapIP2ServerName::iterator itIP2ServerName = m_mapIP2ServerName.find(vecObject[0].m_szClientIP);
-
-            if (itIP2ServerName != m_mapIP2ServerName.end())
+            if(vecObject.size() >0 )
             {
-                strUrl = m_strHtmlDetailPath + string(itIP2ServerName->second) + string(".html");
-            }
-            else
-            {
-                strUrl = m_strHtmlDetailPath + string(vecObject[0].m_szClientIP) + string(".html");
-            }
+                HtmlDocument::Element* tr = table->AddChild("tr");
+                HtmlDocument::Element* td1 = tr->AddChild("td");
+                string strServerName =  ConvertGBKToUtf8(itGroupNodeData->first);
+                td1->AddTextChild(strServerName);
 
-            td8a->AddAttribute("href", strUrl);
-            td8a->AddAttribute("target", "_blank");
-            string strServerDetail =  GbkToUtf8("详细信息");
-            td8->AddTextChild(strServerDetail);
+                HtmlDocument::Element* td2 = tr->AddChild("td");
+                td2->AddTextChild(vecObject[0].m_szClientIP);
+
+                HtmlDocument::Element* td3 = tr->AddChild("td");
+                sprintf(szTmp, "%d", vecObject[0].m_u4ConnectCount);
+                td3->AddTextChild(szTmp);
+
+                HtmlDocument::Element* td4 = tr->AddChild("td");
+                sprintf(szTmp, "%d", vecObject[0].m_u4Cpu);
+                td4->AddTextChild(szTmp);
+
+                HtmlDocument::Element* td5 = tr->AddChild("td");
+                sprintf(szTmp, "%d", vecObject[0].m_u4MemorySize);
+                td5->AddTextChild(szTmp);
+
+                HtmlDocument::Element* td6 = tr->AddChild("td");
+                sprintf(szTmp, "%d", vecObject[0].m_u4DataIn);
+                td6->AddTextChild(szTmp);
+
+                HtmlDocument::Element* td7 = tr->AddChild("td");
+                sprintf(szTmp, "%d", vecObject[0].m_u4DataOut);
+                td7->AddTextChild(szTmp);
+
+                HtmlDocument::Element* td8 = tr->AddChild("td");
+                HtmlDocument::Element* td8a = td8->AddChild("a");
+                string strUrl;
+                mapIP2ServerName::iterator itIP2ServerName = m_mapIP2ServerName.find(vecObject[0].m_szClientIP);
+
+                if (itIP2ServerName != m_mapIP2ServerName.end())
+                {
+                    strUrl =  m_strHtmlDetailPath + string(itIP2ServerName->second) + string(".html");
+                }
+                else
+                {
+                    strUrl =  m_strHtmlDetailPath + string(vecObject[0].m_szClientIP) + string(".html");
+                }
+
+                td8a->AddAttribute("href", strUrl);
+                td8a->AddAttribute("target", "_blank");
+                string strServerDetail =  ConvertGBKToUtf8("详细信息");
+                td8->AddTextChild(strServerDetail);
+            }
         }
     }
 
@@ -506,7 +509,7 @@ void CDataManager::make_detail_html()
                     HtmlDocument::Element* meta = head->AddChild("meta");
                     meta->AddAttribute("charset", "utf-8");
                     HtmlDocument::Element* title = head->AddChild("title");
-                    string strTitle = GbkToUtf8(strHostName);
+                    string strTitle = ConvertGBKToUtf8(strHostName);
                     title->AddTextChild(strTitle);
 
                     //添加JS代码
