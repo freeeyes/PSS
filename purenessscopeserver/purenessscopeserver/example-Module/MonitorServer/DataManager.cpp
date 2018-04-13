@@ -436,11 +436,11 @@ void CDataManager::make_index_html()
 
             if (itIP2ServerName != m_mapIP2ServerName.end())
             {
-                strUrl =  string("detail/") + string(itIP2ServerName->second) + string(".html");
+                strUrl = m_strHtmlDetailPath + string(itIP2ServerName->second) + string(".html");
             }
             else
             {
-                strUrl =  string("detail/") + string(vecObject[0].m_szClientIP) + string(".html");
+                strUrl = m_strHtmlDetailPath + string(vecObject[0].m_szClientIP) + string(".html");
             }
 
             td8a->AddAttribute("href", strUrl);
@@ -465,6 +465,63 @@ void CDataManager::make_index_html()
 //生成detail html文件
 void CDataManager::make_detail_html()
 {
+    //生成细节html文件
+
+    //获得所有的群组
+    for (mapGroupNodeData::iterator b = m_mapGroupNodeData.begin(); b != m_mapGroupNodeData.end(); ++b)
+    {
+        mapIP2NodeData& objmapIP2NodeData = (mapIP2NodeData&)b->second;
+
+        //遍历群组列表
+        for (mapIP2NodeData::iterator nb = objmapIP2NodeData.begin(); nb != objmapIP2NodeData.end(); ++nb)
+        {
+            PssNodeInfoList* pPssNodeInfoList = (PssNodeInfoList*)nb->second;
+
+            if (NULL != pPssNodeInfoList)
+            {
+                vector<PssNodeInfoSt> vecPssNodeInfoList;
+                pPssNodeInfoList->GetAllSavingObject(vecPssNodeInfoList);
+
+                if (vecPssNodeInfoList.size() > 0)
+                {
+                    //生成细节页面
+                    string strDetailFileName;
+                    string strHostName;
+                    mapIP2ServerName::iterator itIP2ServerName = m_mapIP2ServerName.find(vecPssNodeInfoList[0].m_szClientIP);
+
+                    if (itIP2ServerName != m_mapIP2ServerName.end())
+                    {
+                        strDetailFileName = m_strHtmlDetailPath + string(itIP2ServerName->second) + string(".html");
+                        strHostName       = string(itIP2ServerName->second);
+                    }
+                    else
+                    {
+                        strDetailFileName = m_strHtmlDetailPath + string(vecPssNodeInfoList[0].m_szClientIP) + string(".html");
+                        strHostName       = string(vecPssNodeInfoList[0].m_szClientIP);
+                    }
+
+                    HtmlDocument doc;
+                    // Generate a document structure.
+                    HtmlDocument::Element* head = doc.root()->AddChild("head");
+                    HtmlDocument::Element* meta = head->AddChild("meta");
+                    meta->AddAttribute("charset", "utf-8");
+                    HtmlDocument::Element* title = head->AddChild("title");
+                    string strTitle = GbkToUtf8(strHostName);
+                    title->AddTextChild(strTitle);
+
+                    //添加JS代码
+
+                    string html_string;
+                    doc.GetHTML(html_string);
+                    FILE* pFile = fopen(strDetailFileName.c_str(), "w");
+
+                    fwrite(html_string.c_str(), sizeof(char), html_string.length(), pFile);
+
+                    fclose(pFile);
+                }
+            }
+        }
+    }
 }
 
 void CDataManager::Serialization()
