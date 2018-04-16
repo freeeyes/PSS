@@ -5,7 +5,7 @@
 	<!-- 设置html细节页面路径，插件会把详细信息存放在这个页面下 -->
 	<htmldetail path="C:\FreeeyesWork\PSS\purenessscopeserver\purenessscopeserver\example-Module\MonitorServer\Html\detail" relativepath="detail" />
 	<!-- 设置Json细节页面路径，插件会把详细信息存放在这个页面下 -->
-	<htmlJsondetail path="C:\FreeeyesWork\PSS\purenessscopeserver\purenessscopeserver\example-Module\MonitorServer\Html\json" relativepath="json" />
+	<htmlJsondetail path="C:\FreeeyesWork\PSS\purenessscopeserver\purenessscopeserver\example-Module\MonitorServer\Html\json" relativepath="../json" />
 	<!-- 设置序列化文件位置 -->
 	<serializationfile filepath="C:\FreeeyesWork\PSS\purenessscopeserver\purenessscopeserver\example-Module\MonitorServer\MonitorSerialization.txt" />
 	
