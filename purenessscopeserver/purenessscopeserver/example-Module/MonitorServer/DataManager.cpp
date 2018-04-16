@@ -63,6 +63,18 @@ bool CDataManager::ParseXmlFile(const char* pXmlFile)
     m_pRootElement = m_pTiXmlDocument->RootElement();
 
     char* pData = NULL;
+    pData = this->GetData(m_pRootElement, "filepath", "path");
+
+    if (NULL != pData)
+    {
+        m_strFilePath = pData;
+    }
+    else
+    {
+        OUR_DEBUG((LM_INFO, "[CDataManager::ParseXmlFile]filepath path is Invalid!!, please check monitor.xml.\n"));
+        return false;
+    }
+
     pData = this->GetData(m_pRootElement, "htmlIndex", "path");
 
     if (NULL != pData)
@@ -480,7 +492,7 @@ void CDataManager::make_index_html()
     // Convert the document to an HTML formatted string.
     string html_string;
     doc.GetHTML(html_string);
-    string strIndexFile = m_strHtmlIndexPath + "/" + m_strHtmlIndexName;
+    string strIndexFile = m_strFilePath + "/" + m_strHtmlIndexPath + "/" + m_strHtmlIndexName;
     FILE* pFile = fopen(strIndexFile.c_str(), "w");
 
     fwrite(html_string.c_str(), sizeof(char), html_string.length(), pFile);
@@ -518,12 +530,12 @@ void CDataManager::make_detail_html()
 
                     if (itIP2ServerName != m_mapIP2ServerName.end())
                     {
-                        strDetailFileName = m_strHtmlDetailPath + "/" + string(itIP2ServerName->second) + string(".html");
+                        strDetailFileName = m_strFilePath + "/" + m_strHtmlDetailPath + "/" + string(itIP2ServerName->second) + string(".html");
                         strHostName = string(itIP2ServerName->second);
                     }
                     else
                     {
-                        strDetailFileName = m_strHtmlDetailPath + "/" + string(vecPssNodeInfoList[0].m_szClientIP) + string(".html");
+                        strDetailFileName = m_strFilePath + "/" + m_strHtmlDetailPath + "/" + string(vecPssNodeInfoList[0].m_szClientIP) + string(".html");
                         strHostName = string(vecPssNodeInfoList[0].m_szClientIP);
                     }
 
@@ -594,7 +606,7 @@ void CDataManager::UnSerialization()
         return;
     }
 
-    std::ifstream fin(m_strSerializationFile.c_str(), std::ios::in);
+    std::ifstream fin((m_strFilePath + "/" + m_strSerializationFile).c_str(), std::ios::in);
 
     char szLine[1024] = { 0 };
 

@@ -1,5 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <config>
+	<!-- 设置htmlindex文件的绝对路径 -->
+	<filepath path="../" />
 	<!-- 设置htmlindex文件的路径 -->
 	<htmlIndex path="C:\FreeeyesWork\PSS\purenessscopeserver\purenessscopeserver\example-Module\MonitorServer\Html" name="index.html"/>
 	<!-- 设置html细节页面路径，插件会把详细信息存放在这个页面下 -->
