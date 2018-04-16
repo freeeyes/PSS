@@ -183,11 +183,12 @@ public:
     //获取保存数据时间间隔
     uint32 GetTimeInterval();
 private:
-    string m_strFilePath;           //html文件的绝对路径
     string m_strHtmlIndexPath;      //htmlindex文件的路径
     string m_strHtmlIndexName;      //htmlindex文件的名称
     string m_strHtmlDetailPath;     //htmldetail文件的路径
+    string m_strRelativeDetailPath; //htmldetail的相对路径
     string m_strHtmlJsonPath;       //htmlJson文件的路径
+    string m_strRelativeJsonPath;   //htmldetail的相对路径
     string m_strSerializationFile;  //序列化存储文件位置
     string m_strJSEchart;           //JS路径
     string m_strJSJQuery;           //JS路径

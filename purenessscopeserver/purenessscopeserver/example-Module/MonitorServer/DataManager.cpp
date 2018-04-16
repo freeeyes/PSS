@@ -63,18 +63,6 @@ bool CDataManager::ParseXmlFile(const char* pXmlFile)
     m_pRootElement = m_pTiXmlDocument->RootElement();
 
     char* pData = NULL;
-    pData = this->GetData(m_pRootElement, "filepath", "path");
-
-    if (NULL != pData)
-    {
-        m_strFilePath = pData;
-    }
-    else
-    {
-        OUR_DEBUG((LM_INFO, "[CDataManager::ParseXmlFile]filepath path is Invalid!!, please check monitor.xml.\n"));
-        return false;
-    }
-
     pData = this->GetData(m_pRootElement, "htmlIndex", "path");
 
     if (NULL != pData)
@@ -111,6 +99,18 @@ bool CDataManager::ParseXmlFile(const char* pXmlFile)
         return false;
     }
 
+    pData = this->GetData(m_pRootElement, "htmldetail", "relativepath");
+
+    if (NULL != pData)
+    {
+        m_strRelativeDetailPath = pData;
+    }
+    else
+    {
+        OUR_DEBUG((LM_INFO, "[CDataManager::ParseXmlFile]htmldetail relativepath path is Invalid!!, please check monitor.xml.\n"));
+        return false;
+    }
+
     pData = this->GetData(m_pRootElement, "htmlJsondetail", "path");
 
     if (NULL != pData)
@@ -120,6 +120,18 @@ bool CDataManager::ParseXmlFile(const char* pXmlFile)
     else
     {
         OUR_DEBUG((LM_INFO, "[CDataManager::ParseXmlFile]htmlJsondetail path is Invalid!!, please check monitor.xml.\n"));
+        return false;
+    }
+
+    pData = this->GetData(m_pRootElement, "htmlJsondetail", "relativepath");
+
+    if (NULL != pData)
+    {
+        m_strRelativeJsonPath = pData;
+    }
+    else
+    {
+        OUR_DEBUG((LM_INFO, "[CDataManager::ParseXmlFile]htmlJsondetail relativepath path is Invalid!!, please check monitor.xml.\n"));
         return false;
     }
 
@@ -474,17 +486,17 @@ void CDataManager::make_index_html()
 
                 if (itIP2ServerName != m_mapIP2ServerName.end())
                 {
-                    strUrl =  m_strHtmlDetailPath + string(itIP2ServerName->second) + string(".html");
+                    strUrl = m_strRelativeDetailPath + "/" + string(itIP2ServerName->second) + string(".html");
                 }
                 else
                 {
-                    strUrl =  m_strHtmlDetailPath + string(vecObject[0].m_szClientIP) + string(".html");
+                    strUrl = m_strRelativeDetailPath + "/" + string(vecObject[0].m_szClientIP) + string(".html");
                 }
 
                 td8a->AddAttribute("href", strUrl);
                 td8a->AddAttribute("target", "_blank");
-                string strServerDetail =  ConvertGBKToUtf8("ÏêÏ¸ÐÅÏ¢");
-                td8->AddTextChild(strServerDetail);
+                string strServerDetail =  ConvertGBKToUtf8("detail");
+                td8a->AddTextChild(strServerDetail);
             }
         }
     }
@@ -492,7 +504,7 @@ void CDataManager::make_index_html()
     // Convert the document to an HTML formatted string.
     string html_string;
     doc.GetHTML(html_string);
-    string strIndexFile = m_strFilePath + "/" + m_strHtmlIndexPath + "/" + m_strHtmlIndexName;
+    string strIndexFile = m_strHtmlIndexPath + "/" + m_strHtmlIndexName;
     FILE* pFile = fopen(strIndexFile.c_str(), "w");
 
     fwrite(html_string.c_str(), sizeof(char), html_string.length(), pFile);
@@ -530,12 +542,12 @@ void CDataManager::make_detail_html()
 
                     if (itIP2ServerName != m_mapIP2ServerName.end())
                     {
-                        strDetailFileName = m_strFilePath + "/" + m_strHtmlDetailPath + "/" + string(itIP2ServerName->second) + string(".html");
+                        strDetailFileName = m_strHtmlDetailPath + "/" + string(itIP2ServerName->second) + string(".html");
                         strHostName = string(itIP2ServerName->second);
                     }
                     else
                     {
-                        strDetailFileName = m_strFilePath + "/" + m_strHtmlDetailPath + "/" + string(vecPssNodeInfoList[0].m_szClientIP) + string(".html");
+                        strDetailFileName = m_strHtmlDetailPath + "/" + string(vecPssNodeInfoList[0].m_szClientIP) + string(".html");
                         strHostName = string(vecPssNodeInfoList[0].m_szClientIP);
                     }
 
@@ -606,7 +618,7 @@ void CDataManager::UnSerialization()
         return;
     }
 
-    std::ifstream fin((m_strFilePath + "/" + m_strSerializationFile).c_str(), std::ios::in);
+    std::ifstream fin(m_strSerializationFile.c_str(), std::ios::in);
 
     char szLine[1024] = { 0 };
 
@@ -886,28 +898,28 @@ string CDataManager::Make_detail_JS_Code(string strServerName)
     string strJSCode;
 
     //CPU
-    strJSCode += "$.getJSON(\"" + m_strHtmlJsonPath + "/" + strServerName + "_cpu.json\", function(strJson){\n";
+    strJSCode += "$.getJSON(\"" + m_strRelativeJsonPath + "/" + strServerName + "_cpu.json\", function(strJson){\n";
     strJSCode += "\tvar myChartcpu = echarts.init(document.getElementById('Cpu'));\n";
     strJSCode += "\tvar option = strJson;\n";
     strJSCode += "\tmyChartcpu.setOption(option);\n";
     strJSCode += "\t});\n\n";
 
     //memory
-    strJSCode += "$.getJSON(\"" + m_strHtmlJsonPath + "/" + strServerName + "_memory.json\", function(strJson){\n";
+    strJSCode += "$.getJSON(\"" + m_strRelativeJsonPath + "/" + strServerName + "_memory.json\", function(strJson){\n";
     strJSCode += "\tvar myChartmemory = echarts.init(document.getElementById('Memory'));\n";
     strJSCode += "\tvar option = strJson;\n";
     strJSCode += "\tmyChartmemory.setOption(option);\n";
     strJSCode += "\t});\n\n";
 
     //connect
-    strJSCode += "$.getJSON(\"" + m_strHtmlJsonPath + "/" + strServerName + "_connect.json\", function(strJson){\n";
+    strJSCode += "$.getJSON(\"" + m_strRelativeJsonPath + "/" + strServerName + "_connect.json\", function(strJson){\n";
     strJSCode += "\tvar myChartconnect = echarts.init(document.getElementById('Connect'));\n";
     strJSCode += "\tvar option = strJson;\n";
     strJSCode += "\tmyChartconnect.setOption(option);\n";
     strJSCode += "\t});\n\n";
 
     //flow
-    strJSCode += "$.getJSON(\"" + m_strHtmlJsonPath + "/" + strServerName + "_flow.json\", function(strJson){\n";
+    strJSCode += "$.getJSON(\"" + m_strRelativeJsonPath + "/" + strServerName + "_flow.json\", function(strJson){\n";
     strJSCode += "\tvar myChartflow = echarts.init(document.getElementById('Flow'));\n";
     strJSCode += "\tvar option = strJson;\n";
     strJSCode += "\tmyChartflow.setOption(option);\n";
