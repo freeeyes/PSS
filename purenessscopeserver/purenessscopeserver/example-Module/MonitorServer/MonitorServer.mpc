@@ -4,6 +4,7 @@ project(Monitor):acelib{
   
   Source_Files{
 	./TinyXML/*.cpp
+	./EncodeConvert/*.cpp
   	./*.cpp 
   }
   specific (gnuace){

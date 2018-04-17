@@ -80,14 +80,14 @@ int CMonitorCommand::handle_timeout(const ACE_Time_Value& tv, const void* arg)
         (*pBuffPacket) >> u4DataInSize;
         (*pBuffPacket) >> u4DataOutSize;
         m_pServerObject->GetPacketManager()->Delete(pBuffPacket);
-        OUR_DEBUG((LM_INFO, 
-            "[CMonitorCommand::handle_timeout]2 u2ReturnCommandID:%d u4CpuRote:%d u4MemorySize:%d u1Switch:%d u4DataInSize:%d u4DataOutSize:%d.\n",
-            u2ReturnCommandID,
-            u4CpuRote,
-            u4MemorySize,
-            u1Switch,
-            u4DataInSize,
-            u4DataOutSize));
+        OUR_DEBUG((LM_INFO,
+                   "[CMonitorCommand::handle_timeout]2 u2ReturnCommandID:%d u4CpuRote:%d u4MemorySize:%d u1Switch:%d u4DataInSize:%d u4DataOutSize:%d.\n",
+                   u2ReturnCommandID,
+                   u4CpuRote,
+                   u4MemorySize,
+                   u1Switch,
+                   u4DataInSize,
+                   u4DataOutSize));
 
         //组装发送数据包
         char szSendBuff[MAX_BUFF_100] = { '\0' };
@@ -128,7 +128,7 @@ int CMonitorCommand::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 
         OUR_DEBUG((LM_INFO, "[CMonitorCommand::handle_timeout] Send COMMAND_MONITOR_DATA OK.\n"));
     }
-    else 
+    else
     {
         OUR_DEBUG((LM_INFO, "[CMonitorCommand::handle_timeout]m_emMonitorState:%d.\n",m_emMonitorState));
     }
@@ -136,17 +136,43 @@ int CMonitorCommand::handle_timeout(const ACE_Time_Value& tv, const void* arg)
     return 0;
 }
 
-int CMonitorCommand::Init(const char* pJson, CServerObject* pServerObject)
+int CMonitorCommand::Init(const char* pJsonFileName, CServerObject* pServerObject)
 {
     //测试Json
     //{"MonitorIP":"127.0.0.1","MonitorPort":"10050","LocalIP":"127.0.0.1","TimeInterval":"60"}
 
+    //读取配置文件信息
+    char szJson[MAX_BUFF_1024] = { '\0' };
+
+    FILE* pFile = ACE_OS::fopen(pJsonFileName, "r");
+
+    if (NULL == pFile)
+    {
+        OUR_DEBUG((LM_INFO, "[CMonitorCommand::Init]pJsonFileName(%s) is not open.\n", szJson));
+        return -1;
+    }
+
+    //获得文件长度
+    ACE_OS::fseek(pFile, 0, SEEK_SET);
+
+    long lFileSize = ACE_OS::ftell(pFile);
+
+    if (lFileSize >= MAX_BUFF_1024)
+    {
+        OUR_DEBUG((LM_INFO, "[CMonitorCommand::Init]pJsonFileName(%s) is to long(%d).\n", pJsonFileName, lFileSize));
+        return -1;
+    }
+
+    //读取文件信息
+    ACE_OS::fread(szJson, sizeof(char), lFileSize, pFile);
+    ACE_OS::fclose(pFile);
+
     //接收配置的Json参数
-    cJSON* pJsonParse = cJSON_Parse(pJson);
+    cJSON* pJsonParse = cJSON_Parse(szJson);
 
     if (NULL == pJsonParse)
     {
-        OUR_DEBUG((LM_INFO, "[CMonitorCommand::Init](%s) is not json.\n", pJson));
+        OUR_DEBUG((LM_INFO, "[CMonitorCommand::Init](%s) is not json.\n", szJson));
         return -1;
     }
 
@@ -154,7 +180,7 @@ int CMonitorCommand::Init(const char* pJson, CServerObject* pServerObject)
 
     if (NULL == pJsonMonitorIP)
     {
-        OUR_DEBUG((LM_INFO, "[CLotDispose_Http::Get_Lot_Download_Json](%s)MonitorIP is no find.\n", pJson));
+        OUR_DEBUG((LM_INFO, "[CLotDispose_Http::Get_Lot_Download_Json](%s)MonitorIP is no find.\n", szJson));
         cJSON_Delete(pJsonParse);
         return -1;
     }
@@ -165,7 +191,7 @@ int CMonitorCommand::Init(const char* pJson, CServerObject* pServerObject)
 
     if (NULL == pJsonMonitorPort)
     {
-        OUR_DEBUG((LM_INFO, "[CLotDispose_Http::Get_Lot_Download_Json](%s)MonitorPort is no find.\n", pJson));
+        OUR_DEBUG((LM_INFO, "[CLotDispose_Http::Get_Lot_Download_Json](%s)MonitorPort is no find.\n", szJson));
         cJSON_Delete(pJsonParse);
         return -1;
     }
@@ -176,7 +202,7 @@ int CMonitorCommand::Init(const char* pJson, CServerObject* pServerObject)
 
     if (NULL == pJsonLocalIP)
     {
-        OUR_DEBUG((LM_INFO, "[CLotDispose_Http::Get_Lot_Download_Json](%s)LocalIP is no find.\n", pJson));
+        OUR_DEBUG((LM_INFO, "[CLotDispose_Http::Get_Lot_Download_Json](%s)LocalIP is no find.\n", szJson));
         cJSON_Delete(pJsonParse);
         return -1;
     }
@@ -187,7 +213,7 @@ int CMonitorCommand::Init(const char* pJson, CServerObject* pServerObject)
 
     if (NULL == pJsonTimeInterval)
     {
-        OUR_DEBUG((LM_INFO, "[CLotDispose_Http::Get_Lot_Download_Json](%s)TimeInterval is no find.\n", pJson));
+        OUR_DEBUG((LM_INFO, "[CLotDispose_Http::Get_Lot_Download_Json](%s)TimeInterval is no find.\n", szJson));
         cJSON_Delete(pJsonParse);
         return -1;
     }

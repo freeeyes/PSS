@@ -291,7 +291,7 @@
     </ClCompile>
     <ClCompile Include=".\RealTimeMonitor.cpp">
     </ClCompile>
-    <ClCompile Include="cJSON.c" />
+    <ClCompile Include="cJSON.cpp" />
     <ClCompile Include="PostMonitorData.cpp" />
   </ItemGroup>
   <ItemGroup>
