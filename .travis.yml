@@ -70,7 +70,7 @@ matrix:
           description: "Build submitted via Travis CI"
         notification_email: freeeyes@163.com;liuchao412@foxmail.com
         build_command_prepend: "cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin;$ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc;make clean"
-        build_command: "make -j 4"
+        build_command: "make -j 4;echo -n;cat $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/cov-int/scm_log.txt;echo -n"
         branch_pattern: master
 
   #
