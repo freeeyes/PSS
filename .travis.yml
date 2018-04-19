@@ -63,6 +63,12 @@ matrix:
           make -j 4;
         fi
 
+    after_script:
+        - export
+        - echo -e "\nstart"
+        - cat $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/cov-int/scm_log.txt;
+        - echo -e "end\n"
+
     addons:
       coverity_scan:
         project:
