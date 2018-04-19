@@ -843,49 +843,66 @@ bool CDataManager::Save_Json_Data(string strServerName, vector<PssNodeInfoSt>& v
 
     //将图表数据写入文件
     FILE* pFile = NULL;
-    char szJsonText[ECHART_JSON_SIZE] = { '\0' };
+    string strJsonText;
 
-    sprintf_safe(szJsonText, ECHART_JSON_SIZE, OUTPUT_CHART_JSON, "cpu", strXTime.c_str(), strYCpu.c_str());
+    strJsonText = (string)"{\"title\": {\"text\": \"" + (string)"cpu" +
+                  (string)"\"},\"tooltip\" : {},\"legend\" : {\"data\":[\"time\"]},\"xAxis\" :" +
+                  strXTime + ",\"yAxis\" : {\"type\":\"value\"}, \"series\": [" +
+                  strYCpu.c_str() + (string)"]}";
+
     strJsonPathFile = m_strHtmlJsonPath + "/" + strServerName + (string)"_cpu.json";
     pFile = ACE_OS::fopen(strJsonPathFile.c_str(), "w+");
 
     if (NULL != pFile)
     {
-        ACE_OS::fwrite(szJsonText, sizeof(char), ACE_OS::strlen(szJsonText), pFile);
+        ACE_OS::fwrite(strJsonText.c_str(), sizeof(char), strJsonText.length(), pFile);
     }
 
     ACE_OS::fclose(pFile);
 
-    sprintf_safe(szJsonText, ECHART_JSON_SIZE, OUTPUT_CHART_JSON, "memory", strXTime.c_str(), strYMemory.c_str());
+    strJsonText = (string)"{\"title\": {\"text\": \"" + (string)"memory" +
+                  (string)"\"},\"tooltip\" : {},\"legend\" : {\"data\":[\"time\"]},\"xAxis\" :" +
+                  strXTime + ",\"yAxis\" : {\"type\":\"value\"}, \"series\": [" +
+                  strYMemory.c_str() + (string)"]}";
+
     strJsonPathFile = m_strHtmlJsonPath + "/" + strServerName + (string)"_memory.json";
     pFile = ACE_OS::fopen(strJsonPathFile.c_str(), "w+");
 
     if (NULL != pFile)
     {
-        ACE_OS::fwrite(szJsonText, sizeof(char), ACE_OS::strlen(szJsonText), pFile);
+        ACE_OS::fwrite(strJsonText.c_str(), sizeof(char), strJsonText.length(), pFile);
     }
 
     ACE_OS::fclose(pFile);
 
-    sprintf_safe(szJsonText, ECHART_JSON_SIZE, OUTPUT_CHART_JSON, "connect", strXTime.c_str(), strYConnect.c_str());
+    strJsonText = (string)"{\"title\": {\"text\": \"" + (string)"connect" +
+                  (string)"\"},\"tooltip\" : {},\"legend\" : {\"data\":[\"time\"]},\"xAxis\" :" +
+                  strXTime + ",\"yAxis\" : {\"type\":\"value\"}, \"series\": [" +
+                  strYConnect.c_str() + (string)"]}";
+
     strJsonPathFile = m_strHtmlJsonPath + "/" + strServerName + (string)"_connect.json";
     pFile = ACE_OS::fopen(strJsonPathFile.c_str(), "w+");
 
     if (NULL != pFile)
     {
-        ACE_OS::fwrite(szJsonText, sizeof(char), ACE_OS::strlen(szJsonText), pFile);
+        ACE_OS::fwrite(strJsonText.c_str(), sizeof(char), strJsonText.length(), pFile);
     }
 
     ACE_OS::fclose(pFile);
 
     string strFlow = strYFlowIn + (string)"," + strYFlowOut;
-    sprintf_safe(szJsonText, ECHART_JSON_SIZE, OUTPUT_CHART_JSON, "flow", strXTime.c_str(), strFlow.c_str());
+
+    strJsonText = (string)"{\"title\": {\"text\": \"" + (string)"flow" +
+                  (string)"\"},\"tooltip\" : {},\"legend\" : {\"data\":[\"time\"]},\"xAxis\" :" +
+                  strFlow + ",\"yAxis\" : {\"type\":\"value\"}, \"series\": [" +
+                  strYConnect.c_str() + (string)"]}";
+
     strJsonPathFile = m_strHtmlJsonPath + "/" + strServerName + (string)"_flow.json";
     pFile = ACE_OS::fopen(strJsonPathFile.c_str(), "w+");
 
     if (NULL != pFile)
     {
-        ACE_OS::fwrite(szJsonText, sizeof(char), ACE_OS::strlen(szJsonText), pFile);
+        ACE_OS::fwrite(strJsonText.c_str(), sizeof(char), strJsonText.length(), pFile);
     }
 
     ACE_OS::fclose(pFile);
