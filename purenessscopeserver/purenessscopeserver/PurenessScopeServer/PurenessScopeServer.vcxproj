@@ -533,6 +533,7 @@
     <ClInclude Include="..\Common\IObject.h" />
     <ClInclude Include="..\Common\IPacketManager.h" />
     <ClInclude Include="..\Common\IPacketParse.h" />
+    <ClInclude Include="..\Common\IpCheck.h" />
     <ClInclude Include="..\Common\ISendCacheManager.h" />
     <ClInclude Include="..\Common\IServerManager.h" />
     <ClInclude Include="..\Common\ITimerManager.h" />

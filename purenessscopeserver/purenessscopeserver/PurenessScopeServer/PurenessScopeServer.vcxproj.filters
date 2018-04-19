@@ -564,6 +564,9 @@
     <ClInclude Include="..\Common\ObjectLru.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\IpCheck.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
