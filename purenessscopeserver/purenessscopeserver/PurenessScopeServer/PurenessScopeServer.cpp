@@ -364,6 +364,13 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
         App_MainConfig::instance()->Display();
     }
 
+    //第二步，判断所有的IP是否是合法的，同时识别IP类型，Ipv6还是Ipv4。
+    if (!App_MainConfig::instance()->CheckAllIP())
+    {
+        OUR_DEBUG((LM_INFO, "[main]CheckAllIP() error.\n"));
+        return 0;
+    }
+
     if (0 != Chlid_Run())
     {
         OUR_DEBUG((LM_INFO, "[main]Chlid_Run error.\n"));
@@ -437,10 +444,18 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
     if(!App_MainConfig::instance()->Init())
     {
         OUR_DEBUG((LM_INFO, "[main]%s\n", App_MainConfig::instance()->GetError()));
+        return 0;
     }
     else
     {
         App_MainConfig::instance()->Display();
+    }
+
+    //第二步，判断所有的IP是否是合法的，同时识别IP类型，Ipv6还是Ipv4。
+    if (!App_MainConfig::instance()->CheckAllIP())
+    {
+        OUR_DEBUG((LM_INFO, "[main]CheckAllIP() error.\n"));
+        return 0;
     }
 
     //隐式加载PacketParse

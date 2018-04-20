@@ -1500,6 +1500,77 @@ void CMainConfig::Display()
     }
 }
 
+bool CMainConfig::CheckAllIP()
+{
+    //检查所有服务器的监听IP(TCP)
+    for (int i = 0; i < (int)m_vecServerInfo.size(); i++)
+    {
+        EM_IP_TYPE emIpType = Check_IP(m_vecServerInfo[i].m_szServerIP);
+
+        if (IP_UNKNOW == emIpType)
+        {
+            OUR_DEBUG((LM_INFO, "[CMainConfig::CheckAllIP]m_vecServerInfo(%s) IP is %s.\n",
+                       m_vecServerInfo[i].m_szServerIP,
+                       Get_Type_Name(emIpType).c_str()));
+            return false;
+        }
+        else if (IP_V6 == emIpType)
+        {
+            m_vecServerInfo[i].m_u1IPType = TYPE_IPV6;
+        }
+        else
+        {
+            m_vecServerInfo[i].m_u1IPType = TYPE_IPV4;
+        }
+    }
+
+    //检查所有服务器的监听IP(UDP)
+    for (int i = 0; i < (int)m_vecUDPServerInfo.size(); i++)
+    {
+        EM_IP_TYPE emIpType = Check_IP(m_vecUDPServerInfo[i].m_szServerIP);
+
+        if (IP_UNKNOW == emIpType)
+        {
+            OUR_DEBUG((LM_INFO, "[CMainConfig::CheckAllIP]m_vecUDPServerInfo(%s) IP is %s.\n",
+                       m_vecUDPServerInfo[i].m_szServerIP,
+                       Get_Type_Name(emIpType).c_str()));
+            return false;
+        }
+        else if (IP_V6 == emIpType)
+        {
+            m_vecUDPServerInfo[i].m_u1IPType = TYPE_IPV6;
+        }
+        else
+        {
+            m_vecUDPServerInfo[i].m_u1IPType = TYPE_IPV4;
+        }
+    }
+
+    //检查ConsoleIP
+    if (ACE_OS::strlen(m_szConsoleIP) > 0)
+    {
+        EM_IP_TYPE emIpType = Check_IP(m_szConsoleIP);
+
+        if (IP_UNKNOW == emIpType)
+        {
+            OUR_DEBUG((LM_INFO, "[CMainConfig::CheckAllIP]m_szConsoleIP(%s) IP is %s.\n",
+                       m_szConsoleIP,
+                       Get_Type_Name(emIpType).c_str()));
+            return false;
+        }
+        else if (IP_V6 == emIpType)
+        {
+            m_u1ConsoleIPType = TYPE_IPV6;
+        }
+        else
+        {
+            m_u1ConsoleIPType = TYPE_IPV4;
+        }
+    }
+
+    return true;
+}
+
 const char* CMainConfig::GetServerName()
 {
     return m_szServerName;

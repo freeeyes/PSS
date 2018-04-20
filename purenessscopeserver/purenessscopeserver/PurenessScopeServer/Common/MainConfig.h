@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "PacketParse.h"
+#include "IpCheck.h"
 
 //PacketParse相关信息
 struct _PacketParseInfo
@@ -231,6 +232,7 @@ public:
     bool Init_Alert(const char* szConfigPath);
     bool Init_Main(const char* szConfigPath);
     void Display();
+    bool CheckAllIP();
     const char* GetError();
 
     const char* GetServerName();
@@ -266,7 +268,7 @@ public:
     void   SetMaxHandlerCount(uint16 u2MaxHandlerCount);
     uint16 GetMaxConnectTime();
     uint8  GetConsoleSupport();
-    int32    GetConsolePort();
+    int32  GetConsolePort();
     uint8  GetConsoleIPType();
     const char* GetConsoleIP();
     vecConsoleKey* GetConsoleKey();
