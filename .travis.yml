@@ -54,9 +54,11 @@ matrix:
     env:
       - secure: "ShQ4E56H5NkB6i/PaEz8NtkFwIjrkQpkRnd1Xb938KM6vtMZA5GfayltSvM4SPrNgZaTH3CRTYWQtxyKDECjvKmK0tOK+cTh13A5Xli9qqaXb+wVQKKenGgx+vcSqEf0fZNvPSs/YRD0vaNHbs6ID990TuduIdn07FoNfTZVHXkUe0zR9gB2ZCX9D2fV2QMIYquBv42GT7rCT2Fz3bTtdcLlJSmDNHF6/Ilx4F26gxlLnA96C0MxSlHuBB3P736hWAHMhRPyyQkqUvMhMB87vyaSl9LYL8wu28dqnBcCO01UDedf7kxO3i/akQlr/qUQGwKFxDufXDszFT1u4UfbwXTW945TjtAaP8EK0OwTZv71X3L4d9vWFwKJkDQ88Rufv+eQ65L5xUMNY+MDMJd58AfZWxqweusJs4LeeT0oGf2cvtVdH/oIBA7PgOX1dN/Q2QMXZrGo6iFy9QCww63qekma3BY720Gx2OrEYtrRHfgdayZneyR7eB4wnPx7oTIseIX1eExXsEao3YY8s93geTrkq0iEAunKDIIR+PQsZ1v3YwNpHhjQv16mZAaq9aNLs1f77uqOqko1AEgAlNloWV6Hvbm3XzHjlo/Zur7Pbcv9wZZ6JQnyPFqXO4KJ34NnSYXbhjARf7tTEYFZBWyEEZvwKgvFCh74HwR827C/Oq4="
       
+      
+    before_install:
+      - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-    
     script: 
       - export
-      - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
       - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then 
           cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin;
           $ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc;
