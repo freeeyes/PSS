@@ -641,7 +641,6 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
     m_vecServerInfo.clear();
     TiXmlElement* pNextTiXmlElementIP       = NULL;
     TiXmlElement* pNextTiXmlElementPort     = NULL;
-    TiXmlElement* pNextTiXmlElementIpType   = NULL;
     TiXmlElement* pNextTiXmlElementPacketID = NULL;
 
     while(true)
@@ -686,7 +685,6 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
     m_vecUDPServerInfo.clear();
     pNextTiXmlElementIP = NULL;
     pNextTiXmlElementPort = NULL;
-    pNextTiXmlElementIpType = NULL;
     pNextTiXmlElementPacketID = NULL;
 
     while (true)
