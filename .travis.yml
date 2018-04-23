@@ -65,6 +65,7 @@ matrix:
 
     after_script:
         - export
+        - find / -name "coverity-macro-compat.h"
         - echo -e "\nstart"
         - cat $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/cov-int/scm_log.txt;
         - echo -e "end\n"
