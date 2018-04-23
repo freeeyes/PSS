@@ -56,6 +56,7 @@ matrix:
       
     script: 
       - export
+      - cd $TRAVIS_BUILD_DIR
       - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
       - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then 
           cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin;
