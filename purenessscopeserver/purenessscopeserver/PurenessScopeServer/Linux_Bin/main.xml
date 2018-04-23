@@ -8,13 +8,13 @@
 	<ServerName name="Freeeyes" desc="当前服务器的名称" />
 	<ServerVersion Version="0.99" desc="当前服务器版本" />
 	<BuffPacket Count="5000" desc="设置BuffPacket内存池的大小" />
-	<TCPServerIP ip="INADDR_ANY" port="10002" ipType="IPV4" desc="监听TCP服务器的IP和端口，可以是多个" />
-	<!-- <TCPServerIP ip="fe80::d433:372b:d0ee:edc4%12" port="10002" ipType="IPV6" desc="监听TCP服务器的IP和端口，可以是多个(IPv6地址测试)" /> -->
-	<!-- <TCPServerIP ip="127.0.0.1" port="10003" ipType="IPV4" desc="监听TCP服务器的IP和端口，可以是多个，要用多个，只要多写几个这样的节点即可" /> -->
+	<TCPServerIP ip="INADDR_ANY" port="10002" desc="监听TCP服务器的IP和端口，可以是多个" />
+	<!-- <TCPServerIP ip="fe80::d433:372b:d0ee:edc4%12" port="10002" desc="监听TCP服务器的IP和端口，可以是多个(IPv6地址测试)" /> -->
+	<!-- <TCPServerIP ip="127.0.0.1" port="10003" desc="监听TCP服务器的IP和端口，可以是多个，要用多个，只要多写几个这样的节点即可" /> -->
 	
 	<PacketParse ParseID="1" ModulePath="./" ModuleName="libPacketParse_Interface.so" Type="H&B" OrgLength="40" />
 	
-	<Console support="1" sip="INADDR_ANY" sport="10010"  desc="维护端口是否开启，support为1是开启，0是关闭，后面对应IP和端口" />
+	<Console support="1" sip="INADDR_ANY" sport="10010" desc="维护端口是否开启，support为1是开启，0是关闭，后面对应IP和端口" />
 	<ConsoleKey Key="freeeyes" desc="维护端允许登录的Key值,可以是多个，key值中不能包含空格" />
 	<ConsoleKey Key="guest" desc="维护端允许登录的Key值,可以是多个，key值中不能包含空格" />
 	<!-- <ConsoleClient cip="127.0.0.1" desc="维护端口可以访问的对应的客户端IP地址，可以支持多个" /> -->
@@ -38,5 +38,5 @@
 	<Monitor CpuAndMemory="0"  CpuMax="50" MemoryMax="1000" desc="是否对CPU和内存定时监控，并输出日志，0为关闭监控，1是打开监控" />
 	<AceDebug TrunOn="0" DebugName="./serverdebug.log" ChkInterval="600" LogFileMaxSize="10240" LogFileMaxCnt="3" Level="" desc="ACEDEBUG文件输出配置，TrunOn=0为不使用，1为使用" />
 	
-	<!-- <UDPServerIP uip="127.0.0.1" uport="10003" uipType="IPV4" desc="监听TCP服务器的IP和端口，可以是多个" /> -->
+	<!-- <UDPServerIP uip="127.0.0.1" uport="10003" desc="监听TCP服务器的IP和端口，可以是多个" /> -->
 </config>

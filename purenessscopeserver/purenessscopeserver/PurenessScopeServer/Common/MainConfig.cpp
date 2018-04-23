@@ -668,24 +668,6 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
             break;
         }
 
-        pData = m_MainConfig.GetData("TCPServerIP", "ipType", pNextTiXmlElementIpType);
-
-        if(pData != NULL)
-        {
-            if(ACE_OS::strcmp(pData, "IPV6") == 0)
-            {
-                serverinfo.m_u1IPType = TYPE_IPV6;
-            }
-            else
-            {
-                serverinfo.m_u1IPType = TYPE_IPV4;
-            }
-        }
-        else
-        {
-            break;
-        }
-
         pData = m_MainConfig.GetData("TCPServerIP", "ParseID", pNextTiXmlElementPacketID);
 
         if (pData != NULL)
@@ -725,24 +707,6 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
         if (pData != NULL)
         {
             serverinfo.m_nPort = ACE_OS::atoi(pData);
-        }
-        else
-        {
-            break;
-        }
-
-        pData = m_MainConfig.GetData("UDPServerIP", "uipType", pNextTiXmlElementIpType);
-
-        if (pData != NULL)
-        {
-            if (ACE_OS::strcmp(pData, "IPV6") == 0)
-            {
-                serverinfo.m_u1IPType = TYPE_IPV6;
-            }
-            else
-            {
-                serverinfo.m_u1IPType = TYPE_IPV4;
-            }
         }
         else
         {
@@ -1153,20 +1117,6 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
     if(pData != NULL)
     {
         m_nConsolePort = (int32)ACE_OS::atoi(pData);
-    }
-
-    pData = m_MainConfig.GetData("Console", "sipType");
-
-    if(pData != NULL)
-    {
-        if(ACE_OS::strcmp(pData, "IPV6") == 0)
-        {
-            m_u1ConsoleIPType = TYPE_IPV6;
-        }
-        else
-        {
-            m_u1ConsoleIPType = TYPE_IPV4;
-        }
     }
 
     //获得Console可接受的客户端IP
