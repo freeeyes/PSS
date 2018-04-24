@@ -17,6 +17,9 @@ int CTimeEventTask::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 
     CDataManager::GetInstance()->make_detail_html();
 
+    //ÐòÁÐ»¯ÄÚ´æ
+    CDataManager::GetInstance()->Serialization();
+
     return 0;
 }
 

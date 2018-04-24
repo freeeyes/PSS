@@ -115,6 +115,9 @@ int InitModule(CServerObject* pServerObject)
         }
         else
         {
+            //反序列化文件，将上次运行的结果刷入内存
+            CDataManager::GetInstance()->UnSerialization();
+
             //初始化定时器
             ACE_NEW_RETURN(g_pTimeEventTask, CTimeEventTask, 0);
 
