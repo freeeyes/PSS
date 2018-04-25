@@ -24,8 +24,7 @@ public:
     int GetRandom(int nRandType = 0);                //随机算法，0默认是伪随机，1是真随机
 
 private:
-    int GetRandomSeed_Pseudo();
-    int GetRandomSeed();
+    int GetRandomSeed_Logic(const char* pPath);
 
 private:
     int m_nMinNumber;

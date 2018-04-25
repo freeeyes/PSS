@@ -29,18 +29,18 @@ int CRandomNumber::GetRandom(int nRandType)
     if (0 == nRandType)
     {
         //如果是0，采用伪随机，速度快。
-        nRandomSeed = GetRandomSeed_Pseudo();
+        nRandomSeed = GetRandomSeed_Logic("/dev/urandom");
     }
     else
     {
         //否则，采用真随机，速度慢。
-        nRandomSeed = GetRandomSeed();
+        nRandomSeed = GetRandomSeed_Logic("/dev/random");
     }
 
     return m_nMinNumber + nRandomSeed % (m_nMaxNumber - m_nMinNumber);
 }
 
-int CRandomNumber::GetRandomSeed_Pseudo()
+int CRandomNumber::GetRandomSeed_Logic(const char* pPath)
 {
     int rnum = 0;
 #if defined WIN32
@@ -52,7 +52,7 @@ int CRandomNumber::GetRandomSeed_Pseudo()
     rnum = *(int*)pbBuffer;
     ::CryptReleaseContext(hProvider, 0);
 #else
-    int fd = open("/dev/urandom", O_RDONLY);
+    int fd = open(pPath, O_RDONLY);
 
     if (fd != -1)
     {
@@ -78,41 +78,4 @@ int CRandomNumber::GetRandomSeed_Pseudo()
     return rnum;
 }
 
-int CRandomNumber::GetRandomSeed()
-{
-    int rnum = 0;
-#if defined WIN32
-    HCRYPTPROV hProvider = 0;
-    const DWORD dwLength = sizeof(int);
-    BYTE pbBuffer[dwLength] = {};
-    ::CryptAcquireContext(&hProvider, 0, 0, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT | CRYPT_SILENT);
-    ::CryptGenRandom(hProvider, dwLength, pbBuffer);
-    rnum = *(int*)pbBuffer;
-    ::CryptReleaseContext(hProvider, 0);
-#else
-    int fd = open("/dev/random", O_RDONLY);
-
-    if (fd != -1)
-    {
-        size_t stReadLen = read(fd, (void*)&rnum, sizeof(int));
-
-        if (stReadLen != sizeof(int))
-        {
-            //读取文件失败
-            rnum = 0;
-        }
-
-        close(fd);
-    }
-
-#endif
-
-    //随机种子不能产生负数
-    if (rnum < 0)
-    {
-        rnum = 0 - rnum;
-    }
-
-    return rnum;
-}
 
