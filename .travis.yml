@@ -52,8 +52,10 @@ matrix:
   #  
   - os: linux
     script: 
+        - export
         - build-wrapper-linux-x86-64 --out-dir bw-output make all
-        - sonar-scanner
+        - cd $TRAVIS_BUILD_DIR
+        - sonar-scanner 
 
     addons:
       sonarcloud:
