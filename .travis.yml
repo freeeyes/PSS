@@ -57,7 +57,7 @@ matrix:
         - $ACE_ROOT/bin/mwc.pl -type gnuace
         - build-wrapper-linux-x86-64 --out-dir bw-output make
         - cd $TRAVIS_BUILD_DIR
-        - sonar-scanner -Dsonar.projectKey=freeeyes -Dsonar.organization=freeeyes-github -Dsonar.sources=$TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin -Dsonar.cfamily.build-wrapper-output=$TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/bw-output
+        - sonar-scanner
 
     addons:
       sonarcloud:
