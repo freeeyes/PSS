@@ -53,9 +53,7 @@ matrix:
   - os: linux
     script: 
         - export
-        - make clean
         - build-wrapper-linux-x86-64 --out-dir bw-output make all
-        - make test
         - sonar-scanner 
 
     addons:
