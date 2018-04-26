@@ -54,8 +54,7 @@ matrix:
     script: 
         - export
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/
-        - build-wrapper-linux-x86-64 --out-dir bw-output make clean all
-        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/
+        - build-wrapper-linux-x86-64 --out-dir bw-output
         - sonar-scanner -X
 
     addons:
