@@ -46,46 +46,21 @@ before_script:
 #
 matrix:
   include:
-
-  #
-  # Build and scan
-  #
-  - os: linux
-    env:
-      - secure: "eaOg3LKrVSgSq2beHikk9gmf0woxBMAivjBu4rIVJCpSsENlz/XQFZ5n+bbKgczdqLcPCbBqJFmtv0xlNQE2dPsEJ2qkqSIMkiV2oU04mCRtjM1hFn1hO2vxqH1AaEEATm6oH6jxfe47IV6zvPY2B2GdXsBCKJMOjMLkZIzBMP5sguCQjY5j7s+T0mkAJTs2Irj+pHBq78mDIjxMi4ezlDsJq+Xi+edb+9jXNWwLuifIgBlzlGtXLBJo2axY3S0qek+m5C4rswarCNQd3LRvohwJWEDellg/ZZUcW6tKQyxNMxFSkj/kbNG2QcO7zKUIjvWqbvcODCAKIonzuE4jD2T1uYwvZG4P4GU3RbBR6GLF6BSmt7Xuvi6OuSXizGO/0n2WulJ5I6n0uPcSvUxgQlEoE245Jc8t8Ayd1mk+HncYsOpbPcMRcldeoQ+bl3IBOC+mQJQDg8GtdcZrEuG1bZkfvbJChrAuX6Rp9v/iVWytFGE5pErX06TfLD2pevHslMt6on8MOz52AmsLC1wmgpfYqcJGoJkf03eK3vvoeAa1UecfZbo2UrSvPEXHfne/YYif1ErdJ7Uyj1xKlS8i6gOXtvfHrBsr4fIkyea7C5DiDpsvubSZA4NGwaZL/uxeDBsDt1ehx3lrMzMWqO6IxGThsvnztrjZu6bjyrHa6Z0="
-      
-    script: 
-      - export
-      - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
-      - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then 
-          cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin;
-          $ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc;
-          make -j 4;
-        fi
-
-    addons:
-      coverity_scan:
-        project:
-          name: "freeeyes/PSS"
-          description: "Build submitted via Travis CI"
-        notification_email: freeeyes@163.com;liuchao412@foxmail.com
-        build_command_prepend: "cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin;$ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc;make clean"
-        build_command: "make -j 4"
-        branch_pattern: master
-
+  
   #
   # Build and sonarcloud
   #  
-  #- os: linux
-  #  script: 
-  #      - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/
-  #      - sonar-scanner
+  - os: linux
+    script: 
+        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/
+        - build-wrapper-linux-x86-64 --out-dir bw-output make all
+        - sonar-scanner
 
-  #  addons:
-  #    sonarcloud:
-  #      organization: "freeeyes"
-  #      token:
-  #        secure: "qzWDGQvGlJlBvJyG+jhAQXRU3K6n0tf+u6goSNMnW9K1/qkJLThO158V8o4N/Yu4JE5L7hIVlSUUuJbU6xEWWazm4x4rI4KGQ8z8K6F7Jm7kshpNybp8PzibkOiB7K2F8+adrk9bELeYGSA06UqlAtvSn5Q22GlFq+Zwlp8RYGFcZHNOaK0GGPPRu4xHdDMIBhpg5kwjEEpYbfWYmhJJRqNzkityhBxylvcCCnln6FDUpgRbIdCzntl2f5Ctp8ZA9zS5ZX/XMOIbtEePT8DisBQ6s0wMIjthBgEhI9om8yphNe8QYv8Y9kfcK+dvpOvm9RKXZrmzXBKgl2JEmp9vxYFLspQy0y4oVeM7l+7gPa6Bj3lpszbOhZZtHmoBQh7RETW5Fmg3ubKDi9+vGWx417k/JRjdGD8NHHDPDhcDSWCgx85y2UcpO1JUY1LoLl7pF6HAQkFG+Eb3wO7bogvgTd46QJixrmJu/kCC7bFVhKVGGpgRq1A4h4dkwfDvTw8w5zL74zd7AdghwfqihEq2PwfizADCoaszocgOg4kmqIsakuVaGE7r4fo4E4sShcb036OIQz2F6gJmLMgasTMG5E1s+K/j2m3QOZ2fLIyKm2/0rKbL9jYvtYf27FWpBKyPnyIKNegZSu7F/RDEGk2qMkIeK7iuV/4DsDXgJcXMiHk="
+    addons:
+      sonarcloud:
+        organization: "freeeyes"
+        token:
+          secure: "qzWDGQvGlJlBvJyG+jhAQXRU3K6n0tf+u6goSNMnW9K1/qkJLThO158V8o4N/Yu4JE5L7hIVlSUUuJbU6xEWWazm4x4rI4KGQ8z8K6F7Jm7kshpNybp8PzibkOiB7K2F8+adrk9bELeYGSA06UqlAtvSn5Q22GlFq+Zwlp8RYGFcZHNOaK0GGPPRu4xHdDMIBhpg5kwjEEpYbfWYmhJJRqNzkityhBxylvcCCnln6FDUpgRbIdCzntl2f5Ctp8ZA9zS5ZX/XMOIbtEePT8DisBQ6s0wMIjthBgEhI9om8yphNe8QYv8Y9kfcK+dvpOvm9RKXZrmzXBKgl2JEmp9vxYFLspQy0y4oVeM7l+7gPa6Bj3lpszbOhZZtHmoBQh7RETW5Fmg3ubKDi9+vGWx417k/JRjdGD8NHHDPDhcDSWCgx85y2UcpO1JUY1LoLl7pF6HAQkFG+Eb3wO7bogvgTd46QJixrmJu/kCC7bFVhKVGGpgRq1A4h4dkwfDvTw8w5zL74zd7AdghwfqihEq2PwfizADCoaszocgOg4kmqIsakuVaGE7r4fo4E4sShcb036OIQz2F6gJmLMgasTMG5E1s+K/j2m3QOZ2fLIyKm2/0rKbL9jYvtYf27FWpBKyPnyIKNegZSu7F/RDEGk2qMkIeK7iuV/4DsDXgJcXMiHk="
 
   #
   # Update Report
