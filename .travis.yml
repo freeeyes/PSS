@@ -55,7 +55,7 @@ matrix:
         - export
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
         - $ACE_ROOT/bin/mwc.pl -type gnuace
-        - build-wrapper-linux-x86-64 --out-dir bw-output make clean
+        - build-wrapper-linux-x86-64 --out-dir bw-output make
         - cd $TRAVIS_BUILD_DIR
         - sonar-scanner 
 
