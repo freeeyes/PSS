@@ -1524,6 +1524,11 @@ TiXmlComment::TiXmlComment( const TiXmlComment& copy ) : TiXmlNode( TiXmlNode::T
 
 TiXmlComment& TiXmlComment::operator=( const TiXmlComment& base )
 {
+    if (&base == this)
+    {
+        return *this;
+    }
+
     Clear();
     base.CopyTo( this );
     return *this;
