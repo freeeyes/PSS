@@ -329,12 +329,6 @@ bool CAceReactorManager::AddNewReactor(int nReactorID, int nReactorType, int nTh
 
     CAceReactor* pAceReactor = new CAceReactor();
 
-    if (NULL == pAceReactor)
-    {
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CAceReactorManager::AddNewReactor]New CAceReactor is NULL.");
-        return false;
-    }
-
     /*
     if (nReactorID == REACTOR_CLIENTDEFINE)
     {

@@ -194,10 +194,6 @@ public:
         {
             strClassInfo = strClassInfo.erase(0,3);
         }
-        else
-        {
-            strClassInfo = strClassInfo;
-        }
 
         strFileName = strClassInfo + "_CreateInfo.log";
 #else

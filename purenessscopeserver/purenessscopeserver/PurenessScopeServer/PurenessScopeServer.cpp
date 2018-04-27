@@ -112,51 +112,43 @@ bool SetAppPath()
 
     char* pFilePath = new char[nSize];
 
-    if(NULL != pFilePath)
+    char szPath[MAX_BUFF_300] = { '\0' };
+    memset(pFilePath, 0, nSize);
+    sprintf(pFilePath, "/proc/%d/exe", getpid());
+
+    //从符号链接中获得当前文件全路径和文件名
+    ssize_t stPathSize = readlink(pFilePath, szPath, MAX_BUFF_300 - 1);
+
+    if (stPathSize <= 0)
     {
-        char szPath[MAX_BUFF_300] = { '\0' };
-        memset(pFilePath, 0, nSize);
-        sprintf(pFilePath,"/proc/%d/exe",getpid());
-
-        //从符号链接中获得当前文件全路径和文件名
-        ssize_t stPathSize = readlink(pFilePath, szPath, MAX_BUFF_300 - 1);
-
-        if (stPathSize <= 0)
-        {
-            OUR_DEBUG((LM_INFO, "[SetAppPath]no find work Path.\n", szPath));
-            SAFE_DELETE_ARRAY(pFilePath);
-            return false;
-        }
-        else
-        {
-            SAFE_DELETE_ARRAY(pFilePath);
-        }
-
-        while(szPath[stPathSize - 1]!='/')
-        {
-            stPathSize--;
-        }
-
-        szPath[stPathSize > 0 ? (stPathSize-1) : 0]= '\0';
-
-        int nRet = chdir(szPath);
-
-        if (-1 == nRet)
-        {
-            OUR_DEBUG((LM_INFO, "[SetAppPath]Set work Path (%s) fail.\n", szPath));
-        }
-        else
-        {
-            OUR_DEBUG((LM_INFO, "[SetAppPath]Set work Path (%s) OK.\n", szPath));
-        }
-
-        return true;
+        OUR_DEBUG((LM_INFO, "[SetAppPath]no find work Path.\n", szPath));
+        SAFE_DELETE_ARRAY(pFilePath);
+        return false;
     }
     else
     {
-        OUR_DEBUG((LM_INFO, "[SetAppPath]Set work Path[null].\n"));
-        return false;
+        SAFE_DELETE_ARRAY(pFilePath);
     }
+
+    while(szPath[stPathSize - 1]!='/')
+    {
+        stPathSize--;
+    }
+
+    szPath[stPathSize > 0 ? (stPathSize-1) : 0]= '\0';
+
+    int nRet = chdir(szPath);
+
+    if (-1 == nRet)
+    {
+        OUR_DEBUG((LM_INFO, "[SetAppPath]Set work Path (%s) fail.\n", szPath));
+    }
+    else
+    {
+        OUR_DEBUG((LM_INFO, "[SetAppPath]Set work Path (%s) OK.\n", szPath));
+    }
+
+    return true;
 }
 
 //获得当前文件打开数

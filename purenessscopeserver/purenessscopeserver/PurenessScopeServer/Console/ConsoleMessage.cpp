@@ -21,12 +21,6 @@ int CConsoleMessage::Dispose(ACE_Message_Block* pmb, IBuffPacket* pBuffPacket, u
 
     char* pCommand = new char[(uint32)pmb->length() + 1];
 
-    if(NULL == pCommand)
-    {
-        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::Dispose]pCommand is NULL.\n"));
-        return CONSOLE_MESSAGE_FAIL;
-    }
-
     pCommand[(uint32)pmb->length() - 1] = '\0';
 
     memcpy_safe((char* )pmb->rd_ptr(), (uint32)pmb->length(), pCommand, (uint32)pmb->length());
