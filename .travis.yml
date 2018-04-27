@@ -57,7 +57,7 @@ matrix:
         - $ACE_ROOT/bin/mwc.pl -type gnuace
         - build-wrapper-linux-x86-64 --out-dir bw-output make clean all
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver
-        - sonar-scanner
+        - sonar-scanner -Dsonar.organization=freeeyes-github
 
     addons:
       sonarcloud:
