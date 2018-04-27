@@ -1367,11 +1367,6 @@ const char* TiXmlElement::Parse( const char* p, TiXmlParsingData* data, TiXmlEnc
             // Try to read an attribute:
             TiXmlAttribute* attrib = new TiXmlAttribute();
 
-            if ( !attrib )
-            {
-                return 0;
-            }
-
             attrib->SetDocument( document );
             pErr = p;
             p = attrib->Parse( p, data, encoding );
@@ -1427,11 +1422,6 @@ const char* TiXmlElement::ReadValue( const char* p, TiXmlParsingData* data, TiXm
         {
             // Take what we have, make a text element.
             TiXmlText* textNode = new TiXmlText( "" );
-
-            if ( !textNode )
-            {
-                return 0;
-            }
 
             if ( TiXmlBase::IsWhiteSpaceCondensed() )
             {
