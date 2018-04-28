@@ -185,6 +185,8 @@
     <ClCompile Include="Common\ServerMessageTask.cpp" />
     <ClCompile Include="Console\ConsolePromiss.cpp" />
     <ClCompile Include="Console\FrameCommand.cpp" />
+    <ClCompile Include="Console\MessageDefine.cpp" />
+    <ClCompile Include="Console\MessageDispose.cpp" />
     <ClCompile Include="Message\MessageDyeingManager.cpp" />
     <ClCompile Include="PurenessScopeServer.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -549,6 +551,8 @@
     <ClInclude Include="Common\ServerMessageTask.h" />
     <ClInclude Include="Console\ConsolePromiss.h" />
     <ClInclude Include="Console\FrameCommand.h" />
+    <ClInclude Include="Console\MessageDefine.h" />
+    <ClInclude Include="Console\MessageDispose.h" />
     <ClInclude Include="Encrypt\Aes.h" />
     <ClInclude Include="FileTest\FileTest.h" />
     <ClInclude Include="FileTest\FileTestManager.h" />

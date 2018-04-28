@@ -226,6 +226,12 @@
     <ClCompile Include="..\Common\ACEMemory.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="Console\MessageDefine.cpp">
+      <Filter>Console\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Console\MessageDispose.cpp">
+      <Filter>Console\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -566,6 +572,12 @@
     </ClInclude>
     <ClInclude Include="..\Common\IpCheck.h">
       <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Console\MessageDefine.h">
+      <Filter>Console\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Console\MessageDispose.h">
+      <Filter>Console\hfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
