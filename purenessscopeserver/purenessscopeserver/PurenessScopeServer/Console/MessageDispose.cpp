@@ -4,21 +4,15 @@ void DoMessage_LoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, u
 {
     _FileInfo FileInfo;
 
-    if (false == GetFileInfo(CommandInfo.m_szCommandExp, FileInfo))
+    if (false == GetFileInfo(CommandInfo.m_szCommandExp, FileInfo) && CommandInfo.m_u1OutputType == 0)
     {
-        if (NULL != pBuffPacket)
-        {
-            if (CommandInfo.m_u1OutputType == 0)
-            {
-                (*pBuffPacket) << (uint8)1;
-            }
-            else
-            {
-                char szTemp[MAX_BUFF_200] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_200, "Command data is Error.\n");
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            }
-        }
+        (*pBuffPacket) << (uint8)1;
+    }
+    else
+    {
+        char szTemp[MAX_BUFF_200] = { '\0' };
+        sprintf_safe(szTemp, MAX_BUFF_200, "Command data is Error.\n");
+        pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
     }
 
     //¼ÓÔØÎÄ¼þMessageManager
@@ -26,18 +20,15 @@ void DoMessage_LoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, u
     if (true == App_ModuleLoader::instance()->LoadModule(FileInfo.m_szFilePath, FileInfo.m_szFileName, FileInfo.m_szFileParam) &&
         true == App_MessageServiceGroup::instance()->PutUpdateCommandMessage(0))
     {
-        if (NULL != pBuffPacket)
+        if (CommandInfo.m_u1OutputType == 0)
         {
-            if (CommandInfo.m_u1OutputType == 0)
-            {
-                (*pBuffPacket) << (uint8)0;
-            }
-            else
-            {
-                char szTemp[MAX_BUFF_200] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_200, "LoadModule(%s) is fail.\n", FileInfo.m_szFileName);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            }
+            (*pBuffPacket) << (uint8)0;
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_200] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_200, "LoadModule(%s) is fail.\n", FileInfo.m_szFileName);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
         }
     }
     else
@@ -65,34 +56,28 @@ void DoMessage_UnLoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket,
     if (true == App_MessageManager::instance()->UnloadModuleCommand(CommandInfo.m_szCommandExp, (uint8)1, App_MessageServiceGroup::instance()->GetWorkThreadCount()) &&
         true == App_MessageServiceGroup::instance()->PutUpdateCommandMessage(App_MessageManager::instance()->GetUpdateIndex()))
     {
-        if (NULL != pBuffPacket)
+        if (CommandInfo.m_u1OutputType == 0)
         {
-            if (CommandInfo.m_u1OutputType == 0)
-            {
-                (*pBuffPacket) << (uint8)0;
-            }
-            else
-            {
-                char szTemp[MAX_BUFF_200] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_200, "UnloadModule(%s) is ok.\n", CommandInfo.m_szCommandExp);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            }
+            (*pBuffPacket) << (uint8)0;
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_200] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_200, "UnloadModule(%s) is ok.\n", CommandInfo.m_szCommandExp);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
         }
     }
     else
     {
-        if (NULL != pBuffPacket)
+        if (CommandInfo.m_u1OutputType == 0)
         {
-            if (CommandInfo.m_u1OutputType == 0)
-            {
-                (*pBuffPacket) << (uint8)1;
-            }
-            else
-            {
-                char szTemp[MAX_BUFF_200] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_200, "UnloadModule(%s) is fail.\n", CommandInfo.m_szCommandExp);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            }
+            (*pBuffPacket) << (uint8)1;
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_200] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_200, "UnloadModule(%s) is fail.\n", CommandInfo.m_szCommandExp);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
         }
     }
 
@@ -104,34 +89,28 @@ void DoMessage_ReLoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket,
     if (true == App_MessageManager::instance()->UnloadModuleCommand(CommandInfo.m_szCommandExp, (uint8)2, App_MessageServiceGroup::instance()->GetWorkThreadCount()) &&
         true == App_MessageServiceGroup::instance()->PutUpdateCommandMessage(App_MessageManager::instance()->GetUpdateIndex()))
     {
-        if (NULL != pBuffPacket)
+        if (CommandInfo.m_u1OutputType == 0)
         {
-            if (CommandInfo.m_u1OutputType == 0)
-            {
-                (*pBuffPacket) << (uint8)0;
-            }
-            else
-            {
-                char szTemp[MAX_BUFF_200] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_200, "UnloadModule(%s) is ok.\n", CommandInfo.m_szCommandExp);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            }
+            (*pBuffPacket) << (uint8)0;
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_200] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_200, "UnloadModule(%s) is ok.\n", CommandInfo.m_szCommandExp);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
         }
     }
     else
     {
-        if (NULL != pBuffPacket)
+        if (CommandInfo.m_u1OutputType == 0)
         {
-            if (CommandInfo.m_u1OutputType == 0)
-            {
-                (*pBuffPacket) << (uint8)1;
-            }
-            else
-            {
-                char szTemp[MAX_BUFF_200] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_200, "UnloadModule(%s) is false.\n", CommandInfo.m_szCommandExp);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            }
+            (*pBuffPacket) << (uint8)1;
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_200] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_200, "UnloadModule(%s) is false.\n", CommandInfo.m_szCommandExp);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
         }
     }
 
@@ -337,6 +316,10 @@ void DoMessage_ShowModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, u
         }
 
         u2ReturnCommandID = CONSOLE_COMMAND_SHOWMOUDLE;
+    }
+    else
+    {
+        OUR_DEBUG((LM_INFO, "[DoMessage_ShowModule]Param is error.\n"));
     }
 }
 

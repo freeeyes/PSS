@@ -255,6 +255,12 @@ int CConsoleMessage::DoCommand(_CommandInfo& CommandInfo, IBuffPacket* pCurrBuff
 {
     uint16 u2ReturnCommandID = CONSOLE_COMMAND_UNKNOW;
 
+    if (NULL == pCurrBuffPacket)
+    {
+        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]pCurrBuffPacket is NULL.\n"));
+        return CONSOLE_MESSAGE_FAIL;
+    }
+
     //查找并处理指令信息
     mapMessageList::iterator f = m_objHashMessageLogicList.find((string)CommandInfo.m_szCommandTitle);
 
