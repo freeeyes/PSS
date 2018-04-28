@@ -11,8 +11,9 @@
 #include "IpCheck.h"
 
 //PacketParse相关信息
-struct _PacketParseInfo
+class _PacketParseInfo
 {
+public:
     uint32 m_u4PacketID;
     uint32 m_u4OrgLength;
     uint8  m_u1Type;
@@ -31,8 +32,9 @@ struct _PacketParseInfo
 
 //服务器信息
 //增加对IPv4和IPv6的支持
-struct _ServerInfo
+class _ServerInfo
 {
+public:
     uint32 m_u4PacketParseInfoID;
     int32  m_nPort;
     uint8  m_u1IPType;
@@ -48,8 +50,9 @@ struct _ServerInfo
 };
 
 //单个插件加载相关信息
-struct _ModuleConfig
+class _ModuleConfig
 {
+public:
     char m_szModuleName[MAX_BUFF_100];
     char m_szModulePath[MAX_BUFF_200];
     char m_szModuleParam[MAX_BUFF_200];
@@ -66,8 +69,9 @@ typedef vector<_ModuleConfig> vecModuleConfig;
 
 //远程管理器支持
 //记录允许远程维护接口进入的数据key的内容。
-struct _ConsoleKey
+class _ConsoleKey
 {
+public:
     char m_szKey[MAX_BUFF_100];
 
     _ConsoleKey()
@@ -79,8 +83,9 @@ struct _ConsoleKey
 typedef vector<_ConsoleKey> vecConsoleKey;
 
 //Console管理后台允许IP信息
-struct _ConsoleClientIP
+class _ConsoleClientIP
 {
+public:
     char m_szServerIP[MAX_BUFF_20];
 
     _ConsoleClientIP()
@@ -90,8 +95,9 @@ struct _ConsoleClientIP
 };
 
 //连接告警阀值相关配置
-struct _ConnectAlert
+class _ConnectAlert
 {
+public:
     uint32 m_u4ConnectMin;
     uint32 m_u4ConnectMax;
     uint32 m_u4DisConnectMin;
@@ -111,8 +117,9 @@ struct _ConnectAlert
 };
 
 //连接IP告警阀值相关配置
-struct _IPAlert
+class _IPAlert
 {
+public:
     uint32 m_u4IPMaxCount;
     uint32 m_u4IPTimeout;
     uint32 m_u4MailID;
@@ -126,8 +133,9 @@ struct _IPAlert
 };
 
 //单链接告警阀值相关配置
-struct _ClientDataAlert
+class _ClientDataAlert
 {
+public:
     uint32 m_u4RecvPacketCount;
     uint32 m_u4RecvDataMax;
     uint32 m_u4SendPacketCount;
@@ -145,8 +153,9 @@ struct _ClientDataAlert
 };
 
 //命令行告警阀值计算
-struct _CommandAlert
+class _CommandAlert
 {
+public:
     uint32 m_u4CommandCount;
     uint32 m_u4MailID;
     uint16 m_u2CommandID;
@@ -161,8 +170,9 @@ struct _CommandAlert
 typedef vector<_CommandAlert> vecCommandAlert;
 
 //邮件配置相关信息
-struct _MailAlert
+class _MailAlert
 {
+public:
     uint32 m_u4MailPort;
     uint32 m_u4MailID;
     char   m_szFromMailAddr[MAX_BUFF_200];
@@ -183,8 +193,9 @@ struct _MailAlert
 typedef vector<_MailAlert> vecMailAlert;
 
 //集群配置相关信息
-struct _GroupListenInfo
+class _GroupListenInfo
 {
+public:
     uint32 m_u4GroupPort;
     uint8  m_u1GroupNeed;
     uint8  m_u1IPType;
@@ -200,8 +211,9 @@ struct _GroupListenInfo
 };
 
 //输出图表信息
-struct _ChartInfo
+class _ChartInfo
 {
+public:
     bool   m_blJsonOutput;
     uint16 m_u2Count;
     uint32 m_u4CommandID;

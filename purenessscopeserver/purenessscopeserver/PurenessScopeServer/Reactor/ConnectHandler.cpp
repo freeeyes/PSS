@@ -33,7 +33,6 @@ CConnectHandler::CConnectHandler(void)
     m_u8SendQueueTimeout  = MAX_QUEUE_TIMEOUT * 1000 * 1000;  //目前因为记录的是纳秒
     m_u8RecvQueueTimeout  = MAX_QUEUE_TIMEOUT * 1000 * 1000;  //目前因为记录的是纳秒
     m_u2TcpNodelay        = TCP_NODELAY_ON;
-    //m_emStatus            = CLIENT_CLOSE_NOTHING;
     m_u4SendMaxBuffSize   = 5*MAX_BUFF_1024;
     m_szLocalIP[0]        = '\0';
     m_szConnectName[0]    = '\0';

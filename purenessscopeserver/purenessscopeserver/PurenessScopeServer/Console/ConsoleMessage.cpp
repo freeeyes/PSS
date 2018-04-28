@@ -110,13 +110,10 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
         CommandInfo.m_szUser[ACE_OS::strlen(szKey)] = '\0';
     }
 
-    if (true == blCheck)
+    if (true == blCheck && false == CheckConsoleKey(szKey))
     {
-        if (false == CheckConsoleKey(szKey))
-        {
-            OUR_DEBUG((LM_ERROR, "[CConsoleMessage::GetCommandInfo]szKey is invalid.\n"));
-            return false;
-        }
+        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::GetCommandInfo]szKey is invalid.\n"));
+        return false;
     }
 
     //获得命令头
@@ -128,12 +125,15 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
         return false;
     }
 
-    memcpy_safe(pCommandBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), (uint32)(pParamBegin - pCommandBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING)), (char*)CommandInfo.m_szCommandTitle, (uint32)(pParamBegin - pCommandBegin - (int)ACE_OS::strlen(COMMAND_SPLIT_STRING)));
-    CommandInfo.m_szCommandTitle[(int)(pParamBegin - pCommandBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING))] = '\0';
+    uint32 u4Data4Len = 0;
+    u4Data4Len = (uint32)(pParamBegin - pCommandBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING));
+    memcpy_safe(pCommandBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), u4Data4Len, (char*)CommandInfo.m_szCommandTitle, (uint32)(pParamBegin - pCommandBegin - (int)ACE_OS::strlen(COMMAND_SPLIT_STRING)));
+    CommandInfo.m_szCommandTitle[u4Data4Len] = '\0';
 
     //获得扩展参数
-    memcpy_safe(pParamBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), (uint32)(nLen - (pParamBegin - pCommand - ACE_OS::strlen(COMMAND_SPLIT_STRING)) + 1), (char*)CommandInfo.m_szCommandExp, (uint32)(nLen - (pParamBegin - pCommand - (int)ACE_OS::strlen(COMMAND_SPLIT_STRING)) + 1));
-    CommandInfo.m_szCommandExp[(nLen - (pParamBegin - pCommand - ACE_OS::strlen(COMMAND_SPLIT_STRING)) + 1)] = '\0';
+    u4Data4Len = (uint32)(nLen - (pParamBegin - pCommand - ACE_OS::strlen(COMMAND_SPLIT_STRING)) + 1);
+    memcpy_safe(pParamBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), u4Data4Len, (char*)CommandInfo.m_szCommandExp, u4Data4Len);
+    CommandInfo.m_szCommandExp[u4Data4Len] = '\0';
 
     return true;
 }
