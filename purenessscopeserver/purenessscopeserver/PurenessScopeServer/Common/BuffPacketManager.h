@@ -11,8 +11,6 @@
 #include "ObjectPoolManager.h"
 #include "MainConfig.h"
 
-using namespace std;
-
 class CBuffPacketManager : public CObjectPoolManager<CBuffPacket, ACE_Recursive_Thread_Mutex>, public IPacketManager
 {
 public:

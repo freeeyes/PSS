@@ -77,7 +77,6 @@ bool CBuffPacket::Close()
         if(NULL != m_szData)
         {
             App_ACEMemory::instance()->free((void* )m_szData);
-            //delete m_szData;
             m_szData          = NULL;
             m_u4ReadPtr       = 0;
             m_u4WritePtr      = 0;
@@ -146,7 +145,6 @@ bool CBuffPacket::AddBuffPacket(uint32 u4Size)
 
             //删除已经不用的内存
             App_ACEMemory::instance()->free(m_szData);
-            //delete m_szData;
             m_szData = szNewData;
         }
 
@@ -203,7 +201,6 @@ bool CBuffPacket::AddBuff(uint32 u4Size)
 
             //删除已经不用的内存
             App_ACEMemory::instance()->free(m_szData);
-            //delete m_szData;
             m_szData = szNewData;
         }
 
@@ -423,7 +420,6 @@ CBuffPacket& CBuffPacket::operator >> (uint32& u4Data)
     if(m_u4WritePtr - m_u4ReadPtr >= (uint32)sizeof(u4Data))
     {
         //把网络字节序，转换为主机字节序
-        //uint32 n4Net = *(uint32 *)ReadPtr();
         uint32 n4Net = 0;
         memcpy_safe(ReadPtr(), (uint32)sizeof(uint32), (char* )&n4Net, (uint32)sizeof(uint32));
         ReadPtr((uint32)sizeof(n4Net));
@@ -448,7 +444,6 @@ CBuffPacket& CBuffPacket::operator >> (uint64& u8Data)
 
     if(m_u4WritePtr - m_u4ReadPtr >= (uint32)sizeof(u8Data))
     {
-        //uint64 u8Net = *(uint64 *)ReadPtr();
         uint64 u8Net = 0;
         memcpy_safe(ReadPtr(), (uint32)sizeof(uint64), (char* )&u8Net, (uint32)sizeof(uint64));
         ReadPtr((uint32)sizeof(u8Net));
