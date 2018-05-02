@@ -46,8 +46,10 @@ public:
     void SetBuffID(uint32 u4BuffID);            //设置BuffID
     uint32 GetBuffID();                         //得到BuffID
 
-    int32 GetHashID();                            //设置HashID
-    void SetHashID(int32 nHashID);                //得到HashID
+    int32 GetHashID();                          //设置HashID
+    void SetHashID(int32 nHashID);              //得到HashID
+
+    char* GetError();                           //返回错误信息
 
 private:
     bool AddBuff(uint32 u4Size);
@@ -101,7 +103,6 @@ private:
     int32                      m_nHashID;                      //记录当前对象在Hash数组中的位置
     bool                       m_blNetSort;                    //字节序开启开关，false为不转换为主机字节序，true为转换为主机字节序
     char                       m_szError[MAX_BUFF_500];        //错误信息
-    ACE_Recursive_Thread_Mutex m_ThreadLock;
 
 public:
     void* operator new(size_t stSize)

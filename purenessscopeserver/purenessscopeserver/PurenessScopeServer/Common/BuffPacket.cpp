@@ -14,16 +14,10 @@ CBuffPacket::CBuffPacket()
 
 CBuffPacket::~CBuffPacket(void)
 {
-    //OUR_DEBUG((LM_ERROR, "[CBuffPacket::~CBuffPacket].\n"));
-    if (false == Close())
-    {
-        OUR_DEBUG((LM_INFO, "[CBuffPacket::~CBuffPacket]Close error(%s).\n", m_szError));
-    }
 }
 
 bool CBuffPacket::Init(int32 nSize, int32 nMaxBuffSize)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     try
     {
         m_szError[0]      = '\0';
@@ -34,7 +28,7 @@ bool CBuffPacket::Init(int32 nSize, int32 nMaxBuffSize)
             OUR_DEBUG((LM_ERROR, "[CBuffPacket::Init] nSize [%d] is more than m_u4MaxPacketSize.\n", nSize));
             char szError[MAX_BUFF_500] = {'\0'};
             sprintf_safe(szError, MAX_BUFF_500, "[CBuffPacket::Init] nSize [%d] is more than m_u4MaxPacketSize.", nSize);
-            throw szError;
+            throw std::domain_error(szError);
         }
 
         //初始化包数据结构
@@ -47,30 +41,27 @@ bool CBuffPacket::Init(int32 nSize, int32 nMaxBuffSize)
         m_szData          = (char*)App_ACEMemory::instance()->malloc(m_u4PacketLen);
         m_u4BuffID        = 0;
 
-        //OUR_DEBUG((LM_ERROR, "[CBuffPacket::Init] nSize [%d], m_szData=[0x%08x].\n", m_u4PacketLen, m_szData));
-
         if(NULL == m_szData)
         {
             OUR_DEBUG((LM_ERROR, "[CBuffPacket::Init] nSize [%d] is new error.\n", m_u4PacketLen));
             char szError[MAX_BUFF_500] = {'\0'};
             sprintf_safe(szError, MAX_BUFF_500, "[CBuffPacket::Init] nSize [%d] is new error..", m_u4PacketLen);
-            throw szError;
+            throw std::domain_error(szError);
         }
 
         m_blNetSort = false;
 
         return true;
     }
-    catch(const char* szError)
+    catch(const std::domain_error& ex)
     {
-        sprintf_safe(m_szError, MAX_BUFF_500, "%s", szError);
+        sprintf_safe(m_szError, MAX_BUFF_500, "%s", ex.what());
         return false;
     }
 }
 
 bool CBuffPacket::Close()
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     try
     {
         if(m_u4PacketLen >= m_u4MaxPacketSize)
@@ -78,7 +69,7 @@ bool CBuffPacket::Close()
             OUR_DEBUG((LM_ERROR, "[CBuffPacket::Close] nSize [%d] is more than m_u4MaxPacketSize.\n", m_u4PacketLen));
             char szError[MAX_BUFF_500] = {'\0'};
             sprintf_safe(szError, MAX_BUFF_500, "[CBuffPacket::Close] nSize [%d] is more than m_u4MaxPacketSize.", m_u4PacketLen);
-            throw szError;
+            throw std::domain_error(szError);
         }
 
         //OUR_DEBUG((LM_ERROR, "[CBuffPacket::Close] nSize [%d], m_szData=[0x%08x].\n", m_u4PacketLen, m_szData));
@@ -95,9 +86,9 @@ bool CBuffPacket::Close()
 
         return true;
     }
-    catch(const char* szError)
+    catch(const std::domain_error& ex)
     {
-        sprintf_safe(m_szError, MAX_BUFF_500, "%s", szError);
+        sprintf_safe(m_szError, MAX_BUFF_500, "%s", ex.what());
         return false;
     }
 }
@@ -115,7 +106,6 @@ bool CBuffPacket::Clear()
 
 bool CBuffPacket::AddBuffPacket(uint32 u4Size)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     try
     {
         char* szNewData = NULL;
@@ -125,7 +115,7 @@ bool CBuffPacket::AddBuffPacket(uint32 u4Size)
             OUR_DEBUG((LM_ERROR, "[CBuffPacket::AddBuff] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", u4Size, m_u4PacketLen));
             char szError[MAX_BUFF_500] = {'\0'};
             sprintf_safe(szError, MAX_BUFF_500, "[CBuffPacket::AddBuff] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", u4Size, m_u4PacketLen);
-            throw szError;
+            throw std::domain_error(szError);
         }
 
         //保存当前长度
@@ -142,7 +132,7 @@ bool CBuffPacket::AddBuffPacket(uint32 u4Size)
             OUR_DEBUG((LM_ERROR, "[CBuffPacket::AddBuff] nSize [%d] is new error.\n", m_u4PacketLen));
             char szError[MAX_BUFF_500] = {'\0'};
             sprintf_safe(szError, MAX_BUFF_500, "[CBuffPacket::AddBuff] nSize [%d] is new error..", m_u4PacketLen);
-            throw szError;
+            throw std::domain_error(szError);
         }
 
         if(NULL == m_szData)
@@ -163,9 +153,9 @@ bool CBuffPacket::AddBuffPacket(uint32 u4Size)
 
         return true;
     }
-    catch(const char* szError)
+    catch(const std::domain_error& ex)
     {
-        sprintf_safe(m_szError, MAX_BUFF_500, "%s", szError);
+        sprintf_safe(m_szError, MAX_BUFF_500, "%s", ex.what());
         return false;
     }
 }
@@ -182,7 +172,7 @@ bool CBuffPacket::AddBuff(uint32 u4Size)
             OUR_DEBUG((LM_ERROR, "[CBuffPacket::AddBuff] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", u4Size, m_u4PacketLen));
             char szError[MAX_BUFF_500] = {'\0'};
             sprintf_safe(szError, MAX_BUFF_500, "[CBuffPacket::AddBuff] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", u4Size, m_u4PacketLen);
-            throw szError;
+            throw std::domain_error(szError);
         }
 
         //保存当前长度
@@ -199,7 +189,7 @@ bool CBuffPacket::AddBuff(uint32 u4Size)
             OUR_DEBUG((LM_ERROR, "[CBuffPacket::AddBuff] nSize [%d] is new error.\n", m_u4PacketLen));
             char szError[MAX_BUFF_500] = {'\0'};
             sprintf_safe(szError, MAX_BUFF_500, "[CBuffPacket::AddBuff] nSize [%d] is new error..", m_u4PacketLen);
-            throw szError;
+            throw std::domain_error(szError);
         }
 
         if(NULL == m_szData)
@@ -220,9 +210,9 @@ bool CBuffPacket::AddBuff(uint32 u4Size)
 
         return true;
     }
-    catch(const char* szError)
+    catch(const std::domain_error& ex)
     {
-        sprintf_safe(m_szError, MAX_BUFF_500, "%s", szError);
+        sprintf_safe(m_szError, MAX_BUFF_500, "%s", ex.what());
         return false;
     }
 }
@@ -254,7 +244,6 @@ uint32 CBuffPacket::GetWriteLen()
 
 uint32 CBuffPacket::GetHeadLen()
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     if(m_u4PacketLen - m_u4ReadPtr > sizeof(uint32))
     {
         return *(uint32*)ReadPtr();
@@ -267,7 +256,6 @@ uint32 CBuffPacket::GetHeadLen()
 
 void CBuffPacket::ReadBuffPtr(uint32 u4Size)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     ReadPtr(u4Size);
 }
 
@@ -281,7 +269,6 @@ void CBuffPacket::ReadPtr(uint32 u4Size)
 
 void CBuffPacket::WriteBuffPtr(uint32 u4Size)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     WritePtr(u4Size);
 }
 
@@ -300,7 +287,6 @@ char* CBuffPacket::ReadPtr()
 
 void CBuffPacket::SetReadPtr(uint32 u4Pos)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     if(u4Pos < m_u4PacketLen)
     {
         m_u4ReadPtr = u4Pos;
@@ -314,7 +300,6 @@ char* CBuffPacket::WritePtr()
 
 bool CBuffPacket::RollBack(uint32 u4Len)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     uint32 u4NewLen = 0;
 
     if(u4Len >= m_u4WritePtr)
@@ -342,7 +327,6 @@ bool CBuffPacket::RollBack(uint32 u4Len)
 
 bool CBuffPacket::WriteStream(const char* pData, uint32 u4Len)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     if(u4Len + m_u4PacketLen >= m_u4MaxPacketSize)
     {
         OUR_DEBUG((LM_ERROR, "[CBuffPacket::WriteStream] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", u4Len, m_u4PacketLen));
@@ -374,7 +358,6 @@ bool CBuffPacket::WriteStream(const char* pData, uint32 u4Len)
 
 bool CBuffPacket::ReadStream(char* pData, uint32& u4Len)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     if(pData == NULL || u4Len > m_u4PacketLen - m_u4ReadPtr)
     {
         return false;
@@ -387,19 +370,16 @@ bool CBuffPacket::ReadStream(char* pData, uint32& u4Len)
 
 void CBuffPacket::SetPacketCount(uint32 u4PacketCount)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     m_u4PacketCount = u4PacketCount;
 }
 
 uint32 CBuffPacket::GetPacketCount()
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     return m_u4PacketCount;
 }
 
 CBuffPacket& CBuffPacket::operator >> (uint8& u1Data)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     u1Data = 0;
 
     if(m_u4WritePtr - m_u4ReadPtr >= sizeof(u1Data))
@@ -413,7 +393,6 @@ CBuffPacket& CBuffPacket::operator >> (uint8& u1Data)
 
 CBuffPacket& CBuffPacket::operator >> (uint16& u2Data)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     u2Data = 0;
 
     if(m_u4WritePtr - m_u4ReadPtr >= (uint32)sizeof(u2Data))
@@ -439,7 +418,6 @@ CBuffPacket& CBuffPacket::operator >> (uint16& u2Data)
 
 CBuffPacket& CBuffPacket::operator >> (uint32& u4Data)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     u4Data = 0;
 
     if(m_u4WritePtr - m_u4ReadPtr >= (uint32)sizeof(u4Data))
@@ -466,7 +444,6 @@ CBuffPacket& CBuffPacket::operator >> (uint32& u4Data)
 
 CBuffPacket& CBuffPacket::operator >> (uint64& u8Data)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     u8Data = 0;
 
     if(m_u4WritePtr - m_u4ReadPtr >= (uint32)sizeof(u8Data))
@@ -491,7 +468,6 @@ CBuffPacket& CBuffPacket::operator >> (uint64& u8Data)
 
 CBuffPacket& CBuffPacket::operator >> (int8& n1Data)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     n1Data = 0;
 
     if(m_u4WritePtr - m_u4ReadPtr >= sizeof(n1Data))
@@ -505,7 +481,6 @@ CBuffPacket& CBuffPacket::operator >> (int8& n1Data)
 
 CBuffPacket& CBuffPacket::operator >> (int16& n2Data)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     n2Data = 0;
 
     if(m_u4WritePtr - m_u4ReadPtr >= sizeof(n2Data))
@@ -529,14 +504,10 @@ CBuffPacket& CBuffPacket::operator >> (int16& n2Data)
 
 CBuffPacket& CBuffPacket::operator >> (int32& n4Data)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     n4Data = 0;
 
     if(m_u4WritePtr - m_u4ReadPtr >= sizeof(n4Data))
     {
-        //n4Data = *(int32 *)ReadPtr();
-        //ReadPtr((uint32)sizeof(n4Data));
-
         int32 n4Net = 0;
         memcpy_safe(ReadPtr(), (uint32)sizeof(int32), (char* )&n4Net, (uint32)sizeof(int32));
         ReadPtr((uint32)sizeof(n4Net));
@@ -556,7 +527,6 @@ CBuffPacket& CBuffPacket::operator >> (int32& n4Data)
 
 CBuffPacket& CBuffPacket::operator >> (float32& f4Data)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     f4Data = 0;
 
     if(m_u4WritePtr - m_u4ReadPtr >= (uint32)sizeof(f4Data))
@@ -571,7 +541,6 @@ CBuffPacket& CBuffPacket::operator >> (float32& f4Data)
 
 CBuffPacket& CBuffPacket::operator >> (float64& f8Data)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     f8Data = 0;
 
     if(m_u4WritePtr - m_u4ReadPtr >= (uint32)sizeof(f8Data))
@@ -586,7 +555,6 @@ CBuffPacket& CBuffPacket::operator >> (float64& f8Data)
 
 CBuffPacket& CBuffPacket::operator >> (VCHARS_STR& str)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     uint8 u1Len = 0;
     (*this) >> (u1Len);
 
@@ -606,7 +574,6 @@ CBuffPacket& CBuffPacket::operator >> (VCHARS_STR& str)
 
 CBuffPacket& CBuffPacket::operator >> (VCHARM_STR& str)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     uint16 u2Len = 0;
     (*this) >> (u2Len);
 
@@ -626,7 +593,6 @@ CBuffPacket& CBuffPacket::operator >> (VCHARM_STR& str)
 
 CBuffPacket& CBuffPacket::operator >> (VCHARB_STR& str)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     uint32 u4Len = 0;
     (*this) >> (u4Len);
 
@@ -646,7 +612,6 @@ CBuffPacket& CBuffPacket::operator >> (VCHARB_STR& str)
 
 CBuffPacket& CBuffPacket::operator >> (string& str)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     uint32 u4Len = 0;
     (*this) >> (u4Len);
 
@@ -661,7 +626,6 @@ CBuffPacket& CBuffPacket::operator >> (string& str)
 
 CBuffPacket& CBuffPacket::operator << (uint8 u1Data)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     if( (uint32)sizeof(u1Data) + m_u4PacketLen >= m_u4MaxPacketSize)
     {
         OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(u1Data), m_u4PacketLen));
@@ -694,7 +658,6 @@ CBuffPacket& CBuffPacket::operator << (uint8 u1Data)
 
 CBuffPacket& CBuffPacket::operator << (uint16 u2Data)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     if( (uint32)sizeof(u2Data) + m_u4PacketLen >= m_u4MaxPacketSize)
     {
         OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(u2Data), m_u4PacketLen));
@@ -751,7 +714,6 @@ CBuffPacket& CBuffPacket::operator << (uint16 u2Data)
 
 CBuffPacket& CBuffPacket::operator << (uint32 u4Data)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     if( (uint32)sizeof(u4Data) + m_u4PacketLen >= m_u4MaxPacketSize)
     {
         OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(u4Data), m_u4PacketLen));
@@ -808,7 +770,6 @@ CBuffPacket& CBuffPacket::operator << (uint32 u4Data)
 
 CBuffPacket& CBuffPacket::operator << (uint64 u8Data)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     if( (uint32)sizeof(u8Data) + m_u4PacketLen >= m_u4MaxPacketSize)
     {
         OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(u8Data), m_u4PacketLen));
@@ -865,7 +826,6 @@ CBuffPacket& CBuffPacket::operator << (uint64 u8Data)
 
 CBuffPacket& CBuffPacket::operator << (int8 n1Data)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     if( (uint32)sizeof(n1Data) + m_u4PacketLen >= m_u4MaxPacketSize)
     {
         OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(n1Data), m_u4PacketLen));
@@ -898,7 +858,6 @@ CBuffPacket& CBuffPacket::operator << (int8 n1Data)
 
 CBuffPacket& CBuffPacket::operator << (int16 n2Data)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     if( (uint32)sizeof(n2Data) + m_u4PacketLen >= m_u4MaxPacketSize)
     {
         OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(n2Data), m_u4PacketLen));
@@ -931,7 +890,6 @@ CBuffPacket& CBuffPacket::operator << (int16 n2Data)
 
 CBuffPacket& CBuffPacket::operator << (int32 n4Data)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     if( (uint32)sizeof(n4Data) + m_u4PacketLen >= m_u4MaxPacketSize)
     {
         OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(n4Data), m_u4PacketLen));
@@ -964,7 +922,6 @@ CBuffPacket& CBuffPacket::operator << (int32 n4Data)
 
 CBuffPacket& CBuffPacket::operator << (float32 f4Data)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     if( (uint32)sizeof(f4Data) + m_u4PacketLen >= m_u4MaxPacketSize)
     {
         OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(f4Data), m_u4PacketLen));
@@ -997,7 +954,6 @@ CBuffPacket& CBuffPacket::operator << (float32 f4Data)
 
 CBuffPacket& CBuffPacket::operator << (float64 f8Data)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     if( (uint32)sizeof(f8Data) + m_u4PacketLen >= m_u4MaxPacketSize)
     {
         OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(f8Data), m_u4PacketLen));
@@ -1030,7 +986,6 @@ CBuffPacket& CBuffPacket::operator << (float64 f8Data)
 
 CBuffPacket& CBuffPacket::operator << (VCHARS_STR& str)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     if( (uint32)sizeof(str.u1Len) + str.u1Len + m_u4PacketLen >= m_u4MaxPacketSize)
     {
         OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(str.u1Len) + str.u1Len, m_u4PacketLen));
@@ -1071,7 +1026,6 @@ CBuffPacket& CBuffPacket::operator << (VCHARS_STR& str)
 
 CBuffPacket& CBuffPacket::operator << (VCHARM_STR& str)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     if( (uint32)sizeof(str.u2Len) + str.u2Len + m_u4PacketLen >= m_u4MaxPacketSize)
     {
         OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(str.u2Len) + str.u2Len, m_u4PacketLen));
@@ -1112,7 +1066,6 @@ CBuffPacket& CBuffPacket::operator << (VCHARM_STR& str)
 
 CBuffPacket& CBuffPacket::operator << (VCHARB_STR& str)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     if((uint32)sizeof(str.u4Len) + str.u4Len + m_u4PacketLen >= m_u4MaxPacketSize)
     {
         OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(str.u4Len) + str.u4Len, m_u4PacketLen));
@@ -1153,7 +1106,6 @@ CBuffPacket& CBuffPacket::operator << (VCHARB_STR& str)
 
 CBuffPacket& CBuffPacket::operator << (string& str)
 {
-    //ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
     uint32 u4Len = (uint32)str.length();
 
     if((uint32)sizeof(u4Len) + u4Len + m_u4PacketLen >= m_u4MaxPacketSize)
@@ -1212,6 +1164,11 @@ uint32 CBuffPacket::GetBuffID()
 void CBuffPacket::SetHashID(int32 nHashID)
 {
     m_nHashID = nHashID;
+}
+
+char* CBuffPacket::GetError()
+{
+    return m_szError;
 }
 
 int32 CBuffPacket::GetHashID()

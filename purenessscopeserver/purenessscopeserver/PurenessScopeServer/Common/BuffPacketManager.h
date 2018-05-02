@@ -20,6 +20,7 @@ public:
     ~CBuffPacketManager();
 
     static void Init_Callback(int nIndex, CBuffPacket* pBuffPacket);
+    static void Close_Callback(int nIndex, CBuffPacket* pBuffPacket);
 
     uint32 GetBuffPacketUsedCount();
     uint32 GetBuffPacketFreeCount();

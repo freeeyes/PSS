@@ -8,7 +8,7 @@ CBuffPacketManager::CBuffPacketManager()
 CBuffPacketManager::~CBuffPacketManager()
 {
     OUR_DEBUG((LM_INFO, "[CBuffPacketManager::~CBuffPacketManager]Begin.\n"));
-    CObjectPoolManager<CBuffPacket, ACE_Recursive_Thread_Mutex>::Close();
+    CObjectPoolManager<CBuffPacket, ACE_Recursive_Thread_Mutex>::Close_Object(CBuffPacketManager::Close_Callback);
 }
 
 void CBuffPacketManager::Init_Callback(int nIndex, CBuffPacket* pBuffPacket)
@@ -18,6 +18,16 @@ void CBuffPacketManager::Init_Callback(int nIndex, CBuffPacket* pBuffPacket)
     pBuffPacket->SetNetSort(App_MainConfig::instance()->GetByteOrder());
     pBuffPacket->SetBuffID(nIndex);
     pBuffPacket->SetHashID(nIndex);
+}
+
+void CBuffPacketManager::Close_Callback(int nIndex, CBuffPacket* pBuffPacket)
+{
+    if (false == pBuffPacket->Close())
+    {
+        OUR_DEBUG((LM_INFO, "[CBuffPacketManager::Close_Callback]Close error[%d](%s).\n",
+                   nIndex,
+                   pBuffPacket->GetError()));
+    }
 }
 
 uint32 CBuffPacketManager::GetBuffPacketUsedCount()

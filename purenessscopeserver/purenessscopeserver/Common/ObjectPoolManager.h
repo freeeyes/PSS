@@ -12,7 +12,8 @@ template<class TYPE, class ACE_LOCK>
 class CObjectPoolManager
 {
 private:
-    typedef void(*Init_Callback)(int, TYPE*);
+    typedef void(*Init_Callback)(int, TYPE*);    //构造逻辑函数指针
+    typedef void(*Close_Callback)(int, TYPE*);   //析构逻辑函数指针
 
 public:
     CObjectPoolManager(void)
@@ -58,6 +59,25 @@ public:
                 }
             }
         }
+    }
+
+    void Close_Object(Close_Callback fn_Close_Callback)
+    {
+        //调用所有的析构逻辑函数，执行析构前的数据清理动作
+        uint32 u4Size = m_objHashObjectList.Get_Count();
+
+        for (uint32 i = 0; i < u4Size; i++)
+        {
+            TYPE* pObject = m_objObjectList.GetObject(i);
+
+            if (NULL != pObject)
+            {
+                fn_Close_Callback(i, pObject);
+            }
+        }
+
+        //清理所有已存在的指针
+        m_objHashObjectList.Close();
     }
 
     void Close()
