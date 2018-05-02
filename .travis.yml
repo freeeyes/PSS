@@ -55,7 +55,20 @@ matrix:
         - export
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
         - $ACE_ROOT/bin/mwc.pl -type gnuace
-        - build-wrapper-linux-x86-64 --out-dir bw-output make clean all
+        - build-wrapper-linux-x86-64 --out-dir bw-output make -j 4
+        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PacketParse_Interface
+        - $ACE_ROOT/bin/mwc.pl -type gnuace
+        - make -j 4
+        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/example-Module/TcpTest
+        - $ACE_ROOT/bin/mwc.pl -type gnuace
+        - make -j 4        
+        # Execute some tests
+        - ./PurenessScopeServer > /dev/null 2>&1 &
+        - sleep 10
+        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/Test
+        - make -j 4
+        - ./Test_Pss
+        - killall -9 PurenessScopeServer        
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer
         - sonar-scanner -Dsonar.organization=freeeyes-github
 
