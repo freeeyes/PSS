@@ -63,6 +63,7 @@ matrix:
         - $ACE_ROOT/bin/mwc.pl -type gnuace
         - make -j 4        
         # Execute some tests
+        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
         - ./PurenessScopeServer > /dev/null 2>&1 &
         - sleep 10
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/Test

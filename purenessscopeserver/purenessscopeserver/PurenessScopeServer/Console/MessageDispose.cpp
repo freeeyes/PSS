@@ -199,35 +199,19 @@ void DoMessage_ShowModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, u
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
-        if (App_ModuleLoader::instance()->GetCurrModuleCount() != 0)
+        vector<_ModuleInfo*> vecModeInfo;
+        App_ModuleLoader::instance()->GetAllModuleInfo(vecModeInfo);
+
+        if (CommandInfo.m_u1OutputType == 0)
         {
-            if (CommandInfo.m_u1OutputType == 0)
-            {
-                (*pBuffPacket) << (uint32)App_ModuleLoader::instance()->GetCurrModuleCount();
-            }
-            else
-            {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleCount(%d)\n", App_ModuleLoader::instance()->GetCurrModuleCount());
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            }
+            (*pBuffPacket) << (uint32)App_ModuleLoader::instance()->GetCurrModuleCount();
         }
         else
         {
-            if (CommandInfo.m_u1OutputType == 0)
-            {
-                (*pBuffPacket) << (uint32)0;
-            }
-            else
-            {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleCount(%d)\n", App_ModuleLoader::instance()->GetCurrModuleCount());
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            }
+            char szTemp[MAX_BUFF_1024] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleCount(%d)\n", App_ModuleLoader::instance()->GetCurrModuleCount());
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
         }
-
-        vector<_ModuleInfo*> vecModeInfo;
-        App_ModuleLoader::instance()->GetAllModuleInfo(vecModeInfo);
 
         for (int i = 0; i < (int)vecModeInfo.size(); i++)
         {
