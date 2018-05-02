@@ -217,85 +217,66 @@ void DoMessage_ShowModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, u
         {
             _ModuleInfo* pModuleInfo = vecModeInfo[i];
 
-            if (NULL != pModuleInfo)
+            if (CommandInfo.m_u1OutputType == 0)
             {
-                if (CommandInfo.m_u1OutputType == 0)
-                {
-                    VCHARS_STR strSName;
-                    strSName.u1Len = (uint8)ACE_OS::strlen(pModuleInfo->GetName());
-                    strSName.text = (char*)pModuleInfo->GetName();
-                    (*pBuffPacket) << strSName;
-                    VCHARS_STR strSModileFile;
-                    strSModileFile.u1Len = (uint8)ACE_OS::strlen(pModuleInfo->strModuleName.c_str());
-                    strSModileFile.text = (char*)pModuleInfo->strModuleName.c_str();
-                    (*pBuffPacket) << strSModileFile;
-                    VCHARS_STR strSModilePath;
-                    strSModilePath.u1Len = (uint8)ACE_OS::strlen(pModuleInfo->strModulePath.c_str());
-                    strSModilePath.text = (char*)pModuleInfo->strModulePath.c_str();
-                    (*pBuffPacket) << strSModilePath;
-                    VCHARS_STR strSModileParam;
-                    strSModileParam.u1Len = (uint8)ACE_OS::strlen(pModuleInfo->strModuleParam.c_str());
-                    strSModileParam.text = (char*)pModuleInfo->strModuleParam.c_str();
-                    (*pBuffPacket) << strSModileParam;
-                    VCHARS_STR strSModileDesc;
-                    strSModileDesc.u1Len = (uint8)ACE_OS::strlen(pModuleInfo->GetDesc());
-                    strSModileDesc.text = (char*)pModuleInfo->GetDesc();
-                    (*pBuffPacket) << strSModileDesc;
+                VCHARS_STR strSName;
+                strSName.u1Len = (uint8)ACE_OS::strlen(pModuleInfo->GetName());
+                strSName.text = (char*)pModuleInfo->GetName();
+                (*pBuffPacket) << strSName;
+                VCHARS_STR strSModileFile;
+                strSModileFile.u1Len = (uint8)ACE_OS::strlen(pModuleInfo->strModuleName.c_str());
+                strSModileFile.text = (char*)pModuleInfo->strModuleName.c_str();
+                (*pBuffPacket) << strSModileFile;
+                VCHARS_STR strSModilePath;
+                strSModilePath.u1Len = (uint8)ACE_OS::strlen(pModuleInfo->strModulePath.c_str());
+                strSModilePath.text = (char*)pModuleInfo->strModulePath.c_str();
+                (*pBuffPacket) << strSModilePath;
+                VCHARS_STR strSModileParam;
+                strSModileParam.u1Len = (uint8)ACE_OS::strlen(pModuleInfo->strModuleParam.c_str());
+                strSModileParam.text = (char*)pModuleInfo->strModuleParam.c_str();
+                (*pBuffPacket) << strSModileParam;
+                VCHARS_STR strSModileDesc;
+                strSModileDesc.u1Len = (uint8)ACE_OS::strlen(pModuleInfo->GetDesc());
+                strSModileDesc.text = (char*)pModuleInfo->GetDesc();
+                (*pBuffPacket) << strSModileDesc;
 
-                    char szTime[MAX_BUFF_100] = { '\0' };
-                    sprintf_safe(szTime, MAX_BUFF_100, "%04d-%02d-%02d %02d:%02d:%02d", pModuleInfo->dtCreateTime.year(), pModuleInfo->dtCreateTime.month(), pModuleInfo->dtCreateTime.day(), pModuleInfo->dtCreateTime.hour(), pModuleInfo->dtCreateTime.minute(), pModuleInfo->dtCreateTime.second());
-                    strSName.text = (char*)szTime;
-                    strSName.u1Len = (uint8)ACE_OS::strlen(szTime);
-                    (*pBuffPacket) << strSName;
+                char szTime[MAX_BUFF_100] = { '\0' };
+                sprintf_safe(szTime, MAX_BUFF_100, "%04d-%02d-%02d %02d:%02d:%02d", pModuleInfo->dtCreateTime.year(), pModuleInfo->dtCreateTime.month(), pModuleInfo->dtCreateTime.day(), pModuleInfo->dtCreateTime.hour(), pModuleInfo->dtCreateTime.minute(), pModuleInfo->dtCreateTime.second());
+                strSName.text = (char*)szTime;
+                strSName.u1Len = (uint8)ACE_OS::strlen(szTime);
+                (*pBuffPacket) << strSName;
 
-                    //写入Module当前状态
-                    uint32 u4ErrorID = 0;
-                    uint8  u1MouduleState = 0;
+                //写入Module当前状态
+                uint32 u4ErrorID = 0;
+                uint8  u1MouduleState = 0;
 
-                    if (true == pModuleInfo->GetModuleState(u4ErrorID))
-                    {
-                        u1MouduleState = 0;
-                    }
-                    else
-                    {
-                        u1MouduleState = 1;
-                    }
+                pModuleInfo->GetModuleState(u4ErrorID);
+                u1MouduleState = u4ErrorID;
 
-                    (*pBuffPacket) << u1MouduleState;
-                    (*pBuffPacket) << u4ErrorID;
-                }
-                else
-                {
-                    char szTemp[MAX_BUFF_1024] = { '\0' };
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleName(%s)\n", pModuleInfo->GetName());
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleFileName(%s)\n", pModuleInfo->strModuleName.c_str());
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleFilePath(%s)\n", pModuleInfo->strModulePath.c_str());
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleParam(%s)\n", pModuleInfo->strModuleParam.c_str());
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleDesc(%s)\n", pModuleInfo->GetDesc());
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "CreeateTime(%04d-%02d-%02d %02d:%02d:%02d)\n", pModuleInfo->dtCreateTime.year(), pModuleInfo->dtCreateTime.month(), pModuleInfo->dtCreateTime.day(), pModuleInfo->dtCreateTime.hour(), pModuleInfo->dtCreateTime.minute(), pModuleInfo->dtCreateTime.second());
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                (*pBuffPacket) << u1MouduleState;
+                (*pBuffPacket) << u4ErrorID;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleName(%s)\n", pModuleInfo->GetName());
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleFileName(%s)\n", pModuleInfo->strModuleName.c_str());
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleFilePath(%s)\n", pModuleInfo->strModulePath.c_str());
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleParam(%s)\n", pModuleInfo->strModuleParam.c_str());
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleDesc(%s)\n", pModuleInfo->GetDesc());
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                sprintf_safe(szTemp, MAX_BUFF_1024, "CreeateTime(%04d-%02d-%02d %02d:%02d:%02d)\n", pModuleInfo->dtCreateTime.year(), pModuleInfo->dtCreateTime.month(), pModuleInfo->dtCreateTime.day(), pModuleInfo->dtCreateTime.hour(), pModuleInfo->dtCreateTime.minute(), pModuleInfo->dtCreateTime.second());
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
 
-                    uint32 u4ErrorID = 0;
+                uint32 u4ErrorID = 0;
 
-                    if (true == pModuleInfo->GetModuleState(u4ErrorID))
-                    {
-                        sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleState Run OK\n");
-                        pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    }
-                    else
-                    {
-                        sprintf_safe(szTemp, MAX_BUFF_1024, " ModuleState Run Fail\n");
-                        pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    }
-
-                    sprintf_safe(szTemp, MAX_BUFF_1024, " ModuleStateErrorID(%d)\n", u4ErrorID);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                }
+                pModuleInfo->GetModuleState(u4ErrorID);
+                sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleState Run u4ErrorID=%d.\n", u4ErrorID);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
             }
         }
 
@@ -1392,72 +1373,63 @@ void DoMessage_ShowAllCommandInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffP
     {
         CHashTable<_ModuleClient>* pHashModuleClient = App_MessageManager::instance()->GetModuleClient();
 
-        if (pHashModuleClient != NULL)
+        //统计个数
+        uint32 u4Count = 0;
+        vector<_ModuleClient*> vecModuleClient;
+        pHashModuleClient->Get_All_Used(vecModuleClient);
+        u4Count = (uint32)vecModuleClient.size();
+
+        if (CommandInfo.m_u1OutputType == 0)
         {
-            //统计个数
-            uint32 u4Count = 0;
-            vector<_ModuleClient*> vecModuleClient;
-            pHashModuleClient->Get_All_Used(vecModuleClient);
-            u4Count = (uint32)vecModuleClient.size();
+            (*pBuffPacket) << u4Count;
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_1024] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_1024, "CommandInfoCount(%d)\n", u4Count);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        }
+
+        for (int i = 0; i < (int)vecModuleClient.size(); i++)
+        {
+            _ModuleClient* pModuleClient = vecModuleClient[i];
 
             if (CommandInfo.m_u1OutputType == 0)
             {
-                (*pBuffPacket) << u4Count;
+                (*pBuffPacket) << (uint32)pModuleClient->m_vecClientCommandInfo.size();
             }
             else
             {
                 char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "CommandInfoCount(%d)\n", u4Count);
+                sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleClientCount(%d)\n", pModuleClient->m_vecClientCommandInfo.size());
                 pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
             }
 
-            for (int i = 0; i < (int)vecModuleClient.size(); i++)
+            for (int j = 0; j < (int)pModuleClient->m_vecClientCommandInfo.size(); j++)
             {
-                _ModuleClient* pModuleClient = vecModuleClient[i];
+                _ClientCommandInfo* pClientCommandInfo = pModuleClient->m_vecClientCommandInfo[j];
 
-                if (NULL != pModuleClient)
+                if (CommandInfo.m_u1OutputType == 0)
                 {
-                    if (CommandInfo.m_u1OutputType == 0)
-                    {
-                        (*pBuffPacket) << (uint32)pModuleClient->m_vecClientCommandInfo.size();
-                    }
-                    else
-                    {
-                        char szTemp[MAX_BUFF_1024] = { '\0' };
-                        sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleClientCount(%d)\n", pModuleClient->m_vecClientCommandInfo.size());
-                        pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    }
-
-                    for (int j = 0; j < (int)pModuleClient->m_vecClientCommandInfo.size(); j++)
-                    {
-                        _ClientCommandInfo* pClientCommandInfo = pModuleClient->m_vecClientCommandInfo[j];
-
-                        if (NULL != pClientCommandInfo)
-                        {
-                            if (CommandInfo.m_u1OutputType == 0)
-                            {
-                                VCHARS_STR strSName;
-                                strSName.text = pClientCommandInfo->m_szModuleName;
-                                strSName.u1Len = (uint8)ACE_OS::strlen(pClientCommandInfo->m_szModuleName);
-                                (*pBuffPacket) << strSName;
-                                (*pBuffPacket) << pClientCommandInfo->m_u2CommandID;
-                                (*pBuffPacket) << pClientCommandInfo->m_u4Count;
-                                (*pBuffPacket) << pClientCommandInfo->m_u4TimeCost;
-                            }
-                            else
-                            {
-                                char szTemp[MAX_BUFF_1024] = { '\0' };
-                                sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleName(%s)\n", pClientCommandInfo->m_szModuleName);
-                                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                                sprintf_safe(szTemp, MAX_BUFF_1024, "CommandID(%d)\n", pClientCommandInfo->m_u2CommandID);
-                                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                                sprintf_safe(szTemp, MAX_BUFF_1024, "Count(%d)\n", pClientCommandInfo->m_u4Count);
-                                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                                sprintf_safe(szTemp, MAX_BUFF_1024, "TimeCost(%d)\n", pClientCommandInfo->m_u4TimeCost);
-                                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                            }
-                        }
-                    }
+                    VCHARS_STR strSName;
+                    strSName.text = pClientCommandInfo->m_szModuleName;
+                    strSName.u1Len = (uint8)ACE_OS::strlen(pClientCommandInfo->m_szModuleName);
+                    (*pBuffPacket) << strSName;
+                    (*pBuffPacket) << pClientCommandInfo->m_u2CommandID;
+                    (*pBuffPacket) << pClientCommandInfo->m_u4Count;
+                    (*pBuffPacket) << pClientCommandInfo->m_u4TimeCost;
+                }
+                else
+                {
+                    char szTemp[MAX_BUFF_1024] = { '\0' };
+                    sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleName(%s)\n", pClientCommandInfo->m_szModuleName);
+                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                    sprintf_safe(szTemp, MAX_BUFF_1024, "CommandID(%d)\n", pClientCommandInfo->m_u2CommandID);
+                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                    sprintf_safe(szTemp, MAX_BUFF_1024, "Count(%d)\n", pClientCommandInfo->m_u4Count);
+                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                    sprintf_safe(szTemp, MAX_BUFF_1024, "TimeCost(%d)\n", pClientCommandInfo->m_u4TimeCost);
+                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
                 }
             }
         }
@@ -2057,40 +2029,19 @@ void DoMessage_GetLogLevelInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
         for (uint16 i = 0; i < (uint16)AppLogManager::instance()->GetLogCount(); i++)
         {
             uint16 u2LogID = AppLogManager::instance()->GetLogID(i);
-
-            if (CommandInfo.m_u1OutputType == 0)
-            {
-                (*pBuffPacket) << u2LogID;
-            }
-            else
-            {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "m_u1OutputType=%d.\n", u2LogID);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            }
+            VCHARS_STR strSServerName;
+            VCHARS_STR strSLogName;
 
             char* pServerName = AppLogManager::instance()->GetLogInfoByServerName(u2LogID);
 
             if (NULL == pServerName)
             {
                 //如果服务器名称为空则直接返回
-                return;
+                continue;
             }
 
-            VCHARS_STR strSName;
-            strSName.text = pServerName;
-            strSName.u1Len = (uint8)ACE_OS::strlen(pServerName);
-
-            if (CommandInfo.m_u1OutputType == 0)
-            {
-                (*pBuffPacket) << strSName;
-            }
-            else
-            {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "pServerName=%d.\n", pServerName);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            }
+            strSServerName.text = pServerName;
+            strSServerName.u1Len = (uint8)ACE_OS::strlen(pServerName);
 
             char* pLogName = AppLogManager::instance()->GetLogInfoByLogName(u2LogID);
 
@@ -2100,30 +2051,28 @@ void DoMessage_GetLogLevelInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
                 return;
             }
 
-            strSName.text = pLogName;
-            strSName.u1Len = (uint8)ACE_OS::strlen(pLogName);
-
-            if (CommandInfo.m_u1OutputType == 0)
-            {
-                (*pBuffPacket) << strSName;
-            }
-            else
-            {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "pLogName=%d.\n", pLogName);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            }
+            strSLogName.text = pLogName;
+            strSLogName.u1Len = (uint8)ACE_OS::strlen(pLogName);
 
             uint8 u1LogType = (uint8)AppLogManager::instance()->GetLogInfoByLogDisplay(u2LogID);
 
             if (CommandInfo.m_u1OutputType == 0)
             {
+                (*pBuffPacket) << u2LogID;
+                (*pBuffPacket) << strSServerName;
+                (*pBuffPacket) << strSLogName;
                 (*pBuffPacket) << u1LogType;
                 (*pBuffPacket) << AppLogManager::instance()->GetLogInfoByLogLevel(i);
             }
             else
             {
                 char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "m_u1OutputType=%d.\n", u2LogID);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                sprintf_safe(szTemp, MAX_BUFF_1024, "pServerName=%d.\n", pServerName);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                sprintf_safe(szTemp, MAX_BUFF_1024, "pLogName=%d.\n", pLogName);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
                 sprintf_safe(szTemp, MAX_BUFF_1024, "u1LogType=%d,GetLogInfoByLogLevel=%d.\n", u1LogType, AppLogManager::instance()->GetLogInfoByLogLevel(i));
                 pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
             }
@@ -2289,22 +2238,22 @@ void DoMessage_SetWorkThreadAI(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
     int nCheck = 0;
     int nStop = 0;
 
-    if (GetAIInfo(CommandInfo.m_szCommandExp, nAI, nDispose, nCheck, nStop) == true)
+    if (GetAIInfo(CommandInfo.m_szCommandExp, nAI, nDispose, nCheck, nStop) == true
+        && nDispose > 0
+        && nCheck > 0
+        && nStop > 0)
     {
         //规范化数据
-        if (nDispose > 0 && nCheck > 0 && nStop > 0)
+        if (nAI > 0)
         {
-            if (nAI > 0)
-            {
-                nAI = 1;
-            }
-            else
-            {
-                nAI = 0;
-            }
-
-            App_MessageServiceGroup::instance()->SetAI((uint8)nAI, (uint32)nDispose, (uint32)nCheck, (uint32)nStop);
+            nAI = 1;
         }
+        else
+        {
+            nAI = 0;
+        }
+
+        App_MessageServiceGroup::instance()->SetAI((uint8)nAI, (uint32)nDispose, (uint32)nCheck, (uint32)nStop);
     }
 
     if (CommandInfo.m_u1OutputType == 0)
@@ -2413,12 +2362,9 @@ void DoMessage_SetMaxConnectCount(_CommandInfo& CommandInfo, IBuffPacket* pBuffP
 {
     uint16 u2MaxConnectHandler = 0;
 
-    if (GetMaxConnectCount(CommandInfo.m_szCommandExp, u2MaxConnectHandler) == true)
+    if (GetMaxConnectCount(CommandInfo.m_szCommandExp, u2MaxConnectHandler) == true && u2MaxConnectHandler > 0)
     {
-        if (u2MaxConnectHandler > 0)
-        {
-            App_MainConfig::instance()->SetMaxHandlerCount(u2MaxConnectHandler);
-        }
+        App_MainConfig::instance()->SetMaxHandlerCount(u2MaxConnectHandler);
     }
 
     if (CommandInfo.m_u1OutputType == 0)
@@ -2793,14 +2739,7 @@ void DoMessage_TestFileStart(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket
         u2ReturnCommandID = CONSOLE_COMMAND_FILE_TEST_START;
 
         FileTestResultInfoSt objFileResult;
-        /*
-        //测试代码
-        objFileResult.n4Result = 0;
-        objFileResult.n4TimeInterval = 2000;
-        objFileResult.n4ProNum = 10;
-        objFileResult.vecProFileDesc.push_back((string)"Test freeeyes");
-        objFileResult.vecProFileDesc.push_back((string)"Test liuchao");
-        */
+
         objFileResult = App_FileTestManager::instance()->FileTestStart(szFileName);
 
         if (CommandInfo.m_u1OutputType == 0)
