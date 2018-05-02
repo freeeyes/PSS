@@ -61,7 +61,7 @@ matrix:
         - make -j 4
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/example-Module/TcpTest
         - $ACE_ROOT/bin/mwc.pl -type gnuace
-        - make -j 4        
+        - make -j 4
         # Execute some tests
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
         - ./PurenessScopeServer > /dev/null 2>&1 &
@@ -69,7 +69,7 @@ matrix:
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/Test
         - make -j 4
         - ./Test_Pss
-        - killall -9 PurenessScopeServer        
+        - killall -9 PurenessScopeServer
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer
         - sonar-scanner -Dsonar.organization=freeeyes-github
 

@@ -204,7 +204,7 @@ void CPacketParseBase::SetPacket_Head_Message(ACE_Message_Block* pmbHead)
     m_pmbHead = pmbHead;
 }
 
-void CPacketParseBase::SetPacket_Body_Message(ACE_Message_Block* pmbHead)
+void CPacketParseBase::SetPacket_Body_Message(ACE_Message_Block* pmbBody)
 {
-    m_pmbBody = pmbHead;
+    m_pmbBody = pmbBody;
 }

@@ -24,26 +24,7 @@ int CReactorUDPHander::OpenAddress(const ACE_INET_Addr& AddrRemote, ACE_Reactor*
 
     reactor(pReactor);
 
-    m_addrLocal = AddrRemote;
-
-    //按照线程初始化统计模块的名字
-    char szName[MAX_BUFF_50] = {'\0'};
-    sprintf_safe(szName, MAX_BUFF_50, "发送线程");
-    m_CommandAccount.InitName(szName, App_MainConfig::instance()->GetMaxCommandCount());
-
-    //初始化统计模块功能
-    m_CommandAccount.Init(App_MainConfig::instance()->GetCommandAccount(),
-                          App_MainConfig::instance()->GetCommandFlow(),
-                          App_MainConfig::instance()->GetPacketTimeOut());
-
-    //设置发送超时时间（因为UDP如果客户端不存在的话，sendto会引起一个recv错误）
-    //在这里设置一个超时，让个recv不会无限等下去
-    struct timeval timeout = {MAX_RECV_UDP_TIMEOUT, 0};
-    ACE_OS::setsockopt(m_skRemote.get_handle(), SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(timeout));
-
-    m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
-
-    return 0;
+    return Init_Open_Address(AddrRemote);
 }
 
 int CReactorUDPHander::OpenAddress(const ACE_INET_Addr& AddrRemote)
@@ -54,26 +35,7 @@ int CReactorUDPHander::OpenAddress(const ACE_INET_Addr& AddrRemote)
         return -1;
     }
 
-    m_addrLocal = AddrRemote;
-
-    //按照线程初始化统计模块的名字
-    char szName[MAX_BUFF_50] = { '\0' };
-    sprintf_safe(szName, MAX_BUFF_50, "发送线程");
-    m_CommandAccount.InitName(szName, App_MainConfig::instance()->GetMaxCommandCount());
-
-    //初始化统计模块功能
-    m_CommandAccount.Init(App_MainConfig::instance()->GetCommandAccount(),
-                          App_MainConfig::instance()->GetCommandFlow(),
-                          App_MainConfig::instance()->GetPacketTimeOut());
-
-    //设置发送超时时间（因为UDP如果客户端不存在的话，sendto会引起一个recv错误）
-    //在这里设置一个超时，让个recv不会无限等下去
-    struct timeval timeout = { MAX_RECV_UDP_TIMEOUT, 0 };
-    ACE_OS::setsockopt(m_skRemote.get_handle(), SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(timeout));
-
-    m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
-
-    return 0;
+    return Init_Open_Address(AddrRemote);
 }
 
 
@@ -410,7 +372,31 @@ bool CReactorUDPHander::CheckMessage(const char* pData, uint32 u4Len)
     return true;
 }
 
-void CReactorUDPHander::GetCommandData( uint16 u2CommandID, _CommandData& objCommandData )
+int CReactorUDPHander::Init_Open_Address(const ACE_INET_Addr& AddrRemote)
+{
+    m_addrLocal = AddrRemote;
+
+    //按照线程初始化统计模块的名字
+    char szName[MAX_BUFF_50] = { '\0' };
+    sprintf_safe(szName, MAX_BUFF_50, "发送线程");
+    m_CommandAccount.InitName(szName, App_MainConfig::instance()->GetMaxCommandCount());
+
+    //初始化统计模块功能
+    m_CommandAccount.Init(App_MainConfig::instance()->GetCommandAccount(),
+                          App_MainConfig::instance()->GetCommandFlow(),
+                          App_MainConfig::instance()->GetPacketTimeOut());
+
+    //设置发送超时时间（因为UDP如果客户端不存在的话，sendto会引起一个recv错误）
+    //在这里设置一个超时，让个recv不会无限等下去
+    struct timeval timeout = { MAX_RECV_UDP_TIMEOUT, 0 };
+    ACE_OS::setsockopt(m_skRemote.get_handle(), SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(timeout));
+
+    m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
+
+    return 0;
+}
+
+void CReactorUDPHander::GetCommandData(uint16 u2CommandID, _CommandData& objCommandData)
 {
     _CommandData* pCommandData = m_CommandAccount.GetCommandData(u2CommandID);
 

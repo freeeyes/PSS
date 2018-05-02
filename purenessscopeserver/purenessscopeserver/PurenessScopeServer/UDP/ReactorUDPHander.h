@@ -37,7 +37,8 @@ public:
     void GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut);                    //得到所有的出口流量
 
 private:
-    bool CheckMessage(const char* pData, uint32 u4Len);     //这里解析数据包并放入数据队列
+    bool CheckMessage(const char* pData, uint32 u4Len);              //这里解析数据包并放入数据队列
+    int  Init_Open_Address(const ACE_INET_Addr& AddrRemote);         //初始化UDP连接对象
 
 private:
     ACE_SOCK_Dgram          m_skRemote;

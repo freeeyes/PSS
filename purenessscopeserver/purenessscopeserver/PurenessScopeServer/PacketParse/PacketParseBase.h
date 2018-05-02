@@ -54,7 +54,7 @@ public:
     void SetPacket_CommandID(uint16 u2PacketCommandID);
     void SetPacket_IsHandleHead(bool blState);
     void SetPacket_Head_Message(ACE_Message_Block* pmbHead);
-    void SetPacket_Body_Message(ACE_Message_Block* pmbHead);
+    void SetPacket_Body_Message(ACE_Message_Block* pmbBody);
 
 private:
     uint32 m_u4PacketHead;               //包头的长度
