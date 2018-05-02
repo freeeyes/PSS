@@ -45,7 +45,9 @@ bool CAppConfig::ReadConfig(const char* szConfigname)
 
         if(NULL == m_pConfig)
         {
-            throw "[CAppConfig::ReadConfig]New ACE_Configuration_Heap error.";
+            char szError[MAX_BUFF_500] = { '\0' };
+            sprintf_safe(szError, MAX_BUFF_500, "[CAppConfig::ReadConfig]New ACE_Configuration_Heap error.");
+            throw std::domain_error(szError);
         }
 
         m_pConfig->open();
@@ -54,7 +56,9 @@ bool CAppConfig::ReadConfig(const char* szConfigname)
 
         if(NULL == m_pIniImp)
         {
-            throw "[CAppConfig::ReadConfig]New ACE_Ini_ImpExp error.";
+            char szError[MAX_BUFF_500] = { '\0' };
+            sprintf_safe(szError, MAX_BUFF_500, "[CAppConfig::ReadConfig]New ACE_Ini_ImpExp error.");
+            throw std::domain_error(szError);
         }
 
         int32 nRet = (int32)m_pIniImp->import_config((ACE_TCHAR*)m_strConfigName.c_str());
@@ -63,14 +67,14 @@ bool CAppConfig::ReadConfig(const char* szConfigname)
         {
             char szError[MAX_BUFF_500] = {'\0'};
             sprintf_safe(szError, MAX_BUFF_500, "[CAppConfig::ReadConfig]import_config error FileName = %s nRet = %d.", m_strConfigName.c_str(), nRet);
-            throw szError;
+            throw std::domain_error(szError);
         }
 
         return true;
     }
-    catch (const char* szError)
+    catch (const std::domain_error& ex)
     {
-        sprintf_safe(m_szError, MAX_BUFF_500, "%s", szError);
+        sprintf_safe(m_szError, MAX_BUFF_500, "%s", ex.what());
         return false;
     }
 }
@@ -81,12 +85,12 @@ bool CAppConfig::WriteConfig(const char* szConfigname)
     {
         if(m_strConfigName == "")
         {
-            throw "[CAppConfig::WriteConfig]m_strConfigName no exist.";
+            throw std::domain_error("[CAppConfig::WriteConfig]m_strConfigName no exist.");
         }
 
         if(m_pIniImp == NULL)
         {
-            throw "[CAppConfig::WriteConfig]m_pIniImp is NULL.";
+            throw std::domain_error("[CAppConfig::WriteConfig]m_pIniImp is NULL.");
         }
 
         int32 nRet = (int32)m_pIniImp->export_config((ACE_TCHAR*)szConfigname);
@@ -95,14 +99,14 @@ bool CAppConfig::WriteConfig(const char* szConfigname)
         {
             char szError[MAX_BUFF_500] = {'\0'};
             sprintf_safe(szError, MAX_BUFF_500, "[CAppConfig::WriteConfig]export_config error FileName = %s nRet = %d.", szConfigname, nRet);
-            throw szError;
+            throw std::domain_error(szError);
         }
 
         return true;
     }
-    catch (const char* szError)
+    catch (const std::domain_error& ex)
     {
-        sprintf_safe(m_szError, MAX_BUFF_500, "%s", szError);
+        sprintf_safe(m_szError, MAX_BUFF_500, "%s", ex.what());
         return false;
     }
 }
@@ -113,12 +117,12 @@ bool CAppConfig::WriteConfig()
     {
         if(m_strConfigName == "")
         {
-            throw "[CAppConfig::WriteConfig]m_strConfigName no exist.";
+            throw std::domain_error("[CAppConfig::WriteConfig]m_strConfigName no exist.");
         }
 
         if(m_pIniImp == NULL)
         {
-            throw "[CAppConfig::WriteConfig]m_pIniImp is NULL.";
+            throw std::domain_error("[CAppConfig::WriteConfig]m_pIniImp is NULL.");
         }
 
         int32 nRet = (int32)m_pIniImp->export_config((ACE_TCHAR*)m_strConfigName.c_str());
@@ -127,14 +131,14 @@ bool CAppConfig::WriteConfig()
         {
             char szError[MAX_BUFF_500] = {'\0'};
             sprintf_safe(szError, MAX_BUFF_500, "[CAppConfig::WriteConfig]export_config error FileName = %s nRet = %d.", m_strConfigName.c_str(), nRet);
-            throw szError;
+            throw std::domain_error(szError);
         }
 
         return true;
     }
-    catch (const char* szError)
+    catch (const std::domain_error& ex)
     {
-        sprintf_safe(m_szError, MAX_BUFF_500, "%s", szError);
+        sprintf_safe(m_szError, MAX_BUFF_500, "%s", ex.what());
         return false;
     }
 }
@@ -160,14 +164,14 @@ bool CAppConfig::GetValue(const char* szName, ACE_TString& strValue, const char*
         {
             char szError[MAX_BUFF_500] = {'\0'};
             sprintf_safe(szError, MAX_BUFF_500, "[CAppConfig::GetValue]export_config error FileName = %s, szName = %s, szRoot = %s, nRet = %d.", m_strConfigName.c_str(), szName, szRoot, nRet);
-            throw szError;
+            throw std::domain_error(szError);
         }
 
         return true;
     }
-    catch (const char* szError)
+    catch (const std::domain_error& ex)
     {
-        sprintf_safe(m_szError, MAX_BUFF_500, "%s", szError);
+        sprintf_safe(m_szError, MAX_BUFF_500, "%s", ex.what());
         return false;
     }
 }
@@ -193,14 +197,14 @@ bool CAppConfig::SetValue(const char* szName, ACE_TString& strValue, const char*
         {
             char szError[MAX_BUFF_500] = {'\0'};
             sprintf_safe(szError, MAX_BUFF_500, "[CAppConfig::SetValue]export_config error FileName = %s, szName = %s, szRoot = %s, nRet = %d.", m_strConfigName.c_str(), szName, szRoot, nRet);
-            throw szError;
+            throw std::domain_error(szError);
         }
 
         return true;
     }
-    catch (const char* szError)
+    catch (const std::domain_error& ex)
     {
-        sprintf_safe(m_szError, MAX_BUFF_500, "%s", szError);
+        sprintf_safe(m_szError, MAX_BUFF_500, "%s", ex.what());
         return false;
     }
 }

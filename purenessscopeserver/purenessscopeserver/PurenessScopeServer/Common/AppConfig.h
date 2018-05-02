@@ -8,6 +8,7 @@
 #define _APPCONFIG_H
 
 #include "define.h"
+#include <stdexcept>
 
 #include "ace/ACE.h"
 #include "ace/OS_main.h"
