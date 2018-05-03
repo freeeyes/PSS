@@ -5,6 +5,7 @@
 
 #include "ACEMemory.h"
 #include "IBuffPacket.h"
+#include <stdexcept>
 
 #define DEFINE_PACKET_SIZE 1024
 #define DEFINE_PACKET_ADD  1024
