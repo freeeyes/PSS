@@ -487,7 +487,7 @@ int CConnectHandler::Dispose_Recv_Data()
     }
 
     //这里需要对m_u4CurrSize进行检查。
-    if (nCurrCount < 0)
+    if (nCurrCount <= 0)
     {
         OUR_DEBUG((LM_ERROR, "[CConnectHandler::RecvData][%d] nCurrCount < 0 m_u4CurrSize = %d.\n", GetConnectID(), m_u4CurrSize));
         m_u4CurrSize = 0;
@@ -752,7 +752,7 @@ int CConnectHandler::Dispose_Recv_Data()
             }
             else if (PACKET_GET_NO_ENOUGTH == n1Ret)
             {
-                break;
+                return 0;
             }
             else
             {
@@ -1081,10 +1081,7 @@ int CConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Size, 
         }
         else if (PACKET_GET_NO_ENOUGTH == n1Ret)
         {
-            OUR_DEBUG((LM_ERROR, "[CProConnectHandle::handle_write_file_stream]Parse_Packet_Stream is PACKET_GET_NO_ENOUGTH.\n"));
-            //接收的数据不完整
-            ClearPacketParse();
-            return -1;
+            return 0;
         }
         else
         {

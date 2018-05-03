@@ -54,14 +54,14 @@ bool CAceReactor::Init(int nReactorType, int nThreadCount, int nMaxHandleCount)
 
                 if (NULL == wfmoreactor)
                 {
-                    throw "[CAceReactor::Init]New ACE_WFMO_Reactor Error.";
+                    throw std::domain_error("[CAceReactor::Init]New ACE_WFMO_Reactor Error.");
                 }
 
                 m_pReactor = new ACE_Reactor(wfmoreactor, 1);
 
                 if (NULL == m_pReactor)
                 {
-                    throw "[CAceReactor::Init]New m_pReactor Error[ACE_WFMO_Reactor].";
+                    throw std::domain_error("[CAceReactor::Init]New m_pReactor Error[ACE_WFMO_Reactor].");
                 }
 
                 m_nReactorType = Reactor_WFMO;
@@ -76,14 +76,14 @@ bool CAceReactor::Init(int nReactorType, int nThreadCount, int nMaxHandleCount)
 
                 if (NULL == selectreactor)
                 {
-                    throw "[CAceReactor::Init]New ACE_Select_Reactor Error.";
+                    throw std::domain_error("[CAceReactor::Init]New ACE_Select_Reactor Error.");
                 }
 
                 m_pReactor = new ACE_Reactor(selectreactor, 1);
 
                 if (NULL == m_pReactor)
                 {
-                    throw "[CAceReactor::Init]New m_pReactor Error[ACE_Select_Reactor].";
+                    throw std::domain_error("[CAceReactor::Init]New m_pReactor Error[ACE_Select_Reactor].");
                 }
 
                 m_nReactorType = Reactor_Select;
@@ -96,14 +96,14 @@ bool CAceReactor::Init(int nReactorType, int nThreadCount, int nMaxHandleCount)
 
                 if (NULL == tpreactor)
                 {
-                    throw "[CAceReactor::Init]New ACE_TP_Reactor Error.";
+                    throw std::domain_error("[CAceReactor::Init]New ACE_TP_Reactor Error.");
                 }
 
                 m_pReactor = new ACE_Reactor(tpreactor, 1);
 
                 if (NULL == m_pReactor)
                 {
-                    throw "[CAceReactor::Init]New m_pReactor Error[ACE_TP_Reactor].";
+                    throw std::domain_error("[CAceReactor::Init]New m_pReactor Error[ACE_TP_Reactor].");
                 }
 
                 m_nReactorType = Reactor_TP;
@@ -118,14 +118,14 @@ bool CAceReactor::Init(int nReactorType, int nThreadCount, int nMaxHandleCount)
 
                 if (NULL == devreactor)
                 {
-                    throw "[CAceReactor::Init]New ACE_Dev_Poll_Reactor Error.";
+                    throw std::domain_error("[CAceReactor::Init]New ACE_Dev_Poll_Reactor Error.");
                 }
 
                 m_pReactor = new ACE_Reactor(devreactor, 1);
 
                 if (NULL == m_pReactor)
                 {
-                    throw "[CAceReactor::Init]New m_pReactor Error[ACE_Dev_Poll_Reactor].";
+                    throw std::domain_error("[CAceReactor::Init]New m_pReactor Error[ACE_Dev_Poll_Reactor].");
                 }
 
                 m_nReactorType = Reactor_DEV_POLL;
@@ -138,14 +138,14 @@ bool CAceReactor::Init(int nReactorType, int nThreadCount, int nMaxHandleCount)
 
                 if (NULL == devreactor)
                 {
-                    throw "[CAceReactor::Init]New ACE_Dev_Poll_Reactor Error.";
+                    throw std::domain_error("[CAceReactor::Init]New ACE_Dev_Poll_Reactor Error.");
                 }
 
                 m_pReactor = new ACE_Reactor(devreactor, 1);
 
                 if (NULL == m_pReactor)
                 {
-                    throw "[CAceReactor::Init]New m_pReactor Error[ACE_Dev_Poll_Reactor].";
+                    throw std::domain_error("[CAceReactor::Init]New m_pReactor Error[ACE_Dev_Poll_Reactor].");
                 }
 
                 m_nReactorType = Reactor_DEV_POLL;
@@ -164,9 +164,9 @@ bool CAceReactor::Init(int nReactorType, int nThreadCount, int nMaxHandleCount)
         m_nThreadCount = nThreadCount;
         return true;
     }
-    catch (const char* szError)
+    catch (const std::domain_error& ex)
     {
-        sprintf_safe(m_szError, MAX_BUFF_500, "%s", szError);
+        sprintf_safe(m_szError, MAX_BUFF_500, "%s", ex.what());
         return false;
     }
 }

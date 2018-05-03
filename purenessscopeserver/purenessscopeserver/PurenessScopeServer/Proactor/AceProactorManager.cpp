@@ -65,14 +65,14 @@ bool CAceProactor::Init(int nProactorType, int nThreadCount)
 
                 if(NULL == pWin32Proactor)
                 {
-                    throw "[CAceProactor::Init]New ACE_WIN32_Proactor Error.";
+                    throw std::domain_error("[CAceProactor::Init]New ACE_WIN32_Proactor Error.");
                 }
 
                 m_pProactor = new ACE_Proactor(pWin32Proactor, 1);
 
                 if(NULL == m_pProactor)
                 {
-                    throw "[CAceProactor::Init]New m_pProactor Error[ACE_WIN32_Proactor].";
+                    throw std::domain_error("[CAceProactor::Init]New m_pProactor Error[ACE_WIN32_Proactor].");
                 }
 
                 m_nProactorType = Proactor_WIN32;
@@ -87,14 +87,14 @@ bool CAceProactor::Init(int nProactorType, int nThreadCount)
 
                 if(NULL == pPosixProactor)
                 {
-                    throw "[CAceProactor::Init]New ACE_POSIX_Proactor Error.";
+                    throw std::domain_error("[CAceProactor::Init]New ACE_POSIX_Proactor Error.");
                 }
 
                 m_pProactor = new ACE_Proactor(pPosixProactor, 1);
 
                 if(NULL == m_pProactor)
                 {
-                    throw "[CAceProactor::Init]New m_pProactor Error[ACE_POSIX_Proactor].";
+                    throw std::domain_error("[CAceProactor::Init]New m_pProactor Error[ACE_POSIX_Proactor].");
                 }
 
                 m_nProactorType = Proactor_POSIX;
@@ -113,9 +113,9 @@ bool CAceProactor::Init(int nProactorType, int nThreadCount)
         m_nThreadCount = nThreadCount;
         return true;
     }
-    catch (const char* szError)
+    catch (const std::domain_error& ex)
     {
-        sprintf_safe(m_szError, MAX_BUFF_500, "%s", szError);
+        sprintf_safe(m_szError, MAX_BUFF_500, "%s", ex.what());
         return false;
     }
 }

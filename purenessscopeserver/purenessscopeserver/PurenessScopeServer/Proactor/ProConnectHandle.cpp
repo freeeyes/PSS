@@ -446,10 +446,7 @@ int CProConnectHandle::handle_write_file_stream(const char* pData, uint32 u4Size
         }
         else if (PACKET_GET_NO_ENOUGTH == n1Ret)
         {
-            OUR_DEBUG((LM_ERROR, "[CProConnectHandle::handle_write_file_stream]Parse_Packet_Stream is PACKET_GET_NO_ENOUGTH.\n"));
-            //接收的数据不完整
-            ClearPacketParse(*pMbStream);
-            return -1;
+            return 0;
         }
         else
         {
@@ -981,7 +978,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                 //OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open]error n1Ret = %d.\n",n1Ret));
                 App_MessageBlockManager::instance()->Close(&mb);
                 //接收的数据不完整，需要继续接收
-                break;
+                return;
             }
             else
             {

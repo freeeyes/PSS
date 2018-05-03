@@ -17,6 +17,7 @@
 #include "ace/Dev_Poll_Reactor.h"
 #include "ace/Task.h"
 #include "ace/Singleton.h"
+#include <stdexcept>
 
 using namespace std;
 

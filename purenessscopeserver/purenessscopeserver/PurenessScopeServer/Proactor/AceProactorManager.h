@@ -9,6 +9,7 @@
 #include "ace/Proactor.h"
 #include "ace/WIN32_Proactor.h"
 #include "ace/POSIX_Proactor.h"
+#include <stdexcept>
 
 using namespace std;
 
