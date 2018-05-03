@@ -16,14 +16,16 @@ project(PurenessScopeServer):aceexe{
   ../*.cpp
  }
  includes += ../Common ../../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../TinyXML ../Mail ../FileTest
- macros += __LINUX__
+ 
 
   specific(make) {
     compile_flags += -fcheck-new
   }
 
   specific(gnuace) {
+	macros += __LINUX__
     compile_flags += -Wno-deprecated -fprofile-arcs -ftest-coverage
+	libs += gocv
   }
 
 
