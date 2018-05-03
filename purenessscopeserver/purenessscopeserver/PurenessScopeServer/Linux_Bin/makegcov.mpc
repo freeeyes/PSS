@@ -25,7 +25,6 @@ project(PurenessScopeServer):aceexe{
   specific(gnuace) {
 	macros += __LINUX__
     compile_flags += -Wno-deprecated -fprofile-arcs -ftest-coverage
-	libs += gocv
   }
 
 

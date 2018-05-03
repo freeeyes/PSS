@@ -296,6 +296,57 @@ enum EM_Server_Recv_State
 #define DEBUG_ON  1
 #define DEBUG_OFF 0
 
+/**
+* Format a message to the thread-safe ACE logging mechanism.  Valid
+* options (prefixed by '%', as in printf format strings) include:
+*  - 'A': print an ACE_timer_t value (which could be either double
+*         or ACE_UINT32.)
+*  - 'a': abort the program at this point abruptly.
+*  - 'b': print a ssize_t value
+*  - 'B': print a size_t value
+*  - 'c': print a character
+*  - 'C': print a char* character string (also see s and W)
+*  - 'i', 'd': print a decimal number
+*  - 'I': indent according to nesting depth (obtained from
+*         ACE_Trace::get_nesting_indent()).
+*  - 'e', 'E', 'f', 'F', 'g', 'G': print a double
+*  - 'l': print line number where an error occurred.
+*  - 'M': print the name of the priority of the message.
+*  - 'm': return the message corresponding to errno value, e.g., as
+*         done by strerror()
+*  - 'N': print file name where the error occurred.
+*  - 'n': print the name of the program (or "<unknown>" if not set)
+*  - 'o': print as an octal number
+*  - 'P': print out the current process id
+*  - 'p': print out the appropriate errno message from sys_errlist,
+*         e.g., as done by perror()
+*  - 'Q': print out the uint64 number
+*  - 'q': print out the int64 number
+*  - '@': print a void* pointer (in hexadecimal)
+*  - 'r': call the function pointed to by the corresponding argument
+*  - 'R': print return status
+*  - 'S': print out the appropriate signal message corresponding
+*         to var-argument, e.g., as done by strsignal()
+*  - 's': prints a ACE_TCHAR* character string (also see C and W)
+*  - 'T': print timestamp in hour:minute:sec:usec format (plain option,
+*         i.e. without any flags, prints system supplied timestamp;
+*         with '#' flag added expects ACE_Time_Value* in argument list)
+*  - 'D': print timestamp as Weekday Month day year hour:minute:sec.usec
+*         (plain option, i.e. without any flags, prints system supplied
+*         timestamp; with '#' flag added expects ACE_Time_Value* in
+*         argument list)
+*  - 't': print thread id (1 if single-threaded)
+*  - 'u': print as unsigned int
+*  - 'w': prints a wide character
+*  - 'W': prints a wchar_t* character string (also see C and s)
+*  - 'x': print as a hex number
+*  - 'X': print as a hex number
+*  - 'z': print an ACE_OS::WChar character
+*  - 'Z': print an ACE_OS::WChar character string
+*  - ':': print a time_t value as an integral number
+*  - '%': print out a single percent sign, '%'
+*  - '?': print out stack trace (see Stack_Trace.h header comments)
+*/
 #define OUR_DEBUG(X)  ACE_DEBUG((LM_INFO, "[%D %P|%t][%N,%l]")); ACE_DEBUG(X)
 
 enum
