@@ -98,13 +98,13 @@ matrix:
     script:
       - export
       - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PacketParse_Interface
-      - $ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc
+      - $ACE_ROOT/bin/mwc.pl -type gnuace
       - make -j 4
       - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/example-Module/TcpTest
       - $ACE_ROOT/bin/mwc.pl -type gnuace
       - make -j 4
       - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
-      - $ACE_ROOT/bin/mwc.pl -type gnuace
+      - $ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc
       - make -j 4
       - ./PurenessScopeServer > /dev/null 2>&1 &
       - sleep 10
