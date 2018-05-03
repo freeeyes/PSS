@@ -72,7 +72,7 @@ matrix:
         - ./Test_Pss
         - killall -9 PurenessScopeServer
         # collect gcov report
-        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/.obj
+        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/.obj
         - ls
         # - gcov --branch-probabilities --branch-counts 
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer
