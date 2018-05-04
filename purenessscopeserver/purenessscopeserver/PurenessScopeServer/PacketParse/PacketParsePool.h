@@ -9,8 +9,6 @@
 #include "MessageBlockManager.h"
 #include "ObjectPoolManager.h"
 
-using namespace std;
-
 //CPacketParse∂‘œÛ≥ÿ
 class CPacketParsePool : public CObjectPoolManager<CPacketParse, ACE_Recursive_Thread_Mutex>
 {

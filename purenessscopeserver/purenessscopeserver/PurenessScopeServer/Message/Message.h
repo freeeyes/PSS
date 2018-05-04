@@ -8,8 +8,6 @@
 #include "IMessage.h"
 #include "ObjectPoolManager.h"
 
-using namespace std;
-
 class CMessage : public IMessage
 {
 public:
@@ -58,6 +56,7 @@ public:
     ~CMessagePool();
 
     static void Init_Callback(int nIndex, CMessage* pMessage);
+    static void Close_Callback(int nIndex, CMessage* pMessage);
 
     CMessage* Create();
     bool Delete(CMessage* pMakePacket);

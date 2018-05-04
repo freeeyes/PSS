@@ -207,7 +207,6 @@ bool GetConnectServerID(const char* pCommand, int& nServerID)
 {
     char szTempData[MAX_BUFF_100] = { '\0' };
 
-    int nCommandLen = (int)ACE_OS::strlen(pCommand);
     //ªÒµ√IPµÿ÷∑
     GetCommandParam(pCommand, "-s ", szTempData, MAX_BUFF_100);
     nServerID = ACE_OS::atoi(szTempData);

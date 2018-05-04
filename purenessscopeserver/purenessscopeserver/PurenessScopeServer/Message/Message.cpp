@@ -26,9 +26,6 @@ CMessage::CMessage(void)
 
 CMessage::~CMessage(void)
 {
-    //OUR_DEBUG((LM_INFO, "[CMessage::~CMessage].\n"));
-    Close();
-    //OUR_DEBUG((LM_INFO, "[CMessage::~CMessage]End.\n"));
 }
 
 void CMessage::SetHashID(int nHasnID)
@@ -167,13 +164,23 @@ CMessagePool::CMessagePool()
 CMessagePool::~CMessagePool()
 {
     OUR_DEBUG((LM_INFO, "[CMessagePool::~CMessagePool].\n"));
-    CObjectPoolManager<CMessage, ACE_Recursive_Thread_Mutex>::Close();
+    CObjectPoolManager<CMessage, ACE_Recursive_Thread_Mutex>::Close_Object(CMessagePool::Close_Callback);
     OUR_DEBUG((LM_INFO, "[CMessagePool::~CMessagePool]End.\n"));
 }
 
 void CMessagePool::Init_Callback(int nIndex, CMessage* pMessage)
 {
     pMessage->SetHashID(nIndex);
+}
+
+void CMessagePool::Close_Callback(int nIndex, CMessage* pMessage)
+{
+    ACE_UNUSED_ARG(nIndex);
+
+    if (NULL != pMessage)
+    {
+        pMessage->Close();
+    }
 }
 
 int CMessagePool::GetUsedCount()

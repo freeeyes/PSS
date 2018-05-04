@@ -3,12 +3,11 @@
 
 CPacketParse::CPacketParse(void)
 {
-    m_nHashID = 0;
+    Init();
 }
 
 CPacketParse::~CPacketParse(void)
 {
-
 }
 
 void CPacketParse::SetHashID(int nHashID)
@@ -23,6 +22,6 @@ int CPacketParse::GetHashID()
 
 void CPacketParse::Init()
 {
-
+    m_nHashID = 0;
 }
 

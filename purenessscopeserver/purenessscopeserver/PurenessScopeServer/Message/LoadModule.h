@@ -11,8 +11,6 @@
 #include <string>
 #include <vector>
 
-using namespace std;
-
 struct _ModuleInfo
 {
     string           strModuleName;         //模块文件名称
