@@ -4,8 +4,6 @@
 #include "MessageDispose.h"
 #include <map>
 
-using namespace std;
-
 class CConsoleMessage
 {
 public:

@@ -183,7 +183,6 @@ int CServerMessageTask::svc(void)
         ACE_Message_Block* mb = NULL;
         ACE_OS::last_error(0);
 
-        //xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, MAX_MSG_PUTTIMEOUT);
         if(getq(mb, 0) == -1)
         {
             OUR_DEBUG((LM_ERROR,"[CMessageService::svc] PutMessage error errno = [%d].\n", ACE_OS::last_error()));
@@ -423,13 +422,10 @@ int CServerMessageTask::CloseMsgQueue()
     ACE_NEW_RETURN(mblk,ACE_Message_Block (0, ACE_Message_Block::MB_STOP),-1);
 
     // If queue is full, flush it before block in while
-    if (msg_queue ()->is_full())
+    if (msg_queue ()->is_full() && (retval = msg_queue()->flush()) == -1)
     {
-        if ((retval=msg_queue ()->flush()) == -1)
-        {
-            OUR_DEBUG((LM_ERROR, "[CServerMessageTask::CloseMsgQueue]put error flushing queue\n"));
-            return -1;
-        }
+        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::CloseMsgQueue]put error flushing queue\n"));
+        return -1;
     }
 
     m_mutex.acquire();
@@ -564,41 +560,9 @@ bool CServerMessageManager::CheckServerMessageThread(ACE_Time_Value tvNow)
 
         if(false == blRet)
         {
+            //线程停止工作，提示问题。
             OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::CheckServerMessageThread]***App_ServerMessageTask Thread is DEAD***.\n"));
             return false;
-            /*
-            //如果发现已经可能死亡，尝试重启线程
-            #ifdef WIN32
-            ACE_hthread_t hthread = 0;
-            int grp_id = m_pServerMessageTask->grp_id();
-
-            if (ACE_Thread_Manager::instance()->hthread_grp_list(grp_id, &hthread, 1) == 1)
-            {
-                int ret = ::TerminateThread (hthread, -1);
-                ACE_Thread_Manager::instance()->wait_grp (grp_id);
-                OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::CheckServerMessageThread]kill return %d, %d\n", ret, GetLastError()));
-            }
-
-            #else
-            int ret = ACE_Thread_Manager::instance()->cancel_task(m_pServerMessageTask, 1);
-            OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::CheckServerMessageThread]kill return %d OK.\n", ret));
-            #endif
-
-            if (0 != m_pServerMessageTask->Close())
-            {
-                OUR_DEBUG((LM_INFO, "[CServerMessageManager::CheckServerMessageThread]m_pServerMessageTask Close error.\n"));
-            }
-
-            SAFE_DELETE(m_pServerMessageTask);
-
-            //重建并重启相应线程
-            Init();
-
-            if (false == Start())
-            {
-                OUR_DEBUG((LM_INFO, "[CServerMessageManager::CheckServerMessageThread]Start error.\n"));
-            }
-            */
         }
 
         return true;

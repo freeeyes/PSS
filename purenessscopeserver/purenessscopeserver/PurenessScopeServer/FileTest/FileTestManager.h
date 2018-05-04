@@ -1,9 +1,6 @@
 #ifndef _FILETESTMANAGER_H_
 #define _FILETESTMANAGER_H_
 
-#include <vector>
-using namespace std;
-
 #ifndef WIN32
 #include "ConnectHandler.h"
 #else

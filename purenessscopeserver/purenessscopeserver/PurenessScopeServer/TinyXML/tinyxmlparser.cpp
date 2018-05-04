@@ -119,23 +119,35 @@ void TiXmlBase::ConvertUTF32ToUTF8( unsigned long input, char* output, int* leng
     switch (*length)
     {
     case 4:
-        --output;
-        *output = (char)((input | BYTE_MARK) & BYTE_MASK);
-        input >>= 6;
+        {
+            --output;
+            *output = (char)((input | BYTE_MARK) & BYTE_MASK);
+            input >>= 6;
+            break;
+        }
 
     case 3:
-        --output;
-        *output = (char)((input | BYTE_MARK) & BYTE_MASK);
-        input >>= 6;
+        {
+            --output;
+            *output = (char)((input | BYTE_MARK) & BYTE_MASK);
+            input >>= 6;
+            break;
+        }
 
     case 2:
-        --output;
-        *output = (char)((input | BYTE_MARK) & BYTE_MASK);
-        input >>= 6;
+        {
+            --output;
+            *output = (char)((input | BYTE_MARK) & BYTE_MASK);
+            input >>= 6;
+            break;
+        }
 
     case 1:
-        --output;
-        *output = (char)(input | FIRST_BYTE_MARK[*length]);
+        {
+            --output;
+            *output = (char)(input | FIRST_BYTE_MARK[*length]);
+            break;
+        }
     }
 }
 

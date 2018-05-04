@@ -3,10 +3,9 @@
 
 #include "define.h"
 
-using namespace std;
-
-struct _ThreadInfo
+class _ThreadInfo
 {
+public:
     uint32              m_u4ThreadIndex;      //系统线程ID
     uint32              m_u4State;            //0为没有数据正在处理，1为正在处理接受数据。
     uint32              m_u4RecvPacketCount;  //此线程下接收包的处理个数

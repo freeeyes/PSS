@@ -45,36 +45,26 @@ void CTimerManager::wait_for_event(void)
 
     while(true)
     {
-        //ACE_Time_Value tvNow(ACE_OS::gettimeofday());
-        //ACE_Time_Value* tvTimeout = m_pTimerQueue->calculate_timeout(&tvNow);
+        ACE_Time_Value tvNow(ACE_OS::gettimeofday());
+        ACE_Time_Value* tvTimeout = m_pTimerQueue->calculate_timeout(&tvNow);
 
-        //if(*tvTimeout == ACE_Time_Value::zero)
-        //{
-        //  m_pTimerQueue->expire();
-        //}
-        //else
-        //{
-        //  ACE_Time_Value tvNext(ACE_OS::gettimeofday());
-
-        //  tvNext += *tvTimeout;
-
-        //  if(m_EvTimer.wait(&tvNext) == -1)
-        //  {
-        //      m_pTimerQueue->expire();
-        //  }
-        //}
-
-        //int time = m_pTimerQueue->expire();
-        if(m_pTimerQueue->is_empty())
+        if(*tvTimeout == ACE_Time_Value::zero)
         {
-            ACE_OS::sleep(1);
+            m_pTimerQueue->expire();
         }
         else
         {
-            ACE_Time_Value time;
-            time.msec(10);
-            ACE_OS::sleep(time);
+            ACE_Time_Value tvNext(ACE_OS::gettimeofday());
+
+            tvNext += *tvTimeout;
+
+            if(m_EvTimer.wait(&tvNext) == -1)
+            {
+                m_pTimerQueue->expire();
+            }
         }
+
+        m_pTimerQueue->expire();
     }
 }
 
