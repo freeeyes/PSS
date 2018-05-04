@@ -74,8 +74,6 @@ int32 GetProcessMemorySize_Linux()
     char line_buff[512] = { 0 };
     sprintf(file_name, "/proc/%d/status", getpid());
 
-    printf("[file_name]%s.\n", file_name);
-
     fd = fopen(file_name, "r");
 
     if (NULL == fd)
@@ -102,7 +100,6 @@ int32 GetProcessMemorySize_Linux()
         }
     }
 
-    //sscanf(line_buff,"%s %d",name,&vmrss);
     fclose(fd);
 
     nMomorySize = vmrss + vmsize;

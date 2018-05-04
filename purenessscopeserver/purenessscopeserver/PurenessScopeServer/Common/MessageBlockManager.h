@@ -25,8 +25,9 @@ typedef ACE_Allocator_Adapter<MUTEX_MB_MALLOC> Mutex_MB_Allocator;
 //管理释放的ACE_Message_Block内存，组织内存池
 #define MAX_MEMORY_BLOCK_COUNT 32
 
-struct _MemoryBlock_List
+class _MemoryBlock_List
 {
+public:
     uint32 m_u4ListSize;
     vector<ACE_Message_Block*> m_mbList;
 
@@ -48,7 +49,7 @@ public:
     {
         for(uint32 i = 0; i < MAX_MEMORY_BLOCK_COUNT; i++)
         {
-            m_MemoryBlock_List[i].m_u4ListSize = (uint32)pow((double)2, (int32)i);;
+            m_MemoryBlock_List[i].m_u4ListSize = (uint32)pow((double)2, (int32)i);
         }
     }
 

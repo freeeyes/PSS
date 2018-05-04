@@ -80,10 +80,6 @@ bool CServerMessageInfoPool::Delete(_Server_Message_Info* pObject)
     {
         OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Delete]szHandlerID=%s(0x%08x).\n", szHashID, pObject));
     }
-    else
-    {
-        //OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHashID, pObject, nPos));
-    }
 
     return true;
 }
@@ -207,25 +203,7 @@ int CServerMessageTask::svc(void)
                 IClientMessage* pClientMessage = NULL;
                 memcpy_safe(mb->rd_ptr(), sizeof(IClientMessage*), (char* )&pClientMessage, sizeof(IClientMessage*));
 
-                bool blIsFind = false;
-
-                if (NULL != pClientMessage)
-                {
-                    for (int i = 0; i < (int)m_vecValidIClientMessage.size(); i++)
-                    {
-                        if (m_vecValidIClientMessage[i] == pClientMessage)
-                        {
-                            //找到了
-                            blIsFind = true;
-                            break;
-                        }
-                    }
-
-                    if (false == blIsFind)
-                    {
-                        m_vecValidIClientMessage.push_back(pClientMessage);
-                    }
-                }
+                Add_ValidIClientMessage(pClientMessage);
 
                 App_MessageBlockManager::instance()->Close(mb);
                 continue;
@@ -236,19 +214,7 @@ int CServerMessageTask::svc(void)
                 IClientMessage* pClientMessage = NULL;
                 memcpy_safe(mb->rd_ptr(), sizeof(IClientMessage*), (char*)&pClientMessage, sizeof(IClientMessage*));
 
-                if (NULL != pClientMessage)
-                {
-                    //先查找有效的列表中是否包含此指针
-                    for (vecValidIClientMessage::iterator b = m_vecValidIClientMessage.begin(); b != m_vecValidIClientMessage.end(); ++b)
-                    {
-                        if (*b == pClientMessage)
-                        {
-                            //找到了，清除
-                            m_vecValidIClientMessage.erase(b);
-                            break;
-                        }
-                    }
-                }
+                Update_ValidIClientMessage(pClientMessage);
 
                 App_MessageBlockManager::instance()->Close(mb);
                 continue;
@@ -480,6 +446,47 @@ int CServerMessageTask::CloseMsgQueue()
     m_cond.wait();
     m_mutex.release();
     return retval;
+}
+
+void CServerMessageTask::Add_ValidIClientMessage(IClientMessage* pClientMessage)
+{
+    bool blIsFind = false;
+
+    if (NULL != pClientMessage)
+    {
+        for (int i = 0; i < (int)m_vecValidIClientMessage.size(); i++)
+        {
+            if (m_vecValidIClientMessage[i] == pClientMessage)
+            {
+                //找到了
+                blIsFind = true;
+                break;
+            }
+        }
+
+        if (false == blIsFind)
+        {
+            m_vecValidIClientMessage.push_back(pClientMessage);
+        }
+    }
+}
+
+void CServerMessageTask::Update_ValidIClientMessage(IClientMessage* pClientMessage)
+{
+    if (NULL != pClientMessage)
+    {
+        //先查找有效的列表中是否包含此指针
+        for (vecValidIClientMessage::iterator b = m_vecValidIClientMessage.begin(); b != m_vecValidIClientMessage.end(); ++b)
+        {
+            if (*b == pClientMessage)
+            {
+                //找到了，清除
+                m_vecValidIClientMessage.erase(b);
+                break;
+            }
+        }
+    }
+
 }
 
 //************************************************

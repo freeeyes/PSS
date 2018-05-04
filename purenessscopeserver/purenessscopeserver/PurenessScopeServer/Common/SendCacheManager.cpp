@@ -20,7 +20,6 @@ void CSendCacheManager::Init(uint32 u4CacheCount, uint32 u4CacheSize)
     for(uint32 i = 0; i < u4CacheCount; i++)
     {
         ACE_Message_Block* pCache = App_MessageBlockManager::instance()->Create(u4CacheSize);
-        //OUR_DEBUG((LM_INFO, "[CSendCacheManager::Init](%d)pMessage=0x%08x.\n", i, pCache));
         char szHashID[10] = {'\0'};
         sprintf_safe(szHashID, 10, "%d", i);
 

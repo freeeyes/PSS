@@ -75,10 +75,6 @@ bool CSendMessagePool::Delete(_SendMessage* pObject)
     {
         OUR_DEBUG((LM_INFO, "[CSendMessagePool::Delete]HashID=%s(0x%08x).\n", szHashID, pObject));
     }
-    else
-    {
-        //OUR_DEBUG((LM_INFO, "[CSendMessagePool::Delete]HashID=%s(0x%08x) nPos=%d.\n", szHashID, pObject, nPos));
-    }
 
     return true;
 }

@@ -493,13 +493,9 @@ My_ACE_Logging_Strategy::init (int argc, ACE_TCHAR* argv[])
 
             // Setup a timeout handler to perform the maximum file size
             // check (if required).
-            if (this->interval_ > 0 && this->max_size_ > 0)
+            if (this->interval_ > 0 && this->max_size_ > 0 && this->reactor() == 0)
             {
-                if (this->reactor () == 0)
-                    // Use singleton.
-                {
-                    this->reactor (ACE_Reactor::instance ());
-                }
+                this->reactor (ACE_Reactor::instance ());
             }
         }
 
@@ -542,39 +538,37 @@ My_ACE_Logging_Strategy::handle_timeout (const ACE_Time_Value&,
 
         // Save current logfile to logfile.old analyze if it was set any
         // fixed number for the log_files.
-        if (fixed_number_)
+        if (fixed_number_ && max_file_number_ < 1)
         {
-            if (max_file_number_ < 1) //we only want one file
-            {
-                // Just unlink the file.
-                ACE_OS::unlink(this->filename_);
+            // Just unlink the file.
+            ACE_OS::unlink(this->filename_);
 
-                // Open a new log file with the same name.
+            // Open a new log file with the same name.
 #if defined (ACE_LACKS_IOSTREAM_TOTALLY)
-                output_file = ACE_OS::fopen(this->filename_,
-                                            ACE_TEXT("wt"));
+            output_file = ACE_OS::fopen(this->filename_,
+                                        ACE_TEXT("wt"));
 
-                if (output_file == 0)
-                {
-                    return -1;
-                }
+            if (output_file == 0)
+            {
+                return -1;
+            }
 
-                this->log_msg_->msg_ostream(output_file);
+            this->log_msg_->msg_ostream(output_file);
 #else
-                output_file->open(ACE_TEXT_ALWAYS_CHAR(this->filename_),
-                                  ios::out);
+            output_file->open(ACE_TEXT_ALWAYS_CHAR(this->filename_),
+                              ios::out);
 #endif /* ACE_LACKS_IOSTREAM_TOTALLY */
 
-                // Release the lock previously acquired.
-                this->log_msg_->release();
-                return 0;
-            }
+            // Release the lock previously acquired.
+            this->log_msg_->release();
+            return 0;
         }
 
         count_++;
 
         // Set the number of digits of the log_files labels.
-        int digits = 1, res = count_;
+        int digits = 1;
+        int res = count_;
 
         while ((res = (res / 10)) > 0)
         {

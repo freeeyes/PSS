@@ -30,33 +30,23 @@ bool CForbiddenIP::Init(const char* szConfigPath)
 
     while(true)
     {
-        char* pData = m_ForbiddenData.GetData("ForbiddenIP", "ip", pNextTiXmlElementIP);
+        char* pIpData   = m_ForbiddenData.GetData("ForbiddenIP", "ip", pNextTiXmlElementIP);
+        char* pTypeData = m_ForbiddenData.GetData("ForbiddenIP", "type", pNextTiXmlElementType);
 
-        if(pData == NULL)
+        if(NULL == pIpData || NULL == pTypeData)
         {
             break;
         }
-        else
-        {
-            sprintf_safe(ForbiddenIP.m_szClientIP, MAX_BUFF_20, "%s", pData);
-        }
 
-        pData = m_ForbiddenData.GetData("ForbiddenIP", "type", pNextTiXmlElementType);
+        sprintf_safe(ForbiddenIP.m_szClientIP, MAX_BUFF_20, "%s", pIpData);
 
-        if(pData == NULL)
+        if (ACE_OS::strcmp(pTypeData, "TCP") == 0)
         {
-            break;
+            ForbiddenIP.m_u1Type = PACKET_TCP;
         }
         else
         {
-            if (ACE_OS::strcmp(pData, "TCP") == 0)
-            {
-                ForbiddenIP.m_u1Type = PACKET_TCP;
-            }
-            else
-            {
-                ForbiddenIP.m_u1Type = PACKET_UDP;
-            }
+            ForbiddenIP.m_u1Type = PACKET_UDP;
         }
 
         m_VecForeverForbiddenIP.push_back(ForbiddenIP);

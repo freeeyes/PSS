@@ -14,8 +14,6 @@
 #include "HashTable.h"
 #include "ObjectArrayList.h"
 
-using namespace std;
-
 //处理服务器间接收数据包过程代码
 //如果服务器间线程处理挂起了，会尝试重启服务
 //add by freeeyes
@@ -27,8 +25,9 @@ using namespace std;
 #define DEL_SERVER_CLIENT  ACE_Message_Block::MB_USER + 2    //删除ClientMessage异步对象
 
 //服务器间通讯的数据结构（接收包）
-struct _Server_Message_Info
+class _Server_Message_Info
 {
+public:
     IClientMessage*    m_pClientMessage;
     uint16             m_u2CommandID;
     ACE_Message_Block* m_pRecvFinish;
@@ -125,7 +124,7 @@ public:
     int GetFreeCount();
 
 private:
-	CObjectArrayList<_Server_Message_Info> m_objArrayList;				//
+    CObjectArrayList<_Server_Message_Info> m_objArrayList;              //
     CHashTable<_Server_Message_Info> m_objServerMessageList;           //Server Message缓冲池
     ACE_Recursive_Thread_Mutex       m_ThreadWriteLock;                //控制多线程锁
 };
@@ -161,11 +160,12 @@ private:
 
     virtual int CloseMsgQueue();
 
-private:
+    void Add_ValidIClientMessage(IClientMessage* pClientMessage);
+    void Update_ValidIClientMessage(IClientMessage* pClientMessage);
+
     //关闭消息队列条件变量
     ACE_Thread_Mutex m_mutex;
     ACE_Condition<ACE_Thread_Mutex> m_cond;
-private:
     uint32               m_u4ThreadID;  //当前线程ID
     bool                 m_blRun;       //当前线程是否运行
     uint32               m_u4MaxQueue;  //在队列中的数据最多个数

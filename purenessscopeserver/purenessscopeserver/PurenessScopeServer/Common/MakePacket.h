@@ -20,10 +20,9 @@
 #include "ProfileTime.h"
 #include "HashTable.h"
 
-using namespace std;
-
-struct _MakePacket
+class _MakePacket
 {
+public:
     uint32         m_u4ConnectID;       //链接ID
     uint32         m_u4PacketParseID;   //对应ConnectID的PacketParseID
     int32          m_nHashID;           //对应记录hash的ID
@@ -78,7 +77,6 @@ private:
     void SetMessage(_MakePacket* pMakePacket, CMessage* pMessage, ACE_Time_Value& tvNow);                                      //一般数据包消息
     void SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, CMessage* pMessage, ACE_Time_Value& tvNow);  //服务发送失败回调数据包消息
 
-private:
     ACE_Recursive_Thread_Mutex     m_ThreadWriteLock;
 };
 typedef ACE_Singleton<CMakePacket, ACE_Null_Mutex> App_MakePacket;

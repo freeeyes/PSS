@@ -6,11 +6,10 @@
 #include "HashTable.h"
 #include "ObjectArrayList.h"
 
-using namespace std;
-
 //定义一个发送数据容器，用于异步发送队列
-struct _SendMessage
+class _SendMessage
 {
+public:
     uint32              m_u4ConnectID;    //要发送的远程ID
     int32               m_nMessageID;     //发送消息的ID
     int32               m_nHashID;        //当前对象的HashID
