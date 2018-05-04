@@ -25,7 +25,6 @@ private:
     bool GetCommandInfo(const char* pCommand, _CommandInfo& CommandInfo, bool blCheck = true);                //把命令切割成应该有的数据格式
     bool CheckConsoleKey(const char* pKey);                                                                   //验证key
 
-private:
     vecConsoleKey*      m_pvecConsoleKey;
     CConsolePromissions m_objConsolePromissions;
 

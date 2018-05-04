@@ -99,6 +99,7 @@ public:
 };
 
 //协议解析, 公用数据部分
+bool GetCommandParam(const char* pCommand, const char* pTag, char* pData, int nMaxSize);                  //解析出指定的Command参数
 bool GetFileInfo(const char* pFile, _FileInfo& FileInfo);                                                 //将一个全路径切分成文件名
 bool GetForbiddenIP(const char* pCommand, _ForbiddenIP& ForbiddenIP);                                     //得到禁止的IP列表
 bool GetConnectServerID(const char* pCommand, int& nServerID);                                            //得到一个指定的服务器ID

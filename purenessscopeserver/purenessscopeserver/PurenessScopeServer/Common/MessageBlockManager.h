@@ -127,7 +127,6 @@ private:
         }
     }
 
-private:
     _MemoryBlock_List m_MemoryBlock_List[MAX_MEMORY_BLOCK_COUNT];
 };
 

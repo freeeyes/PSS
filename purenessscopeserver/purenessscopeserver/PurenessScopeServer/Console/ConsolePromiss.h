@@ -10,8 +10,9 @@
 
 #define MAX_COMSOLE_COMMAND_COUNT 100
 
-struct _Console_Command_Info
+class _Console_Command_Info
 {
+public:
     char m_szCommand[MAX_BUFF_50];
     char m_szUser[MAX_BUFF_200];
 
@@ -36,7 +37,6 @@ public:
 private:
     int Check_Split_User(const char* pUser, const char* pUserList);
 
-private:
     CHashTable<_Console_Command_Info> m_objHashCommandList;
 };
 

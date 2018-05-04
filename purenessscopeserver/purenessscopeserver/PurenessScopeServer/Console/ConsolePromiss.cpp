@@ -13,7 +13,6 @@ CConsolePromissions::~CConsolePromissions()
 void CConsolePromissions::Init(const char* pFileName)
 {
     CXmlOpeation m_ConcoleConfig;
-    char* pData = NULL;
 
     //初始化队列
     Close();
@@ -30,32 +29,21 @@ void CConsolePromissions::Init(const char* pFileName)
 
     while (true)
     {
+        char* pCommandNameData = NULL;
+        char* pUserData        = NULL;
+
         _Console_Command_Info* pConsole_Command_Info = new _Console_Command_Info();
-        pData = m_ConcoleConfig.GetData("CommandInfo", "CommandName", pNextTiXmlCommandName);
+        pCommandNameData = m_ConcoleConfig.GetData("CommandInfo", "CommandName", pNextTiXmlCommandName);
+        pUserData = m_ConcoleConfig.GetData("CommandInfo", "User", pNextTiXmlUser);
 
-        if (pData != NULL)
+        if (NULL == pCommandNameData || NULL == pUserData)
         {
-            sprintf_safe(pConsole_Command_Info->m_szCommand, MAX_BUFF_50, "%s", pData);
-        }
-        else
-        {
-            //OUR_DEBUG((LM_INFO, "[CConsolePromissions::Init]Get CommandName error.\n"));
             SAFE_DELETE(pConsole_Command_Info);
             break;
         }
 
-        pData = m_ConcoleConfig.GetData("CommandInfo", "User", pNextTiXmlUser);
-
-        if (pData != NULL)
-        {
-            sprintf_safe(pConsole_Command_Info->m_szUser, MAX_BUFF_200, "%s", pData);
-        }
-        else
-        {
-            OUR_DEBUG((LM_INFO, "[CConsolePromissions::Init]Get User error.\n"));
-            SAFE_DELETE(pConsole_Command_Info);
-            break;
-        }
+        sprintf_safe(pConsole_Command_Info->m_szCommand, MAX_BUFF_50, "%s", pCommandNameData);
+        sprintf_safe(pConsole_Command_Info->m_szUser, MAX_BUFF_200, "%s", pUserData);
 
         if (-1 == m_objHashCommandList.Add_Hash_Data(pConsole_Command_Info->m_szCommand, pConsole_Command_Info))
         {

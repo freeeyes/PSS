@@ -178,16 +178,26 @@ int CServerMessageTask::svc(void)
     ACE_Time_Value tvSleep(0, MAX_MSG_SENDCHECKTIME*MAX_BUFF_1000);
     ACE_OS::sleep(tvSleep);
 
-    while(true)
+    while(m_blRun)
     {
         ACE_Message_Block* mb = NULL;
         ACE_OS::last_error(0);
+
+        if ((0 == mb->size()) && (mb->msg_type() == ACE_Message_Block::MB_STOP))
+        {
+            m_mutex.acquire();
+            mb->release();
+            this->msg_queue()->deactivate();
+            m_cond.signal();
+            m_mutex.release();
+            break;
+        }
 
         if(getq(mb, 0) == -1)
         {
             OUR_DEBUG((LM_ERROR,"[CMessageService::svc] PutMessage error errno = [%d].\n", ACE_OS::last_error()));
             m_blRun = false;
-            break;
+            continue;
         }
         else
         {
@@ -217,16 +227,6 @@ int CServerMessageTask::svc(void)
 
                 App_MessageBlockManager::instance()->Close(mb);
                 continue;
-            }
-
-            if ((0 == mb->size ()) && (mb->msg_type () == ACE_Message_Block::MB_STOP))
-            {
-                m_mutex.acquire();
-                mb->release ();
-                this->msg_queue ()->deactivate ();
-                m_cond.signal();
-                m_mutex.release();
-                break;
             }
 
             _Server_Message_Info* msg = *((_Server_Message_Info**)mb->base());
@@ -422,7 +422,7 @@ int CServerMessageTask::CloseMsgQueue()
     ACE_NEW_RETURN(mblk,ACE_Message_Block (0, ACE_Message_Block::MB_STOP),-1);
 
     // If queue is full, flush it before block in while
-    if (msg_queue ()->is_full() && (retval = msg_queue()->flush()) == -1)
+    if (msg_queue ()->is_full() && msg_queue()->flush() == -1)
     {
         OUR_DEBUG((LM_ERROR, "[CServerMessageTask::CloseMsgQueue]put error flushing queue\n"));
         return -1;

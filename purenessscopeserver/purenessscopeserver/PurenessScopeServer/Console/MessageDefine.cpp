@@ -1,5 +1,41 @@
 #include "MessageDispose.h"
 
+bool GetCommandParam(const char* pCommand, const char* pTag, char* pData, int nMaxSize)
+{
+    char* pPosBegin = (char*)ACE_OS::strstr(pCommand, pTag);
+
+    //判断是否包含指定的关键字
+    if (NULL == pPosBegin)
+    {
+        OUR_DEBUG((LM_INFO, "[GetCommandParam](%s)no find(%s) key.\n", pCommand, pTag));
+        return false;
+    }
+
+    char* pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
+
+    int nLen = 0;
+
+    if (NULL == pPosEnd)
+    {
+        //没有找到 " "结尾,直接从最后计算
+        nLen = (int)(pCommand - pPosBegin - 3);
+    }
+    else
+    {
+        nLen = (int)(pPosEnd - pPosBegin - 3);
+    }
+
+    if (nLen >= nMaxSize || nLen < 0)
+    {
+        OUR_DEBUG((LM_INFO, "[GetCommandParam](%s)[%s]nLen is more key.\n", pCommand, pTag));
+        return false;
+    }
+
+    memcpy_safe(pPosBegin + 3, (uint32)nLen, pData, (uint32)nMaxSize);
+    pData[nLen] = '\0';
+    return true;
+}
+
 bool GetFileInfo(const char* pFile, _FileInfo& FileInfo)
 {
     //按照逗号拆分
@@ -46,43 +82,15 @@ bool GetForbiddenIP(const char* pCommand, _ForbiddenIP& ForbiddenIP)
     char szTempData[MAX_BUFF_100] = { '\0' };
 
     //获得IP地址
-    char* pPosBegin = (char*)ACE_OS::strstr(pCommand, "-c ");
-    char* pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
-    int nLen = (int)(pPosEnd - pPosBegin - 3);
-
-    if (nLen >= MAX_BUFF_100 || nLen < 0)
-    {
-        return false;
-    }
-
-    memcpy_safe(pPosBegin + 3, (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
-    szTempData[nLen] = '\0';
+    GetCommandParam(pCommand, "-c ", szTempData, MAX_BUFF_100);
     sprintf_safe(ForbiddenIP.m_szClientIP, MAX_IP_SIZE, szTempData);
 
-    pPosBegin = (char*)ACE_OS::strstr(pCommand, "-t ");
-    pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
-    nLen = (int)(pPosEnd - pPosBegin - 3);
-
-    if (nLen >= MAX_BUFF_100 || nLen < 0)
-    {
-        return false;
-    }
-
-    memcpy_safe(pPosBegin + 3, (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
-    szTempData[nLen] = '\0';
+    //获得IP类型，UDP or TCP
+    GetCommandParam(pCommand, "-t ", szTempData, MAX_BUFF_100);
     ForbiddenIP.m_u1Type = (uint8)ACE_OS::atoi(szTempData);
 
-    pPosBegin = (char*)ACE_OS::strstr(pCommand, "-s ");
-    pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
-    nLen = (int)(pPosEnd - pPosBegin - 3);
-
-    if (nLen >= MAX_BUFF_100 || nLen < 0)
-    {
-        return false;
-    }
-
-    memcpy_safe(pPosBegin + 3, (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
-    szTempData[nLen] = '\0';
+    //获得封禁时间，单位秒
+    GetCommandParam(pCommand, "-s ", szTempData, MAX_BUFF_100);
     ForbiddenIP.m_u4Second = (uint32)ACE_OS::atoi(szTempData);
 
     return true;
@@ -93,17 +101,7 @@ bool GetTrackIP(const char* pCommand, _ForbiddenIP& ForbiddenIP)
     char szTempData[MAX_BUFF_100] = { '\0' };
 
     //获得IP地址
-    char* pPosBegin = (char*)ACE_OS::strstr(pCommand, "-c ");
-    char* pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
-    int nLen = (int)(pPosEnd - pPosBegin - 3);
-
-    if (nLen >= MAX_BUFF_100 || nLen < 0)
-    {
-        return false;
-    }
-
-    memcpy_safe(pPosBegin + 3, (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
-    szTempData[nLen] = '\0';
+    GetCommandParam(pCommand, "-c ", szTempData, MAX_BUFF_100);
     sprintf_safe(ForbiddenIP.m_szClientIP, MAX_IP_SIZE, szTempData);
 
     return true;
@@ -111,17 +109,11 @@ bool GetTrackIP(const char* pCommand, _ForbiddenIP& ForbiddenIP)
 
 bool GetLogLevel(const char* pCommand, int& nLogLevel)
 {
+    char szTempData[MAX_BUFF_100] = { '\0' };
+
     //获得日志等级
-    char* pPosBegin = (char*)ACE_OS::strstr(pCommand, "-l ");
-
-    if (NULL != pPosBegin)
-    {
-        char szTempData[MAX_BUFF_100] = { '\0' };
-        int nLen = (int)ACE_OS::strlen(pCommand) - (int)(pPosBegin - pCommand) - 3;
-        memcpy_safe(pPosBegin + 3, (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
-        nLogLevel = ACE_OS::atoi(szTempData);
-    }
-
+    GetCommandParam(pCommand, "-l ", szTempData, MAX_BUFF_100);
+    nLogLevel = ACE_OS::atoi(szTempData);
     return true;
 }
 
@@ -171,15 +163,7 @@ bool GetAIInfo(const char* pCommand, int& nAI, int& nDispose, int& nCheck, int& 
 bool GetNickName(const char* pCommand, char* pName)
 {
     //获得别名
-    char* pPosBegin = (char*)ACE_OS::strstr(pCommand, "-n ");
-
-    if (NULL != pPosBegin)
-    {
-        int nLen = (int)ACE_OS::strlen(pCommand) - (int)(pPosBegin - pCommand) - 3;
-        memcpy_safe((char*)(pPosBegin + 3), (uint32)nLen, pName, (uint32)MAX_BUFF_100);
-        pName[nLen] = '\0';
-    }
-
+    GetCommandParam(pCommand, "-n ", pName, MAX_BUFF_100);
     return true;
 }
 
@@ -189,30 +173,11 @@ bool GetConnectID(const char* pCommand, uint32& u4ConnectID, bool& blFlag)
     int  nFlag = 0;
 
     //获得ConnectID
-    char* pPosBegin = (char*)ACE_OS::strstr(pCommand, "-n ");
-    char* pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
-    int nLen = (int)(pPosEnd - pPosBegin - 3);
-
-    if (nLen >= MAX_BUFF_100 || nLen < 0)
-    {
-        return false;
-    }
-
-    memcpy_safe((char*)(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
-    szTempData[nLen] = '\0';
+    GetCommandParam(pCommand, "-n ", szTempData, MAX_BUFF_100);
     u4ConnectID = (uint32)ACE_OS::atoi(szTempData);
 
-    pPosBegin = (char*)ACE_OS::strstr(pCommand, "-f ");
-    pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
-    nLen = (int)(pPosEnd - pPosBegin - 3);
-
-    if (nLen >= MAX_BUFF_100 || nLen < 0)
-    {
-        return false;
-    }
-
-    memcpy_safe((char*)(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
-    szTempData[nLen] = '\0';
+    //获得标记位
+    GetCommandParam(pCommand, "-f ", szTempData, MAX_BUFF_100);
     nFlag = (int)ACE_OS::atoi(szTempData);
 
     if (nFlag == 0)
@@ -232,17 +197,7 @@ bool GetMaxConnectCount(const char* pCommand, uint16& u2MaxConnectCount)
     char szTempData[MAX_BUFF_100] = { '\0' };
 
     //获得ConnectID
-    char* pPosBegin = (char*)ACE_OS::strstr(pCommand, "-n ");
-    char* pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
-    int nLen = (int)(pPosEnd - pPosBegin - 3);
-
-    if (nLen >= MAX_BUFF_100 || nLen < 0)
-    {
-        return false;
-    }
-
-    memcpy_safe((char*)(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
-    szTempData[nLen] = '\0';
+    GetCommandParam(pCommand, "-n ", szTempData, MAX_BUFF_100);
     u2MaxConnectCount = (uint16)ACE_OS::atoi(szTempData);
 
     return true;
@@ -254,16 +209,7 @@ bool GetConnectServerID(const char* pCommand, int& nServerID)
 
     int nCommandLen = (int)ACE_OS::strlen(pCommand);
     //获得IP地址
-    char* pPosBegin = (char*)ACE_OS::strstr(pCommand, "-s ");
-    int nLen = (int)(nCommandLen - (pPosBegin - pCommand) - 3);
-
-    if (nLen >= MAX_BUFF_100 || nLen < 0)
-    {
-        return false;
-    }
-
-    memcpy_safe((char*)(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
-
+    GetCommandParam(pCommand, "-s ", szTempData, MAX_BUFF_100);
     nServerID = ACE_OS::atoi(szTempData);
 
     return true;
@@ -274,80 +220,27 @@ bool GetListenInfo(const char* pCommand, _ListenInfo& objListenInfo)
     char szTempData[MAX_BUFF_100] = { '\0' };
 
     //获得IP地址
-    char* pPosBegin = (char*)ACE_OS::strstr(pCommand, "-i ");
-    char* pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
-    int nLen = (int)(pPosEnd - pPosBegin - 3);
-
-    if (nLen >= MAX_BUFF_100 || nLen < 0)
-    {
-        return false;
-    }
-
-    memcpy_safe((char*)(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
-    szTempData[nLen] = '\0';
+    GetCommandParam(pCommand, "-i ", szTempData, MAX_BUFF_100);
     sprintf_safe(objListenInfo.m_szListenIP, MAX_BUFF_20, szTempData);
 
     //获得Port
-    pPosBegin = (char*)ACE_OS::strstr(pCommand, "-p ");
-    pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
-    nLen = (int)(pPosEnd - pPosBegin - 3);
-
-    if (nLen >= MAX_BUFF_100 || nLen < 0)
-    {
-        return false;
-    }
-
-    memcpy_safe((char*)(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
-    szTempData[nLen] = '\0';
+    GetCommandParam(pCommand, "-p ", szTempData, MAX_BUFF_100);
     objListenInfo.m_u4Port = ACE_OS::atoi(szTempData);
 
     //获得IP类型
-    pPosBegin = (char*)ACE_OS::strstr(pCommand, "-t ");
-    pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
-    nLen = (int)(pPosEnd - pPosBegin - 3);
-
-    if (nLen >= MAX_BUFF_100 || nLen < 0)
-    {
-        return false;
-    }
-
-    memcpy_safe((char*)(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
-    szTempData[nLen] = '\0';
+    GetCommandParam(pCommand, "-t ", szTempData, MAX_BUFF_100);
     objListenInfo.m_u1IPType = ACE_OS::atoi(szTempData);
 
     //获得PacketParseID
-    pPosBegin = (char*)ACE_OS::strstr(pCommand, "-n ");
-    pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
-    nLen = (int)(pPosEnd - pPosBegin - 3);
-
-    if (nLen >= MAX_BUFF_100 || nLen < 0)
-    {
-        return false;
-    }
-
-    memcpy_safe((char*)(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
-    szTempData[nLen] = '\0';
+    GetCommandParam(pCommand, "-n ", szTempData, MAX_BUFF_100);
     objListenInfo.m_u4PacketParseID = ACE_OS::atoi(szTempData);
     return true;
 }
 
 bool GetTestFileName(const char* pCommand, char* pFileName)
 {
-    int nCommandSize = (int)ACE_OS::strlen(pCommand);
-    char* pPosBegin = (char*)ACE_OS::strstr(pCommand, "-f ");
-    uint16 u2Len = (uint16)(nCommandSize - (int(pPosBegin - pCommand) + 3));
-
-    if (u2Len < MAX_BUFF_200 && u2Len > 0)
-    {
-        memcpy_safe((char*)(pPosBegin + 3), (uint32)u2Len, pFileName, (uint32)MAX_BUFF_200);
-        pFileName[u2Len] = '\0';
-        return true;
-    }
-    else
-    {
-        OUR_DEBUG((LM_INFO, "[GetTestFileName]nCommandSize=%d is more than MAX_BUFF_200 or is zero.\n", u2Len));
-        return false;
-    }
+    //得到文件名
+    return GetCommandParam(pCommand, "-f ", pFileName, MAX_BUFF_200);
 }
 
 bool GetDyeingIP(const char* pCommand, _DyeIPInfo& objDyeIPInfo)
@@ -355,31 +248,11 @@ bool GetDyeingIP(const char* pCommand, _DyeIPInfo& objDyeIPInfo)
     char szTempData[MAX_BUFF_100] = { '\0' };
 
     //获得IP地址
-    char* pPosBegin = (char*)ACE_OS::strstr(pCommand, "-i ");
-    char* pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
-    int nLen = (int)(pPosEnd - pPosBegin - 3);
-
-    if (nLen >= MAX_BUFF_100 || nLen < 0)
-    {
-        return false;
-    }
-
-    memcpy_safe((char*)(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
-    szTempData[nLen] = '\0';
+    GetCommandParam(pCommand, "-i ", szTempData, MAX_BUFF_100);
     sprintf_safe(objDyeIPInfo.m_szClientIP, MAX_BUFF_20, szTempData);
 
     //获得当前个数
-    pPosBegin = (char*)ACE_OS::strstr(pCommand, "-c ");
-    pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
-    nLen = (int)(pPosEnd - pPosBegin - 3);
-
-    if (nLen >= MAX_BUFF_100 || nLen < 0)
-    {
-        return false;
-    }
-
-    memcpy_safe((char*)(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
-    szTempData[nLen] = '\0';
+    GetCommandParam(pCommand, "-c ", szTempData, MAX_BUFF_100);
     objDyeIPInfo.m_u2MaxCount = ACE_OS::atoi(szTempData);
 
     return true;
@@ -391,17 +264,7 @@ bool GetDyeingCommand(const char* pCommand, _DyeCommandInfo& objDyeCommandInfo)
     char szTempData[MAX_BUFF_100] = { '\0' };
 
     //获得CommandID
-    char* pPosBegin = (char*)ACE_OS::strstr(pCommand, "-i ");
-    char* pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
-    int nLen = (int)(pPosEnd - pPosBegin - 3);
-
-    if (nLen >= MAX_BUFF_100 || nLen < 0)
-    {
-        return false;
-    }
-
-    memcpy_safe((char*)(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
-    szTempData[nLen] = '\0';
+    GetCommandParam(pCommand, "-i ", szTempData, MAX_BUFF_100);
 
     if (szTempData[0] != '0' && szTempData[1] != 'x')
     {
@@ -416,17 +279,7 @@ bool GetDyeingCommand(const char* pCommand, _DyeCommandInfo& objDyeCommandInfo)
     objDyeCommandInfo.m_u2CommandID = (uint16)ACE_OS::strtol(szCommandID, NULL, 16);
 
     //获得当前个数
-    pPosBegin = (char*)ACE_OS::strstr(pCommand, "-c ");
-    pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
-    nLen = (int)(pPosEnd - pPosBegin - 3);
-
-    if (nLen >= MAX_BUFF_100 || nLen < 0)
-    {
-        return false;
-    }
-
-    memcpy_safe((char*)(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
-    szTempData[nLen] = '\0';
+    GetCommandParam(pCommand, "-c ", szTempData, MAX_BUFF_100);
     objDyeCommandInfo.m_u2MaxCount = ACE_OS::atoi(szTempData);
 
     return true;
@@ -437,30 +290,13 @@ bool GetPoolSet(const char* pCommand, _PoolName& objPoolName)
     char szTempData[MAX_BUFF_100] = { '\0' };
 
     //获得内存池创建设置
-    char* pPosBegin = (char*)ACE_OS::strstr(pCommand, "-n ");
-    char* pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
-    int nLen = (int)(pPosEnd - pPosBegin - 3);
-
-    if (nLen >= MAX_BUFF_50 || nLen < 0)
-    {
-        return false;
-    }
-
-    memcpy_safe((char*)(pPosBegin + 3), (uint32)nLen, objPoolName.m_szPoolName, (uint32)MAX_BUFF_50);
-    objPoolName.m_szPoolName[nLen] = '\0';
+    GetCommandParam(pCommand, "-n ", szTempData, MAX_BUFF_100);
+    uint32 u4SrcSize = (uint32)ACE_OS::strlen(szTempData);
+    memcpy_safe(szTempData, u4SrcSize, objPoolName.m_szPoolName, (uint32)MAX_BUFF_50);
+    objPoolName.m_szPoolName[u4SrcSize] = '\0';
 
     //获得当前个数
-    pPosBegin = (char*)ACE_OS::strstr(pCommand, "-b ");
-    pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
-    nLen = (int)(pPosEnd - pPosBegin - 3);
-
-    if (nLen >= MAX_BUFF_50 || nLen < 0)
-    {
-        return false;
-    }
-
-    memcpy_safe((char*)(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
-    szTempData[nLen] = '\0';
+    GetCommandParam(pCommand, "-b ", szTempData, MAX_BUFF_100);
 
     if (ACE_OS::strcmp(szTempData, "true") == 0)
     {
@@ -478,18 +314,7 @@ bool GetDebug(const char* pCommand, uint8& u1Debug)
 {
     char szTempData[MAX_BUFF_100] = { '\0' };
 
-    int nCommandLen = (int)ACE_OS::strlen(pCommand);
-    //获得IP地址
-    char* pPosBegin = (char*)ACE_OS::strstr(pCommand, "-s ");
-    int nLen = (int)(nCommandLen - (pPosBegin - pCommand) - 3);
-
-    if (nLen >= MAX_BUFF_100 || nLen < 0)
-    {
-        return false;
-    }
-
-    memcpy_safe((char*)(pPosBegin + 3), (uint32)nLen, szTempData, (uint32)MAX_BUFF_100);
-
+    GetCommandParam(pCommand, "-s ", szTempData, MAX_BUFF_100);
     u1Debug = (uint8)ACE_OS::atoi(szTempData);
 
     return true;
