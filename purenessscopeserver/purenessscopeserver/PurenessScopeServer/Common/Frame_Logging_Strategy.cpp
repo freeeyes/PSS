@@ -8,8 +8,6 @@
 #include "ace/Dev_Poll_Reactor.h"
 #include "Frame_Logging_Strategy.h"
 
-
-
 static void* run_reactor (void* pReactor)
 {
     ACE_Reactor* pLogReactor = (ACE_Reactor*)pReactor;
@@ -74,9 +72,9 @@ Frame_Logging_Strategy::~Frame_Logging_Strategy()
     ACE_DEBUG((LM_INFO, ACE_TEXT("[Frame_Logging_Strategy::~Frame_Logging_Strategy]End\n")));
 }
 
-string Frame_Logging_Strategy::GetLogLevel(const string& strLogLevel)
+std::string Frame_Logging_Strategy::GetLogLevel(const std::string& strLogLevel)
 {
-    string strOutLogLevel="";
+    std::string strOutLogLevel="";
 
     if(strLogLevel == "DEBUG")
     {
@@ -124,8 +122,8 @@ int Frame_Logging_Strategy::InitLogStrategy(Logging_Config_Param& ConfigParam)
     //Set Arg List
     char cmdline[1024] = {0};
 
-    string strTemp = ConfigParam.m_strLogLevel;
-    string strLogLevel = GetLogLevel(strTemp);
+    std::string strTemp = ConfigParam.m_strLogLevel;
+    std::string strLogLevel = GetLogLevel(strTemp);
 
     if(ConfigParam.m_bSendTerminal)
     {
@@ -152,14 +150,12 @@ int Frame_Logging_Strategy::InitLogStrategy(Logging_Config_Param& ConfigParam)
 
 
     ACE_NEW_RETURN(pLogStraReactor, ACE_Reactor(pImpl,1), -1);
-    //ACE_NEW_RETURN(pLogStraReactor, ACE_Reactor, -1);
     ACE_NEW_RETURN(pLogStrategy, My_ACE_Logging_Strategy, -1);
 
     //Set Reactor
     pLogStrategy->reactor(pLogStraReactor);
 
     ACE_ARGV args;
-    //args.add(__argv[0]);
     args.add(ACE_TEXT(cmdline));
 
     pLogStrategy->init(args.argc(),args.argv());

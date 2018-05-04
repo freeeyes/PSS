@@ -12,11 +12,10 @@
 #include "HashTable.h"
 #include "ace/Hash_Map_Manager.h"
 
-using namespace std;
-
 //统计信息，里面有要统计的命令信息定义
-struct _CommandData
+class _CommandData
 {
+public:
     uint64 m_u8CommandCost;                //命令的执行耗费总时间
     uint32 m_u4CommandCount;               //命令的总调用次数
     uint32 m_u4PacketSize;                 //命令产生的总流量
@@ -76,8 +75,9 @@ struct _CommandData
     }
 };
 
-struct _CommandAlertData
+class _CommandAlertData
 {
+public:
     uint32 m_u4CommandCount;
     uint32 m_u4MailID;
     uint32 m_u4CurrCount;
@@ -96,8 +96,9 @@ struct _CommandAlertData
 typedef vector<_CommandAlertData> vecCommandAlertData;   //记录所有的告警监控阀值
 
 //对应端口数据接收信息
-struct _Port_Data_Account
+class _Port_Data_Account
 {
+public:
     uint8                       m_u1Type;                        //当前连接类型
     uint32                      m_u4Port;                        //当前数据端口
     uint8                       m_u1Minute;                      //获得当前分钟数

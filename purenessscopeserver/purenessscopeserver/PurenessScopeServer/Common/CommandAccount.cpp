@@ -392,6 +392,4 @@ void Combo_Port_List(vecPortDataAccount& vec_Port_Data_Account, vecPortDataAccou
             vec_Port_Data_All_Account.push_back(vec_Port_Data_Account[iLoop]);
         }
     }
-
-    return;
 }

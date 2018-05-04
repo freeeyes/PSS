@@ -3,7 +3,6 @@
 
 #include "MyACELoggingStrategy.h"
 #include <string>
-using namespace std;
 
 #define LOG_CONFIG_ARGV_COUNT   6
 
@@ -43,7 +42,7 @@ public:
     ~Frame_Logging_Strategy();
 
     //日志级别
-    string GetLogLevel(const string& strLogLevel);
+    std::string GetLogLevel(const std::string& strLogLevel);
 
     int InitLogStrategy();
 

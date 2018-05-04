@@ -72,8 +72,6 @@ bool CBuffPacket::Close()
             throw std::domain_error(szError);
         }
 
-        //OUR_DEBUG((LM_ERROR, "[CBuffPacket::Close] nSize [%d], m_szData=[0x%08x].\n", m_u4PacketLen, m_szData));
-
         if(NULL != m_szData)
         {
             App_ACEMemory::instance()->free((void* )m_szData);

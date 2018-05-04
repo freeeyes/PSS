@@ -15,8 +15,9 @@
 
 #define MAX_IP_SIZE 50
 
-struct _ForbiddenIP
+class _ForbiddenIP
 {
+public:
     uint32         m_u4Second;                  //禁止的秒数
     uint8          m_u1ConnectType;             //链接的类型，0为TCP，1为UDP
     uint8          m_u1Type;                    //禁止的类型，0为永久禁止，1为时段禁止。
@@ -54,7 +55,6 @@ private:
     bool SaveConfig();                                                                      //存储配置文件
     bool CompareIP(char* pTargetIP, char* pClientIP);                                       //比较是否在当前IP段
 
-private:
     CXmlOpeation   m_ForbiddenData;
     VecForbiddenIP m_VecForeverForbiddenIP;           //永久封停的IP列表
     VecForbiddenIP m_VecTempForbiddenIP;              //临时封停的IP列表

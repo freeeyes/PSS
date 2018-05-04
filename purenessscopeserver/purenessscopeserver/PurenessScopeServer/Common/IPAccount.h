@@ -15,8 +15,9 @@
 #include "ace/Recursive_Thread_Mutex.h"
 
 //IP访问统计模块
-struct _IPAccount
+class _IPAccount
 {
+public:
     int32          m_nCount;             //当前链接次数
     int32          m_nAllCount;          //指定IP链接次数总和
     int32          m_nMinute;            //当前分钟数
@@ -123,47 +124,7 @@ public:
         ACE_Date_Time  dtNowTime;
         uint16 u2NowTime = (uint16)dtNowTime.minute();
 
-        //检查当前时间连接总数
-        if (m_u1Minute == (uint8)u2NowTime)
-        {
-            m_u4CurrConnectCount++;
-        }
-        else
-        {
-            m_u4LastConnectCount = m_u4CurrConnectCount;
-            m_u4CurrConnectCount = 1;
-            m_u1Minute           = (uint8)u2NowTime;
-        }
-
-        if((int32)(u2NowTime - m_u2CurrTime)  < 0)
-        {
-            u2NowTime += 60;
-        }
-
-        if(u2NowTime - m_u2CurrTime >= 10)
-        {
-            //清理Hash数组
-            vector<_IPAccount* > vecIPAccount;
-            m_objIPList.Get_All_Used(vecIPAccount);
-
-            for(int32 i = 0; i < (int32)vecIPAccount.size(); i++)
-            {
-                _IPAccount* pIPAccount =vecIPAccount[i];
-
-                if(NULL != pIPAccount)
-                {
-                    if(false == pIPAccount->Check(dtNowTime))
-                    {
-                        if (-1 == m_objIPList.Del_Hash_Data(pIPAccount->m_strIP.c_str()))
-                        {
-                            OUR_DEBUG((LM_INFO, "[CIPAccount::AddIP]Del_Hash_Data(%s) is error.\n", pIPAccount->m_strIP.c_str()));
-                        }
-
-                        SAFE_DELETE(pIPAccount);
-                    }
-                }
-            }
-        }
+        Clear_Hash_Data(u2NowTime, dtNowTime);
 
         bool blRet = false;
 
@@ -172,34 +133,22 @@ public:
         {
             _IPAccount* pIPAccount = m_objIPList.Get_Hash_Box_Data(strIP.c_str());
 
-            if(NULL == pIPAccount)
+            if (NULL == pIPAccount)
             {
                 //没有找到，添加
                 pIPAccount = new _IPAccount();
 
-                if(NULL == pIPAccount)
-                {
-                    blRet = true;
-                }
-                else
-                {
-                    pIPAccount->m_strIP     = strIP;
-                    pIPAccount->Add(dtNowTime);
+                pIPAccount->m_strIP = strIP;
+                pIPAccount->Add(dtNowTime);
 
-                    //查看缓冲是否已满
-                    if(m_objIPList.Get_Count() == m_objIPList.Get_Used_Count())
-                    {
-                        //暂时不处理
-                        SAFE_DELETE(pIPAccount);
-                        return true;
-                    }
-                    else
-                    {
-                        if (-1 == m_objIPList.Add_Hash_Data(strIP.c_str(), pIPAccount))
-                        {
-                            OUR_DEBUG((LM_INFO, "[CIPAccount::AddIP]Add_Hash_Data(%s) is error.\n", strIP.c_str()));
-                        }
-                    }
+                //查看缓冲是否已满
+                if (m_objIPList.Get_Count() == m_objIPList.Get_Used_Count()
+                    || -1 == m_objIPList.Add_Hash_Data(strIP.c_str(), pIPAccount))
+                {
+                    //暂时不处理
+                    OUR_DEBUG((LM_INFO, "[CIPAccount::AddIP]Add_Hash_Data(%s) is error.\n", strIP.c_str()));
+                    SAFE_DELETE(pIPAccount);
+                    blRet = true;
                 }
             }
             else
@@ -212,7 +161,6 @@ public:
                 }
             }
 
-            blRet = true;
         }
         else
         {
@@ -261,6 +209,49 @@ public:
     }
 
 private:
+    //定时清理Hash数组
+    void Clear_Hash_Data(uint16 u2NowTime, ACE_Date_Time& dtNowTime)
+    {
+        //检查当前时间连接总数
+        if (m_u1Minute == (uint8)u2NowTime)
+        {
+            m_u4CurrConnectCount++;
+        }
+        else
+        {
+            m_u4LastConnectCount = m_u4CurrConnectCount;
+            m_u4CurrConnectCount = 1;
+            m_u1Minute = (uint8)u2NowTime;
+        }
+
+        if ((int32)(u2NowTime - m_u2CurrTime) < 0)
+        {
+            u2NowTime += 60;
+        }
+
+        if (u2NowTime - m_u2CurrTime >= 10)
+        {
+            //清理Hash数组
+            vector<_IPAccount* > vecIPAccount;
+            m_objIPList.Get_All_Used(vecIPAccount);
+
+            for (int32 i = 0; i < (int32)vecIPAccount.size(); i++)
+            {
+                _IPAccount* pIPAccount = vecIPAccount[i];
+
+                if (false == pIPAccount->Check(dtNowTime))
+                {
+                    if (-1 == m_objIPList.Del_Hash_Data(pIPAccount->m_strIP.c_str()))
+                    {
+                        OUR_DEBUG((LM_INFO, "[CIPAccount::AddIP]Del_Hash_Data(%s) is error.\n", pIPAccount->m_strIP.c_str()));
+                    }
+
+                    SAFE_DELETE(pIPAccount);
+                }
+            }
+        }
+    }
+
     uint32                           m_u4MaxConnectCount;                  //每秒允许的最大连接数，前提是m_nNeedCheck = 0;才会生效
     uint32                           m_u4CurrConnectCount;                 //当前连接总数
     uint32                           m_u4LastConnectCount;                 //之前一分钟的连接总数记录
@@ -350,13 +341,9 @@ public:
             {
                 m_u4CurrConnect++;
             }
+        }
 
-            return true;
-        }
-        else
-        {
-            return true;
-        }
+        return true;
     }
 
     bool AddDisConnect()
@@ -374,35 +361,21 @@ public:
             {
                 m_u4CurrDisConnect++;
             }
+        }
 
-            return true;
-        }
-        else
-        {
-            return true;
-        }
+        return true;
     }
 
     int32 CheckConnectCount()
     {
-        if(m_u4ConnectMax > 0)
+        if(m_u4ConnectMax > 0 && m_u4CurrConnect > m_u4ConnectMax)
         {
-            if(m_u4CurrConnect > m_u4ConnectMax)
-            {
-                return 1;   //1为超越max上限
-            }
+            return 1;   //1为超越max上限
         }
 
-        if(m_u4ConnectMin > 0)
+        if(m_u4ConnectMin > 0 && m_u4CurrConnect < m_u4ConnectMin)
         {
-            if(m_u4CurrConnect < m_u4ConnectMin)
-            {
-                return 2;    //2为低于min下限
-            }
-        }
-        else
-        {
-            return 0;
+            return 2;    //2为低于min下限
         }
 
         return 0;
@@ -410,24 +383,14 @@ public:
 
     int32 CheckDisConnectCount()
     {
-        if(m_u4DisConnectMax > 0)
+        if(m_u4DisConnectMax > 0 && m_u4CurrDisConnect > m_u4DisConnectMax)
         {
-            if(m_u4CurrDisConnect > m_u4DisConnectMax)
-            {
-                return 1;    //1为超越max上限
-            }
+            return 1;    //1为超越max上限
         }
 
-        if(m_u4ConnectMin > 0)
+        if(m_u4ConnectMin > 0 && m_u4CurrDisConnect < m_u4DisConnectMin)
         {
-            if(m_u4CurrDisConnect < m_u4DisConnectMin)
-            {
-                return 2;    //2为低于min下限
-            }
-        }
-        else
-        {
-            return 0;
+            return 2;    //2为低于min下限
         }
 
         return 0;

@@ -23,8 +23,6 @@ bool CForbiddenIP::Init(const char* szConfigPath)
     m_VecForeverForbiddenIP.clear();
     m_VecTempForbiddenIP.clear();
 
-    ACE_TString strValue;
-
     _ForbiddenIP ForbiddenIP;
 
     TiXmlElement* pNextTiXmlElementIP   = NULL;
@@ -34,20 +32,24 @@ bool CForbiddenIP::Init(const char* szConfigPath)
     {
         char* pData = m_ForbiddenData.GetData("ForbiddenIP", "ip", pNextTiXmlElementIP);
 
-        if(pData != NULL)
+        if(pData == NULL)
         {
-            sprintf_safe(ForbiddenIP.m_szClientIP, MAX_BUFF_20, "%s", pData);
+            break;
         }
         else
         {
-            break;
+            sprintf_safe(ForbiddenIP.m_szClientIP, MAX_BUFF_20, "%s", pData);
         }
 
         pData = m_ForbiddenData.GetData("ForbiddenIP", "type", pNextTiXmlElementType);
 
-        if(pData != NULL)
+        if(pData == NULL)
         {
-            if(ACE_OS::strcmp(pData, "TCP") == 0)
+            break;
+        }
+        else
+        {
+            if (ACE_OS::strcmp(pData, "TCP") == 0)
             {
                 ForbiddenIP.m_u1Type = PACKET_TCP;
             }
@@ -55,10 +57,6 @@ bool CForbiddenIP::Init(const char* szConfigPath)
             {
                 ForbiddenIP.m_u1Type = PACKET_UDP;
             }
-        }
-        else
-        {
-            break;
         }
 
         m_VecForeverForbiddenIP.push_back(ForbiddenIP);
@@ -252,12 +250,9 @@ bool CForbiddenIP::CompareIP(char* pTargetIP, char* pClientIP)
         memcpy_safe(pClientPos, (uint32)(pClientTPos - pClientPos), szClient, (uint32)MAX_IP_SIZE);
         szClient[(int32)(pClientTPos - pClientPos)] = '\0';
 
-        if(strcmp(szTarget, "*") != 0)
+        if(strcmp(szTarget, "*") != 0 && strcmp(szTarget, szClient) != 0)
         {
-            if(strcmp(szTarget, szClient) != 0)
-            {
-                return false;
-            }
+            return false;
         }
 
         pTargetPos = pTargetTPos + 1;
