@@ -21,8 +21,9 @@
 #define FILELOG_CONFIG    "logger.xml"
 
 //从XML读取的日志文件信息
-struct _Log_File_Info
+class _Log_File_Info
 {
+public:
     uint16 m_u2LogID;
     uint8  m_u1FileClass;
     uint8  m_u1DisPlay;
@@ -617,6 +618,12 @@ public:
     uint16 GetLogInfoByLogLevel(uint16 u2LogID);
 
 private:
+    void Read_XML_Data_Single_String(CXmlOpeation& objXmlOpeation, const char* pTag, const char* pName, char* pValue, int nMaxSize);
+    void Read_XML_Data_Single_Uint32(CXmlOpeation& objXmlOpeation, const char* pTag, const char* pName, uint32& u4Value);
+    bool Read_XML_Data_Multiple_String(CXmlOpeation& objXmlOpeation, const char* pTag, const char* pName, char* pValue, int nMaxSize, TiXmlElement*& pTi);
+    bool Read_XML_Data_Multiple_Uint16(CXmlOpeation& objXmlOpeation, const char* pTag, const char* pName, uint16& u2Value, TiXmlElement*& pTi);
+    bool Read_XML_Data_Multiple_Uint8(CXmlOpeation& objXmlOpeation, const char* pTag, const char* pName, uint8& u1Value, TiXmlElement*& pTi);
+
     CLogFile**                     m_pLogFileList;
     char                           m_szLogRoot[MAX_BUFF_100];
     int                            m_nCount;
