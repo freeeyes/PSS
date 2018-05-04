@@ -148,6 +148,10 @@ public:
                     //暂时不处理
                     OUR_DEBUG((LM_INFO, "[CIPAccount::AddIP]Add_Hash_Data(%s) is error.\n", strIP.c_str()));
                     SAFE_DELETE(pIPAccount);
+                    blRet = false;
+                }
+                else
+                {
                     blRet = true;
                 }
             }
@@ -158,6 +162,10 @@ public:
                 if((uint32)pIPAccount->m_nCount >= m_u4MaxConnectCount)
                 {
                     blRet = false;
+                }
+                else
+                {
+                    blRet = true;
                 }
             }
 

@@ -58,7 +58,7 @@ int stringCut(const unsigned char* pcSrc, const char* start, const char* end, ch
 int connectSmtp(ACE_HANDLE& socketFd, const unsigned char* smtpUrl, const unsigned short smtpPort)
 {
     struct sockaddr_in smtpAddr;
-    struct hostent   host = NULL;
+    struct hostent   host;
     ACE_HOSTENT_DATA buf  = {'\0'};
     int    hosterr        = 0;
 
@@ -71,7 +71,7 @@ int connectSmtp(ACE_HANDLE& socketFd, const unsigned char* smtpUrl, const unsign
     ACE_OS::memset(&smtpAddr, 0, sizeof(smtpAddr));
     smtpAddr.sin_family = AF_INET;
     smtpAddr.sin_port = htons(smtpPort);
-    smtpAddr.sin_addr = *((struct in_addr*)host->h_addr);
+    smtpAddr.sin_addr = *((struct in_addr*)host.h_addr);
 
     socketFd = ACE_OS::socket(PF_INET, SOCK_STREAM, 0);
 
