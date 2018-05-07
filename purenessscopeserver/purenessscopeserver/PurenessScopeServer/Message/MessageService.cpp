@@ -97,12 +97,14 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
 
 bool CMessageService::Start()
 {
-    m_emThreadState = THREAD_RUN;
-
     if(0 != open())
     {
         m_emThreadState = THREAD_STOP;
         return false;
+    }
+    else
+    {
+        m_emThreadState = THREAD_RUN;
     }
 
     return true;
@@ -134,20 +136,11 @@ int CMessageService::open(void* args)
 
 int CMessageService::svc(void)
 {
-    // Cache our ACE_Thread_Manager pointer.
-    ACE_Thread_Manager* mgr = this->thr_mgr ();
-
     while(true)
     {
-        if (mgr->testcancel(mgr->thr_self ()))
-        {
-            return 0;
-        }
-
         ACE_Message_Block* mb = NULL;
         ACE_OS::last_error(0);
 
-        //xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, MAX_MSG_PUTTIMEOUT);
         if(getq(mb, 0) == -1)
         {
             OUR_DEBUG((LM_ERROR,"[CMessageService::svc] PutMessage error errno = [%d].\n", ACE_OS::last_error()));
@@ -156,36 +149,14 @@ int CMessageService::svc(void)
         }
         else
         {
-            if(mb == NULL)
-            {
-                continue;
-            }
-
             if ((mb->msg_type() == ACE_Message_Block::MB_USER))
             {
-                uint32 u4UpdateIndex = 0;
-                memcpy_safe(mb->rd_ptr(), sizeof(int), (char* )&u4UpdateIndex, sizeof(int));
-                OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)<UpDateIndex=%d>CopyMessageManagerList.\n", m_ThreadInfo.m_u4ThreadID, u4UpdateIndex));
-
-                if (u4UpdateIndex > 0)
-                {
-                    int nReload = App_ModuleLoader::instance()->UnloadListUpdate(u4UpdateIndex);
-
-                    if (1 == nReload)
-                    {
-                        //需要通知大家再更新一下副本(让新的加载生效)
-                        App_MessageServiceGroup::instance()->PutUpdateCommandMessage(App_MessageManager::instance()->GetUpdateIndex());
-                    }
-
-                    //同步信令列表
-                    CopyMessageManagerList();
-                }
+                UpdateCommandList(mb);
 
                 App_MessageBlockManager::instance()->Close(mb);
                 continue;
             }
-
-            if ((0 == mb->size ()) && (mb->msg_type () == ACE_Message_Block::MB_STOP))
+            else if ((0 == mb->size ()) && (mb->msg_type () == ACE_Message_Block::MB_STOP))
             {
                 m_mutex.acquire();
                 mb->release ();
@@ -194,25 +165,14 @@ int CMessageService::svc(void)
                 m_mutex.release();
                 break;
             }
-
-            while(m_emThreadState != THREAD_RUN)
+            else
             {
-                //如果模块正在卸载或者重载，线程在这里等加载完毕（等1ms）。
-                ACE_Time_Value tvsleep(0, 1000);
-                ACE_OS::sleep(tvsleep);
-            }
+                CMessage* msg = *((CMessage**)mb->base());
 
-            CMessage* msg = *((CMessage**)mb->base());
-
-            if(!msg)
-            {
-                OUR_DEBUG((LM_ERROR,"[CMessageService::svc] mb msg == NULL CurrthreadNo=[%d]!\n", m_u4ThreadID));
-                continue;
-            }
-
-            if (false == this->ProcessMessage(msg, m_u4ThreadID))
-            {
-                OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)ProcessMessage is false!\n", m_u4ThreadID));
+                if (false == this->ProcessMessage(msg, m_u4ThreadID))
+                {
+                    OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)ProcessMessage is false!\n", m_u4ThreadID));
+                }
             }
         }
 
@@ -842,6 +802,27 @@ int CMessageService::CloseMsgQueue()
     m_cond.wait();
     m_mutex.release();
     return retval;
+}
+
+void CMessageService::UpdateCommandList(ACE_Message_Block* pmb)
+{
+    uint32 u4UpdateIndex = 0;
+    memcpy_safe(pmb->rd_ptr(), sizeof(int), (char*)&u4UpdateIndex, sizeof(int));
+    OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)<UpDateIndex=%d>CopyMessageManagerList.\n", m_ThreadInfo.m_u4ThreadID, u4UpdateIndex));
+
+    if (u4UpdateIndex > 0)
+    {
+        int nReload = App_ModuleLoader::instance()->UnloadListUpdate(u4UpdateIndex);
+
+        if (1 == nReload)
+        {
+            //需要通知大家再更新一下副本(让新的加载生效)
+            App_MessageServiceGroup::instance()->PutUpdateCommandMessage(App_MessageManager::instance()->GetUpdateIndex());
+        }
+
+        //同步信令列表
+        CopyMessageManagerList();
+    }
 }
 
 //==========================================================

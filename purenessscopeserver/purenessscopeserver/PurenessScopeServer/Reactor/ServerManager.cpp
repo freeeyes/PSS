@@ -77,7 +77,7 @@ bool CServerManager::Init()
     }
 
     //初始化防攻击系统
-    App_IPAccount::instance()->Init(App_MainConfig::instance()->GetMaxHandlerCount());
+    App_IPAccount::instance()->Init(App_MainConfig::instance()->GetIPAlert()->m_u4IPMaxCount);
 
     App_ConnectAccount::instance()->Init(App_MainConfig::instance()->GetConnectAlert()->m_u4ConnectMin,
                                          App_MainConfig::instance()->GetConnectAlert()->m_u4ConnectMax,

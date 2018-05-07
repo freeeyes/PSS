@@ -109,10 +109,11 @@ void CConnectHandler::Close()
 
     OUR_DEBUG((LM_ERROR, "[CConnectHandler::Close](0x%08x)Close(ConnectID=%d) OK.\n", this, GetConnectID()));
 
-    //删除链接对象
-    App_ConnectManager::instance()->CloseConnectByClient(GetConnectID());
-
-    m_u4ConnectID = 0;
+    //删除存在列表中的对象引用,这里加一个判定，如果是0说明当前连接尚未完成Manager添加。
+    if (GetConnectID() > 0)
+    {
+        App_ConnectManager::instance()->CloseConnectByClient(GetConnectID());
+    }
 
     //回归用过的指针
     App_ConnectHandlerPool::instance()->Delete(this);
@@ -249,6 +250,7 @@ int CConnectHandler::open(void*)
     m_atvOutput           = ACE_OS::gettimeofday();
     m_atvSendAlive        = ACE_OS::gettimeofday();
 
+    m_u4ConnectID         = 0;
     m_u4AllRecvCount      = 0;
     m_u4AllSendCount      = 0;
     m_u4AllRecvSize       = 0;

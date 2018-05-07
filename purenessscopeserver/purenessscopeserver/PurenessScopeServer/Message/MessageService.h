@@ -95,7 +95,8 @@ private:
 
     virtual int CloseMsgQueue();
 
-private:
+    void UpdateCommandList(ACE_Message_Block* pmb);        //更新指令列表
+
     uint64                         m_u8TimeCost;           //Put到队列信息的数据处理时间
     uint32                         m_u4ThreadID;           //当前线程ID
     uint32                         m_u4MaxQueue;           //线程中最大消息对象个数

@@ -13,8 +13,6 @@
 //用hash数组可以获得累积更高的性能提升
 //add by freeeyes
 
-using namespace std;
-
 //命令订阅者者的格式
 class _ClientCommandInfo
 {
