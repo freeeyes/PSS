@@ -84,25 +84,25 @@ bool CFileLogger::Init()
     }
 
     //得到服务器名称
-    Read_XML_Data_Single_String(objXmlOpeation, "ServerLogHead", "Text", szServerName, MAX_BUFF_100);
+    objXmlOpeation.Read_XML_Data_Single_String("ServerLogHead", "Text", szServerName, MAX_BUFF_100);
     OUR_DEBUG((LM_ERROR, "[CFileLogger::readConfig]strServerName=%s\n", szServerName));
 
     //得到单个日志最大大小
-    Read_XML_Data_Single_Uint32(objXmlOpeation, "ServerLogHead", "LogFileMaxSize", u4FileMaxSize);
+    objXmlOpeation.Read_XML_Data_Single_Uint32("ServerLogHead", "LogFileMaxSize", u4FileMaxSize);
 
     //得到绝对路径
-    Read_XML_Data_Single_String(objXmlOpeation, "LogPath", "Path", m_szLogRoot, MAX_BUFF_100);
+    objXmlOpeation.Read_XML_Data_Single_String("LogPath", "Path", m_szLogRoot, MAX_BUFF_100);
     OUR_DEBUG((LM_ERROR, "[CFileLogger::readConfig]m_strRoot=%s\n", m_szLogRoot));
 
     //得到日志池配置信息，日志块的大小
-    Read_XML_Data_Single_Uint32(objXmlOpeation, "LogPool", "BlockSize", m_u4BlockSize);
+    objXmlOpeation.Read_XML_Data_Single_Uint32("LogPool", "BlockSize", m_u4BlockSize);
 
     //得到日志池配置信息，缓冲池中日志块的个数
-    Read_XML_Data_Single_Uint32(objXmlOpeation, "LogPool", "PoolCount", m_u4PoolCount);
+    objXmlOpeation.Read_XML_Data_Single_Uint32("LogPool", "PoolCount", m_u4PoolCount);
 
     //得到日志池中的当前日志级别
     //此功能感谢宇/ka程枫 的好想法，赞一个，积少成多就会汇聚洪流
-    Read_XML_Data_Single_Uint32(objXmlOpeation, "LogLevel", "CurrLevel", m_u4CurrLogLevel);
+    objXmlOpeation.Read_XML_Data_Single_Uint32("LogLevel", "CurrLevel", m_u4CurrLogLevel);
 
     //添加子类的个数
     TiXmlElement* pNextTiXmlElement        = NULL;
@@ -114,7 +114,7 @@ bool CFileLogger::Init()
     while(true)
     {
         //得到日志id
-        if(true == Read_XML_Data_Multiple_Uint16(objXmlOpeation, "LogInfo", "logid", u2LogID, pNextTiXmlElementIdx))
+        if(true == objXmlOpeation.Read_XML_Data_Multiple_Uint16("LogInfo", "logid", u2LogID, pNextTiXmlElementIdx))
         {
             OUR_DEBUG((LM_ERROR, "[CFileLogger::readConfig]u2LogID=%d\n", u2LogID));
         }
@@ -124,19 +124,19 @@ bool CFileLogger::Init()
         }
 
         //得到日志名称
-        Read_XML_Data_Multiple_String(objXmlOpeation, "LogInfo", "logname", szFileName, MAX_BUFF_100, pNextTiXmlElement);
+        objXmlOpeation.Read_XML_Data_Multiple_String("LogInfo", "logname", szFileName, MAX_BUFF_100, pNextTiXmlElement);
         OUR_DEBUG((LM_ERROR, "[CFileLogger::readConfig]strFileValue=%s\n", szFileName));
 
         //得到日志类型
-        Read_XML_Data_Multiple_Uint8(objXmlOpeation, "LogInfo", "logtype", u1FileClass, pNextTiXmlElementPos);
+        objXmlOpeation.Read_XML_Data_Multiple_Uint8("LogInfo", "logtype", u1FileClass, pNextTiXmlElementPos);
         OUR_DEBUG((LM_ERROR, "[CFileLogger::readConfig]u1FileClass=%d\n", u1FileClass));
 
         //得到日志输出来源，0为输出到文件，1为输出到屏幕
-        Read_XML_Data_Multiple_Uint8(objXmlOpeation, "LogInfo", "Display", u1DisPlay, pNextTiXmlElementDisplay);
+        objXmlOpeation.Read_XML_Data_Multiple_Uint8("LogInfo", "Display", u1DisPlay, pNextTiXmlElementDisplay);
         OUR_DEBUG((LM_ERROR, "[CFileLogger::readConfig]u1DisPlay=%d\n", u1DisPlay));
 
         //得到日志当前级别
-        Read_XML_Data_Multiple_Uint16(objXmlOpeation, "LogInfo", "Level", u2LogLevel, pNextTiXmlElementLevel);
+        objXmlOpeation.Read_XML_Data_Multiple_Uint16("LogInfo", "Level", u2LogLevel, pNextTiXmlElementLevel);
         OUR_DEBUG((LM_ERROR, "[CFileLogger::readConfig]u4LogLevel=%d\n", u2LogLevel));
 
         //加入缓冲
@@ -239,68 +239,4 @@ uint16 CFileLogger::GetLogInfoByLogLevel(uint16 u2LogID)
     return m_pLogFileList[nIndex]->GetLevel();
 }
 
-void CFileLogger::Read_XML_Data_Single_String(CXmlOpeation& objXmlOpeation, const char* pTag, const char* pName, char* pValue, int nMaxSize)
-{
-    char* pData = objXmlOpeation.GetData(pTag, pName);
-
-    if (pData != NULL)
-    {
-        sprintf_safe(pValue, nMaxSize, "%s", pData);
-    }
-}
-
-void CFileLogger::Read_XML_Data_Single_Uint32(CXmlOpeation& objXmlOpeation, const char* pTag, const char* pName, uint32& u4Value)
-{
-    char* pData = objXmlOpeation.GetData(pTag, pName);
-
-    if (pData != NULL)
-    {
-        u4Value = (uint32)ACE_OS::atoi(pData);
-    }
-}
-
-bool CFileLogger::Read_XML_Data_Multiple_String(CXmlOpeation& objXmlOpeation, const char* pTag, const char* pName, char* pValue, int nMaxSize, TiXmlElement*& pTi)
-{
-    char* pData = objXmlOpeation.GetData(pTag, pName, pTi);
-
-    if (pData != NULL)
-    {
-        sprintf_safe(pValue, nMaxSize, "%s", pData);
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-bool CFileLogger::Read_XML_Data_Multiple_Uint16(CXmlOpeation& objXmlOpeation, const char* pTag, const char* pName, uint16& u2Value, TiXmlElement*& pTi)
-{
-    char* pData = objXmlOpeation.GetData(pTag, pName, pTi);
-
-    if (pData != NULL)
-    {
-        u2Value = (uint16)atoi(pData);
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-bool CFileLogger::Read_XML_Data_Multiple_Uint8(CXmlOpeation& objXmlOpeation, const char* pTag, const char* pName, uint8& u1Value, TiXmlElement*& pTi)
-{
-    char* pData = objXmlOpeation.GetData(pTag, pName, pTi);
-
-    if (pData != NULL)
-    {
-        u1Value = (uint8)atoi(pData);
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
 

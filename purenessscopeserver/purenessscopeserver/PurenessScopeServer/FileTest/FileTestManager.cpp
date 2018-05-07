@@ -4,19 +4,17 @@ CFileTestManager::CFileTestManager(void)
 {
     m_bFileTesting     = false;
     m_n4TimerID        = 0;
-    m_n4ConnectCount   = 0;
+    m_u4ConnectCount   = 0;
     m_u4ParseID        = 0;
-    m_n4ResponseCount  = 0;
-    m_n4ExpectTime     = 1000;
-    m_n4ContentType    = 1;
-    m_n4TimeInterval   = 0;
+    m_u4ResponseCount  = 0;
+    m_u4ExpectTime     = 1000;
+    m_u4ContentType    = 1;
+    m_u4TimeInterval   = 0;
 }
 
 CFileTestManager::~CFileTestManager(void)
 {
     Close();
-
-    return;
 }
 
 FileTestResultInfoSt CFileTestManager::FileTestStart(const char* szXmlFileTestName)
@@ -37,7 +35,7 @@ FileTestResultInfoSt CFileTestManager::FileTestStart(const char* szXmlFileTestNa
         }
         else
         {
-            m_n4TimerID = App_TimerManager::instance()->schedule(this, (void*)NULL, ACE_OS::gettimeofday() + ACE_Time_Value(m_n4TimeInterval), ACE_Time_Value(m_n4TimeInterval));
+            m_n4TimerID = App_TimerManager::instance()->schedule(this, (void*)NULL, ACE_OS::gettimeofday() + ACE_Time_Value(m_u4TimeInterval), ACE_Time_Value(m_u4TimeInterval));
 
             if(-1 == m_n4TimerID)
             {
@@ -78,18 +76,18 @@ void CFileTestManager::HandlerServerResponse(uint32 u4ConnectID)
 
     if (NULL == pResponseRecord)
     {
-        OUR_DEBUG((LM_INFO, "[CFileTestManager::HandlerServerResponse]Response time too long m_n4ExpectTimeNo find connectID=%d.\n", u4ConnectID));
+        OUR_DEBUG((LM_INFO, "[CFileTestManager::HandlerServerResponse]Response time too long m_u4ExpectTimeNo find connectID=%d.\n", u4ConnectID));
         return;
     }
 
-    if(pResponseRecord->m_u1ResponseCount + 1 == m_n4ResponseCount)
+    if(pResponseRecord->m_u1ResponseCount + 1 == m_u4ResponseCount)
     {
         ACE_Time_Value atvResponse = ACE_OS::gettimeofday();
 
-        if(m_n4ExpectTime <= (int)((uint64)atvResponse.get_msec() - pResponseRecord->m_u8StartTime))
+        if(m_u4ExpectTime <= (int)((uint64)atvResponse.get_msec() - pResponseRecord->m_u8StartTime))
         {
             //应答时间超过期望时间限制
-            OUR_DEBUG((LM_INFO, "[CFileTestManager::HandlerServerResponse]Response time too long m_n4ExpectTime:%d.\n",m_n4ExpectTime));
+            OUR_DEBUG((LM_INFO, "[CFileTestManager::HandlerServerResponse]Response time too long m_u4ExpectTime:%d.\n",m_u4ExpectTime));
         }
 
 #ifndef WIN32
@@ -141,6 +139,7 @@ void CFileTestManager::Close()
 bool CFileTestManager::LoadXmlCfg(const char* szXmlFileTestName, FileTestResultInfoSt& objFileTestResult)
 {
     char* pData = NULL;
+    char  szTempValue[MAX_BUFF_100] = { '\0' };
     OUR_DEBUG((LM_INFO, "[CProConnectAcceptManager::LoadXmlCfg]Filename = %s.\n", szXmlFileTestName));
 
     if(false == m_MainConfig.Init(szXmlFileTestName))
@@ -150,88 +149,35 @@ bool CFileTestManager::LoadXmlCfg(const char* szXmlFileTestName, FileTestResultI
         return false;
     }
 
-    pData = m_MainConfig.GetData("FileTestConfig", "Path");
+    //获得相对路径
+    m_strProFilePath = "./";
+    m_MainConfig.Read_XML_Data_Single_String("FileTestConfig", "Path", m_strProFilePath);
 
-    if(NULL != pData)
-    {
-        m_strProFilePath = pData;
-    }
-    else
-    {
-        m_strProFilePath = "./";
-    }
+    //获得定时执行时间间隔
+    m_u4TimeInterval = 10;
+    m_MainConfig.Read_XML_Data_Single_Uint32("FileTestConfig", "TimeInterval", m_u4TimeInterval);
+    OUR_DEBUG((LM_INFO, "[CProConnectAcceptManager::LoadXmlCfg]m_u4TimeInterval = %d.\n", m_u4TimeInterval));
 
-    pData = m_MainConfig.GetData("FileTestConfig", "TimeInterval");
+    //获得连接总数
+    m_u4ConnectCount = 10;
+    m_MainConfig.Read_XML_Data_Single_Uint32("FileTestConfig", "ConnectCount", m_u4ConnectCount);
+    OUR_DEBUG((LM_INFO, "[CProConnectAcceptManager::LoadXmlCfg]m_u4ConnectCount = %d.\n", m_u4ConnectCount));
 
-    if(NULL != pData)
-    {
-        m_n4TimeInterval = (uint8)ACE_OS::atoi(pData);
-        objFileTestResult.n4TimeInterval = m_n4TimeInterval;
-        OUR_DEBUG((LM_INFO, "[CProConnectAcceptManager::LoadXmlCfg]m_n4TimeInterval = %d.\n", m_n4TimeInterval));
-    }
-    else
-    {
-        m_n4TimeInterval = 10;
-    }
+    m_u4ResponseCount = 1;
+    m_MainConfig.Read_XML_Data_Single_Uint32("FileTestConfig", "ResponseCount", m_u4ResponseCount);
+    OUR_DEBUG((LM_INFO, "[CProConnectAcceptManager::LoadXmlCfg]m_u4ResponseCount = %d.\n", m_u4ResponseCount));
 
-    pData = m_MainConfig.GetData("FileTestConfig", "ConnectCount");
+    m_u4ExpectTime = 1000;
+    m_MainConfig.Read_XML_Data_Single_Uint32("FileTestConfig", "ExpectTime", m_u4ExpectTime);
+    OUR_DEBUG((LM_INFO, "[CProConnectAcceptManager::LoadXmlCfg]m_u4ExpectTime = %d.\n", m_u4ExpectTime));
 
-    if(NULL != pData)
-    {
-        m_n4ConnectCount = (uint8)ACE_OS::atoi(pData);
-        objFileTestResult.n4ConnectNum = m_n4ConnectCount;
-        OUR_DEBUG((LM_INFO, "[CProConnectAcceptManager::LoadXmlCfg]m_n4ConnectCount = %d.\n", m_n4ConnectCount));
-    }
-    else
-    {
-        m_n4ConnectCount = 10;
-    }
+    //默认解析器类型
+    m_u4ParseID = 1;
+    m_MainConfig.Read_XML_Data_Single_Uint32("FileTestConfig", "ParseID", m_u4ParseID);
 
-    pData = m_MainConfig.GetData("FileTestConfig", "ResponseCount");
-
-    if(NULL != pData)
-    {
-        m_n4ResponseCount = (uint8)ACE_OS::atoi(pData);
-        OUR_DEBUG((LM_INFO, "[CProConnectAcceptManager::LoadXmlCfg]m_n4ResponseCount = %d.\n", m_n4ResponseCount));
-    }
-    else
-    {
-        m_n4ResponseCount = 1;
-    }
-
-    pData = m_MainConfig.GetData("FileTestConfig", "ExpectTime");
-
-    if(NULL != pData)
-    {
-        m_n4ExpectTime = (uint8)ACE_OS::atoi(pData);
-        OUR_DEBUG((LM_INFO, "[CProConnectAcceptManager::LoadXmlCfg]m_n4ExpectTime = %d.\n", m_n4ExpectTime));
-    }
-    else
-    {
-        m_n4ExpectTime = 1000;
-    }
-
-    pData = m_MainConfig.GetData("FileTestConfig", "ParseID");
-
-    if(NULL != pData)
-    {
-        m_u4ParseID = (uint8)ACE_OS::atoi(pData);
-    }
-    else
-    {
-        m_u4ParseID = 1;
-    }
-
-    pData = m_MainConfig.GetData("FileTestConfig", "ContentType");
-
-    if(NULL != pData)
-    {
-        m_n4ContentType = (uint8)ACE_OS::atoi(pData);
-    }
-    else
-    {
-        m_n4ContentType = 1; //默认是二进制协议
-    }
+    //默认是二进制协议
+    m_u4ContentType = 1;
+    m_MainConfig.Read_XML_Data_Single_Uint32("FileTestConfig", "ContentType", m_u4ContentType);
 
     //命令监控相关配置
     TiXmlElement* pNextTiXmlElementFileName     = NULL;
@@ -240,34 +186,27 @@ bool CFileTestManager::LoadXmlCfg(const char* szXmlFileTestName, FileTestResultI
     while(true)
     {
         FileTestDataInfoSt objFileTestDataInfo;
+        string strPathFile;
         string strFileName;
         string strFileDesc;
 
-        pData = m_MainConfig.GetData("FileInfo", "FileName", pNextTiXmlElementFileName);
+        bool blRet = m_MainConfig.Read_XML_Data_Multiple_String("FileInfo", "FileName", strFileName, pNextTiXmlElementFileName);
 
-        if(pData != NULL)
-        {
-            strFileName = m_strProFilePath + pData;
-        }
-        else
+        if(false == blRet)
         {
             break;
         }
 
-        pData = m_MainConfig.GetData("FileInfo", "Desc", pNextTiXmlElementDesc);
+        strPathFile = m_strProFilePath + strFileName;
+        blRet = m_MainConfig.Read_XML_Data_Multiple_String("FileInfo", "Desc", strFileDesc, pNextTiXmlElementDesc);
 
-        if(pData != NULL)
+        if(false == blRet)
         {
-            strFileDesc = pData;
             objFileTestResult.vecProFileDesc.push_back(strFileDesc);
-        }
-        else
-        {
-            break;
         }
 
         //读取数据包文件内容
-        int nReadFileRet = ReadTestFile(strFileName.c_str(), m_n4ContentType, objFileTestDataInfo);
+        int nReadFileRet = ReadTestFile(strPathFile.c_str(), m_u4ContentType, objFileTestDataInfo);
 
         if(RESULT_OK == nReadFileRet)
         {
@@ -348,6 +287,7 @@ int CFileTestManager::ReadTestFile(const char* pFileName, int nType, FileTestDat
                 objFileTestDataInfo.m_u4DataLength = static_cast<uint32>(nDataSize);
             }
         }
+
         ioFile.close();
     }
 
@@ -358,7 +298,7 @@ int CFileTestManager::ResponseRecordList()
 {
     //初始化Hash表
     m_objResponseRecordList.Close();
-    m_objResponseRecordList.Init((int)m_n4ConnectCount);
+    m_objResponseRecordList.Init((int)m_u4ConnectCount);
 
     return 0;
 }
@@ -379,22 +319,22 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
         for (int i = 0; i < nUsedSize; i++)
         {
             //在上一个轮询周期，没有结束的对象
-            if(m_n4ExpectTime <= (int)((uint64)tv.get_msec() - vecList[i]->m_u8StartTime))
+            if(m_u4ExpectTime <= (int)((uint64)tv.get_msec() - vecList[i]->m_u8StartTime))
             {
                 //超过了执行范围时间
-                OUR_DEBUG((LM_INFO, "[CFileTestManager::handle_timeout]Response time too long m_n4ExpectTime:%d.\n", m_n4ExpectTime));
-                AppLogManager::instance()->WriteLog(LOG_SYSTEM_ERROR, "[CFileTestManager::handle_timeout]Response time too long connectID=%d, m_n4ExpectTime=%d.",
+                OUR_DEBUG((LM_INFO, "[CFileTestManager::handle_timeout]Response time too long m_u4ExpectTime:%d.\n", m_u4ExpectTime));
+                AppLogManager::instance()->WriteLog(LOG_SYSTEM_ERROR, "[CFileTestManager::handle_timeout]Response time too long connectID=%d, m_u4ExpectTime=%d.",
                                                     vecList[i]->m_u4ConnectID,
-                                                    m_n4TimeInterval);
+                                                    m_u4TimeInterval);
             }
             else
             {
                 //超过了定时器时间
-                OUR_DEBUG((LM_INFO, "[CFileTestManager::handle_timeout]Response time too long m_n4TimeInterval:%d.\n", m_n4TimeInterval));
+                OUR_DEBUG((LM_INFO, "[CFileTestManager::handle_timeout]Response time too long m_u4TimeInterval:%d.\n", m_u4TimeInterval));
                 //写入错误日志
-                AppLogManager::instance()->WriteLog(LOG_SYSTEM_ERROR, "[CFileTestManager::handle_timeout]Response time too long connectID=%d, m_n4TimeInterval=%d.",
+                AppLogManager::instance()->WriteLog(LOG_SYSTEM_ERROR, "[CFileTestManager::handle_timeout]Response time too long connectID=%d, m_u4TimeInterval=%d.",
                                                     vecList[i]->m_u4ConnectID,
-                                                    m_n4TimeInterval);
+                                                    m_u4TimeInterval);
             }
 
             char szConnectID[10] = { '\0' };
@@ -407,7 +347,7 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 #ifndef WIN32
     CConnectHandler* pConnectHandler = NULL;
 
-    for (int iLoop = 0; iLoop < m_n4ConnectCount; iLoop++)
+    for (int iLoop = 0; iLoop < m_u4ConnectCount; iLoop++)
     {
         pConnectHandler = App_ConnectHandlerPool::instance()->Create();
 
@@ -460,7 +400,7 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 #else
     CProConnectHandle* ptrProConnectHandle = NULL;
 
-    for (int iLoop = 0; iLoop < m_n4ConnectCount; iLoop++)
+    for (uint32 iLoop = 0; iLoop < m_u4ConnectCount; iLoop++)
     {
         ptrProConnectHandle = App_ProConnectHandlerPool::instance()->Create();
 

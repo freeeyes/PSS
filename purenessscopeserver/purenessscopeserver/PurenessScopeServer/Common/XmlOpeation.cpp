@@ -32,6 +32,156 @@ bool CXmlOpeation::Init(const char* pFileName)
     return true;
 }
 
+bool CXmlOpeation::Read_XML_Data_Single_String(const char* pTag, const char* pName, char* pValue, int nMaxSize)
+{
+    char* pData = GetData(pTag, pName);
+
+    if (pData != NULL)
+    {
+        sprintf_safe(pValue, nMaxSize, "%s", pData);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool CXmlOpeation::Read_XML_Data_Single_String(const char* pTag, const char* pName, string& strValue)
+{
+    char* pData = GetData(pTag, pName);
+
+    if (pData != NULL)
+    {
+        strValue = (string)pData;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool CXmlOpeation::Read_XML_Data_Multiple_String(const char* pTag, const char* pName, char* pValue, int nMaxSize, TiXmlElement*& pTi)
+{
+    char* pData = GetData(pTag, pName, pTi);
+
+    if (pData != NULL)
+    {
+        sprintf_safe(pValue, nMaxSize, "%s", pData);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool CXmlOpeation::Read_XML_Data_Multiple_String(const char* pTag, const char* pName, string& strValue, TiXmlElement*& pTi)
+{
+    char* pData = GetData(pTag, pName, pTi);
+
+    if (pData != NULL)
+    {
+        strValue = (string)pData;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool CXmlOpeation::Read_XML_Data_Single_Uint32(const char* pTag, const char* pName, uint32& u4Value)
+{
+    char* pData = GetData(pTag, pName);
+
+    if (pData != NULL)
+    {
+        u4Value = (uint32)ACE_OS::atoi(pData);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool CXmlOpeation::Read_XML_Data_Multiple_Uint32(const char* pTag, const char* pName, uint32& u4Value, TiXmlElement*& pTi)
+{
+    char* pData = GetData(pTag, pName, pTi);
+
+    if (pData != NULL)
+    {
+        u4Value = (uint32)atoi(pData);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool CXmlOpeation::Read_XML_Data_Single_Uint16(const char* pTag, const char* pName, uint16& u2Value)
+{
+    char* pData = GetData(pTag, pName);
+
+    if (pData != NULL)
+    {
+        u2Value = (uint16)ACE_OS::atoi(pData);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool CXmlOpeation::Read_XML_Data_Multiple_Uint16(const char* pTag, const char* pName, uint16& u2Value, TiXmlElement*& pTi)
+{
+    char* pData = GetData(pTag, pName, pTi);
+
+    if (pData != NULL)
+    {
+        u2Value = (uint16)atoi(pData);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool CXmlOpeation::Read_XML_Data_Single_Uint8(const char* pTag, const char* pName, uint8& u1Value)
+{
+    char* pData = GetData(pTag, pName);
+
+    if (pData != NULL)
+    {
+        u1Value = (uint8)ACE_OS::atoi(pData);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool CXmlOpeation::Read_XML_Data_Multiple_Uint8(const char* pTag, const char* pName, uint8& u1Value, TiXmlElement*& pTi)
+{
+    char* pData = GetData(pTag, pName, pTi);
+
+    if (pData != NULL)
+    {
+        u1Value = (uint8)atoi(pData);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 void CXmlOpeation::Close()
 {
     if(NULL != m_pTiXmlDocument)

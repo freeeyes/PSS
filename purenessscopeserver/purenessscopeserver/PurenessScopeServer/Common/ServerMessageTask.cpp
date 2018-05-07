@@ -197,15 +197,9 @@ int CServerMessageTask::svc(void)
         {
             OUR_DEBUG((LM_ERROR,"[CMessageService::svc] PutMessage error errno = [%d].\n", ACE_OS::last_error()));
             m_blRun = false;
-            continue;
         }
         else
         {
-            if (mb == NULL)
-            {
-                continue;
-            }
-
             //处理ClientMessage对象添加
             if (mb->msg_type() == ADD_SERVER_CLIENT)
             {

@@ -21,7 +21,7 @@ class CFileTestManager : public ACE_Task<ACE_MT_SYNCH>, public IFileTestManager
 public:
     CFileTestManager(void);
     virtual ~CFileTestManager(void);
-public:
+
     //文件测试方法
     FileTestResultInfoSt FileTestStart(const char* szXmlFileTestName);      //开始文件测试
     int FileTestEnd();                                                      //结束文件测试
@@ -34,7 +34,7 @@ private:
     int  ResponseRecordList();                                                                      //初始化ResponseRecord
 
     virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);   //定时器检查
-private:
+
     ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;
     ACE_Time_Value m_atvLastCheck;
     //文件测试变量
@@ -43,12 +43,12 @@ private:
 
     CXmlOpeation m_MainConfig;
     string m_strProFilePath;
-    int    m_n4TimeInterval;      //定时器事件间隔
-    int    m_n4ConnectCount;      //模拟连接数
-    int    m_n4ResponseCount;     //期望的应答条数
-    int    m_n4ExpectTime;        //期望测试时总的耗时(单位毫秒)
+    uint32 m_u4TimeInterval;      //定时器事件间隔
+    uint32 m_u4ConnectCount;      //模拟连接数
+    uint32 m_u4ResponseCount;     //期望的应答条数
+    uint32 m_u4ExpectTime;        //期望测试时总的耗时(单位毫秒)
     uint32 m_u4ParseID;           //解析包ID
-    int    m_n4ContentType;       //协议数据类型,1是二进制协议,0是文本协议
+    uint32 m_u4ContentType;       //协议数据类型,1是二进制协议,0是文本协议
 
     typedef vector<FileTestDataInfoSt> vecFileTestDataInfoSt;
     vecFileTestDataInfoSt m_vecFileTestDataInfoSt;
