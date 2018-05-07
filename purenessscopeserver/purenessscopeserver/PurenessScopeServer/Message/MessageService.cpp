@@ -694,7 +694,7 @@ void CMessageService::CopyMessageManagerList()
 
                 for (int j = 0; j < pClientCommandList->GetCount(); j++)
                 {
-                    if (false == pCurrClientCommandList->AddClientCommand(pClientCommandList->GetClientCommandIndex(j)->m_pClientCommand, pClientCommandList->GetClientCommandIndex(j)->m_szModuleName))
+                    if (false == pCurrClientCommandList->AddClientCommand(pClientCommandList->GetClientCommandIndex(j)->m_pClientCommand, pClientCommandList->GetClientCommandIndex(j)->m_szModuleName, NULL))
                     {
                         OUR_DEBUG((LM_INFO, "[CMessageService::CopyMessageManagerList]<%s>CommandID=%d add error.\n", pClientCommandList->GetClientCommandIndex(j)->m_szModuleName, pClientCommandList->GetCommandID()));
                     }
