@@ -7,10 +7,6 @@
 #include "ConnectHandler.h"
 #include "AceReactorManager.h"
 
-#include <vector>
-
-using namespace std;
-
 //用于普通客户端
 class ConnectAcceptor : public ACE_Acceptor<CConnectHandler, ACE_SOCK_ACCEPTOR>
 {
@@ -20,7 +16,7 @@ public:
     void InitClientReactor(uint32 u4ClientReactorCount);
     void SetPacketParseInfoID(uint32 u4PaccketParseInfoID);
     uint32 GetPacketParseInfoID();
-    
+
 protected:
     virtual int make_svc_handler(CConnectHandler*& sh);
 

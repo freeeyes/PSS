@@ -33,10 +33,9 @@ private:
     int  ReadTestFile(const char* pFileName, int nType, FileTestDataInfoSt& objFileTestDataInfo);   //将消息包文件读入数据结构
     int  ResponseRecordList();                                                                      //初始化ResponseRecord
 
-    virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);   //定时器检查
+    int handle_timeout(const ACE_Time_Value& tv, const void* arg);   //定时器检查
 
     ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;
-    ACE_Time_Value m_atvLastCheck;
     //文件测试变量
     bool m_bFileTesting;          //是否正在进行文件测试
     int32 m_n4TimerID;            //定时器ID
@@ -53,18 +52,20 @@ private:
     typedef vector<FileTestDataInfoSt> vecFileTestDataInfoSt;
     vecFileTestDataInfoSt m_vecFileTestDataInfoSt;
 
-    typedef struct RESPONSERECORD
+    //内部使用的映射类
+    class ResponseRecordSt
     {
+    public:
         uint64 m_u8StartTime;
         uint8  m_u1ResponseCount;
         uint32 m_u4ConnectID;
 
-        RESPONSERECORD()
+        ResponseRecordSt()
         {
             Init();
         }
 
-        RESPONSERECORD(const RESPONSERECORD& ar)
+        ResponseRecordSt(const ResponseRecordSt& ar)
         {
             this->m_u8StartTime     = ar.m_u8StartTime;
             this->m_u1ResponseCount = ar.m_u1ResponseCount;
@@ -78,13 +79,13 @@ private:
             m_u4ConnectID      = 0;
         }
 
-        RESPONSERECORD& operator= (const RESPONSERECORD& ar)
+        ResponseRecordSt& operator= (const ResponseRecordSt& ar)
         {
             this->m_u8StartTime     = ar.m_u8StartTime;
             this->m_u1ResponseCount = ar.m_u1ResponseCount;
             return *this;
         }
-    } ResponseRecordSt;
+    } ;
 
     //定义接收参数
     CHashTable<ResponseRecordSt> m_objResponseRecordList;

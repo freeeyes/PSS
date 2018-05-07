@@ -61,7 +61,6 @@ bool CFileLogger::Init()
     CXmlOpeation objXmlOpeation;
 
     //默认单个文件最大是8M
-    int nData                       = -1;
     uint32 u4FileMaxSize            = MAX_BUFF_500;
     uint16 u2LogID                  = 0;
     uint16 u2LogLevel               = 0;
@@ -70,7 +69,6 @@ bool CFileLogger::Init()
     char szFile[MAX_BUFF_1024]      = {'\0'};
     char szFileName[MAX_BUFF_100]   = {'\0'};
     char szServerName[MAX_BUFF_100] = {'\0'};
-    char* pData = NULL;
     vector<_Log_File_Info> objvecLogFileInfo;
 
     Close();

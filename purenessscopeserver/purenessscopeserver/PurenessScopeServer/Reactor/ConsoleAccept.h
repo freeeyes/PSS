@@ -7,10 +7,6 @@
 #include "ConnectHandler.h"
 #include "ConsoleHandler.h"
 
-#include <vector>
-
-using namespace std;
-
 //用于后台管理接口
 class ConnectConsoleAcceptor : public ACE_Acceptor<CConsoleHandler, ACE_SOCK_ACCEPTOR>
 {

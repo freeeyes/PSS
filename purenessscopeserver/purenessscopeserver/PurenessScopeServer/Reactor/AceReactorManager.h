@@ -19,8 +19,6 @@
 #include "ace/Singleton.h"
 #include <stdexcept>
 
-using namespace std;
-
 enum
 {
     Reactor_Select      = 0x01,
