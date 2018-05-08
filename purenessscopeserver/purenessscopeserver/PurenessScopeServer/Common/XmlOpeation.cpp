@@ -43,6 +43,7 @@ bool CXmlOpeation::Read_XML_Data_Single_String(const char* pTag, const char* pNa
     }
     else
     {
+        OUR_DEBUG((LM_INFO, "[CXmlOpeation::Read_XML_Data_Single_String]tag=%s,name=%s no find.\n", pTag, pName));
         return false;
     }
 }
@@ -58,6 +59,7 @@ bool CXmlOpeation::Read_XML_Data_Single_String(const char* pTag, const char* pNa
     }
     else
     {
+        OUR_DEBUG((LM_INFO, "[CXmlOpeation::Read_XML_Data_Single_String]tag=%s,name=%s no find.\n", pTag, pName));
         return false;
     }
 }
@@ -103,6 +105,7 @@ bool CXmlOpeation::Read_XML_Data_Single_Uint32(const char* pTag, const char* pNa
     }
     else
     {
+        OUR_DEBUG((LM_INFO, "[CXmlOpeation::Read_XML_Data_Single_Uint32]tag=%s,name=%s no find.\n", pTag, pName));
         return false;
     }
 }
@@ -133,6 +136,7 @@ bool CXmlOpeation::Read_XML_Data_Single_Uint16(const char* pTag, const char* pNa
     }
     else
     {
+        OUR_DEBUG((LM_INFO, "[CXmlOpeation::Read_XML_Data_Single_Uint16]tag=%s,name=%s no find.\n", pTag, pName));
         return false;
     }
 }
@@ -163,6 +167,7 @@ bool CXmlOpeation::Read_XML_Data_Single_Uint8(const char* pTag, const char* pNam
     }
     else
     {
+        OUR_DEBUG((LM_INFO, "[CXmlOpeation::Read_XML_Data_Single_Uint8]tag=%s,name=%s no find.\n", pTag, pName));
         return false;
     }
 }

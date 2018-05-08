@@ -100,6 +100,11 @@ private:
     bool PutSendPacket(ACE_Message_Block* pMbData);                          //发送数据
     void ClearPacketParse();                                                 //清理正在使用的PacketParse
 
+    bool Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPacket);                   //将发送数据写入文件
+    void Recovery_BuffPacket(bool blDelete, IBuffPacket* pBuffPacket);                      //回收用完的BuffPacket
+    bool Send_Input_To_Cache(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, bool blDelete, IBuffPacket* pBuffPacket);       //讲发送对象放入缓存
+    bool Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, uint8 u1State, int nMessageID, bool blDelete, IBuffPacket* pBuffPacket);         //将数据发送给对端
+
     int RecvData();                                                          //接收数据，正常模式
 
     int Dispose_Recv_Data();                                                 //处理接收数据

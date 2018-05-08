@@ -80,11 +80,11 @@ void CFileTestManager::HandlerServerResponse(uint32 u4ConnectID)
         return;
     }
 
-    if(pResponseRecord->m_u1ResponseCount + 1 == m_u4ResponseCount)
+    if((uint32)(pResponseRecord->m_u1ResponseCount + 1) == m_u4ResponseCount)
     {
         ACE_Time_Value atvResponse = ACE_OS::gettimeofday();
 
-        if(m_u4ExpectTime <= (int)((uint64)atvResponse.get_msec() - pResponseRecord->m_u8StartTime))
+        if(m_u4ExpectTime <= (uint32)((uint64)atvResponse.get_msec() - pResponseRecord->m_u8StartTime))
         {
             //应答时间超过期望时间限制
             OUR_DEBUG((LM_INFO, "[CFileTestManager::HandlerServerResponse]Response time too long m_u4ExpectTime:%d.\n",m_u4ExpectTime));
@@ -138,8 +138,6 @@ void CFileTestManager::Close()
 
 bool CFileTestManager::LoadXmlCfg(const char* szXmlFileTestName, FileTestResultInfoSt& objFileTestResult)
 {
-    char* pData = NULL;
-    char  szTempValue[MAX_BUFF_100] = { '\0' };
     OUR_DEBUG((LM_INFO, "[CProConnectAcceptManager::LoadXmlCfg]Filename = %s.\n", szXmlFileTestName));
 
     if(false == m_MainConfig.Init(szXmlFileTestName))
@@ -319,7 +317,7 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
         for (int i = 0; i < nUsedSize; i++)
         {
             //在上一个轮询周期，没有结束的对象
-            if(m_u4ExpectTime <= (int)((uint64)tv.get_msec() - vecList[i]->m_u8StartTime))
+            if(m_u4ExpectTime <= (uint32)((uint64)tv.get_msec() - vecList[i]->m_u8StartTime))
             {
                 //超过了执行范围时间
                 OUR_DEBUG((LM_INFO, "[CFileTestManager::handle_timeout]Response time too long m_u4ExpectTime:%d.\n", m_u4ExpectTime));
@@ -347,7 +345,7 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 #ifndef WIN32
     CConnectHandler* pConnectHandler = NULL;
 
-    for (int iLoop = 0; iLoop < m_u4ConnectCount; iLoop++)
+    for (uint32 iLoop = 0; iLoop < m_u4ConnectCount; iLoop++)
     {
         pConnectHandler = App_ConnectHandlerPool::instance()->Create();
 

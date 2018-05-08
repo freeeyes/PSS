@@ -227,16 +227,13 @@ int CConnectClient::RecvData()
         OUR_DEBUG((LM_ERROR, "[CConnectClient::handle_input][%d] nCurrCount < 0 m_u4CurrSize = %d.\n", GetServerID(), m_u4CurrSize));
         m_u4CurrSize = 0;
 
-        if (NULL != m_pClientMessage)
-        {
-            _ClientIPInfo objServerIPInfo;
-            sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-            objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+        _ClientIPInfo objServerIPInfo;
+        sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+        objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
 
-            if(S2S_NEED_CALLBACK == m_ems2s)
-            {
-                m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
-            }
+        if(S2S_NEED_CALLBACK == m_ems2s)
+        {
+            m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
         }
 
         return -1;
@@ -251,56 +248,20 @@ int CConnectClient::RecvData()
         OUR_DEBUG((LM_ERROR, "[CConnectClient::handle_input] ConnectID = %d, recv data is error nDataLen = [%d] errno = [%d].\n", GetServerID(), nDataLen, u4Error));
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectClient::handle_input] ConnectID = %d, recv data is error[%d].\n", GetServerID(), nDataLen);
 
-        if (NULL != m_pClientMessage)
-        {
-            _ClientIPInfo objServerIPInfo;
-            sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-            objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+        _ClientIPInfo objServerIPInfo;
+        sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+        objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
 
-            if(S2S_NEED_CALLBACK == m_ems2s)
-            {
-                m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
-            }
+        if(S2S_NEED_CALLBACK == m_ems2s)
+        {
+            m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
         }
 
         return -1;
     }
 
     //如果是DEBUG状态，记录当前接受包的二进制数据
-    if (App_MainConfig::instance()->GetDebug() == DEBUG_ON)
-    {
-        char szDebugData[MAX_BUFF_1024] = {'\0'};
-        char szLog[10]  = {'\0'};
-        int  nDebugSize = 0;
-        bool blblMore   = false;
-
-        if (nDataLen >= MAX_BUFF_200)
-        {
-            nDebugSize = MAX_BUFF_200;
-            blblMore   = true;
-        }
-        else
-        {
-            nDebugSize = nDataLen;
-        }
-
-        char* pData = m_pCurrMessage->wr_ptr();
-
-        for (int i = 0; i < nDebugSize; i++)
-        {
-            sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
-            sprintf_safe(szDebugData + 5 * i, MAX_BUFF_1024 - 5 * i, "%s", szLog);
-        }
-
-        if (blblMore == true)
-        {
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_SERVERRECV, "[%s:%d]%s.(数据包过长只记录前200字节)", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
-        }
-        else
-        {
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_SERVERRECV, "[%s:%d]%s.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
-        }
-    }
+    Output_Debug_Data(m_pCurrMessage, LOG_SYSTEM_DEBUG_SERVERRECV);
 
     m_pCurrMessage->wr_ptr(nDataLen);
 
@@ -444,6 +405,48 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
     return 0;
 }
 
+void CConnectClient::Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType)
+{
+    char szPacketDebugData[MAX_BUFF_1024] = { '\0' };
+
+    if (App_MainConfig::instance()->GetDebug() == DEBUG_ON)
+    {
+        int nDataLen = (int)pMbData->length();
+        char szLog[10] = { '\0' };
+        uint32 u4DebugSize = 0;
+        bool blblMore = false;
+
+        if ((uint32)nDataLen >= MAX_BUFF_200)
+        {
+            u4DebugSize = MAX_BUFF_200 - 1;
+            blblMore = true;
+        }
+        else
+        {
+            u4DebugSize = (uint32)nDataLen;
+        }
+
+        char* pData = pMbData->rd_ptr();
+
+        for (uint32 i = 0; i < u4DebugSize; i++)
+        {
+            sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
+            sprintf_safe(szPacketDebugData + 5 * i, MAX_BUFF_1024 - 5 * i, "%s", szLog);
+        }
+
+        szPacketDebugData[5 * u4DebugSize] = '\0';
+
+        if (blblMore == true)
+        {
+            AppLogManager::instance()->WriteLog(nLogType, "[%s:%d]%s.(数据包过长只记录前200字节)", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szPacketDebugData);
+        }
+        else
+        {
+            AppLogManager::instance()->WriteLog(nLogType, "[%s:%d]%s.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szPacketDebugData);
+        }
+    }
+}
+
 int CConnectClient::handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask)
 {
     if (h == ACE_INVALID_HANDLE)
@@ -583,40 +586,7 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
     }
 
     //如果是DEBUG状态，记录当前接受包的二进制数据
-    if (App_MainConfig::instance()->GetDebug() == DEBUG_ON)
-    {
-        char szDebugData[MAX_BUFF_1024] = {'\0'};
-        char szLog[10]  = {'\0'};
-        int  nDebugSize = 0;
-        bool blblMore   = false;
-
-        if (pmblk->length() >= MAX_BUFF_200)
-        {
-            nDebugSize = MAX_BUFF_200;
-            blblMore   = true;
-        }
-        else
-        {
-            nDebugSize = (int)pmblk->length();
-        }
-
-        char* pData = pmblk->rd_ptr();
-
-        for (int i = 0; i < nDebugSize; i++)
-        {
-            sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
-            sprintf_safe(szDebugData + 5 * i, MAX_BUFF_1024 - 5 * i, "%s", szLog);
-        }
-
-        if (blblMore == true)
-        {
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTRECV, "[%s:%d]%s.(数据包过长只记录前200字节)", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
-        }
-        else
-        {
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTRECV, "[%s:%d]%s.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szDebugData);
-        }
-    }
+    Output_Debug_Data(pmblk, LOG_SYSTEM_DEBUG_CLIENTSEND);
 
     ACE_Time_Value     nowait(MAX_MSG_PACKETTIMEOUT);
 

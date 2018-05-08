@@ -51,6 +51,8 @@ private:
 
     int Dispose_Recv_Data(ACE_Message_Block* pCurrMessage);               //处理接收到的数据
 
+    void Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType);     //输出DEBUG信息
+
     uint32                      m_u4SendSize;           //发送字节数
     uint32                      m_u4SendCount;          //发送数据包数
     uint32                      m_u4RecvSize;           //接受字节数
