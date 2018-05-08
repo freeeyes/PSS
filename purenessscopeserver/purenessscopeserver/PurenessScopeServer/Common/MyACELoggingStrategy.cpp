@@ -51,94 +51,7 @@ My_ACE_Logging_Strategy::priorities (ACE_TCHAR* priority_string,
                                       ACE_TEXT ("|"),
                                       &strtokp))
     {
-        if (ACE_OS::strcmp (priority, ACE_TEXT ("SHUTDOWN")) == 0)
-        {
-            ACE_SET_BITS (priority_mask, LM_SHUTDOWN);
-        }
-        else if (ACE_OS::strcmp (priority, ACE_TEXT ("~SHUTDOWN")) == 0)
-        {
-            ACE_CLR_BITS (priority_mask, LM_SHUTDOWN);
-        }
-        else if (ACE_OS::strcmp (priority, ACE_TEXT ("TRACE")) == 0)
-        {
-            ACE_SET_BITS (priority_mask, LM_TRACE);
-        }
-        else if (ACE_OS::strcmp (priority, ACE_TEXT ("~TRACE")) == 0)
-        {
-            ACE_CLR_BITS (priority_mask, LM_TRACE);
-        }
-        else if (ACE_OS::strcmp (priority, ACE_TEXT ("DEBUG")) == 0)
-        {
-            ACE_SET_BITS (priority_mask, LM_DEBUG);
-        }
-        else if (ACE_OS::strcmp (priority, ACE_TEXT ("~DEBUG")) == 0)
-        {
-            ACE_CLR_BITS (priority_mask, LM_DEBUG);
-        }
-        else if (ACE_OS::strcmp (priority, ACE_TEXT ("INFO")) == 0)
-        {
-            ACE_SET_BITS (priority_mask, LM_INFO);
-        }
-        else if (ACE_OS::strcmp (priority, ACE_TEXT ("~INFO")) == 0)
-        {
-            ACE_CLR_BITS (priority_mask, LM_INFO);
-        }
-        else if (ACE_OS::strcmp (priority, ACE_TEXT ("NOTICE")) == 0)
-        {
-            ACE_SET_BITS (priority_mask, LM_NOTICE);
-        }
-        else if (ACE_OS::strcmp (priority, ACE_TEXT ("~NOTICE")) == 0)
-        {
-            ACE_CLR_BITS (priority_mask, LM_NOTICE);
-        }
-        else if (ACE_OS::strcmp (priority, ACE_TEXT ("WARNING")) == 0)
-        {
-            ACE_SET_BITS (priority_mask, LM_WARNING);
-        }
-        else if (ACE_OS::strcmp (priority, ACE_TEXT ("~WARNING")) == 0)
-        {
-            ACE_CLR_BITS (priority_mask, LM_WARNING);
-        }
-        else if (ACE_OS::strcmp (priority, ACE_TEXT ("STARTUP")) == 0)
-        {
-            ACE_SET_BITS (priority_mask, LM_STARTUP);
-        }
-        else if (ACE_OS::strcmp (priority, ACE_TEXT ("~STARTUP")) == 0)
-        {
-            ACE_CLR_BITS (priority_mask, LM_STARTUP);
-        }
-        else if (ACE_OS::strcmp (priority, ACE_TEXT ("ERROR")) == 0)
-        {
-            ACE_SET_BITS (priority_mask, LM_ERROR);
-        }
-        else if (ACE_OS::strcmp (priority, ACE_TEXT ("~ERROR")) == 0)
-        {
-            ACE_CLR_BITS (priority_mask, LM_ERROR);
-        }
-        else if (ACE_OS::strcmp (priority, ACE_TEXT ("CRITICAL")) == 0)
-        {
-            ACE_SET_BITS (priority_mask, LM_CRITICAL);
-        }
-        else if (ACE_OS::strcmp (priority, ACE_TEXT ("~CRITICAL")) == 0)
-        {
-            ACE_CLR_BITS (priority_mask, LM_CRITICAL);
-        }
-        else if (ACE_OS::strcmp (priority, ACE_TEXT ("ALERT")) == 0)
-        {
-            ACE_SET_BITS (priority_mask, LM_ALERT);
-        }
-        else if (ACE_OS::strcmp (priority, ACE_TEXT ("~ALERT")) == 0)
-        {
-            ACE_CLR_BITS (priority_mask, LM_ALERT);
-        }
-        else if (ACE_OS::strcmp (priority, ACE_TEXT ("EMERGENCY")) == 0)
-        {
-            ACE_SET_BITS (priority_mask, LM_EMERGENCY);
-        }
-        else if (ACE_OS::strcmp (priority, ACE_TEXT ("~EMERGENCY")) == 0)
-        {
-            ACE_CLR_BITS (priority_mask, LM_EMERGENCY);
-        }
+        set_priority_mask(priority, priority_mask);
     }
 
     // Affect right priority mask.
@@ -196,6 +109,147 @@ My_ACE_Logging_Strategy::tokenize (ACE_TCHAR* flag_string)
             ACE_SET_BITS (this->flags_, ACE_Log_Msg::SYSLOG);
         }
     }
+}
+
+void My_ACE_Logging_Strategy::set_priority_mask(ACE_TCHAR* priority, u_long& priority_mask)
+{
+    if (ACE_OS::strcmp(priority, ACE_TEXT("SHUTDOWN")) == 0)
+    {
+        ACE_SET_BITS(priority_mask, LM_SHUTDOWN);
+    }
+    else if (ACE_OS::strcmp(priority, ACE_TEXT("~SHUTDOWN")) == 0)
+    {
+        ACE_CLR_BITS(priority_mask, LM_SHUTDOWN);
+    }
+    else if (ACE_OS::strcmp(priority, ACE_TEXT("TRACE")) == 0)
+    {
+        ACE_SET_BITS(priority_mask, LM_TRACE);
+    }
+    else if (ACE_OS::strcmp(priority, ACE_TEXT("~TRACE")) == 0)
+    {
+        ACE_CLR_BITS(priority_mask, LM_TRACE);
+    }
+    else if (ACE_OS::strcmp(priority, ACE_TEXT("DEBUG")) == 0)
+    {
+        ACE_SET_BITS(priority_mask, LM_DEBUG);
+    }
+    else if (ACE_OS::strcmp(priority, ACE_TEXT("~DEBUG")) == 0)
+    {
+        ACE_CLR_BITS(priority_mask, LM_DEBUG);
+    }
+    else if (ACE_OS::strcmp(priority, ACE_TEXT("INFO")) == 0)
+    {
+        ACE_SET_BITS(priority_mask, LM_INFO);
+    }
+    else if (ACE_OS::strcmp(priority, ACE_TEXT("~INFO")) == 0)
+    {
+        ACE_CLR_BITS(priority_mask, LM_INFO);
+    }
+    else if (ACE_OS::strcmp(priority, ACE_TEXT("NOTICE")) == 0)
+    {
+        ACE_SET_BITS(priority_mask, LM_NOTICE);
+    }
+    else if (ACE_OS::strcmp(priority, ACE_TEXT("~NOTICE")) == 0)
+    {
+        ACE_CLR_BITS(priority_mask, LM_NOTICE);
+    }
+    else if (ACE_OS::strcmp(priority, ACE_TEXT("WARNING")) == 0)
+    {
+        ACE_SET_BITS(priority_mask, LM_WARNING);
+    }
+    else if (ACE_OS::strcmp(priority, ACE_TEXT("~WARNING")) == 0)
+    {
+        ACE_CLR_BITS(priority_mask, LM_WARNING);
+    }
+    else if (ACE_OS::strcmp(priority, ACE_TEXT("STARTUP")) == 0)
+    {
+        ACE_SET_BITS(priority_mask, LM_STARTUP);
+    }
+    else if (ACE_OS::strcmp(priority, ACE_TEXT("~STARTUP")) == 0)
+    {
+        ACE_CLR_BITS(priority_mask, LM_STARTUP);
+    }
+    else if (ACE_OS::strcmp(priority, ACE_TEXT("ERROR")) == 0)
+    {
+        ACE_SET_BITS(priority_mask, LM_ERROR);
+    }
+    else if (ACE_OS::strcmp(priority, ACE_TEXT("~ERROR")) == 0)
+    {
+        ACE_CLR_BITS(priority_mask, LM_ERROR);
+    }
+    else if (ACE_OS::strcmp(priority, ACE_TEXT("CRITICAL")) == 0)
+    {
+        ACE_SET_BITS(priority_mask, LM_CRITICAL);
+    }
+    else if (ACE_OS::strcmp(priority, ACE_TEXT("~CRITICAL")) == 0)
+    {
+        ACE_CLR_BITS(priority_mask, LM_CRITICAL);
+    }
+    else if (ACE_OS::strcmp(priority, ACE_TEXT("ALERT")) == 0)
+    {
+        ACE_SET_BITS(priority_mask, LM_ALERT);
+    }
+    else if (ACE_OS::strcmp(priority, ACE_TEXT("~ALERT")) == 0)
+    {
+        ACE_CLR_BITS(priority_mask, LM_ALERT);
+    }
+    else if (ACE_OS::strcmp(priority, ACE_TEXT("EMERGENCY")) == 0)
+    {
+        ACE_SET_BITS(priority_mask, LM_EMERGENCY);
+    }
+    else if (ACE_OS::strcmp(priority, ACE_TEXT("~EMERGENCY")) == 0)
+    {
+        ACE_CLR_BITS(priority_mask, LM_EMERGENCY);
+    }
+}
+
+void My_ACE_Logging_Strategy::update_old_log_file(ACE_TCHAR* backup)
+{
+    ACE_TCHAR to_backup[MAXPATHLEN + 1];
+
+    // reorder the logs starting at the oldest (the biggest
+    // number) watch if we reached max_file_number_.
+    int max_num;
+
+    if (fixed_number_ && count_ > max_file_number_)
+        // count_ will always be bigger than max_file_number_,
+        // so do nothing so to always reorder files from
+        // max_file_number_.
+    {
+        max_num = max_file_number_;
+    }
+    else
+    {
+        max_num = count_;
+    }
+
+    for (int i = max_num; i > 1; i--)
+    {
+        ACE_OS::sprintf(backup,
+                        ACE_TEXT("%s.%d"),
+                        this->filename_,
+                        i);
+        ACE_OS::sprintf(to_backup,
+                        ACE_TEXT("%s.%d"),
+                        this->filename_,
+                        i - 1);
+
+        // Remove any existing old file; ignore error as
+        // file may not exist.
+        ACE_OS::unlink(backup);
+
+        // Rename the current log file to the name of the
+        // backup log file.
+        if (0 != ACE_OS::rename(to_backup, backup, -1))
+        {
+            ACELIB_ERROR((LM_ERROR,
+                          ACE_TEXT("(%s -> %s)rename file error;\n"), this->filename_, backup));
+        }
+    }
+
+    ACE_OS::sprintf(backup,
+                    ACE_TEXT("%s.1"),
+                    this->filename_);
 }
 
 int
@@ -583,51 +637,7 @@ My_ACE_Logging_Strategy::handle_timeout (const ACE_Time_Value&,
             // log_files
             if (order_files_)
             {
-                ACE_TCHAR to_backup[MAXPATHLEN + 1];
-
-                // reorder the logs starting at the oldest (the biggest
-                // number) watch if we reached max_file_number_.
-                int max_num;
-
-                if (fixed_number_ && count_ > max_file_number_)
-                    // count_ will always be bigger than max_file_number_,
-                    // so do nothing so to always reorder files from
-                    // max_file_number_.
-                {
-                    max_num = max_file_number_;
-                }
-                else
-                {
-                    max_num = count_;
-                }
-
-                for (int i = max_num; i > 1; i--)
-                {
-                    ACE_OS::sprintf(backup,
-                                    ACE_TEXT("%s.%d"),
-                                    this->filename_,
-                                    i);
-                    ACE_OS::sprintf(to_backup,
-                                    ACE_TEXT("%s.%d"),
-                                    this->filename_,
-                                    i - 1);
-
-                    // Remove any existing old file; ignore error as
-                    // file may not exist.
-                    ACE_OS::unlink(backup);
-
-                    // Rename the current log file to the name of the
-                    // backup log file.
-                    if(0 != ACE_OS::rename(to_backup, backup, -1))
-                    {
-                        ACELIB_ERROR((LM_ERROR,
-                                      ACE_TEXT("(%s -> %s)rename file error;\n"), this->filename_, backup));
-                    }
-                }
-
-                ACE_OS::sprintf (backup,
-                                 ACE_TEXT ("%s.1"),
-                                 this->filename_);
+                update_old_log_file(backup);
             }
             else
             {

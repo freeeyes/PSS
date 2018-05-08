@@ -2,19 +2,19 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{6a95d022-f950-4a4a-a37b-998231176c1b}</UniqueIdentifier>
+      <UniqueIdentifier>{f6c5e34d-6ed6-4993-8e43-7a26715d3e36}</UniqueIdentifier>
       <Extensions>cpp;cxx;cc;c;C</Extensions>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{94258250-c7c8-4ff8-945f-d8819d680704}</UniqueIdentifier>
+      <UniqueIdentifier>{f220a48e-597b-4b52-b152-461218a7f38a}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hh</Extensions>
     </Filter>
     <Filter Include="Build Files">
-      <UniqueIdentifier>{cfa118b7-9688-4667-bedb-303c3b6678a8}</UniqueIdentifier>
+      <UniqueIdentifier>{88cd8123-acab-4a86-b232-83436e4b24f4}</UniqueIdentifier>
       <Extensions>mpc;mpb;mwc</Extensions>
     </Filter>
     <Filter Include="Documentation">
-      <UniqueIdentifier>{3fe74487-ea7c-4da3-8229-c80de2a39dc6}</UniqueIdentifier>
+      <UniqueIdentifier>{60e831f4-d5b9-4b25-add2-db5020ab1e60}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -32,17 +32,16 @@
     <ClInclude Include="BaseCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PostServerLogic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ProxyManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="TestTCPPost.mpc">
+    <None Include="TestTCPPost.mpc">
       <Filter>Build Files</Filter>
-    </CustomBuild>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <CustomBuild Include="ReadMe.txt">
       <Filter>Documentation</Filter>
     </CustomBuild>

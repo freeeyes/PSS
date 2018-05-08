@@ -135,6 +135,12 @@ private:
     /// Tokenize to set all the flags
     void tokenize (ACE_TCHAR* flag_string);
 
+    //update priority_mask
+    void set_priority_mask(ACE_TCHAR* priority, u_long& priority_mask);
+
+    //update old file
+    void update_old_log_file(ACE_TCHAR* backup);
+
     /// Tokenize to set priorities (either process or thread one).
     void priorities (ACE_TCHAR* priority_string,
                      ACE_Log_Msg::MASK_TYPE mask);

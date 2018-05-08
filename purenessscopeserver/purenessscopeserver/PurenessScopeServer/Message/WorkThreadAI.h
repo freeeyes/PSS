@@ -273,6 +273,8 @@ public:
     void GetAllForbiden(uint32 u4ThreadID, vecCommandTimeout& objForbiden);
 
 private:
+    int Do_Command_Account(uint16 u2CommandID, uint32 u4Now, uint32 u4TimeCost, bool& blRet);   //统计Command的AI数据
+
     uint8      m_u1WTAI;                           //工作线程AI开关，0为关闭，1为打开
     uint16     m_u4DisposeTime;                    //业务包处理超时时间
     uint32     m_u4WTCheckTime;                    //工作线程超时包的时间范围，单位是秒
@@ -282,7 +284,6 @@ private:
     char       m_szWTReturnData[MAX_BUFF_1024];    //返回的数据体，最多1K
     uint16     m_u2ReturnDataLen;                  //返回数据体长度
 
-private:
     //超时的命令集合
     struct _CommandTime
     {

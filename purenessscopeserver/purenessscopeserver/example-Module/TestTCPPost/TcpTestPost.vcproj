@@ -6,7 +6,7 @@
 	ProjectGUID="{3B20673A-FECA-1BAD-3A62-9A060000002E}"
 	RootNamespace="TcpTestPost"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="0"
+	SignManifests="true"
 	>
 	<Platforms>
 		<Platform
@@ -25,6 +25,7 @@
 			IntermediateDirectory="Debug\TcpTestPost\I386"
 			ConfigurationType="2"
 			CharacterSet="0"
+
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -50,8 +51,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(ACE_ROOT),.,..\Include"
-				PreprocessorDefinitions="TEST_TCPPOST_BUILD_DLL;_DEBUG;WIN32;_WINDOWS;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;MPC_LIB_MODIFIER=\&quot;d\&quot;"
+				AdditionalIncludeDirectories="$(ACE_ROOT),.,..\..\Common"
+				PreprocessorDefinitions="TEST_TCPPOST_BUILD_DLL;_DEBUG;WIN32;_WINDOWS;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;MPC_LIB_MODIFIER=\&quot;d\&quot;"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -66,16 +67,16 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+				PreprocessorDefinitions="_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS"
 				Culture="1033"
-				AdditionalIncludeDirectories="$(ACE_ROOT),.,..\Include"
+				AdditionalIncludeDirectories="$(ACE_ROOT),.,..\..\Common"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ACEd.lib"
+				AdditionalDependencies="ACEd.lib iphlpapi.lib"
 				OutputFile="$(OutDir)\TcpTestPostd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -89,9 +90,6 @@
 				Name="VCALinkTool"
 			/>
 			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
 				Name="VCXDCMakeTool"
 			/>
 			<Tool
@@ -99,9 +97,6 @@
 			/>
 			<Tool
 				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -113,6 +108,7 @@
 			IntermediateDirectory="Release\TcpTestPost\I386"
 			ConfigurationType="2"
 			CharacterSet="0"
+
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -138,8 +134,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories="$(ACE_ROOT),.,..\Include"
-				PreprocessorDefinitions="TEST_TCPPOST_BUILD_DLL;NDEBUG;WIN32;_WINDOWS;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+				AdditionalIncludeDirectories="$(ACE_ROOT),.,..\..\Common"
+				PreprocessorDefinitions="TEST_TCPPOST_BUILD_DLL;NDEBUG;WIN32;_WINDOWS;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
 				WarningLevel="3"
@@ -151,16 +147,16 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+				PreprocessorDefinitions="NDEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS"
 				Culture="1033"
-				AdditionalIncludeDirectories="$(ACE_ROOT),.,..\Include"
+				AdditionalIncludeDirectories="$(ACE_ROOT),.,..\..\Common"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ACE.lib"
+				AdditionalDependencies="ACE.lib iphlpapi.lib"
 				OutputFile="$(OutDir)\TcpTestPost.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -176,9 +172,6 @@
 				Name="VCALinkTool"
 			/>
 			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
 				Name="VCXDCMakeTool"
 			/>
 			<Tool
@@ -186,9 +179,6 @@
 			/>
 			<Tool
 				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -200,6 +190,7 @@
 			IntermediateDirectory="Debug\TcpTestPost\AMD64"
 			ConfigurationType="2"
 			CharacterSet="0"
+
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -225,8 +216,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(ACE_ROOT),.,..\Include"
-				PreprocessorDefinitions="TEST_TCPPOST_BUILD_DLL;_DEBUG;WIN32;_WINDOWS;_CRT_NONSTDC_NO_WARNINGS;_AMD64_;_WIN64;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;MPC_LIB_MODIFIER=\&quot;d\&quot;"
+				AdditionalIncludeDirectories="$(ACE_ROOT),.,..\..\Common"
+				PreprocessorDefinitions="TEST_TCPPOST_BUILD_DLL;_DEBUG;WIN32;_WINDOWS;_CRT_NONSTDC_NO_WARNINGS;_AMD64_;_WIN64;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;MPC_LIB_MODIFIER=\&quot;d\&quot;"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -241,9 +232,9 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WIN64"
+				PreprocessorDefinitions="_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;_WIN64"
 				Culture="1033"
-				AdditionalIncludeDirectories="$(ACE_ROOT),.,..\Include"
+				AdditionalIncludeDirectories="$(ACE_ROOT),.,..\..\Common"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -251,7 +242,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/machine:AMD64"
-				AdditionalDependencies="ACEd.lib"
+				AdditionalDependencies="ACEd.lib iphlpapi.lib"
 				OutputFile="$(OutDir)\TcpTestPostd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -283,6 +274,7 @@
 			IntermediateDirectory="Release\TcpTestPost\AMD64"
 			ConfigurationType="2"
 			CharacterSet="0"
+
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -308,8 +300,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories="$(ACE_ROOT),.,..\Include"
-				PreprocessorDefinitions="TEST_TCPPOST_BUILD_DLL;NDEBUG;WIN32;_WINDOWS;_CRT_NONSTDC_NO_WARNINGS;_AMD64_;_WIN64;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+				AdditionalIncludeDirectories="$(ACE_ROOT),.,..\..\Common"
+				PreprocessorDefinitions="TEST_TCPPOST_BUILD_DLL;NDEBUG;WIN32;_WINDOWS;_CRT_NONSTDC_NO_WARNINGS;_AMD64_;_WIN64;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
 				WarningLevel="3"
@@ -321,9 +313,9 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WIN64"
+				PreprocessorDefinitions="NDEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;_WIN64"
 				Culture="1033"
-				AdditionalIncludeDirectories="$(ACE_ROOT),.,..\Include"
+				AdditionalIncludeDirectories="$(ACE_ROOT),.,..\..\Common"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -331,7 +323,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/machine:AMD64"
-				AdditionalDependencies="ACE.lib"
+				AdditionalDependencies="ACE.lib iphlpapi.lib"
 				OutputFile="$(OutDir)\TcpTestPost.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -365,108 +357,82 @@
 	<Files>
 		<Filter
 			Name="Source Files"
-			Filter="cpp;cxx;cc;c;C"
-			>
+			Filter="cpp;cxx;cc;c;C">
 			<File
-				RelativePath="BaseCommand.cpp"
-				>
+				RelativePath=".\BaseCommand.cpp">
 			</File>
 			<File
-				RelativePath=".\ProxyManager.cpp"
-				>
+				RelativePath=".\ProxyManager.cpp">
 			</File>
 			<File
-				RelativePath="TestTCPPost.cpp"
-				>
+				RelativePath=".\TestTCPPost.cpp">
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
-			Filter="h;hpp;hxx;hh"
-			>
+			Filter="h;hpp;hxx;hh">
 			<File
-				RelativePath="BaseCommand.h"
-				>
+				RelativePath=".\BaseCommand.h">
 			</File>
 			<File
-				RelativePath=".\PostServerLogic.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ProxyManager.h"
-				>
+				RelativePath=".\ProxyManager.h">
 			</File>
 		</Filter>
 		<Filter
 			Name="Build Files"
-			Filter="mpc;mpb;mwc"
-			>
+			Filter="mpc;mpb;mwc">
 			<File
-				RelativePath="TestTCPPost.mpc"
-				>
+				RelativePath="TestTCPPost.mpc">
 				<FileConfiguration
 					Name="Debug|Win32"
 					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
+				>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
+				>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|x64"
 					ExcludedFromBuild="true"
-				/>
+				>
+				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|x64"
 					ExcludedFromBuild="true"
-				/>
+				>
+				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter
 			Name="Documentation"
-			>
+			Filter="">
 			<File
-				RelativePath="ReadMe.txt"
-				>
+				RelativePath="ReadMe.txt">
 				<FileConfiguration
 					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
+					ExcludedFromBuild="TRUE">
 					<Tool
-						Name="VCCustomBuildTool"
-					/>
+						Name="VCCustomBuildTool"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
+					ExcludedFromBuild="TRUE">
 					<Tool
-						Name="VCCustomBuildTool"
-					/>
+						Name="VCCustomBuildTool"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|x64"
-					ExcludedFromBuild="TRUE"
-					>
+					ExcludedFromBuild="TRUE">
 					<Tool
-						Name="VCCustomBuildTool"
-					/>
+						Name="VCCustomBuildTool"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|x64"
-					ExcludedFromBuild="TRUE"
-					>
+					ExcludedFromBuild="TRUE">
 					<Tool
-						Name="VCCustomBuildTool"
-					/>
+						Name="VCCustomBuildTool"/>
 				</FileConfiguration>
 			</File>
 		</Filter>
