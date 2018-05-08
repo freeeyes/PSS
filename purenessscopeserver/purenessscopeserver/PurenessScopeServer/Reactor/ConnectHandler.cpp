@@ -2542,11 +2542,6 @@ int CConnectManager::svc (void)
         }
         else
         {
-            if (mb == NULL)
-            {
-                continue;
-            }
-
             if ((0 == mb->size ()) && (mb->msg_type () == ACE_Message_Block::MB_STOP))
             {
                 m_mutex.acquire();
@@ -2558,11 +2553,6 @@ int CConnectManager::svc (void)
             }
 
             _SendMessage* msg = *((_SendMessage**)mb->base());
-
-            if (!msg)
-            {
-                continue;
-            }
 
             if (0 == msg->m_u1Type)
             {
@@ -2684,77 +2674,7 @@ bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType,
         pCurrBuffPacket->WriteStream(pBuffPacket->GetData(), pBuffPacket->GetPacketLen());
 
         //放入发送队列
-        _SendMessage* pSendMessage = m_SendMessagePool.Create();
-
-        if(NULL == pSendMessage)
-        {
-            OUR_DEBUG((LM_ERROR,"[CConnectManager::PutMessage] new _SendMessage is error.\n"));
-
-            if(true == blDelete)
-            {
-                App_BuffPacketManager::instance()->Delete(pBuffPacket);
-            }
-
-            return false;
-        }
-
-        ACE_Message_Block* mb = pSendMessage->GetQueueMessage();
-
-        if(NULL != mb)
-        {
-            pSendMessage->m_u4ConnectID = u4ConnectID;
-            pSendMessage->m_pBuffPacket = pCurrBuffPacket;
-            pSendMessage->m_nEvents     = u1SendType;
-            pSendMessage->m_u2CommandID = u2CommandID;
-            pSendMessage->m_blDelete    = PACKET_IS_FRAMEWORK_RECYC;
-            pSendMessage->m_u1SendState = u1SendState;
-            pSendMessage->m_nMessageID  = nServerID;
-            pSendMessage->m_u1Type      = 0;
-            pSendMessage->m_tvSend      = ACE_OS::gettimeofday();
-
-            //判断队列是否是已经最大
-            int nQueueCount = (int)msg_queue()->message_count();
-
-            if(nQueueCount >= (int)m_u2SendQueueMax)
-            {
-                OUR_DEBUG((LM_ERROR,"[CConnectManager::PutMessage] Queue is Full nQueueCount = [%d].\n", nQueueCount));
-
-                if(true == blDelete)
-                {
-                    App_BuffPacketManager::instance()->Delete(pBuffPacket);
-                }
-
-                m_SendMessagePool.Delete(pSendMessage);
-                return false;
-            }
-
-            ACE_Time_Value xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, MAX_MSG_PUTTIMEOUT);
-
-            if(this->putq(mb, &xtime) == -1)
-            {
-                OUR_DEBUG((LM_ERROR,"[CConnectManager::PutMessage] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
-
-                if(true == blDelete)
-                {
-                    App_BuffPacketManager::instance()->Delete(pBuffPacket);
-                }
-
-                m_SendMessagePool.Delete(pSendMessage);
-                return false;
-            }
-        }
-        else
-        {
-            OUR_DEBUG((LM_ERROR,"[CMessageService::PutMessage] mb new error.\n"));
-
-            if(true == blDelete)
-            {
-                App_BuffPacketManager::instance()->Delete(pBuffPacket);
-            }
-
-            m_SendMessagePool.Delete(pSendMessage);
-            return false;
-        }
+        PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, u1SendState, true, 0);
     }
 
     return true;
