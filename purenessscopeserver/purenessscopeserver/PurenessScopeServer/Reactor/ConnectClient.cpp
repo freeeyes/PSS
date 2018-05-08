@@ -304,59 +304,7 @@ int CConnectClient::RecvData()
 
     m_pCurrMessage->wr_ptr(nDataLen);
 
-    if (NULL != m_pClientMessage)
-    {
-        //接收数据，返回给逻辑层，自己不处理整包完整性判定
-        _ClientIPInfo objServerIPInfo;
-        sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-        objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
-
-        uint16 u2CommandID             = 0;
-        ACE_Message_Block* pRecvFinish = NULL;
-
-        m_atvRecv     = ACE_OS::gettimeofday();
-        m_emRecvState = SERVER_RECV_BEGIN;
-
-        while (true)
-        {
-            EM_PACKET_ROUTE em_PacketRoute = PACKET_ROUTE_SELF;
-            bool blRet = m_pClientMessage->Recv_Format_data(m_pCurrMessage, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish, em_PacketRoute);
-
-            if (true == blRet)
-            {
-                if (PACKET_ROUTE_SELF == em_PacketRoute)
-                {
-                    //有数据需要处理，则处理
-                    if (App_MainConfig::instance()->GetConnectServerRunType() == 0)
-                    {
-                        //调用数据包处理
-                        m_pClientMessage->RecvData(u2CommandID, pRecvFinish, objServerIPInfo);
-                        //回收处理包
-                        App_MessageBlockManager::instance()->Close(pRecvFinish);
-                    }
-                    else
-                    {
-                        //异步消息处理
-                        _Server_Message_Info* pServer_Message_Info = App_ServerMessageInfoPool::instance()->Create();
-                        pServer_Message_Info->m_pClientMessage = m_pClientMessage;
-                        pServer_Message_Info->m_objServerIPInfo = objServerIPInfo;
-                        pServer_Message_Info->m_pRecvFinish = pRecvFinish;
-                        pServer_Message_Info->m_u2CommandID = u2CommandID;
-                        App_ServerMessageTask::instance()->PutMessage(pServer_Message_Info);
-                    }
-                }
-                else
-                {
-                    //将数据放回到消息线程
-                    SendMessageGroup(u2CommandID, pRecvFinish);
-                }
-            }
-            else
-            {
-                break;
-            }
-        }
-    }
+    Dispose_Recv_Data(m_pCurrMessage);
 
     m_emRecvState = SERVER_RECV_END;
 
@@ -434,6 +382,62 @@ int CConnectClient::SendMessageGroup(uint16 u2CommandID, ACE_Message_Block* pmbl
             OUR_DEBUG((LM_ERROR, "[CConnectClient::SendMessageGroup] App_MessageServiceGroup::instance()->PutMessage Error.\n"));
             App_MessageServiceGroup::instance()->DeleteMessage(GetServerID(), pMessage);
             return false;
+        }
+    }
+
+    return 0;
+}
+
+int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
+{
+    //接收数据，返回给逻辑层，自己不处理整包完整性判定
+    _ClientIPInfo objServerIPInfo;
+    sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+    objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+
+    uint16 u2CommandID = 0;
+    ACE_Message_Block* pRecvFinish = NULL;
+
+    m_atvRecv = ACE_OS::gettimeofday();
+    m_emRecvState = SERVER_RECV_BEGIN;
+    EM_PACKET_ROUTE em_PacketRoute = PACKET_ROUTE_SELF;
+
+    while (true)
+    {
+        bool blRet = m_pClientMessage->Recv_Format_data(pCurrMessage, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish, em_PacketRoute);
+
+        if (false == blRet)
+        {
+            break;
+        }
+        else
+        {
+            if (PACKET_ROUTE_SELF == em_PacketRoute)
+            {
+                //有数据需要处理，则处理
+                if (App_MainConfig::instance()->GetConnectServerRunType() == 0)
+                {
+                    //调用数据包处理
+                    m_pClientMessage->RecvData(u2CommandID, pRecvFinish, objServerIPInfo);
+                    //回收处理包
+                    App_MessageBlockManager::instance()->Close(pRecvFinish);
+                }
+                else
+                {
+                    //异步消息处理
+                    _Server_Message_Info* pServer_Message_Info = App_ServerMessageInfoPool::instance()->Create();
+                    pServer_Message_Info->m_pClientMessage = m_pClientMessage;
+                    pServer_Message_Info->m_objServerIPInfo = objServerIPInfo;
+                    pServer_Message_Info->m_pRecvFinish = pRecvFinish;
+                    pServer_Message_Info->m_u2CommandID = u2CommandID;
+                    App_ServerMessageTask::instance()->PutMessage(pServer_Message_Info);
+                }
+            }
+            else
+            {
+                //将数据放回到消息线程
+                SendMessageGroup(u2CommandID, pRecvFinish);
+            }
         }
     }
 

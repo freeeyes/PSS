@@ -13,6 +13,7 @@ CPacketParsePool::~CPacketParsePool()
 
 void CPacketParsePool::Init_Callback(int nIndex, CPacketParse* pPacketParse)
 {
+    pPacketParse->Init();
     pPacketParse->SetHashID(nIndex);
 }
 

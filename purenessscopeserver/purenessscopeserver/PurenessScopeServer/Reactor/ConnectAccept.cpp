@@ -29,8 +29,6 @@ uint32 ConnectAcceptor::GetPacketParseInfoID()
 
 int ConnectAcceptor::make_svc_handler(CConnectHandler*& sh)
 {
-    OUR_DEBUG((LM_ERROR, "[ConnectAcceptor::make_svc_handler]Connect accept.\n"));
-
     //如果正在处理的链接超过了服务器设定的数值，则不允许链接继续链接服务器
     if (App_ConnectHandlerPool::instance()->GetUsedCount() > App_MainConfig::instance()->GetMaxHandlerCount())
     {
@@ -50,7 +48,7 @@ int ConnectAcceptor::make_svc_handler(CConnectHandler*& sh)
             //这里会根据反应器线程配置，自动匹配一个空闲的反应器
             int nIndex = (int)(m_u4AcceptCount % m_u4ClientReactorCount);
             ACE_Reactor* pReactor = App_ReactorManager::instance()->GetAce_Client_Reactor(nIndex);
-            //OUR_DEBUG((LM_ERROR, "[ConnectAcceptor::make_svc_handler]m_u4AcceptCount=%d, pReactor=0x%08x.\n", m_u4AcceptCount, pReactor));
+
             pConnectHandler->reactor(pReactor);
             pConnectHandler->SetPacketParseInfoID(m_u4PacketParseInfoID);
             m_u4AcceptCount++;

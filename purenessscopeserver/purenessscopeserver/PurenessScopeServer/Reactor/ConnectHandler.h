@@ -91,6 +91,11 @@ public:
     void SetSendCacheManager(CSendCacheManager* pSendCacheManager);
 
 private:
+    void Get_Recv_length(int& nCurrCount);                                   //得到要处理的数据长度
+    void Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType);        //输出DEBUG信息
+    int  Dispose_Paceket_Parse_Head();                                       //处理消息头函数
+    int  Dispose_Paceket_Parse_Body();                                       //处理消息头函数
+    int  Dispose_Paceket_Parse_Strram();                                     //处理流消息函数
     bool CheckMessage();                                                     //处理接收的数据
     bool PutSendPacket(ACE_Message_Block* pMbData);                          //发送数据
     void ClearPacketParse();                                                 //清理正在使用的PacketParse
@@ -99,7 +104,6 @@ private:
 
     int Dispose_Recv_Data();                                                 //处理接收数据
 
-private:
     uint64                     m_u8RecvQueueTimeCost;          //成功接收数据到数据处理完成（未发送）花费的时间总和
     uint64                     m_u8SendQueueTimeCost;          //成功发送数据到数据处理完成（只发送）花费的时间总和
     uint64                     m_u8SendQueueTimeout;           //发送超时时间，超过这个时间的都会被记录到日志中

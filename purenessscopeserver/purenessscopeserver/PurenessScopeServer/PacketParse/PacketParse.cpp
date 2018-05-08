@@ -3,7 +3,6 @@
 
 CPacketParse::CPacketParse(void)
 {
-    Init();
 }
 
 CPacketParse::~CPacketParse(void)
