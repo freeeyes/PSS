@@ -105,9 +105,10 @@ private:
     bool Send_Input_To_Cache(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, bool blDelete, IBuffPacket* pBuffPacket);       //讲发送对象放入缓存
     bool Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, uint8 u1State, int nMessageID, bool blDelete, IBuffPacket* pBuffPacket);         //将数据发送给对端
 
-    int RecvData();                                                          //接收数据，正常模式
+    int  RecvData();                                                          //接收数据，正常模式
 
-    int Dispose_Recv_Data();                                                 //处理接收数据
+    int  Dispose_Recv_Data();                                                 //处理接收数据
+    void Send_MakePacket_Queue(CPacketParse* m_pPacketParse, uint8 u1Option); //将数据发送入工作线程消息队列
 
     uint64                     m_u8RecvQueueTimeCost;          //成功接收数据到数据处理完成（未发送）花费的时间总和
     uint64                     m_u8SendQueueTimeCost;          //成功发送数据到数据处理完成（只发送）花费的时间总和

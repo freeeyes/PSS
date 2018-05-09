@@ -63,39 +63,15 @@ void CConnectHandler::Close()
     //调用连接断开消息
     App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->DisConnect(GetConnectID());
 
-    //组织数据
-    _MakePacket objMakePacket;
-
-    objMakePacket.m_u4ConnectID       = GetConnectID();
-    objMakePacket.m_pPacketParse      = NULL;
-    objMakePacket.m_AddrRemote        = m_addrRemote;
-
-    if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
-    {
-        objMakePacket.m_AddrListen.set(m_u4LocalPort);
-    }
-    else
-    {
-        objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
-    }
-
     if (CONNECT_SERVER_CLOSE == m_u1ConnectState)
     {
         //服务器主动断开
-        objMakePacket.m_u1Option = PACKET_SDISCONNECT;
+        Send_MakePacket_Queue(NULL, PACKET_SDISCONNECT);
     }
     else
     {
         //客户端连接断开
-        objMakePacket.m_u1Option = PACKET_CDISCONNECT;
-    }
-
-    //发送客户端链接断开消息。
-    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-    if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-    {
-        OUR_DEBUG((LM_ERROR, "[CConnectHandler::Close] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
+        Send_MakePacket_Queue(NULL, PACKET_CDISCONNECT);
     }
 
     //msg_queue()->deactivate();
@@ -256,11 +232,9 @@ int CConnectHandler::open(void*)
 
     m_u4ReadSendSize      = 0;
     m_u4SuccessSendSize   = 0;
-    //m_emStatus            = CLIENT_CLOSE_NOTHING;
 
     //设置接收缓冲池的大小
     int nTecvBuffSize = MAX_MSG_SOCKETBUFF;
-    //ACE_OS::setsockopt(this->get_handle(), SOL_SOCKET, SO_RCVBUF, (char* )&nTecvBuffSize, sizeof(nTecvBuffSize));
     ACE_OS::setsockopt(this->get_handle(), SOL_SOCKET, SO_SNDBUF, (char* )&nTecvBuffSize, sizeof(nTecvBuffSize));
 
     if(m_u2TcpNodelay == TCP_NODELAY_OFF)
@@ -307,30 +281,7 @@ int CConnectHandler::open(void*)
     //告诉PacketParse连接应建立
     App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Connect(GetConnectID(), GetClientIPInfo(), GetLocalIPInfo());
 
-    //组织数据
-    _MakePacket objMakePacket;
-
-    objMakePacket.m_u4ConnectID       = GetConnectID();
-    objMakePacket.m_pPacketParse      = NULL;
-    objMakePacket.m_u1Option          = PACKET_CONNECT;
-    objMakePacket.m_AddrRemote        = m_addrRemote;
-
-    if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
-    {
-        objMakePacket.m_AddrListen.set(m_u4LocalPort);
-    }
-    else
-    {
-        objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
-    }
-
-    //发送链接建立消息。
-    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-    if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-    {
-        OUR_DEBUG((LM_ERROR, "[CConnectHandler::open] ConnectID=%d, PACKET_CONNECT is error.\n", GetConnectID()));
-    }
+    Send_MakePacket_Queue(NULL, PACKET_CONNECT);
 
     OUR_DEBUG((LM_DEBUG,"[CConnectHandler::open]Open(%d) Connection from [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
 
@@ -563,6 +514,34 @@ int CConnectHandler::Dispose_Recv_Data()
     return 0;
 }
 
+void CConnectHandler::Send_MakePacket_Queue(CPacketParse* m_pPacketParse, uint8 u1Option)
+{
+    //组织数据
+    _MakePacket objMakePacket;
+
+    objMakePacket.m_u4ConnectID = GetConnectID();
+    objMakePacket.m_pPacketParse = m_pPacketParse;
+    objMakePacket.m_u1Option = u1Option;
+    objMakePacket.m_AddrRemote = m_addrRemote;
+
+    if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
+    {
+        objMakePacket.m_AddrListen.set(m_u4LocalPort);
+    }
+    else
+    {
+        objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
+    }
+
+    //发送链接建立消息。
+    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+
+    if (false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
+    {
+        OUR_DEBUG((LM_ERROR, "[CConnectHandler::Send_MakePacket_Queue] ConnectID=%d, u1Option=%d is error.\n", GetConnectID(), u1Option));
+    }
+}
+
 //关闭链接
 int CConnectHandler::handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask)
 {
@@ -693,30 +672,7 @@ uint32 CConnectHandler::file_open(IFileTestManager* pFileTest)
     //告诉PacketParse连接应建立
     App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Connect(GetConnectID(), GetClientIPInfo(), GetLocalIPInfo());
 
-    //组织数据
-    _MakePacket objMakePacket;
-
-    objMakePacket.m_u4ConnectID  = GetConnectID();
-    objMakePacket.m_pPacketParse = NULL;
-    objMakePacket.m_u1Option     = PACKET_CONNECT;
-    objMakePacket.m_AddrRemote   = m_addrRemote;
-
-    if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
-    {
-        objMakePacket.m_AddrListen.set(m_u4LocalPort);
-    }
-    else
-    {
-        objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
-    }
-
-    //发送链接建立消息。
-    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-    if (false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-    {
-        OUR_DEBUG((LM_ERROR, "[CConnectHandler::open] ConnectID=%d, PACKET_CONNECT is error.\n", GetConnectID()));
-    }
+    Send_MakePacket_Queue(NULL, PACKET_CONNECT);
 
     OUR_DEBUG((LM_DEBUG, "[CConnectHandler::open]Open(%d) Connection from [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
 
@@ -876,28 +832,7 @@ void CConnectHandler::SetSendQueueTimeCost(uint32 u4TimeCost)
         ACE_Time_Value tvNow = ACE_OS::gettimeofday();
         AppLogManager::instance()->WriteLog(LOG_SYSTEM_SENDQUEUEERROR, "[TCP]IP=%s,Prot=%d,m_u8SendQueueTimeout = [%d], Timeout=[%d].", GetClientIPInfo().m_szClientIP, GetClientIPInfo().m_nPort, (uint32)m_u8SendQueueTimeout, u4TimeCost);
 
-        //组织数据
-        _MakePacket objMakePacket;
-
-        objMakePacket.m_u4ConnectID       = GetConnectID();
-        objMakePacket.m_pPacketParse      = NULL;
-        objMakePacket.m_u1Option          = PACKET_SEND_TIMEOUT;
-        objMakePacket.m_AddrRemote        = m_addrRemote;
-
-        if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
-        {
-            objMakePacket.m_AddrListen.set(m_u4LocalPort);
-        }
-        else
-        {
-            objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
-        }
-
-        //告诉插件连接发送超时阀值报警
-        if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-        {
-            OUR_DEBUG((LM_ERROR, "[CProConnectHandle::SetSendQueueTimeCost] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
-        }
+        Send_MakePacket_Queue(NULL, PACKET_SEND_TIMEOUT);
     }
 }
 
@@ -1112,36 +1047,14 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
             if(nMessageID > 0)
             {
                 //需要回调发送成功回执
-                _MakePacket objMakePacket;
-
                 CPacketParse objPacketParse;
                 ACE_Message_Block* pSendOKData = App_MessageBlockManager::instance()->Create(sizeof(int));
-                memcpy_safe((char* )&nMessageID, sizeof(int), pSendOKData->wr_ptr(), sizeof(int));
+                memcpy_safe((char*)&nMessageID, sizeof(int), pSendOKData->wr_ptr(), sizeof(int));
                 pSendOKData->wr_ptr(sizeof(int));
                 objPacketParse.SetPacket_Head_Message(pSendOKData);
                 objPacketParse.SetPacket_Head_Curr_Length((uint32)pSendOKData->length());
 
-                objMakePacket.m_u4ConnectID       = GetConnectID();
-                objMakePacket.m_pPacketParse      = &objPacketParse;
-                objMakePacket.m_u1Option          = PACKET_SEND_OK;
-                objMakePacket.m_AddrRemote        = m_addrRemote;
-
-                if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
-                {
-                    objMakePacket.m_AddrListen.set(m_u4LocalPort);
-                }
-                else
-                {
-                    objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
-                }
-
-                //发送客户端链接断开消息。
-                ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-                if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-                {
-                    OUR_DEBUG((LM_ERROR, "[CConnectHandle::Close] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
-                }
+                Send_MakePacket_Queue(&objPacketParse, PACKET_SEND_OK);
 
                 //还原消息类型
                 pMbData->msg_type(ACE_Message_Block::MB_DATA);
@@ -1442,32 +1355,7 @@ bool CConnectHandler::CheckMessage()
         return false;
     }
 
-    //组织数据
-    _MakePacket objMakePacket;
-
-    objMakePacket.m_u4ConnectID       = GetConnectID();
-    objMakePacket.m_pPacketParse      = m_pPacketParse;
-    objMakePacket.m_AddrRemote        = m_addrRemote;
-    objMakePacket.m_u4PacketParseID   = GetPacketParseInfoID();
-
-    if(ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
-    {
-        objMakePacket.m_AddrListen.set(m_u4LocalPort);
-    }
-    else
-    {
-        objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
-    }
-
-    objMakePacket.m_u1Option = PACKET_PARSE;
-
-    //将数据Buff放入消息体中
-    if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvCheck))
-    {
-        m_pPacketParse = NULL;
-
-        OUR_DEBUG((LM_ERROR, "[CConnectHandle::CheckMessage] ConnectID = %d, PutMessageBlock is error.\n", GetConnectID()));
-    }
+    Send_MakePacket_Queue(m_pPacketParse, PACKET_PARSE);
 
     //更新时间轮盘
     App_ConnectManager::instance()->SetConnectTimeWheel(this);
