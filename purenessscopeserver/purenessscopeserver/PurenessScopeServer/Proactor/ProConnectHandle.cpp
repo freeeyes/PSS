@@ -1163,9 +1163,7 @@ uint8 CProConnectHandle::GetSendBuffState()
 
 bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, uint8 u1State, uint8 u1SendType, uint32& u4PacketSize, bool blDelete, int nMessageID)
 {
-    //OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::SendMessage]Connectid=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
-    //OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::SendMessage]Connectid=%d,m_nIOCount=%d 1.\n", GetConnectID(), m_nIOCount));
 
     if(NULL == pBuffPacket)
     {
@@ -1183,10 +1181,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
         ACE_Time_Value tvNow = ACE_OS::gettimeofday();
         App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
 
-        if(true == blDelete)
-        {
-            App_BuffPacketManager::instance()->Delete(pBuffPacket);
-        }
+        Recovery_BuffPacket(blDelete, pBuffPacket);
 
         return false;
     }
@@ -1220,10 +1215,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
                 ACE_Time_Value tvNow = ACE_OS::gettimeofday();
                 App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
 
-                if (true == blDelete)
-                {
-                    App_BuffPacketManager::instance()->Delete(pBuffPacket);
-                }
+                Recovery_BuffPacket(blDelete, pBuffPacket);
 
                 return false;
             }
@@ -1244,10 +1236,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
                 }
             }
 
-            if (true == blDelete)
-            {
-                App_BuffPacketManager::instance()->Delete(pBuffPacket);
-            }
+            Recovery_BuffPacket(blDelete, pBuffPacket);
 
             return true;
         }
@@ -1265,11 +1254,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
                 {
                     OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", GetConnectID(), u4SendPacketSize, m_u4SendMaxBuffSize));
 
-                    if (true == blDelete)
-                    {
-                        //删除发送数据包
-                        App_BuffPacketManager::instance()->Delete(pBuffPacket);
-                    }
+                    Recovery_BuffPacket(blDelete, pBuffPacket);
 
                     return false;
                 }
@@ -1291,11 +1276,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
                     ACE_Time_Value tvNow = ACE_OS::gettimeofday();
                     App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
 
-                    if (true == blDelete)
-                    {
-                        //删除发送数据包
-                        App_BuffPacketManager::instance()->Delete(pBuffPacket);
-                    }
+                    Recovery_BuffPacket(blDelete, pBuffPacket);
 
                     return false;
                 }
@@ -1323,10 +1304,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
                     ACE_Time_Value tvNow = ACE_OS::gettimeofday();
                     App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
 
-                    if (true == blDelete)
-                    {
-                        App_BuffPacketManager::instance()->Delete(pBuffPacket);
-                    }
+                    Recovery_BuffPacket(blDelete, pBuffPacket);
 
                     return false;
                 }
@@ -1340,24 +1318,14 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
             {
                 OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::SendMessage] Connectid=[%d](m_pBlockMessage->length() error(%d).\n", GetConnectID(), m_pBlockMessage->length()));
 
-                if (true == blDelete)
-                {
-                    App_BuffPacketManager::instance()->Delete(pBuffPacket);
-                }
+                Recovery_BuffPacket(blDelete, pBuffPacket);
 
                 return false;
             }
 
-            if (true == blDelete)
-            {
-                App_BuffPacketManager::instance()->Delete(pBuffPacket);
-            }
+            Recovery_BuffPacket(blDelete, pBuffPacket);
 
             //判断是否发送完成后关闭连接
-            //if (PACKET_SEND_FIN_CLOSE == u1State)
-            //{
-            //    m_emStatus = CLIENT_CLOSE_SENDOK;
-            //}
 
             //将消息ID放入MessageBlock
             ACE_Message_Block::ACE_Message_Type objType = ACE_Message_Block::MB_USER + nMessageID;
@@ -1408,10 +1376,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
             m_pFileTest->HandlerServerResponse(GetConnectID());
         }
 
-        if (true == blDelete)
-        {
-            App_BuffPacketManager::instance()->Delete(pBuffPacket);
-        }
+        Recovery_BuffPacket(blDelete, pBuffPacket);
 
         return true;
     }
@@ -1800,6 +1765,14 @@ void CProConnectHandle::SetLocalIPInfo(const char* pLocalIP, uint32 u4LocalPort)
 void CProConnectHandle::PutSendPacketError(ACE_Message_Block* pMbData)
 {
 
+}
+
+void CProConnectHandle::Recovery_BuffPacket(bool blDelete, IBuffPacket* pBuffPacket)
+{
+    if (true == blDelete)
+    {
+        App_BuffPacketManager::instance()->Delete(pBuffPacket);
+    }
 }
 
 void CProConnectHandle::SetSendCacheManager(ISendCacheManager* pSendCacheManager)

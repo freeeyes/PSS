@@ -31,7 +31,7 @@ public:
 
     int  Run_Open(ACE_Reactor* pReactor);
     void Close();
-    bool SendMessage(const char*& pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead = true, uint16 u2CommandID = 0, bool blDlete = true);
+    bool SendMessage(char*& pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead = true, uint16 u2CommandID = 0, bool blDlete = true);
     _ClientConnectInfo GetClientConnectInfo();
     void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);    //获得指定命令统计信息
     void GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut);                    //得到所有的出口流量
@@ -39,8 +39,8 @@ public:
 private:
     bool CheckMessage(const char* pData, uint32 u4Len);              //这里解析数据包并放入数据队列
     int  Init_Open_Address(const ACE_INET_Addr& AddrRemote);         //初始化UDP连接对象
+    void Recovery_Message(bool blDelete, char*& pMessage);           //回收用完的char数组
 
-private:
     ACE_SOCK_Dgram          m_skRemote;
     ACE_INET_Addr           m_addrRemote;                   //数据发送方的IP信息
     ACE_INET_Addr           m_addrLocal;                    //监听方的IP信息

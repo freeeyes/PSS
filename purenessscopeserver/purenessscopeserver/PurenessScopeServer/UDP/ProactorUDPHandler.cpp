@@ -149,7 +149,7 @@ void CProactorUDPHandler::handle_read_dgram(const ACE_Asynch_Read_Dgram::Result&
     }
 }
 
-bool CProactorUDPHandler::SendMessage(const char*& pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead, uint16 u2CommandID, bool blDlete)
+bool CProactorUDPHandler::SendMessage(char*& pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead, uint16 u2CommandID, bool blDlete)
 {
     ACE_Time_Value m_tvBegin = ACE_OS::gettimeofday();
 
@@ -160,10 +160,7 @@ bool CProactorUDPHandler::SendMessage(const char*& pMessage, uint32 u4Len, const
     {
         OUR_DEBUG((LM_INFO, "[CProactorUDPHandler::SendMessage]set_address error[%d].\n", errno));
 
-        if(true == blDlete)
-        {
-            SAFE_DELETE_ARRAY(pMessage);
-        }
+        Recovery_Message(blDlete, pMessage);
 
         return false;
     }
@@ -178,10 +175,7 @@ bool CProactorUDPHandler::SendMessage(const char*& pMessage, uint32 u4Len, const
 
         if(NULL == pMbData)
         {
-            if(true == blDlete)
-            {
-                SAFE_DELETE_ARRAY(pMessage);
-            }
+            Recovery_Message(blDlete, pMessage);
 
             return false;
         }
@@ -197,10 +191,7 @@ bool CProactorUDPHandler::SendMessage(const char*& pMessage, uint32 u4Len, const
             m_u4SendSize += u4DataLen;
             m_u4SendPacketCount++;
 
-            if(true == blDlete)
-            {
-                SAFE_DELETE_ARRAY(pMessage);
-            }
+            Recovery_Message(blDlete, pMessage);
 
             //统计发送信息
             m_CommandAccount.SaveCommandData(u2CommandID, (uint32)nPort, PACKET_UDP, u4DataLen, COMMAND_TYPE_OUT);
@@ -214,10 +205,7 @@ bool CProactorUDPHandler::SendMessage(const char*& pMessage, uint32 u4Len, const
         {
             OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::SendMessage]send error(%d).\n", errno));
 
-            if(true == blDlete)
-            {
-                SAFE_DELETE_ARRAY(pMessage);
-            }
+            Recovery_Message(blDlete, pMessage);
 
             //释放发送体
             App_MessageBlockManager::instance()->Close(pMbData);
@@ -234,10 +222,8 @@ bool CProactorUDPHandler::SendMessage(const char*& pMessage, uint32 u4Len, const
             m_atvOutput = ACE_OS::gettimeofday();
             m_u4SendSize += u4Len;
             m_u4SendPacketCount++;
-			if (true == blDlete)
-			{
-				SAFE_DELETE_ARRAY(pMessage);
-			}
+
+            Recovery_Message(blDlete, pMessage);
 
             //统计发送信息
             m_CommandAccount.SaveCommandData(u2CommandID, (uint32)nPort, PACKET_UDP, u4Len, COMMAND_TYPE_OUT);
@@ -247,10 +233,9 @@ bool CProactorUDPHandler::SendMessage(const char*& pMessage, uint32 u4Len, const
         else
         {
             OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::SendMessage]send error(%d).\n", errno));
-			if (true == blDlete)
-			{
-				SAFE_DELETE_ARRAY(pMessage);
-			}
+
+            Recovery_Message(blDlete, pMessage);
+
             return false;
         }
     }//end if(blHead == true)
@@ -410,7 +395,15 @@ bool CProactorUDPHandler::CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len)
     return true;
 }
 
-void CProactorUDPHandler::GetCommandData( uint16 u2CommandID, _CommandData& objCommandData )
+void CProactorUDPHandler::Recovery_Message(bool blDelete, char*& pMessage)
+{
+    if (true == blDelete)
+    {
+        SAFE_DELETE_ARRAY(pMessage);
+    }
+}
+
+void CProactorUDPHandler::GetCommandData(uint16 u2CommandID, _CommandData& objCommandData)
 {
     _CommandData* pCommandData = m_CommandAccount.GetCommandData(u2CommandID);
 

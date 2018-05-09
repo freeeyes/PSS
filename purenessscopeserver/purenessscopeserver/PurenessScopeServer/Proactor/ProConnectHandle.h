@@ -93,8 +93,8 @@ private:
     bool PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State);            //将发送数据发送出去
     void ClearPacketParse(ACE_Message_Block& mbCurrBlock);                    //清理正在使用的PacketParse
     void PutSendPacketError(ACE_Message_Block* pMbData);                      //发送失败回调
+    void Recovery_BuffPacket(bool blDelete, IBuffPacket* pBuffPacket);        //回收用完的BuffPacket
 
-private:
     uint64             m_u8RecvQueueTimeCost;          //成功接收数据到数据处理完成（未发送）花费的时间总和
     uint64             m_u8SendQueueTimeCost;          //成功发送数据到数据处理完成（只发送）花费的时间总和
     uint32             m_u4MaxPacketSize;              //单个数据包的最大长度
