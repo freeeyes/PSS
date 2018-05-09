@@ -74,7 +74,6 @@ void CConnectHandler::Close()
         Send_MakePacket_Queue(NULL, PACKET_CDISCONNECT);
     }
 
-    //msg_queue()->deactivate();
     shutdown();
     AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %dws, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %dws.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, (uint32)m_u8RecvQueueTimeCost, m_u4RecvQueueCount, (uint32)m_u8SendQueueTimeCost);
 
@@ -211,55 +210,10 @@ int CConnectHandler::open(void*)
         return -1;
     }
 
-    //设置默认别名
-    SetConnectName(m_addrRemote.get_host_addr());
-
-    //初始化当前链接的某些参数
-    m_atvConnect          = ACE_OS::gettimeofday();
-    m_atvInput            = ACE_OS::gettimeofday();
-    m_atvOutput           = ACE_OS::gettimeofday();
-    m_atvSendAlive        = ACE_OS::gettimeofday();
-
-    m_u4ConnectID         = 0;
-    m_u4AllRecvCount      = 0;
-    m_u4AllSendCount      = 0;
-    m_u4AllRecvSize       = 0;
-    m_u4AllSendSize       = 0;
-    m_u8RecvQueueTimeCost = 0;
-    m_u4RecvQueueCount    = 0;
-    m_u8SendQueueTimeCost = 0;
-    m_u4CurrSize          = 0;
-
-    m_u4ReadSendSize      = 0;
-    m_u4SuccessSendSize   = 0;
-
-    //设置接收缓冲池的大小
-    int nTecvBuffSize = MAX_MSG_SOCKETBUFF;
-    ACE_OS::setsockopt(this->get_handle(), SOL_SOCKET, SO_SNDBUF, (char* )&nTecvBuffSize, sizeof(nTecvBuffSize));
-
-    if(m_u2TcpNodelay == TCP_NODELAY_OFF)
+    //初始化参数设置
+    if (-1 == Init_Open_Connect())
     {
-        //如果设置了禁用Nagle算法，则这里要禁用。
-        int nOpt=1;
-        ACE_OS::setsockopt(this->get_handle(), IPPROTO_TCP, TCP_NODELAY, (char* )&nOpt, sizeof(int));
-    }
-
-    m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
-
-    if(NULL == m_pPacketParse)
-    {
-        OUR_DEBUG((LM_DEBUG,"[CConnectHandler::open]Open(%d) m_pPacketParse new error.\n", GetConnectID()));
         return -1;
-    }
-
-    //申请头的大小对应的mb
-    if(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
-    {
-        m_pCurrMessage = App_MessageBlockManager::instance()->Create(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength);
-    }
-    else
-    {
-        m_pCurrMessage = App_MessageBlockManager::instance()->Create(App_MainConfig::instance()->GetServerRecvBuff());
     }
 
     if(m_pCurrMessage == NULL)
@@ -542,6 +496,58 @@ void CConnectHandler::Send_MakePacket_Queue(CPacketParse* m_pPacketParse, uint8 
     }
 }
 
+int CConnectHandler::Init_Open_Connect()
+{
+    //设置默认别名
+    SetConnectName(m_addrRemote.get_host_addr());
+
+    //初始化当前链接的某些参数
+    m_atvConnect          = ACE_OS::gettimeofday();
+    m_atvInput            = ACE_OS::gettimeofday();
+    m_atvOutput           = ACE_OS::gettimeofday();
+    m_atvSendAlive        = ACE_OS::gettimeofday();
+
+    m_u4ConnectID         = 0;
+    m_u4AllRecvCount      = 0;
+    m_u4AllSendCount      = 0;
+    m_u4AllRecvSize       = 0;
+    m_u4AllSendSize       = 0;
+    m_u8RecvQueueTimeCost = 0;
+    m_u4RecvQueueCount    = 0;
+    m_u8SendQueueTimeCost = 0;
+    m_u4CurrSize          = 0;
+
+    m_u4ReadSendSize      = 0;
+    m_u4SuccessSendSize   = 0;
+
+    if (m_u2TcpNodelay == TCP_NODELAY_OFF)
+    {
+        //如果设置了禁用Nagle算法，则这里要禁用。
+        int nOpt = 1;
+        ACE_OS::setsockopt(this->get_handle(), IPPROTO_TCP, TCP_NODELAY, (char*)&nOpt, sizeof(int));
+    }
+
+    m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
+
+    if (NULL == m_pPacketParse)
+    {
+        OUR_DEBUG((LM_DEBUG, "[CConnectHandler::open]Open(%d) m_pPacketParse new error.\n", GetConnectID()));
+        return -1;
+    }
+
+    //申请头的大小对应的mb
+    if (App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
+    {
+        m_pCurrMessage = App_MessageBlockManager::instance()->Create(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength);
+    }
+    else
+    {
+        m_pCurrMessage = App_MessageBlockManager::instance()->Create(App_MainConfig::instance()->GetServerRecvBuff());
+    }
+
+    return 0;
+}
+
 //关闭链接
 int CConnectHandler::handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask)
 {
@@ -580,7 +586,6 @@ uint32 CConnectHandler::file_open(IFileTestManager* pFileTest)
     m_u1IsActive = 1;
 
     //重置缓冲区
-    //m_pBlockMessage->reset();
 
     if (NULL == App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID))
     {
@@ -603,55 +608,12 @@ uint32 CConnectHandler::file_open(IFileTestManager* pFileTest)
         return 1;
     }
 
-    //设置默认别名
-    SetConnectName(m_addrRemote.get_host_addr());
-
-    //初始化当前链接的某些参数
-    m_atvConnect = ACE_OS::gettimeofday();
-    m_atvInput = ACE_OS::gettimeofday();
-    m_atvOutput = ACE_OS::gettimeofday();
-    m_atvSendAlive = ACE_OS::gettimeofday();
-
-    m_u4AllRecvCount = 0;
-    m_u4AllSendCount = 0;
-    m_u4AllRecvSize = 0;
-    m_u4AllSendSize = 0;
-    m_u8RecvQueueTimeCost = 0;
-    m_u4RecvQueueCount = 0;
-    m_u8SendQueueTimeCost = 0;
-    m_u4CurrSize = 0;
-
-    m_u4ReadSendSize = 0;
-    m_u4SuccessSendSize = 0;
-
-    //设置接收缓冲池的大小
-    int nTecvBuffSize = MAX_MSG_SOCKETBUFF;
-    ACE_OS::setsockopt(this->get_handle(), SOL_SOCKET, SO_SNDBUF, (char*)&nTecvBuffSize, sizeof(nTecvBuffSize));
-
-    if (m_u2TcpNodelay == TCP_NODELAY_OFF)
+    if (-1 == Init_Open_Connect())
     {
-        //如果设置了禁用Nagle算法，则这里要禁用。
-        int nOpt = 1;
-        ACE_OS::setsockopt(this->get_handle(), IPPROTO_TCP, TCP_NODELAY, (char*)&nOpt, sizeof(int));
-    }
-
-    m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
-
-    if (NULL == m_pPacketParse)
-    {
-        OUR_DEBUG((LM_DEBUG, "[CConnectHandler::open]Open(%d) m_pPacketParse new error.\n", GetConnectID()));
         return 0;
     }
 
-    //申请头的大小对应的mb
-    if (App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
-    {
-        m_pCurrMessage = App_MessageBlockManager::instance()->Create(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength);
-    }
-    else
-    {
-        m_pCurrMessage = App_MessageBlockManager::instance()->Create(App_MainConfig::instance()->GetServerRecvBuff());
-    }
+
 
     if (m_pCurrMessage == NULL)
     {

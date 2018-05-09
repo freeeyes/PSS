@@ -109,6 +109,7 @@ private:
 
     int  Dispose_Recv_Data();                                                 //处理接收数据
     void Send_MakePacket_Queue(CPacketParse* m_pPacketParse, uint8 u1Option); //将数据发送入工作线程消息队列
+    int  Init_Open_Connect();                                                 //当第一次建立连接初始化的时候调用
 
     uint64                     m_u8RecvQueueTimeCost;          //成功接收数据到数据处理完成（未发送）花费的时间总和
     uint64                     m_u8SendQueueTimeCost;          //成功发送数据到数据处理完成（只发送）花费的时间总和
