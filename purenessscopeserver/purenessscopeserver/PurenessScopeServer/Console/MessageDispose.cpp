@@ -14,6 +14,106 @@ void Combo_Common_Return_Data(uint8 u1OutputType, uint8 u1State, const char* pMe
     }
 }
 
+void Combo_Common_Head_Data(uint8 u1OutputType, uint32 u4Count, const char* pMessage, IBuffPacket* pBuffPacket)
+{
+    if (u1OutputType == 0)
+    {
+        (*pBuffPacket) << (uint32)u4Count;
+    }
+    else
+    {
+        char szTemp[MAX_BUFF_200] = { '\0' };
+        sprintf_safe(szTemp, MAX_BUFF_200, pMessage);
+        pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+    }
+}
+
+void Combo_Common_vecClientConnectInfo(uint8 u1OutputType, vecClientConnectInfo& VecClientConnectInfo, IBuffPacket* pBuffPacket)
+{
+    char szIP[MAX_BUFF_100] = { '\0' };
+
+    for (int i = 0; i < (int)VecClientConnectInfo.size(); i++)
+    {
+        _ClientConnectInfo ClientConnectInfo = VecClientConnectInfo[i];
+
+        if (true == ClientConnectInfo.m_blValid)
+        {
+            sprintf_safe(szIP, MAX_BUFF_100, "0.0.0.0:0");
+
+            if (u1OutputType == 0)
+            {
+                VCHARS_STR strSName;
+                strSName.text = szIP;
+                strSName.u1Len = (uint8)ACE_OS::strlen(szIP);
+
+                (*pBuffPacket) << strSName;
+                (*pBuffPacket) << ClientConnectInfo.m_u4ConnectID;
+                (*pBuffPacket) << ClientConnectInfo.m_u4RecvCount;
+                (*pBuffPacket) << ClientConnectInfo.m_u4SendCount;
+                (*pBuffPacket) << ClientConnectInfo.m_u4AllRecvSize;
+                (*pBuffPacket) << ClientConnectInfo.m_u4AllSendSize;
+                (*pBuffPacket) << ClientConnectInfo.m_u4BeginTime;
+                (*pBuffPacket) << ClientConnectInfo.m_u4AliveTime;
+                (*pBuffPacket) << ClientConnectInfo.m_u4RecvQueueCount;
+                (*pBuffPacket) << ClientConnectInfo.m_u8RecvQueueTimeCost;
+                (*pBuffPacket) << ClientConnectInfo.m_u8SendQueueTimeCost;
+            }
+            else
+            {
+                char szTemp[MAX_BUFF_1024] = { '\0' };
+                sprintf_safe(szTemp, MAX_BUFF_1024, "UDP IP(%s)\n", szIP);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                sprintf_safe(szTemp, MAX_BUFF_1024, "UDP Command(%d)\n", ClientConnectInfo.m_u4ConnectID);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                sprintf_safe(szTemp, MAX_BUFF_1024, "UDP RecvCount(%d)\n", ClientConnectInfo.m_u4RecvCount);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                sprintf_safe(szTemp, MAX_BUFF_1024, "UDP SendCount(%d)\n", ClientConnectInfo.m_u4SendCount);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                sprintf_safe(szTemp, MAX_BUFF_1024, "UDP AllRecvSize(%d)\n", ClientConnectInfo.m_u4AllRecvSize);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                sprintf_safe(szTemp, MAX_BUFF_1024, "UDP AllSendSize(%d)\n", ClientConnectInfo.m_u4AllSendSize);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                sprintf_safe(szTemp, MAX_BUFF_1024, "UDP BeginTime(%d)\n", ClientConnectInfo.m_u4BeginTime);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                sprintf_safe(szTemp, MAX_BUFF_1024, "UDP AliveTime(%d)\n", ClientConnectInfo.m_u4AliveTime);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                sprintf_safe(szTemp, MAX_BUFF_1024, "UDP RecvQueueCount(%d)\n", ClientConnectInfo.m_u4RecvQueueCount);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            }
+        }
+    }
+}
+
+void Combo_Common_VecForbiddenIP(uint8 u1OutputType, VecForbiddenIP* pIPList, IBuffPacket* pBuffPacket)
+{
+    for (int i = 0; i < (int)pIPList->size(); i++)
+    {
+        if (u1OutputType == 0)
+        {
+            VCHARS_STR strSName;
+            strSName.text = pIPList->at(i).m_szClientIP;
+            strSName.u1Len = (uint8)ACE_OS::strlen(pIPList->at(i).m_szClientIP);
+
+            (*pBuffPacket) << strSName;
+            (*pBuffPacket) << pIPList->at(i).m_u1Type;
+            (*pBuffPacket) << (uint32)pIPList->at(i).m_tvBegin.sec();
+            (*pBuffPacket) << pIPList->at(i).m_u4Second;
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_1024] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden(%s)\n", pIPList->at(i).m_szClientIP);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden Type(%d)\n", pIPList->at(i).m_u1Type);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden BeginTime(%d)\n", pIPList->at(i).m_tvBegin.sec());
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden IntervalTime(%d)\n", pIPList->at(i).m_u4Second);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        }
+    }
+}
+
 void DoMessage_LoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     _FileInfo FileInfo;
@@ -436,71 +536,10 @@ void DoMessage_ClientInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, u
         App_ConnectManager::instance()->GetConnectInfo(VecClientConnectInfo);
 #endif
 
-        if (CommandInfo.m_u1OutputType == 0)
-        {
-            (*pBuffPacket) << (uint32)VecClientConnectInfo.size();
-        }
-        else
-        {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "Client IP Count(%d)\n", VecClientConnectInfo.size());
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-        }
+        uint32 u4ConnectCount = (uint32)VecClientConnectInfo.size();
+        Combo_Common_Head_Data(CommandInfo.m_u1OutputType, u4ConnectCount, "Client IP Count(%d).\n", pBuffPacket);
 
-        for (int i = 0; i < (int)VecClientConnectInfo.size(); i++)
-        {
-            _ClientConnectInfo ClientConnectInfo = VecClientConnectInfo[i];
-
-            if (true == ClientConnectInfo.m_blValid)
-            {
-                sprintf_safe(szIP, MAX_BUFF_100, "%s:%d", ClientConnectInfo.m_addrRemote.get_host_addr(), ClientConnectInfo.m_addrRemote.get_port_number());
-
-                VCHARS_STR strSName;
-                strSName.text = szIP;
-                strSName.u1Len = (uint8)ACE_OS::strlen(szIP);
-
-                if (CommandInfo.m_u1OutputType == 0)
-                {
-                    (*pBuffPacket) << strSName;
-                    (*pBuffPacket) << ClientConnectInfo.m_u4ConnectID;
-                    (*pBuffPacket) << ClientConnectInfo.m_u4RecvCount;
-                    (*pBuffPacket) << ClientConnectInfo.m_u4SendCount;
-                    (*pBuffPacket) << ClientConnectInfo.m_u4AllRecvSize;
-                    (*pBuffPacket) << ClientConnectInfo.m_u4AllSendSize;
-                    (*pBuffPacket) << ClientConnectInfo.m_u4BeginTime;
-                    (*pBuffPacket) << ClientConnectInfo.m_u4AliveTime;
-                    (*pBuffPacket) << ClientConnectInfo.m_u4RecvQueueCount;
-                    (*pBuffPacket) << ClientConnectInfo.m_u8RecvQueueTimeCost;
-                    (*pBuffPacket) << ClientConnectInfo.m_u8SendQueueTimeCost;
-                }
-                else
-                {
-                    char szTemp[MAX_BUFF_1024] = { '\0' };
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "Client IP(%s)\n", szIP);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "Client ConnectID(%d)\n", ClientConnectInfo.m_u4ConnectID);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "Client RecvCount(%d)\n", ClientConnectInfo.m_u4RecvCount);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "Client SendCount(%d)\n", ClientConnectInfo.m_u4SendCount);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "Client AllRecvSize(%d)\n", ClientConnectInfo.m_u4AllRecvSize);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "Client AllSendSize(%d)\n", ClientConnectInfo.m_u4AllSendSize);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "Client BeginTime(%d)\n", ClientConnectInfo.m_u4BeginTime);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "Client AliveTime(%d)\n", ClientConnectInfo.m_u4AliveTime);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "Client RecvQueueCount(%d)\n", ClientConnectInfo.m_u4RecvQueueCount);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "Client RecvQueueTimeCost(%d)\n", (uint32)ClientConnectInfo.m_u8RecvQueueTimeCost);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "Client SendQueueTimeCost(%d)\n", (uint32)ClientConnectInfo.m_u8SendQueueTimeCost);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                }
-            }
-        }
+        Combo_Common_vecClientConnectInfo(CommandInfo.m_u1OutputType, VecClientConnectInfo, pBuffPacket);
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_CLIENTINFO;
@@ -582,71 +621,11 @@ void DoMessage_ShowForbiddenList(_CommandInfo& CommandInfo, IBuffPacket* pBuffPa
         }
 
         uint32 u4Count = (uint32)pForeverForbiddenIP->size() + (uint32)pTempForbiddenIP->size();
+        Combo_Common_Head_Data(CommandInfo.m_u1OutputType, u4Count, "IP Forbidden Count(%d).\n", pBuffPacket);
 
-        if (CommandInfo.m_u1OutputType == 0)
-        {
-            (*pBuffPacket) << u4Count;
-        }
-        else
-        {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden Count(%d)\n", u4Count);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-        }
+        Combo_Common_VecForbiddenIP(CommandInfo.m_u1OutputType, pForeverForbiddenIP, pBuffPacket);
 
-        for (int i = 0; i < (int)pForeverForbiddenIP->size(); i++)
-        {
-            if (CommandInfo.m_u1OutputType == 0)
-            {
-                VCHARS_STR strSName;
-                strSName.text = pForeverForbiddenIP->at(i).m_szClientIP;
-                strSName.u1Len = (uint8)ACE_OS::strlen(pForeverForbiddenIP->at(i).m_szClientIP);
-
-                (*pBuffPacket) << strSName;
-                (*pBuffPacket) << pForeverForbiddenIP->at(i).m_u1Type;
-                (*pBuffPacket) << (uint32)pForeverForbiddenIP->at(i).m_tvBegin.sec();
-                (*pBuffPacket) << pForeverForbiddenIP->at(i).m_u4Second;
-            }
-            else
-            {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden(%s)\n", pForeverForbiddenIP->at(i).m_szClientIP);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden Type(%d)\n", pForeverForbiddenIP->at(i).m_u1Type);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden BeginTime(%d)\n", pForeverForbiddenIP->at(i).m_tvBegin.sec());
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden IntervalTime(%d)\n", pForeverForbiddenIP->at(i).m_u4Second);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            }
-        }
-
-        for (int i = 0; i < (int)pTempForbiddenIP->size(); i++)
-        {
-            if (CommandInfo.m_u1OutputType == 0)
-            {
-                VCHARS_STR strSName;
-                strSName.text = pTempForbiddenIP->at(i).m_szClientIP;
-                strSName.u1Len = (uint8)ACE_OS::strlen(pTempForbiddenIP->at(i).m_szClientIP);
-
-                (*pBuffPacket) << strSName;
-                (*pBuffPacket) << pTempForbiddenIP->at(i).m_u1Type;
-                (*pBuffPacket) << (uint32)pTempForbiddenIP->at(i).m_tvBegin.sec();
-                (*pBuffPacket) << pTempForbiddenIP->at(i).m_u4Second;
-            }
-            else
-            {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "IP Temp Forbidden(%s)\n", pForeverForbiddenIP->at(i).m_szClientIP);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "IP Temp Forbidden Type(%d)\n", pForeverForbiddenIP->at(i).m_u1Type);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "IP Temp Forbidden BeginTime(%d)\n", pForeverForbiddenIP->at(i).m_tvBegin.sec());
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "IP Temp Forbidden IntervalTime(%d)\n", pForeverForbiddenIP->at(i).m_u4Second);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            }
-        }
+        Combo_Common_VecForbiddenIP(CommandInfo.m_u1OutputType, pTempForbiddenIP, pBuffPacket);
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_FORBIDDENIPSHOW;
@@ -683,67 +662,10 @@ void DoMessage_UDPClientInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket
         App_ReUDPManager::instance()->GetClientConnectInfo(VecClientConnectInfo);
 #endif
 
-        if (CommandInfo.m_u1OutputType == 0)
-        {
-            (*pBuffPacket) << (uint32)VecClientConnectInfo.size();
-        }
-        else
-        {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "UDPClient Count(%d)\n", (uint32)VecClientConnectInfo.size());
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-        }
+        uint32 u4ConnectCount = (uint32)VecClientConnectInfo.size();
+        Combo_Common_Head_Data(CommandInfo.m_u1OutputType, u4ConnectCount, "UDPClient Count(%d).\n", pBuffPacket);
 
-        for (int i = 0; i < (int)VecClientConnectInfo.size(); i++)
-        {
-            _ClientConnectInfo ClientConnectInfo = VecClientConnectInfo[i];
-
-            if (true == ClientConnectInfo.m_blValid)
-            {
-                sprintf_safe(szIP, MAX_BUFF_100, "0.0.0.0:0");
-
-                if (CommandInfo.m_u1OutputType == 0)
-                {
-                    VCHARS_STR strSName;
-                    strSName.text = szIP;
-                    strSName.u1Len = (uint8)ACE_OS::strlen(szIP);
-
-                    (*pBuffPacket) << strSName;
-                    (*pBuffPacket) << ClientConnectInfo.m_u4ConnectID;
-                    (*pBuffPacket) << ClientConnectInfo.m_u4RecvCount;
-                    (*pBuffPacket) << ClientConnectInfo.m_u4SendCount;
-                    (*pBuffPacket) << ClientConnectInfo.m_u4AllRecvSize;
-                    (*pBuffPacket) << ClientConnectInfo.m_u4AllSendSize;
-                    (*pBuffPacket) << ClientConnectInfo.m_u4BeginTime;
-                    (*pBuffPacket) << ClientConnectInfo.m_u4AliveTime;
-                    (*pBuffPacket) << ClientConnectInfo.m_u4RecvQueueCount;
-                    (*pBuffPacket) << ClientConnectInfo.m_u8RecvQueueTimeCost;
-                    (*pBuffPacket) << ClientConnectInfo.m_u8SendQueueTimeCost;
-                }
-                else
-                {
-                    char szTemp[MAX_BUFF_1024] = { '\0' };
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "UDP IP(%s)\n", szIP);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "UDP Command(%d)\n", ClientConnectInfo.m_u4ConnectID);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "UDP RecvCount(%d)\n", ClientConnectInfo.m_u4RecvCount);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "UDP SendCount(%d)\n", ClientConnectInfo.m_u4SendCount);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "UDP AllRecvSize(%d)\n", ClientConnectInfo.m_u4AllRecvSize);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "UDP AllSendSize(%d)\n", ClientConnectInfo.m_u4AllSendSize);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "UDP BeginTime(%d)\n", ClientConnectInfo.m_u4BeginTime);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "UDP AliveTime(%d)\n", ClientConnectInfo.m_u4AliveTime);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "UDP RecvQueueCount(%d)\n", ClientConnectInfo.m_u4RecvQueueCount);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                }
-            }
-        }
+        Combo_Common_vecClientConnectInfo(CommandInfo.m_u1OutputType, VecClientConnectInfo, pBuffPacket);
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_UDPCONNECTINFO;
@@ -762,85 +684,10 @@ void DoMessage_ServerConnectTCP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPac
         App_ClientReConnectManager::instance()->GetConnectInfo(VecClientConnectInfo);
 #endif
 
-        if (CommandInfo.m_u1OutputType == 0)
-        {
-            (*pBuffPacket) << (uint32)VecClientConnectInfo.size();
-        }
-        else
-        {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "ServerConnect Count(%d)\n", (uint32)VecClientConnectInfo.size());
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-        }
+        uint32 u4ConnectCount = (uint32)VecClientConnectInfo.size();
+        Combo_Common_Head_Data(CommandInfo.m_u1OutputType, u4ConnectCount, "ServerConnect Count(%d).\n", pBuffPacket);
 
-        for (int i = 0; i < (int)VecClientConnectInfo.size(); i++)
-        {
-            _ClientConnectInfo ClientConnectInfo = VecClientConnectInfo[i];
-
-            sprintf_safe(szIP, MAX_BUFF_100, "%s:%d", ClientConnectInfo.m_addrRemote.get_host_addr(), ClientConnectInfo.m_addrRemote.get_port_number());
-
-            VCHARS_STR strSName;
-            strSName.text = szIP;
-            strSName.u1Len = (uint8)ACE_OS::strlen(szIP);
-
-            if (CommandInfo.m_u1OutputType == 0)
-            {
-                if (ClientConnectInfo.m_blValid == true)
-                {
-                    (*pBuffPacket) << (uint8)0;   //链接已存在
-                }
-                else
-                {
-                    (*pBuffPacket) << (uint8)1;   //连接不存在
-                }
-
-                (*pBuffPacket) << strSName;
-                (*pBuffPacket) << ClientConnectInfo.m_u4ConnectID;
-                (*pBuffPacket) << ClientConnectInfo.m_u4RecvCount;
-                (*pBuffPacket) << ClientConnectInfo.m_u4SendCount;
-                (*pBuffPacket) << ClientConnectInfo.m_u4AllRecvSize;
-                (*pBuffPacket) << ClientConnectInfo.m_u4AllSendSize;
-                (*pBuffPacket) << ClientConnectInfo.m_u4BeginTime;
-                (*pBuffPacket) << ClientConnectInfo.m_u4AliveTime;
-                (*pBuffPacket) << ClientConnectInfo.m_u4RecvQueueCount;
-                (*pBuffPacket) << ClientConnectInfo.m_u8RecvQueueTimeCost;
-                (*pBuffPacket) << ClientConnectInfo.m_u8SendQueueTimeCost;
-            }
-            else
-            {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-
-                if (ClientConnectInfo.m_blValid == true)
-                {
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "Connect Active.\n");
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                }
-                else
-                {
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "Connect Disactive.\n");
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                }
-
-                sprintf_safe(szTemp, MAX_BUFF_1024, "ConnectIP(%s)\n", szIP);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "ConnectID(%d)\n", ClientConnectInfo.m_u4ConnectID);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "RecvCount(%d)\n", ClientConnectInfo.m_u4RecvCount);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "SendCount(%d)\n", ClientConnectInfo.m_u4SendCount);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "AllRecvSize(%d)\n", ClientConnectInfo.m_u4AllRecvSize);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "AllSendSize(%d)\n", ClientConnectInfo.m_u4AllSendSize);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "BeginTime(%d)\n", ClientConnectInfo.m_u4BeginTime);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "AliveTime(%d)\n", ClientConnectInfo.m_u4AliveTime);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "RecvQueueCount(%d)\n", ClientConnectInfo.m_u4RecvQueueCount);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            }
-        }
+        Combo_Common_vecClientConnectInfo(CommandInfo.m_u1OutputType, VecClientConnectInfo, pBuffPacket);
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_SERVERCONNECT_TCP;
@@ -859,67 +706,10 @@ void DoMessage_ServerConnectUDP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPac
         App_ClientReConnectManager::instance()->GetUDPConnectInfo(VecClientConnectInfo);
 #endif
 
-        if (CommandInfo.m_u1OutputType == 0)
-        {
-            (*pBuffPacket) << (uint32)VecClientConnectInfo.size();
-        }
-        else
-        {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "UDP Server Count(%d)\n", (uint32)VecClientConnectInfo.size());
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-        }
+        uint32 u4ConnectCount = (uint32)VecClientConnectInfo.size();
+        Combo_Common_Head_Data(CommandInfo.m_u1OutputType, u4ConnectCount, "ServerConnect Count(%d).\n", pBuffPacket);
 
-        for (int i = 0; i < (int)VecClientConnectInfo.size(); i++)
-        {
-            _ClientConnectInfo ClientConnectInfo = VecClientConnectInfo[i];
-
-            if (true == ClientConnectInfo.m_blValid)
-            {
-                sprintf_safe(szIP, MAX_BUFF_100, "0.0.0.0:0");
-
-                if (CommandInfo.m_u1OutputType == 0)
-                {
-                    VCHARS_STR strSName;
-                    strSName.text = szIP;
-                    strSName.u1Len = (uint8)ACE_OS::strlen(szIP);
-
-                    (*pBuffPacket) << strSName;
-                    (*pBuffPacket) << ClientConnectInfo.m_u4ConnectID;
-                    (*pBuffPacket) << ClientConnectInfo.m_u4RecvCount;
-                    (*pBuffPacket) << ClientConnectInfo.m_u4SendCount;
-                    (*pBuffPacket) << ClientConnectInfo.m_u4AllRecvSize;
-                    (*pBuffPacket) << ClientConnectInfo.m_u4AllSendSize;
-                    (*pBuffPacket) << ClientConnectInfo.m_u4BeginTime;
-                    (*pBuffPacket) << ClientConnectInfo.m_u4AliveTime;
-                    (*pBuffPacket) << ClientConnectInfo.m_u4RecvQueueCount;
-                    (*pBuffPacket) << ClientConnectInfo.m_u8RecvQueueTimeCost;
-                    (*pBuffPacket) << ClientConnectInfo.m_u8SendQueueTimeCost;
-                }
-                else
-                {
-                    char szTemp[MAX_BUFF_1024] = { '\0' };
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "UDP IP(%s)\n", szIP);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "UDPServer ConnectID(%d)\n", ClientConnectInfo.m_u4ConnectID);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "UDPServer RecvCount(%d)\n", ClientConnectInfo.m_u4RecvCount);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "UDPServer RecvCount(%d)\n", ClientConnectInfo.m_u4SendCount);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "UDPServer AllRecvSize(%d)\n", ClientConnectInfo.m_u4AllRecvSize);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "UDPServer AllSendSize(%d)\n", ClientConnectInfo.m_u4AllSendSize);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "UDPServer BeginTime(%d)\n", ClientConnectInfo.m_u4BeginTime);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "UDPServer AliveTime(%d)\n", ClientConnectInfo.m_u4AliveTime);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "UDPServer RecvQueueCount(%d)\n", ClientConnectInfo.m_u4RecvQueueCount);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                }
-            }
-        }
+        Combo_Common_vecClientConnectInfo(CommandInfo.m_u1OutputType, VecClientConnectInfo, pBuffPacket);
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_SERVERCONNECT_UDP;
@@ -1238,85 +1028,10 @@ void DoMessage_ReConnectServer(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
         App_ClientReConnectManager::instance()->GetConnectInfo(VecClientConnectInfo);
 #endif
 
-        if (CommandInfo.m_u1OutputType == 0)
-        {
-            (*pBuffPacket) << (uint32)VecClientConnectInfo.size();
-        }
-        else
-        {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "ConnectServerCount(%d)\n", VecClientConnectInfo.size());
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-        }
+        uint32 u4ConnectCount = (uint32)VecClientConnectInfo.size();
+        Combo_Common_Head_Data(CommandInfo.m_u1OutputType, u4ConnectCount, "ConnectServerCount(%d)\n", pBuffPacket);
 
-        for (int i = 0; i < (int)VecClientConnectInfo.size(); i++)
-        {
-            _ClientConnectInfo ClientConnectInfo = VecClientConnectInfo[i];
-
-            sprintf_safe(szIP, MAX_BUFF_100, "%s:%d", ClientConnectInfo.m_addrRemote.get_host_addr(), ClientConnectInfo.m_addrRemote.get_port_number());
-
-            if (CommandInfo.m_u1OutputType == 0)
-            {
-                VCHARS_STR strSName;
-                strSName.text = szIP;
-                strSName.u1Len = (uint8)ACE_OS::strlen(szIP);
-
-                if (ClientConnectInfo.m_blValid == true)
-                {
-                    (*pBuffPacket) << (uint8)0;   //链接已存在
-                }
-                else
-                {
-                    (*pBuffPacket) << (uint8)1;   //连接不存在
-                }
-
-                (*pBuffPacket) << strSName;
-                (*pBuffPacket) << ClientConnectInfo.m_u4ConnectID;
-                (*pBuffPacket) << ClientConnectInfo.m_u4RecvCount;
-                (*pBuffPacket) << ClientConnectInfo.m_u4SendCount;
-                (*pBuffPacket) << ClientConnectInfo.m_u4AllRecvSize;
-                (*pBuffPacket) << ClientConnectInfo.m_u4AllSendSize;
-                (*pBuffPacket) << ClientConnectInfo.m_u4BeginTime;
-                (*pBuffPacket) << ClientConnectInfo.m_u4AliveTime;
-                (*pBuffPacket) << ClientConnectInfo.m_u4RecvQueueCount;
-                (*pBuffPacket) << ClientConnectInfo.m_u8RecvQueueTimeCost;
-                (*pBuffPacket) << ClientConnectInfo.m_u8SendQueueTimeCost;
-            }
-            else
-            {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "IP(%s)\n", szIP);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-
-                if (ClientConnectInfo.m_blValid == true)
-                {
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "ConnectType:Connected\n", szIP);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                }
-                else
-                {
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "ConnectType:DisConnected\n", szIP);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                }
-
-                sprintf_safe(szTemp, MAX_BUFF_1024, "ConnectID:(%d)\n", ClientConnectInfo.m_u4ConnectID);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "RecvCount:(%d)\n", ClientConnectInfo.m_u4RecvCount);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "SendCount:(%d)\n", ClientConnectInfo.m_u4SendCount);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "AllRecvSize:(%d)\n", ClientConnectInfo.m_u4AllRecvSize);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "AllSendSize:(%d)\n", ClientConnectInfo.m_u4AllSendSize);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "BeginTime:(%d)\n", ClientConnectInfo.m_u4BeginTime);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "AliveTime:(%d)\n", ClientConnectInfo.m_u4AliveTime);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "RecvQueueCount:(%d)\n", ClientConnectInfo.m_u4RecvQueueCount);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            }
-        }
+        Combo_Common_vecClientConnectInfo(CommandInfo.m_u1OutputType, VecClientConnectInfo, pBuffPacket);
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_SERVERRECONNECT;
