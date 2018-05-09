@@ -179,20 +179,11 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
     ACE_Time_Value nowait(MAX_MSG_PACKETTIMEOUT);
     m_atvInput = ACE_OS::gettimeofday();
 
-    if (fd == ACE_INVALID_HANDLE)
+    if (fd == ACE_INVALID_HANDLE || NULL == m_pPacketParse)
     {
         m_u4CurrSize = 0;
-        OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input]fd == ACE_INVALID_HANDLE.\n"));
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CConsoleHandler::handle_input]fd == ACE_INVALID_HANDLE.");
-        return -1;
-    }
-
-    //判断数据包结构是否为NULL
-    if (m_pPacketParse == NULL)
-    {
-        m_u4CurrSize = 0;
-        OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input]m_pPacketParse == NULL.\n"));
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CConsoleHandler::handle_input]m_pPacketParse == NULL.");
+        OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input]fd == ACE_INVALID_HANDLE or m_pPacketParse is NULL.\n"));
+        sprintf_safe(m_szError, MAX_BUFF_500, "[CConsoleHandler::handle_input]fd == ACE_INVALID_HANDLE or m_pPacketParse is NULL.");
         return -1;
     }
 
@@ -203,24 +194,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input]m_pCurrMessage == NULL.\n"));
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConsoleHandler::handle_input]m_pCurrMessage == NULL.");
 
-        if (m_pPacketParse->GetMessageHead() != NULL)
-        {
-            App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
-        }
-
-        if (m_pPacketParse->GetMessageBody() != NULL)
-        {
-            App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
-        }
-
-        if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageHead() != m_pCurrMessage)
-        {
-            App_MessageBlockManager::instance()->Close(m_pCurrMessage);
-        }
-
-        m_pCurrMessage = NULL;
-
-        SAFE_DELETE(m_pPacketParse);
+        Clear_PacketParse();
         return -1;
     }
 
@@ -232,24 +206,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input][%d] nCurrCount < 0 m_u4CurrSize = %d.\n", GetConnectID(), m_u4CurrSize));
         m_u4CurrSize = 0;
 
-        if (m_pPacketParse->GetMessageHead() != NULL)
-        {
-            App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
-        }
-
-        if (m_pPacketParse->GetMessageBody() != NULL)
-        {
-            App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
-        }
-
-        if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageHead() != m_pCurrMessage)
-        {
-            App_MessageBlockManager::instance()->Close(m_pCurrMessage);
-        }
-
-        m_pCurrMessage = NULL;
-
-        SAFE_DELETE(m_pPacketParse);
+        Clear_PacketParse();
         return -1;
     }
 
@@ -262,24 +219,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input] ConnectID = %d, recv data is error nDataLen = [%d] errno = [%d].\n", GetConnectID(), nDataLen, u4Error));
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConsoleHandler::handle_input] ConnectID = %d, recv data is error[%d].\n", GetConnectID(), nDataLen);
 
-        if (m_pPacketParse->GetMessageHead() != NULL)
-        {
-            App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
-        }
-
-        if (m_pPacketParse->GetMessageBody() != NULL)
-        {
-            App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
-        }
-
-        if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageHead() != m_pCurrMessage)
-        {
-            App_MessageBlockManager::instance()->Close(m_pCurrMessage);
-        }
-
-        m_pCurrMessage = NULL;
-
-        SAFE_DELETE(m_pPacketParse);
+        Clear_PacketParse();
         return -1;
     }
 
@@ -316,40 +256,14 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
             {
                 OUR_DEBUG((LM_INFO, "[CConsoleHandler::handle_input]CheckMessage error.\n"));
 
-                if (m_pPacketParse->GetMessageHead() != NULL)
-                {
-                    App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
-                }
-
-                if (m_pPacketParse->GetMessageBody() != NULL)
-                {
-                    App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
-                }
-
-                if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageHead() != m_pCurrMessage)
-                {
-                    App_MessageBlockManager::instance()->Close(m_pCurrMessage);
-                }
-
-                m_pCurrMessage = NULL;
-
-                SAFE_DELETE(m_pPacketParse);
+                Clear_PacketParse();
                 return -1;
             }
 
         }
 
-        if (m_pPacketParse->GetMessageHead() != NULL)
-        {
-            App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
-        }
+        Clear_PacketParse();
 
-        if (m_pPacketParse->GetMessageBody() != NULL)
-        {
-            App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
-        }
-
-        SAFE_DELETE(m_pPacketParse);
         m_pPacketParse = new CConsolePacketParse();
 
         //申请头的大小对应的mb
@@ -523,6 +437,28 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
     }
 
     return true;
+}
+
+void CConsoleHandler::Clear_PacketParse()
+{
+    if (m_pPacketParse->GetMessageHead() != NULL)
+    {
+        App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
+    }
+
+    if (m_pPacketParse->GetMessageBody() != NULL)
+    {
+        App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
+    }
+
+    if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageHead() != m_pCurrMessage)
+    {
+        App_MessageBlockManager::instance()->Close(m_pCurrMessage);
+    }
+
+    m_pCurrMessage = NULL;
+
+    SAFE_DELETE(m_pPacketParse);
 }
 
 bool CConsoleHandler::CheckMessage()
