@@ -95,7 +95,7 @@ private:
     void Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType);        //输出DEBUG信息
     int  Dispose_Paceket_Parse_Head();                                       //处理消息头函数
     int  Dispose_Paceket_Parse_Body();                                       //处理消息头函数
-    int  Dispose_Paceket_Parse_Strram();                                     //处理流消息函数
+    int  Dispose_Paceket_Parse_Strram(ACE_Message_Block* pCurrMessage);      //处理流消息函数
     bool CheckMessage();                                                     //处理接收的数据
     bool PutSendPacket(ACE_Message_Block* pMbData);                          //发送数据
     void ClearPacketParse();                                                 //清理正在使用的PacketParse
@@ -105,9 +105,11 @@ private:
     bool Send_Input_To_Cache(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, bool blDelete, IBuffPacket* pBuffPacket);       //讲发送对象放入缓存
     bool Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, uint8 u1State, int nMessageID, bool blDelete, IBuffPacket* pBuffPacket);         //将数据发送给对端
 
-    int RecvData();                                                          //接收数据，正常模式
+    int  RecvData();                                                          //接收数据，正常模式
 
-    int Dispose_Recv_Data();                                                 //处理接收数据
+    int  Dispose_Recv_Data();                                                 //处理接收数据
+    void Send_MakePacket_Queue(CPacketParse* m_pPacketParse, uint8 u1Option); //将数据发送入工作线程消息队列
+    int  Init_Open_Connect();                                                 //当第一次建立连接初始化的时候调用
 
     uint64                     m_u8RecvQueueTimeCost;          //成功接收数据到数据处理完成（未发送）花费的时间总和
     uint64                     m_u8SendQueueTimeCost;          //成功发送数据到数据处理完成（只发送）花费的时间总和
@@ -182,9 +184,9 @@ public:
     bool AddConnect(uint32 u4ConnectID, CConnectHandler* pConnectHandler);
     bool SetConnectTimeWheel(CConnectHandler* pConnectHandler);                                            //设置消息轮盘
     bool DelConnectTimeWheel(CConnectHandler* pConnectHandler);                                            //删除消息轮盘
-    bool SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket,  uint16 u2CommandID, uint8 u1SendState, uint8 u1SendType, ACE_Time_Value& tvSendBegin, bool blDelete = true, int nServerID = 0);  //同步发送                                                                     //发送缓冲数据
-    bool PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nServerID = 0); //异步发送
-    bool PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nServerID = 0);                  //异步群发
+    bool SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket,  uint16 u2CommandID, uint8 u1SendState, uint8 u1SendType, ACE_Time_Value& tvSendBegin, bool blDelete = true, int nMessageID = 0);  //同步发送                                                                     //发送缓冲数据
+    bool PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nMessageID = 0); //异步发送
+    bool PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nMessageID = 0);                  //异步群发
     bool Close(uint32 u4ConnectID);                                                                          //客户单关闭
     bool CloseUnLock(uint32 u4ConnectID);                                                                    //关闭连接，不上锁版本
     bool CloseConnect(uint32 u4ConnectID);                                                                   //服务器关闭
@@ -281,9 +283,9 @@ public:
     bool PostMessage(vector<uint32> vecConnectID, const char*& pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL,
                      uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nServerID = 0);   //异步群发指定的ID
     bool PostMessageAll(IBuffPacket*& pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,
-                        uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nServerID = 0);
+                        uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nMessageID = 0);
     bool PostMessageAll(const char*& pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL,
-                        uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nServerID = 0);
+                        uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nMessageID = 0);
     bool CloseConnect(uint32 u4ConnectID);                                                                   //服务器关闭
     bool CloseConnectByClient(uint32 u4ConnectID);                                                           //客户端关闭
     _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                                                       //得到指定链接信息

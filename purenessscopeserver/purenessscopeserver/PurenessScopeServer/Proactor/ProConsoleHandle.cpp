@@ -356,33 +356,13 @@ bool CProConsoleHandle::GetIsClosing()
 
 bool CProConsoleHandle::SendMessage(IBuffPacket* pBuffPacket, uint8 u1OutputType)
 {
-    CConsolePacketParse PacketParse;
+    ACE_Message_Block* pMbData = NULL;
 
-    if(NULL == pBuffPacket)
+    if (false == Console_Common_SendMessage_Data_Check(GetConnectID(), pBuffPacket, u1OutputType, pMbData))
     {
-        //OUR_DEBUG((LM_DEBUG,"[CProConsoleHandle::SendMessage] Connectid=[%d] pBuffPacket is NULL.\n", GetConnectID()));
         Close();
         return false;
     }
-
-    ACE_Message_Block* pMbData = NULL;
-
-    if (0 == u1OutputType)
-    {
-        int nSendLength = PacketParse.MakePacketLength(GetConnectID(), pBuffPacket->GetPacketLen());
-        pMbData = App_MessageBlockManager::instance()->Create(nSendLength);
-
-        //这里组成返回数据包
-        PacketParse.MakePacket(GetConnectID(), pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pMbData);
-    }
-    else
-    {
-        pMbData = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
-        memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pMbData->wr_ptr(), pBuffPacket->GetPacketLen());
-        pMbData->wr_ptr(pBuffPacket->GetPacketLen());
-    }
-
-    App_BuffPacketManager::instance()->Delete(pBuffPacket);
 
     if (false == PutSendPacket(pMbData))
     {
@@ -431,13 +411,11 @@ bool CProConsoleHandle::RecvClinetPacket(uint32 u4PackeLen)
     m_ThreadWriteLock.acquire();
     m_nIOCount++;
     m_ThreadWriteLock.release();
-    //OUR_DEBUG((LM_ERROR, "[CProConsoleHandle::RecvClinetPacket]Connectid=%d, m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
 
     ACE_Message_Block* pmb = App_MessageBlockManager::instance()->Create(u4PackeLen);
 
     if(pmb == NULL)
     {
-        //AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount);
         OUR_DEBUG((LM_ERROR, "[CProConsoleHandle::RecvClinetPacket] pmb new is NULL.\n"));
 
         if(m_pPacketParse->GetMessageHead() != NULL)
@@ -458,7 +436,6 @@ bool CProConsoleHandle::RecvClinetPacket(uint32 u4PackeLen)
     if(m_Reader.read(*pmb, u4PackeLen) == -1)
     {
         //如果读失败，则关闭连接。
-        //AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount);
         OUR_DEBUG((LM_ERROR, "[CProConsoleHandle::RecvClinetPacket] m_reader.read is error(%d)(%d).\n", GetConnectID(), errno));
 
         App_MessageBlockManager::instance()->Close(pmb);
@@ -495,14 +472,12 @@ bool CProConsoleHandle::CheckMessage()
         uint8 u1Output = 0;
         uint32 u4Return = (uint32)App_ConsoleManager::instance()->Dispose(m_pPacketParse->GetMessageBody(), pBuffPacket, u1Output);
 
-        if(CONSOLE_MESSAGE_SUCCESS == u4Return)
+        if (CONSOLE_MESSAGE_SUCCESS == u4Return)
         {
-            if(pBuffPacket->GetPacketLen() > 0)
+            if (pBuffPacket->GetPacketLen() > 0
+                && false == SendMessage(dynamic_cast<IBuffPacket*>(pBuffPacket), u1Output))
             {
-                if (false == SendMessage(dynamic_cast<IBuffPacket*>(pBuffPacket), u1Output))
-                {
-                    OUR_DEBUG((LM_INFO, "[CProConsoleHandle::CheckMessage]SendMessage error.\n"));
-                }
+                OUR_DEBUG((LM_INFO, "[CProConsoleHandle::CheckMessage]SendMessage error.\n"));
             }
         }
         else if(CONSOLE_MESSAGE_FAIL == u4Return)

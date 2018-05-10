@@ -28,15 +28,15 @@ public:
 
     int  OpenAddress(const ACE_INET_Addr& AddrLocal, ACE_Proactor* pProactor);
     void Close();
-    bool SendMessage(const char*& pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead = true, uint16 u2CommandID = 0, bool blDlete = true);
+    bool SendMessage(char*& pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead = true, uint16 u2CommandID = 0, bool blDlete = true);
     _ClientConnectInfo GetClientConnectInfo();
     void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);    //获得指定命令统计信息
     void GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut);                    //得到所有的流量信息
 
 private:
-    bool CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len);     //这里解析数据包并放入数据队列
+    bool CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len);              //这里解析数据包并放入数据队列
+    void Recovery_Message(bool blDelete, char*& pMessage);                    //回收用完的char数组
 
-private:
     CPacketParse*           m_pPacketParse;                 //数据包解析类
     ACE_INET_Addr           m_addrRemote;                   //数据发送方的IP信息
     ACE_INET_Addr           m_addrLocal;                    //监听方的IP信息

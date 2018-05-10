@@ -26,7 +26,6 @@ CProConnectHandle::CProConnectHandle(void) : m_u4LocalPort(0), m_u4SendCheckTime
     m_u2SendQueueTimeout  = MAX_QUEUE_TIMEOUT * 1000;  //目前因为记录的是微秒，所以这里相应的扩大1000倍
     m_u2RecvQueueTimeout  = MAX_QUEUE_TIMEOUT * 1000;  //目前因为记录的是微秒，所以这里相应的扩大1000倍
     m_u2TcpNodelay        = TCP_NODELAY_ON;
-    //m_emStatus            = CLIENT_CLOSE_NOTHING;
     m_u4SendMaxBuffSize   = 5*1024;
     m_nHashID             = 0;
     m_szConnectName[0]    = '\0';
@@ -130,29 +129,7 @@ void CProConnectHandle::Close(int nIOCount, int nErrno)
         if (CONNECT_SERVER_CLOSE != m_u1ConnectState)
         {
             //组织数据
-            _MakePacket objMakePacket;
-
-            objMakePacket.m_u4ConnectID = GetConnectID();
-            objMakePacket.m_pPacketParse = NULL;
-            objMakePacket.m_AddrRemote = m_addrRemote;
-            objMakePacket.m_u1Option = PACKET_CDISCONNECT;
-
-            if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
-            {
-                objMakePacket.m_AddrListen.set(m_u4LocalPort);
-            }
-            else
-            {
-                objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
-            }
-
-            //发送客户端链接断开消息。
-            ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-            if (false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-            {
-                OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
-            }
+            Send_MakePacket_Queue(NULL, PACKET_CDISCONNECT);
 
             m_Reader.cancel();
             m_Writer.cancel();
@@ -188,7 +165,7 @@ bool CProConnectHandle::ServerClose(EM_Client_Close_status emStatus, uint8 u1Opt
         if (CLIENT_CLOSE_IMMEDIATLY == emStatus)
         {
             //组织数据
-            _MakePacket objMakePacket;
+            Send_MakePacket_Queue(NULL, u1OptionEvent);
 
             if (PACKET_SDISCONNECT == u1OptionEvent)
             {
@@ -197,29 +174,6 @@ bool CProConnectHandle::ServerClose(EM_Client_Close_status emStatus, uint8 u1Opt
             else
             {
                 OUR_DEBUG((LM_ERROR, "[CProConnectHandle::ServerClose]ConnectID = %d, u1OptionEvent = PACKET_CDISCONNECT.\n", GetConnectID()));
-            }
-
-            objMakePacket.m_u4ConnectID  = GetConnectID();
-            objMakePacket.m_pPacketParse = NULL;
-            objMakePacket.m_u1Option     = u1OptionEvent;
-            objMakePacket.m_AddrRemote   = m_addrRemote;
-
-            if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
-            {
-                objMakePacket.m_AddrListen.set(m_u4LocalPort);
-            }
-            else
-            {
-                objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
-            }
-
-            //发送服务器端链接断开消息。
-            ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-            if (false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-            {
-                OUR_DEBUG((LM_ERROR, "[CProConnectHandle::ServerClose]ConnectID = %d, PACKET_SDISCONNECT is error.\n", GetConnectID()));
-                return false;
             }
 
             m_Reader.cancel();
@@ -276,7 +230,6 @@ uint32 CProConnectHandle::file_open(IFileTestManager* pFileTest)
     m_u8SendQueueTimeCost = 0;
     m_u4SuccessSendSize = 0;
     m_u4ReadSendSize = 0;
-    //m_emStatus = CLIENT_CLOSE_NOTHING;
     m_blIsLog = false;
     m_szConnectName[0] = '\0';
     m_u1IsActive = 1;
@@ -297,29 +250,7 @@ uint32 CProConnectHandle::file_open(IFileTestManager* pFileTest)
     }
 
     //组织数据
-    _MakePacket objMakePacket;
-
-    objMakePacket.m_u4ConnectID = GetConnectID();
-    objMakePacket.m_pPacketParse = NULL;
-    objMakePacket.m_u1Option = PACKET_CONNECT;
-    objMakePacket.m_AddrRemote = m_addrRemote;
-
-    if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
-    {
-        objMakePacket.m_AddrListen.set(m_u4LocalPort);
-    }
-    else
-    {
-        objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
-    }
-
-    //发送链接建立消息。
-    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-    if (false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-    {
-        OUR_DEBUG((LM_ERROR, "[CProConnectHandle::file_open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
-    }
+    Send_MakePacket_Queue(NULL, PACKET_CONNECT);
 
     OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::file_open]Open(%d) Connection from [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
     m_pFileTest = pFileTest;
@@ -462,7 +393,6 @@ int CProConnectHandle::handle_write_file_stream(const char* pData, uint32 u4Size
 void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
-    //OUR_DEBUG((LM_INFO, "[CProConnectHandle::open] [0x%08x]Connection from [%s:%d]\n", this, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
 
     m_atvConnect      = ACE_OS::gettimeofday();
     m_atvInput        = ACE_OS::gettimeofday();
@@ -481,7 +411,6 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
     m_u8SendQueueTimeCost = 0;
     m_u4SuccessSendSize   = 0;
     m_u4ReadSendSize      = 0;
-    //m_emStatus            = CLIENT_CLOSE_NOTHING;
     m_blIsLog             = false;
     m_szConnectName[0]    = '\0';
     m_u1IsActive          = 1;
@@ -548,13 +477,6 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
     //写入连接日志
     AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Connection from [%s:%d]To Server GetHandlerID=%d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), GetHandlerID());
 
-    //ACE_Sig_Action writeAction((ACE_SignalHandler)SIG_IGN);
-    //writeAction.register_action(SIGPIPE, 0);
-
-    //int nTecvBuffSize = MAX_MSG_SOCKETBUFF;
-    //ACE_OS::setsockopt(this->get_handle(), SOL_SOCKET, SO_RCVBUF, (char* )&nTecvBuffSize, sizeof(nTecvBuffSize));
-    //ACE_OS::setsockopt(h, SOL_SOCKET, SO_SNDBUF, (char* )&nTecvBuffSize, sizeof(nTecvBuffSize));
-
     //将这个链接放入链接库
     if(false == App_ProConnectManager::instance()->AddConnect(this))
     {
@@ -565,8 +487,6 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
     }
 
     m_u1ConnectState = CONNECT_OPEN;
-
-    //OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::open] Open(%d).\n", GetConnectID()));
 
     m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
 
@@ -581,46 +501,12 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
     App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Connect(GetConnectID(), GetClientIPInfo(), GetLocalIPInfo());
 
     //组织数据
-    _MakePacket objMakePacket;
-
-    objMakePacket.m_u4ConnectID       = GetConnectID();
-    objMakePacket.m_pPacketParse      = NULL;
-    objMakePacket.m_u1Option          = PACKET_CONNECT;
-    objMakePacket.m_AddrRemote        = m_addrRemote;
-
-    if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
-    {
-        objMakePacket.m_AddrListen.set(m_u4LocalPort);
-    }
-    else
-    {
-        objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
-    }
-
-    //发送链接建立消息。
-    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-    if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-    {
-        OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
-    }
+    Send_MakePacket_Queue(NULL, PACKET_CONNECT);
 
     OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::open]Open(%d) Connection from [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
 
-    if(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
-    {
-        if (false == RecvClinetPacket(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength))
-        {
-            OUR_DEBUG((LM_INFO, "[CProConnectHandle::open](%d)RecvClinetPacket error.\n", GetConnectID()));
-        }
-    }
-    else
-    {
-        if (false == RecvClinetPacket(App_MainConfig::instance()->GetServerRecvBuff()))
-        {
-            OUR_DEBUG((LM_INFO, "[CProConnectHandle::open](%d)RecvClinetPacket error.\n", GetConnectID()));
-        }
-    }
+    //获得接收缓冲区大小
+    Get_Recv_length();
 
     return;
 }
@@ -631,8 +517,6 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
     ACE_Message_Block& mb = result.message_block();
     uint32 u4PacketLen = (uint32)result.bytes_transferred();
     int nTran = (int)result.bytes_transferred();
-
-    //OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::handle_read_stream](%d)  bytes_transferred=%d, bytes_to_read=%d.\n", GetConnectID(),  result.bytes_transferred(), result.bytes_to_read()));
 
     if(!result.success() || result.bytes_transferred() == 0)
     {
@@ -648,42 +532,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
 
     m_atvInput = ACE_OS::gettimeofday();
 
-    //如果是DEBUG状态，记录当前接受包的二进制数据
-    if(App_MainConfig::instance()->GetDebug() == DEBUG_ON || m_blIsLog == true)
-    {
-        char szLog[10]  = {'\0'};
-        int  nDebugSize = 0;
-        bool blblMore   = false;
-
-        if(mb.length() >= m_u4PacketDebugSize)
-        {
-            nDebugSize = m_u4PacketDebugSize - 1;
-            blblMore   = true;
-        }
-        else
-        {
-            nDebugSize = (int)mb.length();
-        }
-
-        char* pData = mb.rd_ptr();
-
-        for(int i = 0; i < nDebugSize; i++)
-        {
-            sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
-            sprintf_safe(m_pPacketDebugData + 5*i, MAX_BUFF_1024 - 5*i, "%s", szLog);
-        }
-
-        m_pPacketDebugData[5 * nDebugSize] = '\0';
-
-        if(blblMore == true)
-        {
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTRECV, "[(%s)%s:%d]%s.(数据包过长只记录前200字节)", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_pPacketDebugData);
-        }
-        else
-        {
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTRECV, "[(%s)%s:%d]%s.", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_pPacketDebugData);
-        }
-    }
+    Output_Debug_Data(&mb, LOG_SYSTEM_DEBUG_CLIENTRECV);
 
     if(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
     {
@@ -704,303 +553,30 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         }
         else if(mb.length() == App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength && m_pPacketParse->GetIsHandleHead())
         {
-            //判断头的合法性
-            _Head_Info objHeadInfo;
-            bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Head_Info(GetConnectID(), &mb, App_MessageBlockManager::instance(), &objHeadInfo);
-
-            if(false == blStateHead)
+            //处理数据包头
+            if (0 != Dispose_Paceket_Parse_Head(&mb))
             {
-                //如果包头是非法的，则返回错误，断开连接。
-                OUR_DEBUG((LM_ERROR, "[CProConnectHandle::handle_read_stream]PacketHead is illegal.\n"));
-
-                //清理PacketParse
-                ClearPacketParse(mb);
-
-                //关闭当前连接
-                Close(2, errno);
                 return;
-            }
-            else
-            {
-                if (NULL == objHeadInfo.m_pmbHead)
-                {
-                    OUR_DEBUG((LM_ERROR, "[CProConnectHandle::RecvData]ConnectID=%d, objHeadInfo.m_pmbHead is NULL.\n", GetConnectID()));
-                }
-
-                m_pPacketParse->SetPacket_IsHandleHead(false);
-                m_pPacketParse->SetPacket_Head_Src_Length(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength);
-                m_pPacketParse->SetPacket_Head_Message(objHeadInfo.m_pmbHead);
-                m_pPacketParse->SetPacket_Head_Curr_Length(objHeadInfo.m_u4HeadCurrLen);
-                m_pPacketParse->SetPacket_Body_Src_Length(objHeadInfo.m_u4BodySrcLen);
-                m_pPacketParse->SetPacket_CommandID(objHeadInfo.m_u2PacketCommandID);
-            }
-
-            //这里添加只处理包头的数据
-            //如果数据只有包头，不需要包体，在这里必须做一些处理，让数据只处理包头就扔到DoMessage()
-            uint32 u4PacketBodyLen = m_pPacketParse->GetPacketBodySrcLen();
-
-            if(u4PacketBodyLen == 0)
-            {
-                //如果只有包头没有包体，则直接丢到逻辑里处理
-                if(false == CheckMessage())
-                {
-                    Close(2);
-                    return;
-                }
-
-                m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
-
-                if(NULL == m_pPacketParse)
-                {
-                    OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::handle_read_stream] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
-
-                    //组织数据
-                    _MakePacket objMakePacket;
-
-                    objMakePacket.m_u4ConnectID       = GetConnectID();
-                    objMakePacket.m_pPacketParse      = NULL;
-                    objMakePacket.m_u1Option          = PACKET_SDISCONNECT;
-                    objMakePacket.m_AddrRemote        = m_addrRemote;
-
-                    if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
-                    {
-                        objMakePacket.m_AddrListen.set(m_u4LocalPort);
-                    }
-                    else
-                    {
-                        objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
-                    }
-
-                    //因为是要关闭连接，所以要多关闭一次IO，对应Open设置的1的初始值
-                    //发送服务器端链接断开消息。
-                    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-                    if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-                    {
-                        OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
-                    }
-
-                    Close(2);
-                    return;
-                }
-
-                Close();
-
-                //接受下一个数据包
-                if (false == RecvClinetPacket(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength))
-                {
-                    OUR_DEBUG((LM_INFO, "[CProConnectHandle::handle_read_stream](%d) RecvClinetPacket error.\n", GetConnectID()));
-                }
-            }
-            else
-            {
-                //如果超过了最大包长度，为非法数据
-                if(u4PacketBodyLen >= m_u4MaxPacketSize)
-                {
-                    OUR_DEBUG((LM_ERROR, "[CProConnectHandle::handle_read_stream]u4PacketHeadLen(%d) more than %d.\n", u4PacketBodyLen, m_u4MaxPacketSize));
-
-                    //清理PacketParse
-                    ClearPacketParse(mb);
-
-                    //关闭当前连接
-                    Close(2, errno);
-                }
-                else
-                {
-                    Close();
-
-                    if (false == RecvClinetPacket(u4PacketBodyLen))
-                    {
-                        OUR_DEBUG((LM_INFO, "[CProConnectHandle::handle_read_stream](%d) RecvClinetPacket u4PacketBodyLen error.\n", GetConnectID()));
-                    }
-                }
             }
         }
         else
         {
-            //接受完整数据完成，开始分析完整数据包
-            _Body_Info obj_Body_Info;
-            bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Body_Info(GetConnectID(), &mb, App_MessageBlockManager::instance(), &obj_Body_Info);
-
-            if(false == blStateBody)
+            //处理数据包体
+            if (0 != Dispose_Paceket_Parse_Body(&mb))
             {
-                //如果数据包体非法，断开连接
-                OUR_DEBUG((LM_ERROR, "[CProConnectHandle::handle_read_stream]SetPacketBody is illegal.\n"));
-
-                //清理PacketParse
-                ClearPacketParse(mb);
-
-                //关闭当前连接
-                Close(2, errno);
                 return;
-            }
-            else
-            {
-                m_pPacketParse->SetPacket_Body_Message(obj_Body_Info.m_pmbBody);
-                m_pPacketParse->SetPacket_Body_Curr_Length(obj_Body_Info.m_u4BodyCurrLen);
-
-                if(obj_Body_Info.m_u2PacketCommandID > 0)
-                {
-                    m_pPacketParse->SetPacket_CommandID(obj_Body_Info.m_u2PacketCommandID);
-                }
-            }
-
-            if(false == CheckMessage())
-            {
-                Close(2);
-                return;
-            }
-
-            m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
-
-            if(NULL == m_pPacketParse)
-            {
-                OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::handle_read_stream] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
-
-                //组织数据
-                _MakePacket objMakePacket;
-
-                objMakePacket.m_u4ConnectID       = GetConnectID();
-                objMakePacket.m_pPacketParse      = NULL;
-                objMakePacket.m_u1Option          = PACKET_SDISCONNECT;
-                objMakePacket.m_AddrRemote = m_addrRemote;
-
-                if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
-                {
-                    objMakePacket.m_AddrListen.set(m_u4LocalPort);
-                }
-                else
-                {
-                    objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
-                }
-
-                //因为是要关闭连接，所以要多关闭一次IO，对应Open设置的1的初始值
-                //发送服务器端链接断开消息。
-                ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-                if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-                {
-                    OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
-                }
-
-                Close(2);
-                return;
-            }
-
-            Close();
-
-            //接受下一个数据包
-            if (false == RecvClinetPacket(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength))
-            {
-                OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open](%d)RecvClinetPacket error.\n", GetConnectID()));
             }
         }
     }
     else
     {
-        //以流模式解析
-        while(true)
+        if (0 != Dispose_Paceket_Parse_Strram(&mb))
         {
-            _Packet_Info obj_Packet_Info;
-            uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Stream(GetConnectID(), &mb, dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info);
-
-            if(PACKET_GET_ENOUGTH == n1Ret)
-            {
-                m_pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
-                m_pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);
-                m_pPacketParse->SetPacket_CommandID(obj_Packet_Info.m_u2PacketCommandID);
-                m_pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4HeadSrcLen);
-                m_pPacketParse->SetPacket_Head_Curr_Length(obj_Packet_Info.m_u4HeadCurrLen);
-                m_pPacketParse->SetPacket_Body_Src_Length(obj_Packet_Info.m_u4BodySrcLen);
-                m_pPacketParse->SetPacket_Body_Curr_Length(obj_Packet_Info.m_u4BodyCurrLen);
-
-                //已经接收了完整数据包，扔给工作线程去处理
-                if(false == CheckMessage())
-                {
-                    App_MessageBlockManager::instance()->Close(&mb);
-
-                    Close(2);
-                    return;
-                }
-
-                m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
-
-                if(NULL == m_pPacketParse)
-                {
-                    OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::handle_read_stream](%d) m_pPacketParse new error.\n", GetConnectID()));
-
-                    //组织数据
-                    _MakePacket objMakePacket;
-
-                    objMakePacket.m_u4ConnectID       = GetConnectID();
-                    objMakePacket.m_pPacketParse      = NULL;
-                    objMakePacket.m_u1Option          = PACKET_SDISCONNECT;
-                    objMakePacket.m_AddrRemote        = m_addrRemote;
-
-                    if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
-                    {
-                        objMakePacket.m_AddrListen.set(m_u4LocalPort);
-                    }
-                    else
-                    {
-                        objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
-                    }
-
-                    //因为是要关闭连接，所以要多关闭一次IO，对应Open设置的1的初始值
-                    //发送服务器端链接断开消息。
-                    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-                    if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-                    {
-                        OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
-                    }
-
-                    App_MessageBlockManager::instance()->Close(&mb);
-
-                    Close(2);
-                    return;
-                }
-
-                //看看是否接收完成了
-                if(mb.length() == 0)
-                {
-                    //OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] length = %d.\n",mb.length()));
-                    App_MessageBlockManager::instance()->Close(&mb);
-                    break;
-                }
-                else
-                {
-                    //还有数据，继续分析
-                    continue;
-                }
-            }
-            else if(PACKET_GET_NO_ENOUGTH == n1Ret)
-            {
-                //OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open]error n1Ret = %d.\n",n1Ret));
-                App_MessageBlockManager::instance()->Close(&mb);
-                //接收的数据不完整，需要继续接收
-                return;
-            }
-            else
-            {
-                //OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open]error n1Ret = %d.\n",n1Ret));
-                App_MessageBlockManager::instance()->Close(&mb);
-                //数据包为错误包，丢弃处理
-                m_pPacketParse->Clear();
-
-                Close(2);
-                return;
-            }
-        }
-
-        Close();
-
-        //接受下一个数据包
-        if (false == RecvClinetPacket(App_MainConfig::instance()->GetServerRecvBuff()))
-        {
-            OUR_DEBUG((LM_INFO, "[CProConnectHandle::open](%d)RecvClinetPacket error.\n", GetConnectID()));
+            return;
         }
     }
+
+    Get_Recv_length();
 
     return;
 }
@@ -1019,11 +595,10 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
 
         OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::handle_write_stream] Connectid=[%d] finish ok...\n", GetConnectID()));
         m_atvOutput = ACE_OS::gettimeofday();
-        //App_MessageBlockManager::instance()->Close(&result.message_block());
+
         //错误消息回调
         App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), &result.message_block(), m_atvOutput);
 
-        //App_MessageBlockManager::instance()->Close(&result.message_block());
 
         return;
     }
@@ -1039,8 +614,6 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
         if(nMessageID > 0)
         {
             //需要回调发送成功回执
-            _MakePacket objMakePacket;
-
             CPacketParse objPacketParse;
             ACE_Message_Block* pMbData = App_MessageBlockManager::instance()->Create(sizeof(int));
             memcpy_safe((char* )&nMessageID, sizeof(int), pMbData->wr_ptr(), sizeof(int));
@@ -1048,27 +621,7 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
             objPacketParse.SetPacket_Head_Message(pMbData);
             objPacketParse.SetPacket_Head_Curr_Length((uint32)pMbData->length());
 
-            objMakePacket.m_u4ConnectID       = GetConnectID();
-            objMakePacket.m_pPacketParse      = &objPacketParse;
-            objMakePacket.m_u1Option          = PACKET_SEND_OK;
-            objMakePacket.m_AddrRemote        = m_addrRemote;
-
-            if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
-            {
-                objMakePacket.m_AddrListen.set(m_u4LocalPort);
-            }
-            else
-            {
-                objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
-            }
-
-            //发送客户端链接断开消息。
-            ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-            if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-            {
-                OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
-            }
+            Send_MakePacket_Queue(&objPacketParse, PACKET_SEND_OK);
 
             //还原消息类型
             result.message_block().msg_type(ACE_Message_Block::MB_DATA);
@@ -1099,12 +652,10 @@ void CProConnectHandle::SetRecvQueueTimeCost(uint32 u4TimeCost)
         AppLogManager::instance()->WriteLog(LOG_SYSTEM_RECVQUEUEERROR, "[TCP]IP=%s,Prot=%d,Timeout=[%d].", GetClientIPInfo().m_szClientIP, GetClientIPInfo().m_nPort, u4TimeCost);
     }
 
-    //OUR_DEBUG((LM_ERROR, "[CProConnectHandle::SetRecvQueueTimeCost]m_u4RecvQueueCount=%d.\n", m_u4RecvQueueCount));
     m_u4RecvQueueCount++;
 
     //测试了几天，感觉这个时间意义，因为获取队列的处理时间片可能很耗时，导致一批数据的阶段性时间增长
     //只要记录超时的数据即可
-    //m_u8RecvQueueTimeCost += u4TimeCost;
 
     Close();
 }
@@ -1121,32 +672,8 @@ void CProConnectHandle::SetSendQueueTimeCost(uint32 u4TimeCost)
         AppLogManager::instance()->WriteLog(LOG_SYSTEM_SENDQUEUEERROR, "[TCP]IP=%s,Prot=%d,Timeout=[%d].", GetClientIPInfo().m_szClientIP, GetClientIPInfo().m_nPort, u4TimeCost);
 
         //组织数据
-        _MakePacket objMakePacket;
-
-        objMakePacket.m_u4ConnectID       = GetConnectID();
-        objMakePacket.m_pPacketParse      = NULL;
-        objMakePacket.m_u1Option          = PACKET_SEND_TIMEOUT;
-        objMakePacket.m_AddrRemote        = m_addrRemote;
-
-        if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
-        {
-            objMakePacket.m_AddrListen.set(m_u4LocalPort);
-        }
-        else
-        {
-            objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
-        }
-
-        //告诉插件连接发送超时阀值报警
-        ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-        if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-        {
-            OUR_DEBUG((LM_ERROR, "[CProConnectHandle::open] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
-        }
+        Send_MakePacket_Queue(NULL, PACKET_SEND_TIMEOUT);
     }
-
-    //m_u8SendQueueTimeCost += u4TimeCost;
 
     Close();
 }
@@ -1163,9 +690,7 @@ uint8 CProConnectHandle::GetSendBuffState()
 
 bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, uint8 u1State, uint8 u1SendType, uint32& u4PacketSize, bool blDelete, int nMessageID)
 {
-    //OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::SendMessage]Connectid=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
-    //OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::SendMessage]Connectid=%d,m_nIOCount=%d 1.\n", GetConnectID(), m_nIOCount));
 
     if(NULL == pBuffPacket)
     {
@@ -1183,10 +708,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
         ACE_Time_Value tvNow = ACE_OS::gettimeofday();
         App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
 
-        if(true == blDelete)
-        {
-            App_BuffPacketManager::instance()->Delete(pBuffPacket);
-        }
+        Recovery_BuffPacket(blDelete, pBuffPacket);
 
         return false;
     }
@@ -1196,224 +718,18 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
         //如果不是直接发送数据，则拼接数据包
         if (u1State == PACKET_SEND_CACHE)
         {
-            //先判断要发送的数据长度，看看是否可以放入缓冲，缓冲是否已经放满。
-            uint32 u4SendPacketSize = 0;
-
-            if (u1SendType == SENDMESSAGE_NOMAL)
-            {
-                u4SendPacketSize = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Make_Send_Packet_Length(GetConnectID(), pBuffPacket->GetPacketLen(), u2CommandID);
-            }
-            else
-            {
-                u4SendPacketSize = (uint32)m_pBlockMessage->length();
-            }
-
-            u4PacketSize = u4SendPacketSize;
-
-            if (u4SendPacketSize + (uint32)m_pBlockMessage->length() >= m_u4SendMaxBuffSize)
-            {
-                OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::SendMessage] Connectid=[%d] m_pBlockMessage is not enougth.\n", GetConnectID()));
-                //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
-                ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
-                memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
-                pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
-                ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-                App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
-
-                if (true == blDelete)
-                {
-                    App_BuffPacketManager::instance()->Delete(pBuffPacket);
-                }
-
-                return false;
-            }
-            else
-            {
-                //添加进缓冲区
-                //SENDMESSAGE_NOMAL是需要包头的时候，否则，不组包直接发送
-                if (u1SendType == SENDMESSAGE_NOMAL)
-                {
-                    //这里组成返回数据包
-                    App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Make_Send_Packet(GetConnectID(), pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), m_pBlockMessage, u2CommandID);
-                }
-                else
-                {
-                    //如果不是SENDMESSAGE_NOMAL，则直接组包
-                    memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)m_pBlockMessage->wr_ptr(), pBuffPacket->GetPacketLen());
-                    m_pBlockMessage->wr_ptr(pBuffPacket->GetPacketLen());
-                }
-            }
-
-            if (true == blDelete)
-            {
-                App_BuffPacketManager::instance()->Delete(pBuffPacket);
-            }
-
-            return true;
+            return Send_Input_To_Cache(u1SendType, u4PacketSize, u2CommandID, blDelete, pBuffPacket);
         }
         else
         {
-            //先判断是否要组装包头，如果需要，则组装在m_pBlockMessage中
-            uint32 u4SendPacketSize = 0;
-            ACE_Message_Block* pMbData = NULL;
-
-            if (u1SendType == SENDMESSAGE_NOMAL)
-            {
-                u4SendPacketSize = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Make_Send_Packet_Length(GetConnectID(), pBuffPacket->GetPacketLen(), u2CommandID);
-
-                if (u4SendPacketSize >= m_u4SendMaxBuffSize)
-                {
-                    OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", GetConnectID(), u4SendPacketSize, m_u4SendMaxBuffSize));
-
-                    if (true == blDelete)
-                    {
-                        //删除发送数据包
-                        App_BuffPacketManager::instance()->Delete(pBuffPacket);
-                    }
-
-                    return false;
-                }
-
-                App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Make_Send_Packet(GetConnectID(), pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), m_pBlockMessage, u2CommandID);
-                //这里MakePacket已经加了数据长度，所以在这里不再追加
-            }
-            else
-            {
-                u4SendPacketSize = (uint32)pBuffPacket->GetPacketLen();
-
-                if (u4SendPacketSize >= m_u4SendMaxBuffSize)
-                {
-                    OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", GetConnectID(), u4SendPacketSize, m_u4SendMaxBuffSize));
-                    //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
-                    ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
-                    memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
-                    pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
-                    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-                    App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
-
-                    if (true == blDelete)
-                    {
-                        //删除发送数据包
-                        App_BuffPacketManager::instance()->Delete(pBuffPacket);
-                    }
-
-                    return false;
-                }
-
-                memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)m_pBlockMessage->wr_ptr(), pBuffPacket->GetPacketLen());
-                m_pBlockMessage->wr_ptr(pBuffPacket->GetPacketLen());
-            }
-
-            //如果之前有缓冲数据，则和缓冲数据一起发送
-            u4PacketSize = (uint32)m_pBlockMessage->length();
-
-            //如果之前有缓冲数据，则和缓冲数据一起发送
-            if (m_pBlockMessage->length() > 0)
-            {
-                //因为是异步发送，发送的数据指针不可以立刻释放，所以需要在这里创建一个新的发送数据块，将数据考入
-                pMbData = App_MessageBlockManager::instance()->Create((uint32)m_pBlockMessage->length());
-
-                if (NULL == pMbData)
-                {
-                    OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::SendMessage] Connectid=[%d] pMbData is NULL.\n", GetConnectID()));
-                    //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
-                    ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
-                    memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
-                    pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
-                    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-                    App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
-
-                    if (true == blDelete)
-                    {
-                        App_BuffPacketManager::instance()->Delete(pBuffPacket);
-                    }
-
-                    return false;
-                }
-
-                memcpy_safe(m_pBlockMessage->rd_ptr(), (uint32)m_pBlockMessage->length(), pMbData->wr_ptr(), (uint32)m_pBlockMessage->length());
-                pMbData->wr_ptr(m_pBlockMessage->length());
-                //放入完成，则清空缓存数据，使命完成
-                m_pBlockMessage->reset();
-            }
-            else
-            {
-                OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::SendMessage] Connectid=[%d](m_pBlockMessage->length() error(%d).\n", GetConnectID(), m_pBlockMessage->length()));
-
-                if (true == blDelete)
-                {
-                    App_BuffPacketManager::instance()->Delete(pBuffPacket);
-                }
-
-                return false;
-            }
-
-            if (true == blDelete)
-            {
-                App_BuffPacketManager::instance()->Delete(pBuffPacket);
-            }
-
-            //判断是否发送完成后关闭连接
-            //if (PACKET_SEND_FIN_CLOSE == u1State)
-            //{
-            //    m_emStatus = CLIENT_CLOSE_SENDOK;
-            //}
-
-            //将消息ID放入MessageBlock
-            ACE_Message_Block::ACE_Message_Type objType = ACE_Message_Block::MB_USER + nMessageID;
-            pMbData->msg_type(objType);
-
-            return PutSendPacket(pMbData,u1State);
+            //要发送数据到对端
+            return Send_Input_To_TCP(u1SendType, u4PacketSize, u2CommandID, u1State, nMessageID, blDelete, pBuffPacket);
         }
     }
     else
     {
         //文件入口，直接写入日志
-        char szLog[10] = { '\0' };
-        uint32 u4DebugSize = 0;
-        bool blblMore = false;
-
-        if (pBuffPacket->GetPacketLen() >= m_u4PacketDebugSize)
-        {
-            u4DebugSize = m_u4PacketDebugSize - 1;
-            blblMore = true;
-        }
-        else
-        {
-            u4DebugSize = (int)pBuffPacket->GetPacketLen();
-        }
-
-        char* pData = (char* )pBuffPacket->GetData();
-
-        for (uint32 i = 0; i < u4DebugSize; i++)
-        {
-            sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
-            sprintf_safe(m_pPacketDebugData + 5 * i, MAX_BUFF_1024 - 5 * i, "0x%02X ", (unsigned char)pData[i]);
-        }
-
-        m_pPacketDebugData[5 * u4DebugSize] = '\0';
-
-        if (blblMore == true)
-        {
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTSEND, "[(%s)%s:%d]%s.(数据包过长)", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_pPacketDebugData);
-        }
-        else
-        {
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTSEND, "[(%s)%s:%d]%s.", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_pPacketDebugData);
-        }
-
-        //回调测试文件管理接口
-        if (NULL != m_pFileTest)
-        {
-            m_pFileTest->HandlerServerResponse(GetConnectID());
-        }
-
-        if (true == blDelete)
-        {
-            App_BuffPacketManager::instance()->Delete(pBuffPacket);
-        }
-
-        return true;
+        return Write_SendData_To_File(blDelete, pBuffPacket);
     }
 }
 
@@ -1425,43 +741,8 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State)
     }
 
     //如果是DEBUG状态，记录当前发送包的二进制数据
-    if(App_MainConfig::instance()->GetDebug() == DEBUG_ON || m_blIsLog == true)
-    {
-        char szLog[10]  = {'\0'};
-        uint32 u4DebugSize = 0;
-        bool blblMore   = false;
+    Output_Debug_Data(pMbData, LOG_SYSTEM_DEBUG_CLIENTSEND);
 
-        if(pMbData->length() >= m_u4PacketDebugSize)
-        {
-            u4DebugSize = m_u4PacketDebugSize - 1;
-            blblMore   = true;
-        }
-        else
-        {
-            u4DebugSize = (int)pMbData->length();
-        }
-
-        char* pData = pMbData->rd_ptr();
-
-        for(uint32 i = 0; i < u4DebugSize; i++)
-        {
-            sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
-            sprintf_safe(m_pPacketDebugData + 5*i, MAX_BUFF_1024 -  5*i, "0x%02X ", (unsigned char)pData[i]);
-        }
-
-        m_pPacketDebugData[5 * u4DebugSize] = '\0';
-
-        if(blblMore == true)
-        {
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTSEND, "[(%s)%s:%d]%s.(数据包过长只记录前200字节)", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_pPacketDebugData);
-        }
-        else
-        {
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTSEND, "[(%s)%s:%d]%s.", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_pPacketDebugData);
-        }
-    }
-
-    //OUR_DEBUG ((LM_ERROR, "[CProConnectHandle::PutSendPacket] Connectid=%d, m_nIOCount=%d!\n", GetConnectID(), m_nIOCount));
     //统计发送数量
     ACE_Date_Time dtNow;
 
@@ -1499,36 +780,13 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State)
         {
             OUR_DEBUG ((LM_ERROR, "[CProConnectHandle::PutSendPacket]ConnectID = %d, SingleConnectMaxSendBuffer is more than(%d)!\n", GetConnectID(), m_u4ReadSendSize - m_u4SuccessSendSize));
             AppLogManager::instance()->WriteLog(LOG_SYSTEM_SENDQUEUEERROR, "]Connection from [%s:%d], SingleConnectMaxSendBuffer is more than(%d)!.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4ReadSendSize - m_u4SuccessSendSize);
-            //App_MessageBlockManager::instance()->Close(pMbData);
 
             //这里发送给插件一个消息，告知插件数据超过阈值
-            _MakePacket objMakePacket;
-
             CPacketParse objPacketParse;
             objPacketParse.SetPacket_Body_Message(pMbData);
             objPacketParse.SetPacket_Body_Curr_Length((uint32)pMbData->length());
 
-            objMakePacket.m_u4ConnectID       = GetConnectID();
-            objMakePacket.m_pPacketParse      = &objPacketParse;
-            objMakePacket.m_u1Option          = PACKET_SEND_TIMEOUT;
-            objMakePacket.m_AddrRemote        = m_addrRemote;
-
-            if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
-            {
-                objMakePacket.m_AddrListen.set(m_u4LocalPort);
-            }
-            else
-            {
-                objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
-            }
-
-            //发送客户端链接断开消息。
-            ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-            if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-            {
-                OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
-            }
+            Send_MakePacket_Queue(&objPacketParse, PACKET_SEND_TIMEOUT);
 
             return false;
         }
@@ -1536,7 +794,6 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State)
         //记录水位标
         m_u4ReadSendSize += (uint32)pMbData->length();
 
-        //OUR_DEBUG ((LM_ERROR, "[CProConnectHandle::PutSendPacket] Connectid=%d, length=%d!\n", GetConnectID(), pMbData->length()));
         if(0 != m_Writer.write(*pMbData, pMbData->length()))
         {
 
@@ -1548,7 +805,6 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State)
         }
         else
         {
-            //OUR_DEBUG ((LM_ERROR, "[CProConnectHandle::PutSendPacket](%s:%d) Send(%d) OK!\n", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), pMbData->length()));
             m_u4AllSendCount += 1;
             m_atvOutput      = ACE_OS::gettimeofday();
 
@@ -1567,10 +823,506 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State)
     }
 }
 
+void CProConnectHandle::Get_Recv_length()
+{
+    if (App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
+    {
+        if (false == RecvClinetPacket(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength))
+        {
+            OUR_DEBUG((LM_INFO, "[CProConnectHandle::open](%d)RecvClinetPacket error.\n", GetConnectID()));
+        }
+    }
+    else
+    {
+        if (false == RecvClinetPacket(App_MainConfig::instance()->GetServerRecvBuff()))
+        {
+            OUR_DEBUG((LM_INFO, "[CProConnectHandle::open](%d)RecvClinetPacket error.\n", GetConnectID()));
+        }
+    }
+}
+
+void CProConnectHandle::Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType)
+{
+    //如果是DEBUG状态，记录当前接受包的二进制数据
+    if (App_MainConfig::instance()->GetDebug() == DEBUG_ON || m_blIsLog == true)
+    {
+        char szLog[10] = { '\0' };
+        int  nDebugSize = 0;
+        bool blblMore = false;
+
+        if (pMbData->length() >= m_u4PacketDebugSize)
+        {
+            nDebugSize = m_u4PacketDebugSize - 1;
+            blblMore = true;
+        }
+        else
+        {
+            nDebugSize = (int)pMbData->length();
+        }
+
+        char* pData = pMbData->rd_ptr();
+
+        for (int i = 0; i < nDebugSize; i++)
+        {
+            sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
+            sprintf_safe(m_pPacketDebugData + 5 * i, MAX_BUFF_1024 - 5 * i, "%s", szLog);
+        }
+
+        m_pPacketDebugData[5 * nDebugSize] = '\0';
+
+        if (blblMore == true)
+        {
+            AppLogManager::instance()->WriteLog(nLogType, "[(%s)%s:%d]%s.(数据包过长只记录前200字节)", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_pPacketDebugData);
+        }
+        else
+        {
+            AppLogManager::instance()->WriteLog(nLogType, "[(%s)%s:%d]%s.", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_pPacketDebugData);
+        }
+    }
+}
+
+int CProConnectHandle::Dispose_Paceket_Parse_Head(ACE_Message_Block* pmb)
+{
+    //判断头的合法性
+    _Head_Info objHeadInfo;
+    bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Head_Info(GetConnectID(), pmb, App_MessageBlockManager::instance(), &objHeadInfo);
+
+    if (false == blStateHead)
+    {
+        //如果包头是非法的，则返回错误，断开连接。
+        OUR_DEBUG((LM_ERROR, "[CProConnectHandle::handle_read_stream]PacketHead is illegal.\n"));
+
+        //清理PacketParse
+        ClearPacketParse(*pmb);
+
+        //关闭当前连接
+        Close(2, errno);
+        return -1;
+    }
+    else
+    {
+        if (NULL == objHeadInfo.m_pmbHead)
+        {
+            OUR_DEBUG((LM_ERROR, "[CProConnectHandle::RecvData]ConnectID=%d, objHeadInfo.m_pmbHead is NULL.\n", GetConnectID()));
+        }
+
+        m_pPacketParse->SetPacket_IsHandleHead(false);
+        m_pPacketParse->SetPacket_Head_Src_Length(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength);
+        m_pPacketParse->SetPacket_Head_Message(objHeadInfo.m_pmbHead);
+        m_pPacketParse->SetPacket_Head_Curr_Length(objHeadInfo.m_u4HeadCurrLen);
+        m_pPacketParse->SetPacket_Body_Src_Length(objHeadInfo.m_u4BodySrcLen);
+        m_pPacketParse->SetPacket_CommandID(objHeadInfo.m_u2PacketCommandID);
+    }
+
+    //这里添加只处理包头的数据
+    //如果数据只有包头，不需要包体，在这里必须做一些处理，让数据只处理包头就扔到DoMessage()
+    uint32 u4PacketBodyLen = m_pPacketParse->GetPacketBodySrcLen();
+
+    if (u4PacketBodyLen == 0)
+    {
+        //如果只有包头没有包体，则直接丢到逻辑里处理
+        if (false == CheckMessage())
+        {
+            Close(2);
+            return -1;
+        }
+
+        m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
+
+        if (NULL == m_pPacketParse)
+        {
+            OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::handle_read_stream] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
+
+            //组织数据
+            Send_MakePacket_Queue(NULL, PACKET_SDISCONNECT);
+
+            Close(2);
+            return -1;
+        }
+
+        Close();
+    }
+    else
+    {
+        //如果超过了最大包长度，为非法数据
+        if (u4PacketBodyLen >= m_u4MaxPacketSize)
+        {
+            OUR_DEBUG((LM_ERROR, "[CProConnectHandle::handle_read_stream]u4PacketHeadLen(%d) more than %d.\n", u4PacketBodyLen, m_u4MaxPacketSize));
+
+            //清理PacketParse
+            ClearPacketParse(*pmb);
+
+            //关闭当前连接
+            Close(2, errno);
+            return -1;
+        }
+        else
+        {
+            Close();
+
+            if (false == RecvClinetPacket(u4PacketBodyLen))
+            {
+                OUR_DEBUG((LM_INFO, "[CProConnectHandle::handle_read_stream](%d) RecvClinetPacket u4PacketBodyLen error.\n", GetConnectID()));
+            }
+        }
+    }
+
+    return 0;
+}
+
+int CProConnectHandle::Dispose_Paceket_Parse_Body(ACE_Message_Block* pmb)
+{
+    //接受完整数据完成，开始分析完整数据包
+    _Body_Info obj_Body_Info;
+    bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Body_Info(GetConnectID(), pmb, App_MessageBlockManager::instance(), &obj_Body_Info);
+
+    if (false == blStateBody)
+    {
+        //如果数据包体非法，断开连接
+        OUR_DEBUG((LM_ERROR, "[CProConnectHandle::handle_read_stream]SetPacketBody is illegal.\n"));
+
+        //清理PacketParse
+        ClearPacketParse(*pmb);
+
+        //关闭当前连接
+        Close(2, errno);
+        return -1;
+    }
+    else
+    {
+        m_pPacketParse->SetPacket_Body_Message(obj_Body_Info.m_pmbBody);
+        m_pPacketParse->SetPacket_Body_Curr_Length(obj_Body_Info.m_u4BodyCurrLen);
+
+        if (obj_Body_Info.m_u2PacketCommandID > 0)
+        {
+            m_pPacketParse->SetPacket_CommandID(obj_Body_Info.m_u2PacketCommandID);
+        }
+    }
+
+    if (false == CheckMessage())
+    {
+        Close(2);
+        return -1;
+    }
+
+    m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
+
+    if (NULL == m_pPacketParse)
+    {
+        OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::handle_read_stream] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
+
+        //组织数据
+        Send_MakePacket_Queue(NULL, PACKET_SDISCONNECT);
+
+        Close(2);
+        return -1;
+    }
+
+    Close();
+    return 0;
+}
+
+int CProConnectHandle::Dispose_Paceket_Parse_Strram(ACE_Message_Block* pCurrMessage)
+{
+    //以流模式解析
+    while (true)
+    {
+        _Packet_Info obj_Packet_Info;
+        uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Stream(GetConnectID(), pCurrMessage, dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info);
+
+        if (PACKET_GET_ENOUGTH == n1Ret)
+        {
+            m_pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
+            m_pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);
+            m_pPacketParse->SetPacket_CommandID(obj_Packet_Info.m_u2PacketCommandID);
+            m_pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4HeadSrcLen);
+            m_pPacketParse->SetPacket_Head_Curr_Length(obj_Packet_Info.m_u4HeadCurrLen);
+            m_pPacketParse->SetPacket_Body_Src_Length(obj_Packet_Info.m_u4BodySrcLen);
+            m_pPacketParse->SetPacket_Body_Curr_Length(obj_Packet_Info.m_u4BodyCurrLen);
+
+            //已经接收了完整数据包，扔给工作线程去处理
+            if (false == CheckMessage())
+            {
+                App_MessageBlockManager::instance()->Close(pCurrMessage);
+
+                Close(2);
+                return -1;
+            }
+
+            m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
+
+            if (NULL == m_pPacketParse)
+            {
+                OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::handle_read_stream](%d) m_pPacketParse new error.\n", GetConnectID()));
+
+                //组织数据
+                Send_MakePacket_Queue(NULL, PACKET_SDISCONNECT);
+
+                App_MessageBlockManager::instance()->Close(pCurrMessage);
+
+                Close(2);
+                return -1;
+            }
+
+            //看看是否接收完成了
+            if (pCurrMessage->length() == 0)
+            {
+                App_MessageBlockManager::instance()->Close(pCurrMessage);
+                break;
+            }
+            else
+            {
+                //还有数据，继续分析
+                continue;
+            }
+        }
+        else if (PACKET_GET_NO_ENOUGTH == n1Ret)
+        {
+            App_MessageBlockManager::instance()->Close(pCurrMessage);
+            //接收的数据不完整，需要继续接收
+            return -1;
+        }
+        else
+        {
+            App_MessageBlockManager::instance()->Close(pCurrMessage);
+            //数据包为错误包，丢弃处理
+            m_pPacketParse->Clear();
+
+            Close(2);
+            return -1;
+        }
+    }
+
+    Close();
+
+    return 0;
+}
+
+void CProConnectHandle::Send_MakePacket_Queue(CPacketParse* m_pPacketParse, uint8 u1Option)
+{
+    //需要回调发送成功回执
+    _MakePacket objMakePacket;
+
+    objMakePacket.m_u4ConnectID     = GetConnectID();
+    objMakePacket.m_pPacketParse    = m_pPacketParse;
+    objMakePacket.m_u1Option        = u1Option;
+    objMakePacket.m_AddrRemote      = m_addrRemote;
+    objMakePacket.m_u4PacketParseID = GetPacketParseInfoID();
+
+    if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
+    {
+        objMakePacket.m_AddrListen.set(m_u4LocalPort);
+    }
+    else
+    {
+        objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
+    }
+
+    //发送客户端链接断开消息。
+    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+
+    if (false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
+    {
+        OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Send_MakePacket_Queue] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
+    }
+}
+
+bool CProConnectHandle::Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPacket)
+{
+    //文件入口，直接写入日志
+    char szLog[10] = { '\0' };
+    uint32 u4DebugSize = 0;
+    bool blblMore = false;
+
+    if (pBuffPacket->GetPacketLen() >= m_u4PacketDebugSize)
+    {
+        u4DebugSize = m_u4PacketDebugSize - 1;
+        blblMore = true;
+    }
+    else
+    {
+        u4DebugSize = (int)pBuffPacket->GetPacketLen();
+    }
+
+    char* pData = (char*)pBuffPacket->GetData();
+
+    for (uint32 i = 0; i < u4DebugSize; i++)
+    {
+        sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
+        sprintf_safe(m_pPacketDebugData + 5 * i, MAX_BUFF_1024 - 5 * i, "0x%02X ", (unsigned char)pData[i]);
+    }
+
+    m_pPacketDebugData[5 * u4DebugSize] = '\0';
+
+    if (blblMore == true)
+    {
+        AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTSEND, "[(%s)%s:%d]%s.(数据包过长)", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_pPacketDebugData);
+    }
+    else
+    {
+        AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTSEND, "[(%s)%s:%d]%s.", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_pPacketDebugData);
+    }
+
+    //回调测试文件管理接口
+    if (NULL != m_pFileTest)
+    {
+        m_pFileTest->HandlerServerResponse(GetConnectID());
+    }
+
+    Recovery_BuffPacket(blDelete, pBuffPacket);
+
+    return true;
+}
+
+bool CProConnectHandle::Send_Input_To_Cache(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, bool blDelete, IBuffPacket* pBuffPacket)
+{
+    //先判断要发送的数据长度，看看是否可以放入缓冲，缓冲是否已经放满。
+    uint32 u4SendPacketSize = 0;
+
+    if (u1SendType == SENDMESSAGE_NOMAL)
+    {
+        u4SendPacketSize = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Make_Send_Packet_Length(GetConnectID(), pBuffPacket->GetPacketLen(), u2CommandID);
+    }
+    else
+    {
+        u4SendPacketSize = (uint32)m_pBlockMessage->length();
+    }
+
+    u4PacketSize = u4SendPacketSize;
+
+    if (u4SendPacketSize + (uint32)m_pBlockMessage->length() >= m_u4SendMaxBuffSize)
+    {
+        OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::SendMessage] Connectid=[%d] m_pBlockMessage is not enougth.\n", GetConnectID()));
+        //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
+        ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
+        memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+        pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
+        ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+        App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
+
+        Recovery_BuffPacket(blDelete, pBuffPacket);
+
+        return false;
+    }
+    else
+    {
+        //添加进缓冲区
+        //SENDMESSAGE_NOMAL是需要包头的时候，否则，不组包直接发送
+        if (u1SendType == SENDMESSAGE_NOMAL)
+        {
+            //这里组成返回数据包
+            App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Make_Send_Packet(GetConnectID(), pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), m_pBlockMessage, u2CommandID);
+        }
+        else
+        {
+            //如果不是SENDMESSAGE_NOMAL，则直接组包
+            memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)m_pBlockMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+            m_pBlockMessage->wr_ptr(pBuffPacket->GetPacketLen());
+        }
+    }
+
+    Recovery_BuffPacket(blDelete, pBuffPacket);
+
+    return true;
+}
+
+bool CProConnectHandle::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, uint8 u1State, int nMessageID, bool blDelete, IBuffPacket* pBuffPacket)
+{
+    //先判断是否要组装包头，如果需要，则组装在m_pBlockMessage中
+    uint32 u4SendPacketSize = 0;
+    ACE_Message_Block* pMbData = NULL;
+
+    if (u1SendType == SENDMESSAGE_NOMAL)
+    {
+        u4SendPacketSize = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Make_Send_Packet_Length(GetConnectID(), pBuffPacket->GetPacketLen(), u2CommandID);
+
+        if (u4SendPacketSize >= m_u4SendMaxBuffSize)
+        {
+            OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", GetConnectID(), u4SendPacketSize, m_u4SendMaxBuffSize));
+
+            Recovery_BuffPacket(blDelete, pBuffPacket);
+
+            return false;
+        }
+
+        App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Make_Send_Packet(GetConnectID(), pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), m_pBlockMessage, u2CommandID);
+        //这里MakePacket已经加了数据长度，所以在这里不再追加
+    }
+    else
+    {
+        u4SendPacketSize = (uint32)pBuffPacket->GetPacketLen();
+
+        if (u4SendPacketSize >= m_u4SendMaxBuffSize)
+        {
+            OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", GetConnectID(), u4SendPacketSize, m_u4SendMaxBuffSize));
+            //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
+            ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
+            memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+            pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
+            ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+            App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
+
+            Recovery_BuffPacket(blDelete, pBuffPacket);
+
+            return false;
+        }
+
+        memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)m_pBlockMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+        m_pBlockMessage->wr_ptr(pBuffPacket->GetPacketLen());
+    }
+
+    //如果之前有缓冲数据，则和缓冲数据一起发送
+    u4PacketSize = (uint32)m_pBlockMessage->length();
+
+    //如果之前有缓冲数据，则和缓冲数据一起发送
+    if (m_pBlockMessage->length() > 0)
+    {
+        //因为是异步发送，发送的数据指针不可以立刻释放，所以需要在这里创建一个新的发送数据块，将数据考入
+        pMbData = App_MessageBlockManager::instance()->Create((uint32)m_pBlockMessage->length());
+
+        if (NULL == pMbData)
+        {
+            OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::SendMessage] Connectid=[%d] pMbData is NULL.\n", GetConnectID()));
+            //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
+            ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
+            memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+            pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
+            ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+            App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
+
+            Recovery_BuffPacket(blDelete, pBuffPacket);
+
+            return false;
+        }
+
+        memcpy_safe(m_pBlockMessage->rd_ptr(), (uint32)m_pBlockMessage->length(), pMbData->wr_ptr(), (uint32)m_pBlockMessage->length());
+        pMbData->wr_ptr(m_pBlockMessage->length());
+        //放入完成，则清空缓存数据，使命完成
+        m_pBlockMessage->reset();
+    }
+    else
+    {
+        OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::SendMessage] Connectid=[%d](m_pBlockMessage->length() error(%d).\n", GetConnectID(), m_pBlockMessage->length()));
+
+        Recovery_BuffPacket(blDelete, pBuffPacket);
+
+        return false;
+    }
+
+    Recovery_BuffPacket(blDelete, pBuffPacket);
+
+    //判断是否发送完成后关闭连接
+
+    //将消息ID放入MessageBlock
+    ACE_Message_Block::ACE_Message_Type objType = ACE_Message_Block::MB_USER + nMessageID;
+    pMbData->msg_type(objType);
+
+    return PutSendPacket(pMbData, u1State);
+}
+
 bool CProConnectHandle::RecvClinetPacket(uint32 u4PackeLen)
 {
     m_nIOCount++;
-    //OUR_DEBUG((LM_ERROR, "[CProConnectHandle::RecvClinetPacket]Connectid=%d, m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
 
     ACE_Message_Block* pmb = App_MessageBlockManager::instance()->Create(u4PackeLen);
 
@@ -1617,7 +1369,6 @@ bool CProConnectHandle::CheckMessage()
 {
     if(m_pPacketParse->GetMessageHead() != NULL)
     {
-        //m_ThreadWriteLock.acquire();
         if(m_pPacketParse->GetMessageBody() == NULL)
         {
             m_u4AllRecvSize += (uint32)m_pPacketParse->GetMessageHead()->length();
@@ -1652,33 +1403,8 @@ bool CProConnectHandle::CheckMessage()
         }
 
         //组织数据
-        _MakePacket objMakePacket;
+        Send_MakePacket_Queue(m_pPacketParse, PACKET_PARSE);
 
-        objMakePacket.m_u4ConnectID       = GetConnectID();
-        objMakePacket.m_pPacketParse      = m_pPacketParse;
-        objMakePacket.m_AddrRemote        = m_addrRemote;
-        objMakePacket.m_u4PacketParseID   = GetPacketParseInfoID();
-
-        if(ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
-        {
-            objMakePacket.m_AddrListen.set(m_u4LocalPort);
-        }
-        else
-        {
-            objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
-        }
-
-        objMakePacket.m_u1Option = PACKET_PARSE;
-
-        //将数据Buff放入消息体中，传递给MakePacket处理。
-        ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-        if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-        {
-            OUR_DEBUG((LM_ERROR, "[CProConnectHandle::CheckMessage] ConnectID = %d, PutMessageBlock is error.\n", GetConnectID()));
-        }
-
-        //OUR_DEBUG((LM_ERROR, "[CProConnectHandle::CheckMessage] ConnectID = %d, put OK.\n", GetConnectID()));
         //更新时间轮盘
         App_ProConnectManager::instance()->SetConnectTimeWheel(this);
 
@@ -1745,7 +1471,6 @@ void CProConnectHandle::ClearPacketParse(ACE_Message_Block& mbCurrBlock)
     {
         if(NULL != &mbCurrBlock && &mbCurrBlock != m_pPacketParse->GetMessageHead() && &mbCurrBlock != m_pPacketParse->GetMessageBody())
         {
-            //OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::handle_read_stream] Message_block release.\n"));
             App_MessageBlockManager::instance()->Close(&mbCurrBlock);
         }
 
@@ -1800,6 +1525,14 @@ void CProConnectHandle::SetLocalIPInfo(const char* pLocalIP, uint32 u4LocalPort)
 void CProConnectHandle::PutSendPacketError(ACE_Message_Block* pMbData)
 {
 
+}
+
+void CProConnectHandle::Recovery_BuffPacket(bool blDelete, IBuffPacket* pBuffPacket)
+{
+    if (true == blDelete)
+    {
+        App_BuffPacketManager::instance()->Delete(pBuffPacket);
+    }
 }
 
 void CProConnectHandle::SetSendCacheManager(ISendCacheManager* pSendCacheManager)
@@ -1886,7 +1619,6 @@ bool CProConnectManager::Close(uint32 u4ConnectID)
 {
     //客户端关闭
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
-    //OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close](%d)Begin.\n", u4ConnectID));
 
     //连接关闭，清除时间轮盘
     CProConnectHandle* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data_By_Uint32(u4ConnectID);
@@ -1909,7 +1641,6 @@ bool CProConnectManager::Close(uint32 u4ConnectID)
     //加入链接统计功能
     App_ConnectAccount::instance()->AddDisConnect();
 
-    //OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close](%d)End.\n", u4ConnectID));
     return true;
 }
 
@@ -2024,7 +1755,6 @@ bool CProConnectManager::AddConnect(uint32 u4ConnectID, CProConnectHandle* pConn
     if(NULL != pCurrConnectHandler)
     {
         sprintf_safe(m_szError, MAX_BUFF_500, "[CProConnectManager::AddConnect] ConnectID[%d] is exist.", u4ConnectID);
-        //m_ThreadWriteLock.release();
         return false;
     }
 
@@ -2047,10 +1777,6 @@ bool CProConnectManager::AddConnect(uint32 u4ConnectID, CProConnectHandle* pConn
     {
         OUR_DEBUG((LM_INFO, "[CProConnectHandle::AddConnect](%d)SetConnectTimeWheel is fail", u4ConnectID));
     }
-
-    //m_ThreadWriteLock.release();
-
-    //OUR_DEBUG((LM_ERROR, "[CProConnectHandle::AddConnect](%d)End.\n", u4ConnectID));
 
     return true;
 }
@@ -2081,8 +1807,6 @@ bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
     m_ThreadWriteLock.acquire();
     CProConnectHandle* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data_By_Uint32(u4ConnectID);
     m_ThreadWriteLock.release();
-
-    //OUR_DEBUG((LM_ERROR,"[CProConnectManager::SendMessage] (%d) Send Begin 1(0x%08x).\n", u4ConnectID, pConnectHandler));
 
     uint32 u4CommandSize = pBuffPacket->GetPacketLen();
 
@@ -2139,7 +1863,6 @@ bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
 
 bool CProConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
-    //OUR_DEBUG((LM_ERROR,"[CProConnectManager::PutMessage]BEGIN.\n"));
     if(NULL == pBuffPacket)
     {
         OUR_DEBUG((LM_ERROR,"[CProConnectManager::PutMessage] pBuffPacket is NULL.\n"));
@@ -2413,7 +2136,6 @@ int CProConnectManager::svc (void)
         ACE_Message_Block* mb = NULL;
         ACE_OS::last_error(0);
 
-        //xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, MAX_MSG_PUTTIMEOUT);
         if(getq(mb, 0) == -1)
         {
             OUR_DEBUG((LM_INFO,"[CProConnectManager::svc] getq is error[%d]!\n", ACE_OS::last_error()));
@@ -2880,7 +2602,6 @@ CProConnectHandle* CProConnectHandlerPool::Create()
 
     //在Hash表中弹出一个已使用的数据
     CProConnectHandle* pHandler = m_objHashHandleList.Pop();
-    //OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Create]pHandler(0x%08x)\n", pHandler));
 
     //没找到空余的
     return pHandler;
@@ -2897,18 +2618,12 @@ bool CProConnectHandlerPool::Delete(CProConnectHandle* pObject)
 
     char szHandlerID[10] = {'\0'};
     sprintf_safe(szHandlerID, 10, "%d", pObject->GetHandlerID());
-    //int nPos = m_objHashHandleList.Add_Hash_Data(szHandlerID, pObject);
     //这里因为内存是固定的，直接写会Hash原有位置
     bool blState = m_objHashHandleList.Push(szHandlerID, pObject);
 
     if(false == blState)
     {
         OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Delete]szHandlerID=%s(0x%08x).\n", szHandlerID, pObject));
-        //m_objHashHandleList.Add_Hash_Data(szHandlerID, pObject);
-    }
-    else
-    {
-        //OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Delete]szHandlerID=%s(0x%08x) nPos=%d.\n", szHandlerID, pObject, nPos));
     }
 
     return true;
@@ -2991,8 +2706,6 @@ bool CProConnectManagerGroup::AddConnect(CProConnectHandle* pConnectHandler)
         return false;
     }
 
-    //OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::Init]u4ConnectID=%d, u2ThreadIndex=%d.\n", u4ConnectID, u2ThreadIndex));
-
     return pConnectManager->AddConnect(u4ConnectID, pConnectHandler);
 }
 
@@ -3045,8 +2758,6 @@ bool CProConnectManagerGroup::PostMessage(uint32 u4ConnectID, IBuffPacket*& pBuf
         return false;
     }
 
-    //OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::PostMessage]u4ConnectID=%d, u2ThreadIndex=%d.\n", u4ConnectID, u2ThreadIndex));
-
     return pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, u1SendState, blDelete, nMessageID);
 }
 
@@ -3069,7 +2780,6 @@ bool CProConnectManagerGroup::PostMessage( uint32 u4ConnectID, const char*& pDat
         return false;
     }
 
-    //OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::PostMessage]u4ConnectID=%d, u2ThreadIndex=%d.\n", u4ConnectID, u2ThreadIndex));
     IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     if(NULL != pBuffPacket)

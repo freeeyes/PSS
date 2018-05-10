@@ -232,6 +232,12 @@
     <ClCompile Include="Console\MessageDispose.cpp">
       <Filter>Console\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="Common\BaseClientConnectManager.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\BaseConsoleHandle.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -578,6 +584,12 @@
     </ClInclude>
     <ClInclude Include="Console\MessageDispose.h">
       <Filter>Console\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\BaseClientConnectManager.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\BaseConsoleHandle.h">
+      <Filter>Common\hfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

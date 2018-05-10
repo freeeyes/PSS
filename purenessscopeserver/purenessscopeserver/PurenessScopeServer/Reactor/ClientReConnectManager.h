@@ -5,8 +5,7 @@
 #include "ace/SOCK_Connector.h"
 
 #include "TimerManager.h"
-#include "IClientManager.h"
-#include "ConnectClient.h"
+#include "BaseClientConnectManager.h"
 #include "ReactorUDPClient.h"
 #include "HashTable.h"
 
@@ -52,7 +51,6 @@ public:
     CClientReConnectManager(void);
     ~CClientReConnectManager(void);
 
-public:
     bool Init(ACE_Reactor* pReactor);
     bool Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, IClientMessage* pClientMessage);                                                             //链接服务器(TCP)
     bool Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage);  //连接服务器(TCP)，指定本地地址

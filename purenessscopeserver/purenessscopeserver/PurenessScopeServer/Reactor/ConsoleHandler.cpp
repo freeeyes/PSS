@@ -52,8 +52,6 @@ void CConsoleHandler::Close(int nIOCount)
 
     m_ThreadLock.release();
 
-    //OUR_DEBUG((LM_ERROR, "[CConsoleHandler::Close]ConnectID=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
-
     //从反应器注销事件
     if (m_nIOCount == 0)
     {
@@ -63,11 +61,9 @@ void CConsoleHandler::Close(int nIOCount)
             App_MessageBlockManager::instance()->Close(m_pCurrMessage);
         }
 
-        //msg_queue()->deactivate();
         SAFE_DELETE(m_pPacketParse);
         shutdown();
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::Close]Close(%d) OK.\n", GetConnectID()));
-        //AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount);
         delete this;
     }
 }
@@ -75,8 +71,6 @@ void CConsoleHandler::Close(int nIOCount)
 bool CConsoleHandler::ServerClose()
 {
     OUR_DEBUG((LM_ERROR, "[CConsoleHandler::ServerClose]Close(%d) OK.\n", GetConnectID()));
-    //AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount);
-    //msg_queue()->deactivate();
     shutdown();
     m_u1ConnectState = CONNECT_SERVER_CLOSE;
     return true;
@@ -140,10 +134,7 @@ int CConsoleHandler::open(void*)
     m_u4AllSendSize   = 0;
     //设置接收缓冲池的大小
     int nTecvBuffSize = MAX_MSG_SOCKETBUFF;
-    //ACE_OS::setsockopt(this->get_handle(), SOL_SOCKET, SO_RCVBUF, (char* )&nTecvBuffSize, sizeof(nTecvBuffSize));
     ACE_OS::setsockopt(this->get_handle(), SOL_SOCKET, SO_SNDBUF, (char*)&nTecvBuffSize, sizeof(nTecvBuffSize));
-    //int nOverTime = MAX_MSG_SENDTIMEOUT;
-    //ACE_OS::setsockopt(this->get_handle(), SOL_SOCKET, SO_SNDTIMEO, (char* )&nOverTime, sizeof(nOverTime));
     m_pPacketParse = new CConsolePacketParse();
 
     if (NULL == m_pPacketParse)
@@ -164,7 +155,6 @@ int CConsoleHandler::open(void*)
         return -1;
     }
 
-    //AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Connection from [%s:%d].",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number());
     m_u1ConnectState = CONNECT_OPEN;
     return nRet;
 }
@@ -175,24 +165,14 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
     m_ThreadLock.acquire();
     m_nIOCount++;
     m_ThreadLock.release();
-    //OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input]ConnectID=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
     ACE_Time_Value nowait(MAX_MSG_PACKETTIMEOUT);
     m_atvInput = ACE_OS::gettimeofday();
 
-    if (fd == ACE_INVALID_HANDLE)
+    if (fd == ACE_INVALID_HANDLE || NULL == m_pPacketParse)
     {
         m_u4CurrSize = 0;
-        OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input]fd == ACE_INVALID_HANDLE.\n"));
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CConsoleHandler::handle_input]fd == ACE_INVALID_HANDLE.");
-        return -1;
-    }
-
-    //判断数据包结构是否为NULL
-    if (m_pPacketParse == NULL)
-    {
-        m_u4CurrSize = 0;
-        OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input]m_pPacketParse == NULL.\n"));
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CConsoleHandler::handle_input]m_pPacketParse == NULL.");
+        OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input]fd == ACE_INVALID_HANDLE or m_pPacketParse is NULL.\n"));
+        sprintf_safe(m_szError, MAX_BUFF_500, "[CConsoleHandler::handle_input]fd == ACE_INVALID_HANDLE or m_pPacketParse is NULL.");
         return -1;
     }
 
@@ -203,24 +183,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input]m_pCurrMessage == NULL.\n"));
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConsoleHandler::handle_input]m_pCurrMessage == NULL.");
 
-        if (m_pPacketParse->GetMessageHead() != NULL)
-        {
-            App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
-        }
-
-        if (m_pPacketParse->GetMessageBody() != NULL)
-        {
-            App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
-        }
-
-        if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageHead() != m_pCurrMessage)
-        {
-            App_MessageBlockManager::instance()->Close(m_pCurrMessage);
-        }
-
-        m_pCurrMessage = NULL;
-
-        SAFE_DELETE(m_pPacketParse);
+        Clear_PacketParse();
         return -1;
     }
 
@@ -232,24 +195,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input][%d] nCurrCount < 0 m_u4CurrSize = %d.\n", GetConnectID(), m_u4CurrSize));
         m_u4CurrSize = 0;
 
-        if (m_pPacketParse->GetMessageHead() != NULL)
-        {
-            App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
-        }
-
-        if (m_pPacketParse->GetMessageBody() != NULL)
-        {
-            App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
-        }
-
-        if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageHead() != m_pCurrMessage)
-        {
-            App_MessageBlockManager::instance()->Close(m_pCurrMessage);
-        }
-
-        m_pCurrMessage = NULL;
-
-        SAFE_DELETE(m_pPacketParse);
+        Clear_PacketParse();
         return -1;
     }
 
@@ -262,24 +208,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input] ConnectID = %d, recv data is error nDataLen = [%d] errno = [%d].\n", GetConnectID(), nDataLen, u4Error));
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConsoleHandler::handle_input] ConnectID = %d, recv data is error[%d].\n", GetConnectID(), nDataLen);
 
-        if (m_pPacketParse->GetMessageHead() != NULL)
-        {
-            App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
-        }
-
-        if (m_pPacketParse->GetMessageBody() != NULL)
-        {
-            App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
-        }
-
-        if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageHead() != m_pCurrMessage)
-        {
-            App_MessageBlockManager::instance()->Close(m_pCurrMessage);
-        }
-
-        m_pCurrMessage = NULL;
-
-        SAFE_DELETE(m_pPacketParse);
+        Clear_PacketParse();
         return -1;
     }
 
@@ -289,7 +218,6 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
     const char* pData = m_pCurrMessage->rd_ptr();
     uint32 u4Len = (uint32)m_pCurrMessage->length();
 
-    //OUR_DEBUG((LM_INFO, "[CConsoleHandler::handle_input]<%d>Data is(%s).\n", nDataLen, pData));
     OUR_DEBUG((LM_INFO, "[CConsoleHandler::handle_input]End is(0x%02x).\n", pData[nDataLen - 1]));
 
     //如果没有读完，短读
@@ -316,40 +244,14 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
             {
                 OUR_DEBUG((LM_INFO, "[CConsoleHandler::handle_input]CheckMessage error.\n"));
 
-                if (m_pPacketParse->GetMessageHead() != NULL)
-                {
-                    App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
-                }
-
-                if (m_pPacketParse->GetMessageBody() != NULL)
-                {
-                    App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
-                }
-
-                if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageHead() != m_pCurrMessage)
-                {
-                    App_MessageBlockManager::instance()->Close(m_pCurrMessage);
-                }
-
-                m_pCurrMessage = NULL;
-
-                SAFE_DELETE(m_pPacketParse);
+                Clear_PacketParse();
                 return -1;
             }
 
         }
 
-        if (m_pPacketParse->GetMessageHead() != NULL)
-        {
-            App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
-        }
+        Clear_PacketParse();
 
-        if (m_pPacketParse->GetMessageBody() != NULL)
-        {
-            App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
-        }
-
-        SAFE_DELETE(m_pPacketParse);
         m_pPacketParse = new CConsolePacketParse();
 
         //申请头的大小对应的mb
@@ -401,34 +303,14 @@ bool CConsoleHandler::SendMessage(IBuffPacket* pBuffPacket, uint8 u1OutputType)
     m_ThreadLock.acquire();
     m_nIOCount++;
     m_ThreadLock.release();
-    //OUR_DEBUG((LM_DEBUG,"[CConsoleHandler::SendMessage]Connectid=%d,m_nIOCount=%d.\n", GetConnectID(), m_nIOCount));
-    CConsolePacketParse PacketParse;
-
-    if (NULL == pBuffPacket)
-    {
-        OUR_DEBUG((LM_DEBUG, "[CConsoleHandler::SendMessage] Connectid=[%d] pBuffPacket is NULL.\n", GetConnectID()));
-        Close();
-        return false;
-    }
 
     ACE_Message_Block* pMbData = NULL;
 
-    if (0 == u1OutputType)
+    if (false == Console_Common_SendMessage_Data_Check(GetConnectID(), pBuffPacket, u1OutputType, pMbData))
     {
-        int nSendLength = PacketParse.MakePacketLength(GetConnectID(), pBuffPacket->GetPacketLen());
-        pMbData = App_MessageBlockManager::instance()->Create(nSendLength);
-
-        //这里组成返回数据包
-        PacketParse.MakePacket(GetConnectID(), pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pMbData);
+        Close();
+        return false;
     }
-    else
-    {
-        pMbData = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
-        memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pMbData->wr_ptr(), pBuffPacket->GetPacketLen());
-        pMbData->wr_ptr(pBuffPacket->GetPacketLen());
-    }
-
-    App_BuffPacketManager::instance()->Delete(pBuffPacket);
 
     if (false == PutSendPacket(pMbData))
     {
@@ -487,16 +369,6 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
 
         if (nDataLen <= 0)
         {
-            /*
-            if (nErr == EWOULDBLOCK)
-            {
-                //如果发送堵塞，则等10毫秒后再发送。
-                ACE_Time_Value tvSleep(0, 10 * MAX_BUFF_1000);
-                ACE_OS::sleep(tvSleep);
-                continue;
-            }
-            */
-
             OUR_DEBUG((LM_ERROR, "[CConsoleHandler::SendPacket] ConnectID = %d, error = %d.\n", GetConnectID(), errno));
             App_MessageBlockManager::instance()->Close(pMbData);
             m_atvOutput      = ACE_OS::gettimeofday();
@@ -505,7 +377,6 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
         }
         else if (nDataLen >= nCurrSendSize)  //当数据包全部发送完毕，清空。
         {
-            //OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_output] ConnectID = %d, send (%d) OK.\n", GetConnectID(), msg_queue()->is_empty()));
             m_u4AllSendCount += 1;
             m_u4AllSendSize  += (uint32)pMbData->length();
             App_MessageBlockManager::instance()->Close(pMbData);
@@ -525,6 +396,28 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
     return true;
 }
 
+void CConsoleHandler::Clear_PacketParse()
+{
+    if (m_pPacketParse->GetMessageHead() != NULL)
+    {
+        App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
+    }
+
+    if (m_pPacketParse->GetMessageBody() != NULL)
+    {
+        App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
+    }
+
+    if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageHead() != m_pCurrMessage)
+    {
+        App_MessageBlockManager::instance()->Close(m_pCurrMessage);
+    }
+
+    m_pCurrMessage = NULL;
+
+    SAFE_DELETE(m_pPacketParse);
+}
+
 bool CConsoleHandler::CheckMessage()
 {
     m_u4AllRecvSize += (uint32)m_pPacketParse->GetMessageHead()->length() + (uint32)m_pPacketParse->GetMessageBody()->length();
@@ -538,12 +431,10 @@ bool CConsoleHandler::CheckMessage()
 
     if (CONSOLE_MESSAGE_SUCCESS == u4Return)
     {
-        if (pBuffPacket->GetPacketLen() > 0)
+        if (pBuffPacket->GetPacketLen() > 0
+            && false == SendMessage(dynamic_cast<IBuffPacket*>(pBuffPacket), u1Output))
         {
-            if (false == SendMessage(dynamic_cast<IBuffPacket*>(pBuffPacket), u1Output))
-            {
-                OUR_DEBUG((LM_INFO, "[CConsoleHandler::CheckMessage]SendMessage error.\n"));
-            }
+            OUR_DEBUG((LM_INFO, "[CConsoleHandler::CheckMessage]SendMessage error.\n"));
         }
     }
     else if(CONSOLE_MESSAGE_FAIL == u4Return)

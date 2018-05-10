@@ -23,7 +23,39 @@
 
 #include "ace/Thread.h"
 #include "ace/Synch.h"
+#else
+//如果是windows
+#include "WindowsProcess.h"
+#include "WindowsDump.h"
+#include <windows.h>
+#endif
 
+//加载所有配置文件中的PacketParse模块
+int Load_PacketParse_Module()
+{
+    App_PacketParseLoader::instance()->Init(App_MainConfig::instance()->GetPacketParseCount());
+
+    for (uint8 i = 0; i < App_MainConfig::instance()->GetPacketParseCount(); i++)
+    {
+        _PacketParseInfo* pPacketParseInfo = App_MainConfig::instance()->GetPacketParseInfo(i);
+        bool blState = App_PacketParseLoader::instance()->LoadPacketInfo(pPacketParseInfo->m_u4PacketID,
+                       pPacketParseInfo->m_u1Type,
+                       pPacketParseInfo->m_u4OrgLength,
+                       pPacketParseInfo->m_szPacketParsePath,
+                       pPacketParseInfo->m_szPacketParseName);
+
+        if (false == blState)
+        {
+            //回收隐式加载PacketParse
+            App_PacketParseLoader::instance()->Close();
+            return -1;
+        }
+    }
+
+    return 0;
+}
+
+#ifndef WIN32
 //关闭消息队列条件变量
 ACE_Thread_Mutex g_mutex;
 ACE_Condition<ACE_Thread_Mutex> g_cond(g_mutex);
@@ -42,7 +74,6 @@ void* thread_Monitor(void* arg)
 
     while(WaitQuitSignal::wait(blFlag))
     {
-        //OUR_DEBUG((LM_INFO, "[thread_Monitor]blFlag=false.\n"));
         sleep(1);
     }
 
@@ -69,7 +100,6 @@ int CheckCoreLimit(int nMaxCoreFile)
         OUR_DEBUG((LM_INFO, "[CheckCoreLimit]** WARNING!WARNING!WARNING!WARNING! **.\n"));
         OUR_DEBUG((LM_INFO, "[CheckCoreLimit]** PSS WILL AUTO UP CORE SIZE LIMIT **.\n"));
         OUR_DEBUG((LM_INFO, "[CheckCoreLimit]** WARNING!WARNING!WARNING!WARNING! **.\n"));
-        //OUR_DEBUG((LM_INFO, "[CheckCoreLimit]rlim.rlim_cur=%d, nMaxOpenFile=%d, openfile is not enougth， please check [ulimit -a].\n", (int)rCorelimit.rlim_cur, nMaxCoreFile));
         rCorelimit.rlim_cur = RLIM_INFINITY;
         rCorelimit.rlim_max = RLIM_INFINITY;
 
@@ -95,7 +125,6 @@ int CheckCoreLimit(int nMaxCoreFile)
         }
     }
 
-    //OUR_DEBUG((LM_INFO, "[CheckCoreLimit]rlim.rlim_cur=%d, nMaxOpenFile=%d, openfile is not enougth， please check [ulimit -a].\n", (int)rCorelimit.rlim_cur, nMaxCoreFile));
     return 0;
 }
 
@@ -197,7 +226,6 @@ int Checkfilelimit(int nMaxOpenFile)
                 return -1;
             }
 
-            //OUR_DEBUG((LM_INFO, "[Checkfilelimit]rlim.rlim_cur=%d, nMaxOpenFile=%d, openfile is not enougth， please check [ulimit -a].\n", (int)rfilelimit.rlim_cur, nMaxOpenFile));
             return 0;
         }
     }
@@ -242,26 +270,11 @@ void Gdaemon()
 int Chlid_Run()
 {
     //显式加载PacketParse
-    App_PacketParseLoader::instance()->Init(App_MainConfig::instance()->GetPacketParseCount());
-
-    for (uint8 i = 0; i < App_MainConfig::instance()->GetPacketParseCount(); i++)
+    if (0 != Load_PacketParse_Module())
     {
-        _PacketParseInfo* pPacketParseInfo = App_MainConfig::instance()->GetPacketParseInfo(i);
-        bool blState = App_PacketParseLoader::instance()->LoadPacketInfo(pPacketParseInfo->m_u4PacketID,
-                       pPacketParseInfo->m_u1Type,
-                       pPacketParseInfo->m_u4OrgLength,
-                       pPacketParseInfo->m_szPacketParsePath,
-                       pPacketParseInfo->m_szPacketParseName);
+        pthread_exit(NULL);
 
-        if (false == blState)
-        {
-            //回收隐式加载PacketParse
-            App_PacketParseLoader::instance()->Close();
-
-            pthread_exit(NULL);
-
-            return 0;
-        }
+        return 0;
     }
 
     //判断是否是需要以服务的状态启动
@@ -271,12 +284,6 @@ int Chlid_Run()
         //daemon(1,1);
         Gdaemon();
     }
-
-    //判断当前并行连接数是否支持框架
-    //if(-1 == Checkfilelimit(App_MainConfig::instance()->GetMaxHandlerCount()))
-    //{
-    //  return 0;
-    //}
 
     //判断当前Core文件尺寸是否需要调整
     if(-1 == CheckCoreLimit(App_MainConfig::instance()->GetCoreFileSize()))
@@ -372,10 +379,6 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 }
 
 #else
-//如果是windows
-#include "WindowsProcess.h"
-#include "WindowsDump.h"
-#include <windows.h>
 
 bool ctrlhandler(DWORD fdwctrltype)
 {
@@ -451,29 +454,14 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
     }
 
     //隐式加载PacketParse
-    App_PacketParseLoader::instance()->Init(App_MainConfig::instance()->GetPacketParseCount());
-
-    for (uint8 i = 0; i < App_MainConfig::instance()->GetPacketParseCount(); i++)
+    if (0 != Load_PacketParse_Module())
     {
-        _PacketParseInfo* pPacketParseInfo = App_MainConfig::instance()->GetPacketParseInfo(i);
-        bool blState = App_PacketParseLoader::instance()->LoadPacketInfo(pPacketParseInfo->m_u4PacketID,
-                       pPacketParseInfo->m_u1Type,
-                       pPacketParseInfo->m_u4OrgLength,
-                       pPacketParseInfo->m_szPacketParsePath,
-                       pPacketParseInfo->m_szPacketParseName);
-
-        if (false == blState)
+        if (App_MainConfig::instance()->GetServerType() == 1)
         {
-            //回收隐式加载PacketParse
-            App_PacketParseLoader::instance()->Close();
-
-            if (App_MainConfig::instance()->GetServerType() == 1)
-            {
-                App_Process::instance()->stopprocesslog();
-            }
-
-            return 0;
+            App_Process::instance()->stopprocesslog();
         }
+
+        return 0;
     }
 
     //判断是否是需要以服务的状态启动

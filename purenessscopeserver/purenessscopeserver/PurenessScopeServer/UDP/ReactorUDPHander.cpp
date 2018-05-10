@@ -106,7 +106,7 @@ void CReactorUDPHander::SetPacketParseInfoID(uint32 u4PacketParseInfoID)
     m_u4PacketParseInfoID = u4PacketParseInfoID;
 }
 
-bool CReactorUDPHander::SendMessage(const char*& pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead, uint16 u2CommandID, bool blDlete)
+bool CReactorUDPHander::SendMessage(char*& pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead, uint16 u2CommandID, bool blDlete)
 {
     ACE_INET_Addr AddrRemote;
     int nErr = AddrRemote.set(nPort, szIP);
@@ -115,10 +115,7 @@ bool CReactorUDPHander::SendMessage(const char*& pMessage, uint32 u4Len, const c
     {
         OUR_DEBUG((LM_INFO, "[CProactorUDPHandler::SendMessage]set_address error[%d].\n", errno));
 
-        if(true == blDlete)
-        {
-            SAFE_DELETE_ARRAY(pMessage);
-        }
+        Recovery_Message(blDlete, pMessage);
 
         return false;
     }
@@ -133,10 +130,7 @@ bool CReactorUDPHander::SendMessage(const char*& pMessage, uint32 u4Len, const c
 
         if(NULL == pMbData)
         {
-            if(true == blDlete)
-            {
-                SAFE_DELETE(pMessage);
-            }
+            Recovery_Message(blDlete, pMessage);
 
             return false;
         }
@@ -151,10 +145,7 @@ bool CReactorUDPHander::SendMessage(const char*& pMessage, uint32 u4Len, const c
             m_u4SendSize += u4Len;
             m_u4SendPacketCount++;
 
-            if(true == blDlete)
-            {
-                SAFE_DELETE_ARRAY(pMessage);
-            }
+            Recovery_Message(blDlete, pMessage);
 
             //统计发送信息
             m_CommandAccount.SaveCommandData(u2CommandID, (uint32)nPort, PACKET_UDP, u4Len, COMMAND_TYPE_OUT);
@@ -168,10 +159,7 @@ bool CReactorUDPHander::SendMessage(const char*& pMessage, uint32 u4Len, const c
         {
             OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::SendMessage]send error(%d).\n", errno));
 
-            if(true == blDlete)
-            {
-                SAFE_DELETE_ARRAY(pMessage);
-            }
+            Recovery_Message(blDlete, pMessage);
 
             //释放发送体
             App_MessageBlockManager::instance()->Close(pMbData);
@@ -189,10 +177,7 @@ bool CReactorUDPHander::SendMessage(const char*& pMessage, uint32 u4Len, const c
             m_u4SendSize += u4Len;
             m_u4SendPacketCount++;
 
-            if (true == blDlete)
-            {
-                SAFE_DELETE_ARRAY(pMessage);
-            }
+            Recovery_Message(blDlete, pMessage);
 
             //统计发送信息
             m_CommandAccount.SaveCommandData(u2CommandID, (uint32)nPort, PACKET_UDP, u4Len, COMMAND_TYPE_OUT);
@@ -203,10 +188,7 @@ bool CReactorUDPHander::SendMessage(const char*& pMessage, uint32 u4Len, const c
         {
             OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::SendMessage]send error(%d).\n", errno));
 
-            if (true == blDlete)
-            {
-                SAFE_DELETE_ARRAY(pMessage);
-            }
+            Recovery_Message(blDlete, pMessage);
 
             return false;
         }
@@ -394,6 +376,14 @@ int CReactorUDPHander::Init_Open_Address(const ACE_INET_Addr& AddrRemote)
     m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
 
     return 0;
+}
+
+void CReactorUDPHander::Recovery_Message(bool blDelete, char*& pMessage)
+{
+    if (true == blDelete)
+    {
+        SAFE_DELETE_ARRAY(pMessage);
+    }
 }
 
 void CReactorUDPHander::GetCommandData(uint16 u2CommandID, _CommandData& objCommandData)

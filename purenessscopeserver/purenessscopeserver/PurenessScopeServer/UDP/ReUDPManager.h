@@ -3,9 +3,6 @@
 
 #include "ReactorUDPHander.h"
 #include "IUDPConnectManager.h"
-#include <vector>
-
-using namespace std;
 
 class CReUDPManager : public IUDPConnectManager
 {
@@ -75,7 +72,7 @@ public:
         }
     }
 
-    bool SendMessage(int nConnectID, const char* pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead = true, uint16 u2CommandID = 0, bool blDlete = true)
+    bool SendMessage(int nConnectID, char*& pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead = true, uint16 u2CommandID = 0, bool blDlete = true)
     {
         ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
 

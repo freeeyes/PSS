@@ -167,303 +167,39 @@ bool CServerManager::Init()
 bool CServerManager::Start()
 {
     //启动TCP监听初始化
-    int nServerPortCount = App_MainConfig::instance()->GetServerPortCount();
+    bool blRet = false;
+    blRet = Start_Tcp_Listen();
 
-    for (int i = 0; i < nServerPortCount; i++)
+    if (false == blRet)
     {
-        ACE_INET_Addr listenAddr;
-        _ServerInfo* pServerInfo = App_MainConfig::instance()->GetServerPort(i);
-
-        if (NULL == pServerInfo)
-        {
-            OUR_DEBUG((LM_INFO, "[CServerManager::Start]pServerInfo [%d] is NULL.\n", i));
-            return false;
-        }
-
-        //判断IPv4还是IPv6
-        int nErr = 0;
-
-        if (pServerInfo->m_u1IPType == TYPE_IPV4)
-        {
-            if (ACE_OS::strcmp(pServerInfo->m_szServerIP, "INADDR_ANY") == 0)
-            {
-                nErr = listenAddr.set(pServerInfo->m_nPort, (uint32)INADDR_ANY);
-            }
-            else
-            {
-                nErr = listenAddr.set(pServerInfo->m_nPort, pServerInfo->m_szServerIP);
-            }
-        }
-        else
-        {
-            if (ACE_OS::strcmp(pServerInfo->m_szServerIP, "INADDR_ANY") == 0)
-            {
-                nErr = listenAddr.set(pServerInfo->m_nPort, (uint32)INADDR_ANY);
-            }
-            else
-            {
-                nErr = listenAddr.set(pServerInfo->m_nPort, pServerInfo->m_szServerIP, 1, PF_INET6);
-            }
-
-        }
-
-        if (nErr != 0)
-        {
-            OUR_DEBUG((LM_INFO, "[CServerManager::Start](%d)set_address error[%d].\n", i, errno));
-            return false;
-        }
-
-        //得到接收器
-        ConnectAcceptor* pConnectAcceptor = App_ConnectAcceptorManager::instance()->GetConnectAcceptor(i);
-
-        if (NULL == pConnectAcceptor)
-        {
-            OUR_DEBUG((LM_INFO, "[CServerManager::Start]pConnectAcceptor[%d] is NULL.\n", i));
-            return false;
-        }
-
-        pConnectAcceptor->SetPacketParseInfoID(pServerInfo->m_u4PacketParseInfoID);
-        int nRet = pConnectAcceptor->Init_Open(listenAddr, 0, 1, 1, (int)App_MainConfig::instance()->GetBacklog());
-
-        if (-1 == nRet)
-        {
-            OUR_DEBUG((LM_INFO, "[CServerManager::Start] pConnectAcceptor->open[%d] is error.\n", i));
-            OUR_DEBUG((LM_INFO, "[CServerManager::Start] Listen from [%s:%d] error(%d).\n", listenAddr.get_host_addr(), listenAddr.get_port_number(), errno));
-            return false;
-        }
-
-        OUR_DEBUG((LM_INFO, "[CServerManager::Start] Listen from [%s:%d] OK.\n", listenAddr.get_host_addr(), listenAddr.get_port_number()));
+        return blRet;
     }
 
     //启动UDP监听
-    int nUDPServerPortCount = App_MainConfig::instance()->GetUDPServerPortCount();
+    blRet = Start_Udp_Listen();
 
-    for (int i = 0; i < nUDPServerPortCount; i++)
+    if (false == blRet)
     {
-        ACE_INET_Addr listenAddr;
-        _ServerInfo* pServerInfo = App_MainConfig::instance()->GetUDPServerPort(i);
-
-        if (NULL == pServerInfo)
-        {
-            OUR_DEBUG((LM_INFO, "[CServerManager::Start]UDP pServerInfo [%d] is NULL.\n", i));
-            return false;
-        }
-
-        int nErr = 0;
-
-        if (pServerInfo->m_u1IPType == TYPE_IPV4)
-        {
-            if (ACE_OS::strcmp(pServerInfo->m_szServerIP, "INADDR_ANY") == 0)
-            {
-                nErr = listenAddr.set(pServerInfo->m_nPort, (uint32)INADDR_ANY);
-            }
-            else
-            {
-                nErr = listenAddr.set(pServerInfo->m_nPort, pServerInfo->m_szServerIP);
-            }
-        }
-        else
-        {
-            if (ACE_OS::strcmp(pServerInfo->m_szServerIP, "INADDR_ANY") == 0)
-            {
-                nErr = listenAddr.set(pServerInfo->m_nPort, (uint32)INADDR_ANY);
-            }
-            else
-            {
-                nErr = listenAddr.set(pServerInfo->m_nPort, pServerInfo->m_szServerIP, 1, PF_INET6);
-            }
-        }
-
-        if (nErr != 0)
-        {
-            OUR_DEBUG((LM_INFO, "[CServerManager::Start]UDP (%d)set_address error[%d].\n", i, errno));
-            return false;
-        }
-
-        //得到接收器
-        CReactorUDPHander* pReactorUDPHandler = App_ReUDPManager::instance()->Create();
-
-        if (NULL == pReactorUDPHandler)
-        {
-            OUR_DEBUG((LM_INFO, "[CServerManager::Start]UDP pReactorUDPHandler[%d] is NULL.\n", i));
-            return false;
-        }
-
-        pReactorUDPHandler->SetPacketParseInfoID(pServerInfo->m_u4PacketParseInfoID);
-        int nRet = pReactorUDPHandler->OpenAddress(listenAddr);
-
-        if (-1 == nRet)
-        {
-            OUR_DEBUG((LM_INFO, "[CServerManager::Start] UDP Listen from [%s:%d] error(%d).\n", listenAddr.get_host_addr(), listenAddr.get_port_number(), errno));
-            return false;
-        }
-
-        OUR_DEBUG((LM_INFO, "[CServerManager::Start] UDP Listen from [%s:%d] OK.\n", listenAddr.get_host_addr(), listenAddr.get_port_number()));
+        return blRet;
     }
 
     //启动后台管理端口监听
-    if (App_MainConfig::instance()->GetConsoleSupport() == CONSOLE_ENABLE)
+    blRet = Start_Console_Tcp_Listen();
+
+    if (false == blRet)
     {
-        ACE_INET_Addr listenConsoleAddr;
-        int nErr = 0;
-
-        if (App_MainConfig::instance()->GetConsoleIPType() == TYPE_IPV4)
-        {
-            if (ACE_OS::strcmp(App_MainConfig::instance()->GetConsoleIP(), "INADDR_ANY") == 0)
-            {
-                nErr = listenConsoleAddr.set(App_MainConfig::instance()->GetConsolePort(), (uint32)INADDR_ANY);
-            }
-            else
-            {
-                nErr = listenConsoleAddr.set(App_MainConfig::instance()->GetConsolePort(), App_MainConfig::instance()->GetConsoleIP());
-            }
-        }
-        else
-        {
-            if (ACE_OS::strcmp(App_MainConfig::instance()->GetConsoleIP(), "INADDR_ANY") == 0)
-            {
-                nErr = listenConsoleAddr.set(App_MainConfig::instance()->GetConsolePort(), (uint32)INADDR_ANY);
-            }
-            else
-            {
-                nErr = listenConsoleAddr.set(App_MainConfig::instance()->GetConsolePort(), App_MainConfig::instance()->GetConsoleIP(), 1, PF_INET6);
-            }
-        }
-
-        if (nErr != 0)
-        {
-            OUR_DEBUG((LM_INFO, "[CServerManager::Start]listenConsoleAddr set_address error[%d].\n", errno));
-            return false;
-        }
-
-        int nRet = m_ConnectConsoleAcceptor.Init_Open(listenConsoleAddr);
-
-        if (-1 == nRet)
-        {
-            OUR_DEBUG((LM_INFO, "[CServerManager::Start] pConnectAcceptor->open is error.\n"));
-            OUR_DEBUG((LM_INFO, "[CServerManager::Start] Listen from [%s:%d] error(%d).\n", listenConsoleAddr.get_host_addr(), listenConsoleAddr.get_port_number(), errno));
-            return false;
-        }
+        return blRet;
     }
 
     if (App_MainConfig::instance()->GetProcessCount() > 1)
     {
-#ifndef WIN32
-        //当前监控子线程个数
-        int nNumChlid = App_MainConfig::instance()->GetProcessCount();
-
-        //检测时间间隔参数
-        //主进程检测时间间隔（设置每隔5秒一次）
-        ACE_Time_Value tvMonitorSleep(5, 0);
-
-        //文件锁
-        int fd_lock = 0;
-
-        int nRet = 0;
-
-        //获得当前路径
-        char szWorkDir[MAX_BUFF_500] = { 0 };
-
-        if (!ACE_OS::getcwd(szWorkDir, sizeof(szWorkDir)))
-        {
-            exit(1);
-        }
-
-        //在Linux下采用多进程的方式启动
-        // 打开（创建）锁文件
-        char szFileName[200] = {'\0'};
-        //memset(szFileName, 0, sizeof(szFileName));
-        sprintf(szFileName, "%s/lockwatch.lk", szWorkDir);
-        fd_lock = open(szFileName, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
-
-        if (fd_lock < 0)
-        {
-            printf("open the flock and exit, errno = %d.\n", errno);
-            exit(1);
-        }
-
-        //查看当前文件锁是否已锁
-        nRet = SeeLock(fd_lock, 0, sizeof(int));
-
-        if (nRet == -1 || nRet == 2)
-        {
-            printf("file is already exist!\n");
-            exit(1);
-        }
-
-        //如果文件锁没锁，则锁住当前文件锁
-        if (AcquireWriteLock(fd_lock, 0, sizeof(int)) != 0)
-        {
-            printf("lock the file failure and exit, idx = 0.\n");
-            exit(1);
-        }
-
-        //写入子进程锁信息
-        lseek(fd_lock, 0, SEEK_SET);
-
-        for (int nIndex = 0; nIndex <= nNumChlid; nIndex++)
-        {
-            ssize_t stWrite = write(fd_lock, &nIndex, sizeof(nIndex));
-
-            if (stWrite <= 0)
-            {
-                printf("lock write fail.\n");
-            }
-        }
-
-        //启动并监控子进程
-        while (1)
-        {
-            for (int nChlidIndex = 1; nChlidIndex <= nNumChlid; nChlidIndex++)
-            {
-                //休眠100ms
-                ACE_Time_Value tvSleep(0, 100000);
-                ACE_OS::sleep(tvSleep);
-
-                //测试每个子进程的锁是否还存在
-                nRet = SeeLock(fd_lock, nChlidIndex * sizeof(int), sizeof(int));
-
-                if (nRet == -1 || nRet == 2)
-                {
-                    continue;
-                }
-
-                //如果文件锁没有被锁，则设置文件锁，并启动子进程
-                int npid = ACE_OS::fork();
-
-                if (npid == 0)
-                {
-                    //上文件锁
-                    if (AcquireWriteLock(fd_lock, nChlidIndex * sizeof(int), sizeof(int)) != 0)
-                    {
-                        printf("child %d AcquireWriteLock failure.\n", nChlidIndex);
-                        exit(1);
-                    }
-
-                    //启动子进程
-                    if (false == Run())
-                    {
-                        printf("child %d Run failure.\n", nChlidIndex);
-                        exit(1);
-                    }
-
-                    //子进程在执行完任务后必须退出循环和释放锁
-                    ReleaseLock(fd_lock, nChlidIndex * sizeof(int), sizeof(int));
-                }
-            }
-
-            //printf("child count(%d) is ok.\n", nNumChlid);
-            //检查间隔
-            ACE_OS::sleep(tvMonitorSleep);
-        }
-
-#endif
+        Multiple_Process_Start();
     }
     else
     {
         if (false == Run())
         {
-            printf("child Run failure.\n");
+            OUR_DEBUG((LM_INFO, "child Run failure.\n"));
             return false;
         }
     }
@@ -622,6 +358,307 @@ bool CServerManager::Run()
     ACE_Thread_Manager::instance()->wait();
 
     return true;
+}
+
+bool CServerManager::Start_Tcp_Listen()
+{
+    int nServerPortCount = App_MainConfig::instance()->GetServerPortCount();
+
+    for (int i = 0; i < nServerPortCount; i++)
+    {
+        ACE_INET_Addr listenAddr;
+        _ServerInfo* pServerInfo = App_MainConfig::instance()->GetServerPort(i);
+
+        if (NULL == pServerInfo)
+        {
+            OUR_DEBUG((LM_INFO, "[CServerManager::Start]pServerInfo [%d] is NULL.\n", i));
+            return false;
+        }
+
+        //判断IPv4还是IPv6
+        int nErr = 0;
+
+        if (pServerInfo->m_u1IPType == TYPE_IPV4)
+        {
+            if (ACE_OS::strcmp(pServerInfo->m_szServerIP, "INADDR_ANY") == 0)
+            {
+                nErr = listenAddr.set(pServerInfo->m_nPort, (uint32)INADDR_ANY);
+            }
+            else
+            {
+                nErr = listenAddr.set(pServerInfo->m_nPort, pServerInfo->m_szServerIP);
+            }
+        }
+        else
+        {
+            if (ACE_OS::strcmp(pServerInfo->m_szServerIP, "INADDR_ANY") == 0)
+            {
+                nErr = listenAddr.set(pServerInfo->m_nPort, (uint32)INADDR_ANY);
+            }
+            else
+            {
+                nErr = listenAddr.set(pServerInfo->m_nPort, pServerInfo->m_szServerIP, 1, PF_INET6);
+            }
+
+        }
+
+        if (nErr != 0)
+        {
+            OUR_DEBUG((LM_INFO, "[CServerManager::Start](%d)set_address error[%d].\n", i, errno));
+            return false;
+        }
+
+        //得到接收器
+        ConnectAcceptor* pConnectAcceptor = App_ConnectAcceptorManager::instance()->GetConnectAcceptor(i);
+
+        if (NULL == pConnectAcceptor)
+        {
+            OUR_DEBUG((LM_INFO, "[CServerManager::Start]pConnectAcceptor[%d] is NULL.\n", i));
+            return false;
+        }
+
+        pConnectAcceptor->SetPacketParseInfoID(pServerInfo->m_u4PacketParseInfoID);
+        int nRet = pConnectAcceptor->Init_Open(listenAddr, 0, 1, 1, (int)App_MainConfig::instance()->GetBacklog());
+
+        if (-1 == nRet)
+        {
+            OUR_DEBUG((LM_INFO, "[CServerManager::Start] pConnectAcceptor->open[%d] is error.\n", i));
+            OUR_DEBUG((LM_INFO, "[CServerManager::Start] Listen from [%s:%d] error(%d).\n", listenAddr.get_host_addr(), listenAddr.get_port_number(), errno));
+            return false;
+        }
+
+        OUR_DEBUG((LM_INFO, "[CServerManager::Start] Listen from [%s:%d] OK.\n", listenAddr.get_host_addr(), listenAddr.get_port_number()));
+    }
+
+    return true;
+}
+
+bool CServerManager::Start_Udp_Listen()
+{
+    int nUDPServerPortCount = App_MainConfig::instance()->GetUDPServerPortCount();
+
+    for (int i = 0; i < nUDPServerPortCount; i++)
+    {
+        ACE_INET_Addr listenAddr;
+        _ServerInfo* pServerInfo = App_MainConfig::instance()->GetUDPServerPort(i);
+
+        if (NULL == pServerInfo)
+        {
+            OUR_DEBUG((LM_INFO, "[CServerManager::Start]UDP pServerInfo [%d] is NULL.\n", i));
+            return false;
+        }
+
+        int nErr = 0;
+
+        if (pServerInfo->m_u1IPType == TYPE_IPV4)
+        {
+            if (ACE_OS::strcmp(pServerInfo->m_szServerIP, "INADDR_ANY") == 0)
+            {
+                nErr = listenAddr.set(pServerInfo->m_nPort, (uint32)INADDR_ANY);
+            }
+            else
+            {
+                nErr = listenAddr.set(pServerInfo->m_nPort, pServerInfo->m_szServerIP);
+            }
+        }
+        else
+        {
+            if (ACE_OS::strcmp(pServerInfo->m_szServerIP, "INADDR_ANY") == 0)
+            {
+                nErr = listenAddr.set(pServerInfo->m_nPort, (uint32)INADDR_ANY);
+            }
+            else
+            {
+                nErr = listenAddr.set(pServerInfo->m_nPort, pServerInfo->m_szServerIP, 1, PF_INET6);
+            }
+        }
+
+        if (nErr != 0)
+        {
+            OUR_DEBUG((LM_INFO, "[CServerManager::Start]UDP (%d)set_address error[%d].\n", i, errno));
+            return false;
+        }
+
+        //得到接收器
+        CReactorUDPHander* pReactorUDPHandler = App_ReUDPManager::instance()->Create();
+
+        if (NULL == pReactorUDPHandler)
+        {
+            OUR_DEBUG((LM_INFO, "[CServerManager::Start]UDP pReactorUDPHandler[%d] is NULL.\n", i));
+            return false;
+        }
+
+        pReactorUDPHandler->SetPacketParseInfoID(pServerInfo->m_u4PacketParseInfoID);
+        int nRet = pReactorUDPHandler->OpenAddress(listenAddr);
+
+        if (-1 == nRet)
+        {
+            OUR_DEBUG((LM_INFO, "[CServerManager::Start] UDP Listen from [%s:%d] error(%d).\n", listenAddr.get_host_addr(), listenAddr.get_port_number(), errno));
+            return false;
+        }
+
+        OUR_DEBUG((LM_INFO, "[CServerManager::Start] UDP Listen from [%s:%d] OK.\n", listenAddr.get_host_addr(), listenAddr.get_port_number()));
+    }
+
+    return true;
+}
+
+bool CServerManager::Start_Console_Tcp_Listen()
+{
+    if (App_MainConfig::instance()->GetConsoleSupport() == CONSOLE_ENABLE)
+    {
+        ACE_INET_Addr listenConsoleAddr;
+        int nErr = 0;
+
+        if (App_MainConfig::instance()->GetConsoleIPType() == TYPE_IPV4)
+        {
+            if (ACE_OS::strcmp(App_MainConfig::instance()->GetConsoleIP(), "INADDR_ANY") == 0)
+            {
+                nErr = listenConsoleAddr.set(App_MainConfig::instance()->GetConsolePort(), (uint32)INADDR_ANY);
+            }
+            else
+            {
+                nErr = listenConsoleAddr.set(App_MainConfig::instance()->GetConsolePort(), App_MainConfig::instance()->GetConsoleIP());
+            }
+        }
+        else
+        {
+            if (ACE_OS::strcmp(App_MainConfig::instance()->GetConsoleIP(), "INADDR_ANY") == 0)
+            {
+                nErr = listenConsoleAddr.set(App_MainConfig::instance()->GetConsolePort(), (uint32)INADDR_ANY);
+            }
+            else
+            {
+                nErr = listenConsoleAddr.set(App_MainConfig::instance()->GetConsolePort(), App_MainConfig::instance()->GetConsoleIP(), 1, PF_INET6);
+            }
+        }
+
+        if (nErr != 0)
+        {
+            OUR_DEBUG((LM_INFO, "[CServerManager::Start]listenConsoleAddr set_address error[%d].\n", errno));
+            return false;
+        }
+
+        int nRet = m_ConnectConsoleAcceptor.Init_Open(listenConsoleAddr);
+
+        if (-1 == nRet)
+        {
+            OUR_DEBUG((LM_INFO, "[CServerManager::Start] pConnectAcceptor->open is error.\n"));
+            OUR_DEBUG((LM_INFO, "[CServerManager::Start] Listen from [%s:%d] error(%d).\n", listenConsoleAddr.get_host_addr(), listenConsoleAddr.get_port_number(), errno));
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void CServerManager::Multiple_Process_Start()
+{
+#ifndef WIN32
+    //当前监控子线程个数
+    int nNumChlid = App_MainConfig::instance()->GetProcessCount();
+
+    //检测时间间隔参数
+    //主进程检测时间间隔（设置每隔5秒一次）
+    ACE_Time_Value tvMonitorSleep(5, 0);
+
+    //文件锁
+    int fd_lock = 0;
+
+    int nRet = 0;
+
+    //获得当前路径
+    char szWorkDir[MAX_BUFF_500] = { 0 };
+
+    if (!ACE_OS::getcwd(szWorkDir, sizeof(szWorkDir)))
+    {
+        exit(1);
+    }
+
+    //在Linux下采用多进程的方式启动
+    // 打开（创建）锁文件
+    char szFileName[200] = { '\0' };
+    //memset(szFileName, 0, sizeof(szFileName));
+    sprintf(szFileName, "%s/lockwatch.lk", szWorkDir);
+    fd_lock = open(szFileName, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+
+    if (fd_lock < 0)
+    {
+        printf("open the flock and exit, errno = %d.\n", errno);
+        exit(1);
+    }
+
+    //查看当前文件锁是否已锁
+    nRet = SeeLock(fd_lock, 0, sizeof(int));
+
+    if (nRet == -1 || nRet == 2)
+    {
+        printf("file is already exist!\n");
+        exit(1);
+    }
+
+    //如果文件锁没锁，则锁住当前文件锁
+    if (AcquireWriteLock(fd_lock, 0, sizeof(int)) != 0)
+    {
+        printf("lock the file failure and exit, idx = 0.\n");
+        exit(1);
+    }
+
+    //写入子进程锁信息
+    lseek(fd_lock, 0, SEEK_SET);
+
+    for (int nIndex = 0; nIndex <= nNumChlid; nIndex++)
+    {
+        write(fd_lock, &nIndex, sizeof(nIndex));
+    }
+
+    //启动并监控子进程
+    while (1)
+    {
+        for (int nChlidIndex = 1; nChlidIndex <= nNumChlid; nChlidIndex++)
+        {
+            //休眠100ms
+            ACE_Time_Value tvSleep(0, 100000);
+            ACE_OS::sleep(tvSleep);
+
+            //测试每个子进程的锁是否还存在
+            nRet = SeeLock(fd_lock, nChlidIndex * sizeof(int), sizeof(int));
+
+            if (nRet == -1 || nRet == 2)
+            {
+                continue;
+            }
+
+            //如果文件锁没有被锁，则设置文件锁，并启动子进程
+            int npid = ACE_OS::fork();
+
+            if (npid == 0)
+            {
+                //上文件锁
+                if (AcquireWriteLock(fd_lock, nChlidIndex * sizeof(int), sizeof(int)) != 0)
+                {
+                    printf("child %d AcquireWriteLock failure.\n", nChlidIndex);
+                    exit(1);
+                }
+
+                //启动子进程
+                if (false == Run())
+                {
+                    printf("child %d Run failure.\n", nChlidIndex);
+                    exit(1);
+                }
+
+                //子进程在执行完任务后必须退出循环和释放锁
+                ReleaseLock(fd_lock, nChlidIndex * sizeof(int), sizeof(int));
+            }
+        }
+
+        //printf("child count(%d) is ok.\n", nNumChlid);
+        //检查间隔
+        ACE_OS::sleep(tvMonitorSleep);
+    }
+
+#endif
 }
 
 bool CServerManager::Close()

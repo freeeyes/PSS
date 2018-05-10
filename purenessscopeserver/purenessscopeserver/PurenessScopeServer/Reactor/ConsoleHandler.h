@@ -15,11 +15,9 @@
 #include "AceReactorManager.h"
 #include "MessageService.h"
 #include "IConnectManager.h"
+#include "BaseConsoleHandle.h"
 #include "ConsoleMessage.h"
-#include "MessageBlockManager.h"
 #include "PacketConsoleParse.h"
-#include "BuffPacketManager.h"
-#include "MessageBlockManager.h"
 
 class CConsoleHandler : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>
 {
@@ -47,8 +45,9 @@ public:
 private:
     bool CheckMessage();                                                      //处理接收的数据
     bool PutSendPacket(ACE_Message_Block* pMbData);                           //发送数据
+    void Clear_PacketParse();                                                 //清理不需要的PacketParse
 
-private:
+
     uint32                     m_u4HandlerID;                  //此Hander生成时的ID
     uint32                     m_u4ConnectID;                  //链接的ID
     uint32                     m_u4AllRecvCount;               //当前链接接收数据包的个数
