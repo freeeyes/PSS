@@ -10,7 +10,7 @@
 
 #include "TimerManager.h"
 #include "ProAsynchConnect.h"
-#include "IClientManager.h"
+#include "BaseClientConnectManager.h"
 #include "ProactorUDPClient.h"
 #include "HashTable.h"
 

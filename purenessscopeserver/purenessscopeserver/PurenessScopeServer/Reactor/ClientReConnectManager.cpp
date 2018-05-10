@@ -70,8 +70,6 @@ bool CReactorClientInfo::Run(bool blIsReady, EM_Server_Connect_State emState)
 
     if (blIsReady == true && SERVER_CONNECT_FIRST != m_emConnectState && SERVER_CONNECT_RECONNECT != m_emConnectState)
     {
-        //OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]AAAAAAA.\n"));
-
         if (true == m_blIsLocal)
         {
             //需要指定接入端口
@@ -113,28 +111,14 @@ bool CReactorClientInfo::SendData(ACE_Message_Block* pmblk)
 
         if (NULL == m_pConnectClient)
         {
-            if(SERVER_CONNECT_FIRST != m_emConnectState && SERVER_CONNECT_RECONNECT != m_emConnectState)
-            {
-                //如果连接不存在，则建立链接。
-                if (false == Run(true, SERVER_CONNECT_RECONNECT))
-                {
-                    OUR_DEBUG((LM_INFO, "[CReactorClientInfo::SendData]Run error.\n"));
-                }
-            }
+            //发送连接建立无信息
+            Common_Send_ConnectError(pmblk, m_AddrServer, m_pClientMessage);
 
-            if (NULL != pmblk)
+            if (SERVER_CONNECT_FIRST != m_emConnectState
+                && SERVER_CONNECT_RECONNECT != m_emConnectState
+                && false == Run(true, SERVER_CONNECT_RECONNECT))
             {
-                App_MessageBlockManager::instance()->Close(pmblk);
-            }
-
-            //如果消息有处理接口，则返回失败接口
-            if (NULL != m_pClientMessage)
-            {
-                //服务器已经断开，需要等待重新连接的结果
-                _ClientIPInfo objServerIPInfo;
-                sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_AddrServer.get_host_addr());
-                objServerIPInfo.m_nPort = m_AddrServer.get_port_number();
-                m_pClientMessage->ConnectError(101, objServerIPInfo);
+                OUR_DEBUG((LM_INFO, "[CReactorClientInfo::SendData]Run error.\n"));
             }
 
             return false;
@@ -145,17 +129,10 @@ bool CReactorClientInfo::SendData(ACE_Message_Block* pmblk)
     {
         //调用数据发送组装
         ACE_Message_Block* pSend = NULL;
-        bool blRet = m_pClientMessage->Send_Format_data(pmblk->rd_ptr(), (uint32)pmblk->length(), App_MessageBlockManager::instance(), pSend);
 
-        if(false == blRet)
+        if (false == Common_Send_Data(pmblk, m_pClientMessage, pSend))
         {
-            App_MessageBlockManager::instance()->Close(pmblk);
-            App_MessageBlockManager::instance()->Close(pSend);
             return false;
-        }
-        else
-        {
-            App_MessageBlockManager::instance()->Close(pmblk);
         }
 
         //发送数据
@@ -175,10 +152,9 @@ int CReactorClientInfo::GetServerID()
 
 bool CReactorClientInfo::Close()
 {
-    //OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::Close]Begin.\n"));
     if (NULL != m_pConnectClient)
     {
-        //OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::Close]End 2.\n"));
+
         SetConnectClient(NULL);
     }
 
