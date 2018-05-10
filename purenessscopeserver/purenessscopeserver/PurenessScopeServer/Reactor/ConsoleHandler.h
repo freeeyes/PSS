@@ -15,11 +15,9 @@
 #include "AceReactorManager.h"
 #include "MessageService.h"
 #include "IConnectManager.h"
+#include "BaseConsoleHandle.h"
 #include "ConsoleMessage.h"
-#include "MessageBlockManager.h"
 #include "PacketConsoleParse.h"
-#include "BuffPacketManager.h"
-#include "MessageBlockManager.h"
 
 class CConsoleHandler : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>
 {
