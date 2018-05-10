@@ -18,7 +18,7 @@ void Common_Send_ConnectError(ACE_Message_Block* pmblk, ACE_INET_Addr& objAddrSe
     }
 }
 
-bool Common_Send_Data(ACE_Message_Block* pmblk, IClientMessage* pClientMessage, ACE_Message_Block* pSend)
+bool Common_Send_Data(ACE_Message_Block* pmblk, IClientMessage* pClientMessage, ACE_Message_Block*& pSend)
 {
     ACE_Message_Block* pSend = NULL;
     bool blRet = pClientMessage->Send_Format_data(pmblk->rd_ptr(), (uint32)pmblk->length(), App_MessageBlockManager::instance(), pSend);
