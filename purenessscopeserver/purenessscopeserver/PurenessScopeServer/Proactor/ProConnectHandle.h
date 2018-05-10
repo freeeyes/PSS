@@ -88,6 +88,17 @@ public:
     uint32 GetPacketParseInfoID();                                            //获得相应的m_u4PacketParseInfoID
 
 private:
+    void Get_Recv_length();                                                  //得到要处理的数据长度
+    void Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType);        //输出DEBUG信息
+    int  Dispose_Paceket_Parse_Head(ACE_Message_Block* pmb);                 //处理消息头函数
+    int  Dispose_Paceket_Parse_Body(ACE_Message_Block* pmb);                 //处理消息头函数
+    int  Dispose_Paceket_Parse_Strram(ACE_Message_Block* pCurrMessage);      //处理流消息函数
+
+    void Send_MakePacket_Queue(CPacketParse* m_pPacketParse, uint8 u1Option); //将数据发送入工作线程消息队列
+    bool Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPacket);                                                                //将发送数据写入文件
+    bool Send_Input_To_Cache(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, bool blDelete, IBuffPacket* pBuffPacket);       //讲发送对象放入缓存
+    bool Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, uint8 u1State, int nMessageID, bool blDelete, IBuffPacket* pBuffPacket);         //将数据发送给对端
+
     bool RecvClinetPacket(uint32 u4PackeLen);                                 //接受数据包
     bool CheckMessage();                                                      //处理接收的数据
     bool PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State);            //将发送数据发送出去

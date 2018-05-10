@@ -443,7 +443,7 @@ int CConnectHandler::Dispose_Recv_Data()
     else
     {
         //以流模式解析
-        if (-1 == Dispose_Paceket_Parse_Strram())
+        if (-1 == Dispose_Paceket_Parse_Strram(m_pCurrMessage))
         {
             return -1;
         }
@@ -473,10 +473,11 @@ void CConnectHandler::Send_MakePacket_Queue(CPacketParse* m_pPacketParse, uint8 
     //组织数据
     _MakePacket objMakePacket;
 
-    objMakePacket.m_u4ConnectID = GetConnectID();
-    objMakePacket.m_pPacketParse = m_pPacketParse;
-    objMakePacket.m_u1Option = u1Option;
-    objMakePacket.m_AddrRemote = m_addrRemote;
+    objMakePacket.m_u4ConnectID     = GetConnectID();
+    objMakePacket.m_pPacketParse    = m_pPacketParse;
+    objMakePacket.m_u1Option        = u1Option;
+    objMakePacket.m_AddrRemote      = m_addrRemote;
+    objMakePacket.m_u4PacketParseID = GetPacketParseInfoID();
 
     if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
     {
@@ -719,39 +720,12 @@ int CConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Size, 
     else
     {
         //流模式处理文件数据
-        ACE_Message_Block* pMbStream = App_MessageBlockManager::instance()->Create(u4Size);
+        ACE_Message_Block* pCurrMessage = App_MessageBlockManager::instance()->Create(u4Size);
+        memcpy_safe((char*)pData, u4Size, pCurrMessage->wr_ptr(), u4Size);
+        pCurrMessage->wr_ptr(u4Size);
 
-        memcpy_safe((char*)pData, u4Size, pMbStream->wr_ptr(), u4Size);
-
-        _Packet_Info obj_Packet_Info;
-        uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Stream(GetConnectID(), pMbStream, dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info);
-
-        if (PACKET_GET_ENOUGTH == n1Ret)
+        if (-1 == Dispose_Paceket_Parse_Strram(pCurrMessage))
         {
-            m_pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
-            m_pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);
-            m_pPacketParse->SetPacket_CommandID(obj_Packet_Info.m_u2PacketCommandID);
-            m_pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4HeadSrcLen);
-            m_pPacketParse->SetPacket_Head_Curr_Length(obj_Packet_Info.m_u4HeadCurrLen);
-            m_pPacketParse->SetPacket_Body_Src_Length(obj_Packet_Info.m_u4BodySrcLen);
-            m_pPacketParse->SetPacket_Body_Curr_Length(obj_Packet_Info.m_u4BodyCurrLen);
-
-            //已经接收了完整数据包，扔给工作线程去处理
-            if (false == CheckMessage())
-            {
-                OUR_DEBUG((LM_ERROR, "[CProConnectHandle::handle_write_file_stream]CheckMessage is false.\n"));
-                return -1;
-            }
-
-        }
-        else if (PACKET_GET_NO_ENOUGTH == n1Ret)
-        {
-            return 0;
-        }
-        else
-        {
-            OUR_DEBUG((LM_ERROR, "[CProConnectHandle::handle_write_file_stream]Parse_Packet_Stream is PACKET_GET_ERROR.\n"));
-            ClearPacketParse();
             return -1;
         }
     }
@@ -1213,12 +1187,12 @@ int CConnectHandler::Dispose_Paceket_Parse_Body()
     return 0;
 }
 
-int CConnectHandler::Dispose_Paceket_Parse_Strram()
+int CConnectHandler::Dispose_Paceket_Parse_Strram(ACE_Message_Block* pCurrMessage)
 {
     while (true)
     {
         _Packet_Info obj_Packet_Info;
-        uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Stream(GetConnectID(), m_pCurrMessage, dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info);
+        uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Stream(GetConnectID(), pCurrMessage, dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info);
 
         if (PACKET_GET_ENOUGTH == n1Ret)
         {
@@ -1247,7 +1221,7 @@ int CConnectHandler::Dispose_Paceket_Parse_Strram()
             }
 
             //看看是否接收完成了
-            if (m_pCurrMessage->length() == 0)
+            if (pCurrMessage->length() == 0)
             {
                 break;
             }
@@ -1265,7 +1239,14 @@ int CConnectHandler::Dispose_Paceket_Parse_Strram()
         {
             m_pPacketParse->Clear();
 
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %dws, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %dws.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount, (uint32)m_u8RecvQueueTimeCost, m_u4RecvQueueCount, (uint32)m_u8SendQueueTimeCost);
+            AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %dws, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %dws.",
+                                                m_addrRemote.get_host_addr(),
+                                                m_addrRemote.get_port_number(),
+                                                m_u4AllRecvSize, m_u4AllRecvCount,
+                                                m_u4AllSendSize, m_u4AllSendCount,
+                                                (uint32)m_u8RecvQueueTimeCost,
+                                                m_u4RecvQueueCount,
+                                                (uint32)m_u8SendQueueTimeCost);
             OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvData] pmb new is NULL.\n"));
             return -1;
         }
@@ -1620,32 +1601,17 @@ bool CConnectHandler::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, 
                 return false;
             }
 
-            ACE_Message_Block::ACE_Message_Type objType = ACE_Message_Block::MB_STOP;
-            pMbData->msg_type(objType);
-
-            //将消息放入队列，让output在反应器线程发送。
-            ACE_Time_Value xtime = ACE_OS::gettimeofday();
-
-            //队列已满，不能再放进去了,就不放进去了
-            if (msg_queue()->is_full() == true)
-            {
-                OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendMessage] Connectid=%d,putq is full(%d).\n", GetConnectID(), msg_queue()->message_count()));
-                App_MessageBlockManager::instance()->Close(pMbData);
-                return false;
-            }
-
-            if (this->putq(pMbData, &xtime) == -1)
-            {
-                OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendMessage] Connectid=%d,putq(%d) output errno = [%d].\n", GetConnectID(), msg_queue()->message_count(), errno));
-                App_MessageBlockManager::instance()->Close(pMbData);
-            }
+            //添加关闭socket指令
+            SendCloseMessage();
         }
-
-        int nWakeupRet = reactor()->schedule_wakeup(this, ACE_Event_Handler::WRITE_MASK);
-
-        if (-1 == nWakeupRet)
+        else
         {
-            OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendMessage] Connectid=%d, nWakeupRet(%d) output errno = [%d].\n", GetConnectID(), nWakeupRet, errno));
+            int nWakeupRet = reactor()->schedule_wakeup(this, ACE_Event_Handler::WRITE_MASK);
+
+            if (-1 == nWakeupRet)
+            {
+                OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendMessage] Connectid=%d, nWakeupRet(%d) output errno = [%d].\n", GetConnectID(), nWakeupRet, errno));
+            }
         }
     }
 

@@ -95,7 +95,7 @@ private:
     void Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType);        //输出DEBUG信息
     int  Dispose_Paceket_Parse_Head();                                       //处理消息头函数
     int  Dispose_Paceket_Parse_Body();                                       //处理消息头函数
-    int  Dispose_Paceket_Parse_Strram();                                     //处理流消息函数
+    int  Dispose_Paceket_Parse_Strram(ACE_Message_Block* pCurrMessage);      //处理流消息函数
     bool CheckMessage();                                                     //处理接收的数据
     bool PutSendPacket(ACE_Message_Block* pMbData);                          //发送数据
     void ClearPacketParse();                                                 //清理正在使用的PacketParse
