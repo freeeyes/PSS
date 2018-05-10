@@ -184,9 +184,9 @@ public:
     bool AddConnect(uint32 u4ConnectID, CConnectHandler* pConnectHandler);
     bool SetConnectTimeWheel(CConnectHandler* pConnectHandler);                                            //设置消息轮盘
     bool DelConnectTimeWheel(CConnectHandler* pConnectHandler);                                            //删除消息轮盘
-    bool SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket,  uint16 u2CommandID, uint8 u1SendState, uint8 u1SendType, ACE_Time_Value& tvSendBegin, bool blDelete = true, int nServerID = 0);  //同步发送                                                                     //发送缓冲数据
-    bool PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nServerID = 0); //异步发送
-    bool PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nServerID = 0);                  //异步群发
+    bool SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket,  uint16 u2CommandID, uint8 u1SendState, uint8 u1SendType, ACE_Time_Value& tvSendBegin, bool blDelete = true, int nMessageID = 0);  //同步发送                                                                     //发送缓冲数据
+    bool PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nMessageID = 0); //异步发送
+    bool PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nMessageID = 0);                  //异步群发
     bool Close(uint32 u4ConnectID);                                                                          //客户单关闭
     bool CloseUnLock(uint32 u4ConnectID);                                                                    //关闭连接，不上锁版本
     bool CloseConnect(uint32 u4ConnectID);                                                                   //服务器关闭
@@ -283,9 +283,9 @@ public:
     bool PostMessage(vector<uint32> vecConnectID, const char*& pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL,
                      uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nServerID = 0);   //异步群发指定的ID
     bool PostMessageAll(IBuffPacket*& pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,
-                        uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nServerID = 0);
+                        uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nMessageID = 0);
     bool PostMessageAll(const char*& pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL,
-                        uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nServerID = 0);
+                        uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nMessageID = 0);
     bool CloseConnect(uint32 u4ConnectID);                                                                   //服务器关闭
     bool CloseConnectByClient(uint32 u4ConnectID);                                                           //客户端关闭
     _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                                                       //得到指定链接信息

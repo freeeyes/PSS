@@ -528,7 +528,6 @@ void DoMessage_ClientInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, u
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
-        char szIP[MAX_BUFF_100] = { '\0' };
         vecClientConnectInfo VecClientConnectInfo;
 #ifdef WIN32
         App_ProConnectManager::instance()->GetConnectInfo(VecClientConnectInfo);
@@ -654,7 +653,6 @@ void DoMessage_UDPClientInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
-        char szIP[MAX_BUFF_100] = { '\0' };
         vecClientConnectInfo VecClientConnectInfo;
 #ifdef WIN32
         App_ProUDPManager::instance()->GetClientConnectInfo(VecClientConnectInfo);
@@ -675,8 +673,6 @@ void DoMessage_ServerConnectTCP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPac
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
-        char szIP[MAX_BUFF_100] = { '\0' };
-
         vecClientConnectInfo VecClientConnectInfo;
 #ifdef WIN32
         App_ClientProConnectManager::instance()->GetConnectInfo(VecClientConnectInfo);
@@ -697,8 +693,6 @@ void DoMessage_ServerConnectUDP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPac
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
-        char szIP[MAX_BUFF_100] = { '\0' };
-
         vecClientConnectInfo VecClientConnectInfo;
 #ifdef WIN32
         App_ClientProConnectManager::instance()->GetUDPConnectInfo(VecClientConnectInfo);
@@ -1017,7 +1011,6 @@ void DoMessage_ReConnectServer(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
 
     if (GetConnectServerID(CommandInfo.m_szCommandExp, nSerevrID) == true)
     {
-        char szIP[MAX_BUFF_100] = { '\0' };
         //获得当前连接状态
         vecClientConnectInfo VecClientConnectInfo;
 #ifdef WIN32  //如果是windows

@@ -56,19 +56,9 @@ bool CProactorClientInfo::Run(bool blIsReadly, EM_Server_Connect_State emState)
         return false;
     }
 
-    /*
-    //链接远端服务器
-    if(m_pProAsynchConnect->GetConnectState() == true)
-    {
-    OUR_DEBUG((LM_ERROR, "[CProactorClientInfo::Run]m_pProAsynchConnect is run.\n"));
-    return false;
-    }
-    */
-
     if(true == blIsReadly && SERVER_CONNECT_FIRST != m_emConnectState && SERVER_CONNECT_RECONNECT != m_emConnectState)
     {
         m_pProAsynchConnect->SetConnectState(true);
-        //OUR_DEBUG((LM_ERROR, "[CProactorClientInfo::Run]Connect IP=%s,Port=%d.\n", m_AddrServer.get_host_addr(), m_AddrServer.get_port_number()));
 
         //创建一个数据参数，传给远端
         _ProConnectState_Info* pProConnectInfo = new _ProConnectState_Info();
@@ -427,9 +417,7 @@ bool CClientProConnectManager::Close(int nServerID)
     //关闭链接对象
     if(NULL != pClientInfo->GetProConnectClient())
     {
-        //OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Close]nServerID =(%d) Begin.\n", nServerID));
         pClientInfo->GetProConnectClient()->ClientClose(ems2s);
-        //OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Close]nServerID =(%d) End.\n", nServerID));
     }
 
     if(S2S_NEED_CALLBACK == ems2s)
@@ -668,7 +656,6 @@ int CClientProConnectManager::handle_timeout(const ACE_Time_Value& tv, const voi
     ACE_UNUSED_ARG(arg);
     ACE_UNUSED_ARG(tv);
 
-    //OUR_DEBUG((LM_DEBUG, "[CClientProConnectManager::handle_timeout]Begin.\n"));
     if(m_ProAsynchConnect.GetConnectState() == true)
     {
         return 0;
@@ -703,15 +690,10 @@ int CClientProConnectManager::handle_timeout(const ACE_Time_Value& tv, const voi
                 {
                     App_ServerMessageTask::instance()->CheckServerMessageThread(tvNow);
                 }
-                else
-                {
-                    //pClientInfo->GetProConnectClient()->GetTimeout(tvNow);
-                }
             }
         }
     }
 
-    //OUR_DEBUG((LM_DEBUG, "[CClientProConnectManager::handle_timeout]End.\n"));
     return 0;
 }
 
@@ -900,7 +882,6 @@ bool CClientProConnectManager::ReConnect(int nServerID)
 
     if(NULL == pClientInfo)
     {
-        //OUR_DEBUG((LM_ERROR, "[GetConnectState::Close]nServerID =(%d) pClientInfo is NULL.\n", nServerID));
         return false;
     }
 

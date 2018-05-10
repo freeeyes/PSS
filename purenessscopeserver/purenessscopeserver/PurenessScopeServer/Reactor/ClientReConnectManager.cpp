@@ -750,7 +750,6 @@ int CClientReConnectManager::handle_timeout(const ACE_Time_Value& tv, const void
 
     for (int i = 0; i < (int)vecCReactorClientInfo.size(); i++)
     {
-        //int nServerID = (int)b->first;
         CReactorClientInfo* pClientInfo = vecCReactorClientInfo[i];
 
         if(NULL != pClientInfo)
@@ -772,10 +771,6 @@ int CClientReConnectManager::handle_timeout(const ACE_Time_Value& tv, const void
                 if(App_MainConfig::instance()->GetConnectServerRunType() == 1)
                 {
                     App_ServerMessageTask::instance()->CheckServerMessageThread(tvNow);
-                }
-                else
-                {
-                    //pClientInfo->GetConnectClient()->GetTimeout(tvNow);
                 }
             }
         }

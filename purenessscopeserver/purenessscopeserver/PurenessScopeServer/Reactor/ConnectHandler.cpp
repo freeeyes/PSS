@@ -1976,7 +1976,7 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
     return true;
 }
 
-bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nServerID)
+bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
     if(NULL == pBuffPacket)
     {
@@ -2003,7 +2003,7 @@ bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
         pSendMessage->m_u2CommandID = u2CommandID;
         pSendMessage->m_blDelete    = blDelete;
         pSendMessage->m_u1SendState = u1SendState;
-        pSendMessage->m_nMessageID  = nServerID;
+        pSendMessage->m_nMessageID  = nMessageID;
         pSendMessage->m_u1Type      = 0;
         pSendMessage->m_tvSend      = ACE_OS::gettimeofday();
 
@@ -2392,8 +2392,10 @@ _ClientIPInfo CConnectManager::GetLocalIPInfo(uint32 u4ConnectID)
     }
 }
 
-bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nServerID)
+bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
+    ACE_UNUSED_ARG(nMessageID);
+
     m_ThreadWriteLock.acquire();
     vector<CConnectHandler*> objvecConnectManager;
     m_objHashConnectList.Get_All_Used(objvecConnectManager);
@@ -3140,7 +3142,7 @@ void CConnectManagerGroup::SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4Tim
     pConnectManager->SetRecvQueueTimeCost(u4ConnectID, u4TimeCost);
 }
 
-bool CConnectManagerGroup::PostMessageAll( IBuffPacket*& pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nServerID)
+bool CConnectManagerGroup::PostMessageAll( IBuffPacket*& pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
     //全部群发
     for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
@@ -3153,7 +3155,7 @@ bool CConnectManagerGroup::PostMessageAll( IBuffPacket*& pBuffPacket, uint8 u1Se
             continue;
         }
 
-        if (false == pConnectManager->PostMessageAll(pBuffPacket, u1SendType, u2CommandID, u1SendState, false, nServerID))
+        if (false == pConnectManager->PostMessageAll(pBuffPacket, u1SendType, u2CommandID, u1SendState, false, nMessageID))
         {
             OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::PostMessageAll](u2CommandID=0x%04x)PostMessageAll error.\n", u2CommandID));
         }
@@ -3168,7 +3170,7 @@ bool CConnectManagerGroup::PostMessageAll( IBuffPacket*& pBuffPacket, uint8 u1Se
     return true;
 }
 
-bool CConnectManagerGroup::PostMessageAll( const char*& pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nServerID)
+bool CConnectManagerGroup::PostMessageAll( const char*& pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
     IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
@@ -3199,7 +3201,7 @@ bool CConnectManagerGroup::PostMessageAll( const char*& pData, uint32 nDataLen, 
             continue;
         }
 
-        if (false == pConnectManager->PostMessageAll(pBuffPacket, u1SendType, u2CommandID, u1SendState, false, nServerID))
+        if (false == pConnectManager->PostMessageAll(pBuffPacket, u1SendType, u2CommandID, u1SendState, false, nMessageID))
         {
             OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::PostMessageAll](u2CommandID=0x%04x)PostMessageAll error.\n", u2CommandID));
         }
