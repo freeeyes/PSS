@@ -9,9 +9,7 @@
 #include "ace/INET_Addr.h"
 #include "ace/SOCK_Dgram.h"
 
-#include "define.h"
-#include "MessageBlockManager.h"
-#include "PacketParsePool.h"
+#include "BaseHander.h"
 #include "MakePacket.h"
 #include "ForbiddenIP.h"
 #include "CommandAccount.h"
@@ -35,7 +33,6 @@ public:
 
 private:
     bool CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len);              //这里解析数据包并放入数据队列
-    void Recovery_Message(bool blDelete, char*& pMessage);                    //回收用完的char数组
 
     CPacketParse*           m_pPacketParse;                 //数据包解析类
     ACE_INET_Addr           m_addrRemote;                   //数据发送方的IP信息

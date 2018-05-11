@@ -148,6 +148,32 @@ int recvStatus(const char* recvString)
     return 0;
 }
 
+int Input_Mail_Command(char* pReadData, char* pWriteData, const ACE_HANDLE socketFd, const char* pName)
+{
+    if (0 >= safeWrite(socketFd, pWriteData, (int)strlen(pWriteData)))
+    {
+        ACE_DEBUG((LM_INFO, "[authEmail]@ safeWrite error.\n"));
+        return -1;
+    }
+
+    /* Recv: username */
+    ACE_OS::memset(pReadData, 0, SMTP_MTU);
+
+    if (0 >= safeRead(socketFd, pReadData, SMTP_MTU))
+    {
+        ACE_DEBUG((LM_INFO, "[%s]@ safeRead error.\n", pName));
+        return -1;
+    }
+
+    if (0 > recvStatus(pReadData))
+    {
+        ACE_DEBUG((LM_INFO, "[%s]@ recvStatus error.\n", pName));
+        return -1;
+    }
+
+    return 0;
+}
+
 int authEmail(const ACE_HANDLE socketFd, const unsigned char* mailAddr, const unsigned char* mailPasswd)
 {
     int outSize   = 0;
@@ -228,24 +254,8 @@ int authEmail(const ACE_HANDLE socketFd, const unsigned char* mailAddr, const un
     base64_encode(writeData, (int)outSize, (const unsigned char*)userName, (int)strlen(userName));
     ACE_OS::strcat(writeData, "\r\n");
 
-    if (0 >= safeWrite(socketFd, writeData, (int)strlen(writeData)))
+    if (-1 == Input_Mail_Command(readData, writeData, socketFd, "authEmail"))
     {
-        ACE_DEBUG((LM_INFO, "[authEmail]@ safeWrite error.\n"));
-        return -1;
-    }
-
-    /* Recv: username */
-    ACE_OS::memset(&readData, 0, SMTP_MTU);
-
-    if (0 >= safeRead(socketFd, readData, SMTP_MTU))
-    {
-        ACE_DEBUG((LM_INFO, "[authEmail]@ safeRead error.\n"));
-        return -1;
-    }
-
-    if (0 > recvStatus(readData))
-    {
-        ACE_DEBUG((LM_INFO, "[authEmail]@ recvStatus error.\n"));
         return -1;
     }
 
@@ -257,24 +267,8 @@ int authEmail(const ACE_HANDLE socketFd, const unsigned char* mailAddr, const un
     base64_encode(writeData, (int)outSize, (const unsigned char*)userPasswd, (int)strlen(userPasswd));
     ACE_OS::strcat(writeData, "\r\n");
 
-    if (0 >= safeWrite(socketFd, writeData, (int)strlen(writeData)))
+    if (-1 == Input_Mail_Command(readData, writeData, socketFd, "authEmail"))
     {
-        ACE_DEBUG((LM_INFO, "[authEmail]SMTP_MTU safeWrite error.\n"));
-        return -1;
-    }
-
-    /* Recv: passwd */
-    ACE_OS::memset(&readData, 0, SMTP_MTU);
-
-    if (0 >= safeRead(socketFd, readData, SMTP_MTU))
-    {
-        ACE_DEBUG((LM_INFO, "[authEmail]SMTP_MTU safeRead error.\n"));
-        return -1;
-    }
-
-    if (0 > recvStatus(readData))
-    {
-        ACE_DEBUG((LM_INFO, "[authEmail]SMTP_MTU recvStatus error.\n"));
         return -1;
     }
 
@@ -291,24 +285,8 @@ int sendEmail(const ACE_HANDLE socketFd, const unsigned char* fromMail, const un
     ACE_OS::memset(&writeData, 0, SMTP_MTU);
     ACE_OS::sprintf(writeData, "MAIL FROM: <%s>\r\n", fromMail);
 
-    if (0 >= safeWrite(socketFd, writeData, (int)strlen(writeData)))
+    if (-1 == Input_Mail_Command(readData, writeData, socketFd, "sendEmail"))
     {
-        ACE_DEBUG((LM_INFO, "[sendEmail]MAIL FROM safeWrite error.\n"));
-        return -1;
-    }
-
-    /* Recv: MAIL FROM */
-    ACE_OS::memset(&readData, 0, SMTP_MTU);
-
-    if (0 >= safeRead(socketFd, readData, SMTP_MTU))
-    {
-        ACE_DEBUG((LM_INFO, "[sendEmail]MAIL FROM safeRead error.\n"));
-        return -1;
-    }
-
-    if (0 > recvStatus(readData))
-    {
-        ACE_DEBUG((LM_INFO, "[sendEmail]MAIL FROM recvStatus error.\n"));
         return -1;
     }
 
@@ -316,24 +294,8 @@ int sendEmail(const ACE_HANDLE socketFd, const unsigned char* fromMail, const un
     ACE_OS::memset(&writeData, 0, SMTP_MTU);
     ACE_OS::sprintf(writeData, "RCPT TO: <%s>\r\n", toMail);
 
-    if (0 >= safeWrite(socketFd, writeData, (int)strlen(writeData)))
+    if (-1 == Input_Mail_Command(readData, writeData, socketFd, "sendEmail"))
     {
-        ACE_DEBUG((LM_INFO, "[sendEmail]RCPT TO safeWrite error.\n"));
-        return -1;
-    }
-
-    /* Recv: RCPT TO */
-    ACE_OS::memset(&readData, 0, SMTP_MTU);
-
-    if (0 >= safeRead(socketFd, readData, SMTP_MTU))
-    {
-        ACE_DEBUG((LM_INFO, "[sendEmail]RCPT TO safeRead error.\n"));
-        return -1;
-    }
-
-    if (0 > recvStatus(readData))
-    {
-        ACE_DEBUG((LM_INFO, "[sendEmail]RCPT TO recvStatus error.\n"));
         return -1;
     }
 

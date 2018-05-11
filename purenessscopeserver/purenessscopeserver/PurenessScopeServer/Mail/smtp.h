@@ -26,4 +26,4 @@ int mailAttachment(unsigned char** mail, const unsigned char* filePath);
 int mailEnd(unsigned char** mail);
 int connectSmtp(ACE_HANDLE& socketFd, const unsigned char* smtpUrl, const unsigned short smtpPort);
 
-
+int Input_Mail_Command(char* pReadData, char* pWriteData, const ACE_HANDLE socketFd, const char* pName);
