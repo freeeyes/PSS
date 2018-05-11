@@ -42,8 +42,6 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
     m_u4HighMask    = u4HighMask;
     m_u4LowMask     = u4LowMask;
 
-    //OUR_DEBUG((LM_INFO, "[CMessageService::Init]ID=%d,m_u4State=%d.\n", m_u4ThreadID = u4ThreadID, m_ThreadInfo.m_u4State));
-
     //添加线程信息
     m_u4ThreadID = u4ThreadID;
     m_ThreadInfo.m_u4ThreadID   = u4ThreadID;
@@ -147,32 +145,29 @@ int CMessageService::svc(void)
             m_blRun = false;
             break;
         }
+        else if ((mb->msg_type() == ACE_Message_Block::MB_USER))
+        {
+            UpdateCommandList(mb);
+
+            App_MessageBlockManager::instance()->Close(mb);
+            continue;
+        }
+        else if ((0 == mb->size ()) && (mb->msg_type () == ACE_Message_Block::MB_STOP))
+        {
+            m_mutex.acquire();
+            mb->release ();
+            this->msg_queue ()->deactivate ();
+            m_cond.signal();
+            m_mutex.release();
+            break;
+        }
         else
         {
-            if ((mb->msg_type() == ACE_Message_Block::MB_USER))
-            {
-                UpdateCommandList(mb);
+            CMessage* msg = *((CMessage**)mb->base());
 
-                App_MessageBlockManager::instance()->Close(mb);
-                continue;
-            }
-            else if ((0 == mb->size ()) && (mb->msg_type () == ACE_Message_Block::MB_STOP))
+            if (false == this->ProcessMessage(msg, m_u4ThreadID))
             {
-                m_mutex.acquire();
-                mb->release ();
-                this->msg_queue ()->deactivate ();
-                m_cond.signal();
-                m_mutex.release();
-                break;
-            }
-            else
-            {
-                CMessage* msg = *((CMessage**)mb->base());
-
-                if (false == this->ProcessMessage(msg, m_u4ThreadID))
-                {
-                    OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)ProcessMessage is false!\n", m_u4ThreadID));
-                }
+                OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)ProcessMessage is false!\n", m_u4ThreadID));
             }
         }
 
@@ -251,9 +246,6 @@ bool CMessageService::PutUpdateCommandMessage(uint32 u4UpdateIndex)
 
 bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 {
-    //CProfileTime DisposeTime;
-    //uint32 u4Cost = (uint32)(pMessage->GetMessageBase()->m_ProfileTime.Stop());
-
     if(NULL == pMessage)
     {
         OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage] [%d]pMessage is NULL.\n", u4ThreadID));
@@ -280,8 +272,6 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
                                             (int)pMessage->GetMessageBase()->m_u2Cmd,
                                             tvQueueDispose.msec());
     }
-
-    //OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage]1 [%d],m_u4State=%d, commandID=%d.\n", u4ThreadID, m_ThreadInfo.m_u4State,  pMessage->GetMessageBase()->m_u2Cmd));
 
     //将要处理的数据放到逻辑处理的地方去
     uint16 u2CommandID = 0;          //数据包的CommandID
@@ -356,8 +346,6 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
             u4TimeCost = u4TimeCost/u2CommandCount;
         }
 
-        //OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage]Command(%d)=[%d].\n", pMessage->GetMessageBase()->m_u2Cmd, u2CommandCount));
-
         //添加统计信息
         m_CommandAccount.SaveCommandData(u2CommandID,
                                          pMessage->GetMessageBase()->m_u4ListenPort,
@@ -426,7 +414,6 @@ bool CMessageService::SaveThreadInfoData()
     m_objThreadHistoryList.AddObject(objCurrThreadInfo);
 
     //开始查看线程是否超时
-    //OUR_DEBUG((LM_INFO, "[CMessageService::SaveThreadInfoData]ID=%d,m_u4State=%d,m_u2ThreadTimeOut=%d,cost=%d.\n", m_ThreadInfo.m_u4ThreadID, m_ThreadInfo.m_u4State, m_u2ThreadTimeOut, tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec()));
     if(m_ThreadInfo.m_u4State == THREAD_RUNBEGIN && tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec() > m_u2ThreadTimeOut)
     {
         AppLogManager::instance()->WriteLog(LOG_SYSTEM_WORKTHREAD, "[CMessageService::handle_timeout] pThreadInfo = [%d] State = [%d] Time = [%04d-%02d-%02d %02d:%02d:%02d] PacketCount = [%d] LastCommand = [0x%x] PacketTime = [%d] TimeOut > %d[%d] CurrPacketCount = [%d] QueueCount = [%d] BuffPacketUsed = [%d] BuffPacketFree = [%d].",
@@ -588,8 +575,6 @@ bool CMessageService::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uin
 
                 //记录命令被调用次数
                 u2Count++;
-                //OUR_DEBUG((LM_ERROR, "[CMessageManager::DoMessage]u2CommandID = %d End.\n", u2CommandID));
-
             }
         }
 
@@ -727,7 +712,6 @@ uint32 CMessageService::GetUsedMessageCount()
 
 CMessage* CMessageService::CreateMessage()
 {
-    //OUR_DEBUG((LM_INFO, "[CMessageService::CreateMessage]GetThreadID=%d, m_MessagePool=0x%08x.\n", GetThreadID(), m_MessagePool));
     CMessage* pMessage = m_MessagePool.Create();
 
     if(NULL != pMessage)
@@ -740,7 +724,6 @@ CMessage* CMessageService::CreateMessage()
 
 void CMessageService::DeleteMessage(CMessage* pMessage)
 {
-    //OUR_DEBUG((LM_INFO, "[CMessageService::DeleteMessage]GetThreadID=%d, m_MessagePool=0x%08x.\n", GetThreadID(), m_MessagePool));
     if (false == m_MessagePool.Delete(pMessage))
     {
         OUR_DEBUG((LM_INFO, "[CMessageService::DeleteMessage]pMessage == NULL.\n"));
@@ -895,7 +878,6 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* a
 bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 u4LowMask, uint32 u4HighMask)
 {
     //删除以前的所有CMessageService对象
-    //Close();
 
     //记录当前设置
     m_u4MaxQueue     = u4MaxQueue;
@@ -985,7 +967,6 @@ bool CMessageServiceGroup::PutMessage(CMessage* pMessage)
 bool CMessageServiceGroup::PutUpdateCommandMessage(uint32 u4UpdateIndex)
 {
     //向所有工作线程群发副本更新消息
-
     uint32 u4Size = (uint32)m_vecMessageService.size();
 
     for (uint32 i = 0; i < u4Size; i++)
@@ -1304,10 +1285,8 @@ bool CMessageServiceGroup::CheckCPUAndMemory()
     {
 #ifdef WIN32
         uint32 u4CurrCpu = (uint32)GetProcessCPU_Idel();
-        //uint32 u4CurrMemory = (uint32)GetProcessMemorySize();
 #else
         uint32 u4CurrCpu = (uint32)GetProcessCPU_Idel_Linux();
-        //uint32 u4CurrMemory = (uint32)GetProcessMemorySize_Linux();
 #endif
 
         //获得相关Messageblock,BuffPacket,MessageCount,内存大小
@@ -1690,8 +1669,6 @@ CMessage* CMessageServiceGroup::CreateMessage(uint32 u4ConnectID, uint8 u1Packet
     {
         return NULL;
     }
-
-    //OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::CreateMessage]n4ThreadID=%d.\n", n4ThreadID));
 
     CMessageService* pMessageService = m_vecMessageService[(uint32)n4ThreadID];
 
