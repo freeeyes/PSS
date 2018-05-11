@@ -1,6 +1,7 @@
 #ifndef _ILOGOBJECT
 #define _ILOGOBJECT
 
+#include "define.h"
 #include "ace/SString.h"
 #include "ace/Message_Block.h"
 

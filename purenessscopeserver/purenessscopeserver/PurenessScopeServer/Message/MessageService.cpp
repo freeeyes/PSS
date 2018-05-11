@@ -693,37 +693,7 @@ int CMessageService::handle_signal(int signum, siginfo_t* siginfo, ucontext_t* u
 
 int CMessageService::CloseMsgQueue()
 {
-    // We can choose to process the message or to differ it into the message
-    // queue, and process them into the svc() method. Chose the last option.
-    int retval;
-
-    ACE_Message_Block* mblk = 0;
-    ACE_NEW_RETURN(mblk,ACE_Message_Block (0, ACE_Message_Block::MB_STOP),-1);
-
-    // If queue is full, flush it before block in while
-    if (msg_queue ()->is_full())
-    {
-        if ((retval=msg_queue ()->flush()) == -1)
-        {
-            OUR_DEBUG((LM_ERROR, "[CMessageService::CloseMsgQueue]put error flushing queue\n"));
-            return -1;
-        }
-    }
-
-    m_mutex.acquire();
-
-    while ((retval = putq (mblk)) == -1)
-    {
-        if (msg_queue ()->state () != ACE_Message_Queue_Base::PULSED)
-        {
-            OUR_DEBUG((LM_ERROR,ACE_TEXT("[CMessageService::CloseMsgQueue]put Queue not activated.\n")));
-            break;
-        }
-    }
-
-    m_cond.wait();
-    m_mutex.release();
-    return retval;
+    return Task_Common_CloseMsgQueue((ACE_Task<ACE_MT_SYNCH>*)this, m_cond, m_mutex);
 }
 
 void CMessageService::UpdateCommandList(ACE_Message_Block* pmb)

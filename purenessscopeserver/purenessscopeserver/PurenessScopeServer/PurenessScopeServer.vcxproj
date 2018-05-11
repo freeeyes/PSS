@@ -185,6 +185,7 @@
     <ClCompile Include="Common\BaseClientConnectManager.cpp" />
     <ClCompile Include="Common\BaseConnectClient.cpp" />
     <ClCompile Include="Common\BaseConsoleHandle.cpp" />
+    <ClCompile Include="Common\BaseTask.cpp" />
     <ClCompile Include="Common\ServerMessageTask.cpp" />
     <ClCompile Include="Console\ConsolePromiss.cpp" />
     <ClCompile Include="Console\FrameCommand.cpp" />
@@ -554,6 +555,7 @@
     <ClInclude Include="Common\BaseClientConnectManager.h" />
     <ClInclude Include="Common\BaseConnectClient.h" />
     <ClInclude Include="Common\BaseConsoleHandle.h" />
+    <ClInclude Include="Common\BaseTask.h" />
     <ClInclude Include="Common\ServerMessageTask.h" />
     <ClInclude Include="Console\ConsolePromiss.h" />
     <ClInclude Include="Console\FrameCommand.h" />

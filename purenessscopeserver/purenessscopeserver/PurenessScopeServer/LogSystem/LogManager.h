@@ -1,12 +1,11 @@
 #ifndef _LOGMANAGER_H
 #define _LOGMANAGER_H
 
-#include "ace/Task.h"
 #include <stdio.h>
 #include <stdarg.h>
-#include "define.h"
 #include "ILogObject.h"
 #include "ILogManager.h"
+#include "BaseTask.h"
 
 //管理日志块的池
 //一个使用者提议，对日志采用分级管理。

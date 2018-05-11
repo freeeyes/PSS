@@ -241,6 +241,9 @@
     <ClCompile Include="Common\BaseConnectClient.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="Common\BaseTask.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -595,6 +598,9 @@
       <Filter>Common\hfile</Filter>
     </ClInclude>
     <ClInclude Include="Common\BaseConnectClient.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\BaseTask.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,14 +1,13 @@
 #ifndef _MESSAGESERVICE_H
 #define _MESSAGESERVICE_H
 
-#include "define.h"
-#include "ace/Task.h"
 #include "ace/Synch.h"
 #include "ace/Malloc_T.h"
 #include "ace/Singleton.h"
 #include "ace/Thread_Mutex.h"
 #include "ace/Date_Time.h"
 
+#include "BaseTask.h"
 #include "Message.h"
 #include "MessageManager.h"
 #include "LogManager.h"
