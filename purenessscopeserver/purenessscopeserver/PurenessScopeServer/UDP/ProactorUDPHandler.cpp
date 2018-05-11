@@ -151,50 +151,31 @@ void CProactorUDPHandler::handle_read_dgram(const ACE_Asynch_Read_Dgram::Result&
 
 bool CProactorUDPHandler::SendMessage(char*& pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead, uint16 u2CommandID, bool blDlete)
 {
-    ACE_Time_Value m_tvBegin = ACE_OS::gettimeofday();
-
+    ACE_Message_Block* pMbData = NULL;
     ACE_INET_Addr AddrRemote;
-    int nErr = AddrRemote.set(nPort, szIP);
+    bool blState = Udp_Common_Send_Message(m_u4PacketParseInfoID,
+                                           AddrRemote,
+                                           pMessage,
+                                           u4Len,
+                                           szIP,
+                                           nPort,
+                                           blHead,
+                                           u2CommandID,
+                                           blDlete,
+                                           pMbData);
 
-    if(nErr != 0)
+    if (true == blState)
     {
-        OUR_DEBUG((LM_INFO, "[CProactorUDPHandler::SendMessage]set_address error[%d].\n", errno));
+        int nSize = (int)m_skRemote.send(pMbData->rd_ptr(), pMbData->length(), AddrRemote);
 
-        Recovery_Message(blDlete, pMessage);
-
-        return false;
-    }
-
-    //如果需要拼接包头，则拼接包头
-    if(blHead == true)
-    {
-        CPacketParse PacketParse;
-
-        uint32 u4SendLength = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Make_Send_Packet_Length(0, u4Len, u2CommandID);
-        ACE_Message_Block* pMbData = App_MessageBlockManager::instance()->Create(u4SendLength);
-
-        if(NULL == pMbData)
-        {
-            Recovery_Message(blDlete, pMessage);
-
-            return false;
-        }
-
-        App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Make_Send_Packet(0, pMessage, u4Len, pMbData, u2CommandID);
-
-        uint32 u4DataLen = (uint32)pMbData->length();
-        int nSize = (int)m_skRemote.send(pMbData->rd_ptr(), u4DataLen, AddrRemote);
-
-        if((uint32)nSize == u4DataLen)
+        if ((uint32)nSize == pMbData->length())
         {
             m_atvOutput = ACE_OS::gettimeofday();
-            m_u4SendSize += u4DataLen;
+            m_u4SendSize += (uint32)nSize;
             m_u4SendPacketCount++;
 
-            Recovery_Message(blDlete, pMessage);
-
             //统计发送信息
-            m_CommandAccount.SaveCommandData(u2CommandID, (uint32)nPort, PACKET_UDP, u4DataLen, COMMAND_TYPE_OUT);
+            m_CommandAccount.SaveCommandData(u2CommandID, (uint32)nPort, PACKET_UDP, nSize, COMMAND_TYPE_OUT);
 
             //释放发送体
             App_MessageBlockManager::instance()->Close(pMbData);
@@ -205,40 +186,14 @@ bool CProactorUDPHandler::SendMessage(char*& pMessage, uint32 u4Len, const char*
         {
             OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::SendMessage]send error(%d).\n", errno));
 
-            Recovery_Message(blDlete, pMessage);
-
             //释放发送体
             App_MessageBlockManager::instance()->Close(pMbData);
 
             return false;
         }
     }
-    else
-    {
-        int nSize = (int)m_skRemote.send(pMessage, u4Len, AddrRemote);
 
-        if((uint32)nSize == u4Len)
-        {
-            m_atvOutput = ACE_OS::gettimeofday();
-            m_u4SendSize += u4Len;
-            m_u4SendPacketCount++;
-
-            Recovery_Message(blDlete, pMessage);
-
-            //统计发送信息
-            m_CommandAccount.SaveCommandData(u2CommandID, (uint32)nPort, PACKET_UDP, u4Len, COMMAND_TYPE_OUT);
-
-            return true;
-        }
-        else
-        {
-            OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::SendMessage]send error(%d).\n", errno));
-
-            Recovery_Message(blDlete, pMessage);
-
-            return false;
-        }
-    }//end if(blHead == true)
+    return true;
 }
 
 _ClientConnectInfo CProactorUDPHandler::GetClientConnectInfo()
@@ -393,14 +348,6 @@ bool CProactorUDPHandler::CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len)
     m_u4RecvPacketCount++;
 
     return true;
-}
-
-void CProactorUDPHandler::Recovery_Message(bool blDelete, char*& pMessage)
-{
-    if (true == blDelete)
-    {
-        SAFE_DELETE_ARRAY(pMessage);
-    }
 }
 
 void CProactorUDPHandler::GetCommandData(uint16 u2CommandID, _CommandData& objCommandData)

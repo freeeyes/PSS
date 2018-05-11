@@ -36,7 +36,7 @@ public:
     void SetReadPtr(uint32 u4Pos);              //设置读指针的位置
     void SetPacketCount(uint32 u4PacketCount);  //设置缓存数据包的个数
     bool RollBack(uint32 u4Len);                //将取出的数据删除，将后面的数据加上
-    bool AddBuffPacket(uint32 u4Size);          //增加Packet的包大小
+    bool AddBuff(uint32 u4Size);                //增加Packet的包大小
     char* ReadPtr();                            //获得读指针
     char* WritePtr();                           //获得写指针
     void ReadBuffPtr(uint32 u4Size);
@@ -53,7 +53,6 @@ public:
     char* GetError();                           //返回错误信息
 
 private:
-    bool AddBuff(uint32 u4Size);
     void ReadPtr(uint32 u4Size);
     void WritePtr(uint32 u4Size);
 

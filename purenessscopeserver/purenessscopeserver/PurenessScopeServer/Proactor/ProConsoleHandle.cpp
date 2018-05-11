@@ -374,12 +374,9 @@ bool CProConsoleHandle::SendMessage(IBuffPacket* pBuffPacket, uint8 u1OutputType
 
 bool CProConsoleHandle::PutSendPacket(ACE_Message_Block* pMbData)
 {
-    //int nSendSize = m_u4AllSendSize;
-
     m_ThreadWriteLock.acquire();
     m_nIOCount++;
     m_ThreadWriteLock.release();
-    //OUR_DEBUG ((LM_ERROR, "[CConnectHandler::PutSendPacket] Connectid=%d, m_nIOCount=%d!\n", GetConnectID(), m_nIOCount));
 
     //异步发送方法
     if(NULL != pMbData)
@@ -460,41 +457,13 @@ bool CProConsoleHandle::RecvClinetPacket(uint32 u4PackeLen)
 
 bool CProConsoleHandle::CheckMessage()
 {
-    if(m_pPacketParse->GetMessageHead() != NULL && m_pPacketParse->GetMessageBody() != NULL)
+    uint8 u1Output           = 0;
+    IBuffPacket* pBuffPacket = NULL;
+    bool blRet = Console_Common_CheckMessage_Data(m_u4AllRecvSize, m_u4AllRecvCount, m_pPacketParse, u1Output, pBuffPacket);
+
+    if (true == blRet && false == SendMessage(dynamic_cast<IBuffPacket*>(pBuffPacket), u1Output))
     {
-        m_u4AllRecvSize += (uint32)m_pPacketParse->GetMessageHead()->length() + (uint32)m_pPacketParse->GetMessageBody()->length();
-        m_u4AllRecvCount++;
-
-        //发送回复信息
-        IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
-
-        //将数据Buff放入消息体中，传递给处理类。
-        uint8 u1Output = 0;
-        uint32 u4Return = (uint32)App_ConsoleManager::instance()->Dispose(m_pPacketParse->GetMessageBody(), pBuffPacket, u1Output);
-
-        if (CONSOLE_MESSAGE_SUCCESS == u4Return)
-        {
-            if (pBuffPacket->GetPacketLen() > 0
-                && false == SendMessage(dynamic_cast<IBuffPacket*>(pBuffPacket), u1Output))
-            {
-                OUR_DEBUG((LM_INFO, "[CProConsoleHandle::CheckMessage]SendMessage error.\n"));
-            }
-        }
-        else if(CONSOLE_MESSAGE_FAIL == u4Return)
-        {
-            OUR_DEBUG((LM_INFO, "[CProConsoleHandle::CheckMessage]Dispose CONSOLE_MESSAGE_FAIL.\n"));
-            App_BuffPacketManager::instance()->Delete(pBuffPacket);
-            return false;
-        }
-        else
-        {
-            App_BuffPacketManager::instance()->Delete(pBuffPacket);
-            return false;
-        }
-    }
-    else
-    {
-        OUR_DEBUG((LM_ERROR, "[CProConsoleHandle::CheckMessage] ConnectID = %d, m_pPacketParse is NULL.\n", GetConnectID()));
+        OUR_DEBUG((LM_INFO, "[CProConsoleHandle::CheckMessage]SendMessage error.\n"));
     }
 
     return true;

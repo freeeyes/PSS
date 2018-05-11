@@ -42,8 +42,6 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
     m_u4HighMask    = u4HighMask;
     m_u4LowMask     = u4LowMask;
 
-    //OUR_DEBUG((LM_INFO, "[CMessageService::Init]ID=%d,m_u4State=%d.\n", m_u4ThreadID = u4ThreadID, m_ThreadInfo.m_u4State));
-
     //添加线程信息
     m_u4ThreadID = u4ThreadID;
     m_ThreadInfo.m_u4ThreadID   = u4ThreadID;
@@ -147,32 +145,29 @@ int CMessageService::svc(void)
             m_blRun = false;
             break;
         }
+        else if ((mb->msg_type() == ACE_Message_Block::MB_USER))
+        {
+            UpdateCommandList(mb);
+
+            App_MessageBlockManager::instance()->Close(mb);
+            continue;
+        }
+        else if ((0 == mb->size ()) && (mb->msg_type () == ACE_Message_Block::MB_STOP))
+        {
+            m_mutex.acquire();
+            mb->release ();
+            this->msg_queue ()->deactivate ();
+            m_cond.signal();
+            m_mutex.release();
+            break;
+        }
         else
         {
-            if ((mb->msg_type() == ACE_Message_Block::MB_USER))
-            {
-                UpdateCommandList(mb);
+            CMessage* msg = *((CMessage**)mb->base());
 
-                App_MessageBlockManager::instance()->Close(mb);
-                continue;
-            }
-            else if ((0 == mb->size ()) && (mb->msg_type () == ACE_Message_Block::MB_STOP))
+            if (false == this->ProcessMessage(msg, m_u4ThreadID))
             {
-                m_mutex.acquire();
-                mb->release ();
-                this->msg_queue ()->deactivate ();
-                m_cond.signal();
-                m_mutex.release();
-                break;
-            }
-            else
-            {
-                CMessage* msg = *((CMessage**)mb->base());
-
-                if (false == this->ProcessMessage(msg, m_u4ThreadID))
-                {
-                    OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)ProcessMessage is false!\n", m_u4ThreadID));
-                }
+                OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)ProcessMessage is false!\n", m_u4ThreadID));
             }
         }
 
@@ -251,9 +246,6 @@ bool CMessageService::PutUpdateCommandMessage(uint32 u4UpdateIndex)
 
 bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 {
-    //CProfileTime DisposeTime;
-    //uint32 u4Cost = (uint32)(pMessage->GetMessageBase()->m_ProfileTime.Stop());
-
     if(NULL == pMessage)
     {
         OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage] [%d]pMessage is NULL.\n", u4ThreadID));
@@ -280,8 +272,6 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
                                             (int)pMessage->GetMessageBase()->m_u2Cmd,
                                             tvQueueDispose.msec());
     }
-
-    //OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage]1 [%d],m_u4State=%d, commandID=%d.\n", u4ThreadID, m_ThreadInfo.m_u4State,  pMessage->GetMessageBase()->m_u2Cmd));
 
     //将要处理的数据放到逻辑处理的地方去
     uint16 u2CommandID = 0;          //数据包的CommandID
@@ -356,8 +346,6 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
             u4TimeCost = u4TimeCost/u2CommandCount;
         }
 
-        //OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage]Command(%d)=[%d].\n", pMessage->GetMessageBase()->m_u2Cmd, u2CommandCount));
-
         //添加统计信息
         m_CommandAccount.SaveCommandData(u2CommandID,
                                          pMessage->GetMessageBase()->m_u4ListenPort,
@@ -426,7 +414,6 @@ bool CMessageService::SaveThreadInfoData()
     m_objThreadHistoryList.AddObject(objCurrThreadInfo);
 
     //开始查看线程是否超时
-    //OUR_DEBUG((LM_INFO, "[CMessageService::SaveThreadInfoData]ID=%d,m_u4State=%d,m_u2ThreadTimeOut=%d,cost=%d.\n", m_ThreadInfo.m_u4ThreadID, m_ThreadInfo.m_u4State, m_u2ThreadTimeOut, tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec()));
     if(m_ThreadInfo.m_u4State == THREAD_RUNBEGIN && tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec() > m_u2ThreadTimeOut)
     {
         AppLogManager::instance()->WriteLog(LOG_SYSTEM_WORKTHREAD, "[CMessageService::handle_timeout] pThreadInfo = [%d] State = [%d] Time = [%04d-%02d-%02d %02d:%02d:%02d] PacketCount = [%d] LastCommand = [0x%x] PacketTime = [%d] TimeOut > %d[%d] CurrPacketCount = [%d] QueueCount = [%d] BuffPacketUsed = [%d] BuffPacketFree = [%d].",
@@ -464,67 +451,6 @@ bool CMessageService::SaveThreadInfoData()
         m_ThreadInfo.m_u4CurrPacketCount = 0;
         return true;
     }
-}
-
-bool CMessageService::GetThreadInfoJson(char* pJson, uint32 u4Len)
-{
-    //将数据输出成Json格式数据
-    char szDataInfo[MAX_BUFF_200] = { '\0' };
-    vector<_ThreadInfo> objVecHistoryList;
-    m_objThreadHistoryList.GetAllSavingObject(objVecHistoryList);
-
-    for(int i = 0; i < (int)objVecHistoryList.size(); i++)
-    {
-        if (0 == i)
-        {
-            sprintf_safe(szDataInfo, MAX_BUFF_200, "%d", objVecHistoryList[i].m_u4CurrPacketCount);
-        }
-        else
-        {
-            char szTemp[MAX_BUFF_500] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_500, "%s", szDataInfo);
-            sprintf_safe(szDataInfo, MAX_BUFF_200, "%s,%d", szTemp, objVecHistoryList[i].m_u4CurrPacketCount);
-        }
-    }
-
-    sprintf_safe(pJson, u4Len, OUTPUT_CHART_JSON_Y, m_u4ThreadID, szDataInfo);
-
-    return true;
-}
-
-bool CMessageService::GetThreadInfoTimeJson(char* pJson, uint32 u4Len)
-{
-    //将数据输出成Json格式数据
-    char szDataInfo[MAX_BUFF_500] = { '\0' };
-    vector<_ThreadInfo> objVecHistoryList;
-    m_objThreadHistoryList.GetAllSavingObject(objVecHistoryList);
-
-    for (int i = 0; i < (int)objVecHistoryList.size(); i++)
-    {
-        ACE_Date_Time dtThreadTime(objVecHistoryList[i].m_tvUpdateTime);
-
-        if (0 == i)
-        {
-            sprintf_safe(szDataInfo, MAX_BUFF_500, "\"%02d:%02d:%02d\"",
-                         dtThreadTime.hour(),
-                         dtThreadTime.minute(),
-                         dtThreadTime.second());
-        }
-        else
-        {
-            char szTemp[MAX_BUFF_500] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_500, "%s", szDataInfo);
-            sprintf_safe(szDataInfo, MAX_BUFF_500, "%s,\"%02d:%02d:%02d\"",
-                         szTemp,
-                         dtThreadTime.hour(),
-                         dtThreadTime.minute(),
-                         dtThreadTime.second());
-        }
-    }
-
-    sprintf_safe(pJson, u4Len, OUTPUT_CHART_JSON_X, szDataInfo);
-
-    return true;
 }
 
 void CMessageService::CloseCommandList()
@@ -588,8 +514,6 @@ bool CMessageService::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uin
 
                 //记录命令被调用次数
                 u2Count++;
-                //OUR_DEBUG((LM_ERROR, "[CMessageManager::DoMessage]u2CommandID = %d End.\n", u2CommandID));
-
             }
         }
 
@@ -727,7 +651,6 @@ uint32 CMessageService::GetUsedMessageCount()
 
 CMessage* CMessageService::CreateMessage()
 {
-    //OUR_DEBUG((LM_INFO, "[CMessageService::CreateMessage]GetThreadID=%d, m_MessagePool=0x%08x.\n", GetThreadID(), m_MessagePool));
     CMessage* pMessage = m_MessagePool.Create();
 
     if(NULL != pMessage)
@@ -740,7 +663,6 @@ CMessage* CMessageService::CreateMessage()
 
 void CMessageService::DeleteMessage(CMessage* pMessage)
 {
-    //OUR_DEBUG((LM_INFO, "[CMessageService::DeleteMessage]GetThreadID=%d, m_MessagePool=0x%08x.\n", GetThreadID(), m_MessagePool));
     if (false == m_MessagePool.Delete(pMessage))
     {
         OUR_DEBUG((LM_INFO, "[CMessageService::DeleteMessage]pMessage == NULL.\n"));
@@ -771,37 +693,7 @@ int CMessageService::handle_signal(int signum, siginfo_t* siginfo, ucontext_t* u
 
 int CMessageService::CloseMsgQueue()
 {
-    // We can choose to process the message or to differ it into the message
-    // queue, and process them into the svc() method. Chose the last option.
-    int retval;
-
-    ACE_Message_Block* mblk = 0;
-    ACE_NEW_RETURN(mblk,ACE_Message_Block (0, ACE_Message_Block::MB_STOP),-1);
-
-    // If queue is full, flush it before block in while
-    if (msg_queue ()->is_full())
-    {
-        if ((retval=msg_queue ()->flush()) == -1)
-        {
-            OUR_DEBUG((LM_ERROR, "[CMessageService::CloseMsgQueue]put error flushing queue\n"));
-            return -1;
-        }
-    }
-
-    m_mutex.acquire();
-
-    while ((retval = putq (mblk)) == -1)
-    {
-        if (msg_queue ()->state () != ACE_Message_Queue_Base::PULSED)
-        {
-            OUR_DEBUG((LM_ERROR,ACE_TEXT("[CMessageService::CloseMsgQueue]put Queue not activated.\n")));
-            break;
-        }
-    }
-
-    m_cond.wait();
-    m_mutex.release();
-    return retval;
+    return Task_Common_CloseMsgQueue((ACE_Task<ACE_MT_SYNCH>*)this, m_cond, m_mutex);
 }
 
 void CMessageService::UpdateCommandList(ACE_Message_Block* pmb)
@@ -880,22 +772,12 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* a
         OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::handle_timeout]CheckPlugInState is fail.\n"));
     }
 
-    //存入工作线程Json图表
-    SaveThreadInfoJson();
-
-    //存储当前连接Json图表
-    SaveConnectJson(tv);
-
-    //存储命令Json图表
-    SaveCommandChart(tv);
-
     return 0;
 }
 
 bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 u4LowMask, uint32 u4HighMask)
 {
     //删除以前的所有CMessageService对象
-    //Close();
 
     //记录当前设置
     m_u4MaxQueue     = u4MaxQueue;
@@ -985,7 +867,6 @@ bool CMessageServiceGroup::PutMessage(CMessage* pMessage)
 bool CMessageServiceGroup::PutUpdateCommandMessage(uint32 u4UpdateIndex)
 {
     //向所有工作线程群发副本更新消息
-
     uint32 u4Size = (uint32)m_vecMessageService.size();
 
     for (uint32 i = 0; i < u4Size; i++)
@@ -1088,191 +969,6 @@ bool CMessageServiceGroup::KillTimer()
     return true;
 }
 
-bool CMessageServiceGroup::SaveCommandChart(ACE_Time_Value tvNow)
-{
-    char szDataXInfo[MAX_BUFF_500]  = { '\0' };
-    char szDataYInfo[MAX_BUFF_200]  = { '\0' };
-    char szDataXLine[MAX_BUFF_200]  = { '\0' };
-    char szDataYLine[MAX_BUFF_500]  = { '\0' };
-    char szDataJson[MAX_BUFF_1024]  = { '\0' };
-    uint32 u4Count = App_MainConfig::instance()->GetCommandChartCount();
-
-    for (uint32 i = 0; i < u4Count; i++)
-    {
-        _Command_Chart_Info obj_Command_Chart_Info;
-        _CommandData objCommandData;
-
-        obj_Command_Chart_Info.m_u2CommandID    = App_MainConfig::instance()->GetCommandChart(i)->m_u4CommandID;
-        obj_Command_Chart_Info.m_tvCommandTime  = tvNow;
-        GetCommandData(obj_Command_Chart_Info.m_u2CommandID, objCommandData);
-        obj_Command_Chart_Info.m_u4CommandCount = objCommandData.m_u4CommandCount;
-        m_vec_Command_Chart_Info[i].AddObject(obj_Command_Chart_Info);
-
-        //输出成图表数据
-        //生成X轴和Y轴
-        vector<_Command_Chart_Info> objVecHistoryList;
-        m_vec_Command_Chart_Info[i].GetAllSavingObject(objVecHistoryList);
-
-        for (int j = 0; j < (int)objVecHistoryList.size(); j++)
-        {
-            ACE_Date_Time dtThreadTime(objVecHistoryList[j].m_tvCommandTime);
-
-            if (0 == j)
-            {
-                sprintf_safe(szDataXInfo, MAX_BUFF_500, "\"%02d:%02d:%02d\"",
-                             dtThreadTime.hour(),
-                             dtThreadTime.minute(),
-                             dtThreadTime.second());
-
-                sprintf_safe(szDataYInfo, MAX_BUFF_200, "%d",
-                             objVecHistoryList[i].m_u4CommandCount);
-            }
-            else
-            {
-                char szTemp[MAX_BUFF_500] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_500, "%s", szDataXInfo);
-                sprintf_safe(szDataXInfo, MAX_BUFF_500, "%s,\"%02d:%02d:%02d\"",
-                             szTemp,
-                             dtThreadTime.hour(),
-                             dtThreadTime.minute(),
-                             dtThreadTime.second());
-                sprintf_safe(szTemp, MAX_BUFF_200, "%s", szDataYInfo);
-                sprintf_safe(szDataYInfo, MAX_BUFF_200, "%s, %d",
-                             szTemp,
-                             objVecHistoryList[i].m_u4CommandCount);
-            }
-
-            sprintf_safe(szDataXLine, MAX_BUFF_200, OUTPUT_CHART_JSON_X, szDataXInfo);
-            sprintf_safe(szDataYLine, MAX_BUFF_500, OUTPUT_CHART_JSON_Y, objVecHistoryList[i].m_u2CommandID, szDataYInfo);
-        }
-
-        //拼接成数据
-        char szTableName[MAX_BUFF_200] = { '\0' };
-        sprintf_safe(szTableName, MAX_BUFF_200, "Pss Command(0x%04x)", obj_Command_Chart_Info.m_u2CommandID);
-        sprintf_safe(szDataJson, MAX_BUFF_1024, OUTPUT_CHART_JSON, szTableName, szDataXLine, szDataYLine);
-        FILE* pFile = ACE_OS::fopen(App_MainConfig::instance()->GetCommandChart(i)->m_szJsonFile, "w");
-
-        if (NULL != pFile)
-        {
-            ACE_OS::fwrite(szDataJson, sizeof(char), strlen(szDataJson), pFile);
-            ACE_OS::fclose(pFile);
-        }
-    }
-
-    return true;
-}
-
-bool CMessageServiceGroup::SaveThreadInfoJson()
-{
-    char  szJsonContent[MAX_BUFF_1024] = { '\0' };
-    char  szYLineData[MAX_BUFF_100]    = { '\0' };
-    char  szYLinesData[MAX_BUFF_500]   = { '\0' };
-    char  szXLinesName[MAX_BUFF_500]   = { '\0' };
-
-    if (false == App_MainConfig::instance()->GetWorkThreadChart()->m_blJsonOutput)
-    {
-        return true;
-    }
-
-    char* pJsonFile = App_MainConfig::instance()->GetWorkThreadChart()->m_szJsonFile;
-
-    //获得当前线程数量
-    uint32 u4Size = (uint32)m_vecMessageService.size();
-
-    if (NULL != pJsonFile && 0 < ACE_OS::strlen(pJsonFile) && u4Size > 0)
-    {
-        //得到X轴描述
-        m_vecMessageService[0]->GetThreadInfoTimeJson(szXLinesName, MAX_BUFF_500);
-
-        //获得Y轴描述
-        for (uint32 i = 0; i < u4Size; i++)
-        {
-            CMessageService* pMessageService = m_vecMessageService[i];
-
-            if (NULL != pMessageService)
-            {
-                pMessageService->GetThreadInfoJson(szYLineData, MAX_BUFF_500);
-            }
-
-            if (0 == i)
-            {
-                sprintf_safe(szYLinesData, MAX_BUFF_500, "%s", szYLineData);
-            }
-            else
-            {
-                char szTemp[MAX_BUFF_500] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_500, "%s", szYLinesData);
-                sprintf_safe(szYLinesData, MAX_BUFF_500, "%s,%s", szTemp, szYLineData);
-            }
-        }
-
-        sprintf_safe(szJsonContent, MAX_BUFF_1024, OUTPUT_CHART_JSON, "PSS Work Thread", szXLinesName, szYLinesData);
-        FILE* pFile = ACE_OS::fopen(pJsonFile, "w");
-
-        if (NULL != pFile)
-        {
-            ACE_OS::fwrite(szJsonContent, sizeof(char), strlen(szJsonContent), pFile);
-            ACE_OS::fclose(pFile);
-        }
-    }
-
-    return true;
-}
-
-bool CMessageServiceGroup::SaveConnectJson(ACE_Time_Value tvNow)
-{
-    _Connect_Chart_Info obj_Connect_Chart_Info;
-#ifdef WIN32
-    obj_Connect_Chart_Info.m_n4ConnectCount     = App_ProConnectManager::instance()->GetCount();
-    obj_Connect_Chart_Info.m_tvConnectTime      = tvNow;
-    obj_Connect_Chart_Info.m_u4LastConnectCount = App_IPAccount::instance()->GetLastConnectCount();
-#else
-    obj_Connect_Chart_Info.m_n4ConnectCount     = App_ConnectManager::instance()->GetCount();
-    obj_Connect_Chart_Info.m_tvConnectTime      = tvNow;
-    obj_Connect_Chart_Info.m_u4LastConnectCount = App_IPAccount::instance()->GetLastConnectCount();
-#endif
-    m_objConnectHistoryList.AddObject(obj_Connect_Chart_Info);
-
-    //写入文件
-    char  szJsonContent[MAX_BUFF_1024] = { '\0' };
-    char  szYLineData[MAX_BUFF_200]    = { '\0' };
-    char  szYLineDataC[MAX_BUFF_200]   = { '\0' };
-    char  szYLinesData[MAX_BUFF_500]   = { '\0' };
-    char  szXLinesName[MAX_BUFF_500]   = { '\0' };
-
-    if (false == App_MainConfig::instance()->GetConnectChart()->m_blJsonOutput)
-    {
-        return true;
-    }
-
-    char* pJsonFile = App_MainConfig::instance()->GetConnectChart()->m_szJsonFile;
-
-    if (NULL != pJsonFile && 0 < ACE_OS::strlen(pJsonFile))
-    {
-        //得到X轴描述
-        GetConnectTimeJson(szXLinesName, MAX_BUFF_500);
-
-        //得到Y轴描述(当前活跃连接数)
-        GetConnectJson(szYLineData, MAX_BUFF_200);
-
-        //得到Y轴描述(当前每分钟连接数)
-        GetCurrConnectJson(szYLineDataC, MAX_BUFF_200);
-
-        sprintf_safe(szYLinesData, MAX_BUFF_500, "%s,%s", szYLineData, szYLineDataC);
-
-        sprintf_safe(szJsonContent, MAX_BUFF_1024, OUTPUT_CHART_JSON, "PSS Connect", szXLinesName, szYLinesData);
-        FILE* pFile = ACE_OS::fopen(pJsonFile, "w");
-
-        if (NULL != pFile)
-        {
-            ACE_OS::fwrite(szJsonContent, sizeof(char), strlen(szJsonContent), pFile);
-            ACE_OS::fclose(pFile);
-        }
-    }
-
-    return true;
-}
-
 bool CMessageServiceGroup::CheckWorkThread()
 {
     uint32 u4Size = (uint32)m_vecMessageService.size();
@@ -1304,10 +1000,8 @@ bool CMessageServiceGroup::CheckCPUAndMemory()
     {
 #ifdef WIN32
         uint32 u4CurrCpu = (uint32)GetProcessCPU_Idel();
-        //uint32 u4CurrMemory = (uint32)GetProcessMemorySize();
 #else
         uint32 u4CurrCpu = (uint32)GetProcessCPU_Idel_Linux();
-        //uint32 u4CurrMemory = (uint32)GetProcessMemorySize_Linux();
 #endif
 
         //获得相关Messageblock,BuffPacket,MessageCount,内存大小
@@ -1395,99 +1089,6 @@ void CMessageServiceGroup::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_
             Combo_Port_List(vec_Service_Port_Data_Account, vec_Port_Data_Account);
         }
     }
-}
-
-bool CMessageServiceGroup::GetConnectJson(char* pJson, uint32 u4Len)
-{
-    //将数据输出成Json格式数据
-    char szDataInfo[MAX_BUFF_200] = { '\0' };
-    vector<_Connect_Chart_Info> objVecHistoryList;
-    m_objConnectHistoryList.GetAllSavingObject(objVecHistoryList);
-
-    for (int i = 0; i < (int)objVecHistoryList.size(); i++)
-    {
-        if (0 == i)
-        {
-            sprintf_safe(szDataInfo, MAX_BUFF_200, "%d",
-                         objVecHistoryList[i].m_n4ConnectCount);
-        }
-        else
-        {
-            char szTemp[MAX_BUFF_200] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_200, "%s", szDataInfo);
-            sprintf_safe(szDataInfo, MAX_BUFF_200, "%s, %d",
-                         szTemp,
-                         objVecHistoryList[i].m_n4ConnectCount);
-        }
-    }
-
-    sprintf_safe(pJson, u4Len, OUTPUT_CHART_JSON_Y, 0, szDataInfo);
-
-    return true;
-}
-
-bool CMessageServiceGroup::GetCurrConnectJson(char* pJson, uint32 u4Len)
-{
-    //将数据输出成Json格式数据
-    char szDataInfo[MAX_BUFF_200] = { '\0' };
-    vector<_Connect_Chart_Info> objVecHistoryList;
-    m_objConnectHistoryList.GetAllSavingObject(objVecHistoryList);
-
-    for (int i = 0; i < (int)objVecHistoryList.size(); i++)
-    {
-        if (0 == i)
-        {
-            sprintf_safe(szDataInfo, MAX_BUFF_200, "%d",
-                         objVecHistoryList[i].m_u4LastConnectCount);
-        }
-        else
-        {
-            char szTemp[MAX_BUFF_200] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_200, "%s", szDataInfo);
-            sprintf_safe(szDataInfo, MAX_BUFF_200, "%s, %d",
-                         szTemp,
-                         objVecHistoryList[i].m_u4LastConnectCount);
-        }
-    }
-
-    sprintf_safe(pJson, u4Len, OUTPUT_CHART_JSON_Y, 1, szDataInfo);
-
-    return true;
-}
-
-bool CMessageServiceGroup::GetConnectTimeJson(char* pJson, uint32 u4Len)
-{
-    //将数据输出成Json格式数据
-    char szDataInfo[MAX_BUFF_500] = { '\0' };
-    vector<_Connect_Chart_Info> objVecHistoryList;
-    m_objConnectHistoryList.GetAllSavingObject(objVecHistoryList);
-
-    for (int i = 0; i < (int)objVecHistoryList.size(); i++)
-    {
-        ACE_Date_Time dtThreadTime(objVecHistoryList[i].m_tvConnectTime);
-
-        if (0 == i)
-        {
-            sprintf_safe(szDataInfo, MAX_BUFF_500, "\"%02d:%02d:%02d\"",
-                         dtThreadTime.hour(),
-                         dtThreadTime.minute(),
-                         dtThreadTime.second());
-        }
-        else
-        {
-            char szTemp[MAX_BUFF_500] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_500, "%s", szDataInfo);
-            sprintf_safe(szDataInfo, MAX_BUFF_500, "%s,\"%02d:%02d:%02d\"",
-                         szTemp,
-                         dtThreadTime.hour(),
-                         dtThreadTime.minute(),
-                         dtThreadTime.second());
-        }
-    }
-
-    sprintf_safe(pJson, u4Len, OUTPUT_CHART_JSON_X, szDataInfo);
-
-    return true;
 }
 
 CThreadInfo* CMessageServiceGroup::GetThreadInfo()
@@ -1690,8 +1291,6 @@ CMessage* CMessageServiceGroup::CreateMessage(uint32 u4ConnectID, uint8 u1Packet
     {
         return NULL;
     }
-
-    //OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::CreateMessage]n4ThreadID=%d.\n", n4ThreadID));
 
     CMessageService* pMessageService = m_vecMessageService[(uint32)n4ThreadID];
 

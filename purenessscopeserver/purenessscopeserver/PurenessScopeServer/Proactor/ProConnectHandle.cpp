@@ -474,9 +474,6 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
         return;
     }
 
-    //写入连接日志
-    AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Connection from [%s:%d]To Server GetHandlerID=%d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), GetHandlerID());
-
     //将这个链接放入链接库
     if(false == App_ProConnectManager::instance()->AddConnect(this))
     {
@@ -485,6 +482,13 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
         Close();
         return;
     }
+
+    //写入连接日志
+    AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Connection from [%s:%d] ConnectID=%d, GetHandlerID=%d.",
+                                        m_addrRemote.get_host_addr(),
+                                        m_addrRemote.get_port_number(),
+                                        GetConnectID(),
+                                        GetHandlerID());
 
     m_u1ConnectState = CONNECT_OPEN;
 
@@ -2495,37 +2499,7 @@ CSendCacheManager* CProConnectManager::GetSendCacheManager()
 
 int CProConnectManager::CloseMsgQueue()
 {
-    // We can choose to process the message or to differ it into the message
-    // queue, and process them into the svc() method. Chose the last option.
-    int retval;
-    ACE_Message_Block* mblk = 0;
-    ACE_NEW_RETURN(mblk,ACE_Message_Block (0, ACE_Message_Block::MB_STOP),-1);
-
-    // If queue is full, flush it before block in while
-    if (msg_queue ()->is_full())
-    {
-        if ((retval=msg_queue ()->flush()) == -1)
-        {
-            OUR_DEBUG((LM_ERROR, "[CProConnectManager::CloseMsgQueue]put error flushing queue\n"));
-            return -1;
-        }
-    }
-
-    m_mutex.acquire();
-
-    while ((retval = putq (mblk)) == -1)
-    {
-        if (msg_queue ()->state () != ACE_Message_Queue_Base::PULSED)
-        {
-            OUR_DEBUG((LM_ERROR,ACE_TEXT("[CProConnectManager::CloseMsgQueue]put Queue not activated.\n")));
-            break;
-        }
-    }
-
-    m_cond.wait();
-    m_mutex.release();
-
-    return retval;
+    return Task_Common_CloseMsgQueue((ACE_Task<ACE_MT_SYNCH>*)this, m_cond, m_mutex);
 }
 
 //*********************************************************************************

@@ -1,8 +1,6 @@
 #ifndef _SERVERMESSAGETASK_H
 #define _SERVERMESSAGETASK_H
 
-#include "define.h"
-#include "ace/Task.h"
 #include "ace/Synch.h"
 #include "ace/Malloc_T.h"
 #include "ace/Singleton.h"
@@ -13,6 +11,7 @@
 #include "MessageBlockManager.h"
 #include "HashTable.h"
 #include "ObjectArrayList.h"
+#include "BaseTask.h"
 
 //处理服务器间接收数据包过程代码
 //如果服务器间线程处理挂起了，会尝试重启服务

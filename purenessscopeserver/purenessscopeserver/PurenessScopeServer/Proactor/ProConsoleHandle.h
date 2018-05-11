@@ -16,7 +16,6 @@
 #include "IConnectManager.h"
 #include "BaseConsoleHandle.h"
 #include "TimerManager.h"
-#include "ConsoleMessage.h"
 #include "Fast_Asynch_Read_Stream.h"
 
 

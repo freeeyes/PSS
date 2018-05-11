@@ -101,62 +101,6 @@ bool CBuffPacket::Clear()
     return true;
 }
 
-bool CBuffPacket::AddBuffPacket(uint32 u4Size)
-{
-    try
-    {
-        char* szNewData = NULL;
-
-        if(u4Size + m_u4PacketLen >= m_u4MaxPacketSize)
-        {
-            OUR_DEBUG((LM_ERROR, "[CBuffPacket::AddBuff] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", u4Size, m_u4PacketLen));
-            char szError[MAX_BUFF_500] = {'\0'};
-            sprintf_safe(szError, MAX_BUFF_500, "[CBuffPacket::AddBuff] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", u4Size, m_u4PacketLen);
-            throw std::domain_error(szError);
-        }
-
-        //保存当前长度
-        uint32 u4OldPacketLen = m_u4PacketLen;
-
-        //格式化新创建的内存大小
-        u4Size = (uint32)(((int32)ceil((double)u4Size/(double)DEFINE_PACKET_ADD))*DEFINE_PACKET_ADD);
-        m_u4PacketLen += u4Size;
-
-        szNewData = (char*)App_ACEMemory::instance()->malloc(m_u4PacketLen);
-
-        if(NULL == szNewData)
-        {
-            OUR_DEBUG((LM_ERROR, "[CBuffPacket::AddBuff] nSize [%d] is new error.\n", m_u4PacketLen));
-            char szError[MAX_BUFF_500] = {'\0'};
-            sprintf_safe(szError, MAX_BUFF_500, "[CBuffPacket::AddBuff] nSize [%d] is new error..", m_u4PacketLen);
-            throw std::domain_error(szError);
-        }
-
-        if(NULL == m_szData)
-        {
-            m_szData = szNewData;
-        }
-        else
-        {
-            //移动内存
-            memmove_safe(m_szData, u4OldPacketLen, szNewData, m_u4PacketLen);
-
-            //删除已经不用的内存
-            App_ACEMemory::instance()->free(m_szData);
-            m_szData = szNewData;
-        }
-
-
-        return true;
-    }
-    catch(const std::domain_error& ex)
-    {
-        sprintf_safe(m_szError, MAX_BUFF_500, "%s", ex.what());
-        return false;
-    }
-}
-
-
 bool CBuffPacket::AddBuff(uint32 u4Size)
 {
     try

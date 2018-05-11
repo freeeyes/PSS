@@ -11,14 +11,13 @@
 #ifndef _CONNECTHANDLE_H
 #define _CONNECTHANDLE_H
 
-#include "define.h"
-
 #include "ace/Reactor.h"
 #include "ace/Svc_Handler.h"
 #include "ace/Synch.h"
 #include "ace/SOCK_Acceptor.h"
 #include "ace/Reactor_Notification_Strategy.h"
 
+#include "BaseTask.h"
 #include "ObjectArrayList.h"
 #include "HashTable.h"
 #include "AceReactorManager.h"

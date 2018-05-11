@@ -16,7 +16,6 @@
 #include "MessageService.h"
 #include "IConnectManager.h"
 #include "BaseConsoleHandle.h"
-#include "ConsoleMessage.h"
 #include "PacketConsoleParse.h"
 
 class CConsoleHandler : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>

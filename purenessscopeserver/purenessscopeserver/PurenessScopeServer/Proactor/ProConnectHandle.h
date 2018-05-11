@@ -23,6 +23,7 @@
 #include "ace/Asynch_Acceptor.h"
 #include "ace/Proactor.h"
 
+#include "BaseTask.h"
 #include "ObjectArrayList.h"
 #include "HashTable.h"
 #include "AceProactorManager.h"

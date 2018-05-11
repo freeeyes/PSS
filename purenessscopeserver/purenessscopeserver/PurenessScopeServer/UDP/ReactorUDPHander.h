@@ -9,9 +9,7 @@
 #include "ace/Reactor.h"
 #include "ace/SOCK_Dgram.h"
 
-#include "define.h"
-#include "MessageBlockManager.h"
-#include "PacketParsePool.h"
+#include "BaseHander.h"
 #include "MakePacket.h"
 #include "CommandAccount.h"
 
@@ -39,7 +37,6 @@ public:
 private:
     bool CheckMessage(const char* pData, uint32 u4Len);              //这里解析数据包并放入数据队列
     int  Init_Open_Address(const ACE_INET_Addr& AddrRemote);         //初始化UDP连接对象
-    void Recovery_Message(bool blDelete, char*& pMessage);           //回收用完的char数组
 
     ACE_SOCK_Dgram          m_skRemote;
     ACE_INET_Addr           m_addrRemote;                   //数据发送方的IP信息
