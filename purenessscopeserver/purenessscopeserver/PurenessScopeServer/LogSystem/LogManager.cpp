@@ -87,13 +87,11 @@ _LogBlockInfo* CLogBlockPool::GetLogBlockInfo()
 
     m_u4CurrIndex++;
 
-    //memset(pLogBlockInfo->m_pBlock, 0, m_u4MaxBlockSize);
     return pLogBlockInfo;
 }
 
 void CLogBlockPool::ReturnBlockInfo(_LogBlockInfo* pLogBlockInfo)
 {
-    //memset(pLogBlockInfo->m_pBlock, 0, m_u4MaxBlockSize);
     pLogBlockInfo->clear();
     pLogBlockInfo->m_blIsUsed = false;
 }
@@ -143,13 +141,11 @@ int CLogManager::svc(void)
 {
     OUR_DEBUG((LM_INFO,"[CLogManager::svc] svc run.\n"));
 
-    //ACE_Time_Value     xtime;
     while(true)
     {
         ACE_Message_Block* mb = NULL;
         ACE_OS::last_error(0);
 
-        //xtime=ACE_OS::gettimeofday()+ACE_Time_Value(0, MAX_MSG_PUTTIMEOUT);
         if(getq(mb, 0) == -1)
         {
             OUR_DEBUG((LM_ERROR,"[CLogManager::svc] get error errno = [%d].\n", ACE_OS::last_error()));
@@ -186,14 +182,11 @@ int CLogManager::svc(void)
                 OUR_DEBUG((LM_ERROR, "[CLogManager::svc] ProcessLog is false.\n"));
             }
 
-            //OUR_DEBUG((LM_ERROR,"[CLogManager::svc] delete pstrLogText BEGIN!\n"));
             //回收日志块
             m_objLogBlockPool.ReturnBlockInfo(pLogBlockInfo);
-            //OUR_DEBUG((LM_ERROR,"[CLogManager::svc] delete pstrLogText END!\n"));
         }
     }
 
-    //OUR_DEBUG((LM_INFO,"[CLogManager::svc] CLogManager::svc finish!\n"));
     return 0;
 }
 
@@ -331,9 +324,7 @@ int CLogManager::ProcessLog(_LogBlockInfo* pLogBlockInfo)
         return -1;
     }
 
-    //m_Logger_Mutex.acquire();
     m_pServerLogger->DoLog((int)pLogBlockInfo->m_u4LogID, pLogBlockInfo);
-    //m_Logger_Mutex.release();
     return 0;
 }
 
@@ -341,162 +332,30 @@ int CLogManager::ProcessLog(_LogBlockInfo* pLogBlockInfo)
 
 int CLogManager::WriteLog(int nLogType, const char* fmt, ...)
 {
-    //从日志块池里面找到一块空余的日志块
-    //查看当前日志是否需要入库
-    if(GetLogInfoByLogLevel(nLogType) < m_pServerLogger->GetCurrLevel())
-    {
-        //低于当前日志等级的全部忽略
-        return 0;
-    }
-
-    m_Logger_Mutex.acquire();
-    _LogBlockInfo* pLogBlockInfo = m_objLogBlockPool.GetLogBlockInfo();
-
-    if(NULL == pLogBlockInfo)
-    {
-        OUR_DEBUG((LM_ERROR,"[CLogManager::WriteLog] m_objLogBlockPool is full!\n"));
-        m_Logger_Mutex.release();
-        return -1;
-    }
-
     va_list ap;
     va_start(ap, fmt);
-    ACE_OS::vsnprintf(pLogBlockInfo->m_pBlock, m_objLogBlockPool.GetBlockSize() - 1, fmt, ap);
+
+    int nRet = Create_Log_Block(nLogType, NULL, NULL, &ap, fmt, 0);
     va_end(ap);
-
-    pLogBlockInfo->m_u4Length = (uint32)strlen(pLogBlockInfo->m_pBlock);
-    pLogBlockInfo->m_u4LogID  = (uint32)nLogType;
-
-    if (IsRun())
-    {
-        if (0 != PutLog(pLogBlockInfo))
-        {
-            OUR_DEBUG((LM_INFO, "[CLogManager::WriteLog]PutLog error.\n"));
-        }
-    }
-    else
-    {
-        m_objLogBlockPool.ReturnBlockInfo(pLogBlockInfo);
-    }
-
-    m_Logger_Mutex.release();
-    return 0;
+    return nRet;
 }
 
 int CLogManager::WriteLogBinary(int nLogType, const char* pData, int nLen)
 {
-    int nRet = 0;
-
-    //查看当前日志是否需要入库
-    if(GetLogInfoByLogLevel(nLogType) < m_pServerLogger->GetCurrLevel())
-    {
-        //低于当前日志等级的全部忽略
-        return 0;
-    }
-
-    //从日志块池里面找到一块空余的日志块
-    m_Logger_Mutex.acquire();
-    _LogBlockInfo* pLogBlockInfo = m_objLogBlockPool.GetLogBlockInfo();
-
-    if(NULL == pLogBlockInfo)
-    {
-        OUR_DEBUG((LM_ERROR,"[ILogManager::WriteLogBinary] m_objLogBlockPool is full!\n"));
-        m_Logger_Mutex.release();
-        return -1;
-    }
-
-    //把二进制转换成明文存储
-    if((uint32)(nLen * 5) >= m_objLogBlockPool.GetBlockSize())
-    {
-        OUR_DEBUG((LM_ERROR,"[ILogManager::WriteLogBinary] write length is more than BlockSize!\n"));
-        m_Logger_Mutex.release();
-        return -1;
-    }
-
-    pLogBlockInfo->m_u4LogID = nLogType;
-    char szLog[10]  = {'\0'};
-
-    for(int i = 0; i < nLen; i++)
-    {
-        sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
-        sprintf_safe(pLogBlockInfo->m_pBlock + 5*i, m_objLogBlockPool.GetBlockSize() - 5*i, "%s", szLog);
-    }
-
-    pLogBlockInfo->m_u4Length = (uint32)(nLen * 5);
-
-    if (IsRun())
-    {
-        nRet = PutLog(pLogBlockInfo);
-
-        if (nRet)
-        {
-            m_objLogBlockPool.ReturnBlockInfo(pLogBlockInfo);
-        }
-    }
-    else
-    {
-        m_objLogBlockPool.ReturnBlockInfo(pLogBlockInfo);
-    }
-
-    m_Logger_Mutex.release();
+    int nRet = Create_Log_Block(nLogType, NULL, NULL, NULL, pData, nLen);
     return nRet;
 }
 
 
 int CLogManager::WriteToMail( int nLogType, uint32 u4MailID, char* pTitle, const char* fmt, ... )
 {
-    //查看当前日志是否需要入库
-    if(GetLogInfoByLogLevel(nLogType) < m_pServerLogger->GetCurrLevel())
-    {
-        //低于当前日志等级的全部忽略
-        return 0;
-    }
-
-    //从日志块池里面找到一块空余的日志块
-    m_Logger_Mutex.acquire();
-    _LogBlockInfo* pLogBlockInfo = m_objLogBlockPool.GetLogBlockInfo();
-
-
-    if(NULL == pLogBlockInfo)
-    {
-        OUR_DEBUG((LM_ERROR,"[CLogManager::WriteLog] m_objLogBlockPool is full!\n"));
-        m_Logger_Mutex.release();
-        return -1;
-    }
-
     va_list ap;
     va_start(ap, fmt);
-    ACE_OS::vsnprintf(pLogBlockInfo->m_pBlock, m_objLogBlockPool.GetBlockSize() - 1, fmt, ap);
+
+    int nRet = Create_Log_Block(nLogType, &u4MailID, pTitle, &ap, fmt, 0);
     va_end(ap);
 
-    pLogBlockInfo->m_u4Length = (uint32)strlen(pLogBlockInfo->m_pBlock);
-    pLogBlockInfo->m_u4LogID  = (uint32)nLogType;
-
-    if(m_blIsMail == false)
-    {
-        pLogBlockInfo->m_u4MailID = 0;
-    }
-    else
-    {
-        pLogBlockInfo->m_u4MailID = u4MailID;
-    }
-
-    ACE_OS::sprintf(pLogBlockInfo->m_szMailTitle, "%s", pTitle);
-
-    if (IsRun())
-    {
-        if (false == PutLog(pLogBlockInfo))
-        {
-            OUR_DEBUG((LM_INFO, "[CLogManager::WriteToMail]PutLog error.\n"));
-        }
-    }
-    else
-    {
-        m_objLogBlockPool.ReturnBlockInfo(pLogBlockInfo);
-    }
-
-    m_Logger_Mutex.release();
-    return 0;
+    return nRet;
 }
 
 //*****************************************************************************
@@ -641,4 +500,78 @@ int CLogManager::CloseMsgQueue()
     return retval;
 }
 
+int CLogManager::Create_Log_Block(int nLogType, uint32* pMailID, char* pTitle, va_list* ap, const char* fmt, int nfmtSize)
+{
+    //查看当前日志是否需要入库
+    if (GetLogInfoByLogLevel(nLogType) < m_pServerLogger->GetCurrLevel())
+    {
+        //低于当前日志等级的全部忽略
+        return 0;
+    }
+
+    //从日志块池里面找到一块空余的日志块
+    m_Logger_Mutex.acquire();
+    _LogBlockInfo* pLogBlockInfo = m_objLogBlockPool.GetLogBlockInfo();
+
+
+    if (NULL == pLogBlockInfo)
+    {
+        OUR_DEBUG((LM_ERROR, "[CLogManager::WriteLog] m_objLogBlockPool is full!\n"));
+        m_Logger_Mutex.release();
+        return -1;
+    }
+
+    if (NULL != ap)
+    {
+        //文本数据
+        ACE_OS::vsnprintf(pLogBlockInfo->m_pBlock, m_objLogBlockPool.GetBlockSize() - 1, fmt, *ap);
+    }
+    else
+    {
+        //二进制数据
+        char szLog[10] = { '\0' };
+        int nLen = nfmtSize;
+
+        for (int i = 0; i < nLen; i++)
+        {
+            sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)fmt[i]);
+            sprintf_safe(pLogBlockInfo->m_pBlock + 5 * i, m_objLogBlockPool.GetBlockSize() - 5 * i, "%s", szLog);
+        }
+
+        pLogBlockInfo->m_u4Length = (uint32)(nLen * 5);
+    }
+
+    pLogBlockInfo->m_u4Length = (uint32)strlen(pLogBlockInfo->m_pBlock);
+    pLogBlockInfo->m_u4LogID = (uint32)nLogType;
+
+    if (NULL != pMailID && NULL != pTitle)
+    {
+        if (m_blIsMail == false)
+        {
+            pLogBlockInfo->m_u4MailID = 0;
+        }
+        else
+        {
+            pLogBlockInfo->m_u4MailID = *pMailID;
+        }
+
+        ACE_OS::sprintf(pLogBlockInfo->m_szMailTitle, "%s", pTitle);
+    }
+
+    if (IsRun())
+    {
+        if (false == PutLog(pLogBlockInfo))
+        {
+            OUR_DEBUG((LM_INFO, "[CLogManager::WriteToMail]PutLog error.\n"));
+        }
+    }
+    else
+    {
+        m_objLogBlockPool.ReturnBlockInfo(pLogBlockInfo);
+    }
+
+    m_Logger_Mutex.release();
+
+    return 0;
+}
 

@@ -474,9 +474,6 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
         return;
     }
 
-    //写入连接日志
-    AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Connection from [%s:%d]To Server GetHandlerID=%d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), GetHandlerID());
-
     //将这个链接放入链接库
     if(false == App_ProConnectManager::instance()->AddConnect(this))
     {
@@ -485,6 +482,13 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
         Close();
         return;
     }
+
+    //写入连接日志
+    AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Connection from [%s:%d] ConnectID=%d, GetHandlerID=%d.",
+                                        m_addrRemote.get_host_addr(),
+                                        m_addrRemote.get_port_number(),
+                                        GetConnectID(),
+                                        GetHandlerID());
 
     m_u1ConnectState = CONNECT_OPEN;
 

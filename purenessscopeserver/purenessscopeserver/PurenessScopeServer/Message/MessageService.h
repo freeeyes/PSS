@@ -84,9 +84,6 @@ public:
 
     void GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_Account);  //得到当前列表描述信息
 
-    bool GetThreadInfoJson(char* pJson, uint32 u4Len);                       //工作线程的echart的json格式(数据列表)
-    bool GetThreadInfoTimeJson(char* pJson, uint32 u4Len);                   //工作线程的echart的json格式(时间列表)
-
 private:
     bool ProcessMessage(CMessage* pMessage, uint32 u4ThreadID);
     void CloseCommandList();                                                //清理当前信令列表副本
@@ -165,17 +162,10 @@ public:
 
     void GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_Account);                  //得到当前列表描述信息
 
-    bool GetConnectJson(char* pJson, uint32 u4Len);                                           //连接数的echart的json格式(数据列表)
-    bool GetCurrConnectJson(char* pJson, uint32 u4Len);                                       //连接数的echart的json格式(数据列表)
-    bool GetConnectTimeJson(char* pJson, uint32 u4Len);                                       //连接数的echart的json格式(时间列表)
-
 private:
     bool StartTimer();
     bool KillTimer();
 
-    bool SaveCommandChart(ACE_Time_Value tvNow);                                             //保存指定命令信息图表
-    bool SaveThreadInfoJson();                                                               //是否记录Json结果
-    bool SaveConnectJson(ACE_Time_Value tvNow);                                              //存储连接信息json结果
     bool CheckWorkThread();                                                                  //检查所有的工作线程状态
     bool CheckPacketParsePool();                                                             //检查正在使用的消息解析对象
     bool CheckCPUAndMemory();                                                                //检查CPU和内存

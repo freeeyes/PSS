@@ -77,12 +77,11 @@ public:
 private:
     int ProcessLog(_LogBlockInfo* pLogBlockInfo);
     virtual int CloseMsgQueue();
+    int Create_Log_Block(int nLogType, uint32* pMailID, char* pTitle, va_list* ap, const char* fmt, int nfmtSize);
 
-private:
     //关闭消息队列条件变量
-    ACE_Thread_Mutex m_mutex;
-    ACE_Condition<ACE_Thread_Mutex> m_cond;
-private:
+    ACE_Thread_Mutex                  m_mutex;
+    ACE_Condition<ACE_Thread_Mutex>   m_cond;
     bool                              m_blRun;                    //日志系统是否启动
     bool                              m_blIsNeedReset;            //日志模块等级升级重置标志
     bool                              m_blIsMail;                 //是否可以发送邮件
