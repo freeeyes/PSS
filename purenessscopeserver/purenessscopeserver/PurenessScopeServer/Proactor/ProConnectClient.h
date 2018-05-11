@@ -11,12 +11,9 @@
 #include "ace/Mutex.h"
 #include "ace/Thread_Mutex.h"
 
-#include "MainConfig.h"
-#include "ClientMessage.h"
 #include "AceProactorManager.h"
+#include "BaseConnectClient.h"
 #include "LogManager.h"
-#include "ServerMessageTask.h"
-#include "MessageService.h"
 
 #define MAX_BUFF_1024 1024
 #define MAX_IP_LEN    16

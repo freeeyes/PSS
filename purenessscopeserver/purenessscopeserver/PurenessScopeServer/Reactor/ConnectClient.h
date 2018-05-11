@@ -15,13 +15,9 @@
 #include "ace/Svc_Handler.h"
 #include "ace/Reactor_Notification_Strategy.h"
 
-#include "MainConfig.h"
-#include "MessageBlockManager.h"
-#include "ClientMessage.h"
 #include "AceReactorManager.h"
+#include "BaseConnectClient.h"
 #include "LogManager.h"
-#include "ServerMessageTask.h"
-#include "MessageService.h"
 
 class CConnectClient : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>
 {

@@ -220,7 +220,7 @@ bool CFileTestManager::LoadXmlCfg(const char* szXmlFileTestName, FileTestResultI
     m_MainConfig.Close();
 
     //初始化连接返回数据数组
-    ResponseRecordList();
+    InitResponseRecordList();
 
     objFileTestResult.n4ProNum = static_cast<int>(m_vecFileTestDataInfoSt.size());
     return true;
@@ -292,13 +292,43 @@ int CFileTestManager::ReadTestFile(const char* pFileName, int nType, FileTestDat
     return RESULT_OK;
 }
 
-int CFileTestManager::ResponseRecordList()
+int CFileTestManager::InitResponseRecordList()
 {
     //初始化Hash表
     m_objResponseRecordList.Close();
     m_objResponseRecordList.Init((int)m_u4ConnectCount);
 
     return 0;
+}
+
+bool CFileTestManager::AddResponseRecordList(uint32 u4ConnectID, const ACE_Time_Value& tv)
+{
+
+    if (0 != u4ConnectID)
+    {
+        ResponseRecordSt* pResponseRecord = new ResponseRecordSt();
+        pResponseRecord->m_u1ResponseCount = 0;
+        pResponseRecord->m_u8StartTime = tv.get_msec();
+        pResponseRecord->m_u4ConnectID = u4ConnectID;
+
+        char szConnectID[10] = { '\0' };
+        sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
+
+        if (-1 == m_objResponseRecordList.Add_Hash_Data(szConnectID, pResponseRecord))
+        {
+            OUR_DEBUG((LM_INFO, "[CFileTestManager::AddResponseRecordList]Add m_objResponseRecordList error, ConnectID=%d.\n", u4ConnectID));
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+    else
+    {
+        OUR_DEBUG((LM_INFO, "[CMainConfig::AddResponseRecordList]file_open error\n"));
+        return false;
+    }
 }
 
 int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
@@ -358,40 +388,7 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 
             uint32 u4ConnectID = pConnectHandler->file_open(dynamic_cast<IFileTestManager*>(this));
 
-            if (0 != u4ConnectID)
-            {
-                ResponseRecordSt* pResponseRecord = new ResponseRecordSt();
-                pResponseRecord->m_u1ResponseCount = 0;
-                pResponseRecord->m_u8StartTime     = tv.get_msec();
-                pResponseRecord->m_u4ConnectID = u4ConnectID;
-
-                char szConnectID[10] = { '\0' };
-                sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
-
-                if (-1 == m_objResponseRecordList.Add_Hash_Data(szConnectID, pResponseRecord))
-                {
-                    OUR_DEBUG((LM_INFO, "[CFileTestManager::handle_timeout]Add m_objResponseRecordList error, ConnectID=%d.\n", u4ConnectID));
-                }
-            }
-            else
-            {
-                OUR_DEBUG((LM_INFO, "[CMainConfig::handle_timeout]file_open error\n"));
-            }
-        }
-    }
-
-    //循环将数据包压入连接对象
-    for (int iLoop = 0; iLoop < (int)m_vecFileTestDataInfoSt.size(); iLoop++)
-    {
-        FileTestDataInfoSt& objFileTestDataInfo = m_vecFileTestDataInfoSt[iLoop];
-
-        vector<ResponseRecordSt*> vecExistList;
-        m_objResponseRecordList.Get_All_Used(vecExistList);
-
-        for (int jLoop = 0; jLoop < (int)vecExistList.size(); jLoop++)
-        {
-            uint32 u4ConnectID = vecExistList[jLoop]->m_u4ConnectID;
-            App_ConnectManager::instance()->handle_write_file_stream(u4ConnectID, objFileTestDataInfo.m_szData, objFileTestDataInfo.m_u4DataLength, m_u4ParseID);
+            AddResponseRecordList(u4ConnectID, tv);
         }
     }
 
@@ -411,28 +408,13 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 
             uint32 u4ConnectID = ptrProConnectHandle->file_open(dynamic_cast<IFileTestManager*>(this));
 
-            if (0 != u4ConnectID)
-            {
-                ResponseRecordSt* pResponseRecord = new ResponseRecordSt();
-                pResponseRecord->m_u1ResponseCount = 0;
-                pResponseRecord->m_u8StartTime = tv.get_msec();
-                pResponseRecord->m_u4ConnectID = u4ConnectID;
-
-                char szConnectID[10] = { '\0' };
-                sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
-
-                if (-1 == m_objResponseRecordList.Add_Hash_Data(szConnectID, pResponseRecord))
-                {
-                    OUR_DEBUG((LM_INFO, "[CFileTestManager::handle_timeout]Add m_objResponseRecordList error, ConnectID=%d.\n", u4ConnectID));
-                }
-            }
-            else
-            {
-                OUR_DEBUG((LM_INFO, "[CMainConfig::handle_timeout]file_open error\n"));
-            }
+            AddResponseRecordList(u4ConnectID, tv);
         }
     }
 
+#endif
+
+    //循环将数据包压入对象
     for (int iLoop = 0; iLoop < (int)m_vecFileTestDataInfoSt.size(); iLoop++)
     {
         FileTestDataInfoSt& objFileTestDataInfo = m_vecFileTestDataInfoSt[iLoop];
@@ -447,7 +429,6 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
         }
     }
 
-#endif
 
     return 0;
 }

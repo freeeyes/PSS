@@ -183,6 +183,7 @@
     <ClCompile Include="..\Common\RandomNumber.cpp" />
     <ClCompile Include="..\Common\Threading.cpp" />
     <ClCompile Include="Common\BaseClientConnectManager.cpp" />
+    <ClCompile Include="Common\BaseConnectClient.cpp" />
     <ClCompile Include="Common\BaseConsoleHandle.cpp" />
     <ClCompile Include="Common\ServerMessageTask.cpp" />
     <ClCompile Include="Console\ConsolePromiss.cpp" />
@@ -551,6 +552,7 @@
     <ClInclude Include="..\Common\TimeWheelLink.h" />
     <ClInclude Include="..\Common\Trace.h" />
     <ClInclude Include="Common\BaseClientConnectManager.h" />
+    <ClInclude Include="Common\BaseConnectClient.h" />
     <ClInclude Include="Common\BaseConsoleHandle.h" />
     <ClInclude Include="Common\ServerMessageTask.h" />
     <ClInclude Include="Console\ConsolePromiss.h" />
