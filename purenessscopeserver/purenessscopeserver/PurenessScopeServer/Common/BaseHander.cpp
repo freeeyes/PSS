@@ -25,7 +25,7 @@ bool Udp_Common_Send_Message(uint32 u4PacketParseInfoID, ACE_INET_Addr& AddrRemo
         CPacketParse PacketParse;
 
         uint32 u4SendLength = App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Make_Send_Packet_Length(0, u4Len, u2CommandID);
-        ACE_Message_Block* pMbData = App_MessageBlockManager::instance()->Create(u4SendLength);
+        pMbData = App_MessageBlockManager::instance()->Create(u4SendLength);
 
         if (NULL == pMbData)
         {
@@ -47,7 +47,7 @@ bool Udp_Common_Send_Message(uint32 u4PacketParseInfoID, ACE_INET_Addr& AddrRemo
     else
     {
         //不需要拼接包头，直接发送
-        ACE_Message_Block* pMbData = App_MessageBlockManager::instance()->Create(u4Len);
+        pMbData = App_MessageBlockManager::instance()->Create(u4Len);
 
         if (NULL == pMbData)
         {

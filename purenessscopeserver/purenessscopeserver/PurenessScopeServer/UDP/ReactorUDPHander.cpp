@@ -149,6 +149,8 @@ bool CReactorUDPHander::SendMessage(char*& pMessage, uint32 u4Len, const char* s
             return false;
         }
     }
+
+    return true;
 }
 
 _ClientConnectInfo CReactorUDPHander::GetClientConnectInfo()

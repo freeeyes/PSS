@@ -163,31 +163,37 @@ bool CProactorUDPHandler::SendMessage(char*& pMessage, uint32 u4Len, const char*
                                            u2CommandID,
                                            blDlete,
                                            pMbData);
-    int nSize = (int)m_skRemote.send(pMbData->rd_ptr(), pMbData->length(), AddrRemote);
 
-    if((uint32)nSize == pMbData->length())
+    if (true == blState)
     {
-        m_atvOutput = ACE_OS::gettimeofday();
-        m_u4SendSize += (uint32)nSize;
-        m_u4SendPacketCount++;
+        int nSize = (int)m_skRemote.send(pMbData->rd_ptr(), pMbData->length(), AddrRemote);
 
-        //统计发送信息
-        m_CommandAccount.SaveCommandData(u2CommandID, (uint32)nPort, PACKET_UDP, nSize, COMMAND_TYPE_OUT);
+        if ((uint32)nSize == pMbData->length())
+        {
+            m_atvOutput = ACE_OS::gettimeofday();
+            m_u4SendSize += (uint32)nSize;
+            m_u4SendPacketCount++;
 
-        //释放发送体
-        App_MessageBlockManager::instance()->Close(pMbData);
+            //统计发送信息
+            m_CommandAccount.SaveCommandData(u2CommandID, (uint32)nPort, PACKET_UDP, nSize, COMMAND_TYPE_OUT);
 
-        return true;
+            //释放发送体
+            App_MessageBlockManager::instance()->Close(pMbData);
+
+            return true;
+        }
+        else
+        {
+            OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::SendMessage]send error(%d).\n", errno));
+
+            //释放发送体
+            App_MessageBlockManager::instance()->Close(pMbData);
+
+            return false;
+        }
     }
-    else
-    {
-        OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::SendMessage]send error(%d).\n", errno));
 
-        //释放发送体
-        App_MessageBlockManager::instance()->Close(pMbData);
-
-        return false;
-    }
+    return true;
 }
 
 _ClientConnectInfo CProactorUDPHandler::GetClientConnectInfo()
