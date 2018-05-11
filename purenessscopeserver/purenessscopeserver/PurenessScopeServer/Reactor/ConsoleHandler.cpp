@@ -420,35 +420,14 @@ void CConsoleHandler::Clear_PacketParse()
 
 bool CConsoleHandler::CheckMessage()
 {
-    m_u4AllRecvSize += (uint32)m_pPacketParse->GetMessageHead()->length() + (uint32)m_pPacketParse->GetMessageBody()->length();
-    m_u4AllRecvCount++;
-    //发送回复信息
-    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
-    //将数据Buff放入消息体中
-    //将数据Buff放入消息体中，传递给处理类。
     uint8 u1Output = 0;
-    uint32 u4Return = (uint32)App_ConsoleManager::instance()->Dispose(m_pPacketParse->GetMessageBody(), pBuffPacket, u1Output);
+    IBuffPacket* pBuffPacket = NULL;
+    bool blRet = Console_Common_CheckMessage_Data(m_u4AllRecvSize, m_u4AllRecvCount, m_pPacketParse, u1Output, pBuffPacket);
 
-    if (CONSOLE_MESSAGE_SUCCESS == u4Return)
+    if (true == blRet && false == SendMessage(dynamic_cast<IBuffPacket*>(pBuffPacket), u1Output))
     {
-        if (pBuffPacket->GetPacketLen() > 0
-            && false == SendMessage(dynamic_cast<IBuffPacket*>(pBuffPacket), u1Output))
-        {
-            OUR_DEBUG((LM_INFO, "[CConsoleHandler::CheckMessage]SendMessage error.\n"));
-        }
+        OUR_DEBUG((LM_INFO, "[CConsoleHandler::CheckMessage]SendMessage error.\n"));
     }
-    else if(CONSOLE_MESSAGE_FAIL == u4Return)
-    {
-        OUR_DEBUG((LM_INFO, "[CConsoleHandler::CheckMessage]u4Return CONSOLE_MESSAGE_FAIL.\n"));
-        App_BuffPacketManager::instance()->Delete(pBuffPacket);
-        return false;
-    }
-    else
-    {
-        App_BuffPacketManager::instance()->Delete(pBuffPacket);
-        return false;
-    }
-
 
     return true;
 }
