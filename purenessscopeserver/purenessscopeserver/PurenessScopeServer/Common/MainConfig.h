@@ -721,7 +721,7 @@ public:
     uint32 GetSendTimeout();
 
     uint32 GetRecvBuffSize();
-    uint16 GetSendQueueMax();
+ //   uint16 GetSendQueueMax();
     uint16 GetThreadTimuOut();
     uint16 GetThreadTimeCheck();
     uint16 GetPacketTimeOut();

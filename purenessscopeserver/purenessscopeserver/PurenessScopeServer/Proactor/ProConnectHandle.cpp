@@ -2430,7 +2430,8 @@ void CProConnectManager::Init(uint16 u2Index)
                           App_MainConfig::instance()->GetPacketTimeOut());
 
     //初始化队列最大发送缓冲数量
-    m_u2SendQueueMax = App_MainConfig::instance()->GetSendQueueMax();
+	//m_u2SendQueueMax = App_MainConfig::instance()->GetSendQueueMax();
+	m_u2SendQueueMax = App_XmlConfig::instance()->GetXmlConfig<xmlSendInfo>(SendInfo)->SendQueueMax;
 
     //初始化发送缓冲池
     m_SendCacheManager.Init(App_MainConfig::instance()->GetBlockCount(), App_MainConfig::instance()->GetBlockSize());
