@@ -2,47 +2,58 @@
 
 
 /*数组元素对应的元素位置已经在构造时候按枚举确认*/
-IConfigOpeation* IConfigOpeation::_array[XmlEnd::MAX];
+IConfigOpeation* IConfigOpeation::_array[XML_Config_MAX];
+
+
+/*定义静态类对象兵现实化实现模板函数*/
+#define DefineClassAndFunc(ClassName)									\
+static ClassName	this##ClassName;									\
+template<>																\
+ClassName* XMainConfig::GetXmlConfig<ClassName>(XmlConfig config)		\
+{																		\
+	return dynamic_cast<ClassName*>(IConfigOpeation::_array[config]);	\
+}																		
+
 
 /*xml配置文件对应类型配置的静态类，需要增加配置文件标签，需要在此添加静态类对象，所有对象不直接使用,也不允许外部使用*/
-static xmlRecvInfo			thisRecvInfo;
-static xmlSendInfo			thisSendInfo;
-static xmlNetWorkMode		thisNetWorkMode;
-static xmlConnectServer		thisConnectServer;
-static xmlClientInfo		thisClientInfo;
-static xmlModuleInfos		thisModuleInfos;
-static xmlModuleMangager	thisModuleMangager;
-static xmlMonitor			thisMonitor;
-static xmlThreadInfoAI		thisThreadInfoAI;
-static xmlThreadInfo		thisThreadInfo;
-static xmlConsole			thisConsole;
-static xmlConsoleKeys		thisConsoleKey;
-static xmlAceDebug			thisAceDebug;
-static xmlCommandAccount	thisCommandAccount;
-static xmlCoreSetting		thisCoreSetting;
-static xmlServerType		thisServerType;
-static xmlServerID			thisServerID;
-static xmlServerName		thisServerName;
-static xmlServerVersion		thisServerVersion;
-static xmlPacketParses		thisPacketParses;
-static xmlBuffPacket		thisBuffPacket;
-static xmlMessage			thisMessage;
-static xmlAlertConnect		thisAlertConnect;
-static xmlIP				thisIP;
-static xmlClientData		thisClientData;
-static xmlCommandInfo		thisCommandInfo;
-static xmlMail				thisMail;
-static xmlWorkThreadChart	thisWorkThreadChart;
-static xmlConnectChart		thisConnectChart;
-static xmlCommandChart		thisCommandChart;
+/*****************类对象和返回函数一一对应*********************/
+DefineClassAndFunc(xmlSendInfo)
+DefineClassAndFunc(xmlNetWorkMode)
+DefineClassAndFunc(xmlConnectServer)
+DefineClassAndFunc(xmlClientInfo)
+DefineClassAndFunc(xmlModuleInfos)
+DefineClassAndFunc(xmlModuleMangager)
+DefineClassAndFunc(xmlMonitor)
+DefineClassAndFunc(xmlThreadInfoAI)
+DefineClassAndFunc(xmlThreadInfo)
+DefineClassAndFunc(xmlConsole)
+DefineClassAndFunc(xmlConsoleKeys)
+DefineClassAndFunc(xmlAceDebug)
+DefineClassAndFunc(xmlCommandAccount)
+DefineClassAndFunc(xmlCoreSetting)
+DefineClassAndFunc(xmlServerType)
+DefineClassAndFunc(xmlServerID)
+DefineClassAndFunc(xmlServerName)
+DefineClassAndFunc(xmlServerVersion)
+DefineClassAndFunc(xmlPacketParses)
+DefineClassAndFunc(xmlBuffPacket)
+DefineClassAndFunc(xmlMessage)
+DefineClassAndFunc(xmlAlertConnect)
+DefineClassAndFunc(xmlIP)
+DefineClassAndFunc(xmlClientData)
+DefineClassAndFunc(xmlCommandInfo)
+DefineClassAndFunc(xmlMail)
+DefineClassAndFunc(xmlWorkThreadChart)
+DefineClassAndFunc(xmlConnectChart)
+DefineClassAndFunc(xmlCommandChart)
 
 
 
 bool XMainConfig::Init()
 {
 	//初始化xml文件
-	return Init(MAINCONFIG, XmlConfig::RecvInfo, XmlConfig::Message)
-		&& Init(ALERTCONFIG, XmlConfig::AlertConnect, XmlConfig::CommandChart);
+	return Init(MAINCONFIG, XML_Config_RecvInfo, XML_Config_Message)
+		&& Init(ALERTCONFIG, XML_Config_AlertConnect, XML_Config_CommandChart);
 }
 
 bool XMainConfig::Init(const char* pFileName, XmlConfig start, XmlConfig end)

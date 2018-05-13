@@ -2513,7 +2513,7 @@ void CConnectManager::Init( uint16 u2Index )
 
     //初始化最大消息发送队列长度
    // m_u2SendQueueMax = App_MainConfig::instance()->GetSendQueueMax();
-	m_u2SendQueueMax = App_XmlConfig::instance()->GetXmlConfig<xmlSendInfo>(SendInfo)->SendQueueMax;
+	m_u2SendQueueMax = App_XmlConfig::instance()->GetXmlConfig<xmlSendInfo>(XML_Config_SendInfo)->SendQueueMax;
     //初始化发送缓冲
     m_SendCacheManager.Init(App_MainConfig::instance()->GetBlockCount(), App_MainConfig::instance()->GetBlockSize());
 
