@@ -93,7 +93,6 @@ int CProactorUDPHandler::OpenAddress(const ACE_INET_Addr& AddrLocal, ACE_Proacto
     m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
 
     size_t stRecvLen = MAX_UDP_PACKET_LEN;
-    //OUR_DEBUG((LM_INFO, "[CProactorUDPHandler::OpenAddress]pMBBuff=0x%08x.\n", pMBBuff));
     int nRecvSize = (int)m_Read.recv(pMBBuff, stRecvLen, 0, PF_INET, m_szAct);
     return nRecvSize;
 }
@@ -144,7 +143,6 @@ void CProactorUDPHandler::handle_read_dgram(const ACE_Asynch_Read_Dgram::Result&
     else
     {
         size_t stRecvLen = MAX_UDP_PACKET_LEN;
-        //OUR_DEBUG((LM_INFO, "[CProactorUDPHandler::handle_read_dgram]pMBBuff=0x%08x.\n", pMBBuff));
         m_Read.recv(pMBBuff, stRecvLen, 0, PF_INET, m_szAct);
     }
 }
@@ -233,31 +231,16 @@ bool CProactorUDPHandler::CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len)
         memcpy_safe((char* )pMbData->rd_ptr(), m_pPacketParse->GetPacketHeadSrcLen(), (char* )pMBHead->wr_ptr(), m_pPacketParse->GetPacketHeadSrcLen());
         pMBHead->wr_ptr(m_pPacketParse->GetPacketHeadSrcLen());
 
-        _Head_Info obj_Head_Info;
-        bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Head_Info(0, pMBHead, App_MessageBlockManager::instance(), &obj_Head_Info);
+        bool blRet = Udp_Common_Recv_Head(pMBHead, m_pPacketParse, m_u4PacketParseInfoID, u4Len);
 
-        if(false == blStateHead)
-        {
-            App_MessageBlockManager::instance()->Close(pMbData);
-            App_PacketParsePool::instance()->Delete(m_pPacketParse);
-            return false;
-        }
-        else
-        {
-            m_pPacketParse->SetPacket_IsHandleHead(false);
-            m_pPacketParse->SetPacket_Head_Curr_Length(obj_Head_Info.m_u4HeadCurrLen);
-            m_pPacketParse->SetPacket_Body_Src_Length(obj_Head_Info.m_u4BodySrcLen);
-            m_pPacketParse->SetPacket_CommandID(obj_Head_Info.m_u2PacketCommandID);
-            m_pPacketParse->SetPacket_Head_Message(pMBHead);
-        }
-
-        if(u4Len != m_pPacketParse->GetPacketHeadSrcLen() + m_pPacketParse->GetPacketBodySrcLen())
+        if (false == blRet)
         {
             App_MessageBlockManager::instance()->Close(pMBHead);
             App_PacketParsePool::instance()->Delete(m_pPacketParse);
             return false;
         }
 
+        //读指针向后移动
         pMbData->rd_ptr(m_pPacketParse->GetPacketHeadSrcLen());
 
         //如果包含包体
@@ -267,8 +250,7 @@ bool CProactorUDPHandler::CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len)
             memcpy_safe((char* )pMbData->rd_ptr(), m_pPacketParse->GetPacketBodySrcLen(), (char* )pMBBody->wr_ptr(), m_pPacketParse->GetPacketBodySrcLen());
             pMBBody->wr_ptr(m_pPacketParse->GetPacketBodySrcLen());
 
-            _Body_Info obj_Body_Info;
-            bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Body_Info(0, pMBBody, App_MessageBlockManager::instance(), &obj_Body_Info);
+            bool blStateBody = Udp_Common_Recv_Body(pMBBody, m_pPacketParse, m_u4PacketParseInfoID);
 
             if(false  == blStateBody)
             {
@@ -277,66 +259,27 @@ bool CProactorUDPHandler::CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len)
                 App_PacketParsePool::instance()->Delete(m_pPacketParse);
                 return false;
             }
-            else
-            {
-                m_pPacketParse->SetPacket_Body_Message(pMBBody);
-                m_pPacketParse->SetPacket_Body_Curr_Length(obj_Body_Info.m_u4BodyCurrLen);
-            }
+
         }
 
-        //组织数据包
-        _MakePacket objMakePacket;
-        objMakePacket.m_u4ConnectID       = UDP_HANDER_ID;
-        objMakePacket.m_pPacketParse      = m_pPacketParse;
-        objMakePacket.m_PacketType        = PACKET_UDP;
-        objMakePacket.m_AddrRemote        = m_addrRemote;
-        objMakePacket.m_AddrListen        = m_addrLocal;
-        objMakePacket.m_u1Option          = PACKET_PARSE;
-
-        //UDP因为不是面向链接的
-        if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvCheck))
+        //处理数据包
+        if (false == Udp_Common_Send_WorkThread(m_pPacketParse, m_addrRemote, m_addrLocal, tvCheck))
         {
-            OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::SendMessage]PutMessageBlock is error.\n"));
-            App_PacketParsePool::instance()->Delete(m_pPacketParse);
             return false;
         }
     }
     else
     {
         //以数据流处理
-        _Packet_Info obj_Packet_Info;
-
-        if(PACKET_GET_ENOUGTH == App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Stream(0, pMbData, App_MessageBlockManager::instance(), &obj_Packet_Info))
+        if (false == Udp_Common_Recv_Stream(pMbData, m_pPacketParse, m_u4PacketParseInfoID))
         {
-            m_pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
-            m_pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);
-            m_pPacketParse->SetPacket_CommandID(obj_Packet_Info.m_u2PacketCommandID);
-            m_pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4HeadSrcLen);
-            m_pPacketParse->SetPacket_Head_Curr_Length(obj_Packet_Info.m_u4HeadCurrLen);
-            m_pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4BodySrcLen);
-            m_pPacketParse->SetPacket_Body_Curr_Length(obj_Packet_Info.m_u4BodyCurrLen);
-
-            //组织数据包
-            _MakePacket objMakePacket;
-            objMakePacket.m_u4ConnectID       = UDP_HANDER_ID;
-            objMakePacket.m_pPacketParse      = m_pPacketParse;
-            objMakePacket.m_PacketType        = PACKET_UDP;
-            objMakePacket.m_AddrRemote        = m_addrRemote;
-            objMakePacket.m_AddrListen        = m_addrLocal;
-            objMakePacket.m_u1Option          = PACKET_PARSE;
-
-            //UDP因为不是面向链接的
-            if(false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvCheck))
-            {
-                App_PacketParsePool::instance()->Delete(m_pPacketParse);
-                OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::SendMessage]PutMessageBlock is error.\n"));
-                return false;
-            }
-        }
-        else
-        {
-            OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::SendMessage]m_pPacketParse GetPacketStream is error.\n"));
             App_PacketParsePool::instance()->Delete(m_pPacketParse);
+            return false;
+        }
+
+        //处理数据包
+        if (false == Udp_Common_Send_WorkThread(m_pPacketParse, m_addrRemote, m_addrLocal, tvCheck))
+        {
             return false;
         }
     }

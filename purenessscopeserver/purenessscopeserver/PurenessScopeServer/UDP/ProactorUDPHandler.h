@@ -10,7 +10,6 @@
 #include "ace/SOCK_Dgram.h"
 
 #include "BaseHander.h"
-#include "MakePacket.h"
 #include "ForbiddenIP.h"
 #include "CommandAccount.h"
 #include "LoadPacketParse.h"

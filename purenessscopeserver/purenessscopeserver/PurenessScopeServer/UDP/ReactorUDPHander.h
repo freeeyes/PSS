@@ -10,7 +10,6 @@
 #include "ace/SOCK_Dgram.h"
 
 #include "BaseHander.h"
-#include "MakePacket.h"
 #include "CommandAccount.h"
 
 class CReactorUDPHander : public ACE_Event_Handler
