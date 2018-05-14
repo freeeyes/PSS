@@ -29,7 +29,6 @@ bool CProServerManager::Init()
     }
 
     int nServerPortCount    = App_MainConfig::instance()->GetServerPortCount();
-    //int nUDPServerPortCount = App_MainConfig::instance()->GetUDPServerPortCount();
     int nReactorCount       = App_MainConfig::instance()->GetReactorCount();
 
     bool blState = false;
@@ -181,12 +180,6 @@ bool CProServerManager::Init()
 
 bool CProServerManager::Start()
 {
-    //×¢²áÐÅºÅÁ¿
-    //if(0 != App_SigHandler::instance()->RegisterSignal(NULL))
-    //{
-    //  return false;
-    //}
-
     //Æô¶¯TCP¼àÌý
     int nServerPortCount = App_MainConfig::instance()->GetServerPortCount();
     //bool blState = false;
