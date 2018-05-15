@@ -976,7 +976,6 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
             pMbData->rd_ptr(nDataLen);
             nIsSendSize      += nDataLen;
             m_atvOutput      = ACE_OS::gettimeofday();
-            continue;
         }
     }
 
@@ -1162,7 +1161,6 @@ int CConnectHandler::Dispose_Paceket_Parse_Stream(ACE_Message_Block* pCurrMessag
 {
     while (true)
     {
-        _Packet_Info obj_Packet_Info;
         uint8 n1Ret = Tcp_Common_Recv_Stream(GetConnectID(), pCurrMessage, m_pPacketParse, m_u4PacketParseInfoID);
 
         if (PACKET_GET_NO_ENOUGTH == n1Ret)
@@ -1191,11 +1189,6 @@ int CConnectHandler::Dispose_Paceket_Parse_Stream(ACE_Message_Block* pCurrMessag
             if (pCurrMessage->length() == 0)
             {
                 break;
-            }
-            else
-            {
-                //还有数据，继续分析
-                continue;
             }
         }
         else
@@ -1273,22 +1266,16 @@ bool CConnectHandler::CheckMessage()
 
 _ClientConnectInfo CConnectHandler::GetClientInfo()
 {
-    _ClientConnectInfo ClientConnectInfo;
-
-    ClientConnectInfo.m_blValid             = true;
-    ClientConnectInfo.m_u4ConnectID         = GetConnectID();
-    ClientConnectInfo.m_addrRemote          = m_addrRemote;
-    ClientConnectInfo.m_u4RecvCount         = m_u4AllRecvCount;
-    ClientConnectInfo.m_u4SendCount         = m_u4AllSendCount;
-    ClientConnectInfo.m_u4AllRecvSize       = m_u4AllSendSize;
-    ClientConnectInfo.m_u4AllSendSize       = m_u4AllSendSize;
-    ClientConnectInfo.m_u4BeginTime         = (uint32)m_atvConnect.sec();
-    ClientConnectInfo.m_u4AliveTime         = (uint32)(ACE_OS::gettimeofday().sec() -  m_atvConnect.sec());
-    ClientConnectInfo.m_u4RecvQueueCount    = m_u4RecvQueueCount;
-    ClientConnectInfo.m_u8RecvQueueTimeCost = m_u8RecvQueueTimeCost;
-    ClientConnectInfo.m_u8SendQueueTimeCost = m_u8SendQueueTimeCost;
-
-    return ClientConnectInfo;
+    return Tcp_Common_ClientInfo(GetConnectID(),
+                                 m_addrRemote,
+                                 m_u4AllRecvCount,
+                                 m_u4AllSendCount,
+                                 m_u4AllRecvSize,
+                                 m_u4AllSendSize,
+                                 m_atvConnect,
+                                 m_u4RecvQueueCount,
+                                 m_u8RecvQueueTimeCost,
+                                 m_u8SendQueueTimeCost);
 }
 
 _ClientIPInfo  CConnectHandler::GetClientIPInfo()
@@ -1351,161 +1338,54 @@ void CConnectHandler::ClearPacketParse()
 
 bool CConnectHandler::Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPacket)
 {
-    char szLog[10] = { '\0' };
-    uint32 u4DebugSize = 0;
-    bool blblMore = false;
-
-    if (pBuffPacket->GetPacketLen() >= m_u4PacketDebugSize)
-    {
-        u4DebugSize = m_u4PacketDebugSize - 1;
-        blblMore = true;
-    }
-    else
-    {
-        u4DebugSize = (int)pBuffPacket->GetPacketLen();
-    }
-
-    char* pData = (char*)pBuffPacket->GetData();
-
-    for (uint32 i = 0; i < u4DebugSize; i++)
-    {
-        sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
-        sprintf_safe(m_pPacketDebugData + 5 * i, MAX_BUFF_1024 - 5 * i, "0x%02X ", (unsigned char)pData[i]);
-    }
-
-    m_pPacketDebugData[5 * u4DebugSize] = '\0';
-
-    if (blblMore == true)
-    {
-        AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTSEND, "[(%s)%s:%d]%s.(数据包过长)", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_pPacketDebugData);
-    }
-    else
-    {
-        AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTSEND, "[(%s)%s:%d]%s.", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_pPacketDebugData);
-    }
-
-    //回调测试文件管理接口
-    if (NULL != m_pFileTest)
-    {
-        m_pFileTest->HandlerServerResponse(GetConnectID());
-    }
-
-    //回收用完的对象
-    Recovery_Common_BuffPacket(blDelete, pBuffPacket);
-
-    return true;
+    //文件入口，直接写入日志
+    return Tcp_Common_File_Message(GetConnectID(),
+                                   m_pFileTest,
+                                   blDelete,
+                                   pBuffPacket,
+                                   m_pPacketDebugData,
+                                   m_u4PacketDebugSize,
+                                   m_addrRemote,
+                                   m_szConnectName);
 }
 
 bool CConnectHandler::Send_Input_To_Cache(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, bool blDelete, IBuffPacket* pBuffPacket)
 {
-    //先判断要发送的数据长度，看看是否可以放入缓冲，缓冲是否已经放满。
-    uint32 u4SendPacketSize = 0;
-
-    if (u1SendType == SENDMESSAGE_NOMAL)
-    {
-        u4SendPacketSize = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Make_Send_Packet_Length(GetConnectID(), pBuffPacket->GetPacketLen(), u2CommandID);
-    }
-    else
-    {
-        u4SendPacketSize = (uint32)pBuffPacket->GetPacketLen();
-    }
-
-    u4PacketSize = u4SendPacketSize;
-
-    if (u4SendPacketSize + (uint32)m_pBlockMessage->length() >= m_u4SendMaxBuffSize)
-    {
-        OUR_DEBUG((LM_DEBUG, "[CConnectHandler::SendMessage] Connectid=[%d] m_pBlockMessage is not enougth.\n", GetConnectID()));
-        ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
-        memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
-        pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
-        ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-        App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
-
-        Recovery_Common_BuffPacket(blDelete, pBuffPacket);
-
-        return false;
-    }
-    else
-    {
-        //SENDMESSAGE_NOMAL是需要包头的时候，否则，不组包直接发送
-        if (u1SendType == SENDMESSAGE_NOMAL)
-        {
-            //这里组成返回数据包
-            App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Make_Send_Packet(GetConnectID(), pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), m_pBlockMessage, u2CommandID);
-        }
-        else
-        {
-            //如果不是SENDMESSAGE_NOMAL，则直接组包
-            memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), m_pBlockMessage->wr_ptr(), pBuffPacket->GetPacketLen());
-            m_pBlockMessage->wr_ptr(pBuffPacket->GetPacketLen());
-        }
-    }
-
-    Recovery_Common_BuffPacket(blDelete, pBuffPacket);
-
-    //放入完成，从这里退出
-    return true;
+    return Tcp_Common_Send_Input_To_Cache(GetConnectID(),
+                                          m_u4PacketParseInfoID,
+                                          m_u4SendMaxBuffSize,
+                                          m_pBlockMessage,
+                                          u1SendType,
+                                          u4PacketSize,
+                                          u2CommandID,
+                                          blDelete,
+                                          pBuffPacket);
 }
 
 bool CConnectHandler::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, uint8 u1State, int nMessageID, bool blDelete, IBuffPacket* pBuffPacket)
 {
-    //先判断是否要组装包头，如果需要，则组装在m_pBlockMessage中
-    uint32 u4SendPacketSize = 0;
+    ACE_Message_Block* pMbData = NULL;
 
-    if (u1SendType == SENDMESSAGE_NOMAL)
+    //拼装数据
+    bool blState = Tcp_Common_Make_Send_Packet(GetConnectID(),
+                   u1SendType,
+                   m_u4PacketParseInfoID,
+                   m_u4SendMaxBuffSize,
+                   pBuffPacket,
+                   u2CommandID,
+                   blDelete,
+                   m_pBlockMessage);
+
+    if (false == blState)
     {
-        u4SendPacketSize = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Make_Send_Packet_Length(GetConnectID(), pBuffPacket->GetPacketLen(), u2CommandID);
-
-        if (u4SendPacketSize >= m_u4SendMaxBuffSize)
-        {
-            OUR_DEBUG((LM_DEBUG, "[CConnectHandler::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", GetConnectID(), u4SendPacketSize, m_u4SendMaxBuffSize));
-            ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
-            memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
-            pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
-            ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-            App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
-
-            Recovery_Common_BuffPacket(blDelete, pBuffPacket);
-
-            return false;
-        }
-
-        App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Make_Send_Packet(GetConnectID(), pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), m_pBlockMessage, u2CommandID);
-        //这里MakePacket已经加了数据长度，所以在这里不再追加
-    }
-    else
-    {
-        u4SendPacketSize = (uint32)pBuffPacket->GetPacketLen();
-
-        if (u4SendPacketSize >= m_u4SendMaxBuffSize)
-        {
-            OUR_DEBUG((LM_DEBUG, "[CConnectHandler::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", GetConnectID(), u4SendPacketSize, m_u4SendMaxBuffSize));
-            ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
-            memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
-            pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
-            ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-            App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
-
-            Recovery_Common_BuffPacket(blDelete, pBuffPacket);
-
-            return false;
-        }
-
-        memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), m_pBlockMessage->wr_ptr(), pBuffPacket->GetPacketLen());
-        m_pBlockMessage->wr_ptr(pBuffPacket->GetPacketLen());
+        return false;
     }
 
     //如果之前有缓冲数据，则和缓冲数据一起发送
     u4PacketSize = (uint32)m_pBlockMessage->length();
 
-    ACE_Message_Block* pMbData = NULL;
-
-    //这里肯定会大于0
-    if (m_pBlockMessage->length() > 0)
-    {
-        //因为是异步发送，发送的数据指针不可以立刻释放，所以需要在这里创建一个新的发送数据块，将数据考入
-        pMbData = App_MessageBlockManager::instance()->Create((uint32)m_pBlockMessage->length());
-    }
+    //因为是异步发送，发送的数据指针不可以立刻释放，所以需要在这里创建一个新的发送数据块，将数据考入
+    pMbData = App_MessageBlockManager::instance()->Create((uint32)m_pBlockMessage->length());
 
     memcpy_safe(m_pBlockMessage->rd_ptr(), (uint32)m_pBlockMessage->length(), pMbData->wr_ptr(), (uint32)m_pBlockMessage->length());
     pMbData->wr_ptr(m_pBlockMessage->length());
