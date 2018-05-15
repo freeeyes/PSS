@@ -76,7 +76,7 @@ public:
 private:
     int ProcessLog(_LogBlockInfo* pLogBlockInfo);
     virtual int CloseMsgQueue();
-    int Create_Log_Block(int nLogType, uint32* pMailID, char* pTitle, va_list* ap, const char* fmt, int nfmtSize);
+    int Create_Log_Block(int nLogType, uint32* pMailID, const char* pTitle, va_list* ap, const char* fmt, int nfmtSize);
 
     //关闭消息队列条件变量
     ACE_Thread_Mutex                  m_mutex;
