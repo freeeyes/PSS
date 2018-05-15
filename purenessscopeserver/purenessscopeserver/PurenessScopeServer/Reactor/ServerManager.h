@@ -8,24 +8,11 @@
 #ifndef _SERVERMANAGER_H
 #define _SERVERMANAGER_H
 
-#include "IServerManager.h"
-#include "define.h"
-#include "MainConfig.h"
-#include "ForbiddenIP.h"
+#include "BaseServerManager.h"
 #include "ConnectAccept.h"
 #include "ConsoleAccept.h"
-#include "MessageService.h"
-#include "LoadModule.h"
-#include "LogManager.h"
-#include "FileLogger.h"
-#include "IObject.h"
-#include "BuffPacketManager.h"
 #include "ClientReConnectManager.h"
 #include "ReUDPManager.h"
-#include "CommandAccount.h"
-#include "ModuleMessageManager.h"
-#include "ControlListen.h"
-#include "FrameCommand.h"
 
 class Frame_Logging_Strategy;
 
