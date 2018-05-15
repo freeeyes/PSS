@@ -1,7 +1,10 @@
 #ifndef _BASEREACTORHANDLER_H
 #define _BASEREACTORHANDLER_H
 
+#include "ace/Task_T.h"
+
 #include "define.h"
+#include "SendMessage.h"
 #include "MessageBlockManager.h"
 #include "LoadPacketParse.h"
 #include "PacketParsePool.h"
@@ -61,5 +64,18 @@ bool Tcp_Common_Send_Input_To_Cache(uint32 u4ConnectID, uint32 u4PacketParseInfo
 bool Tcp_Common_Make_Send_Packet(uint32 u4ConnectID, uint8 u1SendType, uint32 u4PacketParseInfoID,
                                  uint32 u4SendMaxBuffSize, IBuffPacket*& pBuffPacket, uint16 u2CommandID,
                                  bool blDelete, ACE_Message_Block* pBlockMessage);
+
+//发送Manager消息队列关闭信息
+bool Tcp_Common_CloseConnect_By_Queue(uint32 u4ConnectID, CSendMessagePool& objSendMessagePool,
+                                      uint32 u4SendQueuePutTime, ACE_Task<ACE_MT_SYNCH>* pTask);
+
+//发送Manager消息队列发送数据消息
+bool Tcp_Common_Manager_Post_Message(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType,
+                                     uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID,
+                                     CSendMessagePool& objSendMessagePool, uint16 u2SendQueueMax,
+                                     uint32 u4SendQueuePutTime, ACE_Task<ACE_MT_SYNCH>* pTask);
+
+//定时器输出统计日志
+void Tcp_Common_Manager_Timeout_CheckInfo(int nActiveConnectCount);
 
 #endif

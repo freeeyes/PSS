@@ -1640,59 +1640,11 @@ bool CConnectManager::CloseConnect(uint32 u4ConnectID)
 
 bool CConnectManager::CloseConnect_By_Queue(uint32 u4ConnectID)
 {
-    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
-
     //放入发送队列
-    _SendMessage* pSendMessage = m_SendMessagePool.Create();
-
-    if (NULL == pSendMessage)
-    {
-        OUR_DEBUG((LM_ERROR, "[CConnectManager::CloseConnect_By_Queue]pSendMessage is NULL.\n"));
-        return false;
-    }
-
-    ACE_Message_Block* mb = pSendMessage->GetQueueMessage();
-
-    if (NULL != mb)
-    {
-        //组装关闭连接指令
-        pSendMessage->m_u4ConnectID = u4ConnectID;
-        pSendMessage->m_pBuffPacket = NULL;
-        pSendMessage->m_nEvents = 0;
-        pSendMessage->m_u2CommandID = 0;
-        pSendMessage->m_u1SendState = 0;
-        pSendMessage->m_blDelete = false;
-        pSendMessage->m_nMessageID = 0;
-        pSendMessage->m_u1Type = 1;
-        pSendMessage->m_tvSend = ACE_OS::gettimeofday();
-
-        //判断队列是否是已经最大
-        int nQueueCount = (int)msg_queue()->message_count();
-
-        if (nQueueCount >= (int)MAX_MSG_THREADQUEUE)
-        {
-            OUR_DEBUG((LM_ERROR, "[CConnectManager::CloseConnect_By_Queue] Queue is Full nQueueCount = [%d].\n", nQueueCount));
-            m_SendMessagePool.Delete(pSendMessage);
-            return false;
-        }
-
-        ACE_Time_Value xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, m_u4SendQueuePutTime);
-
-        if (this->putq(mb, &xtime) == -1)
-        {
-            OUR_DEBUG((LM_ERROR, "[CConnectManager::CloseConnect_By_Queue] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
-            m_SendMessagePool.Delete(pSendMessage);
-            return false;
-        }
-    }
-    else
-    {
-        OUR_DEBUG((LM_ERROR, "[CConnectManager::CloseConnect_By_Queue] mb new error.\n"));
-        m_SendMessagePool.Delete(pSendMessage);
-        return false;
-    }
-
-    return true;
+    return Tcp_Common_CloseConnect_By_Queue(u4ConnectID,
+                                            m_SendMessagePool,
+                                            m_u4SendQueuePutTime,
+                                            dynamic_cast<ACE_Task<ACE_MT_SYNCH>*>(this));
 }
 
 bool CConnectManager::AddConnect(uint32 u4ConnectID, CConnectHandler* pConnectHandler)
@@ -1786,19 +1738,7 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
     {
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectManager::SendMessage] ConnectID[%d] is not find.", u4ConnectID);
         //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
-        ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
-
-        if (NULL == pSendMessage)
-        {
-            OUR_DEBUG((LM_INFO, "[CConnectManager::SendMessage] ConnectID[%d] Create ACE_Message_Block(%d) fail.\n", u4ConnectID, pBuffPacket->GetPacketLen()));
-            App_BuffPacketManager::instance()->Delete(pBuffPacket);
-            return false;
-        }
-
-        memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char* )pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
-        pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
-        ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-        App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
+        Tcp_Common_Send_Message_Error(blDelete, pBuffPacket);
 
         if(true == blDelete)
         {
@@ -1813,80 +1753,17 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
 
 bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
-    if(NULL == pBuffPacket)
-    {
-        OUR_DEBUG((LM_ERROR,"[CConnectManager::PutMessage] pBuffPacket is NULL.\n"));
-        return false;
-    }
-
-    //放入发送队列
-    _SendMessage* pSendMessage = m_SendMessagePool.Create();
-
-    if (NULL == pSendMessage)
-    {
-        OUR_DEBUG((LM_ERROR, "[CConnectManager::PutMessage](%d)pSendMessage is NULL(free=%d).\n", u4ConnectID, m_SendMessagePool.GetFreeCount()));
-        return false;
-    }
-
-    ACE_Message_Block* mb = pSendMessage->GetQueueMessage();
-
-    if(NULL != mb)
-    {
-        pSendMessage->m_u4ConnectID = u4ConnectID;
-        pSendMessage->m_pBuffPacket = pBuffPacket;
-        pSendMessage->m_nEvents     = u1SendType;
-        pSendMessage->m_u2CommandID = u2CommandID;
-        pSendMessage->m_blDelete    = blDelete;
-        pSendMessage->m_u1SendState = u1SendState;
-        pSendMessage->m_nMessageID  = nMessageID;
-        pSendMessage->m_u1Type      = 0;
-        pSendMessage->m_tvSend      = ACE_OS::gettimeofday();
-
-        //判断队列是否是已经最大
-        int nQueueCount = (int)msg_queue()->message_count();
-
-        if(nQueueCount >= (int)m_u2SendQueueMax)
-        {
-            OUR_DEBUG((LM_ERROR,"[CConnectManager::PutMessage] Queue is Full nQueueCount = [%d].\n", nQueueCount));
-
-            if(true == blDelete)
-            {
-                App_BuffPacketManager::instance()->Delete(pBuffPacket);
-            }
-
-            m_SendMessagePool.Delete(pSendMessage);
-            return false;
-        }
-
-        ACE_Time_Value xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, m_u4SendQueuePutTime);
-
-        if(this->putq(mb, &xtime) == -1)
-        {
-            OUR_DEBUG((LM_ERROR,"[CConnectManager::PutMessage] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
-
-            if(true == blDelete)
-            {
-                App_BuffPacketManager::instance()->Delete(pBuffPacket);
-            }
-
-            m_SendMessagePool.Delete(pSendMessage);
-            return false;
-        }
-    }
-    else
-    {
-        OUR_DEBUG((LM_ERROR,"[CMessageService::PutMessage] mb new error.\n"));
-
-        if(true == blDelete)
-        {
-            App_BuffPacketManager::instance()->Delete(pBuffPacket);
-        }
-
-        m_SendMessagePool.Delete(pSendMessage);
-        return false;
-    }
-
-    return true;
+    return Tcp_Common_Manager_Post_Message(u4ConnectID,
+                                           pBuffPacket,
+                                           u1SendType,
+                                           u2CommandID,
+                                           u1SendState,
+                                           blDelete,
+                                           nMessageID,
+                                           m_SendMessagePool,
+                                           m_u2SendQueueMax,
+                                           m_u4SendQueuePutTime,
+                                           dynamic_cast<ACE_Task<ACE_MT_SYNCH>*>(this));
 }
 
 const char* CConnectManager::GetError()
@@ -1981,78 +1858,7 @@ int CConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
         m_TimeWheelLink.Tick();
 
         //判定是否应该记录链接日志
-        ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-        ACE_Time_Value tvInterval(tvNow - m_tvCheckConnect);
-
-        if(tvInterval.sec() >= MAX_MSG_HANDLETIME)
-        {
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "[CConnectManager]CurrConnectCount = %d,TimeInterval=%d, TimeConnect=%d, TimeDisConnect=%d.",
-                                                GetCount(), MAX_MSG_HANDLETIME, m_u4TimeConnect, m_u4TimeDisConnect);
-
-            //重置单位时间连接数和断开连接数
-            m_u4TimeConnect    = 0;
-            m_u4TimeDisConnect = 0;
-            m_tvCheckConnect   = tvNow;
-        }
-
-        //检测连接总数是否超越监控阀值
-        if(App_MainConfig::instance()->GetConnectAlert()->m_u4ConnectAlert > 0)
-        {
-            if(GetCount() > (int)App_MainConfig::instance()->GetConnectAlert()->m_u4ConnectAlert)
-            {
-                AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
-                                                       App_MainConfig::instance()->GetConnectAlert()->m_u4MailID,
-                                                       (char* )"Alert",
-                                                       "[CProConnectManager]active ConnectCount is more than limit(%d > %d).",
-                                                       GetCount(),
-                                                       App_MainConfig::instance()->GetConnectAlert()->m_u4ConnectAlert);
-            }
-        }
-
-        //检测单位时间连接数是否超越阀值
-        int nCheckRet = App_ConnectAccount::instance()->CheckConnectCount();
-
-        if(nCheckRet == 1)
-        {
-            AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
-                                                   App_MainConfig::instance()->GetConnectAlert()->m_u4MailID,
-                                                   (char* )"Alert",
-                                                   "[CProConnectManager]CheckConnectCount is more than limit(%d > %d).",
-                                                   App_ConnectAccount::instance()->GetCurrConnect(),
-                                                   App_ConnectAccount::instance()->GetConnectMax());
-        }
-        else if(nCheckRet == 2)
-        {
-            AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
-                                                   App_MainConfig::instance()->GetConnectAlert()->m_u4MailID,
-                                                   (char* )"Alert",
-                                                   "[CProConnectManager]CheckConnectCount is little than limit(%d < %d).",
-                                                   App_ConnectAccount::instance()->GetCurrConnect(),
-                                                   App_ConnectAccount::instance()->Get4ConnectMin());
-        }
-
-        //检测单位时间连接断开数是否超越阀值
-        nCheckRet = App_ConnectAccount::instance()->CheckDisConnectCount();
-
-        if(nCheckRet == 1)
-        {
-            AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
-                                                   App_MainConfig::instance()->GetConnectAlert()->m_u4MailID,
-                                                   (char* )"Alert",
-                                                   "[CProConnectManager]CheckDisConnectCount is more than limit(%d > %d).",
-                                                   App_ConnectAccount::instance()->GetCurrConnect(),
-                                                   App_ConnectAccount::instance()->GetDisConnectMax());
-        }
-        else if(nCheckRet == 2)
-        {
-            AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
-                                                   App_MainConfig::instance()->GetConnectAlert()->m_u4MailID,
-                                                   (char* )"Alert",
-                                                   "[CProConnectManager]CheckDisConnectCount is little than limit(%d < %d).",
-                                                   App_ConnectAccount::instance()->GetCurrConnect(),
-                                                   App_ConnectAccount::instance()->GetDisConnectMin());
-        }
-
+        Tcp_Common_Manager_Timeout_CheckInfo(GetCount());
     }
 
     return 0;
