@@ -75,6 +75,12 @@ bool Server_Manager_Common_Pool()
         App_PacketParsePool::instance()->Init(App_MainConfig::instance()->GetMaxHandlerCount(), CPacketParsePool::Init_Callback);
     }
 
+    //初始化消息处理线程
+    App_MessageServiceGroup::instance()->Init(App_MainConfig::instance()->GetThreadCount(),
+            App_MainConfig::instance()->GetMsgMaxQueue(),
+            App_MainConfig::instance()->GetMsgLowMark(),
+            App_MainConfig::instance()->GetMgsHighMark());
+
     return true;
 }
 

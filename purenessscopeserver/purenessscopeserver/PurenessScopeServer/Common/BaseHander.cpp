@@ -155,3 +155,70 @@ bool Udp_Common_Send_WorkThread(CPacketParse*& pPacketParse, ACE_INET_Addr addrR
 
     return true;
 }
+
+void Recovery_Common_BuffPacket(bool blDelete, IBuffPacket* pBuffPacket)
+{
+    if (true == blDelete)
+    {
+        App_BuffPacketManager::instance()->Delete(pBuffPacket);
+    }
+}
+
+void Tcp_Common_Send_Message_Error(bool blDelete, IBuffPacket* pBuffPacket)
+{
+    ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
+    memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+    pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
+    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+    App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
+
+    Recovery_Common_BuffPacket(blDelete, pBuffPacket);
+}
+
+uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPacketParse* pPacketParse, uint32 u4PacketParseInfoID)
+{
+    _Packet_Info obj_Packet_Info;
+    uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Parse_Packet_Stream(u4ConnectID, pMbData, dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info);
+
+    if (PACKET_GET_ENOUGTH == n1Ret)
+    {
+        pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
+        pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);
+        pPacketParse->SetPacket_CommandID(obj_Packet_Info.m_u2PacketCommandID);
+        pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4HeadSrcLen);
+        pPacketParse->SetPacket_Head_Curr_Length(obj_Packet_Info.m_u4HeadCurrLen);
+        pPacketParse->SetPacket_Body_Src_Length(obj_Packet_Info.m_u4BodySrcLen);
+        pPacketParse->SetPacket_Body_Curr_Length(obj_Packet_Info.m_u4BodyCurrLen);
+    }
+
+    return n1Ret;
+}
+
+void Send_MakePacket_Queue(uint32 u4ConnectID, uint32 u4PacketParseID, CPacketParse* m_pPacketParse, uint8 u1Option, ACE_INET_Addr& addrRemote, const char* pLocalIP, uint32 u4LocalPort)
+{
+    //需要回调发送成功回执
+    _MakePacket objMakePacket;
+
+    objMakePacket.m_u4ConnectID = u4ConnectID;
+    objMakePacket.m_pPacketParse = m_pPacketParse;
+    objMakePacket.m_u1Option = u1Option;
+    objMakePacket.m_AddrRemote = addrRemote;
+    objMakePacket.m_u4PacketParseID = u4PacketParseID;
+
+    if (ACE_OS::strcmp("INADDR_ANY", pLocalIP) == 0)
+    {
+        objMakePacket.m_AddrListen.set(u4LocalPort);
+    }
+    else
+    {
+        objMakePacket.m_AddrListen.set(u4LocalPort, pLocalIP);
+    }
+
+    //发送客户端链接断开消息。
+    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+
+    if (false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
+    {
+        OUR_DEBUG((LM_ERROR, "[Send_MakePacket_Queue] ConnectID = %d, PACKET_CONNECT is error.\n", u4ConnectID));
+    }
+}

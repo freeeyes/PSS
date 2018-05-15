@@ -23,14 +23,13 @@
 #include "ace/Asynch_Acceptor.h"
 #include "ace/Proactor.h"
 
+#include "BaseHander.h"
 #include "BaseTask.h"
 #include "ObjectArrayList.h"
 #include "HashTable.h"
 #include "AceProactorManager.h"
 #include "IConnectManager.h"
 #include "TimerManager.h"
-#include "MakePacket.h"
-#include "PacketParsePool.h"
 #include "BuffPacketManager.h"
 #include "Fast_Asynch_Read_Stream.h"
 #include "ForbiddenIP.h"
@@ -38,11 +37,8 @@
 #include "SendMessage.h"
 #include "CommandAccount.h"
 #include "SendCacheManager.h"
-#include "LoadPacketParse.h"
 #include "TimeWheelLink.h"
 #include "FileTest.h"
-
-#include <vector>
 
 class CProConnectHandle : public ACE_Service_Handler
 {
@@ -93,9 +89,8 @@ private:
     void Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType);        //输出DEBUG信息
     int  Dispose_Paceket_Parse_Head(ACE_Message_Block* pmb);                 //处理消息头函数
     int  Dispose_Paceket_Parse_Body(ACE_Message_Block* pmb);                 //处理消息头函数
-    int  Dispose_Paceket_Parse_Strram(ACE_Message_Block* pCurrMessage);      //处理流消息函数
+    int  Dispose_Paceket_Parse_Stream(ACE_Message_Block* pCurrMessage);      //处理流消息函数
 
-    void Send_MakePacket_Queue(CPacketParse* m_pPacketParse, uint8 u1Option); //将数据发送入工作线程消息队列
     bool Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPacket);                                                                //将发送数据写入文件
     bool Send_Input_To_Cache(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, bool blDelete, IBuffPacket* pBuffPacket);       //讲发送对象放入缓存
     bool Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, uint8 u1State, int nMessageID, bool blDelete, IBuffPacket* pBuffPacket);         //将数据发送给对端
@@ -105,7 +100,6 @@ private:
     bool PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State);            //将发送数据发送出去
     void ClearPacketParse(ACE_Message_Block& mbCurrBlock);                    //清理正在使用的PacketParse
     void PutSendPacketError(ACE_Message_Block* pMbData);                      //发送失败回调
-    void Recovery_BuffPacket(bool blDelete, IBuffPacket* pBuffPacket);        //回收用完的BuffPacket
 
     uint64             m_u8RecvQueueTimeCost;          //成功接收数据到数据处理完成（未发送）花费的时间总和
     uint64             m_u8SendQueueTimeCost;          //成功发送数据到数据处理完成（只发送）花费的时间总和

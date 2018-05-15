@@ -27,4 +27,17 @@ bool Udp_Common_Recv_Stream(ACE_Message_Block* pMbData, CPacketParse* pPacketPar
 
 //提交udp数据到工作线程
 bool Udp_Common_Send_WorkThread(CPacketParse*& pPacketParse, ACE_INET_Addr addrRemote, ACE_INET_Addr addrLocal, ACE_Time_Value& tvCheck);
+
+//清理数据缓冲
+void Recovery_Common_BuffPacket(bool blDelete, IBuffPacket* pBuffPacket);
+
+//错误信息返回工作线程
+void Tcp_Common_Send_Message_Error(bool blDelete, IBuffPacket* pBuffPacket);
+
+//TCP流消息处理
+uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPacketParse* pPacketParse, uint32 u4PacketParseInfoID);
+
+//将数据发送入工作线程消息队列
+void Send_MakePacket_Queue(uint32 u4ConnectID, uint32 u4PacketParseID, CPacketParse* m_pPacketParse, uint8 u1Option, ACE_INET_Addr& addrRemote, const char* pLocalIP, uint32 u4LocalPort);
+
 #endif

@@ -129,7 +129,7 @@ void CProConnectHandle::Close(int nIOCount, int nErrno)
         if (CONNECT_SERVER_CLOSE != m_u1ConnectState)
         {
             //组织数据
-            Send_MakePacket_Queue(NULL, PACKET_CDISCONNECT);
+            Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CDISCONNECT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
 
             m_Reader.cancel();
             m_Writer.cancel();
@@ -165,7 +165,7 @@ bool CProConnectHandle::ServerClose(EM_Client_Close_status emStatus, uint8 u1Opt
         if (CLIENT_CLOSE_IMMEDIATLY == emStatus)
         {
             //组织数据
-            Send_MakePacket_Queue(NULL, u1OptionEvent);
+            Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, u1OptionEvent, m_addrRemote, m_szLocalIP, m_u4LocalPort);
 
             if (PACKET_SDISCONNECT == u1OptionEvent)
             {
@@ -250,7 +250,7 @@ uint32 CProConnectHandle::file_open(IFileTestManager* pFileTest)
     }
 
     //组织数据
-    Send_MakePacket_Queue(NULL, PACKET_CONNECT);
+    Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CONNECT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
 
     OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::file_open]Open(%d) Connection from [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
     m_pFileTest = pFileTest;
@@ -505,7 +505,7 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
     App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Connect(GetConnectID(), GetClientIPInfo(), GetLocalIPInfo());
 
     //组织数据
-    Send_MakePacket_Queue(NULL, PACKET_CONNECT);
+    Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CONNECT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
 
     OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::open]Open(%d) Connection from [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
 
@@ -574,7 +574,12 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
     }
     else
     {
-        if (0 != Dispose_Paceket_Parse_Strram(&mb))
+        int nStream = Dispose_Paceket_Parse_Stream(&mb);
+
+        //清理处理完的数据缓冲区
+        App_MessageBlockManager::instance()->Close(&mb);
+
+        if (0 != nStream)
         {
             return;
         }
@@ -625,7 +630,7 @@ void CProConnectHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
             objPacketParse.SetPacket_Head_Message(pMbData);
             objPacketParse.SetPacket_Head_Curr_Length((uint32)pMbData->length());
 
-            Send_MakePacket_Queue(&objPacketParse, PACKET_SEND_OK);
+            Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, &objPacketParse, PACKET_SEND_OK, m_addrRemote, m_szLocalIP, m_u4LocalPort);
 
             //还原消息类型
             result.message_block().msg_type(ACE_Message_Block::MB_DATA);
@@ -676,7 +681,7 @@ void CProConnectHandle::SetSendQueueTimeCost(uint32 u4TimeCost)
         AppLogManager::instance()->WriteLog(LOG_SYSTEM_SENDQUEUEERROR, "[TCP]IP=%s,Prot=%d,Timeout=[%d].", GetClientIPInfo().m_szClientIP, GetClientIPInfo().m_nPort, u4TimeCost);
 
         //组织数据
-        Send_MakePacket_Queue(NULL, PACKET_SEND_TIMEOUT);
+        Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_SEND_TIMEOUT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
     }
 
     Close();
@@ -706,13 +711,7 @@ bool CProConnectHandle::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket
     if(m_u1IsActive == 0)
     {
         //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
-        ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
-        memcpy_safe((char* )pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char* )pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
-        pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
-        ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-        App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
-
-        Recovery_BuffPacket(blDelete, pBuffPacket);
+        Tcp_Common_Send_Message_Error(blDelete, pBuffPacket);
 
         return false;
     }
@@ -790,7 +789,7 @@ bool CProConnectHandle::PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State)
             objPacketParse.SetPacket_Body_Message(pMbData);
             objPacketParse.SetPacket_Body_Curr_Length((uint32)pMbData->length());
 
-            Send_MakePacket_Queue(&objPacketParse, PACKET_SEND_TIMEOUT);
+            Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, &objPacketParse, PACKET_SEND_TIMEOUT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
 
             return false;
         }
@@ -938,7 +937,7 @@ int CProConnectHandle::Dispose_Paceket_Parse_Head(ACE_Message_Block* pmb)
             OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::handle_read_stream] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
 
             //组织数据
-            Send_MakePacket_Queue(NULL, PACKET_SDISCONNECT);
+            Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_SDISCONNECT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
 
             Close(2);
             return -1;
@@ -1016,7 +1015,7 @@ int CProConnectHandle::Dispose_Paceket_Parse_Body(ACE_Message_Block* pmb)
         OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::handle_read_stream] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
 
         //组织数据
-        Send_MakePacket_Queue(NULL, PACKET_SDISCONNECT);
+        Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_SDISCONNECT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
 
         Close(2);
         return -1;
@@ -1026,24 +1025,21 @@ int CProConnectHandle::Dispose_Paceket_Parse_Body(ACE_Message_Block* pmb)
     return 0;
 }
 
-int CProConnectHandle::Dispose_Paceket_Parse_Strram(ACE_Message_Block* pCurrMessage)
+int CProConnectHandle::Dispose_Paceket_Parse_Stream(ACE_Message_Block* pCurrMessage)
 {
     //以流模式解析
     while (true)
     {
-        _Packet_Info obj_Packet_Info;
-        uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Stream(GetConnectID(), pCurrMessage, dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info);
+        //处理消息
+        uint8 n1Ret = Tcp_Common_Recv_Stream(GetConnectID(), pCurrMessage, m_pPacketParse, m_u4PacketParseInfoID);
 
-        if (PACKET_GET_ENOUGTH == n1Ret)
+        if (PACKET_GET_NO_ENOUGTH == n1Ret)
         {
-            m_pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
-            m_pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);
-            m_pPacketParse->SetPacket_CommandID(obj_Packet_Info.m_u2PacketCommandID);
-            m_pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4HeadSrcLen);
-            m_pPacketParse->SetPacket_Head_Curr_Length(obj_Packet_Info.m_u4HeadCurrLen);
-            m_pPacketParse->SetPacket_Body_Src_Length(obj_Packet_Info.m_u4BodySrcLen);
-            m_pPacketParse->SetPacket_Body_Curr_Length(obj_Packet_Info.m_u4BodyCurrLen);
-
+            //接收的数据不完整，需要继续接收
+            break;
+        }
+        else if (PACKET_GET_ENOUGTH == n1Ret)
+        {
             //已经接收了完整数据包，扔给工作线程去处理
             if (false == CheckMessage())
             {
@@ -1060,9 +1056,7 @@ int CProConnectHandle::Dispose_Paceket_Parse_Strram(ACE_Message_Block* pCurrMess
                 OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::handle_read_stream](%d) m_pPacketParse new error.\n", GetConnectID()));
 
                 //组织数据
-                Send_MakePacket_Queue(NULL, PACKET_SDISCONNECT);
-
-                App_MessageBlockManager::instance()->Close(pCurrMessage);
+                Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_SDISCONNECT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
 
                 Close(2);
                 return -1;
@@ -1071,7 +1065,6 @@ int CProConnectHandle::Dispose_Paceket_Parse_Strram(ACE_Message_Block* pCurrMess
             //看看是否接收完成了
             if (pCurrMessage->length() == 0)
             {
-                App_MessageBlockManager::instance()->Close(pCurrMessage);
                 break;
             }
             else
@@ -1080,15 +1073,8 @@ int CProConnectHandle::Dispose_Paceket_Parse_Strram(ACE_Message_Block* pCurrMess
                 continue;
             }
         }
-        else if (PACKET_GET_NO_ENOUGTH == n1Ret)
-        {
-            App_MessageBlockManager::instance()->Close(pCurrMessage);
-            //接收的数据不完整，需要继续接收
-            return -1;
-        }
         else
         {
-            App_MessageBlockManager::instance()->Close(pCurrMessage);
             //数据包为错误包，丢弃处理
             m_pPacketParse->Clear();
 
@@ -1100,35 +1086,6 @@ int CProConnectHandle::Dispose_Paceket_Parse_Strram(ACE_Message_Block* pCurrMess
     Close();
 
     return 0;
-}
-
-void CProConnectHandle::Send_MakePacket_Queue(CPacketParse* m_pPacketParse, uint8 u1Option)
-{
-    //需要回调发送成功回执
-    _MakePacket objMakePacket;
-
-    objMakePacket.m_u4ConnectID     = GetConnectID();
-    objMakePacket.m_pPacketParse    = m_pPacketParse;
-    objMakePacket.m_u1Option        = u1Option;
-    objMakePacket.m_AddrRemote      = m_addrRemote;
-    objMakePacket.m_u4PacketParseID = GetPacketParseInfoID();
-
-    if (ACE_OS::strcmp("INADDR_ANY", m_szLocalIP) == 0)
-    {
-        objMakePacket.m_AddrListen.set(m_u4LocalPort);
-    }
-    else
-    {
-        objMakePacket.m_AddrListen.set(m_u4LocalPort, m_szLocalIP);
-    }
-
-    //发送客户端链接断开消息。
-    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-    if (false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
-    {
-        OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Send_MakePacket_Queue] ConnectID = %d, PACKET_CONNECT is error.\n", GetConnectID()));
-    }
 }
 
 bool CProConnectHandle::Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPacket)
@@ -1173,7 +1130,7 @@ bool CProConnectHandle::Write_SendData_To_File(bool blDelete, IBuffPacket* pBuff
         m_pFileTest->HandlerServerResponse(GetConnectID());
     }
 
-    Recovery_BuffPacket(blDelete, pBuffPacket);
+    Recovery_Common_BuffPacket(blDelete, pBuffPacket);
 
     return true;
 }
@@ -1204,7 +1161,7 @@ bool CProConnectHandle::Send_Input_To_Cache(uint8 u1SendType, uint32& u4PacketSi
         ACE_Time_Value tvNow = ACE_OS::gettimeofday();
         App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
 
-        Recovery_BuffPacket(blDelete, pBuffPacket);
+        Recovery_Common_BuffPacket(blDelete, pBuffPacket);
 
         return false;
     }
@@ -1225,7 +1182,7 @@ bool CProConnectHandle::Send_Input_To_Cache(uint8 u1SendType, uint32& u4PacketSi
         }
     }
 
-    Recovery_BuffPacket(blDelete, pBuffPacket);
+    Recovery_Common_BuffPacket(blDelete, pBuffPacket);
 
     return true;
 }
@@ -1244,7 +1201,7 @@ bool CProConnectHandle::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize
         {
             OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", GetConnectID(), u4SendPacketSize, m_u4SendMaxBuffSize));
 
-            Recovery_BuffPacket(blDelete, pBuffPacket);
+            Recovery_Common_BuffPacket(blDelete, pBuffPacket);
 
             return false;
         }
@@ -1266,7 +1223,7 @@ bool CProConnectHandle::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize
             ACE_Time_Value tvNow = ACE_OS::gettimeofday();
             App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
 
-            Recovery_BuffPacket(blDelete, pBuffPacket);
+            Recovery_Common_BuffPacket(blDelete, pBuffPacket);
 
             return false;
         }
@@ -1294,7 +1251,7 @@ bool CProConnectHandle::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize
             ACE_Time_Value tvNow = ACE_OS::gettimeofday();
             App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
 
-            Recovery_BuffPacket(blDelete, pBuffPacket);
+            Recovery_Common_BuffPacket(blDelete, pBuffPacket);
 
             return false;
         }
@@ -1308,12 +1265,12 @@ bool CProConnectHandle::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize
     {
         OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::SendMessage] Connectid=[%d](m_pBlockMessage->length() error(%d).\n", GetConnectID(), m_pBlockMessage->length()));
 
-        Recovery_BuffPacket(blDelete, pBuffPacket);
+        Recovery_Common_BuffPacket(blDelete, pBuffPacket);
 
         return false;
     }
 
-    Recovery_BuffPacket(blDelete, pBuffPacket);
+    Recovery_Common_BuffPacket(blDelete, pBuffPacket);
 
     //判断是否发送完成后关闭连接
 
@@ -1407,7 +1364,7 @@ bool CProConnectHandle::CheckMessage()
         }
 
         //组织数据
-        Send_MakePacket_Queue(m_pPacketParse, PACKET_PARSE);
+        Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, m_pPacketParse, PACKET_PARSE, m_addrRemote, m_szLocalIP, m_u4LocalPort);
 
         //更新时间轮盘
         App_ProConnectManager::instance()->SetConnectTimeWheel(this);
@@ -1529,14 +1486,6 @@ void CProConnectHandle::SetLocalIPInfo(const char* pLocalIP, uint32 u4LocalPort)
 void CProConnectHandle::PutSendPacketError(ACE_Message_Block* pMbData)
 {
 
-}
-
-void CProConnectHandle::Recovery_BuffPacket(bool blDelete, IBuffPacket* pBuffPacket)
-{
-    if (true == blDelete)
-    {
-        App_BuffPacketManager::instance()->Delete(pBuffPacket);
-    }
 }
 
 void CProConnectHandle::SetSendCacheManager(ISendCacheManager* pSendCacheManager)

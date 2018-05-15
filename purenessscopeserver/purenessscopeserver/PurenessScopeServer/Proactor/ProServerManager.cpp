@@ -65,12 +65,6 @@ bool CProServerManager::Init()
                                   pFrameCommand,
                                   pServerManager);
 
-    //初始化消息处理线程
-    App_MessageServiceGroup::instance()->Init(App_MainConfig::instance()->GetThreadCount(),
-            App_MainConfig::instance()->GetMsgMaxQueue(),
-            App_MainConfig::instance()->GetMsgLowMark(),
-            App_MainConfig::instance()->GetMgsHighMark());
-
     //初始化模块加载，因为这里可能包含了中间服务器连接加载
     if (false == Server_Manager_Common_Module())
     {

@@ -75,12 +75,6 @@ bool CServerManager::Init()
                                   pFrameCommand,
                                   pServerManager);
 
-    //初始化消息处理线程
-    App_MessageServiceGroup::instance()->Init(App_MainConfig::instance()->GetThreadCount(),
-            App_MainConfig::instance()->GetMsgMaxQueue(),
-            App_MainConfig::instance()->GetMsgLowMark(),
-            App_MainConfig::instance()->GetMgsHighMark());
-
     //初始化模块加载，因为这里可能包含了中间服务器连接加载
     if (false == Server_Manager_Common_Module())
     {
@@ -452,7 +446,6 @@ void CServerManager::Multiple_Process_Start()
     //在Linux下采用多进程的方式启动
     // 打开（创建）锁文件
     char szFileName[200] = { '\0' };
-    //memset(szFileName, 0, sizeof(szFileName));
     sprintf(szFileName, "%s/lockwatch.lk", szWorkDir);
     fd_lock = open(szFileName, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 
@@ -527,7 +520,6 @@ void CServerManager::Multiple_Process_Start()
             }
         }
 
-        //printf("child count(%d) is ok.\n", nNumChlid);
         //检查间隔
         ACE_OS::sleep(tvMonitorSleep);
     }
