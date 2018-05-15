@@ -342,7 +342,7 @@ int CLogManager::WriteLogBinary(int nLogType, const char* pData, int nLen)
 }
 
 
-int CLogManager::WriteToMail( int nLogType, uint32 u4MailID, char* pTitle, const char* fmt, ... )
+int CLogManager::WriteToMail( int nLogType, uint32 u4MailID, const char* pTitle, const char* fmt, ... )
 {
     va_list ap;
     va_start(ap, fmt);

@@ -823,6 +823,8 @@ bool CConnectHandler::SendCloseMessage()
         {
             return false;
         }
+
+        m_u1ConnectState = CONNECT_SERVER_CLOSE;
     }
     else
     {
@@ -1334,7 +1336,6 @@ bool CConnectHandler::Send_Block_Queue(ACE_Message_Block* pMb)
     }
     else
     {
-        m_u1ConnectState = CONNECT_SERVER_CLOSE;
         int nWakeupRet = reactor()->schedule_wakeup(this, ACE_Event_Handler::WRITE_MASK);
 
         if (-1 == nWakeupRet)
@@ -1721,7 +1722,7 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
 
         if (false == pConnectHandler->SendMessage(u2CommandID, pBuffPacket, u1SendState, u1SendType, u4PacketSize, blDelete, nMessageID))
         {
-            OUR_DEBUG((LM_ERROR, "[CConnectManager::SendMessage](%d) BSendMessage error.\n", u4ConnectID));
+            OUR_DEBUG((LM_ERROR, "[CConnectManager::SendMessage](%d) SendMessage error.\n", u4ConnectID));
         }
 
         //记录消息发送消耗时间

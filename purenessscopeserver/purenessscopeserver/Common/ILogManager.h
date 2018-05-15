@@ -12,7 +12,7 @@ public:
     //二进制日志记录
     virtual int WriteLogBinary(int nLogType, const char* pData, int nLen) = 0;
     //发送邮件记录
-    virtual int WriteToMail(int nLogType, uint32 u4MailID, char* pTitle, const char* fmt, ...) = 0;
+    virtual int WriteToMail(int nLogType, uint32 u4MailID, const char* pTitle, const char* fmt, ...) = 0;
 };
 
 #endif
