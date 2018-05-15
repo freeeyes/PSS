@@ -95,6 +95,7 @@ private:
     bool CheckMessage();                                                     //处理接收的数据
     bool PutSendPacket(ACE_Message_Block* pMbData);                          //发送数据
     void ClearPacketParse();                                                 //清理正在使用的PacketParse
+    bool Send_Block_Queue(ACE_Message_Block* pMb);                           //发送队列停止消息
 
     bool Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPacket);                   //将发送数据写入文件
     bool Send_Input_To_Cache(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, bool blDelete, IBuffPacket* pBuffPacket);       //讲发送对象放入缓存

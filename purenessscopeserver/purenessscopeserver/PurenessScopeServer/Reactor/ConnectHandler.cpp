@@ -819,31 +819,9 @@ bool CConnectHandler::SendCloseMessage()
         ACE_Message_Block::ACE_Message_Type objType = ACE_Message_Block::MB_STOP;
         pMbData->msg_type(objType);
 
-        //将消息放入队列，让output在反应器线程发送。
-        ACE_Time_Value xtime = ACE_OS::gettimeofday();
-
-        //队列已满，不能再放进去了,就不放进去了
-        if (msg_queue()->is_full() == true)
+        if (false == Send_Block_Queue(pMbData))
         {
-            OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendCloseMessage] Connectid=%d,putq is full(%d).\n", GetConnectID(), msg_queue()->message_count()));
-            App_MessageBlockManager::instance()->Close(pMbData);
             return false;
-        }
-
-        if (this->putq(pMbData, &xtime) == -1)
-        {
-            OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendCloseMessage] Connectid=%d,putq(%d) output errno = [%d].\n", GetConnectID(), msg_queue()->message_count(), errno));
-            App_MessageBlockManager::instance()->Close(pMbData);
-        }
-        else
-        {
-            m_u1ConnectState = CONNECT_SERVER_CLOSE;
-            int nWakeupRet = reactor()->schedule_wakeup(this, ACE_Event_Handler::WRITE_MASK);
-
-            if (-1 == nWakeupRet)
-            {
-                OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendCloseMessage] Connectid=%d, nWakeupRet(%d) output errno = [%d].\n", GetConnectID(), nWakeupRet, errno));
-            }
         }
     }
     else
@@ -1336,6 +1314,38 @@ void CConnectHandler::ClearPacketParse()
     }
 }
 
+bool CConnectHandler::Send_Block_Queue(ACE_Message_Block* pMb)
+{
+    //将消息放入队列，让output在反应器线程发送。
+    ACE_Time_Value xtime = ACE_OS::gettimeofday();
+
+    //队列已满，不能再放进去了,就不放进去了
+    if (msg_queue()->is_full() == true)
+    {
+        OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendCloseMessage] Connectid=%d,putq is full(%d).\n", GetConnectID(), msg_queue()->message_count()));
+        App_MessageBlockManager::instance()->Close(pMb);
+        return false;
+    }
+
+    if (this->putq(pMb, &xtime) == -1)
+    {
+        OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendCloseMessage] Connectid=%d,putq(%d) output errno = [%d].\n", GetConnectID(), msg_queue()->message_count(), errno));
+        App_MessageBlockManager::instance()->Close(pMb);
+    }
+    else
+    {
+        m_u1ConnectState = CONNECT_SERVER_CLOSE;
+        int nWakeupRet = reactor()->schedule_wakeup(this, ACE_Event_Handler::WRITE_MASK);
+
+        if (-1 == nWakeupRet)
+        {
+            OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendCloseMessage] Connectid=%d, nWakeupRet(%d) output errno = [%d].\n", GetConnectID(), nWakeupRet, errno));
+        }
+    }
+
+    return true;
+}
+
 bool CConnectHandler::Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPacket)
 {
     //文件入口，直接写入日志
@@ -1409,44 +1419,33 @@ bool CConnectHandler::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, 
     //将消息放入队列，让output在反应器线程发送。
     ACE_Time_Value xtime = ACE_OS::gettimeofday();
 
-    //队列已满，不能再放进去了,就不放进去了
-    if (msg_queue()->is_full() == true)
+    if (false == Send_Block_Queue(pMbData))
     {
-        OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendMessage] Connectid=%d,putq is full(%d).\n", GetConnectID(), msg_queue()->message_count()));
-        App_MessageBlockManager::instance()->Close(pMbData);
         return false;
     }
 
-    if (this->putq(pMbData, &xtime) == -1)
+    //如果需要发送完成后删除，则配置标记位
+    if (PACKET_SEND_FIN_CLOSE == u1State)
     {
-        OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendMessage] Connectid=%d,putq(%d) output errno = [%d].\n", GetConnectID(), msg_queue()->message_count(), errno));
-        App_MessageBlockManager::instance()->Close(pMbData);
+        m_u1ConnectState = CONNECT_SERVER_CLOSE;
+        ACE_Message_Block* pMbData = App_MessageBlockManager::instance()->Create(sizeof(int));
+
+        if (NULL == pMbData)
+        {
+            OUR_DEBUG((LM_DEBUG, "[CConnectHandler::SendMessage] Connectid=[%d] pMbData is NULL.\n", GetConnectID()));
+            return false;
+        }
+
+        //添加关闭socket指令
+        SendCloseMessage();
     }
     else
     {
-        //如果需要发送完成后删除，则配置标记位
-        if (PACKET_SEND_FIN_CLOSE == u1State)
+        int nWakeupRet = reactor()->schedule_wakeup(this, ACE_Event_Handler::WRITE_MASK);
+
+        if (-1 == nWakeupRet)
         {
-            m_u1ConnectState = CONNECT_SERVER_CLOSE;
-            ACE_Message_Block* pMbData = App_MessageBlockManager::instance()->Create(sizeof(int));
-
-            if (NULL == pMbData)
-            {
-                OUR_DEBUG((LM_DEBUG, "[CConnectHandler::SendMessage] Connectid=[%d] pMbData is NULL.\n", GetConnectID()));
-                return false;
-            }
-
-            //添加关闭socket指令
-            SendCloseMessage();
-        }
-        else
-        {
-            int nWakeupRet = reactor()->schedule_wakeup(this, ACE_Event_Handler::WRITE_MASK);
-
-            if (-1 == nWakeupRet)
-            {
-                OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendMessage] Connectid=%d, nWakeupRet(%d) output errno = [%d].\n", GetConnectID(), nWakeupRet, errno));
-            }
+            OUR_DEBUG((LM_ERROR, "[CConnectHandler::SendMessage] Connectid=%d, nWakeupRet(%d) output errno = [%d].\n", GetConnectID(), nWakeupRet, errno));
         }
     }
 
@@ -2110,20 +2109,11 @@ void CConnectManager::GetClientNameInfo(const char* pName, vecClientNameInfo& ob
 
         if(NULL != pConnectHandler && ACE_OS::strcmp(pConnectHandler->GetConnectName(), pName) == 0)
         {
-            _ClientNameInfo ClientNameInfo;
-            ClientNameInfo.m_nConnectID = (int)pConnectHandler->GetConnectID();
-            sprintf_safe(ClientNameInfo.m_szName, MAX_BUFF_100, "%s", pConnectHandler->GetConnectName());
-            sprintf_safe(ClientNameInfo.m_szClientIP, MAX_BUFF_50, "%s", pConnectHandler->GetClientIPInfo().m_szClientIP);
-            ClientNameInfo.m_nPort =  pConnectHandler->GetClientIPInfo().m_nPort;
-
-            if(pConnectHandler->GetIsLog() == true)
-            {
-                ClientNameInfo.m_nLog = 1;
-            }
-            else
-            {
-                ClientNameInfo.m_nLog = 0;
-            }
+            _ClientNameInfo ClientNameInfo = Tcp_Common_ClientNameInfo((int)pConnectHandler->GetConnectID(),
+                                             pConnectHandler->GetConnectName(),
+                                             pConnectHandler->GetClientIPInfo().m_szClientIP,
+                                             pConnectHandler->GetClientIPInfo().m_nPort,
+                                             pConnectHandler->GetIsLog());
 
             objClientNameInfo.push_back(ClientNameInfo);
         }
@@ -2137,21 +2127,8 @@ _CommandData* CConnectManager::GetCommandData( uint16 u2CommandID )
 
 void CConnectManager::Init( uint16 u2Index )
 {
-    //按照线程初始化统计模块的名字
-    char szName[MAX_BUFF_50] = {'\0'};
-    sprintf_safe(szName, MAX_BUFF_50, "发送线程(%d)", u2Index);
-    m_CommandAccount.InitName(szName, App_MainConfig::instance()->GetMaxCommandCount());
-
-    //初始化统计模块功能
-    m_CommandAccount.Init(App_MainConfig::instance()->GetCommandAccount(),
-                          App_MainConfig::instance()->GetCommandFlow(),
-                          App_MainConfig::instance()->GetPacketTimeOut());
-
-    //初始化最大消息发送队列长度
-    m_u2SendQueueMax = App_MainConfig::instance()->GetSendQueueMax();
-    //m_u2SendQueueMax = App_XmlConfig::instance()->GetXmlConfig<xmlSendInfo>(XML_Config_SendInfo)->SendQueueMax;
-    //初始化发送缓冲
-    m_SendCacheManager.Init(App_MainConfig::instance()->GetBlockCount(), App_MainConfig::instance()->GetBlockSize());
+    //初始化公共的部分
+    Tcp_Common_Manager_Init(u2Index, m_CommandAccount, m_u2SendQueueMax, m_SendCacheManager);
 
     //初始化Hash表
     uint16 u2PoolSize = App_MainConfig::instance()->GetMaxHandlerCount();

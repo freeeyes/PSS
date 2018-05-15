@@ -592,3 +592,43 @@ void Tcp_Common_Manager_Timeout_CheckInfo(int nActiveConnectCount)
     }
 
 }
+
+_ClientNameInfo Tcp_Common_ClientNameInfo(uint32 u4ConnectID, const char* pConnectName, const char* pClientIP, int nClientPort, bool IsLog)
+{
+    _ClientNameInfo ClientNameInfo;
+    ClientNameInfo.m_nConnectID = (int)u4ConnectID;
+    sprintf_safe(ClientNameInfo.m_szName, MAX_BUFF_100, "%s", pConnectName);
+    sprintf_safe(ClientNameInfo.m_szClientIP, MAX_BUFF_50, "%s", pClientIP);
+    ClientNameInfo.m_nPort = nClientPort;
+
+    if (IsLog == true)
+    {
+        ClientNameInfo.m_nLog = 1;
+    }
+    else
+    {
+        ClientNameInfo.m_nLog = 0;
+    }
+
+    return ClientNameInfo;
+}
+
+void Tcp_Common_Manager_Init(uint16 u2Index, CCommandAccount& objCommandAccount, uint16& u2SendQueueMax, CSendCacheManager& objSendCacheManager)
+{
+    //按照线程初始化统计模块的名字
+    char szName[MAX_BUFF_50] = { '\0' };
+    sprintf_safe(szName, MAX_BUFF_50, "发送线程(%d)", u2Index);
+    objCommandAccount.InitName(szName, App_MainConfig::instance()->GetMaxCommandCount());
+
+    //初始化统计模块功能
+    objCommandAccount.Init(App_MainConfig::instance()->GetCommandAccount(),
+                           App_MainConfig::instance()->GetCommandFlow(),
+                           App_MainConfig::instance()->GetPacketTimeOut());
+
+    //初始化队列最大发送缓冲数量
+    u2SendQueueMax = App_MainConfig::instance()->GetSendQueueMax();
+    //m_u2SendQueueMax = App_XmlConfig::instance()->GetXmlConfig<xmlSendInfo>(XML_Config_SendInfo)->SendQueueMax;
+
+    //初始化发送缓冲池
+    objSendCacheManager.Init(App_MainConfig::instance()->GetBlockCount(), App_MainConfig::instance()->GetBlockSize());
+}

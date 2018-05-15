@@ -10,6 +10,7 @@
 #include "PacketParsePool.h"
 #include "MakePacket.h"
 #include "FileTest.h"
+#include "SendCacheManager.h"
 
 //所有的handler用到的公共函数
 //add by freeeyes
@@ -77,5 +78,11 @@ bool Tcp_Common_Manager_Post_Message(uint32 u4ConnectID, IBuffPacket* pBuffPacke
 
 //定时器输出统计日志
 void Tcp_Common_Manager_Timeout_CheckInfo(int nActiveConnectCount);
+
+//获得连接姓名
+_ClientNameInfo Tcp_Common_ClientNameInfo(uint32 u4ConnectID, const char* pConnectName, const char* pClientIP, int nClientPort, bool IsLog);
+
+//初始化Manager
+void  Tcp_Common_Manager_Init(uint16 u2Index, CCommandAccount& objCommandAccount, uint16& u2SendQueueMax, CSendCacheManager& objSendCacheManager);
 
 #endif

@@ -2029,20 +2029,11 @@ void CProConnectManager::GetClientNameInfo(const char* pName, vecClientNameInfo&
 
         if(NULL != pConnectHandler && ACE_OS::strcmp(pConnectHandler->GetConnectName(), pName) == 0)
         {
-            _ClientNameInfo ClientNameInfo;
-            ClientNameInfo.m_nConnectID = (int)pConnectHandler->GetConnectID();
-            sprintf_safe(ClientNameInfo.m_szName, MAX_BUFF_100, "%s", pConnectHandler->GetConnectName());
-            sprintf_safe(ClientNameInfo.m_szClientIP, MAX_BUFF_50, "%s", pConnectHandler->GetClientIPInfo().m_szClientIP);
-            ClientNameInfo.m_nPort =  pConnectHandler->GetClientIPInfo().m_nPort;
-
-            if(pConnectHandler->GetIsLog() == true)
-            {
-                ClientNameInfo.m_nLog = 1;
-            }
-            else
-            {
-                ClientNameInfo.m_nLog = 0;
-            }
+            _ClientNameInfo ClientNameInfo = Tcp_Common_ClientNameInfo((int)pConnectHandler->GetConnectID(),
+                                             pConnectHandler->GetConnectName(),
+                                             pConnectHandler->GetClientIPInfo().m_szClientIP,
+                                             pConnectHandler->GetClientIPInfo().m_nPort,
+                                             pConnectHandler->GetIsLog());
 
             objClientNameInfo.push_back(ClientNameInfo);
         }
@@ -2051,22 +2042,8 @@ void CProConnectManager::GetClientNameInfo(const char* pName, vecClientNameInfo&
 
 void CProConnectManager::Init(uint16 u2Index)
 {
-    //按照线程初始化统计模块的名字
-    char szName[MAX_BUFF_50] = {'\0'};
-    sprintf_safe(szName, MAX_BUFF_50, "发送线程(%d)", u2Index);
-    m_CommandAccount.InitName(szName, App_MainConfig::instance()->GetMaxCommandCount());
-
-    //初始化统计模块功能
-    m_CommandAccount.Init(App_MainConfig::instance()->GetCommandAccount(),
-                          App_MainConfig::instance()->GetCommandFlow(),
-                          App_MainConfig::instance()->GetPacketTimeOut());
-
-    //初始化队列最大发送缓冲数量
-    m_u2SendQueueMax = App_MainConfig::instance()->GetSendQueueMax();
-    //m_u2SendQueueMax = App_XmlConfig::instance()->GetXmlConfig<xmlSendInfo>(XML_Config_SendInfo)->SendQueueMax;
-
-    //初始化发送缓冲池
-    m_SendCacheManager.Init(App_MainConfig::instance()->GetBlockCount(), App_MainConfig::instance()->GetBlockSize());
+    //初始化公共的部分
+    Tcp_Common_Manager_Init(u2Index, m_CommandAccount, m_u2SendQueueMax, m_SendCacheManager);
 
     //初始化Hash表
     uint16 u2PoolSize = App_MainConfig::instance()->GetMaxHandlerCount();
