@@ -10,7 +10,7 @@ int Task_Common_CloseMsgQueue(ACE_Task<ACE_MT_SYNCH>* pTask, ACE_Condition<ACE_T
     ACE_NEW_RETURN(mblk, ACE_Message_Block(0, ACE_Message_Block::MB_STOP), -1);
 
     // If queue is full, flush it before block in while
-    if (pTask->msg_queue()->is_full() && (retval = pTask->msg_queue()->flush()) == -1)
+    if (pTask->msg_queue()->is_full() && pTask->msg_queue()->flush() == -1)
     {
         OUR_DEBUG((LM_ERROR, "[CLogManager::CloseMsgQueue]put error flushing queue\n"));
     }

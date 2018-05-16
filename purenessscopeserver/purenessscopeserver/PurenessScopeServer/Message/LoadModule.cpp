@@ -14,7 +14,6 @@ CLoadModule::CLoadModule(void)
 CLoadModule::~CLoadModule(void)
 {
     OUR_DEBUG((LM_INFO, "[CLoadModule::~CLoadModule].\n"));
-    //Close();
 }
 
 void CLoadModule::Init(uint16 u2MaxModuleCount)
@@ -50,11 +49,9 @@ void CLoadModule::Close()
     for (uint32 i = 0; i < u4Size; i++)
     {
         //卸载并删除当初new的module对象
-        //OUR_DEBUG((LM_INFO, "[CLoadModule::Close]name=%s.\n", obj_vecModuleName[i].c_str()));
         UnLoadModule(obj_vecModuleName[i].c_str());
     }
 
-    //OUR_DEBUG((LM_INFO, "[CLoadModule::Close]FINISH!!!!.\n"));
     m_objHashModuleList.Close();
 }
 
@@ -126,10 +123,6 @@ bool CLoadModule::UnLoadModule(const char* szModuleName, bool blIsDelete)
     {
         //清除和此关联的所有订阅
         pModuleInfo->UnLoadModuleData();
-
-        //这里延迟一下，因为有可能正在处理当前信息，所以必须在这里延迟一下，防止报错（改变了处理模式，这种方式是很蠢笨的，所以这段代码废弃之）
-        //ACE_Time_Value tvSleep(MAX_LOADMODEL_CLOSE, 0);
-        //ACE_OS::sleep(tvSleep);
 
         //清除模块相关索引和数据
         int nRet = ACE_OS::dlclose(pModuleInfo->hModule);
@@ -252,13 +245,10 @@ bool CLoadModule::InitModule()
 
     for (uint32 i = 0; i < u4Size; i++)
     {
-        if (NULL != vecModeInfo[i]->InitModule)
+        if (NULL != vecModeInfo[i]->InitModule && 0 != vecModeInfo[i]->InitModule(App_ServerObject::instance()))
         {
-            if (0 != vecModeInfo[i]->InitModule(App_ServerObject::instance()))
-            {
-                blRet = false;
-                break;
-            }
+            blRet = false;
+            break;
         }
     }
 
