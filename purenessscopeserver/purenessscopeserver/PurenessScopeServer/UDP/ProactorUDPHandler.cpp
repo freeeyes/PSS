@@ -175,9 +175,7 @@ bool CProactorUDPHandler::SendMessage(char*& pMessage, uint32 u4Len, const char*
         return false;
     }
 
-    m_atvOutput = ACE_OS::gettimeofday();
-    m_u4SendSize += (uint32)u4Len;
-    m_u4SendPacketCount++;
+    SaveProSendInfo(u4Len);
 
     //统计发送信息
     m_CommandAccount.SaveCommandData(u2CommandID, (uint32)nPort, PACKET_UDP, u4Len, COMMAND_TYPE_OUT);
@@ -285,6 +283,13 @@ bool CProactorUDPHandler::CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len)
     m_u4RecvPacketCount++;
 
     return true;
+}
+
+void CProactorUDPHandler::SaveProSendInfo(uint32 u4Len)
+{
+    m_atvOutput = ACE_OS::gettimeofday();
+    m_u4SendSize += u4Len;
+    m_u4SendPacketCount++;
 }
 
 void CProactorUDPHandler::GetCommandData(uint16 u2CommandID, _CommandData& objCommandData)

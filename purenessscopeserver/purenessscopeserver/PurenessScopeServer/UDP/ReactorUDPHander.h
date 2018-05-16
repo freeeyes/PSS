@@ -36,6 +36,7 @@ public:
 private:
     bool CheckMessage(const char* pData, uint32 u4Len);              //这里解析数据包并放入数据队列
     int  Init_Open_Address(const ACE_INET_Addr& AddrRemote);         //初始化UDP连接对象
+    void SaveSendInfo(uint32 u4Len);                                 //记录发送信息
 
     ACE_SOCK_Dgram          m_skRemote;
     ACE_INET_Addr           m_addrRemote;                   //数据发送方的IP信息

@@ -32,6 +32,7 @@ public:
 
 private:
     bool CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len);              //这里解析数据包并放入数据队列
+    void SaveProSendInfo(uint32 u4Len);                                       //记录发送信息
 
     CPacketParse*           m_pPacketParse;                 //数据包解析类
     ACE_INET_Addr           m_addrRemote;                   //数据发送方的IP信息

@@ -134,9 +134,7 @@ bool CReactorUDPHander::SendMessage(char*& pMessage, uint32 u4Len, const char* s
         return false;
     }
 
-    m_atvOutput = ACE_OS::gettimeofday();
-    m_u4SendSize += u4Len;
-    m_u4SendPacketCount++;
+    SaveSendInfo(u4Len);
 
     //统计发送信息
     m_CommandAccount.SaveCommandData(u2CommandID, (uint32)nPort, PACKET_UDP, u4Len, COMMAND_TYPE_OUT);
@@ -272,6 +270,13 @@ int CReactorUDPHander::Init_Open_Address(const ACE_INET_Addr& AddrRemote)
     m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
 
     return 0;
+}
+
+void CReactorUDPHander::SaveSendInfo(uint32 u4Len)
+{
+    m_atvOutput = ACE_OS::gettimeofday();
+    m_u4SendSize += u4Len;
+    m_u4SendPacketCount++;
 }
 
 void CReactorUDPHander::GetCommandData(uint16 u2CommandID, _CommandData& objCommandData)
