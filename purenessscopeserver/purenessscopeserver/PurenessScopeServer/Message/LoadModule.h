@@ -11,8 +11,9 @@
 #include <string>
 #include <vector>
 
-struct _ModuleInfo
+class _ModuleInfo
 {
+public:
     string           strModuleName;         //模块文件名称
     string           strModulePath;         //模块路径
     string           strModuleParam;        //模块启动参数
@@ -41,8 +42,9 @@ struct _ModuleInfo
     }
 };
 
-struct _WaitUnloadModule
+class _WaitUnloadModule
 {
+public:
     uint32           m_u4UpdateIndex;                //工作线程总数
     uint32           m_u4ThreadCurrEndCount;         //当前已经结束的工作线程个数
     uint8            m_u1UnloadState;                //重载状态，1为卸载，2为重载
