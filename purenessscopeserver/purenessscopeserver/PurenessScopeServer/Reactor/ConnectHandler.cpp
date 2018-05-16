@@ -1246,16 +1246,19 @@ bool CConnectHandler::CheckMessage()
 
 _ClientConnectInfo CConnectHandler::GetClientInfo()
 {
-    return Tcp_Common_ClientInfo(GetConnectID(),
-                                 m_addrRemote,
-                                 m_u4AllRecvCount,
-                                 m_u4AllSendCount,
-                                 m_u4AllRecvSize,
-                                 m_u4AllSendSize,
-                                 m_atvConnect,
-                                 m_u4RecvQueueCount,
-                                 m_u8RecvQueueTimeCost,
-                                 m_u8SendQueueTimeCost);
+    _ClientConnectInfo_Param obj_ClientConnectInfo_Param;
+    obj_ClientConnectInfo_Param.m_addrRemote = m_addrRemote;
+    obj_ClientConnectInfo_Param.m_atvConnect = m_atvConnect;
+    obj_ClientConnectInfo_Param.m_u4AllRecvCount = m_u4AllRecvCount;
+    obj_ClientConnectInfo_Param.m_u4AllRecvSize = m_u4AllRecvSize;
+    obj_ClientConnectInfo_Param.m_u4AllSendCount = m_u4AllSendCount;
+    obj_ClientConnectInfo_Param.m_u4AllSendSize = m_u4AllSendSize;
+    obj_ClientConnectInfo_Param.m_u4ConnectID = GetConnectID();
+    obj_ClientConnectInfo_Param.m_u4RecvQueueCount = m_u4RecvQueueCount;
+    obj_ClientConnectInfo_Param.m_u8RecvQueueTimeCost = m_u8RecvQueueTimeCost;
+    obj_ClientConnectInfo_Param.m_u8SendQueueTimeCost = m_u8SendQueueTimeCost;
+
+    return Tcp_Common_ClientInfo(obj_ClientConnectInfo_Param);
 }
 
 _ClientIPInfo  CConnectHandler::GetClientIPInfo()
@@ -1350,13 +1353,16 @@ bool CConnectHandler::Send_Block_Queue(ACE_Message_Block* pMb)
 bool CConnectHandler::Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPacket)
 {
     //文件入口，直接写入日志
-    return Tcp_Common_File_Message(GetConnectID(),
-                                   m_pFileTest,
-                                   blDelete,
+    _File_Message_Param obj_File_Message_Param;
+    obj_File_Message_Param.m_addrRemote        = m_addrRemote;
+    obj_File_Message_Param.m_blDelete          = blDelete;
+    obj_File_Message_Param.m_pFileTest         = m_pFileTest;
+    obj_File_Message_Param.m_pPacketDebugData  = m_pPacketDebugData;
+    obj_File_Message_Param.m_u4ConnectID       = GetConnectID();
+    obj_File_Message_Param.m_u4PacketDebugSize = m_u4PacketDebugSize;
+
+    return Tcp_Common_File_Message(obj_File_Message_Param,
                                    pBuffPacket,
-                                   m_pPacketDebugData,
-                                   m_u4PacketDebugSize,
-                                   m_addrRemote,
                                    m_szConnectName);
 }
 

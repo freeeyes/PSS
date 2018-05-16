@@ -8,59 +8,57 @@ void Recovery_Message(bool blDelete, char*& pMessage)
     }
 }
 
-bool Udp_Common_Send_Message(uint32 u4PacketParseInfoID, ACE_INET_Addr& AddrRemote, char*& pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead, uint16 u2CommandID, bool blDlete, ACE_Message_Block*& pMbData)
+bool Udp_Common_Send_Message(_Send_Message_Param obj_Send_Message_Param, ACE_INET_Addr& AddrRemote, char*& pMessage, ACE_Message_Block*& pMbData)
 {
-    int nErr = AddrRemote.set(nPort, szIP);
+    int nErr = AddrRemote.set(obj_Send_Message_Param.m_nPort, obj_Send_Message_Param.m_pIP);
 
     if (nErr != 0)
     {
         OUR_DEBUG((LM_INFO, "[Udp_Common_Send_Message]set_address error[%d].\n", errno));
-        Recovery_Message(blDlete, pMessage);
+        Recovery_Message(obj_Send_Message_Param.m_blDlete, pMessage);
         return false;
     }
 
-    if (blHead == true)
+    if (obj_Send_Message_Param.m_blHead == true)
     {
         //如果需要拼接包头，则拼接包头
-        CPacketParse PacketParse;
-
-        uint32 u4SendLength = App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Make_Send_Packet_Length(0, u4Len, u2CommandID);
+        uint32 u4SendLength = App_PacketParseLoader::instance()->GetPacketParseInfo(obj_Send_Message_Param.m_u4PacketParseInfoID)->Make_Send_Packet_Length(0, obj_Send_Message_Param.m_u4Len, obj_Send_Message_Param.m_u2CommandID);
         pMbData = App_MessageBlockManager::instance()->Create(u4SendLength);
 
         if (NULL == pMbData)
         {
             OUR_DEBUG((LM_INFO, "Udp_Common_Send_Message]pMbData is NULL.\n"));
-            Recovery_Message(blDlete, pMessage);
+            Recovery_Message(obj_Send_Message_Param.m_blDlete, pMessage);
             return false;
         }
 
-        if (false == App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Make_Send_Packet(0, pMessage, u4Len, pMbData, u2CommandID))
+        if (false == App_PacketParseLoader::instance()->GetPacketParseInfo(obj_Send_Message_Param.m_u4PacketParseInfoID)->Make_Send_Packet(0, pMessage, obj_Send_Message_Param.m_u4Len, pMbData, obj_Send_Message_Param.m_u2CommandID))
         {
             OUR_DEBUG((LM_INFO, "Udp_Common_Send_Message]Make_Send_Packet is false.\n"));
-            Recovery_Message(blDlete, pMessage);
+            Recovery_Message(obj_Send_Message_Param.m_blDlete, pMessage);
             return false;
         }
 
-        Recovery_Message(blDlete, pMessage);
+        Recovery_Message(obj_Send_Message_Param.m_blDlete, pMessage);
         return true;
     }
     else
     {
         //不需要拼接包头，直接发送
-        pMbData = App_MessageBlockManager::instance()->Create(u4Len);
+        pMbData = App_MessageBlockManager::instance()->Create(obj_Send_Message_Param.m_u4Len);
 
         if (NULL == pMbData)
         {
             OUR_DEBUG((LM_INFO, "Udp_Common_Send_Message]pMbData is NULL.\n"));
-            Recovery_Message(blDlete, pMessage);
+            Recovery_Message(obj_Send_Message_Param.m_blDlete, pMessage);
             return false;
         }
 
         //将数据拷贝到ACE_Message_Block对象中
-        memcpy_safe(pMessage, u4Len, pMbData->wr_ptr(), u4Len);
-        pMbData->wr_ptr(u4Len);
+        memcpy_safe(pMessage, obj_Send_Message_Param.m_u4Len, pMbData->wr_ptr(), obj_Send_Message_Param.m_u4Len);
+        pMbData->wr_ptr(obj_Send_Message_Param.m_u4Len);
 
-        Recovery_Message(blDlete, pMessage);
+        Recovery_Message(obj_Send_Message_Param.m_blDlete, pMessage);
         return true;
     }
 }
@@ -227,15 +225,15 @@ void Send_MakePacket_Queue(uint32 u4ConnectID, uint32 u4PacketParseID, CPacketPa
     }
 }
 
-bool Tcp_Common_File_Message(uint32 u4ConnectID, IFileTestManager* pFileTest, bool blDelete, IBuffPacket*& pBuffPacket, char* pPacketDebugData, uint32 u4PacketDebugSize, ACE_INET_Addr addrRemote, const char* pConnectName)
+bool Tcp_Common_File_Message(_File_Message_Param obj_File_Message_Param, IBuffPacket*& pBuffPacket, const char* pConnectName)
 {
     char szLog[10] = { '\0' };
     uint32 u4DebugSize = 0;
     bool blblMore = false;
 
-    if (pBuffPacket->GetPacketLen() >= u4PacketDebugSize)
+    if (pBuffPacket->GetPacketLen() >= obj_File_Message_Param.m_u4PacketDebugSize)
     {
-        u4DebugSize = u4PacketDebugSize - 1;
+        u4DebugSize = obj_File_Message_Param.m_u4PacketDebugSize - 1;
         blblMore = true;
     }
     else
@@ -248,48 +246,48 @@ bool Tcp_Common_File_Message(uint32 u4ConnectID, IFileTestManager* pFileTest, bo
     for (uint32 i = 0; i < u4DebugSize; i++)
     {
         sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
-        sprintf_safe(pPacketDebugData + 5 * i, MAX_BUFF_1024 - 5 * i, "0x%02X ", (unsigned char)pData[i]);
+        sprintf_safe(obj_File_Message_Param.m_pPacketDebugData + 5 * i, MAX_BUFF_1024 - 5 * i, "0x%02X ", (unsigned char)pData[i]);
     }
 
-    pPacketDebugData[5 * u4DebugSize] = '\0';
+    obj_File_Message_Param.m_pPacketDebugData[5 * u4DebugSize] = '\0';
 
     if (blblMore == true)
     {
-        AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTSEND, "[(%s)%s:%d]%s.(数据包过长)", pConnectName, addrRemote.get_host_addr(), addrRemote.get_port_number(), pPacketDebugData);
+        AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTSEND, "[(%s)%s:%d]%s.(数据包过长)", pConnectName, obj_File_Message_Param.m_addrRemote.get_host_addr(), obj_File_Message_Param.m_addrRemote.get_port_number(), obj_File_Message_Param.m_pPacketDebugData);
     }
     else
     {
-        AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTSEND, "[(%s)%s:%d]%s.", pConnectName, addrRemote.get_host_addr(), addrRemote.get_port_number(), pPacketDebugData);
+        AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTSEND, "[(%s)%s:%d]%s.", pConnectName, obj_File_Message_Param.m_addrRemote.get_host_addr(), obj_File_Message_Param.m_addrRemote.get_port_number(), obj_File_Message_Param.m_pPacketDebugData);
     }
 
     //回调测试文件管理接口
-    if (NULL != pFileTest)
+    if (NULL != obj_File_Message_Param.m_pFileTest)
     {
-        pFileTest->HandlerServerResponse(u4ConnectID);
+        obj_File_Message_Param.m_pFileTest->HandlerServerResponse(obj_File_Message_Param.m_u4ConnectID);
     }
 
     //回收用完的对象
-    Recovery_Common_BuffPacket(blDelete, pBuffPacket);
+    Recovery_Common_BuffPacket(obj_File_Message_Param.m_blDelete, pBuffPacket);
 
     return true;
 }
 
-_ClientConnectInfo Tcp_Common_ClientInfo(uint32 u4ConnectID, ACE_INET_Addr addrRemote, uint32 u4AllRecvCount, uint32 u4AllSendCount, uint32 u4AllRecvSize, uint32 u4AllSendSize, ACE_Time_Value atvConnect, uint32 u4RecvQueueCount, uint64 u8RecvQueueTimeCost, uint64 u8SendQueueTimeCost)
+_ClientConnectInfo Tcp_Common_ClientInfo(_ClientConnectInfo_Param obj_ClientConnectInfo_Param)
 {
     _ClientConnectInfo ClientConnectInfo;
 
     ClientConnectInfo.m_blValid = true;
-    ClientConnectInfo.m_u4ConnectID = u4ConnectID;
-    ClientConnectInfo.m_addrRemote = addrRemote;
-    ClientConnectInfo.m_u4RecvCount = u4AllRecvCount;
-    ClientConnectInfo.m_u4SendCount = u4AllSendCount;
-    ClientConnectInfo.m_u4AllRecvSize = u4AllRecvSize;
-    ClientConnectInfo.m_u4AllSendSize = u4AllSendSize;
-    ClientConnectInfo.m_u4BeginTime = (uint32)atvConnect.sec();
-    ClientConnectInfo.m_u4AliveTime = (uint32)(ACE_OS::gettimeofday().sec() - atvConnect.sec());
-    ClientConnectInfo.m_u4RecvQueueCount = u4RecvQueueCount;
-    ClientConnectInfo.m_u8RecvQueueTimeCost = u8RecvQueueTimeCost;
-    ClientConnectInfo.m_u8SendQueueTimeCost = u8SendQueueTimeCost;
+    ClientConnectInfo.m_u4ConnectID = obj_ClientConnectInfo_Param.m_u4ConnectID;
+    ClientConnectInfo.m_addrRemote = obj_ClientConnectInfo_Param.m_addrRemote;
+    ClientConnectInfo.m_u4RecvCount = obj_ClientConnectInfo_Param.m_u4AllRecvCount;
+    ClientConnectInfo.m_u4SendCount = obj_ClientConnectInfo_Param.m_u4AllSendCount;
+    ClientConnectInfo.m_u4AllRecvSize = obj_ClientConnectInfo_Param.m_u4AllRecvSize;
+    ClientConnectInfo.m_u4AllSendSize = obj_ClientConnectInfo_Param.m_u4AllSendSize;
+    ClientConnectInfo.m_u4BeginTime = (uint32)obj_ClientConnectInfo_Param.m_atvConnect.sec();
+    ClientConnectInfo.m_u4AliveTime = (uint32)(ACE_OS::gettimeofday().sec() - obj_ClientConnectInfo_Param.m_atvConnect.sec());
+    ClientConnectInfo.m_u4RecvQueueCount = obj_ClientConnectInfo_Param.m_u4RecvQueueCount;
+    ClientConnectInfo.m_u8RecvQueueTimeCost = obj_ClientConnectInfo_Param.m_u8RecvQueueTimeCost;
+    ClientConnectInfo.m_u8SendQueueTimeCost = obj_ClientConnectInfo_Param.m_u8SendQueueTimeCost;
 
     return ClientConnectInfo;
 }
@@ -534,17 +532,15 @@ bool Tcp_Common_Manager_Post_Message(uint32 u4ConnectID, IBuffPacket* pBuffPacke
 void Tcp_Common_Manager_Timeout_CheckInfo(int nActiveConnectCount)
 {
     //检测连接总数是否超越监控阀值
-    if (App_MainConfig::instance()->GetConnectAlert()->m_u4ConnectAlert > 0)
+    if (App_MainConfig::instance()->GetConnectAlert()->m_u4ConnectAlert > 0
+        && nActiveConnectCount > (int)App_MainConfig::instance()->GetConnectAlert()->m_u4ConnectAlert)
     {
-        if (nActiveConnectCount > (int)App_MainConfig::instance()->GetConnectAlert()->m_u4ConnectAlert)
-        {
-            AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
-                                                   App_MainConfig::instance()->GetConnectAlert()->m_u4MailID,
-                                                   (char*)"Alert",
-                                                   "[Tcp_Common_Manager_Timeout_CheckInfo]active ConnectCount is more than limit(%d > %d).",
-                                                   nActiveConnectCount,
-                                                   App_MainConfig::instance()->GetConnectAlert()->m_u4ConnectAlert);
-        }
+        AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
+                                               App_MainConfig::instance()->GetConnectAlert()->m_u4MailID,
+                                               (char*)"Alert",
+                                               "[Tcp_Common_Manager_Timeout_CheckInfo]active ConnectCount is more than limit(%d > %d).",
+                                               nActiveConnectCount,
+                                               App_MainConfig::instance()->GetConnectAlert()->m_u4ConnectAlert);
     }
 
     //检测单位时间连接数是否超越阀值
@@ -627,7 +623,6 @@ void Tcp_Common_Manager_Init(uint16 u2Index, CCommandAccount& objCommandAccount,
 
     //初始化队列最大发送缓冲数量
     u2SendQueueMax = App_MainConfig::instance()->GetSendQueueMax();
-    //m_u2SendQueueMax = App_XmlConfig::instance()->GetXmlConfig<xmlSendInfo>(XML_Config_SendInfo)->SendQueueMax;
 
     //初始化发送缓冲池
     objSendCacheManager.Init(App_MainConfig::instance()->GetBlockCount(), App_MainConfig::instance()->GetBlockSize());

@@ -110,15 +110,19 @@ bool CReactorUDPHander::SendMessage(char*& pMessage, uint32 u4Len, const char* s
 {
     ACE_Message_Block* pMbData = NULL;
     ACE_INET_Addr AddrRemote;
-    bool blState = Udp_Common_Send_Message(m_u4PacketParseInfoID,
+
+    _Send_Message_Param obj_Send_Message_Param;
+    obj_Send_Message_Param.m_u4PacketParseInfoID = m_u4PacketParseInfoID;
+    obj_Send_Message_Param.m_blDlete             = blDlete;
+    obj_Send_Message_Param.m_blHead              = blHead;
+    obj_Send_Message_Param.m_nPort               = nPort;
+    obj_Send_Message_Param.m_pIP                 = (char*)szIP;
+    obj_Send_Message_Param.m_u2CommandID         = u2CommandID;
+    obj_Send_Message_Param.m_u4Len               = u4Len;
+
+    bool blState = Udp_Common_Send_Message(obj_Send_Message_Param,
                                            AddrRemote,
                                            pMessage,
-                                           u4Len,
-                                           szIP,
-                                           nPort,
-                                           blHead,
-                                           u2CommandID,
-                                           blDlete,
                                            pMbData);
 
     if (true == blState)
