@@ -281,7 +281,6 @@ int Chlid_Run()
     if(App_MainConfig::instance()->GetServerType() == 1)
     {
         OUR_DEBUG((LM_INFO, "[main]Procress is run background.\n"));
-        //daemon(1,1);
         Gdaemon();
     }
 

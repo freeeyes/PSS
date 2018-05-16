@@ -113,25 +113,6 @@ bool CAceReactor::Init(int nReactorType, int nThreadCount, int nMaxHandleCount)
 #ifdef ACE_HAS_EVENT_POLL     //Linux下的EPoll模型
 
         case Reactor_DEV_POLL:
-            {
-                ACE_Dev_Poll_Reactor* devreactor = new ACE_Dev_Poll_Reactor(nMaxHandleCount);
-
-                if (NULL == devreactor)
-                {
-                    throw std::domain_error("[CAceReactor::Init]New ACE_Dev_Poll_Reactor Error.");
-                }
-
-                m_pReactor = new ACE_Reactor(devreactor, 1);
-
-                if (NULL == m_pReactor)
-                {
-                    throw std::domain_error("[CAceReactor::Init]New m_pReactor Error[ACE_Dev_Poll_Reactor].");
-                }
-
-                m_nReactorType = Reactor_DEV_POLL;
-                break;
-            }
-
         case Reactor_DEV_POLL_ET:
             {
                 ACE_Dev_Poll_Reactor* devreactor = new ACE_Dev_Poll_Reactor(nMaxHandleCount);
@@ -203,7 +184,6 @@ int CAceReactor::svc()
     {
         m_blRun = true;
 
-        //OUR_DEBUG((LM_ERROR, "CAceReactor::Svc] (%P|%t) Begin nReactorID= [%d] begin.... \n", m_u4ReactorID));
         m_pReactor->owner(ACE_OS::thr_self());
 
         while (m_pReactor->reactor_event_loop_done() == 0)
@@ -329,13 +309,6 @@ bool CAceReactorManager::AddNewReactor(int nReactorID, int nReactorType, int nTh
 
     CAceReactor* pAceReactor = new CAceReactor();
 
-    /*
-    if (nReactorID == REACTOR_CLIENTDEFINE)
-    {
-    nThreadCount = 0;
-    }
-    */
-
     pAceReactor->SetReactorID((uint32)nReactorID);
     bool blState = pAceReactor->Init(nReactorType, nThreadCount, nMaxHandleCount);
 
@@ -353,10 +326,6 @@ bool CAceReactorManager::AddNewReactor(int nReactorID, int nReactorType, int nTh
         return false;
     }
 
-    //if(nReactorID == REACTOR_CLIENTDEFINE)          //第一个Reactor作为默认的
-    //{
-    //  ACE_Reactor::instance(pAceReactor->GetReactor(), false);
-    //}
     m_pReactorList[nReactorID] = pAceReactor;
     OUR_DEBUG((LM_INFO, "[CAceReactorManager::AddNewReactor]New [%d] ReactorTxype = [%d] nThreadCount = [%d]. pAceReactor=[%@]\n", nReactorID, nReactorType, nThreadCount, pAceReactor));
     return true;
@@ -426,7 +395,6 @@ ACE_Reactor* CAceReactorManager::GetAce_Reactor(int nReactorID)
 
     if (NULL != m_pReactorList[nReactorID])
     {
-        //OUR_DEBUG((LM_INFO, "CAceReactorManager::GetAce_Reactor id=[%d] pAceReactor=[0x%@]\n",nReactorID, pAceReactor));
         return m_pReactorList[nReactorID]->GetReactor();
     }
     else
@@ -448,7 +416,6 @@ ACE_Reactor* CAceReactorManager::GetAce_Client_Reactor(int nReactorID)
 
     if (NULL != m_pReactorList[nClientReactor])
     {
-        //OUR_DEBUG((LM_INFO, "CAceReactorManager::GetAce_Reactor id=[%d] pAceReactor=[0x%@]\n",nReactorID, pAceReactor));
         return m_pReactorList[nClientReactor]->GetReactor();
     }
     else

@@ -21,10 +21,7 @@ public:
 
     _Dyeing_IP()
     {
-        m_u2MaxCount  = 0;
-        m_u2CurrCount = 0;
-        m_blIsValid   = false;
-        m_szIP[0]     = '\0';
+        Clear();
     }
 
     void Clear()
@@ -47,10 +44,7 @@ public:
 
     _Dyeing_Command()
     {
-        m_u2CommandID   = 0;
-        m_u2MaxCount    = 0;
-        m_u2CurrCount   = 0;
-        m_blIsValid     = false;
+        Clear();
     }
 
     void Clear()
