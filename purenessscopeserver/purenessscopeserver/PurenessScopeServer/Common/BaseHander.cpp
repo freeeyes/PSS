@@ -8,7 +8,8 @@ void Recovery_Message(bool blDelete, char*& pMessage)
     }
 }
 
-bool Udp_Common_Send_Message(_Send_Message_Param obj_Send_Message_Param, ACE_INET_Addr& AddrRemote, char*& pMessage, ACE_Message_Block*& pMbData)
+bool Udp_Common_Send_Message(_Send_Message_Param obj_Send_Message_Param, ACE_INET_Addr& AddrRemote, char*& pMessage,
+                             ACE_Message_Block*& pMbData, ACE_SOCK_Dgram& skRemote)
 {
     int nErr = AddrRemote.set(obj_Send_Message_Param.m_nPort, obj_Send_Message_Param.m_pIP);
 
@@ -61,6 +62,15 @@ bool Udp_Common_Send_Message(_Send_Message_Param obj_Send_Message_Param, ACE_INE
         Recovery_Message(obj_Send_Message_Param.m_blDlete, pMessage);
         return true;
     }
+
+    int nSize = (int)skRemote.send(pMbData->rd_ptr(), pMbData->length(), AddrRemote);
+
+    if ((uint32)nSize != pMbData->length())
+    {
+        return false;
+    }
+
+    return true;
 }
 
 bool Udp_Common_Recv_Head(ACE_Message_Block* pMBHead, CPacketParse* pPacketParse, uint32 u4PacketParseInfoID, uint32 u4Len)
@@ -348,7 +358,8 @@ bool Tcp_Common_Send_Input_To_Cache(_Input_To_Cache_Param obj_Input_To_Cache_Par
 
 bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
                                  IBuffPacket*& pBuffPacket,
-                                 ACE_Message_Block* pBlockMessage)
+                                 ACE_Message_Block* pBlockMessage,
+                                 ACE_Message_Block*& pMbData)
 {
     uint32 u4SendPacketSize = 0;
 
@@ -390,6 +401,14 @@ bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
         memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pBlockMessage->wr_ptr(), pBuffPacket->GetPacketLen());
         pBlockMessage->wr_ptr(pBuffPacket->GetPacketLen());
     }
+
+    //因为是异步发送，发送的数据指针不可以立刻释放，所以需要在这里创建一个新的发送数据块，将数据考入
+    pMbData = App_MessageBlockManager::instance()->Create((uint32)pBlockMessage->length());
+
+    memcpy_safe(pBlockMessage->rd_ptr(), (uint32)pBlockMessage->length(), pMbData->wr_ptr(), (uint32)pBlockMessage->length());
+    pMbData->wr_ptr(pBlockMessage->length());
+    //放入完成，则清空缓存数据，使命完成
+    pBlockMessage->reset();
 
     return true;
 }

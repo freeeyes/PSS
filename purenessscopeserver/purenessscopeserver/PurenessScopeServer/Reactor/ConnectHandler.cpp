@@ -1397,23 +1397,13 @@ bool CConnectHandler::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, 
     //拼装数据
     bool blState = Tcp_Common_Make_Send_Packet(obj_Send_Packet_Param,
                    pBuffPacket,
-                   m_pBlockMessage);
+                   m_pBlockMessage,
+                   pMbData);
 
     if (false == blState)
     {
         return false;
     }
-
-    //如果之前有缓冲数据，则和缓冲数据一起发送
-    u4PacketSize = (uint32)m_pBlockMessage->length();
-
-    //因为是异步发送，发送的数据指针不可以立刻释放，所以需要在这里创建一个新的发送数据块，将数据考入
-    pMbData = App_MessageBlockManager::instance()->Create((uint32)m_pBlockMessage->length());
-
-    memcpy_safe(m_pBlockMessage->rd_ptr(), (uint32)m_pBlockMessage->length(), pMbData->wr_ptr(), (uint32)m_pBlockMessage->length());
-    pMbData->wr_ptr(m_pBlockMessage->length());
-    //放入完成，则清空缓存数据，使命完成
-    m_pBlockMessage->reset();
 
     //回收内存
     Recovery_Common_BuffPacket(blDelete, pBuffPacket);

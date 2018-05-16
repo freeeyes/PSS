@@ -79,6 +79,12 @@ ACE_Message_Block* CMessageBlockManager::Create(uint32 u4Size)
 bool CMessageBlockManager::Close(ACE_Message_Block* pMessageBlock)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
+
+    if (NULL == pMessageBlock)
+    {
+        return false;
+    }
+
     pMessageBlock->msg_type(ACE_Message_Block::MB_DATA);
     pMessageBlock->reset();
     m_MemoryBlock_Pool.Set(pMessageBlock);
@@ -91,7 +97,7 @@ bool CMessageBlockManager::Close(ACE_Message_Block* pMessageBlock)
     }
     else
     {
-        OUR_DEBUG((LM_ERROR, "[CMessageBlockManager::{]m_u4UsedSize = [%d],u4FormatSize=[%d] realse Error!\n", m_u4UsedSize, u4Size));
+        OUR_DEBUG((LM_ERROR, "[CMessageBlockManager::Close]m_u4UsedSize = [%d],u4FormatSize=[%d] realse Error!\n", m_u4UsedSize, u4Size));
     }
 
     return true;

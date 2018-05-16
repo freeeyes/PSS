@@ -11,6 +11,7 @@
 #include "MakePacket.h"
 #include "FileTest.h"
 #include "SendCacheManager.h"
+#include "ace/SOCK_Dgram.h"
 
 //所有的handler用到的公共函数
 //add by freeeyes
@@ -44,7 +45,8 @@ public:
 };
 
 //udp函数发送数据包合成函数
-bool Udp_Common_Send_Message(_Send_Message_Param obj_Send_Message_Param, ACE_INET_Addr& AddrRemote, char*& pMessage, ACE_Message_Block*& pMbData);
+bool Udp_Common_Send_Message(_Send_Message_Param obj_Send_Message_Param, ACE_INET_Addr& AddrRemote, char*& pMessage,
+                             ACE_Message_Block*& pMbData, ACE_SOCK_Dgram& skRemote);
 
 //udp处理消息头函数
 bool Udp_Common_Recv_Head(ACE_Message_Block* pMBHead, CPacketParse* pPacketParse, uint32 u4PacketParseInfoID, uint32 u4Len);
@@ -178,7 +180,8 @@ public:
 //组装发送数据
 bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
                                  IBuffPacket*& pBuffPacket,
-                                 ACE_Message_Block* pBlockMessage);
+                                 ACE_Message_Block* pBlockMessage,
+                                 ACE_Message_Block*& pMbData);
 
 //发送Manager消息队列关闭信息
 bool Tcp_Common_CloseConnect_By_Queue(uint32 u4ConnectID, CSendMessagePool& objSendMessagePool,
