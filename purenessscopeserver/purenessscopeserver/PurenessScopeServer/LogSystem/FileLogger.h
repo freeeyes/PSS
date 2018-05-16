@@ -116,8 +116,6 @@ public:
                 }
             }
         }
-
-        return;
     }
 
     virtual ~CLogFile()
@@ -295,12 +293,9 @@ public:
         }
 
         //查看是否要发送邮件
-        if(pLogBlockInfo->m_u4MailID > 0)
+        if(pLogBlockInfo->m_u4MailID > 0 && false == SendMail(pLogBlockInfo))
         {
-            if (false == SendMail(pLogBlockInfo))
-            {
-                OUR_DEBUG((LM_INFO, "[CLogFile::doLog](%s)Send mail fail.\n", m_StrlogName.c_str()));
-            }
+            OUR_DEBUG((LM_INFO, "[CLogFile::doLog](%s)Send mail fail.\n", m_StrlogName.c_str()));
         }
 
         //检查是否超过了文件块，如果超过了，创建一个新日志文件。
@@ -517,12 +512,9 @@ public:
         char szDate[MAX_TIME_SIZE] = {'\0'};
         sprintf_safe(szDate, MAX_TIME_SIZE, "%04d-%02d-%02d", dt.year(), dt.month(), dt.day());
 
-        if(ACE_OS::strcmp(szDate, m_szLogTime) != 0)
+        if(ACE_OS::strcmp(szDate, m_szLogTime) != 0 && false == Run())
         {
-            if (false == Run())
-            {
-                OUR_DEBUG((LM_INFO, "[ServerLogger](%s)Run fail.\n", m_StrlogName.c_str()));
-            }
+            OUR_DEBUG((LM_INFO, "[ServerLogger](%s)Run fail.\n", m_StrlogName.c_str()));
         }
     }
 

@@ -74,6 +74,7 @@ public:
     int WriteToMail(int nLogType, uint32 u4MailID, const char* pTitle, const char* fmt, ...);
 
 private:
+    bool Dispose_Queue();
     int ProcessLog(_LogBlockInfo* pLogBlockInfo);
     virtual int CloseMsgQueue();
     int Create_Log_Block(int nLogType, uint32* pMailID, const char* pTitle, va_list* ap, const char* fmt, int nfmtSize);

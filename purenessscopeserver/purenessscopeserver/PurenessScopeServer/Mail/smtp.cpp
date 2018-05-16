@@ -9,7 +9,8 @@
 
 int stringCut(const unsigned char* pcSrc, const char* start, const char* end, char* pcDest)
 {
-    unsigned char* posStart = NULL, *posEnd = NULL;
+    unsigned char* posStart = NULL;
+    unsigned char* posEnd = NULL;
     int len;
 
     if (0 == *pcSrc || NULL == pcDest)

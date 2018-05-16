@@ -143,42 +143,10 @@ int CLogManager::svc(void)
 
     while(true)
     {
-        ACE_Message_Block* mb = NULL;
-        ACE_OS::last_error(0);
-
-        if(getq(mb, 0) == -1)
+        //消息处理
+        if (false == Dispose_Queue())
         {
-            OUR_DEBUG((LM_ERROR,"[CLogManager::svc] get error errno = [%d].\n", ACE_OS::last_error()));
-            m_blRun = false;
             break;
-        }
-        else if ((0 == mb->size()) && (mb->msg_type() == ACE_Message_Block::MB_STOP))
-        {
-
-            m_mutex.acquire();
-            mb->release ();
-            this->msg_queue ()->deactivate ();
-            m_cond.signal();
-            m_mutex.release();
-            break;
-        }
-        else
-        {
-            _LogBlockInfo* pLogBlockInfo = *((_LogBlockInfo**)mb->base());
-
-            if (!pLogBlockInfo)
-            {
-                OUR_DEBUG((LM_ERROR,"[CLogManager::svc] CLogManager mb log == NULL!\n"));
-                continue;
-            }
-
-            if (0 != ProcessLog(pLogBlockInfo))
-            {
-                OUR_DEBUG((LM_ERROR, "[CLogManager::svc] ProcessLog is false.\n"));
-            }
-
-            //回收日志块
-            m_objLogBlockPool.ReturnBlockInfo(pLogBlockInfo);
         }
     }
 
@@ -310,6 +278,48 @@ int CLogManager::UnRegisterLog()
     }
 
     return 0;
+}
+
+bool CLogManager::Dispose_Queue()
+{
+    ACE_Message_Block* mb = NULL;
+    ACE_OS::last_error(0);
+
+    if (getq(mb, 0) == -1)
+    {
+        OUR_DEBUG((LM_ERROR, "[CLogManager::svc] get error errno = [%d].\n", ACE_OS::last_error()));
+        m_blRun = false;
+        return false;
+    }
+    else if (mb->msg_type() == ACE_Message_Block::MB_STOP)
+    {
+        m_mutex.acquire();
+        mb->release();
+        this->msg_queue()->deactivate();
+        m_cond.signal();
+        m_mutex.release();
+        return false;
+    }
+    else
+    {
+        _LogBlockInfo* pLogBlockInfo = *((_LogBlockInfo**)mb->base());
+
+        if (!pLogBlockInfo)
+        {
+            OUR_DEBUG((LM_ERROR, "[CLogManager::svc] CLogManager mb log == NULL!\n"));
+            return true;
+        }
+
+        if (0 != ProcessLog(pLogBlockInfo))
+        {
+            OUR_DEBUG((LM_ERROR, "[CLogManager::svc] ProcessLog is false.\n"));
+        }
+
+        //回收日志块
+        m_objLogBlockPool.ReturnBlockInfo(pLogBlockInfo);
+    }
+
+    return true;
 }
 
 int CLogManager::ProcessLog(_LogBlockInfo* pLogBlockInfo)

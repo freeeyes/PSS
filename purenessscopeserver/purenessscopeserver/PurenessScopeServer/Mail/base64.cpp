@@ -59,12 +59,9 @@ int base64_decode(unsigned char* out, const char* in, int out_size)
 
         v = (v << 6) + map2[index];
 
-        if (i & 3)
+        if (i & 3 && dst - out < out_size)
         {
-            if (dst - out < out_size)
-            {
-                *dst++ = v >> (6 - 2 * (i & 3));
-            }
+            *dst++ = v >> (6 - 2 * (i & 3));
         }
     }
 
@@ -81,7 +78,8 @@ char* base64_encode(char* out, int out_size, const unsigned char* in, int in_siz
 {
     static const char b64[] =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    char* ret, *dst;
+    char* ret;
+    char* dst;
     unsigned i_bits = 0;
     int i_shift = 0;
     int bytes_remaining = in_size;

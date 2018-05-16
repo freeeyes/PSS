@@ -28,13 +28,13 @@ public:
     void HandlerServerResponse(uint32 u4ConnectID);                         //当前连接发送数据包的回调方法
     void Close();                                                           //清理
 
+    virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);
+
 private:
     bool LoadXmlCfg(const char* szXmlFileTestName, FileTestResultInfoSt& objFileTestResult);        //读取测试配置文件
     int  ReadTestFile(const char* pFileName, int nType, FileTestDataInfoSt& objFileTestDataInfo);   //将消息包文件读入数据结构
     int  InitResponseRecordList();                                                                  //初始化ResponseRecord
     bool AddResponseRecordList(uint32 u4ConnectID, const ACE_Time_Value& tv);                       //添加ResponseRecordList
-
-    int handle_timeout(const ACE_Time_Value& tv, const void* arg);   //定时器检查
 
     ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;
     //文件测试变量
