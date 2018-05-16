@@ -205,8 +205,9 @@ private:
 };
 
 //相关参数设计
-struct _WorkThreadAIInfo
+class _WorkThreadAIInfo
 {
+public:
     uint32     m_u4ThreadID;                       //工作线程ID
     uint8      m_u1WTAI;                           //工作线程AI开关，0为关闭，1为打开
     uint32     m_u4DisposeTime;                    //业务包处理超时时间
@@ -229,8 +230,9 @@ struct _WorkThreadAIInfo
 typedef vector<_WorkThreadAIInfo> vecWorkThreadAIInfo;
 
 //超时命令单元
-struct _CommandTimeout
+class _CommandTimeout
 {
+public:
     uint32 m_u4ThreadID;        //工作线程ID
     uint16 m_u2CommandID;       //超时的命令
     uint32 m_u4Second;          //超时当前时间，以1970年以来开始计算的秒数
@@ -285,8 +287,9 @@ private:
     uint16     m_u2ReturnDataLen;                  //返回数据体长度
 
     //超时的命令集合
-    struct _CommandTime
+    class _CommandTime
     {
+    public:
         uint16 m_u2CommandID;
         CRingLink<_CommandTimeout> m_objTime;
 

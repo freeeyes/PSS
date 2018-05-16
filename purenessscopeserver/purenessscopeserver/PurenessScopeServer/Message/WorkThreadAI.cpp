@@ -178,8 +178,6 @@ void CWorkThreadAI::GetAIInfo(_WorkThreadAIInfo& objWorkThreadAIInfo)
 
 void CWorkThreadAI::GetAllTimeout(uint32 u4ThreadID, vecCommandTimeout& objTimeout)
 {
-    //objTimeout.clear();
-
     uint32 u4Size = (uint32)m_vecCommandTime.size();
 
     for(uint32 i = 0; i < u4Size; i++)
@@ -207,8 +205,6 @@ void CWorkThreadAI::GetAllTimeout(uint32 u4ThreadID, vecCommandTimeout& objTimeo
 
 void CWorkThreadAI::GetAllForbiden(uint32 u4ThreadID, vecCommandTimeout& objForbiden)
 {
-    //objForbiden.clear();
-
     uint32 u4Size = (uint32)m_vecCommandTimeout.size();
 
     for(uint32 i = 0; i < u4Size; i++)

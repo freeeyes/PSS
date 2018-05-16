@@ -11,8 +11,9 @@
 #define  MAX_DYEING_COMMAND_COUNT 10  //最大染色命令数
 
 //IP监控，目前考虑同一时刻只能监控一个
-struct _Dyeing_IP
+class _Dyeing_IP
 {
+public:
     uint16  m_u2MaxCount;        //当前需要监控的最大个数
     uint16  m_u2CurrCount;       //当前的已处理的个数
     bool m_blIsValid;            //监控是否有效
@@ -36,8 +37,9 @@ struct _Dyeing_IP
 };
 
 //监控命令参数
-struct _Dyeing_Command
+class _Dyeing_Command
 {
+public:
     uint16  m_u2CommandID;       //当前CommandID
     uint16  m_u2MaxCount;        //当前需要监控的最大个数
     uint16  m_u2CurrCount;       //当前的已处理的个数

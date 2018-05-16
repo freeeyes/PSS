@@ -200,7 +200,7 @@ void CMessagePool::GetCreateInfoList(vector<_Object_Create_Info>& objCreateList)
 
 CMessage* CMessagePool::Create()
 {
-    return dynamic_cast<CMessage*>(CObjectPoolManager<CMessage, ACE_Recursive_Thread_Mutex>::Create(__FILE__, __LINE__));;
+    return dynamic_cast<CMessage*>(CObjectPoolManager<CMessage, ACE_Recursive_Thread_Mutex>::Create(__FILE__, __LINE__));
 }
 
 bool CMessagePool::Delete(CMessage* pMessage)
@@ -212,7 +212,6 @@ bool CMessagePool::Delete(CMessage* pMessage)
 
     pMessage->Clear();
 
-    //bool blState = m_objHashMessageList.Push(szHashID, pObject);
     bool blState = CObjectPoolManager<CMessage, ACE_Recursive_Thread_Mutex>::Delete(pMessage->GetHashID(), pMessage);
 
     if(false == blState)

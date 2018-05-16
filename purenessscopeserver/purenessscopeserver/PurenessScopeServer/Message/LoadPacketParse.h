@@ -10,8 +10,9 @@
 #include "HashTable.h"
 #include "IMessageBlockManager.h"
 
-struct _Packet_Parse_Info
+class _Packet_Parse_Info
 {
+public:
     uint32           m_u4PacketParseID;       //当前packetParseID
     uint8            m_u1PacketParseType;     //包头包体或者流模式
     uint32           m_u4OrgLength;           //数据包头长度
@@ -58,7 +59,6 @@ public:
     _Packet_Parse_Info* GetPacketParseInfo(uint32 u4PacketParseID);
 
 private:
-    //_Packet_Parse_Info m_Packet_Parse_Info;
     CHashTable<_Packet_Parse_Info>        m_objPacketParseList;                  //Hash内存池
 };
 

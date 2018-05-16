@@ -30,7 +30,6 @@ CMessageManager::CMessageManager(void)
 CMessageManager::~CMessageManager(void)
 {
     OUR_DEBUG((LM_INFO, "[CMessageManager::~CMessageManager].\n"));
-    //Close();
 }
 
 void CMessageManager::Init(uint16 u2MaxModuleCount, uint32 u4MaxCommandCount)

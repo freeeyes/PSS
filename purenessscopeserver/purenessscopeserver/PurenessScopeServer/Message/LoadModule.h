@@ -104,7 +104,6 @@ public:
 private:
     bool LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo, const char* pModulePath);    //开始加载模块的接口和数据
 
-private:
     CHashTable<_ModuleInfo>            m_objHashModuleList;
     char                               m_szModulePath[MAX_BUFF_200];
     vector<_WaitUnloadModule>          m_vecWaitUnloadModule;

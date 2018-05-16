@@ -7,7 +7,6 @@ CLoadPacketParse::CLoadPacketParse()
 CLoadPacketParse::~CLoadPacketParse()
 {
     OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::~CLoadPacketParse]\n"));
-    //Close();
 }
 
 void CLoadPacketParse::Init(int nCount)

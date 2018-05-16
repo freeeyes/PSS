@@ -136,39 +136,9 @@ int CMessageService::svc(void)
 {
     while(true)
     {
-        ACE_Message_Block* mb = NULL;
-        ACE_OS::last_error(0);
-
-        if(getq(mb, 0) == -1)
+        if (false == Dispose_Queue())
         {
-            OUR_DEBUG((LM_ERROR,"[CMessageService::svc] PutMessage error errno = [%d].\n", ACE_OS::last_error()));
-            m_blRun = false;
             break;
-        }
-        else if ((mb->msg_type() == ACE_Message_Block::MB_USER))
-        {
-            UpdateCommandList(mb);
-
-            App_MessageBlockManager::instance()->Close(mb);
-            continue;
-        }
-        else if ((0 == mb->size ()) && (mb->msg_type () == ACE_Message_Block::MB_STOP))
-        {
-            m_mutex.acquire();
-            mb->release ();
-            this->msg_queue ()->deactivate ();
-            m_cond.signal();
-            m_mutex.release();
-            break;
-        }
-        else
-        {
-            CMessage* msg = *((CMessage**)mb->base());
-
-            if (false == this->ProcessMessage(msg, m_u4ThreadID))
-            {
-                OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)ProcessMessage is false!\n", m_u4ThreadID));
-            }
         }
 
         //使用内存池，这块内存不必再释放
@@ -496,13 +466,11 @@ bool CMessageService::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uin
             if (NULL != pClientCommandInfo)
             {
                 //判断当前消息是否有指定的监听端口
-                if (pClientCommandInfo->m_objListenIPInfo.m_nPort > 0)
+                if (pClientCommandInfo->m_objListenIPInfo.m_nPort > 0 &&
+                    (ACE_OS::strcmp(pClientCommandInfo->m_objListenIPInfo.m_szClientIP, pMessage->GetMessageBase()->m_szListenIP) != 0 ||
+                     (uint32)pClientCommandInfo->m_objListenIPInfo.m_nPort != pMessage->GetMessageBase()->m_u4ListenPort))
                 {
-                    if (ACE_OS::strcmp(pClientCommandInfo->m_objListenIPInfo.m_szClientIP, pMessage->GetMessageBase()->m_szListenIP) != 0 ||
-                        (uint32)pClientCommandInfo->m_objListenIPInfo.m_nPort != pMessage->GetMessageBase()->m_u4ListenPort)
-                    {
-                        continue;
-                    }
+                    continue;
                 }
 
                 //标记当前命令运行状态
@@ -717,6 +685,46 @@ void CMessageService::UpdateCommandList(ACE_Message_Block* pmb)
     }
 }
 
+bool CMessageService::Dispose_Queue()
+{
+    ACE_Message_Block* mb = NULL;
+    ACE_OS::last_error(0);
+
+    if (getq(mb, 0) == -1)
+    {
+        OUR_DEBUG((LM_ERROR, "[CMessageService::svc] PutMessage error errno = [%d].\n", ACE_OS::last_error()));
+        m_blRun = false;
+        return false;
+    }
+    else if (mb->msg_type() == ACE_Message_Block::MB_USER)
+    {
+        UpdateCommandList(mb);
+
+        App_MessageBlockManager::instance()->Close(mb);
+        return true;
+    }
+    else if (mb->msg_type() == ACE_Message_Block::MB_STOP)
+    {
+        m_mutex.acquire();
+        mb->release();
+        this->msg_queue()->deactivate();
+        m_cond.signal();
+        m_mutex.release();
+        return false;
+    }
+    else
+    {
+        CMessage* msg = *((CMessage**)mb->base());
+
+        if (false == this->ProcessMessage(msg, m_u4ThreadID))
+        {
+            OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)ProcessMessage is false!\n", m_u4ThreadID));
+        }
+
+        return true;
+    }
+}
+
 //==========================================================
 CMessageServiceGroup::CMessageServiceGroup()
 {
@@ -740,7 +748,6 @@ CMessageServiceGroup::CMessageServiceGroup()
 
 CMessageServiceGroup::~CMessageServiceGroup()
 {
-    //Close();
 }
 
 int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* arg)
@@ -853,12 +860,9 @@ bool CMessageServiceGroup::PutMessage(CMessage* pMessage)
 
     CMessageService* pMessageService = m_vecMessageService[(uint32)n4ThreadID];
 
-    if (NULL != pMessageService)
+    if (NULL != pMessageService && false == pMessageService->PutMessage(pMessage))
     {
-        if (false == pMessageService->PutMessage(pMessage))
-        {
-            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::PutMessage](%d)pMessageService fail.\n", pMessageService->GetThreadID()));
-        }
+        OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::PutMessage](%d)pMessageService fail.\n", pMessageService->GetThreadID()));
     }
 
     return true;
@@ -873,13 +877,10 @@ bool CMessageServiceGroup::PutUpdateCommandMessage(uint32 u4UpdateIndex)
     {
         CMessageService* pMessageService = m_vecMessageService[i];
 
-        if (NULL != pMessageService)
+        if (NULL != pMessageService && false == pMessageService->PutUpdateCommandMessage(u4UpdateIndex))
         {
-            if (false == pMessageService->PutUpdateCommandMessage(u4UpdateIndex))
-            {
-                OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::PutMessage](%d)pMessageService fail.\n", pMessageService->GetThreadID()));
-                return false;
-            }
+            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::PutMessage](%d)pMessageService fail.\n", pMessageService->GetThreadID()));
+            return false;
         }
     }
 
