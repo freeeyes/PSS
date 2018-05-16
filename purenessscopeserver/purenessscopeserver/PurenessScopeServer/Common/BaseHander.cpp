@@ -292,14 +292,16 @@ _ClientConnectInfo Tcp_Common_ClientInfo(_ClientConnectInfo_Param obj_ClientConn
     return ClientConnectInfo;
 }
 
-bool Tcp_Common_Send_Input_To_Cache(uint32 u4ConnectID, uint32 u4PacketParseInfoID, uint32 u4SendMaxBuffSize, ACE_Message_Block* pBlockMessage, uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, bool blDelete, IBuffPacket*& pBuffPacket)
+bool Tcp_Common_Send_Input_To_Cache(_Input_To_Cache_Param obj_Input_To_Cache_Param,
+                                    ACE_Message_Block* pBlockMessage, uint32& u4PacketSize,
+                                    IBuffPacket*& pBuffPacket)
 {
     //先判断要发送的数据长度，看看是否可以放入缓冲，缓冲是否已经放满。
     uint32 u4SendPacketSize = 0;
 
-    if (u1SendType == SENDMESSAGE_NOMAL)
+    if (obj_Input_To_Cache_Param.m_u1SendType == SENDMESSAGE_NOMAL)
     {
-        u4SendPacketSize = App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Make_Send_Packet_Length(u4ConnectID, pBuffPacket->GetPacketLen(), u2CommandID);
+        u4SendPacketSize = App_PacketParseLoader::instance()->GetPacketParseInfo(obj_Input_To_Cache_Param.m_u4PacketParseInfoID)->Make_Send_Packet_Length(obj_Input_To_Cache_Param.m_u4ConnectID, pBuffPacket->GetPacketLen(), obj_Input_To_Cache_Param.m_u2CommandID);
     }
     else
     {
@@ -308,9 +310,9 @@ bool Tcp_Common_Send_Input_To_Cache(uint32 u4ConnectID, uint32 u4PacketParseInfo
 
     u4PacketSize = u4SendPacketSize;
 
-    if (u4SendPacketSize + (uint32)pBlockMessage->length() >= u4SendMaxBuffSize)
+    if (u4SendPacketSize + (uint32)pBlockMessage->length() >= obj_Input_To_Cache_Param.m_u4SendMaxBuffSize)
     {
-        OUR_DEBUG((LM_DEBUG, "[Tcp_Common_Send_Input_To_Cache] Connectid=[%d] m_pBlockMessage is not enougth.\n", u4ConnectID));
+        OUR_DEBUG((LM_DEBUG, "[Tcp_Common_Send_Input_To_Cache] Connectid=[%d] m_pBlockMessage is not enougth.\n", obj_Input_To_Cache_Param.m_u4ConnectID));
         //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
         ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
         memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
@@ -318,7 +320,7 @@ bool Tcp_Common_Send_Input_To_Cache(uint32 u4ConnectID, uint32 u4PacketParseInfo
         ACE_Time_Value tvNow = ACE_OS::gettimeofday();
         App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
 
-        Recovery_Common_BuffPacket(blDelete, pBuffPacket);
+        Recovery_Common_BuffPacket(obj_Input_To_Cache_Param.m_blDelete, pBuffPacket);
 
         return false;
     }
@@ -326,10 +328,10 @@ bool Tcp_Common_Send_Input_To_Cache(uint32 u4ConnectID, uint32 u4PacketParseInfo
     {
         //添加进缓冲区
         //SENDMESSAGE_NOMAL是需要包头的时候，否则，不组包直接发送
-        if (u1SendType == SENDMESSAGE_NOMAL)
+        if (obj_Input_To_Cache_Param.m_u1SendType == SENDMESSAGE_NOMAL)
         {
             //这里组成返回数据包
-            App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Make_Send_Packet(u4ConnectID, pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pBlockMessage, u2CommandID);
+            App_PacketParseLoader::instance()->GetPacketParseInfo(obj_Input_To_Cache_Param.m_u4PacketParseInfoID)->Make_Send_Packet(obj_Input_To_Cache_Param.m_u4ConnectID, pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pBlockMessage, obj_Input_To_Cache_Param.m_u2CommandID);
         }
         else
         {
@@ -339,38 +341,40 @@ bool Tcp_Common_Send_Input_To_Cache(uint32 u4ConnectID, uint32 u4PacketParseInfo
         }
     }
 
-    Recovery_Common_BuffPacket(blDelete, pBuffPacket);
+    Recovery_Common_BuffPacket(obj_Input_To_Cache_Param.m_blDelete, pBuffPacket);
 
     return true;
 }
 
-bool Tcp_Common_Make_Send_Packet(uint32 u4ConnectID, uint8 u1SendType, uint32 u4PacketParseInfoID, uint32 u4SendMaxBuffSize, IBuffPacket*& pBuffPacket, uint16 u2CommandID, bool blDelete, ACE_Message_Block* pBlockMessage)
+bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
+                                 IBuffPacket*& pBuffPacket,
+                                 ACE_Message_Block* pBlockMessage)
 {
     uint32 u4SendPacketSize = 0;
 
-    if (u1SendType == SENDMESSAGE_NOMAL)
+    if (obj_Send_Packet_Param.m_u1SendType == SENDMESSAGE_NOMAL)
     {
-        u4SendPacketSize = App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Make_Send_Packet_Length(u4ConnectID, pBuffPacket->GetPacketLen(), u2CommandID);
+        u4SendPacketSize = App_PacketParseLoader::instance()->GetPacketParseInfo(obj_Send_Packet_Param.m_u4PacketParseInfoID)->Make_Send_Packet_Length(obj_Send_Packet_Param.m_u4ConnectID, pBuffPacket->GetPacketLen(), obj_Send_Packet_Param.m_u2CommandID);
 
-        if (u4SendPacketSize >= u4SendMaxBuffSize)
+        if (u4SendPacketSize >= obj_Send_Packet_Param.m_u4SendMaxBuffSize)
         {
-            OUR_DEBUG((LM_DEBUG, "[Tcp_Common_Make_Send_Packet](%d) u4SendPacketSize is more than(%d)(%d).\n", u4ConnectID, u4SendPacketSize, u4SendMaxBuffSize));
+            OUR_DEBUG((LM_DEBUG, "[Tcp_Common_Make_Send_Packet](%d) u4SendPacketSize is more than(%d)(%d).\n", obj_Send_Packet_Param.m_u4ConnectID, u4SendPacketSize, obj_Send_Packet_Param.m_u4SendMaxBuffSize));
 
-            Recovery_Common_BuffPacket(blDelete, pBuffPacket);
+            Recovery_Common_BuffPacket(obj_Send_Packet_Param.m_blDelete, pBuffPacket);
 
             return false;
         }
 
-        App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Make_Send_Packet(u4ConnectID, pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pBlockMessage, u2CommandID);
+        App_PacketParseLoader::instance()->GetPacketParseInfo(obj_Send_Packet_Param.m_u4PacketParseInfoID)->Make_Send_Packet(obj_Send_Packet_Param.m_u4ConnectID, pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pBlockMessage, obj_Send_Packet_Param.m_u2CommandID);
         //这里MakePacket已经加了数据长度，所以在这里不再追加
     }
     else
     {
         u4SendPacketSize = (uint32)pBuffPacket->GetPacketLen();
 
-        if (u4SendPacketSize >= u4SendMaxBuffSize)
+        if (u4SendPacketSize >= obj_Send_Packet_Param.m_u4SendMaxBuffSize)
         {
-            OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", u4ConnectID, u4SendPacketSize, u4SendMaxBuffSize));
+            OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", obj_Send_Packet_Param.m_u4ConnectID, u4SendPacketSize, obj_Send_Packet_Param.m_u4SendMaxBuffSize));
             //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
             ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
             memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
@@ -378,7 +382,7 @@ bool Tcp_Common_Make_Send_Packet(uint32 u4ConnectID, uint8 u1SendType, uint32 u4
             ACE_Time_Value tvNow = ACE_OS::gettimeofday();
             App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
 
-            Recovery_Common_BuffPacket(blDelete, pBuffPacket);
+            Recovery_Common_BuffPacket(obj_Send_Packet_Param.m_blDelete, pBuffPacket);
 
             return false;
         }
@@ -445,7 +449,9 @@ bool Tcp_Common_CloseConnect_By_Queue(uint32 u4ConnectID, CSendMessagePool& objS
     return true;
 }
 
-bool Tcp_Common_Manager_Post_Message(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID, CSendMessagePool& objSendMessagePool, uint16 u2SendQueueMax, uint32 u4SendQueuePutTime, ACE_Task<ACE_MT_SYNCH>* pTask)
+bool Tcp_Common_Manager_Post_Message(_Post_Message_Param obj_Post_Message_Param, IBuffPacket* pBuffPacket,
+                                     CSendMessagePool& objSendMessagePool,
+                                     ACE_Task<ACE_MT_SYNCH>* pTask)
 {
     if (NULL == pBuffPacket)
     {
@@ -460,7 +466,7 @@ bool Tcp_Common_Manager_Post_Message(uint32 u4ConnectID, IBuffPacket* pBuffPacke
     {
         OUR_DEBUG((LM_ERROR, "[CProConnectManager::PutMessage] new _SendMessage is error.\n"));
 
-        if (true == blDelete)
+        if (true == obj_Post_Message_Param.m_blDelete)
         {
             App_BuffPacketManager::instance()->Delete(pBuffPacket);
         }
@@ -472,24 +478,24 @@ bool Tcp_Common_Manager_Post_Message(uint32 u4ConnectID, IBuffPacket* pBuffPacke
 
     if (NULL != mb)
     {
-        pSendMessage->m_u4ConnectID = u4ConnectID;
+        pSendMessage->m_u4ConnectID = obj_Post_Message_Param.m_u4ConnectID;
         pSendMessage->m_pBuffPacket = pBuffPacket;
-        pSendMessage->m_nEvents     = u1SendType;
-        pSendMessage->m_u2CommandID = u2CommandID;
-        pSendMessage->m_u1SendState = u1SendState;
-        pSendMessage->m_blDelete    = blDelete;
-        pSendMessage->m_nMessageID  = nMessageID;
+        pSendMessage->m_nEvents     = obj_Post_Message_Param.m_u1SendType;
+        pSendMessage->m_u2CommandID = obj_Post_Message_Param.m_u2CommandID;
+        pSendMessage->m_u1SendState = obj_Post_Message_Param.m_u1SendState;
+        pSendMessage->m_blDelete    = obj_Post_Message_Param.m_blDelete;
+        pSendMessage->m_nMessageID  = obj_Post_Message_Param.m_nMessageID;
         pSendMessage->m_u1Type      = 0;
         pSendMessage->m_tvSend      = ACE_OS::gettimeofday();
 
         //判断队列是否是已经最大
         int nQueueCount = (int)pTask->msg_queue()->message_count();
 
-        if (nQueueCount >= (int)u2SendQueueMax)
+        if (nQueueCount >= (int)obj_Post_Message_Param.m_u2SendQueueMax)
         {
             OUR_DEBUG((LM_ERROR, "[CProConnectManager::PutMessage] Queue is Full nQueueCount = [%d].\n", nQueueCount));
 
-            if (true == blDelete)
+            if (true == obj_Post_Message_Param.m_blDelete)
             {
                 App_BuffPacketManager::instance()->Delete(pBuffPacket);
             }
@@ -498,13 +504,13 @@ bool Tcp_Common_Manager_Post_Message(uint32 u4ConnectID, IBuffPacket* pBuffPacke
             return false;
         }
 
-        ACE_Time_Value xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, u4SendQueuePutTime);
+        ACE_Time_Value xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, obj_Post_Message_Param.m_u4SendQueuePutTime);
 
         if (pTask->putq(mb, &xtime) == -1)
         {
             OUR_DEBUG((LM_ERROR, "[CProConnectManager::PutMessage] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
 
-            if (true == blDelete)
+            if (true == obj_Post_Message_Param.m_blDelete)
             {
                 App_BuffPacketManager::instance()->Delete(pBuffPacket);
             }
@@ -517,7 +523,7 @@ bool Tcp_Common_Manager_Post_Message(uint32 u4ConnectID, IBuffPacket* pBuffPacke
     {
         OUR_DEBUG((LM_ERROR, "[CMessageService::PutMessage] mb new error.\n"));
 
-        if (true == blDelete)
+        if (true == obj_Post_Message_Param.m_blDelete)
         {
             App_BuffPacketManager::instance()->Delete(pBuffPacket);
         }

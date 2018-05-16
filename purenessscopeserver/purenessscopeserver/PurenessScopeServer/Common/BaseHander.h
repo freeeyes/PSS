@@ -126,25 +126,94 @@ public:
 //返回当前Handler的信息
 _ClientConnectInfo Tcp_Common_ClientInfo(_ClientConnectInfo_Param obj_ClientConnectInfo_Param);
 
+//Tcp_Common_Send_Input_To_Cache的参数
+class _Input_To_Cache_Param
+{
+public:
+    uint32 m_u4ConnectID;
+    uint32 m_u4PacketParseInfoID;
+    uint32 m_u4SendMaxBuffSize;
+    uint8 m_u1SendType;
+    uint16 m_u2CommandID;
+    bool m_blDelete;
+
+    _Input_To_Cache_Param()
+    {
+        m_u4ConnectID         = 0;
+        m_u4PacketParseInfoID = 0;
+        m_u4SendMaxBuffSize   = 0;
+        m_u1SendType          = 0;
+        m_u2CommandID         = 0;
+        m_blDelete            = false;
+    }
+};
+
 //将数据添加入发送缓冲区
-bool Tcp_Common_Send_Input_To_Cache(uint32 u4ConnectID, uint32 u4PacketParseInfoID, uint32 u4SendMaxBuffSize,
-                                    ACE_Message_Block* pBlockMessage, uint8 u1SendType, uint32& u4PacketSize,
-                                    uint16 u2CommandID, bool blDelete, IBuffPacket*& pBuffPacket);
+bool Tcp_Common_Send_Input_To_Cache(_Input_To_Cache_Param obj_Input_To_Cache_Param,
+                                    ACE_Message_Block* pBlockMessage, uint32& u4PacketSize,
+                                    IBuffPacket*& pBuffPacket);
+
+//Tcp_Common_Make_Send_Packet的参数
+class _Send_Packet_Param
+{
+public:
+    uint32 m_u4ConnectID;
+    uint8  m_u1SendType;
+    uint32 m_u4PacketParseInfoID;
+    uint32 m_u4SendMaxBuffSize;
+    uint16 m_u2CommandID;
+    bool m_blDelete;
+
+    _Send_Packet_Param()
+    {
+        m_u4ConnectID         = 0;
+        m_u1SendType          = 0;
+        m_u4PacketParseInfoID = 0;
+        m_u4SendMaxBuffSize   = 0;
+        m_u2CommandID         = 0;
+        m_blDelete            = false;
+    }
+};
 
 //组装发送数据
-bool Tcp_Common_Make_Send_Packet(uint32 u4ConnectID, uint8 u1SendType, uint32 u4PacketParseInfoID,
-                                 uint32 u4SendMaxBuffSize, IBuffPacket*& pBuffPacket, uint16 u2CommandID,
-                                 bool blDelete, ACE_Message_Block* pBlockMessage);
+bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
+                                 IBuffPacket*& pBuffPacket,
+                                 ACE_Message_Block* pBlockMessage);
 
 //发送Manager消息队列关闭信息
 bool Tcp_Common_CloseConnect_By_Queue(uint32 u4ConnectID, CSendMessagePool& objSendMessagePool,
                                       uint32 u4SendQueuePutTime, ACE_Task<ACE_MT_SYNCH>* pTask);
 
+//Tcp_Common_Manager_Post_Message的参数
+class _Post_Message_Param
+{
+public:
+    uint32 m_u4ConnectID;
+    uint8 m_u1SendType;
+    uint16 m_u2CommandID;
+    uint8 m_u1SendState;
+    bool m_blDelete;
+    int m_nMessageID;
+    uint16 m_u2SendQueueMax;
+    uint32 m_u4SendQueuePutTime;
+
+    _Post_Message_Param()
+    {
+        m_u4ConnectID        = 0;
+        m_u1SendType         = 0;
+        m_u2CommandID        = 0;
+        m_u1SendState        = 0;
+        m_blDelete           = false;
+        m_nMessageID         = 0;
+        m_u2SendQueueMax     = 0;
+        m_u4SendQueuePutTime = 0;
+    }
+};
+
 //发送Manager消息队列发送数据消息
-bool Tcp_Common_Manager_Post_Message(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType,
-                                     uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID,
-                                     CSendMessagePool& objSendMessagePool, uint16 u2SendQueueMax,
-                                     uint32 u4SendQueuePutTime, ACE_Task<ACE_MT_SYNCH>* pTask);
+bool Tcp_Common_Manager_Post_Message(_Post_Message_Param obj_Post_Message_Param, IBuffPacket* pBuffPacket,
+                                     CSendMessagePool& objSendMessagePool,
+                                     ACE_Task<ACE_MT_SYNCH>* pTask);
 
 //定时器输出统计日志
 void Tcp_Common_Manager_Timeout_CheckInfo(int nActiveConnectCount);

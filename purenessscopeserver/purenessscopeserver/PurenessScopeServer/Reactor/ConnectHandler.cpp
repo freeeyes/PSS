@@ -1368,14 +1368,17 @@ bool CConnectHandler::Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPa
 
 bool CConnectHandler::Send_Input_To_Cache(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, bool blDelete, IBuffPacket* pBuffPacket)
 {
-    return Tcp_Common_Send_Input_To_Cache(GetConnectID(),
-                                          m_u4PacketParseInfoID,
-                                          m_u4SendMaxBuffSize,
+    _Input_To_Cache_Param obj_Input_To_Cache_Param;
+    obj_Input_To_Cache_Param.m_blDelete            = blDelete;
+    obj_Input_To_Cache_Param.m_u1SendType          = u1SendType;
+    obj_Input_To_Cache_Param.m_u2CommandID         = u2CommandID;
+    obj_Input_To_Cache_Param.m_u4ConnectID         = m_u4ConnectID;
+    obj_Input_To_Cache_Param.m_u4PacketParseInfoID = m_u4PacketParseInfoID;
+    obj_Input_To_Cache_Param.m_u4SendMaxBuffSize   = m_u4SendMaxBuffSize;
+
+    return Tcp_Common_Send_Input_To_Cache(obj_Input_To_Cache_Param,
                                           m_pBlockMessage,
-                                          u1SendType,
                                           u4PacketSize,
-                                          u2CommandID,
-                                          blDelete,
                                           pBuffPacket);
 }
 
@@ -1383,14 +1386,17 @@ bool CConnectHandler::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, 
 {
     ACE_Message_Block* pMbData = NULL;
 
+    _Send_Packet_Param obj_Send_Packet_Param;
+    obj_Send_Packet_Param.m_blDelete            = blDelete;
+    obj_Send_Packet_Param.m_u1SendType          = u1SendType;
+    obj_Send_Packet_Param.m_u2CommandID         = u2CommandID;
+    obj_Send_Packet_Param.m_u4ConnectID         = GetConnectID();
+    obj_Send_Packet_Param.m_u4PacketParseInfoID = m_u4PacketParseInfoID;
+    obj_Send_Packet_Param.m_u4SendMaxBuffSize   = m_u4SendMaxBuffSize;
+
     //Æ´×°Êý¾Ý
-    bool blState = Tcp_Common_Make_Send_Packet(GetConnectID(),
-                   u1SendType,
-                   m_u4PacketParseInfoID,
-                   m_u4SendMaxBuffSize,
+    bool blState = Tcp_Common_Make_Send_Packet(obj_Send_Packet_Param,
                    pBuffPacket,
-                   u2CommandID,
-                   blDelete,
                    m_pBlockMessage);
 
     if (false == blState)
@@ -1759,16 +1765,19 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
 
 bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
-    return Tcp_Common_Manager_Post_Message(u4ConnectID,
+    _Post_Message_Param obj_Post_Message_Param;
+    obj_Post_Message_Param.m_blDelete = blDelete;
+    obj_Post_Message_Param.m_nMessageID = nMessageID;
+    obj_Post_Message_Param.m_u1SendState = u1SendState;
+    obj_Post_Message_Param.m_u1SendType = u1SendType;
+    obj_Post_Message_Param.m_u2CommandID = u2CommandID;
+    obj_Post_Message_Param.m_u2SendQueueMax = m_u2SendQueueMax;
+    obj_Post_Message_Param.m_u4ConnectID = u4ConnectID;
+    obj_Post_Message_Param.m_u4SendQueuePutTime = m_u4SendQueuePutTime;
+
+    return Tcp_Common_Manager_Post_Message(obj_Post_Message_Param,
                                            pBuffPacket,
-                                           u1SendType,
-                                           u2CommandID,
-                                           u1SendState,
-                                           blDelete,
-                                           nMessageID,
                                            m_SendMessagePool,
-                                           m_u2SendQueueMax,
-                                           m_u4SendQueuePutTime,
                                            dynamic_cast<ACE_Task<ACE_MT_SYNCH>*>(this));
 }
 
