@@ -70,7 +70,7 @@ matrix:
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/Test
         - make -j 4
         - ./Test_Pss
-        - killall -9 PurenessScopeServer
+        - killall PurenessScopeServer
         # collect gcov report
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/.obj
         - ls
