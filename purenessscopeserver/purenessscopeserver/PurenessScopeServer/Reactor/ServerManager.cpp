@@ -476,7 +476,13 @@ void CServerManager::Multiple_Process_Start()
 
     for (int nIndex = 0; nIndex <= nNumChlid; nIndex++)
     {
-        write(fd_lock, &nIndex, sizeof(nIndex));
+        ssize_t stSize = write(fd_lock, &nIndex, sizeof(nIndex));
+
+        if (0 == stSize)
+        {
+            OUR_DEBUG((LM_ERROR, "write idx = %d, error.\n", nIndex));
+            exit(1);
+        }
     }
 
     //启动并监控子进程

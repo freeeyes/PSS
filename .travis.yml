@@ -77,7 +77,6 @@ matrix:
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/.obj
         - ls
         - LC_ALL=en gcov --branch-probabilities --branch-counts ../../PurenessScopeServer.cpp -o ./
-        - gcovr -r WHERE_SONAR_SCANNER_WILL_RUN -x --object-directory=ABSOLUTE_PATH_TO_GCOV_FILES_FOLDER > report.xml
         # - gcov --branch-probabilities --branch-counts 
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer
         - sonar-scanner
