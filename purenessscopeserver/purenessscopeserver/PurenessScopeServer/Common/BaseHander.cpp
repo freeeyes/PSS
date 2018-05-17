@@ -359,17 +359,16 @@ bool Tcp_Common_Send_Input_To_Cache(_Input_To_Cache_Param obj_Input_To_Cache_Par
 bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
                                  IBuffPacket*& pBuffPacket,
                                  ACE_Message_Block* pBlockMessage,
-                                 ACE_Message_Block*& pMbData)
+                                 ACE_Message_Block*& pMbData,
+                                 uint32& u4PacketSize)
 {
-    uint32 u4SendPacketSize = 0;
-
     if (obj_Send_Packet_Param.m_u1SendType == SENDMESSAGE_NOMAL)
     {
-        u4SendPacketSize = App_PacketParseLoader::instance()->GetPacketParseInfo(obj_Send_Packet_Param.m_u4PacketParseInfoID)->Make_Send_Packet_Length(obj_Send_Packet_Param.m_u4ConnectID, pBuffPacket->GetPacketLen(), obj_Send_Packet_Param.m_u2CommandID);
+        u4PacketSize = App_PacketParseLoader::instance()->GetPacketParseInfo(obj_Send_Packet_Param.m_u4PacketParseInfoID)->Make_Send_Packet_Length(obj_Send_Packet_Param.m_u4ConnectID, pBuffPacket->GetPacketLen(), obj_Send_Packet_Param.m_u2CommandID);
 
-        if (u4SendPacketSize >= obj_Send_Packet_Param.m_u4SendMaxBuffSize)
+        if (u4PacketSize >= obj_Send_Packet_Param.m_u4SendMaxBuffSize)
         {
-            OUR_DEBUG((LM_DEBUG, "[Tcp_Common_Make_Send_Packet](%d) u4SendPacketSize is more than(%d)(%d).\n", obj_Send_Packet_Param.m_u4ConnectID, u4SendPacketSize, obj_Send_Packet_Param.m_u4SendMaxBuffSize));
+            OUR_DEBUG((LM_DEBUG, "[Tcp_Common_Make_Send_Packet](%d) u4SendPacketSize is more than(%d)(%d).\n", obj_Send_Packet_Param.m_u4ConnectID, u4PacketSize, obj_Send_Packet_Param.m_u4SendMaxBuffSize));
 
             Recovery_Common_BuffPacket(obj_Send_Packet_Param.m_blDelete, pBuffPacket);
 
@@ -381,11 +380,11 @@ bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
     }
     else
     {
-        u4SendPacketSize = (uint32)pBuffPacket->GetPacketLen();
+        u4PacketSize = (uint32)pBuffPacket->GetPacketLen();
 
-        if (u4SendPacketSize >= obj_Send_Packet_Param.m_u4SendMaxBuffSize)
+        if (u4PacketSize >= obj_Send_Packet_Param.m_u4SendMaxBuffSize)
         {
-            OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", obj_Send_Packet_Param.m_u4ConnectID, u4SendPacketSize, obj_Send_Packet_Param.m_u4SendMaxBuffSize));
+            OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", obj_Send_Packet_Param.m_u4ConnectID, u4PacketSize, obj_Send_Packet_Param.m_u4SendMaxBuffSize));
             //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
             ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
             memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());

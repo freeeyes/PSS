@@ -1137,7 +1137,8 @@ bool CProConnectHandle::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize
     bool blState = Tcp_Common_Make_Send_Packet(obj_Send_Packet_Param,
                    pBuffPacket,
                    m_pBlockMessage,
-                   pMbData);
+                   pMbData,
+                   u4PacketSize);
 
     if (false == blState)
     {
