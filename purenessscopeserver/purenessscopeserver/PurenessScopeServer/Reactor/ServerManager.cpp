@@ -451,7 +451,7 @@ void CServerManager::Multiple_Process_Start()
 
     if (fd_lock < 0)
     {
-        printf("open the flock and exit, errno = %d.\n", errno);
+        OUR_DEBUG((LM_ERROR, "open the flock and exit, errno = %d.\n", errno));
         exit(1);
     }
 
@@ -460,14 +460,14 @@ void CServerManager::Multiple_Process_Start()
 
     if (nRet == -1 || nRet == 2)
     {
-        printf("file is already exist!\n");
+        OUR_DEBUG((LM_ERROR, "file is already exist!\n"));
         exit(1);
     }
 
     //如果文件锁没锁，则锁住当前文件锁
     if (AcquireWriteLock(fd_lock, 0, sizeof(int)) != 0)
     {
-        printf("lock the file failure and exit, idx = 0.\n");
+        OUR_DEBUG((LM_ERROR, "lock the file failure and exit, idx = 0.\n"));
         exit(1);
     }
 
@@ -504,14 +504,14 @@ void CServerManager::Multiple_Process_Start()
                 //上文件锁
                 if (AcquireWriteLock(fd_lock, nChlidIndex * sizeof(int), sizeof(int)) != 0)
                 {
-                    printf("child %d AcquireWriteLock failure.\n", nChlidIndex);
+                    OUR_DEBUG((LM_ERROR, "child %d AcquireWriteLock failure.\n", nChlidIndex));
                     exit(1);
                 }
 
                 //启动子进程
                 if (false == Run())
                 {
-                    printf("child %d Run failure.\n", nChlidIndex);
+                    OUR_DEBUG((LM_ERROR, "child %d Run failure.\n", nChlidIndex));
                     exit(1);
                 }
 

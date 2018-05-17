@@ -1139,56 +1139,20 @@ int CConnectHandler::Dispose_Paceket_Parse_Body()
 
 int CConnectHandler::Dispose_Paceket_Parse_Stream(ACE_Message_Block* pCurrMessage)
 {
+    int nRet = 0;
+
     while (true)
     {
-        uint8 n1Ret = Tcp_Common_Recv_Stream(GetConnectID(), pCurrMessage, m_pPacketParse, m_u4PacketParseInfoID);
+        //处理单一数据块
+        nRet = Dispose_Paceket_Parse_Stream_Single(pCurrMessage);
 
-        if (PACKET_GET_NO_ENOUGTH == n1Ret)
+        if (1 != nRet)
         {
             break;
         }
-        else if (PACKET_GET_ENOUGTH == n1Ret)
-        {
-            if (false == CheckMessage())
-            {
-                return -1;
-            }
-
-            m_u4CurrSize = 0;
-
-            //申请新的包
-            m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
-
-            if (NULL == m_pPacketParse)
-            {
-                OUR_DEBUG((LM_DEBUG, "[%t|CConnectHandle::RecvData] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
-                return -1;
-            }
-
-            //看看是否接收完成了
-            if (pCurrMessage->length() == 0)
-            {
-                break;
-            }
-        }
-        else
-        {
-            m_pPacketParse->Clear();
-
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %dws, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %dws.",
-                                                m_addrRemote.get_host_addr(),
-                                                m_addrRemote.get_port_number(),
-                                                m_u4AllRecvSize, m_u4AllRecvCount,
-                                                m_u4AllSendSize, m_u4AllSendCount,
-                                                (uint32)m_u8RecvQueueTimeCost,
-                                                m_u4RecvQueueCount,
-                                                (uint32)m_u8SendQueueTimeCost);
-            OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvData] pmb new is NULL.\n"));
-            return -1;
-        }
     }
 
-    return 0;
+    return nRet;
 }
 
 bool CConnectHandler::CheckMessage()
@@ -1455,6 +1419,59 @@ bool CConnectHandler::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, 
     return true;
 }
 
+int CConnectHandler::Dispose_Paceket_Parse_Stream_Single(ACE_Message_Block* pCurrMessage)
+{
+    uint8 n1Ret = Tcp_Common_Recv_Stream(GetConnectID(), pCurrMessage, m_pPacketParse, m_u4PacketParseInfoID);
+
+    if (PACKET_GET_NO_ENOUGTH == n1Ret)
+    {
+        return 0;
+    }
+    else if (PACKET_GET_ENOUGTH == n1Ret)
+    {
+        if (false == CheckMessage())
+        {
+            return -1;
+        }
+
+        m_u4CurrSize = 0;
+
+        //申请新的包
+        m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
+
+        if (NULL == m_pPacketParse)
+        {
+            OUR_DEBUG((LM_DEBUG, "[%t|CConnectHandle::RecvData] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
+            return -1;
+        }
+
+        //看看是否接收完成了
+        if (pCurrMessage->length() == 0)
+        {
+            return 0;
+        }
+        else
+        {
+            return 1;
+        }
+    }
+    else
+    {
+        m_pPacketParse->Clear();
+
+        AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, m_u8RecvQueueTimeCost = %dws, m_u4RecvQueueCount = %d, m_u8SendQueueTimeCost = %dws.",
+                                            m_addrRemote.get_host_addr(),
+                                            m_addrRemote.get_port_number(),
+                                            m_u4AllRecvSize, m_u4AllRecvCount,
+                                            m_u4AllSendSize, m_u4AllSendCount,
+                                            (uint32)m_u8RecvQueueTimeCost,
+                                            m_u4RecvQueueCount,
+                                            (uint32)m_u8SendQueueTimeCost);
+        OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvData] pmb new is NULL.\n"));
+        return -1;
+    }
+}
+
 void CConnectHandler::SetConnectName(const char* pName)
 {
     sprintf_safe(m_szConnectName, MAX_BUFF_100, "%s", pName);
@@ -1636,7 +1653,7 @@ bool CConnectManager::CloseConnect(uint32 u4ConnectID)
     else
     {
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectManager::CloseConnect] ConnectID[%d] is not find.", u4ConnectID);
-        return true;
+        return false;
     }
 }
 
@@ -1852,14 +1869,9 @@ int CConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 
     _TimerCheckID* pTimerCheckID = (_TimerCheckID*)arg;
 
-    if(NULL == pTimerCheckID)
+    if(NULL != pTimerCheckID && pTimerCheckID->m_u2TimerCheckID == PARM_CONNECTHANDLE_CHECK)
     {
-        return 0;
-    }
-
-    //定时检测发送，这里将定时记录链接信息放入其中，减少一个定时器
-    if(pTimerCheckID->m_u2TimerCheckID == PARM_CONNECTHANDLE_CHECK)
-    {
+        //定时检测发送，这里将定时记录链接信息放入其中，减少一个定时器
         m_TimeWheelLink.Tick();
 
         //判定是否应该记录链接日志
@@ -1879,12 +1891,9 @@ void CConnectManager::TimeWheel_Timeout_Callback(void* pArgsContext, vector<CCon
         CConnectManager* pManager = reinterpret_cast<CConnectManager*>(pArgsContext);
         OUR_DEBUG((LM_INFO, "[CConnectManager::TimeWheel_Timeout_Callback]ConnectID(%d).\n", vecConnectHandle[i]->GetConnectID()));
 
-        if (NULL != pManager)
+        if (NULL != pManager && false == pManager->CloseConnect_By_Queue(vecConnectHandle[i]->GetConnectID()))
         {
-            if (false == pManager->CloseConnect_By_Queue(vecConnectHandle[i]->GetConnectID()))
-            {
-                OUR_DEBUG((LM_INFO, "[CConnectManager::TimeWheel_Timeout_Callback]CloseConnect_By_Queue error.\n"));
-            }
+            OUR_DEBUG((LM_INFO, "[CConnectManager::TimeWheel_Timeout_Callback]CloseConnect_By_Queue error.\n"));
         }
     }
 }
@@ -1927,47 +1936,10 @@ int CConnectManager::svc (void)
 
     while(true)
     {
-        ACE_Message_Block* mb = NULL;
-        ACE_OS::last_error(0);
-
-        if(getq(mb, 0) == -1)
+        //处理消息队列信息
+        if (false == Dispose_Queue())
         {
-            OUR_DEBUG((LM_ERROR,"[CConnectManager::svc] get error errno = [%d].\n", ACE_OS::last_error()));
-            m_blRun = false;
             break;
-        }
-        else
-        {
-            if ((0 == mb->size ()) && (mb->msg_type () == ACE_Message_Block::MB_STOP))
-            {
-                m_mutex.acquire();
-                mb->release ();
-                this->msg_queue ()->deactivate ();
-                m_cond.signal();
-                m_mutex.release();
-                break;
-            }
-
-            _SendMessage* msg = *((_SendMessage**)mb->base());
-
-            if (0 == msg->m_u1Type)
-            {
-                //处理发送数据
-                if (false == SendMessage(msg->m_u4ConnectID, msg->m_pBuffPacket, msg->m_u2CommandID, msg->m_u1SendState, msg->m_nEvents, msg->m_tvSend, msg->m_blDelete, msg->m_nMessageID))
-                {
-                    OUR_DEBUG((LM_INFO, "[CConnectManager::svc]SendMessage error.\n"));
-                }
-            }
-            else
-            {
-                //处理连接服务器主动关闭
-                if (false == CloseConnect(msg->m_u4ConnectID))
-                {
-                    OUR_DEBUG((LM_INFO, "[CConnectManager::svc]CloseConnect error.\n"));
-                }
-            }
-
-            m_SendMessagePool.Delete(msg);
         }
     }
 
@@ -1977,7 +1949,6 @@ int CConnectManager::svc (void)
 
 int CConnectManager::close(u_long)
 {
-    //m_blRun = false;
     OUR_DEBUG((LM_INFO,"[CConnectManager::close] close().\n"));
     return 0;
 }
@@ -2181,6 +2152,54 @@ int CConnectManager::CloseMsgQueue()
     return Task_Common_CloseMsgQueue((ACE_Task<ACE_MT_SYNCH>*)this, m_cond, m_mutex);
 }
 
+bool CConnectManager::Dispose_Queue()
+{
+    ACE_Message_Block* mb = NULL;
+    ACE_OS::last_error(0);
+
+    if (getq(mb, 0) == -1)
+    {
+        OUR_DEBUG((LM_ERROR, "[CConnectManager::Dispose_Queue] get error errno = [%d].\n", ACE_OS::last_error()));
+        m_blRun = false;
+        return false;
+    }
+    else
+    {
+        if ((0 == mb->size()) && (mb->msg_type() == ACE_Message_Block::MB_STOP))
+        {
+            m_mutex.acquire();
+            mb->release();
+            this->msg_queue()->deactivate();
+            m_cond.signal();
+            m_mutex.release();
+            return false;
+        }
+
+        _SendMessage* msg = *((_SendMessage**)mb->base());
+
+        if (0 == msg->m_u1Type)
+        {
+            //处理发送数据
+            if (false == SendMessage(msg->m_u4ConnectID, msg->m_pBuffPacket, msg->m_u2CommandID, msg->m_u1SendState, msg->m_nEvents, msg->m_tvSend, msg->m_blDelete, msg->m_nMessageID))
+            {
+                OUR_DEBUG((LM_INFO, "[CConnectManager::Dispose_Queue]SendMessage error.\n"));
+            }
+        }
+        else
+        {
+            //处理连接服务器主动关闭
+            if (false == CloseConnect(msg->m_u4ConnectID))
+            {
+                OUR_DEBUG((LM_INFO, "[CConnectManager::Dispose_Queue]CloseConnect error.\n"));
+            }
+        }
+
+        m_SendMessagePool.Delete(msg);
+    }
+
+    return true;
+}
+
 //*********************************************************************************
 
 CConnectHandlerPool::CConnectHandlerPool(void)
@@ -2322,14 +2341,11 @@ void CConnectManagerGroup::Init(uint16 u2SendQueueCount)
     {
         CConnectManager* pConnectManager = new CConnectManager();
 
-        if(NULL != pConnectManager)
-        {
-            //初始化统计器
-            pConnectManager->Init((uint16)i);
-            //加入数组
-            m_objConnnectManagerList[i] = pConnectManager;
-            OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::Init]Creat %d SendQueue OK.\n", i));
-        }
+        //初始化统计器
+        pConnectManager->Init((uint16)i);
+        //加入数组
+        m_objConnnectManagerList[i] = pConnectManager;
+        OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::Init]Creat %d SendQueue OK.\n", i));
     }
 
     m_u2ThreadQueueCount = u2SendQueueCount;
@@ -2671,12 +2687,9 @@ bool CConnectManagerGroup::StartTimer()
     {
         CConnectManager* pConnectManager = m_objConnnectManagerList[i];
 
-        if(NULL != pConnectManager)
+        if(NULL != pConnectManager && false == pConnectManager->StartTimer())
         {
-            if (false == pConnectManager->StartTimer())
-            {
-                OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::StartTimer]StartTimer error.\n"));
-            }
+            OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::StartTimer]StartTimer error.\n"));
         }
     }
 

@@ -100,7 +100,7 @@ private:
     bool Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPacket);                   //将发送数据写入文件
     bool Send_Input_To_Cache(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, bool blDelete, IBuffPacket* pBuffPacket);       //讲发送对象放入缓存
     bool Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, uint8 u1State, int nMessageID, bool blDelete, IBuffPacket* pBuffPacket);         //将数据发送给对端
-
+    int  Dispose_Paceket_Parse_Stream_Single(ACE_Message_Block* pCurrMessage);              //处理单一数据包
     int  RecvData();                                                          //接收数据，正常模式
 
     int  Dispose_Recv_Data();                                                 //处理接收数据
@@ -151,7 +151,6 @@ private:
     CPacketParse*              m_pPacketParse;                 //数据包解析类
     ACE_Message_Block*         m_pCurrMessage;                 //当前的MB对象
     ACE_Message_Block*         m_pBlockMessage;                //当前发送缓冲等待数据块
-    CPacketParse               m_objSendPacketParse;           //发送数据包组织结构
     _TimeConnectInfo           m_TimeConnectInfo;              //链接健康检测器
     char*                      m_pPacketDebugData;             //记录数据包的Debug缓冲字符串
     EM_IO_TYPE                 m_emIOType;                     //当前IO入口类型
@@ -209,8 +208,8 @@ public:
 
 private:
     virtual int CloseMsgQueue();
+    bool Dispose_Queue();
 
-private:
     //关闭消息队列条件变量
     ACE_Thread_Mutex m_mutex;
     ACE_Condition<ACE_Thread_Mutex> m_cond;
