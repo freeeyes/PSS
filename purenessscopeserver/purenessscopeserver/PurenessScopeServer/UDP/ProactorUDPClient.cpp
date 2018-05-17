@@ -98,7 +98,6 @@ void CProactorUDPClient::handle_read_dgram(const ACE_Asynch_Read_Dgram::Result& 
     if(nPacketLen != 0 && nTran != 0)
     {
         //处理数据
-        //OUR_DEBUG((LM_INFO, "[CProactorUDPHandler::handle_read_dgram]CProactorUDPClient::handle_read_dgram.\n"));
         if (false == CheckMessage(pMb, (uint32)nTran))
         {
             OUR_DEBUG((LM_INFO, "[CProactorUDPClient::handle_read_dgram]CheckMessage error.\n"));

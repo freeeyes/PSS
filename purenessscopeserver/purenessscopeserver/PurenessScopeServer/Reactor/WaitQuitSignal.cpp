@@ -32,9 +32,9 @@ void WaitQuitSignal::init()
         sigaddset(&m_wait_mask, SIGKILL);
         pthread_sigmask(SIG_BLOCK, &m_wait_mask, 0);
     }
-    catch (std::exception& e)
+    catch (const std::domain_error& ex)
     {
-        std::cerr << "exception: " << e.what() << std::endl;
+        std::cout << "exception: " << e.what() << std::endl;
     }
 
     m_time.tv_sec=0;
@@ -60,9 +60,9 @@ bool WaitQuitSignal::wait(bool& blFlag)
             break;
         }
     }
-    catch (std::exception& e)
+    catch (const std::domain_error& ex)
     {
-        std::cerr << "exception: " << e.what() << std::endl;
+        std::cout << "exception: " << e.what() << std::endl;
     }
 
     return blFlag;
