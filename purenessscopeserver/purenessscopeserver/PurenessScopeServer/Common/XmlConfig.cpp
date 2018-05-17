@@ -4,47 +4,47 @@
 IConfigOpeation* IConfigOpeation::_array[XML_Config_MAX];
 
 
-/*定义静态类对象兵现实化实现模板函数*/
-#define DefineClassAndFunc(ClassName)                                   \
-static ClassName    this##ClassName;                                    \
-template<>                                                              \
-ClassName* XMainConfig::GetXmlConfig<ClassName>(XmlConfig config)       \
-{                                                                       \
-    return dynamic_cast<ClassName*>(IConfigOpeation::_array[config]);   \
+/*定义静态类对象并绑定对应枚举，实现返回模板函数*/
+#define DefineClassAndFunc(ClassName, XMLConfig)							\
+static ClassName    this##ClassName(XMLConfig);								\
+template<>																	\
+ClassName* XMainConfig::GetXmlConfig<ClassName>()							\
+{																			\
+    return dynamic_cast<ClassName*>(IConfigOpeation::_array[XMLConfig]);	\
 }
 
 
 /*xml配置文件对应类型配置的静态类，需要增加配置文件标签，需要在此添加静态类对象，所有对象不直接使用,也不允许外部使用*/
 /*****************类对象和返回函数一一对应*********************/
-DefineClassAndFunc(xmlSendInfo)
-DefineClassAndFunc(xmlNetWorkMode)
-DefineClassAndFunc(xmlConnectServer)
-DefineClassAndFunc(xmlClientInfo)
-DefineClassAndFunc(xmlModuleInfos)
-DefineClassAndFunc(xmlModuleMangager)
-DefineClassAndFunc(xmlMonitor)
-DefineClassAndFunc(xmlThreadInfoAI)
-DefineClassAndFunc(xmlThreadInfo)
-DefineClassAndFunc(xmlConsole)
-DefineClassAndFunc(xmlConsoleKeys)
-DefineClassAndFunc(xmlAceDebug)
-DefineClassAndFunc(xmlCommandAccount)
-DefineClassAndFunc(xmlCoreSetting)
-DefineClassAndFunc(xmlServerType)
-DefineClassAndFunc(xmlServerID)
-DefineClassAndFunc(xmlServerName)
-DefineClassAndFunc(xmlServerVersion)
-DefineClassAndFunc(xmlPacketParses)
-DefineClassAndFunc(xmlBuffPacket)
-DefineClassAndFunc(xmlMessage)
-DefineClassAndFunc(xmlAlertConnect)
-DefineClassAndFunc(xmlIP)
-DefineClassAndFunc(xmlClientData)
-DefineClassAndFunc(xmlCommandInfo)
-DefineClassAndFunc(xmlMail)
-DefineClassAndFunc(xmlWorkThreadChart)
-DefineClassAndFunc(xmlConnectChart)
-DefineClassAndFunc(xmlCommandChart)
+DefineClassAndFunc(xmlSendInfo, XML_Config_SendInfo)
+DefineClassAndFunc(xmlNetWorkMode, XML_Config_NetWorkMode)
+DefineClassAndFunc(xmlConnectServer, XML_Config_ConnectServer)
+DefineClassAndFunc(xmlClientInfo, XML_Config_ClientInfo)
+DefineClassAndFunc(xmlModuleInfos, XML_Config_ModuleInfos)
+DefineClassAndFunc(xmlModuleMangager, XML_Config_ModuleMangager)
+DefineClassAndFunc(xmlMonitor, XML_Config_Monitor)
+DefineClassAndFunc(xmlThreadInfoAI, XML_Config_ThreadInfoAI)
+DefineClassAndFunc(xmlThreadInfo, XML_Config_ThreadInfo)
+DefineClassAndFunc(xmlConsole, XML_Config_Console)
+DefineClassAndFunc(xmlConsoleKeys, XML_Config_ConsoleKeys)
+DefineClassAndFunc(xmlAceDebug, XML_Config_AceDebug)
+DefineClassAndFunc(xmlCommandAccount, XML_Config_CommandAccount)
+DefineClassAndFunc(xmlCoreSetting, XML_Config_CoreSetting)
+DefineClassAndFunc(xmlServerType, XML_Config_ServerType)
+DefineClassAndFunc(xmlServerID, XML_Config_ServerID)
+DefineClassAndFunc(xmlServerName, XML_Config_ServerName)
+DefineClassAndFunc(xmlServerVersion, XML_Config_ServerVersion)
+DefineClassAndFunc(xmlPacketParses, XML_Config_PacketParses)
+DefineClassAndFunc(xmlBuffPacket, XML_Config_BuffPacket)
+DefineClassAndFunc(xmlMessage, XML_Config_Message)
+DefineClassAndFunc(xmlAlertConnect, XML_Config_AlertConnect)
+DefineClassAndFunc(xmlIP, XML_Config_IP)
+DefineClassAndFunc(xmlClientData, XML_Config_ClientData)
+DefineClassAndFunc(xmlCommandInfo, XML_Config_CommandInfo)
+DefineClassAndFunc(xmlMail, XML_Config_Mail)
+DefineClassAndFunc(xmlWorkThreadChart, XML_Config_WorkThreadChart)
+DefineClassAndFunc(xmlConnectChart, XML_Config_ConnectChart)
+DefineClassAndFunc(xmlCommandChart, XML_Config_CommandChart)
 
 
 
