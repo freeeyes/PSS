@@ -186,7 +186,7 @@ bool CConnectAcceptorManager::InitConnectAcceptor(int nCount, uint32 u4ClientRea
 
             if (NULL == pConnectAcceptor)
             {
-                throw "[CConnectAcceptorManager::InitConnectAcceptor]pConnectAcceptor new is fail.";
+                throw std::domain_error("[CConnectAcceptorManager::InitConnectAcceptor]pConnectAcceptor new is fail.");
             }
 
             pConnectAcceptor->InitClientReactor(u4ClientReactorCount);
@@ -195,9 +195,9 @@ bool CConnectAcceptorManager::InitConnectAcceptor(int nCount, uint32 u4ClientRea
 
         return true;
     }
-    catch (const char* szError)
+    catch (const std::domain_error& ex)
     {
-        sprintf_safe(m_szError, MAX_BUFF_500, "%s", szError);
+        sprintf_safe(m_szError, MAX_BUFF_500, "%s", ex.what());
         return false;
     }
 }
@@ -207,13 +207,9 @@ void CConnectAcceptorManager::Close()
     for (int i = 0; i < (int)m_vecConnectAcceptor.size(); i++)
     {
         ConnectAcceptor* pConnectAcceptor = m_vecConnectAcceptor[i];
-
-        if (NULL != pConnectAcceptor)
-        {
-            pConnectAcceptor->close();
-            delete pConnectAcceptor;
-            pConnectAcceptor = NULL;
-        }
+        pConnectAcceptor->close();
+        delete pConnectAcceptor;
+        pConnectAcceptor = NULL;
     }
 
     m_vecConnectAcceptor.clear();
@@ -227,16 +223,13 @@ bool CConnectAcceptorManager::Close(const char* pIP, uint32 n4Port)
     {
         ConnectAcceptor* pConnectAcceptor = (ConnectAcceptor*)(*b);
 
-        if (NULL != pConnectAcceptor)
+        if(ACE_OS::strcmp(pConnectAcceptor->GetListenIP(), pIP) == 0
+           && pConnectAcceptor->GetListenPort() == n4Port)
         {
-            if(ACE_OS::strcmp(pConnectAcceptor->GetListenIP(), pIP) == 0
-               && pConnectAcceptor->GetListenPort() == n4Port)
-            {
-                pConnectAcceptor->close();
-                SAFE_DELETE(pConnectAcceptor);
-                m_vecConnectAcceptor.erase(b);
-                break;
-            }
+            pConnectAcceptor->close();
+            SAFE_DELETE(pConnectAcceptor);
+            m_vecConnectAcceptor.erase(b);
+            break;
         }
     }
 
@@ -270,13 +263,11 @@ bool CConnectAcceptorManager::CheckIPInfo(const char* pIP, uint32 n4Port)
     {
         ConnectAcceptor* pConnectAcceptor = (ConnectAcceptor*)(*b);
 
-        if (NULL != pConnectAcceptor)
+        if (NULL != pConnectAcceptor
+            && ACE_OS::strcmp(pConnectAcceptor->GetListenIP(), pIP) == 0
+            && pConnectAcceptor->GetListenPort() == n4Port)
         {
-            if(ACE_OS::strcmp(pConnectAcceptor->GetListenIP(), pIP) == 0
-               && pConnectAcceptor->GetListenPort() == n4Port)
-            {
-                return true;
-            }
+            return true;
         }
     }
 

@@ -39,7 +39,6 @@ void CConnectClient::Close()
     //从反应器注销事件
     if (m_nIOCount == 0)
     {
-        //msg_queue()->deactivate();
         shutdown();
         OUR_DEBUG((LM_ERROR, "[CConnectClient::Close]Close(%s:%d) OK.\n", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
 
@@ -410,9 +409,6 @@ int CConnectClient::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
 
     while (-1 != this->getq(pmbSendData, &nowait))
     {
-        //OUR_DEBUG((LM_INFO, "[CConnectClient::handle_output]ConnectID=%d pmbSendData->length()=%d.\n", GetServerID(), pmbSendData->length()));
-        //OUR_DEBUG((LM_INFO, "[CConnectClient::handle_output]ConnectID=%d msg_queue()->message_bytes()=%d.\n", GetServerID(), msg_queue()->message_bytes()));
-
         if (NULL == pmbSendData)
         {
             OUR_DEBUG((LM_INFO, "[CConnectClient::handle_output]ConnectID=%d pmbSendData is NULL.\n", GetServerID()));
@@ -476,11 +472,8 @@ int CConnectClient::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
             }
         }
 
-        //ACE_Time_Value tvCost = ACE_OS::gettimeofday() - nowait;
-        //OUR_DEBUG((LM_INFO, "[CConnectHandler::handle_output]ConnectID=%d timeCost=%d.\n", GetServerID(), tvCost.msec()));
     }
 
-    //OUR_DEBUG((LM_INFO, "[CConnectHandler::handle_output]ConnectID=%d send finish.\n", GetServerID()));
     int nWakeupRet = reactor()->cancel_wakeup(this, ACE_Event_Handler::WRITE_MASK);
 
     if (-1 == nWakeupRet)
@@ -538,9 +531,6 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
 
     //将消息放入队列，让output在反应器线程发送。
     ACE_Time_Value xtime = ACE_OS::gettimeofday();
-
-    //OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, Send Data Length = %d.\n", GetServerID(), pmblk->length()));
-    //OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d,msg_queue()->message_bytes() = %d.\n", GetServerID(), msg_queue()->message_bytes()));
 
     //队列已满，不能再放进去了,就不放进去了
     if (msg_queue()->is_full() == true)

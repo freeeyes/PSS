@@ -287,8 +287,6 @@ void CAceReactorManager::Close()
 
 void CAceReactorManager::Init(uint16 u2Count)
 {
-    //Close();
-
     m_pReactorList  = (CAceReactor** )new char[sizeof(CAceReactor*)*u2Count];;
     ACE_OS::memset(m_pReactorList, 0, sizeof(CAceReactor*)*u2Count);
     m_u2RectorCount = u2Count;
@@ -338,12 +336,9 @@ bool CAceReactorManager::StartOtherReactor()
     {
         CAceReactor* pAceReactor = m_pReactorList[i];
 
-        if (NULL != pAceReactor)
+        if (NULL != pAceReactor && false == pAceReactor->Start())
         {
-            if (false == pAceReactor->Start())
-            {
-                OUR_DEBUG((LM_INFO, "[CAceReactorManager::AddNewReactor]Start error.\n"));
-            }
+            OUR_DEBUG((LM_INFO, "[CAceReactorManager::AddNewReactor]Start error.\n"));
         }
     }
 

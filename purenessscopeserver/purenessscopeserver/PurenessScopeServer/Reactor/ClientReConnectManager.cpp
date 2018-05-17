@@ -234,7 +234,6 @@ CClientReConnectManager::CClientReConnectManager(void)
 CClientReConnectManager::~CClientReConnectManager(void)
 {
     OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::~CClientReConnectManager].\n"));
-    //Close();
 }
 
 bool CClientReConnectManager::Init(ACE_Reactor* pReactor)

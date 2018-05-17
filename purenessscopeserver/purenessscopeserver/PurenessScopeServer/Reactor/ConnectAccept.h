@@ -6,6 +6,7 @@
 #include "ace/INET_Addr.h"
 #include "ConnectHandler.h"
 #include "AceReactorManager.h"
+#include <stdexcept>
 
 //用于普通客户端
 class ConnectAcceptor : public ACE_Acceptor<CConnectHandler, ACE_SOCK_ACCEPTOR>
