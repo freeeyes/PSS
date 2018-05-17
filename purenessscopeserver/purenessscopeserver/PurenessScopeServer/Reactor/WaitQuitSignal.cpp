@@ -23,46 +23,32 @@ struct timespec WaitQuitSignal::m_time;
 
 void WaitQuitSignal::init()
 {
-    try
-    {
-        sigemptyset(&m_wait_mask);
-        sigaddset(&m_wait_mask, SIGINT);
-        sigaddset(&m_wait_mask, SIGQUIT);
-        sigaddset(&m_wait_mask, SIGTERM);
-        sigaddset(&m_wait_mask, SIGKILL);
-        pthread_sigmask(SIG_BLOCK, &m_wait_mask, 0);
-    }
-    catch (const std::domain_error& ex)
-    {
-        std::cout << "exception: " << e.what() << std::endl;
-    }
+    sigemptyset(&m_wait_mask);
+    sigaddset(&m_wait_mask, SIGINT);
+    sigaddset(&m_wait_mask, SIGQUIT);
+    sigaddset(&m_wait_mask, SIGTERM);
+    sigaddset(&m_wait_mask, SIGKILL);
+    pthread_sigmask(SIG_BLOCK, &m_wait_mask, 0);
 
     m_time.tv_sec=0;
     m_time.tv_nsec =0;
 }
 bool WaitQuitSignal::wait(bool& blFlag)
 {
-    try
-    {
-        siginfo_t sig ;
+    siginfo_t sig ;
 
-        switch(sigtimedwait(&m_wait_mask,&sig,&m_time))
-        {
-        case SIGKILL:
-        case SIGINT:
-        case SIGQUIT:
-        case SIGTERM:
-            App_ServerManager::instance()->Close();
-            blFlag = false;
-            break;
-
-        default:
-            break;
-        }
-    }
-    catch (const std::domain_error& ex)
+    switch(sigtimedwait(&m_wait_mask,&sig,&m_time))
     {
-        std::cout << "exception: " << e.what() << std::endl;
+    case SIGKILL:
+    case SIGINT:
+    case SIGQUIT:
+    case SIGTERM:
+        App_ServerManager::instance()->Close();
+        blFlag = false;
+        break;
+
+    default:
+        break;
     }
 
     return blFlag;

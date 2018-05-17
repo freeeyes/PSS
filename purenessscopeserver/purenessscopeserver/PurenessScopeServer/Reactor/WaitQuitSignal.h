@@ -12,7 +12,6 @@
 #include <signal.h>
 #include <time.h>
 #include <pthread.h>
-#include <stdexcept>
 
 class WaitQuitSignal
 {
