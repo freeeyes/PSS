@@ -18,8 +18,6 @@ env:
     - COMPILER=g++-7
 
 before_install:
-  # install gcovr
-  - pip install git+https://github.com/gcovr/gcovr.git
   - mkdir -p $ACEDIR
   - cd $ACEDIR
   - wget http://download.dre.vanderbilt.edu/previous_versions/ACE-6.4.0.tar.gz
@@ -55,7 +53,7 @@ matrix:
   #  
   - os: linux
     script: 
-        - export
+        - export    
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
         # Compile by gcov
         - $ACE_ROOT/bin/mwc.pl -type gnuace psssonar.mwc
@@ -80,7 +78,7 @@ matrix:
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/.obj
         - LC_ALL=en gcov --branch-probabilities --branch-counts ../../PurenessScopeServer.cpp -o ./
         - ls
-        # - gcov --branch-probabilities --branch-counts 
+        # gcovr -r WHERE_SONAR_SCANNER_WILL_RUN -x --object-directory=ABSOLUTE_PATH_TO_GCOV_FILES_FOLDER > report.xml
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer
         - sonar-scanner
 
