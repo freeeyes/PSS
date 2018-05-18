@@ -18,10 +18,13 @@ env:
     - COMPILER=g++-7
 
 before_install:
+  # install gcovr
+  - pip install git+https://github.com/gcovr/gcovr.git
   - mkdir -p $ACEDIR
   - cd $ACEDIR
   - wget http://download.dre.vanderbilt.edu/previous_versions/ACE-6.4.0.tar.gz
   - tar zxf ACE-6.4.0.tar.gz
+  
 
 before_script:
   - export
