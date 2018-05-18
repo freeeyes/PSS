@@ -214,7 +214,6 @@ private:
     ACE_Thread_Mutex m_mutex;
     ACE_Condition<ACE_Thread_Mutex> m_cond;
 
-private:
     uint32                             m_u4TimeCheckID;         //定时器检查的TimerID
     uint32                             m_u4SendQueuePutTime;    //发送队列入队超时时间
     uint32                             m_u4TimeConnect;         //单位时间连接建立数
@@ -305,7 +304,7 @@ public:
 
 private:
     uint32 GetGroupIndex();                                                                                  //得到当前链接的ID自增量
-private:
+
     uint32            m_u4CurrMaxCount;                                                                      //当前链接自增量
     uint16            m_u2ThreadQueueCount;                                                                  //当前发送线程队列个数
     ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;                                                           //控制多线程锁

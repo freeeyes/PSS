@@ -468,7 +468,6 @@ int CConnectClient::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
             {
                 pmbSendData->rd_ptr(nDataLen);
                 nIsSendSize += nDataLen;
-                continue;
             }
         }
 

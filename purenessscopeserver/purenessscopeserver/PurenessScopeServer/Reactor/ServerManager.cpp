@@ -508,11 +508,7 @@ void CServerManager::Multiple_Process_Start()
             if (npid == 0)
             {
                 //上文件锁
-                if (AcquireWriteLock(fd_lock, nChlidIndex * sizeof(int), sizeof(int)) != 0)
-                {
-                    OUR_DEBUG((LM_ERROR, "child %d AcquireWriteLock failure.\n", nChlidIndex));
-                    exit(1);
-                }
+                AcquireWriteLock(fd_lock, nChlidIndex * sizeof(int), sizeof(int));
 
                 //启动子进程
                 if (false == Run())

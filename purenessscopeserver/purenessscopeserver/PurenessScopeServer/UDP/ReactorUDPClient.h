@@ -31,7 +31,6 @@ public:
 private:
     bool CheckMessage(const char* pData, uint32 u4Len);     //这里解析数据包并放入数据队列
 
-private:
     ACE_SOCK_Dgram          m_skRemote;
     ACE_INET_Addr           m_addrRemote;                   //数据发送方的IP信息
     IClientUDPMessage*      m_pClientUDPMessage;            //消息处理类

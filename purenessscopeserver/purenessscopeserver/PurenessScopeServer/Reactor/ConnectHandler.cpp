@@ -741,7 +741,6 @@ void CConnectHandler::SetSendQueueTimeCost(uint32 u4TimeCost)
     //如果超过阀值，则记录到日志中去
     if((uint32)(m_u8SendQueueTimeout) <= u4TimeCost)
     {
-        ACE_Time_Value tvNow = ACE_OS::gettimeofday();
         AppLogManager::instance()->WriteLog(LOG_SYSTEM_SENDQUEUEERROR, "[TCP]IP=%s,Prot=%d,m_u8SendQueueTimeout = [%d], Timeout=[%d].", GetClientIPInfo().m_szClientIP, GetClientIPInfo().m_nPort, (uint32)m_u8SendQueueTimeout, u4TimeCost);
 
         Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_SEND_TIMEOUT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
@@ -1385,7 +1384,6 @@ bool CConnectHandler::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, 
     pMbData->msg_type(objType);
 
     //将消息放入队列，让output在反应器线程发送。
-    ACE_Time_Value xtime = ACE_OS::gettimeofday();
 
     if (false == Send_Block_Queue(pMbData))
     {
@@ -1860,9 +1858,6 @@ int CConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
     ACE_UNUSED_ARG(arg);
     ACE_UNUSED_ARG(tv);
 
-    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-    vector<CConnectHandler*> vecDelConnectHandler;
-
     if(arg == NULL)
     {
         OUR_DEBUG((LM_ERROR, "[CConnectManager::handle_timeout]arg is not NULL, tv = %d.\n", tv.sec()));
@@ -1933,8 +1928,6 @@ int CConnectManager::open(void* args)
 
 int CConnectManager::svc (void)
 {
-    ACE_Time_Value xtime;
-
     while(true)
     {
         //处理消息队列信息

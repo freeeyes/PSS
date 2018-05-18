@@ -138,7 +138,6 @@ void CProactorUDPHandler::handle_read_dgram(const ACE_Asynch_Read_Dgram::Result&
     if(NULL == pMBBuff)
     {
         OUR_DEBUG((LM_INFO, "[CProactorUDPHandler::handle_read_dgram]pMBBuff is NULL.\n"));
-        return;
     }
     else
     {

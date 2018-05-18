@@ -70,12 +70,9 @@ int CReactorUDPClient::handle_input(ACE_HANDLE fd)
 
     int nDataLen = (int)m_skRemote.recv(szBuff, MAX_UDP_PACKET_LEN, m_addrRemote);
 
-    if(nDataLen > 0)
+    if(nDataLen > 0 && false == CheckMessage(szBuff, (uint32)nDataLen))
     {
-        if (false == CheckMessage(szBuff, (uint32)nDataLen))
-        {
-            OUR_DEBUG((LM_INFO, "[CReactorUDPClient::handle_inpu]CheckMessage error.\n"));
-        }
+        OUR_DEBUG((LM_INFO, "[CReactorUDPClient::handle_inpu]CheckMessage error.\n"));
     }
 
     return 0;

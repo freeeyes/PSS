@@ -28,7 +28,6 @@ public:
 private:
     bool CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len);     //这里解析数据包并放入数据队列
 
-private:
     ACE_INET_Addr           m_addrRemote;                   //数据发送方的IP信息
     ACE_SOCK_Dgram          m_skRemote;
     ACE_Asynch_Read_Dgram   m_Read;
