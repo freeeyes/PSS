@@ -29,6 +29,7 @@ enum XmlConfig
 	XML_Config_RecvInfo = XML_Config_MIN,
 	XML_Config_SendInfo,
 	XML_Config_NetWorkMode,
+	XML_Config_TCPServerIPs,
 	/********连接信息********/
 	XML_Config_ConnectServer,
 	XML_Config_ClientInfo,
@@ -80,6 +81,7 @@ class IConfigOpeation;
 class XMainConfig
 {
 public:
+	XMainConfig() { Init(); }
 	bool Init();
 	template<class T>
 	T* GetXmlConfig();
@@ -144,6 +146,21 @@ public:
 	uint16 BackLog;
 	uint8 ByteOrder;
 	xmlNetWorkMode(XmlConfig config) : IConfigOpeation(config), Mode(0), BackLog(0), ByteOrder(false) {}
+	bool Init(CXmlOpeation* pXmlOpeation);
+};
+
+class xmlTCPServerIPs : public IConfigOpeation
+{
+public:
+	class _TCPServerIP
+	{
+	public:
+		string ip;
+		uint32 port;
+		_TCPServerIP() : ip(""), port(0){}
+	};
+	std::vector<_TCPServerIP> vec;
+	xmlTCPServerIPs(XmlConfig config) : IConfigOpeation(config) {}
 	bool Init(CXmlOpeation* pXmlOpeation);
 };
 

@@ -18,6 +18,7 @@ ClassName* XMainConfig::GetXmlConfig<ClassName>()							\
 /*****************类对象和返回函数一一对应*********************/
 DefineClassAndFunc(xmlSendInfo, XML_Config_SendInfo)
 DefineClassAndFunc(xmlNetWorkMode, XML_Config_NetWorkMode)
+DefineClassAndFunc(xmlTCPServerIPs, XML_Config_TCPServerIPs)
 DefineClassAndFunc(xmlConnectServer, XML_Config_ConnectServer)
 DefineClassAndFunc(xmlClientInfo, XML_Config_ClientInfo)
 DefineClassAndFunc(xmlModuleInfos, XML_Config_ModuleInfos)
@@ -100,11 +101,6 @@ bool xmlSendInfo::Init(CXmlOpeation* m_pXmlOpeation)
 	{
 		SendDatamark = MaxBlockSize;
 		bKet = m_pXmlOpeation->Read_XML_Data_Single_Uint16("SendInfo", "TcpNodelay", TcpNodelay);
-
-		if (TcpNodelay != TCP_NODELAY_ON)
-		{
-			TcpNodelay = TCP_NODELAY_OFF;
-		}
 	}
 
 	return bKet;
@@ -128,6 +124,21 @@ bool xmlNetWorkMode::Init(CXmlOpeation* m_pXmlOpeation)
 	return bKet;
 }
 
+
+bool xmlTCPServerIPs::Init(CXmlOpeation* pXmlOpeation)
+{
+	TiXmlElement* pIP = NULL;
+	TiXmlElement* pPort = NULL;
+
+	_TCPServerIP tcpServerIP;
+	while (pXmlOpeation->Read_XML_Data_Multiple_String("TCPServerIP", "ip", tcpServerIP.ip, pIP)
+		&& pXmlOpeation->Read_XML_Data_Multiple_Uint32("TCPServerIP", "port", tcpServerIP.port, pPort))
+	{
+		vec.push_back(tcpServerIP);
+	}
+
+	return true;
+}
 
 bool xmlConnectServer::Init(CXmlOpeation* pXmlOpeation)
 {
