@@ -196,6 +196,8 @@ bool CProServerManager::Start()
                 return false;
             }
 
+            pProactorUDPHandler->SetRecvSize(pServerInfo->m_u4MaxRecvSize);
+
             if(0 != pProactorUDPHandler->OpenAddress(listenAddr, pProactor))
             {
                 OUR_DEBUG((LM_INFO, "[CProServerManager::Start] UDP Listen from [%s:%d] error(%d).\n",listenAddr.get_host_addr(), listenAddr.get_port_number(), errno));

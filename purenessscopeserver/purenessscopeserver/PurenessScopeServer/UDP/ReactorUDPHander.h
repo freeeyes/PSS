@@ -32,6 +32,8 @@ public:
     _ClientConnectInfo GetClientConnectInfo();
     void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);    //获得指定命令统计信息
     void GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut);                    //得到所有的出口流量
+    void SetRecvSize(uint32 u4RecvSize);                                      //设置接收数据包最大尺寸
+    uint32 GetRecvSize();                                                     //得到数据包最大尺寸
 
 private:
     bool CheckMessage(const char* pData, uint32 u4Len);              //这里解析数据包并放入数据队列
@@ -42,6 +44,7 @@ private:
     ACE_INET_Addr           m_addrRemote;                   //数据发送方的IP信息
     ACE_INET_Addr           m_addrLocal;                    //监听方的IP信息
     CPacketParse*           m_pPacketParse;                 //数据包解析类
+    char*                   m_pRecvBuff;                    //接收数据缓冲指针
 
     ACE_Time_Value          m_atvInput;                     //接收包的时间
     ACE_Time_Value          m_atvOutput;                    //发送包的时间
@@ -49,6 +52,7 @@ private:
     uint32                  m_u4SendPacketCount;            //发送数据包的数量
     uint32                  m_u4RecvSize;                   //接收数据的总大小
     uint32                  m_u4SendSize;                   //发送数据的总大小
+    uint32                  m_u4MaxRecvSize;                //最大接收数据包尺寸
     CCommandAccount         m_CommandAccount;               //数据包统计
     uint32                  m_u4PacketParseInfoID;          //对应处理packetParse的模块ID
 };

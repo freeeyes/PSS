@@ -36,6 +36,7 @@ class _ServerInfo
 {
 public:
     uint32 m_u4PacketParseInfoID;
+    uint32 m_u4MaxRecvSize;
     int32  m_nPort;
     uint8  m_u1IPType;
     char   m_szServerIP[MAX_BUFF_50];
@@ -44,6 +45,7 @@ public:
     {
         m_szServerIP[0]       = '\0';
         m_nPort               = 0;
+        m_u4MaxRecvSize       = 0;
         m_u1IPType            = TYPE_IPV4;
         m_u4PacketParseInfoID = 0;
     }

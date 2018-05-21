@@ -10,6 +10,7 @@ CProactorUDPHandler::CProactorUDPHandler(void)
     m_szCompletionkey[0]  = '\0';
     m_szAct[0]            = '\0';
     m_u4PacketParseInfoID = 0;
+    m_u4MaxRecvSize       = MAX_BUFF_1024;
 }
 
 CProactorUDPHandler::~CProactorUDPHandler(void)
@@ -76,7 +77,7 @@ int CProactorUDPHandler::OpenAddress(const ACE_INET_Addr& AddrLocal, ACE_Proacto
         return -1;
     }
 
-    ACE_Message_Block* pMBBuff = App_MessageBlockManager::instance()->Create(MAX_UDP_PACKET_LEN);
+    ACE_Message_Block* pMBBuff = App_MessageBlockManager::instance()->Create(m_u4MaxRecvSize);
 
     if(NULL == pMBBuff)
     {
@@ -92,7 +93,7 @@ int CProactorUDPHandler::OpenAddress(const ACE_INET_Addr& AddrLocal, ACE_Proacto
 
     m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
 
-    size_t stRecvLen = MAX_UDP_PACKET_LEN;
+    size_t stRecvLen = m_u4MaxRecvSize;
     int nRecvSize = (int)m_Read.recv(pMBBuff, stRecvLen, 0, PF_INET, m_szAct);
     return nRecvSize;
 }
@@ -133,7 +134,7 @@ void CProactorUDPHandler::handle_read_dgram(const ACE_Asynch_Read_Dgram::Result&
     }
 
     App_MessageBlockManager::instance()->Close(pMb);
-    pMBBuff = App_MessageBlockManager::instance()->Create(MAX_UDP_PACKET_LEN);
+    pMBBuff = App_MessageBlockManager::instance()->Create(m_u4MaxRecvSize);
 
     if(NULL == pMBBuff)
     {
@@ -141,7 +142,7 @@ void CProactorUDPHandler::handle_read_dgram(const ACE_Asynch_Read_Dgram::Result&
     }
     else
     {
-        size_t stRecvLen = MAX_UDP_PACKET_LEN;
+        size_t stRecvLen = m_u4MaxRecvSize;
         m_Read.recv(pMBBuff, stRecvLen, 0, PF_INET, m_szAct);
     }
 }
@@ -305,4 +306,14 @@ void CProactorUDPHandler::GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut)
 {
     u4FlowIn  = m_CommandAccount.GetFlowIn();
     u4FlowOut = m_CommandAccount.GetFlowOut();
+}
+
+void CProactorUDPHandler::SetRecvSize(uint32 u4MaxRecvSize)
+{
+    m_u4MaxRecvSize = u4MaxRecvSize;
+}
+
+uint32 CProactorUDPHandler::GetRecvSize()
+{
+    return m_u4MaxRecvSize;
 }

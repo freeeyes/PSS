@@ -642,6 +642,7 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
     TiXmlElement* pNextTiXmlElementIP       = NULL;
     TiXmlElement* pNextTiXmlElementPort     = NULL;
     TiXmlElement* pNextTiXmlElementPacketID = NULL;
+    TiXmlElement* pNexttTiXmlElementMaxRecv = NULL;
 
     while(true)
     {
@@ -720,6 +721,17 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
         else
         {
             serverinfo.m_u4PacketParseInfoID = 0;
+        }
+
+        pData = m_MainConfig.GetData("UDPServerIP", "uMaxRecvSize", pNexttTiXmlElementMaxRecv);
+
+        if (pData != NULL)
+        {
+            serverinfo.m_u4MaxRecvSize = (uint32)ACE_OS::atoi(pData);
+        }
+        else
+        {
+            serverinfo.m_u4MaxRecvSize = 1024;
         }
 
         m_vecUDPServerInfo.push_back(serverinfo);

@@ -8,6 +8,8 @@ CReactorUDPHander::CReactorUDPHander(void)
     m_u4RecvSize          = 0;
     m_u4SendSize          = 0;
     m_u4PacketParseInfoID = 0;
+    m_u4MaxRecvSize       = MAX_BUFF_1024;
+    m_pRecvBuff           = NULL;
 }
 
 CReactorUDPHander::~CReactorUDPHander(void)
@@ -23,6 +25,15 @@ int CReactorUDPHander::OpenAddress(const ACE_INET_Addr& AddrRemote, ACE_Reactor*
     }
 
     reactor(pReactor);
+
+    if (NULL != m_pRecvBuff)
+    {
+        SAFE_DELETE_ARRAY(m_pRecvBuff);
+    }
+
+    m_pRecvBuff = new char[m_u4MaxRecvSize];
+
+    ACE_OS::memset(m_pRecvBuff, 0, m_u4MaxRecvSize);
 
     return Init_Open_Address(AddrRemote);
 }
@@ -73,13 +84,11 @@ int CReactorUDPHander::handle_input(ACE_HANDLE fd)
         return -1;
     }
 
-    char szBuff[MAX_UDP_PACKET_LEN] = {'\0'};
-
-    int nDataLen = (int)m_skRemote.recv(szBuff, MAX_UDP_PACKET_LEN, m_addrRemote);
+    int nDataLen = (int)m_skRemote.recv(m_pRecvBuff, m_u4MaxRecvSize, m_addrRemote);
 
     if(nDataLen > 0)
     {
-        if (false == CheckMessage(szBuff, (uint32)nDataLen))
+        if (false == CheckMessage(m_pRecvBuff, (uint32)nDataLen))
         {
             OUR_DEBUG((LM_INFO, "[CReactorUDPHander::handle_input]CheckMessage fail.\n"));
         }
@@ -293,4 +302,14 @@ void CReactorUDPHander::GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut)
 {
     u4FlowIn  = m_CommandAccount.GetFlowIn();
     u4FlowOut = m_CommandAccount.GetFlowOut();
+}
+
+void CReactorUDPHander::SetRecvSize(uint32 u4RecvSize)
+{
+    m_u4MaxRecvSize = u4RecvSize;
+}
+
+uint32 CReactorUDPHander::GetRecvSize()
+{
+    return m_u4MaxRecvSize;
 }
