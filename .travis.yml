@@ -54,6 +54,7 @@ matrix:
   - os: linux
     script: 
         - export    
+        - pip install --upgrade pip
         - pip install gcovr
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
         # Compile by gcov
