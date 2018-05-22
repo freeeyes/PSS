@@ -1014,11 +1014,6 @@ bool CMainConfig::Init_Main(const char* szConfigPath)
         m_u2SendQueuePutTime = (uint16)ACE_OS::atoi(pData);
     }
 
-    //pData = m_MainConfig.GetData("SendInfo", "MaxSendMask");
-    //if(pData != NULL)
-    //{
-    //  m_u4SendDatamark = (int32)ACE_OS::atoi(pData);
-    //}
     pData = m_MainConfig.GetData("SendInfo", "MaxBlockSize");
 
     if(pData != NULL)
@@ -1465,7 +1460,7 @@ bool CMainConfig::CheckAllIP()
     //检查所有服务器的监听IP(TCP)
     for (int i = 0; i < (int)m_vecServerInfo.size(); i++)
     {
-        EM_IP_TYPE emIpType = Check_IP(m_vecServerInfo[i].m_szServerIP);
+        EM_CHECK_IP_TYPE emIpType = Check_IP(m_vecServerInfo[i].m_szServerIP);
 
         if (IP_UNKNOW == emIpType)
         {
@@ -1487,7 +1482,7 @@ bool CMainConfig::CheckAllIP()
     //检查所有服务器的监听IP(UDP)
     for (int i = 0; i < (int)m_vecUDPServerInfo.size(); i++)
     {
-        EM_IP_TYPE emIpType = Check_IP(m_vecUDPServerInfo[i].m_szServerIP);
+        EM_CHECK_IP_TYPE emIpType = Check_IP(m_vecUDPServerInfo[i].m_szServerIP);
 
         if (IP_UNKNOW == emIpType)
         {
@@ -1509,7 +1504,7 @@ bool CMainConfig::CheckAllIP()
     //检查ConsoleIP
     if (ACE_OS::strlen(m_szConsoleIP) > 0)
     {
-        EM_IP_TYPE emIpType = Check_IP(m_szConsoleIP);
+        EM_CHECK_IP_TYPE emIpType = Check_IP(m_szConsoleIP);
 
         if (IP_UNKNOW == emIpType)
         {

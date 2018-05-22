@@ -39,6 +39,7 @@
 #include "SendCacheManager.h"
 #include "TimeWheelLink.h"
 #include "FileTest.h"
+#include "XmlConfig.h"
 
 class CProConnectHandle : public ACE_Service_Handler
 {

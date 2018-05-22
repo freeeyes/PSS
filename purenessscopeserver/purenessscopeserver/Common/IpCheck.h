@@ -1,3 +1,6 @@
+#ifndef _IPCHECK_H
+#define _IPCHECK_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,7 +10,7 @@
 
 using namespace std;
 
-enum EM_IP_TYPE
+enum EM_CHECK_IP_TYPE
 {
     IP_V4 = 0,
     IP_V6,
@@ -43,7 +46,7 @@ static void str_split(const string& src, const string& separator, vector<string>
     dest.push_back(substring);
 }
 
-static EM_IP_TYPE Check_IP_V6(vector<string> vecIpSection)
+static EM_CHECK_IP_TYPE Check_IP_V6(vector<string> vecIpSection)
 {
     for (int i = 0; i < (int)vecIpSection.size(); i++)
     {
@@ -73,7 +76,7 @@ static EM_IP_TYPE Check_IP_V6(vector<string> vecIpSection)
     return IP_V6;
 }
 
-static EM_IP_TYPE Check_IP_V4(vector<string> vecIpSection)
+static EM_CHECK_IP_TYPE Check_IP_V4(vector<string> vecIpSection)
 {
     if (vecIpSection.size() != 4)
     {
@@ -104,7 +107,7 @@ static EM_IP_TYPE Check_IP_V4(vector<string> vecIpSection)
     return IP_V4;
 }
 
-inline EM_IP_TYPE Check_IP(string strIP)
+inline EM_CHECK_IP_TYPE Check_IP(string strIP)
 {
     if (strIP == "INADDR_ANY")
     {
@@ -166,7 +169,7 @@ inline EM_IP_TYPE Check_IP(string strIP)
     return IP_UNKNOW;
 }
 
-inline string Get_Type_Name(EM_IP_TYPE emType)
+inline string Get_Type_Name(EM_CHECK_IP_TYPE emType)
 {
     if (IP_V4 == emType)
     {
@@ -181,3 +184,4 @@ inline string Get_Type_Name(EM_IP_TYPE emType)
         return (string)"IP Unknow";
     }
 }
+#endif
