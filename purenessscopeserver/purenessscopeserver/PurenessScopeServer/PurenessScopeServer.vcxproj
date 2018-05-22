@@ -189,6 +189,7 @@
     <ClCompile Include="Common\BaseServerManager.cpp" />
     <ClCompile Include="Common\BaseTask.cpp" />
     <ClCompile Include="Common\ServerMessageTask.cpp" />
+    <ClCompile Include="Common\XmlConfig.cpp" />
     <ClCompile Include="Console\ConsolePromiss.cpp" />
     <ClCompile Include="Console\FrameCommand.cpp" />
     <ClCompile Include="Console\MessageDefine.cpp" />
@@ -561,6 +562,7 @@
     <ClInclude Include="Common\BaseServerManager.h" />
     <ClInclude Include="Common\BaseTask.h" />
     <ClInclude Include="Common\ServerMessageTask.h" />
+    <ClInclude Include="Common\XmlConfig.h" />
     <ClInclude Include="Console\ConsolePromiss.h" />
     <ClInclude Include="Console\FrameCommand.h" />
     <ClInclude Include="Console\MessageDefine.h" />

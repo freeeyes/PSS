@@ -92,6 +92,7 @@ private:
 
 typedef ACE_Singleton<XMainConfig, ACE_Null_Mutex> App_XmlConfig;
 
+#define GetXmlConfigAttribute(XmlClass) App_XmlConfig::instance()->GetXmlConfig<XmlClass>()
 
 class IConfigOpeation
 {

@@ -1,5 +1,4 @@
 #include "ProConnectHandle.h"
-
 CProConnectHandle::CProConnectHandle(void) : m_u4LocalPort(0), m_u4SendCheckTime(0)
 {
     m_szError[0]          = '\0';
@@ -45,33 +44,64 @@ CProConnectHandle::~CProConnectHandle(void)
     m_u4PacketDebugSize = 0;
 }
 
+/*
+//xmlconfigÊ¹ÓÃÀý×Ó
 void CProConnectHandle::Init(uint16 u2HandlerID)
 {
-    m_u4HandlerID      = u2HandlerID;
-    m_u2MaxConnectTime = App_MainConfig::instance()->GetMaxConnectTime();
-    m_u4SendThresHold  = App_MainConfig::instance()->GetSendTimeout();
-    m_u4MaxPacketSize  = App_MainConfig::instance()->GetRecvBuffSize();
-    m_u2TcpNodelay     = App_MainConfig::instance()->GetTcpNodelay();
+	m_u4HandlerID = u2HandlerID;
+	m_u2MaxConnectTime = GetXmlConfigAttribute(xmlClientInfo)->MaxConnectTime;
+	m_u4SendThresHold = GetXmlConfigAttribute(xmlSendInfo)->SendTimeout;
+	m_u4MaxPacketSize = GetXmlConfigAttribute(xmlRecvInfo)->RecvBuffSize;
+	m_u2TcpNodelay = GetXmlConfigAttribute(xmlSendInfo)->TcpNodelay;
 
-    m_u2SendQueueTimeout = App_MainConfig::instance()->GetSendQueueTimeout() * 1000;
+	m_u2SendQueueTimeout = GetXmlConfigAttribute(xmlSendInfo)->SendQueueTimeout * 1000;
 
-    if(m_u2SendQueueTimeout == 0)
-    {
-        m_u2SendQueueTimeout = MAX_QUEUE_TIMEOUT * 1000;
-    }
+	if (m_u2SendQueueTimeout == 0)
+	{
+		m_u2SendQueueTimeout = MAX_QUEUE_TIMEOUT * 1000;
+	}
 
-    m_u2RecvQueueTimeout = App_MainConfig::instance()->GetRecvQueueTimeout() * 1000;
+	m_u2RecvQueueTimeout = GetXmlConfigAttribute(xmlRecvInfo)->RecvQueueTimeout * 1000;
 
-    if(m_u2RecvQueueTimeout == 0)
-    {
-        m_u2RecvQueueTimeout = MAX_QUEUE_TIMEOUT * 1000;
-    }
+	if (m_u2RecvQueueTimeout == 0)
+	{
+		m_u2RecvQueueTimeout = MAX_QUEUE_TIMEOUT * 1000;
+	}
 
-    m_u4SendMaxBuffSize  = App_MainConfig::instance()->GetBlockSize();
+	m_u4SendMaxBuffSize = GetXmlConfigAttribute(xmlSendInfo)->MaxBlockSize;
 
-    m_pPacketDebugData   = new char[App_MainConfig::instance()->GetDebugSize()];
-    m_u4PacketDebugSize  = App_MainConfig::instance()->GetDebugSize() / 5;
+	m_pPacketDebugData = new char[GetXmlConfigAttribute(xmlServerType)->DebugSize];
+	m_u4PacketDebugSize = GetXmlConfigAttribute(xmlServerType)->DebugSize / 5;
+}*/
+
+void CProConnectHandle::Init(uint16 u2HandlerID)
+{
+	m_u4HandlerID = u2HandlerID;
+	m_u2MaxConnectTime = App_MainConfig::instance()->GetMaxConnectTime();
+	m_u4SendThresHold = App_MainConfig::instance()->GetSendTimeout();
+	m_u4MaxPacketSize = App_MainConfig::instance()->GetRecvBuffSize();
+	m_u2TcpNodelay = App_MainConfig::instance()->GetTcpNodelay();
+
+	m_u2SendQueueTimeout = App_MainConfig::instance()->GetSendQueueTimeout() * 1000;
+
+	if (m_u2SendQueueTimeout == 0)
+	{
+		m_u2SendQueueTimeout = MAX_QUEUE_TIMEOUT * 1000;
+	}
+
+	m_u2RecvQueueTimeout = App_MainConfig::instance()->GetRecvQueueTimeout() * 1000;
+
+	if (m_u2RecvQueueTimeout == 0)
+	{
+		m_u2RecvQueueTimeout = MAX_QUEUE_TIMEOUT * 1000;
+	}
+
+	m_u4SendMaxBuffSize = App_MainConfig::instance()->GetBlockSize();
+
+	m_pPacketDebugData = new char[App_MainConfig::instance()->GetDebugSize()];
+	m_u4PacketDebugSize = App_MainConfig::instance()->GetDebugSize() / 5;
 }
+
 
 uint32 CProConnectHandle::GetHandlerID()
 {
