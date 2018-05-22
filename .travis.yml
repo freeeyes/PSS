@@ -54,8 +54,8 @@ matrix:
   - os: linux
     script: 
         - export    
-        - pip install --upgrade pip
-        - pip install gcovr
+        #- pip install --upgrade pip
+        #- pip install gcovr
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
         # Compile by gcov
         - $ACE_ROOT/bin/mwc.pl -type gnuace psssonar.mwc
@@ -80,7 +80,7 @@ matrix:
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/.obj
         - LC_ALL=en gcov --branch-probabilities --branch-counts ../../PurenessScopeServer.cpp -o ./
         - ls
-        # gcovr -r WHERE_SONAR_SCANNER_WILL_RUN -x --object-directory=ABSOLUTE_PATH_TO_GCOV_FILES_FOLDER > report.xml
+        # gcovr -r $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer -x --object-directory=A$TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/.obj > report.xml
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer
         - sonar-scanner
 
