@@ -16,6 +16,7 @@ ClassName* XMainConfig::GetXmlConfig<ClassName>()							\
 
 /*xml配置文件对应类型配置的静态类，需要增加配置文件标签，需要在此添加静态类对象，所有对象不直接使用,也不允许外部使用*/
 /*****************类对象和返回函数一一对应*********************/
+DefineClassAndFunc(xmlRecvInfo, XML_Config_RecvInfo)
 DefineClassAndFunc(xmlSendInfo, XML_Config_SendInfo)
 DefineClassAndFunc(xmlNetWorkMode, XML_Config_NetWorkMode)
 DefineClassAndFunc(xmlTCPServerIPs, XML_Config_TCPServerIPs)
@@ -52,11 +53,11 @@ DefineClassAndFunc(xmlCommandChart, XML_Config_CommandChart)
 bool XMainConfig::Init()
 {
 	//初始化xml文件
-	return Init(MAINCONFIG, XML_Config_RecvInfo, XML_Config_Message)
-		&& Init(ALERTCONFIG, XML_Config_AlertConnect, XML_Config_CommandChart);
+	return InitFile(MAINCONFIG, XML_Config_RecvInfo, XML_Config_Message)
+		&& InitFile(ALERTCONFIG, XML_Config_AlertConnect, XML_Config_CommandChart);
 }
 
-bool XMainConfig::Init(const char* pFileName, XmlConfig start, XmlConfig end)
+bool XMainConfig::InitFile(const char* pFileName, XmlConfig start, XmlConfig end)
 {
 	bool bKet = true;
 
