@@ -360,7 +360,7 @@ bool CProServerManager::Close()
     App_MessageManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_MessageManager OK.\n"));
 
-    App_BuffPacketManager::instance()->Close();
+    App_BuffPacketManager::instance()->Close_Object(CBuffPacketManager::Close_Callback);
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_BuffPacketManager OK\n"));
 
     App_ProactorManager::instance()->StopProactor();
