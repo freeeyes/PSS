@@ -368,6 +368,8 @@ int CMessageService::Close()
 
     m_objClientCommandList.Close();
 
+    m_MessagePool.Close_Object(CMessagePool::Close_Callback);
+
     OUR_DEBUG((LM_INFO, "[CMessageService::close] Close().\n"));
     return 0;
 }
