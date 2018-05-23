@@ -81,8 +81,9 @@ matrix:
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/.obj
         # - ls
         - gcovr -r ../ -o ../report.xml --xml-pretty
-        - cd ../
-        - ls -l
+        # - cd ../
+        # - ls -l
+        - gcov --branch-probabilities --branch-counts ../../PurenessScopeServer.cpp -o ./
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer
         - sonar-scanner
 
