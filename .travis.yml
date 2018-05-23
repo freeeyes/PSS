@@ -83,9 +83,9 @@ matrix:
         - gcovr -r ../ -o ../report.xml --xml-pretty
         # - cd ../
         # - ls -l
-        - gcov --branch-probabilities --branch-counts ../../PurenessScopeServer.cpp -o ./
+        # - gcov --branch-probabilities --branch-counts ../../PurenessScopeServer.cpp -o ./
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer
-        - sonar-scanner
+        - sonar-scanner -x
 
     addons:
       sonarcloud:
