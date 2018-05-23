@@ -47,7 +47,6 @@ before_script:
 #
 matrix:
   include:
-    - python: '2.7'
   #
   # Build and sonarcloud
   #  
@@ -81,7 +80,7 @@ matrix:
         # collect gcov report
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/.obj
         - LC_ALL=en gcov --branch-probabilities --branch-counts ../../PurenessScopeServer.cpp -o ./
-        - ls
+        # - ls
         # gcovr -r ../ -o ../report.xml --xml-pretty
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer
         - sonar-scanner
