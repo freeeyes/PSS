@@ -79,10 +79,10 @@ matrix:
         - sleep 5
         # collect gcov report
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/.obj
-        - LC_ALL=en gcov --branch-probabilities --branch-counts ../../PurenessScopeServer.cpp -o ./
         # - ls
         - gcovr -r ../ -o ../report.xml --xml-pretty
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer
+        - ls -l
         - sonar-scanner
 
     addons:
