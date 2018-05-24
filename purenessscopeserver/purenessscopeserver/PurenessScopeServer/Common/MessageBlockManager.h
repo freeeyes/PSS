@@ -69,6 +69,11 @@ public:
     //从内存池里找找看有没有匹配的回收内存
     ACE_Message_Block* Get(uint32 uSize)
     {
+        if (0 == uSize)
+        {
+            return NULL;
+        }
+
         int32 nIndex = pow_2(uSize);
 
         if(nIndex >= MAX_MEMORY_BLOCK_COUNT)
