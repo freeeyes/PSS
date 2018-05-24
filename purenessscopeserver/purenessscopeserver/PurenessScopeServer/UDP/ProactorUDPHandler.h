@@ -9,6 +9,7 @@
 #include "ace/INET_Addr.h"
 #include "ace/SOCK_Dgram.h"
 
+#include "XmlConfig.h"
 #include "BaseHander.h"
 #include "ForbiddenIP.h"
 #include "CommandAccount.h"
