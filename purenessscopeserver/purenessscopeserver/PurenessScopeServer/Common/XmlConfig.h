@@ -35,6 +35,7 @@ enum XmlConfig
 	XML_Config_ThreadInfo,
 	XML_Config_Console,
 	XML_Config_ConsoleKeys,
+	XML_Config_ConsoleClients,
 	/********ÎÄ¼þ¼ÇÂ¼********/
 	XML_Config_AceDebug,
 	XML_Config_CommandAccount,
@@ -263,6 +264,20 @@ public:
 	};
 	std::vector<_ConsoleKey> vec;
 	xmlConsoleKeys(XmlConfig config) : IConfigOpeation(config) {}
+	bool Init(CXmlOpeation* pXmlOpeation);
+};
+
+class xmlConsoleClients : public IConfigOpeation
+{
+public:
+	class _ConsoleClient
+	{
+	public:
+		std::string cip;
+		_ConsoleClient() : cip("") {}
+	};
+	std::vector<_ConsoleClient> vec;
+	xmlConsoleClients(XmlConfig config) : IConfigOpeation(config) {}
 	bool Init(CXmlOpeation* pXmlOpeation);
 };
 

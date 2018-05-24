@@ -29,6 +29,7 @@ DefineClassAndFunc(xmlThreadInfoAI, XML_Config_ThreadInfoAI)
 DefineClassAndFunc(xmlThreadInfo, XML_Config_ThreadInfo)
 DefineClassAndFunc(xmlConsole, XML_Config_Console)
 DefineClassAndFunc(xmlConsoleKeys, XML_Config_ConsoleKeys)
+DefineClassAndFunc(xmlConsoleClients, XML_Config_ConsoleClients)
 DefineClassAndFunc(xmlAceDebug, XML_Config_AceDebug)
 DefineClassAndFunc(xmlCommandAccount, XML_Config_CommandAccount)
 DefineClassAndFunc(xmlCoreSetting, XML_Config_CoreSetting)
@@ -222,6 +223,19 @@ bool xmlConsoleKeys::Init(CXmlOpeation* pXmlOpeation)
 	while (pXmlOpeation->Read_XML_Data_Multiple_String("ConsoleKey", "Key", consolekey.Key, pKey))
 	{
 		vec.push_back(consolekey);
+	}
+
+	return true;
+}
+
+bool xmlConsoleClients::Init(CXmlOpeation* pXmlOpeation)
+{
+	TiXmlElement* pCip = NULL;
+	_ConsoleClient consoleclient;
+
+	while (pXmlOpeation->Read_XML_Data_Multiple_String("ConsoleClient", "cip", consoleclient.cip, pCip))
+	{
+		vec.push_back(consoleclient);
 	}
 
 	return true;
