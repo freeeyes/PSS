@@ -15,7 +15,7 @@ bool CProServerManager::Init()
     //是否打开ACE_DEBUG文件存储
     Server_Manager_Common_FrameLogging(m_pFrameLoggingStrategy);
 
-    int nServerPortCount    = App_MainConfig::instance()->GetServerPortCount();
+    int nServerPortCount    = (int)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
     int nReactorCount       = App_MainConfig::instance()->GetReactorCount();
 
     bool blState = false;

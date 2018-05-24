@@ -108,9 +108,7 @@ void CProConsoleHandle::open(ACE_HANDLE h, ACE_Message_Block&)
     ACE_Time_Value tvOpenBegin(ACE_OS::gettimeofday());
 
     //初始化key值列表
-    App_ConsoleManager::instance()->SetConsoleKey(App_MainConfig::instance()->GetConsoleKey());
-
-    //OUR_DEBUG((LM_INFO, "[CProConsoleHandle::open] [0x%08x]Connection from [%s:%d]\n", this, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
+    App_ConsoleManager::instance()->SetConsoleKey(GetXmlConfigAttribute(xmlConsoleKeys)->vec);
 
     m_atvConnect      = ACE_OS::gettimeofday();
     m_atvInput        = ACE_OS::gettimeofday();

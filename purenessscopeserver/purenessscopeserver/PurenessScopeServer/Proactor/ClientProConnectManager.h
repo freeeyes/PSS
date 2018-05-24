@@ -13,6 +13,7 @@
 #include "BaseClientConnectManager.h"
 #include "ProactorUDPClient.h"
 #include "HashTable.h"
+#include "XmlConfig.h"
 
 #define PRO_CONNECT_SERVER_TIMEOUT 100*1000
 

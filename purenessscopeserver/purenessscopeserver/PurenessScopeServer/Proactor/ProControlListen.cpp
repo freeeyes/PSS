@@ -60,7 +60,7 @@ bool CProControlListen::AddListen( const char* pListenIP, uint32 u4Port, uint8 u
         return false;
     }
 
-    int nRet = pProConnectAcceptor->open(listenAddr, 0, 1, App_MainConfig::instance()->GetBacklog(), 1, pProactor);
+    int nRet = pProConnectAcceptor->open(listenAddr, 0, 1, GetXmlConfigAttribute(xmlNetWorkMode)->BackLog, 1, pProactor);
 
     if(-1 == nRet)
     {
@@ -94,17 +94,15 @@ uint32 CProControlListen::GetListenCount()
     if (0 == App_ProConnectAcceptManager::instance()->GetCount())
     {
         //监控尚未启动，需要从配置文件中获取
-        int nServerPortCount = App_MainConfig::instance()->GetServerPortCount();
+        int nServerPortCount = (int)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
 
         for (int i = 0; i < nServerPortCount; i++)
         {
             _ControlInfo objInfo;
 
-            _ServerInfo* pServerInfo = App_MainConfig::instance()->GetServerPort(i);
-
             sprintf_safe(objInfo.m_szListenIP,
-                         MAX_BUFF_20, "%s", pServerInfo->m_szServerIP);
-            objInfo.m_u4Port = pServerInfo->m_nPort;
+                         MAX_BUFF_20, "%s", GetXmlConfigAttribute(xmlTCPServerIPs)->vec[i].ip.c_str());
+            objInfo.m_u4Port = GetXmlConfigAttribute(xmlTCPServerIPs)->vec[i].port;
             m_vecListenList.push_back(objInfo);
         }
     }
@@ -141,5 +139,5 @@ bool CProControlListen::ShowListen(uint32 u4Index, _ControlInfo& objControlInfo)
 
 uint32 CProControlListen::GetServerID()
 {
-    return App_MainConfig::instance()->GetServerID();
+    return GetXmlConfigAttribute(xmlServerID)->id;
 }

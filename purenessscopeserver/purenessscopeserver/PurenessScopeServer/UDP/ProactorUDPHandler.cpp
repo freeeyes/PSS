@@ -38,12 +38,12 @@ int CProactorUDPHandler::OpenAddress(const ACE_INET_Addr& AddrLocal, ACE_Proacto
     //按照线程初始化统计模块的名字
     char szName[MAX_BUFF_50] = {'\0'};
     sprintf_safe(szName, MAX_BUFF_50, "发送线程");
-    m_CommandAccount.InitName(szName, App_MainConfig::instance()->GetMaxCommandCount());
+    m_CommandAccount.InitName(szName, GetXmlConfigAttribute(xmlCommandAccount)->MaxCommandCount);
 
     //初始化统计模块功能
-    m_CommandAccount.Init(App_MainConfig::instance()->GetCommandAccount(),
-                          App_MainConfig::instance()->GetCommandFlow(),
-                          App_MainConfig::instance()->GetPacketTimeOut());
+    m_CommandAccount.Init(GetXmlConfigAttribute(xmlCommandAccount)->Account,
+                          GetXmlConfigAttribute(xmlCommandAccount)->FlowAccount,
+                          GetXmlConfigAttribute(xmlThreadInfo)->DisposeTimeout);
 
 
     //设置发送超时时间（因为UDP如果客户端不存在的话，sendto会引起一个recv错误）
@@ -86,10 +86,10 @@ int CProactorUDPHandler::OpenAddress(const ACE_INET_Addr& AddrLocal, ACE_Proacto
     }
 
     //初始化检查器
-    m_TimeConnectInfo.Init(App_MainConfig::instance()->GetClientDataAlert()->m_u4RecvPacketCount,
-                           App_MainConfig::instance()->GetClientDataAlert()->m_u4RecvDataMax,
-                           App_MainConfig::instance()->GetClientDataAlert()->m_u4SendPacketCount,
-                           App_MainConfig::instance()->GetClientDataAlert()->m_u4SendDataMax);
+    m_TimeConnectInfo.Init(GetXmlConfigAttribute(xmlClientData)->RecvPacketCount,
+                           GetXmlConfigAttribute(xmlClientData)->RecvDataMax,
+                           GetXmlConfigAttribute(xmlClientData)->SendPacketCount,
+                           GetXmlConfigAttribute(xmlClientData)->SendDataMax);
 
     m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
 
