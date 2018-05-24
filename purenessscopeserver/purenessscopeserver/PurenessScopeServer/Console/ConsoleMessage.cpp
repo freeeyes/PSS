@@ -2,7 +2,6 @@
 
 CConsoleMessage::CConsoleMessage()
 {
-    m_pvecConsoleKey = NULL;
     m_objConsolePromissions.Init(CONSOLECONFIG);
 
     Init();
@@ -296,22 +295,17 @@ int CConsoleMessage::DoCommand(_CommandInfo& CommandInfo, IBuffPacket* pCurrBuff
     return CONSOLE_MESSAGE_SUCCESS;
 }
 
-bool CConsoleMessage::SetConsoleKey(vecConsoleKey* pvecConsoleKey)
+bool CConsoleMessage::SetConsoleKey(vector<xmlConsoleKeys::_ConsoleKey> vecConsoleKeyList)
 {
-    m_pvecConsoleKey = pvecConsoleKey;
+    m_vecConsolekeyList.swap(vecConsoleKeyList);
     return true;
 }
 
 bool CConsoleMessage::CheckConsoleKey(const char* pKey)
 {
-    if (NULL == m_pvecConsoleKey)
+    for (int i = 0; i < (int)m_vecConsolekeyList.size(); i++)
     {
-        return false;
-    }
-
-    for (int i = 0; i < (int)m_pvecConsoleKey->size(); i++)
-    {
-        if (ACE_OS::strcmp((*m_pvecConsoleKey)[i].m_szKey, pKey) == 0)
+        if (ACE_OS::strcmp(m_vecConsolekeyList[i].Key.c_str(), pKey) == 0)
         {
             //key值对上了
             return true;

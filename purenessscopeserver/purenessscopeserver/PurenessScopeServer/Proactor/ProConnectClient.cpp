@@ -93,7 +93,7 @@ void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 
     //从配置文件获取数据
-    m_u4MaxPacketSize  = App_MainConfig::instance()->GetRecvBuffSize();
+    m_u4MaxPacketSize  = GetXmlConfigAttribute(xmlRecvInfo)->RecvBuffSize;
 
     m_nIOCount = 1;
     this->handle(h);
@@ -116,7 +116,7 @@ void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
     App_ClientProConnectManager::instance()->SetHandler(m_nServerID, this);
     m_pClientMessage = App_ClientProConnectManager::instance()->GetClientMessage(m_nServerID);
 
-    if (false == RecvData(App_MainConfig::instance()->GetConnectServerRecvBuffer(), NULL))
+    if (false == RecvData(GetXmlConfigAttribute(xmlConnectServer)->Recvbuff, NULL))
     {
         OUR_DEBUG((LM_DEBUG, "[CProConnectClient::open](%d)GetConnectServerRecvBuffer is error.\n", m_nServerID));
     }
@@ -128,11 +128,6 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
 
     ACE_Message_Block& mb = result.message_block();
     uint32 u4PacketLen = (uint32)result.bytes_transferred();
-
-    //OUR_DEBUG((LM_DEBUG,"[CProConnectClient::handle_read_stream] m_nServerID=%d, bytes_transferred=%d, this=0x%08x.\n",
-    //  m_nServerID,
-    //  u4PacketLen,
-    //  this));
 
     if(!result.success() || u4PacketLen == 0)
     {
@@ -211,7 +206,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                 memcpy_safe(pmbSave->wr_ptr(), (uint32)mb.length(), mb.rd_ptr(), (uint32)mb.length());
                 pmbSave->wr_ptr(mb.length());
 
-                if (false == RecvData(App_MainConfig::instance()->GetConnectServerRecvBuffer(), pmbSave))
+                if (false == RecvData(GetXmlConfigAttribute(xmlConnectServer)->Recvbuff, pmbSave))
                 {
                     OUR_DEBUG((LM_INFO, "[CProConnectClient::handle_read_stream](%d)RecvData is fail.\n", m_nServerID));
                 }
@@ -219,7 +214,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         }
         else
         {
-            if (false == RecvData(App_MainConfig::instance()->GetConnectServerRecvBuffer(), NULL))
+            if (false == RecvData(GetXmlConfigAttribute(xmlConnectServer)->Recvbuff, NULL))
             {
                 OUR_DEBUG((LM_INFO, "[CProConnectClient::handle_read_stream](%d)RecvData is fail.\n", m_nServerID));
             }
@@ -324,7 +319,7 @@ bool CProConnectClient::SendData(ACE_Message_Block* pmblk)
     //OUR_DEBUG((LM_DEBUG, "[CProConnectClient::SendData]Begin.\n"));
 
     //如果是DEBUG状态，记录当前接受包的二进制数据
-    if(App_MainConfig::instance()->GetDebug() == DEBUG_ON)
+    if(GetXmlConfigAttribute(xmlServerType)->Debug == DEBUG_ON)
     {
         char szDebugData[MAX_BUFF_1024] = {'\0'};
         char szLog[10]  = {'\0'};

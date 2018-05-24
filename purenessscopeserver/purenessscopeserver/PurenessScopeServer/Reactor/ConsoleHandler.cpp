@@ -90,7 +90,7 @@ int CConsoleHandler::open(void*)
 {
     m_nIOCount = 1;
     //初始化key值列表
-    App_ConsoleManager::instance()->SetConsoleKey(App_MainConfig::instance()->GetConsoleKey());
+    App_ConsoleManager::instance()->SetConsoleKey(GetXmlConfigAttribute(xmlConsoleKeys)->vec);
     int nRet = ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>::open();
 
     if (nRet != 0)
