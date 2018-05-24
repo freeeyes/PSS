@@ -164,7 +164,6 @@ CMessagePool::CMessagePool()
 CMessagePool::~CMessagePool()
 {
     OUR_DEBUG((LM_INFO, "[CMessagePool::~CMessagePool].\n"));
-    CObjectPoolManager<CMessage, ACE_Recursive_Thread_Mutex>::Close_Object(CMessagePool::Close_Callback);
     OUR_DEBUG((LM_INFO, "[CMessagePool::~CMessagePool]End.\n"));
 }
 

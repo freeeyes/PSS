@@ -3,13 +3,6 @@
 #include "define.h"
 #include "XmlOpeation.h"
 
-#include "ace/Singleton.h"
-#include <vector>
-
-#include "PacketParse.h"
-#include "IpCheck.h"
-
-
 //main.xml配置枚举
 
 /*1.枚举值以复数s结束的可能该类型有多个，并作为数组元素
@@ -86,12 +79,13 @@ public:
 	template<class T>
 	T* GetXmlConfig();
 private:
-	bool Init(const char* pFileName, XmlConfig start, XmlConfig end);
+	bool InitFile(const char* pFileName, XmlConfig start, XmlConfig end);
 	CXmlOpeation m_XmlOpeation;
 };
 
 typedef ACE_Singleton<XMainConfig, ACE_Null_Mutex> App_XmlConfig;
 
+#define GetXmlConfigAttribute(XmlClass) App_XmlConfig::instance()->GetXmlConfig<XmlClass>()
 
 class IConfigOpeation
 {

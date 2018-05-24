@@ -47,13 +47,16 @@ before_script:
 #
 matrix:
   include:
-  
   #
   # Build and sonarcloud
   #  
   - os: linux
     script: 
         - export    
+        - wget https://bootstrap.pypa.io/ez_setup.py -O - | sudo python
+        - sudo easy_install gcovr
+        #- pip install --upgrade pip
+        #- pip install gcovr
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
         # Compile by gcov
         - $ACE_ROOT/bin/mwc.pl -type gnuace psssonar.mwc
@@ -76,11 +79,14 @@ matrix:
         - sleep 5
         # collect gcov report
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/.obj
-        - LC_ALL=en gcov --branch-probabilities --branch-counts ../../PurenessScopeServer.cpp -o ./
-        - ls
-        # gcovr -r WHERE_SONAR_SCANNER_WILL_RUN -x --object-directory=ABSOLUTE_PATH_TO_GCOV_FILES_FOLDER > report.xml
+        # - ls
+        - gcovr -r ../ -o ../../report.xml --xml-pretty
+        # - cd ../
+        # - ls -l
+        # - gcov --branch-probabilities --branch-counts ../../PurenessScopeServer.cpp -o ./
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer
-        - sonar-scanner
+        - ls -l
+        - sonar-scanner -X
 
     addons:
       sonarcloud:

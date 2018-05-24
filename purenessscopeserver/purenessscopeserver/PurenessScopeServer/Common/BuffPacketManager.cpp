@@ -8,7 +8,6 @@ CBuffPacketManager::CBuffPacketManager()
 CBuffPacketManager::~CBuffPacketManager()
 {
     OUR_DEBUG((LM_INFO, "[CBuffPacketManager::~CBuffPacketManager]Begin.\n"));
-    CObjectPoolManager<CBuffPacket, ACE_Recursive_Thread_Mutex>::Close_Object(CBuffPacketManager::Close_Callback);
 }
 
 void CBuffPacketManager::Init_Callback(int nIndex, CBuffPacket* pBuffPacket)
