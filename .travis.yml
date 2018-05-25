@@ -53,10 +53,8 @@ matrix:
   - os: linux
     script: 
         - export    
-        - wget https://bootstrap.pypa.io/ez_setup.py -O - | sudo python
-        - sudo easy_install gcovr
-        #- pip install --upgrade pip
-        #- pip install gcovr
+        # - wget https://bootstrap.pypa.io/ez_setup.py -O - | sudo python
+        # - sudo easy_install gcovr
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
         # Compile by gcov
         - $ACE_ROOT/bin/mwc.pl -type gnuace psssonar.mwc
@@ -80,10 +78,17 @@ matrix:
         # collect gcov report
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/.obj
         # - ls
-        - gcovr -r ../ -o ../../report.xml --xml-pretty
+        # - gcovr -r ../ -o ../../report.xml --xml-pretty
         # - cd ../
         # - ls -l
         # - gcov --branch-probabilities --branch-counts ../../PurenessScopeServer.cpp -o ./
+        - gcov -r -o . ../../*.cpp
+        - gcov -r -o . ../../Common/*.cpp
+        - gcov -r -o . ../../FileTest/*.cpp
+        - gcov -r -o . ../../PacketParse/*.cpp
+        - gcov -r -o . ../../Message/*.cpp
+        - gcov -r -o . ../../Reactor/*.cpp
+        - gcov -r -o . ../../LogSystem/*.cpp
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer
         - ls -l
         - sonar-scanner -X
