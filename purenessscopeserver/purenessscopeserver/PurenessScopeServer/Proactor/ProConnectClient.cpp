@@ -147,7 +147,6 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
             }
         }
 
-        //OUR_DEBUG((LM_INFO, "[CProConnectClient::handle_read_stream]m_ems2s=%d.\n", m_ems2s));
         Close();
         return;
     }

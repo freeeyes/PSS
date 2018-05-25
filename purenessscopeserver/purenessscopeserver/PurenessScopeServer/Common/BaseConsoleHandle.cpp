@@ -58,3 +58,16 @@ bool Console_Common_CheckMessage_Data(uint32& u4AllRecvSize, uint32& u4AllRecvCo
         return false;
     }
 }
+
+bool check_console_ip(const char* pConsoleIP)
+{
+    for (int i = 0; i < (int)GetXmlConfigAttribute(xmlConsoleClients)->vec.size(); i++)
+    {
+        if (ACE_OS::strcmp(GetXmlConfigAttribute(xmlConsoleClients)->vec[i].cip.c_str(), pConsoleIP) == 0)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}

@@ -3,7 +3,7 @@
 bool Recv_Common_Dispose_Client_Message(uint16 u2CommandID, ACE_Message_Block* pRecvFinish, _ClientIPInfo& objServerIPInfo, IClientMessage* pClientMessage)
 {
     //有数据需要处理，则处理
-    if (App_MainConfig::instance()->GetConnectServerRunType() == 0)
+    if (GetXmlConfigAttribute(xmlConnectServer)->RunType = 0)
     {
         //调用数据包处理
         pClientMessage->RecvData(u2CommandID, pRecvFinish, objServerIPInfo);

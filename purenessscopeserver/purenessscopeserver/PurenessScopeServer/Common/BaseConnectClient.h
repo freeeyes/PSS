@@ -9,6 +9,7 @@
 #include "ClientMessage.h"
 #include "ServerMessageTask.h"
 #include "MessageService.h"
+#include "XmlConfig.h"
 
 //接收来自服务器间通讯的消息，并处理
 bool Recv_Common_Dispose_Client_Message(uint16 u2CommandID, ACE_Message_Block* pRecvFinish, _ClientIPInfo& objServerIPInfo, IClientMessage* pClientMessage);

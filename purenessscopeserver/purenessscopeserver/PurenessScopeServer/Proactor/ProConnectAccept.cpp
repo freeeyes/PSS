@@ -47,7 +47,7 @@ int ProConnectAcceptor::validate_connection (const ACE_Asynch_Accept::Result& re
         const ACE_INET_Addr& local)
 {
     //如果正在处理的链接超过了服务器设定的数值，则不允许链接继续链接服务器
-    if(App_ProConnectHandlerPool::instance()->GetUsedCount() > GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount)
+    if(App_ProConnectHandlerPool::instance()->GetUsedCount() > (int)GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount)
     {
         OUR_DEBUG((LM_ERROR, "[ProConnectAcceptor::validate_connection]Connect is more MaxHandlerCount(%d > %d).\n",
                    App_ProConnectHandlerPool::instance()->GetUsedCount(),

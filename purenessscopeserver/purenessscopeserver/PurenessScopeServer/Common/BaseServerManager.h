@@ -17,6 +17,7 @@
 #include "BuffPacketManager.h"
 #include "Frame_Logging_Strategy.h"
 #include "ControlListen.h"
+#include "XmlConfig.h"
 
 //初始化ACE输出性质
 bool Server_Manager_Common_FrameLogging(Frame_Logging_Strategy*& pFrameLoggingStrategy);

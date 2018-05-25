@@ -51,16 +51,6 @@ bool CAceProactor::Init(int nProactorType, int nThreadCount)
 
         case Proactor_WIN32:    //这个功能限制于Windows操作的默认反应器，如果是COM服务器可以使用Proactor_WFMO_msg
             {
-                /*
-                int nEventCount = 0;
-
-                if(nThreadCount == 0)
-                {
-                    //得到CPU的个数，监听线程根据CPU数量来创建多个事件回调。
-                    nEventCount = ACE_OS::num_processors_online() * 2;
-                }
-                */
-
                 ACE_WIN32_Proactor* pWin32Proactor = new ACE_WIN32_Proactor(nThreadCount);
 
                 if(NULL == pWin32Proactor)
@@ -323,8 +313,6 @@ bool CAceProactorManager::StopProactor()
             {
                 OUR_DEBUG((LM_ERROR, "[CAceProactorManager::StopProactor]ProactorID=%d stop error.\n", pAceProactor->GetProactorID()));
             }
-
-            //pAceProactor->wait();
         }
     }
 
@@ -348,7 +336,6 @@ ACE_Proactor* CAceProactorManager::GetAce_Proactor(int nProactorID)
         return NULL;
     }
 
-    //OUR_DEBUG((LM_INFO, "CAceProactorManager::GetAce_Proactor id=[%d] pAceProactor=[0x%@]\n",nProactorID, pAceProactor));
     if(NULL != m_pAceProactorList[nProactorID])
     {
         return m_pAceProactorList[nProactorID]->GetProactor();

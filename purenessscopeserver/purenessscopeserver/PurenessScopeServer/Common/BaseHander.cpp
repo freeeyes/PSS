@@ -556,15 +556,15 @@ bool Tcp_Common_Manager_Post_Message(_Post_Message_Param obj_Post_Message_Param,
 void Tcp_Common_Manager_Timeout_CheckInfo(int nActiveConnectCount)
 {
     //检测连接总数是否超越监控阀值
-    if (App_MainConfig::instance()->GetConnectAlert()->m_u4ConnectAlert > 0
-        && nActiveConnectCount > (int)App_MainConfig::instance()->GetConnectAlert()->m_u4ConnectAlert)
+    if (GetXmlConfigAttribute(xmlAlertConnect)->ConnectAlert > 0
+        && nActiveConnectCount > (int)GetXmlConfigAttribute(xmlAlertConnect)->ConnectAlert)
     {
         AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
-                                               App_MainConfig::instance()->GetConnectAlert()->m_u4MailID,
+                                               GetXmlConfigAttribute(xmlAlertConnect)->MailID,
                                                (char*)"Alert",
                                                "[Tcp_Common_Manager_Timeout_CheckInfo]active ConnectCount is more than limit(%d > %d).",
                                                nActiveConnectCount,
-                                               App_MainConfig::instance()->GetConnectAlert()->m_u4ConnectAlert);
+                                               GetXmlConfigAttribute(xmlAlertConnect)->ConnectAlert);
     }
 
     //检测单位时间连接数是否超越阀值
@@ -573,7 +573,7 @@ void Tcp_Common_Manager_Timeout_CheckInfo(int nActiveConnectCount)
     if (nCheckRet == 1)
     {
         AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
-                                               App_MainConfig::instance()->GetConnectAlert()->m_u4MailID,
+                                               GetXmlConfigAttribute(xmlAlertConnect)->MailID,
                                                "Alert",
                                                "[Tcp_Common_Manager_Timeout_CheckInfo]CheckConnectCount is more than limit(%d > %d).",
                                                App_ConnectAccount::instance()->GetCurrConnect(),
@@ -582,7 +582,7 @@ void Tcp_Common_Manager_Timeout_CheckInfo(int nActiveConnectCount)
     else if (nCheckRet == 2)
     {
         AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
-                                               App_MainConfig::instance()->GetConnectAlert()->m_u4MailID,
+                                               GetXmlConfigAttribute(xmlAlertConnect)->MailID,
                                                "Alert",
                                                "[Tcp_Common_Manager_Timeout_CheckInfo]CheckConnectCount is little than limit(%d < %d).",
                                                App_ConnectAccount::instance()->GetCurrConnect(),
@@ -595,7 +595,7 @@ void Tcp_Common_Manager_Timeout_CheckInfo(int nActiveConnectCount)
     if (nCheckRet == 1)
     {
         AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
-                                               App_MainConfig::instance()->GetConnectAlert()->m_u4MailID,
+                                               GetXmlConfigAttribute(xmlAlertConnect)->MailID,
                                                "Alert",
                                                "[Tcp_Common_Manager_Timeout_CheckInfo]CheckDisConnectCount is more than limit(%d > %d).",
                                                App_ConnectAccount::instance()->GetCurrConnect(),
@@ -604,7 +604,7 @@ void Tcp_Common_Manager_Timeout_CheckInfo(int nActiveConnectCount)
     else if (nCheckRet == 2)
     {
         AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
-                                               App_MainConfig::instance()->GetConnectAlert()->m_u4MailID,
+                                               GetXmlConfigAttribute(xmlAlertConnect)->MailID,
                                                "Alert",
                                                "[Tcp_Common_Manager_Timeout_CheckInfo]CheckDisConnectCount is little than limit(%d < %d).",
                                                App_ConnectAccount::instance()->GetCurrConnect(),
@@ -638,16 +638,16 @@ void Tcp_Common_Manager_Init(uint16 u2Index, CCommandAccount& objCommandAccount,
     //按照线程初始化统计模块的名字
     char szName[MAX_BUFF_50] = { '\0' };
     sprintf_safe(szName, MAX_BUFF_50, "发送线程(%d)", u2Index);
-    objCommandAccount.InitName(szName, App_MainConfig::instance()->GetMaxCommandCount());
+    objCommandAccount.InitName(szName, GetXmlConfigAttribute(xmlCommandAccount)->MaxCommandCount);
 
     //初始化统计模块功能
-    objCommandAccount.Init(App_MainConfig::instance()->GetCommandAccount(),
-                           App_MainConfig::instance()->GetCommandFlow(),
-                           App_MainConfig::instance()->GetPacketTimeOut());
+    objCommandAccount.Init(GetXmlConfigAttribute(xmlCommandAccount)->Account,
+                           GetXmlConfigAttribute(xmlCommandAccount)->FlowAccount,
+                           GetXmlConfigAttribute(xmlThreadInfo)->DisposeTimeout);
 
     //初始化队列最大发送缓冲数量
-    u2SendQueueMax = App_MainConfig::instance()->GetSendQueueMax();
+    u2SendQueueMax = GetXmlConfigAttribute(xmlSendInfo)->SendQueueMax;
 
     //初始化发送缓冲池
-    objSendCacheManager.Init(App_MainConfig::instance()->GetBlockCount(), App_MainConfig::instance()->GetBlockSize());
+    objSendCacheManager.Init(GetXmlConfigAttribute(xmlSendInfo)->BlockCount, GetXmlConfigAttribute(xmlSendInfo)->MaxBlockSize);
 }

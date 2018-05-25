@@ -12,7 +12,8 @@ int CProConsoleConnectAcceptor::validate_connection (const ACE_Asynch_Accept::Re
         const ACE_INET_Addr& local)
 {
     //如果不在服务器允许的IP范围中，则不需链接
-    if(App_MainConfig::instance()->CompareConsoleClinetIP(remote.get_host_addr()) == false)
+    //if(App_MainConfig::instance()->CompareConsoleClinetIP(remote.get_host_addr()) == false)
+    if(false == check_console_ip(remote.get_host_addr()))
     {
         return -1;
     }

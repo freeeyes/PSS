@@ -12,6 +12,7 @@
 #include "FileTest.h"
 #include "SendCacheManager.h"
 #include "ace/SOCK_Dgram.h"
+#include "XmlConfig.h"
 
 //所有的handler用到的公共函数
 //add by freeeyes
