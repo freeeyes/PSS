@@ -75,11 +75,13 @@ class IConfigOpeation;
 class XMainConfig
 {
 public:
-	XMainConfig() { Init(); }
+	XMainConfig() { _initIsOk = Init(); }
+	bool InitIsOk() { return _initIsOk; }
 	bool Init();
 	template<class T>
 	T* GetXmlConfig();
 private:
+	bool _initIsOk;
 	bool InitFile(const char* pFileName, XmlConfig start, XmlConfig end);
 	CXmlOpeation m_XmlOpeation;
 };
