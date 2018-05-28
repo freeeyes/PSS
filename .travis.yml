@@ -76,21 +76,21 @@ matrix:
         - killall PurenessScopeServer
         - sleep 5
         # collect gcov report
-        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/.obj
-        # - ls
+        # - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/.obj
         # - gcovr -r ../ -o ../../report.xml --xml-pretty
         # - cd ../
         # - ls -l
-        # - gcov --branch-probabilities --branch-counts ../../PurenessScopeServer.cpp -o ./
-        - gcov -r -o . ../../*.cpp
-        - gcov -r -o . ../../Common/*.cpp
-        - gcov -r -o . ../../FileTest/*.cpp
-        - gcov -r -o . ../../PacketParse/*.cpp
-        - gcov -r -o . ../../Message/*.cpp
-        - gcov -r -o . ../../Reactor/*.cpp
-        - gcov -r -o . ../../LogSystem/*.cpp
-        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer
-        - ls -l
+        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
+        - gcov -r -o ./.obj ../*.cpp
+        - gcov -r -o ./.obj ../Common/*.cpp
+        - gcov -r -o ./.obj ../Console/*.cpp
+        - gcov -r -o ./.obj ../FileTest/*.cpp
+        - gcov -r -o ./.obj ../TinyXML/*.cpp
+        - gcov -r -o ./.obj ../PacketParse/*.cpp
+        - gcov -r -o ./.obj ../LogSystem/*.cpp
+        - gcov -r -o ./.obj ../Message/*.cpp
+        - gcov -r -o ./.obj ../Reactor/*.cpp
+        - gcov -r -o ./.obj ../Mail/*.cpp
         - sonar-scanner -X
 
     addons:
