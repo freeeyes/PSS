@@ -6,36 +6,36 @@
  	<th>time cost(ms)</th>
    </tr>
     <tr>
-      <td colspan="4">[Test CI run UTC time] 2018-05-28 08:44:51</td>
+      <td colspan="4">[Test CI run UTC time] 2018-05-28 09:26:07</td>
     </tr>
-   <tr style="background-color:#C1FFC1;color:Black;">
+   <tr style="background-color:#CD5C5C;color:Black;">
 <td>single packet test</td>
-<td>0</td>
-<td>[s][127.0.0.1:10002]success.</td>
-<td>0.470000ms</td>
-<tr style="background-color:#C1FFC1;color:Black;">
+<td>1</td>
+<td>[e][127.0.0.1:10002]connnect server fail.[Connection refused].</td>
+<td>0.063000ms</td>
+<tr style="background-color:#CD5C5C;color:Black;">
 <td>multiple packet test(10)</td>
-<td>0</td>
-<td>[s][127.0.0.1:10002]success.</td>
-<td>1.228000ms</td>
-<tr style="background-color:#C1FFC1;color:Black;">
+<td>1</td>
+<td>[e][127.0.0.1:10002]connnect server fail.[Connection refused].</td>
+<td>0.024000ms</td>
+<tr style="background-color:#CD5C5C;color:Black;">
 <td>multiple connect test(10)</td>
-<td>0</td>
-<td>[s][127.0.0.1:10002]success.</td>
-<td>5.750000ms</td>
-<tr style="background-color:#C1FFC1;color:Black;">
+<td>1</td>
+<td>[e][127.0.0.1:10002]connnect server fail.[Connection refused].</td>
+<td>0.017000ms</td>
+<tr style="background-color:#CD5C5C;color:Black;">
 <td>unvaild packet test</td>
-<td>0</td>
-<td>[s][127.0.0.1:10002]success.[Connection reset by peer]</td>
-<td>0.486000ms</td>
-<tr style="background-color:#C1FFC1;color:Black;">
+<td>1</td>
+<td>[e][127.0.0.1:10002]connnect server fail.[Connection refused].</td>
+<td>0.015000ms</td>
+<tr style="background-color:#CD5C5C;color:Black;">
 <td>helf packet test</td>
-<td>0</td>
-<td>[s][127.0.0.1:10002]success.</td>
-<td>0.407000ms</td>
+<td>1</td>
+<td>[e][127.0.0.1:10002]connnect server fail.[Connection refused].</td>
+<td>0.015000ms</td>
 <tr style="background-color:#C1FFC1;color:Black;">
 <td>Muliple connect packet test</td>
 <td>0</td>
 <td>[s][127.0.0.1:10002]success.</td>
-<td>3.927000ms</td>
+<td>0.532000ms</td>
  </table>
