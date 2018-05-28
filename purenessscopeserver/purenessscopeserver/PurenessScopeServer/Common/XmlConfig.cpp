@@ -1,5 +1,5 @@
 #include "XmlConfig.h"
-
+#include "define.h"
 /*数组元素对应的元素位置已经在构造时候按枚举确认*/
 IConfigOpeation* IConfigOpeation::_array[XML_Config_MAX];
 
@@ -110,9 +110,80 @@ bool xmlSendInfo::Init(CXmlOpeation* m_pXmlOpeation)
 
 bool xmlNetWorkMode::Init(CXmlOpeation* m_pXmlOpeation)
 {
-	return (m_pXmlOpeation->Read_XML_Data_Single_String("NetWorkMode", "Mode", Mode)
+	bool bKet = false;
+	std::string strMode;
+	std::string strNetByteOrder;
+
+	if (m_pXmlOpeation->Read_XML_Data_Single_String("NetWorkMode", "Mode", strMode)
 		&& m_pXmlOpeation->Read_XML_Data_Single_Uint16("NetWorkMode", "BackLog", BackLog)
-		&& m_pXmlOpeation->Read_XML_Data_Single_String("NetWorkMode", "ByteOrder", ByteOrder));
+		&& m_pXmlOpeation->Read_XML_Data_Single_String("NetWorkMode", "ByteOrder", strNetByteOrder))
+	{
+		SetNetByteOrder(strNetByteOrder);
+		SetLocalByteOrder();
+		bKet = SetIOMode(strMode);
+	}
+
+	return bKet;
+}
+
+bool xmlNetWorkMode::SetIOMode(const std::string& pData)
+{
+	bool bKet = true;
+
+	if (pData.compare("Iocp") == 0)
+	{
+		Mode = (uint8)NETWORKMODE_PRO_IOCP;
+	}
+	else if (pData.compare("Select") == 0)
+	{
+		Mode = (uint8)NETWORKMODE_RE_SELECT;
+	}
+	else if (pData.compare("Poll") == 0)
+	{
+		Mode = (uint8)NETWORKMODE_RE_TPSELECT;
+	}
+	else if (pData.compare("Epoll") == 0)
+	{
+		Mode = (uint8)NETWORKMODE_RE_EPOLL;
+	}
+	else if (pData.compare("Epoll_et") == 0)
+	{
+		Mode = (uint8)NETWORKMODE_RE_EPOLL_ET;
+	}
+	else
+	{
+		OUR_DEBUG((LM_INFO, "[CMainConfig::Init_Main]NetworkMode is Invalid!!, please read main.xml desc.\n"));
+		bKet = false;
+	}
+
+	return bKet;
+}
+
+void xmlNetWorkMode::SetLocalByteOrder()
+{
+	//判定字节序
+	if (O32_HOST_ORDER == O32_LITTLE_ENDIAN)
+	{
+		LocalByteOrder = SYSTEM_LITTLE_ORDER;
+		OUR_DEBUG((LM_INFO, "[CMainConfig::CMainConfig]SYSYTEM SYSTEM_LITTLE_ORDER.\n"));
+	}
+	else
+	{
+		LocalByteOrder = SYSTEM_BIG_ORDER;
+		OUR_DEBUG((LM_INFO, "[CMainConfig::CMainConfig]SYSYTEM SYSTEM_BIG_ORDER.\n"));
+	}
+}
+
+void xmlNetWorkMode::SetNetByteOrder(const std::string& pData)
+{
+	if (pData.compare("NET_ORDER") == 0)
+	{
+		NetByteOrder = true;
+	}
+	else
+	{
+		NetByteOrder = false;
+	}
 }
 
 

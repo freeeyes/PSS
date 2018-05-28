@@ -145,11 +145,17 @@ public:
 class xmlNetWorkMode : public IConfigOpeation
 {
 public:
-	std::string Mode;
+	uint8 Mode;
     uint16 BackLog;
-    std::string ByteOrder;
-    xmlNetWorkMode(XmlConfig config) : IConfigOpeation(config), Mode(0), BackLog(0), ByteOrder(false) {}
+    bool NetByteOrder;
+	ENUM_CHAR_ORDER LocalByteOrder;
+    xmlNetWorkMode(XmlConfig config) : IConfigOpeation(config), Mode(0), 
+		BackLog(0), NetByteOrder(false), LocalByteOrder(SYSTEM_BIG_ORDER){}
     bool Init(CXmlOpeation* pXmlOpeation);
+private:
+	bool SetIOMode(const std::string& pData);
+	void SetLocalByteOrder();
+	void SetNetByteOrder(const std::string& pData);
 };
 
 class xmlTCPServerIPs : public IConfigOpeation

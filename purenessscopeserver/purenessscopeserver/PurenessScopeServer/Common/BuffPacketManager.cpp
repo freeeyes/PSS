@@ -14,6 +14,7 @@ void CBuffPacketManager::Init_Callback(int nIndex, CBuffPacket* pBuffPacket)
 {
     //ÉèÖÃBuffPacketÄ¬ÈÏ×ÖÐò
     pBuffPacket->Init(DEFINE_PACKET_SIZE, GetXmlConfigAttribute(xmlMessage)->Msg_Buff_Max_Size);
+    pBuffPacket->SetNetSort(GetXmlConfigAttribute(xmlNetWorkMode)->NetByteOrder);
     pBuffPacket->SetBuffID(nIndex);
     pBuffPacket->SetHashID(nIndex);
 }

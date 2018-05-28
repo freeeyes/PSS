@@ -230,12 +230,6 @@ public:
     }
 };
 
-enum ENUM_CHAR_ORDER
-{
-    SYSTEM_LITTLE_ORDER = 0,   //Ð¡¶Ë×ÖÐò
-    SYSTEM_BIG_ORDER,          //´ó¶Ë×ÖÐò
-};
-
 class CMainConfig
 {
 public:

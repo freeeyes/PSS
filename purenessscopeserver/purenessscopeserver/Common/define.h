@@ -1393,6 +1393,12 @@ private:
 //获得对自己大小端的自我判定
 //添加在mainConfig中，是因为没必要在define.h中判定
 //在框架里自己判定是否转换大小端
+enum ENUM_CHAR_ORDER
+{
+	SYSTEM_LITTLE_ORDER = 0,   //小端字序
+	SYSTEM_BIG_ORDER,          //大端字序
+};
+
 enum
 {
     O32_LITTLE_ENDIAN = 0x03020100ul,
