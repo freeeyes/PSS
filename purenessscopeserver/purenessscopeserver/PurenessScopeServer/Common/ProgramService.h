@@ -29,7 +29,7 @@ static int32 ServerMain()
         return 0;
     }
 
-    if(App_MainConfig::instance()->GetServerType() == 0)
+    if(GetXmlConfigAttribute(xmlServerType)->Type == 0)
     {
         //等待服务结束
         ACE_Thread_Manager::instance()->wait();

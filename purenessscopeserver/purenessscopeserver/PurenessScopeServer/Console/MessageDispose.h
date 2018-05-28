@@ -19,6 +19,7 @@
 #include "IObject.h"
 #include "FileTestManager.h"
 #include "ConsolePromiss.h"
+#include "XmlConfig.h"
 
 #ifdef WIN32
 #include "ProConnectHandle.h"

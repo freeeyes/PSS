@@ -86,7 +86,8 @@ bool Process::parse_args(int argc, ACE_TCHAR* argv[])
 
 int Process::run(int argc, ACE_TCHAR* argv[])
 {
-    App_Service::instance()->name(ACE_TEXT (App_MainConfig::instance()->GetDisplayServiceName()), ACE_TEXT (App_MainConfig::instance()->GetWindowsServiceName()));
+    App_Service::instance()->name(ACE_TEXT (GetXmlConfigAttribute(xmlServerType)->displayname.c_str()),
+                                  ACE_TEXT (GetXmlConfigAttribute(xmlServerType)->name.c_str()));
 
     bool blStata = parse_args(argc, argv);
 
@@ -190,11 +191,11 @@ void Process::startprocesslog()
     //是否打开ACE_DEBUG文件存储
     Logging_Config_Param objParam;
 
-    sprintf_safe(objParam.m_strLogFile, 256, "%s", (string(App_MainConfig::instance()->GetDisplayServiceName()) + string(".log")).c_str());
-    objParam.m_iChkInterval    = App_MainConfig::instance()->GetChkInterval();
-    objParam.m_iLogFileMaxCnt  = App_MainConfig::instance()->GetLogFileMaxCnt();
-    objParam.m_iLogFileMaxSize = App_MainConfig::instance()->GetLogFileMaxSize();
-    sprintf_safe(objParam.m_strLogLevel, 128, "%s", App_MainConfig::instance()->GetDebugLevel());
+    sprintf_safe(objParam.m_strLogFile, 256, "%s.log", GetXmlConfigAttribute(xmlServerType)->displayname.c_str());
+    objParam.m_iChkInterval    = (int)GetXmlConfigAttribute(xmlAceDebug)->ChkInterval;
+    objParam.m_iLogFileMaxCnt  = (int)GetXmlConfigAttribute(xmlAceDebug)->LogFileMaxCnt;
+    objParam.m_iLogFileMaxSize = (int)GetXmlConfigAttribute(xmlAceDebug)->LogFileMaxSize;
+    sprintf_safe(objParam.m_strLogLevel, 128, "%s", GetXmlConfigAttribute(xmlAceDebug)->Level.c_str());
 
     m_pFrameLoggingStrategy->InitLogStrategy(objParam);
 }

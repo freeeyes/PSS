@@ -259,7 +259,7 @@ void DoMessage_ClientMessageCount(_CommandInfo& CommandInfo, IBuffPacket* pBuffP
         {
             (*pBuffPacket) << (uint32)nActiveClient;
             (*pBuffPacket) << (uint32)nPoolClient;
-            (*pBuffPacket) << App_MainConfig::instance()->GetMaxHandlerCount();
+            (*pBuffPacket) << (uint16)GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount;
         }
         else
         {
@@ -276,12 +276,15 @@ void DoMessage_ClientMessageCount(_CommandInfo& CommandInfo, IBuffPacket* pBuffP
         {
             (*pBuffPacket) << (uint32)nActiveClient;
             (*pBuffPacket) << (uint32)nPoolClient;
-            (*pBuffPacket) << App_MainConfig::instance()->GetMaxHandlerCount();
+            (*pBuffPacket) << (uint16)GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount;
         }
         else
         {
             char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "ActiveClient(%d).\nPoolClient(%d).\nMaxHandlerCount(%d).\n", nActiveClient, nPoolClient, App_MainConfig::instance()->GetMaxHandlerCount());
+            sprintf_safe(szTemp, MAX_BUFF_1024, "ActiveClient(%d).\nPoolClient(%d).\nMaxHandlerCount(%d).\n",
+                         nActiveClient,
+                         nPoolClient,
+                         GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount);
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
         }
 
@@ -715,7 +718,7 @@ void DoMessage_ShowProcessInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
     {
         int nCPU = 0;
         int nMemorySize = 0;
-        uint8 u1Flow = App_MainConfig::instance()->GetCommandFlow();      //流量统计标记位
+        uint8 u1Flow = GetXmlConfigAttribute(xmlCommandAccount)->FlowAccount;      //流量统计标记位
         uint32 u4FlowIn = 0;      //总流量流入字节
         uint32 u4FlowOut = 0;      //总流量流出字节
 
@@ -929,17 +932,17 @@ void DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
             VCHARS_STR strSTemp;
 
             //返回服务器ID
-            uint16 u2SerevrID = (uint32)App_MainConfig::instance()->GetServerID();
+            uint16 u2SerevrID = GetXmlConfigAttribute(xmlServerID)->id;
             (*pBuffPacket) << u2SerevrID;
 
             //返回服务器名称
-            strSTemp.text = (char*)App_MainConfig::instance()->GetServerName();
-            strSTemp.u1Len = (uint8)ACE_OS::strlen(App_MainConfig::instance()->GetServerName());
+            strSTemp.text = (char*)GetXmlConfigAttribute(xmlServerName)->name.c_str();
+            strSTemp.u1Len = (uint8)GetXmlConfigAttribute(xmlServerName)->name.length();
             (*pBuffPacket) << strSTemp;
 
             //返回服务器版本
-            strSTemp.text = (char*)App_MainConfig::instance()->GetServerVersion();
-            strSTemp.u1Len = (uint8)ACE_OS::strlen(App_MainConfig::instance()->GetServerVersion());
+            strSTemp.text = (char*)GetXmlConfigAttribute(xmlServerVersion)->Version.c_str();
+            strSTemp.u1Len = (uint8)GetXmlConfigAttribute(xmlServerVersion)->Version.length();
             (*pBuffPacket) << strSTemp;
 
             //返回加载模块个数
@@ -949,8 +952,8 @@ void DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
             (*pBuffPacket) << (uint16)App_MessageServiceGroup::instance()->GetThreadInfo()->GetThreadCount();
 
             //返回当前协议包的版本号
-            strSTemp.text = (char*)App_MainConfig::instance()->GetServerVersion();
-            strSTemp.u1Len = (uint8)ACE_OS::strlen(App_MainConfig::instance()->GetPacketVersion());
+            strSTemp.text = (char*)GetXmlConfigAttribute(xmlServerVersion)->Version.c_str();
+            strSTemp.u1Len = (uint8)GetXmlConfigAttribute(xmlServerVersion)->Version.length();
             (*pBuffPacket) << strSTemp;
 
             //返回当前服务器是大端还是小端
