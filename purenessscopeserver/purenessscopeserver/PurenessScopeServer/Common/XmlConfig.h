@@ -55,7 +55,7 @@ enum XmlConfig
     XML_Config_IP,
     XML_Config_ClientData,
     XML_Config_CommandInfo,
-    XML_Config_Mail,
+    XML_Config_Mails,
     XML_Config_WorkThreadChart,
     XML_Config_ConnectChart,
     XML_Config_CommandChart,
@@ -145,9 +145,9 @@ public:
 class xmlNetWorkMode : public IConfigOpeation
 {
 public:
-    uint8 Mode;
+	std::string Mode;
     uint16 BackLog;
-    bool ByteOrder;
+    std::string ByteOrder;
     xmlNetWorkMode(XmlConfig config) : IConfigOpeation(config), Mode(0), BackLog(0), ByteOrder(false) {}
     bool Init(CXmlOpeation* pXmlOpeation);
 };
@@ -449,17 +449,23 @@ public:
     bool Init(CXmlOpeation* pXmlOpeation);
 };
 
-class xmlMail : public IConfigOpeation
+class xmlMails : public IConfigOpeation
 {
 public:
-    uint16 MailID;
-    std::string fromMailAddr;
-    std::string toMailAddr;
-    uint32 MailPass;
-    std::string MailUrl;
-    uint16 MailPort;
-    xmlMail(XmlConfig config) : IConfigOpeation(config), MailID(1), fromMailAddr("local@163.com"), toMailAddr("freeeyes@163.com"),
-        MailPass(123456), MailUrl("smtp.163.com"), MailPort(25) {}
+	class _Mail
+	{
+	public:
+		uint16 MailID;
+		std::string fromMailAddr;
+		std::string toMailAddr;
+		uint32 MailPass;
+		std::string MailUrl;
+		uint16 MailPort;
+		_Mail() : MailID(1), fromMailAddr("local@163.com"), toMailAddr("freeeyes@163.com"),
+			MailPass(123456), MailUrl("smtp.163.com"), MailPort(25) {}
+	};
+	std::vector<_Mail> _vec;
+	xmlMails(XmlConfig config) : IConfigOpeation(config){}
     bool Init(CXmlOpeation* pXmlOpeation);
 };
 

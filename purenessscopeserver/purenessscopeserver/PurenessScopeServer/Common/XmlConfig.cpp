@@ -44,7 +44,7 @@ DefineClassAndFunc(xmlAlertConnect, XML_Config_AlertConnect)
 DefineClassAndFunc(xmlIP, XML_Config_IP)
 DefineClassAndFunc(xmlClientData, XML_Config_ClientData)
 DefineClassAndFunc(xmlCommandInfo, XML_Config_CommandInfo)
-DefineClassAndFunc(xmlMail, XML_Config_Mail)
+DefineClassAndFunc(xmlMails, XML_Config_Mails)
 DefineClassAndFunc(xmlWorkThreadChart, XML_Config_WorkThreadChart)
 DefineClassAndFunc(xmlConnectChart, XML_Config_ConnectChart)
 DefineClassAndFunc(xmlCommandChart, XML_Config_CommandChart)
@@ -110,29 +110,9 @@ bool xmlSendInfo::Init(CXmlOpeation* m_pXmlOpeation)
 
 bool xmlNetWorkMode::Init(CXmlOpeation* m_pXmlOpeation)
 {
-    bool bKet = false;
-    string str_mode;
-    string str_byte;
-
-    if (m_pXmlOpeation->Read_XML_Data_Single_String("NetWorkMode", "Mode", str_mode)
-        && m_pXmlOpeation->Read_XML_Data_Single_Uint16("NetWorkMode", "BackLog", BackLog)
-        && m_pXmlOpeation->Read_XML_Data_Single_String("NetWorkMode", "ByteOrder", str_byte))
-    {
-        Mode = (uint8)ACE_OS::atoi(str_mode.c_str());
-
-        if(strcmp(str_byte.c_str(), "NET_ORDER") == 0)
-        {
-            ByteOrder = true;
-        }
-        else
-        {
-            ByteOrder = false;
-        }
-
-        bKet = true;
-    }
-
-    return bKet;
+	return (m_pXmlOpeation->Read_XML_Data_Single_String("NetWorkMode", "Mode", Mode)
+		&& m_pXmlOpeation->Read_XML_Data_Single_Uint16("NetWorkMode", "BackLog", BackLog)
+		&& m_pXmlOpeation->Read_XML_Data_Single_String("NetWorkMode", "ByteOrder", ByteOrder));
 }
 
 
@@ -368,14 +348,26 @@ bool xmlCommandInfo::Init(CXmlOpeation* pXmlOpeation)
            && pXmlOpeation->Read_XML_Data_Single_Uint32("CommandInfo", "MailID", MailID);
 }
 
-bool xmlMail::Init(CXmlOpeation* pXmlOpeation)
+bool xmlMails::Init(CXmlOpeation* pXmlOpeation)
 {
-    return pXmlOpeation->Read_XML_Data_Single_Uint16("Mail", "MailID", MailID)
-           && pXmlOpeation->Read_XML_Data_Single_String("Mail", "fromMailAddr", fromMailAddr)
-           && pXmlOpeation->Read_XML_Data_Single_String("Mail", "toMailAddr", toMailAddr)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("Mail", "MailPass", MailPass)
-           && pXmlOpeation->Read_XML_Data_Single_String("Mail", "MailUrl", MailUrl)
-           && pXmlOpeation->Read_XML_Data_Single_Uint16("Mail", "MailPort", MailPort);
+	TiXmlElement* pMailID = NULL;
+	TiXmlElement* pfromMailAddr = NULL;
+	TiXmlElement* ptoMailAddr = NULL;
+	TiXmlElement* pMailPass = NULL;
+	TiXmlElement* pMailUrl = NULL;
+	TiXmlElement* pMailPort = NULL;
+	_Mail mail;
+
+	while (pXmlOpeation->Read_XML_Data_Multiple_Uint16("Mail", "MailID", mail.MailID, pMailID)
+		&& pXmlOpeation->Read_XML_Data_Multiple_String("Mail", "fromMailAddr", mail.fromMailAddr, pfromMailAddr)
+		&& pXmlOpeation->Read_XML_Data_Multiple_String("Mail", "toMailAddr", mail.toMailAddr, ptoMailAddr)
+		&& pXmlOpeation->Read_XML_Data_Multiple_Uint32("Mail", "MailPass", mail.MailPass, pMailPass)
+		&& pXmlOpeation->Read_XML_Data_Multiple_String("Mail", "MailUrl", mail.MailUrl, pMailUrl)
+		&& pXmlOpeation->Read_XML_Data_Multiple_Uint16("Mail", "MailPort", mail.MailPort, pMailPort))
+    {
+		_vec.push_back(mail);
+    }
+	return true;
 }
 
 bool xmlWorkThreadChart::Init(CXmlOpeation* pXmlOpeation)
