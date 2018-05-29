@@ -54,7 +54,7 @@ enum XmlConfig
     XML_Config_AlertConnect,
     XML_Config_IP,
     XML_Config_ClientData,
-    XML_Config_CommandInfo,
+    XML_Config_CommandInfos,
     XML_Config_Mails,
     XML_Config_WorkThreadChart,
     XML_Config_ConnectChart,
@@ -445,13 +445,19 @@ public:
     bool Init(CXmlOpeation* pXmlOpeation);
 };
 
-class xmlCommandInfo : public IConfigOpeation
+class xmlCommandInfos : public IConfigOpeation
 {
 public:
-    uint32 CommandID;
-    uint32 CommandCount;
-    uint32 MailID;
-    xmlCommandInfo(XmlConfig config) : IConfigOpeation(config), CommandID(4096), CommandCount(0), MailID(0) {}
+	class _CommandInfo
+	{
+	public:
+		uint32 CommandID;
+		uint32 CommandCount;
+		uint32 MailID;
+		_CommandInfo() : CommandID(4096), CommandCount(0), MailID(0) {}
+	};
+	std::vector<_CommandInfo> _vec;
+	xmlCommandInfos(XmlConfig config) : IConfigOpeation(config) {}
     bool Init(CXmlOpeation* pXmlOpeation);
 };
 

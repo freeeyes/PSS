@@ -43,7 +43,7 @@ DefineClassAndFunc(xmlMessage, XML_Config_Message)
 DefineClassAndFunc(xmlAlertConnect, XML_Config_AlertConnect)
 DefineClassAndFunc(xmlIP, XML_Config_IP)
 DefineClassAndFunc(xmlClientData, XML_Config_ClientData)
-DefineClassAndFunc(xmlCommandInfo, XML_Config_CommandInfo)
+DefineClassAndFunc(xmlCommandInfos, XML_Config_CommandInfos)
 DefineClassAndFunc(xmlMails, XML_Config_Mails)
 DefineClassAndFunc(xmlWorkThreadChart, XML_Config_WorkThreadChart)
 DefineClassAndFunc(xmlConnectChart, XML_Config_ConnectChart)
@@ -424,11 +424,21 @@ bool xmlClientData::Init(CXmlOpeation* pXmlOpeation)
            && pXmlOpeation->Read_XML_Data_Single_Uint32("ClientData", "MailID", MailID);
 }
 
-bool xmlCommandInfo::Init(CXmlOpeation* pXmlOpeation)
+bool xmlCommandInfos::Init(CXmlOpeation* pXmlOpeation)
 {
-    return pXmlOpeation->Read_XML_Data_Single_Uint32("CommandInfo", "CommandID", CommandID)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("CommandInfo", "CommandCount", CommandCount)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("CommandInfo", "MailID", MailID);
+	TiXmlElement* pCommandID = NULL;
+	TiXmlElement* pCommandCount = NULL;
+	TiXmlElement* pMailID = NULL;
+	_CommandInfo commandInfo;
+
+	while (pXmlOpeation->Read_XML_Data_Multiple_Uint32("CommandInfo", "CommandID", commandInfo.CommandID, pCommandID)
+		&& pXmlOpeation->Read_XML_Data_Multiple_Uint32("CommandInfo", "CommandCount", commandInfo.CommandCount, pCommandCount)
+		&& pXmlOpeation->Read_XML_Data_Multiple_Uint32("CommandInfo", "MailID", commandInfo.MailID, pMailID))
+	{
+		_vec.push_back(commandInfo);
+	}
+
+	return true;
 }
 
 bool xmlMails::Init(CXmlOpeation* pXmlOpeation)
