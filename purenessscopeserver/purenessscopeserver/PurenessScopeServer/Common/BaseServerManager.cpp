@@ -124,38 +124,38 @@ bool Server_Manager_Common_Module()
     return true;
 }
 
-bool Server_Manager_Common_Addr(_ServerInfo* pServerInfo, ACE_INET_Addr& listenAddr)
+bool Server_Manager_Common_Addr(uint8 u4IpType, const char* pIP, uint32 u4Port, ACE_INET_Addr& listenAddr)
 {
     //ÅÐ¶ÏIPv4»¹ÊÇIPv6
     int nErr = 0;
 
-    if (pServerInfo->m_u1IPType == TYPE_IPV4)
+    if (u4IpType == TYPE_IPV4)
     {
-        if (ACE_OS::strcmp(pServerInfo->m_szServerIP, "INADDR_ANY") == 0)
+        if (ACE_OS::strcmp(pIP, "INADDR_ANY") == 0)
         {
-            nErr = listenAddr.set(pServerInfo->m_nPort, (uint32)INADDR_ANY);
+            nErr = listenAddr.set(u4Port, (uint32)INADDR_ANY);
         }
         else
         {
-            nErr = listenAddr.set(pServerInfo->m_nPort, pServerInfo->m_szServerIP);
+            nErr = listenAddr.set(u4Port, pIP);
         }
     }
     else
     {
-        if (ACE_OS::strcmp(pServerInfo->m_szServerIP, "INADDR_ANY") == 0)
+        if (ACE_OS::strcmp(pIP, "INADDR_ANY") == 0)
         {
-            nErr = listenAddr.set(pServerInfo->m_nPort, (uint32)INADDR_ANY);
+            nErr = listenAddr.set(u4Port, (uint32)INADDR_ANY);
         }
         else
         {
-            nErr = listenAddr.set(pServerInfo->m_nPort, pServerInfo->m_szServerIP, 1, PF_INET6);
+            nErr = listenAddr.set(u4Port, pIP, 1, PF_INET6);
         }
 
     }
 
     if (nErr != 0)
     {
-        OUR_DEBUG((LM_INFO, "[Server_Manager_Common_Addr](%d)set_address error[%s:%d].\n", pServerInfo->m_szServerIP, pServerInfo->m_nPort, errno));
+        OUR_DEBUG((LM_INFO, "[Server_Manager_Common_Addr](%d)set_address error[%s:%d].\n", pIP, u4Port, errno));
         return false;
     }
 

@@ -984,8 +984,6 @@ void DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
             //文本输出
             char szCharOrder[MAX_BUFF_20] = { '\0' };
 
-            bool blByteSort = false;
-
             if (GetXmlConfigAttribute(xmlNetWorkMode)->NetByteOrder == false)
             {
                 sprintf_safe(szCharOrder, MAX_BUFF_20, "HostOrder");   //主机字序
@@ -1849,6 +1847,9 @@ void DoMessage_ServerClose(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, 
     }
 
     //这里暂不实现，没必要
+    ACE_UNUSED_ARG(CommandInfo);
+    ACE_UNUSED_ARG(pBuffPacket);
+    ACE_UNUSED_ARG(u2ReturnCommandID);
 }
 
 void DoMessage_TestFileStart(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)

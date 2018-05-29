@@ -84,8 +84,6 @@ matrix:
         # collect gcov report
         # - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/.obj
         # - gcovr -r ../ -o ../../report.xml --xml-pretty
-        # - cd ../
-        # - ls -l
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
         - gcov -r -o ./.obj ../*.cpp
         - gcov -r -o ./.obj ../Common/*.cpp

@@ -35,6 +35,6 @@ bool Server_Manager_Common_IObject(IConnectManager* pConnectManager, IClientMana
 bool Server_Manager_Common_Module();
 
 //×ª»»Addr IP½Ó¿Ú
-bool Server_Manager_Common_Addr(_ServerInfo* pServerInfo, ACE_INET_Addr& listenAddr);
+bool Server_Manager_Common_Addr(uint8 u4IpType, const char* pIP, uint32 u4Port, ACE_INET_Addr& listenAddr);
 
 #endif

@@ -15,14 +15,15 @@ bool CServerManager::Init()
     //是否打开ACE_DEBUG文件存储
     Server_Manager_Common_FrameLogging(m_pFrameLoggingStrategy);
 
-    int nServerPortCount = App_MainConfig::instance()->GetServerPortCount();
-    int nReactorCount = App_MainConfig::instance()->GetReactorCount();
+    int nServerPortCount = (int)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
+    int nReactorCount = 3 + GetXmlConfigAttribute(xmlMessage)->Msg_Thread;
 
     //初始化模块数组相关参数
-    App_MessageManager::instance()->Init(App_MainConfig::instance()->GetMaxModuleCount(), App_MainConfig::instance()->GetMaxCommandCount());
+    App_MessageManager::instance()->Init(GetXmlConfigAttribute(xmlModuleMangager)->MaxCount,
+                                         GetXmlConfigAttribute(xmlCommandAccount)->MaxCommandCount);
 
     //初始化加载模块的信息
-    App_ModuleLoader::instance()->Init(App_MainConfig::instance()->GetMaxModuleCount());
+    App_ModuleLoader::instance()->Init(GetXmlConfigAttribute(xmlModuleMangager)->MaxCount);
 
     //初始化禁止IP列表
     App_ForbiddenIP::instance()->Init(FORBIDDENIP_FILE);
@@ -30,13 +31,13 @@ bool CServerManager::Init()
     OUR_DEBUG((LM_INFO, "[CServerManager::Init]nReactorCount=%d.\n", nReactorCount));
 
     //为多进程做准备，针对epoll和epollet初始化不能在这里去做,因为在多进程里epoll_create必须在子进程里去声明
-    if (NETWORKMODE_RE_EPOLL != App_MainConfig::instance()->GetNetworkMode() && NETWORKMODE_RE_EPOLL_ET != App_MainConfig::instance()->GetNetworkMode())
+    if (NETWORKMODE_RE_EPOLL != GetXmlConfigAttribute(xmlNetWorkMode)->Mode
+        && NETWORKMODE_RE_EPOLL_ET != GetXmlConfigAttribute(xmlNetWorkMode)->Mode)
     {
         //初始化反应器集合
         App_ReactorManager::instance()->Init((uint16)nReactorCount);
 
-        OUR_DEBUG((LM_INFO, "[CServerManager::Init]****1*******.\n"));
-        Init_Reactor((uint8)nReactorCount, App_MainConfig::instance()->GetNetworkMode());
+        Init_Reactor((uint8)nReactorCount, GetXmlConfigAttribute(xmlNetWorkMode)->Mode);
     }
 
     //初始化日志系统线程
@@ -49,7 +50,7 @@ bool CServerManager::Init()
     Server_Manager_Common_Pool();
 
     //初始化ConnectHandler对象池
-    if (App_MainConfig::instance()->GetMaxHandlerCount() <= 0)
+    if (GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount <= 0)
     {
         //初始化PacketParse对象池
         App_ConnectHandlerPool::instance()->Init(MAX_HANDLE_POOL);
@@ -57,11 +58,11 @@ bool CServerManager::Init()
     else
     {
         //初始化PacketParse对象池
-        App_ConnectHandlerPool::instance()->Init(App_MainConfig::instance()->GetMaxHandlerCount());
+        App_ConnectHandlerPool::instance()->Init(GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount);
     }
 
     //初始化链接管理器
-    App_ConnectManager::instance()->Init(App_MainConfig::instance()->GetSendQueueCount());
+    App_ConnectManager::instance()->Init(GetXmlConfigAttribute(xmlSendInfo)->SendQueueCount);
 
     //初始化给插件的对象接口
     IConnectManager* pConnectManager       = dynamic_cast<IConnectManager*>(App_ConnectManager::instance());
@@ -160,12 +161,12 @@ bool CServerManager::Init_Reactor(uint8 u1ReactorCount, uint8 u1NetMode)
         }
         else if (u1NetMode == NETWORKMODE_RE_EPOLL)
         {
-            blState = App_ReactorManager::instance()->AddNewReactor(i, Reactor_DEV_POLL, 1, App_MainConfig::instance()->GetMaxHandlerCount());
+            blState = App_ReactorManager::instance()->AddNewReactor(i, Reactor_DEV_POLL, 1, GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount);
             OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_DEV_POLL.\n"));
         }
         else if (u1NetMode == NETWORKMODE_RE_EPOLL_ET)
         {
-            blState = App_ReactorManager::instance()->AddNewReactor(i, Reactor_DEV_POLL_ET, 1, App_MainConfig::instance()->GetMaxHandlerCount());
+            blState = App_ReactorManager::instance()->AddNewReactor(i, Reactor_DEV_POLL_ET, 1, GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount);
             OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_DEV_POLL_ET.\n"));
         }
         else
@@ -188,12 +189,13 @@ bool CServerManager::Init_Reactor(uint8 u1ReactorCount, uint8 u1NetMode)
 bool CServerManager::Run()
 {
     //对应多进程，epoll必须在子进程里进行初始化
-    if (NETWORKMODE_RE_EPOLL == App_MainConfig::instance()->GetNetworkMode() || NETWORKMODE_RE_EPOLL_ET == App_MainConfig::instance()->GetNetworkMode())
+    if (NETWORKMODE_RE_EPOLL == GetXmlConfigAttribute(xmlNetWorkMode)->Mode
+        || NETWORKMODE_RE_EPOLL_ET == GetXmlConfigAttribute(xmlNetWorkMode)->Mode)
     {
         //初始化反应器集合
-        App_ReactorManager::instance()->Init((uint16)App_MainConfig::instance()->GetReactorCount());
+        App_ReactorManager::instance()->Init((uint16)(3 + GetXmlConfigAttribute(xmlMessage)->Msg_Thread));
 
-        if (false == Init_Reactor((uint8)App_MainConfig::instance()->GetReactorCount(), App_MainConfig::instance()->GetNetworkMode()))
+        if (false == Init_Reactor((uint8)(3 + GetXmlConfigAttribute(xmlMessage)->Msg_Thread), GetXmlConfigAttribute(xmlNetWorkMode)->Mode))
         {
             OUR_DEBUG((LM_INFO, "[CServerManager::Run]Init_Reactor Error.\n"));
             return false;
@@ -203,10 +205,10 @@ bool CServerManager::Run()
     //启动中间服务器链接管理器
     App_ClientReConnectManager::instance()->Init(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_POSTDEFINE));
 
-    int nServerPortCount = App_MainConfig::instance()->GetServerPortCount();
+    uint16 u2ServerPortCount = (int)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
 
     //创建和启动TCP反应器
-    for (int i = 0; i < nServerPortCount; i++)
+    for (uint16 i = 0; i < u2ServerPortCount; i++)
     {
         //得到接收器
         ConnectAcceptor* pConnectAcceptor = App_ConnectAcceptorManager::instance()->GetConnectAcceptor(i);
@@ -218,7 +220,7 @@ bool CServerManager::Run()
     m_ConnectConsoleAcceptor.Run_Open(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_CLIENTDEFINE));
 
     //创建和启动UDP反应器
-    uint16 u2UDPServerPortCount = App_MainConfig::instance()->GetUDPServerPortCount();
+    uint16 u2UDPServerPortCount = (uint16)GetXmlConfigAttribute(xmlUDPServerIPs)->vec.size();
 
     for (uint16 i = 0; i < u2UDPServerPortCount; i++)
     {
@@ -241,7 +243,7 @@ bool CServerManager::Run()
     }
 
     //启动服务器间检查线程
-    if (false == App_ClientReConnectManager::instance()->StartConnectTask(App_MainConfig::instance()->GetConnectServerCheck()))
+    if (false == App_ClientReConnectManager::instance()->StartConnectTask(GetXmlConfigAttribute(xmlConnectServer)->TimeCheck))
     {
         OUR_DEBUG((LM_INFO, "[CServerManager::Run]StartConnectTask error.\n"));
         return false;
@@ -271,7 +273,7 @@ bool CServerManager::Run()
     //开始消息处理线程
     App_MessageServiceGroup::instance()->Start();
 
-    if (App_MainConfig::instance()->GetConnectServerRunType() == 1)
+    if (GetXmlConfigAttribute(xmlConnectServer)->RunType == 1)
     {
         //启动异步处理服务器间消息包的过程
         App_ServerMessageTask::instance()->Start();
@@ -294,15 +296,16 @@ bool CServerManager::Run()
 
 bool CServerManager::Start_Tcp_Listen()
 {
-    int nServerPortCount = App_MainConfig::instance()->GetServerPortCount();
+    int nServerPortCount = (int)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
 
     for (int i = 0; i < nServerPortCount; i++)
     {
         ACE_INET_Addr listenAddr;
 
-        _ServerInfo* pServerInfo = App_MainConfig::instance()->GetServerPort(i);
-
-        if (false == Server_Manager_Common_Addr(pServerInfo, listenAddr))
+        if (false == Server_Manager_Common_Addr(GetXmlConfigAttribute(xmlTCPServerIPs)->vec[i].ipType,
+                                                GetXmlConfigAttribute(xmlTCPServerIPs)->vec[i].ip.c_str(),
+                                                GetXmlConfigAttribute(xmlTCPServerIPs)->vec[i].port,
+                                                listenAddr))
         {
             return false;
         }
@@ -316,8 +319,8 @@ bool CServerManager::Start_Tcp_Listen()
             return false;
         }
 
-        pConnectAcceptor->SetPacketParseInfoID(pServerInfo->m_u4PacketParseInfoID);
-        int nRet = pConnectAcceptor->Init_Open(listenAddr, 0, 1, 1, (int)App_MainConfig::instance()->GetBacklog());
+        pConnectAcceptor->SetPacketParseInfoID(GetXmlConfigAttribute(xmlTCPServerIPs)->vec[i].packetparseid);
+        int nRet = pConnectAcceptor->Init_Open(listenAddr, 0, 1, 1, (int)GetXmlConfigAttribute(xmlNetWorkMode)->BackLog);
 
         if (-1 == nRet)
         {
@@ -334,15 +337,16 @@ bool CServerManager::Start_Tcp_Listen()
 
 bool CServerManager::Start_Udp_Listen()
 {
-    int nUDPServerPortCount = App_MainConfig::instance()->GetUDPServerPortCount();
+    int nUDPServerPortCount = (int)GetXmlConfigAttribute(xmlUDPServerIPs)->vec.size();
 
     for (int i = 0; i < nUDPServerPortCount; i++)
     {
         ACE_INET_Addr listenAddr;
 
-        _ServerInfo* pServerInfo = App_MainConfig::instance()->GetUDPServerPort(i);
-
-        if (false == Server_Manager_Common_Addr(pServerInfo, listenAddr))
+        if (false == Server_Manager_Common_Addr(GetXmlConfigAttribute(xmlUDPServerIPs)->vec[i].uipType,
+                                                GetXmlConfigAttribute(xmlUDPServerIPs)->vec[i].uip.c_str(),
+                                                GetXmlConfigAttribute(xmlUDPServerIPs)->vec[i].uport,
+                                                listenAddr))
         {
             return false;
         }
@@ -356,7 +360,8 @@ bool CServerManager::Start_Udp_Listen()
             return false;
         }
 
-        pReactorUDPHandler->SetPacketParseInfoID(pServerInfo->m_u4PacketParseInfoID);
+        pReactorUDPHandler->SetRecvSize(GetXmlConfigAttribute(xmlUDPServerIPs)->vec[i].uMaxRecvSize);
+        pReactorUDPHandler->SetPacketParseInfoID(GetXmlConfigAttribute(xmlUDPServerIPs)->vec[i].uPacketParseID);
         int nRet = pReactorUDPHandler->OpenAddress(listenAddr);
 
         if (-1 == nRet)
@@ -373,31 +378,33 @@ bool CServerManager::Start_Udp_Listen()
 
 bool CServerManager::Start_Console_Tcp_Listen()
 {
-    if (App_MainConfig::instance()->GetConsoleSupport() == CONSOLE_ENABLE)
+    if (GetXmlConfigAttribute(xmlConsole)->support == CONSOLE_ENABLE)
     {
         ACE_INET_Addr listenConsoleAddr;
         int nErr = 0;
 
-        if (App_MainConfig::instance()->GetConsoleIPType() == TYPE_IPV4)
+        if (GetXmlConfigAttribute(xmlConsole)->ipType == TYPE_IPV4)
         {
-            if (ACE_OS::strcmp(App_MainConfig::instance()->GetConsoleIP(), "INADDR_ANY") == 0)
+            if (ACE_OS::strcmp(GetXmlConfigAttribute(xmlConsole)->sip.c_str(), "INADDR_ANY") == 0)
             {
-                nErr = listenConsoleAddr.set(App_MainConfig::instance()->GetConsolePort(), (uint32)INADDR_ANY);
+                nErr = listenConsoleAddr.set(GetXmlConfigAttribute(xmlConsole)->sport, (uint32)INADDR_ANY);
             }
             else
             {
-                nErr = listenConsoleAddr.set(App_MainConfig::instance()->GetConsolePort(), App_MainConfig::instance()->GetConsoleIP());
+                nErr = listenConsoleAddr.set(GetXmlConfigAttribute(xmlConsole)->sport,
+                                             GetXmlConfigAttribute(xmlConsole)->sip.c_str());
             }
         }
         else
         {
-            if (ACE_OS::strcmp(App_MainConfig::instance()->GetConsoleIP(), "INADDR_ANY") == 0)
+            if (ACE_OS::strcmp(GetXmlConfigAttribute(xmlConsole)->sip.c_str(), "INADDR_ANY") == 0)
             {
-                nErr = listenConsoleAddr.set(App_MainConfig::instance()->GetConsolePort(), (uint32)INADDR_ANY);
+                nErr = listenConsoleAddr.set(GetXmlConfigAttribute(xmlConsole)->sport, (uint32)INADDR_ANY);
             }
             else
             {
-                nErr = listenConsoleAddr.set(App_MainConfig::instance()->GetConsolePort(), App_MainConfig::instance()->GetConsoleIP(), 1, PF_INET6);
+                nErr = listenConsoleAddr.set(GetXmlConfigAttribute(xmlConsole)->sport,
+                                             GetXmlConfigAttribute(xmlConsole)->sip.c_str(), 1, PF_INET6);
             }
         }
 

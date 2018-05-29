@@ -23,7 +23,7 @@ enum XmlConfig
     XML_Config_SendInfo,
     XML_Config_NetWorkMode,
     XML_Config_TCPServerIPs,
-	XML_Config_UDPServerIPs,
+    XML_Config_UDPServerIPs,
     /********连接信息********/
     XML_Config_ConnectServer,
     XML_Config_ClientInfo,
@@ -79,7 +79,7 @@ public:
     XMainConfig()
     {
         _initIsOk = Init();
-	}
+    }
 
     bool InitIsOk()
     {
@@ -168,9 +168,10 @@ public:
     {
     public:
         std::string ip;
-		uint8 ipType;
         uint32 port;
-        _TCPServerIP() : ip(""), port(0), ipType(0){}
+        uint8 ipType;
+        uint32 packetparseid;
+        _TCPServerIP() : ip(""), port(0), ipType(0), packetparseid(0) {}
     };
     std::vector<_TCPServerIP> vec;
     xmlTCPServerIPs(XmlConfig config) : IConfigOpeation(config) {}
@@ -180,18 +181,19 @@ public:
 class xmlUDPServerIPs : public IConfigOpeation
 {
 public:
-	class _UDPServerIP
-	{
-	public:
-		std::string uip;
-		uint8 uipType;
-		uint32 uport;
-		uint32 uMaxRecvSize;
-		_UDPServerIP() : uip("127.0.0.1"), uipType(0), uport(0), uMaxRecvSize(0) {}
-	};
-	std::vector<_UDPServerIP> vec;
-	xmlUDPServerIPs(XmlConfig config) : IConfigOpeation(config) {}
-	bool Init(CXmlOpeation* pXmlOpeation);
+    class _UDPServerIP
+    {
+    public:
+        std::string uip;
+        uint8 uipType;
+        uint32 uport;
+        uint32 uMaxRecvSize;
+        uint32 uPacketParseID;
+        _UDPServerIP() : uip("127.0.0.1"), uipType(0), uport(0), uMaxRecvSize(0), uPacketParseID(0) {}
+    };
+    std::vector<_UDPServerIP> vec;
+    xmlUDPServerIPs(XmlConfig config) : IConfigOpeation(config) {}
+    bool Init(CXmlOpeation* pXmlOpeation);
 };
 
 class xmlConnectServer : public IConfigOpeation
@@ -283,8 +285,8 @@ class xmlConsole : public IConfigOpeation
 public:
     uint8 support;
     std::string sip;
-	uint8 ipType;
     uint16 sport;
+    uint8 ipType;
     xmlConsole(XmlConfig config) : IConfigOpeation(config), support(1), sip("INADDR_ANY"), sport(10010), ipType(0) {}
     bool Init(CXmlOpeation* pXmlOpeation);
 };
@@ -470,16 +472,16 @@ public:
 class xmlCommandInfos : public IConfigOpeation
 {
 public:
-	class _CommandInfo
-	{
-	public:
-		uint32 CommandID;
-		uint32 CommandCount;
-		uint32 MailID;
-		_CommandInfo() : CommandID(4096), CommandCount(0), MailID(0) {}
-	};
-	std::vector<_CommandInfo> _vec;
-	xmlCommandInfos(XmlConfig config) : IConfigOpeation(config) {}
+    class _CommandInfo
+    {
+    public:
+        uint32 CommandID;
+        uint32 CommandCount;
+        uint32 MailID;
+        _CommandInfo() : CommandID(4096), CommandCount(0), MailID(0) {}
+    };
+    std::vector<_CommandInfo> _vec;
+    xmlCommandInfos(XmlConfig config) : IConfigOpeation(config) {}
     bool Init(CXmlOpeation* pXmlOpeation);
 };
 

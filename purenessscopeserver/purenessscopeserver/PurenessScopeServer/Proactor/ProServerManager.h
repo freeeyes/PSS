@@ -7,6 +7,7 @@
 #include "AceProactorManager.h"
 #include "ClientProConnectManager.h"
 #include "ProUDPManager.h"
+#include "XmlConfig.h"
 
 //添加对服务器控制的支持，Console模块用于支持外网对服务器的控制
 //add by freeeyes

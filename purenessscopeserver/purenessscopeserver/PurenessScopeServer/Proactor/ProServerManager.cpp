@@ -16,15 +16,16 @@ bool CProServerManager::Init()
     Server_Manager_Common_FrameLogging(m_pFrameLoggingStrategy);
 
     int nServerPortCount    = (int)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
-    int nReactorCount       = App_MainConfig::instance()->GetReactorCount();
+    int nReactorCount       = 3 + GetXmlConfigAttribute(xmlMessage)->Msg_Thread;
 
     bool blState = false;
 
     //初始化模块数组相关参数
-    App_MessageManager::instance()->Init(App_MainConfig::instance()->GetMaxModuleCount(), App_MainConfig::instance()->GetMaxCommandCount());
+    App_MessageManager::instance()->Init(GetXmlConfigAttribute(xmlModuleMangager)->MaxCount,
+                                         GetXmlConfigAttribute(xmlCommandAccount)->MaxCommandCount);
 
     //初始化加载模块的信息
-    App_ModuleLoader::instance()->Init(App_MainConfig::instance()->GetMaxModuleCount());
+    App_ModuleLoader::instance()->Init(GetXmlConfigAttribute(xmlModuleMangager)->MaxCount);
 
     //初始化禁止IP列表
     App_ForbiddenIP::instance()->Init(FORBIDDENIP_FILE);
@@ -39,7 +40,7 @@ bool CProServerManager::Init()
     Server_Manager_Common_Pool();
 
     //初始化ProConnectHandler对象池
-    if(App_MainConfig::instance()->GetMaxHandlerCount() <= 0)
+    if(GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount <= 0)
     {
         //初始化PacketParse对象池
         App_ProConnectHandlerPool::instance()->Init(MAX_HANDLE_POOL);
@@ -47,11 +48,11 @@ bool CProServerManager::Init()
     else
     {
         //初始化PacketParse对象池
-        App_ProConnectHandlerPool::instance()->Init(App_MainConfig::instance()->GetMaxHandlerCount());
+        App_ProConnectHandlerPool::instance()->Init(GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount);
     }
 
     //初始化链接管理器
-    App_ProConnectManager::instance()->Init(App_MainConfig::instance()->GetSendQueueCount());
+    App_ProConnectManager::instance()->Init(GetXmlConfigAttribute(xmlSendInfo)->SendQueueCount);
 
     //初始化给插件的对象接口
     IConnectManager* pConnectManager       = dynamic_cast<IConnectManager*>(App_ProConnectManager::instance());
@@ -91,7 +92,7 @@ bool CProServerManager::Init()
     {
         OUR_DEBUG((LM_INFO, "[CProServerManager::Init()]... i=[%d].\n", i));
 
-        if (App_MainConfig::instance()->GetNetworkMode() == NETWORKMODE_PRO_IOCP)
+        if (GetXmlConfigAttribute(xmlNetWorkMode)->Mode == NETWORKMODE_PRO_IOCP)
         {
             blState = App_ProactorManager::instance()->AddNewProactor(i, Proactor_WIN32, 1);
             OUR_DEBUG((LM_INFO, "[CProServerManager::Init]AddNewProactor NETWORKMODE = Proactor_WIN32.\n"));
@@ -115,16 +116,17 @@ bool CProServerManager::Init()
 bool CProServerManager::Start()
 {
     //启动TCP监听
-    int nServerPortCount = App_MainConfig::instance()->GetServerPortCount();
+    int nServerPortCount = (int)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
 
     //初始化监听远程连接
     for(int i = 0 ; i < nServerPortCount; i++)
     {
         ACE_INET_Addr listenAddr;
 
-        _ServerInfo* pServerInfo = App_MainConfig::instance()->GetServerPort(i);
-
-        if (false == Server_Manager_Common_Addr(pServerInfo, listenAddr))
+        if (false == Server_Manager_Common_Addr(GetXmlConfigAttribute(xmlTCPServerIPs)->vec[i].ipType,
+                                                GetXmlConfigAttribute(xmlTCPServerIPs)->vec[i].ip.c_str(),
+                                                GetXmlConfigAttribute(xmlTCPServerIPs)->vec[i].port,
+                                                listenAddr))
         {
             return false;
         }
@@ -139,8 +141,9 @@ bool CProServerManager::Start()
         }
 
         //设置监听IP信息
-        pConnectAcceptor->SetPacketParseInfoID(pServerInfo->m_u4PacketParseInfoID);
-        pConnectAcceptor->SetListenInfo(pServerInfo->m_szServerIP, (uint32)pServerInfo->m_nPort);
+        pConnectAcceptor->SetPacketParseInfoID(GetXmlConfigAttribute(xmlTCPServerIPs)->vec[i].packetparseid);
+        pConnectAcceptor->SetListenInfo(GetXmlConfigAttribute(xmlTCPServerIPs)->vec[i].ip.c_str(),
+                                        (uint32)GetXmlConfigAttribute(xmlTCPServerIPs)->vec[i].port);
 
         ACE_Proactor* pProactor = App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE);
 
@@ -150,7 +153,7 @@ bool CProServerManager::Start()
             return false;
         }
 
-        int nRet = pConnectAcceptor->open(listenAddr, 0, 1, App_MainConfig::instance()->GetBacklog(), 1, pProactor);
+        int nRet = pConnectAcceptor->open(listenAddr, 0, 1, GetXmlConfigAttribute(xmlNetWorkMode)->BackLog, 1, pProactor);
 
         if(-1 == nRet)
         {
@@ -163,13 +166,11 @@ bool CProServerManager::Start()
     }
 
     //启动UDP监听
-    int nUDPServerPortCount = App_MainConfig::instance()->GetUDPServerPortCount();
+    int nUDPServerPortCount = (int)GetXmlConfigAttribute(xmlUDPServerIPs)->vec.size();
 
     for(int i = 0 ; i < nUDPServerPortCount; i++)
     {
         ACE_INET_Addr listenAddr;
-
-        _ServerInfo* pServerInfo = App_MainConfig::instance()->GetUDPServerPort(i);
 
         CProactorUDPHandler* pProactorUDPHandler = App_ProUDPManager::instance()->Create();
 
@@ -180,10 +181,13 @@ bool CProServerManager::Start()
         }
         else
         {
-            pProactorUDPHandler->SetPacketParseInfoID(pServerInfo->m_u4PacketParseInfoID);
+            pProactorUDPHandler->SetPacketParseInfoID(GetXmlConfigAttribute(xmlUDPServerIPs)->vec[i].uPacketParseID);
             int nErr = 0;
 
-            if (false == Server_Manager_Common_Addr(pServerInfo, listenAddr))
+            if (false == Server_Manager_Common_Addr(GetXmlConfigAttribute(xmlUDPServerIPs)->vec[i].uipType,
+                                                    GetXmlConfigAttribute(xmlUDPServerIPs)->vec[i].uip.c_str(),
+                                                    GetXmlConfigAttribute(xmlUDPServerIPs)->vec[i].uport,
+                                                    listenAddr))
             {
                 return false;
             }
@@ -196,7 +200,7 @@ bool CProServerManager::Start()
                 return false;
             }
 
-            pProactorUDPHandler->SetRecvSize(pServerInfo->m_u4MaxRecvSize);
+            pProactorUDPHandler->SetRecvSize(GetXmlConfigAttribute(xmlUDPServerIPs)->vec[i].uMaxRecvSize);
 
             if(0 != pProactorUDPHandler->OpenAddress(listenAddr, pProactor))
             {
@@ -209,36 +213,36 @@ bool CProServerManager::Start()
     }
 
     //启动后台管理端口监听
-    if(App_MainConfig::instance()->GetConsoleSupport() == CONSOLE_ENABLE)
+    if(GetXmlConfigAttribute(xmlConsole)->support == CONSOLE_ENABLE)
     {
         ACE_INET_Addr listenConsoleAddr;
 
         int nErr = 0;
 
-        if(App_MainConfig::instance()->GetConsoleIPType() == TYPE_IPV4)
+        if(GetXmlConfigAttribute(xmlConsole)->ipType == TYPE_IPV4)
         {
-            if(ACE_OS::strcmp(App_MainConfig::instance()->GetConsoleIP(), "INADDR_ANY") == 0)
+            if(ACE_OS::strcmp(GetXmlConfigAttribute(xmlConsole)->sip.c_str(), "INADDR_ANY") == 0)
             {
-                nErr = listenConsoleAddr.set(App_MainConfig::instance()->GetConsolePort(),
+                nErr = listenConsoleAddr.set(GetXmlConfigAttribute(xmlConsole)->sport,
                                              (uint32)INADDR_ANY);
             }
             else
             {
-                nErr = listenConsoleAddr.set(App_MainConfig::instance()->GetConsolePort(),
-                                             App_MainConfig::instance()->GetConsoleIP());
+                nErr = listenConsoleAddr.set(GetXmlConfigAttribute(xmlConsole)->sport,
+                                             GetXmlConfigAttribute(xmlConsole)->sip.c_str());
             }
         }
         else
         {
-            if(ACE_OS::strcmp(App_MainConfig::instance()->GetConsoleIP(), "INADDR_ANY") == 0)
+            if(ACE_OS::strcmp(GetXmlConfigAttribute(xmlConsole)->sip.c_str(), "INADDR_ANY") == 0)
             {
-                nErr = listenConsoleAddr.set(App_MainConfig::instance()->GetConsolePort(),
+                nErr = listenConsoleAddr.set(GetXmlConfigAttribute(xmlConsole)->sport,
                                              (uint32)INADDR_ANY);
             }
             else
             {
-                nErr = listenConsoleAddr.set(App_MainConfig::instance()->GetConsolePort(),
-                                             App_MainConfig::instance()->GetConsoleIP(), 1, PF_INET6);
+                nErr = listenConsoleAddr.set(GetXmlConfigAttribute(xmlConsole)->sport,
+                                             GetXmlConfigAttribute(xmlConsole)->sip.c_str(), 1, PF_INET6);
             }
         }
 
@@ -294,7 +298,7 @@ bool CProServerManager::Start()
     App_ClientProConnectManager::instance()->Init(App_ProactorManager::instance()->GetAce_Proactor(REACTOR_POSTDEFINE));
 
     //启动中间服务器链接管理器定时器
-    App_ClientProConnectManager::instance()->StartConnectTask(App_MainConfig::instance()->GetConnectServerCheck());
+    App_ClientProConnectManager::instance()->StartConnectTask(GetXmlConfigAttribute(xmlConnectServer)->TimeCheck);
 
     //加载所有的插件初始化动作
     if (false == App_ModuleLoader::instance()->InitModule())
@@ -306,7 +310,7 @@ bool CProServerManager::Start()
     //开始消息处理线程
     App_MessageServiceGroup::instance()->Start();
 
-    if(App_MainConfig::instance()->GetConnectServerRunType() == 1)
+    if(GetXmlConfigAttribute(xmlConnectServer)->RunType == 1)
     {
         //启动异步处理服务器间消息包的过程
         App_ServerMessageTask::instance()->Start();

@@ -22,6 +22,7 @@ DefineClassAndFunc(xmlRecvInfo, XML_Config_RecvInfo)
 DefineClassAndFunc(xmlSendInfo, XML_Config_SendInfo)
 DefineClassAndFunc(xmlNetWorkMode, XML_Config_NetWorkMode)
 DefineClassAndFunc(xmlTCPServerIPs, XML_Config_TCPServerIPs)
+DefineClassAndFunc(xmlUDPServerIPs, XML_Config_UDPServerIPs)
 DefineClassAndFunc(xmlConnectServer, XML_Config_ConnectServer)
 DefineClassAndFunc(xmlClientInfo, XML_Config_ClientInfo)
 DefineClassAndFunc(xmlModuleInfos, XML_Config_ModuleInfos)
@@ -100,8 +101,8 @@ bool xmlSendInfo::Init(CXmlOpeation* m_pXmlOpeation)
         && m_pXmlOpeation->Read_XML_Data_Single_Uint16("SendInfo", "PutQueueTimeout", PutQueueTimeout)
         && m_pXmlOpeation->Read_XML_Data_Single_Uint32("SendInfo", "BlockCount", BlockCount)
         && m_pXmlOpeation->Read_XML_Data_Single_Uint32("SendInfo", "MaxBlockSize", MaxBlockSize)
-		&& m_pXmlOpeation->Read_XML_Data_Single_Uint16("SendInfo", "SendQueueTimeout", SendQueueTimeout)
-		&& m_pXmlOpeation->Read_XML_Data_Single_Uint16("SendInfo", "SendQueueCount", SendQueueCount))
+        && m_pXmlOpeation->Read_XML_Data_Single_Uint16("SendInfo", "SendQueueTimeout", SendQueueTimeout)
+        && m_pXmlOpeation->Read_XML_Data_Single_Uint16("SendInfo", "SendQueueCount", SendQueueCount))
     {
         SendDatamark = MaxBlockSize;
         bKet = m_pXmlOpeation->Read_XML_Data_Single_Uint16("SendInfo", "TcpNodelay", TcpNodelay);
@@ -191,17 +192,19 @@ void xmlNetWorkMode::SetNetByteOrder(const std::string& pData)
 
 bool xmlTCPServerIPs::Init(CXmlOpeation* pXmlOpeation)
 {
-	bool bKet = true;
+    bool bKet = true;
     TiXmlElement* pIP = NULL;
     TiXmlElement* pPort = NULL;
+    TiXmlElement* pPacketParseID = NULL;
 
     _TCPServerIP tcpServerIP;
 
     while (bKet
-		&& pXmlOpeation->Read_XML_Data_Multiple_String("TCPServerIP", "ip", tcpServerIP.ip, pIP)
-		&& pXmlOpeation->Read_XML_Data_Multiple_Uint32("TCPServerIP", "port", tcpServerIP.port, pPort))
+           && pXmlOpeation->Read_XML_Data_Multiple_String("TCPServerIP", "ip", tcpServerIP.ip, pIP)
+           && pXmlOpeation->Read_XML_Data_Multiple_Uint32("TCPServerIP", "port", tcpServerIP.port, pPort)
+           && pXmlOpeation->Read_XML_Data_Multiple_Uint32("TCPServerIP", "ParseID", tcpServerIP.packetparseid, pPacketParseID))
     {
-		bKet = Check_IPType(tcpServerIP.ip, tcpServerIP.ipType);
+        bKet = Check_IPType(tcpServerIP.ip, tcpServerIP.ipType);
         vec.push_back(tcpServerIP);
     }
 
@@ -210,21 +213,25 @@ bool xmlTCPServerIPs::Init(CXmlOpeation* pXmlOpeation)
 
 bool xmlUDPServerIPs::Init(CXmlOpeation* pXmlOpeation)
 {
-	bool bKet = true;
-	TiXmlElement* pUIP = NULL;
-	TiXmlElement* pUPort = NULL;
-	TiXmlElement* pUMaxRecvSize = NULL;
-	_UDPServerIP udpServerIP;
+    bool bKet = true;
+    TiXmlElement* pUIP = NULL;
+    TiXmlElement* pUPort = NULL;
+    TiXmlElement* pUMaxRecvSize = NULL;
+    TiXmlElement* pUPacketParseID = NULL;
 
-	while (bKet
-		&& pXmlOpeation->Read_XML_Data_Multiple_String("UDPServerIP", "uip", udpServerIP.uip, pUIP)
-		&& pXmlOpeation->Read_XML_Data_Multiple_Uint32("UDPServerIP", "uport", udpServerIP.uport, pUPort)
-		&& pXmlOpeation->Read_XML_Data_Multiple_Uint32("UDPServerIP", "uMaxRecvSize", udpServerIP.uMaxRecvSize, pUMaxRecvSize))
-	{
-		bKet = Check_IPType(udpServerIP.uip, udpServerIP.uipType);
-		vec.push_back(udpServerIP);
-	}
-	return bKet;
+    _UDPServerIP udpServerIP;
+
+    while (bKet
+           && pXmlOpeation->Read_XML_Data_Multiple_String("UDPServerIP", "uip", udpServerIP.uip, pUIP)
+           && pXmlOpeation->Read_XML_Data_Multiple_Uint32("UDPServerIP", "uport", udpServerIP.uport, pUPort)
+           && pXmlOpeation->Read_XML_Data_Multiple_Uint32("UDPServerIP", "uMaxRecvSize", udpServerIP.uMaxRecvSize, pUMaxRecvSize)
+           && pXmlOpeation->Read_XML_Data_Multiple_Uint32("UDPServerIP", "uParseID", udpServerIP.uPacketParseID, pUPacketParseID))
+    {
+        bKet = Check_IPType(udpServerIP.uip, udpServerIP.uipType);
+        vec.push_back(udpServerIP);
+    }
+
+    return bKet;
 }
 
 
@@ -297,16 +304,16 @@ bool xmlThreadInfo::Init(CXmlOpeation* pXmlOpeation)
 
 bool xmlConsole::Init(CXmlOpeation* pXmlOpeation)
 {
-	bool bKet = true;
+    bool bKet = true;
 
-	if (pXmlOpeation->Read_XML_Data_Single_Uint8("Console", "support", support)
-		&& pXmlOpeation->Read_XML_Data_Single_String("Console", "sip", sip)
-		&& pXmlOpeation->Read_XML_Data_Single_Uint16("Console", "sport", sport))
-	{
-		bKet = Check_IPType(sip, ipType);
-	}
-	
-	return bKet;
+    if (pXmlOpeation->Read_XML_Data_Single_Uint8("Console", "support", support)
+        && pXmlOpeation->Read_XML_Data_Single_String("Console", "sip", sip)
+        && pXmlOpeation->Read_XML_Data_Single_Uint16("Console", "sport", sport))
+    {
+        bKet = Check_IPType(sip, ipType);
+    }
+
+    return bKet;
 }
 
 bool xmlConsoleKeys::Init(CXmlOpeation* pXmlOpeation)
@@ -459,19 +466,19 @@ bool xmlClientData::Init(CXmlOpeation* pXmlOpeation)
 
 bool xmlCommandInfos::Init(CXmlOpeation* pXmlOpeation)
 {
-	TiXmlElement* pCommandID = NULL;
-	TiXmlElement* pCommandCount = NULL;
-	TiXmlElement* pMailID = NULL;
-	_CommandInfo commandInfo;
+    TiXmlElement* pCommandID = NULL;
+    TiXmlElement* pCommandCount = NULL;
+    TiXmlElement* pMailID = NULL;
+    _CommandInfo commandInfo;
 
-	while (pXmlOpeation->Read_XML_Data_Multiple_Uint32("CommandInfo", "CommandID", commandInfo.CommandID, pCommandID)
-		&& pXmlOpeation->Read_XML_Data_Multiple_Uint32("CommandInfo", "CommandCount", commandInfo.CommandCount, pCommandCount)
-		&& pXmlOpeation->Read_XML_Data_Multiple_Uint32("CommandInfo", "MailID", commandInfo.MailID, pMailID))
-	{
-		_vec.push_back(commandInfo);
-	}
+    while (pXmlOpeation->Read_XML_Data_Multiple_Uint32("CommandInfo", "CommandID", commandInfo.CommandID, pCommandID)
+           && pXmlOpeation->Read_XML_Data_Multiple_Uint32("CommandInfo", "CommandCount", commandInfo.CommandCount, pCommandCount)
+           && pXmlOpeation->Read_XML_Data_Multiple_Uint32("CommandInfo", "MailID", commandInfo.MailID, pMailID))
+    {
+        _vec.push_back(commandInfo);
+    }
 
-	return true;
+    return true;
 }
 
 bool xmlMails::Init(CXmlOpeation* pXmlOpeation)
@@ -499,7 +506,7 @@ bool xmlMails::Init(CXmlOpeation* pXmlOpeation)
 
 xmlMails::_Mail* xmlMails::GetMailAlert(uint16 MailID)
 {
-    for (int i = 0; i < _vec.size(); i++)
+    for (int i = 0; i < (int)_vec.size(); i++)
     {
         if (_vec[i].MailID == MailID)
         {
