@@ -33,16 +33,16 @@
 //加载所有配置文件中的PacketParse模块
 int Load_PacketParse_Module()
 {
-    App_PacketParseLoader::instance()->Init(App_MainConfig::instance()->GetPacketParseCount());
+    int nPacketParseCount = (int)GetXmlConfigAttribute(xmlPacketParses)->_vec.size();
+    App_PacketParseLoader::instance()->Init(nPacketParseCount);
 
-    for (uint8 i = 0; i < App_MainConfig::instance()->GetPacketParseCount(); i++)
+    for (uint8 i = 0; i < nPacketParseCount; i++)
     {
-        _PacketParseInfo* pPacketParseInfo = App_MainConfig::instance()->GetPacketParseInfo(i);
-        bool blState = App_PacketParseLoader::instance()->LoadPacketInfo(pPacketParseInfo->m_u4PacketID,
-                       pPacketParseInfo->m_u1Type,
-                       pPacketParseInfo->m_u4OrgLength,
-                       pPacketParseInfo->m_szPacketParsePath,
-                       pPacketParseInfo->m_szPacketParseName);
+        bool blState = App_PacketParseLoader::instance()->LoadPacketInfo(GetXmlConfigAttribute(xmlPacketParses)->_vec[i].ParseID,
+                       GetXmlConfigAttribute(xmlPacketParses)->_vec[i].Type,
+                       GetXmlConfigAttribute(xmlPacketParses)->_vec[i].OrgLength,
+                       GetXmlConfigAttribute(xmlPacketParses)->_vec[i].ModulePath.c_str(),
+                       GetXmlConfigAttribute(xmlPacketParses)->_vec[i].ModuleName.c_str());
 
         if (false == blState)
         {
@@ -278,14 +278,14 @@ int Chlid_Run()
     }
 
     //判断是否是需要以服务的状态启动
-    if(App_MainConfig::instance()->GetServerType() == 1)
+    if(GetXmlConfigAttribute(xmlServerType)->Type == 1)
     {
         OUR_DEBUG((LM_INFO, "[main]Procress is run background.\n"));
         Gdaemon();
     }
 
     //判断当前Core文件尺寸是否需要调整
-    if(-1 == CheckCoreLimit(App_MainConfig::instance()->GetCoreFileSize()))
+    if(-1 == CheckCoreLimit(GetXmlConfigAttribute(xmlCoreSetting)->CoreNeed))
     {
         return 0;
     }
@@ -455,7 +455,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
     //隐式加载PacketParse
     if (0 != Load_PacketParse_Module())
     {
-        if (App_MainConfig::instance()->GetServerType() == 1)
+        if (GetXmlConfigAttribute(xmlServerType)->Type == 1)
         {
             App_Process::instance()->stopprocesslog();
         }
@@ -464,7 +464,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
     }
 
     //判断是否是需要以服务的状态启动
-    if(App_MainConfig::instance()->GetServerType() == 1)
+    if(GetXmlConfigAttribute(xmlServerType)->Type == 1)
     {
         App_Process::instance()->startprocesslog();
 
@@ -481,7 +481,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
     //回收隐式加载PacketParse
     App_PacketParseLoader::instance()->Close();
 
-    if(App_MainConfig::instance()->GetServerType() == 1)
+    if(GetXmlConfigAttribute(xmlServerType)->Type == 1)
     {
         App_Process::instance()->stopprocesslog();
     }

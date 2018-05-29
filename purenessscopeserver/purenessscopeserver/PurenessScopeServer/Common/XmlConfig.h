@@ -145,17 +145,17 @@ public:
 class xmlNetWorkMode : public IConfigOpeation
 {
 public:
-	uint8 Mode;
+    uint8 Mode;
     uint16 BackLog;
     bool NetByteOrder;
-	ENUM_CHAR_ORDER LocalByteOrder;
-    xmlNetWorkMode(XmlConfig config) : IConfigOpeation(config), Mode(0), 
-		BackLog(0), NetByteOrder(false), LocalByteOrder(SYSTEM_BIG_ORDER){}
+    ENUM_CHAR_ORDER LocalByteOrder;
+    xmlNetWorkMode(XmlConfig config) : IConfigOpeation(config), Mode(0),
+        BackLog(0), NetByteOrder(false), LocalByteOrder(SYSTEM_BIG_ORDER) {}
     bool Init(CXmlOpeation* pXmlOpeation);
 private:
-	bool SetIOMode(const std::string& pData);
-	void SetLocalByteOrder();
-	void SetNetByteOrder(const std::string& pData);
+    bool SetIOMode(const std::string& pData);
+    void SetLocalByteOrder();
+    void SetNetByteOrder(const std::string& pData);
 };
 
 class xmlTCPServerIPs : public IConfigOpeation
@@ -372,13 +372,13 @@ public:
     class _PacketParse
     {
     public:
-        uint16 uParseID;
-        std::string szModulePath;
-        std::string szModuleName;
-        std::string szType;
-        uint16 uOrgLength;
-        _PacketParse() : uParseID(1), szModulePath("./"),
-            szModuleName("PacketParse_Interface.dll"), szType("STREAM"), uOrgLength(40) {}
+        uint16 ParseID;
+        std::string ModulePath;
+        std::string ModuleName;
+        uint8 Type;
+        uint16 OrgLength;
+        _PacketParse() : ParseID(1), ModulePath("./"),
+            ModuleName("PacketParse_Interface.dll"), Type(PACKET_WITHHEAD), OrgLength(40) {}
     };
     std::vector<_PacketParse> _vec;
     xmlPacketParses(XmlConfig config) : IConfigOpeation(config) {}
@@ -458,21 +458,24 @@ public:
 class xmlMails : public IConfigOpeation
 {
 public:
-	class _Mail
-	{
-	public:
-		uint16 MailID;
-		std::string fromMailAddr;
-		std::string toMailAddr;
-		uint32 MailPass;
-		std::string MailUrl;
-		uint16 MailPort;
-		_Mail() : MailID(1), fromMailAddr("local@163.com"), toMailAddr("freeeyes@163.com"),
-			MailPass(123456), MailUrl("smtp.163.com"), MailPort(25) {}
-	};
-	std::vector<_Mail> _vec;
-	xmlMails(XmlConfig config) : IConfigOpeation(config){}
+    class _Mail
+    {
+    public:
+        uint16 MailID;
+        std::string fromMailAddr;
+        std::string toMailAddr;
+        std::string MailPass;
+        std::string MailUrl;
+        uint16 MailPort;
+        _Mail() : MailID(1), fromMailAddr("local@163.com"), toMailAddr("freeeyes@163.com"),
+            MailPass("123456"), MailUrl("smtp.163.com"), MailPort(25) {}
+    };
+    std::vector<_Mail> _vec;
+    xmlMails(XmlConfig config) : IConfigOpeation(config) {}
     bool Init(CXmlOpeation* pXmlOpeation);
+
+    //根据指定的邮箱ID查找邮箱配置信息
+    _Mail* GetMailAlert(uint16 MailID);
 };
 
 class xmlWorkThreadChart : public IConfigOpeation

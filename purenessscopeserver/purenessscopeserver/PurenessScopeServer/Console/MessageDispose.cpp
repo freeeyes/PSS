@@ -264,7 +264,10 @@ void DoMessage_ClientMessageCount(_CommandInfo& CommandInfo, IBuffPacket* pBuffP
         else
         {
             char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "ActiveClient(%d).\nPoolClient(%d).\nMaxHandlerCount(%d).\n", nActiveClient, nPoolClient, App_MainConfig::instance()->GetMaxHandlerCount());
+            sprintf_safe(szTemp, MAX_BUFF_1024, "ActiveClient(%d).\nPoolClient(%d).\nMaxHandlerCount(%d).\n",
+                         nActiveClient,
+                         nPoolClient,
+                         GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount);
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
         }
 
@@ -957,7 +960,7 @@ void DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
             (*pBuffPacket) << strSTemp;
 
             //返回当前服务器是大端还是小端
-            if (App_MainConfig::instance()->GetCharOrder() == SYSTEM_LITTLE_ORDER)
+            if (GetXmlConfigAttribute(xmlNetWorkMode)->LocalByteOrder == SYSTEM_LITTLE_ORDER)
             {
                 (*pBuffPacket) << (uint8)0;     //小端
             }
@@ -967,7 +970,7 @@ void DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
             }
 
             //返回当前网络包字序规则
-            if (App_MainConfig::instance()->GetByteOrder() == false)
+            if (GetXmlConfigAttribute(xmlNetWorkMode)->NetByteOrder == false)
             {
                 (*pBuffPacket) << (uint8)0;   //主机字序
             }
@@ -981,7 +984,9 @@ void DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
             //文本输出
             char szCharOrder[MAX_BUFF_20] = { '\0' };
 
-            if (App_MainConfig::instance()->GetByteOrder() == false)
+            bool blByteSort = false;
+
+            if (GetXmlConfigAttribute(xmlNetWorkMode)->NetByteOrder == false)
             {
                 sprintf_safe(szCharOrder, MAX_BUFF_20, "HostOrder");   //主机字序
             }
@@ -993,12 +998,12 @@ void DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
 
             char szConsoleOutput[MAX_BUFF_1024] = { '\0' };
             sprintf_safe(szConsoleOutput, MAX_BUFF_1024, "ServerID:%d\nServerName:%s\nServerVersion:%s\nServerModuleCount=%d\nWorkthreadCount:%d\nServerProtocol:%s\nCharOrder:%s\n",
-                         App_MainConfig::instance()->GetServerID(),
-                         App_MainConfig::instance()->GetServerName(),
-                         App_MainConfig::instance()->GetServerVersion(),
+                         GetXmlConfigAttribute(xmlServerID)->id,
+                         GetXmlConfigAttribute(xmlServerName)->name.c_str(),
+                         GetXmlConfigAttribute(xmlServerVersion)->Version.c_str(),
                          App_ModuleLoader::instance()->GetCurrModuleCount(),
                          App_MessageServiceGroup::instance()->GetThreadInfo()->GetThreadCount(),
-                         App_MainConfig::instance()->GetServerVersion(),
+                         GetXmlConfigAttribute(xmlServerVersion)->Version.c_str(),
                          szCharOrder);
 
             pBuffPacket->WriteStream(szConsoleOutput, (uint32)ACE_OS::strlen(szConsoleOutput));
@@ -1104,11 +1109,11 @@ void DoMessage_SetDebug(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uin
     {
         if (u1Debug == DEBUG_OFF)
         {
-            App_MainConfig::instance()->SetDebug(DEBUG_OFF);
+            GetXmlConfigAttribute(xmlAceDebug)->TrunOn = DEBUG_OFF;
         }
         else
         {
-            App_MainConfig::instance()->SetDebug(DEBUG_ON);
+            GetXmlConfigAttribute(xmlAceDebug)->TrunOn = DEBUG_ON;
         }
 
         if (CommandInfo.m_u1OutputType == 0)
@@ -1132,13 +1137,13 @@ void DoMessage_ShowDebug(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, ui
     {
         if (CommandInfo.m_u1OutputType == 0)
         {
-            (*pBuffPacket) << (uint8)App_MainConfig::instance()->GetDebug();
+            (*pBuffPacket) << GetXmlConfigAttribute(xmlAceDebug)->TrunOn;
             (*pBuffPacket) << (uint8)0;
         }
         else
         {
             char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "DebugState(%d)\n", App_MainConfig::instance()->GetDebug());
+            sprintf_safe(szTemp, MAX_BUFF_1024, "DebugState(%d)\n", GetXmlConfigAttribute(xmlAceDebug)->TrunOn);
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
             sprintf_safe(szTemp, MAX_BUFF_1024, "State(OK)\n");
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
@@ -1641,7 +1646,7 @@ void DoMessage_SetMaxConnectCount(_CommandInfo& CommandInfo, IBuffPacket* pBuffP
 
     if (GetMaxConnectCount(CommandInfo.m_szCommandExp, u2MaxConnectHandler) == true && u2MaxConnectHandler > 0)
     {
-        App_MainConfig::instance()->SetMaxHandlerCount(u2MaxConnectHandler);
+        GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount = u2MaxConnectHandler;
     }
 
     if (CommandInfo.m_u1OutputType == 0)
@@ -1814,7 +1819,7 @@ void DoMessage_MonitorInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, 
         {
             (*pBuffPacket) << (uint32)nActiveClient;
             (*pBuffPacket) << (uint32)nPoolClient;
-            (*pBuffPacket) << (uint16)App_MainConfig::instance()->GetMaxHandlerCount();
+            (*pBuffPacket) << (uint16)GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount;
             (*pBuffPacket) << (uint16)App_ConnectAccount::instance()->GetCurrConnect();
             (*pBuffPacket) << u4FlowIn;
             (*pBuffPacket) << u4FlowOut;
@@ -1825,7 +1830,7 @@ void DoMessage_MonitorInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, 
             sprintf_safe(szTemp, MAX_BUFF_1024, "nActiveClient=%d,nPoolClient=%d,MaxHandlerCoun=%d,CurrConnect=%d,u4FlowIn=%d,u4FlowOut=%d.\n",
                          nActiveClient,
                          nPoolClient,
-                         App_MainConfig::instance()->GetMaxHandlerCount(),
+                         GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount,
                          App_ConnectAccount::instance()->GetCurrConnect(),
                          u4FlowIn,
                          u4FlowOut);
@@ -1843,11 +1848,7 @@ void DoMessage_ServerClose(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, 
         return;
     }
 
-    if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0 && App_MainConfig::instance()->GetServerClose() == 0)
-    {
-        u2ReturnCommandID = CONSOLE_COMMAND_CLOSE_SERVER;
-        App_ServerObject::instance()->GetServerManager()->Close();
-    }
+    //这里暂不实现，没必要
 }
 
 void DoMessage_TestFileStart(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)

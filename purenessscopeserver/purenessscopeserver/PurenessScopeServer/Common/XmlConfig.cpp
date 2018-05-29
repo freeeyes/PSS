@@ -110,80 +110,80 @@ bool xmlSendInfo::Init(CXmlOpeation* m_pXmlOpeation)
 
 bool xmlNetWorkMode::Init(CXmlOpeation* m_pXmlOpeation)
 {
-	bool bKet = false;
-	std::string strMode;
-	std::string strNetByteOrder;
+    bool bKet = false;
+    std::string strMode;
+    std::string strNetByteOrder;
 
-	if (m_pXmlOpeation->Read_XML_Data_Single_String("NetWorkMode", "Mode", strMode)
-		&& m_pXmlOpeation->Read_XML_Data_Single_Uint16("NetWorkMode", "BackLog", BackLog)
-		&& m_pXmlOpeation->Read_XML_Data_Single_String("NetWorkMode", "ByteOrder", strNetByteOrder))
-	{
-		SetNetByteOrder(strNetByteOrder);
-		SetLocalByteOrder();
-		bKet = SetIOMode(strMode);
-	}
+    if (m_pXmlOpeation->Read_XML_Data_Single_String("NetWorkMode", "Mode", strMode)
+        && m_pXmlOpeation->Read_XML_Data_Single_Uint16("NetWorkMode", "BackLog", BackLog)
+        && m_pXmlOpeation->Read_XML_Data_Single_String("NetWorkMode", "ByteOrder", strNetByteOrder))
+    {
+        SetNetByteOrder(strNetByteOrder);
+        SetLocalByteOrder();
+        bKet = SetIOMode(strMode);
+    }
 
-	return bKet;
+    return bKet;
 }
 
 bool xmlNetWorkMode::SetIOMode(const std::string& pData)
 {
-	bool bKet = true;
+    bool bKet = true;
 
-	if (pData.compare("Iocp") == 0)
-	{
-		Mode = (uint8)NETWORKMODE_PRO_IOCP;
-	}
-	else if (pData.compare("Select") == 0)
-	{
-		Mode = (uint8)NETWORKMODE_RE_SELECT;
-	}
-	else if (pData.compare("Poll") == 0)
-	{
-		Mode = (uint8)NETWORKMODE_RE_TPSELECT;
-	}
-	else if (pData.compare("Epoll") == 0)
-	{
-		Mode = (uint8)NETWORKMODE_RE_EPOLL;
-	}
-	else if (pData.compare("Epoll_et") == 0)
-	{
-		Mode = (uint8)NETWORKMODE_RE_EPOLL_ET;
-	}
-	else
-	{
-		OUR_DEBUG((LM_INFO, "[CMainConfig::Init_Main]NetworkMode is Invalid!!, please read main.xml desc.\n"));
-		bKet = false;
-	}
+    if (pData.compare("Iocp") == 0)
+    {
+        Mode = (uint8)NETWORKMODE_PRO_IOCP;
+    }
+    else if (pData.compare("Select") == 0)
+    {
+        Mode = (uint8)NETWORKMODE_RE_SELECT;
+    }
+    else if (pData.compare("Poll") == 0)
+    {
+        Mode = (uint8)NETWORKMODE_RE_TPSELECT;
+    }
+    else if (pData.compare("Epoll") == 0)
+    {
+        Mode = (uint8)NETWORKMODE_RE_EPOLL;
+    }
+    else if (pData.compare("Epoll_et") == 0)
+    {
+        Mode = (uint8)NETWORKMODE_RE_EPOLL_ET;
+    }
+    else
+    {
+        OUR_DEBUG((LM_INFO, "[CMainConfig::Init_Main]NetworkMode is Invalid!!, please read main.xml desc.\n"));
+        bKet = false;
+    }
 
-	return bKet;
+    return bKet;
 }
 
 void xmlNetWorkMode::SetLocalByteOrder()
 {
-	//判定字节序
-	if (O32_HOST_ORDER == O32_LITTLE_ENDIAN)
-	{
-		LocalByteOrder = SYSTEM_LITTLE_ORDER;
-		OUR_DEBUG((LM_INFO, "[CMainConfig::CMainConfig]SYSYTEM SYSTEM_LITTLE_ORDER.\n"));
-	}
-	else
-	{
-		LocalByteOrder = SYSTEM_BIG_ORDER;
-		OUR_DEBUG((LM_INFO, "[CMainConfig::CMainConfig]SYSYTEM SYSTEM_BIG_ORDER.\n"));
-	}
+    //判定字节序
+    if (O32_HOST_ORDER == O32_LITTLE_ENDIAN)
+    {
+        LocalByteOrder = SYSTEM_LITTLE_ORDER;
+        OUR_DEBUG((LM_INFO, "[CMainConfig::CMainConfig]SYSYTEM SYSTEM_LITTLE_ORDER.\n"));
+    }
+    else
+    {
+        LocalByteOrder = SYSTEM_BIG_ORDER;
+        OUR_DEBUG((LM_INFO, "[CMainConfig::CMainConfig]SYSYTEM SYSTEM_BIG_ORDER.\n"));
+    }
 }
 
 void xmlNetWorkMode::SetNetByteOrder(const std::string& pData)
 {
-	if (pData.compare("NET_ORDER") == 0)
-	{
-		NetByteOrder = true;
-	}
-	else
-	{
-		NetByteOrder = false;
-	}
+    if (pData.compare("NET_ORDER") == 0)
+    {
+        NetByteOrder = true;
+    }
+    else
+    {
+        NetByteOrder = false;
+    }
 }
 
 
@@ -359,13 +359,25 @@ bool xmlPacketParses::Init(CXmlOpeation* pXmlOpeation)
     TiXmlElement* pOrg = NULL;
 
     _PacketParse packetparse;
+    string Type;
 
-    while (pXmlOpeation->Read_XML_Data_Multiple_Uint16("PacketParse", "ParseID", packetparse.uParseID, pParseID)
-           && pXmlOpeation->Read_XML_Data_Multiple_String("PacketParse", "ModulePath", packetparse.szModulePath, pPath)
-           && pXmlOpeation->Read_XML_Data_Multiple_String("PacketParse", "ModuleName", packetparse.szModuleName, pName)
-           && pXmlOpeation->Read_XML_Data_Multiple_String("PacketParse", "Type", packetparse.szType, pType)
-           && pXmlOpeation->Read_XML_Data_Multiple_Uint16("PacketParse", "OrgLength", packetparse.uOrgLength, pOrg))
+    while (pXmlOpeation->Read_XML_Data_Multiple_Uint16("PacketParse", "ParseID", packetparse.ParseID, pParseID)
+           && pXmlOpeation->Read_XML_Data_Multiple_String("PacketParse", "ModulePath", packetparse.ModulePath, pPath)
+           && pXmlOpeation->Read_XML_Data_Multiple_String("PacketParse", "ModuleName", packetparse.ModuleName, pName)
+           && pXmlOpeation->Read_XML_Data_Multiple_String("PacketParse", "Type", Type, pType)
+           && pXmlOpeation->Read_XML_Data_Multiple_Uint16("PacketParse", "OrgLength", packetparse.OrgLength, pOrg))
     {
+        if (ACE_OS::strcmp(Type.c_str(), "STREAM") == 0)
+        {
+            //流模式
+            packetparse.Type = (uint8)PACKET_WITHSTREAM;
+        }
+        else
+        {
+            //数据头体模式
+            packetparse.Type = (uint8)PACKET_WITHHEAD;
+        }
+
         _vec.push_back(packetparse);
     }
 
@@ -421,24 +433,38 @@ bool xmlCommandInfo::Init(CXmlOpeation* pXmlOpeation)
 
 bool xmlMails::Init(CXmlOpeation* pXmlOpeation)
 {
-	TiXmlElement* pMailID = NULL;
-	TiXmlElement* pfromMailAddr = NULL;
-	TiXmlElement* ptoMailAddr = NULL;
-	TiXmlElement* pMailPass = NULL;
-	TiXmlElement* pMailUrl = NULL;
-	TiXmlElement* pMailPort = NULL;
-	_Mail mail;
+    TiXmlElement* pMailID = NULL;
+    TiXmlElement* pfromMailAddr = NULL;
+    TiXmlElement* ptoMailAddr = NULL;
+    TiXmlElement* pMailPass = NULL;
+    TiXmlElement* pMailUrl = NULL;
+    TiXmlElement* pMailPort = NULL;
+    _Mail mail;
 
-	while (pXmlOpeation->Read_XML_Data_Multiple_Uint16("Mail", "MailID", mail.MailID, pMailID)
-		&& pXmlOpeation->Read_XML_Data_Multiple_String("Mail", "fromMailAddr", mail.fromMailAddr, pfromMailAddr)
-		&& pXmlOpeation->Read_XML_Data_Multiple_String("Mail", "toMailAddr", mail.toMailAddr, ptoMailAddr)
-		&& pXmlOpeation->Read_XML_Data_Multiple_Uint32("Mail", "MailPass", mail.MailPass, pMailPass)
-		&& pXmlOpeation->Read_XML_Data_Multiple_String("Mail", "MailUrl", mail.MailUrl, pMailUrl)
-		&& pXmlOpeation->Read_XML_Data_Multiple_Uint16("Mail", "MailPort", mail.MailPort, pMailPort))
+    while (pXmlOpeation->Read_XML_Data_Multiple_Uint16("Mail", "MailID", mail.MailID, pMailID)
+           && pXmlOpeation->Read_XML_Data_Multiple_String("Mail", "fromMailAddr", mail.fromMailAddr, pfromMailAddr)
+           && pXmlOpeation->Read_XML_Data_Multiple_String("Mail", "toMailAddr", mail.toMailAddr, ptoMailAddr)
+           && pXmlOpeation->Read_XML_Data_Multiple_String("Mail", "MailPass", mail.MailPass, pMailPass)
+           && pXmlOpeation->Read_XML_Data_Multiple_String("Mail", "MailUrl", mail.MailUrl, pMailUrl)
+           && pXmlOpeation->Read_XML_Data_Multiple_Uint16("Mail", "MailPort", mail.MailPort, pMailPort))
     {
-		_vec.push_back(mail);
+        _vec.push_back(mail);
     }
-	return true;
+
+    return true;
+}
+
+xmlMails::_Mail* xmlMails::GetMailAlert(uint16 MailID)
+{
+    for (int i = 0; i < _vec.size(); i++)
+    {
+        if (_vec[i].MailID == MailID)
+        {
+            return &_vec[i];
+        }
+    }
+
+    return NULL;
 }
 
 bool xmlWorkThreadChart::Init(CXmlOpeation* pXmlOpeation)

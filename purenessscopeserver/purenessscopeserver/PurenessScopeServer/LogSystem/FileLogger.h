@@ -10,6 +10,7 @@
 #include "MainConfig.h"
 #include "ILogObject.h"
 #include "smtp.h"
+#include "XmlConfig.h"
 
 #define MAX_CMD_NUM   100
 #define MAX_TIME_SIZE 100
@@ -307,7 +308,7 @@ public:
     bool SendMail(_LogBlockInfo* pLogBlockInfo)
     {
         //·¢ËÍÓÊ¼ş
-        _MailAlert* pMailAlert = App_MainConfig::instance()->GetMailAlert(pLogBlockInfo->m_u4MailID);
+        xmlMails::_Mail* pMailAlert = GetXmlConfigAttribute(xmlMails)->GetMailAlert(pLogBlockInfo->m_u4MailID);
 
         if(NULL == pMailAlert)
         {
@@ -319,8 +320,8 @@ public:
 
         int nRet = 0;
         nRet = mailText(&pMail,
-                        (const unsigned char*)pMailAlert->m_szFromMailAddr,
-                        (const unsigned char*)pMailAlert->m_szToMailAddr,
+                        (const unsigned char*)pMailAlert->fromMailAddr.c_str(),
+                        (const unsigned char*)pMailAlert->toMailAddr.c_str(),
                         (const unsigned char*)pLogBlockInfo->m_szMailTitle,
                         (const unsigned char*)pLogBlockInfo->m_pBlock);
 
@@ -342,8 +343,8 @@ public:
 
         ACE_HANDLE fd;
 
-        nRet = connectSmtp(fd, (const unsigned char*)pMailAlert->m_szMailUrl,
-                           pMailAlert->m_u4MailPort);
+        nRet = connectSmtp(fd, (const unsigned char*)pMailAlert->MailUrl.c_str(),
+                           pMailAlert->MailPort);
 
         if(nRet != 0)
         {
@@ -360,8 +361,8 @@ public:
         }
 
         nRet = authEmail(fd,
-                         (const unsigned char*)pMailAlert->m_szFromMailAddr,
-                         (const unsigned char*)pMailAlert->m_szMailPass);
+                         (const unsigned char*)pMailAlert->fromMailAddr.c_str(),
+                         (const unsigned char*)pMailAlert->MailPass.c_str());
 
         if(nRet != 0)
         {
@@ -371,8 +372,8 @@ public:
             return false;
         }
 
-        nRet = sendEmail(fd, (const unsigned char*)pMailAlert->m_szFromMailAddr,
-                         (const unsigned char*)pMailAlert->m_szToMailAddr,
+        nRet = sendEmail(fd, (const unsigned char*)pMailAlert->fromMailAddr.c_str(),
+                         (const unsigned char*)pMailAlert->toMailAddr.c_str(),
                          (const unsigned char*)pMail,
                          (const int)strlen((const char*)pMail));
 
