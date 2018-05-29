@@ -126,12 +126,13 @@ matrix:
       - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
       - $ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc
       - make -j 4
-      - ./PurenessScopeServer
+      - ./PurenessScopeServer > a.out 2>&1 &
       - sleep 10
       - cd $TRAVIS_BUILD_DIR/purenessscopeserver/Test
       - make -j 4
       - ./Test_Pss
       - killall -9 PurenessScopeServer
+      - cat a.log
       - cd $TRAVIS_BUILD_DIR
       - git init
       - git config user.name "freeeyes"
