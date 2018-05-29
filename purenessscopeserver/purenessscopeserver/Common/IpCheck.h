@@ -184,4 +184,36 @@ inline string Get_Type_Name(EM_CHECK_IP_TYPE emType)
         return (string)"IP Unknow";
     }
 }
+
+
+/*
+根据ip地址，判断Ip类型
+参数:	in	ip: 传入的Ip地址
+		out	ipType: 需要写入的类型
+返回值: false为非法ip类型，ture为正常ip类型.
+*/
+static bool Check_IPType(const std::string& ip, uint8& ipType)
+{
+	bool bKet = true;
+	EM_CHECK_IP_TYPE emIpType = Check_IP(ip);
+
+	if (IP_UNKNOW == emIpType)
+	{
+		OUR_DEBUG((LM_INFO, "[XmlConfig::SetIPType](%s) IP is %s.\n",
+			ip,
+			Get_Type_Name(emIpType).c_str()));
+		bKet = false;
+	}
+	else if (IP_V6 == emIpType)
+	{
+		ipType = TYPE_IPV6;
+	}
+	else
+	{
+		ipType = TYPE_IPV4;
+	}
+
+	return bKet;
+}
+
 #endif

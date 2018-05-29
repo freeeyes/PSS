@@ -1,5 +1,7 @@
 #include "XmlConfig.h"
 #include "define.h"
+#include "IpCheck.h"
+
 /*数组元素对应的元素位置已经在构造时候按枚举确认*/
 IConfigOpeation* IConfigOpeation::_array[XML_Config_MAX];
 
@@ -49,8 +51,6 @@ DefineClassAndFunc(xmlWorkThreadChart, XML_Config_WorkThreadChart)
 DefineClassAndFunc(xmlConnectChart, XML_Config_ConnectChart)
 DefineClassAndFunc(xmlCommandChart, XML_Config_CommandChart)
 
-
-
 bool XMainConfig::Init()
 {
     //初始化xml文件
@@ -99,7 +99,9 @@ bool xmlSendInfo::Init(CXmlOpeation* m_pXmlOpeation)
         && m_pXmlOpeation->Read_XML_Data_Single_Uint16("SendInfo", "SendQueueMax", SendQueueMax)
         && m_pXmlOpeation->Read_XML_Data_Single_Uint16("SendInfo", "PutQueueTimeout", PutQueueTimeout)
         && m_pXmlOpeation->Read_XML_Data_Single_Uint32("SendInfo", "BlockCount", BlockCount)
-        && m_pXmlOpeation->Read_XML_Data_Single_Uint32("SendInfo", "MaxBlockSize", MaxBlockSize))
+        && m_pXmlOpeation->Read_XML_Data_Single_Uint32("SendInfo", "MaxBlockSize", MaxBlockSize)
+		&& m_pXmlOpeation->Read_XML_Data_Single_Uint16("SendInfo", "SendQueueTimeout", SendQueueTimeout)
+		&& m_pXmlOpeation->Read_XML_Data_Single_Uint16("SendInfo", "SendQueueCount", SendQueueCount))
     {
         SendDatamark = MaxBlockSize;
         bKet = m_pXmlOpeation->Read_XML_Data_Single_Uint16("SendInfo", "TcpNodelay", TcpNodelay);
@@ -189,19 +191,43 @@ void xmlNetWorkMode::SetNetByteOrder(const std::string& pData)
 
 bool xmlTCPServerIPs::Init(CXmlOpeation* pXmlOpeation)
 {
+	bool bKet = true;
     TiXmlElement* pIP = NULL;
     TiXmlElement* pPort = NULL;
 
     _TCPServerIP tcpServerIP;
 
-    while (pXmlOpeation->Read_XML_Data_Multiple_String("TCPServerIP", "ip", tcpServerIP.ip, pIP)
-           && pXmlOpeation->Read_XML_Data_Multiple_Uint32("TCPServerIP", "port", tcpServerIP.port, pPort))
+    while (bKet
+		&& pXmlOpeation->Read_XML_Data_Multiple_String("TCPServerIP", "ip", tcpServerIP.ip, pIP)
+		&& pXmlOpeation->Read_XML_Data_Multiple_Uint32("TCPServerIP", "port", tcpServerIP.port, pPort))
     {
+		bKet = Check_IPType(tcpServerIP.ip, tcpServerIP.ipType);
         vec.push_back(tcpServerIP);
     }
 
-    return true;
+    return bKet;
 }
+
+bool xmlUDPServerIPs::Init(CXmlOpeation* pXmlOpeation)
+{
+	bool bKet = true;
+	TiXmlElement* pUIP = NULL;
+	TiXmlElement* pUPort = NULL;
+	TiXmlElement* pUMaxRecvSize = NULL;
+	_UDPServerIP udpServerIP;
+
+	while (bKet
+		&& pXmlOpeation->Read_XML_Data_Multiple_String("UDPServerIP", "uip", udpServerIP.uip, pUIP)
+		&& pXmlOpeation->Read_XML_Data_Multiple_Uint32("UDPServerIP", "uport", udpServerIP.uport, pUPort)
+		&& pXmlOpeation->Read_XML_Data_Multiple_Uint32("UDPServerIP", "uMaxRecvSize", udpServerIP.uMaxRecvSize, pUMaxRecvSize))
+	{
+		bKet = Check_IPType(udpServerIP.uip, udpServerIP.uipType);
+		vec.push_back(udpServerIP);
+	}
+	return bKet;
+}
+
+
 
 bool xmlConnectServer::Init(CXmlOpeation* pXmlOpeation)
 {
@@ -271,9 +297,16 @@ bool xmlThreadInfo::Init(CXmlOpeation* pXmlOpeation)
 
 bool xmlConsole::Init(CXmlOpeation* pXmlOpeation)
 {
-    return pXmlOpeation->Read_XML_Data_Single_Uint8("Console", "support", support)
-           && pXmlOpeation->Read_XML_Data_Single_String("Console", "sip", sip)
-           && pXmlOpeation->Read_XML_Data_Single_Uint16("Console", "sport", sport);
+	bool bKet = true;
+
+	if (pXmlOpeation->Read_XML_Data_Single_Uint8("Console", "support", support)
+		&& pXmlOpeation->Read_XML_Data_Single_String("Console", "sip", sip)
+		&& pXmlOpeation->Read_XML_Data_Single_Uint16("Console", "sport", sport))
+	{
+		bKet = Check_IPType(sip, ipType);
+	}
+	
+	return bKet;
 }
 
 bool xmlConsoleKeys::Init(CXmlOpeation* pXmlOpeation)
@@ -367,7 +400,7 @@ bool xmlPacketParses::Init(CXmlOpeation* pXmlOpeation)
            && pXmlOpeation->Read_XML_Data_Multiple_String("PacketParse", "Type", Type, pType)
            && pXmlOpeation->Read_XML_Data_Multiple_Uint16("PacketParse", "OrgLength", packetparse.OrgLength, pOrg))
     {
-        if (ACE_OS::strcmp(Type.c_str(), "STREAM") == 0)
+        if (Type.compare("STREAM") == 0)
         {
             //流模式
             packetparse.Type = (uint8)PACKET_WITHSTREAM;

@@ -23,6 +23,7 @@ enum XmlConfig
     XML_Config_SendInfo,
     XML_Config_NetWorkMode,
     XML_Config_TCPServerIPs,
+	XML_Config_UDPServerIPs,
     /********连接信息********/
     XML_Config_ConnectServer,
     XML_Config_ClientInfo,
@@ -78,12 +79,14 @@ public:
     XMainConfig()
     {
         _initIsOk = Init();
-    }
+	}
+
     bool InitIsOk()
     {
         return _initIsOk;
     }
     bool Init();
+
     template<class T>
     T* GetXmlConfig();
 private:
@@ -164,13 +167,31 @@ public:
     class _TCPServerIP
     {
     public:
-        string ip;
+        std::string ip;
+		uint8 ipType;
         uint32 port;
-        _TCPServerIP() : ip(""), port(0) {}
+        _TCPServerIP() : ip(""), port(0), ipType(0){}
     };
     std::vector<_TCPServerIP> vec;
     xmlTCPServerIPs(XmlConfig config) : IConfigOpeation(config) {}
     bool Init(CXmlOpeation* pXmlOpeation);
+};
+
+class xmlUDPServerIPs : public IConfigOpeation
+{
+public:
+	class _UDPServerIP
+	{
+	public:
+		std::string uip;
+		uint8 uipType;
+		uint32 uport;
+		uint32 uMaxRecvSize;
+		_UDPServerIP() : uip("127.0.0.1"), uipType(0), uport(0), uMaxRecvSize(0) {}
+	};
+	std::vector<_UDPServerIP> vec;
+	xmlUDPServerIPs(XmlConfig config) : IConfigOpeation(config) {}
+	bool Init(CXmlOpeation* pXmlOpeation);
 };
 
 class xmlConnectServer : public IConfigOpeation
@@ -262,8 +283,9 @@ class xmlConsole : public IConfigOpeation
 public:
     uint8 support;
     std::string sip;
+	uint8 ipType;
     uint16 sport;
-    xmlConsole(XmlConfig config) : IConfigOpeation(config), support(1), sip("INADDR_ANY"), sport(10010) {}
+    xmlConsole(XmlConfig config) : IConfigOpeation(config), support(1), sip("INADDR_ANY"), sport(10010), ipType(0) {}
     bool Init(CXmlOpeation* pXmlOpeation);
 };
 

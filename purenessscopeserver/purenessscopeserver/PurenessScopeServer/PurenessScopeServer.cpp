@@ -445,14 +445,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
         App_MainConfig::instance()->Display();
     }
 
-    //第二步，判断所有的IP是否是合法的，同时识别IP类型，Ipv6还是Ipv4。
-    if (!App_MainConfig::instance()->CheckAllIP())
-    {
-        OUR_DEBUG((LM_INFO, "[main]CheckAllIP() error.\n"));
-        return 0;
-    }
-
-    //隐式加载PacketParse
+    //第二步,隐式加载PacketParse
     if (0 != Load_PacketParse_Module())
     {
         if (GetXmlConfigAttribute(xmlServerType)->Type == 1)
