@@ -19,7 +19,7 @@ CMessageService::CMessageService():m_mutex(), m_cond(m_mutex)
     m_u2ThreadTimeCheck  = 0;
     m_u4WorkQueuePutTime = 0;
 
-    uint16 u2ThreadTimeOut = App_MainConfig::instance()->GetThreadTimuOut();
+    uint16 u2ThreadTimeOut = GetXmlConfigAttribute(xmlThreadInfo)->ThreadTimeout;
 
     if(u2ThreadTimeOut == 0)
     {
@@ -46,48 +46,38 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
     m_u4ThreadID = u4ThreadID;
     m_ThreadInfo.m_u4ThreadID   = u4ThreadID;
 
-    m_u4WorkQueuePutTime = App_MainConfig::instance()->GetWorkQueuePutTime() * 1000;
+    m_u4WorkQueuePutTime = GetXmlConfigAttribute(xmlThreadInfo)->PutQueueTimeout * 1000;
 
     //初始化线程AI
-    m_WorkThreadAI.Init(App_MainConfig::instance()->GetWTAI(),
-                        App_MainConfig::instance()->GetPacketTimeOut(),
-                        App_MainConfig::instance()->GetWTCheckTime(),
-                        App_MainConfig::instance()->GetWTTimeoutCount(),
-                        App_MainConfig::instance()->GetWTStopTime(),
-                        App_MainConfig::instance()->GetWTReturnDataType(),
-                        App_MainConfig::instance()->GetWTReturnData());
+    m_WorkThreadAI.Init(GetXmlConfigAttribute(xmlThreadInfoAI)->AI,
+                        GetXmlConfigAttribute(xmlThreadInfoAI)->TimeoutCount,
+                        GetXmlConfigAttribute(xmlThreadInfoAI)->CheckTime,
+                        GetXmlConfigAttribute(xmlThreadInfoAI)->TimeoutCount,
+                        GetXmlConfigAttribute(xmlThreadInfoAI)->StopTime,
+                        GetXmlConfigAttribute(xmlThreadInfoAI)->ReturnDataType,
+                        GetXmlConfigAttribute(xmlThreadInfoAI)->ReturnData.c_str());
 
     //按照线程初始化统计模块的名字
     char szName[MAX_BUFF_50] = {'\0'};
     sprintf_safe(szName, MAX_BUFF_50, "工作线程(%d)", u4ThreadID);
-    m_CommandAccount.InitName(szName, App_MainConfig::instance()->GetMaxCommandCount());
+    m_CommandAccount.InitName(szName, GetXmlConfigAttribute(xmlCommandAccount)->MaxCommandCount);
 
     //初始化统计模块功能
-    m_CommandAccount.Init(App_MainConfig::instance()->GetCommandAccount(),
-                          App_MainConfig::instance()->GetCommandFlow(),
-                          App_MainConfig::instance()->GetPacketTimeOut());
+    m_CommandAccount.Init(GetXmlConfigAttribute(xmlCommandAccount)->Account,
+                          GetXmlConfigAttribute(xmlCommandAccount)->FlowAccount,
+                          GetXmlConfigAttribute(xmlThreadInfo)->ThreadTimeout);
 
     //初始化本地信令列表副本
     m_objClientCommandList.Init(App_MessageManager::instance()->GetMaxCommandCount());
 
     //初始化CommandID告警阀值相关
-    for(int i = 0; i < (int)App_MainConfig::instance()->GetCommandAlertCount(); i++)
+    for(int i = 0; i < (int)GetXmlConfigAttribute(xmlCommandInfos)->_vec.size(); i++)
     {
-        _CommandAlert* pCommandAlert = App_MainConfig::instance()->GetCommandAlert(i);
-
-        if(NULL != pCommandAlert)
-        {
-            m_CommandAccount.AddCommandAlert(pCommandAlert->m_u2CommandID,
-                                             pCommandAlert->m_u4CommandCount,
-                                             pCommandAlert->m_u4MailID);
-        }
+        m_CommandAccount.AddCommandAlert(GetXmlConfigAttribute(xmlCommandInfos)->_vec[i].CommandID,
+                                         GetXmlConfigAttribute(xmlCommandInfos)->_vec[i].CommandCount,
+                                         GetXmlConfigAttribute(xmlCommandInfos)->_vec[i].MailID);
     }
 
-    //初始化工作线程历史记录
-    if (true == App_MainConfig::instance()->GetWorkThreadChart()->m_blJsonOutput)
-    {
-        m_objThreadHistoryList.Init(App_MainConfig::instance()->GetWorkThreadChart()->m_u2Count);
-    }
 
     //设置消息池
     m_MessagePool.Init(MAX_MESSAGE_POOL, CMessagePool::Init_Callback);
@@ -236,7 +226,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
     //判断队列处理时间是否超过了数据入队列的时间
     ACE_Time_Value tvQueueDispose(m_ThreadInfo.m_tvUpdateTime - pMessage->GetMessageBase()->m_tvRecvTime);
 
-    if (tvQueueDispose.msec() > (uint32)App_MainConfig::instance()->GetPacketTimeOut())
+    if (tvQueueDispose.msec() > (uint32)GetXmlConfigAttribute(xmlThreadInfo)->DisposeTimeout)
     {
         AppLogManager::instance()->WriteLog(LOG_SYSTEM_COMMANDDATA, "[CMessageService::ProcessMessage]CommandID=0x%04x, Queue put dispose time interval(%d).\n",
                                             (int)pMessage->GetMessageBase()->m_u2Cmd,
@@ -383,7 +373,6 @@ bool CMessageService::SaveThreadInfoData()
     //添加到线程信息历史数据表
     _ThreadInfo objCurrThreadInfo    = m_ThreadInfo;
     objCurrThreadInfo.m_tvUpdateTime = ACE_OS::gettimeofday();
-    m_objThreadHistoryList.AddObject(objCurrThreadInfo);
 
     //开始查看线程是否超时
     if(m_ThreadInfo.m_u4State == THREAD_RUNBEGIN && tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec() > m_u2ThreadTimeOut)
@@ -736,7 +725,7 @@ CMessageServiceGroup::CMessageServiceGroup()
     m_u4LowMask      = 0;
     m_u2CurrThreadID = 0;
 
-    uint16 u2ThreadTimeCheck = App_MainConfig::instance()->GetThreadTimeCheck();
+    uint16 u2ThreadTimeCheck = GetXmlConfigAttribute(xmlThreadInfo)->ThreadTimeCheck;
 
     if(u2ThreadTimeCheck == 0)
     {
@@ -813,22 +802,6 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
         pMessageService->Init(i, u4MaxQueue, u4LowMask, u4HighMask);
 
         m_vecMessageService.push_back(pMessageService);
-    }
-
-    //初始化连接信息历史记录
-    if (true == App_MainConfig::instance()->GetConnectChart()->m_blJsonOutput)
-    {
-        m_objConnectHistoryList.Init(App_MainConfig::instance()->GetConnectChart()->m_u2Count);
-    }
-
-    //初始化命令图表记录
-    uint32 u4Count = App_MainConfig::instance()->GetCommandChartCount();
-
-    for (uint32 i = 0; i < u4Count; i++)
-    {
-        CObjectLruList<_Command_Chart_Info, ACE_Null_Mutex> obj_Command_Chart_Info;
-        obj_Command_Chart_Info.Init(App_MainConfig::instance()->GetCommandChart(i)->m_u2Count);
-        m_vec_Command_Chart_Info.push_back(obj_Command_Chart_Info);
     }
 
     return true;
@@ -999,7 +972,7 @@ bool CMessageServiceGroup::CheckPacketParsePool()
 
 bool CMessageServiceGroup::CheckCPUAndMemory()
 {
-    if (App_MainConfig::instance()->GetMonitor() == 1)
+    if (GetXmlConfigAttribute(xmlMonitor)->CpuAndMemory == 1)
     {
 #ifdef WIN32
         uint32 u4CurrCpu = (uint32)GetProcessCPU_Idel();
@@ -1012,7 +985,7 @@ bool CMessageServiceGroup::CheckCPUAndMemory()
         uint32 u4BuffPacketCount = App_BuffPacketManager::instance()->GetBuffPacketUsedCount();
         uint32 u4MessageCount = GetUsedMessageCount();
 
-        if (u4CurrCpu > App_MainConfig::instance()->GetCpuMax() || u4MessageBlockUsedSize > App_MainConfig::instance()->GetMemoryMax())
+        if (u4CurrCpu > GetXmlConfigAttribute(xmlMonitor)->CpuMax || u4MessageBlockUsedSize > GetXmlConfigAttribute(xmlMonitor)->MemoryMax)
         {
             OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::handle_timeout]CPU Rote=%d,MessageBlock=%d,u4BuffPacketCount=%d,u4MessageCount=%d ALERT.\n", u4CurrCpu, u4MessageBlockUsedSize, u4BuffPacketCount, u4MessageCount));
             AppLogManager::instance()->WriteLog(LOG_SYSTEM_MONITOR, "[Monitor] CPU Rote=%d,MessageBlock=%d,u4BuffPacketCount=%d,u4MessageCount=%d.", u4CurrCpu, u4MessageBlockUsedSize, u4BuffPacketCount, u4MessageCount);

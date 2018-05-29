@@ -113,7 +113,6 @@ private:
     CMessagePool                   m_MessagePool;          //消息池
 
     CHashTable<CClientCommandList>                      m_objClientCommandList;  //可执行的信令列表
-    CObjectLruList<_ThreadInfo, ACE_Null_Mutex>         m_objThreadHistoryList;  //工作线程历史信息记录
 
     ACE_Thread_Mutex m_mutex;
     ACE_Condition<ACE_Thread_Mutex> m_cond;
@@ -188,9 +187,7 @@ public:
     uint16                                              m_u2CurrThreadID;          //当前轮询到的线程ID
     CThreadInfo                                         m_objAllThreadInfo;        //当前所有线程信息
     CMessageDyeingManager                               m_objMessageDyeingManager; //数据染色类
-    C_Connect_Chart_List                                m_objConnectHistoryList;   //连接信息历史信息记录
     ACE_Recursive_Thread_Mutex                          m_ThreadLock;              //用于线程操作的线程锁，保证CurrThreadID的数据正常
-    vec_Command_Chart_Info                              m_vec_Command_Chart_Info; //命令历史信息列表
 };
 
 typedef ACE_Singleton<CMessageServiceGroup, ACE_Null_Mutex> App_MessageServiceGroup;

@@ -55,6 +55,12 @@ matrix:
         - export    
         # - wget https://bootstrap.pypa.io/ez_setup.py -O - | sudo python
         # - sudo easy_install gcovr
+        # - wget https://sourceforge.net/projects/cppunit/files/cppunit/1.12.1/cppunit-1.12.1.tar.gz
+        # - tar zxvf cppunit-1.12.1.tar.gz
+        # - cd cppunit-1.12.1
+        # - ./configure --prefix=$TRAVIS_BUILD_DIR
+        # - make 
+        # - make install 
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
         # Compile by gcov
         - $ACE_ROOT/bin/mwc.pl -type gnuace psssonar.mwc
