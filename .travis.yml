@@ -73,10 +73,8 @@ matrix:
         - make -j 4
         # Execute some tests
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
-        #- ./PurenessScopeServer > /dev/null 2>&1 &
-        - nohup ./PurenessScopeServer > pssout.file 2>&1 &
+        - ./PurenessScopeServer > /dev/null 2>&1 &
         - sleep 10
-        - cat pssout.file
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/Test
         - make -j 4
         - ./Test_Pss
@@ -134,9 +132,9 @@ matrix:
       - cd $TRAVIS_BUILD_DIR/purenessscopeserver/Test
       - make -j 4
       - ./Test_Pss
-      - killall -9 PurenessScopeServer
       - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
       - cat pssout.file
+      - killall -9 PurenessScopeServer
       - cd $TRAVIS_BUILD_DIR
       - git init
       - git config user.name "freeeyes"
