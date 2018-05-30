@@ -50,13 +50,12 @@ DefineClassAndFunc(xmlCommandInfos, XML_Config_CommandInfos)
 DefineClassAndFunc(xmlMails, XML_Config_Mails)
 DefineClassAndFunc(xmlWorkThreadChart, XML_Config_WorkThreadChart)
 DefineClassAndFunc(xmlConnectChart, XML_Config_ConnectChart)
-DefineClassAndFunc(xmlCommandChart, XML_Config_CommandChart)
 
 bool XMainConfig::Init()
 {
     //初始化xml文件
     return InitFile(MAINCONFIG, XML_Config_RecvInfo, XML_Config_Message)
-           && InitFile(ALERTCONFIG, XML_Config_AlertConnect, XML_Config_CommandChart);
+           && InitFile(ALERTCONFIG, XML_Config_AlertConnect, XML_Config_ConnectChart);
 }
 
 bool XMainConfig::InitFile(const char* pFileName, XmlConfig start, XmlConfig end)
@@ -542,12 +541,4 @@ bool xmlConnectChart::Init(CXmlOpeation* pXmlOpeation)
     return pXmlOpeation->Read_XML_Data_Single_Uint16("ConnectChart", "JsonOutput", JsonOutput)
            && pXmlOpeation->Read_XML_Data_Single_Uint32("ConnectChart", "Count", Count)
            && pXmlOpeation->Read_XML_Data_Single_String("ConnectChart", "File", File);
-}
-
-bool xmlCommandChart::Init(CXmlOpeation* pXmlOpeation)
-{
-    return pXmlOpeation->Read_XML_Data_Single_Uint16("CommandChart", "JsonOutput", JsonOutput)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("CommandChart", "Count", Count)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("CommandChart", "CommandID", CommandID)
-           && pXmlOpeation->Read_XML_Data_Single_String("CommandChart", "File", File);
 }

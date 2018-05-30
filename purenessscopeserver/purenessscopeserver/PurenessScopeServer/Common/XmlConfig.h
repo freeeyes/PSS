@@ -59,7 +59,6 @@ enum XmlConfig
     XML_Config_Mails,
     XML_Config_WorkThreadChart,
     XML_Config_ConnectChart,
-    XML_Config_CommandChart,
 
     /*Ã¶¾Ù½áÊø*/
     XML_Config_End
@@ -106,13 +105,13 @@ public:
     virtual ~IConfigOpeation() {}
 protected:
     IConfigOpeation(XmlConfig config, const char* name)
-		: m_name(name)
+        : m_name(name)
     {
         _array[config] = this;
     }
     virtual bool Init(CXmlOpeation* pXmlOpeation) = 0;
 private:
-	std::string m_name;
+    std::string m_name;
     static IConfigOpeation* _array[XML_Config_MAX];
 };
 
@@ -426,7 +425,7 @@ public:
     uint32 Msg_Low_mark;
     uint32 Msg_Buff_Max_Size;
     uint16 Msg_Thread;
-	uint16 Msg_Process;
+    uint16 Msg_Process;
     uint32 Msg_MaxQueue;
     xmlMessage(XmlConfig config, const char* name) : IConfigOpeation(config, name), Msg_High_mark(64000), Msg_Low_mark(64000), Msg_Buff_Max_Size(20480),
         Msg_Thread(5), Msg_Process(1), Msg_MaxQueue(10000) {}
@@ -533,15 +532,4 @@ public:
     bool Init(CXmlOpeation* pXmlOpeation);
 };
 
-class xmlCommandChart : public IConfigOpeation
-{
-public:
-    uint16 JsonOutput;
-    uint32 Count;
-    uint32 CommandID;
-    std::string File;
-    xmlCommandChart(XmlConfig config, const char* name) : IConfigOpeation(config, name), JsonOutput(1), Count(10), CommandID(4096),
-        File("./Log/Command4096.json") {}
-    bool Init(CXmlOpeation* pXmlOpeation);
-};
 
