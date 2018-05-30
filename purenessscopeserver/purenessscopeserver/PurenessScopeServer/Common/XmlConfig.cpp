@@ -8,12 +8,12 @@ IConfigOpeation* IConfigOpeation::_array[XML_Config_MAX];
 
 /*定义静态类对象并绑定对应枚举，实现返回模板函数*/
 #define DefineClassAndFunc(ClassName, XMLConfig)                            \
-    static ClassName    this##ClassName(XMLConfig);                             \
-    template<>                                                                  \
-    ClassName* XMainConfig::GetXmlConfig<ClassName>()                           \
-    {                                                                           \
-        return dynamic_cast<ClassName*>(IConfigOpeation::_array[XMLConfig]);    \
-    }
+static ClassName    this##ClassName(XMLConfig, "##ClassName##" );			\
+template<>                                                                  \
+ClassName* XMainConfig::GetXmlConfig<ClassName>()                           \
+{                                                                           \
+    return dynamic_cast<ClassName*>(IConfigOpeation::_array[XMLConfig]);    \
+}
 
 
 /*xml配置文件对应类型配置的静态类，需要增加配置文件标签，需要在此添加静态类对象，所有对象不直接使用,也不允许外部使用*/
@@ -59,7 +59,7 @@ bool XMainConfig::Init()
            && InitFile(ALERTCONFIG, XML_Config_AlertConnect, XML_Config_CommandChart);
 }
 
-bool XMainConfig::InitFile(const char* pFileName, int start, int end)
+bool XMainConfig::InitFile(const char* pFileName, XmlConfig start, XmlConfig end)
 {
     bool bKet = true;
 
