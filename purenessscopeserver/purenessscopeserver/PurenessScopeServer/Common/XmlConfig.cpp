@@ -59,7 +59,7 @@ bool XMainConfig::Init()
            && InitFile(ALERTCONFIG, XML_Config_AlertConnect, XML_Config_CommandChart);
 }
 
-bool XMainConfig::InitFile(const char* pFileName, XmlConfig start, XmlConfig end)
+bool XMainConfig::InitFile(const char* pFileName, int start, int end)
 {
     bool bKet = true;
 
