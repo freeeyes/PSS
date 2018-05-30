@@ -30,7 +30,7 @@ uint32 ConnectAcceptor::GetPacketParseInfoID()
 int ConnectAcceptor::make_svc_handler(CConnectHandler*& sh)
 {
     //如果正在处理的链接超过了服务器设定的数值，则不允许链接继续链接服务器
-    if (App_ConnectHandlerPool::instance()->GetUsedCount() > GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount)
+    if (App_ConnectHandlerPool::instance()->GetUsedCount() > (int)GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount)
     {
         OUR_DEBUG((LM_ERROR, "[ConnectAcceptor::make_svc_handler]Connect is more MaxHandlerCount(%d > %d).\n",
                    App_ConnectHandlerPool::instance()->GetUsedCount(),
