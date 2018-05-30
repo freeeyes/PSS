@@ -33,16 +33,16 @@
 //加载所有配置文件中的PacketParse模块
 int Load_PacketParse_Module()
 {
-    int nPacketParseCount = (int)GetXmlConfigAttribute(xmlPacketParses)->_vec.size();
+    int nPacketParseCount = (int)GetXmlConfigAttribute(xmlPacketParses)->vec.size();
     App_PacketParseLoader::instance()->Init(nPacketParseCount);
 
     for (uint8 i = 0; i < nPacketParseCount; i++)
     {
-        bool blState = App_PacketParseLoader::instance()->LoadPacketInfo(GetXmlConfigAttribute(xmlPacketParses)->_vec[i].ParseID,
-                       GetXmlConfigAttribute(xmlPacketParses)->_vec[i].Type,
-                       GetXmlConfigAttribute(xmlPacketParses)->_vec[i].OrgLength,
-                       GetXmlConfigAttribute(xmlPacketParses)->_vec[i].ModulePath.c_str(),
-                       GetXmlConfigAttribute(xmlPacketParses)->_vec[i].ModuleName.c_str());
+        bool blState = App_PacketParseLoader::instance()->LoadPacketInfo(GetXmlConfigAttribute(xmlPacketParses)->vec[i].ParseID,
+                       GetXmlConfigAttribute(xmlPacketParses)->vec[i].Type,
+                       GetXmlConfigAttribute(xmlPacketParses)->vec[i].OrgLength,
+                       GetXmlConfigAttribute(xmlPacketParses)->vec[i].ModulePath.c_str(),
+                       GetXmlConfigAttribute(xmlPacketParses)->vec[i].ModuleName.c_str());
 
         if (false == blState)
         {

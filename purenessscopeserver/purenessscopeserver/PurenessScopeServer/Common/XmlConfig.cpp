@@ -418,7 +418,7 @@ bool xmlPacketParses::Init(CXmlOpeation* pXmlOpeation)
             packetparse.Type = (uint8)PACKET_WITHHEAD;
         }
 
-        _vec.push_back(packetparse);
+        vec.push_back(packetparse);
     }
 
     return true;
@@ -475,7 +475,7 @@ bool xmlCommandInfos::Init(CXmlOpeation* pXmlOpeation)
            && pXmlOpeation->Read_XML_Data_Multiple_Uint32("CommandInfo", "CommandCount", commandInfo.CommandCount, pCommandCount)
            && pXmlOpeation->Read_XML_Data_Multiple_Uint32("CommandInfo", "MailID", commandInfo.MailID, pMailID))
     {
-        _vec.push_back(commandInfo);
+        vec.push_back(commandInfo);
     }
 
     return true;
@@ -498,7 +498,7 @@ bool xmlMails::Init(CXmlOpeation* pXmlOpeation)
            && pXmlOpeation->Read_XML_Data_Multiple_String("Mail", "MailUrl", mail.MailUrl, pMailUrl)
            && pXmlOpeation->Read_XML_Data_Multiple_Uint16("Mail", "MailPort", mail.MailPort, pMailPort))
     {
-        _vec.push_back(mail);
+        vec.push_back(mail);
     }
 
     return true;
@@ -506,11 +506,11 @@ bool xmlMails::Init(CXmlOpeation* pXmlOpeation)
 
 xmlMails::_Mail* xmlMails::GetMailAlert(uint16 MailID)
 {
-    for (int i = 0; i < (int)_vec.size(); i++)
+    for (int i = 0; i < (int)vec.size(); i++)
     {
-        if (_vec[i].MailID == MailID)
+        if (vec[i].MailID == MailID)
         {
-            return &_vec[i];
+            return &vec[i];
         }
     }
 

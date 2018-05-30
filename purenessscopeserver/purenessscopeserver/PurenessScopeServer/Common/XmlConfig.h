@@ -404,7 +404,7 @@ public:
         _PacketParse() : ParseID(1), ModulePath("./"),
             ModuleName("PacketParse_Interface.dll"), Type(PACKET_WITHHEAD), OrgLength(40) {}
     };
-    std::vector<_PacketParse> _vec;
+    std::vector<_PacketParse> vec;
     xmlPacketParses(XmlConfig config) : IConfigOpeation(config) {}
     bool Init(CXmlOpeation* pXmlOpeation);
 };
@@ -480,7 +480,7 @@ public:
         uint32 MailID;
         _CommandInfo() : CommandID(4096), CommandCount(0), MailID(0) {}
     };
-    std::vector<_CommandInfo> _vec;
+    std::vector<_CommandInfo> vec;
     xmlCommandInfos(XmlConfig config) : IConfigOpeation(config) {}
     bool Init(CXmlOpeation* pXmlOpeation);
 };
@@ -500,7 +500,7 @@ public:
         _Mail() : MailID(1), fromMailAddr("local@163.com"), toMailAddr("freeeyes@163.com"),
             MailPass("123456"), MailUrl("smtp.163.com"), MailPort(25) {}
     };
-    std::vector<_Mail> _vec;
+    std::vector<_Mail> vec;
     xmlMails(XmlConfig config) : IConfigOpeation(config) {}
     bool Init(CXmlOpeation* pXmlOpeation);
 
