@@ -70,9 +70,6 @@
     <ClCompile Include="LogSystem\LogManager.cpp">
       <Filter>Log\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="Common\MainConfig.cpp">
-      <Filter>Common\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="Common\MakePacket.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
@@ -329,9 +326,6 @@
     </ClInclude>
     <ClInclude Include="LogSystem\LogManager.h">
       <Filter>Log\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\MainConfig.h">
-      <Filter>Common\hfile</Filter>
     </ClInclude>
     <ClInclude Include="Common\MakePacket.h">
       <Filter>Common\hfile</Filter>

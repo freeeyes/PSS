@@ -32,17 +32,6 @@ LONG ApplicationCrashHandler(EXCEPTION_POINTERS* pException)
 {
     // 这里弹出一个错误对话框并退出程序
 
-    //重新获得当前配置文件，因考虑到程序崩溃，程序本身的内存未必能用，在这里堆栈新建了一个。
-    CMainConfig objMainConfig;
-    objMainConfig.Init();
-    char* pScript = objMainConfig.GetCoreScript();
-
-    if (strlen(pScript) > 0)
-    {
-        //如果存在配置脚本，则执行
-        ACE_OS::system((ACE_TCHAR* )pScript);
-    }
-
     CreateDumpFile(DUMP_FILE, pException);
     FatalAppExit(-1,  "*** Unhandled Exception! ***");
 

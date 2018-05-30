@@ -4,7 +4,6 @@
 //实现*ConnectClient公共的代码部分。
 //add by freeeyes
 
-#include "MainConfig.h"
 #include "MessageBlockManager.h"
 #include "ClientMessage.h"
 #include "ServerMessageTask.h"

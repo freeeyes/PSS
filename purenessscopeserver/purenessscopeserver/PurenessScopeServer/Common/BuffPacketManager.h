@@ -9,7 +9,6 @@
 #include "IPacketManager.h"
 #include "BuffPacket.h"
 #include "ObjectPoolManager.h"
-#include "MainConfig.h"
 #include "XmlConfig.h"
 
 class CBuffPacketManager : public CObjectPoolManager<CBuffPacket, ACE_Recursive_Thread_Mutex>, public IPacketManager

@@ -5,7 +5,6 @@
 #include "ace/Singleton.h"
 
 #include "PacketParse.h"
-#include "MainConfig.h"
 #include "MessageBlockManager.h"
 #include "ObjectPoolManager.h"
 

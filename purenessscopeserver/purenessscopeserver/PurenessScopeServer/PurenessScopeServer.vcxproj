@@ -379,12 +379,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Common\MainConfig.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="Common\MakePacket.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
@@ -611,7 +605,6 @@
     <ClInclude Include="Common\Frame_Logging_Strategy.h" />
     <ClInclude Include="Common\IPAccount.h" />
     <ClInclude Include="Common\LinuxCPU.h" />
-    <ClInclude Include="Common\MainConfig.h" />
     <ClInclude Include="Common\MakePacket.h" />
     <ClInclude Include="Common\MessageBlockManager.h" />
     <ClInclude Include="Common\MyACELoggingStrategy.h" />

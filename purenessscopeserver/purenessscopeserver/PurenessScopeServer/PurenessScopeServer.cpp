@@ -10,7 +10,6 @@
 // add by freeeyes
 // 2013-09-24
 
-#include "MainConfig.h"
 #include "Frame_Logging_Strategy.h"
 
 #ifndef WIN32

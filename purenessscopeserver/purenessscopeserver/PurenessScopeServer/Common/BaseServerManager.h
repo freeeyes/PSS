@@ -5,7 +5,6 @@
 //add by freeeyes
 
 #include "define.h"
-#include "MainConfig.h"
 #include "ForbiddenIP.h"
 #include "MessageService.h"
 #include "LoadModule.h"
