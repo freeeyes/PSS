@@ -426,9 +426,10 @@ public:
     uint32 Msg_Low_mark;
     uint32 Msg_Buff_Max_Size;
     uint16 Msg_Thread;
+	uint16 Msg_Process;
     uint32 Msg_MaxQueue;
     xmlMessage(XmlConfig config, const char* name) : IConfigOpeation(config, name), Msg_High_mark(64000), Msg_Low_mark(64000), Msg_Buff_Max_Size(20480),
-        Msg_Thread(5), Msg_MaxQueue(10000) {}
+        Msg_Thread(5), Msg_Process(1), Msg_MaxQueue(10000) {}
     bool Init(CXmlOpeation* pXmlOpeation);
 };
 

@@ -431,11 +431,17 @@ bool xmlBuffPacket::Init(CXmlOpeation* pXmlOpeation)
 
 bool xmlMessage::Init(CXmlOpeation* pXmlOpeation)
 {
-    return pXmlOpeation->Read_XML_Data_Single_Uint32("Message", "Msg_High_mark", Msg_High_mark)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("Message", "Msg_Low_mark", Msg_Low_mark)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("Message", "Msg_Buff_Max_Size", Msg_Buff_Max_Size)
-           && pXmlOpeation->Read_XML_Data_Single_Uint16("Message", "Msg_Thread", Msg_Thread)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("Message", "Msg_MaxQueue", Msg_MaxQueue);
+	bool bKet = false;
+	if (pXmlOpeation->Read_XML_Data_Single_Uint32("Message", "Msg_High_mark", Msg_High_mark)
+		&& pXmlOpeation->Read_XML_Data_Single_Uint32("Message", "Msg_Low_mark", Msg_Low_mark)
+		&& pXmlOpeation->Read_XML_Data_Single_Uint32("Message", "Msg_Buff_Max_Size", Msg_Buff_Max_Size)
+		&& pXmlOpeation->Read_XML_Data_Single_Uint16("Message", "Msg_Thread", Msg_Thread)
+		&& pXmlOpeation->Read_XML_Data_Single_Uint32("Message", "Msg_MaxQueue", Msg_MaxQueue))
+	{
+		pXmlOpeation->Read_XML_Data_Single_Uint16("Message", "Msg_Process", Msg_Process);
+	} 
+
+	return bKet;
 }
 
 /******************************alert.xml***************************************/
