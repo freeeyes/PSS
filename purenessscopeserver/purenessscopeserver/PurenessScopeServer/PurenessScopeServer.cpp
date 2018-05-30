@@ -269,19 +269,19 @@ void Gdaemon()
 //子进程程序
 int Chlid_Run()
 {
+    //判断是否是需要以服务的状态启动
+    if(GetXmlConfigAttribute(xmlServerType)->Type == 1)
+    {
+        OUR_DEBUG((LM_INFO, "[main]Procress is run background.\n"));
+        Gdaemon();
+    }
+
     //显式加载PacketParse
     if (0 != Load_PacketParse_Module())
     {
         pthread_exit(NULL);
 
         return 0;
-    }
-
-    //判断是否是需要以服务的状态启动
-    if(GetXmlConfigAttribute(xmlServerType)->Type == 1)
-    {
-        OUR_DEBUG((LM_INFO, "[main]Procress is run background.\n"));
-        Gdaemon();
     }
 
     //判断当前Core文件尺寸是否需要调整
@@ -427,6 +427,12 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
     if(!App_XmlConfig::instance()->InitIsOk())
     {
         OUR_DEBUG((LM_INFO, "[main]!App_XmlConfig->InitIsOk() is false.\n"));
+        return 0;
+    }
+
+    //显式加载PacketParse
+    if (0 != Load_PacketParse_Module())
+    {
         return 0;
     }
 

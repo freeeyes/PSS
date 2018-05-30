@@ -73,6 +73,11 @@ bool XMainConfig::InitFile(const char* pFileName, XmlConfig start, XmlConfig end
         for (int i = start; i <= end && bKet; ++i)
         {
             bKet = IConfigOpeation::_array[i]->Init(&m_XmlOpeation);
+
+            if (false == bKet)
+            {
+                OUR_DEBUG((LM_INFO, "[XMainConfig::InitFile](%d) Init is false.\n", i));
+            }
         }
     }
     else
@@ -440,6 +445,7 @@ bool xmlMessage::Init(CXmlOpeation* pXmlOpeation)
         && pXmlOpeation->Read_XML_Data_Single_Uint32("Message", "Msg_MaxQueue", Msg_MaxQueue))
     {
         pXmlOpeation->Read_XML_Data_Single_Uint16("Message", "Msg_Process", Msg_Process);
+        bKet = true;
     }
 
     return bKet;
