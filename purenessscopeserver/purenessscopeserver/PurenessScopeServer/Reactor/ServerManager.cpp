@@ -124,7 +124,7 @@ bool CServerManager::Start()
         return blRet;
     }
 
-    if (App_MainConfig::instance()->GetProcessCount() > 1)
+    if (GetXmlConfigAttribute(xmlMessage)->Msg_Process > 1)
     {
         Multiple_Process_Start();
     }
@@ -431,7 +431,7 @@ void CServerManager::Multiple_Process_Start()
 {
 #ifndef WIN32
     //当前监控子线程个数
-    int nNumChlid = App_MainConfig::instance()->GetProcessCount();
+    int nNumChlid = GetXmlConfigAttribute(xmlMessage)->Msg_Process;
 
     //检测时间间隔参数
     //主进程检测时间间隔（设置每隔5秒一次）

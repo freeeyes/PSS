@@ -50,11 +50,16 @@ bool CControlListen::AddListen( const char* pListenIP, uint32 u4Port, uint8 u1IP
 
     pConnectAcceptor->SetPacketParseInfoID(nPacketParseID);
 
-    int nRet = pConnectAcceptor->open2(listenAddr, App_ReactorManager::instance()->GetAce_Reactor(REACTOR_CLIENTDEFINE), ACE_NONBLOCK, (int)App_MainConfig::instance()->GetBacklog());
+    int nRet = pConnectAcceptor->open2(listenAddr,
+                                       App_ReactorManager::instance()->GetAce_Reactor(REACTOR_CLIENTDEFINE),
+                                       ACE_NONBLOCK,
+                                       (int)GetXmlConfigAttribute(xmlNetWorkMode)->BackLog);
 
     if (-1 == nRet)
     {
-        OUR_DEBUG((LM_INFO, "[CControlListen::AddListen] Listen from [%s:%d] error(%d).\n", listenAddr.get_host_addr(), listenAddr.get_port_number(), errno));
+        OUR_DEBUG((LM_INFO, "[CControlListen::AddListen] Listen from [%s:%d] error(%d).\n",
+                   listenAddr.get_host_addr(),
+                   listenAddr.get_port_number(), errno));
         return false;
     }
 
@@ -84,17 +89,15 @@ uint32 CControlListen::GetListenCount()
     if (0 == App_ConnectAcceptorManager::instance()->GetCount())
     {
         //监控尚未启动，需要从配置文件中获取
-        int nServerPortCount = App_MainConfig::instance()->GetServerPortCount();
+        int nServerPortCount = (int)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
 
         for (int i = 0; i < nServerPortCount; i++)
         {
             _ControlInfo objInfo;
 
-            _ServerInfo* pServerInfo = App_MainConfig::instance()->GetServerPort(i);
-
             sprintf_safe(objInfo.m_szListenIP,
-                         MAX_BUFF_20, "%s", pServerInfo->m_szServerIP);
-            objInfo.m_u4Port = pServerInfo->m_nPort;
+                         MAX_BUFF_20, "%s", GetXmlConfigAttribute(xmlTCPServerIPs)->vec[i].ip.c_str());
+            objInfo.m_u4Port = GetXmlConfigAttribute(xmlTCPServerIPs)->vec[i].port;
             m_vecListenList.push_back(objInfo);
         }
     }
@@ -131,5 +134,5 @@ bool CControlListen::ShowListen(uint32 u4Index, _ControlInfo& objControlInfo)
 
 uint32 CControlListen::GetServerID()
 {
-    return App_MainConfig::instance()->GetServerID();
+    return GetXmlConfigAttribute(xmlServerID)->id;
 }

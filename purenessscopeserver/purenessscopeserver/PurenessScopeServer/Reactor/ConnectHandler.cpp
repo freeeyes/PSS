@@ -95,30 +95,30 @@ void CConnectHandler::Close()
 void CConnectHandler::Init(uint16 u2HandlerID)
 {
     m_u4HandlerID      = u2HandlerID;
-    m_u2MaxConnectTime = App_MainConfig::instance()->GetMaxConnectTime();
-    m_u4SendThresHold  = App_MainConfig::instance()->GetSendTimeout();
-    m_u4MaxPacketSize  = App_MainConfig::instance()->GetRecvBuffSize();
-    m_u2TcpNodelay     = App_MainConfig::instance()->GetTcpNodelay();
+    m_u2MaxConnectTime = GetXmlConfigAttribute(xmlClientInfo)->MaxConnectTime;
+    m_u4SendThresHold  = GetXmlConfigAttribute(xmlSendInfo)->SendTimeout;
+    m_u4MaxPacketSize  = GetXmlConfigAttribute(xmlRecvInfo)->RecvBuffSize;
+    m_u2TcpNodelay     = GetXmlConfigAttribute(xmlSendInfo)->TcpNodelay;
 
-    m_u8SendQueueTimeout = (uint64)(App_MainConfig::instance()->GetSendQueueTimeout()) * 1000 * 1000;
+    m_u8SendQueueTimeout = (uint64)(GetXmlConfigAttribute(xmlSendInfo)->SendQueueTimeout) * 1000 * 1000;
 
     if(m_u8SendQueueTimeout == 0)
     {
         m_u8SendQueueTimeout = MAX_QUEUE_TIMEOUT * 1000 * 1000;
     }
 
-    m_u8RecvQueueTimeout = (uint64)(App_MainConfig::instance()->GetRecvQueueTimeout()) * 1000 * 1000;
+    m_u8RecvQueueTimeout = (uint64)(GetXmlConfigAttribute(xmlRecvInfo)->RecvQueueTimeout) * 1000 * 1000;
 
     if(m_u8RecvQueueTimeout == 0)
     {
         m_u8RecvQueueTimeout = MAX_QUEUE_TIMEOUT * 1000 * 1000;
     }
 
-    m_u4SendMaxBuffSize  = App_MainConfig::instance()->GetBlockSize();
+    m_u4SendMaxBuffSize  = GetXmlConfigAttribute(xmlSendInfo)->MaxBlockSize;
     m_pBlockMessage      = NULL;
 
-    m_pPacketDebugData   = new char[App_MainConfig::instance()->GetDebugSize()];
-    m_u4PacketDebugSize  = App_MainConfig::instance()->GetDebugSize() / 5;
+    m_pPacketDebugData   = new char[GetXmlConfigAttribute(xmlServerType)->DebugSize];
+    m_u4PacketDebugSize  = GetXmlConfigAttribute(xmlServerType)->DebugSize / 5;
 }
 
 void CConnectHandler::SetPacketParseInfoID(uint32 u4PacketParseInfoID)
@@ -183,11 +183,11 @@ int CConnectHandler::open(void*)
     if(false == App_IPAccount::instance()->AddIP((string)m_addrRemote.get_host_addr()))
     {
         OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]IP connect frequently.\n", m_addrRemote.get_host_addr()));
-        App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), App_MainConfig::instance()->GetIPAlert()->m_u4IPTimeout);
+        App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), GetXmlConfigAttribute(xmlIP)->Timeout);
 
         //发送告警邮件
         AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
-                                               App_MainConfig::instance()->GetIPAlert()->m_u4MailID,
+                                               GetXmlConfigAttribute(xmlAlertConnect)->MailID,
                                                (char* )"Alert IP",
                                                "[CConnectHandler::open] IP is more than IP Max,");
 
@@ -195,10 +195,10 @@ int CConnectHandler::open(void*)
     }
 
     //初始化检查器
-    m_TimeConnectInfo.Init(App_MainConfig::instance()->GetClientDataAlert()->m_u4RecvPacketCount,
-                           App_MainConfig::instance()->GetClientDataAlert()->m_u4RecvDataMax,
-                           App_MainConfig::instance()->GetClientDataAlert()->m_u4SendPacketCount,
-                           App_MainConfig::instance()->GetClientDataAlert()->m_u4SendDataMax);
+    m_TimeConnectInfo.Init(GetXmlConfigAttribute(xmlClientData)->RecvPacketCount,
+                           GetXmlConfigAttribute(xmlClientData)->RecvDataMax,
+                           GetXmlConfigAttribute(xmlClientData)->SendPacketCount,
+                           GetXmlConfigAttribute(xmlClientData)->SendDataMax);
 
     int nRet = 0;
 
@@ -452,7 +452,7 @@ int CConnectHandler::Dispose_Recv_Data()
         m_u4CurrSize = 0;
 
         //计算下一个包的大小
-        u4NewPacketSize = App_MainConfig::instance()->GetServerRecvBuff();
+        u4NewPacketSize = GetXmlConfigAttribute(xmlClientInfo)->MaxBuffRecv;
     }
 
     //申请头的大小对应的mb
@@ -514,7 +514,7 @@ int CConnectHandler::Init_Open_Connect()
     }
     else
     {
-        m_pCurrMessage = App_MessageBlockManager::instance()->Create(App_MainConfig::instance()->GetServerRecvBuff());
+        m_pCurrMessage = App_MessageBlockManager::instance()->Create(GetXmlConfigAttribute(xmlClientInfo)->MaxBuffRecv);
     }
 
     return 0;
@@ -567,10 +567,10 @@ uint32 CConnectHandler::file_open(IFileTestManager* pFileTest)
     }
 
     //初始化检查器
-    m_TimeConnectInfo.Init(App_MainConfig::instance()->GetClientDataAlert()->m_u4RecvPacketCount,
-                           App_MainConfig::instance()->GetClientDataAlert()->m_u4RecvDataMax,
-                           App_MainConfig::instance()->GetClientDataAlert()->m_u4SendPacketCount,
-                           App_MainConfig::instance()->GetClientDataAlert()->m_u4SendDataMax);
+    m_TimeConnectInfo.Init(GetXmlConfigAttribute(xmlClientData)->RecvPacketCount,
+                           GetXmlConfigAttribute(xmlClientData)->RecvDataMax,
+                           GetXmlConfigAttribute(xmlClientData)->SendPacketCount,
+                           GetXmlConfigAttribute(xmlClientData)->SendDataMax);
 
     //设置链接为非阻塞模式
     if (this->peer().enable(ACE_NONBLOCK) == -1)
@@ -851,7 +851,7 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
     {
         //超过了限定的阀值，需要关闭链接，并记录日志
         AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECTABNORMAL,
-                                               App_MainConfig::instance()->GetClientDataAlert()->m_u4MailID,
+                                               GetXmlConfigAttribute(xmlAlertConnect)->MailID,
                                                (char* )"Alert",
                                                "[TCP]IP=%s,Prot=%d,SendPacketCount=%d, SendSize=%d.",
                                                m_addrRemote.get_host_addr(),
@@ -860,7 +860,7 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
                                                m_TimeConnectInfo.m_u4SendSize);
 
         //设置封禁时间
-        App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), App_MainConfig::instance()->GetIPAlert()->m_u4IPTimeout);
+        App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), GetXmlConfigAttribute(xmlIP)->Timeout);
         OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, Send Data is more than limit.\n", GetConnectID()));
 
         ACE_Time_Value tvNow = ACE_OS::gettimeofday();
@@ -976,13 +976,13 @@ void CConnectHandler::Get_Recv_length(int& nCurrCount)
     }
     else
     {
-        nCurrCount = (uint32)App_MainConfig::instance()->GetServerRecvBuff() - (uint32)m_pCurrMessage->length();
+        nCurrCount = (uint32)GetXmlConfigAttribute(xmlClientInfo)->MaxBuffRecv - (uint32)m_pCurrMessage->length();
     }
 }
 
 void CConnectHandler::Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType)
 {
-    if (App_MainConfig::instance()->GetDebug() == DEBUG_ON || m_blIsLog == true)
+    if (GetXmlConfigAttribute(xmlServerType)->Debug == DEBUG_ON || m_blIsLog == true)
     {
         int nDataLen = (int)pMbData->length();
         char szLog[10] = { '\0' };
@@ -1180,7 +1180,7 @@ bool CConnectHandler::CheckMessage()
     {
         //超过了限定的阀值，需要关闭链接，并记录日志
         AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECTABNORMAL,
-                                               App_MainConfig::instance()->GetClientDataAlert()->m_u4MailID,
+                                               GetXmlConfigAttribute(xmlAlertConnect)->MailID,
                                                (char* )"Alert",
                                                "[TCP]IP=%s,Prot=%d,PacketCount=%d, RecvSize=%d.",
                                                m_addrRemote.get_host_addr(),
@@ -1192,7 +1192,7 @@ bool CConnectHandler::CheckMessage()
         m_pPacketParse = NULL;
 
         //设置封禁时间
-        App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), App_MainConfig::instance()->GetIPAlert()->m_u4IPTimeout);
+        App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), GetXmlConfigAttribute(xmlIP)->Timeout);
         OUR_DEBUG((LM_ERROR, "[CConnectHandle::CheckMessage] ConnectID = %d, PutMessageBlock is check invalid.\n", GetConnectID()));
         return false;
     }
@@ -1244,9 +1244,9 @@ bool CConnectHandler::CheckSendMask(uint32 u4PacketLen)
 {
     m_u4ReadSendSize += u4PacketLen;
 
-    if(m_u4ReadSendSize - m_u4SuccessSendSize >= App_MainConfig::instance()->GetSendDataMask())
+    if(m_u4ReadSendSize - m_u4SuccessSendSize >= GetXmlConfigAttribute(xmlSendInfo)->MaxBlockSize)
     {
-        OUR_DEBUG ((LM_ERROR, "[CConnectHandler::CheckSendMask]ConnectID = %d, SingleConnectMaxSendBuffer is more than DataMask(%d)(%d:%d)!\n", GetConnectID(), App_MainConfig::instance()->GetSendDataMask(), m_u4ReadSendSize, m_u4SuccessSendSize));
+        OUR_DEBUG ((LM_ERROR, "[CConnectHandler::CheckSendMask]ConnectID = %d, SingleConnectMaxSendBuffer is more than DataMask(%d)(%d:%d)!\n", GetConnectID(), GetXmlConfigAttribute(xmlSendInfo)->MaxBlockSize, m_u4ReadSendSize, m_u4SuccessSendSize));
         AppLogManager::instance()->WriteLog(LOG_SYSTEM_SENDQUEUEERROR, "]Connection from [%s:%d], SingleConnectMaxSendBuffer is more than(%d)!.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4ReadSendSize - m_u4SuccessSendSize);
         return false;
     }
@@ -1826,7 +1826,10 @@ bool CConnectManager::StartTimer()
     }
 
     m_pTCTimeSendCheck->m_u2TimerCheckID = PARM_CONNECTHANDLE_CHECK;
-    long lTimeCheckID = pReactor->schedule_timer(this, (const void*)m_pTCTimeSendCheck, ACE_Time_Value(App_MainConfig::instance()->GetCheckAliveTime(), 0), ACE_Time_Value(App_MainConfig::instance()->GetCheckAliveTime(), 0));
+    long lTimeCheckID = pReactor->schedule_timer(this,
+                        (const void*)m_pTCTimeSendCheck,
+                        ACE_Time_Value(GetXmlConfigAttribute(xmlClientInfo)->CheckAliveTime, 0),
+                        ACE_Time_Value(GetXmlConfigAttribute(xmlClientInfo)->CheckAliveTime, 0));
 
     if(-1 == lTimeCheckID)
     {
@@ -1919,7 +1922,7 @@ int CConnectManager::open(void* args)
         return -1;
     }
 
-    m_u4SendQueuePutTime = App_MainConfig::instance()->GetSendQueuePutTime() * 1000;
+    m_u4SendQueuePutTime = GetXmlConfigAttribute(xmlSendInfo)->PutQueueTimeout * 1000;
 
     resume();
 
@@ -2102,11 +2105,14 @@ void CConnectManager::Init( uint16 u2Index )
     Tcp_Common_Manager_Init(u2Index, m_CommandAccount, m_u2SendQueueMax, m_SendCacheManager);
 
     //初始化Hash表
-    uint16 u2PoolSize = App_MainConfig::instance()->GetMaxHandlerCount();
+    uint16 u2PoolSize = GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount;
     m_objHashConnectList.Init((int)u2PoolSize);
 
     //初始化时间轮盘
-    m_TimeWheelLink.Init(App_MainConfig::instance()->GetMaxConnectTime(), App_MainConfig::instance()->GetCheckAliveTime(), (int)u2PoolSize, CConnectManager::TimeWheel_Timeout_Callback, (void*)this);
+    m_TimeWheelLink.Init(GetXmlConfigAttribute(xmlClientInfo)->MaxConnectTime,
+                         GetXmlConfigAttribute(xmlClientInfo)->CheckAliveTime,
+                         (int)u2PoolSize,
+                         CConnectManager::TimeWheel_Timeout_Callback, (void*)this);
 }
 
 void CConnectManager::GetFlowInfo(uint32& u4UdpFlowIn, uint32& u4UdpFlowOut)

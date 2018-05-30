@@ -8,12 +8,12 @@ IConfigOpeation* IConfigOpeation::_array[XML_Config_MAX];
 
 /*定义静态类对象并绑定对应枚举，实现返回模板函数*/
 #define DefineClassAndFunc(ClassName, XMLConfig)                            \
-static ClassName    this##ClassName(XMLConfig, "##ClassName##" );			\
-template<>                                                                  \
-ClassName* XMainConfig::GetXmlConfig<ClassName>()                           \
-{                                                                           \
-    return dynamic_cast<ClassName*>(IConfigOpeation::_array[XMLConfig]);    \
-}
+    static ClassName    this##ClassName(XMLConfig, "##ClassName##" );           \
+    template<>                                                                  \
+    ClassName* XMainConfig::GetXmlConfig<ClassName>()                           \
+    {                                                                           \
+        return dynamic_cast<ClassName*>(IConfigOpeation::_array[XMLConfig]);    \
+    }
 
 
 /*xml配置文件对应类型配置的静态类，需要增加配置文件标签，需要在此添加静态类对象，所有对象不直接使用,也不允许外部使用*/
@@ -431,17 +431,18 @@ bool xmlBuffPacket::Init(CXmlOpeation* pXmlOpeation)
 
 bool xmlMessage::Init(CXmlOpeation* pXmlOpeation)
 {
-	bool bKet = false;
-	if (pXmlOpeation->Read_XML_Data_Single_Uint32("Message", "Msg_High_mark", Msg_High_mark)
-		&& pXmlOpeation->Read_XML_Data_Single_Uint32("Message", "Msg_Low_mark", Msg_Low_mark)
-		&& pXmlOpeation->Read_XML_Data_Single_Uint32("Message", "Msg_Buff_Max_Size", Msg_Buff_Max_Size)
-		&& pXmlOpeation->Read_XML_Data_Single_Uint16("Message", "Msg_Thread", Msg_Thread)
-		&& pXmlOpeation->Read_XML_Data_Single_Uint32("Message", "Msg_MaxQueue", Msg_MaxQueue))
-	{
-		pXmlOpeation->Read_XML_Data_Single_Uint16("Message", "Msg_Process", Msg_Process);
-	} 
+    bool bKet = false;
 
-	return bKet;
+    if (pXmlOpeation->Read_XML_Data_Single_Uint32("Message", "Msg_High_mark", Msg_High_mark)
+        && pXmlOpeation->Read_XML_Data_Single_Uint32("Message", "Msg_Low_mark", Msg_Low_mark)
+        && pXmlOpeation->Read_XML_Data_Single_Uint32("Message", "Msg_Buff_Max_Size", Msg_Buff_Max_Size)
+        && pXmlOpeation->Read_XML_Data_Single_Uint16("Message", "Msg_Thread", Msg_Thread)
+        && pXmlOpeation->Read_XML_Data_Single_Uint32("Message", "Msg_MaxQueue", Msg_MaxQueue))
+    {
+        pXmlOpeation->Read_XML_Data_Single_Uint16("Message", "Msg_Process", Msg_Process);
+    }
+
+    return bKet;
 }
 
 /******************************alert.xml***************************************/

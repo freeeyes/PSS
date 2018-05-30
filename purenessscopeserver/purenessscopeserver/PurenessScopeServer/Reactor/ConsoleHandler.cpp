@@ -117,7 +117,7 @@ int CConsoleHandler::open(void*)
     }
 
     //判断是否在服务器允许的IP范围内
-    if (App_MainConfig::instance()->CompareConsoleClinetIP(m_addrRemote.get_host_addr()) == false)
+    if (CompareConsoleClinetIP(m_addrRemote.get_host_addr()) == false)
     {
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::open]this IP is abort.\n"));
         return -1;
@@ -415,6 +415,19 @@ void CConsoleHandler::Clear_PacketParse()
     m_pCurrMessage = NULL;
 
     SAFE_DELETE(m_pPacketParse);
+}
+
+bool CConsoleHandler::CompareConsoleClinetIP(const char* pIP)
+{
+    for (int32 i = 0; i < (int32)GetXmlConfigAttribute(xmlConsoleClients)->vec.size(); i++)
+    {
+        if (ACE_OS::strcmp(GetXmlConfigAttribute(xmlConsoleClients)->vec[i].cip.c_str(), pIP) == 0)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool CConsoleHandler::CheckMessage()

@@ -105,7 +105,7 @@ int CConnectClient::open(void* p)
     msg_queue()->low_water_mark(MAX_MSG_MASK);
 
     //从配置文件获取数据
-    m_u4MaxPacketSize  = App_MainConfig::instance()->GetRecvBuffSize();
+    m_u4MaxPacketSize  = GetXmlConfigAttribute(xmlRecvInfo)->RecvBuffSize;
 
     if (p != NULL)
     {
@@ -139,7 +139,7 @@ int CConnectClient::open(void* p)
     m_atvBegin          = ACE_OS::gettimeofday();
     m_u4CurrSize        = 0;
     //申请当前的MessageBlock
-    m_pCurrMessage = App_MessageBlockManager::instance()->Create(App_MainConfig::instance()->GetConnectServerRecvBuffer());
+    m_pCurrMessage = App_MessageBlockManager::instance()->Create(GetXmlConfigAttribute(xmlConnectServer)->Recvbuff);
 
     if (m_pCurrMessage == NULL)
     {
@@ -346,7 +346,7 @@ void CConnectClient::Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType)
 {
     char szPacketDebugData[MAX_BUFF_1024] = { '\0' };
 
-    if (App_MainConfig::instance()->GetDebug() == DEBUG_ON)
+    if (GetXmlConfigAttribute(xmlServerType)->Debug == DEBUG_ON)
     {
         int nDataLen = (int)pMbData->length();
         char szLog[10] = { '\0' };

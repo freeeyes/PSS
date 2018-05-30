@@ -45,6 +45,7 @@ private:
     bool CheckMessage();                                                      //处理接收的数据
     bool PutSendPacket(ACE_Message_Block* pMbData);                           //发送数据
     void Clear_PacketParse();                                                 //清理不需要的PacketParse
+    bool CompareConsoleClinetIP(const char* pIP);                             //检查一个Console连接的IP是否在指定的允许列表中
 
 
     uint32                     m_u4HandlerID;                  //此Hander生成时的ID

@@ -245,7 +245,7 @@ bool CClientReConnectManager::Init(ACE_Reactor* pReactor)
     }
 
     //记录缓冲池的最大上限
-    m_u4MaxPoolCount = App_MainConfig::instance()->GetServerConnectCount();
+    m_u4MaxPoolCount = GetXmlConfigAttribute(xmlConnectServer)->Count;
 
     //初始化Hash数组(TCP)
     m_objClientTCPList.Init((int)m_u4MaxPoolCount);
@@ -253,7 +253,7 @@ bool CClientReConnectManager::Init(ACE_Reactor* pReactor)
     //初始化Hash数组(UDP)
     m_objClientUDPList.Init((int)m_u4MaxPoolCount);
 
-    m_u4ConnectServerTimeout = App_MainConfig::instance()->GetConnectServerTimeout() * 1000; //转换为微妙
+    m_u4ConnectServerTimeout = GetXmlConfigAttribute(xmlConnectServer)->TimeInterval * 1000; //转换为微妙
 
     if (m_u4ConnectServerTimeout == 0)
     {
@@ -767,7 +767,7 @@ int CClientReConnectManager::handle_timeout(const ACE_Time_Value& tv, const void
                 ACE_Time_Value tvNow = ACE_OS::gettimeofday();
 
                 //如果是异步模式，则需要检查处理线程是否被挂起
-                if(App_MainConfig::instance()->GetConnectServerRunType() == 1)
+                if(GetXmlConfigAttribute(xmlConnectServer)->RunType == 1)
                 {
                     App_ServerMessageTask::instance()->CheckServerMessageThread(tvNow);
                 }

@@ -352,20 +352,9 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
     }
 
     //读取配置文件
-    if(!App_MainConfig::instance()->Init())
+    if(!App_XmlConfig::instance()->InitIsOk())
     {
-        OUR_DEBUG((LM_INFO, "[main]%s\n", App_MainConfig::instance()->GetError()));
-        return 0;
-    }
-    else
-    {
-        App_MainConfig::instance()->Display();
-    }
-
-    //第二步，判断所有的IP是否是合法的，同时识别IP类型，Ipv6还是Ipv4。
-    if (!App_MainConfig::instance()->CheckAllIP())
-    {
-        OUR_DEBUG((LM_INFO, "[main]CheckAllIP() error.\n"));
+        OUR_DEBUG((LM_INFO, "[main]App_XmlConfig::instance()->InitIsOk() is false.\n"));
         return 0;
     }
 
@@ -435,24 +424,9 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
     SetConsoleCtrlHandler((PHANDLER_ROUTINE)ctrlhandler, true);
 
     //第一步，读取配置文件
-    if(!App_MainConfig::instance()->Init())
+    if(!App_XmlConfig::instance()->InitIsOk())
     {
-        OUR_DEBUG((LM_INFO, "[main]%s\n", App_MainConfig::instance()->GetError()));
-        return 0;
-    }
-    else
-    {
-        App_MainConfig::instance()->Display();
-    }
-
-    //第二步,隐式加载PacketParse
-    if (0 != Load_PacketParse_Module())
-    {
-        if (GetXmlConfigAttribute(xmlServerType)->Type == 1)
-        {
-            App_Process::instance()->stopprocesslog();
-        }
-
+        OUR_DEBUG((LM_INFO, "[main]!App_XmlConfig->InitIsOk() is false.\n"));
         return 0;
     }
 
