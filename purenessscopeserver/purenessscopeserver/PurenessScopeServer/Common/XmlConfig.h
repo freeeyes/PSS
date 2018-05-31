@@ -102,6 +102,7 @@ class IConfigOpeation
 {
     friend class XMainConfig;
 public:
+	const std::string& ClassName() { return m_name; }
     virtual ~IConfigOpeation() {}
 protected:
     IConfigOpeation(XmlConfig config, const char* name)

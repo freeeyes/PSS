@@ -8,12 +8,12 @@ IConfigOpeation* IConfigOpeation::_array[XML_Config_MAX];
 
 /*定义静态类对象并绑定对应枚举，实现返回模板函数*/
 #define DefineClassAndFunc(ClassName, XMLConfig)                            \
-    static ClassName    this##ClassName(XMLConfig, "##ClassName##" );           \
-    template<>                                                                  \
-    ClassName* XMainConfig::GetXmlConfig<ClassName>()                           \
-    {                                                                           \
-        return dynamic_cast<ClassName*>(IConfigOpeation::_array[XMLConfig]);    \
-    }
+static ClassName    this##ClassName(XMLConfig, "##ClassName##" );           \
+template<>                                                                  \
+ClassName* XMainConfig::GetXmlConfig<ClassName>()                           \
+{                                                                           \
+    return dynamic_cast<ClassName*>(IConfigOpeation::_array[XMLConfig]);    \
+}
 
 
 /*xml配置文件对应类型配置的静态类，需要增加配置文件标签，需要在此添加静态类对象，所有对象不直接使用,也不允许外部使用*/
@@ -159,7 +159,7 @@ bool xmlNetWorkMode::SetIOMode(const std::string& pData)
     }
     else
     {
-        OUR_DEBUG((LM_INFO, "[CMainConfig::Init_Main]NetworkMode is Invalid!!, please read main.xml desc.\n"));
+        OUR_DEBUG((LM_INFO, "[XMainConfig::SetIOMode]NetworkMode is Invalid!!, please read main.xml desc.\n"));
         bKet = false;
     }
 
@@ -172,12 +172,12 @@ void xmlNetWorkMode::SetLocalByteOrder()
     if (O32_HOST_ORDER == O32_LITTLE_ENDIAN)
     {
         LocalByteOrder = SYSTEM_LITTLE_ORDER;
-        OUR_DEBUG((LM_INFO, "[CMainConfig::CMainConfig]SYSYTEM SYSTEM_LITTLE_ORDER.\n"));
+        OUR_DEBUG((LM_INFO, "[XMainConfig::SetLocalByteOrder]SYSYTEM SYSTEM_LITTLE_ORDER.\n"));
     }
     else
     {
         LocalByteOrder = SYSTEM_BIG_ORDER;
-        OUR_DEBUG((LM_INFO, "[CMainConfig::CMainConfig]SYSYTEM SYSTEM_BIG_ORDER.\n"));
+        OUR_DEBUG((LM_INFO, "[XMainConfig::SetLocalByteOrder]SYSYTEM SYSTEM_BIG_ORDER.\n"));
     }
 }
 
