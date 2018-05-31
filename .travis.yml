@@ -61,8 +61,10 @@ matrix:
         - ./configure LDFLAGS='-ldl' --prefix=$TRAVIS_BUILD_DIR
         - make 
         - make install
-        - ls 
         - sudo find . -name "libcppunit.so"
+        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
+        - cd ../../../
+        - ls 
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
         # Compile by gcov
         - $ACE_ROOT/bin/mwc.pl -type gnuace psssonar.mwc
