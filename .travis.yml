@@ -62,7 +62,9 @@ matrix:
         - make 
         - make install
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
-        # Compile by gcov
+        - cd ../../../../lib
+        - ls
+        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
         - $ACE_ROOT/bin/mwc.pl -type gnuace psssonar.mwc
         - build-wrapper-linux-x86-64 --out-dir bw-output make -j 4
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PacketParse_Interface
