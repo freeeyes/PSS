@@ -16,13 +16,9 @@ project(PurenessScopeServer):aceexe{
   ../CppUnit/*.cpp
   ../*.cpp
  }
- includes += /opt/local/include
  includes += ../Common ../../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../TinyXML ../Mail ../FileTest ../CppUnit
  
- libs += cppunit
- libpaths += /opt/local/lib
- 
- macros += __LINUX__ _CPPUNIT_TEST
+ macros += __LINUX__ 
 
   specific(gnuace) {
     compile_flags += -fprofile-arcs -ftest-coverage
