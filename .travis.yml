@@ -61,9 +61,7 @@ matrix:
         - ./configure LDFLAGS='-ldl' --prefix=$TRAVIS_BUILD_DIR
         - make 
         - make install
-        - export C_INCLUDE_PATH=$TRAVIS_BUILD_DIR/include:$C_INCLUDE_PATH
-        - export LIBRARY_PATH=$TRAVIS_BUILD_DIR/lib:$LIBRARY_PATH
-        - export LD_LIBRARY_PATH=$TRAVIS_BUILD_DIR/lib:$LD_LIBRARY_PATH        
+        - ls 
         - sudo find . -name "libcppunit.so"
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
         # Compile by gcov
