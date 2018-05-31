@@ -63,9 +63,8 @@ matrix:
         - make install
         - sudo find . -name "libcppunit.so"
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
-        - cd ../../../../
+        - cd ../../../../lib
         - ls 
-        - pwd
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
         # Compile by gcov
         - $ACE_ROOT/bin/mwc.pl -type gnuace psssonar.mwc

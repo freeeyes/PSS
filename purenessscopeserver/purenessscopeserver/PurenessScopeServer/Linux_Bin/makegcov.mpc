@@ -20,6 +20,7 @@ project(PurenessScopeServer):aceexe{
  includes += ../Common ../../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../TinyXML ../Mail ../FileTest ../CppUnit
  
  libpaths += ../../../../lib
+ libs += cppunit
  
  macros += __LINUX__ _CPPUNIT_TEST
 
