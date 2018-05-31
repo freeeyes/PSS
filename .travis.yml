@@ -63,7 +63,7 @@ matrix:
         - make install
         - sudo find . -name "libcppunit.so"
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
-        - cd ../../../
+        - cd ../../../../
         - ls 
         - pwd
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
