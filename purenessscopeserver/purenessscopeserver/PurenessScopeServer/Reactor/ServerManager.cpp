@@ -1,5 +1,9 @@
 #include "ServerManager.h"
 
+#ifdef _CPPUNIT_TEST
+#include "CppUnitMain.h"
+#endif
+
 CServerManager::CServerManager(void)
 {
     m_pFrameLoggingStrategy = NULL;
@@ -288,6 +292,14 @@ bool CServerManager::Run()
         OUR_DEBUG((LM_INFO, "[CServerManager::Run]App_ReactorManager::instance()->StartClientReactor is error.\n"));
         return false;
     }
+
+#ifdef _CPPUNIT_TEST
+    //运行CppUnit自动化测试
+    OUR_DEBUG((LM_INFO, "[CppUnit]********************************\n"));
+    CCppUnitMain objCppUnitMain;
+    objCppUnitMain.Run("report.txt");
+    OUR_DEBUG((LM_INFO, "[CppUnit]********************************\n"));
+#endif
 
     ACE_Thread_Manager::instance()->wait();
 

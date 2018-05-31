@@ -61,6 +61,7 @@ matrix:
         # - ./configure --prefix=$TRAVIS_BUILD_DIR
         # - make 
         # - make install 
+        - sudo apt-get install -y libcppunit-dev
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
         # Compile by gcov
         - $ACE_ROOT/bin/mwc.pl -type gnuace psssonar.mwc

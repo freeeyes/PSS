@@ -13,18 +13,17 @@ project(PurenessScopeServer):aceexe{
   ../TinyXML/*.cpp
   ../Mail/*.cpp
   ../FileTest/*.cpp
+  ../CppUnit/*.cpp
   ../*.cpp
  }
- includes += ../Common ../../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../TinyXML ../Mail ../FileTest
+ includes += ../Common ../../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../TinyXML ../Mail ../FileTest ../CppUnit
+ libs += cppunit
+ libpaths += /usr/local/lib 
  
-
-  specific(make) {
-    compile_flags += -fcheck-new
-  }
+ macros += __LINUX__ _CPPUNIT_TEST
 
   specific(gnuace) {
-	macros += __LINUX__
-    compile_flags += -Wno-deprecated -fprofile-arcs -ftest-coverage
+    compile_flags += -fprofile-arcs -ftest-coverage
   }
 
 
