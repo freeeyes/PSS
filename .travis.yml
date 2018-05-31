@@ -56,7 +56,7 @@ matrix:
         # - wget https://bootstrap.pypa.io/ez_setup.py -O - | sudo python
         # - sudo easy_install gcovr
         - sudo apt-get install -y libcppunit-dev
-        - sudo find / -name "libcppunit.so"
+        - sudo find / -name "*cppunit*.so"
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
         # Compile by gcov
         - $ACE_ROOT/bin/mwc.pl -type gnuace psssonar.mwc
