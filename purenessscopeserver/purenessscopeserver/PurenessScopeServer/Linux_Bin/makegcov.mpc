@@ -16,11 +16,11 @@ project(PurenessScopeServer):aceexe{
   ../CppUnit/*.cpp
   ../*.cpp
  }
- includes += cppunit-1.12.1/include
+ includes += /opt/local/include
  includes += ../Common ../../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../TinyXML ../Mail ../FileTest ../CppUnit
  
  libs += cppunit
- libpaths += ../../../cppunit-1.12.1/src/cppunit/.libs
+ libpaths += /opt/local/lib
  
  macros += __LINUX__ _CPPUNIT_TEST
 
