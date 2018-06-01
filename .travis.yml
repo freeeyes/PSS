@@ -101,6 +101,7 @@ matrix:
         - gcov -r -o ./.obj ../Message/*.cpp
         - gcov -r -o ./.obj ../Reactor/*.cpp
         - gcov -r -o ./.obj ../Mail/*.cpp
+        - gcov -r -o ./.obj ../CppUnit/*.cpp
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer
         - sonar-scanner -X
 

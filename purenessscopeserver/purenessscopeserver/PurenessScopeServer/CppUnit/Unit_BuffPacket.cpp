@@ -19,30 +19,51 @@ void CUnit_BuffPacket::tearDown(void)
 void CUnit_BuffPacket::Read_Write_BuffPacket(void)
 {
     bool blRet    = false;
-    uint8  u1Data = 1;
-    uint16 u2Data = 2;
-    uint32 u4Data = 4;
-    uint64 u8Data = 8;
+    uint8   u1Data = 1;
+    uint16  u2Data = 2;
+    uint32  u4Data = 4;
+    uint64  u8Data = 8;
+    int8    n1Data = -1;
+    int16   n2Data = -2;
+    int32   n4Data = -4;
+    float32 f4Data = 4.0f;
+    float64 f8Data = 8.0f;
 
-    uint8  u1OutData = 0;
-    uint16 u2OutData = 0;
-    uint32 u4OutData = 0;
-    uint64 u8OutData = 0;
+    uint8   u1OutData = 0;
+    uint16  u2OutData = 0;
+    uint32  u4OutData = 0;
+    uint64  u8OutData = 0;
+    int8    n1OutData = 0;
+    int16   n2OutData = 0;
+    int32   n4OutData = 0;
+    float32 f4OutData = 0.0f;
+    float64 f8OutData = 0.0f;
 
     //–¥»Î
     (*m_pBuffPacket) << u1Data;
     (*m_pBuffPacket) << u2Data;
     (*m_pBuffPacket) << u4Data;
     (*m_pBuffPacket) << u8Data;
+    (*m_pBuffPacket) << n1Data;
+    (*m_pBuffPacket) << n2Data;
+    (*m_pBuffPacket) << n4Data;
+    (*m_pBuffPacket) << f4Data;
+    (*m_pBuffPacket) << f8Data;
 
     //∂¡»°
     (*m_pBuffPacket) >> u1OutData;
     (*m_pBuffPacket) >> u2OutData;
     (*m_pBuffPacket) >> u4OutData;
     (*m_pBuffPacket) >> u8OutData;
+    (*m_pBuffPacket) >> n1OutData;
+    (*m_pBuffPacket) >> n2OutData;
+    (*m_pBuffPacket) >> n4OutData;
+    (*m_pBuffPacket) >> f4OutData;
+    (*m_pBuffPacket) >> f8OutData;
 
-    if (m_pBuffPacket->GetPacketLen() != 0)
+    if (m_pBuffPacket->GetPacketLen() - m_pBuffPacket->GetReadLen() != 0)
     {
+        OUR_DEBUG((LM_INFO, "[Read_Write_String_BuffPacket]GetPacketLen=%d.\n", m_pBuffPacket->GetPacketLen()));
         CPPUNIT_ASSERT_MESSAGE("[Read_Write_String_BuffPacket]GetPacketLen is not zero.", true == blRet);
         return;
     }
@@ -50,7 +71,12 @@ void CUnit_BuffPacket::Read_Write_BuffPacket(void)
     if(u1OutData == u1Data &&
        u2OutData == u2Data &&
        u4OutData == u4Data &&
-       u8OutData == u8Data)
+       u8OutData == u8Data &&
+       n1OutData == n1Data &&
+       n2OutData == n2Data &&
+       n4OutData == n4Data &&
+       f4OutData == f4Data &&
+       f8OutData == f8Data)
     {
         blRet = true;
     }
@@ -88,8 +114,9 @@ void CUnit_BuffPacket::Read_Write_String_BuffPacket(void)
     (*m_pBuffPacket) >> obj_Ret_VCHARM_STR;
     (*m_pBuffPacket) >> obj_Ret_VCHARB_STR;
 
-    if (m_pBuffPacket->GetPacketLen() != 0)
+    if (m_pBuffPacket->GetPacketLen() - m_pBuffPacket->GetReadLen() != 0)
     {
+        OUR_DEBUG((LM_INFO, "[Read_Write_String_BuffPacket]GetPacketLen=%d.\n", m_pBuffPacket->GetPacketLen()));
         CPPUNIT_ASSERT_MESSAGE("[Read_Write_String_BuffPacket]GetPacketLen is not zero.", true == blRet);
         return;
     }
@@ -123,8 +150,9 @@ void CUnit_BuffPacket::Read_Write_Binary_BuffPacket(void)
     uint32 u4ReadLen = ACE_OS::strlen(szData);
     m_pBuffPacket->ReadStream(szRetData, u4ReadLen);
 
-    if (m_pBuffPacket->GetPacketLen() != 0)
+    if (m_pBuffPacket->GetPacketLen() - m_pBuffPacket->GetReadLen() != 0)
     {
+        OUR_DEBUG((LM_INFO, "[Read_Write_String_BuffPacket]GetPacketLen=%d.\n", m_pBuffPacket->GetPacketLen()));
         CPPUNIT_ASSERT_MESSAGE("[Read_Write_Binary_BuffPacket]GetPacketLen is not zero.", true == blRet);
         return;
     }
