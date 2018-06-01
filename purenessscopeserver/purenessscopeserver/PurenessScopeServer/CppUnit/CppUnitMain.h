@@ -9,7 +9,7 @@
 #include "Unit_BuffPacket.h"
 #include "Unit_FileTestManager.h"
 
-#define CPPUNIT_REPORT_PATH "./reports/cppunit/report.txt"
+#define CPPUNIT_REPORT_PATH "./reports/cppunit/report.xml"
 
 class CCppUnitMain
 {

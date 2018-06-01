@@ -34,14 +34,14 @@ int CCppUnitMain::Run()
     testrunner.run(testresult);
 
     // output results in compiler-format
-    CPPUNIT_NS::CompilerOutputter compileroutputter(&collectedresults, out);
-    compileroutputter.write ();
-    out.close();
+    //CPPUNIT_NS::CompilerOutputter compileroutputter(&collectedresults, out);
+    //compileroutputter.write ();
 
     // Output XML for Jenkins CPPunit plugin
     //ofstream xmlFileOut("cppTestBasicMathResults.xml");
-    //XmlOutputter xmlOut(&collectedresults, xmlFileOut);
-    //xmlOut.write();
+    CppUnit::XmlOutputter xmlOut(&collectedresults, out);
+    xmlOut.write();
+    out.close();
 
     // return 0 if tests were successful
     return collectedresults.wasSuccessful() ? 0 : 1;
