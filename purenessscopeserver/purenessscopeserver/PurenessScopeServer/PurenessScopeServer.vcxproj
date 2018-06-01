@@ -194,6 +194,8 @@
     <ClCompile Include="Console\FrameCommand.cpp" />
     <ClCompile Include="Console\MessageDefine.cpp" />
     <ClCompile Include="Console\MessageDispose.cpp" />
+    <ClCompile Include="CppUnit\CppUnitMain.cpp" />
+    <ClCompile Include="CppUnit\Unit_BuffPacket.cpp" />
     <ClCompile Include="Message\MessageDyeingManager.cpp" />
     <ClCompile Include="PurenessScopeServer.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -561,6 +563,9 @@
     <ClInclude Include="Console\FrameCommand.h" />
     <ClInclude Include="Console\MessageDefine.h" />
     <ClInclude Include="Console\MessageDispose.h" />
+    <ClInclude Include="CppUnit\CppUnitMain.h" />
+    <ClInclude Include="CppUnit\Unit_BuffPacket.h" />
+    <ClInclude Include="CppUnit\Unit_Common.h" />
     <ClInclude Include="Encrypt\Aes.h" />
     <ClInclude Include="FileTest\FileTest.h" />
     <ClInclude Include="FileTest\FileTestManager.h" />

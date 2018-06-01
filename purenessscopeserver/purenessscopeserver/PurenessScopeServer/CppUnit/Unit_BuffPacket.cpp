@@ -49,8 +49,8 @@ void CUnit_BuffPacket::Read_Write_BuffPacket(void)
 
     if(u1OutData == u1Data &&
        u2OutData == u2Data &&
-       u4OutData == u4OutData &&
-       u8OutData == u8OutData)
+       u4OutData == u4Data &&
+       u8OutData == u8Data)
     {
         blRet = true;
     }
@@ -62,7 +62,6 @@ void CUnit_BuffPacket::Read_Write_String_BuffPacket(void)
 {
     bool blRet = false;
     char szData[30]    = { '\0' };
-    char szRetData[20] = { '\0' };
 
     _VCHARS_STR obj_VCHARS_STR;
     _VCHARM_STR obj_VCHARM_STR;
@@ -72,14 +71,14 @@ void CUnit_BuffPacket::Read_Write_String_BuffPacket(void)
     _VCHARM_STR obj_Ret_VCHARM_STR;
     _VCHARB_STR obj_Ret_VCHARB_STR;
 
-    ACE_OS::sptintf(szData, "freeeyes");
+    sprintf_safe(szData, 30, "freeeyes");
 
     obj_VCHARS_STR.text = szData;
-    obj_VCHARS_STR.u1Len = ACE_OS::strlen(szData);
+    obj_VCHARS_STR.u1Len = (uint8)ACE_OS::strlen(szData);
     obj_VCHARM_STR.text = szData;
-    obj_VCHARM_STR.u1Len = ACE_OS::strlen(szData);
+    obj_VCHARM_STR.u2Len = (uint16)ACE_OS::strlen(szData);
     obj_VCHARB_STR.text = szData;
-    obj_VCHARB_STR.u1Len = ACE_OS::strlen(szData);
+    obj_VCHARB_STR.u4Len = (uint32)ACE_OS::strlen(szData);
 
     (*m_pBuffPacket) << obj_VCHARS_STR;
     (*m_pBuffPacket) << obj_VCHARM_STR;
@@ -109,9 +108,9 @@ void CUnit_BuffPacket::Read_Write_Binary_BuffPacket(void)
 {
     bool blRet = false;
     char szData[30] = { '\0' };
-    char szRetData[20] = { '\0' };
+    char szRetData[30] = { '\0' };
 
-    ACE_OS::sptintf(szData, "freeeyes");
+    sprintf_safe(szData, 30, "freeeyes");
 
     m_pBuffPacket->WriteStream(szData, ACE_OS::strlen(szData));
 
@@ -121,7 +120,8 @@ void CUnit_BuffPacket::Read_Write_Binary_BuffPacket(void)
         return;
     }
 
-    m_pBuffPacket->ReadStream(szRetData, ACE_OS::strlen(szData));
+    uint32 u4ReadLen = ACE_OS::strlen(szData);
+    m_pBuffPacket->ReadStream(szRetData, u4ReadLen);
 
     if (m_pBuffPacket->GetPacketLen() != 0)
     {

@@ -250,6 +250,12 @@
     <ClCompile Include="Common\XmlConfig.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="CppUnit\CppUnitMain.cpp">
+      <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="CppUnit\Unit_BuffPacket.cpp">
+      <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -615,6 +621,15 @@
     <ClInclude Include="Common\XmlConfig.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
+    <ClInclude Include="CppUnit\CppUnitMain.h">
+      <Filter>CppUnit\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\Unit_BuffPacket.h">
+      <Filter>CppUnit\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\Unit_Common.h">
+      <Filter>CppUnit\hfile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -724,6 +739,15 @@
     </Filter>
     <Filter Include="Reactor\cppfile">
       <UniqueIdentifier>{2c263c1d-404b-43bd-95c7-725b3199c8f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CppUnit">
+      <UniqueIdentifier>{0f1feb6c-b6f4-4a7c-b190-f48f8b592edc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CppUnit\hfile">
+      <UniqueIdentifier>{de713252-9822-4162-bdf5-86b770c0d7a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CppUnit\cppfile">
+      <UniqueIdentifier>{0f62b50d-545b-4de3-852e-6f0e85ef76f4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
