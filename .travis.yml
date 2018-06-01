@@ -83,7 +83,7 @@ matrix:
         - make -j 4
         - ./Test_Pss
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
-        - cat pssout.file
+        # - cat pssout.file
         #close server
         - killall PurenessScopeServer
         - sleep 5

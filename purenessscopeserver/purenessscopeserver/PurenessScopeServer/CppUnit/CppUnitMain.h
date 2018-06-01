@@ -8,13 +8,15 @@
 
 #include "Unit_BuffPacket.h"
 
+#define CPPUNIT_REPORT_PATH "./reports/cppunit/report.txt"
+
 class CCppUnitMain
 {
 public:
     CCppUnitMain();
     virtual ~CCppUnitMain();
-	
-	int Run(const char* pReportPath);
+
+    int Run();
 };
 
 #endif

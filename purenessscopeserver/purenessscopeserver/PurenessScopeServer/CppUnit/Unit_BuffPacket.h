@@ -10,17 +10,20 @@ class CUnit_BuffPacket : public CppUnit::TestFixture
 {
     CPPUNIT_TEST_SUITE(CUnit_BuffPacket);
     CPPUNIT_TEST(Read_Write_BuffPacket);
+    CPPUNIT_TEST(Read_Write_String_BuffPacket);
     CPPUNIT_TEST_SUITE_END();
 public:
     void setUp(void);
-    
+
     void tearDown(void);
-    
+
 protected:
-    void Read_Write_BuffPacket(void);      //∂¡–¥≤‚ ‘
+    void Read_Write_BuffPacket(void);          //∂¡–¥≤‚ ‘
+    void Read_Write_String_BuffPacket(void);   //∂¡–¥◊÷∑˚¥Æ≤‚ ‘
+    void Read_Write_Binary_BuffPacket(void);   //∂¡–¥∂˛Ω¯÷∆≤‚ ‘
 
 private:
-	CBuffPacket* m_pBuffPacket;
+    CBuffPacket* m_pBuffPacket;
 };
 
 #endif

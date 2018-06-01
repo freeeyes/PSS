@@ -297,7 +297,7 @@ bool CServerManager::Run()
     //运行CppUnit自动化测试
     OUR_DEBUG((LM_INFO, "[CppUnit]********************************\n"));
     CCppUnitMain objCppUnitMain;
-    objCppUnitMain.Run("report.txt");
+    objCppUnitMain.Run();
     OUR_DEBUG((LM_INFO, "[CppUnit]********************************\n"));
 #endif
 
