@@ -12,18 +12,21 @@ class CUnit_BuffPacket : public CppUnit::TestFixture
     CPPUNIT_TEST(Read_Write_BuffPacket);
     CPPUNIT_TEST(Read_Write_String_BuffPacket);
     CPPUNIT_TEST(Read_Write_Binary_BuffPacket);
+    CPPUNIT_TEST(Check_Size_BuffPacket);
     CPPUNIT_TEST_SUITE_END();
 public:
-    void setUp(void);
+    virtual ~CUnit_BuffPacket();
 
-    void tearDown(void);
+    virtual void setUp(void);
 
-protected:
+    virtual void tearDown(void);
+
     void Read_Write_BuffPacket(void);          //∂¡–¥≤‚ ‘
     void Read_Write_String_BuffPacket(void);   //∂¡–¥◊÷∑˚¥Æ≤‚ ‘
     void Read_Write_Binary_BuffPacket(void);   //∂¡–¥∂˛Ω¯÷∆≤‚ ‘
+    void Check_Size_BuffPacket(void);          //œ‡πÿ∂‘œÛ≥ﬂ¥Áµƒ≤‚ ‘
 
-private:
+protected:
     CBuffPacket* m_pBuffPacket;
 };
 

@@ -2,6 +2,11 @@
 
 #ifdef _CPPUNIT_TEST
 
+CUnit_BuffPacket::~CUnit_BuffPacket()
+{
+
+}
+
 void CUnit_BuffPacket::setUp(void)
 {
     m_pBuffPacket = new CBuffPacket();
@@ -61,7 +66,7 @@ void CUnit_BuffPacket::Read_Write_BuffPacket(void)
     (*m_pBuffPacket) >> f4OutData;
     (*m_pBuffPacket) >> f8OutData;
 
-    if (m_pBuffPacket->GetPacketLen() - m_pBuffPacket->GetReadLen() != 0)
+    if (m_pBuffPacket->GetWriteLen() - m_pBuffPacket->GetReadLen() != 0)
     {
         OUR_DEBUG((LM_INFO, "[Read_Write_String_BuffPacket]GetPacketLen=%d.\n", m_pBuffPacket->GetPacketLen()));
         CPPUNIT_ASSERT_MESSAGE("[Read_Write_String_BuffPacket]GetPacketLen is not zero.", true == blRet);
@@ -114,7 +119,7 @@ void CUnit_BuffPacket::Read_Write_String_BuffPacket(void)
     (*m_pBuffPacket) >> obj_Ret_VCHARM_STR;
     (*m_pBuffPacket) >> obj_Ret_VCHARB_STR;
 
-    if (m_pBuffPacket->GetPacketLen() - m_pBuffPacket->GetReadLen() != 0)
+    if (m_pBuffPacket->GetWriteLen() - m_pBuffPacket->GetReadLen() != 0)
     {
         OUR_DEBUG((LM_INFO, "[Read_Write_String_BuffPacket]GetPacketLen=%d.\n", m_pBuffPacket->GetPacketLen()));
         CPPUNIT_ASSERT_MESSAGE("[Read_Write_String_BuffPacket]GetPacketLen is not zero.", true == blRet);
@@ -141,7 +146,7 @@ void CUnit_BuffPacket::Read_Write_Binary_BuffPacket(void)
 
     m_pBuffPacket->WriteStream(szData, ACE_OS::strlen(szData));
 
-    if (m_pBuffPacket->GetPacketLen() != ACE_OS::strlen(szData))
+    if (m_pBuffPacket->GetWriteLen() != ACE_OS::strlen(szData))
     {
         CPPUNIT_ASSERT_MESSAGE("[Read_Write_Binary_BuffPacket]write len fail.", true == blRet);
         return;
@@ -163,6 +168,34 @@ void CUnit_BuffPacket::Read_Write_Binary_BuffPacket(void)
     }
 
     CPPUNIT_ASSERT_MESSAGE("[Read_Write_String_BuffPacket]fail.", true == blRet);
+}
+
+void CUnit_BuffPacket::Check_Size_BuffPacket(void)
+{
+    bool blRet = false;
+    m_pBuffPacket->Clear();
+
+    uint8   u1Data = 1;
+
+    (*m_pBuffPacket) << u1Data;
+
+    if (m_pBuffPacket->GetHeadLen() != 1)
+    {
+        CPPUNIT_ASSERT_MESSAGE("[Check_Size_BuffPacket]GetHeadLen() error.", true == blRet);
+        return;
+    }
+
+    if (m_pBuffPacket->GetPacketSize() % 1024 != 0)
+    {
+        CPPUNIT_ASSERT_MESSAGE("[Check_Size_BuffPacket]GetPacketSize() error.", true == blRet);
+        return;
+    }
+
+    if (m_pBuffPacket->GetPacketLen() != 1)
+    {
+        CPPUNIT_ASSERT_MESSAGE("[Check_Size_BuffPacket]GetPacketLen() error.", true == blRet);
+        return;
+    }
 }
 
 #endif

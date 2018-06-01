@@ -155,11 +155,13 @@ bool CFileTestManager::LoadXmlCfg(const char* szXmlFileTestName, FileTestResultI
     m_u4TimeInterval = 10;
     m_MainConfig.Read_XML_Data_Single_Uint32("FileTestConfig", "TimeInterval", m_u4TimeInterval);
     OUR_DEBUG((LM_INFO, "[CProConnectAcceptManager::LoadXmlCfg]m_u4TimeInterval = %d.\n", m_u4TimeInterval));
+    objFileTestResult.n4TimeInterval = (int32)m_u4TimeInterval;
 
     //获得连接总数
     m_u4ConnectCount = 10;
     m_MainConfig.Read_XML_Data_Single_Uint32("FileTestConfig", "ConnectCount", m_u4ConnectCount);
     OUR_DEBUG((LM_INFO, "[CProConnectAcceptManager::LoadXmlCfg]m_u4ConnectCount = %d.\n", m_u4ConnectCount));
+    objFileTestResult.n4ConnectNum = (int32)m_u4ConnectCount;
 
     m_u4ResponseCount = 1;
     m_MainConfig.Read_XML_Data_Single_Uint32("FileTestConfig", "ResponseCount", m_u4ResponseCount);

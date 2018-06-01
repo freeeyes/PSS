@@ -4,7 +4,8 @@
 
 CCppUnitMain::CCppUnitMain()
 {
-    CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_BuffPacket, "Pss");
+    CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_FileTestManager, "pss");
+    CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_FileTestManager, "pss");
 }
 
 CCppUnitMain::~CCppUnitMain()
@@ -29,7 +30,7 @@ int CCppUnitMain::Run()
 
     // insert test-suite at test-runner by registry
     CPPUNIT_NS::TestRunner testrunner;
-    testrunner.addTest (CPPUNIT_NS::TestFactoryRegistry::getRegistry("Pss").makeTest ());
+    testrunner.addTest(CPPUNIT_NS::TestFactoryRegistry::getRegistry("pss").makeTest());
     testrunner.run(testresult);
 
     // output results in compiler-format
