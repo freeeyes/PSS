@@ -8,6 +8,7 @@
 
 #include "Unit_BuffPacket.h"
 #include "Unit_FileTestManager.h"
+#include "Unit_CommandAccount.h"
 
 #define CPPUNIT_REPORT_PATH "./reports/cppunit/report.xml"
 

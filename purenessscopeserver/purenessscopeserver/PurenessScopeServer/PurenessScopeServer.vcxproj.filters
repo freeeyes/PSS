@@ -251,12 +251,15 @@
       <Filter>Common\cppfile</Filter>
     </ClCompile>
     <ClCompile Include="CppUnit\Unit_FileTestManager.cpp">
-		<Filter>CppUnit\cppfile</Filter>
-	</ClCompile>
+      <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
     <ClCompile Include="CppUnit\CppUnitMain.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
     <ClCompile Include="CppUnit\Unit_BuffPacket.cpp">
+      <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Unit_CommandAccount.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
   </ItemGroup>
@@ -635,7 +638,10 @@
     </ClInclude>
     <ClInclude Include="CppUnit\Unit_FileTestManager.h">
       <Filter>CppUnit\hfile</Filter>
-    </ClInclude>		
+    </ClInclude>
+    <ClInclude Include="Unit_CommandAccount.h">
+      <Filter>CppUnit\hfile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
