@@ -183,7 +183,7 @@ uint32 CBuffPacket::GetWriteLen()
 
 uint32 CBuffPacket::GetHeadLen()
 {
-    if(m_u4PacketLen - m_u4ReadPtr > sizeof(uint32))
+    if(m_u4WritePtr - m_u4ReadPtr > sizeof(uint32))
     {
         return *(uint32*)ReadPtr();
     }

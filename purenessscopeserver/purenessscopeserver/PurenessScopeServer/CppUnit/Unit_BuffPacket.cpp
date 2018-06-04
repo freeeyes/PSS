@@ -179,8 +179,9 @@ void CUnit_BuffPacket::Check_Size_BuffPacket(void)
 
     (*m_pBuffPacket) << u1Data;
 
-    if (m_pBuffPacket->GetHeadLen() != 1)
+    if (m_pBuffPacket->GetHeadLen() != 0)
     {
+        OUR_DEBUG((LM_INFO, "[Check_Size_BuffPacket]m_pBuffPacket->GetHeadLen()=%d.\n", m_pBuffPacket->GetHeadLen()));
         CPPUNIT_ASSERT_MESSAGE("[Check_Size_BuffPacket]GetHeadLen() error.", true == blRet);
         return;
     }

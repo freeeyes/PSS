@@ -250,6 +250,9 @@
     <ClCompile Include="Common\XmlConfig.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="CppUnit\Unit_FileTestManager.cpp">
+		<Filter>CppUnit\cppfile</Filter>
+	</ClCompile>
     <ClCompile Include="CppUnit\CppUnitMain.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
@@ -630,6 +633,9 @@
     <ClInclude Include="CppUnit\Unit_Common.h">
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
+    <ClInclude Include="CppUnit\Unit_FileTestManager.h">
+      <Filter>CppUnit\hfile</Filter>
+    </ClInclude>		
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
