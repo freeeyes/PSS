@@ -18,7 +18,8 @@
 #define MAX_BUFF_300  300
 #define MAX_BUFF_1024 1024
 
-#define COMMAND_AUTOTEST_HEAD 0x1000
+#define COMMAND_AUTOTEST_HEAD     0x1000
+#define COMMAND_AUTOTEST_UDP_HEAD 0x1001
 
 #define HTML_REPORT "<table border=\"1\" cellpadding=\"10\">\n \
   <tr>\n \
