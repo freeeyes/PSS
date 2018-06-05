@@ -124,11 +124,4 @@ void CUnit_CommandAccount::Test_CommandAccount_PortList(void)
     CPPUNIT_ASSERT_MESSAGE("[Test_CommandAccount_PortList]pCommandData is Error.", true == blRet);
 }
 
-void CUnit_CommandAccount::Test_Error(void)
-{
-    bool blRet = false;
-
-    CPPUNIT_ASSERT_MESSAGE("[Test_CommandAccount_PortList]This is Test Error.", true == blRet);
-}
-
 #endif

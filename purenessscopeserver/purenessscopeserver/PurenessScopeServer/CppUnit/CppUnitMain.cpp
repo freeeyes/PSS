@@ -7,6 +7,7 @@ CCppUnitMain::CCppUnitMain()
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_BuffPacket, "pss");
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_FileTestManager, "pss");
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_CommandAccount, "pss");
+    CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_AppConfig, "pss");
 }
 
 CCppUnitMain::~CCppUnitMain()
@@ -34,12 +35,7 @@ int CCppUnitMain::Run()
     testrunner.addTest(CPPUNIT_NS::TestFactoryRegistry::getRegistry("pss").makeTest());
     testrunner.run(testresult);
 
-    // output results in compiler-format
-    //CPPUNIT_NS::CompilerOutputter compileroutputter(&collectedresults, out);
-    //compileroutputter.write ();
-
     // Output XML for Jenkins CPPunit plugin
-    //ofstream xmlFileOut("cppTestBasicMathResults.xml");
     CppUnit::XmlOutputter xmlOut(&collectedresults, out);
     xmlOut.write();
     out.close();

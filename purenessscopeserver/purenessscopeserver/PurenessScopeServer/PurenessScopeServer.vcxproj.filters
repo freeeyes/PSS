@@ -259,7 +259,7 @@
     <ClCompile Include="CppUnit\Unit_BuffPacket.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="Unit_CommandAccount.cpp">
+    <ClCompile Include="CppUnit\Unit_CommandAccount.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
   </ItemGroup>
@@ -639,7 +639,7 @@
     <ClInclude Include="CppUnit\Unit_FileTestManager.h">
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="Unit_CommandAccount.h">
+    <ClInclude Include="CppUnit\Unit_CommandAccount.h">
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
   </ItemGroup>
