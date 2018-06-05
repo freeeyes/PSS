@@ -26,7 +26,7 @@ public:
     void Read_Write_Binary_BuffPacket(void);   //读写二进制测试
     void Check_Size_BuffPacket(void);          //相关对象尺寸的测试
 
-protected:
+private:
     CBuffPacket* m_pBuffPacket;
 };
 

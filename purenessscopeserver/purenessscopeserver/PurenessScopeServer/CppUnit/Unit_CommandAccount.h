@@ -27,7 +27,7 @@ public:
     void Test_CommandAccount_Flow(void);          //测试输入输出数据
     void Test_CommandAccount_PortList(void);      //测试端口数据
 
-protected:
+private:
     CCommandAccount* m_pCommandAccount;
     uint8            m_u1CommandAccount;
     uint8            m_u1Flow;

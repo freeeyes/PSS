@@ -22,7 +22,7 @@ public:
 
     void Test_XML_Read(void);
     void Test_XML_Write(void);
-protected:
+private:
     CAppConfig* m_pAppConfig;
 };
 

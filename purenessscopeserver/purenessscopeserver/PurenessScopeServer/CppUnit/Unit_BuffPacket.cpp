@@ -31,8 +31,8 @@ void CUnit_BuffPacket::Read_Write_BuffPacket(void)
     int8    n1Data = -1;
     int16   n2Data = -2;
     int32   n4Data = -4;
-    float32 f4Data = 4.0f;
-    float64 f8Data = 8.0f;
+    float32 f4Data = 4.0F;
+    float64 f8Data = 8.0F;
 
     uint8   u1OutData = 0;
     uint16  u2OutData = 0;
@@ -41,8 +41,8 @@ void CUnit_BuffPacket::Read_Write_BuffPacket(void)
     int8    n1OutData = 0;
     int16   n2OutData = 0;
     int32   n4OutData = 0;
-    float32 f4OutData = 0.0f;
-    float64 f8OutData = 0.0f;
+    float32 f4OutData = 0.0F;
+    float64 f8OutData = 0.0F;
 
     //–¥»Î
     (*m_pBuffPacket) << u1Data;

@@ -23,7 +23,7 @@ public:
     void Test_FileTestStop(void);
     void Test_handle_timeout(void);
 
-protected:
+private:
     CFileTestManager* m_pFileTestManager;
 };
 
