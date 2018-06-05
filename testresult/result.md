@@ -6,41 +6,41 @@
  	<th>time cost(ms)</th>
    </tr>
     <tr>
-      <td colspan="4">[Test CI run UTC time] 2018-06-05 10:02:35</td>
+      <td colspan="4">[Test CI run UTC time] 2018-06-05 10:12:12</td>
     </tr>
-   <tr style="background-color:#CD5C5C;color:Black;">
+   <tr style="background-color:#C1FFC1;color:Black;">
 <td>single packet test</td>
-<td>1</td>
-<td>[e][127.0.0.1:10002]connnect server fail.[Connection refused]。</td>
-<td>0.118000ms</td>
-<tr style="background-color:#CD5C5C;color:Black;">
+<td>0</td>
+<td>[s][127.0.0.1:10002]success.</td>
+<td>1.795000ms</td>
+<tr style="background-color:#C1FFC1;color:Black;">
 <td>multiple packet test(10)</td>
-<td>1</td>
-<td>[e][127.0.0.1:10002]connnect server fail.[Connection refused]。</td>
-<td>0.032000ms</td>
-<tr style="background-color:#CD5C5C;color:Black;">
+<td>0</td>
+<td>[s][127.0.0.1:10002]success.</td>
+<td>1.414000ms</td>
+<tr style="background-color:#C1FFC1;color:Black;">
 <td>multiple connect test(10)</td>
-<td>1</td>
-<td>[e][127.0.0.1:10002]connnect server fail.[Connection refused]。</td>
-<td>0.025000ms</td>
-<tr style="background-color:#CD5C5C;color:Black;">
+<td>0</td>
+<td>[s][127.0.0.1:10002]success.</td>
+<td>6.035000ms</td>
+<tr style="background-color:#C1FFC1;color:Black;">
 <td>unvaild packet test</td>
-<td>1</td>
-<td>[e][127.0.0.1:10002]connnect server fail.[Connection refused]。</td>
-<td>0.025000ms</td>
-<tr style="background-color:#CD5C5C;color:Black;">
+<td>0</td>
+<td>[s][127.0.0.1:10002]success.[Connection reset by peer]</td>
+<td>0.478000ms</td>
+<tr style="background-color:#C1FFC1;color:Black;">
 <td>helf packet test</td>
-<td>1</td>
-<td>[e][127.0.0.1:10002]connnect server fail.[Connection refused]。</td>
-<td>0.024000ms</td>
+<td>0</td>
+<td>[s][127.0.0.1:10002]success.</td>
+<td>0.308000ms</td>
 <tr style="background-color:#C1FFC1;color:Black;">
 <td>Muliple connect packet test</td>
 <td>0</td>
 <td>[s][127.0.0.1:10002]success.</td>
-<td>0.827000ms</td>
+<td>3.855000ms</td>
 <tr style="background-color:#C1FFC1;color:Black;">
 <td>single UDP packet test</td>
 <td>0</td>
 <td>[s][127.0.0.1:10003]success.</td>
-<td>0.044000ms</td>
+<td>0.052000ms</td>
  </table>
