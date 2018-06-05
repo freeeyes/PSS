@@ -195,6 +195,7 @@
     <ClCompile Include="Console\MessageDefine.cpp" />
     <ClCompile Include="Console\MessageDispose.cpp" />
     <ClCompile Include="CppUnit\CppUnitMain.cpp" />
+    <ClCompile Include="CppUnit\Unit_AppConfig.cpp" />
     <ClCompile Include="CppUnit\Unit_BuffPacket.cpp" />
     <ClCompile Include="CppUnit\Unit_CommandAccount.cpp" />
     <ClCompile Include="CppUnit\Unit_FileTestManager.cpp" />
@@ -566,6 +567,7 @@
     <ClInclude Include="Console\MessageDefine.h" />
     <ClInclude Include="Console\MessageDispose.h" />
     <ClInclude Include="CppUnit\CppUnitMain.h" />
+    <ClInclude Include="CppUnit\Unit_AppConfig.h" />
     <ClInclude Include="CppUnit\Unit_BuffPacket.h" />
     <ClInclude Include="CppUnit\Unit_CommandAccount.h" />
     <ClInclude Include="CppUnit\Unit_Common.h" />

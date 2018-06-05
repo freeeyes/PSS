@@ -72,9 +72,13 @@ matrix:
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PacketParse_Interface
         - $ACE_ROOT/bin/mwc.pl -type gnuace
         - make -j 4
+        # make PlugIn
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/example-Module/TcpTest
         - $ACE_ROOT/bin/mwc.pl -type gnuace
         - make -j 4
+        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/example-Module/UDPTest
+        - $ACE_ROOT/bin/mwc.pl -type gnuace
+        - make -j 4        
         # Execute some tests
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
         - nohup ./PurenessScopeServer > pssout.file 2>&1 &

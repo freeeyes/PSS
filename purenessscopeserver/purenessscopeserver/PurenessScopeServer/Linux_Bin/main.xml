@@ -23,9 +23,8 @@
 	<Message Msg_High_mark="64000" Msg_Low_mark="64000" Msg_Buff_Max_Size="20480" Msg_Process="1" Msg_Thread="3" Msg_MaxQueue="10000" desc="消息处理线程相关参数设置，" />
 	<ModuleManager MaxCount="100" desc="框架支持的最大插件数量" />
 	<!-- <Module ModuleSPath="./" ModuleString="libAutoTest.so" ModuleSParam="" desc="模块加载配置相关参数，ModulePath是路径，ModuleString是模块名称，以逗号隔开"/> -->
-	<ModuleInfo ModuleSPath="./" ModuleSName="libTcpTest.so" ModuleSParam="../../example-Module/TcpTest/TcpTest.ini" Desc="ModuleParam为插件启动参数"/>
-	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="TcpTestPostd.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/> -->
-	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="TimerTestd.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/> -->	
+	<ModuleInfo ModuleSPath="./" ModuleSName="libTcpTest.so" ModuleSParam="" Desc="ModuleParam为插件启动参数"/>
+	<ModuleInfo ModuleSPath="./" ModuleSName="libUDPTest.so" ModuleSParam="" Desc="ModuleParam为插件启动参数"/>
 	
 	<CoreSetting CoreNeed="0" Script="" desc="是否需要打开Core文件支持，0为不需要，1为需要" />
 	<CommandAccount Account="1" FlowAccount="1" MaxCommandCount="2000" desc="Account为1记录统计命令日志，0为不记录，FlowAccount为流量统计，1为开启，0为关闭" />
@@ -38,5 +37,5 @@
 	<Monitor CpuAndMemory="0"  CpuMax="50" MemoryMax="1000" desc="是否对CPU和内存定时监控，并输出日志，0为关闭监控，1是打开监控" />
 	<AceDebug TrunOn="0" DebugName="./serverdebug.log" ChkInterval="600" LogFileMaxSize="10240" LogFileMaxCnt="3" Level="" desc="ACEDEBUG文件输出配置，TrunOn=0为不使用，1为使用" />
 	
-	<!-- <UDPServerIP uip="127.0.0.1" uport="10003" desc="监听TCP服务器的IP和端口，可以是多个" /> -->
+	<UDPServerIP uip="127.0.0.1" uport="10003" uParseID="1" uMaxRecvSize="1024" desc="监听UDP服务器的IP和端口，可以是多个" />
 </config>

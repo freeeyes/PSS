@@ -7,7 +7,7 @@
 #include <string>
 
 //定义客户端信令(TCP)
-#define COMMAND_BASE            0x1000
+#define COMMAND_BASE            0x1001
 #define COMMAND_RETURN_ALIVE    0xf000
 
 using namespace std;

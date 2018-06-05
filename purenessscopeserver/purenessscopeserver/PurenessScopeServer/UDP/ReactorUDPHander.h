@@ -23,7 +23,6 @@ public:
     virtual int handle_close(ACE_HANDLE handle, ACE_Reactor_Mask close_mask);
 
     void SetPacketParseInfoID(uint32 u4PacketParseInfoID);                    //设置对应的m_u4PacketParseInfoID
-    int  OpenAddress(const ACE_INET_Addr& AddrRemote);
     int  OpenAddress(const ACE_INET_Addr& AddrRemote, ACE_Reactor* pReactor);
 
     int  Run_Open(ACE_Reactor* pReactor);

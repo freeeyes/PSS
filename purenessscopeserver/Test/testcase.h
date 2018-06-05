@@ -20,7 +20,10 @@ bool CheckTcpErrorPacketHead(_ClientInfo& objClientInfo, _ResultInfo& objResultI
 bool CheckTcpHalfPacket(_ClientInfo& objClientInfo, _ResultInfo& objResultInfo);
 
 //多线程测试连接
-void* Thread_CheckTcpPacket();
+bool Thread_CheckTcpPacket(_ClientInfo& objClientInfo, _ResultInfo& objResultInfo);
+
+//测试UDP包
+bool Thread_CheckUdpPacket(_ClientInfo& objClientInfo, _ResultInfo& objResultInfo);
 
 //测试多线程并发
 bool CheckTcpMulipleThreadPacket(int nCount, _ClientInfo& objClientInfo, _ResultInfo& objResultInfo);

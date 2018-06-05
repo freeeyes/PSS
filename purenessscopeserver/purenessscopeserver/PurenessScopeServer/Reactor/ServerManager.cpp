@@ -374,7 +374,7 @@ bool CServerManager::Start_Udp_Listen()
 
         pReactorUDPHandler->SetRecvSize(GetXmlConfigAttribute(xmlUDPServerIPs)->vec[i].uMaxRecvSize);
         pReactorUDPHandler->SetPacketParseInfoID(GetXmlConfigAttribute(xmlUDPServerIPs)->vec[i].uPacketParseID);
-        int nRet = pReactorUDPHandler->OpenAddress(listenAddr);
+        int nRet = pReactorUDPHandler->OpenAddress(listenAddr, App_ReactorManager::instance()->GetAce_Reactor(REACTOR_CLIENTDEFINE));
 
         if (-1 == nRet)
         {

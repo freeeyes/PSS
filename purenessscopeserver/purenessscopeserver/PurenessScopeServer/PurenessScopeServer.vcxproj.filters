@@ -262,6 +262,9 @@
     <ClCompile Include="CppUnit\Unit_CommandAccount.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="CppUnit\Unit_AppConfig.cpp">
+      <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -640,6 +643,9 @@
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
     <ClInclude Include="CppUnit\Unit_CommandAccount.h">
+      <Filter>CppUnit\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\Unit_AppConfig.h">
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
   </ItemGroup>
