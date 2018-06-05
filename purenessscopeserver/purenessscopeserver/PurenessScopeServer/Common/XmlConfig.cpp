@@ -69,15 +69,17 @@ bool XMainConfig::InitFile(const char* pFileName, XmlConfig start, XmlConfig end
         1.范围
         2.init函数返回结果
         */
-        for (int i = start; i <= end && bKet; ++i)
+		int i = start;
+        for (; i <= end && bKet; ++i)
         {
             bKet = IConfigOpeation::_array[i]->Init(&m_XmlOpeation);
-
-            if (false == bKet)
-            {
-                OUR_DEBUG((LM_INFO, "[XMainConfig::InitFile](%d) Init is false.\n", i));
-            }
         }
+
+		if (false == bKet)
+		{
+			OUR_DEBUG((LM_INFO, "[XMainConfig::InitFile](%s) Init is false.\n", 
+				IConfigOpeation::_array[i]->ClassName().c_str()));
+		}
     }
     else
     {
