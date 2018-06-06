@@ -2,992 +2,1034 @@
 
 bool CheckTcpPacket(_ClientInfo& objClientInfo, _ResultInfo& objResultInfo)
 {
-	struct timeval ttStart, ttEnd;
-	int sckClient;
-	char szSession[32]      = {'\0'}; 
-	int nSrcLen = 0;
-	int nDecLen = 0;
-	
-	gettimeofday(&ttStart, NULL);
-	
-	sprintf(objResultInfo.m_szTestName, "single packet test");
-	sprintf(szSession, "FREEEYES");
+    struct timeval ttStart, ttEnd;
+    int sckClient;
+    char szSession[32]      = {'\0'};
+    int nSrcLen = 0;
+    int nDecLen = 0;
 
-	//socket创建的准备工作
-	struct sockaddr_in sockaddr;
+    gettimeofday(&ttStart, NULL);
 
-	memset(&sockaddr, 0, sizeof(sockaddr));
-	sockaddr.sin_family = AF_INET;
-	sockaddr.sin_port   = htons(objClientInfo.m_nPort);
-	sockaddr.sin_addr.s_addr = inet_addr(objClientInfo.m_szServerIP);
+    sprintf(objResultInfo.m_szTestName, "single packet test");
+    sprintf(szSession, "FREEEYES");
 
-	sckClient = socket(AF_INET, SOCK_STREAM, 0);
+    //socket创建的准备工作
+    struct sockaddr_in sockaddr;
 
-	struct timeval tvTimeout;  
-	tvTimeout.tv_sec  = 5;
-	tvTimeout.tv_usec = 0;
-	setsockopt(sckClient, SOL_SOCKET, SO_RCVTIMEO, (char *)&tvTimeout, sizeof(tvTimeout));
+    memset(&sockaddr, 0, sizeof(sockaddr));
+    sockaddr.sin_family = AF_INET;
+    sockaddr.sin_port   = htons(objClientInfo.m_nPort);
+    sockaddr.sin_addr.s_addr = inet_addr(objClientInfo.m_szServerIP);
 
-	//连接远程服务器
-	int nErr = connect(sckClient, (struct sockaddr *)&sockaddr, sizeof(sockaddr));
-	if(0 != nErr)
-	{
-		gettimeofday(&ttEnd, NULL);
-		sprintf(objResultInfo.m_szResult, "[e][%s:%d]connnect server fail.[%s]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
-		objResultInfo.m_nRet          = 1;
-		objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-		return false;
-	}
+    sckClient = socket(AF_INET, SOCK_STREAM, 0);
 
-	//拼装发送包体
-	char szSendBuffer[MAX_BUFF_200] ={'\0'};
+    struct timeval tvTimeout;
+    tvTimeout.tv_sec  = 5;
+    tvTimeout.tv_usec = 0;
+    setsockopt(sckClient, SOL_SOCKET, SO_RCVTIMEO, (char*)&tvTimeout, sizeof(tvTimeout));
 
-	short sVersion = 1;
-	short sCommand = (short)COMMAND_AUTOTEST_HEAD;
-	int nPacketLen = objClientInfo.m_nSendLength;
+    //连接远程服务器
+    int nErr = connect(sckClient, (struct sockaddr*)&sockaddr, sizeof(sockaddr));
 
-	memcpy(szSendBuffer, (char* )&sVersion, sizeof(short));
-	memcpy((char* )&szSendBuffer[2], (char* )&sCommand, sizeof(short));
-	memcpy((char* )&szSendBuffer[4], (char* )&nPacketLen, sizeof(int));
-	memcpy((char* )&szSendBuffer[8], (char* )&szSession, sizeof(char)*32);
-	memcpy((char* )&szSendBuffer[40], (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
-	int nSendLen = nPacketLen + 40;
+    if(0 != nErr)
+    {
+        gettimeofday(&ttEnd, NULL);
+        sprintf(objResultInfo.m_szResult, "[e][%s:%d]connnect server fail.[%s]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
+        objResultInfo.m_nRet          = 1;
+        objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+        return false;
+    }
 
-	//发送数据
-	int nTotalSendLen = nSendLen;
-	int nBeginSend    = 0;
-	int nCurrSendLen  = 0;
-	bool blSendFlag   = false;
-	int nBeginRecv    = 0;
-	int nCurrRecvLen  = 0;
-	bool blRecvFlag   = false;
-	while(true)
-	{
-		nCurrSendLen = send(sckClient, szSendBuffer + nBeginSend, nTotalSendLen, 0);
-		if(nCurrSendLen <= 0)
-		{
-			close(sckClient);
-			gettimeofday(&ttEnd, NULL);
-			sprintf(objResultInfo.m_szResult, "[e][%s:%d]send server fail.[%s]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
-			objResultInfo.m_nRet          = 1;
-			objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-			return false;
-		}
-		else
-		{
-			nTotalSendLen -= nCurrSendLen;
-			if(nTotalSendLen == 0)
-			{
-				//发送完成
-				blSendFlag = true;
-				break;
-			}
-			else
-			{
-				nBeginSend += nCurrSendLen;
-			}
-		}
-	}
+    //拼装发送包体
+    char szSendBuffer[MAX_BUFF_200] = {'\0'};
 
-	if(blSendFlag == false)
-	{
-		close(sckClient);
-	  gettimeofday(&ttEnd, NULL);
-		sprintf(objResultInfo.m_szResult, "[e][%s:%d]send buff size not equal, buffer size[%d], send size[%d]", objClientInfo.m_szServerIP, objClientInfo.m_nPort, objClientInfo.m_nSendLength, nTotalSendLen);
-		objResultInfo.m_nRet          = 1;
-		objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-		return false;
-	}
-	else
-	{
-		int nTotalRecvLen               = nPacketLen + sizeof(int);
-		char szRecvBuffData[1024 * 100] = {'\0'};
+    short sVersion = 1;
+    short sCommand = (short)COMMAND_AUTOTEST_HEAD;
+    int nPacketLen = objClientInfo.m_nSendLength;
 
-		while(true)
-		{
-			
-			//如果发送成功了，则处理接收数据
-			nCurrRecvLen = recv(sckClient, (char* )szRecvBuffData + nBeginRecv, nTotalRecvLen, 0);
-			if(nCurrRecvLen <= 0)
-			{
-				close(sckClient);
-				gettimeofday(&ttEnd, NULL);
-				sprintf(objResultInfo.m_szResult, "[e][%s:%d]client recv data error.[%s]", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
-				objResultInfo.m_nRet = 1;
-				objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-				return false;
-			}
-			else
-			{
-				nTotalRecvLen -= nCurrRecvLen;
-				if(nTotalRecvLen == 0)
-				{
-					//接收完成
-					break;
-				}
-				else
-				{
-					nBeginRecv += nCurrRecvLen;
-				}
-			}
-		}
-	}
+    memcpy(szSendBuffer, (char* )&sVersion, sizeof(short));
+    memcpy((char* )&szSendBuffer[2], (char* )&sCommand, sizeof(short));
+    memcpy((char* )&szSendBuffer[4], (char* )&nPacketLen, sizeof(int));
+    memcpy((char* )&szSendBuffer[8], (char* )&szSession, sizeof(char)*32);
+    memcpy((char* )&szSendBuffer[40], (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
+    int nSendLen = nPacketLen + 40;
 
-	sprintf(objResultInfo.m_szResult, "[s][%s:%d]success.", objClientInfo.m_szServerIP, objClientInfo.m_nPort);
-	gettimeofday(&ttEnd, NULL);
-	objResultInfo.m_nRet = 0;
-	objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-	close(sckClient);
+    //发送数据
+    int nTotalSendLen = nSendLen;
+    int nBeginSend    = 0;
+    int nCurrSendLen  = 0;
+    bool blSendFlag   = false;
+    int nBeginRecv    = 0;
+    int nCurrRecvLen  = 0;
+    bool blRecvFlag   = false;
 
-	return true;
+    while(true)
+    {
+        nCurrSendLen = send(sckClient, szSendBuffer + nBeginSend, nTotalSendLen, 0);
+
+        if(nCurrSendLen <= 0)
+        {
+            close(sckClient);
+            gettimeofday(&ttEnd, NULL);
+            sprintf(objResultInfo.m_szResult, "[e][%s:%d]send server fail.[%s]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
+            objResultInfo.m_nRet          = 1;
+            objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+            return false;
+        }
+        else
+        {
+            nTotalSendLen -= nCurrSendLen;
+
+            if(nTotalSendLen == 0)
+            {
+                //发送完成
+                blSendFlag = true;
+                break;
+            }
+            else
+            {
+                nBeginSend += nCurrSendLen;
+            }
+        }
+    }
+
+    if(blSendFlag == false)
+    {
+        close(sckClient);
+        gettimeofday(&ttEnd, NULL);
+        sprintf(objResultInfo.m_szResult, "[e][%s:%d]send buff size not equal, buffer size[%d], send size[%d]", objClientInfo.m_szServerIP, objClientInfo.m_nPort, objClientInfo.m_nSendLength, nTotalSendLen);
+        objResultInfo.m_nRet          = 1;
+        objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+        return false;
+    }
+    else
+    {
+        int nTotalRecvLen               = nPacketLen + sizeof(int);
+        char szRecvBuffData[1024 * 100] = {'\0'};
+
+        while(true)
+        {
+
+            //如果发送成功了，则处理接收数据
+            nCurrRecvLen = recv(sckClient, (char* )szRecvBuffData + nBeginRecv, nTotalRecvLen, 0);
+
+            if(nCurrRecvLen <= 0)
+            {
+                close(sckClient);
+                gettimeofday(&ttEnd, NULL);
+                sprintf(objResultInfo.m_szResult, "[e][%s:%d]client recv data error.[%s]", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
+                objResultInfo.m_nRet = 1;
+                objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+                return false;
+            }
+            else
+            {
+                nTotalRecvLen -= nCurrRecvLen;
+
+                if(nTotalRecvLen == 0)
+                {
+                    //接收完成
+                    break;
+                }
+                else
+                {
+                    nBeginRecv += nCurrRecvLen;
+                }
+            }
+        }
+    }
+
+    sprintf(objResultInfo.m_szResult, "[s][%s:%d]success.", objClientInfo.m_szServerIP, objClientInfo.m_nPort);
+    gettimeofday(&ttEnd, NULL);
+    objResultInfo.m_nRet = 0;
+    objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+    close(sckClient);
+
+    return true;
 }
 
 bool CheckMultipleTcpPacket(int nCount, _ClientInfo& objClientInfo, _ResultInfo& objResultInfo)
 {
-	struct timeval ttStart, ttEnd;
-	int sckClient;
-	char szSession[32]      = {'\0'}; 
-	int nSrcLen = 0;
-	int nDecLen = 0;
-	
-	gettimeofday(&ttStart, NULL);
-	
-	sprintf(objResultInfo.m_szTestName, "multiple packet test(%d)", nCount);
-	sprintf(szSession, "FREEEYES");
+    struct timeval ttStart, ttEnd;
+    int sckClient;
+    char szSession[32]      = {'\0'};
+    int nSrcLen = 0;
+    int nDecLen = 0;
 
-	//socket创建的准备工作
-	struct sockaddr_in sockaddr;
+    gettimeofday(&ttStart, NULL);
 
-	memset(&sockaddr, 0, sizeof(sockaddr));
-	sockaddr.sin_family = AF_INET;
-	sockaddr.sin_port   = htons(objClientInfo.m_nPort);
-	sockaddr.sin_addr.s_addr = inet_addr(objClientInfo.m_szServerIP);
+    sprintf(objResultInfo.m_szTestName, "multiple packet test(%d)", nCount);
+    sprintf(szSession, "FREEEYES");
 
-	sckClient = socket(AF_INET, SOCK_STREAM, 0);
+    //socket创建的准备工作
+    struct sockaddr_in sockaddr;
 
-	struct timeval tvTimeout;  
-	tvTimeout.tv_sec  = 5;
-	tvTimeout.tv_usec = 0;
-	setsockopt(sckClient, SOL_SOCKET, SO_RCVTIMEO, (char *)&tvTimeout, sizeof(tvTimeout));
+    memset(&sockaddr, 0, sizeof(sockaddr));
+    sockaddr.sin_family = AF_INET;
+    sockaddr.sin_port   = htons(objClientInfo.m_nPort);
+    sockaddr.sin_addr.s_addr = inet_addr(objClientInfo.m_szServerIP);
 
-	//连接远程服务器
-	int nErr = connect(sckClient, (struct sockaddr *)&sockaddr, sizeof(sockaddr));
-	if(0 != nErr)
-	{
-		gettimeofday(&ttEnd, NULL);
-		sprintf(objResultInfo.m_szResult, "[e][%s:%d]connnect server fail.[%s]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
-		objResultInfo.m_nRet          = 1;
-		objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-		return false;
-	}
+    sckClient = socket(AF_INET, SOCK_STREAM, 0);
 
-	//拼装发送包体
-	char szSendBuffer[MAX_BUFF_200] ={'\0'};
+    struct timeval tvTimeout;
+    tvTimeout.tv_sec  = 5;
+    tvTimeout.tv_usec = 0;
+    setsockopt(sckClient, SOL_SOCKET, SO_RCVTIMEO, (char*)&tvTimeout, sizeof(tvTimeout));
 
-	short sVersion = 1;
-	short sCommand = (short)COMMAND_AUTOTEST_HEAD;
-	int nPacketLen = objClientInfo.m_nSendLength;
+    //连接远程服务器
+    int nErr = connect(sckClient, (struct sockaddr*)&sockaddr, sizeof(sockaddr));
 
-	memcpy(szSendBuffer, (char* )&sVersion, sizeof(short));
-	memcpy((char* )&szSendBuffer[2], (char* )&sCommand, sizeof(short));
-	memcpy((char* )&szSendBuffer[4], (char* )&nPacketLen, sizeof(int));
-	memcpy((char* )&szSendBuffer[8], (char* )&szSession, sizeof(char)*32);
-	memcpy((char* )&szSendBuffer[40], (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
-	int nSendLen = nPacketLen + 40;
-	
-	//拼装测试发送数据包
-	char* pData = new char[nCount * nSendLen];
-	memset(pData, 0, nCount * nSendLen);
-	for(int i = 0; i < nCount; i++)
-	{
-		memcpy((char* )&pData[i * nSendLen], szSendBuffer, nSendLen);
-	}
+    if(0 != nErr)
+    {
+        gettimeofday(&ttEnd, NULL);
+        sprintf(objResultInfo.m_szResult, "[e][%s:%d]connnect server fail.[%s]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
+        objResultInfo.m_nRet          = 1;
+        objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+        return false;
+    }
 
-	//发送数据
-	int nTotalSendLen = nCount * nSendLen;
-	int nBeginSend    = 0;
-	int nCurrSendLen  = 0;
-	bool blSendFlag   = false;
-	int nBeginRecv    = 0;
-	int nCurrRecvLen  = 0;
-	bool blRecvFlag   = false;
-	while(true)
-	{
-		nCurrSendLen = send(sckClient, pData + nBeginSend, nTotalSendLen, 0);
-		if(nCurrSendLen <= 0)
-		{
-			delete [] pData;
-			close(sckClient);
-			gettimeofday(&ttEnd, NULL);
-			sprintf(objResultInfo.m_szResult, "[e][%s:%d]send server fail.[%s]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
-			objResultInfo.m_nRet          = 1;
-			objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-			return false;
-		}
-		else
-		{
-			nTotalSendLen -= nCurrSendLen;
-			if(nTotalSendLen == 0)
-			{
-				//发送完成
-				delete [] pData;
-				blSendFlag = true;
-				break;
-			}
-			else
-			{
-				nBeginSend += nCurrSendLen;
-			}
-		}
-	}
+    //拼装发送包体
+    char szSendBuffer[MAX_BUFF_200] = {'\0'};
 
-	if(blSendFlag == false)
-	{
-		close(sckClient);
-	  gettimeofday(&ttEnd, NULL);
-		sprintf(objResultInfo.m_szResult, "[e][%s:%d]send buff size not equal, buffer size[%d], send size[%d]", objClientInfo.m_szServerIP, objClientInfo.m_nPort, objClientInfo.m_nSendLength, nTotalSendLen);
-		objResultInfo.m_nRet          = 1;
-		objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-		return false;
-	}
-	else
-	{
-		int nTotalRecvLen               = nCount * (nPacketLen + sizeof(int));
-		char szRecvBuffData[1024 * 100] = {'\0'};
+    short sVersion = 1;
+    short sCommand = (short)COMMAND_AUTOTEST_HEAD;
+    int nPacketLen = objClientInfo.m_nSendLength;
 
-		while(true)
-		{
-			
-			//如果发送成功了，则处理接收数据
-			nCurrRecvLen = recv(sckClient, (char* )szRecvBuffData + nBeginRecv, nTotalRecvLen, 0);
-			if(nCurrRecvLen <= 0)
-			{
-				close(sckClient);
-				gettimeofday(&ttEnd, NULL);
-				sprintf(objResultInfo.m_szResult, "[e][%s:%d]client recv data error.[%s]", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
-				objResultInfo.m_nRet = 1;
-				objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-				return false;
-			}
-			else
-			{
-				nTotalRecvLen -= nCurrRecvLen;
-				if(nTotalRecvLen == 0)
-				{
-					//接收完成
-					break;
-				}
-				else
-				{
-					nBeginRecv += nCurrRecvLen;
-				}
-			}
-		}
-	}
+    memcpy(szSendBuffer, (char* )&sVersion, sizeof(short));
+    memcpy((char* )&szSendBuffer[2], (char* )&sCommand, sizeof(short));
+    memcpy((char* )&szSendBuffer[4], (char* )&nPacketLen, sizeof(int));
+    memcpy((char* )&szSendBuffer[8], (char* )&szSession, sizeof(char)*32);
+    memcpy((char* )&szSendBuffer[40], (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
+    int nSendLen = nPacketLen + 40;
 
-	sprintf(objResultInfo.m_szResult, "[s][%s:%d]success.", objClientInfo.m_szServerIP, objClientInfo.m_nPort);
-	gettimeofday(&ttEnd, NULL);
-	objResultInfo.m_nRet = 0;
-	objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-	close(sckClient);
+    //拼装测试发送数据包
+    char* pData = new char[nCount * nSendLen];
+    memset(pData, 0, nCount * nSendLen);
 
-	return true;	
+    for(int i = 0; i < nCount; i++)
+    {
+        memcpy((char* )&pData[i * nSendLen], szSendBuffer, nSendLen);
+    }
+
+    //发送数据
+    int nTotalSendLen = nCount * nSendLen;
+    int nBeginSend    = 0;
+    int nCurrSendLen  = 0;
+    bool blSendFlag   = false;
+    int nBeginRecv    = 0;
+    int nCurrRecvLen  = 0;
+    bool blRecvFlag   = false;
+
+    while(true)
+    {
+        nCurrSendLen = send(sckClient, pData + nBeginSend, nTotalSendLen, 0);
+
+        if(nCurrSendLen <= 0)
+        {
+            delete [] pData;
+            close(sckClient);
+            gettimeofday(&ttEnd, NULL);
+            sprintf(objResultInfo.m_szResult, "[e][%s:%d]send server fail.[%s]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
+            objResultInfo.m_nRet          = 1;
+            objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+            return false;
+        }
+        else
+        {
+            nTotalSendLen -= nCurrSendLen;
+
+            if(nTotalSendLen == 0)
+            {
+                //发送完成
+                delete [] pData;
+                blSendFlag = true;
+                break;
+            }
+            else
+            {
+                nBeginSend += nCurrSendLen;
+            }
+        }
+    }
+
+    if(blSendFlag == false)
+    {
+        close(sckClient);
+        gettimeofday(&ttEnd, NULL);
+        sprintf(objResultInfo.m_szResult, "[e][%s:%d]send buff size not equal, buffer size[%d], send size[%d]", objClientInfo.m_szServerIP, objClientInfo.m_nPort, objClientInfo.m_nSendLength, nTotalSendLen);
+        objResultInfo.m_nRet          = 1;
+        objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+        return false;
+    }
+    else
+    {
+        int nTotalRecvLen               = nCount * (nPacketLen + sizeof(int));
+        char szRecvBuffData[1024 * 100] = {'\0'};
+
+        while(true)
+        {
+
+            //如果发送成功了，则处理接收数据
+            nCurrRecvLen = recv(sckClient, (char* )szRecvBuffData + nBeginRecv, nTotalRecvLen, 0);
+
+            if(nCurrRecvLen <= 0)
+            {
+                close(sckClient);
+                gettimeofday(&ttEnd, NULL);
+                sprintf(objResultInfo.m_szResult, "[e][%s:%d]client recv data error.[%s]", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
+                objResultInfo.m_nRet = 1;
+                objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+                return false;
+            }
+            else
+            {
+                nTotalRecvLen -= nCurrRecvLen;
+
+                if(nTotalRecvLen == 0)
+                {
+                    //接收完成
+                    break;
+                }
+                else
+                {
+                    nBeginRecv += nCurrRecvLen;
+                }
+            }
+        }
+    }
+
+    sprintf(objResultInfo.m_szResult, "[s][%s:%d]success.", objClientInfo.m_szServerIP, objClientInfo.m_nPort);
+    gettimeofday(&ttEnd, NULL);
+    objResultInfo.m_nRet = 0;
+    objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+    close(sckClient);
+
+    return true;
 }
 
 bool CheckMultipleTcpConnect(int nCount, _ClientInfo& objClientInfo, _ResultInfo& objResultInfo)
 {
-	struct timeval ttStart, ttEnd;
-	int sckClient;
-	char szSession[32]      = {'\0'}; 
-	int nSrcLen = 0;
-	int nDecLen = 0;
-	
-	gettimeofday(&ttStart, NULL);
-	
-	sprintf(objResultInfo.m_szTestName, "multiple connect test(%d)", nCount);
-	sprintf(szSession, "FREEEYES");
+    struct timeval ttStart, ttEnd;
+    int sckClient;
+    char szSession[32]      = {'\0'};
+    int nSrcLen = 0;
+    int nDecLen = 0;
 
-	//socket创建的准备工作
-	struct sockaddr_in sockaddr;
+    gettimeofday(&ttStart, NULL);
 
-	memset(&sockaddr, 0, sizeof(sockaddr));
-	sockaddr.sin_family = AF_INET;
-	sockaddr.sin_port   = htons(objClientInfo.m_nPort);
-	sockaddr.sin_addr.s_addr = inet_addr(objClientInfo.m_szServerIP);
+    sprintf(objResultInfo.m_szTestName, "multiple connect test(%d)", nCount);
+    sprintf(szSession, "FREEEYES");
 
-	for(int i = 0; i < nCount; i++)
-	{
-		sckClient = socket(AF_INET, SOCK_STREAM, 0);
+    //socket创建的准备工作
+    struct sockaddr_in sockaddr;
 
-		struct timeval tvTimeout;  
-		tvTimeout.tv_sec  = 5;
-		tvTimeout.tv_usec = 0;
-		setsockopt(sckClient, SOL_SOCKET, SO_RCVTIMEO, (char *)&tvTimeout, sizeof(tvTimeout));
+    memset(&sockaddr, 0, sizeof(sockaddr));
+    sockaddr.sin_family = AF_INET;
+    sockaddr.sin_port   = htons(objClientInfo.m_nPort);
+    sockaddr.sin_addr.s_addr = inet_addr(objClientInfo.m_szServerIP);
 
-		//连接远程服务器
-		int nErr = connect(sckClient, (struct sockaddr *)&sockaddr, sizeof(sockaddr));
-		if(0 != nErr)
-		{
-			gettimeofday(&ttEnd, NULL);
-			sprintf(objResultInfo.m_szResult, "[e][%s:%d]connnect server fail.[%s]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
-			objResultInfo.m_nRet          = 1;
-			objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-			return false;
-		}
+    for(int i = 0; i < nCount; i++)
+    {
+        sckClient = socket(AF_INET, SOCK_STREAM, 0);
 
-		//拼装发送包体
-		char szSendBuffer[MAX_BUFF_200] ={'\0'};
+        struct timeval tvTimeout;
+        tvTimeout.tv_sec  = 5;
+        tvTimeout.tv_usec = 0;
+        setsockopt(sckClient, SOL_SOCKET, SO_RCVTIMEO, (char*)&tvTimeout, sizeof(tvTimeout));
 
-		short sVersion = 1;
-		short sCommand = (short)COMMAND_AUTOTEST_HEAD;
-		int nPacketLen = objClientInfo.m_nSendLength;
+        //连接远程服务器
+        int nErr = connect(sckClient, (struct sockaddr*)&sockaddr, sizeof(sockaddr));
 
-		memcpy(szSendBuffer, (char* )&sVersion, sizeof(short));
-		memcpy((char* )&szSendBuffer[2], (char* )&sCommand, sizeof(short));
-		memcpy((char* )&szSendBuffer[4], (char* )&nPacketLen, sizeof(int));
-		memcpy((char* )&szSendBuffer[8], (char* )&szSession, sizeof(char)*32);
-		memcpy((char* )&szSendBuffer[40], (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
-		int nSendLen = nPacketLen + 40;
+        if(0 != nErr)
+        {
+            gettimeofday(&ttEnd, NULL);
+            sprintf(objResultInfo.m_szResult, "[e][%s:%d]connnect server fail.[%s]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
+            objResultInfo.m_nRet          = 1;
+            objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+            return false;
+        }
 
-		//发送数据
-		int nTotalSendLen = nSendLen;
-		int nBeginSend    = 0;
-		int nCurrSendLen  = 0;
-		bool blSendFlag   = false;
-		int nBeginRecv    = 0;
-		int nCurrRecvLen  = 0;
-		bool blRecvFlag   = false;
-		while(true)
-		{
-			nCurrSendLen = send(sckClient, szSendBuffer + nBeginSend, nTotalSendLen, 0);
-			if(nCurrSendLen <= 0)
-			{
-				close(sckClient);
-				gettimeofday(&ttEnd, NULL);
-				sprintf(objResultInfo.m_szResult, "[e][%s:%d]send server fail.[%s]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
-				objResultInfo.m_nRet          = 1;
-				objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-				return false;
-			}
-			else
-			{
-				nTotalSendLen -= nCurrSendLen;
-				if(nTotalSendLen == 0)
-				{
-					//发送完成
-					blSendFlag = true;
-					break;
-				}
-				else
-				{
-					nBeginSend += nCurrSendLen;
-				}
-			}
-		}
+        //拼装发送包体
+        char szSendBuffer[MAX_BUFF_200] = {'\0'};
 
-		if(blSendFlag == false)
-		{
-			close(sckClient);
-		  gettimeofday(&ttEnd, NULL);
-			sprintf(objResultInfo.m_szResult, "[e][%s:%d]send buff size not equal, buffer size[%d], send size[%d]", objClientInfo.m_szServerIP, objClientInfo.m_nPort, objClientInfo.m_nSendLength, nTotalSendLen);
-			objResultInfo.m_nRet          = 1;
-			objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-			return false;
-		}
-		else
-		{
-			int nTotalRecvLen               = nPacketLen + sizeof(int);
-			char szRecvBuffData[1024 * 100] = {'\0'};
+        short sVersion = 1;
+        short sCommand = (short)COMMAND_AUTOTEST_HEAD;
+        int nPacketLen = objClientInfo.m_nSendLength;
 
-			while(true)
-			{
-				
-				//如果发送成功了，则处理接收数据
-				nCurrRecvLen = recv(sckClient, (char* )szRecvBuffData + nBeginRecv, nTotalRecvLen, 0);
-				if(nCurrRecvLen <= 0)
-				{
-					close(sckClient);
-					gettimeofday(&ttEnd, NULL);
-					sprintf(objResultInfo.m_szResult, "[e][%s:%d]client recv data error.[%s]", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
-					objResultInfo.m_nRet = 1;
-					objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-					return false;
-				}
-				else
-				{
-					nTotalRecvLen -= nCurrRecvLen;
-					if(nTotalRecvLen == 0)
-					{
-						//接收完成
-						break;
-					}
-					else
-					{
-						nBeginRecv += nCurrRecvLen;
-					}
-				}
-			}
-		}
+        memcpy(szSendBuffer, (char* )&sVersion, sizeof(short));
+        memcpy((char* )&szSendBuffer[2], (char* )&sCommand, sizeof(short));
+        memcpy((char* )&szSendBuffer[4], (char* )&nPacketLen, sizeof(int));
+        memcpy((char* )&szSendBuffer[8], (char* )&szSession, sizeof(char)*32);
+        memcpy((char* )&szSendBuffer[40], (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
+        int nSendLen = nPacketLen + 40;
 
-		sprintf(objResultInfo.m_szResult, "[s][%s:%d]success.", objClientInfo.m_szServerIP, objClientInfo.m_nPort);
-		gettimeofday(&ttEnd, NULL);
-		objResultInfo.m_nRet = 0;
-		objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-		close(sckClient);
-	}
+        //发送数据
+        int nTotalSendLen = nSendLen;
+        int nBeginSend    = 0;
+        int nCurrSendLen  = 0;
+        bool blSendFlag   = false;
+        int nBeginRecv    = 0;
+        int nCurrRecvLen  = 0;
+        bool blRecvFlag   = false;
 
-	return true;	
+        while(true)
+        {
+            nCurrSendLen = send(sckClient, szSendBuffer + nBeginSend, nTotalSendLen, 0);
+
+            if(nCurrSendLen <= 0)
+            {
+                close(sckClient);
+                gettimeofday(&ttEnd, NULL);
+                sprintf(objResultInfo.m_szResult, "[e][%s:%d]send server fail.[%s]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
+                objResultInfo.m_nRet          = 1;
+                objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+                return false;
+            }
+            else
+            {
+                nTotalSendLen -= nCurrSendLen;
+
+                if(nTotalSendLen == 0)
+                {
+                    //发送完成
+                    blSendFlag = true;
+                    break;
+                }
+                else
+                {
+                    nBeginSend += nCurrSendLen;
+                }
+            }
+        }
+
+        if(blSendFlag == false)
+        {
+            close(sckClient);
+            gettimeofday(&ttEnd, NULL);
+            sprintf(objResultInfo.m_szResult, "[e][%s:%d]send buff size not equal, buffer size[%d], send size[%d]", objClientInfo.m_szServerIP, objClientInfo.m_nPort, objClientInfo.m_nSendLength, nTotalSendLen);
+            objResultInfo.m_nRet          = 1;
+            objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+            return false;
+        }
+        else
+        {
+            int nTotalRecvLen               = nPacketLen + sizeof(int);
+            char szRecvBuffData[1024 * 100] = {'\0'};
+
+            while(true)
+            {
+
+                //如果发送成功了，则处理接收数据
+                nCurrRecvLen = recv(sckClient, (char* )szRecvBuffData + nBeginRecv, nTotalRecvLen, 0);
+
+                if(nCurrRecvLen <= 0)
+                {
+                    close(sckClient);
+                    gettimeofday(&ttEnd, NULL);
+                    sprintf(objResultInfo.m_szResult, "[e][%s:%d]client recv data error.[%s]", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
+                    objResultInfo.m_nRet = 1;
+                    objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+                    return false;
+                }
+                else
+                {
+                    nTotalRecvLen -= nCurrRecvLen;
+
+                    if(nTotalRecvLen == 0)
+                    {
+                        //接收完成
+                        break;
+                    }
+                    else
+                    {
+                        nBeginRecv += nCurrRecvLen;
+                    }
+                }
+            }
+        }
+
+        sprintf(objResultInfo.m_szResult, "[s][%s:%d]success.", objClientInfo.m_szServerIP, objClientInfo.m_nPort);
+        gettimeofday(&ttEnd, NULL);
+        objResultInfo.m_nRet = 0;
+        objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+        close(sckClient);
+    }
+
+    return true;
 }
 
 bool CheckTcpErrorPacketHead(_ClientInfo& objClientInfo, _ResultInfo& objResultInfo)
 {
-	struct timeval ttStart, ttEnd;
-	int sckClient;
-	char szSession[32]      = {'\0'}; 
-	int nSrcLen = 0;
-	int nDecLen = 0;
-	
-	gettimeofday(&ttStart, NULL);
-	
-	sprintf(objResultInfo.m_szTestName, "unvaild packet test");
-	sprintf(szSession, "FREEEYES");
+    struct timeval ttStart, ttEnd;
+    int sckClient;
+    char szSession[32]      = {'\0'};
+    int nSrcLen = 0;
+    int nDecLen = 0;
 
-	//socket创建的准备工作
-	struct sockaddr_in sockaddr;
+    gettimeofday(&ttStart, NULL);
 
-	memset(&sockaddr, 0, sizeof(sockaddr));
-	sockaddr.sin_family = AF_INET;
-	sockaddr.sin_port   = htons(objClientInfo.m_nPort);
-	sockaddr.sin_addr.s_addr = inet_addr(objClientInfo.m_szServerIP);
+    sprintf(objResultInfo.m_szTestName, "unvaild packet test");
+    sprintf(szSession, "FREEEYES");
 
-	sckClient = socket(AF_INET, SOCK_STREAM, 0);
+    //socket创建的准备工作
+    struct sockaddr_in sockaddr;
 
-	struct timeval tvTimeout;  
-	tvTimeout.tv_sec  = 5;
-	tvTimeout.tv_usec = 0;
-	setsockopt(sckClient, SOL_SOCKET, SO_RCVTIMEO, (char *)&tvTimeout, sizeof(tvTimeout));
+    memset(&sockaddr, 0, sizeof(sockaddr));
+    sockaddr.sin_family = AF_INET;
+    sockaddr.sin_port   = htons(objClientInfo.m_nPort);
+    sockaddr.sin_addr.s_addr = inet_addr(objClientInfo.m_szServerIP);
 
-	//连接远程服务器
-	int nErr = connect(sckClient, (struct sockaddr *)&sockaddr, sizeof(sockaddr));
-	if(0 != nErr)
-	{
-		gettimeofday(&ttEnd, NULL);
-		sprintf(objResultInfo.m_szResult, "[e][%s:%d]connnect server fail.[%s]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
-		objResultInfo.m_nRet          = 1;
-		objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-		return false;
-	}
+    sckClient = socket(AF_INET, SOCK_STREAM, 0);
 
-	//拼装发送包体
-	char szSendBuffer[MAX_BUFF_200] ={'\0'};
+    struct timeval tvTimeout;
+    tvTimeout.tv_sec  = 5;
+    tvTimeout.tv_usec = 0;
+    setsockopt(sckClient, SOL_SOCKET, SO_RCVTIMEO, (char*)&tvTimeout, sizeof(tvTimeout));
 
-	short sVersion = 1;
-	short sCommand = (short)COMMAND_AUTOTEST_HEAD;
-	int nPacketLen = objClientInfo.m_nSendLength;
+    //连接远程服务器
+    int nErr = connect(sckClient, (struct sockaddr*)&sockaddr, sizeof(sockaddr));
 
-	//模拟一个无效包头
-	memset(szSendBuffer, 0, 40);
-	memcpy((char* )&szSendBuffer[40], (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
-	int nSendLen = nPacketLen + 40;
+    if(0 != nErr)
+    {
+        gettimeofday(&ttEnd, NULL);
+        sprintf(objResultInfo.m_szResult, "[e][%s:%d]connnect server fail.[%s]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
+        objResultInfo.m_nRet          = 1;
+        objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+        return false;
+    }
 
-	//发送数据
-	int nTotalSendLen = nSendLen;
-	int nBeginSend    = 0;
-	int nCurrSendLen  = 0;
-	bool blSendFlag   = false;
-	int nBeginRecv    = 0;
-	int nCurrRecvLen  = 0;
-	bool blRecvFlag   = false;
-	while(true)
-	{
-		nCurrSendLen = send(sckClient, szSendBuffer + nBeginSend, nTotalSendLen, 0);
-		if(nCurrSendLen <= 0)
-		{
-			close(sckClient);
-			gettimeofday(&ttEnd, NULL);
-			sprintf(objResultInfo.m_szResult, "[e][%s:%d]send server fail.[%s]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
-			objResultInfo.m_nRet          = 1;
-			objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-			return false;
-		}
-		else
-		{
-			nTotalSendLen -= nCurrSendLen;
-			if(nTotalSendLen == 0)
-			{
-				//发送完成
-				blSendFlag = true;
-				break;
-			}
-			else
-			{
-				nBeginSend += nCurrSendLen;
-			}
-		}
-	}
+    //拼装发送包体
+    char szSendBuffer[MAX_BUFF_200] = {'\0'};
 
-	if(blSendFlag == false)
-	{
-		close(sckClient);
-	  gettimeofday(&ttEnd, NULL);
-		sprintf(objResultInfo.m_szResult, "[e][%s:%d]send buff size not equal, buffer size[%d], send size[%d]", objClientInfo.m_szServerIP, objClientInfo.m_nPort, objClientInfo.m_nSendLength, nTotalSendLen);
-		objResultInfo.m_nRet          = 1;
-		objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-		return false;
-	}
-	else
-	{
-		int nTotalRecvLen               = nPacketLen + sizeof(int);
-		char szRecvBuffData[1024 * 100] = {'\0'};
+    short sVersion = 1;
+    short sCommand = (short)COMMAND_AUTOTEST_HEAD;
+    int nPacketLen = objClientInfo.m_nSendLength;
 
-		while(true)
-		{
-			
-			//如果发送成功了，则处理接收数据
-			nCurrRecvLen = recv(sckClient, (char* )szRecvBuffData + nBeginRecv, nTotalRecvLen, 0);
-			if(nCurrRecvLen <= 0)
-			{
-				close(sckClient);
-				gettimeofday(&ttEnd, NULL);
-				sprintf(objResultInfo.m_szResult, "[s][%s:%d]success.[%s]", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
-				objResultInfo.m_nRet = 0;
-				objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-				return false;
-			}
-			else
-			{
-				nTotalRecvLen -= nCurrRecvLen;
-				if(nTotalRecvLen == 0)
-				{
-					//接收完成
-					break;
-				}
-				else
-				{
-					nBeginRecv += nCurrRecvLen;
-				}
-			}
-		}
-	}
+    //模拟一个无效包头
+    memset(szSendBuffer, 0, 40);
+    memcpy((char* )&szSendBuffer[40], (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
+    int nSendLen = nPacketLen + 40;
 
-	sprintf(objResultInfo.m_szResult, "[e][%s:%d]error recv data.", objClientInfo.m_szServerIP, objClientInfo.m_nPort);
-	gettimeofday(&ttEnd, NULL);
-	objResultInfo.m_nRet = 1;
-	objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-	close(sckClient);
+    //发送数据
+    int nTotalSendLen = nSendLen;
+    int nBeginSend    = 0;
+    int nCurrSendLen  = 0;
+    bool blSendFlag   = false;
+    int nBeginRecv    = 0;
+    int nCurrRecvLen  = 0;
+    bool blRecvFlag   = false;
 
-	return true;	
+    while(true)
+    {
+        nCurrSendLen = send(sckClient, szSendBuffer + nBeginSend, nTotalSendLen, 0);
+
+        if(nCurrSendLen <= 0)
+        {
+            close(sckClient);
+            gettimeofday(&ttEnd, NULL);
+            sprintf(objResultInfo.m_szResult, "[e][%s:%d]send server fail.[%s]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
+            objResultInfo.m_nRet          = 1;
+            objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+            return false;
+        }
+        else
+        {
+            nTotalSendLen -= nCurrSendLen;
+
+            if(nTotalSendLen == 0)
+            {
+                //发送完成
+                blSendFlag = true;
+                break;
+            }
+            else
+            {
+                nBeginSend += nCurrSendLen;
+            }
+        }
+    }
+
+    if(blSendFlag == false)
+    {
+        close(sckClient);
+        gettimeofday(&ttEnd, NULL);
+        sprintf(objResultInfo.m_szResult, "[e][%s:%d]send buff size not equal, buffer size[%d], send size[%d]", objClientInfo.m_szServerIP, objClientInfo.m_nPort, objClientInfo.m_nSendLength, nTotalSendLen);
+        objResultInfo.m_nRet          = 1;
+        objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+        return false;
+    }
+    else
+    {
+        int nTotalRecvLen               = nPacketLen + sizeof(int);
+        char szRecvBuffData[1024 * 100] = {'\0'};
+
+        while(true)
+        {
+
+            //如果发送成功了，则处理接收数据
+            nCurrRecvLen = recv(sckClient, (char* )szRecvBuffData + nBeginRecv, nTotalRecvLen, 0);
+
+            if(nCurrRecvLen <= 0)
+            {
+                close(sckClient);
+                gettimeofday(&ttEnd, NULL);
+                sprintf(objResultInfo.m_szResult, "[s][%s:%d]success.[%s]", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
+                objResultInfo.m_nRet = 0;
+                objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+                return false;
+            }
+            else
+            {
+                nTotalRecvLen -= nCurrRecvLen;
+
+                if(nTotalRecvLen == 0)
+                {
+                    //接收完成
+                    break;
+                }
+                else
+                {
+                    nBeginRecv += nCurrRecvLen;
+                }
+            }
+        }
+    }
+
+    sprintf(objResultInfo.m_szResult, "[e][%s:%d]error recv data.", objClientInfo.m_szServerIP, objClientInfo.m_nPort);
+    gettimeofday(&ttEnd, NULL);
+    objResultInfo.m_nRet = 1;
+    objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+    close(sckClient);
+
+    return true;
 }
 
 bool CheckTcpHalfPacket(_ClientInfo& objClientInfo, _ResultInfo& objResultInfo)
 {
-	struct timeval ttStart, ttEnd;
-	int sckClient;
-	char szSession[32]      = {'\0'}; 
-	int nSrcLen = 0;
-	int nDecLen = 0;
-	
-	gettimeofday(&ttStart, NULL);
-	
-	sprintf(objResultInfo.m_szTestName, "helf packet test");
-	sprintf(szSession, "FREEEYES");
+    struct timeval ttStart, ttEnd;
+    int sckClient;
+    char szSession[32]      = {'\0'};
+    int nSrcLen = 0;
+    int nDecLen = 0;
 
-	//socket创建的准备工作
-	struct sockaddr_in sockaddr;
+    gettimeofday(&ttStart, NULL);
 
-	memset(&sockaddr, 0, sizeof(sockaddr));
-	sockaddr.sin_family = AF_INET;
-	sockaddr.sin_port   = htons(objClientInfo.m_nPort);
-	sockaddr.sin_addr.s_addr = inet_addr(objClientInfo.m_szServerIP);
+    sprintf(objResultInfo.m_szTestName, "helf packet test");
+    sprintf(szSession, "FREEEYES");
 
-	sckClient = socket(AF_INET, SOCK_STREAM, 0);
+    //socket创建的准备工作
+    struct sockaddr_in sockaddr;
 
-	struct timeval tvTimeout;  
-	tvTimeout.tv_sec  = 5;
-	tvTimeout.tv_usec = 0;
-	setsockopt(sckClient, SOL_SOCKET, SO_RCVTIMEO, (char *)&tvTimeout, sizeof(tvTimeout));
+    memset(&sockaddr, 0, sizeof(sockaddr));
+    sockaddr.sin_family = AF_INET;
+    sockaddr.sin_port   = htons(objClientInfo.m_nPort);
+    sockaddr.sin_addr.s_addr = inet_addr(objClientInfo.m_szServerIP);
 
-	//连接远程服务器
-	int nErr = connect(sckClient, (struct sockaddr *)&sockaddr, sizeof(sockaddr));
-	if(0 != nErr)
-	{
-		gettimeofday(&ttEnd, NULL);
-		sprintf(objResultInfo.m_szResult, "[e][%s:%d]connnect server fail.[%s]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
-		objResultInfo.m_nRet          = 1;
-		objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-		return false;
-	}
+    sckClient = socket(AF_INET, SOCK_STREAM, 0);
 
-	//拼装发送包体
-	char szSendBuffer[MAX_BUFF_200] ={'\0'};
+    struct timeval tvTimeout;
+    tvTimeout.tv_sec  = 5;
+    tvTimeout.tv_usec = 0;
+    setsockopt(sckClient, SOL_SOCKET, SO_RCVTIMEO, (char*)&tvTimeout, sizeof(tvTimeout));
 
-	short sVersion = 1;
-	short sCommand = (short)COMMAND_AUTOTEST_HEAD;
-	int nPacketLen = objClientInfo.m_nSendLength;
+    //连接远程服务器
+    int nErr = connect(sckClient, (struct sockaddr*)&sockaddr, sizeof(sockaddr));
 
-	memcpy(szSendBuffer, (char* )&sVersion, sizeof(short));
-	memcpy((char* )&szSendBuffer[2], (char* )&sCommand, sizeof(short));
-	memcpy((char* )&szSendBuffer[4], (char* )&nPacketLen, sizeof(int));
-	memcpy((char* )&szSendBuffer[8], (char* )&szSession, sizeof(char)*32);
-	memcpy((char* )&szSendBuffer[40], (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
-	int nSendLen = nPacketLen + 40;
+    if(0 != nErr)
+    {
+        gettimeofday(&ttEnd, NULL);
+        sprintf(objResultInfo.m_szResult, "[e][%s:%d]connnect server fail.[%s]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
+        objResultInfo.m_nRet          = 1;
+        objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+        return false;
+    }
 
-	//发送数据
-	int nTotalSendLen = 2;
-	int nBeginSend    = 0;
-	int nCurrSendLen  = 0;
-	bool blSendFlag   = false;
-	int nBeginRecv    = 0;
-	int nCurrRecvLen  = 0;
-	bool blRecvFlag   = false;
-	while(true)
-	{
-		nCurrSendLen = send(sckClient, szSendBuffer + nBeginSend, nTotalSendLen, 0);
-		if(nCurrSendLen <= 0)
-		{
-			close(sckClient);
-			gettimeofday(&ttEnd, NULL);
-			sprintf(objResultInfo.m_szResult, "[e][%s:%d]send server fail.[%s]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
-			objResultInfo.m_nRet          = 1;
-			objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-			return false;
-		}
-		else
-		{
-			nTotalSendLen -= nCurrSendLen;
-			if(nTotalSendLen == 0)
-			{
-				//发送完成
-				blSendFlag = true;
-				break;
-			}
-			else
-			{
-				nBeginSend += nCurrSendLen;
-			}
-		}
-	}
-	
-	usleep(1);
-	nTotalSendLen = nSendLen - 2;
-	nBeginSend    = 2;
-	nCurrSendLen  = 0;
-	blSendFlag   = false;
-	nBeginRecv    = 0;
-	nCurrRecvLen  = 0;
-	while(true)
-	{
-		nCurrSendLen = send(sckClient, szSendBuffer + nBeginSend, nTotalSendLen, 0);
-		if(nCurrSendLen <= 0)
-		{
-			close(sckClient);
-			gettimeofday(&ttEnd, NULL);
-			sprintf(objResultInfo.m_szResult, "[e][%s:%d]send server fail.[%s]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
-			objResultInfo.m_nRet          = 1;
-			objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-			return false;
-		}
-		else
-		{
-			nTotalSendLen -= nCurrSendLen;
-			if(nTotalSendLen == 0)
-			{
-				//发送完成
-				blSendFlag = true;
-				break;
-			}
-			else
-			{
-				nBeginSend += nCurrSendLen;
-			}
-		}
-	}	
+    //拼装发送包体
+    char szSendBuffer[MAX_BUFF_200] = {'\0'};
 
-	if(blSendFlag == false)
-	{
-		close(sckClient);
-	  gettimeofday(&ttEnd, NULL);
-		sprintf(objResultInfo.m_szResult, "[e][%s:%d]send buff size not equal, buffer size[%d], send size[%d]", objClientInfo.m_szServerIP, objClientInfo.m_nPort, objClientInfo.m_nSendLength, nTotalSendLen);
-		objResultInfo.m_nRet          = 1;
-		objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-		return false;
-	}
-	else
-	{
-		int nTotalRecvLen               = nPacketLen + sizeof(int);
-		char szRecvBuffData[1024 * 100] = {'\0'};
+    short sVersion = 1;
+    short sCommand = (short)COMMAND_AUTOTEST_HEAD;
+    int nPacketLen = objClientInfo.m_nSendLength;
 
-		while(true)
-		{
-			
-			//如果发送成功了，则处理接收数据
-			nCurrRecvLen = recv(sckClient, (char* )szRecvBuffData + nBeginRecv, nTotalRecvLen, 0);
-			if(nCurrRecvLen <= 0)
-			{
-				close(sckClient);
-				gettimeofday(&ttEnd, NULL);
-				sprintf(objResultInfo.m_szResult, "[e][%s:%d]client recv data error.[%s]", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
-				objResultInfo.m_nRet = 1;
-				objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-				return false;
-			}
-			else
-			{
-				nTotalRecvLen -= nCurrRecvLen;
-				if(nTotalRecvLen == 0)
-				{
-					//接收完成
-					break;
-				}
-				else
-				{
-					nBeginRecv += nCurrRecvLen;
-				}
-			}
-		}
-	}
+    memcpy(szSendBuffer, (char* )&sVersion, sizeof(short));
+    memcpy((char* )&szSendBuffer[2], (char* )&sCommand, sizeof(short));
+    memcpy((char* )&szSendBuffer[4], (char* )&nPacketLen, sizeof(int));
+    memcpy((char* )&szSendBuffer[8], (char* )&szSession, sizeof(char)*32);
+    memcpy((char* )&szSendBuffer[40], (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
+    int nSendLen = nPacketLen + 40;
 
-	sprintf(objResultInfo.m_szResult, "[s][%s:%d]success.", objClientInfo.m_szServerIP, objClientInfo.m_nPort);
-	gettimeofday(&ttEnd, NULL);
-	objResultInfo.m_nRet = 0;
-	objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-	close(sckClient);
+    //发送数据
+    int nTotalSendLen = 2;
+    int nBeginSend    = 0;
+    int nCurrSendLen  = 0;
+    bool blSendFlag   = false;
+    int nBeginRecv    = 0;
+    int nCurrRecvLen  = 0;
+    bool blRecvFlag   = false;
 
-	return true;	
+    while(true)
+    {
+        nCurrSendLen = send(sckClient, szSendBuffer + nBeginSend, nTotalSendLen, 0);
+
+        if(nCurrSendLen <= 0)
+        {
+            close(sckClient);
+            gettimeofday(&ttEnd, NULL);
+            sprintf(objResultInfo.m_szResult, "[e][%s:%d]send server fail.[%s]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
+            objResultInfo.m_nRet          = 1;
+            objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+            return false;
+        }
+        else
+        {
+            nTotalSendLen -= nCurrSendLen;
+
+            if(nTotalSendLen == 0)
+            {
+                //发送完成
+                blSendFlag = true;
+                break;
+            }
+            else
+            {
+                nBeginSend += nCurrSendLen;
+            }
+        }
+    }
+
+    usleep(1);
+    nTotalSendLen = nSendLen - 2;
+    nBeginSend    = 2;
+    nCurrSendLen  = 0;
+    blSendFlag   = false;
+    nBeginRecv    = 0;
+    nCurrRecvLen  = 0;
+
+    while(true)
+    {
+        nCurrSendLen = send(sckClient, szSendBuffer + nBeginSend, nTotalSendLen, 0);
+
+        if(nCurrSendLen <= 0)
+        {
+            close(sckClient);
+            gettimeofday(&ttEnd, NULL);
+            sprintf(objResultInfo.m_szResult, "[e][%s:%d]send server fail.[%s]。", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
+            objResultInfo.m_nRet          = 1;
+            objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+            return false;
+        }
+        else
+        {
+            nTotalSendLen -= nCurrSendLen;
+
+            if(nTotalSendLen == 0)
+            {
+                //发送完成
+                blSendFlag = true;
+                break;
+            }
+            else
+            {
+                nBeginSend += nCurrSendLen;
+            }
+        }
+    }
+
+    if(blSendFlag == false)
+    {
+        close(sckClient);
+        gettimeofday(&ttEnd, NULL);
+        sprintf(objResultInfo.m_szResult, "[e][%s:%d]send buff size not equal, buffer size[%d], send size[%d]", objClientInfo.m_szServerIP, objClientInfo.m_nPort, objClientInfo.m_nSendLength, nTotalSendLen);
+        objResultInfo.m_nRet          = 1;
+        objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+        return false;
+    }
+    else
+    {
+        int nTotalRecvLen               = nPacketLen + sizeof(int);
+        char szRecvBuffData[1024 * 100] = {'\0'};
+
+        while(true)
+        {
+
+            //如果发送成功了，则处理接收数据
+            nCurrRecvLen = recv(sckClient, (char* )szRecvBuffData + nBeginRecv, nTotalRecvLen, 0);
+
+            if(nCurrRecvLen <= 0)
+            {
+                close(sckClient);
+                gettimeofday(&ttEnd, NULL);
+                sprintf(objResultInfo.m_szResult, "[e][%s:%d]client recv data error.[%s]", objClientInfo.m_szServerIP, objClientInfo.m_nPort, strerror(errno));
+                objResultInfo.m_nRet = 1;
+                objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+                return false;
+            }
+            else
+            {
+                nTotalRecvLen -= nCurrRecvLen;
+
+                if(nTotalRecvLen == 0)
+                {
+                    //接收完成
+                    break;
+                }
+                else
+                {
+                    nBeginRecv += nCurrRecvLen;
+                }
+            }
+        }
+    }
+
+    sprintf(objResultInfo.m_szResult, "[s][%s:%d]success.", objClientInfo.m_szServerIP, objClientInfo.m_nPort);
+    gettimeofday(&ttEnd, NULL);
+    objResultInfo.m_nRet = 0;
+    objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+    close(sckClient);
+
+    return true;
 }
 
 void* Thread_CheckTcpPacket(void* arg)
 {
-	_ThreadParam* pThreadParam = (_ThreadParam* )arg;
+    _ThreadParam* pThreadParam = (_ThreadParam* )arg;
 
-	if(NULL != pThreadParam)
-	{
-		CheckTcpPacket(*pThreadParam->m_pClientInfo, *pThreadParam->m_pResultInfo);
-	}
-	
-	pthread_barrier_wait(pThreadParam->m_Barrier);	
+    if(NULL != pThreadParam)
+    {
+        CheckTcpPacket(*pThreadParam->m_pClientInfo, *pThreadParam->m_pResultInfo);
+    }
+
+    pthread_barrier_wait(pThreadParam->m_Barrier);
 }
 
 
 void* Thread_CheckRecvUdpPacket(void* arg)
 {
-	_ThreadParam* pThreadParam = (_ThreadParam* )arg;
+    _ThreadParam* pThreadParam = (_ThreadParam* )arg;
 
-	if(NULL != pThreadParam)
-	{
-		Thread_CheckUdpPacket_Recv(*pThreadParam->m_pClientInfo, *pThreadParam->m_pResultInfo);
-	}
-	
-	pthread_barrier_wait(pThreadParam->m_Barrier);	
+    if(NULL != pThreadParam)
+    {
+        Thread_CheckUdpPacket_Recv(*pThreadParam->m_pClientInfo, *pThreadParam->m_pResultInfo);
+    }
+
+    pthread_barrier_wait(pThreadParam->m_Barrier);
 }
 
 bool CheckTcpMulipleThreadPacket(int nCount, _ClientInfo& objClientInfo, _ResultInfo& objResultInfo)
 {
-	struct timeval ttStart, ttEnd;
-	int sckClient;
-	char szSession[32]      = {'\0'}; 
-	int nSrcLen = 0;
-	int nDecLen = 0;
-	
-	gettimeofday(&ttStart, NULL);
-	
-	sprintf(objResultInfo.m_szTestName, "Muliple connect packet test");
-	
-	_ResultInfo* pResultInfoList   = new _ResultInfo[nCount];
-	_ThreadParam* pThreadParamList = new _ThreadParam[nCount];
-	
-	memset(pResultInfoList, 0, sizeof(pResultInfoList));
-	memset(pThreadParamList, 0, sizeof(pThreadParamList));
-	
-	pthread_barrier_t barrier;
-	
-	//初始化栅栏
-	pthread_barrier_init(&barrier, NULL, 1 + nCount);
-	
-	for(int i = 0; i < nCount; i++)
-	{
-		pthread_t pid;
-		
-		_ThreadParam* pThreadParam  = &pThreadParamList[i];
-		pThreadParam->m_pClientInfo = &objClientInfo;
-		pThreadParam->m_pResultInfo = &pResultInfoList[i];
-		pThreadParam->m_Barrier     = &barrier;
+    struct timeval ttStart, ttEnd;
+    int sckClient;
+    char szSession[32]      = {'\0'};
+    int nSrcLen = 0;
+    int nDecLen = 0;
 
-		pthread_create(&pid, NULL, &Thread_CheckTcpPacket, (void* )pThreadParam);
-	}
-	
-	pthread_barrier_wait(&barrier);
-  pthread_barrier_destroy(&barrier);
-  
-	for(int i = 0; i < nCount; i++)
-	{
-		if(pResultInfoList[i].m_nRet == 1)
-		{
-			sprintf(objResultInfo.m_szResult, "[e][%s:%d]error(Connect ID %d).", objClientInfo.m_szServerIP, objClientInfo.m_nPort, i);
-			objResultInfo.m_nRet = 1;			
-		}
-	}  
-	
-	sprintf(objResultInfo.m_szResult, "[s][%s:%d]success.", objClientInfo.m_szServerIP, objClientInfo.m_nPort);
-	gettimeofday(&ttEnd, NULL);
-	objResultInfo.m_nRet = 0;
-	objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;	
-	
-	delete [] pThreadParamList;
-	delete [] pResultInfoList;
-	return true;
+    gettimeofday(&ttStart, NULL);
+
+    sprintf(objResultInfo.m_szTestName, "Muliple connect packet test");
+
+    _ResultInfo* pResultInfoList   = new _ResultInfo[nCount];
+    _ThreadParam* pThreadParamList = new _ThreadParam[nCount];
+
+    memset(pResultInfoList, 0, sizeof(pResultInfoList));
+    memset(pThreadParamList, 0, sizeof(pThreadParamList));
+
+    pthread_barrier_t barrier;
+
+    //初始化栅栏
+    pthread_barrier_init(&barrier, NULL, 1 + nCount);
+
+    for(int i = 0; i < nCount; i++)
+    {
+        pthread_t pid;
+
+        _ThreadParam* pThreadParam  = &pThreadParamList[i];
+        pThreadParam->m_pClientInfo = &objClientInfo;
+        pThreadParam->m_pResultInfo = &pResultInfoList[i];
+        pThreadParam->m_Barrier     = &barrier;
+
+        pthread_create(&pid, NULL, &Thread_CheckTcpPacket, (void* )pThreadParam);
+    }
+
+    pthread_barrier_wait(&barrier);
+    pthread_barrier_destroy(&barrier);
+
+    for(int i = 0; i < nCount; i++)
+    {
+        if(pResultInfoList[i].m_nRet == 1)
+        {
+            sprintf(objResultInfo.m_szResult, "[e][%s:%d]error(Connect ID %d).", objClientInfo.m_szServerIP, objClientInfo.m_nPort, i);
+            objResultInfo.m_nRet = 1;
+        }
+    }
+
+    sprintf(objResultInfo.m_szResult, "[s][%s:%d]success.", objClientInfo.m_szServerIP, objClientInfo.m_nPort);
+    gettimeofday(&ttEnd, NULL);
+    objResultInfo.m_nRet = 0;
+    objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+
+    delete [] pThreadParamList;
+    delete [] pResultInfoList;
+    return true;
 }
 
 bool Thread_CheckUdpPacket(_ClientInfo& objClientInfo, _ResultInfo& objResultInfo, _ResultInfo& objRecvResultInfo)
 {
-	//测试UDP发包
-	struct timeval ttStart, ttEnd;
-	int sckClient;
-	char szSession[32]      = {'\0'}; 
-	int nSrcLen = 0;
-	int nDecLen = 0;
-	
-	gettimeofday(&ttStart, NULL);
-	
-	sprintf(objResultInfo.m_szTestName, "single UDP packet test");
-	sprintf(szSession, "FREEEYES");
+    //测试UDP发包
+    struct timeval ttStart, ttEnd;
+    int sckClient;
+    char szSession[32]      = {'\0'};
+    int nSrcLen = 0;
+    int nDecLen = 0;
 
-	//socket创建的准备工作
-	struct sockaddr_in sockaddr_Client;
+    gettimeofday(&ttStart, NULL);
 
-	memset(&sockaddr_Client, 0, sizeof(sockaddr_Client));
-	sockaddr_Client.sin_family = AF_INET;
-	sockaddr_Client.sin_port   = htons(10003);
-	sockaddr_Client.sin_addr.s_addr = inet_addr(objClientInfo.m_szServerIP);
+    sprintf(objResultInfo.m_szTestName, "single UDP packet test");
+    sprintf(szSession, "FREEEYES");
 
-	sckClient = socket(AF_INET, SOCK_DGRAM, 0);
-	
-	//拼装发送包体
-	char szSendBuffer[MAX_BUFF_200] ={'\0'};
+    //socket创建的准备工作
+    struct sockaddr_in sockaddr_Client;
 
-	short sVersion = 1;
-	short sCommand = (short)COMMAND_AUTOTEST_UDP_HEAD;
-	int nPacketLen = objClientInfo.m_nSendLength;
+    memset(&sockaddr_Client, 0, sizeof(sockaddr_Client));
+    sockaddr_Client.sin_family = AF_INET;
+    sockaddr_Client.sin_port   = htons(10003);
+    sockaddr_Client.sin_addr.s_addr = inet_addr(objClientInfo.m_szServerIP);
 
-	memcpy(szSendBuffer, (char* )&sVersion, sizeof(short));
-	memcpy((char* )&szSendBuffer[2], (char* )&sCommand, sizeof(short));
-	memcpy((char* )&szSendBuffer[4], (char* )&nPacketLen, sizeof(int));
-	memcpy((char* )&szSendBuffer[8], (char* )&szSession, sizeof(char)*32);
-	memcpy((char* )&szSendBuffer[40], (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
-	int nSendLen = nPacketLen + 40;
-	
-	//设置接收数据包线程
-	pthread_t pid;
-	_ThreadParam* pThreadParam = new _ThreadParam();
-	
-	pthread_barrier_t barrier;
-	
-	//初始化栅栏
-	pthread_barrier_init(&barrier, NULL, 1 + 1);	
-	
-	pThreadParam->m_pClientInfo = &objClientInfo;
-	pThreadParam->m_pResultInfo = &objRecvResultInfo;
-	pThreadParam->m_Barrier     = &barrier;	
-	
-	pthread_create(&pid, NULL, &Thread_CheckRecvUdpPacket, (void* )pThreadParam);
+    sckClient = socket(AF_INET, SOCK_DGRAM, 0);
 
-	//发送数据
-	int nTotalSendLen = nSendLen;
-	int nBeginSend    = 0;
-	int nCurrSendLen  = 0;
-	bool blSendFlag   = false;
-	int nBeginRecv    = 0;
-	int nCurrRecvLen  = 0;
-	bool blRecvFlag   = false;	
-	
-	printf("[Thread_CheckUdpPacket]nTotalSendLen=%d.\n", nTotalSendLen);
-	if( sendto(sckClient, szSendBuffer, nTotalSendLen, 0, (struct sockaddr*)&sockaddr_Client, sizeof(sockaddr_Client)) == -1)
-	{
-			close(sckClient);
-			gettimeofday(&ttEnd, NULL);
-			sprintf(objResultInfo.m_szResult, "[e][%s:%d]client Udp Send data error.[%s]", objClientInfo.m_szServerIP, 10003, strerror(errno));
-			objResultInfo.m_nRet = 1;
-			objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-			return false;			
-	}
-	
-	sprintf(objResultInfo.m_szResult, "[s][%s:%d]success.", objClientInfo.m_szServerIP, 10003);
-	gettimeofday(&ttEnd, NULL);
-	objResultInfo.m_nRet = 0;
-	objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;		
-	close(sckClient);
-	
-	//等待接收线程返回信息
-	pthread_barrier_wait(&barrier);
-  pthread_barrier_destroy(&barrier);
-  
-  delete pThreadParam;	
-	
-	return true;
+    //拼装发送包体
+    char szSendBuffer[MAX_BUFF_200] = {'\0'};
+
+    short sVersion = 1;
+    short sCommand = (short)COMMAND_AUTOTEST_UDP_HEAD;
+    int nPacketLen = objClientInfo.m_nSendLength;
+
+    memcpy(szSendBuffer, (char* )&sVersion, sizeof(short));
+    memcpy((char* )&szSendBuffer[2], (char* )&sCommand, sizeof(short));
+    memcpy((char* )&szSendBuffer[4], (char* )&nPacketLen, sizeof(int));
+    memcpy((char* )&szSendBuffer[8], (char* )&szSession, sizeof(char)*32);
+    memcpy((char* )&szSendBuffer[40], (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
+    int nSendLen = nPacketLen + 40;
+
+    //设置接收数据包线程
+    pthread_t pid;
+    _ThreadParam* pThreadParam = new _ThreadParam();
+
+    pthread_barrier_t barrier;
+
+    //初始化栅栏
+    pthread_barrier_init(&barrier, NULL, 1 + 1);
+
+    pThreadParam->m_pClientInfo = &objClientInfo;
+    pThreadParam->m_pResultInfo = &objRecvResultInfo;
+    pThreadParam->m_Barrier     = &barrier;
+
+    pthread_create(&pid, NULL, &Thread_CheckRecvUdpPacket, (void* )pThreadParam);
+
+    //发送数据
+    int nTotalSendLen = nSendLen;
+    int nBeginSend    = 0;
+    int nCurrSendLen  = 0;
+    bool blSendFlag   = false;
+    int nBeginRecv    = 0;
+    int nCurrRecvLen  = 0;
+    bool blRecvFlag   = false;
+
+    printf("[Thread_CheckUdpPacket]nTotalSendLen=%d.\n", nTotalSendLen);
+
+    if( sendto(sckClient, szSendBuffer, nTotalSendLen, 0, (struct sockaddr*)&sockaddr_Client, sizeof(sockaddr_Client)) == -1)
+    {
+        close(sckClient);
+        gettimeofday(&ttEnd, NULL);
+        sprintf(objResultInfo.m_szResult, "[e][%s:%d]client Udp Send data error.[%s]", objClientInfo.m_szServerIP, 10003, strerror(errno));
+        objResultInfo.m_nRet = 1;
+        objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+        return false;
+    }
+
+    sprintf(objResultInfo.m_szResult, "[s][%s:%d]success.", objClientInfo.m_szServerIP, 10003);
+    gettimeofday(&ttEnd, NULL);
+    objResultInfo.m_nRet = 0;
+    objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+    close(sckClient);
+
+    //等待接收线程返回信息
+    pthread_barrier_wait(&barrier);
+    pthread_barrier_destroy(&barrier);
+
+    delete pThreadParam;
+
+    return true;
 }
 
 bool Thread_CheckUdpPacket_Recv(_ClientInfo& objClientInfo, _ResultInfo& objResultInfo)
 {
-		struct timeval ttStart, ttEnd;
+    struct timeval ttStart, ttEnd;
     int sockListen = socket(AF_INET, SOCK_DGRAM, 0);
-    
+
     gettimeofday(&ttStart, NULL);
     sprintf(objResultInfo.m_szTestName, "single UDP packet recv test");
 
-    int set = 1;  
-    setsockopt(sockListen, SOL_SOCKET, SO_REUSEADDR, &set, sizeof(int));  
-    struct sockaddr_in recvAddr;  
-    memset(&recvAddr, 0, sizeof(struct sockaddr_in));  
-    recvAddr.sin_family = AF_INET;  
-    recvAddr.sin_port = htons(20002);  
+    int set = 1;
+    setsockopt(sockListen, SOL_SOCKET, SO_REUSEADDR, &set, sizeof(int));
+    struct sockaddr_in recvAddr;
+    memset(&recvAddr, 0, sizeof(struct sockaddr_in));
+    recvAddr.sin_family = AF_INET;
+    recvAddr.sin_port = htons(20003);
     recvAddr.sin_addr.s_addr = inet_addr(objClientInfo.m_szServerIP);
-    // 必须绑定，否则无法监听  
-    if(bind(sockListen, (struct sockaddr *)&recvAddr, sizeof(struct sockaddr)) == -1)
-    {  
-			close(sockListen);
-			gettimeofday(&ttEnd, NULL);
-			sprintf(objResultInfo.m_szResult, "[e][%s:%d]client Udp bind error.[%s]", objClientInfo.m_szServerIP, 20002, strerror(errno));
-			objResultInfo.m_nRet = 1;
-			objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-			return false;		
-    }  
-    
+
+    //设置超时时间
+    struct timeval timeout = {3,0};
+    setsockopt(sockListen, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(struct timeval));
+
+    // 必须绑定，否则无法监听
+    if(bind(sockListen, (struct sockaddr*)&recvAddr, sizeof(struct sockaddr)) == -1)
+    {
+        close(sockListen);
+        gettimeofday(&ttEnd, NULL);
+        sprintf(objResultInfo.m_szResult, "[e][%s:%d]client Udp bind error.[%s]", objClientInfo.m_szServerIP, 20002, strerror(errno));
+        objResultInfo.m_nRet = 1;
+        objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+        return false;
+    }
+
     printf("[Thread_CheckUdpPacket_Recv]Begin Listen UDP.\n");
-    int recvbytes;  
-    char recvbuf[128];  
-    int addrLen = sizeof(struct sockaddr_in);  
-    if((recvbytes = recvfrom(sockListen, recvbuf, 128, 0,  
-        (struct sockaddr *)&recvAddr, (socklen_t*)&addrLen)) != -1)
-    {  
-        recvbuf[recvbytes] = '\0';  
-        //printf("receive a broadCast messgse:%s\n", recvbuf);  
+    int recvbytes;
+    char recvbuf[128];
+    int addrLen = sizeof(struct sockaddr_in);
+
+    if((recvbytes = recvfrom(sockListen, recvbuf, 128, 0,
+                             (struct sockaddr*)&recvAddr, (socklen_t*)&addrLen)) != -1)
+    {
+        recvbuf[recvbytes] = '\0';
+
+        //printf("receive a broadCast messgse:%s\n", recvbuf);
         if(recvbytes == 14 && strcmp(recvbuf, "Hello  friend.") == 0)
         {
-					sprintf(objResultInfo.m_szResult, "[s][%s:%d]success.", objClientInfo.m_szServerIP, 20002);
-					gettimeofday(&ttEnd, NULL);
-					objResultInfo.m_nRet = 0;
-					objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;		        	
+            sprintf(objResultInfo.m_szResult, "[s][%s:%d]success.", objClientInfo.m_szServerIP, 20002);
+            gettimeofday(&ttEnd, NULL);
+            objResultInfo.m_nRet = 0;
+            objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
         }
         else
         {
-        	printf("[Thread_CheckUdpPacket_Recv]Recv Data Error.\n");
-					sprintf(objResultInfo.m_szResult, "[s][%s:%d]Recv Data Error.", objClientInfo.m_szServerIP, 20002);
-					gettimeofday(&ttEnd, NULL);
-					objResultInfo.m_nRet = 0;
-					objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;		         	
+            printf("[Thread_CheckUdpPacket_Recv]Recv Data Error.\n");
+            sprintf(objResultInfo.m_szResult, "[s][%s:%d]Recv Data Error.", objClientInfo.m_szServerIP, 20002);
+            gettimeofday(&ttEnd, NULL);
+            objResultInfo.m_nRet = 0;
+            objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
         }
-        
+
         close(sockListen);
     }
     else
-    {  
-			close(sockListen);
-			gettimeofday(&ttEnd, NULL);
-			sprintf(objResultInfo.m_szResult, "[e][%s:%d]client Udp bind error.[%s]", objClientInfo.m_szServerIP, 20002, strerror(errno));
-			objResultInfo.m_nRet = 1;
-			objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-			return false;	 
-    }  
-    
-    return true;  	
+    {
+        close(sockListen);
+        gettimeofday(&ttEnd, NULL);
+        sprintf(objResultInfo.m_szResult, "[e][%s:%d]client Udp bind error.[%s]", objClientInfo.m_szServerIP, 20002, strerror(errno));
+        objResultInfo.m_nRet = 1;
+        objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+        return false;
+    }
+
+    return true;
 }
