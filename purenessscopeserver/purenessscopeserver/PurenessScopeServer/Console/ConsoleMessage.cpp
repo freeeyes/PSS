@@ -4,6 +4,8 @@ CConsoleMessage::CConsoleMessage()
 {
     m_objConsolePromissions.Init(CONSOLECONFIG);
 
+    SetConsoleKey(GetXmlConfigAttribute(xmlConsoleKeys)->vec);
+
     Init();
 }
 

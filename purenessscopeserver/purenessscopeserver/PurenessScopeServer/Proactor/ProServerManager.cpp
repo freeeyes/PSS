@@ -153,6 +153,7 @@ bool CProServerManager::Start()
             return false;
         }
 
+        int nBackLog = GetXmlConfigAttribute(xmlNetWorkMode)->BackLog;
         int nRet = pConnectAcceptor->open(listenAddr, 0, 1, GetXmlConfigAttribute(xmlNetWorkMode)->BackLog, 1, pProactor);
 
         if(-1 == nRet)

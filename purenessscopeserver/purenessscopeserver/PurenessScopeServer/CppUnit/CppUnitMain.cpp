@@ -8,6 +8,8 @@ CCppUnitMain::CCppUnitMain()
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_FileTestManager, "pss");
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_CommandAccount, "pss");
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_AppConfig, "pss");
+    CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_ConsolePromissions, "pss");
+    CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_ConsoleMessage, "pss");
 }
 
 CCppUnitMain::~CCppUnitMain()

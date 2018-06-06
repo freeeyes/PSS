@@ -10,6 +10,8 @@
 #include "Unit_FileTestManager.h"
 #include "Unit_CommandAccount.h"
 #include "Unit_AppConfig.h"
+#include "Uint_ConsolePromissions.h"
+#include "Uint_ConsoleMessage.h"
 
 #define CPPUNIT_REPORT_PATH "./reports/cppunit/report.xml"
 

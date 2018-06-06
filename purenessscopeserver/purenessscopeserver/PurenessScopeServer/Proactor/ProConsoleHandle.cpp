@@ -107,9 +107,6 @@ void CProConsoleHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 {
     ACE_Time_Value tvOpenBegin(ACE_OS::gettimeofday());
 
-    //初始化key值列表
-    App_ConsoleManager::instance()->SetConsoleKey(GetXmlConfigAttribute(xmlConsoleKeys)->vec);
-
     m_atvConnect      = ACE_OS::gettimeofday();
     m_atvInput        = ACE_OS::gettimeofday();
     m_atvOutput       = ACE_OS::gettimeofday();

@@ -61,6 +61,12 @@ bool Console_Common_CheckMessage_Data(uint32& u4AllRecvSize, uint32& u4AllRecvCo
 
 bool check_console_ip(const char* pConsoleIP)
 {
+    //如果是0个设置，就是允许所有的Ip连接访问
+    if (0 == GetXmlConfigAttribute(xmlConsoleClients)->vec.size())
+    {
+        return true;
+    }
+
     for (int i = 0; i < (int)GetXmlConfigAttribute(xmlConsoleClients)->vec.size(); i++)
     {
         if (ACE_OS::strcmp(GetXmlConfigAttribute(xmlConsoleClients)->vec[i].cip.c_str(), pConsoleIP) == 0)
