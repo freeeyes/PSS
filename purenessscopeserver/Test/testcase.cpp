@@ -768,6 +768,19 @@ void* Thread_CheckTcpPacket(void* arg)
 	pthread_barrier_wait(pThreadParam->m_Barrier);	
 }
 
+
+void* Thread_CheckRecvUdpPacket(void* arg)
+{
+	_ThreadParam* pThreadParam = (_ThreadParam* )arg;
+
+	if(NULL != pThreadParam)
+	{
+		Thread_CheckUdpPacket_Recv(*pThreadParam->m_pClientInfo, *pThreadParam->m_pResultInfo);
+	}
+	
+	pthread_barrier_wait(pThreadParam->m_Barrier);	
+}
+
 bool CheckTcpMulipleThreadPacket(int nCount, _ClientInfo& objClientInfo, _ResultInfo& objResultInfo)
 {
 	struct timeval ttStart, ttEnd;
@@ -825,7 +838,7 @@ bool CheckTcpMulipleThreadPacket(int nCount, _ClientInfo& objClientInfo, _Result
 	return true;
 }
 
-bool Thread_CheckUdpPacket(_ClientInfo& objClientInfo, _ResultInfo& objResultInfo)
+bool Thread_CheckUdpPacket(_ClientInfo& objClientInfo, _ResultInfo& objResultInfo, _ResultInfo& objRecvResultInfo)
 {
 	//测试UDP发包
 	struct timeval ttStart, ttEnd;
@@ -862,6 +875,21 @@ bool Thread_CheckUdpPacket(_ClientInfo& objClientInfo, _ResultInfo& objResultInf
 	memcpy((char* )&szSendBuffer[8], (char* )&szSession, sizeof(char)*32);
 	memcpy((char* )&szSendBuffer[40], (char* )objClientInfo.m_pSendBuffer, sizeof(char) * objClientInfo.m_nSendLength);
 	int nSendLen = nPacketLen + 40;
+	
+	//设置接收数据包线程
+	pthread_t pid;
+	_ThreadParam* pThreadParam = new _ThreadParam();
+	
+	pthread_barrier_t barrier;
+	
+	//初始化栅栏
+	pthread_barrier_init(&barrier, NULL, 1 + 1);	
+	
+	pThreadParam->m_pClientInfo = &objClientInfo;
+	pThreadParam->m_pResultInfo = &objRecvResultInfo;
+	pThreadParam->m_Barrier     = &barrier;	
+	
+	pthread_create(&pid, NULL, &Thread_CheckRecvUdpPacket, (void* )pThreadParam);
 
 	//发送数据
 	int nTotalSendLen = nSendLen;
@@ -887,6 +915,79 @@ bool Thread_CheckUdpPacket(_ClientInfo& objClientInfo, _ResultInfo& objResultInf
 	gettimeofday(&ttEnd, NULL);
 	objResultInfo.m_nRet = 0;
 	objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;		
+	close(sckClient);
+	
+	//等待接收线程返回信息
+	pthread_barrier_wait(&barrier);
+  pthread_barrier_destroy(&barrier);
+  
+  delete pThreadParam;	
 	
 	return true;
+}
+
+bool Thread_CheckUdpPacket_Recv(_ClientInfo& objClientInfo, _ResultInfo& objResultInfo)
+{
+		struct timeval ttStart, ttEnd;
+    int sockListen = socket(AF_INET, SOCK_DGRAM, 0);
+    
+    gettimeofday(&ttStart, NULL);
+    sprintf(objResultInfo.m_szTestName, "single UDP packet recv test");
+
+    int set = 1;  
+    setsockopt(sockListen, SOL_SOCKET, SO_REUSEADDR, &set, sizeof(int));  
+    struct sockaddr_in recvAddr;  
+    memset(&recvAddr, 0, sizeof(struct sockaddr_in));  
+    recvAddr.sin_family = AF_INET;  
+    recvAddr.sin_port = htons(20002);  
+    recvAddr.sin_addr.s_addr = inet_addr(objClientInfo.m_szServerIP);
+    // 必须绑定，否则无法监听  
+    if(bind(sockListen, (struct sockaddr *)&recvAddr, sizeof(struct sockaddr)) == -1)
+    {  
+			close(sockListen);
+			gettimeofday(&ttEnd, NULL);
+			sprintf(objResultInfo.m_szResult, "[e][%s:%d]client Udp bind error.[%s]", objClientInfo.m_szServerIP, 20002, strerror(errno));
+			objResultInfo.m_nRet = 1;
+			objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+			return false;		
+    }  
+    
+    printf("[Thread_CheckUdpPacket_Recv]Begin Listen UDP.\n");
+    int recvbytes;  
+    char recvbuf[128];  
+    int addrLen = sizeof(struct sockaddr_in);  
+    if((recvbytes = recvfrom(sockListen, recvbuf, 128, 0,  
+        (struct sockaddr *)&recvAddr, (socklen_t*)&addrLen)) != -1)
+    {  
+        recvbuf[recvbytes] = '\0';  
+        //printf("receive a broadCast messgse:%s\n", recvbuf);  
+        if(recvbytes == 14 && strcmp(recvbuf, "Hello  friend.") == 0)
+        {
+					sprintf(objResultInfo.m_szResult, "[s][%s:%d]success.", objClientInfo.m_szServerIP, 20002);
+					gettimeofday(&ttEnd, NULL);
+					objResultInfo.m_nRet = 0;
+					objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;		        	
+        }
+        else
+        {
+        	printf("[Thread_CheckUdpPacket_Recv]Recv Data Error.\n");
+					sprintf(objResultInfo.m_szResult, "[s][%s:%d]Recv Data Error.", objClientInfo.m_szServerIP, 20002);
+					gettimeofday(&ttEnd, NULL);
+					objResultInfo.m_nRet = 0;
+					objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;		         	
+        }
+        
+        close(sockListen);
+    }
+    else
+    {  
+			close(sockListen);
+			gettimeofday(&ttEnd, NULL);
+			sprintf(objResultInfo.m_szResult, "[e][%s:%d]client Udp bind error.[%s]", objClientInfo.m_szServerIP, 20002, strerror(errno));
+			objResultInfo.m_nRet = 1;
+			objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+			return false;	 
+    }  
+    
+    return true;  	
 }

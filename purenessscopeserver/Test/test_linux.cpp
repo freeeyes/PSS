@@ -73,11 +73,16 @@ int main()
 	strResultInfo += szHtmlResult;
 	nTestCount++;
 	
-	Thread_CheckUdpPacket(objClientInfo, objResultInfo);
+	_ResultInfo objRecvResultInfo;
+	Thread_CheckUdpPacket(objClientInfo, objResultInfo, objRecvResultInfo);
 	objResultInfo.Display();
 	objResultInfo.To_Html(szHtmlResult);
 	strResultInfo += szHtmlResult;
 	nTestCount++;	
+	objRecvResultInfo.Display();
+	objRecvResultInfo.To_Html(szHtmlResult);
+	strResultInfo += szHtmlResult;
+	nTestCount++;		
 	
 	//输出成文件格式
 	char* pHtmlFile = new char[nTestCount*MAX_BUFF_1024];

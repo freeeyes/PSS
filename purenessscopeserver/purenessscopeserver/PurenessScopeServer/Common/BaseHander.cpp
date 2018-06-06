@@ -28,20 +28,19 @@ bool Udp_Common_Send_Message(_Send_Message_Param obj_Send_Message_Param, ACE_INE
 
         if (NULL == pMbData)
         {
-            OUR_DEBUG((LM_INFO, "Udp_Common_Send_Message]pMbData is NULL.\n"));
+            OUR_DEBUG((LM_INFO, "[Udp_Common_Send_Message]pMbData is NULL.\n"));
             Recovery_Message(obj_Send_Message_Param.m_blDlete, pMessage);
             return false;
         }
 
         if (false == App_PacketParseLoader::instance()->GetPacketParseInfo(obj_Send_Message_Param.m_u4PacketParseInfoID)->Make_Send_Packet(0, pMessage, obj_Send_Message_Param.m_u4Len, pMbData, obj_Send_Message_Param.m_u2CommandID))
         {
-            OUR_DEBUG((LM_INFO, "Udp_Common_Send_Message]Make_Send_Packet is false.\n"));
+            OUR_DEBUG((LM_INFO, "[Udp_Common_Send_Message]Make_Send_Packet is false.\n"));
             Recovery_Message(obj_Send_Message_Param.m_blDlete, pMessage);
             return false;
         }
 
         Recovery_Message(obj_Send_Message_Param.m_blDlete, pMessage);
-        return true;
     }
     else
     {
@@ -50,7 +49,7 @@ bool Udp_Common_Send_Message(_Send_Message_Param obj_Send_Message_Param, ACE_INE
 
         if (NULL == pMbData)
         {
-            OUR_DEBUG((LM_INFO, "Udp_Common_Send_Message]pMbData is NULL.\n"));
+            OUR_DEBUG((LM_INFO, "[Udp_Common_Send_Message]pMbData is NULL.\n"));
             Recovery_Message(obj_Send_Message_Param.m_blDlete, pMessage);
             return false;
         }
@@ -60,7 +59,6 @@ bool Udp_Common_Send_Message(_Send_Message_Param obj_Send_Message_Param, ACE_INE
         pMbData->wr_ptr(obj_Send_Message_Param.m_u4Len);
 
         Recovery_Message(obj_Send_Message_Param.m_blDlete, pMessage);
-        return true;
     }
 
     int nSize = (int)skRemote.send(pMbData->rd_ptr(), pMbData->length(), AddrRemote);
