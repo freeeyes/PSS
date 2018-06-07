@@ -53,7 +53,7 @@ bool CUnit_ConsoleMessage::Create_Command(const char* pCommand, uint16 u2ReturnC
     if (u2ReturnCommandID != u2CommandID)
     {
         char szError[MAX_BUFF_200] = { '\0' };
-        sprintf_safe(szError, MAX_BUFF_200, "[Create_Command](%s) u2ReturnCommandID error.", pCommand);
+        sprintf_safe(szError, MAX_BUFF_200, "[Create_Command](%s) u2ReturnCommandID error(%d).", pCommand, u2CommandID);
         CPPUNIT_ASSERT_MESSAGE(szError, true == blRet);
     }
 
@@ -141,6 +141,78 @@ void CUnit_ConsoleMessage::Test_DoMessage_ReConnectServer(void)
 void CUnit_ConsoleMessage::Test_DoMessage_CommandTimeout(void)
 {
     Create_Command("b freeeyes CommandTimeout -a&", CONSOLE_COMMAND_COMMANDTIMEOUT);
+}
+
+void CUnit_ConsoleMessage::Test_DoMessage_CommandTimeoutclr(void)
+{
+    Create_Command("b freeeyes CommandTimeoutclr -a&", CONSOLE_COMMAND_COMMANDTIMEOUTCLR);
+}
+
+void CUnit_ConsoleMessage::Test_DoMessage_CommandDataLog(void)
+{
+    Create_Command("b freeeyes CommandDataLog -a&", CONSOLE_COMMAND_COMMANDDATALOG);
+}
+
+void CUnit_ConsoleMessage::Test_DoMessage_SetDebug(void)
+{
+    char szCommand[MAX_BUFF_200] = { '\0' };
+    sprintf_safe(szCommand, MAX_BUFF_200, "b freeeyes SetDebug -s %d &", GetXmlConfigAttribute(xmlServerType)->Debug);
+    Create_Command(szCommand, CONSOLE_COMMAND_SETDEBUG);
+}
+
+void CUnit_ConsoleMessage::Test_DoMessage_ShowDebug(void)
+{
+    Create_Command("b freeeyes ShowDebug -a&", CONSOLE_COMMAND_SHOWDEBUG);
+}
+
+void CUnit_ConsoleMessage::Test_DoMessage_GetTrackCommand(void)
+{
+    Create_Command("b freeeyes GetTrackCommandInfo -a&", CONSOLE_COMMAND_GETTRACKCOMMAND);
+}
+
+void CUnit_ConsoleMessage::Test_DoMessage_GetConnectIPInfo(void)
+{
+    Create_Command("b freeeyes GetConnectIPInfo -s 1&", CONSOLE_COMMAND_GETCONNECTIPINFO);
+}
+
+void CUnit_ConsoleMessage::Test_DoMessage_GetLogLevelInfo(void)
+{
+    Create_Command("b freeeyes GetLogInfo -a&", CONSOLE_COMMAND_GETLOGINFO);
+}
+
+void CUnit_ConsoleMessage::Test_DoMessage_GetThreadAI(void)
+{
+    Create_Command("b freeeyes GetWorkThreadAI -a&", CONSOLE_COMMAND_GETWTAI);
+}
+
+void CUnit_ConsoleMessage::Test_DoMessage_GetWorkThreadTO(void)
+{
+    Create_Command("b freeeyes GetWorkThreadTO -a&", CONSOLE_COMMAND_GETWTTIMEOUT);
+}
+
+void CUnit_ConsoleMessage::Test_DoMessage_GetNickNameInfo(void)
+{
+    Create_Command("b freeeyes GetNickNameInfo -n 127.0.0.1&", CONSOLE_COMMAND_GETNICKNAMEINFO);
+}
+
+void CUnit_ConsoleMessage::Test_DoMessage_ShowListen(void)
+{
+    Create_Command("b freeeyes ShowListen -a&", CONSOLE_COMMAND_SHOW_LISTEN);
+}
+
+void CUnit_ConsoleMessage::Test_DoMessage_MonitorInfo(void)
+{
+    Create_Command("b freeeyes Monitor -a&", CONSOLE_COMMAND_MONITOR_INFO);
+}
+
+void CUnit_ConsoleMessage::Test_DoMessage_PortList(void)
+{
+    Create_Command("b freeeyes PortFlow -a&", CONSOLE_COMMAND_PORT_FLOW);
+}
+
+void CUnit_ConsoleMessage::Test_Do_Message_BuffPacket(void)
+{
+    Create_Command("b freeeyes BuffPacketState -a&", CONSOLE_COMMAND_PACKET_STATE);
 }
 
 #endif

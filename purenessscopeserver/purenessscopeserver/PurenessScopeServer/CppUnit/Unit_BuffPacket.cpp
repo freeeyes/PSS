@@ -195,7 +195,6 @@ void CUnit_BuffPacket::Check_Size_BuffPacket(void)
     if (m_pBuffPacket->GetPacketLen() != 1)
     {
         CPPUNIT_ASSERT_MESSAGE("[Check_Size_BuffPacket]GetPacketLen() error.", true == blRet);
-        return;
     }
 }
 

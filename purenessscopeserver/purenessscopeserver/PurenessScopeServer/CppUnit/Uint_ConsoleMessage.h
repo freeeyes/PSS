@@ -25,6 +25,20 @@ class CUnit_ConsoleMessage : public CppUnit::TestFixture
     CPPUNIT_TEST(Test_DoMessage_ShowServerInfo);
     CPPUNIT_TEST(Test_DoMessage_ReConnectServer);
     CPPUNIT_TEST(Test_DoMessage_CommandTimeout);
+    CPPUNIT_TEST(Test_DoMessage_CommandTimeoutclr);
+    CPPUNIT_TEST(Test_DoMessage_CommandDataLog);
+    CPPUNIT_TEST(Test_DoMessage_SetDebug);
+    CPPUNIT_TEST(Test_DoMessage_ShowDebug);
+    CPPUNIT_TEST(Test_DoMessage_GetTrackCommand);
+    CPPUNIT_TEST(Test_DoMessage_GetConnectIPInfo);
+    CPPUNIT_TEST(Test_DoMessage_GetLogLevelInfo);
+    CPPUNIT_TEST(Test_DoMessage_GetThreadAI);
+    CPPUNIT_TEST(Test_DoMessage_GetWorkThreadTO);
+    CPPUNIT_TEST(Test_DoMessage_GetNickNameInfo);
+    CPPUNIT_TEST(Test_DoMessage_ShowListen);
+    CPPUNIT_TEST(Test_DoMessage_MonitorInfo);
+    CPPUNIT_TEST(Test_DoMessage_PortList);
+    CPPUNIT_TEST(Test_Do_Message_BuffPacket);
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -50,6 +64,20 @@ public:
     void Test_DoMessage_ShowServerInfo(void);
     void Test_DoMessage_ReConnectServer(void);
     void Test_DoMessage_CommandTimeout(void);
+    void Test_DoMessage_CommandTimeoutclr(void);
+    void Test_DoMessage_CommandDataLog(void);
+    void Test_DoMessage_SetDebug(void);
+    void Test_DoMessage_ShowDebug(void);
+    void Test_DoMessage_GetTrackCommand(void);
+    void Test_DoMessage_GetConnectIPInfo(void);
+    void Test_DoMessage_GetLogLevelInfo(void);
+    void Test_DoMessage_GetThreadAI(void);
+    void Test_DoMessage_GetWorkThreadTO(void);
+    void Test_DoMessage_GetNickNameInfo(void);
+    void Test_DoMessage_ShowListen(void);
+    void Test_DoMessage_MonitorInfo(void);
+    void Test_DoMessage_PortList(void);
+    void Test_Do_Message_BuffPacket(void);
 
 private:
     bool Create_Command(const char* pCommand, uint16 u2ReturnCommandID);

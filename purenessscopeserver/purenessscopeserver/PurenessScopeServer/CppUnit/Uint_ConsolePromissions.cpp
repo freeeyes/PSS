@@ -28,7 +28,6 @@ void CUnit_ConsolePromissions::Test_Promission_User(void)
     {
         OUR_DEBUG((LM_INFO, "[Test_Promission_User]freeeyes user valid fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Read_Write_String_BuffPacket]freeeyes user valid fail.", true == blRet);
-        return;
     }
 }
 

@@ -271,6 +271,10 @@ int CConsoleMessage::DoCommand(_CommandInfo& CommandInfo, IBuffPacket* pCurrBuff
         DoMessage_Logic fn_DoMessage_Logic = (DoMessage_Logic)f->second;
         fn_DoMessage_Logic(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
+    else
+    {
+        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]Command is no Find.\n"));
+    }
 
     //拼接返回数据包内容
     uint32 u4PacketSize = pCurrBuffPacket->GetPacketLen();
