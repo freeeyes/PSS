@@ -904,6 +904,52 @@ public:
         }
     }
 
+    void Clear_Unit32()
+    {
+        vector<uint32> vecList;
+
+        if (NULL == m_lpTable)
+        {
+            return;
+        }
+
+        if (HASH_DEBUG_ON == m_emHashDebug)
+        {
+            OUR_DEBUG((LM_INFO, "[CHashTable::Clear_Unit32](%d)Data is Clear.\n", Get_Used_Count()));
+        }
+
+        for (uint32 i = 0; i < (uint32)m_objHashPool.Get_Count(); i++)
+        {
+            if (NULL != m_lpTable[i])
+            {
+                _Hash_Link_Info<T>* pLastLink = m_lpTable[i];
+
+                while (NULL != pLastLink)
+                {
+                    if (NULL != pLastLink->m_pData)
+                    {
+                        vecList.push_back(i);
+                    }
+                    else
+                    {
+                        OUR_DEBUG((LM_INFO, "[CHashTable::Clear]pLastLink->m_pData is NULL.\n"));
+                    }
+
+                    pLastLink = pLastLink->m_pNext;
+                }
+            }
+        }
+
+        //清理数据
+        for (int32 i = 0; i < (int32)vecList.size(); i++)
+        {
+            if (-1 == Del_Hash_Data_By_Unit32(vecList[i]))
+            {
+                OUR_DEBUG((LM_INFO, "[CHashTable::Clear_Unit32](%d) is Delete error.\n", vecList[i]));
+            }
+        }
+    }
+
     //添加一个Hash数据块(key为一个数字)
     //最所以独立出来，是为了减少将数字转化为字符串在做Hsah的这个步骤。
     //直接采用key做Hash计算的下标
@@ -1324,7 +1370,7 @@ private:
 
             while (NULL != pLastLink)
             {
-                if (NULL != pLastLink->m_pData && strcmp(pLastLink->m_pData->m_pKey, szCurrKey) == 0)
+                if (NULL != pLastLink->m_pData)
                 {
                     //找到了对应的key,这个数据已经存在
                     if (pLastLink->m_pPerv == NULL)

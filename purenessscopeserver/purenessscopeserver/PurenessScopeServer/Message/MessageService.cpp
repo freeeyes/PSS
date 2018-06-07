@@ -352,8 +352,6 @@ int CMessageService::Close()
         msg_queue()->deactivate();
     }
 
-    m_MessagePool.Close();
-
     CloseCommandList();
 
     m_objClientCommandList.Close();
@@ -427,7 +425,7 @@ void CMessageService::CloseCommandList()
         SAFE_DELETE(vecClientCommandList[i]);
     }
 
-    m_objClientCommandList.Clear();
+    m_objClientCommandList.Clear_Unit32();
 }
 
 CClientCommandList* CMessageService::GetClientCommandList(uint16 u2CommandID)
