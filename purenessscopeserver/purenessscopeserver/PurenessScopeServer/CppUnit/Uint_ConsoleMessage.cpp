@@ -130,7 +130,7 @@ void CUnit_ConsoleMessage::Test_DoMessage_ShowAllCommandInfo(void)
 
 void CUnit_ConsoleMessage::Test_DoMessage_ShowServerInfo(void)
 {
-    //Create_Command("b freeeyes ShowServerInfo -a&", CONSOLE_COMMAND_SERVERINFO);
+    Create_Command("b freeeyes ShowServerInfo -a&", CONSOLE_COMMAND_SERVERINFO);
 }
 
 void CUnit_ConsoleMessage::Test_DoMessage_ReConnectServer(void)

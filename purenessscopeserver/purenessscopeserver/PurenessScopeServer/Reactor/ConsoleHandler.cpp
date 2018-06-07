@@ -417,6 +417,11 @@ void CConsoleHandler::Clear_PacketParse()
 
 bool CConsoleHandler::CompareConsoleClinetIP(const char* pIP)
 {
+    if (GetXmlConfigAttribute(xmlConsoleClients)->vec.size() == 0)
+    {
+        return true;
+    }
+
     for (int32 i = 0; i < (int32)GetXmlConfigAttribute(xmlConsoleClients)->vec.size(); i++)
     {
         if (ACE_OS::strcmp(GetXmlConfigAttribute(xmlConsoleClients)->vec[i].cip.c_str(), pIP) == 0)

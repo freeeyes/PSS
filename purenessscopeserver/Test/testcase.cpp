@@ -974,7 +974,7 @@ bool Thread_CheckUdpPacket_Recv(_ClientInfo& objClientInfo, _ResultInfo& objResu
     struct sockaddr_in recvAddr;
     memset(&recvAddr, 0, sizeof(struct sockaddr_in));
     recvAddr.sin_family = AF_INET;
-    recvAddr.sin_port = htons(20003);
+    recvAddr.sin_port = htons(20002);
     recvAddr.sin_addr.s_addr = inet_addr(objClientInfo.m_szServerIP);
 
     //设置超时时间

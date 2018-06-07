@@ -801,6 +801,11 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
 
         pMessageService->Init(i, u4MaxQueue, u4LowMask, u4HighMask);
 
+        //将线程信息放入线程组
+        _ThreadInfo* pThreadInfo = pMessageService->GetThreadInfo();
+
+        m_objAllThreadInfo.AddThreadInfo(i, pThreadInfo);
+
         m_vecMessageService.push_back(pMessageService);
     }
 
@@ -1069,23 +1074,6 @@ void CMessageServiceGroup::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_
 
 CThreadInfo* CMessageServiceGroup::GetThreadInfo()
 {
-    uint32 u4Size = (uint32)m_vecMessageService.size();
-
-    for (uint32 i = 0; i < u4Size; i++)
-    {
-        CMessageService* pMessageService = m_vecMessageService[i];
-
-        if (NULL != pMessageService)
-        {
-            _ThreadInfo* pThreadInfo = pMessageService->GetThreadInfo();
-
-            if (NULL != pThreadInfo)
-            {
-                m_objAllThreadInfo.AddThreadInfo(i, pThreadInfo);
-            }
-        }
-    }
-
     return &m_objAllThreadInfo;
 }
 
