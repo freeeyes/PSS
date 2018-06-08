@@ -3,7 +3,7 @@
 CConsoleMessage::CConsoleMessage()
 {
     m_objConsolePromissions.Init(CONSOLECONFIG);
-    
+
     SetConsoleKey(GetXmlConfigAttribute(xmlConsoleKeys)->vec);
 
     Init();
@@ -90,8 +90,6 @@ int CConsoleMessage::Dispose(ACE_Message_Block* pmb, IBuffPacket* pBuffPacket, u
     {
         pCommand[pmb->length() - 3] = '\0';
     }
-    
-    OUR_DEBUG((LM_INFO, "[CConsoleMessage::Dispose]pCommand=%s.\n", pCommand));
 
     //解析命令，把数据切割出来
     if(CONSOLE_MESSAGE_SUCCESS != ParseCommand(pCommand, pBuffPacket, u1OutputType))
@@ -275,7 +273,7 @@ int CConsoleMessage::DoCommand(_CommandInfo& CommandInfo, IBuffPacket* pCurrBuff
     }
     else
     {
-    		OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]Command is no Find.\n"));
+        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]Command is no Find.\n"));
     }
 
     //拼接返回数据包内容
@@ -306,16 +304,13 @@ int CConsoleMessage::DoCommand(_CommandInfo& CommandInfo, IBuffPacket* pCurrBuff
 bool CConsoleMessage::SetConsoleKey(vector<xmlConsoleKeys::_ConsoleKey> vecConsoleKeyList)
 {
     m_vecConsolekeyList.swap(vecConsoleKeyList);
-    OUR_DEBUG((LM_INFO, "[CConsoleMessage::SetConsoleKey]size=%d.\n", m_vecConsolekeyList.size()));
     return true;
 }
 
 bool CConsoleMessage::CheckConsoleKey(const char* pKey)
 {
-		OUR_DEBUG((LM_INFO, "[CConsoleMessage::CheckConsoleKey]size=%d.\n", m_vecConsolekeyList.size()));
     for (int i = 0; i < (int)m_vecConsolekeyList.size(); i++)
     {
-    		OUR_DEBUG((LM_INFO, "[CConsoleMessage::CheckConsoleKey]Key=%s, pKey=%s.\n", m_vecConsolekeyList[i].Key.c_str(), pKey));
         if (ACE_OS::strcmp(m_vecConsolekeyList[i].Key.c_str(), pKey) == 0)
         {
             //key值对上了
