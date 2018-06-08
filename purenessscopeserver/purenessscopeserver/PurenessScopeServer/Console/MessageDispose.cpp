@@ -470,9 +470,9 @@ void DoMessage_CommandInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, 
                 sprintf_safe(szTemp, MAX_BUFF_1024, "CommandID is no Find.\n");
                 pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
             }
-
-            u2ReturnCommandID = CONSOLE_COMMAND_COMMANDINFO;
         }
+        
+        u2ReturnCommandID = CONSOLE_COMMAND_COMMANDINFO;
     }
 }
 
@@ -948,12 +948,14 @@ void DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
             strSTemp.u1Len = (uint8)GetXmlConfigAttribute(xmlServerVersion)->Version.length();
             (*pBuffPacket) << strSTemp;
 
+						
             //返回加载模块个数
             (*pBuffPacket) << (uint16)App_ModuleLoader::instance()->GetCurrModuleCount();
-
+            	
+            
             //返回工作线程个数
             (*pBuffPacket) << (uint16)App_MessageServiceGroup::instance()->GetThreadInfo()->GetThreadCount();
-
+						
             //返回当前协议包的版本号
             strSTemp.text = (char*)GetXmlConfigAttribute(xmlServerVersion)->Version.c_str();
             strSTemp.u1Len = (uint8)GetXmlConfigAttribute(xmlServerVersion)->Version.length();
@@ -1937,8 +1939,10 @@ void DoMessage_TestFileStop(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket,
 
 void DoMessage_PortList(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
+		OUR_DEBUG((LM_INFO, "[DoMessage_PortList]In.\n"));
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
+    		OUR_DEBUG((LM_INFO, "[DoMessage_PortList]In 1.\n"));
         u2ReturnCommandID = CONSOLE_COMMAND_PORT_FLOW;
 
         vector<_Port_Data_Account> vec_Port_Data_Account;
