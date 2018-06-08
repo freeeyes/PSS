@@ -2,12 +2,12 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_Aes::~CUnit_Aes()
+CUnit_ConnectTcp::~CUnit_ConnectTcp()
 {
 
 }
 
-void CUnit_Aes::setUp(void)
+void CUnit_ConnectTcp::setUp(void)
 {
     m_pAES = new AES();
 
@@ -26,13 +26,13 @@ void CUnit_Aes::setUp(void)
     m_pAES->SetKey((unsigned char* )szkey);
 }
 
-void CUnit_Aes::tearDown(void)
+void CUnit_ConnectTcp::tearDown(void)
 {
     delete m_pAES;
     m_pAES = NULL;
 }
 
-void CUnit_Aes::Test_Aes(void)
+void CUnit_ConnectTcp::Test_Aes(void)
 {
     bool blRet                 = false;
     char szTest[MAX_BUFF_100]  = { '\0' };
@@ -70,7 +70,7 @@ void CUnit_Aes::Test_Aes(void)
     CPPUNIT_ASSERT_MESSAGE("[Test_Aes]Aes is fail.", true == blRet);
 }
 
-void CUnit_Aes::Byte2Hex(const unsigned char* src, int len, char* dest)
+void CUnit_ConnectTcp::Byte2Hex(const unsigned char* src, int len, char* dest)
 {
     for (int i = 0; i < len; ++i)
     {
@@ -78,7 +78,7 @@ void CUnit_Aes::Byte2Hex(const unsigned char* src, int len, char* dest)
     }
 }
 
-void CUnit_Aes::Hex2Byte(const char* src, int len, unsigned char* dest)
+void CUnit_ConnectTcp::Hex2Byte(const char* src, int len, unsigned char* dest)
 {
     int length = len / 2;
 
@@ -88,7 +88,7 @@ void CUnit_Aes::Hex2Byte(const char* src, int len, unsigned char* dest)
     }
 }
 
-int CUnit_Aes::Char2Int(char c)
+int CUnit_ConnectTcp::Char2Int(char c)
 {
     if ('0' <= c && c <= '9')
     {

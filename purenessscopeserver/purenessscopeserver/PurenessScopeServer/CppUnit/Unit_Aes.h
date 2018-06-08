@@ -7,14 +7,14 @@
 #include "define.h"
 #include "Aes.h"
 
-class CUnit_Aes : public CppUnit::TestFixture
+class CUnit_ConnectTcp : public CppUnit::TestFixture
 {
-    CPPUNIT_TEST_SUITE(CUnit_Aes);
+    CPPUNIT_TEST_SUITE(CUnit_ConnectTcp);
     CPPUNIT_TEST(Test_Aes);
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    virtual ~CUnit_Aes();
+    virtual ~CUnit_ConnectTcp();
 
     virtual void setUp(void);
 
