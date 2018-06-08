@@ -12,6 +12,7 @@
 #include "Unit_AppConfig.h"
 #include "Uint_ConsolePromissions.h"
 #include "Uint_ConsoleMessage.h"
+#include "Unit_Aes.h"
 
 #define CPPUNIT_REPORT_PATH "./reports/cppunit/report.xml"
 

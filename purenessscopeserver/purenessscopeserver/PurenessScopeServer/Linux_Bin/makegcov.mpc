@@ -4,6 +4,7 @@ project(PurenessScopeServer):aceexe{
  Source_Files{
   ../../Common/*.cpp	
   ../Common/*.cpp
+  ../Encrypt/*.cpp
   ../Console/*.cpp
   ../LogSystem/*.cpp
   ../Message/*.cpp
@@ -17,7 +18,7 @@ project(PurenessScopeServer):aceexe{
   ../*.cpp
  }
  includes += ../../../../include
- includes += ../Common ../../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../TinyXML ../Mail ../FileTest ../CppUnit
+ includes += ../Common ../../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../TinyXML ../Mail ../FileTest ../CppUnit ../Encrypt
  
  libpaths += ../../../../lib
  libs += cppunit
