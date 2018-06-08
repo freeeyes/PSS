@@ -31,4 +31,7 @@ bool Thread_CheckUdpPacket(_ClientInfo& objClientInfo, _ResultInfo& objResultInf
 //测试UDP包接收
 bool Thread_CheckUdpPacket_Recv(_ClientInfo& objClientInfo, _ResultInfo& objResultInfo);
 
+//测试Console连接
+bool CheckConsolePacket(_ResultInfo& objResultInfo);
+
 #endif

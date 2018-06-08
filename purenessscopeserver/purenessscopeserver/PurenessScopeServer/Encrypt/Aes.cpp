@@ -249,7 +249,8 @@ unsigned char AES::FFmul(unsigned char a, unsigned char b)
 
 void AES::SubBytes(unsigned char state[][4])
 {
-    int r,c;
+    int r = 0;
+    int c = 0;
 
     for(r=0; r<4; r++)
     {
@@ -263,7 +264,8 @@ void AES::SubBytes(unsigned char state[][4])
 void AES::ShiftRows(unsigned char state[][4])
 {
     unsigned char t[4];
-    int r,c;
+    int r = 0;
+    int c = 0;
 
     for(r=1; r<4; r++)
     {
@@ -282,7 +284,8 @@ void AES::ShiftRows(unsigned char state[][4])
 void AES::MixColumns(unsigned char state[][4])
 {
     unsigned char t[4];
-    int r,c;
+    int r = 0;
+    int c = 0;
 
     for(c=0; c< 4; c++)
     {
@@ -303,7 +306,8 @@ void AES::MixColumns(unsigned char state[][4])
 
 void AES::AddRoundKey(unsigned char state[][4], unsigned char k[][4])
 {
-    int r,c;
+    int r = 0;
+    int c = 0;
 
     for(c=0; c<4; c++)
     {
@@ -316,7 +320,8 @@ void AES::AddRoundKey(unsigned char state[][4], unsigned char k[][4])
 
 void AES::InvSubBytes(unsigned char state[][4])
 {
-    int r,c;
+    int r = 0;
+    int c = 0;
 
     for(r=0; r<4; r++)
     {
@@ -330,7 +335,8 @@ void AES::InvSubBytes(unsigned char state[][4])
 void AES::InvShiftRows(unsigned char state[][4])
 {
     unsigned char t[4];
-    int r,c;
+    int r = 0;
+    int c = 0;
 
     for(r=1; r<4; r++)
     {
@@ -349,7 +355,8 @@ void AES::InvShiftRows(unsigned char state[][4])
 void AES::InvMixColumns(unsigned char state[][4])
 {
     unsigned char t[4];
-    int r,c;
+    int r = 0;
+    int c = 0;
 
     for(c=0; c< 4; c++)
     {

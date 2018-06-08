@@ -84,6 +84,12 @@ int main()
     strResultInfo += szHtmlResult;
     nTestCount++;
 
+    CheckConsolePacket(objResultInfo);
+    objResultInfo.Display();
+    objResultInfo.To_Html(szHtmlResult);
+    strResultInfo += szHtmlResult;
+    nTestCount++;
+
     //输出成文件格式
     char* pHtmlFile = new char[nTestCount*MAX_BUFF_1024];
     memset(pHtmlFile, 0, nTestCount*MAX_BUFF_1024);

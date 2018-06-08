@@ -1033,3 +1033,138 @@ bool Thread_CheckUdpPacket_Recv(_ClientInfo& objClientInfo, _ResultInfo& objResu
 
     return true;
 }
+
+bool CheckConsolePacket(_ResultInfo& objResultInfo)
+{
+    struct timeval ttStart, ttEnd;
+    int sckClient;
+    char szSession[32]      = {'\0'};
+    int nSrcLen = 0;
+    int nDecLen = 0;
+
+    gettimeofday(&ttStart, NULL);
+
+    sprintf(objResultInfo.m_szTestName, "console command test");
+    sprintf(szSession, "FREEEYES");
+
+    //socket创建的准备工作
+    struct sockaddr_in sockaddr;
+
+    memset(&sockaddr, 0, sizeof(sockaddr));
+    sockaddr.sin_family = AF_INET;
+    sockaddr.sin_port   = htons(10010);
+    sockaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+    sckClient = socket(AF_INET, SOCK_STREAM, 0);
+
+    struct timeval tvTimeout;
+    tvTimeout.tv_sec  = 5;
+    tvTimeout.tv_usec = 0;
+    setsockopt(sckClient, SOL_SOCKET, SO_RCVTIMEO, (char*)&tvTimeout, sizeof(tvTimeout));
+
+    //连接远程服务器
+    int nErr = connect(sckClient, (struct sockaddr*)&sockaddr, sizeof(sockaddr));
+
+    if(0 != nErr)
+    {
+        gettimeofday(&ttEnd, NULL);
+        sprintf(objResultInfo.m_szResult, "[e][127.0.0.1:10010]connnect server fail.[%s]。", strerror(errno));
+        objResultInfo.m_nRet          = 1;
+        objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+        return false;
+    }
+
+    //拼装发送包体
+    char szSendBuffer[MAX_BUFF_200] = {'\0'};
+
+    char szSendData[200] = { '\0' };
+    sprintf(szSendData, "b freeeyes ShowModule -a&");
+    int nSendDataLen = strlen(szSendData);
+
+    //发送数据
+    int nTotalSendLen = nSendDataLen;
+    int nBeginSend    = 0;
+    int nCurrSendLen  = 0;
+    bool blSendFlag   = false;
+    int nBeginRecv    = 0;
+    int nCurrRecvLen  = 0;
+    bool blRecvFlag   = false;
+
+    while(true)
+    {
+        nCurrSendLen = send(sckClient, szSendData + nBeginSend, nTotalSendLen, 0);
+
+        if(nCurrSendLen <= 0)
+        {
+            close(sckClient);
+            gettimeofday(&ttEnd, NULL);
+            sprintf(objResultInfo.m_szResult, "[e][127.0.0.1:10010]send server fail.[%s]。", strerror(errno));
+            objResultInfo.m_nRet          = 1;
+            objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+            return false;
+        }
+        else
+        {
+            nTotalSendLen -= nCurrSendLen;
+
+            if(nTotalSendLen == 0)
+            {
+                //发送完成
+                blSendFlag = true;
+                break;
+            }
+            else
+            {
+                nBeginSend += nCurrSendLen;
+            }
+        }
+    }
+
+    if(blSendFlag == false)
+    {
+        close(sckClient);
+        gettimeofday(&ttEnd, NULL);
+        sprintf(objResultInfo.m_szResult, "[e][127.0.0.1:10010]send buff size not equal, buffer size[%d], send size[%d]", nTotalSendLen);
+        objResultInfo.m_nRet          = 1;
+        objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+        return false;
+    }
+    else
+    {
+        int nTotalRecvLen               = 200;
+        char szRecvBuffData[1024 * 100] = {'\0'};
+
+        while(true)
+        {
+
+            //如果发送成功了，则处理接收数据
+            nCurrRecvLen = recv(sckClient, (char* )szRecvBuffData + nBeginRecv, nTotalRecvLen, 0);
+
+            if(nCurrRecvLen <= 0)
+            {
+                close(sckClient);
+                gettimeofday(&ttEnd, NULL);
+                sprintf(objResultInfo.m_szResult, "[e][127.0.0.1:10010]client recv data error.[%s]", strerror(errno));
+                objResultInfo.m_nRet = 1;
+                objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+                return false;
+            }
+            else
+            {
+                nTotalRecvLen -= nCurrRecvLen;
+                break;
+            }
+        }
+    }
+
+    sprintf(objResultInfo.m_szResult, "[s][127.0.0.1:10010]success.");
+    gettimeofday(&ttEnd, NULL);
+    objResultInfo.m_nRet = 0;
+    objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
+    close(sckClient);
+
+    return true;
+
+
+    return true;
+}
