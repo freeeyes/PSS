@@ -60,7 +60,7 @@ b freeeyes ShowServerInfo -a&
 		<tr><th>uint8</th><th>插件当前运行状态字 0 为正常</th></tr>
 		<tr><th>uint32</th><th>插件当前运行错误码 0 为正常</th></tr>
         <tr>
-            <th rowspan="3">LoadModule TcpTest.so,./,Param</th>
+            <th rowspan="3">LoadModule ./,TcpTest.so,Param</th>
             <th rowspan="3">加载一个插件,TcpTest.so是文件名,./是插件在服务器上的路径，Param是插件启动参数</th>
             <th>类型</th>
             <th>说明</th>
@@ -468,7 +468,7 @@ b freeeyes ShowServerInfo -a&
 		<tr><th>uint16</th><th>返回命令ID</th></tr>
         <tr><th>uint8</th><th>执行状态 0 成功</th></tr>
         <tr>
-            <th rowspan="3">SetTrackCommand -i 127.0.0.1 -c 5 </th>
+            <th rowspan="3">SetTrackCommand -i 0x1000 -c 5 </th>
             <th rowspan="3">给指定信令ID的数据染色，-i信令ID，格式是0xXXXX，-c是染色数据包数</th>
             <th>类型</th>
             <th>说明</th>

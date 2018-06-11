@@ -13,6 +13,7 @@ CCppUnitMain::CCppUnitMain()
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_Aes, "pss");
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_ConnectTcp, "pss");
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_Basehandler, "pss");
+    CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_MessageDefine, "pss");
 }
 
 CCppUnitMain::~CCppUnitMain()

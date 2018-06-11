@@ -60,7 +60,7 @@ b freeeyes ShowServerInfo -a&
 		<tr><th>uint8</th><th>Plug - in current running status word 0 is ok</th></tr>
 		<tr><th>uint32</th><th>Plug - in currently running error code 0 is ok</th></tr>
         <tr>
-            <th rowspan="3">LoadModule TcpTest.so,./,Param</th>
+            <th rowspan="3">LoadModule ./,TcpTest.so,Param</th>
             <th rowspan="3">Load a plug - in, tcptest.so is the file name,. / is the path of the plug-in on the server, param is the plug-in startup parameter</th>
             <th>Type</th>
             <th>Explain</th>
@@ -466,7 +466,7 @@ b freeeyes ShowServerInfo -a&
 		<tr><th>uint16</th><th>Return command ID</th></tr>
         <tr><th>uint8</th><th>Execution state 0 succeeded</th></tr>
         <tr>
-            <th rowspan="3">SetTrackCommand -i 127.0.0.1 -c 5 </th>
+            <th rowspan="3">SetTrackCommand -i 0x1000 -c 5 </th>
             <th rowspan="3">Dyes the data for the specified message id, -i message id in the format 0xxxxxx, -c is the number of dyed packets</th>
             <th>Type</th>
             <th>Explain</th>
