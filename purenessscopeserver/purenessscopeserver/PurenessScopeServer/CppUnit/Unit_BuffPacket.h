@@ -13,6 +13,9 @@ class CUnit_BuffPacket : public CppUnit::TestFixture
     CPPUNIT_TEST(Read_Write_String_BuffPacket);
     CPPUNIT_TEST(Read_Write_Binary_BuffPacket);
     CPPUNIT_TEST(Check_Size_BuffPacket);
+    CPPUNIT_TEST(Check_AddBuff);
+    CPPUNIT_TEST(Check_RollBack);
+    CPPUNIT_TEST(Check_String);
     CPPUNIT_TEST_SUITE_END();
 public:
     virtual ~CUnit_BuffPacket();
@@ -25,6 +28,9 @@ public:
     void Read_Write_String_BuffPacket(void);   //读写字符串测试
     void Read_Write_Binary_BuffPacket(void);   //读写二进制测试
     void Check_Size_BuffPacket(void);          //相关对象尺寸的测试
+    void Check_AddBuff(void);
+    void Check_RollBack(void);
+    void Check_String(void);
 
 private:
     CBuffPacket* m_pBuffPacket;

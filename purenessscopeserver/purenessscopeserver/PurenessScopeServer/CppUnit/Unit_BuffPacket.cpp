@@ -198,4 +198,55 @@ void CUnit_BuffPacket::Check_Size_BuffPacket(void)
     }
 }
 
+void CUnit_BuffPacket::Check_AddBuff(void)
+{
+    bool blRet = false;
+
+    if (false == m_pBuffPacket->AddBuff(1024))
+    {
+        CPPUNIT_ASSERT_MESSAGE("[Check_AddBuff]AddBuff(1024) error.", true == blRet);
+    }
+}
+
+void CUnit_BuffPacket::Check_RollBack(void)
+{
+    bool blRet = false;
+
+    uint8  u1Data = 0;
+    uint32 u4Data = 1;
+    (*m_pBuffPacket) << u1Data;
+    (*m_pBuffPacket) << u4Data;
+
+    if (false == m_pBuffPacket->RollBack(1))
+    {
+        CPPUNIT_ASSERT_MESSAGE("[Check_RollBack]RollBack(1) error.", true == blRet);
+        return;
+    }
+
+    uint32 u4Out = 0;
+    (*m_pBuffPacket) >> u4Out;
+
+    if (u4Out != u4Data)
+    {
+        CPPUNIT_ASSERT_MESSAGE("[Check_RollBack]RollBack(1) u4Data != u4Out.", true == blRet);
+        return;
+    }
+}
+
+void CUnit_BuffPacket::Check_String(void)
+{
+    bool blRet = false;
+
+    string strData = "freeeyes";
+    string strCout = "";
+
+    (*m_pBuffPacket) << strData;
+    (*m_pBuffPacket) >> strCout;
+
+    if (strCout != strData)
+    {
+        CPPUNIT_ASSERT_MESSAGE("[Check_String]RollBack(1) strData != strCout.", true == blRet);
+    }
+}
+
 #endif

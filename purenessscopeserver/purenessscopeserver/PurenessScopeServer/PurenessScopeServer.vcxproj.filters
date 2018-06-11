@@ -271,6 +271,12 @@
     <ClCompile Include="CppUnit\Uint_ConsoleMessage.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="CppUnit\Unit_Aes.cpp">
+      <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="CppUnit\Unit_ConnectTcp.cpp">
+      <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -658,6 +664,15 @@
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
     <ClInclude Include="CppUnit\Uint_ConsoleMessage.h">
+      <Filter>CppUnit\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\Unit_Aes.h">
+      <Filter>CppUnit\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\Unit_ConnectTcp.h">
+      <Filter>CppUnit\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\PostServerMessage.h">
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
   </ItemGroup>
