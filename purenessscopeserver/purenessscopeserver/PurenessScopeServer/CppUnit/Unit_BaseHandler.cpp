@@ -4,10 +4,12 @@
 
 void CUnit_Basehandler::setUp(void)
 {
+    m_nBaseHandlerID = 1;
 }
 
 void CUnit_Basehandler::tearDown(void)
 {
+    m_nBaseHandlerID = 0;
 }
 
 
@@ -81,6 +83,8 @@ void CUnit_Basehandler::Test_Tcp_Common_ClientInfo(void)
 {
     bool blRet = true;
     _ClientConnectInfo_Param obj_ClientConnectInfo_Param;
+
+    Tcp_Common_ClientInfo(obj_ClientConnectInfo_Param);
 
     CPPUNIT_ASSERT_MESSAGE("[Test_Tcp_Common_ClientInfo]obj_ClientConnectInfo_Param is false.", true == blRet);
 }

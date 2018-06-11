@@ -28,6 +28,9 @@ public:
     void Test_Tcp_Common_ClientInfo(void);
     void Test_Tcp_Common_Send_Input_To_Cache(void);
     void Test_Tcp_Common_Manager_Timeout_CheckInfo(void);
+private:
+    int m_nBaseHandlerID;
+
 };
 
 #endif
