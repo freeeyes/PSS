@@ -9,20 +9,22 @@ CUnit_ConnectTcp::~CUnit_ConnectTcp()
 
 void CUnit_ConnectTcp::setUp(void)
 {
+    m_nServerID = 1;
 }
 
 void CUnit_ConnectTcp::tearDown(void)
 {
+    m_nServerID = 0;
 }
 
 void CUnit_ConnectTcp::Test_Connect_Tcp_Server(void)
 {
     bool blRet                 = false;
     CPostServerData objPostServerData;
-    objPostServerData.SetServerID(1);
+    objPostServerData.SetServerID(m_nServerID);
 
     //连接远程服务器
-    if (false == App_ClientReConnectManager::instance()->Connect(1,
+    if (false == App_ClientReConnectManager::instance()->Connect(m_nServerID,
             "127.0.0.1",
             10002,
             TYPE_IPV4,
@@ -56,7 +58,7 @@ void CUnit_ConnectTcp::Test_Connect_Tcp_Server(void)
 
     char* pData = (char* )szSendBuffer;
 
-    if (false == App_ClientReConnectManager::instance()->SendData(1, pData, nSendLen, false))
+    if (false == App_ClientReConnectManager::instance()->SendData(m_nServerID, pData, nSendLen, false))
     {
         OUR_DEBUG((LM_INFO, "[Test_Connect_Tcp_Server]Send TCP [127.0.0.1:10002] is fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Tcp_Server]Send TCP [127.0.0.1:10002] is fail.\n", true == blRet);
@@ -66,7 +68,7 @@ void CUnit_ConnectTcp::Test_Connect_Tcp_Server(void)
     ACE_Time_Value tvSleep(0, 20*1000);
     ACE_OS::sleep(tvSleep);
 
-    App_ClientReConnectManager::instance()->Close(1);
+    App_ClientReConnectManager::instance()->Close(m_nServerID);
     OUR_DEBUG((LM_INFO, "[Test_Connect_Tcp_Server]Close OK.\n"));
 }
 

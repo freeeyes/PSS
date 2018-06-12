@@ -531,7 +531,7 @@ bool CClientReConnectManager::SendData(int nServerID, char*& pData, int nSize, b
     return pClientInfo->SendData(pmblk);
 }
 
-bool CClientReConnectManager::SendDataUDP(int nServerID, const char* pIP, int nPort, const char*& pMessage, uint32 u4Len, bool blIsDelete)
+bool CClientReConnectManager::SendDataUDP(int nServerID, const char* pIP, int nPort, char*& pMessage, uint32 u4Len, bool blIsDelete)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     char szServerID[10] = {'\0'};

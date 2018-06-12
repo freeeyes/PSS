@@ -66,7 +66,7 @@ public:
     virtual bool CloseUDP(int nServerID);                                                                                              //关闭链接（UDP）
     bool ConnectErrorClose(int nServerID);                                                                                     //由内部错误引起的失败，由ProConnectClient调用
     virtual bool SendData(int nServerID, char*& pData, int nSize, bool blIsDelete = true);                                             //发送数据（TCP）
-    virtual bool SendDataUDP(int nServerID,const char* pIP, int nPort, const char*& pMessage, uint32 u4Len, bool blIsDelete = true);   //发送数据（UDP）
+    virtual bool SendDataUDP(int nServerID,const char* pIP, int nPort, char*& pMessage, uint32 u4Len, bool blIsDelete = true);   //发送数据（UDP）
     bool SetHandler(int nServerID, CProConnectClient* pProConnectClient);                                                      //将指定的CProConnectClient*绑定给nServerID
     virtual IClientMessage* GetClientMessage(int nServerID);                                                                           //获得ClientMessage对象
     virtual bool StartConnectTask(int nIntervalTime = CONNECT_LIMIT_RETRY);                                                            //设置自动重连的定时器

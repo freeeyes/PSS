@@ -14,6 +14,7 @@
 #include "Uint_ConsoleMessage.h"
 #include "Unit_Aes.h"
 #include "Unit_ConnectTcp.h"
+#include "Unit_ConnectUdp.h"
 #include "Unit_BaseHandler.h"
 #include "Unit_MessageDefine.h"
 #include "Unit_Logging.h"

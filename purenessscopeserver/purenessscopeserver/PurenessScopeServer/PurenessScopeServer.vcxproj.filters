@@ -283,6 +283,18 @@
     <ClCompile Include="CppUnit\Unit_MessageDefine.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="CppUnit\Unit_Logging.cpp">
+      <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="CppUnit\Unit_IPAccount.cpp">
+      <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="CppUnit\Unit_FrameCommand.cpp">
+      <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="CppUnit\Unit_ConnectUdp.cpp">
+      <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -685,6 +697,21 @@
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
     <ClInclude Include="CppUnit\Unit_MessageDefine.h">
+      <Filter>CppUnit\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\Unit_Logging.h">
+      <Filter>CppUnit\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\Unit_IPAccount.h">
+      <Filter>CppUnit\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\Unit_FrameCommand.h">
+      <Filter>CppUnit\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\Unit_ConnectUdp.h">
+      <Filter>CppUnit</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\PostUdpServerMessage.h">
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
   </ItemGroup>

@@ -229,7 +229,6 @@ void CUnit_BuffPacket::Check_RollBack(void)
     if (u4Out != u4Data)
     {
         CPPUNIT_ASSERT_MESSAGE("[Check_RollBack]RollBack(1) u4Data != u4Out.", true == blRet);
-        return;
     }
 }
 

@@ -22,7 +22,8 @@ public:
     virtual void tearDown(void);
 
     void Test_Connect_Tcp_Server(void);
-
+private:
+    int m_nServerID;
 };
 
 #endif
