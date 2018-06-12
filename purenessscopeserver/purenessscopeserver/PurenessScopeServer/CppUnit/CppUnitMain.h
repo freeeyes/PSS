@@ -16,6 +16,7 @@
 #include "Unit_ConnectTcp.h"
 #include "Unit_BaseHandler.h"
 #include "Unit_MessageDefine.h"
+#include "Unit_Logging.h"
 
 #define CPPUNIT_REPORT_PATH "./reports/cppunit/report.xml"
 
