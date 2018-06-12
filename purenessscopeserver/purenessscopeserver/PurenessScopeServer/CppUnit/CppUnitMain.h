@@ -18,6 +18,7 @@
 #include "Unit_MessageDefine.h"
 #include "Unit_Logging.h"
 #include "Unit_IPAccount.h"
+#include "Unit_FrameCommand.h"
 
 #define CPPUNIT_REPORT_PATH "./reports/cppunit/report.xml"
 
