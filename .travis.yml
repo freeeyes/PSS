@@ -99,7 +99,7 @@ matrix:
         - gcov -r -o ./.obj ../Common/*.cpp
         - gcov -r -o ./.obj ../Console/*.cpp
         - gcov -r -o ./.obj ../FileTest/*.cpp
-        - gcov -r -o ./.obj ../TinyXML/*.cpp
+        - gcov -r -o ./.obj ../Encrypt/*.cpp
         - gcov -r -o ./.obj ../PacketParse/*.cpp
         - gcov -r -o ./.obj ../LogSystem/*.cpp
         - gcov -r -o ./.obj ../Message/*.cpp
