@@ -2,6 +2,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![GitHub version](https://badge.fury.io/gh/freeeyes%2FPSS.svg)](https://badge.fury.io/gh/freeeyes%2FPSS)
 [![coverity](https://scan.coverity.com/projects/14425/badge.svg)](https://scan.coverity.com/projects/freeeyes-pss)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=freeeyes&metric=alert_status)](https://sonarcloud.io/dashboard?id=freeeyes)
 [![Platform](https://img.shields.io/badge/platform-Linux,%20Windows-green.svg?style=flat)](https://github.com/freeeyes/PSS)
  
 ## [English Introduction](Readme_English.md)  
