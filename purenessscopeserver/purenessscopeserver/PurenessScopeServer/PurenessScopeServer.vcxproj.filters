@@ -295,6 +295,9 @@
     <ClCompile Include="CppUnit\Unit_ConnectUdp.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="CppUnit\Unit_TimeQueue.cpp">
+      <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -712,6 +715,9 @@
       <Filter>CppUnit</Filter>
     </ClInclude>
     <ClInclude Include="CppUnit\PostUdpServerMessage.h">
+      <Filter>CppUnit\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\Unit_TimeQueue.h">
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
   </ItemGroup>
