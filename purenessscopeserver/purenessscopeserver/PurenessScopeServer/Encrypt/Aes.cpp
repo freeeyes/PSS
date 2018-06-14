@@ -67,7 +67,9 @@ AES::~AES()
 unsigned char* AES::Cipher(unsigned char* input)
 {
     unsigned char state[4][4];
-    int i,r,c;
+    int i = 0;
+    int r = 0;
+    int c = 0;
 
     for(r=0; r<4; r++)
     {
@@ -106,7 +108,9 @@ unsigned char* AES::Cipher(unsigned char* input)
 unsigned char* AES::InvCipher(unsigned char* input)
 {
     unsigned char state[4][4];
-    int i,r,c;
+    int i = 0;
+    int r = 0;
+    int c = 0;
 
     for(r=0; r<4; r++)
     {
@@ -176,7 +180,10 @@ void* AES::InvCipher(void* input, int length)
 
 void AES::KeyExpansion(const unsigned char* key, unsigned char w[][4][4])
 {
-    int i,j,r,c;
+    int i = 0;
+    int j = 0;
+    int r = 0;
+    int c = 0;
     unsigned char rc[] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36};
 
     for(r=0; r<4; r++)
