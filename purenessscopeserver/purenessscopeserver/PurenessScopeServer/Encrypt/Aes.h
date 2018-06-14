@@ -3,7 +3,7 @@
 
 //AES加解密算法，建议秘钥超过1024字节
 #include <stdio.h>
-#include <memory>
+#include <memory.h>
 #include <string>
 
 class AES
