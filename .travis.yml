@@ -104,7 +104,6 @@ matrix:
         - gcov -r -o ./.obj ../LogSystem/*.cpp
         - gcov -r -o ./.obj ../Message/*.cpp
         - gcov -r -o ./.obj ../Reactor/*.cpp
-        - gcov -r -o ./.obj ../Mail/*.cpp
         - gcov -r -o ./.obj ../CppUnit/*.cpp
         - gcov -r -o ./.obj ../UDP/*.cpp
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer
@@ -142,7 +141,6 @@ matrix:
       - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
       - $ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc
       - make -j 4
-      #- ./PurenessScopeServer > /dev/null 2>&1 &
       - nohup ./PurenessScopeServer > pssout.file 2>&1 &
       - sleep 10
       - cd $TRAVIS_BUILD_DIR/purenessscopeserver/Test
