@@ -8,8 +8,8 @@
 > 5. 研究ACE_Thread_Timer_Queue_Adapter线程优雅的关闭方式 (Finish)
 > 6. 重新整理目前纷乱的目录结构 (waiting)
 > 7. 修改服务器间传输测试插件的代码 (Finish)
-> 8. 整理xml2Databse，提供对windows的编译支持 (Doing)
-> 9. 提出AI定时调度功能的想法，设计方案。(waiting)
+> 8. 整理xml2Databse，提供数据锁对windows的编译支持 (Finish)
+> 9. 提出AI定时调度功能的想法，设计方案。(Doing)
 
 ##work by ruqi
 > 1. 配置PSS生成Windows程序在sonar里检测与代码覆盖 (Doing)
