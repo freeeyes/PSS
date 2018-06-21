@@ -40,6 +40,12 @@ CPacketParse* CPacketParsePool::Create(const char* pFileName, uint32 u4Line)
 
 bool CPacketParsePool::Delete(CPacketParse* pPacketParse, bool blDelete)
 {
+	if (NULL == pPacketParse)
+	{
+		OUR_DEBUG((LM_INFO, "[CPacketParsePool::Delete] pPacketParse is NULL.\n"));
+		return false;
+	}
+
     if (true == blDelete)
     {
         //清理包头和包体的内存
