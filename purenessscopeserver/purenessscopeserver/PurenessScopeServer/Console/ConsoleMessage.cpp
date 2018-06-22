@@ -16,52 +16,52 @@ CConsoleMessage::~CConsoleMessage()
 int CConsoleMessage::Init()
 {
     //初始化支持命令数组
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAHE_LOADMOUDLE, DoMessage_LoadModule));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAHE_UNLOADMOUDLE, DoMessage_UnLoadModule));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAHE_RELOADMOUDLE, DoMessage_ReLoadModule));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAHE_SHOWMOUDLE, DoMessage_ShowModule));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAHE_CLIENTCOUNT, DoMessage_ClientMessageCount));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAHE_COMMANDINFO, DoMessage_CommandInfo));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAHE_THREADINFO, DoMessage_WorkThreadState));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAHE_CLIENTINFO, DoMessage_ClientInfo));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAHE_FORBIDDENIP, DoMessage_ForbiddenIP));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAHE_FORBIDDENIPSHOW, DoMessage_ShowForbiddenList));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAHE_LIFTED, DoMessage_LifedIP));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAHE_COLSECLIENT, DoMessage_CloseClient));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAHE_UDPCONNECTINFO, DoMessage_UDPClientInfo));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAHE_SERVERCONNECT_TCP, DoMessage_ServerConnectTCP));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAHE_SERVERCONNECT_UDP, DoMessage_ServerConnectUDP));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAGE_PROCESSINFO, DoMessage_ShowProcessInfo));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAGE_CLIENTHISTORY, DoMessage_ShowClientHisTory));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAGE_ALLCOMMANDINFO, DoMessage_ShowAllCommandInfo));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAGE_SERVERINFO, DoMessage_ShowServerInfo));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAGE_SERVERRECONNECT, DoMessage_ReConnectServer));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAHE_COMMANDTIMEOUT, DoMessage_CommandTimeout));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAHE_COMMANDTIMEOUTCLR, DoMessage_CommandTimeoutclr));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAGE_COMMANDDATALOG, DoMessage_CommandDataLog));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAGE_SETDEBUG, DoMessage_SetDebug));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAGE_SHOWDEBUG, DoMessage_ShowDebug));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAGE_SETTRACKIP, DoMessage_SetTrackIP));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAGE_SETTRACECOMMAND, DoMessage_SetTraceCommand));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAGE_GETTRACKIPINFO, DoMessage_GetTrackCommand));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAGE_GETCONNECTIPINFO, DoMessage_GetConnectIPInfo));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAGE_GETLOGINFO, DoMessage_GetLogLevelInfo));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAGE_SETLOGLEVEL, DoMessage_SetLogLevelInfo));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAGE_GETWTAI, DoMessage_GetThreadAI));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAGE_GETWTTIMEOUT, DoMessage_GetWorkThreadTO));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAGE_SETWTAI, DoMessage_SetWorkThreadAI));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAGE_GETNICKNAMEINFO, DoMessage_GetNickNameInfo));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAGE_SETCONNECTLOG, DoMessage_SetConnectLog));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAGE_SETMAXCONNECTCOUNT, DoMessage_SetMaxConnectCount));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAGE_ADD_LISTEN, DoMessage_AddListen));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSAGE_DEL_LISTEN, DoMessage_DelListen));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSATE_SHOW_LISTEN, DoMessage_ShowListen));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSATE_MONITOR_INFO, DoMessage_MonitorInfo));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSATE_FILE_TEST_START, DoMessage_TestFileStart));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSATE_FILE_TEST_STOP, DoMessage_TestFileStop));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSATE_PORT_FLOW, DoMessage_PortList));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSATE_PACKET_STATE, Do_Message_BuffPacket));
-    m_objHashMessageLogicList.insert(pair<string, DoMessage_Logic>(CONSOLEMESSATE_POOL_SET, Do_Message_PoolSet));
+    m_objHashMessageLogicList.bind(CONSOLEMESSAHE_LOADMOUDLE, DoMessage_LoadModule);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAHE_UNLOADMOUDLE, DoMessage_UnLoadModule);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAHE_RELOADMOUDLE, DoMessage_ReLoadModule);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAHE_SHOWMOUDLE, DoMessage_ShowModule);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAHE_CLIENTCOUNT, DoMessage_ClientMessageCount);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAHE_COMMANDINFO, DoMessage_CommandInfo);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAHE_THREADINFO, DoMessage_WorkThreadState);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAHE_CLIENTINFO, DoMessage_ClientInfo);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAHE_FORBIDDENIP, DoMessage_ForbiddenIP);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAHE_FORBIDDENIPSHOW, DoMessage_ShowForbiddenList);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAHE_LIFTED, DoMessage_LifedIP);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAHE_COLSECLIENT, DoMessage_CloseClient);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAHE_UDPCONNECTINFO, DoMessage_UDPClientInfo);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAHE_SERVERCONNECT_TCP, DoMessage_ServerConnectTCP);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAHE_SERVERCONNECT_UDP, DoMessage_ServerConnectUDP);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAGE_PROCESSINFO, DoMessage_ShowProcessInfo);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAGE_CLIENTHISTORY, DoMessage_ShowClientHisTory);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAGE_ALLCOMMANDINFO, DoMessage_ShowAllCommandInfo);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAGE_SERVERINFO, DoMessage_ShowServerInfo);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAGE_SERVERRECONNECT, DoMessage_ReConnectServer);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAHE_COMMANDTIMEOUT, DoMessage_CommandTimeout);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAHE_COMMANDTIMEOUTCLR, DoMessage_CommandTimeoutclr);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAGE_COMMANDDATALOG, DoMessage_CommandDataLog);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAGE_SETDEBUG, DoMessage_SetDebug);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAGE_SHOWDEBUG, DoMessage_ShowDebug);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAGE_SETTRACKIP, DoMessage_SetTrackIP);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAGE_SETTRACECOMMAND, DoMessage_SetTraceCommand);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAGE_GETTRACKIPINFO, DoMessage_GetTrackCommand);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAGE_GETCONNECTIPINFO, DoMessage_GetConnectIPInfo);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAGE_GETLOGINFO, DoMessage_GetLogLevelInfo);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAGE_SETLOGLEVEL, DoMessage_SetLogLevelInfo);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAGE_GETWTAI, DoMessage_GetThreadAI);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAGE_GETWTTIMEOUT, DoMessage_GetWorkThreadTO);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAGE_SETWTAI, DoMessage_SetWorkThreadAI);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAGE_GETNICKNAMEINFO, DoMessage_GetNickNameInfo);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAGE_SETCONNECTLOG, DoMessage_SetConnectLog);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAGE_SETMAXCONNECTCOUNT, DoMessage_SetMaxConnectCount);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAGE_ADD_LISTEN, DoMessage_AddListen);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAGE_DEL_LISTEN, DoMessage_DelListen);
+    m_objHashMessageLogicList.bind(CONSOLEMESSATE_SHOW_LISTEN, DoMessage_ShowListen);
+    m_objHashMessageLogicList.bind(CONSOLEMESSATE_MONITOR_INFO, DoMessage_MonitorInfo);
+    m_objHashMessageLogicList.bind(CONSOLEMESSATE_FILE_TEST_START, DoMessage_TestFileStart);
+    m_objHashMessageLogicList.bind(CONSOLEMESSATE_FILE_TEST_STOP, DoMessage_TestFileStop);
+    m_objHashMessageLogicList.bind(CONSOLEMESSATE_PORT_FLOW, DoMessage_PortList);
+    m_objHashMessageLogicList.bind(CONSOLEMESSATE_PACKET_STATE, Do_Message_BuffPacket);
+    m_objHashMessageLogicList.bind(CONSOLEMESSATE_POOL_SET, Do_Message_PoolSet);
 
     return 0;
 }
@@ -263,12 +263,12 @@ int CConsoleMessage::DoCommand(_CommandInfo& CommandInfo, IBuffPacket* pCurrBuff
     }
 
     //查找并处理指令信息
-    mapMessageList::iterator f = m_objHashMessageLogicList.find((string)CommandInfo.m_szCommandTitle);
+    DoMessage_Logic fn_DoMessage_Logic;
+    m_objHashMessageLogicList.find((string)CommandInfo.m_szCommandTitle, fn_DoMessage_Logic);
 
-    if (f != m_objHashMessageLogicList.end())
+    if (NULL != fn_DoMessage_Logic)
     {
         //找到了，执行指令
-        DoMessage_Logic fn_DoMessage_Logic = (DoMessage_Logic)f->second;
         fn_DoMessage_Logic(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);
     }
     else

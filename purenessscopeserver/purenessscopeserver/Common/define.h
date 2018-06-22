@@ -19,6 +19,7 @@
 #include "ace/OS_NS_string.h"
 #include "ace/High_Res_Timer.h"
 #include "ace/INET_Addr.h"
+#include "ace/Hash_Map_Manager.h"
 #include <math.h>
 
 #include <vector>
@@ -1395,8 +1396,8 @@ private:
 //在框架里自己判定是否转换大小端
 enum ENUM_CHAR_ORDER
 {
-	SYSTEM_LITTLE_ORDER = 0,   //小端字序
-	SYSTEM_BIG_ORDER,          //大端字序
+    SYSTEM_LITTLE_ORDER = 0,   //小端字序
+    SYSTEM_BIG_ORDER,          //大端字序
 };
 
 enum
@@ -1651,6 +1652,13 @@ struct _ClientNameInfo
     }
 };
 typedef vector<_ClientNameInfo> vecClientNameInfo;
+
+//格式化一个ACE Hash类
+template<class EXT_ID, class INT_ID>
+class ACE_Hash_Map :
+    public ACE_Hash_Map_Manager_Ex<EXT_ID, INT_ID,
+    ACE_Hash<EXT_ID>, ACE_Equal_To<EXT_ID>, ACE_Null_Mutex>
+{};
 
 END_NAMESPACE
 USING_NAMESPACE

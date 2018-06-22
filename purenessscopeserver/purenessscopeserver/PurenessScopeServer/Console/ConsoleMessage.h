@@ -3,7 +3,6 @@
 
 #include "MessageDispose.h"
 #include "XmlConfig.h"
-#include <map>
 
 class CConsoleMessage
 {
@@ -31,7 +30,7 @@ private:
 
     //定义统一的函数指针模板
     typedef void(*DoMessage_Logic)(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
-    typedef map<string, DoMessage_Logic> mapMessageList;
+    typedef ACE_Hash_Map<string, DoMessage_Logic> mapMessageList;
     mapMessageList      m_objHashMessageLogicList;             //处理函数Hash列表
 };
 

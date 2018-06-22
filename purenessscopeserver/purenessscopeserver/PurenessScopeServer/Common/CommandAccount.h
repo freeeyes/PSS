@@ -10,7 +10,6 @@
 #include "define.h"
 #include "LogManager.h"
 #include "HashTable.h"
-#include "ace/Hash_Map_Manager.h"
 
 //统计信息，里面有要统计的命令信息定义
 class _CommandData
@@ -218,13 +217,6 @@ typedef vector<_Port_Data_Account> vecPortDataAccount;
 
 //合并结果集
 void Combo_Port_List(vecPortDataAccount& vec_Port_Data_Account, vecPortDataAccount& vec_Port_Data_All_Account);
-
-//格式化一个ACE Hash类
-template<class EXT_ID, class INT_ID>
-class ACE_Hash_Map :
-    public ACE_Hash_Map_Manager_Ex<EXT_ID, INT_ID,
-    ACE_Hash<EXT_ID>, ACE_Equal_To<EXT_ID>, ACE_Null_Mutex>
-{};
 
 //统计所有进出框架的命令执行情况，目前不包括向其他服务器请求的统计，因为这部分协议无法统一。
 class CCommandAccount
