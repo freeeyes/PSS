@@ -13,4 +13,5 @@
 
 ##work by ruqi
 > 1. 配置PSS生成Windows程序在sonar里检测与代码覆盖 (Doing)
-> 2. 重新设计PSS现有目录结构，把框架，插件，模块，工具分类。 (waiting)
+> 2. 搭建jenkins配合sonar做Windows下的检测 (waiting)
+> 3. 重新设计PSS现有目录结构，把框架，插件，模块，工具分类。 (waiting)
