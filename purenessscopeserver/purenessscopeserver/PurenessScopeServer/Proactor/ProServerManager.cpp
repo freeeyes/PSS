@@ -379,6 +379,10 @@ bool CProServerManager::Close()
         SAFE_DELETE(m_pFrameLoggingStrategy);
     }
 
+    //等待所有资源释放完毕
+    ACE_Time_Value tvSleep(0, 100);
+    ACE_OS::sleep(tvSleep);
+
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]EndLogStrategy end....\n"));
 
     return true;
