@@ -259,7 +259,7 @@ public:
                                  objCreateList[i].m_u4Line,
                                  objCreateList[i].m_u4Count);
 
-                    if (ioFile.send (szLog, strlen(szLog)) != strlen(szLog))
+                    if ((int)ioFile.send (szLog, strlen(szLog)) != (int)strlen(szLog))
                     {
                         OUR_DEBUG((LM_INFO, "[CObjectPoolManager::OutputCreateInfo]Write filename:%s Error.\n",strFileName.c_str()));
                     }

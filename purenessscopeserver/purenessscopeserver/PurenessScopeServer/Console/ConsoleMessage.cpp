@@ -263,7 +263,7 @@ int CConsoleMessage::DoCommand(_CommandInfo& CommandInfo, IBuffPacket* pCurrBuff
     }
 
     //查找并处理指令信息
-    DoMessage_Logic fn_DoMessage_Logic;
+    DoMessage_Logic fn_DoMessage_Logic = NULL;
     m_objHashMessageLogicList.find((string)CommandInfo.m_szCommandTitle, fn_DoMessage_Logic);
 
     if (NULL != fn_DoMessage_Logic)

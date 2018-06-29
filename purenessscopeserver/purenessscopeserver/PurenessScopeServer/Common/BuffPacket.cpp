@@ -41,14 +41,6 @@ bool CBuffPacket::Init(int32 nSize, int32 nMaxBuffSize)
         m_szData          = (char*)App_ACEMemory::instance()->malloc(m_u4PacketLen);
         m_u4BuffID        = 0;
 
-        if(NULL == m_szData)
-        {
-            OUR_DEBUG((LM_ERROR, "[CBuffPacket::Init] nSize [%d] is new error.\n", m_u4PacketLen));
-            char szError[MAX_BUFF_500] = {'\0'};
-            sprintf_safe(szError, MAX_BUFF_500, "[CBuffPacket::Init] nSize [%d] is new error..", m_u4PacketLen);
-            throw std::domain_error(szError);
-        }
-
         m_blNetSort = false;
 
         return true;
