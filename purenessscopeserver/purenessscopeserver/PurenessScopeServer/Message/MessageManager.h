@@ -93,13 +93,15 @@ public:
     {
         _ClientCommandInfo* pClientCommandInfo = new _ClientCommandInfo();
         pClientCommandInfo->m_pClientCommand  = pClientCommand;
-        m_vecClientCommandList.push_back(pClientCommandInfo);
+
         sprintf_safe(pClientCommandInfo->m_szModuleName, MAX_BUFF_100, "%s", pMuduleName);
 
         if (NULL != pListenInfo)
         {
             pClientCommandInfo->m_objListenIPInfo = (*pListenInfo);
         }
+
+        m_vecClientCommandList.push_back(pClientCommandInfo);
 
         return pClientCommandInfo;
     }
