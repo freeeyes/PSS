@@ -87,7 +87,7 @@ matrix:
         - make -j 4
         - ./Test_Pss
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
-        - cat pssout.file
+        # - cat pssout.file
         #close server
         - killall PurenessScopeServer
         - sleep 5
@@ -95,17 +95,20 @@ matrix:
         # - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/.obj
         # - gcovr -r ../ -o ../../report.xml --xml-pretty
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
-        - gcov -r -o ./.obj ../*.cpp
-        - gcov -r -o ./.obj ../Common/*.cpp
-        - gcov -r -o ./.obj ../Console/*.cpp
-        - gcov -r -o ./.obj ../FileTest/*.cpp
-        - gcov -r -o ./.obj ../Encrypt/*.cpp
-        - gcov -r -o ./.obj ../PacketParse/*.cpp
-        - gcov -r -o ./.obj ../LogSystem/*.cpp
-        - gcov -r -o ./.obj ../Message/*.cpp
-        - gcov -r -o ./.obj ../Reactor/*.cpp
-        - gcov -r -o ./.obj ../CppUnit/*.cpp
-        - gcov -r -o ./.obj ../UDP/*.cpp
+        - gcov -r -o ./.obj ../*.cpp > /dev/null
+        - gcov -r -o ./.obj ../Common/*.cpp > /dev/null
+        - gcov -r -o ./.obj ../Console/*.cpp > /dev/null
+        - gcov -r -o ./.obj ../FileTest/*.cpp > /dev/null
+        - gcov -r -o ./.obj ../Encrypt/*.cpp > /dev/null
+        - gcov -r -o ./.obj ../PacketParse/*.cpp > /dev/null
+        - gcov -r -o ./.obj ../LogSystem/*.cpp > /dev/null
+        - gcov -r -o ./.obj ../Message/*.cpp > /dev/null
+        - gcov -r -o ./.obj ../Reactor/*.cpp > /dev/null
+        - gcov -r -o ./.obj ../CppUnit/*.cpp > /dev/null
+        - gcov -r -o ./.obj ../UDP/*.cpp > /dev/null
+        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/reports/cppunit
+        - ls 
+        - cat report.xml
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer
         - sonar-scanner -X
 
