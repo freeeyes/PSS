@@ -44,17 +44,24 @@ int CModuleMessageManager::SendFrameMessage(uint16 u2CommandID, uint32 u4Connect
         objPacketParse.SetPacket_Body_Message(pMb);
     }
 
-    objMakePacket.m_PacketType   = PACKET_TCP;
-    objMakePacket.m_u4ConnectID  = u4ConnectID;
-    objMakePacket.m_pPacketParse = &objPacketParse;
-    objMakePacket.m_u1Option     = PACKET_PARSE;
-
-    if(true == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
+    if (u4ConnectID > 0)
     {
-        return 0;
+        objMakePacket.m_PacketType = PACKET_TCP;
+        objMakePacket.m_u4ConnectID = u4ConnectID;
+        objMakePacket.m_pPacketParse = &objPacketParse;
+        objMakePacket.m_u1Option = PACKET_PARSE;
+
+        if (true == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
+        {
+            return 0;
+        }
+        else
+        {
+            return 1;
+        }
     }
     else
     {
-        return 1;
+        return 0;
     }
 }

@@ -65,7 +65,7 @@ void CUnit_ModuleMessageManager::Test_SendFrameMessage(void)
     pHeadPacket->WriteStream(szSession, 32);
     pBodyPacket->WriteStream(szData, (int)ACE_OS::strlen(szData));
 
-    if (0 == m_pModuleMessageManager->SendFrameMessage(u2Command, 1, pHeadPacket, pBodyPacket))
+    if (0 == m_pModuleMessageManager->SendFrameMessage(u2Command, 0, pHeadPacket, pBodyPacket))
     {
         blRet = true;
     }
