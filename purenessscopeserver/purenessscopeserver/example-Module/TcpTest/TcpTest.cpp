@@ -10,7 +10,7 @@
 #include "ace/svc_export.h"
 
 static const char* g_szDesc      = "样例TCP模块";       //模块的描述文字
-static const char* g_szName      = "TCP测试";           //模块的名字
+static const char* g_szName      = "TCPTest";           //模块的名字
 static const char* g_szModuleKey = "BaseTCP";           //模块的Key
 
 #ifdef WIN32

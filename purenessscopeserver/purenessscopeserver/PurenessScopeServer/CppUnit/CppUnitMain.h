@@ -21,6 +21,7 @@
 #include "Unit_IPAccount.h"
 #include "Unit_FrameCommand.h"
 #include "Unit_TimeQueue.h"
+#include "Unit_ModuleMessageManager.h"
 
 #define CPPUNIT_REPORT_PATH "./reports/cppunit/report.xml"
 

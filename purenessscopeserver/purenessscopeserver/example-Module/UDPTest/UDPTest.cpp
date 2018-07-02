@@ -9,7 +9,7 @@
 #include "ace/svc_export.h"
 
 static const char *g_szDesc      = "样例UDP模块";       //模块的描述文字
-static const char *g_szName      = "UDP测试";           //模块的名字
+static const char *g_szName      = "UDPTest";           //模块的名字
 static const char *g_szModuleKey = "BaseUDP";           //模块的Key
 
 #ifdef WIN32
