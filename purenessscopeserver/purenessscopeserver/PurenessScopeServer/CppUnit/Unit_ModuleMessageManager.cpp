@@ -28,7 +28,8 @@ void CUnit_ModuleMessageManager::Test_SendModuleMessage(void)
     sprintf_safe(szSession, 32, "freeeyes");
     sprintf_safe(szData, 30, "freeeyes");
 
-    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create();
+    IBuffPacket* pBuffPacket       = App_BuffPacketManager::instance()->Create();
+    IBuffPacket* pReturnBuffPacket = App_BuffPacketManager::instance()->Create();
 
     (*pBuffPacket) << (uint16)1;
     (*pBuffPacket) << u2Command;
@@ -36,7 +37,7 @@ void CUnit_ModuleMessageManager::Test_SendModuleMessage(void)
     pBuffPacket->WriteStream(szSession, 32);
     pBuffPacket->WriteStream(szData, (int)ACE_OS::strlen(szData));
 
-    if(0 == m_pModuleMessageManager->SendModuleMessage("UDPTest", u2Command, pBuffPacket, NULL))
+    if(0 == m_pModuleMessageManager->SendModuleMessage("UDPTest", u2Command, pBuffPacket, pReturnBuffPacket))
     {
         blRet = true;
     }
@@ -69,6 +70,9 @@ void CUnit_ModuleMessageManager::Test_SendFrameMessage(void)
     {
         blRet = true;
     }
+
+    App_BuffPacketManager::instance()->Delete(pHeadPacket);
+    App_BuffPacketManager::instance()->Delete(pBodyPacket);
 
     CPPUNIT_ASSERT_MESSAGE("[Test_SendFrameMessage]SendModuleMessage is fail.", true == blRet);
 }
