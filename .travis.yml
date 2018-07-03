@@ -87,7 +87,7 @@ matrix:
         - make -j 4
         - ./Test_Pss
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
-        # - cat pssout.file
+        - cat pssout.file
         #close server
         - killall PurenessScopeServer
         - sleep 5
@@ -106,9 +106,9 @@ matrix:
         - gcov -r -o ./.obj ../Reactor/*.cpp > /dev/null
         - gcov -r -o ./.obj ../CppUnit/*.cpp > /dev/null
         - gcov -r -o ./.obj ../UDP/*.cpp > /dev/null
-        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/reports/cppunit
-        - ls 
-        - cat report.xml
+        #- cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/reports/cppunit
+        #- ls 
+        #- cat report.xml
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer
         - sonar-scanner -X
 
