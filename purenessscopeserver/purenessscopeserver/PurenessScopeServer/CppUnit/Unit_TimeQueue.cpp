@@ -51,11 +51,14 @@ void CUnit_TimerManager::Test_TimerManager(void)
         CPPUNIT_ASSERT_MESSAGE("[Test_TimerManager]schedule is fail.", true == blRet);
     }
 
-    ACE_Time_Value tvSleep(1, 0);
+    ACE_Time_Value tvSleep(0, 2000);
     ACE_OS::sleep(tvSleep);
 
     objActiveTimer.deactivate();
     objActiveTimer.close();
+
+    ACE_Time_Value tvSleep(0, 1000);
+    ACE_OS::sleep(tvSleep);
     OUR_DEBUG((LM_INFO, "[CUnit_TimerManager]objActiveTimer is close.\n"));
 }
 
