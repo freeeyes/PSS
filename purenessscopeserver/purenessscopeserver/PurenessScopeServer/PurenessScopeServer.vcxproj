@@ -204,6 +204,7 @@
     <ClCompile Include="CppUnit\Unit_CommandAccount.cpp" />
     <ClCompile Include="CppUnit\Unit_ConnectTcp.cpp" />
     <ClCompile Include="CppUnit\Unit_ConnectUdp.cpp" />
+    <ClCompile Include="CppUnit\Unit_FileLog.cpp" />
     <ClCompile Include="CppUnit\Unit_FileTestManager.cpp" />
     <ClCompile Include="CppUnit\Unit_FrameCommand.cpp" />
     <ClCompile Include="CppUnit\Unit_IPAccount.cpp" />
@@ -591,6 +592,7 @@
     <ClInclude Include="CppUnit\Unit_Common.h" />
     <ClInclude Include="CppUnit\Unit_ConnectTcp.h" />
     <ClInclude Include="CppUnit\Unit_ConnectUdp.h" />
+    <ClInclude Include="CppUnit\Unit_FileLog.h" />
     <ClInclude Include="CppUnit\Unit_FileTestManager.h" />
     <ClInclude Include="CppUnit\Unit_FrameCommand.h" />
     <ClInclude Include="CppUnit\Unit_IPAccount.h" />
