@@ -104,8 +104,8 @@ matrix:
         - gcov -r -o ./.obj ../LogSystem/*.cpp > /dev/null
         - gcov -r -o ./.obj ../Message/*.cpp > /dev/null
         - gcov -r -o ./.obj ../Reactor/*.cpp > /dev/null
-        - gcov -r -o ./.obj ../CppUnit/*.cpp > /dev/null
         - gcov -r -o ./.obj ../UDP/*.cpp > /dev/null
+        - gcov -r -o ./.obj ../CppUnit/*.cpp > /dev/null
         #- cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/reports/cppunit
         #- ls 
         #- cat report.xml
