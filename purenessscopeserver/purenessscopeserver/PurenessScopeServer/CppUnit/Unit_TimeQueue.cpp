@@ -57,8 +57,8 @@ void CUnit_TimerManager::Test_TimerManager(void)
     objActiveTimer.deactivate();
     objActiveTimer.close();
 
-    ACE_Time_Value tvSleep(0, 1000);
-    ACE_OS::sleep(tvSleep);
+    ACE_Time_Value tvSleepClose(0, 1000);
+    ACE_OS::sleep(tvSleepClose);
     OUR_DEBUG((LM_INFO, "[CUnit_TimerManager]objActiveTimer is close.\n"));
 }
 
