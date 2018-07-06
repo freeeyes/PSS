@@ -155,7 +155,8 @@ int CBaseCommand::DoMessage_HandIn(IMessage* pMessage, bool& bDeleteFlag)
 	if(NULL != m_pServerObject->GetConnectManager())
 	{
 		//发送全部数据
-		m_pServerObject->GetConnectManager()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID, szReturnData, 
+		const char* ptrReturnData = reinterpret_cast<const char*>(szReturnData);
+		m_pServerObject->GetConnectManager()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID, ptrReturnData, 
 			(uint32)ACE_OS::strlen(szReturnData), SENDMESSAGE_JAMPNOMAL, u2PostCommandID, PACKET_SEND_IMMEDIATLY, PACKET_IS_SELF_RECYC);
 	}
 	else
@@ -198,7 +199,8 @@ int CBaseCommand::DoMessage_DataIn(IMessage* pMessage, bool& bDeleteFlag)
 	if(NULL != m_pServerObject->GetConnectManager())
 	{
 		//发送全部数据
-		m_pServerObject->GetConnectManager()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID, szReturnBuff, 
+		const char* ptrReturnData = reinterpret_cast<const char*>(szReturnBuff);
+		m_pServerObject->GetConnectManager()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID, ptrReturnData, 
 			u4ReturnLen, SENDMESSAGE_JAMPNOMAL, u2PostCommandID, PACKET_SEND_IMMEDIATLY, PACKET_IS_SELF_RECYC);
 	}
 	else
