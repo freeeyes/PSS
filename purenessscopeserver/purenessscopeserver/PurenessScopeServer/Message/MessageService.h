@@ -174,10 +174,6 @@ private:
     vecMessageService m_vecMessageService;
 
 public:
-    typedef CObjectLruList<_Connect_Chart_Info, ACE_Null_Mutex> C_Connect_Chart_List;   //连接信息历史记录
-    typedef CObjectLruList<_Command_Chart_Info, ACE_Null_Mutex> C_Command_Chart_List;   //命令执行信息历史记录
-    typedef vector<C_Command_Chart_List>                        vec_Command_Chart_Info; //命令信息历史信息记录
-
     uint32                                              m_u4MaxQueue;              //线程中最大消息对象个数
     uint32                                              m_u4HighMask;              //线程高水位
     uint32                                              m_u4LowMask;               //线程低水位
