@@ -304,6 +304,12 @@
     <ClCompile Include="CppUnit\Unit_FileLog.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="CppUnit\Unit_BaseConnectClient.cpp">
+      <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="CppUnit\Uint_ServerMessageInfoPool.cpp">
+      <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -717,9 +723,6 @@
     <ClInclude Include="CppUnit\Unit_FrameCommand.h">
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="CppUnit\Unit_ConnectUdp.h">
-      <Filter>CppUnit</Filter>
-    </ClInclude>
     <ClInclude Include="CppUnit\PostUdpServerMessage.h">
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
@@ -730,6 +733,15 @@
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
     <ClInclude Include="CppUnit\Unit_FileLog.h">
+      <Filter>CppUnit\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\Unit_ConnectUdp.h">
+      <Filter>CppUnit\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\Unit_BaseConnectClient.h">
+      <Filter>CppUnit\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\Uint_ServerMessageInfoPool.h">
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
   </ItemGroup>

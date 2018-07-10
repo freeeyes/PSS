@@ -197,8 +197,10 @@
     <ClCompile Include="CppUnit\CppUnitMain.cpp" />
     <ClCompile Include="CppUnit\Uint_ConsoleMessage.cpp" />
     <ClCompile Include="CppUnit\Uint_ConsolePromissions.cpp" />
+    <ClCompile Include="CppUnit\Uint_ServerMessageInfoPool.cpp" />
     <ClCompile Include="CppUnit\Unit_Aes.cpp" />
     <ClCompile Include="CppUnit\Unit_AppConfig.cpp" />
+    <ClCompile Include="CppUnit\Unit_BaseConnectClient.cpp" />
     <ClCompile Include="CppUnit\Unit_BaseHandler.cpp" />
     <ClCompile Include="CppUnit\Unit_BuffPacket.cpp" />
     <ClCompile Include="CppUnit\Unit_CommandAccount.cpp" />
@@ -584,8 +586,10 @@
     <ClInclude Include="CppUnit\PostUdpServerMessage.h" />
     <ClInclude Include="CppUnit\Uint_ConsoleMessage.h" />
     <ClInclude Include="CppUnit\Uint_ConsolePromissions.h" />
+    <ClInclude Include="CppUnit\Uint_ServerMessageInfoPool.h" />
     <ClInclude Include="CppUnit\Unit_Aes.h" />
     <ClInclude Include="CppUnit\Unit_AppConfig.h" />
+    <ClInclude Include="CppUnit\Unit_BaseConnectClient.h" />
     <ClInclude Include="CppUnit\Unit_BaseHandler.h" />
     <ClInclude Include="CppUnit\Unit_BuffPacket.h" />
     <ClInclude Include="CppUnit\Unit_CommandAccount.h" />
