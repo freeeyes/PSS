@@ -21,6 +21,9 @@ public:
     virtual void tearDown(void);
 
     void Test_Make_Common_Dispose_Client_WorkTread_Message(void);
+
+private:
+    uint16 m_u2CommandID;
 };
 
 #endif
