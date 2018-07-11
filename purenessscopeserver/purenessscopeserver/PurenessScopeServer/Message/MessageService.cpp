@@ -339,8 +339,6 @@ int CMessageService::Close()
 {
     if(m_blRun)
     {
-        m_blRun = false;
-
         if (false == this->CloseMsgQueue())
         {
             OUR_DEBUG((LM_INFO, "[CMessageService::Close]CloseMsgQueue is fail.\n"));
@@ -348,7 +346,6 @@ int CMessageService::Close()
     }
     else
     {
-        m_blRun = false;
         msg_queue()->deactivate();
     }
 
@@ -680,7 +677,7 @@ bool CMessageService::Dispose_Queue()
 
     if (getq(mb, 0) == -1)
     {
-        OUR_DEBUG((LM_ERROR, "[CMessageService::svc] PutMessage error errno = [%d].\n", ACE_OS::last_error()));
+        OUR_DEBUG((LM_ERROR, "[CMessageService::Dispose_Queue] PutMessage error errno = [%d].\n", ACE_OS::last_error()));
         m_blRun = false;
         return false;
     }
@@ -698,6 +695,7 @@ bool CMessageService::Dispose_Queue()
         this->msg_queue()->deactivate();
         m_cond.signal();
         m_mutex.release();
+        m_blRun = false;
         return false;
     }
     else

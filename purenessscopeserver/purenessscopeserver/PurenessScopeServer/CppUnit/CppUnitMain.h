@@ -25,6 +25,7 @@
 #include "Unit_FileLog.h"
 #include "Unit_BaseConnectClient.h"
 #include "Uint_ServerMessageInfoPool.h"
+#include "Uint_ServerMessageManager.h"
 
 #define CPPUNIT_REPORT_PATH "./reports/cppunit/report.xml"
 

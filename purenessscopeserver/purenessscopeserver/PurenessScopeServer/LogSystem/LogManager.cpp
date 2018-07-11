@@ -166,7 +166,6 @@ int CLogManager::Close()
     {
         msg_queue()->deactivate();
         msg_queue()->flush();
-        m_blRun = false;
     }
 
     return 0;
@@ -198,7 +197,7 @@ int CLogManager::Start()
 
 int CLogManager::Stop()
 {
-    m_blRun = false;
+    Close();
     return 0;
 }
 
@@ -298,7 +297,8 @@ bool CLogManager::Dispose_Queue()
         this->msg_queue()->deactivate();
         m_cond.signal();
         m_mutex.release();
-        return false;
+        m_blRun = false;
+        return true;
     }
     else
     {

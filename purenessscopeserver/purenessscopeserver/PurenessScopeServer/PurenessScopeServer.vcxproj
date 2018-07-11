@@ -198,6 +198,7 @@
     <ClCompile Include="CppUnit\Uint_ConsoleMessage.cpp" />
     <ClCompile Include="CppUnit\Uint_ConsolePromissions.cpp" />
     <ClCompile Include="CppUnit\Uint_ServerMessageInfoPool.cpp" />
+    <ClCompile Include="CppUnit\Uint_ServerMessageManager.cpp" />
     <ClCompile Include="CppUnit\Unit_Aes.cpp" />
     <ClCompile Include="CppUnit\Unit_AppConfig.cpp" />
     <ClCompile Include="CppUnit\Unit_BaseConnectClient.cpp" />
@@ -587,6 +588,7 @@
     <ClInclude Include="CppUnit\Uint_ConsoleMessage.h" />
     <ClInclude Include="CppUnit\Uint_ConsolePromissions.h" />
     <ClInclude Include="CppUnit\Uint_ServerMessageInfoPool.h" />
+    <ClInclude Include="CppUnit\Uint_ServerMessageManager.h" />
     <ClInclude Include="CppUnit\Unit_Aes.h" />
     <ClInclude Include="CppUnit\Unit_AppConfig.h" />
     <ClInclude Include="CppUnit\Unit_BaseConnectClient.h" />

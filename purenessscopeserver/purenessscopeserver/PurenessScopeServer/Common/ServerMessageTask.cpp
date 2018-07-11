@@ -155,16 +155,17 @@ int CServerMessageTask::Close()
 {
     if (m_blRun)
     {
-        m_blRun = false;
+        OUR_DEBUG((LM_INFO, "[CServerMessageTask::Close]Begin.\n"));
 
         if (-1 == this->CloseMsgQueue())
         {
             OUR_DEBUG((LM_INFO, "[CServerMessageTask::Close]CloseMsgQueue error.\n"));
         }
+
+        OUR_DEBUG((LM_INFO, "[CServerMessageTask::Close]End.\n"));
     }
     else
     {
-        m_blRun = false;
         msg_queue()->deactivate();
         msg_queue()->flush();
     }
@@ -174,32 +175,30 @@ int CServerMessageTask::Close()
 
 int CServerMessageTask::svc(void)
 {
-    //稍微休息一下，等一下其他线程再如主循环
-    ACE_Time_Value tvSleep(0, MAX_MSG_SENDCHECKTIME*MAX_BUFF_1000);
-    ACE_OS::sleep(tvSleep);
-
     while(m_blRun)
     {
         ACE_Message_Block* mb = NULL;
         ACE_OS::last_error(0);
 
-        if ((0 == mb->size()) && (mb->msg_type() == ACE_Message_Block::MB_STOP))
-        {
-            m_mutex.acquire();
-            mb->release();
-            this->msg_queue()->deactivate();
-            m_cond.signal();
-            m_mutex.release();
-            break;
-        }
-
         if(getq(mb, 0) == -1)
         {
-            OUR_DEBUG((LM_ERROR,"[CMessageService::svc] PutMessage error errno = [%d].\n", ACE_OS::last_error()));
+            OUR_DEBUG((LM_ERROR,"[CMessageService::svc] getq error errno = [%d].\n", ACE_OS::last_error()));
             m_blRun = false;
         }
         else
         {
+            //处理结束消息队列线程
+            if (mb->msg_type() == ACE_Message_Block::MB_STOP)
+            {
+                m_mutex.acquire();
+                mb->release();
+                this->msg_queue()->deactivate();
+                m_cond.signal();
+                m_mutex.release();
+                m_blRun = false;
+                break;
+            }
+
             //处理ClientMessage对象添加
             if (mb->msg_type() == ADD_SERVER_CLIENT)
             {
@@ -324,7 +323,7 @@ bool CServerMessageTask::PutMessage_Del_Client(IClientMessage* pClientMessage)
 
     if (NULL == pmb)
     {
-        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::PutMessage_Add_Client] ACE_Message_Block is NULL.\n"));
+        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::PutMessage_Del_Client] ACE_Message_Block is NULL.\n"));
         return false;
     }
 
@@ -337,7 +336,7 @@ bool CServerMessageTask::PutMessage_Del_Client(IClientMessage* pClientMessage)
 
     if (nQueueCount >= (int)m_u4MaxQueue)
     {
-        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::PutMessage_Add_Client] Queue is Full nQueueCount = [%d].\n", nQueueCount));
+        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::PutMessage_Del_Client] Queue is Full nQueueCount = [%d].\n", nQueueCount));
         return false;
     }
 
@@ -345,7 +344,7 @@ bool CServerMessageTask::PutMessage_Del_Client(IClientMessage* pClientMessage)
 
     if (this->putq(pmb, &xtime) == -1)
     {
-        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::PutMessage_Add_Client] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
+        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::PutMessage_Del_Client] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
         return false;
     }
 

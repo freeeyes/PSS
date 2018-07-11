@@ -1788,6 +1788,7 @@ int CProConnectManager::svc (void)
                 this->msg_queue ()->deactivate ();
                 m_cond.signal();
                 m_mutex.release();
+                m_blRun = false;
                 break;
             }
 

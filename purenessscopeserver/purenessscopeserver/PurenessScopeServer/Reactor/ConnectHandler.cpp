@@ -2172,6 +2172,7 @@ bool CConnectManager::Dispose_Queue()
             this->msg_queue()->deactivate();
             m_cond.signal();
             m_mutex.release();
+            m_blRun = false;
             return false;
         }
 
