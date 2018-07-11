@@ -50,7 +50,6 @@ void CUnit_ServerMessageInfoPool::Test_ServerMessageInfoPool(void)
     {
         OUR_DEBUG((LM_INFO, "[Test_ServerMessageInfoPool]GetFreeCount is not MAX_SERVER_MESSAGE_INFO_COUNT.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_ServerMessageInfoPool]GetFreeCount is not MAX_SERVER_MESSAGE_INFO_COUNT.", true == blRet);
-        return;
     }
 }
 

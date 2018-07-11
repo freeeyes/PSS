@@ -9,17 +9,18 @@ CUnit_BaseConnectClient::~CUnit_BaseConnectClient()
 
 void CUnit_BaseConnectClient::setUp(void)
 {
+    m_u2CommandID = 0x1003;
 }
 
 void CUnit_BaseConnectClient::tearDown(void)
 {
+    m_u2CommandID = 0;
 }
 
 void CUnit_BaseConnectClient::Test_Make_Common_Dispose_Client_WorkTread_Message(void)
 {
     bool blRet = false;
 
-    uint16 u2CommandID = 0x1003;
     uint32 u4ServerID  = 1;
 
     char szData[10] = { '\0' };
@@ -31,11 +32,10 @@ void CUnit_BaseConnectClient::Test_Make_Common_Dispose_Client_WorkTread_Message(
 
     ACE_INET_Addr AddrRemote;
 
-    if (0 != Make_Common_Dispose_Client_WorkTread_Message(u2CommandID, u4ServerID, pmblk, AddrRemote))
+    if (0 != Make_Common_Dispose_Client_WorkTread_Message(m_u2CommandID, u4ServerID, pmblk, AddrRemote))
     {
         OUR_DEBUG((LM_INFO, "[Make_Common_Dispose_Client_WorkTread_Message]Error.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Make_Common_Dispose_Client_WorkTread_Message]Error.", true == blRet);
-        return;
     }
 }
 
