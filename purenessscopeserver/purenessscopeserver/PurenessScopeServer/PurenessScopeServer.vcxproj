@@ -215,7 +215,9 @@
     <ClCompile Include="CppUnit\Unit_MessageDefine.cpp" />
     <ClCompile Include="CppUnit\Unit_MessageDyeingManager.cpp" />
     <ClCompile Include="CppUnit\Unit_ModuleMessageManager.cpp" />
+    <ClCompile Include="CppUnit\Unit_ProfileTime.cpp" />
     <ClCompile Include="CppUnit\Unit_TimeQueue.cpp" />
+    <ClCompile Include="CppUnit\Unit_WorkThreadAI.cpp" />
     <ClCompile Include="Message\MessageDyeingManager.cpp" />
     <ClCompile Include="PurenessScopeServer.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -606,7 +608,9 @@
     <ClInclude Include="CppUnit\Unit_Logging.h" />
     <ClInclude Include="CppUnit\Unit_MessageDefine.h" />
     <ClInclude Include="CppUnit\Unit_ModuleMessageManager.h" />
+    <ClInclude Include="CppUnit\Unit_ProfileTime.h" />
     <ClInclude Include="CppUnit\Unit_TimeQueue.h" />
+    <ClInclude Include="CppUnit\Unit_WorkThreadAI.h" />
     <ClInclude Include="Encrypt\Aes.h" />
     <ClInclude Include="FileTest\FileTest.h" />
     <ClInclude Include="FileTest\FileTestManager.h" />

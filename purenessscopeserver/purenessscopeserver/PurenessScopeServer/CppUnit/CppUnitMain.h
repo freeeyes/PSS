@@ -27,6 +27,8 @@
 #include "Uint_ServerMessageInfoPool.h"
 #include "Uint_ServerMessageManager.h"
 #include "Unit_MessageDyeingManager.h"
+#include "Unit_ProfileTime.h"
+#include "Unit_WorkThreadAI.h"
 
 #define CPPUNIT_REPORT_PATH "./reports/cppunit/report.xml"
 

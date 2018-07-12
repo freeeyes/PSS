@@ -235,14 +235,14 @@ class _CommandTimeout
 public:
     uint32 m_u4ThreadID;        //工作线程ID
     uint16 m_u2CommandID;       //超时的命令
-    uint32 m_u4Second;          //超时当前时间，以1970年以来开始计算的秒数
+    uint64 m_u8Second;          //超时当前时间，以1970年以来开始计算的秒数
     uint32 m_u4Timeout;         //命令执行时间，单位是毫秒
 
     _CommandTimeout()
     {
         m_u4ThreadID  = 0;
         m_u2CommandID = 0;
-        m_u4Second    = 0;
+        m_u8Second = 0;
         m_u4Timeout   = 0;
     }
 };
@@ -269,13 +269,13 @@ public:
 
     void ReSet(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime);
 
-    bool CheckCurrTimeout(uint16 u2CommandID, uint32 u4Now);
+    bool CheckCurrTimeout(uint16 u2CommandID, uint64 u8Now);
 
     void GetAllTimeout(uint32 u4ThreadID, vecCommandTimeout& objTimeout);
     void GetAllForbiden(uint32 u4ThreadID, vecCommandTimeout& objForbiden);
 
 private:
-    int Do_Command_Account(uint16 u2CommandID, uint32 u4Now, uint32 u4TimeCost, bool& blRet);   //统计Command的AI数据
+    int Do_Command_Account(uint16 u2CommandID, uint64 u8Now, uint32 u4TimeCost, bool& blRet);   //统计Command的AI数据
 
     uint8      m_u1WTAI;                           //工作线程AI开关，0为关闭，1为打开
     uint16     m_u4DisposeTime;                    //业务包处理超时时间

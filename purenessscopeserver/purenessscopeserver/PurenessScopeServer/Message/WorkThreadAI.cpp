@@ -57,11 +57,11 @@ bool CWorkThreadAI::SaveTimeout(uint16 u2CommandID, uint32 u4TimeCost)
             return false;
         }
 
-        uint32 u4Now = (uint32)ACE_OS::gettimeofday().sec();
+        uint64 u8Now = (uint64)ACE_OS::gettimeofday().sec();
 
         //如果开启AI功能
         bool blState = false;
-        int nRet = Do_Command_Account(u2CommandID, u4Now, u4TimeCost, blState);
+        int nRet = Do_Command_Account(u2CommandID, u8Now, u4TimeCost, blState);
 
         if (1 == nRet)
         {
@@ -77,7 +77,7 @@ bool CWorkThreadAI::SaveTimeout(uint16 u2CommandID, uint32 u4TimeCost)
         if(NULL != pCommandTimeout)
         {
             pCommandTimeout->m_u2CommandID = u2CommandID;
-            pCommandTimeout->m_u4Second    = u4Now;
+            pCommandTimeout->m_u8Second    = u8Now;
             pCommandTimeout->m_u4Timeout   = u4TimeCost;
         }
 
@@ -90,17 +90,17 @@ bool CWorkThreadAI::SaveTimeout(uint16 u2CommandID, uint32 u4TimeCost)
             //需要关闭了
             _CommandTimeout objCommandTimeout;
             objCommandTimeout.m_u2CommandID = u2CommandID;
-            objCommandTimeout.m_u4Second    = u4Now + m_u4WTStopTime;
+            objCommandTimeout.m_u8Second = u8Now + m_u4WTStopTime;
             m_vecCommandTimeout.push_back(objCommandTimeout);
         }
 
-        return false;
+        return true;
     }
 
     return false;
 }
 
-bool CWorkThreadAI::CheckCurrTimeout(uint16 u2CommandID, uint32 u4Now)
+bool CWorkThreadAI::CheckCurrTimeout(uint16 u2CommandID, uint64 u8Now)
 {
     if(m_u1WTAI == 1)
     {
@@ -116,7 +116,7 @@ bool CWorkThreadAI::CheckCurrTimeout(uint16 u2CommandID, uint32 u4Now)
 
             if(objCommandTimeout.m_u2CommandID == u2CommandID)
             {
-                if(objCommandTimeout.m_u4Second >= u4Now)
+                if(objCommandTimeout.m_u8Second >= u8Now)
                 {
                     //在禁止时间内，返回当前命令不应被继续处理
                     return true;
@@ -190,11 +190,11 @@ void CWorkThreadAI::GetAllTimeout(uint32 u4ThreadID, vecCommandTimeout& objTimeo
             {
                 _CommandTimeout objData;
 
-                if(pCommandTime->m_objTime.GetLinkData(j)->m_u4Second > 0)
+                if(pCommandTime->m_objTime.GetLinkData(j)->m_u8Second > 0)
                 {
                     objData.m_u4ThreadID  = u4ThreadID;
                     objData.m_u2CommandID = pCommandTime->m_objTime.GetLinkData(j)->m_u2CommandID;
-                    objData.m_u4Second    = pCommandTime->m_objTime.GetLinkData(j)->m_u4Second;
+                    objData.m_u8Second    = pCommandTime->m_objTime.GetLinkData(j)->m_u8Second;
                     objData.m_u4Timeout   = pCommandTime->m_objTime.GetLinkData(j)->m_u4Timeout;
                     objTimeout.push_back(objData);
                 }
@@ -212,12 +212,12 @@ void CWorkThreadAI::GetAllForbiden(uint32 u4ThreadID, vecCommandTimeout& objForb
         _CommandTimeout objData;
         objData.m_u4ThreadID  = u4ThreadID;
         objData.m_u2CommandID = m_vecCommandTimeout[i].m_u2CommandID;
-        objData.m_u4Second    = m_vecCommandTimeout[i].m_u4Second;
+        objData.m_u8Second    = m_vecCommandTimeout[i].m_u8Second;
         objForbiden.push_back(objData);
     }
 }
 
-int CWorkThreadAI::Do_Command_Account(uint16 u2CommandID, uint32 u4Now, uint32 u4TimeCost, bool& blRet)
+int CWorkThreadAI::Do_Command_Account(uint16 u2CommandID, uint64 u8Now, uint32 u4TimeCost, bool& blRet)
 {
     for (uint16 i = 0; i < (uint16)m_vecCommandTime.size(); i++)
     {
@@ -229,7 +229,7 @@ int CWorkThreadAI::Do_Command_Account(uint16 u2CommandID, uint32 u4Now, uint32 u
             if (NULL != pCommandTimeout)
             {
                 pCommandTimeout->m_u2CommandID = u2CommandID;
-                pCommandTimeout->m_u4Second = u4Now;
+                pCommandTimeout->m_u8Second = u8Now;
                 pCommandTimeout->m_u4Timeout = u4TimeCost;
             }
 
@@ -240,12 +240,12 @@ int CWorkThreadAI::Do_Command_Account(uint16 u2CommandID, uint32 u4Now, uint32 u
 
             if (NULL != pCommandLastTimeout)
             {
-                if (u4Now - pCommandLastTimeout->m_u4Second <= m_u4WTCheckTime)
+                if (u8Now - pCommandLastTimeout->m_u8Second <= m_u4WTCheckTime)
                 {
                     //需要关闭了
                     _CommandTimeout objCommandTimeout;
                     objCommandTimeout.m_u2CommandID = u2CommandID;
-                    objCommandTimeout.m_u4Second = u4Now + m_u4WTStopTime;
+                    objCommandTimeout.m_u8Second = u8Now + m_u4WTStopTime;
                     m_vecCommandTimeout.push_back(objCommandTimeout);
 
                     blRet = true;
