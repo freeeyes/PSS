@@ -213,6 +213,7 @@
     <ClCompile Include="CppUnit\Unit_IPAccount.cpp" />
     <ClCompile Include="CppUnit\Unit_Logging.cpp" />
     <ClCompile Include="CppUnit\Unit_MessageDefine.cpp" />
+    <ClCompile Include="CppUnit\Unit_MessageDyeingManager.cpp" />
     <ClCompile Include="CppUnit\Unit_ModuleMessageManager.cpp" />
     <ClCompile Include="CppUnit\Unit_TimeQueue.cpp" />
     <ClCompile Include="Message\MessageDyeingManager.cpp" />

@@ -71,7 +71,7 @@ void CUnit_ServerMessageManager::Test_ServerMessageManager(void)
 
     pMessage->m_u2CommandID    = 0x1000;
     pMessage->m_pRecvFinish    = pmb;
-    pMessage->m_pClientMessage = (IClientMessage*)&objPostServerData;
+    pMessage->m_pClientMessage = dynamic_cast<IClientMessage*>(&objPostServerData);
 
     OUR_DEBUG((LM_INFO, "[Test_ServerMessageManager]Begin Send Data.\n"));
 
@@ -83,7 +83,7 @@ void CUnit_ServerMessageManager::Test_ServerMessageManager(void)
 
     OUR_DEBUG((LM_INFO, "[Test_ServerMessageManager]Begin Send Finish.\n"));
 
-    m_pServerMessageManager->DelClientMessage((IClientMessage*)&objPostServerData);
+    m_pServerMessageManager->DelClientMessage(dynamic_cast<IClientMessage*>(&objPostServerData));
 
     OUR_DEBUG((LM_INFO, "[Test_ServerMessageManager]DelClientMessage Finish.\n"));
 

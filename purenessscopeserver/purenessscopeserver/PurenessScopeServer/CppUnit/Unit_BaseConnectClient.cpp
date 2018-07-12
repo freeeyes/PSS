@@ -39,4 +39,14 @@ void CUnit_BaseConnectClient::Test_Make_Common_Dispose_Client_WorkTread_Message(
     }
 }
 
+void CUnit_BaseConnectClient::Test_Common_Send_ConnectError(void)
+{
+    ACE_INET_Addr objAddrServer;
+    CPostServerData objPostServerData;
+
+    ACE_Message_Block* pMb = App_MessageBlockManager::instance()->Create(10);
+
+    Common_Send_ConnectError(pMb, objAddrServer, dynamic_cast<IClientMessage*>(&objPostServerData));
+}
+
 #endif

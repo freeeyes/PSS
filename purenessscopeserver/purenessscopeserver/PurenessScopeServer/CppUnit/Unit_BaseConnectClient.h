@@ -4,13 +4,15 @@
 #ifdef _CPPUNIT_TEST
 
 #include "Unit_Common.h"
+#include "PostServerMessage.h"
 #include "BaseConnectClient.h"
-
+#include "BaseClientConnectManager.h"
 
 class CUnit_BaseConnectClient : public CppUnit::TestFixture
 {
     CPPUNIT_TEST_SUITE(CUnit_BaseConnectClient);
     CPPUNIT_TEST(Test_Make_Common_Dispose_Client_WorkTread_Message);
+    CPPUNIT_TEST(Test_Common_Send_ConnectError);
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -21,6 +23,8 @@ public:
     virtual void tearDown(void);
 
     void Test_Make_Common_Dispose_Client_WorkTread_Message(void);
+
+    void Test_Common_Send_ConnectError(void);
 
 private:
     uint16 m_u2CommandID;

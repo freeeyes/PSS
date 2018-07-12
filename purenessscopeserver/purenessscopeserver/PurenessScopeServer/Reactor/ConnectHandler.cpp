@@ -709,22 +709,6 @@ int CConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Size, 
     return 0;
 }
 
-bool CConnectHandler::CheckAlive(ACE_Time_Value& tvNow)
-{
-    ACE_Time_Value tvIntval(tvNow - m_atvInput);
-
-    if(tvIntval.sec() > m_u2MaxConnectTime)
-    {
-        //如果超过了最大时间，则服务器关闭链接
-        OUR_DEBUG ((LM_ERROR, "[CConnectHandle::CheckAlive] Connectid=%d Server Close!\n", GetConnectID()));
-        return false;
-    }
-    else
-    {
-        return true;
-    }
-}
-
 void CConnectHandler::SetRecvQueueTimeCost(uint32 u4TimeCost)
 {
     //如果超过阀值，则记录到日志中去

@@ -310,6 +310,10 @@
     <ClCompile Include="CppUnit\Uint_ServerMessageInfoPool.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="CppUnit\Uint_ServerMessageManager.cpp" />
+    <ClCompile Include="CppUnit\Unit_MessageDyeingManager.cpp">
+      <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -744,6 +748,7 @@
     <ClInclude Include="CppUnit\Uint_ServerMessageInfoPool.h">
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
+    <ClInclude Include="CppUnit\Uint_ServerMessageManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
