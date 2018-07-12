@@ -471,7 +471,7 @@ void DoMessage_CommandInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, 
                 pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
             }
         }
-        
+
         u2ReturnCommandID = CONSOLE_COMMAND_COMMANDINFO;
     }
 }
@@ -948,14 +948,14 @@ void DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
             strSTemp.u1Len = (uint8)GetXmlConfigAttribute(xmlServerVersion)->Version.length();
             (*pBuffPacket) << strSTemp;
 
-						
+
             //返回加载模块个数
             (*pBuffPacket) << (uint16)App_ModuleLoader::instance()->GetCurrModuleCount();
-            	
-            
+
+
             //返回工作线程个数
             (*pBuffPacket) << (uint16)App_MessageServiceGroup::instance()->GetThreadInfo()->GetThreadCount();
-						
+
             //返回当前协议包的版本号
             strSTemp.text = (char*)GetXmlConfigAttribute(xmlServerVersion)->Version.c_str();
             strSTemp.u1Len = (uint8)GetXmlConfigAttribute(xmlServerVersion)->Version.length();
@@ -1460,7 +1460,7 @@ void DoMessage_GetWorkThreadTO(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
             {
                 (*pBuffPacket) << objTimeout[i].m_u4ThreadID;
                 (*pBuffPacket) << objTimeout[i].m_u2CommandID;
-                (*pBuffPacket) << objTimeout[i].m_u4Second;
+                (*pBuffPacket) << (uint32)objTimeout[i].m_u8Second;
                 (*pBuffPacket) << objTimeout[i].m_u4Timeout;
             }
             else
@@ -1469,7 +1469,7 @@ void DoMessage_GetWorkThreadTO(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
                 sprintf_safe(szTemp, MAX_BUFF_1024, "m_u4ThreadID=%d,m_u2CommandID=%d,m_u4Second=%d,m_u4Timeout=%d.\n",
                              objTimeout[i].m_u4ThreadID,
                              objTimeout[i].m_u2CommandID,
-                             objTimeout[i].m_u4Second,
+                             (uint32)objTimeout[i].m_u8Second,
                              objTimeout[i].m_u4Timeout);
                 pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
             }
@@ -1496,7 +1496,7 @@ void DoMessage_GetWorkThreadTO(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
             {
                 (*pBuffPacket) << objTimeoutF[i].m_u4ThreadID;
                 (*pBuffPacket) << objTimeoutF[i].m_u2CommandID;
-                (*pBuffPacket) << objTimeoutF[i].m_u4Second;
+                (*pBuffPacket) << (uint32)objTimeoutF[i].m_u8Second;
             }
             else
             {
@@ -1504,7 +1504,7 @@ void DoMessage_GetWorkThreadTO(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
                 sprintf_safe(szTemp, MAX_BUFF_1024, "m_u4ThreadID=%d,m_u2CommandID=%d,m_u4Second=%d.\n",
                              objTimeoutF[i].m_u4ThreadID,
                              objTimeoutF[i].m_u2CommandID,
-                             objTimeoutF[i].m_u4Second);
+                             (uint32)objTimeoutF[i].m_u8Second);
                 pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
             }
         }
@@ -1939,10 +1939,11 @@ void DoMessage_TestFileStop(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket,
 
 void DoMessage_PortList(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-		OUR_DEBUG((LM_INFO, "[DoMessage_PortList]In.\n"));
+    OUR_DEBUG((LM_INFO, "[DoMessage_PortList]In.\n"));
+
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
-    		OUR_DEBUG((LM_INFO, "[DoMessage_PortList]In 1.\n"));
+        OUR_DEBUG((LM_INFO, "[DoMessage_PortList]In 1.\n"));
         u2ReturnCommandID = CONSOLE_COMMAND_PORT_FLOW;
 
         vector<_Port_Data_Account> vec_Port_Data_Account;
