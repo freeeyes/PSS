@@ -188,6 +188,7 @@
     <ClCompile Include="Common\BaseHander.cpp" />
     <ClCompile Include="Common\BaseServerManager.cpp" />
     <ClCompile Include="Common\BaseTask.cpp" />
+    <ClCompile Include="Common\IPAccount.cpp" />
     <ClCompile Include="Common\ServerMessageTask.cpp" />
     <ClCompile Include="Common\XmlConfig.cpp" />
     <ClCompile Include="Console\ConsolePromiss.cpp" />
