@@ -7,7 +7,6 @@
 //这里采用Hash数组的方式替代
 //默认是当前最大连接的2倍
 
-
 #include <string>
 #include "ace/Date_Time.h"
 #include "define.h"
