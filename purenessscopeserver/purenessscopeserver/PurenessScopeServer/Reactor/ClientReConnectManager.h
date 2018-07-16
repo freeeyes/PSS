@@ -77,11 +77,11 @@ public:
     void GetUDPConnectInfo(vecClientConnectInfo& VecClientConnectInfo);   //返回当前存活链接的信息（UDP）
     virtual EM_Server_Connect_State GetConnectState(int nServerID);               //得到一个当前连接状态
 
+    virtual int handle_timeout(const ACE_Time_Value& current_time, const void* act = 0);               //定时器执行
+
 private:
     bool ConnectTcpInit(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CReactorClientInfo*& pClientInfo);
     bool ConnectUdpInit(int nServerID, CReactorUDPClient*& pReactorUDPClient);
-
-    virtual int handle_timeout(const ACE_Time_Value& current_time, const void* act = 0);               //定时器执行
 
 public:
     CHashTable<CReactorClientInfo> m_objClientTCPList;            //TCP客户端链接

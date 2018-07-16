@@ -326,6 +326,9 @@
     <ClCompile Include="CppUnit\Unit_ControlListen.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="CppUnit\Unit_MakePacket.cpp">
+      <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -768,6 +771,9 @@
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
     <ClInclude Include="CppUnit\Unit_ControlListen.h">
+      <Filter>CppUnit\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\Unit_MakePacket.h">
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
   </ItemGroup>

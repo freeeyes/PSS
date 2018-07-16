@@ -38,6 +38,45 @@ void CUnit_ConnectTcp::Test_Connect_Tcp_Server(void)
     ACE_Time_Value tvConnectSleep(0, 10000);
     ACE_OS::sleep(tvConnectSleep);
 
+    //测试定时执行程序
+    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+    App_ClientReConnectManager::instance()->handle_timeout(tvNow, NULL);
+
+    //获得当前连接信息
+    vecClientConnectInfo VecClientConnectInfo;
+    App_ClientReConnectManager::instance()->GetConnectInfo(VecClientConnectInfo);
+
+    if (1 != VecClientConnectInfo.size())
+    {
+        OUR_DEBUG((LM_INFO, "[Test_Connect_Tcp_Server]App_ClientReConnectManager::instance()->GetConnectInfo() is fail.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Tcp_Server]App_ClientReConnectManager::instance()->GetConnectInfo() is fail.", true == blRet);
+        return;
+    }
+
+    //获得ServerID的连接状态
+    EM_Server_Connect_State emConnectState = App_ClientReConnectManager::instance()->GetConnectState(m_nServerID);
+
+    if (emConnectState != SERVER_CONNECT_OK)
+    {
+        OUR_DEBUG((LM_INFO, "[Test_Connect_Tcp_Server]App_ClientReConnectManager::instance()->GetConnectState is fail.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Tcp_Server]App_ClientReConnectManager::instance()->GetConnectState is fail.", true == blRet);
+        return;
+    }
+
+    //获得当前裂解端口信息
+    App_ClientReConnectManager::instance()->GetServerAddr(m_nServerID);
+
+    _ClientIPInfo objServerIPInfo;
+    App_ClientReConnectManager::instance()->GetServerIPInfo(m_nServerID, objServerIPInfo);
+
+    //设置OK
+    if (false == App_ClientReConnectManager::instance()->SetServerConnectState(m_nServerID, SERVER_CONNECT_OK))
+    {
+        OUR_DEBUG((LM_INFO, "[Test_Connect_Tcp_Server]App_ClientReConnectManager::instance()->SetServerConnectState is fail.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Tcp_Server]App_ClientReConnectManager::instance()->SetServerConnectState is fail.", true == blRet);
+        return;
+    }
+
     //拼装测试发送数据
     char szSendBuffer[MAX_BUFF_200] = { '\0' };
     char szBuff[20]                 = { '\0' };
