@@ -36,14 +36,6 @@ bool CUnit_ConsoleMessage::Create_Command(const char* pCommand, uint16 u2ReturnC
 
     //执行命令
     m_pConsoleMessage->Dispose(pmb, pBuffPacket, u1Output);
-    pmb->release();
-
-    if (NULL == pBuffPacket)
-    {
-        char szError[MAX_BUFF_200] = { '\0' };
-        sprintf_safe(szError, MAX_BUFF_200, "[Create_Command](%s) pBuffPacket is NULL.", pCommand);
-        CPPUNIT_ASSERT_MESSAGE(szError, true == blRet);
-    }
 
     //比较返回关键字是否一致
     uint16 u2CommandID = 0;
@@ -56,6 +48,22 @@ bool CUnit_ConsoleMessage::Create_Command(const char* pCommand, uint16 u2ReturnC
         sprintf_safe(szError, MAX_BUFF_200, "[Create_Command](%s) u2ReturnCommandID error(%d).", pCommand, u2CommandID);
         CPPUNIT_ASSERT_MESSAGE(szError, true == blRet);
     }
+
+    pBuffPacket->Clear();
+
+    //检测命令行模式
+    u1Output = 1;
+    m_pConsoleMessage->Dispose(pmb, pBuffPacket, u1Output);
+
+    if (pBuffPacket->GetPacketLen() <= 0)
+    {
+        char szError[MAX_BUFF_200] = { '\0' };
+        sprintf_safe(szError, MAX_BUFF_200, "[Create_Command](%s) u2ReturnCommandID stream error(%d).", pCommand, u2CommandID);
+        CPPUNIT_ASSERT_MESSAGE(szError, true == blRet);
+    }
+
+    //回收命令行内存
+    pmb->release();
 
     //回收BuffPacket模块
     App_BuffPacketManager::instance()->Delete(pBuffPacket);
