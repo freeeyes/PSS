@@ -31,6 +31,7 @@ void CUnit_FileLogger::Test_FileLogger(void)
 
     if (false == m_pLogFile->Run())
     {
+        OUR_DEBUG((LM_INFO, "[Test_FileLogger]m_pLogFile->Run() fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_FileLogger]m_pLogFile->Run() fail.", true == blRet);
         return;
     }
@@ -43,8 +44,8 @@ void CUnit_FileLogger::Test_FileLogger(void)
 
     if (0 != m_pLogFile->doLog(&objLogBlockInfo))
     {
+        OUR_DEBUG((LM_INFO, "[Test_FileLogger]m_pLogFile->doLog() fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_FileLogger]m_pLogFile->doLog() fail.", true == blRet);
-        return;
     }
 
 }
