@@ -249,5 +249,28 @@ void CUnit_ConsoleMessage::Test_Do_Message_BuffPacket(void)
     Create_Command("t freeeyes BuffPacketState -a&", CONSOLE_COMMAND_PACKET_STATE);
 }
 
+void CUnit_ConsoleMessage::Test_Do_Message_LoadModule(void)
+{
+    //测试插件卸载和添加
+    Create_Command("b freeeyes UnLoadModule TCPTest&", CONSOLE_COMMAND_UNLOADMOUDLE);
+
+    ACE_Time_Value tvSleep(0, 10000);
+    ACE_OS::sleep(tvSleep);
+
+    Create_Command("b freeeyes LoadModule ./,libTcpTest.so,&", CONSOLE_COMMAND_LOADMOUDLE);
+
+    ACE_OS::sleep(tvSleep);
+
+    //测试文本输出
+    Create_Command("t freeeyes UnLoadModule TCPTest&", CONSOLE_COMMAND_UNLOADMOUDLE);
+
+    ACE_Time_Value tvSleep(0, 10000);
+    ACE_OS::sleep(tvSleep);
+
+    Create_Command("t freeeyes LoadModule ./,libTcpTest.so,&", CONSOLE_COMMAND_LOADMOUDLE);
+
+    ACE_OS::sleep(tvSleep);
+}
+
 #endif
 

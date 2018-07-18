@@ -39,6 +39,7 @@ class CUnit_ConsoleMessage : public CppUnit::TestFixture
     CPPUNIT_TEST(Test_DoMessage_MonitorInfo);
     CPPUNIT_TEST(Test_DoMessage_PortList);
     CPPUNIT_TEST(Test_Do_Message_BuffPacket);
+    CPPUNIT_TEST(Test_Do_Message_LoadModule);
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -78,6 +79,7 @@ public:
     void Test_DoMessage_MonitorInfo(void);
     void Test_DoMessage_PortList(void);
     void Test_Do_Message_BuffPacket(void);
+    void Test_Do_Message_LoadModule(void);
 
 private:
     bool Create_Command(const char* pCommand, uint16 u2ReturnCommandID);
