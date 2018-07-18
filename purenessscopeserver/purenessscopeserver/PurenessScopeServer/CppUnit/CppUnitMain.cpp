@@ -30,6 +30,7 @@ CCppUnitMain::CCppUnitMain()
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_WorkThreadAI, "pss");
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_ControlListen, "pss");
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_MakePacket, "pss");
+    CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_ForbiddenIP, "pss");
 }
 
 CCppUnitMain::~CCppUnitMain()

@@ -31,6 +31,7 @@
 #include "Unit_WorkThreadAI.h"
 #include "Unit_ControlListen.h"
 #include "Unit_MakePacket.h"
+#include "Unit_ForbiddenIP.h"
 
 #define CPPUNIT_REPORT_PATH "./reports/cppunit/report.xml"
 
