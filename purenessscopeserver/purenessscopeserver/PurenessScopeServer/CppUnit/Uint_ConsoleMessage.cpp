@@ -264,7 +264,6 @@ void CUnit_ConsoleMessage::Test_Do_Message_LoadModule(void)
     //≤‚ ‘Œƒ±æ ‰≥ˆ
     Create_Command("t freeeyes UnLoadModule TCPTest&", CONSOLE_COMMAND_UNLOADMOUDLE);
 
-    ACE_Time_Value tvSleep(0, 10000);
     ACE_OS::sleep(tvSleep);
 
     Create_Command("t freeeyes LoadModule ./,libTcpTest.so,&", CONSOLE_COMMAND_LOADMOUDLE);
