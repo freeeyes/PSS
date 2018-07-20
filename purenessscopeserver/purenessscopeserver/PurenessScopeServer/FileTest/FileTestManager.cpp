@@ -328,7 +328,7 @@ bool CFileTestManager::AddResponseRecordList(uint32 u4ConnectID, const ACE_Time_
     }
     else
     {
-        OUR_DEBUG((LM_INFO, "[CMainConfig::AddResponseRecordList]file_open error\n"));
+        OUR_DEBUG((LM_INFO, "[CMainConfig::AddResponseRecordList]AddResponseRecordList error\n"));
         return false;
     }
 }

@@ -572,20 +572,10 @@ uint32 CConnectHandler::file_open(IFileTestManager* pFileTest)
                            GetXmlConfigAttribute(xmlClientData)->SendPacketCount,
                            GetXmlConfigAttribute(xmlClientData)->SendDataMax);
 
-    //设置链接为非阻塞模式
-    if (this->peer().enable(ACE_NONBLOCK) == -1)
-    {
-        OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]this->peer().enable  = ACE_NONBLOCK error.\n"));
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::open]this->peer().enable  = ACE_NONBLOCK error.");
-        return 1;
-    }
-
     if (-1 == Init_Open_Connect())
     {
         return 0;
     }
-
-
 
     if (m_pCurrMessage == NULL)
     {
