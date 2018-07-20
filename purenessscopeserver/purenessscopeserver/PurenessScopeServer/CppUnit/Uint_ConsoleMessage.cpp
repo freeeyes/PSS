@@ -40,6 +40,7 @@ bool CUnit_ConsoleMessage::Create_Command(const char* pCommand, uint16 u2ReturnC
         char szError[MAX_BUFF_200] = { '\0' };
         sprintf_safe(szError, MAX_BUFF_200, "[Create_Command](%s)m_pConsoleMessage->Dispose.", pCommand);
         CPPUNIT_ASSERT_MESSAGE(szError, true == blRet);
+        return false;
     }
 
     //比较返回关键字是否一致
@@ -52,6 +53,7 @@ bool CUnit_ConsoleMessage::Create_Command(const char* pCommand, uint16 u2ReturnC
         char szError[MAX_BUFF_200] = { '\0' };
         sprintf_safe(szError, MAX_BUFF_200, "[Create_Command](%s) u2ReturnCommandID error(%d).", pCommand, u2CommandID);
         CPPUNIT_ASSERT_MESSAGE(szError, true == blRet);
+        return false;
     }
 
     //回收命令行内存
