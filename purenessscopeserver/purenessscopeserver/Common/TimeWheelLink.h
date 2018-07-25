@@ -243,7 +243,7 @@ public:
         {
             if (m_pBlockIDList[i] == INVAILD_BLOCKID)
             {
-                if(i == nListSize -1)
+                if(i == nListSize - 1)
                 {
                     m_nBlockIDListIndex = 0;
                 }
@@ -295,10 +295,8 @@ public:
                 char szKey[MAX_TIMEWHEEL_KEY] = { '\0' };
                 sprintf_safe(szKey, MAX_TIMEWHEEL_KEY, "0x%08x", vecEntey[i]);
 
-                if (-1 == m_htIndexList.Del_Hash_Data(szKey))
-                {
-                    OUR_DEBUG((LM_INFO, "[CTimeWheelLink::Tick]Delete(%s) error.\n", szKey));
-                }
+                //清理Key对象
+                Del_TimeWheel_Object(szKey);
             }
 
             if (NULL != m_fn_Timeout_Callback)
