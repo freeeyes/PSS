@@ -296,7 +296,7 @@ public:
                 sprintf_safe(szKey, MAX_TIMEWHEEL_KEY, "0x%08x", vecEntey[i]);
 
                 //清理Key对象
-                Del_TimeWheel_Object(szKey);
+                Del_TimeWheel_Object(vecEntey[i]);
             }
 
             if (NULL != m_fn_Timeout_Callback)
