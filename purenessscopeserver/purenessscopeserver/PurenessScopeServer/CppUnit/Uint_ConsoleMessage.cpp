@@ -43,17 +43,20 @@ bool CUnit_ConsoleMessage::Create_Command(const char* pCommand, uint16 u2ReturnC
         return false;
     }
 
-    //比较返回关键字是否一致
-    uint16 u2CommandID = 0;
-
-    (*pBuffPacket) >> u2CommandID;
-
-    if (u2ReturnCommandID != u2CommandID)
+    if (pCommand[0] == 'b')
     {
-        char szError[MAX_BUFF_200] = { '\0' };
-        sprintf_safe(szError, MAX_BUFF_200, "[Create_Command](%s) u2ReturnCommandID error(%d).", pCommand, u2CommandID);
-        CPPUNIT_ASSERT_MESSAGE(szError, true == blRet);
-        return false;
+        //比较返回关键字是否一致
+        uint16 u2CommandID = 0;
+
+        (*pBuffPacket) >> u2CommandID;
+
+        if (u2ReturnCommandID != u2CommandID)
+        {
+            char szError[MAX_BUFF_200] = { '\0' };
+            sprintf_safe(szError, MAX_BUFF_200, "[Create_Command](%s) u2ReturnCommandID error(%d).", pCommand, u2CommandID);
+            CPPUNIT_ASSERT_MESSAGE(szError, true == blRet);
+            return false;
+        }
     }
 
     //回收命令行内存

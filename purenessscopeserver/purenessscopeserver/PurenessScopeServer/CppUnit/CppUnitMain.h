@@ -33,6 +33,7 @@
 #include "Unit_MakePacket.h"
 #include "Unit_ForbiddenIP.h"
 #include "Uint_AceReactorManager.h"
+#include "Uint_ThreadInfo.h"
 
 #define CPPUNIT_REPORT_PATH "./reports/cppunit/report.xml"
 
