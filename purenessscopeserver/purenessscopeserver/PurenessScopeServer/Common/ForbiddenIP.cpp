@@ -68,10 +68,10 @@ bool CForbiddenIP::CheckIP(const char* pIP, uint8 u1ConnectType)
 
     for(VecForbiddenIP::iterator b = m_VecTempForbiddenIP.begin(); b != m_VecTempForbiddenIP.end(); ++b)
     {
-        if((*b).m_u1ConnectType == u1ConnectType && CompareIP((*b).m_szClientIP, (char* )pIP) == false)
+        if((*b).m_u1ConnectType == u1ConnectType && CompareIP((*b).m_szClientIP, (char* )pIP) == true)
         {
             //如果是禁止时间段内，则返回false，否则删除定时信息。
-            if((*b).m_tvBegin.sec() + (*b).m_u4Second > (uint32)ACE_OS::gettimeofday().sec())
+            if ((*b).m_tvBegin + ACE_Time_Value((*b).m_u4Second, 0) > ACE_OS::gettimeofday())
             {
                 return false;
             }
