@@ -1719,15 +1719,21 @@ int CProConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
 
     ACE_UNUSED_ARG(arg);
-    ACE_UNUSED_ARG(tv);
 
-    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+    ACE_Time_Value tvNow = tv;
 
     //转动时间轮盘
     m_TimeWheelLink.Tick();
 
     //判定是否应该记录链接日志
     Tcp_Common_Manager_Timeout_CheckInfo(GetCount());
+
+    ACE_Time_Value tvEnd = ACE_OS::gettimeofday();
+
+    //得到时间执行了多少秒，并记录日志
+    ACE_Time_Value tvCost = tvEnd - tvNow;
+    AppLogManager::instance()->WriteLog(LOG_SYSTEM_WORKTHREAD, "[CProConnectManager::handle_timeout]TimeCost=%d.", tvCost.msec());
+
     return 0;
 }
 

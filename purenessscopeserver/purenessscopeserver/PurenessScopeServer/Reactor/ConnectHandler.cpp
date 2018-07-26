@@ -1833,12 +1833,13 @@ bool CConnectManager::KillTimer()
 int CConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 {
     ACE_UNUSED_ARG(arg);
-    ACE_UNUSED_ARG(tv);
 
     if(arg == NULL)
     {
         OUR_DEBUG((LM_ERROR, "[CConnectManager::handle_timeout]arg is not NULL, tv = %d.\n", tv.sec()));
     }
+
+    ACE_Time_Value tvNow = tv;
 
     _TimerCheckID* pTimerCheckID = (_TimerCheckID*)arg;
 
@@ -1850,6 +1851,12 @@ int CConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
         //判定是否应该记录链接日志
         Tcp_Common_Manager_Timeout_CheckInfo(GetCount());
     }
+
+    ACE_Time_Value tvEnd = ACE_OS::gettimeofday();
+
+    //得到时间执行了多少秒，并记录日志
+    ACE_Time_Value tvCost = tvEnd - tvNow;
+    AppLogManager::instance()->WriteLog(LOG_SYSTEM_WORKTHREAD, "[CConnectManager::handle_timeout]TimeCost=%d.", tvCost.msec());
 
     return 0;
 }
