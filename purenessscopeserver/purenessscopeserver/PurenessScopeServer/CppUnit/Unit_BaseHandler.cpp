@@ -12,40 +12,6 @@ void CUnit_Basehandler::tearDown(void)
     m_nBaseHandlerID = 0;
 }
 
-
-void CUnit_Basehandler::Test_Udp_Common_Recv_Stream(void)
-{
-    bool blRet                 = false;
-    ACE_Message_Block*     pMB = new ACE_Message_Block(4);
-    uint32 u4PacketParseInfoID = 1;
-    CPacketParse objPacketParse;
-
-    blRet = Udp_Common_Recv_Stream(pMB, &objPacketParse, u4PacketParseInfoID);
-
-    CPPUNIT_ASSERT_MESSAGE("[Test_Udp_Common_Recv_Stream]Udp_Common_Recv_Stream is false.", true == blRet);
-
-    SAFE_DELETE(pMB);
-}
-
-void CUnit_Basehandler::Test_Common_Recv_Stream(void)
-{
-    bool blRet = false;
-    ACE_Message_Block*     pMB = new ACE_Message_Block(4);
-    uint32 u4PacketParseInfoID = 1;
-    CPacketParse objPacketParse;
-
-    uint8 u1Ret = Tcp_Common_Recv_Stream(1, pMB, &objPacketParse, u4PacketParseInfoID);
-
-    if (PACKET_GET_ENOUGTH == u1Ret)
-    {
-        blRet = true;
-    }
-
-    CPPUNIT_ASSERT_MESSAGE("[Test_Common_Recv_Stream]Tcp_Common_Recv_Stream is false.", true == blRet);
-
-    SAFE_DELETE(pMB);
-}
-
 void CUnit_Basehandler::Test_Tcp_Common_File_Message(void)
 {
     bool blRet = false;
