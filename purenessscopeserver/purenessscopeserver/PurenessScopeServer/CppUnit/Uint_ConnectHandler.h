@@ -9,7 +9,9 @@
 class CUnit_ConnectHandler : public CppUnit::TestFixture
 {
     CPPUNIT_TEST_SUITE(CUnit_ConnectHandler);
-    CPPUNIT_TEST(Test_ConnectHandler);
+    CPPUNIT_TEST(Test_ConnectHandler_Stream);
+    CPPUNIT_TEST(Test_ConnectHandler_CloseMessages);
+    CPPUNIT_TEST(Test_ConnectHandler_Debug);
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -19,7 +21,11 @@ public:
 
     virtual void tearDown(void);
 
-    void Test_ConnectHandler(void);
+    void Test_ConnectHandler_Stream(void);
+
+    void Test_ConnectHandler_CloseMessages(void);
+
+    void Test_ConnectHandler_Debug(void);
 
 private:
     CConnectHandler* m_pConnectHandler;

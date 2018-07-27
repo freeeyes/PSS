@@ -11,6 +11,8 @@ void CUnit_ConnectHandler::setUp(void)
 {
     m_pConnectHandler = new CConnectHandler();
     m_pConnectHandler->Init(1);
+    m_pConnectHandler->SetConnectID(111);
+    m_pConnectHandler->SetPacketParseInfoID(1);
 }
 
 void CUnit_ConnectHandler::tearDown(void)
@@ -19,13 +21,10 @@ void CUnit_ConnectHandler::tearDown(void)
     m_pConnectHandler = NULL;
 }
 
-void CUnit_ConnectHandler::Test_ConnectHandler(void)
+void CUnit_ConnectHandler::Test_ConnectHandler_Stream(void)
 {
     //测试创建指定的反应器
-    int blRet = false;
-
-    m_pConnectHandler->SetConnectID(111);
-    m_pConnectHandler->SetPacketParseInfoID(1);
+    bool blRet = false;
 
     //拼装测试发送数据
     char szSendBuffer[MAX_BUFF_200] = { '\0' };
@@ -53,9 +52,40 @@ void CUnit_ConnectHandler::Test_ConnectHandler(void)
 
     if (false == blRet)
     {
-        OUR_DEBUG((LM_INFO, "[Test_ConnectHandler]Test_Paceket_Parse_Stream is fail.\n"));
-        CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler]Test_Paceket_Parse_Stream is fail.", true == blRet);
+        OUR_DEBUG((LM_INFO, "[Test_ConnectHandler_Stream]Test_Paceket_Parse_Stream is fail.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler_Stream]Test_Paceket_Parse_Stream is fail.", true == blRet);
     }
+}
+
+void CUnit_ConnectHandler::Test_ConnectHandler_CloseMessages(void)
+{
+    bool blRet = false;
+
+    blRet = m_pConnectHandler->SendCloseMessage();
+
+    if (false == blRet)
+    {
+        OUR_DEBUG((LM_INFO, "[Test_ConnectHandler_CloseMessages]SendCloseMessage is fail.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler_Stream]SendCloseMessage is fail.", true == blRet);
+    }
+}
+
+void CUnit_ConnectHandler::Test_ConnectHandler_Debug(void)
+{
+    char szText[MAX_BUFF_20] = { '\0' };
+
+    sprintf_safe(szText, MAX_BUFF_20, "freeeyes");
+
+    ACE_Message_Block* pmb = new ACE_Message_Block(20);
+
+    memcpy_safe(szText, ACE_OS::strlen(szText), pmb->wr_ptr(), ACE_OS::strlen(szText));
+    pmb->wr_ptr(ACE_OS::strlen(szText));
+
+    m_pConnectHandler->SetIsLog(true);
+
+    m_pConnectHandler->Output_Debug_Data(pmb, LOG_SYSTEM_DEBUG_CLIENTRECV);
+
+    pmb->release();
 }
 
 #endif
