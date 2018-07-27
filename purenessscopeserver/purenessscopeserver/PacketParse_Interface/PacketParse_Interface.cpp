@@ -77,12 +77,12 @@ extern "C"
                    u2CmdID,
                    u4BodyLen));
         PACKETPARSE_SHOW_END
-		
-		//如果命令ID为0，则为错误包
+
+        //如果命令ID为0，则为错误包
         if(0 == u2CmdID)
         {
-        	return false;	
-        }		
+            return false;
+        }
 
         //填充返回给框架的数据包头信息
         pHeadInfo->m_u4HeadSrcLen      = u4Len;
@@ -117,11 +117,59 @@ extern "C"
     //流模式据解析，解析成功需要填充_Packet_Info结构
     uint8 Parse_Packet_Stream(uint32 u4ConnectID, ACE_Message_Block* pCurrMessage, IMessageBlockManager* pMessageBlockManager, _Packet_Info* pPacketInfo)
     {
+        uint32 u4HeadLen = 40;
+
         //这里可以添加你的代码
         if(NULL == pCurrMessage || NULL == pMessageBlockManager || NULL == pPacketInfo)
         {
             return PACKET_GET_ERROR;
         }
+
+        //添加以流模式处理指定的数据包(和包头包体的协议一致的处理方式)
+        if (pCurrMessage->length() <= u4HeadLen)
+        {
+            //不够数据包头
+            return PACKET_GET_NO_ENOUGTH;
+        }
+
+        ACE_Message_Block* pHeadmb = pMessageBlockManager->Create(u4HeadLen);
+        memcpy_safe(pCurrMessage->rd_ptr(), u4HeadLen, pHeadmb->wr_ptr(), u4HeadLen);
+        pCurrMessage->rd_ptr(u4HeadLen);
+        pHeadmb->wr_ptr(u4HeadLen);
+        _Head_Info objHeadInfo;
+
+        //处理包头
+        if (false == Parse_Packet_Head_Info(u4ConnectID, pHeadmb, pMessageBlockManager, &objHeadInfo))
+        {
+            return PACKET_GET_ERROR;
+        }
+
+        //记录数据包头信息
+        pPacketInfo->m_pmbHead           = objHeadInfo.m_pmbHead;
+        pPacketInfo->m_u4HeadSrcLen      = objHeadInfo.m_u4HeadSrcLen;
+        pPacketInfo->m_u4HeadCurrLen     = objHeadInfo.m_u4HeadCurrLen;
+        pPacketInfo->m_u2PacketCommandID = objHeadInfo.m_u2PacketCommandID;
+        pPacketInfo->m_u4BodySrcLen      = objHeadInfo.m_u4BodySrcLen;
+
+        if (pPacketInfo->m_u4BodySrcLen != pCurrMessage->length())
+        {
+            return PACKET_GET_ERROR;
+        }
+
+        //处理数据包体
+        ACE_Message_Block* pBodymb = pMessageBlockManager->Create(pPacketInfo->m_u4BodySrcLen);
+        memcpy_safe(pCurrMessage->rd_ptr(), pPacketInfo->m_u4BodySrcLen, pBodymb->wr_ptr(), pPacketInfo->m_u4BodySrcLen);
+        pCurrMessage->rd_ptr(pPacketInfo->m_u4BodySrcLen);
+        pBodymb->wr_ptr(pPacketInfo->m_u4BodySrcLen);
+        _Body_Info objBodyInfo;
+
+        if (false == Parse_Packet_Body_Info(u4ConnectID, pBodymb, pMessageBlockManager, &objBodyInfo))
+        {
+            return PACKET_GET_ERROR;
+        }
+
+        pPacketInfo->m_pmbBody       = objBodyInfo.m_pmbBody;
+        pPacketInfo->m_u4BodyCurrLen = objBodyInfo.m_u4BodyCurrLen;
 
         PACKETPARSE_SHOW_BEGIN
         OUR_DEBUG((LM_INFO, "[CPacketParse::Parse_Packet_Stream]u4ConnectID=%d,pCurrMessage=%d.\n", u4ConnectID, pCurrMessage->length()));

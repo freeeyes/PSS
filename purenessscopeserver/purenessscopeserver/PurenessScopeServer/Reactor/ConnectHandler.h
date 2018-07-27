@@ -83,7 +83,8 @@ public:
     bool GetIsLog();                                                         //获得当前连接是否可以写入日志
     void SetHashID(int nHashID);                                             //设置Hash数组下标
     int  GetHashID();                                                        //得到Hash数组下标
-    void SetSendCacheManager(CSendCacheManager* pSendCacheManager);
+    void SetSendCacheManager(CSendCacheManager* pSendCacheManager);          //设置缓冲区对象
+    bool Test_Paceket_Parse_Stream(ACE_Message_Block* pmb);                  //测试流模式解析数据入口
 
 private:
     void Get_Recv_length(int& nCurrCount);                                   //得到要处理的数据长度

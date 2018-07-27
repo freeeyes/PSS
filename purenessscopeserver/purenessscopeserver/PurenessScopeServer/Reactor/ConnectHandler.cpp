@@ -1489,6 +1489,27 @@ void CConnectHandler::SetSendCacheManager(CSendCacheManager* pSendCacheManager)
     }
 }
 
+bool CConnectHandler::Test_Paceket_Parse_Stream(ACE_Message_Block* pmb)
+{
+    //ÉêÇëÐÂµÄ°ü
+    m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
+
+    if (NULL == m_pPacketParse)
+    {
+        OUR_DEBUG((LM_DEBUG, "[%t|CConnectHandle::Test_Paceket_Parse_Stream] (%d) m_pPacketParse new error.\n", GetConnectID()));
+        return -1;
+    }
+
+    if (0 == Dispose_Paceket_Parse_Stream_Single(pmb))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 //***************************************************************************
 CConnectManager::CConnectManager(void):m_mutex(), m_cond(m_mutex)
 {
