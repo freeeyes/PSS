@@ -5,6 +5,7 @@
 
 #include "Unit_Common.h"
 #include "ConsoleMessage.h"
+#include "BaseConsoleHandle.h"
 
 class CUnit_ConsoleMessage : public CppUnit::TestFixture
 {
@@ -40,6 +41,8 @@ class CUnit_ConsoleMessage : public CppUnit::TestFixture
     CPPUNIT_TEST(Test_DoMessage_PortList);
     CPPUNIT_TEST(Test_Do_Message_BuffPacket);
     CPPUNIT_TEST(Test_Do_Message_LoadModule);
+    CPPUNIT_TEST(Test_Do_Error_Command);
+    CPPUNIT_TEST(Test_Check_Console_Ip);
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -80,9 +83,12 @@ public:
     void Test_DoMessage_PortList(void);
     void Test_Do_Message_BuffPacket(void);
     void Test_Do_Message_LoadModule(void);
+    void Test_Do_Error_Command(void);
+    void Test_Check_Console_Ip(void);
 
 private:
     bool Create_Command(const char* pCommand, uint16 u2ReturnCommandID);
+    bool Create_Command_Error(const char* pCommand);
 
     CConsoleMessage* m_pConsoleMessage;
 };

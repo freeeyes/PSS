@@ -35,7 +35,7 @@ bool CUnit_ConsoleMessage::Create_Command(const char* pCommand, uint16 u2ReturnC
     pmb->wr_ptr(ACE_OS::strlen(pCommand));
 
     //执行命令
-    if (0 != m_pConsoleMessage->Dispose(pmb, pBuffPacket, u1Output))
+    if (CONSOLE_MESSAGE_SUCCESS != m_pConsoleMessage->Dispose(pmb, pBuffPacket, u1Output))
     {
         char szError[MAX_BUFF_200] = { '\0' };
         sprintf_safe(szError, MAX_BUFF_200, "[Create_Command](%s)m_pConsoleMessage->Dispose.", pCommand);
@@ -57,6 +57,43 @@ bool CUnit_ConsoleMessage::Create_Command(const char* pCommand, uint16 u2ReturnC
             CPPUNIT_ASSERT_MESSAGE(szError, true == blRet);
             return false;
         }
+    }
+
+    //回收命令行内存
+    pmb->release();
+
+    //回收BuffPacket模块
+    App_BuffPacketManager::instance()->Delete(pBuffPacket);
+
+    return blRet;
+}
+
+bool CUnit_ConsoleMessage::Create_Command_Error(const char* pCommand)
+{
+    bool blRet = false;
+    uint8 u1Output = 0;
+    ACE_Message_Block* pmb = NULL;
+
+    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
+
+    //拼接命令字
+    int nCommandLen = ACE_OS::strlen(pCommand);
+
+    pmb = new ACE_Message_Block(ACE_OS::strlen(pCommand));
+    memcpy_safe((char*)pCommand, nCommandLen, pmb->wr_ptr(), nCommandLen);
+    pmb->wr_ptr(ACE_OS::strlen(pCommand));
+
+    //执行命令
+    if (CONSOLE_MESSAGE_FAIL != m_pConsoleMessage->Dispose(pmb, pBuffPacket, u1Output))
+    {
+        char szError[MAX_BUFF_200] = { '\0' };
+        sprintf_safe(szError, MAX_BUFF_200, "[Create_Command_Error](%s)m_pConsoleMessage->Dispose.", pCommand);
+        CPPUNIT_ASSERT_MESSAGE(szError, true == blRet);
+        return false;
+    }
+    else
+    {
+        blRet = true;
     }
 
     //回收命令行内存
@@ -274,6 +311,22 @@ void CUnit_ConsoleMessage::Test_Do_Message_LoadModule(void)
     Create_Command("t freeeyes LoadModule ./,libTcpTest.so,&", CONSOLE_COMMAND_LOADMOUDLE);
 
     ACE_OS::sleep(tvSleep);
+}
+
+void CUnit_ConsoleMessage::Test_Do_Error_Command(void)
+{
+    Create_Command_Error("b xxxxx test");
+}
+
+void CUnit_ConsoleMessage::Test_Check_Console_Ip(void)
+{
+    bool blRet = false;
+    blRet = check_console_ip("127.0.0.1");
+
+    if (false == blRet)
+    {
+        CPPUNIT_ASSERT_MESSAGE("[Test_Check_Console_Ip]check_console_ip() false.", true == blRet);
+    }
 }
 
 #endif
