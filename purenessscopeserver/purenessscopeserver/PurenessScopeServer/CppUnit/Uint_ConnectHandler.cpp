@@ -66,7 +66,7 @@ void CUnit_ConnectHandler::Test_ConnectHandler_CloseMessages(void)
     if (false == blRet)
     {
         OUR_DEBUG((LM_INFO, "[Test_ConnectHandler_CloseMessages]SendCloseMessage is fail.\n"));
-        CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler_Stream]SendCloseMessage is fail.", true == blRet);
+        CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler_CloseMessages]SendCloseMessage is fail.", true == blRet);
     }
 }
 
@@ -86,6 +86,18 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Debug(void)
     m_pConnectHandler->Output_Debug_Data(pmb, LOG_SYSTEM_DEBUG_CLIENTRECV);
 
     pmb->release();
+}
+
+void CUnit_ConnectHandler::Test_ConnectHandler_Close_Queue(void)
+{
+    bool blRet = false;
+    blRet = App_ConnectManager::instance()->CloseConnect(1);
+
+    if (false == blRet)
+    {
+        OUR_DEBUG((LM_INFO, "[Test_ConnectHandler_Close_Queue]CloseConnect is fail.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler_Close_Queue]CloseConnect is fail.", true == blRet);
+    }
 }
 
 #endif
