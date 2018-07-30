@@ -11,7 +11,7 @@ CPacketParseBase::CPacketParseBase(void)
     m_u1Sort            = 0;
 
     //这里修改属于你的包解析版本号
-    sprintf_safe(m_szPacketVersion, MAX_BUFF_20, "0.99");
+    sprintf_safe(m_szPacketVersion, MAX_BUFF_20, "1.00");
 
     m_blIsHandleHead    = true;
 

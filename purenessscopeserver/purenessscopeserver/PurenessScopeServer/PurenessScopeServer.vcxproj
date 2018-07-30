@@ -200,6 +200,7 @@
     <ClCompile Include="CppUnit\Uint_ConnectHandler.cpp" />
     <ClCompile Include="CppUnit\Uint_ConsoleMessage.cpp" />
     <ClCompile Include="CppUnit\Uint_ConsolePromissions.cpp" />
+    <ClCompile Include="CppUnit\Uint_PacketParse.cpp" />
     <ClCompile Include="CppUnit\Uint_ServerMessageInfoPool.cpp" />
     <ClCompile Include="CppUnit\Uint_ServerMessageManager.cpp" />
     <ClCompile Include="CppUnit\Uint_ThreadInfo.cpp" />
@@ -599,6 +600,7 @@
     <ClInclude Include="CppUnit\Uint_ConnectHandler.h" />
     <ClInclude Include="CppUnit\Uint_ConsoleMessage.h" />
     <ClInclude Include="CppUnit\Uint_ConsolePromissions.h" />
+    <ClInclude Include="CppUnit\Uint_PacketParse.h" />
     <ClInclude Include="CppUnit\Uint_ServerMessageInfoPool.h" />
     <ClInclude Include="CppUnit\Uint_ServerMessageManager.h" />
     <ClInclude Include="CppUnit\Uint_ThreadInfo.h" />

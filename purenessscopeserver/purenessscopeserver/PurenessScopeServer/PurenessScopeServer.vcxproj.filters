@@ -341,6 +341,9 @@
     <ClCompile Include="CppUnit\Uint_ConnectHandler.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="CppUnit\Uint_PacketParse.cpp">
+      <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -798,6 +801,9 @@
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
     <ClInclude Include="CppUnit\Uint_ConnectHandler.h">
+      <Filter>CppUnit\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\Uint_PacketParse.h">
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
   </ItemGroup>
