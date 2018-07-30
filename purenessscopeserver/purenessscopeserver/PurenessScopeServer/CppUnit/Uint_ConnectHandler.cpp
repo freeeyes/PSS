@@ -33,6 +33,17 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Stream(void)
     sprintf_safe(szBuff, 20, "freeeyes");
     sprintf_safe(szSession, 32, "FREEEYES");
 
+    //测试得到HashID
+    m_pConnectHandler->SetHashID(111);
+
+    if (111 != m_pConnectHandler->GetHashID())
+    {
+        OUR_DEBUG((LM_INFO, "[Test_ConnectHandler_Stream]GetHashID is fail(%d).\n", m_pConnectHandler->GetHashID()));
+        CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler_Stream]GetHashID is fail.", true == blRet);
+        return;
+    }
+
+    //测试以流模式解数据包
     short sVersion = 1;
     short sCommand = (short)0x1000;
     int nPacketLen = ACE_OS::strlen(szBuff);
@@ -98,6 +109,45 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Close_Queue(void)
         OUR_DEBUG((LM_INFO, "[Test_ConnectHandler_Close_Queue]CloseConnect is fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler_Close_Queue]CloseConnect is fail.", true == blRet);
     }
+}
+
+void CUnit_ConnectHandler::Test_ConnectHandler_PostMessage(void)
+{
+    bool blRet = false;
+    char szData[10] = { '\0' };
+    sprintf_safe(szData, 10, "freeeyes");
+
+    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
+
+    (*pBuffPacket) << (uint32)1;
+
+    //测试断开连接
+    App_ConnectManager::instance()->Close(1);
+
+    App_ConnectManager::instance()->CloseUnLock(1);
+
+    App_ConnectManager::instance()->SetRecvQueueTimeCost(1, 1000);
+
+    //测试群发数据
+    const char* ptrReturnData = reinterpret_cast<const char*>(szData);
+    uint32 u4SendLen = (uint32)ACE_OS::strlen(szData);
+    App_ConnectManager::instance()->PostMessageAll(ptrReturnData, u4SendLen, SENDMESSAGE_NOMAL, 0, true, false, 0);
+
+    App_ConnectManager::instance()->PostMessageAll(ptrReturnData, u4SendLen, SENDMESSAGE_NOMAL, 0, false, false, 0);
+
+    App_ConnectManager::instance()->PostMessageAll(pBuffPacket, SENDMESSAGE_NOMAL, 0, true, false, 0);
+
+    App_ConnectManager::instance()->SetConnectName(1, "freeeyes");
+
+    App_ConnectManager::instance()->SetIsLog(1, false);
+
+    if (CLIENT_CONNECT_NO_EXIST != App_ConnectManager::instance()->GetConnectState(1))
+    {
+        OUR_DEBUG((LM_INFO, "[Test_ConnectHandler_PostMessage]GetConnectState is fail.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler_PostMessage]GetConnectState is fail.", true == blRet);
+    }
+
+    App_BuffPacketManager::instance()->Delete(pBuffPacket);
 }
 
 #endif
