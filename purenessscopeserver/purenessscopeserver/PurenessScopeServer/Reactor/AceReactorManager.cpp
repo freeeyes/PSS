@@ -130,34 +130,24 @@ bool CAceReactor::Init(int nReactorType, int nThreadCount, int nMaxHandleCount)
 #ifdef WIN32
 
         case Reactor_WFMO:    //这个功能限制于Windows操作的默认反应器，如果是COM服务器可以使用Reactor_WFMO_msg
-            {
-                Create_Reactor_WFMO();
-                break;
-            }
-
+            Create_Reactor_WFMO();
+            break;
 #endif
 
         case Reactor_Select:    //这个类的功能是服务于非Windows的默认反应器
-            {
-                Create_Reactor_Select();
-                break;
-            }
+            Create_Reactor_Select();
+            break;
 
         case Reactor_TP:
-            {
-                Create_Reactor_TP();
-                break;
-            }
+            Create_Reactor_TP();
+            break;
 
 #ifdef ACE_HAS_EVENT_POLL     //Linux下的EPoll模型
 
         case Reactor_DEV_POLL:
         case Reactor_DEV_POLL_ET:
-            {
-                Create_DEV_POLL(nMaxHandleCount);
-                break;
-            }
-
+            Create_DEV_POLL(nMaxHandleCount);
+            break;
 #endif
 
         default:

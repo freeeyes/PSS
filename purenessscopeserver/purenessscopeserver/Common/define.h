@@ -922,6 +922,12 @@ typedef  struct _VCHARB_STR
 
     void SetData(const char* pData, uint32& u4Length)
     {
+        //如果长度是0，后面不再做解析
+        if (u4Length == 0)
+        {
+            return;
+        }
+
         if(blCopy == true)
         {
             //如果是需要构建新内存，则在这里申请
