@@ -39,6 +39,13 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Stream(void)
 
     _ClientConnectInfo objClientConnectInfo = m_pConnectHandler->GetClientInfo();
 
+    if (111 != objClientConnectInfo.m_u4ConnectID)
+    {
+        OUR_DEBUG((LM_INFO, "[Test_ConnectHandler_Stream]GetClientInfo is fail(%d).\n", objClientConnectInfo.m_u4ConnectID));
+        CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler_Stream]GetClientInfo is fail.", true == blRet);
+        return;
+    }
+
     IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create();
 
     (*pBuffPacket) << (uint32)1;

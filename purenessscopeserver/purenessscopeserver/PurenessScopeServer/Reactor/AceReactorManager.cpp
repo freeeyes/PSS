@@ -20,6 +20,87 @@ uint32 CAceReactor::GetReactorID()
     return m_u4ReactorID;
 }
 
+void CAceReactor::Create_Reactor_WFMO()
+{
+#ifdef WIN32
+    ACE_WFMO_Reactor* wfmoreactor = new ACE_WFMO_Reactor();
+
+    if (NULL == wfmoreactor)
+    {
+        throw std::domain_error("[CAceReactor::Init]New ACE_WFMO_Reactor Error.");
+    }
+
+    m_pReactor = new ACE_Reactor(wfmoreactor, 1);
+
+    if (NULL == m_pReactor)
+    {
+        throw std::domain_error("[CAceReactor::Init]New m_pReactor Error[ACE_WFMO_Reactor].");
+    }
+
+    m_nReactorType = Reactor_WFMO;
+
+#endif
+}
+
+void CAceReactor::Create_Reactor_Select()
+{
+    ACE_Select_Reactor* selectreactor = new ACE_Select_Reactor();
+
+    if (NULL == selectreactor)
+    {
+        throw std::domain_error("[CAceReactor::Init]New ACE_Select_Reactor Error.");
+    }
+
+    m_pReactor = new ACE_Reactor(selectreactor, 1);
+
+    if (NULL == m_pReactor)
+    {
+        throw std::domain_error("[CAceReactor::Init]New m_pReactor Error[ACE_Select_Reactor].");
+    }
+
+    m_nReactorType = Reactor_Select;
+}
+
+void CAceReactor::Create_Reactor_TP()
+{
+    ACE_TP_Reactor* tpreactor = new ACE_TP_Reactor();
+
+    if (NULL == tpreactor)
+    {
+        throw std::domain_error("[CAceReactor::Init]New ACE_TP_Reactor Error.");
+    }
+
+    m_pReactor = new ACE_Reactor(tpreactor, 1);
+
+    if (NULL == m_pReactor)
+    {
+        throw std::domain_error("[CAceReactor::Init]New m_pReactor Error[ACE_TP_Reactor].");
+    }
+
+    m_nReactorType = Reactor_TP;
+}
+
+void CAceReactor::Create_DEV_POLL(int nMaxHandleCount)
+{
+#ifdef ACE_HAS_EVENT_POLL
+    ACE_Dev_Poll_Reactor* devreactor = new ACE_Dev_Poll_Reactor(nMaxHandleCount);
+
+    if (NULL == devreactor)
+    {
+        throw std::domain_error("[CAceReactor::Init]New ACE_Dev_Poll_Reactor Error.");
+    }
+
+    m_pReactor = new ACE_Reactor(devreactor, 1);
+
+    if (NULL == m_pReactor)
+    {
+        throw std::domain_error("[CAceReactor::Init]New m_pReactor Error[ACE_Dev_Poll_Reactor].");
+    }
+
+    m_nReactorType = Reactor_DEV_POLL;
+#endif
+}
+
 CAceReactor::~CAceReactor()
 {
     OUR_DEBUG((LM_INFO, "[CAceReactor::~CAceReactor].\n"));
@@ -50,21 +131,7 @@ bool CAceReactor::Init(int nReactorType, int nThreadCount, int nMaxHandleCount)
 
         case Reactor_WFMO:    //这个功能限制于Windows操作的默认反应器，如果是COM服务器可以使用Reactor_WFMO_msg
             {
-                ACE_WFMO_Reactor* wfmoreactor = new ACE_WFMO_Reactor();
-
-                if (NULL == wfmoreactor)
-                {
-                    throw std::domain_error("[CAceReactor::Init]New ACE_WFMO_Reactor Error.");
-                }
-
-                m_pReactor = new ACE_Reactor(wfmoreactor, 1);
-
-                if (NULL == m_pReactor)
-                {
-                    throw std::domain_error("[CAceReactor::Init]New m_pReactor Error[ACE_WFMO_Reactor].");
-                }
-
-                m_nReactorType = Reactor_WFMO;
+                Create_Reactor_WFMO();
                 break;
             }
 
@@ -72,41 +139,13 @@ bool CAceReactor::Init(int nReactorType, int nThreadCount, int nMaxHandleCount)
 
         case Reactor_Select:    //这个类的功能是服务于非Windows的默认反应器
             {
-                ACE_Select_Reactor* selectreactor = new ACE_Select_Reactor();
-
-                if (NULL == selectreactor)
-                {
-                    throw std::domain_error("[CAceReactor::Init]New ACE_Select_Reactor Error.");
-                }
-
-                m_pReactor = new ACE_Reactor(selectreactor, 1);
-
-                if (NULL == m_pReactor)
-                {
-                    throw std::domain_error("[CAceReactor::Init]New m_pReactor Error[ACE_Select_Reactor].");
-                }
-
-                m_nReactorType = Reactor_Select;
+                Create_Reactor_Select();
                 break;
             }
 
         case Reactor_TP:
             {
-                ACE_TP_Reactor* tpreactor = new ACE_TP_Reactor();
-
-                if (NULL == tpreactor)
-                {
-                    throw std::domain_error("[CAceReactor::Init]New ACE_TP_Reactor Error.");
-                }
-
-                m_pReactor = new ACE_Reactor(tpreactor, 1);
-
-                if (NULL == m_pReactor)
-                {
-                    throw std::domain_error("[CAceReactor::Init]New m_pReactor Error[ACE_TP_Reactor].");
-                }
-
-                m_nReactorType = Reactor_TP;
+                Create_Reactor_TP();
                 break;
             }
 
@@ -115,21 +154,7 @@ bool CAceReactor::Init(int nReactorType, int nThreadCount, int nMaxHandleCount)
         case Reactor_DEV_POLL:
         case Reactor_DEV_POLL_ET:
             {
-                ACE_Dev_Poll_Reactor* devreactor = new ACE_Dev_Poll_Reactor(nMaxHandleCount);
-
-                if (NULL == devreactor)
-                {
-                    throw std::domain_error("[CAceReactor::Init]New ACE_Dev_Poll_Reactor Error.");
-                }
-
-                m_pReactor = new ACE_Reactor(devreactor, 1);
-
-                if (NULL == m_pReactor)
-                {
-                    throw std::domain_error("[CAceReactor::Init]New m_pReactor Error[ACE_Dev_Poll_Reactor].");
-                }
-
-                m_nReactorType = Reactor_DEV_POLL;
+                Create_DEV_POLL(nMaxHandleCount);
                 break;
             }
 

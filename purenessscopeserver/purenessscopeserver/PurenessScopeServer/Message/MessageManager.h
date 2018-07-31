@@ -58,7 +58,7 @@ public:
         m_u2CommandID = 0;
     }
 
-    CClientCommandList(uint16 u2CommandID) : m_u2CommandID(u2CommandID)
+    explicit CClientCommandList(uint16 u2CommandID) : m_u2CommandID(u2CommandID)
     {
     }
 

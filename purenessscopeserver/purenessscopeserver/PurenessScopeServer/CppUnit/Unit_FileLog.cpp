@@ -20,7 +20,6 @@ void CUnit_FileLogger::tearDown(void)
 void CUnit_FileLogger::Test_FileLogger(void)
 {
     bool blRet = false;
-    ACE_FILE_Addr objFileAddr;
 
     CLogFile ObjCopyLogFile("./", 8192, 1024);
 

@@ -56,6 +56,11 @@ public:
     uint32 GetReactorID();
 
 private:
+    void Create_Reactor_WFMO();
+    void Create_Reactor_Select();
+    void Create_Reactor_TP();
+    void Create_DEV_POLL(int nMaxHandleCount);
+
     ACE_Reactor* m_pReactor;
     int          m_nReactorType;
     int          m_nThreadCount;

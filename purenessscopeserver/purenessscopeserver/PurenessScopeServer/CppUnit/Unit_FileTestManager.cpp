@@ -56,6 +56,13 @@ void CUnit_FileTestManager::Test_handle_timeout(void)
 
     FileTestResultInfoSt objInfo = m_pFileTestManager->FileTestStart("./FileTestCfg.xml");
 
+    if (1 != objInfo.n4ConnectNum)
+    {
+        OUR_DEBUG((LM_INFO, "[Test_FileLogger]m_pFileTestManager->FileTestStart() fail.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[Test_FileLogger]m_pFileTestManager->FileTestStart() fail.", true == blRet);
+        return;
+    }
+
     ACE_Time_Value tvNow = ACE_OS::gettimeofday();
     int nRet = m_pFileTestManager->handle_timeout(tvNow, NULL);
 
