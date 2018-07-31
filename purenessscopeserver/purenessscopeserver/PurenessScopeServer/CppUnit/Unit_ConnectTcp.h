@@ -12,6 +12,7 @@ class CUnit_ConnectTcp : public CppUnit::TestFixture
 {
     CPPUNIT_TEST_SUITE(CUnit_ConnectTcp);
     CPPUNIT_TEST(Test_Connect_Tcp_Server);
+    CPPUNIT_TEST(Test_Connect_Tcp_Server_With_Local);
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -22,6 +23,9 @@ public:
     virtual void tearDown(void);
 
     void Test_Connect_Tcp_Server(void);
+
+    void Test_Connect_Tcp_Server_With_Local(void);
+
 private:
     int m_nServerID;
 };
