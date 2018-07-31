@@ -87,6 +87,10 @@ public:
     bool Test_Paceket_Parse_Stream(ACE_Message_Block* pmb);                  //测试流模式解析数据入口
     void Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType);        //输出DEBUG信息
 
+    bool Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPacket);                   //将发送数据写入文件
+    bool Send_Input_To_Cache(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, bool blDelete, IBuffPacket* pBuffPacket);       //讲发送对象放入缓存
+    bool Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, uint8 u1State, int nMessageID, bool blDelete, IBuffPacket* pBuffPacket);         //将数据发送给对端
+
 private:
     void Get_Recv_length(int& nCurrCount);                                   //得到要处理的数据长度
     int  Dispose_Paceket_Parse_Head();                                       //处理消息头函数
@@ -97,10 +101,7 @@ private:
     void ClearPacketParse();                                                 //清理正在使用的PacketParse
     bool Send_Block_Queue(ACE_Message_Block* pMb);                           //发送队列停止消息
 
-    bool Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPacket);                   //将发送数据写入文件
-    bool Send_Input_To_Cache(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, bool blDelete, IBuffPacket* pBuffPacket);       //讲发送对象放入缓存
-    bool Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, uint8 u1State, int nMessageID, bool blDelete, IBuffPacket* pBuffPacket);         //将数据发送给对端
-    int  Dispose_Paceket_Parse_Stream_Single(ACE_Message_Block* pCurrMessage);              //处理单一数据包
+    int  Dispose_Paceket_Parse_Stream_Single(ACE_Message_Block* pCurrMessage);//处理单一数据包
     int  RecvData();                                                          //接收数据，正常模式
 
     int  Dispose_Recv_Data();                                                 //处理接收数据
@@ -301,6 +302,8 @@ public:
     virtual EM_Client_Connect_status GetConnectState(uint32 u4ConnectID);
 
     int handle_write_file_stream(uint32 u4ConnectID, const char* pData, uint32 u4Size, uint8 u1ParseID);     //文件接口模拟数据包入口
+
+    CConnectManager* GetManagerFormList(int nIndex);                                                       //获得当前Manager的指针
 
 private:
     uint32 GetGroupIndex();                                                                                  //得到当前链接的ID自增量

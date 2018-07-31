@@ -2942,3 +2942,15 @@ int CConnectManagerGroup::handle_write_file_stream(uint32 u4ConnectID, const cha
 
     return pConnectManager->handle_write_file_stream(u4ConnectID, pData, u4Size, u1ParseID);
 }
+
+CConnectManager* CConnectManagerGroup::GetManagerFormList(int nIndex)
+{
+    if (nIndex < 0 || nIndex >= m_u2ThreadQueueCount)
+    {
+        return NULL;
+    }
+    else
+    {
+        return m_objConnnectManagerList[nIndex];
+    }
+}

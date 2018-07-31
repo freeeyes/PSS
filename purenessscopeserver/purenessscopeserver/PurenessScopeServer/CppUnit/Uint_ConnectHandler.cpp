@@ -10,6 +10,7 @@ CUnit_ConnectHandler::~CUnit_ConnectHandler()
 void CUnit_ConnectHandler::setUp(void)
 {
     m_pConnectHandler = new CConnectHandler();
+
     m_pConnectHandler->Init(1);
     m_pConnectHandler->SetConnectID(111);
     m_pConnectHandler->SetPacketParseInfoID(1);
@@ -32,6 +33,45 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Stream(void)
     char szSession[32] = { '\0' };
     sprintf_safe(szBuff, 20, "test111");
     sprintf_safe(szSession, 32, "FREEEYES");
+
+    //测试设置执行时间接口
+    m_pConnectHandler->SetRecvQueueTimeCost(100000);
+
+    _ClientConnectInfo objClientConnectInfo = m_pConnectHandler->GetClientInfo();
+
+    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create();
+
+    (*pBuffPacket) << (uint32)1;
+
+    m_pConnectHandler->Write_SendData_To_File(false, pBuffPacket);
+
+    CSendCacheManager objSendCacheManager;
+    objSendCacheManager.Init(1, 1000);
+
+    m_pConnectHandler->SetSendCacheManager(&objSendCacheManager);
+
+    uint16 u2PostCommand = 0x1001;
+    uint32 u4PacketSize = 4;
+    m_pConnectHandler->Send_Input_To_Cache(SENDMESSAGE_JAMPNOMAL, u4PacketSize, u2PostCommand, true, pBuffPacket);
+
+    m_pConnectHandler->SetConnectName("127.0.0.1");
+
+    if (false != m_pConnectHandler->GetIsLog())
+    {
+        OUR_DEBUG((LM_INFO, "[Test_ConnectHandler_Stream]GetIsLog is fail.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler_Stream]GetIsLog is fail.", true == blRet);
+        return;
+    }
+
+    if (ACE_OS::strcmp(m_pConnectHandler->GetConnectName(), "127.0.0.1") != 0)
+    {
+        OUR_DEBUG((LM_INFO, "[Test_ConnectHandler_Stream]GetConnectName is fail.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler_Stream]GetConnectName is fail.", true == blRet);
+        return;
+    }
+
+    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+    App_ConnectManager::instance()->GetManagerFormList(0)->handle_timeout(tvNow, NULL);
 
     //测试得到HashID
     m_pConnectHandler->SetHashID(111);
@@ -131,6 +171,14 @@ void CUnit_ConnectHandler::Test_ConnectHandler_PostMessage(void)
     //测试群发数据
     const char* ptrReturnData = reinterpret_cast<const char*>(szData);
     uint32 u4SendLen = (uint32)ACE_OS::strlen(szData);
+
+    vector<uint32> vecConnectIDList;
+    vecConnectIDList.push_back(1);
+
+    App_ConnectManager::instance()->PostMessage(1, ptrReturnData, u4SendLen, SENDMESSAGE_NOMAL, 0, true, false, 0);
+
+    App_ConnectManager::instance()->PostMessage(vecConnectIDList, ptrReturnData, u4SendLen, SENDMESSAGE_NOMAL, 0, true, false, 0);
+
     App_ConnectManager::instance()->PostMessageAll(ptrReturnData, u4SendLen, SENDMESSAGE_NOMAL, 0, true, false, 0);
 
     App_ConnectManager::instance()->PostMessageAll(ptrReturnData, u4SendLen, SENDMESSAGE_NOMAL, 0, false, false, 0);

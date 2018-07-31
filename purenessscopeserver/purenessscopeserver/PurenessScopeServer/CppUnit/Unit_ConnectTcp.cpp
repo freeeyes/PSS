@@ -119,10 +119,10 @@ void CUnit_ConnectTcp::Test_Connect_Tcp_Server_With_Local(void)
 {
     bool blRet = false;
     CPostServerData objPostServerData;
-    objPostServerData.SetServerID(m_nServerID);
+    objPostServerData.SetServerID(2);
 
     //连接远程服务器
-    if (false == App_ClientReConnectManager::instance()->Connect(m_nServerID,
+    if (false == App_ClientReConnectManager::instance()->Connect(2,
             "127.0.0.1",
             10002,
             TYPE_IPV4,
@@ -139,9 +139,7 @@ void CUnit_ConnectTcp::Test_Connect_Tcp_Server_With_Local(void)
     ACE_Time_Value tvConnectSleep(0, 10000);
     ACE_OS::sleep(tvConnectSleep);
 
-    App_ClientReConnectManager::instance()->DeleteIClientMessage((IClientMessage*)&objPostServerData);
-
-    if (false == App_ClientReConnectManager::instance()->Close(m_nServerID))
+    if (false == App_ClientReConnectManager::instance()->Close(2))
     {
         OUR_DEBUG((LM_INFO, "[Test_Connect_Tcp_Server_With_Local]Close TCP [127.0.0.1:10002] is fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Tcp_Server_With_Local]Close TCP [127.0.0.1:10002] is fail.\n", true == blRet);

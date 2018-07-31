@@ -25,6 +25,7 @@ public:
 
     //得到指定的一个连接的缓冲
     ACE_Message_Block* GetCacheData(uint32 u4ConnectID);
+
     //释放指定一个连接的缓冲
     void FreeCacheData(uint32 u4ConnectID);
 

@@ -300,18 +300,20 @@ public:
     const char* GetError();                                                                                  //得到错误信息
     void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);                                   //获得指定命令统计信息
     void GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut);                                                   //得到出口流量信息
-    virtual EM_Client_Connect_status GetConnectState(uint32 u4ConnectID);                                            //得到连接状态
+    virtual EM_Client_Connect_status GetConnectState(uint32 u4ConnectID);                                    //得到连接状态
 
     int handle_write_file_stream(uint32 u4ConnectID, const char* pData, uint32 u4Size, uint8 u1ParseID);     //文件接口模拟数据包入口
+
+    CProConnectManager* GetManagerFormList(int nIndex);                                                      //获得当前Manager的指针
 
 private:
     uint32 GetGroupIndex();                                                                                  //得到当前链接的ID自增量
 
 private:
     ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;                                                           //控制多线程锁
-    CProConnectManager**        m_objProConnnectManagerList;                                                        //所有链接管理者
-    uint16                      m_u2ThreadQueueCount;                                                                  //当前发送线程队列个数
-    uint32                      m_u4CurrMaxCount;                                                                      //当前链接自增量
+    CProConnectManager**        m_objProConnnectManagerList;                                                 //所有链接管理者
+    uint16                      m_u2ThreadQueueCount;                                                        //当前发送线程队列个数
+    uint32                      m_u4CurrMaxCount;                                                            //当前链接自增量
 };
 
 
