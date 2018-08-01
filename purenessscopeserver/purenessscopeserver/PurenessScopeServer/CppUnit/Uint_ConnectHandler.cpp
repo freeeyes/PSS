@@ -186,6 +186,8 @@ void CUnit_ConnectHandler::Test_ConnectHandler_PostMessage(void)
 
     App_ConnectManager::instance()->PostMessage(vecConnectIDList, ptrReturnData, u4SendLen, SENDMESSAGE_NOMAL, 0, true, false, 0);
 
+    App_ConnectManager::instance()->PostMessage(vecConnectIDList, pBuffPacket, SENDMESSAGE_NOMAL, 0, true, false, 0);
+
     App_ConnectManager::instance()->PostMessageAll(ptrReturnData, u4SendLen, SENDMESSAGE_NOMAL, 0, true, false, 0);
 
     App_ConnectManager::instance()->PostMessageAll(ptrReturnData, u4SendLen, SENDMESSAGE_NOMAL, 0, false, false, 0);
@@ -195,6 +197,15 @@ void CUnit_ConnectHandler::Test_ConnectHandler_PostMessage(void)
     App_ConnectManager::instance()->SetConnectName(1, "freeeyes");
 
     App_ConnectManager::instance()->SetIsLog(1, false);
+
+    _ClientIPInfo objClientIPInfo = App_ConnectManager::instance()->GetLocalIPInfo(1);
+
+    if (strcmp(objClientIPInfo.m_szClientIP, "") != 0)
+    {
+        OUR_DEBUG((LM_INFO, "[Test_ConnectHandler_PostMessage]GetLocalIPInfo is fail.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler_PostMessage]GetLocalIPInfo is fail.", true == blRet);
+        return;
+    }
 
     if (CLIENT_CONNECT_NO_EXIST != App_ConnectManager::instance()->GetConnectState(1))
     {
