@@ -143,6 +143,15 @@ void CUnit_ConnectTcp::Test_Connect_Tcp_Server_With_Local(void)
     {
         OUR_DEBUG((LM_INFO, "[Test_Connect_Tcp_Server_With_Local]Close TCP [127.0.0.1:10002] is fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Tcp_Server_With_Local]Close TCP [127.0.0.1:10002] is fail.\n", true == blRet);
+        return;
+    }
+
+    //测试关闭错误的连接
+    if (false != App_ClientReConnectManager::instance()->ConnectErrorClose(3))
+    {
+        OUR_DEBUG((LM_INFO, "[Test_Connect_Tcp_Server_With_Local]ConnectErrorClose is fail.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Tcp_Server_With_Local]ConnectErrorClose is fail.\n", true == blRet);
+        return;
     }
 }
 

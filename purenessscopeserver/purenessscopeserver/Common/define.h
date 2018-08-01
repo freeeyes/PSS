@@ -22,6 +22,12 @@
 #include "ace/Hash_Map_Manager.h"
 #include <math.h>
 
+#ifndef WIN32
+#include <unistd.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+#endif
+
 #include <vector>
 
 using namespace std;
@@ -1668,5 +1674,95 @@ class ACE_Hash_Map :
 
 END_NAMESPACE
 USING_NAMESPACE
+
+#ifndef WIN32
+
+//获得当前文件打开数
+inline int Checkfilelimit(int nMaxOpenFile)
+{
+    //获得当前文件打开数
+    struct rlimit rfilelimit;
+
+    if (getrlimit(RLIMIT_NOFILE, &rfilelimit) != 0)
+    {
+        OUR_DEBUG((LM_INFO, "[Checkfilelimit]failed to getrlimit number of files.\n"));
+        return -1;
+    }
+    else
+    {
+        OUR_DEBUG((LM_INFO, "[Checkfilelimit]rfilelimit.rlim_cur=%d,nMaxOpenFile=%d.\n", rfilelimit.rlim_cur, nMaxOpenFile));
+
+        //提示同时文件打开数不足，需要设置。
+        if ((int)rfilelimit.rlim_cur < nMaxOpenFile)
+        {
+            OUR_DEBUG((LM_INFO, "[Checkfilelimit]** WARNING!WARNING!WARNING!WARNING! **.\n"));
+            OUR_DEBUG((LM_INFO, "[Checkfilelimit]** PSS WILL AUTO UP FILE OPEN LIMIT **.\n"));
+            OUR_DEBUG((LM_INFO, "[Checkfilelimit]** WARNING!WARNING!WARNING!WARNING! **.\n"));
+            //这段自动提升的功能暂时注释，运维人员必须知道这个问题并自己设置，这是上选。
+            //尝试临时提高并行文件数
+            rfilelimit.rlim_cur = (rlim_t)nMaxOpenFile;
+            rfilelimit.rlim_max = (rlim_t)nMaxOpenFile;
+
+            if (setrlimit(RLIMIT_NOFILE, &rfilelimit) != 0)
+            {
+                OUR_DEBUG((LM_INFO, "[Checkfilelimit]failed to setrlimit number of files(error=%s).\n", strerror(errno)));
+                return -1;
+            }
+
+            //如果修改成功，再次检查一下
+            if (getrlimit(RLIMIT_NOFILE, &rfilelimit) != 0)
+            {
+                OUR_DEBUG((LM_INFO, "[Checkfilelimit]failed to getrlimit number of files.\n"));
+                return -1;
+            }
+
+            //再次检查修改后的文件句柄数
+            if ((int)rfilelimit.rlim_cur < nMaxOpenFile)
+            {
+                OUR_DEBUG((LM_INFO, "[Checkfilelimit]rlim.rlim_cur=%d, nMaxOpenFile=%d, openfile is not enougth， please check [ulimit -a].\n", (int)rfilelimit.rlim_cur, nMaxOpenFile));
+                return -1;
+            }
+
+            return 0;
+        }
+    }
+
+    return 0;
+}
+
+inline void Gdaemon()
+{
+    pid_t pid;
+
+    signal(SIGTTOU, SIG_IGN);
+    signal(SIGTTIN, SIG_IGN);
+    signal(SIGTSTP, SIG_IGN);
+
+    if (setpgrp() == -1)
+    {
+        perror("setpgrp failure");
+    }
+
+    signal(SIGHUP, SIG_IGN);
+
+    if ((pid = fork()) < 0)
+    {
+        perror("fork failure");
+        exit(1);
+    }
+    else if (pid > 0)
+    {
+        exit(0);
+    }
+
+    setsid();
+    umask(0);
+
+    signal(SIGCLD, SIG_IGN);
+    signal(SIGCHLD, SIG_IGN);
+    signal(SIGPIPE, SIG_IGN);
+}
+
+#endif
 
 #endif

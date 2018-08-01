@@ -97,4 +97,20 @@ void CUnit_Basehandler::Test_Tcp_Common_Manager_Timeout_CheckInfo(void)
     CPPUNIT_ASSERT_MESSAGE("[Test_Tcp_Common_Manager_Timeout_CheckInfo]Tcp_Common_Manager_Timeout_CheckInfo is false.", true == blRet);
 }
 
+void CUnit_Basehandler::Test_Tcp_Common_ClientNameInfo(void)
+{
+    bool blRet = false;
+
+    _ClientNameInfo objClientNameInfo = Tcp_Common_ClientNameInfo(1, "freeeyes", "127.0.0.1", 20022, true);
+
+    if (objClientNameInfo.m_nConnectID != 1 ||
+        ACE_OS::strcmp(objClientNameInfo.m_szName, "freeeyes") != 0 ||
+        ACE_OS::strcmp(objClientNameInfo.m_szClientIP, "127.0.0.1") != 0 ||
+        objClientNameInfo.m_nPort != 20022 ||
+        objClientNameInfo.m_nLog != 1)
+    {
+        CPPUNIT_ASSERT_MESSAGE("[Test_Tcp_Common_ClientNameInfo]Tcp_Common_ClientNameInfo is false.", true == blRet);
+    }
+}
+
 #endif
