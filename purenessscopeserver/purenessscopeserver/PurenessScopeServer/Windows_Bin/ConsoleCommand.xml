@@ -49,4 +49,5 @@
 	<CommandInfo CommandName="TestFileStop" User="freeeyes" desc="停止服务器文件测试用例" />
 	<CommandInfo CommandName="PortFlow" User="freeeyes" desc="获得当前BuffPacket使用情况" />
 	<CommandInfo CommandName="BuffPacketState" User="freeeyes" desc="获得当前BuffPacket使用情况" />
+	<CommandInfo CommandName="PoolSet" User="freeeyes" desc="设置当前内存池的使用痕迹" />
 </config>

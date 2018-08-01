@@ -329,5 +329,77 @@ void CUnit_ConsoleMessage::Test_Check_Console_Ip(void)
     }
 }
 
+void CUnit_ConsoleMessage::Test_Do_Message_CloseClient(void)
+{
+    Create_Command("b freeeyes CloseClient 1&", CONSOLE_COMMAND_COLSECLIENT);
+    Create_Command("t freeeyes CloseClient 1&", CONSOLE_COMMAND_COLSECLIENT);
+}
+
+void CUnit_ConsoleMessage::Test_Do_Message_UDPClientInfo(void)
+{
+    Create_Command("b freeeyes UDPConnectClient -a&", CONSOLE_COMMAND_UDPCONNECTINFO);
+    Create_Command("t freeeyes UDPConnectClient -a&", CONSOLE_COMMAND_UDPCONNECTINFO);
+}
+
+void CUnit_ConsoleMessage::Test_Do_Message_SetTrackIP(void)
+{
+    Create_Command("b freeeyes SetTrackIP -i 127.0.0.1 -c 5 &", CONSOLE_COMMAND_SETTRACKIP);
+    Create_Command("t freeeyes SetTrackIP -i 127.0.0.1 -c 5 &", CONSOLE_COMMAND_SETTRACKIP);
+}
+
+void CUnit_ConsoleMessage::Test_Do_Message_SetLogLevelInfo(void)
+{
+    Create_Command("b freeeyes SetLogLevel -l 1&", CONSOLE_COMMAND_SETLOGLEVEL);
+    Create_Command("t freeeyes SetLogLevel -l 1&", CONSOLE_COMMAND_SETLOGLEVEL);
+}
+
+void CUnit_ConsoleMessage::Test_Do_Message_SetWorkThreadAI(void)
+{
+    Create_Command("b freeeyes SetWorkThreadAI -i 1,30,30,30&", CONSOLE_COMMAND_SETWTAI);
+    Create_Command("t freeeyes SetWorkThreadAI -i 1,30,30,30&", CONSOLE_COMMAND_SETWTAI);
+}
+
+void CUnit_ConsoleMessage::Test_Do_Message_SetMaxConnectCount(void)
+{
+    Create_Command("b freeeyes SetMaxConnectCount -n 10000 &", CONSOLE_COMMAND_SETMAXCONNECTCOUNT);
+    Create_Command("t freeeyes SetMaxConnectCount -n 10000 &", CONSOLE_COMMAND_SETMAXCONNECTCOUNT);
+}
+
+void CUnit_ConsoleMessage::Test_Do_Message_SetConnectLog(void)
+{
+    Create_Command("b freeeyes SetConnectLog -n 1 -f 0 &", CONSOLE_COMMAND_SETCONNECTLOG);
+    Create_Command("t freeeyes SetConnectLog -n 1 -f 0 &", CONSOLE_COMMAND_SETCONNECTLOG);
+}
+
+void CUnit_ConsoleMessage::Test_Do_Message_AddListen(void)
+{
+    Create_Command("b freeeyes AddListen -i 127.0.0.1 -p 10071 -t 1 -n 1&", CONSOLE_COMMAND_ADD_LISTEN);
+    Create_Command("t freeeyes AddListen -i 127.0.0.1 -p 10071 -t 1 -n 1&", CONSOLE_COMMAND_ADD_LISTEN);
+}
+
+void CUnit_ConsoleMessage::Test_Do_Message_DelListen(void)
+{
+    Create_Command("b freeeyes DelListen -i 127.0.0.1 -p 10071 -t 1 &", CONSOLE_COMMAND_DEL_LISTEN);
+    Create_Command("t freeeyes DelListen -i 127.0.0.1 -p 10071 -t 1 &", CONSOLE_COMMAND_DEL_LISTEN);
+}
+
+void CUnit_ConsoleMessage::Test_Do_Message_TestFileStart(void)
+{
+    Create_Command("b freeeyes TestFileStart -f FileTestCfg.xml&", CONSOLE_COMMAND_FILE_TEST_START);
+    Create_Command("t freeeyes TestFileStart -f FileTestCfg.xml&", CONSOLE_COMMAND_FILE_TEST_START);
+}
+
+void CUnit_ConsoleMessage::Test_Do_Message_TestFileStop(void)
+{
+    Create_Command("b freeeyes TestFileStop -a&", CONSOLE_COMMAND_FILE_TEST_STOP);
+    Create_Command("t freeeyes TestFileStop -a&", CONSOLE_COMMAND_FILE_TEST_STOP);
+}
+
+void CUnit_ConsoleMessage::Test_Do_Message_PoolSet(void)
+{
+    Create_Command("b freeeyes PoolSet -n BuffPacket -b fasle &", CONSOLE_COMMAND_POOL_SET);
+    Create_Command("b freeeyes PoolSet -n PacketParse -b false &", CONSOLE_COMMAND_POOL_SET);
+}
+
 #endif
 

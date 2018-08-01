@@ -43,6 +43,18 @@ class CUnit_ConsoleMessage : public CppUnit::TestFixture
     CPPUNIT_TEST(Test_Do_Message_LoadModule);
     CPPUNIT_TEST(Test_Do_Error_Command);
     CPPUNIT_TEST(Test_Check_Console_Ip);
+    CPPUNIT_TEST(Test_Do_Message_CloseClient);
+    CPPUNIT_TEST(Test_Do_Message_UDPClientInfo);
+    CPPUNIT_TEST(Test_Do_Message_SetTrackIP);
+    CPPUNIT_TEST(Test_Do_Message_SetLogLevelInfo);
+    CPPUNIT_TEST(Test_Do_Message_SetWorkThreadAI);
+    CPPUNIT_TEST(Test_Do_Message_SetMaxConnectCount);
+    CPPUNIT_TEST(Test_Do_Message_SetConnectLog);
+    CPPUNIT_TEST(Test_Do_Message_AddListen);
+    CPPUNIT_TEST(Test_Do_Message_DelListen);
+    CPPUNIT_TEST(Test_Do_Message_TestFileStart);
+    CPPUNIT_TEST(Test_Do_Message_TestFileStop);
+    CPPUNIT_TEST(Test_Do_Message_PoolSet);
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -85,6 +97,18 @@ public:
     void Test_Do_Message_LoadModule(void);
     void Test_Do_Error_Command(void);
     void Test_Check_Console_Ip(void);
+    void Test_Do_Message_CloseClient(void);
+    void Test_Do_Message_UDPClientInfo(void);
+    void Test_Do_Message_SetTrackIP(void);
+    void Test_Do_Message_SetLogLevelInfo(void);
+    void Test_Do_Message_SetWorkThreadAI(void);
+    void Test_Do_Message_SetMaxConnectCount(void);
+    void Test_Do_Message_SetConnectLog(void);
+    void Test_Do_Message_AddListen(void);
+    void Test_Do_Message_DelListen(void);
+    void Test_Do_Message_TestFileStart(void);
+    void Test_Do_Message_TestFileStop(void);
+    void Test_Do_Message_PoolSet(void);
 
 private:
     bool Create_Command(const char* pCommand, uint16 u2ReturnCommandID);
