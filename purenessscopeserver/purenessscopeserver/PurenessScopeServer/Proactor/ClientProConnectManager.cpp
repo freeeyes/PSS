@@ -418,19 +418,6 @@ bool CClientProConnectManager::Close(int nServerID)
     if(NULL != pClientInfo->GetProConnectClient())
     {
         pClientInfo->GetProConnectClient()->ClientClose(ems2s);
-    }
-
-    if(S2S_NEED_CALLBACK == ems2s)
-    {
-        SAFE_DELETE(pClientInfo);
-    }
-    else
-    {
-        if (false == pClientInfo->Close())
-        {
-            OUR_DEBUG((LM_INFO, "[CClientProConnectManager::Close]pClientInfo->Close fail.\n"));
-        }
-
         SAFE_DELETE(pClientInfo);
     }
 
@@ -618,13 +605,11 @@ void CClientProConnectManager::Close()
     {
         CProactorClientInfo* pClientInfo = vecProactorClientInfo[i];
 
+        EM_s2s ems2s = S2S_INNEED_CALLBACK;
+
         if(NULL != pClientInfo)
         {
-            if (false == pClientInfo->Close())
-            {
-                OUR_DEBUG((LM_INFO, "[CClientProConnectManager::Close]pClientInfo->Close is fail.\n"));
-            }
-
+            pClientInfo->GetProConnectClient()->ClientClose(ems2s);
             SAFE_DELETE(pClientInfo);
         }
     }

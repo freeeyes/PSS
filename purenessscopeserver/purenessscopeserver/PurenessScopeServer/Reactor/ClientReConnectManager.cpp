@@ -417,6 +417,7 @@ bool CClientReConnectManager::Close(int nServerID)
     if (NULL != pClientInfo->GetConnectClient())
     {
         pClientInfo->GetConnectClient()->ClientClose();
+        SAFE_DELETE(pClientInfo);
     }
 
     //从Hash里面删除当前存在的对象
@@ -605,11 +606,7 @@ void CClientReConnectManager::Close()
 
         if(NULL != pClientInfo)
         {
-            if (false == pClientInfo->Close())
-            {
-                OUR_DEBUG((LM_INFO, "[CClientReConnectManager::Close]Close error.\n"));
-            }
-
+            pClientInfo->GetConnectClient()->ClientClose();
             SAFE_DELETE(pClientInfo);
         }
     }
@@ -632,6 +629,11 @@ void CClientReConnectManager::Close()
 
     m_objClientUDPList.Close();
     m_u4MaxPoolCount = 0;
+
+    //等待各自的连接对象自己关闭，因为不是在当前线程关闭，所以这里要等一下。
+    ACE_Time_Value tvSleep(0, 10000);
+    ACE_OS::sleep(tvSleep);
+
     m_ActiveTimer.deactivate();
     OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]End.\n"));
 }
