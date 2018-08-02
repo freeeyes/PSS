@@ -113,4 +113,46 @@ void CUnit_Basehandler::Test_Tcp_Common_ClientNameInfo(void)
     }
 }
 
+void CUnit_Basehandler::Test_Udp_Common_Recv_Stream(void)
+{
+    bool blRet = false;
+
+    //拼装测试发送数据
+    char szSendUDP[MAX_BUFF_200] = { '\0' };
+    char szBodyBuff[MAX_BUFF_20] = { '\0' };
+    char szSession[32]           = { '\0' };
+    sprintf_safe(szBodyBuff, 20, "testudp");
+    sprintf_safe(szSession, 32, "FREEEYES");
+
+    //测试以流模式解数据包
+    short sVersion = 1;
+    short sCommand = (short)0x1000;
+    int nPacketLen = ACE_OS::strlen(szBodyBuff);
+
+    memcpy(szSendUDP, (char*)&sVersion, sizeof(short));
+    memcpy((char*)&szSendUDP[2], (char*)&sCommand, sizeof(short));
+    memcpy((char*)&szSendUDP[4], (char*)&nPacketLen, sizeof(int));
+    memcpy((char*)&szSendUDP[8], (char*)&szSession, sizeof(char) * 32);
+    memcpy((char*)&szSendUDP[40], (char*)szBodyBuff, sizeof(char) * nPacketLen);
+    uint32 u4SendLen = nPacketLen + 40;
+
+    ACE_Message_Block* pmb = App_MessageBlockManager::instance()->Create(u4SendLen);
+    memcpy_safe(szSendUDP, u4SendLen, pmb->wr_ptr(), u4SendLen);
+    pmb->wr_ptr(u4SendLen);
+
+    CPacketParse* pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
+
+    if (false == Udp_Common_Recv_Stream(pmb, pPacketParse, 1))
+    {
+        OUR_DEBUG((LM_INFO, "[Test_Udp_Common_Recv_Stream]Udp_Common_Recv_Stream is fail.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[Test_Udp_Common_Recv_Stream]Udp_Common_Recv_Stream is fail.", true == blRet);
+    }
+    else
+    {
+        App_PacketParsePool::instance()->Delete(pPacketParse);
+    }
+
+    App_MessageBlockManager::instance()->Close(pmb);
+}
+
 #endif

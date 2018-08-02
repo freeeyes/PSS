@@ -397,8 +397,8 @@ void CUnit_ConsoleMessage::Test_Do_Message_TestFileStop(void)
 
 void CUnit_ConsoleMessage::Test_Do_Message_PoolSet(void)
 {
-    Create_Command("b freeeyes PoolSet -n BuffPacket -b fasle &", CONSOLE_COMMAND_POOL_SET);
-    Create_Command("b freeeyes PoolSet -n PacketParse -b false &", CONSOLE_COMMAND_POOL_SET);
+    Create_Command("b freeeyes PoolSet -n BuffPacket -b false&", CONSOLE_COMMAND_POOL_SET);
+    Create_Command("b freeeyes PoolSet -n PacketParse -b false&", CONSOLE_COMMAND_POOL_SET);
 }
 
 #endif

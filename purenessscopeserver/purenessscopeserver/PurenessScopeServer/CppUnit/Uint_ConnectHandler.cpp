@@ -31,7 +31,7 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Stream(void)
     char szSendData[MAX_BUFF_200] = { '\0' };
     char szBuff[20] = { '\0' };
     char szSession[32] = { '\0' };
-    sprintf_safe(szBuff, 20, "test111");
+    sprintf_safe(szBuff, 20, "testtcp");
     sprintf_safe(szSession, 32, "FREEEYES");
 
     //测试设置执行时间接口
