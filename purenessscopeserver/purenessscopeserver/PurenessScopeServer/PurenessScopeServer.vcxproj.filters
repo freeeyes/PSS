@@ -346,6 +346,9 @@
     <ClCompile Include="CppUnit\Uint_ServerMessageManager.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="CppUnit\Uint_MessageService.cpp">
+      <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -808,6 +811,9 @@
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
     <ClInclude Include="CppUnit\Uint_ServerMessageManager.h">
+      <Filter>CppUnit\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\Uint_MessageService.h">
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
   </ItemGroup>

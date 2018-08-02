@@ -98,6 +98,8 @@ void CAceReactor::Create_DEV_POLL(int nMaxHandleCount)
     }
 
     m_nReactorType = Reactor_DEV_POLL;
+#else
+    OUR_DEBUG((LM_INFO, "[CAceReactor::Create_DEV_POLL]this OS isn't support.\n"));
 #endif
 }
 
@@ -151,10 +153,8 @@ bool CAceReactor::Init(int nReactorType, int nThreadCount, int nMaxHandleCount)
 #endif
 
         default:
-            {
-                OUR_DEBUG((LM_INFO, "[CAceReactor::Init]Unknow nReactorType(%d).\n", nReactorType));
-                return false;
-            }
+            OUR_DEBUG((LM_INFO, "[CAceReactor::Init]Unknow nReactorType(%d).\n", nReactorType));
+            return false;
         }
 
         m_nThreadCount = nThreadCount;
@@ -302,7 +302,7 @@ void CAceReactorManager::Close()
 
 void CAceReactorManager::Init(uint16 u2Count)
 {
-    m_pReactorList  = (CAceReactor** )new char[sizeof(CAceReactor*)*u2Count];;
+    m_pReactorList  = (CAceReactor** )new char[sizeof(CAceReactor*)*u2Count];
     ACE_OS::memset(m_pReactorList, 0, sizeof(CAceReactor*)*u2Count);
     m_u2RectorCount = u2Count;
 }
