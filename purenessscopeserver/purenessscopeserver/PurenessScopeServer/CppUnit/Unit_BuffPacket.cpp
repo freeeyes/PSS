@@ -288,7 +288,7 @@ void CUnit_BuffPacket::Check_AddBuff_More_Uint16(void)
 
     (*m_pBuffPacket) >> u2Des;
 
-    if (u2Src != u2Src)
+    if (u2Src != u2Des)
     {
         CPPUNIT_ASSERT_MESSAGE("[Check_AddBuff_More_Uint16]Src != Des.", true == blRet);
     }
@@ -311,7 +311,7 @@ void CUnit_BuffPacket::Check_AddBuff_More_Uint32(void)
 
     (*m_pBuffPacket) >> u4Des;
 
-    if (u4Src != u4Src)
+    if (u4Src != u4Des)
     {
         CPPUNIT_ASSERT_MESSAGE("[Check_AddBuff_More_Uint32]Src != Des.", true == blRet);
     }
