@@ -37,6 +37,7 @@
 #include "Uint_ConnectHandler.h"
 #include "Uint_PacketParse.h"
 #include "Uint_MessageService.h"
+#include "Uint_ConnectClient.h"
 
 #define CPPUNIT_REPORT_PATH "./reports/cppunit/report.xml"
 

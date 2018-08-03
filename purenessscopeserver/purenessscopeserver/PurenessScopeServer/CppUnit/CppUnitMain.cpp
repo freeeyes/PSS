@@ -36,6 +36,7 @@ CCppUnitMain::CCppUnitMain()
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_ConnectHandler, "pss");
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_PacketParse, "pss");
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_MessageService, "pss");
+    CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_ConnectClient, "pss");
 }
 
 CCppUnitMain::~CCppUnitMain()

@@ -22,7 +22,7 @@ void CUnit_MessageService::tearDown(void)
 void CUnit_MessageService::Test_MessageService(void)
 {
     //测试创建指定的反应器
-    int blRet = false;
+    bool blRet = false;
     uint32 u4ThreadID = m_pMessageService->GetThreadID();
 
     if (1 != u4ThreadID)

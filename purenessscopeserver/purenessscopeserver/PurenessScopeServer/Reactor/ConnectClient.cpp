@@ -220,24 +220,6 @@ int CConnectClient::RecvData()
 
     int nCurrCount = (uint32)m_pCurrMessage->size();
 
-    if (nCurrCount < 0)
-    {
-        //如果剩余字节为负，说明程序出了问题
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::handle_input][%d] nCurrCount < 0 m_u4CurrSize = %d.\n", GetServerID(), m_u4CurrSize));
-        m_u4CurrSize = 0;
-
-        _ClientIPInfo objServerIPInfo;
-        sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-        objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
-
-        if(S2S_NEED_CALLBACK == m_ems2s)
-        {
-            m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
-        }
-
-        return -1;
-    }
-
     int nDataLen = (int)this->peer().recv(m_pCurrMessage->wr_ptr(), nCurrCount, MSG_NOSIGNAL, &nowait);
 
     if (nDataLen <= 0)
