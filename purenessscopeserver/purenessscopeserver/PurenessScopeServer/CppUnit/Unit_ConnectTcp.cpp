@@ -151,7 +151,6 @@ void CUnit_ConnectTcp::Test_Connect_Tcp_Server_With_Local(void)
     {
         OUR_DEBUG((LM_INFO, "[Test_Connect_Tcp_Server_With_Local]ConnectErrorClose is fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Tcp_Server_With_Local]ConnectErrorClose is fail.\n", true == blRet);
-        return;
     }
 }
 

@@ -38,7 +38,8 @@ void CAceReactor::Create_Reactor_WFMO()
     }
 
     m_nReactorType = Reactor_WFMO;
-
+#else
+    OUR_DEBUG((LM_INFO, "[CAceReactor::Create_Reactor_WFMO]this os is not support.\n"));
 #endif
 }
 
