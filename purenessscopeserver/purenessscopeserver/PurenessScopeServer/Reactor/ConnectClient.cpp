@@ -301,11 +301,11 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
     return 0;
 }
 
-void CConnectClient::Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType)
+void CConnectClient::Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType, bool blLog)
 {
     char szPacketDebugData[MAX_BUFF_1024] = { '\0' };
 
-    if (GetXmlConfigAttribute(xmlServerType)->Debug == DEBUG_ON)
+    if (GetXmlConfigAttribute(xmlServerType)->Debug == DEBUG_ON || false == blLog)
     {
         int nDataLen = (int)pMbData->length();
         char szLog[10] = { '\0' };

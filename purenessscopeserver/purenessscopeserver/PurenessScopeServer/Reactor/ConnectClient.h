@@ -41,13 +41,13 @@ public:
     void ClientClose();                                    //主动关闭
     _ClientConnectInfo GetClientConnectInfo();             //得到当前链接信息
 
+    void Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType, bool blLog = false);     //输出DEBUG信息
+
 private:
     int RecvData();                                                       //接收数据，正常模式
     int SendMessageGroup(uint16 u2CommandID, ACE_Message_Block* pmblk);   //将接收的数据包发给框架消息处理模块
 
     int Dispose_Recv_Data(ACE_Message_Block* pCurrMessage);               //处理接收到的数据
-
-    void Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType);     //输出DEBUG信息
 
     uint32                      m_u4SendSize;           //发送字节数
     uint32                      m_u4SendCount;          //发送数据包数

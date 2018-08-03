@@ -20,9 +20,9 @@ uint32 CAceReactor::GetReactorID()
     return m_u4ReactorID;
 }
 
+#ifdef WIN32
 void CAceReactor::Create_Reactor_WFMO()
 {
-#ifdef WIN32
     ACE_WFMO_Reactor* wfmoreactor = new ACE_WFMO_Reactor();
 
     if (NULL == wfmoreactor)
@@ -38,10 +38,8 @@ void CAceReactor::Create_Reactor_WFMO()
     }
 
     m_nReactorType = Reactor_WFMO;
-#else
-    OUR_DEBUG((LM_INFO, "[CAceReactor::Create_Reactor_WFMO]this os is not support.\n"));
-#endif
 }
+#endif
 
 void CAceReactor::Create_Reactor_Select()
 {
