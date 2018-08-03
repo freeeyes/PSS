@@ -65,7 +65,7 @@ void CUnit_MessageService::Test_MessageService(void)
         return;
     }
 
-    App_MessageServiceGroup::instance()->CheckCPUAndMemory();
+    App_MessageServiceGroup::instance()->CheckCPUAndMemory(true);
 
     m_pMessageService->Close();
 }

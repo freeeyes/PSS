@@ -159,7 +159,7 @@ public:
     void GetDyeingCommand(vec_Dyeing_Command_list& objList);                                  //获得当前命令染色状态
 
     void GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_Account);                  //得到当前列表描述信息
-    bool CheckCPUAndMemory();                                                                 //检查CPU和内存
+    bool CheckCPUAndMemory(bool blTest = false);                                              //检查CPU和内存
 
 private:
     bool StartTimer();

@@ -970,9 +970,9 @@ bool CMessageServiceGroup::CheckPacketParsePool()
     return true;
 }
 
-bool CMessageServiceGroup::CheckCPUAndMemory()
+bool CMessageServiceGroup::CheckCPUAndMemory(bool blTest)
 {
-    if (GetXmlConfigAttribute(xmlMonitor)->CpuAndMemory == 1)
+    if (GetXmlConfigAttribute(xmlMonitor)->CpuAndMemory == 1 || true == blTest)
     {
 #ifdef WIN32
         uint32 u4CurrCpu = (uint32)GetProcessCPU_Idel();

@@ -56,7 +56,9 @@ public:
     uint32 GetReactorID();
 
 private:
+#ifdef WIN32
     void Create_Reactor_WFMO();
+#endif
     void Create_Reactor_Select();
     void Create_Reactor_TP();
     void Create_DEV_POLL(int nMaxHandleCount);

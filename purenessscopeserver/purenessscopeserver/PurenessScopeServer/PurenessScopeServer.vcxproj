@@ -197,6 +197,7 @@
     <ClCompile Include="Console\MessageDispose.cpp" />
     <ClCompile Include="CppUnit\CppUnitMain.cpp" />
     <ClCompile Include="CppUnit\Uint_AceReactorManager.cpp" />
+    <ClCompile Include="CppUnit\Uint_ConnectClient.cpp" />
     <ClCompile Include="CppUnit\Uint_ConnectHandler.cpp" />
     <ClCompile Include="CppUnit\Uint_ConsoleMessage.cpp" />
     <ClCompile Include="CppUnit\Uint_ConsolePromissions.cpp" />
@@ -598,6 +599,7 @@
     <ClInclude Include="CppUnit\PostServerMessage.h" />
     <ClInclude Include="CppUnit\PostUdpServerMessage.h" />
     <ClInclude Include="CppUnit\Uint_AceReactorManager.h" />
+    <ClInclude Include="CppUnit\Uint_ConnectClient.h" />
     <ClInclude Include="CppUnit\Uint_ConnectHandler.h" />
     <ClInclude Include="CppUnit\Uint_ConsoleMessage.h" />
     <ClInclude Include="CppUnit\Uint_ConsolePromissions.h" />
