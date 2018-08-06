@@ -57,6 +57,8 @@ Frame_Logging_Strategy::~Frame_Logging_Strategy()
 {
     ACE_DEBUG((LM_INFO, ACE_TEXT("[Frame_Logging_Strategy::~Frame_Logging_Strategy]Begin\n")));
 
+    pLogStrategy->fini();
+
     if (pLogStrategy != NULL)
     {
         pLogStrategy->reactor(NULL);

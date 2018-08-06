@@ -81,6 +81,13 @@ void CUnit_ServerMessageManager::Test_ServerMessageManager(void)
     ACE_Time_Value tvSleepDispose(0, 10000);
     ACE_OS::sleep(tvSleepDispose);
 
+    if (false == m_pServerMessageManager->CheckServerMessageThread(ACE_OS::gettimeofday()))
+    {
+        OUR_DEBUG((LM_INFO, "[Test_ServerMessageManager]m_pServerMessageManager->CheckServerMessageThread() is NULL.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[Test_ServerMessageManager]m_pServerMessageManager->CheckServerMessageThread() is NULL.", true == blRet);
+        return;
+    }
+
     OUR_DEBUG((LM_INFO, "[Test_ServerMessageManager]Begin Send Finish.\n"));
 
     m_pServerMessageManager->DelClientMessage(dynamic_cast<IClientMessage*>(&objPostServerData));
