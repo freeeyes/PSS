@@ -25,6 +25,12 @@ void CUnit_IPAccount::Test_IPAccount_Add(void)
     blRet = m_pIPAccount->AddIP("127.0.0.1");
 
     CPPUNIT_ASSERT_MESSAGE("[CUnit_IPAccount]Test_IPAccount_Add is fail.", true == blRet);
+
+    _IPAccount obj_IPAccount;
+    ACE_Date_Time dtNowTime;
+    blRet = obj_IPAccount.Check(dtNowTime);
+
+    CPPUNIT_ASSERT_MESSAGE("[CUnit_IPAccount]obj_IPAccount->Check is fail.", true == blRet);
 }
 
 void CUnit_IPAccount::Test_IPAccount_Count(void)
