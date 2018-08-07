@@ -33,11 +33,6 @@ void CLogBlockPool::Init(uint32 u4BlockSize, uint32 u4PoolCount)
 
     m_pLogBlockInfo = new _LogBlockInfo[u4PoolCount];
 
-    if(NULL == m_pLogBlockInfo)
-    {
-        OUR_DEBUG((LM_INFO, "[CLogBlockPool::CLogBlockPool]CLogBlockPool new (%d) fail.\n", u4PoolCount));
-    }
-
     for(uint32 i = 0; i < u4PoolCount; i++)
     {
         m_pLogBlockInfo[i].m_pBlock = new char[u4BlockSize];
