@@ -201,8 +201,65 @@ void CUnit_Basehandler::Test_Udp_Common_Send_Message(void)
     {
         OUR_DEBUG((LM_INFO, "[Test_Udp_Common_Send_Message]Udp_Common_Send_Message(127.0.0.1) is fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_Udp_Common_Send_Message]Udp_Common_Send_Message(127.0.0.1) is fail.", true == blRet);
+        return;
     }
 
+    SAFE_DELETE_ARRAY(pMessage);
+    App_MessageBlockManager::instance()->Close(pMbData);
+
+}
+
+void CUnit_Basehandler::Test_Tcp_Common_Make_Send_Packet(void)
+{
+    bool blRet = false;
+    ACE_Message_Block* pMbData       = NULL;
+    ACE_Message_Block* pBlockMessage = App_MessageBlockManager::instance()->Create(MAX_BUFF_200);
+    IBuffPacket* pBuffPacket         = App_BuffPacketManager::instance()->Create();
+
+    (*pBuffPacket) << (uint32)10;
+
+    _Send_Packet_Param obj_Send_Packet_Param;
+    obj_Send_Packet_Param.m_blDelete = false;
+    obj_Send_Packet_Param.m_u1SendType = SENDMESSAGE_NOMAL;
+    obj_Send_Packet_Param.m_u2CommandID = 0x2001;
+    obj_Send_Packet_Param.m_u4ConnectID = 1;
+    obj_Send_Packet_Param.m_u4PacketParseInfoID = 1;
+    obj_Send_Packet_Param.m_u4SendMaxBuffSize = 1;
+
+    uint32 u4PacketSize = 4;
+
+    //测试数据长度超长
+    bool blState = Tcp_Common_Make_Send_Packet(obj_Send_Packet_Param,
+                   pBuffPacket,
+                   pBlockMessage,
+                   pMbData,
+                   u4PacketSize);
+
+    if (blState == true)
+    {
+        OUR_DEBUG((LM_INFO, "[Test_Tcp_Common_Make_Send_Packet]Tcp_Common_Make_Send_Packet(m_u4SendMaxBuffSize=1) is fail.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[Test_Tcp_Common_Make_Send_Packet]Tcp_Common_Make_Send_Packet(m_u4SendMaxBuffSize=1) is fail.", true == blRet);
+        return;
+    }
+
+    obj_Send_Packet_Param.m_u4SendMaxBuffSize = MAX_BUFF_200;
+
+    blState = Tcp_Common_Make_Send_Packet(obj_Send_Packet_Param,
+                                          pBuffPacket,
+                                          pBlockMessage,
+                                          pMbData,
+                                          u4PacketSize);
+
+    if (blState == false)
+    {
+        OUR_DEBUG((LM_INFO, "[Test_Tcp_Common_Make_Send_Packet]Tcp_Common_Make_Send_Packet(m_u4SendMaxBuffSize=1) is fail.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[Test_Tcp_Common_Make_Send_Packet]Tcp_Common_Make_Send_Packet(m_u4SendMaxBuffSize=1) is fail.", true == blRet);
+        return;
+    }
+
+    App_BuffPacketManager::instance()->Delete(pBuffPacket);
+    App_MessageBlockManager::instance()->Close(pMbData);
+    App_MessageBlockManager::instance()->Close(pBlockMessage);
 }
 
 #endif

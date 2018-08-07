@@ -26,13 +26,6 @@ bool Udp_Common_Send_Message(_Send_Message_Param obj_Send_Message_Param, ACE_INE
         uint32 u4SendLength = App_PacketParseLoader::instance()->GetPacketParseInfo(obj_Send_Message_Param.m_u4PacketParseInfoID)->Make_Send_Packet_Length(0, obj_Send_Message_Param.m_u4Len, obj_Send_Message_Param.m_u2CommandID);
         pMbData = App_MessageBlockManager::instance()->Create(u4SendLength);
 
-        if (NULL == pMbData)
-        {
-            OUR_DEBUG((LM_INFO, "[Udp_Common_Send_Message]pMbData is NULL.\n"));
-            Recovery_Message(obj_Send_Message_Param.m_blDlete, pMessage);
-            return false;
-        }
-
         if (false == App_PacketParseLoader::instance()->GetPacketParseInfo(obj_Send_Message_Param.m_u4PacketParseInfoID)->Make_Send_Packet(0, pMessage, obj_Send_Message_Param.m_u4Len, pMbData, obj_Send_Message_Param.m_u2CommandID))
         {
             OUR_DEBUG((LM_INFO, "[Udp_Common_Send_Message]Make_Send_Packet is false.\n"));
@@ -46,13 +39,6 @@ bool Udp_Common_Send_Message(_Send_Message_Param obj_Send_Message_Param, ACE_INE
     {
         //不需要拼接包头，直接发送
         pMbData = App_MessageBlockManager::instance()->Create(obj_Send_Message_Param.m_u4Len);
-
-        if (NULL == pMbData)
-        {
-            OUR_DEBUG((LM_INFO, "[Udp_Common_Send_Message]pMbData is NULL.\n"));
-            Recovery_Message(obj_Send_Message_Param.m_blDlete, pMessage);
-            return false;
-        }
 
         //将数据拷贝到ACE_Message_Block对象中
         memcpy_safe(pMessage, obj_Send_Message_Param.m_u4Len, pMbData->wr_ptr(), obj_Send_Message_Param.m_u4Len);

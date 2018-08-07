@@ -16,6 +16,7 @@ class CUnit_Basehandler : public CppUnit::TestFixture
     CPPUNIT_TEST(Test_Tcp_Common_ClientNameInfo);
     CPPUNIT_TEST(Test_Udp_Common_Recv_Stream);
     CPPUNIT_TEST(Test_Udp_Common_Send_Message);
+    CPPUNIT_TEST(Test_Tcp_Common_Make_Send_Packet);
     CPPUNIT_TEST_SUITE_END();
 public:
 
@@ -30,6 +31,7 @@ public:
     void Test_Tcp_Common_ClientNameInfo(void);
     void Test_Udp_Common_Recv_Stream(void);
     void Test_Udp_Common_Send_Message(void);
+    void Test_Tcp_Common_Make_Send_Packet(void);
 private:
     int m_nBaseHandlerID;
 
