@@ -129,7 +129,7 @@ public:
 
     virtual int doLog(_LogBlockInfo* pLogBlockInfo);
 
-    bool SendMail(_LogBlockInfo* pLogBlockInfo);
+    bool SendMail(_LogBlockInfo* pLogBlockInfo, xmlMails::_Mail* pMailInfo = NULL);
 
     ACE_TString& GetLoggerName();
 

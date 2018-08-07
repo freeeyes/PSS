@@ -104,4 +104,19 @@ void CUnit_FileLogger::Test_FileLogger(void)
 
 }
 
+void CUnit_FileLogger::Test_SendMail(void)
+{
+    _LogBlockInfo   objLogBlockInfo;
+    xmlMails::_Mail objMailInfo;
+
+    char szMailBody[MAX_BUFF_200] = { '\0' };
+
+    sprintf_safe(objLogBlockInfo.m_szMailTitle, MAX_BUFF_200, "Pss Test");
+    sprintf_safe(szMailBody, MAX_BUFF_200, "Pss Test");
+
+    objLogBlockInfo.m_pBlock = (char* )szMailBody;
+
+    m_pLogFile->SendMail(&objLogBlockInfo, &objMailInfo);
+}
+
 #endif

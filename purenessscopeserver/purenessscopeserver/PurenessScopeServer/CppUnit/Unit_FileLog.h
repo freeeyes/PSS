@@ -10,6 +10,7 @@ class CUnit_FileLogger : public CppUnit::TestFixture
 {
     CPPUNIT_TEST_SUITE(CUnit_FileLogger);
     CPPUNIT_TEST(Test_FileLogger);
+    CPPUNIT_TEST(Test_SendMail);
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -20,6 +21,8 @@ public:
     virtual void tearDown(void);
 
     void Test_FileLogger(void);
+
+    void Test_SendMail(void);
 
 private:
     CLogFile* m_pLogFile;

@@ -219,10 +219,20 @@ int CLogFile::doLog(_LogBlockInfo* pLogBlockInfo)
     return 0;
 }
 
-bool CLogFile::SendMail(_LogBlockInfo* pLogBlockInfo)
+bool CLogFile::SendMail(_LogBlockInfo* pLogBlockInfo, xmlMails::_Mail* pMailInfo)
 {
     //发送邮件
-    xmlMails::_Mail* pMailAlert = GetXmlConfigAttribute(xmlMails)->GetMailAlert(pLogBlockInfo->m_u4MailID);
+    xmlMails::_Mail* pMailAlert = NULL;
+
+    //如果没有单独配置，则从配置文件中直接获得
+    if(NULL == pMailInfo)
+    {
+        pMailAlert = GetXmlConfigAttribute(xmlMails)->GetMailAlert(pLogBlockInfo->m_u4MailID);
+    }
+    else
+    {
+        pMailAlert = pMailInfo;
+    }
 
     if (NULL == pMailAlert)
     {
