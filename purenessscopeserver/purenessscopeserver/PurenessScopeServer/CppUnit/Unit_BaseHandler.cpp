@@ -155,4 +155,54 @@ void CUnit_Basehandler::Test_Udp_Common_Recv_Stream(void)
     App_MessageBlockManager::instance()->Close(pmb);
 }
 
+void CUnit_Basehandler::Test_Udp_Common_Send_Message(void)
+{
+    bool blRet = false;
+    ACE_Message_Block* pMbData = NULL;
+    ACE_INET_Addr AddrRemote;
+    ACE_SOCK_Dgram skRemote;
+
+    uint32 u4Len = MAX_BUFF_20;
+    char* pMessage = new char[u4Len];
+    memset(pMessage, 0, u4Len);
+
+    _Send_Message_Param obj_Send_Message_Param;
+    obj_Send_Message_Param.m_u4PacketParseInfoID = 1;
+    obj_Send_Message_Param.m_blDlete = false;
+    obj_Send_Message_Param.m_blHead = true;
+    obj_Send_Message_Param.m_nPort = 20002;
+    obj_Send_Message_Param.m_pIP = (char*)"300.0.0.1";
+    obj_Send_Message_Param.m_u2CommandID = 0x1002;
+    obj_Send_Message_Param.m_u4Len = u4Len;
+
+    //测试错误的IP地址
+    bool blState = Udp_Common_Send_Message(obj_Send_Message_Param,
+                                           AddrRemote,
+                                           pMessage,
+                                           pMbData,
+                                           skRemote);
+
+    if (blState == true)
+    {
+        OUR_DEBUG((LM_INFO, "[Test_Udp_Common_Send_Message]Udp_Common_Send_Message(300.0.0.1) is fail.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[Test_Udp_Common_Send_Message]Udp_Common_Send_Message(300.0.0.1) is fail.", true == blRet);
+        return;
+    }
+
+    //测试正常的数据解析
+    obj_Send_Message_Param.m_pIP = (char*)"127.0.0.1";
+    blState = Udp_Common_Send_Message(obj_Send_Message_Param,
+                                      AddrRemote,
+                                      pMessage,
+                                      pMbData,
+                                      skRemote);
+
+    if (blState == true)
+    {
+        OUR_DEBUG((LM_INFO, "[Test_Udp_Common_Send_Message]Udp_Common_Send_Message(127.0.0.1) is fail.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[Test_Udp_Common_Send_Message]Udp_Common_Send_Message(127.0.0.1) is fail.", true == blRet);
+    }
+
+}
+
 #endif
