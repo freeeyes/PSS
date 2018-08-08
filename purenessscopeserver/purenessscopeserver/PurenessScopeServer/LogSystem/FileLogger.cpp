@@ -310,10 +310,11 @@ bool CLogFile::SendMail(_LogBlockInfo* pLogBlockInfo, xmlMails::_Mail* pMailInfo
         ACE_OS::close(fd);
         return false;
     }
+
+    ACE_OS::close(fd);
     */
 
     free(pMail);
-    ACE_OS::close(fd);
     return true;
 }
 
