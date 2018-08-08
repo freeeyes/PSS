@@ -249,7 +249,7 @@ bool CLogFile::SendMail(_LogBlockInfo* pLogBlockInfo, xmlMails::_Mail* pMailInfo
                     (const unsigned char*)pLogBlockInfo->m_szMailTitle,
                     (const unsigned char*)pLogBlockInfo->m_pBlock);
 
-    if (nRet != 0)
+    if (nRet <= 0)
     {
         OUR_DEBUG((LM_ERROR, "[CLogFile::SendMail]MailID(%d) mailText error.\n", pLogBlockInfo->m_u4MailID));
         free(pMail);
@@ -265,6 +265,8 @@ bool CLogFile::SendMail(_LogBlockInfo* pLogBlockInfo, xmlMails::_Mail* pMailInfo
         return false;
     }
 
+    //这里先注释掉，以后用CURL重写一个。
+    /*
     ACE_HANDLE fd;
 
     nRet = connectSmtp(fd, (const unsigned char*)pMailAlert->MailUrl.c_str(),
@@ -308,6 +310,7 @@ bool CLogFile::SendMail(_LogBlockInfo* pLogBlockInfo, xmlMails::_Mail* pMailInfo
         ACE_OS::close(fd);
         return false;
     }
+    */
 
     free(pMail);
     ACE_OS::close(fd);
