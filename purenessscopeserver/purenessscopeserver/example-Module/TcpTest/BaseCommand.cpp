@@ -110,9 +110,18 @@ int CBaseCommand::Do_Base(IMessage* pMessage)
     IBuffPacket* pResponsesPacket = m_pServerObject->GetPacketManager()->Create();
     uint16 u2PostCommandID = COMMAND_BASE;
 
-    //数据原样奉还
-    (*pResponsesPacket) << (uint32)BodyPacket.m_nDataLen;
-    pResponsesPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
+    //如果数据长度是0，则什么都不做
+    if (BodyPacket.m_nDataLen == 0)
+    {
+        //返回数据头
+        (*pResponsesPacket) << (uint32)BodyPacket.m_nDataLen;
+    }
+    else
+    {
+        //数据原样奉还
+        (*pResponsesPacket) << (uint32)BodyPacket.m_nDataLen;
+        pResponsesPacket->WriteStream(BodyPacket.m_pData, BodyPacket.m_nDataLen);
+    }
 
     //(*pResponsesPacket) << u2PostCommandID;
     //(*pResponsesPacket) << u8ClientTime;

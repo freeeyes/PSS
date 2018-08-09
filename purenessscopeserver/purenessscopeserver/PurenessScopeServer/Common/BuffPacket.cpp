@@ -258,6 +258,11 @@ bool CBuffPacket::RollBack(uint32 u4Len)
 
 bool CBuffPacket::WriteStream(const char* pData, uint32 u4Len)
 {
+    if (NULL == pData || u4Len == 0)
+    {
+        return false;
+    }
+
     if(u4Len + m_u4PacketLen >= m_u4MaxPacketSize)
     {
         OUR_DEBUG((LM_ERROR, "[CBuffPacket::WriteStream] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", u4Len, m_u4PacketLen));

@@ -39,6 +39,7 @@
 #include "Uint_MessageService.h"
 #include "Uint_ConnectClient.h"
 #include "Uint_LogManager.h"
+#include "Unit_LoadModule.h"
 
 #define CPPUNIT_REPORT_PATH "./reports/cppunit/report.xml"
 
