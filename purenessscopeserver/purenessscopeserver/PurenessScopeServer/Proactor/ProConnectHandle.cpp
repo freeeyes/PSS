@@ -585,6 +585,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         }
     }
 
+    Close();
     Get_Recv_length();
 
     return;

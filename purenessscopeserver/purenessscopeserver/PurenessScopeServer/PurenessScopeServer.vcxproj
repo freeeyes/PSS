@@ -221,6 +221,7 @@
     <ClCompile Include="CppUnit\Unit_ForbiddenIP.cpp" />
     <ClCompile Include="CppUnit\Unit_FrameCommand.cpp" />
     <ClCompile Include="CppUnit\Unit_IPAccount.cpp" />
+    <ClCompile Include="CppUnit\Unit_LoadModule.cpp" />
     <ClCompile Include="CppUnit\Unit_Logging.cpp" />
     <ClCompile Include="CppUnit\Unit_MakePacket.cpp" />
     <ClCompile Include="CppUnit\Unit_MessageDefine.cpp" />
@@ -625,6 +626,7 @@
     <ClInclude Include="CppUnit\Unit_ForbiddenIP.h" />
     <ClInclude Include="CppUnit\Unit_FrameCommand.h" />
     <ClInclude Include="CppUnit\Unit_IPAccount.h" />
+    <ClInclude Include="CppUnit\Unit_LoadModule.h" />
     <ClInclude Include="CppUnit\Unit_Logging.h" />
     <ClInclude Include="CppUnit\Unit_MakePacket.h" />
     <ClInclude Include="CppUnit\Unit_MessageDefine.h" />
