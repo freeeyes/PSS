@@ -60,7 +60,6 @@ void CUnit_LoadModule::Test_LoadModule(void)
     if (false == App_ModuleLoader::instance()->GetAllModuleName(0, szModuleName, u2ModuleNameLen))
     {
         CPPUNIT_ASSERT_MESSAGE("[Test_LoadModule]GetAllModuleName is error.", true == blRet);
-        return;
     }
 }
 

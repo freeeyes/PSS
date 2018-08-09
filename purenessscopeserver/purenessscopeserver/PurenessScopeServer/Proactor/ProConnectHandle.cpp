@@ -554,10 +554,13 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                 Close(2, errno);
                 return;
             }
+
+            Close();
         }
         else if(mb.length() == App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength && m_pPacketParse->GetIsHandleHead())
         {
             //处理数据包头
+
             if (0 != Dispose_Paceket_Parse_Head(&mb))
             {
                 return;
@@ -585,7 +588,6 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         }
     }
 
-    Close();
     Get_Recv_length();
 
     return;
@@ -955,6 +957,7 @@ int CProConnectHandle::Dispose_Paceket_Parse_Head(ACE_Message_Block* pmb)
         }
 
         Close();
+        OUR_DEBUG((LM_INFO, "[CProConnectHandle::Dispose_Paceket_Parse_Head]m_nIOCount=%d.\n", m_nIOCount));
     }
     else
     {
