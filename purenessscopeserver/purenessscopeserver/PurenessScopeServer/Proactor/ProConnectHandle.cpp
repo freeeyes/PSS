@@ -125,6 +125,8 @@ void CProConnectHandle::Close(int nIOCount, int nErrno)
                                             m_u8SendQueueTimeCost);
 
 
+
+
         //如果是服务器关闭，则不理，因为连接已经清理掉了
         if (CONNECT_SERVER_CLOSE != m_u1ConnectState)
         {
@@ -522,7 +524,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
     uint32 u4PacketLen = (uint32)result.bytes_transferred();
     int nTran = (int)result.bytes_transferred();
 
-    if(!result.success() || result.bytes_transferred() == 0)
+    if(!result.success() || result.bytes_transferred() == 0 || this->handle() == ACE_INVALID_HANDLE)
     {
         //链接断开
         //清理PacketParse
