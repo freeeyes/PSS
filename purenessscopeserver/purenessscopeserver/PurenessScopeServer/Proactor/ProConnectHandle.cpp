@@ -1,41 +1,41 @@
 #include "ProConnectHandle.h"
 CProConnectHandle::CProConnectHandle(void) : m_u4LocalPort(0), m_u4SendCheckTime(0)
 {
-    m_szError[0]          = '\0';
-    m_u4ConnectID         = 0;
-    m_u4AllRecvCount      = 0;
-    m_u4AllSendCount      = 0;
-    m_u4AllRecvSize       = 0;
-    m_u4AllSendSize       = 0;
-    m_nIOCount            = 0;
-    m_u4HandlerID         = 0;
-    m_u2MaxConnectTime    = 0;
-    m_u4SendThresHold     = MAX_MSG_SNEDTHRESHOLD;
-    m_u1ConnectState      = CONNECT_INIT;
-    m_u1SendBuffState     = CONNECT_SENDNON;
-    m_pPacketParse        = NULL;
-    m_u4MaxPacketSize     = MAX_MSG_PACKETLENGTH;
-    m_u8RecvQueueTimeCost = 0;
-    m_u4RecvQueueCount    = 0;
-    m_u8SendQueueTimeCost = 0;
-    m_u4ReadSendSize      = 0;
-    m_u4SuccessSendSize   = 0;
-    m_u1IsActive          = 0;
-    m_pBlockMessage       = NULL;
-    m_u2SendQueueTimeout  = MAX_QUEUE_TIMEOUT * 1000;  //目前因为记录的是微秒，所以这里相应的扩大1000倍
-    m_u2RecvQueueTimeout  = MAX_QUEUE_TIMEOUT * 1000;  //目前因为记录的是微秒，所以这里相应的扩大1000倍
-    m_u2TcpNodelay        = TCP_NODELAY_ON;
-    m_u4SendMaxBuffSize   = 5*1024;
-    m_nHashID             = 0;
-    m_szConnectName[0]    = '\0';
-    m_blIsLog             = false;
-    m_szLocalIP[0]        = '\0';
-    m_u4RecvPacketCount   = 0;
-    m_u4PacketParseInfoID = 0;
-    m_u4PacketDebugSize   = 0;
-    m_pPacketDebugData    = NULL;
-    m_emIOType            = NET_INPUT;
-    m_pFileTest           = NULL;
+    m_szError[0]           = '\0';
+    m_u4ConnectID          = 0;
+    m_u4AllRecvCount       = 0;
+    m_u4AllSendCount       = 0;
+    m_u4AllRecvSize        = 0;
+    m_u4AllSendSize        = 0;
+    m_nIOCount             = 0;
+    m_u4HandlerID          = 0;
+    m_u2MaxConnectTime     = 0;
+    m_u4SendThresHold      = MAX_MSG_SNEDTHRESHOLD;
+    m_u1ConnectState       = CONNECT_INIT;
+    m_u1SendBuffState      = CONNECT_SENDNON;
+    m_pPacketParse         = NULL;
+    m_u4MaxPacketSize      = MAX_MSG_PACKETLENGTH;
+    m_u8RecvQueueTimeCost  = 0;
+    m_u4RecvQueueCount     = 0;
+    m_u8SendQueueTimeCost  = 0;
+    m_u4ReadSendSize       = 0;
+    m_u4SuccessSendSize    = 0;
+    m_u1IsActive           = 0;
+    m_pBlockMessage        = NULL;
+    m_u2SendQueueTimeout   = MAX_QUEUE_TIMEOUT * 1000;  //目前因为记录的是微秒，所以这里相应的扩大1000倍
+    m_u2RecvQueueTimeout   = MAX_QUEUE_TIMEOUT * 1000;  //目前因为记录的是微秒，所以这里相应的扩大1000倍
+    m_u2TcpNodelay         = TCP_NODELAY_ON;
+    m_u4SendMaxBuffSize    = 5*1024;
+    m_nHashID              = 0;
+    m_szConnectName[0]     = '\0';
+    m_blIsLog              = false;
+    m_szLocalIP[0]         = '\0';
+    m_u4RecvPacketCount    = 0;
+    m_u4PacketParseInfoID  = 0;
+    m_u4PacketDebugSize    = 0;
+    m_pPacketDebugData     = NULL;
+    m_emIOType             = NET_INPUT;
+    m_pFileTest            = NULL;
 }
 
 CProConnectHandle::~CProConnectHandle(void)
@@ -545,6 +545,9 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         if(result.bytes_transferred() < result.bytes_to_read())
         {
             //短读，继续读
+            OUR_DEBUG((LM_INFO, "[CProConnectHandle::handle_read_stream]bytes_to_read=%d,bytes_transferred=%d.\n",
+                       result.bytes_to_read(),
+                       result.bytes_transferred()));
             int nRead = (int)result.bytes_to_read() - (int)result.bytes_transferred();
 
             if(-1 == m_Reader.read(mb, nRead))
@@ -557,7 +560,7 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                 return;
             }
 
-            Close();
+            return;
         }
         else if(mb.length() == App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength && m_pPacketParse->GetIsHandleHead())
         {
@@ -903,6 +906,7 @@ int CProConnectHandle::Dispose_Paceket_Parse_Head(ACE_Message_Block* pmb)
 {
     //判断头的合法性
     _Head_Info objHeadInfo;
+
     bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Head_Info(GetConnectID(), pmb, App_MessageBlockManager::instance(), &objHeadInfo);
 
     if (false == blStateHead)
