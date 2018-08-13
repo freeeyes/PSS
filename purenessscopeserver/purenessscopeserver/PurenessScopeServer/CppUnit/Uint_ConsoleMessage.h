@@ -41,6 +41,7 @@ class CUnit_ConsoleMessage : public CppUnit::TestFixture
     CPPUNIT_TEST(Test_DoMessage_PortList);
     CPPUNIT_TEST(Test_Do_Message_BuffPacket);
     CPPUNIT_TEST(Test_Do_Message_LoadModule);
+    CPPUNIT_TEST(Test_Do_Message_ReLoadModule);
     CPPUNIT_TEST(Test_Do_Error_Command);
     CPPUNIT_TEST(Test_Check_Console_Ip);
     CPPUNIT_TEST(Test_Do_Message_CloseClient);
@@ -109,6 +110,7 @@ public:
     void Test_Do_Message_TestFileStart(void);
     void Test_Do_Message_TestFileStop(void);
     void Test_Do_Message_PoolSet(void);
+    void Test_Do_Message_ReLoadModule(void);
 
 private:
     bool Create_Command(const char* pCommand, uint16 u2ReturnCommandID);

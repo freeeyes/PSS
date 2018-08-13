@@ -401,5 +401,19 @@ void CUnit_ConsoleMessage::Test_Do_Message_PoolSet(void)
     Create_Command("b freeeyes PoolSet -n PacketParse -b false&", CONSOLE_COMMAND_POOL_SET);
 }
 
+void CUnit_ConsoleMessage::Test_Do_Message_ReLoadModule(void)
+{
+    //测试插件卸载和添加
+    Create_Command("b freeeyes ReLoadModule TCPTest&", CONSOLE_COMMAND_RELOADMOUDLE);
+
+    ACE_Time_Value tvSleep(0, 10000);
+    ACE_OS::sleep(tvSleep);
+
+    //测试文本输出
+    Create_Command("t freeeyes ReLoadModule TCPTest&", CONSOLE_COMMAND_RELOADMOUDLE);
+
+    ACE_OS::sleep(tvSleep);
+}
+
 #endif
 
