@@ -132,7 +132,7 @@ void DoMessage_LoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, u
     //加载文件MessageManager
     //消息所有的工作线程同步更新一下各自的消息列表副本
     if (true == App_ModuleLoader::instance()->LoadModule(FileInfo.m_szFilePath, FileInfo.m_szFileName, FileInfo.m_szFileParam) &&
-        true == App_MessageServiceGroup::instance()->PutUpdateCommandMessage(0))
+        true == App_MessageServiceGroup::instance()->PutUpdateCommandMessage(App_MessageManager::instance()->GetUpdateIndex()))
     {
         if (CommandInfo.m_u1OutputType == 0)
         {
