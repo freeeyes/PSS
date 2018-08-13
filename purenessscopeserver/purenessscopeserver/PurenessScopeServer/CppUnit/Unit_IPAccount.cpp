@@ -76,6 +76,33 @@ void CUnit_IPAccount::Test_IPAccount_GetInfo(void)
     CPPUNIT_ASSERT_MESSAGE("[Test_IPAccount_GetInfo]GetInfo is fail.", true == blRet);
 }
 
+void CUnit_IPAccount::Test_CConnectAccount(void)
+{
+    bool blRet = false;
+    CConnectAccount objConnectAccount;
+
+    objConnectAccount.Init(0, 1000, 0, 1000);
+
+    if (0 != objConnectAccount.Get4ConnectMin() || 1000 != objConnectAccount.GetConnectMax())
+    {
+        CPPUNIT_ASSERT_MESSAGE("[Test_CConnectAccount]Get4ConnectMin or GetConnectMax is error.", true == blRet);
+        return;
+    }
+
+    if (0 != objConnectAccount.GetDisConnectMin()
+        || 1000 != objConnectAccount.GetDisConnectMax()
+        || 0 != objConnectAccount.GetCurrDisConnect())
+    {
+        CPPUNIT_ASSERT_MESSAGE("[Test_CConnectAccount]GetDisConnectMin or GetDisConnectMin is error.", true == blRet);
+        return;
+    }
+
+    if (false == objConnectAccount.AddConnect() || false == objConnectAccount.AddDisConnect())
+    {
+        CPPUNIT_ASSERT_MESSAGE("[Test_CConnectAccount]GetDisConnectMin or GetDisConnectMin is error.", true == blRet);
+    }
+}
+
 #endif
 
 

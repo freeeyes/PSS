@@ -13,6 +13,7 @@ class CUnit_IPAccount : public CppUnit::TestFixture
     CPPUNIT_TEST(Test_IPAccount_Count);
     CPPUNIT_TEST(Test_IPAccount_LastConnectCount);
     CPPUNIT_TEST(Test_IPAccount_GetInfo);
+    CPPUNIT_TEST(Test_CConnectAccount);
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -29,6 +30,8 @@ public:
     void Test_IPAccount_LastConnectCount(void);
 
     void Test_IPAccount_GetInfo(void);
+
+    void Test_CConnectAccount(void);
 
 private:
     CIPAccount* m_pIPAccount;
