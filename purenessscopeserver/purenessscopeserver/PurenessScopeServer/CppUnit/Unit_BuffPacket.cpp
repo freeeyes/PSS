@@ -545,4 +545,38 @@ void CUnit_BuffPacket::Check_AddBuff_More_VCHARB_STR(void)
     }
 }
 
+void CUnit_BuffPacket::Test_PacketCount()
+{
+    bool blRet = false;
+    m_pBuffPacket->SetPacketCount(2);
+
+    if (m_pBuffPacket->GetPacketCount() != 2)
+    {
+        CPPUNIT_ASSERT_MESSAGE("[Test_PacketCount]GetPacketCount() != SetPacketCount.", true == blRet);
+        return;
+    }
+
+    //≤‚ ‘“∆∂Ø∂¡÷∏’Î
+    uint32 u4Data = 12;
+    (*m_pBuffPacket) << u4Data;
+    u4Data = 13;
+    (*m_pBuffPacket) << u4Data;
+
+    m_pBuffPacket->ReadBuffPtr(4);
+
+    m_pBuffPacket->SetReadPtr(0);
+
+    m_pBuffPacket->WriteBuffPtr(8);
+
+    m_pBuffPacket->GetError();
+
+    m_pBuffPacket->SetHashID(1);
+
+    if (m_pBuffPacket->GetHashID() != 1)
+    {
+        CPPUNIT_ASSERT_MESSAGE("[Test_PacketCount]GetHashID() error.", true == blRet);
+    }
+
+}
+
 #endif

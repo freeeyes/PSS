@@ -30,7 +30,7 @@ class CUnit_BuffPacket : public CppUnit::TestFixture
     CPPUNIT_TEST(Check_AddBuff_More_VCHARS_STR);
     CPPUNIT_TEST(Check_AddBuff_More_VCHARM_STR);
     CPPUNIT_TEST(Check_AddBuff_More_VCHARB_STR);
-
+    CPPUNIT_TEST(Test_PacketCount);
     CPPUNIT_TEST_SUITE_END();
 public:
     virtual ~CUnit_BuffPacket();
@@ -59,6 +59,8 @@ public:
     void Check_AddBuff_More_VCHARS_STR(void);
     void Check_AddBuff_More_VCHARM_STR(void);
     void Check_AddBuff_More_VCHARB_STR(void);
+
+    void Test_PacketCount();
 
 private:
     CBuffPacket* m_pBuffPacket;

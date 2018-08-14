@@ -54,32 +54,16 @@ bool CBuffPacket::Init(int32 nSize, int32 nMaxBuffSize)
 
 bool CBuffPacket::Close()
 {
-    try
+    if(NULL != m_szData)
     {
-        if(m_u4PacketLen >= m_u4MaxPacketSize)
-        {
-            OUR_DEBUG((LM_ERROR, "[CBuffPacket::Close] nSize [%d] is more than m_u4MaxPacketSize.\n", m_u4PacketLen));
-            char szError[MAX_BUFF_500] = {'\0'};
-            sprintf_safe(szError, MAX_BUFF_500, "[CBuffPacket::Close] nSize [%d] is more than m_u4MaxPacketSize.", m_u4PacketLen);
-            throw std::domain_error(szError);
-        }
-
-        if(NULL != m_szData)
-        {
-            App_ACEMemory::instance()->free((void* )m_szData);
-            m_szData          = NULL;
-            m_u4ReadPtr       = 0;
-            m_u4WritePtr      = 0;
-            m_u4PacketLen     = 0;
-        }
-
-        return true;
+        App_ACEMemory::instance()->free((void* )m_szData);
+        m_szData          = NULL;
+        m_u4ReadPtr       = 0;
+        m_u4WritePtr      = 0;
+        m_u4PacketLen     = 0;
     }
-    catch(const std::domain_error& ex)
-    {
-        sprintf_safe(m_szError, MAX_BUFF_500, "%s", ex.what());
-        return false;
-    }
+
+    return true;
 }
 
 bool CBuffPacket::Clear()
