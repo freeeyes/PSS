@@ -84,6 +84,14 @@ void CUnit_Basehandler::Test_Tcp_Common_Send_Input_To_Cache(void)
 
     CPPUNIT_ASSERT_MESSAGE("[Test_Tcp_Common_Send_Input_To_Cache]Tcp_Common_Send_Input_To_Cache is false.", true == blRet);
 
+    //测试缓冲区小于发送数据的分支
+    obj_Input_To_Cache_Param.m_u4SendMaxBuffSize = 2;
+
+    Tcp_Common_Send_Input_To_Cache(obj_Input_To_Cache_Param,
+                                   pMB,
+                                   u4PacketSize,
+                                   pBuffPacket);
+
     App_BuffPacketManager::instance()->Delete(pBuffPacket);
     SAFE_DELETE(pMB);
 }
@@ -220,7 +228,7 @@ void CUnit_Basehandler::Test_Tcp_Common_Make_Send_Packet(void)
 
     _Send_Packet_Param obj_Send_Packet_Param;
     obj_Send_Packet_Param.m_blDelete = false;
-    obj_Send_Packet_Param.m_u1SendType = SENDMESSAGE_NOMAL;
+    obj_Send_Packet_Param.m_u1SendType = SENDMESSAGE_JAMPNOMAL;
     obj_Send_Packet_Param.m_u2CommandID = 0x2001;
     obj_Send_Packet_Param.m_u4ConnectID = 1;
     obj_Send_Packet_Param.m_u4PacketParseInfoID = 1;
