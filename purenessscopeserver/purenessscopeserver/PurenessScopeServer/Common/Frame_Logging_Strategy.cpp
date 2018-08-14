@@ -190,3 +190,8 @@ int Frame_Logging_Strategy::EndLogStrategy()
     return 0;
 }
 
+My_ACE_Logging_Strategy* Frame_Logging_Strategy::GetStrategy()
+{
+    return pLogStrategy;
+}
+

@@ -52,6 +52,9 @@ public:
     //结束策略
     int EndLogStrategy();
 
+    //得到pLogStrategy指针
+    My_ACE_Logging_Strategy* GetStrategy();
+
 private:
     ACE_Reactor* pLogStraReactor;
     My_ACE_Logging_Strategy* pLogStrategy;
