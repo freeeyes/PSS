@@ -209,7 +209,7 @@ bool CServerManager::Run()
     //启动中间服务器链接管理器
     App_ClientReConnectManager::instance()->Init(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_POSTDEFINE));
 
-    uint16 u2ServerPortCount = (int)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
+    uint16 u2ServerPortCount = (uint16)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
 
     //创建和启动TCP反应器
     for (uint16 i = 0; i < u2ServerPortCount; i++)

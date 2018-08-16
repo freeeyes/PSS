@@ -62,7 +62,7 @@ bool XMainConfig::InitFile(const char* pFileName, XmlConfig start, XmlConfig end
 {
     bool bKet = true;
 
-    if (m_XmlOpeation.Init(pFileName))
+    if (m_XmlOperation.Init(pFileName))
     {
         /*
         注意for循环为2个判断条件
@@ -72,7 +72,7 @@ bool XMainConfig::InitFile(const char* pFileName, XmlConfig start, XmlConfig end
 		int i = start;
         for (; i <= end && bKet; ++i)
         {
-            bKet = IConfigOpeation::_array[i]->Init(&m_XmlOpeation);
+            bKet = IConfigOpeation::_array[i]->Init(&m_XmlOperation);
         }
 
 		if (false == bKet)
@@ -92,40 +92,40 @@ bool XMainConfig::InitFile(const char* pFileName, XmlConfig start, XmlConfig end
 
 /**********************************对应XmlConfig类各自的初始化行为***************************************/
 
-bool xmlRecvInfo::Init(CXmlOpeation* m_pXmlOpeation)
+bool xmlRecvInfo::Init(CXmlOpeation* pXmlOperation)
 {
-    return m_pXmlOpeation->Read_XML_Data_Single_Uint16("RecvInfo", "RecvQueueTimeout", RecvQueueTimeout)
-           && m_pXmlOpeation->Read_XML_Data_Single_Uint32("RecvInfo", "RecvBuffSize", RecvBuffSize);
+    return pXmlOperation->Read_XML_Data_Single_Uint16("RecvInfo", "RecvQueueTimeout", RecvQueueTimeout)
+           && pXmlOperation->Read_XML_Data_Single_Uint32("RecvInfo", "RecvBuffSize", RecvBuffSize);
 }
 
-bool xmlSendInfo::Init(CXmlOpeation* m_pXmlOpeation)
+bool xmlSendInfo::Init(CXmlOpeation* pXmlOperation)
 {
     bool bKet = false;
 
-    if (m_pXmlOpeation->Read_XML_Data_Single_Uint16("SendInfo", "SendTimeout", SendTimeout)
-        && m_pXmlOpeation->Read_XML_Data_Single_Uint16("SendInfo", "SendQueueMax", SendQueueMax)
-        && m_pXmlOpeation->Read_XML_Data_Single_Uint16("SendInfo", "PutQueueTimeout", PutQueueTimeout)
-        && m_pXmlOpeation->Read_XML_Data_Single_Uint32("SendInfo", "BlockCount", BlockCount)
-        && m_pXmlOpeation->Read_XML_Data_Single_Uint32("SendInfo", "MaxBlockSize", MaxBlockSize)
-        && m_pXmlOpeation->Read_XML_Data_Single_Uint16("SendInfo", "SendQueueTimeout", SendQueueTimeout)
-        && m_pXmlOpeation->Read_XML_Data_Single_Uint16("SendInfo", "SendQueueCount", SendQueueCount))
+    if (pXmlOperation->Read_XML_Data_Single_Uint16("SendInfo", "SendTimeout", SendTimeout)
+        && pXmlOperation->Read_XML_Data_Single_Uint16("SendInfo", "SendQueueMax", SendQueueMax)
+		&& pXmlOperation->Read_XML_Data_Single_Uint16("SendInfo", "PutQueueTimeout", PutQueueTimeout)
+		&& pXmlOperation->Read_XML_Data_Single_Uint32("SendInfo", "BlockCount", BlockCount)
+		&& pXmlOperation->Read_XML_Data_Single_Uint32("SendInfo", "MaxBlockSize", MaxBlockSize)
+		&& pXmlOperation->Read_XML_Data_Single_Uint16("SendInfo", "SendQueueTimeout", SendQueueTimeout)
+		&& pXmlOperation->Read_XML_Data_Single_Uint16("SendInfo", "SendQueueCount", SendQueueCount))
     {
         SendDatamark = MaxBlockSize;
-        bKet = m_pXmlOpeation->Read_XML_Data_Single_Uint16("SendInfo", "TcpNodelay", TcpNodelay);
+        bKet = pXmlOperation->Read_XML_Data_Single_Uint16("SendInfo", "TcpNodelay", TcpNodelay);
     }
 
     return bKet;
 }
 
-bool xmlNetWorkMode::Init(CXmlOpeation* m_pXmlOpeation)
+bool xmlNetWorkMode::Init(CXmlOpeation* pXmlOperation)
 {
     bool bKet = false;
     std::string strMode;
     std::string strNetByteOrder;
 
-    if (m_pXmlOpeation->Read_XML_Data_Single_String("NetWorkMode", "Mode", strMode)
-        && m_pXmlOpeation->Read_XML_Data_Single_Uint16("NetWorkMode", "BackLog", BackLog)
-        && m_pXmlOpeation->Read_XML_Data_Single_String("NetWorkMode", "ByteOrder", strNetByteOrder))
+    if (pXmlOperation->Read_XML_Data_Single_String("NetWorkMode", "Mode", strMode)
+        && pXmlOperation->Read_XML_Data_Single_Uint16("NetWorkMode", "BackLog", BackLog)
+        && pXmlOperation->Read_XML_Data_Single_String("NetWorkMode", "ByteOrder", strNetByteOrder))
     {
         SetNetByteOrder(strNetByteOrder);
         SetLocalByteOrder();
@@ -196,7 +196,7 @@ void xmlNetWorkMode::SetNetByteOrder(const std::string& pData)
 }
 
 
-bool xmlTCPServerIPs::Init(CXmlOpeation* pXmlOpeation)
+bool xmlTCPServerIPs::Init(CXmlOpeation* pXmlOperation)
 {
     bool bKet = true;
     TiXmlElement* pIP = NULL;
@@ -206,9 +206,9 @@ bool xmlTCPServerIPs::Init(CXmlOpeation* pXmlOpeation)
     _TCPServerIP tcpServerIP;
 
     while (bKet
-           && pXmlOpeation->Read_XML_Data_Multiple_String("TCPServerIP", "ip", tcpServerIP.ip, pIP)
-           && pXmlOpeation->Read_XML_Data_Multiple_Uint32("TCPServerIP", "port", tcpServerIP.port, pPort)
-           && pXmlOpeation->Read_XML_Data_Multiple_Uint32("TCPServerIP", "ParseID", tcpServerIP.packetparseid, pPacketParseID))
+           && pXmlOperation->Read_XML_Data_Multiple_String("TCPServerIP", "ip", tcpServerIP.ip, pIP)
+           && pXmlOperation->Read_XML_Data_Multiple_Uint32("TCPServerIP", "port", tcpServerIP.port, pPort)
+           && pXmlOperation->Read_XML_Data_Multiple_Uint32("TCPServerIP", "ParseID", tcpServerIP.packetparseid, pPacketParseID))
     {
         bKet = Check_IPType(tcpServerIP.ip, tcpServerIP.ipType);
         vec.push_back(tcpServerIP);
@@ -217,7 +217,7 @@ bool xmlTCPServerIPs::Init(CXmlOpeation* pXmlOpeation)
     return bKet;
 }
 
-bool xmlUDPServerIPs::Init(CXmlOpeation* pXmlOpeation)
+bool xmlUDPServerIPs::Init(CXmlOpeation* pXmlOperation)
 {
     bool bKet = true;
     TiXmlElement* pUIP = NULL;
@@ -228,10 +228,10 @@ bool xmlUDPServerIPs::Init(CXmlOpeation* pXmlOpeation)
     _UDPServerIP udpServerIP;
 
     while (bKet
-           && pXmlOpeation->Read_XML_Data_Multiple_String("UDPServerIP", "uip", udpServerIP.uip, pUIP)
-           && pXmlOpeation->Read_XML_Data_Multiple_Uint32("UDPServerIP", "uport", udpServerIP.uport, pUPort)
-           && pXmlOpeation->Read_XML_Data_Multiple_Uint32("UDPServerIP", "uMaxRecvSize", udpServerIP.uMaxRecvSize, pUMaxRecvSize)
-           && pXmlOpeation->Read_XML_Data_Multiple_Uint32("UDPServerIP", "uParseID", udpServerIP.uPacketParseID, pUPacketParseID))
+           && pXmlOperation->Read_XML_Data_Multiple_String("UDPServerIP", "uip", udpServerIP.uip, pUIP)
+           && pXmlOperation->Read_XML_Data_Multiple_Uint32("UDPServerIP", "uport", udpServerIP.uport, pUPort)
+           && pXmlOperation->Read_XML_Data_Multiple_Uint32("UDPServerIP", "uMaxRecvSize", udpServerIP.uMaxRecvSize, pUMaxRecvSize)
+           && pXmlOperation->Read_XML_Data_Multiple_Uint32("UDPServerIP", "uParseID", udpServerIP.uPacketParseID, pUPacketParseID))
     {
         bKet = Check_IPType(udpServerIP.uip, udpServerIP.uipType);
         vec.push_back(udpServerIP);
@@ -242,25 +242,25 @@ bool xmlUDPServerIPs::Init(CXmlOpeation* pXmlOpeation)
 
 
 
-bool xmlConnectServer::Init(CXmlOpeation* pXmlOpeation)
+bool xmlConnectServer::Init(CXmlOpeation* pXmlOperation)
 {
-    return pXmlOpeation->Read_XML_Data_Single_Uint32("ConnectServer", "TimeInterval", TimeInterval)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("ConnectServer", "Recvbuff", Recvbuff)
-           && pXmlOpeation->Read_XML_Data_Single_Uint8("ConnectServer", "RunType", RunType)
-           && pXmlOpeation->Read_XML_Data_Single_Uint16("ConnectServer", "TimeCheck", TimeCheck)
-           && pXmlOpeation->Read_XML_Data_Single_Uint16("ConnectServer", "Count", Count);
+    return pXmlOperation->Read_XML_Data_Single_Uint32("ConnectServer", "TimeInterval", TimeInterval)
+           && pXmlOperation->Read_XML_Data_Single_Uint32("ConnectServer", "Recvbuff", Recvbuff)
+           && pXmlOperation->Read_XML_Data_Single_Uint8("ConnectServer", "RunType", RunType)
+           && pXmlOperation->Read_XML_Data_Single_Uint16("ConnectServer", "TimeCheck", TimeCheck)
+           && pXmlOperation->Read_XML_Data_Single_Uint16("ConnectServer", "Count", Count);
 }
 
-bool xmlClientInfo::Init(CXmlOpeation* pXmlOpeation)
+bool xmlClientInfo::Init(CXmlOpeation* pXmlOperation)
 {
-    return pXmlOpeation->Read_XML_Data_Single_Uint32("ClientInfo", "HandlerCount", HandlerCount)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("ClientInfo", "MaxHandlerCount", MaxHandlerCount)
-           && pXmlOpeation->Read_XML_Data_Single_Uint16("ClientInfo", "MaxConnectTime", MaxConnectTime)
-           && pXmlOpeation->Read_XML_Data_Single_Uint16("ClientInfo", "CheckAliveTime", CheckAliveTime)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("ClientInfo", "MaxBuffRecv", MaxBuffRecv);
+    return pXmlOperation->Read_XML_Data_Single_Uint32("ClientInfo", "HandlerCount", HandlerCount)
+           && pXmlOperation->Read_XML_Data_Single_Uint32("ClientInfo", "MaxHandlerCount", MaxHandlerCount)
+           && pXmlOperation->Read_XML_Data_Single_Uint16("ClientInfo", "MaxConnectTime", MaxConnectTime)
+           && pXmlOperation->Read_XML_Data_Single_Uint16("ClientInfo", "CheckAliveTime", CheckAliveTime)
+           && pXmlOperation->Read_XML_Data_Single_Uint32("ClientInfo", "MaxBuffRecv", MaxBuffRecv);
 }
 
-bool xmlModuleInfos::Init(CXmlOpeation* pXmlOpeation)
+bool xmlModuleInfos::Init(CXmlOpeation* pXmlOperation)
 {
     TiXmlElement* pName = NULL;
     TiXmlElement* pPath = NULL;
@@ -268,9 +268,9 @@ bool xmlModuleInfos::Init(CXmlOpeation* pXmlOpeation)
 
     _ModuleInfo moduleInfo;
 
-    while (pXmlOpeation->Read_XML_Data_Multiple_String("ModuleInfo", "ModuleSName", moduleInfo.szModuleName, pName)
-           && pXmlOpeation->Read_XML_Data_Multiple_String("ModuleInfo", "ModuleSPath", moduleInfo.szModulePath, pPath)
-           && pXmlOpeation->Read_XML_Data_Multiple_String("ModuleInfo", "ModuleSParam", moduleInfo.szModuleParam, pParam))
+    while (pXmlOperation->Read_XML_Data_Multiple_String("ModuleInfo", "ModuleSName", moduleInfo.szModuleName, pName)
+           && pXmlOperation->Read_XML_Data_Multiple_String("ModuleInfo", "ModuleSPath", moduleInfo.szModulePath, pPath)
+           && pXmlOperation->Read_XML_Data_Multiple_String("ModuleInfo", "ModuleSParam", moduleInfo.szModuleParam, pParam))
     {
         vec.push_back(moduleInfo);
     }
@@ -278,43 +278,43 @@ bool xmlModuleInfos::Init(CXmlOpeation* pXmlOpeation)
     return true;
 }
 
-bool xmlModuleMangager::Init(CXmlOpeation* pXmlOpeation)
+bool xmlModuleMangager::Init(CXmlOpeation* pXmlOperation)
 {
-    return pXmlOpeation->Read_XML_Data_Single_Uint32("ModuleManager", "MaxCount", MaxCount);
+    return pXmlOperation->Read_XML_Data_Single_Uint32("ModuleManager", "MaxCount", MaxCount);
 }
 
-bool xmlMonitor::Init(CXmlOpeation* pXmlOpeation)
+bool xmlMonitor::Init(CXmlOpeation* pXmlOperation)
 {
-    return pXmlOpeation->Read_XML_Data_Single_Uint8("Monitor", "CpuAndMemory", CpuAndMemory)
-           && pXmlOpeation->Read_XML_Data_Single_Uint16("Monitor", "CpuMax", CpuMax)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("Monitor", "MemoryMax", MemoryMax);
+    return pXmlOperation->Read_XML_Data_Single_Uint8("Monitor", "CpuAndMemory", CpuAndMemory)
+           && pXmlOperation->Read_XML_Data_Single_Uint16("Monitor", "CpuMax", CpuMax)
+           && pXmlOperation->Read_XML_Data_Single_Uint32("Monitor", "MemoryMax", MemoryMax);
 }
 
-bool xmlThreadInfoAI::Init(CXmlOpeation* pXmlOpeation)
+bool xmlThreadInfoAI::Init(CXmlOpeation* pXmlOperation)
 {
-    return pXmlOpeation->Read_XML_Data_Single_Uint8("ThreadInfoAI", "AI", AI)
-           && pXmlOpeation->Read_XML_Data_Single_Uint8("ThreadInfoAI", "ReturnDataType", ReturnDataType)
-           && pXmlOpeation->Read_XML_Data_Single_Uint16("ThreadInfoAI", "CheckTime", CheckTime)
-           && pXmlOpeation->Read_XML_Data_Single_Uint16("ThreadInfoAI", "TimeoutCount", TimeoutCount)
-           && pXmlOpeation->Read_XML_Data_Single_Uint16("ThreadInfoAI", "StopTime", StopTime)
-           && pXmlOpeation->Read_XML_Data_Single_String("ThreadInfoAI", "ReturnData", ReturnData);
+    return pXmlOperation->Read_XML_Data_Single_Uint8("ThreadInfoAI", "AI", AI)
+           && pXmlOperation->Read_XML_Data_Single_Uint8("ThreadInfoAI", "ReturnDataType", ReturnDataType)
+           && pXmlOperation->Read_XML_Data_Single_Uint16("ThreadInfoAI", "CheckTime", CheckTime)
+           && pXmlOperation->Read_XML_Data_Single_Uint16("ThreadInfoAI", "TimeoutCount", TimeoutCount)
+           && pXmlOperation->Read_XML_Data_Single_Uint16("ThreadInfoAI", "StopTime", StopTime)
+           && pXmlOperation->Read_XML_Data_Single_String("ThreadInfoAI", "ReturnData", ReturnData);
 }
 
-bool xmlThreadInfo::Init(CXmlOpeation* pXmlOpeation)
+bool xmlThreadInfo::Init(CXmlOpeation* pXmlOperation)
 {
-    return pXmlOpeation->Read_XML_Data_Single_Uint16("ThreadInfo", "ThreadTimeout", ThreadTimeout)
-           && pXmlOpeation->Read_XML_Data_Single_Uint16("ThreadInfo", "ThreadTimeCheck", ThreadTimeCheck)
-           && pXmlOpeation->Read_XML_Data_Single_Uint16("ThreadInfo", "DisposeTimeout", DisposeTimeout)
-           && pXmlOpeation->Read_XML_Data_Single_Uint16("ThreadInfo", "PutQueueTimeout", PutQueueTimeout);
+    return pXmlOperation->Read_XML_Data_Single_Uint16("ThreadInfo", "ThreadTimeout", ThreadTimeout)
+           && pXmlOperation->Read_XML_Data_Single_Uint16("ThreadInfo", "ThreadTimeCheck", ThreadTimeCheck)
+           && pXmlOperation->Read_XML_Data_Single_Uint16("ThreadInfo", "DisposeTimeout", DisposeTimeout)
+           && pXmlOperation->Read_XML_Data_Single_Uint16("ThreadInfo", "PutQueueTimeout", PutQueueTimeout);
 }
 
-bool xmlConsole::Init(CXmlOpeation* pXmlOpeation)
+bool xmlConsole::Init(CXmlOpeation* pXmlOperation)
 {
     bool bKet = true;
 
-    if (pXmlOpeation->Read_XML_Data_Single_Uint8("Console", "support", support)
-        && pXmlOpeation->Read_XML_Data_Single_String("Console", "sip", sip)
-        && pXmlOpeation->Read_XML_Data_Single_Uint16("Console", "sport", sport))
+    if (pXmlOperation->Read_XML_Data_Single_Uint8("Console", "support", support)
+        && pXmlOperation->Read_XML_Data_Single_String("Console", "sip", sip)
+        && pXmlOperation->Read_XML_Data_Single_Uint16("Console", "sport", sport))
     {
         bKet = Check_IPType(sip, ipType);
     }
@@ -322,12 +322,12 @@ bool xmlConsole::Init(CXmlOpeation* pXmlOpeation)
     return bKet;
 }
 
-bool xmlConsoleKeys::Init(CXmlOpeation* pXmlOpeation)
+bool xmlConsoleKeys::Init(CXmlOpeation* pXmlOperation)
 {
     TiXmlElement* pKey = NULL;
     _ConsoleKey consolekey;
 
-    while (pXmlOpeation->Read_XML_Data_Multiple_String("ConsoleKey", "Key", consolekey.Key, pKey))
+    while (pXmlOperation->Read_XML_Data_Multiple_String("ConsoleKey", "Key", consolekey.Key, pKey))
     {
         vec.push_back(consolekey);
     }
@@ -335,12 +335,12 @@ bool xmlConsoleKeys::Init(CXmlOpeation* pXmlOpeation)
     return true;
 }
 
-bool xmlConsoleClients::Init(CXmlOpeation* pXmlOpeation)
+bool xmlConsoleClients::Init(CXmlOpeation* pXmlOperation)
 {
     TiXmlElement* pCip = NULL;
     _ConsoleClient consoleclient;
 
-    while (pXmlOpeation->Read_XML_Data_Multiple_String("ConsoleClient", "cip", consoleclient.cip, pCip))
+    while (pXmlOperation->Read_XML_Data_Multiple_String("ConsoleClient", "cip", consoleclient.cip, pCip))
     {
         vec.push_back(consoleclient);
     }
@@ -348,55 +348,55 @@ bool xmlConsoleClients::Init(CXmlOpeation* pXmlOpeation)
     return true;
 }
 
-bool xmlAceDebug::Init(CXmlOpeation* pXmlOpeation)
+bool xmlAceDebug::Init(CXmlOpeation* pXmlOperation)
 {
-    return pXmlOpeation->Read_XML_Data_Single_Uint8("AceDebug", "TrunOn", TrunOn)
-           && pXmlOpeation->Read_XML_Data_Single_String("AceDebug", "DebugName", DebugName)
-           && pXmlOpeation->Read_XML_Data_Single_Uint16("AceDebug", "ChkInterval", ChkInterval)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("AceDebug", "LogFileMaxSize", LogFileMaxSize)
-           && pXmlOpeation->Read_XML_Data_Single_Uint8("AceDebug", "LogFileMaxCnt", LogFileMaxCnt)
-           && pXmlOpeation->Read_XML_Data_Single_String("AceDebug", "Level", Level);
+    return pXmlOperation->Read_XML_Data_Single_Uint8("AceDebug", "TrunOn", TrunOn)
+           && pXmlOperation->Read_XML_Data_Single_String("AceDebug", "DebugName", DebugName)
+           && pXmlOperation->Read_XML_Data_Single_Uint16("AceDebug", "ChkInterval", ChkInterval)
+           && pXmlOperation->Read_XML_Data_Single_Uint32("AceDebug", "LogFileMaxSize", LogFileMaxSize)
+           && pXmlOperation->Read_XML_Data_Single_Uint8("AceDebug", "LogFileMaxCnt", LogFileMaxCnt)
+           && pXmlOperation->Read_XML_Data_Single_String("AceDebug", "Level", Level);
 }
 
-bool xmlCommandAccount::Init(CXmlOpeation* pXmlOpeation)
+bool xmlCommandAccount::Init(CXmlOpeation* pXmlOperation)
 {
-    return pXmlOpeation->Read_XML_Data_Single_Uint8("CommandAccount", "Account", Account)
-           && pXmlOpeation->Read_XML_Data_Single_Uint8("CommandAccount", "FlowAccount", FlowAccount)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("CommandAccount", "MaxCommandCount", MaxCommandCount);
+    return pXmlOperation->Read_XML_Data_Single_Uint8("CommandAccount", "Account", Account)
+           && pXmlOperation->Read_XML_Data_Single_Uint8("CommandAccount", "FlowAccount", FlowAccount)
+           && pXmlOperation->Read_XML_Data_Single_Uint32("CommandAccount", "MaxCommandCount", MaxCommandCount);
 }
 
-bool xmlCoreSetting::Init(CXmlOpeation* pXmlOpeation)
+bool xmlCoreSetting::Init(CXmlOpeation* pXmlOperation)
 {
-    return pXmlOpeation->Read_XML_Data_Single_Uint8("CoreSetting", "CoreNeed", CoreNeed)
-           && pXmlOpeation->Read_XML_Data_Single_String("CoreSetting", "Script", Script);
+    return pXmlOperation->Read_XML_Data_Single_Uint8("CoreSetting", "CoreNeed", CoreNeed)
+           && pXmlOperation->Read_XML_Data_Single_String("CoreSetting", "Script", Script);
 }
 
-bool xmlServerType::Init(CXmlOpeation* pXmlOpeation)
+bool xmlServerType::Init(CXmlOpeation* pXmlOperation)
 {
-    return pXmlOpeation->Read_XML_Data_Single_Uint8("ServerType", "Type", Type)
-           && pXmlOpeation->Read_XML_Data_Single_String("ServerType", "name", name)
-           && pXmlOpeation->Read_XML_Data_Single_String("ServerType", "displayname", displayname)
-           && pXmlOpeation->Read_XML_Data_Single_Uint8("ServerType", "Debug", Debug)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("ServerType", "DebugSize", DebugSize)
-           && pXmlOpeation->Read_XML_Data_Single_Uint8("ServerType", "IsClose", IsClose);
+    return pXmlOperation->Read_XML_Data_Single_Uint8("ServerType", "Type", Type)
+           && pXmlOperation->Read_XML_Data_Single_String("ServerType", "name", name)
+           && pXmlOperation->Read_XML_Data_Single_String("ServerType", "displayname", displayname)
+           && pXmlOperation->Read_XML_Data_Single_Uint8("ServerType", "Debug", Debug)
+           && pXmlOperation->Read_XML_Data_Single_Uint32("ServerType", "DebugSize", DebugSize)
+           && pXmlOperation->Read_XML_Data_Single_Uint8("ServerType", "IsClose", IsClose);
 }
 
-bool xmlServerID::Init(CXmlOpeation* pXmlOpeation)
+bool xmlServerID::Init(CXmlOpeation* pXmlOperation)
 {
-    return pXmlOpeation->Read_XML_Data_Single_Uint32("ServerID", "id", id);
+    return pXmlOperation->Read_XML_Data_Single_Uint32("ServerID", "id", id);
 }
 
-bool xmlServerName::Init(CXmlOpeation* pXmlOpeation)
+bool xmlServerName::Init(CXmlOpeation* pXmlOperation)
 {
-    return pXmlOpeation->Read_XML_Data_Single_String("ServerName", "name", name);
+    return pXmlOperation->Read_XML_Data_Single_String("ServerName", "name", name);
 }
 
-bool xmlServerVersion::Init(CXmlOpeation* pXmlOpeation)
+bool xmlServerVersion::Init(CXmlOpeation* pXmlOperation)
 {
-    return pXmlOpeation->Read_XML_Data_Single_String("ServerVersion", "Version", Version);
+    return pXmlOperation->Read_XML_Data_Single_String("ServerVersion", "Version", Version);
 }
 
-bool xmlPacketParses::Init(CXmlOpeation* pXmlOpeation)
+bool xmlPacketParses::Init(CXmlOpeation* pXmlOperation)
 {
     TiXmlElement* pParseID = NULL;
     TiXmlElement* pPath = NULL;
@@ -407,11 +407,11 @@ bool xmlPacketParses::Init(CXmlOpeation* pXmlOpeation)
     _PacketParse packetparse;
     string Type;
 
-    while (pXmlOpeation->Read_XML_Data_Multiple_Uint16("PacketParse", "ParseID", packetparse.ParseID, pParseID)
-           && pXmlOpeation->Read_XML_Data_Multiple_String("PacketParse", "ModulePath", packetparse.ModulePath, pPath)
-           && pXmlOpeation->Read_XML_Data_Multiple_String("PacketParse", "ModuleName", packetparse.ModuleName, pName)
-           && pXmlOpeation->Read_XML_Data_Multiple_String("PacketParse", "Type", Type, pType)
-           && pXmlOpeation->Read_XML_Data_Multiple_Uint16("PacketParse", "OrgLength", packetparse.OrgLength, pOrg))
+    while (pXmlOperation->Read_XML_Data_Multiple_Uint16("PacketParse", "ParseID", packetparse.ParseID, pParseID)
+           && pXmlOperation->Read_XML_Data_Multiple_String("PacketParse", "ModulePath", packetparse.ModulePath, pPath)
+           && pXmlOperation->Read_XML_Data_Multiple_String("PacketParse", "ModuleName", packetparse.ModuleName, pName)
+           && pXmlOperation->Read_XML_Data_Multiple_String("PacketParse", "Type", Type, pType)
+           && pXmlOperation->Read_XML_Data_Multiple_Uint16("PacketParse", "OrgLength", packetparse.OrgLength, pOrg))
     {
         if (Type.compare("STREAM") == 0)
         {
@@ -430,22 +430,22 @@ bool xmlPacketParses::Init(CXmlOpeation* pXmlOpeation)
     return true;
 }
 
-bool xmlBuffPacket::Init(CXmlOpeation* pXmlOpeation)
+bool xmlBuffPacket::Init(CXmlOpeation* pXmlOperation)
 {
-    return pXmlOpeation->Read_XML_Data_Single_Uint32("BuffPacket", "Count", Count);
+    return pXmlOperation->Read_XML_Data_Single_Uint32("BuffPacket", "Count", Count);
 }
 
-bool xmlMessage::Init(CXmlOpeation* pXmlOpeation)
+bool xmlMessage::Init(CXmlOpeation* pXmlOperation)
 {
     bool bKet = false;
 
-    if (pXmlOpeation->Read_XML_Data_Single_Uint32("Message", "Msg_High_mark", Msg_High_mark)
-        && pXmlOpeation->Read_XML_Data_Single_Uint32("Message", "Msg_Low_mark", Msg_Low_mark)
-        && pXmlOpeation->Read_XML_Data_Single_Uint32("Message", "Msg_Buff_Max_Size", Msg_Buff_Max_Size)
-        && pXmlOpeation->Read_XML_Data_Single_Uint16("Message", "Msg_Thread", Msg_Thread)
-        && pXmlOpeation->Read_XML_Data_Single_Uint32("Message", "Msg_MaxQueue", Msg_MaxQueue))
+    if (pXmlOperation->Read_XML_Data_Single_Uint32("Message", "Msg_High_mark", Msg_High_mark)
+        && pXmlOperation->Read_XML_Data_Single_Uint32("Message", "Msg_Low_mark", Msg_Low_mark)
+        && pXmlOperation->Read_XML_Data_Single_Uint32("Message", "Msg_Buff_Max_Size", Msg_Buff_Max_Size)
+        && pXmlOperation->Read_XML_Data_Single_Uint16("Message", "Msg_Thread", Msg_Thread)
+        && pXmlOperation->Read_XML_Data_Single_Uint32("Message", "Msg_MaxQueue", Msg_MaxQueue))
     {
-        pXmlOpeation->Read_XML_Data_Single_Uint16("Message", "Msg_Process", Msg_Process);
+        pXmlOperation->Read_XML_Data_Single_Uint16("Message", "Msg_Process", Msg_Process);
         bKet = true;
     }
 
@@ -453,41 +453,41 @@ bool xmlMessage::Init(CXmlOpeation* pXmlOpeation)
 }
 
 /******************************alert.xml***************************************/
-bool xmlAlertConnect::Init(CXmlOpeation* pXmlOpeation)
+bool xmlAlertConnect::Init(CXmlOpeation* pXmlOperation)
 {
-    return pXmlOpeation->Read_XML_Data_Single_Uint8("AlertConnect", "ConnectMin", ConnectMin)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("AlertConnect", "ConnectMax", ConnectMax)
-           && pXmlOpeation->Read_XML_Data_Single_Uint16("AlertConnect", "DisConnectMin", DisConnectMin)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("AlertConnect", "DisConnectMax", DisConnectMax)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("AlertConnect", "ConnectAlert", ConnectAlert)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("AlertConnect", "MailID", MailID);
+    return pXmlOperation->Read_XML_Data_Single_Uint8("AlertConnect", "ConnectMin", ConnectMin)
+           && pXmlOperation->Read_XML_Data_Single_Uint32("AlertConnect", "ConnectMax", ConnectMax)
+           && pXmlOperation->Read_XML_Data_Single_Uint16("AlertConnect", "DisConnectMin", DisConnectMin)
+           && pXmlOperation->Read_XML_Data_Single_Uint32("AlertConnect", "DisConnectMax", DisConnectMax)
+           && pXmlOperation->Read_XML_Data_Single_Uint32("AlertConnect", "ConnectAlert", ConnectAlert)
+           && pXmlOperation->Read_XML_Data_Single_Uint32("AlertConnect", "MailID", MailID);
 }
 
-bool xmlIP::Init(CXmlOpeation* pXmlOpeation)
+bool xmlIP::Init(CXmlOpeation* pXmlOperation)
 {
-    return pXmlOpeation->Read_XML_Data_Single_Uint8("IP", "IPMax", IPMax)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("IP", "Timeout", Timeout);
+    return pXmlOperation->Read_XML_Data_Single_Uint8("IP", "IPMax", IPMax)
+           && pXmlOperation->Read_XML_Data_Single_Uint32("IP", "Timeout", Timeout);
 }
 
-bool xmlClientData::Init(CXmlOpeation* pXmlOpeation)
+bool xmlClientData::Init(CXmlOpeation* pXmlOperation)
 {
-    return pXmlOpeation->Read_XML_Data_Single_Uint16("ClientData", "RecvPacketCount", RecvPacketCount)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("ClientData", "RecvDataMax", RecvDataMax)
-           && pXmlOpeation->Read_XML_Data_Single_Uint16("ClientData", "SendPacketCount", SendPacketCount)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("ClientData", "SendDataMax", SendDataMax)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("ClientData", "MailID", MailID);
+    return pXmlOperation->Read_XML_Data_Single_Uint16("ClientData", "RecvPacketCount", RecvPacketCount)
+           && pXmlOperation->Read_XML_Data_Single_Uint32("ClientData", "RecvDataMax", RecvDataMax)
+           && pXmlOperation->Read_XML_Data_Single_Uint16("ClientData", "SendPacketCount", SendPacketCount)
+           && pXmlOperation->Read_XML_Data_Single_Uint32("ClientData", "SendDataMax", SendDataMax)
+           && pXmlOperation->Read_XML_Data_Single_Uint32("ClientData", "MailID", MailID);
 }
 
-bool xmlCommandInfos::Init(CXmlOpeation* pXmlOpeation)
+bool xmlCommandInfos::Init(CXmlOpeation* pXmlOperation)
 {
     TiXmlElement* pCommandID = NULL;
     TiXmlElement* pCommandCount = NULL;
     TiXmlElement* pMailID = NULL;
     _CommandInfo commandInfo;
 
-    while (pXmlOpeation->Read_XML_Data_Multiple_Uint32("CommandInfo", "CommandID", commandInfo.CommandID, pCommandID)
-           && pXmlOpeation->Read_XML_Data_Multiple_Uint32("CommandInfo", "CommandCount", commandInfo.CommandCount, pCommandCount)
-           && pXmlOpeation->Read_XML_Data_Multiple_Uint32("CommandInfo", "MailID", commandInfo.MailID, pMailID))
+    while (pXmlOperation->Read_XML_Data_Multiple_Uint32("CommandInfo", "CommandID", commandInfo.CommandID, pCommandID)
+           && pXmlOperation->Read_XML_Data_Multiple_Uint32("CommandInfo", "CommandCount", commandInfo.CommandCount, pCommandCount)
+           && pXmlOperation->Read_XML_Data_Multiple_Uint32("CommandInfo", "MailID", commandInfo.MailID, pMailID))
     {
         vec.push_back(commandInfo);
     }
@@ -495,7 +495,7 @@ bool xmlCommandInfos::Init(CXmlOpeation* pXmlOpeation)
     return true;
 }
 
-bool xmlMails::Init(CXmlOpeation* pXmlOpeation)
+bool xmlMails::Init(CXmlOpeation* pXmlOperation)
 {
     TiXmlElement* pMailID = NULL;
     TiXmlElement* pfromMailAddr = NULL;
@@ -505,12 +505,12 @@ bool xmlMails::Init(CXmlOpeation* pXmlOpeation)
     TiXmlElement* pMailPort = NULL;
     _Mail mail;
 
-    while (pXmlOpeation->Read_XML_Data_Multiple_Uint16("Mail", "MailID", mail.MailID, pMailID)
-           && pXmlOpeation->Read_XML_Data_Multiple_String("Mail", "fromMailAddr", mail.fromMailAddr, pfromMailAddr)
-           && pXmlOpeation->Read_XML_Data_Multiple_String("Mail", "toMailAddr", mail.toMailAddr, ptoMailAddr)
-           && pXmlOpeation->Read_XML_Data_Multiple_String("Mail", "MailPass", mail.MailPass, pMailPass)
-           && pXmlOpeation->Read_XML_Data_Multiple_String("Mail", "MailUrl", mail.MailUrl, pMailUrl)
-           && pXmlOpeation->Read_XML_Data_Multiple_Uint16("Mail", "MailPort", mail.MailPort, pMailPort))
+    while (pXmlOperation->Read_XML_Data_Multiple_Uint16("Mail", "MailID", mail.MailID, pMailID)
+           && pXmlOperation->Read_XML_Data_Multiple_String("Mail", "fromMailAddr", mail.fromMailAddr, pfromMailAddr)
+           && pXmlOperation->Read_XML_Data_Multiple_String("Mail", "toMailAddr", mail.toMailAddr, ptoMailAddr)
+           && pXmlOperation->Read_XML_Data_Multiple_String("Mail", "MailPass", mail.MailPass, pMailPass)
+           && pXmlOperation->Read_XML_Data_Multiple_String("Mail", "MailUrl", mail.MailUrl, pMailUrl)
+           && pXmlOperation->Read_XML_Data_Multiple_Uint16("Mail", "MailPort", mail.MailPort, pMailPort))
     {
         vec.push_back(mail);
     }
@@ -531,16 +531,16 @@ xmlMails::_Mail* xmlMails::GetMailAlert(uint16 MailID)
     return NULL;
 }
 
-bool xmlWorkThreadChart::Init(CXmlOpeation* pXmlOpeation)
+bool xmlWorkThreadChart::Init(CXmlOpeation* pXmlOperation)
 {
-    return pXmlOpeation->Read_XML_Data_Single_Uint16("WorkThreadChart", "JsonOutput", JsonOutput)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("WorkThreadChart", "Count", Count)
-           && pXmlOpeation->Read_XML_Data_Single_String("WorkThreadChart", "File", File);
+    return pXmlOperation->Read_XML_Data_Single_Uint16("WorkThreadChart", "JsonOutput", JsonOutput)
+           && pXmlOperation->Read_XML_Data_Single_Uint32("WorkThreadChart", "Count", Count)
+           && pXmlOperation->Read_XML_Data_Single_String("WorkThreadChart", "File", File);
 }
 
-bool xmlConnectChart::Init(CXmlOpeation* pXmlOpeation)
+bool xmlConnectChart::Init(CXmlOpeation* pXmlOperation)
 {
-    return pXmlOpeation->Read_XML_Data_Single_Uint16("ConnectChart", "JsonOutput", JsonOutput)
-           && pXmlOpeation->Read_XML_Data_Single_Uint32("ConnectChart", "Count", Count)
-           && pXmlOpeation->Read_XML_Data_Single_String("ConnectChart", "File", File);
+    return pXmlOperation->Read_XML_Data_Single_Uint16("ConnectChart", "JsonOutput", JsonOutput)
+           && pXmlOperation->Read_XML_Data_Single_Uint32("ConnectChart", "Count", Count)
+           && pXmlOperation->Read_XML_Data_Single_String("ConnectChart", "File", File);
 }
