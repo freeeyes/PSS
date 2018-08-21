@@ -51,8 +51,6 @@ void CUnit_LogManager::Test_Write_Log(void)
         return;
     }
 
-    //²âÊÔÓÊ¼þÐ´Èë
-    AppLogManager::instance()->WriteToMail(LOG_SYSTEM, 1, szData, "freeeyes test(%d)", 1);
 }
 
 #endif
