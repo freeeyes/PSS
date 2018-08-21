@@ -53,6 +53,7 @@ matrix:
   - os: linux
     script: 
         - export    
+        - find / -name "*curl.*"
         # - wget https://bootstrap.pypa.io/ez_setup.py -O - | sudo python
         # - sudo easy_install gcovr
         # install cppunit

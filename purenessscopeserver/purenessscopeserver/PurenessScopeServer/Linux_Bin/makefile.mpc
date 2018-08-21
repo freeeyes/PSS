@@ -15,9 +15,12 @@ project(PurenessScopeServer):aceexe{
   ../FileTest/*.cpp
   ../*.cpp
  }
- includes += ../Common ../../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../TinyXML ../Mail ../FileTest
- macros += __LINUX__
-
+  includes += ../Common ../../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../TinyXML ../Mail ../FileTest
+  macros += __LINUX__
+  includes += /usr/local/include/
+  libs += curl
+  libpaths += /usr/lib64/
+  
   specific(make) {
     compile_flags += -fcheck-new
   }
@@ -26,7 +29,5 @@ project(PurenessScopeServer):aceexe{
     compile_flags += -Wno-deprecated
   }
 
-  includes += /usr/local/include/
-  libs += curl
-  libpaths += /usr/lib64/
+
 }
