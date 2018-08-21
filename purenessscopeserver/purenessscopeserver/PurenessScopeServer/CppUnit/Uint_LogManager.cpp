@@ -52,11 +52,7 @@ void CUnit_LogManager::Test_Write_Log(void)
     }
 
     //²âÊÔÓÊ¼þÐ´Èë
-    if (-1 == AppLogManager::instance()->WriteToMail(LOG_SYSTEM, 1, szData, "freeeyes test(%d)", 1))
-    {
-        OUR_DEBUG((LM_INFO, "[Test_Write_Log]WriteToMail is fail.\n"));
-        CPPUNIT_ASSERT_MESSAGE("[Test_Write_Log]WriteToMail is fail.", true == blRet);
-    }
+    AppLogManager::instance()->WriteToMail(LOG_SYSTEM, 1, szData, "freeeyes test(%d)", 1);
 }
 
 #endif

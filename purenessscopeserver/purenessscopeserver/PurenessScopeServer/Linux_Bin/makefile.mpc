@@ -21,7 +21,7 @@ project(PurenessScopeServer):aceexe{
   includes += /usr/include/
   libs += curl
   libpaths += /usr/lib64/ 
-  libpaths += /usr/lib/
+  libpaths += /usr/lib/x86_64-linux-gnu/
   
   specific(make) {
     compile_flags += -fcheck-new
