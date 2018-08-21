@@ -116,7 +116,6 @@ void CUnit_FileLogger::Test_SendMail(void)
 
     objLogBlockInfo.m_pBlock = (char* )szMailBody;
 
-    m_pLogFile->SendMail(&objLogBlockInfo, &objMailInfo);
 }
 
 #endif
