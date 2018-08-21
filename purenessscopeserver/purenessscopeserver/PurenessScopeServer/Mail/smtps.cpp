@@ -12,6 +12,7 @@ static size_t read_callback(void* ptr, size_t size, size_t nmemb, void* userp)
     }
 
     data = pooh->pText[pooh->counter];
+    printf("[read_callback]data=%s.\n", data);
 
     if (data)
     {
@@ -63,7 +64,7 @@ int Send_Mail_From_Ssl(const char* pUser, const char* pPass, const char* pFrom, 
     sprintf(textList[1], "\n");
     sprintf(textList[2], "%s\n", pData);
     sprintf(textList[3], "\n");
-    sprintf(textList[4], "\n");
+    textList[4] = NULL;
 
     pooh.counter = 0;
     pooh.pText = textList;

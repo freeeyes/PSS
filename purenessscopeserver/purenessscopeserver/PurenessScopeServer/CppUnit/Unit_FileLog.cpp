@@ -116,6 +116,15 @@ void CUnit_FileLogger::Test_SendMail(void)
 
     objLogBlockInfo.m_pBlock = (char* )szMailBody;
 
+    objMailInfo.MailID       = 1;
+    objMailInfo.fromMailAddr = "freeeyes@163.com";
+    objMailInfo.toMailAddr   = "freeeyes@163.com";
+    objMailInfo.MailPass     = "free98370112";
+    objMailInfo.MailUrl      = "smtps://smtp.163.com";
+    objMailInfo.MailPort     = 465;
+
+    //这里测试邮件发送
+    m_pLogFile->SendMail(&objLogBlockInfo, &objMailInfo);
 }
 
 #endif
