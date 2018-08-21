@@ -358,6 +358,9 @@
     <ClCompile Include="CppUnit\Unit_LoadModule.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="Mail\smtps.cpp">
+      <Filter>Mail\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -833,6 +836,9 @@
     </ClInclude>
     <ClInclude Include="CppUnit\Unit_LoadModule.h">
       <Filter>CppUnit\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Mail\smtps.h">
+      <Filter>Mail\hfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

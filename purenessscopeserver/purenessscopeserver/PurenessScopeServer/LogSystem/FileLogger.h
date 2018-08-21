@@ -8,7 +8,7 @@
 
 #include "define.h"
 #include "ILogObject.h"
-#include "smtp.h"
+#include "smtps.h"
 #include "XmlConfig.h"
 
 #define MAX_CMD_NUM   100

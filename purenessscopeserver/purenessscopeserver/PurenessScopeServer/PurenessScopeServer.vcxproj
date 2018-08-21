@@ -230,6 +230,7 @@
     <ClCompile Include="CppUnit\Unit_ProfileTime.cpp" />
     <ClCompile Include="CppUnit\Unit_TimeQueue.cpp" />
     <ClCompile Include="CppUnit\Unit_WorkThreadAI.cpp" />
+    <ClCompile Include="Mail\smtps.cpp" />
     <ClCompile Include="Message\MessageDyeingManager.cpp" />
     <ClCompile Include="PurenessScopeServer.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -637,6 +638,7 @@
     <ClInclude Include="Encrypt\Aes.h" />
     <ClInclude Include="FileTest\FileTest.h" />
     <ClInclude Include="FileTest\FileTestManager.h" />
+    <ClInclude Include="Mail\smtps.h" />
     <ClInclude Include="Message\MessageDyeingManager.h" />
     <ClInclude Include="PacketParse\PacketConsoleParse.h" />
     <ClInclude Include="PacketParse\PacketParse.h" />

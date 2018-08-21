@@ -20,7 +20,7 @@
 <CommandInfo CommandID="4096" CommandCount="0" MailID="0"/>
 
 <!-- 配置邮件告警功能 MailID必须大于0,可以支持多个 -->
-<Mail MailID="1" fromMailAddr="local@163.com" toMailAddr="freeeyes@163.com" MailPass="123456" MailUrl="smtp.163.com" MailPort="25" />
+<Mail MailID="1" fromMailAddr="freeeyes@163.com" toMailAddr="freeeyes@163.com" MailPass="123456" MailUrl="smtps://smtp.163.com" MailPort="465" />
 
 <!-- 生成对应的监控图表 -->
 <WorkThreadChart JsonOutput="1" Count="10" File="./Log/WorkThread.json" />

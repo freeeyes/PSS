@@ -240,82 +240,27 @@ bool CLogFile::SendMail(_LogBlockInfo* pLogBlockInfo, xmlMails::_Mail* pMailInfo
         return false;
     }
 
-    unsigned char* pMail = (unsigned char*)ACE_OS::calloc(1, 1);
+    char szMailURL[MAX_BUFF_100] = { '\0' };
 
-    int nRet = 0;
-    nRet = mailText(&pMail,
-                    (const unsigned char*)pMailAlert->fromMailAddr.c_str(),
-                    (const unsigned char*)pMailAlert->toMailAddr.c_str(),
-                    (const unsigned char*)pLogBlockInfo->m_szMailTitle,
-                    (const unsigned char*)pLogBlockInfo->m_pBlock);
+    sprintf_safe(szMailURL, MAX_BUFF_100, "%s:%d", pMailAlert->MailUrl.c_str(), pMailAlert->MailPort);
 
-    if (nRet <= 0)
+    //发送smtps邮件
+    int nRet = Send_Mail_From_Ssl(pMailAlert->fromMailAddr.c_str(),
+                                  pMailAlert->MailPass.c_str(),
+                                  pMailAlert->fromMailAddr.c_str(),
+                                  pMailAlert->toMailAddr.c_str(),
+                                  szMailURL,
+                                  pLogBlockInfo->m_szMailTitle,
+                                  pLogBlockInfo->m_pBlock);
+
+    if (0 != nRet)
     {
-        OUR_DEBUG((LM_ERROR, "[CLogFile::SendMail]MailID(%d) mailText error.\n", pLogBlockInfo->m_u4MailID));
-        free(pMail);
         return false;
     }
-
-    nRet = mailEnd(&pMail);
-
-    if (nRet != 0)
+    else
     {
-        OUR_DEBUG((LM_ERROR, "[CLogFile::SendMail]MailID(%d) mailEnd error.\n", pLogBlockInfo->m_u4MailID));
-        free(pMail);
-        return false;
+        return true;
     }
-
-    //这里先注释掉，以后用CURL重写一个。
-    /*
-    ACE_HANDLE fd;
-
-    nRet = connectSmtp(fd, (const unsigned char*)pMailAlert->MailUrl.c_str(),
-                       pMailAlert->MailPort);
-
-    if (nRet != 0)
-    {
-        OUR_DEBUG((LM_ERROR, "[CLogFile::SendMail]MailID(%d) connectSmtp error.\n", pLogBlockInfo->m_u4MailID));
-        free(pMail);
-        return false;
-    }
-
-    if (fd == ACE_INVALID_HANDLE)
-    {
-        OUR_DEBUG((LM_ERROR, "[CLogFile::SendMail]MailID(%d) connectSmtp error.\n", pLogBlockInfo->m_u4MailID));
-        free(pMail);
-        return false;
-    }
-
-    nRet = authEmail(fd,
-                     (const unsigned char*)pMailAlert->fromMailAddr.c_str(),
-                     (const unsigned char*)pMailAlert->MailPass.c_str());
-
-    if (nRet != 0)
-    {
-        OUR_DEBUG((LM_ERROR, "[CLogFile::SendMail]MailID(%d) authEmail error.\n", pLogBlockInfo->m_u4MailID));
-        free(pMail);
-        ACE_OS::close(fd);
-        return false;
-    }
-
-    nRet = sendEmail(fd, (const unsigned char*)pMailAlert->fromMailAddr.c_str(),
-                     (const unsigned char*)pMailAlert->toMailAddr.c_str(),
-                     (const unsigned char*)pMail,
-                     (const int)strlen((const char*)pMail));
-
-    if (nRet != 0)
-    {
-        OUR_DEBUG((LM_ERROR, "[CLogFile::SendMail]MailID(%d) sendEmail error.\n", pLogBlockInfo->m_u4MailID));
-        free(pMail);
-        ACE_OS::close(fd);
-        return false;
-    }
-
-    ACE_OS::close(fd);
-    */
-
-    free(pMail);
-    return true;
 }
 
 ACE_TString& CLogFile::GetLoggerName()

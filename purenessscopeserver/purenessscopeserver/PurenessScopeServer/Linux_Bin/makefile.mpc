@@ -26,5 +26,7 @@ project(PurenessScopeServer):aceexe{
     compile_flags += -Wno-deprecated
   }
 
-
+  includes += /usr/local/include/
+  libs += curl
+  libpaths += /usr/lib64/
 }

@@ -22,6 +22,9 @@ project(PurenessScopeServer):aceexe{
  
  libpaths += ../../../../lib
  libs += cppunit
+ includes += /usr/local/include/
+ libs += curl
+ libpaths += /usr/lib64/ 
  
  macros += __LINUX__ _CPPUNIT_TEST
 
