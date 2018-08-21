@@ -18,8 +18,10 @@ project(PurenessScopeServer):aceexe{
   includes += ../Common ../../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../TinyXML ../Mail ../FileTest
   macros += __LINUX__
   includes += /usr/local/include/
+  includes += /usr/include/
   libs += curl
-  libpaths += /usr/lib64/
+  libpaths += /usr/lib64/ 
+  libpaths += /usr/lib/
   
   specific(make) {
     compile_flags += -fcheck-new
