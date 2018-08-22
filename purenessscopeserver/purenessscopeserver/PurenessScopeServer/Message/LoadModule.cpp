@@ -21,7 +21,7 @@ void CLoadModule::Init(uint16 u2MaxModuleCount)
     Close();
 
     //≥ı ºªØHashTable
-    m_objHashModuleList.Init((int)u2MaxModuleCount);
+    m_objHashModuleList.Init((int)u2MaxModuleCount, MAX_BUFF_50);
 }
 
 void CLoadModule::Close()
