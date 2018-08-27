@@ -361,6 +361,15 @@
     <ClCompile Include="Mail\smtps.cpp">
       <Filter>Mail\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="..\Common\Time_Value.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\TimerInfo.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\TimerThread.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -839,6 +848,21 @@
     </ClInclude>
     <ClInclude Include="Mail\smtps.h">
       <Filter>Mail\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ITSTimer.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Time_Value.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\TimerCommon.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\TimerInfo.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\TimerThread.h">
+      <Filter>Common\hfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

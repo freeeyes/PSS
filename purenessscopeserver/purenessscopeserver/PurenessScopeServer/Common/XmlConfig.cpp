@@ -8,12 +8,12 @@ IConfigOpeation* IConfigOpeation::_array[XML_Config_MAX];
 
 /*定义静态类对象并绑定对应枚举，实现返回模板函数*/
 #define DefineClassAndFunc(ClassName, XMLConfig)                            \
-static ClassName    this##ClassName(XMLConfig, #ClassName);					\
-template<>                                                                  \
-ClassName* XMainConfig::GetXmlConfig<ClassName>()                           \
-{                                                                           \
-    return dynamic_cast<ClassName*>(IConfigOpeation::_array[XMLConfig]);    \
-}
+    static ClassName    this##ClassName(XMLConfig, #ClassName);                 \
+    template<>                                                                  \
+    ClassName* XMainConfig::GetXmlConfig<ClassName>()                           \
+    {                                                                           \
+        return dynamic_cast<ClassName*>(IConfigOpeation::_array[XMLConfig]);    \
+    }
 
 
 /*xml配置文件对应类型配置的静态类，需要增加配置文件标签，需要在此添加静态类对象，所有对象不直接使用,也不允许外部使用*/
@@ -43,19 +43,18 @@ DefineClassAndFunc(xmlServerVersion, XML_Config_ServerVersion)
 DefineClassAndFunc(xmlPacketParses, XML_Config_PacketParses)
 DefineClassAndFunc(xmlBuffPacket, XML_Config_BuffPacket)
 DefineClassAndFunc(xmlMessage, XML_Config_Message)
+DefineClassAndFunc(xmlTSTimer, XML_Config_Timer)
 DefineClassAndFunc(xmlAlertConnect, XML_Config_AlertConnect)
 DefineClassAndFunc(xmlIP, XML_Config_IP)
 DefineClassAndFunc(xmlClientData, XML_Config_ClientData)
 DefineClassAndFunc(xmlCommandInfos, XML_Config_CommandInfos)
-DefineClassAndFunc(xmlMails, XML_Config_Mails)
-DefineClassAndFunc(xmlWorkThreadChart, XML_Config_WorkThreadChart)
-DefineClassAndFunc(xmlConnectChart, XML_Config_ConnectChart)
+DefineClassAndFunc(xmlMails, XML_Config_Mails);
 
 bool XMainConfig::Init()
 {
     //初始化xml文件
-    return InitFile(MAINCONFIG, XML_Config_RecvInfo, XML_Config_Message)
-           && InitFile(ALERTCONFIG, XML_Config_AlertConnect, XML_Config_ConnectChart);
+    return InitFile(MAINCONFIG, XML_Config_RecvInfo, XML_Config_Timer)
+           && InitFile(ALERTCONFIG, XML_Config_AlertConnect, XML_Config_Mails);
 }
 
 bool XMainConfig::InitFile(const char* pFileName, XmlConfig start, XmlConfig end)
@@ -69,17 +68,18 @@ bool XMainConfig::InitFile(const char* pFileName, XmlConfig start, XmlConfig end
         1.范围
         2.init函数返回结果
         */
-		int i = start;
+        int i = start;
+
         for (; i <= end && bKet; ++i)
         {
             bKet = IConfigOpeation::_array[i]->Init(&m_XmlOperation);
         }
 
-		if (false == bKet)
-		{
-			OUR_DEBUG((LM_INFO, "[XMainConfig::InitFile](%s) Init is false.\n", 
-				IConfigOpeation::_array[i]->ClassName().c_str()));
-		}
+        if (false == bKet)
+        {
+            OUR_DEBUG((LM_INFO, "[XMainConfig::InitFile](%s) Init is false.\n",
+                       IConfigOpeation::_array[i]->ClassName().c_str()));
+        }
     }
     else
     {
@@ -104,11 +104,11 @@ bool xmlSendInfo::Init(CXmlOpeation* pXmlOperation)
 
     if (pXmlOperation->Read_XML_Data_Single_Uint16("SendInfo", "SendTimeout", SendTimeout)
         && pXmlOperation->Read_XML_Data_Single_Uint16("SendInfo", "SendQueueMax", SendQueueMax)
-		&& pXmlOperation->Read_XML_Data_Single_Uint16("SendInfo", "PutQueueTimeout", PutQueueTimeout)
-		&& pXmlOperation->Read_XML_Data_Single_Uint32("SendInfo", "BlockCount", BlockCount)
-		&& pXmlOperation->Read_XML_Data_Single_Uint32("SendInfo", "MaxBlockSize", MaxBlockSize)
-		&& pXmlOperation->Read_XML_Data_Single_Uint16("SendInfo", "SendQueueTimeout", SendQueueTimeout)
-		&& pXmlOperation->Read_XML_Data_Single_Uint16("SendInfo", "SendQueueCount", SendQueueCount))
+        && pXmlOperation->Read_XML_Data_Single_Uint16("SendInfo", "PutQueueTimeout", PutQueueTimeout)
+        && pXmlOperation->Read_XML_Data_Single_Uint32("SendInfo", "BlockCount", BlockCount)
+        && pXmlOperation->Read_XML_Data_Single_Uint32("SendInfo", "MaxBlockSize", MaxBlockSize)
+        && pXmlOperation->Read_XML_Data_Single_Uint16("SendInfo", "SendQueueTimeout", SendQueueTimeout)
+        && pXmlOperation->Read_XML_Data_Single_Uint16("SendInfo", "SendQueueCount", SendQueueCount))
     {
         SendDatamark = MaxBlockSize;
         bKet = pXmlOperation->Read_XML_Data_Single_Uint16("SendInfo", "TcpNodelay", TcpNodelay);
@@ -531,16 +531,7 @@ xmlMails::_Mail* xmlMails::GetMailAlert(uint16 MailID)
     return NULL;
 }
 
-bool xmlWorkThreadChart::Init(CXmlOpeation* pXmlOperation)
+bool xmlTSTimer::Init(CXmlOpeation* pXmlOperation)
 {
-    return pXmlOperation->Read_XML_Data_Single_Uint16("WorkThreadChart", "JsonOutput", JsonOutput)
-           && pXmlOperation->Read_XML_Data_Single_Uint32("WorkThreadChart", "Count", Count)
-           && pXmlOperation->Read_XML_Data_Single_String("WorkThreadChart", "File", File);
-}
-
-bool xmlConnectChart::Init(CXmlOpeation* pXmlOperation)
-{
-    return pXmlOperation->Read_XML_Data_Single_Uint16("ConnectChart", "JsonOutput", JsonOutput)
-           && pXmlOperation->Read_XML_Data_Single_Uint32("ConnectChart", "Count", Count)
-           && pXmlOperation->Read_XML_Data_Single_String("ConnectChart", "File", File);
+    return pXmlOperation->Read_XML_Data_Single_Uint16("TSTimer", "TimerListPool", TimerListCount);
 }

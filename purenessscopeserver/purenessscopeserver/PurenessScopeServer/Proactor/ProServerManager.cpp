@@ -30,6 +30,12 @@ bool CProServerManager::Init()
     //初始化禁止IP列表
     App_ForbiddenIP::instance()->Init(FORBIDDENIP_FILE);
 
+    //初始化TS定时器
+    if (GetXmlConfigAttribute(xmlTSTimer)->TimerListCount > 0)
+    {
+        m_TSThread.Init(GetXmlConfigAttribute(xmlTSTimer)->TimerListCount);
+    }
+
     //初始化日志系统线程
     if (false == Server_Manager_Common_LogSystem())
     {
@@ -59,12 +65,14 @@ bool CProServerManager::Init()
     IClientManager*  pClientManager        = dynamic_cast<IClientManager*>(App_ClientProConnectManager::instance());
     IUDPConnectManager* pUDPConnectManager = dynamic_cast<IUDPConnectManager*>(App_ProUDPManager::instance());
     IFrameCommand* pFrameCommand           = dynamic_cast<IFrameCommand*>(&m_objFrameCommand);
+    ITSTimerManager* pTSTimer              = dynamic_cast<ITSTimerManager*>(&m_TSThread);
     IServerManager* pServerManager         = dynamic_cast<IServerManager*>(this);
     Server_Manager_Common_IObject(pConnectManager,
                                   pClientManager,
                                   pUDPConnectManager,
                                   pFrameCommand,
-                                  pServerManager);
+                                  pServerManager,
+                                  pTSTimer);
 
     //初始化模块加载，因为这里可能包含了中间服务器连接加载
     if (false == Server_Manager_Common_Module())
@@ -271,6 +279,12 @@ bool CProServerManager::Start()
         }
     }
 
+    //启动TS定时器
+    if (GetXmlConfigAttribute(xmlTSTimer)->TimerListCount > 0)
+    {
+        m_TSThread.Run();
+    }
+
     //启动日志服务线程
     if(0 != AppLogManager::instance()->Start())
     {
@@ -334,6 +348,10 @@ bool CProServerManager::Start()
 bool CProServerManager::Close()
 {
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close begin....\n"));
+
+    m_TSThread.Close();
+    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close m_TSThread OK.\n"));
+
     App_ProConnectAcceptManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ProConnectAcceptManager OK.\n"));
 

@@ -50,6 +50,7 @@ enum XmlConfig
     XML_Config_PacketParses,
     XML_Config_BuffPacket,
     XML_Config_Message,
+    XML_Config_Timer,
 
     /****************alert.xml*****************/
     XML_Config_AlertConnect,
@@ -57,8 +58,6 @@ enum XmlConfig
     XML_Config_ClientData,
     XML_Config_CommandInfos,
     XML_Config_Mails,
-    XML_Config_WorkThreadChart,
-    XML_Config_ConnectChart,
 
     /*Ã¶¾Ù½áÊø*/
     XML_Config_End
@@ -102,10 +101,10 @@ class IConfigOpeation
 {
     friend class XMainConfig;
 public:
-	const std::string& ClassName() 
-	{ 
-		return m_name; 
-	}
+    const std::string& ClassName()
+    {
+        return m_name;
+    }
     virtual ~IConfigOpeation() {}
 protected:
     IConfigOpeation(XmlConfig config, const char* name)
@@ -514,26 +513,14 @@ public:
     _Mail* GetMailAlert(uint16 MailID);
 };
 
-class xmlWorkThreadChart : public IConfigOpeation
+class xmlTSTimer : public IConfigOpeation
 {
 public:
-    uint16 JsonOutput;
-    uint32 Count;
-    std::string File;
-    xmlWorkThreadChart(XmlConfig config, const char* name) : IConfigOpeation(config, name), JsonOutput(1), Count(10),
-        File("./Log/WorkThread.json") {}
+    uint16 TimerListCount;
+    xmlTSTimer(XmlConfig config, const char* name) : IConfigOpeation(config, name), TimerListCount(10)
+    {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
-class xmlConnectChart : public IConfigOpeation
-{
-public:
-    uint16 JsonOutput;
-    uint32 Count;
-    std::string File;
-    xmlConnectChart(XmlConfig config, const char* name) : IConfigOpeation(config, name), JsonOutput(1), Count(10),
-        File("./Log/ConnnectInfo.json") {}
-    bool Init(CXmlOpeation* pXmlOperation);
-};
 
 

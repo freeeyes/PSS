@@ -17,6 +17,7 @@
 #include "Frame_Logging_Strategy.h"
 #include "ControlListen.h"
 #include "XmlConfig.h"
+#include "TimerThread.h"
 
 //初始化ACE输出性质
 bool Server_Manager_Common_FrameLogging(Frame_Logging_Strategy*& pFrameLoggingStrategy);
@@ -28,7 +29,12 @@ bool Server_Manager_Common_LogSystem();
 bool Server_Manager_Common_Pool();
 
 //初始化插件所有的接口对象
-bool Server_Manager_Common_IObject(IConnectManager* pConnectManager, IClientManager* pClientManager, IUDPConnectManager* pUDPConnectManager, IFrameCommand* pFrameCommand, IServerManager* pIServerManager);
+bool Server_Manager_Common_IObject(IConnectManager* pConnectManager,
+                                   IClientManager* pClientManager,
+                                   IUDPConnectManager* pUDPConnectManager,
+                                   IFrameCommand* pFrameCommand,
+                                   IServerManager* pIServerManager,
+                                   ITSTimerManager* pTSTimerManager);
 
 //初始化模块插件的加载
 bool Server_Manager_Common_Module();

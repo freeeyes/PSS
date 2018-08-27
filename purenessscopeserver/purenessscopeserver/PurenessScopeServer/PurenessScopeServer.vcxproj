@@ -182,6 +182,9 @@
     <ClCompile Include="..\Common\ACEMemory.cpp" />
     <ClCompile Include="..\Common\RandomNumber.cpp" />
     <ClCompile Include="..\Common\Threading.cpp" />
+    <ClCompile Include="..\Common\TimerInfo.cpp" />
+    <ClCompile Include="..\Common\TimerThread.cpp" />
+    <ClCompile Include="..\Common\Time_Value.cpp" />
     <ClCompile Include="Common\BaseClientConnectManager.cpp" />
     <ClCompile Include="Common\BaseConnectClient.cpp" />
     <ClCompile Include="Common\BaseConsoleHandle.cpp" />
@@ -577,6 +580,7 @@
     <ClInclude Include="..\Common\ISendCacheManager.h" />
     <ClInclude Include="..\Common\IServerManager.h" />
     <ClInclude Include="..\Common\ITimerManager.h" />
+    <ClInclude Include="..\Common\ITSTimer.h" />
     <ClInclude Include="..\Common\IUDPConnectManager.h" />
     <ClInclude Include="..\Common\ObjectArrayList.h" />
     <ClInclude Include="..\Common\ObjectLru.h" />
@@ -584,7 +588,11 @@
     <ClInclude Include="..\Common\ProfileTime.h" />
     <ClInclude Include="..\Common\RandomNumber.h" />
     <ClInclude Include="..\Common\Threading.h" />
+    <ClInclude Include="..\Common\TimerCommon.h" />
+    <ClInclude Include="..\Common\TimerInfo.h" />
+    <ClInclude Include="..\Common\TimerThread.h" />
     <ClInclude Include="..\Common\TimeWheelLink.h" />
+    <ClInclude Include="..\Common\Time_Value.h" />
     <ClInclude Include="..\Common\Trace.h" />
     <ClInclude Include="Common\BaseClientConnectManager.h" />
     <ClInclude Include="Common\BaseConnectClient.h" />
