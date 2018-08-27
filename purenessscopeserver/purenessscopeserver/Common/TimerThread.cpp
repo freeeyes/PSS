@@ -13,8 +13,8 @@ void* thr_fn(void* arg)
 
     //最后运行的TimerID
     int nLastRunTimerID = 0;
-    int nTimeCost       = 0;
-    int nInterval       = 0;
+    int nTimeCost = 0;
+    int nInterval = 0;
 
     ts_timer::CTime_Value obj_Now = ts_timer::GetTimeofDay();
 
@@ -112,15 +112,10 @@ void* thr_fn(void* arg)
 
             nLastRunTimerID = pTimerInfoList->Get_Curr_Timer()->Get_Timer_ID();
 
-            if (NULL != pTimerInfoList->Get_Curr_Timer())
+            if (NULL != pTimerInfoList->Get_Curr_Timer() && ts_timer::TIMER_STATE_DEL == pTimerInfoList->Get_Curr_Timer()->Do_Timer_Event(obj_Begin))
             {
-                ts_timer::EM_Timer_State emstate = pTimerInfoList->Get_Curr_Timer()->Do_Timer_Event(obj_Begin);
-
-                if (ts_timer::TIMER_STATE_DEL == emstate)
-                {
-                    //如果执行完需要清除定时器，在这里回收定时器
-                    pTimerInfoList->Del_Timer(pTimerInfoList->Get_Curr_Timer()->Get_Timer_ID());
-                }
+                //如果执行完需要清除定时器，在这里回收定时器
+                pTimerInfoList->Del_Timer(pTimerInfoList->Get_Curr_Timer()->Get_Timer_ID());
             }
 
             obj_Now = ts_timer::GetTimeofDay();
