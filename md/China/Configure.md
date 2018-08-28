@@ -233,6 +233,13 @@
 		<tr><th>LogFileMaxCnt</th><th>日志文件循环覆盖的个数</th></tr>
 		<tr><th>Level</th><th>日志输出等级</th></tr>
 		<tr><th>desc</th><th>当前标签描述信息</th></tr>
+        <tr>
+            <th rowspan="2">TSTimer</th>
+            <th rowspan="2">TS定时器设置</th>
+            <th>属性</th>
+            <th>说明</th>
+        </tr>
+		<tr><th>TimerListPool</th><th>当前定时器池的最大允许任务数，如果是0，则默认不开启TS定时器线程</th></tr>
 </table>
 
 ## logger.xml(框架日志配置信息)  

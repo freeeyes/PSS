@@ -233,6 +233,13 @@
 		<tr><th>LogFileMaxCnt</th><th>Number of log file loop overrides</th></tr>
 		<tr><th>Level</th><th>Log output level</th></tr>
 		<tr><th>desc</th><th>Current label description information</th></tr>
+        <tr>
+            <th rowspan="2">TSTimer</th>
+            <th rowspan="2">TSTimer configure</th>
+            <th>Attribute</th>
+            <th>information</th>
+        </tr>
+		<tr><th>TimerListPool</th><th>The maximum number of tasks allowed for the current timer pool. if it is 0, the ts timer thread will not be started by default.</th></tr>
 </table>
 
 ## logger.xml(Framework log configuration information)  
