@@ -48,7 +48,6 @@ void CUnit_LogManager::Test_Write_Log(void)
     {
         OUR_DEBUG((LM_INFO, "[Test_Write_Log]WriteLogBinary is fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_Write_Log]WriteLogBinary is fail.", true == blRet);
-        return;
     }
 
 }

@@ -370,6 +370,9 @@
     <ClCompile Include="..\Common\TimerThread.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="Common\TcpRedirection.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -862,6 +865,9 @@
       <Filter>Common\hfile</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\TimerThread.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\TcpRedirection.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
   </ItemGroup>

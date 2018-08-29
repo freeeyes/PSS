@@ -51,6 +51,7 @@ enum XmlConfig
     XML_Config_BuffPacket,
     XML_Config_Message,
     XML_Config_Timer,
+    XML_Config_Redirection,
 
     /****************alert.xml*****************/
     XML_Config_AlertConnect,
@@ -522,5 +523,21 @@ public:
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
+class xmlTcpRedirection : public IConfigOpeation
+{
+public:
+    class _RedirectionInfo
+    {
+    public:
+        uint32 SrcPort;
+        string RedirectionIP;
+        uint32 RedirectionPort;
+        uint8  Mode;
+        _RedirectionInfo() : SrcPort(0), RedirectionIP(""), RedirectionPort(0), Mode(0) {}
+    };
+    std::vector<_RedirectionInfo> vec;
+    xmlTcpRedirection(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
+    bool Init(CXmlOpeation* pXmlOperation);
+};
 
 

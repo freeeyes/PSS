@@ -193,6 +193,7 @@
     <ClCompile Include="Common\BaseTask.cpp" />
     <ClCompile Include="Common\IPAccount.cpp" />
     <ClCompile Include="Common\ServerMessageTask.cpp" />
+    <ClCompile Include="Common\TcpRedirection.cpp" />
     <ClCompile Include="Common\XmlConfig.cpp" />
     <ClCompile Include="Console\ConsolePromiss.cpp" />
     <ClCompile Include="Console\FrameCommand.cpp" />
@@ -601,6 +602,7 @@
     <ClInclude Include="Common\BaseServerManager.h" />
     <ClInclude Include="Common\BaseTask.h" />
     <ClInclude Include="Common\ServerMessageTask.h" />
+    <ClInclude Include="Common\TcpRedirection.h" />
     <ClInclude Include="Common\XmlConfig.h" />
     <ClInclude Include="Console\ConsolePromiss.h" />
     <ClInclude Include="Console\FrameCommand.h" />

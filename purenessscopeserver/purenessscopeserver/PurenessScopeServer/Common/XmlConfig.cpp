@@ -44,16 +44,17 @@ DefineClassAndFunc(xmlPacketParses, XML_Config_PacketParses)
 DefineClassAndFunc(xmlBuffPacket, XML_Config_BuffPacket)
 DefineClassAndFunc(xmlMessage, XML_Config_Message)
 DefineClassAndFunc(xmlTSTimer, XML_Config_Timer)
+DefineClassAndFunc(xmlTcpRedirection, XML_Config_Redirection)
 DefineClassAndFunc(xmlAlertConnect, XML_Config_AlertConnect)
 DefineClassAndFunc(xmlIP, XML_Config_IP)
 DefineClassAndFunc(xmlClientData, XML_Config_ClientData)
 DefineClassAndFunc(xmlCommandInfos, XML_Config_CommandInfos)
-DefineClassAndFunc(xmlMails, XML_Config_Mails);
+DefineClassAndFunc(xmlMails, XML_Config_Mails)
 
 bool XMainConfig::Init()
 {
     //初始化xml文件
-    return InitFile(MAINCONFIG, XML_Config_RecvInfo, XML_Config_Timer)
+    return InitFile(MAINCONFIG, XML_Config_RecvInfo, XML_Config_Redirection)
            && InitFile(ALERTCONFIG, XML_Config_AlertConnect, XML_Config_Mails);
 }
 
@@ -534,4 +535,23 @@ xmlMails::_Mail* xmlMails::GetMailAlert(uint16 MailID)
 bool xmlTSTimer::Init(CXmlOpeation* pXmlOperation)
 {
     return pXmlOperation->Read_XML_Data_Single_Uint16("TSTimer", "TimerListPool", TimerListCount);
+}
+
+bool xmlTcpRedirection::Init(CXmlOpeation* pXmlOperation)
+{
+    TiXmlElement* pSrcPort         = NULL;
+    TiXmlElement* pRedirectionIP   = NULL;
+    TiXmlElement* pRedirectionPort = NULL;
+    TiXmlElement* pMode            = NULL;
+    _RedirectionInfo redirecttioninfo;
+
+    while (pXmlOperation->Read_XML_Data_Multiple_Uint32("TcpRedirection", "SrcPort", redirecttioninfo.SrcPort, pSrcPort)
+           && pXmlOperation->Read_XML_Data_Multiple_String("TcpRedirection", "RedirectionIP", redirecttioninfo.RedirectionIP, pRedirectionIP)
+           && pXmlOperation->Read_XML_Data_Multiple_Uint32("TcpRedirection", "RedirectionPort", redirecttioninfo.RedirectionPort, pRedirectionPort)
+           && pXmlOperation->Read_XML_Data_Multiple_Uint8("TcpRedirection", "Mode", redirecttioninfo.Mode, pMode))
+    {
+        vec.push_back(redirecttioninfo);
+    }
+
+    return true;
 }

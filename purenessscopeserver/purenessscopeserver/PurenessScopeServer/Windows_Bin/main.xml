@@ -68,5 +68,5 @@
 	<TSTimer TimerListPool="0" />
 	
 	<!-- 设置转发接口 -->
-	<TcRedirection SrcPort="10002" RedirectionIP="127.0.0.1" RedirectionPort="10003" Mode="0" />
+	<TcpRedirection SrcPort="10002" RedirectionIP="127.0.0.1" RedirectionPort="10003" Mode="0" />
 </config>
