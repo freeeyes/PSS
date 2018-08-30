@@ -106,9 +106,9 @@ matrix:
         - gcov -r -o ./.obj ../Reactor/*.cpp > /dev/null
         - gcov -r -o ./.obj ../UDP/*.cpp > /dev/null
         - gcov -r -o ./.obj ../CppUnit/*.cpp > /dev/null
-        #- cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/reports/cppunit
+        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/reports/cppunit
         #- ls 
-        #- cat report.xml
+        - cat report.xml
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer
         - sonar-scanner -X
 
