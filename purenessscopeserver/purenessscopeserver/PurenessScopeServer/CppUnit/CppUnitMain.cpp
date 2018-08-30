@@ -5,6 +5,7 @@
 CCppUnitMain::CCppUnitMain()
 {
     //CUnit_Frame_Logging这个暂不测试，因为这个会导致整个日志输出不全
+    /*
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_BuffPacket, "pss");
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_FileTestManager, "pss");
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_CommandAccount, "pss");
@@ -40,7 +41,8 @@ CCppUnitMain::CCppUnitMain()
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_Frame_Logging, "pss");
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_LogManager, "pss");
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_LoadModule, "pss");
-    //CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_Redirection, "pss");
+    */
+    CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_Redirection, "pss");
 }
 
 CCppUnitMain::~CCppUnitMain()
