@@ -33,6 +33,7 @@
 #include "SendCacheManager.h"
 #include "TimeWheelLink.h"
 #include "FileTest.h"
+#include "TcpRedirection.h"
 
 #ifdef __LINUX__
 #include "netinet/tcp.h"

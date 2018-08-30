@@ -216,7 +216,13 @@ void Send_MakePacket_Queue(uint32 u4ConnectID, uint32 u4PacketParseID, CPacketPa
         objMakePacket.m_AddrListen.set(u4LocalPort, pLocalIP);
     }
 
-    //发送客户端链接断开消息。
+    //如果这个端口是转发协议端口且为本地不处理，则不处理
+    if (false == App_TcpRedirection::instance()->GetMode(u4LocalPort))
+    {
+        return;
+    }
+
+    //将数据送入工作线程处理队列
     ACE_Time_Value tvNow = ACE_OS::gettimeofday();
 
     if (false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
@@ -394,6 +400,7 @@ bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
     //因为是异步发送，发送的数据指针不可以立刻释放，所以需要在这里创建一个新的发送数据块，将数据考入
     pMbData = App_MessageBlockManager::instance()->Create((uint32)pBlockMessage->length());
 
+    OUR_DEBUG((LM_INFO, "[Tcp_Common_Make_Send_Packet]pBlockMessage->length()=%d.\n", pBlockMessage->length()));
     memcpy_safe(pBlockMessage->rd_ptr(), (uint32)pBlockMessage->length(), pMbData->wr_ptr(), (uint32)pBlockMessage->length());
     pMbData->wr_ptr(pBlockMessage->length());
     //放入完成，则清空缓存数据，使命完成

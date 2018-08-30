@@ -533,7 +533,8 @@ public:
         string RedirectionIP;
         uint32 RedirectionPort;
         uint8  Mode;
-        _RedirectionInfo() : SrcPort(0), RedirectionIP(""), RedirectionPort(0), Mode(0) {}
+        uint8  ConnectState;
+        _RedirectionInfo() : SrcPort(0), RedirectionIP(""), RedirectionPort(0), Mode(0), ConnectState(0) {}
     };
     std::vector<_RedirectionInfo> vec;
     xmlTcpRedirection(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}

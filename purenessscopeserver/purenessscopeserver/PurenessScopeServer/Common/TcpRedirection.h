@@ -17,7 +17,7 @@
 class CRedirectionData : public IClientMessage
 {
 public:
-    CRedirectionData() : m_u4ServerID(0), m_u1Mode(0), m_pConnectManager(NULL)
+    CRedirectionData() : m_u4ServerID(0), m_u1Mode(0), m_u1ConnectState(0), m_pConnectManager(NULL)
     {
     }
 
@@ -28,6 +28,16 @@ public:
     void SetMode(uint8 u1Mode)
     {
         m_u1Mode = u1Mode;
+    }
+
+    uint8 GetMode()
+    {
+        return m_u1Mode;
+    }
+
+    void SetConnectState(uint8 u1ConnectState)
+    {
+        m_u1ConnectState = u1ConnectState;
     }
 
     void SetConnectManager(IConnectManager* pConnectManager)
@@ -73,9 +83,17 @@ public:
         ACE_UNUSED_ARG(pMessageBlockManager);
         emPacketRoute = PACKET_ROUTE_SELF;
 
+        if (mbRecv->length() == 0)
+        {
+            return false;
+        }
+
         u2CommandID = 0x1000;
 
-        mbFinishRecv = mbRecv;
+        mbFinishRecv = pMessageBlockManager->Create((uint32)mbRecv->length());
+        memcpy_safe(mbRecv->rd_ptr(), (uint32)mbRecv->length(), mbFinishRecv->wr_ptr(), (uint32)mbRecv->length());
+        mbFinishRecv->wr_ptr(mbRecv->length());
+        mbRecv->rd_ptr(mbRecv->length());
 
         return true;
     }
@@ -85,7 +103,7 @@ public:
         //数据包已经收全，在这里处理数据
         ACE_UNUSED_ARG(u2CommandID);
 
-        if (NULL == m_pConnectManager || 1 == m_u1Mode)
+        if (NULL == m_pConnectManager || 0 == m_u1Mode)
         {
             return true;
         }
@@ -95,14 +113,13 @@ public:
         pBuffPacket->WriteStream((char* )mbRecv->rd_ptr(), (uint32)mbRecv->length());
 
         //将数据转发给指定的ConnectID
-        m_pConnectManager->PostMessage(m_u4ServerID,
-                                       pBuffPacket,
-                                       SENDMESSAGE_JAMPNOMAL,
-                                       0,
-                                       PACKET_SEND_IMMEDIATLY,
-                                       PACKET_IS_FRAMEWORK_RECYC,
-                                       0);
-        return true;
+        return m_pConnectManager->PostMessage(m_u4ServerID,
+                                              pBuffPacket,
+                                              SENDMESSAGE_JAMPNOMAL,
+                                              0,
+                                              PACKET_SEND_IMMEDIATLY,
+                                              PACKET_IS_FRAMEWORK_RECYC,
+                                              0);
     }
 
     virtual void ReConnect(int nServerID)
@@ -114,6 +131,13 @@ public:
     {
         ACE_UNUSED_ARG(objServerIPInfo);
         OUR_DEBUG((LM_INFO, "[CRedirectionData::ConnectError]nServerID=%d, nError=%d.\n", m_u4ServerID, nError));
+
+        if (1 == m_u1ConnectState)
+        {
+            //断开客户端
+            m_pConnectManager->CloseConnect(m_u4ServerID);
+        }
+
         return true;
     }
 
@@ -125,6 +149,7 @@ public:
 private:
     uint32                     m_u4ServerID;
     uint8                      m_u1Mode;            //0 不回应数据, 1 回应数据
+    uint8                      m_u1ConnectState;    //0 不和远程连接状态同步 1 和远程连接状态同步
     IConnectManager*           m_pConnectManager;
 
 };
@@ -137,13 +162,15 @@ public:
 
     void Close();
 
-    void Init(xmlTcpRedirection& objCXmlTcpRedirection, uint32 u4MaxHandlerCount, IClientManager* pClientManager, IConnectManager* pConnectManager);
+    void Init(xmlTcpRedirection* pCXmlTcpRedirection, uint32 u4MaxHandlerCount, IClientManager* pClientManager, IConnectManager* pConnectManager);
 
     void ConnectRedirect(uint32 u4SrcPort, uint32 u4ConnectID);
 
     void DataRedirect(uint32 u4ConnectID, ACE_Message_Block* mb);
 
     void CloseRedirect(uint32 u4ConnectID);
+
+    bool GetMode(uint32 u4LocalPort);
 
 private:
     CHashTable<xmlTcpRedirection::_RedirectionInfo> m_objRedirectList;          //转发服务器接口列表
@@ -152,5 +179,7 @@ private:
     IClientManager*                                 m_pClientManager;
     IConnectManager*                                m_pConnectManager;
 };
+
+typedef ACE_Singleton<CTcpRedirection, ACE_Null_Mutex> App_TcpRedirection;
 
 #endif

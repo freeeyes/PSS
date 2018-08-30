@@ -149,6 +149,9 @@ void CProConnectHandle::Close(int nIOCount, int nErrno)
 
         OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close](0x%08x)Close(ConnectID=%d) OK.\n", this, GetConnectID()));
 
+        //查看是否需要转发数据
+        App_TcpRedirection::instance()->CloseRedirect(GetConnectID());
+
         //删除存在列表中的对象引用,这里加一个判定，如果是0说明当前连接尚未完成Manager添加。
         if (GetConnectID() > 0)
         {
@@ -511,6 +514,9 @@ void CProConnectHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 
     OUR_DEBUG((LM_DEBUG,"[CProConnectHandle::open]Open(%d) Connection from [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
 
+    //查看是否需要转发数据
+    App_TcpRedirection::instance()->ConnectRedirect(m_u4LocalPort, GetConnectID());
+
     //获得接收缓冲区大小
     Get_Recv_length();
 
@@ -536,9 +542,25 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         return;
     }
 
+    //查看是否需要转发数据
+    App_TcpRedirection::instance()->DataRedirect(GetConnectID(), &mb);
+
     m_atvInput = ACE_OS::gettimeofday();
 
     Output_Debug_Data(&mb, LOG_SYSTEM_DEBUG_CLIENTRECV);
+
+    char szData[10] = { '\0' };
+
+    if (m_pPacketParse->GetIsHandleHead() == true)
+    {
+        sprintf_safe(szData, 10, "true");
+    }
+    else
+    {
+        sprintf_safe(szData, 10, "false");
+    }
+
+    OUR_DEBUG((LM_INFO, "[CTcpRedirection::DataRedirect]u4ConnectID=%d, GetIsHandleHead()=%s.\n", GetConnectID(), szData));
 
     if(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
     {
@@ -565,7 +587,6 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         else if(mb.length() == App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength && m_pPacketParse->GetIsHandleHead())
         {
             //处理数据包头
-
             if (0 != Dispose_Paceket_Parse_Head(&mb))
             {
                 return;

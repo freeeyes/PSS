@@ -80,6 +80,12 @@ bool CProServerManager::Init()
         return false;
     }
 
+    //初始化转发列表
+    App_TcpRedirection::instance()->Init(GetXmlConfigAttribute(xmlTcpRedirection),
+                                         GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount,
+                                         pClientManager,
+                                         pConnectManager);
+
     //让所有的线程拷同步副本
     App_MessageServiceGroup::instance()->CopyMessageManagerList();
 

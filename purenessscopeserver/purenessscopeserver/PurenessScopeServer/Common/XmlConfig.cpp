@@ -543,12 +543,14 @@ bool xmlTcpRedirection::Init(CXmlOpeation* pXmlOperation)
     TiXmlElement* pRedirectionIP   = NULL;
     TiXmlElement* pRedirectionPort = NULL;
     TiXmlElement* pMode            = NULL;
+    TiXmlElement* pConnectState    = NULL;
     _RedirectionInfo redirecttioninfo;
 
     while (pXmlOperation->Read_XML_Data_Multiple_Uint32("TcpRedirection", "SrcPort", redirecttioninfo.SrcPort, pSrcPort)
            && pXmlOperation->Read_XML_Data_Multiple_String("TcpRedirection", "RedirectionIP", redirecttioninfo.RedirectionIP, pRedirectionIP)
            && pXmlOperation->Read_XML_Data_Multiple_Uint32("TcpRedirection", "RedirectionPort", redirecttioninfo.RedirectionPort, pRedirectionPort)
-           && pXmlOperation->Read_XML_Data_Multiple_Uint8("TcpRedirection", "Mode", redirecttioninfo.Mode, pMode))
+           && pXmlOperation->Read_XML_Data_Multiple_Uint8("TcpRedirection", "Mode", redirecttioninfo.Mode, pMode)
+           && pXmlOperation->Read_XML_Data_Multiple_Uint8("TcpRedirection", "ConnectState", redirecttioninfo.ConnectState, pConnectState))
     {
         vec.push_back(redirecttioninfo);
     }

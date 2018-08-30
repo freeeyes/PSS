@@ -40,6 +40,7 @@
 #include "TimeWheelLink.h"
 #include "FileTest.h"
 #include "XmlConfig.h"
+#include "TcpRedirection.h"
 
 class CProConnectHandle : public ACE_Service_Handler
 {

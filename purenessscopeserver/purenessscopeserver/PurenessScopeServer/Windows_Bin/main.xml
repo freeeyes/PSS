@@ -67,6 +67,8 @@
 	<!-- TS定时器列表参数,TimerListPool是定时容器中最多定时任务的数量,设置为0,为不开启 -->
 	<TSTimer TimerListPool="0" />
 	
-	<!-- 设置转发接口 -->
-	<TcpRedirection SrcPort="10002" RedirectionIP="127.0.0.1" RedirectionPort="10003" Mode="0" />
+	<!-- 设置转发接口,可以是多个, 与端口一一对应 -->
+	<!-- Mode 0 只转发数据，不将回应数据回应客户端。 1 转发数据，并接受转发服务器的回应数据回应给客户端 -->
+	<!-- ConnectState 0 和转发连接不同步。 1 和转发连接同步 -->
+	<TcpRedirection SrcPort="10002" RedirectionIP="127.0.0.1" RedirectionPort="10003" Mode="1" ConnectState="0" />
 </config>

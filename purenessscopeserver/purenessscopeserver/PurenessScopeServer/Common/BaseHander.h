@@ -13,6 +13,7 @@
 #include "SendCacheManager.h"
 #include "ace/SOCK_Dgram.h"
 #include "XmlConfig.h"
+#include "TcpRedirection.h"
 
 //所有的handler用到的公共函数
 //add by freeeyes
