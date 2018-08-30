@@ -26,7 +26,7 @@ void CTcpRedirection::Init(xmlTcpRedirection* pCXmlTcpRedirection, uint32 u4MaxH
     m_pClientManager  = pClientManager;
     m_pConnectManager = pConnectManager;
 
-    for (int i = 0; i < pCXmlTcpRedirection->vec.size(); i++)
+    for (int i = 0; i < (int)pCXmlTcpRedirection->vec.size(); i++)
     {
         xmlTcpRedirection::_RedirectionInfo* pRedirectionInfo = &pCXmlTcpRedirection->vec[i];
 
@@ -65,7 +65,8 @@ void CTcpRedirection::ConnectRedirect(uint32 u4SrcPort, uint32 u4ConnectID)
         //这里要做到同步等待中间服务器连接建立成功再继续
         while (true)
         {
-            if (SERVER_CONNECT_FIRST == m_pClientManager->GetConnectState(u4ConnectID))
+            if (SERVER_CONNECT_FIRST == m_pClientManager->GetConnectState(u4ConnectID)
+                || SERVER_CONNECT_OK == m_pClientManager->GetConnectState(u4ConnectID))
             {
                 break;
             }
@@ -73,8 +74,6 @@ void CTcpRedirection::ConnectRedirect(uint32 u4SrcPort, uint32 u4ConnectID)
             ACE_Time_Value tvSleep(0, 1000);
             ACE_OS::sleep(tvSleep);
         }
-
-        OUR_DEBUG((LM_INFO, "[CTcpRedirection::ConnectRedirect]u4SrcPort=%d,u4ConnectID=%d.\n", u4SrcPort, u4ConnectID));
     }
 }
 
@@ -85,7 +84,6 @@ void CTcpRedirection::DataRedirect(uint32 u4ConnectID, ACE_Message_Block* mb)
         return;
     }
 
-    OUR_DEBUG((LM_INFO, "[CTcpRedirection::DataRedirect]u4ConnectID=%d,mb.length=%d.\n", u4ConnectID, mb->length()));
     CRedirectionData* pRedirectionData = m_objRedirectConnectList.Get_Hash_Box_Data_By_Uint32(u4ConnectID);
 
     if (NULL != pRedirectionData)

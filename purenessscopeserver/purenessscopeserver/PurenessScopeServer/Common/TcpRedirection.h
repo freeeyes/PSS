@@ -102,6 +102,7 @@ public:
     {
         //数据包已经收全，在这里处理数据
         ACE_UNUSED_ARG(u2CommandID);
+        ACE_UNUSED_ARG(objServerIPInfo);
 
         if (NULL == m_pConnectManager || 0 == m_u1Mode)
         {

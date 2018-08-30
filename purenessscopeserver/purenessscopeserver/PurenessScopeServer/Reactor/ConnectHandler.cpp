@@ -401,15 +401,15 @@ int CConnectHandler::Dispose_Recv_Data()
         return -1;
     }
 
+    m_u4CurrSize += nDataLen;
+
+    m_pCurrMessage->wr_ptr(nDataLen);
+
     //如果是DEBUG状态，记录当前接受包的二进制数据
     Output_Debug_Data(m_pCurrMessage, LOG_SYSTEM_DEBUG_CLIENTRECV);
 
     //查看是否需要转发数据
     App_TcpRedirection::instance()->DataRedirect(GetConnectID(), m_pCurrMessage);
-
-    m_u4CurrSize += nDataLen;
-
-    m_pCurrMessage->wr_ptr(nDataLen);
 
     if (App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
     {

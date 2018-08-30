@@ -560,8 +560,6 @@ void CProConnectHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         sprintf_safe(szData, 10, "false");
     }
 
-    OUR_DEBUG((LM_INFO, "[CTcpRedirection::DataRedirect]u4ConnectID=%d, GetIsHandleHead()=%s.\n", GetConnectID(), szData));
-
     if(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
     {
         if(result.bytes_transferred() < result.bytes_to_read())
