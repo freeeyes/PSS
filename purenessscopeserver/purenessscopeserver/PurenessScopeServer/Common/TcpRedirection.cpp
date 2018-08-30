@@ -18,7 +18,7 @@ void CTcpRedirection::Close()
     m_u2Count = 0;
 }
 
-void CTcpRedirection::Init(xmlTcpRedirection* pCXmlTcpRedirection, uint32 u4MaxHandlerCount, IClientManager* pClientManager, IConnectManager* pConnectManager)
+void CTcpRedirection::Init(std::vector<xmlTcpRedirection::_RedirectionInfo> vecInfo, uint32 u4MaxHandlerCount, IClientManager* pClientManager, IConnectManager* pConnectManager)
 {
     //设置Hash表最大的数量是100
     m_objRedirectList.Init(MAX_BUFF_100);
@@ -26,14 +26,14 @@ void CTcpRedirection::Init(xmlTcpRedirection* pCXmlTcpRedirection, uint32 u4MaxH
     m_pClientManager  = pClientManager;
     m_pConnectManager = pConnectManager;
 
-    for (int i = 0; i < (int)pCXmlTcpRedirection->vec.size(); i++)
+    for (int i = 0; i < (int)vecInfo.size(); i++)
     {
-        xmlTcpRedirection::_RedirectionInfo* pRedirectionInfo = &pCXmlTcpRedirection->vec[i];
+        xmlTcpRedirection::_RedirectionInfo* pRedirectionInfo = &vecInfo[i];
 
         m_objRedirectList.Add_Hash_Data_By_Key_Unit32(pRedirectionInfo->SrcPort, pRedirectionInfo);
     }
 
-    m_u2Count = (uint16)pCXmlTcpRedirection->vec.size();
+    m_u2Count = (uint16)vecInfo.size();
 }
 
 void CTcpRedirection::ConnectRedirect(uint32 u4SrcPort, uint32 u4ConnectID)

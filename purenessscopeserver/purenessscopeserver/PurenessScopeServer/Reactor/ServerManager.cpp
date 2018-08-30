@@ -95,7 +95,7 @@ bool CServerManager::Init()
     }
 
     //初始化转发列表
-    App_TcpRedirection::instance()->Init(GetXmlConfigAttribute(xmlTcpRedirection),
+    App_TcpRedirection::instance()->Init(GetXmlConfigAttribute(xmlTcpRedirection)->vec,
                                          GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount,
                                          pClientManager,
                                          pConnectManager);

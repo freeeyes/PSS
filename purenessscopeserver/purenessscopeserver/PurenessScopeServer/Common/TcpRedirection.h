@@ -163,7 +163,7 @@ public:
 
     void Close();
 
-    void Init(xmlTcpRedirection* pCXmlTcpRedirection, uint32 u4MaxHandlerCount, IClientManager* pClientManager, IConnectManager* pConnectManager);
+    void Init(std::vector<xmlTcpRedirection::_RedirectionInfo> vec, uint32 u4MaxHandlerCount, IClientManager* pClientManager, IConnectManager* pConnectManager);
 
     void ConnectRedirect(uint32 u4SrcPort, uint32 u4ConnectID);
 

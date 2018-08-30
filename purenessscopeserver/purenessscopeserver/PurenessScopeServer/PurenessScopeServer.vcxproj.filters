@@ -373,6 +373,9 @@
     <ClCompile Include="Common\TcpRedirection.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="CppUnit\Uint_TcpRedirection.cpp">
+      <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -869,6 +872,9 @@
     </ClInclude>
     <ClInclude Include="Common\TcpRedirection.h">
       <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\Uint_TcpRedirection.h">
+      <Filter>CppUnit\hfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -210,6 +210,7 @@
     <ClCompile Include="CppUnit\Uint_PacketParse.cpp" />
     <ClCompile Include="CppUnit\Uint_ServerMessageInfoPool.cpp" />
     <ClCompile Include="CppUnit\Uint_ServerMessageManager.cpp" />
+    <ClCompile Include="CppUnit\Uint_TcpRedirection.cpp" />
     <ClCompile Include="CppUnit\Uint_ThreadInfo.cpp" />
     <ClCompile Include="CppUnit\Unit_Aes.cpp" />
     <ClCompile Include="CppUnit\Unit_AppConfig.cpp" />
@@ -621,6 +622,7 @@
     <ClInclude Include="CppUnit\Uint_PacketParse.h" />
     <ClInclude Include="CppUnit\Uint_ServerMessageInfoPool.h" />
     <ClInclude Include="CppUnit\Uint_ServerMessageManager.h" />
+    <ClInclude Include="CppUnit\Uint_TcpRedirection.h" />
     <ClInclude Include="CppUnit\Uint_ThreadInfo.h" />
     <ClInclude Include="CppUnit\Unit_Aes.h" />
     <ClInclude Include="CppUnit\Unit_AppConfig.h" />

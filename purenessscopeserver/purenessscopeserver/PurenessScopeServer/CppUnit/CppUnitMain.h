@@ -40,6 +40,7 @@
 #include "Uint_ConnectClient.h"
 #include "Uint_LogManager.h"
 #include "Unit_LoadModule.h"
+#include "Uint_TcpRedirection.h"
 
 #define CPPUNIT_REPORT_PATH "./reports/cppunit/report.xml"
 
