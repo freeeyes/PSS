@@ -60,13 +60,13 @@ void CUnit_Redirection::Test_Redirection(void)
     memcpy((char*)&szSendBufferData[40], (char*)szBuff, sizeof(char) * nPacketLen);
 
     ACE_Message_Block* pmb = App_MessageBlockManager::instance()->Create(40);
-    memcpy_safe((char*)&szSendBuffer[0], 40, pmb->wr_ptr(), 40);
+    memcpy_safe((char*)&szSendBufferData[0], 40, pmb->wr_ptr(), 40);
     pmb->wr_ptr(40);
     m_pTcpRedirection->DataRedirect(u4ConnectID, pmb);
     App_MessageBlockManager::instance()->Close(pmb);
 
     pmb = App_MessageBlockManager::instance()->Create(8);
-    memcpy_safe((char*)&szSendBuffer[40], 8, pmb->wr_ptr(), 8);
+    memcpy_safe((char*)&szSendBufferData[40], 8, pmb->wr_ptr(), 8);
     pmb->wr_ptr(8);
     m_pTcpRedirection->DataRedirect(u4ConnectID, pmb);
     App_MessageBlockManager::instance()->Close(pmb);
