@@ -22,7 +22,7 @@ void CUnit_ControlListen::Test_ControlListen(void)
 {
     bool blRet = false;
 
-    if (false == m_pControlListen->AddListen("127.0.0.1", 10005, TYPE_IPV4, 1))
+    if (false == m_pControlListen->AddListen("127.0.0.1", 10007, TYPE_IPV4, 1))
     {
         OUR_DEBUG((LM_INFO, "[Test_ControlListen]m_pControlListen->AddListen() Error.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_ControlListen]m_pControlListen->AddListen() Error.", true == blRet);

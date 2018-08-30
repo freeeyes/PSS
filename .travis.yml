@@ -86,14 +86,16 @@ matrix:
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/Test
         - make -j 4
         - ./Test_Pss
-        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
-        - cat pssout.file
+        #- cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
+        #- cat pssout.file
         #close server
         - killall PurenessScopeServer
         - sleep 5
         # collect gcov report
         # - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/.obj
         # - gcovr -r ../ -o ../../report.xml --xml-pretty
+        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/.obj
+        - ls
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
         - gcov -r -o ./.obj ../*.cpp > /dev/null
         - gcov -r -o ./.obj ../Common/*.cpp > /dev/null
@@ -106,9 +108,9 @@ matrix:
         - gcov -r -o ./.obj ../Reactor/*.cpp > /dev/null
         - gcov -r -o ./.obj ../UDP/*.cpp > /dev/null
         - gcov -r -o ./.obj ../CppUnit/*.cpp > /dev/null
-        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/reports/cppunit
+        #- cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/reports/cppunit
         #- ls 
-        - cat report.xml
+        #- cat report.xml
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer
         - sonar-scanner -X
 
