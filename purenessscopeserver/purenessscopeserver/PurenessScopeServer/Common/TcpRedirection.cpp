@@ -90,9 +90,11 @@ void CTcpRedirection::DataRedirect(uint32 u4ConnectID, ACE_Message_Block* mb)
     {
         char* pData = (char*)mb->rd_ptr();
 
-        if (false == m_pClientManager->SendData(u4ConnectID, pData, (int)mb->length(), false))
+        //如果在连接状态，才发送数据
+        if (SERVER_CONNECT_FIRST == m_pClientManager->GetConnectState(u4ConnectID)
+            || SERVER_CONNECT_OK == m_pClientManager->GetConnectState(u4ConnectID))
         {
-            OUR_DEBUG((LM_INFO, "[CTcpRedirection::DataRedirect]u4ConnectID=%d send error.\n", u4ConnectID));
+            m_pClientManager->SendData(u4ConnectID, pData, (int)mb->length(), false);
         }
     }
 }
