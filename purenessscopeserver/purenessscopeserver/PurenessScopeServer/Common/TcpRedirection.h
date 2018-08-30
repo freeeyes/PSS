@@ -63,15 +63,6 @@ public:
 
         //申请发送的内存
         mbSend = pMessageBlockManager->Create(u4Len);
-
-        if (NULL == mbSend)
-        {
-            OUR_DEBUG((LM_INFO, "[CRedirectionData::Send_Format_data](%d)Format Create Data NULL(%d) OK.\n", m_u4ServerID, u4Len));
-            return false;
-        }
-
-        //如果需要组装数据，在这里写你的代码
-        //这里只是用例，只做简单的内存拷贝，演示完整的操作流程
         memcpy_safe(pData, u4Len, mbSend->wr_ptr(), u4Len);
         mbSend->wr_ptr(u4Len);
         return true;

@@ -43,21 +43,21 @@ void CUnit_Redirection::Test_Redirection(void)
 
     //测试组装数据
     //拼装测试发送数据
-    char szSendBuffer[MAX_BUFF_200] = { '\0' };
+    char szSendBufferData[MAX_BUFF_200] = { '\0' };
     char szBuff[20] = { '\0' };
     char szSession[32] = { '\0' };
-    sprintf_safe(szBuff, 20, "freeeyes");
-    sprintf_safe(szSession, 32, "FREEEYES");
+    sprintf_safe(szBuff, 20, "redirecttion");
+    sprintf_safe(szSession, 32, "redirecttion");
 
     short sVersion = 1;
     short sCommand = (short)0x1000;
     int nPacketLen = ACE_OS::strlen(szBuff);
 
-    memcpy(szSendBuffer, (char*)&sVersion, sizeof(short));
-    memcpy((char*)&szSendBuffer[2], (char*)&sCommand, sizeof(short));
-    memcpy((char*)&szSendBuffer[4], (char*)&nPacketLen, sizeof(int));
-    memcpy((char*)&szSendBuffer[8], (char*)&szSession, sizeof(char) * 32);
-    memcpy((char*)&szSendBuffer[40], (char*)szBuff, sizeof(char) * nPacketLen);
+    memcpy(szSendBufferData, (char*)&sVersion, sizeof(short));
+    memcpy((char*)&szSendBufferData[2], (char*)&sCommand, sizeof(short));
+    memcpy((char*)&szSendBufferData[4], (char*)&nPacketLen, sizeof(int));
+    memcpy((char*)&szSendBufferData[8], (char*)&szSession, sizeof(char) * 32);
+    memcpy((char*)&szSendBufferData[40], (char*)szBuff, sizeof(char) * nPacketLen);
 
     ACE_Message_Block* pmb = App_MessageBlockManager::instance()->Create(40);
     memcpy_safe((char*)&szSendBuffer[0], 40, pmb->wr_ptr(), 40);
