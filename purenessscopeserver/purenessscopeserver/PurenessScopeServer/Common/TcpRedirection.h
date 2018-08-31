@@ -14,7 +14,7 @@
 #include "IClientManager.h"
 #include "IConnectManager.h"
 
-#define MAX_CONNECT_COUNT  5
+#define MAX_CONNECT_REDIRECTION_COUNT  5
 
 class CRedirectionData : public IClientMessage
 {

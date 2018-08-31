@@ -69,7 +69,7 @@ void CTcpRedirection::ConnectRedirect(uint32 u4SrcPort, uint32 u4ConnectID)
         {
             if (SERVER_CONNECT_FIRST == m_pClientManager->GetConnectState(u4ConnectID)
                 || SERVER_CONNECT_OK == m_pClientManager->GetConnectState(u4ConnectID)
-                || nRunCount >= MAX_CONNECT_COUNT)
+                || nRunCount >= MAX_CONNECT_REDIRECTION_COUNT)
             {
                 break;
             }
