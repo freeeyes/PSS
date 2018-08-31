@@ -240,6 +240,17 @@
             <th>说明</th>
         </tr>
 		<tr><th>TimerListPool</th><th>当前定时器池的最大允许任务数，如果是0，则默认不开启TS定时器线程</th></tr>
+        <tr>
+            <th rowspan="6">TcpRedirection</th>
+            <th rowspan="6">数据中继</th>
+            <th>属性</th>
+            <th>说明</th>
+            <tr><th>SrcPort</th><th>需要对应转发的本地端口</th></tr>
+		    <tr><th>RedirectionIP</th><th>转发IP</th></tr>
+			<tr><th>RedirectionPort</th><th>转发Port</th></tr>
+			<tr><th>Mode</th><th>0 只转发数据，不将回应数据回应客户端。 1 转发数据，并接受转发服务器的回应数据回应给客户端</th></tr>
+            <tr><th>ConnectState</th><th>ConnectState 0 和转发连接不同步。 1 和转发连接同步</th></tr>
+        </tr>
 </table>
 
 ## logger.xml(框架日志配置信息)  

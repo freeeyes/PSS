@@ -63,16 +63,20 @@ void CTcpRedirection::ConnectRedirect(uint32 u4SrcPort, uint32 u4ConnectID)
                                   (IClientMessage*)pRedirectionData);
 
         //这里要做到同步等待中间服务器连接建立成功再继续
+        int nRunCount = 0;
+
         while (true)
         {
             if (SERVER_CONNECT_FIRST == m_pClientManager->GetConnectState(u4ConnectID)
-                || SERVER_CONNECT_OK == m_pClientManager->GetConnectState(u4ConnectID))
+                || SERVER_CONNECT_OK == m_pClientManager->GetConnectState(u4ConnectID)
+                || nRunCount >= MAX_CONNECT_COUNT)
             {
                 break;
             }
 
             ACE_Time_Value tvSleep(0, 1000);
             ACE_OS::sleep(tvSleep);
+            nRunCount++;
         }
     }
 }

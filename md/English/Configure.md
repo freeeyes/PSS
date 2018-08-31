@@ -240,6 +240,18 @@
             <th>information</th>
         </tr>
 		<tr><th>TimerListPool</th><th>The maximum number of tasks allowed for the current timer pool. if it is 0, the ts timer thread will not be started by default.</th></tr>
+        <tr>
+            <th rowspan="6">TcpRedirection</th>
+            <th rowspan="6">Data forwarding</th>
+            <th>Attribute</th>
+            <th>information</th>
+            <tr><th>SrcPort</th><th>Local ports that need corresponding forwarding</th></tr>
+		    <tr><th>RedirectionIP</th><th>Forward IP</th></tr>
+			<tr><th>RedirectionPort</th><th>Forward Port</th></tr>
+			<tr><th>Mode</th><th>0 only forwards data and does not respond to the client with response data. 1 Forward data and accept the response data from the forwarding server to the client</th></tr>
+            <tr><th>ConnectState</th><th>0 is out of sync with the forwarding connection. 1 is synchronized with the forwarding connection</th></tr>
+        </tr>
+
 </table>
 
 ## logger.xml(Framework log configuration information)  
