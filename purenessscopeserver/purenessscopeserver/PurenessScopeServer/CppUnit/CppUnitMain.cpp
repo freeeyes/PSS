@@ -40,7 +40,7 @@ CCppUnitMain::CCppUnitMain()
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_LogManager, "pss");
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_LoadModule, "pss");
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_Redirection, "pss");
-    //CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_Frame_Logging, "pss");
+    CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_Frame_Logging, "pss");
 }
 
 CCppUnitMain::~CCppUnitMain()
