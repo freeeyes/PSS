@@ -25,7 +25,7 @@ Implement standard TCP packet processing flow display。
 
 ## (2)UdpTest plugin 
 ### target  
-Implement standard TCP packet processing flow display.   
+Implement standard UDP packet processing flow display.   
 ### Test message format  
 <table width="100%" border="1" cellpadding="0" cellspacing="0">
         <tr>

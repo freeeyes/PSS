@@ -25,7 +25,7 @@
 
 ## (2)UdpTest插件  
 ### 目的  
-实现标准的TCP数据包处理流程展示。  
+实现标准的UDP数据包处理流程展示。  
 ### 测试信令格式  
 <table width="100%" border="1" cellpadding="0" cellspacing="0">
         <tr>
