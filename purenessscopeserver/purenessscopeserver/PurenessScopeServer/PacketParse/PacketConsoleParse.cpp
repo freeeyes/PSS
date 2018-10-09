@@ -24,10 +24,8 @@ bool CConsolePacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* p
 {
     char* pData = pmbHead->rd_ptr();
 
-    if(u4ConnectID == 0 && pMessageBlockManager != NULL)
-    {
-        //UDP数据包，没有u4ConnectID
-    }
+    ACE_UNUSED_ARG(u4ConnectID);
+    ACE_UNUSED_ARG(pMessageBlockManager);
 
     //这里添加自己对包头的分析，主要分析出包长度。
     uint32 u4Len = (uint32)pmbHead->length();
