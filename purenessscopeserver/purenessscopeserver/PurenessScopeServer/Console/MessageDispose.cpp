@@ -121,12 +121,7 @@ void DoMessage_LoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, u
     if (false == GetFileInfo(CommandInfo.m_szCommandExp, FileInfo) && CommandInfo.m_u1OutputType == 0)
     {
         (*pBuffPacket) << (uint8)1;
-    }
-    else
-    {
-        char szTemp[MAX_BUFF_200] = { '\0' };
-        sprintf_safe(szTemp, MAX_BUFF_200, "Command data is Error.\n");
-        pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        return;
     }
 
     //¼ÓÔØÎÄ¼þMessageManager
