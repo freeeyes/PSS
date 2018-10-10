@@ -27,9 +27,6 @@
 	<!-- 消息处理线程相关参数设置 -->
 	<Message Msg_High_mark="64000" Msg_Low_mark="64000" Msg_Buff_Max_Size="20480" Msg_Thread="5" Msg_MaxQueue="10000" desc="消息处理线程相关参数设置，" />
 	
-	<!-- 测试UDP模块加载流程的用例 -->
-	<!-- <Module ModuleSPath="./" ModuleSName="UDPTestd.dll" ModuleSParam="" desc="模块加载配置相关参数，ModulePath是路径，ModuleString是模块名称，以逗号隔开"/> -->
-	
 	<!-- 测试Tcp插件加载流程的用例 -->
 	<ModuleManager MaxCount="100" desc="框架支持的最大插件数量" />
 	
