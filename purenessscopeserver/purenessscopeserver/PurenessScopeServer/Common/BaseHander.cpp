@@ -190,7 +190,6 @@ uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPa
     {
         OUR_DEBUG((LM_ERROR, "[Udp_Common_Recv_Stream]m_pPacketParse GetPacketStream is error.\n"));
         App_PacketParsePool::instance()->Delete(pPacketParse);
-        return false;
     }
 
     return n1Ret;
