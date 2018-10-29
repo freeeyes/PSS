@@ -89,6 +89,16 @@ namespace ts_timer
             nCurrCount++;
         }
     }
+
+    //获得sleep时间数
+    inline void Get_Sleep(int nTime)
+    {
+#ifdef WIN32
+        Sleep(nTime);
+#else
+        nanosleep(nTime);
+#endif
+    }
 };
 
 #endif

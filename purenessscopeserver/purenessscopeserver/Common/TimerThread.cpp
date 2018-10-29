@@ -13,8 +13,8 @@ void* thr_fn(void* arg)
 
     //最后运行的TimerID
     int nLastRunTimerID = 0;
-    int nTimeCost = 0;
-    int nInterval = 0;
+    int nTimeCost       = 0;
+    int nInterval       = 0;
 
     ts_timer::CTime_Value obj_Now = ts_timer::GetTimeofDay();
 
@@ -139,6 +139,14 @@ ts_timer::CTimerThread::CTimerThread()
 
 ts_timer::CTimerThread::~CTimerThread()
 {
+    //判断工作线程是否正在运行
+    if (m_TimerInfoList.Get_Run() == true)
+    {
+        Modify(TIMER_STOP);
+    }
+
+    Get_Sleep(10);
+
     m_TimerInfoList.Close();
 }
 
