@@ -1,5 +1,5 @@
 project(PacketParse_Interface_Http):acelib{
-  sharedname=PacketParse_VS2015_Http
+  sharedname=PacketParse_Interface_Http
   dynamicflags += PACKETPARSE_INTERFACE_HTTP_EXPORTS
 
   Source_Files{ 
