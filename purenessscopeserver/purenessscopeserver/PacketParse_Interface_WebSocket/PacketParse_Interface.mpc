@@ -1,4 +1,4 @@
-project(PacketParse_VS2015_WebSocket):acelib{
+project(PacketParse_Interface_WebSocket):acelib{
   sharedname=PacketParse_VS2015_WebSocket
   dynamicflags += TEST_TCP_BUILD_DLL
   

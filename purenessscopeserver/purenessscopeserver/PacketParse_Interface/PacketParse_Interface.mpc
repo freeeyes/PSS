@@ -1,4 +1,4 @@
-project(PacketParse_VS2015):acelib{
+project(PacketParse_Interface):acelib{
   sharedname=PacketParse_VS2015
   dynamicflags += TEST_TCP_BUILD_DLL
   
