@@ -1,5 +1,5 @@
-project(PacketParse_Interface_monitor):acelib{
-  sharedname=PacketParse_Interface_monitor
+project(PacketParse_VS2015_monitor):acelib{
+  sharedname=PacketParse_VS2015_monitor
   dynamicflags += TEST_TCP_BUILD_DLL
   
   Source_Files{
