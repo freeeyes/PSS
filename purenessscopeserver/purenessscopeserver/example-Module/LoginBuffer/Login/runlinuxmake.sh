@@ -1,1 +1,0 @@
-mwc.pl -type gnuace
