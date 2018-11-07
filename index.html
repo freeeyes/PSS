@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ARK - open source plugin framework</title>
+  <link rel="icon" href="_images/favicon.ico">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="keywords" content="server,plugin,module,game,network,linux,windows,perfermance">
+  <meta name="description" content="A lightweight, agility, scalable, distributed plugin framework.">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css" title="vue">
+  <style>
+    nav.app-nav li ul {
+      min-width: 100px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">Loading ...</div>
+  <script>
+    window.$docsify = {
+      nameLink: [
+        '/en-us/',
+        '/'
+      ],
+      name: 'PSS',
+      repo: 'freeeyes/PSS',
+      coverpage: [
+        '/',
+        '/en-us/'
+      ],
+      loadSidebar: true,
+      loadNavbar: true,
+      mergeNavbar: true,
+      autoHeader: true,
+      auto2top: true,
+      maxLevel: 4,
+      subMaxLevel: 2,
+      formatUpdated: '{MM}/{DD} {HH}:{mm}',
+
+      search: {
+        noData: {
+          '/en-us/': 'No results!',
+          '/': '没有结果!'
+        },
+        paths: 'auto',
+        placeholder: {
+          '/en-us/': 'Search',
+          '/': '搜索'
+        }
+      },
+
+      plugins: [
+        function (hook) {
+          var footer = [
+            '<hr/>',
+            '<footer>',
+            '<span><a href="https://github.com/freeeyes/PSS">PSS</a> &copy; 2018. </span>',
+            'Please feel free to use and contribute to the development.',
+            '<p><span>Published with <a href="https://github.com/QingWei-Li/docsify" target="_blank">docsify</a>.</span></p>',
+            '</footer>'
+          ].join('')
+
+          hook.afterEach(function (html) {
+            return html + footer
+          })
+        }
+      ]
+    }
+  </script>
+  <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
+  <script src="//unpkg.com/docsify/lib/plugins/search.min.js"></script>
+  <script src="//unpkg.com/prismjs/components/prism-bash.min.js"></script>
+  <script src="//unpkg.com/prismjs/components/prism-markdown.min.js"></script>
+  <script src="//unpkg.com/prismjs/components/prism-batch.min.js"></script>
+  <script src="//unpkg.com/prismjs/components/prism-c.min.js"></script>
+  <script src="//unpkg.com/prismjs/components/prism-clike.min.js"></script>
+  <script src="//unpkg.com/prismjs/components/prism-cpp.min.js"></script>
+  <script src="//unpkg.com/prismjs/components/prism-csharp.js"></script>
+  <script src="//unpkg.com/prismjs/components/prism-makefile.min.js"></script>
+  <script src="//unpkg.com/docsify-copy-code@2"></script>
+  <script src="//unpkg.com/docsify-edit-on-github@1.0.1/index.js"></script>
+</body>
+</html>
