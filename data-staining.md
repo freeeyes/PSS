@@ -22,10 +22,10 @@ Trace.h是提供给插件使用的一组功能，包括三个宏组成
 
 ## Trace功能的使用
 
-你可以在你需要的时候，生成一个key。这个可以在你的插件逻辑代码中决定。  
-当你的key生成以后，只要在每个函数调用"桩"的地方输入这个key，"桩"就会执行记录。  
+你可以在你需要的时候，生成一个key。这个可以在你的插件逻辑代码中决定。
+当你的key生成以后，只要在每个函数调用"桩"的地方输入这个key，"桩"就会执行记录。
 例如，你在插件的DoMessage()函数里面，接收到某一个指令，你可以  
-string strKey = CREATE_TRACE(Clinet.IP, Client.port, Client.Command);  
+string strKey = CREATE_TRACE(Clinet.IP, Client.port, Client.Command);
 然后在你的一系列数据处理过程中，添加  
 DO_TRACE("./", strKey.c_str());  
 在一些情况下，我们需要对数据进行运行时间的统计。  

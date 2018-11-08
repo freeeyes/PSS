@@ -18,7 +18,7 @@ b freeeyes ShowServerInfo -a&
 ```
 
 `b`: 输出结果以二进制结果输出，如果想以文本结构输出，这里可以使用 `i` (比如在telnet下)  
-`freeeyes`: 用户名，这个是必须的，PSS框架会对用户进行校验，具体校验设置在`main.xml`  （设置用户名）和`ConsoleCommand.xml`（设置对应的权限）有权限才能被执行。
+`freeeyes`: 用户名，这个是必须的，PSS框架会对用户进行校验，具体校验设置在`main.xml`（设置用户名）和`ConsoleCommand.xml`（设置对应的权限）有权限才能被执行。
 `ShowServerInfo`: 命令的名称.  
 `-a`: 命令的参数部分。  
 `&`: 命令结束符，是必须的。
