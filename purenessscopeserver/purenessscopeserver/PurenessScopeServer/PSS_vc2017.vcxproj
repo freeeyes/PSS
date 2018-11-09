@@ -1,0 +1,735 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{8C99CA60-B114-4866-8D87-9DC0C17831F3}</ProjectGuid>
+    <RootNamespace>PurenessScopeServer</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>.\Windows_Bin\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)_D</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)_D</TargetName>
+    <OutDir>.\Windows_Bin\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>.\Windows_Bin\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>.\Windows_Bin</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ACE_ROOT);../Common;./Common;./Encrypt;./LogSystem;./Message;./PacketParse;./Proactor;./Reactor;./UDP;./Console;./TinyXML;./Mail;./FileTest</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>aced.lib;DbgHelp.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName)_D.exe</OutputFile>
+      <AdditionalLibraryDirectories>$(ACE_ROOT)\lib;.\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ACE_ROOT);../Common;./Common;./Encrypt;./LogSystem;./Message;./PacketParse;./Proactor;./Reactor;./UDP;./Console;./TinyXML;./Mail;./FileTest</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>aced.lib;DbgHelp.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName)_D.exe</OutputFile>
+      <AdditionalLibraryDirectories>$(ACE_ROOT)\lib;.\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ACE_ROOT);./Common;./Encrypt;./IObject;./LogSystem;./Message;./PacketParse;./Proactor;./Reactor;./UDP;./Console;./TinyXML;./Mail;./FileTest;</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>ace.lib;DbgHelp.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName)_R.exe</OutputFile>
+      <AdditionalLibraryDirectories>$(ACE_ROOT)\lib;.\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ACE_ROOT);../Common;./Common;./Encrypt;./LogSystem;./Message;./PacketParse;./Proactor;./Reactor;./UDP;./Console;./TinyXML;./Mail;./FileTest</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4091;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>ace.lib;DbgHelp.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName)_R.exe</OutputFile>
+      <AdditionalLibraryDirectories>$(ACE_ROOT)\lib;.\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Common\ACEMemory.cpp" />
+    <ClCompile Include="..\Common\RandomNumber.cpp" />
+    <ClCompile Include="..\Common\Threading.cpp" />
+    <ClCompile Include="..\Common\TimerInfo.cpp" />
+    <ClCompile Include="..\Common\TimerThread.cpp" />
+    <ClCompile Include="..\Common\Time_Value.cpp" />
+    <ClCompile Include="Common\BaseClientConnectManager.cpp" />
+    <ClCompile Include="Common\BaseConnectClient.cpp" />
+    <ClCompile Include="Common\BaseConsoleHandle.cpp" />
+    <ClCompile Include="Common\BaseHander.cpp" />
+    <ClCompile Include="Common\BaseServerManager.cpp" />
+    <ClCompile Include="Common\BaseTask.cpp" />
+    <ClCompile Include="Common\IPAccount.cpp" />
+    <ClCompile Include="Common\ServerMessageTask.cpp" />
+    <ClCompile Include="Common\TcpRedirection.cpp" />
+    <ClCompile Include="Common\XmlConfig.cpp" />
+    <ClCompile Include="Console\ConsolePromiss.cpp" />
+    <ClCompile Include="Console\FrameCommand.cpp" />
+    <ClCompile Include="Console\MessageDefine.cpp" />
+    <ClCompile Include="Console\MessageDispose.cpp" />
+    <ClCompile Include="CppUnit\CppUnitMain.cpp" />
+    <ClCompile Include="CppUnit\Uint_AceReactorManager.cpp" />
+    <ClCompile Include="CppUnit\Uint_ConnectClient.cpp" />
+    <ClCompile Include="CppUnit\Uint_ConnectHandler.cpp" />
+    <ClCompile Include="CppUnit\Uint_ConsoleMessage.cpp" />
+    <ClCompile Include="CppUnit\Uint_ConsolePromissions.cpp" />
+    <ClCompile Include="CppUnit\Uint_LogManager.cpp" />
+    <ClCompile Include="CppUnit\Uint_MessageService.cpp" />
+    <ClCompile Include="CppUnit\Uint_PacketParse.cpp" />
+    <ClCompile Include="CppUnit\Uint_ServerMessageInfoPool.cpp" />
+    <ClCompile Include="CppUnit\Uint_ServerMessageManager.cpp" />
+    <ClCompile Include="CppUnit\Uint_TcpRedirection.cpp" />
+    <ClCompile Include="CppUnit\Uint_ThreadInfo.cpp" />
+    <ClCompile Include="CppUnit\Unit_Aes.cpp" />
+    <ClCompile Include="CppUnit\Unit_AppConfig.cpp" />
+    <ClCompile Include="CppUnit\Unit_BaseConnectClient.cpp" />
+    <ClCompile Include="CppUnit\Unit_BaseHandler.cpp" />
+    <ClCompile Include="CppUnit\Unit_BuffPacket.cpp" />
+    <ClCompile Include="CppUnit\Unit_CommandAccount.cpp" />
+    <ClCompile Include="CppUnit\Unit_ConnectTcp.cpp" />
+    <ClCompile Include="CppUnit\Unit_ConnectUdp.cpp" />
+    <ClCompile Include="CppUnit\Unit_ControlListen.cpp" />
+    <ClCompile Include="CppUnit\Unit_FileLog.cpp" />
+    <ClCompile Include="CppUnit\Unit_FileTestManager.cpp" />
+    <ClCompile Include="CppUnit\Unit_ForbiddenIP.cpp" />
+    <ClCompile Include="CppUnit\Unit_FrameCommand.cpp" />
+    <ClCompile Include="CppUnit\Unit_IPAccount.cpp" />
+    <ClCompile Include="CppUnit\Unit_LoadModule.cpp" />
+    <ClCompile Include="CppUnit\Unit_Logging.cpp" />
+    <ClCompile Include="CppUnit\Unit_MakePacket.cpp" />
+    <ClCompile Include="CppUnit\Unit_MessageDefine.cpp" />
+    <ClCompile Include="CppUnit\Unit_MessageDyeingManager.cpp" />
+    <ClCompile Include="CppUnit\Unit_ModuleMessageManager.cpp" />
+    <ClCompile Include="CppUnit\Unit_ProfileTime.cpp" />
+    <ClCompile Include="CppUnit\Unit_TimeQueue.cpp" />
+    <ClCompile Include="CppUnit\Unit_WorkThreadAI.cpp" />
+    <ClCompile Include="Mail\smtps.cpp" />
+    <ClCompile Include="Message\MessageDyeingManager.cpp" />
+    <ClCompile Include="PurenessScopeServer.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Encrypt\Aes.cpp" />
+    <ClCompile Include="FileTest\FileTestManager.cpp" />
+    <ClCompile Include="PacketParse\PacketConsoleParse.cpp" />
+    <ClCompile Include="PacketParse\PacketParse.cpp" />
+    <ClCompile Include="PacketParse\PacketParseBase.cpp" />
+    <ClCompile Include="PacketParse\PacketParsePool.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="LogSystem\FileLogger.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="LogSystem\LogManager.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Message\LoadModule.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Message\LoadPacketParse.cpp" />
+    <ClCompile Include="Message\Message.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Message\MessageManager.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Message\MessageService.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Message\ModuleMessageManager.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Message\WorkThreadAI.cpp" />
+    <ClCompile Include="Proactor\AceProactorManager.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Proactor\ClientProConnectManager.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Proactor\ProAsynchConnect.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Proactor\ProConnectAccept.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Proactor\ProConnectClient.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Proactor\ProConnectHandle.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Proactor\ProConsoleAccept.cpp" />
+    <ClCompile Include="Proactor\ProConsoleHandle.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Proactor\ProControlListen.cpp" />
+    <ClCompile Include="Proactor\ProServerManager.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Proactor\ProSigHandle.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Console\ConsoleMessage.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="UDP\ProactorUDPClient.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="UDP\ProactorUDPHandler.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="UDP\ReactorUDPClient.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="UDP\ReactorUDPHander.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Common\AppConfig.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Common\BuffPacket.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Common\BuffPacketManager.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Common\CommandAccount.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Common\ForbiddenIP.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Common\Frame_Logging_Strategy.cpp" />
+    <ClCompile Include="Common\LinuxCPU.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Common\MakePacket.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Common\MessageBlockManager.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Common\MyACELoggingStrategy.cpp" />
+    <ClCompile Include="Common\ProfileTime.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Common\ProgramService.cpp" />
+    <ClCompile Include="Common\SendCacheManager.cpp" />
+    <ClCompile Include="Common\SendMessage.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)</XMLDocumentationFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)</XMLDocumentationFileName>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+    </ClCompile>
+    <ClCompile Include="Common\ThreadInfo.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Common\TimerManager.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Common\WindowsCPU.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Common\WindowsProcess.cpp" />
+    <ClCompile Include="Common\XmlOpeation.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Reactor\AceReactorManager.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Reactor\ClientReConnectManager.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Reactor\ConnectAccept.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Reactor\ConnectClient.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Reactor\ConnectHandler.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Reactor\ConsoleAccept.cpp" />
+    <ClCompile Include="Reactor\ConsoleHandler.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Reactor\ControlListen.cpp" />
+    <ClCompile Include="Reactor\ServerManager.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Reactor\WaitQuitSignal.cpp" />
+    <ClCompile Include="TinyXML\tinystr.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="TinyXML\tinyxml.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="TinyXML\tinyxmlerror.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="TinyXML\tinyxmlparser.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Mail\base64.cpp" />
+    <ClCompile Include="Mail\smtp.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Common\ACEMemory.h" />
+    <ClInclude Include="..\Common\ClientCommand.h" />
+    <ClInclude Include="..\Common\ClientMessage.h" />
+    <ClInclude Include="..\Common\ClientUDPMassage.h" />
+    <ClInclude Include="..\Common\CreateInfo.h" />
+    <ClInclude Include="..\Common\define.h" />
+    <ClInclude Include="..\Common\HashTable.h" />
+    <ClInclude Include="..\Common\IBuffPacket.h" />
+    <ClInclude Include="..\Common\ICheckPacket.h" />
+    <ClInclude Include="..\Common\IClientManager.h" />
+    <ClInclude Include="..\Common\IClientParse.h" />
+    <ClInclude Include="..\Common\IConnectManager.h" />
+    <ClInclude Include="..\Common\IControlListen.h" />
+    <ClInclude Include="..\Common\IFrameCommand.h" />
+    <ClInclude Include="..\Common\ILogManager.h" />
+    <ClInclude Include="..\Common\ILogObject.h" />
+    <ClInclude Include="..\Common\IMessage.h" />
+    <ClInclude Include="..\Common\IMessageBlockManager.h" />
+    <ClInclude Include="..\Common\IMessageManager.h" />
+    <ClInclude Include="..\Common\IModuleInfo.h" />
+    <ClInclude Include="..\Common\IModuleMessageManager.h" />
+    <ClInclude Include="..\Common\IObject.h" />
+    <ClInclude Include="..\Common\IPacketManager.h" />
+    <ClInclude Include="..\Common\IPacketParse.h" />
+    <ClInclude Include="..\Common\IpCheck.h" />
+    <ClInclude Include="..\Common\ISendCacheManager.h" />
+    <ClInclude Include="..\Common\IServerManager.h" />
+    <ClInclude Include="..\Common\ITimerManager.h" />
+    <ClInclude Include="..\Common\ITSTimer.h" />
+    <ClInclude Include="..\Common\IUDPConnectManager.h" />
+    <ClInclude Include="..\Common\ObjectArrayList.h" />
+    <ClInclude Include="..\Common\ObjectLru.h" />
+    <ClInclude Include="..\Common\ObjectPoolManager.h" />
+    <ClInclude Include="..\Common\ProfileTime.h" />
+    <ClInclude Include="..\Common\RandomNumber.h" />
+    <ClInclude Include="..\Common\Threading.h" />
+    <ClInclude Include="..\Common\TimerCommon.h" />
+    <ClInclude Include="..\Common\TimerInfo.h" />
+    <ClInclude Include="..\Common\TimerThread.h" />
+    <ClInclude Include="..\Common\TimeWheelLink.h" />
+    <ClInclude Include="..\Common\Time_Value.h" />
+    <ClInclude Include="..\Common\Trace.h" />
+    <ClInclude Include="Common\BaseClientConnectManager.h" />
+    <ClInclude Include="Common\BaseConnectClient.h" />
+    <ClInclude Include="Common\BaseConsoleHandle.h" />
+    <ClInclude Include="Common\BaseHander.h" />
+    <ClInclude Include="Common\BaseServerManager.h" />
+    <ClInclude Include="Common\BaseTask.h" />
+    <ClInclude Include="Common\ServerMessageTask.h" />
+    <ClInclude Include="Common\TcpRedirection.h" />
+    <ClInclude Include="Common\XmlConfig.h" />
+    <ClInclude Include="Console\ConsolePromiss.h" />
+    <ClInclude Include="Console\FrameCommand.h" />
+    <ClInclude Include="Console\MessageDefine.h" />
+    <ClInclude Include="Console\MessageDispose.h" />
+    <ClInclude Include="CppUnit\CppUnitMain.h" />
+    <ClInclude Include="CppUnit\PostServerMessage.h" />
+    <ClInclude Include="CppUnit\PostUdpServerMessage.h" />
+    <ClInclude Include="CppUnit\Uint_AceReactorManager.h" />
+    <ClInclude Include="CppUnit\Uint_ConnectClient.h" />
+    <ClInclude Include="CppUnit\Uint_ConnectHandler.h" />
+    <ClInclude Include="CppUnit\Uint_ConsoleMessage.h" />
+    <ClInclude Include="CppUnit\Uint_ConsolePromissions.h" />
+    <ClInclude Include="CppUnit\Uint_LogManager.h" />
+    <ClInclude Include="CppUnit\Uint_MessageService.h" />
+    <ClInclude Include="CppUnit\Uint_PacketParse.h" />
+    <ClInclude Include="CppUnit\Uint_ServerMessageInfoPool.h" />
+    <ClInclude Include="CppUnit\Uint_ServerMessageManager.h" />
+    <ClInclude Include="CppUnit\Uint_TcpRedirection.h" />
+    <ClInclude Include="CppUnit\Uint_ThreadInfo.h" />
+    <ClInclude Include="CppUnit\Unit_Aes.h" />
+    <ClInclude Include="CppUnit\Unit_AppConfig.h" />
+    <ClInclude Include="CppUnit\Unit_BaseConnectClient.h" />
+    <ClInclude Include="CppUnit\Unit_BaseHandler.h" />
+    <ClInclude Include="CppUnit\Unit_BuffPacket.h" />
+    <ClInclude Include="CppUnit\Unit_CommandAccount.h" />
+    <ClInclude Include="CppUnit\Unit_Common.h" />
+    <ClInclude Include="CppUnit\Unit_ConnectTcp.h" />
+    <ClInclude Include="CppUnit\Unit_ConnectUdp.h" />
+    <ClInclude Include="CppUnit\Unit_ControlListen.h" />
+    <ClInclude Include="CppUnit\Unit_FileLog.h" />
+    <ClInclude Include="CppUnit\Unit_FileTestManager.h" />
+    <ClInclude Include="CppUnit\Unit_ForbiddenIP.h" />
+    <ClInclude Include="CppUnit\Unit_FrameCommand.h" />
+    <ClInclude Include="CppUnit\Unit_IPAccount.h" />
+    <ClInclude Include="CppUnit\Unit_LoadModule.h" />
+    <ClInclude Include="CppUnit\Unit_Logging.h" />
+    <ClInclude Include="CppUnit\Unit_MakePacket.h" />
+    <ClInclude Include="CppUnit\Unit_MessageDefine.h" />
+    <ClInclude Include="CppUnit\Unit_ModuleMessageManager.h" />
+    <ClInclude Include="CppUnit\Unit_ProfileTime.h" />
+    <ClInclude Include="CppUnit\Unit_TimeQueue.h" />
+    <ClInclude Include="CppUnit\Unit_WorkThreadAI.h" />
+    <ClInclude Include="Encrypt\Aes.h" />
+    <ClInclude Include="FileTest\FileTest.h" />
+    <ClInclude Include="FileTest\FileTestManager.h" />
+    <ClInclude Include="Mail\smtps.h" />
+    <ClInclude Include="Message\MessageDyeingManager.h" />
+    <ClInclude Include="PacketParse\PacketConsoleParse.h" />
+    <ClInclude Include="PacketParse\PacketParse.h" />
+    <ClInclude Include="PacketParse\PacketParseBase.h" />
+    <ClInclude Include="PacketParse\PacketParsePool.h" />
+    <ClInclude Include="LogSystem\FileLogger.h" />
+    <ClInclude Include="LogSystem\LogManager.h" />
+    <ClInclude Include="Message\LoadModule.h" />
+    <ClInclude Include="Message\LoadPacketParse.h" />
+    <ClInclude Include="Message\Message.h" />
+    <ClInclude Include="Message\MessageManager.h" />
+    <ClInclude Include="Message\MessageService.h" />
+    <ClInclude Include="Message\ModuleMessageManager.h" />
+    <ClInclude Include="Message\WorkThreadAI.h" />
+    <ClInclude Include="Proactor\AceProactorManager.h" />
+    <ClInclude Include="Proactor\ClientProConnectManager.h" />
+    <ClInclude Include="Proactor\ProAsynchConnect.h" />
+    <ClInclude Include="Proactor\ProConnectAccept.h" />
+    <ClInclude Include="Proactor\ProConnectClient.h" />
+    <ClInclude Include="Proactor\ProConnectHandle.h" />
+    <ClInclude Include="Proactor\ProConsoleAccept.h" />
+    <ClInclude Include="Proactor\ProConsoleHandle.h" />
+    <ClInclude Include="Proactor\ProControlListen.h" />
+    <ClInclude Include="Proactor\ProServerManager.h" />
+    <ClInclude Include="Proactor\ProSigHandle.h" />
+    <ClInclude Include="Console\ConsoleMessage.h" />
+    <ClInclude Include="UDP\ProactorUDPClient.h" />
+    <ClInclude Include="UDP\ProactorUDPHandler.h" />
+    <ClInclude Include="UDP\ProUDPManager.h" />
+    <ClInclude Include="UDP\ReactorUDPClient.h" />
+    <ClInclude Include="UDP\ReactorUDPHander.h" />
+    <ClInclude Include="UDP\ReUDPManager.h" />
+    <ClInclude Include="Common\AppConfig.h" />
+    <ClInclude Include="Common\BuffPacket.h" />
+    <ClInclude Include="Common\BuffPacketManager.h" />
+    <ClInclude Include="Common\CommandAccount.h" />
+    <ClInclude Include="Common\Fast_Asynch_Read_Stream.h" />
+    <ClInclude Include="Common\ForbiddenIP.h" />
+    <ClInclude Include="Common\Frame_Logging_Strategy.h" />
+    <ClInclude Include="Common\IPAccount.h" />
+    <ClInclude Include="Common\LinuxCPU.h" />
+    <ClInclude Include="Common\MakePacket.h" />
+    <ClInclude Include="Common\MessageBlockManager.h" />
+    <ClInclude Include="Common\MyACELoggingStrategy.h" />
+    <ClInclude Include="Common\ProgramService.h" />
+    <ClInclude Include="Common\Ring.h" />
+    <ClInclude Include="Common\SendCacheManager.h" />
+    <ClInclude Include="Common\SendMessage.h" />
+    <ClInclude Include="Common\ThreadInfo.h" />
+    <ClInclude Include="Common\ThreadLock.h" />
+    <ClInclude Include="Common\TimerManager.h" />
+    <ClInclude Include="Common\WindowsCPU.h" />
+    <ClInclude Include="Common\WindowsDump.h" />
+    <ClInclude Include="Common\WindowsProcess.h" />
+    <ClInclude Include="Common\XmlOpeation.h" />
+    <ClInclude Include="Reactor\AceReactorManager.h" />
+    <ClInclude Include="Reactor\ClientReConnectManager.h" />
+    <ClInclude Include="Reactor\ConnectAccept.h" />
+    <ClInclude Include="Reactor\ConnectClient.h" />
+    <ClInclude Include="Reactor\ConnectHandler.h" />
+    <ClInclude Include="Reactor\ConsoleAccept.h" />
+    <ClInclude Include="Reactor\ConsoleHandler.h" />
+    <ClInclude Include="Reactor\ControlListen.h" />
+    <ClInclude Include="Reactor\ServerManager.h" />
+    <ClInclude Include="Reactor\WaitQuitSignal.h" />
+    <ClInclude Include="TinyXML\tinystr.h" />
+    <ClInclude Include="TinyXML\tinyxml.h" />
+    <ClInclude Include="Mail\base64.h" />
+    <ClInclude Include="Mail\smtp.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties ZerocIce_Home="C:\Ice-3.3.1" ZerocIce_HomeExpanded="C:\Ice-3.3.1" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
