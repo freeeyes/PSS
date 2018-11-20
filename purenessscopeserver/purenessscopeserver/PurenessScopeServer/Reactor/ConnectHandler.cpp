@@ -233,7 +233,11 @@ int CConnectHandler::open(void*)
         return -1;
     }
 
-    AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Connection from [%s:%d].",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number());
+    AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Connection from [%s:%d]ConnectID=%d, GetHandlerID=%d.",
+                                        m_addrRemote.get_host_addr(),
+                                        m_addrRemote.get_port_number(),
+                                        GetConnectID(),
+                                        GetHandlerID());
 
     //告诉PacketParse连接应建立
     App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Connect(GetConnectID(), GetClientIPInfo(), GetLocalIPInfo());
@@ -1588,6 +1592,9 @@ bool CConnectManager::Close(uint32 u4ConnectID)
         OUR_DEBUG((LM_INFO, "[CConnectManager::Close]DelConnectTimeWheel error.\n"));
     }
 
+    AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "[CConnectManager::Close]ConnectID=%d.",
+                                        u4ConnectID);
+
     int nPos = m_objHashConnectList.Del_Hash_Data_By_Unit32(u4ConnectID);
 
     if(0 < nPos)
@@ -1603,6 +1610,9 @@ bool CConnectManager::Close(uint32 u4ConnectID)
     }
     else
     {
+        AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "[CConnectManager::Close]ConnectID=%d FAIL.",
+                                            u4ConnectID);
+
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectManager::Close] ConnectID[%d] is not find.", u4ConnectID);
         return true;
     }
