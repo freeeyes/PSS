@@ -1597,25 +1597,22 @@ bool CConnectManager::Close(uint32 u4ConnectID)
 
     int nPos = m_objHashConnectList.Del_Hash_Data_By_Unit32(u4ConnectID);
 
-    if(0 < nPos)
-    {
-        //回收发送缓冲
-        m_SendCacheManager.FreeCacheData(u4ConnectID);
-        m_u4TimeDisConnect++;
-
-        //加入链接统计功能
-        App_ConnectAccount::instance()->AddDisConnect();
-
-        return true;
-    }
-    else
+    if(0 > nPos)
     {
         AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "[CConnectManager::Close]ConnectID=%d FAIL.",
                                             u4ConnectID);
 
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectManager::Close] ConnectID[%d] is not find.", u4ConnectID);
-        return true;
     }
+
+    //回收发送缓冲
+    m_SendCacheManager.FreeCacheData(u4ConnectID);
+    m_u4TimeDisConnect++;
+
+    //加入链接统计功能
+    App_ConnectAccount::instance()->AddDisConnect();
+
+    return true;
 }
 
 bool CConnectManager::CloseUnLock(uint32 u4ConnectID)

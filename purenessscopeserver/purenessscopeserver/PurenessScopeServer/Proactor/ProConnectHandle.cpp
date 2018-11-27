@@ -1490,7 +1490,16 @@ bool CProConnectManager::Close(uint32 u4ConnectID)
         OUR_DEBUG((LM_ERROR, "[CProConnectHandle::Close]DelConnectTimeWheel ConnectID=%d.\n", u4ConnectID));
     }
 
-    m_objHashConnectList.Del_Hash_Data_By_Unit32(u4ConnectID);
+    int32 nPos = m_objHashConnectList.Del_Hash_Data_By_Unit32(u4ConnectID);
+
+    if (0 > nPos)
+    {
+        AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "[CConnectManager::Close]ConnectID=%d FAIL.",
+                                            u4ConnectID);
+
+        sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectManager::Close] ConnectID[%d] is not find.", u4ConnectID);
+    }
+
     m_u4TimeDisConnect++;
 
     //回收发送内存块
