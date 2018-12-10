@@ -34,43 +34,50 @@ int ts_timer::ITimerInfo::Get_Timer_Frequency()
     return m_nFrequency;
 }
 
-int ts_timer::ITimerInfo::Get_Next_Timer(CTime_Value ttNow)
+int ts_timer::ITimerInfo::Get_Next_Timer(CTime_Value ttNow, bool blState)
 {
     CTime_Value ttInterval;
 
+    int nSeconds = m_nFrequency / 1000;
+    int nUseconds = (m_nFrequency % 1000) * 1000;
+
     if (m_ttLastRunTime.IsZero() == true && m_ttNextTime.IsZero() == true)
     {
-        int nSeconds = m_nFrequency / 1000;
-        int nUseconds = (m_nFrequency % 1000) * 1000;
         //如果是第一次计算,看看有没有初始化时间参数
         m_ttNextTime = m_ttBeginTime + CTime_Value(nSeconds, nUseconds);
     }
 
-    //如果下一次运行时间小于当前时间
-    if (m_ttNextTime.Get_milliseconds() > ttNow.Get_milliseconds())
+    if (false == blState)
     {
-        ttInterval = m_ttNextTime - ttNow;
-        int nIntervalFrquency = ttInterval.Get_milliseconds();
-        return nIntervalFrquency;
+        //如果下一次运行时间小于当前时间
+        if (m_ttNextTime.Get_milliseconds() > ttNow.Get_milliseconds())
+        {
+            ttInterval = m_ttNextTime - ttNow;
+            int nIntervalFrquency = ttInterval.Get_milliseconds();
+            return nIntervalFrquency;
+        }
+        else
+        {
+            return -1;
+        }
     }
     else
     {
-        return -1;
+        //计算当前下个要指定的时间
+        while (true)
+        {
+            if (m_ttNextTime.Get_milliseconds() < ttNow.Get_milliseconds())
+            {
+                m_ttNextTime = m_ttNextTime + CTime_Value(nSeconds, nUseconds);
+            }
+            else
+            {
+                ttInterval = m_ttNextTime - ttNow;
+                int nIntervalFrquency = ttInterval.Get_milliseconds();
+                return nIntervalFrquency;
+            }
+        }
     }
-}
-
-void ts_timer::ITimerInfo::Set_Next_Timer()
-{
-    int nSeconds = m_nFrequency / 1000;
-    int nUseconds = (m_nFrequency % 1000) * 1000;
-
-    //如有上一次运行时间
-    m_ttNextTime = m_ttNextTime + CTime_Value(nSeconds, nUseconds);
-}
-
-void ts_timer::ITimerInfo::Set_Next_Time(CTime_Value ttNextTime)
-{
-    m_ttNextTime = ttNextTime;
 }
 
 ts_timer::CTime_Value ts_timer::ITimerInfo::Get_Next_Time()
@@ -89,20 +96,20 @@ ts_timer::EM_Timer_State ts_timer::ITimerInfo::Do_Timer_Event(ts_timer::CTime_Va
 
 
     //设置下次运行时间
-    Set_Next_Timer();
+    int nSeconds = m_nFrequency / 1000;
+    int nUseconds = (m_nFrequency % 1000) * 1000;
+
+    m_ttNextTime = m_ttNextTime + CTime_Value(nSeconds, nUseconds);
 
     return emState;
 }
 
-void ts_timer::ITimerInfo::Do_Error_Events(int nLastRunTimerID, int nTimeoutTime, CTime_Value& obj_Next, std::vector<CTime_Value>& vecTimoutList)
+void ts_timer::ITimerInfo::Do_Error_Events(int nLastRunTimerID, int nTimeoutTime, std::vector<CTime_Value>& vecTimoutList)
 {
     if (NULL != m_fn_Timeout_Error)
     {
         m_fn_Timeout_Error(nLastRunTimerID, nTimeoutTime, Get_Timer_ID(), vecTimoutList, m_pArgContext);
     }
-
-    //设置下一次执行时间
-    Set_Next_Time(obj_Next);
 }
 
 //定时器列表类
@@ -116,9 +123,8 @@ pthread_mutex_t* ts_timer::CTimerInfoList::Get_mutex()
 }
 
 
-ts_timer::CTimerInfoList::CTimerInfoList() : m_nMaxCount(0), m_NextRunTimer(NULL), m_blRun(false), m_emEventType(TIMER_DO_EVENT), m_nThreadID(0), m_pCond(NULL), m_pMutex(NULL)
+ts_timer::CTimerInfoList::CTimerInfoList() : m_nCurrTimerIndex(0), m_nMaxCount(0), m_NextRunTimer(NULL), m_blRun(false), m_emEventType(TIMER_DO_EVENT), m_pCond(NULL), m_pMutex(NULL)
 {
-
 }
 
 ts_timer::CTimerInfoList::~CTimerInfoList()
@@ -246,11 +252,11 @@ bool ts_timer::CTimerInfoList::Add_Timer(ITimerInfo* pTimerInfo)
     {
         if ((*it)->Get_Timer_ID() == pTimerInfo->Get_Timer_ID())
         {
-            return true;
+            return false;
         }
     }
 
-    if ((int)m_TimerList.size() >= m_nMaxCount)
+    if (m_TimerList.size() >= m_nMaxCount)
     {
         return false;
     }
@@ -276,47 +282,114 @@ bool ts_timer::CTimerInfoList::Del_Timer(int nTimerID)
     return false;
 }
 
-int ts_timer::CTimerInfoList::Get_Next_Timer(CTime_Value& tvNow)
+
+std::vector<_Lcm_Info>* ts_timer::CTimerInfoList::Get_Curr_Timer()
 {
-    //计算出下一个需要运行的定时器最短到期时间
-    int nInterval = 0;
-    int nCurrCount = (int)m_TimerList.size();
-    m_emEventType = TIMER_DO_EVENT;
-
-    //这里要记录一下绝对时间
-    for (int i = 0; i < nCurrCount; i++)
+    if (m_TimerAssemble.size() == 0)
     {
-        if (i == 0)
-        {
-            nInterval = m_TimerList[i]->Get_Next_Timer(tvNow);
-            m_NextRunTimer = m_TimerList[i];
-        }
-        else
-        {
-            int nCurrInterval = m_TimerList[i]->Get_Next_Timer(tvNow);
-
-            if (nCurrInterval < nInterval)
-            {
-                nInterval = nCurrInterval;
-                m_NextRunTimer = m_TimerList[i];
-            }
-        }
-
-        if (nInterval <= 0)
-        {
-            return nInterval;
-        }
+        return NULL;
     }
 
-    return nInterval;
+    int nCurrTimerIndex = m_nCurrTimerIndex;
+
+    if (m_nCurrTimerIndex >= m_TimerAssemble.size() - 1)
+    {
+        m_nCurrTimerIndex = 0;
+    }
+
+    return (std::vector<_Lcm_Info>*)&m_TimerAssemble[m_nCurrTimerIndex];
 }
 
-ts_timer::ITimerInfo* ts_timer::CTimerInfoList::Get_Curr_Timer()
+void ts_timer::CTimerInfoList::Calculation_Run_Assemble(CTime_Value obj_Now)
 {
-    return m_NextRunTimer;
+    std::vector<_Lcm_Info> vec_Lcm_Info;
+    int nMinInterval = -1;
+    int nIndex       = 0;
+
+    for (int i = 0; i < (int)m_TimerList.size(); i++)
+    {
+        _Lcm_Info obj_Lcm_Info;
+        obj_Lcm_Info.m_nID      = m_TimerList[i]->Get_Timer_ID();
+        obj_Lcm_Info.m_nTimeout = m_TimerList[i]->Get_Timer_Frequency();
+        vec_Lcm_Info.push_back(obj_Lcm_Info);
+
+        m_TimerList[i]->Get_Next_Timer(obj_Now, true);
+    }
+
+    //得到最小公倍数
+    int nData = Get_LeastCommonMultiple(vec_Lcm_Info);
+
+    //得到定时器的最小运行时
+    m_TimerAssemble.clear();
+    Get_Minimum_Set(vec_Lcm_Info, nData, m_TimerAssemble);
+
+    //计算出应该从哪个ID开始
+    int milliseconds = 0;
+
+    if (0 == m_TimerAssemble.size())
+    {
+        return;
+    }
+
+    CTime_Value ttBeginTime = GetTimerInfo(m_TimerAssemble[0][0].m_nIndex)->Get_Next_Time();
+
+    for (int i = 0; i < m_TimerAssemble.size(); i++)
+    {
+        CTime_Value ttInterval = ttBeginTime - obj_Now;
+
+        if (ttInterval.Get_milliseconds() > 0)
+        {
+            nIndex = i;
+        }
+
+        int nSeconds = m_TimerAssemble[i][0].m_nTimeout / 1000;
+        int nUseconds = (m_TimerAssemble[i][0].m_nTimeout % 1000) * 1000;
+
+        ttBeginTime = ttBeginTime + CTime_Value(nSeconds, nUseconds);
+    }
+
+    //计算起始位置
+    m_nCurrTimerIndex = nIndex;
+
+}
+
+std::vector<_Lcm_Info>* ts_timer::CTimerInfoList::Get_Curr_Assemble()
+{
+    return &m_TimerAssemble[m_nCurrTimerIndex];
+}
+
+std::vector<_Lcm_Info>* ts_timer::CTimerInfoList::Get_Next_Assemble()
+{
+    if (GetCurrTimerCount() == 0)
+    {
+        return NULL;
+    }
+
+    if (m_nCurrTimerIndex == GetCurrTimerCount() - 1)
+    {
+        m_nCurrTimerIndex = 0;
+    }
+    else
+    {
+        m_nCurrTimerIndex++;
+    }
+
+    return &m_TimerAssemble[m_nCurrTimerIndex];
 }
 
 int ts_timer::CTimerInfoList::GetCurrTimerCount()
 {
     return (int)m_TimerList.size();
+}
+
+ts_timer::ITimerInfo* ts_timer::CTimerInfoList::GetTimerInfo(int nIndex)
+{
+    if (nIndex < GetCurrTimerCount() && nIndex >= 0)
+    {
+        return m_TimerList[nIndex];
+    }
+    else
+    {
+        return NULL;
+    }
 }

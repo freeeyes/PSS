@@ -80,13 +80,13 @@ std::string ts_timer::CTime_Value::Get_string()
 #else
         localtime_r(&m_tv_sec, &tmDate);
 
-        sprintf(szData, "%04d-%02d-%02d %02d:%02d:%02d %03d", tmDate.tm_year + 1900,
-                tmDate.tm_mon + 1,
-                tmDate.tm_mday,
-                tmDate.tm_hour,
-                tmDate.tm_min,
-                tmDate.tm_sec,
-                (int)(m_tv_usec / 1000));
+        snprintf(szData, 100, "%04d-%02d-%02d %02d:%02d:%02d %03d", tmDate.tm_year + 1900,
+                 tmDate.tm_mon + 1,
+                 tmDate.tm_mday,
+                 tmDate.tm_hour,
+                 tmDate.tm_min,
+                 tmDate.tm_sec,
+                 (int)(m_tv_usec / 1000));
 
 #endif
     }

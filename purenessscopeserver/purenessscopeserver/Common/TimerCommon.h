@@ -1,6 +1,7 @@
-ï»¿#ifndef _TIMER_COMMON_H
+#ifndef _TIMER_COMMON_H
 #define _TIMER_COMMON_H
 
+#include <vector>
 #include "Time_Value.h"
 #ifdef WIN32
 #include "windows.h"
@@ -8,7 +9,7 @@
 #include<sys/time.h>
 #endif
 
-//timerçš„ä¸€äº›å…¬ç”¨APIå‡½æ•°
+//timerµÄÒ»Ð©¹«ÓÃAPIº¯Êý
 //add by freeyes
 
 namespace ts_timer
@@ -58,20 +59,20 @@ namespace ts_timer
         return obj_Time_Value;
     }
 
-    //èŽ·å¾—è¶…æ—¶æ—¶é—´åˆ—è¡¨
+    //»ñµÃ³¬Ê±Ê±¼äÁÐ±í
     inline void Get_Timout_TimeInfo(CTime_Value& ttBegin, int nFrequency, CTime_Value& ttNow, std::vector<CTime_Value>& vecTimoutList)
     {
         int nSeconds  = nFrequency / 1000;
         int nUseconds = (nFrequency % 1000) * 1000;
 
-        //è¶…è¿‡æœ€å¤§æ¬¡æ•°å°±é€€å‡ºå¾ªçŽ¯ï¼Œä¿æŒæ•ˆçŽ‡ã€‚
+        //³¬¹ý×î´ó´ÎÊý¾ÍÍË³öÑ­»·£¬±£³ÖÐ§ÂÊ¡£
         int nCurrCount = 0;
 
         while (true)
         {
             if (nCurrCount >= MAX_TIMOUTLIST_COUNT)
             {
-                //å¦‚æžœè¶…è¿‡æœ€å¤§å¾ªçŽ¯æ¬¡æ•°ï¼Œé€€å‡º
+                //Èç¹û³¬¹ý×î´óÑ­»·´ÎÊý£¬ÍË³ö
                 return;
             }
 
@@ -81,7 +82,7 @@ namespace ts_timer
             }
             else
             {
-                //è®¡ç®—ä¸‹æ¬¡åˆ°è¾¾æ—¶é—´
+                //¼ÆËãÏÂ´Îµ½´ïÊ±¼ä
                 vecTimoutList.push_back(ttBegin);
                 ttBegin = ttBegin + CTime_Value(nSeconds, nUseconds);
             }
@@ -90,7 +91,7 @@ namespace ts_timer
         }
     }
 
-    //èŽ·å¾—sleepæ—¶é—´æ•°
+    //»ñµÃsleepÊ±¼äÊý
     inline void Get_Sleep(int nTime)
     {
 #ifdef WIN32
@@ -98,7 +99,7 @@ namespace ts_timer
 #else
         struct timespec rqt;
         rqt.tv_sec = 0;
-        rqt.tv_nsec = (long)nTime*1000*1000; //çº³ç§’
+        rqt.tv_nsec = (long)nTime * 1000 * 1000; //ÄÉÃë
 
         nanosleep(&rqt, NULL);
 #endif

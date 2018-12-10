@@ -1,8 +1,8 @@
 #ifndef _TIMER_THREAD_H
 #define _TIMER_THREAD_H
 
-#include "ITSTimer.h"
 #include "TimerInfo.h"
+#include "ITSTimer.h"
 
 namespace ts_timer
 {
@@ -10,7 +10,7 @@ namespace ts_timer
     {
     public:
         CTimerThread();
-        virtual ~CTimerThread();
+        ~CTimerThread();
 
         void Init(int nMaxCount = MAX_TIMER_LIST_COUNT);
 
@@ -19,7 +19,12 @@ namespace ts_timer
         void Run();
 
         //添加定时器
-        bool Add_Timer(int nTimerID, int nFrequency, CTime_Value* pttBegin, Timeout_Callback fn_Timeout_Callback, void* pArgContext, Timeout_Error_Callback fn_Timeout_Error_Callback);
+        bool Add_Timer(int nTimerID,
+                       int nFrequency,
+                       CTime_Value* pttBegin,
+                       Timeout_Callback fn_Timeout_Callback,
+                       void* pArgContext,
+                       Timeout_Error_Callback fn_Timeout_Error_Callback);
 
         //删除定时器
         bool Del_Timer(int nTimerID);

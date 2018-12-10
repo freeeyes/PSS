@@ -16,30 +16,55 @@ void* thr_fn(void* arg)
     int nTimeCost       = 0;
     int nInterval       = 0;
 
-    ts_timer::CTime_Value obj_Now = ts_timer::GetTimeofDay();
+    ts_timer::CTime_Value obj_Now;
 
     while (pTimerInfoList->Get_Run())
     {
         if (pTimerInfoList->Get_Event_Type() != ts_timer::TIMER_PAUSE)
         {
-            //得到定时器下一个执行对象的差距时间
-            nInterval = pTimerInfoList->Get_Next_Timer(obj_Now);
+            bool blExpire = true;
 
-            if (nInterval < 0)
+            while (blExpire)
             {
-                //计算错误周期
-                std::vector<ts_timer::CTime_Value> vecTimoutList;
-                ts_timer::CTime_Value obj_Time_Begin = pTimerInfoList->Get_Curr_Timer()->Get_Next_Time();
-                Get_Timout_TimeInfo(obj_Time_Begin,
-                                    pTimerInfoList->Get_Curr_Timer()->Get_Timer_Frequency(),
-                                    obj_Now,
-                                    vecTimoutList);
+                //得到定时器下一个执行对象列表
+                obj_Now = ts_timer::GetTimeofDay();
+                std::vector<_Lcm_Info>* pList = pTimerInfoList->Get_Next_Assemble();
 
-                pTimerInfoList->Get_Curr_Timer()->Do_Error_Events(nLastRunTimerID, nTimeCost, obj_Time_Begin, vecTimoutList);
+                if (NULL == pList)
+                {
+                    break;
+                }
 
-                //重新计算下一次到期时间
-                nInterval = pTimerInfoList->Get_Next_Timer(obj_Now);
+                for (int i = 0; i < pList->size(); i++)
+                {
+                    ts_timer::ITimerInfo* pTimerInfo = pTimerInfoList->GetTimerInfo((*pList)[i].m_nIndex);
+
+                    //得到定时器下一个执行对象的差距时间
+                    ts_timer::CTime_Value tvInterval = pTimerInfo->Get_Next_Time() - obj_Now;
+                    nInterval = (int)tvInterval.Get_milliseconds();
+
+                    if (nInterval < 0)
+                    {
+                        //计算错误周期
+                        std::vector<ts_timer::CTime_Value> vecTimoutList;
+                        ts_timer::CTime_Value obj_Time_Begin = pTimerInfo->Get_Next_Time();
+                        Get_Timout_TimeInfo(obj_Time_Begin,
+                                            pTimerInfo->Get_Timer_Frequency(),
+                                            obj_Now,
+                                            vecTimoutList);
+
+                        pTimerInfo->Do_Error_Events(nLastRunTimerID, nTimeCost, vecTimoutList);
+
+                        //重新计算下一次到期时间
+                        pTimerInfo->Get_Next_Timer(obj_Now, true);
+                    }
+                    else
+                    {
+                        blExpire = false;
+                    }
+                }
             }
+
         }
 
         pTimerInfoList->Lock();
@@ -88,6 +113,9 @@ void* thr_fn(void* arg)
 
         }
 
+        //得到当前时间
+        ts_timer::CTime_Value obj_Now = ts_timer::GetTimeofDay();
+
         if (pTimerInfoList->Get_Event_Type() == ts_timer::TIMER_STOP)
         {
             //关闭当前线程
@@ -95,31 +123,38 @@ void* thr_fn(void* arg)
             pTimerInfoList->Set_Run(false);
         }
         else if (pTimerInfoList->Get_Event_Type() == ts_timer::TIMER_MODIFY
-                 || pTimerInfoList->Get_Event_Type() == ts_timer::TIMER_PAUSE
                  || pTimerInfoList->Get_Event_Type() == ts_timer::TIMER_RESTORE)
         {
-            //重新计算下一次唤醒时间
-            obj_Now = ts_timer::GetTimeofDay();
+            //重新计算下循环列表
+            pTimerInfoList->Calculation_Run_Assemble(obj_Now);
+            pTimerInfoList->Set_Event_Type(ts_timer::TIMER_DO_EVENT);
+            pTimerInfoList->UnLock();
+            continue;
+        }
+        else if (pTimerInfoList->Get_Event_Type() == ts_timer::TIMER_PAUSE)
+        {
+            //暂停
             pTimerInfoList->UnLock();
             continue;
         }
         else
         {
-            pTimerInfoList->Get_Event_Type();
+            std::vector<_Lcm_Info>* pList = pTimerInfoList->Get_Curr_Assemble();
 
-            //执行定时器
-            ts_timer::CTime_Value obj_Begin = ts_timer::GetTimeofDay();
-
-            nLastRunTimerID = pTimerInfoList->Get_Curr_Timer()->Get_Timer_ID();
-
-            if (NULL != pTimerInfoList->Get_Curr_Timer() && ts_timer::TIMER_STATE_DEL == pTimerInfoList->Get_Curr_Timer()->Do_Timer_Event(obj_Begin))
+            for (int i = 0; i < pList->size(); i++)
             {
-                //如果执行完需要清除定时器，在这里回收定时器
-                pTimerInfoList->Del_Timer(pTimerInfoList->Get_Curr_Timer()->Get_Timer_ID());
+                ts_timer::ITimerInfo* pTimerInfo = pTimerInfoList->GetTimerInfo((*pList)[i].m_nIndex);
+
+                if (ts_timer::TIMER_STATE_DEL == pTimerInfo->Do_Timer_Event(obj_Now))
+                {
+                    pTimerInfoList->Del_Timer(pTimerInfoList->GetTimerInfo((*pList)[i].m_nIndex)->Get_Timer_ID());
+                    //重新计算列表
+                    pTimerInfoList->Calculation_Run_Assemble(obj_Now);
+                }
             }
 
-            obj_Now = ts_timer::GetTimeofDay();
-            ts_timer::CTime_Value obj_Interval = obj_Now - obj_Begin;
+            ts_timer::CTime_Value obj_End = ts_timer::GetTimeofDay();
+            ts_timer::CTime_Value obj_Interval = obj_End - obj_Now;
 
             //计算定时任务执行时间
             nTimeCost = obj_Interval.Get_milliseconds();
@@ -254,9 +289,11 @@ bool ts_timer::CTimerThread::Restore()
 
 void ts_timer::CTimerThread::Modify(EM_Event_Type emType)
 {
+    m_TimerInfoList.Lock();
+
     m_TimerInfoList.Set_Event_Type(emType);
 
-    m_TimerInfoList.Lock();
+    m_TimerInfoList.UnLock();
 
     if (NULL != m_TimerInfoList.Get_cond())
     {
@@ -266,6 +303,4 @@ void ts_timer::CTimerThread::Modify(EM_Event_Type emType)
         pthread_cond_signal(m_TimerInfoList.Get_cond());
 #endif
     }
-
-    m_TimerInfoList.UnLock();
 }
