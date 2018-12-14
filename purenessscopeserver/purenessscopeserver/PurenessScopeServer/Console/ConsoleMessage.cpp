@@ -137,8 +137,7 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
         return false;
     }
 
-    memcpy_safe((char*)pCommand, (int)(pKeyBegin - pCommand), szOutputType, (int)(pKeyBegin - pCommand));
-    szOutputType[(int)(pKeyBegin - pCommand)] = '\0';
+    memcpy_safe((char*)pCommand, (int)(pKeyBegin - pCommand), szOutputType, (int)(pKeyBegin - pCommand), true);
 
     if (ACE_OS::strcmp(szOutputType, "b") == 0)
     {
@@ -161,7 +160,7 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
     memcpy_safe((char* )pKeyBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING),
                 (int)(pCommandBegin - pKeyBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING)),
                 szKey,
-                (int)(pCommandBegin - pKeyBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING)),
+                MAX_BUFF_100,
                 true);
 
     memcpy_safe(szKey, (uint32)ACE_OS::strlen(szKey), CommandInfo.m_szUser, MAX_BUFF_50, true);

@@ -480,7 +480,7 @@ inline bool memcpy_safe(char* pSrc, uint32 u4SrcLen, char* pDes, uint32 u4DesLen
         if (u4DesLen > u4SrcLen && true == blIsString)
         {
             //如果是文本，拷贝后末尾补\0结尾
-            pDes[u4SrcLen + 1] = '\0';
+            pDes[u4SrcLen] = '\0';
         }
 
         return true;
