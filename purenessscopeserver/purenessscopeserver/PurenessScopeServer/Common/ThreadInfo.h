@@ -44,14 +44,18 @@ public:
 
     _ThreadInfo& operator = (const _ThreadInfo& ar)
     {
-        this->m_u4ThreadIndex        = ar.m_u4ThreadIndex;
-        this->m_tvUpdateTime         = ar.m_tvUpdateTime;
-        this->m_tvCreateTime         = ar.m_tvCreateTime;
-        this->m_u4State              = ar.m_u4State;
-        this->m_u4RecvPacketCount    = ar.m_u4RecvPacketCount;
-        this->m_u2CommandID          = ar.m_u2CommandID;
-        this->m_u2PacketTime         = ar.m_u2PacketTime;
-        this->m_u4CurrPacketCount    = ar.m_u4CurrPacketCount;
+        if (this != &ar)
+        {
+            this->m_u4ThreadIndex = ar.m_u4ThreadIndex;
+            this->m_tvUpdateTime = ar.m_tvUpdateTime;
+            this->m_tvCreateTime = ar.m_tvCreateTime;
+            this->m_u4State = ar.m_u4State;
+            this->m_u4RecvPacketCount = ar.m_u4RecvPacketCount;
+            this->m_u2CommandID = ar.m_u2CommandID;
+            this->m_u2PacketTime = ar.m_u2PacketTime;
+            this->m_u4CurrPacketCount = ar.m_u4CurrPacketCount;
+        }
+
         return *this;
     }
 };

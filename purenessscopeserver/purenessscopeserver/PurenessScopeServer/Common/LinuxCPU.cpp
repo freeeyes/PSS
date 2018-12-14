@@ -53,8 +53,7 @@ int32 GetProcessCPU_Idel_Linux()
 
     if(blFlag == true)
     {
-        memcpy_safe(&szbuffer[i], (uint32)nLen - i, szTmp, (uint32)50);
-        szTmp[nLen - i] = '\0';
+        memcpy_safe(&szbuffer[i], (uint32)nLen - i, szTmp, (uint32)50, true);
     }
 
     float fcpu;

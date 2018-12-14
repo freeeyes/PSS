@@ -389,8 +389,6 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
             m_atvOutput      = ACE_OS::gettimeofday();
         }
     }
-
-    return true;
 }
 
 void CConsoleHandler::Clear_PacketParse()

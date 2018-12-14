@@ -944,8 +944,6 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
             m_atvOutput      = ACE_OS::gettimeofday();
         }
     }
-
-    return true;
 }
 
 void CConnectHandler::Get_Recv_length(int& nCurrCount)
@@ -1776,8 +1774,6 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
 
         return true;
     }
-
-    return true;
 }
 
 bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)

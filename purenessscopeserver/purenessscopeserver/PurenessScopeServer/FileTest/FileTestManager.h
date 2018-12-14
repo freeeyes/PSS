@@ -82,8 +82,12 @@ private:
 
         ResponseRecordSt& operator= (const ResponseRecordSt& ar)
         {
-            this->m_u8StartTime     = ar.m_u8StartTime;
-            this->m_u1ResponseCount = ar.m_u1ResponseCount;
+            if (this != &ar)
+            {
+                this->m_u8StartTime = ar.m_u8StartTime;
+                this->m_u1ResponseCount = ar.m_u1ResponseCount;
+            }
+
             return *this;
         }
     } ;

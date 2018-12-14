@@ -193,8 +193,6 @@ int Chlid_Run()
     if (0 != Load_PacketParse_Module())
     {
         pthread_exit(NULL);
-
-        return 0;
     }
 
     //判断当前Core文件尺寸是否需要调整
@@ -242,8 +240,6 @@ int Chlid_Run()
     App_PacketParseLoader::instance()->Close();
 
     pthread_exit(NULL);
-
-    return 0;
 }
 
 int ACE_TMAIN(int argc, ACE_TCHAR* argv[])

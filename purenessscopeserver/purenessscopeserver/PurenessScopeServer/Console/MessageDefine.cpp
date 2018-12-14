@@ -53,8 +53,7 @@ bool GetFileInfo(const char* pFile, _FileInfo& FileInfo)
             {
                 //模块路径
                 nEnd = i;
-                memcpy_safe((char*)&pFile[nBegin], nEnd - nBegin, FileInfo.m_szFilePath, MAX_BUFF_100);
-                FileInfo.m_szFilePath[nEnd - nBegin] = '\0';
+                memcpy_safe((char*)&pFile[nBegin], nEnd - nBegin, FileInfo.m_szFilePath, MAX_BUFF_100, true);
                 nBegin = i + 1;
                 nPosIndex++;
             }
@@ -62,13 +61,11 @@ bool GetFileInfo(const char* pFile, _FileInfo& FileInfo)
             {
                 //模块文件名
                 nEnd = i;
-                memcpy_safe((char*)&pFile[nBegin], nEnd - nBegin, FileInfo.m_szFileName, MAX_BUFF_100);
-                FileInfo.m_szFileName[nEnd - nBegin] = '\0';
+                memcpy_safe((char*)&pFile[nBegin], nEnd - nBegin, FileInfo.m_szFileName, MAX_BUFF_100, true);
                 nBegin = i + 1;
                 //模块参数
                 nEnd = nLen;
-                memcpy_safe((char*)&pFile[nBegin], nEnd - nBegin, FileInfo.m_szFileParam, MAX_BUFF_200);
-                FileInfo.m_szFileParam[nEnd - nBegin] = '\0';
+                memcpy_safe((char*)&pFile[nBegin], nEnd - nBegin, FileInfo.m_szFileParam, MAX_BUFF_200, true);
                 break;
             }
         }
@@ -291,8 +288,7 @@ bool GetPoolSet(const char* pCommand, _PoolName& objPoolName)
     //获得内存池创建设置
     GetCommandParam(pCommand, "-n ", szTempData, MAX_BUFF_100);
     uint32 u4SrcSize = (uint32)ACE_OS::strlen(szTempData);
-    memcpy_safe(szTempData, u4SrcSize, objPoolName.m_szPoolName, (uint32)MAX_BUFF_50);
-    objPoolName.m_szPoolName[u4SrcSize] = '\0';
+    memcpy_safe(szTempData, u4SrcSize, objPoolName.m_szPoolName, (uint32)MAX_BUFF_50, true);
 
     //获得当前个数
     GetCommandParam(pCommand, "-b ", szTempData, MAX_BUFF_100);

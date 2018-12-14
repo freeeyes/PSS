@@ -73,21 +73,25 @@ public:
 
     CLogFile& operator = (CLogFile& ar)
     {
-        this->SetLoggerID(ar.GetLoggerID());
-        this->SetLevel(ar.GetLevel());
-        this->SetLoggerName(ar.GetLoggerName().c_str());
-        this->SetServerName(ar.GetServerName().c_str());
-        this->SetLoggerClass(ar.GetLoggerClass());
-        this->SetBufferSize(ar.GetBufferSize());
-        this->SetLogTime(ar.GetLogTime());
-        this->SetDisplay(ar.GetDisPlay());
-        this->SetFileRoot(ar.GetFileRoot());
-        this->SetFileAddr(ar.GetFileAddr());
-        this->SetConnector(ar.GetConnector());
-        this->SetFileIO(ar.GetFileIO());
-        this->SetCurrFileIndex(ar.GetCurrFileIndex());
-        this->SetFileMaxSize(ar.GetFileMaxSize());
-        this->SetCurrFileSize(ar.GetCurrFileSize());
+        if (this != &ar)
+        {
+            this->SetLoggerID(ar.GetLoggerID());
+            this->SetLevel(ar.GetLevel());
+            this->SetLoggerName(ar.GetLoggerName().c_str());
+            this->SetServerName(ar.GetServerName().c_str());
+            this->SetLoggerClass(ar.GetLoggerClass());
+            this->SetBufferSize(ar.GetBufferSize());
+            this->SetLogTime(ar.GetLogTime());
+            this->SetDisplay(ar.GetDisPlay());
+            this->SetFileRoot(ar.GetFileRoot());
+            this->SetFileAddr(ar.GetFileAddr());
+            this->SetConnector(ar.GetConnector());
+            this->SetFileIO(ar.GetFileIO());
+            this->SetCurrFileIndex(ar.GetCurrFileIndex());
+            this->SetFileMaxSize(ar.GetFileMaxSize());
+            this->SetCurrFileSize(ar.GetCurrFileSize());
+        }
+
         return *this;
     }
 

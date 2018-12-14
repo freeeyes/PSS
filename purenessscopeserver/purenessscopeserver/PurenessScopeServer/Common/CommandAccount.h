@@ -47,13 +47,17 @@ public:
 
     _CommandData& operator = (const _CommandData& ar)
     {
-        this->m_u2CommandID    = ar.m_u2CommandID;
-        this->m_u4CommandCount = ar.m_u4CommandCount;
-        this->m_u8CommandCost  = ar.m_u8CommandCost;
-        this->m_u1CommandType  = ar.m_u1CommandType;
-        this->m_u4PacketSize   = ar.m_u4PacketSize;
-        this->m_u1PacketType   = ar.m_u1PacketType;
-        this->m_tvCommandTime  = ar.m_tvCommandTime;
+        if (this != &ar)
+        {
+            this->m_u2CommandID = ar.m_u2CommandID;
+            this->m_u4CommandCount = ar.m_u4CommandCount;
+            this->m_u8CommandCost = ar.m_u8CommandCost;
+            this->m_u1CommandType = ar.m_u1CommandType;
+            this->m_u4PacketSize = ar.m_u4PacketSize;
+            this->m_u1PacketType = ar.m_u1PacketType;
+            this->m_tvCommandTime = ar.m_tvCommandTime;
+        }
+
         return *this;
     }
 
@@ -115,11 +119,15 @@ public:
 
     _Port_Data_Account& operator = (const _Port_Data_Account& ar)
     {
-        this->m_u1Type    = ar.m_u1Type;
-        this->m_u4Port    = ar.m_u4Port;
-        this->m_u4FlowIn  = ar.m_u4FlowIn;
-        this->m_u4FlowOut = ar.m_u4FlowOut;
-        this->m_u1Minute  = ar.m_u1Minute;
+        if (this != &ar)
+        {
+            this->m_u1Type = ar.m_u1Type;
+            this->m_u4Port = ar.m_u4Port;
+            this->m_u4FlowIn = ar.m_u4FlowIn;
+            this->m_u4FlowOut = ar.m_u4FlowOut;
+            this->m_u1Minute = ar.m_u1Minute;
+        }
+
         return *this;
     }
 

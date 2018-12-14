@@ -133,7 +133,7 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
     //添加到HashPool里面
     char szPacketID[10] = { '\0' };
     sprintf_safe(szPacketID, 10, "%d", pPacketParseInfo->m_u4PacketParseID);
-    int nHashPos = m_objPacketParseList.Add_Hash_Data(szPacketID, pPacketParseInfo);
+    int32 nHashPos = m_objPacketParseList.Add_Hash_Data(szPacketID, pPacketParseInfo);
 
     if (nHashPos < 0)
     {

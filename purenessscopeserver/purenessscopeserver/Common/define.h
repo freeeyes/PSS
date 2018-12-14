@@ -467,7 +467,7 @@ inline void sprintf_safe(char* szText, int nLen, const char* fmt ...)
 };
 
 //支持memcpy的边界检查
-inline bool memcpy_safe(char* pSrc, uint32 u4SrcLen, char* pDes, uint32 u4DesLen)
+inline bool memcpy_safe(char* pSrc, uint32 u4SrcLen, char* pDes, uint32 u4DesLen, bool blIsString = false)
 {
     if(u4SrcLen > u4DesLen)
     {
@@ -476,6 +476,13 @@ inline bool memcpy_safe(char* pSrc, uint32 u4SrcLen, char* pDes, uint32 u4DesLen
     else
     {
         ACE_OS::memcpy((void* )pDes, (void* )pSrc, (size_t)u4SrcLen);
+
+        if (u4DesLen > u4SrcLen && true == blIsString)
+        {
+            //如果是文本，拷贝后末尾补\0结尾
+            pDes[u4SrcLen + 1] = '\0';
+        }
+
         return true;
     }
 }

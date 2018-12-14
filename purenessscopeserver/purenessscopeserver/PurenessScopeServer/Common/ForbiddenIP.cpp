@@ -217,10 +217,9 @@ bool CForbiddenIP::CompareIP(char* pTargetIP, char* pClientIP)
     char szTarget[5];
     char szClient[5];
 
-    memcpy_safe(pTargetIP, (uint32)ACE_OS::strlen(pTargetIP), szTargetIP, (uint32)MAX_IP_SIZE);
-    szTargetIP[ACE_OS::strlen(pTargetIP)] = '\0';
-    memcpy_safe(pClientIP, (uint32)ACE_OS::strlen(pClientIP), szClientIP, (uint32)MAX_IP_SIZE);
-    szClientIP[ACE_OS::strlen(pTargetIP)] = '\0';
+    memcpy_safe(pTargetIP, (uint32)ACE_OS::strlen(pTargetIP), szTargetIP, (uint32)MAX_IP_SIZE, true);
+
+    memcpy_safe(pClientIP, (uint32)ACE_OS::strlen(pClientIP), szClientIP, (uint32)MAX_IP_SIZE, true);
 
     char* pTargetPos = (char* )szTargetIP;
     char* pClientPos = (char* )szClientIP;
