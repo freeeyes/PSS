@@ -71,7 +71,7 @@ int32 GetProcessMemorySize_Linux()
     char file_name[64] = { 0 };
     FILE* fd;
     char line_buff[512] = { 0 };
-    sprintf(file_name, "/proc/%d/status", getpid());
+    snprintf(file_name, 64, "/proc/%d/status", getpid());
 
     fd = fopen(file_name, "r");
 

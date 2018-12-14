@@ -23,7 +23,7 @@ static void* run_reactor (void* pReactor)
 Logging_Config_Param::Logging_Config_Param()
 {
     //日志文件，全路径
-    ACE_OS::strcpy(m_strLogFile, "./serverdebug.log");
+    ACE_OS::snprintf(m_strLogFile, 256, "%s%s", m_strLogFile, "/serverdebug.log");
 
     //文件大小检测时间(Secs)
     m_iChkInterval = 600;
@@ -129,21 +129,25 @@ int Frame_Logging_Strategy::InitLogStrategy(Logging_Config_Param& ConfigParam)
 
     if(ConfigParam.m_bSendTerminal)
     {
-        ACE_OS::sprintf(cmdline,"-s %s -f STDERR -p %s -i %d -m %d -N %d",
-                        ConfigParam.m_strLogFile,
-                        strLogLevel.c_str(),
-                        ConfigParam.m_iChkInterval,
-                        ConfigParam.m_iLogFileMaxSize,
-                        ConfigParam.m_iLogFileMaxCnt);
+        ACE_OS::snprintf(cmdline,
+                         1024,
+                         "-s %s -f STDERR -p %s -i %d -m %d -N %d",
+                         ConfigParam.m_strLogFile,
+                         strLogLevel.c_str(),
+                         ConfigParam.m_iChkInterval,
+                         ConfigParam.m_iLogFileMaxSize,
+                         ConfigParam.m_iLogFileMaxCnt);
     }
     else
     {
-        ACE_OS::sprintf(cmdline,"-s %s -f OSTREAM -p %s -i %d -m %d -N %d",
-                        ConfigParam.m_strLogFile,
-                        strLogLevel.c_str(),
-                        ConfigParam.m_iChkInterval,
-                        ConfigParam.m_iLogFileMaxSize,
-                        ConfigParam.m_iLogFileMaxCnt);
+        ACE_OS::snprintf(cmdline,
+                         1024,
+                         "-s %s -f OSTREAM -p %s -i %d -m %d -N %d",
+                         ConfigParam.m_strLogFile,
+                         strLogLevel.c_str(),
+                         ConfigParam.m_iChkInterval,
+                         ConfigParam.m_iLogFileMaxSize,
+                         ConfigParam.m_iLogFileMaxCnt);
     }
 
     ACE_Reactor_Impl* pImpl = 0;

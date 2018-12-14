@@ -524,7 +524,7 @@ int CLogManager::Create_Log_Block(int nLogType, uint32* pMailID, const char* pTi
             pLogBlockInfo->m_u4MailID = *pMailID;
         }
 
-        ACE_OS::sprintf(pLogBlockInfo->m_szMailTitle, "%s", pTitle);
+        ACE_OS::snprintf(pLogBlockInfo->m_szMailTitle, MAX_BUFF_200, "%s", pTitle);
     }
 
     if (IsRun())

@@ -225,14 +225,16 @@ void My_ACE_Logging_Strategy::update_old_log_file(ACE_TCHAR* backup)
 
     for (int i = max_num; i > 1; i--)
     {
-        ACE_OS::sprintf(backup,
-                        ACE_TEXT("%s.%d"),
-                        this->filename_,
-                        i);
-        ACE_OS::sprintf(to_backup,
-                        ACE_TEXT("%s.%d"),
-                        this->filename_,
-                        i - 1);
+        ACE_OS::snprintf(backup,
+                         MAXPATHLEN,
+                         ACE_TEXT("%s.%d"),
+                         this->filename_,
+                         i);
+        ACE_OS::snprintf(to_backup,
+                         MAXPATHLEN,
+                         ACE_TEXT("%s.%d"),
+                         this->filename_,
+                         i - 1);
 
         // Remove any existing old file; ignore error as
         // file may not exist.
@@ -247,9 +249,10 @@ void My_ACE_Logging_Strategy::update_old_log_file(ACE_TCHAR* backup)
         }
     }
 
-    ACE_OS::sprintf(backup,
-                    ACE_TEXT("%s.1"),
-                    this->filename_);
+    ACE_OS::snprintf(backup,
+                     MAXPATHLEN,
+                     ACE_TEXT("%s.1"),
+                     this->filename_);
 }
 
 int
@@ -395,8 +398,7 @@ My_ACE_Logging_Strategy::My_ACE_Logging_Strategy (void)
     }
 
     // Add the filename to the end
-    ACE_OS::strcat (this->filename_,
-                    ACE_TEXT ("logfile"));
+    ACE_OS::snprintf(this->filename_, MAXPATHLEN, "%s%s", this->filename_, ACE_TEXT("logfile"));
 #endif /* ACE_DEFAULT_LOGFILE */
 }
 
@@ -646,10 +648,11 @@ My_ACE_Logging_Strategy::handle_timeout (const ACE_Time_Value&,
                     count_ = 1;    // start over from 1
                 }
 
-                ACE_OS::sprintf (backup,
-                                 ACE_TEXT ("%s.%d"),
-                                 this->filename_,
-                                 count_);
+                ACE_OS::snprintf (backup,
+                                  MAXPATHLEN,
+                                  ACE_TEXT ("%s.%d"),
+                                  this->filename_,
+                                  count_);
             }
 
             // Remove any existing old file; ignore error as file may

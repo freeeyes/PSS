@@ -485,8 +485,8 @@ void CServerManager::Multiple_Process_Start()
 
     //在Linux下采用多进程的方式启动
     // 打开（创建）锁文件
-    char szFileName[200] = { '\0' };
-    sprintf(szFileName, "%s/lockwatch.lk", szWorkDir);
+    char szFileName[MAX_BUFF_200] = { '\0' };
+    ACE_OS::snprintf(szFileName, MAX_BUFF_200, "%s/lockwatch.lk", szWorkDir);
     fd_lock = open(szFileName, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 
     if (fd_lock < 0)

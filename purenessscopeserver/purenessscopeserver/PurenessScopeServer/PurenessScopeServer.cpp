@@ -142,7 +142,7 @@ bool SetAppPath()
 
     char szPath[MAX_BUFF_300] = { '\0' };
     memset(pFilePath, 0, nSize);
-    sprintf(pFilePath, "/proc/%d/exe", getpid());
+    ACE_OS::snprintf(pFilePath, MAX_BUFF_300, "/proc/%d/exe", getpid());
 
     //从符号链接中获得当前文件全路径和文件名
     ssize_t stPathSize = readlink(pFilePath, szPath, MAX_BUFF_300 - 1);
