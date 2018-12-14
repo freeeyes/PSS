@@ -528,6 +528,12 @@ void CMessageService::CopyMessageManagerList()
             if (NULL != pClientCommandList)
             {
                 CClientCommandList* pCurrClientCommandList = new CClientCommandList();
+
+                if (NULL == pCurrClientCommandList)
+                {
+                    continue;
+                }
+
                 pCurrClientCommandList->SetCommandID(pClientCommandList->GetCommandID());
 
                 for (int j = 0; j < pClientCommandList->GetCount(); j++)
