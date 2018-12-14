@@ -570,8 +570,6 @@ CBuffPacket& CBuffPacket::operator << (uint8 u1Data)
         WritePtr((uint32)sizeof(u1Data));
         return *this;
     }
-
-    return *this;
 }
 
 CBuffPacket& CBuffPacket::operator << (uint16 u2Data)
@@ -626,8 +624,6 @@ CBuffPacket& CBuffPacket::operator << (uint16 u2Data)
         WritePtr((uint32)sizeof(u2Net));
         return *this;
     }
-
-    return *this;
 }
 
 CBuffPacket& CBuffPacket::operator << (uint32 u4Data)
@@ -682,8 +678,6 @@ CBuffPacket& CBuffPacket::operator << (uint32 u4Data)
         WritePtr((uint32)sizeof(u4Net));
         return *this;
     }
-
-    return *this;
 }
 
 CBuffPacket& CBuffPacket::operator << (uint64 u8Data)
@@ -738,8 +732,6 @@ CBuffPacket& CBuffPacket::operator << (uint64 u8Data)
         WritePtr((uint32)sizeof(u8Net));
         return *this;
     }
-
-    return *this;
 }
 
 CBuffPacket& CBuffPacket::operator << (int8 n1Data)
@@ -770,8 +762,6 @@ CBuffPacket& CBuffPacket::operator << (int8 n1Data)
         WritePtr((uint32)sizeof(n1Data));
         return *this;
     }
-
-    return *this;
 }
 
 CBuffPacket& CBuffPacket::operator << (int16 n2Data)
@@ -802,8 +792,6 @@ CBuffPacket& CBuffPacket::operator << (int16 n2Data)
         WritePtr((uint32)sizeof(n2Data));
         return *this;
     }
-
-    return *this;
 }
 
 CBuffPacket& CBuffPacket::operator << (int32 n4Data)
@@ -834,8 +822,6 @@ CBuffPacket& CBuffPacket::operator << (int32 n4Data)
         WritePtr((uint32)sizeof(n4Data));
         return *this;
     }
-
-    return *this;
 }
 
 CBuffPacket& CBuffPacket::operator << (float32 f4Data)
@@ -866,8 +852,6 @@ CBuffPacket& CBuffPacket::operator << (float32 f4Data)
         WritePtr((uint32)sizeof(f4Data));
         return *this;
     }
-
-    return *this;
 }
 
 CBuffPacket& CBuffPacket::operator << (float64 f8Data)
@@ -898,8 +882,6 @@ CBuffPacket& CBuffPacket::operator << (float64 f8Data)
         WritePtr((uint32)sizeof(f8Data));
         return *this;
     }
-
-    return *this;
 }
 
 CBuffPacket& CBuffPacket::operator << (VCHARS_STR& str)
@@ -938,8 +920,6 @@ CBuffPacket& CBuffPacket::operator << (VCHARS_STR& str)
         WritePtr(str.u1Len);
         return *this;
     }
-
-    return *this;
 }
 
 CBuffPacket& CBuffPacket::operator << (VCHARM_STR& str)
@@ -978,8 +958,6 @@ CBuffPacket& CBuffPacket::operator << (VCHARM_STR& str)
         WritePtr(str.u2Len);
         return *this;
     }
-
-    return *this;
 }
 
 CBuffPacket& CBuffPacket::operator << (VCHARB_STR& str)
@@ -1018,8 +996,6 @@ CBuffPacket& CBuffPacket::operator << (VCHARB_STR& str)
         WritePtr(str.u4Len);
         return *this;
     }
-
-    return *this;
 }
 
 CBuffPacket& CBuffPacket::operator << (string& str)
@@ -1060,8 +1036,6 @@ CBuffPacket& CBuffPacket::operator << (string& str)
         WritePtr(u4Len);
         return *this;
     }
-
-    return *this;
 }
 
 void CBuffPacket::SetNetSort(bool blState)
