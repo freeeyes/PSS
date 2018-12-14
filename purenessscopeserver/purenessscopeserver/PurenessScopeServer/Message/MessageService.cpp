@@ -540,6 +540,7 @@ void CMessageService::CopyMessageManagerList()
                 if (false == m_objClientCommandList.Add_Hash_Data_By_Key_Unit32((uint32)pClientCommandList->GetCommandID(), pCurrClientCommandList))
                 {
                     OUR_DEBUG((LM_INFO, "[CMessageService::CopyMessageManagerList]CommandID=%d add error.\n", pClientCommandList->GetCommandID()));
+                    SAFE_DELETE(pCurrClientCommandList);
                 }
             }
         }

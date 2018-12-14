@@ -137,6 +137,7 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
 
     if (nHashPos < 0)
     {
+        SAFE_DELETE(pPacketParseInfo);
         return false;
     }
     else
