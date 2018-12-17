@@ -605,7 +605,7 @@ uint32 CConnectHandler::file_open(IFileTestManager* pFileTest)
     }
 
     //写入连接日志
-    AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Connection from [%s:%d] ConnectID=%d, GetHandlerID=%d.",
+    AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "File Connection from [%s:%d] ConnectID=%d, GetHandlerID=%d.",
                                         m_addrRemote.get_host_addr(),
                                         m_addrRemote.get_port_number(),
                                         GetConnectID(),
