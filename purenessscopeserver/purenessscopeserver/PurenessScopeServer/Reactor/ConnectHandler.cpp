@@ -616,7 +616,7 @@ uint32 CConnectHandler::file_open(IFileTestManager* pFileTest)
 
     Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CONNECT,m_addrRemote, m_szLocalIP, m_u4LocalPort);
 
-    OUR_DEBUG((LM_DEBUG, "[CConnectHandler::open]Open(%d) Connection from [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
+    OUR_DEBUG((LM_DEBUG, "[CConnectHandler::file_open]Open(%d) Connection from [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
 
     m_u1ConnectState = CONNECT_OPEN;
     m_emIOType       = FILE_INPUT;
