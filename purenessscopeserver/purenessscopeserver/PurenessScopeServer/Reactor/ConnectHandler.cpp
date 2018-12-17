@@ -233,20 +233,7 @@ int CConnectHandler::open(void*)
         return -1;
     }
 
-    AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Connection from [%s:%d]ConnectID=%d, GetHandlerID=%d.",
-                                        m_addrRemote.get_host_addr(),
-                                        m_addrRemote.get_port_number(),
-                                        GetConnectID(),
-                                        GetHandlerID());
-
-    //告诉PacketParse连接应建立
-    App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Connect(GetConnectID(), GetClientIPInfo(), GetLocalIPInfo());
-
-    Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CONNECT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
-
-    OUR_DEBUG((LM_DEBUG,"[CConnectHandler::open]Open(%d) Connection from [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
-
-    m_u1ConnectState = CONNECT_OPEN;
+    ConnectOpen();
 
     nRet = this->reactor()->register_handler(this, ACE_Event_Handler::READ_MASK|ACE_Event_Handler::WRITE_MASK);
 
@@ -604,21 +591,8 @@ uint32 CConnectHandler::file_open(IFileTestManager* pFileTest)
         return 0;
     }
 
-    //写入连接日志
-    AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "File Connection from [%s:%d] ConnectID=%d, GetHandlerID=%d.",
-                                        m_addrRemote.get_host_addr(),
-                                        m_addrRemote.get_port_number(),
-                                        GetConnectID(),
-                                        GetHandlerID());
+    ConnectOpen();
 
-    //告诉PacketParse连接应建立
-    App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Connect(GetConnectID(), GetClientIPInfo(), GetLocalIPInfo());
-
-    Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CONNECT,m_addrRemote, m_szLocalIP, m_u4LocalPort);
-
-    OUR_DEBUG((LM_DEBUG, "[CConnectHandler::file_open]Open(%d) Connection from [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
-
-    m_u1ConnectState = CONNECT_OPEN;
     m_emIOType       = FILE_INPUT;
     m_pFileTest      = pFileTest;
 
@@ -944,6 +918,25 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
             m_atvOutput      = ACE_OS::gettimeofday();
         }
     }
+}
+
+void CConnectHandler::ConnectOpen()
+{
+    //写入连接日志
+    AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Connection from [%s:%d]ConnectID=%d, GetHandlerID=%d.",
+                                        m_addrRemote.get_host_addr(),
+                                        m_addrRemote.get_port_number(),
+                                        GetConnectID(),
+                                        GetHandlerID());
+
+    //告诉PacketParse连接应建立
+    App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Connect(GetConnectID(), GetClientIPInfo(), GetLocalIPInfo());
+
+    Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CONNECT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
+
+    OUR_DEBUG((LM_DEBUG, "[CConnectHandler::open]Open(%d) Connection from [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
+
+    m_u1ConnectState = CONNECT_OPEN;
 }
 
 void CConnectHandler::Get_Recv_length(int& nCurrCount)

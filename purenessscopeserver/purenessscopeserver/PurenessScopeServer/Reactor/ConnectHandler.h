@@ -93,6 +93,7 @@ public:
     bool Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, uint8 u1State, int nMessageID, bool blDelete, IBuffPacket* pBuffPacket);         //将数据发送给对端
 
 private:
+    void ConnectOpen();                                                      //设置连接相关打开代码
     void Get_Recv_length(int& nCurrCount);                                   //得到要处理的数据长度
     int  Dispose_Paceket_Parse_Head();                                       //处理消息头函数
     int  Dispose_Paceket_Parse_Body();                                       //处理消息头函数
