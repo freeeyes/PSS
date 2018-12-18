@@ -95,7 +95,7 @@ bool CCommandAccount::Save_Flow(uint16 u2CommandID, uint32 u4Port, uint8 u1Packe
         else
         {
             //创建新的端口信息
-            _Port_Data_Account* p_Port_Data_Account = new _Port_Data_Account();
+            p_Port_Data_Account = new _Port_Data_Account();
             p_Port_Data_Account->Init(u1PacketType, u4Port);
             p_Port_Data_Account->SetFlow(u1CommandType, u4PacketSize, tvTime);
             m_objectPortAccount.bind(u4Port, p_Port_Data_Account);
@@ -132,7 +132,7 @@ bool CCommandAccount::Save_Command(uint16 u2CommandID, uint32 u4Port, uint8 u1Pa
         else
         {
             //添加新的命令统计信息
-            _CommandData* pCommandData = new _CommandData();
+            pCommandData = new _CommandData();
 
             if (pCommandData != NULL)
             {

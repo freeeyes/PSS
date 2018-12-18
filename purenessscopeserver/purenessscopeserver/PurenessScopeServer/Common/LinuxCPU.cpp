@@ -59,7 +59,7 @@ int32 GetProcessCPU_Idel_Linux()
     float fcpu;
     fcpu = (float)atof(szTmp);
     fclose(fd);
-    nRet = system("rm -rf aasnowy.txt");
+    system("rm -rf aasnowy.txt");
 
     return (int32)(fcpu*100);
 }

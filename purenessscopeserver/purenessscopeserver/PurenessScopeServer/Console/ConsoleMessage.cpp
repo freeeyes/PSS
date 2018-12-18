@@ -280,7 +280,6 @@ int CConsoleMessage::DoCommand(_CommandInfo& CommandInfo, IBuffPacket* pCurrBuff
 
     if (u4PacketSize == 0 || CONSOLE_COMMAND_UNKNOW == u2ReturnCommandID)
     {
-        u2ReturnCommandID = CONSOLE_COMMAND_UNKNOW;
         App_BuffPacketManager::instance()->Delete(pCurrBuffPacket);
         return CONSOLE_MESSAGE_FAIL;
     }

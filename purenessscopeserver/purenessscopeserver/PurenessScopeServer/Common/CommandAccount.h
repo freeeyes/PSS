@@ -277,6 +277,4 @@ public:
     ACE_Hash_Map<uint32, _Port_Data_Account*> m_objectPortAccount;             //根据端口统计每条数据的进出量
 };
 
-//typedef ACE_Singleton<CCommandAccount, ACE_Recursive_Thread_Mutex> App_CommandAccount;
-
 #endif

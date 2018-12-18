@@ -53,10 +53,6 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 * other than the singleton reactor you'll need to get a pointer to
 * the @c ACE_Logging_Strategy instance and do this
 *
-* ACE_Reactor my_reactor;
-* ACE_Logging_Strategy *logging_strategy = ...... // Get instance.
-*
-* logging_strategy->reactor (&my_reactor);
 *
 * and then logging_strategy will use your reactor.  If you're
 * dynamically linking the @c ACE_Logging_Strategy then you can use

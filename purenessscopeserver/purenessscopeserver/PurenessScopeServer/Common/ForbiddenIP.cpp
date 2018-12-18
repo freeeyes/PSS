@@ -183,7 +183,7 @@ bool CForbiddenIP::SaveConfig()
             sprintf_safe(szTemp, MAX_BUFF_500, "<ForbiddenIP ip=\"%s\" type=\"UDP\" desc=\"ForbiddenIP£¬type is 'TCP' or 'UDP'\" />\r\n", m_VecForeverForbiddenIP[i].m_szClientIP);
         }
 
-        size_t stSize = ACE_OS::fwrite(szTemp, sizeof(char), ACE_OS::strlen(szTemp), pFile);
+        stSize = ACE_OS::fwrite(szTemp, sizeof(char), ACE_OS::strlen(szTemp), pFile);
 
         if(stSize !=  ACE_OS::strlen(szTemp))
         {
