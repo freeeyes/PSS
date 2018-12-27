@@ -199,7 +199,7 @@ int CBaseCommand::DoMessage_DataIn(IMessage* pMessage, bool& bDeleteFlag)
 	if(NULL != m_pServerObject->GetConnectManager())
 	{
 		//发送全部数据
-		const char* ptrReturnData = reinterpret_cast<const char*>(szReturnBuff);
+		char* ptrReturnData = szReturnBuff;
 		m_pServerObject->GetConnectManager()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID, ptrReturnData, 
 			u4ReturnLen, SENDMESSAGE_JAMPNOMAL, u2PostCommandID, PACKET_SEND_IMMEDIATLY, PACKET_IS_SELF_RECYC);
 	}

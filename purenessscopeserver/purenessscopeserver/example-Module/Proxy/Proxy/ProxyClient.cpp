@@ -112,7 +112,7 @@ int CProxyClient::handle_input( ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/ )
         //这里把收到的数据发送给客户端
         if(NULL != m_pServerObject)
         {
-            const char* ptrReturnData = reinterpret_cast<const char*>(szClientBuff);
+            char* ptrReturnData = szClientBuff;
             m_pServerObject->GetConnectManager()->PostMessage(m_u4ConnectID, ptrReturnData, (uint32)nDataLen, SENDMESSAGE_JAMPNOMAL,
                     (uint16)COMMAND_RETURN_PROXY, PACKET_SEND_IMMEDIATLY, false);
         }

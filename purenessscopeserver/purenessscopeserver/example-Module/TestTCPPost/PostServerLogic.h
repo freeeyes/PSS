@@ -207,7 +207,7 @@ public:
 
         if(m_u2SendBuffLength > 0)
         {
-            char* ptrReturnData = const_cast<char*>(m_szSendBuffData);
+            char* ptrReturnData = m_szSendBuffData;
 
             //·¢ËÍÊý¾Ý
             if(true == m_pServerObject->GetClientManager()->SendData((int)m_u4ServerID, ptrReturnData, m_u2SendBuffLength, false))
