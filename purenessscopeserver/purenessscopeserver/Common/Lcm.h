@@ -18,7 +18,7 @@ struct _Lcm_Info
     }
 };
 
-static int gcd(int nA, int nB)
+inline int gcd(int nA, int nB)
 {
     if (nA < 1)
     {
@@ -38,7 +38,7 @@ static int gcd(int nA, int nB)
     return nA;
 }
 
-static int lcm(int nA, int nB)
+inline int lcm(int nA, int nB)
 {
     if (nA == 0 || nB == 0 || gcd(nA, nB) == 0)
     {
@@ -51,7 +51,7 @@ static int lcm(int nA, int nB)
 }
 
 //计算最大公倍数
-static int Get_LeastCommonMultiple(std::vector<_Lcm_Info>& vec_Lcm_Info)
+inline int Get_LeastCommonMultiple(std::vector<_Lcm_Info>& vec_Lcm_Info)
 {
     if (vec_Lcm_Info.size() <= 1)
     {
@@ -78,7 +78,7 @@ static int Get_LeastCommonMultiple(std::vector<_Lcm_Info>& vec_Lcm_Info)
     return nData;
 }
 
-static void Get_Min_Set(std::vector<_Lcm_Info>& vec_Lcm_Info_Temp, std::vector<_Lcm_Info>& vec_Lcm_Info, int& nMinStep, int& nMinData)
+inline void Get_Min_Set(std::vector<_Lcm_Info>& vec_Lcm_Info_Temp, std::vector<_Lcm_Info>& vec_Lcm_Info, int& nMinStep, int& nMinData)
 {
     int nMin = vec_Lcm_Info_Temp[0].m_nTimeout;
     nMinData = 0;
@@ -109,7 +109,7 @@ static void Get_Min_Set(std::vector<_Lcm_Info>& vec_Lcm_Info_Temp, std::vector<_
 }
 
 //计算最小集
-static int Get_Minimum_Set(std::vector<_Lcm_Info>& vec_Lcm_Info, int nLeastCommonMultiple, std::vector<std::vector<_Lcm_Info> >& vecList)
+inline int Get_Minimum_Set(std::vector<_Lcm_Info>& vec_Lcm_Info, int nLeastCommonMultiple, std::vector<std::vector<_Lcm_Info> >& vecList)
 {
     int  nTotal    = 0;
     int  nMinSetp  = 0;
