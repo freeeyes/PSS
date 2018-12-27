@@ -176,7 +176,7 @@ void CUnit_ConnectHandler::Test_ConnectHandler_PostMessage(void)
     App_ConnectManager::instance()->SetRecvQueueTimeCost(1, 1000);
 
     //测试群发数据
-    const char* ptrReturnData = reinterpret_cast<const char*>(szData);
+    char* ptrReturnData = szData;
     uint32 u4SendLen = (uint32)ACE_OS::strlen(szData);
 
     vector<uint32> vecConnectIDList;

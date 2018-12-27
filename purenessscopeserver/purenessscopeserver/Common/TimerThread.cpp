@@ -35,7 +35,7 @@ void* thr_fn(void* arg)
                     break;
                 }
 
-                for (int i = 0; i < pList->size(); i++)
+                for (int i = 0; i < (int)pList->size(); i++)
                 {
                     ts_timer::ITimerInfo* pTimerInfo = pTimerInfoList->GetTimerInfo((*pList)[i].m_nIndex);
 
@@ -141,7 +141,7 @@ void* thr_fn(void* arg)
         {
             std::vector<_Lcm_Info>* pList = pTimerInfoList->Get_Curr_Assemble();
 
-            for (int i = 0; i < pList->size(); i++)
+            for (int i = 0; i < (int)pList->size(); i++)
             {
                 ts_timer::ITimerInfo* pTimerInfo = pTimerInfoList->GetTimerInfo((*pList)[i].m_nIndex);
 
