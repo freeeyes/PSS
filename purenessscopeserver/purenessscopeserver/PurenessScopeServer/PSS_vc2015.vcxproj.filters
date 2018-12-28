@@ -876,6 +876,9 @@
     <ClInclude Include="CppUnit\Uint_TcpRedirection.h">
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\Lcm.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
