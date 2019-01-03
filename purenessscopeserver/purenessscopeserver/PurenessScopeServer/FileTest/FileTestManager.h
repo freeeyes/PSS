@@ -5,7 +5,7 @@
 #include "ConnectHandler.h"
 #else
 //Èç¹ûÊÇwindows
-#include "ProConnectHandle.h"
+#include "ProConnectHandler.h"
 #endif
 
 #include "HashTable.h"

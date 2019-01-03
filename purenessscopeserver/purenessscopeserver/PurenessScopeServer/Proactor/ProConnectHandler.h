@@ -42,11 +42,11 @@
 #include "XmlConfig.h"
 #include "TcpRedirection.h"
 
-class CProConnectHandle : public ACE_Service_Handler
+class CProConnectHandler : public ACE_Service_Handler
 {
 public:
-    CProConnectHandle(void);
-    ~CProConnectHandle(void);
+    CProConnectHandler(void);
+    ~CProConnectHandler(void);
 
     //重写继承方法
     virtual void open(ACE_HANDLE h, ACE_Message_Block&);                                             //用户建立一个链接
@@ -168,7 +168,7 @@ public:
 
     void Init(uint16 u2Index);
 
-    static void TimeWheel_Timeout_Callback(void* pArgsContext, vector<CProConnectHandle*> vecProConnectHandle);
+    static void TimeWheel_Timeout_Callback(void* pArgsContext, vector<CProConnectHandler*> vecProConnectHandle);
 
     virtual int open(void* args = 0);
     virtual int svc (void);
@@ -176,9 +176,9 @@ public:
     virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);
 
     void CloseAll();                                                                                         //关闭所有链接信息
-    bool AddConnect(uint32 u4ConnectID, CProConnectHandle* pConnectHandler);                                 //添加一个新的链接信息
-    bool SetConnectTimeWheel(CProConnectHandle* pConnectHandler);                                            //设置消息轮盘
-    bool DelConnectTimeWheel(CProConnectHandle* pConnectHandler);                                            //删除消息轮盘
+    bool AddConnect(uint32 u4ConnectID, CProConnectHandler* pConnectHandler);                                 //添加一个新的链接信息
+    bool SetConnectTimeWheel(CProConnectHandler* pConnectHandler);                                            //设置消息轮盘
+    bool DelConnectTimeWheel(CProConnectHandler* pConnectHandler);                                            //删除消息轮盘
     bool SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint16 u2CommandID, uint8 u1SendState, uint8 u1SendType, ACE_Time_Value& tvSendBegin, bool blDelete, int nMessageID);          //发送数据
     bool PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,
                      uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDelete = true, int nMessageID = 0);    //异步发送
@@ -224,13 +224,13 @@ private:
     uint16                             m_u2SendQueueMax;        //发送队列最大长度
     bool                               m_blRun;                 //线程是否在运行
     char                               m_szError[MAX_BUFF_500]; //错误信息描述
-    CHashTable<CProConnectHandle>      m_objHashConnectList;    //记录当前已经连接的节点，使用固定内存结构
+    CHashTable<CProConnectHandler>      m_objHashConnectList;    //记录当前已经连接的节点，使用固定内存结构
     ACE_Recursive_Thread_Mutex         m_ThreadWriteLock;       //用于循环监控和断开链接时候的数据锁
     ACE_Time_Value                     m_tvCheckConnect;        //定时器下一次检测链接时间
     CSendMessagePool                   m_SendMessagePool;       //发送对象库
     CCommandAccount                    m_CommandAccount;        //当前线程命令统计数据
     CSendCacheManager                  m_SendCacheManager;      //发送缓冲池
-    CTimeWheelLink<CProConnectHandle>  m_TimeWheelLink;         //连接时间轮盘
+    CTimeWheelLink<CProConnectHandler>  m_TimeWheelLink;         //连接时间轮盘
 };
 
 //链接ConnectHandler内存池
@@ -243,16 +243,16 @@ public:
     void Init(int nObjcetCount);
     void Close();
 
-    CProConnectHandle* Create();
-    bool Delete(CProConnectHandle* pObject);
+    CProConnectHandler* Create();
+    bool Delete(CProConnectHandler* pObject);
 
     int GetUsedCount();
     int GetFreeCount();
 
 private:
     ACE_Recursive_Thread_Mutex          m_ThreadWriteLock;                     //控制多线程锁
-    CHashTable<CProConnectHandle>       m_objHashHandleList;                   //Hash管理表
-    CObjectArrayList<CProConnectHandle> m_objHandlerList;                      //数据列表对象
+    CHashTable<CProConnectHandler>       m_objHashHandleList;                   //Hash管理表
+    CObjectArrayList<CProConnectHandler> m_objHandlerList;                      //数据列表对象
     uint32                              m_u4CurrMaxCount;                      //当前池里Handler总数
 };
 
@@ -266,10 +266,10 @@ public:
     void Init(uint16 u2SendQueueCount);
     void Close();
 
-    bool AddConnect(CProConnectHandle* pConnectHandler);
+    bool AddConnect(CProConnectHandler* pConnectHandler);
 
-    bool SetConnectTimeWheel(CProConnectHandle* pConnectHandler);                                            //设置消息轮盘
-    bool DelConnectTimeWheel(CProConnectHandle* pConnectHandler);                                            //删除消息轮盘
+    bool SetConnectTimeWheel(CProConnectHandler* pConnectHandler);                                            //设置消息轮盘
+    bool DelConnectTimeWheel(CProConnectHandler* pConnectHandler);                                            //删除消息轮盘
 
     virtual bool PostMessage(uint32 u4ConnectID, IBuffPacket*& pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,
                              uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDlete = true, int nMessageID = 0);    //异步发送

@@ -379,7 +379,7 @@ bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
 
         if (u4PacketSize >= obj_Send_Packet_Param.m_u4SendMaxBuffSize)
         {
-            OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", obj_Send_Packet_Param.m_u4ConnectID, u4PacketSize, obj_Send_Packet_Param.m_u4SendMaxBuffSize));
+            OUR_DEBUG((LM_DEBUG, "[CProConnectHandler::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", obj_Send_Packet_Param.m_u4ConnectID, u4PacketSize, obj_Send_Packet_Param.m_u4SendMaxBuffSize));
             //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
             ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
             memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());

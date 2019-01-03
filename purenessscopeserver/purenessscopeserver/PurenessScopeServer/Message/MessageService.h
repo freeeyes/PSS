@@ -20,7 +20,7 @@
 #include "ObjectLru.h"
 
 #ifdef WIN32
-#include "ProConnectHandle.h"
+#include "ProConnectHandler.h"
 #include "WindowsCPU.h"
 #else
 #include "ConnectHandler.h"

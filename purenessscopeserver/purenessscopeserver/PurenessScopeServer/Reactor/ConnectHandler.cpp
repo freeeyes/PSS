@@ -605,7 +605,7 @@ int CConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Size, 
 
     if (NULL == m_pPacketParse)
     {
-        OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::handle_write_file_stream](%d) m_pPacketParse new error.\n", GetConnectID()));
+        OUR_DEBUG((LM_DEBUG, "[CProConnectHandler::handle_write_file_stream](%d) m_pPacketParse new error.\n", GetConnectID()));
         return -1;
     }
 
@@ -623,7 +623,7 @@ int CConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Size, 
 
         if (false == blStateHead)
         {
-            OUR_DEBUG((LM_DEBUG, "[CProConnectHandle::handle_write_file_stream](%d) Parse_Packet_Head_Info is illegal.\n", GetConnectID()));
+            OUR_DEBUG((LM_DEBUG, "[CProConnectHandler::handle_write_file_stream](%d) Parse_Packet_Head_Info is illegal.\n", GetConnectID()));
             ClearPacketParse();
             return -1;
         }
@@ -647,7 +647,7 @@ int CConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Size, 
         if (false == blStateBody)
         {
             //如果数据包体非法，断开连接
-            OUR_DEBUG((LM_ERROR, "[CProConnectHandle::handle_write_file_stream]Parse_Packet_Body_Info is illegal.\n"));
+            OUR_DEBUG((LM_ERROR, "[CProConnectHandler::handle_write_file_stream]Parse_Packet_Body_Info is illegal.\n"));
 
             //清理PacketParse
             ClearPacketParse();
@@ -666,7 +666,7 @@ int CConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Size, 
 
         if (false == CheckMessage())
         {
-            OUR_DEBUG((LM_ERROR, "[CProConnectHandle::handle_write_file_stream]CheckMessage is false.\n"));
+            OUR_DEBUG((LM_ERROR, "[CProConnectHandler::handle_write_file_stream]CheckMessage is false.\n"));
             return -1;
         }
     }

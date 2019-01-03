@@ -22,7 +22,7 @@
 #include "XmlConfig.h"
 
 #ifdef WIN32
-#include "ProConnectHandle.h"
+#include "ProConnectHandler.h"
 #include "ClientProConnectManager.h"
 #include "ProUDPManager.h"
 #include "WindowsCPU.h"
@@ -86,9 +86,9 @@
 #define CONSOLE_COMMAND_POOL_SET           0x1035
 
 //目前支持的命令
-#define CONSOLEMESSAHE_LOADMOUDLE         "LoadModule"          //加载模块
-#define CONSOLEMESSAHE_UNLOADMOUDLE       "UnLoadModule"        //卸载模块
-#define CONSOLEMESSAHE_RELOADMOUDLE       "ReLoadModule"        //重新加载模块
+#define CONSOLEMESSAHE_LOADMODULE         "LoadModule"          //加载模块
+#define CONSOLEMESSAHE_UNLOADMODULE       "UnLoadModule"        //卸载模块
+#define CONSOLEMESSAHE_RELOADMODULE       "ReLoadModule"        //重新加载模块
 #define CONSOLEMESSAHE_SHOWMOUDLE         "ShowModule"          //显示所有现在已经加载的模块
 #define CONSOLEMESSAHE_CLIENTCOUNT        "ClientCount"         //当前客户端连接数
 #define CONSOLEMESSAHE_COMMANDINFO        "CommandInfo"         //当前某一个信令的状态信息

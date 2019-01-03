@@ -16,9 +16,9 @@ CConsoleMessage::~CConsoleMessage()
 int CConsoleMessage::Init()
 {
     //初始化支持命令数组
-    m_objHashMessageLogicList.bind(CONSOLEMESSAHE_LOADMOUDLE, DoMessage_LoadModule);
-    m_objHashMessageLogicList.bind(CONSOLEMESSAHE_UNLOADMOUDLE, DoMessage_UnLoadModule);
-    m_objHashMessageLogicList.bind(CONSOLEMESSAHE_RELOADMOUDLE, DoMessage_ReLoadModule);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAHE_LOADMODULE, DoMessage_LoadModule);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAHE_UNLOADMODULE, DoMessage_UnLoadModule);
+    m_objHashMessageLogicList.bind(CONSOLEMESSAHE_RELOADMODULE, DoMessage_ReLoadModule);
     m_objHashMessageLogicList.bind(CONSOLEMESSAHE_SHOWMOUDLE, DoMessage_ShowModule);
     m_objHashMessageLogicList.bind(CONSOLEMESSAHE_CLIENTCOUNT, DoMessage_ClientMessageCount);
     m_objHashMessageLogicList.bind(CONSOLEMESSAHE_COMMANDINFO, DoMessage_CommandInfo);

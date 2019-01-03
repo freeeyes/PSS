@@ -9,7 +9,7 @@
 
 #include "MessageManager.h"
 #ifdef WIN32
-#include "ProConnectHandle.h"
+#include "ProConnectHandler.h"
 #else
 #include "ConnectHandler.h"
 #endif

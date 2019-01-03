@@ -395,7 +395,7 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
     }
 
 #else
-    CProConnectHandle* ptrProConnectHandle = NULL;
+    CProConnectHandler* ptrProConnectHandle = NULL;
 
     for (uint32 iLoop = 0; iLoop < m_u4ConnectCount; iLoop++)
     {

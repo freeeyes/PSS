@@ -6,11 +6,11 @@
 using namespace std;
 
 #include "ForbiddenIP.h"
-#include "ProConnectHandle.h"
+#include "ProConnectHandler.h"
 #include "AceProactorManager.h"
 
 //平常客户端的Acceptor
-class ProConnectAcceptor : public ACE_Asynch_Acceptor<CProConnectHandle>
+class ProConnectAcceptor : public ACE_Asynch_Acceptor<CProConnectHandler>
 {
 public:
     ProConnectAcceptor();
@@ -19,7 +19,7 @@ public:
     uint32 GetPacketParseInfoID();
 
 private:
-    virtual CProConnectHandle* make_handler (void);
+    virtual CProConnectHandler* make_handler (void);
     virtual int validate_connection (const ACE_Asynch_Accept::Result& result,
                                      const ACE_INET_Addr& remote,
                                      const ACE_INET_Addr& local);
