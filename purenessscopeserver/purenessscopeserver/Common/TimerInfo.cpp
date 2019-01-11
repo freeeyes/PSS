@@ -359,7 +359,7 @@ std::vector<_Lcm_Info>* ts_timer::CTimerInfoList::Get_Curr_Assemble()
 
 std::vector<_Lcm_Info>* ts_timer::CTimerInfoList::Get_Next_Assemble()
 {
-    if (GetCurrTimerCount() == 0)
+    if (GetCurrTimerCount() == 0 || GetAssembleCount() == 0)
     {
         return NULL;
     }
