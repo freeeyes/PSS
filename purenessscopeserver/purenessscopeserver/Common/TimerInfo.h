@@ -137,6 +137,8 @@ namespace ts_timer
 
         int GetCurrTimerCount();                                   //得到当前定时器的Count
 
+        int GetAssembleCount();                                    //得到当前镜像列表的数量
+
         ITimerInfo* GetTimerInfo(int nIndex);                      //得到指定的Timer指针
 
     private:
