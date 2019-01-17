@@ -376,6 +376,12 @@
     <ClCompile Include="Proactor\ProConnectHandler.cpp">
       <Filter>Proactor\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="Proactor\ProTTyHandler.cpp">
+      <Filter>Proactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Proactor\ProTTyClientManager.cpp">
+      <Filter>Proactor\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -877,6 +883,18 @@
       <Filter>Common\hfile</Filter>
     </ClInclude>
     <ClInclude Include="Proactor\ProConnectHandler.h">
+      <Filter>Proactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Proactor\ProTTyHandler.h">
+      <Filter>Proactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ITTyClientManager.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ITTyMessage.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Proactor\ProTTyClientManager.h">
       <Filter>Proactor\hfile</Filter>
     </ClInclude>
   </ItemGroup>

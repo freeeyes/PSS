@@ -238,6 +238,8 @@
     <ClCompile Include="Mail\smtps.cpp" />
     <ClCompile Include="Message\MessageDyeingManager.cpp" />
     <ClCompile Include="Proactor\ProConnectHandler.cpp" />
+    <ClCompile Include="Proactor\ProTTyClientManager.cpp" />
+    <ClCompile Include="Proactor\ProTTyHandler.cpp" />
     <ClCompile Include="PurenessScopeServer.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
@@ -578,6 +580,8 @@
     <ClInclude Include="..\Common\IServerManager.h" />
     <ClInclude Include="..\Common\ITimerManager.h" />
     <ClInclude Include="..\Common\ITSTimer.h" />
+    <ClInclude Include="..\Common\ITTyClientManager.h" />
+    <ClInclude Include="..\Common\ITTyMessage.h" />
     <ClInclude Include="..\Common\IUDPConnectManager.h" />
     <ClInclude Include="..\Common\Lcm.h" />
     <ClInclude Include="..\Common\ObjectArrayList.h" />
@@ -673,6 +677,8 @@
     <ClInclude Include="Proactor\ProServerManager.h" />
     <ClInclude Include="Proactor\ProSigHandle.h" />
     <ClInclude Include="Console\ConsoleMessage.h" />
+    <ClInclude Include="Proactor\ProTTyClientManager.h" />
+    <ClInclude Include="Proactor\ProTTyHandler.h" />
     <ClInclude Include="UDP\ProactorUDPClient.h" />
     <ClInclude Include="UDP\ProactorUDPHandler.h" />
     <ClInclude Include="UDP\ProUDPManager.h" />
