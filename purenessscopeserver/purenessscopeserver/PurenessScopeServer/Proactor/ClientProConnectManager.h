@@ -92,7 +92,6 @@ private:
     CHashTable<CProactorClientInfo> m_objClientTCPList;            //TCP客户端链接
     CHashTable<CProactorUDPClient>  m_objClientUDPList;            //UDP客户端链接
     ACE_Recursive_Thread_Mutex      m_ThreadWritrLock;             //线程锁
-    ActiveTimer                     m_ActiveTimer;                 //时间管理器
     int                             m_nTaskID;                     //定时检测工具
     bool                            m_blProactorFinish;            //Proactor是否已经注册
     uint32                          m_u4ConnectServerTimeout;      //连接间隔时间

@@ -566,7 +566,7 @@ bool CClientReConnectManager::SendDataUDP(int nServerID, const char* pIP, int nP
 bool CClientReConnectManager::StartConnectTask(int nIntervalTime)
 {
     CancelConnectTask();
-    m_nTaskID = m_ActiveTimer.schedule(this, (void*)NULL, ACE_OS::gettimeofday() + ACE_Time_Value(nIntervalTime), ACE_Time_Value(nIntervalTime));
+    m_nTaskID = App_TimerManager::instance()->schedule(this, (void*)NULL, ACE_OS::gettimeofday() + ACE_Time_Value(nIntervalTime), ACE_Time_Value(nIntervalTime));
 
     if (m_nTaskID == -1)
     {
@@ -574,7 +574,6 @@ bool CClientReConnectManager::StartConnectTask(int nIntervalTime)
         return false;
     }
 
-    m_ActiveTimer.activate();
     m_blReactorFinish = true;
     return true;
 }
@@ -584,7 +583,7 @@ void CClientReConnectManager::CancelConnectTask()
     if (m_nTaskID != -1)
     {
         //杀死之前的定时器，重新开启新的定时器
-        m_ActiveTimer.cancel(m_nTaskID);
+        App_TimerManager::instance()->cancel(m_nTaskID);
         m_nTaskID = -1;
     }
 }
@@ -634,7 +633,6 @@ void CClientReConnectManager::Close()
     ACE_Time_Value tvSleep(0, 10000);
     ACE_OS::sleep(tvSleep);
 
-    m_ActiveTimer.deactivate();
     OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]End.\n"));
 }
 

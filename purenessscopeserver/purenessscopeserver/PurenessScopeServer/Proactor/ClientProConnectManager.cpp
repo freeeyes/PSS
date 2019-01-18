@@ -255,9 +255,6 @@ bool CClientProConnectManager::Init(ACE_Proactor* pProactor)
         //标记Proactor已经连接成功
         m_blProactorFinish = true;
 
-        //连接器启动成功，这时候启动定时器
-        m_ActiveTimer.activate();
-
         return true;
     }
 }
@@ -568,7 +565,7 @@ bool CClientProConnectManager::SendDataUDP(int nServerID,const char* pIP, int nP
 bool CClientProConnectManager::StartConnectTask(int nIntervalTime)
 {
     CancelConnectTask();
-    m_nTaskID = m_ActiveTimer.schedule(this, (void* )NULL, ACE_OS::gettimeofday() + ACE_Time_Value(nIntervalTime), ACE_Time_Value(nIntervalTime));
+    m_nTaskID = App_TimerManager::instance()->schedule(this, (void* )NULL, ACE_OS::gettimeofday() + ACE_Time_Value(nIntervalTime), ACE_Time_Value(nIntervalTime));
 
     if(m_nTaskID == -1)
     {
@@ -576,7 +573,6 @@ bool CClientProConnectManager::StartConnectTask(int nIntervalTime)
         return false;
     }
 
-    m_ActiveTimer.activate();
     return true;
 }
 
@@ -585,7 +581,7 @@ void CClientProConnectManager::CancelConnectTask()
     if(m_nTaskID != -1)
     {
         //杀死之前的定时器，重新开启新的定时器
-        m_ActiveTimer.cancel(m_nTaskID);
+        App_TimerManager::instance()->cancel(m_nTaskID);
         m_nTaskID = -1;
     }
 }
@@ -632,8 +628,6 @@ void CClientProConnectManager::Close()
 
     m_objClientUDPList.Close();
     m_u4MaxPoolCount = 0;
-    m_ActiveTimer.deactivate();
-
 }
 
 int CClientProConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)

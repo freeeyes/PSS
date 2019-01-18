@@ -88,7 +88,6 @@ public:
     CHashTable<CReactorUDPClient>  m_objClientUDPList;            //UDP客户端链接
     CConnectClientConnector        m_ReactorConnect;              //Reactor连接客户端对象
     ACE_Recursive_Thread_Mutex     m_ThreadWritrLock;             //线程锁
-    ActiveTimer                    m_ActiveTimer;                 //时间管理器
     int                            m_nTaskID;                     //定时检测工具
     ACE_Reactor*                   m_pReactor;                    //当前的反应器
     bool                           m_blReactorFinish;             //Reactor是否已经注册
