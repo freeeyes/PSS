@@ -388,6 +388,9 @@
     <ClCompile Include="Reactor\ReTTyClientManager.cpp">
       <Filter>Reactor\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="CppUnit\Unit_TTyClientManager.cpp">
+      <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -908,6 +911,9 @@
     </ClInclude>
     <ClInclude Include="Reactor\ReTTyClientManager.h">
       <Filter>Reactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\Unit_TTyClientManager.h">
+      <Filter>CppUnit\hfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
