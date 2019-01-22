@@ -29,6 +29,8 @@ void CReTTyClientManager::Close()
     vector<CReTTyHandler*> vecTTyClientHandlerInfo;
     m_objTTyClientHandlerList.Get_All_Used(vecTTyClientHandlerInfo);
 
+    OUR_DEBUG((LM_INFO, "[CReTTyClientManager::Close]Count=%d.\n", vecTTyClientHandlerInfo.size()));
+
     for (int i = 0; i < (int)vecTTyClientHandlerInfo.size(); i++)
     {
         CReTTyHandler* pTTyClientHandler = vecTTyClientHandlerInfo[i];

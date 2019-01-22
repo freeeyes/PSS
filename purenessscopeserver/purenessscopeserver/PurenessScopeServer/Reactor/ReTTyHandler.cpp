@@ -8,6 +8,7 @@ CReTTyHandler::CReTTyHandler() : m_blState(false), m_blPause(false), m_pTTyMessa
 
 CReTTyHandler::~CReTTyHandler()
 {
+    OUR_DEBUG((LM_INFO, "[CReTTyHandler::~CReTTyHandler].\n"));
     Close();
 
     //回收资源
