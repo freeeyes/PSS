@@ -34,7 +34,8 @@ bool Server_Manager_Common_IObject(IConnectManager* pConnectManager,
                                    IUDPConnectManager* pUDPConnectManager,
                                    IFrameCommand* pFrameCommand,
                                    IServerManager* pIServerManager,
-                                   ITSTimerManager* pTSTimerManager);
+                                   ITSTimerManager* pTSTimerManager,
+                                   ITTyClientManager* pTTyClientManager);
 
 //初始化模块插件的加载
 bool Server_Manager_Common_Module();

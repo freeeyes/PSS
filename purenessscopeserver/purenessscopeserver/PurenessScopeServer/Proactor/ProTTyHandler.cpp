@@ -159,10 +159,10 @@ bool CProTTyHandler::Send_Data(const char* pData, ssize_t nLen)
         {
             //发送数据失败
             m_pTTyMessage->ReportMessage(m_u4ConnectID, (uint32)errno, EM_TTY_EVENT_RW_ERROR);
-        }
 
-        //中断设备
-        Close();
+            //中断设备
+            Close();
+        }
 
         return true;
     }

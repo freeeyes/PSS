@@ -4,6 +4,7 @@
 #include "BaseServerManager.h"
 #include "ProConnectAccept.h"
 #include "ProConsoleAccept.h"
+#include "ProTTyClientManager.h"
 #include "AceProactorManager.h"
 #include "ClientProConnectManager.h"
 #include "ProUDPManager.h"

@@ -84,7 +84,7 @@ bool Server_Manager_Common_Pool()
     return true;
 }
 
-bool Server_Manager_Common_IObject(IConnectManager* pConnectManager, IClientManager* pClientManager, IUDPConnectManager* pUDPConnectManager, IFrameCommand* pFrameCommand, IServerManager* pIServerManager, ITSTimerManager* pTSTimerManager)
+bool Server_Manager_Common_IObject(IConnectManager* pConnectManager, IClientManager* pClientManager, IUDPConnectManager* pUDPConnectManager, IFrameCommand* pFrameCommand, IServerManager* pIServerManager, ITSTimerManager* pTSTimerManager, ITTyClientManager* pTTyClientManager)
 {
     App_ServerObject::instance()->SetMessageManager(dynamic_cast<IMessageManager*>(App_MessageManager::instance()));
     App_ServerObject::instance()->SetLogManager(dynamic_cast<ILogManager*>(AppLogManager::instance()));
@@ -100,6 +100,7 @@ bool Server_Manager_Common_IObject(IConnectManager* pConnectManager, IClientMana
     App_ServerObject::instance()->SetFrameCommand(pFrameCommand);
     App_ServerObject::instance()->SetServerManager(pIServerManager);
     App_ServerObject::instance()->SetTSTimer(pTSTimerManager);
+    App_ServerObject::instance()->SetTTyClientManager(pTTyClientManager);
 
     return true;
 }

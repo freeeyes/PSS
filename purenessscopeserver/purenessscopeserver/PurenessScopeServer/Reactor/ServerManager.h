@@ -13,6 +13,7 @@
 #include "ConsoleAccept.h"
 #include "ClientReConnectManager.h"
 #include "ReUDPManager.h"
+#include "ReTTyClientManager.h"
 
 class Frame_Logging_Strategy;
 

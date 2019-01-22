@@ -67,12 +67,14 @@ bool CProServerManager::Init()
     IFrameCommand* pFrameCommand           = dynamic_cast<IFrameCommand*>(&m_objFrameCommand);
     ITSTimerManager* pTSTimer              = dynamic_cast<ITSTimerManager*>(&m_TSThread);
     IServerManager* pServerManager         = dynamic_cast<IServerManager*>(this);
+    ITTyClientManager* pTTyClientManager   = dynamic_cast<ITTyClientManager*>(App_ProTTyClientManager::instance());
     Server_Manager_Common_IObject(pConnectManager,
                                   pClientManager,
                                   pUDPConnectManager,
                                   pFrameCommand,
                                   pServerManager,
-                                  pTSTimer);
+                                  pTSTimer,
+                                  pTTyClientManager);
 
     //初始化模块加载，因为这里可能包含了中间服务器连接加载
     if (false == Server_Manager_Common_Module())

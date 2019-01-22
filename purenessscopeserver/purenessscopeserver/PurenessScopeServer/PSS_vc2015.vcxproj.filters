@@ -382,6 +382,12 @@
     <ClCompile Include="Proactor\ProTTyClientManager.cpp">
       <Filter>Proactor\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="Reactor\ReTTyHandler.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor\ReTTyClientManager.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -896,6 +902,12 @@
     </ClInclude>
     <ClInclude Include="Proactor\ProTTyClientManager.h">
       <Filter>Proactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\ReTTyHandler.h">
+      <Filter>Reactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\ReTTyClientManager.h">
+      <Filter>Reactor\hfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

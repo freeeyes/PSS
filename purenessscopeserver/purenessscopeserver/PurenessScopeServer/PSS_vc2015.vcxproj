@@ -357,6 +357,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Reactor\ReTTyClientManager.cpp" />
+    <ClCompile Include="Reactor\ReTTyHandler.cpp" />
     <ClCompile Include="UDP\ProactorUDPClient.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
@@ -679,6 +681,8 @@
     <ClInclude Include="Console\ConsoleMessage.h" />
     <ClInclude Include="Proactor\ProTTyClientManager.h" />
     <ClInclude Include="Proactor\ProTTyHandler.h" />
+    <ClInclude Include="Reactor\ReTTyClientManager.h" />
+    <ClInclude Include="Reactor\ReTTyHandler.h" />
     <ClInclude Include="UDP\ProactorUDPClient.h" />
     <ClInclude Include="UDP\ProactorUDPHandler.h" />
     <ClInclude Include="UDP\ProUDPManager.h" />

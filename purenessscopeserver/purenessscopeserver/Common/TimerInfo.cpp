@@ -123,7 +123,15 @@ pthread_mutex_t* ts_timer::CTimerInfoList::Get_mutex()
 }
 
 
-ts_timer::CTimerInfoList::CTimerInfoList() : m_nCurrTimerIndex(0), m_nMaxCount(0), m_NextRunTimer(NULL), m_blRun(false), m_emEventType(TIMER_DO_EVENT), m_pCond(NULL), m_pMutex(NULL)
+ts_timer::CTimerInfoList::CTimerInfoList() :
+    m_nCurrTimerIndex(0),
+    m_nMaxCount(0),
+    m_NextRunTimer(NULL),
+    m_blRun(false),
+    m_emEventType(TIMER_DO_EVENT),
+    m_nThreadID(0),
+    m_pMutex(NULL),
+    m_pCond(NULL)
 {
 }
 
@@ -256,7 +264,7 @@ bool ts_timer::CTimerInfoList::Add_Timer(ITimerInfo* pTimerInfo)
         }
     }
 
-    if (m_TimerList.size() >= m_nMaxCount)
+    if ((int)m_TimerList.size() >= m_nMaxCount)
     {
         return false;
     }
@@ -290,9 +298,7 @@ std::vector<_Lcm_Info>* ts_timer::CTimerInfoList::Get_Curr_Timer()
         return NULL;
     }
 
-    int nCurrTimerIndex = m_nCurrTimerIndex;
-
-    if (m_nCurrTimerIndex >= m_TimerAssemble.size() - 1)
+    if (m_nCurrTimerIndex >= (int)m_TimerAssemble.size() - 1)
     {
         m_nCurrTimerIndex = 0;
     }
@@ -303,7 +309,6 @@ std::vector<_Lcm_Info>* ts_timer::CTimerInfoList::Get_Curr_Timer()
 void ts_timer::CTimerInfoList::Calculation_Run_Assemble(CTime_Value obj_Now)
 {
     std::vector<_Lcm_Info> vec_Lcm_Info;
-    int nMinInterval = -1;
     int nIndex       = 0;
 
     for (int i = 0; i < (int)m_TimerList.size(); i++)
@@ -324,8 +329,6 @@ void ts_timer::CTimerInfoList::Calculation_Run_Assemble(CTime_Value obj_Now)
     Get_Minimum_Set(vec_Lcm_Info, nData, m_TimerAssemble);
 
     //计算出应该从哪个ID开始
-    int milliseconds = 0;
-
     if (0 == m_TimerAssemble.size())
     {
         return;
@@ -333,7 +336,7 @@ void ts_timer::CTimerInfoList::Calculation_Run_Assemble(CTime_Value obj_Now)
 
     CTime_Value ttBeginTime = GetTimerInfo(m_TimerAssemble[0][0].m_nIndex)->Get_Next_Time();
 
-    for (int i = 0; i < m_TimerAssemble.size(); i++)
+    for (int i = 0; i < (int)m_TimerAssemble.size(); i++)
     {
         CTime_Value ttInterval = ttBeginTime - obj_Now;
 

@@ -142,8 +142,6 @@ namespace ts_timer
         ITimerInfo* GetTimerInfo(int nIndex);                      //得到指定的Timer指针
 
     private:
-        std::vector<ITimerInfo*>             m_TimerList;      //当前定时器对象列表
-        std::vector<std::vector<_Lcm_Info> > m_TimerAssemble;  //执行定时器的计划镜像
         int                                  m_nCurrTimerIndex;//记录当前TimerID
         int                                  m_nMaxCount;      //当前定时器对象最大容量
         ITimerInfo*                          m_NextRunTimer;   //下一次要运行的定时器对象
@@ -159,6 +157,8 @@ namespace ts_timer
         pthread_mutex_t*           m_pMutex;
         pthread_cond_t*            m_pCond;
 #endif
+        std::vector<ITimerInfo*>             m_TimerList;      //当前定时器对象列表
+        std::vector<std::vector<_Lcm_Info> > m_TimerAssemble;  //执行定时器的计划镜像
     };
 }
 

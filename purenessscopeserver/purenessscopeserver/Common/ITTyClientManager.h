@@ -44,6 +44,6 @@ public:
     virtual bool Pause(uint16 u2ConnectID) = 0;                                                              // 暂停端口
     virtual bool Resume(uint16 u2ConnectID) = 0;                                                             // 恢复暂停端口
 
-    virtual bool SendMessage(uint16 u2ConnectID, char*& pMessage, uint32 u4Len, bool blDlete = true) = 0;    // 发送数据
+    virtual bool SendMessage(uint16 u2ConnectID, char*& pMessage, uint32 u4Len) = 0;                         // 发送数据
 };
 #endif

@@ -1,18 +1,18 @@
-#include "ProTTyClientManager.h"
+#include "ReTTyClientManager.h"
 
-CProTTyClientManager::CProTTyClientManager(): m_pProactor(NULL), m_u2MaxListCount(0)
+CReTTyClientManager::CReTTyClientManager(): m_pReactor(NULL), m_u2MaxListCount(0)
 {
 
 }
 
-CProTTyClientManager::~CProTTyClientManager()
+CReTTyClientManager::~CReTTyClientManager()
 {
 
 }
 
-bool CProTTyClientManager::Init(ACE_Proactor* pProactor, uint16 u2MaxTTyCount)
+bool CReTTyClientManager::Init(ACE_Reactor* pReactor, uint16 u2MaxTTyCount)
 {
-    m_pProactor      = pProactor;
+    m_pReactor       = pReactor;
     m_u2MaxListCount = u2MaxTTyCount;
 
     //初始化Hash数组(TCP)
@@ -21,17 +21,17 @@ bool CProTTyClientManager::Init(ACE_Proactor* pProactor, uint16 u2MaxTTyCount)
     return true;
 }
 
-void CProTTyClientManager::Close()
+void CReTTyClientManager::Close()
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 
     //关闭所有已存在的链接
-    vector<CProTTyHandler*> vecTTyClientHandlerInfo;
+    vector<CReTTyHandler*> vecTTyClientHandlerInfo;
     m_objTTyClientHandlerList.Get_All_Used(vecTTyClientHandlerInfo);
 
     for (int i = 0; i < (int)vecTTyClientHandlerInfo.size(); i++)
     {
-        CProTTyHandler* pTTyClientHandler = vecTTyClientHandlerInfo[i];
+        CReTTyHandler* pTTyClientHandler = vecTTyClientHandlerInfo[i];
 
         if (NULL != pTTyClientHandler)
         {
@@ -43,7 +43,7 @@ void CProTTyClientManager::Close()
     m_objTTyClientHandlerList.Close();
 }
 
-bool CProTTyClientManager::Close(uint16 u2ConnectID)
+bool CReTTyClientManager::Close(uint16 u2ConnectID)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 
@@ -51,11 +51,11 @@ bool CProTTyClientManager::Close(uint16 u2ConnectID)
     char szConnectID[MAX_BUFF_20] = { '\0' };
     sprintf_safe(szConnectID, MAX_BUFF_20, "%d", u2ConnectID);
 
-    CProTTyHandler* pTTyClientHandler = m_objTTyClientHandlerList.Get_Hash_Box_Data(szConnectID);
+    CReTTyHandler* pTTyClientHandler = m_objTTyClientHandlerList.Get_Hash_Box_Data(szConnectID);
 
     if (NULL == pTTyClientHandler)
     {
-        OUR_DEBUG((LM_INFO, "[CProTTyClientManager::Close](u2ConnectID=%d) is no exist.\n", u2ConnectID));
+        OUR_DEBUG((LM_INFO, "[CReTTyClientManager::Close](u2ConnectID=%d) is no exist.\n", u2ConnectID));
         return false;
     }
     else
@@ -67,7 +67,7 @@ bool CProTTyClientManager::Close(uint16 u2ConnectID)
     }
 }
 
-bool CProTTyClientManager::Pause(uint16 u2ConnectID)
+bool CReTTyClientManager::Pause(uint16 u2ConnectID)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 
@@ -75,11 +75,11 @@ bool CProTTyClientManager::Pause(uint16 u2ConnectID)
     char szConnectID[MAX_BUFF_20] = { '\0' };
     sprintf_safe(szConnectID, MAX_BUFF_20, "%d", u2ConnectID);
 
-    CProTTyHandler* pTTyClientHandler = m_objTTyClientHandlerList.Get_Hash_Box_Data(szConnectID);
+    CReTTyHandler* pTTyClientHandler = m_objTTyClientHandlerList.Get_Hash_Box_Data(szConnectID);
 
     if (NULL == pTTyClientHandler)
     {
-        OUR_DEBUG((LM_INFO, "[CProTTyClientManager::Pause](u2ConnectID=%d) is no exist.\n", u2ConnectID));
+        OUR_DEBUG((LM_INFO, "[CReTTyClientManager::Pause](u2ConnectID=%d) is no exist.\n", u2ConnectID));
         return false;
     }
     else
@@ -89,7 +89,7 @@ bool CProTTyClientManager::Pause(uint16 u2ConnectID)
     }
 }
 
-bool CProTTyClientManager::Resume(uint16 u2ConnectID)
+bool CReTTyClientManager::Resume(uint16 u2ConnectID)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 
@@ -97,11 +97,11 @@ bool CProTTyClientManager::Resume(uint16 u2ConnectID)
     char szConnectID[MAX_BUFF_20] = { '\0' };
     sprintf_safe(szConnectID, MAX_BUFF_20, "%d", u2ConnectID);
 
-    CProTTyHandler* pTTyClientHandler = m_objTTyClientHandlerList.Get_Hash_Box_Data(szConnectID);
+    CReTTyHandler* pTTyClientHandler = m_objTTyClientHandlerList.Get_Hash_Box_Data(szConnectID);
 
     if (NULL == pTTyClientHandler)
     {
-        OUR_DEBUG((LM_INFO, "[CProTTyClientManager::Resume](u2ConnectID=%d) is no exist.\n", u2ConnectID));
+        OUR_DEBUG((LM_INFO, "[CReTTyClientManager::Resume](u2ConnectID=%d) is no exist.\n", u2ConnectID));
         return false;
     }
     else
@@ -111,7 +111,7 @@ bool CProTTyClientManager::Resume(uint16 u2ConnectID)
     }
 }
 
-bool CProTTyClientManager::SendMessage(uint16 u2ConnectID, char*& pMessage, uint32 u4Len)
+bool CReTTyClientManager::SendMessage(uint16 u2ConnectID, char*& pMessage, uint32 u4Len)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 
@@ -119,11 +119,11 @@ bool CProTTyClientManager::SendMessage(uint16 u2ConnectID, char*& pMessage, uint
     char szConnectID[MAX_BUFF_20] = { '\0' };
     sprintf_safe(szConnectID, MAX_BUFF_20, "%d", u2ConnectID);
 
-    CProTTyHandler* pTTyClientHandler = m_objTTyClientHandlerList.Get_Hash_Box_Data(szConnectID);
+    CReTTyHandler* pTTyClientHandler = m_objTTyClientHandlerList.Get_Hash_Box_Data(szConnectID);
 
     if (NULL == pTTyClientHandler)
     {
-        OUR_DEBUG((LM_INFO, "[CProTTyClientManager::SendMessage](u2ConnectID=%d) is no exist.\n", u2ConnectID));
+        OUR_DEBUG((LM_INFO, "[CReTTyClientManager::SendMessage](u2ConnectID=%d) is no exist.\n", u2ConnectID));
         return false;
     }
     else
@@ -132,7 +132,7 @@ bool CProTTyClientManager::SendMessage(uint16 u2ConnectID, char*& pMessage, uint
     }
 }
 
-int CProTTyClientManager::Connect(uint16 u2ConnectID, const char* pName, _TTyDevParam& inParam, ITTyMessage* pMessageRecv)
+int CReTTyClientManager::Connect(uint16 u2ConnectID, const char* pName, _TTyDevParam& inParam, ITTyMessage* pMessageRecv)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 
@@ -140,15 +140,15 @@ int CProTTyClientManager::Connect(uint16 u2ConnectID, const char* pName, _TTyDev
     char szConnectID[MAX_BUFF_20] = { '\0' };
     sprintf_safe(szConnectID, MAX_BUFF_20, "%d", u2ConnectID);
 
-    CProTTyHandler* pTTyClientHandler = m_objTTyClientHandlerList.Get_Hash_Box_Data(szConnectID);
+    CReTTyHandler* pTTyClientHandler = m_objTTyClientHandlerList.Get_Hash_Box_Data(szConnectID);
 
     if (NULL != pTTyClientHandler)
     {
-        OUR_DEBUG((LM_INFO, "[CProTTyClientManager::Connect](%s) is exist.\n", pName));
+        OUR_DEBUG((LM_INFO, "[CReTTyClientManager::Connect](%s) is exist.\n", pName));
         return -1;
     }
 
-    pTTyClientHandler = new CProTTyHandler();
+    pTTyClientHandler = new CReTTyHandler();
 
     //匹配相关参数
     ACE_TTY_IO::Serial_Params inTTyParams;
@@ -170,18 +170,18 @@ int CProTTyClientManager::Connect(uint16 u2ConnectID, const char* pName, _TTyDev
     inTTyParams.readmincharacters = inParam.m_u4Readmincharacters;
 
     //绑定反应器
-    pTTyClientHandler->proactor(m_pProactor);
+    pTTyClientHandler->reactor(m_pReactor);
 
     if (false == pTTyClientHandler->Init(u2ConnectID, pName, inTTyParams, pMessageRecv))
     {
-        OUR_DEBUG((LM_INFO, "[CProTTyClientManager::Connect](%s)pTTyClientHandler Init Error.\n", pName));
+        OUR_DEBUG((LM_INFO, "[CReTTyClientManager::Connect](%s)pTTyClientHandler Init Error.\n", pName));
         SAFE_DELETE(pTTyClientHandler);
         return -1;
     }
 
     if (false == m_objTTyClientHandlerList.Add_Hash_Data(szConnectID, pTTyClientHandler))
     {
-        OUR_DEBUG((LM_INFO, "[CProTTyClientManager::Connect](%s)Add_Hash_Data Error.\n", pName));
+        OUR_DEBUG((LM_INFO, "[CReTTyClientManager::Connect](%s)Add_Hash_Data Error.\n", pName));
         SAFE_DELETE(pTTyClientHandler);
         return -1;
     }
@@ -189,7 +189,7 @@ int CProTTyClientManager::Connect(uint16 u2ConnectID, const char* pName, _TTyDev
     return 0;
 }
 
-bool CProTTyClientManager::GetClientDevInfo(uint16 u2ConnectID, _TTyDevParam& outParam)
+bool CReTTyClientManager::GetClientDevInfo(uint16 u2ConnectID, _TTyDevParam& outParam)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 
@@ -197,11 +197,11 @@ bool CProTTyClientManager::GetClientDevInfo(uint16 u2ConnectID, _TTyDevParam& ou
     char szConnectID[MAX_BUFF_20] = { '\0' };
     sprintf_safe(szConnectID, MAX_BUFF_20, "%d", u2ConnectID);
 
-    CProTTyHandler* pTTyClientHandler = m_objTTyClientHandlerList.Get_Hash_Box_Data(szConnectID);
+    CReTTyHandler* pTTyClientHandler = m_objTTyClientHandlerList.Get_Hash_Box_Data(szConnectID);
 
     if (NULL == pTTyClientHandler)
     {
-        OUR_DEBUG((LM_INFO, "[CProTTyClientManager::GetClientDevInfo](u2ConnectID=%d) is no exist.\n", u2ConnectID));
+        OUR_DEBUG((LM_INFO, "[CReTTyClientManager::GetClientDevInfo](u2ConnectID=%d) is no exist.\n", u2ConnectID));
         return false;
     }
 
@@ -224,7 +224,7 @@ bool CProTTyClientManager::GetClientDevInfo(uint16 u2ConnectID, _TTyDevParam& ou
     return true;
 }
 
-bool CProTTyClientManager::IsConnect(uint16 u2ConnectID)
+bool CReTTyClientManager::IsConnect(uint16 u2ConnectID)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 
@@ -232,11 +232,11 @@ bool CProTTyClientManager::IsConnect(uint16 u2ConnectID)
     char szConnectID[MAX_BUFF_20] = { '\0' };
     sprintf_safe(szConnectID, MAX_BUFF_20, "%d", u2ConnectID);
 
-    CProTTyHandler* pTTyClientHandler = m_objTTyClientHandlerList.Get_Hash_Box_Data(szConnectID);
+    CReTTyHandler* pTTyClientHandler = m_objTTyClientHandlerList.Get_Hash_Box_Data(szConnectID);
 
     if (NULL == pTTyClientHandler)
     {
-        OUR_DEBUG((LM_INFO, "[ CProTTyClientManager::IsConnect](u2ConnectID=%d) is no exist.\n", u2ConnectID));
+        OUR_DEBUG((LM_INFO, "[ CReTTyClientManager::IsConnect](u2ConnectID=%d) is no exist.\n", u2ConnectID));
         return false;
     }
 
