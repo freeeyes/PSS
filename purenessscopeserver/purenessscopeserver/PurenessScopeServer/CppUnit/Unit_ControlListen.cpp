@@ -46,7 +46,7 @@ void CUnit_ControlListen::Test_ControlListen(void)
         return;
     }
 
-    if (false == m_pControlListen->DelListen("127.0.0.1", 10005))
+    if (false == m_pControlListen->DelListen("127.0.0.1", 10007))
     {
         OUR_DEBUG((LM_INFO, "[Test_ControlListen]m_pControlListen->AddListen() Error.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_ControlListen]m_pControlListen->AddListen() Error.", true == blRet);

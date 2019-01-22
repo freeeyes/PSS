@@ -7,7 +7,7 @@ CReTTyClientManager::CReTTyClientManager(): m_pReactor(NULL), m_u2MaxListCount(0
 
 CReTTyClientManager::~CReTTyClientManager()
 {
-
+    Close();
 }
 
 bool CReTTyClientManager::Init(ACE_Reactor* pReactor, uint16 u2MaxTTyCount)

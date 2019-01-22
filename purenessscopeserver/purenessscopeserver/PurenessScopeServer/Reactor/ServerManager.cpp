@@ -232,6 +232,9 @@ bool CServerManager::Run()
     //启动中间服务器链接管理器
     App_ClientReConnectManager::instance()->Init(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_POSTDEFINE));
 
+    //初始化TTy连接管理器
+    App_ReTTyClientManager::instance()->Init(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_POSTDEFINE), MAX_BUFF_100);
+
     uint16 u2ServerPortCount = (uint16)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
 
     //创建和启动TCP反应器
@@ -585,6 +588,8 @@ bool CServerManager::Close()
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ModuleLoader OK.\n"));
     App_ClientReConnectManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ClientReConnectManager OK.\n"));
+    App_ReTTyClientManager::instance()->Close();
+    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ReTTyClientManager OK.\n"));
     App_ModuleLoader::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_MessageManager OK.\n"));
     App_ServerMessageTask::instance()->Close();

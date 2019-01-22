@@ -28,6 +28,27 @@ struct _TTyDevParam // 尽量与ACE_TTY_IO::Serial_Params保持一致方便赋值
     int           m_nXOnlim;                // XON
     int           m_nXOfflim;               // XOFF
     unsigned int  m_u4Readmincharacters;
+
+    _TTyDevParam()
+    {
+        m_szDevName[0]        = '\0';
+        m_nBaudRate           = 19200;
+        m_uDatabits           = 8;
+        m_uStopbits           = 1;
+        m_pParitymode         = "NONE";
+        m_blCTSenb            = 0;
+        m_uRTSenb             = 0;
+        m_blDSRenb            = 0;
+        m_blDTRdisable        = 0;
+        m_nReadtimeoutmsec    = 0;
+        m_blXinenb            = 0;
+        m_blXoutenb           = 0;
+        m_blModem             = 0;
+        m_blRcvenb            = 1;
+        m_nXOnlim             = 0;
+        m_nXOfflim            = 0;
+        m_u4Readmincharacters = 0;
+    }
 };
 
 //文件描述符管理类

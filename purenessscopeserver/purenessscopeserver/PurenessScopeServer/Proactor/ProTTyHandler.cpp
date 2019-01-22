@@ -10,7 +10,9 @@ CProTTyHandler::~CProTTyHandler()
 {
     Close();
 
-    delete m_pmbReadBuff;
+    //回收资源
+    SAFE_DELETE(m_pTTyMessage);
+    SAFE_DELETE(m_pmbReadBuff);
 }
 
 bool CProTTyHandler::ConnectTTy()

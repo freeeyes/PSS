@@ -9,6 +9,9 @@ CReTTyHandler::CReTTyHandler() : m_blState(false), m_blPause(false), m_pTTyMessa
 CReTTyHandler::~CReTTyHandler()
 {
     Close();
+
+    //回收资源
+    SAFE_DELETE(m_pTTyMessage);
     SAFE_DELETE(m_pmbReadBuff);
 }
 

@@ -320,6 +320,9 @@ bool CProServerManager::Start()
     //初始化服务器间通讯类
     App_ClientProConnectManager::instance()->Init(App_ProactorManager::instance()->GetAce_Proactor(REACTOR_POSTDEFINE));
 
+    //初始化TTy连接管理器
+    App_ProTTyClientManager::instance()->Init(App_ProactorManager::instance()->GetAce_Proactor(REACTOR_POSTDEFINE), MAX_BUFF_100);
+
     //启动中间服务器链接管理器定时器
     App_ClientProConnectManager::instance()->StartConnectTask(GetXmlConfigAttribute(xmlConnectServer)->TimeCheck);
 
@@ -372,6 +375,9 @@ bool CProServerManager::Close()
 
     App_ClientProConnectManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ClientProConnectManager OK.\n"));
+
+    App_ProTTyClientManager::instance()->Close();
+    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ProTTyClientManager OK.\n"));
 
     App_ModuleLoader::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ModuleLoader OK.\n"));
