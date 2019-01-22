@@ -50,34 +50,6 @@ void CUnit_TTyClientManager::Test_TTyClientManager(void)
     App_ReTTyClientManager::instance()->Close(u2ConnectID);
 }
 
-void CUnit_TTyClientManager::Test_TTyHandler(void)
-{
-    bool blRet = false;
-    CReTTyHandler objReTTyHandler;
-    _TTyDevParam inParam;
-
-    objReTTyHandler.GetParams();
-
-    objReTTyHandler.SetPause(false);
-
-    blRet = objReTTyHandler.GetPause();
-
-    siginfo_t* psinfo   = NULL;
-    ucontext_t* context = NULL;
-    objReTTyHandler.handle_signal(0, psinfo, context);
-
-    ACE_HANDLE handle           = ACE_INVALID_HANDLE;
-    ACE_Reactor_Mask close_mask = 0;
-    objReTTyHandler.handle_close(handle, close_mask);
-
-    ACE_Time_Value tvNow;
-    objReTTyHandler.handle_timeout(tvNow, NULL);
-
-    objReTTyHandler.Close();
-
-    CPPUNIT_ASSERT_MESSAGE("[Test_TTyHandler]m_nBaudRate is fail.", true == blRet);
-}
-
 #endif
 
 

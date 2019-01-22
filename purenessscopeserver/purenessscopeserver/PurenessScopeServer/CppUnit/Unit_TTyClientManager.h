@@ -27,7 +27,6 @@ class CUnit_TTyClientManager : public CppUnit::TestFixture
 {
     CPPUNIT_TEST_SUITE(CUnit_TTyClientManager);
     CPPUNIT_TEST(Test_TTyClientManager);
-    CPPUNIT_TEST(Test_TTyHandler);
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -38,8 +37,6 @@ public:
     virtual void tearDown(void);
 
     void Test_TTyClientManager(void);
-
-    void Test_TTyHandler(void);
 };
 
 #endif
