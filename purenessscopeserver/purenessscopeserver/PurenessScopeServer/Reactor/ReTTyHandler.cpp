@@ -109,7 +109,7 @@ int CReTTyHandler::handle_input(ACE_HANDLE handle)
     }
     else
     {
-        if (NULL != m_pTTyMessage && true == m_blPause)
+        if (NULL != m_pTTyMessage && false == m_blPause)
         {
             //回调接收数据函数
             m_pTTyMessage->RecvData(m_u4ConnectID, m_pmbReadBuff->rd_ptr(), (uint32)bytes_read);
@@ -151,7 +151,7 @@ bool CReTTyHandler::Send_Data(const char* pData, ssize_t nLen)
     //如果连接已断开，这里尝试重连
     ConnectTTy();
 
-    if (true == m_blState && true == m_blPause)
+    if (true == m_blState && false == m_blPause)
     {
         if (nLen != m_ReTtyio.send_n(pData, nLen))
         {

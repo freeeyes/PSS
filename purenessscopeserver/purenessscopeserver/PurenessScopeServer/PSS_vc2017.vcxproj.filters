@@ -376,6 +376,18 @@
     <ClCompile Include="CppUnit\Uint_TcpRedirection.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="Reactor\ReTTyClientManager.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor\ReTTyHandler.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Proactor\ProTTyClientManager.cpp">
+      <Filter>Proactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Proactor\ProTTyHandler.cpp">
+      <Filter>Proactor\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -875,6 +887,18 @@
     </ClInclude>
     <ClInclude Include="CppUnit\Uint_TcpRedirection.h">
       <Filter>CppUnit\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\ReTTyHandler.h">
+      <Filter>Reactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\ReTTyClientManager.h">
+      <Filter>Reactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Proactor\ProTTyClientManager.h">
+      <Filter>Proactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Proactor\ProTTyHandler.h">
+      <Filter>Proactor\hfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
