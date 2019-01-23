@@ -30,6 +30,9 @@
 	<!-- 测试Tcp插件加载流程的用例 -->
 	<ModuleManager MaxCount="100" desc="框架支持的最大插件数量" />
 	
+	<!--TTy串口,红外和蓝牙接口连接管理器对应配置参数,MaxDevCount是设备的最大连接上限,timecheck是自检周期,单位是秒 -->
+	<TTYClient MaxDevCount="100" TimeCheck="120" />	
+	
 	<!-- 允许插件设置个性化,可以多个,这里可以单独设置每个插件的不同参数,可以与Module设置同时生效,亦可不用此设置 -->
 	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="Monitord.dll" ModuleSParam="" Desc="ModuleParam为插件启动参数"/> -->
 	<!-- <ModuleInfo ModuleSPath="./" ModuleSName="RealTimeMonitord.dll" ModuleSParam="../../example-Module/RealTimeMonitor/Config.conf" Desc="ModuleParam为插件启动参数"/> -->

@@ -321,7 +321,9 @@ bool CProServerManager::Start()
     App_ClientProConnectManager::instance()->Init(App_ProactorManager::instance()->GetAce_Proactor(REACTOR_POSTDEFINE));
 
     //初始化TTy连接管理器
-    App_ProTTyClientManager::instance()->Init(App_ProactorManager::instance()->GetAce_Proactor(REACTOR_POSTDEFINE), MAX_BUFF_100);
+    App_ProTTyClientManager::instance()->Init(App_ProactorManager::instance()->GetAce_Proactor(REACTOR_POSTDEFINE),
+            GetXmlConfigAttribute(xmlTTyClientManagerInfo)->MaxTTyDevCount,
+            GetXmlConfigAttribute(xmlTTyClientManagerInfo)->TimeCheck);
 
     //启动中间服务器链接管理器定时器
     App_ClientProConnectManager::instance()->StartConnectTask(GetXmlConfigAttribute(xmlConnectServer)->TimeCheck);

@@ -27,6 +27,7 @@ enum XmlConfig
     /********连接信息********/
     XML_Config_ConnectServer,
     XML_Config_ClientInfo,
+    XML_Config_TTyClientManager,
     /********模块设置********/
     XML_Config_ModuleInfos,
     XML_Config_ModuleMangager,
@@ -166,6 +167,7 @@ private:
     void SetNetByteOrder(const std::string& pData);
 };
 
+//Tcp监听服务器列表
 class xmlTCPServerIPs : public IConfigOpeation
 {
 public:
@@ -183,6 +185,7 @@ public:
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
+//Udp监听端口信息
 class xmlUDPServerIPs : public IConfigOpeation
 {
 public:
@@ -201,6 +204,7 @@ public:
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
+//服务器间连接信息
 class xmlConnectServer : public IConfigOpeation
 {
 public:
@@ -436,7 +440,15 @@ public:
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
-
+//TTy相关管理配置
+class xmlTTyClientManagerInfo : public IConfigOpeation
+{
+public:
+    uint16 MaxTTyDevCount;
+    uint16 TimeCheck;
+    xmlTTyClientManagerInfo(XmlConfig config, const char* name) : IConfigOpeation(config, name), MaxTTyDevCount(MAX_BUFF_100), TimeCheck(120) {}
+    bool Init(CXmlOpeation* pXmlOperation);
+};
 
 /****************************alert.xml*****************************/
 class xmlAlertConnect : public IConfigOpeation

@@ -233,7 +233,9 @@ bool CServerManager::Run()
     App_ClientReConnectManager::instance()->Init(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_POSTDEFINE));
 
     //初始化TTy连接管理器
-    App_ReTTyClientManager::instance()->Init(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_POSTDEFINE), MAX_BUFF_100);
+    App_ReTTyClientManager::instance()->Init(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_POSTDEFINE),
+            GetXmlConfigAttribute(xmlTTyClientManagerInfo)->MaxTTyDevCount,
+            GetXmlConfigAttribute(xmlTTyClientManagerInfo)->TimeCheck);
 
     uint16 u2ServerPortCount = (uint16)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
 

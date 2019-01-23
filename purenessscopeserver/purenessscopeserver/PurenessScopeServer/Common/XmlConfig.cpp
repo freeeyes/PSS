@@ -25,6 +25,7 @@ DefineClassAndFunc(xmlTCPServerIPs, XML_Config_TCPServerIPs)
 DefineClassAndFunc(xmlUDPServerIPs, XML_Config_UDPServerIPs)
 DefineClassAndFunc(xmlConnectServer, XML_Config_ConnectServer)
 DefineClassAndFunc(xmlClientInfo, XML_Config_ClientInfo)
+DefineClassAndFunc(xmlTTyClientManagerInfo, XML_Config_TTyClientManager)
 DefineClassAndFunc(xmlModuleInfos, XML_Config_ModuleInfos)
 DefineClassAndFunc(xmlModuleMangager, XML_Config_ModuleMangager)
 DefineClassAndFunc(xmlMonitor, XML_Config_Monitor)
@@ -452,6 +453,20 @@ bool xmlMessage::Init(CXmlOpeation* pXmlOperation)
 
     return bKet;
 }
+
+bool xmlTTyClientManagerInfo::Init(CXmlOpeation* pXmlOperation)
+{
+    bool bKet = false;
+
+    if (pXmlOperation->Read_XML_Data_Single_Uint16("TTYClient", "MaxDevCount", MaxTTyDevCount)
+        && pXmlOperation->Read_XML_Data_Single_Uint16("TTYClient", "TimeCheck", TimeCheck))
+    {
+        bKet = true;
+    }
+
+    return bKet;
+}
+
 
 /******************************alert.xml***************************************/
 bool xmlAlertConnect::Init(CXmlOpeation* pXmlOperation)

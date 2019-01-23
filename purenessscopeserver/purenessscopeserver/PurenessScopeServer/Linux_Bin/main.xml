@@ -24,6 +24,8 @@
 	<!-- 消息处理线程相关参数设置 -->
 	<Message Msg_High_mark="64000" Msg_Low_mark="64000" Msg_Buff_Max_Size="20480" Msg_Process="1" Msg_Thread="3" Msg_MaxQueue="10000" desc="消息处理线程相关参数设置，" />
 	<ModuleManager MaxCount="100" desc="框架支持的最大插件数量" />
+	<!--TTy串口,红外和蓝牙接口连接管理器对应配置参数,MaxDevCount是设备的最大连接上限,timecheck是自检周期,单位是秒 -->
+	<TTYClient MaxDevCount="100" TimeCheck="120" />	
 	<!-- <Module ModuleSPath="./" ModuleString="libAutoTest.so" ModuleSParam="" desc="模块加载配置相关参数，ModulePath是路径，ModuleString是模块名称，以逗号隔开"/> -->
 	<ModuleInfo ModuleSPath="./" ModuleSName="libTcpTest.so" ModuleSParam="" Desc="ModuleParam为插件启动参数"/>
 	<ModuleInfo ModuleSPath="./" ModuleSName="libUDPTest.so" ModuleSParam="" Desc="ModuleParam为插件启动参数"/>

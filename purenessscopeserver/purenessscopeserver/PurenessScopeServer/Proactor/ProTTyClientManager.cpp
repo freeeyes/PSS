@@ -1,6 +1,6 @@
 #include "ProTTyClientManager.h"
 
-CProTTyClientManager::CProTTyClientManager(): m_pProactor(NULL), m_u2MaxListCount(0)
+CProTTyClientManager::CProTTyClientManager(): m_pProactor(NULL), m_u2MaxListCount(MAX_BUFF_100), m_u2TimeCheck(120), m_nTaskID(-1)
 {
 
 }
@@ -10,13 +10,41 @@ CProTTyClientManager::~CProTTyClientManager()
 
 }
 
-bool CProTTyClientManager::Init(ACE_Proactor* pProactor, uint16 u2MaxTTyCount)
+bool CProTTyClientManager::StartConnectTask()
+{
+    CancelConnectTask();
+    m_nTaskID = App_TimerManager::instance()->schedule(this, (void*)NULL, ACE_OS::gettimeofday() + ACE_Time_Value(m_u2TimeCheck), ACE_Time_Value(m_u2TimeCheck));
+
+    if (m_nTaskID == -1)
+    {
+        OUR_DEBUG((LM_ERROR, "[CReTTyClientManager::StartConnectTask].StartConnectTask is fail, time is (%d).\n", m_u2TimeCheck));
+        return false;
+    }
+
+    return true;
+}
+
+void CProTTyClientManager::CancelConnectTask()
+{
+    if (m_nTaskID != -1)
+    {
+        //杀死之前的定时器，重新开启新的定时器
+        App_TimerManager::instance()->cancel(m_nTaskID);
+        m_nTaskID = -1;
+    }
+}
+
+bool CProTTyClientManager::Init(ACE_Proactor* pProactor, uint16 u2MaxTTyCount, uint16 u2TimeCheck)
 {
     m_pProactor      = pProactor;
     m_u2MaxListCount = u2MaxTTyCount;
+    m_u2TimeCheck    = u2TimeCheck;
 
     //初始化Hash数组(TCP)
     m_objTTyClientHandlerList.Init((int)m_u2MaxListCount);
+
+    //启动定时器
+    StartConnectTask();
 
     return true;
 }
@@ -24,6 +52,9 @@ bool CProTTyClientManager::Init(ACE_Proactor* pProactor, uint16 u2MaxTTyCount)
 void CProTTyClientManager::Close()
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
+
+    //关闭定时器
+    CancelConnectTask();
 
     //关闭所有已存在的链接
     vector<CProTTyHandler*> vecTTyClientHandlerInfo;
@@ -130,6 +161,32 @@ bool CProTTyClientManager::SendMessage(uint16 u2ConnectID, char*& pMessage, uint
     {
         return pTTyClientHandler->Send_Data(pMessage, u4Len);
     }
+}
+
+int CProTTyClientManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
+{
+    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
+
+    ACE_UNUSED_ARG(tv);
+    ACE_UNUSED_ARG(arg);
+
+    OUR_DEBUG((LM_INFO, "[CProTTyClientManager::handle_timeout](%d) Run.\n", m_objTTyClientHandlerList.Get_Count()));
+
+    //关闭所有已存在的链接
+    vector<CProTTyHandler*> vecTTyClientHandlerInfo;
+    m_objTTyClientHandlerList.Get_All_Used(vecTTyClientHandlerInfo);
+
+    for (int i = 0; i < (int)vecTTyClientHandlerInfo.size(); i++)
+    {
+        CProTTyHandler* pTTyClientHandler = vecTTyClientHandlerInfo[i];
+
+        if (NULL != pTTyClientHandler)
+        {
+            pTTyClientHandler->ConnectTTy();
+        }
+    }
+
+    return 0;
 }
 
 int CProTTyClientManager::Connect(uint16 u2ConnectID, const char* pName, _TTyDevParam& inParam, ITTyMessage* pMessageRecv)
