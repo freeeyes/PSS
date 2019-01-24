@@ -427,7 +427,7 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
         for (int jLoop = 0; jLoop < (int)vecExistList.size(); jLoop++)
         {
             uint32 u4ConnectID = vecExistList[jLoop]->m_u4ConnectID;
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
             App_ProConnectManager::instance()->handle_write_file_stream(u4ConnectID, objFileTestDataInfo.m_szData, objFileTestDataInfo.m_u4DataLength, m_u4ParseID);
 #else
             App_ConnectManager::instance()->handle_write_file_stream(u4ConnectID, objFileTestDataInfo.m_szData, objFileTestDataInfo.m_u4DataLength, m_u4ParseID);

@@ -1,7 +1,9 @@
 #ifndef _WINDOWSPROCESS_H
 #define _WINDOWSPROCESS_H
 
-#ifdef WIN32
+#include "define.h"
+
+#if PSS_PLATFORM == PLATFORM_WIN
 
 #include "ace/Log_Msg.h"
 #include "ace/Get_Opt.h"

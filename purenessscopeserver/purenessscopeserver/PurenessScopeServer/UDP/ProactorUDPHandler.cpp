@@ -52,7 +52,7 @@ int CProactorUDPHandler::OpenAddress(const ACE_INET_Addr& AddrLocal, ACE_Proacto
     ACE_OS::setsockopt(m_skRemote.get_handle(), SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(timeout));
 
     //Linux下无此对应宏，为了考虑通用，这部分只在windows下设置
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
     //设置wsaIoctl
     bool blBehavior = false;
     unsigned long lRet = 0;

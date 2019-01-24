@@ -20,7 +20,7 @@ uint32 CAceReactor::GetReactorID()
     return m_u4ReactorID;
 }
 
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
 void CAceReactor::Create_Reactor_WFMO()
 {
     ACE_WFMO_Reactor* wfmoreactor = new ACE_WFMO_Reactor();
@@ -128,7 +128,7 @@ bool CAceReactor::Init(int nReactorType, int nThreadCount, int nMaxHandleCount)
     {
         switch (nReactorType)
         {
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
 
         case Reactor_WFMO:    //这个功能限制于Windows操作的默认反应器，如果是COM服务器可以使用Reactor_WFMO_msg
             Create_Reactor_WFMO();

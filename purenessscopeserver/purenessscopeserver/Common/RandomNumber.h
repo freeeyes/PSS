@@ -5,8 +5,9 @@
 //给出指定范围，产生出随机数。
 
 #include <stdlib.h>
+#include "define.h"
 
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
 #include "windows.h"
 #include "wincrypt.h"
 #else

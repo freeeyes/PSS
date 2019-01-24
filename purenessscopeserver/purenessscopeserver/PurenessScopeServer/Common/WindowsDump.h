@@ -1,7 +1,9 @@
 #ifndef _WINDOWSDUMP_H
 #define _WINDOWSDUMP_H
 
-#ifdef WIN32
+#include "define.h"
+
+#if PSS_PLATFORM == PLATFORM_WIN
 
 #include <Windows.h>
 #include <dbghelp.h>

@@ -47,7 +47,7 @@ bool CAceProactor::Init(int nProactorType, int nThreadCount)
     {
         switch (nProactorType)
         {
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
 
         case Proactor_WIN32:    //这个功能限制于Windows操作的默认反应器，如果是COM服务器可以使用Proactor_WFMO_msg
             {

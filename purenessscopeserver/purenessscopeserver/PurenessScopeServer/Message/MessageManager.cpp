@@ -8,7 +8,7 @@
 // 2009-01-29
 
 #include "MessageManager.h"
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
 #include "ProConnectHandler.h"
 #else
 #include "ConnectHandler.h"

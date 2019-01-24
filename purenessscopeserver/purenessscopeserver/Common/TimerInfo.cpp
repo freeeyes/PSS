@@ -113,7 +113,7 @@ void ts_timer::ITimerInfo::Do_Error_Events(int nLastRunTimerID, int nTimeoutTime
 }
 
 //定时器列表类
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
 CRITICAL_SECTION* ts_timer::CTimerInfoList::Get_mutex()
 #else
 pthread_mutex_t* ts_timer::CTimerInfoList::Get_mutex()
@@ -155,7 +155,7 @@ ts_timer::EM_Event_Type ts_timer::CTimerInfoList::Get_Event_Type()
     return m_emEventType;
 }
 
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
 CONDITION_VARIABLE* ts_timer::CTimerInfoList::Get_cond()
 #else
 pthread_cond_t* ts_timer::CTimerInfoList::Get_cond()
@@ -164,7 +164,7 @@ pthread_cond_t* ts_timer::CTimerInfoList::Get_cond()
     return m_pCond;
 }
 
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
 void ts_timer::CTimerInfoList::Set_Thread_ID(DWORD nThreadID)
 #else
 void ts_timer::CTimerInfoList::Set_Thread_ID(pthread_t nThreadID)
@@ -173,7 +173,7 @@ void ts_timer::CTimerInfoList::Set_Thread_ID(pthread_t nThreadID)
     m_nThreadID = nThreadID;
 }
 
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
 DWORD ts_timer::CTimerInfoList::Get_Thread_ID()
 #else
 pthread_t ts_timer::CTimerInfoList::Get_Thread_ID()
@@ -184,7 +184,7 @@ pthread_t ts_timer::CTimerInfoList::Get_Thread_ID()
 
 void ts_timer::CTimerInfoList::Lock()
 {
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
     EnterCriticalSection(m_pMutex);
 #else
     pthread_mutex_lock(m_pMutex);
@@ -193,7 +193,7 @@ void ts_timer::CTimerInfoList::Lock()
 
 void ts_timer::CTimerInfoList::UnLock()
 {
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
     LeaveCriticalSection(m_pMutex);
 #else
     pthread_mutex_unlock(m_pMutex);
@@ -202,7 +202,7 @@ void ts_timer::CTimerInfoList::UnLock()
 
 void ts_timer::CTimerInfoList::Init(int nMaxCount /*= MAX_TIMER_LIST_COUNT*/)
 {
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
     m_pMutex = new CRITICAL_SECTION();
     m_pCond = new CONDITION_VARIABLE();
 #else
@@ -210,7 +210,7 @@ void ts_timer::CTimerInfoList::Init(int nMaxCount /*= MAX_TIMER_LIST_COUNT*/)
     m_pCond = new pthread_cond_t();
 #endif
 
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
     InitializeConditionVariable(m_pCond);
     InitializeCriticalSection(m_pMutex);
 #else
@@ -225,7 +225,7 @@ void ts_timer::CTimerInfoList::Close()
 {
     if (NULL != m_pMutex && NULL != m_pCond)
     {
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         DeleteCriticalSection(m_pMutex);
         delete m_pMutex;
         delete m_pCond;

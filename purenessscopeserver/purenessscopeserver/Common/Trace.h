@@ -3,8 +3,9 @@
 
 #include "stdio.h"
 #include "stdlib.h"
+#include "define.h"
 
-#ifdef _WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
 #include <windows.h>
 #include <process.h>
 #else

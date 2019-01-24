@@ -56,7 +56,7 @@ std::string ts_timer::CTime_Value::Get_string()
 
     if (true == IsZero())
     {
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         sprintf_s(szData, 50, "1970-01-01 00:00:00");
 #else
         snprintf(szData, 50, "1970-01-01 00:00:00");
@@ -66,7 +66,7 @@ std::string ts_timer::CTime_Value::Get_string()
     {
         struct tm tmDate;
 
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         localtime_s(&tmDate, &m_tv_sec);
 
         sprintf_s(szData, 50, "%04d-%02d-%02d %02d:%02d:%02d %03d", tmDate.tm_year + 1900,

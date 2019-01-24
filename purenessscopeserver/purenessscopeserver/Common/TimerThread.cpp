@@ -2,7 +2,7 @@
 
 
 //定时器线程
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
 DWORD WINAPI thr_fn(void* arg)
 #else
 void* thr_fn(void* arg)
@@ -71,7 +71,7 @@ void* thr_fn(void* arg)
 
         if (nInterval >= 0 && pTimerInfoList->Get_Event_Type() != ts_timer::TIMER_PAUSE && pTimerInfoList->GetCurrTimerCount() > 0)
         {
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
             SleepConditionVariableCS(reinterpret_cast<PCONDITION_VARIABLE>(pTimerInfoList->Get_cond()),
                                      reinterpret_cast<PCRITICAL_SECTION>(pTimerInfoList->Get_mutex()),
                                      nInterval);
@@ -101,7 +101,7 @@ void* thr_fn(void* arg)
             //定时器暂停或者列表无数据
             if (pTimerInfoList->Get_Event_Type() == ts_timer::TIMER_PAUSE || pTimerInfoList->GetCurrTimerCount() == 0)
             {
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
                 SleepConditionVariableCS(reinterpret_cast<PCONDITION_VARIABLE>(pTimerInfoList->Get_cond()),
                                          reinterpret_cast<PCRITICAL_SECTION>(pTimerInfoList->Get_mutex()),
                                          INFINITE);
@@ -205,7 +205,7 @@ void ts_timer::CTimerThread::Run()
 {
     m_TimerInfoList.Set_Run(true);
 
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
     DWORD nThreadID = 0;
     CreateThread(NULL, 0, thr_fn, (PVOID)&m_TimerInfoList, 0, &nThreadID);
     m_TimerInfoList.Set_Thread_ID(nThreadID);
@@ -297,7 +297,7 @@ void ts_timer::CTimerThread::Modify(EM_Event_Type emType)
 
     if (NULL != m_TimerInfoList.Get_cond())
     {
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         WakeAllConditionVariable(m_TimerInfoList.Get_cond());
 #else
         pthread_cond_signal(m_TimerInfoList.Get_cond());

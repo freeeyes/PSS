@@ -1,5 +1,5 @@
-#ifdef WIN32
 #include "ProgramService.h"
+#if PSS_PLATFORM == PLATFORM_WIN
 
 CProgramService::CProgramService(void)
 {

@@ -259,7 +259,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
             //直接返回应急数据给客户端，不在到逻辑里去处理
 
             char* ptrReturnData = m_WorkThreadAI.GetReturnData();
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
             App_ProConnectManager::instance()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID,
                     ptrReturnData,
                     m_WorkThreadAI.GetReturnDataLength(),
@@ -984,7 +984,7 @@ bool CMessageServiceGroup::CheckCPUAndMemory(bool blTest)
 {
     if (GetXmlConfigAttribute(xmlMonitor)->CpuAndMemory == 1 || true == blTest)
     {
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         uint32 u4CurrCpu = (uint32)GetProcessCPU_Idel();
 #else
         uint32 u4CurrCpu = (uint32)GetProcessCPU_Idel_Linux();

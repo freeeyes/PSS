@@ -19,7 +19,7 @@
 #include "MessageDyeingManager.h"
 #include "ObjectLru.h"
 
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
 #include "ProConnectHandler.h"
 #include "WindowsCPU.h"
 #else

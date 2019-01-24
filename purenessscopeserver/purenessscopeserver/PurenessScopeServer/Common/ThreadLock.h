@@ -6,13 +6,14 @@
 #ifndef _THREADLOCK_H
 #define _THREADLOCK_H
 
-#ifdef WIN32
+#include "define.h"
+#if PSS_PLATFORM == PLATFORM_WIN
 #include <Windows.h>
 #else
 #include <pthread.h>
 #endif
 
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
 #define LOCK_MUTEXT CRITICAL_SECTION
 #else
 #define LOCK_MUTEXT pthread_mutex_t
@@ -35,7 +36,7 @@ public:
 
     void Init()
     {
-#ifdef _WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         InitializeCriticalSection(&m_lock);
 #else
         pthread_mutex_init(&m_lock, NULL);
@@ -44,7 +45,7 @@ public:
 
     void Close()
     {
-#ifdef _WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         DeleteCriticalSection(&m_lock);
 #else
         pthread_mutex_destroy(&m_lock);
@@ -54,7 +55,7 @@ public:
     void Lock()
     {
         m_Time = ACE_OS::gettimeofday();
-#ifdef _WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         EnterCriticalSection(&m_lock);
 #else
         pthread_mutex_lock(&m_lock);
@@ -65,7 +66,7 @@ public:
     {
         m_Time = ACE_OS::gettimeofday() - m_Time;
 
-#ifdef _WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         LeaveCriticalSection(&m_lock);
 #else
         pthread_mutex_unlock(&m_lock);

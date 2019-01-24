@@ -1,8 +1,8 @@
 #ifndef _WINDOWSCPU_H
 #define _WINDOWSCPU_H
 
-#ifdef WIN32
 #include "define.h"
+#if PSS_PLATFORM == PLATFORM_WIN
 #include <windows.h>
 #include <Psapi.h>
 #include <conio.h>

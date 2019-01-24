@@ -39,6 +39,19 @@ using namespace std;
 
 BEGIN_NAMESPACE
 
+//自动判定操作系统
+#define PLATFORM_WIN     0
+#define PLATFORM_UNIX    1
+#define PLATFORM_APPLE   2
+
+#if defined(__WIN32__) || defined(WIN32) || defined(_WIN32) || defined(__WIN64__) || defined(WIN64) || defined(_WIN64)
+#  define PSS_PLATFORM PLATFORM_WIN
+#elif defined(__APPLE_CC__)
+#  define PSS_PLATFORM PLATFORM_APPLE
+#else
+#  define PSS_PLATFORM PLATFORM_UNIX
+#endif
+
 #ifndef NULL
 #define NULL 0
 #endif
@@ -87,7 +100,7 @@ static bool Convert_Version(int nTagVserion)
 #define CONSOLE_PACKET_MAX_SIZE  200 //声明console的数据包大小
 
 //根据不同的操作系统，定义不同的recv接收参数类型
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
 #define MSG_NOSIGNAL          0            //信号量参数（WINDOWS）
 #endif
 
@@ -1290,7 +1303,7 @@ struct _ServerConnectInfo
 
 inline void __show__( const char* szTemp)
 {
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
     printf_s("[__show__]%s.\n", szTemp);
 #else
     printf("[__show__]%s.\n", szTemp);
@@ -1386,7 +1399,7 @@ public:
 private:
     unsigned long GetSystemTickCount()
     {
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         return (unsigned long)GetTickCount();
 #else
         struct timespec ts;

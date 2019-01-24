@@ -530,7 +530,7 @@ void DoMessage_ClientInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, u
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
         vecClientConnectInfo VecClientConnectInfo;
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         App_ProConnectManager::instance()->GetConnectInfo(VecClientConnectInfo);
 #else
         App_ConnectManager::instance()->GetConnectInfo(VecClientConnectInfo);
@@ -548,7 +548,7 @@ void DoMessage_ClientInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, u
 void DoMessage_CloseClient(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     uint32 u4ConnectID = (uint32)ACE_OS::atoi(CommandInfo.m_szCommandExp);
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
     App_ProConnectManager::instance()->CloseConnect(u4ConnectID);
 
     if (CommandInfo.m_u1OutputType == 0)
@@ -655,7 +655,7 @@ void DoMessage_UDPClientInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
         vecClientConnectInfo VecClientConnectInfo;
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         App_ProUDPManager::instance()->GetClientConnectInfo(VecClientConnectInfo);
 #else
         App_ReUDPManager::instance()->GetClientConnectInfo(VecClientConnectInfo);
@@ -675,7 +675,7 @@ void DoMessage_ServerConnectTCP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPac
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
         vecClientConnectInfo VecClientConnectInfo;
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         App_ClientProConnectManager::instance()->GetConnectInfo(VecClientConnectInfo);
 #else
         App_ClientReConnectManager::instance()->GetConnectInfo(VecClientConnectInfo);
@@ -695,7 +695,7 @@ void DoMessage_ServerConnectUDP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPac
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
         vecClientConnectInfo VecClientConnectInfo;
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         App_ClientProConnectManager::instance()->GetUDPConnectInfo(VecClientConnectInfo);
 #else
         App_ClientReConnectManager::instance()->GetUDPConnectInfo(VecClientConnectInfo);
@@ -728,7 +728,7 @@ void DoMessage_ShowProcessInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
         u4FlowIn += u4MessageFlowIn;
         u4FlowOut += u4MessageFlowOut;
 
-#ifdef WIN32  //如果是windows
+#if PSS_PLATFORM == PLATFORM_WIN  //如果是windows
         //得到所有TCP出口流量统计
         uint32 u4ConnectFlowIn = 0;
         uint32 u4ConnectFlowOut = 0;
@@ -1016,7 +1016,7 @@ void DoMessage_ReConnectServer(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
     {
         //获得当前连接状态
         vecClientConnectInfo VecClientConnectInfo;
-#ifdef WIN32  //如果是windows
+#if PSS_PLATFORM == PLATFORM_WIN  //如果是windows
         App_ClientProConnectManager::instance()->ReConnect(nSerevrID);
         App_ClientProConnectManager::instance()->GetConnectInfo(VecClientConnectInfo);
 #else
@@ -1240,7 +1240,7 @@ void DoMessage_GetConnectIPInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPac
 
     if (GetConnectServerID(CommandInfo.m_szCommandExp, nConnectID) == true)
     {
-#ifdef WIN32  //如果是windows
+#if PSS_PLATFORM == PLATFORM_WIN  //如果是windows
         _ClientIPInfo objClientIPInfo = App_ProConnectManager::instance()->GetClientIPInfo((uint32)nConnectID);
 #else
         _ClientIPInfo objClientIPInfo = App_ConnectManager::instance()->GetClientIPInfo((uint32)nConnectID);
@@ -1554,7 +1554,7 @@ void DoMessage_GetNickNameInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
 
     if (GetNickName(CommandInfo.m_szCommandExp, szNickName) == true)
     {
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         App_ProConnectManager::instance()->GetClientNameInfo(szNickName, objClientNameInfo);
 #else
         App_ConnectManager::instance()->GetClientNameInfo(szNickName, objClientNameInfo);
@@ -1614,7 +1614,7 @@ void DoMessage_SetConnectLog(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket
 
     if (GetConnectID(CommandInfo.m_szCommandExp, u4ConnectID, blIsLog) == true)
     {
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         App_ProConnectManager::instance()->SetIsLog(u4ConnectID, blIsLog);
 #else
         App_ConnectManager::instance()->SetIsLog(u4ConnectID, blIsLog);
@@ -1665,7 +1665,7 @@ void DoMessage_AddListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, ui
 
     if (GetListenInfo(CommandInfo.m_szCommandExp, objListenInfo) == true)
     {
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         blState = App_ProControlListen::instance()->AddListen(objListenInfo.m_szListenIP,
                   objListenInfo.m_u4Port,
                   objListenInfo.m_u1IPType,
@@ -1697,7 +1697,7 @@ void DoMessage_DelListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, ui
 
     if (GetListenInfo(CommandInfo.m_szCommandExp, objListenInfo) == true)
     {
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         blState = App_ProControlListen::instance()->DelListen(objListenInfo.m_szListenIP,
                   objListenInfo.m_u4Port);
 #else
@@ -1724,7 +1724,7 @@ void DoMessage_ShowListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, u
 
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         u4ListenCount = App_ProControlListen::instance()->GetListenCount();
 #else
         u4ListenCount = App_ControlListen::instance()->GetListenCount();
@@ -1744,7 +1744,7 @@ void DoMessage_ShowListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, u
         for (uint32 i = 0; i < u4ListenCount; i++)
         {
             _ControlInfo obj_ControlInfo;
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
             App_ProControlListen::instance()->ShowListen(i, obj_ControlInfo);
 #else
             App_ControlListen::instance()->ShowListen(i, obj_ControlInfo);
@@ -1798,7 +1798,7 @@ void DoMessage_MonitorInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, 
         uint32 u4UdpFlowOut = 0;
         int nActiveClient   = 0;
         int nPoolClient     = 0;
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         App_ProUDPManager::instance()->GetFlowInfo(u4UdpFlowIn, u4UdpFlowOut);
         nActiveClient = App_ProConnectManager::instance()->GetCount();
         nPoolClient = App_ProConnectHandlerPool::instance()->GetFreeCount();

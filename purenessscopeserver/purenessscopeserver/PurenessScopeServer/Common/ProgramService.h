@@ -1,7 +1,9 @@
 #ifndef _PROGRAMSERVICE_H
 #define _PROGRAMSERVICE_H
 
-#ifdef WIN32
+#include "define.h"
+
+#if PSS_PLATFORM == PLATFORM_WIN
 
 #include "ace/Time_Value.h"
 #include "ace/Event_Handler.h"

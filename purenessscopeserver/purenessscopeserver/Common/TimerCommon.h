@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "Time_Value.h"
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
 #include "windows.h"
 #else
 #include<sys/time.h>
@@ -16,7 +16,7 @@ namespace ts_timer
 {
 #define MAX_TIMOUTLIST_COUNT 100
 
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
 #define PIRNTF printf_s
 #else
 #define PIRNTF printf
@@ -26,7 +26,7 @@ namespace ts_timer
     {
         CTime_Value obj_Time_Value;
 
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
 
         FILETIME   tfile;
         ::GetSystemTimeAsFileTime(&tfile);
@@ -94,7 +94,7 @@ namespace ts_timer
     //获得sleep时间数
     inline void Get_Sleep(int nTime)
     {
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         Sleep(nTime);
 #else
         struct timespec rqt;

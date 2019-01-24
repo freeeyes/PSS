@@ -1,6 +1,6 @@
-#ifdef WIN32
 #include "WindowsProcess.h"
 
+#if PSS_PLATFORM == PLATFORM_WIN
 ACE_NT_SERVICE_DEFINE (PssServer, CProgramService, ACE_TEXT("PssServer Service"));
 
 Process::Process (void)

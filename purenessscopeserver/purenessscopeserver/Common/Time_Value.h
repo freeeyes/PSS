@@ -5,6 +5,18 @@
 #include "time.h"
 #include <string>
 
+#define PLATFORM_WIN     0
+#define PLATFORM_UNIX    1
+#define PLATFORM_APPLE   2
+
+#if defined(__WIN32__) || defined(WIN32) || defined(_WIN32) || defined(__WIN64__) || defined(WIN64) || defined(_WIN64)
+#  define PSS_PLATFORM PLATFORM_WIN
+#elif defined(__APPLE_CC__)
+#  define PSS_PLATFORM PLATFORM_APPLE
+#else
+#  define PSS_PLATFORM PLATFORM_UNIX
+#endif
+
 //Time Value数据类型
 //add by freeeyes
 

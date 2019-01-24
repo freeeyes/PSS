@@ -56,7 +56,7 @@ public:
     uint32 GetReactorID();
 
 private:
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
     void Create_Reactor_WFMO();
 #endif
     void Create_Reactor_Select();

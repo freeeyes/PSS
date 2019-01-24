@@ -4,7 +4,10 @@
 //定义Timer的执行单元
 //add by freeeyes
 
-#ifdef WIN32
+#include "time.h"
+#include "TimerCommon.h"
+#include "Lcm.h"
+#if PSS_PLATFORM == PLATFORM_WIN
 #include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -15,9 +18,6 @@
 #include <pthread.h>
 #include <errno.h>
 #endif
-#include "time.h"
-#include "TimerCommon.h"
-#include "Lcm.h"
 
 //定时器相关对象声明
 //add by freeeyes
@@ -83,7 +83,7 @@ namespace ts_timer
         CTimerInfoList();
         ~CTimerInfoList();
 
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         CRITICAL_SECTION* Get_mutex();
 #else
         pthread_mutex_t* Get_mutex();
@@ -93,19 +93,19 @@ namespace ts_timer
 
         EM_Event_Type Get_Event_Type();
 
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         CONDITION_VARIABLE* Get_cond();
 #else
         pthread_cond_t* Get_cond();
 #endif
 
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         void Set_Thread_ID(DWORD nThreadID);
 #else
         void Set_Thread_ID(pthread_t nThreadID);
 #endif
 
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         DWORD Get_Thread_ID();
 #else
         pthread_t Get_Thread_ID();
@@ -148,7 +148,7 @@ namespace ts_timer
         bool                                 m_blRun;          //是否运行
         EM_Event_Type                        m_emEventType;    //当前事件执行状态
 
-#ifdef WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         DWORD                      m_nThreadID;
         CRITICAL_SECTION*          m_pMutex;
         CONDITION_VARIABLE*        m_pCond;

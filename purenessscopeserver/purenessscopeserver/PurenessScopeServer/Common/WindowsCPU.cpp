@@ -1,7 +1,6 @@
-#ifdef WIN32
-
 #include "WindowsCPU.h"
 
+#if PSS_PLATFORM == PLATFORM_WIN
 typedef  LONG  (WINAPI*  PROCNTQSI)(UINT,PVOID,ULONG,PULONG);
 PROCNTQSI  NtQuerySystemInformation;
 
@@ -26,6 +25,7 @@ uint32 GetProcessMemorySize()
         uint32 u4PageSize = (uint32)pmc.PagefileUsage;
         return (u4WorkSize + u4PageSize)/(1024*1024);
     }
+
     return 0;
 }
 
