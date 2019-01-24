@@ -113,11 +113,7 @@ void ts_timer::ITimerInfo::Do_Error_Events(int nLastRunTimerID, int nTimeoutTime
 }
 
 //定时器列表类
-#if PSS_PLATFORM == PLATFORM_WIN
-CRITICAL_SECTION* ts_timer::CTimerInfoList::Get_mutex()
-#else
-pthread_mutex_t* ts_timer::CTimerInfoList::Get_mutex()
-#endif
+ts_timer::TIMER_THREAD_MUTEX* ts_timer::CTimerInfoList::Get_mutex()
 {
     return m_pMutex;
 }
@@ -137,7 +133,7 @@ ts_timer::CTimerInfoList::CTimerInfoList() :
 
 ts_timer::CTimerInfoList::~CTimerInfoList()
 {
-
+    Close();
 }
 
 void ts_timer::CTimerInfoList::Set_Event_Type(EM_Event_Type emEventType)
@@ -155,29 +151,18 @@ ts_timer::EM_Event_Type ts_timer::CTimerInfoList::Get_Event_Type()
     return m_emEventType;
 }
 
-#if PSS_PLATFORM == PLATFORM_WIN
-CONDITION_VARIABLE* ts_timer::CTimerInfoList::Get_cond()
-#else
-pthread_cond_t* ts_timer::CTimerInfoList::Get_cond()
-#endif
+
+ts_timer::TIMER_THREAD_COND* ts_timer::CTimerInfoList::Get_cond()
 {
     return m_pCond;
 }
 
-#if PSS_PLATFORM == PLATFORM_WIN
-void ts_timer::CTimerInfoList::Set_Thread_ID(DWORD nThreadID)
-#else
-void ts_timer::CTimerInfoList::Set_Thread_ID(pthread_t nThreadID)
-#endif
+void ts_timer::CTimerInfoList::Set_Thread_ID(TIMER_THREAD_ID nThreadID)
 {
     m_nThreadID = nThreadID;
 }
 
-#if PSS_PLATFORM == PLATFORM_WIN
-DWORD ts_timer::CTimerInfoList::Get_Thread_ID()
-#else
-pthread_t ts_timer::CTimerInfoList::Get_Thread_ID()
-#endif
+ts_timer::TIMER_THREAD_ID ts_timer::CTimerInfoList::Get_Thread_ID()
 {
     return m_nThreadID;
 }
@@ -227,19 +212,14 @@ void ts_timer::CTimerInfoList::Close()
     {
 #if PSS_PLATFORM == PLATFORM_WIN
         DeleteCriticalSection(m_pMutex);
-        delete m_pMutex;
-        delete m_pCond;
-        m_pMutex = NULL;
-        m_pCond = NULL;
 #else
         pthread_mutex_destroy(m_pMutex);
         pthread_cond_destroy(m_pCond);
-
+#endif
         delete m_pMutex;
         delete m_pCond;
         m_pMutex = NULL;
-        m_pCond = NULL;
-#endif
+        m_pCond  = NULL;
     }
 }
 

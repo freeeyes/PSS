@@ -44,6 +44,17 @@ namespace ts_timer
         TIMER_RESTORE,       //恢复暂停定时器
     };
 
+#if PSS_PLATFORM == PLATFORM_WIN
+    typedef CRITICAL_SECTION TIMER_THREAD_MUTEX;
+    typedef CONDITION_VARIABLE TIMER_THREAD_COND;
+    typedef DWORD TIMER_THREAD_ID;
+#else
+    typedef pthread_mutex_t TIMER_THREAD_MUTEX;
+    typedef pthread_cond_t TIMER_THREAD_COND;
+    typedef pthread_t TIMER_THREAD_ID;
+#endif
+
+
     class ITimerInfo
     {
     public:
@@ -83,33 +94,17 @@ namespace ts_timer
         CTimerInfoList();
         ~CTimerInfoList();
 
-#if PSS_PLATFORM == PLATFORM_WIN
-        CRITICAL_SECTION* Get_mutex();
-#else
-        pthread_mutex_t* Get_mutex();
-#endif
+        TIMER_THREAD_MUTEX* Get_mutex();
 
         void Set_Event_Type(EM_Event_Type emEventType);
 
         EM_Event_Type Get_Event_Type();
 
-#if PSS_PLATFORM == PLATFORM_WIN
-        CONDITION_VARIABLE* Get_cond();
-#else
-        pthread_cond_t* Get_cond();
-#endif
+        TIMER_THREAD_COND* Get_cond();
 
-#if PSS_PLATFORM == PLATFORM_WIN
-        void Set_Thread_ID(DWORD nThreadID);
-#else
-        void Set_Thread_ID(pthread_t nThreadID);
-#endif
+        void Set_Thread_ID(TIMER_THREAD_ID nThreadID);
 
-#if PSS_PLATFORM == PLATFORM_WIN
-        DWORD Get_Thread_ID();
-#else
-        pthread_t Get_Thread_ID();
-#endif
+        TIMER_THREAD_ID Get_Thread_ID();
 
         void Lock();
 
@@ -147,16 +142,10 @@ namespace ts_timer
         ITimerInfo*                          m_NextRunTimer;   //下一次要运行的定时器对象
         bool                                 m_blRun;          //是否运行
         EM_Event_Type                        m_emEventType;    //当前事件执行状态
+        TIMER_THREAD_ID                      m_nThreadID;
+        TIMER_THREAD_MUTEX*                  m_pMutex;
+        TIMER_THREAD_COND*                   m_pCond;
 
-#if PSS_PLATFORM == PLATFORM_WIN
-        DWORD                      m_nThreadID;
-        CRITICAL_SECTION*          m_pMutex;
-        CONDITION_VARIABLE*        m_pCond;
-#else
-        pthread_t                  m_nThreadID;
-        pthread_mutex_t*           m_pMutex;
-        pthread_cond_t*            m_pCond;
-#endif
         std::vector<ITimerInfo*>             m_TimerList;      //当前定时器对象列表
         std::vector<std::vector<_Lcm_Info> > m_TimerAssemble;  //执行定时器的计划镜像
     };
