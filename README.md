@@ -1,7 +1,6 @@
 [![Build Status](https://travis-ci.org/freeeyes/PSS.svg?branch=master)](https://travis-ci.org/freeeyes/PSS)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![GitHub version](https://badge.fury.io/gh/freeeyes%2FPSS.svg)](https://badge.fury.io/gh/freeeyes%2FPSS)
-[![coverity](https://scan.coverity.com/projects/14425/badge.svg)](https://scan.coverity.com/projects/freeeyes-pss)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=freeeyes&metric=alert_status)](https://sonarcloud.io/dashboard?id=freeeyes)
 [![Platform](https://img.shields.io/badge/platform-Linux,%20Windows-green.svg?style=flat)](https://github.com/freeeyes/PSS)
  
@@ -20,21 +19,18 @@
 > 希望能和大家一步步完善这个体系，真正做到有价值的框架。 我的目标是，你用的爽，就是成功。也希望大家越来越喜欢它。 
 > 另外最新代码会发布在SVN上，如果你有SVN，最好从SVN上直接下载，我会定时打版本包放在download里面提供下载。
 
-
-
 ## [Tarvis CI自动提交最新测试报告信息](./testresult/result.md)
 ## [PSS框架如何编译](./md/China/Install.md) 
 ## [PSS框架配置说明](./md/China/Configure.md)
 ## [PSS逻辑插件用例说明](./md/China/examples.md)
 ## [后台指令集合](./md/China/PSSFrameCommand.md) 
+## [插件使用框架API说明](./md/China/PSSPluginAPI.md) 
 ## [数据染色功能](./md/China/Dyeing.md)
 ## [如何开发一个逻辑插件](./md/China/LogicPlugin.md) 
 ## [如何开发一个解析插件](./md/China/PacketParsePlugin.md) 
 ## [更新日志](./md/China/Changelog.md)
 
 ![pss框架流程图](http://on-img.com/chart_image/5a6ae014e4b0d1c5b5b1e6fa.png)
-
-![pss运行图表](chart.jpg)
 
 >##提供几个压测数据（TcpPass工具，可从PSS开源工具包中获得） 
 * * *  

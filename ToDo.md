@@ -12,6 +12,7 @@
 > 9. 开发新的定时器组件，放弃ACE自己的定时器组件。允许绑定指定函数，并支持定时异常事件。(Finish)
 > 10. 重新开发支持ssl的邮件发送程序，使用CURL组件替换原有的smtp服务,目前smtp基本都转为smtps。(Finish)
 > 11. 开发支持直接转发的数据中继功能，参数配置化实现。(Finish)
+> 12. 开发TTy设备的支持。(Finish)
 
 ##work by ruqi
 > 1. 配置PSS生成Windows程序在sonar里检测与代码覆盖 (Doing)
