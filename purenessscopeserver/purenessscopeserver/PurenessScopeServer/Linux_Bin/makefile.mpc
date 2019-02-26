@@ -16,12 +16,17 @@ project(PurenessScopeServer):aceexe{
   ../*.cpp
  }
   includes += ../Common ../../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../TinyXML ../Mail ../FileTest
-  macros += __LINUX__
   includes += /usr/local/include/
   includes += /usr/include/
   libs += curl
   libpaths += /usr/lib64/ 
   libpaths += /usr/lib/x86_64-linux-gnu/
+  
+   verbatim(gnuace, local) {
+   ifneq (, $(shell which curl))
+      CPPFLAGS     += -D__THREE_LIBRARY_CURL__
+   		endif 
+   }  
   
   specific(make) {
     compile_flags += -fcheck-new

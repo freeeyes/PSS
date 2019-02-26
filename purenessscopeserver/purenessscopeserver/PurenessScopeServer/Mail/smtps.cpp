@@ -1,6 +1,6 @@
 #include "smtps.h"
 
-#ifndef WIN32
+#ifdef __THREE_LIBRARY_CURL__
 static size_t read_callback(void* ptr, size_t size, size_t nmemb, void* userp)
 {
     struct WriteThis* pooh = (struct WriteThis*)userp;
@@ -43,7 +43,7 @@ static long tvdiff(struct timeval newer, struct timeval older)
 
 int Send_Mail_From_Ssl(const char* pUser, const char* pPass, const char* pFrom, const char* pTo, const char* pUrl, const char* pTitle, const char* pData)
 {
-#ifndef WIN32
+#ifdef __THREE_LIBRARY_CURL__
     CURL* curl;
     CURLM* mcurl;
     int still_running = 1;

@@ -3,7 +3,7 @@
 CProfileTime::CProfileTime(void)
 {
     //在windows下，获得滴答的频率
-#ifndef __LINUX__
+#if PSS_PLATFORM == PLATFORM_WIN
     ::QueryPerformanceFrequency(&m_liPerfFreq);
     ::QueryPerformanceFrequency(&m_liPerfStart);
     ::QueryPerformanceFrequency(&m_liPerfStop);
@@ -16,7 +16,7 @@ CProfileTime::~CProfileTime(void)
 
 bool CProfileTime::Start()
 {
-#ifndef __LINUX__
+#if PSS_PLATFORM == PLATFORM_WIN
     QueryPerformanceCounter(&m_liPerfStart);
 #else
     m_HighResTimer.start();
@@ -27,7 +27,7 @@ bool CProfileTime::Start()
 
 uint64 CProfileTime::Stop()
 {
-#ifndef __LINUX__
+#if PSS_PLATFORM == PLATFORM_WIN
     QueryPerformanceCounter(&m_liPerfStop);
 
     return (((m_liPerfStop.QuadPart - m_liPerfStart.QuadPart) * 1000 * 1000 * 1000)/m_liPerfFreq.QuadPart);

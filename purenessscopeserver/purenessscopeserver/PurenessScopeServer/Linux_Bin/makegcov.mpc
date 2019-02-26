@@ -17,18 +17,22 @@ project(PurenessScopeServer):aceexe{
   ../CppUnit/*.cpp
   ../*.cpp
  }
- includes += ../../../../include
+ includes += /root/Tools/cppunit-1.12.1/include
  includes += ../Common ../../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../TinyXML ../Mail ../FileTest ../CppUnit ../Encrypt
  
- libpaths += ../../../../lib
+ libpaths += /root/Tools/cppunit-1.12.1/src/cppunit/.libs
  libs += cppunit
  includes += /usr/local/include/
- includes += /usr/include/
  libs += curl
- libpaths += /usr/lib64/ 
- libpaths += /usr/lib/x86_64-linux-gnu/
+ libpaths += /usr/lib64/  
  
- macros += __LINUX__ _CPPUNIT_TEST
+ macros += _CPPUNIT_TEST
+ 
+   verbatim(gnuace, local) {
+   ifneq (, $(shell which curl))
+      CPPFLAGS     += -D__THREE_LIBRARY_CURL__
+   		endif 
+   }
 
   specific(gnuace) {
     compile_flags += -fprofile-arcs -ftest-coverage

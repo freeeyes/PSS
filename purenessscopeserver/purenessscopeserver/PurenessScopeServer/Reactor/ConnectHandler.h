@@ -35,7 +35,7 @@
 #include "FileTest.h"
 #include "TcpRedirection.h"
 
-#ifdef __LINUX__
+#if PSS_PLATFORM != PLATFORM_WIN
 #include "netinet/tcp.h"
 #endif
 

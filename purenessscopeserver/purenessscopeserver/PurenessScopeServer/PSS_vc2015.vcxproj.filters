@@ -693,9 +693,6 @@
     <ClInclude Include="..\Common\Threading.h">
       <Filter>IObject</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\ProfileTime.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="..\Common\RandomNumber.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
@@ -908,6 +905,9 @@
     </ClInclude>
     <ClInclude Include="Reactor\ReTTyClientManager.h">
       <Filter>Reactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\ProfileTime.h">
+      <Filter>Common\hfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

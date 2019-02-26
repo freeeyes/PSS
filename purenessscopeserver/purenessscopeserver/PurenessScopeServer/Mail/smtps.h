@@ -1,7 +1,7 @@
 #ifndef _SMTPS_H
 #define _SMTPS_H
 
-#ifndef WIN32
+#ifdef __THREE_LIBRARY_CURL__
 #include <string.h>
 #include <curl/curl.h>
 
