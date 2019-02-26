@@ -30,6 +30,7 @@ project(PurenessScopeServer):aceexe{
       CPPFLAGS     += -D__THREE_LIBRARY_CURL__
       LDLIBS       += -lcurl
    endif   
+   }
 
   specific(gnuace) {
     compile_flags += -Wno-deprecated
