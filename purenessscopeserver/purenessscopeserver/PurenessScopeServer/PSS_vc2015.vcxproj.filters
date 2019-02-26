@@ -906,7 +906,7 @@
     <ClInclude Include="Reactor\ReTTyClientManager.h">
       <Filter>Reactor\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="Common\ProfileTime.h">
+    <ClInclude Include="..\Common\ProfileTime.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
   </ItemGroup>

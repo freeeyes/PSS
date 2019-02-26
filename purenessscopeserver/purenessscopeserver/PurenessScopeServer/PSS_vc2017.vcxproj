@@ -591,6 +591,7 @@
     <ClInclude Include="..\Common\ObjectArrayList.h" />
     <ClInclude Include="..\Common\ObjectLru.h" />
     <ClInclude Include="..\Common\ObjectPoolManager.h" />
+    <ClInclude Include="..\Common\ProfileTime.h" />
     <ClInclude Include="..\Common\RandomNumber.h" />
     <ClInclude Include="..\Common\Threading.h" />
     <ClInclude Include="..\Common\TimerCommon.h" />
@@ -605,7 +606,6 @@
     <ClInclude Include="Common\BaseHander.h" />
     <ClInclude Include="Common\BaseServerManager.h" />
     <ClInclude Include="Common\BaseTask.h" />
-    <ClInclude Include="Common\ProfileTime.h" />
     <ClInclude Include="Common\ServerMessageTask.h" />
     <ClInclude Include="Common\TcpRedirection.h" />
     <ClInclude Include="Common\XmlConfig.h" />

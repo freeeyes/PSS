@@ -897,7 +897,7 @@
     <ClInclude Include="Proactor\ProTTyHandler.h">
       <Filter>Proactor\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="Common\ProfileTime.h">
+    <ClInclude Include="..\Common\ProfileTime.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
   </ItemGroup>

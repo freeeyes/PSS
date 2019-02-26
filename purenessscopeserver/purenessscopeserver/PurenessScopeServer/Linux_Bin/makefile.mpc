@@ -18,19 +18,18 @@ project(PurenessScopeServer):aceexe{
   includes += ../Common ../../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../TinyXML ../Mail ../FileTest
   includes += /usr/local/include/
   includes += /usr/include/
-  libs += curl
   libpaths += /usr/lib64/ 
   libpaths += /usr/lib/x86_64-linux-gnu/
-  
-   verbatim(gnuace, local) {
-   ifneq (, $(shell which curl))
-      CPPFLAGS     += -D__THREE_LIBRARY_CURL__
-   		endif 
-   }  
   
   specific(make) {
     compile_flags += -fcheck-new
   }
+  
+   verbatim(gnuace, local) {
+   ifneq (, $(shell which curl))
+      CPPFLAGS     += -D__THREE_LIBRARY_CURL__
+      LDLIBS       += -lcurl
+   endif   
 
   specific(gnuace) {
     compile_flags += -Wno-deprecated
