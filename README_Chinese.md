@@ -1,6 +1,7 @@
  [English](./README.md) | 简体中文 
 
 <p align="right">当前稳定版本: <strong>v1.0.0</strong></p>
+<p align="center"><img src="https://github.com/freeeyes/PSS/Icon.jpg" alt="PSS"/></p>
 <center>这是一个基于网络的插件式框架，提供跨平台的IO和逻辑分离的插件服务.  
 
 

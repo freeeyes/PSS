@@ -1,6 +1,7 @@
 English | [简体中文](./README_Chinese.md)  
 
 <p align="right">Current stable version: <strong>v1.0.0</strong></p>
+<p align="center"><img src="https://github.com/freeeyes/PSS/Icon.jpg" alt="PSS"/></p>
 <center>This is a based plug-in framework that provides cross-platform IO and logically separated plug-in services.  
 
 
