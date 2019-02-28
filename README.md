@@ -1,7 +1,7 @@
 English | [简体中文](./README_Chinese.md)  
 
 <p align="right">Current stable version: <strong>v1.0.0</strong></p>
-<center>This is a web-based plug-in framework that provides cross-platform IO and logically separated plug-in services.  
+<center>This is a based plug-in framework that provides cross-platform IO and logically separated plug-in services.  
 
 
 ----------
@@ -11,7 +11,7 @@ English | [简体中文](./README_Chinese.md)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![GitHub version](https://badge.fury.io/gh/freeeyes%2FPSS.svg)](https://badge.fury.io/gh/freeeyes%2FPSS)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=freeeyes&metric=alert_status)](https://sonarcloud.io/dashboard?id=freeeyes)
-[![Platform](https://img.shields.io/badge/platform-Linux,%20Windows-green.svg?style=flat)](https://github.com/freeeyes/PSS)\
+[![Platform](https://img.shields.io/badge/platform-Linux,%20Windows-green.svg?style=flat)](https://github.com/freeeyes/PSS)
 </center>
  
 # OverView 
