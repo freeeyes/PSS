@@ -89,8 +89,8 @@ matrix:
         #- cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin
         #- cat pssout.file
         #close server
-        - killall PurenessScopeServer
         - sleep 5
+        - killall PurenessScopeServer
         # collect gcov report
         # - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/PurenessScopeServer/Linux_Bin/.obj
         # - gcovr -r ../ -o ../../report.xml --xml-pretty
