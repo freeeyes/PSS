@@ -142,8 +142,12 @@ matrix:
       - make -j 4
       - cd $TRAVIS_BUILD_DIR/purenessscopeserver/example-Module/UDPTest
       - $ACE_ROOT/bin/mwc.pl -type gnuace
-      - make -j 4        
-      - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessScopeServer/Linux_Bin
+      - make -j 4      
+      - cd $TRAVIS_BUILD_DIR/purenessscopeserver/
+      - ls
+      - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver
+      - ls
+      - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/Linux_Bin
       - $ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc
       - make -j 4
       - nohup ./PurenessScopeServer > pssout.file 2>&1 &
@@ -151,7 +155,7 @@ matrix:
       - cd $TRAVIS_BUILD_DIR/CppUnitTest/Test
       - make -j 4
       - ./Test_Pss
-      - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessScopeServer/Linux_Bin
+      - cd $TRAVIS_BUILD_DIR/purenessscopeserver/purenessscopeserver/Linux_Bin
       - cat pssout.file
       - killall -9 PurenessScopeServer
       - cd $TRAVIS_BUILD_DIR
