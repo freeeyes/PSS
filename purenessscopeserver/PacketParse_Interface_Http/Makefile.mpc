@@ -7,10 +7,10 @@ project(PacketParse_Interface_Http):acelib{
   }
   
   specific (prop:microsoft){
-  dllout = ../PurenessScopeServer/Windows_Bin
+  dllout = ../FrameCore/Windows_Bin
   } else {
   macros += __LINUX__
-  dllout = ../PurenessScopeServer/Linux_Bin
+  dllout = ../FrameCore/Linux_Bin
   } 
   includes += ../Common
 }

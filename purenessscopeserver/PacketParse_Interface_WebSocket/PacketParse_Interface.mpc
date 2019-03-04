@@ -9,9 +9,9 @@ project(PacketParse_Interface_WebSocket):acelib{
   
   libout = ./
   specific (prop:microsoft){
-	dllout = ../PurenessScopeServer/Windows_Bin
+	dllout = ../FrameCore/Windows_Bin
   } else {
-	dllout = ../PurenessScopeServer/Linux_Bin
+	dllout = ../FrameCore/Linux_Bin
   }
   includes += ../Common
 }
