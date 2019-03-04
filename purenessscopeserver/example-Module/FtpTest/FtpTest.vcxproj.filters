@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{0e224752-b985-4e7d-a134-b05835d6a0cf}</UniqueIdentifier>
+      <Extensions>cpp;cxx;cc;c;C</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{0fc735d3-a470-4399-8965-0b4ae1d579e0}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hh</Extensions>
+    </Filter>
+    <Filter Include="Build Files">
+      <UniqueIdentifier>{b129afd6-7c1a-4a8e-bd43-f207a0b3569c}</UniqueIdentifier>
+      <Extensions>mpc;mpb;mwc</Extensions>
+    </Filter>
+    <Filter Include="Documentation">
+      <UniqueIdentifier>{23dc0464-18c0-42d3-84fd-243a3e31b7d3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="BaseCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DirView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FtpTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BaseCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DirView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="FtpTest.mpc">
+      <Filter>Build Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ReadMe.txt">
+      <Filter>Documentation</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

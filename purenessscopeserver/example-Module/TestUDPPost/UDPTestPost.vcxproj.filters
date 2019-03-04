@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{6276171b-41ad-487d-ade2-b8c315d3a8eb}</UniqueIdentifier>
+      <Extensions>cpp;cxx;cc;c;C</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{99db723f-cd1f-4106-8b28-0cb7974db708}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hh</Extensions>
+    </Filter>
+    <Filter Include="Build Files">
+      <UniqueIdentifier>{08bd30e2-8df2-45bc-bb37-be4fa17815c0}</UniqueIdentifier>
+      <Extensions>mpc;mpb;mwc</Extensions>
+    </Filter>
+    <Filter Include="Documentation">
+      <UniqueIdentifier>{4e486171-4a0a-4617-b0de-bbe2fa19040b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="BaseCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TestUDPPost.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BaseCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TestUDPPost.mpc">
+      <Filter>Build Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="ReadMe.txt">
+      <Filter>Documentation</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

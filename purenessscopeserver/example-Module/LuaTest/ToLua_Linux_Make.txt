@@ -1,0 +1,34 @@
+tolua++与lua紧密联系在一起的，所以，编译安装tolua++最简单的方式如下:
+1、解压lua-5.1.4.tar.gz
+tar xvzf lua-5.1.4.tar.gz
+2、编译lua
+cd lua-5.1.4.tar.gz
+make linux
+3、解压tolua++-1.0.93.tar.bz2
+tar xvjf tolua++-1.0.93.tar.bz2
+4、下载scons并安装，地址http://www.scons.org/download.php
+ linux下使用wget http://prdownloads.sourceforge.net/scons/scons-2.3.2-1.noarch.rpm
+rpm -ihv scons-2.3.2-1.noarch.rpm
+或者
+python setup.py install
+
+5、编译安装tolua++
+wget http://www.codenix.com/~tolua/tolua++-1.0.93.tar.bz2
+tar xvjf tolua++-1.0.93.tar.bz2
+cd tolua++-1.0.93
+cp custom-5.1.py custom.py
+vim custom.py修改里面的项如下：
+CCFLAGS = ['-I/home/jackcy/Tools/lua-5.1.4/src', '-O2', '-ansi'] 注意这里是大写i
+注意，如果是64位的linux 这里应该改写成
+CCFLAGS = ['-I/home/jackcy/Tools/lua-5.1.4/src', '-O2', '-ansi', '-fPIC'] 注意这里是大写i
+LIBPATH = ['/home/jackcy/Tools/lua-5.1.4/src']
+LIBS = ['lua', 'dl', 'm']
+prefix = '/mingw'
+#build_dev=1
+tolua_bin = 'tolua++5.1'
+tolua_lib = 'tolua++5.1'
+TOLUAPP = 'tolua++5.1'
+6、拷贝toluabind_default.c文件
+cp src/bin/toluabind_default.c src/bin/toluabind.c
+7、运行scons:
+scons all

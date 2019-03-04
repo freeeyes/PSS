@@ -1,0 +1,25 @@
+project(AutoTest):acelib{
+  sharedname=AutoTest
+  dynamicflags += TEST_TCP_BUILD_DLL
+  
+  Source_Files{
+  	./*.cpp 
+  }
+  specific (gnuace){
+		macros += __LINUX__   
+		compile_flags += -Wno-deprecated
+	}
+	
+  specific(make) {
+    compile_flags += -fcheck-new
+  }
+  
+  libout = ./
+  specific (prop:microsoft){
+	dllout = ../../PurenessScopeServer/Windows_Bin
+  } else {
+	dllout = ../../PurenessScopeServer/Linux_Bin
+  }
+  includes += .
+  includes += ../../Common
+}

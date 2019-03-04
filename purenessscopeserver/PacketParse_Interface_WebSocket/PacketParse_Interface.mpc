@@ -1,0 +1,17 @@
+project(PacketParse_Interface_WebSocket):acelib{
+  sharedname=PacketParse_Interface_WebSocket
+  dynamicflags += TEST_TCP_BUILD_DLL
+  
+  Source_Files{
+  	./*.cpp 
+  }
+  macros += __LINUX__  
+  
+  libout = ./
+  specific (prop:microsoft){
+	dllout = ../PurenessScopeServer/Windows_Bin
+  } else {
+	dllout = ../PurenessScopeServer/Linux_Bin
+  }
+  includes += ../Common
+}

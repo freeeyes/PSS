@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include=".\MonitorServer.cpp" />
+    <ClCompile Include=".\MonitorCommand.cpp" />
+    <ClCompile Include="DataManager.cpp" />
+    <ClCompile Include="TinyXML\tinystr.cpp">
+      <Filter>TinyXML</Filter>
+    </ClCompile>
+    <ClCompile Include="TinyXML\tinyxml.cpp">
+      <Filter>TinyXML</Filter>
+    </ClCompile>
+    <ClCompile Include="TinyXML\tinyxmlerror.cpp">
+      <Filter>TinyXML</Filter>
+    </ClCompile>
+    <ClCompile Include="TinyXML\tinyxmlparser.cpp">
+      <Filter>TinyXML</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeEvent.cpp" />
+    <ClCompile Include="EncodeConvert\GBKtoUTF8.cpp">
+      <Filter>EncodeConvert</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include=".\MonitorCommand.h" />
+    <ClInclude Include="DataManager.h" />
+    <ClInclude Include="TinyXML\tinystr.h">
+      <Filter>TinyXML</Filter>
+    </ClInclude>
+    <ClInclude Include="TinyXML\tinyxml.h">
+      <Filter>TinyXML</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeEvent.h" />
+    <ClInclude Include="EncodeConvert\GBKtoUTF8.h">
+      <Filter>EncodeConvert</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="MonitorServer.mpc" />
+    <None Include="EncodeConvert\GBKtoUTF8.inl">
+      <Filter>EncodeConvert</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="TinyXML">
+      <UniqueIdentifier>{cdc3e448-8ea0-4069-a816-3eae52025661}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EncodeConvert">
+      <UniqueIdentifier>{a2c82fb4-6817-414e-a33f-a6ed8f27c26e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

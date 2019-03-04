@@ -1,0 +1,23 @@
+# *****************************
+# 预定义
+# *****************************
+CC = g++
+AR = ar
+CFLAGS = -g -O2 -D__LINUX__
+LDFLAGS=-Wl,-E
+INCLUDES = -I./ -I../ -I/usr/include -I${ACE_ROOT} -I../include -I./Lua -I./LuaTest -I/m2mjk/tools/tolua/include
+LIBS = -L/usr/lib64 -L${ACE_ROOT}/lib  -L/usr/local/lib64 -L/m2mjk/tools/tolua/lib -L./ -L../ -lACE -lz -ldl -ltolua++
+# *****************************
+# 变换规则
+# *****************************
+# Here are some rules for converting .cpp -> .o
+.SUFFIXES: .cpp .o
+.cpp.o:
+	@$(CC) -fPIC $(CFLAGS) ${INCLUDES} -c -g $*.cpp 
+	@echo '----- '$*.cpp' is compiled ok!'
+
+# Here are some rules for converting .c -> .o
+.SUFFIXES: .c .o
+.c.o:
+	@$(CC) $(CFLAGS) -c $*.c 
+	@echo '----- '$*.c' is compiled ok!'

@@ -1,0 +1,28 @@
+project(ZooClient):acelib{
+  sharedname=ZooClient
+  dynamicflags += TEST_TCP_BUILD_DLL
+  libout = ./
+  
+  Source_Files{
+  	./*.cpp 
+  }
+  specific (gnuace){
+		macros += __LINUX__   
+		compile_flags += -Wno-deprecated
+	}
+	
+  specific(make) {
+    compile_flags += -fcheck-new
+  }
+  
+  specific (prop:microsoft){
+	dllout = ../../PurenessScopeServer/Windows_Bin
+  } else {
+	dllout = ../../PurenessScopeServer/Linux_Bin
+  }
+  includes += .
+  includes += ../../Common
+  includes += /usr/local/include/zookeeper
+  libs += zookeeper_mt
+  libpaths += /usr/local/lib
+}

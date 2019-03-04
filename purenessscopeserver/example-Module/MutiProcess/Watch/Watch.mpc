@@ -1,0 +1,14 @@
+project(Watch):aceexe{
+  exename=Watch
+  includes += ../../include ../Common
+  specific (prop:microsoft){
+		exeout=”../../../PurenessScopeServer/Windows_Bin”
+  }else{
+  	macros += __LINUX__
+  } 
+  
+  Source_Files {
+   ../Common/*.cpp 
+   *.cpp
+  }  
+}

@@ -1,0 +1,23 @@
+要编译dll或者so
+
+请先运行样例文件夹下的zzz.bat,它会根据不同的操作系统生成不同的工程文件。
+如果在windows下，它会生成相应本地编译器的工程文件。
+如果在linux下，请不要用zzz.bat，直接用当前目录下的makefile文件即可
+
+如果在windows下，程序会自动生成在
+..\PurenessScopeServer\Windows_Bin
+
+如果是linux下，程序会自动生成在
+请直接进行make
+..\PurenessScopeServer\Linux_Bin
+
+文件目录的说明：
+TcpTest	实现最简单的TCP一收一发数据的用例，这个例子展现了使用PSS如何接收和发送数据。
+TestTCPPost	数据透传(TCP)，当客户端发送一条数据到PSS服务器，服务器会把当前数据包完整的转发到其他指定的服务器上。此用例演示了此过程。
+UDPTest	实现了与客户端一个UDP包的数据包收发过程，演示了此过程的全部功能。
+TestUDPPost	数据透传(UDP)，当客户端发送一条数据到PSS服务器，服务器会把当前数据包完整的转发到其他指定的服务器上。此用例演示了此过程。
+FtpTest	演示了一个PSS框架开发的支持在指定用户登陆的时候，对指定的文件进行上传下载，并支持遍历文件夹的过程。相关测试客户端为PSSFtpClient。
+LoginBuffer	演示了一个基于二级缓冲的用户登陆登出的例子，使用共享内存，减少当大量登陆用户同时涌入的时候，如何减少对数据源的压力。
+			并演示了，如何做到共享内存和数据源互为备份。相关测试客户端为PSSLoginClient
+PlugAtoB 演示了PSS框架模块间调用的机制，客户端发送一个数据包请求，PlugA处理数据的时候调用PlugB完成相关协作。相关测试客户端为PSSPlugClient
+Proxy 演示了socket接代理的用例,proxy为代理插件，ProxyServer为远程目标服务器，

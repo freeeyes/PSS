@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<!-- 设置htmlindex文件的路径 -->
+	<htmlIndex path="C:\FreeeyesWork\PSS\purenessscopeserver\purenessscopeserver\example-Module\MonitorServer\Html" name="index.html"/>
+	<!-- 设置html细节页面路径，插件会把详细信息存放在这个页面下 -->
+	<htmldetail path="C:\FreeeyesWork\PSS\purenessscopeserver\purenessscopeserver\example-Module\MonitorServer\Html\detail" relativepath="detail" />
+	<!-- 设置Json细节页面路径，插件会把详细信息存放在这个页面下 -->
+	<htmlJsondetail path="C:\FreeeyesWork\PSS\purenessscopeserver\purenessscopeserver\example-Module\MonitorServer\Html\json" relativepath="../json" />
+	<!-- 设置序列化文件位置 -->
+	<serializationfile filepath="C:\FreeeyesWork\PSS\purenessscopeserver\purenessscopeserver\example-Module\MonitorServer\MonitorSerialization.txt" />
+	
+	<!-- 设置echart JS和Jquery JS的路径 -->
+	<JsEchart src="../js/echarts.min.js" />
+	<JsJquery src="../js/jquery-1.8.3.min.js" />
+
+	<!-- 不在列表中的数据连接最大历史记录数 和 保存数据间隔时间 -->
+	<defaultcfg historymaxcount="10" timeinterval="10" />
+
+	<!-- group分组设置，可以多个 -->
+	<group name="test">
+		<!-- ServerInfo设置，可以多个 -->
+		<ServerInfo name="test-01" ip="127.0.0.1" historymaxcount="10"/>
+	</group>
+</config>

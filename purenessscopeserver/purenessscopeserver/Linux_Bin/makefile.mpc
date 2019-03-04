@@ -1,0 +1,40 @@
+project(PurenessScopeServer):aceexe{
+ 	exename = PurenessScopeServer
+
+ Source_Files{
+  ../../Common/*.cpp	
+  ../Common/*.cpp
+  ../Console/*.cpp
+  ../LogSystem/*.cpp
+  ../Message/*.cpp
+  ../PacketParse/*.cpp
+  ../Reactor/*.cpp
+  ../UDP/*.cpp
+  ../TinyXML/*.cpp
+  ../Mail/*.cpp
+  ../FileTest/*.cpp
+  ../*.cpp
+ }
+  includes += ../Common ../../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../TinyXML ../Mail ../FileTest
+  includes += /usr/local/include/
+  includes += /usr/include/
+  libpaths += /usr/lib64/ 
+  libpaths += /usr/lib/x86_64-linux-gnu/
+  
+  specific(make) {
+    compile_flags += -fcheck-new
+  }
+  
+   verbatim(gnuace, local) {
+   ifneq (, $(shell which curl))
+      CPPFLAGS     += -D__THREE_LIBRARY_CURL__
+      LDLIBS       += -lcurl
+   endif   
+   }
+
+  specific(gnuace) {
+    compile_flags += -Wno-deprecated
+  }
+
+
+}

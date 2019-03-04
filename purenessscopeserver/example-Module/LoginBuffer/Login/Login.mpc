@@ -1,0 +1,26 @@
+project(Login):acelib{
+  sharedname=Login
+  dynamicflags += TEST_TCP_BUILD_LOGIN_DLL
+  libout = ./
+  
+  Source_Files{
+  	./*.cpp 
+	../Common/*.cpp
+  }
+  specific (gnuace){
+		macros += __LINUX__   
+		compile_flags += -Wno-deprecated
+	}
+	
+  specific(make) {
+    compile_flags += -fcheck-new
+  }
+  
+  specific (prop:microsoft){
+	dllout = ../../../PurenessScopeServer/Windows_Bin
+  } else {
+	dllout = ../../../PurenessScopeServer/Linux_Bin
+  }
+  includes += .
+  includes += ../../../Common ../Common
+}

@@ -1,0 +1,21 @@
+project(TcpTest):acelib{
+  sharedname=TcpTest
+  dynamicflags += TEST_TCP_BUILD_DLL
+  
+  Source_Files{
+  	./*.cpp 
+  }
+  specific (gnuace){
+		macros += __LINUX__   
+		compile_flags += -Wno-deprecated
+	}
+  
+  libout = ./
+  specific (prop:microsoft){
+	dllout = ../../PurenessScopeServer/Windows_Bin
+  } else {
+	dllout = ../../PurenessScopeServer/Linux_Bin
+  }
+  includes += .
+  includes += ../../Common ./IniRead
+}

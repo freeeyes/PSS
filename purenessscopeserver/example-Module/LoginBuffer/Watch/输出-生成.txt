@@ -1,0 +1,16 @@
+1>------ 已启动生成: 项目: Watch, 配置: Debug Win32 ------
+1>正在编译...
+1>Watch.cpp
+1>UserValidManager.cpp
+1>SMOption.cpp
+1>正在生成代码...
+1>正在编译资源清单...
+1>Microsoft (R) Windows (R) Resource Compiler Version 6.0.5724.0
+1>Copyright (C) Microsoft Corporation.  All rights reserved.
+1>正在链接...
+1>正在嵌入清单...
+1>Microsoft (R) Windows (R) Resource Compiler Version 6.0.5724.0
+1>Copyright (C) Microsoft Corporation.  All rights reserved.
+1>生成日志保存在“file://d:\freeeyesWork\Pureness\PurenessScopeServer_SVN\purenessscopeserver\ purenessscopeserver --username freeeyes1226@gmail.com\example-Module\LoginBuffer\Watch\Debug\Watch\I386\BuildLog.htm”
+1>Watch - 0 个错误，0 个警告
+========== 生成: 成功 1 个，失败 0 个，最新 0 个，跳过 0 个 ==========
