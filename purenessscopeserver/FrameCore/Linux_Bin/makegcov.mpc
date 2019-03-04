@@ -17,10 +17,10 @@ project(PurenessScopeServer):aceexe{
   ../CppUnit/*.cpp
   ../*.cpp
  }
- includes += ../../../../include
+ includes += ../../../include
  includes += ../Common ../../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../TinyXML ../Mail ../FileTest ../CppUnit ../Encrypt
  
- libpaths += ../../../../lib
+ libpaths += ../../../lib
  libs += cppunit
  includes += /usr/local/include/
  includes += /usr/include/

@@ -64,7 +64,7 @@ matrix:
         - make install
         - LD_LIBRARY_PATH=$TRAVIS_BUILD_DIR/lib:$LD_LIBRARY_PATH
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/FrameCore/Linux_Bin
-        - cd ../../../../lib
+        - cd ../../../lib
         - ls
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/FrameCore/Linux_Bin
         - $ACE_ROOT/bin/mwc.pl -type gnuace psssonar.mwc
