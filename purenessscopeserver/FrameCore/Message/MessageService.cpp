@@ -311,7 +311,8 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
                                          pMessage->GetMessageBase()->m_u4ListenPort,
                                          pMessage->GetMessageBase()->m_u1PacketType,
                                          pMessage->GetMessageBase()->m_u4HeadSrcSize + pMessage->GetMessageBase()->m_u4BodySrcSize,
-                                         COMMAND_TYPE_IN);
+                                         COMMAND_TYPE_IN,
+                                         m_ThreadInfo.m_tvUpdateTime);
     }
 
     if (true == blDeleteFlag)
@@ -469,6 +470,16 @@ bool CMessageService::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uin
                 //记录命令被调用次数
                 u2Count++;
             }
+        }
+
+        //判断是否需要记录超时日志
+        if (pClientCommandList->GetCommandTimeout() > 0)
+        {
+            AppLogManager::instance()->WriteLog(LOG_SYSTEM_WORKTHREAD, "ThreadID=%d, CommandID=%d, Timeout=%d ms, Cost time=%d.",
+                                                m_u4ThreadID,
+                                                u2CommandID,
+                                                pClientCommandList->GetCommandTimeout(),
+                                                u4TimeCost);
         }
 
         return true;
