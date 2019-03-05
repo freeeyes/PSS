@@ -48,7 +48,8 @@ public:
 class CClientCommandList
 {
 private:
-    uint16 m_u2CommandID;
+    uint16  m_u2CommandID;                      //当前处理信令ID
+    uint16  m_u2Timeout;                        //当前处理超时时间
     typedef vector<_ClientCommandInfo*> vecClientCommandList;
     vecClientCommandList m_vecClientCommandList;
 
@@ -56,6 +57,7 @@ public:
     CClientCommandList()
     {
         m_u2CommandID = 0;
+        m_u2Timeout   = 0;
     }
 
     explicit CClientCommandList(uint16 u2CommandID) : m_u2CommandID(u2CommandID)
@@ -65,6 +67,16 @@ public:
     ~CClientCommandList()
     {
         Close();
+    }
+
+    void SetCommandTimeout(uint16 u2Timeout)
+    {
+        m_u2Timeout = u2Timeout;
+    }
+
+    uint16 GetCommandTimeout()
+    {
+        return m_u2Timeout;
     }
 
     void SetCommandID(uint16 u2CommandID)

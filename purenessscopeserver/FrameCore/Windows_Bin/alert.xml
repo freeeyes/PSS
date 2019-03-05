@@ -22,8 +22,6 @@
 <!-- 配置邮件告警功能 MailID必须大于0,可以支持多个 -->
 <Mail MailID="1" fromMailAddr="freeeyes@163.com" toMailAddr="freeeyes@163.com" MailPass="123456" MailUrl="smtps://smtp.163.com" MailPort="465" />
 
-<!-- 生成对应的监控图表 -->
-<WorkThreadChart JsonOutput="1" Count="10" File="./Log/WorkThread.json" />
-<ConnectChart JsonOutput="1" Count="10" File="./Log/ConnnectInfo.json" />
-<CommandChart JsonOutput="1" Count="10" CommandID="4096" File="./Log/Command4096.json" />
+<!-- 设置指定信令超时时间,单位是毫秒 -->
+<CommandTimeout CommandID = "4096" Timeout="500" />
 </config>

@@ -60,6 +60,7 @@ enum XmlConfig
     XML_Config_ClientData,
     XML_Config_CommandInfos,
     XML_Config_Mails,
+    XML_Config_Commands_Timeout,
 
     /*枚举结束*/
     XML_Config_End
@@ -524,6 +525,25 @@ public:
 
     //根据指定的邮箱ID查找邮箱配置信息
     _Mail* GetMailAlert(uint16 MailID);
+};
+
+class xmlCommandsTimeout : public IConfigOpeation
+{
+public:
+    class _CommandsTimeout
+    {
+    public:
+        uint16 CommandID;
+        uint16 Timeout;
+        _CommandsTimeout() : CommandID(0), Timeout(0)
+        {}
+    };
+    std::vector<_CommandsTimeout> vec;
+    xmlCommandsTimeout(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
+    bool Init(CXmlOpeation* pXmlOperation);
+
+    //根据指定的邮箱ID查找邮箱配置信息
+    _CommandsTimeout* GetCommandAlert(uint16 CommandID);
 };
 
 class xmlTSTimer : public IConfigOpeation

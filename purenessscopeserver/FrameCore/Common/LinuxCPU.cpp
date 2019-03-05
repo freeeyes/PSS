@@ -59,9 +59,17 @@ int32 GetProcessCPU_Idel_Linux()
     float fcpu;
     fcpu = (float)atof(szTmp);
     fclose(fd);
-    system("rm -rf aasnowy.txt");
+    strCPU = "rm -rf aasnowy.txt";
+    nRet = system(strCPU.c_str());
 
-    return (int32)(fcpu*100);
+    if (nRet == -1)
+    {
+        return 0;
+    }
+    else
+    {
+        return (int32)(fcpu*100);
+    }
 }
 
 int32 GetProcessMemorySize_Linux()

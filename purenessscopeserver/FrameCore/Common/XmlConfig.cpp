@@ -51,12 +51,13 @@ DefineClassAndFunc(xmlIP, XML_Config_IP)
 DefineClassAndFunc(xmlClientData, XML_Config_ClientData)
 DefineClassAndFunc(xmlCommandInfos, XML_Config_CommandInfos)
 DefineClassAndFunc(xmlMails, XML_Config_Mails)
+DefineClassAndFunc(xmlCommandsTimeout, XML_Config_Commands_Timeout)
 
 bool XMainConfig::Init()
 {
     //初始化xml文件
     return InitFile(MAINCONFIG, XML_Config_RecvInfo, XML_Config_Redirection)
-           && InitFile(ALERTCONFIG, XML_Config_AlertConnect, XML_Config_Mails);
+           && InitFile(ALERTCONFIG, XML_Config_AlertConnect, XML_Config_Commands_Timeout);
 }
 
 bool XMainConfig::InitFile(const char* pFileName, XmlConfig start, XmlConfig end)
@@ -571,4 +572,33 @@ bool xmlTcpRedirection::Init(CXmlOpeation* pXmlOperation)
     }
 
     return true;
+}
+
+bool xmlCommandsTimeout::Init(CXmlOpeation* pXmlOperation)
+{
+    TiXmlElement* pCommandID = NULL;
+    TiXmlElement* pTimeout = NULL;
+
+    _CommandsTimeout CommandsTimeout;
+
+    while (pXmlOperation->Read_XML_Data_Multiple_Uint16("CommandTimeout", "CommandID", CommandsTimeout.CommandID, pCommandID)
+           && pXmlOperation->Read_XML_Data_Multiple_Uint16("CommandTimeout", "Timeout", CommandsTimeout.Timeout, pTimeout))
+    {
+        vec.push_back(CommandsTimeout);
+    }
+
+    return true;
+}
+
+xmlCommandsTimeout::_CommandsTimeout* xmlCommandsTimeout::GetCommandAlert(uint16 CommandID)
+{
+    for (int i = 0; i < (int)vec.size(); i++)
+    {
+        if (vec[i].CommandID == CommandID)
+        {
+            return &vec[i];
+        }
+    }
+
+    return NULL;
 }

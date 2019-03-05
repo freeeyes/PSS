@@ -535,6 +535,7 @@ void CMessageService::CopyMessageManagerList()
                 }
 
                 pCurrClientCommandList->SetCommandID(pClientCommandList->GetCommandID());
+                pCurrClientCommandList->SetCommandTimeout(pClientCommandList->GetCommandTimeout());
 
                 for (int j = 0; j < pClientCommandList->GetCount(); j++)
                 {

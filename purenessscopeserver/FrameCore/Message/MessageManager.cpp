@@ -173,10 +173,19 @@ bool CMessageManager::AddClientCommand_Ex(uint16 u2CommandID, CClientCommand* pC
         return false;
     }
 
+    //从配置文件获取Timeout设置
+    xmlCommandsTimeout::_CommandsTimeout* pCommandTimeout = GetXmlConfigAttribute(xmlCommandsTimeout)->GetCommandAlert(u2CommandID);
+
     CClientCommandList* pClientCommandList = GetClientCommandExist(u2CommandID);
 
     if (NULL != pClientCommandList)
     {
+        //如果超时时间不为空，设置为超时时间
+        if (NULL != pCommandTimeout)
+        {
+            pClientCommandList->SetCommandTimeout(pCommandTimeout->Timeout);
+        }
+
         //该命令已存在
         _ClientCommandInfo* pClientCommandInfo = pClientCommandList->AddClientCommand(pClientCommand, pModuleName, pListenInfo);
         //设置命令绑定ID
