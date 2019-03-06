@@ -23,6 +23,11 @@ public:
 
     CAppConfig(const CAppConfig& ar);
 
+    CAppConfig& operator = (CAppConfig& ar)
+    {
+        ACE_UNUSED_ARG(ar);
+    }
+
     void Close();
 
     bool ReadConfig(const char* szConfigname);

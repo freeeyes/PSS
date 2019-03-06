@@ -76,6 +76,10 @@ public:
         this->m_tvCommandTime  += ar.m_tvCommandTime;
         return *this;
     }
+
+    ~_CommandData()
+    {
+    }
 };
 
 class _CommandAlertData
@@ -115,6 +119,15 @@ public:
         m_u4FlowIn     = 0;
         m_u4FlowOut    = 0;
         m_u1Minute     = 0;
+    }
+
+    ~_Port_Data_Account()
+    {
+    }
+
+    _Port_Data_Account(const _Port_Data_Account& ar)
+    {
+        (*this) = ar;
     }
 
     _Port_Data_Account& operator = (const _Port_Data_Account& ar)
