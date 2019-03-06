@@ -13,7 +13,7 @@ CCommandAccount::CCommandAccount()
 
 CCommandAccount::CCommandAccount(const CCommandAccount& ar)
 {
-    ACE_UNUSED_ARG(ar);
+    (*this) = ar;
 }
 
 CCommandAccount::~CCommandAccount()

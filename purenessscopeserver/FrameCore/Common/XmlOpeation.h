@@ -11,6 +11,18 @@ public:
     CXmlOpeation(void);
     ~CXmlOpeation(void);
 
+    CXmlOpeation(const CXmlOpeation& ar);
+
+    CXmlOpeation& operator = (const CXmlOpeation& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
+
     bool Init(const char* pFileName);
 
     char* GetData(const char* pName, const char* pAttrName);

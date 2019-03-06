@@ -21,7 +21,10 @@ public:
 
     CSendCacheManager& operator = (const CSendCacheManager& ar)
     {
-        ACE_UNUSED_ARG(ar);
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
 
         return *this;
     }

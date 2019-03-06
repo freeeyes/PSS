@@ -29,6 +29,18 @@ public:
     CConsolePromissions();
     ~CConsolePromissions();
 
+    CConsolePromissions(const CConsolePromissions& ar);
+
+    CConsolePromissions& operator = (const CConsolePromissions& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
+
     void Init(const char* pFileName);
     void Close();
 

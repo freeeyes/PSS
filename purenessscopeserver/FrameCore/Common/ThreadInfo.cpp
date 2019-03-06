@@ -12,6 +12,11 @@ CThreadInfo::CThreadInfo(void)
     m_nThreadCount = 0;
 }
 
+CThreadInfo::CThreadInfo(const CThreadInfo& ar)
+{
+    (*this) = ar;
+}
+
 CThreadInfo::~CThreadInfo(void)
 {
     OUR_DEBUG((LM_ERROR, "[CThreadInfo::~CThreadInfo].\n"));

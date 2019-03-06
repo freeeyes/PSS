@@ -34,7 +34,10 @@ public:
 
     CRedirectionData& operator = (const CRedirectionData& ar)
     {
-        ACE_UNUSED_ARG(ar);
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
 
         return *this;
     }
@@ -165,6 +168,18 @@ class CTcpRedirection
 public:
     CTcpRedirection();
     ~CTcpRedirection();
+
+    CTcpRedirection(const CTcpRedirection& ar);
+
+    CTcpRedirection& operator = (const CTcpRedirection& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
 
     void Close();
 

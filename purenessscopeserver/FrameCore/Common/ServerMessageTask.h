@@ -121,7 +121,10 @@ public:
 
     CServerMessageInfoPool& operator = (const CServerMessageInfoPool& ar)
     {
-        ACE_UNUSED_ARG(ar);
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
 
         return *this;
     }
@@ -150,7 +153,10 @@ public:
 
     CServerMessageTask& operator = (const CServerMessageTask& ar)
     {
-        ACE_UNUSED_ARG(ar);
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
 
         return *this;
     }
@@ -207,7 +213,10 @@ public:
 
     CServerMessageManager& operator = (const CServerMessageManager& ar)
     {
-        ACE_UNUSED_ARG(ar);
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
 
         return *this;
     }

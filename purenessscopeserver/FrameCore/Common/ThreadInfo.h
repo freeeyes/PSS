@@ -62,6 +62,18 @@ public:
     CThreadInfo(void);
     ~CThreadInfo(void);
 
+    CThreadInfo(const CThreadInfo& ar);
+
+    CThreadInfo& operator = (const CThreadInfo& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
+
     void Init(int nCount);
 
     bool AddThreadInfo(uint32 u4ThreadID);

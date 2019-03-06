@@ -20,7 +20,10 @@ public:
 
     Logging_Config_Param& operator = (const Logging_Config_Param& ar)
     {
-        ACE_UNUSED_ARG(ar);
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
 
         return *this;
     }
@@ -55,7 +58,10 @@ public:
 
     Frame_Logging_Strategy& operator = (const Frame_Logging_Strategy& ar)
     {
-        ACE_UNUSED_ARG(ar);
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
 
         return *this;
     }

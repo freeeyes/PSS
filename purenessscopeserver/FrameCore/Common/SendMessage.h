@@ -129,7 +129,10 @@ public:
 
     CSendMessagePool& operator = (const CSendMessagePool& ar)
     {
-        ACE_UNUSED_ARG(ar);
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
 
         return *this;
     }

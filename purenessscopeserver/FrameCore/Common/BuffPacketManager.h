@@ -21,7 +21,10 @@ public:
 
     CBuffPacketManager& operator = (const CBuffPacketManager& ar)
     {
-        ACE_UNUSED_ARG(ar);
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
 
         return *this;
     }

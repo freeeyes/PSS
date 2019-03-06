@@ -5,6 +5,11 @@ CTcpRedirection::CTcpRedirection() : m_u2Count(0), m_pClientManager(NULL), m_pCo
 
 }
 
+CTcpRedirection::CTcpRedirection(const CTcpRedirection& ar)
+{
+    (*this) = ar;
+}
+
 CTcpRedirection::~CTcpRedirection()
 {
     Close();

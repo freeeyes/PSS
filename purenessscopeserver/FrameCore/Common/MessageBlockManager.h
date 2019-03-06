@@ -65,7 +65,10 @@ public:
 
     CMemoryBlock_Pool& operator = (const CMemoryBlock_Pool& ar)
     {
-        ACE_UNUSED_ARG(ar);
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
 
         return *this;
     }
@@ -157,7 +160,10 @@ public:
 
     CMessageBlockManager& operator = (const CMessageBlockManager& ar)
     {
-        ACE_UNUSED_ARG(ar);
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
 
         return *this;
     }

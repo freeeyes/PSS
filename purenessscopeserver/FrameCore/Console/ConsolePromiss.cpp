@@ -5,6 +5,11 @@ CConsolePromissions::CConsolePromissions()
 
 }
 
+CConsolePromissions::CConsolePromissions(const CConsolePromissions& ar)
+{
+    (*this) = ar;
+}
+
 CConsolePromissions::~CConsolePromissions()
 {
     Close();

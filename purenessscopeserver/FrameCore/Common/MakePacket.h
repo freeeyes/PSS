@@ -72,7 +72,10 @@ public:
 
     CMakePacket& operator = (const CMakePacket& ar)
     {
-        ACE_UNUSED_ARG(ar);
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
 
         return *this;
     }

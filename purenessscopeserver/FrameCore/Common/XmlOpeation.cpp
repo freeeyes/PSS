@@ -6,6 +6,11 @@ CXmlOpeation::CXmlOpeation(void)
     m_pRootElement   = NULL;
 }
 
+CXmlOpeation::CXmlOpeation(const CXmlOpeation& ar)
+{
+    (*this) = ar;
+}
+
 CXmlOpeation::~CXmlOpeation(void)
 {
     Close();
