@@ -40,6 +40,15 @@ public:
 
     ~CIPAccount();
 
+    CIPAccount(const CIPAccount& ar);
+
+    CIPAccount& operator = (const CIPAccount& ar)
+    {
+        ACE_UNUSED_ARG(ar);
+
+        return *this;
+    }
+
     void Close();
 
     void Init(uint32 u4IPCount);

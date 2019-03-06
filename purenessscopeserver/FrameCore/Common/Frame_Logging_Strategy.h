@@ -16,6 +16,16 @@ public:
     Logging_Config_Param();
     ~Logging_Config_Param();
 
+    Logging_Config_Param(const Logging_Config_Param& ar);
+
+    Logging_Config_Param& operator = (const Logging_Config_Param& ar)
+    {
+        ACE_UNUSED_ARG(ar);
+
+        return *this;
+    }
+
+
     //文件大小检测时间(Secs)
     int m_iChkInterval;
 
@@ -40,6 +50,15 @@ class Frame_Logging_Strategy
 public:
     Frame_Logging_Strategy();
     ~Frame_Logging_Strategy();
+
+    Frame_Logging_Strategy(const Frame_Logging_Strategy& ar);
+
+    Frame_Logging_Strategy& operator = (const Frame_Logging_Strategy& ar)
+    {
+        ACE_UNUSED_ARG(ar);
+
+        return *this;
+    }
 
     //日志级别
     std::string GetLogLevel(const std::string& strLogLevel);

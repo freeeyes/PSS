@@ -5,6 +5,11 @@ CServerMessageInfoPool::CServerMessageInfoPool()
 
 }
 
+CServerMessageInfoPool::CServerMessageInfoPool(const CServerMessageInfoPool& ar)
+{
+    (*this) = ar;
+}
+
 CServerMessageInfoPool::~CServerMessageInfoPool()
 {
     OUR_DEBUG((LM_INFO, "[CMessagePool::~CMessagePool].\n"));
@@ -458,6 +463,11 @@ CServerMessageManager::CServerMessageManager()
 {
     m_pServerMessageTask = NULL;
     Init();
+}
+
+CServerMessageManager::CServerMessageManager(const CServerMessageManager& ar)
+{
+    (*this) = ar;
 }
 
 CServerMessageManager::~CServerMessageManager()

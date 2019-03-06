@@ -5,6 +5,11 @@ CForbiddenIP::CForbiddenIP()
 
 }
 
+CForbiddenIP::CForbiddenIP(const CForbiddenIP& ar)
+{
+    (*this) = ar;
+}
+
 CForbiddenIP::~CForbiddenIP()
 {
     OUR_DEBUG((LM_INFO, "[CForbiddenIP::~CForbiddenIP].\n"));
@@ -273,7 +278,7 @@ VecForbiddenIP* CForbiddenIP::ShowForeverIP() const
     return (VecForbiddenIP*)&m_VecForeverForbiddenIP;
 }
 
-VecForbiddenIP* CForbiddenIP::ShowTemoIP() const
+VecForbiddenIP* CForbiddenIP::ShowTempIP() const
 {
     return (VecForbiddenIP*)&m_VecTempForbiddenIP;
 }

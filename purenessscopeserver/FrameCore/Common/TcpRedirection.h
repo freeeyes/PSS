@@ -27,6 +27,18 @@ public:
     {
     }
 
+    CRedirectionData(const CRedirectionData& ar)
+    {
+        (*this) = ar;
+    };
+
+    CRedirectionData& operator = (const CRedirectionData& ar)
+    {
+        ACE_UNUSED_ARG(ar);
+
+        return *this;
+    }
+
     void SetMode(uint8 u1Mode)
     {
         m_u1Mode = u1Mode;

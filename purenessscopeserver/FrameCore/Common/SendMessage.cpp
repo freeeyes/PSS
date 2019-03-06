@@ -4,6 +4,11 @@ CSendMessagePool::CSendMessagePool(void)
 {
 }
 
+CSendMessagePool::CSendMessagePool(const CSendMessagePool& ar)
+{
+    (*this) = ar;
+}
+
 CSendMessagePool::~CSendMessagePool(void)
 {
     OUR_DEBUG((LM_INFO, "[CSendMessagePool::~CSendMessagePool].\n"));

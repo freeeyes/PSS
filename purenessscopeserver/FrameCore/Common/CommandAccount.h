@@ -246,6 +246,14 @@ public:
     CCommandAccount();
     ~CCommandAccount();
 
+    CCommandAccount(const CCommandAccount& ar);
+
+    CCommandAccount& operator = (const CCommandAccount& ar)
+    {
+        ACE_UNUSED_ARG(ar);
+        return *this;
+    }
+
     void InitName(const char* pName, uint32 u4CommandCount);
     void Init(uint8 u1CommandAccount, uint8 u1Flow, uint16 u2RecvTimeout);
     void AddCommandAlert(uint16 u2CommandID, uint32 u4Count, uint32 u4MailID);

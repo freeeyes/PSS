@@ -11,6 +11,11 @@ CCommandAccount::CCommandAccount()
     m_u8PacketTimeout  =  MAX_QUEUE_TIMEOUT * 1000;
 }
 
+CCommandAccount::CCommandAccount(const CCommandAccount& ar)
+{
+    ACE_UNUSED_ARG(ar);
+}
+
 CCommandAccount::~CCommandAccount()
 {
     OUR_DEBUG((LM_ERROR, "CCommandAccount::~CCommandAccount].\n"));

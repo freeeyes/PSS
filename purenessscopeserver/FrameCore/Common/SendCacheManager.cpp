@@ -5,6 +5,11 @@ CSendCacheManager::CSendCacheManager()
     m_u4UsedCount = 0;
 }
 
+CSendCacheManager::CSendCacheManager(const CSendCacheManager& ar)
+{
+    (*this) = ar;
+}
+
 CSendCacheManager::~CSendCacheManager()
 {
     OUR_DEBUG((LM_INFO, "[CSendCacheManager::~CSendCacheManager]Begin.\n"));

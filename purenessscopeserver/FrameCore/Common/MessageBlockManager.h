@@ -58,6 +58,18 @@ public:
         Close();
     }
 
+    CMemoryBlock_Pool(const CMemoryBlock_Pool& ar)
+    {
+        (*this) = ar;
+    };
+
+    CMemoryBlock_Pool& operator = (const CMemoryBlock_Pool& ar)
+    {
+        ACE_UNUSED_ARG(ar);
+
+        return *this;
+    }
+
     void Close()
     {
         for(uint32 i = 0; i < MAX_MEMORY_BLOCK_COUNT; i++)
@@ -140,6 +152,15 @@ class CMessageBlockManager : public IMessageBlockManager
 public:
     CMessageBlockManager(void);
     virtual ~CMessageBlockManager(void);
+
+    CMessageBlockManager(const CMessageBlockManager& ar);
+
+    CMessageBlockManager& operator = (const CMessageBlockManager& ar)
+    {
+        ACE_UNUSED_ARG(ar);
+
+        return *this;
+    }
 
     void Init();
     void Close();

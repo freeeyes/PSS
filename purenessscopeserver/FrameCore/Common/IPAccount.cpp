@@ -59,6 +59,11 @@ CIPAccount::CIPAccount()
     m_u1Minute = (uint8)dtNowTime.minute();
 }
 
+CIPAccount::CIPAccount(const CIPAccount& ar)
+{
+    (*this) = ar;
+}
+
 CIPAccount::~CIPAccount()
 {
     OUR_DEBUG((LM_INFO, "[CIPAccount::~CIPAccount].\n"));

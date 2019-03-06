@@ -125,6 +125,15 @@ public:
     CSendMessagePool(void);
     ~CSendMessagePool(void);
 
+    CSendMessagePool(const CSendMessagePool& ar);
+
+    CSendMessagePool& operator = (const CSendMessagePool& ar)
+    {
+        ACE_UNUSED_ARG(ar);
+
+        return *this;
+    }
+
     void Init(int32 nObjcetCount = MAX_MSG_THREADQUEUE);
     void Close();
 

@@ -4,6 +4,11 @@ CMakePacket::CMakePacket(void)
 {
 }
 
+CMakePacket::CMakePacket(const CMakePacket& ar)
+{
+    (*this) = ar;
+}
+
 CMakePacket::~CMakePacket(void)
 {
     OUR_DEBUG((LM_INFO, "[CMakePacket::~CMakePacket].\n"));

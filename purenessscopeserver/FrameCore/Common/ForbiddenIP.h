@@ -42,6 +42,21 @@ public:
     CForbiddenIP();
     ~CForbiddenIP();
 
+    CForbiddenIP(const CForbiddenIP& ar);
+
+    CForbiddenIP& operator = (const CForbiddenIP& ar)
+    {
+        if (this != &ar)
+        {
+            this->m_VecForeverForbiddenIP.assign(ar.ShowForeverIP()->begin(), ar.ShowForeverIP()->end());
+            this->m_VecTempForbiddenIP.assign(ar.ShowTempIP()->begin(), ar.ShowTempIP()->end());
+        }
+
+        return *this;
+    }
+
+
+
     bool Init(const char* szConfigPath);                                                    //≥ı ºªØº”‘ÿ”¿æ√∑‚Õ£IPŒƒº˛
     bool CheckIP(const char* pIP, uint8 u1ConnectType = CONNECT_TCP);                       //ºÏ≤‚IP «∑Òø…“‘¡¥Ω”
     bool AddForeverIP(const char* pIP, uint8 u1ConnectType = CONNECT_TCP);                  //ÃÌº””¿æ√∑‚Õ£µƒIP
@@ -49,7 +64,7 @@ public:
     bool DelForeverIP(const char* pIP, uint8 u1ConnectType = CONNECT_TCP);                  //…æ≥˝”¿æ√∑‚Õ£IP
     bool DelTempIP(const char* pIP, uint8 u1ConnectType = CONNECT_TCP);                     //…æ≥˝¡Ÿ ±∑‚Õ£IP
     VecForbiddenIP* ShowForeverIP() const;                                                  //œ‘ æ”¿æ√∑‚Õ£IP
-    VecForbiddenIP* ShowTemoIP() const;                                                     //œ‘ æ¡Ÿ ±∑‚Õ£IP
+    VecForbiddenIP* ShowTempIP() const;                                                     //œ‘ æ¡Ÿ ±∑‚Õ£IP
 
 private:
     bool SaveConfig();                                                                      //¥Ê¥¢≈‰÷√Œƒº˛

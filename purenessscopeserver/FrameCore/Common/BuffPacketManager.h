@@ -17,6 +17,15 @@ public:
     CBuffPacketManager();
     ~CBuffPacketManager();
 
+    CBuffPacketManager(const CBuffPacketManager& ar);
+
+    CBuffPacketManager& operator = (const CBuffPacketManager& ar)
+    {
+        ACE_UNUSED_ARG(ar);
+
+        return *this;
+    }
+
     static void Init_Callback(int nIndex, CBuffPacket* pBuffPacket);
     static void Close_Callback(int nIndex, CBuffPacket* pBuffPacket);
 

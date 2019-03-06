@@ -117,6 +117,15 @@ public:
     CServerMessageInfoPool();
     ~CServerMessageInfoPool();
 
+    CServerMessageInfoPool(const CServerMessageInfoPool& ar);
+
+    CServerMessageInfoPool& operator = (const CServerMessageInfoPool& ar)
+    {
+        ACE_UNUSED_ARG(ar);
+
+        return *this;
+    }
+
     void Init(uint32 u4PacketCount = MAX_SERVER_MESSAGE_INFO_COUNT);
     void Close();
 
@@ -138,6 +147,13 @@ class CServerMessageTask : public ACE_Task<ACE_MT_SYNCH>
 public:
     CServerMessageTask();
     ~CServerMessageTask();
+
+    CServerMessageTask& operator = (const CServerMessageTask& ar)
+    {
+        ACE_UNUSED_ARG(ar);
+
+        return *this;
+    }
 
     virtual int open(void* args = 0);
     virtual int svc (void);
@@ -186,6 +202,15 @@ class CServerMessageManager
 public:
     CServerMessageManager();
     ~CServerMessageManager();
+
+    CServerMessageManager(const CServerMessageManager& ar);
+
+    CServerMessageManager& operator = (const CServerMessageManager& ar)
+    {
+        ACE_UNUSED_ARG(ar);
+
+        return *this;
+    }
 
     void Init();
 

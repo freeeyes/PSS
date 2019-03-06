@@ -613,7 +613,7 @@ void DoMessage_ShowForbiddenList(_CommandInfo& CommandInfo, IBuffPacket* pBuffPa
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
         VecForbiddenIP* pForeverForbiddenIP = App_ForbiddenIP::instance()->ShowForeverIP();
-        VecForbiddenIP* pTempForbiddenIP = App_ForbiddenIP::instance()->ShowTemoIP();
+        VecForbiddenIP* pTempForbiddenIP = App_ForbiddenIP::instance()->ShowTempIP();
 
         if (pForeverForbiddenIP == NULL || pTempForbiddenIP == NULL)
         {

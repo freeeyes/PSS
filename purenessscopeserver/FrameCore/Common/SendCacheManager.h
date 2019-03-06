@@ -17,6 +17,15 @@ public:
     CSendCacheManager();
     ~CSendCacheManager();
 
+    CSendCacheManager(const CSendCacheManager& ar);
+
+    CSendCacheManager& operator = (const CSendCacheManager& ar)
+    {
+        ACE_UNUSED_ARG(ar);
+
+        return *this;
+    }
+
     void Init(uint32 u4CacheCount, uint32 u4CacheSize);
     void Close();
 

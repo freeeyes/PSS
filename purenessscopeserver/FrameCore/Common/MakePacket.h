@@ -68,6 +68,15 @@ public:
     CMakePacket(void);
     ~CMakePacket(void);
 
+    CMakePacket(const CMakePacket& ar);
+
+    CMakePacket& operator = (const CMakePacket& ar)
+    {
+        ACE_UNUSED_ARG(ar);
+
+        return *this;
+    }
+
     bool Init();
 
     bool PutMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& tvNow);                                                     //处理消息数据包
