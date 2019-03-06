@@ -91,6 +91,7 @@ matrix:
         #close server
         - sleep 5
         - killall PurenessScopeServer
+        - sleep 5
         # collect gcov report
         # - cd $TRAVIS_BUILD_DIR/purenessscopeserver/FrameCore/Linux_Bin/.obj
         # - gcovr -r ../ -o ../../report.xml --xml-pretty
