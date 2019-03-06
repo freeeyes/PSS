@@ -56,7 +56,7 @@ matrix:
         # - wget https://bootstrap.pypa.io/ez_setup.py -O - | sudo python
         # - sudo easy_install gcovr
         # install cppunit
-        - wget https://sourceforge.net/projects/cppunit/files/cppunit/1.12.1/cppunit-1.12.1.tar.gz
+        - wget https://nchc.dl.sourceforge.net/project/cppunit/cppunit/1.12.1/cppunit-1.12.1.tar.gz
         - tar zxvf cppunit-1.12.1.tar.gz
         - cd cppunit-1.12.1
         - ./configure LDFLAGS='-ldl' --prefix=$TRAVIS_BUILD_DIR
@@ -89,7 +89,7 @@ matrix:
         #- cd $TRAVIS_BUILD_DIR/purenessscopeserver/FrameCore/Linux_Bin
         #- cat pssout.file
         #close server
-        - sleep 5
+        - sleep 2
         - killall PurenessScopeServer
         - sleep 5
         # collect gcov report
