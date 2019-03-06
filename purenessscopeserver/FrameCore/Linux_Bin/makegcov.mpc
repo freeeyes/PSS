@@ -37,7 +37,7 @@ project(PurenessScopeServer):aceexe{
    } 
 
   specific(gnuace) {
-    compile_flags += -fprofile-arcs -ftest-coverage
+    compile_flags += -fprofile-arcs -ftest-coverage -std=c++11
   }
 
 

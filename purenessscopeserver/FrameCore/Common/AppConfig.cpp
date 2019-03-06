@@ -7,6 +7,11 @@ CAppConfig::CAppConfig(void)
     m_szError[0] = '\0';
 }
 
+CAppConfig::CAppConfig(const CAppConfig& p)
+{
+    ACE_UNUSED_ARG(p);
+}
+
 CAppConfig::~CAppConfig(void)
 {
     OUR_DEBUG((LM_INFO, "[CAppConfig::~CAppConfig].\n"));

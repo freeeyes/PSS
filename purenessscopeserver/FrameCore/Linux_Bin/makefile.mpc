@@ -33,7 +33,7 @@ project(PurenessScopeServer):aceexe{
    }
 
   specific(gnuace) {
-    compile_flags += -Wno-deprecated
+    compile_flags += -Wno-deprecated -std=c++11
   }
 
 

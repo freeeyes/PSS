@@ -21,6 +21,8 @@ public:
     CAppConfig(void);
     ~CAppConfig(void);
 
+    CAppConfig(const CAppConfig& ar);
+
     void Close();
 
     bool ReadConfig(const char* szConfigname);
