@@ -29,6 +29,8 @@ public:
         {
             ACE_UNUSED_ARG(ar);
         }
+
+        return *this;
     }
 
     void Close();
