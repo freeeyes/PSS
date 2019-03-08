@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxFrame" name="PurenessLineFrame">
+		<title>PurenessLine Client</title>
+		<icon>/data/develop/Lib/Network/PSS-master/Icon.jpg</icon>
+		<size>780,493</size>
+		<style>wxDEFAULT_DIALOG_STYLE</style>
+		<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
+			<pos>216,72</pos>
+			<object class="wxStaticBox" name="ID_STATICBOX1" variable="StaticBox1" member="yes">
+				<label>CPU监控</label>
+				<pos>8,8</pos>
+				<size>536,224</size>
+			</object>
+			<object class="wxStaticBox" name="ID_STATICBOX2" variable="StaticBox2" member="yes">
+				<label>内存监控</label>
+				<pos>8,240</pos>
+				<size>536,248</size>
+			</object>
+			<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
+				<label>服务器IP地址</label>
+				<pos>552,24</pos>
+			</object>
+			<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="TextCtrl_ServerIP" member="yes">
+				<maxlength>16</maxlength>
+				<pos>640,16</pos>
+				<size>128,35</size>
+			</object>
+			<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
+				<label>服务器端口</label>
+				<pos>552,72</pos>
+			</object>
+			<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="TextCtrl_ServerPort" member="yes">
+				<maxlength>5</maxlength>
+				<pos>640,64</pos>
+				<size>128,35</size>
+			</object>
+			<object class="wxButton" name="ID_BUTTON1" variable="Button_StartMonitor" member="yes">
+				<label>开始监听</label>
+				<pos>552,120</pos>
+				<handler function="OnButton_StartMonitorClick" entry="EVT_BUTTON" />
+			</object>
+			<object class="wxButton" name="ID_BUTTON2" variable="Button_StopMonitor" member="yes">
+				<label>取消监听</label>
+				<pos>680,120</pos>
+				<handler function="OnButton_StopMonitorClick" entry="EVT_BUTTON" />
+			</object>
+		</object>
+		<object class="wxTimer" name="ID_TIMER1" variable="Timer_chartUpdateTimer" member="yes">
+			<interval>1000</interval>
+			<handler function="OnTimer_chartUpdateTimerTrigger" entry="EVT_TIMER" />
+		</object>
+		<object class="wxTimer" name="ID_TIMER2" variable="Timer_dataRateTimer" member="yes">
+			<interval>1000</interval>
+			<handler function="OnTimer_dataRateTimerTrigger" entry="EVT_TIMER" />
+		</object>
+	</object>
+</wxsmith>

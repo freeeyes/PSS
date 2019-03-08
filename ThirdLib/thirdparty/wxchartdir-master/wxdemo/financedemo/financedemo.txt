@@ -1,0 +1,1 @@
+./Release/financedemo.cpp.o ./Release/hotspotdialog.cpp.o ./Release/wxchartviewer.cpp.o ./Release/financedemoapp.cpp.o

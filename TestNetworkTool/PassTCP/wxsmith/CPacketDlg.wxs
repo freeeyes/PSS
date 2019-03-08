@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxDialog" name="CPacketDlg">
+		<title>顺序数据包设置</title>
+		<size>581,389</size>
+		<id_arg>0</id_arg>
+		<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
+			<pos>0,0</pos>
+			<size>584,400</size>
+			<handler function="OnPanel1Paint" entry="EVT_PAINT" />
+			<object class="wxStaticBox" name="ID_STATICBOX1" variable="StaticBox1" member="yes">
+				<label>添加数据包</label>
+				<pos>0,0</pos>
+				<size>576,224</size>
+			</object>
+			<object class="wxStaticBox" name="ID_STATICBOX2" variable="StaticBox2" member="yes">
+				<label>压测数据包信息</label>
+				<pos>0,224</pos>
+				<size>576,168</size>
+			</object>
+			<object class="wxStaticText" name="wxID_ANY" variable="StaticText1" member="yes">
+				<label>NOTE：添加数据包，其中随机数字的部分请用%d来替代，目前只支持文本协议，未来考虑二进制协议的支持，所有的回车换行请用/r/n明文写出，程序会 自动替换这这些字符。二进制数据包暂不支持随机替换.\\\\r\\&#x0A;如果发送文本数据包样例格式为:GET / HTTP/1.1\\\\\\\\r\\\\\\&#x0A;Accept: */*\\\\\\\\r\\\\\\&#x0A;Accept-Language: zh-cn\\\\\\\\r\\\\\\&#x0A;\\\\\\\\r\\\\\\&#x0A;\\\\r\\&#x0A;文本数据包格式为:0a 00 00 00 00 10 be cd aa 8f 3c 01 00 00</label>
+				<pos>16,24</pos>
+				<size>544,112</size>
+			</object>
+			<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
+				<label>数据包</label>
+				<pos>16,160</pos>
+			</object>
+			<object class="wxTextCtrl" name="ID_TEXTCTRL_PacketData" variable="TextCtrl_PacketData" member="yes">
+				<pos>72,144</pos>
+				<size>488,48</size>
+			</object>
+			<object class="wxButton" name="ID_BUTTON_AddPacket" variable="Button_AddPacket" member="yes">
+				<label>添加数据包</label>
+				<pos>24,190</pos>
+				<handler function="OnButton_AddPacketClick" entry="EVT_BUTTON" />
+			</object>
+			<object class="wxRadioBox" name="ID_RADIOBOX_PacketType" variable="RadioBox_PacketType" member="yes">
+				<label></label>
+				<content>
+					<item>二进制数据包</item>
+					<item>文本数据包</item>
+				</content>
+				<pos>128,178</pos>
+				<style>wxRA_VERTICAL</style>
+			</object>
+			<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
+				<label>接收字节数</label>
+				<pos>384,195</pos>
+			</object>
+			<object class="wxTextCtrl" name="ID_TEXTCTRL_RecvLength" variable="TextCtrl_RecvLength" member="yes">
+				<value>0</value>
+				<pos>448,192</pos>
+				<size>120,25</size>
+			</object>
+			<object class="wxButton" name="ID_BUTTON_SavePacketToFile" variable="Button_SavePacketToFile" member="yes">
+				<label>保存成文件</label>
+				<pos>16,352</pos>
+				<handler function="OnButton_SavePacketToFileClick" entry="EVT_BUTTON" />
+			</object>
+			<object class="wxButton" name="ID_BUTTON_LoadPacketFile" variable="Button_LoadPacketFile" member="yes">
+				<label>打开文件</label>
+				<pos>96,352</pos>
+				<handler function="OnButton_LoadPacketFileClick" entry="EVT_BUTTON" />
+			</object>
+			<object class="wxButton" name="ID_BUTTON4" variable="Button_DeletePacketItem" member="yes">
+				<label>删除条目</label>
+				<pos>184,352</pos>
+				<handler function="OnButton_DeletePacketItemClick" entry="EVT_BUTTON" />
+			</object>
+			<object class="wxButton" name="ID_BUTTON_PreviewSendResult" variable="Button_PreviewSendResult" member="yes">
+				<label>预览发送结果</label>
+				<pos>280,352</pos>
+				<handler function="OnButton_PreviewSendResultClick" entry="EVT_BUTTON" />
+			</object>
+			<object class="wxButton" name="ID_BUTTON_CloseDialog" variable="Button_CloseDialog" member="yes">
+				<label>设置完成</label>
+				<pos>480,352</pos>
+				<handler function="OnButton_CloseDialogClick" entry="EVT_BUTTON" />
+			</object>
+			<object class="wxListBox" name="ID_LISTBOX_PacketList" variable="ListBox_PacketList" member="yes">
+				<default>-1</default>
+				<pos>16,248</pos>
+				<size>256,104</size>
+			</object>
+			<object class="wxListBox" name="ID_LISTBOX_PacketPreviewList" variable="ListBox_PacketPreviewList" member="yes">
+				<default>-1</default>
+				<pos>280,248</pos>
+				<size>288,104</size>
+			</object>
+		</object>
+	</object>
+</wxsmith>

@@ -1,0 +1,1 @@
+./Release/viewportcontroldemoapp.cpp.o ./Release/wxchartviewer.cpp.o ./Release/viewportcontroldemo.cpp.o

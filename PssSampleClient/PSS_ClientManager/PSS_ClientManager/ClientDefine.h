@@ -1,30 +1,32 @@
 #ifndef _CLIENTDEFINE_H
 #define _CLIENTDEFINE_H
 
-#define MESSAGE_SENDERROR        "·¢ËÍ¸ø·þÎñÆ÷ÃüÁîÊ§°Ü"
-#define MESSAGE_TITLE_ERROR      "´íÎóÐÅÏ¢"
-#define MESSAGE_TITLE_SUCCESS    "·þÎñÆ÷ÐÅÏ¢" 
-#define MESSAGE_TITLE_CONNECT    "ÉèÖÃ·þÎñÆ÷µØÖ·³É¹¦"
-#define MESSAGE_RESULT_SUCCESS   "ÃüÁîÖ´ÐÐ³É¹¦"
-#define MESSAGE_RESULT_FAIL      "ÃüÁîÖ´ÐÐÊ§°Ü"
-#define MESSAGE_INSERT_NULL      "±ØÐëÊäÈëÏà¹ØÐÅÏ¢²ÅÄÜ½øÐÐ´Ë²Ù×÷"
-#define MESSAGE_TITLE_INFO       "ÌáÊ¾ÐÅÏ¢"
-#define MESSAGE_IS_CLOSE_SERVER  "ÊÇ·ñÕæµÄ¹Ø±Õ·þÎñÆ÷£¿"
-#define MESSAGE_IS_CLOSE_OVER    "·þÎñÆ÷¹Ø±ÕÖ¸ÁîÒÑ·¢³ö"
+
+#define MESSAGE_SENDERROR        "å‘é€ç»™æœåŠ¡å™¨å‘½ä»¤å¤±è´¥"
+#define MESSAGE_TITLE_ERROR      "é”™è¯¯ä¿¡æ¯"
+#define MESSAGE_TITLE_SUCCESS    "æœåŠ¡å™¨ä¿¡æ¯"
+#define MESSAGE_TITLE_CONNECT    "è®¾ç½®æœåŠ¡å™¨åœ°å€æˆåŠŸ"
+#define MESSAGE_RESULT_SUCCESS   "å‘½ä»¤æ‰§è¡ŒæˆåŠŸ"
+#define MESSAGE_RESULT_FAIL      "å‘½ä»¤æ‰§è¡Œå¤±è´¥"
+#define MESSAGE_INSERT_NULL      "å¿…é¡»è¾“å…¥ç›¸å…³ä¿¡æ¯æ‰èƒ½è¿›è¡Œæ­¤æ“ä½œ"
+#define MESSAGE_TITLE_INFO       "æç¤ºä¿¡æ¯"
+#define MESSAGE_IS_CLOSE_SERVER  "æ˜¯å¦çœŸçš„å…³é—­æœåŠ¡å™¨ï¼Ÿ"
+#define MESSAGE_IS_CLOSE_OVER    "æœåŠ¡å™¨å…³é—­æŒ‡ä»¤å·²å‘å‡º"
+
 
 struct _ClientConnectInfo
 {
-  char       m_szIP[50];            //IPµØÖ·ÐÅÏ¢
-  int        m_nConnectID;          //Á´½ÓµÄID
-  int        m_nRecvCount;          //½ÓÊÕ°üÊýÁ¿
-  int        m_nSendCount;          //·¢ËÍ°üÊýÁ¿
-  int        m_nAllRecvSize;        //½ÓÊÕ×Ö½ÚÊý
-  int        m_nAllSendSize;        //·¢ËÍ×Ö½ÚÊý
-  int        m_nBeginTime;          //Á´½Ó½¨Á¢Ê±¼ä
-  int        m_nAliveTime;          //´æ»îÊ±¼äÃëÊý
-  int        m_nRecvQueueCount;     //½ÓÊÜÂß¼­´¦Àí°üµÄ¸öÊý
-  long long  m_nRecvQueueTimeCost;  //½ÓÊÜÂß¼­´¦Àí°ü×ÜÊ±¼äÏûºÄ
-  long long  m_nSendQueueTimeCost;  //·¢ËÍÊý¾Ý×ÜÊ±¼äÏûºÄ
+  char       m_szIP[50];            //IPåœ°å€ä¿¡æ¯
+  int        m_nConnectID;          //é“¾æŽ¥çš„ID
+  int        m_nRecvCount;          //æŽ¥æ”¶åŒ…æ•°é‡
+  int        m_nSendCount;          //å‘é€åŒ…æ•°é‡
+  int        m_nAllRecvSize;        //æŽ¥æ”¶å­—èŠ‚æ•°
+  int        m_nAllSendSize;        //å‘é€å­—èŠ‚æ•°
+  int        m_nBeginTime;          //é“¾æŽ¥å»ºç«‹æ—¶é—´
+  int        m_nAliveTime;          //å­˜æ´»æ—¶é—´ç§’æ•°
+  int        m_nRecvQueueCount;     //æŽ¥å—é€»è¾‘å¤„ç†åŒ…çš„ä¸ªæ•°
+  long long  m_nRecvQueueTimeCost;  //æŽ¥å—é€»è¾‘å¤„ç†åŒ…æ€»æ—¶é—´æ¶ˆè€—
+  long long  m_nSendQueueTimeCost;  //å‘é€æ•°æ®æ€»æ—¶é—´æ¶ˆè€—
 
   _ClientConnectInfo()
   {

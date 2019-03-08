@@ -1,0 +1,1 @@
+./Debug/up_up_up_up_purenessscopeserver_example-Module_UDPTest_BaseCommand.cpp.o ./Debug/up_up_up_up_purenessscopeserver_example-Module_UDPTest_UDPTest.cpp.o

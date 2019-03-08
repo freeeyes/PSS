@@ -1,7 +1,7 @@
-// CommonTCPClient.cpp : 定义控制台应用程序的入口点。
+// CommonTCPClient.cpp : 露篓脪氓驴脴脰脝脤篓脫娄脫脙鲁脤脨貌碌脛脠毛驴脷碌茫隆拢
 //
 
-#include "stdafx.h"
+//#include "stdafx.h"
 #include "CommonTCPClient.h"
 
 //add by freeeyes

@@ -1,0 +1,15 @@
+# Package Information for pkg-config
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+includedir=@includedir@
+libdir=@libdir@
+wxver=@WX_VERSION_MAJOR@.@WX_VERSION_MINOR@
+
+Name: wxchartdir-@WX_VERSION_MAJOR@.@WX_VERSION_MINOR@
+Description: wxChartDir Chart viewer for ChartDirector for use in programs based on wxWidgets
+URL: https://github.com/utelle/wxchartdir/
+Version: @VERSION@
+Cflags: -I${includedir}
+Libs: -L${libdir} -l@WXCHARTDIR_LIBNAME@ -lchartdir
+Libs.private: -lpthread

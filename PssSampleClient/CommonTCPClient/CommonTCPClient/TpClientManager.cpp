@@ -1,62 +1,41 @@
-#include "StdAfx.h"
+//#include "StdAfx.h"
 #include "TpClientManager.h"
 
 CTpClientManager* CTpClientManager::m_pTpClientManager    = NULL;
 
-//定时器的TimerID
-UINT g_nTimerID = 0;
 
 //定时器到达回调事件
-void CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT idEvent, DWORD dwTime)
-{
-	CTpClientManager::Instance().TPClient_HandleEvents((int)idEvent);
-}
 
-DWORD CALLBACK Recv_thread(PVOID pvoid)
+int  Recv_thread( )
 {
 	//遍历循环所有的激活连接，如果有数据，则收到
 	while(true)
 	{
 		CTpClientManager::Instance().Recv_All_Data();
 
-		DWORD dwMilliseconds = TCP_RECV_SLEEP;
-		Sleep(dwMilliseconds);
+		int dwMilliseconds = TCP_RECV_SLEEP;
+		std::this_thread::sleep_for(std::chrono::milliseconds(dwMilliseconds));
 	}
 }
 
-
-DWORD CALLBACK Timer_thread(PVOID pvoid)
+int  Timer_thread( )
 {
-	MSG objmsg;   
-	PeekMessage(&objmsg, NULL, WM_USER, WM_USER, PM_NOREMOVE);   
-	g_nTimerID = SetTimer(NULL, TIMER_EVENT_ID, TIMER_EVENT_INTERVAL, TimerProc);
 
-	if(g_nTimerID <= 0)
+
+	while(true)
 	{
-		printf_s("[Timer Thread]nTimerID create error.\n");
-		return 0;  
+        CTpClientManager::Instance().TPClient_HandleEvents((int)TIMER_EVENT_ID);
+
+		int dwMilliseconds = TIMER_EVENT_INTERVAL;
+		std::this_thread::sleep_for(std::chrono::milliseconds(dwMilliseconds));
+		printf_s("[Timer Thread]Timer is End.\n");
+
 	}
 
-	BOOL  blRet;
-	while((blRet = GetMessage(&objmsg, NULL, 0, 0))!= 0)   
-	{     
-		if(blRet == -1)   
-		{   
-			printf_s("[Timer Thread]Errror =%d.\n", errno);
-			break;  
-		}   
-		else   
-		{    
-			TranslateMessage(&objmsg);     
-			DispatchMessage(&objmsg);     
-	}   
-	}
-
-	KillTimer(NULL, g_nTimerID);
-	g_nTimerID = 0;
-	printf_s("[Timer Thread]Timer is End.\n");
 	return 0;
 }
+
+
 
 CTpClientManager::CTpClientManager(void)
 {
@@ -65,6 +44,7 @@ CTpClientManager::CTpClientManager(void)
 CTpClientManager::~CTpClientManager(void)
 {
 	TPClient_DisConnect_All();
+	FreeSocketEnvironment();
 }
 
 int CTpClientManager::TPClient_Connect( int nServerID, const char* pIP, int nPort, CRecvData* pRecvData /*= NULL*/ )
@@ -113,7 +93,7 @@ int CTpClientManager::TPClient_Send( int nServerID, const char* pBuff, int nLen 
 		{
 			ConnectToServer((*pTpClientInfo));
 		}
-		
+
 		int nTotalSendLen = nLen;
 		int nBeginSend    = 0;
 		int nCurrSendLen  = 0;
@@ -123,10 +103,16 @@ int CTpClientManager::TPClient_Send( int nServerID, const char* pBuff, int nLen 
 		{
 			while(true)
 			{
-				nCurrSendLen = send(pTpClientInfo->m_sckClient, pBuff + nBeginSend, nTotalSendLen, 0);
+				//nCurrSendLen = send(pTpClientInfo->m_sckClient, pBuff + nBeginSend, nTotalSendLen, 0);
+		        transresult_t   rt;
+                SocketSend(pTpClientInfo->m_sckClient, pBuff + nBeginSend, nTotalSendLen, rt);
+				nCurrSendLen    =rt.nbytes;
+
 				if(nCurrSendLen <= 0)
 				{
-					closesocket(pTpClientInfo->m_sckClient);
+					//closesocket(pTpClientInfo->m_sckClient);
+					SocketClose(pTpClientInfo->m_sckClient);
+
 					pTpClientInfo->m_nState    = 0;
 					pTpClientInfo->m_sckClient = INVALID_SOCKET;
 					break;
@@ -219,7 +205,10 @@ bool CTpClientManager::DelTcpClient( int nServerID )
 			//判断是否需要断开连接
 			if(((_TpClientInfo)(*b)).m_nState == 1 && ((_TpClientInfo)(*b)).m_sckClient != INVALID_SOCKET)
 			{
-				closesocket(((_TpClientInfo)(*b)).m_sckClient);
+				//closesocket(((_TpClientInfo)(*b)).m_sckClient);
+                HSocket sckclent    =((_TpClientInfo)(*b)).m_sckClient;
+                SocketClose(sckclent);
+
 				if(m_blDebug)
 				{
 					printf_s("[CTpClientManager::DelTcpClient]close ServerID=%d socket.\n", ((_TpClientInfo)(*b)).m_nServerID);
@@ -242,7 +231,10 @@ bool CTpClientManager::DelTcpClient_All()
 		//判断是否需要断开连接
 		if(((_TpClientInfo)(*b)).m_nState == 1 && ((_TpClientInfo)(*b)).m_sckClient != INVALID_SOCKET)
 		{
-			closesocket(((_TpClientInfo)(*b)).m_sckClient);
+            HSocket sckclent    =((_TpClientInfo)(*b)).m_sckClient;
+			//closesocket(((_TpClientInfo)(*b)).m_sckClient);
+			SocketClose(sckclent);
+
 			if(m_blDebug)
 			{
 				printf_s("[CTpClientManager::DelTcpClient_All]close ServerID=%d socket\n.", ((_TpClientInfo)(*b)).m_nServerID);
@@ -267,14 +259,15 @@ int CTpClientManager::TPClient_HandleEvents( int nEventsID )
 
 int CTpClientManager::TPClient_Run(bool blIsDebug)
 {
-	DWORD dwThreadId;
-	//创建一个线程运行定时器
-	HANDLE hThread = CreateThread(NULL, 0, Timer_thread, 0, 0, &dwThreadId);
 
+	//创建一个线程定时运行
+    std::thread hThreadTimer(&Timer_thread);
+    hThreadTimer.detach();
 
-	DWORD dwThreadRecvId;
 	//创建一个线程接收所有数据
-	HANDLE hThreadRecv = CreateThread(NULL, 0, Recv_thread, 0, 0, &dwThreadRecvId);
+    std::thread hThreadRecv(&Recv_thread);
+    hThreadRecv.detach();
+
 
 	return 0;
 }
@@ -287,33 +280,29 @@ void CTpClientManager::SetDebug( bool blDebug )
 int CTpClientManager::ConnectToServer( _TpClientInfo& objTpClientInfo )
 {
 	//socket创建的准备工作
-	struct sockaddr_in sockaddr;
-
-	memset(&sockaddr, 0, sizeof(sockaddr));
-	sockaddr.sin_family = AF_INET;
-	sockaddr.sin_port   = htons(objTpClientInfo.m_nPort);
-	sockaddr.sin_addr.S_un.S_addr = inet_addr(objTpClientInfo.m_szTpIP);
-
-	SOCKET sckClient = socket(AF_INET, SOCK_STREAM, 0);
-
 	//设置接收超时时间
-	DWORD TimeOut = (DWORD)TCP_RECV_TIMEOUT;
-	::setsockopt(sckClient, SOL_SOCKET, SO_RCVTIMEO, (char *)&TimeOut, sizeof(TimeOut));
+	int TimeOut = TCP_RECV_TIMEOUT;
 
-	int nErr = connect(sckClient, (SOCKADDR*)&sockaddr, sizeof(SOCKADDR));
+    struct sockaddr_in sockaddr;
+	HSocket sckClient = SocketOpen(SOCK_STREAM);
+	SocketTimeOut(sckClient, TimeOut, -1, -1);
+	GetAddressFrom(&sockaddr,objTpClientInfo.m_szTpIP, objTpClientInfo.m_nPort);
+
+	int nErr = SocketConnect(sckClient, &sockaddr);
 	if(0 != nErr)
 	{
 		if(m_blDebug)
 		{
-			printf_s("[CTpClientManager::ConnectToServer]connect error(%d).\n", WSAGetLastError());
+			printf_s("[CTpClientManager::ConnectToServer]connect error(%d).\n", GetLastSocketError());
 			objTpClientInfo.m_nState    = 0;
 			objTpClientInfo.m_sckClient = INVALID_SOCKET;
 		}
 	}
 	else
 	{
-		unsigned long ul = 1;//1为非阻塞,0为阻塞
-		ioctlsocket(sckClient, FIONBIO, (unsigned long*)&ul);
+		bool ul = true;//false为非阻塞,true为阻塞
+		//ioctlsocket(sckClient, FIONBIO, (unsigned long*)&ul);
+		SocketBlock(sckClient, ul);
 
 		if(m_blDebug)
 		{
@@ -338,25 +327,31 @@ void CTpClientManager::Recv_All_Data()
 		if(m_vecTpClientInfo[i].m_nState == 1 && m_vecTpClientInfo[i].m_sckClient != INVALID_SOCKET)
 		{
 			char szBuff[MAX_BUFF_1024] = {'\0'};
-			int nCurrRecvLen = recv(m_vecTpClientInfo[i].m_sckClient, (char* )szBuff, MAX_BUFF_1024, 0);
+
+			transresult_t   rt;
+            SocketRecv(m_vecTpClientInfo[i].m_sckClient, (char* )szBuff, MAX_BUFF_1024, rt);
+            int nCurrRecvLen    =rt.nbytes;
+
 			if(nCurrRecvLen <= 0)
 			{
-				int nError = WSAGetLastError();
+				int nError = GetLastSocketError();
 
 				//因为是非阻塞，所以如果是10035则忽略
-				if(nError != WSAEWOULDBLOCK)
+				if((nError != 0)  ||(nError != 10035)  )
 				{
 					if(m_blDebug)
 					{
 						printf_s("[CTpClientManager::Recv_All_Data][%d](%s:%d) is close（%d）.\n", m_vecTpClientInfo[i].m_nServerID, m_vecTpClientInfo[i].m_szTpIP, m_vecTpClientInfo[i].m_nPort, nError);
 					}
 
-					closesocket(m_vecTpClientInfo[i].m_sckClient);
+					//closesocket(m_vecTpClientInfo[i].m_sckClient);
+					SocketClose(m_vecTpClientInfo[i].m_sckClient);
+
 					m_vecTpClientInfo[i].m_sckClient = INVALID_SOCKET;
 					m_vecTpClientInfo[i].m_nState    = 0;
 
 				}
-				continue;				
+				continue;
 			}
 
 			if(m_vecTpClientInfo[i].m_pRecvData != NULL)
@@ -365,7 +360,7 @@ void CTpClientManager::Recv_All_Data()
 				m_vecTpClientInfo[i].m_pRecvData->RecvData(szBuff, nCurrRecvLen);
 			}
 		}
-		
+
 	}
 }
 

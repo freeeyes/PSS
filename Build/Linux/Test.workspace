@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeLite_Workspace Name="Test" Database="" Version="10.0.0">
+  <Project Name="Test" Path="../CppUnitTest/Test.project" Active="No"/>
+  <Project Name="PassTCP" Path="../TestNetworkTool/PassTCP.project" Active="Yes"/>
+  <Project Name="XML2CPP" Path="../PluginMaker/XML2CPP/XML2CPP.project" Active="No"/>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="Debug" Selected="no">
+      <Environment/>
+      <Project Name="Test" ConfigName="Debug"/>
+      <Project Name="PassTCP" ConfigName="Debug"/>
+      <Project Name="XML2CPP" ConfigName="Debug"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Release" Selected="yes">
+      <Environment/>
+      <Project Name="Test" ConfigName="Release"/>
+      <Project Name="PassTCP" ConfigName="Release"/>
+      <Project Name="XML2CPP" ConfigName="Release"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
+</CodeLite_Workspace>

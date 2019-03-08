@@ -1,0 +1,64 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+#include "wxchartviewer_version.h"
+
+#include <windows.h>
+
+/* WXCHARTVIEWER_STRINGIZE works as the preprocessor # operator but also works with macros */
+#define WXCHARTVIEWER_STRINGIZE_HELPER(x)  #x
+#define WXCHARTVIEWER_STRINGIZE(x)         WXCHARTVIEWER_STRINGIZE_HELPER(x)
+ 
+#define WXCHARTVIEWER_MAKE_VERSION_DOT_STRING(x, y, z, w) \
+  WXCHARTVIEWER_STRINGIZE(x) "." WXCHARTVIEWER_STRINGIZE(y) "." WXCHARTVIEWER_STRINGIZE(z) "." WXCHARTVIEWER_STRINGIZE(w)
+ 
+#define WXCHARTVIEWER_VERSION_NUM_DOT_STRING \
+  WXCHARTVIEWER_MAKE_VERSION_DOT_STRING(WXCHARTVIEWER_MAJOR_VERSION, WXCHARTVIEWER_MINOR_VERSION, WXCHARTVIEWER_RELEASE_NUMBER, WXCHARTVIEWER_SUBRELEASE_NUMBER)
+
+// 0x0409 is US English, 0x04b0 is Unicode and 0x0000 is 7 bit ASCII. see
+// http://msdn.microsoft.com/en-us/library/aa381049(VS.85).aspx for the full
+// list of languages and charsets
+#define LANG 0x0409
+#ifdef _UNICODE
+  #define CHARSET 0x4b0
+  #define LANG_WITH_CHARSET "040904b0"
+#else
+  #define CHARSET 0
+  #define LANG_WITH_CHARSET "04090000"
+#endif
+
+VS_VERSION_INFO VERSIONINFO
+  FILEVERSION WXCHARTVIEWER_MAJOR_VERSION,WXCHARTVIEWER_MINOR_VERSION,WXCHARTVIEWER_RELEASE_NUMBER,WXCHARTVIEWER_SUBRELEASE_NUMBER
+  PRODUCTVERSION WXCHARTVIEWER_MAJOR_VERSION,WXCHARTVIEWER_MINOR_VERSION,WXCHARTVIEWER_RELEASE_NUMBER,WXCHARTVIEWER_SUBRELEASE_NUMBER
+  FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+  FILEFLAGS 0x1L
+#else
+  FILEFLAGS 0x0L
+#endif
+  FILEOS VOS_NT_WINDOWS32
+  FILETYPE VFT_DLL
+  FILESUBTYPE 0x0L
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK LANG_WITH_CHARSET
+    BEGIN
+      VALUE "Comments", "wxChartViewer - ChartDirector graphics control for wxWidgets applications"
+      VALUE "CompanyName", "wxChartDir Development Team"
+      VALUE "FileDescription", "wxChartViewer"
+      VALUE "FileVersion", WXCHARTVIEWER_VERSION_NUM_DOT_STRING
+      VALUE "InternalName", WXCHARTVIEWER_STRINGIZE(WXCHARTVIEWER_DLLNAME) ".dll"
+      VALUE "LegalCopyright", "Copyright (C) 2018, Ulrich Telle"
+      VALUE "OriginalFilename", WXCHARTVIEWER_STRINGIZE(WXCHARTVIEWER_DLLNAME) ".dll"
+      VALUE "ProductName", "wxChartViewer"
+      VALUE "ProductVersion", WXCHARTVIEWER_VERSION_NUM_DOT_STRING
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", LANG, CHARSET
+  END
+END

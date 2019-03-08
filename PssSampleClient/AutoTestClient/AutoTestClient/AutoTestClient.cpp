@@ -2,11 +2,12 @@
 //
 
 #include "XmlOpeation.h"
-#include "TcpSocketClient.h"
+#include "sock_wrap.h"
+
 #ifdef WIN32
 #include <windows.h>
 #else
-#include <pthread.h>  
+#include <pthread.h>
 #endif
 
 #define XML_PATH "XML_Packet"
@@ -15,7 +16,7 @@
 #ifdef WIN32
 typedef HANDLE Thread_Mutex;
 #else
-typedef pthread_mutex_t Thread_Mutex
+typedef pthread_mutex_t Thread_Mutex;
 #endif
 
 struct _Thread_Info
@@ -45,8 +46,8 @@ Thread_Mutex Create_Mutex()
 	Thread_Mutex mutex;
 #ifdef WIN32
 		mutex = CreateMutex(NULL, FALSE, NULL);
-#else	
-		pthread_mutex_init(&mutex, NULL); 
+#else
+		pthread_mutex_init(&mutex, NULL);
 #endif
 		return mutex;
 }
@@ -56,19 +57,19 @@ static void Close_Mutex(Thread_Mutex& mutex)
 {
 #ifdef WIN32
 	CloseHandle(mutex);
-#else	
-	pthread_mutex_destroy(&mutex, NULL); 
+#else
+	pthread_mutex_destroy(&mutex);
 #endif
 }
 
 //线程锁打开
 static void Lock(Thread_Mutex& mutex)
 {
-	if(NULL != mutex)
+	//if(NULL != mutex)
 	{
 #ifdef WIN32
 		WaitForSingleObject(mutex, INFINITE);
-#else	
+#else
 		pthread_mutex_lock(&mutex);
 #endif
 	}
@@ -77,11 +78,11 @@ static void Lock(Thread_Mutex& mutex)
 //线程锁结束
 static void UnLock(Thread_Mutex& mutex)
 {
-	if(NULL != mutex)
+	//if(NULL != mutex)
 	{
 #ifdef WIN32
 		ReleaseMutex(mutex);
-#else	
+#else
 		pthread_mutex_unlock(&mutex);
 #endif
 	}
@@ -95,7 +96,7 @@ void* Run_Test(void * arg)
 #endif
 {
 	//连接远程测试
-	ODSocket obj_ODSocket;
+	//ODSocket obj_ODSocket;
 	string strContent;
 	string strTime;
 
@@ -103,9 +104,15 @@ void* Run_Test(void * arg)
 
 	printf("[Run_Test]obj_Command_Info.m_szCommandName=%s.\n", p_Thread_Info->p_Command_Info->m_szCommandName);
 
-	obj_ODSocket.Init();
-	obj_ODSocket.Create(AF_INET, SOCK_STREAM, 0);
-	bool blState = obj_ODSocket.Connect(p_Thread_Info->szIP, p_Thread_Info->nPort, 5);
+	//obj_ODSocket.Init();
+	//obj_ODSocket.Create(AF_INET, SOCK_STREAM, 0);
+	//bool blState = obj_ODSocket.Connect(p_Thread_Info->szIP, p_Thread_Info->nPort, 5);
+
+	InitializeSocketEnvironment();
+	HSocket obj_ODSocket    =SocketOpen(SOCK_STREAM);
+	sockaddr_in addr;
+	GetAddressFrom(&addr, p_Thread_Info->szIP, p_Thread_Info->nPort);
+	bool blState = SocketConnect(obj_ODSocket, &addr);
 	if(false == blState)
 	{
 		Lock(p_Thread_Info->mutex);
@@ -126,8 +133,12 @@ void* Run_Test(void * arg)
 		bool blSendFlag = false;
 		int nCurrSend = 0;
 		while(true)
-		{	
-			int nDataLen = obj_ODSocket.Send(&pSend[nCurrSend], nSendLen - nCurrSend);
+		{
+			//int nDataLen = obj_ODSocket.Send(&pSend[nCurrSend], nSendLen - nCurrSend);
+
+			transresult_t rt;
+			SocketSend(obj_ODSocket, &pSend[nCurrSend], nSendLen - nCurrSend, rt);
+			int nDataLen = rt.nbytes;
 			if(nDataLen < 0)
 			{
 				strContent = "发送数据包失败";
@@ -141,7 +152,7 @@ void* Run_Test(void * arg)
 			}
 			else
 			{
-				nCurrSend += nDataLen; 
+				nCurrSend += nDataLen;
 			}
 		}
 		delete pSend;
@@ -161,7 +172,12 @@ void* Run_Test(void * arg)
 			int nCurrRecv = 0;
 			while(true)
 			{
-				int nDataLen = obj_ODSocket.Recv(&pRecv[nCurrRecv], nRecvLen - nCurrRecv);
+				//int nDataLen = obj_ODSocket.Recv(&pRecv[nCurrRecv], nRecvLen - nCurrRecv);
+
+                transresult_t rt;
+                SocketRecv(obj_ODSocket, &pRecv[nCurrRecv], nRecvLen - nCurrRecv, rt);
+                int nDataLen = rt.nbytes;
+
 				if(nDataLen <= 0)
 				{
 					strContent = "接收返回数据包失败";
@@ -176,7 +192,7 @@ void* Run_Test(void * arg)
 				}
 				else
 				{
-					//继续收包 
+					//继续收包
 					nCurrRecv += nDataLen;
 				}
 			}
@@ -235,7 +251,10 @@ void* Run_Test(void * arg)
 		}
 		UnLock(p_Thread_Info->mutex);
 	}
-	obj_ODSocket.Close();
+	//obj_ODSocket.Close();
+	SocketClose(obj_ODSocket);
+
+	FreeSocketEnvironment();
 
 	return 0;
 }
@@ -255,7 +274,7 @@ void Run_Assemble_List(vec_Test_Assemble obj_Test_Assemble_List)
 
 	for(int i = 0; i < (int)obj_Test_Assemble_List.size(); i++)
 	{
-		Create_TD_Title(pFile, obj_Test_Assemble_List[i].m_szTestAssembleName, obj_Test_Assemble_List[i].m_szDesc, 
+		Create_TD_Title(pFile, obj_Test_Assemble_List[i].m_szTestAssembleName, obj_Test_Assemble_List[i].m_szDesc,
 						obj_Test_Assemble_List[i].m_szIP, obj_Test_Assemble_List[i].m_nPort);
 
 		short sOrder = 0;
@@ -302,7 +321,7 @@ void Run_Assemble_List(vec_Test_Assemble obj_Test_Assemble_List)
 					DWORD ThID;
 					handleArray[k] = CreateThread(NULL, 0, Run_Test, (void* )&threadinfoarray[k], 0, &ThID);
 				}
-				
+
 				//等待所有线程结束
 				WaitForMultipleObjects(2, handleArray, TRUE, INFINITE);
 				delete[] handleArray;

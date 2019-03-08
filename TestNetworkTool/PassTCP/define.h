@@ -1,10 +1,14 @@
 #ifndef _DEFINE_H
 #define _DEFINE_H
 
-#include <WinSock2.h>
+//#include <WinSock2.h>
+#include <arpa/inet.h>
 #include <time.h>
 #include <string>
 #include <vector>
+#include <cstring>
+
+
 
 using namespace std;
 
@@ -16,7 +20,7 @@ using namespace std;
 
 //字符串替换函数
 inline void string_replace( string&s1,const string&s2,const string&s3 )
-{	
+{
 	string::size_type pos = 0;
 	string::size_type a = s2.size();
 	string::size_type b = s3.size();
@@ -33,7 +37,7 @@ struct _RandomPacketInfo
 	char szPacket[MAX_RANDOM_PACKET];   //保存随机数据包
 	int nLen;                           //随机数据包长度
 	int nType;                          //数据类型，默认是文本，文本1，二进制2
-	int nRecdvLength;                   //接收字符串的长度  
+	int nRecdvLength;                   //接收字符串的长度
 
 	_RandomPacketInfo()
 	{
@@ -72,7 +76,7 @@ inline void WebSocketSendData(const char* pData, int nLen, char* pSendData, int&
 		return;
 	}
 
-	if(nLen <= 125) 
+	if(nLen <= 125)
 	{
 		pSendData[nPos] = -127;
 		nPos++;
@@ -82,8 +86,8 @@ inline void WebSocketSendData(const char* pData, int nLen, char* pSendData, int&
 		nPos++;
 
 		//4字节的mark
-		memcpy_s((char* )szMark, 4, &nLen, 4);
-		memcpy_s((char* )&pSendData[nPos], 4, szMark, 4);
+		memcpy((char* )szMark,  &nLen, 4);
+		memcpy((char* )&pSendData[nPos],  szMark, 4);
 		nPos += 4;
 
 		//按位加密
@@ -106,12 +110,12 @@ inline void WebSocketSendData(const char* pData, int nLen, char* pSendData, int&
 		//数据实际长度。最大65535
 		//转换成网络字序
 		short sDataLen = htons((short)nLen);
-		memcpy_s((char* )&pSendData[nPos], 2, (char* )&sDataLen, 2);
+		memcpy((char* )&pSendData[nPos],  (char* )&sDataLen, 2);
 		nPos += 2;
 
 		//4字节的mark
-		memcpy_s((char* )szMark, 4, &nLen, 4);
-		memcpy_s((char* )&pSendData[nPos], 4, szMark, 4);
+		memcpy((char* )szMark,  &nLen, 4);
+		memcpy((char* )&pSendData[nPos],  szMark, 4);
 		nPos += 4;
 
 		//按位加密
@@ -249,7 +253,7 @@ private:
 		else if(cTag >='a'&&  cTag <='f')
 		{
 			cDes = cTag - 'a' + 10;
-			return true; 
+			return true;
 		}
 		else if(cTag >= '0'&& cTag<= '9')
 		{
@@ -339,7 +343,7 @@ public:
 			return false;
 		}
 
-		memcpy_s(objRandomPacketInfo.szPacket, nLen, pData, nLen);
+		memcpy(objRandomPacketInfo.szPacket,  pData, nLen);
 		objRandomPacketInfo.szPacket[nLen] = '\0';
 		objRandomPacketInfo.nLen           = nLen;
 		objRandomPacketInfo.nRecdvLength   = nRecvLength;
@@ -399,7 +403,7 @@ public:
 			ReplaceNumber(strData, (string)"%03d", 3);
 			ReplaceNumber(strData, (string)"%04d", 4);
 
-			memcpy_s(pData, strData.length(), strData.c_str(), strData.length());
+			memcpy(pData,  strData.c_str(), strData.length());
 			pData[strData.length()] = '\0';
 			nLen = strData.length();
 			nRecvLength = pRandomPacketInfo->nRecdvLength;
@@ -410,7 +414,7 @@ public:
 			CConvertBuffer objConvertBuffer;
 
 			//存入数据
-			objConvertBuffer.Convertstr2charArray(pRandomPacketInfo->szPacket, pRandomPacketInfo->nLen, 
+			objConvertBuffer.Convertstr2charArray(pRandomPacketInfo->szPacket, pRandomPacketInfo->nLen,
 				(unsigned char*)pData, nLen);
 			nRecvLength = pRandomPacketInfo->nRecdvLength;
 		}
@@ -444,7 +448,7 @@ public:
 			ReplaceNumber(strData, (string)"%03d", 3);
 			ReplaceNumber(strData, (string)"%04d", 4);
 
-			memcpy_s(pData, strData.length(), strData.c_str(), strData.length());
+			memcpy(pData, strData.c_str(), strData.length());
 			pData[strData.length()] = '\0';
 			nLen = strData.length();
 			nRecvLength = pRandomPacketInfo->nRecdvLength;
@@ -452,7 +456,7 @@ public:
 		else
 		{
 			//存入数据
-			memcpy_s(pData, pRandomPacketInfo->nLen, pRandomPacketInfo->szPacket, pRandomPacketInfo->nLen);
+			memcpy(pData, pRandomPacketInfo->szPacket, pRandomPacketInfo->nLen);
 			nLen = pRandomPacketInfo->nLen;
 			nRecvLength = pRandomPacketInfo->nRecdvLength;
 		}
@@ -470,7 +474,7 @@ public:
 	virtual bool InitSendSize(int nSendLen)                                     = 0;
 	virtual char* GetSendData()                                                 = 0;
 	virtual char* GetSendData(int nThreadID, int nCurrIndex, int& nSendDataLen) = 0;
-	virtual int GetSendLength()                                                 = 0;                   
+	virtual int GetSendLength()                                                 = 0;
 	virtual int GetRecvLength()                                                 = 0;
 	virtual void SetRecvLength(int nRecvLen)                                    = 0;
 	virtual void SetMaxSendLength(int nMaxLength)                               = 0;
@@ -482,30 +486,30 @@ private:
 	{
 		if(nStep == 1)
 		{
-			char szNumber[20] = {'\0'}; 
+			char szNumber[20] = {'\0'};
 			int nNumber = RandomValue(0, 9);
-			sprintf_s(szNumber, 20, "%d", nNumber);
+			sprintf(szNumber,  "%d", nNumber);
 			string_replace(strData, strTag, (string)szNumber);
 		}
 		else if(nStep == 2)
 		{
-			char szNumber[20] = {'\0'}; 
+			char szNumber[20] = {'\0'};
 			int nNumber = RandomValue(0, 99);
-			sprintf_s(szNumber, 20, "%d", nNumber);
+			sprintf(szNumber,  "%d", nNumber);
 			string_replace(strData, strTag, (string)szNumber);
 		}
 		else if(nStep == 3)
 		{
-			char szNumber[20] = {'\0'}; 
+			char szNumber[20] = {'\0'};
 			int nNumber = RandomValue(0, 999);
-			sprintf_s(szNumber, 20, "%d", nNumber);
+			sprintf(szNumber,  "%d", nNumber);
 			string_replace(strData, strTag, (string)szNumber);
 		}
 		else if(nStep == 4)
 		{
-			char szNumber[20] = {'\0'}; 
+			char szNumber[20] = {'\0'};
 			int nNumber = RandomValue(0, 9999);
-			sprintf_s(szNumber, 20, "%d", nNumber);
+			sprintf(szNumber,  "%d", nNumber);
 			string_replace(strData, strTag, (string)szNumber);
 		}
 	}
@@ -524,8 +528,8 @@ public:
 class CNomalLogic : public CBaseDataLogic
 {
 public:
-	CNomalLogic() 
-	{ 
+	CNomalLogic()
+	{
 		m_pSendData      = NULL;
 		m_nSendLen       = 0;
 		m_nRecvLen       = 0;
@@ -567,7 +571,7 @@ public:
 	//设置相关发送Buff
 	void SetSendBuff(const char* pData, int nLen)
 	{
-		memcpy_s(m_pSendData, nLen, pData, nLen);
+		memcpy(m_pSendData,  pData, nLen);
 		m_nSendLen = nLen;
 	}
 
@@ -633,8 +637,8 @@ private:
 class CWebSocketLogic : public CBaseDataLogic
 {
 public:
-	CWebSocketLogic() 
-	{ 
+	CWebSocketLogic()
+	{
 		m_pHandInData    = NULL;
 		m_pSendData      = NULL;
 		m_nSendLen       = 0;
@@ -665,7 +669,7 @@ public:
 		Close();
 
 		m_pHandInData = new char[300];
-		sprintf_s(m_pHandInData, 300, "GET / HTTP/1.1\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: 127.0.0.1:10002\r\nSec-WebSocket-Key: cfMpieGIwzS7+4+nIqv5fA==\r\nSec-WebSocket-Version: 13\r\n\r\n");
+		sprintf(m_pHandInData,  "GET / HTTP/1.1\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: 127.0.0.1:10002\r\nSec-WebSocket-Key: cfMpieGIwzS7+4+nIqv5fA==\r\nSec-WebSocket-Version: 13\r\n\r\n");
 
 		m_pSendData = new char[nSendLen];
 		m_nSendLen  = nSendLen;
@@ -765,12 +769,12 @@ public:
 	bool  m_blIsSendCount;                //是否随机数据包数
 	bool  m_blIsWriteFile;                //是否写入文件
 	bool  m_blIsSendOne;                  //是否只发一次
-	bool  m_blLuaAdvance;                 //是否启动Lua高级模式 
+	bool  m_blLuaAdvance;                 //是否启动Lua高级模式
 	int   m_nConnectType;                 //链接类型，0是TCP，1是UDP
 	int   m_nUdpClientPort;               //UDP客户端接收数据端口
 	int   m_nSendCount;                   //发送总数据包数
 	char  m_szLuaFileName[MAX_BUFF_1024]; //高级模式的Lua文件名
-	CBaseDataLogic* m_pLogic;             //数据对象  
+	CBaseDataLogic* m_pLogic;             //数据对象
 
 	_Socket_Info()
 	{
@@ -803,7 +807,7 @@ public:
 		//这里不再管释放，交由上层解决
 		//if(m_pLogic != NULL)
 		//{
-		//	delete m_pLogic; 
+		//	delete m_pLogic;
 		//}
 	}
 
@@ -822,7 +826,7 @@ struct _Socket_State_Info
 	int m_nSendByteCount;             //发送字节数
 	int m_nRecvByteCount;             //接收字节数
 	int m_nMinRecvTime;               //最小接收时间
-	int m_nMaxRecvTime;               //最大接收时间 
+	int m_nMaxRecvTime;               //最大接收时间
 
 	_Socket_State_Info()
 	{

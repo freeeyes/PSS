@@ -1,0 +1,1 @@
+./Release/up_up_up_up_purenessscopeserver_example-Module_KafkaClient_BaseCommand.cpp.o ./Release/up_up_up_up_purenessscopeserver_example-Module_KafkaClient_KafkaClient.cpp.o ./Release/up_up_up_up_purenessscopeserver_example-Module_KafkaClient_kafkaTest.cpp.o

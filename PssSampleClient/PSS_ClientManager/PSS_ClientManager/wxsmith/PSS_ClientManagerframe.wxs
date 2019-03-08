@@ -1,0 +1,847 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxFrame" name="PSS_ClientManagerFrame">
+		<title>PSS__ClientManager</title>
+		<centered>1</centered>
+		<icon>/data/develop/Lib/Network/PSS-master/Icon.jpg</icon>
+		<size>1003,506</size>
+		<style>wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX</style>
+		<object class="wxNotebook" name="ID_NOTEBOOK1" variable="Notebook1" member="yes">
+			<pos>0,-16</pos>
+			<size>1240,506</size>
+			<object class="notebookpage">
+				<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
+					<size>899,461</size>
+					<object class="wxStaticBox" name="ID_STATICBOX1" variable="StaticBox1" member="yes">
+						<label>服务器管理接口信息</label>
+						<pos>8,8</pos>
+						<size>832,224</size>
+					</object>
+					<object class="wxStaticBox" name="ID_STATICBOX2" variable="StaticBox2" member="yes">
+						<label>模块信息</label>
+						<pos>8,232</pos>
+						<size>832,224</size>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
+						<label>服务器IP</label>
+						<pos>16,40</pos>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
+						<label>服务器密钥</label>
+						<pos>16,80</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="TextCtrl_ServerIP" member="yes">
+						<value>127.0.0.1</value>
+						<maxlength>16</maxlength>
+						<pos>88,32</pos>
+						<size>114,35</size>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="TextCtrl_ServerKey" member="yes">
+						<value>freeeyes</value>
+						<pos>88,72</pos>
+						<size>114,35</size>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
+						<label>服务器端口</label>
+						<pos>216,40</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL3" variable="TextCtrl_ServerPort" member="yes">
+						<value>10010</value>
+						<maxlength>5</maxlength>
+						<pos>296,32</pos>
+					</object>
+					<object class="wxButton" name="ID_BUTTON1" variable="Button_Set" member="yes">
+						<label>设置</label>
+						<pos>400,32</pos>
+						<handler function="OnButton_SetClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxButton" name="ID_BUTTON2" variable="Button_GetServerstate" member="yes">
+						<label>获得服务器状态</label>
+						<pos>496,32</pos>
+						<handler function="OnButton_GetServerstateClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxButton" name="ID_BUTTON3" variable="Button_CloseServer" member="yes">
+						<label>关闭服务器(远程服务器必须允许关闭才能生效)</label>
+						<pos>216,72</pos>
+						<size>392,35</size>
+						<handler function="OnButton_CloseServerClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxListBox" name="ID_LISTBOX1" variable="ListBox_ConfigList" member="yes">
+						<content>
+							<item>Windows PSS</item>
+							<item>Linux PSS</item>
+						</content>
+						<pos>616,72</pos>
+						<size>136,152</size>
+						<handler function="OnListBox_ConfigListSelect" entry="EVT_LISTBOX" />
+					</object>
+					<object class="wxButton" name="ID_BUTTON4" variable="Button_LoadConfigfile" member="yes">
+						<label>从配置文件加载</label>
+						<pos>616,32</pos>
+						<size>136,34</size>
+						<handler function="OnButton_LoadConfigfileClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxButton" name="ID_BUTTON5" variable="Button_ShowAllModule" member="yes">
+						<label>显示所有模块</label>
+						<pos>24,264</pos>
+						<handler function="OnButton_ShowAllModuleClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
+						<label>模块路径</label>
+						<pos>136,272</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL4" variable="TextCtrl_ModulePath" member="yes">
+						<pos>200,264</pos>
+						<size>160,35</size>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText5" member="yes">
+						<label>文件名称</label>
+						<pos>368,272</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL5" variable="TextCtrl_ModuleFilename" member="yes">
+						<pos>432,264</pos>
+						<size>210,35</size>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText6" member="yes">
+						<label>模块名称</label>
+						<pos>24,312</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL6" variable="TextCtrl_ModuleName" member="yes">
+						<pos>88,304</pos>
+						<size>168,35</size>
+						<handler function="OnTextCtrl_ModuleNmaeText" entry="EVT_TEXT" />
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT7" variable="StaticText7" member="yes">
+						<label>模块参数</label>
+						<pos>264,312</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL7" variable="TextCtrl_ModuleParam" member="yes">
+						<pos>328,304</pos>
+						<size>218,35</size>
+					</object>
+					<object class="wxButton" name="ID_BUTTON6" variable="Button_LoadModule" member="yes">
+						<label>加载</label>
+						<pos>664,264</pos>
+						<handler function="OnButton_LoadModuleClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxButton" name="ID_BUTTON7" variable="Button_UnloadModule" member="yes">
+						<label>卸载</label>
+						<pos>560,304</pos>
+						<handler function="OnButton_UnloadModuleClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxButton" name="ID_BUTTON8" variable="Button_ReloadModule" member="yes">
+						<label>重载</label>
+						<pos>664,304</pos>
+						<handler function="OnButton_ReloadModuleClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxListCtrl" name="ID_LISTCTRL1" variable="ListCtrl_ModuleList" member="yes">
+						<pos>16,344</pos>
+						<size>736,112</size>
+						<style>wxLC_LIST|wxLC_REPORT|wxLC_SINGLE_SEL</style>
+						<handler function="OnListCtrl_ModuleListItemSelect" entry="EVT_LIST_ITEM_SELECTED" />
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL38" variable="TextCtrl_ServerInfo" member="yes">
+						<pos>16,112</pos>
+						<size>592,112</size>
+						<style>wxTE_MULTILINE|wxTE_RICH|wxTE_RICH2</style>
+					</object>
+				</object>
+				<label>客户端主模块管理</label>
+			</object>
+			<object class="notebookpage">
+				<object class="wxPanel" name="ID_PANEL2" variable="Panel2" member="yes">
+					<object class="wxStaticBox" name="ID_STATICBOX3" variable="StaticBox3" member="yes">
+						<label>链接信息历史记录</label>
+						<pos>16,248</pos>
+						<size>808,200</size>
+					</object>
+					<object class="wxStaticBox" name="ID_STATICBOX4" variable="StaticBox4" member="yes">
+						<label>链接信息</label>
+						<pos>16,8</pos>
+						<size>808,240</size>
+					</object>
+					<object class="wxButton" name="ID_BUTTON9" variable="Button_GetCurrClientCount" member="yes">
+						<label>获得当前客户端链接个数</label>
+						<pos>32,32</pos>
+						<handler function="OnButton_GetCurrClientCountClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT8" variable="StaticText8" member="yes">
+						<label>当前链接数量</label>
+						<pos>216,40</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL8" variable="TextCtrl_CurrClientCount" member="yes">
+						<pos>304,32</pos>
+						<enabled>0</enabled>
+						<handler function="OnTextCtrl_CurrLinkCountText" entry="EVT_TEXT" />
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT9" variable="StaticText9" member="yes">
+						<label>当前流量(入)</label>
+						<pos>416,40</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL9" variable="TextCtrl_CurrFlowIn" member="yes">
+						<pos>504,32</pos>
+						<enabled>0</enabled>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT10" variable="StaticText10" member="yes">
+						<label>当前流量(出)</label>
+						<pos>616,40</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL10" variable="TextCtrl_CurrFlowOut" member="yes">
+						<pos>704,32</pos>
+						<enabled>0</enabled>
+					</object>
+					<object class="wxButton" name="ID_BUTTON10" variable="Button_SetLinkLimit" member="yes">
+						<label>重新设置上限</label>
+						<pos>32,72</pos>
+						<size>168,34</size>
+						<handler function="OnButton_SetLinkLimitClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT11" variable="StaticText11" member="yes">
+						<label>链接总数上限</label>
+						<pos>216,80</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL11" variable="TextCtrl_LinkUpperLimit" member="yes">
+						<pos>304,72</pos>
+					</object>
+					<object class="wxButton" name="ID_BUTTON11" variable="Button_SetDebug" member="yes">
+						<label>设置DEBUG</label>
+						<pos>32,112</pos>
+						<handler function="OnButton_SetDebugClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxRadioBox" name="ID_RADIOBOX1" variable="RadioBox_DebugState" member="yes">
+						<label></label>
+						<content>
+							<item>DEBUG开启</item>
+							<item>DEBUG关闭</item>
+						</content>
+						<pos>144,96</pos>
+						<size>224,56</size>
+						<style>wxBORDER_NONE</style>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT12" variable="StaticText12" member="yes">
+						<label>获得DEBUG状态</label>
+						<pos>504,120</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL12" variable="TextCtrl_CurrDebugStat" member="yes">
+						<pos>616,112</pos>
+						<enabled>0</enabled>
+					</object>
+					<object class="wxButton" name="ID_BUTTON12" variable="Button_GetDebugState" member="yes">
+						<label>获取DEBUG</label>
+						<pos>400,112</pos>
+						<handler function="OnButton_GetDebugStateClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxButton" name="ID_BUTTON13" variable="Button_StartFile" member="yes">
+						<label>启动文件</label>
+						<pos>32,160</pos>
+						<handler function="OnButton_StartFileClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT13" variable="StaticText13" member="yes">
+						<label>当前CPU消耗</label>
+						<pos>40,208</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL13" variable="TextCtrl_CurrCpuOccupy" member="yes">
+						<pos>136,200</pos>
+						<enabled>0</enabled>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT14" variable="StaticText14" member="yes">
+						<label>当前内存消耗</label>
+						<pos>256,208</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL14" variable="TextCtrl_CurrMemOccupy" member="yes">
+						<pos>360,200</pos>
+						<enabled>0</enabled>
+					</object>
+					<object class="wxButton" name="ID_BUTTON14" variable="Button_StopFile" member="yes">
+						<label>停止文件</label>
+						<pos>136,160</pos>
+						<handler function="OnButton_StopFileClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT15" variable="StaticText15" member="yes">
+						<label>数据包文件路径</label>
+						<pos>256,168</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL15" variable="TextCtrl_PacketFile" member="yes">
+						<value>FileTestCfg.xml</value>
+						<pos>360,160</pos>
+						<size>440,35</size>
+					</object>
+					<object class="wxButton" name="ID_BUTTON15" variable="Button_GetLinkHistory" member="yes">
+						<label>获得当前链接历史</label>
+						<pos>24,280</pos>
+						<size>224,32</size>
+						<handler function="OnButton_GetLinkHistoryClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxListCtrl" name="ID_LISTCTRL2" variable="ListCtrl_LinkHistory" member="yes">
+						<pos>24,320</pos>
+						<size>776,120</size>
+						<style>wxLC_LIST|wxLC_REPORT</style>
+					</object>
+				</object>
+				<label>客户端鏈接管理模块</label>
+			</object>
+			<object class="notebookpage">
+				<object class="wxPanel" name="ID_PANEL3" variable="Panel3" member="yes">
+					<object class="wxStaticBox" name="ID_STATICBOX5" variable="StaticBox5" member="yes">
+						<label>模块调用信息</label>
+						<pos>8,8</pos>
+						<size>824,448</size>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT16" variable="StaticText16" member="yes">
+						<label>命令ID</label>
+						<pos>24,40</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL16" variable="TextCtrl_ModuleID" member="yes">
+						<pos>88,32</pos>
+						<handler function="OnTextCtrl_ModuleIDText" entry="EVT_TEXT" />
+					</object>
+					<object class="wxButton" name="ID_BUTTON16" variable="Button_ShowModuleCmd" member="yes">
+						<label>查看命令</label>
+						<pos>232,32</pos>
+						<handler function="OnButton_ShowModuleCmdClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxButton" name="ID_BUTTON17" variable="Button_ShowAllCmd" member="yes">
+						<label>查看全部</label>
+						<pos>360,32</pos>
+						<enabled>0</enabled>
+						<handler function="OnButton_ShowAllCmdClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT17" variable="StaticText17" member="yes">
+						<label>命令ID格式为十六进制，比如0X1000</label>
+						<pos>456,40</pos>
+					</object>
+					<object class="wxListCtrl" name="ID_LISTCTRL3" variable="ListCtrl_ModuleInfo" member="yes">
+						<pos>24,80</pos>
+						<size>792,168</size>
+						<style>wxLC_LIST|wxLC_REPORT</style>
+					</object>
+					<object class="wxButton" name="ID_BUTTON18" variable="Button_ShowTimeoutCmd" member="yes">
+						<label>查看超时命令</label>
+						<pos>40,256</pos>
+						<handler function="OnButton_ShowTimeoutCmdClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxButton" name="ID_BUTTON19" variable="Button_ClearTimeoutCmd" member="yes">
+						<label>清除超时命令</label>
+						<pos>176,256</pos>
+						<handler function="OnButton_ClearTimeoutCmdClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxButton" name="ID_BUTTON20" variable="Button_SaveSmdHistory" member="yes">
+						<label>保存命令日志</label>
+						<pos>312,256</pos>
+						<handler function="OnButton_SaveSmdHistoryClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxListCtrl" name="ID_LISTCTRL4" variable="ListCtrl_CommandTimeout" member="yes">
+						<pos>24,304</pos>
+						<size>792,144</size>
+						<style>wxLC_LIST|wxLC_REPORT</style>
+					</object>
+				</object>
+				<label>客户端主模块运行信息</label>
+			</object>
+			<object class="notebookpage">
+				<object class="wxPanel" name="ID_PANEL4" variable="Panel4" member="yes">
+					<object class="wxStaticBox" name="ID_STATICBOX6" variable="StaticBox6" member="yes">
+						<label>链接管理</label>
+						<pos>8,8</pos>
+						<size>824,448</size>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT18" variable="StaticText18" member="yes">
+						<label>要停止的客户端链接ID</label>
+						<pos>24,32</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL17" variable="TextCtrl_ClientID" member="yes">
+						<pos>168,24</pos>
+						<size>120,35</size>
+					</object>
+					<object class="wxButton" name="ID_BUTTON21" variable="Button_DisconnectClient" member="yes">
+						<label>断开链接</label>
+						<pos>304,24</pos>
+						<handler function="OnButton_DisconnectClientClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxButton" name="ID_BUTTON22" variable="Button_ShowClient" member="yes">
+						<label>查看TCP</label>
+						<pos>408,24</pos>
+						<handler function="OnButton_ShowClientClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxListCtrl" name="ID_LISTCTRL5" variable="ListCtrl_ClientTcpInfo" member="yes">
+						<pos>24,64</pos>
+						<size>792,192</size>
+						<style>wxLC_LIST|wxLC_REPORT</style>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT19" variable="StaticText19" member="yes">
+						<label>当前日志等级</label>
+						<pos>16,272</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL18" variable="TextCtrl_LogLevel" member="yes">
+						<value>1</value>
+						<pos>112,264</pos>
+					</object>
+					<object class="wxButton" name="ID_BUTTON23" variable="Button_SetLogLevel" member="yes">
+						<label>设置日志等级</label>
+						<pos>232,264</pos>
+						<handler function="OnButton_SetLogLevelClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxButton" name="ID_BUTTON24" variable="Button_ShowCurrLoginfo" member="yes">
+						<label>查看当前日志项</label>
+						<pos>352,264</pos>
+						<handler function="OnButton_ShowCurrLoginfoClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxListCtrl" name="ID_LISTCTRL6" variable="ListCtrl_LogInfo" member="yes">
+						<pos>24,312</pos>
+						<size>792,136</size>
+						<style>wxLC_LIST|wxLC_REPORT</style>
+					</object>
+				</object>
+				<label>客户端链接管理</label>
+			</object>
+			<object class="notebookpage">
+				<object class="wxPanel" name="ID_PANEL5" variable="Panel5" member="yes">
+					<object class="wxStaticBox" name="ID_STATICBOX7" variable="StaticBox7" member="yes">
+						<label>工作线程状态</label>
+						<pos>8,8</pos>
+						<size>832,448</size>
+					</object>
+					<object class="wxButton" name="ID_BUTTON25" variable="Button_ShowWorkThreadStat" member="yes">
+						<label>查看工作线程状态</label>
+						<pos>24,32</pos>
+						<handler function="OnButton_ShowWorkThreadStatClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxListCtrl" name="ID_LISTCTRL7" variable="ListCtrl_WorkThreadInfo" member="yes">
+						<pos>24,72</pos>
+						<size>808,160</size>
+						<style>wxLC_LIST|wxLC_REPORT</style>
+					</object>
+					<object class="wxStaticBox" name="ID_STATICBOX8" variable="StaticBox8" member="yes">
+						<label>设置监控参数</label>
+						<pos>16,240</pos>
+						<size>816,216</size>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT20" variable="StaticText20" member="yes">
+						<label>当前工作线程个数</label>
+						<pos>20,264</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL19" variable="TextCtrl_ThreadCount" member="yes">
+						<value>3</value>
+						<pos>128,256</pos>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT21" variable="StaticText21" member="yes">
+						<label>检查间隔</label>
+						<pos>240,264</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL20" variable="TextCtrl_CheckTime" member="yes">
+						<value>60</value>
+						<pos>304,256</pos>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT22" variable="StaticText22" member="yes">
+						<label>秒</label>
+						<pos>408,264</pos>
+					</object>
+					<object class="wxButton" name="ID_BUTTON26" variable="Button_StartMonitor" member="yes">
+						<label>开始监控</label>
+						<pos>480,256</pos>
+						<handler function="OnButton_StartMonitorClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxButton" name="ID_BUTTON27" variable="Button_StopMonitor" member="yes">
+						<label>停止监控</label>
+						<pos>584,256</pos>
+						<handler function="OnButton_StopMonitorClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxCheckBox" name="ID_CHECKBOX1" variable="CheckBox_Voice" member="yes">
+						<label>开启声音报警</label>
+						<pos>680,260</pos>
+					</object>
+					<object class="wxListCtrl" name="ID_LISTCTRL8" variable="ListCtrl_CheckLog" member="yes">
+						<pos>24,296</pos>
+						<size>448,152</size>
+						<style>wxLC_LIST|wxLC_REPORT</style>
+					</object>
+					<object class="wxRadioBox" name="ID_RADIOBOX2" variable="RadioBox_MonitorServer" member="yes">
+						<label></label>
+						<content>
+							<item>监控当前服务器</item>
+							<item>监控列表服务器</item>
+						</content>
+						<pos>480,280</pos>
+						<size>336,48</size>
+					</object>
+					<object class="wxListCtrl" name="ID_LISTCTRL9" variable="ListCtrl_ServerList" member="yes">
+						<pos>480,336</pos>
+						<size>344,72</size>
+						<style>wxLC_LIST|wxLC_REPORT</style>
+					</object>
+					<object class="wxButton" name="ID_BUTTON28" variable="Button_LoadFile" member="yes">
+						<label>从文件中加载</label>
+						<pos>480,416</pos>
+						<handler function="OnButton_LoadFileClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxButton" name="ID_BUTTON29" variable="Button_ClearLoad" member="yes">
+						<label>清除加载</label>
+						<pos>736,416</pos>
+						<handler function="OnButton_ClearLoadClick" entry="EVT_BUTTON" />
+					</object>
+				</object>
+				<label>工作线程状态</label>
+			</object>
+			<object class="notebookpage">
+				<object class="wxPanel" name="ID_PANEL6" variable="Panel6" member="yes">
+					<object class="wxStaticBox" name="ID_STATICBOX9" variable="StaticBox9" member="yes">
+						<label>服务器间链接管理</label>
+						<pos>0,8</pos>
+						<size>856,440</size>
+					</object>
+					<object class="wxButton" name="ID_BUTTON30" variable="Button_ShowServerLinkInfo" member="yes">
+						<label>查看服务器间链接信息</label>
+						<pos>16,32</pos>
+						<handler function="OnButton_ShowServerLinkInfoClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT23" variable="StaticText23" member="yes">
+						<label>服务器ID</label>
+						<pos>16,76</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL21" variable="TextCtrl_ServerID" member="yes">
+						<pos>72,72</pos>
+					</object>
+					<object class="wxButton" name="ID_BUTTON31" variable="Button_ReconnectServer" member="yes">
+						<label>重新连接</label>
+						<pos>176,72</pos>
+						<handler function="OnButton_ReconnectServerClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxListCtrl" name="ID_LISTCTRL10" variable="ListCtrl_ServerConnect" member="yes">
+						<pos>16,112</pos>
+						<size>824,136</size>
+						<style>wxLC_LIST|wxLC_REPORT</style>
+					</object>
+					<object class="wxListCtrl" name="ID_LISTCTRL11" variable="ListCtrl_ServerLisen" member="yes">
+						<pos>16,296</pos>
+						<size>328,136</size>
+						<style>wxLC_LIST|wxLC_REPORT</style>
+					</object>
+					<object class="wxButton" name="ID_BUTTON32" variable="Button_ShowPSSLisenInfo" member="yes">
+						<label>查看PSS监听信息</label>
+						<pos>8,256</pos>
+						<handler function="OnButton_ShowPSSLisenInfoClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxStaticBox" name="ID_STATICBOX10" variable="StaticBox10" member="yes">
+						<label>动态添加和关闭监听端口</label>
+						<pos>368,256</pos>
+						<size>472,184</size>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT24" variable="StaticText24" member="yes">
+						<label>监听IP</label>
+						<pos>392,288</pos>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT25" variable="StaticText25" member="yes">
+						<label>监听端口</label>
+						<pos>392,328</pos>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT26" variable="StaticText26" member="yes">
+						<label>IP类型</label>
+						<pos>392,368</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL22" variable="TextCtrl_LisenIP" member="yes">
+						<maxlength>16</maxlength>
+						<pos>456,280</pos>
+						<size>136,35</size>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL23" variable="TextCtrl_LisenPort" member="yes">
+						<value>0</value>
+						<maxlength>5</maxlength>
+						<pos>456,320</pos>
+						<size>136,35</size>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT27" variable="StaticText27" member="yes">
+						<label>解析模块 ID</label>
+						<pos>600,328</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL24" variable="TextCtrl_PacketParseID" member="yes">
+						<pos>688,320</pos>
+					</object>
+					<object class="wxComboBox" name="ID_COMBOBOX1" variable="ComboBox_ListenType" member="yes">
+						<content>
+							<item>IPv4</item>
+							<item>IPv6</item>
+						</content>
+						<selection>0</selection>
+						<pos>456,360</pos>
+					</object>
+					<object class="wxButton" name="ID_BUTTON33" variable="Button_InsertNewMonitor" member="yes">
+						<label>添加新监听</label>
+						<pos>392,400</pos>
+						<handler function="OnButton_InsertNewMonitorClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxButton" name="ID_BUTTON34" variable="Button_DeleteOldMonitor" member="yes">
+						<label>停止已有监听</label>
+						<pos>560,400</pos>
+						<handler function="OnButton_DeleteOldMonitorClick" entry="EVT_BUTTON" />
+					</object>
+				</object>
+				<label>服务器间链接信息</label>
+			</object>
+			<object class="notebookpage">
+				<object class="wxPanel" name="ID_PANEL7" variable="Panel7" member="yes">
+					<object class="wxStaticBox" name="ID_STATICBOX11" variable="StaticBox11" member="yes">
+						<label>IP封禁管理</label>
+						<pos>8,8</pos>
+						<size>792,440</size>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT28" variable="StaticText28" member="yes">
+						<label>要封禁的IP地址(支持*)</label>
+						<pos>24,40</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL25" variable="TextCtrl_ForbidenIP" member="yes">
+						<maxlength>16</maxlength>
+						<pos>160,32</pos>
+						<size>128,35</size>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT29" variable="StaticText29" member="yes">
+						<label>要封禁的秒数</label>
+						<pos>312,40</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL26" variable="TextCtrl_ForbidenSeconds" member="yes">
+						<pos>392,32</pos>
+					</object>
+					<object class="wxRadioBox" name="ID_RADIOBOX3" variable="RadioBoxm_TimeForbiden" member="yes">
+						<label></label>
+						<content>
+							<item>时段封禁</item>
+							<item>永久封禁</item>
+						</content>
+						<pos>16,48</pos>
+						<size>208,40</size>
+						<style>wxBORDER_NONE</style>
+					</object>
+					<object class="wxButton" name="ID_BUTTON35" variable="Button_InsertForbiden" member="yes">
+						<label>添加封禁</label>
+						<pos>24,96</pos>
+						<handler function="OnButton_InsertForbidenClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxButton" name="ID_BUTTON36" variable="Button_ReleaseForbiden" member="yes">
+						<label>解除封禁</label>
+						<pos>144,96</pos>
+						<handler function="OnButton_ReleaseForbidenClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxButton" name="ID_BUTTON37" variable="Button_ShowForbiden" member="yes">
+						<label>查看列表</label>
+						<pos>272,96</pos>
+						<handler function="OnButton_ShowForbidenClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxListCtrl" name="ID_LISTCTRL12" variable="ListCtrl_ForbidenList" member="yes">
+						<pos>24,136</pos>
+						<size>768,128</size>
+						<style>wxLC_LIST|wxLC_REPORT</style>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT30" variable="StaticText30" member="yes">
+						<label>要查看的连接别名</label>
+						<pos>16,280</pos>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT31" variable="StaticText31" member="yes">
+						<label>ConnectID</label>
+						<pos>16,312</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL27" variable="TextCtrl_NickName" member="yes">
+						<pos>128,272</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL28" variable="TextCtrl_ConnectID" member="yes">
+						<pos>128,312</pos>
+					</object>
+					<object class="wxButton" name="ID_BUTTON38" variable="Button_SearchNickname" member="yes">
+						<label>查询别名</label>
+						<pos>240,272</pos>
+						<handler function="OnButton_SearchNicknameClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxButton" name="ID_BUTTON39" variable="Button_OpenLog" member="yes">
+						<label>打开日志</label>
+						<pos>240,312</pos>
+						<handler function="OnButton_OpenLogClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxButton" name="ID_BUTTON40" variable="Button_Closelog" member="yes">
+						<label>关闭日志</label>
+						<pos>336,312</pos>
+						<handler function="OnButton_CloselogClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxListCtrl" name="ID_LISTCTRL13" variable="ListCtrl_NickInfo" member="yes">
+						<pos>16,352</pos>
+						<size>776,104</size>
+						<style>wxLC_LIST|wxLC_REPORT</style>
+					</object>
+				</object>
+				<label>IP封禁管理</label>
+			</object>
+			<object class="notebookpage">
+				<object class="wxPanel" name="ID_PANEL8" variable="Panel8" member="yes">
+					<object class="wxStaticBox" name="ID_STATICBOX12" variable="StaticBox12" member="yes">
+						<label>设置跟踪的IP</label>
+						<pos>8,8</pos>
+						<size>816,184</size>
+					</object>
+					<object class="wxListCtrl" name="ID_LISTCTRL14" variable="ListCtrl_TrackIPHistory" member="yes">
+						<pos>8,200</pos>
+						<size>816,256</size>
+						<style>wxLC_LIST|wxLC_REPORT</style>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT32" variable="StaticText32" member="yes">
+						<label>要查询的ConnectID</label>
+						<pos>24,40</pos>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT33" variable="StaticText33" member="yes">
+						<label>染色的IP地址</label>
+						<pos>24,80</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL29" variable="TextCtr_TrackConnectID" member="yes">
+						<pos>152,32</pos>
+						<size>136,35</size>
+					</object>
+					<object class="wxButton" name="ID_BUTTON41" variable="Button_GetTrackSourceIP" member="yes">
+						<label>查询IP来源</label>
+						<pos>304,32</pos>
+						<handler function="OnButton_GetTrackSourceIPClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL30" variable="TextCtrl_IPInfo" member="yes">
+						<pos>408,32</pos>
+						<size>136,35</size>
+						<enabled>0</enabled>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL31" variable="TextCtr_TrackIP" member="yes">
+						<value>127.0.0.1</value>
+						<pos>152,72</pos>
+						<size>136,35</size>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL32" variable="TextCtrl_TrackIPCount" member="yes">
+						<value>1</value>
+						<pos>408,72</pos>
+						<size>136,35</size>
+					</object>
+					<object class="wxButton" name="ID_BUTTON42" variable="Button_SetTrackCommandID" member="yes">
+						<label>设置CommandID</label>
+						<pos>560,112</pos>
+						<handler function="OnButton_SetTrackCommandIDClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxButton" name="ID_BUTTON43" variable="Button_SetTrackIP" member="yes">
+						<label>设置IP</label>
+						<pos>560,72</pos>
+						<size>128,35</size>
+						<handler function="OnButton_SetTrackIPClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxButton" name="ID_BUTTON44" variable="Button_ShowTrackCommandID" member="yes">
+						<label>染色的CommandID信息</label>
+						<pos>16,152</pos>
+						<handler function="OnButton_ShowTrackCommandIDClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT35" variable="StaticText35" member="yes">
+						<label>染色数据个数</label>
+						<pos>312,80</pos>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT36" variable="StaticText36" member="yes">
+						<label>染色的CommandID</label>
+						<pos>24,120</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL33" variable="TextCtrl_TrackCommandID" member="yes">
+						<value>0x1000</value>
+						<pos>152,112</pos>
+						<size>136,35</size>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT37" variable="StaticText37" member="yes">
+						<label>染色数据个数</label>
+						<pos>312,120</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL34" variable="TextCtrl_TracCommandCount" member="yes">
+						<value>1</value>
+						<pos>408,112</pos>
+						<size>136,35</size>
+					</object>
+				</object>
+				<label>数据染色</label>
+			</object>
+			<object class="notebookpage">
+				<object class="wxPanel" name="ID_PANEL9" variable="Panel9" member="yes">
+					<object class="wxStaticBox" name="ID_STATICBOX13" variable="StaticBox13" member="yes">
+						<label>静态</label>
+						<pos>8,8</pos>
+						<size>864,224</size>
+					</object>
+					<object class="wxStaticBox" name="ID_STATICBOX14" variable="StaticBox14" member="yes">
+						<label>静态</label>
+						<pos>8,240</pos>
+						<size>864,216</size>
+					</object>
+					<object class="wxListCtrl" name="ID_LISTCTRL15" variable="ListCtrl_WorkThreadAI" member="yes">
+						<pos>16,40</pos>
+						<size>600,184</size>
+						<style>wxLC_LIST|wxLC_REPORT|wxLC_SINGLE_SEL</style>
+					</object>
+					<object class="wxCheckBox" name="ID_CHECKBOX2" variable="CheckBox_WorkThread" member="yes">
+						<label>WorkThreadAI是否开启</label>
+						<pos>632,40</pos>
+						<size>184,24</size>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT34" variable="StaticText34" member="yes">
+						<label>超时时间</label>
+						<pos>632,72</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL35" variable="TextCtrl_WorkThreadDisposeTime" member="yes">
+						<value>40</value>
+						<pos>704,64</pos>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT38" variable="StaticText38" member="yes">
+						<label>毫秒</label>
+						<pos>816,72</pos>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT39" variable="StaticText39" member="yes">
+						<label>时间区间</label>
+						<pos>632,112</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL36" variable="TextCtrl_WorkThreadCheckTime" member="yes">
+						<value>30</value>
+						<pos>704,104</pos>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT40" variable="StaticText40" member="yes">
+						<label>秒</label>
+						<pos>816,112</pos>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT41" variable="StaticText41" member="yes">
+						<label>中断时间</label>
+						<pos>632,152</pos>
+					</object>
+					<object class="wxTextCtrl" name="ID_TEXTCTRL37" variable="TextCtrl_WorkThreadStopTime" member="yes">
+						<value>30</value>
+						<pos>704,144</pos>
+					</object>
+					<object class="wxStaticText" name="ID_STATICTEXT42" variable="StaticText42" member="yes">
+						<label>秒</label>
+						<pos>816,152</pos>
+					</object>
+					<object class="wxButton" name="ID_BUTTON45" variable="Button_ResetWorkThread" member="yes">
+						<label>重新设置</label>
+						<pos>632,192</pos>
+						<handler function="OnButton_ResetWorkThreadClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxButton" name="ID_BUTTON46" variable="Button_GetWorkThreadParam" member="yes">
+						<label>工作线程AI参数</label>
+						<pos>720,192</pos>
+						<handler function="OnButton_GetWorkThreadParamClick" entry="EVT_BUTTON" />
+					</object>
+					<object class="wxListCtrl" name="ID_LISTCTRL16" variable="ListCtr_WorkThreadTimeout" member="yes">
+						<pos>16,264</pos>
+						<size>408,184</size>
+						<style>wxLC_LIST|wxLC_REPORT|wxLC_SINGLE_SEL</style>
+					</object>
+					<object class="wxListCtrl" name="ID_LISTCTRL17" variable="ListCtrl_WorkThreadForbiden" member="yes">
+						<pos>440,264</pos>
+						<size>280,184</size>
+						<style>wxLC_LIST|wxLC_REPORT|wxLC_SINGLE_SEL</style>
+					</object>
+					<object class="wxButton" name="ID_BUTTON47" variable="Button_GetWorkThreadPool" member="yes">
+						<label>查询当前AI数据池</label>
+						<pos>728,408</pos>
+						<handler function="OnButton_GetWorkThreadPoolClick" entry="EVT_BUTTON" />
+					</object>
+				</object>
+				<label>工作线程AI相关</label>
+			</object>
+		</object>
+		<object class="wxTimer" name="ID_TIMER1" variable="Timer_WorkThread" member="yes">
+			<interval>60000</interval>
+			<handler function="OnTimer_WorkThreadTrigger" entry="EVT_TIMER" />
+		</object>
+	</object>
+</wxsmith>

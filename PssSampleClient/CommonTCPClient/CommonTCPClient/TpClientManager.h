@@ -1,9 +1,11 @@
 #pragma once
 
 //管理所有已建立的连接对象
-#include <winsock.h>
-#include <Windows.h>
+//#include <winsock.h>
+//#include <Windows.h>
 #include <vector>
+#include "sock_wrap.h"
+#include "macro.h"
 
 using namespace std;
 
@@ -12,7 +14,7 @@ using namespace std;
 
 #define FUNC_SUCCESS          0      //函数执行成功
 #define FUNC_FAIL_EXIST       -1     //连接已经存在
-#define FUNC_FAIL_NO_EXIST    -2     //连接不存在 
+#define FUNC_FAIL_NO_EXIST    -2     //连接不存在
 #define FUNC_SEND_ERROR       -3     //发送数据失败
 
 #define INTVALID_SERVERID     -1     //无效的ID
@@ -35,7 +37,7 @@ struct _TpClientInfo
 	int        m_nServerID;             //服务器ID
 	char       m_szTpIP[MAX_BUFF_50];   //TCP的IP
 	int        m_nPort;                 //TCP的端口
-	SOCKET     m_sckClient;             //Socket
+	HSocket    m_sckClient;             //Socket
 	int        m_nState;                //0为未连接，1为已连接
 	CRecvData* m_pRecvData;             //处理接收数据的回调类
 
@@ -58,8 +60,9 @@ public:
 	static CTpClientManager& Instance()
 	{
 		//初始化TCP链接
-		WSADATA wsaData;
-		int nErr = WSAStartup(MAKEWORD(2, 2), &wsaData);
+		//WSADATA wsaData;
+		//int nErr = WSAStartup(MAKEWORD(2, 2), &wsaData);
+		int nErr = InitializeSocketEnvironment();
 		if(nErr != 0)
 		{
 			//MessageBox(_T("本机socket库加载失败，请检查本机socket库版本"), _T("错误信息"), MB_OK);

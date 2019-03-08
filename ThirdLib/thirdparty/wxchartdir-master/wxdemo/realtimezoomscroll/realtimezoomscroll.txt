@@ -1,0 +1,1 @@
+./Release/realtimezoomscrollapp.cpp.o ./Release/wxchartviewer.cpp.o ./Release/realtimezoomscroll.cpp.o

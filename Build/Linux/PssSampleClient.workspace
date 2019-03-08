@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeLite_Workspace Name="PssSampleClient" Database="" Version="10.0.0">
+  <Project Name="AutoTestClient" Path="../PssSampleClient/AutoTestClient/AutoTestClient.project" Active="Yes"/>
+  <Project Name="CommonTCPClient" Path="../PssSampleClient/CommonTCPClient/CommonTCPClient.project" Active="No"/>
+  <Project Name="PSS_ClientManager" Path="../PssSampleClient/PSS_ClientManager/PSS_ClientManager.project" Active="No"/>
+  <Project Name="PssFtpClient" Path="../PssSampleClient/PssFtpClient/PssFtpClient.project" Active="No"/>
+  <Project Name="PSSLoginClient" Path="../PssSampleClient/PSSLoginClient/PSSLoginClient.project" Active="No"/>
+  <Project Name="PSSPlugClient" Path="../PssSampleClient/PSSPlugClient/PSSPlugClient.project" Active="No"/>
+  <Project Name="PSSProxyClient" Path="../PssSampleClient/PSSProxyClient/PSSProxyClient.project" Active="No"/>
+  <Project Name="PurenessLine" Path="../PssSampleClient/PurenessLine/PurenessLine.project" Active="No"/>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="Debug" Selected="no">
+      <Environment/>
+      <Project Name="AutoTestClient" ConfigName="Debug"/>
+      <Project Name="CommonTCPClient" ConfigName="Debug"/>
+      <Project Name="PSS_ClientManager" ConfigName="Debug"/>
+      <Project Name="PssFtpClient" ConfigName="Debug"/>
+      <Project Name="PSSLoginClient" ConfigName="Debug"/>
+      <Project Name="PSSPlugClient" ConfigName="Debug"/>
+      <Project Name="PSSProxyClient" ConfigName="Debug"/>
+      <Project Name="PurenessLine" ConfigName="Debug"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Release" Selected="yes">
+      <Environment/>
+      <Project Name="AutoTestClient" ConfigName="Release"/>
+      <Project Name="CommonTCPClient" ConfigName="Release"/>
+      <Project Name="PSSLoginClient" ConfigName="Release"/>
+      <Project Name="PSSPlugClient" ConfigName="Release"/>
+      <Project Name="PSSProxyClient" ConfigName="Release"/>
+      <Project Name="PSS_ClientManager" ConfigName="Release"/>
+      <Project Name="PssFtpClient" ConfigName="Release"/>
+      <Project Name="PurenessLine" ConfigName="Release"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
+</CodeLite_Workspace>

@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeLite_Project Name="PassTCP" Version="10.0.0" InternalType="GUI">
+  <Plugins>
+    <Plugin Name="qmake">
+      <![CDATA[00010001N0007Release000000000000]]>
+    </Plugin>
+  </Plugins>
+  <VirtualDirectory Name="lib"/>
+  <VirtualDirectory Name="src">
+    <File Name="../Base/thirdparty/LuaLib/tolua_to.c"/>
+    <File Name="../Base/thirdparty/LuaLib/tolua_push.c"/>
+    <File Name="../Base/thirdparty/LuaLib/tolua_map.c"/>
+    <File Name="../Base/thirdparty/LuaLib/tolua_is.c"/>
+    <File Name="../Base/thirdparty/LuaLib/tolua_event.h"/>
+    <File Name="../Base/thirdparty/LuaLib/tolua_event.c"/>
+    <File Name="../Base/thirdparty/LuaLib/toluabind.h"/>
+    <File Name="../Base/thirdparty/LuaLib/toluabind.c"/>
+    <File Name="../Base/thirdparty/LuaLib/tolua++.h"/>
+    <File Name="../Base/thirdparty/LuaLib/print.c"/>
+    <File Name="../Base/thirdparty/LuaLib/lzio.h"/>
+    <File Name="../Base/thirdparty/LuaLib/lzio.c"/>
+    <File Name="../Base/thirdparty/LuaLib/lvm.h"/>
+    <File Name="../Base/thirdparty/LuaLib/lvm.c"/>
+    <File Name="../Base/thirdparty/LuaLib/lundump.h"/>
+    <File Name="../Base/thirdparty/LuaLib/lundump.c"/>
+    <File Name="../Base/thirdparty/LuaLib/lualib.h"/>
+    <File Name="../Base/thirdparty/LuaLib/luaconf.h"/>
+    <File Name="../Base/thirdparty/LuaLib/lua.h"/>
+    <File Name="../Base/thirdparty/LuaLib/ltm.h"/>
+    <File Name="../Base/thirdparty/LuaLib/ltm.c"/>
+    <File Name="../Base/thirdparty/LuaLib/ltablib.c"/>
+    <File Name="../Base/thirdparty/LuaLib/ltable.h"/>
+    <File Name="../Base/thirdparty/LuaLib/ltable.c"/>
+    <File Name="../Base/thirdparty/LuaLib/lstrlib.c"/>
+    <File Name="../Base/thirdparty/LuaLib/lstring.h"/>
+    <File Name="../Base/thirdparty/LuaLib/lstring.c"/>
+    <File Name="../Base/thirdparty/LuaLib/lstate.h"/>
+    <File Name="../Base/thirdparty/LuaLib/lstate.c"/>
+    <File Name="../Base/thirdparty/LuaLib/lparser.h"/>
+    <File Name="../Base/thirdparty/LuaLib/lparser.c"/>
+    <File Name="../Base/thirdparty/LuaLib/loslib.c"/>
+    <File Name="../Base/thirdparty/LuaLib/lopcodes.h"/>
+    <File Name="../Base/thirdparty/LuaLib/lopcodes.c"/>
+    <File Name="../Base/thirdparty/LuaLib/lobject.h"/>
+    <File Name="../Base/thirdparty/LuaLib/lobject.c"/>
+    <File Name="../Base/thirdparty/LuaLib/loadlib.c"/>
+    <File Name="../Base/thirdparty/LuaLib/lmem.h"/>
+    <File Name="../Base/thirdparty/LuaLib/lmem.c"/>
+    <File Name="../Base/thirdparty/LuaLib/lmathlib.c"/>
+    <File Name="../Base/thirdparty/LuaLib/llimits.h"/>
+    <File Name="../Base/thirdparty/LuaLib/llex.h"/>
+    <File Name="../Base/thirdparty/LuaLib/llex.c"/>
+    <File Name="../Base/thirdparty/LuaLib/liolib.c"/>
+    <File Name="../Base/thirdparty/LuaLib/linit.c"/>
+    <File Name="../Base/thirdparty/LuaLib/lgc.h"/>
+    <File Name="../Base/thirdparty/LuaLib/lgc.c"/>
+    <File Name="../Base/thirdparty/LuaLib/lfunc.h"/>
+    <File Name="../Base/thirdparty/LuaLib/lfunc.c"/>
+    <File Name="../Base/thirdparty/LuaLib/ldump.c"/>
+    <File Name="../Base/thirdparty/LuaLib/ldo.h"/>
+    <File Name="../Base/thirdparty/LuaLib/ldo.c"/>
+    <File Name="../Base/thirdparty/LuaLib/ldebug.h"/>
+    <File Name="../Base/thirdparty/LuaLib/ldebug.c"/>
+    <File Name="../Base/thirdparty/LuaLib/ldblib.c"/>
+    <File Name="../Base/thirdparty/LuaLib/lcode.h"/>
+    <File Name="../Base/thirdparty/LuaLib/lcode.c"/>
+    <File Name="../Base/thirdparty/LuaLib/lbaselib.c"/>
+    <File Name="../Base/thirdparty/LuaLib/lauxlib.h"/>
+    <File Name="../Base/thirdparty/LuaLib/lauxlib.c"/>
+    <File Name="../Base/thirdparty/LuaLib/lapi.h"/>
+    <File Name="../Base/thirdparty/LuaLib/lapi.c"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="TinyXML">
+    <File Name="../Base/include/TinyXML/tinyxmlparser.cpp"/>
+    <File Name="../Base/include/TinyXML/tinyxmlerror.cpp"/>
+    <File Name="../Base/include/TinyXML/tinyxml.h"/>
+    <File Name="../Base/include/TinyXML/tinyxml.cpp"/>
+    <File Name="../Base/include/TinyXML/tinystr.h"/>
+    <File Name="../Base/include/TinyXML/tinystr.cpp"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="Lua">
+    <File Name="../Base/include/Lua/ParamData.h"/>
+    <File Name="../Base/include/Lua/LuaFn_Tcp.h"/>
+    <File Name="../Base/include/Lua/LuaFnRegister.h"/>
+    <File Name="../Base/include/Lua/LuaFn.h"/>
+    <File Name="../Base/include/Lua/LuaFn.cpp"/>
+    <File Name="../Base/include/Lua/LuaDefine.h"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="PassTCP">
+    <File Name="../Base/thirdparty/sock_wrap.h"/>
+    <File Name="../Base/thirdparty/sock_wrap.cpp"/>
+    <File Name="PassTCP/PassTCPApp.cpp"/>
+    <File Name="PassTCP/ClientUdpSocket.h"/>
+    <File Name="PassTCP/PassTCPDlg.h"/>
+    <File Name="PassTCP/PassTCPDlg.cpp"/>
+    <File Name="PassTCP/define.h"/>
+    <File Name="PassTCP/ClientUdpSocket.cpp"/>
+    <File Name="PassTCP/ClientTcpSocket.h"/>
+    <File Name="PassTCP/PacketDlg.h"/>
+    <File Name="PassTCP/ClientTcpSocket.cpp"/>
+    <File Name="PassTCP/PassTCPApp.h"/>
+    <File Name="PassTCP/PacketDlg.cpp"/>
+  </VirtualDirectory>
+  <Description/>
+  <Dependencies/>
+  <Settings Type="Executable">
+    <GlobalSettings>
+      <Compiler Options="" C_Options="" Assembler="">
+        <IncludePath Value="."/>
+      </Compiler>
+      <Linker Options="">
+        <LibraryPath Value="."/>
+      </Linker>
+      <ResourceCompiler Options=""/>
+    </GlobalSettings>
+    <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-g;-O0;-Wall;$(shell wx-config --cxxflags --unicode=yes  )" C_Options="-g;-O0;-Wall;$(shell wx-config --cxxflags --unicode=yes  )" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0"/>
+      <Linker Options="$(shell wx-config   --libs --unicode=yes)" Required="yes"/>
+      <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
+      <General OutputFile="" IntermediateDirectory="./Debug" Command="$(WorkspacePath)/cmake-build-$(WorkspaceConfiguration)/output/$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <BuildSystem Name="CMake"/>
+      <Environment EnvVarSetName="&lt;使用默认&gt;" DbgSetName="&lt;使用默认&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no" EnableCpp14="no">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+    <Configuration Name="Release" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-O2;-Wall;$(shell wx-config --cxxflags --unicode=yes --debug=no)" C_Options="-O2;-Wall;$(shell wx-config --cxxflags --unicode=yes --debug=no)" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+        <IncludePath Value="."/>
+        <IncludePath Value="../Base/thirdparty/toluapp-master/include"/>
+        <IncludePath Value="../Base/thirdparty"/>
+        <IncludePath Value="./PassTCP"/>
+        <IncludePath Value="../Base/include"/>
+        <IncludePath Value="../Base/include/TinyXML"/>
+        <IncludePath Value="../Base/include/Lua"/>
+        <IncludePath Value="../Base/thirdparty/LuaLib"/>
+        <Preprocessor Value="NDEBUG"/>
+        <Preprocessor Value="_LINUX_PLATFORM_"/>
+      </Compiler>
+      <Linker Options=";$(shell wx-config --debug=no --libs --unicode=yes)" Required="yes">
+        <Library Value="/usr/lib/libpthread.so"/>
+        <Library Value="/usr/lib/libdl.so"/>
+      </Linker>
+      <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
+      <General OutputFile="./Linux_Bin/$(ProjectName)" IntermediateDirectory="./Release" Command="$(WorkspacePath)/Bin/$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <BuildSystem Name="CMake"/>
+      <Environment EnvVarSetName="&lt;使用默认&gt;" DbgSetName="&lt;使用默认&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no" EnableCpp14="no">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+  </Settings>
+</CodeLite_Project>

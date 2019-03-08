@@ -1,106 +1,218 @@
+/***************************************************************
+ * Name:      PassTCPDlg.h
+ * Purpose:   Defines Application Frame
+ * Author:    Smith ()
+ * Created:   2019-02-17
+ * Copyright: Smith ()
+ * License:
+ **************************************************************/
 
-// PassTCPDlg.h : Õ∑Œƒº˛
-//
+#ifndef CPASSTCPDLG_H
+#define CPASSTCPDLG_H
 
-#pragma once
-#include "afxcmn.h"
+//(*Headers(CPassTCPDlg)
+#include <wx/button.h>
+#include <wx/checkbox.h>
+#include <wx/choice.h>
+#include <wx/dirdlg.h>
+#include <wx/frame.h>
+#include <wx/panel.h>
+#include <wx/radiobox.h>
+#include <wx/statbox.h>
+#include <wx/stattext.h>
+#include <wx/textctrl.h>
+#include <wx/timer.h>
+//*)
+
+
+
 #include "ClientTcpSocket.h"
 #include "ClientUdpSocket.h"
-#include "afxwin.h"
-#include <afxpriv.h>
 
-#include "PacketDlg.h"
 
 using namespace std;
 
 typedef vector<CClientTcpSocket* > vecClientTcpSocket;
 typedef vector<CClientUdpSocket* > vecClientUdpSocket;
 
-#define COLOR_TEXT_BULE 1
-#define COLOR_TEXT_RED  2
 
-// CPassTCPDlg ∂‘ª∞øÚ
-class CPassTCPDlg : public CDialog
+
+class CPassTCPDlg: public wxFrame
 {
-// ππ‘Ï
-public:
-	CPassTCPDlg(CWnd* pParent = NULL);	// ±Í◊ºππ‘Ï∫Ø ˝
+    public:
 
-// ∂‘ª∞øÚ ˝æ›
-	enum { IDD = IDD_PASSTCP_DIALOG };
+        CPassTCPDlg(wxWindow* parent,wxWindowID id = -1);
+        virtual ~CPassTCPDlg();
 
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV ÷ß≥÷
+    private:
 
+        //(*Handlers(CPassTCPDlg)
+        void OnQuit(wxCommandEvent& event);
+        void OnAbout(wxCommandEvent& event);
+        void OnButton_LuaAdvanceClick(wxCommandEvent& event);
+        void OnButton_StatTestClick(wxCommandEvent& event);
+        void OnButton_StopTestClick(wxCommandEvent& event);
+        void OnButton_ExportTestDataClick(wxCommandEvent& event);
+        void OnButton_SetRadomPacketClick(wxCommandEvent& event);
+        void OnClose(wxCloseEvent& event);
+        void OnTimer_TestTrigger(wxTimerEvent& event);
+        void OnChoice_SendBuffStyleSelect(wxCommandEvent& event);
+        void OnButton1Click(wxCommandEvent& event);
+        void OnTextCtrl_ServerIPText(wxCommandEvent& event);
+        //*)
 
-//  µœ÷
-protected:
-	HICON m_hIcon;
+        //(*Identifiers(CPassTCPDlg)
+        static const long ID_STATICBOX1;
+        static const long ID_STATICTEXT1;
+        static const long ID_STATICTEXT2;
+        static const long ID_STATICBOX2;
+        static const long ID_STATICTEXT3;
+        static const long ID_STATICTEXT4;
+        static const long ID_STATICTEXT5;
+        static const long ID_STATICBOX3;
+        static const long ID_STATICTEXT6;
+        static const long ID_TEXTCTRL1;
+        static const long ID_CHECKBOX1;
+        static const long ID_BUTTON_LuaAdvance;
+        static const long ID_BUTTON_StatTest;
+        static const long ID_BUTTON_StopTest;
+        static const long ID_BUTTON_ExportTestData;
+        static const long ID_BUTTON_SetRadomPacket;
+        static const long ID_TEXTCTRL2;
+        static const long ID_TEXTCTRL3;
+        static const long ID_TEXTCTRL4;
+        static const long ID_TEXTCTRL5;
+        static const long ID_TEXTCTRL6;
+        static const long ID_STATICTEXT7;
+        static const long ID_STATICTEXT8;
+        static const long ID_STATICTEXT9;
+        static const long ID_STATICTEXT10;
+        static const long ID_TEXTCTRL7;
+        static const long ID_TEXTCTRL8;
+        static const long ID_TEXTCTRL9;
+        static const long ID_TEXTCTRL10;
+        static const long ID_CHECKBOX2;
+        static const long ID_CHECKBOX3;
+        static const long ID_CHECKBOX4;
+        static const long ID_CHECKBOX5;
+        static const long ID_CHECKBOX6;
+        static const long ID_CHECKBOX7;
+        static const long ID_CHECKBOX8;
+        static const long ID_RADIOBOX1;
+        static const long ID_STATICTEXT11;
+        static const long ID_STATICTEXT12;
+        static const long ID_STATICTEXT13;
+        static const long ID_STATICTEXT14;
+        static const long ID_STATICTEXT15;
+        static const long ID_STATICTEXT16;
+        static const long ID_TEXTCTRL11;
+        static const long ID_TEXTCTRL12;
+        static const long ID_TEXTCTRL13;
+        static const long ID_TEXTCTRL14;
+        static const long ID_TEXTCTRL15;
+        static const long ID_TEXTCTRL16;
+        static const long ID_STATICTEXT17;
+        static const long ID_STATICTEXT18;
+        static const long ID_STATICTEXT19;
+        static const long ID_TEXTCTRL17;
+        static const long ID_TEXTCTRL18;
+        static const long ID_TEXTCTRL19;
+        static const long ID_STATICTEXT20;
+        static const long ID_TEXTCTRL20;
+        static const long ID_STATICTEXT21;
+        static const long ID_TEXTCTRL21;
+        static const long ID_STATICTEXT22;
+        static const long ID_CHOICE1;
+        static const long ID_TEXTCTRL22;
+        static const long ID_PANEL1;
+        static const long ID_TIMER_Test;
+        //*)
 
-	// …˙≥…µƒœ˚œ¢”≥…‰∫Ø ˝
-	virtual BOOL OnInitDialog();
-	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
-	afx_msg void OnPaint();
-	afx_msg HCURSOR OnQueryDragIcon();
-	DECLARE_MESSAGE_MAP()
+        //(*Declarations(CPassTCPDlg)
+        wxButton* Button_ExportTestData;
+        wxButton* Button_LuaAdvance;
+        wxButton* Button_SetRadomPacket;
+        wxButton* Button_StatTest;
+        wxButton* Button_StopTest;
+        wxCheckBox* CheckBoxIsWriteLog;
+        wxCheckBox* CheckBoxLuaAdvance;
+        wxCheckBox* CheckBox_IsAlwayConnect;
+        wxCheckBox* CheckBox_IsBroken;
+        wxCheckBox* CheckBox_IsRecv;
+        wxCheckBox* CheckBox_RadomSendCount;
+        wxCheckBox* CheckBox_RadomaDelay;
+        wxCheckBox* CheckBox_SendOne;
+        wxChoice* Choice_SendBuffStyle;
+        wxDirDialog* DirDialog_Lua;
+        wxPanel* Panel1;
+        wxRadioBox* RadioBox_nRadio;
+        wxStaticBox* StaticBox1;
+        wxStaticBox* StaticBox2;
+        wxStaticBox* StaticBox3;
+        wxStaticText* StaticText10;
+        wxStaticText* StaticText11;
+        wxStaticText* StaticText12;
+        wxStaticText* StaticText13;
+        wxStaticText* StaticText14;
+        wxStaticText* StaticText15;
+        wxStaticText* StaticText16;
+        wxStaticText* StaticText17;
+        wxStaticText* StaticText18;
+        wxStaticText* StaticText19;
+        wxStaticText* StaticText1;
+        wxStaticText* StaticText20;
+        wxStaticText* StaticText21;
+        wxStaticText* StaticText22;
+        wxStaticText* StaticText2;
+        wxStaticText* StaticText3;
+        wxStaticText* StaticText4;
+        wxStaticText* StaticText5;
+        wxStaticText* StaticText6;
+        wxStaticText* StaticText7;
+        wxStaticText* StaticText8;
+        wxStaticText* StaticText9;
+        wxTextCtrl* TextCtrl_ClientUdpPort;
+        wxTextCtrl* TextCtrl_CurrConnect;
+        wxTextCtrl* TextCtrl_FailConnect;
+        wxTextCtrl* TextCtrl_FailRecv;
+        wxTextCtrl* TextCtrl_FailSend;
+        wxTextCtrl* TextCtrl_LuaControlFilePath;
+        wxTextCtrl* TextCtrl_MaxTime;
+        wxTextCtrl* TextCtrl_MinTime;
+        wxTextCtrl* TextCtrl_PacketSendMax;
+        wxTextCtrl* TextCtrl_PacketTimewait;
+        wxTextCtrl* TextCtrl_RecvByteCount;
+        wxTextCtrl* TextCtrl_RecvLength;
+        wxTextCtrl* TextCtrl_RecvTimeOut;
+        wxTextCtrl* TextCtrl_SendByteCount;
+        wxTextCtrl* TextCtrl_SendText;
+        wxTextCtrl* TextCtrl_ServerIP;
+        wxTextCtrl* TextCtrl_ServerPort;
+        wxTextCtrl* TextCtrl_SocketInterval;
+        wxTextCtrl* TextCtrl_SuccessConnect;
+        wxTextCtrl* TextCtrl_SuccessRecv;
+        wxTextCtrl* TextCtrl_SuccessSend;
+        wxTextCtrl* TextCtrl_TestThreadCount;
+        wxTimer Timer_Test;
+        //*)
+
+        DECLARE_EVENT_TABLE()
 
 private:
-  void InitView();
-  void ClearResult();
-  void Close(bool blClose = false);
-
-  void SetRichTextColor(int nColor);
+    void ClearResult();
 
 private:
-  CTime m_tmBegin;             //—π≤‚ø™ º ±º‰
-  bool  m_blIsRun;             //—π≤‚ «∑Ò‘⁄Ω¯––
-  CTime m_tmEnd;               //—π≤‚Õ£÷π ±º‰
-  int   m_nCurrTextStyle;      //µ±«∞Œƒ±æ∑Á∏Ò
-  CBaseDataLogic* m_pLogic;    // «∑Ò…Ë÷√¡À◊Ó–¬µƒ¬ﬂº≠∞¸
 
-public:
-  CEdit m_txtServerIP;
-  CEdit m_txtPort;
-  CEdit m_txtThreadCount;
-  CEdit m_txtRecvTimeout;
-  CEdit m_txtSocketInterval;
-  CEdit m_txtRecvLength;
-  CButton m_chkIsAlwayConnect;
-  CButton m_chkRadomaDelay;
-  CButton m_chkIsRecv;
-  CButton m_ChkIsBroken;
-  CButton m_chkRadomSendCount;
-  CButton m_chkIsWriteLog;
-  CButton m_chkSendOne;
-  CButton m_chkLuaAdvance;
-  CEdit m_txtSuccessConnect;
-  CEdit m_txtSuccessSend;
-  CEdit m_txtSuccessRecv;
-  CEdit m_txtCurrConnect;
-  CEdit m_txtFailConnect;
-  CEdit m_txtFailSend;
-  CEdit m_txtFailRecv;
-  CEdit m_txtClientUdpPort;
-  CEdit m_txtPacketTimewait;
-  CEdit m_txtSendByteCount;
-  CEdit m_txtRecvByteCount;
-  CEdit m_txtLuaFilePath;
-  CEdit m_txtSendCount;
-  CEdit m_txtMinTime;
-  CEdit m_txtMaxTime;
-  CComboBox m_cbSendBuffStyle;
-  CRichEditCtrl m_reSendText;
-  int m_nRadio;
-  
   vecClientTcpSocket m_vecClientTcpSocket;
   vecClientUdpSocket m_vecClientUdpSocket;
-  afx_msg void OnClose();
-  afx_msg void OnBnClickedButton2();
-  afx_msg void OnTimer(UINT_PTR nIDEvent);
-  afx_msg void OnBnClickedButton3();
-  afx_msg void OnCbnSelchangeCombo1();
-  afx_msg void OnBnClickedButton1();
-  afx_msg void OnBnClickedButton4();
 
-  afx_msg void OnBnClickedButton5();
+  wxDateTime m_tmBegin;             //ÂéãÊµãÂºÄÂßãÊó∂Èó¥
+  wxDateTime m_tmEnd;               //ÂéãÊµãÂÅúÊ≠¢Êó∂Èó¥
+
+  bool  m_blIsRun;             //ÂéãÊµãÊòØÂê¶Âú®ËøõË°å
+  int   m_nCurrTextStyle;      //ÂΩìÂâçÊñáÊú¨È£éÊ†º
+  CBaseDataLogic* m_pLogic;    //ÊòØÂê¶ËÆæÁΩÆ‰∫ÜÊúÄÊñ∞ÁöÑÈÄªËæëÂåÖ
+
 };
+
+#endif // CPassTCPDlg_H

@@ -1,5 +1,11 @@
-#include "StdAfx.h"
+//#include "StdAfx.h"
 #include "ClientUdpSocket.h"
+#include "sock_wrap.h"
+
+#include <time.h>
+#include <thread>
+
+
 
 CClientUdpSocket::CClientUdpSocket(void)
 {
@@ -32,8 +38,8 @@ void CClientUdpSocket::Run()
 {
 	int nPacketCount = 1;
 	m_blRun = true;
-	SOCKET sckClient;
-	SOCKET sckServer;
+	HSocket sckClient;
+	HSocket sckServer;
 
 	//此部分为兼容Lua参数而设计
 	//为了减少不必要的new和delete操作，所以参数在这里先声明好
@@ -64,7 +70,7 @@ void CClientUdpSocket::Run()
 		bool blState = m_objLuaFn.LoadLuaFile(m_pSocket_Info->m_szLuaFileName);
 		if(false == blState)
 		{
-			printf_s("[Main]Open Lua file error.\n");
+			printf("[Main]Open Lua file error.\n");
 			return;
 		}
 
@@ -78,7 +84,7 @@ void CClientUdpSocket::Run()
 		pRecvParam2   = new _ParamData();
 		pRecvParam3   = new _ParamData();
 		pRecvParam4   = new _ParamData();
-		pRecvParamOut = new _ParamData(); 
+		pRecvParamOut = new _ParamData();
 
 	}
 
@@ -88,26 +94,33 @@ void CClientUdpSocket::Run()
 	//socket创建的准备工作
 	struct sockaddr_in svrsockaddr;
 
-	memset(&svrsockaddr, 0, sizeof(SOCKADDR_IN));
-	svrsockaddr.sin_family = AF_INET;
-	svrsockaddr.sin_port   = htons(m_pSocket_Info->m_nPort);
-	svrsockaddr.sin_addr.S_un.S_addr = inet_addr(m_pSocket_Info->m_szSerevrIP);
+//	memset(&svrsockaddr, 0, sizeof(sockaddr_in));
+//	svrsockaddr.sin_family = AF_INET;
+//	svrsockaddr.sin_port   = htons(m_pSocket_Info->m_nPort);
+//	svrsockaddr.sin_addr.S_un.S_addr = inet_addr(m_pSocket_Info->m_szSerevrIP);
+        GetAddressFrom(&svrsockaddr,   m_pSocket_Info->m_szSerevrIP, m_pSocket_Info->m_nPort);
 
-	sckClient = socket(AF_INET, SOCK_DGRAM, 0);
+	sckClient = SocketOpen( SOCK_DGRAM);
 
-	DWORD TimeOut = (DWORD)m_pSocket_Info->m_nRecvTimeout;
-	::setsockopt(sckClient, SOL_SOCKET, SO_RCVTIMEO, (char *)&TimeOut, sizeof(TimeOut));
+	int TimeOut = (int)m_pSocket_Info->m_nRecvTimeout;
+	//::setsockopt(sckClient, SOL_SOCKET, SO_RCVTIMEO, (char *)&TimeOut, sizeof(TimeOut));
+        SocketTimeOut(sckClient, TimeOut, -1, -1);
+
 
 	//设置接收监听端口
-	sckServer = socket(AF_INET, SOCK_DGRAM, 0);
+	sckServer =  SocketOpen( SOCK_DGRAM);
 
 	struct sockaddr_in clientsockaddr;
-	memset(&clientsockaddr, 0, sizeof(SOCKADDR_IN));
-	clientsockaddr.sin_family = AF_INET;
-	clientsockaddr.sin_port   = htons(m_pSocket_Info->m_nUdpClientPort);
-	clientsockaddr.sin_addr.S_un.S_addr = inet_addr(m_pSocket_Info->m_szSerevrIP);
+        //memset(&clientsockaddr, 0, sizeof());
+        //clientsockaddr.sin_family = AF_INET;
+        //clientsockaddr.sin_port   = htons(m_pSocket_Info->m_nUdpClientPort);
+        //clientsockaddr.sin_addr.S_un.S_addr = inet_addr(m_pSocket_Info->m_szSerevrIP);
+        GetAddressFrom(&svrsockaddr,   m_pSocket_Info->m_szSerevrIP, m_pSocket_Info->m_nUdpClientPort);
 
-	bind(sckServer, (SOCKADDR *) &clientsockaddr, sizeof(clientsockaddr));
+
+        //bind(sckServer, (sockaddr_in *) &clientsockaddr, sizeof(clientsockaddr));
+        SocketBind(sckServer, &clientsockaddr);
+
 
 	//发送次数
 	int nSendIndex = 0;
@@ -158,15 +171,16 @@ void CClientUdpSocket::Run()
 
 		if(blIsConnect == false)
 		{
-			DWORD dwSleepTime = (DWORD)m_pSocket_Info->m_nDelaySecond;
+                        int dwSleepTime = (int)m_pSocket_Info->m_nDelaySecond;
 			if(m_pSocket_Info->m_blIsRadomaDelay == true)
 			{
 				//如果是随机的，则从1-1000之间随机一个时间
-				dwSleepTime = (DWORD)RandomValue(1, 1000);
+                                dwSleepTime = (int)RandomValue(1, 1000);
 			}
 
 			//挂起指定的时间
-			Sleep(dwSleepTime);
+                        //Sleep(dwSleepTime);
+            std::this_thread::sleep_for(std::chrono::milliseconds(dwSleepTime*1000));
 
 			m_pSocket_State_Info->m_nSuccessConnect++;
 			m_pSocket_State_Info->m_nCurrectSocket = 1;
@@ -196,8 +210,8 @@ void CClientUdpSocket::Run()
 				char* pData = m_pSocket_Info->m_pLogic->GetSendData(m_pSocket_Info->m_nThreadID, nSendIndex, nSendLen);
 				for(int i = 0; i < nSendCount; i++)
 				{
-					MEMCOPY_SAFE(&szSendBuffData[i * nSendLen], 
-						pData, 
+					MEMCOPY_SAFE(&szSendBuffData[i * nSendLen],
+						pData,
 						nSendLen);
 				}
 				nPacketCount = nSendCount;
@@ -233,11 +247,13 @@ void CClientUdpSocket::Run()
 			while(true)
 			{
 				//UDP发送
-				int nssssSize = sizeof(SOCKADDR);
-				nCurrSendLen = sendto(sckClient, pSendData + nBeginSend, nTotalSendLen, 0, (sockaddr* )&svrsockaddr, sizeof(SOCKADDR));
+				int nssssSize = sizeof(sockaddr_in);
+				nCurrSendLen = sendto(sckClient, pSendData + nBeginSend, nTotalSendLen, 0, (sockaddr* )&svrsockaddr, sizeof(sockaddr_in));
+                //void SocketSend(HSocket hs, const char *ptr, int nbytes, transresult_t &rt);
+
 				if(nCurrSendLen <= 0)
 				{
-					DWORD dwError = GetLastError();
+					int dwError = GetLastSocketError();
 					WriteFile_Error("sendto error", (int)dwError);
 					m_pSocket_State_Info->m_nFailSend += nPacketCount;
 					m_pSocket_State_Info->m_nCurrectSocket = 0;
@@ -267,7 +283,7 @@ void CClientUdpSocket::Run()
 				while(true)
 				{
 					//如果发送成功了，则处理接收数据
-					int nClientAddrSize = sizeof(SOCKADDR_IN);
+					int nClientAddrSize = sizeof(sockaddr_in);
 
 					//socket创建的准备工作
 					struct sockaddr_in clientsockaddr1;
@@ -280,10 +296,12 @@ void CClientUdpSocket::Run()
 					clientsockaddr.sin_addr.S_un.S_addr = inet_addr(m_pSocket_Info->m_szSerevrIP);
 					*/
 
-					nCurrRecvLen = recvfrom(sckServer, (char* )szRecvBuffData + nBeginRecv, nTotalRecvLen, 0, (sockaddr* )&clientsockaddr1, &nClientAddrSize);
+					//nCurrRecvLen = recvfrom(sckServer, (char* )szRecvBuffData + nBeginRecv, nTotalRecvLen, 0, (sockaddr* )&clientsockaddr1, &nClientAddrSize);
+                    nCurrRecvLen = SockRecvFrom(sckServer, (char* )szRecvBuffData + nBeginRecv, nTotalRecvLen,  &clientsockaddr1);
+
 					if(nCurrRecvLen <= 0)
 					{
-						DWORD dwError = GetLastError();
+						int dwError = GetLastSocketError();
 						WriteFile_Error("sendto error", (int)dwError);
 						m_pSocket_State_Info->m_nFailRecv += nPacketCount;
 						//closesocket(sckClient);
@@ -435,8 +453,8 @@ void CClientUdpSocket::Run()
 			//如果有数据包间隔，则sleep指定的时间
 			if(m_pSocket_Info->m_nPacketTimewait > 0)
 			{
-				DWORD dwSleepTime = (DWORD)m_pSocket_Info->m_nPacketTimewait;
-				Sleep(dwSleepTime);
+				int dwSleepTime = (int)m_pSocket_Info->m_nPacketTimewait;
+				std::this_thread::sleep_for(std::chrono::milliseconds(dwSleepTime*1000));
 			}
 
 			//如果是长连接，则不关闭连接
@@ -456,8 +474,8 @@ void CClientUdpSocket::Run()
 	}
 
 	//如果连接没断，则断开
-	closesocket(sckClient);
-	closesocket(sckServer);
+	SocketClose(sckClient);
+	SocketClose(sckServer);
 	m_pSocket_State_Info->m_nCurrectSocket = 0;
 	blIsConnect = false;
 
@@ -496,8 +514,8 @@ bool CClientUdpSocket::WriteFile_SendBuff( const char* pData, int nLen )
 {
 	FILE* pFile = NULL;
 	char szFileName[20];
-	sprintf_s(szFileName, "Thread%d.log", m_pSocket_Info->m_nThreadID);
-	fopen_s(&pFile, szFileName, "a+");
+	sprintf(szFileName, "Thread%d.log", m_pSocket_Info->m_nThreadID);
+	pFile   =fopen( szFileName, "a+");
 	if(pFile == NULL)
 	{
 		return false;
@@ -509,7 +527,7 @@ bool CClientUdpSocket::WriteFile_SendBuff( const char* pData, int nLen )
 	for(int i = 0; i < nLen; i++)
 	{
 		char szChar[20];
-		sprintf_s(szChar, 20, " 0x%02X", (unsigned char )pData[i]);
+		sprintf(szChar,  " 0x%02X", (unsigned char )pData[i]);
 		strLog += szChar;
 	}
 
@@ -525,8 +543,8 @@ bool CClientUdpSocket::WriteFile_RecvBuff( const char* pData, int nLen )
 {
 	FILE* pFile = NULL;
 	char szFileName[20];
-	sprintf_s(szFileName, "Thread%d.log", m_pSocket_Info->m_nThreadID);
-	fopen_s(&pFile, szFileName, "a+");
+	sprintf(szFileName, "Thread%d.log", m_pSocket_Info->m_nThreadID);
+	pFile   =fopen( szFileName, "a+");
 	if(pFile == NULL)
 	{
 		return false;
@@ -538,7 +556,7 @@ bool CClientUdpSocket::WriteFile_RecvBuff( const char* pData, int nLen )
 	for(int i = 0; i < nLen; i++)
 	{
 		char szChar[20];
-		sprintf_s(szChar, 20, " 0x%02X", (unsigned char )pData[i]);
+		sprintf(szChar,  " 0x%02X", (unsigned char )pData[i]);
 		strLog += szChar;
 	}
 
@@ -554,19 +572,20 @@ bool CClientUdpSocket::WriteFile_Error( const char* pError, int nErrorNumber )
 {
 	time_t ttNow    = time(NULL);
 	struct tm tmNow;
-	localtime_s(&tmNow, &ttNow);
+	//localtime(&tmNow, &ttNow);
+    tmNow   =*(localtime( &ttNow));
 
 	char szTimeNow[30] = {'\0'};
-	sprintf_s(szTimeNow, 30, "[%04d-%02d-%02d %02d:%02d:%02d]", tmNow.tm_year + 1900, tmNow.tm_mon + 1, tmNow.tm_mday, tmNow.tm_hour, tmNow.tm_min, tmNow.tm_sec);
+	sprintf(szTimeNow,  "[%04d-%02d-%02d %02d:%02d:%02d]", tmNow.tm_year + 1900, tmNow.tm_mon + 1, tmNow.tm_mday, tmNow.tm_hour, tmNow.tm_min, tmNow.tm_sec);
 
 	//拼接出错日志输出
 	char szError[1024] = {'\0'};
-	sprintf_s(szError, 1024, "%s %s, errno=%d.\n", szTimeNow, pError, nErrorNumber);
+	sprintf(szError,  "%s %s, errno=%d.\n", szTimeNow, pError, nErrorNumber);
 
 	FILE* pFile = NULL;
 	char szFileName[30];
-	sprintf_s(szFileName, "StressTest_Error.log");
-	fopen_s(&pFile, szFileName, "a+");
+	sprintf(szFileName, "StressTest_Error.log");
+	pFile  = fopen(szFileName, "a+");
 	if(pFile == NULL)
 	{
 		return false;

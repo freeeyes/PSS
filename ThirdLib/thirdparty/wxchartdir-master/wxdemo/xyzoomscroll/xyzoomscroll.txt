@@ -1,0 +1,1 @@
+./Release/hotspotdialog.cpp.o ./Release/xyzoomscroll.cpp.o ./Release/xyzoomscrollapp.cpp.o ./Release/wxchartviewer.cpp.o

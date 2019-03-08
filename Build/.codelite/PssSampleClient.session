@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Session Name="/data/develop/Lib/Network/PSS-master/Build/PssSampleClient.workspace">
+  <int Value="4" Name="m_selectedTab"/>
+  <wxString Value="/data/develop/Lib/Network/PSS-master/Build/PssSampleClient.workspace" Name="m_workspaceName"/>
+  <TabInfoArray Name="TabInfoArray">
+    <TabInfo>
+      <wxString Value="/data/develop/Lib/Network/PSS-master/PssSampleClient/AutoTestClient/AutoTestClient/AutoTestClient.cpp" Name="FileName"/>
+      <int Value="0" Name="FirstVisibleLine"/>
+      <int Value="4" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="/data/develop/Lib/Network/PSS-master/Base/thirdparty/sock_wrap.h" Name="FileName"/>
+      <int Value="12" Name="FirstVisibleLine"/>
+      <int Value="14" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="/data/develop/Lib/Network/PSS-master/PssSampleClient/PSSProxyClient/PSSProxyClient/PSSProxyClientMain.h" Name="FileName"/>
+      <int Value="21" Name="FirstVisibleLine"/>
+      <int Value="23" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="/data/develop/Lib/Network/PSS-master/PssSampleClient/PurenessLine/PurenessLine/wxchartviewer.cpp" Name="FileName"/>
+      <int Value="9" Name="FirstVisibleLine"/>
+      <int Value="11" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="/data/develop/Lib/Network/PSS-master/Base/thirdparty/wxchartdir-master/wxdemo/common/wxchartviewer.h" Name="FileName"/>
+      <int Value="97" Name="FirstVisibleLine"/>
+      <int Value="114" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+  </TabInfoArray>
+  <SerializedObject Name="m_breakpoints">
+    <long Value="0" Name="Count"/>
+  </SerializedObject>
+  <wxString Value="*.c;*.cpp;*.cxx;*.cc;*.h;*.hpp;*.inc;*.mm;*.m;*.xrc;*.plist;*.txt" Name="m_findInFilesMask"/>
+</Session>

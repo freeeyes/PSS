@@ -1,0 +1,1 @@
+./Release/wxdemoapp.cpp.o ./Release/wxdemo.cpp.o ./Release/wxchartviewer.cpp.o ./Release/democharts.cpp.o ./Release/hotspotdialog.cpp.o
