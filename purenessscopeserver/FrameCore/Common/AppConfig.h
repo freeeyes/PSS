@@ -25,7 +25,10 @@ public:
 
     CAppConfig& operator = (CAppConfig& ar)
     {
-        ACE_UNUSED_ARG(ar);
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
     }
 
     void Close();
