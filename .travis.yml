@@ -98,17 +98,17 @@ matrix:
         - cd $TRAVIS_BUILD_DIR/Build/Linux/.obj
         - ls
         - cd $TRAVIS_BUILD_DIR/Build/Linux/
-        - gcov -r -o ./.obj ../*.cpp > /dev/null
-        - gcov -r -o ./.obj ../Common/*.cpp > /dev/null
-        - gcov -r -o ./.obj ../Console/*.cpp > /dev/null
-        - gcov -r -o ./.obj ../FileTest/*.cpp > /dev/null
-        - gcov -r -o ./.obj ../Encrypt/*.cpp > /dev/null
-        - gcov -r -o ./.obj ../PacketParse/*.cpp > /dev/null
-        - gcov -r -o ./.obj ../LogSystem/*.cpp > /dev/null
-        - gcov -r -o ./.obj ../Message/*.cpp > /dev/null
-        - gcov -r -o ./.obj ../Reactor/*.cpp > /dev/null
-        - gcov -r -o ./.obj ../UDP/*.cpp > /dev/null
-        - gcov -r -o ./.obj ../CppUnit/*.cpp > /dev/null
+        - gcov -r -o ./.obj ../../purenessscopeserver/FrameCore/*.cpp > /dev/null
+        - gcov -r -o ./.obj ../../purenessscopeserver/FrameCore/Common/*.cpp > /dev/null
+        - gcov -r -o ./.obj ../../purenessscopeserver/FrameCore/Console/*.cpp > /dev/null
+        - gcov -r -o ./.obj ../../purenessscopeserver/FrameCore/FileTest/*.cpp > /dev/null
+        - gcov -r -o ./.obj ../../purenessscopeserver/FrameCore/Encrypt/*.cpp > /dev/null
+        - gcov -r -o ./.obj ../../purenessscopeserver/FrameCore/PacketParse/*.cpp > /dev/null
+        - gcov -r -o ./.obj ../../purenessscopeserver/FrameCore/LogSystem/*.cpp > /dev/null
+        - gcov -r -o ./.obj ../../purenessscopeserver/FrameCore/Message/*.cpp > /dev/null
+        - gcov -r -o ./.obj ../../purenessscopeserver/FrameCore/Reactor/*.cpp > /dev/null
+        - gcov -r -o ./.obj ../../purenessscopeserver/FrameCore/UDP/*.cpp > /dev/null
+        - gcov -r -o ./.obj ../../purenessscopeserver/FrameCore/CppUnit/*.cpp > /dev/null
         - cd $TRAVIS_BUILD_DIR/Build/Linux/reports/cppunit
         #- ls 
         - cat report.xml
