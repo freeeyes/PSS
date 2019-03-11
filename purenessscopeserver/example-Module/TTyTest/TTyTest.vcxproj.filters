@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{75a04a3b-cf69-4e5f-ad5c-aa5bd709ed39}</UniqueIdentifier>
+      <Extensions>cpp;cxx;cc;c;C</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{ce0d3732-e7f5-4725-aafc-55abed6b1497}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hh</Extensions>
+    </Filter>
+    <Filter Include="Build Files">
+      <UniqueIdentifier>{fb80a785-15b3-41de-926e-56a121d8debd}</UniqueIdentifier>
+      <Extensions>mpc;mpb;mwc</Extensions>
+    </Filter>
+    <Filter Include="Documentation">
+      <UniqueIdentifier>{3a508fe7-abd4-421b-a861-b865e19211e0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="BaseCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TTyTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BaseCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="ReadMe.txt">
+      <Filter>Documentation</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TTyTest.mpc">
+      <Filter>Build Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>
