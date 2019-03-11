@@ -8,6 +8,7 @@ project(PurenessScopeServer):aceexe{
   ../../purenessscopeserver/FrameCore/LogSystem/*.cpp
   ../../purenessscopeserver/FrameCore/Message/*.cpp
   ../../purenessscopeserver/FrameCore/PacketParse/*.cpp
+  ../../purenessscopeserver/FrameCore/Encrypt/*.cpp
   ../../purenessscopeserver/FrameCore/Reactor/*.cpp
   ../../purenessscopeserver/FrameCore/UDP/*.cpp
   ../../purenessscopeserver/FrameCore/TinyXML/*.cpp
@@ -23,12 +24,14 @@ project(PurenessScopeServer):aceexe{
 			  ../../purenessscopeserver/FrameCore/LogSystem \
 			  ../../purenessscopeserver/FrameCore/Message \
 			  ../../purenessscopeserver/FrameCore/PacketParse \
+			  ../../purenessscopeserver/FrameCore/Encrypt \
 			  ../../purenessscopeserver/FrameCore/Reactor \
 			  ../../purenessscopeserver/FrameCore/UDP \
 			  ../../purenessscopeserver/FrameCore/TinyXML \
 			  ../../purenessscopeserver/FrameCore/Mail \
 			  ../../purenessscopeserver/FrameCore/FileTest \
 			  ../../purenessscopeserver/FrameCore/CppUnit
+			  
  libpaths += ../../lib
  libs += cppunit
  includes += /usr/local/include/
