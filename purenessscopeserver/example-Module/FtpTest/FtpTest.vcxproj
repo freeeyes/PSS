@@ -22,6 +22,7 @@
     <ProjectGuid>{6D1726BE-FECA-1BAD-2246-CB560000002E}</ProjectGuid>
     <RootNamespace>FtpTest</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -64,7 +65,7 @@
     <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>..\..\PurenessScopeServer\Windows_Bin\</OutDir>
+    <OutDir>..\..\..\Build\Windows\</OutDir>
     <IntDir>Debug\FtpTest\I386\</IntDir>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
@@ -74,7 +75,7 @@
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>..\..\PurenessScopeServer\Windows_Bin\</OutDir>
+    <OutDir>..\..\..\Build\Windows\</OutDir>
     <IntDir>Debug\FtpTest\AMD64\</IntDir>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>

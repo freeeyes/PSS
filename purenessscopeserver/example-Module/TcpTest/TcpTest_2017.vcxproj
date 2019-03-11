@@ -65,7 +65,7 @@
     <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>..\..\FrameCore\Windows_Bin\</OutDir>
+    <OutDir>..\..\..\Build\Windows\</OutDir>
     <IntDir>Debug\TcpTest\I386\</IntDir>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
@@ -75,7 +75,7 @@
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>..\..\FrameCore\Windows_Bin\</OutDir>
+    <OutDir>..\..\..\Build\Windows\</OutDir>
     <IntDir>Debug\TcpTest\AMD64\</IntDir>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>

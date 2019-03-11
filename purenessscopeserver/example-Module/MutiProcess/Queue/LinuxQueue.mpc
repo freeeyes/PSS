@@ -17,9 +17,9 @@ project(LinuxQueue):acelib{
   }
   
   specific (prop:microsoft){
-	dllout = ../../../PurenessScopeServer/Windows_Bin
+	dllout = ../../../../Build/Windows
   } else {
-	dllout = ../../../PurenessScopeServer/Linux_Bin
+	dllout = ../../../../Build/Linux
   }
   includes += ../../../Common ../Common
 }

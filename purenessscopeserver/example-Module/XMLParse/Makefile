@@ -23,6 +23,6 @@ $(LIB_BASE):$(PATS)
 clean:
 	rm -rf *.o  $(LIB_BASE) $(LIB_BASE_OBJS)
 clear:	
-	mv libXMLParse.so ../../PurenessScopeServer/Linux_Bin/	
+	mv libXMLParse.so ../../../Build/Linux
 cl:	
 	rm -rf *.o 

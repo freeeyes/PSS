@@ -21,6 +21,6 @@ $(LIB_BASE):$(PATS)
 clean:
 	rm -rf *.o  $(LIB_BASE) $(LIB_BASE_OBJS)
 clear:	
-	mv libPlugA.so ../../../PurenessScopeServer/Linux_Bin/	
+	mv libPlugA.so ../../../../Build/Linux
 cl:	
 	rm -rf *.o 

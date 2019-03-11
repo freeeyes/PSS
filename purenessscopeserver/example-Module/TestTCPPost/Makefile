@@ -21,6 +21,6 @@ $(LIB_BASE): $(PATS)
 clean:
 	rm -rf *.o  $(LIB_BASE) $(LIB_BASE_OBJS)
 clear:	
-	mv libTcpPostTest.so ../../PurenessScopeServer/Linux_Bin/		
+	mv libTcpPostTest.so ../../../Build/Linux		
 cl:	
 	rm -rf *.o 
