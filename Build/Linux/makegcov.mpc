@@ -34,6 +34,7 @@ project(PurenessScopeServer):aceexe{
 			  
  libpaths += ../../lib
  libs += cppunit
+ 
  includes += /usr/local/include/
  includes += /usr/include/
  libpaths += /usr/lib64/ 
