@@ -2,25 +2,34 @@ project(PurenessScopeServer):aceexe{
  	exename = PurenessScopeServer
 
  Source_Files{
-  ../../Common/*.cpp	
-  ../Common/*.cpp
-  ../Encrypt/*.cpp
-  ../Console/*.cpp
-  ../LogSystem/*.cpp
-  ../Message/*.cpp
-  ../PacketParse/*.cpp
-  ../Reactor/*.cpp
-  ../UDP/*.cpp
-  ../TinyXML/*.cpp
-  ../Mail/*.cpp
-  ../FileTest/*.cpp
-  ../CppUnit/*.cpp
-  ../*.cpp
+  ../../purenessscopeserver/Common/*.cpp	
+  ../../purenessscopeserver/FrameCore/Common/*.cpp
+  ../../purenessscopeserver/FrameCore/Console/*.cpp
+  ../../purenessscopeserver/FrameCore/LogSystem/*.cpp
+  ../../purenessscopeserver/FrameCore/Message/*.cpp
+  ../../purenessscopeserver/FrameCore/PacketParse/*.cpp
+  ../../purenessscopeserver/FrameCore/Reactor/*.cpp
+  ../../purenessscopeserver/FrameCore/UDP/*.cpp
+  ../../purenessscopeserver/FrameCore/TinyXML/*.cpp
+  ../../purenessscopeserver/FrameCore/Mail/*.cpp
+  ../../purenessscopeserver/FrameCore/FileTest/*.cpp
+  ../../purenessscopeserver/FrameCore/CppUnit/*.cpp
+  ../../purenessscopeserver/FrameCore/*.cpp
  }
- includes += ../../../include
- includes += ../Common ../../Common ../Console ../LogSystem ../Message ../PacketParse ../Reactor ../UDP ../TinyXML ../Mail ../FileTest ../CppUnit ../Encrypt
- 
- libpaths += ../../../lib
+ includes += ../../include
+ includes += ../../purenessscopeserver/Common \
+              ../../purenessscopeserver/FrameCore/Common \
+			  ../../purenessscopeserver/FrameCore/Console \
+			  ../../purenessscopeserver/FrameCore/LogSystem \
+			  ../../purenessscopeserver/FrameCore/Message \
+			  ../../purenessscopeserver/FrameCore/PacketParse \
+			  ../../purenessscopeserver/FrameCore/Reactor \
+			  ../../purenessscopeserver/FrameCore/UDP \
+			  ../../purenessscopeserver/FrameCore/TinyXML \
+			  ../../purenessscopeserver/FrameCore/Mail \
+			  ../../purenessscopeserver/FrameCore/FileTest \
+			  ../../purenessscopeserver/FrameCore/CppUnit
+ libpaths += ../../lib
  libs += cppunit
  includes += /usr/local/include/
  includes += /usr/include/
