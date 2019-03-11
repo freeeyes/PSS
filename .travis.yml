@@ -63,10 +63,10 @@ matrix:
         - make 
         - make install
         - LD_LIBRARY_PATH=$TRAVIS_BUILD_DIR/lib:$LD_LIBRARY_PATH
-        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/FrameCore/Linux_Bin
-        - cd ../../../lib
+        - cd $TRAVIS_BUILD_DIR/Build/Linux/
+        - cd ../../lib
         - ls
-        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/FrameCore/Linux_Bin
+        - cd $TRAVIS_BUILD_DIR/Build/Linux/
         - $ACE_ROOT/bin/mwc.pl -type gnuace psssonar.mwc
         - build-wrapper-linux-x86-64 --out-dir bw-output make -j 4
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/PacketParse_Interface
@@ -80,7 +80,7 @@ matrix:
         - $ACE_ROOT/bin/mwc.pl -type gnuace
         - make -j 4        
         # Execute some tests
-        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/FrameCore/Linux_Bin
+        - cd $TRAVIS_BUILD_DIR/Build/Linux/
         - nohup ./PurenessScopeServer > pssout.file 2>&1 &
         - sleep 10
         - cd $TRAVIS_BUILD_DIR/CppUnitTest/Test
@@ -95,9 +95,9 @@ matrix:
         # collect gcov report
         # - cd $TRAVIS_BUILD_DIR/purenessscopeserver/FrameCore/Linux_Bin/.obj
         # - gcovr -r ../ -o ../../report.xml --xml-pretty
-        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/FrameCore/Linux_Bin/.obj
+        - cd $TRAVIS_BUILD_DIR/Build/Linux/.obj
         - ls
-        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/FrameCore/Linux_Bin
+        - cd $TRAVIS_BUILD_DIR/Build/Linux/
         - gcov -r -o ./.obj ../*.cpp > /dev/null
         - gcov -r -o ./.obj ../Common/*.cpp > /dev/null
         - gcov -r -o ./.obj ../Console/*.cpp > /dev/null
@@ -109,7 +109,7 @@ matrix:
         - gcov -r -o ./.obj ../Reactor/*.cpp > /dev/null
         - gcov -r -o ./.obj ../UDP/*.cpp > /dev/null
         - gcov -r -o ./.obj ../CppUnit/*.cpp > /dev/null
-        - cd $TRAVIS_BUILD_DIR/purenessscopeserver/FrameCore/Linux_Bin/reports/cppunit
+        - cd $TRAVIS_BUILD_DIR/Build/Linux/reports/cppunit
         #- ls 
         - cat report.xml
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/FrameCore
@@ -144,7 +144,7 @@ matrix:
       - cd $TRAVIS_BUILD_DIR/purenessscopeserver/example-Module/UDPTest
       - $ACE_ROOT/bin/mwc.pl -type gnuace
       - make -j 4      
-      - cd $TRAVIS_BUILD_DIR/purenessscopeserver/FrameCore/Linux_Bin
+      - cd $TRAVIS_BUILD_DIR/Build/Linux/
       - $ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc
       - make -j 4
       - nohup ./PurenessScopeServer > pssout.file 2>&1 &
