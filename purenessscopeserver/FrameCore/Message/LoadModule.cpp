@@ -11,6 +11,11 @@ CLoadModule::CLoadModule(void)
     m_szModulePath[0] = '\0';
 }
 
+CLoadModule::CLoadModule(const CLoadModule& ar)
+{
+    (*this) = ar;
+}
+
 CLoadModule::~CLoadModule(void)
 {
     OUR_DEBUG((LM_INFO, "[CLoadModule::~CLoadModule].\n"));

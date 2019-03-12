@@ -41,6 +41,18 @@ public:
     CMessageService();
     ~CMessageService();
 
+    CMessageService(const CMessageService& ar);
+
+    CMessageService& operator = (const CMessageService& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
+
     virtual int handle_signal (int signum,
                                siginfo_t*   = 0,
                                ucontext_t* = 0);

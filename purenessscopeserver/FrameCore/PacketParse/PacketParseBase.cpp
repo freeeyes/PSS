@@ -20,6 +20,11 @@ CPacketParseBase::CPacketParseBase(void)
     m_pPacketHeadInfo   = NULL;
 }
 
+CPacketParseBase::CPacketParseBase(const CPacketParseBase& ar)
+{
+    (*this) = ar;
+}
+
 CPacketParseBase::~CPacketParseBase(void)
 {
     SAFE_DELETE(m_pPacketHeadInfo);

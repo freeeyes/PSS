@@ -256,6 +256,18 @@ public:
     CWorkThreadAI();
     ~CWorkThreadAI();
 
+    CWorkThreadAI(const CWorkThreadAI& ar);
+
+    CWorkThreadAI& operator = (const CWorkThreadAI& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
+
     void Close();
 
     void Init(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTTimeoutCount, uint32 u4WTStopTime, uint8 u1WTReturnDataType, const char* pReturnData);

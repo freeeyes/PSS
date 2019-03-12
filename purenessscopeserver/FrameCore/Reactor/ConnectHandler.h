@@ -43,7 +43,19 @@ class CConnectHandler : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>
 {
 public:
     CConnectHandler(void);
-    ~CConnectHandler(void);
+    virtual ~CConnectHandler(void);
+
+    CConnectHandler(const CConnectHandler& ar);
+
+    CConnectHandler& operator = (const CConnectHandler& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
 
     //重写继承方法
     virtual int open(void*);                                                 //用户建立一个链接
@@ -167,6 +179,18 @@ public:
     CConnectManager(void);
     ~CConnectManager(void);
 
+    CConnectManager(const CConnectManager& ar);
+
+    CConnectManager& operator = (const CConnectManager& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
+
     virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);   //定时器检查
 
     static void TimeWheel_Timeout_Callback(void* pArgsContext, vector<CConnectHandler*> vecConnectHandle);
@@ -241,6 +265,18 @@ public:
     CConnectHandlerPool(void);
     ~CConnectHandlerPool(void);
 
+    CConnectHandlerPool(const CConnectHandlerPool& ar);
+
+    CConnectHandlerPool& operator = (const CConnectHandlerPool& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
+
     void Init(int nObjcetCount);
     void Close();
 
@@ -263,6 +299,18 @@ class CConnectManagerGroup : public IConnectManager
 public:
     CConnectManagerGroup();
     ~CConnectManagerGroup();
+
+    CConnectManagerGroup(const CConnectManagerGroup& ar);
+
+    CConnectManagerGroup& operator = (const CConnectManagerGroup& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
 
     void Init(uint16 u2SendQueueCount);
     void Close();

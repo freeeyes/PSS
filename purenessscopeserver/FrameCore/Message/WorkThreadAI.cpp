@@ -12,6 +12,11 @@ CWorkThreadAI::CWorkThreadAI()
     m_szWTReturnData[0]       = '\0';
 }
 
+CWorkThreadAI::CWorkThreadAI(const CWorkThreadAI& ar)
+{
+    (*this) = ar;
+}
+
 CWorkThreadAI::~CWorkThreadAI()
 {
     Close();

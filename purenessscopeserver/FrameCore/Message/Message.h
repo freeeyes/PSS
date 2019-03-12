@@ -55,6 +55,18 @@ public:
     CMessagePool();
     ~CMessagePool();
 
+    CMessagePool(const CMessagePool& ar);
+
+    CMessagePool& operator = (const CMessagePool& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
+
     static void Init_Callback(int nIndex, CMessage* pMessage);
     static void Close_Callback(int nIndex, CMessage* pMessage);
 

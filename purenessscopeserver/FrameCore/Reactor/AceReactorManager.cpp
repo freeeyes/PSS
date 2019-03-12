@@ -10,6 +10,11 @@ CAceReactor::CAceReactor()
     m_u4ReactorID  = 0;
 }
 
+CAceReactor::CAceReactor(const CAceReactor& ar) : CAceReactor()
+{
+    (*this) = ar;
+}
+
 void CAceReactor::SetReactorID(uint32 u4ReactorID)
 {
     m_u4ReactorID = u4ReactorID;
@@ -270,6 +275,11 @@ CAceReactorManager::CAceReactorManager(void)
     m_pReactorList  = NULL;
     m_u2RectorCount = 0;
     ACE_OS::memset(m_szError, 0, MAX_BUFF_500);
+}
+
+CAceReactorManager::CAceReactorManager(const CAceReactorManager& ar)
+{
+    (*this) = ar;
 }
 
 CAceReactorManager::~CAceReactorManager(void)

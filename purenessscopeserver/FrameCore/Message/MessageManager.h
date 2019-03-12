@@ -69,6 +69,21 @@ public:
         Close();
     }
 
+    CClientCommandList(const CClientCommandList& ar)
+    {
+        (*this) = ar;
+    }
+
+    CClientCommandList& operator = (const CClientCommandList& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
+
     void SetCommandTimeout(uint16 u2Timeout)
     {
         m_u2Timeout = u2Timeout;
@@ -168,6 +183,18 @@ class CMessageManager : public IMessageManager
 public:
     CMessageManager(void);
     virtual ~CMessageManager(void);
+
+    CMessageManager(const CMessageManager& ar);
+
+    CMessageManager& operator = (const CMessageManager& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
 
     void Init(uint16 u2MaxModuleCount, uint32 u4MaxCommandCount);
 

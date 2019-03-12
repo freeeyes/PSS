@@ -23,6 +23,18 @@ public:
     CServerManager(void);
     ~CServerManager(void);
 
+    CServerManager(const CServerManager& ar);
+
+    CServerManager& operator = (const CServerManager& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
+
     bool Init();
     bool Start();
     bool Close();

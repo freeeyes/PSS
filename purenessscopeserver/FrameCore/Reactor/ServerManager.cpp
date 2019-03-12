@@ -9,6 +9,11 @@ CServerManager::CServerManager(void)
     m_pFrameLoggingStrategy = NULL;
 }
 
+CServerManager::CServerManager(const CServerManager& ar)
+{
+    (*this) = ar;
+}
+
 CServerManager::~CServerManager(void)
 {
     OUR_DEBUG((LM_INFO, "[CServerManager::~CServerManager].\n"));

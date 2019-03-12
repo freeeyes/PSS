@@ -4,6 +4,11 @@ CPacketParsePool::CPacketParsePool()
 {
 }
 
+CPacketParsePool::CPacketParsePool(const CPacketParsePool& ar)
+{
+    (*this) = ar;
+}
+
 CPacketParsePool::~CPacketParsePool()
 {
     OUR_DEBUG((LM_INFO, "[CPacketParsePool::~CPacketParsePool].\n"));
@@ -40,11 +45,11 @@ CPacketParse* CPacketParsePool::Create(const char* pFileName, uint32 u4Line)
 
 bool CPacketParsePool::Delete(CPacketParse* pPacketParse, bool blDelete)
 {
-	if (NULL == pPacketParse)
-	{
-		OUR_DEBUG((LM_INFO, "[CPacketParsePool::Delete] pPacketParse is NULL.\n"));
-		return false;
-	}
+    if (NULL == pPacketParse)
+    {
+        OUR_DEBUG((LM_INFO, "[CPacketParsePool::Delete] pPacketParse is NULL.\n"));
+        return false;
+    }
 
     if (true == blDelete)
     {

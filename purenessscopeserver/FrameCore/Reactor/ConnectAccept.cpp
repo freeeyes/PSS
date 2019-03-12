@@ -9,6 +9,16 @@ ConnectAcceptor::ConnectAcceptor()
     m_u4PacketParseInfoID  = 0;
 }
 
+ConnectAcceptor::ConnectAcceptor(const ConnectAcceptor& ar)
+{
+    (*this) = ar;
+}
+
+ConnectAcceptor::~ConnectAcceptor()
+{
+
+}
+
 void ConnectAcceptor::InitClientReactor(uint32 u4ClientReactorCount)
 {
     if(u4ClientReactorCount > 0)
@@ -167,6 +177,11 @@ CConnectAcceptorManager::CConnectAcceptorManager(void)
 {
     m_nAcceptorCount = 0;
     m_szError[0]     = '\0';
+}
+
+CConnectAcceptorManager::CConnectAcceptorManager(const CConnectAcceptorManager& ar)
+{
+    (*this) = ar;
 }
 
 CConnectAcceptorManager::~CConnectAcceptorManager(void)

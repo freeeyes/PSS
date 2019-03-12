@@ -161,6 +161,11 @@ CMessagePool::CMessagePool()
 {
 }
 
+CMessagePool::CMessagePool(const CMessagePool& ar)
+{
+    (*this) = ar;
+}
+
 CMessagePool::~CMessagePool()
 {
     OUR_DEBUG((LM_INFO, "[CMessagePool::~CMessagePool].\n"));

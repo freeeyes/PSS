@@ -12,6 +12,11 @@ CReactorClientInfo::CReactorClientInfo()
     m_blIsLocal              = false;
 }
 
+CReactorClientInfo::CReactorClientInfo(const CReactorClientInfo& ar)
+{
+    (*this) = ar;
+}
+
 CReactorClientInfo::~CReactorClientInfo()
 {
     OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::~CReactorClientInfo].\n"));
@@ -229,6 +234,11 @@ CClientReConnectManager::CClientReConnectManager(void)
     m_blReactorFinish        = false;
     m_u4ConnectServerTimeout = 0;
     m_u4MaxPoolCount         = 0;
+}
+
+CClientReConnectManager::CClientReConnectManager(const CClientReConnectManager& ar)
+{
+    (*this) = ar;
 }
 
 CClientReConnectManager::~CClientReConnectManager(void)
