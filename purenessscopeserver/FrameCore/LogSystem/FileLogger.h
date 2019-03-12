@@ -190,7 +190,7 @@ class CFileLogger : public IServerLogger
 {
 public:
     CFileLogger();
-    ~CFileLogger();
+    virtual ~CFileLogger();
 
     int DoLog(int nLogType, _LogBlockInfo* pLogBlockInfo);
     int GetLogTypeCount();
