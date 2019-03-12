@@ -19,7 +19,7 @@ public:
 
     CUnit_AceReactorManager(const CUnit_AceReactorManager& ar);
 
-    CUnit_AceReactorManager& operator = (CUnit_AceReactorManager& ar)
+    CUnit_AceReactorManager& operator = (const CUnit_AceReactorManager& ar)
     {
         if (this != &ar)
         {

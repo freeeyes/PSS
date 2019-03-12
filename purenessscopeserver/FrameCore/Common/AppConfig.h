@@ -23,7 +23,7 @@ public:
 
     CAppConfig(const CAppConfig& ar);
 
-    CAppConfig& operator = (CAppConfig& ar)
+    CAppConfig& operator = (const CAppConfig& ar)
     {
         if (this != &ar)
         {
