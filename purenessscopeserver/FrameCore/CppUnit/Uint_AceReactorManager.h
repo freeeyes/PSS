@@ -13,7 +13,7 @@ class CUnit_AceReactorManager : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    virtual ~CUnit_AceReactorManager();
+    CUnit_AceReactorManager();
 
     virtual void setUp(void);
 

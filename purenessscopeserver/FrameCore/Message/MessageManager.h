@@ -167,7 +167,7 @@ class CMessageManager : public IMessageManager
 {
 public:
     CMessageManager(void);
-    ~CMessageManager(void);
+    virtual ~CMessageManager(void);
 
     void Init(uint16 u2MaxModuleCount, uint32 u4MaxCommandCount);
 
