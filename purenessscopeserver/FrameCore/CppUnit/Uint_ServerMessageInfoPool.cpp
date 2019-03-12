@@ -2,9 +2,18 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_ServerMessageInfoPool::~CUnit_ServerMessageInfoPool()
+CUnit_ServerMessageInfoPool::CUnit_ServerMessageInfoPool()
 {
     m_pServerMessageInfoPool = NULL;
+}
+
+CUnit_ServerMessageInfoPool::CUnit_ServerMessageInfoPool(const CUnit_ServerMessageInfoPool& ar)
+{
+    (*this) = ar;
+}
+
+CUnit_ServerMessageInfoPool::~CUnit_ServerMessageInfoPool()
+{
 }
 
 void CUnit_ServerMessageInfoPool::setUp(void)

@@ -2,9 +2,19 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_ConnectClient::~CUnit_ConnectClient()
+CUnit_ConnectClient::CUnit_ConnectClient()
 {
     m_pConnectClient = NULL;
+}
+
+CUnit_ConnectClient::CUnit_ConnectClient(const CUnit_ConnectClient& ar)
+{
+    (*this) = ar;
+}
+
+CUnit_ConnectClient::~CUnit_ConnectClient()
+{
+
 }
 
 void CUnit_ConnectClient::setUp(void)

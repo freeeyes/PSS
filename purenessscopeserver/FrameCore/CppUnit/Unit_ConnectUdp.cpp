@@ -2,6 +2,16 @@
 
 #ifdef _CPPUNIT_TEST
 
+CUnit_ConnectUdp::CUnit_ConnectUdp()
+{
+    m_nServerID = 0;
+}
+
+CUnit_ConnectUdp::CUnit_ConnectUdp(const CUnit_ConnectUdp& ar)
+{
+    (*this) = ar;
+}
+
 CUnit_ConnectUdp::~CUnit_ConnectUdp()
 {
 

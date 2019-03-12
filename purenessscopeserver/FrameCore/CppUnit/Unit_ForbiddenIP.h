@@ -13,7 +13,21 @@ class CUnit_ForbiddenIP : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
+    CUnit_ForbiddenIP();
+
     virtual ~CUnit_ForbiddenIP();
+
+    CUnit_ForbiddenIP(const CUnit_ForbiddenIP& ar);
+
+    CUnit_ForbiddenIP& operator = (const CUnit_ForbiddenIP& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
 
     virtual void setUp(void);
 

@@ -13,7 +13,21 @@ class CUnit_ThreadInfo : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
+    CUnit_ThreadInfo();
+
     virtual ~CUnit_ThreadInfo();
+
+    CUnit_ThreadInfo(const CUnit_ThreadInfo& ar);
+
+    CUnit_ThreadInfo& operator = (const CUnit_ThreadInfo& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
 
     virtual void setUp(void);
 

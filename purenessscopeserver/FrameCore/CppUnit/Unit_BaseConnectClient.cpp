@@ -2,6 +2,16 @@
 
 #ifdef _CPPUNIT_TEST
 
+CUnit_BaseConnectClient::CUnit_BaseConnectClient()
+{
+    m_u2CommandID = 0;
+}
+
+CUnit_BaseConnectClient::CUnit_BaseConnectClient(const CUnit_BaseConnectClient& ar)
+{
+    (*this) = ar;
+}
+
 CUnit_BaseConnectClient::~CUnit_BaseConnectClient()
 {
 

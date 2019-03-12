@@ -33,7 +33,21 @@ class CUnit_BuffPacket : public CppUnit::TestFixture
     CPPUNIT_TEST(Test_PacketCount);
     CPPUNIT_TEST_SUITE_END();
 public:
+    CUnit_BuffPacket();
+
     virtual ~CUnit_BuffPacket();
+
+    CUnit_BuffPacket(const CUnit_BuffPacket& ar);
+
+    CUnit_BuffPacket& operator = (const CUnit_BuffPacket& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
 
     virtual void setUp(void);
 

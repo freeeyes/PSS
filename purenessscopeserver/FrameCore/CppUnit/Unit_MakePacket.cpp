@@ -2,9 +2,18 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_MakePacket::~CUnit_MakePacket()
+CUnit_MakePacket::CUnit_MakePacket()
 {
     m_pMakePacket = NULL;
+}
+
+CUnit_MakePacket::CUnit_MakePacket(const CUnit_MakePacket& ar)
+{
+    (*this) = ar;
+}
+
+CUnit_MakePacket::~CUnit_MakePacket()
+{
 }
 
 void CUnit_MakePacket::setUp(void)

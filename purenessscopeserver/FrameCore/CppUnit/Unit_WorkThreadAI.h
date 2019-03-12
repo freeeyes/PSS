@@ -13,7 +13,21 @@ class CUnit_WorkThreadAI : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
+    CUnit_WorkThreadAI();
+
     virtual ~CUnit_WorkThreadAI();
+
+    CUnit_WorkThreadAI(const CUnit_WorkThreadAI& ar);
+
+    CUnit_WorkThreadAI& operator = (const CUnit_WorkThreadAI& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
 
     virtual void setUp(void);
 

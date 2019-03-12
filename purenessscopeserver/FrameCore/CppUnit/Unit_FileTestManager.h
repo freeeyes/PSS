@@ -14,6 +14,21 @@ class CUnit_FileTestManager : public CppUnit::TestFixture
     CPPUNIT_TEST(Test_FileTestStop);
     CPPUNIT_TEST_SUITE_END();
 public:
+    CUnit_FileTestManager();
+
+    virtual ~CUnit_FileTestManager();
+
+    CUnit_FileTestManager(const CUnit_FileTestManager& ar);
+
+    CUnit_FileTestManager& operator = (const CUnit_FileTestManager& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
 
     virtual void setUp(void);
 

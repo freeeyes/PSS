@@ -2,10 +2,21 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_MessageService::~CUnit_MessageService()
+CUnit_MessageService::CUnit_MessageService()
 {
     m_pMessageService = NULL;
 }
+
+CUnit_MessageService::CUnit_MessageService(const CUnit_MessageService& ar)
+{
+    (*this) = ar;
+}
+
+CUnit_MessageService::~CUnit_MessageService()
+{
+}
+
+
 
 void CUnit_MessageService::setUp(void)
 {

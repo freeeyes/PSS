@@ -15,7 +15,21 @@ class CUnit_ConnectUdp : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
+    CUnit_ConnectUdp();
+
     virtual ~CUnit_ConnectUdp();
+
+    CUnit_ConnectUdp(const CUnit_ConnectUdp& ar);
+
+    CUnit_ConnectUdp& operator = (const CUnit_ConnectUdp& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
 
     virtual void setUp(void);
 

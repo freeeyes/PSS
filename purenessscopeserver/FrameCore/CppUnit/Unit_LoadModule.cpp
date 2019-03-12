@@ -2,9 +2,18 @@
 
 #ifdef _CPPUNIT_TEST
 
+CUnit_LoadModule::CUnit_LoadModule()
+{
+    m_szModuleName[0] = '\0';
+}
+
+CUnit_LoadModule::CUnit_LoadModule(const CUnit_LoadModule& ar)
+{
+    (*this) = ar;
+}
+
 CUnit_LoadModule::~CUnit_LoadModule()
 {
-
 }
 
 void CUnit_LoadModule::setUp(void)

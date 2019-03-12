@@ -14,7 +14,21 @@ class CUnit_ModuleMessageManager : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
+    CUnit_ModuleMessageManager();
+
     virtual ~CUnit_ModuleMessageManager();
+
+    CUnit_ModuleMessageManager(const CUnit_ModuleMessageManager& ar);
+
+    CUnit_ModuleMessageManager& operator = (const CUnit_ModuleMessageManager& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
 
     virtual void setUp(void);
 

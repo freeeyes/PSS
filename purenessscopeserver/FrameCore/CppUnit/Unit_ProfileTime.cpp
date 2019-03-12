@@ -2,9 +2,18 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_ProfileTime::~CUnit_ProfileTime()
+CUnit_ProfileTime::CUnit_ProfileTime()
 {
     m_pProfileTime = NULL;
+}
+
+CUnit_ProfileTime::CUnit_ProfileTime(const CUnit_ProfileTime& ar)
+{
+    (*this) = ar;
+}
+
+CUnit_ProfileTime::~CUnit_ProfileTime()
+{
 }
 
 void CUnit_ProfileTime::setUp(void)

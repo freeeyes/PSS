@@ -13,7 +13,21 @@ class CUnit_MessageDyeingManager : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
+    CUnit_MessageDyeingManager();
+
     virtual ~CUnit_MessageDyeingManager();
+
+    CUnit_MessageDyeingManager(const CUnit_MessageDyeingManager& ar);
+
+    CUnit_MessageDyeingManager& operator = (const CUnit_MessageDyeingManager& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
 
     virtual void setUp(void);
 
