@@ -31,7 +31,7 @@ CMessageService::CMessageService():m_mutex(), m_cond(m_mutex)
     }
 }
 
-CMessageService::CMessageService(const CMessageService& ar) : CMessageService(0)
+CMessageService::CMessageService(const CMessageService& ar) : CMessageService()
 {
     (*this) = ar;
 }
