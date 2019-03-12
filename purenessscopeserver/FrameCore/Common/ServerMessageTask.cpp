@@ -104,6 +104,11 @@ CServerMessageTask::CServerMessageTask():m_mutex(), m_cond(m_mutex)
     m_emState    = SERVER_RECV_INIT;
 }
 
+CServerMessageTask::CServerMessageTask(const CServerMessageTask& ar) : CServerMessageTask()
+{
+    (*this) = ar;
+}
+
 CServerMessageTask::~CServerMessageTask()
 {
     OUR_DEBUG((LM_INFO, "[CServerMessageTask::~CServerMessageTask].\n"));

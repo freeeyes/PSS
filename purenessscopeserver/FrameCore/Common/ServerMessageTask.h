@@ -151,6 +151,8 @@ public:
     CServerMessageTask();
     virtual ~CServerMessageTask();
 
+    CServerMessageTask(const CServerMessageTask& ar);
+
     CServerMessageTask& operator = (const CServerMessageTask& ar)
     {
         if (this != &ar)
