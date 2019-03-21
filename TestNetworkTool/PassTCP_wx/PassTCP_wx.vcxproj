@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{52597042-CCE6-4937-A729-59637D6B9474}</ProjectGuid>
+    <ProjectGuid>{14EA48D4-9D57-4F27-AA9F-F654F75041FE}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>PSS_ClientManager_wx</RootNamespace>
+    <RootNamespace>PassTCP_wx</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -75,7 +75,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>.\Bin</OutDir>
+    <OutDir>.\bin</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -91,7 +91,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_WIN32_PLATFORM_;WIN32_LEAN_AND_MEAN;_WINSOCK_DEPRECATED_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Tools\wxWidgets-3.1.2\include\;..\..\ThirdLib\include;..\..\ThirdLib\src;..\..\ThirdLib\thirdparty;..\..\ThirdLib\include\TinyXML;C:\Tools\wxWidgets-3.1.2\lib\vc_x64_lib\mswud</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Tools\wxWidgets-3.1.2\include\;..\..\ThirdLib\include\Lua;..\..\ThirdLib\include;..\..\ThirdLib\src;..\..\ThirdLib\thirdparty;..\..\ThirdLib\thirdparty\LuaLib;..\..\ThirdLib\include\TinyXML;C:\Tools\wxWidgets-3.1.2\lib\vc_x64_lib\mswud</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -108,14 +108,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_WIN32_PLATFORM_;WIN32_LEAN_AND_MEAN;_WINSOCK_DEPRECATED_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Tools\wxWidgets-3.1.2\include\;..\..\ThirdLib\include;..\..\ThirdLib\src;..\..\ThirdLib\thirdparty;..\..\ThirdLib\include\TinyXML;C:\Tools\wxWidgets-3.1.2\lib\vc_x64_lib\mswud</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Tools\wxWidgets-3.1.2\include\;..\..\ThirdLib\include\Lua;..\..\ThirdLib\include;..\..\ThirdLib\src;..\..\ThirdLib\thirdparty;..\..\ThirdLib\thirdparty\LuaLib;..\..\ThirdLib\include\TinyXML;C:\Tools\wxWidgets-3.1.2\lib\vc_x64_lib\mswud</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>C:\Tools\wxWidgets-3.1.2\lib\vc_x64_lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>wxbase31ud.lib;wxbase31ud_net.lib;wxbase31ud_xml.lib;wxexpatd.lib;wxjpegd.lib;wxmsw31ud_adv.lib;wxmsw31ud_aui.lib;wxmsw31ud_core.lib;wxmsw31ud_gl.lib;wxmsw31ud_html.lib;wxmsw31ud_media.lib;wxmsw31ud_propgrid.lib;wxmsw31ud_qa.lib;wxmsw31ud_ribbon.lib;wxmsw31ud_richtext.lib;wxmsw31ud_stc.lib;wxmsw31ud_xrc.lib;wxpngd.lib;wxregexud.lib;wxscintillad.lib;wxtiffd.lib;wxzlibd.lib;comctl32.lib;rpcrt4.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Tools\wxWidgets-3.1.2\lib\vc_x64_lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -155,25 +154,104 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\ThirdLib\include\Lua\LuaFn.cpp" />
     <ClCompile Include="..\..\ThirdLib\include\TinyXML\tinystr.cpp" />
     <ClCompile Include="..\..\ThirdLib\include\TinyXML\tinyxml.cpp" />
     <ClCompile Include="..\..\ThirdLib\include\TinyXML\tinyxmlerror.cpp" />
     <ClCompile Include="..\..\ThirdLib\include\TinyXML\tinyxmlparser.cpp" />
-    <ClCompile Include="..\..\ThirdLib\include\XmlOpeation.cpp" />
-    <ClCompile Include="..\..\ThirdLib\src\TcpClientConnect.cpp" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lapi.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lauxlib.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lbaselib.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lcode.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\ldblib.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\ldebug.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\ldo.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\ldump.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lfunc.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lgc.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\linit.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\liolib.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\llex.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lmathlib.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lmem.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\loadlib.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lobject.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lopcodes.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\loslib.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lparser.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lstate.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lstring.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lstrlib.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\ltable.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\ltablib.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\ltm.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lundump.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lvm.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lzio.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\print.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\toluabind.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\tolua_event.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\tolua_is.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\tolua_map.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\tolua_push.c" />
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\tolua_to.c" />
     <ClCompile Include="..\..\ThirdLib\thirdparty\sock_wrap.cpp" />
-    <ClCompile Include="PSS_ClientManagerApp.cpp" />
-    <ClCompile Include="PSS_ClientManagerMain.cpp" />
+    <ClCompile Include="ClientTcpSocket.cpp" />
+    <ClCompile Include="ClientUdpSocket.cpp" />
+    <ClCompile Include="PacketDlg.cpp" />
+    <ClCompile Include="PassTCPApp.cpp" />
+    <ClCompile Include="PassTCPDlg.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\ThirdLib\include\Lua\LuaDefine.h" />
+    <ClInclude Include="..\..\ThirdLib\include\Lua\LuaFn.h" />
+    <ClInclude Include="..\..\ThirdLib\include\Lua\LuaFnRegister.h" />
+    <ClInclude Include="..\..\ThirdLib\include\Lua\LuaFn_Tcp.h" />
+    <ClInclude Include="..\..\ThirdLib\include\Lua\ParamData.h" />
     <ClInclude Include="..\..\ThirdLib\include\TinyXML\tinystr.h" />
     <ClInclude Include="..\..\ThirdLib\include\TinyXML\tinyxml.h" />
-    <ClInclude Include="..\..\ThirdLib\include\XmlOpeation.h" />
-    <ClInclude Include="..\..\ThirdLib\src\TcpClientConnect.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lapi.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lauxlib.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lcode.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\ldebug.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\ldo.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lfunc.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lgc.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\llex.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\llimits.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lmem.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lobject.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lopcodes.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lparser.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lstate.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lstring.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\ltable.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\ltm.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lua.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\luaconf.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lualib.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lundump.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lvm.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lzio.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\tolua++.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\toluabind.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\tolua_event.h" />
+    <ClInclude Include="..\..\ThirdLib\thirdparty\macro.h" />
     <ClInclude Include="..\..\ThirdLib\thirdparty\sock_wrap.h" />
-    <ClInclude Include="clientdefine.h" />
-    <ClInclude Include="PSS_ClientManagerApp.h" />
-    <ClInclude Include="PSS_ClientManagerMain.h" />
+    <ClInclude Include="ClientTcpSocket.h" />
+    <ClInclude Include="ClientUdpSocket.h" />
+    <ClInclude Include="define.h" />
+    <ClInclude Include="PacketDlg.h" />
+    <ClInclude Include="PassTCPApp.h" />
+    <ClInclude Include="PassTCPDlg.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\ThirdLib\thirdparty\LuaLib\Lua.vcproj" />
+    <None Include="..\..\ThirdLib\thirdparty\LuaLib\Lua.vcproj.8.00.old" />
+    <None Include="..\..\ThirdLib\thirdparty\LuaLib\Makefile" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\ThirdLib\thirdparty\LuaLib\ReadMe.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -32,7 +32,7 @@ public:
     void SetParam(void* pParam, const char* szType, int nTypeLen)
     {
         m_pParam = pParam;
-#if WIN32
+#if _WIN32_PLATFORM_
         sprintf_s(m_szType, MAX_PARAM_200, "%s", szType);
 #else
         sprintf(m_szType, "%s", szType);
@@ -98,7 +98,7 @@ public:
     {
         m_blIsDelete = true;
     }
-	
+
     ~CParamGroup()
     {
         if(m_blIsDelete == true)

@@ -9,7 +9,7 @@ static int LuaFn_Tcp_Print(lua_State* pState)
     int nLen = (int)lua_tonumber(pState, 2);
     char* pData = (char* )lua_tostring(pState, 1);
 
-#if WIN32
+#if _WIN32_PLATFORM_
     printf_s("[LuaFn_Tcp_Print]nLen=%d.\n", nLen);
 #else
     printf("[LuaFn_Tcp_Print]nLen=%d.\n", nLen);

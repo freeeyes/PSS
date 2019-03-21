@@ -1,0 +1,310 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Tinyxml">
+      <UniqueIdentifier>{2db4c1fd-47ba-4325-848b-a230b15b9a40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Lua">
+      <UniqueIdentifier>{55212dad-6ef4-4e95-9ffc-009395aa0565}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LuaFn">
+      <UniqueIdentifier>{09a7aafa-4890-4e0b-9cbe-7b41457d019e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ClientTcpSocket.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientUdpSocket.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PassTCPApp.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PassTCPDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\include\TinyXML\tinystr.cpp">
+      <Filter>Tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\include\TinyXML\tinyxml.cpp">
+      <Filter>Tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\include\TinyXML\tinyxmlerror.cpp">
+      <Filter>Tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\include\TinyXML\tinyxmlparser.cpp">
+      <Filter>Tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lapi.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lauxlib.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lbaselib.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lcode.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\ldblib.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\ldebug.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\ldo.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\ldump.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lfunc.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lgc.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\linit.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\liolib.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\llex.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lmathlib.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lmem.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\loadlib.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lobject.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lopcodes.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\loslib.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lparser.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lstate.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lstring.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lstrlib.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\ltable.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\ltablib.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\ltm.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lundump.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lvm.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\lzio.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\print.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\tolua_event.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\tolua_is.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\tolua_map.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\tolua_push.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\tolua_to.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\LuaLib\toluabind.c">
+      <Filter>Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\include\Lua\LuaFn.cpp">
+      <Filter>LuaFn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ThirdLib\thirdparty\sock_wrap.cpp">
+      <Filter>头文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ClientTcpSocket.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientUdpSocket.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="define.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PassTCPApp.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PassTCPDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\include\TinyXML\tinystr.h">
+      <Filter>Tinyxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\include\TinyXML\tinyxml.h">
+      <Filter>Tinyxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lapi.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lauxlib.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lcode.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\ldebug.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\ldo.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lfunc.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lgc.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\llex.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\llimits.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lmem.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lobject.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lopcodes.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lparser.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lstate.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lstring.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\ltable.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\ltm.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lua.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\luaconf.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lualib.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lundump.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lvm.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\lzio.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\tolua_event.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\tolua++.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\LuaLib\toluabind.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\include\Lua\LuaDefine.h">
+      <Filter>LuaFn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\include\Lua\LuaFn.h">
+      <Filter>LuaFn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\include\Lua\LuaFn_Tcp.h">
+      <Filter>LuaFn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\include\Lua\LuaFnRegister.h">
+      <Filter>LuaFn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\include\Lua\ParamData.h">
+      <Filter>LuaFn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\macro.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdLib\thirdparty\sock_wrap.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\ThirdLib\thirdparty\LuaLib\Lua.vcproj">
+      <Filter>Lua</Filter>
+    </None>
+    <None Include="..\..\ThirdLib\thirdparty\LuaLib\Lua.vcproj.8.00.old">
+      <Filter>Lua</Filter>
+    </None>
+    <None Include="..\..\ThirdLib\thirdparty\LuaLib\Makefile">
+      <Filter>Lua</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\ThirdLib\thirdparty\LuaLib\ReadMe.txt">
+      <Filter>Lua</Filter>
+    </Text>
+  </ItemGroup>
+</Project>
