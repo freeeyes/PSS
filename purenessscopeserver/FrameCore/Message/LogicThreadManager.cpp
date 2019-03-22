@@ -76,6 +76,18 @@ void CLogicThread::Init(CLogicThreadInfo objThreadInfo)
     m_MessagePool.Init(MAX_MESSAGE_POOL, CLogicThreadMessagePool::Init_Callback);
 }
 
+bool CLogicThread::Start()
+{
+    if (0 != open())
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
 int CLogicThread::handle_signal(int signum, siginfo_t* siginfo, ucontext_t* ucontext)
 {
     if (signum == SIGUSR1 + grp_id())
@@ -186,6 +198,11 @@ bool CLogicThread::PutMessage(int nMessageID, void* pParam)
     return true;
 }
 
+CLogicThreadInfo* CLogicThread::GetThreadInfo()
+{
+    return &m_objThreadInfo;
+}
+
 int CLogicThread::CloseMsgQueue()
 {
     return Task_Common_CloseMsgQueue((ACE_Task<ACE_MT_SYNCH>*)this, m_logicthreadcond, m_logicthreadmutex);
@@ -255,22 +272,139 @@ CLogicThreadManager::~CLogicThreadManager()
 
 }
 
+void CLogicThreadManager::Init()
+{
+    //≥ı ºªØHash±Ì
+    m_objThreadInfoList.Init(LOGICTHREAD_MAX_COUNT);
+    m_objMessageIDList.Init(LOGICTHREAD_MESSAGE_MAX_COUNT);
+}
+
 int CLogicThreadManager::CreateLogicThread(int nLogicThreadID, int nTimeout, ThreadInit thread_init, ThreadCallbackLogic thread_callback_logic, ThreadErrorLogic thread_callback_error, ThreadExit thread_exit)
 {
+    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWriteLock);
+
+    CLogicThread* pLogicThread = m_objThreadInfoList.Get_Hash_Box_Data_By_Uint32((uint32)nLogicThreadID);
+
+    if (NULL != pLogicThread)
+    {
+        OUR_DEBUG((LM_INFO, "[CLogicThreadManager::CreateLogicThread]Create logic thread id(%d) is exist.\n", nLogicThreadID));
+        return -1;
+    }
+
+    CLogicThreadInfo* pLogicThreadInfo = new CLogicThreadInfo();
+
+    pLogicThreadInfo->m_nLogicThreadID         = nLogicThreadID;
+    pLogicThreadInfo->m_nTimeout               = nTimeout;
+    pLogicThreadInfo->fn_thread_init           = thread_init;
+    pLogicThreadInfo->fn_thread_callback_logic = thread_callback_logic;
+    pLogicThreadInfo->fn_thread_callback_error = thread_callback_error;
+    pLogicThreadInfo->fn_thread_exit           = thread_exit;
+
+    pLogicThread = new CLogicThread();
+    pLogicThread->Init(*pLogicThreadInfo);
+
+    if (false == pLogicThread->Start())
+    {
+        OUR_DEBUG((LM_INFO, "[CLogicThreadManager::CreateLogicThread]nLogicThreadID=%d Start error.\n", nLogicThreadID));
+        SAFE_DELETE(pLogicThreadInfo);
+        SAFE_DELETE(pLogicThread);
+        return -1;
+    }
+
+    if (0 > m_objThreadInfoList.Add_Hash_Data_By_Key_Unit32(nLogicThreadID, pLogicThread))
+    {
+        OUR_DEBUG((LM_INFO, "[CLogicThreadManager::CreateLogicThread]nLogicThreadID=%d add error.\n", nLogicThreadID));
+        SAFE_DELETE(pLogicThreadInfo);
+        SAFE_DELETE(pLogicThread);
+        return -1;
+    }
+
     return 0;
 }
 
 int CLogicThreadManager::KillLogicThread(int nLogicThreadID)
 {
-    return 0;
+    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWriteLock);
+
+    CLogicThread* pLogicThread = m_objThreadInfoList.Get_Hash_Box_Data_By_Uint32((uint32)nLogicThreadID);
+
+    if (NULL == pLogicThread)
+    {
+        OUR_DEBUG((LM_INFO, "[CLogicThreadManager::CreateLogicThread]Create logic thread id(%d) is no exist.\n", nLogicThreadID));
+        return -1;
+    }
+    else
+    {
+        pLogicThread->Close();
+        SAFE_DELETE(pLogicThread);
+        m_objThreadInfoList.Del_Hash_Data_By_Unit32((uint32)nLogicThreadID);
+        return 0;
+    }
 }
 
 int CLogicThreadManager::MessageMappingLogicThread(int nLogicThreadID, int nMessageID)
 {
+    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWriteLock);
+
+    CLogicThreadInfo* pLogicThreadInfo = NULL;
+    CLogicThread* pLogicThread = m_objThreadInfoList.Get_Hash_Box_Data_By_Uint32((uint32)nLogicThreadID);
+
+    if (NULL == pLogicThread)
+    {
+        OUR_DEBUG((LM_INFO, "[CLogicThreadManager::CreateLogicThread]Create logic thread id(%d) is no exist.\n", nLogicThreadID));
+        return -1;
+    }
+
+    pLogicThreadInfo = m_objMessageIDList.Get_Hash_Box_Data_By_Uint32((uint32)nMessageID);
+
+    if (NULL != pLogicThreadInfo)
+    {
+        OUR_DEBUG((LM_INFO, "[CLogicThreadManager::CreateLogicThread]Message id(%d) at logic thread(%d) is exist.\n",
+                   nMessageID,
+                   pLogicThreadInfo->m_nLogicThreadID));
+        return -1;
+    }
+
+    pLogicThreadInfo = pLogicThread->GetThreadInfo();
+
+    if (0 > m_objMessageIDList.Add_Hash_Data_By_Key_Unit32((uint32)nMessageID, pLogicThreadInfo))
+    {
+        OUR_DEBUG((LM_INFO, "[CLogicThreadManager::CreateLogicThread]Message id(%d) at logic thread(%d) add error.\n",
+                   nMessageID,
+                   pLogicThreadInfo->m_nLogicThreadID));
+        return -1;
+    }
+
     return 0;
 }
 
 int CLogicThreadManager::SendLogicThreadMessage(int nMessageID, void* arg)
 {
+    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWriteLock);
+
+    CLogicThreadInfo* pLogicThreadInfo = m_objMessageIDList.Get_Hash_Box_Data_By_Uint32((uint32)nMessageID);
+
+    if (NULL == pLogicThreadInfo)
+    {
+        OUR_DEBUG((LM_INFO, "[CLogicThreadManager::CreateLogicThread]Message id(%d) at logic is no exist.\n",
+                   nMessageID,
+                   pLogicThreadInfo->m_nLogicThreadID));
+        return -1;
+    }
+
+    CLogicThread* pLogicThread = m_objThreadInfoList.Get_Hash_Box_Data_By_Uint32((uint32)pLogicThreadInfo->m_nLogicThreadID);
+
+    if (NULL == pLogicThread)
+    {
+        OUR_DEBUG((LM_INFO, "[CLogicThreadManager::CreateLogicThread]Create logic thread id(%d) is no exist.\n", pLogicThreadInfo->m_nLogicThreadID));
+        return -1;
+    }
+
+    if (false == pLogicThread->PutMessage(nMessageID, arg))
+    {
+        OUR_DEBUG((LM_INFO, "[CLogicThreadManager::CreateLogicThread]Create logic thread id(%d) putmessage error.\n", pLogicThreadInfo->m_nLogicThreadID));
+        return -1;
+    }
+
     return 0;
 }

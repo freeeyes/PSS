@@ -1,11 +1,19 @@
 #ifndef _LOGICTHREADMANAGER_H
 #define _LOGICTHREADMANAGER_H
 
+#include "ace/Synch.h"
+#include "ace/Malloc_T.h"
+#include "ace/Singleton.h"
+#include "ace/Thread_Mutex.h"
+
 #include "define.h"
 #include "HashTable.h"
 #include "ILogicThreadManager.h"
 #include "ObjectPoolManager.h"
 #include "BaseTask.h"
+
+#define LOGICTHREAD_MAX_COUNT         100
+#define LOGICTHREAD_MESSAGE_MAX_COUNT 2000
 
 //逻辑线程的消息体
 class CLogicThreadMessage
@@ -164,6 +172,8 @@ public:
 
     void Init(CLogicThreadInfo objThreadInfo);
 
+    bool Start();
+
     virtual int handle_signal(int signum,
                               siginfo_t* = 0,
                               ucontext_t* = 0);
@@ -173,6 +183,8 @@ public:
     int Close();
 
     bool PutMessage(int nMessageID, void* pParam);
+
+    CLogicThreadInfo* GetThreadInfo();
 
 private:
     int CloseMsgQueue();
@@ -195,6 +207,8 @@ public:
     CLogicThreadManager();
     virtual ~CLogicThreadManager();
 
+    void Init();
+
     //创建逻辑线程
     virtual int CreateLogicThread(int nLogicThreadID,
                                   int nTimeout,
@@ -212,6 +226,10 @@ public:
     //发送线程消息
     virtual int SendLogicThreadMessage(int nMessageID, void* arg);
 
+public:
+    CHashTable<CLogicThread>     m_objThreadInfoList;
+    CHashTable<CLogicThreadInfo> m_objMessageIDList;
+    ACE_Recursive_Thread_Mutex   m_ThreadWriteLock;
 };
 
 #endif
