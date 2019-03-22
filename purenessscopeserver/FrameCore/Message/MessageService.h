@@ -39,7 +39,7 @@ class CMessageService : public ACE_Task<ACE_MT_SYNCH>
 {
 public:
     CMessageService();
-    ~CMessageService();
+    virtual ~CMessageService();
 
     CMessageService(const CMessageService& ar);
 
@@ -54,7 +54,7 @@ public:
     }
 
     virtual int handle_signal (int signum,
-                               siginfo_t*   = 0,
+                               siginfo_t*  = 0,
                                ucontext_t* = 0);
 
     virtual int open(void* args = 0);

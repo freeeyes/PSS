@@ -236,6 +236,7 @@
     <ClCompile Include="CppUnit\Unit_TimeQueue.cpp" />
     <ClCompile Include="CppUnit\Unit_WorkThreadAI.cpp" />
     <ClCompile Include="Mail\smtps.cpp" />
+    <ClCompile Include="Message\LogicThreadManager.cpp" />
     <ClCompile Include="Message\MessageDyeingManager.cpp" />
     <ClCompile Include="Proactor\ProConnectHandler.cpp" />
     <ClCompile Include="Proactor\ProTTyClientManager.cpp" />
@@ -567,6 +568,7 @@
     <ClInclude Include="..\Common\IConnectManager.h" />
     <ClInclude Include="..\Common\IControlListen.h" />
     <ClInclude Include="..\Common\IFrameCommand.h" />
+    <ClInclude Include="..\Common\ILogicThreadManager.h" />
     <ClInclude Include="..\Common\ILogManager.h" />
     <ClInclude Include="..\Common\ILogObject.h" />
     <ClInclude Include="..\Common\IMessage.h" />
@@ -653,6 +655,7 @@
     <ClInclude Include="FileTest\FileTest.h" />
     <ClInclude Include="FileTest\FileTestManager.h" />
     <ClInclude Include="Mail\smtps.h" />
+    <ClInclude Include="Message\LogicThreadManager.h" />
     <ClInclude Include="Message\MessageDyeingManager.h" />
     <ClInclude Include="PacketParse\PacketConsoleParse.h" />
     <ClInclude Include="PacketParse\PacketParse.h" />

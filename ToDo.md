@@ -13,6 +13,8 @@
 > 10. 重新开发支持ssl的邮件发送程序，使用CURL组件替换原有的smtp服务,目前smtp基本都转为smtps。(Finish)
 > 11. 开发支持直接转发的数据中继功能，参数配置化实现。(Finish)
 > 12. 开发TTy设备的支持。(Finish)
+> 13. 开发支持跨平台的PSS工具组。(Doing)
+> 14. 开发平台逻辑线程是使用接口。(Doing)
 
 ##work by ruqi
 > 1. 配置PSS生成Windows程序在sonar里检测与代码覆盖 (Doing)

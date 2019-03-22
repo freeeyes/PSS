@@ -388,6 +388,9 @@
     <ClCompile Include="Reactor\ReTTyClientManager.cpp">
       <Filter>Reactor\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="Message\LogicThreadManager.cpp">
+      <Filter>Message\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -908,6 +911,12 @@
     </ClInclude>
     <ClInclude Include="..\Common\ProfileTime.h">
       <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Message\LogicThreadManager.h">
+      <Filter>Message\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ILogicThreadManager.h">
+      <Filter>IObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

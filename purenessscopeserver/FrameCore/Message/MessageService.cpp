@@ -129,7 +129,7 @@ int CMessageService::open(void* args)
 
 int CMessageService::svc(void)
 {
-    while(true)
+    while(m_blRun)
     {
         if (false == Dispose_Queue())
         {
