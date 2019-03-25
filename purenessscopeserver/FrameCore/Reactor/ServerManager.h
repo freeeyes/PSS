@@ -14,6 +14,7 @@
 #include "ClientReConnectManager.h"
 #include "ReUDPManager.h"
 #include "ReTTyClientManager.h"
+#include "LogicThreadManager.h"
 
 class Frame_Logging_Strategy;
 

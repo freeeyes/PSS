@@ -196,9 +196,11 @@ bool CLogicThread::PutMessage(int nMessageID, void* pParam)
 
     if (NULL != pMessage)
     {
-        ACE_Message_Block* mb = pMessage->GetQueueMessage();
+        pMessage->m_nMessageID = nMessageID;
+        pMessage->m_pParam     = pParam;
 
-        ACE_Time_Value xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, 10000);
+        ACE_Message_Block* mb  = pMessage->GetQueueMessage();
+        ACE_Time_Value xtime   = ACE_OS::gettimeofday() + ACE_Time_Value(0, 10000);
 
         if (this->putq(mb, &xtime) == -1)
         {
@@ -251,7 +253,7 @@ bool CLogicThread::Dispose_Queue()
         //处理消息
         CLogicThreadMessage* msg = *((CLogicThreadMessage**)mb->base());
 
-        ThreadReturn emRet;
+        ThreadReturn emRet = THREAD_Task_Finish;
 
         m_u4ThreadState = THREAD_RUNBEGIN;
         m_tvUpdateTime  = ACE_OS::gettimeofday();
@@ -293,6 +295,8 @@ CLogicThreadManager::~CLogicThreadManager()
 int CLogicThreadManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWriteLock);
+    ACE_UNUSED_ARG(arg);
+
     vector<CLogicThread*> vecLogicThreadList;
 
     m_objThreadInfoList.Get_All_Used(vecLogicThreadList);

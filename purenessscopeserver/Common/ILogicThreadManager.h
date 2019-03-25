@@ -1,5 +1,5 @@
-﻿#ifndef _ILOGICTHREAD_H
-#define _ILOGICTHREAD_H
+﻿#ifndef _ILOGICTHREADMANAGER_H
+#define _ILOGICTHREADMANAGER_H
 
 #include <stdio.h>
 
@@ -48,10 +48,5 @@ public:
     //发送线程消息
     virtual int SendLogicThreadMessage(int nMessageID, void* arg) = 0;
 };
-
-int ILogicThreadManager::MessageMappingLogicThread(int nLogicThreadID, int nMessageID)
-{
-    return 0;
-}
 
 #endif

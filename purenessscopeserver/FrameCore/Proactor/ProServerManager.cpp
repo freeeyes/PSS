@@ -60,6 +60,9 @@ bool CProServerManager::Init()
     //初始化链接管理器
     App_ProConnectManager::instance()->Init(GetXmlConfigAttribute(xmlSendInfo)->SendQueueCount);
 
+    //初始化拆件逻辑线程
+    App_LogicThreadManager::instance()->Init();
+
     //初始化给插件的对象接口
     IConnectManager* pConnectManager       = dynamic_cast<IConnectManager*>(App_ProConnectManager::instance());
     IClientManager*  pClientManager        = dynamic_cast<IClientManager*>(App_ClientProConnectManager::instance());
@@ -68,13 +71,16 @@ bool CProServerManager::Init()
     ITSTimerManager* pTSTimer              = dynamic_cast<ITSTimerManager*>(&m_TSThread);
     IServerManager* pServerManager         = dynamic_cast<IServerManager*>(this);
     ITTyClientManager* pTTyClientManager   = dynamic_cast<ITTyClientManager*>(App_ProTTyClientManager::instance());
+    ILogicThreadManager* pLogicThreadManager = dynamic_cast<ILogicThreadManager*>(App_LogicThreadManager::instance());
+
     Server_Manager_Common_IObject(pConnectManager,
                                   pClientManager,
                                   pUDPConnectManager,
                                   pFrameCommand,
                                   pServerManager,
                                   pTSTimer,
-                                  pTTyClientManager);
+                                  pTTyClientManager,
+                                  pLogicThreadManager);
 
     //初始化模块加载，因为这里可能包含了中间服务器连接加载
     if (false == Server_Manager_Common_Module())
@@ -367,6 +373,9 @@ bool CProServerManager::Close()
 
     App_ProConnectAcceptManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ProConnectAcceptManager OK.\n"));
+
+    App_LogicThreadManager::instance()->Close();
+    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_LogicThreadManager OK.\n"));
 
     m_ProConsoleConnectAcceptor.cancel();
     App_TimerManager::instance()->deactivate();

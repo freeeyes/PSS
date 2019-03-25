@@ -22,6 +22,7 @@
 #include "IFrameCommand.h"
 #include "ITSTimer.h"
 #include "ITTyClientManager.h"
+#include "ILogicThreadManager.h"
 
 class CServerObject
 {
@@ -43,6 +44,7 @@ public:
         m_pFrameCommand         = NULL;
         m_pTSTimerManager       = NULL;
         m_pTTyClientManager     = NULL;
+        m_pLogicThreadManager   = NULL;
     }
 
     virtual ~CServerObject() {}
@@ -110,6 +112,11 @@ public:
         m_pTTyClientManager = pTTyClientManager;
     }
 
+    void SetLogicThreadManager(ILogicThreadManager* pLogicThreadManager)
+    {
+        m_pLogicThreadManager = pLogicThreadManager;
+    }
+
     IMessageManager*       GetMessageManager()
     {
         return m_pIMessageManager;
@@ -174,6 +181,11 @@ public:
         return m_pTTyClientManager;
     }
 
+    ILogicThreadManager* GetLogicThreadManager()
+    {
+        return m_pLogicThreadManager;
+    }
+
 private:
     IMessageManager*       m_pIMessageManager;
     ILogManager*           m_pLogManager;
@@ -190,6 +202,7 @@ private:
     IFrameCommand*         m_pFrameCommand;
     ITSTimerManager*       m_pTSTimerManager;
     ITTyClientManager*     m_pTTyClientManager;
+    ILogicThreadManager*   m_pLogicThreadManager;
 };
 
 typedef ACE_Singleton<CServerObject, ACE_Null_Mutex> App_ServerObject;
