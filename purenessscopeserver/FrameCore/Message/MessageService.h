@@ -69,7 +69,7 @@ public:
     bool PutUpdateCommandMessage(uint32 u4UpdateIndex);
 
     _ThreadInfo* GetThreadInfo();
-    bool SaveThreadInfoData();                              //记录当前工作线程状态信息日志
+    bool SaveThreadInfoData(const ACE_Time_Value& tvNow);   //记录当前工作线程状态信息日志
 
     void GetAIInfo(_WorkThreadAIInfo& objAIInfo);           //得到所有工作线程的AI配置
     void GetAITO(vecCommandTimeout& objTimeout);            //得到所有的AI超时数据包信息
@@ -135,7 +135,7 @@ class CMessageServiceGroup : public ACE_Task<ACE_MT_SYNCH>
 {
 public:
     CMessageServiceGroup();
-    ~CMessageServiceGroup();
+    virtual ~CMessageServiceGroup();
 
     virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);
 
@@ -177,10 +177,10 @@ private:
     bool StartTimer();
     bool KillTimer();
 
-    bool CheckWorkThread();                                                                   //检查所有的工作线程状态
-    bool CheckPacketParsePool();                                                              //检查正在使用的消息解析对象
-    bool CheckPlugInState();                                                                  //检查所有插件状态
-    int32 GetWorkThreadID(uint32 u4ConnectID, uint8 u1PacketType);                            //根据操作类型和ConnectID计算出那个工作线程ID
+    bool CheckWorkThread(const ACE_Time_Value& tvNow);                                                 //检查所有的工作线程状态
+    bool CheckPacketParsePool();                                                                       //检查正在使用的消息解析对象
+    bool CheckPlugInState();                                                                           //检查所有插件状态
+    int32 GetWorkThreadID(uint32 u4ConnectID, uint8 u1PacketType);                                     //根据操作类型和ConnectID计算出那个工作线程ID
 
     typedef vector<CMessageService*> vecMessageService;
     vecMessageService m_vecMessageService;

@@ -11,6 +11,7 @@
 #include "ILogicThreadManager.h"
 #include "ObjectPoolManager.h"
 #include "BaseTask.h"
+#include "TimerManager.h"
 
 #define LOGICTHREAD_MAX_COUNT         100
 #define LOGICTHREAD_MESSAGE_MAX_COUNT 2000
@@ -182,6 +183,8 @@ public:
     virtual int svc(void);
     int Close();
 
+    bool CheckTimeout(ACE_Time_Value tvNow);
+
     bool PutMessage(int nMessageID, void* pParam);
 
     CLogicThreadInfo* GetThreadInfo();
@@ -201,13 +204,17 @@ private:
 };
 
 //逻辑线程管理器
-class CLogicThreadManager : public ILogicThreadManager
+class CLogicThreadManager : public ILogicThreadManager, public ACE_Task<ACE_MT_SYNCH>
 {
 public:
     CLogicThreadManager();
     virtual ~CLogicThreadManager();
 
+    virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);
+
     void Init();
+
+    void Close();
 
     //创建逻辑线程
     virtual int CreateLogicThread(int nLogicThreadID,
@@ -230,6 +237,9 @@ public:
     CHashTable<CLogicThread>     m_objThreadInfoList;
     CHashTable<CLogicThreadInfo> m_objMessageIDList;
     ACE_Recursive_Thread_Mutex   m_ThreadWriteLock;
+    uint32                       m_u4TimerID;
 };
+
+typedef ACE_Singleton<CLogicThreadManager, ACE_Null_Mutex> App_LogicThreadManager;
 
 #endif

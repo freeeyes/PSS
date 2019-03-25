@@ -173,6 +173,23 @@ int CLogicThread::Close()
     return 0;
 }
 
+bool CLogicThread::CheckTimeout(ACE_Time_Value tvNow)
+{
+    if (THREAD_RUNBEGIN == m_u4ThreadState)
+    {
+        ACE_Time_Value tvInterval = tvNow - m_tvUpdateTime;
+
+        if (tvInterval.sec() > m_objThreadInfo.m_nTimeout)
+        {
+            //回调线程超时错误接口
+            m_objThreadInfo.fn_thread_callback_error(m_objThreadInfo.m_nLogicThreadID, 1);
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool CLogicThread::PutMessage(int nMessageID, void* pParam)
 {
     CLogicThreadMessage* pMessage = m_MessagePool.Create();
@@ -237,6 +254,7 @@ bool CLogicThread::Dispose_Queue()
         ThreadReturn emRet;
 
         m_u4ThreadState = THREAD_RUNBEGIN;
+        m_tvUpdateTime  = ACE_OS::gettimeofday();
 
         if (NULL != m_objThreadInfo.fn_thread_callback_logic)
         {
@@ -264,12 +282,27 @@ bool CLogicThread::Dispose_Queue()
 
 CLogicThreadManager::CLogicThreadManager()
 {
-
+    m_u4TimerID = 0;
 }
 
 CLogicThreadManager::~CLogicThreadManager()
 {
+    Close();
+}
 
+int CLogicThreadManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
+{
+    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWriteLock);
+    vector<CLogicThread*> vecLogicThreadList;
+
+    m_objThreadInfoList.Get_All_Used(vecLogicThreadList);
+
+    for (int i = 0; i < (int)vecLogicThreadList.size(); i++)
+    {
+        vecLogicThreadList[i]->CheckTimeout(tv);
+    }
+
+    return 0;
 }
 
 void CLogicThreadManager::Init()
@@ -277,6 +310,36 @@ void CLogicThreadManager::Init()
     //初始化Hash表
     m_objThreadInfoList.Init(LOGICTHREAD_MAX_COUNT);
     m_objMessageIDList.Init(LOGICTHREAD_MESSAGE_MAX_COUNT);
+
+    //启动定时器(默认一分钟一次)
+    m_u4TimerID = App_TimerManager::instance()->schedule(this, NULL, ACE_OS::gettimeofday() + ACE_Time_Value(MAX_MSG_STARTTIME), ACE_Time_Value(MAX_MSG_TIMEDELAYTIME));
+}
+
+void CLogicThreadManager::Close()
+{
+    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWriteLock);
+
+    //停止定时器
+    if (m_u4TimerID > 0)
+    {
+        App_TimerManager::instance()->cancel(m_u4TimerID);
+        m_u4TimerID = 0;
+    }
+
+    ACE_Time_Value tvSleep(0, 1000);
+    vector<CLogicThread*> vecLogicThreadList;
+
+    m_objThreadInfoList.Get_All_Used(vecLogicThreadList);
+
+    for (int i = 0; i < (int)vecLogicThreadList.size(); i++)
+    {
+        vecLogicThreadList[i]->Close();
+
+        ACE_OS::sleep(tvSleep);
+        SAFE_DELETE(vecLogicThreadList[i]);
+    }
+
+    vecLogicThreadList.clear();
 }
 
 int CLogicThreadManager::CreateLogicThread(int nLogicThreadID, int nTimeout, ThreadInit thread_init, ThreadCallbackLogic thread_callback_logic, ThreadErrorLogic thread_callback_error, ThreadExit thread_exit)
