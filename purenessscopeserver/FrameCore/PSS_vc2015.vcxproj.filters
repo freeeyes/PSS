@@ -391,6 +391,9 @@
     <ClCompile Include="Message\LogicThreadManager.cpp">
       <Filter>Message\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="CppUnit\Unit_LogicThreadManager.cpp">
+      <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -917,6 +920,9 @@
     </ClInclude>
     <ClInclude Include="..\Common\ILogicThreadManager.h">
       <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\Unit_LogicThreadManager.h">
+      <Filter>CppUnit\hfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

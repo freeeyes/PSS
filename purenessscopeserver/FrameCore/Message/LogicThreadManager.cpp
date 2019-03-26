@@ -65,7 +65,6 @@ CLogicThread::CLogicThread(const CLogicThread& ar) : CLogicThread()
 
 CLogicThread::~CLogicThread()
 {
-    Close();
 }
 
 void CLogicThread::Init(CLogicThreadInfo objThreadInfo)
@@ -289,7 +288,6 @@ CLogicThreadManager::CLogicThreadManager()
 
 CLogicThreadManager::~CLogicThreadManager()
 {
-    Close();
 }
 
 int CLogicThreadManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
