@@ -1,6 +1,8 @@
-# PSS <small>1.0.0</small>
+![logo](_images/pss.svg ':size=380x141')
 
-> This is a server-side frame. Supporting programmers to develop TCP&UDP logic service by using plugin(so/dll).
+# <small>v1.0.0</small>
+
+> This is a cross platform server frame, Supporting programmers to develop TCP&UDP logic service by using plugin(so/dll).
 
 [GitHub](https://github.com/freeeyes/PSS)
 [Getting Started](#PSS)
