@@ -1,4 +1,4 @@
-#ifndef _SOCK_WRAP_H_
+﻿#ifndef _SOCK_WRAP_H_
 #define _SOCK_WRAP_H_
 
 //#include "platform.h"

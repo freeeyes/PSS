@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "define.h"
 #include "LuaFn.h"
@@ -31,5 +31,5 @@ private:
     _Socket_State_Info* m_pSocket_State_Info;
     bool                m_blRun;
     CLuaFn              m_objLuaFn;
-    int                 m_nThreadID;     //�߳�ID
+    int                 m_nThreadID;     //线程ID
 };

@@ -1,4 +1,4 @@
-/***************************************************************
+﻿/***************************************************************
  * Name:      PassTCPApp.cpp
  * Purpose:   Code for Application Class
  * Author:    smith ()
@@ -21,12 +21,14 @@ bool PassTCPApp::OnInit()
     //(*AppInitialize
     bool wxsOK = true;
     wxInitAllImageHandlers();
+
     if ( wxsOK )
     {
-    	CPassTCPDlg* Frame = new CPassTCPDlg(0);
-    	Frame->Show();
-    	SetTopWindow(Frame);
+        CPassTCPDlg* Frame = new CPassTCPDlg(0);
+        Frame->Show();
+        SetTopWindow(Frame);
     }
+
     //*)
     return wxsOK;
 

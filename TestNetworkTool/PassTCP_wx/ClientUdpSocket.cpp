@@ -1,4 +1,4 @@
-//#include "StdAfx.h"
+ï»¿//#include "StdAfx.h"
 #include "ClientUdpSocket.h"
 
 CClientUdpSocket::CClientUdpSocket(void)
@@ -35,8 +35,8 @@ void CClientUdpSocket::Run()
     HSocket sckClient;
     HSocket sckServer;
 
-    //´Ë²¿·ÖÎª¼æÈİLua²ÎÊı¶øÉè¼Æ
-    //ÎªÁË¼õÉÙ²»±ØÒªµÄnewºÍdelete²Ù×÷£¬ËùÒÔ²ÎÊıÔÚÕâÀïÏÈÉùÃ÷ºÃ
+    //æ­¤éƒ¨åˆ†ä¸ºå…¼å®¹Luaå‚æ•°è€Œè®¾è®¡
+    //ä¸ºäº†å‡å°‘ä¸å¿…è¦çš„newå’Œdeleteæ“ä½œï¼Œæ‰€ä»¥å‚æ•°åœ¨è¿™é‡Œå…ˆå£°æ˜å¥½
     _ParamData* pSendParam1   = NULL;
     _ParamData* pSendParam2   = NULL;
     _ParamData* pSendParam3   = NULL;
@@ -56,7 +56,7 @@ void CClientUdpSocket::Run()
         return;
     }
 
-    //Èç¹ûÊÇ¸ß¼¶Ä£Ê½
+    //å¦‚æœæ˜¯é«˜çº§æ¨¡å¼
     if(m_pSocket_Info->m_blLuaAdvance == true)
     {
         m_objLuaFn.InitClass();
@@ -69,7 +69,7 @@ void CClientUdpSocket::Run()
             return;
         }
 
-        //³õÊ¼»¯ËùÓĞÒªÊ¹ÓÃµÄLua²ÎÊı
+        //åˆå§‹åŒ–æ‰€æœ‰è¦ä½¿ç”¨çš„Luaå‚æ•°
         pSendParam1   = new _ParamData();
         pSendParam2   = new _ParamData();
         pSendParam3   = new _ParamData();
@@ -83,10 +83,10 @@ void CClientUdpSocket::Run()
 
     }
 
-    //¿´¿´ÊÇ·ñÊÇ³¤Á¬½Ó£¬Èç¹ûÊÇ³¤Á¬½Ó£¬ÔòÖ»´¦ÀíÒ»´Î¡£
+    //çœ‹çœ‹æ˜¯å¦æ˜¯é•¿è¿æ¥ï¼Œå¦‚æœæ˜¯é•¿è¿æ¥ï¼Œåˆ™åªå¤„ç†ä¸€æ¬¡ã€‚
     bool blIsConnect = false;
 
-    //socket´´½¨µÄ×¼±¸¹¤×÷
+    //socketåˆ›å»ºçš„å‡†å¤‡å·¥ä½œ
     struct sockaddr_in svrsockaddr;
 
     //  memset(&svrsockaddr, 0, sizeof(sockaddr_in));
@@ -102,7 +102,7 @@ void CClientUdpSocket::Run()
     SocketTimeOut(sckClient, TimeOut, -1, -1);
 
 
-    //ÉèÖÃ½ÓÊÕ¼àÌı¶Ë¿Ú
+    //è®¾ç½®æ¥æ”¶ç›‘å¬ç«¯å£
     sckServer =  SocketOpen( SOCK_DGRAM);
 
     struct sockaddr_in clientsockaddr;
@@ -117,7 +117,7 @@ void CClientUdpSocket::Run()
     SocketBind(sckServer, &clientsockaddr);
 
 
-    //·¢ËÍ´ÎÊı
+    //å‘é€æ¬¡æ•°
     int nSendIndex = 0;
 
     while(m_blRun)
@@ -126,17 +126,17 @@ void CClientUdpSocket::Run()
 
         if(m_pSocket_Info->m_nSendCount != 0 && m_pSocket_State_Info->m_nSuccessSend >= m_pSocket_Info->m_nSendCount)
         {
-            //·¢ËÍÖ¸¶¨ÊıÄ¿µÄÊı¾İ°üÍê³É
+            //å‘é€æŒ‡å®šæ•°ç›®çš„æ•°æ®åŒ…å®Œæˆ
             break;
         }
 
-        //²é¿´ÊÇ·ñ¿ªÆô¸ß¼¶Ä£Ê½
+        //æŸ¥çœ‹æ˜¯å¦å¼€å¯é«˜çº§æ¨¡å¼
         if(m_pSocket_Info->m_blLuaAdvance == true)
         {
-            //ÖØÖÃ»º³å×î´ó³¤¶È
+            //é‡ç½®ç¼“å†²æœ€å¤§é•¿åº¦
             m_pSocket_Info->m_pLogic->SetMaxSendLength(nLuaBufferMaxLength);
 
-            //¿ªÊ¼µ÷ÓÃLua½Å±¾£¬È¥×éÖ¯Êı¾İ¿é
+            //å¼€å§‹è°ƒç”¨Luaè„šæœ¬ï¼Œå»ç»„ç»‡æ•°æ®å—
             CParamGroup objIn;
             CParamGroup objOut;
 
@@ -171,11 +171,11 @@ void CClientUdpSocket::Run()
 
             if(m_pSocket_Info->m_blIsRadomaDelay == true)
             {
-                //Èç¹ûÊÇËæ»úµÄ£¬Ôò´Ó1-1000Ö®¼äËæ»úÒ»¸öÊ±¼ä
+                //å¦‚æœæ˜¯éšæœºçš„ï¼Œåˆ™ä»1-1000ä¹‹é—´éšæœºä¸€ä¸ªæ—¶é—´
                 dwSleepTime = (int)RandomValue(1, 1000);
             }
 
-            //¹ÒÆğÖ¸¶¨µÄÊ±¼ä
+            //æŒ‚èµ·æŒ‡å®šçš„æ—¶é—´
             //Sleep(dwSleepTime);
             std::this_thread::sleep_for(std::chrono::milliseconds(dwSleepTime*1000));
 
@@ -186,7 +186,7 @@ void CClientUdpSocket::Run()
 
         if(blIsConnect == true)
         {
-            //·¢ËÍÊı¾İ
+            //å‘é€æ•°æ®
             char szSendBuffData[MAX_BUFF_1024 * 100] = {'\0'};
             char szRecvBuffData[MAX_BUFF_1024 * 100] = {'\0'};
 
@@ -194,12 +194,12 @@ void CClientUdpSocket::Run()
             int nSendLen      = 0;
             int nTotalRecvLen = 0;
 
-            //Èç¹ûÊı¾İÎªËæ»úÊı¾İ°ü
+            //å¦‚æœæ•°æ®ä¸ºéšæœºæ•°æ®åŒ…
             if(m_pSocket_Info->m_blIsSendCount == true)
             {
                 int nSendCount = RandomValue(1, 10);
 
-                //ÕâÀï×·¼ÓÒ»¸öÂß¼­£¬¼ÇÂ¼µ±Ç°·¢°üµÄ×ÜÊıÊÇ·ñÆ¥Åä£¬Ëæ»úÊı²»ÄÜ³¬¹ıµ±Ç°·¢°ü×ÜÊı
+                //è¿™é‡Œè¿½åŠ ä¸€ä¸ªé€»è¾‘ï¼Œè®°å½•å½“å‰å‘åŒ…çš„æ€»æ•°æ˜¯å¦åŒ¹é…ï¼Œéšæœºæ•°ä¸èƒ½è¶…è¿‡å½“å‰å‘åŒ…æ€»æ•°
                 if(m_pSocket_Info->m_nSendCount != 0 && nSendCount + m_pSocket_State_Info->m_nSuccessSend > m_pSocket_Info->m_nSendCount)
                 {
                     nSendCount = m_pSocket_Info->m_nSendCount - m_pSocket_State_Info->m_nSuccessSend;
@@ -216,22 +216,22 @@ void CClientUdpSocket::Run()
 
                 nPacketCount = nSendCount;
 
-                //·¢ËÍÊı¾İ
+                //å‘é€æ•°æ®
                 pSendData     = (char* )szSendBuffData;
                 nSendLen      = m_pSocket_Info->m_pLogic->GetSendLength() * nSendCount;
                 nTotalRecvLen = m_pSocket_Info->m_pLogic->GetSendLength() * nSendCount;
             }
             else
             {
-                //·¢ËÍÊı¾İ
+                //å‘é€æ•°æ®
                 pSendData     = (char* )m_pSocket_Info->m_pLogic->GetSendData(m_pSocket_Info->m_nThreadID, nSendIndex, nSendLen);
                 nTotalRecvLen = m_pSocket_Info->m_pLogic->GetRecvLength();
             }
 
-            //¼ÇÂ¼Ó¦ÊÕ×Ö½Ú×ÜÊı
+            //è®°å½•åº”æ”¶å­—èŠ‚æ€»æ•°
             int nRecvAllSize = nTotalRecvLen;
 
-            //Èç¹ûĞèÒª¼ÇÂ¼ÈÕÖ¾£¬Ôò½«Êı¾İ¼ÆÈëÈÕÖ¾
+            //å¦‚æœéœ€è¦è®°å½•æ—¥å¿—ï¼Œåˆ™å°†æ•°æ®è®¡å…¥æ—¥å¿—
             if(m_pSocket_Info->m_blIsWriteFile == true)
             {
                 WriteFile_SendBuff(pSendData, nSendLen);
@@ -247,7 +247,7 @@ void CClientUdpSocket::Run()
 
             while(true)
             {
-                //UDP·¢ËÍ
+                //UDPå‘é€
                 int nssssSize = sizeof(sockaddr_in);
                 nCurrSendLen = sendto(sckClient, pSendData + nBeginSend, nTotalSendLen, 0, (sockaddr* )&svrsockaddr, sizeof(sockaddr_in));
                 //void SocketSend(HSocket hs, const char *ptr, int nbytes, transresult_t &rt);
@@ -267,7 +267,7 @@ void CClientUdpSocket::Run()
 
                     if(nTotalSendLen == 0)
                     {
-                        //·¢ËÍÍê³É
+                        //å‘é€å®Œæˆ
                         m_pSocket_State_Info->m_nSuccessSend += nPacketCount;
                         blSendFlag = true;
                         break;
@@ -279,15 +279,15 @@ void CClientUdpSocket::Run()
                 }
             }
 
-            //½ÓÊÕÊı¾İ
+            //æ¥æ”¶æ•°æ®
             if(blSendFlag == true && m_pSocket_Info->m_blIsRecv == true)
             {
                 while(true)
                 {
-                    //Èç¹û·¢ËÍ³É¹¦ÁË£¬Ôò´¦Àí½ÓÊÕÊı¾İ
+                    //å¦‚æœå‘é€æˆåŠŸäº†ï¼Œåˆ™å¤„ç†æ¥æ”¶æ•°æ®
                     int nClientAddrSize = sizeof(sockaddr_in);
 
-                    //socket´´½¨µÄ×¼±¸¹¤×÷
+                    //socketåˆ›å»ºçš„å‡†å¤‡å·¥ä½œ
                     struct sockaddr_in clientsockaddr1;
                     /*
                     struct sockaddr_in clientsockaddr;
@@ -313,7 +313,7 @@ void CClientUdpSocket::Run()
                     }
                     else
                     {
-                        //Èç¹ûÊÇ¸ß¼¶Ä£Ê½£¬ÕâÀïµ÷ÓÃLua½Ó¿Ú·½·¨
+                        //å¦‚æœæ˜¯é«˜çº§æ¨¡å¼ï¼Œè¿™é‡Œè°ƒç”¨Luaæ¥å£æ–¹æ³•
                         if(m_pSocket_Info->m_blLuaAdvance == true)
                         {
                             m_pSocket_State_Info->m_nRecvByteCount += nCurrRecvLen;
@@ -338,7 +338,7 @@ void CClientUdpSocket::Run()
                             objRecvIn.Push(pRecvParam4);
                             objRecvOut.Push(pRecvParamOut);
 
-                            //µ÷ÓÃ½ÓÊÕº¯Êı
+                            //è°ƒç”¨æ¥æ”¶å‡½æ•°
                             m_objLuaFn.CallFileFn("PassTcp_GetRecvData", objRecvIn, objRecvOut);
 
                             int* pReturn = (int* )pRecvParamOut->GetParam();
@@ -347,20 +347,20 @@ void CClientUdpSocket::Run()
                             objRecvIn.Close(false);
                             objRecvOut.Close(false);
 
-                            //ÅĞ¶Ï½Å±¾·µ»ØÖµ
+                            //åˆ¤æ–­è„šæœ¬è¿”å›å€¼
                             if(nState == 0)
                             {
-                                //½ÓÊÕÑéÖ¤³É¹¦
+                                //æ¥æ”¶éªŒè¯æˆåŠŸ
                                 m_pSocket_State_Info->m_nSuccessRecv += nPacketCount;
                                 blRecvFlag = true;
 
-                                //Èç¹ûĞèÒª¼ÇÂ¼ÈÕÖ¾£¬Ôò½«Êı¾İ¼ÆÈëÈÕÖ¾
+                                //å¦‚æœéœ€è¦è®°å½•æ—¥å¿—ï¼Œåˆ™å°†æ•°æ®è®¡å…¥æ—¥å¿—
                                 if(m_pSocket_Info->m_blIsWriteFile == true)
                                 {
                                     WriteFile_RecvBuff(szRecvBuffData, nRecvAllSize);
                                 }
 
-                                //¼ÆËã×îĞ¡Ê±¼äºÍ×î´óÊ±¼ä
+                                //è®¡ç®—æœ€å°æ—¶é—´å’Œæœ€å¤§æ—¶é—´
                                 int tTime = (int)((unsigned int)GetTickCount() - tBegin);
 
                                 if(tTime > 0 && m_pSocket_State_Info->m_nMinRecvTime == 0)
@@ -385,16 +385,16 @@ void CClientUdpSocket::Run()
                             }
                             else if(nState == 1)
                             {
-                                //¼ÌĞø½ÓÊÕ
+                                //ç»§ç»­æ¥æ”¶
                                 nBeginRecv += nCurrRecvLen;
                             }
                             else
                             {
-                                //½ÓÊÕ°üÑéÖ¤Ê§°Ü
+                                //æ¥æ”¶åŒ…éªŒè¯å¤±è´¥
                                 m_pSocket_State_Info->m_nFailRecv += nPacketCount;
                                 blRecvFlag = true;
 
-                                //Èç¹ûĞèÒª¼ÇÂ¼ÈÕÖ¾£¬Ôò½«Êı¾İ¼ÆÈëÈÕÖ¾
+                                //å¦‚æœéœ€è¦è®°å½•æ—¥å¿—ï¼Œåˆ™å°†æ•°æ®è®¡å…¥æ—¥å¿—
                                 if(m_pSocket_Info->m_blIsWriteFile == true)
                                 {
                                     WriteFile_RecvBuff(szRecvBuffData, nRecvAllSize);
@@ -405,7 +405,7 @@ void CClientUdpSocket::Run()
                         }
                         else
                         {
-                            //Èç¹û²»ÊÇ¸ß¼¶Ä£Ê½£¬Ôò²ÉÓÃÅäÖÃµÄÅĞ¶¨×¼Ôò
+                            //å¦‚æœä¸æ˜¯é«˜çº§æ¨¡å¼ï¼Œåˆ™é‡‡ç”¨é…ç½®çš„åˆ¤å®šå‡†åˆ™
                             m_pSocket_State_Info->m_nRecvByteCount += nCurrRecvLen;
                             nTotalRecvLen -= nCurrRecvLen;
 
@@ -413,17 +413,17 @@ void CClientUdpSocket::Run()
 
                             if(emState == DATA_RETURN_STATE_SUCCESS)
                             {
-                                //½ÓÊÕÍê³É
+                                //æ¥æ”¶å®Œæˆ
                                 m_pSocket_State_Info->m_nSuccessRecv += nPacketCount;
                                 blRecvFlag = true;
 
-                                //Èç¹ûĞèÒª¼ÇÂ¼ÈÕÖ¾£¬Ôò½«Êı¾İ¼ÆÈëÈÕÖ¾
+                                //å¦‚æœéœ€è¦è®°å½•æ—¥å¿—ï¼Œåˆ™å°†æ•°æ®è®¡å…¥æ—¥å¿—
                                 if(m_pSocket_Info->m_blIsWriteFile == true)
                                 {
                                     WriteFile_RecvBuff(szRecvBuffData, nRecvAllSize);
                                 }
 
-                                //¼ÆËã×îĞ¡Ê±¼äºÍ×î´óÊ±¼ä
+                                //è®¡ç®—æœ€å°æ—¶é—´å’Œæœ€å¤§æ—¶é—´
                                 int tTime = (int)((unsigned int)GetTickCount() - tBegin);
 
                                 if(tTime > 0 && m_pSocket_State_Info->m_nMinRecvTime == 0)
@@ -455,14 +455,14 @@ void CClientUdpSocket::Run()
                 }
             }
 
-            //Èç¹ûÓĞÊı¾İ°ü¼ä¸ô£¬ÔòsleepÖ¸¶¨µÄÊ±¼ä
+            //å¦‚æœæœ‰æ•°æ®åŒ…é—´éš”ï¼Œåˆ™sleepæŒ‡å®šçš„æ—¶é—´
             if(m_pSocket_Info->m_nPacketTimewait > 0)
             {
                 int dwSleepTime = (int)m_pSocket_Info->m_nPacketTimewait;
                 std::this_thread::sleep_for(std::chrono::milliseconds(dwSleepTime*1000));
             }
 
-            //Èç¹ûÊÇ³¤Á¬½Ó£¬Ôò²»¹Ø±ÕÁ¬½Ó
+            //å¦‚æœæ˜¯é•¿è¿æ¥ï¼Œåˆ™ä¸å…³é—­è¿æ¥
             if(m_pSocket_Info->m_blIsAlwayConnect == false)
             {
                 //closesocket(sckClient);
@@ -471,20 +471,20 @@ void CClientUdpSocket::Run()
             }
         }
 
-        //Èç¹ûÖ»·¢ËÍÒ»´Î£¬ÔÚÕâÀïÍË³ö
+        //å¦‚æœåªå‘é€ä¸€æ¬¡ï¼Œåœ¨è¿™é‡Œé€€å‡º
         if(m_pSocket_Info->m_blIsSendOne == true)
         {
             m_blRun = false;
         }
     }
 
-    //Èç¹ûÁ¬½ÓÃ»¶Ï£¬Ôò¶Ï¿ª
+    //å¦‚æœè¿æ¥æ²¡æ–­ï¼Œåˆ™æ–­å¼€
     SocketClose(sckClient);
     SocketClose(sckServer);
     m_pSocket_State_Info->m_nCurrectSocket = 0;
     blIsConnect = false;
 
-    //»ØÊÕËùÓĞµÄLuaÉêÇëµÄÄÚ´æ
+    //å›æ”¶æ‰€æœ‰çš„Luaç”³è¯·çš„å†…å­˜
     delete pSendParam1;
     delete pSendParam2;
     delete pSendParam3;
@@ -585,7 +585,7 @@ bool CClientUdpSocket::WriteFile_Error( const char* pError, int nErrorNumber )
     char szTimeNow[30] = {'\0'};
     sprintf(szTimeNow,  "[%04d-%02d-%02d %02d:%02d:%02d]", tmNow.tm_year + 1900, tmNow.tm_mon + 1, tmNow.tm_mday, tmNow.tm_hour, tmNow.tm_min, tmNow.tm_sec);
 
-    //Æ´½Ó³ö´íÈÕÖ¾Êä³ö
+    //æ‹¼æ¥å‡ºé”™æ—¥å¿—è¾“å‡º
     char szError[1024] = {'\0'};
     sprintf(szError,  "%s %s, errno=%d.\n", szTimeNow, pError, nErrorNumber);
 

@@ -163,7 +163,7 @@
       <Filter>LuaFn</Filter>
     </ClCompile>
     <ClCompile Include="..\..\ThirdLib\thirdparty\sock_wrap.cpp">
-      <Filter>头文件</Filter>
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

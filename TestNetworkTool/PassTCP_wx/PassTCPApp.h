@@ -1,4 +1,4 @@
-/***************************************************************
+﻿/***************************************************************
  * Name:      PassTCPApp.h
  * Purpose:   Defines Application Class
  * Author:    smith ()
@@ -14,8 +14,8 @@
 
 class PassTCPApp : public wxApp
 {
-    public:
-        virtual bool OnInit();
+public:
+    virtual bool OnInit();
 };
 
 #endif // PASSTCPAPP_H

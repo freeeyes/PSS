@@ -1,4 +1,4 @@
-#ifndef _DEFINE_H
+ï»¿#ifndef _DEFINE_H
 #define _DEFINE_H
 
 #if defined(_WIN32_PLATFORM_)
@@ -26,7 +26,7 @@ using namespace std;
 
 #define MAX_RANDOM_PACKET 5*1024
 
-//×Ö·û´®Ìæ»»º¯Êı
+//å­—ç¬¦ä¸²æ›¿æ¢å‡½æ•°
 inline void string_replace( string& s1,const string& s2,const string& s3 )
 {
     string::size_type pos = 0;
@@ -40,13 +40,13 @@ inline void string_replace( string& s1,const string& s2,const string& s3 )
     }
 }
 
-//Ëæ»úÊı¾İ°üĞÅÏ¢
+//éšæœºæ•°æ®åŒ…ä¿¡æ¯
 struct _RandomPacketInfo
 {
-    char szPacket[MAX_RANDOM_PACKET];   //±£´æËæ»úÊı¾İ°ü
-    int nLen;                           //Ëæ»úÊı¾İ°ü³¤¶È
-    int nType;                          //Êı¾İÀàĞÍ£¬Ä¬ÈÏÊÇÎÄ±¾£¬ÎÄ±¾1£¬¶ş½øÖÆ2
-    int nRecdvLength;                   //½ÓÊÕ×Ö·û´®µÄ³¤¶È
+    char szPacket[MAX_RANDOM_PACKET];   //ä¿å­˜éšæœºæ•°æ®åŒ…
+    int nLen;                           //éšæœºæ•°æ®åŒ…é•¿åº¦
+    int nType;                          //æ•°æ®ç±»å‹ï¼Œé»˜è®¤æ˜¯æ–‡æœ¬ï¼Œæ–‡æœ¬1ï¼ŒäºŒè¿›åˆ¶2
+    int nRecdvLength;                   //æ¥æ”¶å­—ç¬¦ä¸²çš„é•¿åº¦
 
     _RandomPacketInfo()
     {
@@ -57,31 +57,31 @@ struct _RandomPacketInfo
     }
 };
 
-//±£´æËæ»úÊı¾İ°üĞòÁĞ
+//ä¿å­˜éšæœºæ•°æ®åŒ…åºåˆ—
 typedef vector<_RandomPacketInfo> vecRandomPacketInfo;
 
-//ÉèÖÃÒ»¸öËæ»úÖÖ×Ó
+//è®¾ç½®ä¸€ä¸ªéšæœºç§å­
 inline void InitRandom()
 {
     srand((int)time(NULL));
 };
 
-//´ÓÒ»¸öÖµÓòÖĞ»ñÈ¡Ò»¸öËæ»úÖµ
+//ä»ä¸€ä¸ªå€¼åŸŸä¸­è·å–ä¸€ä¸ªéšæœºå€¼
 inline int RandomValue(int nMin, int nMax)
 {
     return  nMin + (int) ((nMax - nMin) * (rand() / (RAND_MAX + 1.0)));
 };
 
-//WebSocket¼ÓÃÜËã·¨
+//WebSocketåŠ å¯†ç®—æ³•
 inline void WebSocketSendData(const char* pData, int nLen, char* pSendData, int& nSendLen)
 {
-    //Ä¿Ç°Õâ¸öº¯ÊıÖ»Ö§³ÖĞ¡ÓÚ64KµÄÊı¾İ°ü
+    //ç›®å‰è¿™ä¸ªå‡½æ•°åªæ”¯æŒå°äº64Kçš„æ•°æ®åŒ…
     char szMark[4]  = {'\0'};
     int nPos = 0;
 
     if(nSendLen < nLen + 8)
     {
-        //»º³å³¤¶È²»¹»
+        //ç¼“å†²é•¿åº¦ä¸å¤Ÿ
         return;
     }
 
@@ -90,16 +90,16 @@ inline void WebSocketSendData(const char* pData, int nLen, char* pSendData, int&
         pSendData[nPos] = -127;
         nPos++;
 
-        //·¢ËÍÊı×Ö³¤¶È
+        //å‘é€æ•°å­—é•¿åº¦
         pSendData[nPos] =  (char)(nLen & 0x7F);
         nPos++;
 
-        //4×Ö½ÚµÄmark
+        //4å­—èŠ‚çš„mark
         memcpy((char* )szMark,  &nLen, 4);
         memcpy((char* )&pSendData[nPos],  szMark, 4);
         nPos += 4;
 
-        //°´Î»¼ÓÃÜ
+        //æŒ‰ä½åŠ å¯†
         for(int i = 0; i < nLen; i++)
         {
             char szTemp = pData[i] ^ (szMark[i % 4]);
@@ -112,22 +112,22 @@ inline void WebSocketSendData(const char* pData, int nLen, char* pSendData, int&
         pSendData[nPos] = -127;
         nPos++;
 
-        //·¢ËÍÊı×Ö³¤¶È
+        //å‘é€æ•°å­—é•¿åº¦
         pSendData[nPos] =  126;
         nPos++;
 
-        //Êı¾İÊµ¼Ê³¤¶È¡£×î´ó65535
-        //×ª»»³ÉÍøÂç×ÖĞò
+        //æ•°æ®å®é™…é•¿åº¦ã€‚æœ€å¤§65535
+        //è½¬æ¢æˆç½‘ç»œå­—åº
         short sDataLen = htons((short)nLen);
         memcpy((char* )&pSendData[nPos],  (char* )&sDataLen, 2);
         nPos += 2;
 
-        //4×Ö½ÚµÄmark
+        //4å­—èŠ‚çš„mark
         memcpy((char* )szMark,  &nLen, 4);
         memcpy((char* )&pSendData[nPos],  szMark, 4);
         nPos += 4;
 
-        //°´Î»¼ÓÃÜ
+        //æŒ‰ä½åŠ å¯†
         for(int i = 0; i < nLen; i++)
         {
             char szTemp = pData[i] ^ (szMark[i % 4]);
@@ -140,7 +140,7 @@ inline void WebSocketSendData(const char* pData, int nLen, char* pSendData, int&
     nSendLen = nPos;
 }
 
-//ÀàĞÍ
+//ç±»å‹
 enum ENUM_TYPE_PROTOCOL
 {
     ENUM_PROTOCOL_TCP = 0,
@@ -148,7 +148,7 @@ enum ENUM_TYPE_PROTOCOL
     ENUM_PROTOCOL_WEBSOCKET,
 };
 
-//¶ş½øÖÆºÍ×Ö·û´®Ïà»¥×ª»»Àà
+//äºŒè¿›åˆ¶å’Œå­—ç¬¦ä¸²ç›¸äº’è½¬æ¢ç±»
 class CConvertBuffer
 {
 public:
@@ -160,8 +160,8 @@ public:
         int nPos         = 0;
         int nCurrSize    = 0;
         int nConvertSize = 0;
-        bool blState     = false;   //×ª»»ºóµÄ×Ö·û´®ÊÇ·ñÓĞĞ§
-        bool blSrcState  = true;    //Ôª×Ö·û´®ÊÇ·ñÓĞĞ§
+        bool blState     = false;   //è½¬æ¢åçš„å­—ç¬¦ä¸²æ˜¯å¦æœ‰æ•ˆ
+        bool blSrcState  = true;    //å…ƒå­—ç¬¦ä¸²æ˜¯å¦æœ‰æ•ˆ
         unsigned char cData;
 
         while(nPos < nSrcLen)
@@ -213,8 +213,8 @@ public:
         int nPos         = 0;
         int nCurrSize    = 0;
         int nConvertSize = 0;
-        bool blState     = false;   //×ª»»ºóµÄ×Ö·û´®ÊÇ·ñÓĞĞ§
-        bool blSrcState  = true;    //Ôª×Ö·û´®ÊÇ·ñÓĞĞ§
+        bool blState     = false;   //è½¬æ¢åçš„å­—ç¬¦ä¸²æ˜¯å¦æœ‰æ•ˆ
+        bool blSrcState  = true;    //å…ƒå­—ç¬¦ä¸²æ˜¯å¦æœ‰æ•ˆ
 
         while(nPos < nSrcLen)
         {
@@ -322,7 +322,7 @@ enum EM_DATA_RETURN_STATE
     DATA_RETURN_STATE_CONTINUE,
 };
 
-//ÉùÃ÷Ò»¸ö»ùÀà£¬À´¸ºÔğ¸ñÊ½»¯Êı¾İ·¢ËÍºÍ½ÓÊÕµÄ²¿·ÖÂß¼­
+//å£°æ˜ä¸€ä¸ªåŸºç±»ï¼Œæ¥è´Ÿè´£æ ¼å¼åŒ–æ•°æ®å‘é€å’Œæ¥æ”¶çš„éƒ¨åˆ†é€»è¾‘
 class CBaseDataLogic
 {
 public:
@@ -343,7 +343,7 @@ public:
         {
             int nPos = 0;
 
-            //É¾³ıÖ¸¶¨Êı¾İ
+            //åˆ é™¤æŒ‡å®šæ•°æ®
             for(vecRandomPacketInfo::iterator b = m_vecRandomPacketInfo.begin(); b != m_vecRandomPacketInfo.end(); b++)
             {
                 if(nIndex == nPos)
@@ -355,7 +355,7 @@ public:
         }
     }
 
-    //Ëæ»ú°üÖ¸Áî¼¯
+    //éšæœºåŒ…æŒ‡ä»¤é›†
     bool InsertRandomPacket(const char* pData, int nLen, int nRecvLength, int nType)
     {
         _RandomPacketInfo objRandomPacketInfo;
@@ -381,7 +381,7 @@ public:
         return true;
     };
 
-    //µÃµ½Ëæ»úÃüÁî°üµÄ¸öÊı
+    //å¾—åˆ°éšæœºå‘½ä»¤åŒ…çš„ä¸ªæ•°
     int  GetRandomPacketCount()
     {
         return (int)m_vecRandomPacketInfo.size();
@@ -399,7 +399,7 @@ public:
         }
     };
 
-    //µÃµ½·¢ËÍÊı¾İµÄ¾ßÌåĞÅÏ¢
+    //å¾—åˆ°å‘é€æ•°æ®çš„å…·ä½“ä¿¡æ¯
     bool GetRandomSend(int nIndex, char* pData, int& nLen, int& nRecvLength)
     {
         int nPos = nIndex % (int)m_vecRandomPacketInfo.size();
@@ -418,7 +418,7 @@ public:
 
         if(pRandomPacketInfo->nType == 1)
         {
-            //Ö»ÓĞÎÄ±¾Ä£Ê½µÄÊÇÊ±ºò½øĞĞÊı×ÖÌæ»»
+            //åªæœ‰æ–‡æœ¬æ¨¡å¼çš„æ˜¯æ—¶å€™è¿›è¡Œæ•°å­—æ›¿æ¢
             string strData = (string)pRandomPacketInfo->szPacket;
 
             ReplaceNumber(strData, (string)"%01d", 1);
@@ -433,10 +433,10 @@ public:
         }
         else
         {
-            //½øĞĞ¶ş½øÖÆ×ª»»
+            //è¿›è¡ŒäºŒè¿›åˆ¶è½¬æ¢
             CConvertBuffer objConvertBuffer;
 
-            //´æÈëÊı¾İ
+            //å­˜å…¥æ•°æ®
             objConvertBuffer.Convertstr2charArray(pRandomPacketInfo->szPacket, pRandomPacketInfo->nLen,
                                                   (unsigned char*)pData, nLen);
             nRecvLength = pRandomPacketInfo->nRecdvLength;
@@ -445,7 +445,7 @@ public:
         return true;
     }
 
-    //ÏÔÊ¾Ô¤ÀÀ
+    //æ˜¾ç¤ºé¢„è§ˆ
     bool GetReview(int nIndex, char* pData, int& nLen, int& nRecvLength)
     {
         int nPos = nIndex % (int)m_vecRandomPacketInfo.size();
@@ -464,7 +464,7 @@ public:
 
         if(pRandomPacketInfo->nType == 1)
         {
-            //Ö»ÓĞÎÄ±¾Ä£Ê½µÄÊÇÊ±ºò½øĞĞÊı×ÖÌæ»»
+            //åªæœ‰æ–‡æœ¬æ¨¡å¼çš„æ˜¯æ—¶å€™è¿›è¡Œæ•°å­—æ›¿æ¢
             string strData = (string)pRandomPacketInfo->szPacket;
 
             ReplaceNumber(strData, (string)"%01d", 1);
@@ -479,7 +479,7 @@ public:
         }
         else
         {
-            //´æÈëÊı¾İ
+            //å­˜å…¥æ•°æ®
             memcpy(pData, pRandomPacketInfo->szPacket, pRandomPacketInfo->nLen);
             nLen = pRandomPacketInfo->nLen;
             nRecvLength = pRandomPacketInfo->nRecdvLength;
@@ -488,13 +488,13 @@ public:
         return true;
     }
 
-    //µÃµ½ÊÇ·ñÎªËæ»úÊı¾İ°ü
+    //å¾—åˆ°æ˜¯å¦ä¸ºéšæœºæ•°æ®åŒ…
     bool GetRandomType()
     {
         return m_blRandomPacket;
     }
 
-    //Õı³£Ö¸Áî¼¯
+    //æ­£å¸¸æŒ‡ä»¤é›†
     virtual bool InitSendSize(int nSendLen)                                     = 0;
     virtual char* GetSendData()                                                 = 0;
     virtual char* GetSendData(int nThreadID, int nCurrIndex, int& nSendDataLen) = 0;
@@ -539,16 +539,16 @@ private:
     }
 
 private:
-    bool  m_blRandomPacket;     //ÊÇ·ñ°üº¬Ëæ»ú°üÁĞ£¬falaseÎª²»°üº¬£¬trueÎª°üº¬
+    bool  m_blRandomPacket;     //æ˜¯å¦åŒ…å«éšæœºåŒ…åˆ—ï¼Œfalaseä¸ºä¸åŒ…å«ï¼Œtrueä¸ºåŒ…å«
     vecRandomPacketInfo m_vecRandomPacketInfo;
 
 public:
-    int m_nClassTye;    //1ÎªCNomalLogic£¬2ÎªWebSocketLogic
+    int m_nClassTye;    //1ä¸ºCNomalLogicï¼Œ2ä¸ºWebSocketLogic
 };
 
-//ÆÕÍ¨µÄTCPÊÕ·¢Ïà¹ØĞÅÏ¢´¦ÀíÂß¼­
-//ÎªÁË¼æÈİÒ»Ğ©ÌØÊâĞ­Òé£¬±ÈÈçwebsocketÒÔ¼°http
-//ÊÕ·¢Êı¾İ²»ÔÙÊÇµ¥¶ÀµÄÒ»¸öÖ¸Õë£¬¶øÊÇÒ»¸ö¼Ì³ĞCBaseDataLogicµÄÀà
+//æ™®é€šçš„TCPæ”¶å‘ç›¸å…³ä¿¡æ¯å¤„ç†é€»è¾‘
+//ä¸ºäº†å…¼å®¹ä¸€äº›ç‰¹æ®Šåè®®ï¼Œæ¯”å¦‚websocketä»¥åŠhttp
+//æ”¶å‘æ•°æ®ä¸å†æ˜¯å•ç‹¬çš„ä¸€ä¸ªæŒ‡é’ˆï¼Œè€Œæ˜¯ä¸€ä¸ªç»§æ‰¿CBaseDataLogicçš„ç±»
 class CNomalLogic : public CBaseDataLogic
 {
 public:
@@ -595,7 +595,7 @@ public:
         m_nSendLen = nMaxLength;
     }
 
-    //ÉèÖÃÏà¹Ø·¢ËÍBuff
+    //è®¾ç½®ç›¸å…³å‘é€Buff
     void SetSendBuff(const char* pData, int nLen)
     {
         memcpy(m_pSendData,  pData, nLen);
@@ -611,13 +611,13 @@ public:
     {
         if(GetRandomType() == false)
         {
-            //µ¥Ò»Êı¾İ°ü
+            //å•ä¸€æ•°æ®åŒ…
             nSendDataLen = m_nSendLen;
             return m_pSendData;
         }
         else
         {
-            //Ë³ĞòÊı¾İ°ü
+            //é¡ºåºæ•°æ®åŒ…
             nSendDataLen = MAX_RANDOM_PACKET;
             GetRandomSend(nCurrIndex, m_pSendData, nSendDataLen, m_nRecvLen);
             return m_pSendData;
@@ -641,12 +641,12 @@ public:
         if(m_nCurrRecvLen == m_nRecvLen)
         {
             m_nCurrRecvLen = 0;
-            //È«²¿½ÓÊÕÍê±Ï£¬·µ»ØÕıÈ·
+            //å…¨éƒ¨æ¥æ”¶å®Œæ¯•ï¼Œè¿”å›æ­£ç¡®
             return DATA_RETURN_STATE_SUCCESS;
         }
         else if(nLen < m_nRecvLen)
         {
-            //Ã»ÓĞ½ÓÊÕÍêÈ«£¬¼ÌĞø½ÓÊÕ
+            //æ²¡æœ‰æ¥æ”¶å®Œå…¨ï¼Œç»§ç»­æ¥æ”¶
             return DATA_RETURN_STATE_CONTINUE;
         }
 
@@ -661,7 +661,7 @@ private:
     int   m_nCurrRecvLen;
 };
 
-//websocketĞ­ÒéÂß¼­°ü
+//websocketåè®®é€»è¾‘åŒ…
 class CWebSocketLogic : public CBaseDataLogic
 {
 public:
@@ -718,10 +718,10 @@ public:
         m_nSendLen = nMaxLength;
     }
 
-    //ÉèÖÃÏà¹Ø·¢ËÍBuff
+    //è®¾ç½®ç›¸å…³å‘é€Buff
     void SetSendBuff(const char* pData, int nLen)
     {
-        //WebSocket¼ÓÃÜÊı¾İ
+        //WebSocketåŠ å¯†æ•°æ®
         WebSocketSendData(pData, nLen, m_pSendData, m_nSendLen);
     }
 
@@ -732,10 +732,10 @@ public:
 
     char* GetSendData(int nThreadID, int nCurrIndex, int& nSendDataLen)
     {
-        //ÕâÀïÌí¼Ówebsocket¼ÓÃÜÉÆ·¨
+        //è¿™é‡Œæ·»åŠ websocketåŠ å¯†å–„æ³•
         if(nCurrIndex == 0)
         {
-            //Èç¹ûÊÇµÚÒ»´Î·¢ËÍÊı¾İ£¬Ôò·¢ËÍÎÕÊÖ°ü
+            //å¦‚æœæ˜¯ç¬¬ä¸€æ¬¡å‘é€æ•°æ®ï¼Œåˆ™å‘é€æ¡æ‰‹åŒ…
             nSendDataLen = (int)strlen(m_pHandInData);
             return m_pHandInData;
         }
@@ -743,13 +743,13 @@ public:
         {
             if(GetRandomType() == false)
             {
-                //µ¥Ò»Êı¾İ°ü
+                //å•ä¸€æ•°æ®åŒ…
                 nSendDataLen = m_nSendLen;
                 return m_pSendData;
             }
             else
             {
-                //Ë³ĞòÊı¾İ°ü
+                //é¡ºåºæ•°æ®åŒ…
                 nSendDataLen = MAX_RANDOM_PACKET;
                 GetRandomSend(nCurrIndex - 1, m_pSendData, nSendDataLen, m_nRecvLen);
                 return m_pSendData;
@@ -780,32 +780,32 @@ private:
     int   m_nCurrRecvLen;
 };
 
-//Ïß³ÌÁ¬½ÓĞÅÏ¢
+//çº¿ç¨‹è¿æ¥ä¿¡æ¯
 class _Socket_Info
 {
 public:
-    char  m_szSerevrIP[MAX_BUFF_20];      //Ô¶³Ì·şÎñÆ÷µÄIP
-    int   m_nPort;                        //Ô¶³Ì·şÎñÆ÷µÄ¶Ë¿Ú
-    int   m_nThreadID;                    //Ïß³ÌID
-    int   m_nRecvTimeout;                 //½ÓÊÕÊı¾İ³¬Ê±Ê±¼ä£¨µ¥Î»ÊÇºÁÃë£©
-    int   m_nDelaySecond;                 //¶ÌÁ¬½Ó¼äÑÓÊ±£¨µ¥Î»ÊÇºÁÃë£©
-    int   m_nPacketTimewait;              //Êı¾İ°ü·¢ËÍ¼ä¸ô(µ¥Î»ÊÇºÁÃë)
-    //int   m_nSendLength;                //·¢ËÍ×Ö·û´®³¤¶È
-    //int   m_nRecvLength;                //½ÓÊÕ×Ö·û´®³¤¶ÈÏŞ¶¨
-    //char* m_pSendBuff;                  //·¢ËÍÊı¾İ³¤¶È
-    bool  m_blIsAlwayConnect;             //ÊÇ·ñ³¤Á¬½Ó
-    bool  m_blIsRadomaDelay;              //ÊÇ·ñËæ»úÑÓÊ±
-    bool  m_blIsRecv;                     //ÊÇ·ñ½ÓÊÕ»ØÓ¦°ü
-    bool  m_blIsBroken;                   //ÊÇ·ñ¶ÏÏßÖØÁ¬
-    bool  m_blIsSendCount;                //ÊÇ·ñËæ»úÊı¾İ°üÊı
-    bool  m_blIsWriteFile;                //ÊÇ·ñĞ´ÈëÎÄ¼ş
-    bool  m_blIsSendOne;                  //ÊÇ·ñÖ»·¢Ò»´Î
-    bool  m_blLuaAdvance;                 //ÊÇ·ñÆô¶¯Lua¸ß¼¶Ä£Ê½
-    int   m_nConnectType;                 //Á´½ÓÀàĞÍ£¬0ÊÇTCP£¬1ÊÇUDP
-    int   m_nUdpClientPort;               //UDP¿Í»§¶Ë½ÓÊÕÊı¾İ¶Ë¿Ú
-    int   m_nSendCount;                   //·¢ËÍ×ÜÊı¾İ°üÊı
-    char  m_szLuaFileName[MAX_BUFF_1024]; //¸ß¼¶Ä£Ê½µÄLuaÎÄ¼şÃû
-    CBaseDataLogic* m_pLogic;             //Êı¾İ¶ÔÏó
+    char  m_szSerevrIP[MAX_BUFF_20];      //è¿œç¨‹æœåŠ¡å™¨çš„IP
+    int   m_nPort;                        //è¿œç¨‹æœåŠ¡å™¨çš„ç«¯å£
+    int   m_nThreadID;                    //çº¿ç¨‹ID
+    int   m_nRecvTimeout;                 //æ¥æ”¶æ•°æ®è¶…æ—¶æ—¶é—´ï¼ˆå•ä½æ˜¯æ¯«ç§’ï¼‰
+    int   m_nDelaySecond;                 //çŸ­è¿æ¥é—´å»¶æ—¶ï¼ˆå•ä½æ˜¯æ¯«ç§’ï¼‰
+    int   m_nPacketTimewait;              //æ•°æ®åŒ…å‘é€é—´éš”(å•ä½æ˜¯æ¯«ç§’)
+    //int   m_nSendLength;                //å‘é€å­—ç¬¦ä¸²é•¿åº¦
+    //int   m_nRecvLength;                //æ¥æ”¶å­—ç¬¦ä¸²é•¿åº¦é™å®š
+    //char* m_pSendBuff;                  //å‘é€æ•°æ®é•¿åº¦
+    bool  m_blIsAlwayConnect;             //æ˜¯å¦é•¿è¿æ¥
+    bool  m_blIsRadomaDelay;              //æ˜¯å¦éšæœºå»¶æ—¶
+    bool  m_blIsRecv;                     //æ˜¯å¦æ¥æ”¶å›åº”åŒ…
+    bool  m_blIsBroken;                   //æ˜¯å¦æ–­çº¿é‡è¿
+    bool  m_blIsSendCount;                //æ˜¯å¦éšæœºæ•°æ®åŒ…æ•°
+    bool  m_blIsWriteFile;                //æ˜¯å¦å†™å…¥æ–‡ä»¶
+    bool  m_blIsSendOne;                  //æ˜¯å¦åªå‘ä¸€æ¬¡
+    bool  m_blLuaAdvance;                 //æ˜¯å¦å¯åŠ¨Luaé«˜çº§æ¨¡å¼
+    int   m_nConnectType;                 //é“¾æ¥ç±»å‹ï¼Œ0æ˜¯TCPï¼Œ1æ˜¯UDP
+    int   m_nUdpClientPort;               //UDPå®¢æˆ·ç«¯æ¥æ”¶æ•°æ®ç«¯å£
+    int   m_nSendCount;                   //å‘é€æ€»æ•°æ®åŒ…æ•°
+    char  m_szLuaFileName[MAX_BUFF_1024]; //é«˜çº§æ¨¡å¼çš„Luaæ–‡ä»¶å
+    CBaseDataLogic* m_pLogic;             //æ•°æ®å¯¹è±¡
 
     _Socket_Info()
     {
@@ -835,7 +835,7 @@ public:
 
     ~_Socket_Info()
     {
-        //ÕâÀï²»ÔÙ¹ÜÊÍ·Å£¬½»ÓÉÉÏ²ã½â¾ö
+        //è¿™é‡Œä¸å†ç®¡é‡Šæ”¾ï¼Œäº¤ç”±ä¸Šå±‚è§£å†³
         //if(m_pLogic != NULL)
         //{
         //  delete m_pLogic;
@@ -844,20 +844,20 @@ public:
 
 };
 
-//Ïß³ÌÔËĞĞ×´Ì¬ĞÅÏ¢
+//çº¿ç¨‹è¿è¡ŒçŠ¶æ€ä¿¡æ¯
 struct _Socket_State_Info
 {
-    int m_nSuccessConnect;            //Á¬½Ó³É¹¦Êı
-    int m_nSuccessSend;               //·¢ËÍ³É¹¦Êı
-    int m_nSuccessRecv;               //½ÓÊÕ³É¹¦Êı
-    int m_nCurrectSocket;             //µ±Ç°Á´½ÓÊı
-    int m_nFailConnect;               //Á¬½ÓÊ§°ÜÊı
-    int m_nFailSend;                  //·¢ËÍÊ§°ÜÊı
-    int m_nFailRecv;                  //½ÓÊÕÊ§°ÜÊı
-    int m_nSendByteCount;             //·¢ËÍ×Ö½ÚÊı
-    int m_nRecvByteCount;             //½ÓÊÕ×Ö½ÚÊı
-    int m_nMinRecvTime;               //×îĞ¡½ÓÊÕÊ±¼ä
-    int m_nMaxRecvTime;               //×î´ó½ÓÊÕÊ±¼ä
+    int m_nSuccessConnect;            //è¿æ¥æˆåŠŸæ•°
+    int m_nSuccessSend;               //å‘é€æˆåŠŸæ•°
+    int m_nSuccessRecv;               //æ¥æ”¶æˆåŠŸæ•°
+    int m_nCurrectSocket;             //å½“å‰é“¾æ¥æ•°
+    int m_nFailConnect;               //è¿æ¥å¤±è´¥æ•°
+    int m_nFailSend;                  //å‘é€å¤±è´¥æ•°
+    int m_nFailRecv;                  //æ¥æ”¶å¤±è´¥æ•°
+    int m_nSendByteCount;             //å‘é€å­—èŠ‚æ•°
+    int m_nRecvByteCount;             //æ¥æ”¶å­—èŠ‚æ•°
+    int m_nMinRecvTime;               //æœ€å°æ¥æ”¶æ—¶é—´
+    int m_nMaxRecvTime;               //æœ€å¤§æ¥æ”¶æ—¶é—´
 
     _Socket_State_Info()
     {

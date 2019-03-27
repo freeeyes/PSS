@@ -1,4 +1,4 @@
-#ifdef _LINUX_PLATFORM_
+﻿#ifdef _LINUX_PLATFORM_
 
 
 #include <stdio.h>
@@ -6,9 +6,9 @@
 
 
 static int sprintf_s(
-    char *buffer,
+    char* buffer,
     size_t sizeOfBuffer,
-    const char *format,...)
+    const char* format,...)
 {
     va_list ap;
 
@@ -19,7 +19,7 @@ static int sprintf_s(
 }
 
 static int printf_s(
-    const char *format,...)
+    const char* format,...)
 {
     va_list ap;
 
