@@ -41,8 +41,6 @@ public:
     CMessageService();
     virtual ~CMessageService();
 
-    CMessageService(const CMessageService& ar);
-
     CMessageService& operator = (const CMessageService& ar)
     {
         if (this != &ar)

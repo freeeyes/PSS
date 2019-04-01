@@ -45,8 +45,6 @@ public:
     CConnectHandler(void);
     virtual ~CConnectHandler(void);
 
-    CConnectHandler(const CConnectHandler& ar);
-
     CConnectHandler& operator = (const CConnectHandler& ar)
     {
         if (this != &ar)
@@ -178,8 +176,6 @@ class CConnectManager : public ACE_Task<ACE_MT_SYNCH>
 public:
     CConnectManager(void);
     ~CConnectManager(void);
-
-    CConnectManager(const CConnectManager& ar);
 
     CConnectManager& operator = (const CConnectManager& ar)
     {

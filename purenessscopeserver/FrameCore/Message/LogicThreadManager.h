@@ -159,8 +159,6 @@ public:
     CLogicThread();
     virtual ~CLogicThread();
 
-    CLogicThread(const CLogicThread& ar);
-
     CLogicThread& operator = (const CLogicThread& ar)
     {
         if (this != &ar)

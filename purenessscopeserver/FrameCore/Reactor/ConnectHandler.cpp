@@ -46,11 +46,6 @@ CConnectHandler::CConnectHandler(void)
     m_u4LocalPort         = 0;
 }
 
-CConnectHandler::CConnectHandler(const CConnectHandler& ar)
-{
-    (*this) = ar;
-}
-
 CConnectHandler::~CConnectHandler(void)
 {
     this->closing_ = true;
@@ -1536,11 +1531,6 @@ CConnectManager::CConnectManager(void):m_mutex(), m_cond(m_mutex)
 
     //初始化发送对象池
     m_SendMessagePool.Init();
-}
-
-CConnectManager::CConnectManager(const CConnectManager& ar) : CConnectManager()
-{
-    (*this) = ar;
 }
 
 CConnectManager::~CConnectManager(void)

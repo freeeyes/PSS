@@ -236,11 +236,6 @@ CClientReConnectManager::CClientReConnectManager(void)
     m_u4MaxPoolCount         = 0;
 }
 
-CClientReConnectManager::CClientReConnectManager(const CClientReConnectManager& ar)
-{
-    (*this) = ar;
-}
-
 CClientReConnectManager::~CClientReConnectManager(void)
 {
     OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::~CClientReConnectManager].\n"));

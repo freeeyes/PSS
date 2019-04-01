@@ -10,11 +10,6 @@ CAceReactor::CAceReactor()
     m_u4ReactorID  = 0;
 }
 
-CAceReactor::CAceReactor(const CAceReactor& ar) : CAceReactor()
-{
-    (*this) = ar;
-}
-
 void CAceReactor::SetReactorID(uint32 u4ReactorID)
 {
     m_u4ReactorID = u4ReactorID;

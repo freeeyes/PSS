@@ -24,11 +24,6 @@ CConsoleHandler::CConsoleHandler(void)
     m_u4SendCheckTime  = 0;
 }
 
-CConsoleHandler::CConsoleHandler(const CConsoleHandler& ar)
-{
-    (*this) = ar;
-}
-
 CConsoleHandler::~CConsoleHandler(void)
 {
     OUR_DEBUG((LM_ERROR, "[CConsoleHandler::~CConsoleHandler].\n"));

@@ -58,11 +58,6 @@ CLogicThread::CLogicThread() : m_blRun(false),
 {
 }
 
-CLogicThread::CLogicThread(const CLogicThread& ar) : CLogicThread()
-{
-    (*this) = ar;
-}
-
 CLogicThread::~CLogicThread()
 {
 }

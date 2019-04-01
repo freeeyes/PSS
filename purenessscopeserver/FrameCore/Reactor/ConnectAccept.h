@@ -16,8 +16,6 @@ public:
 
     virtual ~ConnectAcceptor();
 
-    ConnectAcceptor(const ConnectAcceptor& ar);
-
     ConnectAcceptor& operator = (const ConnectAcceptor& ar)
     {
         if (this != &ar)

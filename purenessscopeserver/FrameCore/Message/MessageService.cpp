@@ -31,11 +31,6 @@ CMessageService::CMessageService():m_mutex(), m_cond(m_mutex)
     }
 }
 
-CMessageService::CMessageService(const CMessageService& ar) : CMessageService()
-{
-    (*this) = ar;
-}
-
 CMessageService::~CMessageService()
 {
     OUR_DEBUG((LM_INFO, "[CMessageService::~CMessageService].\n"));

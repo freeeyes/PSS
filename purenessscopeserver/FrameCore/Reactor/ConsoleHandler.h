@@ -24,8 +24,6 @@ public:
     CConsoleHandler(void);
     ~CConsoleHandler(void);
 
-    CConsoleHandler(const CConsoleHandler& ar);
-
     CConsoleHandler& operator = (const CConsoleHandler& ar)
     {
         if (this != &ar)

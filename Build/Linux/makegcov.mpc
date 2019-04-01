@@ -46,7 +46,12 @@ project(PurenessScopeServer):aceexe{
    ifneq (, $(shell which curl))
       CPPFLAGS     += -D__THREE_LIBRARY_CURL__
       LDLIBS       += -lcurl
-   		endif 
+   endif 
+   
+   GCC_VER_GTE48=$(shell echo `gcc -dumpversion | cut -f1-2 -d.` \\>= 4.8 | bc)
+   ifeq ($(GCC_VER_GTE48), 1)
+   	 CPPFLAGS += -std=c++11
+   endif   
    } 
 
   specific(gnuace) {

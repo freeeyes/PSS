@@ -64,8 +64,6 @@ public:
     CClientReConnectManager(void);
     virtual ~CClientReConnectManager(void);
 
-    CClientReConnectManager(const CClientReConnectManager& ar);
-
     CClientReConnectManager& operator = (const CClientReConnectManager& ar)
     {
         if (this != &ar)

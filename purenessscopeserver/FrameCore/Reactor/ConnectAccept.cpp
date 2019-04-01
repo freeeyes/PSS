@@ -9,11 +9,6 @@ ConnectAcceptor::ConnectAcceptor()
     m_u4PacketParseInfoID  = 0;
 }
 
-ConnectAcceptor::ConnectAcceptor(const ConnectAcceptor& ar)
-{
-    (*this) = ar;
-}
-
 ConnectAcceptor::~ConnectAcceptor()
 {
 

@@ -38,8 +38,6 @@ private:
 public:
     ~CAceReactor();
 
-    CAceReactor(const CAceReactor& ar);
-
     CAceReactor& operator = (const CAceReactor& ar)
     {
         if (this != &ar)
