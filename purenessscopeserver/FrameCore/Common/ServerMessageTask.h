@@ -149,7 +149,9 @@ class CServerMessageTask : public ACE_Task<ACE_MT_SYNCH>
 {
 public:
     CServerMessageTask();
-    ~CServerMessageTask();
+    virtual ~CServerMessageTask();
+
+    CServerMessageTask(const CServerMessageTask& ar);
 
     CServerMessageTask& operator = (const CServerMessageTask& ar)
     {

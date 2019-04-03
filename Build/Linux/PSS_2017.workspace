@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeLite_Workspace Name="PSS_2017" Database="" Version="10.0.0">
+  <Project Name="PurenessScopeServer" Path="../../purenessscopeserver/FrameCore/PurenessScopeServer.project" Active="Yes"/>
+  <Project Name="PacketParse_Interface" Path="../../purenessscopeserver/PacketParse_Interface/PacketParse_Interface.project" Active="No"/>
+  <Project Name="PacketParse_Interface_Http" Path="../../purenessscopeserver/PacketParse_Interface_Http/PacketParse_Interface_Http.project" Active="No"/>
+  <Project Name="PacketParse_Interface_Monitor" Path="../../purenessscopeserver/PacketParse_Interface_Monitor/PacketParse_Interface_Monitor.project" Active="No"/>
+  <Project Name="PacketParse_Interface_WebSocket" Path="../../purenessscopeserver/PacketParse_Interface_WebSocket/PacketParse_Interface_WebSocket.project" Active="No"/>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="Debug" Selected="no">
+      <Environment/>
+      <Project Name="PurenessScopeServer" ConfigName="Debug"/>
+      <Project Name="PacketParse_Interface" ConfigName="Debug"/>
+      <Project Name="PacketParse_Interface_Http" ConfigName="Debug"/>
+      <Project Name="PacketParse_Interface_Monitor" ConfigName="Debug"/>
+      <Project Name="PacketParse_Interface_WebSocket" ConfigName="Debug"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Release" Selected="yes">
+      <Environment/>
+      <Project Name="PurenessScopeServer" ConfigName="Release"/>
+      <Project Name="PacketParse_Interface" ConfigName="Release"/>
+      <Project Name="PacketParse_Interface_Http" ConfigName="Release"/>
+      <Project Name="PacketParse_Interface_Monitor" ConfigName="Release"/>
+      <Project Name="PacketParse_Interface_WebSocket" ConfigName="Release"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
+</CodeLite_Workspace>

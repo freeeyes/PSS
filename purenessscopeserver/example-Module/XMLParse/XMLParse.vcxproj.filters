@@ -1,62 +1,35 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{c454ebb1-4b41-4049-b73c-b27947ee26e1}</UniqueIdentifier>
-      <Extensions>cpp;cxx;cc;c;C</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{cf476824-a40e-4554-b878-606cab7720f0}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hh</Extensions>
-    </Filter>
-    <Filter Include="Build Files">
-      <UniqueIdentifier>{ab429387-66c4-48bd-b9cd-4a649b19d059}</UniqueIdentifier>
-      <Extensions>mpc;mpb;mwc</Extensions>
-    </Filter>
     <Filter Include="TinyXML">
-      <UniqueIdentifier>{b18971ef-b8b0-4412-8902-bce7cabf8b16}</UniqueIdentifier>
+      <UniqueIdentifier>{bcf246fa-d4cd-431f-8810-0c810e8af4d8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BaseCommand.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="XmlOpeation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="XMLParse.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TinyXML\tinystr.cpp">
+    <ClCompile Include="..\..\..\ThirdLib\include\TinyXML\tinystr.cpp">
       <Filter>TinyXML</Filter>
     </ClCompile>
-    <ClCompile Include="TinyXML\tinyxml.cpp">
+    <ClCompile Include="..\..\..\ThirdLib\include\TinyXML\tinyxml.cpp">
       <Filter>TinyXML</Filter>
     </ClCompile>
-    <ClCompile Include="TinyXML\tinyxmlerror.cpp">
+    <ClCompile Include="..\..\..\ThirdLib\include\TinyXML\tinyxmlerror.cpp">
       <Filter>TinyXML</Filter>
     </ClCompile>
-    <ClCompile Include="TinyXML\tinyxmlparser.cpp">
+    <ClCompile Include="..\..\..\ThirdLib\include\TinyXML\tinyxmlparser.cpp">
       <Filter>TinyXML</Filter>
     </ClCompile>
+    <ClCompile Include="XMLParse\BaseCommand.cpp" />
+    <ClCompile Include="XMLParse\XMLParse.cpp" />
+    <ClCompile Include="..\..\..\ThirdLib\include\XmlOpeation.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BaseCommand.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="XmlOpeation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TinyXML\tinystr.h">
+    <ClInclude Include="..\..\..\ThirdLib\include\TinyXML\tinystr.h">
       <Filter>TinyXML</Filter>
     </ClInclude>
-    <ClInclude Include="TinyXML\tinyxml.h">
+    <ClInclude Include="..\..\..\ThirdLib\include\TinyXML\tinyxml.h">
       <Filter>TinyXML</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="XMLParse.mpc">
-      <Filter>Build Files</Filter>
-    </CustomBuild>
+    <ClInclude Include="XMLParse\BaseCommand.h" />
+    <ClInclude Include="..\..\..\ThirdLib\include\XmlOpeation.h" />
   </ItemGroup>
 </Project>

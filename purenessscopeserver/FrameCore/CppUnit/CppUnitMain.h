@@ -41,6 +41,7 @@
 #include "Uint_LogManager.h"
 #include "Unit_LoadModule.h"
 #include "Uint_TcpRedirection.h"
+#include "Unit_LogicThreadManager.h"
 
 #define CPPUNIT_REPORT_PATH "./reports/cppunit/report.xml"
 

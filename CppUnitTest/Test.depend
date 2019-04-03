@@ -1,0 +1,77 @@
+# depslib dependency file v1.0
+1553654185 source:/data/develop/Lib/Network/PSS-master/ThirdLib/thirdparty/sock_wrap.cpp
+	<stdio.h>
+	<string.h>
+	<fcntl.h>
+	"sock_wrap.h"
+	<windows.h>
+	<stdlib.h>
+	<errno.h>
+	<unistd.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<arpa/inet.h>
+
+1553655281 /data/develop/Lib/Network/PSS-master/ThirdLib/thirdparty/sock_wrap.h
+	<winsock2.h>
+	<ws2def.h>
+	<sys/time.h>
+	<linux/errno.h>
+	<netinet/in.h>
+	<sys/socket.h>
+	<sys/types.h>
+	<time.h>
+	<thread>
+
+1553657405 source:/data/develop/Lib/Network/PSS-master/CppUnitTest/Test/test_linux.cpp
+	"commons.h"
+	"testcase.h"
+
+1553658616 /data/develop/Lib/Network/PSS-master/CppUnitTest/Test/commons.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<errno.h>
+	<assert.h>
+	<time.h>
+	<winsock2.h>
+	<unistd.h>
+	<sys/time.h>
+	<linux/errno.h>
+	<netinet/in.h>
+	<sys/socket.h>
+	<sys/types.h>
+	<time.h>
+	<fcntl.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<sys/types.h>
+	<arpa/inet.h>
+	<sys/time.h>
+
+1553657405 /data/develop/Lib/Network/PSS-master/CppUnitTest/Test/testcase.h
+	<vector>
+	<thread>
+	<mutex>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<errno.h>
+	<assert.h>
+	<time.h>
+	"commons.h"
+	"sock_wrap.h"
+
+1553658737 source:/data/develop/Lib/Network/PSS-master/CppUnitTest/Test/testcase.cpp
+
+1553655281 /data/develop/Lib/Network/PSS-master/ThirdLib/thirdparty//sock_wrap.h
+	<winsock2.h>
+	<ws2def.h>
+	<sys/time.h>
+	<linux/errno.h>
+	<netinet/in.h>
+	<sys/socket.h>
+	<sys/types.h>
+	<time.h>
+	<thread>
+

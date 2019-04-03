@@ -13,7 +13,21 @@ class CUnit_MessageService : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
+    CUnit_MessageService();
+
     virtual ~CUnit_MessageService();
+
+    CUnit_MessageService(const CUnit_MessageService& ar);
+
+    CUnit_MessageService& operator = (const CUnit_MessageService& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
 
     virtual void setUp(void);
 

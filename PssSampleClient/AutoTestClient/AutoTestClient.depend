@@ -1,0 +1,25 @@
+# depslib dependency file v1.0
+1553654185 source:/data/develop/Lib/Network/PSS-master/ThirdLib/thirdparty/sock_wrap.cpp
+	<stdio.h>
+	<string.h>
+	<fcntl.h>
+	"sock_wrap.h"
+	<windows.h>
+	<stdlib.h>
+	<errno.h>
+	<unistd.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<arpa/inet.h>
+
+1553655281 /data/develop/Lib/Network/PSS-master/ThirdLib/thirdparty/sock_wrap.h
+	<winsock2.h>
+	<ws2def.h>
+	<sys/time.h>
+	<linux/errno.h>
+	<netinet/in.h>
+	<sys/socket.h>
+	<sys/types.h>
+	<time.h>
+	<thread>
+

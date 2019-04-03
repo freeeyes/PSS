@@ -7,9 +7,9 @@ CAppConfig::CAppConfig(void)
     m_szError[0] = '\0';
 }
 
-CAppConfig::CAppConfig(const CAppConfig& p)
+CAppConfig::CAppConfig(const CAppConfig& ar)
 {
-    ACE_UNUSED_ARG(p);
+    (*this) = ar;
 }
 
 CAppConfig::~CAppConfig(void)

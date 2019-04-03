@@ -17,7 +17,21 @@ class CUnit_ConnectHandler : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
+    CUnit_ConnectHandler();
+
     virtual ~CUnit_ConnectHandler();
+
+    CUnit_ConnectHandler(const CUnit_ConnectHandler& ar);
+
+    CUnit_ConnectHandler& operator = (const CUnit_ConnectHandler& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
 
     virtual void setUp(void);
 

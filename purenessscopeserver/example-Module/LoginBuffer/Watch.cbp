@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Watch" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Release x64">
+				<Option output="../../../Build/Prj_CodeBlocks/Linux_Bin/Module/Watch" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../../../Build/Prj_CodeBlocks/Temp/" />
+				<Option deps_output="../../../Build/Prj_CodeBlocks/Linux_Bin/Module/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O1" />
+					<Add option="-Wall" />
+					<Add option="-fPIC" />
+					<Add directory="../../Common/" />
+					<Add directory="./Common/" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="$(ACE_ROOT)/" />
+					<Add directory="../../include/" />
+					<Add directory="../Common/" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="/usr/local/lib/libACE.so" />
+					<Add directory="./" />
+					<Add directory="$(ACE_ROOT)/lib/" />
+				</Linker>
+			</Target>
+		</Build>
+		<Unit filename="Common/CacheManager.h" />
+		<Unit filename="Common/SMDefine.h" />
+		<Unit filename="Common/SMOption.cpp" />
+		<Unit filename="Common/SMOption.h" />
+		<Unit filename="Common/UserInfoManager.cpp" />
+		<Unit filename="Common/UserInfoManager.h" />
+		<Unit filename="Common/UserValidManager.cpp" />
+		<Unit filename="Common/UserValidManager.h" />
+		<Unit filename="Watch/Watch.cpp" />
+		<Extensions>
+			<envvars />
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

@@ -20,7 +20,7 @@
 
 //子进程数量
 #define CHILDCOUNT  1
-
+/*
 //写独占文件锁
 int AcquireWriteLock(int fd, int start, int len)
 {
@@ -33,7 +33,7 @@ int AcquireWriteLock(int fd, int start, int len)
 
 	return fcntl(fd, F_SETLKW, &arg);
 }
-
+*/
 //释放独占文件锁
 int ReleaseLock(int fd, int start, int len)
 {
@@ -46,7 +46,7 @@ int ReleaseLock(int fd, int start, int len)
 
 	return fcntl(fd, F_SETLKW, &arg);
 }
-
+/*
 //查看写锁
 int SeeLock(int fd, int start, int len)
 {
@@ -77,6 +77,7 @@ int SeeLock(int fd, int start, int len)
 
 	return 0;
 }
+*/
 
 int Chlid_Run()
 {

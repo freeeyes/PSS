@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeLite_Workspace Name="example-Module" Database="" Version="10.0.0">
+  <Project Name="AutoTest" Path="../../purenessscopeserver/example-Module/AutoTest/AutoTest.project" Active="No"/>
+  <Project Name="FtpTest" Path="../../purenessscopeserver/example-Module/FtpTest/FtpTest.project" Active="No"/>
+  <Project Name="Http" Path="../../purenessscopeserver/example-Module/Http/Http.project" Active="No"/>
+  <Project Name="KafkaClient" Path="../../purenessscopeserver/example-Module/KafkaClient/KafkaClient.project" Active="No"/>
+  <Project Name="LGLogic" Path="../../purenessscopeserver/example-Module/LGLogic/LGLogic.project" Active="No"/>
+  <Project Name="LoginBuffer_Login" Path="../../purenessscopeserver/example-Module/LoginBuffer/Login.project" Active="No"/>
+  <Project Name="LoginBuffer_Watch" Path="../../purenessscopeserver/example-Module/LoginBuffer/Watch.project" Active="No"/>
+  <Project Name="LsPlugIn" Path="../../purenessscopeserver/example-Module/LsPlugIn/LsPlugIn.project" Active="No"/>
+  <Project Name="LuaTest" Path="../../purenessscopeserver/example-Module/LuaTest/LuaTest.project" Active="No"/>
+  <Project Name="MonitorServer" Path="../../purenessscopeserver/example-Module/MonitorServer/MonitorServer.project" Active="No"/>
+  <Project Name="MutiProcess_Queue" Path="../../purenessscopeserver/example-Module/MutiProcess/Queue.project" Active="No"/>
+  <Project Name="MutiProcess_Watch" Path="../../purenessscopeserver/example-Module/MutiProcess/Watch.project" Active="No"/>
+  <Project Name="PlugA" Path="../../purenessscopeserver/example-Module/PlugAtoB/PlugA.project" Active="No"/>
+  <Project Name="PlugB" Path="../../purenessscopeserver/example-Module/PlugAtoB/PlugB.project" Active="No"/>
+  <Project Name="Proxy" Path="../../purenessscopeserver/example-Module/Proxy/Proxy.project" Active="No"/>
+  <Project Name="ProxyServer" Path="../../purenessscopeserver/example-Module/Proxy/ProxyServer.project" Active="No"/>
+  <Project Name="RealTimeMonitor" Path="../../purenessscopeserver/example-Module/RealTimeMonitor/RealTimeMonitor.project" Active="No"/>
+  <Project Name="TcpTest" Path="../../purenessscopeserver/example-Module/TcpTest/TcpTest.project" Active="No"/>
+  <Project Name="TestTCPPost" Path="../../purenessscopeserver/example-Module/TestTCPPost/TestTCPPost.project" Active="No"/>
+  <Project Name="TestUDPPost" Path="../../purenessscopeserver/example-Module/TestUDPPost/TestUDPPost.project" Active="No"/>
+  <Project Name="TimerTest" Path="../../purenessscopeserver/example-Module/TimerTest/TimerTest.project" Active="No"/>
+  <Project Name="TTyTest" Path="../../purenessscopeserver/example-Module/TTyTest/TTyTest.project" Active="No"/>
+  <Project Name="UDPTest" Path="../../purenessscopeserver/example-Module/UDPTest/UDPTest.project" Active="No"/>
+  <Project Name="WebSocket" Path="../../purenessscopeserver/example-Module/WebSocket/WebSocket.project" Active="No"/>
+  <Project Name="XMLParse" Path="../../purenessscopeserver/example-Module/XMLParse/XMLParse.project" Active="Yes"/>
+  <Project Name="ZooClient" Path="../../purenessscopeserver/example-Module/ZooClient/ZooClient.project" Active="No"/>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="Debug" Selected="no">
+      <Environment/>
+      <Project Name="AutoTest" ConfigName="Debug"/>
+      <Project Name="FtpTest" ConfigName="Debug"/>
+      <Project Name="Http" ConfigName="Debug"/>
+      <Project Name="KafkaClient" ConfigName="Debug"/>
+      <Project Name="LGLogic" ConfigName="Debug"/>
+      <Project Name="LoginBuffer_Login" ConfigName="Debug"/>
+      <Project Name="LoginBuffer_Watch" ConfigName="Debug"/>
+      <Project Name="LsPlugIn" ConfigName="Debug"/>
+      <Project Name="LuaTest" ConfigName="Debug"/>
+      <Project Name="MonitorServer" ConfigName="Debug"/>
+      <Project Name="MutiProcess_Queue" ConfigName="Debug"/>
+      <Project Name="MutiProcess_Watch" ConfigName="Debug"/>
+      <Project Name="PlugA" ConfigName="Debug"/>
+      <Project Name="PlugB" ConfigName="Debug"/>
+      <Project Name="Proxy" ConfigName="Debug"/>
+      <Project Name="ProxyServer" ConfigName="Debug"/>
+      <Project Name="RealTimeMonitor" ConfigName="Debug"/>
+      <Project Name="TcpTest" ConfigName="Debug"/>
+      <Project Name="TestTCPPost" ConfigName="Debug"/>
+      <Project Name="TestUDPPost" ConfigName="Debug"/>
+      <Project Name="TimerTest" ConfigName="Debug"/>
+      <Project Name="TTyTest" ConfigName="Debug"/>
+      <Project Name="UDPTest" ConfigName="Debug"/>
+      <Project Name="WebSocket" ConfigName="Debug"/>
+      <Project Name="XMLParse" ConfigName="Debug"/>
+      <Project Name="ZooClient" ConfigName="Debug"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Release" Selected="yes">
+      <Environment/>
+      <Project Name="AutoTest" ConfigName="Release"/>
+      <Project Name="FtpTest" ConfigName="Release"/>
+      <Project Name="Http" ConfigName="Release"/>
+      <Project Name="KafkaClient" ConfigName="Release"/>
+      <Project Name="LGLogic" ConfigName="Release"/>
+      <Project Name="LoginBuffer_Login" ConfigName="Release"/>
+      <Project Name="LoginBuffer_Watch" ConfigName="Release"/>
+      <Project Name="LsPlugIn" ConfigName="Release"/>
+      <Project Name="LuaTest" ConfigName="Release"/>
+      <Project Name="MonitorServer" ConfigName="Release"/>
+      <Project Name="MutiProcess_Queue" ConfigName="Release"/>
+      <Project Name="MutiProcess_Watch" ConfigName="Release"/>
+      <Project Name="PlugA" ConfigName="Release"/>
+      <Project Name="PlugB" ConfigName="Release"/>
+      <Project Name="Proxy" ConfigName="Release"/>
+      <Project Name="ProxyServer" ConfigName="Release"/>
+      <Project Name="RealTimeMonitor" ConfigName="Release"/>
+      <Project Name="TcpTest" ConfigName="Release"/>
+      <Project Name="TestTCPPost" ConfigName="Release"/>
+      <Project Name="TestUDPPost" ConfigName="Release"/>
+      <Project Name="TimerTest" ConfigName="Release"/>
+      <Project Name="TTyTest" ConfigName="Release"/>
+      <Project Name="UDPTest" ConfigName="Release"/>
+      <Project Name="WebSocket" ConfigName="Release"/>
+      <Project Name="XMLParse" ConfigName="Release"/>
+      <Project Name="ZooClient" ConfigName="Release"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
+</CodeLite_Workspace>

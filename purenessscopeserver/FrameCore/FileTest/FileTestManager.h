@@ -22,6 +22,18 @@ public:
     CFileTestManager(void);
     virtual ~CFileTestManager(void);
 
+    CFileTestManager(const CFileTestManager& ar);
+
+    CFileTestManager& operator = (const CFileTestManager& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
+
     //文件测试方法
     FileTestResultInfoSt FileTestStart(const char* szXmlFileTestName);      //开始文件测试
     int FileTestEnd();                                                      //结束文件测试
@@ -64,6 +76,10 @@ private:
         ResponseRecordSt()
         {
             Init();
+        }
+
+        ~ResponseRecordSt()
+        {
         }
 
         ResponseRecordSt(const ResponseRecordSt& ar)

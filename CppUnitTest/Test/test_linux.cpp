@@ -1,4 +1,4 @@
-#include <string>
+ï»¿#include <string>
 #include "commons.h"
 #include "testcase.h"
 
@@ -6,14 +6,14 @@ using namespace std;
 
 int main()
 {
-    //ÔËĞĞ²âÊÔÓÃÀı
+    //è¿è¡Œæµ‹è¯•ç”¨ä¾‹
     int nTestCount = 0;
     string strResultInfo;
     char szHtmlResult[MAX_BUFF_1024] = {'\0'};
     _ResultInfo objResultInfo;
     _ClientInfo objClientInfo;
 
-    //»ñµÃµ±Ç°²âÊÔÔËĞĞÊ±¼ä
+    //è·å¾—å½“å‰æµ‹è¯•è¿è¡Œæ—¶é—´
     time_t ttCurrentTime;
     time(&ttCurrentTime);
     struct tm* pTime;
@@ -27,7 +27,7 @@ int main()
             pTime->tm_min,
             pTime->tm_sec);
 
-    //¿ªÊ¼²âÊÔÓÃÀı
+    //å¼€å§‹æµ‹è¯•ç”¨ä¾‹
     char szBuff[20] = {'\0'};
     sprintf(szBuff, "freeeyes");
 
@@ -90,7 +90,7 @@ int main()
     strResultInfo += szHtmlResult;
     nTestCount++;
 
-    //Êä³ö³ÉÎÄ¼ş¸ñÊ½
+    //è¾“å‡ºæˆæ–‡ä»¶æ ¼å¼
     char* pHtmlFile = new char[nTestCount*MAX_BUFF_1024];
     memset(pHtmlFile, 0, nTestCount*MAX_BUFF_1024);
 

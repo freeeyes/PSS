@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxFrame" name="PSSLoginClientFrame">
+		<title>二级缓冲测试客户端</title>
+		<icon>./Icon.jpg</icon>
+		<size>643,496</size>
+		<style>wxDEFAULT_DIALOG_STYLE</style>
+		<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
+			<pos>128,112</pos>
+			<size>643,496</size>
+			<object class="wxStaticBox" name="ID_STATICBOX1" variable="StaticBox1" member="yes">
+				<label>登陆测试</label>
+				<pos>8,8</pos>
+				<size>624,160</size>
+			</object>
+			<object class="wxStaticBox" name="ID_STATICBOX2" variable="StaticBox2" member="yes">
+				<label>用户信息</label>
+				<pos>8,176</pos>
+				<size>624,128</size>
+			</object>
+			<object class="wxStaticBox" name="ID_STATICBOX3" variable="StaticBox3" member="yes">
+				<label>测试结果</label>
+				<pos>8,304</pos>
+				<size>624,136</size>
+			</object>
+			<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
+				<label>时间消耗</label>
+				<pos>8,456</pos>
+			</object>
+			<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="TextCtrl_TimeUsed" member="yes">
+				<pos>72,448</pos>
+				<size>256,35</size>
+			</object>
+			<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
+				<label>服务器IP</label>
+				<pos>24,40</pos>
+			</object>
+			<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
+				<label>用户名</label>
+				<pos>24,80</pos>
+			</object>
+			<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
+				<label>随机从</label>
+				<pos>24,120</pos>
+			</object>
+			<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText5" member="yes">
+				<label>服务器端口</label>
+				<pos>232,40</pos>
+			</object>
+			<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="TextCtrl_ServerPort" member="yes">
+				<value>10002</value>
+				<pos>304,32</pos>
+				<size>128,35</size>
+			</object>
+			<object class="wxTextCtrl" name="ID_TEXTCTRL3" variable="TextCtrl_ServerIP" member="yes">
+				<value>127.0.0.1</value>
+				<pos>88,32</pos>
+				<size>128,35</size>
+			</object>
+			<object class="wxTextCtrl" name="ID_TEXTCTRL4" variable="TextCtrl_Username" member="yes">
+				<value>freeeyes</value>
+				<pos>88,72</pos>
+				<size>128,35</size>
+			</object>
+			<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText6" member="yes">
+				<label>密码</label>
+				<pos>232,80</pos>
+			</object>
+			<object class="wxTextCtrl" name="ID_TEXTCTRL5" variable="TextCtrl_Password" member="yes">
+				<value>123456</value>
+				<pos>304,72</pos>
+				<size>128,35</size>
+			</object>
+			<object class="wxTextCtrl" name="ID_TEXTCTRL6" variable="TextCtrl_RadomStart" member="yes">
+				<value>1</value>
+				<pos>88,112</pos>
+				<size>128,35</size>
+			</object>
+			<object class="wxStaticText" name="ID_STATICTEXT7" variable="StaticText7" member="yes">
+				<label>到</label>
+				<pos>232,120</pos>
+			</object>
+			<object class="wxTextCtrl" name="ID_TEXTCTRL7" variable="TextCtrl_RadomEnd" member="yes">
+				<value>5</value>
+				<pos>304,112</pos>
+				<size>128,35</size>
+			</object>
+			<object class="wxButton" name="ID_BUTTON1" variable="Button_LoginOnceTest" member="yes">
+				<label>单一测试</label>
+				<pos>448,72</pos>
+				<handler function="OnButton_LoginOnceTestClick" entry="EVT_BUTTON" />
+			</object>
+			<object class="wxButton" name="ID_BUTTON2" variable="Button_StartTest" member="yes">
+				<label>压力测试</label>
+				<pos>448,112</pos>
+				<handler function="OnButton_StartTestClick" entry="EVT_BUTTON" />
+			</object>
+			<object class="wxButton" name="ID_BUTTON3" variable="Button_StopTest" member="yes">
+				<label>停止测试</label>
+				<pos>544,112</pos>
+				<handler function="OnButton_StopTestClick" entry="EVT_BUTTON" />
+			</object>
+			<object class="wxStaticText" name="ID_STATICTEXT8" variable="StaticText8" member="yes">
+				<label>用户ID</label>
+				<pos>24,208</pos>
+			</object>
+			<object class="wxTextCtrl" name="ID_TEXTCTRL8" variable="TextCtrl_UserID_Once" member="yes">
+				<value>1001</value>
+				<pos>88,200</pos>
+				<size>128,35</size>
+			</object>
+			<object class="wxButton" name="ID_BUTTON4" variable="Button_UserID_OnceTest" member="yes">
+				<label>单一测试</label>
+				<pos>232,200</pos>
+				<handler function="OnButton_UserID_OnceTestClick" entry="EVT_BUTTON" />
+			</object>
+			<object class="wxStaticText" name="ID_STATICTEXT9" variable="StaticText9" member="yes">
+				<label>用户ID</label>
+				<pos>24,248</pos>
+			</object>
+			<object class="wxTextCtrl" name="ID_TEXTCTRL9" variable="TextCtrl_UserID_Set" member="yes">
+				<pos>88,248</pos>
+				<size>120,35</size>
+			</object>
+			<object class="wxStaticText" name="ID_STATICTEXT10" variable="StaticText10" member="yes">
+				<label>Life</label>
+				<pos>232,256</pos>
+			</object>
+			<object class="wxStaticText" name="ID_STATICTEXT11" variable="StaticText11" member="yes">
+				<label>Magic</label>
+				<pos>392,256</pos>
+			</object>
+			<object class="wxTextCtrl" name="ID_TEXTCTRL10" variable="TextCtrl_Life" member="yes">
+				<pos>264,248</pos>
+			</object>
+			<object class="wxTextCtrl" name="ID_TEXTCTRL11" variable="TextCtrl_Magic" member="yes">
+				<pos>432,248</pos>
+			</object>
+			<object class="wxButton" name="ID_BUTTON5" variable="Button_SetParam" member="yes">
+				<label>设置数值</label>
+				<pos>544,248</pos>
+				<handler function="OnButton_SetParamClick" entry="EVT_BUTTON" />
+			</object>
+			<object class="wxListCtrl" name="ID_LISTCTRL1" variable="ListCtrl_Result" member="yes">
+				<pos>24,328</pos>
+				<size>600,104</size>
+				<style>wxLC_LIST|wxLC_REPORT</style>
+			</object>
+		</object>
+		<object class="wxTimer" name="ID_TIMER1" variable="Timer_MainForm" member="yes">
+			<handler function="OnTimer_MainFormTrigger" entry="EVT_TIMER" />
+		</object>
+	</object>
+</wxsmith>

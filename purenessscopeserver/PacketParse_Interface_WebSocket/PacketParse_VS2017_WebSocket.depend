@@ -1,0 +1,36 @@
+# depslib dependency file v1.0
+1553770511 source:/data/develop/Lib/Network/PSS-master/purenessscopeserver/PacketParse_Interface_WebSocket/PacketParse_Interface_WebSocket/PacketParse_Interface.cpp
+	"define.h"
+	"WebSocketInfo.h"
+	"IMessageBlockManager.h"
+	"ace/svc_export.h"
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//define.h
+	"ace/SString.h"
+	"ace/Malloc.h"
+	"ace/Malloc_T.h"
+	"ace/Task_T.h"
+	"ace/Local_Memory_Pool.h"
+	"ace/Time_Value.h"
+	"ace/OS_main.h"
+	"ace/OS_NS_sys_stat.h"
+	"ace/OS_NS_sys_socket.h"
+	"ace/OS_NS_unistd.h"
+	"ace/OS_NS_string.h"
+	"ace/High_Res_Timer.h"
+	"ace/INET_Addr.h"
+	"ace/Hash_Map_Manager.h"
+	<math.h>
+	<unistd.h>
+	<sys/time.h>
+	<sys/resource.h>
+	<vector>
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/PacketParse_Interface_WebSocket/PacketParse_Interface_WebSocket/WebSocketInfo.h
+	"define.h"
+	<map>
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/PacketParse_Interface_WebSocket/PacketParse_Interface_WebSocket/IMessageBlockManager.h
+	"define.h"
+	"ace/Message_Block.h"
+

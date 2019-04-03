@@ -24,6 +24,18 @@ public:
     CConsoleHandler(void);
     ~CConsoleHandler(void);
 
+    CConsoleHandler(const CConsoleHandler& ar);
+
+    CConsoleHandler& operator = (const CConsoleHandler& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
+
     //重写继承方法
     virtual int open(void*);                                                //用户建立一个链接
     virtual int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE);

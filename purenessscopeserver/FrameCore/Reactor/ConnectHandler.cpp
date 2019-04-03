@@ -46,6 +46,11 @@ CConnectHandler::CConnectHandler(void)
     m_u4LocalPort         = 0;
 }
 
+CConnectHandler::CConnectHandler(const CConnectHandler& ar)
+{
+    (*this) = ar;
+}
+
 CConnectHandler::~CConnectHandler(void)
 {
     this->closing_ = true;
@@ -1533,6 +1538,11 @@ CConnectManager::CConnectManager(void):m_mutex(), m_cond(m_mutex)
     m_SendMessagePool.Init();
 }
 
+CConnectManager::CConnectManager(const CConnectManager& ar) : CConnectManager()
+{
+    (*this) = ar;
+}
+
 CConnectManager::~CConnectManager(void)
 {
     OUR_DEBUG((LM_INFO, "[CConnectManager::~CConnectManager].\n"));
@@ -2216,6 +2226,11 @@ CConnectHandlerPool::CConnectHandlerPool(void)
     m_u4CurrMaxCount = 1;
 }
 
+CConnectHandlerPool::CConnectHandlerPool(const CConnectHandlerPool& ar)
+{
+    (*this) = ar;
+}
+
 CConnectHandlerPool::~CConnectHandlerPool(void)
 {
     OUR_DEBUG((LM_INFO, "[CConnectHandlerPool::~CConnectHandlerPool].\n"));
@@ -2314,6 +2329,11 @@ CConnectManagerGroup::CConnectManagerGroup()
     m_objConnnectManagerList = NULL;
     m_u4CurrMaxCount         = 0;
     m_u2ThreadQueueCount     = SENDQUEUECOUNT;
+}
+
+CConnectManagerGroup::CConnectManagerGroup(const CConnectManagerGroup& ar)
+{
+    (*this) = ar;
 }
 
 CConnectManagerGroup::~CConnectManagerGroup()

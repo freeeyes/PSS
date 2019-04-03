@@ -13,7 +13,21 @@ class CUnit_ProfileTime : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
+    CUnit_ProfileTime();
+
     virtual ~CUnit_ProfileTime();
+
+    CUnit_ProfileTime(const CUnit_ProfileTime& ar);
+
+    CUnit_ProfileTime& operator = (const CUnit_ProfileTime& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
 
     virtual void setUp(void);
 

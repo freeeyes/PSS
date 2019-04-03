@@ -2,58 +2,56 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{be4a353b-864b-4c78-a5d6-81417c877b8c}</UniqueIdentifier>
+      <UniqueIdentifier>{c3207d70-4331-4c63-af78-e26a5943da31}</UniqueIdentifier>
       <Extensions>cpp;cxx;cc;c;C</Extensions>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{932fe134-0564-4af4-bc78-43580d6831f5}</UniqueIdentifier>
+      <UniqueIdentifier>{1c94c99f-f18b-41fa-b748-66dbc91cc8f8}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hh</Extensions>
     </Filter>
     <Filter Include="Build Files">
-      <UniqueIdentifier>{07d1efe8-5afe-4a1b-8154-69ed6b228f1a}</UniqueIdentifier>
+      <UniqueIdentifier>{e758c90c-2a34-4f86-948d-b5b5baf09ddc}</UniqueIdentifier>
       <Extensions>mpc;mpb;mwc</Extensions>
+    </Filter>
+    <Filter Include="IniRead">
+      <UniqueIdentifier>{d57c00b4-b1e7-4ac1-908b-cde11bc465a5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BaseCommand.cpp">
+    <ClCompile Include="LGLogic\BaseCommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IniRead\dictionary.c">
+    <ClCompile Include="LGLogic\LGLogic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IniRead\iniparser.c">
+    <ClCompile Include="LGLogic\ListManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LGLogic.cpp">
+    <ClCompile Include="LGLogic\LSServerManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ListManager.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="LGLogic\IniRead\dictionary.c">
+      <Filter>IniRead</Filter>
     </ClCompile>
-    <ClCompile Include="LSServerManager.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="LGLogic\IniRead\iniparser.c">
+      <Filter>IniRead</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BaseCommand.h">
+    <ClInclude Include="LGLogic\BaseCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IniRead\dictionary.h">
+    <ClInclude Include="LGLogic\ListManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IniRead\iniparser.h">
+    <ClInclude Include="LGLogic\LSServerManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ListManager.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="LGLogic\IniRead\dictionary.h">
+      <Filter>IniRead</Filter>
     </ClInclude>
-    <ClInclude Include="LSServerManager.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="LGLogic\IniRead\iniparser.h">
+      <Filter>IniRead</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="LGLogic.mpc">
-      <Filter>Build Files</Filter>
-    </CustomBuild>
   </ItemGroup>
 </Project>

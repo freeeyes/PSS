@@ -1,59 +1,31 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{660044c3-25d1-4780-98a7-1930d47de2c9}</UniqueIdentifier>
-      <Extensions>cpp;cxx;cc;c;C</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{761e8eb2-07ee-4e23-a25f-7f75ba6c4c43}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hh</Extensions>
-    </Filter>
-    <Filter Include="Build Files">
-      <UniqueIdentifier>{6ca231d3-4144-40ae-96c0-a6525e59ee66}</UniqueIdentifier>
-      <Extensions>mpc;mpb;mwc</Extensions>
+    <Filter Include="IniRead">
+      <UniqueIdentifier>{71f7ee3a-9563-4030-9a55-3814bb480a71}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BaseCommand.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="LsPlugIn\IniRead\dictionary.c">
+      <Filter>IniRead</Filter>
     </ClCompile>
-    <ClCompile Include="IniRead\dictionary.c">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="LsPlugIn\IniRead\iniparser.c">
+      <Filter>IniRead</Filter>
     </ClCompile>
-    <ClCompile Include="IniRead\iniparser.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ListManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LSLogic.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MD5.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <ClCompile Include="LsPlugIn\BaseCommand.cpp" />
+    <ClCompile Include="LsPlugIn\ListManager.cpp" />
+    <ClCompile Include="LsPlugIn\LSLogic.cpp" />
+    <ClCompile Include="LsPlugIn\MD5.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BaseCommand.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="LsPlugIn\IniRead\dictionary.h">
+      <Filter>IniRead</Filter>
     </ClInclude>
-    <ClInclude Include="IniRead\dictionary.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="LsPlugIn\IniRead\iniparser.h">
+      <Filter>IniRead</Filter>
     </ClInclude>
-    <ClInclude Include="IniRead\iniparser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ListManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MD5.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="LSLogic.mpc">
-      <Filter>Build Files</Filter>
-    </CustomBuild>
+    <ClInclude Include="LsPlugIn\BaseCommand.h" />
+    <ClInclude Include="LsPlugIn\ListManager.h" />
+    <ClInclude Include="LsPlugIn\MD5.h" />
   </ItemGroup>
 </Project>

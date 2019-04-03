@@ -16,7 +16,21 @@ class CUnit_CommandAccount : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
+    CUnit_CommandAccount();
+
     virtual ~CUnit_CommandAccount();
+
+    CUnit_CommandAccount(const CUnit_CommandAccount& ar);
+
+    CUnit_CommandAccount& operator = (const CUnit_CommandAccount& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
 
     virtual void setUp(void);
 

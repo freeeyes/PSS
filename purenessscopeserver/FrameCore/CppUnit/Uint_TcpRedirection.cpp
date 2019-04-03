@@ -2,9 +2,18 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_Redirection::~CUnit_Redirection()
+CUnit_Redirection::CUnit_Redirection()
 {
     m_pTcpRedirection = NULL;
+}
+
+CUnit_Redirection::CUnit_Redirection(const CUnit_Redirection& ar)
+{
+    (*this) = ar;
+}
+
+CUnit_Redirection::~CUnit_Redirection()
+{
 }
 
 void CUnit_Redirection::setUp(void)

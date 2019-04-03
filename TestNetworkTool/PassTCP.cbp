@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="PassTCP" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Release x64">
+				<Option output="../Build/Prj_CodeBlocks/Linux_Bin/PassTCP" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../Build/Prj_CodeBlocks/Temp/" />
+				<Option deps_output="../Build/Prj_CodeBlocks/Linux_Bin/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O1" />
+					<Add option="-Wall" />
+					<Add option="`wx-config --cflags`" />
+					<Add option="-D_LINUX_PLATFORM_" />
+					<Add directory="../ThirdLib/include/" />
+					<Add directory="../ThirdLib/include/Lua/" />
+					<Add directory="../ThirdLib/thirdparty/" />
+					<Add directory="../ThirdLib/thirdparty/LuaLib/" />
+					<Add directory="../ThirdLib/include/TinyXML/" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="`wx-config --libs`" />
+					<Add directory="$(WXWIN)/lib/vc_x64_lib/" />
+				</Linker>
+			</Target>
+		</Build>
+		<Unit filename="../ThirdLib/include/Lua/LuaDefine.h" />
+		<Unit filename="../ThirdLib/include/Lua/LuaFn.cpp" />
+		<Unit filename="../ThirdLib/include/Lua/LuaFn.h" />
+		<Unit filename="../ThirdLib/include/Lua/LuaFnRegister.h" />
+		<Unit filename="../ThirdLib/include/Lua/LuaFn_Tcp.h" />
+		<Unit filename="../ThirdLib/include/Lua/ParamData.h" />
+		<Unit filename="../ThirdLib/include/TinyXML/tinystr.cpp" />
+		<Unit filename="../ThirdLib/include/TinyXML/tinystr.h" />
+		<Unit filename="../ThirdLib/include/TinyXML/tinyxml.cpp" />
+		<Unit filename="../ThirdLib/include/TinyXML/tinyxml.h" />
+		<Unit filename="../ThirdLib/include/TinyXML/tinyxmlerror.cpp" />
+		<Unit filename="../ThirdLib/include/TinyXML/tinyxmlparser.cpp" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lapi.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lapi.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lauxlib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lauxlib.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lbaselib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lcode.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lcode.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/ldblib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/ldebug.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/ldebug.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/ldo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/ldo.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/ldump.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lfunc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lfunc.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lgc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lgc.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/linit.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/liolib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/llex.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/llex.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/llimits.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lmathlib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lmem.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lmem.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/loadlib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lobject.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lobject.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lopcodes.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lopcodes.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/loslib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lparser.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lparser.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lstate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lstate.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lstring.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lstring.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lstrlib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/ltable.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/ltable.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/ltablib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/ltm.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/ltm.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lua.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/luaconf.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lualib.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lundump.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lundump.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lvm.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lvm.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lzio.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/lzio.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/print.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/tolua++.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/tolua_event.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/tolua_event.h" />
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/tolua_is.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/tolua_map.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/tolua_push.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/tolua_to.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/toluabind.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ThirdLib/thirdparty/LuaLib/toluabind.h" />
+		<Unit filename="../ThirdLib/thirdparty/sock_wrap.cpp" />
+		<Unit filename="../ThirdLib/thirdparty/sock_wrap.h" />
+		<Unit filename="PassTCP/ClientTcpSocket.cpp" />
+		<Unit filename="PassTCP/ClientTcpSocket.h" />
+		<Unit filename="PassTCP/ClientUdpSocket.cpp" />
+		<Unit filename="PassTCP/ClientUdpSocket.h" />
+		<Unit filename="PassTCP/PacketDlg.cpp" />
+		<Unit filename="PassTCP/PacketDlg.h" />
+		<Unit filename="PassTCP/PassTCPApp.cpp" />
+		<Unit filename="PassTCP/PassTCPApp.h" />
+		<Unit filename="PassTCP/PassTCPDlg.cpp" />
+		<Unit filename="PassTCP/PassTCPDlg.h" />
+		<Unit filename="PassTCP/define.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

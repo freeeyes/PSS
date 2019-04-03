@@ -19,6 +19,21 @@ class CUnit_Basehandler : public CppUnit::TestFixture
     CPPUNIT_TEST(Test_Tcp_Common_Make_Send_Packet);
     CPPUNIT_TEST_SUITE_END();
 public:
+    CUnit_Basehandler();
+
+    virtual ~CUnit_Basehandler();
+
+    CUnit_Basehandler(const CUnit_Basehandler& ar);
+
+    CUnit_Basehandler& operator = (const CUnit_Basehandler& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
 
     virtual void setUp(void);
 

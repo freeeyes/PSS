@@ -15,6 +15,18 @@ public:
     CPacketParsePool();
     ~CPacketParsePool();
 
+    CPacketParsePool(const CPacketParsePool& ar);
+
+    CPacketParsePool& operator = (const CPacketParsePool& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
+
     static void Init_Callback(int nIndex, CPacketParse* pPacketParse);
     void Close();
 

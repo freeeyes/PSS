@@ -1,37 +1,54 @@
-#ifndef _TESTCASE_H
+ï»¿#ifndef _TESTCASE_H
 #define _TESTCASE_H
 
-#include "commons.h"
-#include "pthread.h"
+#include <vector>
+#include <thread> 
+#include <mutex>
+#include <stdio.h>  
+#include <stdlib.h>  
 
-//²âÊÔµ¥¸öÊı¾İ°üÊÕ·¢Çé¿ö
+#include <string.h>  
+#include <errno.h>  
+#include <assert.h>  
+#include <time.h>
+
+//#include "pthread.h"
+
+
+#include "commons.h"
+#include "sock_wrap.h"
+
+
+
+
+//Â²Ã¢ÃŠÃ”ÂµÂ¥Â¸Ã¶ÃŠÃ½Â¾ÃÂ°Ã¼ÃŠÃ•Â·Â¢Ã‡Ã©Â¿Ã¶
 bool CheckTcpPacket(_ClientInfo& objClientInfo, _ResultInfo& objResultInfo);
 
-//²âÊÔ¶à¸öÊı¾İ°üÊÕ·¢Çé¿ö
+//Â²Ã¢ÃŠÃ”Â¶Ã Â¸Ã¶ÃŠÃ½Â¾ÃÂ°Ã¼ÃŠÃ•Â·Â¢Ã‡Ã©Â¿Ã¶
 bool CheckMultipleTcpPacket(int nCount, _ClientInfo& objClientInfo, _ResultInfo& objResultInfo);
 
-//²âÊÔ¶à¸öÁ¬½ÓÊÕ·¢°üÇé¿ö
+//Â²Ã¢ÃŠÃ”Â¶Ã Â¸Ã¶ÃÂ¬Â½Ã“ÃŠÃ•Â·Â¢Â°Ã¼Ã‡Ã©Â¿Ã¶
 bool CheckMultipleTcpConnect(int nCount, _ClientInfo& objClientInfo, _ResultInfo& objResultInfo);
 
-//²âÊÔ·Ç·¨Êı¾İ°üÍ·µÄÎÊÌâ
+//Â²Ã¢ÃŠÃ”Â·Ã‡Â·Â¨ÃŠÃ½Â¾ÃÂ°Ã¼ÃÂ·ÂµÃ„ÃÃŠÃŒÃ¢
 bool CheckTcpErrorPacketHead(_ClientInfo& objClientInfo, _ResultInfo& objResultInfo);
 
-//²âÊÔÊı¾İÕ³°ü
+//Â²Ã¢ÃŠÃ”ÃŠÃ½Â¾ÃÃ•Â³Â°Ã¼
 bool CheckTcpHalfPacket(_ClientInfo& objClientInfo, _ResultInfo& objResultInfo);
 
-//¶àÏß³Ì²âÊÔÁ¬½Ó
+//Â¶Ã ÃÃŸÂ³ÃŒÂ²Ã¢ÃŠÃ”ÃÂ¬Â½Ã“
 bool Thread_CheckTcpPacket(_ClientInfo& objClientInfo, _ResultInfo& objResultInfo);
 
-//²âÊÔ¶àÏß³Ì²¢·¢
+//Â²Ã¢ÃŠÃ”Â¶Ã ÃÃŸÂ³ÃŒÂ²Â¢Â·Â¢
 bool CheckTcpMulipleThreadPacket(int nCount, _ClientInfo& objClientInfo, _ResultInfo& objResultInfo);
 
-//²âÊÔUDP°ü·¢ËÍ
+//Â²Ã¢ÃŠÃ”UDPÂ°Ã¼Â·Â¢Ã‹Ã
 bool Thread_CheckUdpPacket(_ClientInfo& objClientInfo, _ResultInfo& objResultInfo, _ResultInfo& objRecvResultInfo);
 
-//²âÊÔUDP°ü½ÓÊÕ
+//Â²Ã¢ÃŠÃ”UDPÂ°Ã¼Â½Ã“ÃŠÃ•
 bool Thread_CheckUdpPacket_Recv(_ClientInfo& objClientInfo, _ResultInfo& objResultInfo);
 
-//²âÊÔConsoleÁ¬½Ó
+//Â²Ã¢ÃŠÃ”ConsoleÃÂ¬Â½Ã“
 bool CheckConsolePacket(_ResultInfo& objResultInfo);
 
 #endif

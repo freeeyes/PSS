@@ -13,7 +13,21 @@ class CUnit_AceReactorManager : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
+    CUnit_AceReactorManager();
+
     virtual ~CUnit_AceReactorManager();
+
+    CUnit_AceReactorManager(const CUnit_AceReactorManager& ar);
+
+    CUnit_AceReactorManager& operator = (const CUnit_AceReactorManager& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
 
     virtual void setUp(void);
 

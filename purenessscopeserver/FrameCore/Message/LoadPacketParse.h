@@ -50,6 +50,18 @@ public:
     CLoadPacketParse();
     ~CLoadPacketParse();
 
+    CLoadPacketParse(const CLoadPacketParse& ar);
+
+    CLoadPacketParse& operator = (const CLoadPacketParse& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
+
     void Init(int nCount);
 
     bool LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint32 u4HeadLen, const char* pPacketParsePath, const char* szPacketParseName);

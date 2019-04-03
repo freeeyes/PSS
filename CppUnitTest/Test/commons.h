@@ -1,18 +1,69 @@
-#ifndef _COMMON_H
+ï»¿#ifndef _COMMON_H
 #define _COMMON_H
 
 #include <stdio.h>  
 #include <stdlib.h>  
-#include <unistd.h>  
+
 #include <string.h>  
 #include <errno.h>  
 #include <assert.h>  
+#include <time.h>
+
+#if defined(_WIN32_PLATFORM_)
+#include <winsock2.h>
+#pragma comment(lib,"ws2_32.lib") 
+
+
+static int gettimeofday(struct timeval *tp, void *tzp)
+{
+	time_t clock;
+	struct tm tm;
+	SYSTEMTIME wtm;
+	GetLocalTime(&wtm);
+	tm.tm_year = wtm.wYear - 1900;
+	tm.tm_mon = wtm.wMonth - 1;
+	tm.tm_mday = wtm.wDay;
+	tm.tm_hour = wtm.wHour;
+	tm.tm_min = wtm.wMinute;
+	tm.tm_sec = wtm.wSecond;
+	tm.tm_isdst = -1;
+	clock = mktime(&tm);
+	tp->tv_sec = clock;
+	tp->tv_usec = wtm.wMilliseconds * 1000;
+	return (0);
+}
+
+
+
+
+#endif
+
+#if defined(_LINUX_PLATFORM_)
+#include <unistd.h>  
+#include <sys/time.h>
+#include <linux/errno.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <time.h>
+#define timelong_t struct timeval
+
 #include <fcntl.h>  
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <sys/types.h>
 #include <arpa/inet.h>
 #include <sys/time.h> 
+
+
+#endif
+
+
+
+
+
+
+
 
 #define MAX_BUFF_200  200
 #define MAX_BUFF_300  300
@@ -39,7 +90,7 @@
 
 #define HTML_NAME "../../testresult/result.md"
 
-//²âÊÔÊı¾İ¼¯
+//Â²Ã¢ÃŠÃ”ÃŠÃ½Â¾ÃÂ¼Â¯
 struct _ClientInfo
 {
 	char  m_szServerIP[30];
@@ -58,13 +109,13 @@ struct _ClientInfo
 	}
 };
 
-//Êä³ö½á¹û¼¯
+//ÃŠÃ¤Â³Ã¶Â½Ã¡Â¹Ã»Â¼Â¯
 struct _ResultInfo
 {
-	char  m_szTestName[MAX_BUFF_300];     //²âÊÔ¼¯Ãû³Æ
-	char  m_szResult[MAX_BUFF_1024];      //²âÊÔ½á¹ûÃèÊö 
-	int   m_nRet;                         //²âÊÔ½á¹û 0 ³É¹¦ 1 Ê§°Ü
-	float m_fMilliseconds;                //ÏûºÄÊ±¼ä      
+	char  m_szTestName[MAX_BUFF_300];     //Â²Ã¢ÃŠÃ”Â¼Â¯ÃƒÃ»Â³Ã†
+	char  m_szResult[MAX_BUFF_1024];      //Â²Ã¢ÃŠÃ”Â½Ã¡Â¹Ã»ÃƒÃ¨ÃŠÃ¶ 
+	int   m_nRet;                         //Â²Ã¢ÃŠÃ”Â½Ã¡Â¹Ã» 0 Â³Ã‰Â¹Â¦ 1 ÃŠÂ§Â°Ãœ
+	float m_fMilliseconds;                //ÃÃ»ÂºÃ„ÃŠÂ±Â¼Ã¤      
 	
 	_ResultInfo()
 	{
@@ -95,18 +146,17 @@ struct _ResultInfo
 	}
 };
 
-//¶àÏß³Ì²âÊÔ²ÎÊı
+//Â¶Ã ÃÃŸÂ³ÃŒÂ²Ã¢ÃŠÃ”Â²ÃÃŠÃ½
 struct _ThreadParam
 {
 	_ClientInfo*       m_pClientInfo;
 	_ResultInfo*       m_pResultInfo;
-	pthread_barrier_t* m_Barrier;
-	
+
 	_ThreadParam()
 	{
 		m_pClientInfo = NULL;
 		m_pResultInfo = NULL;
-		m_Barrier     = NULL;
+
 	}
 };
 

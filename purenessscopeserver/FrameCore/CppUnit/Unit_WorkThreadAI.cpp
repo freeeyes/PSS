@@ -2,9 +2,18 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_WorkThreadAI::~CUnit_WorkThreadAI()
+CUnit_WorkThreadAI::CUnit_WorkThreadAI()
 {
     m_pWorkThreadAI = NULL;
+}
+
+CUnit_WorkThreadAI::CUnit_WorkThreadAI(const CUnit_WorkThreadAI& ar)
+{
+    (*this) = ar;
+}
+
+CUnit_WorkThreadAI::~CUnit_WorkThreadAI()
+{
 }
 
 void CUnit_WorkThreadAI::setUp(void)

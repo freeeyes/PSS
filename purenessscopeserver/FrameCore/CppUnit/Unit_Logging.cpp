@@ -2,9 +2,18 @@
 
 #ifdef _CPPUNIT_TEST
 
+CUnit_Frame_Logging::CUnit_Frame_Logging()
+{
+    m_pFrameLoggingStrategy = NULL;
+}
+
+CUnit_Frame_Logging::CUnit_Frame_Logging(const CUnit_Frame_Logging& ar)
+{
+    (*this) = ar;
+}
+
 CUnit_Frame_Logging::~CUnit_Frame_Logging()
 {
-
 }
 
 void CUnit_Frame_Logging::setUp(void)

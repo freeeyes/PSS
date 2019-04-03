@@ -1,10 +1,26 @@
-#ifndef _DEFINE_H
+ï»¿#ifndef _DEFINE_H
 #define _DEFINE_H
 
+#if defined(_WIN32_PLATFORM_)
 #include <WinSock2.h>
+#include <ws2tcpip.h>
+#include <windows.h>
+#pragma comment(lib,"ws2_32.lib") 
+
+#else
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <stdlib.h>
+#include <netinet/in.h>
+#include <errno.h>
+#include <string.h>
+#endif
+#include <stdio.h>
 #include <time.h>
 #include <string>
 #include <vector>
+#include <cstring>
 
 using namespace std;
 
@@ -14,830 +30,854 @@ using namespace std;
 
 #define MAX_RANDOM_PACKET 5*1024
 
-//×Ö·û´®Ìæ»»º¯Êı
-inline void string_replace( string&s1,const string&s2,const string&s3 )
-{	
-	string::size_type pos = 0;
-	string::size_type a = s2.size();
-	string::size_type b = s3.size();
-	while((pos=s1.find(s2,pos))!=string::npos)
-	{
-		s1.replace(pos,a,s3);
-		pos += b;
-	}
+//å­—ç¬¦ä¸²æ›¿æ¢å‡½æ•°
+inline void string_replace( string& s1,const string& s2,const string& s3 )
+{
+    string::size_type pos = 0;
+    string::size_type a = s2.size();
+    string::size_type b = s3.size();
+
+    while((pos=s1.find(s2,pos))!=string::npos)
+    {
+        s1.replace(pos,a,s3);
+        pos += b;
+    }
 }
 
-//Ëæ»úÊı¾İ°üĞÅÏ¢
+//éšæœºæ•°æ®åŒ…ä¿¡æ¯
 struct _RandomPacketInfo
 {
-	char szPacket[MAX_RANDOM_PACKET];   //±£´æËæ»úÊı¾İ°ü
-	int nLen;                           //Ëæ»úÊı¾İ°ü³¤¶È
-	int nType;                          //Êı¾İÀàĞÍ£¬Ä¬ÈÏÊÇÎÄ±¾£¬ÎÄ±¾1£¬¶ş½øÖÆ2
-	int nRecdvLength;                   //½ÓÊÕ×Ö·û´®µÄ³¤¶È  
+    char szPacket[MAX_RANDOM_PACKET];   //ä¿å­˜éšæœºæ•°æ®åŒ…
+    int nLen;                           //éšæœºæ•°æ®åŒ…é•¿åº¦
+    int nType;                          //æ•°æ®ç±»å‹ï¼Œé»˜è®¤æ˜¯æ–‡æœ¬ï¼Œæ–‡æœ¬1ï¼ŒäºŒè¿›åˆ¶2
+    int nRecdvLength;                   //æ¥æ”¶å­—ç¬¦ä¸²çš„é•¿åº¦
 
-	_RandomPacketInfo()
-	{
-		szPacket[0]  = '\0';
-		nLen         = 0;
-		nType        = 1;
-		nRecdvLength = 0;
-	}
+    _RandomPacketInfo()
+    {
+        szPacket[0]  = '\0';
+        nLen         = 0;
+        nType        = 1;
+        nRecdvLength = 0;
+    }
 };
 
-//±£´æËæ»úÊı¾İ°üĞòÁĞ
+//ä¿å­˜éšæœºæ•°æ®åŒ…åºåˆ—
 typedef vector<_RandomPacketInfo> vecRandomPacketInfo;
 
-//ÉèÖÃÒ»¸öËæ»úÖÖ×Ó
+//è®¾ç½®ä¸€ä¸ªéšæœºç§å­
 inline void InitRandom()
 {
-	srand((int)time(NULL));
+    srand((int)time(NULL));
 };
 
-//´ÓÒ»¸öÖµÓòÖĞ»ñÈ¡Ò»¸öËæ»úÖµ
+//ä»ä¸€ä¸ªå€¼åŸŸä¸­è·å–ä¸€ä¸ªéšæœºå€¼
 inline int RandomValue(int nMin, int nMax)
 {
-	return  nMin + (int) ((nMax - nMin) * (rand() / (RAND_MAX + 1.0)));
+    return  nMin + (int) ((nMax - nMin) * (rand() / (RAND_MAX + 1.0)));
 };
 
-//WebSocket¼ÓÃÜËã·¨
+//WebSocketåŠ å¯†ç®—æ³•
 inline void WebSocketSendData(const char* pData, int nLen, char* pSendData, int& nSendLen)
 {
-	//Ä¿Ç°Õâ¸öº¯ÊıÖ»Ö§³ÖĞ¡ÓÚ64KµÄÊı¾İ°ü
-	char szMark[4]  = {'\0'};
-	int nPos = 0;
+    //ç›®å‰è¿™ä¸ªå‡½æ•°åªæ”¯æŒå°äº64Kçš„æ•°æ®åŒ…
+    char szMark[4]  = {'\0'};
+    int nPos = 0;
 
-	if(nSendLen < nLen + 8)
-	{
-		//»º³å³¤¶È²»¹»
-		return;
-	}
+    if(nSendLen < nLen + 8)
+    {
+        //ç¼“å†²é•¿åº¦ä¸å¤Ÿ
+        return;
+    }
 
-	if(nLen <= 125) 
-	{
-		pSendData[nPos] = -127;
-		nPos++;
+    if(nLen <= 125)
+    {
+        pSendData[nPos] = -127;
+        nPos++;
 
-		//·¢ËÍÊı×Ö³¤¶È
-		pSendData[nPos] =  (char)(nLen & 0x7F);
-		nPos++;
+        //å‘é€æ•°å­—é•¿åº¦
+        pSendData[nPos] =  (char)(nLen & 0x7F);
+        nPos++;
 
-		//4×Ö½ÚµÄmark
-		memcpy_s((char* )szMark, 4, &nLen, 4);
-		memcpy_s((char* )&pSendData[nPos], 4, szMark, 4);
-		nPos += 4;
+        //4å­—èŠ‚çš„mark
+        memcpy((char* )szMark,  &nLen, 4);
+        memcpy((char* )&pSendData[nPos],  szMark, 4);
+        nPos += 4;
 
-		//°´Î»¼ÓÃÜ
-		for(int i = 0; i < nLen; i++)
-		{
-			char szTemp = pData[i] ^ (szMark[i % 4]);
-			pSendData[nPos] = szTemp;
-			nPos++;
-		}
-	}
-	else
-	{
-		pSendData[nPos] = -127;
-		nPos++;
+        //æŒ‰ä½åŠ å¯†
+        for(int i = 0; i < nLen; i++)
+        {
+            char szTemp = pData[i] ^ (szMark[i % 4]);
+            pSendData[nPos] = szTemp;
+            nPos++;
+        }
+    }
+    else
+    {
+        pSendData[nPos] = -127;
+        nPos++;
 
-		//·¢ËÍÊı×Ö³¤¶È
-		pSendData[nPos] =  126;
-		nPos++;
+        //å‘é€æ•°å­—é•¿åº¦
+        pSendData[nPos] =  126;
+        nPos++;
 
-		//Êı¾İÊµ¼Ê³¤¶È¡£×î´ó65535
-		//×ª»»³ÉÍøÂç×ÖĞò
-		short sDataLen = htons((short)nLen);
-		memcpy_s((char* )&pSendData[nPos], 2, (char* )&sDataLen, 2);
-		nPos += 2;
+        //æ•°æ®å®é™…é•¿åº¦ã€‚æœ€å¤§65535
+        //è½¬æ¢æˆç½‘ç»œå­—åº
+       // u_short sDataLen = ::htons((u_short)nLen);
+		u_short sDataLen = 10;
+        memcpy((char* )&pSendData[nPos],  (char* )&sDataLen, 2);
+        nPos += 2;
 
-		//4×Ö½ÚµÄmark
-		memcpy_s((char* )szMark, 4, &nLen, 4);
-		memcpy_s((char* )&pSendData[nPos], 4, szMark, 4);
-		nPos += 4;
+        //4å­—èŠ‚çš„mark
+        memcpy((char* )szMark,  &nLen, 4);
+        memcpy((char* )&pSendData[nPos],  szMark, 4);
+        nPos += 4;
 
-		//°´Î»¼ÓÃÜ
-		for(int i = 0; i < nLen; i++)
-		{
-			char szTemp = pData[i] ^ (szMark[i % 4]);
-			pSendData[nPos] = szTemp;
-			nPos++;
-		}
-	}
+        //æŒ‰ä½åŠ å¯†
+        for(int i = 0; i < nLen; i++)
+        {
+            char szTemp = pData[i] ^ (szMark[i % 4]);
+            pSendData[nPos] = szTemp;
+            nPos++;
+        }
+    }
 
 
-	nSendLen = nPos;
+    nSendLen = nPos;
 }
 
-//ÀàĞÍ
+//ç±»å‹
 enum ENUM_TYPE_PROTOCOL
 {
-	ENUM_PROTOCOL_TCP = 0,
-	ENUM_PROTOCOL_UDP,
-	ENUM_PROTOCOL_WEBSOCKET,
+    ENUM_PROTOCOL_TCP = 0,
+    ENUM_PROTOCOL_UDP,
+    ENUM_PROTOCOL_WEBSOCKET,
 };
 
-//¶ş½øÖÆºÍ×Ö·û´®Ïà»¥×ª»»Àà
+//äºŒè¿›åˆ¶å’Œå­—ç¬¦ä¸²ç›¸äº’è½¬æ¢ç±»
 class CConvertBuffer
 {
 public:
-	CConvertBuffer() {};
-	~CConvertBuffer() {};
-	int GetBufferSize(const char* pData, int nSrcLen)
-	{
-		char szData[3] = {'\0'};
-		int nPos         = 0;
-		int nCurrSize    = 0;
-		int nConvertSize = 0;
-		bool blState     = false;   //×ª»»ºóµÄ×Ö·û´®ÊÇ·ñÓĞĞ§
-		bool blSrcState  = true;    //Ôª×Ö·û´®ÊÇ·ñÓĞĞ§
-		unsigned char cData;
+    CConvertBuffer() {};
+    ~CConvertBuffer() {};
+    int GetBufferSize(const char* pData, int nSrcLen)
+    {
+        char szData[3] = {'\0'};
+        int nPos         = 0;
+        int nCurrSize    = 0;
+        int nConvertSize = 0;
+        bool blState     = false;   //è½¬æ¢åçš„å­—ç¬¦ä¸²æ˜¯å¦æœ‰æ•ˆ
+        bool blSrcState  = true;    //å…ƒå­—ç¬¦ä¸²æ˜¯å¦æœ‰æ•ˆ
+        unsigned char cData;
 
-		while(nPos < nSrcLen)
-		{
-			if(pData[nPos] == '\r' || pData[nPos] == '\n' || pData[nPos] == ' ' || nPos == nSrcLen - 1)
-			{
-				if(nPos == nSrcLen - 1)
-				{
-					szData[nCurrSize++] = pData[nPos];
-				}
+        while(nPos < nSrcLen)
+        {
+            if(pData[nPos] == '\r' || pData[nPos] == '\n' || pData[nPos] == ' ' || nPos == nSrcLen - 1)
+            {
+                if(nPos == nSrcLen - 1)
+                {
+                    szData[nCurrSize++] = pData[nPos];
+                }
 
-				szData[nCurrSize] = '\0';
-				if(blSrcState == true)
-				{
-					blState = ConvertStr2char(szData, cData);
-					if(blState == true)
-					{
-						nConvertSize++;
-					}
-				}
-				nCurrSize  = 0;
-				blSrcState = true;
-				nPos++;
-			}
-			else
-			{
-				if(nCurrSize < 2)
-				{
-					szData[nCurrSize++] = pData[nPos];
-				}
-				else
-				{
-					blSrcState = false;
-				}
-				nPos++;
-			}
-		}
+                szData[nCurrSize] = '\0';
 
-		return nConvertSize;
-	};
+                if(blSrcState == true)
+                {
+                    blState = ConvertStr2char(szData, cData);
 
-	bool Convertstr2charArray(const char* pData, int nSrcLen, unsigned char* pDes, int& nMaxLen)
-	{
-		char szData[3] = {'\0'};
-		int nPos         = 0;
-		int nCurrSize    = 0;
-		int nConvertSize = 0;
-		bool blState     = false;   //×ª»»ºóµÄ×Ö·û´®ÊÇ·ñÓĞĞ§
-		bool blSrcState  = true;    //Ôª×Ö·û´®ÊÇ·ñÓĞĞ§
+                    if(blState == true)
+                    {
+                        nConvertSize++;
+                    }
+                }
 
-		while(nPos < nSrcLen)
-		{
-			if(pData[nPos] == '\r' || pData[nPos] == '\n' || pData[nPos] == ' ' || nPos == nSrcLen - 1)
-			{
-				if(nPos == nSrcLen - 1)
-				{
-					szData[nCurrSize++] = pData[nPos];
-				}
+                nCurrSize  = 0;
+                blSrcState = true;
+                nPos++;
+            }
+            else
+            {
+                if(nCurrSize < 2)
+                {
+                    szData[nCurrSize++] = pData[nPos];
+                }
+                else
+                {
+                    blSrcState = false;
+                }
 
-				szData[nCurrSize] = '\0';
-				if(nConvertSize < nMaxLen && blSrcState == true)
-				{
-					blState = ConvertStr2char(szData, pDes[nConvertSize]);
-					if(blState == true)
-					{
-						nConvertSize++;
-					}
-				}
-				nCurrSize  = 0;
-				blSrcState = true;
-				nPos++;
-			}
-			else
-			{
-				if(nCurrSize < 2)
-				{
-					szData[nCurrSize++] = pData[nPos];
-				}
-				else
-				{
-					blSrcState = false;
-				}
-				nPos++;
-			}
-		}
+                nPos++;
+            }
+        }
 
-		nMaxLen = nConvertSize;
-		return true;
-	};
+        return nConvertSize;
+    };
+
+    bool Convertstr2charArray(const char* pData, int nSrcLen, unsigned char* pDes, int& nMaxLen)
+    {
+        char szData[3] = {'\0'};
+        int nPos         = 0;
+        int nCurrSize    = 0;
+        int nConvertSize = 0;
+        bool blState     = false;   //è½¬æ¢åçš„å­—ç¬¦ä¸²æ˜¯å¦æœ‰æ•ˆ
+        bool blSrcState  = true;    //å…ƒå­—ç¬¦ä¸²æ˜¯å¦æœ‰æ•ˆ
+
+        while(nPos < nSrcLen)
+        {
+            if(pData[nPos] == '\r' || pData[nPos] == '\n' || pData[nPos] == ' ' || nPos == nSrcLen - 1)
+            {
+                if(nPos == nSrcLen - 1)
+                {
+                    szData[nCurrSize++] = pData[nPos];
+                }
+
+                szData[nCurrSize] = '\0';
+
+                if(nConvertSize < nMaxLen && blSrcState == true)
+                {
+                    blState = ConvertStr2char(szData, pDes[nConvertSize]);
+
+                    if(blState == true)
+                    {
+                        nConvertSize++;
+                    }
+                }
+
+                nCurrSize  = 0;
+                blSrcState = true;
+                nPos++;
+            }
+            else
+            {
+                if(nCurrSize < 2)
+                {
+                    szData[nCurrSize++] = pData[nPos];
+                }
+                else
+                {
+                    blSrcState = false;
+                }
+
+                nPos++;
+            }
+        }
+
+        nMaxLen = nConvertSize;
+        return true;
+    };
 private:
-	bool Get_binary_Char(unsigned char cTag, unsigned char& cDes)
-	{
-		if(cTag >='A'&&  cTag <='F')
-		{
-			cDes = cTag - 'A' + 10;
-			return true;
-		}
-		else if(cTag >='a'&&  cTag <='f')
-		{
-			cDes = cTag - 'a' + 10;
-			return true; 
-		}
-		else if(cTag >= '0'&& cTag<= '9')
-		{
-			cDes = cTag-'0';
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
+    bool Get_binary_Char(unsigned char cTag, unsigned char& cDes)
+    {
+        if(cTag >='A'&&  cTag <='F')
+        {
+            cDes = cTag - 'A' + 10;
+            return true;
+        }
+        else if(cTag >='a'&&  cTag <='f')
+        {
+            cDes = cTag - 'a' + 10;
+            return true;
+        }
+        else if(cTag >= '0'&& cTag<= '9')
+        {
+            cDes = cTag-'0';
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
-	bool ConvertStr2char(const char* pData, unsigned char& cData)
-	{
-		if(pData == NULL || strlen(pData) != 2)
-		{
-			return false;
-		}
+    bool ConvertStr2char(const char* pData, unsigned char& cData)
+    {
+        if(pData == NULL || strlen(pData) != 2)
+        {
+            return false;
+        }
 
-		char cFirst = pData[1];
-		unsigned char cTemp = 0;
-		bool blStste = Get_binary_Char(cFirst, cTemp);
-		if(false == blStste)
-		{
-			return false;
-		}
-		cData = cTemp;
-		char cSecond = pData[0];
-		blStste  = Get_binary_Char(cSecond, cTemp);
-		if(false == blStste)
-		{
-			return false;
-		}
-		cTemp = cTemp << 4;
-		cData = cData | cTemp;
+        char cFirst = pData[1];
+        unsigned char cTemp = 0;
+        bool blStste = Get_binary_Char(cFirst, cTemp);
 
-		return true;
-	}
+        if(false == blStste)
+        {
+            return false;
+        }
+
+        cData = cTemp;
+        char cSecond = pData[0];
+        blStste  = Get_binary_Char(cSecond, cTemp);
+
+        if(false == blStste)
+        {
+            return false;
+        }
+
+        cTemp = cTemp << 4;
+        cData = cData | cTemp;
+
+        return true;
+    }
 };
 
 enum EM_DATA_RETURN_STATE
 {
-	DATA_RETURN_STATE_SUCCESS = 0,
-	DATA_RETURN_STATE_ERROR,
-	DATA_RETURN_STATE_CONTINUE,
+    DATA_RETURN_STATE_SUCCESS = 0,
+    DATA_RETURN_STATE_ERROR,
+    DATA_RETURN_STATE_CONTINUE,
 };
 
-//ÉùÃ÷Ò»¸ö»ùÀà£¬À´¸ºÔğ¸ñÊ½»¯Êı¾İ·¢ËÍºÍ½ÓÊÕµÄ²¿·ÖÂß¼­
+//å£°æ˜ä¸€ä¸ªåŸºç±»ï¼Œæ¥è´Ÿè´£æ ¼å¼åŒ–æ•°æ®å‘é€å’Œæ¥æ”¶çš„éƒ¨åˆ†é€»è¾‘
 class CBaseDataLogic
 {
 public:
-	CBaseDataLogic()
-	{
-		m_blRandomPacket = false;
-		m_nClassTye      = 1;
-	}
+    CBaseDataLogic()
+    {
+        m_blRandomPacket = false;
+        m_nClassTye      = 1;
+    }
 
-	void ClearRandomPacket()
-	{
-		m_vecRandomPacketInfo.clear();
-	}
+    void ClearRandomPacket()
+    {
+        m_vecRandomPacketInfo.clear();
+    }
 
-	void DeleteRandomPacket(int nIndex)
-	{
-		if(nIndex >= 0 && nIndex < (int)m_vecRandomPacketInfo.size())
-		{
-			int nPos = 0;
-			//É¾³ıÖ¸¶¨Êı¾İ
-			for(vecRandomPacketInfo::iterator b = m_vecRandomPacketInfo.begin();b != m_vecRandomPacketInfo.end(); b++)
-			{
-				if(nIndex == nPos)
-				{
-					m_vecRandomPacketInfo.erase(b);
-					break;
-				}
-			}
-		}
-	}
+    void DeleteRandomPacket(int nIndex)
+    {
+        if(nIndex >= 0 && nIndex < (int)m_vecRandomPacketInfo.size())
+        {
+            int nPos = 0;
 
-	//Ëæ»ú°üÖ¸Áî¼¯
-	bool InsertRandomPacket(const char* pData, int nLen, int nRecvLength, int nType)
-	{
-		_RandomPacketInfo objRandomPacketInfo;
+            //åˆ é™¤æŒ‡å®šæ•°æ®
+            for(vecRandomPacketInfo::iterator b = m_vecRandomPacketInfo.begin(); b != m_vecRandomPacketInfo.end(); b++)
+            {
+                if(nIndex == nPos)
+                {
+                    m_vecRandomPacketInfo.erase(b);
+                    break;
+                }
+            }
+        }
+    }
 
-		if(nLen >= MAX_RANDOM_PACKET || nLen <= 0)
-		{
-			return false;
-		}
+    //éšæœºåŒ…æŒ‡ä»¤é›†
+    bool InsertRandomPacket(const char* pData, int nLen, int nRecvLength, int nType)
+    {
+        _RandomPacketInfo objRandomPacketInfo;
 
-		memcpy_s(objRandomPacketInfo.szPacket, nLen, pData, nLen);
-		objRandomPacketInfo.szPacket[nLen] = '\0';
-		objRandomPacketInfo.nLen           = nLen;
-		objRandomPacketInfo.nRecdvLength   = nRecvLength;
-		objRandomPacketInfo.nType          = nType;
+        if(nLen >= MAX_RANDOM_PACKET || nLen <= 0)
+        {
+            return false;
+        }
 
-		m_vecRandomPacketInfo.push_back(objRandomPacketInfo);
+        memcpy(objRandomPacketInfo.szPacket,  pData, nLen);
+        objRandomPacketInfo.szPacket[nLen] = '\0';
+        objRandomPacketInfo.nLen           = nLen;
+        objRandomPacketInfo.nRecdvLength   = nRecvLength;
+        objRandomPacketInfo.nType          = nType;
 
-		if(m_blRandomPacket == false)
-		{
-			m_blRandomPacket = true;
-		}
+        m_vecRandomPacketInfo.push_back(objRandomPacketInfo);
 
-		return true;
-	};
+        if(m_blRandomPacket == false)
+        {
+            m_blRandomPacket = true;
+        }
 
-	//µÃµ½Ëæ»úÃüÁî°üµÄ¸öÊı
-	int  GetRandomPacketCount()
-	{
-		return (int)m_vecRandomPacketInfo.size();
-	};
+        return true;
+    };
 
-	_RandomPacketInfo* GettRandomPacket(int nIndex)
-	{
-		if(nIndex >= (int)m_vecRandomPacketInfo.size() || nIndex < 0)
-		{
-			return NULL;
-		}
-		else
-		{
-			return (_RandomPacketInfo* )&m_vecRandomPacketInfo[nIndex];
-		}
-	};
+    //å¾—åˆ°éšæœºå‘½ä»¤åŒ…çš„ä¸ªæ•°
+    int  GetRandomPacketCount()
+    {
+        return (int)m_vecRandomPacketInfo.size();
+    };
 
-	//µÃµ½·¢ËÍÊı¾İµÄ¾ßÌåĞÅÏ¢
-	bool GetRandomSend(int nIndex, char* pData, int& nLen, int& nRecvLength)
-	{
-		int nPos = nIndex % (int)m_vecRandomPacketInfo.size();
+    _RandomPacketInfo* GettRandomPacket(int nIndex)
+    {
+        if(nIndex >= (int)m_vecRandomPacketInfo.size() || nIndex < 0)
+        {
+            return NULL;
+        }
+        else
+        {
+            return (_RandomPacketInfo* )&m_vecRandomPacketInfo[nIndex];
+        }
+    };
 
-		_RandomPacketInfo* pRandomPacketInfo = GettRandomPacket(nPos);
-		if(NULL == pRandomPacketInfo)
-		{
-			return false;
-		}
+    //å¾—åˆ°å‘é€æ•°æ®çš„å…·ä½“ä¿¡æ¯
+    bool GetRandomSend(int nIndex, char* pData, int& nLen, int& nRecvLength)
+    {
+        int nPos = nIndex % (int)m_vecRandomPacketInfo.size();
 
-		if(nLen < pRandomPacketInfo->nLen)
-		{
-			return false;
-		}
+        _RandomPacketInfo* pRandomPacketInfo = GettRandomPacket(nPos);
 
-		if(pRandomPacketInfo->nType == 1)
-		{
-			//Ö»ÓĞÎÄ±¾Ä£Ê½µÄÊÇÊ±ºò½øĞĞÊı×ÖÌæ»»
-			string strData = (string)pRandomPacketInfo->szPacket;
+        if(NULL == pRandomPacketInfo)
+        {
+            return false;
+        }
 
-			ReplaceNumber(strData, (string)"%01d", 1);
-			ReplaceNumber(strData, (string)"%02d", 2);
-			ReplaceNumber(strData, (string)"%03d", 3);
-			ReplaceNumber(strData, (string)"%04d", 4);
+        if(nLen < pRandomPacketInfo->nLen)
+        {
+            return false;
+        }
 
-			memcpy_s(pData, strData.length(), strData.c_str(), strData.length());
-			pData[strData.length()] = '\0';
-			nLen = strData.length();
-			nRecvLength = pRandomPacketInfo->nRecdvLength;
-		}
-		else
-		{
-			//½øĞĞ¶ş½øÖÆ×ª»»
-			CConvertBuffer objConvertBuffer;
+        if(pRandomPacketInfo->nType == 1)
+        {
+            //åªæœ‰æ–‡æœ¬æ¨¡å¼çš„æ˜¯æ—¶å€™è¿›è¡Œæ•°å­—æ›¿æ¢
+            string strData = (string)pRandomPacketInfo->szPacket;
 
-			//´æÈëÊı¾İ
-			objConvertBuffer.Convertstr2charArray(pRandomPacketInfo->szPacket, pRandomPacketInfo->nLen, 
-				(unsigned char*)pData, nLen);
-			nRecvLength = pRandomPacketInfo->nRecdvLength;
-		}
+            ReplaceNumber(strData, (string)"%01d", 1);
+            ReplaceNumber(strData, (string)"%02d", 2);
+            ReplaceNumber(strData, (string)"%03d", 3);
+            ReplaceNumber(strData, (string)"%04d", 4);
 
-		return true;
-	}
+            memcpy(pData,  strData.c_str(), strData.length());
+            pData[strData.length()] = '\0';
+            nLen = (int)strData.length();
+            nRecvLength = pRandomPacketInfo->nRecdvLength;
+        }
+        else
+        {
+            //è¿›è¡ŒäºŒè¿›åˆ¶è½¬æ¢
+            CConvertBuffer objConvertBuffer;
 
-	//ÏÔÊ¾Ô¤ÀÀ
-	bool GetReview(int nIndex, char* pData, int& nLen, int& nRecvLength)
-	{
-		int nPos = nIndex % (int)m_vecRandomPacketInfo.size();
+            //å­˜å…¥æ•°æ®
+            objConvertBuffer.Convertstr2charArray(pRandomPacketInfo->szPacket, pRandomPacketInfo->nLen,
+                                                  (unsigned char*)pData, nLen);
+            nRecvLength = pRandomPacketInfo->nRecdvLength;
+        }
 
-		_RandomPacketInfo* pRandomPacketInfo = GettRandomPacket(nPos);
-		if(NULL == pRandomPacketInfo)
-		{
-			return false;
-		}
+        return true;
+    }
 
-		if(nLen < pRandomPacketInfo->nLen)
-		{
-			return false;
-		}
+    //æ˜¾ç¤ºé¢„è§ˆ
+    bool GetReview(int nIndex, char* pData, int& nLen, int& nRecvLength)
+    {
+        int nPos = nIndex % (int)m_vecRandomPacketInfo.size();
 
-		if(pRandomPacketInfo->nType == 1)
-		{
-			//Ö»ÓĞÎÄ±¾Ä£Ê½µÄÊÇÊ±ºò½øĞĞÊı×ÖÌæ»»
-			string strData = (string)pRandomPacketInfo->szPacket;
+        _RandomPacketInfo* pRandomPacketInfo = GettRandomPacket(nPos);
 
-			ReplaceNumber(strData, (string)"%01d", 1);
-			ReplaceNumber(strData, (string)"%02d", 2);
-			ReplaceNumber(strData, (string)"%03d", 3);
-			ReplaceNumber(strData, (string)"%04d", 4);
+        if(NULL == pRandomPacketInfo)
+        {
+            return false;
+        }
 
-			memcpy_s(pData, strData.length(), strData.c_str(), strData.length());
-			pData[strData.length()] = '\0';
-			nLen = strData.length();
-			nRecvLength = pRandomPacketInfo->nRecdvLength;
-		}
-		else
-		{
-			//´æÈëÊı¾İ
-			memcpy_s(pData, pRandomPacketInfo->nLen, pRandomPacketInfo->szPacket, pRandomPacketInfo->nLen);
-			nLen = pRandomPacketInfo->nLen;
-			nRecvLength = pRandomPacketInfo->nRecdvLength;
-		}
+        if(nLen < pRandomPacketInfo->nLen)
+        {
+            return false;
+        }
 
-		return true;
-	}
+        if(pRandomPacketInfo->nType == 1)
+        {
+            //åªæœ‰æ–‡æœ¬æ¨¡å¼çš„æ˜¯æ—¶å€™è¿›è¡Œæ•°å­—æ›¿æ¢
+            string strData = (string)pRandomPacketInfo->szPacket;
 
-	//µÃµ½ÊÇ·ñÎªËæ»úÊı¾İ°ü
-	bool GetRandomType()
-	{
-		return m_blRandomPacket;
-	}
+            ReplaceNumber(strData, (string)"%01d", 1);
+            ReplaceNumber(strData, (string)"%02d", 2);
+            ReplaceNumber(strData, (string)"%03d", 3);
+            ReplaceNumber(strData, (string)"%04d", 4);
 
-	//Õı³£Ö¸Áî¼¯
-	virtual bool InitSendSize(int nSendLen)                                     = 0;
-	virtual char* GetSendData()                                                 = 0;
-	virtual char* GetSendData(int nThreadID, int nCurrIndex, int& nSendDataLen) = 0;
-	virtual int GetSendLength()                                                 = 0;                   
-	virtual int GetRecvLength()                                                 = 0;
-	virtual void SetRecvLength(int nRecvLen)                                    = 0;
-	virtual void SetMaxSendLength(int nMaxLength)                               = 0;
-	virtual void SetSendBuff(const char* pData, int nLen)                       = 0;
-	virtual EM_DATA_RETURN_STATE GetRecvData(int nThreadID, int nCurrIndex, char* pData, int nLen) = 0;
+            memcpy(pData, strData.c_str(), strData.length());
+            pData[strData.length()] = '\0';
+            nLen = (int)strData.length();
+            nRecvLength = pRandomPacketInfo->nRecdvLength;
+        }
+        else
+        {
+            //å­˜å…¥æ•°æ®
+            memcpy(pData, pRandomPacketInfo->szPacket, pRandomPacketInfo->nLen);
+            nLen = pRandomPacketInfo->nLen;
+            nRecvLength = pRandomPacketInfo->nRecdvLength;
+        }
 
-private:
-	void ReplaceNumber(string& strData, string strTag, int nStep)
-	{
-		if(nStep == 1)
-		{
-			char szNumber[20] = {'\0'}; 
-			int nNumber = RandomValue(0, 9);
-			sprintf_s(szNumber, 20, "%d", nNumber);
-			string_replace(strData, strTag, (string)szNumber);
-		}
-		else if(nStep == 2)
-		{
-			char szNumber[20] = {'\0'}; 
-			int nNumber = RandomValue(0, 99);
-			sprintf_s(szNumber, 20, "%d", nNumber);
-			string_replace(strData, strTag, (string)szNumber);
-		}
-		else if(nStep == 3)
-		{
-			char szNumber[20] = {'\0'}; 
-			int nNumber = RandomValue(0, 999);
-			sprintf_s(szNumber, 20, "%d", nNumber);
-			string_replace(strData, strTag, (string)szNumber);
-		}
-		else if(nStep == 4)
-		{
-			char szNumber[20] = {'\0'}; 
-			int nNumber = RandomValue(0, 9999);
-			sprintf_s(szNumber, 20, "%d", nNumber);
-			string_replace(strData, strTag, (string)szNumber);
-		}
-	}
+        return true;
+    }
+
+    //å¾—åˆ°æ˜¯å¦ä¸ºéšæœºæ•°æ®åŒ…
+    bool GetRandomType()
+    {
+        return m_blRandomPacket;
+    }
+
+    //æ­£å¸¸æŒ‡ä»¤é›†
+    virtual bool InitSendSize(int nSendLen)                                     = 0;
+    virtual char* GetSendData()                                                 = 0;
+    virtual char* GetSendData(int nThreadID, int nCurrIndex, int& nSendDataLen) = 0;
+    virtual int GetSendLength()                                                 = 0;
+    virtual int GetRecvLength()                                                 = 0;
+    virtual void SetRecvLength(int nRecvLen)                                    = 0;
+    virtual void SetMaxSendLength(int nMaxLength)                               = 0;
+    virtual void SetSendBuff(const char* pData, int nLen)                       = 0;
+    virtual EM_DATA_RETURN_STATE GetRecvData(int nThreadID, int nCurrIndex, char* pData, int nLen) = 0;
 
 private:
-	bool  m_blRandomPacket;     //ÊÇ·ñ°üº¬Ëæ»ú°üÁĞ£¬falaseÎª²»°üº¬£¬trueÎª°üº¬
-	vecRandomPacketInfo m_vecRandomPacketInfo;
+    void ReplaceNumber(string& strData, string strTag, int nStep)
+    {
+        if(nStep == 1)
+        {
+            char szNumber[20] = {'\0'};
+            int nNumber = RandomValue(0, 9);
+            sprintf(szNumber,  "%d", nNumber);
+            string_replace(strData, strTag, (string)szNumber);
+        }
+        else if(nStep == 2)
+        {
+            char szNumber[20] = {'\0'};
+            int nNumber = RandomValue(0, 99);
+            sprintf(szNumber,  "%d", nNumber);
+            string_replace(strData, strTag, (string)szNumber);
+        }
+        else if(nStep == 3)
+        {
+            char szNumber[20] = {'\0'};
+            int nNumber = RandomValue(0, 999);
+            sprintf(szNumber,  "%d", nNumber);
+            string_replace(strData, strTag, (string)szNumber);
+        }
+        else if(nStep == 4)
+        {
+            char szNumber[20] = {'\0'};
+            int nNumber = RandomValue(0, 9999);
+            sprintf(szNumber,  "%d", nNumber);
+            string_replace(strData, strTag, (string)szNumber);
+        }
+    }
+
+private:
+    bool  m_blRandomPacket;     //æ˜¯å¦åŒ…å«éšæœºåŒ…åˆ—ï¼Œfalaseä¸ºä¸åŒ…å«ï¼Œtrueä¸ºåŒ…å«
+    vecRandomPacketInfo m_vecRandomPacketInfo;
 
 public:
-	int m_nClassTye;    //1ÎªCNomalLogic£¬2ÎªWebSocketLogic
+    int m_nClassTye;    //1ä¸ºCNomalLogicï¼Œ2ä¸ºWebSocketLogic
 };
 
-//ÆÕÍ¨µÄTCPÊÕ·¢Ïà¹ØĞÅÏ¢´¦ÀíÂß¼­
-//ÎªÁË¼æÈİÒ»Ğ©ÌØÊâĞ­Òé£¬±ÈÈçwebsocketÒÔ¼°http
-//ÊÕ·¢Êı¾İ²»ÔÙÊÇµ¥¶ÀµÄÒ»¸öÖ¸Õë£¬¶øÊÇÒ»¸ö¼Ì³ĞCBaseDataLogicµÄÀà
+//æ™®é€šçš„TCPæ”¶å‘ç›¸å…³ä¿¡æ¯å¤„ç†é€»è¾‘
+//ä¸ºäº†å…¼å®¹ä¸€äº›ç‰¹æ®Šåè®®ï¼Œæ¯”å¦‚websocketä»¥åŠhttp
+//æ”¶å‘æ•°æ®ä¸å†æ˜¯å•ç‹¬çš„ä¸€ä¸ªæŒ‡é’ˆï¼Œè€Œæ˜¯ä¸€ä¸ªç»§æ‰¿CBaseDataLogicçš„ç±»
 class CNomalLogic : public CBaseDataLogic
 {
 public:
-	CNomalLogic() 
-	{ 
-		m_pSendData      = NULL;
-		m_nSendLen       = 0;
-		m_nRecvLen       = 0;
-		m_nCurrRecvLen   = 0;
-		m_nClassTye      = 1;
-	};
+    CNomalLogic()
+    {
+        m_pSendData      = NULL;
+        m_nSendLen       = 0;
+        m_nRecvLen       = 0;
+        m_nCurrRecvLen   = 0;
+        m_nClassTye      = 1;
+    };
 
-	~CNomalLogic() { Close(); };
+    ~CNomalLogic()
+    {
+        Close();
+    };
 
-	void Close()
-	{
-		if(NULL != m_pSendData)
-		{
-			delete[] m_pSendData;
-			m_pSendData = NULL;
-		}
-	}
+    void Close()
+    {
+        if(NULL != m_pSendData)
+        {
+            delete[] m_pSendData;
+            m_pSendData = NULL;
+        }
+    }
 
-	bool InitSendSize(int nSendLen = MAX_RANDOM_PACKET)
-	{
-		Close();
+    bool InitSendSize(int nSendLen = MAX_RANDOM_PACKET)
+    {
+        Close();
 
-		m_pSendData = new char[nSendLen];
-		m_nSendLen  = nSendLen;
+        m_pSendData = new char[nSendLen];
+        m_nSendLen  = nSendLen;
 
-		return true;
-	}
+        return true;
+    }
 
-	void SetRecvLength(int nRecvLen)
-	{
-		m_nRecvLen = nRecvLen;
-	}
+    void SetRecvLength(int nRecvLen)
+    {
+        m_nRecvLen = nRecvLen;
+    }
 
-	void SetMaxSendLength(int nMaxLength)
-	{
-		m_nSendLen = nMaxLength;
-	}
+    void SetMaxSendLength(int nMaxLength)
+    {
+        m_nSendLen = nMaxLength;
+    }
 
-	//ÉèÖÃÏà¹Ø·¢ËÍBuff
-	void SetSendBuff(const char* pData, int nLen)
-	{
-		memcpy_s(m_pSendData, nLen, pData, nLen);
-		m_nSendLen = nLen;
-	}
+    //è®¾ç½®ç›¸å…³å‘é€Buff
+    void SetSendBuff(const char* pData, int nLen)
+    {
+        memcpy(m_pSendData,  pData, nLen);
+        m_nSendLen = nLen;
+    }
 
-	char* GetSendData()
-	{
-		return m_pSendData;
-	}
+    char* GetSendData()
+    {
+        return m_pSendData;
+    }
 
-	char* GetSendData(int nThreadID, int nCurrIndex, int& nSendDataLen)
-	{
-		if(GetRandomType() == false)
-		{
-			//µ¥Ò»Êı¾İ°ü
-			nSendDataLen = m_nSendLen;
-			return m_pSendData;
-		}
-		else
-		{
-			//Ë³ĞòÊı¾İ°ü
-			nSendDataLen = MAX_RANDOM_PACKET;
-			GetRandomSend(nCurrIndex, m_pSendData, nSendDataLen, m_nRecvLen);
-			return m_pSendData;
-		}
-	}
+    char* GetSendData(int nThreadID, int nCurrIndex, int& nSendDataLen)
+    {
+        if(GetRandomType() == false)
+        {
+            //å•ä¸€æ•°æ®åŒ…
+            nSendDataLen = m_nSendLen;
+            return m_pSendData;
+        }
+        else
+        {
+            //é¡ºåºæ•°æ®åŒ…
+            nSendDataLen = MAX_RANDOM_PACKET;
+            GetRandomSend(nCurrIndex, m_pSendData, nSendDataLen, m_nRecvLen);
+            return m_pSendData;
+        }
+    }
 
-	int GetSendLength()
-	{
-		return m_nSendLen;
-	}
+    int GetSendLength()
+    {
+        return m_nSendLen;
+    }
 
-	int GetRecvLength()
-	{
-		return m_nRecvLen;
-	}
+    int GetRecvLength()
+    {
+        return m_nRecvLen;
+    }
 
-	EM_DATA_RETURN_STATE GetRecvData(int nThreadID, int nCurrIndex, char* pData, int nLen)
-	{
-		m_nCurrRecvLen += nLen;
-		if(m_nCurrRecvLen == m_nRecvLen)
-		{
-			m_nCurrRecvLen = 0;
-			//È«²¿½ÓÊÕÍê±Ï£¬·µ»ØÕıÈ·
-			return DATA_RETURN_STATE_SUCCESS;
-		}
-		else if(nLen < m_nRecvLen)
-		{
-			//Ã»ÓĞ½ÓÊÕÍêÈ«£¬¼ÌĞø½ÓÊÕ
-			return DATA_RETURN_STATE_CONTINUE;
-		}
+    EM_DATA_RETURN_STATE GetRecvData(int nThreadID, int nCurrIndex, char* pData, int nLen)
+    {
+        m_nCurrRecvLen += nLen;
 
-		m_nCurrRecvLen = 0;
-		return DATA_RETURN_STATE_ERROR;
-	}
+        if(m_nCurrRecvLen == m_nRecvLen)
+        {
+            m_nCurrRecvLen = 0;
+            //å…¨éƒ¨æ¥æ”¶å®Œæ¯•ï¼Œè¿”å›æ­£ç¡®
+            return DATA_RETURN_STATE_SUCCESS;
+        }
+        else if(nLen < m_nRecvLen)
+        {
+            //æ²¡æœ‰æ¥æ”¶å®Œå…¨ï¼Œç»§ç»­æ¥æ”¶
+            return DATA_RETURN_STATE_CONTINUE;
+        }
+
+        m_nCurrRecvLen = 0;
+        return DATA_RETURN_STATE_ERROR;
+    }
 
 private:
-	char* m_pSendData;
-	int   m_nSendLen;
-	int   m_nRecvLen;
-	int   m_nCurrRecvLen;
+    char* m_pSendData;
+    int   m_nSendLen;
+    int   m_nRecvLen;
+    int   m_nCurrRecvLen;
 };
 
-//websocketĞ­ÒéÂß¼­°ü
+//websocketåè®®é€»è¾‘åŒ…
 class CWebSocketLogic : public CBaseDataLogic
 {
 public:
-	CWebSocketLogic() 
-	{ 
-		m_pHandInData    = NULL;
-		m_pSendData      = NULL;
-		m_nSendLen       = 0;
-		m_nRecvLen       = 0;
-		m_nCurrRecvLen   = 0;
-		m_nClassTye      = 2;
-	};
+    CWebSocketLogic()
+    {
+        m_pHandInData    = NULL;
+        m_pSendData      = NULL;
+        m_nSendLen       = 0;
+        m_nRecvLen       = 0;
+        m_nCurrRecvLen   = 0;
+        m_nClassTye      = 2;
+    };
 
-	~CWebSocketLogic() { Close(); };
+    ~CWebSocketLogic()
+    {
+        Close();
+    };
 
-	void Close()
-	{
-		if(NULL != m_pHandInData)
-		{
-			delete[] m_pHandInData;
-			m_pHandInData = NULL;
-		}
+    void Close()
+    {
+        if(NULL != m_pHandInData)
+        {
+            delete[] m_pHandInData;
+            m_pHandInData = NULL;
+        }
 
-		if(NULL != m_pSendData)
-		{
-			delete[] m_pSendData;
-			m_pSendData = NULL;
-		}
-	}
+        if(NULL != m_pSendData)
+        {
+            delete[] m_pSendData;
+            m_pSendData = NULL;
+        }
+    }
 
-	bool InitSendSize(int nSendLen = MAX_RANDOM_PACKET)
-	{
-		Close();
+    bool InitSendSize(int nSendLen = MAX_RANDOM_PACKET)
+    {
+        Close();
 
-		m_pHandInData = new char[300];
-		sprintf_s(m_pHandInData, 300, "GET / HTTP/1.1\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: 127.0.0.1:10002\r\nSec-WebSocket-Key: cfMpieGIwzS7+4+nIqv5fA==\r\nSec-WebSocket-Version: 13\r\n\r\n");
+        m_pHandInData = new char[300];
+        sprintf(m_pHandInData,  "GET / HTTP/1.1\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: 127.0.0.1:10002\r\nSec-WebSocket-Key: cfMpieGIwzS7+4+nIqv5fA==\r\nSec-WebSocket-Version: 13\r\n\r\n");
 
-		m_pSendData = new char[nSendLen];
-		m_nSendLen  = nSendLen;
+        m_pSendData = new char[nSendLen];
+        m_nSendLen  = nSendLen;
 
-		return true;
-	}
+        return true;
+    }
 
-	void SetRecvLength(int nRecvLen)
-	{
-		m_nRecvLen = nRecvLen;
-	}
+    void SetRecvLength(int nRecvLen)
+    {
+        m_nRecvLen = nRecvLen;
+    }
 
-	void SetMaxSendLength(int nMaxLength)
-	{
-		m_nSendLen = nMaxLength;
-	}
+    void SetMaxSendLength(int nMaxLength)
+    {
+        m_nSendLen = nMaxLength;
+    }
 
-	//ÉèÖÃÏà¹Ø·¢ËÍBuff
-	void SetSendBuff(const char* pData, int nLen)
-	{
-		//WebSocket¼ÓÃÜÊı¾İ
-		WebSocketSendData(pData, nLen, m_pSendData, m_nSendLen);
-	}
+    //è®¾ç½®ç›¸å…³å‘é€Buff
+    void SetSendBuff(const char* pData, int nLen)
+    {
+        //WebSocketåŠ å¯†æ•°æ®
+        WebSocketSendData(pData, nLen, m_pSendData, m_nSendLen);
+    }
 
-	char* GetSendData()
-	{
-		return m_pSendData;
-	}
+    char* GetSendData()
+    {
+        return m_pSendData;
+    }
 
-	char* GetSendData(int nThreadID, int nCurrIndex, int& nSendDataLen)
-	{
-		//ÕâÀïÌí¼Ówebsocket¼ÓÃÜÉÆ·¨
-		if(nCurrIndex == 0)
-		{
-			//Èç¹ûÊÇµÚÒ»´Î·¢ËÍÊı¾İ£¬Ôò·¢ËÍÎÕÊÖ°ü
-			nSendDataLen = strlen(m_pHandInData);
-			return m_pHandInData;
-		}
-		else
-		{
-			if(GetRandomType() == false)
-			{
-				//µ¥Ò»Êı¾İ°ü
-				nSendDataLen = m_nSendLen;
-				return m_pSendData;
-			}
-			else
-			{
-				//Ë³ĞòÊı¾İ°ü
-				nSendDataLen = MAX_RANDOM_PACKET;
-				GetRandomSend(nCurrIndex - 1, m_pSendData, nSendDataLen, m_nRecvLen);
-				return m_pSendData;
-			}
-		}
-	}
+    char* GetSendData(int nThreadID, int nCurrIndex, int& nSendDataLen)
+    {
+        //è¿™é‡Œæ·»åŠ websocketåŠ å¯†å–„æ³•
+        if(nCurrIndex == 0)
+        {
+            //å¦‚æœæ˜¯ç¬¬ä¸€æ¬¡å‘é€æ•°æ®ï¼Œåˆ™å‘é€æ¡æ‰‹åŒ…
+            nSendDataLen = (int)strlen(m_pHandInData);
+            return m_pHandInData;
+        }
+        else
+        {
+            if(GetRandomType() == false)
+            {
+                //å•ä¸€æ•°æ®åŒ…
+                nSendDataLen = m_nSendLen;
+                return m_pSendData;
+            }
+            else
+            {
+                //é¡ºåºæ•°æ®åŒ…
+                nSendDataLen = MAX_RANDOM_PACKET;
+                GetRandomSend(nCurrIndex - 1, m_pSendData, nSendDataLen, m_nRecvLen);
+                return m_pSendData;
+            }
+        }
+    }
 
-	int GetSendLength()
-	{
-		return m_nSendLen;
-	}
+    int GetSendLength()
+    {
+        return m_nSendLen;
+    }
 
-	int GetRecvLength()
-	{
-		return m_nRecvLen;
-	}
+    int GetRecvLength()
+    {
+        return m_nRecvLen;
+    }
 
-	EM_DATA_RETURN_STATE GetRecvData(int nThreadID, int nCurrIndex, char* pData, int nLen)
-	{
-		return DATA_RETURN_STATE_SUCCESS;
-	}
+    EM_DATA_RETURN_STATE GetRecvData(int nThreadID, int nCurrIndex, char* pData, int nLen)
+    {
+        return DATA_RETURN_STATE_SUCCESS;
+    }
 
 private:
-	char* m_pHandInData;
-	char* m_pSendData;
-	int   m_nSendLen;
-	int   m_nRecvLen;
-	int   m_nCurrRecvLen;
+    char* m_pHandInData;
+    char* m_pSendData;
+    int   m_nSendLen;
+    int   m_nRecvLen;
+    int   m_nCurrRecvLen;
 };
 
-//Ïß³ÌÁ¬½ÓĞÅÏ¢
+//çº¿ç¨‹è¿æ¥ä¿¡æ¯
 class _Socket_Info
 {
 public:
-	char  m_szSerevrIP[MAX_BUFF_20];      //Ô¶³Ì·şÎñÆ÷µÄIP
-	int   m_nPort;                        //Ô¶³Ì·şÎñÆ÷µÄ¶Ë¿Ú
-	int   m_nThreadID;                    //Ïß³ÌID
-	int   m_nRecvTimeout;                 //½ÓÊÕÊı¾İ³¬Ê±Ê±¼ä£¨µ¥Î»ÊÇºÁÃë£©
-	int   m_nDelaySecond;                 //¶ÌÁ¬½Ó¼äÑÓÊ±£¨µ¥Î»ÊÇºÁÃë£©
-	int   m_nPacketTimewait;              //Êı¾İ°ü·¢ËÍ¼ä¸ô(µ¥Î»ÊÇºÁÃë)
-	//int   m_nSendLength;                //·¢ËÍ×Ö·û´®³¤¶È
-	//int   m_nRecvLength;                //½ÓÊÕ×Ö·û´®³¤¶ÈÏŞ¶¨
-	//char* m_pSendBuff;                  //·¢ËÍÊı¾İ³¤¶È
-	bool  m_blIsAlwayConnect;             //ÊÇ·ñ³¤Á¬½Ó
-	bool  m_blIsRadomaDelay;              //ÊÇ·ñËæ»úÑÓÊ±
-	bool  m_blIsRecv;                     //ÊÇ·ñ½ÓÊÕ»ØÓ¦°ü
-	bool  m_blIsBroken;                   //ÊÇ·ñ¶ÏÏßÖØÁ¬
-	bool  m_blIsSendCount;                //ÊÇ·ñËæ»úÊı¾İ°üÊı
-	bool  m_blIsWriteFile;                //ÊÇ·ñĞ´ÈëÎÄ¼ş
-	bool  m_blIsSendOne;                  //ÊÇ·ñÖ»·¢Ò»´Î
-	bool  m_blLuaAdvance;                 //ÊÇ·ñÆô¶¯Lua¸ß¼¶Ä£Ê½ 
-	int   m_nConnectType;                 //Á´½ÓÀàĞÍ£¬0ÊÇTCP£¬1ÊÇUDP
-	int   m_nUdpClientPort;               //UDP¿Í»§¶Ë½ÓÊÕÊı¾İ¶Ë¿Ú
-	int   m_nSendCount;                   //·¢ËÍ×ÜÊı¾İ°üÊı
-	char  m_szLuaFileName[MAX_BUFF_1024]; //¸ß¼¶Ä£Ê½µÄLuaÎÄ¼şÃû
-	CBaseDataLogic* m_pLogic;             //Êı¾İ¶ÔÏó  
+    char  m_szSerevrIP[MAX_BUFF_20];      //è¿œç¨‹æœåŠ¡å™¨çš„IP
+    int   m_nPort;                        //è¿œç¨‹æœåŠ¡å™¨çš„ç«¯å£
+    int   m_nThreadID;                    //çº¿ç¨‹ID
+    int   m_nRecvTimeout;                 //æ¥æ”¶æ•°æ®è¶…æ—¶æ—¶é—´ï¼ˆå•ä½æ˜¯æ¯«ç§’ï¼‰
+    int   m_nDelaySecond;                 //çŸ­è¿æ¥é—´å»¶æ—¶ï¼ˆå•ä½æ˜¯æ¯«ç§’ï¼‰
+    int   m_nPacketTimewait;              //æ•°æ®åŒ…å‘é€é—´éš”(å•ä½æ˜¯æ¯«ç§’)
+    //int   m_nSendLength;                //å‘é€å­—ç¬¦ä¸²é•¿åº¦
+    //int   m_nRecvLength;                //æ¥æ”¶å­—ç¬¦ä¸²é•¿åº¦é™å®š
+    //char* m_pSendBuff;                  //å‘é€æ•°æ®é•¿åº¦
+    bool  m_blIsAlwayConnect;             //æ˜¯å¦é•¿è¿æ¥
+    bool  m_blIsRadomaDelay;              //æ˜¯å¦éšæœºå»¶æ—¶
+    bool  m_blIsRecv;                     //æ˜¯å¦æ¥æ”¶å›åº”åŒ…
+    bool  m_blIsBroken;                   //æ˜¯å¦æ–­çº¿é‡è¿
+    bool  m_blIsSendCount;                //æ˜¯å¦éšæœºæ•°æ®åŒ…æ•°
+    bool  m_blIsWriteFile;                //æ˜¯å¦å†™å…¥æ–‡ä»¶
+    bool  m_blIsSendOne;                  //æ˜¯å¦åªå‘ä¸€æ¬¡
+    bool  m_blLuaAdvance;                 //æ˜¯å¦å¯åŠ¨Luaé«˜çº§æ¨¡å¼
+    int   m_nConnectType;                 //é“¾æ¥ç±»å‹ï¼Œ0æ˜¯TCPï¼Œ1æ˜¯UDP
+    int   m_nUdpClientPort;               //UDPå®¢æˆ·ç«¯æ¥æ”¶æ•°æ®ç«¯å£
+    int   m_nSendCount;                   //å‘é€æ€»æ•°æ®åŒ…æ•°
+    char  m_szLuaFileName[MAX_BUFF_1024]; //é«˜çº§æ¨¡å¼çš„Luaæ–‡ä»¶å
+    CBaseDataLogic* m_pLogic;             //æ•°æ®å¯¹è±¡
 
-	_Socket_Info()
-	{
-		m_szSerevrIP[0]    = '\0';
-		m_nPort            = 0;
-		m_nThreadID        = 0;
-		m_nRecvTimeout     = 0;
-		m_nPacketTimewait  = 0;
-		m_nDelaySecond     = 0;
-		//m_nSendLength      = 0;
-		//m_nRecvLength      = 0;
-		m_nSendCount       = 0;
-		//m_pSendBuff        = NULL;
-		m_blIsAlwayConnect = false;
-		m_blIsRadomaDelay  = false;
-		m_blIsRecv         = true;
-		m_blIsBroken       = true;
-		m_blIsSendCount    = false;
-		m_blIsWriteFile    = false;
-		m_blIsSendOne      = false;
-		m_blLuaAdvance     = false;
-		m_nConnectType     = 0;
-		m_nUdpClientPort   = 0;
-		m_szLuaFileName[0] = '\0';
-		m_pLogic           = NULL;
-	}
+    _Socket_Info()
+    {
+        m_szSerevrIP[0]    = '\0';
+        m_nPort            = 0;
+        m_nThreadID        = 0;
+        m_nRecvTimeout     = 0;
+        m_nPacketTimewait  = 0;
+        m_nDelaySecond     = 0;
+        //m_nSendLength      = 0;
+        //m_nRecvLength      = 0;
+        m_nSendCount       = 0;
+        //m_pSendBuff        = NULL;
+        m_blIsAlwayConnect = false;
+        m_blIsRadomaDelay  = false;
+        m_blIsRecv         = true;
+        m_blIsBroken       = true;
+        m_blIsSendCount    = false;
+        m_blIsWriteFile    = false;
+        m_blIsSendOne      = false;
+        m_blLuaAdvance     = false;
+        m_nConnectType     = 0;
+        m_nUdpClientPort   = 0;
+        m_szLuaFileName[0] = '\0';
+        m_pLogic           = NULL;
+    }
 
-	~_Socket_Info()
-	{
-		//ÕâÀï²»ÔÙ¹ÜÊÍ·Å£¬½»ÓÉÉÏ²ã½â¾ö
-		//if(m_pLogic != NULL)
-		//{
-		//	delete m_pLogic; 
-		//}
-	}
+    ~_Socket_Info()
+    {
+        //è¿™é‡Œä¸å†ç®¡é‡Šæ”¾ï¼Œäº¤ç”±ä¸Šå±‚è§£å†³
+        //if(m_pLogic != NULL)
+        //{
+        //  delete m_pLogic;
+        //}
+    }
 
 };
 
-//Ïß³ÌÔËĞĞ×´Ì¬ĞÅÏ¢
+//çº¿ç¨‹è¿è¡ŒçŠ¶æ€ä¿¡æ¯
 struct _Socket_State_Info
 {
-	int m_nSuccessConnect;            //Á¬½Ó³É¹¦Êı
-	int m_nSuccessSend;               //·¢ËÍ³É¹¦Êı
-	int m_nSuccessRecv;               //½ÓÊÕ³É¹¦Êı
-	int m_nCurrectSocket;             //µ±Ç°Á´½ÓÊı
-	int m_nFailConnect;               //Á¬½ÓÊ§°ÜÊı
-	int m_nFailSend;                  //·¢ËÍÊ§°ÜÊı
-	int m_nFailRecv;                  //½ÓÊÕÊ§°ÜÊı
-	int m_nSendByteCount;             //·¢ËÍ×Ö½ÚÊı
-	int m_nRecvByteCount;             //½ÓÊÕ×Ö½ÚÊı
-	int m_nMinRecvTime;               //×îĞ¡½ÓÊÕÊ±¼ä
-	int m_nMaxRecvTime;               //×î´ó½ÓÊÕÊ±¼ä 
+    int m_nSuccessConnect;            //è¿æ¥æˆåŠŸæ•°
+    int m_nSuccessSend;               //å‘é€æˆåŠŸæ•°
+    int m_nSuccessRecv;               //æ¥æ”¶æˆåŠŸæ•°
+    int m_nCurrectSocket;             //å½“å‰é“¾æ¥æ•°
+    int m_nFailConnect;               //è¿æ¥å¤±è´¥æ•°
+    int m_nFailSend;                  //å‘é€å¤±è´¥æ•°
+    int m_nFailRecv;                  //æ¥æ”¶å¤±è´¥æ•°
+    int m_nSendByteCount;             //å‘é€å­—èŠ‚æ•°
+    int m_nRecvByteCount;             //æ¥æ”¶å­—èŠ‚æ•°
+    int m_nMinRecvTime;               //æœ€å°æ¥æ”¶æ—¶é—´
+    int m_nMaxRecvTime;               //æœ€å¤§æ¥æ”¶æ—¶é—´
 
-	_Socket_State_Info()
-	{
-		m_nSuccessConnect = 0;
-		m_nSuccessSend    = 0;
-		m_nSuccessRecv    = 0;
-		m_nCurrectSocket  = 0;
-		m_nFailConnect    = 0;
-		m_nFailSend       = 0;
-		m_nFailRecv       = 0;
-		m_nSendByteCount  = 0;
-		m_nRecvByteCount  = 0;
-		m_nMinRecvTime    = 0;
-		m_nMaxRecvTime    = 0;
-	}
+    _Socket_State_Info()
+    {
+        m_nSuccessConnect = 0;
+        m_nSuccessSend    = 0;
+        m_nSuccessRecv    = 0;
+        m_nCurrectSocket  = 0;
+        m_nFailConnect    = 0;
+        m_nFailSend       = 0;
+        m_nFailRecv       = 0;
+        m_nSendByteCount  = 0;
+        m_nRecvByteCount  = 0;
+        m_nMinRecvTime    = 0;
+        m_nMaxRecvTime    = 0;
+    }
 };
 
 

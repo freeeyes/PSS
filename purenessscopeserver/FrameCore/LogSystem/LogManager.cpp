@@ -18,6 +18,11 @@ CLogBlockPool::CLogBlockPool()
     m_u4CurrIndex    = 0;
 }
 
+CLogBlockPool::CLogBlockPool(const CLogBlockPool& ar)
+{
+    (*this) = ar;
+}
+
 CLogBlockPool::~CLogBlockPool()
 {
     Close();
@@ -105,6 +110,11 @@ CLogManager::CLogManager(void):m_mutex(), m_cond(m_mutex)
     m_nQueueMax     = MAX_MSG_THREADQUEUE;
     m_pServerLogger = NULL;
     m_blIsMail      = false;
+}
+
+CLogManager::CLogManager(const CLogManager& ar) : CLogManager()
+{
+    (*this) = ar;
 }
 
 CLogManager::~CLogManager(void)

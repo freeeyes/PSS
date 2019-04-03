@@ -1,0 +1,120 @@
+##
+## Auto Generated makefile by CodeLite IDE
+## any manual changes will be erased      
+##
+## Release
+ProjectName            :=MutiProcess_Queue
+ConfigurationName      :=Release
+WorkspacePath          :=../../../Build/Linux
+ProjectPath            :=../../purenessscopeserver/example-Module/MutiProcess
+IntermediateDirectory  :=$(WorkspacePath)/Linux_Bin/Temp
+OutDir                 := $(IntermediateDirectory)
+CurrentFileName        :=
+CurrentFilePath        :=
+CurrentFileFullPath    :=
+User                   :=fox mulder
+Date                   :=2019年03月30日
+CodeLitePath           :=/home/fox-mulder/.codelite
+LinkerName             :=/usr/bin/g++
+SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
+ObjectSuffix           :=.o
+DependSuffix           :=.o.d
+PreprocessSuffix       :=.i
+DebugSwitch            :=-g 
+IncludeSwitch          :=-I
+LibrarySwitch          :=-l
+OutputSwitch           :=-o 
+LibraryPathSwitch      :=-L
+PreprocessorSwitch     :=-D
+SourceSwitch           :=-c 
+OutputFile             :=$(WorkspacePath)/Linux_Bin/Module/lib$(ProjectName)
+Preprocessors          :=
+ObjectSwitch           :=-o 
+ArchiveOutputSwitch    := 
+PreprocessOnlySwitch   :=-E
+ObjectsFileList        :="MutiProcess_Queue.txt"
+PCHCompileFlags        :=
+MakeDirCommand         :=mkdir -p
+LinkOptions            :=  -s 
+IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch)../../../purenessscopeserver/Common $(IncludeSwitch)./Common 
+IncludePCH             := 
+RcIncludePath          := 
+Libs                   := 
+ArLibs                 :=  
+LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch). $(LibraryPathSwitch)Release 
+
+##
+## Common variables
+## AR, CXX, CC, AS, CXXFLAGS and CFLAGS can be overriden using an environment variables
+##
+AR       := /usr/bin/ar rcu
+CXX      := /usr/bin/g++
+CC       := /usr/bin/gcc
+CXXFLAGS :=  -O2 -fPIC -Wall -fexceptions  $(Preprocessors)
+CFLAGS   :=  -O2 -fPIC -Wall -fexceptions  $(Preprocessors)
+ASFLAGS  := 
+AS       := /usr/bin/as
+
+
+##
+## User defined environment variables
+##
+CodeLiteDir:=/usr/share/codelite
+Objects0=$(IntermediateDirectory)/Queue_BaseCommand.cpp$(ObjectSuffix) $(IntermediateDirectory)/Queue_LinuxQueue.cpp$(ObjectSuffix) 
+
+
+
+Objects=$(Objects0) 
+
+##
+## Main Build Targets 
+##
+.PHONY: all clean PreBuild PrePreBuild PostBuild MakeIntermediateDirs
+all: $(OutputFile)
+
+$(OutputFile): $(IntermediateDirectory)/.d $(Objects) 
+	@$(MakeDirCommand) $(@D)
+	@echo "" > $(IntermediateDirectory)/.d
+	@echo $(Objects0)  > $(ObjectsFileList)
+	$(SharedObjectLinkerName) $(OutputSwitch)$(OutputFile) @$(ObjectsFileList) $(LibPath) $(Libs) $(LinkOptions)
+	@$(MakeDirCommand) "../../../Build/Linux/.build-release"
+	@echo rebuilt > "../../../Build/Linux/.build-release/MutiProcess_Queue"
+
+MakeIntermediateDirs:
+	@test -d $(WorkspacePath)/Linux_Bin/Temp || $(MakeDirCommand) $(WorkspacePath)/Linux_Bin/Temp
+
+
+$(IntermediateDirectory)/.d:
+	@test -d $(WorkspacePath)/Linux_Bin/Temp || $(MakeDirCommand) $(WorkspacePath)/Linux_Bin/Temp
+
+PreBuild:
+
+
+##
+## Objects
+##
+$(IntermediateDirectory)/Queue_BaseCommand.cpp$(ObjectSuffix): ./Queue/BaseCommand.cpp $(IntermediateDirectory)/Queue_BaseCommand.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "./Queue/BaseCommand.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/Queue_BaseCommand.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/Queue_BaseCommand.cpp$(DependSuffix): ./Queue/BaseCommand.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/Queue_BaseCommand.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/Queue_BaseCommand.cpp$(DependSuffix) -MM ./Queue/BaseCommand.cpp
+
+$(IntermediateDirectory)/Queue_BaseCommand.cpp$(PreprocessSuffix): ./Queue/BaseCommand.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/Queue_BaseCommand.cpp$(PreprocessSuffix) ./Queue/BaseCommand.cpp
+
+$(IntermediateDirectory)/Queue_LinuxQueue.cpp$(ObjectSuffix): ./Queue/LinuxQueue.cpp $(IntermediateDirectory)/Queue_LinuxQueue.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "./Queue/LinuxQueue.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/Queue_LinuxQueue.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/Queue_LinuxQueue.cpp$(DependSuffix): ./Queue/LinuxQueue.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/Queue_LinuxQueue.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/Queue_LinuxQueue.cpp$(DependSuffix) -MM ./Queue/LinuxQueue.cpp
+
+$(IntermediateDirectory)/Queue_LinuxQueue.cpp$(PreprocessSuffix): ./Queue/LinuxQueue.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/Queue_LinuxQueue.cpp$(PreprocessSuffix) ./Queue/LinuxQueue.cpp
+
+
+-include $(IntermediateDirectory)/*$(DependSuffix)
+##
+## Clean
+##
+clean:
+	$(RM) -r $(WorkspacePath)/Linux_Bin/Temp/
+
+

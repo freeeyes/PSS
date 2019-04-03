@@ -1,0 +1,12 @@
+-I/data/develop/Lib/Network/PSS-master/PssSampleClient/PSSFtpClient
+-I/data/develop/Lib/Network/PSS-master/ThirdLib/include/TinyXML
+-I/data/develop/Lib/Network/PSS-master/ThirdLib/include
+-I/data/develop/Lib/Network/PSS-master/ThirdLib/thirdparty
+-I/data/develop/Lib/Network/PSS-master/ThirdLib/src
+-I/usr/lib/wx/include/gtk2-unicode-3.0
+-I/usr/include/wx-3.0
+-D__WXGTK__
+-D_FILE_OFFSET_BITS=64
+-DWXUSINGDLL
+-DNDEBUG
+-D_LINUX_PLATFORM_

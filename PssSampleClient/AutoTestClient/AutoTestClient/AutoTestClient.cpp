@@ -1,22 +1,14 @@
 // AutoTestClient.cpp : 定义控制台应用程序的入口点。
 //
+#include <thread> 
+#include <mutex>
 
 #include "XmlOpeation.h"
-#include "TcpSocketClient.h"
-#ifdef WIN32
-#include <windows.h>
-#else
-#include <pthread.h>  
-#endif
+#include "sock_wrap.h"
 
 #define XML_PATH "XML_Packet"
 #define XML_FILE_RESULT "Auto_Test_Resault.html"
 
-#ifdef WIN32
-typedef HANDLE Thread_Mutex;
-#else
-typedef pthread_mutex_t Thread_Mutex
-#endif
 
 struct _Thread_Info
 {
@@ -26,7 +18,7 @@ struct _Thread_Info
 	int nPort;
 	short sOrder;
 	int nThreadID;
-	Thread_Mutex mutex;
+	std::mutex mutex;
 
 	_Thread_Info()
 	{
@@ -39,63 +31,13 @@ struct _Thread_Info
 	}
 };
 
-//创建线程锁
-Thread_Mutex Create_Mutex()
-{
-	Thread_Mutex mutex;
-#ifdef WIN32
-		mutex = CreateMutex(NULL, FALSE, NULL);
-#else	
-		pthread_mutex_init(&mutex, NULL); 
-#endif
-		return mutex;
-}
-
-//销毁线程锁
-static void Close_Mutex(Thread_Mutex& mutex)
-{
-#ifdef WIN32
-	CloseHandle(mutex);
-#else	
-	pthread_mutex_destroy(&mutex, NULL); 
-#endif
-}
-
-//线程锁打开
-static void Lock(Thread_Mutex& mutex)
-{
-	if(NULL != mutex)
-	{
-#ifdef WIN32
-		WaitForSingleObject(mutex, INFINITE);
-#else	
-		pthread_mutex_lock(&mutex);
-#endif
-	}
-}
-
-//线程锁结束
-static void UnLock(Thread_Mutex& mutex)
-{
-	if(NULL != mutex)
-	{
-#ifdef WIN32
-		ReleaseMutex(mutex);
-#else	
-		pthread_mutex_unlock(&mutex);
-#endif
-	}
-}
 
 //运行测试子集
-#ifdef WIN32
-DWORD WINAPI Run_Test(LPVOID arg)
-#else
 void* Run_Test(void * arg)
-#endif
+
 {
 	//连接远程测试
-	ODSocket obj_ODSocket;
+	//ODSocket obj_ODSocket;
 	string strContent;
 	string strTime;
 
@@ -103,14 +45,20 @@ void* Run_Test(void * arg)
 
 	printf("[Run_Test]obj_Command_Info.m_szCommandName=%s.\n", p_Thread_Info->p_Command_Info->m_szCommandName);
 
-	obj_ODSocket.Init();
-	obj_ODSocket.Create(AF_INET, SOCK_STREAM, 0);
-	bool blState = obj_ODSocket.Connect(p_Thread_Info->szIP, p_Thread_Info->nPort, 5);
+	//obj_ODSocket.Init();
+	//obj_ODSocket.Create(AF_INET, SOCK_STREAM, 0);
+	//bool blState = obj_ODSocket.Connect(p_Thread_Info->szIP, p_Thread_Info->nPort, 5);
+
+	InitializeSocketEnvironment();
+	HSocket obj_ODSocket    =SocketOpen(SOCK_STREAM);
+	sockaddr_in addr;
+	GetAddressFrom(&addr, p_Thread_Info->szIP, p_Thread_Info->nPort);
+	bool blState = SocketConnect(obj_ODSocket, &addr);
 	if(false == blState)
 	{
-		Lock(p_Thread_Info->mutex);
+        std::lock_guard<std::mutex> lock(p_Thread_Info->mutex);
 		Create_TD_Content(p_Thread_Info->pFile, "error", p_Thread_Info->p_Command_Info->m_szCommandName, "连接建立失败", strTime.c_str());
-		UnLock(p_Thread_Info->mutex);
+
 		return 0;
 	}
 
@@ -126,8 +74,12 @@ void* Run_Test(void * arg)
 		bool blSendFlag = false;
 		int nCurrSend = 0;
 		while(true)
-		{	
-			int nDataLen = obj_ODSocket.Send(&pSend[nCurrSend], nSendLen - nCurrSend);
+		{
+			//int nDataLen = obj_ODSocket.Send(&pSend[nCurrSend], nSendLen - nCurrSend);
+
+			transresult_t rt;
+			SocketSend(obj_ODSocket, &pSend[nCurrSend], nSendLen - nCurrSend, rt);
+			int nDataLen = rt.nbytes;
 			if(nDataLen < 0)
 			{
 				strContent = "发送数据包失败";
@@ -141,7 +93,7 @@ void* Run_Test(void * arg)
 			}
 			else
 			{
-				nCurrSend += nDataLen; 
+				nCurrSend += nDataLen;
 			}
 		}
 		delete pSend;
@@ -161,7 +113,12 @@ void* Run_Test(void * arg)
 			int nCurrRecv = 0;
 			while(true)
 			{
-				int nDataLen = obj_ODSocket.Recv(&pRecv[nCurrRecv], nRecvLen - nCurrRecv);
+				//int nDataLen = obj_ODSocket.Recv(&pRecv[nCurrRecv], nRecvLen - nCurrRecv);
+
+                transresult_t rt;
+                SocketRecv(obj_ODSocket, &pRecv[nCurrRecv], nRecvLen - nCurrRecv, rt);
+                int nDataLen = rt.nbytes;
+
 				if(nDataLen <= 0)
 				{
 					strContent = "接收返回数据包失败";
@@ -176,7 +133,7 @@ void* Run_Test(void * arg)
 				}
 				else
 				{
-					//继续收包 
+					//继续收包
 					nCurrRecv += nDataLen;
 				}
 			}
@@ -207,7 +164,7 @@ void* Run_Test(void * arg)
 
 	if(blIsError == true)
 	{
-		Lock(p_Thread_Info->mutex);
+        std::lock_guard<std::mutex> lock(p_Thread_Info->mutex);
 		if(p_Thread_Info->nThreadID == 0)
 		{
 			Create_TD_Content(p_Thread_Info->pFile, "error", p_Thread_Info->p_Command_Info->m_szCommandName, strContent.c_str(), strTime.c_str());
@@ -218,11 +175,10 @@ void* Run_Test(void * arg)
 			sprintf_safe(szName, MAX_BUFF_100, "%s(线程ID:%d)",  p_Thread_Info->p_Command_Info->m_szCommandName, p_Thread_Info->nThreadID);
 			Create_TD_Content(p_Thread_Info->pFile, "error", szName, strContent.c_str(), strTime.c_str());
 		}
-		UnLock(p_Thread_Info->mutex);
 	}
 	else
 	{
-		Lock(p_Thread_Info->mutex);
+		std::lock_guard<std::mutex> lock(p_Thread_Info->mutex);
 		if(p_Thread_Info->nThreadID == 0)
 		{
 			Create_TD_Content(p_Thread_Info->pFile, "content", p_Thread_Info->p_Command_Info->m_szCommandName, strContent.c_str(), strTime.c_str());
@@ -233,9 +189,11 @@ void* Run_Test(void * arg)
 			sprintf_safe(szName, MAX_BUFF_100, "%s(线程ID:%d)",  p_Thread_Info->p_Command_Info->m_szCommandName, p_Thread_Info->nThreadID);
 			Create_TD_Content(p_Thread_Info->pFile, "content", szName, strContent.c_str(), strTime.c_str());
 		}
-		UnLock(p_Thread_Info->mutex);
 	}
-	obj_ODSocket.Close();
+	//obj_ODSocket.Close();
+	SocketClose(obj_ODSocket);
+
+	FreeSocketEnvironment();
 
 	return 0;
 }
@@ -255,7 +213,7 @@ void Run_Assemble_List(vec_Test_Assemble obj_Test_Assemble_List)
 
 	for(int i = 0; i < (int)obj_Test_Assemble_List.size(); i++)
 	{
-		Create_TD_Title(pFile, obj_Test_Assemble_List[i].m_szTestAssembleName, obj_Test_Assemble_List[i].m_szDesc, 
+		Create_TD_Title(pFile, obj_Test_Assemble_List[i].m_szTestAssembleName, obj_Test_Assemble_List[i].m_szDesc,
 						obj_Test_Assemble_List[i].m_szIP, obj_Test_Assemble_List[i].m_nPort);
 
 		short sOrder = 0;
@@ -266,7 +224,7 @@ void Run_Assemble_List(vec_Test_Assemble obj_Test_Assemble_List)
 
 		for(int j = 0; j < (int)obj_Test_Assemble_List[i].m_obj_Command_Info_List.size(); j++)
 		{
-			Thread_Mutex objmutex = Create_Mutex();
+			
 
 			//查看是否是需要多线程
 			if(obj_Test_Assemble_List[i].m_obj_Command_Info_List[j].m_nThreadCount == 1)
@@ -277,7 +235,6 @@ void Run_Assemble_List(vec_Test_Assemble obj_Test_Assemble_List)
 				sprintf_safe(p_Thread_Info->szIP, 50, "%s", obj_Test_Assemble_List[i].m_szIP);
 				p_Thread_Info->nPort          = obj_Test_Assemble_List[i].m_nPort;
 				p_Thread_Info->sOrder         = sOrder;
-				p_Thread_Info->mutex          = objmutex;
 
 				Run_Test((void* )p_Thread_Info);
 
@@ -286,30 +243,11 @@ void Run_Assemble_List(vec_Test_Assemble obj_Test_Assemble_List)
 			else
 			{
 				//启动多线程测试
-#ifdef WIN32
 				_Thread_Info* threadinfoarray = new _Thread_Info[obj_Test_Assemble_List[i].m_obj_Command_Info_List[j].m_nThreadCount];
-				HANDLE* handleArray = new HANDLE[obj_Test_Assemble_List[i].m_obj_Command_Info_List[j].m_nThreadCount];
-				for(int k = 0; k < obj_Test_Assemble_List[i].m_obj_Command_Info_List[j].m_nThreadCount; k++)
-				{
-					threadinfoarray[k].pFile          = pFile;
-					threadinfoarray[k].p_Command_Info = &obj_Test_Assemble_List[i].m_obj_Command_Info_List[j];
-					sprintf_safe(threadinfoarray[k].szIP, MAX_BUFF_50, "%s", obj_Test_Assemble_List[i].m_szIP);
-					threadinfoarray[k].nPort          = obj_Test_Assemble_List[i].m_nPort;
-					threadinfoarray[k].sOrder         = sOrder;
-					threadinfoarray[k].mutex          = objmutex;
-					threadinfoarray[k].nThreadID      = k + 1;
-
-					DWORD ThID;
-					handleArray[k] = CreateThread(NULL, 0, Run_Test, (void* )&threadinfoarray[k], 0, &ThID);
-				}
+				std::vector<std::thread>	threads;
+                
 				
-				//等待所有线程结束
-				WaitForMultipleObjects(2, handleArray, TRUE, INFINITE);
-				delete[] handleArray;
-				delete[] threadinfoarray;
-#else
-				_Thread_Info* threadinfoarray = new _Thread_Info[obj_Test_Assemble_List[i].m_obj_Command_Info_List[j].m_nThreadCount];
-				pthread_t* handleArray = new pthread_t[obj_Test_Assemble_List[i].m_obj_Command_Info_List[j].m_nThreadCount];
+				//std::thread threads[obj_Test_Assemble_List[i].m_obj_Command_Info_List[j].m_nThreadCount];
 				for(int k = 1; k <= obj_Test_Assemble_List[i].m_obj_Command_Info_List[j].m_nThreadCount; k++)
 				{
 					threadinfoarray[k].pFile          = pFile;
@@ -317,24 +255,21 @@ void Run_Assemble_List(vec_Test_Assemble obj_Test_Assemble_List)
 					sprintf_safe(threadinfoarray[k].szIP, MAX_BUFF_50, "%s", obj_Test_Assemble_List[i].m_szIP);
 					threadinfoarray[k].nPort          = obj_Test_Assemble_List[i].m_nPort;
 					threadinfoarray[k].sOrder         = sOrder;
-					threadinfoarray[k].mutex          = objmutex;
 					threadinfoarray[k].nThreadID      = k;
 
-					pthread_create(&handleArray[k], NULL, &Run_Test, (void* )&threadinfoarray[k]);
+                    threads.push_back(std::thread(Run_Test, (void* )&threadinfoarray[k]));
+                    
 				}
 
 				//等待所有线程结束
 				for(int k = 1; k <= obj_Test_Assemble_List[i].m_obj_Command_Info_List[j].m_nThreadCount; k++)
 				{
-					pthread_join(handleArray[k], NULL);
+                    threads[k-1].join();
 				}
 
-				delete[] handleArray;
 				delete[] threadinfoarray;
-#endif
 
 			}
-			Close_Mutex(objmutex);
 		}
 	}
 	Create_HTML_End(pFile);

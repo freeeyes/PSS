@@ -2,9 +2,18 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_ForbiddenIP::~CUnit_ForbiddenIP()
+CUnit_ForbiddenIP::CUnit_ForbiddenIP()
 {
     m_pForbiddenIP = NULL;
+}
+
+CUnit_ForbiddenIP::CUnit_ForbiddenIP(const CUnit_ForbiddenIP& ar)
+{
+    (*this) = ar;
+}
+
+CUnit_ForbiddenIP::~CUnit_ForbiddenIP()
+{
 }
 
 void CUnit_ForbiddenIP::setUp(void)

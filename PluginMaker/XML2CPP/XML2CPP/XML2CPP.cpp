@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
 #ifdef WIN32
 	_mkdir(objProjectInfo.m_szProjectName);
 #else
-	mkdir(objProjectInfo.m_szProjectName);
+	mkdir(objProjectInfo.m_szProjectName,0777);
 #endif
 
 	//写入主文件

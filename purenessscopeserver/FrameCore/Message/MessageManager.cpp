@@ -27,6 +27,11 @@ CMessageManager::CMessageManager(void)
     m_u4UpdateIndex        = 0;
 }
 
+CMessageManager::CMessageManager(const CMessageManager& ar)
+{
+    (*this) = ar;
+}
+
 CMessageManager::~CMessageManager(void)
 {
     OUR_DEBUG((LM_INFO, "[CMessageManager::~CMessageManager].\n"));

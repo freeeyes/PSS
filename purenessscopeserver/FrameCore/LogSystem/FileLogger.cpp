@@ -451,6 +451,11 @@ CFileLogger::CFileLogger()
     m_szLogRoot[0]   = '\0';
 }
 
+CFileLogger::CFileLogger(const CFileLogger& ar)
+{
+    (*this) = ar;
+}
+
 CFileLogger::~CFileLogger()
 {
     OUR_DEBUG((LM_INFO, "[CFileLogger::~CFileLogger].\n"));

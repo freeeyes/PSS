@@ -1,0 +1,112 @@
+##
+## Auto Generated makefile by CodeLite IDE
+## any manual changes will be erased      
+##
+## Release
+ProjectName            :=ProxyServer
+ConfigurationName      :=Release
+WorkspacePath          :=/data/develop/Lib/Network/PSS-master/Build/Linux
+ProjectPath            :=/data/develop/Lib/Network/PSS-master/purenessscopeserver/example-Module/Proxy
+IntermediateDirectory  :=$(WorkspacePath)/Linux_Bin/Temp
+OutDir                 := $(IntermediateDirectory)
+CurrentFileName        :=
+CurrentFilePath        :=
+CurrentFileFullPath    :=
+User                   :=fox mulder
+Date                   :=2019年03月30日
+CodeLitePath           :=/home/fox-mulder/.codelite
+LinkerName             :=/usr/bin/g++
+SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
+ObjectSuffix           :=.o
+DependSuffix           :=.o.d
+PreprocessSuffix       :=.i
+DebugSwitch            :=-g 
+IncludeSwitch          :=-I
+LibrarySwitch          :=-l
+OutputSwitch           :=-o 
+LibraryPathSwitch      :=-L
+PreprocessorSwitch     :=-D
+SourceSwitch           :=-c 
+OutputFile             :=$(WorkspacePath)/Linux_Bin/Module/lib$(ProjectName)
+Preprocessors          :=
+ObjectSwitch           :=-o 
+ArchiveOutputSwitch    := 
+PreprocessOnlySwitch   :=-E
+ObjectsFileList        :="ProxyServer.txt"
+PCHCompileFlags        :=
+MakeDirCommand         :=mkdir -p
+LinkOptions            :=  -s 
+IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch)../../../purenessscopeserver/Common 
+IncludePCH             := 
+RcIncludePath          := 
+Libs                   := 
+ArLibs                 :=  
+LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch). $(LibraryPathSwitch)Release 
+
+##
+## Common variables
+## AR, CXX, CC, AS, CXXFLAGS and CFLAGS can be overriden using an environment variables
+##
+AR       := /usr/bin/ar rcu
+CXX      := /usr/bin/g++
+CC       := /usr/bin/gcc
+CXXFLAGS :=  -O2 -fPIC -Wall -fexceptions  $(Preprocessors)
+CFLAGS   :=  -O2 -fPIC -Wall -fexceptions  $(Preprocessors)
+ASFLAGS  := 
+AS       := /usr/bin/as
+
+
+##
+## User defined environment variables
+##
+CodeLiteDir:=/usr/share/codelite
+Objects0=$(IntermediateDirectory)/ProxyServer_ProxyServeMain.cpp$(ObjectSuffix) 
+
+
+
+Objects=$(Objects0) 
+
+##
+## Main Build Targets 
+##
+.PHONY: all clean PreBuild PrePreBuild PostBuild MakeIntermediateDirs
+all: $(OutputFile)
+
+$(OutputFile): $(IntermediateDirectory)/.d $(Objects) 
+	@$(MakeDirCommand) $(@D)
+	@echo "" > $(IntermediateDirectory)/.d
+	@echo $(Objects0)  > $(ObjectsFileList)
+	$(SharedObjectLinkerName) $(OutputSwitch)$(OutputFile) @$(ObjectsFileList) $(LibPath) $(Libs) $(LinkOptions)
+	@$(MakeDirCommand) "/data/develop/Lib/Network/PSS-master/Build/Linux/.build-release"
+	@echo rebuilt > "/data/develop/Lib/Network/PSS-master/Build/Linux/.build-release/ProxyServer"
+
+MakeIntermediateDirs:
+	@test -d $(WorkspacePath)/Linux_Bin/Temp || $(MakeDirCommand) $(WorkspacePath)/Linux_Bin/Temp
+
+
+$(IntermediateDirectory)/.d:
+	@test -d $(WorkspacePath)/Linux_Bin/Temp || $(MakeDirCommand) $(WorkspacePath)/Linux_Bin/Temp
+
+PreBuild:
+
+
+##
+## Objects
+##
+$(IntermediateDirectory)/ProxyServer_ProxyServeMain.cpp$(ObjectSuffix): ./ProxyServer/ProxyServeMain.cpp $(IntermediateDirectory)/ProxyServer_ProxyServeMain.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/data/develop/Lib/Network/PSS-master/purenessscopeserver/example-Module/Proxy/ProxyServer/ProxyServeMain.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/ProxyServer_ProxyServeMain.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/ProxyServer_ProxyServeMain.cpp$(DependSuffix): ./ProxyServer/ProxyServeMain.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/ProxyServer_ProxyServeMain.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/ProxyServer_ProxyServeMain.cpp$(DependSuffix) -MM ./ProxyServer/ProxyServeMain.cpp
+
+$(IntermediateDirectory)/ProxyServer_ProxyServeMain.cpp$(PreprocessSuffix): ./ProxyServer/ProxyServeMain.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/ProxyServer_ProxyServeMain.cpp$(PreprocessSuffix) ./ProxyServer/ProxyServeMain.cpp
+
+
+-include $(IntermediateDirectory)/*$(DependSuffix)
+##
+## Clean
+##
+clean:
+	$(RM) -r $(WorkspacePath)/Linux_Bin/Temp/
+
+

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="PssSampleClient workspace">
+		<Project filename="../../PssSampleClient/PSSFtpClient/PssFtpClient.cbp" />
+		<Project filename="../../PssSampleClient/AutoTestClient/AutoTestClient.cbp" />
+		<Project filename="../../PssSampleClient/CommonTCPClient/CommonTCPClient.cbp" />
+		<Project filename="../../PssSampleClient/PSSLoginClient/PSSLoginClient.cbp" />
+		<Project filename="../../PssSampleClient/PSSPlugClient/PSSPlugClient.cbp" />
+		<Project filename="../../PssSampleClient/PSSProxyClient/PSSProxyClient.cbp" />
+	</Workspace>
+</CodeBlocks_workspace_file>

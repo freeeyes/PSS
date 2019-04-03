@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeLite_Project Name="LuaTest" Version="10.0.0">
+  <Plugins>
+    <Plugin Name="qmake">
+      <![CDATA[00010001N0007Release000000000000]]>
+    </Plugin>
+  </Plugins>
+  <VirtualDirectory Name="LuaLib">
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/tolua_is.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lbaselib.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lstrlib.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lundump.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lstring.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/toluabind.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lobject.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/print.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/luaconf.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lmem.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lparser.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/ldump.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lopcodes.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lfunc.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/llimits.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/ltable.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lapi.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/tolua++.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lzio.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lopcodes.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lua.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/llex.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/ldebug.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lgc.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/tolua_event.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/ltable.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lcode.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/loadlib.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lvm.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/llex.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lualib.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/toluabind.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/tolua_map.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lundump.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lparser.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lmem.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/ldo.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lstring.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lstate.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/ldo.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/ltm.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/tolua_to.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lauxlib.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lmathlib.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/tolua_push.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lauxlib.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lapi.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/ltablib.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lvm.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/loslib.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/liolib.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lcode.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lobject.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/ldebug.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/tolua_event.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lgc.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/ldblib.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lstate.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/linit.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/ltm.c"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lzio.h"/>
+    <File Name="../../../ThirdLib/thirdparty/LuaLib/lfunc.h"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="include">
+    <File Name="../../../ThirdLib/include/Lua/ParamData.h"/>
+    <File Name="./LuaTest/BaseCommand.h"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="src">
+    <File Name="./LuaTest/BaseCommand.cpp"/>
+  </VirtualDirectory>
+  <Description/>
+  <Dependencies/>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
+  <Settings Type="Dynamic Library">
+    <GlobalSettings>
+      <Compiler Options="" C_Options="" Assembler="">
+        <IncludePath Value="."/>
+      </Compiler>
+      <Linker Options="">
+        <LibraryPath Value="."/>
+      </Linker>
+      <ResourceCompiler Options=""/>
+    </GlobalSettings>
+    <Configuration Name="Debug" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Dynamic Library" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-fPIC -g -Wall -fexceptions " C_Options="-fPIC -g -Wall -fexceptions " Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+        <IncludePath Value="../../../../purenessscopeserver/Common"/>
+      </Compiler>
+      <Linker Options="-O0" Required="yes">
+        <LibraryPath Value="."/>
+        <LibraryPath Value="Debug"/>
+      </Linker>
+      <ResourceCompiler Options="" Required="no"/>
+      <General OutputFile="bin/Debug/libLuaTest" IntermediateDirectory="./Debug" Command="./libLuaTest" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="bin/Debug" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
+      <Environment EnvVarSetName="&lt;Use Workspace Settings&gt;" DbgSetName="&lt;Use Global Settings&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName/>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no" EnableCpp14="no">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+    <Configuration Name="Release" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Dynamic Library" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-O2 -fPIC -Wall -fexceptions " C_Options="-O2 -fPIC -Wall -fexceptions " Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+        <IncludePath Value="../../../purenessscopeserver/Common"/>
+        <IncludePath Value="../../../ThirdLib/thirdparty/LuaLib/"/>
+        <IncludePath Value="../../../ThirdLib/thirdparty/toluapp-master/include"/>
+        <IncludePath Value="../../../ThirdLib/thirdparty/LuaLib/"/>
+        <IncludePath Value="../../../ThirdLib/include/Lua/"/>
+      </Compiler>
+      <Linker Options="-s " Required="yes">
+        <LibraryPath Value="."/>
+        <LibraryPath Value="Release"/>
+      </Linker>
+      <ResourceCompiler Options="" Required="no"/>
+      <General OutputFile="$(WorkspacePath)/Linux_Bin/Module/lib$(ProjectName)" IntermediateDirectory="$(WorkspacePath)/Linux_Bin/Temp" Command="$(WorkspacePath)/Linux_Bin/Module/lib$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/Linux_Bin/Module/" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
+      <Environment EnvVarSetName="&lt;使用默认&gt;" DbgSetName="&lt;使用默认&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName/>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no" EnableCpp14="no">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+  </Settings>
+</CodeLite_Project>

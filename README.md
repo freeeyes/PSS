@@ -1,12 +1,10 @@
-English | [简体中文](./README_Chinese.md)  
+English | [简体中文](./README_Chinese.md)
 
 <p align="right">Current stable version: <strong>v1.0.0</strong></p>
-<p align="center"><img src="https://github.com/freeeyes/PSS/blob/master/Icon.jpg" alt="PSS"/></p>
+<p align="center"><img src="https://raw.githubusercontent.com/freeeyes/PSS/gh-pages/_images/pss.svg?sanitize=true" alt="pss" width="380"/></p>
 <center>This is a based plug-in framework that provides cross-platform IO and logically separated plug-in services.  
 
-
 ----------
-
 
 [![Build Status](https://travis-ci.org/freeeyes/PSS.svg?branch=master)](https://travis-ci.org/freeeyes/PSS)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -14,20 +12,28 @@ English | [简体中文](./README_Chinese.md)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=freeeyes&metric=alert_status)](https://sonarcloud.io/dashboard?id=freeeyes)
 [![Platform](https://img.shields.io/badge/platform-Linux,%20Windows-green.svg?style=flat)](https://github.com/freeeyes/PSS)
 </center>
- 
-# OverView 
-this is a server framework. Support the way developers use plug-ins ( so or dll library).  
-develop logical services for related TCP and UDP. This service framework is based on ace and can be compiled and run adaptively under windows and Linux.   
-the purpose of this service framework is to peel off the relationship between network io and logical developers as much as possible, so that the logical developers are more focused on their own business, and the network io is fully implemented by the configuration file.  
-operation and maintenance manager can through the auxiliary management tools, to obtain the framework operation status, work thread, data flow status, connection status and other information.  
-auxiliary operation and maintenance management, troubleshooting.  
-in addition, developers can also be completely out of the framework, using the tools around the framework, pressure test their logic module, so as to minimize the possible problems before online.  
-before using the framework, you can use the framework to provide small tools, pressure test performance indicators of the current framework, as a basis for whether to adopt.  
-example has a special test case, can provide a developer reference.   
-the goal of this framework is not just a network io plug-in interface, but a complete set of development process, as far as possible to reduce the developer 's pay.  
-specification development process ( currently available on the SVN framework testing tools, specific functions please refer to other instructions MD )  
-hope to be able to step by step with you to improve the system, really do a valuable framework. My goal is, you use cool, is to succeed. And I hope you like it more and more.  
 
+# OverView
+
+this is a server framework. Support the way developers use plug-ins ( so or dll library).  
+develop logical services for related TCP and UDP. This service framework is based on ace and can be compiled and run adaptively under windows and Linux.
+
+the purpose of this service framework is to peel off the relationship between network io and logical developers as much as possible, so that the logical developers are more focused on their own business, and the network io is fully implemented by the configuration file.
+
+operation and maintenance manager can through the auxiliary management tools, to obtain the framework operation status, work thread, data flow status, connection status and other information.  
+auxiliary operation and maintenance management, troubleshooting.
+
+in addition, developers can also be completely out of the framework, using the tools around the framework, pressure test their logic module, so as to minimize the possible problems before online.
+
+before using the framework, you can use the framework to provide small tools, pressure test performance indicators of the current framework, as a basis for whether to adopt.
+
+example has a special test case, can provide a developer reference.
+
+the goal of this framework is not just a network io plug-in interface, but a complete set of development process, as far as possible to reduce the developer 's pay.
+
+specification development process ( currently available on the SVN framework testing tools, specific functions please refer to other instructions MD )
+
+hope to be able to step by step with you to improve the system, really do a valuable framework. My goal is, you use cool, is to succeed. And I hope you like it more and more.
 
 ## [How does the PSS framework compile](./Doc/English/Install.md) 
 ## [Pss framework configuration instructions](./Doc/English/Configure.md)
@@ -39,18 +45,21 @@ hope to be able to step by step with you to improve the system, really do a valu
 
 ![pss frame flow chart](http://on-img.com/chart_image/5a6ae014e4b0d1c5b5b1e6fa.png)
 
->##Provides several piezometric data ( TCP pass tool available from PSS open source kit ) 
+> **Provides several piezometric data ( TCP pass tool available from PSS open source kit )**
 
-* * *  
-> ###Windows  
-> Test PSS IP:172.21.1.200, Port:10002. (Windows7 x64 DEBUG)  
+----------
+
+### Windows
+
+> Test PSS IP:172.21.1.200, Port:10002. (Windows7 x64 DEBUG)
+
 * Test IO protocal:TCP  
 * Begin Time: 2013-09-18 11:07:42  
 * End Time: 2013-09-18 12:06:00  
 * Thread counts:10  
 * connect counts:10  
 * send package counts:11675202  
-* recv package counts:11675202   
+* recv package counts:11675202
 * connect fails:0  
 * send fails:0  
 * recv dails:0  
@@ -58,9 +67,12 @@ hope to be able to step by step with you to improve the system, really do a valu
 * send success rote:100.000000%  
 * recv success rote:100.000000%  
 
-* * * 
-> ###Linux  
+----------
+
+### Linux
+
 > Test PSS IP:172.21.1.68, port:10002.(Linux ContOS6 x64 DEBUG)
+
 * Test IO protocal:TCP
 * Begin Time:: 2013-09-16 09:55:58
 * End Time: 2013-09-16 10:38:09
@@ -75,13 +87,10 @@ hope to be able to step by step with you to improve the system, really do a valu
 * send success rote:100.000000%
 * recv success rote:100.000000%
 
-* * *
+----------
 
-author:
-freeeyes
+Author: freeeyes
 
-thanks:
-凹凸man,w1w,乔戈,Bobo,弄香花满衣,崔,kz
+Thanks: 凹凸man,w1w,乔戈,Bobo,弄香花满衣,崔,kz,Jerry-Larry
 
 QQ group: 260862613
-

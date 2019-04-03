@@ -1,0 +1,51 @@
+project(PurenessScopeServer):aceexe{
+ 	exename = PurenessScopeServer
+
+ Source_Files{
+  ../../purenessscopeserver/Common/*.cpp	
+  ../../purenessscopeserver/FrameCore/Common/*.cpp
+  ../../purenessscopeserver/FrameCore/Console/*.cpp
+  ../../purenessscopeserver/FrameCore/LogSystem/*.cpp
+  ../../purenessscopeserver/FrameCore/Message/*.cpp
+  ../../purenessscopeserver/FrameCore/PacketParse/*.cpp
+  ../../purenessscopeserver/FrameCore/Reactor/*.cpp
+  ../../purenessscopeserver/FrameCore/UDP/*.cpp
+  ../../purenessscopeserver/FrameCore/TinyXML/*.cpp
+  ../../purenessscopeserver/FrameCore/Mail/*.cpp
+  ../../purenessscopeserver/FrameCore/FileTest/*.cpp
+  ../../purenessscopeserver/FrameCore/*.cpp
+ }
+  includes += ../../purenessscopeserver/Common \
+              ../../purenessscopeserver/FrameCore/Common \
+			  ../../purenessscopeserver/FrameCore/Console \
+			  ../../purenessscopeserver/FrameCore/LogSystem \
+			  ../../purenessscopeserver/FrameCore/Message \
+			  ../../purenessscopeserver/FrameCore/PacketParse \
+			  ../../purenessscopeserver/FrameCore/Reactor \
+			  ../../purenessscopeserver/FrameCore/UDP \
+			  ../../purenessscopeserver/FrameCore/TinyXML \
+			  ../../purenessscopeserver/FrameCore/Mail \
+			  ../../purenessscopeserver/FrameCore/FileTest
+			  
+  includes += /usr/local/include/
+  includes += /usr/include/
+  libpaths += /usr/lib64/ 
+  libpaths += /usr/lib/x86_64-linux-gnu/
+  
+  specific(make) {
+    compile_flags += -fcheck-new
+  }
+  
+   verbatim(gnuace, local) {
+   ifneq (, $(shell which curl))
+      CPPFLAGS     += -D__THREE_LIBRARY_CURL__
+      LDLIBS       += -lcurl
+   endif   
+   }
+
+  specific(gnuace) {
+    compile_flags += -Wno-deprecated -std=c++11
+  }
+
+
+}

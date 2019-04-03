@@ -31,6 +31,11 @@ CMessageService::CMessageService():m_mutex(), m_cond(m_mutex)
     }
 }
 
+CMessageService::CMessageService(const CMessageService& ar) : CMessageService()
+{
+    (*this) = ar;
+}
+
 CMessageService::~CMessageService()
 {
     OUR_DEBUG((LM_INFO, "[CMessageService::~CMessageService].\n"));
@@ -124,7 +129,7 @@ int CMessageService::open(void* args)
 
 int CMessageService::svc(void)
 {
-    while(true)
+    while(m_blRun)
     {
         if (false == Dispose_Queue())
         {
@@ -360,10 +365,9 @@ int CMessageService::Close()
     return 0;
 }
 
-bool CMessageService::SaveThreadInfoData()
+bool CMessageService::SaveThreadInfoData(const ACE_Time_Value& tvNow)
 {
     //这里进行线程自检
-    ACE_Time_Value tvNow(ACE_OS::gettimeofday());
     ACE_Date_Time dt(m_ThreadInfo.m_tvUpdateTime);
 
     //添加到线程信息历史数据表
@@ -761,10 +765,9 @@ CMessageServiceGroup::~CMessageServiceGroup()
 int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 {
     ACE_UNUSED_ARG(arg);
-    ACE_UNUSED_ARG(tv);
 
     //检查所有工作线程
-    if (false == CheckWorkThread())
+    if (false == CheckWorkThread(tv))
     {
         OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::handle_timeout]CheckWorkThread is fail.\n"));
     }
@@ -967,7 +970,7 @@ bool CMessageServiceGroup::KillTimer()
     return true;
 }
 
-bool CMessageServiceGroup::CheckWorkThread()
+bool CMessageServiceGroup::CheckWorkThread(const ACE_Time_Value& tvNow)
 {
     uint32 u4Size = (uint32)m_vecMessageService.size();
 
@@ -975,7 +978,7 @@ bool CMessageServiceGroup::CheckWorkThread()
     {
         CMessageService* pMessageService = m_vecMessageService[i];
 
-        if (NULL != pMessageService && false == pMessageService->SaveThreadInfoData())
+        if (NULL != pMessageService && false == pMessageService->SaveThreadInfoData(tvNow))
         {
             OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::CheckWorkThread]SaveThreadInfo error.\n"));
         }

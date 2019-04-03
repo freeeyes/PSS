@@ -23,7 +23,21 @@ class CUnit_TimerManager : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
+    CUnit_TimerManager();
+
     virtual ~CUnit_TimerManager();
+
+    CUnit_TimerManager(const CUnit_TimerManager& ar);
+
+    CUnit_TimerManager& operator = (const CUnit_TimerManager& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
 
     virtual void setUp(void);
 

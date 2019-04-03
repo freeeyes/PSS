@@ -12,6 +12,11 @@ CFileTestManager::CFileTestManager(void)
     m_u4TimeInterval   = 0;
 }
 
+CFileTestManager::CFileTestManager(const CFileTestManager& ar)
+{
+    (*this) = ar;
+}
+
 CFileTestManager::~CFileTestManager(void)
 {
     Close();

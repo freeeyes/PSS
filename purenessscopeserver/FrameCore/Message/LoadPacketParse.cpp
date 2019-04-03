@@ -4,6 +4,11 @@ CLoadPacketParse::CLoadPacketParse()
 {
 }
 
+CLoadPacketParse::CLoadPacketParse(const CLoadPacketParse& ar)
+{
+    (*this) = ar;
+}
+
 CLoadPacketParse::~CLoadPacketParse()
 {
     OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::~CLoadPacketParse]\n"));

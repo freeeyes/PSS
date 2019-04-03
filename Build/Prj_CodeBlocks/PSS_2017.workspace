@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="PSS_vc2017 workspace">
+		<Project filename="../../purenessscopeserver/FrameCore/PSS_vc2017.cbp" />
+		<Project filename="../../purenessscopeserver/PacketParse_Interface/PacketParse_VS2017.cbp" />
+		<Project filename="../../purenessscopeserver/PacketParse_Interface_Http/PacketParse_VS2017_Http.cbp" />
+		<Project filename="../../purenessscopeserver/PacketParse_Interface_Monitor/PacketParse_Interface_Monitor.cbp" />
+		<Project filename="../../purenessscopeserver/PacketParse_Interface_WebSocket/PacketParse_VS2017_WebSocket.cbp" />
+	</Workspace>
+</CodeBlocks_workspace_file>

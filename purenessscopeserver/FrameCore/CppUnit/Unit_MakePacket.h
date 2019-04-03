@@ -13,7 +13,21 @@ class CUnit_MakePacket : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
+    CUnit_MakePacket();
+
     virtual ~CUnit_MakePacket();
+
+    CUnit_MakePacket(const CUnit_MakePacket& ar);
+
+    CUnit_MakePacket& operator = (const CUnit_MakePacket& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
 
     virtual void setUp(void);
 

@@ -190,7 +190,19 @@ class CFileLogger : public IServerLogger
 {
 public:
     CFileLogger();
-    ~CFileLogger();
+    virtual ~CFileLogger();
+
+    CFileLogger(const CFileLogger& ar);
+
+    CFileLogger& operator = (const CFileLogger& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
 
     int DoLog(int nLogType, _LogBlockInfo* pLogBlockInfo);
     int GetLogTypeCount();

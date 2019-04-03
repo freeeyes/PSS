@@ -2,6 +2,20 @@
 
 #ifdef _CPPUNIT_TEST
 
+CUnit_FileTestManager::CUnit_FileTestManager()
+{
+    m_pFileTestManager = NULL;
+}
+
+CUnit_FileTestManager::CUnit_FileTestManager(const CUnit_FileTestManager& ar)
+{
+    (*this) = ar;
+}
+
+CUnit_FileTestManager::~CUnit_FileTestManager()
+{
+}
+
 void CUnit_FileTestManager::setUp(void)
 {
     m_pFileTestManager = new CFileTestManager();

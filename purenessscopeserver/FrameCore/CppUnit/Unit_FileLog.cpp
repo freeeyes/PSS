@@ -2,9 +2,18 @@
 
 #ifdef _CPPUNIT_TEST
 
+CUnit_FileLogger::CUnit_FileLogger()
+{
+    m_pLogFile = NULL;
+}
+
+CUnit_FileLogger::CUnit_FileLogger(const CUnit_FileLogger& ar)
+{
+    (*this) = ar;
+}
+
 CUnit_FileLogger::~CUnit_FileLogger()
 {
-
 }
 
 void CUnit_FileLogger::setUp(void)

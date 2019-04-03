@@ -2,6 +2,19 @@
 
 #ifdef _CPPUNIT_TEST
 
+CUnit_CommandAccount::CUnit_CommandAccount()
+{
+    m_pCommandAccount  = 0;
+    m_u1CommandAccount = 1;
+    m_u1Flow           = 0;
+    m_u2RecvTimeout    = 30;
+}
+
+CUnit_CommandAccount::CUnit_CommandAccount(const CUnit_CommandAccount& ar)
+{
+    (*this) = ar;
+}
+
 CUnit_CommandAccount::~CUnit_CommandAccount()
 {
 }

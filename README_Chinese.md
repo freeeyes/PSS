@@ -1,20 +1,19 @@
- [English](./README.md) | 简体中文 
+[English](./README.md) | 简体中文
 
 <p align="right">当前稳定版本: <strong>v1.0.0</strong></p>
-<p align="center"><img src="https://github.com/freeeyes/PSS/blob/master/Icon.jpg" alt="PSS"/></p>
+<p align="center"><img src="https://raw.githubusercontent.com/freeeyes/PSS/gh-pages/_images/pss.svg?sanitize=true" alt="pss" width="380"/></p>
 <center>这是一个基于网络的插件式框架，提供跨平台的IO和逻辑分离的插件服务.  
 
-
 ----------
-
 
 [![Build Status](https://travis-ci.org/freeeyes/PSS.svg?branch=master)](https://travis-ci.org/freeeyes/PSS)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![GitHub version](https://badge.fury.io/gh/freeeyes%2FPSS.svg)](https://badge.fury.io/gh/freeeyes%2FPSS)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=freeeyes&metric=alert_status)](https://sonarcloud.io/dashboard?id=freeeyes)
 [![Platform](https://img.shields.io/badge/platform-Linux,%20Windows-green.svg?style=flat)](https://github.com/freeeyes/PSS)
- 
-#介绍
+
+# 介绍
+
 这是一个服务器框架。支持开发者使用插件(so或者dll)的方式，  
 开发相关TCP和UDP的逻辑服务。 本服务框架基于ACE，可以在windows和linux下自适应编译运行。 
 本服务框架的宗旨是尽量剥离网络IO和逻辑开发者之间的关系，让逻辑开发者更专注于自己的业务，而网络IO部分完全由配置文件去实现。 
@@ -41,10 +40,14 @@ example下有专门的测试用例，可以提供开发者参考。
 
 ![pss框架流程图](http://on-img.com/chart_image/5a6ae014e4b0d1c5b5b1e6fa.png)
 
->##提供几个压测数据（TcpPass工具，可从PSS开源工具包中获得） 
-* * *  
-> ###Windows平台
-压测IP:172.21.1.200, 压测端口:10002.（Win7 DEBUG）
+>##提供几个压测数据(TcpPass工具，可从PSS开源工具包中获得)
+
+----------
+
+### Windows平台
+
+压测IP:172.21.1.200, 压测端口:10002 (Win7 DEBUG)
+
 * 压测类型:TCP
 * 压测开始时间为: 2013-09-18 11:07:42
 * 压测结束时间为: 2013-09-18 12:06:00
@@ -59,9 +62,9 @@ example下有专门的测试用例，可以提供开发者参考。
 * 发送数据包成功百分比:100.000000%
 * 接收数据包成功百分比:100.000000%
 
-* * * 
-> ###Linux平台
-* 压测IP:172.21.1.68, 压测端口:10002.（Linux ContOS6 DEBUG）
+### Linux平台
+
+* 压测IP:172.21.1.68, 压测端口:10002 (Linux ContOS6 DEBUG)
 * 压测类型:TCP
 * 压测开始时间为: 2013-09-16 09:55:58
 * 压测结束时间为: 2013-09-16 10:38:09
@@ -76,13 +79,12 @@ example下有专门的测试用例，可以提供开发者参考。
 * 发送数据包成功百分比:100.000000%
 * 接收数据包成功百分比:100.000000%
 
-* * *
+----------
 
 作者:
 freeeyes
 
 框架贡献者:
-凹凸man,w1w,乔戈,Bobo,弄香花满衣,崔,kz
+凹凸man,w1w,乔戈,Bobo,弄香花满衣,崔,kz,Jerry-Larry
 
 QQ框架技术讨论群: 260862613
-

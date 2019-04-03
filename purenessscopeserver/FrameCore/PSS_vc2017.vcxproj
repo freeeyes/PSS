@@ -22,7 +22,7 @@
     <ProjectGuid>{8C99CA60-B114-4866-8D87-9DC0C17831F3}</ProjectGuid>
     <RootNamespace>PurenessScopeServer</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -67,7 +67,7 @@
     <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>.\Windows_Bin\</OutDir>
+    <OutDir>..\..\Build\Windows\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)_D</TargetName>
@@ -75,7 +75,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)_D</TargetName>
-    <OutDir>.\Windows_Bin\</OutDir>
+    <OutDir>..\..\Build\Windows\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>.\Windows_Bin\</OutDir>
@@ -84,7 +84,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>.\Windows_Bin</OutDir>
+    <OutDir>$(SolutionDir)\Windows_Bin</OutDir>
+    <IntDir>$(SolutionDir)\Temp\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -236,7 +237,9 @@
     <ClCompile Include="CppUnit\Unit_TimeQueue.cpp" />
     <ClCompile Include="CppUnit\Unit_WorkThreadAI.cpp" />
     <ClCompile Include="Mail\smtps.cpp" />
+    <ClCompile Include="Message\LogicThreadManager.cpp" />
     <ClCompile Include="Message\MessageDyeingManager.cpp" />
+    <ClCompile Include="Proactor\ProConnectHandler.cpp" />
     <ClCompile Include="Proactor\ProTTyClientManager.cpp" />
     <ClCompile Include="Proactor\ProTTyHandler.cpp" />
     <ClCompile Include="PurenessScopeServer.cpp">
@@ -325,12 +328,6 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Proactor\ProConnectClient.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Proactor\ProConnectHandle.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -655,6 +652,7 @@
     <ClInclude Include="FileTest\FileTest.h" />
     <ClInclude Include="FileTest\FileTestManager.h" />
     <ClInclude Include="Mail\smtps.h" />
+    <ClInclude Include="Message\LogicThreadManager.h" />
     <ClInclude Include="Message\MessageDyeingManager.h" />
     <ClInclude Include="PacketParse\PacketConsoleParse.h" />
     <ClInclude Include="PacketParse\PacketParse.h" />
@@ -674,7 +672,7 @@
     <ClInclude Include="Proactor\ProAsynchConnect.h" />
     <ClInclude Include="Proactor\ProConnectAccept.h" />
     <ClInclude Include="Proactor\ProConnectClient.h" />
-    <ClInclude Include="Proactor\ProConnectHandle.h" />
+    <ClInclude Include="Proactor\ProConnectHandler.h" />
     <ClInclude Include="Proactor\ProConsoleAccept.h" />
     <ClInclude Include="Proactor\ProConsoleHandle.h" />
     <ClInclude Include="Proactor\ProControlListen.h" />

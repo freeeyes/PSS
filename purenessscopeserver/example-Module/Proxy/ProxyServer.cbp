@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="ProxyServer" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Release x64">
+				<Option output="../../../Build/Prj_CodeBlocks/Linux_Bin/Module/ProxyServer" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../../../Build/Prj_CodeBlocks/Temp/" />
+				<Option deps_output="../../../Build/Prj_CodeBlocks/Linux_Bin/Module/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O1" />
+					<Add option="-Wall" />
+					<Add option="-fPIC" />
+					<Add directory="./" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="$(ACE_ROOT)/" />
+					<Add directory="./" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="-s" />
+					<Add directory="./" />
+					<Add directory="$(ACE_ROOT)/lib/" />
+				</Linker>
+			</Target>
+		</Build>
+		<Linker>
+			<Add library="/usr/local/lib/libACE.so" />
+		</Linker>
+		<Unit filename="ProxyServer/ProxyServeMain.cpp" />
+		<Extensions>
+			<envvars />
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

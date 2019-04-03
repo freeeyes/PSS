@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxFrame" name="PSSProxyClientFrame">
+		<title>PSS代理测试客户端</title>
+		<icon>./Icon.jpg</icon>
+		<size>532,410</size>
+		<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
+			<pos>144,96</pos>
+			<object class="wxStaticBox" name="ID_STATICBOX1" variable="StaticBox1" member="yes">
+				<label>代理测试</label>
+				<pos>8,8</pos>
+				<size>520,168</size>
+			</object>
+			<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
+				<label>测试IP</label>
+				<pos>32,40</pos>
+			</object>
+			<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
+				<label>测试端口</label>
+				<pos>256,40</pos>
+			</object>
+			<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
+				<label>测试代码</label>
+				<pos>32,88</pos>
+			</object>
+			<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="TextCtrl_ServerIP" member="yes">
+				<value>127.0.0.1</value>
+				<maxlength>16</maxlength>
+				<pos>88,32</pos>
+				<size>160,35</size>
+			</object>
+			<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="TextCtrl_ServerPort" member="yes">
+				<value>10002</value>
+				<pos>328,32</pos>
+				<size>-1,35</size>
+			</object>
+			<object class="wxTextCtrl" name="ID_TEXTCTRL3" variable="TextCtrl_SendData" member="yes">
+				<value>01 00 30 10 08 00 00 00 46 45 45 45 45 59 45 53 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 be cd aa 8f 3c 01 00 00</value>
+				<pos>88,80</pos>
+				<size>432,35</size>
+			</object>
+			<object class="wxButton" name="ID_BUTTON1" variable="Button_StartTest" member="yes">
+				<label>开始测试短连接</label>
+				<pos>32,128</pos>
+				<handler function="OnButton_StartTestClick" entry="EVT_BUTTON" />
+			</object>
+		</object>
+	</object>
+</wxsmith>

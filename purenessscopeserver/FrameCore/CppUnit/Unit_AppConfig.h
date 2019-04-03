@@ -14,7 +14,21 @@ class CUnit_AppConfig : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
+    CUnit_AppConfig();
+
     virtual ~CUnit_AppConfig();
+
+    CUnit_AppConfig(const CUnit_AppConfig& ar);
+
+    CUnit_AppConfig& operator = (const CUnit_AppConfig& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
 
     virtual void setUp(void);
 

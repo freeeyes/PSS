@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="PssFtpClient" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Release x64">
+				<Option output="../../Build/Prj_CodeBlocks/Linux_Bin/PssFtpClient" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../../Build/Prj_CodeBlocks/Temp/" />
+				<Option deps_output="../../Build/Prj_CodeBlocks/Linux_Bin/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O1" />
+					<Add option="-Wall" />
+					<Add option="`wx-config --cflags`" />
+					<Add option="-D_LINUX_PLATFORM_" />
+					<Add directory="../../ThirdLib/include/" />
+					<Add directory="../../ThirdLib/include/Lua/" />
+					<Add directory="../../ThirdLib/thirdparty/" />
+					<Add directory="../../ThirdLib/thirdparty/LuaLib/" />
+					<Add directory="../../ThirdLib/include/TinyXML/" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="`wx-config --libs`" />
+					<Add library="/usr/local/lib/liblog4cplus.so" />
+				</Linker>
+			</Target>
+		</Build>
+		<Unit filename="../../ThirdLib/include/CNetOperation.cpp" />
+		<Unit filename="../../ThirdLib/include/CNetOperation.h" />
+		<Unit filename="../../ThirdLib/thirdparty/Mylog.cpp" />
+		<Unit filename="../../ThirdLib/thirdparty/sock_wrap.cpp" />
+		<Unit filename="../../ThirdLib/thirdparty/sock_wrap.h" />
+		<Unit filename="PssFtpClient/PssFtpClientApp.cpp" />
+		<Unit filename="PssFtpClient/PssFtpClientApp.h" />
+		<Unit filename="PssFtpClient/PssFtpClientMain.cpp" />
+		<Unit filename="PssFtpClient/PssFtpClientMain.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

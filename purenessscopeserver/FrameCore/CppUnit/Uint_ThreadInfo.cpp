@@ -2,9 +2,18 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_ThreadInfo::~CUnit_ThreadInfo()
+CUnit_ThreadInfo::CUnit_ThreadInfo()
 {
     m_pThreadInfo = NULL;
+}
+
+CUnit_ThreadInfo::CUnit_ThreadInfo(const CUnit_ThreadInfo& ar)
+{
+    (*this) = ar;
+}
+
+CUnit_ThreadInfo::~CUnit_ThreadInfo()
+{
 }
 
 void CUnit_ThreadInfo::setUp(void)

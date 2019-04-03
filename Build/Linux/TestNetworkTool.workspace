@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeLite_Workspace Name="TestNetworkTool" Database="" Version="10.0.0">
+  <Project Name="PassTCP" Path="../../TestNetworkTool/PassTCP.project" Active="Yes"/>
+  <Project Name="PSS_ClientManager" Path="../../TestNetworkTool/PSS_ClientManager.project"/>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="Debug" Selected="no">
+      <Environment/>
+      <Project Name="PassTCP" ConfigName="Debug"/>
+      <Project Name="PSS_ClientManager" ConfigName="Debug"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Release" Selected="yes">
+      <Environment/>
+      <Project Name="PassTCP" ConfigName="Release"/>
+      <Project Name="PSS_ClientManager" ConfigName="Release"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
+</CodeLite_Workspace>

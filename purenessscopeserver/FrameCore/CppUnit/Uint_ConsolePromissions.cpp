@@ -2,6 +2,16 @@
 
 #ifdef _CPPUNIT_TEST
 
+CUnit_ConsolePromissions::CUnit_ConsolePromissions()
+{
+    m_pConsolePromissions = NULL;
+}
+
+CUnit_ConsolePromissions::CUnit_ConsolePromissions(const CUnit_ConsolePromissions& ar)
+{
+    (*this) = ar;
+}
+
 CUnit_ConsolePromissions::~CUnit_ConsolePromissions()
 {
 

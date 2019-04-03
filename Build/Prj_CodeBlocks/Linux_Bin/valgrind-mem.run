@@ -1,0 +1,1 @@
+valgrind --tool=memcheck --leak-check=full --show-reachable=yes --log-file=EfcLog.log ./PurenessScopeServer

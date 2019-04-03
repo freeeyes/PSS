@@ -2,9 +2,19 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_AceReactorManager::~CUnit_AceReactorManager()
+CUnit_AceReactorManager::CUnit_AceReactorManager()
 {
     m_pReactorManager = NULL;
+}
+
+CUnit_AceReactorManager::CUnit_AceReactorManager(const CUnit_AceReactorManager& ar)
+{
+    (*this) = ar;
+}
+
+CUnit_AceReactorManager::~CUnit_AceReactorManager()
+{
+
 }
 
 void CUnit_AceReactorManager::setUp(void)

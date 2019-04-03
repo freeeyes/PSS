@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<!-- 文件测试相关设置 ContentType=1是二进制协议,0是文本协议,ResponseCount表示整组协议期望的应答条数,ExpectTime期望测试时总的耗时(单位毫秒)-->
+	<!-- ExpectTime时间必须在TimeInterval周期内 -->
+	<FileTestConfig Path="./FileTest/" TimeInterval="10" ConnectCount="1" ResponseCount="1" ExpectTime="500" ParseID="1" ContentType="1" Desc="文件测试相关设置" />
+	<!-- 协议文件信息,协议文件需要按照业务逻辑先后顺序配置,其中FileName是包含协议内容的文件名-->
+	<!-- FileInfo可以是多个，单一数据包目前大小不能超过10K -->
+	<FileInfo FileName="1.txt" Desc="PSS 测试" />
+</Config>

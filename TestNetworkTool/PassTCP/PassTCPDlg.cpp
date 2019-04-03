@@ -1,1202 +1,1193 @@
+Ôªø/***************************************************************
+ * Name:      PassTCPDlg.cpp
+ * Purpose:   Code for Application Frame
+ * Author:    Smith ()
+ * Created:   2019-02-17
+ * Copyright: Smith ()
+ * License:
+ **************************************************************/
 
-// PassTCPDlg.cpp :  µœ÷Œƒº˛
-//
-
-#include "stdafx.h"
-#include "PassTCP.h"
 #include "PassTCPDlg.h"
+#include <wx/msgdlg.h>
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#endif
+#include "macro.h"
+#include "PacketDlg.h"
 
 
-// ”√”⁄”¶”√≥Ã–Ú°∞πÿ”⁄°±≤Àµ•œÓµƒ CAboutDlg ∂‘ª∞øÚ
 
-//œﬂ≥Ã÷¥––
-DWORD WINAPI ThreadProc(LPVOID argv)
+//(*InternalHeaders(CPassTCPDlg)
+#include <wx/bitmap.h>
+#include <wx/icon.h>
+#include <wx/image.h>
+#include <wx/intl.h>
+#include <wx/string.h>
+//*)
+
+
+
+
+//Á∫øÁ®ãÊâßË°å
+int  ThreadProc(void* argv)
 {
 
-	CClientTcpSocket* pClientTcpSocket = (CClientTcpSocket* )argv;
-	pClientTcpSocket->Run();
+    CClientTcpSocket* pClientTcpSocket = (CClientTcpSocket* )argv;
+    pClientTcpSocket->Run();
 
-	return 0;
+    return 0;
 }
 
-DWORD WINAPI ThreadUDPProc(LPVOID argv)
+int  ThreadUDPProc(void* argv)
 {
 
-	CClientUdpSocket* pClientUdpSocket = (CClientUdpSocket* )argv;
-	pClientUdpSocket->Run();
+    CClientUdpSocket* pClientUdpSocket = (CClientUdpSocket* )argv;
+    pClientUdpSocket->Run();
 
-	return 0;
+    return 0;
 }
 
 
-class CAboutDlg : public CDialog
+
+
+//helper functions
+enum wxbuildinfoformat
 {
-public:
-	CAboutDlg();
-
-	// ∂‘ª∞øÚ ˝æ›
-	enum { IDD = IDD_ABOUTBOX };
-
-protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV ÷ß≥÷
-
-	//  µœ÷
-protected:
-	DECLARE_MESSAGE_MAP()
+    short_f, long_f
 };
 
-CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD)
+wxString wxbuildinfo(wxbuildinfoformat format)
 {
+    wxString wxbuild(wxVERSION_STRING);
+
+    if (format == long_f )
+    {
+#if defined(__WXMSW__)
+        wxbuild << _T("-Windows");
+#elif defined(__UNIX__)
+        wxbuild << _T("-Linux");
+#endif
+
+#if wxUSE_UNICODE
+        wxbuild << _T("-Unicode build");
+#else
+        wxbuild << _T("-ANSI build");
+#endif // wxUSE_UNICODE
+    }
+
+    return wxbuild;
 }
 
-void CAboutDlg::DoDataExchange(CDataExchange* pDX)
+//(*IdInit(CPassTCPDlg)
+const long CPassTCPDlg::ID_STATICBOX1 = wxNewId();
+const long CPassTCPDlg::ID_STATICTEXT1 = wxNewId();
+const long CPassTCPDlg::ID_STATICTEXT2 = wxNewId();
+const long CPassTCPDlg::ID_STATICBOX2 = wxNewId();
+const long CPassTCPDlg::ID_STATICTEXT3 = wxNewId();
+const long CPassTCPDlg::ID_STATICTEXT4 = wxNewId();
+const long CPassTCPDlg::ID_STATICTEXT5 = wxNewId();
+const long CPassTCPDlg::ID_STATICBOX3 = wxNewId();
+const long CPassTCPDlg::ID_STATICTEXT6 = wxNewId();
+const long CPassTCPDlg::ID_TEXTCTRL1 = wxNewId();
+const long CPassTCPDlg::ID_CHECKBOX1 = wxNewId();
+const long CPassTCPDlg::ID_BUTTON_LuaAdvance = wxNewId();
+const long CPassTCPDlg::ID_BUTTON_StatTest = wxNewId();
+const long CPassTCPDlg::ID_BUTTON_StopTest = wxNewId();
+const long CPassTCPDlg::ID_BUTTON_ExportTestData = wxNewId();
+const long CPassTCPDlg::ID_BUTTON_SetRadomPacket = wxNewId();
+const long CPassTCPDlg::ID_TEXTCTRL2 = wxNewId();
+const long CPassTCPDlg::ID_TEXTCTRL3 = wxNewId();
+const long CPassTCPDlg::ID_TEXTCTRL4 = wxNewId();
+const long CPassTCPDlg::ID_TEXTCTRL5 = wxNewId();
+const long CPassTCPDlg::ID_TEXTCTRL6 = wxNewId();
+const long CPassTCPDlg::ID_STATICTEXT7 = wxNewId();
+const long CPassTCPDlg::ID_STATICTEXT8 = wxNewId();
+const long CPassTCPDlg::ID_STATICTEXT9 = wxNewId();
+const long CPassTCPDlg::ID_STATICTEXT10 = wxNewId();
+const long CPassTCPDlg::ID_TEXTCTRL7 = wxNewId();
+const long CPassTCPDlg::ID_TEXTCTRL8 = wxNewId();
+const long CPassTCPDlg::ID_TEXTCTRL9 = wxNewId();
+const long CPassTCPDlg::ID_TEXTCTRL10 = wxNewId();
+const long CPassTCPDlg::ID_CHECKBOX2 = wxNewId();
+const long CPassTCPDlg::ID_CHECKBOX3 = wxNewId();
+const long CPassTCPDlg::ID_CHECKBOX4 = wxNewId();
+const long CPassTCPDlg::ID_CHECKBOX5 = wxNewId();
+const long CPassTCPDlg::ID_CHECKBOX6 = wxNewId();
+const long CPassTCPDlg::ID_CHECKBOX7 = wxNewId();
+const long CPassTCPDlg::ID_CHECKBOX8 = wxNewId();
+const long CPassTCPDlg::ID_RADIOBOX1 = wxNewId();
+const long CPassTCPDlg::ID_STATICTEXT11 = wxNewId();
+const long CPassTCPDlg::ID_STATICTEXT12 = wxNewId();
+const long CPassTCPDlg::ID_STATICTEXT13 = wxNewId();
+const long CPassTCPDlg::ID_STATICTEXT14 = wxNewId();
+const long CPassTCPDlg::ID_STATICTEXT15 = wxNewId();
+const long CPassTCPDlg::ID_STATICTEXT16 = wxNewId();
+const long CPassTCPDlg::ID_TEXTCTRL11 = wxNewId();
+const long CPassTCPDlg::ID_TEXTCTRL12 = wxNewId();
+const long CPassTCPDlg::ID_TEXTCTRL13 = wxNewId();
+const long CPassTCPDlg::ID_TEXTCTRL14 = wxNewId();
+const long CPassTCPDlg::ID_TEXTCTRL15 = wxNewId();
+const long CPassTCPDlg::ID_TEXTCTRL16 = wxNewId();
+const long CPassTCPDlg::ID_STATICTEXT17 = wxNewId();
+const long CPassTCPDlg::ID_STATICTEXT18 = wxNewId();
+const long CPassTCPDlg::ID_STATICTEXT19 = wxNewId();
+const long CPassTCPDlg::ID_TEXTCTRL17 = wxNewId();
+const long CPassTCPDlg::ID_TEXTCTRL18 = wxNewId();
+const long CPassTCPDlg::ID_TEXTCTRL19 = wxNewId();
+const long CPassTCPDlg::ID_STATICTEXT20 = wxNewId();
+const long CPassTCPDlg::ID_TEXTCTRL20 = wxNewId();
+const long CPassTCPDlg::ID_STATICTEXT21 = wxNewId();
+const long CPassTCPDlg::ID_TEXTCTRL21 = wxNewId();
+const long CPassTCPDlg::ID_STATICTEXT22 = wxNewId();
+const long CPassTCPDlg::ID_CHOICE1 = wxNewId();
+const long CPassTCPDlg::ID_TEXTCTRL22 = wxNewId();
+const long CPassTCPDlg::ID_PANEL1 = wxNewId();
+const long CPassTCPDlg::ID_TIMER_Test = wxNewId();
+//*)
+
+BEGIN_EVENT_TABLE(CPassTCPDlg,wxFrame)
+    //(*EventTable(CPassTCPDlg)
+    //*)
+END_EVENT_TABLE()
+
+CPassTCPDlg::CPassTCPDlg(wxWindow* parent,wxWindowID id)
 {
-	CDialog::DoDataExchange(pDX);
+    //(*Initialize(CPassTCPDlg)
+    Create(parent, id, wxT("TCPÂéãÂäõÊµãËØïÈÄöÁî®Â∑•ÂÖ∑"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("id"));
+    SetClientSize(wxSize(769,510));
+    {
+    	wxIcon FrameIcon;
+    	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("./small.ico"))));
+    	SetIcon(FrameIcon);
+    }
+    Panel1 = new wxPanel(this, ID_PANEL1, wxPoint(224,216), wxSize(752,514), wxTAB_TRAVERSAL, _T("ID_PANEL1"));
+    StaticBox1 = new wxStaticBox(Panel1, ID_STATICBOX1, wxT("ÂèÇÊï∞ÈÖçÁΩÆ"), wxPoint(0,0), wxSize(768,296), 0, _T("ID_STATICBOX1"));
+    StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, wxT("ÊúçÂä°Âô®IP"), wxPoint(24,22), wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+    StaticText2 = new wxStaticText(Panel1, ID_STATICTEXT2, wxT("ÂéãÊµãÁ∫øÁ®ãÊï∞"), wxPoint(24,52), wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+    StaticBox2 = new wxStaticBox(Panel1, ID_STATICBOX2, wxT("ÂéãÂäõÊµãËØïÂèÇÊï∞"), wxPoint(8,288), wxSize(760,232), 0, _T("ID_STATICBOX2"));
+    StaticText3 = new wxStaticText(Panel1, ID_STATICTEXT3, wxT("ËøûÊé•Èó¥Âª∂ËøüÊØ´Áßí"), wxPoint(24,80), wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+    StaticText4 = new wxStaticText(Panel1, ID_STATICTEXT4, wxT("Êï∞ÊçÆÂåÖÈó¥Èöî"), wxPoint(24,108), wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+    StaticText5 = new wxStaticText(Panel1, ID_STATICTEXT5, wxT("ËÆæÁΩÆÂèëÂåÖÊÄªÊï∞ÔºåÂ¶ÇÊûúÊó†ÈôêËÆæÁΩÆ‰∏∫Èõ∂"), wxPoint(24,140), wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+    StaticBox3 = new wxStaticBox(Panel1, ID_STATICBOX3, wxT("È´òÁ∫ßÊ®°Âºè(LUAÊñá‰ª∂ÊéßÂà∂Ê®°Âºè)"), wxPoint(16,160), wxSize(736,88), 0, _T("ID_STATICBOX3"));
+    StaticText6 = new wxStaticText(Panel1, ID_STATICTEXT6, wxT("LuaÊéßÂà∂Êñá‰ª∂Ë∑ØÂæÑ"), wxPoint(32,188), wxDefaultSize, 0, _T("ID_STATICTEXT6"));
+    TextCtrl_LuaControlFilePath = new wxTextCtrl(Panel1, ID_TEXTCTRL1, wxEmptyString, wxPoint(144,184), wxSize(576,24), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+    CheckBoxLuaAdvance = new wxCheckBox(Panel1, ID_CHECKBOX1, wxT("ÂêØÁî®È´òÁ∫ßÊ®°Âºè"), wxPoint(32,216), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+    CheckBoxLuaAdvance->SetValue(false);
+    Button_LuaAdvance = new wxButton(Panel1, ID_BUTTON_LuaAdvance, wxT("ÊâìÂºÄÊñá‰ª∂Â§π"), wxPoint(144,208), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_LuaAdvance"));
+    Button_StatTest = new wxButton(Panel1, ID_BUTTON_StatTest, wxT("ÂºÄÂßãÂéãÊµã"), wxPoint(32,252), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_StatTest"));
+    Button_StopTest = new wxButton(Panel1, ID_BUTTON_StopTest, wxT("ÂÅúÊ≠¢ÂéãÊµã"), wxPoint(200,252), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_StopTest"));
+    Button_ExportTestData = new wxButton(Panel1, ID_BUTTON_ExportTestData, wxT("ÂØºÂá∫ÂéãÊµãÊï∞ÊçÆÊñáÊ°£"), wxPoint(352,252), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_ExportTestData"));
+    Button_SetRadomPacket = new wxButton(Panel1, ID_BUTTON_SetRadomPacket, wxT("ËÆæÁΩÆÈöèÊú∫Êï∞ÊçÆÂåÖÂ∫èÂàó"), wxPoint(528,252), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_SetRadomPacket"));
+    TextCtrl_ServerIP = new wxTextCtrl(Panel1, ID_TEXTCTRL2, wxT("127.0.0.1"), wxPoint(120,20), wxSize(-1,24), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
+    TextCtrl_ServerIP->SetMaxLength(15);
+    TextCtrl_TestThreadCount = new wxTextCtrl(Panel1, ID_TEXTCTRL3, wxT("1"), wxPoint(120,48), wxSize(-1,24), 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
+    TextCtrl_SocketInterval = new wxTextCtrl(Panel1, ID_TEXTCTRL4, wxT("0"), wxPoint(120,76), wxSize(-1,24), 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
+    TextCtrl_PacketTimewait = new wxTextCtrl(Panel1, ID_TEXTCTRL5, wxT("0"), wxPoint(120,104), wxSize(-1,24), 0, wxDefaultValidator, _T("ID_TEXTCTRL5"));
+    TextCtrl_PacketSendMax = new wxTextCtrl(Panel1, ID_TEXTCTRL6, wxT("0"), wxPoint(232,136), wxSize(184,24), 0, wxDefaultValidator, _T("ID_TEXTCTRL6"));
+    StaticText7 = new wxStaticText(Panel1, ID_STATICTEXT7, wxT("ÊúçÂä°Âô®Á´ØÂè£"), wxPoint(232,22), wxDefaultSize, 0, _T("ID_STATICTEXT7"));
+    StaticText8 = new wxStaticText(Panel1, ID_STATICTEXT8, wxT("Êé•Êî∂Ë∂ÖÊó∂ÁßíÊï∞"), wxPoint(232,48), wxDefaultSize, 0, _T("ID_STATICTEXT8"));
+    StaticText9 = new wxStaticText(Panel1, ID_STATICTEXT9, wxT("Êé•Êî∂Â≠óËäÇÈôêÂÆö"), wxPoint(232,72), wxDefaultSize, 0, _T("ID_STATICTEXT9"));
+    StaticText10 = new wxStaticText(Panel1, ID_STATICTEXT10, wxT("UDPÊé•Êî∂Á´ØÂè£"), wxPoint(236,104), wxDefaultSize, 0, _T("ID_STATICTEXT10"));
+    TextCtrl_ServerPort = new wxTextCtrl(Panel1, ID_TEXTCTRL7, wxT("10002"), wxPoint(320,20), wxSize(-1,24), 0, wxDefaultValidator, _T("ID_TEXTCTRL7"));
+    TextCtrl_ServerPort->SetMaxLength(5);
+    TextCtrl_RecvTimeOut = new wxTextCtrl(Panel1, ID_TEXTCTRL8, wxT("1000"), wxPoint(320,48), wxSize(-1,24), 0, wxDefaultValidator, _T("ID_TEXTCTRL8"));
+    TextCtrl_RecvLength = new wxTextCtrl(Panel1, ID_TEXTCTRL9, wxT("12"), wxPoint(320,76), wxSize(-1,24), 0, wxDefaultValidator, _T("ID_TEXTCTRL9"));
+    TextCtrl_ClientUdpPort = new wxTextCtrl(Panel1, ID_TEXTCTRL10, wxT("20002"), wxPoint(320,104), wxSize(-1,24), 0, wxDefaultValidator, _T("ID_TEXTCTRL10"));
+    CheckBox_IsAlwayConnect = new wxCheckBox(Panel1, ID_CHECKBOX2, wxT("ÊòØÂê¶ÂºÄÂêØÈïøËøûÊé•"), wxPoint(448,22), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
+    CheckBox_IsAlwayConnect->SetValue(false);
+    CheckBox_RadomaDelay = new wxCheckBox(Panel1, ID_CHECKBOX3, wxT("ÊòØÂê¶ÂºÄÂêØÈöèÊú∫Âª∂Êó∂"), wxPoint(600,22), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
+    CheckBox_RadomaDelay->SetValue(false);
+    CheckBox_IsRecv = new wxCheckBox(Panel1, ID_CHECKBOX4, wxT("ÊòØÂê¶Êé•Êî∂Â∫îÁ≠îÂåÖ"), wxPoint(448,48), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
+    CheckBox_IsRecv->SetValue(true);
+    CheckBox_IsBroken = new wxCheckBox(Panel1, ID_CHECKBOX5, wxT("ÊòØÂê¶ÂºÄÂêØÊñ≠Á∫øËá™Âä®ÈáçËøû"), wxPoint(600,48), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX5"));
+    CheckBox_IsBroken->SetValue(true);
+    CheckBox_RadomSendCount = new wxCheckBox(Panel1, ID_CHECKBOX6, wxT("ÊòØÂê¶ÂêØÁî®ÈöèÊú∫Êï∞ÊçÆÂåÖÊï∞(ÈöèÊú∫1-10‰∏™Êï∞ÊçÆÂåÖ)"), wxPoint(448,72), wxSize(256,17), 0, wxDefaultValidator, _T("ID_CHECKBOX6"));
+    CheckBox_RadomSendCount->SetValue(false);
+    CheckBoxIsWriteLog = new wxCheckBox(Panel1, ID_CHECKBOX7, wxT("ÊòØÂê¶ËÆ∞ÂΩïÊï∞ÊçÆÊó•Âøó"), wxPoint(448,96), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX7"));
+    CheckBoxIsWriteLog->SetValue(false);
+    CheckBox_SendOne = new wxCheckBox(Panel1, ID_CHECKBOX8, wxT("Âè™ÂèëÈÄÅ‰∏Ä‰∏™ÂåÖ"), wxPoint(600,96), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX8"));
+    CheckBox_SendOne->SetValue(false);
+    wxString __wxRadioBoxChoices_1[3] =
+    {
+    	wxT("TCPÈìæÊé•"),
+    	wxT("UDPÈìæÊé•"),
+    	wxT("WebSocketÈìæÊé•")
+    };
+    RadioBox_nRadio = new wxRadioBox(Panel1, ID_RADIOBOX1, wxEmptyString, wxPoint(448,112), wxSize(312,48), 3, __wxRadioBoxChoices_1, 1, wxRA_VERTICAL|wxFULL_REPAINT_ON_RESIZE, wxDefaultValidator, _T("ID_RADIOBOX1"));
+    StaticText11 = new wxStaticText(Panel1, ID_STATICTEXT11, wxT("ËøûÊé•ÊàêÂäüÊï∞"), wxPoint(32,312), wxDefaultSize, 0, _T("ID_STATICTEXT11"));
+    StaticText12 = new wxStaticText(Panel1, ID_STATICTEXT12, wxT("ÂèëÈÄÅÊàêÂäüÊï∞"), wxPoint(32,344), wxDefaultSize, 0, _T("ID_STATICTEXT12"));
+    StaticText13 = new wxStaticText(Panel1, ID_STATICTEXT13, wxT("Êé•Êî∂ÊàêÂäüÊï∞"), wxPoint(32,376), wxDefaultSize, 0, _T("ID_STATICTEXT13"));
+    StaticText14 = new wxStaticText(Panel1, ID_STATICTEXT14, wxT("ÂΩìÂâçËøûÊé•Êï∞"), wxPoint(32,406), wxDefaultSize, 0, _T("ID_STATICTEXT14"));
+    StaticText15 = new wxStaticText(Panel1, ID_STATICTEXT15, wxT("ÊúÄÂ∞èÂìçÂ∫îÊó∂Èó¥"), wxPoint(32,436), wxDefaultSize, 0, _T("ID_STATICTEXT15"));
+    StaticText16 = new wxStaticText(Panel1, ID_STATICTEXT16, wxT("ÂèëÈÄÅÂ≠óËäÇÊï∞"), wxPoint(32,466), wxDefaultSize, 0, _T("ID_STATICTEXT16"));
+    TextCtrl_SuccessConnect = new wxTextCtrl(Panel1, ID_TEXTCTRL11, wxEmptyString, wxPoint(112,308), wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL11"));
+    TextCtrl_SuccessSend = new wxTextCtrl(Panel1, ID_TEXTCTRL12, wxEmptyString, wxPoint(112,340), wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL12"));
+    TextCtrl_SuccessRecv = new wxTextCtrl(Panel1, ID_TEXTCTRL13, wxEmptyString, wxPoint(112,372), wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL13"));
+    TextCtrl_CurrConnect = new wxTextCtrl(Panel1, ID_TEXTCTRL14, wxEmptyString, wxPoint(112,402), wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL14"));
+    TextCtrl_MinTime = new wxTextCtrl(Panel1, ID_TEXTCTRL15, wxEmptyString, wxPoint(112,432), wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL15"));
+    TextCtrl_SendByteCount = new wxTextCtrl(Panel1, ID_TEXTCTRL16, wxEmptyString, wxPoint(112,464), wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL16"));
+    StaticText17 = new wxStaticText(Panel1, ID_STATICTEXT17, wxT("ËøûÊé•Â§±Ë¥•Êï∞"), wxPoint(240,312), wxDefaultSize, 0, _T("ID_STATICTEXT17"));
+    StaticText18 = new wxStaticText(Panel1, ID_STATICTEXT18, wxT("ÂèëÈÄÅÂ§±Ë¥•Êï∞"), wxPoint(240,344), wxDefaultSize, 0, _T("ID_STATICTEXT18"));
+    StaticText19 = new wxStaticText(Panel1, ID_STATICTEXT19, wxT("Êé•Êî∂Â§±Ë¥•Êï∞"), wxPoint(240,376), wxDefaultSize, 0, _T("ID_STATICTEXT19"));
+    TextCtrl_FailConnect = new wxTextCtrl(Panel1, ID_TEXTCTRL17, wxEmptyString, wxPoint(320,308), wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL17"));
+    TextCtrl_FailSend = new wxTextCtrl(Panel1, ID_TEXTCTRL18, wxEmptyString, wxPoint(320,340), wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL18"));
+    TextCtrl_FailRecv = new wxTextCtrl(Panel1, ID_TEXTCTRL19, wxEmptyString, wxPoint(320,372), wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL19"));
+    StaticText20 = new wxStaticText(Panel1, ID_STATICTEXT20, wxT("ÊúÄÂ§ßÂìçÂ∫îÊó∂Èó¥"), wxPoint(240,436), wxDefaultSize, 0, _T("ID_STATICTEXT20"));
+    TextCtrl_MaxTime = new wxTextCtrl(Panel1, ID_TEXTCTRL20, wxEmptyString, wxPoint(320,432), wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL20"));
+    StaticText21 = new wxStaticText(Panel1, ID_STATICTEXT21, wxT("Êé•Êî∂Â≠óËäÇÊï∞"), wxPoint(240,466), wxDefaultSize, 0, _T("ID_STATICTEXT21"));
+    TextCtrl_RecvByteCount = new wxTextCtrl(Panel1, ID_TEXTCTRL21, wxEmptyString, wxPoint(320,464), wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL21"));
+    StaticText22 = new wxStaticText(Panel1, ID_STATICTEXT22, wxT("ÂéãÊµãÂèëÈÄÅ‰∫åËøõÂà∂‰∏≤"), wxPoint(448,312), wxDefaultSize, 0, _T("ID_STATICTEXT22"));
+    Choice_SendBuffStyle = new wxChoice(Panel1, ID_CHOICE1, wxPoint(560,308), wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE1"));
+    Choice_SendBuffStyle->SetSelection( Choice_SendBuffStyle->Append(wxT("‰∫åËøõÂà∂Ê®°Âºè")) );
+    Choice_SendBuffStyle->Append(wxT("ÊñáÊú¨Ê®°Âºè"));
+    TextCtrl_SendText = new wxTextCtrl(Panel1, ID_TEXTCTRL22, wxEmptyString, wxPoint(448,336), wxSize(288,152), wxTE_MULTILINE, wxDefaultValidator, _T("ID_TEXTCTRL22"));
+    DirDialog_Lua = new wxDirDialog(this, wxT("ÊâìÂºÄÁõÆÂΩï"), wxEmptyString, wxDD_DEFAULT_STYLE|wxDD_DIR_MUST_EXIST|wxDD_CHANGE_DIR, wxDefaultPosition, wxDefaultSize, _T("wxDirDialog"));
+    Timer_Test.SetOwner(this, ID_TIMER_Test);
+    Timer_Test.Start(1000, false);
+
+    Connect(ID_BUTTON_LuaAdvance,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&CPassTCPDlg::OnButton_LuaAdvanceClick);
+    Connect(ID_BUTTON_StatTest,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&CPassTCPDlg::OnButton_StatTestClick);
+    Connect(ID_BUTTON_StopTest,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&CPassTCPDlg::OnButton_StopTestClick);
+    Connect(ID_BUTTON_ExportTestData,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&CPassTCPDlg::OnButton_ExportTestDataClick);
+    Connect(ID_BUTTON_SetRadomPacket,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&CPassTCPDlg::OnButton_SetRadomPacketClick);
+    Connect(ID_TEXTCTRL2,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&CPassTCPDlg::OnTextCtrl_ServerIPText);
+    Connect(ID_CHOICE1,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&CPassTCPDlg::OnChoice_SendBuffStyleSelect);
+    Connect(ID_TIMER_Test,wxEVT_TIMER,(wxObjectEventFunction)&CPassTCPDlg::OnTimer_TestTrigger);
+    Connect(wxID_ANY,wxEVT_CLOSE_WINDOW,(wxObjectEventFunction)&CPassTCPDlg::OnClose);
+    //*)
 }
 
-BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
-END_MESSAGE_MAP()
-
-
-// CPassTCPDlg ∂‘ª∞øÚ
-
-
-
-
-CPassTCPDlg::CPassTCPDlg(CWnd* pParent /*=NULL*/)
-: CDialog(CPassTCPDlg::IDD, pParent)
-, m_nRadio(0)
+CPassTCPDlg::~CPassTCPDlg()
 {
-	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+    //(*Destroy(CPassTCPDlg)
+    //*)
 }
 
-void CPassTCPDlg::DoDataExchange(CDataExchange* pDX)
+void CPassTCPDlg::OnQuit(wxCommandEvent& event)
 {
-	CDialog::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_EDIT1, m_txtServerIP);
-	DDX_Control(pDX, IDC_EDIT2, m_txtPort);
-	DDX_Control(pDX, IDC_EDIT3, m_txtThreadCount);
-	DDX_Control(pDX, IDC_EDIT13, m_txtRecvTimeout);
-	DDX_Control(pDX, IDC_EDIT4, m_txtSocketInterval);
-	DDX_Control(pDX, IDC_CHECK1, m_chkIsAlwayConnect);
-	DDX_Control(pDX, IDC_CHECK3, m_chkRadomaDelay);
-	DDX_Control(pDX, IDC_CHECK2, m_chkIsRecv);
-	DDX_Control(pDX, IDC_CHECK4, m_ChkIsBroken);
-	DDX_Control(pDX, IDC_EDIT6, m_txtSuccessConnect);
-	DDX_Control(pDX, IDC_EDIT7, m_txtSuccessSend);
-	DDX_Control(pDX, IDC_EDIT8, m_txtSuccessRecv);
-	DDX_Control(pDX, IDC_EDIT9, m_txtCurrConnect);
-	DDX_Control(pDX, IDC_EDIT10, m_txtFailConnect);
-	DDX_Control(pDX, IDC_EDIT11, m_txtFailSend);
-	DDX_Control(pDX, IDC_EDIT12, m_txtFailRecv);
-	DDX_Control(pDX, IDC_EDIT14, m_txtRecvLength);
-	DDX_Control(pDX, IDC_CHECK5, m_chkRadomSendCount);
-	DDX_Control(pDX, IDC_CHECK6, m_chkIsWriteLog);
-	DDX_Control(pDX, IDC_CHECK7, m_chkSendOne);
-	DDX_Radio(pDX, IDC_RADIO1, m_nRadio);
-	DDX_Control(pDX, IDC_EDIT15, m_txtClientUdpPort);
-	DDX_Control(pDX, IDC_EDIT16, m_txtPacketTimewait);
-	DDX_Control(pDX, IDC_EDIT17, m_txtSendByteCount);
-	DDX_Control(pDX, IDC_EDIT18, m_txtRecvByteCount);
-	DDX_Control(pDX, IDC_COMBO1, m_cbSendBuffStyle);
-	DDX_Control(pDX, IDC_RICHEDIT21, m_reSendText);
-	//DDX_Control(pDX, IDC_EDIT5, m_reSendText);
-	DDX_Control(pDX, IDC_EDIT19, m_txtLuaFilePath);
-	DDX_Control(pDX, IDC_CHECK8, m_chkLuaAdvance);
-	DDX_Control(pDX, IDC_EDIT20, m_txtSendCount);
-	DDX_Control(pDX, IDC_EDIT21, m_txtMinTime);
-	DDX_Control(pDX, IDC_EDIT22, m_txtMaxTime);
+    Close();
 }
 
-BEGIN_MESSAGE_MAP(CPassTCPDlg, CDialog)
-	ON_WM_SYSCOMMAND()
-	ON_WM_PAINT()
-	ON_WM_QUERYDRAGICON()
-	//}}AFX_MSG_MAP
-	ON_BN_CLICKED(IDC_BUTTON1, &CPassTCPDlg::OnBnClickedButton1)
-	ON_WM_CLOSE()
-	ON_BN_CLICKED(IDC_BUTTON2, &CPassTCPDlg::OnBnClickedButton2)
-	ON_WM_TIMER()
-	ON_BN_CLICKED(IDC_BUTTON3, &CPassTCPDlg::OnBnClickedButton3)
-	ON_CBN_SELCHANGE(IDC_COMBO1, &CPassTCPDlg::OnCbnSelchangeCombo1)
-	ON_BN_CLICKED(IDC_BUTTON4, &CPassTCPDlg::OnBnClickedButton4)
-	ON_BN_CLICKED(IDC_BUTTON5, &CPassTCPDlg::OnBnClickedButton5)
-END_MESSAGE_MAP()
-
-
-// CPassTCPDlg œ˚œ¢¥¶¿Ì≥Ã–Ú
-
-BOOL CPassTCPDlg::OnInitDialog()
+void CPassTCPDlg::OnAbout(wxCommandEvent& event)
 {
-	CDialog::OnInitDialog();
+    wxString msg = wxT("PassTCPÔºå1.0 ÁâàÔºåÂéãÂäõÊµãËØïÂ∑•ÂÖ∑\r\nCopyright freeeeyes (C) 2013\r\n");
+    wxMessageBox(msg, wxT("ÂÖ≥‰∫é PassTCP"), wxOK | wxICON_INFORMATION, this);
 
-	// Ω´°∞πÿ”⁄...°±≤Àµ•œÓÃÌº”µΩœµÕ≥≤Àµ•÷–°£
-
-	// IDM_ABOUTBOX ±ÿ–Î‘⁄œµÕ≥√¸¡Ó∑∂Œßƒ⁄°£
-	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
-	ASSERT(IDM_ABOUTBOX < 0xF000);
-
-	CMenu* pSysMenu = GetSystemMenu(FALSE);
-	if (pSysMenu != NULL)
-	{
-		BOOL bNameValid;
-		CString strAboutMenu;
-		bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
-		ASSERT(bNameValid);
-		if (!strAboutMenu.IsEmpty())
-		{
-			pSysMenu->AppendMenu(MF_SEPARATOR);
-			pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
-		}
-	}
-
-	// …Ë÷√¥À∂‘ª∞øÚµƒÕº±Í°£µ±”¶”√≥Ã–Ú÷˜¥∞ø⁄≤ª «∂‘ª∞øÚ ±£¨øÚº‹Ω´◊‘∂Ø
-	//  ÷¥––¥À≤Ÿ◊˜
-	SetIcon(m_hIcon, TRUE);			// …Ë÷√¥ÛÕº±Í
-	SetIcon(m_hIcon, FALSE);		// …Ë÷√–°Õº±Í
-
-	SetTimer(1, 1000, NULL);
-	InitRandom();
-
-	// TODO: ‘⁄¥ÀÃÌº”∂ÓÕ‚µƒ≥ı ºªØ¥˙¬Î
-	InitView();
-
-	return TRUE;  // ≥˝∑«Ω´Ωπµ„…Ë÷√µΩøÿº˛£¨∑Ò‘Ú∑µªÿ TRUE
 }
 
-void CPassTCPDlg::OnSysCommand(UINT nID, LPARAM lParam)
+void CPassTCPDlg::OnButton_LuaAdvanceClick(wxCommandEvent& event)
 {
-	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
-	{
-		CAboutDlg dlgAbout;
-		dlgAbout.DoModal();
-	}
-	else
-	{
-		CDialog::OnSysCommand(nID, lParam);
-	}
+    //ÊâìÂºÄLuaÊñá‰ª∂Â§π
+    //È¶ñÂÖàÂà§Êñ≠È´òÁ∫ßÈÄâÈ°πÊòØÂê¶Â∑≤ÁªèÊâìÂºÄ
+
+    if(this->CheckBoxLuaAdvance->IsChecked()   ==false)
+    {
+        wxString msg = wxT("ËØ∑ÂÖàÈÄâÊã©ÂêØÁî®È´òÁ∫ßÊ®°ÂºèÂºÄÂÖ≥„ÄÇ");
+        wxMessageBox(msg, wxT("ÂÖ≥‰∫é PassTCP"), wxOK | wxICON_INFORMATION, this);
+        return;
+    }
+
+    if  (this->DirDialog_Lua->ShowModal()    ==wxID_OK)
+    {
+        wxString    LuaDirPath  =this->DirDialog_Lua->GetPath();
+        this->TextCtrl_LuaControlFilePath->SetValue(LuaDirPath);
+    }
+
 }
 
-// »Áπ˚œÚ∂‘ª∞øÚÃÌº”◊Ó–°ªØ∞¥≈•£¨‘Ú–Ë“™œ¬√Êµƒ¥˙¬Î
-//  ¿¥ªÊ÷∆∏√Õº±Í°£∂‘”⁄ π”√Œƒµµ/ ”Õºƒ£–Õµƒ MFC ”¶”√≥Ã–Ú£¨
-//  ’‚Ω´”…øÚº‹◊‘∂ØÕÍ≥…°£
-
-void CPassTCPDlg::OnPaint()
+void CPassTCPDlg::OnButton_StatTestClick(wxCommandEvent& event)
 {
-	if (IsIconic())
-	{
-		CPaintDC dc(this); // ”√”⁄ªÊ÷∆µƒ…Ë±∏…œœ¬Œƒ
+    //ÂºÄÂßãÂéãÊµã‰ª£Á†ÅÂú®ËøôÈáå
+    char* pSendData = NULL;
+    ClearResult();
+    Close();
 
-		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
-		//  πÕº±Í‘⁄π§◊˜«¯æÿ–Œ÷–æ”÷–
-		int cxIcon = GetSystemMetrics(SM_CXICON);
-		int cyIcon = GetSystemMetrics(SM_CYICON);
-		CRect rect;
-		GetClientRect(&rect);
-		int x = (rect.Width() - cxIcon + 1) / 2;
-		int y = (rect.Height() - cyIcon + 1) / 2;
+    //m_txtThreadCount.GetWindowText(strData);
+    int nThreadCount = wxAtoi(this->TextCtrl_TestThreadCount->GetValue());
+    //m_txtSendCount.GetWindowText(strData);
+    int nAllSendCount = wxAtoi(this->TextCtrl_PacketSendMax->GetValue());
 
-		// ªÊ÷∆Õº±Í
-		dc.DrawIcon(x, y, m_hIcon);
-	}
-	else
-	{
-		CDialog::OnPaint();
-	}
+    //Ê†πÊçÆÁ∫øÁ®ãÊï∞ËÆ°ÁÆóÂèëÈÄÅÈáè
+    int nThreadSendCount = nAllSendCount / nThreadCount;
+
+    for(int i = 0; i < nThreadCount; i++)
+    {
+        //ËØªÂèñÁ∫øÁ®ã‰ø°ÊÅØ
+        _Socket_Info* pSocket_Info             = new _Socket_Info();
+        _Socket_State_Info* pSocket_State_Info = new _Socket_State_Info();
+
+        ENUM_TYPE_PROTOCOL emType = ENUM_PROTOCOL_TCP;
+        //ÈªòËÆ§TCPÁ±ªÂûãÔºå0ÊòØTCPÔºå1ÊòØUDP
+
+
+
+        switch(this->RadioBox_nRadio->GetSelection())
+        {
+        case 0:  //TCP
+            {
+                pSocket_Info->m_nConnectType = 0;
+                emType = ENUM_PROTOCOL_TCP;
+
+                if(m_pLogic == NULL)
+                {
+                    CNomalLogic* pNomalLogic = new CNomalLogic();
+                    m_pLogic = (CBaseDataLogic* )pNomalLogic;
+                    pSocket_Info->m_pLogic = m_pLogic;
+                }
+                else
+                {
+                    pSocket_Info->m_pLogic = m_pLogic;
+                }
+
+                break;
+            }
+
+        case 1:   //UDP
+            {
+                pSocket_Info->m_nConnectType = 1;
+                emType = ENUM_PROTOCOL_UDP;
+
+                if(m_pLogic == NULL)
+                {
+                    CNomalLogic* pNomalLogic = new CNomalLogic();
+                    m_pLogic =  (CBaseDataLogic* )pNomalLogic;
+                    pSocket_Info->m_pLogic = m_pLogic;
+                }
+                else
+                {
+                    pSocket_Info->m_pLogic = m_pLogic;
+                }
+
+                break;
+            }
+
+        case 2:     //WebSocket
+            {
+                pSocket_Info->m_nConnectType = 0;
+                emType = ENUM_PROTOCOL_WEBSOCKET;
+
+                if(m_pLogic == NULL)
+                {
+                    CWebSocketLogic* pWebSocketLogic = new CWebSocketLogic();
+                    pSocket_Info->m_pLogic = (CBaseDataLogic* )pWebSocketLogic;
+                }
+                else
+                {
+                    pSocket_Info->m_pLogic = m_pLogic;
+                }
+
+                break;
+            }
+        }
+
+
+        //std::string stlstring = std::string(strData.mb_str());
+        wxString    m_szSerevrIP    =this->TextCtrl_ServerIP->GetValue();
+        strncpy(pSocket_Info->m_szSerevrIP, (const char*)m_szSerevrIP.mb_str(), 16);
+        int nDecLen =this->TextCtrl_ServerIP->GetValue().length();
+        pSocket_Info->m_szSerevrIP[nDecLen] = '\0';
+
+        pSocket_Info->m_nPort = wxAtoi(this->TextCtrl_ServerPort->GetValue());
+        pSocket_Info->m_nRecvTimeout = wxAtoi(this->TextCtrl_RecvTimeOut->GetValue());
+        pSocket_Info->m_nDelaySecond = wxAtoi(this->TextCtrl_SocketInterval->GetValue());
+        pSocket_Info->m_pLogic->SetRecvLength(wxAtoi(this->TextCtrl_RecvLength->GetValue()));
+        pSocket_Info->m_nUdpClientPort = wxAtoi(this->TextCtrl_ClientUdpPort->GetValue());
+        pSocket_Info->m_nPacketTimewait = wxAtoi(this->TextCtrl_PacketTimewait->GetValue());
+
+
+        if(nThreadSendCount > 0)
+        {
+            if(i == nThreadCount - 1 && nThreadCount > 1)
+            {
+                pSocket_Info->m_nSendCount = nThreadSendCount + ( nAllSendCount % nThreadSendCount);
+            }
+            else
+            {
+                pSocket_Info->m_nSendCount = nThreadSendCount;
+            }
+        }
+
+        if(this->CheckBoxLuaAdvance->IsChecked() == true)
+        {
+            //Â¶ÇÊûúÊòØLuaÊñá‰ª∂Ê®°ÂºèÔºåÁõ¥Êé•ÂàùÂßãÂåñ‰∏Ä‰∏™100kÁöÑÊï∞ÊçÆÂùó
+            //ÁÑ∂ÂêéÊ†πÊçÆËÑöÊú¨ÂéªÁªÑÁªáÂèëÈÄÅÊï∞ÊçÆ
+            pSocket_Info->m_pLogic->InitSendSize(100 * MAX_BUFF_1024);
+        }
+        else
+        {
+
+            std::string SendText    =std::string(this->TextCtrl_SendText->GetValue());
+            int nBufferSize =SendText.length();
+            pSendData = new char[nBufferSize];
+            strncpy(pSendData, (const char*)SendText.c_str(), nBufferSize);
+
+            pSendData[nBufferSize] = '\0';
+
+
+
+            if(this->Choice_SendBuffStyle->GetSelection() == 0)
+            {
+                if(emType != ENUM_PROTOCOL_WEBSOCKET)
+                {
+                    //Â¶ÇÊûúÊòØ‰∫åËøõÂà∂Ê®°Âºè
+                    CConvertBuffer objConvertBuffer;
+                    //Ëé∑ÂæóË¶ÅËΩ¨Êç¢ÁöÑÊï∞ÊçÆÂùóÂ§ßÂ∞è
+                    pSocket_Info->m_pLogic->InitSendSize(objConvertBuffer.GetBufferSize(pSendData, nDecLen));
+                    //Â∞ÜÊï∞ÊçÆ‰∏≤ËΩ¨Êç¢Êàê‰∫åËøõÂà∂‰∏≤
+                    int nSendLen = nDecLen;
+                    objConvertBuffer.Convertstr2charArray(pSendData, strlen(pSendData),
+                                                          (unsigned char*)pSocket_Info->m_pLogic->GetSendData(), nSendLen);
+                }
+                else
+                {
+                    //Â¶ÇÊûúÊòØwebSocketÊ®°Âºè
+                    char szOriData[100 * MAX_BUFF_1024] = {'\0'};
+                    //Â¶ÇÊûúÊòØ‰∫åËøõÂà∂Ê®°Âºè
+                    CConvertBuffer objConvertBuffer;
+                    //Ëé∑ÂæóË¶ÅËΩ¨Êç¢ÁöÑÊï∞ÊçÆÂùóÂ§ßÂ∞è
+                    pSocket_Info->m_pLogic->InitSendSize(100 * MAX_BUFF_1024);
+                    //Â∞ÜÊï∞ÊçÆ‰∏≤ËΩ¨Êç¢Êàê‰∫åËøõÂà∂‰∏≤
+                    int nSendLen = 100 * MAX_BUFF_1024;
+                    objConvertBuffer.Convertstr2charArray(pSendData, strlen(pSendData),
+                                                          (unsigned char*)szOriData, nSendLen);
+
+                    pSocket_Info->m_pLogic->SetSendBuff(szOriData, nSendLen);
+                }
+            }
+            else
+            {
+                if(emType != ENUM_PROTOCOL_WEBSOCKET)
+                {
+                    //Â¶ÇÊûúÊòØÊñáÊú¨Ê®°Âºè
+                    pSocket_Info->m_pLogic->InitSendSize(nDecLen);
+                    memcpy(pSocket_Info->m_pLogic->GetSendData(),  pSendData, nDecLen);
+                }
+                else
+                {
+                    //Â¶ÇÊûúÊòØwebSocketÊ®°Âºè
+                    pSocket_Info->m_pLogic->InitSendSize(100 * MAX_BUFF_1024);
+                    pSocket_Info->m_pLogic->SetSendBuff(pSendData, nDecLen);
+                }
+            }
+
+            delete[] pSendData;
+
+        }
+
+        pSocket_Info->m_blIsAlwayConnect = this->CheckBox_IsAlwayConnect->IsChecked();
+
+        pSocket_Info->m_blIsRadomaDelay = this->CheckBox_RadomaDelay->IsChecked();
+        pSocket_Info->m_blIsRecv = this->CheckBox_IsRecv->IsChecked();
+
+        pSocket_Info->m_blIsBroken = this->CheckBox_IsBroken->IsChecked();
+
+        pSocket_Info->m_blIsSendCount = this->CheckBox_RadomSendCount->IsChecked();
+        pSocket_Info->m_blIsWriteFile = this->CheckBoxIsWriteLog->IsChecked();
+        pSocket_Info->m_blIsSendOne = this->CheckBox_SendOne->IsChecked();
+        pSocket_Info->m_blLuaAdvance = this->CheckBoxLuaAdvance->IsChecked();
+
+        //ÊòØÂê¶ÂºÄÂêØÈ´òÁ∫ßÊ®°Âºè
+        if(this->CheckBoxLuaAdvance->IsChecked() == true)
+        {
+            //Â¶ÇÊûúÊâìÂºÄÈ´òÁ∫ßÊ®°ÂºèÔºåÂàôËØªÂèñÊñá‰ª∂
+
+            wxString    m_txtLuaFilePath    =this->TextCtrl_LuaControlFilePath->GetValue();
+
+            if(m_txtLuaFilePath.length() == 0)
+            {
+                wxMessageBox(wxT("ÊÇ®Â∑≤ÁªèÂºÄÂêØ‰∫ÜÈ´òÁ∫ßÊ®°ÂºèÔºåÂøÖÈ°ªËÆæÁΩÆÂøÖË¶ÅÁöÑLuaÊñá‰ª∂Âêç„ÄÇ"), this->GetTitle(), wxOK | wxICON_INFORMATION, this);
+                delete pSocket_Info;
+                delete pSocket_State_Info;
+                return;
+            }
+
+            std::string LuaFilePathText    =std::string(m_txtLuaFilePath);
+            int nBufferSize =LuaFilePathText.length();
+            strncpy(pSocket_Info->m_szLuaFileName, (const char*)LuaFilePathText.c_str(), nBufferSize);
+            pSocket_Info->m_szLuaFileName[nDecLen] = '\0';
+
+        }
+
+
+        if(pSocket_Info->m_nConnectType == 0)
+        {
+            //TCPÂèëÈÄÅ
+            CClientTcpSocket* pClientTcpSocket = new CClientTcpSocket();
+            pClientTcpSocket->SetSocketThread(pSocket_Info, pSocket_State_Info);
+            pClientTcpSocket->SetThreadID(i);
+
+
+            std::thread thread_tcp(ThreadProc, pClientTcpSocket);
+
+            //DWORD  ThreadID = 0;
+            //CreateThread(NULL, NULL, ThreadProc, (LPVOID)pClientTcpSocket, NULL, &ThreadID);
+
+            m_vecClientTcpSocket.push_back(pClientTcpSocket);
+        }
+        else
+        {
+            //UDPÂèëÈÄÅ
+            CClientUdpSocket* pClientUdpSocket = new CClientUdpSocket();
+            pClientUdpSocket->SetSocketThread(pSocket_Info, pSocket_State_Info);
+
+            //DWORD  ThreadID = 0;
+            //CreateThread(NULL, NULL, ThreadUDPProc, (LPVOID)pClientUdpSocket, NULL, &ThreadID);
+
+            std::thread thread_udp(ThreadUDPProc, pClientUdpSocket);
+
+            m_vecClientUdpSocket.push_back(pClientUdpSocket);
+        }
+
+        m_tmBegin = wxDateTime::Now ();
+        m_blIsRun = true;
+    }
 }
 
-//µ±”√ªßÕœ∂Ø◊Ó–°ªØ¥∞ø⁄ ±œµÕ≥µ˜”√¥À∫Ø ˝»°µ√π‚±Í
-//œ‘ æ°£
-HCURSOR CPassTCPDlg::OnQueryDragIcon()
+void CPassTCPDlg::OnButton_StopTestClick(wxCommandEvent& event)
 {
-	return static_cast<HCURSOR>(m_hIcon);
+    //ÂÅúÊ≠¢ÂéãÊµã
+    int nCount = (int)m_vecClientUdpSocket.size();
+
+    for(int i = 0; i < nCount; i++)
+    {
+        CClientUdpSocket* pClientUdpSocket = (CClientUdpSocket* )m_vecClientUdpSocket[i];
+
+        if(NULL != pClientUdpSocket)
+        {
+            pClientUdpSocket->Stop();
+        }
+    }
+
+    nCount = (int)m_vecClientTcpSocket.size();
+
+    for(int i = 0; i < nCount; i++)
+    {
+        CClientTcpSocket* pClientTcpSocket = (CClientTcpSocket* )m_vecClientTcpSocket[i];
+
+        if(NULL != pClientTcpSocket)
+        {
+            pClientTcpSocket->Stop();
+        }
+    }
+
+    m_tmEnd = wxDateTime::Now ();
+    m_blIsRun = false;
+
 }
 
 
-void CPassTCPDlg::OnBnClickedButton1()
+
+void CPassTCPDlg::OnButton_ExportTestDataClick(wxCommandEvent& event)
 {
-	//ø™ º—π≤‚¥˙¬Î‘⁄’‚¿Ô
-	char* pSendData = NULL;
-	ClearResult();
-	Close();
+    //ÂÜôÂÖ•ÂéãÊµãÊä•Âëä
+    FILE* pFile = NULL;
+    char szFileName[20];
+    sprintf(szFileName, "StressTest.log");
+    pFile   =fopen( szFileName, "a+");
 
-	CString strData;
+    if(pFile == NULL)
+    {
+        wxMessageBox(wxT("ÂØºÂá∫ÂéãÊµãÊä•ÂëäÂ§±Ë¥•ÔºåÊñá‰ª∂‰∏çÂ≠ò"), this->GetTitle(), wxOK | wxICON_INFORMATION, this);
+        return;
+    }
 
-	m_txtThreadCount.GetWindowText(strData);
-	int nThreadCount = _ttoi((LPCTSTR)strData);
-	m_txtSendCount.GetWindowText(strData);
-	int nAllSendCount = _ttoi((LPCTSTR)strData);
+    char szLogText[1024] = {'\0'};
 
-	//∏˘æ›œﬂ≥Ã ˝º∆À„∑¢ÀÕ¡ø
-	int nThreadSendCount = nAllSendCount / nThreadCount;
-	 
-	for(int i = 0; i < nThreadCount; i++)
-	{
-		//∂¡»°œﬂ≥Ã–≈œ¢
-		_Socket_Info* pSocket_Info             = new _Socket_Info();
-		_Socket_State_Info* pSocket_State_Info = new _Socket_State_Info();
+    sprintf(szLogText,  "=============================================\n");
+    fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
 
-		ENUM_TYPE_PROTOCOL emType = ENUM_PROTOCOL_TCP;
-		//ƒ¨»œTCP¿‡–Õ£¨0 «TCP£¨1 «UDP
-		switch(GetCheckedRadioButton(IDC_RADIO1, IDC_RADIO3))
-		{
-		case IDC_RADIO1:
-			{
-				pSocket_Info->m_nConnectType = 0;
-				emType = ENUM_PROTOCOL_TCP;
-				if(m_pLogic == NULL)
-				{
-					CNomalLogic* pNomalLogic = new CNomalLogic();
-					m_pLogic = (CBaseDataLogic* )pNomalLogic;
-					pSocket_Info->m_pLogic = m_pLogic;
-				}
-				else
-				{
-					pSocket_Info->m_pLogic = m_pLogic;
-				}
-				break;
-			}
-		case IDC_RADIO2:
-			{
-				pSocket_Info->m_nConnectType = 1;
-				emType = ENUM_PROTOCOL_UDP;
-				if(m_pLogic == NULL)
-				{
-					CNomalLogic* pNomalLogic = new CNomalLogic();
-					m_pLogic =  (CBaseDataLogic* )pNomalLogic;
-					pSocket_Info->m_pLogic = m_pLogic;
-				}
-				else
-				{
-					pSocket_Info->m_pLogic = m_pLogic;
-				}
-				break;
-			}
-		case IDC_RADIO3:
-			{
-				pSocket_Info->m_nConnectType = 0;
-				emType = ENUM_PROTOCOL_WEBSOCKET;
-				if(m_pLogic == NULL)
-				{
-					CWebSocketLogic* pWebSocketLogic = new CWebSocketLogic();
-					pSocket_Info->m_pLogic = (CBaseDataLogic* )pWebSocketLogic;
-				}
-				else
-				{
-					pSocket_Info->m_pLogic = m_pLogic;
-				}
-				break;
-			}
-		}
+    //ÈªòËÆ§TCPÁ±ªÂûãÔºå0ÊòØTCPÔºå1ÊòØUDP
 
-		m_txtServerIP.GetWindowText(strData);
-		int nSrcLen = WideCharToMultiByte(CP_ACP, 0, strData, strData.GetLength(), NULL, 0, NULL, NULL);
-		int nDecLen = WideCharToMultiByte(CP_ACP, 0, strData, nSrcLen, pSocket_Info->m_szSerevrIP, MAX_BUFF_20, NULL,NULL);
-		pSocket_Info->m_szSerevrIP[nDecLen] = '\0';
+    switch(this->RadioBox_nRadio->GetSelection())
+    {
+    case 0:
+        sprintf(szLogText,  "ÂéãÊµãÁ±ªÂûã:TCP\n");
+        break;
 
-		m_txtPort.GetWindowText(strData);
-		pSocket_Info->m_nPort = _ttoi((LPCTSTR)strData);
-		m_txtRecvTimeout.GetWindowText(strData);
-		pSocket_Info->m_nRecvTimeout = _ttoi((LPCTSTR)strData);
-		m_txtSocketInterval.GetWindowText(strData);
-		pSocket_Info->m_nDelaySecond = _ttoi((LPCTSTR)strData);
-		m_txtRecvLength.GetWindowText(strData);
-		pSocket_Info->m_pLogic->SetRecvLength(_ttoi((LPCTSTR)strData));
-		m_txtClientUdpPort.GetWindowText(strData);
-		pSocket_Info->m_nUdpClientPort = _ttoi((LPCTSTR)strData);
-		m_txtPacketTimewait.GetWindowText(strData);
-		pSocket_Info->m_nPacketTimewait = _ttoi((LPCTSTR)strData);
+    case 1:
+        sprintf(szLogText,  "ÂéãÊµãÁ±ªÂûã:UDP\n");
+        break;
 
-		if(nThreadSendCount > 0)
-		{
-			if(i == nThreadCount - 1 && nThreadCount > 1)
-			{
-				pSocket_Info->m_nSendCount = nThreadSendCount + ( nAllSendCount % nThreadSendCount);
-			}
-			else
-			{
-				pSocket_Info->m_nSendCount = nThreadSendCount;
-			}
-		}
+    case 2:
+        sprintf(szLogText,  "ÂéãÊµãÁ±ªÂûã:WebSocket\n");
+        break;
+    }
 
-		m_reSendText.GetWindowText(strData);
+    fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
 
 
-		int nBufferSize = 0;
-		if(m_chkLuaAdvance.GetCheck() == BST_CHECKED)
-		{
-			//»Áπ˚ «LuaŒƒº˛ƒ£ Ω£¨÷±Ω”≥ı ºªØ“ª∏ˆ100kµƒ ˝æ›øÈ
-			//»ª∫Û∏˘æ›Ω≈±æ»•◊È÷Ø∑¢ÀÕ ˝æ›
-			pSocket_Info->m_pLogic->InitSendSize(100 * MAX_BUFF_1024);
-		}
-		else
-		{
-			nSrcLen = WideCharToMultiByte(CP_ACP, 0, strData, strData.GetLength(), NULL, 0, NULL, NULL);
-			nBufferSize = WideCharToMultiByte(CP_ACP, 0, strData, -1, NULL, 0, NULL, NULL);  
-			pSendData = new char[nBufferSize];
-			nDecLen = WideCharToMultiByte(CP_ACP, 0, strData, nSrcLen, pSendData, nBufferSize, NULL,NULL);
-			pSendData[nDecLen] = '\0';
+    std::string    m_szSerevrIP    =std::string(this->TextCtrl_ServerIP->GetValue());
+    int    m_nPort    =wxAtoi(this->TextCtrl_ServerPort->GetValue());
 
-			if(m_cbSendBuffStyle.GetCurSel() == 0)
-			{
-				if(emType != ENUM_PROTOCOL_WEBSOCKET)
-				{
-					//»Áπ˚ «∂˛Ω¯÷∆ƒ£ Ω
-					CConvertBuffer objConvertBuffer;
-					//ªÒµ√“™◊™ªªµƒ ˝æ›øÈ¥Û–°
-					pSocket_Info->m_pLogic->InitSendSize(objConvertBuffer.GetBufferSize(pSendData, nDecLen));
-					//Ω´ ˝æ›¥Æ◊™ªª≥…∂˛Ω¯÷∆¥Æ
-					int nSendLen = nDecLen;
-					objConvertBuffer.Convertstr2charArray(pSendData, strlen(pSendData), 
-						(unsigned char*)pSocket_Info->m_pLogic->GetSendData(), nSendLen);
-				}
-				else
-				{
-					//»Áπ˚ «webSocketƒ£ Ω
-					char szOriData[100 * MAX_BUFF_1024] = {'\0'};
-					//»Áπ˚ «∂˛Ω¯÷∆ƒ£ Ω
-					CConvertBuffer objConvertBuffer;
-					//ªÒµ√“™◊™ªªµƒ ˝æ›øÈ¥Û–°
-					pSocket_Info->m_pLogic->InitSendSize(100 * MAX_BUFF_1024);
-					//Ω´ ˝æ›¥Æ◊™ªª≥…∂˛Ω¯÷∆¥Æ
-					int nSendLen = 100 * MAX_BUFF_1024;
-					objConvertBuffer.Convertstr2charArray(pSendData, strlen(pSendData), 
-						(unsigned char*)szOriData, nSendLen);
-					
-					pSocket_Info->m_pLogic->SetSendBuff(szOriData, nSendLen);
-				}
-			}
-			else
-			{
-				if(emType != ENUM_PROTOCOL_WEBSOCKET)
-				{
-					//»Áπ˚ «Œƒ±æƒ£ Ω
-					pSocket_Info->m_pLogic->InitSendSize(nDecLen);
-					memcpy_s(pSocket_Info->m_pLogic->GetSendData(), nDecLen, pSendData, nDecLen);
-				}
-				else
-				{
-					//»Áπ˚ «webSocketƒ£ Ω
-					pSocket_Info->m_pLogic->InitSendSize(100 * MAX_BUFF_1024);
-					pSocket_Info->m_pLogic->SetSendBuff(pSendData, nDecLen);
-				}
-			}
+    sprintf(szLogText,  "ÂéãÊµãIP:%s, ÂéãÊµãÁ´ØÂè£:%d.\n", m_szSerevrIP.c_str(), m_nPort);
 
-			delete[] pSendData;
 
-		}
+    //CString strBeginTime = m_tmBegin.Format("%Y-%m-%d %H:%M:%S");
+    sprintf(szLogText,  "ÂéãÊµãÂºÄÂßãÊó∂Èó¥‰∏∫: %04d-%02d-%02d %02d:%02d:%02d\n", m_tmBegin.GetYear(), m_tmBegin.GetMonth(), m_tmBegin.GetDay(), m_tmBegin.GetHour(), m_tmBegin.GetMinute(), m_tmBegin.GetSecond());
+    fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
 
-		if(m_chkIsAlwayConnect.GetCheck() == BST_CHECKED)
-		{
-			pSocket_Info->m_blIsAlwayConnect = true;
-		}
-		else
-		{
-			pSocket_Info->m_blIsAlwayConnect = false;
-		}
+    if(m_blIsRun == true)
+    {
+        wxDateTime tmNow = wxDateTime::Now();
 
-		if(m_chkRadomaDelay.GetCheck() == BST_CHECKED)
-		{
-			pSocket_Info->m_blIsRadomaDelay = true;
-		}
-		else
-		{
-			pSocket_Info->m_blIsRadomaDelay = false;
-		}
+        //CString strNowTime = tmNow.Format("%Y-%m-%d %H:%M:%S");
+        sprintf(szLogText,  "ÂéãÊµãÁªìÊùüÊó∂Èó¥‰∏∫: %04d-%02d-%02d %02d:%02d:%02d\n", tmNow.GetYear(), tmNow.GetMonth(), tmNow.GetDay(), tmNow.GetHour(), tmNow.GetMinute(), tmNow.GetSecond());
+        fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
+    }
+    else
+    {
+        //CString strEndTime = m_tmEnd.Format("%Y-%m-%d %H:%M:%S");
+        sprintf(szLogText,  "ÂéãÊµãÁªìÊùüÊó∂Èó¥‰∏∫: %04d-%02d-%02d %02d:%02d:%02d\n", m_tmEnd.GetYear(), m_tmEnd.GetMonth(), m_tmEnd.GetDay(), m_tmEnd.GetHour(), m_tmEnd.GetMinute(), m_tmEnd.GetSecond());
+        fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
+    }
 
-		if(m_chkIsRecv.GetCheck() == BST_CHECKED)
-		{
-			pSocket_Info->m_blIsRecv = true;
-		}
-		else
-		{
-			pSocket_Info->m_blIsRecv = false;
-		}
 
-		if(m_ChkIsBroken.GetCheck() == BST_CHECKED)
-		{
-			pSocket_Info->m_blIsBroken = true;
-		}
-		else
-		{
-			pSocket_Info->m_blIsBroken = false;
-		}
+    int m_txtThreadCount = wxAtoi(this->TextCtrl_TestThreadCount->GetValue());
+    int m_txtSuccessConnect = wxAtoi(this->TextCtrl_SuccessConnect->GetValue());
+    int m_txtSuccessSend = wxAtoi(this->TextCtrl_SuccessSend->GetValue());
+    int m_txtSuccessRecv = wxAtoi(this->TextCtrl_SuccessRecv->GetValue());
+    int m_txtSendByteCount = wxAtoi(this->TextCtrl_SendByteCount->GetValue());
+    int m_txtRecvByteCount = wxAtoi(this->TextCtrl_RecvByteCount->GetValue());
+    int m_txtFailConnect    =wxAtoi(this->TextCtrl_FailConnect->GetValue());
+    int m_txtFailSend = wxAtoi(this->TextCtrl_FailSend->GetValue());
+    int m_txtFailRecv = wxAtoi(this->TextCtrl_FailRecv->GetValue());
+    int m_txtMinTime = wxAtoi(this->TextCtrl_MinTime->GetValue());
+    int m_txtMaxTime = wxAtoi(this->TextCtrl_MaxTime->GetValue());
 
-		if(m_chkRadomSendCount.GetCheck() == BST_CHECKED)
-		{
-			pSocket_Info->m_blIsSendCount = true;
-		}
-		else
-		{
-			pSocket_Info->m_blIsSendCount = false;
-		}
 
-		if(m_chkIsWriteLog.GetCheck() == BST_CHECKED)
-		{
-			pSocket_Info->m_blIsWriteFile = true;
-		}
-		else
-		{
-			pSocket_Info->m_blIsWriteFile = false;
-		}
+    sprintf(szLogText,  "ÂéãÊµãÁ∫øÁ®ãÊï∞:%d\n", m_txtThreadCount);
+    fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
 
-		if(m_chkSendOne.GetCheck() == BST_CHECKED)
-		{
-			pSocket_Info->m_blIsSendOne = true;
-		}
-		else
-		{
-			pSocket_Info->m_blIsSendOne = false;
-		}
+    sprintf(szLogText,  "ÂàõÂª∫ÊàêÂäüËøûÊé•Êï∞:%d\n",m_txtSuccessConnect);
+    fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
 
-		// «∑Òø™∆Ù∏ﬂº∂ƒ£ Ω
-		if(m_chkLuaAdvance.GetCheck() == BST_CHECKED)
-		{
-			pSocket_Info->m_blLuaAdvance = true;
+    sprintf(szLogText,  "ÊàêÂäüÂèëÈÄÅÊï∞ÊçÆÂåÖÊï∞:%d\n", m_txtSuccessSend);
+    fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
 
-			//»Áπ˚¥Úø™∏ﬂº∂ƒ£ Ω£¨‘Ú∂¡»°Œƒº˛
-			m_txtLuaFilePath.GetWindowText(strData);
+    sprintf(szLogText,  "ÊàêÂäüÊé•Êî∂Êï∞ÊçÆÂåÖÊï∞:%d\n", m_txtSuccessRecv);
+    fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
 
-			if(strData == "")
-			{
-				MessageBox(_T("ƒ˙“—æ≠ø™∆Ù¡À∏ﬂº∂ƒ£ Ω£¨±ÿ–Î…Ë÷√±ÿ“™µƒLuaŒƒº˛√˚°£"));
-				delete pSocket_Info;
-				delete pSocket_State_Info;
-				return;
-			}
+    sprintf(szLogText,  "ÂèëÈÄÅÂ≠óËäÇÊï∞:%d\n", m_txtSendByteCount);
+    fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
 
-			nSrcLen = WideCharToMultiByte(CP_ACP, 0, strData, strData.GetLength(), NULL, 0, NULL, NULL);
-			int nBufferSize = WideCharToMultiByte(CP_ACP, 0, strData, -1, NULL, 0, NULL, NULL);  
-			nDecLen = WideCharToMultiByte(CP_ACP, 0, strData, nSrcLen, pSocket_Info->m_szLuaFileName, nBufferSize, NULL,NULL);
-			pSocket_Info->m_szLuaFileName[nDecLen] = '\0';
-		}
-		else
-		{
-			pSocket_Info->m_blLuaAdvance = false;
-		}
+    sprintf(szLogText,  "Êé•Êî∂Â≠óËäÇÊï∞:%d\n", m_txtRecvByteCount);
+    fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
 
-		if(pSocket_Info->m_nConnectType == 0)
-		{
-			//TCP∑¢ÀÕ
-			CClientTcpSocket* pClientTcpSocket = new CClientTcpSocket();
-			pClientTcpSocket->SetSocketThread(pSocket_Info, pSocket_State_Info);
-			pClientTcpSocket->SetThreadID(i);
 
-			DWORD  ThreadID = 0;
-			CreateThread(NULL, NULL, ThreadProc, (LPVOID)pClientTcpSocket, NULL, &ThreadID);
+    sprintf(szLogText,  "ËøûÊé•Â§±Ë¥•Êï∞:%d\n",m_txtFailConnect);
+    fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
 
-			m_vecClientTcpSocket.push_back(pClientTcpSocket);
-		}
-		else
-		{
-			//UDP∑¢ÀÕ
-			CClientUdpSocket* pClientUdpSocket = new CClientUdpSocket();
-			pClientUdpSocket->SetSocketThread(pSocket_Info, pSocket_State_Info);
+    sprintf(szLogText,  "ÂèëÈÄÅÂ§±Ë¥•Êï∞ÊçÆÂåÖÊï∞:%d\n", m_txtFailSend);
+    fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
 
-			DWORD  ThreadID = 0;
-			CreateThread(NULL, NULL, ThreadUDPProc, (LPVOID)pClientUdpSocket, NULL, &ThreadID);
+    sprintf(szLogText,  "Êé•Êî∂Â§±Ë¥•Êï∞ÊçÆÂåÖÊï∞:%d\n", m_txtFailRecv);
+    fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
 
-			m_vecClientUdpSocket.push_back(pClientUdpSocket);
-		}
+    sprintf(szLogText,  "ÊúÄÂ∞èÂçïÂåÖÂìçÂ∫îÊó∂Èó¥:%dÊØ´Áßí\n", m_txtFailRecv);
+    fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
 
-		m_tmBegin = CTime::GetCurrentTime();
-		m_blIsRun = true;
-	}
+    sprintf(szLogText,  "ÊúÄÂ§ßÂçïÂåÖÂìçÂ∫îÊó∂Èó¥:%dÊØ´Áßí\n", m_txtMaxTime);
+    fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
+
+
+    //ËøûÊé•ÊàêÂäüÁôæÂàÜÊØî
+    float fRote = 0.0f;
+    int nSucccess = wxAtoi(this->TextCtrl_SuccessConnect->GetValue());
+    int nFail     = wxAtoi(this->TextCtrl_FailConnect->GetValue());
+
+
+    if(nSucccess + nFail == 0)
+    {
+        fRote = 0.0f;
+    }
+    else
+    {
+        fRote = (float)nSucccess/(nSucccess + nFail);
+    }
+
+    sprintf(szLogText,  "ËøûÊé•ÊàêÂäüÁôæÂàÜÊØî:%f%%\n", fRote*100.0);
+    fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
+
+    //ÂèëÈÄÅÊàêÂäüÁôæÂàÜÊØî
+    nSucccess = wxAtoi(this->TextCtrl_SuccessSend->GetValue());
+    nFail     =  wxAtoi(this->TextCtrl_FailSend->GetValue());
+
+    if(nSucccess + nFail == 0)
+    {
+        fRote = 0.0f;
+    }
+    else
+    {
+        fRote = (float)nSucccess/(nSucccess + nFail);
+    }
+
+    sprintf(szLogText,  "ÂèëÈÄÅÊï∞ÊçÆÂåÖÊàêÂäüÁôæÂàÜÊØî:%f%%\n", fRote*100.0);
+    fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
+
+    //Êé•Êî∂ÊàêÂäüÁôæÂàÜÊØî
+    nSucccess =  wxAtoi(this->TextCtrl_SuccessRecv->GetValue());
+    nFail     = wxAtoi(this->TextCtrl_FailRecv->GetValue());
+
+    if(nSucccess + nFail == 0)
+    {
+        fRote = 0.0f;
+    }
+    else
+    {
+        fRote = (float)nSucccess/(nSucccess + nFail);
+    }
+
+    sprintf(szLogText,  "Êé•Êî∂Êï∞ÊçÆÂåÖÊàêÂäüÁôæÂàÜÊØî:%f%%\n", fRote*100.0);
+    fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
+
+    sprintf(szLogText,  "=============================================\n");
+    fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
+
+    fclose(pFile);
+
+    wxMessageBox(wxT("ÂØºÂá∫ÂéãÊµãÊä•ÂëäÊàêÂäü"), this->GetTitle(), wxOK | wxICON_INFORMATION, this);
+
 }
 
-void CPassTCPDlg::InitView()
+void CPassTCPDlg::OnButton_SetRadomPacketClick(wxCommandEvent& event)
 {
-	m_chkIsRecv.SetCheck(BST_CHECKED);
-	m_ChkIsBroken.SetCheck(BST_CHECKED);
+    //ËÆæÁΩÆÈöèÊú∫Êï∞ÊçÆÂåÖÂ∫èÂàó
+    CPacketDlg* objPacketDlg;
+    objPacketDlg    =new CPacketDlg(this);
 
-	m_reSendText.SetOptions(ECOOP_XOR, ECO_WANTRETURN);
 
-	SetRichTextColor(COLOR_TEXT_BULE);
+    switch(this->RadioBox_nRadio->GetSelection ())
+    {
+    case 0:
+        {
+            if(m_pLogic != NULL)
+            {
+                delete m_pLogic;
+            }
 
-	m_pLogic = NULL;
+            CNomalLogic* pNomalLogic = new CNomalLogic();
+            m_pLogic = (CBaseDataLogic* )pNomalLogic;
+            break;
+        }
 
-	m_txtServerIP.SetWindowText(_T("127.0.0.1"));
-	m_txtPort.SetWindowText(_T("10002"));
-	m_txtThreadCount.SetWindowText(_T("1"));
-	m_txtRecvTimeout.SetWindowText(_T("1000"));
-	m_txtPacketTimewait.SetWindowText(_T("0"));
-	m_txtSocketInterval.SetWindowText(_T("0"));
-	m_txtRecvLength.SetWindowText(_T("12"));
-	m_reSendText.SetWindowText(_T("01 00 00 10 08 00 00 00 46 45 45 45 45 59 45 53 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 be cd aa 8f 3c 01 00 00"));
-	m_txtClientUdpPort.SetWindowText(_T("20002"));
+    case 1:
+        {
+            if(m_pLogic != NULL)
+            {
+                delete m_pLogic;
+            }
 
-	m_txtSendByteCount.SetWindowText(_T("0"));
-	m_txtRecvByteCount.SetWindowText(_T("0"));
+            CNomalLogic* pNomalLogic = new CNomalLogic();
+            m_pLogic = (CBaseDataLogic* )pNomalLogic;
+            break;
+        }
 
-	m_txtSendCount.SetWindowText(_T("0"));
-	m_txtMinTime.SetWindowText(_T("0"));
-	m_txtMaxTime.SetWindowText(_T("0"));
+    case 2:
+        {
+            if(m_pLogic != NULL)
+            {
+                delete m_pLogic;
+            }
 
-	m_nRadio = 1;
+            CWebSocketLogic* pWebSocketLogic = new CWebSocketLogic();
+            m_pLogic = (CBaseDataLogic* )pWebSocketLogic;
+            break;
+        }
+    }
 
-	m_cbSendBuffStyle.InsertString(0, _T("∂˛Ω¯÷∆ƒ£ Ω"));
-	m_cbSendBuffStyle.InsertString(1, _T("Œƒ±æƒ£ Ω"));
-	m_cbSendBuffStyle.SetCurSel(0);
-	m_nCurrTextStyle = 0;
+    objPacketDlg->SetBaseDataLogic(m_pLogic);
 
-	ClearResult();
+    objPacketDlg->ShowModal();
 
-	//≥ı ºªØTCP¡¥Ω”
-	WSADATA wsaData;
-	int nErr = WSAStartup(MAKEWORD(2, 2), &wsaData);
-	if(nErr != 0)
-	{
-		MessageBox(_T("±æª˙socketø‚º”‘ÿ ß∞‹£¨«ÎºÏ≤È±æª˙socketø‚∞Ê±æ"), _T("¥ÌŒÛ–≈œ¢"), MB_OK);
-	}
+
 }
+
+
+
+
+
+
+
+
 
 void CPassTCPDlg::ClearResult()
 {
-	m_txtSuccessConnect.SetWindowText(_T("0"));
-	m_txtSuccessSend.SetWindowText(_T("0"));
-	m_txtSuccessRecv.SetWindowText(_T("0"));
-	m_txtCurrConnect.SetWindowText(_T("0"));
-	m_txtFailConnect.SetWindowText(_T("0"));
-	m_txtFailSend.SetWindowText(_T("0"));
-	m_txtFailRecv.SetWindowText(_T("0"));
 
-	m_txtSendByteCount.SetWindowText(_T("0"));
-	m_txtRecvByteCount.SetWindowText(_T("0"));
-}
-
-void CPassTCPDlg::Close(bool blClose)
-{
-	int nCount = m_vecClientUdpSocket.size();
-	for(int i = 0; i < nCount; i++)
-	{
-		CClientUdpSocket* pClientUdpSocket = (CClientUdpSocket* )m_vecClientUdpSocket[i];
-		if(NULL != pClientUdpSocket)
-		{
-			pClientUdpSocket->Stop();
-
-			DWORD dwSleep = 100;
-			Sleep(dwSleep);
-
-			delete pClientUdpSocket;
-			pClientUdpSocket = NULL;
-		}
-	}
-	m_vecClientUdpSocket.clear();
-
-	nCount = m_vecClientTcpSocket.size();
-	for(int i = 0; i < nCount; i++)
-	{
-		CClientTcpSocket* pClientTcpSocket = (CClientTcpSocket* )m_vecClientTcpSocket[i];
-		if(NULL != pClientTcpSocket)
-		{
-			pClientTcpSocket->Stop();
-
-			DWORD dwSleep = 100;
-			Sleep(dwSleep);
-
-			delete pClientTcpSocket;
-			pClientTcpSocket = NULL;
-		}
-	}
-
-	m_vecClientTcpSocket.clear();
-
-	if(blClose == true && m_pLogic != NULL)
-	{
-		if(m_pLogic->m_nClassTye == 1)
-		{
-			delete (CNomalLogic* )m_pLogic;
-		}
-		else
-		{
-			delete (CWebSocketLogic* )m_pLogic;
-		}
-	}
-}
-
-void CPassTCPDlg::OnClose()
-{
-	Close(true);
-	WSACleanup();
-	CDialog::OnClose();
-}
-
-void CPassTCPDlg::OnBnClickedButton2()
-{
-	//Õ£÷π—π≤‚
-	int nCount = (int)m_vecClientUdpSocket.size();
-	for(int i = 0; i < nCount; i++)
-	{
-		CClientUdpSocket* pClientUdpSocket = (CClientUdpSocket* )m_vecClientUdpSocket[i];
-		if(NULL != pClientUdpSocket)
-		{
-			pClientUdpSocket->Stop();
-		}
-	}
-
-	nCount = (int)m_vecClientTcpSocket.size();
-	for(int i = 0; i < nCount; i++)
-	{
-		CClientTcpSocket* pClientTcpSocket = (CClientTcpSocket* )m_vecClientTcpSocket[i];
-		if(NULL != pClientTcpSocket)
-		{
-			pClientTcpSocket->Stop();
-		}
-	}
-
-	m_tmEnd = CTime::GetCurrentTime();
-	m_blIsRun = false; 
-}
-
-void CPassTCPDlg::OnTimer(UINT_PTR nIDEvent)
-{
-	if(nIDEvent == 1)
-	{
-		int nSuccessConnect = 0;
-		int nSuccessSend    = 0;
-		int nSuccessRecv    = 0;
-		int ntCurrConnect   = 0;
-		int nFailConnect    = 0;
-		int nFailSend       = 0;
-		int nFailRecv       = 0;
-		int nCurrConnect    = 0;
-		int nSendByteCount  = 0;
-		int nRecvByteCount  = 0;
-		int nMinTime        = 0;
-		int nMaxTime        = 0;
-
-		int nConnectType = 0;
-		switch(GetCheckedRadioButton(IDC_RADIO1, IDC_RADIO3))
-		{
-		case IDC_RADIO1:
-			nConnectType = 0;
-			break;
-		case IDC_RADIO2:
-			nConnectType = 1;
-			break;
-		case IDC_RADIO3:
-			nConnectType = 0;
-			break;
-		}
-
-		if(nConnectType == 0)
-		{
-			for(int i = 0; i < (int)m_vecClientTcpSocket.size(); i++)
-			{
-				CClientTcpSocket* pClientTcpSocket = (CClientTcpSocket* )m_vecClientTcpSocket[i];
-				if(NULL != pClientTcpSocket)
-				{
-					_Socket_State_Info* pSocket_State_Info = pClientTcpSocket->GetStateInfo();
-					if(NULL != pSocket_State_Info)
-					{
-						nSuccessConnect += pSocket_State_Info->m_nSuccessConnect;
-						nSuccessSend    += pSocket_State_Info->m_nSuccessSend;
-						nSuccessRecv    += pSocket_State_Info->m_nSuccessRecv;
-						nFailConnect    += pSocket_State_Info->m_nFailConnect;
-						nFailSend       += pSocket_State_Info->m_nFailSend;
-						nFailRecv       += pSocket_State_Info->m_nFailRecv;
-						nCurrConnect    += pSocket_State_Info->m_nCurrectSocket;
-						nSendByteCount  += pSocket_State_Info->m_nSendByteCount;
-						nRecvByteCount  += pSocket_State_Info->m_nRecvByteCount;
-
-						if(i == 0)
-						{
-							nMinTime = pSocket_State_Info->m_nMinRecvTime;
-							nMaxTime = pSocket_State_Info->m_nMaxRecvTime;
-						}
-						else
-						{
-							if(nMinTime > pSocket_State_Info->m_nMinRecvTime)
-							{
-								nMinTime = pSocket_State_Info->m_nMinRecvTime;
-							}
-
-							if(nMaxTime < pSocket_State_Info->m_nMaxRecvTime)
-							{
-								nMaxTime = pSocket_State_Info->m_nMaxRecvTime;
-							}
-						}
-					}
-				}
-			}
-
-			//œ‘ æœ‡πÿ ˝æ›
-			CString strData;
-			strData.Format(_T("%d"), nSuccessConnect);
-			m_txtSuccessConnect.SetWindowText(strData);
-			strData.Format(_T("%d"), nSuccessSend);
-			m_txtSuccessSend.SetWindowText(strData);
-			strData.Format(_T("%d"), nSuccessRecv);
-			m_txtSuccessRecv.SetWindowText(strData);
-			strData.Format(_T("%d"), nFailConnect);
-			m_txtFailConnect.SetWindowText(strData);
-			strData.Format(_T("%d"), nFailSend);
-			m_txtFailSend.SetWindowText(strData);
-			strData.Format(_T("%d"), nFailRecv);
-			m_txtFailRecv.SetWindowText(strData);
-			strData.Format(_T("%d"), nCurrConnect);
-			m_txtCurrConnect.SetWindowText(strData);
-			strData.Format(_T("%d"), nSendByteCount);
-			m_txtSendByteCount.SetWindowText(strData);
-			strData.Format(_T("%d"), nRecvByteCount);
-			m_txtRecvByteCount.SetWindowText(strData);
-			strData.Format(_T("%d"), nMinTime);
-			m_txtMinTime.SetWindowText(strData);
-			strData.Format(_T("%d"), nMaxTime);
-			m_txtMaxTime.SetWindowText(strData);
-		}
-		else
-		{
-			for(int i = 0; i < (int)m_vecClientUdpSocket.size(); i++)
-			{
-				CClientUdpSocket* pClientUdpSocket = (CClientUdpSocket* )m_vecClientUdpSocket[i];
-				if(NULL != pClientUdpSocket)
-				{
-					_Socket_State_Info* pSocket_State_Info = pClientUdpSocket->GetStateInfo();
-					if(NULL != pSocket_State_Info)
-					{
-						nSuccessConnect += pSocket_State_Info->m_nSuccessConnect;
-						nSuccessSend    += pSocket_State_Info->m_nSuccessSend;
-						nSuccessRecv    += pSocket_State_Info->m_nSuccessRecv;
-						nFailConnect    += pSocket_State_Info->m_nFailConnect;
-						nFailSend       += pSocket_State_Info->m_nFailSend;
-						nFailRecv       += pSocket_State_Info->m_nFailRecv;
-						nCurrConnect    += pSocket_State_Info->m_nCurrectSocket;
-					}
-
-					if(i == 0)
-					{
-						nMinTime = pSocket_State_Info->m_nMinRecvTime;
-						nMaxTime = pSocket_State_Info->m_nMaxRecvTime;
-					}
-					else
-					{
-						if(nMinTime > pSocket_State_Info->m_nMinRecvTime)
-						{
-							nMinTime = pSocket_State_Info->m_nMinRecvTime;
-						}
-
-						if(nMaxTime < pSocket_State_Info->m_nMaxRecvTime)
-						{
-							nMaxTime = pSocket_State_Info->m_nMaxRecvTime;
-						}
-					}
-				}
-			}
-
-			//œ‘ æœ‡πÿ ˝æ›
-			CString strData;
-			strData.Format(_T("%d"), nSuccessConnect);
-			m_txtSuccessConnect.SetWindowText(strData);
-			strData.Format(_T("%d"), nSuccessSend);
-			m_txtSuccessSend.SetWindowText(strData);
-			strData.Format(_T("%d"), nSuccessRecv);
-			m_txtSuccessRecv.SetWindowText(strData);
-			strData.Format(_T("%d"), nFailConnect);
-			m_txtFailConnect.SetWindowText(strData);
-			strData.Format(_T("%d"), nFailSend);
-			m_txtFailSend.SetWindowText(strData);
-			strData.Format(_T("%d"), nFailRecv);
-			m_txtFailRecv.SetWindowText(strData);
-			strData.Format(_T("%d"), nCurrConnect);
-			m_txtCurrConnect.SetWindowText(strData);
-			strData.Format(_T("%d"), nMinTime);
-			m_txtMinTime.SetWindowText(strData);
-			strData.Format(_T("%d"), nMaxTime);
-			m_txtMaxTime.SetWindowText(strData);
-		}
-	}
-
-	CDialog::OnTimer(nIDEvent);
-}
-
-void CPassTCPDlg::OnBnClickedButton3()
-{
-	//–¥»Î—π≤‚±®∏Ê
-	FILE* pFile = NULL;
-	char szFileName[20];
-	sprintf_s(szFileName, "StressTest.log");
-	fopen_s(&pFile, szFileName, "a+");
-	if(pFile == NULL)
-	{
-		MessageBox(_T("µº≥ˆ—π≤‚±®∏Ê ß∞‹£¨Œƒº˛≤ª¥Ê‘⁄"), _T("Ã· æ–≈œ¢"), MB_OK);
-		return;
-	}
-
-	char szLogText[1024] = {'\0'};
-
-	sprintf_s(szLogText, 1024, "=============================================\n");
-	fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
-
-	//ƒ¨»œTCP¿‡–Õ£¨0 «TCP£¨1 «UDP
-	switch(GetCheckedRadioButton(IDC_RADIO1, IDC_RADIO3))
-	{
-	case IDC_RADIO1:
-		sprintf_s(szLogText, 1024, "—π≤‚¿‡–Õ:TCP\n");
-		break;
-	case IDC_RADIO2:
-		sprintf_s(szLogText, 1024, "—π≤‚¿‡–Õ:UDP\n");
-		break;
-	case IDC_RADIO3:
-		sprintf_s(szLogText, 1024, "—π≤‚¿‡–Õ:WebSocket\n");
-		break;
-	}
-	fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
-
-	CString strData;
-	CString strDataPort;
-	m_txtServerIP.GetWindowText(strData);
-
-	char szServerIP[MAX_BUFF_20] = {'\0'};
-	int nSrcLen = WideCharToMultiByte(CP_ACP, 0, strData, strData.GetLength(), NULL, 0, NULL, NULL);
-	int nDecLen = WideCharToMultiByte(CP_ACP, 0, strData, nSrcLen, szServerIP, MAX_BUFF_20, NULL,NULL);
-	szServerIP[nDecLen] = '\0';
-
-	m_txtPort.GetWindowText(strDataPort);
-	sprintf_s(szLogText, 1024, "—π≤‚IP:%s, —π≤‚∂Àø⁄:%d.\n", szServerIP, _ttoi((LPCTSTR)strDataPort));
-	fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
-
-	//CString strBeginTime = m_tmBegin.Format("%Y-%m-%d %H:%M:%S");
-	sprintf_s(szLogText, 1024, "—π≤‚ø™ º ±º‰Œ™: %04d-%02d-%02d %02d:%02d:%02d\n", m_tmBegin.GetYear(), m_tmBegin.GetMonth(), m_tmBegin.GetDay(), m_tmBegin.GetHour(), m_tmBegin.GetMinute(), m_tmBegin.GetSecond());
-	fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
-
-	if(m_blIsRun == true)
-	{
-		CTime tmNow = CTime::GetCurrentTime();
-
-		//CString strNowTime = tmNow.Format("%Y-%m-%d %H:%M:%S");
-		sprintf_s(szLogText, 1024, "—π≤‚Ω· ¯ ±º‰Œ™: %04d-%02d-%02d %02d:%02d:%02d\n", tmNow.GetYear(), tmNow.GetMonth(), tmNow.GetDay(), tmNow.GetHour(), tmNow.GetMinute(), tmNow.GetSecond());
-
-		fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
-	}
-	else
-	{
-		//CString strEndTime = m_tmEnd.Format("%Y-%m-%d %H:%M:%S");
-		sprintf_s(szLogText, 1024, "—π≤‚Ω· ¯ ±º‰Œ™: %04d-%02d-%02d %02d:%02d:%02d\n", m_tmEnd.GetYear(), m_tmEnd.GetMonth(), m_tmEnd.GetDay(), m_tmEnd.GetHour(), m_tmEnd.GetMinute(), m_tmEnd.GetSecond());
-
-		fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
-	}
-
-	
-	m_txtThreadCount.GetWindowText(strData);
-	sprintf_s(szLogText, 1024, "—π≤‚œﬂ≥Ã ˝:%d\n", _ttoi((LPCTSTR)strData));
-	fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
-
-	m_txtSuccessConnect.GetWindowText(strData);
-	sprintf_s(szLogText, 1024, "¥¥Ω®≥…π¶¡¨Ω” ˝:%d\n", _ttoi((LPCTSTR)strData));
-	fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
-
-	m_txtSuccessSend.GetWindowText(strData);
-	sprintf_s(szLogText, 1024, "≥…π¶∑¢ÀÕ ˝æ›∞¸ ˝:%d\n", _ttoi((LPCTSTR)strData));
-	fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
-
-	m_txtSuccessRecv.GetWindowText(strData);
-	sprintf_s(szLogText, 1024, "≥…π¶Ω” ’ ˝æ›∞¸ ˝:%d\n", _ttoi((LPCTSTR)strData));
-	fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
-
-	m_txtSendByteCount.GetWindowText(strData);
-	sprintf_s(szLogText, 1024, "∑¢ÀÕ◊÷Ω⁄ ˝:%d\n", _ttoi((LPCTSTR)strData));
-	fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
-
-	m_txtRecvByteCount.GetWindowText(strData);
-	sprintf_s(szLogText, 1024, "Ω” ’◊÷Ω⁄ ˝:%d\n", _ttoi((LPCTSTR)strData));
-	fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
-
-	m_txtFailConnect.GetWindowText(strData);
-	sprintf_s(szLogText, 1024, "¡¨Ω” ß∞‹ ˝:%d\n", _ttoi((LPCTSTR)strData));
-	fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
-
-	m_txtFailSend.GetWindowText(strData);
-	sprintf_s(szLogText, 1024, "∑¢ÀÕ ß∞‹ ˝æ›∞¸ ˝:%d\n", _ttoi((LPCTSTR)strData));
-	fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
-
-	m_txtFailRecv.GetWindowText(strData);
-	sprintf_s(szLogText, 1024, "Ω” ’ ß∞‹ ˝æ›∞¸ ˝:%d\n", _ttoi((LPCTSTR)strData));
-	fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
-
-	m_txtMinTime.GetWindowText(strData);
-	sprintf_s(szLogText, 1024, "◊Ó–°µ•∞¸œÏ”¶ ±º‰:%d∫¡√Î\n", _ttoi((LPCTSTR)strData));
-	fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
-
-	m_txtMaxTime.GetWindowText(strData);
-	sprintf_s(szLogText, 1024, "◊Ó¥Ûµ•∞¸œÏ”¶ ±º‰:%d∫¡√Î\n", _ttoi((LPCTSTR)strData));
-	fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
-
-	//¡¨Ω”≥…π¶∞Ÿ∑÷±»
-	float fRote = 0.0f;
-	m_txtSuccessConnect.GetWindowText(strData);
-	int nSucccess =  _ttoi((LPCTSTR)strData);
-	m_txtFailConnect.GetWindowText(strData);
-	int nFail     = _ttoi((LPCTSTR)strData);
-	if(nSucccess + nFail == 0)
-	{
-		fRote = 0.0f;
-	}
-	else
-	{
-		fRote = (float)nSucccess/(nSucccess + nFail);
-	}
-
-	sprintf_s(szLogText, 1024, "¡¨Ω”≥…π¶∞Ÿ∑÷±»:%f%%\n", fRote*100.0);
-	fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
-
-	//∑¢ÀÕ≥…π¶∞Ÿ∑÷±»
-	m_txtSuccessSend.GetWindowText(strData);
-	nSucccess =  _ttoi((LPCTSTR)strData);
-	m_txtFailSend.GetWindowText(strData);
-	nFail     = _ttoi((LPCTSTR)strData);
-	if(nSucccess + nFail == 0)
-	{
-		fRote = 0.0f;
-	}
-	else
-	{
-		fRote = (float)nSucccess/(nSucccess + nFail);
-	}
-	sprintf_s(szLogText, 1024, "∑¢ÀÕ ˝æ›∞¸≥…π¶∞Ÿ∑÷±»:%f%%\n", fRote*100.0);
-	fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
-
-	//Ω” ’≥…π¶∞Ÿ∑÷±»
-	m_txtSuccessRecv.GetWindowText(strData);
-	nSucccess =  _ttoi((LPCTSTR)strData);
-	m_txtFailRecv.GetWindowText(strData);
-	nFail     = _ttoi((LPCTSTR)strData);
-	if(nSucccess + nFail == 0)
-	{
-		fRote = 0.0f;
-	}
-	else
-	{
-		fRote = (float)nSucccess/(nSucccess + nFail);
-	}
-	sprintf_s(szLogText, 1024, "Ω” ’ ˝æ›∞¸≥…π¶∞Ÿ∑÷±»:%f%%\n", fRote*100.0);
-	fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
-
-	sprintf_s(szLogText, 1024, "=============================================\n");
-	fwrite(szLogText, strlen(szLogText), sizeof(char), pFile);
-
-	fclose(pFile);
-
-	MessageBox(_T("µº≥ˆ—π≤‚±®∏Ê≥…π¶"), _T("Ã· æ–≈œ¢"), MB_OK);
+    this->TextCtrl_SuccessConnect->SetValue(wxT("0"));
+    this->TextCtrl_SuccessSend->SetValue(wxT("0"));
+    this->TextCtrl_SuccessRecv->SetValue(wxT("0"));
+    this->TextCtrl_CurrConnect->SetValue(wxT("0"));
+    this->TextCtrl_FailConnect->SetValue(wxT("0"));
+    this->TextCtrl_FailRecv->SetValue(wxT("0"));
+    this->TextCtrl_FailSend->SetValue(wxT("0"));
+    this->TextCtrl_FailConnect->SetValue(wxT("0"));
+    this->TextCtrl_SendByteCount->SetValue(wxT("0"));
+    this->TextCtrl_RecvByteCount->SetValue(wxT("0"));
 
 }
 
-void CPassTCPDlg::OnCbnSelchangeCombo1()
+
+
+
+void CPassTCPDlg::OnClose(wxCloseEvent& event)
 {
-	//Œƒ±æ±‡÷∆ƒ£ Ω£¨∏˘æ›”√ªßµƒ—°œÓ£¨±‰ªØŒƒ±æµƒƒ⁄»›
-	int nCurrTextStyle = m_cbSendBuffStyle.GetCurSel();
-	if(nCurrTextStyle != m_nCurrTextStyle)
-	{
-		if(nCurrTextStyle == 0)  //Ω≤Œƒ±æ◊™ªØŒ™∂˛Ω¯÷∆
-		{
-			//µ±∑Á∏Ò∑¢…˙∏ƒ±‰µƒ ±∫Ú±‰ªØ
-			CString strData;
-			m_reSendText.GetWindowText(strData);
+    int nCount = m_vecClientUdpSocket.size();
 
-			int nSrcLen = WideCharToMultiByte(CP_ACP, 0, strData, strData.GetLength(), NULL, 0, NULL, NULL);
-			int nBufferSize = WideCharToMultiByte(CP_ACP, 0, strData, -1, NULL, 0, NULL, NULL);  
-			char* pSendData = new char[nBufferSize + 1];
-			int nDecLen = WideCharToMultiByte(CP_ACP, 0, strData, nSrcLen, pSendData, nBufferSize, NULL,NULL);
-			pSendData[nDecLen] = '\0';
+    for(int i = 0; i < nCount; i++)
+    {
+        CClientUdpSocket* pClientUdpSocket = (CClientUdpSocket* )m_vecClientUdpSocket[i];
 
-			if(nDecLen <= 0)
-			{
-				//»Áπ˚√ª”–ƒ⁄»›æÕ≤ª◊™ªª
-				m_nCurrTextStyle = nCurrTextStyle;
-				SetRichTextColor(COLOR_TEXT_BULE);
-				return;
-			}
+        if(NULL != pClientUdpSocket)
+        {
+            pClientUdpSocket->Stop();
 
-			//◊™ªØ∫Ûµƒ◊÷∑˚¥Æ
-			int nConvertSize = (nBufferSize + 1)*4;
-			char* pErSendBuff = new char[nConvertSize];
-			memset(pErSendBuff, 0, nConvertSize);
+            int dwSleep = 100;
+            //Sleep(dwSleep);
+            std::this_thread::sleep_for(std::chrono::milliseconds(dwSleep*1000));
 
-			for(int i = 0; i < nDecLen; i++)
-			{
-				char szLog[4] = {'\0'};
-				if( i != nDecLen - 1)
-				{
-					sprintf_s(szLog, 4, "%02X ", (unsigned char)pSendData[i]);
-				}
-				else
-				{
-					sprintf_s(szLog, 4, "%02X", (unsigned char)pSendData[i]);
-				}
-				
-				if(i == 0)
-				{
-					sprintf_s(pErSendBuff, nConvertSize, "%s%s", pErSendBuff, szLog);
-				}
-				else
-				{
-					sprintf_s(pErSendBuff, nConvertSize, "%s %s", pErSendBuff, szLog);
-				}
-			}
 
-			//Ω´◊™ªª∫Ûµƒ∂˛Ω¯÷∆£¨œ‘ æ‘⁄Œƒ±æøÚƒ⁄
-			wchar_t *pwText = new wchar_t[nConvertSize];
+            delete pClientUdpSocket;
+            pClientUdpSocket = NULL;
+        }
+    }
 
-			nSrcLen = MultiByteToWideChar (CP_ACP, 0, pErSendBuff, -1, NULL, 0);
-			nBufferSize = MultiByteToWideChar (CP_ACP, 0, pErSendBuff, -1, pwText, nSrcLen);
-			pwText[nBufferSize] = '\0';
+    m_vecClientUdpSocket.clear();
 
-			m_reSendText.SetWindowText(pwText);
+    nCount = m_vecClientTcpSocket.size();
 
-			delete[] pwText;
-			delete[] pSendData;
-			delete[] pErSendBuff;
+    for(int i = 0; i < nCount; i++)
+    {
+        CClientTcpSocket* pClientTcpSocket = (CClientTcpSocket* )m_vecClientTcpSocket[i];
 
-			SetRichTextColor(COLOR_TEXT_BULE);
-		}
-		else
-		{
-			//Ω´∂˛Ω¯÷∆◊™ªØ≥…Œƒ±æ
-			CString strData;
-			m_reSendText.GetWindowText(strData);
+        if(NULL != pClientTcpSocket)
+        {
+            pClientTcpSocket->Stop();
 
-			int nSrcLen = WideCharToMultiByte(CP_ACP, 0, strData, strData.GetLength(), NULL, 0, NULL, NULL);
-			int nBufferSize = WideCharToMultiByte(CP_ACP, 0, strData, -1, NULL, 0, NULL, NULL);  
-			char* pSendData = new char[nBufferSize + 1];
-			int nDecLen = WideCharToMultiByte(CP_ACP, 0, strData, nSrcLen, pSendData, nBufferSize, NULL,NULL);
-			pSendData[nDecLen] = '\0';
 
-			if(nDecLen <= 0)
-			{
-				//»Áπ˚√ª”–ƒ⁄»›æÕ≤ª◊™ªª
-				m_nCurrTextStyle = nCurrTextStyle;
-				SetRichTextColor(COLOR_TEXT_RED);
-				return;
-			}
+            int dwSleep = 100;
+            //Sleep(dwSleep);
+            std::this_thread::sleep_for(std::chrono::milliseconds(dwSleep*1000));
 
-			int nTextSize = 0;
-			if(nDecLen % 3 != 0)
-			{
-				nTextSize = nDecLen / 3 + 2;
-			}
-			else
-			{
-				nTextSize = nDecLen / 3 + 1;
-			}
+            delete pClientTcpSocket;
+            pClientTcpSocket = NULL;
+        }
+    }
 
-			char* pTextData = new char[nTextSize];
-			memset(pTextData, 0, nTextSize);
+    m_vecClientTcpSocket.clear();
 
-			CConvertBuffer objConvertBuffer;
-			//Ω´ ˝æ›¥Æ◊™ªª≥…∂˛Ω¯÷∆¥Æ
-			objConvertBuffer.Convertstr2charArray(pSendData, strlen(pSendData), (unsigned char*)pTextData, nTextSize);
+    if( m_pLogic != NULL)
+    {
+        if(m_pLogic->m_nClassTye == 1)
+        {
+            delete (CNomalLogic* )m_pLogic;
+        }
+        else
+        {
+            delete (CWebSocketLogic* )m_pLogic;
+        }
+    }
 
-			//Ω´◊™ªª∫Ûµƒ∂˛Ω¯÷∆£¨œ‘ æ‘⁄Œƒ±æøÚƒ⁄
-			wchar_t *pwText = new wchar_t[nTextSize + 2];
+    this->Destroy();
 
-			nSrcLen = MultiByteToWideChar (CP_ACP, 0, pTextData, -1, NULL, 0);
-			nBufferSize = MultiByteToWideChar (CP_ACP, 0, pTextData, -1, pwText, nSrcLen);
-			pwText[nBufferSize] = '\0';
-
-			m_reSendText.SetWindowText(pwText);
-
-			delete[] pwText;
-			delete[] pSendData;
-			delete[] pTextData;
-
-			SetRichTextColor(COLOR_TEXT_RED);
-		}
-
-		m_nCurrTextStyle = nCurrTextStyle;
-
-	}
 }
 
-void CPassTCPDlg::SetRichTextColor(int nColor)
+void CPassTCPDlg::OnTimer_TestTrigger(wxTimerEvent& event)
 {
-	::CHARFORMAT2   cf; 
-	memset(&cf, 0x00, sizeof(cf)); 
-	cf.cbSize        =   sizeof(cf); 
-	if(nColor == COLOR_TEXT_BULE)
-	{
-		cf.crTextColor   =   RGB(0, 0, 255); 
-	}
-	else if(nColor == COLOR_TEXT_RED)
-	{
-		cf.crTextColor   =   RGB(255, 0, 0); 
-	}
-	cf.dwMask        =   CFM_COLOR;
+    //if(nIDEvent == 1)
+    {
+        int nSuccessConnect = 0;
+        int nSuccessSend    = 0;
+        int nSuccessRecv    = 0;
+        int ntCurrConnect   = 0;
+        int nFailConnect    = 0;
+        int nFailSend       = 0;
+        int nFailRecv       = 0;
+        int nCurrConnect    = 0;
+        int nSendByteCount  = 0;
+        int nRecvByteCount  = 0;
+        int nMinTime        = 0;
+        int nMaxTime        = 0;
 
-	m_reSendText.SetDefaultCharFormat(cf);//…Ë÷√ ‰»ÎøÚƒ⁄À˘”–◊÷∑˚µƒ◊÷ÃÂ
+        int nConnectType = 0;
+
+        switch(this->RadioBox_nRadio->GetSelection ())
+        {
+        case 0:
+            nConnectType = 0;
+            break;
+
+        case 1:
+            nConnectType = 1;
+            break;
+
+        case 2:
+            nConnectType = 0;
+            break;
+        }
+
+        if(nConnectType == 0)
+        {
+            for(int i = 0; i < (int)m_vecClientTcpSocket.size(); i++)
+            {
+                CClientTcpSocket* pClientTcpSocket = (CClientTcpSocket* )m_vecClientTcpSocket[i];
+
+                if(NULL != pClientTcpSocket)
+                {
+                    _Socket_State_Info* pSocket_State_Info = pClientTcpSocket->GetStateInfo();
+
+                    if(NULL != pSocket_State_Info)
+                    {
+                        nSuccessConnect += pSocket_State_Info->m_nSuccessConnect;
+                        nSuccessSend    += pSocket_State_Info->m_nSuccessSend;
+                        nSuccessRecv    += pSocket_State_Info->m_nSuccessRecv;
+                        nFailConnect    += pSocket_State_Info->m_nFailConnect;
+                        nFailSend       += pSocket_State_Info->m_nFailSend;
+                        nFailRecv       += pSocket_State_Info->m_nFailRecv;
+                        nCurrConnect    += pSocket_State_Info->m_nCurrectSocket;
+                        nSendByteCount  += pSocket_State_Info->m_nSendByteCount;
+                        nRecvByteCount  += pSocket_State_Info->m_nRecvByteCount;
+
+                        if(i == 0)
+                        {
+                            nMinTime = pSocket_State_Info->m_nMinRecvTime;
+                            nMaxTime = pSocket_State_Info->m_nMaxRecvTime;
+                        }
+                        else
+                        {
+                            if(nMinTime > pSocket_State_Info->m_nMinRecvTime)
+                            {
+                                nMinTime = pSocket_State_Info->m_nMinRecvTime;
+                            }
+
+                            if(nMaxTime < pSocket_State_Info->m_nMaxRecvTime)
+                            {
+                                nMaxTime = pSocket_State_Info->m_nMaxRecvTime;
+                            }
+                        }
+                    }
+                }
+            }
+
+            //ÊòæÁ§∫Áõ∏ÂÖ≥Êï∞ÊçÆ
+
+            this->TextCtrl_SuccessConnect->SetValue( wxString::Format(wxT("%i"),nSuccessConnect));
+            this->TextCtrl_SuccessSend->SetValue( wxString::Format(wxT("%i"),nSuccessSend));
+            this->TextCtrl_SuccessRecv->SetValue( wxString::Format(wxT("%i"),nSuccessRecv));
+            this->TextCtrl_CurrConnect->SetValue( wxString::Format(wxT("%i"),ntCurrConnect));
+            this->TextCtrl_FailConnect->SetValue( wxString::Format(wxT("%i"),nFailConnect));
+            this->TextCtrl_FailRecv->SetValue( wxString::Format(wxT("%i"),nFailRecv));
+            this->TextCtrl_FailSend->SetValue( wxString::Format(wxT("%i"),nFailSend));
+            this->TextCtrl_SendByteCount->SetValue( wxString::Format(wxT("%i"),nSendByteCount));
+            this->TextCtrl_RecvByteCount->SetValue( wxString::Format(wxT("%i"),nRecvByteCount));
+
+            this->TextCtrl_MinTime->SetValue( wxString::Format(wxT("%i"),nMinTime));
+            this->TextCtrl_MaxTime->SetValue( wxString::Format(wxT("%i"),nMaxTime));
+
+        }
+        else
+        {
+            for(int i = 0; i < (int)m_vecClientUdpSocket.size(); i++)
+            {
+                CClientUdpSocket* pClientUdpSocket = (CClientUdpSocket* )m_vecClientUdpSocket[i];
+
+                if(NULL != pClientUdpSocket)
+                {
+                    _Socket_State_Info* pSocket_State_Info = pClientUdpSocket->GetStateInfo();
+
+                    if(NULL != pSocket_State_Info)
+                    {
+                        nSuccessConnect += pSocket_State_Info->m_nSuccessConnect;
+                        nSuccessSend    += pSocket_State_Info->m_nSuccessSend;
+                        nSuccessRecv    += pSocket_State_Info->m_nSuccessRecv;
+                        nFailConnect    += pSocket_State_Info->m_nFailConnect;
+                        nFailSend       += pSocket_State_Info->m_nFailSend;
+                        nFailRecv       += pSocket_State_Info->m_nFailRecv;
+                        nCurrConnect    += pSocket_State_Info->m_nCurrectSocket;
+                    }
+
+                    if(i == 0)
+                    {
+                        nMinTime = pSocket_State_Info->m_nMinRecvTime;
+                        nMaxTime = pSocket_State_Info->m_nMaxRecvTime;
+                    }
+                    else
+                    {
+                        if(nMinTime > pSocket_State_Info->m_nMinRecvTime)
+                        {
+                            nMinTime = pSocket_State_Info->m_nMinRecvTime;
+                        }
+
+                        if(nMaxTime < pSocket_State_Info->m_nMaxRecvTime)
+                        {
+                            nMaxTime = pSocket_State_Info->m_nMaxRecvTime;
+                        }
+                    }
+                }
+            }
+
+            //ÊòæÁ§∫Áõ∏ÂÖ≥Êï∞ÊçÆ
+
+            this->TextCtrl_SuccessConnect->SetValue( wxString::Format(wxT("%i"),nSuccessConnect));
+            this->TextCtrl_SuccessSend->SetValue( wxString::Format(wxT("%i"),nSuccessSend));
+            this->TextCtrl_SuccessRecv->SetValue( wxString::Format(wxT("%i"),nSuccessRecv));
+            this->TextCtrl_CurrConnect->SetValue( wxString::Format(wxT("%i"),ntCurrConnect));
+            this->TextCtrl_FailConnect->SetValue( wxString::Format(wxT("%i"),nFailConnect));
+            this->TextCtrl_FailRecv->SetValue( wxString::Format(wxT("%i"),nFailRecv));
+            this->TextCtrl_FailSend->SetValue( wxString::Format(wxT("%i"),nFailSend));
+
+            this->TextCtrl_MinTime->SetValue( wxString::Format(wxT("%i"),nMinTime));
+            this->TextCtrl_MaxTime->SetValue( wxString::Format(wxT("%i"),nMaxTime));
+
+
+        }
+    }
+
+    //event.Skip();
+
+
+
 }
 
-void CPassTCPDlg::OnBnClickedButton4()
+void CPassTCPDlg::OnChoice_SendBuffStyleSelect(wxCommandEvent& event)
 {
-	//¥Úø™LuaŒƒº˛º–
-	// ◊œ»≈–∂œ∏ﬂº∂—°œÓ «∑Ò“—æ≠¥Úø™
-	if(m_chkLuaAdvance.GetCheck() != BST_CHECKED)
-	{
-		MessageBox(_T("«Îœ»—°‘Ò∆Ù”√∏ﬂº∂ƒ£ Ωø™πÿ°£"), _T("Ã· æ–≈œ¢"), MB_OK);
-		return;
-	}
+    //ÊñáÊú¨ÁºñÂà∂Ê®°ÂºèÔºåÊ†πÊçÆÁî®Êà∑ÁöÑÈÄâÈ°πÔºåÂèòÂåñÊñáÊú¨ÁöÑÂÜÖÂÆπ
 
-	//¥Úø™µ±«∞¬∑æ∂
-	TCHAR szBuffer[2048] = {'\0'};
-	GetCurrentDirectory(2048, szBuffer);
+    int nCurrTextStyle = this->Choice_SendBuffStyle->GetSelection();
 
-	CFileDialog dlgFile(TRUE, _T( "*lua" ), NULL, OFN_FILEMUSTEXIST | OFN_HIDEREADONLY, _T("LuaŒƒº˛(*.lua)|*.lua|"));
-	dlgFile.m_ofn.lpstrInitialDir = szBuffer;
+    if(nCurrTextStyle != m_nCurrTextStyle)
+    {
+        if(nCurrTextStyle == 0)  //ËÆ≤ÊñáÊú¨ËΩ¨Âåñ‰∏∫‰∫åËøõÂà∂
+        {
+            //ÂΩìÈ£éÊ†ºÂèëÁîüÊîπÂèòÁöÑÊó∂ÂÄôÂèòÂåñ
 
-	if (dlgFile.DoModal() == IDOK) 
-	{
-		CString strLuaFile = dlgFile.GetPathName();
-		m_txtLuaFilePath.SetWindowText(strLuaFile);
-	}
+            std::string  m_reSendText =std::string(this->TextCtrl_SendText->GetValue());
+            ///m_txtPacketData.GetWindowText(strData);
+            int nSrcLen = m_reSendText.length();
+            int nBufferSize = nSrcLen;
+            int nDecLen = nSrcLen ;
+
+            char* pSendData = new char[nBufferSize + 1];
+            strncpy(pSendData, (const char*)m_reSendText.c_str(), nBufferSize);
+            pSendData[nBufferSize] = '\0';
+
+
+            if(nDecLen <= 0)
+            {
+                //Â¶ÇÊûúÊ≤°ÊúâÂÜÖÂÆπÂ∞±‰∏çËΩ¨Êç¢
+                m_nCurrTextStyle = nCurrTextStyle;
+                //SetRichTextColor(COLOR_TEXT_BULE);
+                return;
+            }
+
+            //ËΩ¨ÂåñÂêéÁöÑÂ≠óÁ¨¶‰∏≤
+            int nConvertSize = (nBufferSize + 1)*4;
+            char* pErSendBuff = new char[nConvertSize];
+            memset(pErSendBuff, 0, nConvertSize);
+
+            for(int i = 0; i < nDecLen; i++)
+            {
+                char szLog[4] = {'\0'};
+
+                if( i != nDecLen - 1)
+                {
+                    sprintf(szLog,  "%02X ", (unsigned char)pSendData[i]);
+                }
+                else
+                {
+                    sprintf(szLog,  "%02X", (unsigned char)pSendData[i]);
+                }
+
+                if(i == 0)
+                {
+                    sprintf(pErSendBuff,  "%s%s", pErSendBuff, szLog);
+                }
+                else
+                {
+                    sprintf(pErSendBuff,  "%s %s", pErSendBuff, szLog);
+                }
+            }
+
+            //Â∞ÜËΩ¨Êç¢ÂêéÁöÑ‰∫åËøõÂà∂ÔºåÊòæÁ§∫Âú®ÊñáÊú¨Ê°ÜÂÜÖ
+            //          wchar_t *pwText = new wchar_t[nConvertSize];
+            //
+            //          nSrcLen = MultiByteToWideChar (CP_ACP, 0, pErSendBuff, -1, NULL, 0);
+            //          nBufferSize = MultiByteToWideChar (CP_ACP, 0, pErSendBuff, -1, pwText, nSrcLen);
+            //          pwText[nBufferSize] = '\0';
+            //
+            //          m_reSendText.SetWindowText(pwText);
+            //
+
+            this->TextCtrl_SendText->SetValue(wxString(pErSendBuff ));
+
+
+
+            delete[] pSendData;
+            delete[] pErSendBuff;
+
+            //SetRichTextColor(COLOR_TEXT_BULE);
+        }
+        else
+        {
+            //Â∞Ü‰∫åËøõÂà∂ËΩ¨ÂåñÊàêÊñáÊú¨
+
+            std::string  m_reSendText =std::string(this->TextCtrl_SendText->GetValue());
+            ///m_txtPacketData.GetWindowText(strData);
+            int nSrcLen = m_reSendText.length();
+            int nBufferSize = nSrcLen;
+
+            char* pSendData = new char[nBufferSize + 1];
+            strncpy(pSendData, (const char*)m_reSendText.c_str(), nBufferSize);
+            pSendData[nBufferSize] = '\0';
+
+            int nDecLen = nSrcLen ;
+
+            if(nDecLen <= 0)
+            {
+                //Â¶ÇÊûúÊ≤°ÊúâÂÜÖÂÆπÂ∞±‰∏çËΩ¨Êç¢
+                m_nCurrTextStyle = nCurrTextStyle;
+                //SetRichTextColor(COLOR_TEXT_RED);
+                return;
+            }
+
+            int nTextSize = 0;
+
+            if(nDecLen % 3 != 0)
+            {
+                nTextSize = nDecLen / 3 + 2;
+            }
+            else
+            {
+                nTextSize = nDecLen / 3 + 1;
+            }
+
+            char* pTextData = new char[nTextSize];
+            memset(pTextData, 0, nTextSize);
+
+            CConvertBuffer objConvertBuffer;
+            //Â∞ÜÊï∞ÊçÆ‰∏≤ËΩ¨Êç¢Êàê‰∫åËøõÂà∂‰∏≤
+            objConvertBuffer.Convertstr2charArray(pSendData, strlen(pSendData), (unsigned char*)pTextData, nTextSize);
+
+            //Â∞ÜËΩ¨Êç¢ÂêéÁöÑ‰∫åËøõÂà∂ÔºåÊòæÁ§∫Âú®ÊñáÊú¨Ê°ÜÂÜÖ
+
+            this->TextCtrl_SendText->SetValue(wxString(pTextData ));
+
+
+            delete[] pSendData;
+            delete[] pTextData;
+
+            //SetRichTextColor(COLOR_TEXT_RED);
+        }
+
+        m_nCurrTextStyle = nCurrTextStyle;
+
+    }
+
+
 }
 
-void CPassTCPDlg::OnBnClickedButton5()
+void CPassTCPDlg::OnButton1Click(wxCommandEvent& event)
 {
-	//…Ë÷√ÀÊª˙ ˝æ›∞¸–Ú¡–
-	CPacketDlg objPacketDlg;
+}
 
-	switch(GetCheckedRadioButton(IDC_RADIO1, IDC_RADIO3))
-	{
-	case IDC_RADIO1:
-		{
-			if(m_pLogic != NULL)
-			{
-				delete m_pLogic;
-			}
-
-			CNomalLogic* pNomalLogic = new CNomalLogic();
-			m_pLogic = (CBaseDataLogic* )pNomalLogic;
-			break;
-		}
-	case IDC_RADIO2:
-		{
-			if(m_pLogic != NULL)
-			{
-				delete m_pLogic;
-			}
-
-			CNomalLogic* pNomalLogic = new CNomalLogic();
-			m_pLogic = (CBaseDataLogic* )pNomalLogic;
-			break;
-		}
-	case IDC_RADIO3:
-		{
-			if(m_pLogic != NULL)
-			{
-				delete m_pLogic;
-			}
-
-			CWebSocketLogic* pWebSocketLogic = new CWebSocketLogic();
-			m_pLogic = (CBaseDataLogic* )pWebSocketLogic;
-			break;
-		}
-	}
-
-	objPacketDlg.SetBaseDataLogic(m_pLogic);
-
-	objPacketDlg.DoModal();
+void CPassTCPDlg::OnTextCtrl_ServerIPText(wxCommandEvent& event)
+{
 }

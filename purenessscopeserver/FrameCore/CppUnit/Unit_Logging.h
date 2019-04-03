@@ -14,7 +14,21 @@ class CUnit_Frame_Logging : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
+    CUnit_Frame_Logging();
+
     virtual ~CUnit_Frame_Logging();
+
+    CUnit_Frame_Logging(const CUnit_Frame_Logging& ar);
+
+    CUnit_Frame_Logging& operator = (const CUnit_Frame_Logging& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
 
     virtual void setUp(void);
 

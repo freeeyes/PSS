@@ -15,21 +15,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BaseCommand.cpp">
+    <ClCompile Include="Http\BaseCommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="HttpTest.cpp">
+    <ClCompile Include="Http\HttpTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BaseCommand.h">
+    <ClInclude Include="Http\BaseCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="HttpTest.mpc">
-      <Filter>Build Files</Filter>
-    </None>
   </ItemGroup>
 </Project>

@@ -18,6 +18,18 @@ public:
     CLogBlockPool();
     ~CLogBlockPool();
 
+    CLogBlockPool(const CLogBlockPool& ar);
+
+    CLogBlockPool& operator = (const CLogBlockPool& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
+
     void Init(uint32 u4BlockSize, uint32 u4PoolCount);
     void Close();
 
@@ -37,7 +49,19 @@ class CLogManager : public ACE_Task<ACE_MT_SYNCH>, public ILogManager
 {
 public:
     CLogManager(void);
-    ~CLogManager(void);
+    virtual ~CLogManager(void);
+
+    CLogManager(const CLogManager& ar);
+
+    CLogManager& operator = (const CLogManager& ar)
+    {
+        if (this != &ar)
+        {
+            ACE_UNUSED_ARG(ar);
+        }
+
+        return *this;
+    }
 
     virtual int open (void* args = 0);
     virtual int svc(void);

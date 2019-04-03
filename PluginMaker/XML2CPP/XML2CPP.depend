@@ -1,0 +1,95 @@
+# depslib dependency file v1.0
+1553654185 source:/data/develop/Lib/Network/PSS-master/ThirdLib/include/TinyXML/tinystr.cpp
+	"tinystr.h"
+
+1553654185 /data/develop/Lib/Network/PSS-master/ThirdLib/include/TinyXML/tinystr.h
+	<assert.h>
+	<string.h>
+
+1553654185 source:/data/develop/Lib/Network/PSS-master/ThirdLib/include/TinyXML/tinyxml.cpp
+	<ctype.h>
+	<sstream>
+	<iostream>
+	"tinyxml.h"
+
+1553654185 /data/develop/Lib/Network/PSS-master/ThirdLib/include/TinyXML/tinyxml.h
+	<ctype.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<assert.h>
+	<string>
+	<iostream>
+	<sstream>
+	"tinystr.h"
+
+1553654185 source:/data/develop/Lib/Network/PSS-master/ThirdLib/include/TinyXML/tinyxmlerror.cpp
+	"tinyxml.h"
+
+1553654185 source:/data/develop/Lib/Network/PSS-master/ThirdLib/include/TinyXML/tinyxmlparser.cpp
+	<ctype.h>
+	<stddef.h>
+	"tinyxml.h"
+	<windows.h>
+
+1553654185 source:/data/develop/Lib/Network/PSS-master/ThirdLib/include/XmlOpeation.cpp
+	"XmlOpeation.h"
+
+1553654185 /data/develop/Lib/Network/PSS-master/ThirdLib/include/XmlOpeation.h
+	"tinyxml.h"
+	"tinystr.h"
+	"Common.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<stdarg.h>
+	<vector>
+	<ctype.h>
+
+1553654185 /data/develop/Lib/Network/PSS-master/ThirdLib/include/Common.h
+	<stdio.h>
+	<stdarg.h>
+	<io.h>
+	"winsock2.h"
+	<unistd.h>
+	<stdio.h>
+	<dirent.h>
+	<sys/stat.h>
+	<arpa/inet.h>
+	<time.h>
+	<string>
+	<vector>
+	<string.h>
+
+1551867304 source:/data/develop/Lib/Network/PSS-master/PluginMaker/XML2CPP/XML2CPP/ParseCAPIFile.cpp
+	"ParseCAPIFile.h"
+
+1551867304 /data/develop/Lib/Network/PSS-master/PluginMaker/XML2CPP/XML2CPP/ParseCAPIFile.h
+	"Common.h"
+	<string>
+
+1553358157 source:/data/develop/Lib/Network/PSS-master/PluginMaker/XML2CPP/XML2CPP/XML2CPP.cpp
+	<direct.h>
+	<sys/stat.h>
+	"Write_Packet_Parse_cpp.h"
+	"Write_Plugin_Main_cpp.h"
+	"Write_Plugin_Command.h"
+	"Write_Plugin_Make.h"
+	"Write_Plugin_Logic.h"
+
+1551867304 /data/develop/Lib/Network/PSS-master/PluginMaker/XML2CPP/XML2CPP/Write_Packet_Parse_cpp.h
+	"XmlOpeation.h"
+
+1551867304 /data/develop/Lib/Network/PSS-master/PluginMaker/XML2CPP/XML2CPP/Write_Plugin_Main_cpp.h
+	"XmlOpeation.h"
+
+1551867304 /data/develop/Lib/Network/PSS-master/PluginMaker/XML2CPP/XML2CPP/Write_Plugin_Command.h
+	"XmlOpeation.h"
+
+1551867304 /data/develop/Lib/Network/PSS-master/PluginMaker/XML2CPP/XML2CPP/Write_Plugin_Make.h
+	"XmlOpeation.h"
+
+1551867304 /data/develop/Lib/Network/PSS-master/PluginMaker/XML2CPP/XML2CPP/Write_Plugin_Logic.h
+	"XmlOpeation.h"
+	"ParseCAPIFile.h"
+

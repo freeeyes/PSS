@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="example-Module workspace">
+		<Project filename="../../purenessscopeserver/example-Module/AutoTest/AutoTest.cbp" />
+		<Project filename="../../purenessscopeserver/example-Module/FtpTest/FtpTest.cbp" />
+		<Project filename="../../purenessscopeserver/example-Module/Http/HttpTest.cbp" />
+		<Project filename="../../purenessscopeserver/example-Module/KafkaClient/KafkaClient.cbp" />
+		<Project filename="../../purenessscopeserver/example-Module/LGLogic/LGLogic.cbp" />
+		<Project filename="../../purenessscopeserver/example-Module/LoginBuffer/Login.cbp" />
+		<Project filename="../../purenessscopeserver/example-Module/LoginBuffer/Watch.cbp" />
+		<Project filename="../../purenessscopeserver/example-Module/LsPlugIn/LSLogic.cbp" />
+		<Project filename="../../purenessscopeserver/example-Module/LuaTest/LuaTest.cbp" />
+		<Project filename="../../purenessscopeserver/example-Module/MonitorServer/MonitorServer.cbp" />
+		<Project filename="../../purenessscopeserver/example-Module/MutiProcess/LinuxQueue.cbp" />
+		<Project filename="../../purenessscopeserver/example-Module/PlugAtoB/PlugA.cbp" />
+		<Project filename="../../purenessscopeserver/example-Module/PlugAtoB/PlugB.cbp" />
+		<Project filename="../../purenessscopeserver/example-Module/Proxy/ProxyServer.cbp" />
+		<Project filename="../../purenessscopeserver/example-Module/Proxy/ProxyTest.cbp" />
+		<Project filename="../../purenessscopeserver/example-Module/RealTimeMonitor/RealTimeMonitor.cbp" />
+		<Project filename="../../purenessscopeserver/example-Module/TestTCPPost/TcpTestPost.cbp" />
+		<Project filename="../../purenessscopeserver/example-Module/TestUDPPost/UDPTestPost.cbp" />
+		<Project filename="../../purenessscopeserver/example-Module/TimerTest/TimerTest.cbp" />
+		<Project filename="../../purenessscopeserver/example-Module/TTyTest/TTyTest.cbp" />
+		<Project filename="../../purenessscopeserver/example-Module/UDPTest/UDPTest_2017.cbp" />
+		<Project filename="../../purenessscopeserver/example-Module/WebSocket/WebSocketTest.cbp" />
+		<Project filename="../../purenessscopeserver/example-Module/XMLParse/XMLParse.cbp" />
+		<Project filename="../../purenessscopeserver/example-Module/ZooClient/ZooClient.cbp" />
+		<Project filename="../../purenessscopeserver/example-Module/TcpTest/TcpTest_2017.cbp" />
+	</Workspace>
+</CodeBlocks_workspace_file>

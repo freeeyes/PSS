@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeLite_Project Name="PurenessScopeServer" Version="10.0.0">
+  <Plugins>
+    <Plugin Name="qmake">
+      <![CDATA[00010001N0007Release000000000000]]>
+    </Plugin>
+  </Plugins>
+  <VirtualDirectory Name="include">
+    <File Name="Message/LogicThreadManager.h"/>
+    <File Name="Message/LogicThreadManager.cpp"/>
+    <File Name="UDP/ReactorUDPHander.h"/>
+    <File Name="UDP/ReactorUDPClient.h"/>
+    <File Name="UDP/ReUDPManager.h"/>
+    <File Name="UDP/ProactorUDPHandler.h"/>
+    <File Name="UDP/ProactorUDPClient.h"/>
+    <File Name="UDP/ProUDPManager.h"/>
+    <File Name="Reactor/WaitQuitSignal.h"/>
+    <File Name="Reactor/ServerManager.h"/>
+    <File Name="Reactor/ReTTyHandler.h"/>
+    <File Name="Reactor/ReTTyClientManager.h"/>
+    <File Name="Reactor/ControlListen.h"/>
+    <File Name="Reactor/ConsoleHandler.h"/>
+    <File Name="Reactor/ConsoleAccept.h"/>
+    <File Name="Reactor/ConnectHandler.h"/>
+    <File Name="Reactor/ConnectClient.h"/>
+    <File Name="Reactor/ConnectAccept.h"/>
+    <File Name="Reactor/ClientReConnectManager.h"/>
+    <File Name="Reactor/AceReactorManager.h"/>
+    <File Name="PacketParse/PacketParsePool.h"/>
+    <File Name="PacketParse/PacketParseBase.h"/>
+    <File Name="PacketParse/PacketParse.h"/>
+    <File Name="PacketParse/PacketConsoleParse.h"/>
+    <File Name="Message/WorkThreadAI.h"/>
+    <File Name="Message/ModuleMessageManager.h"/>
+    <File Name="Message/MessageService.h"/>
+    <File Name="Message/MessageManager.h"/>
+    <File Name="Message/MessageDyeingManager.h"/>
+    <File Name="Message/Message.h"/>
+    <File Name="Message/LoadPacketParse.h"/>
+    <File Name="Message/LoadModule.h"/>
+    <File Name="Mail/smtps.h"/>
+    <File Name="Mail/smtp.h"/>
+    <File Name="Mail/base64.h"/>
+    <File Name="LogSystem/LogManager.h"/>
+    <File Name="LogSystem/FileLogger.h"/>
+    <File Name="FileTest/FileTestManager.h"/>
+    <File Name="FileTest/FileTest.h"/>
+    <File Name="Console/MessageDispose.h"/>
+    <File Name="Console/MessageDefine.h"/>
+    <File Name="Console/FrameCommand.h"/>
+    <File Name="Console/ConsolePromiss.h"/>
+    <File Name="Console/ConsoleMessage.h"/>
+    <File Name="Common/XmlOpeation.h"/>
+    <File Name="Common/XmlConfig.h"/>
+    <File Name="Common/WindowsProcess.h"/>
+    <File Name="Common/WindowsDump.h"/>
+    <File Name="Common/WindowsCPU.h"/>
+    <File Name="Common/TimerManager.h"/>
+    <File Name="Common/ThreadLock.h"/>
+    <File Name="Common/ThreadInfo.h"/>
+    <File Name="Common/TcpRedirection.h"/>
+    <File Name="Common/ServerMessageTask.h"/>
+    <File Name="Common/SendMessage.h"/>
+    <File Name="Common/SendCacheManager.h"/>
+    <File Name="Common/Ring.h"/>
+    <File Name="Common/ProgramService.h"/>
+    <File Name="Common/MyACELoggingStrategy.h"/>
+    <File Name="Common/MessageBlockManager.h"/>
+    <File Name="Common/MakePacket.h"/>
+    <File Name="Common/LinuxCPU.h"/>
+    <File Name="Common/IPAccount.h"/>
+    <File Name="Common/Frame_Logging_Strategy.h"/>
+    <File Name="Common/ForbiddenIP.h"/>
+    <File Name="Common/Fast_Asynch_Read_Stream.h"/>
+    <File Name="Common/CommandAccount.h"/>
+    <File Name="Common/ClientUDPMassage.h"/>
+    <File Name="Common/BuffPacketManager.h"/>
+    <File Name="Common/BuffPacket.h"/>
+    <File Name="Common/BaseTask.h"/>
+    <File Name="Common/BaseServerManager.h"/>
+    <File Name="Common/BaseHander.h"/>
+    <File Name="Common/BaseConsoleHandle.h"/>
+    <File Name="Common/BaseConnectClient.h"/>
+    <File Name="Common/BaseClientConnectManager.h"/>
+    <File Name="Common/AppConfig.h"/>
+    <File Name="../Common/define.h"/>
+    <File Name="../Common/Trace.h"/>
+    <File Name="../Common/TimerThread.h"/>
+    <File Name="../Common/TimerInfo.h"/>
+    <File Name="../Common/TimerCommon.h"/>
+    <File Name="../Common/Time_Value.h"/>
+    <File Name="../Common/TimeWheelLink.h"/>
+    <File Name="../Common/Threading.h"/>
+    <File Name="../Common/RandomNumber.h"/>
+    <File Name="../Common/ProfileTime.h"/>
+    <File Name="../Common/ObjectPoolManager.h"/>
+    <File Name="../Common/ObjectLru.h"/>
+    <File Name="../Common/ObjectArrayList.h"/>
+    <File Name="../Common/Lcm.h"/>
+    <File Name="../Common/IpCheck.h"/>
+    <File Name="../Common/IUDPConnectManager.h"/>
+    <File Name="../Common/ITimerManager.h"/>
+    <File Name="../Common/ITTyMessage.h"/>
+    <File Name="../Common/ITTyClientManager.h"/>
+    <File Name="../Common/ITSTimer.h"/>
+    <File Name="../Common/IServerManager.h"/>
+    <File Name="../Common/ISendCacheManager.h"/>
+    <File Name="../Common/IPacketParse.h"/>
+    <File Name="../Common/IPacketManager.h"/>
+    <File Name="../Common/IObject.h"/>
+    <File Name="../Common/IModuleMessageManager.h"/>
+    <File Name="../Common/IModuleInfo.h"/>
+    <File Name="../Common/IMessageManager.h"/>
+    <File Name="../Common/IMessageBlockManager.h"/>
+    <File Name="../Common/IMessage.h"/>
+    <File Name="../Common/ILogObject.h"/>
+    <File Name="../Common/ILogManager.h"/>
+    <File Name="../Common/IFrameCommand.h"/>
+    <File Name="../Common/IControlListen.h"/>
+    <File Name="../Common/IConnectManager.h"/>
+    <File Name="../Common/IClientParse.h"/>
+    <File Name="../Common/IClientManager.h"/>
+    <File Name="../Common/ICheckPacket.h"/>
+    <File Name="../Common/IBuffPacket.h"/>
+    <File Name="../Common/HtmlPraseDoc.h"/>
+    <File Name="../Common/HashTable.h"/>
+    <File Name="../Common/CreateInfo.h"/>
+    <File Name="../Common/ClientUDPMassage.h"/>
+    <File Name="../Common/ClientMessage.h"/>
+    <File Name="../Common/ClientCommand.h"/>
+    <File Name="../Common/ACEMemory.h"/>
+    <File Name="../../ThirdLib/include/TinyXML/tinyxml.h"/>
+    <File Name="../../ThirdLib/include/TinyXML/tinystr.h"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="src">
+    <File Name="UDP/ReactorUDPHander.cpp"/>
+    <File Name="UDP/ReactorUDPClient.cpp"/>
+    <File Name="UDP/ProactorUDPHandler.cpp"/>
+    <File Name="UDP/ProactorUDPClient.cpp"/>
+    <File Name="Reactor/WaitQuitSignal.cpp"/>
+    <File Name="Reactor/ServerManager.cpp"/>
+    <File Name="Reactor/ReTTyHandler.cpp"/>
+    <File Name="Reactor/ReTTyClientManager.cpp"/>
+    <File Name="Reactor/ControlListen.cpp"/>
+    <File Name="Reactor/ConsoleHandler.cpp"/>
+    <File Name="Reactor/ConsoleAccept.cpp"/>
+    <File Name="Reactor/ConnectHandler.cpp"/>
+    <File Name="Reactor/ConnectClient.cpp"/>
+    <File Name="Reactor/ConnectAccept.cpp"/>
+    <File Name="Reactor/ClientReConnectManager.cpp"/>
+    <File Name="Reactor/AceReactorManager.cpp"/>
+    <File Name="PurenessScopeServer.cpp"/>
+    <File Name="PacketParse/PacketParsePool.cpp"/>
+    <File Name="PacketParse/PacketParseBase.cpp"/>
+    <File Name="PacketParse/PacketParse.cpp"/>
+    <File Name="PacketParse/PacketConsoleParse.cpp"/>
+    <File Name="Message/WorkThreadAI.cpp"/>
+    <File Name="Message/ModuleMessageManager.cpp"/>
+    <File Name="Message/MessageService.cpp"/>
+    <File Name="Message/MessageManager.cpp"/>
+    <File Name="Message/MessageDyeingManager.cpp"/>
+    <File Name="Message/Message.cpp"/>
+    <File Name="Message/LoadPacketParse.cpp"/>
+    <File Name="Message/LoadModule.cpp"/>
+    <File Name="Mail/smtps.cpp"/>
+    <File Name="Mail/smtp.cpp"/>
+    <File Name="Mail/base64.cpp"/>
+    <File Name="LogSystem/LogManager.cpp"/>
+    <File Name="LogSystem/FileLogger.cpp"/>
+    <File Name="FileTest/FileTestManager.cpp"/>
+    <File Name="Console/MessageDispose.cpp"/>
+    <File Name="Console/MessageDefine.cpp"/>
+    <File Name="Console/FrameCommand.cpp"/>
+    <File Name="Console/ConsolePromiss.cpp"/>
+    <File Name="Console/ConsoleMessage.cpp"/>
+    <File Name="Common/XmlOpeation.cpp"/>
+    <File Name="Common/XmlConfig.cpp"/>
+    <File Name="Common/WindowsProcess.cpp"/>
+    <File Name="Common/WindowsCPU.cpp"/>
+    <File Name="Common/TimerManager.cpp"/>
+    <File Name="Common/ThreadInfo.cpp"/>
+    <File Name="Common/TcpRedirection.cpp"/>
+    <File Name="Common/ServerMessageTask.cpp"/>
+    <File Name="Common/SendMessage.cpp"/>
+    <File Name="Common/SendCacheManager.cpp"/>
+    <File Name="Common/ProgramService.cpp"/>
+    <File Name="Common/ProfileTime.cpp"/>
+    <File Name="Common/MyACELoggingStrategy.cpp"/>
+    <File Name="Common/MessageBlockManager.cpp"/>
+    <File Name="Common/MakePacket.cpp"/>
+    <File Name="Common/LinuxCPU.cpp"/>
+    <File Name="Common/IPAccount.cpp"/>
+    <File Name="Common/Frame_Logging_Strategy.cpp"/>
+    <File Name="Common/ForbiddenIP.cpp"/>
+    <File Name="Common/CommandAccount.cpp"/>
+    <File Name="Common/BuffPacketManager.cpp"/>
+    <File Name="Common/BuffPacket.cpp"/>
+    <File Name="Common/BaseTask.cpp"/>
+    <File Name="Common/BaseServerManager.cpp"/>
+    <File Name="Common/BaseHander.cpp"/>
+    <File Name="Common/BaseConsoleHandle.cpp"/>
+    <File Name="Common/BaseConnectClient.cpp"/>
+    <File Name="Common/BaseClientConnectManager.cpp"/>
+    <File Name="Common/AppConfig.cpp"/>
+    <File Name="../Common/TimerThread.cpp"/>
+    <File Name="../Common/TimerInfo.cpp"/>
+    <File Name="../Common/Time_Value.cpp"/>
+    <File Name="../Common/Threading.cpp"/>
+    <File Name="../Common/RandomNumber.cpp"/>
+    <File Name="../Common/ACEMemory.cpp"/>
+    <File Name="../../ThirdLib/include/TinyXML/tinyxmlparser.cpp"/>
+    <File Name="../../ThirdLib/include/TinyXML/tinyxmlerror.cpp"/>
+    <File Name="../../ThirdLib/include/TinyXML/tinyxml.cpp"/>
+    <File Name="../../ThirdLib/include/TinyXML/tinystr.cpp"/>
+  </VirtualDirectory>
+  <Description/>
+  <Dependencies/>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
+  <Settings Type="Executable">
+    <GlobalSettings>
+      <Compiler Options="" C_Options="" Assembler="">
+        <IncludePath Value="."/>
+      </Compiler>
+      <Linker Options="">
+        <LibraryPath Value="."/>
+      </Linker>
+      <ResourceCompiler Options=""/>
+    </GlobalSettings>
+    <Configuration Name="Debug" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-g -Wall -fexceptions " C_Options="-g -Wall -fexceptions " Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+        <IncludePath Value="."/>
+      </Compiler>
+      <Linker Options="-O0" Required="yes">
+        <LibraryPath Value="."/>
+        <LibraryPath Value="Debug"/>
+      </Linker>
+      <ResourceCompiler Options="" Required="no"/>
+      <General OutputFile="bin/Debug/PurenessScopeServer" IntermediateDirectory="./Debug" Command="./PurenessScopeServer" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="bin/Debug" PauseExecWhenProcTerminates="no" IsGUIProgram="no" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
+      <Environment EnvVarSetName="&lt;Use Workspace Settings&gt;" DbgSetName="&lt;Use Global Settings&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName/>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no" EnableCpp14="no">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+    <Configuration Name="Release" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-O2 -Wall -fexceptions " C_Options="-O2 -Wall -fexceptions " Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+        <IncludePath Value="../../purenessscopeserver/Common"/>
+        <IncludePath Value="./Common"/>
+        <IncludePath Value="../../ThirdLib/include/TinyXML"/>
+        <IncludePath Value="./Mail"/>
+        <IncludePath Value="./Message"/>
+        <IncludePath Value="./LogSystem"/>
+        <IncludePath Value="./Reactor"/>
+        <IncludePath Value="./PacketParse"/>
+        <IncludePath Value="./FileTest"/>
+        <IncludePath Value="./UDP"/>
+        <IncludePath Value="./Console"/>
+      </Compiler>
+      <Linker Options="-s " Required="yes">
+        <LibraryPath Value="/usr/local/lib/"/>
+        <LibraryPath Value="/usr/lib/"/>
+        <Library Value="libACE.so"/>
+        <Library Value="libdl.so"/>
+        <Library Value="libpthread.so"/>
+      </Linker>
+      <ResourceCompiler Options="" Required="no"/>
+      <General OutputFile="$(WorkspacePath)/Linux_Bin/$(ProjectName)" IntermediateDirectory="$(WorkspacePath)/Temp" Command="$(WorkspacePath)/Linux_Bin/$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/Linux_Bin/" PauseExecWhenProcTerminates="no" IsGUIProgram="no" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
+      <Environment EnvVarSetName="&lt;使用默认&gt;" DbgSetName="&lt;使用默认&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName/>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no" EnableCpp14="no">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+  </Settings>
+</CodeLite_Project>

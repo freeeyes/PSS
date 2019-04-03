@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="XML2CPP" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Release">
+				<Option output="../../Build/Prj_CodeBlocks/Linux_Bin/XML2CPP" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../../Build/Prj_CodeBlocks/Temp/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add directory="../../ThirdLib/include" />
+					<Add directory="../../ThirdLib/include/TinyXML" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Unit filename="../../ThirdLib/include/TinyXML/tinystr.cpp" />
+		<Unit filename="../../ThirdLib/include/TinyXML/tinystr.h" />
+		<Unit filename="../../ThirdLib/include/TinyXML/tinyxml.cpp" />
+		<Unit filename="../../ThirdLib/include/TinyXML/tinyxml.h" />
+		<Unit filename="../../ThirdLib/include/TinyXML/tinyxmlerror.cpp" />
+		<Unit filename="../../ThirdLib/include/TinyXML/tinyxmlparser.cpp" />
+		<Unit filename="../../ThirdLib/include/XmlOpeation.cpp" />
+		<Unit filename="../../ThirdLib/include/XmlOpeation.h" />
+		<Unit filename="XML2CPP/ParseCAPIFile.cpp" />
+		<Unit filename="XML2CPP/ParseCAPIFile.h" />
+		<Unit filename="XML2CPP/Write_Packet_Parse_cpp.h" />
+		<Unit filename="XML2CPP/Write_Plugin_Command.h" />
+		<Unit filename="XML2CPP/Write_Plugin_Logic.h" />
+		<Unit filename="XML2CPP/Write_Plugin_Main_cpp.h" />
+		<Unit filename="XML2CPP/Write_Plugin_Make.h" />
+		<Unit filename="XML2CPP/XML2CPP.cpp" />
+		<Extensions>
+			<envvars />
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

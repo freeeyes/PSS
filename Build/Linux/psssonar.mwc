@@ -1,0 +1,4 @@
+workspace(PSS) {
+  makegcov.mpc
+  cmdline += -include $PWD
+}

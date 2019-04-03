@@ -1,0 +1,190 @@
+# depslib dependency file v1.0
+1551867304 source:/data/develop/Lib/Network/PSS-master/purenessscopeserver/example-Module/TcpTest/TcpTest/BaseCommand.cpp
+	"BaseCommand.h"
+
+1551867304 /data/develop/Lib/Network/PSS-master/purenessscopeserver/example-Module/TcpTest/TcpTest/BaseCommand.h
+	"IBuffPacket.h"
+	"ClientCommand.h"
+	"IObject.h"
+	"Trace.h"
+	<string>
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//IBuffPacket.h
+	"define.h"
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//define.h
+	"ace/SString.h"
+	"ace/Malloc.h"
+	"ace/Malloc_T.h"
+	"ace/Task_T.h"
+	"ace/Local_Memory_Pool.h"
+	"ace/Time_Value.h"
+	"ace/OS_main.h"
+	"ace/OS_NS_sys_stat.h"
+	"ace/OS_NS_sys_socket.h"
+	"ace/OS_NS_unistd.h"
+	"ace/OS_NS_string.h"
+	"ace/High_Res_Timer.h"
+	"ace/INET_Addr.h"
+	"ace/Hash_Map_Manager.h"
+	<math.h>
+	<unistd.h>
+	<sys/time.h>
+	<sys/resource.h>
+	<vector>
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//ClientCommand.h
+	"IMessage.h"
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//IMessage.h
+	"IBuffPacket.h"
+	"ProfileTime.h"
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//ProfileTime.h
+	"define.h"
+	"ace/Profile_Timer.h"
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//IObject.h
+	"IMessage.h"
+	"IMessageManager.h"
+	"ILogManager.h"
+	"IConnectManager.h"
+	"IPacketManager.h"
+	"IClientManager.h"
+	"IUDPConnectManager.h"
+	"ITimerManager.h"
+	"IModuleMessageManager.h"
+	"IControlListen.h"
+	"IModuleInfo.h"
+	"IServerManager.h"
+	"IMessageBlockManager.h"
+	"IFrameCommand.h"
+	"ITSTimer.h"
+	"ITTyClientManager.h"
+	"ILogicThreadManager.h"
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//IMessageManager.h
+	"ClientCommand.h"
+	"IMessage.h"
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//ILogManager.h
+	"ILogObject.h"
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//ILogObject.h
+	"define.h"
+	"ace/SString.h"
+	"ace/Message_Block.h"
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//IConnectManager.h
+	"IBuffPacket.h"
+	<vector>
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//IPacketManager.h
+	"IBuffPacket.h"
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//IClientManager.h
+	"ClientMessage.h"
+	"ClientUDPMassage.h"
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//ClientMessage.h
+	"IMessageBlockManager.h"
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//IMessageBlockManager.h
+	"define.h"
+	"ace/Message_Block.h"
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//ClientUDPMassage.h
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//IUDPConnectManager.h
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//ITimerManager.h
+	"ace/Log_Msg.h"
+	"ace/Event_Handler.h"
+	"ace/Singleton.h"
+	"ace/Synch.h"
+	"ace/Task.h"
+	"ace/Timer_Heap_T.h"
+	"ace/Timer_Queue.h"
+	"ace/Timer_Heap.h"
+	"ace/Timer_Wheel.h"
+	"ace/Timer_Hash.h"
+	"ace/Timer_List.h"
+	"ace/Timer_Queue_Adapters.h"
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//IModuleMessageManager.h
+	"IBuffPacket.h"
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//IControlListen.h
+	"define.h"
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//IModuleInfo.h
+	"define.h"
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//IServerManager.h
+	<stdio.h>
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//IFrameCommand.h
+	"define.h"
+	"IBuffPacket.h"
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//ITSTimer.h
+	"TimerInfo.h"
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//TimerInfo.h
+	"time.h"
+	"TimerCommon.h"
+	"Lcm.h"
+	<windows.h>
+	<stdlib.h>
+	<stdio.h>
+	<stdio.h>
+	<sys/time.h>
+	<unistd.h>
+	<pthread.h>
+	<errno.h>
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//TimerCommon.h
+	<vector>
+	"Time_Value.h"
+	"windows.h"
+	<sys/time.h>
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//Time_Value.h
+	"stdio.h"
+	"time.h"
+	<string>
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//Lcm.h
+	<stdio.h>
+	<vector>
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//ITTyClientManager.h
+	"ITTyMessage.h"
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//ITTyMessage.h
+	<stdio.h>
+	"define.h"
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//ILogicThreadManager.h
+	<stdio.h>
+
+1553770511 /data/develop/Lib/Network/PSS-master/purenessscopeserver/Common//Trace.h
+	"stdio.h"
+	"stdlib.h"
+	"define.h"
+	<windows.h>
+	<process.h>
+	<stdio.h>
+	<string.h>
+	<sys/time.h>
+	<sys/types.h>
+	<unistd.h>
+	<stdarg.h>
+	<sys/syscall.h>
+	<string>
+
+1551867304 source:/data/develop/Lib/Network/PSS-master/purenessscopeserver/example-Module/TcpTest/TcpTest/TcpTest.cpp
+	"BaseCommand.h"
+	"IObject.h"
+	"ace/svc_export.h"
+
