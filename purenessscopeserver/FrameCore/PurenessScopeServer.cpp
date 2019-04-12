@@ -327,7 +327,8 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
     SetCurrentDirectory(szFileName);
 
     //添加Dump文件
-    SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)ApplicationCrashHandler);
+    SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)exception_handler);
+    base_set_crash_handler(main_crash_handler, nullptr);
 
     //添加对Console
     SetConsoleCtrlHandler((PHANDLER_ROUTINE)ctrlhandler, true);
