@@ -330,9 +330,10 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
     SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)exception_handler);
     base_set_crash_handler(main_crash_handler, nullptr);
 
-    //添加对Console
+    //添加对Console	由于windows系统的机制导致ctrlhandler有时无法正常执行结束就被系统结束掉进程暂时关闭windows上的回调
+#ifndef WIN32
     SetConsoleCtrlHandler((PHANDLER_ROUTINE)ctrlhandler, true);
-
+#endif
     //第一步，读取配置文件
     if(!App_XmlConfig::instance()->InitIsOk())
     {
