@@ -1826,21 +1826,25 @@ bool CConnectManager::StartTimer()
     }
 
     m_pTCTimeSendCheck->m_u2TimerCheckID = PARM_CONNECTHANDLE_CHECK;
-    long lTimeCheckID = pReactor->schedule_timer(this,
-                        (const void*)m_pTCTimeSendCheck,
-                        ACE_Time_Value(GetXmlConfigAttribute(xmlClientInfo)->CheckAliveTime, 0),
-                        ACE_Time_Value(GetXmlConfigAttribute(xmlClientInfo)->CheckAliveTime, 0));
 
-    if(-1 == lTimeCheckID)
+    if (GetXmlConfigAttribute(xmlClientInfo)->CheckAliveTime > 0)
     {
-        OUR_DEBUG((LM_ERROR, "CConnectManager::StartTimer()--> Start thread m_u4TimeCheckID error.\n"));
-        return false;
-    }
-    else
-    {
-        m_u4TimeCheckID = (uint32)lTimeCheckID;
-        OUR_DEBUG((LM_ERROR, "CConnectManager::StartTimer()--> Start thread time OK.\n"));
-        return true;
+        long lTimeCheckID = pReactor->schedule_timer(this,
+                            (const void*)m_pTCTimeSendCheck,
+                            ACE_Time_Value(GetXmlConfigAttribute(xmlClientInfo)->CheckAliveTime, 0),
+                            ACE_Time_Value(GetXmlConfigAttribute(xmlClientInfo)->CheckAliveTime, 0));
+
+        if (-1 == lTimeCheckID)
+        {
+            OUR_DEBUG((LM_ERROR, "CConnectManager::StartTimer()--> Start thread m_u4TimeCheckID error.\n"));
+            return false;
+        }
+        else
+        {
+            m_u4TimeCheckID = (uint32)lTimeCheckID;
+            OUR_DEBUG((LM_ERROR, "CConnectManager::StartTimer()--> Start thread time OK.\n"));
+            return true;
+        }
     }
 }
 

@@ -1710,18 +1710,22 @@ bool CProConnectManager::StartTimer()
 
     //检测链接发送存活包数
     uint16 u2CheckAlive = GetXmlConfigAttribute(xmlClientInfo)->CheckAliveTime;
-    long lTimeCheckID = App_TimerManager::instance()->schedule(this, (void*)NULL, ACE_OS::gettimeofday() + ACE_Time_Value(u2CheckAlive), ACE_Time_Value(u2CheckAlive));
 
-    if(-1 == lTimeCheckID)
+    if (u2CheckAlive > 0)
     {
-        OUR_DEBUG((LM_ERROR, "CProConnectManager::StartTimer()--> Start thread m_u4TimeCheckID error.\n"));
-        return false;
-    }
-    else
-    {
-        m_u4TimeCheckID = (uint32)lTimeCheckID;
-        OUR_DEBUG((LM_ERROR, "CProConnectManager::StartTimer()--> Start thread time OK.\n"));
-        return true;
+        long lTimeCheckID = App_TimerManager::instance()->schedule(this, (void*)NULL, ACE_OS::gettimeofday() + ACE_Time_Value(u2CheckAlive), ACE_Time_Value(u2CheckAlive));
+
+        if (-1 == lTimeCheckID)
+        {
+            OUR_DEBUG((LM_ERROR, "CProConnectManager::StartTimer()--> Start thread m_u4TimeCheckID error.\n"));
+            return false;
+        }
+        else
+        {
+            m_u4TimeCheckID = (uint32)lTimeCheckID;
+            OUR_DEBUG((LM_ERROR, "CProConnectManager::StartTimer()--> Start thread time OK.\n"));
+            return true;
+        }
     }
 }
 
