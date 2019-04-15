@@ -6,51 +6,51 @@
  	<th>time cost(ms)</th>
    </tr>
     <tr>
-      <td colspan="4">[Test CI run UTC time] 2019-04-15 03:42:18</td>
+      <td colspan="4">[Test CI run UTC time] 2019-04-15 05:21:34</td>
     </tr>
    <tr style="background-color:#C1FFC1;color:Black;">
 <td>single packet test</td>
 <td>0</td>
 <td>[s][127.0.0.1:10002]success.</td>
-<td>0.805000ms</td>
+<td>1.248000ms</td>
 <tr style="background-color:#C1FFC1;color:Black;">
 <td>multiple packet test(10)</td>
 <td>0</td>
 <td>[s][127.0.0.1:10002]success.</td>
-<td>1.639000ms</td>
+<td>1.668000ms</td>
 <tr style="background-color:#C1FFC1;color:Black;">
 <td>multiple connect test(10)</td>
 <td>0</td>
 <td>[s][127.0.0.1:10002]success.</td>
-<td>5.132000ms</td>
+<td>10.641000ms</td>
 <tr style="background-color:#C1FFC1;color:Black;">
 <td>unvaild packet test</td>
 <td>0</td>
 <td>[s][127.0.0.1:10002]success.[Connection reset by peer]</td>
-<td>0.434000ms</td>
+<td>0.566000ms</td>
 <tr style="background-color:#C1FFC1;color:Black;">
 <td>helf packet test</td>
 <td>0</td>
 <td>[s][127.0.0.1:10002]success.</td>
-<td>0.293000ms</td>
+<td>0.907000ms</td>
 <tr style="background-color:#C1FFC1;color:Black;">
 <td>Muliple connect packet test</td>
 <td>0</td>
 <td>[s][127.0.0.1:10002]success.</td>
-<td>3.735000ms</td>
+<td>4.607000ms</td>
 <tr style="background-color:#C1FFC1;color:Black;">
 <td>single UDP packet test</td>
 <td>0</td>
 <td>[s][127.0.0.1:10003]success.</td>
-<td>0.077000ms</td>
-<tr style="background-color:#C1FFC1;color:Black;">
+<td>0.363000ms</td>
+<tr style="background-color:#CD5C5C;color:Black;">
 <td>single UDP packet recv test</td>
-<td>0</td>
-<td>[s][127.0.0.1:20002]success.</td>
-<td>0.116000ms</td>
+<td>1</td>
+<td>[e][127.0.0.1:20002]client Udp bind error.[Resource temporarily unavailable]</td>
+<td>2997.471924ms</td>
 <tr style="background-color:#C1FFC1;color:Black;">
 <td>console command test</td>
 <td>0</td>
 <td>[s][127.0.0.1:10010]success.</td>
-<td>0.763000ms</td>
+<td>0.986000ms</td>
  </table>
