@@ -2771,7 +2771,12 @@ void CConnectManagerGroup::SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4Tim
     pConnectManager->SetRecvQueueTimeCost(u4ConnectID, u4TimeCost);
 }
 
-bool CConnectManagerGroup::PostMessageAll( IBuffPacket*& pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
+uint16 CConnectManagerGroup::GetConnectCheckTime()
+{
+    return GetXmlConfigAttribute(xmlClientInfo)->CheckAliveTime;
+}
+
+bool CConnectManagerGroup::PostMessageAll(IBuffPacket*& pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
     //全部群发
     for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)

@@ -65,6 +65,8 @@ public:
     virtual void GetClientNameInfo(const char* pName, vecClientNameInfo& objClientNameInfo)                      = 0;
     //得到指定的客户端连接状态,false为链接不存在，true为链接存在
     virtual EM_Client_Connect_status GetConnectState(uint32 u4ConnectID)                                         = 0;
+    //得到指定的服务器检查间隔
+    virtual uint16 GetConnectCheckTime()                                                                         = 0;
 };
 
 #endif

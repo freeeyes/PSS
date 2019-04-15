@@ -287,11 +287,12 @@ public:
 
     virtual _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                                                       //得到指定链接信息
     virtual _ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID);                                                        //得到监听链接信息
-    void GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo);                                         //返回当前存活链接的信息
-    void SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4TimeCost);                                        //记录指定链接数据处理时间
+    void GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo);                                                 //返回当前存活链接的信息
+    void SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4TimeCost);                                                //记录指定链接数据处理时间
     virtual bool SetConnectName(uint32 u4ConnectID, const char* pName);                                              //设置当前连接名称
     virtual bool SetIsLog(uint32 u4ConnectID, bool blIsLog);                                                         //设置当前连接数据是否写入日志
     virtual void GetClientNameInfo(const char* pName, vecClientNameInfo& objClientNameInfo);                         //得到指定别名的所有设置信息
+    virtual uint16 GetConnectCheckTime();                                                                            //得到TCP检查的时间间隔
 
     virtual int  GetCount();
     void CloseAll();

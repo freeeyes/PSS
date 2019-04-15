@@ -14,6 +14,7 @@ class CUnit_ConnectHandler : public CppUnit::TestFixture
     CPPUNIT_TEST(Test_ConnectHandler_Debug);
     CPPUNIT_TEST(Test_ConnectHandler_Close_Queue);
     CPPUNIT_TEST(Test_ConnectHandler_PostMessage);
+    CPPUNIT_TEST(Test_Connect_CheckTIme);
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -46,6 +47,8 @@ public:
     void Test_ConnectHandler_Close_Queue(void);
 
     void Test_ConnectHandler_PostMessage(void);
+
+    void Test_Connect_CheckTime(void);
 
 private:
     CConnectHandler* m_pConnectHandler;

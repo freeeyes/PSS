@@ -226,5 +226,19 @@ void CUnit_ConnectHandler::Test_ConnectHandler_PostMessage(void)
     App_BuffPacketManager::instance()->Delete(pBuffPacket);
 }
 
+void CUnit_ConnectHandler::Test_Connect_CheckTime(void)
+{
+    bool blRet = false;
+
+    uint16 u2CheckTime = App_ConnectManager::instance()->GetConnectCheckTime();
+
+    if(u2CheckTime != 60)
+    {
+        OUR_DEBUG((LM_INFO, "[Test_Connect_CheckTime]GetLocalIPInfo is fail.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[Test_Connect_CheckTime]GetLocalIPInfo is fail.", true == blRet);
+        return;
+    }
+}
+
 #endif
 

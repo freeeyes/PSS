@@ -2811,6 +2811,11 @@ void CProConnectManagerGroup::GetClientNameInfo( const char* pName, vecClientNam
     }
 }
 
+uint16 CProConnectManagerGroup::GetConnectCheckTime()
+{
+    return GetXmlConfigAttribute(xmlClientInfo)->CheckAliveTime;
+}
+
 void CProConnectManagerGroup::GetCommandData(uint16 u2CommandID, _CommandData& objCommandData)
 {
     for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
