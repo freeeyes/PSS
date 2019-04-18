@@ -115,9 +115,6 @@
     <ClCompile Include="Proactor\ProConnectClient.cpp">
       <Filter>Proactor\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="Proactor\ProConnectHandle.cpp">
-      <Filter>Proactor\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="Proactor\ProConsoleAccept.cpp">
       <Filter>Proactor\cppfile</Filter>
     </ClCompile>
@@ -388,6 +385,9 @@
     <ClCompile Include="Proactor\ProTTyHandler.cpp">
       <Filter>Proactor\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="Proactor\ProConnectHandler.cpp">
+      <Filter>Proactor\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -508,9 +508,6 @@
       <Filter>Proactor\hfile</Filter>
     </ClInclude>
     <ClInclude Include="Proactor\ProConnectClient.h">
-      <Filter>Proactor\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="Proactor\ProConnectHandle.h">
       <Filter>Proactor\hfile</Filter>
     </ClInclude>
     <ClInclude Include="Proactor\ProConsoleAccept.h">
@@ -899,6 +896,9 @@
     </ClInclude>
     <ClInclude Include="..\Common\ProfileTime.h">
       <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Proactor\ProConnectHandler.h">
+      <Filter>Proactor\hfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

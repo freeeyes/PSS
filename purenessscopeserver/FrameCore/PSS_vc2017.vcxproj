@@ -237,6 +237,7 @@
     <ClCompile Include="CppUnit\Unit_WorkThreadAI.cpp" />
     <ClCompile Include="Mail\smtps.cpp" />
     <ClCompile Include="Message\MessageDyeingManager.cpp" />
+    <ClCompile Include="Proactor\ProConnectHandler.cpp" />
     <ClCompile Include="Proactor\ProTTyClientManager.cpp" />
     <ClCompile Include="Proactor\ProTTyHandler.cpp" />
     <ClCompile Include="PurenessScopeServer.cpp">
@@ -325,12 +326,6 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Proactor\ProConnectClient.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Proactor\ProConnectHandle.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -674,7 +669,7 @@
     <ClInclude Include="Proactor\ProAsynchConnect.h" />
     <ClInclude Include="Proactor\ProConnectAccept.h" />
     <ClInclude Include="Proactor\ProConnectClient.h" />
-    <ClInclude Include="Proactor\ProConnectHandle.h" />
+    <ClInclude Include="Proactor\ProConnectHandler.h" />
     <ClInclude Include="Proactor\ProConsoleAccept.h" />
     <ClInclude Include="Proactor\ProConsoleHandle.h" />
     <ClInclude Include="Proactor\ProControlListen.h" />
