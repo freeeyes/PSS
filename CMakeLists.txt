@@ -6,7 +6,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 project(pss)
 
 #3rd cmake modules
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+#list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 #check cxx flag in linux system
 if(UNIX)
@@ -24,7 +24,7 @@ set(ROOT_DIR ${PROJECT_SOURCE_DIR})
 
 include_directories(
     ${ROOT_DIR}
-    # include dir
+    #TODO:include dir
 )
 
 if(UNIX)
@@ -39,18 +39,18 @@ if(UNIX)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -DNDEBUG")
     endif()
     set(LDFLAGS "$ENV{LDFLAGS} -stdlib=libc++")
-    #3rd lib dir
+    #TODO:3rd lib dir
     #set(DEP_LIB_DIR ${ROOT_DIR}/dep/lib/ ${ROOT_DIR}/bin/lib/)
-    #output dir
+    #TODO:output dir
     #set(BIN_OUTPUT_DIR ${ROOT_DIR}/bin/bin/)
-    #plugin or lib output dir
+    #TODO:plugin or lib output dir
     #set(LIB_OUTPUT_DIR ${ROOT_DIR}/bin/lib)
     add_definitions(-Wno-unused-variable -Wno-unused-parameter -Wno-unused-function -Wno-strict-aliasing -Wno-pmf-conversions)
     
-    #coverage
-    if(ENABLE_COVERAGE)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage")
-    endif()
+    #OPTION:coverage
+    #if(ENABLE_COVERAGE)
+    #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage")
+    #endif()
     
 else()
     #windows
@@ -68,7 +68,7 @@ else()
     else(CMAKE_BUILD_TYPE MATCHES "debug")
         add_definitions(-DNDEBUG)
     endif(CMAKE_BUILD_TYPE MATCHES "debug")
-    #put all out file in one directory
+    #TODO:put all out file in one directory
     #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${LIB_OUTPUT_DIR}")
     #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${LIB_OUTPUT_DIR}")
     #set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG "${LIB_OUTPUT_DIR}")
@@ -77,7 +77,7 @@ else()
     #set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${LIB_OUTPUT_DIR}")
 endif()
 
-#lib link dir
+#TODO:lib link dir
 #link_directories(${DEP_LIB_DIR})
 
 #log
@@ -93,5 +93,5 @@ message("CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 message("Start to build all...")
 
 #add your own sub dirs
-#add 
-#add_subdirectory(frame/app)
+add_subdirectory(purenessscopeserver)
+#TODO:add other dirs
