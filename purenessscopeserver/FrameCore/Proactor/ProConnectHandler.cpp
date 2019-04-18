@@ -1727,6 +1727,8 @@ bool CProConnectManager::StartTimer()
             return true;
         }
     }
+
+    return true;
 }
 
 bool CProConnectManager::KillTimer()
