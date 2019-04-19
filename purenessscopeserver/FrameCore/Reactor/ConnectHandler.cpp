@@ -1846,6 +1846,8 @@ bool CConnectManager::StartTimer()
             return true;
         }
     }
+
+    return true;
 }
 
 bool CConnectManager::KillTimer()
