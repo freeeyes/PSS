@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<PlugIn desc="SmartShareBicycleBasic" keyID="SmartShareBicycleBasicID" Name="SmartShareBicycleBasic">
+	<Define DefName="UNLOCK_DOWN" type="number" DefValue="0x81" />
+	<Define DefName="LOCK_DOWN" type="number" DefValue="0x82" />
+	<Define DefName="PARAM_REPORT" type="number" DefValue="0x87" />
+	<Define DefName="VALIDATION_INFO_REPORT" type="number" DefValue="0x8B" />
+
+	
+	<Command CommandIn="CLIENT_LINK_CONNECT" FuncName="Do_Connect">
+	</Command>		
+	
+	<Command CommandIn="CLIENT_LINK_CDISCONNET" FuncName="Do_DisConnect">
+	</Command>	
+	
+	<Command CommandOut="UNLOCK_DOWN" FuncName="Do_Bicycle_Unlock">
+		<Object class="Smart_Share_Bicycle_Unlock" PacketType="RETURN" />
+	</Command>
+
+	<Command CommandOut="LOCK_DOWN" FuncName="Do_Bicycle_Lock">
+		<Object class="Smart_Share_Bicycle_Lock" PacketType="RETURN" />
+	</Command>
+
+	<Command CommandIn="PARAM_REPORT" FuncName="Do_Bicycle_Param_Report">
+		<Object class="Frame_Head" PacketType="HEAD" />
+		<Object class="Smart_Share_Bicycle_Param_Body" PacketType="BODY" />
+	</Command>
+
+	<Command CommandIn="VALIDATION_INFO_REPORT" FuncName="Do_Bicycle_ValidationInfo_Report">
+		<Object class="Frame_Head" PacketType="HEAD" />
+		<Object class="Smart_Share_Bicycle_Validation_Infomation_Body" PacketType="BODY" />
+	</Command>
+</PlugIn>

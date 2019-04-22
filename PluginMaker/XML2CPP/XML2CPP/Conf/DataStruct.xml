@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- add by freeeyes -->
+<!-- sport under type -->
+<!-- string(Need length),uint8,uint16,uint32,uint64,int8,int16,int32,float32,float64 -->
+<configer>
+	<Frame_Head desc="智享单车上报信息头">
+		<StartCode desc="起始码">uint16</StartCode>
+		<FunctionCode desc="功能码">uint8</FunctionCode>
+		<BodyLength desc="包体长度">uint8</BodyLength>
+	</Frame_Head>
+
+	<Smart_Share_Bicycle_Unlock desc="共享单车开锁">
+		<Frame_Head class="Frame_Head" desc="回应包头">Frame_Head</Frame_Head>
+		<OperationType desc="动作类型">uint8</OperationType>
+		<OperationOrder desc="动作指令">uint8</OperationOrder>
+		<OperationCondition desc="动作条件">uint8</OperationCondition>
+		<OperationTime desc="动作时间">uint32</OperationTime>
+		<OperationParam desc="动作参数">uint32</OperationParam>
+	</Smart_Share_Bicycle_Unlock>
+
+	<Smart_Share_Bicycle_Lock desc="共享单车关锁">
+		<Frame_Head class="Frame_Head" desc="回应包头">Frame_Head</Frame_Head>
+		<OperationType desc="动作类型">uint8</OperationType>
+		<OperationOrder desc="动作指令">uint8</OperationOrder>
+		<OperationCondition desc="动作条件">uint8</OperationCondition>
+		<OperationTime desc="动作时间">uint32</OperationTime>
+		<OperationParam desc="动作参数">uint32</OperationParam>
+	</Smart_Share_Bicycle_Lock>
+
+	<Smart_Share_Bicycle_Param_Body desc="共享单车参数上报包体">
+		<IMEI length="10" StreamLength="8" desc="IMEI">char</IMEI>
+		<IMSI length="10" StreamLength="8" desc="IMSI">char</IMSI>
+		<RTC desc="RTC">uint32</RTC>
+		<Fireware_Version length="2" StringLength="2" desc="固件版本号">char</Fireware_Version>
+		<Hardware_Version desc="硬件版本号">uint8</Hardware_Version>
+		<Position length="8" StringLength="8" desc="经纬度">char</Position>
+		<Operation desc="锁动作">uint8</Operation>
+		<Voltage1 desc="电压1">uint8</Voltage1>
+		<Voltage2 desc="电压2">uint8</Voltage2>
+		<Temperature desc="温度">uint8</Temperature>
+		<StatusCode desc="状态码">uint8</StatusCode>
+		<ErrorCode desc="错误码">uint8</ErrorCode>
+	</Smart_Share_Bicycle_Param_Body>
+
+	<Smart_Share_Bicycle_Param desc="共享单车参数上报">
+		<Frame_Head class="Frame_Head" desc="回应包头">Frame_Head</Frame_Head>
+		<Smart_Share_Bicycle_Param_Body class="Smart_Share_Bicycle_Param_Body" desc="共享单车参数上报包体">Smart_Share_Bicycle_Param_Body</Smart_Share_Bicycle_Param_Body>
+	</Smart_Share_Bicycle_Param>
+
+	<Smart_Share_Bicycle_Validation_Infomation_Body desc="智能单车验证信息上报包体">
+		<IMEI length="10" StreamLength="8" desc="IMEI">char</IMEI>
+		<Hardware_Version desc="硬件版本号">uint8</Hardware_Version>
+		<Fireware_Version length="2" StringLength="2" desc="固件版本号">char</Fireware_Version>
+	</Smart_Share_Bicycle_Validation_Infomation_Body>
+	<Smart_Share_Bicycle_Validation_Infomation desc="智能单车验证信息上报">
+		<Frame_Head class="Frame_Head" desc="回应包头">Frame_Head</Frame_Head>
+		<Smart_Share_Bicycle_Validation_Infomation_Body class="Smart_Share_Bicycle_Validation_Infomation_Body" desc="智能单车验证信息上报包体">Smart_Share_Bicycle_Validation_Infomation_Body</Smart_Share_Bicycle_Validation_Infomation_Body>
+	</Smart_Share_Bicycle_Validation_Infomation>
+</configer>
