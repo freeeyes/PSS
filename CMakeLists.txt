@@ -5,11 +5,6 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 project(pss)
 
-if(UNIX)
-set(ACE_ROOT C:\Tools\ACE-6.3.0\ACE_wrappers)
-else()
-set(ACE_ROOT /root/Tools/ACE_wrappers)
-endif()
 #3rd cmake modules
 #list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
@@ -26,42 +21,6 @@ endif()
 ########################################################################
 
 set(ROOT_DIR ${PROJECT_SOURCE_DIR})
-
-if(UNIX)
-include_directories(
-    #TODO:include dir
-	${ACE_ROOT}/
-	${ROOT_DIR}/purenessscopeserver/Common
-	${ROOT_DIR}/purenessscopeserver/FrameCore/Common
-	${ROOT_DIR}/purenessscopeserver/FrameCore/Console
-	${ROOT_DIR}/purenessscopeserver/FrameCore/LogSystem
-	${ROOT_DIR}/purenessscopeserver/FrameCore/Message
-	${ROOT_DIR}/purenessscopeserver/FrameCore/PacketParse
-	${ROOT_DIR}/purenessscopeserver/FrameCore/Reactor
-	${ROOT_DIR}/purenessscopeserver/FrameCore/UDP
-	${ROOT_DIR}/purenessscopeserver/FrameCore/TinyXML
-	${ROOT_DIR}/purenessscopeserver/FrameCore/Mail
-	${ROOT_DIR}/purenessscopeserver/FrameCore/FileTest
-	${ROOT_DIR}/purenessscopeserver/FrameCore
-)
-else()
-include_directories(
-    #TODO:include dir
-	${ACE_ROOT}/
-	${ROOT_DIR}/purenessscopeserver/Common
-	${ROOT_DIR}/purenessscopeserver/FrameCore/Common
-	${ROOT_DIR}/purenessscopeserver/FrameCore/Console
-	${ROOT_DIR}/purenessscopeserver/FrameCore/LogSystem
-	${ROOT_DIR}/purenessscopeserver/FrameCore/Message
-	${ROOT_DIR}/purenessscopeserver/FrameCore/PacketParse
-	${ROOT_DIR}/purenessscopeserver/FrameCore/Reactor
-	${ROOT_DIR}/purenessscopeserver/FrameCore/UDP
-	${ROOT_DIR}/purenessscopeserver/FrameCore/TinyXML
-	${ROOT_DIR}/purenessscopeserver/FrameCore/Mail
-	${ROOT_DIR}/purenessscopeserver/FrameCore/FileTest
-	${ROOT_DIR}/purenessscopeserver/FrameCore
-)
-endif()
 
 if(UNIX)
     #linux
