@@ -76,15 +76,15 @@ endif()
 add_executable(pss ${PSS_SRC})
 
 if(UNIX)
-	set(DEP_LIB_DIR ${ACE_ROOT}/lib)
-	target_link_libraries(libace.so)
+	link_directories(${ACE_ROOT}/lib)
+	target_link_libraries(pss ace)
     set(BIN_OUTPUT_DIR ${ROOT_DIR}/Build/Linux/)
     set(LIB_OUTPUT_DIR ${ROOT_DIR}/Build/Linux/)	
 else()
-	set(DEP_LIB_DIR ${ACE_ROOT}/lib)
+	link_directories(${ACE_ROOT}/lib)
 	set(BIN_OUTPUT_DIR ${ROOT_DIR}/Build/Windows/)
     set(LIB_OUTPUT_DIR ${ROOT_DIR}/Build/Windows/)
-    target_link_libraries(
+    target_link_libraries(pss 
     debug aced.lib
     optimized ace.lib
 	)    
