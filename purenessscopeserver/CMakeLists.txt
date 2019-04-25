@@ -20,19 +20,38 @@ include_directories(
 	${ROOT_DIR}/FrameCore/FileTest
 	${ROOT_DIR}/FrameCore)
 
-file(GLOB PSS_SRC *.h *.cpp
-	Common/*.h Common/*.cpp 
-    FrameCore/Common/*.h FrameCore/Common/*.cpp 
-	FrameCore/Console/*.h FrameCore/Console/*.cpp 
-	FrameCore/LogSystem/*.h FrameCore/LogSystem/*.cpp 
-	FrameCore/Message/*.h FrameCore/Message/*.cpp 
-	FrameCore/PacketParse/*.h FrameCore/PacketParse/*.cpp 
-	FrameCore/Reactor/*.h FrameCore/Proactor/*.cpp 
-	FrameCore/UDP/*.h FrameCore/UDP/*.cpp 
-	FrameCore/TinyXML/*.h FrameCore/TinyXML/*.cpp 
-	FrameCore/Mail/*.h FrameCore/Mail/*.cpp 
-	FrameCore/FileTest/*.h FrameCore/FileTest/*.cpp 
-	FrameCore/*.h FrameCore/*.cpp)
+if(UNIX)
+	file(GLOB PSS_SRC *.h *.cpp
+		Common/*.h Common/*.cpp 
+		FrameCore/Common/*.h FrameCore/Common/*.cpp 
+		FrameCore/Console/*.h FrameCore/Console/*.cpp 
+		FrameCore/LogSystem/*.h FrameCore/LogSystem/*.cpp 
+		FrameCore/Message/*.h FrameCore/Message/*.cpp 
+		FrameCore/PacketParse/*.h FrameCore/PacketParse/*.cpp 
+		FrameCore/Reactor/*.h FrameCore/Reactor/*.cpp 
+		FrameCore/UDP/*.h FrameCore/UDP/*.cpp 
+		FrameCore/TinyXML/*.h FrameCore/TinyXML/*.cpp 
+		FrameCore/Mail/*.h FrameCore/Mail/*.cpp 
+		FrameCore/FileTest/*.h FrameCore/FileTest/*.cpp 
+		FrameCore/*.h FrameCore/*.cpp)
+else()
+	file(GLOB PSS_SRC *.h *.cpp
+		Common/*.h Common/*.cpp 
+		FrameCore/Common/*.h FrameCore/Common/*.cpp 
+		FrameCore/Console/*.h FrameCore/Console/*.cpp 
+		FrameCore/LogSystem/*.h FrameCore/LogSystem/*.cpp 
+		FrameCore/Message/*.h FrameCore/Message/*.cpp 
+		FrameCore/PacketParse/*.h FrameCore/PacketParse/*.cpp 
+		FrameCore/Proactor/*.h FrameCore/Proactor/*.cpp 
+		FrameCore/UDP/*.h FrameCore/UDP/*.cpp 
+		FrameCore/TinyXML/*.h FrameCore/TinyXML/*.cpp 
+		FrameCore/Mail/*.h FrameCore/Mail/*.cpp 
+		FrameCore/FileTest/*.h FrameCore/FileTest/*.cpp 
+		FrameCore/*.h FrameCore/*.cpp)
+		
+	source_group("Include" FILES) 
+	add_executable(pss FILES)
+endif()
 
 set(BIN_OUTPUT_DIR ${ROOT_DIR}/Build/Linux/)
 set(LIB_OUTPUT_DIR ${ROOT_DIR}/Build/Linux/)
