@@ -35,12 +35,7 @@ if(UNIX)
     endif()
     set(LDFLAGS "$ENV{LDFLAGS} -stdlib=libc++")
     #TODO:3rd lib dir
-    #set(DEP_LIB_DIR ${ROOT_DIR}/dep/lib/ ${ROOT_DIR}/bin/lib/)
 	set(DEP_LIB_DIR ${ACE_ROOT}/lib/)
-    #TODO:output dir
-    #set(BIN_OUTPUT_DIR ${ROOT_DIR}/bin/bin/)
-    #TODO:plugin or lib output dir
-    #set(LIB_OUTPUT_DIR ${ROOT_DIR}/bin/lib)
     add_definitions(-Wno-unused-variable -Wno-unused-parameter -Wno-unused-function -Wno-strict-aliasing -Wno-pmf-conversions)
     
     #OPTION:coverage
@@ -61,17 +56,7 @@ else()
     else(CMAKE_BUILD_TYPE MATCHES "debug")
         add_definitions(-DNDEBUG)
     endif(CMAKE_BUILD_TYPE MATCHES "debug")
-    #TODO:put all out file in one directory
-    #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${LIB_OUTPUT_DIR}")
-    #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${LIB_OUTPUT_DIR}")
-    #set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG "${LIB_OUTPUT_DIR}")
-    #set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE "${LIB_OUTPUT_DIR}")
-    #set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${LIB_OUTPUT_DIR}")
-    #set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${LIB_OUTPUT_DIR}")
 endif()
-
-#TODO:lib link dir
-#link_directories(${DEP_LIB_DIR})
 
 #log
 message("ROOT dir=${ROOT_DIR}")

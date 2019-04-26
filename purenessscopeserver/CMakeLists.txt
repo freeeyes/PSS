@@ -1,8 +1,10 @@
 if(UNIX)
 	set(ACE_ROOT /root/Tools/ACE_wrappers)
 	set(BIN_OUTPUT_DIR ${ROOT_DIR}/Build/Linux/)
+	set(LIB_OUTPUT_DIR ${ROOT_DIR}/Build/Linux/)
 else()
 	set(ACE_ROOT C:/Tools/ACE-6.3.0/ACE_wrappers)
+	set(BIN_OUTPUT_DIR ${ROOT_DIR}/Build/Windows/)
 	set(LIB_OUTPUT_DIR ${ROOT_DIR}/Build/Windows/)
 endif()
 
@@ -145,13 +147,24 @@ if(UNIX)
 	target_link_libraries(pss ace)	
 else()
     target_link_libraries(pss 
-    debug aced.lib
-    optimized ace.lib)    
+    debug aced.lib DbgHelp.lib psapi.lib
+    optimized ace.lib DbgHelp.lib psapi.lib)    
 endif()
 
-set_target_properties(pss PROPERTIES OUTPUT_NAME_DEBUG "pss_d") #TODO:if you have another name, please change it.
+set_target_properties(pss PROPERTIES 
+	OUTPUT_NAME_DEBUG "pss_d"
+	ARCHIVE_OUTPUT_DIRECTORY ${BIN_OUTPUT_DIR}
+    RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT_DIR}
+    LIBRARY_OUTPUT_DIRECTORY ${BIN_OUTPUT_DIR}) #TODO:if you have another name, please change it.
 set_target_properties(pss PROPERTIES
     FOLDER "pss"
     ARCHIVE_OUTPUT_DIRECTORY ${BIN_OUTPUT_DIR}
     RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT_DIR}
     LIBRARY_OUTPUT_DIRECTORY ${BIN_OUTPUT_DIR})
+	
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${BIN_OUTPUT_DIR}")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${BIN_OUTPUT_DIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG "${BIN_OUTPUT_DIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE "${BIN_OUTPUT_DIR}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${BIN_OUTPUT_DIR}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${BIN_OUTPUT_DIR}")	

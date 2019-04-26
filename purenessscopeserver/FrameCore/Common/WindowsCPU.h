@@ -102,7 +102,7 @@ private:
 
 int GetProcessCPU_Idel();
 
-inline uint32 GetProcessMemorySize();
+uint32 GetProcessMemorySize();
 
 #endif
 
