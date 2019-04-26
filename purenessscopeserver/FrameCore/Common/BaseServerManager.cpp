@@ -91,7 +91,8 @@ bool Server_Manager_Common_IObject(IConnectManager* pConnectManager,
                                    IServerManager* pIServerManager,
                                    ITSTimerManager* pTSTimerManager,
                                    ITTyClientManager* pTTyClientManager,
-                                   ILogicThreadManager* pLogicThreadManager)
+                                   ILogicThreadManager* pLogicThreadManager,
+                                   IControlListen* pControlListen)
 {
     App_ServerObject::instance()->SetMessageManager(dynamic_cast<IMessageManager*>(App_MessageManager::instance()));
     App_ServerObject::instance()->SetLogManager(dynamic_cast<ILogManager*>(AppLogManager::instance()));
@@ -101,7 +102,7 @@ bool Server_Manager_Common_IObject(IConnectManager* pConnectManager,
     App_ServerObject::instance()->SetUDPConnectManager(pUDPConnectManager);
     App_ServerObject::instance()->SetTimerManager(reinterpret_cast<ActiveTimer*>(App_TimerManager::instance()));
     App_ServerObject::instance()->SetModuleMessageManager(dynamic_cast<IModuleMessageManager*>(App_ModuleMessageManager::instance()));
-    App_ServerObject::instance()->SetControlListen(dynamic_cast<IControlListen*>(App_ControlListen::instance()));
+    App_ServerObject::instance()->SetControlListen(pControlListen);
     App_ServerObject::instance()->SetModuleInfo(dynamic_cast<IModuleInfo*>(App_ModuleLoader::instance()));
     App_ServerObject::instance()->SetMessageBlockManager(dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()));
     App_ServerObject::instance()->SetFrameCommand(pFrameCommand);

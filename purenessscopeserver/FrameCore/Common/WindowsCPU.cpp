@@ -19,14 +19,14 @@ uint32 GetProcessMemorySize()
 {
     PROCESS_MEMORY_COUNTERS pmc;
 
-    if(::GetProcessMemoryInfo(::GetCurrentProcess(), &pmc, sizeof(pmc)))
+    if (::GetProcessMemoryInfo(::GetCurrentProcess(), &pmc, sizeof(pmc)))
     {
         uint32 u4WorkSize = (uint32)pmc.WorkingSetSize;
         uint32 u4PageSize = (uint32)pmc.PagefileUsage;
-        return (u4WorkSize + u4PageSize)/(1024*1024);
+        return (u4WorkSize + u4PageSize) / (1024 * 1024);
     }
 
     return 0;
-}
+};
 
 #endif

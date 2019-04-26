@@ -91,6 +91,7 @@ bool CServerManager::Init()
     IServerManager* pServerManager           = dynamic_cast<IServerManager*>(this);
     ITTyClientManager* pTTyClientManager     = dynamic_cast<ITTyClientManager*>(App_ReTTyClientManager::instance());
     ILogicThreadManager* pLogicThreadManager = dynamic_cast<ILogicThreadManager*>(App_LogicThreadManager::instance());
+    IControlListen* pControlListen = dynamic_cast<IControlListen*>(App_ControlListen::instance());
 
     Server_Manager_Common_IObject(pConnectManager,
                                   pClientManager,
@@ -99,7 +100,8 @@ bool CServerManager::Init()
                                   pServerManager,
                                   pTSTimer,
                                   pTTyClientManager,
-                                  pLogicThreadManager);
+                                  pLogicThreadManager,
+                                  pControlListen);
 
     //初始化模块加载，因为这里可能包含了中间服务器连接加载
     if (false == Server_Manager_Common_Module())

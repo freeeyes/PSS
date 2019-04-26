@@ -7,9 +7,6 @@
     <ClCompile Include="Proactor\AceProactorManager.cpp">
       <Filter>Proactor\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="Reactor\AceReactorManager.cpp">
-      <Filter>Reactor\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="Common\BuffPacket.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
@@ -19,32 +16,11 @@
     <ClCompile Include="Proactor\ClientProConnectManager.cpp">
       <Filter>Proactor\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="Reactor\ClientReConnectManager.cpp">
-      <Filter>Reactor\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="Common\CommandAccount.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="Reactor\ConnectAccept.cpp">
-      <Filter>Reactor\cppfile</Filter>
-    </ClCompile>
-    <ClCompile Include="Reactor\ConnectClient.cpp">
-      <Filter>Reactor\cppfile</Filter>
-    </ClCompile>
-    <ClCompile Include="Reactor\ConnectHandler.cpp">
-      <Filter>Reactor\cppfile</Filter>
-    </ClCompile>
-    <ClCompile Include="Reactor\ConsoleAccept.cpp">
-      <Filter>Reactor\cppfile</Filter>
-    </ClCompile>
-    <ClCompile Include="Reactor\ConsoleHandler.cpp">
-      <Filter>Reactor\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="Console\ConsoleMessage.cpp">
       <Filter>Console\cppfile</Filter>
-    </ClCompile>
-    <ClCompile Include="Reactor\ControlListen.cpp">
-      <Filter>Reactor\cppfile</Filter>
     </ClCompile>
     <ClCompile Include="LogSystem\FileLogger.cpp">
       <Filter>Log\cppfile</Filter>
@@ -139,20 +115,11 @@
     <ClCompile Include="PurenessScopeServer.cpp">
       <Filter>Main</Filter>
     </ClCompile>
-    <ClCompile Include="UDP\ReactorUDPClient.cpp">
-      <Filter>Reactor\cppfile</Filter>
-    </ClCompile>
-    <ClCompile Include="UDP\ReactorUDPHander.cpp">
-      <Filter>Reactor\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="Common\SendCacheManager.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
     <ClCompile Include="Common\SendMessage.cpp">
       <Filter>Common\cppfile</Filter>
-    </ClCompile>
-    <ClCompile Include="Reactor\ServerManager.cpp">
-      <Filter>Reactor\cppfile</Filter>
     </ClCompile>
     <ClCompile Include="Common\ServerMessageTask.cpp">
       <Filter>Common\cppfile</Filter>
@@ -177,9 +144,6 @@
     </ClCompile>
     <ClCompile Include="TinyXML\tinyxmlparser.cpp">
       <Filter>tinyXML\cppfile</Filter>
-    </ClCompile>
-    <ClCompile Include="Reactor\WaitQuitSignal.cpp">
-      <Filter>Reactor\cppfile</Filter>
     </ClCompile>
     <ClCompile Include="Common\WindowsCPU.cpp">
       <Filter>Common\cppfile</Filter>
@@ -373,12 +337,6 @@
     <ClCompile Include="CppUnit\Uint_TcpRedirection.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="Reactor\ReTTyClientManager.cpp">
-      <Filter>Reactor\cppfile</Filter>
-    </ClCompile>
-    <ClCompile Include="Reactor\ReTTyHandler.cpp">
-      <Filter>Reactor\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="Proactor\ProTTyClientManager.cpp">
       <Filter>Proactor\cppfile</Filter>
     </ClCompile>
@@ -399,9 +357,6 @@
     <ClInclude Include="Proactor\AceProactorManager.h">
       <Filter>Proactor\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="Reactor\AceReactorManager.h">
-      <Filter>Reactor\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="Common\BuffPacket.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
@@ -411,32 +366,11 @@
     <ClInclude Include="Proactor\ClientProConnectManager.h">
       <Filter>Proactor\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="Reactor\ClientReConnectManager.h">
-      <Filter>Reactor\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="Common\CommandAccount.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="Reactor\ConnectAccept.h">
-      <Filter>Reactor\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="Reactor\ConnectClient.h">
-      <Filter>Reactor\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="Reactor\ConnectHandler.h">
-      <Filter>Reactor\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="Reactor\ConsoleAccept.h">
-      <Filter>Reactor\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="Reactor\ConsoleHandler.h">
-      <Filter>Reactor\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="Console\ConsoleMessage.h">
       <Filter>Console\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="Reactor\ControlListen.h">
-      <Filter>Reactor\hfile</Filter>
     </ClInclude>
     <ClInclude Include="Common\Fast_Asynch_Read_Stream.h">
       <Filter>Common\hfile</Filter>
@@ -534,15 +468,6 @@
     <ClInclude Include="UDP\ProUDPManager.h">
       <Filter>Proactor\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="UDP\ReactorUDPClient.h">
-      <Filter>Reactor\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="UDP\ReactorUDPHander.h">
-      <Filter>Reactor\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="UDP\ReUDPManager.h">
-      <Filter>Reactor\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="Common\Ring.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
@@ -551,9 +476,6 @@
     </ClInclude>
     <ClInclude Include="Common\SendMessage.h">
       <Filter>Common\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="Reactor\ServerManager.h">
-      <Filter>Reactor\hfile</Filter>
     </ClInclude>
     <ClInclude Include="Common\ServerMessageTask.h">
       <Filter>Common\hfile</Filter>
@@ -575,9 +497,6 @@
     </ClInclude>
     <ClInclude Include="TinyXML\tinyxml.h">
       <Filter>tinyXML\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="Reactor\WaitQuitSignal.h">
-      <Filter>Reactor\hfile</Filter>
     </ClInclude>
     <ClInclude Include="Common\WindowsCPU.h">
       <Filter>Common\hfile</Filter>
@@ -885,12 +804,6 @@
     <ClInclude Include="CppUnit\Uint_TcpRedirection.h">
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="Reactor\ReTTyHandler.h">
-      <Filter>Reactor\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="Reactor\ReTTyClientManager.h">
-      <Filter>Reactor\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="Proactor\ProTTyClientManager.h">
       <Filter>Proactor\hfile</Filter>
     </ClInclude>
@@ -919,9 +832,6 @@
     </Filter>
     <Filter Include="Proactor">
       <UniqueIdentifier>{2a678cc6-c2ae-4c13-aaa7-086e05baf28c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Reactor">
-      <UniqueIdentifier>{34c4c620-4b26-491c-a515-fdac51ca51f9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Encrypt">
       <UniqueIdentifier>{3b791c4d-65a6-454b-a4b1-2794c06c04a0}</UniqueIdentifier>
@@ -1012,12 +922,6 @@
     </Filter>
     <Filter Include="Proactor\cppfile">
       <UniqueIdentifier>{b9c7fd4f-4b91-4b70-ac4e-0516b2b19322}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Reactor\hfile">
-      <UniqueIdentifier>{a6a9e4d3-7350-4fa3-ae09-e5a80ed0ee2e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Reactor\cppfile">
-      <UniqueIdentifier>{2c263c1d-404b-43bd-95c7-725b3199c8f8}</UniqueIdentifier>
     </Filter>
     <Filter Include="CppUnit">
       <UniqueIdentifier>{0f1feb6c-b6f4-4a7c-b190-f48f8b592edc}</UniqueIdentifier>

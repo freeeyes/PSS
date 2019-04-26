@@ -89,7 +89,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ACE_ROOT);../Common;./Common;./Encrypt;./LogSystem;./Message;./PacketParse;./Proactor;./Reactor;./UDP;./Console;./TinyXML;./Mail;./FileTest</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ACE_ROOT);../Common;./Common;./Encrypt;./LogSystem;./Message;./PacketParse;./Proactor;./UDP;./Console;./TinyXML;./Mail;./FileTest</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -358,8 +358,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Reactor\ReTTyClientManager.cpp" />
-    <ClCompile Include="Reactor\ReTTyHandler.cpp" />
     <ClCompile Include="UDP\ProactorUDPClient.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
@@ -367,18 +365,6 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="UDP\ProactorUDPHandler.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="UDP\ReactorUDPClient.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="UDP\ReactorUDPHander.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -481,51 +467,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Reactor\AceReactorManager.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Reactor\ClientReConnectManager.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Reactor\ConnectAccept.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Reactor\ConnectClient.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Reactor\ConnectHandler.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Reactor\ConsoleAccept.cpp" />
-    <ClCompile Include="Reactor\ConsoleHandler.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Reactor\ControlListen.cpp" />
-    <ClCompile Include="Reactor\ServerManager.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Reactor\WaitQuitSignal.cpp" />
     <ClCompile Include="TinyXML\tinystr.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
@@ -681,14 +622,9 @@
     <ClInclude Include="Console\ConsoleMessage.h" />
     <ClInclude Include="Proactor\ProTTyClientManager.h" />
     <ClInclude Include="Proactor\ProTTyHandler.h" />
-    <ClInclude Include="Reactor\ReTTyClientManager.h" />
-    <ClInclude Include="Reactor\ReTTyHandler.h" />
     <ClInclude Include="UDP\ProactorUDPClient.h" />
     <ClInclude Include="UDP\ProactorUDPHandler.h" />
     <ClInclude Include="UDP\ProUDPManager.h" />
-    <ClInclude Include="UDP\ReactorUDPClient.h" />
-    <ClInclude Include="UDP\ReactorUDPHander.h" />
-    <ClInclude Include="UDP\ReUDPManager.h" />
     <ClInclude Include="Common\AppConfig.h" />
     <ClInclude Include="Common\BuffPacket.h" />
     <ClInclude Include="Common\BuffPacketManager.h" />
@@ -712,16 +648,6 @@
     <ClInclude Include="Common\WindowsDump.h" />
     <ClInclude Include="Common\WindowsProcess.h" />
     <ClInclude Include="Common\XmlOpeation.h" />
-    <ClInclude Include="Reactor\AceReactorManager.h" />
-    <ClInclude Include="Reactor\ClientReConnectManager.h" />
-    <ClInclude Include="Reactor\ConnectAccept.h" />
-    <ClInclude Include="Reactor\ConnectClient.h" />
-    <ClInclude Include="Reactor\ConnectHandler.h" />
-    <ClInclude Include="Reactor\ConsoleAccept.h" />
-    <ClInclude Include="Reactor\ConsoleHandler.h" />
-    <ClInclude Include="Reactor\ControlListen.h" />
-    <ClInclude Include="Reactor\ServerManager.h" />
-    <ClInclude Include="Reactor\WaitQuitSignal.h" />
     <ClInclude Include="TinyXML\tinystr.h" />
     <ClInclude Include="TinyXML\tinyxml.h" />
     <ClInclude Include="Mail\base64.h" />

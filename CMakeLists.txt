@@ -50,7 +50,6 @@ if(UNIX)
     
 else()
     #windows
-    add_compile_options("/std:c++latest")
     set(DEP_LIB_DIR ${ACE_ROOT}/lib/)
     set(BIN_OUTPUT_DIR ${ROOT_DIR}/Build/Windows)
     add_definitions(

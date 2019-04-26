@@ -64,14 +64,15 @@ bool CProServerManager::Init()
     App_LogicThreadManager::instance()->Init();
 
     //初始化给插件的对象接口
-    IConnectManager* pConnectManager       = dynamic_cast<IConnectManager*>(App_ProConnectManager::instance());
-    IClientManager*  pClientManager        = dynamic_cast<IClientManager*>(App_ClientProConnectManager::instance());
-    IUDPConnectManager* pUDPConnectManager = dynamic_cast<IUDPConnectManager*>(App_ProUDPManager::instance());
-    IFrameCommand* pFrameCommand           = dynamic_cast<IFrameCommand*>(&m_objFrameCommand);
-    ITSTimerManager* pTSTimer              = dynamic_cast<ITSTimerManager*>(&m_TSThread);
-    IServerManager* pServerManager         = dynamic_cast<IServerManager*>(this);
-    ITTyClientManager* pTTyClientManager   = dynamic_cast<ITTyClientManager*>(App_ProTTyClientManager::instance());
+    IConnectManager* pConnectManager         = dynamic_cast<IConnectManager*>(App_ProConnectManager::instance());
+    IClientManager*  pClientManager          = dynamic_cast<IClientManager*>(App_ClientProConnectManager::instance());
+    IUDPConnectManager* pUDPConnectManager   = dynamic_cast<IUDPConnectManager*>(App_ProUDPManager::instance());
+    IFrameCommand* pFrameCommand             = dynamic_cast<IFrameCommand*>(&m_objFrameCommand);
+    ITSTimerManager* pTSTimer                = dynamic_cast<ITSTimerManager*>(&m_TSThread);
+    IServerManager* pServerManager           = dynamic_cast<IServerManager*>(this);
+    ITTyClientManager* pTTyClientManager     = dynamic_cast<ITTyClientManager*>(App_ProTTyClientManager::instance());
     ILogicThreadManager* pLogicThreadManager = dynamic_cast<ILogicThreadManager*>(App_LogicThreadManager::instance());
+    IControlListen* pControlListen           = dynamic_cast<IControlListen*>(App_ProControlListen::instance());
 
     Server_Manager_Common_IObject(pConnectManager,
                                   pClientManager,
@@ -80,7 +81,8 @@ bool CProServerManager::Init()
                                   pServerManager,
                                   pTSTimer,
                                   pTTyClientManager,
-                                  pLogicThreadManager);
+                                  pLogicThreadManager,
+                                  pControlListen);
 
     //初始化模块加载，因为这里可能包含了中间服务器连接加载
     if (false == Server_Manager_Common_Module())

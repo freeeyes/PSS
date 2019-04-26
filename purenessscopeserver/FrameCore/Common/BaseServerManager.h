@@ -15,7 +15,7 @@
 #include "FrameCommand.h"
 #include "BuffPacketManager.h"
 #include "Frame_Logging_Strategy.h"
-#include "ControlListen.h"
+#include "IControlListen.h"
 #include "XmlConfig.h"
 #include "TimerThread.h"
 
@@ -36,7 +36,8 @@ bool Server_Manager_Common_IObject(IConnectManager* pConnectManager,
                                    IServerManager* pIServerManager,
                                    ITSTimerManager* pTSTimerManager,
                                    ITTyClientManager* pTTyClientManager,
-                                   ILogicThreadManager* pLogicThreadManager);
+                                   ILogicThreadManager* pLogicThreadManager,
+                                   IControlListen* pControlListen);
 
 //初始化模块插件的加载
 bool Server_Manager_Common_Module();
