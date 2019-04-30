@@ -1,1 +1,1 @@
-cmake -G "Visual Studio 15 Win64" ..
+cmake -G "Visual Studio 15 Win64" -DVS_DEVENV_PATH="C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\IDE\devenv.exe" .. 

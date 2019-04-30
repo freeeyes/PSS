@@ -2,18 +2,8 @@
 
 echo "Check Vs Path..."
 REM echo %VS140COMNTOOLS%
-set VSFind="false"
-set VSPath=%VS140COMNTOOLS%
-if defined VSPath ( 
-	echo "Find VS2015"
-	set VSFind="true"
-) else (
-	echo "No Find VS2015, You must install vs2015" 
-)
+set VS_DEVENV_PATH=%1
 
-if %VSFind%=="true" (
-echo "Check Vs OK"
-)
 echo "Check ACE Path..."
 REM echo %VS140COMNTOOLS%
 set ACEFind="false"
@@ -23,7 +13,7 @@ if defined ACEPath (
 	set VSFind="true"
 ) else (
 	echo "No Find ACE, begin download ace..."
-	powershell -Command "Invoke-WebRequest http://download.dre.vanderbilt.edu/previous_versions/ACE-6.4.0.zip -OutFile ACE-src-6.4.0.zip"
+	powershell -Command "Invoke-WebRequest http://download.dre.vanderbilt.edu/previous_versions/ACE-6.5.0.zip -OutFile ACE-src-6.4.0.zip"
 	echo "download ace ok"
 	echo "download ace expand zip begin..."
 	powershell -Command "Expand-Archive 'ACE-6.4.0.zip' '.\'"
@@ -35,8 +25,7 @@ if defined ACEPath (
 	powershell -Command "'#include \"ace/config-win32.h\"' >> '.\ACE_wrappers\ace\config.h'"
 	echo "create ace config.h end..."\
 	echo "compile ace begin..."
-	cmake -G "Visual Studio 15 Win64" ..
-	"%VSPath%..\IDE\Devenv" .\ACE_wrappers\ace\ace_vc14.sln /build "Debug|x64" /project .\ACE_wrappers\ace\ACE_vc14.vcxproj
+	"%VS_DEVENV_PATH%" .\ACE_wrappers\ace\ace_vc14.sln /build "Debug|x64" /project .\ACE_wrappers\ace\ACE_vc14.vcxproj
 	echo "compile ace end..."	
 	echo "set environment ACE_ROOT begin..."	
 	set CurrPath=%cd%\ACE_wrappers\
