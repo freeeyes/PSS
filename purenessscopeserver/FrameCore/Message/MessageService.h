@@ -59,7 +59,7 @@ public:
     virtual int svc (void);
     int Close();
 
-    void Init(uint32 u4ThreadID, uint32 u4MaxQueue = MAX_MSG_THREADQUEUE, uint32 u4LowMask = MAX_MSG_MASK, uint32 u4HighMask = MAX_MSG_MASK);
+    void Init(uint32 u4ThreadID, uint32 u4MaxQueue = MAX_MSG_THREADQUEUE, uint32 u4LowMask = MAX_MSG_MASK, uint32 u4HighMask = MAX_MSG_MASK, bool blIsCpuAffinity = false);
 
     bool Start();
 
@@ -113,6 +113,7 @@ private:
     uint16                         m_u2ThreadTimeOut;
     uint16                         m_u2ThreadTimeCheck;
     bool                           m_blRun;                //线程是否在运行
+    bool                           m_blIsCpuAffinity;      //是否CPU绑定
 
     MESSAGE_SERVICE_THREAD_STATE   m_emThreadState;        //当前工作线程状态
 
@@ -190,6 +191,7 @@ public:
     uint32                                              m_u4TimerID;               //定时器ID
     uint16                                              m_u2ThreadTimeCheck;       //线程自检时间
     uint16                                              m_u2CurrThreadID;          //当前轮询到的线程ID
+    uint16                                              m_u2CpuNumber;             //当前CPU的核数
     CThreadInfo                                         m_objAllThreadInfo;        //当前所有线程信息
     CMessageDyeingManager                               m_objMessageDyeingManager; //数据染色类
     ACE_Recursive_Thread_Mutex                          m_ThreadLock;              //用于线程操作的线程锁，保证CurrThreadID的数据正常

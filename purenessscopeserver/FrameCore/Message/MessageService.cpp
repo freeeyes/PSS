@@ -11,6 +11,7 @@ CMessageService::CMessageService():m_mutex(), m_cond(m_mutex)
     m_u4ThreadID         = 0;
     m_u4MaxQueue         = MAX_MSG_THREADQUEUE;
     m_blRun              = false;
+    m_blIsCpuAffinity    = false;
     m_u4HighMask         = 0;
     m_u4LowMask          = 0;
     m_u8TimeCost         = 0;
@@ -36,7 +37,7 @@ CMessageService::~CMessageService()
     OUR_DEBUG((LM_INFO, "[CMessageService::~CMessageService].\n"));
 }
 
-void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMask, uint32 u4HighMask)
+void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMask, uint32 u4HighMask, bool blIsCpuAffinity)
 {
     m_u4MaxQueue    = u4MaxQueue;
     m_u4HighMask    = u4HighMask;
@@ -45,6 +46,9 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
     //添加线程信息
     m_u4ThreadID = u4ThreadID;
     m_ThreadInfo.m_u4ThreadID   = u4ThreadID;
+
+    //设置当前线程是否CPU绑定
+    m_blIsCpuAffinity = blIsCpuAffinity;
 
     m_u4WorkQueuePutTime = GetXmlConfigAttribute(xmlThreadInfo)->PutQueueTimeout * 1000;
 
@@ -124,6 +128,24 @@ int CMessageService::open(void* args)
 
 int CMessageService::svc(void)
 {
+    //判断是否要绑定CPU
+    if (true == m_blIsCpuAffinity)
+    {
+#if PSS_PLATFORM == PLATFORM_WIN
+        SetThreadAffinityMask(GetCurrentThread(), m_u4ThreadID);
+#else
+        cpu_set_t mask;
+        CPU_ZERO(&mask);
+        CPU_SET(m_u4ThreadID, &mask);
+
+        if (pthread_setaffinity_np(pthread_self(), sizeof(mask), &mask) != 0)
+        {
+            OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)cound not get thread affinity.\n", m_u4ThreadID));
+        }
+
+#endif
+    }
+
     while(m_blRun)
     {
         if (false == Dispose_Queue())
@@ -740,6 +762,7 @@ CMessageServiceGroup::CMessageServiceGroup()
     m_u4HighMask     = 0;
     m_u4LowMask      = 0;
     m_u2CurrThreadID = 0;
+    m_u2CpuNumber    = 0;
 
     uint16 u2ThreadTimeCheck = GetXmlConfigAttribute(xmlThreadInfo)->ThreadTimeCheck;
 
@@ -803,6 +826,17 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
     //时序模式开启
     OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Init]Timing sequence Start.\n"));
 
+    //获得当前CPU的数量
+#if PSS_PLATFORM == PLATFORM_WIN
+    SYSTEM_INFO si;
+    GetSystemInfo(&si);
+    m_u2CpuNumber = si.dwNumberOfProcessors;
+#else
+    m_u2CpuNumber = sysconf(_SC_NPROCESSORS_CONF);
+#endif
+
+    OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Init]CPU NUmber is %d.\n", m_u2CpuNumber));
+
     //初始化所有的Message对象
     for (uint32 i = 0; i < u4ThreadCount; i++)
     {
@@ -814,7 +848,15 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
             return false;
         }
 
-        pMessageService->Init(i, u4MaxQueue, u4LowMask, u4HighMask);
+        //如果CPU多于工作线程数量，则自动绑定线程到CPU
+        if (m_u2CpuNumber >= u4ThreadCount)
+        {
+            pMessageService->Init(i, u4MaxQueue, u4LowMask, u4HighMask, true);
+        }
+        else
+        {
+            pMessageService->Init(i, u4MaxQueue, u4LowMask, u4HighMask, false);
+        }
 
         //将线程信息放入线程组
         _ThreadInfo* pThreadInfo = pMessageService->GetThreadInfo();
