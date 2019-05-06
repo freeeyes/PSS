@@ -15,6 +15,7 @@
 #include "ReUDPManager.h"
 #include "ReTTyClientManager.h"
 #include "LogicThreadManager.h"
+#include "ControlListen.h"
 
 class Frame_Logging_Strategy;
 
