@@ -795,6 +795,13 @@ bool CConnectHandler::SendCloseMessage()
     return true;
 }
 
+bool CConnectHandler::SendTimeoutMessage ()
+{
+	Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CHEK_TIMEOUT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
+	
+	return true;
+}
+
 bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 {
     if(NULL == pMbData)
@@ -1903,6 +1910,9 @@ void CConnectManager::TimeWheel_Timeout_Callback(void* pArgsContext, vector<CCon
         CConnectManager* pManager = reinterpret_cast<CConnectManager*>(pArgsContext);
         OUR_DEBUG((LM_INFO, "[CConnectManager::TimeWheel_Timeout_Callback]ConnectID(%d).\n", vecConnectHandle[i]->GetConnectID()));
 
+				//通知业务插件，超时信息
+				vecConnectHandle[i]->SendTimeoutMessage();
+				
         if (NULL != pManager && false == pManager->CloseConnect_By_Queue(vecConnectHandle[i]->GetConnectID()))
         {
             OUR_DEBUG((LM_INFO, "[CConnectManager::TimeWheel_Timeout_Callback]CloseConnect_By_Queue error.\n"));

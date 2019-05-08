@@ -85,6 +85,7 @@ public:
     void SetSendCacheManager(ISendCacheManager* pSendCacheManager);           //设置发送缓冲接口
     void SetPacketParseInfoID(uint32 u4PacketParseInfoID);                    //设置对应的m_u4PacketParseInfoID
     uint32 GetPacketParseInfoID();                                            //获得相应的m_u4PacketParseInfoID
+    bool SendTimeoutMessage();                                                //发送连接超时消息
 
 private:
     void Get_Recv_length();                                                  //得到要处理的数据长度

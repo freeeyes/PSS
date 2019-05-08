@@ -1414,6 +1414,13 @@ uint32 CProConnectHandler::GetPacketParseInfoID()
     return m_u4PacketParseInfoID;
 }
 
+bool CProConnectHandler::SendTimeoutMessage()
+{
+    Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CHEK_TIMEOUT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
+
+    return true;
+}
+
 //***************************************************************************
 CProConnectManager::CProConnectManager(void):m_mutex(), m_cond(m_mutex), m_u4SendQueuePutTime(0)
 {
@@ -2114,12 +2121,12 @@ void CProConnectManager::TimeWheel_Timeout_Callback(void* pArgsContext, vector<C
             CProConnectManager* pManager = reinterpret_cast<CProConnectManager*>(pArgsContext);
             OUR_DEBUG((LM_INFO, "[CProConnectManager::TimeWheel_Timeout_Callback]ConnectID(%d).\n", vecProConnectHandle[i]->GetConnectID()));
 
-            if (NULL != pManager)
+            //通知业务插件，超时信息
+            vecProConnectHandle[i]->SendTimeoutMessage();
+
+            if (NULL != pManager && false == pManager->CloseConnect_By_Queue(vecProConnectHandle[i]->GetConnectID()))
             {
-                if (false == pManager->CloseConnect_By_Queue(vecProConnectHandle[i]->GetConnectID()))
-                {
-                    OUR_DEBUG((LM_INFO, "[CProConnectManager::TimeWheel_Timeout_Callback]CloseConnect_By_Queue error.\n"));
-                }
+                OUR_DEBUG((LM_INFO, "[CProConnectManager::TimeWheel_Timeout_Callback]CloseConnect_By_Queue error.\n"));
             }
         }
     }
