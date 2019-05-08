@@ -1910,8 +1910,8 @@ void CConnectManager::TimeWheel_Timeout_Callback(void* pArgsContext, vector<CCon
         CConnectManager* pManager = reinterpret_cast<CConnectManager*>(pArgsContext);
         OUR_DEBUG((LM_INFO, "[CConnectManager::TimeWheel_Timeout_Callback]ConnectID(%d).\n", vecConnectHandle[i]->GetConnectID()));
 
-				//通知业务插件，超时信息
-				vecConnectHandle[i]->SendTimeoutMessage();
+		//通知业务插件，超时信息
+		vecConnectHandle[i]->SendTimeoutMessage();
 				
         if (NULL != pManager && false == pManager->CloseConnect_By_Queue(vecConnectHandle[i]->GetConnectID()))
         {
