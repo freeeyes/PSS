@@ -402,6 +402,7 @@ int mailText(unsigned char** mail, const unsigned char* fromMail, const unsigned
     if (NULL == szMailText)
     {
         ACE_DEBUG((LM_ERROR, "[mailText]szMailText malloc fail!\n"));
+        free(szMailText);
         return -1;
     }
 
@@ -410,6 +411,7 @@ int mailText(unsigned char** mail, const unsigned char* fromMail, const unsigned
     if (-1 == stringCut(fromMail, NULL, "@", fromName))
     {
         ACE_DEBUG((LM_ERROR, "[mailText]stringCut fromMail fail!\n"));
+        free(szMailText);
         return -1;
     }
 
@@ -418,6 +420,7 @@ int mailText(unsigned char** mail, const unsigned char* fromMail, const unsigned
     if (-1 == stringCut(toMail, NULL, "@", toName))
     {
         ACE_DEBUG((LM_ERROR, "[mailText]stringCut toMail fail!\n"));
+        free(szMailText);
         return -1;
     }
 
@@ -428,6 +431,7 @@ int mailText(unsigned char** mail, const unsigned char* fromMail, const unsigned
     if (NULL == *mail)
     {
         ACE_DEBUG((LM_ERROR, "[mailText]realloc fail.\n"));
+        free(szMailText);
         return -1;
     }
 
