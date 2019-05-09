@@ -21,6 +21,7 @@
 #include "ace/INET_Addr.h"
 #include "ace/Hash_Map_Manager.h"
 #include <math.h>
+#include <sysinfoapi.h>
 
 #ifndef WIN32
 #include <unistd.h>
@@ -436,6 +437,10 @@ typedef short int16;
 typedef INT32 int32;
 #endif
 
+#ifndef int64
+typedef INT64 int64;
+#endif
+
 #ifndef float32
 typedef float float32;
 #endif
@@ -803,7 +808,8 @@ typedef  struct _VCHARS_STR
             if(type == VCHARS_TYPE_TEXT)
             {
                 //文本模式
-                text = new char[u1Length + 1];
+				uint32 ulen = u1Length + 1;
+                text = new char[ulen];
 
                 if (false == memcpy_safe((char*)pData, u1Length, text, u1Length))
                 {
@@ -881,7 +887,8 @@ typedef  struct _VCHARM_STR
             if(type == VCHARS_TYPE_TEXT)
             {
                 //文本模式
-                text = new char[u2Length + 1];
+				uint32 ulen = u2Length + 1;
+                text = new char[ulen];
 
                 if (false == memcpy_safe((char*)pData, u2Length, text, u2Length))
                 {
@@ -1374,7 +1381,7 @@ public:
     void TimeEnd()
     {
         m_lEnd = GetSystemTickCount();
-        long lTimeInterval = m_lEnd - m_lBegin;  //转换成毫秒
+		uint64 lTimeInterval = m_lEnd - m_lBegin;  //转换成毫秒
 
         if(lTimeInterval >= (long)m_nMillionSecond)
         {
@@ -1397,10 +1404,26 @@ public:
     }
 
 private:
-    unsigned long GetSystemTickCount()
+	int64 GetSystemTickCount()
     {
 #if PSS_PLATFORM == PLATFORM_WIN
-        return (unsigned long)GetTickCount();
+        //return (unsigned long)GetTickCount();
+		static LARGE_INTEGER TicksPerSecond = { 0 };
+		LARGE_INTEGER Tick;
+
+		if (!TicksPerSecond.QuadPart)
+		{
+			QueryPerformanceFrequency(&TicksPerSecond);
+		}
+
+		QueryPerformanceCounter(&Tick);
+
+		int64 Seconds = Tick.QuadPart / TicksPerSecond.QuadPart;
+		int64 LeftPart = Tick.QuadPart - (TicksPerSecond.QuadPart * Seconds);
+		int64 MillSeconds = LeftPart * 1000 / TicksPerSecond.QuadPart;
+		int64 Ret = Seconds * 1000 + MillSeconds;
+		_ASSERT(Ret > 0);
+		return Ret;
 #else
         struct timespec ts;
 
@@ -1411,8 +1434,8 @@ private:
     }
 
 private:
-    long         m_lBegin;
-    long         m_lEnd;
+	int64       m_lBegin;
+	int64       m_lEnd;
     int32        m_nFileLine;
     uint32       m_nMillionSecond;
     char         m_szFunctionName[MAX_BUFF_100];
