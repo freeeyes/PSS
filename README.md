@@ -89,8 +89,7 @@ hope to be able to step by step with you to improve the system, really do a valu
 
 ----------
 
-Author: freeeyes
-
-Thanks: 凹凸man,w1w,乔戈,Bobo,弄香花满衣,崔,kz
+Author & Thanks: 
+凹凸man,w1w,乔戈,Bobo,弄香花满衣,崔,kz,瑞奇
 
 QQ group: 260862613
