@@ -21,7 +21,6 @@
 #include "ace/INET_Addr.h"
 #include "ace/Hash_Map_Manager.h"
 #include <math.h>
-#include <sysinfoapi.h>
 
 #ifndef WIN32
 #include <unistd.h>
