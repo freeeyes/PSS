@@ -437,7 +437,7 @@ typedef INT32 int32;
 #endif
 
 #ifndef int64
-typedef INT64 int64;
+typedef ACE_INT64 int64;
 #endif
 
 #ifndef float32
