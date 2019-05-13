@@ -830,7 +830,7 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
 #if PSS_PLATFORM == PLATFORM_WIN
     SYSTEM_INFO si;
     GetSystemInfo(&si);
-    m_u2CpuNumber = si.dwNumberOfProcessors;
+    m_u2CpuNumber = (uint16)si.dwNumberOfProcessors;
 #else
     m_u2CpuNumber = sysconf(_SC_NPROCESSORS_CONF);
 #endif

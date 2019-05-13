@@ -87,10 +87,7 @@ class CLogicThreadInfo
 public:
     CLogicThreadInfo() : m_nLogicThreadID(0),
         m_nTimeout(0),
-        fn_thread_init(NULL),
-        fn_thread_callback_logic(NULL),
-        fn_thread_callback_error(NULL),
-        fn_thread_exit(NULL)
+        m_pLogicQueue(NULL)
     {
     }
 
@@ -109,21 +106,15 @@ public:
         {
             this->m_nLogicThreadID         = ar.m_nLogicThreadID;
             this->m_nTimeout               = ar.m_nTimeout;
-            this->fn_thread_init           = ar.fn_thread_init;
-            this->fn_thread_callback_logic = ar.fn_thread_callback_logic;
-            this->fn_thread_callback_error = ar.fn_thread_callback_error;
-            this->fn_thread_exit           = ar.fn_thread_exit;
+            this->m_pLogicQueue            = ar.m_pLogicQueue;
         }
 
         return *this;
     }
 
-    int m_nLogicThreadID;
-    int m_nTimeout;
-    ThreadInit fn_thread_init;
-    ThreadCallbackLogic fn_thread_callback_logic;
-    ThreadErrorLogic fn_thread_callback_error;
-    ThreadExit fn_thread_exit;
+    int          m_nLogicThreadID;
+    int          m_nTimeout;
+    ILogicQueue* m_pLogicQueue;
 };
 
 //Message对象池
@@ -215,12 +206,17 @@ public:
     void Close();
 
     //创建逻辑线程
-    virtual int CreateLogicThread(int nLogicThreadID,
-                                  int nTimeout,
-                                  ThreadInit thread_init,
-                                  ThreadCallbackLogic thread_callback_logic,
-                                  ThreadErrorLogic thread_callback_error,
-                                  ThreadExit thread_exit);
+    int CreateLogicThread(int nLogicThreadID,
+                          int nTimeout,
+                          ILogicQueue* pLogicQueue);
+
+    virtual int CreateLogicThread(ILogicQueue* pLogicQueue)
+    {
+
+        return CreateLogicThread(pLogicQueue->GetLogicThreadID(),
+                                 pLogicQueue->GetTimeOut(),
+                                 pLogicQueue);
+    };
 
     //关闭逻辑线程
     virtual int KillLogicThread(int nLogicThreadID);

@@ -124,9 +124,9 @@ int CLogicThread::svc(void)
     //调用初始化线程操作
     m_u4ThreadState = THREAD_INIT;
 
-    if (NULL != m_objThreadInfo.fn_thread_init)
+    if (NULL != m_objThreadInfo.m_pLogicQueue)
     {
-        m_objThreadInfo.fn_thread_init(m_objThreadInfo.m_nLogicThreadID);
+        m_objThreadInfo.m_pLogicQueue->Init(m_objThreadInfo.m_nLogicThreadID);
     }
 
     while (m_blRun)
@@ -140,10 +140,12 @@ int CLogicThread::svc(void)
     }
 
     //调用线程结束函数
-    if (NULL != m_objThreadInfo.fn_thread_exit)
+    if (NULL != m_objThreadInfo.m_pLogicQueue)
     {
-        m_objThreadInfo.fn_thread_exit(m_objThreadInfo.m_nLogicThreadID);
+        m_objThreadInfo.m_pLogicQueue->Exit(m_objThreadInfo.m_nLogicThreadID);
     }
+
+    SAFE_DELETE(m_objThreadInfo.m_pLogicQueue);
 
     return 0;
 }
@@ -176,7 +178,7 @@ bool CLogicThread::CheckTimeout(ACE_Time_Value tvNow)
         if (tvInterval.sec() > m_objThreadInfo.m_nTimeout)
         {
             //回调线程超时错误接口
-            m_objThreadInfo.fn_thread_callback_error(m_objThreadInfo.m_nLogicThreadID, 1);
+            m_objThreadInfo.m_pLogicQueue->Error(m_objThreadInfo.m_nLogicThreadID, 1);
             return false;
         }
     }
@@ -252,9 +254,9 @@ bool CLogicThread::Dispose_Queue()
         m_u4ThreadState = THREAD_RUNBEGIN;
         m_tvUpdateTime  = ACE_OS::gettimeofday();
 
-        if (NULL != m_objThreadInfo.fn_thread_callback_logic)
+        if (NULL != m_objThreadInfo.m_pLogicQueue)
         {
-            emRet = m_objThreadInfo.fn_thread_callback_logic(m_objThreadInfo.m_nLogicThreadID,
+            emRet = m_objThreadInfo.m_pLogicQueue->Run(m_objThreadInfo.m_nLogicThreadID,
                     msg->m_nMessageID,
                     msg->m_pParam);
 
@@ -339,7 +341,7 @@ void CLogicThreadManager::Close()
     vecLogicThreadList.clear();
 }
 
-int CLogicThreadManager::CreateLogicThread(int nLogicThreadID, int nTimeout, ThreadInit thread_init, ThreadCallbackLogic thread_callback_logic, ThreadErrorLogic thread_callback_error, ThreadExit thread_exit)
+int CLogicThreadManager::CreateLogicThread(int nLogicThreadID, int nTimeout, ILogicQueue* pLogicQueue)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWriteLock);
 
@@ -355,12 +357,9 @@ int CLogicThreadManager::CreateLogicThread(int nLogicThreadID, int nTimeout, Thr
 
     pLogicThreadInfo->m_nLogicThreadID         = nLogicThreadID;
     pLogicThreadInfo->m_nTimeout               = nTimeout;
-    pLogicThreadInfo->fn_thread_init           = thread_init;
-    pLogicThreadInfo->fn_thread_callback_logic = thread_callback_logic;
-    pLogicThreadInfo->fn_thread_callback_error = thread_callback_error;
-    pLogicThreadInfo->fn_thread_exit           = thread_exit;
-
+    pLogicThreadInfo->m_pLogicQueue            = pLogicQueue;
     pLogicThread = new CLogicThread();
+
     pLogicThread->Init(*pLogicThreadInfo);
 
     if (false == pLogicThread->Start())

@@ -5,20 +5,48 @@
 
 #include "Unit_Common.h"
 #include "define.h"
+#include "ILogicQueue.h"
 #include "LogicThreadManager.h"
 
+class CLogicTestQueue : public ILogicQueue
+{
+public:
+    CLogicTestQueue(uint32 u4LogicThreadID, uint32 u4Timeout, std::string strDesc):
+        ILogicQueue(u4LogicThreadID, u4Timeout, strDesc)
+    {
+    };
 
-//初始化逻辑线程
-void Test_LogicThreadInit(int nLogicThread);
+    virtual ~CLogicTestQueue() {};
 
-//线程消息处理函数(参数为线程ID, 消息ID, 内容指针)
-ThreadReturn Test_LogicThreadCallbackLogic(int nLogicThread, int nMessage, void* arg);
+    virtual bool Init(int nLogicThread)
+    {
+        OUR_DEBUG((LM_INFO, "[Test_LogicThreadInit]Init LogicThread=%d.\n", nLogicThread));
+        return true;
+    };
 
-//线程错误回调函数(线程ID, 错误ID)
-void Test_LogicThreadErrorLogic(int nLogicThread, int nErrorID);
+    //执行逻辑
+    virtual ThreadReturn Run(int nLogicThread, int nMessage, void* arg)
+    {
+        ACE_UNUSED_ARG(arg);
 
-//线程退出函数
-void Test_LogicThreadExit(int nLogicThread);
+        OUR_DEBUG((LM_INFO, "[Test_LogicThreadCallbackLogic]LogicThread=%d, nMessage=%d.\n", nLogicThread, nMessage));
+
+        return THREAD_Task_Finish;
+    };
+
+    //错误处理
+    virtual uint32 Error(int nLogicThread, int nErrorID)
+    {
+        OUR_DEBUG((LM_INFO, "[Test_LogicThreadErrorLogic]LogicThread=%d, nErrorID=%d.\n", nLogicThread, nErrorID));
+        return 0;
+    };
+
+    //退出善后
+    virtual void Exit(int nLogicThread)
+    {
+        OUR_DEBUG((LM_INFO, "[Test_LogicThreadExit]LogicThread=%d.\n", nLogicThread));
+    };
+};
 
 class CUnit_LogicThreadManager : public CppUnit::TestFixture
 {
@@ -51,6 +79,7 @@ public:
 
 private:
     int  m_nMessage;
+    CLogicTestQueue* m_pLogicTestQueue;
 };
 
 #endif
