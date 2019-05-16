@@ -126,7 +126,7 @@ int CLogicThread::svc(void)
 
     if (NULL != m_objThreadInfo.m_pLogicQueue)
     {
-        m_objThreadInfo.m_pLogicQueue->Init(m_objThreadInfo.m_nLogicThreadID);
+        m_objThreadInfo.m_pLogicQueue->Init();
     }
 
     while (m_blRun)
@@ -142,7 +142,7 @@ int CLogicThread::svc(void)
     //调用线程结束函数
     if (NULL != m_objThreadInfo.m_pLogicQueue)
     {
-        m_objThreadInfo.m_pLogicQueue->Exit(m_objThreadInfo.m_nLogicThreadID);
+        m_objThreadInfo.m_pLogicQueue->Exit();
     }
 
     SAFE_DELETE(m_objThreadInfo.m_pLogicQueue);
@@ -178,7 +178,7 @@ bool CLogicThread::CheckTimeout(ACE_Time_Value tvNow)
         if (tvInterval.sec() > m_objThreadInfo.m_nTimeout)
         {
             //回调线程超时错误接口
-            m_objThreadInfo.m_pLogicQueue->Error(m_objThreadInfo.m_nLogicThreadID, 1);
+            m_objThreadInfo.m_pLogicQueue->Error(1);
             return false;
         }
     }
@@ -256,8 +256,7 @@ bool CLogicThread::Dispose_Queue()
 
         if (NULL != m_objThreadInfo.m_pLogicQueue)
         {
-            emRet = m_objThreadInfo.m_pLogicQueue->Run(m_objThreadInfo.m_nLogicThreadID,
-                    msg->m_nMessageID,
+            emRet = m_objThreadInfo.m_pLogicQueue->Run(msg->m_nMessageID,
                     msg->m_pParam);
 
         }

@@ -18,33 +18,33 @@ public:
 
     virtual ~CLogicTestQueue() {};
 
-    virtual bool Init(int nLogicThread)
+    virtual bool Init()
     {
-        OUR_DEBUG((LM_INFO, "[Test_LogicThreadInit]Init LogicThread=%d.\n", nLogicThread));
+        OUR_DEBUG((LM_INFO, "[Test_LogicThreadInit]Init LogicThread=%d.\n", GetLogicThreadID()));
         return true;
     };
 
     //执行逻辑
-    virtual ThreadReturn Run(int nLogicThread, int nMessage, void* arg)
+    virtual ThreadReturn Run(int nMessage, void* arg)
     {
         ACE_UNUSED_ARG(arg);
 
-        OUR_DEBUG((LM_INFO, "[Test_LogicThreadCallbackLogic]LogicThread=%d, nMessage=%d.\n", nLogicThread, nMessage));
+        OUR_DEBUG((LM_INFO, "[Test_LogicThreadCallbackLogic]LogicThread=%d, nMessage=%d.\n", GetLogicThreadID(), nMessage));
 
         return THREAD_Task_Finish;
     };
 
     //错误处理
-    virtual uint32 Error(int nLogicThread, int nErrorID)
+    virtual uint32 Error(int nErrorID)
     {
-        OUR_DEBUG((LM_INFO, "[Test_LogicThreadErrorLogic]LogicThread=%d, nErrorID=%d.\n", nLogicThread, nErrorID));
+        OUR_DEBUG((LM_INFO, "[Test_LogicThreadErrorLogic]LogicThread=%d, nErrorID=%d.\n", GetLogicThreadID(), nErrorID));
         return 0;
     };
 
     //退出善后
-    virtual void Exit(int nLogicThread)
+    virtual void Exit()
     {
-        OUR_DEBUG((LM_INFO, "[Test_LogicThreadExit]LogicThread=%d.\n", nLogicThread));
+        OUR_DEBUG((LM_INFO, "[Test_LogicThreadExit]LogicThread=%d.\n", GetLogicThreadID()));
     };
 };
 

@@ -33,13 +33,13 @@ public:
 
 public:
     //初始化内容
-    virtual bool Init(int nLogicThread) = 0;
+    virtual bool Init() = 0;
     //执行逻辑
-    virtual ThreadReturn Run(int nLogicThread, int nMessage, void* arg) = 0;
+    virtual ThreadReturn Run(int nMessage, void* arg) = 0;
     //错误处理
-    virtual uint32 Error(int nLogicThread, int nErrorID) = 0;
+    virtual uint32 Error(int nErrorID) = 0;
     //退出善后
-    virtual void Exit(int nLogicThread) = 0;
+    virtual void Exit() = 0;
 
 private:
     uint32      m_u4LogicThreadID;

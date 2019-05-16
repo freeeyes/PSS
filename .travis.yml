@@ -59,7 +59,7 @@ matrix:
         - wget https://nchc.dl.sourceforge.net/project/cppunit/cppunit/1.12.1/cppunit-1.12.1.tar.gz
         - tar zxvf cppunit-1.12.1.tar.gz
         - cd cppunit-1.12.1
-        - ./configure LDFLAGS='-ldl' --prefix=$TRAVIS_BUILD_DIR
+        - ./configure LDFLAGS='-ldl' --enable-std-cpp11 --prefix=$TRAVIS_BUILD_DIR
         - make 
         - make install
         - LD_LIBRARY_PATH=$TRAVIS_BUILD_DIR/lib:$LD_LIBRARY_PATH
