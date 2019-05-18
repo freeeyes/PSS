@@ -40,7 +40,7 @@ public:
 
     CLogicThreadMessage(const CLogicThreadMessage& ar)
     {
-        (*this) = ar;
+        (*this) = ::std::move(ar);
     }
 
     CLogicThreadMessage& operator = (const CLogicThreadMessage& ar)
@@ -97,7 +97,7 @@ public:
 
     CLogicThreadInfo(const CLogicThreadInfo& ar)
     {
-        (*this) = ar;
+        (*this) = ::std::move(ar);
     }
 
     CLogicThreadInfo& operator = (const CLogicThreadInfo& ar)

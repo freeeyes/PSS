@@ -6,7 +6,7 @@ CLogicThreadMessagePool::CLogicThreadMessagePool()
 
 CLogicThreadMessagePool::CLogicThreadMessagePool(const CLogicThreadMessagePool& ar)
 {
-    (*this) = ar;
+    *this = ::std::move(ar);
 }
 
 void CLogicThreadMessagePool::Init_Callback(int nIndex, CLogicThreadMessage* pMessage)
