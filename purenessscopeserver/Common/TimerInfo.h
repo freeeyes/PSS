@@ -24,16 +24,13 @@
 
 namespace ts_timer
 {
+#define MAX_TIMER_LIST_COUNT 10
+
     enum EM_Timer_State
     {
         TIMER_STATE_OK = 0,    //定时器正常运行
         TIMER_STATE_DEL,       //定时器删除
     };
-
-#define MAX_TIMER_LIST_COUNT 10
-
-    typedef void(*Timeout_Callback)(int, CTime_Value&, void*, EM_Timer_State&);
-    typedef void(*Timeout_Error_Callback)(int, int, int, std::vector<CTime_Value>, void*);
 
     enum EM_Event_Type
     {
@@ -54,6 +51,57 @@ namespace ts_timer
     typedef pthread_t TIMER_THREAD_ID;
 #endif
 
+    //定时器节点基础类，用于集成实现
+    class ITimeNode
+    {
+    public:
+        ITimeNode() : m_nTimerID(0), m_nFrequency(0), m_ttBegin(GetTimeofDay()) {};
+        virtual ~ITimeNode() {};
+
+        void SetTimerID(int nTimerID)
+        {
+            m_nTimerID = nTimerID;
+        }
+
+        int GetTimerID()
+        {
+            return m_nTimerID;
+        }
+
+        void SetFrequency(int nFrequency)
+        {
+            m_nFrequency = nFrequency;
+        }
+
+        int GetFrequency()
+        {
+            return m_nFrequency;
+        }
+
+        void SetBeginTime(CTime_Value ttBegin)
+        {
+            m_ttBegin = ttBegin;
+        }
+
+        CTime_Value GetBeginTime()
+        {
+            return m_ttBegin;
+        }
+
+        //定时器执行函数
+        virtual void Run(CTime_Value& tvNow, void* pArg, EM_Timer_State& emState) = 0;
+
+        //定时器执行超时函数
+        //nLastRunTimerID 执行时间被占用的定时器ID
+        //nTimeoutTime 被占据的定时器时间长度
+        //vecTimoutList 被占用的定时器时段
+        virtual void Error(int nLastRunTimerID, int nTimeoutTime, std::vector<CTime_Value>& vecTimoutList, void* pArg) = 0;
+
+    private:
+        int         m_nTimerID;     //定时器ID
+        int         m_nFrequency;   //当前定时器时间间隔(ms)
+        CTime_Value m_ttBegin;      //当前定时器需要的开始时间
+    };
 
     class ITimerInfo
     {
@@ -61,7 +109,7 @@ namespace ts_timer
         ITimerInfo();
         virtual ~ITimerInfo();
 
-        void Set_Timer_Param(int nTimerID, int nFrequency, CTime_Value ttBegin, Timeout_Callback fn_Timeout_Callback, void* pArgContext, Timeout_Error_Callback fn_Timeout_Error_Callback);
+        void Set_Timer_Param(ITimeNode* pTimeNode, void* pArgContext);
 
         int Get_Timer_ID();
 
@@ -76,15 +124,12 @@ namespace ts_timer
         void Do_Error_Events(int nLastRunTimerID, int nTimeoutTime, std::vector<CTime_Value>& vecTimoutList);
 
     private:
-        int m_nTimerID;                                  //当前唯一的Timer标识
-        int m_nFrequency;                                //当前的操作频度(单位是毫秒)
         CTime_Value m_ttBeginTime;                       //开始定时器的时间
         CTime_Value m_ttLastRunTime;                     //上一次成功运行定时器的时间
         CTime_Value m_ttNextTime;                        //下一次运行的时间
 
-        Timeout_Callback       m_fn_Timeout_Callback;    //回调函数
-        Timeout_Error_Callback m_fn_Timeout_Error;       //回调定时器执行超时函数
-        void*                  m_pArgContext;            //回调函数上下文
+        ITimeNode*  m_pTimeNode;                         //定时器ID
+        void*       m_pArgContext;                       //回调函数上下文
     };
 
     //定时事件列表

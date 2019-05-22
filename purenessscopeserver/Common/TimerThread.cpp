@@ -227,26 +227,16 @@ void ts_timer::CTimerThread::Run()
 * pArgContext 任务到期执行的参数
 * fn_Timeout_Error_Callback 定时器没按时执行的报错事件，可以为空
 */
-bool ts_timer::CTimerThread::Add_Timer(int nTimerID, int nFrequency, CTime_Value* pttBegin, Timeout_Callback fn_Timeout_Callback, void* pArgContext, Timeout_Error_Callback fn_Timeout_Error_Callback)
+bool ts_timer::CTimerThread::Add_Timer(ITimeNode* pTimeNode, void* pArgContext)
 {
-    if (NULL == fn_Timeout_Callback)
+    if (NULL == pTimeNode)
     {
         return false;
     }
 
     ITimerInfo* pTimerInfo = new ITimerInfo();
 
-    if (NULL != pttBegin)
-    {
-        //有开始时间
-        pTimerInfo->Set_Timer_Param(nTimerID, nFrequency, *pttBegin, fn_Timeout_Callback, pArgContext, fn_Timeout_Error_Callback);
-    }
-    else
-    {
-        //从现在开始
-        CTime_Value ttBegin = GetTimeofDay();
-        pTimerInfo->Set_Timer_Param(nTimerID, nFrequency, ttBegin, fn_Timeout_Callback, pArgContext, fn_Timeout_Error_Callback);
-    }
+    pTimerInfo->Set_Timer_Param(pTimeNode, pArgContext);
 
     bool blRet = m_TimerInfoList.Add_Timer(pTimerInfo);
 

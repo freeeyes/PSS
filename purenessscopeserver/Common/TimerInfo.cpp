@@ -1,12 +1,10 @@
 #include "TimerInfo.h"
 
-ts_timer::ITimerInfo::ITimerInfo() : m_nTimerID(-1), m_nFrequency(-1)
+ts_timer::ITimerInfo::ITimerInfo() : m_pTimeNode(NULL), m_pArgContext(NULL)
 {
     //初始化时间
     m_ttBeginTime.Set_time(0, 0);
-    m_ttLastRunTime.Set_time(0, 0);
-    m_fn_Timeout_Error    = NULL;
-    m_fn_Timeout_Callback = NULL;
+    m_ttLastRunTime.Set_time(0, 0);;
 }
 
 ts_timer::ITimerInfo::~ITimerInfo()
@@ -14,32 +12,47 @@ ts_timer::ITimerInfo::~ITimerInfo()
 
 }
 
-void ts_timer::ITimerInfo::Set_Timer_Param(int nTimerID, int nFrequency, CTime_Value ttBegin, Timeout_Callback fn_Timeout_Callback, void* pArgContext, Timeout_Error_Callback fn_Timeout_Error_Callback)
+void ts_timer::ITimerInfo::Set_Timer_Param(ITimeNode* pTimeNode, void* pArgContext)
 {
-    m_nTimerID            = nTimerID;
-    m_nFrequency          = nFrequency;
-    m_ttBeginTime         = ttBegin;
-    m_fn_Timeout_Callback = fn_Timeout_Callback;
+    m_pTimeNode           = pTimeNode;
     m_pArgContext         = pArgContext;
-    m_fn_Timeout_Error    = fn_Timeout_Error_Callback;
 }
 
 int ts_timer::ITimerInfo::Get_Timer_ID()
 {
-    return m_nTimerID;
+    if(NULL != m_pTimeNode)
+    {
+        return m_pTimeNode->GetTimerID();
+    }
+    else
+    {
+        return -1;
+    }
 }
 
 int ts_timer::ITimerInfo::Get_Timer_Frequency()
 {
-    return m_nFrequency;
+    if (NULL != m_pTimeNode)
+    {
+        return m_pTimeNode->GetFrequency();
+    }
+    else
+    {
+        return -1;
+    }
 }
 
 int ts_timer::ITimerInfo::Get_Next_Timer(CTime_Value ttNow, bool blState)
 {
     CTime_Value ttInterval;
 
-    int nSeconds = m_nFrequency / 1000;
-    int nUseconds = (m_nFrequency % 1000) * 1000;
+    if (NULL == m_pTimeNode)
+    {
+        return -1;
+    }
+
+    int nSeconds = m_pTimeNode->GetFrequency() / 1000;
+    int nUseconds = (m_pTimeNode->GetFrequency() % 1000) * 1000;
 
     if (m_ttLastRunTime.IsZero() == true && m_ttNextTime.IsZero() == true)
     {
@@ -92,23 +105,26 @@ ts_timer::EM_Timer_State ts_timer::ITimerInfo::Do_Timer_Event(ts_timer::CTime_Va
 
     //执行回调函数
     EM_Timer_State emState = TIMER_STATE_OK;
-    m_fn_Timeout_Callback(Get_Timer_ID(), obj_Now, m_pArgContext, emState);
 
+    if (NULL != m_pTimeNode)
+    {
+        m_pTimeNode->Run(obj_Now, m_pArgContext, emState);
 
-    //设置下次运行时间
-    int nSeconds = m_nFrequency / 1000;
-    int nUseconds = (m_nFrequency % 1000) * 1000;
+        //设置下次运行时间
+        int nSeconds = m_pTimeNode->GetFrequency() / 1000;
+        int nUseconds = (m_pTimeNode->GetFrequency() % 1000) * 1000;
 
-    m_ttNextTime = m_ttNextTime + CTime_Value(nSeconds, nUseconds);
+        m_ttNextTime = m_ttNextTime + CTime_Value(nSeconds, nUseconds);
+    }
 
     return emState;
 }
 
 void ts_timer::ITimerInfo::Do_Error_Events(int nLastRunTimerID, int nTimeoutTime, std::vector<CTime_Value>& vecTimoutList)
 {
-    if (NULL != m_fn_Timeout_Error)
+    if (NULL != m_pTimeNode)
     {
-        m_fn_Timeout_Error(nLastRunTimerID, nTimeoutTime, Get_Timer_ID(), vecTimoutList, m_pArgContext);
+        m_pTimeNode->Error(nLastRunTimerID, nTimeoutTime, vecTimoutList, m_pArgContext);
     }
 }
 
