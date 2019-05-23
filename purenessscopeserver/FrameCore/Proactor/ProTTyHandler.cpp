@@ -1,6 +1,6 @@
 #include "ProTTyHandler.h"
 
-CProTTyHandler::CProTTyHandler() : m_blState(false), m_blPause(false), m_pTTyMessage(NULL)
+CProTTyHandler::CProTTyHandler() : m_blState(false), m_blPause(false), m_pTTyMessage(NULL), m_emDispose(CONNECT_IO_PLUGIN), m_u4PacketParseInfoID(0)
 {
     m_szName[0] = 0;
     m_pmbReadBuff = new ACE_Message_Block(MAX_BUFF_1024);
@@ -67,12 +67,14 @@ void CProTTyHandler::Close()
     }
 }
 
-bool CProTTyHandler::Init(uint32 u4ConnectID, const char* pName, ACE_TTY_IO::Serial_Params inParams, ITTyMessage* pTTyMessage)
+bool CProTTyHandler::Init(uint32 u4ConnectID, const char* pName, ACE_TTY_IO::Serial_Params inParams, ITTyMessage* pTTyMessage, EM_CONNECT_IO_DISPOSE emDispose, uint32 u4PacketParseInfoID)
 {
     m_u4ConnectID = u4ConnectID;
     sprintf_safe(m_szName, MAX_BUFF_100, "%s", pName);
-    m_pTTyMessage = pTTyMessage;
-    m_ObjParams   = inParams;
+    m_pTTyMessage         = pTTyMessage;
+    m_ObjParams           = inParams;
+    m_emDispose           = emDispose;
+    m_u4PacketParseInfoID = u4PacketParseInfoID;
 
     //初始化连接设备
     ConnectTTy();
@@ -126,8 +128,45 @@ void CProTTyHandler::handle_read_file(const ACE_Asynch_Read_File::Result& result
 
     if (NULL != m_pTTyMessage && false == m_blPause)
     {
-        //回调接收数据函数
-        m_pTTyMessage->RecvData(m_u4ConnectID, mb.rd_ptr(), (uint32)result.bytes_transferred());
+        if (CONNECT_IO_PLUGIN == m_emDispose)
+        {
+            //回调接收数据函数
+            m_pTTyMessage->RecvData(m_u4ConnectID, mb.rd_ptr(), (uint32)result.bytes_transferred());
+        }
+        else
+        {
+            //调用框架的函数处理
+            _Packet_Parse_Info* pPacketParse = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID);
+
+            if (NULL != pPacketParse)
+            {
+                _Packet_Info obj_Packet_Info;
+                uint8 n1Ret = pPacketParse->Parse_Packet_Stream(m_u4ConnectID,
+                              &mb,
+                              dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()),
+                              &obj_Packet_Info,
+                              CONNECT_IO_TTY);
+
+                if (PACKET_GET_ENOUGTH == n1Ret)
+                {
+                    //发送消息给消息框架
+                    CPacketParse* pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
+                    pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
+                    pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);
+                    pPacketParse->SetPacket_CommandID(obj_Packet_Info.m_u2PacketCommandID);
+                    pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4HeadSrcLen);
+                    pPacketParse->SetPacket_Head_Curr_Length(obj_Packet_Info.m_u4HeadCurrLen);
+                    pPacketParse->SetPacket_Body_Src_Length(obj_Packet_Info.m_u4BodySrcLen);
+                    pPacketParse->SetPacket_Body_Curr_Length(obj_Packet_Info.m_u4BodyCurrLen);
+
+                    ACE_INET_Addr m_addrRemote;
+                    Send_MakePacket_Queue(m_u4ConnectID, m_u4PacketParseInfoID, pPacketParse, PACKET_PARSE, m_addrRemote, "TTy", 0);
+
+                    //清理用完的m_pPacketParse
+                    App_PacketParsePool::instance()->Delete(pPacketParse);
+                }
+            }
+        }
     }
 
     Ready_To_Read_Buff();

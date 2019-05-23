@@ -141,10 +141,6 @@ public:
     {
         return m_pUDPConnectManager;
     }
-    ActiveTimer*           GetTimerManager()
-    {
-        return m_pTimerManager;
-    }
     IModuleMessageManager* GetModuleMessageManager()
     {
         return m_pModuleMessageManager;
