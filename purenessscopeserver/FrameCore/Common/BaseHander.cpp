@@ -60,7 +60,7 @@ bool Udp_Common_Send_Message(_Send_Message_Param obj_Send_Message_Param, ACE_INE
 bool Udp_Common_Recv_Head(ACE_Message_Block* pMBHead, CPacketParse* pPacketParse, uint32 u4PacketParseInfoID, uint32 u4Len)
 {
     _Head_Info obj_Head_Info;
-    bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Parse_Packet_Head_Info(0, pMBHead, App_MessageBlockManager::instance(), &obj_Head_Info);
+    bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Parse_Packet_Head_Info(0, pMBHead, App_MessageBlockManager::instance(), &obj_Head_Info, CONNECT_IO_UDP);
 
     if (false == blStateHead)
     {
@@ -86,7 +86,7 @@ bool Udp_Common_Recv_Head(ACE_Message_Block* pMBHead, CPacketParse* pPacketParse
 bool Udp_Common_Recv_Body(ACE_Message_Block* pMBBody, CPacketParse* pPacketParse, uint32 u4PacketParseInfoID)
 {
     _Body_Info obj_Body_Info;
-    bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Parse_Packet_Body_Info(0, pMBBody, App_MessageBlockManager::instance(), &obj_Body_Info);
+    bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Parse_Packet_Body_Info(0, pMBBody, App_MessageBlockManager::instance(), &obj_Body_Info, CONNECT_IO_UDP);
 
     if (false == blStateBody)
     {
@@ -106,7 +106,7 @@ bool Udp_Common_Recv_Stream(ACE_Message_Block* pMbData, CPacketParse* pPacketPar
     //以数据流处理
     _Packet_Info obj_Packet_Info;
 
-    if (PACKET_GET_ENOUGTH == App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Parse_Packet_Stream(0, pMbData, App_MessageBlockManager::instance(), &obj_Packet_Info))
+    if (PACKET_GET_ENOUGTH == App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Parse_Packet_Stream(0, pMbData, App_MessageBlockManager::instance(), &obj_Packet_Info, CONNECT_IO_UDP))
     {
         pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
         pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);
@@ -174,7 +174,7 @@ void Tcp_Common_Send_Message_Error(bool blDelete, IBuffPacket* pBuffPacket)
 uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPacketParse* pPacketParse, uint32 u4PacketParseInfoID)
 {
     _Packet_Info obj_Packet_Info;
-    uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Parse_Packet_Stream(u4ConnectID, pMbData, dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info);
+    uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Parse_Packet_Stream(u4ConnectID, pMbData, dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info, CONNECT_IO_UDP);
 
     if (PACKET_GET_ENOUGTH == n1Ret)
     {

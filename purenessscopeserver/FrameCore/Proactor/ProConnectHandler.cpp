@@ -289,7 +289,7 @@ int CProConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Siz
 
         //解析消息头
         _Head_Info objHeadInfo;
-        bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Head_Info(GetConnectID(), pMbHead, App_MessageBlockManager::instance(), &objHeadInfo);
+        bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Head_Info(GetConnectID(), pMbHead, App_MessageBlockManager::instance(), &objHeadInfo, CONNECT_IO_TCP);
 
         if (false == blStateHead)
         {
@@ -318,7 +318,11 @@ int CProConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Siz
 
         //解析数据包体
         _Body_Info obj_Body_Info;
-        bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Body_Info(GetConnectID(), pMbBody, App_MessageBlockManager::instance(), &obj_Body_Info);
+        bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Body_Info(GetConnectID(),
+                           pMbBody,
+                           App_MessageBlockManager::instance(),
+                           &obj_Body_Info,
+                           CONNECT_IO_TCP);
 
         if (false == blStateBody)
         {
@@ -360,7 +364,7 @@ int CProConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Siz
         memcpy_safe((char*)pData, u4Size, pMbStream->wr_ptr(), u4Size);
 
         _Packet_Info obj_Packet_Info;
-        uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Stream(GetConnectID(), pMbStream, dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info);
+        uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Stream(GetConnectID(), pMbStream, dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info, CONNECT_IO_TCP);
 
         if (PACKET_GET_ENOUGTH == n1Ret)
         {
@@ -926,7 +930,7 @@ int CProConnectHandler::Dispose_Paceket_Parse_Head(ACE_Message_Block* pmb)
     //判断头的合法性
     _Head_Info objHeadInfo;
 
-    bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Head_Info(GetConnectID(), pmb, App_MessageBlockManager::instance(), &objHeadInfo);
+    bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Head_Info(GetConnectID(), pmb, App_MessageBlockManager::instance(), &objHeadInfo, CONNECT_IO_TCP);
 
     if (false == blStateHead)
     {
@@ -1011,7 +1015,11 @@ int CProConnectHandler::Dispose_Paceket_Parse_Body(ACE_Message_Block* pmb)
 {
     //接受完整数据完成，开始分析完整数据包
     _Body_Info obj_Body_Info;
-    bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Body_Info(GetConnectID(), pmb, App_MessageBlockManager::instance(), &obj_Body_Info);
+    bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Body_Info(GetConnectID(),
+                       pmb,
+                       App_MessageBlockManager::instance(),
+                       &obj_Body_Info,
+                       CONNECT_IO_TCP);
 
     if (false == blStateBody)
     {

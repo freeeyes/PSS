@@ -217,6 +217,24 @@ static bool Convert_Version(int nTagVserion)
 #define OUTPUT_CHART_JSON "{\"title\": {\"text\": \"%s\"},\"tooltip\" : {}, \
 \"legend\" : {\"data\":[\"time\"]},\"xAxis\" : %s,\"yAxis\" : {\"type\":\"value\"}, \"series\": [%s]}"
 
+//连接的性质类型
+enum EM_CONNECT_IO_TYPE
+{
+    CONNECT_IO_TCP = 0,      //IO是TCP
+    CONNECT_IO_UDP,          //IO是UDP
+    CONNECT_IO_TTY,          //IO是TTY
+    CONNECT_IO_SERVER_TCP,   //IO是服务期间连接TCP
+    CONNECT_IO_SERVER_UDP    //IO是服务期间连接UDP
+};
+
+//服务器间通讯和TTy通讯的处理模式，可以选择是框架处理还是业务处理
+enum EM_CONNECT_IO_DISPOSE
+{
+    CONNECT_IO_FRAME = 0,     //框架PacketParse处理
+    CONNECT_IO_PLUGIN         //插件自己处理
+};
+
+//UDP的播放模式
 enum EM_UDP_TYPE
 {
     UDP_SINGLE = 0,        //UDP单独连接
@@ -807,7 +825,7 @@ typedef  struct _VCHARS_STR
             if(type == VCHARS_TYPE_TEXT)
             {
                 //文本模式
-				uint32 ulen = u1Length + 1;
+                uint32 ulen = u1Length + 1;
                 text = new char[ulen];
 
                 if (false == memcpy_safe((char*)pData, u1Length, text, u1Length))
@@ -886,7 +904,7 @@ typedef  struct _VCHARM_STR
             if(type == VCHARS_TYPE_TEXT)
             {
                 //文本模式
-				uint32 ulen = u2Length + 1;
+                uint32 ulen = u2Length + 1;
                 text = new char[ulen];
 
                 if (false == memcpy_safe((char*)pData, u2Length, text, u2Length))
@@ -1380,7 +1398,7 @@ public:
     void TimeEnd()
     {
         m_lEnd = GetSystemTickCount();
-		uint64 lTimeInterval = m_lEnd - m_lBegin;  //转换成毫秒
+        uint64 lTimeInterval = m_lEnd - m_lBegin;  //转换成毫秒
 
         if(lTimeInterval >= (long)m_nMillionSecond)
         {
@@ -1403,26 +1421,26 @@ public:
     }
 
 private:
-	int64 GetSystemTickCount()
+    int64 GetSystemTickCount()
     {
 #if PSS_PLATFORM == PLATFORM_WIN
         //return (unsigned long)GetTickCount();
-		static LARGE_INTEGER TicksPerSecond = { 0 };
-		LARGE_INTEGER Tick;
+        static LARGE_INTEGER TicksPerSecond = { 0 };
+        LARGE_INTEGER Tick;
 
-		if (!TicksPerSecond.QuadPart)
-		{
-			QueryPerformanceFrequency(&TicksPerSecond);
-		}
+        if (!TicksPerSecond.QuadPart)
+        {
+            QueryPerformanceFrequency(&TicksPerSecond);
+        }
 
-		QueryPerformanceCounter(&Tick);
+        QueryPerformanceCounter(&Tick);
 
-		int64 Seconds = Tick.QuadPart / TicksPerSecond.QuadPart;
-		int64 LeftPart = Tick.QuadPart - (TicksPerSecond.QuadPart * Seconds);
-		int64 MillSeconds = LeftPart * 1000 / TicksPerSecond.QuadPart;
-		int64 Ret = Seconds * 1000 + MillSeconds;
-		_ASSERT(Ret > 0);
-		return Ret;
+        int64 Seconds = Tick.QuadPart / TicksPerSecond.QuadPart;
+        int64 LeftPart = Tick.QuadPart - (TicksPerSecond.QuadPart * Seconds);
+        int64 MillSeconds = LeftPart * 1000 / TicksPerSecond.QuadPart;
+        int64 Ret = Seconds * 1000 + MillSeconds;
+        _ASSERT(Ret > 0);
+        return Ret;
 #else
         struct timespec ts;
 
@@ -1433,8 +1451,8 @@ private:
     }
 
 private:
-	int64       m_lBegin;
-	int64       m_lEnd;
+    int64       m_lBegin;
+    int64       m_lEnd;
     int32        m_nFileLine;
     uint32       m_nMillionSecond;
     char         m_szFunctionName[MAX_BUFF_100];

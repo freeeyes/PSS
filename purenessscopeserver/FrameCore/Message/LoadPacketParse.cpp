@@ -47,7 +47,7 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
         return false;
     }
 
-    pPacketParseInfo->Parse_Packet_Head_Info = (bool(*)(uint32, ACE_Message_Block*, IMessageBlockManager*, _Head_Info*))ACE_OS::dlsym(pPacketParseInfo->m_hModule, "Parse_Packet_Head_Info");
+    pPacketParseInfo->Parse_Packet_Head_Info = (bool(*)(uint32, ACE_Message_Block*, IMessageBlockManager*, _Head_Info*, EM_CONNECT_IO_TYPE))ACE_OS::dlsym(pPacketParseInfo->m_hModule, "Parse_Packet_Head_Info");
 
     if(NULL == pPacketParseInfo->m_hModule || !pPacketParseInfo->Parse_Packet_Head_Info)
     {
@@ -58,7 +58,7 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
         return false;
     }
 
-    pPacketParseInfo->Parse_Packet_Body_Info = (bool(*)(uint32, ACE_Message_Block*, IMessageBlockManager*, _Body_Info*))ACE_OS::dlsym(pPacketParseInfo->m_hModule, "Parse_Packet_Body_Info");
+    pPacketParseInfo->Parse_Packet_Body_Info = (bool(*)(uint32, ACE_Message_Block*, IMessageBlockManager*, _Body_Info*, EM_CONNECT_IO_TYPE))ACE_OS::dlsym(pPacketParseInfo->m_hModule, "Parse_Packet_Body_Info");
 
     if(NULL == pPacketParseInfo->m_hModule || !pPacketParseInfo->Parse_Packet_Body_Info)
     {
@@ -69,7 +69,7 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
         return false;
     }
 
-    pPacketParseInfo->Parse_Packet_Stream = (uint8(*)(uint32, ACE_Message_Block*, IMessageBlockManager*, _Packet_Info*))ACE_OS::dlsym(pPacketParseInfo->m_hModule, "Parse_Packet_Stream");
+    pPacketParseInfo->Parse_Packet_Stream = (uint8(*)(uint32, ACE_Message_Block*, IMessageBlockManager*, _Packet_Info*, EM_CONNECT_IO_TYPE))ACE_OS::dlsym(pPacketParseInfo->m_hModule, "Parse_Packet_Stream");
 
     if(NULL == pPacketParseInfo->m_hModule || !pPacketParseInfo->Parse_Packet_Stream)
     {

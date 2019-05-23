@@ -238,7 +238,7 @@ CPassTCPDlg::CPassTCPDlg(wxWindow* parent,wxWindowID id)
     Choice_SendBuffStyle = new wxChoice(Panel1, ID_CHOICE1, wxPoint(560,308), wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE1"));
     Choice_SendBuffStyle->SetSelection( Choice_SendBuffStyle->Append(wxT("二进制模式")) );
     Choice_SendBuffStyle->Append(wxT("文本模式"));
-    TextCtrl_SendText = new wxTextCtrl(Panel1, ID_TEXTCTRL22, wxEmptyString, wxPoint(448,336), wxSize(288,152), wxTE_MULTILINE, wxDefaultValidator, _T("ID_TEXTCTRL22"));
+    TextCtrl_SendText = new wxTextCtrl(Panel1, ID_TEXTCTRL22, wxT("01 00 00 10 08 00 00 00 46 45 45 45 45 59 45 53 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 be cd aa 8f 3c 01 00 00"), wxPoint(448,336), wxSize(288,152), wxTE_MULTILINE, wxDefaultValidator, _T("ID_TEXTCTRL22"));
     DirDialog_Lua = new wxDirDialog(this, wxT("打开目录"), wxEmptyString, wxDD_DEFAULT_STYLE|wxDD_DIR_MUST_EXIST|wxDD_CHANGE_DIR, wxDefaultPosition, wxDefaultSize, _T("wxDirDialog"));
     Timer_Test.SetOwner(this, ID_TIMER_Test);
     Timer_Test.Start(1000, false);

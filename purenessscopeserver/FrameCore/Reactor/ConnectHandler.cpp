@@ -619,7 +619,7 @@ int CConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Size, 
 
         //解析消息头
         _Head_Info objHeadInfo;
-        bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Head_Info(GetConnectID(), pMbHead, App_MessageBlockManager::instance(), &objHeadInfo);
+        bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Head_Info(GetConnectID(), pMbHead, App_MessageBlockManager::instance(), &objHeadInfo, CONNECT_IO_TCP);
 
         if (false == blStateHead)
         {
@@ -642,7 +642,7 @@ int CConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Size, 
 
         //解析数据包体
         _Body_Info obj_Body_Info;
-        bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Body_Info(GetConnectID(), pMbBody, App_MessageBlockManager::instance(), &obj_Body_Info);
+        bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Body_Info(GetConnectID(), pMbBody, App_MessageBlockManager::instance(), &obj_Body_Info, CONNECT_IO_TCP);
 
         if (false == blStateBody)
         {
@@ -1008,7 +1008,7 @@ void CConnectHandler::Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType
 int CConnectHandler::Dispose_Paceket_Parse_Head()
 {
     _Head_Info objHeadInfo;
-    bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Head_Info(GetConnectID(), m_pCurrMessage, App_MessageBlockManager::instance(), &objHeadInfo);
+    bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Head_Info(GetConnectID(), m_pCurrMessage, App_MessageBlockManager::instance(), &objHeadInfo, CONNECT_IO_TCP);
 
     if (false == blStateHead)
     {
@@ -1097,7 +1097,7 @@ int CConnectHandler::Dispose_Paceket_Parse_Head()
 int CConnectHandler::Dispose_Paceket_Parse_Body()
 {
     _Body_Info obj_Body_Info;
-    bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Body_Info(GetConnectID(), m_pCurrMessage, App_MessageBlockManager::instance(), &obj_Body_Info);
+    bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Body_Info(GetConnectID(), m_pCurrMessage, App_MessageBlockManager::instance(), &obj_Body_Info, CONNECT_IO_TCP);
 
     if (false == blStateBody)
     {
