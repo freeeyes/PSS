@@ -428,6 +428,8 @@ void CPassTCPDlg::OnButton_StatTestClick(wxCommandEvent& event)
             {
                 if(emType != ENUM_PROTOCOL_WEBSOCKET)
                 {
+                    nDecLen = strlen(pSendData);
+
                     //如果是二进制模式
                     CConvertBuffer objConvertBuffer;
                     //获得要转换的数据块大小
