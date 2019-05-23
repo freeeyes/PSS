@@ -1,0 +1,297 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#ifndef APSTUDIO_INVOKED
+#include "targetver.h"
+#endif
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 中文(中华人民共和国) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#ifndef APSTUDIO_INVOKED\r\n"
+    "#include ""targetver.h""\r\n"
+    "#endif\r\n"
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
+    "LANGUAGE 4, 2\r\n"
+    "#pragma code_page(936)\r\n"
+    "#include ""res\\PassTCP.rc2""  // ??è? Microsoft Visual C++ ?¨¤?§?è?-|¨???¨￠?§o???\r\n"
+    "#include ""l.CHS\\afxres.rc""      // ?¨¤?§o?¨￠??¨￠?§|?t\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\PassTCP.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "关于 PassTCP"
+FONT 9, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,14,14,20,20
+    LTEXT           "PassTCP，1.0 版，压力测试工具",IDC_STATIC,42,14,114,8,SS_NOPREFIX
+    LTEXT           "Copyright freeeeyes (C) 2013",IDC_STATIC,42,26,114,8
+    DEFPUSHBUTTON   "确定",IDOK,113,41,50,14,WS_GROUP
+END
+
+IDD_PASSTCP_DIALOG DIALOGEX 0, 0, 427, 292
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "TCP压力测试通用工具"
+FONT 9, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    GROUPBOX        "参数配置",IDC_STATIC,7,7,413,156
+    GROUPBOX        "压力测试参数",IDC_STATIC,7,166,413,119
+    LTEXT           "服务器IP",IDC_STATIC,15,19,28,8
+    EDITTEXT        IDC_EDIT1,44,16,88,14,ES_AUTOHSCROLL
+    LTEXT           "服务器端口",IDC_STATIC,141,19,35,8
+    EDITTEXT        IDC_EDIT2,182,16,36,14,ES_AUTOHSCROLL
+    LTEXT           "压测线程数",IDC_STATIC,15,36,35,8
+    EDITTEXT        IDC_EDIT3,53,33,78,14,ES_AUTOHSCROLL
+    LTEXT           "连接间延迟毫秒",IDC_STATIC,15,53,49,8
+    EDITTEXT        IDC_EDIT4,68,51,36,14,ES_AUTOHSCROLL
+    CONTROL         "是否开启长连接",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,235,18,64,10
+    CONTROL         "是否接收应答包",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,235,33,64,10
+    CONTROL         "是否开启随机延时",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,301,19,71,10
+    CONTROL         "是否开启断线自动重连",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,301,34,85,10
+    PUSHBUTTON      "开始压测",IDC_BUTTON1,14,147,50,14
+    PUSHBUTTON      "停止压测",IDC_BUTTON2,73,147,50,14
+    PUSHBUTTON      "导出压测数据文档",IDC_BUTTON3,132,147,71,14
+    LTEXT           "压测发送二进制串",IDC_STATIC,190,177,56,8
+    LTEXT           "连接成功数",IDC_STATIC,14,182,35,8
+    EDITTEXT        IDC_EDIT6,53,179,42,14,ES_AUTOHSCROLL
+    LTEXT           "发送成功数",IDC_STATIC,14,196,35,8
+    EDITTEXT        IDC_EDIT7,53,194,42,14,ES_AUTOHSCROLL
+    LTEXT           "接收成功数",IDC_STATIC,14,211,35,8
+    EDITTEXT        IDC_EDIT8,53,209,42,14,ES_AUTOHSCROLL
+    LTEXT           "当前连接数",IDC_STATIC,14,227,35,8
+    EDITTEXT        IDC_EDIT9,53,224,42,14,ES_AUTOHSCROLL
+    LTEXT           "连接失败数",IDC_STATIC,101,182,35,8
+    EDITTEXT        IDC_EDIT10,140,179,42,14,ES_AUTOHSCROLL
+    LTEXT           "发送失败数",IDC_STATIC,101,196,35,8
+    EDITTEXT        IDC_EDIT11,140,194,42,14,ES_AUTOHSCROLL
+    LTEXT           "接收失败数",IDC_STATIC,101,211,35,8
+    EDITTEXT        IDC_EDIT12,140,209,42,14,ES_AUTOHSCROLL
+    LTEXT           "接收超时秒数",IDC_STATIC,137,36,42,8
+    EDITTEXT        IDC_EDIT13,182,33,36,14,ES_AUTOHSCROLL
+    LTEXT           "接收字节限定",IDC_STATIC,137,53,42,8
+    EDITTEXT        IDC_EDIT14,182,50,36,14,ES_AUTOHSCROLL
+    CONTROL         "是否启用随机数据包数(随机1-10个数据包)",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,235,48,146,10
+    CONTROL         "是否记录数据日志",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,235,63,66,10
+    CONTROL         "只发送一个包",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,301,63,57,10
+    CONTROL         "TCP链接",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,235,78,37,10
+    CONTROL         "UDP链接",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,279,78,43,10
+    CONTROL         "WebSocket连接",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,324,79,64,10
+    LTEXT           "UDP接收端口",IDC_STATIC,137,69,42,8
+    EDITTEXT        IDC_EDIT15,182,67,36,14,ES_AUTOHSCROLL
+    LTEXT           "数据包间隔",IDC_STATIC,21,69,35,8
+    EDITTEXT        IDC_EDIT16,68,67,36,14,ES_AUTOHSCROLL
+    LTEXT           "发送字节数",IDC_STATIC,16,266,35,8
+    EDITTEXT        IDC_EDIT17,55,264,42,14,ES_AUTOHSCROLL
+    LTEXT           "接收字节数",IDC_STATIC,100,266,35,8
+    EDITTEXT        IDC_EDIT18,139,264,42,14,ES_AUTOHSCROLL
+    COMBOBOX        IDC_COMBO1,253,175,69,55,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "",IDC_RICHEDIT21,"RichEdit20W",ES_MULTILINE | ES_AUTOHSCROLL | WS_BORDER | WS_HSCROLL | WS_TABSTOP,189,192,222,85
+    GROUPBOX        "高级模式(LUA文件控制模式)",IDC_STATIC,14,95,398,50
+    EDITTEXT        IDC_EDIT19,74,107,330,14,ES_AUTOHSCROLL
+    LTEXT           "Lua控制文件路径",IDC_STATIC,20,109,55,8
+    PUSHBUTTON      "打开文件夹",IDC_BUTTON4,75,126,50,14
+    CONTROL         "启用高级模式",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,127,52,10
+    LTEXT           "设置发包总数，如果无限设置成0",IDC_STATIC,14,84,107,8
+    EDITTEXT        IDC_EDIT20,123,83,96,14,ES_AUTOHSCROLL
+    LTEXT           "最小响应时间",IDC_STATIC,14,241,42,8
+    EDITTEXT        IDC_EDIT21,57,239,38,14,ES_AUTOHSCROLL
+    LTEXT           "最大响应时间",IDC_STATIC,100,241,42,8
+    EDITTEXT        IDC_EDIT22,143,239,38,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "设置随机数据包序列",IDC_BUTTON5,209,147,71,14
+END
+
+IDD_PACKET_DIALOG DIALOGEX 0, 0, 384, 237
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "顺序据包设置"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "添加数据包",IDC_STATIC,7,7,370,122
+    LTEXT           "NOTE：添加数据包，其中随机数字的部分请用%d来替代，目前只支持文本协议，未来考虑二进制协议的支持，所有的回车换行请用/r/n明文写出，程序会 自动替换这这些字符。二进制数据包暂不支持随机替换.\r\n如果发送文本数据包样例格式为:GET / HTTP/1.1\\r\\nAccept: */*\\r\\nAccept-Language: zh-cn\\r\\n\\r\\n\r\n文本数据包格式为:0a 00 00 00 00 10 be cd aa 8f 3c 01 00 00",IDC_STATIC,16,18,353,51
+    LTEXT           "数据包",IDC_STATIC,17,79,25,8
+    EDITTEXT        IDC_EDIT1,47,78,322,29,ES_MULTILINE | ES_AUTOHSCROLL
+    PUSHBUTTON      "添加数据包",IDC_BUTTON1,15,111,50,14
+    GROUPBOX        "压测数据包信息",IDC_STATIC,7,131,370,99
+    LISTBOX         IDC_LIST1,15,144,177,70,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LISTBOX         IDC_LIST2,202,144,166,70,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "保存成文件",IDC_BUTTON2,14,214,61,14
+    PUSHBUTTON      "预览发送结果",IDC_BUTTON3,201,214,70,14
+    PUSHBUTTON      "删除条目",IDC_BUTTON4,130,214,63,14
+    EDITTEXT        IDC_EDIT2,326,111,41,14,ES_AUTOHSCROLL
+    LTEXT           "接收字节数",IDC_STATIC,276,113,44,8
+    CONTROL         "二进制数据包",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,77,114,64,10
+    CONTROL         "文本数据包",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,144,114,56,10
+    PUSHBUTTON      "设置完成",IDC_BUTTON5,319,214,50,14
+    PUSHBUTTON      "打开文件",IDC_BUTTON6,77,214,51,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080403a8"
+        BEGIN
+            VALUE "CompanyName", "TODO: <公司名>"
+            VALUE "FileDescription", "TODO: <文件说明>"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "PassTCP.exe"
+            VALUE "LegalCopyright", "TODO: (C) <公司名>。保留所有权利。"
+            VALUE "OriginalFilename", "PassTCP.exe"
+            VALUE "ProductName", "TODO: <产品名>"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x804, 936
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 163
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 55
+    END
+
+    IDD_PASSTCP_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 420
+        VERTGUIDE, 140
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 285
+    END
+
+    IDD_PACKET_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 377
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 230
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "关于 PassTCP(&A)..."
+END
+
+#endif    // 中文(中华人民共和国) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+LANGUAGE 4, 2
+#pragma code_page(936)
+#include "res\PassTCP.rc2"  // ??è? Microsoft Visual C++ ?¨¤?§?è?-|¨???¨￠?§o???
+#include "l.CHS\afxres.rc"      // ?¨¤?§o?¨￠??¨￠?§|?t
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
