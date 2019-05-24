@@ -1,4 +1,4 @@
-#include "LogicThreadManager.h"
+#include "MessageQueueManager.h"
 
 CLogicThreadMessagePool::CLogicThreadMessagePool()
 {
@@ -277,16 +277,16 @@ bool CLogicThread::Dispose_Queue()
     }
 }
 
-CLogicThreadManager::CLogicThreadManager()
+CMessageQueueManager::CMessageQueueManager()
 {
     m_u4TimerID = 0;
 }
 
-CLogicThreadManager::~CLogicThreadManager()
+CMessageQueueManager::~CMessageQueueManager()
 {
 }
 
-int CLogicThreadManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
+int CMessageQueueManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWriteLock);
     ACE_UNUSED_ARG(arg);
@@ -303,7 +303,7 @@ int CLogicThreadManager::handle_timeout(const ACE_Time_Value& tv, const void* ar
     return 0;
 }
 
-void CLogicThreadManager::Init()
+void CMessageQueueManager::Init()
 {
     //³õÊ¼»¯Hash±í
     m_objThreadInfoList.Init(LOGICTHREAD_MAX_COUNT);
@@ -313,7 +313,7 @@ void CLogicThreadManager::Init()
     m_u4TimerID = App_TimerManager::instance()->schedule(this, NULL, ACE_OS::gettimeofday() + ACE_Time_Value(MAX_MSG_STARTTIME), ACE_Time_Value(MAX_MSG_TIMEDELAYTIME));
 }
 
-void CLogicThreadManager::Close()
+void CMessageQueueManager::Close()
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWriteLock);
 
@@ -340,7 +340,7 @@ void CLogicThreadManager::Close()
     vecLogicThreadList.clear();
 }
 
-int CLogicThreadManager::CreateLogicThread(int nLogicThreadID, int nTimeout, ILogicQueue* pLogicQueue)
+int CMessageQueueManager::CreateLogicThread(int nLogicThreadID, int nTimeout, ILogicQueue* pLogicQueue)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWriteLock);
 
@@ -348,7 +348,7 @@ int CLogicThreadManager::CreateLogicThread(int nLogicThreadID, int nTimeout, ILo
 
     if (NULL != pLogicThread)
     {
-        OUR_DEBUG((LM_INFO, "[CLogicThreadManager::CreateLogicThread]Create logic thread id(%d) is exist.\n", nLogicThreadID));
+        OUR_DEBUG((LM_INFO, "[CMessageQueueManager::CreateLogicThread]Create logic thread id(%d) is exist.\n", nLogicThreadID));
         return -1;
     }
 
@@ -363,7 +363,7 @@ int CLogicThreadManager::CreateLogicThread(int nLogicThreadID, int nTimeout, ILo
 
     if (false == pLogicThread->Start())
     {
-        OUR_DEBUG((LM_INFO, "[CLogicThreadManager::CreateLogicThread]nLogicThreadID=%d Start error.\n", nLogicThreadID));
+        OUR_DEBUG((LM_INFO, "[CMessageQueueManager::CreateLogicThread]nLogicThreadID=%d Start error.\n", nLogicThreadID));
         SAFE_DELETE(pLogicThreadInfo);
         SAFE_DELETE(pLogicThread);
         return -1;
@@ -371,7 +371,7 @@ int CLogicThreadManager::CreateLogicThread(int nLogicThreadID, int nTimeout, ILo
 
     if (0 > m_objThreadInfoList.Add_Hash_Data_By_Key_Unit32(nLogicThreadID, pLogicThread))
     {
-        OUR_DEBUG((LM_INFO, "[CLogicThreadManager::CreateLogicThread]nLogicThreadID=%d add error.\n", nLogicThreadID));
+        OUR_DEBUG((LM_INFO, "[CMessageQueueManager::CreateLogicThread]nLogicThreadID=%d add error.\n", nLogicThreadID));
         SAFE_DELETE(pLogicThreadInfo);
         SAFE_DELETE(pLogicThread);
         return -1;
@@ -380,7 +380,7 @@ int CLogicThreadManager::CreateLogicThread(int nLogicThreadID, int nTimeout, ILo
     return 0;
 }
 
-int CLogicThreadManager::KillLogicThread(int nLogicThreadID)
+int CMessageQueueManager::KillLogicThread(int nLogicThreadID)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWriteLock);
 
@@ -388,7 +388,7 @@ int CLogicThreadManager::KillLogicThread(int nLogicThreadID)
 
     if (NULL == pLogicThread)
     {
-        OUR_DEBUG((LM_INFO, "[CLogicThreadManager::CreateLogicThread]Create logic thread id(%d) is no exist.\n", nLogicThreadID));
+        OUR_DEBUG((LM_INFO, "[CMessageQueueManager::CreateLogicThread]Create logic thread id(%d) is no exist.\n", nLogicThreadID));
         return -1;
     }
     else
@@ -400,7 +400,7 @@ int CLogicThreadManager::KillLogicThread(int nLogicThreadID)
     }
 }
 
-int CLogicThreadManager::MessageMappingLogicThread(int nLogicThreadID, int nMessageID)
+int CMessageQueueManager::MessageMappingLogicThread(int nLogicThreadID, int nMessageID)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWriteLock);
 
@@ -409,7 +409,7 @@ int CLogicThreadManager::MessageMappingLogicThread(int nLogicThreadID, int nMess
 
     if (NULL == pLogicThread)
     {
-        OUR_DEBUG((LM_INFO, "[CLogicThreadManager::CreateLogicThread]Create logic thread id(%d) is no exist.\n", nLogicThreadID));
+        OUR_DEBUG((LM_INFO, "[CMessageQueueManager::CreateLogicThread]Create logic thread id(%d) is no exist.\n", nLogicThreadID));
         return -1;
     }
 
@@ -417,7 +417,7 @@ int CLogicThreadManager::MessageMappingLogicThread(int nLogicThreadID, int nMess
 
     if (NULL != pLogicThreadInfo)
     {
-        OUR_DEBUG((LM_INFO, "[CLogicThreadManager::CreateLogicThread]Message id(%d) at logic thread(%d) is exist.\n",
+        OUR_DEBUG((LM_INFO, "[CMessageQueueManager::CreateLogicThread]Message id(%d) at logic thread(%d) is exist.\n",
                    nMessageID,
                    pLogicThreadInfo->m_nLogicThreadID));
         return -1;
@@ -427,7 +427,7 @@ int CLogicThreadManager::MessageMappingLogicThread(int nLogicThreadID, int nMess
 
     if (0 > m_objMessageIDList.Add_Hash_Data_By_Key_Unit32((uint32)nMessageID, pLogicThreadInfo))
     {
-        OUR_DEBUG((LM_INFO, "[CLogicThreadManager::CreateLogicThread]Message id(%d) at logic thread(%d) add error.\n",
+        OUR_DEBUG((LM_INFO, "[CMessageQueueManager::CreateLogicThread]Message id(%d) at logic thread(%d) add error.\n",
                    nMessageID,
                    pLogicThreadInfo->m_nLogicThreadID));
         return -1;
@@ -436,7 +436,7 @@ int CLogicThreadManager::MessageMappingLogicThread(int nLogicThreadID, int nMess
     return 0;
 }
 
-int CLogicThreadManager::SendLogicThreadMessage(int nMessageID, void* arg)
+int CMessageQueueManager::SendLogicThreadMessage(int nMessageID, void* arg)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWriteLock);
 
@@ -444,7 +444,7 @@ int CLogicThreadManager::SendLogicThreadMessage(int nMessageID, void* arg)
 
     if (NULL == pLogicThreadInfo)
     {
-        OUR_DEBUG((LM_INFO, "[CLogicThreadManager::CreateLogicThread]Message id(%d) at logic is no exist.\n",
+        OUR_DEBUG((LM_INFO, "[CMessageQueueManager::CreateLogicThread]Message id(%d) at logic is no exist.\n",
                    nMessageID,
                    pLogicThreadInfo->m_nLogicThreadID));
         return -1;
@@ -454,13 +454,13 @@ int CLogicThreadManager::SendLogicThreadMessage(int nMessageID, void* arg)
 
     if (NULL == pLogicThread)
     {
-        OUR_DEBUG((LM_INFO, "[CLogicThreadManager::CreateLogicThread]Create logic thread id(%d) is no exist.\n", pLogicThreadInfo->m_nLogicThreadID));
+        OUR_DEBUG((LM_INFO, "[CMessageQueueManager::CreateLogicThread]Create logic thread id(%d) is no exist.\n", pLogicThreadInfo->m_nLogicThreadID));
         return -1;
     }
 
     if (false == pLogicThread->PutMessage(nMessageID, arg))
     {
-        OUR_DEBUG((LM_INFO, "[CLogicThreadManager::CreateLogicThread]Create logic thread id(%d) putmessage error.\n", pLogicThreadInfo->m_nLogicThreadID));
+        OUR_DEBUG((LM_INFO, "[CMessageQueueManager::CreateLogicThread]Create logic thread id(%d) putmessage error.\n", pLogicThreadInfo->m_nLogicThreadID));
         return -1;
     }
 

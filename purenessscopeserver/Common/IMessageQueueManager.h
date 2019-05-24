@@ -1,13 +1,13 @@
-﻿#ifndef _ILOGICTHREADMANAGER_H
-#define _ILOGICTHREADMANAGER_H
+﻿#ifndef _IMESSAGEQUEUEMANAGER_H
+#define _IMESSAGEQUEUEMANAGER_H
 
 #include <stdio.h>
 #include "ILogicQueue.h"
 
-class ILogicThreadManager
+class IMessageQueueManager
 {
 public:
-    virtual ~ILogicThreadManager() {}
+    virtual ~IMessageQueueManager() {}
 
     //创建消息队列
     virtual int CreateLogicThread(ILogicQueue* pLogicQueue) = 0;

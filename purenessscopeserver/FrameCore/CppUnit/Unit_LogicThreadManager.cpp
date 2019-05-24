@@ -29,7 +29,7 @@ void CUnit_LogicThreadManager::tearDown(void)
 void CUnit_LogicThreadManager::Test_LogicThreadManager(void)
 {
     bool blRet = false;
-    int nRet = App_LogicThreadManager::instance()->CreateLogicThread(1,
+    int nRet = App_MessageQueueManager::instance()->CreateLogicThread(1,
                120,
                m_pLogicTestQueue);
 
@@ -39,7 +39,7 @@ void CUnit_LogicThreadManager::Test_LogicThreadManager(void)
         CPPUNIT_ASSERT_MESSAGE("[Test_TimerManager]CreateLogicThread is fail.", true == blRet);
     }
 
-    nRet = App_LogicThreadManager::instance()->MessageMappingLogicThread(1, m_nMessage);
+    nRet = App_MessageQueueManager::instance()->MessageMappingLogicThread(1, m_nMessage);
 
     if (0 != nRet)
     {
@@ -47,7 +47,7 @@ void CUnit_LogicThreadManager::Test_LogicThreadManager(void)
         CPPUNIT_ASSERT_MESSAGE("[Test_TimerManager]MessageMappingLogicThread is fail.", true == blRet);
     }
 
-    nRet = App_LogicThreadManager::instance()->SendLogicThreadMessage(m_nMessage, NULL);
+    nRet = App_MessageQueueManager::instance()->SendLogicThreadMessage(m_nMessage, NULL);
 
     if (0 != nRet)
     {

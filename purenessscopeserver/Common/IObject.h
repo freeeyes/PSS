@@ -22,7 +22,7 @@
 #include "IFrameCommand.h"
 #include "ITSTimer.h"
 #include "ITTyClientManager.h"
-#include "ILogicThreadManager.h"
+#include "IMessageQueueManager.h"
 
 class CServerObject
 {
@@ -44,7 +44,7 @@ public:
         m_pFrameCommand         = NULL;
         m_pTSTimerManager       = NULL;
         m_pTTyClientManager     = NULL;
-        m_pLogicThreadManager   = NULL;
+        m_pMessageQueueManager  = NULL;
     }
 
     virtual ~CServerObject() {}
@@ -112,9 +112,9 @@ public:
         m_pTTyClientManager = pTTyClientManager;
     }
 
-    void SetLogicThreadManager(ILogicThreadManager* pLogicThreadManager)
+    void SetMessageQueueManager(IMessageQueueManager* pMessageQueueManager)
     {
-        m_pLogicThreadManager = pLogicThreadManager;
+        m_pMessageQueueManager = pMessageQueueManager;
     }
 
     IMessageManager*       GetMessageManager()
@@ -177,9 +177,9 @@ public:
         return m_pTTyClientManager;
     }
 
-    ILogicThreadManager* GetLogicThreadManager()
+    IMessageQueueManager* GetMessageQueueManager()
     {
-        return m_pLogicThreadManager;
+        return m_pMessageQueueManager;
     }
 
 private:
@@ -198,7 +198,7 @@ private:
     IFrameCommand*         m_pFrameCommand;
     ITSTimerManager*       m_pTSTimerManager;
     ITTyClientManager*     m_pTTyClientManager;
-    ILogicThreadManager*   m_pLogicThreadManager;
+    IMessageQueueManager*  m_pMessageQueueManager;
 };
 
 typedef ACE_Singleton<CServerObject, ACE_Null_Mutex> App_ServerObject;

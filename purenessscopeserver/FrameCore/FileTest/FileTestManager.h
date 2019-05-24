@@ -22,8 +22,6 @@ public:
     CFileTestManager(void);
     virtual ~CFileTestManager(void);
 
-    CFileTestManager(const CFileTestManager& ar);
-
     CFileTestManager& operator = (const CFileTestManager& ar)
     {
         if (this != &ar)

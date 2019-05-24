@@ -346,14 +346,14 @@
     <ClCompile Include="Proactor\ProConnectHandler.cpp">
       <Filter>Proactor\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="Message\LogicThreadManager.cpp">
-      <Filter>Message\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="CppUnit\Unit_LogicThreadManager.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\ILogicQueue.cpp">
       <Filter>Common\hfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Message\MessageQueueManager.cpp">
+      <Filter>Message\cppfile</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -825,14 +825,14 @@
     <ClInclude Include="..\Common\ILogicThreadManager.h">
       <Filter>IObject</Filter>
     </ClInclude>
-    <ClInclude Include="Message\LogicThreadManager.h">
-      <Filter>Message\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="..\Common\ILogicQueue.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
     <ClInclude Include="CppUnit\Unit_LogicThreadManager.h">
       <Filter>CppUnit\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Message\MessageQueueManager.h">
+      <Filter>Message\hfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

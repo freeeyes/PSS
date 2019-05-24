@@ -8,7 +8,7 @@
 
 #include "define.h"
 #include "HashTable.h"
-#include "ILogicThreadManager.h"
+#include "IMessageQueueManager.h"
 #include "ObjectPoolManager.h"
 #include "BaseTask.h"
 #include "TimerManager.h"
@@ -193,11 +193,11 @@ private:
 };
 
 //逻辑线程管理器
-class CLogicThreadManager : public ILogicThreadManager, public ACE_Task<ACE_MT_SYNCH>
+class CMessageQueueManager : public IMessageQueueManager, public ACE_Task<ACE_MT_SYNCH>
 {
 public:
-    CLogicThreadManager();
-    virtual ~CLogicThreadManager();
+    CMessageQueueManager();
+    virtual ~CMessageQueueManager();
 
     virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);
 
@@ -234,6 +234,6 @@ public:
     uint32                       m_u4TimerID;
 };
 
-typedef ACE_Singleton<CLogicThreadManager, ACE_Null_Mutex> App_LogicThreadManager;
+typedef ACE_Singleton<CMessageQueueManager, ACE_Null_Mutex> App_MessageQueueManager;
 
 #endif

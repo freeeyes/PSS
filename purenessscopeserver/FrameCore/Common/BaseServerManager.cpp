@@ -91,7 +91,7 @@ bool Server_Manager_Common_IObject(IConnectManager* pConnectManager,
                                    IServerManager* pIServerManager,
                                    ITSTimerManager* pTSTimerManager,
                                    ITTyClientManager* pTTyClientManager,
-                                   ILogicThreadManager* pLogicThreadManager,
+                                   IMessageQueueManager* pMessageQueueManager,
                                    IControlListen* pControlListen)
 {
     App_ServerObject::instance()->SetMessageManager(dynamic_cast<IMessageManager*>(App_MessageManager::instance()));
@@ -109,7 +109,7 @@ bool Server_Manager_Common_IObject(IConnectManager* pConnectManager,
     App_ServerObject::instance()->SetServerManager(pIServerManager);
     App_ServerObject::instance()->SetTSTimer(pTSTimerManager);
     App_ServerObject::instance()->SetTTyClientManager(pTTyClientManager);
-    App_ServerObject::instance()->SetLogicThreadManager(pLogicThreadManager);
+    App_ServerObject::instance()->SetMessageQueueManager(pMessageQueueManager);
 
     return true;
 }

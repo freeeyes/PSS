@@ -61,18 +61,18 @@ bool CProServerManager::Init()
     App_ProConnectManager::instance()->Init(GetXmlConfigAttribute(xmlSendInfo)->SendQueueCount);
 
     //初始化拆件逻辑线程
-    App_LogicThreadManager::instance()->Init();
+    App_MessageQueueManager::instance()->Init();
 
     //初始化给插件的对象接口
-    IConnectManager* pConnectManager         = dynamic_cast<IConnectManager*>(App_ProConnectManager::instance());
-    IClientManager*  pClientManager          = dynamic_cast<IClientManager*>(App_ClientProConnectManager::instance());
-    IUDPConnectManager* pUDPConnectManager   = dynamic_cast<IUDPConnectManager*>(App_ProUDPManager::instance());
-    IFrameCommand* pFrameCommand             = dynamic_cast<IFrameCommand*>(&m_objFrameCommand);
-    ITSTimerManager* pTSTimer                = dynamic_cast<ITSTimerManager*>(&m_TSThread);
-    IServerManager* pServerManager           = dynamic_cast<IServerManager*>(this);
-    ITTyClientManager* pTTyClientManager     = dynamic_cast<ITTyClientManager*>(App_ProTTyClientManager::instance());
-    ILogicThreadManager* pLogicThreadManager = dynamic_cast<ILogicThreadManager*>(App_LogicThreadManager::instance());
-    IControlListen* pControlListen           = dynamic_cast<IControlListen*>(App_ProControlListen::instance());
+    IConnectManager* pConnectManager           = dynamic_cast<IConnectManager*>(App_ProConnectManager::instance());
+    IClientManager*  pClientManager            = dynamic_cast<IClientManager*>(App_ClientProConnectManager::instance());
+    IUDPConnectManager* pUDPConnectManager     = dynamic_cast<IUDPConnectManager*>(App_ProUDPManager::instance());
+    IFrameCommand* pFrameCommand               = dynamic_cast<IFrameCommand*>(&m_objFrameCommand);
+    ITSTimerManager* pTSTimer                  = dynamic_cast<ITSTimerManager*>(&m_TSThread);
+    IServerManager* pServerManager             = dynamic_cast<IServerManager*>(this);
+    ITTyClientManager* pTTyClientManager       = dynamic_cast<ITTyClientManager*>(App_ProTTyClientManager::instance());
+    IMessageQueueManager* pMessageQueueManager = dynamic_cast<IMessageQueueManager*>(App_MessageQueueManager::instance());
+    IControlListen* pControlListen             = dynamic_cast<IControlListen*>(App_ProControlListen::instance());
 
     Server_Manager_Common_IObject(pConnectManager,
                                   pClientManager,
@@ -81,7 +81,7 @@ bool CProServerManager::Init()
                                   pServerManager,
                                   pTSTimer,
                                   pTTyClientManager,
-                                  pLogicThreadManager,
+                                  pMessageQueueManager,
                                   pControlListen);
 
     //初始化模块加载，因为这里可能包含了中间服务器连接加载
@@ -396,8 +396,8 @@ bool CProServerManager::Close()
     App_ProConnectAcceptManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ProConnectAcceptManager OK.\n"));
 
-    App_LogicThreadManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_LogicThreadManager OK.\n"));
+    App_MessageQueueManager::instance()->Close();
+    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_MessageQueueManager OK.\n"));
 
     m_ProConsoleConnectAcceptor.cancel();
     App_TimerManager::instance()->deactivate();
