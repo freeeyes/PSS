@@ -246,6 +246,63 @@ int CProTTyClientManager::Connect(uint16 u2ConnectID, const char* pName, _TTyDev
     return 0;
 }
 
+int CProTTyClientManager::ConnectFrame(uint16 u2ConnectID, const char* pName, _TTyDevParam& inParam, uint32 u4PacketParseID)
+{
+    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
+
+    //先查找这个设备是否已经注册
+    char szConnectID[MAX_BUFF_20] = { '\0' };
+    sprintf_safe(szConnectID, MAX_BUFF_20, "%d", u2ConnectID);
+
+    CProTTyHandler* pTTyClientHandler = m_objTTyClientHandlerList.Get_Hash_Box_Data(szConnectID);
+
+    if (NULL != pTTyClientHandler)
+    {
+        OUR_DEBUG((LM_INFO, "[CProTTyClientManager::ConnectFrame](%s) is exist.\n", pName));
+        return -1;
+    }
+
+    pTTyClientHandler = new CProTTyHandler();
+
+    //匹配相关参数
+    ACE_TTY_IO::Serial_Params inTTyParams;
+    inTTyParams.baudrate = inParam.m_nBaudRate;
+    inTTyParams.databits = inParam.m_uDatabits;
+    inTTyParams.stopbits = inParam.m_uStopbits;
+    inTTyParams.paritymode = inParam.m_pParitymode;
+    inTTyParams.ctsenb = inParam.m_blCTSenb;
+    inTTyParams.rtsenb = inParam.m_uRTSenb;
+    inTTyParams.dsrenb = inParam.m_blDSRenb;
+    inTTyParams.dtrdisable = inParam.m_blDTRdisable;
+    inTTyParams.readtimeoutmsec = inParam.m_nReadtimeoutmsec;
+    inTTyParams.xinenb = inParam.m_blXinenb;
+    inTTyParams.xoutenb = inParam.m_blXoutenb;
+    inTTyParams.modem = inParam.m_blModem;
+    inTTyParams.rcvenb = inParam.m_blRcvenb;
+    inTTyParams.xonlim = inParam.m_nXOnlim;
+    inTTyParams.xofflim = inParam.m_nXOfflim;
+    inTTyParams.readmincharacters = inParam.m_u4Readmincharacters;
+
+    //绑定反应器
+    pTTyClientHandler->proactor(m_pProactor);
+
+    if (false == pTTyClientHandler->Init(u2ConnectID, pName, inTTyParams, NULL, CONNECT_IO_FRAME, u4PacketParseID))
+    {
+        OUR_DEBUG((LM_INFO, "[CProTTyClientManager::ConnectFrame](%s)pTTyClientHandler Init Error.\n", pName));
+        SAFE_DELETE(pTTyClientHandler);
+        return -1;
+    }
+
+    if (false == m_objTTyClientHandlerList.Add_Hash_Data(szConnectID, pTTyClientHandler))
+    {
+        OUR_DEBUG((LM_INFO, "[CProTTyClientManager::ConnectFrame](%s)Add_Hash_Data Error.\n", pName));
+        SAFE_DELETE(pTTyClientHandler);
+        return -1;
+    }
+
+    return 0;
+}
+
 bool CProTTyClientManager::GetClientDevInfo(uint16 u2ConnectID, _TTyDevParam& outParam)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);

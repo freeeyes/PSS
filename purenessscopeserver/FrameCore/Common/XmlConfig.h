@@ -24,6 +24,7 @@ enum XmlConfig
     XML_Config_NetWorkMode,
     XML_Config_TCPServerIPs,
     XML_Config_UDPServerIPs,
+    XML_Config_TTyDrives,
     /********连接信息********/
     XML_Config_ConnectServer,
     XML_Config_ClientInfo,
@@ -202,6 +203,28 @@ public:
     };
     std::vector<_UDPServerIP> vec;
     xmlUDPServerIPs(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
+    bool Init(CXmlOpeation* pXmlOperation);
+};
+
+//TTy设备端口监听
+class xmlTTyDrives : public IConfigOpeation
+{
+public:
+    class _TTyDrives
+    {
+    public:
+        uint32 u4TTyID;
+        uint32 u4PacketParseID;
+        uint32 u4Baud;
+        uint32 u4DataBits;
+        uint32 u4StopBits;
+        std::string strParity;
+        std::string strPortName;
+        std::string strDesc;
+        _TTyDrives() : u4TTyID(0), u4PacketParseID(0), u4Baud(0), u4DataBits(0), u4StopBits(0), strParity(""), strPortName(""), strDesc("") {}
+    };
+    std::vector<_TTyDrives> vec;
+    xmlTTyDrives(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 

@@ -12,6 +12,9 @@
 #include "ace/DEV_Connector.h"
 #include "ITTyMessage.h"
 #include "define.h"
+#include "LoadPacketParse.h"
+#include "MessageBlockManager.h"
+#include "BaseHander.h"
 
 class CReTTyHandler : public ACE_Event_Handler
 {
@@ -23,7 +26,13 @@ public:
 
     void Close();
 
-    bool Init(uint32 u4ConnectID, const char* pName, ACE_TTY_IO::Serial_Params inParams, ITTyMessage* pTTyMessage);
+    bool Init(uint32 u4ConnectID,
+              const char* pName,
+              ACE_TTY_IO::Serial_Params inParams,
+              ITTyMessage* pTTyMessage,
+              EM_CONNECT_IO_DISPOSE emDispose = CONNECT_IO_PLUGIN,
+              uint32 u4PacketParseInfoID = 0);
+
     bool GetConnectState();
     ACE_TTY_IO::Serial_Params GetParams();
     void SetPause(bool blPause);                //设置暂停状态
@@ -46,6 +55,8 @@ private:
     bool                                  m_blPause;                   //是否暂停
     uint32                                m_u4ConnectID;               //当前设备ID
     ITTyMessage*                          m_pTTyMessage;               //TTyMessage对象
+    EM_CONNECT_IO_DISPOSE                 m_emDispose;                 //处理模式，框架处理 or 业务处理
+    uint32                                m_u4PacketParseInfoID;       //框架处理模块ID
 };
 
 #endif

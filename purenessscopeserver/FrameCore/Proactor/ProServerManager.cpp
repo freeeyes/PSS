@@ -355,6 +355,26 @@ bool CProServerManager::Start()
     //开始启动链接发送定时器
     App_ProConnectManager::instance()->StartTimer();
 
+    //开始启动tty相关监听
+    int nTTyCount = (int)GetXmlConfigAttribute(xmlTTyDrives)->vec.size();
+
+    for (int i = 0; i < nTTyCount; i++)
+    {
+        _TTyDevParam objCom;
+
+        objCom.m_nBaudRate   = (int)GetXmlConfigAttribute(xmlTTyDrives)->vec[i].u4Baud;
+        objCom.m_uDatabits   = (unsigned char)GetXmlConfigAttribute(xmlTTyDrives)->vec[i].u4DataBits;
+        objCom.m_uStopbits   = (unsigned char)GetXmlConfigAttribute(xmlTTyDrives)->vec[i].u4StopBits;
+        objCom.m_pParitymode = (const char*)GetXmlConfigAttribute(xmlTTyDrives)->vec[i].strParity.c_str();
+        strcpy_safe(GetXmlConfigAttribute(xmlTTyDrives)->vec[i].strPortName.c_str(), objCom.m_szDevName, 32);
+
+        //添加监听
+        App_ProTTyClientManager::instance()->ConnectFrame(GetXmlConfigAttribute(xmlTTyDrives)->vec[i].u4TTyID,
+                GetXmlConfigAttribute(xmlTTyDrives)->vec[i].strPortName.c_str(),
+                objCom,
+                GetXmlConfigAttribute(xmlTTyDrives)->vec[i].u4PacketParseID);
+
+    }
 
     //开闸，让客户端数据进来
     if (!App_ProactorManager::instance()->StartClientProactor())

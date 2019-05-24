@@ -57,6 +57,7 @@ class ITTyClientManager
 public:
     virtual ~ITTyClientManager() {}
     virtual int Connect(uint16 u2ConnectID, const char* pName, _TTyDevParam& inParam, ITTyMessage* pMessageRecv) = 0;           // 连接（打开）端口
+    virtual int ConnectFrame(uint16 u2ConnectID, const char* pName, _TTyDevParam& inParam, uint32 u4PacketParseID) = 0;         //连接（打开）端口，投递到框架
 
     virtual bool GetClientDevInfo(uint16 u2ConnectID, _TTyDevParam& outParam) = 0;                           // 获取连接配置信息
     virtual bool IsConnect(uint16 u2ConnectID) = 0;                                                          // 是否连接（打开）状态

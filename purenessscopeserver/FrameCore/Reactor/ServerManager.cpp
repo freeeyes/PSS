@@ -327,6 +327,27 @@ bool CServerManager::Run()
     //开始启动链接发送定时器
     App_ConnectManager::instance()->StartTimer();
 
+    //开始启动tty相关监听
+    int nReTTyCount = (int)GetXmlConfigAttribute(xmlTTyDrives)->vec.size();
+
+    for (int i = 0; i < nReTTyCount; i++)
+    {
+        _TTyDevParam objReCom;
+
+        objReCom.m_nBaudRate = (int)GetXmlConfigAttribute(xmlTTyDrives)->vec[i].u4Baud;
+        objReCom.m_uDatabits = (unsigned char)GetXmlConfigAttribute(xmlTTyDrives)->vec[i].u4DataBits;
+        objReCom.m_uStopbits = (unsigned char)GetXmlConfigAttribute(xmlTTyDrives)->vec[i].u4StopBits;
+        objReCom.m_pParitymode = (const char*)GetXmlConfigAttribute(xmlTTyDrives)->vec[i].strParity.c_str();
+        strcpy_safe(GetXmlConfigAttribute(xmlTTyDrives)->vec[i].strPortName.c_str(), objReCom.m_szDevName, 32);
+
+        //添加监听
+        App_ReTTyClientManager::instance()->ConnectFrame(GetXmlConfigAttribute(xmlTTyDrives)->vec[i].u4TTyID,
+                GetXmlConfigAttribute(xmlTTyDrives)->vec[i].strPortName.c_str(),
+                objReCom,
+                GetXmlConfigAttribute(xmlTTyDrives)->vec[i].u4PacketParseID);
+
+    }
+
     //最后开闸，启动客户端反应器，让客户端数据进来
     if (!App_ReactorManager::instance()->StartClientReactor())
     {

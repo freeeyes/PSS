@@ -22,7 +22,8 @@ public:
     bool Init(ACE_Proactor* pProactor, uint16 u2MaxTTyCount, uint16 u2TimeCheck);                        //初始化管理器
     void Close();                                                                                        //关闭所有连接
 
-    virtual int Connect(uint16 u2ConnectID, const char* pName, _TTyDevParam& inParam, ITTyMessage* pMessageRecv);  // 连接（打开）端口
+    virtual int Connect(uint16 u2ConnectID, const char* pName, _TTyDevParam& inParam, ITTyMessage* pMessageRecv);      // 连接（打开）端口
+    virtual int ConnectFrame(uint16 u2ConnectID, const char* pName, _TTyDevParam& inParam, uint32 u4PacketParseID);    // 连接（打开）端口
 
     virtual bool GetClientDevInfo(uint16 u2ConnectID, _TTyDevParam& outParam);                           // 获取连接配置信息
     virtual bool IsConnect(uint16 u2ConnectID);                                                          // 是否连接（打开）状态

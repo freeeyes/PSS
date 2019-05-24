@@ -23,6 +23,7 @@ DefineClassAndFunc(xmlSendInfo, XML_Config_SendInfo)
 DefineClassAndFunc(xmlNetWorkMode, XML_Config_NetWorkMode)
 DefineClassAndFunc(xmlTCPServerIPs, XML_Config_TCPServerIPs)
 DefineClassAndFunc(xmlUDPServerIPs, XML_Config_UDPServerIPs)
+DefineClassAndFunc(xmlTTyDrives, XML_Config_TTyDrives)
 DefineClassAndFunc(xmlConnectServer, XML_Config_ConnectServer)
 DefineClassAndFunc(xmlClientInfo, XML_Config_ClientInfo)
 DefineClassAndFunc(xmlTTyClientManagerInfo, XML_Config_TTyClientManager)
@@ -243,7 +244,35 @@ bool xmlUDPServerIPs::Init(CXmlOpeation* pXmlOperation)
     return bKet;
 }
 
+bool xmlTTyDrives::Init(CXmlOpeation* pXmlOperation)
+{
+    bool bKet = true;
+    TiXmlElement* pTTyID          = NULL;
+    TiXmlElement* pParseID        = NULL;
+    TiXmlElement* pBaud           = NULL;
+    TiXmlElement* pDataBits       = NULL;
+    TiXmlElement* pStopBits       = NULL;
+    TiXmlElement* pParity         = NULL;
+    TiXmlElement* pPortName       = NULL;
+    TiXmlElement* pPortDesc       = NULL;
 
+    _TTyDrives TTyDrives;
+
+    while (bKet
+           && pXmlOperation->Read_XML_Data_Multiple_Uint32("TTy", "ComID", TTyDrives.u4TTyID, pTTyID)
+           && pXmlOperation->Read_XML_Data_Multiple_Uint32("TTy", "ParseID", TTyDrives.u4PacketParseID, pParseID)
+           && pXmlOperation->Read_XML_Data_Multiple_Uint32("TTy", "Baud", TTyDrives.u4Baud, pBaud)
+           && pXmlOperation->Read_XML_Data_Multiple_Uint32("TTy", "DataBits", TTyDrives.u4DataBits, pDataBits)
+           && pXmlOperation->Read_XML_Data_Multiple_Uint32("TTy", "DataBits", TTyDrives.u4StopBits, pStopBits)
+           && pXmlOperation->Read_XML_Data_Multiple_String("TTy", "Parity", TTyDrives.strParity, pParity)
+           && pXmlOperation->Read_XML_Data_Multiple_String("TTy", "PortName", TTyDrives.strPortName, pPortName)
+           && pXmlOperation->Read_XML_Data_Multiple_String("TTy", "PortDes", TTyDrives.strDesc, pPortDesc))
+    {
+        vec.push_back(TTyDrives);
+    }
+
+    return bKet;
+}
 
 bool xmlConnectServer::Init(CXmlOpeation* pXmlOperation)
 {
