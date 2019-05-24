@@ -16,16 +16,6 @@ public:
 
     virtual ~ConnectAcceptor();
 
-    ConnectAcceptor& operator = (const ConnectAcceptor& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
     void InitClientReactor(uint32 u4ClientReactorCount);
     void SetPacketParseInfoID(uint32 u4PaccketParseInfoID);
     uint32 GetPacketParseInfoID();
