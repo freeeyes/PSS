@@ -111,17 +111,14 @@ int CReTTyHandler::handle_input(ACE_HANDLE handle)
     }
     else
     {
-        if (CONNECT_IO_PLUGIN == m_emDispose)
+        if (false != m_blPause)
         {
-            if (false == m_blPause)
+            if (CONNECT_IO_PLUGIN == m_emDispose)
             {
                 //回调接收数据函数
                 m_pTTyMessage->RecvData(m_u4ConnectID, m_pmbReadBuff->rd_ptr(), (uint32)bytes_read);
             }
-        }
-        else
-        {
-            if (false == m_blPause)
+            else
             {
                 //调用框架的函数处理
                 _Packet_Parse_Info* pPacketParse = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID);

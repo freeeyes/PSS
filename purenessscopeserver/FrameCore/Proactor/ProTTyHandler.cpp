@@ -126,9 +126,9 @@ void CProTTyHandler::handle_read_file(const ACE_Asynch_Read_File::Result& result
 
     ACE_Message_Block& mb = result.message_block();
 
-    if (NULL != m_pTTyMessage && false == m_blPause)
+    if (false == m_blPause)
     {
-        if (CONNECT_IO_PLUGIN == m_emDispose)
+        if (CONNECT_IO_PLUGIN == m_emDispose && NULL != m_pTTyMessage)
         {
             //回调接收数据函数
             m_pTTyMessage->RecvData(m_u4ConnectID, mb.rd_ptr(), (uint32)result.bytes_transferred());
