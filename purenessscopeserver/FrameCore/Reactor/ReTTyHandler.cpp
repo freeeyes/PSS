@@ -52,6 +52,16 @@ void CReTTyHandler::Close()
 {
     if (true == m_blState)
     {
+        if (CONNECT_IO_FRAME == m_emDispose)
+        {
+            //发送packetParse断开消息
+            App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->DisConnect(m_u4ConnectID);
+
+            //发送框架消息
+            ACE_INET_Addr m_addrRemote;
+            Send_MakePacket_Queue(m_u4ConnectID, m_u4PacketParseInfoID, NULL, PACKET_TTY_DISCONNECT, m_addrRemote, "TTy", 0);
+        }
+
         m_ReTtyio.close();
         m_blState = false;
     }
@@ -67,7 +77,24 @@ bool CReTTyHandler::Init(uint32 u4ConnectID, const char* pName, ACE_TTY_IO::Seri
     m_u4PacketParseInfoID = u4PacketParseInfoID;
 
     //初始化连接设备
-    return ConnectTTy();
+    bool blRet = ConnectTTy();
+
+    if (true == blRet && CONNECT_IO_FRAME == m_emDispose)
+    {
+        _ClientIPInfo objClientIPInfo;
+        _ClientIPInfo objLocalIPInfo;
+
+        //发送packetParse断开消息
+        App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Connect(m_u4ConnectID,
+                objClientIPInfo,
+                objLocalIPInfo);
+
+        //发送框架消息
+        ACE_INET_Addr m_addrRemote;
+        Send_MakePacket_Queue(m_u4ConnectID, m_u4PacketParseInfoID, NULL, PACKET_TTY_CONNECT, m_addrRemote, "TTy", 0);
+    }
+
+    return blRet;
 }
 
 bool CReTTyHandler::GetConnectState()

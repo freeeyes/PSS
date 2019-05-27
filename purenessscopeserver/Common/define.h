@@ -152,6 +152,8 @@ static bool Convert_Version(int nTagVserion)
 #define PACKET_SEND_TIMEOUT   6            //服务器发送时间超过阀值的标志
 #define PACKET_CHEK_TIMEOUT   7            //服务器心跳检测超时事件
 #define PACKET_SEND_OK        8            //发送成功回执
+#define PACKET_TTY_CONNECT    9            //TTy设备连接
+#define PACKET_TTY_DISCONNECT 10           //TTy设备断开连接
 
 #define MAX_PACKET_PARSE      5000         //PACKETPARSE对象池个数
 #define MAX_MESSAGE_POOL      5000         //Message对象池个数
@@ -409,6 +411,8 @@ enum
 #define CLINET_LINK_SENDERROR      0x0005      //客户端发送失败消息 
 #define CLINET_LINK_CHECKTIMEOUT   0x0006      //服务器心跳检测超时消息  
 #define CLIENT_LINK_SENDOK         0x0007      //服务器发送成功回执
+#define CLINET_LINK_TTY_CONNECT    0x0008      //tty建立连接
+#define CLINET_LINK_TTY_DISCONNECT 0x0009      //tty断开建立连接
 #define CLIENT_LINK_USER           0x0100      //用户信令开始序列头部
 //*****************************************************************
 

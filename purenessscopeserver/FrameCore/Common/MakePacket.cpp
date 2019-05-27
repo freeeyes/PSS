@@ -100,6 +100,14 @@ void CMakePacket::SetMessage(_MakePacket* pMakePacket, CMessage* pMessage, ACE_T
         {
             pMessage->GetMessageBase()->m_u2Cmd         = CLIENT_LINK_SENDOK;
         }
+        else if (pMakePacket->m_u1Option == PACKET_TTY_CONNECT)
+        {
+            pMessage->GetMessageBase()->m_u2Cmd = CLINET_LINK_TTY_CONNECT;
+        }
+        else if (pMakePacket->m_u1Option == PACKET_TTY_DISCONNECT)
+        {
+            pMessage->GetMessageBase()->m_u2Cmd = CLINET_LINK_TTY_DISCONNECT;
+        }
 
         pMessage->GetMessageBase()->m_u4ConnectID     = pMakePacket->m_u4ConnectID;
         pMessage->GetMessageBase()->m_tvRecvTime      = tvNow;

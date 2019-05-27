@@ -62,6 +62,16 @@ void CProTTyHandler::Close()
         m_ObjReadRequire.cancel();
         m_ObjWriteRequire.cancel();
 
+        if (CONNECT_IO_FRAME == m_emDispose)
+        {
+            //发送packetParse断开消息
+            App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->DisConnect(m_u4ConnectID);
+
+            //发送框架消息
+            ACE_INET_Addr m_addrRemote;
+            Send_MakePacket_Queue(m_u4ConnectID, m_u4PacketParseInfoID, NULL, PACKET_TTY_DISCONNECT, m_addrRemote, "TTy", 0);
+        }
+
         m_Ttyio.close();
         m_blState = false;
     }
@@ -77,10 +87,30 @@ bool CProTTyHandler::Init(uint32 u4ConnectID, const char* pName, ACE_TTY_IO::Ser
     m_u4PacketParseInfoID = u4PacketParseInfoID;
 
     //初始化连接设备
-    ConnectTTy();
+    if (true == ConnectTTy())
+    {
+        if (CONNECT_IO_FRAME == m_emDispose)
+        {
+            //发送packetParse断开消息
+            _ClientIPInfo objClientIPInfo;
+            _ClientIPInfo objLocalIPInfo;
+            App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Connect(m_u4ConnectID,
+                    objClientIPInfo,
+                    objLocalIPInfo);
 
-    Ready_To_Read_Buff();
-    return true;
+            //发送框架消息
+            ACE_INET_Addr m_addrRemote;
+            Send_MakePacket_Queue(m_u4ConnectID, m_u4PacketParseInfoID, NULL, PACKET_TTY_CONNECT, m_addrRemote, "TTy", 0);
+        }
+
+        //准备接受数据
+        Ready_To_Read_Buff();
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 bool CProTTyHandler::GetConnectState()
@@ -110,8 +140,16 @@ void CProTTyHandler::handle_read_file(const ACE_Asynch_Read_File::Result& result
         //接收设备数据异常
         OUR_DEBUG((LM_ERROR, "[CProTTyHandler::handle_read_file]Error:%d.\n", (int)result.error()));
 
-        //通知上层应用
-        m_pTTyMessage->ReportMessage(m_u4ConnectID, (uint32)result.error(), EM_TTY_EVENT_RW_ERROR);
+        if (CONNECT_IO_PLUGIN == m_emDispose && NULL != m_pTTyMessage)
+        {
+            //通知上层应用
+            m_pTTyMessage->ReportMessage(m_u4ConnectID, (uint32)result.error(), EM_TTY_EVENT_RW_ERROR);
+        }
+
+        if (CONNECT_IO_FRAME == m_emDispose)
+        {
+            //通知框架消息
+        }
 
         //断开当前设备
         Close();

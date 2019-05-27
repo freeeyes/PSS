@@ -261,13 +261,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
     u2CommandID = pMessage->GetMessageBase()->m_u2Cmd;
 
     //抛出掉链接建立和断开，只计算逻辑数据包
-    if(pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CONNECT
-       && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CDISCONNET
-       && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_SDISCONNET
-       && pMessage->GetMessageBase()->m_u2Cmd != CLINET_LINK_SENDTIMEOUT
-       && pMessage->GetMessageBase()->m_u2Cmd != CLINET_LINK_SENDERROR
-       && pMessage->GetMessageBase()->m_u2Cmd != CLINET_LINK_CHECKTIMEOUT
-       &&  pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_SENDOK)
+    if(pMessage->GetMessageBase()->m_u2Cmd >= CLIENT_LINK_USER)
     {
         m_ThreadInfo.m_u4RecvPacketCount++;
         m_ThreadInfo.m_u4CurrPacketCount++;
@@ -311,13 +305,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 
     DoMessage(m_ThreadInfo.m_tvUpdateTime, pMessage, u2CommandID, u4TimeCost, u2CommandCount, blDeleteFlag);
 
-    if(pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CONNECT
-       && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_CDISCONNET
-       && pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_SDISCONNET
-       && pMessage->GetMessageBase()->m_u2Cmd != CLINET_LINK_SENDTIMEOUT
-       && pMessage->GetMessageBase()->m_u2Cmd != CLINET_LINK_SENDERROR
-       && pMessage->GetMessageBase()->m_u2Cmd != CLINET_LINK_CHECKTIMEOUT
-       &&  pMessage->GetMessageBase()->m_u2Cmd != CLIENT_LINK_SENDOK)
+    if(pMessage->GetMessageBase()->m_u2Cmd >= CLIENT_LINK_USER)
     {
         //如果AI启动了，则在这里进行AI判定
         m_WorkThreadAI.SaveTimeout(pMessage->GetMessageBase()->m_u2Cmd, u4TimeCost);
