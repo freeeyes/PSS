@@ -797,9 +797,9 @@ bool CConnectHandler::SendCloseMessage()
 
 bool CConnectHandler::SendTimeoutMessage ()
 {
-	Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CHEK_TIMEOUT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
-	
-	return true;
+    Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CHEK_TIMEOUT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
+
+    return true;
 }
 
 bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
@@ -1758,7 +1758,7 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
         pConnectHandler->SetSendQueueTimeCost(u4SendCost);
 
         _ClientIPInfo objClientIP = pConnectHandler->GetLocalIPInfo();
-        m_CommandAccount.SaveCommandData(u2CommandID, (uint32)objClientIP.m_nPort, PACKET_TCP, u4PacketSize, COMMAND_TYPE_OUT);
+        m_CommandAccount.SaveCommandData(u2CommandID, (uint32)objClientIP.m_nPort, CONNECT_IO_TCP, u4PacketSize, COMMAND_TYPE_OUT);
         return true;
     }
     else
@@ -1910,9 +1910,9 @@ void CConnectManager::TimeWheel_Timeout_Callback(void* pArgsContext, vector<CCon
         CConnectManager* pManager = reinterpret_cast<CConnectManager*>(pArgsContext);
         OUR_DEBUG((LM_INFO, "[CConnectManager::TimeWheel_Timeout_Callback]ConnectID(%d).\n", vecConnectHandle[i]->GetConnectID()));
 
-		//通知业务插件，超时信息
-		vecConnectHandle[i]->SendTimeoutMessage();
-				
+        //通知业务插件，超时信息
+        vecConnectHandle[i]->SendTimeoutMessage();
+
         if (NULL != pManager && false == pManager->CloseConnect_By_Queue(vecConnectHandle[i]->GetConnectID()))
         {
             OUR_DEBUG((LM_INFO, "[CConnectManager::TimeWheel_Timeout_Callback]CloseConnect_By_Queue error.\n"));
