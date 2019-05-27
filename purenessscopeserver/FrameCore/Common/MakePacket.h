@@ -27,14 +27,14 @@ public:
     uint32         m_u4PacketParseID;   //对应ConnectID的PacketParseID
     int32          m_nHashID;           //对应记录hash的ID
     CPacketParse*  m_pPacketParse;      //数据包数据指针
-    uint8          m_PacketType;        //数据包类型
+    uint8          m_u1PacketType;      //数据包类型
     uint8          m_u1Option;          //操作类型
     ACE_INET_Addr  m_AddrRemote;        //数据包的来源IP信息
     ACE_INET_Addr  m_AddrListen;        //数据包来源监听IP信息
 
     _MakePacket()
     {
-        m_PacketType        = PACKET_TCP;  //0为TCP,1是UDP 默认是TCP
+        m_u1PacketType      = CONNECT_IO_TCP;  //0为TCP,1是UDP 默认是TCP
         m_u4ConnectID       = 0;
         m_u1Option          = 0;
         m_pPacketParse      = NULL;
@@ -44,7 +44,7 @@ public:
 
     void Clear()
     {
-        m_PacketType        = PACKET_TCP;  //0为TCP,1是UDP 默认是TCP
+        m_u1PacketType      = CONNECT_IO_TCP;  //0为TCP,1是UDP 默认是TCP
         m_u4ConnectID       = 0;
         m_u1Option          = 0;
         m_pPacketParse      = NULL;

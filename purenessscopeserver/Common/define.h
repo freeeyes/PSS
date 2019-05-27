@@ -177,9 +177,6 @@ static bool Convert_Version(int nTagVserion)
 #define MAX_UDP_PACKET_LEN                1024   //UDP数据包的最大大小
 #define UDP_HANDER_ID                     0      //默认UDP的ConnectID
 
-#define PACKET_TCP                        0      //数据包来源类型TCP
-#define PACKET_UDP                        1      //数据包来源类型UDP
-
 #define RESOUCE_FROM_CLIENT               0      //客户端数据包
 #define RESOUCE_FROM_SERVER               1      //服务器间数据包
 

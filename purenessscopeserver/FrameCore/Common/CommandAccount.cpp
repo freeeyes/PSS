@@ -273,7 +273,7 @@ bool CCommandAccount::SaveCommandDataLog()
                 strCommandType = "Server Out Data";
             }
 
-            if(pCommandData->m_u1PacketType == PACKET_TCP)
+            if(pCommandData->m_u1PacketType == CONNECT_IO_TCP)
             {
                 strPacketType = "TCP";
             }

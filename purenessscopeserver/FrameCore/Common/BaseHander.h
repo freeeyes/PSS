@@ -73,7 +73,8 @@ uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPa
 
 //将数据发送入工作线程消息队列
 void Send_MakePacket_Queue(uint32 u4ConnectID, uint32 u4PacketParseID, CPacketParse* m_pPacketParse, uint8 u1Option,
-                           ACE_INET_Addr& addrRemote, const char* pLocalIP, uint32 u4LocalPort);
+                           ACE_INET_Addr& addrRemote, const char* pLocalIP,
+                           uint32 u4LocalPort, EM_CONNECT_IO_TYPE emIOType = CONNECT_IO_TCP);
 
 //File_Message的参数
 class _File_Message_Param

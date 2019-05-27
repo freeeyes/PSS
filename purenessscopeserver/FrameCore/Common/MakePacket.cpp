@@ -28,7 +28,7 @@ bool CMakePacket::PutMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& tvNo
     }
 
     //根据操作OP，调用相应的方法。
-    CMessage* pMessage = App_MessageServiceGroup::instance()->CreateMessage(pMakePacket->m_u4ConnectID, pMakePacket->m_PacketType);
+    CMessage* pMessage = App_MessageServiceGroup::instance()->CreateMessage(pMakePacket->m_u4ConnectID, pMakePacket->m_u1PacketType);
 
     if(NULL == pMessage)
     {
@@ -128,7 +128,7 @@ void CMakePacket::SetMessage(_MakePacket* pMakePacket, CMessage* pMessage, ACE_T
             pMessage->SetPacketBody(NULL);
         }
 
-        pMessage->GetMessageBase()->m_u1PacketType  = pMakePacket->m_PacketType;
+        pMessage->GetMessageBase()->m_u1PacketType  = pMakePacket->m_u1PacketType;
 
         sprintf_safe(pMessage->GetMessageBase()->m_szIP, MAX_BUFF_20, "%s", pMakePacket->m_AddrRemote.get_host_addr());
         pMessage->GetMessageBase()->m_u4Port = (uint32)pMakePacket->m_AddrRemote.get_port_number();
@@ -164,7 +164,7 @@ void CMakePacket::SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBo
 
 bool CMakePacket::PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, ACE_Time_Value& tvNow)
 {
-    CMessage* pMessage = App_MessageServiceGroup::instance()->CreateMessage(u4ConnectID, (uint8)PACKET_TCP);
+    CMessage* pMessage = App_MessageServiceGroup::instance()->CreateMessage(u4ConnectID, (uint8)CONNECT_IO_TCP);
 
     if(NULL == pMessage)
     {

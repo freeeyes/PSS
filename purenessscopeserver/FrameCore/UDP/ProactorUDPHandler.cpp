@@ -178,7 +178,7 @@ bool CProactorUDPHandler::SendMessage(char*& pMessage, uint32 u4Len, const char*
     SaveProSendInfo(u4Len);
 
     //统计发送信息
-    m_CommandAccount.SaveCommandData(u2CommandID, (uint32)nPort, PACKET_UDP, u4Len, COMMAND_TYPE_OUT);
+    m_CommandAccount.SaveCommandData(u2CommandID, (uint32)nPort, CONNECT_IO_UDP, u4Len, COMMAND_TYPE_OUT);
 
     //释放发送体
     App_MessageBlockManager::instance()->Close(pMbData);

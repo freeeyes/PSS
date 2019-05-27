@@ -1658,7 +1658,7 @@ bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
 
         _ClientIPInfo objClientIP = pConnectHandler->GetLocalIPInfo();
 
-        if (false == m_CommandAccount.SaveCommandData(u2CommandID, (uint32)objClientIP.m_nPort, PACKET_TCP, u4CommandSize, COMMAND_TYPE_OUT))
+        if (false == m_CommandAccount.SaveCommandData(u2CommandID, (uint32)objClientIP.m_nPort, CONNECT_IO_TCP, u4CommandSize, COMMAND_TYPE_OUT))
         {
             OUR_DEBUG((LM_INFO, "[CProConnectManager::SendMessage]ConnectID=%d, CommandID=%d, SaveCommandData error.\n", u4ConnectID, u2CommandID));
         }

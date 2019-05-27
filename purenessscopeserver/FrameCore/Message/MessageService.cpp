@@ -1364,11 +1364,11 @@ int32 CMessageServiceGroup::GetWorkThreadID(uint32 u4ConnectID, uint8 u1PackeTyp
         return n4ThreadID;
     }
 
-    if(u1PackeType == PACKET_TCP)
+    if(u1PackeType == CONNECT_IO_TCP)
     {
         n4ThreadID = u4ConnectID % (uint32)m_vecMessageService.size();
     }
-    else if(u1PackeType == PACKET_UDP)
+    else if(u1PackeType == CONNECT_IO_UDP)
     {
         //如果是UDP协议，则记录当前线程的位置，直接+1，调用随机数速度比较慢（因为要读文件）
         m_ThreadLock.acquire();

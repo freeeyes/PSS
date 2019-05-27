@@ -69,7 +69,7 @@ void CProTTyHandler::Close()
 
             //发送框架消息
             ACE_INET_Addr m_addrRemote;
-            Send_MakePacket_Queue(m_u4ConnectID, m_u4PacketParseInfoID, NULL, PACKET_TTY_DISCONNECT, m_addrRemote, "TTy", 0);
+            Send_MakePacket_Queue(m_u4ConnectID, m_u4PacketParseInfoID, NULL, PACKET_TTY_DISCONNECT, m_addrRemote, "TTy", 0, CONNECT_IO_TTY);
         }
 
         m_Ttyio.close();
@@ -100,7 +100,7 @@ bool CProTTyHandler::Init(uint32 u4ConnectID, const char* pName, ACE_TTY_IO::Ser
 
             //发送框架消息
             ACE_INET_Addr m_addrRemote;
-            Send_MakePacket_Queue(m_u4ConnectID, m_u4PacketParseInfoID, NULL, PACKET_TTY_CONNECT, m_addrRemote, "TTy", 0);
+            Send_MakePacket_Queue(m_u4ConnectID, m_u4PacketParseInfoID, NULL, PACKET_TTY_CONNECT, m_addrRemote, "TTy", 0, CONNECT_IO_TTY);
         }
 
         //准备接受数据
@@ -198,7 +198,7 @@ void CProTTyHandler::handle_read_file(const ACE_Asynch_Read_File::Result& result
                     pPacketParse->SetPacket_Body_Curr_Length(obj_Packet_Info.m_u4BodyCurrLen);
 
                     ACE_INET_Addr m_addrRemote;
-                    Send_MakePacket_Queue(m_u4ConnectID, m_u4PacketParseInfoID, pPacketParse, PACKET_PARSE, m_addrRemote, "TTy", 0);
+                    Send_MakePacket_Queue(m_u4ConnectID, m_u4PacketParseInfoID, pPacketParse, PACKET_PARSE, m_addrRemote, "TTy", 0, CONNECT_IO_TTY);
 
                     //清理用完的m_pPacketParse
                     App_PacketParsePool::instance()->Delete(pPacketParse);

@@ -7,26 +7,26 @@
 //记录消息的一些参数
 struct _MessageBase
 {
-    uint32         m_u4HeadSrcSize;             //包头原始长度
-    uint32         m_u4BodySrcSize;             //包体原始长度
-    uint32         m_u4ConnectID;               //消息链接ConnectID，如果是UDP则这个值无效
-    uint32         m_u4Port;                    //客户端端口
-    uint32         m_u4ListenPort;              //监听端口
-    uint32         m_u4WorkThreadID;            //工作线程ID
-    uint32         m_u4PacketParseID;           //与ConnectID对应的解析器ID
-    uint16         m_u2Cmd;                     //命令字的ID
-    uint8          m_u1PacketType;              //数据包来源类型
-    uint8          m_u1ResouceType;             //数据来源，服务器间数据包或者客户端数据包
-    char           m_szIP[MAX_BUFF_20];         //客户端IP
-    char           m_szListenIP[MAX_BUFF_20];   //监听IP
-    char           m_szTraceID[MAX_BUFF_50];    //TraceID
-    CProfileTime   m_ProfileTime;               //消息到达时间
-    ACE_Time_Value m_tvRecvTime;                //消息接收时间
+    uint32             m_u4HeadSrcSize;             //包头原始长度
+    uint32             m_u4BodySrcSize;             //包体原始长度
+    uint32             m_u4ConnectID;               //消息链接ConnectID，如果是UDP则这个值无效
+    uint32             m_u4Port;                    //客户端端口
+    uint32             m_u4ListenPort;              //监听端口
+    uint32             m_u4WorkThreadID;            //工作线程ID
+    uint32             m_u4PacketParseID;           //与ConnectID对应的解析器ID
+    uint16             m_u2Cmd;                     //命令字的ID
+    uint8              m_u1PacketType;              //数据包来源类型
+    uint8              m_u1ResouceType;             //数据来源，服务器间数据包或者客户端数据包
+    char               m_szIP[MAX_BUFF_20];         //客户端IP
+    char               m_szListenIP[MAX_BUFF_20];   //监听IP
+    char               m_szTraceID[MAX_BUFF_50];    //TraceID
+    CProfileTime       m_ProfileTime;               //消息到达时间
+    ACE_Time_Value     m_tvRecvTime;                //消息接收时间
 
     _MessageBase()
     {
-        m_u1PacketType    = PACKET_TCP;          //默认为TCP
-        m_u1ResouceType   = RESOUCE_FROM_CLIENT; //默认为来源于客户端的数据包
+        m_u1PacketType    = CONNECT_IO_TCP;          //默认为TCP
+        m_u1ResouceType   = RESOUCE_FROM_CLIENT;     //默认为来源于客户端的数据包
         m_u4ConnectID     = 0;
         m_u2Cmd           = 0;
         m_u4HeadSrcSize   = 0;
@@ -42,7 +42,7 @@ struct _MessageBase
 
     void Clear()
     {
-        m_u1PacketType    = PACKET_TCP;   //默认为TCP
+        m_u1PacketType    = CONNECT_IO_TCP;   //默认为TCP
         m_u1ResouceType   = RESOUCE_FROM_CLIENT; //默认为来源于客户端的数据包
         m_u4ConnectID     = 0;
         m_u2Cmd           = 0;

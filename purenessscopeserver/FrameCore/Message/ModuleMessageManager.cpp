@@ -46,7 +46,7 @@ int CModuleMessageManager::SendFrameMessage(uint16 u2CommandID, uint32 u4Connect
 
     if (u4ConnectID > 0)
     {
-        objMakePacket.m_PacketType = PACKET_TCP;
+        objMakePacket.m_u1PacketType = CONNECT_IO_TCP;
         objMakePacket.m_u4ConnectID = u4ConnectID;
         objMakePacket.m_pPacketParse = &objPacketParse;
         objMakePacket.m_u1Option = PACKET_PARSE;

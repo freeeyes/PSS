@@ -47,11 +47,11 @@ bool CForbiddenIP::Init(const char* szConfigPath)
 
         if (ACE_OS::strcmp(pTypeData, "TCP") == 0)
         {
-            ForbiddenIP.m_u1Type = PACKET_TCP;
+            ForbiddenIP.m_u1Type = CONNECT_IO_TCP;
         }
         else
         {
-            ForbiddenIP.m_u1Type = PACKET_UDP;
+            ForbiddenIP.m_u1Type = CONNECT_IO_UDP;
         }
 
         m_VecForeverForbiddenIP.push_back(ForbiddenIP);
