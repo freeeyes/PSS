@@ -1361,7 +1361,10 @@ int32 CMessageServiceGroup::GetWorkThreadID(uint32 u4ConnectID, uint8 u1PackeTyp
         return n4ThreadID;
     }
 
-    if(u1PackeType == CONNECT_IO_TCP)
+    if (u1PackeType == CONNECT_IO_TCP
+        || CONNECT_IO_TTY == u1PackeType
+        || CONNECT_IO_SERVER_TCP == u1PackeType
+        || CONNECT_IO_SERVER_UDP == u1PackeType)
     {
         n4ThreadID = u4ConnectID % (uint32)m_vecMessageService.size();
     }

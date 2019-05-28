@@ -207,13 +207,16 @@ void Send_MakePacket_Queue(uint32 u4ConnectID, uint32 u4PacketParseID, CPacketPa
     objMakePacket.m_u4PacketParseID = u4PacketParseID;
     objMakePacket.m_u1PacketType      = (uint8)emIOType;
 
-    if (ACE_OS::strcmp("INADDR_ANY", pLocalIP) == 0)
+    if (CONNECT_IO_TCP == emIOType || CONNECT_IO_UDP == emIOType)
     {
-        objMakePacket.m_AddrListen.set(u4LocalPort);
-    }
-    else
-    {
-        objMakePacket.m_AddrListen.set(u4LocalPort, pLocalIP);
+        if (ACE_OS::strcmp("INADDR_ANY", pLocalIP) == 0)
+        {
+            objMakePacket.m_AddrListen.set(u4LocalPort);
+        }
+        else
+        {
+            objMakePacket.m_AddrListen.set(u4LocalPort, pLocalIP);
+        }
     }
 
     //如果这个端口是转发协议端口且为本地不处理，则不处理
