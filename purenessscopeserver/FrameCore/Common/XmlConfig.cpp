@@ -24,6 +24,7 @@ DefineClassAndFunc(xmlNetWorkMode, XML_Config_NetWorkMode)
 DefineClassAndFunc(xmlTCPServerIPs, XML_Config_TCPServerIPs)
 DefineClassAndFunc(xmlUDPServerIPs, XML_Config_UDPServerIPs)
 DefineClassAndFunc(xmlTTyDrives, XML_Config_TTyDrives)
+DefineClassAndFunc(xmlServer2Server, XML_Config_Server2Servers)
 DefineClassAndFunc(xmlConnectServer, XML_Config_ConnectServer)
 DefineClassAndFunc(xmlClientInfo, XML_Config_ClientInfo)
 DefineClassAndFunc(xmlTTyClientManagerInfo, XML_Config_TTyClientManager)
@@ -260,7 +261,7 @@ bool xmlTTyDrives::Init(CXmlOpeation* pXmlOperation)
 
     while (bKet
            && pXmlOperation->Read_XML_Data_Multiple_Uint32("TTy", "ComID", TTyDrives.u4TTyID, pTTyID)
-           && pXmlOperation->Read_XML_Data_Multiple_Uint32("TTy", "ParseID", TTyDrives.u4PacketParseID, pParseID)
+           && pXmlOperation->Read_XML_Data_Multiple_Uint32("TTy", "TTyParseID", TTyDrives.u4PacketParseID, pParseID)
            && pXmlOperation->Read_XML_Data_Multiple_Uint32("TTy", "Baud", TTyDrives.u4Baud, pBaud)
            && pXmlOperation->Read_XML_Data_Multiple_Uint32("TTy", "DataBits", TTyDrives.u4DataBits, pDataBits)
            && pXmlOperation->Read_XML_Data_Multiple_Uint32("TTy", "StopBits", TTyDrives.u4StopBits, pStopBits)
@@ -269,6 +270,28 @@ bool xmlTTyDrives::Init(CXmlOpeation* pXmlOperation)
            && pXmlOperation->Read_XML_Data_Multiple_String("TTy", "PortDes", TTyDrives.strDesc, pPortDesc))
     {
         vec.push_back(TTyDrives);
+    }
+
+    return bKet;
+}
+
+bool xmlServer2Server::Init(CXmlOpeation* pXmlOperation)
+{
+    bool bKet = true;
+    TiXmlElement* pServerID      = NULL;
+    TiXmlElement* pServerIP      = NULL;
+    TiXmlElement* pServerPort    = NULL;
+    TiXmlElement* pParketParseID = NULL;
+
+    _Server2Server Server2Server;
+
+    while (bKet
+           && pXmlOperation->Read_XML_Data_Multiple_Uint32("ServerToServer", "S2SID", Server2Server.u4ServerID, pServerID)
+           && pXmlOperation->Read_XML_Data_Multiple_String("ServerToServer", "S2SIp", Server2Server.strServerIP, pServerIP)
+           && pXmlOperation->Read_XML_Data_Multiple_Uint32("ServerToServer", "S2SPort", Server2Server.u4ServerPort, pServerPort)
+           && pXmlOperation->Read_XML_Data_Multiple_Uint32("ServerToServer", "S2SPacketParseID", Server2Server.u4PacketParseID, pParketParseID))
+    {
+        vec.push_back(Server2Server);
     }
 
     return bKet;

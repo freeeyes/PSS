@@ -376,6 +376,22 @@ bool CProServerManager::Start()
 
     }
 
+    //开启服务器间通讯相关配置信息
+    int nS2SCount = (int)GetXmlConfigAttribute(xmlServer2Server)->vec.size();
+
+    for (int i = 0; i < nS2SCount; i++)
+    {
+        uint8 u1IPType = TYPE_IPV4;
+        Check_IPType(GetXmlConfigAttribute(xmlServer2Server)->vec[i].strServerIP.c_str(), u1IPType);
+
+        //开启服务器2服务器监听
+        App_ClientProConnectManager::instance()->ConnectFrame(GetXmlConfigAttribute(xmlServer2Server)->vec[i].u4ServerID,
+                GetXmlConfigAttribute(xmlServer2Server)->vec[i].strServerIP.c_str(),
+                GetXmlConfigAttribute(xmlServer2Server)->vec[i].u4ServerPort,
+                u1IPType,
+                GetXmlConfigAttribute(xmlServer2Server)->vec[i].u4PacketParseID);
+    }
+
     //开闸，让客户端数据进来
     if (!App_ProactorManager::instance()->StartClientProactor())
     {

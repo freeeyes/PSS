@@ -16,6 +16,7 @@
 #include "ReTTyClientManager.h"
 #include "MessageQueueManager.h"
 #include "ControlListen.h"
+#include "IpCheck.h"
 
 class Frame_Logging_Strategy;
 

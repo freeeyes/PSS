@@ -10,6 +10,7 @@
 #include "ProUDPManager.h"
 #include "XmlConfig.h"
 #include "MessageQueueManager.h"
+#include "IpCheck.h"
 
 //添加对服务器控制的支持，Console模块用于支持外网对服务器的控制
 //add by freeeyes

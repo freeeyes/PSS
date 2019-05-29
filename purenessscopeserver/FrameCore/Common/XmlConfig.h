@@ -25,6 +25,7 @@ enum XmlConfig
     XML_Config_TCPServerIPs,
     XML_Config_UDPServerIPs,
     XML_Config_TTyDrives,
+    XML_Config_Server2Servers,
     /********连接信息********/
     XML_Config_ConnectServer,
     XML_Config_ClientInfo,
@@ -225,6 +226,24 @@ public:
     };
     std::vector<_TTyDrives> vec;
     xmlTTyDrives(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
+    bool Init(CXmlOpeation* pXmlOperation);
+};
+
+//服务器间通讯端口设置
+class xmlServer2Server : public IConfigOpeation
+{
+public:
+    class _Server2Server
+    {
+    public:
+        uint32 u4ServerID;
+        std::string strServerIP;
+        uint32 u4ServerPort;
+        uint32 u4PacketParseID;
+        _Server2Server() : u4ServerID(0), strServerIP(""), u4ServerPort(0), u4PacketParseID(0) {}
+    };
+    std::vector<_Server2Server> vec;
+    xmlServer2Server(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
