@@ -22,7 +22,7 @@ CReactorClientInfo::~CReactorClientInfo()
     OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::~CReactorClientInfo].\n"));
 }
 
-bool CReactorClientInfo::Init(int nServerID, const char* pIP, int nPort, uint8 u1IPType, CConnectClientConnector* pReactorConnect, IClientMessage* pClientMessage, ACE_Reactor* pReactor)
+bool CReactorClientInfo::Init(int nServerID, const char* pIP, int nPort, uint8 u1IPType, CConnectClientConnector* pReactorConnect, IClientMessage* pClientMessage, ACE_Reactor* pReactor, uint32 u4PacketParseID)
 {
     int nRet = 0;
 
@@ -45,6 +45,7 @@ bool CReactorClientInfo::Init(int nServerID, const char* pIP, int nPort, uint8 u
     m_pReactorConnect   = pReactorConnect;
     m_nServerID         = nServerID;
     m_pReactor          = pReactor;
+    m_u4PacketParseID   = u4PacketParseID;
     return true;
 }
 
@@ -205,6 +206,16 @@ void CReactorClientInfo::SetServerConnectState(EM_Server_Connect_State objState)
     m_emConnectState = objState;
 }
 
+void CReactorClientInfo::SetPacketParseID(uint32 u4PacketParseID)
+{
+    m_u4PacketParseID = u4PacketParseID;
+}
+
+uint32 CReactorClientInfo::GetPacketParseID()
+{
+    return m_u4PacketParseID;
+}
+
 void CReactorClientInfo::SetLocalAddr( const char* pIP, int nPort, uint8 u1IPType )
 {
     int nRet = 0;
@@ -275,7 +286,7 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, int nPort,
     CReactorClientInfo* pClientInfo = NULL;
 
     //连接初始化动作
-    if (false == ConnectTcpInit(nServerID, pIP, nPort, u1IPType, NULL, 0, u1IPType, pClientMessage, pClientInfo))
+    if (false == ConnectTcpInit(nServerID, pIP, nPort, u1IPType, NULL, 0, u1IPType, pClientMessage, pClientInfo, 0))
     {
         return false;
     }
@@ -305,7 +316,7 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, int nPort,
     CReactorClientInfo* pClientInfo = NULL;
 
     //连接初始化动作
-    if (false == ConnectTcpInit(nServerID, pIP, nPort, u1IPType, pLocalIP, nLocalPort, u1LocalIPType, pClientMessage, pClientInfo))
+    if (false == ConnectTcpInit(nServerID, pIP, nPort, u1IPType, pLocalIP, nLocalPort, u1LocalIPType, pClientMessage, pClientInfo, 0))
     {
         return false;
     }
@@ -326,6 +337,66 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, int nPort,
     }
 
     OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]nServerID =(%d) connect is OK.\n", nServerID));
+    return true;
+}
+
+bool CClientReConnectManager::ConnectFrame(int nServerID, const char* pIP, int nPort, uint8 u1IPType, uint32 u4PacketParseID)
+{
+    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
+    CReactorClientInfo* pClientInfo = NULL;
+
+    //连接初始化动作
+    if (false == ConnectTcpInit(nServerID, pIP, nPort, u1IPType, NULL, 0, u1IPType, NULL, pClientInfo, u4PacketParseID))
+    {
+        return false;
+    }
+
+    //开始链接
+    if (false == pClientInfo->Run(m_blReactorFinish, SERVER_CONNECT_FIRST))
+    {
+        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::ConnectFrame]Run Error.\n"));
+        delete pClientInfo;
+        pClientInfo = NULL;
+
+        if (false == Close(nServerID))
+        {
+            OUR_DEBUG((LM_INFO, "[CClientReConnectManager::ConnectFrame]Close Error"));
+        }
+
+        return false;
+    }
+
+    OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::ConnectFrame]nServerID =(%d) connect is OK.\n", nServerID));
+    return true;
+}
+
+bool CClientReConnectManager::ConnectFrame(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, uint32 u4PacketParseID)
+{
+    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
+    CReactorClientInfo* pClientInfo = NULL;
+
+    //连接初始化动作
+    if (false == ConnectTcpInit(nServerID, pIP, nPort, u1IPType, pLocalIP, nLocalPort, u1LocalIPType, NULL, pClientInfo, u4PacketParseID))
+    {
+        return false;
+    }
+
+    //开始链接
+    if (false == pClientInfo->Run(m_blReactorFinish, SERVER_CONNECT_FIRST))
+    {
+        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::ConnectFrame]Run Error.\n"));
+        delete pClientInfo;
+        pClientInfo = NULL;
+
+        if (false == Close(nServerID))
+        {
+            OUR_DEBUG((LM_INFO, "[CClientReConnectManager::ConnectFrame]Close Error.\n"));
+        }
+
+        return false;
+    }
+
+    OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::ConnectFrame]nServerID =(%d) connect is OK.\n", nServerID));
     return true;
 }
 
@@ -641,7 +712,7 @@ void CClientReConnectManager::Close()
     OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]End.\n"));
 }
 
-bool CClientReConnectManager::ConnectTcpInit(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CReactorClientInfo*& pClientInfo)
+bool CClientReConnectManager::ConnectTcpInit(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CReactorClientInfo*& pClientInfo, uint32 u4PacketParseID)
 {
     //查找已有连接
     char szServerID[10] = { '\0' };
@@ -671,9 +742,12 @@ bool CClientReConnectManager::ConnectTcpInit(int nServerID, const char* pIP, int
     }
 
     //添加有效的pClientMessage
-    App_ServerMessageTask::instance()->AddClientMessage(pClientMessage);
+    if (GetXmlConfigAttribute(xmlConnectServer)->RunType == 1)
+    {
+        App_ServerMessageTask::instance()->AddClientMessage(pClientMessage);
+    }
 
-    if (false == pClientInfo->Init(nServerID, pIP, nPort, u1IPType, &m_ReactorConnect, pClientMessage, m_pReactor))
+    if (false == pClientInfo->Init(nServerID, pIP, nPort, u1IPType, &m_ReactorConnect, pClientMessage, m_pReactor, u4PacketParseID))
     {
         OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]pClientInfo Init Error.\n"));
         SAFE_DELETE(pClientInfo);
@@ -865,6 +939,22 @@ EM_Server_Connect_State CClientReConnectManager::GetConnectState( int nServerID 
     }
 
     return pClientInfo->GetServerConnectState();
+}
+
+uint32 CClientReConnectManager::GetPacketParseID(int nServerID)
+{
+    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
+    char szServerID[10] = { '\0' };
+    sprintf_safe(szServerID, 10, "%d", nServerID);
+
+    CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
+
+    if (NULL != pClientInfo)
+    {
+        return pClientInfo->GetPacketParseID();
+    }
+
+    return 0;
 }
 
 bool CClientReConnectManager::ReConnect(int nServerID)

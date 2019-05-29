@@ -834,6 +834,9 @@
     <ClInclude Include="Message\MessageQueueManager.h">
       <Filter>Message\hfile</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\ITTyClientManager.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

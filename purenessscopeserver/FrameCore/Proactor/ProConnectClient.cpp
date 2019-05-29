@@ -17,6 +17,7 @@ CProConnectClient::CProConnectClient(void)
     m_u4CostTime        = 0;
 
     m_emRecvState       = SERVER_RECV_INIT;
+    m_emDispose         = CONNECT_IO_PLUGIN;
 }
 
 CProConnectClient::~CProConnectClient(void)
@@ -43,6 +44,19 @@ void CProConnectClient::Close()
         {
             ACE_OS::closesocket(this->handle());
             this->handle(ACE_INVALID_HANDLE);
+        }
+
+        if (CONNECT_IO_FRAME == m_emDispose)
+        {
+            //发送packetParse断开消息
+            _ClientIPInfo objClientIPInfo;
+            _ClientIPInfo objLocalIPInfo;
+            App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Connect(m_nServerID,
+                    objClientIPInfo,
+                    objLocalIPInfo);
+
+            //发送框架消息
+            Send_MakePacket_Queue(m_nServerID, m_u4PacketParseInfoID, NULL, PACKET_SERVER_TCP_DISCONNECT, m_AddrRemote, "127.0.0.1", 0, CONNECT_IO_SERVER_TCP);
         }
 
         App_ClientProConnectManager::instance()->CloseByClient(m_nServerID);
@@ -76,6 +90,12 @@ void CProConnectClient::ClientClose(EM_s2s& ems2s)
 void CProConnectClient::SetServerID(int nServerID)
 {
     m_nServerID = nServerID;
+}
+
+void CProConnectClient::SetPacketParseInfoID(uint32 u4PacketParseInfoID)
+{
+    m_emDispose           = CONNECT_IO_FRAME;
+    m_u4PacketParseInfoID = u4PacketParseInfoID;
 }
 
 void CProConnectClient::SetClientMessage(IClientMessage* pClientMessage)
@@ -116,6 +136,26 @@ void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
     App_ClientProConnectManager::instance()->SetHandler(m_nServerID, this);
     m_pClientMessage = App_ClientProConnectManager::instance()->GetClientMessage(m_nServerID);
 
+    uint32 u4PacketParseID = App_ClientProConnectManager::instance()->GetPacketParseID(m_nServerID);
+
+    if (u4PacketParseID > 0)
+    {
+        SetPacketParseInfoID(u4PacketParseID);
+    }
+
+    if (CONNECT_IO_FRAME == m_emDispose)
+    {
+        //发送packetParse断开消息
+        _ClientIPInfo objClientIPInfo;
+        _ClientIPInfo objLocalIPInfo;
+        App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Connect(m_nServerID,
+                objClientIPInfo,
+                objLocalIPInfo);
+
+        //发送框架消息
+        Send_MakePacket_Queue(m_nServerID, m_u4PacketParseInfoID, NULL, PACKET_SERVER_TCP_CONNECT, m_AddrRemote, "127.0.0.1", 0, CONNECT_IO_SERVER_TCP);
+    }
+
     if (false == RecvData(GetXmlConfigAttribute(xmlConnectServer)->Recvbuff, NULL))
     {
         OUR_DEBUG((LM_DEBUG, "[CProConnectClient::open](%d)GetConnectServerRecvBuffer is error.\n", m_nServerID));
@@ -129,11 +169,11 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
     ACE_Message_Block& mb = result.message_block();
     uint32 u4PacketLen = (uint32)result.bytes_transferred();
 
-    if(!result.success() || u4PacketLen == 0)
+    if (!result.success() || u4PacketLen == 0)
     {
         mb.release();
 
-        if(NULL != m_pClientMessage)
+        if (NULL != m_pClientMessage)
         {
             _ClientIPInfo objServerIPInfo;
             sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_AddrRemote.get_host_addr());
@@ -141,7 +181,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
 
             //这里只处理远端服务器断开连接的消息，回调ConnectError
             //服务器主动关闭不在回调ConnectError
-            if(S2S_NEED_CALLBACK == m_ems2s)
+            if (S2S_NEED_CALLBACK == m_ems2s)
             {
                 m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
             }
@@ -153,73 +193,110 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
     else
     {
         //处理接收数据(这里不区分是不是完整包，交给上层逻辑自己去判定)
-        if(NULL != m_pClientMessage)
+        if (CONNECT_IO_FRAME == m_emDispose)
         {
-            _ClientIPInfo objServerIPInfo;
-            sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_AddrRemote.get_host_addr());
-            objServerIPInfo.m_nPort = m_AddrRemote.get_port_number();
-            //m_pClientMessage->RecvData(&mb, objServerIPInfo);
+            _Packet_Parse_Info* pPacketParse = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID);
 
-            //这里处理一下是不是完整包
-            uint16 u2CommandID             = 0;
-            ACE_Message_Block* pRecvFinish = NULL;
-
-            m_atvRecv     = ACE_OS::gettimeofday();
-            m_emRecvState = SERVER_RECV_BEGIN;
-
-            while (true)
+            if (NULL != pPacketParse)
             {
-                EM_PACKET_ROUTE em_PacketRoute = PACKET_ROUTE_SELF;
-                bool blRet = m_pClientMessage->Recv_Format_data(&mb, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish, em_PacketRoute);
+                _Packet_Info obj_Packet_Info;
+                uint8 n1Ret = pPacketParse->Parse_Packet_Stream(m_nServerID,
+                              &mb,
+                              dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()),
+                              &obj_Packet_Info,
+                              CONNECT_IO_TTY);
 
-                if (true == blRet)
+                if (PACKET_GET_ENOUGTH == n1Ret)
                 {
-                    if (PACKET_ROUTE_SELF == em_PacketRoute)
+
+                    //发送消息给消息框架
+                    CPacketParse* pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
+                    pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
+                    pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);
+                    pPacketParse->SetPacket_CommandID(obj_Packet_Info.m_u2PacketCommandID);
+                    pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4HeadSrcLen);
+                    pPacketParse->SetPacket_Head_Curr_Length(obj_Packet_Info.m_u4HeadCurrLen);
+                    pPacketParse->SetPacket_Body_Src_Length(obj_Packet_Info.m_u4BodySrcLen);
+                    pPacketParse->SetPacket_Body_Curr_Length(obj_Packet_Info.m_u4BodyCurrLen);
+
+                    //发送框架消息
+                    Send_MakePacket_Queue(m_nServerID, m_u4PacketParseInfoID, pPacketParse, PACKET_PARSE, m_AddrRemote, "127.0.0.1", 0, CONNECT_IO_SERVER_TCP);
+
+                    //清理用完的m_pPacketParse
+                    App_PacketParsePool::instance()->Delete(pPacketParse);
+                }
+            }
+            else
+            {
+
+                if (NULL != m_pClientMessage)
+                {
+                    _ClientIPInfo objServerIPInfo;
+                    sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_AddrRemote.get_host_addr());
+                    objServerIPInfo.m_nPort = m_AddrRemote.get_port_number();
+                    //m_pClientMessage->RecvData(&mb, objServerIPInfo);
+
+                    //这里处理一下是不是完整包
+                    uint16 u2CommandID = 0;
+                    ACE_Message_Block* pRecvFinish = NULL;
+
+                    m_atvRecv = ACE_OS::gettimeofday();
+                    m_emRecvState = SERVER_RECV_BEGIN;
+
+                    while (true)
                     {
-                        //直接调用插件内注册的对象处理数据
-                        Recv_Common_Dispose_Client_Message(u2CommandID, pRecvFinish, objServerIPInfo, m_pClientMessage);
+                        EM_PACKET_ROUTE em_PacketRoute = PACKET_ROUTE_SELF;
+                        bool blRet = m_pClientMessage->Recv_Format_data(&mb, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish, em_PacketRoute);
+
+                        if (true == blRet)
+                        {
+                            if (PACKET_ROUTE_SELF == em_PacketRoute)
+                            {
+                                //直接调用插件内注册的对象处理数据
+                                Recv_Common_Dispose_Client_Message(u2CommandID, pRecvFinish, objServerIPInfo, m_pClientMessage);
+                            }
+                            else
+                            {
+                                //将数据放回到工作消息线程
+                                SendMessageGroup(u2CommandID, pRecvFinish);
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
-                    else
+                }
+
+                m_emRecvState = SERVER_RECV_END;
+
+                //如果有剩余数据，放入数据包里面去
+                if (mb.length() > 0)
+                {
+                    ACE_Message_Block* pmbSave = App_MessageBlockManager::instance()->Create((uint32)mb.length());
+
+                    if (NULL != pmbSave)
                     {
-                        //将数据放回到工作消息线程
-                        SendMessageGroup(u2CommandID, pRecvFinish);
+                        memcpy_safe(pmbSave->wr_ptr(), (uint32)mb.length(), mb.rd_ptr(), (uint32)mb.length());
+                        pmbSave->wr_ptr(mb.length());
+
+                        if (false == RecvData(GetXmlConfigAttribute(xmlConnectServer)->Recvbuff, pmbSave))
+                        {
+                            OUR_DEBUG((LM_INFO, "[CProConnectClient::handle_read_stream](%d)RecvData is fail.\n", m_nServerID));
+                        }
                     }
                 }
                 else
                 {
-                    break;
+                    if (false == RecvData(GetXmlConfigAttribute(xmlConnectServer)->Recvbuff, NULL))
+                    {
+                        OUR_DEBUG((LM_INFO, "[CProConnectClient::handle_read_stream](%d)RecvData is fail.\n", m_nServerID));
+                    }
                 }
-            }
 
-        }
-
-        m_emRecvState = SERVER_RECV_END;
-
-        //如果有剩余数据，放入数据包里面去
-        if (mb.length() > 0)
-        {
-            ACE_Message_Block* pmbSave = App_MessageBlockManager::instance()->Create((uint32)mb.length());
-
-            if (NULL != pmbSave)
-            {
-                memcpy_safe(pmbSave->wr_ptr(), (uint32)mb.length(), mb.rd_ptr(), (uint32)mb.length());
-                pmbSave->wr_ptr(mb.length());
-
-                if (false == RecvData(GetXmlConfigAttribute(xmlConnectServer)->Recvbuff, pmbSave))
-                {
-                    OUR_DEBUG((LM_INFO, "[CProConnectClient::handle_read_stream](%d)RecvData is fail.\n", m_nServerID));
-                }
+                mb.release();
             }
         }
-        else
-        {
-            if (false == RecvData(GetXmlConfigAttribute(xmlConnectServer)->Recvbuff, NULL))
-            {
-                OUR_DEBUG((LM_INFO, "[CProConnectClient::handle_read_stream](%d)RecvData is fail.\n", m_nServerID));
-            }
-        }
-
-        mb.release();
     }
 }
 

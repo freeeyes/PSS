@@ -154,6 +154,10 @@ static bool Convert_Version(int nTagVserion)
 #define PACKET_SEND_OK        8            //发送成功回执
 #define PACKET_TTY_CONNECT    9            //TTy设备连接
 #define PACKET_TTY_DISCONNECT 10           //TTy设备断开连接
+#define PACKET_SERVER_TCP_CONNECT 11       //服务器间通讯Tcp连接建立
+#define PACKET_SERVER_TCP_DISCONNECT 12    //服务器间通讯Tcp连接断开
+#define PACKET_SERVER_UDP_CONNECT 13       //服务器间通讯Tcp连接建立
+#define PACKET_SERVER_UDP_DISCONNECT 14    //服务器间通讯Tcp连接断开
 
 #define MAX_PACKET_PARSE      5000         //PACKETPARSE对象池个数
 #define MAX_MESSAGE_POOL      5000         //Message对象池个数
@@ -410,6 +414,10 @@ enum
 #define CLIENT_LINK_SENDOK         0x0007      //服务器发送成功回执
 #define CLINET_LINK_TTY_CONNECT    0x0008      //tty建立连接
 #define CLINET_LINK_TTY_DISCONNECT 0x0009      //tty断开建立连接
+#define CLINET_LINK_ST_CONNECT     0x000a      //服务器间TCP连接
+#define CLINET_LINK_ST_DISCONNECT  0x000b      //服务器间TCP连接断开
+#define CLINET_LINK_SU_CONNECT     0x000c      //服务器间UDP连接
+#define CLINET_LINK_SU_DISCONNECT  0x000d      //服务器间UDP连接断开
 #define CLIENT_LINK_USER           0x0100      //用户信令开始序列头部
 //*****************************************************************
 

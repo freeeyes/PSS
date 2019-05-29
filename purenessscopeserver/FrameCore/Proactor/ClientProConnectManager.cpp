@@ -6,6 +6,7 @@ CProactorClientInfo::CProactorClientInfo()
     m_pProAsynchConnect = NULL;
     m_pClientMessage    = NULL;
     m_nServerID         = 0;
+    m_u4PacketParseID   = 0;
     m_emConnectState    = SERVER_CONNECT_READY;
     m_blIsLocal         = false;
 }
@@ -14,7 +15,7 @@ CProactorClientInfo::~CProactorClientInfo()
 {
 }
 
-bool CProactorClientInfo::Init(const char* pIP, int nPort, uint8 u1IPType, int nServerID, CProAsynchConnect* pProAsynchConnect, IClientMessage* pClientMessage)
+bool CProactorClientInfo::Init(const char* pIP, int nPort, uint8 u1IPType, int nServerID, CProAsynchConnect* pProAsynchConnect, IClientMessage* pClientMessage, uint32 u4PacketParseID)
 {
     OUR_DEBUG((LM_ERROR, "[CProactorClientInfo::Init]SetAddrServer(%s:%d) Begin.\n", pIP, nPort));
 
@@ -38,6 +39,7 @@ bool CProactorClientInfo::Init(const char* pIP, int nPort, uint8 u1IPType, int n
     m_pProAsynchConnect = pProAsynchConnect;
     m_pClientMessage    = pClientMessage;
     m_nServerID         = nServerID;
+    m_u4PacketParseID   = u4PacketParseID;
 
     return true;
 }
@@ -194,6 +196,16 @@ void CProactorClientInfo::SetServerConnectState( EM_Server_Connect_State objStat
     m_emConnectState = objState;
 }
 
+void CProactorClientInfo::SetPacketParseID(uint32 u4PacketParseID)
+{
+    m_u4PacketParseID = u4PacketParseID;
+}
+
+NAMESPACE::uint32 CProactorClientInfo::GetPacketParseID()
+{
+    return m_u4PacketParseID;
+}
+
 void CProactorClientInfo::SetLocalAddr( const char* pIP, int nPort, uint8 u1IPType )
 {
     if(u1IPType == TYPE_IPV4)
@@ -278,7 +290,10 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, int nPort
     }
 
     //添加有效的pClientMessage
-    App_ServerMessageTask::instance()->AddClientMessage(pClientMessage);
+    if (GetXmlConfigAttribute(xmlConnectServer)->RunType == 1)
+    {
+        App_ServerMessageTask::instance()->AddClientMessage(pClientMessage);
+    }
 
     OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) connect is OK.\n", nServerID));
 
@@ -307,6 +322,52 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, int nPort
     if (GetXmlConfigAttribute(xmlConnectServer)->RunType == 1)
     {
         App_ServerMessageTask::instance()->AddClientMessage(pClientMessage);
+    }
+
+    OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) connect is OK.\n", nServerID));
+
+    return true;
+}
+
+bool CClientProConnectManager::ConnectFrame(int nServerID, const char* pIP, int nPort, uint8 u1IPType, uint32 u4PacketParse)
+{
+    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
+    CProactorClientInfo* pClientInfo = NULL;
+
+    //连接初始化动作
+    if (false == ConnectTcpInit(nServerID, pIP, nPort, u1IPType, NULL, 0, u1IPType, NULL, pClientInfo, u4PacketParse))
+    {
+        return false;
+    }
+
+    //第一次开始链接
+    if (false == pClientInfo->Run(m_blProactorFinish, SERVER_CONNECT_FIRST))
+    {
+        SAFE_DELETE(pClientInfo);
+        return false;
+    }
+
+    OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) connect is OK.\n", nServerID));
+
+    return true;
+}
+
+bool CClientProConnectManager::ConnectFrame(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, uint32 u4PacketParse)
+{
+    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
+    CProactorClientInfo* pClientInfo = NULL;
+
+    //连接初始化动作
+    if (false == ConnectTcpInit(nServerID, pIP, nPort, u1IPType, pLocalIP, nLocalPort, u1LocalIPType, NULL, pClientInfo, u4PacketParse))
+    {
+        return false;
+    }
+
+    //第一次开始链接
+    if (false == pClientInfo->Run(m_blProactorFinish, SERVER_CONNECT_FIRST))
+    {
+        SAFE_DELETE(pClientInfo);
+        return false;
     }
 
     OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) connect is OK.\n", nServerID));
@@ -481,6 +542,22 @@ IClientMessage* CClientProConnectManager::GetClientMessage(int nServerID)
     }
 
     return NULL;
+}
+
+uint32 CClientProConnectManager::GetPacketParseID(int nServerID)
+{
+    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
+    char szServerID[10] = { '\0' };
+    sprintf_safe(szServerID, 10, "%d", nServerID);
+
+    CProactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
+
+    if (NULL != pClientInfo)
+    {
+        return pClientInfo->GetPacketParseID();
+    }
+
+    return 0;
 }
 
 bool CClientProConnectManager::SendData(int nServerID, char*& pData, int nSize, bool blIsDelete)
@@ -676,7 +753,7 @@ int CClientProConnectManager::handle_timeout(const ACE_Time_Value& tv, const voi
     return 0;
 }
 
-bool CClientProConnectManager::ConnectTcpInit(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CProactorClientInfo*& pClientInfo)
+bool CClientProConnectManager::ConnectTcpInit(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CProactorClientInfo*& pClientInfo, uint32 u4PacketParseID)
 {
     char szServerID[10] = { '\0' };
     sprintf_safe(szServerID, 10, "%d", nServerID);
@@ -699,7 +776,7 @@ bool CClientProConnectManager::ConnectTcpInit(int nServerID, const char* pIP, in
     //初始化链接信息
     pClientInfo = new CProactorClientInfo();
 
-    if (false == pClientInfo->Init(pIP, nPort, u1IPType, nServerID, &m_ProAsynchConnect, pClientMessage))
+    if (false == pClientInfo->Init(pIP, nPort, u1IPType, nServerID, &m_ProAsynchConnect, pClientMessage, u4PacketParseID))
     {
         SAFE_DELETE(pClientInfo);
         return false;

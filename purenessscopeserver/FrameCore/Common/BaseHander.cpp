@@ -195,13 +195,13 @@ uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPa
     return n1Ret;
 }
 
-void Send_MakePacket_Queue(uint32 u4ConnectID, uint32 u4PacketParseID, CPacketParse* m_pPacketParse, uint8 u1Option, ACE_INET_Addr& addrRemote, const char* pLocalIP, uint32 u4LocalPort, EM_CONNECT_IO_TYPE emIOType)
+void Send_MakePacket_Queue(uint32 u4ConnectID, uint32 u4PacketParseID, CPacketParse* pPacketParse, uint8 u1Option, ACE_INET_Addr& addrRemote, const char* pLocalIP, uint32 u4LocalPort, EM_CONNECT_IO_TYPE emIOType)
 {
     //需要回调发送成功回执
     _MakePacket objMakePacket;
 
     objMakePacket.m_u4ConnectID     = u4ConnectID;
-    objMakePacket.m_pPacketParse    = m_pPacketParse;
+    objMakePacket.m_pPacketParse    = pPacketParse;
     objMakePacket.m_u1Option        = u1Option;
     objMakePacket.m_AddrRemote      = addrRemote;
     objMakePacket.m_u4PacketParseID = u4PacketParseID;

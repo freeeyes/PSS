@@ -25,7 +25,7 @@ public:
     CProactorClientInfo();
     ~CProactorClientInfo();
 
-    bool Init(const char* pIP, int nPort, uint8 u1IPType, int nServerID, CProAsynchConnect* pProAsynchConnect, IClientMessage* pClientMessage);  //初始化链接地址和端口
+    bool Init(const char* pIP, int nPort, uint8 u1IPType, int nServerID, CProAsynchConnect* pProAsynchConnect, IClientMessage* pClientMessage, uint32 u4PacketParseID);  //初始化链接地址和端口
     void SetLocalAddr(const char* pIP, int nPort, uint8 u1IPType);                             //设置本地IP和端口
     bool Run(bool blIsReadly, EM_Server_Connect_State emState = SERVER_CONNECT_RECONNECT);     //开始链接
     bool SendData(ACE_Message_Block* pmblk);                                                   //发送数据
@@ -37,6 +37,8 @@ public:
     ACE_INET_Addr GetServerAddr();                                                             //获得服务器的地址
     EM_Server_Connect_State GetServerConnectState();                                           //得到当前连接状态
     void SetServerConnectState(EM_Server_Connect_State objState);                              //设置当前连接状态
+    void SetPacketParseID(uint32 u4PacketParseID);                                             //设置解析器ID
+    uint32 GetPacketParseID();                                                                 //获得解析器ID
 
 private:
     ACE_INET_Addr             m_AddrLocal;                //本地的连接地址（可以指定）
@@ -44,6 +46,7 @@ private:
     CProConnectClient*        m_pProConnectClient;        //当前链接对象
     CProAsynchConnect*        m_pProAsynchConnect;        //异步链接对象
     IClientMessage*           m_pClientMessage;           //回调函数类，回调返回错误和返回数据方法
+    uint32                    m_u4PacketParseID;          //可设置的PacketParseID
     bool                      m_blIsLocal;                //是否需要制定本地端口
     int                       m_nServerID;                //服务器ID，由用户起名，用于区别连接
     EM_Server_Connect_State   m_emConnectState;           //连接状态
@@ -59,6 +62,8 @@ public:
     bool Init(ACE_Proactor* pProactor);                                                                                        //初始化链接器
     virtual bool Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, IClientMessage* pClientMessage);                   //链接指定的服务器（TCP）
     virtual bool Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage);  //连接服务器(TCP)，指定本地地址
+    virtual bool ConnectFrame(int nServerID, const char* pIP, int nPort, uint8 u1IPType, uint32 u4PacketParse);                //连接指定的服务器，并给出PacketParseID
+    virtual bool ConnectFrame(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, uint32 u4PacketParse);      //连接指定的服务器，并给出PacketParseID
     virtual bool ConnectUDP(int nServerID, const char* pIP, int nPort, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage);                                //建立一个指向UDP的链接（UDP）
     bool ReConnect(int nServerID);                                                                                             //重新连接一个指定的服务器(TCP)
     bool CloseByClient(int nServerID);                                                                                         //远程被动关闭(TCP)
@@ -69,6 +74,7 @@ public:
     virtual bool SendDataUDP(int nServerID,const char* pIP, int nPort, char*& pMessage, uint32 u4Len, bool blIsDelete = true);   //发送数据（UDP）
     bool SetHandler(int nServerID, CProConnectClient* pProConnectClient);                                                      //将指定的CProConnectClient*绑定给nServerID
     virtual IClientMessage* GetClientMessage(int nServerID);                                                                           //获得ClientMessage对象
+    virtual uint32 GetPacketParseID(int nServerID);                                                                           //获得PacketParseID
     virtual bool StartConnectTask(int nIntervalTime = CONNECT_LIMIT_RETRY);                                                            //设置自动重连的定时器
     virtual void CancelConnectTask();                                                                                                  //关闭重连定时器
     virtual void Close();                                                                                                              //关闭所有连接
@@ -84,7 +90,7 @@ public:
     virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);                       //定时检测
 
 private:
-    bool ConnectTcpInit(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CProactorClientInfo*& pClientInfo);
+    bool ConnectTcpInit(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CProactorClientInfo*& pClientInfo, uint32 u4PacketParseID = 0);
     bool ConnectUdpInit(int nServerID, CProactorUDPClient*& pProactorUDPClient);
 
 private:

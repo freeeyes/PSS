@@ -30,21 +30,26 @@ void CPacketParsePool::Close()
 
 int CPacketParsePool::GetUsedCount()
 {
+    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
     return CObjectPoolManager<CPacketParse, ACE_Recursive_Thread_Mutex>::GetUsedCount();
 }
 
 int CPacketParsePool::GetFreeCount()
 {
+    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
     return  CObjectPoolManager<CPacketParse, ACE_Recursive_Thread_Mutex>::GetFreeCount();
 }
 
 CPacketParse* CPacketParsePool::Create(const char* pFileName, uint32 u4Line)
 {
+    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
     return CObjectPoolManager<CPacketParse, ACE_Recursive_Thread_Mutex>::Create(pFileName, u4Line);
 }
 
 bool CPacketParsePool::Delete(CPacketParse* pPacketParse, bool blDelete)
 {
+    ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
+
     if (NULL == pPacketParse)
     {
         OUR_DEBUG((LM_INFO, "[CPacketParsePool::Delete] pPacketParse is NULL.\n"));

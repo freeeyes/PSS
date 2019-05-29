@@ -14,6 +14,12 @@ public:
     virtual bool Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, IClientMessage* pClientMessage)                  = 0;
     //设置TCP链接参数，pClientMessage为远端数据到达处理类，可以设置本地IP和端口。
     virtual bool Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage) = 0;
+
+    //设置TCP链接参数，pClientMessage为远端数据到达处理类。
+    virtual bool ConnectFrame(int nServerID, const char* pIP, int nPort, uint8 u1IPType, uint32 u4PacketParse) = 0;
+    //设置TCP链接参数，pClientMessage为远端数据到达处理类，可以设置本地IP和端口。
+    virtual bool ConnectFrame(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, uint32 u4PacketParse) = 0;
+
     //设置UDP链接参数，pClientUDPMessage为远端数据到达处理类。
     virtual bool ConnectUDP(int nServerID, const char* pIP, int nPort, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage) = 0;
     //关闭某一个ServerID对应的TCP链接
@@ -34,6 +40,8 @@ public:
     virtual EM_Server_Connect_State GetConnectState(int nServerID)                                                                    = 0;
     //获得一个ServerID对应的pClientMessage对象信息
     virtual IClientMessage* GetClientMessage(int nServerID)                                                                           = 0;
+    //获得一个ServerID对应的PacketParseID
+    virtual uint32 GetPacketParseID(int nServerID)                                                                                    = 0;
     //获得一个ServerID对应的IP信息
     virtual bool GetServerIPInfo(int nServerID, _ClientIPInfo& objServerIPInfo)                                                       = 0;
     //删除一个正在使用的IClientMessage

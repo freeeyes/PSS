@@ -35,6 +35,9 @@ public:
 
     int GetUsedCount();
     int GetFreeCount();
+
+private:
+    ACE_Recursive_Thread_Mutex m_ThreadWriteLock;                     //控制多线程锁
 };
 
 typedef ACE_Singleton<CPacketParsePool, ACE_Null_Mutex> App_PacketParsePool;

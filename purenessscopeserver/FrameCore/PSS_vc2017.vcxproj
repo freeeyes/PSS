@@ -528,6 +528,7 @@
     <ClInclude Include="..\Common\IServerManager.h" />
     <ClInclude Include="..\Common\ITimerManager.h" />
     <ClInclude Include="..\Common\ITSTimer.h" />
+    <ClInclude Include="..\Common\ITTyClientManager.h" />
     <ClInclude Include="..\Common\IUDPConnectManager.h" />
     <ClInclude Include="..\Common\ObjectArrayList.h" />
     <ClInclude Include="..\Common\ObjectLru.h" />
