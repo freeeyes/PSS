@@ -19,6 +19,9 @@ CConnectClient::CConnectClient(void)
     m_u1ConnectState    = 0;
 
     m_emRecvState       = SERVER_RECV_INIT;
+    m_emDispose         = CONNECT_IO_PLUGIN;
+    m_u4PacketParseInfoID = 0;
+
 }
 
 CConnectClient::~CConnectClient(void)
@@ -44,6 +47,26 @@ void CConnectClient::Close()
 
         //删除链接对象
         App_ClientReConnectManager::instance()->CloseByClient(m_nServerID);
+
+        if (CONNECT_IO_FRAME == m_emDispose)
+        {
+            //发送packetParse断开消息
+            _ClientIPInfo objClientIPInfo;
+            _ClientIPInfo objLocalIPInfo;
+            App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Connect(m_nServerID,
+                    objClientIPInfo,
+                    objLocalIPInfo);
+
+            //发送框架消息
+            Send_MakePacket_Queue(m_nServerID,
+                                  m_u4PacketParseInfoID,
+                                  NULL,
+                                  PACKET_SERVER_TCP_DISCONNECT,
+                                  m_addrRemote,
+                                  "127.0.0.1",
+                                  0,
+                                  CONNECT_IO_SERVER_TCP);
+        }
 
         //回归用过的指针
         delete this;
@@ -151,7 +174,35 @@ int CConnectClient::open(void* p)
 
     App_ClientReConnectManager::instance()->SetHandler(m_nServerID, this);
     m_pClientMessage = App_ClientReConnectManager::instance()->GetClientMessage(m_nServerID);
+
+    uint32 u4PacketParseID = App_ClientReConnectManager::instance()->GetPacketParseID(m_nServerID);
+
+    if (u4PacketParseID > 0)
+    {
+        SetPacketParseInfoID(u4PacketParseID);
+    }
+
     OUR_DEBUG((LM_INFO, "[CConnectClient::open] Connection from [%s:%d]\n", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
+
+    if (CONNECT_IO_FRAME == m_emDispose)
+    {
+        //发送packetParse断开消息
+        _ClientIPInfo objClientIPInfo;
+        _ClientIPInfo objLocalIPInfo;
+        App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Connect(m_nServerID,
+                objClientIPInfo,
+                objLocalIPInfo);
+
+        //发送框架消息
+        Send_MakePacket_Queue(m_nServerID,
+                              m_u4PacketParseInfoID,
+                              NULL,
+                              PACKET_SERVER_TCP_CONNECT,
+                              m_addrRemote,
+                              "127.0.0.1",
+                              0,
+                              CONNECT_IO_SERVER_TCP);
+    }
 
     int nRet = this->reactor()->register_handler(this, ACE_Event_Handler::READ_MASK | ACE_Event_Handler::WRITE_MASK);
 
@@ -263,37 +314,81 @@ int CConnectClient::SendMessageGroup(uint16 u2CommandID, ACE_Message_Block* pmbl
 
 int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
 {
-    //接收数据，返回给逻辑层，自己不处理整包完整性判定
-    _ClientIPInfo objServerIPInfo;
-    sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-    objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
-
-    uint16 u2CommandID = 0;
-    ACE_Message_Block* pRecvFinish = NULL;
-
-    m_atvRecv = ACE_OS::gettimeofday();
-    m_emRecvState = SERVER_RECV_BEGIN;
-    EM_PACKET_ROUTE em_PacketRoute = PACKET_ROUTE_SELF;
-
-    while (true)
+    if (CONNECT_IO_FRAME == m_emDispose)
     {
-        bool blRet = m_pClientMessage->Recv_Format_data(pCurrMessage, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish, em_PacketRoute);
+        _Packet_Parse_Info* pPacketParse = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID);
 
-        if (false == blRet)
+        if (NULL != pPacketParse)
         {
-            break;
-        }
-        else
-        {
-            if (PACKET_ROUTE_SELF == em_PacketRoute)
+            _Packet_Info obj_Packet_Info;
+            uint8 n1Ret = pPacketParse->Parse_Packet_Stream(m_nServerID,
+                          pCurrMessage,
+                          dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()),
+                          &obj_Packet_Info,
+                          CONNECT_IO_SERVER_TCP);
+
+            if (PACKET_GET_ENOUGTH == n1Ret)
             {
-                //直接调用插件内注册的对象处理数据
-                Recv_Common_Dispose_Client_Message(u2CommandID, pRecvFinish, objServerIPInfo, m_pClientMessage);
+
+                //发送消息给消息框架
+                CPacketParse* pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
+                pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
+                pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);
+                pPacketParse->SetPacket_CommandID(obj_Packet_Info.m_u2PacketCommandID);
+                pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4HeadSrcLen);
+                pPacketParse->SetPacket_Head_Curr_Length(obj_Packet_Info.m_u4HeadCurrLen);
+                pPacketParse->SetPacket_Body_Src_Length(obj_Packet_Info.m_u4BodySrcLen);
+                pPacketParse->SetPacket_Body_Curr_Length(obj_Packet_Info.m_u4BodyCurrLen);
+
+                //发送框架消息
+                Send_MakePacket_Queue(m_nServerID,
+                                      m_u4PacketParseInfoID,
+                                      pPacketParse,
+                                      PACKET_PARSE,
+                                      m_addrRemote,
+                                      "127.0.0.1",
+                                      0,
+                                      CONNECT_IO_SERVER_TCP);
+
+                //清理用完的m_pPacketParse
+                App_PacketParsePool::instance()->Delete(pPacketParse);
+            }
+        }
+    }
+    else
+    {
+        //接收数据，返回给逻辑层，自己不处理整包完整性判定
+        _ClientIPInfo objServerIPInfo;
+        sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+        objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+
+        uint16 u2CommandID = 0;
+        ACE_Message_Block* pRecvFinish = NULL;
+
+        m_atvRecv = ACE_OS::gettimeofday();
+        m_emRecvState = SERVER_RECV_BEGIN;
+        EM_PACKET_ROUTE em_PacketRoute = PACKET_ROUTE_SELF;
+
+        while (true)
+        {
+            bool blRet = m_pClientMessage->Recv_Format_data(pCurrMessage, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish, em_PacketRoute);
+
+            if (false == blRet)
+            {
+                break;
             }
             else
             {
-                //将数据放回到消息线程
-                SendMessageGroup(u2CommandID, pRecvFinish);
+                if (PACKET_ROUTE_SELF == em_PacketRoute)
+                {
+                    //直接调用插件内注册的对象处理数据
+                    Recv_Common_Dispose_Client_Message(u2CommandID, pRecvFinish, objServerIPInfo, m_pClientMessage);
+                }
+                else
+                {
+                    //将数据放回到消息线程
+                    SendMessageGroup(u2CommandID, pRecvFinish);
+                }
             }
         }
     }
@@ -455,6 +550,11 @@ void CConnectClient::SetServerID(int nServerID)
 int CConnectClient::GetServerID()
 {
     return m_nServerID;
+}
+
+void CConnectClient::SetPacketParseInfoID(uint32 u4PacketParseInfoID)
+{
+    m_u4PacketParseInfoID = u4PacketParseInfoID;
 }
 
 bool CConnectClient::SendData(ACE_Message_Block* pmblk)

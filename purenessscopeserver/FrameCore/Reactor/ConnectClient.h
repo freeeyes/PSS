@@ -18,6 +18,7 @@
 #include "AceReactorManager.h"
 #include "BaseConnectClient.h"
 #include "LogManager.h"
+#include "BaseHander.h"
 
 class CConnectClient : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>
 {
@@ -33,6 +34,7 @@ public:
     void SetClientMessage(IClientMessage* pClientMessage); //设置消息接收处理类
     void SetServerID(int nServerID);                       //设置当前的ServerID
     int  GetServerID();                                    //获得当前ServerID
+    void SetPacketParseInfoID(uint32 u4PacketParseInfoID); //设置PacketParseID
     bool SendData(ACE_Message_Block* pmblk);
     void Close();
 
@@ -70,5 +72,7 @@ private:
     EM_s2s                      m_ems2s;                //是否需要回调状态
     ACE_Time_Value              m_atvRecv;              //数据接收时间
     EM_Server_Recv_State        m_emRecvState;          //0为未接收数据，1为接收数据完成，2为处理数据完成
+    EM_CONNECT_IO_DISPOSE       m_emDispose;                 //处理模式，框架处理 or 业务处理
+    uint32                      m_u4PacketParseInfoID;       //框架处理模块ID
 };
 #endif
