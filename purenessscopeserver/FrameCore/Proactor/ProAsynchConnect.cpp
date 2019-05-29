@@ -17,7 +17,22 @@ CProConnectClient* CProAsynchConnect::make_handler()
 
     if(NULL != pProConnectClient)
     {
+        //在这里设置连接的相关参数
         pProConnectClient->SetServerID(m_nServerID);
+        uint32 u4PacketParseID = App_ClientProConnectManager::instance()->GetPacketParseID(m_nServerID);
+        IClientMessage* pClientMessage = App_ClientProConnectManager::instance()->GetClientMessage(m_nServerID);
+
+        if (u4PacketParseID > 0)
+        {
+            pProConnectClient->SetPacketParseInfoID(u4PacketParseID);
+        }
+        else
+        {
+            pProConnectClient->SetClientMessage(pClientMessage);
+        }
+
+        App_ClientProConnectManager::instance()->SetHandler(m_nServerID, pProConnectClient);
+
         SetConnectState(false);
     }
     else

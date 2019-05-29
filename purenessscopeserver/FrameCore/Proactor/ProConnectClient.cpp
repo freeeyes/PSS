@@ -133,15 +133,6 @@ void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
     m_atvBegin          = ACE_OS::gettimeofday();
 
     OUR_DEBUG((LM_DEBUG,"[CProConnectClient::open] m_nServerID=%d, this=0x%08x.\n", m_nServerID, this));
-    App_ClientProConnectManager::instance()->SetHandler(m_nServerID, this);
-    m_pClientMessage = App_ClientProConnectManager::instance()->GetClientMessage(m_nServerID);
-
-    uint32 u4PacketParseID = App_ClientProConnectManager::instance()->GetPacketParseID(m_nServerID);
-
-    if (u4PacketParseID > 0)
-    {
-        SetPacketParseInfoID(u4PacketParseID);
-    }
 
     if (CONNECT_IO_FRAME == m_emDispose)
     {

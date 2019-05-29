@@ -172,16 +172,6 @@ int CConnectClient::open(void* p)
 
     m_u1ConnectState = CONNECT_OPEN;
 
-    App_ClientReConnectManager::instance()->SetHandler(m_nServerID, this);
-    m_pClientMessage = App_ClientReConnectManager::instance()->GetClientMessage(m_nServerID);
-
-    uint32 u4PacketParseID = App_ClientReConnectManager::instance()->GetPacketParseID(m_nServerID);
-
-    if (u4PacketParseID > 0)
-    {
-        SetPacketParseInfoID(u4PacketParseID);
-    }
-
     OUR_DEBUG((LM_INFO, "[CConnectClient::open] Connection from [%s:%d]\n", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
 
     if (CONNECT_IO_FRAME == m_emDispose)

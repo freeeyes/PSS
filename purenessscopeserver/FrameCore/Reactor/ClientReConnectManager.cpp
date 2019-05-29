@@ -71,8 +71,24 @@ bool CReactorClientInfo::Run(bool blIsReady, EM_Server_Connect_State emState)
         return false;
     }
 
+    //配置连接对象设置参数
     m_pConnectClient->SetServerID(m_nServerID);
     m_pConnectClient->reactor(m_pReactor);
+
+    IClientMessage* pClientMessage = App_ClientReConnectManager::instance()->GetClientMessage(m_nServerID);
+
+    uint32 u4PacketParseID = App_ClientReConnectManager::instance()->GetPacketParseID(m_nServerID);
+
+    if (u4PacketParseID > 0)
+    {
+        m_pConnectClient->SetPacketParseInfoID(u4PacketParseID);
+    }
+    else
+    {
+        m_pConnectClient->SetClientMessage(pClientMessage);
+    }
+
+    App_ClientReConnectManager::instance()->SetHandler(m_nServerID, m_pConnectClient);
 
     if (blIsReady == true && SERVER_CONNECT_FIRST != m_emConnectState && SERVER_CONNECT_RECONNECT != m_emConnectState)
     {
