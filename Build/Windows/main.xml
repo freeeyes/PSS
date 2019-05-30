@@ -19,10 +19,10 @@
 	<!-- <UDPServerIP uip="127.0.0.1" uport="10003" uParseID="1" uMaxRecvSize="1024" desc="监听UDP服务器的IP和端口，可以是多个" /> -->
 	
 	<!-- 配置Tty接口 ParseID 对应指定的解析接口-->
-	<TTy ComID="1" TTyParseID="1" Baud="9600" DataBits="8" StopBits="0" Parity="0" PortName="COM3" PortDes="Test 10"/>
+	<!-- <TTy ComID="1" TTyParseID="1" Baud="9600" DataBits="8" StopBits="0" Parity="0" PortName="COM3" PortDes="Test 10"/> -->
 	
 	<!-- 添加服务器间通讯的配置项 -->
-	<ServerToServer S2SID="1" S2SIp="127.0.0.1" S2SPort="10002" S2SPacketParseID="1"/>
+	<!-- <ServerToServer S2SID="1" S2SIp="127.0.0.1" S2SPort="10002" S2SPacketParseID="1"/> -->
 	
 	<!-- "H&B"指的是包头包体模式，"STREAM"是流模式 OrgLength在H&B是包头默认长度 -->
 	<!-- 第一个ParseParse是默认ParseID，如果TCPServerIP或者UDPServerIP没有指定，则默认采用这个ParseID，ParseID必须大于0 -->
