@@ -216,12 +216,6 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                     //清理用完的m_pPacketParse
                     App_PacketParsePool::instance()->Delete(pPacketParse);
                 }
-				else if (PACKET_GET_ERROR == n1Ret)
-				{
-					//如果返回解析错误，则直接关闭当前连接
-					Close();
-					return;
-				}
             }
         }
         else
