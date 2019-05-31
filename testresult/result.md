@@ -6,51 +6,51 @@
  	<th>time cost(ms)</th>
    </tr>
     <tr>
-      <td colspan="4">[Test CI run UTC time] 2019-05-31 03:17:52</td>
+      <td colspan="4">[Test CI run UTC time] 2019-05-31 03:49:01</td>
     </tr>
-   <tr style="background-color:#C1FFC1;color:Black;">
+   <tr style="background-color:#CD5C5C;color:Black;">
 <td>single packet test</td>
-<td>0</td>
-<td>[s][127.0.0.1:10002]success.</td>
-<td>0.762000ms</td>
-<tr style="background-color:#C1FFC1;color:Black;">
+<td>1</td>
+<td>[e][127.0.0.1:10002]connnect server fail.[Connection refused]。</td>
+<td>0.098000ms</td>
+<tr style="background-color:#CD5C5C;color:Black;">
 <td>multiple packet test(10)</td>
-<td>0</td>
-<td>[s][127.0.0.1:10002]success.</td>
-<td>1.794000ms</td>
-<tr style="background-color:#C1FFC1;color:Black;">
+<td>1</td>
+<td>[e][127.0.0.1:10002]connnect server fail.[Connection refused]。</td>
+<td>0.022000ms</td>
+<tr style="background-color:#CD5C5C;color:Black;">
 <td>multiple connect test(10)</td>
-<td>0</td>
-<td>[s][127.0.0.1:10002]success.</td>
-<td>5.397000ms</td>
-<tr style="background-color:#C1FFC1;color:Black;">
+<td>1</td>
+<td>[e][127.0.0.1:10002]connnect server fail.[Connection refused]。</td>
+<td>0.011000ms</td>
+<tr style="background-color:#CD5C5C;color:Black;">
 <td>unvaild packet test</td>
-<td>0</td>
-<td>[s][127.0.0.1:10002]success.[Connection reset by peer]</td>
-<td>0.281000ms</td>
-<tr style="background-color:#C1FFC1;color:Black;">
+<td>1</td>
+<td>[e][127.0.0.1:10002]connnect server fail.[Connection refused]。</td>
+<td>0.010000ms</td>
+<tr style="background-color:#CD5C5C;color:Black;">
 <td>helf packet test</td>
-<td>0</td>
-<td>[s][127.0.0.1:10002]success.</td>
-<td>0.436000ms</td>
+<td>1</td>
+<td>[e][127.0.0.1:10002]connnect server fail.[Connection refused]。</td>
+<td>0.011000ms</td>
 <tr style="background-color:#C1FFC1;color:Black;">
 <td>Muliple connect packet test</td>
 <td>0</td>
 <td>[s][127.0.0.1:10002]success.</td>
-<td>3.902000ms</td>
+<td>0.427000ms</td>
 <tr style="background-color:#C1FFC1;color:Black;">
 <td>single UDP packet test</td>
 <td>0</td>
 <td>[s][127.0.0.1:10003]success.</td>
-<td>0.077000ms</td>
-<tr style="background-color:#C1FFC1;color:Black;">
+<td>0.069000ms</td>
+<tr style="background-color:#CD5C5C;color:Black;">
 <td>single UDP packet recv test</td>
-<td>0</td>
-<td>[s][127.0.0.1:20002]success.</td>
-<td>0.117000ms</td>
-<tr style="background-color:#C1FFC1;color:Black;">
+<td>1</td>
+<td>[e][127.0.0.1:20002]client Udp bind error.[Resource temporarily unavailable]</td>
+<td>2999.990967ms</td>
+<tr style="background-color:#CD5C5C;color:Black;">
 <td>console command test</td>
-<td>0</td>
-<td>[s][127.0.0.1:10010]success.</td>
-<td>0.738000ms</td>
+<td>1</td>
+<td>[e][127.0.0.1:10010]connnect server fail.[Connection refused]。</td>
+<td>0.094000ms</td>
  </table>
