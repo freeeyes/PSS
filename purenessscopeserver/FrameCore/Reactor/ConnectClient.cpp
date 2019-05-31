@@ -347,7 +347,7 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
             {
                 // 数据包解析错误，断开连接
                 Close();
-                return;
+                return 0;
             }
         }
     }
