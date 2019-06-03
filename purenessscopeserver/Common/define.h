@@ -28,6 +28,7 @@
 #include <sys/resource.h>
 #endif
 
+#include <memory>
 #include <vector>
 
 using namespace std;

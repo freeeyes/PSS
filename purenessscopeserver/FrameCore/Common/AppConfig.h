@@ -14,6 +14,7 @@
 #include "ace/OS_main.h"
 #include "ace/Configuration.h"
 #include "ace/Configuration_Import_Export.h"
+#include <memory>
 
 class CAppConfig
 {
@@ -33,8 +34,6 @@ public:
         return *this;
     }
 
-    void Close();
-
     bool ReadConfig(const char* szConfigname);
     bool WriteConfig(const char* szConfigname);
     bool WriteConfig();
@@ -45,8 +44,8 @@ public:
     const char* GetError();
 
 private:
-    ACE_Configuration_Heap* m_pConfig;
-    ACE_Ini_ImpExp*         m_pIniImp;
+    std::shared_ptr<ACE_Configuration_Heap> m_pConfig;
+    std::shared_ptr<ACE_Ini_ImpExp>         m_pIniImp;
     ACE_TString             m_strConfigName;
     char                    m_szError[MAX_BUFF_500];
 };
