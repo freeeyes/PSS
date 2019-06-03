@@ -20,19 +20,6 @@ class CAppConfig
 {
 public:
     CAppConfig(void);
-    ~CAppConfig(void);
-
-    CAppConfig(const CAppConfig& ar);
-
-    CAppConfig& operator = (const CAppConfig& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     bool ReadConfig(const char* szConfigname);
     bool WriteConfig(const char* szConfigname);

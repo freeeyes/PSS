@@ -7,17 +7,6 @@ CAppConfig::CAppConfig(void)
     m_szError[0] = '\0';
 }
 
-CAppConfig::CAppConfig(const CAppConfig& ar)
-{
-    //这里需要用move把实参的左值性转换为右值,避免调用复制构造CAppConfig(CAppConfig&& ar)
-    (*this) = std::move(ar);
-}
-
-CAppConfig::~CAppConfig(void)
-{
-    OUR_DEBUG((LM_INFO, "[CAppConfig::~CAppConfig].\n"));
-}
-
 const char* CAppConfig::GetError()
 {
     return m_szError;
@@ -29,8 +18,6 @@ bool CAppConfig::ReadConfig(const char* szConfigname)
     {
         m_strConfigName = szConfigname;
 
-        //m_pConfig = new ACE_Configuration_Heap();
-
         if (nullptr == m_pConfig)
         {
             char szError[MAX_BUFF_500] = { '\0' };
@@ -39,8 +26,6 @@ bool CAppConfig::ReadConfig(const char* szConfigname)
         }
 
         m_pConfig->open();
-
-        //m_pIniImp = new ACE_Ini_ImpExp(*m_pConfig);
 
         if (nullptr == m_pIniImp)
         {
