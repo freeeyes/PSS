@@ -47,7 +47,7 @@ public:
 };
 
 //udp函数发送数据包合成函数
-bool Udp_Common_Send_Message(_Send_Message_Param obj_Send_Message_Param, ACE_INET_Addr& AddrRemote, char*& pMessage,
+bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param, ACE_INET_Addr& AddrRemote, char*& pMessage,
                              ACE_Message_Block*& pMbData, ACE_SOCK_Dgram& skRemote);
 
 //udp处理消息头函数
