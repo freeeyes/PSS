@@ -11,11 +11,6 @@ CCommandAccount::CCommandAccount()
     m_u8PacketTimeout  =  MAX_QUEUE_TIMEOUT * 1000;
 }
 
-CCommandAccount::CCommandAccount(const CCommandAccount& ar)
-{
-    (*this) = ar;
-}
-
 CCommandAccount::~CCommandAccount()
 {
     OUR_DEBUG((LM_ERROR, "CCommandAccount::~CCommandAccount].\n"));
@@ -82,7 +77,7 @@ void CCommandAccount::Close()
     m_u1CommandAccount = 0;
 }
 
-bool CCommandAccount::Save_Flow(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value tvTime)
+bool CCommandAccount::Save_Flow(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
 {
     ACE_UNUSED_ARG(u2CommandID);
 
@@ -110,7 +105,7 @@ bool CCommandAccount::Save_Flow(uint16 u2CommandID, uint32 u4Port, uint8 u1Packe
     return true;
 }
 
-bool CCommandAccount::Save_Command(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value tvTime)
+bool CCommandAccount::Save_Command(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
 {
     ACE_UNUSED_ARG(u4Port);
 
@@ -163,7 +158,7 @@ bool CCommandAccount::Save_Command(uint16 u2CommandID, uint32 u4Port, uint8 u1Pa
     return true;
 }
 
-bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value tvTime)
+bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
 {
     ACE_UNUSED_ARG(u4Port);
     ACE_UNUSED_ARG(u1PacketType);
@@ -209,7 +204,7 @@ bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint32 u4Port, uint8 u1Pack
     return true;
 }
 
-bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value tvTime)
+bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
 {
     //如果流量开关打开，则记录流量(单位是分钟)
     bool blRet = true;

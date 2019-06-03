@@ -105,7 +105,6 @@ void CReactorUDPHander::SetPacketParseInfoID(uint32 u4PacketParseInfoID)
 bool CReactorUDPHander::SendMessage(char*& pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead, uint16 u2CommandID, bool blDlete)
 {
     ACE_Message_Block* pMbData = NULL;
-    ACE_INET_Addr AddrRemote;
 
     _Send_Message_Param obj_Send_Message_Param;
     obj_Send_Message_Param.m_u4PacketParseInfoID = m_u4PacketParseInfoID;
@@ -117,7 +116,6 @@ bool CReactorUDPHander::SendMessage(char*& pMessage, uint32 u4Len, const char* s
     obj_Send_Message_Param.m_u4Len               = u4Len;
 
     bool blState = Udp_Common_Send_Message(obj_Send_Message_Param,
-                                           AddrRemote,
                                            pMessage,
                                            pMbData,
                                            m_skRemote);

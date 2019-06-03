@@ -182,7 +182,6 @@ void CUnit_Basehandler::Test_Udp_Common_Send_Message(void)
 {
     bool blRet = false;
     ACE_Message_Block* pMbData = NULL;
-    ACE_INET_Addr AddrRemote;
     ACE_SOCK_Dgram skRemote;
 
     uint32 u4Len = MAX_BUFF_20;
@@ -200,7 +199,6 @@ void CUnit_Basehandler::Test_Udp_Common_Send_Message(void)
 
     //测试错误的IP地址
     bool blState = Udp_Common_Send_Message(obj_Send_Message_Param,
-                                           AddrRemote,
                                            pMessage,
                                            pMbData,
                                            skRemote);
@@ -215,7 +213,6 @@ void CUnit_Basehandler::Test_Udp_Common_Send_Message(void)
     //测试正常的数据解析
     obj_Send_Message_Param.m_pIP = (char*)"127.0.0.1";
     blState = Udp_Common_Send_Message(obj_Send_Message_Param,
-                                      AddrRemote,
                                       pMessage,
                                       pMbData,
                                       skRemote);

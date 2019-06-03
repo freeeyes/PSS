@@ -33,18 +33,6 @@ public:
         m_u1CommandType  = COMMAND_TYPE_IN;
     }
 
-    //拷贝构造函数
-    _CommandData(const _CommandData& ar)
-    {
-        this->m_u2CommandID    = ar.m_u2CommandID;
-        this->m_u4CommandCount = ar.m_u4CommandCount;
-        this->m_u8CommandCost  = ar.m_u8CommandCost;
-        this->m_u1CommandType  = ar.m_u1CommandType;
-        this->m_u4PacketSize   = ar.m_u4PacketSize;
-        this->m_u1PacketType   = ar.m_u1PacketType;
-        this->m_tvCommandTime  = ar.m_tvCommandTime;
-    }
-
     _CommandData& operator = (const _CommandData& ar)
     {
         if (this != &ar)
@@ -77,9 +65,7 @@ public:
         return *this;
     }
 
-    ~_CommandData()
-    {
-    }
+    ~_CommandData() = default;
 };
 
 class _CommandAlertData
@@ -121,14 +107,7 @@ public:
         m_u1Minute     = 0;
     }
 
-    ~_Port_Data_Account()
-    {
-    }
-
-    _Port_Data_Account(const _Port_Data_Account& ar)
-    {
-        (*this) = ar;
-    }
+    ~_Port_Data_Account() = default;
 
     _Port_Data_Account& operator = (const _Port_Data_Account& ar)
     {
@@ -200,7 +179,7 @@ public:
         }
     }
 
-    void SetFlow(uint8 u1CommandType, uint32 u4Size, ACE_Time_Value tvNow)
+    void SetFlow(uint8 u1CommandType, uint32 u4Size, ACE_Time_Value const& tvNow)
     {
         //记录端口流量
         ACE_Date_Time dtNowTime(tvNow);
@@ -246,8 +225,6 @@ public:
     CCommandAccount();
     ~CCommandAccount();
 
-    CCommandAccount(const CCommandAccount& ar);
-
     CCommandAccount& operator = (const CCommandAccount& ar)
     {
         if (this != &ar)
@@ -264,7 +241,7 @@ public:
 
     bool SaveCommandData(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType = CONNECT_IO_TCP,
                          uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,
-                         ACE_Time_Value tvTime = ACE_OS::gettimeofday());   //记录命令执行信息
+                         ACE_Time_Value const& tvTime = ACE_OS::gettimeofday());   //记录命令执行信息
     bool SaveCommandDataLog();                         //存储命令执行信息的日志
     _CommandData* GetCommandData(uint16 u2CommandID);  //获得指定命令的相关数据
 
@@ -281,15 +258,15 @@ public:
 private:
     bool Save_Flow(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType = CONNECT_IO_TCP,
                    uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,
-                   ACE_Time_Value tvTime = ACE_OS::gettimeofday());                    //流量统计
+                   ACE_Time_Value const& tvTime = ACE_OS::gettimeofday());                    //流量统计
 
     bool Save_Command(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType = CONNECT_IO_TCP,
                       uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,
-                      ACE_Time_Value tvTime = ACE_OS::gettimeofday());                 //命令统计
+                      ACE_Time_Value const& tvTime = ACE_OS::gettimeofday());                 //命令统计
 
     bool Save_Alert(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType = CONNECT_IO_TCP,
                     uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,
-                    ACE_Time_Value tvTime = ACE_OS::gettimeofday());                 //命令告警统计
+                    ACE_Time_Value const& tvTime = ACE_OS::gettimeofday());                 //命令告警统计
 
 public:
     uint64                                    m_u8PacketTimeout;               //包处理超时时间

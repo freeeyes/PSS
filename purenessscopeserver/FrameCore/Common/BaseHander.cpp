@@ -8,9 +8,10 @@ void Recovery_Message(bool blDelete, char*& pMessage)
     }
 }
 
-bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param, ACE_INET_Addr AddrRemote, char*& pMessage,
+bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param, char*& pMessage,
                              ACE_Message_Block*& pMbData, ACE_SOCK_Dgram& skRemote)
 {
+    ACE_INET_Addr AddrRemote;
     int nErr = AddrRemote.set(obj_Send_Message_Param.m_nPort, obj_Send_Message_Param.m_pIP);
 
     if (nErr != 0)
