@@ -47,7 +47,7 @@ public:
 };
 
 //udp函数发送数据包合成函数
-bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param, ACE_INET_Addr& AddrRemote, char*& pMessage,
+bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param, ACE_INET_Addr AddrRemote, char*& pMessage,
                              ACE_Message_Block*& pMbData, ACE_SOCK_Dgram& skRemote);
 
 //udp处理消息头函数
@@ -60,7 +60,7 @@ bool Udp_Common_Recv_Body(ACE_Message_Block* pMBBody, CPacketParse* pPacketParse
 bool Udp_Common_Recv_Stream(ACE_Message_Block* pMbData, CPacketParse* pPacketParse, uint32 u4PacketParseInfoID);
 
 //提交udp数据到工作线程
-bool Udp_Common_Send_WorkThread(CPacketParse*& pPacketParse, ACE_INET_Addr addrRemote, ACE_INET_Addr addrLocal, ACE_Time_Value& tvCheck);
+bool Udp_Common_Send_WorkThread(CPacketParse*& pPacketParse, ACE_INET_Addr const& addrRemote, ACE_INET_Addr const& addrLocal, ACE_Time_Value& tvCheck);
 
 //清理数据缓冲
 void Recovery_Common_BuffPacket(bool blDelete, IBuffPacket* pBuffPacket);
@@ -98,7 +98,7 @@ public:
 };
 
 //文件压测数据入工作线程
-bool Tcp_Common_File_Message(_File_Message_Param obj_File_Message_Param, IBuffPacket*& pBuffPacket, const char* pConnectName);
+bool Tcp_Common_File_Message(_File_Message_Param const& obj_File_Message_Param, IBuffPacket*& pBuffPacket, const char* pConnectName);
 
 //Tcp_Common_ClientInfo的参数
 class _ClientConnectInfo_Param
@@ -129,7 +129,7 @@ public:
 };
 
 //返回当前Handler的信息
-_ClientConnectInfo Tcp_Common_ClientInfo(_ClientConnectInfo_Param obj_ClientConnectInfo_Param);
+_ClientConnectInfo Tcp_Common_ClientInfo(_ClientConnectInfo_Param const& obj_ClientConnectInfo_Param);
 
 //Tcp_Common_Send_Input_To_Cache的参数
 class _Input_To_Cache_Param

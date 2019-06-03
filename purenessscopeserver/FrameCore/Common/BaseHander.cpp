@@ -8,7 +8,7 @@ void Recovery_Message(bool blDelete, char*& pMessage)
     }
 }
 
-bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param, ACE_INET_Addr& AddrRemote, char*& pMessage,
+bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param, ACE_INET_Addr AddrRemote, char*& pMessage,
                              ACE_Message_Block*& pMbData, ACE_SOCK_Dgram& skRemote)
 {
     int nErr = AddrRemote.set(obj_Send_Message_Param.m_nPort, obj_Send_Message_Param.m_pIP);
@@ -126,7 +126,7 @@ bool Udp_Common_Recv_Stream(ACE_Message_Block* pMbData, CPacketParse* pPacketPar
     return true;
 }
 
-bool Udp_Common_Send_WorkThread(CPacketParse*& pPacketParse, ACE_INET_Addr addrRemote, ACE_INET_Addr addrLocal, ACE_Time_Value& tvCheck)
+bool Udp_Common_Send_WorkThread(CPacketParse*& pPacketParse, ACE_INET_Addr const& addrRemote, ACE_INET_Addr const& addrLocal, ACE_Time_Value& tvCheck)
 {
     //组织数据包
     _MakePacket objMakePacket;
@@ -234,7 +234,7 @@ void Send_MakePacket_Queue(uint32 u4ConnectID, uint32 u4PacketParseID, CPacketPa
     }
 }
 
-bool Tcp_Common_File_Message(_File_Message_Param obj_File_Message_Param, IBuffPacket*& pBuffPacket, const char* pConnectName)
+bool Tcp_Common_File_Message(_File_Message_Param const& obj_File_Message_Param, IBuffPacket*& pBuffPacket, const char* pConnectName)
 {
     char szLog[10] = { '\0' };
     uint32 u4DebugSize = 0;
@@ -281,7 +281,7 @@ bool Tcp_Common_File_Message(_File_Message_Param obj_File_Message_Param, IBuffPa
     return true;
 }
 
-_ClientConnectInfo Tcp_Common_ClientInfo(_ClientConnectInfo_Param obj_ClientConnectInfo_Param)
+_ClientConnectInfo Tcp_Common_ClientInfo(_ClientConnectInfo_Param const& obj_ClientConnectInfo_Param)
 {
     _ClientConnectInfo ClientConnectInfo;
 

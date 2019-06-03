@@ -15,19 +15,7 @@ class CBuffPacketManager : public CObjectPoolManager<CBuffPacket, ACE_Recursive_
 {
 public:
     CBuffPacketManager();
-    ~CBuffPacketManager();
-
-    CBuffPacketManager(const CBuffPacketManager& ar);
-
-    CBuffPacketManager& operator = (const CBuffPacketManager& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
+    virtual ~CBuffPacketManager() = default;
 
     static void Init_Callback(int nIndex, CBuffPacket* pBuffPacket);
     static void Close_Callback(int nIndex, CBuffPacket* pBuffPacket);

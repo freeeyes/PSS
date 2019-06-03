@@ -7,10 +7,9 @@
 #include "IBuffPacket.h"
 #include <stdexcept>
 
-#define DEFINE_PACKET_SIZE 1024
-#define DEFINE_PACKET_ADD  1024
-
-#define USER_PACKET_MEMORY_POOL 1   //定义使用ACE内存池分配
+const uint32 DEFINE_PACKET_SIZE      = 1024;
+const uint32 DEFINE_PACKET_ADD       = 1024;
+const uint8  USER_PACKET_MEMORY_POOL = 1; //定义使用ACE内存池分配
 
 class CBuffPacket : public IBuffPacket
 {

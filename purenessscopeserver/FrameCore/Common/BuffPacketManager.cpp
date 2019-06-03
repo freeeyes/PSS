@@ -5,16 +5,6 @@ CBuffPacketManager::CBuffPacketManager()
 
 }
 
-CBuffPacketManager::CBuffPacketManager(const CBuffPacketManager& ar)
-{
-    (*this) = ar;
-}
-
-CBuffPacketManager::~CBuffPacketManager()
-{
-    OUR_DEBUG((LM_INFO, "[CBuffPacketManager::~CBuffPacketManager]Begin.\n"));
-}
-
 void CBuffPacketManager::Init_Callback(int nIndex, CBuffPacket* pBuffPacket)
 {
     //…Ë÷√BuffPacketƒ¨»œ◊÷–Ú
