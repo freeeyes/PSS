@@ -33,22 +33,6 @@ public:
         m_u1CommandType  = COMMAND_TYPE_IN;
     }
 
-    _CommandData& operator = (const _CommandData& ar)
-    {
-        if (this != &ar)
-        {
-            this->m_u2CommandID = ar.m_u2CommandID;
-            this->m_u4CommandCount = ar.m_u4CommandCount;
-            this->m_u8CommandCost = ar.m_u8CommandCost;
-            this->m_u1CommandType = ar.m_u1CommandType;
-            this->m_u4PacketSize = ar.m_u4PacketSize;
-            this->m_u1PacketType = ar.m_u1PacketType;
-            this->m_tvCommandTime = ar.m_tvCommandTime;
-        }
-
-        return *this;
-    }
-
     _CommandData& operator += (const _CommandData& ar)
     {
         if(this->m_u2CommandID != ar.m_u2CommandID)
@@ -64,8 +48,6 @@ public:
         this->m_tvCommandTime  += ar.m_tvCommandTime;
         return *this;
     }
-
-    ~_CommandData() = default;
 };
 
 class _CommandAlertData
@@ -105,22 +87,6 @@ public:
         m_u4FlowIn     = 0;
         m_u4FlowOut    = 0;
         m_u1Minute     = 0;
-    }
-
-    ~_Port_Data_Account() = default;
-
-    _Port_Data_Account& operator = (const _Port_Data_Account& ar)
-    {
-        if (this != &ar)
-        {
-            this->m_u1Type = ar.m_u1Type;
-            this->m_u4Port = ar.m_u4Port;
-            this->m_u4FlowIn = ar.m_u4FlowIn;
-            this->m_u4FlowOut = ar.m_u4FlowOut;
-            this->m_u1Minute = ar.m_u1Minute;
-        }
-
-        return *this;
     }
 
     _Port_Data_Account& operator += (const _Port_Data_Account& ar)
@@ -224,16 +190,6 @@ class CCommandAccount
 public:
     CCommandAccount();
     ~CCommandAccount();
-
-    CCommandAccount& operator = (const CCommandAccount& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     void InitName(const char* pName, uint32 u4CommandCount);
     void Init(uint8 u1CommandAccount, uint8 u1Flow, uint16 u2RecvTimeout);
