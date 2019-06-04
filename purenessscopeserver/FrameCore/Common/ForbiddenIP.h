@@ -41,19 +41,6 @@ class CForbiddenIP
 public:
     CForbiddenIP();
 
-    CForbiddenIP& operator = (const CForbiddenIP& ar)
-    {
-        if (this != &ar)
-        {
-            this->m_VecForeverForbiddenIP.assign(ar.ShowForeverIP()->begin(), ar.ShowForeverIP()->end());
-            this->m_VecTempForbiddenIP.assign(ar.ShowTempIP()->begin(), ar.ShowTempIP()->end());
-        }
-
-        return *this;
-    }
-
-
-
     bool Init(const char* szConfigPath);                                                    //初始化加载永久封停IP文件
     bool CheckIP(const char* pIP, uint8 u1ConnectType = CONNECT_TCP);                       //检测IP是否可以链接
     bool AddForeverIP(const char* pIP, uint8 u1ConnectType = CONNECT_TCP);                  //添加永久封停的IP
