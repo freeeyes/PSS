@@ -5,16 +5,6 @@ CForbiddenIP::CForbiddenIP()
 
 }
 
-CForbiddenIP::CForbiddenIP(const CForbiddenIP& ar)
-{
-    (*this) = ar;
-}
-
-CForbiddenIP::~CForbiddenIP()
-{
-    OUR_DEBUG((LM_INFO, "[CForbiddenIP::~CForbiddenIP].\n"));
-}
-
 bool CForbiddenIP::Init(const char* szConfigPath)
 {
     OUR_DEBUG((LM_INFO, "[CForbiddenIP::Init]Filename = %s.\n", szConfigPath));

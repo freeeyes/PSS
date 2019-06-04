@@ -13,7 +13,7 @@
 #include "XmlOpeation.h"
 #include "ace/Singleton.h"
 
-#define MAX_IP_SIZE 50
+const uint16 MAX_IP_SIZE = 50;
 
 class _ForbiddenIP
 {
@@ -40,9 +40,6 @@ class CForbiddenIP
 {
 public:
     CForbiddenIP();
-    ~CForbiddenIP();
-
-    CForbiddenIP(const CForbiddenIP& ar);
 
     CForbiddenIP& operator = (const CForbiddenIP& ar)
     {
