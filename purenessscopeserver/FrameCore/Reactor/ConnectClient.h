@@ -38,7 +38,7 @@ public:
     bool SendData(ACE_Message_Block* pmblk);
     void Close();
 
-    bool GetTimeout(ACE_Time_Value tvNow);                 //获得当前数据处理是否超时
+    bool GetTimeout(ACE_Time_Value const& tvNow);                 //获得当前数据处理是否超时
 
     void ClientClose();                                    //主动关闭
     _ClientConnectInfo GetClientConnectInfo();             //得到当前链接信息

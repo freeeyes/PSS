@@ -306,12 +306,12 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
 {
     if (CONNECT_IO_FRAME == m_emDispose)
     {
-        _Packet_Parse_Info* pPacketParse = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID);
+        _Packet_Parse_Info* pPacketParseInfo = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID);
 
-        if (NULL != pPacketParse)
+        if (NULL != pPacketParseInfo)
         {
             _Packet_Info obj_Packet_Info;
-            uint8 n1Ret = pPacketParse->Parse_Packet_Stream(m_nServerID,
+            uint8 n1Ret = pPacketParseInfo->Parse_Packet_Stream(m_nServerID,
                           pCurrMessage,
                           dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()),
                           &obj_Packet_Info,
@@ -627,7 +627,7 @@ _ClientConnectInfo CConnectClient::GetClientConnectInfo()
     return ClientConnectInfo;
 }
 
-bool CConnectClient::GetTimeout(ACE_Time_Value tvNow)
+bool CConnectClient::GetTimeout(ACE_Time_Value const& tvNow)
 {
     ACE_Time_Value tvIntval(tvNow - m_atvRecv);
 

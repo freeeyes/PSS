@@ -1379,13 +1379,6 @@ bool CConnectHandler::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, 
     if (PACKET_SEND_FIN_CLOSE == u1State)
     {
         m_u1ConnectState = CONNECT_SERVER_CLOSE;
-        ACE_Message_Block* pMbData = App_MessageBlockManager::instance()->Create(sizeof(int));
-
-        if (NULL == pMbData)
-        {
-            OUR_DEBUG((LM_DEBUG, "[CConnectHandler::SendMessage] Connectid=[%d] pMbData is NULL.\n", GetConnectID()));
-            return false;
-        }
 
         //ÃÌº”πÿ±’socket÷∏¡Ó
         SendCloseMessage();

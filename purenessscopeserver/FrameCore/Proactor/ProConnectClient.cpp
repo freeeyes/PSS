@@ -186,12 +186,12 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         //处理接收数据(这里不区分是不是完整包，交给上层逻辑自己去判定)
         if (CONNECT_IO_FRAME == m_emDispose)
         {
-            _Packet_Parse_Info* pPacketParse = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID);
+            _Packet_Parse_Info* pPacketParseInfo = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID);
 
-            if (NULL != pPacketParse)
+            if (NULL != pPacketParseInfo)
             {
                 _Packet_Info obj_Packet_Info;
-                uint8 n1Ret = pPacketParse->Parse_Packet_Stream(m_nServerID,
+                uint8 n1Ret = pPacketParseInfo->Parse_Packet_Stream(m_nServerID,
                               &mb,
                               dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()),
                               &obj_Packet_Info,
@@ -216,12 +216,12 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                     //清理用完的m_pPacketParse
                     App_PacketParsePool::instance()->Delete(pPacketParse);
                 }
-				else if (PACKET_GET_ERROR == n1Ret)
-				{
-					// 数据包解析错误，断开连接
-					Close();
-					return;
-				}
+                else if (PACKET_GET_ERROR == n1Ret)
+                {
+                    // 数据包解析错误，断开连接
+                    Close();
+                    return;
+                }
             }
         }
         else
@@ -328,7 +328,7 @@ void CProConnectClient::addresses(const ACE_INET_Addr& remote_address, const ACE
     m_AddrRemote = remote_address;
 }
 
-bool CProConnectClient::GetTimeout(ACE_Time_Value tvNow)
+bool CProConnectClient::GetTimeout(ACE_Time_Value const& tvNow)
 {
     ACE_Time_Value tvIntval(tvNow - m_atvRecv);
 
