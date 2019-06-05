@@ -117,7 +117,7 @@ bool CWorkThreadAI::CheckCurrTimeout(uint16 u2CommandID, uint64 u8Now)
         //如果需要检测才走循环
         for(vector<_CommandTimeout>::iterator b = m_vecCommandTimeout.begin(); b != m_vecCommandTimeout.end(); ++b)
         {
-            _CommandTimeout& objCommandTimeout = (_CommandTimeout)*b;
+            _CommandTimeout& objCommandTimeout = (_CommandTimeout& )(*b);
 
             if(objCommandTimeout.m_u2CommandID == u2CommandID)
             {
