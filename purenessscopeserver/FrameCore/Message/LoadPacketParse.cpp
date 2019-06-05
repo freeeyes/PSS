@@ -102,7 +102,7 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
         return false;
     }
 
-    pPacketParseInfo->Connect = (bool(*)(uint32, _ClientIPInfo, _ClientIPInfo))ACE_OS::dlsym(pPacketParseInfo->m_hModule, "Connect");
+    pPacketParseInfo->Connect = (bool(*)(uint32, _ClientIPInfo, _ClientIPInfo const&))ACE_OS::dlsym(pPacketParseInfo->m_hModule, "Connect");
 
     if(NULL == pPacketParseInfo->m_hModule || !pPacketParseInfo->Connect)
     {

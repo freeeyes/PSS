@@ -122,7 +122,7 @@ uint8 CConsolePacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block
 }
 
 
-bool CConsolePacketParse::Connect( uint32 u4ConnectID, _ClientIPInfo objClientIPInfo, _ClientIPInfo objLocalIPInfo)
+bool CConsolePacketParse::Connect( uint32 u4ConnectID, _ClientIPInfo const& objClientIPInfo, _ClientIPInfo const& objLocalIPInfo)
 {
     //这里添加你对连接建立的逻辑处理，如果没有则不用在这里写任何代码
     //返回false，则连接会断开
