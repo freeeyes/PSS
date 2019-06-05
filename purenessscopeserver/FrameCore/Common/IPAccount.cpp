@@ -9,7 +9,7 @@ _IPAccount::_IPAccount()
     m_nMinute = (int32)m_dtLastTime.minute();
 }
 
-void _IPAccount::Add(ACE_Date_Time dtNowTime)
+void _IPAccount::Add(ACE_Date_Time const& dtNowTime)
 {
     m_dtLastTime = dtNowTime;
 
@@ -26,7 +26,7 @@ void _IPAccount::Add(ACE_Date_Time dtNowTime)
     }
 }
 
-bool _IPAccount::Check(ACE_Date_Time dtNowTime)
+bool _IPAccount::Check(ACE_Date_Time const& dtNowTime)
 {
     //如果3分钟内没有更新，则清理之
     uint16 u2NowTime = (uint32)dtNowTime.minute();
@@ -57,11 +57,6 @@ CIPAccount::CIPAccount()
 
     ACE_Date_Time  dtNowTime;
     m_u1Minute = (uint8)dtNowTime.minute();
-}
-
-CIPAccount::CIPAccount(const CIPAccount& ar)
-{
-    (*this) = ar;
 }
 
 CIPAccount::~CIPAccount()

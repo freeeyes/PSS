@@ -10,11 +10,6 @@ CMessageBlockManager::CMessageBlockManager(void)
     Init();
 }
 
-CMessageBlockManager::CMessageBlockManager(const CMessageBlockManager& ar)
-{
-    (*this) = ar;
-}
-
 CMessageBlockManager::~CMessageBlockManager(void)
 {
     Close();

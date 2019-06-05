@@ -25,10 +25,10 @@ public:
 
     _IPAccount();
 
-    void Add(ACE_Date_Time dtNowTime);
+    void Add(ACE_Date_Time const& dtNowTime);
 
     //false为数据已过期
-    bool Check(ACE_Date_Time dtNowTime);
+    bool Check(ACE_Date_Time const& dtNowTime);
 };
 
 typedef vector<_IPAccount> vecIPAccount;
@@ -39,18 +39,6 @@ public:
     CIPAccount();
 
     ~CIPAccount();
-
-    CIPAccount(const CIPAccount& ar);
-
-    CIPAccount& operator = (const CIPAccount& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     void Close();
 

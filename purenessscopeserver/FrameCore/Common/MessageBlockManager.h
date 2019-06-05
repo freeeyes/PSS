@@ -23,7 +23,7 @@ typedef ACE_Malloc<ACE_LOCAL_MEMORY_POOL, ACE_SYNCH_MUTEX> MUTEX_MB_MALLOC;
 typedef ACE_Allocator_Adapter<MUTEX_MB_MALLOC> Mutex_MB_Allocator;
 
 //管理释放的ACE_Message_Block内存，组织内存池
-#define MAX_MEMORY_BLOCK_COUNT 32
+const uint32 MAX_MEMORY_BLOCK_COUNT = 32;
 
 class _MemoryBlock_List
 {
@@ -56,21 +56,6 @@ public:
     ~CMemoryBlock_Pool()
     {
         Close();
-    }
-
-    CMemoryBlock_Pool(const CMemoryBlock_Pool& ar)
-    {
-        (*this) = ar;
-    };
-
-    CMemoryBlock_Pool& operator = (const CMemoryBlock_Pool& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
     }
 
     void Close()
@@ -155,18 +140,6 @@ class CMessageBlockManager : public IMessageBlockManager
 public:
     CMessageBlockManager(void);
     virtual ~CMessageBlockManager(void);
-
-    CMessageBlockManager(const CMessageBlockManager& ar);
-
-    CMessageBlockManager& operator = (const CMessageBlockManager& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     void Init();
     void Close();

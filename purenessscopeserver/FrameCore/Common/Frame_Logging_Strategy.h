@@ -4,7 +4,7 @@
 #include "MyACELoggingStrategy.h"
 #include <string>
 
-#define LOG_CONFIG_ARGV_COUNT   6
+const int CONFIG_ARGV_COUNT = 6;
 
 //修复ACE_Logging_Strategy的一个BUG
 //解决在多线程下双写导致的tellp()函数线程安全的问题
@@ -14,20 +14,6 @@ class Logging_Config_Param
 {
 public:
     Logging_Config_Param();
-    ~Logging_Config_Param();
-
-    Logging_Config_Param(const Logging_Config_Param& ar);
-
-    Logging_Config_Param& operator = (const Logging_Config_Param& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
 
     //文件大小检测时间(Secs)
     int m_iChkInterval;
@@ -53,18 +39,6 @@ class Frame_Logging_Strategy
 public:
     Frame_Logging_Strategy();
     ~Frame_Logging_Strategy();
-
-    Frame_Logging_Strategy(const Frame_Logging_Strategy& ar);
-
-    Frame_Logging_Strategy& operator = (const Frame_Logging_Strategy& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     //日志级别
     std::string GetLogLevel(const std::string& strLogLevel);

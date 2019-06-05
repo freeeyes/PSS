@@ -66,19 +66,6 @@ class CMakePacket
 {
 public:
     CMakePacket(void);
-    ~CMakePacket(void);
-
-    CMakePacket(const CMakePacket& ar);
-
-    CMakePacket& operator = (const CMakePacket& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     bool Init();
 

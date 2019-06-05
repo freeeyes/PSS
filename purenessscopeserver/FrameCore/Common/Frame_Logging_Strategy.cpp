@@ -41,26 +41,11 @@ Logging_Config_Param::Logging_Config_Param()
     memset(m_strLogLevel,0,sizeof(m_strLogLevel));
 }
 
-Logging_Config_Param::Logging_Config_Param(const Logging_Config_Param& ar)
-{
-    (*this) = ar;
-}
-
-Logging_Config_Param::~Logging_Config_Param()
-{
-    ACE_DEBUG((LM_INFO, ACE_TEXT("(%P|%t) %M ~Logging_Config_Param[%N,%l]\n")));
-}
-
 //»’÷æ≤ﬂ¬‘
 Frame_Logging_Strategy::Frame_Logging_Strategy()
 {
     pLogStraReactor = NULL;
     pLogStrategy = NULL;
-}
-
-Frame_Logging_Strategy::Frame_Logging_Strategy(const Frame_Logging_Strategy& ar)
-{
-    (*this) = ar;
 }
 
 Frame_Logging_Strategy::~Frame_Logging_Strategy()
