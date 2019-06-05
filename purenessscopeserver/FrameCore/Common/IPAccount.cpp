@@ -59,13 +59,6 @@ CIPAccount::CIPAccount()
     m_u1Minute = (uint8)dtNowTime.minute();
 }
 
-CIPAccount::~CIPAccount()
-{
-    OUR_DEBUG((LM_INFO, "[CIPAccount::~CIPAccount].\n"));
-    Close();
-    OUR_DEBUG((LM_INFO, "[CIPAccount::~CIPAccount]End.\n"));
-}
-
 void CIPAccount::Close()
 {
     for (int32 i = 0; i < m_objIPList.Get_Count(); i++)

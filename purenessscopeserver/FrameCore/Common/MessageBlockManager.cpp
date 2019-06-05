@@ -10,11 +10,6 @@ CMessageBlockManager::CMessageBlockManager(void)
     Init();
 }
 
-CMessageBlockManager::~CMessageBlockManager(void)
-{
-    Close();
-}
-
 void CMessageBlockManager::Init()
 {
     m_pmsgallocator   = new Mutex_MB_Allocator();

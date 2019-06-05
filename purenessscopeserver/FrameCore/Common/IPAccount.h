@@ -38,8 +38,6 @@ class CIPAccount
 public:
     CIPAccount();
 
-    ~CIPAccount();
-
     void Close();
 
     void Init(uint32 u4IPCount);

@@ -48,9 +48,9 @@ Frame_Logging_Strategy::Frame_Logging_Strategy()
     pLogStrategy = NULL;
 }
 
-Frame_Logging_Strategy::~Frame_Logging_Strategy()
+void Frame_Logging_Strategy::Close()
 {
-    ACE_DEBUG((LM_INFO, ACE_TEXT("[Frame_Logging_Strategy::~Frame_Logging_Strategy]Begin\n")));
+    ACE_DEBUG((LM_INFO, ACE_TEXT("[Frame_Logging_Strategy::Close]Begin\n")));
 
     pLogStrategy->fini();
 
@@ -60,13 +60,13 @@ Frame_Logging_Strategy::~Frame_Logging_Strategy()
         delete pLogStrategy;
     }
 
-    if(pLogStraReactor != NULL)
+    if (pLogStraReactor != NULL)
     {
         pLogStraReactor->close();
         delete pLogStraReactor;
     }
 
-    ACE_DEBUG((LM_INFO, ACE_TEXT("[Frame_Logging_Strategy::~Frame_Logging_Strategy]End\n")));
+    ACE_DEBUG((LM_INFO, ACE_TEXT("[Frame_Logging_Strategy::Close]End\n")));
 }
 
 std::string Frame_Logging_Strategy::GetLogLevel(const std::string& strLogLevel)

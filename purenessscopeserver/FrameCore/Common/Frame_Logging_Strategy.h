@@ -38,7 +38,8 @@ class Frame_Logging_Strategy
 {
 public:
     Frame_Logging_Strategy();
-    ~Frame_Logging_Strategy();
+
+    void Close();
 
     //日志级别
     std::string GetLogLevel(const std::string& strLogLevel);

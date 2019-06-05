@@ -452,11 +452,16 @@ bool CProServerManager::Close()
     App_ProactorManager::instance()->StopProactor();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ReactorManager OK.\n"));
 
+    App_IPAccount::instance()->Close();
+    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_IPAccount OK.\n"));
+    App_MessageBlockManager::instance()->Close();
+    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_MessageBlockManager OK.\n"));
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close end....\n"));
 
     if(NULL != m_pFrameLoggingStrategy)
     {
         m_pFrameLoggingStrategy->EndLogStrategy();
+        m_pFrameLoggingStrategy->Close();
         SAFE_DELETE(m_pFrameLoggingStrategy);
     }
 

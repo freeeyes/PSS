@@ -53,11 +53,6 @@ public:
         }
     }
 
-    ~CMemoryBlock_Pool()
-    {
-        Close();
-    }
-
     void Close()
     {
         for(uint32 i = 0; i < MAX_MEMORY_BLOCK_COUNT; i++)
@@ -139,7 +134,6 @@ class CMessageBlockManager : public IMessageBlockManager
 {
 public:
     CMessageBlockManager(void);
-    virtual ~CMessageBlockManager(void);
 
     void Init();
     void Close();
