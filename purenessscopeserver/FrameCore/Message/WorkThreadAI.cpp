@@ -157,11 +157,13 @@ void CWorkThreadAI::Close()
 
     for(uint32 i = 0; i < u4Size; i++)
     {
+        m_vecCommandTime[i]->m_objTime.Close();
         SAFE_DELETE(m_vecCommandTime[i]);
     }
 
     m_vecCommandTime.clear();
     m_vecCommandTimeout.clear();
+
 }
 
 void CWorkThreadAI::ReSet(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime)

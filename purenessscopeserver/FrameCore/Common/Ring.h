@@ -16,18 +16,6 @@ public:
         m_pRingLink = NULL;
     }
 
-    CRingLink(const CRingLink& ar)
-    {
-        (*this) = ar;
-    };
-
-    CRingLink& operator = (const CRingLink& ar)
-    {
-        ACE_UNUSED_ARG(ar);
-
-        return *this;
-    }
-
     void Init(int nMaxCount)
     {
         Close();
@@ -35,11 +23,6 @@ public:
         m_nMaxCount = nMaxCount;
         m_nIndex    = 0;
         m_pRingLink = new T[nMaxCount];
-    }
-
-    ~CRingLink()
-    {
-        Close();
     }
 
     void Close()

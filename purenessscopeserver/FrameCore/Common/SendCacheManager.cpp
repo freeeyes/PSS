@@ -5,18 +5,6 @@ CSendCacheManager::CSendCacheManager()
     m_u4UsedCount = 0;
 }
 
-CSendCacheManager::CSendCacheManager(const CSendCacheManager& ar)
-{
-    (*this) = ar;
-}
-
-CSendCacheManager::~CSendCacheManager()
-{
-    OUR_DEBUG((LM_INFO, "[CSendCacheManager::~CSendCacheManager]Begin.\n"));
-    Close();
-    OUR_DEBUG((LM_INFO, "[CSendCacheManager::~CSendCacheManager]End.\n"));
-}
-
 void CSendCacheManager::Init(uint32 u4CacheCount, uint32 u4CacheSize)
 {
     //初始化HashTable
@@ -37,6 +25,7 @@ void CSendCacheManager::Init(uint32 u4CacheCount, uint32 u4CacheSize)
 
 void CSendCacheManager::Close()
 {
+    OUR_DEBUG((LM_INFO, "[CSendCacheManager::Close]Begin.\n"));
     //回收内存
     //清理所有已存在的指针
     vector<ACE_Message_Block*> vecMb;

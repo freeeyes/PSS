@@ -56,6 +56,8 @@ public:
         *ppMessage = this;
     }
 
+    _SendMessage(_SendMessage&&) = default;
+
     _SendMessage& operator = (const _SendMessage& ar)
     {
         if (this != &ar)
@@ -79,6 +81,8 @@ public:
 
         return *this;
     }
+
+    _SendMessage& operator=(_SendMessage&&) = default;
 
     ~_SendMessage()
     {

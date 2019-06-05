@@ -8,26 +8,10 @@
 //负责记录发送缓冲池，用于反复利用内存。
 //add by freeeyes
 
-//默认缓冲池是10个
-#define MAX_CACHE_POOL_SIZE 10
-
 class CSendCacheManager : public ISendCacheManager
 {
 public:
     CSendCacheManager();
-    ~CSendCacheManager();
-
-    CSendCacheManager(const CSendCacheManager& ar);
-
-    CSendCacheManager& operator = (const CSendCacheManager& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     void Init(uint32 u4CacheCount, uint32 u4CacheSize);
     void Close();
