@@ -7,7 +7,7 @@
 #include "ObjectArrayList.h"
 
 //定义一个发送数据容器，用于异步发送队列
-class _SendMessage
+class _SendMessage final
 {
 public:
     uint32              m_u4ConnectID;    //要发送的远程ID
