@@ -387,7 +387,7 @@ bool CServerMessageTask::ProcessMessage(_Server_Message_Info* pMessage, uint32 u
     return true;
 }
 
-bool CServerMessageTask::CheckServerMessageThread(ACE_Time_Value tvNow)
+bool CServerMessageTask::CheckServerMessageThread(ACE_Time_Value const& tvNow)
 {
     ACE_Time_Value tvIntval(tvNow - m_tvDispose);
 
@@ -534,7 +534,7 @@ bool CServerMessageManager::PutMessage(_Server_Message_Info* pMessage)
     }
 }
 
-bool CServerMessageManager::CheckServerMessageThread(ACE_Time_Value tvNow)
+bool CServerMessageManager::CheckServerMessageThread(ACE_Time_Value const& tvNow)
 {
     if(NULL != m_pServerMessageTask)
     {

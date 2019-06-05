@@ -55,7 +55,7 @@ bool AES::SetKey(const unsigned char* szKey)
         return false;
     }
 
-    KeyExpansion(szKey, w);
+    KeyExpansion(szKey);
     return true;
 }
 
@@ -178,7 +178,7 @@ void* AES::InvCipher(void* input, int length)
     return input;
 }
 
-void AES::KeyExpansion(const unsigned char* key, unsigned char w[][4][4])
+void AES::KeyExpansion(const unsigned char* key)
 {
     int i = 0;
     int j = 0;

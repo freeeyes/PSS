@@ -169,7 +169,7 @@ int CLogicThread::Close()
     return 0;
 }
 
-bool CLogicThread::CheckTimeout(ACE_Time_Value tvNow)
+bool CLogicThread::CheckTimeout(ACE_Time_Value const& tvNow)
 {
     if (THREAD_RUNBEGIN == m_u4ThreadState)
     {

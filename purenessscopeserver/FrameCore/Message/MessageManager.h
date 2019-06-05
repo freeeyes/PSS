@@ -200,9 +200,9 @@ public:
 
     void Close();
 
-    bool AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, _ClientIPInfo objListenInfo);   //×¢²áÃüÁî
-    bool AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName);   //×¢²áÃüÁî
-    bool DelClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand);                            //Ğ¶ÔØÃüÁî
+    virtual bool AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, _ClientIPInfo* pListenInfo);   //×¢²áÃüÁî
+    virtual bool AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName);   //×¢²áÃüÁî
+    virtual bool DelClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand);                            //Ğ¶ÔØÃüÁî
 
     bool UnloadModuleCommand(const char* pModuleName, uint8 u1LoadState, uint32 u4ThreadCount);  //Ğ¶ÔØÖ¸¶¨Ä£¿éÊÂ¼ş£¬u1State= 1 Ğ¶ÔØ£¬2 ÖØÔØ
 

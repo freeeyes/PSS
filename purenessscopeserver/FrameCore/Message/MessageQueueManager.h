@@ -172,7 +172,7 @@ public:
     virtual int svc(void);
     int Close();
 
-    bool CheckTimeout(ACE_Time_Value tvNow);
+    bool CheckTimeout(ACE_Time_Value const& tvNow);
 
     bool PutMessage(int nMessageID, void* pParam);
 

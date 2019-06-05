@@ -75,11 +75,11 @@ public:
         }
 
 
-				
+
         //这里添加完整数据包算法
         uint32 u4Count = 0;
         memcpy_safe(&m_szRecvBuffData[0], sizeof(uint32), (char*)&u4Count, sizeof(uint32));
-        
+
         uint32 u4RecvFinish = u4Count + sizeof(uint32);
 
         if (u4RecvFinish <= m_u2RecvBuffLength)
@@ -91,11 +91,11 @@ public:
 
             m_u2RecvBuffLength -= u4RecvFinish;
         }
-        
+
         return true;
     }
 
-    virtual bool RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv,  _ClientIPInfo objServerIPInfo)
+    virtual bool RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv,  _ClientIPInfo const& objServerIPInfo)
     {
         //数据包已经收全，在这里处理数据
         ACE_UNUSED_ARG(u2CommandID);
@@ -110,7 +110,7 @@ public:
         OUR_DEBUG((LM_INFO, "[CPostServerData::ReConnect]nServerID=%d.\n", nServerID));
     }
 
-    virtual bool ConnectError(int nError, _ClientIPInfo objServerIPInfo)
+    virtual bool ConnectError(int nError, _ClientIPInfo const& objServerIPInfo)
     {
         ACE_UNUSED_ARG(objServerIPInfo);
         OUR_DEBUG((LM_INFO, "[CPostServerData::ConnectError]nServerID=%d, nError=%d.\n", m_u4ServerID, nError));

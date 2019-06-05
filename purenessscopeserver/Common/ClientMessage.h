@@ -30,9 +30,9 @@ public:
     //链接重连成功回调函数
     virtual void ReConnect(int nServerID)                                                               = 0;    //连接重连成功接口
     //处理接收数据
-    virtual bool RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv, _ClientIPInfo objServerIPInfo) = 0;    //接收数据的函数
+    virtual bool RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv, _ClientIPInfo const& objServerIPInfo) = 0;    //接收数据的函数
     //链接异常回调函数
-    virtual bool ConnectError(int nError, _ClientIPInfo objServerIPInfo)                                = 0;    //当出错的时候，调用此接口返回错误信息
+    virtual bool ConnectError(int nError, _ClientIPInfo const& objServerIPInfo)                                = 0;    //当出错的时候，调用此接口返回错误信息
 };
 
 #endif

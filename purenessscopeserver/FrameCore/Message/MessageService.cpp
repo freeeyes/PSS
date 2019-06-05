@@ -529,18 +529,19 @@ void CMessageService::CopyMessageManagerList()
 {
     CloseCommandList();
 
-    CHashTable<CClientCommandList>* pClientCommandList = App_MessageManager::instance()->GetHashCommandList();
+    CHashTable<CClientCommandList>* pHashtCommandList = App_MessageManager::instance()->GetHashCommandList();
 
-    if (NULL != pClientCommandList)
+    if (NULL != pHashtCommandList)
     {
+        CClientCommandList* pClientCommandList = NULL;
         vector<CClientCommandList*> vecClientCommandList;
-        pClientCommandList->Get_All_Used(vecClientCommandList);
+        pHashtCommandList->Get_All_Used(vecClientCommandList);
 
         uint32 u4Size = (uint32)vecClientCommandList.size();
 
         for (uint32 i = 0; i < u4Size; i++)
         {
-            CClientCommandList* pClientCommandList = vecClientCommandList[i];
+            pClientCommandList = vecClientCommandList[i];
 
             if (NULL != pClientCommandList)
             {

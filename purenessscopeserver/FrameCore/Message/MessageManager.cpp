@@ -55,9 +55,9 @@ bool CMessageManager::AddClientCommand(uint16 u2CommandID, CClientCommand* pClie
     return AddClientCommand_Ex(u2CommandID, pClientCommand, pModuleName, NULL);
 }
 
-bool CMessageManager::AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, _ClientIPInfo objListenInfo)
+bool CMessageManager::AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, _ClientIPInfo* pListenInfo)
 {
-    return AddClientCommand_Ex(u2CommandID, pClientCommand, pModuleName, &objListenInfo);
+    return AddClientCommand_Ex(u2CommandID, pClientCommand, pModuleName, pListenInfo);
 }
 
 bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1LoadState, uint32 u4ThreadCount)

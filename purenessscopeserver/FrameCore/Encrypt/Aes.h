@@ -3,7 +3,7 @@
 
 //AES加解密算法，建议秘钥超过1024字节
 #include <stdio.h>
-#include <memory.h>
+#include <memory>
 #include <string>
 
 class AES
@@ -22,7 +22,7 @@ private:
     unsigned char InvSbox[256];
     unsigned char w[11][4][4];
 
-    void KeyExpansion(const unsigned char* key, unsigned char w[][4][4]);
+    void KeyExpansion(const unsigned char* key);
     unsigned char FFmul(unsigned char a, unsigned char b);
 
     void SubBytes(unsigned char state[][4]);

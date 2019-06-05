@@ -106,7 +106,7 @@ public:
         return true;
     }
 
-    virtual bool RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv, _ClientIPInfo objServerIPInfo)
+    virtual bool RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv, _ClientIPInfo const& objServerIPInfo)
     {
         //数据包已经收全，在这里处理数据
         ACE_UNUSED_ARG(u2CommandID);
@@ -136,7 +136,7 @@ public:
         OUR_DEBUG((LM_INFO, "[CRedirectionData::ReConnect]nServerID=%d.\n", nServerID));
     }
 
-    virtual bool ConnectError(int nError, _ClientIPInfo objServerIPInfo)
+    virtual bool ConnectError(int nError, _ClientIPInfo const& objServerIPInfo)
     {
         ACE_UNUSED_ARG(objServerIPInfo);
         OUR_DEBUG((LM_INFO, "[CRedirectionData::ConnectError]nServerID=%d, nError=%d.\n", m_u4ServerID, nError));
