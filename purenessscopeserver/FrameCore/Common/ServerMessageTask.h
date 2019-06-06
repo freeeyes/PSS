@@ -50,27 +50,9 @@ public:
         *ppMessage = this;
     }
 
-    _Server_Message_Info& operator = (const _Server_Message_Info& ar)
+    void Close()
     {
-        if (this != &ar)
-        {
-            this->m_pClientMessage = ar.m_pClientMessage;
-            this->m_u2CommandID = ar.m_u2CommandID;
-            this->m_pRecvFinish = ar.m_pRecvFinish;
-            this->m_objServerIPInfo = ar.m_objServerIPInfo;
-            this->m_nHashID = ar.m_nHashID;
-
-            memcpy_safe((char*)ar.m_pmbQueuePtr->base(), (uint32)ar.m_pmbQueuePtr->length(), m_pmbQueuePtr->base(), (uint32)m_pmbQueuePtr->length());
-            _Server_Message_Info** ppMessage = (_Server_Message_Info**)m_pmbQueuePtr->base();
-            *ppMessage = this;
-        }
-
-        return *this;
-    }
-
-    ~_Server_Message_Info()
-    {
-        if(NULL != m_pmbQueuePtr)
+        if (NULL != m_pmbQueuePtr)
         {
             m_pmbQueuePtr->release();
             m_pmbQueuePtr = NULL;
@@ -112,7 +94,7 @@ public:
     int GetFreeCount();
 
 private:
-    CObjectArrayList<_Server_Message_Info> m_objArrayList;              //
+    CObjectArrayList<_Server_Message_Info> m_objArrayList;              //_Server_Message_Info内存对象列表
     CHashTable<_Server_Message_Info> m_objServerMessageList;           //Server Message缓冲池
     ACE_Recursive_Thread_Mutex       m_ThreadWriteLock;                //控制多线程锁
 };

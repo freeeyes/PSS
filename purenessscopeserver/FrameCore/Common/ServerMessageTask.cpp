@@ -83,6 +83,12 @@ void CServerMessageInfoPool::Close()
     //清理所有已存在的指针
     OUR_DEBUG((LM_INFO, "[CMessagePool::Close]Begin.\n"));
     m_objServerMessageList.Close();
+
+    for (uint32 i = 0; i < m_objArrayList.GetCount(); i++)
+    {
+        m_objArrayList.GetObjectA(i)->Close();
+    }
+
     OUR_DEBUG((LM_INFO, "[CMessagePool::Close]End.\n"));
 }
 
