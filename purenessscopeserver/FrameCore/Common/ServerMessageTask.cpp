@@ -457,16 +457,6 @@ CServerMessageManager::CServerMessageManager()
     Init();
 }
 
-CServerMessageManager::CServerMessageManager(const CServerMessageManager& ar)
-{
-    (*this) = ar;
-}
-
-CServerMessageManager::~CServerMessageManager()
-{
-    OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::~CServerMessageManager].\n"));
-}
-
 void CServerMessageManager::Init()
 {
     if(NULL == m_pServerMessageTask)

@@ -660,6 +660,8 @@ bool CServerManager::Close()
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]BuffPacketManager OK\n"));
     App_ReactorManager::instance()->StopReactor();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ReactorManager OK.\n"));
+    App_TcpRedirection::instance()->Close();
+    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_TcpRedirection OK.\n"));
     App_IPAccount::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_IPAccount OK.\n"));
     App_MessageBlockManager::instance()->Close();

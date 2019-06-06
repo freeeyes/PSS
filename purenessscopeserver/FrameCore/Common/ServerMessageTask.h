@@ -151,19 +151,6 @@ class CServerMessageManager
 {
 public:
     CServerMessageManager();
-    ~CServerMessageManager();
-
-    CServerMessageManager(const CServerMessageManager& ar);
-
-    CServerMessageManager& operator = (const CServerMessageManager& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     void Init();
 

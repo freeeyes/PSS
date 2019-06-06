@@ -5,22 +5,15 @@ CTcpRedirection::CTcpRedirection() : m_u2Count(0), m_pClientManager(NULL), m_pCo
 
 }
 
-CTcpRedirection::CTcpRedirection(const CTcpRedirection& ar)
-{
-    (*this) = ar;
-}
-
-CTcpRedirection::~CTcpRedirection()
-{
-    Close();
-}
 
 void CTcpRedirection::Close()
 {
+    OUR_DEBUG((LM_INFO, "[CTcpRedirection::Close]Begin.\n"));
     //É¾³ýhash±í¿Õ¼ä
     m_objRedirectList.Close();
 
     m_u2Count = 0;
+    OUR_DEBUG((LM_INFO, "[CTcpRedirection::Close]End.\n"));
 }
 
 void CTcpRedirection::Init(std::vector<xmlTcpRedirection::_RedirectionInfo> vecInfo, uint32 u4MaxHandlerCount, IClientManager* pClientManager, IConnectManager* pConnectManager)
