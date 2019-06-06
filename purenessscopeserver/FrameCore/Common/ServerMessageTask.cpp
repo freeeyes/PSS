@@ -160,8 +160,6 @@ int CServerMessageTask::Close()
         msg_queue()->flush();
     }
 
-    App_ServerMessageInfoPool::instance()->Close();
-
     return 0;
 }
 
@@ -234,6 +232,7 @@ int CServerMessageTask::svc(void)
         }
     }
 
+    App_ServerMessageInfoPool::instance()->Close();
     OUR_DEBUG((LM_INFO,"[CServerMessageTask::svc] svc finish!\n"));
     return 0;
 }
