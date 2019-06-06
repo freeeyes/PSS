@@ -14,32 +14,13 @@
 #include "IClientManager.h"
 #include "IConnectManager.h"
 
-#define MAX_CONNECT_REDIRECTION_COUNT  5
+const int MAX_CONNECT_REDIRECTION_COUNT = 5;
 
 class CRedirectionData : public IClientMessage
 {
 public:
     CRedirectionData() : m_u4ServerID(0), m_u1Mode(0), m_u1ConnectState(0), m_pConnectManager(NULL)
     {
-    }
-
-    virtual ~CRedirectionData()
-    {
-    }
-
-    CRedirectionData(const CRedirectionData& ar)
-    {
-        (*this) = ar;
-    };
-
-    CRedirectionData& operator = (const CRedirectionData& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
     }
 
     void SetMode(uint8 u1Mode)

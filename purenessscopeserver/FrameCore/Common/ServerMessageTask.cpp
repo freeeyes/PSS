@@ -86,7 +86,7 @@ void CServerMessageInfoPool::Close()
 
     for (uint32 i = 0; i < m_objArrayList.GetCount(); i++)
     {
-        m_objArrayList.GetObjectA(i)->Close();
+        m_objArrayList.GetObject(i)->Close();
     }
 
     OUR_DEBUG((LM_INFO, "[CMessagePool::Close]End.\n"));
