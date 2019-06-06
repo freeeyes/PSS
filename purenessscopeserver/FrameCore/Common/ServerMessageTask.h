@@ -17,11 +17,11 @@
 //如果服务器间线程处理挂起了，会尝试重启服务
 //add by freeeyes
 
-#define MAX_SERVER_MESSAGE_QUEUE 1000    //允许最大队列长度
-#define MAX_DISPOSE_TIMEOUT      30      //允许最大等待处理时间  
+const uint32 MAX_SERVER_MESSAGE_QUEUE = 1000;    //允许最大队列长度
+const uint32 MAX_DISPOSE_TIMEOUT      = 30;      //允许最大等待处理时间
 
-#define ADD_SERVER_CLIENT  ACE_Message_Block::MB_USER + 1    //添加ClientMessage异步对象
-#define DEL_SERVER_CLIENT  ACE_Message_Block::MB_USER + 2    //删除ClientMessage异步对象
+const uint32 ADD_SERVER_CLIENT = ACE_Message_Block::MB_USER + 1;    //添加ClientMessage异步对象
+const uint32 DEL_SERVER_CLIENT = ACE_Message_Block::MB_USER + 2;    //删除ClientMessage异步对象
 
 //服务器间通讯的数据结构（接收包）
 class _Server_Message_Info
@@ -37,29 +37,15 @@ public:
 
     _Server_Message_Info()
     {
-        m_nHashID        = 0;
-        m_u2CommandID    = 0;
+        m_nHashID = 0;
+        m_u2CommandID = 0;
         m_pClientMessage = NULL;
-        m_pRecvFinish    = NULL;
+        m_pRecvFinish = NULL;
 
         //这里设置消息队列模块指针内容，这样就不必反复的new和delete，提升性能
         //指针关系也可以在这里直接指定，不必使用的使用再指定
-        m_pmbQueuePtr  = new ACE_Message_Block(sizeof(_Server_Message_Info*));
+        m_pmbQueuePtr = new ACE_Message_Block(sizeof(_Server_Message_Info*));
 
-        _Server_Message_Info** ppMessage = (_Server_Message_Info**)m_pmbQueuePtr->base();
-        *ppMessage = this;
-    }
-
-    //拷贝构造函数
-    _Server_Message_Info(const _Server_Message_Info& ar)
-    {
-        this->m_pClientMessage           = ar.m_pClientMessage;
-        this->m_u2CommandID              = ar.m_u2CommandID;
-        this->m_pRecvFinish              = ar.m_pRecvFinish;
-        sprintf_safe(this->m_objServerIPInfo.m_szClientIP, MAX_BUFF_50, "%s", ar.m_objServerIPInfo.m_szClientIP);
-        this->m_objServerIPInfo.m_nPort  = ar.m_objServerIPInfo.m_nPort;
-        this->m_nHashID                  = ar.m_nHashID;
-        this->m_pmbQueuePtr              = new ACE_Message_Block(sizeof(_Server_Message_Info*));
         _Server_Message_Info** ppMessage = (_Server_Message_Info**)m_pmbQueuePtr->base();
         *ppMessage = this;
     }
@@ -108,26 +94,13 @@ public:
 
 };
 
-#define MAX_SERVER_MESSAGE_INFO_COUNT 100
+const uint32 MAX_SERVER_MESSAGE_INFO_COUNT = 100;
 
 //_Server_Message_Info对象池
 class CServerMessageInfoPool
 {
 public:
     CServerMessageInfoPool();
-    ~CServerMessageInfoPool();
-
-    CServerMessageInfoPool(const CServerMessageInfoPool& ar);
-
-    CServerMessageInfoPool& operator = (const CServerMessageInfoPool& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     void Init(uint32 u4PacketCount = MAX_SERVER_MESSAGE_INFO_COUNT);
     void Close();
@@ -149,19 +122,6 @@ class CServerMessageTask : public ACE_Task<ACE_MT_SYNCH>
 {
 public:
     CServerMessageTask();
-    virtual ~CServerMessageTask();
-
-    CServerMessageTask(const CServerMessageTask& ar);
-
-    CServerMessageTask& operator = (const CServerMessageTask& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     virtual int open(void* args = 0);
     virtual int svc (void);

@@ -5,18 +5,6 @@ CServerMessageInfoPool::CServerMessageInfoPool()
 
 }
 
-CServerMessageInfoPool::CServerMessageInfoPool(const CServerMessageInfoPool& ar)
-{
-    (*this) = ar;
-}
-
-CServerMessageInfoPool::~CServerMessageInfoPool()
-{
-    OUR_DEBUG((LM_INFO, "[CMessagePool::~CMessagePool].\n"));
-    Close();
-    OUR_DEBUG((LM_INFO, "[CMessagePool::~CMessagePool]End.\n"));
-}
-
 void CServerMessageInfoPool::Init(uint32 u4PacketCount /*= MAX_SERVER_MESSAGE_INFO_COUNT*/)
 {
     Close();
@@ -93,7 +81,9 @@ bool CServerMessageInfoPool::Delete(_Server_Message_Info* pObject)
 void CServerMessageInfoPool::Close()
 {
     //清理所有已存在的指针
+    OUR_DEBUG((LM_INFO, "[CMessagePool::Close]Begin.\n"));
     m_objServerMessageList.Close();
+    OUR_DEBUG((LM_INFO, "[CMessagePool::Close]End.\n"));
 }
 
 CServerMessageTask::CServerMessageTask():m_mutex(), m_cond(m_mutex)
@@ -102,16 +92,6 @@ CServerMessageTask::CServerMessageTask():m_mutex(), m_cond(m_mutex)
     m_blRun      = false;
     m_u4MaxQueue = MAX_SERVER_MESSAGE_QUEUE;
     m_emState    = SERVER_RECV_INIT;
-}
-
-CServerMessageTask::CServerMessageTask(const CServerMessageTask& ar) : CServerMessageTask()
-{
-    (*this) = ar;
-}
-
-CServerMessageTask::~CServerMessageTask()
-{
-    OUR_DEBUG((LM_INFO, "[CServerMessageTask::~CServerMessageTask].\n"));
 }
 
 bool CServerMessageTask::Start()
@@ -179,6 +159,8 @@ int CServerMessageTask::Close()
         msg_queue()->deactivate();
         msg_queue()->flush();
     }
+
+    App_ServerMessageInfoPool::instance()->Close();
 
     return 0;
 }
