@@ -9,10 +9,15 @@ CTcpRedirection::CTcpRedirection() : m_u2Count(0), m_pClientManager(NULL), m_pCo
 void CTcpRedirection::Close()
 {
     OUR_DEBUG((LM_INFO, "[CTcpRedirection::Close]Begin.\n"));
-    //删除hash表空间
-    m_objRedirectList.Close();
 
-    m_u2Count = 0;
+    if (m_u2Count > 0)
+    {
+        //删除hash表空间
+        m_objRedirectList.Close();
+
+        m_u2Count = 0;
+    }
+
     OUR_DEBUG((LM_INFO, "[CTcpRedirection::Close]End.\n"));
 }
 
