@@ -468,6 +468,8 @@ public:
     {
         if(0 == m_cIsDelete)
         {
+            m_objHashPool.Close();
+            m_objHashLinkPool.Close();
             delete[] m_pBase;
         }
 

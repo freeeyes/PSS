@@ -21,7 +21,7 @@ enum
     CONSOLE_MESSAGE_CLOSE   = 2,
 };
 
-#define COMMAND_SPLIT_STRING " "
+static const char* COMMAND_SPLIT_STRING = " ";
 
 //命令处理参数
 class _CommandInfo

@@ -8,7 +8,7 @@
 //Console»®œﬁ±Ì
 //add by freeeyes
 
-#define MAX_COMSOLE_COMMAND_COUNT 100
+const uint32 MAX_COMSOLE_COMMAND_COUNT = 100;
 
 class _Console_Command_Info
 {
@@ -27,19 +27,6 @@ class CConsolePromissions
 {
 public:
     CConsolePromissions();
-    ~CConsolePromissions();
-
-    CConsolePromissions(const CConsolePromissions& ar);
-
-    CConsolePromissions& operator = (const CConsolePromissions& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     void Init(const char* pFileName);
     void Close();

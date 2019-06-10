@@ -5,16 +5,6 @@ CConsolePromissions::CConsolePromissions()
 
 }
 
-CConsolePromissions::CConsolePromissions(const CConsolePromissions& ar)
-{
-    (*this) = ar;
-}
-
-CConsolePromissions::~CConsolePromissions()
-{
-    Close();
-}
-
 void CConsolePromissions::Init(const char* pFileName)
 {
     CXmlOpeation m_ConcoleConfig;
