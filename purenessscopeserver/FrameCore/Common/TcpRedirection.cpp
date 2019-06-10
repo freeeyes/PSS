@@ -10,13 +10,10 @@ void CTcpRedirection::Close()
 {
     OUR_DEBUG((LM_INFO, "[CTcpRedirection::Close]Begin.\n"));
 
-    if (m_u2Count > 0)
-    {
-        //删除hash表空间
-        m_objRedirectList.Close();
+    //删除hash表空间
+    m_objRedirectList.Close();
 
-        m_u2Count = 0;
-    }
+    m_u2Count = 0;
 
     OUR_DEBUG((LM_INFO, "[CTcpRedirection::Close]End.\n"));
 }

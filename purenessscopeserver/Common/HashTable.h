@@ -481,7 +481,7 @@ public:
         size_t stSize = Get_Size(nHashCount, nKeySize);
         char* pData = new char[stSize];
         memset(pData, 0, stSize);
-        int32 nPos         = 0;
+        int32 nPos       = 0;
         m_pBase          = pData;
         m_nCurrLinkIndex = 0;
         m_cIsDelete      = 0;
