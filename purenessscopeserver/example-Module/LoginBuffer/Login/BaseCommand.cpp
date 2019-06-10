@@ -172,7 +172,8 @@ void CBaseCommand::Do_User_Login( IMessage* pMessage )
                 ACE_OS::memcpy(&szPostData[u4Pos], (char* )&pMessage->GetMessageBase()->m_u4ConnectID, sizeof(uint32));
                 u4Pos += sizeof(uint32);
 
-                if(false == m_pServerObject->GetClientManager()->SendData(1, szPostData, (int)u4SendSize, false))
+				char* ptrReturnData = szPostData;
+                if(false == m_pServerObject->GetClientManager()->SendData(1, ptrReturnData, (int)u4SendSize, false))
                 {
                     u4Ret = LOGIN_FAIL_NOEXIST;
                 }
