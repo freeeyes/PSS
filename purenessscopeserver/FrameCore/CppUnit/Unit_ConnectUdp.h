@@ -6,7 +6,7 @@
 #include "Unit_Common.h"
 #include "PostUdpServerMessage.h"
 
-#define COMMAND_AUTOTEST_UDP_HEAD 0x1001
+const short COMMAND_AUTOTEST_UDP_HEAD = 0x1001;
 
 class CUnit_ConnectUdp : public CppUnit::TestFixture
 {

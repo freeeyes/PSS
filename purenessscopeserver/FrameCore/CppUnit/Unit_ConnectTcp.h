@@ -6,7 +6,7 @@
 #include "Unit_Common.h"
 #include "PostServerMessage.h"
 
-#define COMMAND_AUTOTEST_HEAD     0x1000
+const short COMMAND_AUTOTEST_HEAD = 0x1000;
 
 class CUnit_ConnectTcp : public CppUnit::TestFixture
 {

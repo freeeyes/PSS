@@ -6,7 +6,7 @@
 #include "Unit_Common.h"
 #include "BuffPacket.h"
 
-#define TEST_BUFFPACKET_MAX_SIZE 20480
+const uint32 TEST_BUFFPACKET_MAX_SIZE = 20480;
 
 class CUnit_BuffPacket : public CppUnit::TestFixture
 {

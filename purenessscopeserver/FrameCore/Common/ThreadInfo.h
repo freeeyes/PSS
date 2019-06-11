@@ -16,43 +16,16 @@ public:
     ACE_Time_Value      m_tvUpdateTime;       //线程最后处理数据的时间
     ACE_Time_Value      m_tvCreateTime;       //线程创建时间
 
-    _ThreadInfo()
+    _ThreadInfo() : m_u4ThreadIndex(0),
+        m_u4State(THREAD_INIT),
+        m_u4RecvPacketCount(0),
+        m_u4CurrPacketCount(0),
+        m_u2CommandID(0),
+        m_u2PacketTime(0),
+        m_u4ThreadID(0),
+        m_tvUpdateTime(ACE_OS::gettimeofday()),
+        m_tvCreateTime(ACE_OS::gettimeofday())
     {
-        m_u4State           = THREAD_INIT;
-        m_tvUpdateTime      = ACE_OS::gettimeofday();
-        m_tvCreateTime      = ACE_OS::gettimeofday();
-        m_u4RecvPacketCount = 0;
-        m_u2CommandID       = 0;
-        m_u4ThreadIndex     = 0;
-        m_u2PacketTime      = 0;
-        m_u4CurrPacketCount = 0;
-        m_u4ThreadID        = 0;
-    }
-
-    ~_ThreadInfo()
-    {
-    }
-
-    _ThreadInfo(const _ThreadInfo& ar)
-    {
-        (*this) = ar;
-    }
-
-    _ThreadInfo& operator = (const _ThreadInfo& ar)
-    {
-        if (this != &ar)
-        {
-            this->m_u4ThreadIndex = ar.m_u4ThreadIndex;
-            this->m_tvUpdateTime = ar.m_tvUpdateTime;
-            this->m_tvCreateTime = ar.m_tvCreateTime;
-            this->m_u4State = ar.m_u4State;
-            this->m_u4RecvPacketCount = ar.m_u4RecvPacketCount;
-            this->m_u2CommandID = ar.m_u2CommandID;
-            this->m_u2PacketTime = ar.m_u2PacketTime;
-            this->m_u4CurrPacketCount = ar.m_u4CurrPacketCount;
-        }
-
-        return *this;
     }
 };
 

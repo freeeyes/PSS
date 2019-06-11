@@ -43,7 +43,7 @@
 #include "Uint_TcpRedirection.h"
 #include "Unit_LogicThreadManager.h"
 
-#define CPPUNIT_REPORT_PATH "./reports/cppunit/report.xml"
+static const char* CPPUNIT_REPORT_PATH = "./reports/cppunit/report.xml";
 
 class CCppUnitMain
 {
