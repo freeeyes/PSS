@@ -20,6 +20,9 @@ bool CProServerManager::Init()
 
     bool blState = false;
 
+    //初始化Console相关参数
+    App_ConsoleManager::instance()->Init();
+
     //初始化模块数组相关参数
     App_MessageManager::instance()->Init(GetXmlConfigAttribute(xmlModuleMangager)->MaxCount,
                                          GetXmlConfigAttribute(xmlCommandAccount)->MaxCommandCount);

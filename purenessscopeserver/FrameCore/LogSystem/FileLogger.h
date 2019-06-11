@@ -15,10 +15,9 @@ const uint16 MAX_CMD_NUM = 100;
 const uint16 MAX_TIME_SIZE = 100;
 
 //定义Log所属类型
-static const char* LOGTYPE_OPERATION = "Operation";
-static const char* LOGTYPE_ERROR = "ServerError";
-
-static const char* FILELOG_CONFIG = "logger.xml";
+static const char LOGTYPE_OPERATION[] = "Operation";
+static const char LOGTYPE_ERROR[] = "ServerError";
+static const char FILELOG_CONFIG[] = "logger.xml";
 
 //从XML读取的日志文件信息
 class _Log_File_Info

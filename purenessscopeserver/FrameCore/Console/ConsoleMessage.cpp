@@ -2,19 +2,14 @@
 
 CConsoleMessage::CConsoleMessage()
 {
-    m_objConsolePromissions.Init(CONSOLECONFIG);
-
-    SetConsoleKey(GetXmlConfigAttribute(xmlConsoleKeys)->vec);
-
-    Init();
-}
-
-CConsoleMessage::~CConsoleMessage()
-{
 }
 
 int CConsoleMessage::Init()
 {
+    m_objConsolePromissions.Init(CONSOLECONFIG);
+
+    SetConsoleKey(GetXmlConfigAttribute(xmlConsoleKeys)->vec);
+
     //初始化支持命令数组
     m_objHashMessageLogicList.bind(CONSOLEMESSAHE_LOADMODULE, DoMessage_LoadModule);
     m_objHashMessageLogicList.bind(CONSOLEMESSAHE_UNLOADMODULE, DoMessage_UnLoadModule);

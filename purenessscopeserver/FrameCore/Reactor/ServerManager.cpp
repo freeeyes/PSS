@@ -27,6 +27,9 @@ bool CServerManager::Init()
     int nServerPortCount = (int)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
     int nReactorCount = 3 + GetXmlConfigAttribute(xmlMessage)->Msg_Thread;
 
+    //初始化Console相关参数
+    App_ConsoleManager::instance()->Init();
+
     //初始化模块数组相关参数
     App_MessageManager::instance()->Init(GetXmlConfigAttribute(xmlModuleMangager)->MaxCount,
                                          GetXmlConfigAttribute(xmlCommandAccount)->MaxCommandCount);
