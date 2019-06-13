@@ -7,15 +7,6 @@ CUnit_ModuleMessageManager::CUnit_ModuleMessageManager()
     m_pModuleMessageManager = NULL;
 }
 
-CUnit_ModuleMessageManager::CUnit_ModuleMessageManager(const CUnit_ModuleMessageManager& ar)
-{
-    (*this) = ar;
-}
-
-CUnit_ModuleMessageManager::~CUnit_ModuleMessageManager()
-{
-}
-
 void CUnit_ModuleMessageManager::setUp(void)
 {
     m_pModuleMessageManager = new CModuleMessageManager();

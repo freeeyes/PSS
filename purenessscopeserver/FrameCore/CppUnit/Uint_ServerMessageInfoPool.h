@@ -15,20 +15,6 @@ class CUnit_ServerMessageInfoPool : public CppUnit::TestFixture
 public:
     CUnit_ServerMessageInfoPool();
 
-    virtual ~CUnit_ServerMessageInfoPool();
-
-    CUnit_ServerMessageInfoPool(const CUnit_ServerMessageInfoPool& ar);
-
-    CUnit_ServerMessageInfoPool& operator = (const CUnit_ServerMessageInfoPool& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
     virtual void setUp(void);
 
     virtual void tearDown(void);

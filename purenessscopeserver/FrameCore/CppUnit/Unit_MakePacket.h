@@ -15,20 +15,6 @@ class CUnit_MakePacket : public CppUnit::TestFixture
 public:
     CUnit_MakePacket();
 
-    virtual ~CUnit_MakePacket();
-
-    CUnit_MakePacket(const CUnit_MakePacket& ar);
-
-    CUnit_MakePacket& operator = (const CUnit_MakePacket& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
     virtual void setUp(void);
 
     virtual void tearDown(void);

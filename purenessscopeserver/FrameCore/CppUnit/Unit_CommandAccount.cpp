@@ -10,15 +10,6 @@ CUnit_CommandAccount::CUnit_CommandAccount()
     m_u2RecvTimeout    = 30;
 }
 
-CUnit_CommandAccount::CUnit_CommandAccount(const CUnit_CommandAccount& ar)
-{
-    (*this) = ar;
-}
-
-CUnit_CommandAccount::~CUnit_CommandAccount()
-{
-}
-
 void CUnit_CommandAccount::setUp(void)
 {
     m_pCommandAccount = new CCommandAccount();

@@ -11,7 +11,6 @@ class CTimeTask : public ACE_Task<ACE_MT_SYNCH>
 {
 public:
     CTimeTask(void);
-    ~CTimeTask(void);
 
     virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);
 };
@@ -24,20 +23,6 @@ class CUnit_TimerManager : public CppUnit::TestFixture
 
 public:
     CUnit_TimerManager();
-
-    virtual ~CUnit_TimerManager();
-
-    CUnit_TimerManager(const CUnit_TimerManager& ar);
-
-    CUnit_TimerManager& operator = (const CUnit_TimerManager& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     virtual void setUp(void);
 

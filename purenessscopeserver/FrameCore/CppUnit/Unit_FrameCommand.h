@@ -15,20 +15,6 @@ class CUnit_FrameCommand: public CppUnit::TestFixture
 public:
     CUnit_FrameCommand();
 
-    virtual ~CUnit_FrameCommand();
-
-    CUnit_FrameCommand(const CUnit_FrameCommand& ar);
-
-    CUnit_FrameCommand& operator = (const CUnit_FrameCommand& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
     virtual void setUp(void);
 
     virtual void tearDown(void);

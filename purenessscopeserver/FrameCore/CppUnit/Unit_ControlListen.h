@@ -15,20 +15,6 @@ class CUnit_ControlListen : public CppUnit::TestFixture
 public:
     CUnit_ControlListen();
 
-    virtual ~CUnit_ControlListen();
-
-    CUnit_ControlListen(const CUnit_ControlListen& ar);
-
-    CUnit_ControlListen& operator = (const CUnit_ControlListen& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
     virtual void setUp(void);
 
     virtual void tearDown(void);

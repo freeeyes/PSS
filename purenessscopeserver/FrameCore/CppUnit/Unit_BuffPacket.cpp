@@ -7,15 +7,6 @@ CUnit_BuffPacket::CUnit_BuffPacket()
     m_pBuffPacket = NULL;
 }
 
-CUnit_BuffPacket::CUnit_BuffPacket(const CUnit_BuffPacket& ar)
-{
-    (*this) = ar;
-}
-
-CUnit_BuffPacket::~CUnit_BuffPacket()
-{
-}
-
 void CUnit_BuffPacket::setUp(void)
 {
     m_pBuffPacket = new CBuffPacket();

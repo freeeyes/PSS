@@ -15,20 +15,6 @@ class CUnit_LoadModule : public CppUnit::TestFixture
 public:
     CUnit_LoadModule();
 
-    virtual ~CUnit_LoadModule();
-
-    CUnit_LoadModule(const CUnit_LoadModule& ar);
-
-    CUnit_LoadModule& operator = (const CUnit_LoadModule& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
     virtual void setUp(void);
 
     virtual void tearDown(void);

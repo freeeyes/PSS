@@ -7,15 +7,6 @@ CUnit_MessageDyeingManager::CUnit_MessageDyeingManager()
     m_pMessageDyeingManager = NULL;
 }
 
-CUnit_MessageDyeingManager::CUnit_MessageDyeingManager(const CUnit_MessageDyeingManager& ar)
-{
-    (*this) = ar;
-}
-
-CUnit_MessageDyeingManager::~CUnit_MessageDyeingManager()
-{
-}
-
 void CUnit_MessageDyeingManager::setUp(void)
 {
     m_pMessageDyeingManager = new CMessageDyeingManager();

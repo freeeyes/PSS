@@ -7,15 +7,6 @@ CUnit_LogManager::CUnit_LogManager()
     m_pLogBlockPool = NULL;
 }
 
-CUnit_LogManager::CUnit_LogManager(const CUnit_LogManager& ar)
-{
-    (*this) = ar;
-}
-
-CUnit_LogManager::~CUnit_LogManager()
-{
-}
-
 void CUnit_LogManager::setUp(void)
 {
     m_pLogBlockPool = new CLogBlockPool();

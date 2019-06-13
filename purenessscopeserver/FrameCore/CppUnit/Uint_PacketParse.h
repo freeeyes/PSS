@@ -15,20 +15,6 @@ class CUnit_PacketParse : public CppUnit::TestFixture
 public:
     CUnit_PacketParse();
 
-    virtual ~CUnit_PacketParse();
-
-    CUnit_PacketParse(const CUnit_PacketParse& ar);
-
-    CUnit_PacketParse& operator = (const CUnit_PacketParse& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
     virtual void setUp(void);
 
     virtual void tearDown(void);

@@ -7,15 +7,6 @@ CUnit_ControlListen::CUnit_ControlListen()
     m_pControlListen = NULL;
 }
 
-CUnit_ControlListen::CUnit_ControlListen(const CUnit_ControlListen& ar)
-{
-    (*this) = ar;
-}
-
-CUnit_ControlListen::~CUnit_ControlListen()
-{
-}
-
 void CUnit_ControlListen::setUp(void)
 {
     m_pControlListen = new CControlListen();

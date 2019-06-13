@@ -7,15 +7,6 @@ CUnit_Aes::CUnit_Aes()
     m_pAES = NULL;
 }
 
-CUnit_Aes::CUnit_Aes(const CUnit_Aes& ar)
-{
-    (*this) = ar;
-}
-
-CUnit_Aes::~CUnit_Aes()
-{
-}
-
 void CUnit_Aes::setUp(void)
 {
     m_pAES = new AES();

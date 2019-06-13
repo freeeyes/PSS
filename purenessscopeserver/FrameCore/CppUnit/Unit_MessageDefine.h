@@ -24,20 +24,6 @@ class CUnit_MessageDefine : public CppUnit::TestFixture
 public:
     CUnit_MessageDefine();
 
-    virtual ~CUnit_MessageDefine();
-
-    CUnit_MessageDefine(const CUnit_MessageDefine& ar);
-
-    CUnit_MessageDefine& operator = (const CUnit_MessageDefine& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
     virtual void setUp(void);
 
     virtual void tearDown(void);

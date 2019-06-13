@@ -7,16 +7,6 @@ CUnit_ConnectUdp::CUnit_ConnectUdp()
     m_nServerID = 0;
 }
 
-CUnit_ConnectUdp::CUnit_ConnectUdp(const CUnit_ConnectUdp& ar)
-{
-    (*this) = ar;
-}
-
-CUnit_ConnectUdp::~CUnit_ConnectUdp()
-{
-
-}
-
 void CUnit_ConnectUdp::setUp(void)
 {
     m_nServerID = 2;

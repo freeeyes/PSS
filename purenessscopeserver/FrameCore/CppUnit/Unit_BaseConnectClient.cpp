@@ -7,16 +7,6 @@ CUnit_BaseConnectClient::CUnit_BaseConnectClient()
     m_u2CommandID = 0;
 }
 
-CUnit_BaseConnectClient::CUnit_BaseConnectClient(const CUnit_BaseConnectClient& ar)
-{
-    (*this) = ar;
-}
-
-CUnit_BaseConnectClient::~CUnit_BaseConnectClient()
-{
-
-}
-
 void CUnit_BaseConnectClient::setUp(void)
 {
     m_u2CommandID = 0x1003;

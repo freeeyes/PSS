@@ -7,15 +7,6 @@ CUnit_ServerMessageInfoPool::CUnit_ServerMessageInfoPool()
     m_pServerMessageInfoPool = NULL;
 }
 
-CUnit_ServerMessageInfoPool::CUnit_ServerMessageInfoPool(const CUnit_ServerMessageInfoPool& ar)
-{
-    (*this) = ar;
-}
-
-CUnit_ServerMessageInfoPool::~CUnit_ServerMessageInfoPool()
-{
-}
-
 void CUnit_ServerMessageInfoPool::setUp(void)
 {
     m_pServerMessageInfoPool = new CServerMessageInfoPool();

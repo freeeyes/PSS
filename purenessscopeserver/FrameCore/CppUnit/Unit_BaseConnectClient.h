@@ -18,20 +18,6 @@ class CUnit_BaseConnectClient : public CppUnit::TestFixture
 public:
     CUnit_BaseConnectClient();
 
-    virtual ~CUnit_BaseConnectClient();
-
-    CUnit_BaseConnectClient(const CUnit_BaseConnectClient& ar);
-
-    CUnit_BaseConnectClient& operator = (const CUnit_BaseConnectClient& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
     virtual void setUp(void);
 
     virtual void tearDown(void);

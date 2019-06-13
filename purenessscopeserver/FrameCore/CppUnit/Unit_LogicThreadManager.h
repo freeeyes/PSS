@@ -16,8 +16,6 @@ public:
     {
     };
 
-    virtual ~CLogicTestQueue() {};
-
     virtual bool Init()
     {
         OUR_DEBUG((LM_INFO, "[Test_LogicThreadInit]Init LogicThread=%d.\n", GetLogicThreadID()));
@@ -56,20 +54,6 @@ class CUnit_LogicThreadManager : public CppUnit::TestFixture
 
 public:
     CUnit_LogicThreadManager();
-
-    virtual ~CUnit_LogicThreadManager();
-
-    CUnit_LogicThreadManager(const CUnit_LogicThreadManager& ar);
-
-    CUnit_LogicThreadManager& operator = (const CUnit_LogicThreadManager& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     virtual void setUp(void);
 

@@ -7,15 +7,6 @@ CUnit_FrameCommand::CUnit_FrameCommand()
     m_pFrameCommand = NULL;
 }
 
-CUnit_FrameCommand::CUnit_FrameCommand(const CUnit_FrameCommand& ar)
-{
-    (*this) = ar;
-}
-
-CUnit_FrameCommand::~CUnit_FrameCommand()
-{
-}
-
 void CUnit_FrameCommand::setUp(void)
 {
     m_pFrameCommand = new CFrameCommand();

@@ -16,20 +16,6 @@ class CUnit_FileTestManager : public CppUnit::TestFixture
 public:
     CUnit_FileTestManager();
 
-    virtual ~CUnit_FileTestManager();
-
-    CUnit_FileTestManager(const CUnit_FileTestManager& ar);
-
-    CUnit_FileTestManager& operator = (const CUnit_FileTestManager& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
     virtual void setUp(void);
 
     virtual void tearDown(void);

@@ -7,16 +7,6 @@ CUnit_Basehandler::CUnit_Basehandler()
     m_nBaseHandlerID = 0;
 }
 
-CUnit_Basehandler::CUnit_Basehandler(const CUnit_Basehandler& ar)
-{
-    (*this) = ar;
-}
-
-CUnit_Basehandler::~CUnit_Basehandler()
-{
-
-}
-
 void CUnit_Basehandler::setUp(void)
 {
     m_nBaseHandlerID = 1;

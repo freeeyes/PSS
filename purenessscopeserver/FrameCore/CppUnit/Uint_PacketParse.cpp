@@ -7,15 +7,6 @@ CUnit_PacketParse::CUnit_PacketParse()
     m_pPacketParsePool = NULL;
 }
 
-CUnit_PacketParse::CUnit_PacketParse(const CUnit_PacketParse& ar)
-{
-    (*this) = ar;
-}
-
-CUnit_PacketParse::~CUnit_PacketParse()
-{
-}
-
 void CUnit_PacketParse::setUp(void)
 {
     m_pPacketParsePool = new CPacketParsePool();

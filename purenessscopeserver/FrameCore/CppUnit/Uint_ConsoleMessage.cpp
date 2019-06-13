@@ -7,18 +7,6 @@ CUnit_ConsoleMessage::CUnit_ConsoleMessage()
     m_pConsoleMessage = NULL;
 }
 
-CUnit_ConsoleMessage::CUnit_ConsoleMessage(const CUnit_ConsoleMessage& ar)
-{
-    (*this) = ar;
-}
-
-CUnit_ConsoleMessage::~CUnit_ConsoleMessage()
-{
-
-}
-
-
-
 void CUnit_ConsoleMessage::setUp(void)
 {
     m_pConsoleMessage = new CConsoleMessage();

@@ -18,20 +18,6 @@ class CUnit_ConnectTcp : public CppUnit::TestFixture
 public:
     CUnit_ConnectTcp();
 
-    virtual ~CUnit_ConnectTcp();
-
-    CUnit_ConnectTcp(const CUnit_ConnectTcp& ar);
-
-    CUnit_ConnectTcp& operator = (const CUnit_ConnectTcp& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
     virtual void setUp(void);
 
     virtual void tearDown(void);

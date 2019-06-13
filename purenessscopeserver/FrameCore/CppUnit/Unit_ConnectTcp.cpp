@@ -7,16 +7,6 @@ CUnit_ConnectTcp::CUnit_ConnectTcp()
     m_nServerID = 0;
 }
 
-CUnit_ConnectTcp::CUnit_ConnectTcp(const CUnit_ConnectTcp& ar)
-{
-    (*this) = ar;
-}
-
-CUnit_ConnectTcp::~CUnit_ConnectTcp()
-{
-
-}
-
 void CUnit_ConnectTcp::setUp(void)
 {
     m_nServerID = 1;

@@ -7,16 +7,6 @@ CUnit_ConsolePromissions::CUnit_ConsolePromissions()
     m_pConsolePromissions = NULL;
 }
 
-CUnit_ConsolePromissions::CUnit_ConsolePromissions(const CUnit_ConsolePromissions& ar)
-{
-    (*this) = ar;
-}
-
-CUnit_ConsolePromissions::~CUnit_ConsolePromissions()
-{
-
-}
-
 void CUnit_ConsolePromissions::setUp(void)
 {
     m_pConsolePromissions = new CConsolePromissions();

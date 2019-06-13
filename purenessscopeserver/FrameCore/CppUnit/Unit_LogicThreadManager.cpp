@@ -8,15 +8,6 @@ CUnit_LogicThreadManager::CUnit_LogicThreadManager()
     m_pLogicTestQueue = NULL;
 }
 
-CUnit_LogicThreadManager::CUnit_LogicThreadManager(const CUnit_LogicThreadManager& ar)
-{
-    (*this) = ar;
-}
-
-CUnit_LogicThreadManager::~CUnit_LogicThreadManager()
-{
-}
-
 void CUnit_LogicThreadManager::setUp(void)
 {
     m_pLogicTestQueue = new CLogicTestQueue(1, 120, "test");

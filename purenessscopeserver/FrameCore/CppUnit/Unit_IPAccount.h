@@ -19,20 +19,6 @@ class CUnit_IPAccount : public CppUnit::TestFixture
 public:
     CUnit_IPAccount();
 
-    virtual ~CUnit_IPAccount();
-
-    CUnit_IPAccount(const CUnit_IPAccount& ar);
-
-    CUnit_IPAccount& operator = (const CUnit_IPAccount& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
     virtual void setUp(void);
 
     virtual void tearDown(void);

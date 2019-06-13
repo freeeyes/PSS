@@ -7,15 +7,6 @@ CUnit_MessageDefine::CUnit_MessageDefine()
     m_nMessageDefine = 0;
 }
 
-CUnit_MessageDefine::CUnit_MessageDefine(const CUnit_MessageDefine& ar)
-{
-    (*this) = ar;
-}
-
-CUnit_MessageDefine::~CUnit_MessageDefine()
-{
-}
-
 void CUnit_MessageDefine::setUp(void)
 {
     m_nMessageDefine = 1;

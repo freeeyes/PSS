@@ -61,20 +61,6 @@ class CUnit_ConsoleMessage : public CppUnit::TestFixture
 public:
     CUnit_ConsoleMessage();
 
-    virtual ~CUnit_ConsoleMessage();
-
-    CUnit_ConsoleMessage(const CUnit_ConsoleMessage& ar);
-
-    CUnit_ConsoleMessage& operator = (const CUnit_ConsoleMessage& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
     virtual void setUp(void);
 
     virtual void tearDown(void);

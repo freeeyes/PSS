@@ -16,20 +16,6 @@ class CUnit_ServerMessageManager : public CppUnit::TestFixture
 public:
     CUnit_ServerMessageManager();
 
-    virtual ~CUnit_ServerMessageManager();
-
-    CUnit_ServerMessageManager(const CUnit_ServerMessageManager& ar);
-
-    CUnit_ServerMessageManager& operator = (const CUnit_ServerMessageManager& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
     virtual void setUp(void);
 
     virtual void tearDown(void);

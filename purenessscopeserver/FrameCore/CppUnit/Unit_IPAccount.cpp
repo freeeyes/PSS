@@ -7,15 +7,6 @@ CUnit_IPAccount::CUnit_IPAccount()
     m_pIPAccount = NULL;
 }
 
-CUnit_IPAccount::CUnit_IPAccount(const CUnit_IPAccount& ar)
-{
-    (*this) = ar;
-}
-
-CUnit_IPAccount::~CUnit_IPAccount()
-{
-}
-
 void CUnit_IPAccount::setUp(void)
 {
     m_pIPAccount = new CIPAccount();

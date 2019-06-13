@@ -21,20 +21,6 @@ class CUnit_Basehandler : public CppUnit::TestFixture
 public:
     CUnit_Basehandler();
 
-    virtual ~CUnit_Basehandler();
-
-    CUnit_Basehandler(const CUnit_Basehandler& ar);
-
-    CUnit_Basehandler& operator = (const CUnit_Basehandler& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
     virtual void setUp(void);
 
     virtual void tearDown(void);

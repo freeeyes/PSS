@@ -16,20 +16,6 @@ class CUnit_LogManager : public CppUnit::TestFixture
 public:
     CUnit_LogManager();
 
-    virtual ~CUnit_LogManager();
-
-    CUnit_LogManager(const CUnit_LogManager& ar);
-
-    CUnit_LogManager& operator = (const CUnit_LogManager& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
     virtual void setUp(void);
 
     virtual void tearDown(void);

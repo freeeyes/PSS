@@ -7,17 +7,6 @@ CUnit_MessageService::CUnit_MessageService()
     m_pMessageService = NULL;
 }
 
-CUnit_MessageService::CUnit_MessageService(const CUnit_MessageService& ar)
-{
-    (*this) = ar;
-}
-
-CUnit_MessageService::~CUnit_MessageService()
-{
-}
-
-
-
 void CUnit_MessageService::setUp(void)
 {
     m_pMessageService = new CMessageService();

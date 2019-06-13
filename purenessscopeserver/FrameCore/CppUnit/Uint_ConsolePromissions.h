@@ -15,21 +15,6 @@ class CUnit_ConsolePromissions : public CppUnit::TestFixture
 public:
     CUnit_ConsolePromissions();
 
-    virtual ~CUnit_ConsolePromissions();
-
-    CUnit_ConsolePromissions(const CUnit_ConsolePromissions& ar);
-
-    CUnit_ConsolePromissions& operator = (const CUnit_ConsolePromissions& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
-
     virtual void setUp(void);
 
     virtual void tearDown(void);

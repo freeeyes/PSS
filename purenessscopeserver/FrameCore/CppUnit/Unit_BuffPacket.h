@@ -35,20 +35,6 @@ class CUnit_BuffPacket : public CppUnit::TestFixture
 public:
     CUnit_BuffPacket();
 
-    virtual ~CUnit_BuffPacket();
-
-    CUnit_BuffPacket(const CUnit_BuffPacket& ar);
-
-    CUnit_BuffPacket& operator = (const CUnit_BuffPacket& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
     virtual void setUp(void);
 
     virtual void tearDown(void);

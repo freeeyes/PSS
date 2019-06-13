@@ -17,20 +17,6 @@ class CUnit_ConnectUdp : public CppUnit::TestFixture
 public:
     CUnit_ConnectUdp();
 
-    virtual ~CUnit_ConnectUdp();
-
-    CUnit_ConnectUdp(const CUnit_ConnectUdp& ar);
-
-    CUnit_ConnectUdp& operator = (const CUnit_ConnectUdp& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
     virtual void setUp(void);
 
     virtual void tearDown(void);

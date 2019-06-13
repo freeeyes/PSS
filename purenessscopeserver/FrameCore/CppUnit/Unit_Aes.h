@@ -16,20 +16,6 @@ class CUnit_Aes : public CppUnit::TestFixture
 public:
     CUnit_Aes();
 
-    virtual ~CUnit_Aes();
-
-    CUnit_Aes(const CUnit_Aes& ar);
-
-    CUnit_Aes& operator = (const CUnit_Aes& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
     virtual void setUp(void);
 
     virtual void tearDown(void);

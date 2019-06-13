@@ -7,16 +7,6 @@ CUnit_ConnectHandler::CUnit_ConnectHandler()
     m_pConnectHandler = NULL;
 }
 
-CUnit_ConnectHandler::CUnit_ConnectHandler(const CUnit_ConnectHandler& ar)
-{
-    (*this) = ar;
-}
-
-CUnit_ConnectHandler::~CUnit_ConnectHandler()
-{
-
-}
-
 void CUnit_ConnectHandler::setUp(void)
 {
     m_pConnectHandler = new CConnectHandler();

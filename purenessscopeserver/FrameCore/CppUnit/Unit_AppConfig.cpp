@@ -7,15 +7,6 @@ CUnit_AppConfig::CUnit_AppConfig()
     m_pAppConfig = NULL;
 }
 
-CUnit_AppConfig::CUnit_AppConfig(const CUnit_AppConfig& ar)
-{
-    (*this) = ar;
-}
-
-CUnit_AppConfig::~CUnit_AppConfig()
-{
-}
-
 void CUnit_AppConfig::setUp(void)
 {
     m_pAppConfig = new CAppConfig();

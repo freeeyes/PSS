@@ -7,15 +7,6 @@ CUnit_ServerMessageManager::CUnit_ServerMessageManager()
     m_pServerMessageManager = NULL;
 }
 
-CUnit_ServerMessageManager::CUnit_ServerMessageManager(const CUnit_ServerMessageManager& ar)
-{
-    (*this) = ar;
-}
-
-CUnit_ServerMessageManager::~CUnit_ServerMessageManager()
-{
-}
-
 void CUnit_ServerMessageManager::setUp(void)
 {
     m_pServerMessageManager = new CServerMessageManager();

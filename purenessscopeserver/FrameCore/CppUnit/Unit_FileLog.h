@@ -16,20 +16,6 @@ class CUnit_FileLogger : public CppUnit::TestFixture
 public:
     CUnit_FileLogger();
 
-    virtual ~CUnit_FileLogger();
-
-    CUnit_FileLogger(const CUnit_FileLogger& ar);
-
-    CUnit_FileLogger& operator = (const CUnit_FileLogger& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
     virtual void setUp(void);
 
     virtual void tearDown(void);

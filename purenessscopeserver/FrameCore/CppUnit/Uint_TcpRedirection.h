@@ -18,20 +18,6 @@ class CUnit_Redirection : public CppUnit::TestFixture
 public:
     CUnit_Redirection();
 
-    virtual ~CUnit_Redirection();
-
-    CUnit_Redirection(const CUnit_Redirection& ar);
-
-    CUnit_Redirection& operator = (const CUnit_Redirection& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
     virtual void setUp(void);
 
     virtual void tearDown(void);
