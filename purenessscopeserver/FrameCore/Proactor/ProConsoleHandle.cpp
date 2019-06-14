@@ -63,7 +63,6 @@ void CProConsoleHandle::Close(int nIOCount)
         }
 
         m_ThreadWriteLock.release();
-        m_pPacketParse->Close();
         SAFE_DELETE(m_pPacketParse);
         OUR_DEBUG((LM_DEBUG,"[CProConsoleHandle::Close] Close(%d) delete OK.\n", GetConnectID()));
 
@@ -190,7 +189,6 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
             App_MessageBlockManager::instance()->Close(&mb);
         }
 
-        m_pPacketParse->Close();
         SAFE_DELETE(m_pPacketParse);
 
         OUR_DEBUG((LM_DEBUG,"[CConnectHandler::handle_read_stream]Connectid=[%d] error(%d)...\n", GetConnectID(), errno));
@@ -231,7 +229,6 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                 App_MessageBlockManager::instance()->Close(&mb);
             }
 
-            m_pPacketParse->Close();
             SAFE_DELETE(m_pPacketParse);
 
             OUR_DEBUG((LM_ERROR, "[CProConsoleHandle::handle_input]Read Shoter error(%d).", errno));
@@ -275,7 +272,6 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                     App_MessageBlockManager::instance()->Close(&mb);
                 }
 
-                m_pPacketParse->Close();
                 SAFE_DELETE(m_pPacketParse);
 
                 Close(2);
@@ -293,7 +289,6 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
             App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
         }
 
-        m_pPacketParse->Close();
         SAFE_DELETE(m_pPacketParse);
         m_pPacketParse = new CConsolePacketParse();
 
@@ -422,7 +417,6 @@ bool CProConsoleHandle::RecvClinetPacket(uint32 u4PackeLen)
             App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
         }
 
-        m_pPacketParse->Close();
         SAFE_DELETE(m_pPacketParse);
         Close(2);
         return false;
@@ -445,7 +439,6 @@ bool CProConsoleHandle::RecvClinetPacket(uint32 u4PackeLen)
             App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
         }
 
-        m_pPacketParse->Close();
         SAFE_DELETE(m_pPacketParse);
         Close(2);
         return false;
