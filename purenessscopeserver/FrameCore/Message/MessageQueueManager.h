@@ -182,7 +182,6 @@ private:
     int CloseMsgQueue();
     bool Dispose_Queue();                                  //队列消费
 
-private:
     CLogicThreadInfo                m_objThreadInfo;
     bool                            m_blRun;
     ACE_Thread_Mutex                m_logicthreadmutex;
@@ -227,7 +226,6 @@ public:
     //发送线程消息
     virtual int SendLogicThreadMessage(int nMessageID, void* arg);
 
-public:
     CHashTable<CLogicThread>     m_objThreadInfoList;
     CHashTable<CLogicThreadInfo> m_objMessageIDList;
     ACE_Recursive_Thread_Mutex   m_ThreadWriteLock;

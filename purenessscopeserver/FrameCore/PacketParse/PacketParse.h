@@ -12,7 +12,7 @@
 
 #include "PacketParseBase.h"
 
-#define PACKET_HEAD_LENGTH 40
+const uint32 PACKET_HEAD_LENGTH = 40;
 
 class CPacketParse : public CPacketParseBase
 {

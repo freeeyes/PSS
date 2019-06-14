@@ -42,7 +42,7 @@ public:
     }
 };
 
-class CWaitUnloadModule
+class CWaitUnLoadModule
 {
 public:
     uint32           m_u4UpdateIndex;                //工作线程总数
@@ -55,7 +55,7 @@ public:
     string           m_strModulePath;                //模块路径
     string           m_strModuleParam;               //模块启动参数
 
-    CWaitUnloadModule()
+    CWaitUnLoadModule()
     {
         m_hModule              = 0;
         m_u1UnloadState        = 0;
@@ -118,7 +118,7 @@ private:
 
     CHashTable<_ModuleInfo>            m_objHashModuleList;
     char                               m_szModulePath[MAX_BUFF_200];
-    vector<CWaitUnloadModule>          m_vecWaitUnloadModule;
+    vector<CWaitUnLoadModule>          m_veCWaitUnLoadModule;
     ACE_Recursive_Thread_Mutex         m_tmModule;
     vector<string>                     m_vecModuleNameList;               //当前插件名称列表
 };

@@ -157,7 +157,7 @@ bool CLoadModule::MoveUnloadList(const char* szModuleName, uint32 u4UpdateIndex,
     else
     {
         //放入等待清理的线程列表
-        CWaitUnloadModule objWaitUnloadModule;
+        CWaitUnLoadModule objWaitUnloadModule;
         sprintf_safe((char* )szModuleName, MAX_BUFF_100, objWaitUnloadModule.m_szModuleName, MAX_BUFF_100);
         objWaitUnloadModule.m_u4UpdateIndex        = u4UpdateIndex;
         objWaitUnloadModule.m_hModule              = pModuleInfo->hModule;
@@ -167,7 +167,7 @@ bool CLoadModule::MoveUnloadList(const char* szModuleName, uint32 u4UpdateIndex,
         objWaitUnloadModule.m_strModuleName        = strModuleName;
         objWaitUnloadModule.m_strModulePath        = strModulePath;
         objWaitUnloadModule.m_strModuleParam       = strModuleParam;
-        m_vecWaitUnloadModule.push_back(objWaitUnloadModule);
+        m_veCWaitUnLoadModule.push_back(objWaitUnloadModule);
 
         //删除存在m_objHashModuleList的插件信息
         m_objHashModuleList.Del_Hash_Data(pModuleInfo->GetName());
@@ -181,9 +181,9 @@ int CLoadModule::UnloadListUpdate(uint32 u4UpdateIndex)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_tmModule);
     int nRet = 0;
-    vector<CWaitUnloadModule>::iterator itr = m_vecWaitUnloadModule.begin();
+    vector<CWaitUnLoadModule>::iterator itr = m_veCWaitUnLoadModule.begin();
 
-    while (itr != m_vecWaitUnloadModule.end())
+    while (itr != m_veCWaitUnLoadModule.end())
     {
         if ((*itr).m_u4UpdateIndex == u4UpdateIndex)
         {
@@ -213,7 +213,7 @@ int CLoadModule::UnloadListUpdate(uint32 u4UpdateIndex)
                 }
 
                 //清理vector中的这个对象
-                m_vecWaitUnloadModule.erase(itr);
+                m_veCWaitUnLoadModule.erase(itr);
                 return nRet;
             }
         }
