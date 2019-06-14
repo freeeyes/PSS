@@ -13,8 +13,8 @@
 #include "BaseTask.h"
 #include "TimerManager.h"
 
-#define LOGICTHREAD_MAX_COUNT         100
-#define LOGICTHREAD_MESSAGE_MAX_COUNT 2000
+const uint16 LOGICTHREAD_MAX_COUNT = 100;
+const uint32 LOGICTHREAD_MESSAGE_MAX_COUNT = 2000;
 
 //逻辑线程的消息体
 class CLogicThreadMessage
@@ -91,27 +91,6 @@ public:
     {
     }
 
-    ~CLogicThreadInfo()
-    {
-    }
-
-    CLogicThreadInfo(const CLogicThreadInfo& ar)
-    {
-        (*this) = ::std::move(ar);
-    }
-
-    CLogicThreadInfo& operator = (const CLogicThreadInfo& ar)
-    {
-        if (this != &ar)
-        {
-            this->m_nLogicThreadID         = ar.m_nLogicThreadID;
-            this->m_nTimeout               = ar.m_nTimeout;
-            this->m_pLogicQueue            = ar.m_pLogicQueue;
-        }
-
-        return *this;
-    }
-
     int          m_nLogicThreadID;
     int          m_nTimeout;
     ILogicQueue* m_pLogicQueue;
@@ -122,19 +101,6 @@ class CLogicThreadMessagePool : public CObjectPoolManager<CLogicThreadMessage, A
 {
 public:
     CLogicThreadMessagePool();
-    ~CLogicThreadMessagePool();
-
-    CLogicThreadMessagePool(const CLogicThreadMessagePool& ar);
-
-    CLogicThreadMessagePool& operator = (const CLogicThreadMessagePool& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     static void Init_Callback(int nIndex, CLogicThreadMessage* pMessage);
     static void Close_Callback(int nIndex, CLogicThreadMessage* pMessage);
@@ -148,17 +114,6 @@ class CLogicThread : public ACE_Task<ACE_MT_SYNCH>
 {
 public:
     CLogicThread();
-    virtual ~CLogicThread();
-
-    CLogicThread& operator = (const CLogicThread& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     void Init(CLogicThreadInfo objThreadInfo);
 
@@ -196,7 +151,6 @@ class CMessageQueueManager : public IMessageQueueManager, public ACE_Task<ACE_MT
 {
 public:
     CMessageQueueManager();
-    virtual ~CMessageQueueManager();
 
     virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);
 
