@@ -17,18 +17,6 @@ public:
 
     virtual ~CPacketParseBase(void);
 
-    CPacketParseBase(const CPacketParseBase& ar);
-
-    CPacketParseBase& operator = (const CPacketParseBase& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
     void Clear();
 
     void Close();

@@ -39,17 +39,6 @@ class CMessageService : public ACE_Task<ACE_MT_SYNCH>
 {
 public:
     CMessageService();
-    virtual ~CMessageService();
-
-    CMessageService& operator = (const CMessageService& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     virtual int handle_signal (int signum,
                                siginfo_t*  = 0,

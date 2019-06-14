@@ -21,14 +21,14 @@
 #include "Ring.h"
 #include "define.h"
 
-#define COMMAND_RETURN_BUSY 0xffff
+const uint16 COMMAND_RETURN_BUSY = 0xffff;
 
 //二进制换砖类，负责二进制的代码转换
 class CConvertBuffer
 {
 public:
     CConvertBuffer() {}
-    ~CConvertBuffer() {}
+
     int GetBufferSize(const char* pData, int nSrcLen)
     {
         char szData[3] = {'\0'};
@@ -254,19 +254,6 @@ class CWorkThreadAI
 {
 public:
     CWorkThreadAI();
-    ~CWorkThreadAI();
-
-    CWorkThreadAI(const CWorkThreadAI& ar);
-
-    CWorkThreadAI& operator = (const CWorkThreadAI& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     void Close();
 

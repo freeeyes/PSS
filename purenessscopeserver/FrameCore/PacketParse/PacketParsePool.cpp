@@ -4,18 +4,6 @@ CPacketParsePool::CPacketParsePool()
 {
 }
 
-CPacketParsePool::CPacketParsePool(const CPacketParsePool& ar)
-{
-    (*this) = ar;
-}
-
-CPacketParsePool::~CPacketParsePool()
-{
-    OUR_DEBUG((LM_INFO, "[CPacketParsePool::~CPacketParsePool].\n"));
-    Close();
-    OUR_DEBUG((LM_INFO, "[CPacketParsePool::~CPacketParsePool] End.\n"));
-}
-
 void CPacketParsePool::Init_Callback(int nIndex, CPacketParse* pPacketParse)
 {
     pPacketParse->Init();
@@ -24,8 +12,10 @@ void CPacketParsePool::Init_Callback(int nIndex, CPacketParse* pPacketParse)
 
 void CPacketParsePool::Close()
 {
+    OUR_DEBUG((LM_INFO, "[CPacketParsePool::~CPacketParsePool].\n"));
     //清理所有已存在的指针
     CObjectPoolManager<CPacketParse, ACE_Recursive_Thread_Mutex>::Close();
+    OUR_DEBUG((LM_INFO, "[CPacketParsePool::~CPacketParsePool] End.\n"));
 }
 
 int CPacketParsePool::GetUsedCount()

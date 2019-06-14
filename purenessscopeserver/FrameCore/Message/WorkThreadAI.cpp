@@ -12,16 +12,6 @@ CWorkThreadAI::CWorkThreadAI()
     m_szWTReturnData[0]       = '\0';
 }
 
-CWorkThreadAI::CWorkThreadAI(const CWorkThreadAI& ar)
-{
-    (*this) = ar;
-}
-
-CWorkThreadAI::~CWorkThreadAI()
-{
-    Close();
-}
-
 void CWorkThreadAI::Init(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTTimeoutCount, uint32 u4WTStopTime, uint8 u1WTReturnDataType, const char* pReturnData)
 {
     m_u1WTAI             = u1AI;

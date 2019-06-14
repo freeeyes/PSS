@@ -32,11 +32,6 @@ CMessageService::CMessageService():m_mutex(), m_cond(m_mutex)
     }
 }
 
-CMessageService::~CMessageService()
-{
-    OUR_DEBUG((LM_INFO, "[CMessageService::~CMessageService].\n"));
-}
-
 void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMask, uint32 u4HighMask, bool blIsCpuAffinity)
 {
     m_u4MaxQueue    = u4MaxQueue;
@@ -365,6 +360,8 @@ int CMessageService::Close()
     m_objClientCommandList.Close();
 
     m_MessagePool.Close_Object(CMessagePool::Close_Callback);
+
+    m_WorkThreadAI.Close();
 
     OUR_DEBUG((LM_INFO, "[CMessageService::close] Close().\n"));
     return 0;
