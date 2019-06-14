@@ -8,7 +8,7 @@
 //考虑到遍历的代价，目前还是觉得这种用小数组遍历应该是可以接受的。
 //add by freeeyes
 
-const uint32 MAX_DYEING_COMMAND_COUNT = 10;  //最大染色命令数
+const uint16 MAX_DYEING_COMMAND_COUNT = 10;  //最大染色命令数
 
 //IP监控，目前考虑同一时刻只能监控一个
 class _Dyeing_IP

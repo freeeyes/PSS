@@ -27,6 +27,8 @@ bool Console_Common_SendMessage_Data_Check(uint32 u4ConnectID, IBuffPacket* pBuf
     //回收IBuffPacket发送数据的内存缓冲
     App_BuffPacketManager::instance()->Delete(pBuffPacket);
 
+    PacketParse.Close();
+
     return true;
 }
 

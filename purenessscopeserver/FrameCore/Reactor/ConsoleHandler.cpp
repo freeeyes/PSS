@@ -61,6 +61,7 @@ void CConsoleHandler::Close(int nIOCount)
             App_MessageBlockManager::instance()->Close(m_pCurrMessage);
         }
 
+        m_pPacketParse->Close();
         SAFE_DELETE(m_pPacketParse);
         shutdown();
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::Close]Close(%d) OK.\n", GetConnectID()));
@@ -410,6 +411,7 @@ void CConsoleHandler::Clear_PacketParse()
 
     m_pCurrMessage = NULL;
 
+    m_pPacketParse->Close();
     SAFE_DELETE(m_pPacketParse);
 }
 

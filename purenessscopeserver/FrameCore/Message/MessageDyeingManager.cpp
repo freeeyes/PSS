@@ -25,7 +25,7 @@ bool CMessageDyeingManager::AddDyeingCommand(uint16 u2CommandID, uint16 u2MaxCou
         return false;
     }
 
-    for (int i = 0; i < MAX_DYEING_COMMAND_COUNT; i++)
+    for (uint16 i = 0; i < MAX_DYEING_COMMAND_COUNT; i++)
     {
         if (m_objCommandList[i].m_blIsValid == false)
         {
@@ -43,7 +43,7 @@ bool CMessageDyeingManager::AddDyeingCommand(uint16 u2CommandID, uint16 u2MaxCou
 
 void CMessageDyeingManager::GetDyeingCommand(vec_Dyeing_Command_list& objList)
 {
-    for (int i = 0; i < MAX_DYEING_COMMAND_COUNT; i++)
+    for (uint16 i = 0; i < MAX_DYEING_COMMAND_COUNT; i++)
     {
         if (m_objCommandList[i].m_blIsValid == true)
         {
@@ -74,7 +74,7 @@ string CMessageDyeingManager::GetTraceID(const char* pClientIP, short sClintPort
     //¼ì²âÃüÁî¹æÔò
     if(m_u2CurrCommandCount > 0)
     {
-        for (int i = 0; i < MAX_DYEING_COMMAND_COUNT; i++)
+        for (uint16 i = 0; i < MAX_DYEING_COMMAND_COUNT; i++)
         {
             if (true == m_objCommandList[i].m_blIsValid && m_objCommandList[i].m_u2CommandID == u2CommandID)
             {
