@@ -13,7 +13,6 @@ class CPacketParsePool : public CObjectPoolManager<CPacketParse, ACE_Recursive_T
 {
 public:
     CPacketParsePool();
-    ~CPacketParsePool();
 
     static void Init_Callback(int nIndex, CPacketParse* pPacketParse);
     void Close();
