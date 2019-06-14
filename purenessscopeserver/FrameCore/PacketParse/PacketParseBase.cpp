@@ -20,6 +20,11 @@ CPacketParseBase::CPacketParseBase(void)
     m_pPacketHeadInfo   = NULL;
 }
 
+CPacketParseBase::~CPacketParseBase(void)
+{
+    SAFE_DELETE(m_pPacketHeadInfo);
+}
+
 void CPacketParseBase::Clear()
 {
     m_pmbHead = NULL;
@@ -47,7 +52,6 @@ void CPacketParseBase::Close()
         m_pmbBody = NULL;
     }
 
-    SAFE_DELETE(m_pPacketHeadInfo);
     m_blIsHandleHead = true;
 }
 

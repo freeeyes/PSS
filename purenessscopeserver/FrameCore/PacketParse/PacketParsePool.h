@@ -15,7 +15,6 @@ public:
     CPacketParsePool();
 
     static void Init_Callback(int nIndex, CPacketParse* pPacketParse);
-    static void Close_Callback(int nIndex, CPacketParse* pPacketParse);
     void Close();
 
     CPacketParse* Create(const char* pFileName, uint32 u4Line);

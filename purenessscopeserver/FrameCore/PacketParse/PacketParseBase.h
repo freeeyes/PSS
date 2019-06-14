@@ -15,6 +15,8 @@ class CPacketParseBase
 public:
     CPacketParseBase(void);
 
+    virtual ~CPacketParseBase(void);
+
     void Clear();
 
     void Close();

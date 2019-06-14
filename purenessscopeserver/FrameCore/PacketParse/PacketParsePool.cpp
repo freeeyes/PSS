@@ -10,17 +10,10 @@ void CPacketParsePool::Init_Callback(int nIndex, CPacketParse* pPacketParse)
     pPacketParse->SetHashID(nIndex);
 }
 
-void CPacketParsePool::Close_Callback(int nIndex, CPacketParse* pPacketParse)
-{
-    ACE_UNUSED_ARG(nIndex);
-    pPacketParse->Close();
-}
-
 void CPacketParsePool::Close()
 {
     OUR_DEBUG((LM_INFO, "[CPacketParsePool::~CPacketParsePool].\n"));
     //清理所有已存在的指针
-    CObjectPoolManager<CPacketParse, ACE_Recursive_Thread_Mutex>::Close_Object(Close_Callback);
     CObjectPoolManager<CPacketParse, ACE_Recursive_Thread_Mutex>::Close();
     OUR_DEBUG((LM_INFO, "[CPacketParsePool::~CPacketParsePool] End.\n"));
 }
