@@ -157,7 +157,7 @@ bool CLoadModule::MoveUnloadList(const char* szModuleName, uint32 u4UpdateIndex,
     else
     {
         //放入等待清理的线程列表
-        _WaitUnloadModule objWaitUnloadModule;
+        CWaitUnloadModule objWaitUnloadModule;
         sprintf_safe((char* )szModuleName, MAX_BUFF_100, objWaitUnloadModule.m_szModuleName, MAX_BUFF_100);
         objWaitUnloadModule.m_u4UpdateIndex        = u4UpdateIndex;
         objWaitUnloadModule.m_hModule              = pModuleInfo->hModule;
@@ -181,7 +181,7 @@ int CLoadModule::UnloadListUpdate(uint32 u4UpdateIndex)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_tmModule);
     int nRet = 0;
-    vector<_WaitUnloadModule>::iterator itr = m_vecWaitUnloadModule.begin();
+    vector<CWaitUnloadModule>::iterator itr = m_vecWaitUnloadModule.begin();
 
     while (itr != m_vecWaitUnloadModule.end())
     {

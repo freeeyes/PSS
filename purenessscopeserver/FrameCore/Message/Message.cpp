@@ -24,10 +24,6 @@ CMessage::CMessage(void)
     *ppMessage = this;
 }
 
-CMessage::~CMessage(void)
-{
-}
-
 void CMessage::SetHashID(int nHasnID)
 {
     m_nHashID = nHasnID;
@@ -159,17 +155,6 @@ void CMessage::Clear()
 
 CMessagePool::CMessagePool()
 {
-}
-
-CMessagePool::CMessagePool(const CMessagePool& ar)
-{
-    (*this) = ar;
-}
-
-CMessagePool::~CMessagePool()
-{
-    OUR_DEBUG((LM_INFO, "[CMessagePool::~CMessagePool].\n"));
-    OUR_DEBUG((LM_INFO, "[CMessagePool::~CMessagePool]End.\n"));
 }
 
 void CMessagePool::Init_Callback(int nIndex, CMessage* pMessage)
