@@ -15,6 +15,7 @@ void CUnit_LogManager::setUp(void)
 
 void CUnit_LogManager::tearDown(void)
 {
+    m_pLogBlockPool->Close();
     delete m_pLogBlockPool;
     m_pLogBlockPool = NULL;
 }

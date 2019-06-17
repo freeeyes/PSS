@@ -18,16 +18,6 @@ CLogBlockPool::CLogBlockPool()
     m_u4CurrIndex    = 0;
 }
 
-CLogBlockPool::CLogBlockPool(const CLogBlockPool& ar)
-{
-    (*this) = ar;
-}
-
-CLogBlockPool::~CLogBlockPool()
-{
-    Close();
-}
-
 void CLogBlockPool::Init(uint32 u4BlockSize, uint32 u4PoolCount)
 {
     //初始化，日志池
@@ -46,17 +36,20 @@ void CLogBlockPool::Init(uint32 u4BlockSize, uint32 u4PoolCount)
     m_u4MaxBlockSize = u4BlockSize;
     m_u4PoolCount    = u4PoolCount;
     m_u4CurrIndex    = 0;
-
 }
 
 void CLogBlockPool::Close()
 {
+    OUR_DEBUG((LM_INFO, "[CLogBlockPool::Close]Begin.\n"));
+
     for(uint32 i = 0; i < m_u4PoolCount; i++)
     {
         SAFE_DELETE_ARRAY(m_pLogBlockInfo[i].m_pBlock);
     }
 
     SAFE_DELETE_ARRAY(m_pLogBlockInfo);
+
+    OUR_DEBUG((LM_INFO, "[CLogBlockPool::Close]End.\n"));
 }
 
 _LogBlockInfo* CLogBlockPool::GetLogBlockInfo()
@@ -154,6 +147,8 @@ int CLogManager::svc(void)
             break;
         }
     }
+
+    m_objLogBlockPool.Close();
 
     return 0;
 }

@@ -16,19 +16,6 @@ class CLogBlockPool
 {
 public:
     CLogBlockPool();
-    ~CLogBlockPool();
-
-    CLogBlockPool(const CLogBlockPool& ar);
-
-    CLogBlockPool& operator = (const CLogBlockPool& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     void Init(uint32 u4BlockSize, uint32 u4PoolCount);
     void Close();
