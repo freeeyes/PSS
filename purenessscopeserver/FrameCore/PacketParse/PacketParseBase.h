@@ -15,7 +15,7 @@ class CPacketParseBase
 public:
     CPacketParseBase(void);
 
-    virtual ~CPacketParseBase(void);
+    virtual ~CPacketParseBase() = default;
 
     void Clear();
 
@@ -44,8 +44,6 @@ public:
     ACE_Message_Block* GetMessageBody();
 
     virtual void Init() = 0;
-    IPacketHeadInfo* GetPacketHeadInfo();
-    void SetPacketHeadInfo(IPacketHeadInfo* pPacketHeadInfo);
 
     void SetPacket_Head_Curr_Length(uint32 u4CurrLength);
     void SetPacket_Body_Curr_Length(uint32 u4CurrLength);
@@ -65,8 +63,6 @@ private:
     bool   m_blIsHandleHead;
     char   m_szPacketVersion[MAX_BUFF_20];   //包解析器版本
     uint8  m_u1Sort;                         //字节序规则，0为主机字节序，1为网络字节序
-
-    IPacketHeadInfo*    m_pPacketHeadInfo;  //数据包头信息
 
     ACE_Message_Block* m_pmbHead;   //包头部分
     ACE_Message_Block* m_pmbBody;   //包体部分

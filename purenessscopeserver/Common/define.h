@@ -1099,15 +1099,6 @@ struct _Packet_Info
     }
 };
 
-//用于记录数据包头信息
-//这部分应该是交给PacketParse去继承实现之
-class IPacketHeadInfo
-{
-public:
-    IPacketHeadInfo() {};
-    virtual ~IPacketHeadInfo() {};
-};
-
 //定时监控数据包和流量的数据信息，用于链接有效性的逻辑判定
 struct _TimeConnectInfo
 {

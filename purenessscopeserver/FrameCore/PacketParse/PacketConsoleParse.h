@@ -18,7 +18,6 @@ class CConsolePacketParse : public CPacketParseBase
 {
 public:
     CConsolePacketParse(void);
-    virtual ~CConsolePacketParse(void);
 
     //≥ı ºªØPacketParsed
     void Init();

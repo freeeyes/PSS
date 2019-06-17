@@ -17,12 +17,6 @@ CPacketParseBase::CPacketParseBase(void)
 
     m_pmbHead           = NULL;
     m_pmbBody           = NULL;
-    m_pPacketHeadInfo   = NULL;
-}
-
-CPacketParseBase::~CPacketParseBase(void)
-{
-    SAFE_DELETE(m_pPacketHeadInfo);
 }
 
 void CPacketParseBase::Clear()
@@ -157,16 +151,6 @@ void CPacketParseBase::Check_Send_Unit64(uint64& u8Data)
         //Ö÷»úÐòµ½ÍøÐò
         u8Data = hl64ton(u8Data);
     }
-}
-
-IPacketHeadInfo* CPacketParseBase::GetPacketHeadInfo()
-{
-    return m_pPacketHeadInfo;
-}
-
-void CPacketParseBase::SetPacketHeadInfo(IPacketHeadInfo* pPacketHeadInfo)
-{
-    m_pPacketHeadInfo = pPacketHeadInfo;
 }
 
 void CPacketParseBase::SetPacket_Head_Curr_Length(uint32 u4CurrLength)

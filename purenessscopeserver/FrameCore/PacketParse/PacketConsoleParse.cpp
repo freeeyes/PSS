@@ -8,10 +8,6 @@ CConsolePacketParse::CConsolePacketParse(void)
     SetPacket_IsHandleHead(true);
 }
 
-CConsolePacketParse::~CConsolePacketParse(void)
-{
-}
-
 void CConsolePacketParse::Init()
 {
     SetPacket_IsHandleHead(true);
