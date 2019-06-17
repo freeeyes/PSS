@@ -11,8 +11,8 @@
 #include "XmlConfig.h"
 #include "ConnectClient.h"
 
-#define RE_CONNECT_SERVER_TIMEOUT 100*1000
-#define WAIT_FOR_RECONNECT_FINISH 5000
+const uint32 RE_CONNECT_SERVER_TIMEOUT = 100 * 1000;
+const uint32 WAIT_FOR_RECONNECT_FINISH = 5000;
 
 typedef ACE_Connector<CConnectClient, ACE_SOCK_CONNECTOR> CConnectClientConnector;
 

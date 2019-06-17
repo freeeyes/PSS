@@ -14,6 +14,7 @@ void CUnit_FileTestManager::setUp(void)
 
 void CUnit_FileTestManager::tearDown(void)
 {
+    m_pFileTestManager->Close();
     delete m_pFileTestManager;
     m_pFileTestManager = NULL;
 }
