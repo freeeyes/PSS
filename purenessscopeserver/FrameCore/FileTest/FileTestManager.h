@@ -71,17 +71,6 @@ private:
             m_u1ResponseCount  = 0;
             m_u4ConnectID      = 0;
         }
-
-        ResponseRecordSt& operator= (const ResponseRecordSt& ar)
-        {
-            if (this != &ar)
-            {
-                this->m_u8StartTime = ar.m_u8StartTime;
-                this->m_u1ResponseCount = ar.m_u1ResponseCount;
-            }
-
-            return *this;
-        }
     } ;
 
     //定义接收参数
