@@ -11,16 +11,6 @@ CLoadModule::CLoadModule(void)
     m_szModulePath[0] = '\0';
 }
 
-CLoadModule::CLoadModule(const CLoadModule& ar)
-{
-    (*this) = ar;
-}
-
-CLoadModule::~CLoadModule(void)
-{
-    OUR_DEBUG((LM_INFO, "[CLoadModule::~CLoadModule].\n"));
-}
-
 void CLoadModule::Init(uint16 u2MaxModuleCount)
 {
     Close();

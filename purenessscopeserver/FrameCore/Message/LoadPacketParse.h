@@ -48,19 +48,6 @@ class CLoadPacketParse
 {
 public:
     CLoadPacketParse();
-    ~CLoadPacketParse();
-
-    CLoadPacketParse(const CLoadPacketParse& ar);
-
-    CLoadPacketParse& operator = (const CLoadPacketParse& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     void Init(int nCount);
 

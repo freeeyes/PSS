@@ -70,19 +70,6 @@ class CLoadModule : public IModuleInfo
 {
 public:
     CLoadModule(void);
-    virtual ~CLoadModule(void);
-
-    CLoadModule(const CLoadModule& ar);
-
-    CLoadModule& operator = (const CLoadModule& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     void Init(uint16 u2MaxModuleCount);
 
