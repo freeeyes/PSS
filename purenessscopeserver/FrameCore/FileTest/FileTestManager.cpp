@@ -12,11 +12,6 @@ CFileTestManager::CFileTestManager(void)
     m_u4TimeInterval   = 0;
 }
 
-CFileTestManager::~CFileTestManager(void)
-{
-    Close();
-}
-
 FileTestResultInfoSt CFileTestManager::FileTestStart(const char* szXmlFileTestName)
 {
     FileTestResultInfoSt objFileTestResult;

@@ -6,10 +6,6 @@ CProServerManager::CProServerManager(void)
     m_pFrameLoggingStrategy = NULL;
 }
 
-CProServerManager::~CProServerManager(void)
-{
-}
-
 bool CProServerManager::Init()
 {
     //是否打开ACE_DEBUG文件存储
@@ -464,6 +460,8 @@ bool CProServerManager::Close()
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_MessageBlockManager OK.\n"));
     App_PacketParsePool::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_PacketParsePool OK.\n"));
+    App_FileTestManager::instance()->Close();
+    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_FileTestManager OK.\n"));
 
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close end....\n"));
 

@@ -9,16 +9,6 @@ CServerManager::CServerManager(void)
     m_pFrameLoggingStrategy = NULL;
 }
 
-CServerManager::CServerManager(const CServerManager& ar)
-{
-    (*this) = ar;
-}
-
-CServerManager::~CServerManager(void)
-{
-    OUR_DEBUG((LM_INFO, "[CServerManager::~CServerManager].\n"));
-}
-
 bool CServerManager::Init()
 {
     //是否打开ACE_DEBUG文件存储
@@ -664,13 +654,15 @@ bool CServerManager::Close()
     App_ReactorManager::instance()->StopReactor();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ReactorManager OK.\n"));
     App_TcpRedirection::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_TcpRedirection OK.\n"));
+    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_TcpRedirection OK.\n"));
     App_IPAccount::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_IPAccount OK.\n"));
+    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_IPAccount OK.\n"));
     App_MessageBlockManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_MessageBlockManager OK.\n"));
+    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_MessageBlockManager OK.\n"));
     App_PacketParsePool::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_PacketParsePool OK.\n"));
+    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_PacketParsePool OK.\n"));
+    App_FileTestManager::instance()->Close();
+    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_FileTestManager OK.\n"));
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close end....\n"));
 
     if (NULL != m_pFrameLoggingStrategy)

@@ -20,17 +20,6 @@ class CFileTestManager : public ACE_Task<ACE_MT_SYNCH>, public IFileTestManager
 {
 public:
     CFileTestManager(void);
-    virtual ~CFileTestManager(void);
-
-    CFileTestManager& operator = (const CFileTestManager& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     //文件测试方法
     FileTestResultInfoSt FileTestStart(const char* szXmlFileTestName);      //开始文件测试
@@ -74,17 +63,6 @@ private:
         ResponseRecordSt()
         {
             Init();
-        }
-
-        ~ResponseRecordSt()
-        {
-        }
-
-        ResponseRecordSt(const ResponseRecordSt& ar)
-        {
-            this->m_u8StartTime     = ar.m_u8StartTime;
-            this->m_u1ResponseCount = ar.m_u1ResponseCount;
-            this->m_u4ConnectID     = ar.m_u4ConnectID;
         }
 
         void Init()
