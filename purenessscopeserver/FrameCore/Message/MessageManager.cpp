@@ -27,16 +27,6 @@ CMessageManager::CMessageManager(void)
     m_u4UpdateIndex        = 0;
 }
 
-CMessageManager::CMessageManager(const CMessageManager& ar)
-{
-    (*this) = ar;
-}
-
-CMessageManager::~CMessageManager(void)
-{
-    OUR_DEBUG((LM_INFO, "[CMessageManager::~CMessageManager].\n"));
-}
-
 void CMessageManager::Init(uint16 u2MaxModuleCount, uint32 u4MaxCommandCount)
 {
     //初始化对象数组
@@ -118,6 +108,7 @@ void CMessageManager::Close()
 
     for (uint32 i = 0; i < u4Size; i++)
     {
+        vecClientCommandList[i]->Close();
         SAFE_DELETE(vecClientCommandList[i]);
     }
 
