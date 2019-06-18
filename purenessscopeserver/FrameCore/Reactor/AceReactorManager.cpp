@@ -102,15 +102,10 @@ void CAceReactor::Create_DEV_POLL(int nMaxHandleCount)
 #endif
 }
 
-CAceReactor::~CAceReactor()
-{
-    OUR_DEBUG((LM_INFO, "[CAceReactor::~CAceReactor].\n"));
-    Close();
-    OUR_DEBUG((LM_INFO, "[CAceReactor::~CAceReactor] End.\n"));
-}
-
 void CAceReactor::Close()
 {
+    OUR_DEBUG((LM_INFO, "[CAceReactor::Close]Begin.\n"));
+
     if (NULL != m_pReactor)
     {
         m_pReactor->close();
@@ -120,6 +115,7 @@ void CAceReactor::Close()
     m_nReactorType = 0;
     m_nThreadCount = 0;
     m_blRun        = false;
+    OUR_DEBUG((LM_INFO, "[CAceReactor::Close]End.\n"));
 }
 
 bool CAceReactor::Init(int nReactorType, int nThreadCount, int nMaxHandleCount)
@@ -270,18 +266,6 @@ CAceReactorManager::CAceReactorManager(void)
     m_pReactorList  = NULL;
     m_u2RectorCount = 0;
     ACE_OS::memset(m_szError, 0, MAX_BUFF_500);
-}
-
-CAceReactorManager::CAceReactorManager(const CAceReactorManager& ar)
-{
-    (*this) = ar;
-}
-
-CAceReactorManager::~CAceReactorManager(void)
-{
-    OUR_DEBUG((LM_INFO, "[CAceReactorManager::~CAceReactorManager].\n"));
-    Close();
-    OUR_DEBUG((LM_INFO, "[CAceReactorManager::~CAceReactorManager]End.\n"));
 }
 
 void CAceReactorManager::Close()

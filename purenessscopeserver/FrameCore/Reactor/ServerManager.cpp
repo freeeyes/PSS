@@ -652,7 +652,7 @@ bool CServerManager::Close()
     App_BuffPacketManager::instance()->Close_Object(CBuffPacketManager::Close_Callback);
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]BuffPacketManager OK\n"));
     App_ReactorManager::instance()->StopReactor();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ReactorManager OK.\n"));
+    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ReactorManager StopReactor OK.\n"));
     App_TcpRedirection::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_TcpRedirection OK.\n"));
     App_IPAccount::instance()->Close();
@@ -663,6 +663,8 @@ bool CServerManager::Close()
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_PacketParsePool OK.\n"));
     App_FileTestManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_FileTestManager OK.\n"));
+    App_ReactorManager::instance()->Close();
+    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ReactorManager OK.\n"));
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close end....\n"));
 
     if (NULL != m_pFrameLoggingStrategy)
