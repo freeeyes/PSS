@@ -665,6 +665,7 @@ bool CServerManager::Close()
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_FileTestManager OK.\n"));
     App_ReactorManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ReactorManager OK.\n"));
+
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close end....\n"));
 
     if (NULL != m_pFrameLoggingStrategy)
