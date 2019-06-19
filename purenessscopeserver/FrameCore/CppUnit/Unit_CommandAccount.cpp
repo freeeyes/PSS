@@ -24,6 +24,7 @@ void CUnit_CommandAccount::setUp(void)
 
 void CUnit_CommandAccount::tearDown(void)
 {
+    m_pCommandAccount->Close();
     delete m_pCommandAccount;
     m_pCommandAccount = NULL;
 }

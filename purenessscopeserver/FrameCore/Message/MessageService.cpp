@@ -359,6 +359,8 @@ int CMessageService::Close()
 
     m_objClientCommandList.Close();
 
+    m_CommandAccount.Close();
+
     m_MessagePool.Close_Object(CMessagePool::Close_Callback);
 
     m_WorkThreadAI.Close();
