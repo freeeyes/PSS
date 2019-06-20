@@ -1,0 +1,324 @@
+#pragma once
+
+#include "define.h"
+#include <windows.h>
+#include <unordered_map>
+#include <vector>
+#include <string>
+#include <assert.h>
+
+
+// 锁
+struct CObjectLock
+{
+	CObjectLock(::CRITICAL_SECTION*cs) :pcs(cs) { ::EnterCriticalSection(pcs); }
+	~CObjectLock() { ::LeaveCriticalSection(pcs); }
+	::CRITICAL_SECTION* pcs;
+};
+
+
+// 对象池基类接口，提供了gc垃圾收集的能力
+class IObjectPool
+{
+public:
+	// 垃圾收集
+	virtual void GC(bool bEnforce) = 0;
+	virtual ~IObjectPool() {}
+};
+
+// 对象池的实体类，通过模板实现通用化
+template<class ObjectType>
+class CObjectPool : public IObjectPool
+{
+private:
+	typedef std::unordered_map<int, char*>  FreePointer;
+	typedef std::vector<char*>   FreeIndex;
+	typedef void* (*ObjectMalloc)(size_t);
+	typedef void (*ObjectFree)(void*);
+public:
+	CObjectPool()
+	{
+		::InitializeCriticalSection(&m_cs);
+		CObjectLock lock(&m_cs);
+		m_growSize = 64;
+		m_MaxObject = m_growSize * 3;
+		m_CurrentObject = 0;
+	}
+
+	~CObjectPool()
+	{
+		GC(true);
+		::DeleteCriticalSection(&m_cs);
+	}
+
+	//设置max的最大值,最好是成长基数的倍数关系,即64 128 256 512 1024,
+	void SetMaxObject(uint32 uMax)
+	{
+		m_MaxObject = uMax;
+	}
+
+	uint32 GetMaxObjects()
+	{
+		return m_MaxObject;
+	}
+
+	uint32 GetCurrentObjects()
+	{
+		return m_CurrentObject;
+	}
+
+	//无参构造
+	ObjectType* Construct()
+	{
+		CObjectLock lock(&m_cs);
+
+		char* pData = GetFreePointer();
+		if (pData == nullptr)
+		{
+			//记录日志
+			
+			assert(pData);
+			return nullptr;
+		}
+			
+
+		ObjectType * const ret = new (pData)ObjectType();
+
+		return ret;
+	}
+
+	//带参构造
+	template<class ... Args>
+	ObjectType* Construct(Args && ... args)
+	{
+		CObjectLock lock(&m_cs);
+
+		char* pData = GetFreePointer();
+		if (pData == nullptr)
+		{
+			//记录日志
+			assert(pData);
+			return nullptr;
+		}
+			
+
+		//调用模板的构造函数
+		ObjectType* const ret = new (pData) ObjectType(std::forward<Args>(args)...);
+
+		return ret;
+	}
+
+	// 销毁一个对象
+	void Destroy(ObjectType* const object)
+	{
+		CObjectLock lock(&m_cs);
+
+		object->~ObjectType();
+		char* pData = (char*)(object);
+		m_FreeIndexs.push_back(pData);
+	}
+
+	//内存回收
+	void GC(bool bEnforce = false)
+	{
+		CObjectLock lock(&m_cs);
+
+		ObjectType* object = nullptr;
+		char* pData = nullptr;
+
+		// 构造一个map来使查找m_FreeIndexs更加快捷一些
+		std::unordered_map<char*, bool> findexs;
+		{
+			for (auto it : m_FreeIndexs)
+			{
+				findexs.insert(std::make_pair(it, true));
+			}
+		}
+
+		//回收内存
+		std::vector<int> deleteList;
+		deleteList.clear();
+
+		bool bCanGC = false;
+		int growSize = 0;
+		
+		auto it = m_FreePointerIndexs.begin(), itEnd = m_FreePointerIndexs.end();
+		for (; it != itEnd; ++it)
+		{
+			// 查找是否可以回收[即自己的指针是否全部在m_FreeIndexs，有一个不在则已分配至少一份出去，不可回收]
+			bCanGC = true;
+			for (int i = 0; i < it->first; ++i)
+			{
+				pData = it->second + i;
+				if (findexs.find(pData) == findexs.end())
+				{
+					if (!bEnforce)
+					{
+						bCanGC = false;
+						break;
+					}
+					else
+					{
+						// 强制回收则都要回收掉
+						object = (ObjectType*)pData;
+						object->~ObjectType();
+					}
+				}
+			}
+			// 可以回收
+			if (bCanGC)
+			{
+				// 回收空闲索引
+				for (int i = 0; i < it->first; ++i)
+				{
+					pData = it->second + i;
+					findexs.erase(pData);
+				}
+				// 回收指针
+				FreeFunc(static_cast<void *>(it->second));
+				// 删除该key
+				deleteList.push_back(growSize);
+
+				//记录当前个数
+				m_CurrentObject -= m_growSize;
+				// 下次减少一倍
+				m_growSize /= 2;
+			}
+		}
+
+		// 写回空闲索引
+		m_FreeIndexs.clear();
+		for (auto it : findexs)
+		{
+			m_FreeIndexs.push_back(it.first);
+		}
+		// 真正删除
+		int size = deleteList.size();
+		for (int i = 0; i < size; ++i)
+		{
+			m_FreePointerIndexs.erase(deleteList[i]);
+		}
+	}
+
+private:
+	void Grow()
+	{
+		//当前个数大于最大数量,不给申请.直接返回.
+		if (m_CurrentObject >= m_MaxObject)
+		{
+			return;
+		}
+
+		int objectSize = sizeof(ObjectType);
+
+		char* pData = static_cast<char*>(MallocFunc(m_growSize * objectSize));
+		if (pData == NULL) 
+			return;
+		// 加入指针map中
+		m_FreePointerIndexs.insert(std::make_pair(m_growSize, pData));
+		// 加入空闲索引中
+		for (int i = 0; i < m_growSize; ++i)
+		{ 
+			m_FreeIndexs.push_back(pData + i);
+		}
+
+		//记录当前个数
+		m_CurrentObject += m_growSize;
+		// 下次增长一倍
+		m_growSize *= 2;
+	}
+
+	char* GetFreePointer()
+	{
+		if (m_FreeIndexs.empty())
+			Grow();
+		if (m_FreeIndexs.empty())
+			return NULL;
+		char* pData = m_FreeIndexs.back();
+		m_FreeIndexs.pop_back();
+		return pData;
+	}
+private:
+	ObjectFree FreeFunc = ::free;
+	ObjectMalloc MallocFunc = ::malloc;
+	FreePointer  m_FreePointerIndexs;// 空闲指针索引map,key为growSize
+	FreeIndex    m_FreeIndexs;       // 空闲索引列表
+	uint32       m_growSize;         // 内存增长的大小
+	uint32		m_MaxObject;			//允许最大对象
+	uint32		m_CurrentObject;		//当前对象个数
+	::CRITICAL_SECTION m_cs;
+};
+
+//Type2Type就是用来保证T的构造调用
+template<class T>
+struct Type2Type {};
+
+// 对象池工厂
+template<class ObjectType>
+class CObjectPool_Factory
+{
+private:
+	CObjectPool_Factory()
+	{
+		::InitializeCriticalSection(&m_cs);
+	}
+public:
+	~CObjectPool_Factory()
+	{
+		::DeleteCriticalSection(&m_cs);
+	}
+
+	// 获得单例
+	static CObjectPool_Factory& GetSingleton()
+	{
+		static CObjectPool_Factory poolFactory;
+		return poolFactory;
+	}
+
+	// 获得ObjectPool
+	//Type2Type保证 会像构造ObjectType
+	CObjectPool<ObjectType>* GetObjectPool(const Type2Type<ObjectType>& , const std::string& name)
+	{
+		CObjectLock lock(&m_cs);
+
+		CObjectPool<ObjectType>* pool = nullptr;
+		auto it = m_poolMap.find(name);
+		if (it == m_poolMap.end())
+		{
+			pool = new CObjectPool<ObjectType>();
+			m_poolMap.insert(std::make_pair(name, pool));
+		}
+		else
+		{
+			pool = (CObjectPool<ObjectType>*)it->second;
+		}
+		return pool;
+	}
+
+	// 全体gc
+	void GC()
+	{
+		CObjectLock lock(&m_cs);
+
+		for (auto it : m_poolMap)
+		{
+			it.second->GC(false);
+		}
+	}
+
+private:
+	typedef std::unordered_map<std::string, CObjectPool<ObjectType>* > PoolMap;
+	PoolMap m_poolMap;
+	::CRITICAL_SECTION m_cs;
+};
+
+
+
+
+
+// 对象池指针定义
+#define DefineObjectPoolPtr(T, pPool) CObjectPool<T>* pPool
+// 获得特定对象池指针。
+#define GetObjectPoolPtr(T) CObjectPool_Factory<T>::GetSingleton().GetObjectPool(Type2Type<T>(),#T)
+// 直接定义对象池
+#define ObjectPoolPtr(T, pPool) DefineObjectPoolPtr(T, pPool) = GetObjectPoolPtr(T)
