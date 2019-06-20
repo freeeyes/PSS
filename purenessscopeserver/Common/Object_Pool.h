@@ -7,15 +7,6 @@
 #include <assert.h>
 #include "ThreadLock.h"
 
-// 锁
-struct CObjectLock
-{
-	CObjectLock(::CRITICAL_SECTION*cs) :pcs(cs) { ::EnterCriticalSection(pcs); }
-	~CObjectLock() { ::LeaveCriticalSection(pcs); }
-	::CRITICAL_SECTION* pcs;
-};
-
-
 // 对象池基类接口，提供了gc垃圾收集的能力
 class IObjectPool
 {
@@ -37,14 +28,12 @@ private:
 public:
 	CObjectPool()
 	{
-		::InitializeCriticalSection(&m_cs);
 		m_isFixed = false;
 	}
 
 	~CObjectPool()
 	{
 		GC(true);
-		::DeleteCriticalSection(&m_cs);
 	}
 
 	//设置固定长度uFixedLength的值
@@ -217,6 +206,7 @@ private:
 	//设置固定长度
 	void SetFixedLength(uint32 uFixedLength)
 	{
+		CAutoLock lock(m_lock);
 		m_uFixedLength = uFixedLength;
 	}
 
@@ -284,15 +274,9 @@ template<class ObjectType>
 class CObjectPool_Factory
 {
 private:
-	CObjectPool_Factory()
-	{
-		::InitializeCriticalSection(&m_cs);
-	}
+	CObjectPool_Factory(){}
 public:
-	~CObjectPool_Factory()
-	{
-		::DeleteCriticalSection(&m_cs);
-	}
+	~CObjectPool_Factory(){}
 
 	// 获得单例
 	static CObjectPool_Factory& GetSingleton()
