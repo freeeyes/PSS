@@ -133,7 +133,7 @@ public:
     void Close();
 
     bool Start();
-    CThreadInfo* GetThreadInfo();
+    CThreadInfoList* GetThreadInfo();
     uint32 GetUsedMessageCount();
 
     uint32 GetWorkThreadCount();                                                              //得到当前工作线程的数量
@@ -181,7 +181,7 @@ public:
     uint16                                              m_u2ThreadTimeCheck;       //线程自检时间
     uint16                                              m_u2CurrThreadID;          //当前轮询到的线程ID
     uint16                                              m_u2CpuNumber;             //当前CPU的核数
-    CThreadInfo                                         m_objAllThreadInfo;        //当前所有线程信息
+    CThreadInfoList                                     m_objAllThreadInfo;        //当前所有线程信息
     CMessageDyeingManager                               m_objMessageDyeingManager; //数据染色类
     ACE_Recursive_Thread_Mutex                          m_ThreadLock;              //用于线程操作的线程锁，保证CurrThreadID的数据正常
 };

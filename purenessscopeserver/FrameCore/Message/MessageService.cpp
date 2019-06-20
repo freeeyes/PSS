@@ -934,6 +934,9 @@ void CMessageServiceGroup::Close()
     }
 
     m_vecMessageService.clear();
+
+    m_objAllThreadInfo.Close();
+
 }
 
 bool CMessageServiceGroup::Start()
@@ -1114,7 +1117,7 @@ void CMessageServiceGroup::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_
     }
 }
 
-CThreadInfo* CMessageServiceGroup::GetThreadInfo()
+CThreadInfoList* CMessageServiceGroup::GetThreadInfo()
 {
     return &m_objAllThreadInfo;
 }

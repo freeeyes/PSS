@@ -6,25 +6,13 @@
 
 #include "ThreadInfo.h"
 
-CThreadInfo::CThreadInfo(void)
+CThreadInfoList::CThreadInfoList(void)
 {
     m_pAllThreadInfo = NULL;
     m_nThreadCount = 0;
 }
 
-CThreadInfo::CThreadInfo(const CThreadInfo& ar)
-{
-    (*this) = ar;
-}
-
-CThreadInfo::~CThreadInfo(void)
-{
-    OUR_DEBUG((LM_ERROR, "[CThreadInfo::~CThreadInfo].\n"));
-    Close();
-    OUR_DEBUG((LM_ERROR, "[CThreadInfo::~CThreadInfo]End.\n"));
-}
-
-void CThreadInfo::Init(int nCount)
+void CThreadInfoList::Init(int nCount)
 {
     Close();
 
@@ -38,7 +26,7 @@ void CThreadInfo::Init(int nCount)
     m_nThreadCount   = nCount;
 }
 
-bool CThreadInfo::AddThreadInfo(uint32 u4ThreadID)
+bool CThreadInfoList::AddThreadInfo(uint32 u4ThreadID)
 {
     if(u4ThreadID >= (uint32)m_nThreadCount)
     {
@@ -47,7 +35,7 @@ bool CThreadInfo::AddThreadInfo(uint32 u4ThreadID)
 
     if(NULL != m_pAllThreadInfo[u4ThreadID])
     {
-        OUR_DEBUG((LM_ERROR, "[CThreadInfo::AddThreadInfo] u4ThreadID = %d is exist.\n", u4ThreadID));
+        OUR_DEBUG((LM_ERROR, "[CThreadInfoList::AddThreadInfo] u4ThreadID = %d is exist.\n", u4ThreadID));
         return false;
     }
     else
@@ -62,7 +50,7 @@ bool CThreadInfo::AddThreadInfo(uint32 u4ThreadID)
     return true;
 }
 
-bool CThreadInfo::AddThreadInfo(uint32 u4ThreadID, _ThreadInfo* pOrcThreadInfo)
+bool CThreadInfoList::AddThreadInfo(uint32 u4ThreadID, _ThreadInfo* pOrcThreadInfo)
 {
     if (u4ThreadID >= (uint32)m_nThreadCount)
     {
@@ -85,8 +73,10 @@ bool CThreadInfo::AddThreadInfo(uint32 u4ThreadID, _ThreadInfo* pOrcThreadInfo)
 
     return true;
 }
-void CThreadInfo::Close()
+void CThreadInfoList::Close()
 {
+    OUR_DEBUG((LM_ERROR, "[CThreadInfoList::~Close]Begin.\n"));
+
     for(int i = 0; i < m_nThreadCount; i++)
     {
         _ThreadInfo* pThreadInfo = m_pAllThreadInfo[i];
@@ -100,15 +90,16 @@ void CThreadInfo::Close()
     SAFE_DELETE_ARRAY(m_pAllThreadInfo);
     m_nThreadCount = 0;
 
+    OUR_DEBUG((LM_ERROR, "[CThreadInfoList::~Close]End.\n"));
 }
 
-_ThreadInfo* CThreadInfo::GetThreadInfo()
+_ThreadInfo* CThreadInfoList::GetThreadInfo()
 {
     //这里不再单独判断ThreadID，因为一个svc目前只有一个线程ID
     return m_pAllThreadInfo[0];
 }
 
-_ThreadInfo* CThreadInfo::GetThreadInfo(uint32 u4ThreadID)
+_ThreadInfo* CThreadInfoList::GetThreadInfo(uint32 u4ThreadID)
 {
     //这里不再单独判断ThreadID，因为一个svc目前只有一个线程ID
     if(u4ThreadID >= (uint32)m_nThreadCount)
@@ -119,7 +110,7 @@ _ThreadInfo* CThreadInfo::GetThreadInfo(uint32 u4ThreadID)
     return m_pAllThreadInfo[u4ThreadID];
 }
 
-bool CThreadInfo::CloseThread(uint32 u4ThreadID)
+bool CThreadInfoList::CloseThread(uint32 u4ThreadID)
 {
     if(u4ThreadID >= (uint32)m_nThreadCount)
     {
@@ -137,7 +128,7 @@ bool CThreadInfo::CloseThread(uint32 u4ThreadID)
     }
 }
 
-int CThreadInfo::GetThreadCount()
+int CThreadInfoList::GetThreadCount()
 {
     return m_nThreadCount;
 }

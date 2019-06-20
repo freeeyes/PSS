@@ -476,7 +476,7 @@ void DoMessage_WorkThreadState(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-s") == 0)
     {
         //获得当前工作线程状态
-        CThreadInfo* pThreadInfo = App_MessageServiceGroup::instance()->GetThreadInfo();
+        CThreadInfoList* pThreadInfo = App_MessageServiceGroup::instance()->GetThreadInfo();
 
         if (NULL != pThreadInfo)
         {

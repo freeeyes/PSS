@@ -22,7 +22,7 @@ public:
     void Test_ThreadInfo(void);
 
 private:
-    CThreadInfo* m_pThreadInfo;
+    CThreadInfoList* m_pThreadInfo;
 };
 
 #endif
