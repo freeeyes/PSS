@@ -76,7 +76,7 @@ public:
 		if (pData == nullptr)
 		{
 			//记录日志
-			
+			OUR_DEBUG((LM_ERROR, "[CObjectPool::Construct()] pData == nullptr (%s).(%d)\n", __FILE__, __LINE__));
 			assert(pData);
 			return nullptr;
 		}
@@ -97,6 +97,8 @@ public:
 		if (pData == nullptr)
 		{
 			//记录日志
+			OUR_DEBUG((LM_ERROR, "[CObjectPool::Construct(Args && ... args)] pData == nullptr (%s).(%d)\n", __FILE__, __LINE__));
+			assert(pData);
 			assert(pData);
 			return nullptr;
 		}
