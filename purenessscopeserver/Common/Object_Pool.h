@@ -1,12 +1,11 @@
 #pragma once
 
 #include "define.h"
-#include <windows.h>
 #include <unordered_map>
 #include <vector>
 #include <string>
 #include <assert.h>
-
+#include "ThreadLock.h"
 
 // 锁
 struct CObjectLock
@@ -39,10 +38,7 @@ public:
 	CObjectPool()
 	{
 		::InitializeCriticalSection(&m_cs);
-		CObjectLock lock(&m_cs);
-		m_growSize = 64;
-		m_MaxObject = m_growSize * 3;
-		m_CurrentObject = 0;
+		m_isFixed = false;
 	}
 
 	~CObjectPool()
@@ -51,15 +47,32 @@ public:
 		::DeleteCriticalSection(&m_cs);
 	}
 
-	//设置max的最大值,最好是成长基数的倍数关系,即64 128 256 512 1024,
-	void SetMaxObject(uint32 uMax)
+	//设置固定长度uFixedLength的值
+	//uFixedLength等于0,内存对象可以自动增长调用GC可回收,否则为固定长度GC无用
+	void Init(uint32 uFixedLength = 0)
 	{
-		m_MaxObject = uMax;
+		CAutoLock lock(m_lock);
+		if (0 == uFixedLength)
+		{
+			//按64作为第一次增长,之后每次增加一倍
+			m_growSize = 64;
+			m_CurrentObject = 0;
+			Grow();
+			m_isFixed = false;
+		}
+		else
+		{
+			m_growSize = uFixedLength;
+			Grow();
+			m_isFixed = true;
+		}
+
+		SetFixedLength(uFixedLength);
 	}
 
-	uint32 GetMaxObjects()
+	bool isFiexdPool()
 	{
-		return m_MaxObject;
+		return m_isFixed;
 	}
 
 	uint32 GetCurrentObjects()
@@ -70,7 +83,7 @@ public:
 	//无参构造
 	ObjectType* Construct()
 	{
-		CObjectLock lock(&m_cs);
+		CAutoLock lock(m_lock);
 
 		char* pData = GetFreePointer();
 		if (pData == nullptr)
@@ -80,7 +93,6 @@ public:
 			assert(pData);
 			return nullptr;
 		}
-			
 
 		ObjectType * const ret = new (pData)ObjectType();
 
@@ -91,7 +103,7 @@ public:
 	template<class ... Args>
 	ObjectType* Construct(Args && ... args)
 	{
-		CObjectLock lock(&m_cs);
+		CAutoLock lock(m_lock);
 
 		char* pData = GetFreePointer();
 		if (pData == nullptr)
@@ -99,10 +111,8 @@ public:
 			//记录日志
 			OUR_DEBUG((LM_ERROR, "[CObjectPool::Construct(Args && ... args)] pData == nullptr (%s).(%d)\n", __FILE__, __LINE__));
 			assert(pData);
-			assert(pData);
 			return nullptr;
 		}
-			
 
 		//调用模板的构造函数
 		ObjectType* const ret = new (pData) ObjectType(std::forward<Args>(args)...);
@@ -113,7 +123,7 @@ public:
 	// 销毁一个对象
 	void Destroy(ObjectType* const object)
 	{
-		CObjectLock lock(&m_cs);
+		CAutoLock lock(m_lock);
 
 		object->~ObjectType();
 		char* pData = (char*)(object);
@@ -123,8 +133,8 @@ public:
 	//内存回收
 	void GC(bool bEnforce = false)
 	{
-		CObjectLock lock(&m_cs);
-
+		CAutoLock lock(m_lock);
+		
 		ObjectType* object = nullptr;
 		char* pData = nullptr;
 
@@ -142,7 +152,6 @@ public:
 		deleteList.clear();
 
 		bool bCanGC = false;
-		int growSize = 0;
 		
 		auto it = m_FreePointerIndexs.begin(), itEnd = m_FreePointerIndexs.end();
 		for (; it != itEnd; ++it)
@@ -170,6 +179,8 @@ public:
 			// 可以回收
 			if (bCanGC)
 			{
+				//grow()最后增加的,那么减少的时候应该最先减少.
+				m_growSize /= 2;
 				// 回收空闲索引
 				for (int i = 0; i < it->first; ++i)
 				{
@@ -179,12 +190,10 @@ public:
 				// 回收指针
 				FreeFunc(static_cast<void *>(it->second));
 				// 删除该key
-				deleteList.push_back(growSize);
+				deleteList.push_back(m_growSize);
 
 				//记录当前个数
 				m_CurrentObject -= m_growSize;
-				// 下次减少一倍
-				m_growSize /= 2;
 			}
 		}
 
@@ -203,14 +212,26 @@ public:
 	}
 
 private:
+	//设置固定长度
+	void SetFixedLength(uint32 uFixedLength)
+	{
+		m_uFixedLength = uFixedLength;
+	}
+
+	uint32 GetFixedLength()
+	{
+		return m_uFixedLength;
+	}
+
 	void Grow()
 	{
 		//当前个数大于最大数量,不给申请.直接返回.
-		if (m_CurrentObject >= m_MaxObject)
+		//固定长度已经设置,不能再次分配大小
+		if (isFiexdPool())
 		{
 			return;
 		}
-
+		
 		int objectSize = sizeof(ObjectType);
 
 		char* pData = static_cast<char*>(MallocFunc(m_growSize * objectSize));
@@ -246,9 +267,10 @@ private:
 	FreePointer  m_FreePointerIndexs;// 空闲指针索引map,key为growSize
 	FreeIndex    m_FreeIndexs;       // 空闲索引列表
 	uint32       m_growSize;         // 内存增长的大小
-	uint32		m_MaxObject;			//允许最大对象
 	uint32		m_CurrentObject;		//当前对象个数
-	::CRITICAL_SECTION m_cs;
+	uint32		m_uFixedLength;			//固定长度
+	bool		m_isFixed;				//固定增长判断true为是
+	CThreadLock m_lock;
 };
 
 //Type2Type就是用来保证T的构造调用
@@ -281,7 +303,7 @@ public:
 	//Type2Type保证 会像构造ObjectType
 	CObjectPool<ObjectType>* GetObjectPool(const Type2Type<ObjectType>& , const std::string& name)
 	{
-		CObjectLock lock(&m_cs);
+		CAutoLock lock(m_lock);
 
 		CObjectPool<ObjectType>* pool = nullptr;
 		auto it = m_poolMap.find(name);
@@ -300,7 +322,7 @@ public:
 	// 全体gc
 	void GC()
 	{
-		CObjectLock lock(&m_cs);
+		CAutoLock lock(m_lock);
 
 		for (auto it : m_poolMap)
 		{
@@ -311,7 +333,7 @@ public:
 private:
 	typedef std::unordered_map<std::string, CObjectPool<ObjectType>* > PoolMap;
 	PoolMap m_poolMap;
-	::CRITICAL_SECTION m_cs;
+	CThreadLock m_lock;
 };
 
 
