@@ -163,6 +163,8 @@ public:
 				pData = it->second + i;
 				if (findexs.find(pData) == findexs.end())
 				{
+					//如果bEnforce = false;
+					//则只是匹配数据
 					if (!bEnforce)
 					{
 						bCanGC = false;
