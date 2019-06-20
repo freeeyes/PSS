@@ -359,6 +359,8 @@ int CMessageService::Close()
 
     m_objClientCommandList.Close();
 
+    m_CommandAccount.Close();
+
     m_MessagePool.Close_Object(CMessagePool::Close_Callback);
 
     m_WorkThreadAI.Close();
@@ -932,6 +934,9 @@ void CMessageServiceGroup::Close()
     }
 
     m_vecMessageService.clear();
+
+    m_objAllThreadInfo.Close();
+
 }
 
 bool CMessageServiceGroup::Start()
@@ -1112,7 +1117,7 @@ void CMessageServiceGroup::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_
     }
 }
 
-CThreadInfo* CMessageServiceGroup::GetThreadInfo()
+CThreadInfoList* CMessageServiceGroup::GetThreadInfo()
 {
     return &m_objAllThreadInfo;
 }

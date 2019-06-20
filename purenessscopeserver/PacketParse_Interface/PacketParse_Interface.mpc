@@ -15,7 +15,8 @@ project(PacketParse_Interface):acelib{
 
   specific(gnuace) {
   macros += __LINUX__  
-    compile_flags += -Wno-deprecated
+    compile_flags += -Wno-deprecated 
+	compile_flags += -std=c++11
   }  
   
   libout = ./

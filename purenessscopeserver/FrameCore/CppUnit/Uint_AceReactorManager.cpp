@@ -15,6 +15,7 @@ void CUnit_AceReactorManager::setUp(void)
 
 void CUnit_AceReactorManager::tearDown(void)
 {
+    m_pReactorManager->Close();
     delete m_pReactorManager;
     m_pReactorManager = NULL;
 }

@@ -36,18 +36,6 @@ private:
     friend class CAceReactorManager;
 
 public:
-    ~CAceReactor();
-
-    CAceReactor& operator = (const CAceReactor& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
     void Close();
 
     bool Init(int nReactorType, int nThreadCount, int nMaxHandleCount = 0);
@@ -85,19 +73,6 @@ class CAceReactorManager
 {
 public:
     CAceReactorManager(void);
-    ~CAceReactorManager(void);
-
-    CAceReactorManager(const CAceReactorManager& ar);
-
-    CAceReactorManager& operator = (const CAceReactorManager& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     void Init(uint16 u2Count);
 

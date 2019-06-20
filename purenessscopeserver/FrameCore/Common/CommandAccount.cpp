@@ -11,12 +11,6 @@ CCommandAccount::CCommandAccount()
     m_u8PacketTimeout  =  MAX_QUEUE_TIMEOUT * 1000;
 }
 
-CCommandAccount::~CCommandAccount()
-{
-    OUR_DEBUG((LM_ERROR, "CCommandAccount::~CCommandAccount].\n"));
-    Close();
-}
-
 void CCommandAccount::InitName(const char* pName, uint32 u4CommandCount)
 {
     sprintf_safe(m_szName, MAX_BUFF_50, "%s", pName);
@@ -50,6 +44,7 @@ void CCommandAccount::AddCommandAlert(uint16 u2CommandID, uint32 u4Count, uint32
 
 void CCommandAccount::Close()
 {
+    OUR_DEBUG((LM_ERROR, "CCommandAccount::Close]Begin.\n"));
     vector<_CommandData*> vecCommandData;
     m_objCommandDataList.Get_All_Used(vecCommandData);
 
@@ -75,6 +70,7 @@ void CCommandAccount::Close()
 
     m_objCommandDataList.Close();
     m_u1CommandAccount = 0;
+    OUR_DEBUG((LM_ERROR, "CCommandAccount::Close]End.\n"));
 }
 
 bool CCommandAccount::Save_Flow(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)

@@ -189,7 +189,6 @@ class CCommandAccount
 {
 public:
     CCommandAccount();
-    ~CCommandAccount();
 
     void InitName(const char* pName, uint32 u4CommandCount);
     void Init(uint8 u1CommandAccount, uint8 u1Flow, uint16 u2RecvTimeout);

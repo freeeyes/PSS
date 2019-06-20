@@ -29,23 +29,10 @@ public:
     }
 };
 
-class CThreadInfo
+class CThreadInfoList
 {
 public:
-    CThreadInfo(void);
-    ~CThreadInfo(void);
-
-    CThreadInfo(const CThreadInfo& ar);
-
-    CThreadInfo& operator = (const CThreadInfo& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
+    CThreadInfoList(void);
 
     void Init(int nCount);
 

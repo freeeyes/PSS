@@ -9,12 +9,13 @@ CUnit_ThreadInfo::CUnit_ThreadInfo()
 
 void CUnit_ThreadInfo::setUp(void)
 {
-    m_pThreadInfo = new CThreadInfo();
+    m_pThreadInfo = new CThreadInfoList();
     m_pThreadInfo->Init(3);
 }
 
 void CUnit_ThreadInfo::tearDown(void)
 {
+    m_pThreadInfo->Close();
     delete m_pThreadInfo;
     m_pThreadInfo = NULL;
 }
