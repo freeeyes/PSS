@@ -1,11 +1,21 @@
 #pragma once
-
 #include "define.h"
 #include <unordered_map>
 #include <vector>
 #include <string>
 #include <assert.h>
 #include "ThreadLock.h"
+
+/*
+说明:	
+CObjectPool<T>为对象池类 生成和管理所有除基础类型的对象.
+CObjectPool_Factory为对象池工厂,单件类,生成和管理所有的CObjectPool<T>类型
+
+1.可以设置固定长度,一旦设置后对象池数量不可变.
+2.固定长度为0,可以自动增长长度,并且可以使用GC回收.多余分配的对象.
+
+by liuruiqi 2019.6.20
+*/
 
 // 对象池基类接口，提供了gc垃圾收集的能力
 class IObjectPool
@@ -119,7 +129,7 @@ public:
 		m_FreeIndexs.push_back(pData);
 	}
 
-	//内存回收
+	//内存回收(true为真释放内存,false为回收地址)
 	void GC(bool bEnforce = false)
 	{
 		CAutoLock lock(m_lock);
@@ -239,7 +249,7 @@ private:
 
 		//记录当前个数
 		m_CurrentObject += m_growSize;
-		// 下次增长一倍
+		//最后一步增加 下次增长一倍
 		m_growSize *= 2;
 	}
 
