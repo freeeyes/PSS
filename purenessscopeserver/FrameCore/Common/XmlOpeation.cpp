@@ -2,31 +2,18 @@
 
 CXmlOpeation::CXmlOpeation(void)
 {
-    m_pTiXmlDocument = NULL;
+    m_pTiXmlDocument = std::make_shared<TiXmlDocument>();
     m_pRootElement   = NULL;
-}
-
-CXmlOpeation::CXmlOpeation(const CXmlOpeation& ar)
-{
-    (*this) = ar;
-}
-
-CXmlOpeation::~CXmlOpeation(void)
-{
-    Close();
 }
 
 bool CXmlOpeation::Init(const char* pFileName)
 {
-    Close();
-    m_pTiXmlDocument = new TiXmlDocument(pFileName);
-
     if(NULL == m_pTiXmlDocument)
     {
         return false;
     }
 
-    if(false == m_pTiXmlDocument->LoadFile())
+    if(false == m_pTiXmlDocument->LoadFile(pFileName))
     {
         return false;
     }
@@ -189,16 +176,6 @@ bool CXmlOpeation::Read_XML_Data_Multiple_Uint8(const char* pTag, const char* pN
     else
     {
         return false;
-    }
-}
-
-void CXmlOpeation::Close()
-{
-    if(NULL != m_pTiXmlDocument)
-    {
-        delete m_pTiXmlDocument;
-        m_pTiXmlDocument = NULL;
-        m_pRootElement   = NULL;
     }
 }
 

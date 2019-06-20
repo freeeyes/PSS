@@ -9,19 +9,6 @@ class CXmlOpeation
 {
 public:
     CXmlOpeation(void);
-    ~CXmlOpeation(void);
-
-    CXmlOpeation(const CXmlOpeation& ar);
-
-    CXmlOpeation& operator = (const CXmlOpeation& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     bool Init(const char* pFileName);
 
@@ -42,11 +29,8 @@ public:
     bool Read_XML_Data_Multiple_Uint16(const char* pTag, const char* pName, uint16& u2Value, TiXmlElement*& pTi);
     bool Read_XML_Data_Multiple_Uint8(const char* pTag, const char* pName, uint8& u1Value, TiXmlElement*& pTi);
 
-
-    void Close();
-
 private:
-    TiXmlDocument* m_pTiXmlDocument;
-    TiXmlElement*  m_pRootElement;
+    std::shared_ptr<TiXmlDocument> m_pTiXmlDocument;
+    TiXmlElement*                  m_pRootElement;
 };
 #endif
