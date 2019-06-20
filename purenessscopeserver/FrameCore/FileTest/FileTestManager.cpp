@@ -214,8 +214,6 @@ bool CFileTestManager::LoadXmlCfg(const char* szXmlFileTestName, FileTestResultI
         }
     }
 
-    m_MainConfig.Close();
-
     //初始化连接返回数据数组
     InitResponseRecordList();
 
