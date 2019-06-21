@@ -45,6 +45,8 @@ class CLogFile
 public:
     CLogFile(const char* pFileRoot, uint32 u4BufferSize, uint32 u4FileMaxSize);
 
+    virtual ~CLogFile() = default;
+
     void Init();
 
     void Close();
