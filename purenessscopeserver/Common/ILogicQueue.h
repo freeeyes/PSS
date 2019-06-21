@@ -20,7 +20,8 @@ class ILogicQueue
 {
 public:
     //初始化必填 参数:逻辑ID, 描述, 检测时间(秒)
-    ILogicQueue(uint32 u4LogicThreadID, uint32 u4Timeout, std::string strDesc);
+    ILogicQueue(uint32 u4LogicThreadID, uint32 u4Timeout, std::string& strDesc);
+	ILogicQueue(const ILogicQueue& ot);
     virtual ~ILogicQueue();
 public:
     //获取线程ID

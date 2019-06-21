@@ -837,6 +837,9 @@
     <ClInclude Include="..\Common\ThreadLock.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\Object_Pool.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

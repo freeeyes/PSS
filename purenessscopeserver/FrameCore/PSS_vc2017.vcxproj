@@ -533,6 +533,7 @@
     <ClInclude Include="..\Common\ObjectArrayList.h" />
     <ClInclude Include="..\Common\ObjectLru.h" />
     <ClInclude Include="..\Common\ObjectPoolManager.h" />
+    <ClInclude Include="..\Common\Object_Pool.h" />
     <ClInclude Include="..\Common\ProfileTime.h" />
     <ClInclude Include="..\Common\RandomNumber.h" />
     <ClInclude Include="..\Common\Threading.h" />
