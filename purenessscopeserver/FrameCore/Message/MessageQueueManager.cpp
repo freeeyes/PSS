@@ -12,7 +12,7 @@ void CLogicThreadMessagePool::Init_Callback(int nIndex, CLogicThreadMessage* pMe
 void CLogicThreadMessagePool::Close_Callback(int nIndex, CLogicThreadMessage* pMessage)
 {
     ACE_UNUSED_ARG(nIndex);
-    ACE_UNUSED_ARG(pMessage);
+    pMessage->Close();
 }
 
 CLogicThreadMessage* CLogicThreadMessagePool::Create()

@@ -29,29 +29,13 @@ public:
         *ppMessage = this;
     }
 
-    ~CLogicThreadMessage()
+    void Close()
     {
         if (NULL != m_pmbQueuePtr)
         {
             m_pmbQueuePtr->release();
             m_pmbQueuePtr = NULL;
         }
-    }
-
-    CLogicThreadMessage(const CLogicThreadMessage& ar)
-    {
-        (*this) = ::std::move(ar);
-    }
-
-    CLogicThreadMessage& operator = (const CLogicThreadMessage& ar)
-    {
-        if (this != &ar)
-        {
-            this->m_nMessageID = ar.m_nMessageID;
-            this->m_pParam = ar.m_pParam;
-        }
-
-        return *this;
     }
 
     void SetHashID(int nHasnID)
