@@ -536,6 +536,7 @@
     <ClInclude Include="..\Common\ProfileTime.h" />
     <ClInclude Include="..\Common\RandomNumber.h" />
     <ClInclude Include="..\Common\Threading.h" />
+    <ClInclude Include="..\Common\ThreadLock.h" />
     <ClInclude Include="..\Common\TimerCommon.h" />
     <ClInclude Include="..\Common\TimerInfo.h" />
     <ClInclude Include="..\Common\TimerThread.h" />
@@ -647,7 +648,6 @@
     <ClInclude Include="Common\SendCacheManager.h" />
     <ClInclude Include="Common\SendMessage.h" />
     <ClInclude Include="Common\ThreadInfo.h" />
-    <ClInclude Include="Common\ThreadLock.h" />
     <ClInclude Include="Common\TimerManager.h" />
     <ClInclude Include="Common\WindowsCPU.h" />
     <ClInclude Include="Common\WindowsDump.h" />

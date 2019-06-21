@@ -451,20 +451,10 @@ CFileLogger::CFileLogger()
     m_szLogRoot[0]   = '\0';
 }
 
-CFileLogger::CFileLogger(const CFileLogger& ar)
-{
-    (*this) = ar;
-}
-
-CFileLogger::~CFileLogger()
-{
-    OUR_DEBUG((LM_INFO, "[CFileLogger::~CFileLogger].\n"));
-    Close();
-    OUR_DEBUG((LM_INFO, "[CFileLogger::~CFileLogger]End.\n"));
-}
-
 void CFileLogger::Close()
 {
+    OUR_DEBUG((LM_INFO, "[CFileLogger::Close]Begin.\n"));
+
     if(NULL != m_pLogFileList)
     {
         for(int i = 0; i < m_nCount; i++)
@@ -478,6 +468,8 @@ void CFileLogger::Close()
         SAFE_DELETE_ARRAY(m_pLogFileList);
         m_nCount = 0;
     }
+
+    OUR_DEBUG((LM_INFO, "[CFileLogger::Close]End.\n"));
 }
 
 int CFileLogger::DoLog(int nLogType, _LogBlockInfo* pLogBlockInfo)

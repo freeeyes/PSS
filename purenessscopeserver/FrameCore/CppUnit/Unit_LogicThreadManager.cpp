@@ -15,6 +15,7 @@ void CUnit_LogicThreadManager::setUp(void)
 
 void CUnit_LogicThreadManager::tearDown(void)
 {
+    m_pLogicTestQueue = NULL;
 }
 
 void CUnit_LogicThreadManager::Test_LogicThreadManager(void)
@@ -45,6 +46,8 @@ void CUnit_LogicThreadManager::Test_LogicThreadManager(void)
         blRet = true;
         CPPUNIT_ASSERT_MESSAGE("[Test_TimerManager]SendLogicThreadMessage is fail.", true == blRet);
     }
+
+    App_MessageQueueManager::instance()->KillLogicThread(1);
 
     ACE_Time_Value tvSleep(0, 1000);
     ACE_OS::sleep(tvSleep);

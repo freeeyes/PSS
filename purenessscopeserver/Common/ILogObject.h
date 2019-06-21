@@ -97,8 +97,9 @@ public:
 class IServerLogger
 {
 public:
-    virtual ~IServerLogger() {}
+    virtual ~IServerLogger() = default;
 
+    virtual void Close()                                          = 0;
     virtual int DoLog(int nLogType, _LogBlockInfo* pLogBlockInfo) = 0;
     virtual int GetLogTypeCount()                                 = 0;
 

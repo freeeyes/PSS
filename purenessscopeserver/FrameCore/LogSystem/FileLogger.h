@@ -189,37 +189,24 @@ class CFileLogger : public IServerLogger
 {
 public:
     CFileLogger();
-    virtual ~CFileLogger();
 
-    CFileLogger(const CFileLogger& ar);
-
-    CFileLogger& operator = (const CFileLogger& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
-
-    int DoLog(int nLogType, _LogBlockInfo* pLogBlockInfo);
-    int GetLogTypeCount();
+    virtual int DoLog(int nLogType, _LogBlockInfo* pLogBlockInfo);
+    virtual int GetLogTypeCount();
 
     bool Init();
-    bool ReSet(uint32 u4CurrLogLevel);
-    void Close();
+    virtual bool ReSet(uint32 u4CurrLogLevel);
+    virtual void Close();
 
-    uint32 GetBlockSize();
-    uint32 GetPoolCount();
+    virtual uint32 GetBlockSize();
+    virtual uint32 GetPoolCount();
 
-    uint32 GetCurrLevel();
+    virtual uint32 GetCurrLevel();
 
-    uint16 GetLogID(uint16 u2Index);
-    char*  GetLogInfoByServerName(uint16 u2LogID);
-    char*  GetLogInfoByLogName(uint16 u2LogID);
-    int    GetLogInfoByLogDisplay(uint16 u2LogID);
-    uint16 GetLogInfoByLogLevel(uint16 u2LogID);
+    virtual uint16 GetLogID(uint16 u2Index);
+    virtual char*  GetLogInfoByServerName(uint16 u2LogID);
+    virtual char*  GetLogInfoByLogName(uint16 u2LogID);
+    virtual int    GetLogInfoByLogDisplay(uint16 u2LogID);
+    virtual uint16 GetLogInfoByLogLevel(uint16 u2LogID);
 
 private:
     CLogFile**                     m_pLogFileList;

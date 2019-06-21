@@ -36,19 +36,6 @@ class CLogManager : public ACE_Task<ACE_MT_SYNCH>, public ILogManager
 {
 public:
     CLogManager(void);
-    virtual ~CLogManager(void);
-
-    CLogManager(const CLogManager& ar);
-
-    CLogManager& operator = (const CLogManager& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     virtual int open (void* args = 0);
     virtual int svc(void);

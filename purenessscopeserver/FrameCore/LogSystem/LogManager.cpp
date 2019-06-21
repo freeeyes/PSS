@@ -105,18 +105,6 @@ CLogManager::CLogManager(void):m_mutex(), m_cond(m_mutex)
     m_blIsMail      = false;
 }
 
-CLogManager::CLogManager(const CLogManager& ar) : CLogManager()
-{
-    (*this) = ar;
-}
-
-CLogManager::~CLogManager(void)
-{
-    OUR_DEBUG((LM_ERROR,"[CLogManager::~CLogManager].\n"));
-    SAFE_DELETE(m_pServerLogger);
-    OUR_DEBUG((LM_ERROR,"[CLogManager::~CLogManager]End.\n"));
-}
-
 int CLogManager::open(void* args)
 {
     if(args != NULL)
@@ -148,8 +136,14 @@ int CLogManager::svc(void)
         }
     }
 
+    //回收日志对象
+    m_pServerLogger->Close();
+    SAFE_DELETE(m_pServerLogger);
+
+    //回收日志块池
     m_objLogBlockPool.Close();
 
+    OUR_DEBUG((LM_ERROR, "[CLogManager::svc]Close OK.\n"));
     return 0;
 }
 
@@ -298,7 +292,6 @@ bool CLogManager::Dispose_Queue()
         m_cond.signal();
         m_mutex.release();
         m_blRun = false;
-        return true;
     }
     else
     {
