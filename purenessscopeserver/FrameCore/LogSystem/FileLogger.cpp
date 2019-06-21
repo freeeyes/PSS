@@ -16,15 +16,6 @@ CLogFile::CLogFile(const char* pFileRoot, uint32 u4BufferSize, uint32 u4FileMaxS
     sprintf_safe(m_szFileRoot, MAX_BUFF_100, "%s", pFileRoot);
 }
 
-CLogFile::~CLogFile()
-{
-    OUR_DEBUG((LM_INFO, "[CLogFile::~CLogFile].\n"));
-    SAFE_DELETE_ARRAY(m_pBuffer);
-    m_u4BufferSize = 0;
-    m_File.close();
-    OUR_DEBUG((LM_INFO, "[CLogFile::~CLogFile] End.\n"));
-}
-
 void CLogFile::Init()
 {
     //在这里初始化读取当前文件夹的文件最大序号和文件大小
@@ -81,6 +72,15 @@ void CLogFile::Init()
             }
         }
     }
+}
+
+void CLogFile::Close()
+{
+    OUR_DEBUG((LM_INFO, "[CLogFile::Close]m_StrlogName=%s.\n", m_StrlogName.c_str()));
+    SAFE_DELETE_ARRAY(m_pBuffer);
+    m_u4BufferSize = 0;
+    m_File.close();
+    OUR_DEBUG((LM_INFO, "[CLogFile::Close] End.\n"));
 }
 
 void CLogFile::SetFileRoot(const char* pFileRoot)
@@ -459,8 +459,9 @@ void CFileLogger::Close()
     {
         for(int i = 0; i < m_nCount; i++)
         {
-            if(NULL != m_pLogFileList[i])
+            if (NULL != m_pLogFileList[i])
             {
+                m_pLogFileList[i]->Close();
                 SAFE_DELETE(m_pLogFileList[i]);
             }
         }
