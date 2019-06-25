@@ -34,59 +34,9 @@ public:
         *ppMessage = this;
     }
 
-    //拷贝构造函数
-    _SendMessage(const _SendMessage& ar)
+    void Close()
     {
-        this->m_u1SendState = ar.m_u1SendState;
-        this->m_blDelete    = ar.m_blDelete;
-        this->m_pBuffPacket = ar.m_pBuffPacket;
-        this->m_u4ConnectID = ar.m_u4ConnectID;
-        this->m_nEvents     = ar.m_nEvents;
-        this->m_u2CommandID = ar.m_u2CommandID;
-        this->m_nHashID     = ar.m_nHashID;
-        this->m_nMessageID  = ar.m_nMessageID;
-        this->m_u1Type      = ar.m_u1Type;
-        this->m_tvSend      = ar.m_tvSend;
-
-        //这里设置消息队列模块指针内容，这样就不必反复的new和delete，提升性能
-        //指针关系也可以在这里直接指定，不必使用的使用再指定
-        this->m_pmbQueuePtr  = new ACE_Message_Block(sizeof(_SendMessage*));
-
-        _SendMessage** ppMessage = (_SendMessage**)m_pmbQueuePtr->base();
-        *ppMessage = this;
-    }
-
-    _SendMessage(_SendMessage&&) = default;
-
-    _SendMessage& operator = (const _SendMessage& ar)
-    {
-        if (this != &ar)
-        {
-            this->m_u1SendState = ar.m_u1SendState;
-            this->m_blDelete = ar.m_blDelete;
-            this->m_pBuffPacket = ar.m_pBuffPacket;
-            this->m_u4ConnectID = ar.m_u4ConnectID;
-            this->m_nEvents = ar.m_nEvents;
-            this->m_u2CommandID = ar.m_u2CommandID;
-            this->m_nHashID = ar.m_nHashID;
-            this->m_nMessageID = ar.m_nMessageID;
-            this->m_u1Type = ar.m_u1Type;
-            this->m_tvSend = ar.m_tvSend;
-
-            memcpy_safe((char*)ar.m_pmbQueuePtr->base(), (uint32)ar.m_pmbQueuePtr->length(), m_pmbQueuePtr->base(), (uint32)m_pmbQueuePtr->length());
-
-            _SendMessage** ppMessage = (_SendMessage**)m_pmbQueuePtr->base();
-            *ppMessage = this;
-        }
-
-        return *this;
-    }
-
-    _SendMessage& operator=(_SendMessage&&) = default;
-
-    ~_SendMessage()
-    {
-        if(NULL != m_pmbQueuePtr)
+        if (NULL != m_pmbQueuePtr)
         {
             m_pmbQueuePtr->release();
             m_pmbQueuePtr = NULL;
