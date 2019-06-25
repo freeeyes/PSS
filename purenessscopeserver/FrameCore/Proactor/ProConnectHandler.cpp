@@ -1885,6 +1885,9 @@ int CProConnectManager::svc (void)
         }
     }
 
+    //回收发送数据池
+    m_SendMessagePool.Close();
+
     OUR_DEBUG((LM_INFO,"[CProConnectManager::svc] svc finish!\n"));
     return 0;
 }

@@ -12,16 +12,6 @@ CReactorClientInfo::CReactorClientInfo()
     m_blIsLocal              = false;
 }
 
-CReactorClientInfo::CReactorClientInfo(const CReactorClientInfo& ar)
-{
-    (*this) = ar;
-}
-
-CReactorClientInfo::~CReactorClientInfo()
-{
-    OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::~CReactorClientInfo].\n"));
-}
-
 bool CReactorClientInfo::Init(int nServerID, const char* pIP, int nPort, uint8 u1IPType, CConnectClientConnector* pReactorConnect, IClientMessage* pClientMessage, ACE_Reactor* pReactor, uint32 u4PacketParseID)
 {
     int nRet = 0;
@@ -261,11 +251,6 @@ CClientReConnectManager::CClientReConnectManager(void)
     m_blReactorFinish        = false;
     m_u4ConnectServerTimeout = 0;
     m_u4MaxPoolCount         = 0;
-}
-
-CClientReConnectManager::~CClientReConnectManager(void)
-{
-    OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::~CClientReConnectManager].\n"));
 }
 
 bool CClientReConnectManager::Init(ACE_Reactor* pReactor)

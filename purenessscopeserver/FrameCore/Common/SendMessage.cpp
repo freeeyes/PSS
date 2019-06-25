@@ -4,18 +4,6 @@ CSendMessagePool::CSendMessagePool(void)
 {
 }
 
-CSendMessagePool::CSendMessagePool(const CSendMessagePool& ar)
-{
-    (*this) = ar;
-}
-
-CSendMessagePool::~CSendMessagePool(void)
-{
-    OUR_DEBUG((LM_INFO, "[CSendMessagePool::~CSendMessagePool].\n"));
-    Close();
-    OUR_DEBUG((LM_INFO, "[CSendMessagePool::~CSendMessagePool] End.\n"));
-}
-
 void CSendMessagePool::Init(int32 nObjcetCount)
 {
     Close();
@@ -45,6 +33,7 @@ void CSendMessagePool::Init(int32 nObjcetCount)
 
 void CSendMessagePool::Close()
 {
+    OUR_DEBUG((LM_INFO, "[CSendMessagePool::Close]Begin.\n"));
     //清理所有已存在的指针
     m_objHashHandleList.Close();
 
@@ -53,6 +42,8 @@ void CSendMessagePool::Close()
     {
         m_objSendMessageList.GetObject(i)->Close();
     }
+
+    OUR_DEBUG((LM_INFO, "[CSendMessagePool::Close]End.\n"));
 }
 
 _SendMessage* CSendMessagePool::Create()

@@ -1956,6 +1956,9 @@ int CConnectManager::svc (void)
         }
     }
 
+    //ªÿ ’∑¢ÀÕª∫≥Â≥ÿ
+    m_SendMessagePool.Close();
+
     OUR_DEBUG((LM_INFO,"[CConnectManager::svc] svc finish!\n"));
     return 0;
 }

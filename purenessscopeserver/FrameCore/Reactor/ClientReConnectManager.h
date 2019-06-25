@@ -20,19 +20,6 @@ class CReactorClientInfo
 {
 public:
     CReactorClientInfo();
-    ~CReactorClientInfo();
-
-    CReactorClientInfo(const CReactorClientInfo& ar);
-
-    CReactorClientInfo& operator = (const CReactorClientInfo& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     bool Init(int nServerID, const char* pIP, int nPort, uint8 u1IPType, CConnectClientConnector* pReactorConnect, IClientMessage* pClientMessage, ACE_Reactor* pReactor, uint32 u4PacketParseID);  //初始化链接地址和端口
     void SetLocalAddr(const char* pIP, int nPort, uint8 u1IPType);                         //绑定本地的IP和端口
@@ -66,17 +53,6 @@ class CClientReConnectManager : public ACE_Event_Handler, public IClientManager
 {
 public:
     CClientReConnectManager(void);
-    virtual ~CClientReConnectManager(void);
-
-    CClientReConnectManager& operator = (const CClientReConnectManager& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     bool Init(ACE_Reactor* pReactor);
     virtual bool Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, IClientMessage* pClientMessage);                                                             //链接服务器(TCP)
