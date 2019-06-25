@@ -9,11 +9,6 @@ ConnectAcceptor::ConnectAcceptor()
     m_u4PacketParseInfoID  = 0;
 }
 
-ConnectAcceptor::~ConnectAcceptor()
-{
-
-}
-
 void ConnectAcceptor::InitClientReactor(uint32 u4ClientReactorCount)
 {
     if(u4ClientReactorCount > 0)
@@ -174,18 +169,6 @@ CConnectAcceptorManager::CConnectAcceptorManager(void)
     m_szError[0]     = '\0';
 }
 
-CConnectAcceptorManager::CConnectAcceptorManager(const CConnectAcceptorManager& ar)
-{
-    (*this) = ar;
-}
-
-CConnectAcceptorManager::~CConnectAcceptorManager(void)
-{
-    OUR_DEBUG((LM_INFO, "[CConnectAcceptorManager::~CConnectAcceptorManager].\n"));
-    Close();
-    OUR_DEBUG((LM_INFO, "[CConnectAcceptorManager::~CConnectAcceptorManager]End.\n"));
-}
-
 bool CConnectAcceptorManager::InitConnectAcceptor(int nCount, uint32 u4ClientReactorCount)
 {
     try
@@ -216,6 +199,8 @@ bool CConnectAcceptorManager::InitConnectAcceptor(int nCount, uint32 u4ClientRea
 
 void CConnectAcceptorManager::Close()
 {
+    OUR_DEBUG((LM_INFO, "[CConnectAcceptorManager::Close]Begin.\n"));
+
     for (int i = 0; i < (int)m_vecConnectAcceptor.size(); i++)
     {
         ConnectAcceptor* pConnectAcceptor = m_vecConnectAcceptor[i];
@@ -226,6 +211,7 @@ void CConnectAcceptorManager::Close()
 
     m_vecConnectAcceptor.clear();
     m_nAcceptorCount = 0;
+    OUR_DEBUG((LM_INFO, "[CConnectAcceptorManager::Close]End.\n"));
 }
 
 bool CConnectAcceptorManager::Close(const char* pIP, uint32 n4Port)

@@ -24,13 +24,6 @@ CConsoleHandler::CConsoleHandler(void)
     m_u4SendCheckTime  = 0;
 }
 
-CConsoleHandler::~CConsoleHandler(void)
-{
-    OUR_DEBUG((LM_ERROR, "[CConsoleHandler::~CConsoleHandler].\n"));
-    SAFE_DELETE(m_pTCClose);
-    OUR_DEBUG((LM_ERROR, "[CConsoleHandler::~CConsoleHandler]End.\n"));
-}
-
 const char* CConsoleHandler::GetError()
 {
     return m_szError;
@@ -64,6 +57,7 @@ void CConsoleHandler::Close(int nIOCount)
         SAFE_DELETE(m_pPacketParse);
         shutdown();
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::Close]Close(%d) OK.\n", GetConnectID()));
+        SAFE_DELETE(m_pTCClose);
         delete this;
     }
 }

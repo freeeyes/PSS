@@ -22,17 +22,6 @@ class CConsoleHandler : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>
 {
 public:
     CConsoleHandler(void);
-    ~CConsoleHandler(void);
-
-    CConsoleHandler& operator = (const CConsoleHandler& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     //重写继承方法
     virtual int open(void*);                                                //用户建立一个链接

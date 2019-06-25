@@ -14,8 +14,6 @@ class ConnectAcceptor : public ACE_Acceptor<CConnectHandler, ACE_SOCK_ACCEPTOR>
 public:
     ConnectAcceptor();
 
-    virtual ~ConnectAcceptor();
-
     void InitClientReactor(uint32 u4ClientReactorCount);
     void SetPacketParseInfoID(uint32 u4PaccketParseInfoID);
     uint32 GetPacketParseInfoID();
@@ -54,19 +52,6 @@ class CConnectAcceptorManager
 {
 public:
     CConnectAcceptorManager(void);
-    ~CConnectAcceptorManager(void);
-
-    CConnectAcceptorManager(const CConnectAcceptorManager& ar);
-
-    CConnectAcceptorManager& operator = (const CConnectAcceptorManager& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     bool InitConnectAcceptor(int nCount, uint32 u4ClientReactorCount);
     void Close();
