@@ -18,6 +18,7 @@ void CUnit_ConnectHandler::setUp(void)
 
 void CUnit_ConnectHandler::tearDown(void)
 {
+    m_pConnectHandler->CloseFinally();
     delete m_pConnectHandler;
     m_pConnectHandler = NULL;
 }

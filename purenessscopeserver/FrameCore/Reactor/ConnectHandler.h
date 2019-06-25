@@ -43,17 +43,6 @@ class CConnectHandler : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>
 {
 public:
     CConnectHandler(void);
-    virtual ~CConnectHandler(void);
-
-    CConnectHandler& operator = (const CConnectHandler& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     //重写继承方法
     virtual int open(void*);                                                 //用户建立一个链接
@@ -72,13 +61,14 @@ public:
     bool CheckSendMask(uint32 u4PacketLen);                                  //检测指定的连接发送数据是否超过阻塞阀值
     bool SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, uint8 u1State, uint8 u1SendType, uint32& u4PacketSize, bool blDelete, int nServerID);  //发送当前数据
     bool SendCloseMessage();                                                 //发送连接关闭消息
-    bool SendTimeoutMessage ();                                              //发送连接超时消息                     
+    bool SendTimeoutMessage ();                                              //发送连接超时消息
 
     void SetRecvQueueTimeCost(uint32 u4TimeCost);                            //记录当前接收数据到模块处理完成的具体时间消耗
     void SetSendQueueTimeCost(uint32 u4TimeCost);                            //记录当前从发送队列到数据发送完成的具体时间消耗
     void SetLocalIPInfo(const char* pLocalIP, uint32 u4LocalPort);           //设置监听IP和端口信息
 
     void Close();                                                            //关闭当前连接
+    void CloseFinally();                                                     //替代析构函数，符合roz规则
 
     uint32      GetHandlerID();                                              //得到当前的handlerID
     const char* GetError();                                                  //得到当前错误信息
@@ -176,17 +166,6 @@ class CConnectManager : public ACE_Task<ACE_MT_SYNCH>
 {
 public:
     CConnectManager(void);
-    ~CConnectManager(void);
-
-    CConnectManager& operator = (const CConnectManager& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);   //定时器检查
 
@@ -260,19 +239,6 @@ class CConnectHandlerPool
 {
 public:
     CConnectHandlerPool(void);
-    ~CConnectHandlerPool(void);
-
-    CConnectHandlerPool(const CConnectHandlerPool& ar);
-
-    CConnectHandlerPool& operator = (const CConnectHandlerPool& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     void Init(int nObjcetCount);
     void Close();
@@ -295,19 +261,6 @@ class CConnectManagerGroup : public IConnectManager
 {
 public:
     CConnectManagerGroup();
-    ~CConnectManagerGroup();
-
-    CConnectManagerGroup(const CConnectManagerGroup& ar);
-
-    CConnectManagerGroup& operator = (const CConnectManagerGroup& ar)
-    {
-        if (this != &ar)
-        {
-            ACE_UNUSED_ARG(ar);
-        }
-
-        return *this;
-    }
 
     void Init(uint16 u2SendQueueCount);
     void Close();

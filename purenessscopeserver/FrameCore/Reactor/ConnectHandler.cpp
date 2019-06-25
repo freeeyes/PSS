@@ -46,13 +46,6 @@ CConnectHandler::CConnectHandler(void)
     m_u4LocalPort         = 0;
 }
 
-CConnectHandler::~CConnectHandler(void)
-{
-    this->closing_ = true;
-    SAFE_DELETE_ARRAY(m_pPacketDebugData);
-    m_u4PacketDebugSize = 0;
-}
-
 const char* CConnectHandler::GetError()
 {
     return m_szError;
@@ -93,6 +86,13 @@ void CConnectHandler::Close()
 
     //回归用过的指针
     App_ConnectHandlerPool::instance()->Delete(this);
+}
+
+void CConnectHandler::CloseFinally()
+{
+    this->closing_ = true;
+    SAFE_DELETE_ARRAY(m_pPacketDebugData);
+    m_u4PacketDebugSize = 0;
 }
 
 void CConnectHandler::Init(uint16 u2HandlerID)
@@ -1533,11 +1533,6 @@ CConnectManager::CConnectManager(void):m_mutex(), m_cond(m_mutex)
     m_SendMessagePool.Init();
 }
 
-CConnectManager::~CConnectManager(void)
-{
-    OUR_DEBUG((LM_INFO, "[CConnectManager::~CConnectManager].\n"));
-}
-
 void CConnectManager::CloseAll()
 {
     if(m_blRun)
@@ -2228,18 +2223,6 @@ CConnectHandlerPool::CConnectHandlerPool(void)
     m_u4CurrMaxCount = 1;
 }
 
-CConnectHandlerPool::CConnectHandlerPool(const CConnectHandlerPool& ar)
-{
-    (*this) = ar;
-}
-
-CConnectHandlerPool::~CConnectHandlerPool(void)
-{
-    OUR_DEBUG((LM_INFO, "[CConnectHandlerPool::~CConnectHandlerPool].\n"));
-    Close();
-    OUR_DEBUG((LM_INFO, "[CConnectHandlerPool::~CConnectHandlerPool]End.\n"));
-}
-
 void CConnectHandlerPool::Init(int nObjcetCount)
 {
     Close();
@@ -2272,11 +2255,20 @@ void CConnectHandlerPool::Init(int nObjcetCount)
 
 void CConnectHandlerPool::Close()
 {
+    OUR_DEBUG((LM_INFO, "[CConnectHandlerPool::Close]Begin.\n"));
     //清理所有已存在的指针
     m_u4CurrMaxCount  = 1;
 
     //删除hash表空间
     m_objHashHandleList.Close();
+
+    //回收内存
+    for (uint32 i = 0; i < m_objHandlerList.GetCount(); i++)
+    {
+        m_objHandlerList.GetObject(i)->CloseFinally();
+    }
+
+    OUR_DEBUG((LM_INFO, "[CConnectHandlerPool::Close]End.\n"));
 }
 
 int CConnectHandlerPool::GetUsedCount()
@@ -2331,18 +2323,6 @@ CConnectManagerGroup::CConnectManagerGroup()
     m_objConnnectManagerList = NULL;
     m_u4CurrMaxCount         = 0;
     m_u2ThreadQueueCount     = SENDQUEUECOUNT;
-}
-
-CConnectManagerGroup::CConnectManagerGroup(const CConnectManagerGroup& ar)
-{
-    (*this) = ar;
-}
-
-CConnectManagerGroup::~CConnectManagerGroup()
-{
-    OUR_DEBUG((LM_INFO, "[CConnectManagerGroup::~CConnectManagerGroup].\n"));
-
-    Close();
 }
 
 void CConnectManagerGroup::Close()

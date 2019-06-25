@@ -270,6 +270,8 @@ CAceReactorManager::CAceReactorManager(void)
 
 void CAceReactorManager::Close()
 {
+    OUR_DEBUG((LM_ERROR, "[CAceReactor::Close] Begin.\n"));
+
     if(NULL != m_pReactorList)
     {
         for (uint16 i = 0; i < m_u2RectorCount; i++)
@@ -286,6 +288,7 @@ void CAceReactorManager::Close()
 
     SAFE_DELETE_ARRAY(m_pReactorList);
     m_u2RectorCount = 0;
+    OUR_DEBUG((LM_ERROR, "[CAceReactor::Close] End.\n"));
 }
 
 void CAceReactorManager::Init(uint16 u2Count)
