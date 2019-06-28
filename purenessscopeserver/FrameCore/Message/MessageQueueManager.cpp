@@ -130,6 +130,8 @@ int CLogicThread::svc(void)
         m_objThreadInfo.m_pLogicQueue->Exit();
     }
 
+    m_MessagePool.Close_Object(CLogicThreadMessagePool::Close_Callback);
+
     SAFE_DELETE(m_objThreadInfo.m_pLogicQueue);
 
     return 0;
@@ -148,8 +150,6 @@ int CLogicThread::Close()
     {
         msg_queue()->deactivate();
     }
-
-    m_MessagePool.Close_Object(CLogicThreadMessagePool::Close_Callback);
 
     return 0;
 }
@@ -333,19 +333,18 @@ int CMessageQueueManager::CreateLogicThread(int nLogicThreadID, int nTimeout, IL
         return -1;
     }
 
-    CLogicThreadInfo* pLogicThreadInfo = new CLogicThreadInfo();
+    CLogicThreadInfo objLogicThreadInfo;
 
-    pLogicThreadInfo->m_nLogicThreadID         = nLogicThreadID;
-    pLogicThreadInfo->m_nTimeout               = nTimeout;
-    pLogicThreadInfo->m_pLogicQueue            = pLogicQueue;
+    objLogicThreadInfo.m_nLogicThreadID         = nLogicThreadID;
+    objLogicThreadInfo.m_nTimeout               = nTimeout;
+    objLogicThreadInfo.m_pLogicQueue            = pLogicQueue;
     pLogicThread = new CLogicThread();
 
-    pLogicThread->Init(*pLogicThreadInfo);
+    pLogicThread->Init(objLogicThreadInfo);
 
     if (false == pLogicThread->Start())
     {
         OUR_DEBUG((LM_INFO, "[CMessageQueueManager::CreateLogicThread]nLogicThreadID=%d Start error.\n", nLogicThreadID));
-        SAFE_DELETE(pLogicThreadInfo);
         SAFE_DELETE(pLogicThread);
         return -1;
     }
@@ -353,7 +352,6 @@ int CMessageQueueManager::CreateLogicThread(int nLogicThreadID, int nTimeout, IL
     if (0 > m_objThreadInfoList.Add_Hash_Data_By_Key_Unit32(nLogicThreadID, pLogicThread))
     {
         OUR_DEBUG((LM_INFO, "[CMessageQueueManager::CreateLogicThread]nLogicThreadID=%d add error.\n", nLogicThreadID));
-        SAFE_DELETE(pLogicThreadInfo);
         SAFE_DELETE(pLogicThread);
         return -1;
     }
@@ -375,8 +373,12 @@ int CMessageQueueManager::KillLogicThread(int nLogicThreadID)
     else
     {
         pLogicThread->Close();
-        SAFE_DELETE(pLogicThread);
         m_objThreadInfoList.Del_Hash_Data_By_Unit32((uint32)nLogicThreadID);
+
+        ACE_Time_Value tvSleep(0, 1000);
+        ACE_OS::sleep(tvSleep);
+
+        SAFE_DELETE(pLogicThread);
         return 0;
     }
 }

@@ -64,7 +64,7 @@ public:
     void Close_Object(Close_Callback fn_Close_Callback)
     {
         //调用所有的析构逻辑函数，执行析构前的数据清理动作
-        uint32 u4Size = m_objHashObjectList.Get_Count();
+        uint32 u4Size = m_objObjectList.GetCount();;
 
         for (uint32 i = 0; i < u4Size; i++)
         {

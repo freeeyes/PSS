@@ -30,6 +30,7 @@ void CUnit_Redirection::setUp(void)
 
 void CUnit_Redirection::tearDown(void)
 {
+    m_pTcpRedirection->Close();
     delete m_pTcpRedirection;
     m_pTcpRedirection = NULL;
 }

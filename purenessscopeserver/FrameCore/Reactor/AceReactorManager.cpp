@@ -201,6 +201,7 @@ int CAceReactor::svc()
             m_pReactor->run_reactor_event_loop();
         }
 
+        Close();
         OUR_DEBUG((LM_ERROR, "CAceReactor::Svc]Begin nReactorID= [%d] end .... \n", m_u4ReactorID));
         return 0;
     }
@@ -280,7 +281,7 @@ void CAceReactorManager::Close()
 
             if (NULL != pAceReactor)
             {
-                pAceReactor->Close();
+                pAceReactor->Stop();
                 SAFE_DELETE(pAceReactor);
             }
         }
