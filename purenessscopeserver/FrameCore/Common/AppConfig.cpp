@@ -34,7 +34,7 @@ bool CAppConfig::ReadConfig(const char* szConfigname)
             throw std::domain_error(szError);
         }
 
-        int32 nRet = (int32)m_pIniImp->import_config((ACE_TCHAR*)m_strConfigName.c_str());
+        int32 nRet = (int32)m_pIniImp->import_config(const_cast<ACE_TCHAR*>(m_strConfigName.c_str()));
 
         if (0 != nRet)
         {
@@ -66,7 +66,7 @@ bool CAppConfig::WriteConfig(const char* szConfigname)
             throw std::domain_error("[CAppConfig::WriteConfig]m_pIniImp is NULL.");
         }
 
-        int32 nRet = (int32)m_pIniImp->export_config((ACE_TCHAR*)szConfigname);
+        int32 nRet = (int32)m_pIniImp->export_config(const_cast<ACE_TCHAR*>(szConfigname));
 
         if (0 != nRet)
         {
@@ -98,7 +98,7 @@ bool CAppConfig::WriteConfig()
             throw std::domain_error("[CAppConfig::WriteConfig]m_pIniImp is NULL.");
         }
 
-        int32 nRet = (int32)m_pIniImp->export_config((ACE_TCHAR*)m_strConfigName.c_str());
+        int32 nRet = (int32)m_pIniImp->export_config(const_cast<ACE_TCHAR*>(m_strConfigName.c_str()));
 
         if (0 != nRet)
         {
@@ -128,10 +128,10 @@ bool CAppConfig::GetValue(const char* szName, ACE_TString& strValue, const char*
         }
         else
         {
-            m_pConfig->expand_path(m_pConfig->root_section(), (ACE_TCHAR*)szRoot, key, 0);
+            m_pConfig->expand_path(m_pConfig->root_section(), const_cast<ACE_TCHAR*>(szRoot), key, 0);
         }
 
-        int32 nRet = (int32)m_pConfig->get_string_value(key, (ACE_TCHAR*)szName, strValue);
+        int32 nRet = (int32)m_pConfig->get_string_value(key, const_cast<ACE_TCHAR*>(szName), strValue);
 
         if (0 != nRet)
         {
@@ -161,10 +161,10 @@ bool CAppConfig::SetValue(const char* szName, ACE_TString& strValue, const char*
         }
         else
         {
-            m_pConfig->expand_path(m_pConfig->root_section(), (ACE_TCHAR*)szRoot, key, 0);
+            m_pConfig->expand_path(m_pConfig->root_section(), const_cast<ACE_TCHAR*>(szRoot), key, 0);
         }
 
-        int32 nRet = (int32)m_pConfig->set_string_value(key, (ACE_TCHAR*)szName, strValue);
+        int32 nRet = (int32)m_pConfig->set_string_value(key, const_cast<ACE_TCHAR*>(szName), strValue);
 
         if (0 != nRet)
         {
