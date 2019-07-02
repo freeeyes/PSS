@@ -222,6 +222,12 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                     Close();
                     return;
                 }
+
+                //等待下一个数据
+                if (false == RecvData(GetXmlConfigAttribute(xmlConnectServer)->Recvbuff, NULL))
+                {
+                    OUR_DEBUG((LM_INFO, "[CProConnectClient::handle_read_stream](%d)RecvData is fail.\n", m_nServerID));
+                }
             }
         }
         else
