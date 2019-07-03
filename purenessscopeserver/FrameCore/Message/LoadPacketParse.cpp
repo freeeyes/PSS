@@ -165,6 +165,8 @@ void CLoadPacketParse::Close()
 
     uint32 u4Size = (uint32)vecPacketParseList.size();
 
+    OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::Close]u4Size=%d.\n", u4Size));
+
     for (uint32 i = 0; i < u4Size; i++)
     {
         if (NULL != vecPacketParseList[i] && NULL != vecPacketParseList[i]->m_hModule)
@@ -176,6 +178,8 @@ void CLoadPacketParse::Close()
 
         SAFE_DELETE(vecPacketParseList[i]);
     }
+
+    vecPacketParseList.clear();
 
     m_objPacketParseList.Close();
 }

@@ -68,6 +68,8 @@ void* thread_Monitor(void* arg)
         OUR_DEBUG((LM_INFO, "[thread_Monitor]arg is not NULL.\n"));
         pthread_exit(0);
     }
+	
+	g_mutex.acquire();
 
     bool blFlag = true;
 
@@ -210,6 +212,10 @@ int Chlid_Run()
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
     pthread_create(&tid, &attr, thread_Monitor, NULL);
+	
+	//等待线程锁生效
+   	ACE_Time_Value tvSleep(0, 1000);
+   	ACE_OS::sleep(tvSleep);	
 
     //第二步，启动主服务器监控
     if(!App_ServerManager::instance()->Init())
@@ -239,7 +245,7 @@ int Chlid_Run()
     //回收隐式加载PacketParse
     App_PacketParseLoader::instance()->Close();
 
-    pthread_exit(NULL);
+	return 0;
 }
 
 int ACE_TMAIN(int argc, ACE_TCHAR* argv[])

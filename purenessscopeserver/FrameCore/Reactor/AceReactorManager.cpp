@@ -109,6 +109,11 @@ void CAceReactor::Close()
     if (NULL != m_pReactor)
     {
         m_pReactor->close();
+
+        //µÈ´ýSVC½áÊø
+        ACE_Time_Value tvSleep(0, 50000);
+        ACE_OS::sleep(tvSleep);
+
         SAFE_DELETE(m_pReactor)
     }
 

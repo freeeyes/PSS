@@ -651,8 +651,6 @@ bool CServerManager::Close()
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_MessageManager OK.\n"));
     App_BuffPacketManager::instance()->Close_Object(CBuffPacketManager::Close_Callback);
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]BuffPacketManager OK\n"));
-    App_ReactorManager::instance()->StopReactor();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ReactorManager StopReactor OK.\n"));
     App_TcpRedirection::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_TcpRedirection OK.\n"));
     App_IPAccount::instance()->Close();

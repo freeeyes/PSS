@@ -2268,6 +2268,8 @@ void CConnectHandlerPool::Close()
         m_objHandlerList.GetObject(i)->CloseFinally();
     }
 
+    m_objHashHandleList.Close();
+
     OUR_DEBUG((LM_INFO, "[CConnectHandlerPool::Close]End.\n"));
 }
 
