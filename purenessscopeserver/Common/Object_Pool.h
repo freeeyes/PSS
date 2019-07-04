@@ -50,7 +50,7 @@ public:
 	//uFixedLength等于0,内存对象可以自动增长调用GC可回收,否则为固定长度GC无用
 	void Init(uint32 uFixedLength = 0)
 	{
-		CAutoLock lock(m_lock);
+		CAutoLock lock(&m_lock);
 		if (0 == uFixedLength)
 		{
 			//按64作为第一次增长,之后每次增加一倍
@@ -82,7 +82,7 @@ public:
 	//无参构造
 	ObjectType* Construct()
 	{
-		CAutoLock lock(m_lock);
+		CAutoLock lock(&m_lock);
 
 		char* pData = GetFreePointer();
 		if (pData == nullptr)
@@ -102,7 +102,7 @@ public:
 	template<class ... Args>
 	ObjectType* Construct(Args && ... args)
 	{
-		CAutoLock lock(m_lock);
+		CAutoLock lock(&m_lock);
 
 		char* pData = GetFreePointer();
 		if (pData == nullptr)
@@ -122,7 +122,7 @@ public:
 	// 销毁一个对象
 	void Destroy(ObjectType* const object)
 	{
-		CAutoLock lock(m_lock);
+		CAutoLock lock(&m_lock);
 
 		object->~ObjectType();
 		char* pData = (char*)(object);
@@ -132,7 +132,7 @@ public:
 	//内存回收(true为真释放内存,false为回收地址)
 	void GC(bool bEnforce = false)
 	{
-		CAutoLock lock(m_lock);
+		CAutoLock lock(&m_lock);
 		
 		ObjectType* object = nullptr;
 		char* pData = nullptr;
@@ -216,7 +216,7 @@ private:
 	//设置固定长度
 	void SetFixedLength(uint32 uFixedLength)
 	{
-		CAutoLock lock(m_lock);
+		CAutoLock lock(&m_lock);
 		m_uFixedLength = uFixedLength;
 	}
 
@@ -275,15 +275,11 @@ private:
 	CThreadLock m_lock;
 };
 
-//Type2Type就是用来保证T的构造调用
-template<class T>
-struct Type2Type {};
-
 // 对象池工厂
 template<class ObjectType>
 class CObjectPool_Factory
 {
-private:
+protected:
 	CObjectPool_Factory(){}
 public:
 	~CObjectPool_Factory(){}
@@ -296,10 +292,9 @@ public:
 	}
 
 	// 获得ObjectPool
-	//Type2Type保证 会像构造ObjectType
-	CObjectPool<ObjectType>* GetObjectPool(const Type2Type<ObjectType>& , const std::string& name)
+	CObjectPool<ObjectType>* GetObjectPool(const std::string& name)
 	{
-		CAutoLock lock(m_lock);
+		CAutoLock lock(&m_lock);
 
 		CObjectPool<ObjectType>* pool = nullptr;
 		auto it = m_poolMap.find(name);
@@ -318,7 +313,7 @@ public:
 	// 全体gc
 	void GC()
 	{
-		CAutoLock lock(m_lock);
+		CAutoLock lock(&m_lock);
 
 		for (auto it : m_poolMap)
 		{
@@ -332,13 +327,9 @@ private:
 	CThreadLock m_lock;
 };
 
-
-
-
-
 // 对象池指针定义
 #define DefineObjectPoolPtr(T, pPool) CObjectPool<T>* pPool
 // 获得特定对象池指针。
-#define GetObjectPoolPtr(T) CObjectPool_Factory<T>::GetSingleton().GetObjectPool(Type2Type<T>(),#T)
+#define GetObjectPoolPtr(T) CObjectPool_Factory<T>::GetSingleton().GetObjectPool(#T)
 // 直接定义对象池
 #define ObjectPoolPtr(T, pPool) DefineObjectPoolPtr(T, pPool) = GetObjectPoolPtr(T)

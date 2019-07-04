@@ -7,14 +7,6 @@ ILogicQueue::ILogicQueue(uint32 u4LogicThreadID, uint32 u4Timeout, std::string& 
 {
 }
 
-ILogicQueue::ILogicQueue(const ILogicQueue& ot)
-	: m_u4LogicThreadID(ot.m_u4LogicThreadID),
-	m_u4Timeout(ot.m_u4Timeout),
-	m_strDesc(ot.m_strDesc)
-{
-
-}
-
 ILogicQueue::~ILogicQueue()
 {
 }
