@@ -205,8 +205,8 @@ public:
 			m_FreeIndexs.push_back(it.first);
 		}
 		// 真正删除
-		int size = deleteList.size();
-		for (int i = 0; i < size; ++i)
+		size_t size = deleteList.size();
+		for (size_t i = 0; i < size; ++i)
 		{
 			m_FreePointerIndexs.erase(deleteList[i]);
 		}
@@ -242,7 +242,7 @@ private:
 		// 加入指针map中
 		m_FreePointerIndexs.insert(std::make_pair(m_growSize, pData));
 		// 加入空闲索引中
-		for (int i = 0; i < m_growSize; ++i)
+		for (uint32 i = 0; i < m_growSize; ++i)
 		{ 
 			m_FreeIndexs.push_back(pData + i);
 		}
