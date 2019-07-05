@@ -109,11 +109,6 @@ void CAceReactor::Close()
     if (NULL != m_pReactor)
     {
         m_pReactor->close();
-
-        //等待SVC结束
-        ACE_Time_Value tvSleep(0, 50000);
-        ACE_OS::sleep(tvSleep);
-
         SAFE_DELETE(m_pReactor)
     }
 
@@ -207,7 +202,7 @@ int CAceReactor::svc()
         }
 
         Close();
-        OUR_DEBUG((LM_ERROR, "CAceReactor::Svc]Begin nReactorID= [%d] end .... \n", m_u4ReactorID));
+        OUR_DEBUG((LM_ERROR, "CAceReactor::Svc]nReactorID= [%d] end .... \n", m_u4ReactorID));
         return 0;
     }
 }
@@ -287,6 +282,11 @@ void CAceReactorManager::Close()
             if (NULL != pAceReactor)
             {
                 pAceReactor->Stop();
+
+                //等待SVC结束
+                ACE_Time_Value tvSleep(0, 50000);
+                ACE_OS::sleep(tvSleep);
+
                 SAFE_DELETE(pAceReactor);
             }
         }

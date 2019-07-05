@@ -1562,6 +1562,9 @@ void CConnectManager::CloseAll()
         pConnectHandler->Close();
     }
 
+    //删除时间轮盘
+    m_TimeWheelLink.Close();
+
     //删除hash表空间
     m_objHashConnectList.Close();
 
