@@ -109,6 +109,11 @@ int CConsoleMessage::ParsePlugInCommand(const char* pCommand, IBuffPacket* pBuff
     return ParseCommand_Plugin(szPluginCommand, pBuffPacket, u1OutputType);
 }
 
+void CConsoleMessage::Close()
+{
+    m_objConsolePromissions.Close();
+}
+
 bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& CommandInfo, bool blCheck)
 {
     int nLen = (int)ACE_OS::strlen(pCommand);

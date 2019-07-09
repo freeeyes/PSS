@@ -462,6 +462,12 @@ bool CProServerManager::Close()
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_PacketParsePool OK.\n"));
     App_FileTestManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_FileTestManager OK.\n"));
+    App_ProactorManager::instance()->Close();
+    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ReactorManager OK.\n"));
+    App_ProConnectHandlerPool::instance()->Close();
+    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ConnectHandlerPool OK.\n"));
+    App_ConsoleManager::instance()->Close();
+    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ConsoleManager OK.\n"));
 
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close end....\n"));
 
