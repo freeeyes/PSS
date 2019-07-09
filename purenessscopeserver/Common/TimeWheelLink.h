@@ -99,6 +99,7 @@ public:
     {
         for (int i = 0; i < (int)m_vecHashContain.size(); i++)
         {
+            m_vecHashContain[i]->Close();
             delete m_vecHashContain[i];
         }
 

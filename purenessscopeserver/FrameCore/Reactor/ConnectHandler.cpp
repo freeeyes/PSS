@@ -1562,6 +1562,9 @@ void CConnectManager::CloseAll()
         pConnectHandler->Close();
     }
 
+    //删除时间轮盘
+    m_TimeWheelLink.Close();
+
     //删除hash表空间
     m_objHashConnectList.Close();
 
@@ -2334,6 +2337,11 @@ void CConnectManagerGroup::Close()
         for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
         {
             CConnectManager* pConnectManager = m_objConnnectManagerList[i];
+            pConnectManager->CloseAll();
+
+            ACE_Time_Value tvSleep(0, 5000);
+            ACE_OS::sleep(tvSleep);
+
             SAFE_DELETE(pConnectManager);
         }
     }
@@ -2682,15 +2690,7 @@ int CConnectManagerGroup::GetCount()
 
 void CConnectManagerGroup::CloseAll()
 {
-    for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
-    {
-        CConnectManager* pConnectManager = m_objConnnectManagerList[i];
-
-        if(NULL != pConnectManager)
-        {
-            pConnectManager->CloseAll();
-        }
-    }
+    Close();
 }
 
 bool CConnectManagerGroup::StartTimer()
