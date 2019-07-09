@@ -12,6 +12,8 @@ public:
     int Dispose(ACE_Message_Block* pmb, IBuffPacket* pBuffPacket, uint8& u1OutputType);     //要处理的命令字解析, pBuffPacket为返回要发送给客户端的数据
     int ParsePlugInCommand(const char* pCommand, IBuffPacket* pBuffPacket);                 //执行命令
 
+    void Close();                                                                           //关闭回收
+
     int Init();                                                                             //初始化命令参数
 
     //初始化部分

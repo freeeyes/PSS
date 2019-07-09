@@ -55,6 +55,7 @@ void CReactorUDPHander::Close()
 {
     ACE_Reactor_Mask close_mask = ACE_Event_Handler::ALL_EVENTS_MASK | ACE_Event_Handler::DONT_CALL;
     this->reactor()->remove_handler(this, close_mask);
+    SAFE_DELETE_ARRAY(m_pRecvBuff);
     m_skRemote.close();
 }
 
