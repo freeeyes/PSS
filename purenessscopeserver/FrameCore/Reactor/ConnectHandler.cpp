@@ -2339,7 +2339,7 @@ void CConnectManagerGroup::Close()
             CConnectManager* pConnectManager = m_objConnnectManagerList[i];
             pConnectManager->CloseAll();
 
-            ACE_Time_Value tvSleep(0, 5000);
+            ACE_Time_Value tvSleep(0, 100000);
             ACE_OS::sleep(tvSleep);
 
             SAFE_DELETE(pConnectManager);

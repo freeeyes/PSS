@@ -41,6 +41,7 @@ CCppUnitMain::CCppUnitMain()
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_LoadModule, "pss");
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_Redirection, "pss");
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_LogicThreadManager, "pss");
+    CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_TimerThread, "pss");
 }
 
 CCppUnitMain::~CCppUnitMain()
