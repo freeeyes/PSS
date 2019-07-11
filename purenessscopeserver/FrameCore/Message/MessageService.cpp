@@ -428,6 +428,7 @@ void CMessageService::CloseCommandList()
 
     for (uint32 i = 0; i < u4Size; i++)
     {
+        vecClientCommandList[i]->Close();
         SAFE_DELETE(vecClientCommandList[i]);
     }
 

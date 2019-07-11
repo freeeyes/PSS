@@ -16,6 +16,7 @@ void ts_timer::ITimerInfo::Set_Timer_Param(ITimeNode* pTimeNode, void* pArgConte
 {
     m_pTimeNode           = pTimeNode;
     m_pArgContext         = pArgContext;
+    m_ttBeginTime         = m_pTimeNode->GetBeginTime();
 }
 
 int ts_timer::ITimerInfo::Get_Timer_ID()
@@ -140,7 +141,7 @@ ts_timer::CTimerInfoList::CTimerInfoList() :
     m_nMaxCount(0),
     m_NextRunTimer(NULL),
     m_blRun(false),
-    m_emEventType(TIMER_DO_EVENT),
+    m_emEventType(TIMER_STOP),
     m_nThreadID(0),
     m_pMutex(NULL),
     m_pCond(NULL)

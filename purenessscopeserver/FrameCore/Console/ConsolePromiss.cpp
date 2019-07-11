@@ -50,6 +50,17 @@ void CConsolePromissions::Init(const char* pFileName)
 
 void CConsolePromissions::Close()
 {
+    //清理配置列表
+    vector<_Console_Command_Info*> vecConsoleCommandList;
+    m_objHashCommandList.Get_All_Used(vecConsoleCommandList);
+
+    uint32 u4Size = (uint32)vecConsoleCommandList.size();
+
+    for (uint32 i = 0; i < u4Size; i++)
+    {
+        SAFE_DELETE(vecConsoleCommandList[i]);
+    }
+
     m_objHashCommandList.Close();
 }
 

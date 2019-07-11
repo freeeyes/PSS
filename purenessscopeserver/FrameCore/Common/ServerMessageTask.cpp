@@ -159,11 +159,17 @@ int CServerMessageTask::Close()
         }
 
         OUR_DEBUG((LM_INFO, "[CServerMessageTask::Close]End.\n"));
+
+        //等待线程释放
+        ACE_Time_Value tvSleep(0, 1000);
+        ACE_OS::sleep(tvSleep);
     }
     else
     {
         msg_queue()->deactivate();
         msg_queue()->flush();
+
+        App_ServerMessageInfoPool::instance()->Close();
     }
 
     return 0;
