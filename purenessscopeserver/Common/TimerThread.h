@@ -3,7 +3,6 @@
 
 #include "TimerInfo.h"
 #include "ITSTimer.h"
-#include "define.h"
 
 namespace ts_timer
 {
