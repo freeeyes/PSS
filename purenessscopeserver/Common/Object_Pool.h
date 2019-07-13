@@ -34,14 +34,10 @@ class CObjectPool : public IObjectPool
 private:
 	typedef std::unordered_map<int, char*>  FreePointer;
 	typedef std::vector<char*>   FreeIndex;
-	typedef void* (*ObjectMalloc)(size_t);
-	typedef void (*ObjectFree)(void*);
 public:
 	CObjectPool()
 	{
 		m_isFixed = false;
-		MallocFunc = App_ACEMemory::instance()->malloc;
-		FreeFunc = App_ACEMemory::instance()->free;
 	}
 
 	~CObjectPool()
@@ -192,7 +188,7 @@ public:
 					findexs.erase(pData);
 				}
 				// 回收指针
-				FreeFunc(static_cast<void *>(it->second));
+				App_ACEMemory::instance()->free(static_cast<void *>(it->second));
 				// 删除该key
 				deleteList.push_back(m_growSize);
 
@@ -239,7 +235,7 @@ private:
 		
 		int objectSize = sizeof(ObjectType);
 
-		char* pData = static_cast<char*>(MallocFunc(m_growSize * objectSize));
+		char* pData = static_cast<char*>(App_ACEMemory::instance()->malloc(m_growSize * objectSize));
 		if (pData == NULL) 
 			return;
 		// 加入指针map中
@@ -267,8 +263,6 @@ private:
 		return pData;
 	}
 private:
-	ObjectFree FreeFunc;
-	ObjectMalloc MallocFunc;
 	FreePointer  m_FreePointerIndexs;// 空闲指针索引map,key为growSize
 	FreeIndex    m_FreeIndexs;       // 空闲索引列表
 	uint32       m_growSize;         // 内存增长的大小
