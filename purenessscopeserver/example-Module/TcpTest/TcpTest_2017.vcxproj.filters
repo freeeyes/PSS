@@ -24,9 +24,15 @@
     <ClCompile Include="TcpTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CGameLogic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CGameLogic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

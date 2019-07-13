@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <assert.h>
+#include <ACEMemory.h>
 #include "ThreadLock.h"
 
 /*
@@ -39,6 +40,8 @@ public:
 	CObjectPool()
 	{
 		m_isFixed = false;
+		MallocFunc = App_ACEMemory::instance()->malloc;
+		FreeFunc = App_ACEMemory::instance()->free;
 	}
 
 	~CObjectPool()
@@ -264,8 +267,8 @@ private:
 		return pData;
 	}
 private:
-	ObjectFree FreeFunc = ::free;
-	ObjectMalloc MallocFunc = ::malloc;
+	ObjectFree FreeFunc;
+	ObjectMalloc MallocFunc;
 	FreePointer  m_FreePointerIndexs;// 空闲指针索引map,key为growSize
 	FreeIndex    m_FreeIndexs;       // 空闲索引列表
 	uint32       m_growSize;         // 内存增长的大小
