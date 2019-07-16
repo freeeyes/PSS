@@ -356,6 +356,10 @@ int CMessageQueueManager::CreateLogicThread(int nLogicThreadID, int nTimeout, IL
         return -1;
     }
 
+    //添加线程启动唤醒等待时间
+    ACE_Time_Value tvSleep(0, 10000);
+    ACE_OS::sleep(tvSleep);
+
     return 0;
 }
 
