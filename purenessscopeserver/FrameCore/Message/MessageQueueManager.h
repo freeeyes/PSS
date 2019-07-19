@@ -16,6 +16,9 @@
 const uint16 LOGICTHREAD_MAX_COUNT = 100;
 const uint32 LOGICTHREAD_MESSAGE_MAX_COUNT = 2000;
 
+const uint16 LOGICTHREAD_CREATE_TIMEWAIT = 1000;
+const uint16 LOGICTHREAD_CLOSE_TIMEWAIT = 1000;
+
 //逻辑线程的消息体
 class CLogicThreadMessage
 {

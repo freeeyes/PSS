@@ -357,7 +357,7 @@ int CMessageQueueManager::CreateLogicThread(int nLogicThreadID, int nTimeout, IL
     }
 
     //添加线程启动唤醒等待时间
-    ACE_Time_Value tvSleep(0, 10000);
+    ACE_Time_Value tvSleep(0, LOGICTHREAD_CREATE_TIMEWAIT);
     ACE_OS::sleep(tvSleep);
 
     return 0;
@@ -379,7 +379,7 @@ int CMessageQueueManager::KillLogicThread(int nLogicThreadID)
         pLogicThread->Close();
         m_objThreadInfoList.Del_Hash_Data_By_Unit32((uint32)nLogicThreadID);
 
-        ACE_Time_Value tvSleep(0, 1000);
+        ACE_Time_Value tvSleep(0, LOGICTHREAD_CLOSE_TIMEWAIT);
         ACE_OS::sleep(tvSleep);
 
         SAFE_DELETE(pLogicThread);
