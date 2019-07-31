@@ -192,7 +192,7 @@ extern "C"
         uint32 u4HttpBodyLength = 0;
         uint8 u1Ret = GetHttpBodyLen(pHttpInfo->m_szData, pHttpInfo->m_u4DataLength, u4HttpHeadLen, u4HttpBodyLength, pPacketInfo);
 
-        if(u1Ret != PACKET_GET_ENOUGTH)
+        if(u1Ret != PACKET_GET_ENOUGH)
         {
             OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]u1Ret:%d.\n",u1Ret));
             return u1Ret;
@@ -228,7 +228,7 @@ extern "C"
         pCurrMessage->rd_ptr(u4Data);
 
         pHttpInfo->Clear();
-        return (uint8)PACKET_GET_ENOUGTH;
+        return (uint8)PACKET_GET_ENOUGH;
     }
 
     uint8 GetHttpBodyLen(char* pData, uint32 u4Len, uint32 u4HeadLen, uint32& u4BodyLen, _Packet_Info* pPacketInfo)
@@ -266,7 +266,7 @@ extern "C"
             //OUR_DEBUG((LM_ERROR, "[CPacketParse::GetHttpBodyLen]u4BodyLen=%d.\n", u4BodyLen));
             if(u4BodyLen == 0)
             {
-                return PACKET_GET_ENOUGTH;
+                return PACKET_GET_ENOUGH;
             }
 
             //如果接受的字节比http里面的数据长度短，说明没接受完
@@ -281,7 +281,7 @@ extern "C"
             u4BodyLen = u4Len - u4HeadLen;
         }
 
-        return PACKET_GET_ENOUGTH;
+        return PACKET_GET_ENOUGH;
     }
 
     //插件退出的时候调用

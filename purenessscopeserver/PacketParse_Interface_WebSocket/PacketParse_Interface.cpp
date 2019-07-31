@@ -235,7 +235,7 @@ extern "C"
 
         u4Len      = payloadSize + nFrameLen;
 
-        return PACKET_GET_ENOUGTH;
+        return PACKET_GET_ENOUGH;
     }
 
     uint8 ReadDataPacketInfo(const char* pData, uint32& u4DataLen, uint16& u2CommandID, uint32& u4PacketLen, _Packet_Info* pPacketInfo)
@@ -310,7 +310,7 @@ extern "C"
                 else
                 {
                     u4DataLen = u4PacketLen;
-                    return (uint8)PACKET_GET_ENOUGTH;
+                    return (uint8)PACKET_GET_ENOUGH;
                 }
             }
         }
@@ -379,7 +379,7 @@ extern "C"
             //设置缓冲处理完毕
             pWebSocketInfo->m_u4DataLength = 0;
 
-            return (uint8)PACKET_GET_ENOUGTH;
+            return (uint8)PACKET_GET_ENOUGH;
         }
         else
         {
@@ -422,7 +422,7 @@ extern "C"
         uint32 u4OriPacketLen = pWebSocketInfo->m_u4DataLength;
         u1Ret = Decrypt(pWebSocketInfo->m_szData, u4OriPacketLen, pDecryptData, u4DecryptLen);
 
-        if(u1Ret != (uint8)PACKET_GET_ENOUGTH)
+        if(u1Ret != (uint8)PACKET_GET_ENOUGH)
         {
             return u1Ret;
         }
@@ -453,7 +453,7 @@ extern "C"
         uint32 u4CurrDecryptDataLen = pWebSocketInfo->m_u4DecryptDataLen;
         u1Ret = ReadDataPacketInfo(pWebSocketInfo->m_szDecryptData, u4CurrDecryptDataLen, pPacketInfo->m_u2PacketCommandID, u4PacketLen, pPacketInfo);
 
-        if(u1Ret == PACKET_GET_ENOUGTH)
+        if(u1Ret == PACKET_GET_ENOUGH)
         {
             //申请一个包头，记录当前包的所有长度
             pPacketInfo->m_pmbHead = pMessageBlockManager->Create(sizeof(uint32));
@@ -514,7 +514,7 @@ extern "C"
                             pWebSocketInfo->m_u4DecryptDataLen);
             }
 
-            return (uint8)PACKET_GET_ENOUGTH;
+            return (uint8)PACKET_GET_ENOUGH;
         }
         else
         {

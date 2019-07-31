@@ -122,7 +122,7 @@ extern "C"
         OUR_DEBUG((LM_INFO, "[CPacketParse::Parse_Packet_Stream]u4ConnectID=%d,pCurrMessage=%d.\n", u4ConnectID, pCurrMessage->length()));
         PACKETPARSE_SHOW_END
 
-        return PACKET_GET_ENOUGTH;
+        return PACKET_GET_ENOUGH;
     }
 
     //拼接数据返回包，所有的返回数据包都会调用这个

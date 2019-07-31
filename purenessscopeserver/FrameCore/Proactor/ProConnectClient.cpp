@@ -197,7 +197,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                               &obj_Packet_Info,
                               CONNECT_IO_SERVER_TCP);
 
-                if (PACKET_GET_ENOUGTH == n1Ret)
+                if (PACKET_GET_ENOUGH == n1Ret)
                 {
 
                     //发送消息给消息框架

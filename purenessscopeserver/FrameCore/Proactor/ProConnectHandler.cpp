@@ -366,7 +366,7 @@ int CProConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Siz
         _Packet_Info obj_Packet_Info;
         uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Stream(GetConnectID(), pMbStream, dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info, CONNECT_IO_TCP);
 
-        if (PACKET_GET_ENOUGTH == n1Ret)
+        if (PACKET_GET_ENOUGH == n1Ret)
         {
             m_pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
             m_pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);
@@ -1080,7 +1080,7 @@ int CProConnectHandler::Dispose_Paceket_Parse_Stream(ACE_Message_Block* pCurrMes
             //接收的数据不完整，需要继续接收
             break;
         }
-        else if (PACKET_GET_ENOUGTH == n1Ret)
+        else if (PACKET_GET_ENOUGH == n1Ret)
         {
             //已经接收了完整数据包，扔给工作线程去处理
             if (false == CheckMessage())
