@@ -1,4 +1,4 @@
-#include "ConnectClient.h"
+R#include "ConnectClient.h"
 #include "ClientReConnectManager.h"
 
 CConnectClient::CConnectClient(void)
@@ -317,7 +317,7 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
                           &obj_Packet_Info,
                           CONNECT_IO_SERVER_TCP);
 
-            if (PACKET_GET_ENOUGTH == n1Ret)
+            if (PACKET_GET_ENOUGH == n1Ret)
             {
 
                 //发送消息给消息框架

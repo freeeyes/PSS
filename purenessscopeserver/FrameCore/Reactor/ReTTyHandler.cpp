@@ -159,7 +159,7 @@ int CReTTyHandler::handle_input(ACE_HANDLE handle)
                                   &obj_Packet_Info,
                                   CONNECT_IO_TTY);
 
-                    if (PACKET_GET_ENOUGTH == n1Ret)
+                    if (PACKET_GET_ENOUGH == n1Ret)
                     {
                         //发送消息给消息框架
                         CPacketParse* pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);

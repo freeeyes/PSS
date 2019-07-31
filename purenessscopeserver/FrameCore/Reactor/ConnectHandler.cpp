@@ -1404,7 +1404,7 @@ int CConnectHandler::Dispose_Paceket_Parse_Stream_Single(ACE_Message_Block* pCur
     {
         return 0;
     }
-    else if (PACKET_GET_ENOUGTH == n1Ret)
+    else if (PACKET_GET_ENOUGH == n1Ret)
     {
         if (false == CheckMessage())
         {
