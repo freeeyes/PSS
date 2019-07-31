@@ -44,7 +44,8 @@ extern "C"
     //解析包头，需要填充pHeadInfo数据结构，完成后填充_Head_Info的数据结构
     bool Parse_Packet_Head_Info(uint32 u4ConnectID, ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager, _Head_Info* pHeadInfo, EM_CONNECT_IO_TYPE emIOType)
     {
-		ACE_UNUSED_ARG(emIOType);
+        ACE_UNUSED_ARG(emIOType);
+
         if(NULL == pHeadInfo || NULL == pMessageBlockManager)
         {
             return false;
@@ -58,7 +59,8 @@ extern "C"
     //解析包体，需要填充pBodyInfo数据结构，完成后填充_Body_Info的数据结构
     bool Parse_Packet_Body_Info(uint32 u4ConnectID, ACE_Message_Block* pmbbody, IMessageBlockManager* pMessageBlockManager, _Body_Info* pBodyInfo, EM_CONNECT_IO_TYPE emIOType)
     {
-		ACE_UNUSED_ARG(emIOType);
+        ACE_UNUSED_ARG(emIOType);
+
         if(NULL == pBodyInfo || NULL == pMessageBlockManager)
         {
             return false;
@@ -72,7 +74,8 @@ extern "C"
     //流模式据解析，解析成功需要填充_Packet_Info结构
     uint8 Parse_Packet_Stream(uint32 u4ConnectID, ACE_Message_Block* pCurrMessage, IMessageBlockManager* pMessageBlockManager, _Packet_Info* pPacketInfo, EM_CONNECT_IO_TYPE emIOType)
     {
-		ACE_UNUSED_ARG(emIOType);
+        ACE_UNUSED_ARG(emIOType);
+
         //这里可以添加你的代码
         if(NULL == pCurrMessage || NULL == pMessageBlockManager)
         {
@@ -264,7 +267,7 @@ extern "C"
         char* pCommand = NULL;
         pCommand = (char* )ACE_OS::strstr(szTemp, ",");
 
-        if(NULL == pInfo)
+        if(NULL == pCommand)
         {
             //如果找不到逗号，说明这个命令包是错误的，断开连接
             return (uint8)PACKET_GET_ERROR;
