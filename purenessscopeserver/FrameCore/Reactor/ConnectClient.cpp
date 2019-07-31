@@ -1,4 +1,4 @@
-R#include "ConnectClient.h"
+#include "ConnectClient.h"
 #include "ClientReConnectManager.h"
 
 CConnectClient::CConnectClient(void)
