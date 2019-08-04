@@ -94,6 +94,7 @@ matrix:
         - cd $TRAVIS_BUILD_DIR/Build/Linux
         - killall PurenessScopeServer
         - sleep 5
+        - cat pssout.file
         # collect gcov report
         # - cd $TRAVIS_BUILD_DIR/purenessscopeserver/FrameCore/Linux_Bin/.obj
         # - gcovr -r ../ -o ../../report.xml --xml-pretty
@@ -156,7 +157,7 @@ matrix:
       - make -j 4
       - ./Test_Pss
       # - cd $TRAVIS_BUILD_DIR/purenessscopeserver/FrameCore/Linux_Bin
-      - cat pssout.file
+      # - cat pssout.file
       - killall -9 PurenessScopeServer     
       
       - cd $TRAVIS_BUILD_DIR
