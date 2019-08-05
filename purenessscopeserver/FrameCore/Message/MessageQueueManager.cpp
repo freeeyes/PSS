@@ -276,9 +276,9 @@ int CMessageQueueManager::handle_timeout(const ACE_Time_Value& tv, const void* a
 
     m_objThreadInfoList.Get_All_Used(vecLogicThreadList);
 
-    for (int i = 0; i < (int)vecLogicThreadList.size(); i++)
+    for (auto* pLogicThread : vecLogicThreadList)
     {
-        vecLogicThreadList[i]->CheckTimeout(tv);
+        pLogicThread->CheckTimeout(tv);
     }
 
     return 0;
@@ -310,12 +310,12 @@ void CMessageQueueManager::Close()
 
     m_objThreadInfoList.Get_All_Used(vecLogicThreadList);
 
-    for (int i = 0; i < (int)vecLogicThreadList.size(); i++)
+    for (auto* pLogicThread : vecLogicThreadList)
     {
-        vecLogicThreadList[i]->Close();
+        pLogicThread->Close();
 
         ACE_OS::sleep(tvSleep);
-        SAFE_DELETE(vecLogicThreadList[i]);
+        SAFE_DELETE(pLogicThread);
     }
 
     vecLogicThreadList.clear();

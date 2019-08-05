@@ -70,11 +70,11 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
     m_objClientCommandList.Init(App_MessageManager::instance()->GetMaxCommandCount());
 
     //初始化CommandID告警阀值相关
-    for(int i = 0; i < (int)GetXmlConfigAttribute(xmlCommandInfos)->vec.size(); i++)
+    for(auto& objCommandInfo : GetXmlConfigAttribute(xmlCommandInfos)->vec)
     {
-        m_CommandAccount.AddCommandAlert(GetXmlConfigAttribute(xmlCommandInfos)->vec[i].CommandID,
-                                         GetXmlConfigAttribute(xmlCommandInfos)->vec[i].CommandCount,
-                                         GetXmlConfigAttribute(xmlCommandInfos)->vec[i].MailID);
+        m_CommandAccount.AddCommandAlert(objCommandInfo.CommandID,
+                                         objCommandInfo.CommandCount,
+                                         objCommandInfo.MailID);
     }
 
 

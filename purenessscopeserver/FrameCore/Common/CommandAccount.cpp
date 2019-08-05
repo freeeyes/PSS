@@ -48,14 +48,9 @@ void CCommandAccount::Close()
     vector<_CommandData*> vecCommandData;
     m_objCommandDataList.Get_All_Used(vecCommandData);
 
-    uint32 u4Size = (uint32)vecCommandData.size();
-
-    for(uint32 i = 0; i < u4Size; i++)
+    for(_CommandData* pCommandData : vecCommandData)
     {
-        if(NULL != vecCommandData[i])
-        {
-            SAFE_DELETE(vecCommandData[i]);
-        }
+        SAFE_DELETE(pCommandData);
     }
 
     //回收端口统计内存
@@ -243,12 +238,8 @@ bool CCommandAccount::SaveCommandDataLog()
     vector<_CommandData*> vecCommandData;
     m_objCommandDataList.Get_All_Used(vecCommandData);
 
-    uint32 u4Size = (uint32)vecCommandData.size();
-
-    for(uint32 i = 0; i < u4Size; i++)
+    for(_CommandData* pCommandData : vecCommandData)
     {
-        _CommandData* pCommandData = vecCommandData[i];
-
         if(pCommandData != NULL)
         {
             ACE_Date_Time dtLastTime(pCommandData->m_tvCommandTime);

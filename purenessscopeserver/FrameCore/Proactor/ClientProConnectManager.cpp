@@ -674,10 +674,8 @@ void CClientProConnectManager::Close()
     vector<CProactorClientInfo*> vecProactorClientInfo;
     m_objClientTCPList.Get_All_Used(vecProactorClientInfo);
 
-    for(int i = 0; i < (int)vecProactorClientInfo.size(); i++)
+    for(auto* pClientInfo : vecProactorClientInfo)
     {
-        CProactorClientInfo* pClientInfo = vecProactorClientInfo[i];
-
         EM_s2s ems2s = S2S_INNEED_CALLBACK;
 
         if(NULL != pClientInfo)
@@ -692,10 +690,8 @@ void CClientProConnectManager::Close()
     vector<CProactorUDPClient*> vecProactorUDPClient;
     m_objClientUDPList.Get_All_Used(vecProactorUDPClient);
 
-    for(int i = 0; i < (int)vecProactorUDPClient.size(); i++)
+    for(auto* pClientInfo : vecProactorUDPClient)
     {
-        CProactorUDPClient* pClientInfo = vecProactorUDPClient[i];
-
         if(NULL != pClientInfo)
         {
             pClientInfo->Close();
@@ -722,10 +718,8 @@ int CClientProConnectManager::handle_timeout(const ACE_Time_Value& tv, const voi
     m_objClientTCPList.Get_All_Used(vecProactorClientInfo);
     m_ThreadWritrLock.release();
 
-    for(int i = 0; i < (int)vecProactorClientInfo.size(); i++)
+    for(auto* pClientInfo : vecProactorClientInfo)
     {
-        CProactorClientInfo* pClientInfo = vecProactorClientInfo[i];
-
         if(NULL != pClientInfo)
         {
             if(NULL == pClientInfo->GetProConnectClient())
@@ -846,10 +840,8 @@ void CClientProConnectManager::GetConnectInfo(vecClientConnectInfo& VecClientCon
     vector<CProactorClientInfo*> vecProactorClientInfo;
     m_objClientTCPList.Get_All_Used(vecProactorClientInfo);
 
-    for(int i = 0; i < (int)vecProactorClientInfo.size(); i++)
+    for(auto* pClientInfo : vecProactorClientInfo)
     {
-        CProactorClientInfo* pClientInfo = vecProactorClientInfo[i];
-
         if(NULL != pClientInfo)
         {
             if(NULL != pClientInfo->GetProConnectClient())
@@ -877,10 +869,8 @@ void CClientProConnectManager::GetUDPConnectInfo(vecClientConnectInfo& VecClient
     vector<CProactorUDPClient*> vecProactorUDPClient;
     m_objClientUDPList.Get_All_Used(vecProactorUDPClient);
 
-    for(int i = 0; i < (int)vecProactorUDPClient.size(); i++)
+    for(auto* pClientInfo : vecProactorUDPClient)
     {
-        CProactorUDPClient* pClientInfo = vecProactorUDPClient[i];
-
         if(NULL != pClientInfo)
         {
             _ClientConnectInfo ClientConnectInfo = pClientInfo->GetClientConnectInfo();
@@ -1032,10 +1022,8 @@ bool CClientProConnectManager::DeleteIClientMessage(IClientMessage* pClientMessa
     vector<CProactorClientInfo*> vecProactorClientInfo;
     m_objClientTCPList.Get_All_Used(vecProactorClientInfo);
 
-    for(int i = 0; i < (int)vecProactorClientInfo.size(); i++)
+    for(auto* pClientInfo : vecProactorClientInfo)
     {
-        CProactorClientInfo* pClientInfo = vecProactorClientInfo[i];
-
         if(NULL != pClientInfo && pClientInfo->GetClientMessage() == pClientMessage)
         {
             //关闭连接，并删除对象。

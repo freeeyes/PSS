@@ -74,10 +74,10 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1LoadS
     if(NULL != pModuleClient)
     {
         //从插件目前注册的命令里面找到所有该插件的信息，一个个释放
-        for(uint32 u4Index = 0; u4Index < (uint32)pModuleClient->m_vecClientCommandInfo.size(); u4Index++)
+        for(auto* pClientCommandInfo : pModuleClient->m_vecClientCommandInfo)
         {
             //在命令列表中删除指定命令的映射关系
-            DeleteCommandByModule(pModuleClient->m_vecClientCommandInfo[u4Index]);
+            DeleteCommandByModule(pClientCommandInfo);
         }
 
         u4TmpUpdateIndex++;

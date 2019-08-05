@@ -143,12 +143,10 @@ uint16 CWorkThreadAI::GetReturnDataLength()
 
 void CWorkThreadAI::Close()
 {
-    uint32 u4Size = (uint32)m_vecCommandTime.size();
-
-    for(uint32 i = 0; i < u4Size; i++)
+    for(auto* pCommandTime : m_vecCommandTime)
     {
-        m_vecCommandTime[i]->m_objTime.Close();
-        SAFE_DELETE(m_vecCommandTime[i]);
+        pCommandTime->m_objTime.Close();
+        SAFE_DELETE(pCommandTime);
     }
 
     m_vecCommandTime.clear();
@@ -175,12 +173,8 @@ void CWorkThreadAI::GetAIInfo(_WorkThreadAIInfo& objWorkThreadAIInfo)
 
 void CWorkThreadAI::GetAllTimeout(uint32 u4ThreadID, vecCommandTimeout& objTimeout)
 {
-    uint32 u4Size = (uint32)m_vecCommandTime.size();
-
-    for(uint32 i = 0; i < u4Size; i++)
+    for(auto* pCommandTime : m_vecCommandTime)
     {
-        _CommandTime* pCommandTime = m_vecCommandTime[i];
-
         if(NULL != pCommandTime)
         {
             for(int j = pCommandTime->m_objTime.GetCount() - 1; j >= 0; j--)
@@ -202,14 +196,12 @@ void CWorkThreadAI::GetAllTimeout(uint32 u4ThreadID, vecCommandTimeout& objTimeo
 
 void CWorkThreadAI::GetAllForbiden(uint32 u4ThreadID, vecCommandTimeout& objForbiden)
 {
-    uint32 u4Size = (uint32)m_vecCommandTimeout.size();
-
-    for(uint32 i = 0; i < u4Size; i++)
+    for(auto& objCommandTimeout : m_vecCommandTimeout)
     {
         _CommandTimeout objData;
         objData.m_u4ThreadID  = u4ThreadID;
-        objData.m_u2CommandID = m_vecCommandTimeout[i].m_u2CommandID;
-        objData.m_u8Second    = m_vecCommandTimeout[i].m_u8Second;
+        objData.m_u2CommandID = objCommandTimeout.m_u2CommandID;
+        objData.m_u8Second    = objCommandTimeout.m_u8Second;
         objForbiden.push_back(objData);
     }
 }

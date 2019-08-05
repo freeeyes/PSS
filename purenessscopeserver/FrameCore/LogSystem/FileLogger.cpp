@@ -588,17 +588,17 @@ bool CFileLogger::Init()
     m_pLogFileList = new CLogFile*[m_nCount];
     memset(m_pLogFileList, 0, sizeof(CLogFile*)*m_nCount);
 
-    for(int i = 0; i < (int)objvecLogFileInfo.size(); i++)
+    for(auto& objFileInfo : objvecLogFileInfo)
     {
-        int nPos = objvecLogFileInfo[i].m_u2LogID % m_nCount;
+        int nPos = objFileInfo.m_u2LogID % m_nCount;
         CLogFile* pLogFile = new CLogFile(m_szLogRoot, m_u4BlockSize, u4FileMaxSize);
 
-        pLogFile->SetLoggerName(objvecLogFileInfo[i].m_szFileName);
-        pLogFile->SetLoggerID(objvecLogFileInfo[i].m_u2LogID);
-        pLogFile->SetLoggerClass(objvecLogFileInfo[i].m_u1FileClass);
-        pLogFile->SetLevel(objvecLogFileInfo[i].m_u2LogLevel);
+        pLogFile->SetLoggerName(objFileInfo.m_szFileName);
+        pLogFile->SetLoggerID(objFileInfo.m_u2LogID);
+        pLogFile->SetLoggerClass(objFileInfo.m_u1FileClass);
+        pLogFile->SetLevel(objFileInfo.m_u2LogLevel);
         pLogFile->SetServerName(szServerName);
-        pLogFile->SetDisplay(objvecLogFileInfo[i].m_u1DisPlay);
+        pLogFile->SetDisplay(objFileInfo.m_u1DisPlay);
         pLogFile->Init();
 
         if (false == pLogFile->Run())

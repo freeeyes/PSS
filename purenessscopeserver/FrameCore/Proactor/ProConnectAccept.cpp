@@ -121,10 +121,8 @@ void CProConnectAcceptManager::Close()
 {
     ACE_Time_Value tvSleep(0, 10000);
 
-    for(int i = 0; i < (int)m_vecConnectAcceptor.size(); i++)
+    for(auto* pConnectAcceptor : m_vecConnectAcceptor)
     {
-        ProConnectAcceptor* pConnectAcceptor = m_vecConnectAcceptor[i];
-
         if(NULL != pConnectAcceptor)
         {
             pConnectAcceptor->cancel();
@@ -183,12 +181,12 @@ const char* CProConnectAcceptManager::GetError()
 bool CProConnectAcceptManager::CheckIPInfo(const char* pIP, uint32 n4Port)
 {
     //找到符合条件指定的端口停止监听
-    for(int i = 0; i < (int)m_vecConnectAcceptor.size(); i++)
+    for(auto* ProConnectAcceptor : m_vecConnectAcceptor)
     {
-        if (NULL != m_vecConnectAcceptor[i])
+        if (NULL != ProConnectAcceptor)
         {
-            if(ACE_OS::strcmp(m_vecConnectAcceptor[i]->GetListenIP(), pIP) == 0
-               && m_vecConnectAcceptor[i]->GetListenPort() == n4Port)
+            if(ACE_OS::strcmp(ProConnectAcceptor->GetListenIP(), pIP) == 0
+               && ProConnectAcceptor->GetListenPort() == n4Port)
             {
                 return true;
             }

@@ -1476,9 +1476,8 @@ void CProConnectManager::CloseAll()
     m_objHashConnectList.Get_All_Used(vecCloseConnectHandler);
 
     //开始关闭所有连接
-    for(int i = 0; i < (int)vecCloseConnectHandler.size(); i++)
+    for(auto* pConnectHandler : vecCloseConnectHandler)
     {
-        CProConnectHandler* pConnectHandler = vecCloseConnectHandler[i];
         pConnectHandler->Close();
     }
 
@@ -1905,10 +1904,8 @@ void CProConnectManager::GetConnectInfo(vecClientConnectInfo& VecClientConnectIn
     vector<CProConnectHandler*> vecProConnectHandle;
     m_objHashConnectList.Get_All_Used(vecProConnectHandle);
 
-    for(int i = 0; i < (int)vecProConnectHandle.size(); i++)
+    for(auto* pConnectHandler : vecProConnectHandle)
     {
-        CProConnectHandler* pConnectHandler = vecProConnectHandle[i];
-
         if(pConnectHandler != NULL)
         {
             VecClientConnectInfo.push_back(pConnectHandler->GetClientInfo());
@@ -1962,13 +1959,13 @@ _ClientIPInfo CProConnectManager::GetLocalIPInfo(uint32 u4ConnectID)
 bool CProConnectManager::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
     m_ThreadWriteLock.acquire();
-    vector<CProConnectHandler*> objveCProConnectManager;
-    m_objHashConnectList.Get_All_Used(objveCProConnectManager);
+    vector<CProConnectHandler*> objvecProConnectManager;
+    m_objHashConnectList.Get_All_Used(objvecProConnectManager);
     m_ThreadWriteLock.release();
 
     uint32 u4ConnectID = 0;
 
-    for(uint32 i = 0; i < (uint32)objveCProConnectManager.size(); i++)
+    for(auto* pProConnectManager : objvecProConnectManager)
     {
         IBuffPacket* pCurrBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
@@ -1995,7 +1992,7 @@ bool CProConnectManager::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendT
 
         if(NULL != mb)
         {
-            pSendMessage->m_u4ConnectID = objveCProConnectManager[i]->GetConnectID();
+            pSendMessage->m_u4ConnectID = pProConnectManager->GetConnectID();
             pSendMessage->m_pBuffPacket = pCurrBuffPacket;
             pSendMessage->m_nEvents     = u1SendType;
             pSendMessage->m_u2CommandID = u2CommandID;
@@ -2088,10 +2085,8 @@ void CProConnectManager::GetClientNameInfo(const char* pName, vecClientNameInfo&
     vector<CProConnectHandler*> vecProConnectHandle;
     m_objHashConnectList.Get_All_Used(vecProConnectHandle);
 
-    for(int i = 0; i < (int)vecProConnectHandle.size(); i++)
+    for(auto* pConnectHandler : vecProConnectHandle)
     {
-        CProConnectHandler* pConnectHandler = vecProConnectHandle[i];
-
         if(NULL != pConnectHandler && ACE_OS::strcmp(pConnectHandler->GetConnectName(), pName) == 0)
         {
             _ClientNameInfo ClientNameInfo = Tcp_Common_ClientNameInfo((int)pConnectHandler->GetConnectID(),
@@ -2469,10 +2464,9 @@ bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPac
 {
     uint32 u4ConnectID = 0;
 
-    for(uint32 i = 0; i < (uint32)vecConnectID.size(); i++)
+    for(auto& u4ConnectID : vecConnectID)
     {
         //判断命中到哪一个线程组里面去
-        u4ConnectID = vecConnectID[i];
         uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
         CProConnectManager* pConnectManager = m_objProConnnectManagerList[u2ThreadIndex];
@@ -2510,12 +2504,9 @@ bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPac
 
 bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, char*& pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
-    uint32 u4ConnectID = 0;
-
-    for(uint32 i = 0; i < (uint32)vecConnectID.size(); i++)
+    for(auto& u4ConnectID : vecConnectID)
     {
         //判断命中到哪一个线程组里面去
-        u4ConnectID = vecConnectID[i];
         uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
         CProConnectManager* pConnectManager = m_objProConnnectManagerList[u2ThreadIndex];

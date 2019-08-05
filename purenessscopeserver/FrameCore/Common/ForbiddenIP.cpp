@@ -52,10 +52,10 @@ bool CForbiddenIP::Init(const char* szConfigPath)
 
 bool CForbiddenIP::CheckIP(const char* pIP, uint8 u1ConnectType)
 {
-    for(int32 i = 0; i < (int32)m_VecForeverForbiddenIP.size(); i++)
+    for(_ForbiddenIP& objForbiddenIP : m_VecForeverForbiddenIP)
     {
-        if(m_VecForeverForbiddenIP[i].m_u1ConnectType == u1ConnectType
-           && CompareIP(m_VecForeverForbiddenIP[i].m_szClientIP, (char* )pIP) == true)
+        if(objForbiddenIP.m_u1ConnectType == u1ConnectType
+           && CompareIP(objForbiddenIP.m_szClientIP, (char* )pIP) == true)
         {
             return false;
         }
@@ -167,15 +167,15 @@ bool CForbiddenIP::SaveConfig()
         return false;
     }
 
-    for(int32 i = 0; i < (int32)m_VecForeverForbiddenIP.size(); i++)
+    for(_ForbiddenIP& objForbiddenIP : m_VecForeverForbiddenIP)
     {
-        if(m_VecForeverForbiddenIP[i].m_u1ConnectType == CONNECT_TCP)
+        if(objForbiddenIP.m_u1ConnectType == CONNECT_TCP)
         {
-            sprintf_safe(szTemp, MAX_BUFF_500, "<ForbiddenIP ip=\"%s\" type=\"TCP\" desc=\"ForbiddenIP£¬type is 'TCP' or 'UDP'\" />\r\n", m_VecForeverForbiddenIP[i].m_szClientIP);
+            sprintf_safe(szTemp, MAX_BUFF_500, "<ForbiddenIP ip=\"%s\" type=\"TCP\" desc=\"ForbiddenIP£¬type is 'TCP' or 'UDP'\" />\r\n", objForbiddenIP.m_szClientIP);
         }
         else
         {
-            sprintf_safe(szTemp, MAX_BUFF_500, "<ForbiddenIP ip=\"%s\" type=\"UDP\" desc=\"ForbiddenIP£¬type is 'TCP' or 'UDP'\" />\r\n", m_VecForeverForbiddenIP[i].m_szClientIP);
+            sprintf_safe(szTemp, MAX_BUFF_500, "<ForbiddenIP ip=\"%s\" type=\"UDP\" desc=\"ForbiddenIP£¬type is 'TCP' or 'UDP'\" />\r\n", objForbiddenIP.m_szClientIP);
         }
 
         stSize = ACE_OS::fwrite(szTemp, sizeof(char), ACE_OS::strlen(szTemp), pFile);
