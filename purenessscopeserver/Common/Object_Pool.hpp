@@ -32,8 +32,8 @@ template<class ObjectType>
 class CObjectPool : public IObjectPool
 {
 private:
-	typedef std::unordered_map<int, char*>  FreePointer;
-	typedef std::vector<char*>   FreeIndex;
+	typedef std::unordered_map<int, ObjectType*>  FreePointer;
+	typedef std::vector<ObjectType*>   FreeIndex;
 public:
 	CObjectPool()
 	{
@@ -83,7 +83,7 @@ public:
 	{
 		CAutoLock lock(&m_lock);
 
-		char* pData = GetFreePointer();
+		auto pData = GetFreePointer();
 		if (pData == nullptr)
 		{
 			//记录日志
@@ -103,7 +103,7 @@ public:
 	{
 		CAutoLock lock(&m_lock);
 
-		char* pData = GetFreePointer();
+		ObjectType* pData = GetFreePointer();
 		if (pData == nullptr)
 		{
 			//记录日志
@@ -124,8 +124,7 @@ public:
 		CAutoLock lock(&m_lock);
 
 		object->~ObjectType();
-		char* pData = (char*)(object);
-		m_FreeIndexs.push_back(pData);
+		m_FreeIndexs.push_back(object);
 	}
 
 	//内存回收(true为真释放内存,false为回收地址)
@@ -134,10 +133,10 @@ public:
 		CAutoLock lock(&m_lock);
 		
 		ObjectType* object = nullptr;
-		char* pData = nullptr;
+		ObjectType* pData = nullptr;
 
 		// 构造一个map来使查找m_FreeIndexs更加快捷一些
-		std::unordered_map<char*, bool> findexs;
+		std::unordered_map<ObjectType*, bool> findexs;
 		{
 			for (auto it : m_FreeIndexs)
 			{
@@ -235,7 +234,7 @@ private:
 		
 		int objectSize = sizeof(ObjectType);
 
-		char* pData = static_cast<char*>(App_ACEMemory::instance()->malloc(m_growSize * objectSize));
+		ObjectType* pData = static_cast<ObjectType*>(App_ACEMemory::instance()->malloc(m_growSize * objectSize));
 		if (pData == NULL) 
 			return;
 		// 加入指针map中
@@ -252,13 +251,13 @@ private:
 		m_growSize *= 2;
 	}
 
-	char* GetFreePointer()
+	ObjectType* GetFreePointer()
 	{
 		if (m_FreeIndexs.empty())
 			Grow();
 		if (m_FreeIndexs.empty())
 			return NULL;
-		char* pData = m_FreeIndexs.back();
+		ObjectType* pData = m_FreeIndexs.back();
 		m_FreeIndexs.pop_back();
 		return pData;
 	}
