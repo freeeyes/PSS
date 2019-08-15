@@ -198,7 +198,7 @@ static bool Convert_Version(int nTagVserion)
 #define PACKET_WITHHEAD                   1      //带包头的数据包模式
 
 #define PACKET_GET_ENOUGH                 0      //得到完整的数据包，需要继续接收
-#define PACKET_GET_NO_ENOUGTH             1      //得到的数据包不完整
+#define PACKET_GET_NO_ENOUGH             1      //得到的数据包不完整
 #define PACKET_GET_ERROR                  2      //数据包格式错误
 
 #define MAX_PACKET_SIZE     1024*1024            //最大允许的包尺寸

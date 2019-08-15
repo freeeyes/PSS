@@ -164,7 +164,7 @@ extern "C"
         if(NULL == pHttpHead)
         {
             OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]pHttpHead is NULL.\n"));
-            return PACKET_GET_NO_ENOUGTH;
+            return PACKET_GET_NO_ENOUGH;
         }
 
         //OUR_DEBUG((LM_ERROR, "[CPacketParse::HttpDispose]http:\n%s", pHttpInfo->m_szData));
@@ -272,7 +272,7 @@ extern "C"
             //如果接受的字节比http里面的数据长度短，说明没接受完
             if(u4BodyLen > u4Len - u4HeadLen)
             {
-                return PACKET_GET_NO_ENOUGTH;
+                return PACKET_GET_NO_ENOUGH;
             }
         }
         else

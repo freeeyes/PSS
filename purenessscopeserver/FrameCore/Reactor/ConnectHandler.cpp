@@ -1400,7 +1400,7 @@ int CConnectHandler::Dispose_Paceket_Parse_Stream_Single(ACE_Message_Block* pCur
 {
     uint8 n1Ret = Tcp_Common_Recv_Stream(GetConnectID(), pCurrMessage, m_pPacketParse, m_u4PacketParseInfoID);
 
-    if (PACKET_GET_NO_ENOUGTH == n1Ret)
+    if (PACKET_GET_NO_ENOUGH == n1Ret)
     {
         return 0;
     }

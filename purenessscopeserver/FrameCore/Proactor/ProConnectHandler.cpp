@@ -384,7 +384,7 @@ int CProConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Siz
             }
 
         }
-        else if (PACKET_GET_NO_ENOUGTH == n1Ret)
+        else if (PACKET_GET_NO_ENOUGH == n1Ret)
         {
             return 0;
         }
@@ -1075,7 +1075,7 @@ int CProConnectHandler::Dispose_Paceket_Parse_Stream(ACE_Message_Block* pCurrMes
         //处理消息
         uint8 n1Ret = Tcp_Common_Recv_Stream(GetConnectID(), pCurrMessage, m_pPacketParse, m_u4PacketParseInfoID);
 
-        if (PACKET_GET_NO_ENOUGTH == n1Ret)
+        if (PACKET_GET_NO_ENOUGH == n1Ret)
         {
             //接收的数据不完整，需要继续接收
             break;

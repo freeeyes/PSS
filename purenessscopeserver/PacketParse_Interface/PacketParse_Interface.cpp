@@ -133,7 +133,7 @@ extern "C"
         if (pCurrMessage->length() <= u4HeadLen)
         {
             //不够数据包头
-            return PACKET_GET_NO_ENOUGTH;
+            return PACKET_GET_NO_ENOUGH;
         }
 
         ACE_Message_Block* pHeadmb = pMessageBlockManager->Create(u4HeadLen);

@@ -145,7 +145,7 @@ extern "C"
 
         if(u4Len < 6)
         {
-            return PACKET_GET_NO_ENOUGTH;
+            return PACKET_GET_NO_ENOUGH;
         }
 
         unsigned char* mp_mask_byte = NULL;
@@ -174,7 +174,7 @@ extern "C"
 
             if (u4Len < (uint32)nMinExpectedSize)
             {
-                return PACKET_GET_NO_ENOUGTH;
+                return PACKET_GET_NO_ENOUGH;
             }
 
             payloadSize = ntohs( *(u_short*) (pOriData + 2) );
@@ -187,7 +187,7 @@ extern "C"
 
             if (u4Len < (uint32)nMinExpectedSize)
             {
-                return PACKET_GET_NO_ENOUGTH;
+                return PACKET_GET_NO_ENOUGH;
             }
 
             payloadSize = ntohl( *(u_long*) (pOriData + 2) );
@@ -203,7 +203,7 @@ extern "C"
 
         if (u4Len < (uint32)nMinExpectedSize)
         {
-            return PACKET_GET_NO_ENOUGTH;
+            return PACKET_GET_NO_ENOUGH;
         }
 
         char masks[4];
@@ -305,7 +305,7 @@ extern "C"
                 //判断包是否接收完整了
                 if(u4PacketLen > u4AllDataCount)
                 {
-                    return (uint8)PACKET_GET_NO_ENOUGTH;
+                    return (uint8)PACKET_GET_NO_ENOUGH;
                 }
                 else
                 {
@@ -384,7 +384,7 @@ extern "C"
         else
         {
             //没有接收到完整的握手数据包，继续接收
-            return (uint8)PACKET_GET_NO_ENOUGTH;
+            return (uint8)PACKET_GET_NO_ENOUGH;
         }
     }
 
@@ -432,7 +432,7 @@ extern "C"
         //如果接受字节少于9个，则认为包头不完整
         if(u4Data < 9)
         {
-            return (uint8)PACKET_GET_NO_ENOUGTH;
+            return (uint8)PACKET_GET_NO_ENOUGH;
         }
 
         //已经解析出完整数据包，判断是否有后续数据包的部分数据
