@@ -102,6 +102,8 @@ private:
     bool                            m_blProactorFinish;            //Proactor是否已经注册
     uint32                          m_u4ConnectServerTimeout;      //连接间隔时间
     uint32                          m_u4MaxPoolCount;              //连接池的上限
+    EM_S2S_Run_State                m_emS2SRunState;               //当前服务连接状态
+    vector<CS2SConnectGetRandyInfo> m_GetReadyInfoList;            //需要等待连接的数据信息
 };
 
 typedef ACE_Singleton<CClientProConnectManager, ACE_Recursive_Thread_Mutex> App_ClientProConnectManager;

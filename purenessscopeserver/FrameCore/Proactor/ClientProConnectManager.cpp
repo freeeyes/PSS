@@ -226,6 +226,7 @@ CClientProConnectManager::CClientProConnectManager(void)
     m_blProactorFinish       = false;
     m_u4MaxPoolCount         = 0;
     m_u4ConnectServerTimeout = 0;
+    m_emS2SRunState          = S2S_Run_State_Init;
 }
 
 CClientProConnectManager::~CClientProConnectManager(void)
@@ -262,19 +263,61 @@ bool CClientProConnectManager::Init(ACE_Proactor* pProactor)
         OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Init]m_ProAsynchConnect open error(%d).\n", ACE_OS::last_error()));
         return false;
     }
-    else
-    {
-        //标记Proactor已经连接成功
-        m_blProactorFinish = true;
 
-        return true;
+    //标记Proactor已经连接成功
+    m_blProactorFinish = true;
+
+    m_emS2SRunState = S2S_Run_State_Run;
+
+    //将之前有缓冲的连接信息建立连接
+    for (CS2SConnectGetRandyInfo f : m_GetReadyInfoList)
+    {
+        if (f.m_nLocalPort == 0)
+        {
+            Connect(f.m_nServerID,
+                    f.m_szServerIP,
+                    f.m_nServerPort,
+                    f.m_u1Type,
+                    f.m_pClientMessage);
+        }
+        else
+        {
+            Connect(f.m_nServerID,
+                    f.m_szServerIP,
+                    f.m_nServerPort,
+                    f.m_u1Type,
+                    f.m_szLocalIP,
+                    f.m_nLocalPort,
+                    f.m_u1LocalIPType,
+                    f.m_pClientMessage);
+        }
     }
+
+    m_GetReadyInfoList.clear();
+
+    return true;
 }
 
 bool CClientProConnectManager::Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, IClientMessage* pClientMessage)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     CProactorClientInfo* pClientInfo = NULL;
+
+    if (S2S_Run_State_Init == m_emS2SRunState)
+    {
+        //如果反应器还没初始化，添加到一个列表中，等待反应器初始化后调用
+        CS2SConnectGetRandyInfo objS2SConnectGetRandyInfo;
+
+        objS2SConnectGetRandyInfo.m_nServerID      = nServerID;
+        sprintf_safe(objS2SConnectGetRandyInfo.m_szServerIP, MAX_BUFF_100, "%s", pIP);
+        objS2SConnectGetRandyInfo.m_nServerPort    = nPort;
+        objS2SConnectGetRandyInfo.m_u1Type         = u1IPType;
+        objS2SConnectGetRandyInfo.m_pClientMessage = pClientMessage;
+
+        m_GetReadyInfoList.push_back(objS2SConnectGetRandyInfo);
+
+        return true;
+    }
 
     //连接初始化动作
     if (false == ConnectTcpInit(nServerID, pIP, nPort, u1IPType, NULL, 0, u1IPType, pClientMessage, pClientInfo))
@@ -304,6 +347,24 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, int nPort
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     CProactorClientInfo* pClientInfo = NULL;
+
+    if (S2S_Run_State_Init == m_emS2SRunState)
+    {
+        //如果反应器还没初始化，添加到一个列表中，等待反应器初始化后调用
+        CS2SConnectGetRandyInfo objS2SConnectGetRandyInfo;
+
+        objS2SConnectGetRandyInfo.m_nServerID      = nServerID;
+        sprintf_safe(objS2SConnectGetRandyInfo.m_szServerIP, MAX_BUFF_100, "%s", pIP);
+        objS2SConnectGetRandyInfo.m_nServerPort    = nPort;
+        objS2SConnectGetRandyInfo.m_u1Type         = u1IPType;
+        sprintf_safe(objS2SConnectGetRandyInfo.m_szLocalIP, MAX_BUFF_100, "%s", pLocalIP);
+        objS2SConnectGetRandyInfo.m_nLocalPort     = nLocalPort;
+        objS2SConnectGetRandyInfo.m_u1LocalIPType  = u1LocalIPType;
+        objS2SConnectGetRandyInfo.m_pClientMessage = pClientMessage;
+        m_GetReadyInfoList.push_back(objS2SConnectGetRandyInfo);
+
+        return true;
+    }
 
     //连接初始化动作
     if (false == ConnectTcpInit(nServerID, pIP, nPort, u1IPType, pLocalIP, nLocalPort, u1LocalIPType, pClientMessage, pClientInfo))

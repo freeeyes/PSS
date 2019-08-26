@@ -4,6 +4,32 @@
 #include "ClientMessage.h"
 #include "ClientUDPMassage.h"
 
+//Server 2 server
+enum EM_S2S_Run_State
+{
+    S2S_Run_State_Init = 0,
+    S2S_Run_State_Run,
+};
+
+//记录准备连接的服务器间连接信息
+class CS2SConnectGetRandyInfo
+{
+public:
+    CS2SConnectGetRandyInfo() : m_nServerID(0), m_nServerPort(0), m_u1Type(0), m_nLocalPort(0), m_u1LocalIPType(0), m_pClientMessage(NULL)
+    {
+        m_szServerIP[0] = '\0';
+    };
+
+    uint32 m_nServerID;
+    char m_szServerIP[MAX_BUFF_100];
+    int m_nServerPort;
+    uint8 m_u1Type;
+    char m_szLocalIP[MAX_BUFF_100];
+    int m_nLocalPort;
+    uint8 m_u1LocalIPType;
+    IClientMessage* m_pClientMessage;
+};
+
 //负责管理服务器间通讯的数据管理
 class IClientManager
 {

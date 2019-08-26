@@ -68,8 +68,8 @@ void* thread_Monitor(void* arg)
         OUR_DEBUG((LM_INFO, "[thread_Monitor]arg is not NULL.\n"));
         pthread_exit(0);
     }
-	
-	g_mutex.acquire();
+
+    g_mutex.acquire();
 
     bool blFlag = true;
 
@@ -212,10 +212,10 @@ int Chlid_Run()
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
     pthread_create(&tid, &attr, thread_Monitor, NULL);
-	
-	//等待线程锁生效
-   	ACE_Time_Value tvSleep(0, 1000);
-   	ACE_OS::sleep(tvSleep);	
+
+    //等待线程锁生效
+    ACE_Time_Value tvSleep(0, 1000);
+    ACE_OS::sleep(tvSleep);
 
     //第二步，启动主服务器监控
     if(!App_ServerManager::instance()->Init())
@@ -245,7 +245,7 @@ int Chlid_Run()
     //回收隐式加载PacketParse
     App_PacketParseLoader::instance()->Close();
 
-	return 0;
+    return 0;
 }
 
 int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
@@ -330,16 +330,19 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
         *pszEnd = 0;
     }
 
+    OUR_DEBUG((LM_INFO, "[main]PSS is Starting.\n"));
+
     SetCurrentDirectory(szFileName);
 
     //添加Dump文件
     SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)exception_handler);
     base_set_crash_handler(main_crash_handler, nullptr);
 
-    //添加对Console	由于windows系统的机制导致ctrlhandler有时无法正常执行结束就被系统结束掉进程暂时关闭windows上的回调
+    //添加对Console  由于windows系统的机制导致ctrlhandler有时无法正常执行结束就被系统结束掉进程暂时关闭windows上的回调
 #ifndef WIN32
     SetConsoleCtrlHandler((PHANDLER_ROUTINE)ctrlhandler, true);
 #endif
+
     //第一步，读取配置文件
     if(!App_XmlConfig::instance()->InitIsOk())
     {

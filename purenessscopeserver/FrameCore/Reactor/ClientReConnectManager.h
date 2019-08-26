@@ -91,15 +91,17 @@ private:
     bool ConnectUdpInit(int nServerID, CReactorUDPClient*& pReactorUDPClient);
 
 public:
-    CHashTable<CReactorClientInfo> m_objClientTCPList;            //TCP客户端链接
-    CHashTable<CReactorUDPClient>  m_objClientUDPList;            //UDP客户端链接
-    CConnectClientConnector        m_ReactorConnect;              //Reactor连接客户端对象
-    ACE_Recursive_Thread_Mutex     m_ThreadWritrLock;             //线程锁
-    int                            m_nTaskID;                     //定时检测工具
-    ACE_Reactor*                   m_pReactor;                    //当前的反应器
-    bool                           m_blReactorFinish;             //Reactor是否已经注册
-    uint32                         m_u4ConnectServerTimeout;      //连接间隔时间
-    int32                          m_u4MaxPoolCount;              //连接池的上限
+    CHashTable<CReactorClientInfo>  m_objClientTCPList;            //TCP客户端链接
+    CHashTable<CReactorUDPClient>   m_objClientUDPList;            //UDP客户端链接
+    CConnectClientConnector         m_ReactorConnect;              //Reactor连接客户端对象
+    ACE_Recursive_Thread_Mutex      m_ThreadWritrLock;             //线程锁
+    int                             m_nTaskID;                     //定时检测工具
+    ACE_Reactor*                    m_pReactor;                    //当前的反应器
+    bool                            m_blReactorFinish;             //Reactor是否已经注册
+    uint32                          m_u4ConnectServerTimeout;      //连接间隔时间
+    int32                           m_u4MaxPoolCount;              //连接池的上限
+    EM_S2S_Run_State                m_emS2SRunState;               //当前服务连接状态
+    vector<CS2SConnectGetRandyInfo> m_GetReadyInfoList;            //需要等待连接的数据信息
 };
 
 typedef ACE_Singleton<CClientReConnectManager, ACE_Recursive_Thread_Mutex> App_ClientReConnectManager;

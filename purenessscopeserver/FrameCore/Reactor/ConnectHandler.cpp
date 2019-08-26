@@ -2037,7 +2037,7 @@ bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType,
 
         if(NULL == pCurrBuffPacket)
         {
-            OUR_DEBUG((LM_INFO, "[CConnectManager::PostMessage]pCurrBuffPacket is NULL.\n"));
+            OUR_DEBUG((LM_INFO, "[CConnectManager::PostMessage](%d)pCurrBuffPacket is NULL.\n", pConnectHandler->GetConnectID()));
 
             if(true == blDelete)
             {

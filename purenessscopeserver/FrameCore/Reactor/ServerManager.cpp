@@ -75,6 +75,8 @@ bool CServerManager::Init()
     //初始化拆件逻辑线程
     App_MessageQueueManager::instance()->Init();
 
+
+
     //初始化给插件的对象接口
     IConnectManager* pConnectManager           = dynamic_cast<IConnectManager*>(App_ConnectManager::instance());
     IClientManager*  pClientManager            = dynamic_cast<IClientManager*>(App_ClientReConnectManager::instance());

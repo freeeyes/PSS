@@ -251,6 +251,7 @@ CClientReConnectManager::CClientReConnectManager(void)
     m_blReactorFinish        = false;
     m_u4ConnectServerTimeout = 0;
     m_u4MaxPoolCount         = 0;
+    m_emS2SRunState          = S2S_Run_State_Init;
 }
 
 bool CClientReConnectManager::Init(ACE_Reactor* pReactor)
@@ -278,6 +279,35 @@ bool CClientReConnectManager::Init(ACE_Reactor* pReactor)
     }
 
     m_pReactor        = pReactor;
+
+    m_emS2SRunState = S2S_Run_State_Run;
+
+    //将之前有缓冲的连接信息建立连接
+    for(CS2SConnectGetRandyInfo f : m_GetReadyInfoList)
+    {
+        if (f.m_nLocalPort == 0)
+        {
+            Connect(f.m_nServerID,
+                    f.m_szServerIP,
+                    f.m_nServerPort,
+                    f.m_u1Type,
+                    f.m_pClientMessage);
+        }
+        else
+        {
+            Connect(f.m_nServerID,
+                    f.m_szServerIP,
+                    f.m_nServerPort,
+                    f.m_u1Type,
+                    f.m_szLocalIP,
+                    f.m_nLocalPort,
+                    f.m_u1LocalIPType,
+                    f.m_pClientMessage);
+        }
+    }
+
+    m_GetReadyInfoList.clear();
+
     return true;
 }
 
@@ -285,6 +315,22 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, int nPort,
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     CReactorClientInfo* pClientInfo = NULL;
+
+    if (S2S_Run_State_Init == m_emS2SRunState)
+    {
+        //如果反应器还没初始化，添加到一个列表中，等待反应器初始化后调用
+        CS2SConnectGetRandyInfo objS2SConnectGetRandyInfo;
+
+        objS2SConnectGetRandyInfo.m_nServerID      = nServerID;
+        sprintf_safe(objS2SConnectGetRandyInfo.m_szServerIP, MAX_BUFF_100, "%s", pIP);
+        objS2SConnectGetRandyInfo.m_nServerPort    = nPort;
+        objS2SConnectGetRandyInfo.m_u1Type         = u1IPType;
+        objS2SConnectGetRandyInfo.m_pClientMessage = pClientMessage;
+
+        m_GetReadyInfoList.push_back(objS2SConnectGetRandyInfo);
+
+        return true;
+    }
 
     //连接初始化动作
     if (false == ConnectTcpInit(nServerID, pIP, nPort, u1IPType, NULL, 0, u1IPType, pClientMessage, pClientInfo, 0))
@@ -315,6 +361,24 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, int nPort,
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     CReactorClientInfo* pClientInfo = NULL;
+
+    if (S2S_Run_State_Init == m_emS2SRunState)
+    {
+        //如果反应器还没初始化，添加到一个列表中，等待反应器初始化后调用
+        CS2SConnectGetRandyInfo objS2SConnectGetRandyInfo;
+
+        objS2SConnectGetRandyInfo.m_nServerID      = nServerID;
+        sprintf_safe(objS2SConnectGetRandyInfo.m_szServerIP, MAX_BUFF_100, "%s", pIP);
+        objS2SConnectGetRandyInfo.m_nServerPort    = nPort;
+        objS2SConnectGetRandyInfo.m_u1Type         = u1IPType;
+        sprintf_safe(objS2SConnectGetRandyInfo.m_szLocalIP, MAX_BUFF_100, "%s", pLocalIP);
+        objS2SConnectGetRandyInfo.m_nLocalPort     = nLocalPort;
+        objS2SConnectGetRandyInfo.m_u1LocalIPType  = u1LocalIPType;
+        objS2SConnectGetRandyInfo.m_pClientMessage = pClientMessage;
+        m_GetReadyInfoList.push_back(objS2SConnectGetRandyInfo);
+
+        return true;
+    }
 
     //连接初始化动作
     if (false == ConnectTcpInit(nServerID, pIP, nPort, u1IPType, pLocalIP, nLocalPort, u1LocalIPType, pClientMessage, pClientInfo, 0))
@@ -794,7 +858,7 @@ bool CClientReConnectManager::ConnectUdpInit(int nServerID, CReactorUDPClient*& 
     //如果池已经满了，则不能在申请新连接
     if (m_objClientUDPList.Get_Used_Count() == m_objClientUDPList.Get_Count())
     {
-        OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) m_objClientTCPList is full.\n", nServerID));
+        OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::ConnectUdpInit]nServerID =(%d) <%d>m_objClientUDPList is full.\n", nServerID, m_objClientUDPList.Get_Count()));
         return false;
     }
 
