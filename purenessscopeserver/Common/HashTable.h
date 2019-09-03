@@ -1263,6 +1263,11 @@ private:
         char szCurrKey[DEF_HASH_KEY_SIZE] = { '\0' };
         sprintf_safe(szCurrKey, DEF_HASH_KEY_SIZE, "%d", uHashStart);
 
+        if (m_objHashPool.Get_Count() == 0)
+        {
+            return -1;
+        }
+
         //把当前数字对当前Hash数组总数取余
         unsigned long uHashPos = uHashStart % m_objHashPool.Get_Count();
 
@@ -1311,6 +1316,11 @@ private:
     //得到hash指定的位置
     int32 GetHashTablePos(const char* lpszString, EM_HASH_STATE emHashState, T*& pT)
     {
+        if (m_objHashPool.Get_Count() == 0)
+        {
+            return -1;
+        }
+
         unsigned long uHashStart = HashString(lpszString, m_objHashPool.Get_Count());
 
         //获取链表，并比对
@@ -1357,6 +1367,11 @@ private:
     {
         char szCurrKey[DEF_HASH_KEY_SIZE] = { '\0' };
         sprintf_safe(szCurrKey, DEF_HASH_KEY_SIZE, "%d", uHashStart);
+
+        if (m_objHashPool.Get_Count() == 0)
+        {
+            return -1;
+        }
 
         //把当前数字对当前Hash数组总数取余
         unsigned long uHashPos = uHashStart % m_objHashPool.Get_Count();
@@ -1410,6 +1425,11 @@ private:
     //删除指定的数据
     int32 DelHashTablePos(const char* lpszString)
     {
+        if (m_objHashPool.Get_Count() == 0)
+        {
+            return -1;
+        }
+
         unsigned long uHashStart = HashString(lpszString, m_objHashPool.Get_Count());
 
         //获取链表，并比对
