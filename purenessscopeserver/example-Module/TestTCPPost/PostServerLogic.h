@@ -113,7 +113,7 @@ public:
         return true;
     }
 
-    bool RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv,  _ClientIPInfo objServerIPInfo)
+    bool RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv,  _ClientIPInfo const& objServerIPInfo)
     {
         //数据包已经收全.发送给客户端数据
         //OUR_DEBUG((LM_INFO, "[CPostServerData::RecvData]Get Data(%d).\n", mbRecv->length()));
@@ -193,7 +193,7 @@ public:
         return true;
     }
 
-    bool ConnectError(int nError,  _ClientIPInfo objServerIPInfo)
+    bool ConnectError(int nError,  _ClientIPInfo const& objServerIPInfo)
     {
         OUR_DEBUG((LM_ERROR, "[CPostServerData::ConnectError]Get Error[%s:%d](%d).\n", objServerIPInfo.m_szClientIP, objServerIPInfo.m_nPort, nError));
         return true;
