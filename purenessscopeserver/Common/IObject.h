@@ -182,6 +182,11 @@ public:
         return m_pMessageQueueManager;
     }
 
+    ActiveTimer* GetAceTimerManager()
+    {
+        return m_pTimerManager;
+    }
+
 private:
     IMessageManager*       m_pIMessageManager;
     ILogManager*           m_pLogManager;

@@ -47,7 +47,7 @@ bool CLSServerManager::Connect()
     }
 }
 
-bool CLSServerManager::RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv, _ClientIPInfo objServerIPInfo)
+bool CLSServerManager::RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv, _ClientIPInfo const& objServerIPInfo)
 {
     //处理收到来自LS的数据
     if(mbRecv->length() <= 40)
@@ -78,7 +78,7 @@ bool CLSServerManager::RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv, _
     return true;
 }
 
-bool CLSServerManager::ConnectError(int nError, _ClientIPInfo objServerIPInfo)
+bool CLSServerManager::ConnectError(int nError, _ClientIPInfo const& objServerIPInfo)
 {
     OUR_DEBUG((LM_INFO, "[CLSServerManager::ConnectError]nError=%d,(%s:%d).\n", nError, objServerIPInfo.m_szClientIP, objServerIPInfo.m_nPort));
     return true;
@@ -120,7 +120,9 @@ void CLSServerManager::Send_LG_Login()
     (*pSendPacket) << m_u4LGPort;
     (*pSendPacket) << strServerCode;
 
-    m_pServerObject->GetClientManager()->SendData(m_u4ServerID, pSendPacket->GetData(), pSendPacket->GetPacketLen(), false);
+    char* pData = (char* )pSendPacket->GetData();
+
+    m_pServerObject->GetClientManager()->SendData(m_u4ServerID, pData, pSendPacket->GetPacketLen(), false);
 
     m_pServerObject->GetPacketManager()->Delete(pSendPacket);
 }
@@ -149,7 +151,9 @@ void CLSServerManager::Send_LG_List()
     strServerCode.SetData(m_objlistManager.Get_MD5_Data(), u1Len);
     (*pSendPacket) << m_u4LGID;
 
-    m_pServerObject->GetClientManager()->SendData(m_u4ServerID, pSendPacket->GetData(), pSendPacket->GetPacketLen(), false);
+    char* pData = (char*)pSendPacket->GetData();
+
+    m_pServerObject->GetClientManager()->SendData(m_u4ServerID, pData, pSendPacket->GetPacketLen(), false);
 
     m_pServerObject->GetPacketManager()->Delete(pSendPacket);
 }
@@ -185,7 +189,9 @@ void CLSServerManager::Send_LG_Alive()
     strServerCode.SetData(m_objlistManager.Get_MD5_Data(), u1Len);
     (*pSendPacket) << m_u4LGID;
 
-    m_pServerObject->GetClientManager()->SendData(m_u4ServerID, pSendPacket->GetData(), pSendPacket->GetPacketLen(), false);
+    char* pData = (char*)pSendPacket->GetData();
+
+    m_pServerObject->GetClientManager()->SendData(m_u4ServerID, pData, pSendPacket->GetPacketLen(), false);
 
     m_pServerObject->GetPacketManager()->Delete(pSendPacket);
 }
@@ -313,7 +319,7 @@ bool CLSServerManager::Send_Format_data(char* pData, uint32 u4Len, IMessageBlock
     return false;
 }
 
-bool CLSServerManager::Recv_Format_data(ACE_Message_Block* mbRecv, IMessageBlockManager* pMessageBlockManager, uint16& u2CommandID, ACE_Message_Block*& mbFinishRecv)
+bool CLSServerManager::Recv_Format_data(ACE_Message_Block* mbRecv, IMessageBlockManager* pMessageBlockManager, uint16& u2CommandID, ACE_Message_Block*& mbFinishRecv, EM_PACKET_ROUTE& emPacketRoute)
 {
     if(m_u4RecvBuffLength + mbRecv->length() < 40 || mbRecv->length() >= RECV_BUFF_SIZE)
     {

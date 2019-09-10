@@ -223,16 +223,24 @@ void CBaseCommand::Init(const char* pFileName)
     //m_objLSServer.Init(1, "127.0.0.1", 10080, m_pServerObject);
     m_objLSServer.Init(1, m_szLSIP, m_u4LSPort, m_pServerObject);
 
-    vecControlInfo objControlInfo;
-    m_pServerObject->GetControlListen()->ShowListen(objControlInfo);
+    vecControlInfo objControlList;
+
+    uint32 u4ListenCount = m_pServerObject->GetControlListen()->GetListenCount();
+
+    for (uint32 i = 0; i < u4ListenCount; i++)
+    {
+        _ControlInfo objControlInfo;
+        m_pServerObject->GetControlListen()->ShowListen(i, objControlInfo);
+        objControlList.push_back(objControlInfo);
+    }
 
     //自动得到当前开放的IP和端口，然后记录下来，发送给远端LS
-    m_objLSServer.Set_LG_Info(objControlInfo[0].m_szListenIP,
-                              objControlInfo[0].m_u4Port,
+    m_objLSServer.Set_LG_Info(objControlList[0].m_szListenIP,
+                              objControlList[0].m_u4Port,
                               (uint32)m_pServerObject->GetControlListen()->GetServerID());
     m_objLSServer.Connect();
 
-    ActiveTimer* pTimer = m_pServerObject->GetTimerManager();
+    ActiveTimer* pTimer = m_pServerObject->GetAceTimerManager();
     m_u4TimeID = (uint32)pTimer->schedule(this, NULL, ACE_OS::gettimeofday() + ACE_Time_Value(MAX_TIMER_INTERVAL), ACE_Time_Value(MAX_TIMER_INTERVAL));
 }
 
