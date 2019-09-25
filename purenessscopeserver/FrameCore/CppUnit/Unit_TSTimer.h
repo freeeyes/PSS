@@ -5,34 +5,7 @@
 
 #include "Unit_Common.h"
 #include "define.h"
-#include "TimerThread.h"
-
-class CTestTimeNode : public ts_timer::ITimeNode
-{
-public:
-    CTestTimeNode() {};
-
-    virtual ~CTestTimeNode() = default;
-
-    virtual void Run(ts_timer::CTime_Value& tvNow, void* pArg, ts_timer::EM_Timer_State& emState)
-    {
-        ACE_UNUSED_ARG(tvNow);
-        ACE_UNUSED_ARG(pArg);
-        ACE_UNUSED_ARG(emState);
-
-        OUR_DEBUG((LM_INFO, "[CTestTimeNode::Run]OK.\n"));
-    }
-
-    virtual void Error(int nLastRunTimerID, int nTimeoutTime, std::vector<ts_timer::CTime_Value>& vecTimoutList, void* pArg)
-    {
-        ACE_UNUSED_ARG(nLastRunTimerID);
-        ACE_UNUSED_ARG(nTimeoutTime);
-        ACE_UNUSED_ARG(vecTimoutList);
-        ACE_UNUSED_ARG(pArg);
-
-        OUR_DEBUG((LM_INFO, "[CTestTimeNode::Error]OK.\n"));
-    }
-};
+#include "TimerEvent.h"
 
 class CUnit_TimerThread : public CppUnit::TestFixture
 {
@@ -50,8 +23,7 @@ public:
     void Test_TimerThread(void);
 
 private:
-    ts_timer::CTimerThread* m_pTimerThread;
-    CTestTimeNode*          m_pThreadNode;
+    CTimerManager*          m_pTimerThread;
 };
 
 #endif

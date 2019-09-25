@@ -183,9 +183,9 @@
     <ClCompile Include="..\Common\ILogicQueue.cpp" />
     <ClCompile Include="..\Common\RandomNumber.cpp" />
     <ClCompile Include="..\Common\Threading.cpp" />
-    <ClCompile Include="..\Common\TimerInfo.cpp" />
-    <ClCompile Include="..\Common\TimerThread.cpp" />
-    <ClCompile Include="..\Common\Time_Value.cpp" />
+    <ClCompile Include="..\Common\ThreadLogic.cpp" />
+    <ClCompile Include="..\Common\TimerEvent.cpp" />
+    <ClCompile Include="..\Common\TimerNodeList.cpp" />
     <ClCompile Include="Common\BaseClientConnectManager.cpp" />
     <ClCompile Include="Common\BaseConnectClient.cpp" />
     <ClCompile Include="Common\BaseConsoleHandle.cpp" />
@@ -236,6 +236,7 @@
     <ClCompile Include="CppUnit\Unit_ModuleMessageManager.cpp" />
     <ClCompile Include="CppUnit\Unit_ProfileTime.cpp" />
     <ClCompile Include="CppUnit\Unit_TimeQueue.cpp" />
+    <ClCompile Include="CppUnit\Unit_TSTimer.cpp" />
     <ClCompile Include="CppUnit\Unit_WorkThreadAI.cpp" />
     <ClCompile Include="Mail\smtps.cpp" />
     <ClCompile Include="Message\MessageDyeingManager.cpp" />
@@ -502,6 +503,7 @@
     <ClInclude Include="..\Common\ClientMessage.h" />
     <ClInclude Include="..\Common\ClientUDPMassage.h" />
     <ClInclude Include="..\Common\CreateInfo.h" />
+    <ClInclude Include="..\Common\date.h" />
     <ClInclude Include="..\Common\define.h" />
     <ClInclude Include="..\Common\HashTable.h" />
     <ClInclude Include="..\Common\IBuffPacket.h" />
@@ -538,12 +540,12 @@
     <ClInclude Include="..\Common\RandomNumber.h" />
     <ClInclude Include="..\Common\Threading.h" />
     <ClInclude Include="..\Common\ThreadLock.h" />
-    <ClInclude Include="..\Common\TimerCommon.h" />
-    <ClInclude Include="..\Common\TimerInfo.h" />
-    <ClInclude Include="..\Common\TimerThread.h" />
+    <ClInclude Include="..\Common\ThreadLogic.h" />
+    <ClInclude Include="..\Common\TimerEvent.h" />
+    <ClInclude Include="..\Common\TimerNodeList.h" />
     <ClInclude Include="..\Common\TimeWheelLink.h" />
-    <ClInclude Include="..\Common\Time_Value.h" />
     <ClInclude Include="..\Common\Trace.h" />
+    <ClInclude Include="..\Common\TSCommon.hpp" />
     <ClInclude Include="Common\BaseClientConnectManager.h" />
     <ClInclude Include="Common\BaseConnectClient.h" />
     <ClInclude Include="Common\BaseConsoleHandle.h" />
@@ -595,6 +597,7 @@
     <ClInclude Include="CppUnit\Unit_ModuleMessageManager.h" />
     <ClInclude Include="CppUnit\Unit_ProfileTime.h" />
     <ClInclude Include="CppUnit\Unit_TimeQueue.h" />
+    <ClInclude Include="CppUnit\Unit_TSTimer.h" />
     <ClInclude Include="CppUnit\Unit_WorkThreadAI.h" />
     <ClInclude Include="Encrypt\Aes.h" />
     <ClInclude Include="FileTest\FileTest.h" />

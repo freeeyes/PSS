@@ -322,15 +322,6 @@
     <ClCompile Include="Mail\smtps.cpp">
       <Filter>Mail\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\Time_Value.cpp">
-      <Filter>Common\cppfile</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\TimerInfo.cpp">
-      <Filter>Common\cppfile</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\TimerThread.cpp">
-      <Filter>Common\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="Common\TcpRedirection.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
@@ -354,6 +345,18 @@
     </ClCompile>
     <ClCompile Include="Message\MessageQueueManager.cpp">
       <Filter>Message\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\ThreadLogic.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\TimerNodeList.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\TimerEvent.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="CppUnit\Unit_TSTimer.cpp">
+      <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -789,18 +792,6 @@
     <ClInclude Include="..\Common\ITSTimer.h">
       <Filter>IObject</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\Time_Value.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\TimerCommon.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\TimerInfo.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\TimerThread.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="Common\TcpRedirection.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
@@ -839,6 +830,24 @@
     </ClInclude>
     <ClInclude Include="..\Common\Object_Pool.h">
       <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\date.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ThreadLogic.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\TSCommon.hpp">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\TimerEvent.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\TimerNodeList.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\Unit_TSTimer.h">
+      <Filter>CppUnit\hfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

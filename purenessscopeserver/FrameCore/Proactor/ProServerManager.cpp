@@ -29,12 +29,6 @@ bool CProServerManager::Init()
     //初始化禁止IP列表
     App_ForbiddenIP::instance()->Init(FORBIDDENIP_FILE);
 
-    //初始化TS定时器
-    if (GetXmlConfigAttribute(xmlTSTimer)->TimerListCount > 0)
-    {
-        m_TSThread.Init(GetXmlConfigAttribute(xmlTSTimer)->TimerListCount);
-    }
-
     //初始化日志系统线程
     if (false == Server_Manager_Common_LogSystem())
     {
@@ -292,12 +286,6 @@ bool CProServerManager::Start()
             OUR_DEBUG((LM_INFO, "[CProServerManager::Start] Listen from [%s:%d] error(%d).\n",listenConsoleAddr.get_host_addr(), listenConsoleAddr.get_port_number(), errno));
             return false;
         }
-    }
-
-    //启动TS定时器
-    if (GetXmlConfigAttribute(xmlTSTimer)->TimerListCount > 0)
-    {
-        m_TSThread.Run();
     }
 
     //启动日志服务线程

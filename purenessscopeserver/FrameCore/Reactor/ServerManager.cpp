@@ -30,12 +30,6 @@ bool CServerManager::Init()
     //初始化禁止IP列表
     App_ForbiddenIP::instance()->Init(FORBIDDENIP_FILE);
 
-    //初始化TS定时器
-    if (GetXmlConfigAttribute(xmlTSTimer)->TimerListCount > 0)
-    {
-        m_TSThread.Init(GetXmlConfigAttribute(xmlTSTimer)->TimerListCount);
-    }
-
     OUR_DEBUG((LM_INFO, "[CServerManager::Init]nReactorCount=%d.\n", nReactorCount));
 
     //为多进程做准备，针对epoll和epollet初始化不能在这里去做,因为在多进程里epoll_create必须在子进程里去声明
@@ -229,12 +223,6 @@ bool CServerManager::Run()
             OUR_DEBUG((LM_INFO, "[CServerManager::Run]Init_Reactor Error.\n"));
             return false;
         }
-    }
-
-    //启动TS定时器
-    if (GetXmlConfigAttribute(xmlTSTimer)->TimerListCount > 0)
-    {
-        m_TSThread.Run();
     }
 
     //启动中间服务器链接管理器
