@@ -810,8 +810,8 @@ CBuffPacket& CBuffPacket::operator << (int16 n2Data)
             n2Net = n2Data;
         }
 
-        *(int16*)WritePtr() = n2Data;
-        WritePtr((uint32)sizeof(n2Data));
+        *(int16*)WritePtr() = n2Net;
+        WritePtr((uint32)sizeof(n2Net));
         return *this;
     }
 }
@@ -862,8 +862,8 @@ CBuffPacket& CBuffPacket::operator << (int32 n4Data)
             n4Net = n4Data;
         }
 
-        *(int32*)WritePtr() = n4Data;
-        WritePtr((uint32)sizeof(n4Data));
+        *(int32*)WritePtr() = n4Net;
+        WritePtr((uint32)sizeof(n4Net));
         return *this;
     }
 }
