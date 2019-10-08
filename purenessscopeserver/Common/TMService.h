@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ITMService.h"
-#include "XmlOpeation.h"
+#include "../FrameCore/Common/XmlOpeation.h"
 
 class CTMService : public ITMService
 {
