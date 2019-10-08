@@ -7,7 +7,6 @@
 CServerManager::CServerManager(void)
 {
     m_pFrameLoggingStrategy = NULL;
-    m_TMService             = NULL;
 }
 
 bool CServerManager::Init()

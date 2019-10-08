@@ -2,7 +2,7 @@
 
 #ifdef _CPPUNIT_TEST
 
-void timer_run_execute(void* arg)
+void test_timer_run_execute(void* arg)
 {
     ACE_UNUSED_ARG(arg);
     OUR_DEBUG((LM_INFO, "[CUnit_TimerThread]timer is active.\n"));
@@ -32,7 +32,7 @@ void CUnit_TimerThread::Test_TimerThread(void)
     bool blRet = false;
 
     milliseconds millsleep(1000);
-    int nRet = m_pTimerThread->Add_Timer(1, millsleep, timer_run_execute, NULL);
+    int nRet = m_pTimerThread->Add_Timer(1, millsleep, test_timer_run_execute, NULL);
 
     if (0 != nRet)
     {

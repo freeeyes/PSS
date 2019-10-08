@@ -1,11 +1,13 @@
 #pragma once
 
 #include "ITMService.h"
+#include "XmlOpeation.h"
 
 class CTMService : public ITMService
 {
 public:
     CTMService();
+    virtual ~CTMService();
 
     int Init();
 

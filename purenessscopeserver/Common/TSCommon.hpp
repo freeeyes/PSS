@@ -2,7 +2,6 @@
 #define _TSCOMMON_H
 
 #include "TimerEvent.h"
-#include "XmlOpeation.h"
 #include "HashTable.h"
 #include "ThreadLogic.h"
 #include <vector>
@@ -27,6 +26,8 @@ enum Enum_Message_Execute_State
 class IMessagePrecess
 {
 public:
+    virtual ~IMessagePrecess() {};
+
     virtual void DoMessage(int _message_id, void* _arg) = 0;
 };
 

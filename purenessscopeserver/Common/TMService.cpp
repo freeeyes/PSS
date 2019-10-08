@@ -11,6 +11,11 @@ CTMService::CTMService() :m_nTimerMaxCount(0), m_nActive(0)
 {
 }
 
+CTMService::~CTMService()
+{
+
+}
+
 int CTMService::Init()
 {
     //读取配置文件
@@ -97,14 +102,10 @@ int CTMService::Init()
 
     int nWorkThreadID = 0;
     int nMessageID    = 0;
-    char szT2MID[50] = { '\0' };
 
     while (objXmlOperation.Read_XML_Data_Multiple_Int("MessageInfo", "LogicThreadID", nWorkThreadID, pWorkThreadID)
            && objXmlOperation.Read_XML_Data_Multiple_Int("MessageInfo", "MessageID", nMessageID, pMessageID))
     {
-        //写入配置文件
-        bool blIsAdd = true;
-
         unordered_map<int, int>::iterator ftm = m_M2TList.find(nMessageID);
 
         if (m_M2TList.end() == ftm)
@@ -163,7 +164,7 @@ int CTMService::AddMessage(string strName, int nMessagePos, long sec, long usec,
         return -1;
     }
 
-    if (pTimerInfo->m_vecEventsList.size() >= pTimerInfo->m_nMaxQueueList)
+    if ((int)pTimerInfo->m_vecEventsList.size() >= pTimerInfo->m_nMaxQueueList)
     {
         return -1;
     }
