@@ -186,6 +186,7 @@
     <ClCompile Include="..\Common\ThreadLogic.cpp" />
     <ClCompile Include="..\Common\TimerEvent.cpp" />
     <ClCompile Include="..\Common\TimerNodeList.cpp" />
+    <ClCompile Include="..\Common\TMService.cpp" />
     <ClCompile Include="Common\BaseClientConnectManager.cpp" />
     <ClCompile Include="Common\BaseConnectClient.cpp" />
     <ClCompile Include="Common\BaseConsoleHandle.cpp" />
@@ -195,7 +196,6 @@
     <ClCompile Include="Common\IPAccount.cpp" />
     <ClCompile Include="Common\ServerMessageTask.cpp" />
     <ClCompile Include="Common\TcpRedirection.cpp" />
-    <ClCompile Include="Common\TMService.cpp" />
     <ClCompile Include="Common\XmlConfig.cpp" />
     <ClCompile Include="Console\ConsolePromiss.cpp" />
     <ClCompile Include="Console\FrameCommand.cpp" />
@@ -546,6 +546,7 @@
     <ClInclude Include="..\Common\TimerEvent.h" />
     <ClInclude Include="..\Common\TimerNodeList.h" />
     <ClInclude Include="..\Common\TimeWheelLink.h" />
+    <ClInclude Include="..\Common\TMService.h" />
     <ClInclude Include="..\Common\Trace.h" />
     <ClInclude Include="..\Common\TSCommon.hpp" />
     <ClInclude Include="Common\BaseClientConnectManager.h" />
@@ -556,7 +557,6 @@
     <ClInclude Include="Common\BaseTask.h" />
     <ClInclude Include="Common\ServerMessageTask.h" />
     <ClInclude Include="Common\TcpRedirection.h" />
-    <ClInclude Include="Common\TMService.h" />
     <ClInclude Include="Common\XmlConfig.h" />
     <ClInclude Include="Console\ConsolePromiss.h" />
     <ClInclude Include="Console\FrameCommand.h" />
