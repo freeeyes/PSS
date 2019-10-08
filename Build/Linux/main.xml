@@ -42,6 +42,4 @@
 	<AceDebug TrunOn="0" DebugName="./pssout.file" ChkInterval="600" LogFileMaxSize="10240" LogFileMaxCnt="3" Level="" desc="ACEDEBUG文件输出配置，TrunOn=0为不使用，1为使用" />
 	
 	<UDPServerIP uip="127.0.0.1" uport="10003" uParseID="1" uMaxRecvSize="1024" desc="监听UDP服务器的IP和端口，可以是多个" />
-	
-	<TSTimer TimerListPool="0" />
 </config>

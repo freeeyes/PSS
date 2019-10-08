@@ -33,7 +33,7 @@ bool Server_Manager_Common_IObject(IConnectManager* pConnectManager,
                                    IUDPConnectManager* pUDPConnectManager,
                                    IFrameCommand* pFrameCommand,
                                    IServerManager* pIServerManager,
-                                   ITSTimerManager* pTSTimerManager,
+                                   ITMService* pTMService,
                                    ITTyClientManager* pTTyClientManager,
                                    IMessageQueueManager* pLogicThreadManager,
                                    IControlListen* pControlListen);

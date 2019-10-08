@@ -21,6 +21,7 @@ public:
     bool Read_XML_Data_Single_Uint32(const char* pTag, const char* pName, uint32& u4Value);
     bool Read_XML_Data_Single_Uint16(const char* pTag, const char* pName, uint16& u2Value);
     bool Read_XML_Data_Single_Uint8(const char* pTag, const char* pName, uint8& u1Value);
+    bool Read_XML_Data_Single_Int(const char* pTag, const char* pName, int& nValue);
 
     //读取循环里的变量
     bool Read_XML_Data_Multiple_String(const char* pTag, const char* pName, string& strValue, TiXmlElement*& pTi);
@@ -28,6 +29,7 @@ public:
     bool Read_XML_Data_Multiple_Uint32(const char* pTag, const char* pName, uint32& u4Value, TiXmlElement*& pTi);
     bool Read_XML_Data_Multiple_Uint16(const char* pTag, const char* pName, uint16& u2Value, TiXmlElement*& pTi);
     bool Read_XML_Data_Multiple_Uint8(const char* pTag, const char* pName, uint8& u1Value, TiXmlElement*& pTi);
+    bool Read_XML_Data_Multiple_Int(const char* pTag, const char* pName, int& u4Value, TiXmlElement*& pTi);
 
 private:
     std::shared_ptr<TiXmlDocument> m_pTiXmlDocument;

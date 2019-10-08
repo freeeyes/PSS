@@ -358,6 +358,9 @@
     <ClCompile Include="CppUnit\Unit_TSTimer.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="..\Common\TMService.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -848,6 +851,12 @@
     </ClInclude>
     <ClInclude Include="CppUnit\Unit_TSTimer.h">
       <Filter>CppUnit\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ITMService.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\TMService.h">
+      <Filter>Common\hfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,11 +1,10 @@
 #ifndef _TSCOMMON_H
 #define _TSCOMMON_H
 
-#include "CTimerEvent.h"
+#include "TimerEvent.h"
 #include "XmlOpeation.h"
 #include "HashTable.h"
 #include "ThreadLogic.h"
-#include "IMessageQueueManager.h"
 #include <vector>
 
 using namespace std;
@@ -24,6 +23,13 @@ enum Enum_Message_Execute_State
     Message_Cancel,
 };
 
+//消息处理类模板
+class IMessagePrecess
+{
+public:
+    virtual void DoMessage(int _message_id, void* _arg) = 0;
+};
+
 class CEventsInfo
 {
 public:
@@ -36,11 +42,9 @@ public:
     int                         m_nUsec;
     Enum_Message_Execute_State  m_emMessageState;
     Enum_Timer_Mode             m_emTimerMode;
+    IMessagePrecess*            m_pIMessagePrecess;
 
-    CMessageInfo::UserFunctor   fn;
-    IMessageQueueManager*       m_pMessageQueueManager;
-
-    CEventsInfo() : m_pArg(NULL), m_nMessageID(0), m_nWorkThreadID(0), m_nMessagePos(0), m_nSec(0), m_nUsec(0), m_emMessageState(Message_Run), m_emTimerMode(Timer_Mode_Run_Once), m_pMessageQueueManager(NULL)
+    CEventsInfo() : m_pArg(NULL), m_nMessageID(0), m_nWorkThreadID(0), m_nMessagePos(0), m_nSec(0), m_nUsec(0), m_emMessageState(Message_Run), m_emTimerMode(Timer_Mode_Run_Once), m_pIMessagePrecess(NULL)
     {
     }
 };
@@ -62,18 +66,23 @@ public:
         m_vecEventsList.push_back(objEventsInfo);
     }
 
-    void DeleteEventInfo(int nMessagePos)
+    void* DeleteEventInfo(int nMessagePos)
     {
         std::lock_guard <std::mutex> lock(m_objMutex);
+
+        void* prg = nullptr;
 
         for (int i = 0; i < (int)m_vecEventsList.size(); i++)
         {
             if (m_vecEventsList[i].m_nMessagePos == nMessagePos)
             {
                 m_vecEventsList[i].m_emMessageState = Message_Cancel;
+                prg = m_vecEventsList[i].m_pArg;
                 break;
             }
         }
+
+        return prg;
     }
 
     void run()
@@ -89,15 +98,13 @@ public:
                 //到时的数据，拿出来处理
                 std::cout << "[CTaskTimeNode::Run](" << m_szName.c_str() << ") is Arrived.\n" << endl;
 
-                if ((*it).m_pMessageQueueManager != NULL && Message_Run == (*it).m_emMessageState)
+                if (NULL != m_pMessageQueueManager)
                 {
-                    //输出到消息队列(消息)
-                    (*it).m_pMessageQueueManager->SendLogicThreadMessage((*it).m_nMessageID, (*it).m_pArg);
-                }
-                else
-                {
-                    //打印日志
-                    std::cout << "[CTaskTimeNode::Run](" << (*it).m_nMessageID << ") is disposed.\n" << endl;
+                    m_pMessageQueueManager->AddMessageClass((*it).m_nWorkThreadID,
+                                                            (*it).m_pIMessagePrecess,
+                                                            &IMessagePrecess::DoMessage,
+                                                            (*it).m_nMessageID,
+                                                            (*it).m_pArg);
                 }
 
                 if ((*it).m_emTimerMode == Timer_Mode_Run_Once)

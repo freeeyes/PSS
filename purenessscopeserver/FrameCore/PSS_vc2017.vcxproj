@@ -186,6 +186,7 @@
     <ClCompile Include="..\Common\ThreadLogic.cpp" />
     <ClCompile Include="..\Common\TimerEvent.cpp" />
     <ClCompile Include="..\Common\TimerNodeList.cpp" />
+    <ClCompile Include="..\Common\TMService.cpp" />
     <ClCompile Include="Common\BaseClientConnectManager.cpp" />
     <ClCompile Include="Common\BaseConnectClient.cpp" />
     <ClCompile Include="Common\BaseConsoleHandle.cpp" />
@@ -529,6 +530,7 @@
     <ClInclude Include="..\Common\ISendCacheManager.h" />
     <ClInclude Include="..\Common\IServerManager.h" />
     <ClInclude Include="..\Common\ITimerManager.h" />
+    <ClInclude Include="..\Common\ITMService.h" />
     <ClInclude Include="..\Common\ITSTimer.h" />
     <ClInclude Include="..\Common\ITTyClientManager.h" />
     <ClInclude Include="..\Common\IUDPConnectManager.h" />
@@ -544,6 +546,7 @@
     <ClInclude Include="..\Common\TimerEvent.h" />
     <ClInclude Include="..\Common\TimerNodeList.h" />
     <ClInclude Include="..\Common\TimeWheelLink.h" />
+    <ClInclude Include="..\Common\TMService.h" />
     <ClInclude Include="..\Common\Trace.h" />
     <ClInclude Include="..\Common\TSCommon.hpp" />
     <ClInclude Include="Common\BaseClientConnectManager.h" />

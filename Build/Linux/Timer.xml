@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<!-- TimerCount is timer pool size, active 0 not activated else is active -->
+	<Info TimerCount="10" Active="1" />
+	<!-- 根据事件名称对应的Timer -->
+	<Timer EventID="1" Name="test1" Interval="1000" EventMaxCount="1000" desc = "对应test1的定时器"/>
+	
+	<!-- 根据消息ID映射不同的工作线程ID的配置关系 -->
+	<MessageInfo LogicThreadID="1" MessageID="1000" />
+</config>

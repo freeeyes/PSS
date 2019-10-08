@@ -56,12 +56,15 @@ bool CProServerManager::Init()
     //初始化拆件逻辑线程
     App_MessageQueueManager::instance()->Init();
 
+    //初始化TMS系统
+    m_TMService.Init();
+
     //初始化给插件的对象接口
     IConnectManager* pConnectManager           = dynamic_cast<IConnectManager*>(App_ProConnectManager::instance());
     IClientManager*  pClientManager            = dynamic_cast<IClientManager*>(App_ClientProConnectManager::instance());
     IUDPConnectManager* pUDPConnectManager     = dynamic_cast<IUDPConnectManager*>(App_ProUDPManager::instance());
     IFrameCommand* pFrameCommand               = dynamic_cast<IFrameCommand*>(&m_objFrameCommand);
-    ITSTimerManager* pTSTimer                  = dynamic_cast<ITSTimerManager*>(&m_TSThread);
+    ITMService* pTMService                     = dynamic_cast<ITMService*>(&m_TMService);
     IServerManager* pServerManager             = dynamic_cast<IServerManager*>(this);
     ITTyClientManager* pTTyClientManager       = dynamic_cast<ITTyClientManager*>(App_ProTTyClientManager::instance());
     IMessageQueueManager* pMessageQueueManager = dynamic_cast<IMessageQueueManager*>(App_MessageQueueManager::instance());
@@ -72,7 +75,7 @@ bool CProServerManager::Init()
                                   pUDPConnectManager,
                                   pFrameCommand,
                                   pServerManager,
-                                  pTSTimer,
+                                  pTMService,
                                   pTTyClientManager,
                                   pMessageQueueManager,
                                   pControlListen);
@@ -393,7 +396,7 @@ bool CProServerManager::Close()
 {
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close begin....\n"));
 
-    m_TSThread.Close();
+    m_TMService.Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close m_TSThread OK.\n"));
 
     App_ProConnectAcceptManager::instance()->Close();

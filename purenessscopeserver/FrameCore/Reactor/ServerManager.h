@@ -18,7 +18,7 @@
 #include "ControlListen.h"
 #include "FileTestManager.h"
 #include "IpCheck.h"
-#include "TimerEvent.h"
+#include "TMService.h"
 
 class Frame_Logging_Strategy;
 
@@ -43,7 +43,7 @@ private:
     ConnectConsoleAcceptor  m_ConnectConsoleAcceptor;    //后台管理链接
     Frame_Logging_Strategy* m_pFrameLoggingStrategy;     //输出对象
     CFrameCommand           m_objFrameCommand;           //框架命令
-    CTimerManager           m_TSThread;                  //TS定时器
+    CTMService              m_TMService;                  //TS定时器
 };
 
 

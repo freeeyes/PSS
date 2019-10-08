@@ -164,6 +164,22 @@ bool CXmlOpeation::Read_XML_Data_Single_Uint8(const char* pTag, const char* pNam
     }
 }
 
+bool CXmlOpeation::Read_XML_Data_Single_Int(const char* pTag, const char* pName, int& nValue)
+{
+    char* pData = GetData(pTag, pName);
+
+    if (pData != NULL)
+    {
+        nValue = ACE_OS::atoi(pData);
+        return true;
+    }
+    else
+    {
+        OUR_DEBUG((LM_INFO, "[CXmlOpeation::Read_XML_Data_Single_Int]tag=%s,name=%s no find.\n", pTag, pName));
+        return false;
+    }
+}
+
 bool CXmlOpeation::Read_XML_Data_Multiple_Uint8(const char* pTag, const char* pName, uint8& u1Value, TiXmlElement*& pTi)
 {
     char* pData = GetData(pTag, pName, pTi);
@@ -171,6 +187,21 @@ bool CXmlOpeation::Read_XML_Data_Multiple_Uint8(const char* pTag, const char* pN
     if (pData != NULL)
     {
         u1Value = (uint8)atoi(pData);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool CXmlOpeation::Read_XML_Data_Multiple_Int(const char* pTag, const char* pName, int& u4Value, TiXmlElement*& pTi)
+{
+    char* pData = GetData(pTag, pName, pTi);
+
+    if (pData != NULL)
+    {
+        u4Value = atoi(pData);
         return true;
     }
     else

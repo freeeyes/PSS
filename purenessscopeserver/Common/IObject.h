@@ -23,6 +23,7 @@
 #include "ITSTimer.h"
 #include "ITTyClientManager.h"
 #include "IMessageQueueManager.h"
+#include "ITMService.h"
 
 class CServerObject
 {
@@ -42,7 +43,7 @@ public:
         m_pTimerManager         = NULL;
         m_pIModuleInfo          = NULL;
         m_pFrameCommand         = NULL;
-        m_pTSTimerManager       = NULL;
+        m_pTMService            = NULL;
         m_pTTyClientManager     = NULL;
         m_pMessageQueueManager  = NULL;
     }
@@ -102,9 +103,9 @@ public:
         m_pFrameCommand = pFrameCommand;
     }
 
-    void SetTSTimer(ITSTimerManager* pTSTimerManager)
+    void SetTMSServce(ITMService* pTMService)
     {
-        m_pTSTimerManager = pTSTimerManager;
+        m_pTMService = pTMService;
     }
 
     void SetTTyClientManager(ITTyClientManager* pTTyClientManager)
@@ -167,9 +168,9 @@ public:
         return m_pFrameCommand;
     }
 
-    ITSTimerManager* GetTSTimer()
+    ITMService* GetTMService()
     {
-        return m_pTSTimerManager;
+        return m_pTMService;
     }
 
     ITTyClientManager* GetTTyClientManager()
@@ -201,7 +202,7 @@ private:
     IServerManager*        m_pIServerManager;
     IMessageBlockManager*  m_pMessageBlockManager;
     IFrameCommand*         m_pFrameCommand;
-    ITSTimerManager*       m_pTSTimerManager;
+    ITMService*            m_pTMService;
     ITTyClientManager*     m_pTTyClientManager;
     IMessageQueueManager*  m_pMessageQueueManager;
 };

@@ -7,6 +7,7 @@
 CServerManager::CServerManager(void)
 {
     m_pFrameLoggingStrategy = NULL;
+    m_TMService             = NULL;
 }
 
 bool CServerManager::Init()
@@ -69,14 +70,15 @@ bool CServerManager::Init()
     //初始化拆件逻辑线程
     App_MessageQueueManager::instance()->Init();
 
-
+    //初始化TMS系统
+    m_TMService.Init();
 
     //初始化给插件的对象接口
     IConnectManager* pConnectManager           = dynamic_cast<IConnectManager*>(App_ConnectManager::instance());
     IClientManager*  pClientManager            = dynamic_cast<IClientManager*>(App_ClientReConnectManager::instance());
     IUDPConnectManager* pUDPConnectManager     = dynamic_cast<IUDPConnectManager*>(App_ReUDPManager::instance());
     IFrameCommand* pFrameCommand               = dynamic_cast<IFrameCommand*>(&m_objFrameCommand);
-    ITSTimerManager* pTSTimer                  = dynamic_cast<ITSTimerManager*>(&m_TSThread);
+    ITMService* pTMService                     = dynamic_cast<ITMService*>(&m_TMService);
     IServerManager* pServerManager             = dynamic_cast<IServerManager*>(this);
     ITTyClientManager* pTTyClientManager       = dynamic_cast<ITTyClientManager*>(App_ReTTyClientManager::instance());
     IMessageQueueManager* pMessageQueueManager = dynamic_cast<IMessageQueueManager*>(App_MessageQueueManager::instance());
@@ -87,7 +89,7 @@ bool CServerManager::Init()
                                   pUDPConnectManager,
                                   pFrameCommand,
                                   pServerManager,
-                                  pTSTimer,
+                                  pTMService,
                                   pTTyClientManager,
                                   pMessageQueueManager,
                                   pControlListen);
@@ -612,7 +614,7 @@ void CServerManager::Multiple_Process_Start()
 bool CServerManager::Close()
 {
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close begin....\n"));
-    m_TSThread.Close();
+    m_TMService.Close();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close m_TSThread OK.\n"));
     App_ConnectAcceptorManager::instance()->Close();
     m_ConnectConsoleAcceptor.close();
