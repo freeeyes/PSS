@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <config>
 	<!-- TimerCount is timer pool size, active 0 not activated else is active -->
-	<Info TimerCount="10" Active="1" />
+	<Info TimerCount="10" Active="0" />
 	<!-- 根据事件名称对应的Timer -->
 	<Timer EventID="1" Name="test1" Interval="1000" EventMaxCount="1000" desc = "对应test1的定时器"/>
 	
