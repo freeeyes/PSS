@@ -148,7 +148,7 @@ matrix:
       - $ACE_ROOT/bin/mwc.pl -type gnuace
       - make -j 4      
       - cd $TRAVIS_BUILD_DIR/Build/Linux/
-      - $ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc\
+      - $ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc
       - ls
       - make -j 4
       - nohup ./PurenessScopeServer > pssout.file 2>&1 &
