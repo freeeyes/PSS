@@ -49,7 +49,6 @@ DefineClassAndFunc(xmlServerVersion, XML_Config_ServerVersion)
 DefineClassAndFunc(xmlPacketParses, XML_Config_PacketParses)
 DefineClassAndFunc(xmlBuffPacket, XML_Config_BuffPacket)
 DefineClassAndFunc(xmlMessage, XML_Config_Message)
-DefineClassAndFunc(xmlTSTimer, XML_Config_Timer)
 DefineClassAndFunc(xmlTcpRedirection, XML_Config_Redirection)
 DefineClassAndFunc(xmlAlertConnect, XML_Config_AlertConnect)
 DefineClassAndFunc(xmlIP, XML_Config_IP)
@@ -601,11 +600,6 @@ xmlMails::_Mail* xmlMails::GetMailAlert(uint16 MailID)
     }
 
     return NULL;
-}
-
-bool xmlTSTimer::Init(CXmlOpeation* pXmlOperation)
-{
-    return pXmlOperation->Read_XML_Data_Single_Uint16("TSTimer", "TimerListPool", TimerListCount);
 }
 
 bool xmlTcpRedirection::Init(CXmlOpeation* pXmlOperation)

@@ -53,7 +53,6 @@ enum XmlConfig
     XML_Config_PacketParses,
     XML_Config_BuffPacket,
     XML_Config_Message,
-    XML_Config_Timer,
     XML_Config_Redirection,
 
     /****************alert.xml*****************/
@@ -586,15 +585,6 @@ public:
 
     //根据指定的邮箱ID查找邮箱配置信息
     _CommandsTimeout* GetCommandAlert(uint16 CommandID);
-};
-
-class xmlTSTimer : public IConfigOpeation
-{
-public:
-    uint16 TimerListCount;
-    xmlTSTimer(XmlConfig config, const char* name) : IConfigOpeation(config, name), TimerListCount(10)
-    {}
-    bool Init(CXmlOpeation* pXmlOperation);
 };
 
 class xmlTcpRedirection : public IConfigOpeation
