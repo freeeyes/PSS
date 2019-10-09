@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <config>
-	<Info TimerCount="10" />
+	<Info TimerCount="10" Active="0" />
 	<!-- 根据事件名称对应的Timer -->
 	<Timer EventID="1" Name="test1" Interval="1000" EventMaxCount="1000" desc = "对应test1的定时器"/>
 	<Timer EventID="2" Name="test2" Interval="1000" EventMaxCount="1000" desc = "对应test2的定时器"/>
