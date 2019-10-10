@@ -361,6 +361,9 @@
     <ClCompile Include="Common\TMService.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="CppUnit\Unit_TMService.cpp">
+      <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -857,6 +860,9 @@
     </ClInclude>
     <ClInclude Include="Common\TMService.h">
       <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\Unit_TMService.h">
+      <Filter>CppUnit\hfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

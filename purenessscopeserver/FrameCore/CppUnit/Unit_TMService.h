@@ -13,7 +13,6 @@ public:
     {
         int* nData = (int*)_arg;
         (*nData) = 1;
-        printf("[CTestUser::DoMessage]****_message_id=%d.\n", _message_id);
     }
 };
 

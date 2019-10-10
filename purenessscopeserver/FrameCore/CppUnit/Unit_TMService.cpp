@@ -13,6 +13,7 @@ void CUnit_TMService::setUp(void)
 
 void CUnit_TMService::tearDown(void)
 {
+    OUR_DEBUG((LM_INFO, "[CUnit_TMService::tearDown]is CLose."));
 }
 
 void CUnit_TMService::Test_TMService(void)
