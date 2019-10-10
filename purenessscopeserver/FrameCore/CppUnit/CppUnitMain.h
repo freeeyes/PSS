@@ -43,6 +43,7 @@
 #include "Uint_TcpRedirection.h"
 #include "Unit_LogicThreadManager.h"
 #include "Unit_TSTimer.h"
+#include "Unit_TMService.h"
 
 static const char CPPUNIT_REPORT_PATH[] = "./reports/cppunit/report.xml";
 
