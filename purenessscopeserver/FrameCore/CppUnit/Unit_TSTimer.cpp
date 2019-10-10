@@ -20,10 +20,6 @@ void CUnit_TimerThread::setUp(void)
 void CUnit_TimerThread::tearDown(void)
 {
     m_pTimerThread->Close();
-
-    ACE_Time_Value tvSleep(0, 1000);
-    ACE_OS::sleep(tvSleep);
-
     SAFE_DELETE(m_pTimerThread);
 }
 
@@ -40,7 +36,7 @@ void CUnit_TimerThread::Test_TimerThread(void)
         CPPUNIT_ASSERT_MESSAGE("[Test_TimerThread]Add_Timer is fail.", true == blRet);
     }
 
-    ACE_Time_Value tvSleep(5, 0);
+    ACE_Time_Value tvSleep(2, 0);
     ACE_OS::sleep(tvSleep);
 
     m_pTimerThread->Close();

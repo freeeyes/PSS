@@ -9,12 +9,12 @@ public:
     CTMService();
     virtual ~CTMService();
 
-    int Init();
+    int Init(int nNeedLoad = 0);
 
     void Close();
 
-    int AddMessage(string strName, int nMessagePos, long sec, long usec, int _Message_id, void* _arg, Enum_Timer_Mode emTimerMode = Timer_Mode_Run_Once, IMessagePrecess* pMessagePrecess = NULL);
-    void* DeleteMessage(string strName, int nMessagePos);
+    int AddMessage(string strName, unsigned long long nMessagePos, long sec, long usec, int _Message_id, void* _arg, Enum_Timer_Mode emTimerMode = Timer_Mode_Run_Once, IMessagePrecess* pMessagePrecess = NULL);
+    void* DeleteMessage(string strName, unsigned long long nMessagePos);
     bool GetRun();
 
 private:

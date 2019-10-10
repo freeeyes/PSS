@@ -16,7 +16,7 @@ CTMService::~CTMService()
 
 }
 
-int CTMService::Init()
+int CTMService::Init(int nNeedLoad)
 {
     //¶ÁÈ¡ÅäÖÃÎÄ¼þ
     CXmlOpeation objXmlOperation;
@@ -31,7 +31,7 @@ int CTMService::Init()
 
     objXmlOperation.Read_XML_Data_Single_Int("Info", "Active", m_nActive);
 
-    if (0 == m_nActive)
+    if (0 == nNeedLoad && 0 == m_nActive)
     {
         return -4;
     }
@@ -150,7 +150,7 @@ void CTMService::Close()
     this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
-int CTMService::AddMessage(string strName, int nMessagePos, long sec, long usec, int _Message_id, void* _arg, Enum_Timer_Mode emTimerMode, IMessagePrecess* pMessagePrecess)
+int CTMService::AddMessage(string strName, unsigned long long nMessagePos, long sec, long usec, int _Message_id, void* _arg, Enum_Timer_Mode emTimerMode, IMessagePrecess* pMessagePrecess)
 {
     if (0 == m_nActive)
     {
@@ -210,10 +210,10 @@ int CTMService::AddMessage(string strName, int nMessagePos, long sec, long usec,
         pTimerInfo->AddEventsInfo(objEventsInfo);
     }
 
-    return nMessagePos;
+    return 0;
 }
 
-void* CTMService::DeleteMessage(string strName, int nMessagePos)
+void* CTMService::DeleteMessage(string strName, unsigned long long nMessagePos)
 {
     if (0 == m_nActive)
     {

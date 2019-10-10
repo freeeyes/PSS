@@ -156,8 +156,8 @@ matrix:
       - cd $TRAVIS_BUILD_DIR/CppUnitTest/Test
       - make -j 4
       - ./Test_Pss
-      - cd $TRAVIS_BUILD_DIR/Build/Linux/
-      - cat pssout.file
+      # - cd $TRAVIS_BUILD_DIR/Build/Linux/
+      # - cat pssout.file
       - killall -9 PurenessScopeServer     
       
       - cd $TRAVIS_BUILD_DIR

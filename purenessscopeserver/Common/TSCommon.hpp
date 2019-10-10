@@ -38,7 +38,7 @@ public:
     void*                       m_pArg;
     int                         m_nMessageID;
     int                         m_nWorkThreadID;
-    int                         m_nMessagePos;
+    unsigned long long          m_nMessagePos;
     int                         m_nSec;                    //time of interval
     int                         m_nUsec;
     Enum_Message_Execute_State  m_emMessageState;
@@ -67,7 +67,7 @@ public:
         m_vecEventsList.push_back(objEventsInfo);
     }
 
-    void* DeleteEventInfo(int nMessagePos)
+    void* DeleteEventInfo(unsigned long long nMessagePos)
     {
         std::lock_guard <std::mutex> lock(m_objMutex);
 

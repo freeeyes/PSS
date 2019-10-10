@@ -158,6 +158,7 @@ void CTimerManager::Close()
 {
     timer_thread_info_.is_run_ = false;
     timer_thread_info_.condition_.notify_one();
+    this_thread::sleep_for(milliseconds(100));
 }
 
 void CTimerManager::run()

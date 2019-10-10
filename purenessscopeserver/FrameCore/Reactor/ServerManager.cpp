@@ -70,7 +70,11 @@ bool CServerManager::Init()
     App_MessageQueueManager::instance()->Init();
 
     //初始化TMS系统
+#ifdef _CPPUNIT_TEST
+    m_TMService.Init(1);   //打开测试接口
+#else
     m_TMService.Init();
+#endif
 
     //初始化给插件的对象接口
     IConnectManager* pConnectManager           = dynamic_cast<IConnectManager*>(App_ConnectManager::instance());
