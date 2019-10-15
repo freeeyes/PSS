@@ -24,6 +24,7 @@
 #include "ITTyClientManager.h"
 #include "IMessageQueueManager.h"
 #include "ITMService.h"
+#include "IEchartlog.h"
 
 class CServerObject
 {
@@ -46,6 +47,7 @@ public:
         m_pTMService            = NULL;
         m_pTTyClientManager     = NULL;
         m_pMessageQueueManager  = NULL;
+        m_pEchartlog            = NULL;
     }
 
     virtual ~CServerObject() {}
@@ -118,6 +120,11 @@ public:
         m_pMessageQueueManager = pMessageQueueManager;
     }
 
+    void SetEchartlog(IEchartlog* pEchartlog)
+    {
+        m_pEchartlog = pEchartlog;
+    }
+
     IMessageManager*       GetMessageManager()
     {
         return m_pIMessageManager;
@@ -188,6 +195,11 @@ public:
         return m_pTimerManager;
     }
 
+    IEchartlog* GetEchartlog()
+    {
+        return m_pEchartlog;
+    }
+
 private:
     IMessageManager*       m_pIMessageManager;
     ILogManager*           m_pLogManager;
@@ -205,6 +217,7 @@ private:
     ITMService*            m_pTMService;
     ITTyClientManager*     m_pTTyClientManager;
     IMessageQueueManager*  m_pMessageQueueManager;
+    IEchartlog*            m_pEchartlog;
 };
 
 typedef ACE_Singleton<CServerObject, ACE_Null_Mutex> App_ServerObject;

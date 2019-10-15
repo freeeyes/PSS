@@ -11,6 +11,7 @@ class CTestUser : public IMessagePrecess
 public:
     void DoMessage(int _message_id, void* _arg)
     {
+        OUR_DEBUG((LM_INFO, "[CTestUser::DoMessage]_message_id=%d.\n", _message_id));
         int* nData = (int*)_arg;
         (*nData) = 1;
     }

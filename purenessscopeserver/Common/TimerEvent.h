@@ -45,7 +45,6 @@ inline std::string get_curr_time()
     sprintf(date, "%04d-%02d-%02d-%02d.%02d.%02d:%d",
             (int)tm_now.tm_year + 1900, (int)tm_now.tm_mon + 1, (int)tm_now.tm_mday,
             (int)time.hours().count(), (int)time.minutes().count(), (int)time.seconds().count(), (int)time.subseconds().count());
-
 #endif
 
 

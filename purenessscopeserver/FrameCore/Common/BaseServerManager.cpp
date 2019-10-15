@@ -110,6 +110,7 @@ bool Server_Manager_Common_IObject(IConnectManager* pConnectManager,
     App_ServerObject::instance()->SetTMSServce(pTMService);
     App_ServerObject::instance()->SetTTyClientManager(pTTyClientManager);
     App_ServerObject::instance()->SetMessageQueueManager(pMessageQueueManager);
+    App_ServerObject::instance()->SetEchartlog(dynamic_cast<IEchartlog*>(App_Echartlog::instance()));
 
     return true;
 }

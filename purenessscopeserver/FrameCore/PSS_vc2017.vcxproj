@@ -180,6 +180,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Common\ACEMemory.cpp" />
+    <ClCompile Include="..\Common\Echartlog.cpp" />
     <ClCompile Include="..\Common\ILogicQueue.cpp" />
     <ClCompile Include="..\Common\RandomNumber.cpp" />
     <ClCompile Include="..\Common\Threading.cpp" />
@@ -507,6 +508,7 @@
     <ClInclude Include="..\Common\CreateInfo.h" />
     <ClInclude Include="..\Common\date.h" />
     <ClInclude Include="..\Common\define.h" />
+    <ClInclude Include="..\Common\Echartlog.h" />
     <ClInclude Include="..\Common\HashTable.h" />
     <ClInclude Include="..\Common\IBuffPacket.h" />
     <ClInclude Include="..\Common\ICheckPacket.h" />
@@ -514,6 +516,7 @@
     <ClInclude Include="..\Common\IClientParse.h" />
     <ClInclude Include="..\Common\IConnectManager.h" />
     <ClInclude Include="..\Common\IControlListen.h" />
+    <ClInclude Include="..\Common\IEchartlog.h" />
     <ClInclude Include="..\Common\IFrameCommand.h" />
     <ClInclude Include="..\Common\ILogicQueue.h" />
     <ClInclude Include="..\Common\ILogicThreadManager.h" />
