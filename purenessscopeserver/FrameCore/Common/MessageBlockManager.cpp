@@ -21,7 +21,7 @@ void CMessageBlockManager::Close()
 {
     m_MemoryBlock_Pool.Close();
 
-    SAFE_DELETE(m_pmsgallocator)
+    SAFE_DELETE(m_pmsgallocator);
     SAFE_DELETE(m_pdata_allocator);
     SAFE_DELETE(m_pbuff_allocator);
 

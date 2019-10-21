@@ -224,6 +224,7 @@
     <ClCompile Include="CppUnit\Unit_ConnectTcp.cpp" />
     <ClCompile Include="CppUnit\Unit_ConnectUdp.cpp" />
     <ClCompile Include="CppUnit\Unit_ControlListen.cpp" />
+    <ClCompile Include="CppUnit\Unit_EChartlog.cpp" />
     <ClCompile Include="CppUnit\Unit_FileLog.cpp" />
     <ClCompile Include="CppUnit\Unit_FileTestManager.cpp" />
     <ClCompile Include="CppUnit\Unit_ForbiddenIP.cpp" />
@@ -591,6 +592,7 @@
     <ClInclude Include="CppUnit\Unit_ConnectTcp.h" />
     <ClInclude Include="CppUnit\Unit_ConnectUdp.h" />
     <ClInclude Include="CppUnit\Unit_ControlListen.h" />
+    <ClInclude Include="CppUnit\Unit_EChartlog.h" />
     <ClInclude Include="CppUnit\Unit_FileLog.h" />
     <ClInclude Include="CppUnit\Unit_FileTestManager.h" />
     <ClInclude Include="CppUnit\Unit_ForbiddenIP.h" />

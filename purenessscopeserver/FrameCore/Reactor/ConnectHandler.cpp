@@ -1753,7 +1753,7 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
     }
     else
     {
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectManager::SendMessage] ConnectID[%d] is not find.", u4ConnectID);
+        OUR_DEBUG(LM_INFO, "[CConnectManager::SendMessage] ConnectID[%d] is not find, PacketSize=%d.", u4ConnectID, pBuffPacket->GetPacketLen());
         //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
         Tcp_Common_Send_Message_Error(blDelete, pBuffPacket);
 

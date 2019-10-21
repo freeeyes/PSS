@@ -367,6 +367,9 @@
     <ClCompile Include="..\Common\Echartlog.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="CppUnit\Unit_EChartlog.cpp">
+      <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -872,6 +875,9 @@
     </ClInclude>
     <ClInclude Include="..\Common\IEchartlog.h">
       <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\Unit_EChartlog.h">
+      <Filter>CppUnit\hfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
