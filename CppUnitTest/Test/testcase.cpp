@@ -1124,7 +1124,7 @@ bool CheckConsolePacket(_ResultInfo& objResultInfo)
     {
         close(sckClient);
         gettimeofday(&ttEnd, NULL);
-        sprintf(objResultInfo.m_szResult, "[e][127.0.0.1:10010]send buff size not equal, buffer size[%d], send size[%d]", nTotalSendLen);
+        sprintf(objResultInfo.m_szResult, "[e][127.0.0.1:10010]send buff size not equal, buffer size[%d], send size[%d]", nSendDataLen, nTotalSendLen);
         objResultInfo.m_nRet          = 1;
         objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
         return false;

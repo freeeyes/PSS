@@ -15,6 +15,8 @@ void CMessageBlockManager::Init()
     m_pmsgallocator   = new Mutex_MB_Allocator();
     m_pdata_allocator = new Mutex_MB_Allocator();
     m_pbuff_allocator = new Mutex_MB_Allocator();
+
+    m_MemoryBlock_Pool.Init(GetXmlConfigAttribute(xmlServerType)->Debug);
 }
 
 void CMessageBlockManager::Close()
@@ -68,6 +70,7 @@ ACE_Message_Block* CMessageBlockManager::Create(uint32 u4Size)
     }
 
     m_u4UsedSize += u4FormatSize;
+    m_MemoryBlock_Pool.Add_Used(pmb);
     return pmb;
 }
 
@@ -76,6 +79,11 @@ bool CMessageBlockManager::Close(ACE_Message_Block* pMessageBlock)
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
     if (NULL == pMessageBlock)
+    {
+        return false;
+    }
+
+    if (false == m_MemoryBlock_Pool.Check_Used(pMessageBlock))
     {
         return false;
     }

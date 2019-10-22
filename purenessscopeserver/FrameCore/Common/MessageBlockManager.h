@@ -16,8 +16,10 @@
 #include "ace/Task.h"
 #include "ace/Synch.h"
 #include <math.h>
+#include <unordered_map>
 
 #include "IMessageBlockManager.h"
+#include "XmlConfig.h"
 
 typedef ACE_Malloc<ACE_LOCAL_MEMORY_POOL, ACE_SYNCH_MUTEX> MUTEX_MB_MALLOC;
 typedef ACE_Allocator_Adapter<MUTEX_MB_MALLOC> Mutex_MB_Allocator;
@@ -45,12 +47,17 @@ public:
 class CMemoryBlock_Pool
 {
 public:
-    CMemoryBlock_Pool()
+    CMemoryBlock_Pool() : m_u1Debug(0)
     {
         for(uint32 i = 0; i < MAX_MEMORY_BLOCK_COUNT; i++)
         {
             m_MemoryBlock_List[i].m_u4ListSize = (uint32)pow((double)2, (int32)i);
         }
+    }
+
+    void Init(uint8 u1Debug)
+    {
+        m_u1Debug = u1Debug;
     }
 
     void Close()
@@ -93,6 +100,51 @@ public:
         }
     }
 
+    bool Add_Used(ACE_Message_Block* pmb)
+    {
+        if (1 == m_u1Debug)
+        {
+            //添加正在使用的对象指针
+            unordered_map<ACE_Message_Block*, uint8>::iterator f = m_mapUsedMemoryMB.find(pmb);
+
+            if (m_mapUsedMemoryMB.end() != f)
+            {
+                OUR_DEBUG((LM_ERROR, "[CMemoryBlock_Pool::Add_Used]add 0x%08x is used.\n", pmb));
+                return false;
+            }
+            else
+            {
+                m_mapUsedMemoryMB.insert(std::make_pair(pmb, 1));
+                return true;
+            }
+        }
+
+        return true;
+    }
+
+    bool Check_Used(ACE_Message_Block* pmb)
+    {
+        if (1 == m_u1Debug)
+        {
+            unordered_map<ACE_Message_Block*, uint8>::iterator f = m_mapUsedMemoryMB.find(pmb);
+
+            //查找指针是否是使用过的有效指针
+            if (m_mapUsedMemoryMB.end() != f)
+            {
+                //清理掉自己的指针
+                m_mapUsedMemoryMB.erase(f);
+                return true;
+            }
+            else
+            {
+                OUR_DEBUG((LM_ERROR, "[CMemoryBlock_Pool::Check_Used]add 0x%08x is not used.\n", pmb));
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     void Set(ACE_Message_Block* pmb)
     {
         if(NULL != pmb)
@@ -127,7 +179,9 @@ private:
         }
     }
 
-    _MemoryBlock_List m_MemoryBlock_List[MAX_MEMORY_BLOCK_COUNT];
+    uint8                                    m_u1Debug;    //0是关闭，1是开启
+    unordered_map<ACE_Message_Block*, uint8> m_mapUsedMemoryMB;
+    _MemoryBlock_List                        m_MemoryBlock_List[MAX_MEMORY_BLOCK_COUNT];
 };
 
 class CMessageBlockManager : public IMessageBlockManager
