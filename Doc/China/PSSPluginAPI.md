@@ -533,35 +533,7 @@ m_pServerObject->GetClientManager()
 		<tr><th>bool</th><th>返回值</th><th>是否执行成功</th></tr>
 </table>  
 
-## 7.框架定时器对象（ActiveTimer）
-### 说明:  
-> 框架定时器指针
-
-###在插件中使用方法:
-m_pServerObject->GetTimerManager()  
-
-###API列表：  
-<table width="100%" border="1" cellpadding="0" cellspacing="0">
-        <tr>
-            <th width="20%">接口名称</th>
-			<th width="20%">说明</th>
-            <th width="60%" colspan="3">接口参数</th>
-        </tr>
-        <tr>
-            <th rowspan="6">schedule</th>
-            <th rowspan="6">添加一个定时器</th>
-            <th>类型</th>
-            <th>参数名称</th>
-            <th>说明</th>
-        </tr>
-		<tr><th>ACE_Task*</th><th>pTask</th><th>定时器Task对象指针</th></tr>
-		<tr><th>void*</th><th>parg</th><th>定时器参数指针</th></tr>
-		<tr><th>ACE_Time_Value</th><th>ttbegin</th><th>定时器开始时间</th></tr>
-		<tr><th>ACE_Time_Value</th><th>ttInterval</th><th>定时器间隔时间</th></tr>
-		<tr><th>int</th><th>返回值</th><th>返回定时器ID</th></tr>
-</table>  
-
-## 8.插件间调用方法（IModuleMessageManager）
+## 7.插件间调用方法（IModuleMessageManager）
 ### 说明:  
 > 提供插件间的互相调用接口
 
@@ -601,7 +573,7 @@ m_pServerObject->GetModuleMessageManager()
 		<tr><th>int</th><th>返回值</th><th>返回执行状态</th></tr>
 </table>  
 
-## 9.插件开启关闭TCP服务监听（IControlListen）
+## 8.插件开启关闭TCP服务监听（IControlListen）
 ### 说明:  
 > 插件开启关闭TCP服务监听接口
 
@@ -665,7 +637,7 @@ m_pServerObject->GetControlListen()
 		<tr><th>uint32</th><th>返回值</th><th>得到当前服务器ID</th></tr>
 </table>  
 
-## 10.服务器插件管理（IModuleInfo）
+## 9.服务器插件管理（IModuleInfo）
 ### 说明:  
 > 获得服务器的插件管理
 
@@ -726,7 +698,7 @@ m_pServerObject->GetModuleInfo()
 		<tr><th>char*</th><th>返回值</th><th>获得一个插件的描述信息</th></tr>
 </table>
 
-## 11.ACE消息块管理（IMessageBlockManager）
+## 10.ACE消息块管理（IMessageBlockManager）
 ### 说明:  
 > ACEMessageBlock对象管理接口
 
@@ -760,7 +732,7 @@ m_pServerObject->GetMessageBlockManager()
 		<tr><th>bool</th><th>返回值</th><th>是否回收成功</th></tr>
 </table>    
 
-## 12.框架维护指令模块（IFrameCommand）
+## 11.框架维护指令模块（IFrameCommand）
 ### 说明:  
 > 允许插件使用维护指令对框架进行控制
 
@@ -786,62 +758,8 @@ m_pServerObject->GetFrameCommand()
 		<tr><th>int</th><th>返回值</th><th>是否执行成功</th></tr>
 </table>    
 
-## 12.TS定时器模块（IFrameCommand）
-### 说明:  
-> 提供插件非ACE的定时器加载方法。
 
-###在插件中使用方法:
-m_pServerObject->GetTSTimer()  
-
-###API列表：  
-<table width="100%" border="1" cellpadding="0" cellspacing="0">
-        <tr>
-            <th width="20%">接口名称</th>
-			<th width="20%">说明</th>
-            <th width="60%" colspan="3">接口参数</th>
-        </tr>
-        <tr>
-            <th rowspan="8">Add_Timer</th>
-            <th rowspan="8">添加一个定时器</th>
-            <th>类型</th>
-            <th>参数名称</th>
-            <th>说明</th>
-        </tr>
-		<tr><th>int</th><th>nTimerID</th><th>定时器ID</th></tr>
-		<tr><th>int</th><th>nFrequency</th><th>定时间隔</th></tr>
-		<tr><th>ts_timer::CTime_Value</th><th>pttBegin</th><th>定时器开始时间</th></tr>
-		<tr><th>ts_timer::Timeout_Callback</th><th>fn_Timeout_Callback</th><th>定时器回调函数</th></tr>
-		<tr><th>void*</th><th>pArgContext</th><th>定时器回调函数参数</th></tr>
-		<tr><th>ts_timer::Timeout_Error_Callback</th><th>fn_Timeout_Error_Callback</th><th>定时器执行异常接口</th></tr>
-		<tr><th>bool</th><th>返回值</th><th>是否执行成功</th></tr>
-        <tr>
-            <th rowspan="3">Del_Timer</th>
-            <th rowspan="3">删除一个定时器</th>
-            <th>类型</th>
-            <th>参数名称</th>
-            <th>说明</th>
-        </tr>
-		<tr><th>int</th><th>nTimerID</th><th>定时器ID</th></tr>
-		<tr><th>bool</th><th>返回值</th><th>是否执行成功</th></tr>
-        <tr>
-            <th rowspan="2">Pause</th>
-            <th rowspan="2">定时器服务暂停</th>
-            <th>类型</th>
-            <th>参数名称</th>
-            <th>说明</th>
-        </tr>
-		<tr><th>bool</th><th>返回值</th><th>是否执行成功</th></tr>
-        <tr>
-            <th rowspan="2">Restore</th>
-            <th rowspan="2">恢复暂停</th>
-            <th>类型</th>
-            <th>参数名称</th>
-            <th>说明</th>
-        </tr>
-		<tr><th>bool</th><th>返回值</th><th>是否执行成功</th></tr>
-</table>    
-
-## 13.TTy接口（ITTyClientManager）
+## 12.TTy接口（ITTyClientManager）
 ### 说明:  
 > 提供插件访问串口，蓝牙，红外设备的接口。
 
@@ -924,4 +842,56 @@ m_pServerObject->GetTTyClientManager()
 		<tr><th>char*&</th><th>pMessage</th><th>发送数据指针</th></tr>
 		<tr><th>uint32</th><th>u4Len</th><th>发送数据长度</th></tr>
 		<tr><th>bool</th><th>返回值</th><th>是否执行成功</th></tr>
+</table>    
+
+
+## 13.TMS计时器服务（TMService）
+### 说明:  
+> 提供继承到框架的C++11实现的非ACE的计时器模块。
+
+###在插件中使用方法:
+1.使用方式：m_pServerObject->GetTMService()  
+2.配合配置文件time.xml来使用
+3.使用例子请查看CppUnit目录下Unit_TMService
+###API列表：  
+<table width="100%" border="1" cellpadding="0" cellspacing="0">
+        <tr>
+            <th width="20%">接口名称</th>
+			<th width="20%">说明</th>
+            <th width="60%" colspan="3">接口参数</th>
+        </tr>
+        <tr>
+            <th rowspan="8">AddMessage</th>
+            <th rowspan="8">添加一个消息</th>
+            <th>类型</th>
+            <th>参数名称</th>
+            <th>说明</th>
+        </tr>
+		<tr><th>std::string</th><th>strName</th><th>消息名</th></tr>
+		<tr><th>unsigned long long</th><th>nMessagePos</th><th>消息位编号</th></tr>
+		<tr><th>long</th><th>sec</th><th>时间(秒)</th></tr>
+		<tr><th>long</th><th>usec</th><th>时间(毫秒)</th></tr>
+		<tr><th>int</th><th>_Message_id</th><th>消息编号(同time.xml中配置)</th></tr>
+		<tr><th>void*</th><th>_arg</th><th>消息参数(注意参数的生命周期)</th></tr>
+		<tr><th>Enum_Timer_Mode</th><th>emTimerMode</th><th>消息投递的方式</th></tr>
+		<tr><th>int</th><th>返回值</th><th>返回0为行成功</th></tr>
+        <tr>
+            <th rowspan="3">DeleteMessage</th>
+            <th rowspan="3">删除一个消息</th>
+            <th>类型</th>
+            <th>参数名称</th>
+            <th>说明</th>
+        </tr>
+		<tr><th>std::string</th><th>strName</th><th>消息名</th></tr>
+		<tr><th>unsigned long long</th><th>nMessagePos</th><th>消息位编号</th></tr>
+		<tr><th>void*</th><th>返回值</th><th>删除消息后，返回加入消息时候的参数地址</th></tr>
+        <tr>
+            <th rowspan="2">GetRun</th>
+            <th rowspan="2">是否在运行中</th>
+            <th>类型</th>
+            <th>参数名称</th>
+            <th>说明</th>
+        </tr>
+		<tr><th>bool</th><th>返回值</th><th>是否执行成功</th></tr>
+        <tr>
 </table>    
