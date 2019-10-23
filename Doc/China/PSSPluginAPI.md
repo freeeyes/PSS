@@ -847,7 +847,7 @@ m_pServerObject->GetTTyClientManager()
 
 ## 13.TMS计时器服务（TMService）
 ### 说明:  
-> 提供继承到框架的C++11实现的非ACE的计时器模块。
+> 提供集成与框架C++11实现的非ACE的计时器模块。
 
 ###在插件中使用方法:
 1.使用方式：m_pServerObject->GetTMService()  
@@ -861,8 +861,8 @@ m_pServerObject->GetTTyClientManager()
             <th width="60%" colspan="3">接口参数</th>
         </tr>
         <tr>
-            <th rowspan="8">AddMessage</th>
-            <th rowspan="8">添加一个消息</th>
+            <th rowspan="9">AddMessage</th>
+            <th rowspan="9">添加一个消息</th>
             <th>类型</th>
             <th>参数名称</th>
             <th>说明</th>
@@ -876,8 +876,8 @@ m_pServerObject->GetTTyClientManager()
 		<tr><th>Enum_Timer_Mode</th><th>emTimerMode</th><th>消息投递的方式</th></tr>
 		<tr><th>int</th><th>返回值</th><th>返回0为行成功</th></tr>
         <tr>
-            <th rowspan="3">DeleteMessage</th>
-            <th rowspan="3">删除一个消息</th>
+            <th rowspan="4">DeleteMessage</th>
+            <th rowspan="4">删除一个消息</th>
             <th>类型</th>
             <th>参数名称</th>
             <th>说明</th>
