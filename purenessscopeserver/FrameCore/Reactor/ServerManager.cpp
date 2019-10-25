@@ -104,10 +104,7 @@ bool CServerManager::Init()
     }
 
     //初始化转发列表
-    App_TcpRedirection::instance()->Init(GetXmlConfigAttribute(xmlTcpRedirection)->vec,
-                                         GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount,
-                                         pClientManager,
-                                         pConnectManager);
+    App_ForwardManager::instance()->Init();
 
 
     //让所有的线程拷同步副本
@@ -646,8 +643,8 @@ bool CServerManager::Close()
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_MessageManager OK.\n"));
     App_BuffPacketManager::instance()->Close_Object(CBuffPacketManager::Close_Callback);
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]BuffPacketManager OK\n"));
-    App_TcpRedirection::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_TcpRedirection OK.\n"));
+    App_ForwardManager::instance()->Close();
+    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ForwardManager OK.\n"));
     App_IPAccount::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_IPAccount OK.\n"));
     App_MessageBlockManager::instance()->Close();

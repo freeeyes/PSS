@@ -73,9 +73,6 @@ void CConnectHandler::Close()
     //清理缓冲的PacketParse对象
     ClearPacketParse();
 
-    //查看是否需要转发数据
-    App_TcpRedirection::instance()->CloseRedirect(GetConnectID());
-
     OUR_DEBUG((LM_ERROR, "[CConnectHandler::Close](0x%08x)Close(ConnectID=%d) OK.\n", this, GetConnectID()));
 
     //删除存在列表中的对象引用,这里加一个判定，如果是0说明当前连接尚未完成Manager添加。
@@ -244,9 +241,6 @@ int CConnectHandler::open(void*)
         OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]ConnectID=%d, nWakeupRet=%d, errno=%d.\n", GetConnectID(), nWakeupRet, errno));
     }
 
-    //查看是否需要转发数据
-    App_TcpRedirection::instance()->ConnectRedirect(m_u4LocalPort, GetConnectID());
-
     m_emIOType = NET_INPUT;
     return nRet;
 }
@@ -398,9 +392,6 @@ int CConnectHandler::Dispose_Recv_Data()
 
     //如果是DEBUG状态，记录当前接受包的二进制数据
     Output_Debug_Data(m_pCurrMessage, LOG_SYSTEM_DEBUG_CLIENTRECV);
-
-    //查看是否需要转发数据
-    App_TcpRedirection::instance()->DataRedirect(GetConnectID(), m_pCurrMessage);
 
     if (App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
     {

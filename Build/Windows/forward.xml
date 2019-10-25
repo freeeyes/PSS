@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<Info Active="0" />
+	<!-- Active0为关闭转发服务，1为打开转发服务 -->
+	<Forward Source="127.0.0.1:10020" Target="127.0.0.1:10030" desc = "test tcp forward"/>
+	<Forward Source="127.0.0.1:10040" Target="tty1" desc = "test tcp forward"/>
+</config>

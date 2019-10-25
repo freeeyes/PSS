@@ -220,12 +220,6 @@ void Send_MakePacket_Queue(uint32 u4ConnectID, uint32 u4PacketParseID, CPacketPa
         }
     }
 
-    //如果这个端口是转发协议端口且为本地不处理，则不处理
-    if (false == App_TcpRedirection::instance()->GetMode(u4LocalPort))
-    {
-        return;
-    }
-
     //将数据送入工作线程处理队列
     ACE_Time_Value tvNow = ACE_OS::gettimeofday();
 

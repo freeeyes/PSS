@@ -149,9 +149,6 @@ void CProConnectHandler::Close(int nIOCount, int nErrno)
 
         OUR_DEBUG((LM_ERROR, "[CProConnectHandler::Close](0x%08x)Close(ConnectID=%d) OK.\n", this, GetConnectID()));
 
-        //查看是否需要转发数据
-        App_TcpRedirection::instance()->CloseRedirect(GetConnectID());
-
         //删除存在列表中的对象引用,这里加一个判定，如果是0说明当前连接尚未完成Manager添加。
         if (GetConnectID() > 0)
         {
@@ -518,9 +515,6 @@ void CProConnectHandler::open(ACE_HANDLE h, ACE_Message_Block&)
 
     OUR_DEBUG((LM_DEBUG,"[CProConnectHandler::open]Open(%d) Connection from [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
 
-    //查看是否需要转发数据
-    App_TcpRedirection::instance()->ConnectRedirect(m_u4LocalPort, GetConnectID());
-
     //获得接收缓冲区大小
     Get_Recv_length();
 
@@ -545,9 +539,6 @@ void CProConnectHandler::handle_read_stream(const ACE_Asynch_Read_Stream::Result
 
         return;
     }
-
-    //查看是否需要转发数据
-    App_TcpRedirection::instance()->DataRedirect(GetConnectID(), &mb);
 
     m_atvInput = ACE_OS::gettimeofday();
 

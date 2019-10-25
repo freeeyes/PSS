@@ -87,10 +87,7 @@ bool CProServerManager::Init()
     }
 
     //初始化转发列表
-    App_TcpRedirection::instance()->Init(GetXmlConfigAttribute(xmlTcpRedirection)->vec,
-                                         GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount,
-                                         pClientManager,
-                                         pConnectManager);
+    App_ForwardManager::instance()->Init();
 
     //让所有的线程拷同步副本
     App_MessageServiceGroup::instance()->CopyMessageManagerList();
@@ -443,8 +440,8 @@ bool CProServerManager::Close()
     App_ProactorManager::instance()->StopProactor();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ReactorManager OK.\n"));
 
-    App_TcpRedirection::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_TcpRedirection OK.\n"));
+    App_ForwardManager::instance()->Close();
+    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ForwardManager OK.\n"));
     App_IPAccount::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_IPAccount OK.\n"));
     App_MessageBlockManager::instance()->Close();

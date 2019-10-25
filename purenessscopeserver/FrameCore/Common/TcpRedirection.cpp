@@ -1,142 +1,166 @@
 #include "TcpRedirection.h"
 
-CTcpRedirection::CTcpRedirection() : m_u2Count(0), m_pClientManager(NULL), m_pConnectManager(NULL)
+CForwardManager::CForwardManager() : m_nActive(0), m_nNeedLoad(0)
 {
 
 }
 
-
-void CTcpRedirection::Close()
+void CForwardManager::Close()
 {
-    OUR_DEBUG((LM_INFO, "[CTcpRedirection::Close]Begin.\n"));
+    m_vecForwardInfo.clear();
 
-    //删除hash表空间
-    m_objRedirectList.Close();
-
-    m_u2Count = 0;
-
-    OUR_DEBUG((LM_INFO, "[CTcpRedirection::Close]End.\n"));
-}
-
-void CTcpRedirection::Init(std::vector<xmlTcpRedirection::_RedirectionInfo> vecInfo, uint32 u4MaxHandlerCount, IClientManager* pClientManager, IConnectManager* pConnectManager)
-{
-    //设置Hash表最大的数量是100
-    m_objRedirectList.Init(MAX_BUFF_100);
-    m_objRedirectConnectList.Init(u4MaxHandlerCount);
-    m_pClientManager  = pClientManager;
-    m_pConnectManager = pConnectManager;
-
-    for (int i = 0; i < (int)vecInfo.size(); i++)
+    for (auto it = m_mapForwardConnectList.begin(); it != m_mapForwardConnectList.end(); ++it)
     {
-        xmlTcpRedirection::_RedirectionInfo* pRedirectionInfo = &vecInfo[i];
-
-        m_objRedirectList.Add_Hash_Data_By_Key_Unit32(pRedirectionInfo->SrcPort, pRedirectionInfo);
+        CForwardConnectInfo* pForwardConnectInfo = it->second;
+        SAFE_DELETE(pForwardConnectInfo);
     }
 
-    m_u2Count = (uint16)vecInfo.size();
+    m_mapForwardConnectList.clear();
 }
 
-void CTcpRedirection::ConnectRedirect(uint32 u4SrcPort, uint32 u4ConnectID)
+int CForwardManager::Init(int nNeedLoad)
 {
-    if (m_u2Count == 0 || NULL == m_pClientManager)
+    //读取配置文件
+    CXmlOpeation objXmlOperation;
+
+    bool blFileExist = objXmlOperation.Init(FORWARD_XML);
+
+    if (false == blFileExist)
     {
-        return;
+        //file is not exist.
+        return -3;
     }
 
-    xmlTcpRedirection::_RedirectionInfo* pRedirectionInfo = m_objRedirectList.Get_Hash_Box_Data_By_Uint32(u4SrcPort);
+    objXmlOperation.Read_XML_Data_Single_Int("Info", "Active", m_nActive);
 
-    if (NULL != pRedirectionInfo)
+    m_nNeedLoad = nNeedLoad;
+
+    if (0 == nNeedLoad && 0 == m_nActive)
     {
-        //连接远程服务器
-        CRedirectionData* pRedirectionData = new CRedirectionData();
-        pRedirectionData->SetServerID(u4ConnectID);
-        pRedirectionData->SetConnectManager(m_pConnectManager);
-        pRedirectionData->SetMode(pRedirectionInfo->Mode);
-        pRedirectionData->SetConnectState(pRedirectionInfo->ConnectState);
+        return -4;
+    }
 
-        m_objRedirectConnectList.Add_Hash_Data_By_Key_Unit32(u4ConnectID, pRedirectionData);
+    Close();
 
-        m_pClientManager->Connect(u4ConnectID,
-                                  pRedirectionInfo->RedirectionIP.c_str(),
-                                  pRedirectionInfo->RedirectionPort,
-                                  TYPE_IPV4,
-                                  (IClientMessage*)pRedirectionData);
+    TiXmlElement* pSource = NULL;
+    TiXmlElement* pTarget = NULL;
 
-        //这里要做到同步等待中间服务器连接建立成功再继续
-        int nRunCount = 0;
+    string strSource;
+    string strTarget;
 
-        while (true)
+    while (objXmlOperation.Read_XML_Data_Multiple_String("Forward", "EventID", strSource, pSource)
+           && objXmlOperation.Read_XML_Data_Multiple_String("Timer", "Name", strTarget, pTarget))
+    {
+        //写入配置文件
+        CForwardInfo objForwardInfo;
+
+        objForwardInfo.m_strSource = strSource;
+        objForwardInfo.m_strTarget = strTarget;
+
+        m_vecForwardInfo.push_back(objForwardInfo);
+    }
+
+    //写入类型
+    int nSize = (int)m_vecForwardInfo.size();
+
+    for (int i = 0; i < nSize; i++)
+    {
+        CForwardConnectInfo* pForwardConnectInfo = new CForwardConnectInfo();
+        pForwardConnectInfo->m_strSource = m_vecForwardInfo[i].m_strSource;
+        pForwardConnectInfo->m_strTarget = m_vecForwardInfo[i].m_strTarget;
+
+        mapForwardConnectList::iterator f = m_mapForwardConnectList.find(pForwardConnectInfo->m_strSource);
+
+        if (f == m_mapForwardConnectList.end())
         {
-            if (SERVER_CONNECT_FIRST == m_pClientManager->GetConnectState(u4ConnectID)
-                || SERVER_CONNECT_OK == m_pClientManager->GetConnectState(u4ConnectID)
-                || nRunCount >= MAX_CONNECT_REDIRECTION_COUNT)
-            {
-                break;
-            }
+            m_mapForwardConnectList.insert(std::make_pair(pForwardConnectInfo->m_strSource, pForwardConnectInfo));
+        }
 
-            ACE_Time_Value tvSleep(0, 1000);
-            ACE_OS::sleep(tvSleep);
-            nRunCount++;
+        pForwardConnectInfo = new CForwardConnectInfo();
+        pForwardConnectInfo->m_strSource = m_vecForwardInfo[i].m_strTarget;
+        pForwardConnectInfo->m_strTarget = m_vecForwardInfo[i].m_strSource;
+
+        f = m_mapForwardConnectList.find(pForwardConnectInfo->m_strSource);
+
+        if (f == m_mapForwardConnectList.end())
+        {
+            m_mapForwardConnectList.insert(std::make_pair(pForwardConnectInfo->m_strSource, pForwardConnectInfo));
         }
     }
+
+    return 0;
 }
 
-void CTcpRedirection::DataRedirect(uint32 u4ConnectID, ACE_Message_Block* mb)
+void CForwardManager::ConnectRegedit(const char* pIP, int nPort, ENUM_FORWARD_TYPE em_type)
 {
-    if (m_u2Count == 0 || NULL == m_pClientManager)
+    if (0 == m_nNeedLoad || 0 == m_nActive)
     {
         return;
     }
 
-    CRedirectionData* pRedirectionData = m_objRedirectConnectList.Get_Hash_Box_Data_By_Uint32(u4ConnectID);
+    char szSource[MAX_BUFF_100] = { '\0' };
 
-    if (NULL != pRedirectionData)
-    {
-        char* pData = (char*)mb->rd_ptr();
+    sprintf_safe(szSource, MAX_BUFF_100, "%s:%d", pIP, nPort);
 
-        //如果在连接状态，才发送数据
-        if (SERVER_CONNECT_FIRST == m_pClientManager->GetConnectState(u4ConnectID)
-            || SERVER_CONNECT_OK == m_pClientManager->GetConnectState(u4ConnectID))
-        {
-            m_pClientManager->SendData(u4ConnectID, pData, (int)mb->length(), false);
-        }
-    }
+    Check_Connect_IP(szSource, em_type, 1);
 }
 
-void CTcpRedirection::CloseRedirect(uint32 u4ConnectID)
+void CForwardManager::ConnectRegedit(const char* pName, ENUM_FORWARD_TYPE em_type)
 {
-    if (m_u2Count == 0 || NULL == m_pClientManager)
+    if (0 == m_nNeedLoad || 0 == m_nActive)
     {
         return;
     }
 
-    //回收内存数据
-    CRedirectionData* pRedirectionData = m_objRedirectConnectList.Get_Hash_Box_Data_By_Uint32(u4ConnectID);
-
-    if (NULL != pRedirectionData)
-    {
-        OUR_DEBUG((LM_INFO, "[CTcpRedirection::CloseRedirect]u4ConnectID=%d.\n", u4ConnectID));
-        SAFE_DELETE(pRedirectionData);
-        m_objRedirectConnectList.Del_Hash_Data_By_Unit32(u4ConnectID);
-        m_pClientManager->Close(u4ConnectID);
-    }
+    Check_Connect_IP(pName, em_type, 1);
 }
 
-bool CTcpRedirection::GetMode(uint32 u4LocalPort)
+void CForwardManager::DisConnectRegedit(const char* pIP, int nPort, ENUM_FORWARD_TYPE em_type)
 {
-    bool blRet = true;
-
-    if (m_u2Count == 0 || NULL == m_pClientManager)
+    if (0 == m_nNeedLoad || 0 == m_nActive)
     {
-        return blRet;
+        return;
     }
 
-    xmlTcpRedirection::_RedirectionInfo* pRedirectionInfo = m_objRedirectList.Get_Hash_Box_Data_By_Uint32(u4LocalPort);
+    char szSource[MAX_BUFF_100] = { '\0' };
 
-    if (NULL != pRedirectionInfo && pRedirectionInfo->Mode == 1)
+    sprintf_safe(szSource, MAX_BUFF_100, "%s:%d", pIP, nPort);
+
+    Check_Connect_IP(szSource, em_type, 0);
+}
+
+void CForwardManager::DisConnectRegedit(const char* pName, ENUM_FORWARD_TYPE em_type)
+{
+    if (0 == m_nNeedLoad || 0 == m_nActive)
     {
-        blRet = false;
+        return;
     }
 
-    return blRet;
+    Check_Connect_IP(pName, em_type, 0);
+}
+
+void CForwardManager::SendData(const char* pIP, int nPort, ACE_Message_Block* pmb)
+{
+    ACE_UNUSED_ARG(pIP);
+    ACE_UNUSED_ARG(nPort);
+    ACE_UNUSED_ARG(pmb);
+}
+
+void CForwardManager::RecvData(const char* pIP, int nPort, ACE_Message_Block* pmb)
+{
+    ACE_UNUSED_ARG(pIP);
+    ACE_UNUSED_ARG(nPort);
+    ACE_UNUSED_ARG(pmb);
+}
+
+void CForwardManager::Check_Connect_IP(const char* pName, ENUM_FORWARD_TYPE em_type, int ConnectState)
+{
+    mapForwardConnectList::iterator f = m_mapForwardConnectList.find((string)pName);
+
+    if (f != m_mapForwardConnectList.end())
+    {
+        CForwardConnectInfo* pForwardConnectInfo = (CForwardConnectInfo*)f->second;
+        pForwardConnectInfo->m_emForwardType = em_type;
+        pForwardConnectInfo->m_u1ConnectState = ConnectState;
+    }
 }

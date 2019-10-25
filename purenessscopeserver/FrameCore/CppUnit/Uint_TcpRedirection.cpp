@@ -4,40 +4,25 @@
 
 CUnit_Redirection::CUnit_Redirection()
 {
-    m_pTcpRedirection = NULL;
+    m_pForwardManager = NULL;
 }
 
 void CUnit_Redirection::setUp(void)
 {
-    m_pTcpRedirection = new CTcpRedirection();
-    xmlTcpRedirection::_RedirectionInfo redirecttioninfo;
-
-    redirecttioninfo.Mode            = 0;
-    redirecttioninfo.ConnectState    = 0;
-    redirecttioninfo.RedirectionIP   = "127.0.0.1";
-    redirecttioninfo.RedirectionPort = 10005;
-    redirecttioninfo.SrcPort         = 10004;
-
-    std::vector<xmlTcpRedirection::_RedirectionInfo> vec;
-
-    IConnectManager* pConnectManager = dynamic_cast<IConnectManager*>(App_ConnectManager::instance());
-    IClientManager*  pClientManager = dynamic_cast<IClientManager*>(App_ClientReConnectManager::instance());
-
-    vec.push_back(redirecttioninfo);
-
-    m_pTcpRedirection->Init(vec, 10, pClientManager, pConnectManager);
+    m_pForwardManager = new CForwardManager();
 }
 
 void CUnit_Redirection::tearDown(void)
 {
-    m_pTcpRedirection->Close();
-    delete m_pTcpRedirection;
-    m_pTcpRedirection = NULL;
+    m_pForwardManager->Close();
+    delete m_pForwardManager;
+    m_pForwardManager = NULL;
 }
 
 void CUnit_Redirection::Test_Redirection(void)
 {
     //²âÊÔ×ª·¢Ä£¿é
+    /*
     uint32 u4ConnectID = 111;
 
     m_pTcpRedirection->ConnectRedirect(10004, u4ConnectID);
@@ -73,6 +58,7 @@ void CUnit_Redirection::Test_Redirection(void)
     App_MessageBlockManager::instance()->Close(pmb);
 
     m_pTcpRedirection->CloseRedirect(u4ConnectID);
+    */
 
 }
 

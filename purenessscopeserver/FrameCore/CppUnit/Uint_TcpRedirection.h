@@ -25,7 +25,7 @@ public:
     void Test_Redirection(void);
 
 private:
-    CTcpRedirection* m_pTcpRedirection;
+    CForwardManager* m_pForwardManager;
 };
 
 #endif

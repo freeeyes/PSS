@@ -21,20 +21,20 @@ void thread_run(CThreadInfo* _thread_info)
         else
         {
             vector<CMessageInfo> thread_curr_queue_data_;
-            //std::lock_guard <std::mutex> lock(_thread_info->thread_mutex_);
             _thread_info->thread_mutex_.lock();
             thread_curr_queue_data_.swap(_thread_info->thread_queue_data_);
             _thread_info->thread_mutex_.unlock();
 
             for(int i = 0; i < (int)thread_curr_queue_data_.size(); i++)
             {
-                //printf("[thread_run]<%d> is data.\n", _thread_info->thread_logic_id_, thread_curr_queue_data_[i]);
                 thread_curr_queue_data_[i].f(thread_curr_queue_data_[i].message_id_, thread_curr_queue_data_[i].arg_);
             }
         }
     }
 
-    printf("[thread_run]<%d> is close.\n", _thread_info->thread_logic_id_);
+    //printf("[thread_run]<%d> is close.\n", _thread_info->thread_logic_id_);
+    delete _thread_info;
+    _thread_info = NULL;
 }
 
 CThreadInfo::CThreadInfo() : thread_logic_id_(0), is_run_(true)
@@ -50,8 +50,9 @@ void CThreadQueueManager::Close()
 {
     for (auto it = thread_list_.begin(); it != thread_list_.end(); ++it)
     {
-        it->second->is_run_ = false;
-        it->second->condition_.notify_one();
+        CThreadInfo* pThreadInfo = it->second;
+        pThreadInfo->is_run_ = false;
+        pThreadInfo->condition_.notify_one();
     }
 }
 
