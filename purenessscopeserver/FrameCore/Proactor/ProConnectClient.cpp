@@ -61,6 +61,9 @@ void CProConnectClient::Close()
 
         App_ClientProConnectManager::instance()->CloseByClient(m_nServerID);
 
+        //转发接口关闭
+        App_ForwardManager::instance()->DisConnectRegedit(m_AddrRemote.get_host_addr(), m_AddrRemote.get_port_number(), ENUM_FORWARD_TCP_S2S);
+        m_strDeviceName = "";
         OUR_DEBUG((LM_DEBUG, "[CProConnectClient::Close]delete OK[0x%08x], m_ems2s=%d.\n", this, m_ems2s));
         delete this;
     }
@@ -147,6 +150,11 @@ void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
         Send_MakePacket_Queue(m_nServerID, m_u4PacketParseInfoID, NULL, PACKET_SERVER_TCP_CONNECT, m_AddrRemote, "127.0.0.1", 0, CONNECT_IO_SERVER_TCP);
     }
 
+    m_strDeviceName = App_ForwardManager::instance()->ConnectRegedit(m_AddrRemote.get_host_addr(),
+                      m_AddrRemote.get_port_number(),
+                      ENUM_FORWARD_TCP_S2S,
+                      dynamic_cast<IDeviceHandler*>(this));
+
     if (false == RecvData(GetXmlConfigAttribute(xmlConnectServer)->Recvbuff, NULL))
     {
         OUR_DEBUG((LM_DEBUG, "[CProConnectClient::open](%d)GetConnectServerRecvBuffer is error.\n", m_nServerID));
@@ -183,6 +191,13 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
     }
     else
     {
+        //查看是否需要转发
+        if ("" != m_strDeviceName)
+        {
+            App_ForwardManager::instance()->SendData(m_strDeviceName, &mb);
+            return;
+        }
+
         //处理接收数据(这里不区分是不是完整包，交给上层逻辑自己去判定)
         if (CONNECT_IO_FRAME == m_emDispose)
         {
@@ -332,6 +347,15 @@ void CProConnectClient::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
 void CProConnectClient::addresses(const ACE_INET_Addr& remote_address, const ACE_INET_Addr& local_address)
 {
     m_AddrRemote = remote_address;
+}
+
+bool CProConnectClient::Device_Send_Data(const char* pData, ssize_t nLen)
+{
+    ACE_Message_Block* pmb = App_MessageBlockManager::instance()->Create((uint32)nLen);
+    memcpy_safe((char* )pData, (uint32)nLen, pmb->wr_ptr(), (uint32)nLen);
+    pmb->wr_ptr(nLen);
+
+    return SendData(pmb);
 }
 
 bool CProConnectClient::GetTimeout(ACE_Time_Value const& tvNow)

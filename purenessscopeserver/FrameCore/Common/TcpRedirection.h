@@ -12,6 +12,7 @@
 #include "ClientCommand.h"
 #include "IClientManager.h"
 #include "IConnectManager.h"
+#include "IDeviceHandler.h"
 #include <unordered_map>
 
 using namespace std;
@@ -38,7 +39,7 @@ public:
 class CForwardConnectInfo
 {
 public:
-    CForwardConnectInfo() : m_u4ConnectID(0), m_emForwardType(ENUM_FORWARD_TCP_UNKNOW), m_u1ConnectState(0)
+    CForwardConnectInfo() : m_u4ConnectID(0), m_emForwardType(ENUM_FORWARD_TCP_UNKNOW), m_u1ConnectState(0), m_pDeviceHandler(NULL)
     {
     };
 
@@ -47,6 +48,7 @@ public:
     uint32            m_u4ConnectID;
     ENUM_FORWARD_TYPE m_emForwardType;
     uint8             m_u1ConnectState;  //0是关闭，1是打开
+    IDeviceHandler*   m_pDeviceHandler;  //驱动指针
 };
 
 class CForwardManager
@@ -58,20 +60,20 @@ public:
 
     int Init(int nNeedLoad = 0);
 
-    void ConnectRegedit(const char* pIP, int nPort, ENUM_FORWARD_TYPE em_type);
+    string ConnectRegedit(const char* pIP, int nPort, ENUM_FORWARD_TYPE em_type, IDeviceHandler* pDeviceHandler);
 
-    void ConnectRegedit(const char* pName, ENUM_FORWARD_TYPE em_type);
+    string ConnectRegedit(const char* pName, ENUM_FORWARD_TYPE em_type, IDeviceHandler* pDeviceHandler);
 
     void DisConnectRegedit(const char* pIP, int nPort, ENUM_FORWARD_TYPE em_type);
 
     void DisConnectRegedit(const char* pName, ENUM_FORWARD_TYPE em_type);
 
-    void SendData(const char* pIP, int nPort, ACE_Message_Block* pmb);
-
-    void RecvData(const char* pIP, int nPort, ACE_Message_Block* pmb);
+    void SendData(string strTarget, ACE_Message_Block* pmb);
 
 private:
-    void Check_Connect_IP(const char* pName, ENUM_FORWARD_TYPE em_type, int ConnectState);
+    string Check_Connect_IP(const char* pName, ENUM_FORWARD_TYPE em_type, int ConnectState, IDeviceHandler* pDeviceHandler = NULL);
+
+    IDeviceHandler* Get_Device_Handler(string strTarget);
 
 private:
     typedef unordered_map<string, CForwardConnectInfo*> mapForwardConnectList;

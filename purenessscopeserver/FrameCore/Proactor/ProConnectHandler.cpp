@@ -155,6 +155,10 @@ void CProConnectHandler::Close(int nIOCount, int nErrno)
             App_ProConnectManager::instance()->Close(GetConnectID());
         }
 
+        //清理转发接口
+        App_ForwardManager::instance()->DisConnectRegedit(m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), ENUM_FORWARD_TCP_CLINET);
+        m_strDeviceName = "";
+
         //将对象指针放入空池中
         App_ProConnectHandlerPool::instance()->Delete(this);
     }
@@ -515,6 +519,12 @@ void CProConnectHandler::open(ACE_HANDLE h, ACE_Message_Block&)
 
     OUR_DEBUG((LM_DEBUG,"[CProConnectHandler::open]Open(%d) Connection from [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
 
+    //查看是否存在转发服务
+    m_strDeviceName = App_ForwardManager::instance()->ConnectRegedit(m_addrRemote.get_host_addr(),
+                      m_addrRemote.get_port_number(),
+                      ENUM_FORWARD_TCP_CLINET,
+                      dynamic_cast<IDeviceHandler*>(this));
+
     //获得接收缓冲区大小
     Get_Recv_length();
 
@@ -537,6 +547,13 @@ void CProConnectHandler::handle_read_stream(const ACE_Asynch_Read_Stream::Result
         //关闭当前连接
         Close(2, errno);
 
+        return;
+    }
+
+    //查看是否需要转发
+    if ("" != m_strDeviceName)
+    {
+        App_ForwardManager::instance()->SendData(m_strDeviceName, &mb);
         return;
     }
 
@@ -1418,6 +1435,20 @@ bool CProConnectHandler::SendTimeoutMessage()
     Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CHEK_TIMEOUT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
 
     return true;
+}
+
+bool CProConnectHandler::Device_Send_Data(const char* pData, ssize_t nLen)
+{
+    uint16 u2CommandID = 0x0000;
+
+    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
+    pBuffPacket->WriteStream(pData, (uint32)nLen);
+
+    uint8 u1State       = PACKET_SEND_IMMEDIATLY;
+    uint8 u1SendState   = SENDMESSAGE_JAMPNOMAL;
+    uint32 u4PacketSize = 0;
+
+    return SendMessage(u2CommandID, pBuffPacket, u1State, u1SendState, u4PacketSize, true, 0);
 }
 
 //***************************************************************************

@@ -15,11 +15,13 @@
 #include "BaseConnectClient.h"
 #include "LogManager.h"
 #include "BaseHander.h"
+#include "TcpRedirection.h"
+#include "IDeviceHandler.h"
 
 #define MAX_BUFF_1024 1024
 #define MAX_IP_LEN    16
 
-class CProConnectClient : public ACE_Service_Handler
+class CProConnectClient : public ACE_Service_Handler, public IDeviceHandler
 {
 public:
     CProConnectClient(void);
@@ -29,6 +31,7 @@ public:
     virtual void handle_read_stream(const ACE_Asynch_Read_Stream::Result& result);                     //接受用户数据
     virtual void handle_write_stream(const ACE_Asynch_Write_Stream::Result& result);                   //发送用户数据
     virtual void addresses(const ACE_INET_Addr& remote_address, const ACE_INET_Addr& local_address);   //获得链接地址
+    virtual bool Device_Send_Data(const char* pData, ssize_t nLen);                                    //透传数据接口
 
     void Close();                                          //链接关闭
     void ClientClose(EM_s2s& ems2s);                       //客户端自我关闭
@@ -68,5 +71,6 @@ private:
     EM_Server_Recv_State        m_emRecvState;               //0为未接收数据，1为接收数据完成，2为处理数据完成
     EM_CONNECT_IO_DISPOSE       m_emDispose;                 //处理模式，框架处理 or 业务处理
     uint32                      m_u4PacketParseInfoID;       //框架处理模块ID
+    string                      m_strDeviceName;             //转发接口名称
 };
 #endif

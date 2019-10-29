@@ -91,28 +91,28 @@ int CForwardManager::Init(int nNeedLoad)
     return 0;
 }
 
-void CForwardManager::ConnectRegedit(const char* pIP, int nPort, ENUM_FORWARD_TYPE em_type)
+string CForwardManager::ConnectRegedit(const char* pIP, int nPort, ENUM_FORWARD_TYPE em_type, IDeviceHandler* pDeviceHandler)
 {
     if (0 == m_nNeedLoad || 0 == m_nActive)
     {
-        return;
+        return "";
     }
 
     char szSource[MAX_BUFF_100] = { '\0' };
 
     sprintf_safe(szSource, MAX_BUFF_100, "%s:%d", pIP, nPort);
 
-    Check_Connect_IP(szSource, em_type, 1);
+    return Check_Connect_IP(szSource, em_type, 1, pDeviceHandler);
 }
 
-void CForwardManager::ConnectRegedit(const char* pName, ENUM_FORWARD_TYPE em_type)
+string CForwardManager::ConnectRegedit(const char* pName, ENUM_FORWARD_TYPE em_type, IDeviceHandler* pDeviceHandler)
 {
     if (0 == m_nNeedLoad || 0 == m_nActive)
     {
-        return;
+        return "";
     }
 
-    Check_Connect_IP(pName, em_type, 1);
+    return Check_Connect_IP(pName, em_type, 1, pDeviceHandler);
 }
 
 void CForwardManager::DisConnectRegedit(const char* pIP, int nPort, ENUM_FORWARD_TYPE em_type)
@@ -139,28 +139,43 @@ void CForwardManager::DisConnectRegedit(const char* pName, ENUM_FORWARD_TYPE em_
     Check_Connect_IP(pName, em_type, 0);
 }
 
-void CForwardManager::SendData(const char* pIP, int nPort, ACE_Message_Block* pmb)
+void CForwardManager::SendData(string strTarget, ACE_Message_Block* pmb)
 {
-    ACE_UNUSED_ARG(pIP);
-    ACE_UNUSED_ARG(nPort);
-    ACE_UNUSED_ARG(pmb);
+    IDeviceHandler* pIDeviceHandler = Get_Device_Handler(strTarget);
+
+    if (NULL != pIDeviceHandler)
+    {
+        pIDeviceHandler->Device_Send_Data(pmb->wr_ptr(), pmb->length());
+        pmb->wr_ptr(pmb->length());
+    }
 }
 
-void CForwardManager::RecvData(const char* pIP, int nPort, ACE_Message_Block* pmb)
-{
-    ACE_UNUSED_ARG(pIP);
-    ACE_UNUSED_ARG(nPort);
-    ACE_UNUSED_ARG(pmb);
-}
-
-void CForwardManager::Check_Connect_IP(const char* pName, ENUM_FORWARD_TYPE em_type, int ConnectState)
+string CForwardManager::Check_Connect_IP(const char* pName, ENUM_FORWARD_TYPE em_type, int ConnectState, IDeviceHandler* pDeviceHandler)
 {
     mapForwardConnectList::iterator f = m_mapForwardConnectList.find((string)pName);
 
     if (f != m_mapForwardConnectList.end())
     {
         CForwardConnectInfo* pForwardConnectInfo = (CForwardConnectInfo*)f->second;
-        pForwardConnectInfo->m_emForwardType = em_type;
-        pForwardConnectInfo->m_u1ConnectState = ConnectState;
+        pForwardConnectInfo->m_emForwardType     = em_type;
+        pForwardConnectInfo->m_u1ConnectState    = ConnectState;
+        pForwardConnectInfo->m_pDeviceHandler    = pDeviceHandler;
+        return pForwardConnectInfo->m_strTarget;
     }
+    else
+    {
+        return "";
+    }
+}
+
+IDeviceHandler* CForwardManager::Get_Device_Handler(string strTarget)
+{
+    mapForwardConnectList::iterator f = m_mapForwardConnectList.find(strTarget);
+
+    if (f != m_mapForwardConnectList.end() && 1 == f->second->m_u1ConnectState)
+    {
+        return f->second->m_pDeviceHandler;
+    }
+
+    return NULL;
 }

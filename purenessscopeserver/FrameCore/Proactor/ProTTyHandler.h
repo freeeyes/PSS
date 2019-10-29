@@ -12,8 +12,10 @@
 #include "LoadPacketParse.h"
 #include "MessageBlockManager.h"
 #include "BaseHander.h"
+#include "TcpRedirection.h"
+#include "IDeviceHandler.h"
 
-class CProTTyHandler : public ACE_Handler
+class CProTTyHandler : public ACE_Handler, public IDeviceHandler
 {
 public:
     CProTTyHandler();
@@ -39,6 +41,8 @@ public:
 
     bool Send_Data(const char* pData, ssize_t nLen);                         //向设备发送数据
 
+    virtual bool Device_Send_Data(const char* pData, ssize_t nLen);          //透传数据接口
+
 private:
     void Ready_To_Read_Buff();
 
@@ -57,6 +61,7 @@ private:
     ITTyMessage*                          m_pTTyMessage;               //TTyMessage对象
     EM_CONNECT_IO_DISPOSE                 m_emDispose;                 //处理模式，框架处理 or 业务处理
     uint32                                m_u4PacketParseInfoID;       //框架处理模块ID
+    string                                m_strDeviceName;             //转发接口名称
 };
 #endif
 

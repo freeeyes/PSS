@@ -41,8 +41,9 @@
 #include "FileTest.h"
 #include "XmlConfig.h"
 #include "TcpRedirection.h"
+#include "IDeviceHandler.h"
 
-class CProConnectHandler : public ACE_Service_Handler
+class CProConnectHandler : public ACE_Service_Handler, public IDeviceHandler
 {
 public:
     CProConnectHandler(void);
@@ -53,6 +54,7 @@ public:
     virtual void handle_read_stream(const ACE_Asynch_Read_Stream::Result& result);                   //处理接受到用户数据包信息事件
     virtual void handle_write_stream(const ACE_Asynch_Write_Stream::Result& result);                 //处理发送到用户数据完成的事件
     virtual void addresses(const ACE_INET_Addr& remote_address, const ACE_INET_Addr& local_address); //获得当前远程客户端的IP地址信息
+    virtual bool Device_Send_Data(const char* pData, ssize_t nLen);                                  //透传数据接口
 
     uint32 file_open(IFileTestManager* pFileTest);                                           //文件入口打开接口
     int handle_write_file_stream(const char* pData, uint32 u4Size, uint8 u1ParseID);         //文件接口模拟数据包入口
@@ -143,7 +145,7 @@ private:
     char               m_szConnectName[MAX_BUFF_100];  //连接名称，可以开放给逻辑插件去设置
     char               m_szError[MAX_BUFF_500];        //错误信息描述文字
     char               m_szLocalIP[MAX_BUFF_50];       //本地监听IP
-
+    string             m_strDeviceName;                //转发接口名称
 
     ACE_Recursive_Thread_Mutex m_ThreadWriteLock;
     _TimeConnectInfo    m_TimeConnectInfo;              //链接健康检测器

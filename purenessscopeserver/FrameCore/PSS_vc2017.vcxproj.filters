@@ -879,6 +879,9 @@
     <ClInclude Include="CppUnit\Unit_EChartlog.h">
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
+    <ClInclude Include="Common\IDeviceHandler.h">
+      <Filter>IObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
