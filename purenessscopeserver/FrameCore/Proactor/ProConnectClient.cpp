@@ -62,8 +62,12 @@ void CProConnectClient::Close()
         App_ClientProConnectManager::instance()->CloseByClient(m_nServerID);
 
         //转发接口关闭
-        App_ForwardManager::instance()->DisConnectRegedit(m_AddrRemote.get_host_addr(), m_AddrRemote.get_port_number(), ENUM_FORWARD_TCP_S2S);
-        m_strDeviceName = "";
+        if ("" != m_strDeviceName)
+        {
+            App_ForwardManager::instance()->DisConnectRegedit(m_AddrRemote.get_host_addr(), m_AddrRemote.get_port_number(), ENUM_FORWARD_TCP_S2S);
+            m_strDeviceName = "";
+        }
+
         OUR_DEBUG((LM_DEBUG, "[CProConnectClient::Close]delete OK[0x%08x], m_ems2s=%d.\n", this, m_ems2s));
         delete this;
     }
@@ -195,6 +199,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         if ("" != m_strDeviceName)
         {
             App_ForwardManager::instance()->SendData(m_strDeviceName, &mb);
+            mb.reset();
             return;
         }
 

@@ -68,6 +68,13 @@ void CConnectClient::Close()
                                   CONNECT_IO_SERVER_TCP);
         }
 
+        //转发接口关闭
+        if ("" != m_strDeviceName)
+        {
+            App_ForwardManager::instance()->DisConnectRegedit(m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), ENUM_FORWARD_TCP_S2S);
+            m_strDeviceName = "";
+        }
+
         //回归用过的指针
         delete this;
     }
@@ -194,6 +201,11 @@ int CConnectClient::open(void* p)
                               CONNECT_IO_SERVER_TCP);
     }
 
+    m_strDeviceName = App_ForwardManager::instance()->ConnectRegedit(m_addrRemote.get_host_addr(),
+                      m_addrRemote.get_port_number(),
+                      ENUM_FORWARD_TCP_S2S,
+                      dynamic_cast<IDeviceHandler*>(this));
+
     int nRet = this->reactor()->register_handler(this, ACE_Event_Handler::READ_MASK | ACE_Event_Handler::WRITE_MASK);
 
     int nWakeupRet = reactor()->cancel_wakeup(this, ACE_Event_Handler::WRITE_MASK);
@@ -280,6 +292,14 @@ int CConnectClient::RecvData()
         }
 
         return -1;
+    }
+
+    //查看是否需要转发
+    if ("" != m_strDeviceName)
+    {
+        App_ForwardManager::instance()->SendData(m_strDeviceName, m_pCurrMessage);
+        m_pCurrMessage->reset();
+        return 0;
     }
 
     //如果是DEBUG状态，记录当前接受包的二进制数据
@@ -531,6 +551,15 @@ int CConnectClient::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
     }
 
     return 0;
+}
+
+bool CConnectClient::Device_Send_Data(const char* pData, ssize_t nLen)
+{
+    ACE_Message_Block* pmb = App_MessageBlockManager::instance()->Create((uint32)nLen);
+    memcpy_safe((char*)pData, (uint32)nLen, pmb->wr_ptr(), (uint32)nLen);
+    pmb->wr_ptr(nLen);
+
+    return SendData(pmb);
 }
 
 void CConnectClient::SetClientMessage(IClientMessage* pClientMessage)

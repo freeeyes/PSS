@@ -81,6 +81,13 @@ void CConnectHandler::Close()
         App_ConnectManager::instance()->CloseConnectByClient(GetConnectID());
     }
 
+    //清理转发接口
+    if ("" != m_strDeviceName)
+    {
+        App_ForwardManager::instance()->DisConnectRegedit(m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), ENUM_FORWARD_TCP_CLINET);
+        m_strDeviceName = "";
+    }
+
     //回归用过的指针
     App_ConnectHandlerPool::instance()->Delete(this);
 }
@@ -209,6 +216,12 @@ int CConnectHandler::open(void*)
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::open]this->peer().enable  = ACE_NONBLOCK error.");
         return -1;
     }
+
+    //查看是否存在转发服务
+    m_strDeviceName = App_ForwardManager::instance()->ConnectRegedit(m_addrRemote.get_host_addr(),
+                      m_addrRemote.get_port_number(),
+                      ENUM_FORWARD_TCP_CLINET,
+                      dynamic_cast<IDeviceHandler*>(this));
 
     //初始化参数设置
     if (-1 == Init_Open_Connect())
@@ -393,6 +406,14 @@ int CConnectHandler::Dispose_Recv_Data()
     //如果是DEBUG状态，记录当前接受包的二进制数据
     Output_Debug_Data(m_pCurrMessage, LOG_SYSTEM_DEBUG_CLIENTRECV);
 
+    //查看是否需要转发
+    if ("" != m_strDeviceName)
+    {
+        App_ForwardManager::instance()->SendData(m_strDeviceName, m_pCurrMessage);
+        m_pCurrMessage->reset();
+        return 0;
+    }
+
     if (App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
     {
         //如果没有读完，短读
@@ -499,7 +520,11 @@ int CConnectHandler::Init_Open_Connect()
     }
 
     //申请头的大小对应的mb
-    if (App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
+    if ("" != m_strDeviceName)
+    {
+        m_pCurrMessage = App_MessageBlockManager::instance()->Create(GetXmlConfigAttribute(xmlClientInfo)->MaxBuffRecv);
+    }
+    else if (App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
     {
         m_pCurrMessage = App_MessageBlockManager::instance()->Create(App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength);
     }
@@ -537,6 +562,20 @@ int CConnectHandler::handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask)
     Close();
 
     return 0;
+}
+
+bool CConnectHandler::Device_Send_Data(const char* pData, ssize_t nLen)
+{
+    uint16 u2CommandID = 0x0000;
+
+    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
+    pBuffPacket->WriteStream(pData, (uint32)nLen);
+
+    uint8 u1State = PACKET_SEND_IMMEDIATLY;
+    uint8 u1SendState = SENDMESSAGE_JAMPNOMAL;
+    uint32 u4PacketSize = 0;
+
+    return SendMessage(u2CommandID, pBuffPacket, u1State, u1SendState, u4PacketSize, true, 0);
 }
 
 uint32 CConnectHandler::file_open(IFileTestManager* pFileTest)
@@ -939,7 +978,11 @@ void CConnectHandler::ConnectOpen()
 
 void CConnectHandler::Get_Recv_length(int& nCurrCount)
 {
-    if (App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
+    if("" != m_strDeviceName)
+    {
+        nCurrCount = (uint32)GetXmlConfigAttribute(xmlClientInfo)->MaxBuffRecv - (uint32)m_pCurrMessage->length();
+    }
+    else if (App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
     {
         if (m_pPacketParse->GetIsHandleHead())
         {

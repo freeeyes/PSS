@@ -173,6 +173,12 @@ void CProTTyHandler::handle_read_file(const ACE_Asynch_Read_File::Result& result
 
     ACE_Message_Block& mb = result.message_block();
 
+    if ("" != m_strDeviceName)
+    {
+        App_ForwardManager::instance()->SendData(m_strDeviceName, &mb);
+        return;
+    }
+
     if (false == m_blPause)
     {
         if (CONNECT_IO_PLUGIN == m_emDispose && NULL != m_pTTyMessage)
@@ -271,12 +277,5 @@ void CProTTyHandler::Ready_To_Read_Buff()
 {
     m_pmbReadBuff->reset();
 
-    if(m_strDeviceName != "")
-    {
-        App_ForwardManager::instance()->SendData(m_strDeviceName, m_pmbReadBuff);
-    }
-    else
-    {
-        m_ObjReadRequire.read(*m_pmbReadBuff, m_pmbReadBuff->space());
-    }
+    m_ObjReadRequire.read(*m_pmbReadBuff, m_pmbReadBuff->space());
 }

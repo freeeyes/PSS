@@ -15,8 +15,10 @@
 #include "LoadPacketParse.h"
 #include "MessageBlockManager.h"
 #include "BaseHander.h"
+#include "TcpRedirection.h"
+#include "IDeviceHandler.h"
 
-class CReTTyHandler : public ACE_Event_Handler
+class CReTTyHandler : public ACE_Event_Handler, public IDeviceHandler
 {
 public:
     CReTTyHandler();
@@ -44,6 +46,7 @@ public:
     int handle_timeout(const ACE_Time_Value& tvNow, const void*  p);
 
     bool Send_Data(const char* pData, ssize_t nLen);                         //向设备发送数据
+    virtual bool Device_Send_Data(const char* pData, ssize_t nLen);          //透传数据接口
 
 private:
     char                                  m_szName[MAX_BUFF_100];
@@ -57,6 +60,7 @@ private:
     ITTyMessage*                          m_pTTyMessage;               //TTyMessage对象
     EM_CONNECT_IO_DISPOSE                 m_emDispose;                 //处理模式，框架处理 or 业务处理
     uint32                                m_u4PacketParseInfoID;       //框架处理模块ID
+    string                                m_strDeviceName;             //转发接口名称
 };
 
 #endif

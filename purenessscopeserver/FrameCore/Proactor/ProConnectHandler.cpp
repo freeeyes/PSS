@@ -156,8 +156,11 @@ void CProConnectHandler::Close(int nIOCount, int nErrno)
         }
 
         //清理转发接口
-        App_ForwardManager::instance()->DisConnectRegedit(m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), ENUM_FORWARD_TCP_CLINET);
-        m_strDeviceName = "";
+        if ("" != m_strDeviceName)
+        {
+            App_ForwardManager::instance()->DisConnectRegedit(m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), ENUM_FORWARD_TCP_CLINET);
+            m_strDeviceName = "";
+        }
 
         //将对象指针放入空池中
         App_ProConnectHandlerPool::instance()->Delete(this);
@@ -554,6 +557,7 @@ void CProConnectHandler::handle_read_stream(const ACE_Asynch_Read_Stream::Result
     if ("" != m_strDeviceName)
     {
         App_ForwardManager::instance()->SendData(m_strDeviceName, &mb);
+        mb.reset();
         return;
     }
 
@@ -867,7 +871,11 @@ bool CProConnectHandler::PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State
 
 void CProConnectHandler::Get_Recv_length()
 {
-    if (App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
+    if ("" != m_strDeviceName)
+    {
+        RecvClinetPacket(GetXmlConfigAttribute(xmlClientInfo)->MaxBuffRecv);
+    }
+    else if (App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
     {
         if (m_pPacketParse->GetIsHandleHead() == true)
         {

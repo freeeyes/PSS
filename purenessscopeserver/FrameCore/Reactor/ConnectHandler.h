@@ -34,6 +34,7 @@
 #include "TimeWheelLink.h"
 #include "FileTest.h"
 #include "TcpRedirection.h"
+#include "IDeviceHandler.h"
 
 #if PSS_PLATFORM != PLATFORM_WIN
 #include "netinet/tcp.h"
@@ -49,6 +50,7 @@ public:
     virtual int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE);            //接受客户端收到的数据块
     virtual int handle_output(ACE_HANDLE fd = ACE_INVALID_HANDLE);           //发送客户端数据
     virtual int handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask);           //链接关闭事件
+    virtual bool Device_Send_Data(const char* pData, ssize_t nLen);          //透传数据接口
 
     uint32 file_open(IFileTestManager* pFileTest);                                           //文件入口打开接口
     int handle_write_file_stream(const char* pData, uint32 u4Size, uint8 u1ParseID);         //文件接口模拟数据包入口
@@ -159,6 +161,7 @@ private:
     char*                      m_pPacketDebugData;             //记录数据包的Debug缓冲字符串
     EM_IO_TYPE                 m_emIOType;                     //当前IO入口类型
     IFileTestManager*          m_pFileTest;                    //文件测试接口入口
+    string                     m_strDeviceName;                //转发接口名称
 };
 
 //管理所有已经建立的链接

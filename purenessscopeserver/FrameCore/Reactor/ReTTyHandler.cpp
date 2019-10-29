@@ -62,6 +62,10 @@ void CReTTyHandler::Close()
             Send_MakePacket_Queue(m_u4ConnectID, m_u4PacketParseInfoID, NULL, PACKET_TTY_DISCONNECT, m_addrRemote, "TTy", 0, CONNECT_IO_TTY);
         }
 
+        //关闭转发接口
+        App_ForwardManager::instance()->DisConnectRegedit(m_szName, ENUM_FORWARD_TCP_TTY);
+        m_strDeviceName = "";
+
         m_ReTtyio.close();
         m_blState = false;
     }
@@ -93,6 +97,11 @@ bool CReTTyHandler::Init(uint32 u4ConnectID, const char* pName, ACE_TTY_IO::Seri
         ACE_INET_Addr m_addrRemote;
         Send_MakePacket_Queue(m_u4ConnectID, m_u4PacketParseInfoID, NULL, PACKET_TTY_CONNECT, m_addrRemote, "TTy", 0, CONNECT_IO_TTY);
     }
+
+    //查看是否存在转发接口
+    m_strDeviceName = App_ForwardManager::instance()->ConnectRegedit(pName,
+                      ENUM_FORWARD_TCP_TTY,
+                      dynamic_cast<IDeviceHandler*>(this));
 
     return blRet;
 }
@@ -138,6 +147,12 @@ int CReTTyHandler::handle_input(ACE_HANDLE handle)
     }
     else
     {
+        if ("" != m_strDeviceName)
+        {
+            App_ForwardManager::instance()->SendData(m_strDeviceName, m_pmbReadBuff);
+            return 0;
+        }
+
         if (false != m_blPause)
         {
             if (CONNECT_IO_PLUGIN == m_emDispose)
@@ -235,5 +250,10 @@ bool CReTTyHandler::Send_Data(const char* pData, ssize_t nLen)
         //当前连接中断，无法发送数据
         return false;
     }
+}
+
+bool CReTTyHandler::Device_Send_Data(const char* pData, ssize_t nLen)
+{
+    return Send_Data(pData, nLen);
 }
 
