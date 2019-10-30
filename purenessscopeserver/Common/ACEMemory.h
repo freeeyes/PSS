@@ -3,8 +3,8 @@
 
 #include "define.h"
 
-typedef ACE_Malloc<ACE_LOCAL_MEMORY_POOL, ACE_SYNCH_MUTEX> PACKET_DATA_MALLOC;
-typedef ACE_Allocator_Adapter<PACKET_DATA_MALLOC> PACKET_DATA_ALLOCTOR;
+//暂时不用ACE_LOCAL_MEMORY_POOL, 实测使用效率存在问题。
+//用new 和 delete 替换之
 
 class CACEMemory
 {
@@ -14,9 +14,6 @@ public:
 
     void* malloc(size_t stSize);
     bool  free(void* p);
-
-private:
-    static PACKET_DATA_ALLOCTOR*  m_pPacketDataAlloctor;
 };
 
 typedef ACE_Singleton<CACEMemory, ACE_Null_Mutex> App_ACEMemory;

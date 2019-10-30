@@ -2,9 +2,6 @@
 
 CMessageBlockManager::CMessageBlockManager(void)
 {
-    m_pmsgallocator   = NULL;
-    m_pbuff_allocator = NULL;
-    m_pdata_allocator = NULL;
     m_u4UsedSize      = 0;
 
     Init();
@@ -12,21 +9,12 @@ CMessageBlockManager::CMessageBlockManager(void)
 
 void CMessageBlockManager::Init()
 {
-    m_pmsgallocator   = new Mutex_MB_Allocator();
-    m_pdata_allocator = new Mutex_MB_Allocator();
-    m_pbuff_allocator = new Mutex_MB_Allocator();
-
     m_MemoryBlock_Pool.Init(GetXmlConfigAttribute(xmlServerType)->Debug);
 }
 
 void CMessageBlockManager::Close()
 {
     m_MemoryBlock_Pool.Close();
-
-    SAFE_DELETE(m_pmsgallocator);
-    SAFE_DELETE(m_pdata_allocator);
-    SAFE_DELETE(m_pbuff_allocator);
-
 }
 
 ACE_Message_Block* CMessageBlockManager::Create(uint32 u4Size)
@@ -48,20 +36,7 @@ ACE_Message_Block* CMessageBlockManager::Create(uint32 u4Size)
     if(NULL == pmb)
     {
         ACE_OS::last_error(0);
-        ACE_NEW_MALLOC_NORETURN(pmb,
-                                static_cast<ACE_Message_Block*>(m_pmsgallocator->malloc(sizeof(ACE_Message_Block))),
-                                ACE_Message_Block(u4FormatSize, // size
-                                        ACE_Message_Block::MB_DATA, // type
-                                        0,
-                                        0,
-                                        m_pbuff_allocator, // allocator_strategy
-                                        0, // locking strategy
-                                        ACE_DEFAULT_MESSAGE_BLOCK_PRIORITY, // priority
-                                        ACE_Time_Value::zero,
-                                        ACE_Time_Value::max_time,
-                                        m_pdata_allocator,
-                                        m_pmsgallocator
-                                                 ));
+        pmb = new ACE_Message_Block(u4FormatSize);
 
         if(0 != ACE_OS::last_error())
         {

@@ -33,8 +33,6 @@ void thread_run(CThreadInfo* _thread_info)
     }
 
     //printf("[thread_run]<%d> is close.\n", _thread_info->thread_logic_id_);
-    delete _thread_info;
-    _thread_info = NULL;
 }
 
 CThreadInfo::CThreadInfo() : thread_logic_id_(0), is_run_(true)
