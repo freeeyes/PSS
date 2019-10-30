@@ -32,6 +32,6 @@ void* CACEMemory::malloc(size_t stSize)
 
 bool CACEMemory::free(void* p)
 {
-    delete (void* )p;
+    delete (char*)(p);
     return true;
 }
