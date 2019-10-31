@@ -28,8 +28,6 @@ public:
 
     int thread_logic_id_;
     bool is_run_;
-    std::thread::id thread_id_;
-    std::thread thread_;
     mutable std::mutex thread_mutex_;
     std::condition_variable condition_;
     vector<CMessageInfo> thread_queue_data_;
@@ -55,6 +53,7 @@ public:
 
 private:
     unordered_map<int, CThreadInfo*> thread_list_;
+    vector<std::thread> threads_;
 };
 
 #endif

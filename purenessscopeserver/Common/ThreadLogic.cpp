@@ -2,16 +2,16 @@
 
 void thread_run(CThreadInfo* _thread_info)
 {
-    if(nullptr == _thread_info)
+    if (nullptr == _thread_info)
     {
         return;
     }
 
     printf("[thread_run]<%d> is begin.\n", _thread_info->thread_logic_id_);
 
-    while(_thread_info->is_run_)
+    while (_thread_info->is_run_)
     {
-        if(_thread_info->thread_queue_data_.size() == 0)
+        if (_thread_info->thread_queue_data_.size() == 0)
         {
             printf("[thread_run]<%d> is wait.\n", _thread_info->thread_logic_id_);
             std::unique_lock <std::mutex> lock(_thread_info->thread_mutex_);
@@ -25,7 +25,7 @@ void thread_run(CThreadInfo* _thread_info)
             thread_curr_queue_data_.swap(_thread_info->thread_queue_data_);
             _thread_info->thread_mutex_.unlock();
 
-            for(int i = 0; i < (int)thread_curr_queue_data_.size(); i++)
+            for (int i = 0; i < (int)thread_curr_queue_data_.size(); i++)
             {
                 thread_curr_queue_data_[i].f(thread_curr_queue_data_[i].message_id_, thread_curr_queue_data_[i].arg_);
             }
@@ -33,6 +33,8 @@ void thread_run(CThreadInfo* _thread_info)
     }
 
     //printf("[thread_run]<%d> is close.\n", _thread_info->thread_logic_id_);
+    delete _thread_info;
+    _thread_info = NULL;
 }
 
 CThreadInfo::CThreadInfo() : thread_logic_id_(0), is_run_(true)
@@ -41,7 +43,6 @@ CThreadInfo::CThreadInfo() : thread_logic_id_(0), is_run_(true)
 
 CThreadQueueManager::CThreadQueueManager()
 {
-
 }
 
 void CThreadQueueManager::Close()
@@ -58,7 +59,7 @@ bool CThreadQueueManager::Create(int _thread_logic_id)
 {
     unordered_map<int, CThreadInfo*>::iterator f = thread_list_.find(_thread_logic_id);
 
-    if(thread_list_.end() != f)
+    if (thread_list_.end() != f)
     {
         printf("[CThreadQueueManager::Create]_thread_logic_id(%d) is exist.\n", _thread_logic_id);
         return false;
@@ -67,8 +68,10 @@ bool CThreadQueueManager::Create(int _thread_logic_id)
 
     CThreadInfo* _thread_info = new CThreadInfo();
     _thread_info->thread_logic_id_ = _thread_logic_id;
-    _thread_info->thread_ =  std::thread(thread_run, _thread_info);
-    _thread_info->thread_id_ = _thread_info->thread_.get_id();
+    std::thread thread_ = std::thread(thread_run, _thread_info);
+    thread_.detach();
+
+    threads_.push_back(std::move(thread_));
 
     thread_list_.insert(std::make_pair(_thread_logic_id, _thread_info));
 
@@ -80,7 +83,7 @@ bool CThreadQueueManager::AddMessage(int _thread_logic_id, CMessageInfo::UserFun
 {
     unordered_map<int, CThreadInfo*>::iterator f = thread_list_.find(_thread_logic_id);
 
-    if(thread_list_.end() == f)
+    if (thread_list_.end() == f)
     {
         printf("[CThreadQueueManager::Create]_thread_logic_id(%d) is not exist.\n", _thread_logic_id);
         return false;
