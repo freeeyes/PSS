@@ -58,7 +58,7 @@ public:
 
     void Close();
 
-    int Init(int nNeedLoad = 0);
+    int Init();
 
     string ConnectRegedit(const char* pIP, int nPort, ENUM_FORWARD_TYPE em_type, IDeviceHandler* pDeviceHandler);
 
@@ -69,6 +69,8 @@ public:
     void DisConnectRegedit(const char* pName, ENUM_FORWARD_TYPE em_type);
 
     void SendData(string strTarget, ACE_Message_Block* pmb);
+
+    void AddForward(string strSource, string strTarget);
 
 private:
     string Check_Connect_IP(const char* pName, ENUM_FORWARD_TYPE em_type, int ConnectState, IDeviceHandler* pDeviceHandler = NULL);
@@ -81,8 +83,6 @@ private:
     vector<CForwardInfo> m_vecForwardInfo;          //需要关注的转发接口信息
     mapForwardConnectList m_mapForwardConnectList;
     int m_nActive;
-    int m_nNeedLoad;
-
 };
 
 typedef ACE_Singleton<CForwardManager, ACE_Null_Mutex> App_ForwardManager;

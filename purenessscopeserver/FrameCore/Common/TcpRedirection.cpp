@@ -1,6 +1,6 @@
 #include "TcpRedirection.h"
 
-CForwardManager::CForwardManager() : m_nActive(0), m_nNeedLoad(0)
+CForwardManager::CForwardManager() : m_nActive(0)
 {
 
 }
@@ -18,7 +18,7 @@ void CForwardManager::Close()
     m_mapForwardConnectList.clear();
 }
 
-int CForwardManager::Init(int nNeedLoad)
+int CForwardManager::Init()
 {
     //读取配置文件
     CXmlOpeation objXmlOperation;
@@ -33,9 +33,7 @@ int CForwardManager::Init(int nNeedLoad)
 
     objXmlOperation.Read_XML_Data_Single_Int("Info", "Active", m_nActive);
 
-    m_nNeedLoad = nNeedLoad;
-
-    if (0 == nNeedLoad && 0 == m_nActive)
+    if (0 == m_nActive)
     {
         return -4;
     }
@@ -93,7 +91,7 @@ int CForwardManager::Init(int nNeedLoad)
 
 string CForwardManager::ConnectRegedit(const char* pIP, int nPort, ENUM_FORWARD_TYPE em_type, IDeviceHandler* pDeviceHandler)
 {
-    if (0 == m_nNeedLoad || 0 == m_nActive)
+    if (0 == m_nActive)
     {
         return "";
     }
@@ -107,7 +105,7 @@ string CForwardManager::ConnectRegedit(const char* pIP, int nPort, ENUM_FORWARD_
 
 string CForwardManager::ConnectRegedit(const char* pName, ENUM_FORWARD_TYPE em_type, IDeviceHandler* pDeviceHandler)
 {
-    if (0 == m_nNeedLoad || 0 == m_nActive)
+    if (0 == m_nActive)
     {
         return "";
     }
@@ -117,7 +115,7 @@ string CForwardManager::ConnectRegedit(const char* pName, ENUM_FORWARD_TYPE em_t
 
 void CForwardManager::DisConnectRegedit(const char* pIP, int nPort, ENUM_FORWARD_TYPE em_type)
 {
-    if (0 == m_nNeedLoad || 0 == m_nActive)
+    if (0 == m_nActive)
     {
         return;
     }
@@ -131,7 +129,7 @@ void CForwardManager::DisConnectRegedit(const char* pIP, int nPort, ENUM_FORWARD
 
 void CForwardManager::DisConnectRegedit(const char* pName, ENUM_FORWARD_TYPE em_type)
 {
-    if (0 == m_nNeedLoad || 0 == m_nActive)
+    if (0 == m_nActive)
     {
         return;
     }
@@ -141,12 +139,55 @@ void CForwardManager::DisConnectRegedit(const char* pName, ENUM_FORWARD_TYPE em_
 
 void CForwardManager::SendData(string strTarget, ACE_Message_Block* pmb)
 {
+    if (0 == m_nActive)
+    {
+        return;
+    }
+
     IDeviceHandler* pIDeviceHandler = Get_Device_Handler(strTarget);
 
     if (NULL != pIDeviceHandler)
     {
         pIDeviceHandler->Device_Send_Data(pmb->wr_ptr(), pmb->length());
         pmb->wr_ptr(pmb->length());
+    }
+}
+
+void CForwardManager::AddForward(string strSource, string strTarget)
+{
+    if (0 == m_nActive)
+    {
+        m_nActive = 1;
+    }
+
+    //写入配置文件
+    CForwardInfo objForwardInfo;
+
+    objForwardInfo.m_strSource = strSource;
+    objForwardInfo.m_strTarget = strTarget;
+
+    m_vecForwardInfo.push_back(objForwardInfo);
+
+    CForwardConnectInfo* pForwardConnectInfo = new CForwardConnectInfo();
+    pForwardConnectInfo->m_strSource = objForwardInfo.m_strSource;
+    pForwardConnectInfo->m_strTarget = objForwardInfo.m_strTarget;
+
+    mapForwardConnectList::iterator f = m_mapForwardConnectList.find(pForwardConnectInfo->m_strSource);
+
+    if (f == m_mapForwardConnectList.end())
+    {
+        m_mapForwardConnectList.insert(std::make_pair(pForwardConnectInfo->m_strSource, pForwardConnectInfo));
+    }
+
+    pForwardConnectInfo = new CForwardConnectInfo();
+    pForwardConnectInfo->m_strSource = objForwardInfo.m_strTarget;
+    pForwardConnectInfo->m_strTarget = objForwardInfo.m_strSource;
+
+    f = m_mapForwardConnectList.find(pForwardConnectInfo->m_strSource);
+
+    if (f == m_mapForwardConnectList.end())
+    {
+        m_mapForwardConnectList.insert(std::make_pair(pForwardConnectInfo->m_strSource, pForwardConnectInfo));
     }
 }
 
