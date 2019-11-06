@@ -45,7 +45,7 @@ int CTMService::Init(int nNeedLoad)
     TiXmlElement* pInterval = NULL;
     TiXmlElement* pMaxEvent = NULL;
 
-    m_HashTimerList.Init(m_nTimerMaxCount);
+    m_HashTimerList.Init(m_nTimerMaxCount, MAX_BUFF_100);
 
     string szName;
     int  nID           = 0;
