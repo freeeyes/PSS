@@ -1733,9 +1733,6 @@ class ACE_Hash_Map :
     ACE_Hash<EXT_ID>, ACE_Equal_To<EXT_ID>, ACE_Null_Mutex>
 {};
 
-END_NAMESPACE
-USING_NAMESPACE
-
 #ifndef WIN32
 
 //获得当前文件打开数
@@ -1823,7 +1820,8 @@ inline void Gdaemon()
     signal(SIGCHLD, SIG_IGN);
     signal(SIGPIPE, SIG_IGN);
 }
-
 #endif
+END_NAMESPACE
+USING_NAMESPACE
 
 #endif
