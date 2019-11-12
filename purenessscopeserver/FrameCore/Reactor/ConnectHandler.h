@@ -40,7 +40,7 @@
 #include "netinet/tcp.h"
 #endif
 
-class CConnectHandler : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>
+class CConnectHandler : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>, public IDeviceHandler
 {
 public:
     CConnectHandler(void);
