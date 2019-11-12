@@ -9,57 +9,92 @@ CUnit_Redirection::CUnit_Redirection()
 
 void CUnit_Redirection::setUp(void)
 {
-    m_pForwardManager = new CForwardManager();
+    m_pForwardManager = App_ForwardManager::instance();
+    m_pForwardManager->AddForward("127.0.0.1:12005", "127.0.0.1:12006");
 }
 
 void CUnit_Redirection::tearDown(void)
 {
-    m_pForwardManager->Close();
-    delete m_pForwardManager;
     m_pForwardManager = NULL;
 }
 
 void CUnit_Redirection::Test_Redirection(void)
 {
     //测试转发模块
-    /*
-    uint32 u4ConnectID = 111;
+    int sockclient1;
+    int sockclient2;
+    bool blRet = false;
+    char szBuffSend[MAX_BUFF_100] = { '\0' };
+    char szBuffRecv[MAX_BUFF_100] = { '\0' };
 
-    m_pTcpRedirection->ConnectRedirect(10004, u4ConnectID);
+    sockclient1 = Create_client(12005, "127.0.0.1", 10002);
+    sockclient2 = Create_client(12006, "127.0.0.1", 10002);
 
-    //测试组装数据
-    //拼装测试发送数据
-    char szSendBufferData[MAX_BUFF_200] = { '\0' };
-    char szBuff[20] = { '\0' };
-    char szSession[32] = { '\0' };
-    sprintf_safe(szBuff, 20, "redirecttion");
-    sprintf_safe(szSession, 32, "redirecttion");
+    OUR_DEBUG((LM_INFO, "[CUnit_Redirection::Test_Redirection]sockclient1=%d, sockclient1=%d.\n", sockclient1, sockclient2));
 
-    short sVersion = 1;
-    short sCommand = (short)0x1000;
-    int nPacketLen = ACE_OS::strlen(szBuff);
+    if (0 == sockclient1 || 0 == sockclient2)
+    {
+        OUR_DEBUG((LM_INFO, "[CUnit_Redirection::Test_Redirection]connect is error.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[CUnit_Redirection::Test_Redirection]connect is error.", true == blRet);
+        return;
+    }
 
-    memcpy(szSendBufferData, (char*)&sVersion, sizeof(short));
-    memcpy((char*)&szSendBufferData[2], (char*)&sCommand, sizeof(short));
-    memcpy((char*)&szSendBufferData[4], (char*)&nPacketLen, sizeof(int));
-    memcpy((char*)&szSendBufferData[8], (char*)&szSession, sizeof(char) * 32);
-    memcpy((char*)&szSendBufferData[40], (char*)szBuff, sizeof(char) * nPacketLen);
+    //尝试发送数据
+    sprintf_safe(szBuffSend, MAX_BUFF_100, "freeeyes");
+    send(sockclient1, szBuffSend, ACE_OS::strlen(szBuffSend), 0);
 
-    ACE_Message_Block* pmb = App_MessageBlockManager::instance()->Create(40);
-    memcpy_safe((char*)&szSendBufferData[0], 40, pmb->wr_ptr(), 40);
-    pmb->wr_ptr(40);
-    m_pTcpRedirection->DataRedirect(u4ConnectID, pmb);
-    App_MessageBlockManager::instance()->Close(pmb);
+    int nRecvLen = recv(sockclient2, szBuffRecv, MAX_BUFF_100, 0);
 
-    pmb = App_MessageBlockManager::instance()->Create(8);
-    memcpy_safe((char*)&szSendBufferData[40], 8, pmb->wr_ptr(), 8);
-    pmb->wr_ptr(8);
-    m_pTcpRedirection->DataRedirect(u4ConnectID, pmb);
-    App_MessageBlockManager::instance()->Close(pmb);
+    if (nRecvLen != (int)ACE_OS::strlen(szBuffSend))
+    {
+        OUR_DEBUG((LM_INFO, "[CUnit_Redirection::Test_Redirection]connect is error.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[CUnit_Redirection::Test_Redirection]recv is error.", true == blRet);
+    }
 
-    m_pTcpRedirection->CloseRedirect(u4ConnectID);
-    */
+    close(sockclient1);
+    close(sockclient2);
+}
 
+int CUnit_Redirection::Create_client(int nClientPort, const char* pIP, int nServerPort)
+{
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+
+    struct sockaddr_in mine, dest;
+
+    bzero(&mine, sizeof(mine));
+
+    mine.sin_family = AF_INET;
+
+    mine.sin_port = htons(nClientPort);
+
+    inet_pton(AF_INET, pIP, &mine.sin_addr);
+
+    bzero(&dest, sizeof(dest));
+
+    dest.sin_family = AF_INET;
+
+    dest.sin_port = htons(nServerPort);
+
+    inet_pton(AF_INET, pIP, &dest.sin_addr);
+
+    int b = bind(sockfd, (struct sockaddr*)&mine, sizeof(mine));
+
+    if (b == -1)
+    {
+        return 0;
+    }
+
+    if (0 == connect(sockfd, (struct sockaddr*)&dest, sizeof(dest)))
+    {
+        ACE_Time_Value tvSleep(0, 1000);
+        ACE_OS::sleep(tvSleep);
+
+        return sockfd;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 #endif

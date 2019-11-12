@@ -18,7 +18,7 @@
 #include "BaseConsoleHandle.h"
 #include "PacketConsoleParse.h"
 
-class CConsoleHandler : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>
+class CConsoleHandler : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>, public IDeviceHandler
 {
 public:
     CConsoleHandler(void);
