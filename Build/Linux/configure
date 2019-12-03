@@ -1,9 +1,42 @@
 #!/bin/bash
 
-echo "checking ace env begin..."
 PSS_PATH=`pwd`
 ACE_PATH_ENV=$ACE_ROOT
 echo $ACE_PATH_ENV
+echo "checking curl begin..."
+CURL_PATH=`whereis curl`
+echo $CURL_PATH
+STR_CURL_INCLUDE="include/curl"
+CURL_RESULT=$(echo $CURL_PATH | grep "${STR_CURL_INCLUDE}")
+if [[ "$CURL_RESULT" != "" ]]
+then
+     echo "find curl lib path"
+else
+     echo "curl lib path no exist"
+     if [ ! -f "curl-7.67.0.tar.gz" ]; then
+     	echo "begin auto download curl packet begin..."
+     	wget https://curl.haxx.se/download/curl-7.67.0.tar.gz
+     	echo "begin auto download curl packet end..."
+     fi
+     
+		if [ ! -d '../third_libs' ]; then
+			mkdir ../third_libs
+		fi    
+		
+		echo "unzip curl packet begin..."
+		tar zxvf curl-7.67.0.tar.gz -C ../third_libs/
+		echo "unzip curl packet end..."		
+		
+		echo "make curl begin..."
+		cd ../third_libs/curl-7.67.0
+		make
+		make install
+		echo "make curl end..."
+fi
+echo "checking curl end..."
+
+cd $ACE_PATH_ENV
+echo "checking ace env begin..."
 if [ "$ACE_PATH_ENV"x = ""x ]; then
 	echo "ace no find"
 	if [ ! -f "ACE-6.5.0.tar.gz" ]; then
@@ -46,11 +79,40 @@ if [ "$ACE_PATH_ENV"x = ""x ]; then
 fi
 echo "checking ace env end..."
 echo "create PSS make begin..."
+cd $PSS_PATH
 echo $PSS_PATH/runlinuxmpc.sh
 sh $PSS_PATH/runlinuxmpc.sh
 echo "create PSS make end..."	
-echo "PSS make begin..."
-cd $PSS_PATH
+echo "compile make begin..."
 make
-echo "PSS make end..."	
-
+echo "compile make end..."	
+echo "create PSS Packetparse make begin..."	
+cd $PSS_PATH
+cd ../../purenessscopeserver/PacketParse_Interface/
+PSS_PACKET_PATH=`pwd`
+echo $PSS_PACKET_PATH
+echo $PSS_PACKET_PATH/runlinuxmpc.sh
+echo "create PSS Packetparse make end..."	
+echo "compile PSS Packetparse make begin..."	
+make
+echo "compile PSS Packetparse make end..."	
+echo "create PSS TcpTest make begin..."	
+cd $PSS_PATH
+cd ../../purenessscopeserver/example-Module/TcpTest
+PSS_TCPTEST_PATH=`pwd`
+echo $PSS_TCPTEST_PATH
+echo $PSS_TCPTEST_PATH/runlinuxmpc.sh
+echo "create PSS TcpTest make end..."	
+echo "compile PSS TcpTest make begin..."	
+make
+echo "compile PSS TcpTest make end..."	
+echo "create PSS UdpTest make begin..."	
+cd $PSS_PATH
+cd ../../purenessscopeserver/example-Module/UDPTest
+PSS_UDPTEST_PATH=`pwd`
+echo $PSS_UDPTEST_PATH
+echo $PSS_UDPTEST_PATH/runlinuxmpc.sh
+echo "create PSS UdpTest make end..."	
+echo "compile PSS UdpTest make begin..."	
+make
+echo "compile PSS UdpTest make end..."	
