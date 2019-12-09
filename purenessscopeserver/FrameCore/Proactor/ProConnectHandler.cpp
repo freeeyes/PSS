@@ -2423,6 +2423,12 @@ bool CProConnectManagerGroup::DelConnectTimeWheel(CProConnectHandler* pConnectHa
 
 bool CProConnectManagerGroup::PostMessage(uint32 u4ConnectID, IBuffPacket*& pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
+    if (0 >= pBuffPacket->GetPacketLen())
+    {
+        OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::PostMessage]send data len is zero.\n"));
+        return false;
+    }
+
     //判断命中到哪一个线程组里面去
     uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
@@ -2439,6 +2445,13 @@ bool CProConnectManagerGroup::PostMessage(uint32 u4ConnectID, IBuffPacket*& pBuf
 
 bool CProConnectManagerGroup::PostMessage( uint32 u4ConnectID, char*& pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
+    //判断发送的数据长度是否大于0
+    if (0 == nDataLen)
+    {
+        OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::PostMessage]send data len is zero.\n"));
+        return false;
+    }
+
     //判断命中到哪一个线程组里面去
     uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
 
@@ -2492,6 +2505,12 @@ bool CProConnectManagerGroup::PostMessage( uint32 u4ConnectID, char*& pData, uin
 
 bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPacket*& pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
+    if (0 >= pBuffPacket->GetPacketLen())
+    {
+        OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::PostMessage]send data len is zero.\n"));
+        return false;
+    }
+
     uint32 u4ConnectID = 0;
 
     for(auto& u4ConnectID : vecConnectID)
@@ -2534,6 +2553,12 @@ bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPac
 
 bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, char*& pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
+    if (0 == nDataLen)
+    {
+        OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::PostMessage]send data len is zero.\n"));
+        return false;
+    }
+
     for(auto& u4ConnectID : vecConnectID)
     {
         //判断命中到哪一个线程组里面去
@@ -2729,6 +2754,12 @@ void CProConnectManagerGroup::SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4
 
 bool CProConnectManagerGroup::PostMessageAll( IBuffPacket*& pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
+    if (0 >= pBuffPacket->GetPacketLen())
+    {
+        OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::PostMessageAll]send data len is zero.\n"));
+        return false;
+    }
+
     //全部群发
     for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
     {
@@ -2736,7 +2767,7 @@ bool CProConnectManagerGroup::PostMessageAll( IBuffPacket*& pBuffPacket, uint8 u
 
         if(NULL == pConnectManager)
         {
-            OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::PostMessage]No find send Queue object.\n"));
+            OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::PostMessageAll]No find send Queue object.\n"));
             continue;
         }
 
@@ -2757,6 +2788,12 @@ bool CProConnectManagerGroup::PostMessageAll( IBuffPacket*& pBuffPacket, uint8 u
 
 bool CProConnectManagerGroup::PostMessageAll( char*& pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
+    if (0 == nDataLen)
+    {
+        OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::PostMessageAll]send data len is zero.\n"));
+        return false;
+    }
+
     IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     if(NULL == pBuffPacket)
