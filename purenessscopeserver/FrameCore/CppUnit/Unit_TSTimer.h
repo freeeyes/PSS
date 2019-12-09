@@ -5,7 +5,7 @@
 
 #include "Unit_Common.h"
 #include "define.h"
-#include "TimerEvent.h"
+#include "TimerEvent.hpp"
 
 class CUnit_TimerThread : public CppUnit::TestFixture
 {

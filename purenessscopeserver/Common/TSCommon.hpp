@@ -1,9 +1,9 @@
 #ifndef _TSCOMMON_H
 #define _TSCOMMON_H
 
-#include "TimerEvent.h"
+#include "TimerEvent.hpp"
 #include "HashTable.h"
-#include "ThreadLogic.h"
+#include "ThreadLogic.hpp"
 #include <vector>
 
 using namespace std;

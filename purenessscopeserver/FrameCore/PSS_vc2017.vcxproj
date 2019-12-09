@@ -184,8 +184,6 @@
     <ClCompile Include="..\Common\ILogicQueue.cpp" />
     <ClCompile Include="..\Common\RandomNumber.cpp" />
     <ClCompile Include="..\Common\Threading.cpp" />
-    <ClCompile Include="..\Common\ThreadLogic.cpp" />
-    <ClCompile Include="..\Common\TimerEvent.cpp" />
     <ClCompile Include="Common\BaseClientConnectManager.cpp" />
     <ClCompile Include="Common\BaseConnectClient.cpp" />
     <ClCompile Include="Common\BaseConsoleHandle.cpp" />
@@ -546,8 +544,8 @@
     <ClInclude Include="..\Common\RandomNumber.h" />
     <ClInclude Include="..\Common\Threading.h" />
     <ClInclude Include="..\Common\ThreadLock.h" />
-    <ClInclude Include="..\Common\ThreadLogic.h" />
-    <ClInclude Include="..\Common\TimerEvent.h" />
+    <ClInclude Include="..\Common\ThreadLogic.hpp" />
+    <ClInclude Include="..\Common\TimerEvent.hpp" />
     <ClInclude Include="..\Common\TimerNodeList.hpp" />
     <ClInclude Include="..\Common\TimeWheelLink.h" />
     <ClInclude Include="..\Common\Trace.h" />

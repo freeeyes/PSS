@@ -346,12 +346,6 @@
     <ClCompile Include="Message\MessageQueueManager.cpp">
       <Filter>Message\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\ThreadLogic.cpp">
-      <Filter>Common\cppfile</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\TimerEvent.cpp">
-      <Filter>Common\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="CppUnit\Unit_TSTimer.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
@@ -843,13 +837,7 @@
     <ClInclude Include="..\Common\date.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\ThreadLogic.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="..\Common\TSCommon.hpp">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\TimerEvent.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
     <ClInclude Include="CppUnit\Unit_TSTimer.h">
@@ -877,6 +865,12 @@
       <Filter>IObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\TimerNodeList.hpp">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\TimerEvent.hpp">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ThreadLogic.hpp">
       <Filter>Common\hfile</Filter>
     </ClInclude>
   </ItemGroup>
