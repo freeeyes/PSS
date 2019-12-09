@@ -349,9 +349,6 @@
     <ClCompile Include="..\Common\ThreadLogic.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\TimerNodeList.cpp">
-      <Filter>Common\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="..\Common\TimerEvent.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
@@ -855,9 +852,6 @@
     <ClInclude Include="..\Common\TimerEvent.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\TimerNodeList.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="CppUnit\Unit_TSTimer.h">
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
@@ -881,6 +875,9 @@
     </ClInclude>
     <ClInclude Include="Common\IDeviceHandler.h">
       <Filter>IObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\TimerNodeList.hpp">
+      <Filter>Common\hfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

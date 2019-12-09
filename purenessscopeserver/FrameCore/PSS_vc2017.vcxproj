@@ -186,7 +186,6 @@
     <ClCompile Include="..\Common\Threading.cpp" />
     <ClCompile Include="..\Common\ThreadLogic.cpp" />
     <ClCompile Include="..\Common\TimerEvent.cpp" />
-    <ClCompile Include="..\Common\TimerNodeList.cpp" />
     <ClCompile Include="Common\BaseClientConnectManager.cpp" />
     <ClCompile Include="Common\BaseConnectClient.cpp" />
     <ClCompile Include="Common\BaseConsoleHandle.cpp" />
@@ -549,7 +548,7 @@
     <ClInclude Include="..\Common\ThreadLock.h" />
     <ClInclude Include="..\Common\ThreadLogic.h" />
     <ClInclude Include="..\Common\TimerEvent.h" />
-    <ClInclude Include="..\Common\TimerNodeList.h" />
+    <ClInclude Include="..\Common\TimerNodeList.hpp" />
     <ClInclude Include="..\Common\TimeWheelLink.h" />
     <ClInclude Include="..\Common\Trace.h" />
     <ClInclude Include="..\Common\TSCommon.hpp" />

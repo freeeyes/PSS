@@ -1,7 +1,7 @@
 #ifndef _TSTIMER_H
 #define _TSTIMER_H
 
-#include "TimerNodeList.h"
+#include "TimerNodeList.hpp"
 
 class ITSTimerManager
 {
