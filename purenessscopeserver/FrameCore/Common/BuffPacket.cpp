@@ -263,14 +263,14 @@ bool CBuffPacket::WriteStream(const char* pData, uint32 u4Len)
         }
 
         //写入文本内容
-        memcpy_safe((char* )pData, u4Len, WritePtr(), GetPacketSize() - GetWriteLen());
+        memcpy_safe(pData, u4Len, WritePtr(), GetPacketSize() - GetWriteLen());
         WritePtr(u4Len);
         return true;
     }
     else
     {
         //写入文本内容
-        memcpy_safe((char* )pData, u4Len, WritePtr(), GetPacketSize() - GetWriteLen());
+        memcpy_safe(pData, u4Len, WritePtr(), GetPacketSize() - GetWriteLen());
         WritePtr(u4Len);
         return true;
     }

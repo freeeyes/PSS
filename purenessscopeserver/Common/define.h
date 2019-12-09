@@ -512,7 +512,7 @@ inline void sprintf_safe(char* szText, int nLen, const char* fmt ...)
 };
 
 //支持memcpy的边界检查
-inline bool memcpy_safe(char* pSrc, uint32 u4SrcLen, char* pDes, uint32 u4DesLen, bool blIsString = false)
+inline bool memcpy_safe(const char* pSrc, uint32 u4SrcLen, char* pDes, uint32 u4DesLen, bool blIsString = false)
 {
     if(u4SrcLen > u4DesLen)
     {

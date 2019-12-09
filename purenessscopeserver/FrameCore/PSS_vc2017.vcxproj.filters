@@ -175,12 +175,6 @@
     <ClCompile Include="Console\FrameCommand.cpp">
       <Filter>Console\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\Threading.cpp">
-      <Filter>IObject</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\ACEMemory.cpp">
-      <Filter>Common\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="Console\MessageDefine.cpp">
       <Filter>Console\cppfile</Filter>
     </ClCompile>
@@ -336,9 +330,6 @@
     </ClCompile>
     <ClCompile Include="CppUnit\Unit_LogicThreadManager.cpp">
       <Filter>CppUnit\cppfile</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\ILogicQueue.cpp">
-      <Filter>Common\hfile</Filter>
     </ClCompile>
     <ClCompile Include="Message\MessageQueueManager.cpp">
       <Filter>Message\cppfile</Filter>
@@ -618,9 +609,6 @@
     <ClInclude Include="..\Common\IUDPConnectManager.h">
       <Filter>IObject</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\Threading.h">
-      <Filter>IObject</Filter>
-    </ClInclude>
     <ClInclude Include="..\Common\HashTable.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
@@ -628,9 +616,6 @@
       <Filter>Common\hfile</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\ObjectArrayList.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\ACEMemory.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\CreateInfo.h">
@@ -810,9 +795,6 @@
     <ClInclude Include="..\Common\ILogicThreadManager.h">
       <Filter>IObject</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\ILogicQueue.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="CppUnit\Unit_LogicThreadManager.h">
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
@@ -872,6 +854,15 @@
     </ClInclude>
     <ClInclude Include="..\Common\RandomNumber.hpp">
       <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ILogicQueue.hpp">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ACEMemory.hpp">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\IMessageQueueManager.h">
+      <Filter>IObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

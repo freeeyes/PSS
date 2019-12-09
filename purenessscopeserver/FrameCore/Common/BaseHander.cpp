@@ -206,7 +206,7 @@ void Send_MakePacket_Queue(uint32 u4ConnectID, uint32 u4PacketParseID, CPacketPa
     objMakePacket.m_u1Option        = u1Option;
     objMakePacket.m_AddrRemote      = addrRemote;
     objMakePacket.m_u4PacketParseID = u4PacketParseID;
-    objMakePacket.m_u1PacketType      = (uint8)emIOType;
+    objMakePacket.m_u1PacketType    = (uint8)emIOType;
 
     if (CONNECT_IO_TCP == emIOType || CONNECT_IO_UDP == emIOType)
     {
@@ -556,7 +556,7 @@ void Tcp_Common_Manager_Timeout_CheckInfo(int nActiveConnectCount)
     {
         AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
                                                GetXmlConfigAttribute(xmlAlertConnect)->MailID,
-                                               (char*)"Alert",
+                                               "Alert",
                                                "[Tcp_Common_Manager_Timeout_CheckInfo]active ConnectCount is more than limit(%d > %d).",
                                                nActiveConnectCount,
                                                GetXmlConfigAttribute(xmlAlertConnect)->ConnectAlert);
