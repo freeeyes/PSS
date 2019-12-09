@@ -1065,7 +1065,7 @@ CBuffPacket& CBuffPacket::operator << (string& str)
             *this << u4Len;
 
             //写入文本内容
-            memcpy_safe((char* )str.c_str(), u4Len, WritePtr(), u4Len);
+            memcpy_safe(str.c_str(), u4Len, WritePtr(), u4Len);
             WritePtr(u4Len);
             return *this;
         }
@@ -1076,7 +1076,7 @@ CBuffPacket& CBuffPacket::operator << (string& str)
         *this << u4Len;
 
         //写入文本内容
-        memcpy_safe((char* )str.c_str(), u4Len, WritePtr(), u4Len);
+        memcpy_safe(str.c_str(), u4Len, WritePtr(), u4Len);
         WritePtr(u4Len);
         return *this;
     }

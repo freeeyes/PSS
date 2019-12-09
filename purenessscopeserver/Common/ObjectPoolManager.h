@@ -96,7 +96,7 @@ public:
         return (uint32)m_objHashObjectList.Get_Used_Count();
     }
 
-    TYPE* Create(const char* pFileName, uint32 u4Line)
+    TYPE* Create(const char* pFileName = __FILE__, uint32 u4Line = __LINE__)
     {
         ACE_Guard<ACE_LOCK> WGuard(m_ThreadLock);
         uint32 u4Pos = 0;
