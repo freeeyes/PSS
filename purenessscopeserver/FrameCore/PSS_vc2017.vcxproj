@@ -182,7 +182,6 @@
     <ClCompile Include="..\Common\ACEMemory.cpp" />
     <ClCompile Include="..\Common\Echartlog.cpp" />
     <ClCompile Include="..\Common\ILogicQueue.cpp" />
-    <ClCompile Include="..\Common\RandomNumber.cpp" />
     <ClCompile Include="..\Common\Threading.cpp" />
     <ClCompile Include="Common\BaseClientConnectManager.cpp" />
     <ClCompile Include="Common\BaseConnectClient.cpp" />
@@ -541,8 +540,9 @@
     <ClInclude Include="..\Common\ObjectPoolManager.h" />
     <ClInclude Include="..\Common\Object_Pool.h" />
     <ClInclude Include="..\Common\ProfileTime.h" />
-    <ClInclude Include="..\Common\RandomNumber.h" />
+    <ClInclude Include="..\Common\RandomNumber.hpp" />
     <ClInclude Include="..\Common\Threading.h" />
+    <ClInclude Include="..\Common\Threading.hpp" />
     <ClInclude Include="..\Common\ThreadLock.h" />
     <ClInclude Include="..\Common\ThreadLogic.hpp" />
     <ClInclude Include="..\Common\TimerEvent.hpp" />

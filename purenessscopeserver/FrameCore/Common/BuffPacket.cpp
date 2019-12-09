@@ -132,7 +132,7 @@ bool CBuffPacket::AddBuff(uint32 u4Size)
     }
 }
 
-const char* CBuffPacket::GetData()
+char* CBuffPacket::GetData()
 {
     return m_szData;
 }

@@ -178,9 +178,6 @@
     <ClCompile Include="..\Common\Threading.cpp">
       <Filter>IObject</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\RandomNumber.cpp">
-      <Filter>Common\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="..\Common\ACEMemory.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
@@ -624,9 +621,6 @@
     <ClInclude Include="..\Common\Threading.h">
       <Filter>IObject</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\RandomNumber.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="..\Common\HashTable.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
@@ -871,6 +865,12 @@
       <Filter>Common\hfile</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\ThreadLogic.hpp">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Threading.hpp">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\RandomNumber.hpp">
       <Filter>Common\hfile</Filter>
     </ClInclude>
   </ItemGroup>

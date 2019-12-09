@@ -20,7 +20,7 @@ bool Console_Common_SendMessage_Data_Check(uint32 u4ConnectID, IBuffPacket* pBuf
     else
     {
         pMbData = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
-        memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pMbData->wr_ptr(), pBuffPacket->GetPacketLen());
+        memcpy_safe(pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pMbData->wr_ptr(), pBuffPacket->GetPacketLen());
         pMbData->wr_ptr(pBuffPacket->GetPacketLen());
     }
 

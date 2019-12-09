@@ -20,7 +20,7 @@ public:
     virtual bool Clear()                = 0;
 
     virtual bool AddBuff(uint32 u4Size) = 0;
-    virtual const char* GetData()       = 0;
+    virtual char* GetData()             = 0;
 
     virtual void SetReadPtr(uint32 u4Pos)                                = 0;    //设置读指针的位置
     virtual void SetPacketCount(uint32 u4PacketCount)                    = 0;    //设置缓存数据包的个数
