@@ -55,7 +55,7 @@ bool CForbiddenIP::CheckIP(const char* pIP, uint8 u1ConnectType)
     for(_ForbiddenIP& objForbiddenIP : m_VecForeverForbiddenIP)
     {
         if(objForbiddenIP.m_u1ConnectType == u1ConnectType
-           && CompareIP(objForbiddenIP.m_szClientIP, (char* )pIP) == true)
+           && CompareIP(objForbiddenIP.m_szClientIP, pIP) == true)
         {
             return false;
         }
@@ -63,7 +63,7 @@ bool CForbiddenIP::CheckIP(const char* pIP, uint8 u1ConnectType)
 
     for(VecForbiddenIP::iterator b = m_VecTempForbiddenIP.begin(); b != m_VecTempForbiddenIP.end(); ++b)
     {
-        if((*b).m_u1ConnectType == u1ConnectType && CompareIP((*b).m_szClientIP, (char* )pIP) == true)
+        if((*b).m_u1ConnectType == u1ConnectType && CompareIP((*b).m_szClientIP, pIP) == true)
         {
             //如果是禁止时间段内，则返回false，否则删除定时信息。
             if ((*b).m_tvBegin + ACE_Time_Value((*b).m_u4Second, 0) > ACE_OS::gettimeofday())
@@ -204,7 +204,7 @@ bool CForbiddenIP::SaveConfig()
     return true;
 }
 
-bool CForbiddenIP::CompareIP(char* pTargetIP, char* pClientIP)
+bool CForbiddenIP::CompareIP(const char* pTargetIP, const char* pClientIP)
 {
     char szTargetIP[MAX_IP_SIZE];
     char szClientIP[MAX_IP_SIZE];
@@ -263,12 +263,12 @@ bool CForbiddenIP::CompareIP(char* pTargetIP, char* pClientIP)
     }
 }
 
-VecForbiddenIP* CForbiddenIP::ShowForeverIP() const
+VecForbiddenIP* CForbiddenIP::ShowForeverIP()
 {
-    return (VecForbiddenIP*)&m_VecForeverForbiddenIP;
+    return &m_VecForeverForbiddenIP;
 }
 
-VecForbiddenIP* CForbiddenIP::ShowTempIP() const
+VecForbiddenIP* CForbiddenIP::ShowTempIP()
 {
-    return (VecForbiddenIP*)&m_VecTempForbiddenIP;
+    return &m_VecTempForbiddenIP;
 }

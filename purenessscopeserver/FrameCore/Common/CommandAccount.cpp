@@ -181,7 +181,7 @@ bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint32 u4Port, uint8 u1Pack
 
                     AppLogManager::instance()->WriteToMail(LOG_SYSTEM_PACKETTIME,
                                                            m_vecCommandAlertData[i].m_u4MailID,
-                                                           (char*)"Alert",
+                                                           "Alert",
                                                            "u2CommandID=%d, m_u4CommandCount more than [%d].",
                                                            u2CommandID,
                                                            (uint32)m_vecCommandAlertData[i].m_u4CommandCount);

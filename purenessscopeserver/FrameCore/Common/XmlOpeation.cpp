@@ -221,7 +221,7 @@ char* CXmlOpeation::GetData(const char* pName, const char* pAttrName)
 
     if(NULL != pTiXmlElement)
     {
-        return (char* )pTiXmlElement->Attribute(pAttrName);
+        return const_cast<char*>(pTiXmlElement->Attribute(pAttrName));
     }
 
     return NULL;
@@ -249,7 +249,7 @@ char* CXmlOpeation::GetData( const char* pName, const char* pAttrName, TiXmlElem
 
     if(NULL != pTiXmlElement)
     {
-        return (char* )pTiXmlElement->Attribute(pAttrName);
+        return const_cast<char* >(pTiXmlElement->Attribute(pAttrName));
     }
 
     return NULL;

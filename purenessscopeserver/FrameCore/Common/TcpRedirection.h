@@ -15,8 +15,6 @@
 #include "IDeviceHandler.h"
 #include <unordered_map>
 
-using namespace std;
-
 static const char FORWARD_XML[] = "forward.xml";
 
 enum ENUM_FORWARD_TYPE
@@ -77,9 +75,7 @@ private:
 
     IDeviceHandler* Get_Device_Handler(string strTarget);
 
-private:
     typedef unordered_map<string, CForwardConnectInfo*> mapForwardConnectList;
-
     vector<CForwardInfo> m_vecForwardInfo;          //需要关注的转发接口信息
     mapForwardConnectList m_mapForwardConnectList;
     int m_nActive;
