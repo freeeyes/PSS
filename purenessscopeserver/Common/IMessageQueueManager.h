@@ -2,7 +2,7 @@
 #define _IMESSAGEQUEUEMANAGER_H
 
 #include <stdio.h>
-#include "ILogicQueue.h"
+#include "ILogicQueue.hpp"
 
 class IMessageQueueManager
 {
