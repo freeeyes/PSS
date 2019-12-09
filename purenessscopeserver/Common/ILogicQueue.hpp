@@ -20,16 +20,36 @@ class ILogicQueue
 {
 public:
     //初始化必填 参数:逻辑ID, 描述, 检测时间(秒)
-    ILogicQueue(uint32 u4LogicThreadID, uint32 u4Timeout, std::string& strDesc);
-	virtual ~ILogicQueue();
+    ILogicQueue(uint32 u4LogicThreadID, uint32 u4Timeout, std::string& strDesc) : m_u4LogicThreadID(u4LogicThreadID),
+        m_u4Timeout(u4Timeout),
+        m_strDesc(strDesc)
+    {
+    };
+
+    virtual ~ILogicQueue() {};
 public:
     //获取线程ID
-    uint32 GetLogicThreadID();
+    uint32 GetLogicThreadID()
+    {
+        return m_u4LogicThreadID;
+    };
+
     //超时
-    void SetTimeOut(uint32 u4Timeout);
-    uint32 GetTimeOut();
+    void SetTimeOut(uint32 u4Timeout)
+    {
+        m_u4Timeout = u4Timeout;
+    };
+
+    uint32 GetTimeOut()
+    {
+        return m_u4Timeout;
+    };
+
     //描述
-    std::string GetDescriptor();
+    std::string GetDescriptor()
+    {
+        return m_strDesc;
+    };
 
 public:
     //初始化内容
@@ -41,7 +61,7 @@ public:
     //退出善后
     virtual void Exit() = 0;
 private:
-	ILogicQueue& operator=(const ILogicQueue&) = delete;
+    ILogicQueue& operator=(const ILogicQueue&) = delete;
 private:
     uint32      m_u4LogicThreadID;
     uint32      m_u4Timeout;

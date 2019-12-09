@@ -3,7 +3,7 @@
 
 #include "ace/Thread_Mutex.h"
 
-#include "ACEMemory.h"
+#include "ACEMemory.hpp"
 #include "IBuffPacket.h"
 #include <stdexcept>
 

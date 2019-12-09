@@ -5,7 +5,7 @@
 
 #include "Unit_Common.h"
 #include "define.h"
-#include "ILogicQueue.h"
+#include "ILogicQueue.hpp"
 #include "MessageQueueManager.h"
 
 class CLogicTestQueue : public ILogicQueue
