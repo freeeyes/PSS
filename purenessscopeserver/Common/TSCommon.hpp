@@ -53,12 +53,14 @@ public:
 using vecEventsList = vector<CEventsInfo>;
 
 //定时器信息结构
-class CTimerInfo
+class CTimerInfo : public ITimerInfo
 {
 public:
     CTimerInfo() : m_nID(0), m_szName{ '\0' }, m_nInterval(0), m_nMaxQueueList(0), m_pMessageQueueManager(NULL)
     {
     }
+
+    virtual ~CTimerInfo() {}
 
     void AddEventsInfo(CEventsInfo objEventsInfo)
     {

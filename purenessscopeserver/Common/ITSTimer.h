@@ -9,7 +9,7 @@ public:
     virtual ~ITSTimerManager() {};
 
     //添加定时器
-    virtual bool Add_Timer(int timer_id, milliseconds timer_interval, TimerFunctor&& f, void* arg) = 0;
+    virtual bool Add_Timer(int timer_id, milliseconds timer_interval, TimerFunctor&& f, ITimerInfo* arg) = 0;
 
     //删除定时器
     virtual bool Del_Timer(int nTimerID) = 0;

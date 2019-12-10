@@ -11,7 +11,14 @@
 using namespace std;
 using namespace std::chrono;
 
-using TimerFunctor = std::function<void(void*)>;
+class ITimerInfo
+{
+public:
+    virtual ~ITimerInfo() {};
+    virtual void run() = 0;
+};
+
+using TimerFunctor = std::function<void(ITimerInfo*)>;
 
 //节点信息
 class CTimerNodeInfo
@@ -52,7 +59,7 @@ public:
     steady_clock::time_point next_time_;      //下一次执行时间
     steady_clock::time_point begin_time_;     //定时器开始时间
     TimerFunctor timer_function_;             //定时器执行函数
-    void*        function_arg_;               //执行函数参数
+    ITimerInfo*  function_arg_;               //执行函数参数
 };
 
 //镜像信息
@@ -67,7 +74,7 @@ public:
     steady_clock::time_point curr_time_;
     microseconds             timer_interval_;
     TimerFunctor             timer_function_;             //定时器执行函数
-    void*                    function_arg_;               //执行函数参数
+    ITimerInfo*              function_arg_;               //执行函数参数
 };
 
 class CTimerNodeList
@@ -79,7 +86,7 @@ public:
     };
     ~CTimerNodeList() {};
 
-    void add_timer_node_info(int timer_id, milliseconds interval, TimerFunctor f, void* arg)
+    void add_timer_node_info(int timer_id, milliseconds interval, TimerFunctor f, ITimerInfo* arg)
     {
         std::shared_ptr<CTimerNodeInfo> timer_node_info = std::make_shared<CTimerNodeInfo>();
         steady_clock::time_point timer_now = steady_clock::now();

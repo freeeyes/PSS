@@ -65,7 +65,7 @@ public:
     int timer_id_;
     milliseconds timer_interval_;
     TimerFunctor timer_function_;
-    void*        function_arg_;
+    ITimerInfo*  function_arg_;
 };
 
 class CTimerThreadInfo
@@ -203,7 +203,7 @@ public:
     CTimerManager() {};
     virtual ~CTimerManager() {};
 
-    virtual bool Add_Timer(int timer_id, milliseconds timer_interval, TimerFunctor&& f, void* arg)
+    virtual bool Add_Timer(int timer_id, milliseconds timer_interval, TimerFunctor&& f, ITimerInfo* arg)
     {
         //如果线程没有启动，则启动定时器线程
         run();

@@ -1,10 +1,11 @@
 #include "TMService.h"
 
-void timer_run_execute(void* arg)
+void timer_run_execute(ITimerInfo* timer_info)
 {
-    CTimerInfo* timer_info = (CTimerInfo*)arg;
-
-    timer_info->run();
+    if (NULL != timer_info)
+    {
+        timer_info->run();
+    }
 }
 
 CTMService::CTMService() :m_nTimerMaxCount(0), m_nActive(0)

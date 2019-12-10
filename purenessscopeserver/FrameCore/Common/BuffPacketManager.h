@@ -20,15 +20,15 @@ public:
     static void Init_Callback(int nIndex, CBuffPacket* pBuffPacket);
     static void Close_Callback(int nIndex, CBuffPacket* pBuffPacket);
 
-    uint32 GetBuffPacketUsedCount();
-    uint32 GetBuffPacketFreeCount();
-    void OutputCreateInfo();
-    void SetCreateFlag(bool blTagCreateInfo);
+    virtual uint32 GetBuffPacketUsedCount();
+    virtual uint32 GetBuffPacketFreeCount();
+    virtual void OutputCreateInfo();
+    virtual void SetCreateFlag(bool blTagCreateInfo);
 
-    IBuffPacket* Create(const char* pFileName = __FILE__, uint32 u4Line = __LINE__);
-    bool Delete(IBuffPacket* pBuffPacket);
-    uint32 GetCreateInfoCount();
-    bool GetCreateInfoList(uint32 u4Index, _Object_Create_Info& objCreateInfo);
+    virtual IBuffPacket* Create(const char* pFileName = __FILE__, uint32 u4Line = __LINE__);
+    virtual bool Delete(IBuffPacket* pBuffPacket);
+    virtual uint32 GetCreateInfoCount();
+    virtual bool GetCreateInfoList(uint32 u4Index, _Object_Create_Info& objCreateInfo);
 private:
     vector<_Object_Create_Info> m_objCreateList;
 };
