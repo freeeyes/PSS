@@ -178,12 +178,15 @@ void CUnit_Basehandler::Test_Udp_Common_Send_Message(void)
     char* pMessage = new char[u4Len];
     memset(pMessage, 0, u4Len);
 
+    char szTestIP[MAX_BUFF_50] = { '\0' };
+    sprintf_safe(szTestIP, MAX_BUFF_50, "300.0.0.1");
+
     _Send_Message_Param obj_Send_Message_Param;
     obj_Send_Message_Param.m_u4PacketParseInfoID = 1;
     obj_Send_Message_Param.m_blDlete = false;
     obj_Send_Message_Param.m_blHead = true;
     obj_Send_Message_Param.m_nPort = 20002;
-    obj_Send_Message_Param.m_pIP = (char*)"300.0.0.1";
+    obj_Send_Message_Param.m_pIP = szTestIP;
     obj_Send_Message_Param.m_u2CommandID = 0x1002;
     obj_Send_Message_Param.m_u4Len = u4Len;
 
@@ -201,7 +204,8 @@ void CUnit_Basehandler::Test_Udp_Common_Send_Message(void)
     }
 
     //测试正常的数据解析
-    obj_Send_Message_Param.m_pIP = (char*)"127.0.0.1";
+    sprintf_safe(szTestIP, MAX_BUFF_50, "127.0.0.1");
+    obj_Send_Message_Param.m_pIP = szTestIP;
     blState = Udp_Common_Send_Message(obj_Send_Message_Param,
                                       pMessage,
                                       pMbData,

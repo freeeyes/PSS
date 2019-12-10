@@ -59,9 +59,10 @@ int CUnit_Redirection::Create_client(int nClientPort, const char* pIP, int nServ
 {
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
-    struct sockaddr_in mine, dest;
+    struct sockaddr_in mine;
+    struct sockaddr_in dest;
 
-    bzero(&mine, sizeof(mine));
+    memset(&mine, 0, sizeof(mine));
 
     mine.sin_family = AF_INET;
 
@@ -69,7 +70,7 @@ int CUnit_Redirection::Create_client(int nClientPort, const char* pIP, int nServ
 
     inet_pton(AF_INET, pIP, &mine.sin_addr);
 
-    bzero(&dest, sizeof(dest));
+    memset(&dest, 0, sizeof(dest));
 
     dest.sin_family = AF_INET;
 

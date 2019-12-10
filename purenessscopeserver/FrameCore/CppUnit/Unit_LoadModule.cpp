@@ -24,7 +24,7 @@ void CUnit_LoadModule::Test_LoadModule(void)
     uint16 u2ModuleNameLen = MAX_BUFF_20;
 
 
-    char* pModuleFileName = (char*)App_ModuleLoader::instance()->GetModuleFileName(m_szModuleName);
+    const char* pModuleFileName = App_ModuleLoader::instance()->GetModuleFileName(m_szModuleName);
 
     if (NULL == pModuleFileName)
     {
@@ -32,7 +32,7 @@ void CUnit_LoadModule::Test_LoadModule(void)
         return;
     }
 
-    char* pModuleFilePath = (char*)App_ModuleLoader::instance()->GetModuleFilePath(m_szModuleName);
+    const char* pModuleFilePath = App_ModuleLoader::instance()->GetModuleFilePath(m_szModuleName);
 
     if (NULL == pModuleFilePath)
     {
@@ -40,7 +40,7 @@ void CUnit_LoadModule::Test_LoadModule(void)
         return;
     }
 
-    char* pModuleFileDesc = (char* )App_ModuleLoader::instance()->GetModuleFileDesc(m_szModuleName);
+    const char* pModuleFileDesc = App_ModuleLoader::instance()->GetModuleFileDesc(m_szModuleName);
 
     if (NULL == pModuleFileDesc)
     {

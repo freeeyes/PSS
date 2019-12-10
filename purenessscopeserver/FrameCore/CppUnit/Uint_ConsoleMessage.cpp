@@ -31,7 +31,7 @@ bool CUnit_ConsoleMessage::Create_Command(const char* pCommand, uint16 u2ReturnC
     int nCommandLen = ACE_OS::strlen(pCommand);
 
     pmb = new ACE_Message_Block(ACE_OS::strlen(pCommand));
-    memcpy_safe((char* )pCommand, nCommandLen, pmb->wr_ptr(), nCommandLen);
+    memcpy_safe(pCommand, nCommandLen, pmb->wr_ptr(), nCommandLen);
     pmb->wr_ptr(ACE_OS::strlen(pCommand));
 
     //Ö´ÐÐÃüÁî
@@ -80,7 +80,7 @@ bool CUnit_ConsoleMessage::Create_Command_Error(const char* pCommand)
     int nCommandLen = ACE_OS::strlen(pCommand);
 
     pmb = new ACE_Message_Block(ACE_OS::strlen(pCommand));
-    memcpy_safe((char*)pCommand, nCommandLen, pmb->wr_ptr(), nCommandLen);
+    memcpy_safe(pCommand, nCommandLen, pmb->wr_ptr(), nCommandLen);
     pmb->wr_ptr(ACE_OS::strlen(pCommand));
 
     //Ö´ÐÐÃüÁî
