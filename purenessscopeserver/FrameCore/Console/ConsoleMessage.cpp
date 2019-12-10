@@ -149,7 +149,7 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
     }
 
     //获得key值
-    char* pCommandBegin = ACE_OS::strstr((char*)pKeyBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), COMMAND_SPLIT_STRING);
+    const char* pCommandBegin = ACE_OS::strstr(pKeyBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), COMMAND_SPLIT_STRING);
 
     if (NULL == pCommandBegin)
     {
@@ -157,7 +157,7 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
         return false;
     }
 
-    memcpy_safe((char* )pKeyBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING),
+    memcpy_safe(pKeyBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING),
                 (int)(pCommandBegin - pKeyBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING)),
                 szKey,
                 MAX_BUFF_100,
@@ -172,7 +172,7 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
     }
 
     //获得命令头
-    char* pParamBegin = ACE_OS::strstr((char*)pCommandBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), COMMAND_SPLIT_STRING);
+    const char* pParamBegin = ACE_OS::strstr(pCommandBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), COMMAND_SPLIT_STRING);
 
     if (NULL == pParamBegin)
     {

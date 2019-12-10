@@ -25,7 +25,7 @@ public:
     void OutputCreateInfo();
     void SetCreateFlag(bool blTagCreateInfo);
 
-    IBuffPacket* Create(const char* pFileName = __FILE__, uint32 u4Line = __LINE__);
+    IBuffPacket* Create(const char* pFileName, uint32 u4Line);
     bool Delete(IBuffPacket* pBuffPacket);
     uint32 GetCreateInfoCount();
     bool GetCreateInfoList(uint32 u4Index, _Object_Create_Info& objCreateInfo);
