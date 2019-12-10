@@ -8,7 +8,7 @@ IConfigOpeation* IConfigOpeation::_array[XML_Config_MAX];
 
 /*定义静态类对象并绑定对应枚举，实现返回模板函数*/
 
-#define CLASSNAME(ClassName) this##ClassName
+#define CLASSNAME(ClassName) (this##ClassName)
 
 #define DefineClassAndFunc(ClassName, XMLConfig)                            \
     static ClassName    CLASSNAME(ClassName)(XMLConfig, #ClassName);      \
