@@ -80,8 +80,8 @@ int CConsolePromissions::Check_Promission(const char* pCommandName, const char* 
 int CConsolePromissions::Check_Split_User(const char* pUser, const char* pUserList)
 {
     char szTempUser[MAX_BUFF_50] = { '\0' };
-    char* pPromissPosBegin = (char* )pUserList;
-    char* pPromissPos = ACE_OS::strstr((char* )pPromissPosBegin, ",");
+    const char* pPromissPosBegin = pUserList;
+    const char* pPromissPos = ACE_OS::strstr(pPromissPosBegin, ",");
 
     while (NULL != pPromissPos)
     {
@@ -90,7 +90,7 @@ int CConsolePromissions::Check_Split_User(const char* pUser, const char* pUserLi
         if (u4NameLen > MAX_BUFF_50)
         {
             pPromissPosBegin = pPromissPos + 1;
-            pPromissPos = ACE_OS::strstr((char*)pUserList, ",");
+            pPromissPos = ACE_OS::strstr(pUserList, ",");
             continue;
         }
 
@@ -105,7 +105,7 @@ int CConsolePromissions::Check_Split_User(const char* pUser, const char* pUserLi
         }
 
         pPromissPosBegin = pPromissPos + 1;
-        pPromissPos = ACE_OS::strstr((char*)pPromissPosBegin, ",");
+        pPromissPos = ACE_OS::strstr(pPromissPosBegin, ",");
     }
 
     //判断最后一个User

@@ -74,7 +74,7 @@ int CConsoleMessage::Dispose(ACE_Message_Block* pmb, IBuffPacket* pBuffPacket, u
 
     pCommand[(uint32)pmb->length() - 1] = '\0';
 
-    memcpy_safe((char* )pmb->rd_ptr(), (uint32)pmb->length(), pCommand, (uint32)pmb->length());
+    memcpy_safe(pmb->rd_ptr(), (uint32)pmb->length(), pCommand, (uint32)pmb->length());
 
     //去除数据尾部的终止符
     if (pCommand[pmb->length() - 1] == '&')
@@ -129,7 +129,7 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
 
     //获得输出模式
     char szOutputType[MAX_BUFF_100] = { '\0' };
-    char* pKeyBegin = ACE_OS::strstr((char*)pCommand, COMMAND_SPLIT_STRING);
+    const char* pKeyBegin = ACE_OS::strstr(pCommand, COMMAND_SPLIT_STRING);
 
     if (NULL == pKeyBegin)
     {
@@ -137,7 +137,7 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
         return false;
     }
 
-    memcpy_safe((char*)pCommand, (int)(pKeyBegin - pCommand), szOutputType, (int)(pKeyBegin - pCommand), true);
+    memcpy_safe(pCommand, (int)(pKeyBegin - pCommand), szOutputType, (int)(pKeyBegin - pCommand), true);
 
     if (ACE_OS::strcmp(szOutputType, "b") == 0)
     {

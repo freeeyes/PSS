@@ -2,7 +2,7 @@
 
 bool GetCommandParam(const char* pCommand, const char* pTag, char* pData, int nMaxSize)
 {
-    char* pPosBegin = (char*)ACE_OS::strstr(pCommand, pTag);
+    const char* pPosBegin = ACE_OS::strstr(pCommand, pTag);
 
     //判断是否包含指定的关键字
     if (NULL == pPosBegin)
@@ -11,7 +11,7 @@ bool GetCommandParam(const char* pCommand, const char* pTag, char* pData, int nM
         return false;
     }
 
-    char* pPosEnd = (char*)ACE_OS::strstr(pPosBegin + 3, " ");
+    const char* pPosEnd = ACE_OS::strstr(pPosBegin + 3, " ");
 
     int nLen = 0;
 
@@ -53,7 +53,7 @@ bool GetFileInfo(const char* pFile, _FileInfo& FileInfo)
             {
                 //模块路径
                 nEnd = i;
-                memcpy_safe((char*)&pFile[nBegin], nEnd - nBegin, FileInfo.m_szFilePath, MAX_BUFF_100, true);
+                memcpy_safe(&pFile[nBegin], nEnd - nBegin, FileInfo.m_szFilePath, MAX_BUFF_100, true);
                 nBegin = i + 1;
                 nPosIndex++;
             }
@@ -61,11 +61,11 @@ bool GetFileInfo(const char* pFile, _FileInfo& FileInfo)
             {
                 //模块文件名
                 nEnd = i;
-                memcpy_safe((char*)&pFile[nBegin], nEnd - nBegin, FileInfo.m_szFileName, MAX_BUFF_100, true);
+                memcpy_safe(&pFile[nBegin], nEnd - nBegin, FileInfo.m_szFileName, MAX_BUFF_100, true);
                 nBegin = i + 1;
                 //模块参数
                 nEnd = nLen;
-                memcpy_safe((char*)&pFile[nBegin], nEnd - nBegin, FileInfo.m_szFileParam, MAX_BUFF_200, true);
+                memcpy_safe(&pFile[nBegin], nEnd - nBegin, FileInfo.m_szFileParam, MAX_BUFF_200, true);
                 break;
             }
         }
@@ -129,7 +129,7 @@ bool GetAIInfo(const char* pCommand, int& nAI, int& nDispose, int& nCheck, int& 
         if (pCommand[i] == ',')
         {
             nEnd = i;
-            memcpy_safe((char*)&pCommand[nBegin], (uint32)(nEnd - nBegin), szTemp, (uint32)MAX_BUFF_20);
+            memcpy_safe(&pCommand[nBegin], (uint32)(nEnd - nBegin), szTemp, (uint32)MAX_BUFF_20);
 
             if (nIndex == 0)
             {
@@ -151,7 +151,7 @@ bool GetAIInfo(const char* pCommand, int& nAI, int& nDispose, int& nCheck, int& 
     }
 
     //最后一个参数
-    memcpy_safe((char*)&pCommand[nBegin], (uint32)(ACE_OS::strlen(pCommand) - nBegin), szTemp, (uint32)MAX_BUFF_20);
+    memcpy_safe(&pCommand[nBegin], (uint32)(ACE_OS::strlen(pCommand) - nBegin), szTemp, (uint32)MAX_BUFF_20);
     nStop = ACE_OS::atoi(szTemp);
 
     return true;
@@ -175,7 +175,7 @@ bool GetConnectID(const char* pCommand, uint32& u4ConnectID, bool& blFlag)
 
     //获得标记位
     GetCommandParam(pCommand, "-f ", szTempData, MAX_BUFF_100);
-    nFlag = (int)ACE_OS::atoi(szTempData);
+    nFlag = ACE_OS::atoi(szTempData);
 
     if (nFlag == 0)
     {

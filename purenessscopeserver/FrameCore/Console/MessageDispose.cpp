@@ -318,7 +318,7 @@ void DoMessage_ShowModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, u
             {
                 VCHARS_STR strSName;
                 strSName.u1Len = (uint8)ACE_OS::strlen(pModuleInfo->GetName());
-                strSName.text = (char*)pModuleInfo->GetName();
+                strSName.text = (char* )pModuleInfo->GetName();
                 (*pBuffPacket) << strSName;
                 VCHARS_STR strSModileFile;
                 strSModileFile.u1Len = (uint8)ACE_OS::strlen(pModuleInfo->strModuleName.c_str());
