@@ -8,12 +8,10 @@
 #include "ace/Dev_Poll_Reactor.h"
 #include "Frame_Logging_Strategy.h"
 
-static void* run_reactor (void* pReactor)
+static void* run_reactor(ACE_Reactor* pReactor)
 {
-    ACE_Reactor* pLogReactor = (ACE_Reactor*)pReactor;
-
-    pLogReactor->owner(ACE_Thread_Manager::instance ()->thr_self());
-    pLogReactor->run_reactor_event_loop ();
+    pReactor->owner(ACE_Thread_Manager::instance ()->thr_self());
+    pReactor->run_reactor_event_loop ();
 
     ACE_DEBUG((LM_INFO, ACE_TEXT("(%P|%t) %M run_reactor exit[%N,%l]\n")));
     return 0;

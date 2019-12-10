@@ -316,30 +316,26 @@ void DoMessage_ShowModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, u
 
             if (CommandInfo.m_u1OutputType == 0)
             {
-                VCHARS_STR strSName;
-                strSName.u1Len = (uint8)ACE_OS::strlen(pModuleInfo->GetName());
-                strSName.text = (char* )pModuleInfo->GetName();
-                (*pBuffPacket) << strSName;
-                VCHARS_STR strSModileFile;
-                strSModileFile.u1Len = (uint8)ACE_OS::strlen(pModuleInfo->strModuleName.c_str());
-                strSModileFile.text = (char*)pModuleInfo->strModuleName.c_str();
-                (*pBuffPacket) << strSModileFile;
-                VCHARS_STR strSModilePath;
-                strSModilePath.u1Len = (uint8)ACE_OS::strlen(pModuleInfo->strModulePath.c_str());
-                strSModilePath.text = (char*)pModuleInfo->strModulePath.c_str();
-                (*pBuffPacket) << strSModilePath;
-                VCHARS_STR strSModileParam;
-                strSModileParam.u1Len = (uint8)ACE_OS::strlen(pModuleInfo->strModuleParam.c_str());
-                strSModileParam.text = (char*)pModuleInfo->strModuleParam.c_str();
-                (*pBuffPacket) << strSModileParam;
-                VCHARS_STR strSModileDesc;
-                strSModileDesc.u1Len = (uint8)ACE_OS::strlen(pModuleInfo->GetDesc());
-                strSModileDesc.text = (char*)pModuleInfo->GetDesc();
-                (*pBuffPacket) << strSModileDesc;
+                uint8 u1ModuleNameLen = (uint8)ACE_OS::strlen(pModuleInfo->GetName());
+                (*pBuffPacket) << u1ModuleNameLen;
+                pBuffPacket->WriteStream(pModuleInfo->GetName(), u1ModuleNameLen);
+                uint8 u1SModileFileLen = (uint8)ACE_OS::strlen(pModuleInfo->strModuleName.c_str());
+                (*pBuffPacket) << u1SModileFileLen;
+                pBuffPacket->WriteStream(pModuleInfo->strModuleName.c_str(), u1SModileFileLen);
+                uint8 u1SModilePathLen = (uint8)ACE_OS::strlen(pModuleInfo->strModulePath.c_str());
+                (*pBuffPacket) << u1SModilePathLen;
+                pBuffPacket->WriteStream(pModuleInfo->strModulePath.c_str(), u1SModilePathLen);
+                uint8 u1SModileParamLen = (uint8)ACE_OS::strlen(pModuleInfo->strModuleParam.c_str());
+                (*pBuffPacket) << u1SModileParamLen;
+                pBuffPacket->WriteStream(pModuleInfo->strModuleParam.c_str(), u1SModileParamLen);
+                uint8 u1SModileDescLen = (uint8)ACE_OS::strlen(pModuleInfo->GetDesc());
+                (*pBuffPacket) << u1SModileDescLen;
+                pBuffPacket->WriteStream(pModuleInfo->GetDesc(), u1SModileDescLen);
 
+                VCHARS_STR strSName;
                 char szTime[MAX_BUFF_100] = { '\0' };
                 sprintf_safe(szTime, MAX_BUFF_100, "%04d-%02d-%02d %02d:%02d:%02d", pModuleInfo->dtCreateTime.year(), pModuleInfo->dtCreateTime.month(), pModuleInfo->dtCreateTime.day(), pModuleInfo->dtCreateTime.hour(), pModuleInfo->dtCreateTime.minute(), pModuleInfo->dtCreateTime.second());
-                strSName.text = (char*)szTime;
+                strSName.text = szTime;
                 strSName.u1Len = (uint8)ACE_OS::strlen(szTime);
                 (*pBuffPacket) << strSName;
 
@@ -815,16 +811,16 @@ void DoMessage_ShowClientHisTory(_CommandInfo& CommandInfo, IBuffPacket* pBuffPa
         {
             if (CommandInfo.m_u1OutputType == 0)
             {
-                VCHARS_STR strSName;
-                strSName.text = (char*)VecIPAccount[i].m_strIP.c_str();
-                strSName.u1Len = (uint8)VecIPAccount[i].m_strIP.length();
 
-                (*pBuffPacket) << strSName;
+                uint8 u1IPLen = (uint8)VecIPAccount[i].m_strIP.length();
+                (*pBuffPacket) << u1IPLen;
+                pBuffPacket->WriteStream(VecIPAccount[i].m_strIP.c_str(), u1IPLen);
                 (*pBuffPacket) << (uint32)VecIPAccount[i].m_nCount;
                 (*pBuffPacket) << (uint32)VecIPAccount[i].m_nAllCount;
 
+                VCHARS_STR strSName;
                 sprintf_safe(szTime, MAX_BUFF_100, "%04d-%02d-%02d %02d:%02d:%02d", VecIPAccount[i].m_dtLastTime.year(), VecIPAccount[i].m_dtLastTime.month(), VecIPAccount[i].m_dtLastTime.day(), VecIPAccount[i].m_dtLastTime.hour(), VecIPAccount[i].m_dtLastTime.minute(), VecIPAccount[i].m_dtLastTime.second());
-                strSName.text = (char*)szTime;
+                strSName.text = szTime;
                 strSName.u1Len = (uint8)ACE_OS::strlen(szTime);
 
                 (*pBuffPacket) << strSName;
@@ -927,21 +923,19 @@ void DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
     {
         if (CommandInfo.m_u1OutputType == 0)
         {
-            VCHARS_STR strSTemp;
-
             //返回服务器ID
             uint16 u2SerevrID = GetXmlConfigAttribute(xmlServerID)->id;
             (*pBuffPacket) << u2SerevrID;
 
             //返回服务器名称
-            strSTemp.text = (char*)GetXmlConfigAttribute(xmlServerName)->name.c_str();
-            strSTemp.u1Len = (uint8)GetXmlConfigAttribute(xmlServerName)->name.length();
-            (*pBuffPacket) << strSTemp;
+            uint8 u1ServerNameLen = (uint8)GetXmlConfigAttribute(xmlServerName)->name.length();
+            (*pBuffPacket) << u1ServerNameLen;
+            pBuffPacket->WriteStream(GetXmlConfigAttribute(xmlServerName)->name.c_str(), u1ServerNameLen);
 
             //返回服务器版本
-            strSTemp.text = (char*)GetXmlConfigAttribute(xmlServerVersion)->Version.c_str();
-            strSTemp.u1Len = (uint8)GetXmlConfigAttribute(xmlServerVersion)->Version.length();
-            (*pBuffPacket) << strSTemp;
+            uint8 u1ServerVersionLen = (uint8)GetXmlConfigAttribute(xmlServerVersion)->Version.length();
+            (*pBuffPacket) << u1ServerVersionLen;
+            pBuffPacket->WriteStream(GetXmlConfigAttribute(xmlServerVersion)->Version.c_str(), u1ServerVersionLen);
 
 
             //返回加载模块个数
@@ -952,9 +946,9 @@ void DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
             (*pBuffPacket) << (uint16)App_MessageServiceGroup::instance()->GetThreadInfo()->GetThreadCount();
 
             //返回当前协议包的版本号
-            strSTemp.text = (char*)GetXmlConfigAttribute(xmlServerVersion)->Version.c_str();
-            strSTemp.u1Len = (uint8)GetXmlConfigAttribute(xmlServerVersion)->Version.length();
-            (*pBuffPacket) << strSTemp;
+            uint8 u1PacketVersionLen = (uint8)GetXmlConfigAttribute(xmlServerVersion)->Version.length();
+            (*pBuffPacket) << u1PacketVersionLen;
+            pBuffPacket->WriteStream(GetXmlConfigAttribute(xmlServerVersion)->Version.c_str(), u1PacketVersionLen);
 
             //返回当前服务器是大端还是小端
             if (GetXmlConfigAttribute(xmlNetWorkMode)->LocalByteOrder == SYSTEM_LITTLE_ORDER)

@@ -105,7 +105,7 @@ class CServerMessageTask : public ACE_Task<ACE_MT_SYNCH>
 public:
     CServerMessageTask();
 
-    virtual int open(void* args = 0);
+    int open();
     virtual int svc (void);
 
     virtual int handle_signal (int signum,siginfo_t*   = 0,ucontext_t* = 0);

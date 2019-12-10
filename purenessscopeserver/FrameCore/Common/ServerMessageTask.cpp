@@ -127,13 +127,8 @@ int CServerMessageTask::handle_signal (int signum,siginfo_t* siginfo,ucontext_t*
     return 0;
 }
 
-int CServerMessageTask::open(void* args /*= 0*/)
+int CServerMessageTask::open()
 {
-    if(args != NULL)
-    {
-        OUR_DEBUG((LM_INFO,"[CServerMessageTask::open]args is not NULL.\n"));
-    }
-
     m_blRun = true;
 
     if(activate(THREAD_PARAM, MAX_MSG_THREADCOUNT) == -1)
