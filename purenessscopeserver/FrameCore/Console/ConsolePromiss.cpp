@@ -24,8 +24,8 @@ void CConsolePromissions::Init(const char* pFileName)
 
     while (true)
     {
-        char* pCommandNameData = NULL;
-        char* pUserData        = NULL;
+        const char* pCommandNameData = NULL;
+        const char* pUserData        = NULL;
 
         _Console_Command_Info* pConsole_Command_Info = new _Console_Command_Info();
         pCommandNameData = m_ConcoleConfig.GetData("CommandInfo", "CommandName", pNextTiXmlCommandName);

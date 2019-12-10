@@ -25,8 +25,8 @@ bool CForbiddenIP::Init(const char* szConfigPath)
 
     while(true)
     {
-        char* pIpData   = m_ForbiddenData.GetData("ForbiddenIP", "ip", pNextTiXmlElementIP);
-        char* pTypeData = m_ForbiddenData.GetData("ForbiddenIP", "type", pNextTiXmlElementType);
+        const char* pIpData   = m_ForbiddenData.GetData("ForbiddenIP", "ip", pNextTiXmlElementIP);
+        const char* pTypeData = m_ForbiddenData.GetData("ForbiddenIP", "type", pNextTiXmlElementType);
 
         if(NULL == pIpData || NULL == pTypeData)
         {

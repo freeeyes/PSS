@@ -12,8 +12,8 @@ public:
 
     bool Init(const char* pFileName);
 
-    char* GetData(const char* pName, const char* pAttrName);
-    char* GetData(const char* pName, const char* pAttrName, TiXmlElement*& pNextTiXmlElement);
+    const char* GetData(const char* pName, const char* pAttrName);
+    const char* GetData(const char* pName, const char* pAttrName, TiXmlElement*& pNextTiXmlElement);
 
     //读取单个变量
     bool Read_XML_Data_Single_String(const char* pTag, const char* pName, string& strValue);
