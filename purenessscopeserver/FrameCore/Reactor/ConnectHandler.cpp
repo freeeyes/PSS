@@ -195,7 +195,7 @@ int CConnectHandler::open(void*)
         //发送告警邮件
         AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
                                                GetXmlConfigAttribute(xmlAlertConnect)->MailID,
-                                               (char* )"Alert IP",
+                                               "Alert IP",
                                                "[CConnectHandler::open] IP is more than IP Max,");
 
         return -1;
@@ -644,7 +644,7 @@ int CConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Size, 
         uint32 u4PacketHead = App_PacketParseLoader::instance()->GetPacketParseInfo(u1ParseID)->m_u4OrgLength;
         ACE_Message_Block* pMbHead = App_MessageBlockManager::instance()->Create(u4PacketHead);
 
-        memcpy_safe((char*)pData, u4PacketHead, pMbHead->wr_ptr(), u4PacketHead);
+        memcpy_safe(pData, u4PacketHead, pMbHead->wr_ptr(), u4PacketHead);
         pMbHead->wr_ptr(u4PacketHead);
 
         //解析消息头
@@ -667,7 +667,7 @@ int CConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Size, 
         //解析消息体
         ACE_Message_Block* pMbBody = App_MessageBlockManager::instance()->Create(u4Size - u4PacketHead);
 
-        memcpy_safe((char*)&pData[u4PacketHead], u4Size - u4PacketHead, pMbBody->wr_ptr(), u4Size - u4PacketHead);
+        memcpy_safe(&pData[u4PacketHead], u4Size - u4PacketHead, pMbBody->wr_ptr(), u4Size - u4PacketHead);
         pMbBody->wr_ptr(u4Size - u4PacketHead);
 
         //解析数据包体
@@ -704,7 +704,7 @@ int CConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Size, 
     {
         //流模式处理文件数据
         ACE_Message_Block* pCurrMessage = App_MessageBlockManager::instance()->Create(u4Size);
-        memcpy_safe((char*)pData, u4Size, pCurrMessage->wr_ptr(), u4Size);
+        memcpy_safe(pData, u4Size, pCurrMessage->wr_ptr(), u4Size);
         pCurrMessage->wr_ptr(u4Size);
 
         if (-1 == Dispose_Paceket_Parse_Stream(pCurrMessage))
@@ -850,7 +850,7 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
         //超过了限定的阀值，需要关闭链接，并记录日志
         AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECTABNORMAL,
                                                GetXmlConfigAttribute(xmlAlertConnect)->MailID,
-                                               (char* )"Alert",
+                                               "Alert",
                                                "[TCP]IP=%s,Prot=%d,SendPacketCount=%d, SendSize=%d.",
                                                m_addrRemote.get_host_addr(),
                                                m_addrRemote.get_port_number(),
@@ -1200,7 +1200,7 @@ bool CConnectHandler::CheckMessage()
         //超过了限定的阀值，需要关闭链接，并记录日志
         AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECTABNORMAL,
                                                GetXmlConfigAttribute(xmlAlertConnect)->MailID,
-                                               (char* )"Alert",
+                                               "Alert",
                                                "[TCP]IP=%s,Prot=%d,PacketCount=%d, RecvSize=%d.",
                                                m_addrRemote.get_host_addr(),
                                                m_addrRemote.get_port_number(),
@@ -1949,13 +1949,8 @@ int CConnectManager::GetCount()
     return m_objHashConnectList.Get_Used_Count();
 }
 
-int CConnectManager::open(void* args)
+int CConnectManager::open()
 {
-    if(args != NULL)
-    {
-        OUR_DEBUG((LM_INFO,"[CConnectManager::open]args is not NULL.\n"));
-    }
-
     m_blRun = true;
     msg_queue()->high_water_mark(MAX_MSG_MASK);
     msg_queue()->low_water_mark(MAX_MSG_MASK);
@@ -2789,7 +2784,7 @@ bool CConnectManagerGroup::CloseUnLock(uint32 u4ConnectID)
 
 const char* CConnectManagerGroup::GetError()
 {
-    return (char* )"";
+    return NULL;
 }
 
 void CConnectManagerGroup::SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4TimeCost)

@@ -174,7 +174,7 @@ public:
 
     static void TimeWheel_Timeout_Callback(void* pArgsContext, vector<CConnectHandler*> vecConnectHandle);
 
-    virtual int open(void* args = 0);
+    virtual int open();
     virtual int svc(void);
     virtual int close(u_long);
 

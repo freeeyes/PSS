@@ -8,7 +8,6 @@ CReactorClientInfo::CReactorClientInfo()
     m_pReactor               = NULL;
     m_nServerID              = 0;
     m_emConnectState         = SERVER_CONNECT_READY;
-    m_AddrLocal              = ACE_Addr::sap_any;
     m_blIsLocal              = false;
 }
 
