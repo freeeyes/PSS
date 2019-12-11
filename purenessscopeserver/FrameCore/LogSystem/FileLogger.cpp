@@ -655,7 +655,7 @@ const char* CFileLogger::GetLogInfoByLogName(uint16 u2LogID)
 {
     int nIndex = u2LogID % m_nCount;
 
-    return (char* )m_pLogFileList[nIndex]->GetLoggerName().c_str();
+    return m_pLogFileList[nIndex]->GetLoggerName().c_str();
 }
 
 int CFileLogger::GetLogInfoByLogDisplay(uint16 u2LogID)

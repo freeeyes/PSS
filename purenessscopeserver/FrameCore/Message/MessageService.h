@@ -44,7 +44,7 @@ public:
                                siginfo_t*  = 0,
                                ucontext_t* = 0);
 
-    virtual int open(void* args = 0);
+    int open();
     virtual int svc (void);
     int Close();
 

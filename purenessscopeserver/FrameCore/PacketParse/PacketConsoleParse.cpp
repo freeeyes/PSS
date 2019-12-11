@@ -84,10 +84,8 @@ uint32 CConsolePacketParse::MakePacketLength(uint32 u4ConnectID, uint32 u4DataLe
 
 bool CConsolePacketParse::MakePacket(uint32 u4ConnectID, const char* pData, uint32 u4Len, ACE_Message_Block* pMbData, uint16 u2CommandID)
 {
-    if(u4ConnectID == 0 && u2CommandID == 0)
-    {
-        //UDP数据包，没有u4ConnectID
-    }
+    ACE_UNUSED_ARG(u4ConnectID);
+    ACE_UNUSED_ARG(u2CommandID);
 
     if(pMbData == NULL)
     {
@@ -95,9 +93,9 @@ bool CConsolePacketParse::MakePacket(uint32 u4ConnectID, const char* pData, uint
     }
 
     //拼装数据包
-    memcpy_safe((char* )&u4Len, (uint32)sizeof(uint32), (char* )pMbData->wr_ptr(), (uint32)sizeof(uint32));
+    memcpy_safe((const char* )&u4Len, (uint32)sizeof(uint32), (char* )pMbData->wr_ptr(), (uint32)sizeof(uint32));
     pMbData->wr_ptr(sizeof(uint32));
-    memcpy_safe((char* )pData, u4Len, pMbData->wr_ptr(), u4Len);
+    memcpy_safe(pData, u4Len, pMbData->wr_ptr(), u4Len);
     pMbData->wr_ptr(u4Len);
 
     return true;

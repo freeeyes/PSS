@@ -84,13 +84,8 @@ int CLogicThread::handle_signal(int signum, siginfo_t* siginfo, ucontext_t* ucon
     return 0;
 }
 
-int CLogicThread::open(void* args)
+int CLogicThread::open()
 {
-    if (args != NULL)
-    {
-        OUR_DEBUG((LM_INFO, "[CLogicThread::open]args is not NULL.\n"));
-    }
-
     m_blRun = true;
 
     if (activate(THREAD_PARAM, MAX_MSG_THREADCOUNT) == -1)

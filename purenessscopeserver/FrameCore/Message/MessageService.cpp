@@ -97,13 +97,8 @@ bool CMessageService::Start()
     return true;
 }
 
-int CMessageService::open(void* args)
+int CMessageService::open()
 {
-    if(args != NULL)
-    {
-        OUR_DEBUG((LM_INFO,"[CMessageService::open]args is not NULL.\n"));
-    }
-
     m_blRun = true;
     msg_queue()->high_water_mark(m_u4HighMask);
     msg_queue()->low_water_mark(m_u4LowMask);

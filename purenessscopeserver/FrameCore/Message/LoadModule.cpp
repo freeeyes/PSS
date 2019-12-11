@@ -148,7 +148,7 @@ bool CLoadModule::MoveUnloadList(const char* szModuleName, uint32 u4UpdateIndex,
     {
         //放入等待清理的线程列表
         CWaitUnLoadModule objWaitUnloadModule;
-        sprintf_safe((char* )szModuleName, MAX_BUFF_100, objWaitUnloadModule.m_szModuleName, MAX_BUFF_100);
+        sprintf_safe(objWaitUnloadModule.m_szModuleName, MAX_BUFF_100, "%s", szModuleName);
         objWaitUnloadModule.m_u4UpdateIndex        = u4UpdateIndex;
         objWaitUnloadModule.m_hModule              = pModuleInfo->hModule;
         objWaitUnloadModule.UnLoadModuleData       = pModuleInfo->UnLoadModuleData;
