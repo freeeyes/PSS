@@ -221,7 +221,7 @@ int Chlid_Run()
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
     _Monitor_Thread_Info* Monitor_Thread_Info = new _Monitor_Thread_Info();
-    sprintf_safe(Monitor_Thread_Info->m_szText, MAX_BUFF_50, "Monitor")£»
+    sprintf_safe(Monitor_Thread_Info->m_szText, MAX_BUFF_50, "Monitor");
 
     pthread_create(&tid, &attr, thread_Monitor, NULL, Monitor_Thread_Info);
 

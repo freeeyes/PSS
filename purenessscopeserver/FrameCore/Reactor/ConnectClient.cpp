@@ -129,6 +129,11 @@ void CConnectClient::ClientClose()
 
 int CConnectClient::open(void* p)
 {
+    if (p != NULL)
+    {
+        OUR_DEBUG((LM_ERROR, "[CConnectClient::open]p is not NULL.\n"));
+    }
+
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadLock);
 
     msg_queue()->high_water_mark(MAX_MSG_MASK);
@@ -136,11 +141,6 @@ int CConnectClient::open(void* p)
 
     //从配置文件获取数据
     m_u4MaxPacketSize  = GetXmlConfigAttribute(xmlRecvInfo)->RecvBuffSize;
-
-    if (p != NULL)
-    {
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::open]p is not NULL.\n"));
-    }
 
     ACE_Time_Value nowait(MAX_MSG_PACKETTIMEOUT);
     m_nIOCount = 1;
@@ -556,7 +556,7 @@ int CConnectClient::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
 bool CConnectClient::Device_Send_Data(const char* pData, ssize_t nLen)
 {
     ACE_Message_Block* pmb = App_MessageBlockManager::instance()->Create((uint32)nLen);
-    memcpy_safe((char*)pData, (uint32)nLen, pmb->wr_ptr(), (uint32)nLen);
+    memcpy_safe(pData, (uint32)nLen, pmb->wr_ptr(), (uint32)nLen);
     pmb->wr_ptr(nLen);
 
     return SendData(pmb);

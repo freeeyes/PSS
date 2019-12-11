@@ -162,13 +162,8 @@ bool CAceReactor::Init(int nReactorType, int nThreadCount, int nMaxHandleCount)
     }
 }
 
-int CAceReactor::open(void* args)
+int CAceReactor::open()
 {
-    if (args != NULL)
-    {
-        OUR_DEBUG((LM_ERROR, "[CAceReactor::open] args is not NULL.\n"));
-    }
-
     OUR_DEBUG((LM_ERROR, "[CAceReactor::Open] Begin nReactorID= [%d].\n", m_u4ReactorID));
 
     if (activate(THREAD_PARAM, m_nThreadCount)  == -1)

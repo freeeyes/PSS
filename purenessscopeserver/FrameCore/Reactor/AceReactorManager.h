@@ -44,7 +44,7 @@ public:
     bool Start();
     bool Stop();
 
-    virtual int open(void* args = 0);
+    int open();
     virtual int svc(void);
 
     void   SetReactorID(uint32 u4ReactorID);
