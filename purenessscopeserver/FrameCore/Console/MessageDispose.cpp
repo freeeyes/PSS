@@ -1300,10 +1300,8 @@ void DoMessage_GetLogLevelInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
         for (uint16 i = 0; i < (uint16)AppLogManager::instance()->GetLogCount(); i++)
         {
             uint16 u2LogID = AppLogManager::instance()->GetLogID(i);
-            VCHARS_STR strSServerName;
-            VCHARS_STR strSLogName;
 
-            char* pServerName = AppLogManager::instance()->GetLogInfoByServerName(u2LogID);
+            const char* pServerName = AppLogManager::instance()->GetLogInfoByServerName(u2LogID);
 
             if (NULL == pServerName)
             {
@@ -1311,10 +1309,9 @@ void DoMessage_GetLogLevelInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
                 continue;
             }
 
-            strSServerName.text = pServerName;
-            strSServerName.u1Len = (uint8)ACE_OS::strlen(pServerName);
+            uint8 u1ServerNameLen = (uint8)ACE_OS::strlen(pServerName);
 
-            char* pLogName = AppLogManager::instance()->GetLogInfoByLogName(u2LogID);
+            const char* pLogName = AppLogManager::instance()->GetLogInfoByLogName(u2LogID);
 
             if (NULL == pLogName)
             {
@@ -1322,16 +1319,17 @@ void DoMessage_GetLogLevelInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
                 return;
             }
 
-            strSLogName.text = pLogName;
-            strSLogName.u1Len = (uint8)ACE_OS::strlen(pLogName);
+            uint8 u1LogNameLen = (uint8)ACE_OS::strlen(pLogName);
 
             uint8 u1LogType = (uint8)AppLogManager::instance()->GetLogInfoByLogDisplay(u2LogID);
 
             if (CommandInfo.m_u1OutputType == 0)
             {
                 (*pBuffPacket) << u2LogID;
-                (*pBuffPacket) << strSServerName;
-                (*pBuffPacket) << strSLogName;
+                (*pBuffPacket) << u1ServerNameLen;
+                pBuffPacket->WriteStream(pServerName, u1ServerNameLen);
+                (*pBuffPacket) << u1LogNameLen;
+                pBuffPacket->WriteStream(pLogName, u1LogNameLen);
                 (*pBuffPacket) << u1LogType;
                 (*pBuffPacket) << AppLogManager::instance()->GetLogInfoByLogLevel(i);
             }

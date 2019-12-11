@@ -37,7 +37,7 @@ class CLogManager : public ACE_Task<ACE_MT_SYNCH>, public ILogManager
 public:
     CLogManager(void);
 
-    virtual int open (void* args = 0);
+    int open ();
     virtual int svc(void);
     int Close();
 
@@ -59,8 +59,8 @@ public:
     uint32 GetCurrLevel();
 
     uint16 GetLogID(uint16 u2Index);
-    char*  GetLogInfoByServerName(uint16 u2LogID);
-    char*  GetLogInfoByLogName(uint16 u2LogID);
+    const char*  GetLogInfoByServerName(uint16 u2LogID);
+    const char*  GetLogInfoByLogName(uint16 u2LogID);
     int    GetLogInfoByLogDisplay(uint16 u2LogID);
     uint16 GetLogInfoByLogLevel(uint16 u2LogID);
 

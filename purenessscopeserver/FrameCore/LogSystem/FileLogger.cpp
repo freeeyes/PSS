@@ -363,7 +363,7 @@ bool CLogFile::Run()
 
     m_File.close();
 
-    m_FileAddr.set((ACE_TCHAR*)strLogName.c_str());
+    m_FileAddr.set(strLogName.c_str());
 
     if (m_Connector.connect(m_File, m_FileAddr, 0, ACE_Addr::sap_any, 0, O_WRONLY | O_CREAT | O_APPEND) == -1)
     {
@@ -644,14 +644,14 @@ uint16 CFileLogger::GetLogID(uint16 u2Index)
     return m_pLogFileList[u2Index]->GetLoggerID();
 }
 
-char* CFileLogger::GetLogInfoByServerName(uint16 u2LogID)
+const char* CFileLogger::GetLogInfoByServerName(uint16 u2LogID)
 {
     int nIndex = u2LogID % m_nCount;
 
-    return (char* )m_pLogFileList[nIndex]->GetServerName().c_str();
+    return m_pLogFileList[nIndex]->GetServerName().c_str();
 }
 
-char* CFileLogger::GetLogInfoByLogName(uint16 u2LogID)
+const char* CFileLogger::GetLogInfoByLogName(uint16 u2LogID)
 {
     int nIndex = u2LogID % m_nCount;
 

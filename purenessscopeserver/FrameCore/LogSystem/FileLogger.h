@@ -160,8 +160,8 @@ public:
     virtual uint32 GetCurrLevel();
 
     virtual uint16 GetLogID(uint16 u2Index);
-    virtual char*  GetLogInfoByServerName(uint16 u2LogID);
-    virtual char*  GetLogInfoByLogName(uint16 u2LogID);
+    virtual const char*  GetLogInfoByServerName(uint16 u2LogID);
+    virtual const char*  GetLogInfoByLogName(uint16 u2LogID);
     virtual int    GetLogInfoByLogDisplay(uint16 u2LogID);
     virtual uint16 GetLogInfoByLogLevel(uint16 u2LogID);
 

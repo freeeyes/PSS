@@ -105,13 +105,8 @@ CLogManager::CLogManager(void):m_mutex(), m_cond(m_mutex)
     m_blIsMail      = false;
 }
 
-int CLogManager::open(void* args)
+int CLogManager::open()
 {
-    if(args != NULL)
-    {
-        OUR_DEBUG((LM_ERROR,"[CLogManager::open]args is not NULL.\n"));
-    }
-
     if(activate(THREAD_PARAM, m_nThreadCount) == -1)
     {
         m_blRun = false;
@@ -414,7 +409,7 @@ uint16 CLogManager::GetLogID(uint16 u2Index)
     }
 }
 
-char* CLogManager::GetLogInfoByServerName(uint16 u2LogID)
+const char* CLogManager::GetLogInfoByServerName(uint16 u2LogID)
 {
     if(m_pServerLogger != NULL)
     {
@@ -426,7 +421,7 @@ char* CLogManager::GetLogInfoByServerName(uint16 u2LogID)
     }
 }
 
-char* CLogManager::GetLogInfoByLogName(uint16 u2LogID)
+const char* CLogManager::GetLogInfoByLogName(uint16 u2LogID)
 {
     if(m_pServerLogger != NULL)
     {

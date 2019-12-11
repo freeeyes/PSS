@@ -145,7 +145,7 @@ unsigned char* AES::InvCipher(unsigned char* input)
     return input;
 }
 
-void* AES::Cipher(void* input, int length)
+char* AES::Cipher(char* input, int length)
 {
     unsigned char* in = (unsigned char*) input;
     int i;
@@ -165,7 +165,7 @@ void* AES::Cipher(void* input, int length)
     return input;
 }
 
-void* AES::InvCipher(void* input, int length)
+char* AES::InvCipher(char* input, int length)
 {
     unsigned char* in = (unsigned char*) input;
     int i;

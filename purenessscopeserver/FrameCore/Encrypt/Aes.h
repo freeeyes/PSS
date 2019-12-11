@@ -16,8 +16,8 @@ public:
     bool SetKey(const unsigned char* szKey);
     unsigned char* Cipher(unsigned char* input);
     unsigned char* InvCipher(unsigned char* input);
-    void* Cipher(void* input, int length=0);
-    void* InvCipher(void* input, int length);
+    char* Cipher(char* input, int length=0);
+    char* InvCipher(char* input, int length);
 
 private:
     unsigned char Sbox[256];
