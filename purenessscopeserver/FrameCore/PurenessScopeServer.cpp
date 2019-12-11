@@ -59,23 +59,11 @@ int Load_PacketParse_Module()
 ACE_Thread_Mutex g_mutex;
 ACE_Condition<ACE_Thread_Mutex> g_cond(g_mutex);
 
-//监控线程描述
-class _Monitor_Thread_Info
-{
-public:
-    _Monitor_Thread_Info()
-    {
-        m_szText[0] = '\0';
-    }
-
-    char m_szText[MAX_BUFF_50];
-
-};
 
 //监控信号量线程
-void thread_Monitor(_Monitor_Thread_Info* arg)
+void* thread_Monitor(void* arg)
 {
-    OUR_DEBUG((LM_INFO, "[thread_Monitor]arg(%s).\n", arg->m_szText));
+    ACE_UNUSED_ARG(arg);
 
     g_mutex.acquire();
 
@@ -90,7 +78,6 @@ void thread_Monitor(_Monitor_Thread_Info* arg)
     g_mutex.release();
 
     OUR_DEBUG((LM_INFO, "[thread_Monitor]exit.\n"));
-    SAFE_DELETE(arg);
     pthread_exit(0);
 }
 
@@ -220,10 +207,7 @@ int Chlid_Run()
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
-    _Monitor_Thread_Info* Monitor_Thread_Info = new _Monitor_Thread_Info();
-    sprintf_safe(Monitor_Thread_Info->m_szText, MAX_BUFF_50, "Monitor");
-
-    pthread_create(&tid, &attr, thread_Monitor, NULL, Monitor_Thread_Info);
+    pthread_create(&tid, &attr, thread_Monitor, NULL);
 
     //等待线程锁生效
     ACE_Time_Value tvSleep(0, 1000);
