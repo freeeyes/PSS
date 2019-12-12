@@ -105,14 +105,17 @@ void CReactorUDPHander::SetPacketParseInfoID(uint32 u4PacketParseInfoID)
 
 bool CReactorUDPHander::SendMessage(char*& pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead, uint16 u2CommandID, bool blDlete)
 {
+    char szSendIP[MAX_BUFF_50] = { '\0' };
     ACE_Message_Block* pMbData = NULL;
+
+    sprintf_safe(szSendIP, MAX_BUFF_50, "%s", szIP);
 
     _Send_Message_Param obj_Send_Message_Param;
     obj_Send_Message_Param.m_u4PacketParseInfoID = m_u4PacketParseInfoID;
     obj_Send_Message_Param.m_blDlete             = blDlete;
     obj_Send_Message_Param.m_blHead              = blHead;
     obj_Send_Message_Param.m_nPort               = nPort;
-    obj_Send_Message_Param.m_pIP                 = szIP;
+    obj_Send_Message_Param.m_pIP                 = szSendIP;
     obj_Send_Message_Param.m_u2CommandID         = u2CommandID;
     obj_Send_Message_Param.m_u4Len               = u4Len;
 
@@ -190,7 +193,7 @@ bool CReactorUDPHander::CheckMessage(const char* pData, uint32 u4Len)
         //如果包含包体
         if(m_pPacketParse->GetPacketBodySrcLen() > 0)
         {
-            char* pBody = (&pData[0] + m_pPacketParse->GetPacketHeadSrcLen());
+            char* pBody = (char* )(&pData[0] + m_pPacketParse->GetPacketHeadSrcLen());
             ACE_Message_Block* pMBBody = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketBodySrcLen());
             memcpy_safe(pBody, m_pPacketParse->GetPacketBodySrcLen(), (char* )pMBBody->wr_ptr(), m_pPacketParse->GetPacketBodySrcLen());
             pMBBody->wr_ptr(m_pPacketParse->GetPacketBodySrcLen());
