@@ -226,12 +226,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BaseCommand.cpp" />
-    <ClCompile Include="CGameLogic.cpp" />
     <ClCompile Include="TcpTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseCommand.h" />
-    <ClInclude Include="CGameLogic.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="TcpTest.mpc">

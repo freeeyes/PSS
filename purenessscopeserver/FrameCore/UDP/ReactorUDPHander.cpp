@@ -112,7 +112,7 @@ bool CReactorUDPHander::SendMessage(char*& pMessage, uint32 u4Len, const char* s
     obj_Send_Message_Param.m_blDlete             = blDlete;
     obj_Send_Message_Param.m_blHead              = blHead;
     obj_Send_Message_Param.m_nPort               = nPort;
-    obj_Send_Message_Param.m_pIP                 = (char*)szIP;
+    obj_Send_Message_Param.m_pIP                 = szIP;
     obj_Send_Message_Param.m_u2CommandID         = u2CommandID;
     obj_Send_Message_Param.m_u4Len               = u4Len;
 
@@ -175,7 +175,7 @@ bool CReactorUDPHander::CheckMessage(const char* pData, uint32 u4Len)
 
         //将完整的数据包转换为PacketParse对象
         ACE_Message_Block* pMBHead = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadSrcLen());
-        memcpy_safe((char* )pData, m_pPacketParse->GetPacketHeadSrcLen(), (char* )pMBHead->wr_ptr(), m_pPacketParse->GetPacketHeadSrcLen());
+        memcpy_safe(pData, m_pPacketParse->GetPacketHeadSrcLen(), (char* )pMBHead->wr_ptr(), m_pPacketParse->GetPacketHeadSrcLen());
         pMBHead->wr_ptr(m_pPacketParse->GetPacketHeadLen());
 
         bool blRet = Udp_Common_Recv_Head(pMBHead, m_pPacketParse, m_u4PacketParseInfoID, u4Len);
@@ -190,7 +190,7 @@ bool CReactorUDPHander::CheckMessage(const char* pData, uint32 u4Len)
         //如果包含包体
         if(m_pPacketParse->GetPacketBodySrcLen() > 0)
         {
-            char* pBody = (char* )(&pData[0] + m_pPacketParse->GetPacketHeadSrcLen());
+            char* pBody = (&pData[0] + m_pPacketParse->GetPacketHeadSrcLen());
             ACE_Message_Block* pMBBody = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketBodySrcLen());
             memcpy_safe(pBody, m_pPacketParse->GetPacketBodySrcLen(), (char* )pMBBody->wr_ptr(), m_pPacketParse->GetPacketBodySrcLen());
             pMBBody->wr_ptr(m_pPacketParse->GetPacketBodySrcLen());
@@ -215,7 +215,7 @@ bool CReactorUDPHander::CheckMessage(const char* pData, uint32 u4Len)
     else
     {
         ACE_Message_Block* pMbData = App_MessageBlockManager::instance()->Create(u4Len);
-        memcpy_safe((char* )pData, u4Len, (char* )pMbData->wr_ptr(), u4Len);
+        memcpy_safe(pData, u4Len, (char* )pMbData->wr_ptr(), u4Len);
         pMbData->wr_ptr(u4Len);
 
         //以数据流处理

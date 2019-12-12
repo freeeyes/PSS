@@ -272,17 +272,17 @@ public:
     bool SetConnectTimeWheel(CConnectHandler* pConnectHandler);                                            //设置消息轮盘
     bool DelConnectTimeWheel(CConnectHandler* pConnectHandler);                                            //删除消息轮盘
     virtual bool PostMessage(uint32 u4ConnectID, IBuffPacket*& pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,
-                             uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nServerID = 0);            //异步发送
+                             uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDelete = true, int nServerID = 0);            //异步发送
     virtual bool PostMessage(uint32 u4ConnectID, char*& pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL,
-                             uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nServerID = 0);            //异步发送
+                             uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDelete = true, int nServerID = 0);            //异步发送
     virtual bool PostMessage(vector<uint32> vecConnectID, IBuffPacket*& pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,
-                             uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nServerID = 0);            //异步群发指定的ID
+                             uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDelete = true, int nServerID = 0);            //异步群发指定的ID
     virtual bool PostMessage(vector<uint32> vecConnectID, char*& pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL,
-                             uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nServerID = 0);   //异步群发指定的ID
+                             uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDelete = true, int nServerID = 0);   //异步群发指定的ID
     virtual bool PostMessageAll(IBuffPacket*& pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,
-                                uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nMessageID = 0);
+                                uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDelete = true, int nMessageID = 0);
     virtual bool PostMessageAll(char*& pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL,
-                                uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nMessageID = 0);
+                                uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDelete = true, int nMessageID = 0);
     virtual bool CloseConnect(uint32 u4ConnectID);                                                                   //服务器关闭
     bool CloseConnectByClient(uint32 u4ConnectID);                                                                   //客户端关闭
     virtual _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                                                       //得到指定链接信息
