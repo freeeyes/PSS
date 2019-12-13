@@ -26,7 +26,7 @@
 > `*        hard    noproc  10000`  
 > `*        soft    nofile  10000`  
 > `*        hard    nofile  10000`   
-## (2) PSS compilation and installation ( Linux, for example, windows itself please install v2015, the program has a special engineering file, open the compilation )  
+## (2) PSS compilation and installation ( Linux, for example, Windows please use CMake command to generate the project directly, the program has a special engineering file, open the compilation )  
 > download PSS and unzip it under the pureness scope server / Linux _ bin path.  
 > first set the script run permissions  
 > `chmod 775 runlinuxmpc.sh` 
@@ -49,5 +49,7 @@
 > libTcpTest.so  
 > PurenessScopeServer  
 > Run. /purenessscopeserver to start successfully.
-
+## (3) You can directly execute the script one-click installation under Linux  
+> Run configure under ./Build directory  
+> Source ~ / .bash_profile after running  
 

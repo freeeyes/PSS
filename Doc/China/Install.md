@@ -26,7 +26,7 @@
 > `*        hard    noproc  10000`  
 > `*        soft    nofile  10000`  
 > `*        hard    nofile  10000`   
-## (2)PSS的编译安装(以Linux为例，Windows本身请安装V2015,程序有专门的工程文件，打开编译即可)
+## (2)PSS的编译安装(以Linux为例，Windows请用CMake指令直接生成项目,程序有专门的工程文件，打开编译即可)
 > 下载PSS并解压，在PurenessScopeServer/Linux_Bin路径下。  
 > 首先设置脚本运行权限
 > `chmod 775 runlinuxmpc.sh` 
@@ -49,5 +49,8 @@
 > libTcpTest.so  
 > PurenessScopeServer  
 > 运行./PurenessScopeServer  便可启动成功。
+## (3)你可以在Linux下直接执行脚本一键安装  
+> 运行./Build目录下的 configure 
+> 运行完成后 source ~/.bash_profile
 
 
