@@ -60,7 +60,7 @@ if [ "$ACE_PATH_ENV"x = ""x ]; then
 	echo $ACE_THIRD_ROOT
 	echo -e "ACE_ROOT=$ACE_THIRD_ROOT" >> ~/.bash_profile
 	echo -e "export ACE_ROOT" >> ~/.bash_profile
-	echo -e 'LD_LIBRARY_PATH=$ACE_ROOT/lib:$LD_LIBRARY_PATH' >> ~/.bash_profile
+	echo -e 'LD_LIBRARY_PATH=/usr/local/lib/:$ACE_ROOT/lib:$LD_LIBRARY_PATH' >> ~/.bash_profile
 	echo -e 'export LD_LIBRARY_PATH' >> ~/.bash_profile
 	echo -e 'PATH=$PATH:$ACE_ROOT/bin' >> ~/.bash_profile
 	echo -e 'export PATH' >> ~/.bash_profile
