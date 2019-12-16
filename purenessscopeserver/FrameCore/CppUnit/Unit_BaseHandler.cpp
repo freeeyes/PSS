@@ -32,7 +32,7 @@ void CUnit_Basehandler::Test_Tcp_Common_File_Message(void)
     //´æ·Å²âÊÔÊý¾Ý
     uint32 u4Data = 1;
 
-    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create();
+    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     (*pBuffPacket) << u4Data;
 
@@ -76,7 +76,7 @@ void CUnit_Basehandler::Test_Tcp_Common_Send_Input_To_Cache(void)
 
     uint32 u4Data = 1;
 
-    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create();
+    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     (*pBuffPacket) << u4Data;
 
@@ -228,7 +228,7 @@ void CUnit_Basehandler::Test_Tcp_Common_Make_Send_Packet(void)
     bool blRet = false;
     ACE_Message_Block* pMbData       = NULL;
     ACE_Message_Block* pBlockMessage = App_MessageBlockManager::instance()->Create(MAX_BUFF_200);
-    IBuffPacket* pBuffPacket         = App_BuffPacketManager::instance()->Create();
+    IBuffPacket* pBuffPacket         = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     (*pBuffPacket) << (uint32)10;
 

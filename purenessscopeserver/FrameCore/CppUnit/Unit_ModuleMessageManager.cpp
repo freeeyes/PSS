@@ -28,8 +28,8 @@ void CUnit_ModuleMessageManager::Test_SendModuleMessage(void)
     sprintf_safe(szSession, 32, "freeeyes");
     sprintf_safe(szData, 30, "freeeyes");
 
-    IBuffPacket* pBuffPacket       = App_BuffPacketManager::instance()->Create();
-    IBuffPacket* pReturnBuffPacket = App_BuffPacketManager::instance()->Create();
+    IBuffPacket* pBuffPacket       = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
+    IBuffPacket* pReturnBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     (*pBuffPacket) << (uint16)1;
     (*pBuffPacket) << u2Command;
@@ -57,8 +57,8 @@ void CUnit_ModuleMessageManager::Test_SendFrameMessage(void)
     sprintf_safe(szSession, 32, "freeeyes");
     sprintf_safe(szData, 30, "freeeyes");
 
-    IBuffPacket* pHeadPacket = App_BuffPacketManager::instance()->Create();
-    IBuffPacket* pBodyPacket = App_BuffPacketManager::instance()->Create();
+    IBuffPacket* pHeadPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
+    IBuffPacket* pBodyPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     (*pHeadPacket) << (uint16)1;
     (*pHeadPacket) << u2Command;

@@ -20,7 +20,7 @@ void CUnit_FrameCommand::tearDown(void)
 void CUnit_FrameCommand::Test_Frame_Command(void)
 {
     bool blRet = false;
-    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create();
+    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     if (CONSOLE_MESSAGE_SUCCESS == m_pFrameCommand->DoFrameCommand("ShowModule -a", pBuffPacket))
     {

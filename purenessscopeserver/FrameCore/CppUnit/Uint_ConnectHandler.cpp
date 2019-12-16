@@ -47,7 +47,7 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Stream(void)
         return;
     }
 
-    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create();
+    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     (*pBuffPacket) << (uint32)1;
 
