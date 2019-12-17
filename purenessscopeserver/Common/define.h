@@ -389,7 +389,7 @@ enum EM_Server_Recv_State
 *  - '%': print out a single percent sign, '%'
 *  - '?': print out stack trace (see Stack_Trace.h header comments)
 */
-#define OUR_DEBUG(X)  ACE_DEBUG((LM_INFO, "[%D %P|%t][%N,%l]")); ACE_DEBUG(X)
+#define OUR_DEBUG(X) { ACE_DEBUG((LM_INFO, "[%D %P|%t][%N,%l]")); ACE_DEBUG(X); }
 
 enum
 {
