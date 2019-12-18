@@ -157,8 +157,11 @@ void Recovery_Common_BuffPacket(bool blDelete, IBuffPacket* pBuffPacket)
     }
 }
 
-void Tcp_Common_Send_Message_Error(bool blDelete, IBuffPacket* pBuffPacket)
+void Tcp_Common_Send_Message_Error(uint32 u4ConnectID, uint16 u2CommandID, bool blDelete, IBuffPacket* pBuffPacket)
 {
+    OUR_DEBUG((LM_INFO, "[Tcp_Common_Send_Message_Error]u4ConnectID=%d, commandID=%d, buffsize=%d.\n", u4ConnectID, u2CommandID, pBuffPacket->GetPacketLen()));
+    OUR_DEBUG((LM_INFO, "[Tcp_Common_Send_Message_Error]GetReadLen()=%d, GetWriteLen()=%d.\n", pBuffPacket->GetReadLen(), pBuffPacket->GetWriteLen()));
+
     ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
     memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
     pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());

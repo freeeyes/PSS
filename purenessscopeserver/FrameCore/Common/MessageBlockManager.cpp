@@ -25,6 +25,7 @@ ACE_Message_Block* CMessageBlockManager::Create(uint32 u4Size)
     if(u4Size == 0)
     {
         //如果申请的空间为0,则直接返回空。
+        OUR_DEBUG((LM_INFO, "[CMessageBlockManager::Create]Size=0.\n"));
         return NULL;
     }
 

@@ -66,7 +66,7 @@ bool Udp_Common_Send_WorkThread(CPacketParse*& pPacketParse, ACE_INET_Addr const
 void Recovery_Common_BuffPacket(bool blDelete, IBuffPacket* pBuffPacket);
 
 //错误信息返回工作线程
-void Tcp_Common_Send_Message_Error(bool blDelete, IBuffPacket* pBuffPacket);
+void Tcp_Common_Send_Message_Error(uint32 u4ConnectID, uint16 u2CommandID, bool blDelete, IBuffPacket* pBuffPacket);
 
 //TCP流消息处理
 uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPacketParse* pPacketParse, uint32 u4PacketParseInfoID);

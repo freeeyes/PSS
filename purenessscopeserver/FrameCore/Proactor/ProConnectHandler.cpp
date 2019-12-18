@@ -754,7 +754,8 @@ bool CProConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacke
     if(m_u1IsActive == 0)
     {
         //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
-        Tcp_Common_Send_Message_Error(blDelete, pBuffPacket);
+        OUR_DEBUG((LM_INFO, "[CProConnectHandler::SendMessage]m_u1IsActive == 0.\n"))
+        Tcp_Common_Send_Message_Error(GetConnectID(), u2CommandID, blDelete, pBuffPacket);
 
         return false;
     }
@@ -1697,10 +1698,9 @@ bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
     else
     {
         sprintf_safe(m_szError, MAX_BUFF_500, "[CProConnectManager::SendMessage] ConnectID[%d] is not find.", u4ConnectID);
-        OUR_DEBUG((LM_INFO, "[CProConnectManager::SendMessage]u4ConnectID=%d, commandID=%d, buffsize=%d.\n", u4ConnectID, u2CommandID, u4CommandSize));
-        OUR_DEBUG((LM_INFO, "[CProConnectManager::SendMessage]GetReadLen()=%d, GetWriteLen()=%d.\n", pBuffPacket->GetReadLen(), pBuffPacket->GetWriteLen()));
         //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
-        Tcp_Common_Send_Message_Error(blDelete, pBuffPacket);
+        OUR_DEBUG((LM_INFO, "[CProConnectManager::SendMessage]pConnectHandler is NULL.\n"));
+        Tcp_Common_Send_Message_Error(u4ConnectID, u2CommandID, blDelete, pBuffPacket);
 
         if(true == blDelete)
         {

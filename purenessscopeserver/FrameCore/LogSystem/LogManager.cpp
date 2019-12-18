@@ -326,7 +326,7 @@ int CLogManager::WriteLogBinary(int nLogType, const char* pData, int nLen)
 {
     int nRet = 0;
 
-    if (nLen * 5 >= m_objLogBlockPool.GetBlockSize())
+    if ((uint32)(nLen * 5) >= m_objLogBlockPool.GetBlockSize())
     {
         OUR_DEBUG((LM_INFO, "[CLogManager::WriteLogBinary]nLen(%d) is more than GetBlockSize.\n"));
         return 1;
