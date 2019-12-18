@@ -2,7 +2,6 @@
 #define _LOGMANAGER_H
 
 #include <stdio.h>
-#include <stdarg.h>
 #include "ILogObject.h"
 #include "ILogManager.h"
 #include "BaseTask.h"
@@ -64,18 +63,54 @@ public:
     int    GetLogInfoByLogDisplay(uint16 u2LogID);
     uint16 GetLogInfoByLogLevel(uint16 u2LogID);
 
+    //对内写日志的接口
+    template <class... Args>
+    int WriteLog_i(int nLogType, const char* fmt, Args&& ... args)
+    {
+        //从日志块池里面找到一块空余的日志块
+        int nRet = 0;
+
+        m_Logger_Mutex.acquire();
+        _LogBlockInfo* pLogBlockInfo = m_objLogBlockPool.GetLogBlockInfo();
+
+        if (NULL != pLogBlockInfo)
+        {
+            ACE_OS::snprintf(pLogBlockInfo->m_pBlock, m_objLogBlockPool.GetBlockSize() - 1, fmt, convert(std::forward<Args>(args))...);
+            nRet = Update_Log_Block(nLogType, NULL, NULL, pLogBlockInfo);
+        }
+
+        m_Logger_Mutex.release();
+        return nRet;
+    };
+
+    template <class... Args>
+    int WriteToMail_i(int nLogType, uint32 u4MailID, const char* pTitle, const char* fmt, Args&& ... args)
+    {
+        int nRet = 0;
+        m_Logger_Mutex.acquire();
+        _LogBlockInfo* pLogBlockInfo = m_objLogBlockPool.GetLogBlockInfo();
+
+        if (NULL != pLogBlockInfo)
+        {
+            ACE_OS::snprintf(pLogBlockInfo->m_pBlock, m_objLogBlockPool.GetBlockSize() - 1, fmt, convert(std::forward<Args>(args))...);
+            nRet = Update_Log_Block(nLogType, &u4MailID, pTitle, pLogBlockInfo);
+        }
+
+        return nRet;
+    };
+
     //对外写日志的接口
-    int WriteLog(int nLogType, const char* fmt, ...);
+    virtual int WriteLogBinary(int nLogType, const char* pData, int nLen);
 
-    int WriteLogBinary(int nLogType, const char* pData, int nLen);
+    virtual int WriteLog_r(int nLogType, const char* fmt, uint32 u4Len);
 
-    int WriteToMail(int nLogType, uint32 u4MailID, const char* pTitle, const char* fmt, ...);
+    virtual int WriteToMail_r(int nLogType, uint32 u4MailID, const char* pTitle, const char* fmt, uint32 u4Len);
 
 private:
     bool Dispose_Queue();
     int ProcessLog(_LogBlockInfo* pLogBlockInfo);
     virtual int CloseMsgQueue();
-    int Create_Log_Block(int nLogType, uint32* pMailID, const char* pTitle, va_list* ap, const char* fmt, int nfmtSize);
+    int Update_Log_Block(int nLogType, uint32* pMailID, const char* pTitle, _LogBlockInfo* pLogBlockInfo);
 
     //关闭消息队列条件变量
     ACE_Thread_Mutex                  m_mutex;

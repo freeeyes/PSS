@@ -124,7 +124,7 @@ void CProConsoleHandle::open(ACE_HANDLE h, ACE_Message_Block&)
     ACE_Time_Value tvOpenEnd(ACE_OS::gettimeofday());
     ACE_Time_Value tvOpen(tvOpenEnd - tvOpenBegin);
 
-    //AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Connection from [%s:%d] DisposeTime = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), tvOpen.msec());
+    //AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "Connection from [%s:%d] DisposeTime = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), tvOpen.msec());
 
     this->handle(h);
 

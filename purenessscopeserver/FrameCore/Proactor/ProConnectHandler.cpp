@@ -113,16 +113,16 @@ void CProConnectHandler::Close(int nIOCount, int nErrno)
         App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->DisConnect(GetConnectID());
 
         //通知逻辑接口，连接已经断开
-        AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, RecvQueueCount=%d, RecvQueueTimeCost=%I64dns, SendQueueTimeCost=%I64dns.",
-                                            m_addrRemote.get_host_addr(),
-                                            m_addrRemote.get_port_number(),
-                                            m_u4AllRecvSize,
-                                            m_u4AllRecvCount,
-                                            m_u4AllSendSize,
-                                            m_u4AllSendCount,
-                                            m_u4RecvQueueCount,
-                                            m_u8RecvQueueTimeCost,
-                                            m_u8SendQueueTimeCost);
+        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, RecvQueueCount=%d, RecvQueueTimeCost=%I64dns, SendQueueTimeCost=%I64dns.",
+                                              m_addrRemote.get_host_addr(),
+                                              m_addrRemote.get_port_number(),
+                                              m_u4AllRecvSize,
+                                              m_u4AllRecvCount,
+                                              m_u4AllSendSize,
+                                              m_u4AllSendCount,
+                                              m_u4RecvQueueCount,
+                                              m_u8RecvQueueTimeCost,
+                                              m_u8SendQueueTimeCost);
 
 
 
@@ -452,10 +452,10 @@ void CProConnectHandler::open(ACE_HANDLE h, ACE_Message_Block&)
         App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), GetXmlConfigAttribute(xmlIP)->Timeout);
 
         //发送告警邮件
-        AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
-                                               GetXmlConfigAttribute(xmlClientData)->MailID,
-                                               "Alert IP",
-                                               "[CProConnectHandler::open] IP is more than IP Max,");
+        AppLogManager::instance()->WriteToMail_i(LOG_SYSTEM_CONNECT,
+                GetXmlConfigAttribute(xmlClientData)->MailID,
+                "Alert IP",
+                "[CProConnectHandler::open] IP is more than IP Max,");
 
         Close();
         return;
@@ -497,11 +497,11 @@ void CProConnectHandler::open(ACE_HANDLE h, ACE_Message_Block&)
     }
 
     //写入连接日志
-    AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Connection from [%s:%d] ConnectID=%d, GetHandlerID=%d.",
-                                        m_addrRemote.get_host_addr(),
-                                        m_addrRemote.get_port_number(),
-                                        GetConnectID(),
-                                        GetHandlerID());
+    AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "Connection from [%s:%d] ConnectID=%d, GetHandlerID=%d.",
+                                          m_addrRemote.get_host_addr(),
+                                          m_addrRemote.get_port_number(),
+                                          GetConnectID(),
+                                          GetHandlerID());
 
     m_u1ConnectState = CONNECT_OPEN;
 
@@ -641,9 +641,9 @@ void CProConnectHandler::handle_write_stream(const ACE_Asynch_Write_Stream::Resu
         int nErrno = errno;
         OUR_DEBUG ((LM_DEBUG,"[CProConnectHandler::handle_write_stream] Connectid=[%d] begin(%d)...\n",GetConnectID(), nErrno));
 
-        AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "WriteError [%s:%d] nErrno = %d  result.bytes_transferred() = %d, ",
-                                            m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), nErrno,
-                                            result.bytes_transferred());
+        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "WriteError [%s:%d] nErrno = %d  result.bytes_transferred() = %d, ",
+                                              m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), nErrno,
+                                              result.bytes_transferred());
 
         OUR_DEBUG((LM_DEBUG,"[CProConnectHandler::handle_write_stream] Connectid=[%d] finish ok...\n", GetConnectID()));
         m_atvOutput = ACE_OS::gettimeofday();
@@ -701,7 +701,7 @@ void CProConnectHandler::SetRecvQueueTimeCost(uint32 u4TimeCost)
     //如果超过阀值，则记录到日志中去
     if((uint32)(m_u2RecvQueueTimeout * 1000) <= u4TimeCost)
     {
-        AppLogManager::instance()->WriteLog(LOG_SYSTEM_RECVQUEUEERROR, "[TCP]IP=%s,Prot=%d,Timeout=[%d].", GetClientIPInfo().m_szClientIP, GetClientIPInfo().m_nPort, u4TimeCost);
+        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_RECVQUEUEERROR, "[TCP]IP=%s,Prot=%d,Timeout=[%d].", GetClientIPInfo().m_szClientIP, GetClientIPInfo().m_nPort, u4TimeCost);
     }
 
     m_u4RecvQueueCount++;
@@ -721,7 +721,7 @@ void CProConnectHandler::SetSendQueueTimeCost(uint32 u4TimeCost)
     //如果超过阀值，则记录到日志中去
     if((uint32)(m_u2SendQueueTimeout * 1000) <= u4TimeCost)
     {
-        AppLogManager::instance()->WriteLog(LOG_SYSTEM_SENDQUEUEERROR, "[TCP]IP=%s,Prot=%d,Timeout=[%d].", GetClientIPInfo().m_szClientIP, GetClientIPInfo().m_nPort, u4TimeCost);
+        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_SENDQUEUEERROR, "[TCP]IP=%s,Prot=%d,Timeout=[%d].", GetClientIPInfo().m_szClientIP, GetClientIPInfo().m_nPort, u4TimeCost);
 
         //组织数据
         Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_SEND_TIMEOUT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
@@ -795,14 +795,14 @@ bool CProConnectHandler::PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State
     if(false == m_TimeConnectInfo.SendCheck((uint8)dtNow.minute(), 1, (uint32)pMbData->length()))
     {
         //超过了限定的阀值，需要关闭链接，并记录日志
-        AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECTABNORMAL,
-                                               GetXmlConfigAttribute(xmlClientData)->MailID,
-                                               "Alert",
-                                               "[TCP]IP=%s,Prot=%d,SendPacketCount=%d, SendSize=%d.",
-                                               m_addrRemote.get_host_addr(),
-                                               m_addrRemote.get_port_number(),
-                                               m_TimeConnectInfo.m_u4SendPacketCount,
-                                               m_TimeConnectInfo.m_u4SendSize);
+        AppLogManager::instance()->WriteToMail_i(LOG_SYSTEM_CONNECTABNORMAL,
+                GetXmlConfigAttribute(xmlClientData)->MailID,
+                "Alert",
+                "[TCP]IP=%s,Prot=%d,SendPacketCount=%d, SendSize=%d.",
+                m_addrRemote.get_host_addr(),
+                m_addrRemote.get_port_number(),
+                m_TimeConnectInfo.m_u4SendPacketCount,
+                m_TimeConnectInfo.m_u4SendSize);
 
         //设置封禁时间
         App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), GetXmlConfigAttribute(xmlIP)->Timeout);
@@ -825,7 +825,7 @@ bool CProConnectHandler::PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State
         if(m_u4ReadSendSize - m_u4SuccessSendSize >= GetXmlConfigAttribute(xmlSendInfo)->SendDatamark)
         {
             OUR_DEBUG ((LM_ERROR, "[CProConnectHandler::PutSendPacket]ConnectID = %d, SingleConnectMaxSendBuffer is more than(%d)!\n", GetConnectID(), m_u4ReadSendSize - m_u4SuccessSendSize));
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_SENDQUEUEERROR, "]Connection from [%s:%d], SingleConnectMaxSendBuffer is more than(%d)!.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4ReadSendSize - m_u4SuccessSendSize);
+            AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_SENDQUEUEERROR, "]Connection from [%s:%d], SingleConnectMaxSendBuffer is more than(%d)!.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4ReadSendSize - m_u4SuccessSendSize);
 
             //这里发送给插件一个消息，告知插件数据超过阈值
             CPacketParse objPacketParse;
@@ -932,11 +932,11 @@ void CProConnectHandler::Output_Debug_Data(ACE_Message_Block* pMbData, int nLogT
 
         if (blblMore == true)
         {
-            AppLogManager::instance()->WriteLog(nLogType, "[(%s)%s:%d]%s.(数据包过长只记录前200字节)", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_pPacketDebugData);
+            AppLogManager::instance()->WriteLog_i(nLogType, "[(%s)%s:%d]%s.(数据包过长只记录前200字节)", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_pPacketDebugData);
         }
         else
         {
-            AppLogManager::instance()->WriteLog(nLogType, "[(%s)%s:%d]%s.", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_pPacketDebugData);
+            AppLogManager::instance()->WriteLog_i(nLogType, "[(%s)%s:%d]%s.", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_pPacketDebugData);
         }
     }
 }
@@ -1222,16 +1222,16 @@ bool CProConnectHandler::RecvClinetPacket(uint32 u4PackeLen)
 
     if(NULL == pmb)
     {
-        AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, RecvQueueCount=%d, RecvQueueTimeCost=%I64d, SendQueueTimeCost=%I64d.",
-                                            m_addrRemote.get_host_addr(),
-                                            m_addrRemote.get_port_number(),
-                                            m_u4AllRecvSize,
-                                            m_u4AllRecvCount,
-                                            m_u4AllSendSize,
-                                            m_u4AllSendCount,
-                                            m_u4RecvQueueCount,
-                                            m_u8RecvQueueTimeCost,
-                                            m_u8SendQueueTimeCost);
+        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, RecvQueueCount=%d, RecvQueueTimeCost=%I64d, SendQueueTimeCost=%I64d.",
+                                              m_addrRemote.get_host_addr(),
+                                              m_addrRemote.get_port_number(),
+                                              m_u4AllRecvSize,
+                                              m_u4AllRecvCount,
+                                              m_u4AllSendSize,
+                                              m_u4AllSendCount,
+                                              m_u4RecvQueueCount,
+                                              m_u8RecvQueueTimeCost,
+                                              m_u8SendQueueTimeCost);
         OUR_DEBUG((LM_ERROR, "[CProConnectHandler::RecvClinetPacket] pmb new is NULL.\n"));
         Close(2);
         return false;
@@ -1241,16 +1241,16 @@ bool CProConnectHandler::RecvClinetPacket(uint32 u4PackeLen)
     {
         //如果读失败，则关闭连接。
         OUR_DEBUG((LM_ERROR, "[CProConnectHandler::RecvClinetPacket] m_reader.read is error(%d)(%d).\n", GetConnectID(), errno));
-        AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, RecvQueueCount=%d, RecvQueueTimeCost=%I64d, SendQueueTimeCost=%I64d.",
-                                            m_addrRemote.get_host_addr(),
-                                            m_addrRemote.get_port_number(),
-                                            m_u4AllRecvSize,
-                                            m_u4AllRecvCount,
-                                            m_u4AllSendSize,
-                                            m_u4AllSendCount,
-                                            m_u4RecvQueueCount,
-                                            m_u8RecvQueueTimeCost,
-                                            m_u8SendQueueTimeCost);
+        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d, RecvQueueCount=%d, RecvQueueTimeCost=%I64d, SendQueueTimeCost=%I64d.",
+                                              m_addrRemote.get_host_addr(),
+                                              m_addrRemote.get_port_number(),
+                                              m_u4AllRecvSize,
+                                              m_u4AllRecvCount,
+                                              m_u4AllSendSize,
+                                              m_u4AllSendCount,
+                                              m_u4RecvQueueCount,
+                                              m_u8RecvQueueTimeCost,
+                                              m_u8SendQueueTimeCost);
         ClearPacketParse(*pmb);
         Close(2);
         return false;
@@ -1279,14 +1279,14 @@ bool CProConnectHandler::CheckMessage()
         if(false == m_TimeConnectInfo.RecvCheck((uint8)dtNow.minute(), 1, m_u4AllRecvSize))
         {
             //超过了限定的阀值，需要关闭链接，并记录日志
-            AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECTABNORMAL,
-                                                   GetXmlConfigAttribute(xmlAlertConnect)->MailID,
-                                                   "Alert",
-                                                   "[TCP]IP=%s,Prot=%d,PacketCount=%d, RecvSize=%d.",
-                                                   m_addrRemote.get_host_addr(),
-                                                   m_addrRemote.get_port_number(),
-                                                   m_TimeConnectInfo.m_u4RecvPacketCount,
-                                                   m_TimeConnectInfo.m_u4RecvSize);
+            AppLogManager::instance()->WriteToMail_i(LOG_SYSTEM_CONNECTABNORMAL,
+                    GetXmlConfigAttribute(xmlAlertConnect)->MailID,
+                    "Alert",
+                    "[TCP]IP=%s,Prot=%d,PacketCount=%d, RecvSize=%d.",
+                    m_addrRemote.get_host_addr(),
+                    m_addrRemote.get_port_number(),
+                    m_TimeConnectInfo.m_u4RecvPacketCount,
+                    m_TimeConnectInfo.m_u4RecvSize);
 
 
             App_PacketParsePool::instance()->Delete(m_pPacketParse, true);
@@ -1539,8 +1539,8 @@ bool CProConnectManager::Close(uint32 u4ConnectID)
 
     if (0 > nPos)
     {
-        AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "[CConnectManager::Close]ConnectID=%d FAIL.",
-                                            u4ConnectID);
+        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "[CConnectManager::Close]ConnectID=%d FAIL.",
+                                              u4ConnectID);
 
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectManager::Close] ConnectID[%d] is not find.", u4ConnectID);
     }
@@ -1822,7 +1822,7 @@ int CProConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg
 
     //得到时间执行了多少秒，并记录日志
     ACE_Time_Value tvCost = tvEnd - tvNow;
-    AppLogManager::instance()->WriteLog(LOG_SYSTEM_WORKTHREAD, "[CProConnectManager::handle_timeout]TimeCost=%d.", tvCost.msec());
+    AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_WORKTHREAD, "[CProConnectManager::handle_timeout]TimeCost=%d.", tvCost.msec());
 
     return 0;
 }

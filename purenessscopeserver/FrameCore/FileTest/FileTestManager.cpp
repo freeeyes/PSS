@@ -346,18 +346,18 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
             {
                 //超过了执行范围时间
                 OUR_DEBUG((LM_INFO, "[CFileTestManager::handle_timeout]Response time too long m_u4ExpectTime:%d.\n", m_u4ExpectTime));
-                AppLogManager::instance()->WriteLog(LOG_SYSTEM_ERROR, "[CFileTestManager::handle_timeout]Response time too long connectID=%d, m_u4ExpectTime=%d.",
-                                                    vecList[i]->m_u4ConnectID,
-                                                    m_u4TimeInterval);
+                AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_ERROR, "[CFileTestManager::handle_timeout]Response time too long connectID=%d, m_u4ExpectTime=%d.",
+                                                      vecList[i]->m_u4ConnectID,
+                                                      m_u4TimeInterval);
             }
             else
             {
                 //超过了定时器时间
                 OUR_DEBUG((LM_INFO, "[CFileTestManager::handle_timeout]Response time too long m_u4TimeInterval:%d.\n", m_u4TimeInterval));
                 //写入错误日志
-                AppLogManager::instance()->WriteLog(LOG_SYSTEM_ERROR, "[CFileTestManager::handle_timeout]Response time too long connectID=%d, m_u4TimeInterval=%d.",
-                                                    vecList[i]->m_u4ConnectID,
-                                                    m_u4TimeInterval);
+                AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_ERROR, "[CFileTestManager::handle_timeout]Response time too long connectID=%d, m_u4TimeInterval=%d.",
+                                                      vecList[i]->m_u4ConnectID,
+                                                      m_u4TimeInterval);
             }
 
             char szConnectID[10] = { '\0' };

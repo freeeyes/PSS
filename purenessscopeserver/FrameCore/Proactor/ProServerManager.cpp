@@ -291,11 +291,11 @@ bool CProServerManager::Start()
     //启动日志服务线程
     if(0 != AppLogManager::instance()->Start())
     {
-        AppLogManager::instance()->WriteLog(LOG_SYSTEM, "[CProServerManager::Init]AppLogManager is ERROR.");
+        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM, "[CProServerManager::Init]AppLogManager is ERROR.");
     }
     else
     {
-        AppLogManager::instance()->WriteLog(LOG_SYSTEM, "[CProServerManager::Init]AppLogManager is OK.");
+        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM, "[CProServerManager::Init]AppLogManager is OK.");
     }
 
     //启动定时器

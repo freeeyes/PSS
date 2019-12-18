@@ -21,6 +21,7 @@
 #include "ace/INET_Addr.h"
 #include "ace/Hash_Map_Manager.h"
 #include <math.h>
+#include <type_traits>
 
 #ifndef WIN32
 #include <unistd.h>
@@ -493,6 +494,18 @@ typedef std::string _tstring;
 #ifndef SAFE_DELETE_ARRAY
 #define SAFE_DELETE_ARRAY(x) if( (x) != NULL ) {delete[] (x); (x) = NULL; }
 #endif
+
+template<typename T>
+struct item_return
+{
+    using type = T && ;
+};
+
+template<typename T>
+inline typename item_return<T>::type convert(T&& arg)
+{
+    return static_cast<T&&>(arg);
+}
 
 //定义一个函数，可以支持内存越界检查
 inline void sprintf_safe(char* szText, int nLen, const char* fmt ...)

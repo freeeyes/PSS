@@ -240,9 +240,9 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 
     if (tvQueueDispose.msec() > (uint32)GetXmlConfigAttribute(xmlThreadInfo)->DisposeTimeout)
     {
-        AppLogManager::instance()->WriteLog(LOG_SYSTEM_COMMANDDATA, "[CMessageService::ProcessMessage]CommandID=0x%04x, Queue put dispose time interval(%d).\n",
-                                            (int)pMessage->GetMessageBase()->m_u2Cmd,
-                                            tvQueueDispose.msec());
+        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_COMMANDDATA, "[CMessageService::ProcessMessage]CommandID=0x%04x, Queue put dispose time interval(%d).\n",
+                                              (int)pMessage->GetMessageBase()->m_u2Cmd,
+                                              tvQueueDispose.msec());
     }
 
     //将要处理的数据放到逻辑处理的地方去
@@ -376,37 +376,37 @@ bool CMessageService::SaveThreadInfoData(const ACE_Time_Value& tvNow)
     //开始查看线程是否超时
     if(m_ThreadInfo.m_u4State == THREAD_RUNBEGIN && tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec() > m_u2ThreadTimeOut)
     {
-        AppLogManager::instance()->WriteLog(LOG_SYSTEM_WORKTHREAD, "[CMessageService::handle_timeout] pThreadInfo = [%d] State = [%d] Time = [%04d-%02d-%02d %02d:%02d:%02d] PacketCount = [%d] LastCommand = [0x%x] PacketTime = [%d] TimeOut > %d[%d] CurrPacketCount = [%d] QueueCount = [%d] BuffPacketUsed = [%d] BuffPacketFree = [%d].",
-                                            m_ThreadInfo.m_u4ThreadID,
-                                            m_ThreadInfo.m_u4State,
-                                            dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second(),
-                                            m_ThreadInfo.m_u4RecvPacketCount,
-                                            m_ThreadInfo.m_u2CommandID,
-                                            m_ThreadInfo.m_u2PacketTime,
-                                            m_u2ThreadTimeOut,
-                                            tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec(),
-                                            m_ThreadInfo.m_u4CurrPacketCount,
-                                            (int)msg_queue()->message_count(),
-                                            App_BuffPacketManager::instance()->GetBuffPacketUsedCount(),
-                                            App_BuffPacketManager::instance()->GetBuffPacketFreeCount());
+        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_WORKTHREAD, "[CMessageService::handle_timeout] pThreadInfo = [%d] State = [%d] Time = [%04d-%02d-%02d %02d:%02d:%02d] PacketCount = [%d] LastCommand = [0x%x] PacketTime = [%d] TimeOut > %d[%d] CurrPacketCount = [%d] QueueCount = [%d] BuffPacketUsed = [%d] BuffPacketFree = [%d].",
+                                              m_ThreadInfo.m_u4ThreadID,
+                                              m_ThreadInfo.m_u4State,
+                                              dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second(),
+                                              m_ThreadInfo.m_u4RecvPacketCount,
+                                              m_ThreadInfo.m_u2CommandID,
+                                              m_ThreadInfo.m_u2PacketTime,
+                                              m_u2ThreadTimeOut,
+                                              tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec(),
+                                              m_ThreadInfo.m_u4CurrPacketCount,
+                                              (int)msg_queue()->message_count(),
+                                              App_BuffPacketManager::instance()->GetBuffPacketUsedCount(),
+                                              App_BuffPacketManager::instance()->GetBuffPacketFreeCount());
 
         //发现阻塞线程，需要重启相应的线程
-        AppLogManager::instance()->WriteLog(LOG_SYSTEM_WORKTHREAD, "[CMessageService::handle_timeout] ThreadID = [%d] Thread is reset.", m_u4ThreadID);
+        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_WORKTHREAD, "[CMessageService::handle_timeout] ThreadID = [%d] Thread is reset.", m_u4ThreadID);
         return false;
     }
     else
     {
-        AppLogManager::instance()->WriteLog(LOG_SYSTEM_WORKTHREAD, "[CMessageService::handle_timeout] pThreadInfo = [%d] State = [%d] Time = [%04d-%02d-%02d %02d:%02d:%02d] PacketCount = [%d] LastCommand = [0x%x] PacketTime = [%d] CurrPacketCount = [%d] QueueCount = [%d] BuffPacketUsed = [%d] BuffPacketFree = [%d].",
-                                            m_ThreadInfo.m_u4ThreadID,
-                                            m_ThreadInfo.m_u4State,
-                                            dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second(),
-                                            m_ThreadInfo.m_u4RecvPacketCount,
-                                            m_ThreadInfo.m_u2CommandID,
-                                            m_ThreadInfo.m_u2PacketTime,
-                                            m_ThreadInfo.m_u4CurrPacketCount,
-                                            (int)msg_queue()->message_count(),
-                                            App_BuffPacketManager::instance()->GetBuffPacketUsedCount(),
-                                            App_BuffPacketManager::instance()->GetBuffPacketFreeCount());
+        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_WORKTHREAD, "[CMessageService::handle_timeout] pThreadInfo = [%d] State = [%d] Time = [%04d-%02d-%02d %02d:%02d:%02d] PacketCount = [%d] LastCommand = [0x%x] PacketTime = [%d] CurrPacketCount = [%d] QueueCount = [%d] BuffPacketUsed = [%d] BuffPacketFree = [%d].",
+                                              m_ThreadInfo.m_u4ThreadID,
+                                              m_ThreadInfo.m_u4State,
+                                              dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second(),
+                                              m_ThreadInfo.m_u4RecvPacketCount,
+                                              m_ThreadInfo.m_u2CommandID,
+                                              m_ThreadInfo.m_u2PacketTime,
+                                              m_ThreadInfo.m_u4CurrPacketCount,
+                                              (int)msg_queue()->message_count(),
+                                              App_BuffPacketManager::instance()->GetBuffPacketUsedCount(),
+                                              App_BuffPacketManager::instance()->GetBuffPacketFreeCount());
 
         m_ThreadInfo.m_u4CurrPacketCount = 0;
         return true;
@@ -479,11 +479,11 @@ bool CMessageService::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uin
         //判断是否需要记录超时日志
         if (pClientCommandList->GetCommandTimeout() > 0)
         {
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_WORKTHREAD, "ThreadID=%d, CommandID=%d, Timeout=%d ms, Cost time=%d.",
-                                                m_u4ThreadID,
-                                                u2CommandID,
-                                                pClientCommandList->GetCommandTimeout(),
-                                                u4TimeCost);
+            AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_WORKTHREAD, "ThreadID=%d, CommandID=%d, Timeout=%d ms, Cost time=%d.",
+                                                  m_u4ThreadID,
+                                                  u2CommandID,
+                                                  pClientCommandList->GetCommandTimeout(),
+                                                  u4TimeCost);
         }
 
         return true;
@@ -498,7 +498,7 @@ bool CMessageService::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uin
                          u2CommandID,
                          pMessage->GetMessageBase()->m_u4HeadSrcSize,
                          pMessage->GetMessageBase()->m_u4BodySrcSize);
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_ERROR, szLog);
+            AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_ERROR, szLog);
         }
     }
 
@@ -1012,7 +1012,7 @@ bool CMessageServiceGroup::CheckWorkThread(const ACE_Time_Value& tvNow)
 
 bool CMessageServiceGroup::CheckPacketParsePool()
 {
-    AppLogManager::instance()->WriteLog(LOG_SYSTEM_PACKETTHREAD, "[CMessageService::handle_timeout] UsedCount = %d, FreeCount= %d.", App_PacketParsePool::instance()->GetUsedCount(), App_PacketParsePool::instance()->GetFreeCount());
+    AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_PACKETTHREAD, "[CMessageService::handle_timeout] UsedCount = %d, FreeCount= %d.", App_PacketParsePool::instance()->GetUsedCount(), App_PacketParsePool::instance()->GetFreeCount());
     return true;
 }
 
@@ -1034,7 +1034,7 @@ bool CMessageServiceGroup::CheckCPUAndMemory(bool blTest)
         if (u4CurrCpu > GetXmlConfigAttribute(xmlMonitor)->CpuMax || u4MessageBlockUsedSize > GetXmlConfigAttribute(xmlMonitor)->MemoryMax)
         {
             OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::handle_timeout]CPU Rote=%d,MessageBlock=%d,u4BuffPacketCount=%d,u4MessageCount=%d ALERT.\n", u4CurrCpu, u4MessageBlockUsedSize, u4BuffPacketCount, u4MessageCount));
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_MONITOR, "[Monitor] CPU Rote=%d,MessageBlock=%d,u4BuffPacketCount=%d,u4MessageCount=%d.", u4CurrCpu, u4MessageBlockUsedSize, u4BuffPacketCount, u4MessageCount);
+            AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_MONITOR, "[Monitor] CPU Rote=%d,MessageBlock=%d,u4BuffPacketCount=%d,u4MessageCount=%d.", u4CurrCpu, u4MessageBlockUsedSize, u4BuffPacketCount, u4MessageCount);
         }
         else
         {
@@ -1067,10 +1067,10 @@ bool CMessageServiceGroup::CheckPlugInState()
                 sprintf_safe(szTitle, MAX_BUFF_50, "ModuleStateError");
 
                 //发送邮件
-                AppLogManager::instance()->WriteToMail(LOG_SYSTEM_MONITOR, 1,
-                                                       szTitle,
-                                                       "Module ErrorID=%d.\n",
-                                                       u4ErrorID);
+                AppLogManager::instance()->WriteToMail_i(LOG_SYSTEM_MONITOR, 1,
+                        szTitle,
+                        "Module ErrorID=%d.\n",
+                        u4ErrorID);
             }
         }
     }

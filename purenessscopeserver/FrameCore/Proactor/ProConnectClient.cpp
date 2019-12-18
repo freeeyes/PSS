@@ -454,11 +454,11 @@ bool CProConnectClient::SendData(ACE_Message_Block* pmblk)
 
         if(blblMore == true)
         {
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_SERVERSEND, "[%s:%d]%s.(数据包过长只记录前200字节)", m_AddrRemote.get_host_addr(), m_AddrRemote.get_port_number(), szDebugData);
+            AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_DEBUG_SERVERSEND, "[%s:%d]%s.(数据包过长只记录前200字节)", m_AddrRemote.get_host_addr(), m_AddrRemote.get_port_number(), szDebugData);
         }
         else
         {
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_SERVERSEND, "[%s:%d]%s.", m_AddrRemote.get_host_addr(), m_AddrRemote.get_port_number(), szDebugData);
+            AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_DEBUG_SERVERSEND, "[%s:%d]%s.", m_AddrRemote.get_host_addr(), m_AddrRemote.get_port_number(), szDebugData);
         }
     }
 

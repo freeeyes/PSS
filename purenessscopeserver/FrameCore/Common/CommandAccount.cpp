@@ -179,12 +179,12 @@ bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint32 u4Port, uint8 u1Pack
                     //如果大于阀值，则记录日志，并且归零当前计数器
                     m_vecCommandAlertData[i].m_u4CurrCount = 0;
 
-                    AppLogManager::instance()->WriteToMail(LOG_SYSTEM_PACKETTIME,
-                                                           m_vecCommandAlertData[i].m_u4MailID,
-                                                           "Alert",
-                                                           "u2CommandID=%d, m_u4CommandCount more than [%d].",
-                                                           u2CommandID,
-                                                           (uint32)m_vecCommandAlertData[i].m_u4CommandCount);
+                    AppLogManager::instance()->WriteToMail_i(LOG_SYSTEM_PACKETTIME,
+                            m_vecCommandAlertData[i].m_u4MailID,
+                            "Alert",
+                            "u2CommandID=%d, m_u4CommandCount more than [%d].",
+                            u2CommandID,
+                            (uint32)m_vecCommandAlertData[i].m_u4CommandCount);
                 }
             }
 
@@ -234,7 +234,7 @@ bool CCommandAccount::SaveCommandDataLog()
         return true;
     }
 
-    AppLogManager::instance()->WriteLog(LOG_SYSTEM_COMMANDDATA, "<Command Data Account[%s]>", m_szName);
+    AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_COMMANDDATA, "<Command Data Account[%s]>", m_szName);
     vector<_CommandData*> vecCommandData;
     m_objCommandDataList.Get_All_Used(vecCommandData);
 
@@ -264,19 +264,19 @@ bool CCommandAccount::SaveCommandDataLog()
                 strPacketType = "UDP";
             }
 
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_COMMANDDATA, "CommandID=0x%04x, CommandType=%s, CommandCount=%d, CommandCost=%lldns, PacketType=%s, PacketSize=%d, CommandLastTime=%04d-%02d-%02d %02d:%02d:%02d%",
-                                                (int32)pCommandData->m_u2CommandID,
-                                                strCommandType.c_str(),
-                                                (int32)pCommandData->m_u4CommandCount,
-                                                (uint64)pCommandData->m_u8CommandCost,
-                                                strPacketType.c_str(),
-                                                (uint32)pCommandData->m_u4PacketSize,
-                                                dtLastTime.year(), dtLastTime.month(), dtLastTime.day(), dtLastTime.hour(), dtLastTime.minute(), dtLastTime.second());
+            AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_COMMANDDATA, "CommandID=0x%04x, CommandType=%s, CommandCount=%d, CommandCost=%lldns, PacketType=%s, PacketSize=%d, CommandLastTime=%04d-%02d-%02d %02d:%02d:%02d%",
+                                                  (int32)pCommandData->m_u2CommandID,
+                                                  strCommandType.c_str(),
+                                                  (int32)pCommandData->m_u4CommandCount,
+                                                  (uint64)pCommandData->m_u8CommandCost,
+                                                  strPacketType.c_str(),
+                                                  (uint32)pCommandData->m_u4PacketSize,
+                                                  dtLastTime.year(), dtLastTime.month(), dtLastTime.day(), dtLastTime.hour(), dtLastTime.minute(), dtLastTime.second());
 
         }
     }
 
-    AppLogManager::instance()->WriteLog(LOG_SYSTEM_COMMANDDATA, "<Command Data Account End>");
+    AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_COMMANDDATA, "<Command Data Account End>");
 
     return true;
 }

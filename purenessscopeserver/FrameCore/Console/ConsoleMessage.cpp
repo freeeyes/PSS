@@ -119,7 +119,7 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
     int nLen = (int)ACE_OS::strlen(pCommand);
     char szKey[MAX_BUFF_100] = {'\0'};
 
-    AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONSOLEDATA, "<Command>%s.", pCommand);
+    AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONSOLEDATA, "<Command>%s.", pCommand);
 
     if(nLen > MAX_BUFF_100*2 + 1)
     {

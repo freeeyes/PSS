@@ -257,11 +257,11 @@ bool Tcp_Common_File_Message(_File_Message_Param const& obj_File_Message_Param, 
 
     if (blblMore == true)
     {
-        AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTSEND, "[(%s)%s:%d]%s.(数据包过长)", pConnectName, obj_File_Message_Param.m_addrRemote.get_host_addr(), obj_File_Message_Param.m_addrRemote.get_port_number(), obj_File_Message_Param.m_pPacketDebugData);
+        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_DEBUG_CLIENTSEND, "[(%s)%s:%d]%s.(数据包过长)", pConnectName, obj_File_Message_Param.m_addrRemote.get_host_addr(), obj_File_Message_Param.m_addrRemote.get_port_number(), obj_File_Message_Param.m_pPacketDebugData);
     }
     else
     {
-        AppLogManager::instance()->WriteLog(LOG_SYSTEM_DEBUG_CLIENTSEND, "[(%s)%s:%d]%s.", pConnectName, obj_File_Message_Param.m_addrRemote.get_host_addr(), obj_File_Message_Param.m_addrRemote.get_port_number(), obj_File_Message_Param.m_pPacketDebugData);
+        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_DEBUG_CLIENTSEND, "[(%s)%s:%d]%s.", pConnectName, obj_File_Message_Param.m_addrRemote.get_host_addr(), obj_File_Message_Param.m_addrRemote.get_port_number(), obj_File_Message_Param.m_pPacketDebugData);
     }
 
     //回调测试文件管理接口
@@ -554,12 +554,12 @@ void Tcp_Common_Manager_Timeout_CheckInfo(int nActiveConnectCount)
     if (GetXmlConfigAttribute(xmlAlertConnect)->ConnectAlert > 0
         && nActiveConnectCount > (int)GetXmlConfigAttribute(xmlAlertConnect)->ConnectAlert)
     {
-        AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
-                                               GetXmlConfigAttribute(xmlAlertConnect)->MailID,
-                                               "Alert",
-                                               "[Tcp_Common_Manager_Timeout_CheckInfo]active ConnectCount is more than limit(%d > %d).",
-                                               nActiveConnectCount,
-                                               GetXmlConfigAttribute(xmlAlertConnect)->ConnectAlert);
+        AppLogManager::instance()->WriteToMail_i(LOG_SYSTEM_CONNECT,
+                GetXmlConfigAttribute(xmlAlertConnect)->MailID,
+                "Alert",
+                "[Tcp_Common_Manager_Timeout_CheckInfo]active ConnectCount is more than limit(%d > %d).",
+                nActiveConnectCount,
+                GetXmlConfigAttribute(xmlAlertConnect)->ConnectAlert);
     }
 
     //检测单位时间连接数是否超越阀值
@@ -567,21 +567,21 @@ void Tcp_Common_Manager_Timeout_CheckInfo(int nActiveConnectCount)
 
     if (nCheckRet == 1)
     {
-        AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
-                                               GetXmlConfigAttribute(xmlAlertConnect)->MailID,
-                                               "Alert",
-                                               "[Tcp_Common_Manager_Timeout_CheckInfo]CheckConnectCount is more than limit(%d > %d).",
-                                               App_ConnectAccount::instance()->GetCurrConnect(),
-                                               App_ConnectAccount::instance()->GetConnectMax());
+        AppLogManager::instance()->WriteToMail_i(LOG_SYSTEM_CONNECT,
+                GetXmlConfigAttribute(xmlAlertConnect)->MailID,
+                "Alert",
+                "[Tcp_Common_Manager_Timeout_CheckInfo]CheckConnectCount is more than limit(%d > %d).",
+                App_ConnectAccount::instance()->GetCurrConnect(),
+                App_ConnectAccount::instance()->GetConnectMax());
     }
     else if (nCheckRet == 2)
     {
-        AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
-                                               GetXmlConfigAttribute(xmlAlertConnect)->MailID,
-                                               "Alert",
-                                               "[Tcp_Common_Manager_Timeout_CheckInfo]CheckConnectCount is little than limit(%d < %d).",
-                                               App_ConnectAccount::instance()->GetCurrConnect(),
-                                               App_ConnectAccount::instance()->Get4ConnectMin());
+        AppLogManager::instance()->WriteToMail_i(LOG_SYSTEM_CONNECT,
+                GetXmlConfigAttribute(xmlAlertConnect)->MailID,
+                "Alert",
+                "[Tcp_Common_Manager_Timeout_CheckInfo]CheckConnectCount is little than limit(%d < %d).",
+                App_ConnectAccount::instance()->GetCurrConnect(),
+                App_ConnectAccount::instance()->Get4ConnectMin());
     }
 
     //检测单位时间连接断开数是否超越阀值
@@ -589,21 +589,21 @@ void Tcp_Common_Manager_Timeout_CheckInfo(int nActiveConnectCount)
 
     if (nCheckRet == 1)
     {
-        AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
-                                               GetXmlConfigAttribute(xmlAlertConnect)->MailID,
-                                               "Alert",
-                                               "[Tcp_Common_Manager_Timeout_CheckInfo]CheckDisConnectCount is more than limit(%d > %d).",
-                                               App_ConnectAccount::instance()->GetCurrConnect(),
-                                               App_ConnectAccount::instance()->GetDisConnectMax());
+        AppLogManager::instance()->WriteToMail_i(LOG_SYSTEM_CONNECT,
+                GetXmlConfigAttribute(xmlAlertConnect)->MailID,
+                "Alert",
+                "[Tcp_Common_Manager_Timeout_CheckInfo]CheckDisConnectCount is more than limit(%d > %d).",
+                App_ConnectAccount::instance()->GetCurrConnect(),
+                App_ConnectAccount::instance()->GetDisConnectMax());
     }
     else if (nCheckRet == 2)
     {
-        AppLogManager::instance()->WriteToMail(LOG_SYSTEM_CONNECT,
-                                               GetXmlConfigAttribute(xmlAlertConnect)->MailID,
-                                               "Alert",
-                                               "[Tcp_Common_Manager_Timeout_CheckInfo]CheckDisConnectCount is little than limit(%d < %d).",
-                                               App_ConnectAccount::instance()->GetCurrConnect(),
-                                               App_ConnectAccount::instance()->GetDisConnectMin());
+        AppLogManager::instance()->WriteToMail_i(LOG_SYSTEM_CONNECT,
+                GetXmlConfigAttribute(xmlAlertConnect)->MailID,
+                "Alert",
+                "[Tcp_Common_Manager_Timeout_CheckInfo]CheckDisConnectCount is little than limit(%d < %d).",
+                App_ConnectAccount::instance()->GetCurrConnect(),
+                App_ConnectAccount::instance()->GetDisConnectMin());
     }
 
 }

@@ -322,32 +322,83 @@ int CLogManager::ProcessLog(_LogBlockInfo* pLogBlockInfo)
 }
 
 //*****************************************************************************
-
-int CLogManager::WriteLog(int nLogType, const char* fmt, ...)
-{
-    va_list ap;
-    va_start(ap, fmt);
-
-    int nRet = Create_Log_Block(nLogType, NULL, NULL, &ap, fmt, 0);
-    va_end(ap);
-    return nRet;
-}
-
 int CLogManager::WriteLogBinary(int nLogType, const char* pData, int nLen)
 {
-    int nRet = Create_Log_Block(nLogType, NULL, NULL, NULL, pData, nLen);
+    int nRet = 0;
+
+    if (nLen * 5 >= m_objLogBlockPool.GetBlockSize())
+    {
+        OUR_DEBUG((LM_INFO, "[CLogManager::WriteLogBinary]nLen(%d) is more than GetBlockSize.\n"));
+        return 1;
+    }
+
+    //从日志块池里面找到一块空余的日志块
+    m_Logger_Mutex.acquire();
+    _LogBlockInfo* pLogBlockInfo = m_objLogBlockPool.GetLogBlockInfo();
+
+    if (NULL != pLogBlockInfo)
+    {
+        //二进制数据
+        char szLog[10] = { '\0' };
+
+        for (int i = 0; i < nLen; i++)
+        {
+            sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
+            sprintf_safe(pLogBlockInfo->m_pBlock + 5 * i, m_objLogBlockPool.GetBlockSize() - 5 * i, "%s", szLog);
+        }
+
+        pLogBlockInfo->m_u4Length = (uint32)(nLen * 5);
+
+        nRet = Update_Log_Block(nLogType, NULL, NULL, pLogBlockInfo);
+    }
+
+    m_Logger_Mutex.release();
     return nRet;
 }
 
-
-int CLogManager::WriteToMail( int nLogType, uint32 u4MailID, const char* pTitle, const char* fmt, ... )
+int CLogManager::WriteLog_r(int nLogType, const char* fmt, uint32 u4Len)
 {
-    va_list ap;
-    va_start(ap, fmt);
+    int nRet = 0;
 
-    int nRet = Create_Log_Block(nLogType, &u4MailID, pTitle, &ap, fmt, 0);
-    va_end(ap);
+    if (u4Len >= m_objLogBlockPool.GetBlockSize())
+    {
+        OUR_DEBUG((LM_ERROR, "[CLogManager::WriteLog_r]Log length is more than max BlockSize.\n"));
+        return 1;
+    }
 
+    m_Logger_Mutex.acquire();
+    _LogBlockInfo* pLogBlockInfo = m_objLogBlockPool.GetLogBlockInfo();
+
+    if (NULL != pLogBlockInfo)
+    {
+        ACE_OS::snprintf(pLogBlockInfo->m_pBlock, m_objLogBlockPool.GetBlockSize() - 1, "%s", fmt);
+        nRet = Update_Log_Block(nLogType, NULL, NULL, pLogBlockInfo);
+    }
+
+    m_Logger_Mutex.release();
+    return nRet;
+}
+
+int CLogManager::WriteToMail_r(int nLogType, uint32 u4MailID, const char* pTitle, const char* fmt, uint32 u4Len)
+{
+    int nRet = 0;
+
+    if (u4Len >= m_objLogBlockPool.GetBlockSize())
+    {
+        OUR_DEBUG((LM_ERROR, "[CLogManager::WriteLog_r]Log length is more than max BlockSize.\n"));
+        return 1;
+    }
+
+    m_Logger_Mutex.acquire();
+    _LogBlockInfo* pLogBlockInfo = m_objLogBlockPool.GetLogBlockInfo();
+
+    if (NULL != pLogBlockInfo)
+    {
+        ACE_OS::snprintf(pLogBlockInfo->m_pBlock, m_objLogBlockPool.GetBlockSize() - 1, "%s", fmt);
+        nRet = Update_Log_Block(nLogType, &u4MailID, pTitle, pLogBlockInfo);
+    }
+
+    m_Logger_Mutex.release();
     return nRet;
 }
 
@@ -462,45 +513,13 @@ int CLogManager::CloseMsgQueue()
     return Task_Common_CloseMsgQueue((ACE_Task<ACE_MT_SYNCH>*)this, m_cond, m_mutex);
 }
 
-int CLogManager::Create_Log_Block(int nLogType, uint32* pMailID, const char* pTitle, va_list* ap, const char* fmt, int nfmtSize)
+int CLogManager::Update_Log_Block(int nLogType, uint32* pMailID, const char* pTitle, _LogBlockInfo* pLogBlockInfo)
 {
     //查看当前日志是否需要入库
     if (GetLogInfoByLogLevel(nLogType) < m_pServerLogger->GetCurrLevel())
     {
         //低于当前日志等级的全部忽略
         return 0;
-    }
-
-    //从日志块池里面找到一块空余的日志块
-    m_Logger_Mutex.acquire();
-    _LogBlockInfo* pLogBlockInfo = m_objLogBlockPool.GetLogBlockInfo();
-
-
-    if (NULL == pLogBlockInfo)
-    {
-        OUR_DEBUG((LM_ERROR, "[CLogManager::WriteLog] m_objLogBlockPool is full!\n"));
-        m_Logger_Mutex.release();
-        return -1;
-    }
-
-    if (NULL != ap)
-    {
-        //文本数据
-        ACE_OS::vsnprintf(pLogBlockInfo->m_pBlock, m_objLogBlockPool.GetBlockSize() - 1, fmt, *ap);
-    }
-    else
-    {
-        //二进制数据
-        char szLog[10] = { '\0' };
-        int nLen = nfmtSize;
-
-        for (int i = 0; i < nLen; i++)
-        {
-            sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)fmt[i]);
-            sprintf_safe(pLogBlockInfo->m_pBlock + 5 * i, m_objLogBlockPool.GetBlockSize() - 5 * i, "%s", szLog);
-        }
-
-        pLogBlockInfo->m_u4Length = (uint32)(nLen * 5);
     }
 
     pLogBlockInfo->m_u4Length = (uint32)strlen(pLogBlockInfo->m_pBlock);
@@ -531,8 +550,6 @@ int CLogManager::Create_Log_Block(int nLogType, uint32* pMailID, const char* pTi
     {
         m_objLogBlockPool.ReturnBlockInfo(pLogBlockInfo);
     }
-
-    m_Logger_Mutex.release();
 
     return 0;
 }
