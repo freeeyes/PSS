@@ -26,7 +26,7 @@
 	
 	<!-- "H&B"指的是包头包体模式，"STREAM"是流模式 OrgLength在H&B是包头默认长度 -->
 	<!-- 第一个ParseParse是默认ParseID，如果TCPServerIP或者UDPServerIP没有指定，则默认采用这个ParseID，ParseID必须大于0 -->
-	<PacketParse ParseID="1" ModulePath="./" ModuleName="PacketParse_VS2017.dll" Type="HB" OrgLength="40" />
+	<PacketParse ParseID="1" ModulePath="./" ModuleName="PacketParse_VS2019.dll" Type="HB" OrgLength="40" />
 
 	<Console support="1" sip="INADDR_ANY" sport="10010" desc="维护端口是否开启，support为1是开启，0是关闭，后面对应IP和端口" />
 	<ConsoleKey Key="freeeyes" desc="维护端允许登录的Key值,可以是多个，key值中不能包含空格" />
