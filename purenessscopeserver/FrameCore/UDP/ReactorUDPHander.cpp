@@ -195,7 +195,7 @@ bool CReactorUDPHander::CheckMessage(const char* pData, uint32 u4Len)
         {
             const char* pBody = pData + m_pPacketParse->GetPacketHeadSrcLen();
             ACE_Message_Block* pMBBody = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketBodySrcLen());
-            memcpy_safe(pBody, m_pPacketParse->GetPacketBodySrcLen(), (char* )pMBBody->wr_ptr(), m_pPacketParse->GetPacketBodySrcLen());
+            memcpy_safe(pBody, m_pPacketParse->GetPacketBodySrcLen(), pMBBody->wr_ptr(), m_pPacketParse->GetPacketBodySrcLen());
             pMBBody->wr_ptr(m_pPacketParse->GetPacketBodySrcLen());
 
             bool blStateBody = Udp_Common_Recv_Body(pMBBody, m_pPacketParse, m_u4PacketParseInfoID);
