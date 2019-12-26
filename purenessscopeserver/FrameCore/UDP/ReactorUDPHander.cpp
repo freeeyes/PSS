@@ -193,7 +193,7 @@ bool CReactorUDPHander::CheckMessage(const char* pData, uint32 u4Len)
         //如果包含包体
         if(m_pPacketParse->GetPacketBodySrcLen() > 0)
         {
-            char* pBody = (char* )(&pData[0] + m_pPacketParse->GetPacketHeadSrcLen());
+            const char* pBody = pData + m_pPacketParse->GetPacketHeadSrcLen();
             ACE_Message_Block* pMBBody = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketBodySrcLen());
             memcpy_safe(pBody, m_pPacketParse->GetPacketBodySrcLen(), (char* )pMBBody->wr_ptr(), m_pPacketParse->GetPacketBodySrcLen());
             pMBBody->wr_ptr(m_pPacketParse->GetPacketBodySrcLen());
