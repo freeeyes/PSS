@@ -189,14 +189,14 @@ int CConnectHandler::open(void*)
     //检查单位时间链接次数是否达到上限
     if(false == App_IPAccount::instance()->AddIP((string)m_addrRemote.get_host_addr()))
     {
-        OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]IP connect frequently.\n", m_addrRemote.get_host_addr()));
+        OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]IP connect frequently(%s).\n", m_addrRemote.get_host_addr()));
         App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), GetXmlConfigAttribute(xmlIP)->Timeout);
 
         //发送告警邮件
         AppLogManager::instance()->WriteToMail_i(LOG_SYSTEM_CONNECT,
                 GetXmlConfigAttribute(xmlAlertConnect)->MailID,
                 "Alert IP",
-                "[CConnectHandler::open] IP is more than IP Max,");
+                "[CConnectHandler::open]IP is more than IP Max(%s).", m_addrRemote.get_host_addr());
 
         return -1;
     }

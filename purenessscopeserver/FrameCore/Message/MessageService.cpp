@@ -493,12 +493,10 @@ bool CMessageService::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uin
         //没有找到对应的注册指令，如果不是define.h定义的异常，则记录异常命令日志
         if (u2CommandID >= CLIENT_LINK_USER)
         {
-            char szLog[MAX_BUFF_500] = { '\0' };
-            sprintf_safe(szLog, MAX_BUFF_500, "[CommandID=%d][HeadLen=%d][BodyLen=%d] is not plugin dispose.",
-                         u2CommandID,
-                         pMessage->GetMessageBase()->m_u4HeadSrcSize,
-                         pMessage->GetMessageBase()->m_u4BodySrcSize);
-            AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_ERROR, szLog);
+			AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_ERROR, "[CommandID=%d][HeadLen=%d][BodyLen=%d] is not plugin dispose.", 
+                u2CommandID,
+				pMessage->GetMessageBase()->m_u4HeadSrcSize,
+				pMessage->GetMessageBase()->m_u4BodySrcSize);
         }
     }
 
