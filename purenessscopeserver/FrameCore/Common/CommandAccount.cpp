@@ -269,7 +269,7 @@ bool CCommandAccount::SaveCommandDataLog()
         }
     }
 
-    AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_COMMANDDATA, "<Command Data Account End>");
+    AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_COMMANDDATA, "<(%s)Command Data Account End>", "CCommandAccount");
 
     return true;
 }
