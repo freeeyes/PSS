@@ -16,22 +16,22 @@ public:
     Logging_Config_Param();
 
     //文件大小检测时间(Secs)
-    int m_iChkInterval;
+    int m_iChkInterval = 600;
 
     //每个日志文件最大大小(KB)
-    int m_iLogFileMaxSize;
+    int m_iLogFileMaxSize = 10240;
 
     //日志文件最大个数
-    int m_iLogFileMaxCnt;
+    int m_iLogFileMaxCnt = 3;
 
     //是否向终端发送
-    int m_bSendTerminal;
+    int m_bSendTerminal = 0;
 
     //日志等级描述
-    char m_strLogLevel[128];
+    char m_strLogLevel[128] = {'\0'};
 
     //日志文件，全路径
-    char m_strLogFile[256];
+    char m_strLogFile[256] = { '\0' };
 };
 
 class Frame_Logging_Strategy
@@ -56,7 +56,7 @@ public:
     My_ACE_Logging_Strategy* GetStrategy();
 
 private:
-    ACE_Reactor* pLogStraReactor;
-    My_ACE_Logging_Strategy* pLogStrategy;
+    ACE_Reactor* pLogStraReactor          = NULL;
+    My_ACE_Logging_Strategy* pLogStrategy = NULL;
 };
 

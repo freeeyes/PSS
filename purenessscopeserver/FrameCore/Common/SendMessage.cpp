@@ -50,10 +50,8 @@ _SendMessage* CSendMessagePool::Create()
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-    _SendMessage* pMessage = NULL;
-
     //在Hash表中弹出一个已使用的数据
-    pMessage = m_objHashHandleList.Pop();
+    _SendMessage*  pMessage = m_objHashHandleList.Pop();
 
     //没找到空余的
     return pMessage;

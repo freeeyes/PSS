@@ -17,11 +17,11 @@
 class _IPAccount
 {
 public:
-    int32          m_nCount;             //当前链接次数
-    int32          m_nAllCount;          //指定IP链接次数总和
-    int32          m_nMinute;            //当前分钟数
-    string         m_strIP;              //当前链接地址
-    ACE_Date_Time  m_dtLastTime;         //最后链接时间
+    int32          m_nCount    = 0;          //当前链接次数
+    int32          m_nAllCount = 0;          //指定IP链接次数总和
+    int32          m_nMinute   = 0;          //当前分钟数
+    string         m_strIP;                  //当前链接地址
+    ACE_Date_Time  m_dtLastTime;             //最后链接时间
 
     _IPAccount();
 
@@ -54,13 +54,13 @@ private:
     //定时清理Hash数组
     void Clear_Hash_Data(uint16 u2NowTime, ACE_Date_Time& dtNowTime);
 
-    uint32                           m_u4MaxConnectCount;                  //每秒允许的最大连接数，前提是m_nNeedCheck = 0;才会生效
-    uint32                           m_u4CurrConnectCount;                 //当前连接总数
-    uint32                           m_u4LastConnectCount;                 //之前一分钟的连接总数记录
-    uint16                           m_u2CurrTime;                         //当前时间
-    uint8                            m_u1Minute;                           //当前分钟数
-    CHashTable<_IPAccount>           m_objIPList;                          //IP统计信息
-    ACE_Recursive_Thread_Mutex       m_ThreadLock;                         //多线程锁
+    uint32                           m_u4MaxConnectCount  = 0;                 //每秒允许的最大连接数，前提是m_nNeedCheck = 0;才会生效
+    uint32                           m_u4CurrConnectCount = 0;                 //当前连接总数
+    uint32                           m_u4LastConnectCount = 0;                 //之前一分钟的连接总数记录
+    uint16                           m_u2CurrTime         = 0;                 //当前时间
+    uint8                            m_u1Minute           = 0;                 //当前分钟数
+    CHashTable<_IPAccount>           m_objIPList;                              //IP统计信息
+    ACE_Recursive_Thread_Mutex       m_ThreadLock;                             //多线程锁
 };
 
 typedef ACE_Singleton<CIPAccount, ACE_Recursive_Thread_Mutex> App_IPAccount;

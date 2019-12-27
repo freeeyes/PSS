@@ -3,8 +3,6 @@
 
 _IPAccount::_IPAccount()
 {
-    m_nCount = 0;
-    m_nAllCount = 0;
     m_dtLastTime.update();
     m_nMinute = (int32)m_dtLastTime.minute();
 }
@@ -50,11 +48,6 @@ bool _IPAccount::Check(ACE_Date_Time const& dtNowTime)
 
 CIPAccount::CIPAccount()
 {
-    m_u4MaxConnectCount = 100;  //默认每秒最高100次
-    m_u4CurrConnectCount = 0;
-    m_u4LastConnectCount = 0;
-    m_u2CurrTime = 0;
-
     ACE_Date_Time  dtNowTime;
     m_u1Minute = (uint8)dtNowTime.minute();
 }
@@ -63,7 +56,7 @@ void CIPAccount::Close()
 {
     for (int32 i = 0; i < m_objIPList.Get_Count(); i++)
     {
-        _IPAccount* pIPAccount = m_objIPList.Pop();
+        const _IPAccount* pIPAccount = m_objIPList.Pop();
         SAFE_DELETE(pIPAccount);
     }
 

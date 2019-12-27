@@ -231,7 +231,7 @@ bool CCommandAccount::SaveCommandDataLog()
     vector<_CommandData*> vecCommandData;
     m_objCommandDataList.Get_All_Used(vecCommandData);
 
-    for(_CommandData* pCommandData : vecCommandData)
+    for(const _CommandData* pCommandData : vecCommandData)
     {
         if(pCommandData != NULL)
         {
@@ -338,7 +338,7 @@ void CCommandAccount::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_
     for (ACE_Hash_Map<uint32, _Port_Data_Account*>::iterator iter = m_objectPortAccount.begin();
          iter != m_objectPortAccount.end(); iter++)
     {
-        _Port_Data_Account* p_Port_Data_Account = (*iter).int_id_;
+        const _Port_Data_Account* p_Port_Data_Account = (*iter).int_id_;
 
         if (NULL != p_Port_Data_Account)
         {

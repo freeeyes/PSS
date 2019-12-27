@@ -21,28 +21,11 @@ Logging_Config_Param::Logging_Config_Param()
 {
     //日志文件，全路径
     ACE_OS::snprintf(m_strLogFile, 256, "%s%s", m_strLogFile, "/serverdebug.log");
-
-    //文件大小检测时间(Secs)
-    m_iChkInterval = 600;
-
-    //每个日志文件最大大小(KB), 默认10M
-    m_iLogFileMaxSize = 10240;
-
-    //日志文件最大个数
-    m_iLogFileMaxCnt = 3;
-
-    //是否向终端发送
-    m_bSendTerminal = 0;
-
-    //日志级别
-    memset(m_strLogLevel,0,sizeof(m_strLogLevel));
 }
 
 //日志策略
 Frame_Logging_Strategy::Frame_Logging_Strategy()
 {
-    pLogStraReactor = NULL;
-    pLogStrategy = NULL;
 }
 
 void Frame_Logging_Strategy::Close()

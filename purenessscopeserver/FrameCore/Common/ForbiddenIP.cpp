@@ -52,7 +52,7 @@ bool CForbiddenIP::Init(const char* szConfigPath)
 
 bool CForbiddenIP::CheckIP(const char* pIP, uint8 u1ConnectType)
 {
-    for(_ForbiddenIP& objForbiddenIP : m_VecForeverForbiddenIP)
+    for(const _ForbiddenIP& objForbiddenIP : m_VecForeverForbiddenIP)
     {
         if(objForbiddenIP.m_u1ConnectType == u1ConnectType
            && CompareIP(objForbiddenIP.m_szClientIP, pIP) == true)

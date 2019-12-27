@@ -27,7 +27,7 @@ int32 GetProcessCPU_Idel_Linux()
         return -1;
     }
 
-    char* pReturn = fgets(szbuffer,sizeof(szbuffer),fd);
+    const char* pReturn = fgets(szbuffer,sizeof(szbuffer),fd);
 
     if (NULL == pReturn)
     {
