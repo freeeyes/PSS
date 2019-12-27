@@ -11,9 +11,6 @@ class CRingLink
 public:
     CRingLink()
     {
-        m_nMaxCount = 0;
-        m_nIndex    = 0;
-        m_pRingLink = NULL;
     }
 
     void Init(int nMaxCount)
@@ -101,9 +98,9 @@ public:
     }
 
 private:
-    int m_nMaxCount;
-    T*  m_pRingLink;
-    int m_nIndex;
+    int m_nMaxCount = 0;
+    int m_nIndex    = 0;
+    T*  m_pRingLink = NULL;
 };
 
 #endif

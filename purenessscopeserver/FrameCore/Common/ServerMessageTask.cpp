@@ -2,7 +2,6 @@
 
 CServerMessageInfoPool::CServerMessageInfoPool()
 {
-
 }
 
 void CServerMessageInfoPool::Init(uint32 u4PacketCount /*= MAX_SERVER_MESSAGE_INFO_COUNT*/)
@@ -349,7 +348,7 @@ bool CServerMessageTask::PutMessage_Del_Client(IClientMessage* pClientMessage)
     return true;
 }
 
-bool CServerMessageTask::ProcessMessage(_Server_Message_Info* pMessage, uint32 u4ThreadID)
+bool CServerMessageTask::ProcessMessage(const _Server_Message_Info* pMessage, uint32 u4ThreadID)
 {
     if(NULL == pMessage)
     {
@@ -389,7 +388,7 @@ bool CServerMessageTask::CheckServerMessageThread(ACE_Time_Value const& tvNow)
     }
 }
 
-bool CServerMessageTask::CheckValidClientMessage(IClientMessage* pClientMessage)
+bool CServerMessageTask::CheckValidClientMessage(const IClientMessage* pClientMessage)
 {
     uint32 u4Size = (uint32)m_vecValidIClientMessage.size();
 
@@ -432,7 +431,7 @@ void CServerMessageTask::Add_ValidIClientMessage(IClientMessage* pClientMessage)
     }
 }
 
-void CServerMessageTask::Update_ValidIClientMessage(IClientMessage* pClientMessage)
+void CServerMessageTask::Update_ValidIClientMessage(const IClientMessage* pClientMessage)
 {
     if (NULL != pClientMessage)
     {
@@ -454,7 +453,6 @@ void CServerMessageTask::Update_ValidIClientMessage(IClientMessage* pClientMessa
 
 CServerMessageManager::CServerMessageManager()
 {
-    m_pServerMessageTask = NULL;
     Init();
 }
 

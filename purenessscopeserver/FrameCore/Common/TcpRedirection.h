@@ -37,16 +37,16 @@ public:
 class CForwardConnectInfo
 {
 public:
-    CForwardConnectInfo() : m_u4ConnectID(0), m_emForwardType(ENUM_FORWARD_TCP_UNKNOW), m_u1ConnectState(0), m_pDeviceHandler(NULL)
+    CForwardConnectInfo()
     {
     };
 
     string            m_strSource;
     string            m_strTarget;
-    uint32            m_u4ConnectID;
-    ENUM_FORWARD_TYPE m_emForwardType;
-    uint8             m_u1ConnectState;  //0是关闭，1是打开
-    IDeviceHandler*   m_pDeviceHandler;  //驱动指针
+    uint32            m_u4ConnectID    = 0;
+    ENUM_FORWARD_TYPE m_emForwardType  = ENUM_FORWARD_TCP_UNKNOW;
+    uint8             m_u1ConnectState = 0;  //0是关闭，1是打开
+    IDeviceHandler*   m_pDeviceHandler = NULL;  //驱动指针
 };
 
 class CForwardManager
@@ -78,7 +78,7 @@ private:
     typedef unordered_map<string, CForwardConnectInfo*> mapForwardConnectList;
     vector<CForwardInfo> m_vecForwardInfo;          //需要关注的转发接口信息
     mapForwardConnectList m_mapForwardConnectList;
-    int m_nActive;
+    int m_nActive = 0;
 };
 
 typedef ACE_Singleton<CForwardManager, ACE_Null_Mutex> App_ForwardManager;

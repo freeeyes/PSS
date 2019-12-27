@@ -2,8 +2,6 @@
 
 CMessageBlockManager::CMessageBlockManager(void)
 {
-    m_u4UsedSize      = 0;
-
     Init();
 }
 

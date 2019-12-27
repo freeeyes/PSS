@@ -27,7 +27,7 @@ const int32 MAX_MEMORY_BLOCK_COUNT = 32;
 class _MemoryBlock_List
 {
 public:
-    uint32 m_u4ListSize;
+    uint32 m_u4ListSize       = 0;
     vector<ACE_Message_Block*> m_mbList;
 
     void Close()
@@ -44,7 +44,7 @@ public:
 class CMemoryBlock_Pool
 {
 public:
-    CMemoryBlock_Pool() : m_u1Debug(0)
+    CMemoryBlock_Pool()
     {
         for(uint32 i = 0; i < MAX_MEMORY_BLOCK_COUNT; i++)
         {
@@ -176,7 +176,7 @@ private:
         }
     }
 
-    uint8                                    m_u1Debug;    //0是关闭，1是开启
+    uint8                                    m_u1Debug = 0;    //0是关闭，1是开启
     unordered_map<ACE_Message_Block*, uint8> m_mapUsedMemoryMB;
     _MemoryBlock_List                        m_MemoryBlock_List[MAX_MEMORY_BLOCK_COUNT];
 };
@@ -195,7 +195,7 @@ public:
     uint32 GetUsedSize();
 
 private:
-    uint32                     m_u4UsedSize;                          //当前正在使用的内存大小
+    uint32                     m_u4UsedSize      = 0;                          //当前正在使用的内存大小
     CMemoryBlock_Pool          m_MemoryBlock_Pool;                    //回收内存池
     ACE_Recursive_Thread_Mutex m_ThreadWriteLock;                     //控制多线程锁
 };

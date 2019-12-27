@@ -1,17 +1,16 @@
 #include "TcpRedirection.h"
 
-CForwardManager::CForwardManager() : m_nActive(0)
+CForwardManager::CForwardManager()
 {
-
 }
 
 void CForwardManager::Close()
 {
     m_vecForwardInfo.clear();
 
-    for (auto it = m_mapForwardConnectList.begin(); it != m_mapForwardConnectList.end(); ++it)
+    for (const auto& it : m_mapForwardConnectList)
     {
-        CForwardConnectInfo* pForwardConnectInfo = it->second;
+        const CForwardConnectInfo* pForwardConnectInfo = it.second;
         SAFE_DELETE(pForwardConnectInfo);
     }
 

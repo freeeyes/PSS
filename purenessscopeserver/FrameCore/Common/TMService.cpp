@@ -8,7 +8,7 @@ void timer_run_execute(ITimerInfo* timer_info)
     }
 }
 
-CTMService::CTMService() :m_nTimerMaxCount(0), m_nActive(0)
+CTMService::CTMService()
 {
 }
 

@@ -19,8 +19,8 @@ public:
 
 private:
     CTimerManager              timer_events_;
-    int                        m_nTimerMaxCount;
-    int                        m_nActive;
+    int                        m_nTimerMaxCount = 0;
+    int                        m_nActive        = 0;
     CHashTable<CTimerInfo>     m_HashTimerList;
     CThreadQueueManager        m_ThreadQueueManager;
     unordered_map<int, int>    m_T2MList;

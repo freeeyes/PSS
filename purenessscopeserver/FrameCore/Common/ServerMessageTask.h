@@ -27,21 +27,15 @@ const uint32 DEL_SERVER_CLIENT = ACE_Message_Block::MB_USER + 2;    //删除Client
 class _Server_Message_Info
 {
 public:
-    IClientMessage*    m_pClientMessage;
-    uint16             m_u2CommandID;
-    ACE_Message_Block* m_pRecvFinish;
+    int                m_nHashID        = 0;
+    uint16             m_u2CommandID    = 0;
+    IClientMessage*    m_pClientMessage = NULL;
+    ACE_Message_Block* m_pRecvFinish    = NULL;
+    ACE_Message_Block* m_pmbQueuePtr    = NULL;        //消息队列指针块
     _ClientIPInfo      m_objServerIPInfo;
-    int                m_nHashID;
-
-    ACE_Message_Block* m_pmbQueuePtr;        //消息队列指针块
 
     _Server_Message_Info()
     {
-        m_nHashID = 0;
-        m_u2CommandID = 0;
-        m_pClientMessage = NULL;
-        m_pRecvFinish = NULL;
-
         //这里设置消息队列模块指针内容，这样就不必反复的new和delete，提升性能
         //指针关系也可以在这里直接指定，不必使用的使用再指定
         m_pmbQueuePtr = new ACE_Message_Block(sizeof(_Server_Message_Info*));
@@ -124,13 +118,13 @@ public:
     bool CheckServerMessageThread(ACE_Time_Value const& tvNow);
 
 private:
-    bool CheckValidClientMessage(IClientMessage* pClientMessage);
-    bool ProcessMessage(_Server_Message_Info* pMessage, uint32 u4ThreadID);
+    bool CheckValidClientMessage(const IClientMessage* pClientMessage);
+    bool ProcessMessage(const _Server_Message_Info* pMessage, uint32 u4ThreadID);
 
     virtual int CloseMsgQueue();
 
     void Add_ValidIClientMessage(IClientMessage* pClientMessage);
-    void Update_ValidIClientMessage(IClientMessage* pClientMessage);
+    void Update_ValidIClientMessage(const IClientMessage* pClientMessage);
 
     //关闭消息队列条件变量
     ACE_Thread_Mutex m_mutex;
@@ -163,7 +157,7 @@ public:
     bool DelClientMessage(IClientMessage* pClientMessage);
 
 private:
-    CServerMessageTask*         m_pServerMessageTask;
+    CServerMessageTask*         m_pServerMessageTask = NULL;
     ACE_Recursive_Thread_Mutex  m_ThreadWritrLock;
 };
 

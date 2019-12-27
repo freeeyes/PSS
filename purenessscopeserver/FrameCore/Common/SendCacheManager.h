@@ -27,7 +27,7 @@ public:
 
 private:
     CHashTable<ACE_Message_Block> m_objCacheHashList;
-    uint32                        m_u4UsedCount;
+    uint32                        m_u4UsedCount = 0;
     ACE_Recursive_Thread_Mutex    m_ThreadLock;
 };
 

@@ -8,8 +8,6 @@
 
 CThreadInfoList::CThreadInfoList(void)
 {
-    m_pAllThreadInfo = NULL;
-    m_nThreadCount = 0;
 }
 
 void CThreadInfoList::Init(int nCount)
@@ -79,12 +77,7 @@ void CThreadInfoList::Close()
 
     for(int i = 0; i < m_nThreadCount; i++)
     {
-        _ThreadInfo* pThreadInfo = m_pAllThreadInfo[i];
-
-        if(NULL != pThreadInfo)
-        {
-            SAFE_DELETE(pThreadInfo);
-        }
+        SAFE_DELETE(m_pAllThreadInfo[i]);
     }
 
     SAFE_DELETE_ARRAY(m_pAllThreadInfo);

@@ -23,23 +23,17 @@
 class _MakePacket
 {
 public:
-    uint32         m_u4ConnectID;       //链接ID
-    uint32         m_u4PacketParseID;   //对应ConnectID的PacketParseID
-    int32          m_nHashID;           //对应记录hash的ID
-    CPacketParse*  m_pPacketParse;      //数据包数据指针
-    uint8          m_u1PacketType;      //数据包类型
-    uint8          m_u1Option;          //操作类型
-    ACE_INET_Addr  m_AddrRemote;        //数据包的来源IP信息
-    ACE_INET_Addr  m_AddrListen;        //数据包来源监听IP信息
+    uint32         m_u4ConnectID     = 0;               //链接ID
+    uint32         m_u4PacketParseID = 0;               //对应ConnectID的PacketParseID
+    int32          m_nHashID         = 0;               //对应记录hash的ID
+    CPacketParse*  m_pPacketParse    = NULL;            //数据包数据指针
+    uint8          m_u1PacketType    = CONNECT_IO_TCP;  //数据包类型
+    uint8          m_u1Option        = 0;               //操作类型
+    ACE_INET_Addr  m_AddrRemote;                        //数据包的来源IP信息
+    ACE_INET_Addr  m_AddrListen;                        //数据包来源监听IP信息
 
     _MakePacket()
     {
-        m_u1PacketType      = CONNECT_IO_TCP;  //0为TCP,1是UDP 默认是TCP
-        m_u4ConnectID       = 0;
-        m_u1Option          = 0;
-        m_pPacketParse      = NULL;
-        m_nHashID           = 0;
-        m_u4PacketParseID   = 0;
     }
 
     void Clear()
@@ -69,12 +63,12 @@ public:
 
     bool Init();
 
-    bool PutMessageBlock(_MakePacket* pMakePacket, ACE_Time_Value& tvNow);                                                     //处理消息数据包
+    bool PutMessageBlock(const _MakePacket* pMakePacket, const ACE_Time_Value tvNow);                                                     //处理消息数据包
     bool PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, ACE_Time_Value& tvNow);                      //发送失败消息回调
 
 private:
-    void SetMessage(_MakePacket* pMakePacket, CMessage* pMessage, ACE_Time_Value& tvNow);                                      //一般数据包消息
-    void SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, CMessage* pMessage, ACE_Time_Value& tvNow);  //服务发送失败回调数据包消息
+    void SetMessage(const _MakePacket* pMakePacket, CMessage* pMessage, const ACE_Time_Value tvNow);                                      //一般数据包消息
+    void SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, CMessage* pMessage, const ACE_Time_Value tvNow);  //服务发送失败回调数据包消息
 
     ACE_Recursive_Thread_Mutex     m_ThreadWriteLock;
 };

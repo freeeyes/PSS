@@ -112,8 +112,8 @@ public:
     virtual ~IConfigOpeation() {}
 protected:
     IConfigOpeation(XmlConfig config, const char* name)
-        : m_name(name)
     {
+        m_name = name;
         _array[config] = this;
     }
     virtual bool Init(CXmlOpeation* pXmlOperation) = 0;
@@ -128,9 +128,9 @@ private:
 class xmlRecvInfo : public IConfigOpeation
 {
 public:
-    uint32 RecvBuffSize;
-    uint16 RecvQueueTimeout;
-    xmlRecvInfo(XmlConfig config, const char* name) : IConfigOpeation(config, name), RecvBuffSize(0), RecvQueueTimeout(0) {}
+    uint32 RecvBuffSize     = 0;
+    uint16 RecvQueueTimeout = 0;
+    xmlRecvInfo(XmlConfig config, const char* name) : IConfigOpeation::IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
@@ -138,17 +138,16 @@ public:
 class xmlSendInfo : public IConfigOpeation
 {
 public:
-    uint16 SendQueueMax;//发送队列中最长的数据包个数
-    uint16 TcpNodelay;
-    uint32 MaxBlockSize;
-    uint32 SendDatamark;
-    uint32 BlockCount;
-    uint16 SendTimeout;
-    uint16 SendQueueTimeout;
-    uint16 SendQueueCount;
-    uint16 PutQueueTimeout;
-    xmlSendInfo(XmlConfig config, const char* name) : IConfigOpeation(config, name), SendQueueMax(0), TcpNodelay(TCP_NODELAY_OFF), MaxBlockSize(0),
-        SendDatamark(0), BlockCount(0), SendTimeout(0), SendQueueTimeout(0), SendQueueCount(0), PutQueueTimeout(0) {}
+    uint16 SendQueueMax     = 0;//发送队列中最长的数据包个数
+    uint16 TcpNodelay       = TCP_NODELAY_OFF;
+    uint32 MaxBlockSize     = 0;
+    uint32 SendDatamark     = 0;
+    uint32 BlockCount       = 0;
+    uint16 SendTimeout      = 0;
+    uint16 SendQueueTimeout = 0;
+    uint16 SendQueueCount   = 0;
+    uint16 PutQueueTimeout  = 0;
+    xmlSendInfo(XmlConfig config, const char* name) : IConfigOpeation::IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
@@ -156,12 +155,11 @@ public:
 class xmlNetWorkMode : public IConfigOpeation
 {
 public:
-    uint8 Mode;
-    uint16 BackLog;
-    bool NetByteOrder;
-    ENUM_CHAR_ORDER LocalByteOrder;
-    xmlNetWorkMode(XmlConfig config, const char* name) : IConfigOpeation(config, name), Mode(0),
-        BackLog(0), NetByteOrder(false), LocalByteOrder(SYSTEM_BIG_ORDER) {}
+    uint8 Mode                     = 0;
+    uint16 BackLog                 = 0;
+    bool NetByteOrder              = false;
+    ENUM_CHAR_ORDER LocalByteOrder = SYSTEM_BIG_ORDER;
+    xmlNetWorkMode(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 private:
     bool SetIOMode(const std::string& pData);
@@ -176,11 +174,11 @@ public:
     class _TCPServerIP
     {
     public:
-        std::string ip;
-        uint32 port;
-        uint8 ipType;
-        uint32 packetparseid;
-        _TCPServerIP() : ip(""), port(0), ipType(0), packetparseid(0) {}
+        std::string ip       = "";
+        uint32 port          = 0;
+        uint8 ipType         = 0;
+        uint32 packetparseid = 0;
+        _TCPServerIP() {}
     };
     std::vector<_TCPServerIP> vec;
     xmlTCPServerIPs(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
@@ -194,12 +192,12 @@ public:
     class _UDPServerIP
     {
     public:
-        std::string uip;
-        uint8 uipType;
-        uint32 uport;
-        uint32 uMaxRecvSize;
-        uint32 uPacketParseID;
-        _UDPServerIP() : uip("127.0.0.1"), uipType(0), uport(0), uMaxRecvSize(0), uPacketParseID(0) {}
+        std::string uip       = "127.0.0.1";
+        uint8 uipType         = 0;
+        uint32 uport          = 0;
+        uint32 uMaxRecvSize   = 0;
+        uint32 uPacketParseID = 0;
+        _UDPServerIP() {}
     };
     std::vector<_UDPServerIP> vec;
     xmlUDPServerIPs(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
@@ -213,15 +211,15 @@ public:
     class _TTyDrives
     {
     public:
-        uint32 u4TTyID;
-        uint32 u4PacketParseID;
-        uint32 u4Baud;
-        uint32 u4DataBits;
-        uint32 u4StopBits;
+        uint32 u4TTyID         = 0;
+        uint32 u4PacketParseID = 0;
+        uint32 u4Baud          = 0;
+        uint32 u4DataBits      = 0;
+        uint32 u4StopBits      = 0;
         std::string strParity;
         std::string strPortName;
         std::string strDesc;
-        _TTyDrives() : u4TTyID(0), u4PacketParseID(0), u4Baud(0), u4DataBits(0), u4StopBits(0), strParity(""), strPortName(""), strDesc("") {}
+        _TTyDrives() {}
     };
     std::vector<_TTyDrives> vec;
     xmlTTyDrives(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
@@ -235,11 +233,11 @@ public:
     class _Server2Server
     {
     public:
-        uint32 u4ServerID;
+        uint32 u4ServerID       = 0;
         std::string strServerIP;
-        uint32 u4ServerPort;
-        uint32 u4PacketParseID;
-        _Server2Server() : u4ServerID(0), strServerIP(""), u4ServerPort(0), u4PacketParseID(0) {}
+        uint32 u4ServerPort     = 0;
+        uint32 u4PacketParseID  = 0;
+        _Server2Server() {}
     };
     std::vector<_Server2Server> vec;
     xmlServer2Server(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
@@ -250,25 +248,24 @@ public:
 class xmlConnectServer : public IConfigOpeation
 {
 public:
-    uint32 TimeInterval;
-    uint32 Recvbuff;
-    uint8 RunType;
-    uint16 TimeCheck;
-    uint16 Count;
-    xmlConnectServer(XmlConfig config, const char* name) : IConfigOpeation(config, name), TimeInterval(500), Recvbuff(1024), RunType(0), Count(100) {}
+    uint32 TimeInterval = MAX_BUFF_500;
+    uint32 Recvbuff     = MAX_BUFF_1024;
+    uint8  RunType      = 0;
+    uint16 TimeCheck    = 0;
+    uint16 Count        = MAX_BUFF_100;
+    xmlConnectServer(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
 class xmlClientInfo : public IConfigOpeation
 {
 public:
-    uint32 HandlerCount;
-    uint32 MaxHandlerCount;
-    uint16 MaxConnectTime;
-    uint16 CheckAliveTime;
-    uint32 MaxBuffRecv;
-    xmlClientInfo(XmlConfig config, const char* name) : IConfigOpeation(config, name), HandlerCount(5000), MaxHandlerCount(10000), MaxConnectTime(120),
-        CheckAliveTime(60), MaxBuffRecv(1024) {}
+    uint32 HandlerCount     = 5000;
+    uint32 MaxHandlerCount  = 10000;
+    uint16 MaxConnectTime   = 120;
+    uint16 CheckAliveTime   = 60;
+    uint32 MaxBuffRecv      = 1024;
+    xmlClientInfo(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
@@ -278,10 +275,10 @@ public:
     class _ModuleInfo
     {
     public:
-        std::string szModuleName;
-        std::string szModulePath;
+        std::string szModuleName  = "TcpTest.dll";
+        std::string szModulePath  = "./";
         std::string szModuleParam;
-        _ModuleInfo() : szModuleName("TcpTest.dll"), szModulePath("./"), szModuleParam("") {}
+        _ModuleInfo() {}
     };
     std::vector<_ModuleInfo> vec;
     xmlModuleInfos(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
@@ -291,54 +288,52 @@ public:
 class xmlModuleMangager : public IConfigOpeation
 {
 public:
-    uint32 MaxCount;
-    xmlModuleMangager(XmlConfig config, const char* name) : IConfigOpeation(config, name), MaxCount(100) {}
+    uint32 MaxCount = MAX_BUFF_100;
+    xmlModuleMangager(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 class xmlMonitor : public IConfigOpeation
 {
 public:
-    uint8 CpuAndMemory;
-    uint16 CpuMax;
-    uint32 MemoryMax;
-    xmlMonitor(XmlConfig config, const char* name) : IConfigOpeation(config, name), CpuAndMemory(1), CpuMax(50), MemoryMax(1000) {}
+    uint8 CpuAndMemory = 1;
+    uint16 CpuMax      = 50;
+    uint32 MemoryMax   = 1000;
+    xmlMonitor(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
 class xmlThreadInfoAI : public IConfigOpeation
 {
 public:
-    uint8 AI;
-    uint8 ReturnDataType;
-    uint16 CheckTime;
-    uint16 TimeoutCount;
-    uint16 StopTime;
-    std::string ReturnData;
-    xmlThreadInfoAI(XmlConfig config, const char* name) : IConfigOpeation(config, name), AI(0), ReturnDataType(1), CheckTime(30),
-        TimeoutCount(1), StopTime(30), ReturnData("ff ff") {}
+    uint8 AI               = 0;
+    uint8 ReturnDataType   = 1;
+    uint16 CheckTime       = 30;
+    uint16 TimeoutCount    = 1;
+    uint16 StopTime        = 30;
+    std::string ReturnData = "ff ff";
+    xmlThreadInfoAI(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
 class xmlThreadInfo : public IConfigOpeation
 {
 public:
-    uint16 ThreadTimeout;
-    uint16 ThreadTimeCheck;
-    uint16 DisposeTimeout;
-    uint16 PutQueueTimeout;
-    xmlThreadInfo(XmlConfig config, const char* name) : IConfigOpeation(config, name), ThreadTimeout(30), ThreadTimeCheck(60),
-        DisposeTimeout(40), PutQueueTimeout(100) {}
+    uint16 ThreadTimeout   = 30;
+    uint16 ThreadTimeCheck = 60;
+    uint16 DisposeTimeout  = 40;
+    uint16 PutQueueTimeout = 100;
+    xmlThreadInfo(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
 class xmlConsole : public IConfigOpeation
 {
 public:
-    uint8 support;
-    std::string sip;
-    uint16 sport;
-    uint8 ipType;
-    xmlConsole(XmlConfig config, const char* name) : IConfigOpeation(config, name), support(1), sip("INADDR_ANY"), sport(10010), ipType(0) {}
+    uint8 support   = 0;
+    std::string sip = "INADDR_ANY";
+    uint16 sport    = 10010;
+    uint8 ipType    = 0;
+    xmlConsole(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
@@ -363,7 +358,7 @@ public:
     {
     public:
         std::string cip;
-        _ConsoleClient() : cip("") {}
+        _ConsoleClient() {}
     };
     std::vector<_ConsoleClient> vec;
     xmlConsoleClients(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
@@ -373,71 +368,69 @@ public:
 class xmlAceDebug : public IConfigOpeation
 {
 public:
-    uint8 TrunOn;
-    std::string DebugName;
-    uint16 ChkInterval;
-    uint32 LogFileMaxSize;
-    uint8 LogFileMaxCnt;
+    uint8 TrunOn          = 0;
+    std::string DebugName = "./serverdebug.log";
+    uint16 ChkInterval    = 600;
+    uint32 LogFileMaxSize = 10240;
+    uint8 LogFileMaxCnt   = 3;
     std::string Level;
-    xmlAceDebug(XmlConfig config, const char* name) : IConfigOpeation(config, name), TrunOn(0), DebugName("./serverdebug.log"), ChkInterval(600),
-        LogFileMaxSize(10240), LogFileMaxCnt(3), Level("") {}
+    xmlAceDebug(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
 class xmlCommandAccount : public IConfigOpeation
 {
 public:
-    uint8 Account;
-    uint8 FlowAccount;
-    uint32 MaxCommandCount;
-    xmlCommandAccount(XmlConfig config, const char* name) : IConfigOpeation(config, name), Account(1), FlowAccount(1), MaxCommandCount(2000) {}
+    uint8 Account          = 1;
+    uint8 FlowAccount      = 1;
+    uint32 MaxCommandCount = 2000;
+    xmlCommandAccount(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
 class xmlCoreSetting : public IConfigOpeation
 {
 public:
-    uint8 CoreNeed;
+    uint8 CoreNeed = 0;
     std::string Script;
-    xmlCoreSetting(XmlConfig config, const char* name) : IConfigOpeation(config, name), CoreNeed(0), Script("") {}
+    xmlCoreSetting(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
 class xmlServerType : public IConfigOpeation
 {
 public:
-    uint8 Type;
-    std::string name;
-    std::string displayname;
-    uint8 Debug;
-    uint32 DebugSize;
-    uint8 IsClose;
-    xmlServerType(XmlConfig config, const char* name) : IConfigOpeation(config, name), Type(0), name("Pss Service"),
-        displayname("PssService"), Debug(0), DebugSize(1000), IsClose(0) {}
+    uint8 Type              = 0;
+    std::string name        = "Pss Service";
+    std::string displayname = "PssService";
+    uint8 Debug             = 0;
+    uint32 DebugSize        = 1000;
+    uint8 IsClose           = 0;
+    xmlServerType(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
 class xmlServerID : public IConfigOpeation
 {
 public:
-    uint32 id;
-    xmlServerID(XmlConfig config, const char* name) : IConfigOpeation(config, name), id(1001) {}
+    uint32 id = 1001;
+    xmlServerID(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
 class xmlServerName : public IConfigOpeation
 {
 public:
-    std::string name;
-    xmlServerName(XmlConfig config, const char* name) : IConfigOpeation(config, name), name("Freeeyes") {}
+    std::string name = "freeeyes";
+    xmlServerName(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
 class xmlServerVersion : public IConfigOpeation
 {
 public:
-    std::string Version;
-    xmlServerVersion(XmlConfig config, const char* name) : IConfigOpeation(config, name), Version("1.00") {}
+    std::string Version = "1.00";
+    xmlServerVersion(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
@@ -447,13 +440,12 @@ public:
     class _PacketParse
     {
     public:
-        uint16 ParseID;
-        std::string ModulePath;
-        std::string ModuleName;
-        uint8 Type;
-        uint16 OrgLength;
-        _PacketParse() : ParseID(1), ModulePath("./"),
-            ModuleName("PacketParse_Interface.dll"), Type(PACKET_WITHHEAD), OrgLength(40) {}
+        uint16 ParseID         = 1;
+        std::string ModulePath = "./";
+        std::string ModuleName = "PacketParse_Interface.dll";
+        uint8 Type             = PACKET_WITHHEAD;
+        uint16 OrgLength       = 40;
+        _PacketParse() {}
     };
     std::vector<_PacketParse> vec;
     xmlPacketParses(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
@@ -463,22 +455,21 @@ public:
 class xmlBuffPacket : public IConfigOpeation
 {
 public:
-    uint32 Count;
-    xmlBuffPacket(XmlConfig config, const char* name) : IConfigOpeation(config, name), Count(5000) {}
+    uint32 Count = 5000;
+    xmlBuffPacket(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
 class xmlMessage : public IConfigOpeation
 {
 public:
-    uint32 Msg_High_mark;
-    uint32 Msg_Low_mark;
-    uint32 Msg_Buff_Max_Size;
-    uint16 Msg_Thread;
-    uint16 Msg_Process;
-    uint32 Msg_MaxQueue;
-    xmlMessage(XmlConfig config, const char* name) : IConfigOpeation(config, name), Msg_High_mark(64000), Msg_Low_mark(64000), Msg_Buff_Max_Size(20480),
-        Msg_Thread(5), Msg_Process(1), Msg_MaxQueue(10000) {}
+    uint32 Msg_High_mark     = 64000;
+    uint32 Msg_Low_mark      = 64000;
+    uint32 Msg_Buff_Max_Size = 20480;
+    uint16 Msg_Thread        = 3;
+    uint16 Msg_Process       = 1;
+    uint32 Msg_MaxQueue      = 10000;
+    xmlMessage(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
@@ -486,9 +477,9 @@ public:
 class xmlTTyClientManagerInfo : public IConfigOpeation
 {
 public:
-    uint16 MaxTTyDevCount;
-    uint16 TimeCheck;
-    xmlTTyClientManagerInfo(XmlConfig config, const char* name) : IConfigOpeation(config, name), MaxTTyDevCount(MAX_BUFF_100), TimeCheck(120) {}
+    uint16 MaxTTyDevCount = MAX_BUFF_100;
+    uint16 TimeCheck      = 120;
+    xmlTTyClientManagerInfo(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
@@ -496,22 +487,21 @@ public:
 class xmlAlertConnect : public IConfigOpeation
 {
 public:
-    uint8 ConnectMin;
-    uint32 ConnectMax;
-    uint16 DisConnectMin;
-    uint32 DisConnectMax;
-    uint32 ConnectAlert;
-    uint32 MailID;
-    xmlAlertConnect(XmlConfig config, const char* name) : IConfigOpeation(config, name), ConnectMin(0), ConnectMax(0), DisConnectMin(0),
-        DisConnectMax(0), ConnectAlert(20000), MailID(0) {}
+    uint8 ConnectMin     = 0;
+    uint32 ConnectMax    = 0;
+    uint16 DisConnectMin = 0;
+    uint32 DisConnectMax = 0;
+    uint32 ConnectAlert  = 20000;
+    uint32 MailID        = 0;
+    xmlAlertConnect(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
 class xmlIP : public IConfigOpeation
 {
 public:
-    uint8 IPMax;
-    uint32 Timeout;
+    uint8 IPMax    = 0;
+    uint32 Timeout = 300;
     xmlIP(XmlConfig config, const char* name) : IConfigOpeation(config, name), IPMax(0), Timeout(300) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
@@ -519,13 +509,12 @@ public:
 class xmlClientData : public IConfigOpeation
 {
 public:
-    uint16 RecvPacketCount;
-    uint32 RecvDataMax;
-    uint16 SendPacketCount;
-    uint32 SendDataMax;
-    uint32 MailID;
-    xmlClientData(XmlConfig config, const char* name) : IConfigOpeation(config, name), RecvPacketCount(0), RecvDataMax(0), SendPacketCount(0),
-        SendDataMax(0), MailID(0) {}
+    uint16 RecvPacketCount = 0;
+    uint32 RecvDataMax     = 0;
+    uint16 SendPacketCount = 0;
+    uint32 SendDataMax     = 0;
+    uint32 MailID          = 0;
+    xmlClientData(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 
@@ -535,10 +524,10 @@ public:
     class _CommandInfo
     {
     public:
-        uint32 CommandID;
-        uint32 CommandCount;
-        uint32 MailID;
-        _CommandInfo() : CommandID(4096), CommandCount(0), MailID(0) {}
+        uint32 CommandID    = 4096;
+        uint32 CommandCount = 0;
+        uint32 MailID       = 0;
+        _CommandInfo() {}
     };
     std::vector<_CommandInfo> vec;
     xmlCommandInfos(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
@@ -551,14 +540,13 @@ public:
     class _Mail
     {
     public:
-        uint16 MailID;
-        std::string fromMailAddr;
-        std::string toMailAddr;
-        std::string MailPass;
-        std::string MailUrl;
-        uint16 MailPort;
-        _Mail() : MailID(1), fromMailAddr("local@163.com"), toMailAddr("freeeyes@163.com"),
-            MailPass("123456"), MailUrl("smtp.163.com"), MailPort(25) {}
+        uint16 MailID            = 1;
+        std::string fromMailAddr = "local@163.com";
+        std::string toMailAddr = "freeeyes@163.com";
+        std::string MailPass     = "123456";
+        std::string MailUrl      = "smtp.163.com";
+        uint16 MailPort          = 25;
+        _Mail() {}
     };
     std::vector<_Mail> vec;
     xmlMails(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
@@ -574,9 +562,9 @@ public:
     class _CommandsTimeout
     {
     public:
-        uint16 CommandID;
-        uint16 Timeout;
-        _CommandsTimeout() : CommandID(0), Timeout(0)
+        uint16 CommandID = 0;
+        uint16 Timeout   = 0;
+        _CommandsTimeout()
         {}
     };
     std::vector<_CommandsTimeout> vec;
@@ -593,12 +581,12 @@ public:
     class _RedirectionInfo
     {
     public:
-        uint32 SrcPort;
+        uint32 SrcPort         = 0;
         string RedirectionIP;
-        uint32 RedirectionPort;
-        uint8  Mode;
-        uint8  ConnectState;
-        _RedirectionInfo() : SrcPort(0), RedirectionIP(""), RedirectionPort(0), Mode(0), ConnectState(0) {}
+        uint32 RedirectionPort = 0;
+        uint8  Mode            = 0;
+        uint8  ConnectState    = 0;
+        _RedirectionInfo() {}
     };
     std::vector<_RedirectionInfo> vec;
     xmlTcpRedirection(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}

@@ -2,7 +2,6 @@
 
 CSendCacheManager::CSendCacheManager()
 {
-    m_u4UsedCount = 0;
 }
 
 void CSendCacheManager::Init(uint32 u4CacheCount, uint32 u4CacheSize)
