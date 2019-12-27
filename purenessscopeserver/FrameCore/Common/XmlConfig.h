@@ -343,8 +343,8 @@ public:
     class _ConsoleKey
     {
     public:
-        std::string Key;
-        _ConsoleKey() : Key("not") {}
+        std::string Key = "not";
+        _ConsoleKey() {}
     };
     std::vector<_ConsoleKey> vec;
     xmlConsoleKeys(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
@@ -502,7 +502,7 @@ class xmlIP : public IConfigOpeation
 public:
     uint8 IPMax    = 0;
     uint32 Timeout = 300;
-    xmlIP(XmlConfig config, const char* name) : IConfigOpeation(config, name), IPMax(0), Timeout(300) {}
+    xmlIP(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
 

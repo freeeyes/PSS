@@ -22,7 +22,7 @@ public:
     void Test_MakePacket(void);
 
 private:
-    CMakePacket* m_pMakePacket;
+    CMakePacket* m_pMakePacket = NULL;
 };
 
 #endif

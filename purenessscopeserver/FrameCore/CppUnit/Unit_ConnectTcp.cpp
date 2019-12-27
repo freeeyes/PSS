@@ -4,7 +4,6 @@
 
 CUnit_ConnectTcp::CUnit_ConnectTcp()
 {
-    m_nServerID = 0;
 }
 
 void CUnit_ConnectTcp::setUp(void)

@@ -22,7 +22,7 @@ public:
     void Test_EChartlog(void);
 
 private:
-    IEchartlog* m_pEchartlog;
+    IEchartlog* m_pEchartlog = NULL;
 };
 
 #endif

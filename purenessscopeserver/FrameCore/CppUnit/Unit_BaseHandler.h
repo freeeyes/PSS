@@ -34,7 +34,7 @@ public:
     void Test_Udp_Common_Send_Message(void);
     void Test_Tcp_Common_Make_Send_Packet(void);
 private:
-    int m_nBaseHandlerID;
+    int m_nBaseHandlerID = 0;
 
 };
 

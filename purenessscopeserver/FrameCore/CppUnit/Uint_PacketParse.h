@@ -22,7 +22,7 @@ public:
     void Test_PacketParsePool(void);
 
 private:
-    CPacketParsePool* m_pPacketParsePool;
+    CPacketParsePool* m_pPacketParsePool = NULL;
 };
 
 #endif

@@ -4,7 +4,6 @@
 
 CUnit_ConsolePromissions::CUnit_ConsolePromissions()
 {
-    m_pConsolePromissions = NULL;
 }
 
 void CUnit_ConsolePromissions::setUp(void)

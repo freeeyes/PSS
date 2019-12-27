@@ -22,7 +22,7 @@ public:
     void Test_LoadModule(void);
 
 private:
-    char m_szModuleName[MAX_BUFF_20];
+    char m_szModuleName[MAX_BUFF_20] = {'\0'};
 };
 
 #endif

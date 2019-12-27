@@ -4,7 +4,6 @@
 
 CUnit_MakePacket::CUnit_MakePacket()
 {
-    m_pMakePacket = NULL;
 }
 
 void CUnit_MakePacket::setUp(void)

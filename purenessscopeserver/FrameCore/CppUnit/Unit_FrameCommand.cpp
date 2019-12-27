@@ -4,7 +4,6 @@
 
 CUnit_FrameCommand::CUnit_FrameCommand()
 {
-    m_pFrameCommand = NULL;
 }
 
 void CUnit_FrameCommand::setUp(void)

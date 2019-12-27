@@ -63,7 +63,7 @@ public:
     void Test_PacketCount();
 
 private:
-    CBuffPacket* m_pBuffPacket;
+    CBuffPacket* m_pBuffPacket = NULL;
 };
 
 #endif

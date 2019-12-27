@@ -310,10 +310,8 @@ void DoMessage_ShowModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
         }
 
-        for (int i = 0; i < (int)vecModeInfo.size(); i++)
+        for (const _ModuleInfo* pModuleInfo : vecModeInfo)
         {
-            _ModuleInfo* pModuleInfo = vecModeInfo[i];
-
             if (CommandInfo.m_u1OutputType == 0)
             {
                 uint8 u1ModuleNameLen = (uint8)ACE_OS::strlen(pModuleInfo->GetName());
@@ -481,7 +479,7 @@ void DoMessage_WorkThreadState(const _CommandInfo& CommandInfo, IBuffPacket* pBu
 
             for (int i = 0; i < nThreadCount; i++)
             {
-                _ThreadInfo* pCurrThreadInfo = pThreadInfo->GetThreadInfo(i);
+                const _ThreadInfo* pCurrThreadInfo = pThreadInfo->GetThreadInfo(i);
 
                 if (CommandInfo.m_u1OutputType == 0)
                 {
@@ -1837,8 +1835,7 @@ void DoMessage_ServerClose(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
 
     //这里暂不实现，没必要
     ACE_UNUSED_ARG(CommandInfo);
-    ACE_UNUSED_ARG(pBuffPacket);
-    ACE_UNUSED_ARG(u2ReturnCommandID);
+    (*pBuffPacket) << u2ReturnCommandID;
 }
 
 void DoMessage_TestFileStart(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)

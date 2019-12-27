@@ -4,8 +4,6 @@
 
 CUnit_LogicThreadManager::CUnit_LogicThreadManager()
 {
-    m_nMessage        = 1000;
-    m_pLogicTestQueue = NULL;
 }
 
 void CUnit_LogicThreadManager::setUp(void)

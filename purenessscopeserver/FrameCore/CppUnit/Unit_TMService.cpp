@@ -2,7 +2,7 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_TMService::CUnit_TMService() : m_pTMService(NULL)
+CUnit_TMService::CUnit_TMService()
 {
 }
 

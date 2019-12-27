@@ -4,7 +4,6 @@
 
 CUnit_FileLogger::CUnit_FileLogger()
 {
-    m_pLogFile = NULL;
 }
 
 void CUnit_FileLogger::setUp(void)

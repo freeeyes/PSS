@@ -116,7 +116,7 @@ private:
     bool Create_Command(const char* pCommand, uint16 u2ReturnCommandID);
     bool Create_Command_Error(const char* pCommand);
 
-    CConsoleMessage* m_pConsoleMessage;
+    CConsoleMessage* m_pConsoleMessage = NULL;
 };
 
 #endif

@@ -4,7 +4,6 @@
 
 CUnit_ThreadInfo::CUnit_ThreadInfo()
 {
-    m_pThreadInfo = NULL;
 }
 
 void CUnit_ThreadInfo::setUp(void)

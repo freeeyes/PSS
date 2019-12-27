@@ -4,7 +4,6 @@
 
 CUnit_ProfileTime::CUnit_ProfileTime()
 {
-    m_pProfileTime = NULL;
 }
 
 void CUnit_ProfileTime::setUp(void)

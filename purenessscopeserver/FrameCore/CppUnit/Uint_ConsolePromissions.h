@@ -21,7 +21,7 @@ public:
 
     void Test_Promission_User(void);
 private:
-    CConsolePromissions* m_pConsolePromissions;
+    CConsolePromissions* m_pConsolePromissions = NULL;
 };
 
 #endif

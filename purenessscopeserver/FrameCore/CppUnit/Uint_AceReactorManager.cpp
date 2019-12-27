@@ -4,7 +4,6 @@
 
 CUnit_AceReactorManager::CUnit_AceReactorManager()
 {
-    m_pReactorManager = NULL;
 }
 
 void CUnit_AceReactorManager::setUp(void)

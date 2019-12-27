@@ -4,7 +4,6 @@
 
 CUnit_AppConfig::CUnit_AppConfig()
 {
-    m_pAppConfig = NULL;
 }
 
 void CUnit_AppConfig::setUp(void)

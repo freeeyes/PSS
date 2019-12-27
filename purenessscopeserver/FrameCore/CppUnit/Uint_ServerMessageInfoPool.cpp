@@ -4,7 +4,6 @@
 
 CUnit_ServerMessageInfoPool::CUnit_ServerMessageInfoPool()
 {
-    m_pServerMessageInfoPool = NULL;
 }
 
 void CUnit_ServerMessageInfoPool::setUp(void)

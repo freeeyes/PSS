@@ -31,7 +31,7 @@ public:
     void Test_TimerManager(void);
 
 private:
-    CTimeTask* m_pTimeTask;
+    CTimeTask* m_pTimeTask = NULL;
 };
 
 #endif

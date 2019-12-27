@@ -4,7 +4,6 @@
 
 CUnit_Basehandler::CUnit_Basehandler()
 {
-    m_nBaseHandlerID = 0;
 }
 
 void CUnit_Basehandler::setUp(void)

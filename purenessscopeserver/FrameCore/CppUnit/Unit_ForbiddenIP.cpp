@@ -4,7 +4,6 @@
 
 CUnit_ForbiddenIP::CUnit_ForbiddenIP()
 {
-    m_pForbiddenIP = NULL;
 }
 
 void CUnit_ForbiddenIP::setUp(void)

@@ -23,7 +23,7 @@ public:
     void Test_ServerMessageManager(void);
 
 private:
-    CServerMessageManager* m_pServerMessageManager;
+    CServerMessageManager* m_pServerMessageManager = NULL;
 };
 
 #endif

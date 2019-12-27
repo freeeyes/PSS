@@ -27,7 +27,7 @@ public:
     void Test_Common_Send_ConnectError(void);
 
 private:
-    uint16 m_u2CommandID;
+    uint16 m_u2CommandID = 0;
 };
 
 #endif

@@ -4,7 +4,6 @@
 
 CUnit_ConsoleMessage::CUnit_ConsoleMessage()
 {
-    m_pConsoleMessage = NULL;
 }
 
 void CUnit_ConsoleMessage::setUp(void)
@@ -15,8 +14,7 @@ void CUnit_ConsoleMessage::setUp(void)
 
 void CUnit_ConsoleMessage::tearDown(void)
 {
-    delete m_pConsoleMessage;
-    m_pConsoleMessage = NULL;
+    SAFE_DELETE(m_pConsoleMessage);
 }
 
 bool CUnit_ConsoleMessage::Create_Command(const char* pCommand, uint16 u2ReturnCommandID)

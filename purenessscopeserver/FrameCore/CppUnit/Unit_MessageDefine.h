@@ -39,7 +39,7 @@ public:
     void Test_GetListenInfo(void);
     void Test_GetPoolSet(void);
 private:
-    int m_nMessageDefine;
+    int m_nMessageDefine = 0;
 };
 
 #endif

@@ -4,7 +4,6 @@
 
 CUnit_Frame_Logging::CUnit_Frame_Logging()
 {
-    m_pFrameLoggingStrategy = NULL;
 }
 
 void CUnit_Frame_Logging::setUp(void)

@@ -37,7 +37,7 @@ public:
     void Test_Connect_CheckTime(void);
 
 private:
-    CConnectHandler* m_pConnectHandler;
+    CConnectHandler* m_pConnectHandler = NULL;
 };
 
 #endif

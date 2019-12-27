@@ -4,7 +4,6 @@
 
 CUnit_Redirection::CUnit_Redirection()
 {
-    m_pForwardManager = NULL;
 }
 
 void CUnit_Redirection::setUp(void)

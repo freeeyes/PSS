@@ -4,7 +4,6 @@
 
 CUnit_ServerMessageManager::CUnit_ServerMessageManager()
 {
-    m_pServerMessageManager = NULL;
 }
 
 void CUnit_ServerMessageManager::setUp(void)

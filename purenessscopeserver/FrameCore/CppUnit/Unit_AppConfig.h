@@ -23,7 +23,7 @@ public:
     void Test_XML_Read(void);
     void Test_XML_Write(void);
 private:
-    CAppConfig* m_pAppConfig;
+    CAppConfig* m_pAppConfig = NULL;
 };
 
 #endif

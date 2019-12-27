@@ -4,7 +4,6 @@
 
 CUnit_LogManager::CUnit_LogManager()
 {
-    m_pLogBlockPool = NULL;
 }
 
 void CUnit_LogManager::setUp(void)

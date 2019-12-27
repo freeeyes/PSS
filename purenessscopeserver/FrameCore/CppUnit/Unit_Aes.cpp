@@ -4,7 +4,6 @@
 
 CUnit_Aes::CUnit_Aes()
 {
-    m_pAES = NULL;
 }
 
 void CUnit_Aes::setUp(void)

@@ -2,7 +2,7 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_EChartlog::CUnit_EChartlog() : m_pEchartlog(NULL)
+CUnit_EChartlog::CUnit_EChartlog()
 {
 }
 

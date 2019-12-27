@@ -4,7 +4,6 @@
 
 CUnit_ModuleMessageManager::CUnit_ModuleMessageManager()
 {
-    m_pModuleMessageManager = NULL;
 }
 
 void CUnit_ModuleMessageManager::setUp(void)

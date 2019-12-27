@@ -4,7 +4,6 @@
 
 CUnit_PacketParse::CUnit_PacketParse()
 {
-    m_pPacketParsePool = NULL;
 }
 
 void CUnit_PacketParse::setUp(void)

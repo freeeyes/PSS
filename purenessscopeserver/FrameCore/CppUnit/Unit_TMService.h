@@ -33,7 +33,7 @@ public:
     void Test_TMService(void);
 
 private:
-    ITMService* m_pTMService;
+    ITMService* m_pTMService = NULL;
 };
 
 #endif

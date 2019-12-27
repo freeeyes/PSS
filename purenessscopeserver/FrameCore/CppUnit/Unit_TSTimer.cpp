@@ -8,7 +8,7 @@ void test_timer_run_execute(ITimerInfo* arg)
     OUR_DEBUG((LM_INFO, "[CUnit_TimerThread]timer is active.\n"));
 }
 
-CUnit_TimerThread::CUnit_TimerThread() : m_pTimerThread(NULL)
+CUnit_TimerThread::CUnit_TimerThread()
 {
 }
 

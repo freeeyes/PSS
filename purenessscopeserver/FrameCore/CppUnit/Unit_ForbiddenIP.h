@@ -22,7 +22,7 @@ public:
     void Test_ForbiddenIP(void);
 
 private:
-    CForbiddenIP* m_pForbiddenIP;
+    CForbiddenIP* m_pForbiddenIP = NULL;
 };
 
 #endif

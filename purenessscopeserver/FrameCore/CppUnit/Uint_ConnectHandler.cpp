@@ -4,7 +4,6 @@
 
 CUnit_ConnectHandler::CUnit_ConnectHandler()
 {
-    m_pConnectHandler = NULL;
 }
 
 void CUnit_ConnectHandler::setUp(void)

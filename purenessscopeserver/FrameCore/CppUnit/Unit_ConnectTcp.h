@@ -27,7 +27,7 @@ public:
     void Test_Connect_Tcp_Server_With_Local(void);
 
 private:
-    int m_nServerID;
+    int m_nServerID = 0;
 };
 
 #endif

@@ -4,7 +4,6 @@
 
 CUnit_ConnectUdp::CUnit_ConnectUdp()
 {
-    m_nServerID = 0;
 }
 
 void CUnit_ConnectUdp::setUp(void)

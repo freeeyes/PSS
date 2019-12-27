@@ -22,7 +22,7 @@ public:
     void Test_DoMessage_AceReactorManager(void);
 
 private:
-    CAceReactorManager* m_pReactorManager;
+    CAceReactorManager* m_pReactorManager = NULL;
 };
 
 #endif

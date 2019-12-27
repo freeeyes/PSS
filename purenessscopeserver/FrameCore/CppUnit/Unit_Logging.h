@@ -23,7 +23,7 @@ public:
     void Test_Debug_Log(void);
 
 private:
-    Frame_Logging_Strategy* m_pFrameLoggingStrategy;
+    Frame_Logging_Strategy* m_pFrameLoggingStrategy = NULL;
 };
 
 #endif

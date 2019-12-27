@@ -14,8 +14,6 @@ class CPostServerData : public IClientMessage
 public:
     CPostServerData()
     {
-        m_u4ServerID         = 0;
-        m_u2RecvBuffLength   = 0;
     }
 
     virtual ~CPostServerData()
@@ -95,7 +93,7 @@ public:
         return true;
     }
 
-    virtual bool RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv,  const _ClientIPInfo objServerIPInfo)
+    virtual bool RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv,  const _ClientIPInfo& objServerIPInfo)
     {
         //数据包已经收全，在这里处理数据
         ACE_UNUSED_ARG(u2CommandID);
@@ -123,9 +121,9 @@ public:
     }
 
 private:
-    uint32                     m_u4ServerID;
-    char                       m_szRecvBuffData[RECV_BUFF_SIZE];  //接收缓冲池
-    uint16                     m_u2RecvBuffLength;                //接收缓冲长度
+    uint32                     m_u4ServerID                     = 0;
+    char                       m_szRecvBuffData[RECV_BUFF_SIZE] = {'\0'};  //接收缓冲池
+    uint16                     m_u2RecvBuffLength               = 0;       //接收缓冲长度
 };
 
 #endif

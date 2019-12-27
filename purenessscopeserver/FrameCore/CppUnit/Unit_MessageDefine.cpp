@@ -4,7 +4,6 @@
 
 CUnit_MessageDefine::CUnit_MessageDefine()
 {
-    m_nMessageDefine = 0;
 }
 
 void CUnit_MessageDefine::setUp(void)

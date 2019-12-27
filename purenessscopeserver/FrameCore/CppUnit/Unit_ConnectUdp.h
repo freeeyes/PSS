@@ -23,7 +23,7 @@ public:
 
     void Test_Connect_Udp_Server(void);
 private:
-    int m_nServerID;
+    int m_nServerID = 0;
 };
 
 #endif

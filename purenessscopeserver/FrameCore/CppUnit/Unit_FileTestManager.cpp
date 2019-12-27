@@ -4,7 +4,6 @@
 
 CUnit_FileTestManager::CUnit_FileTestManager()
 {
-    m_pFileTestManager = NULL;
 }
 
 void CUnit_FileTestManager::setUp(void)

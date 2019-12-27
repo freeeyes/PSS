@@ -4,7 +4,6 @@
 
 CUnit_BuffPacket::CUnit_BuffPacket()
 {
-    m_pBuffPacket = NULL;
 }
 
 void CUnit_BuffPacket::setUp(void)

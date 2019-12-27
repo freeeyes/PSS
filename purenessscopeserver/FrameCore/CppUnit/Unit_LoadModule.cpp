@@ -4,7 +4,6 @@
 
 CUnit_LoadModule::CUnit_LoadModule()
 {
-    m_szModuleName[0] = '\0';
 }
 
 void CUnit_LoadModule::setUp(void)

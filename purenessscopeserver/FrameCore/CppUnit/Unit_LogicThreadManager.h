@@ -62,8 +62,8 @@ public:
     void Test_LogicThreadManager(void);
 
 private:
-    int  m_nMessage;
-    CLogicTestQueue* m_pLogicTestQueue;
+    int  m_nMessage                    = 1000;
+    CLogicTestQueue* m_pLogicTestQueue = NULL;
 };
 
 #endif

@@ -4,7 +4,6 @@
 
 CUnit_ConnectClient::CUnit_ConnectClient()
 {
-    m_pConnectClient = NULL;
 }
 
 void CUnit_ConnectClient::setUp(void)

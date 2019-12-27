@@ -4,7 +4,6 @@
 
 CUnit_BaseConnectClient::CUnit_BaseConnectClient()
 {
-    m_u2CommandID = 0;
 }
 
 void CUnit_BaseConnectClient::setUp(void)

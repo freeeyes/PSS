@@ -22,7 +22,7 @@ public:
     void Test_Frame_Command(void);
 
 private:
-    CFrameCommand* m_pFrameCommand;
+    CFrameCommand* m_pFrameCommand = NULL;
 };
 
 #endif

@@ -4,10 +4,6 @@
 
 CUnit_CommandAccount::CUnit_CommandAccount()
 {
-    m_pCommandAccount  = 0;
-    m_u1CommandAccount = 1;
-    m_u1Flow           = 0;
-    m_u2RecvTimeout    = 30;
 }
 
 void CUnit_CommandAccount::setUp(void)

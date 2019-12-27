@@ -4,7 +4,6 @@
 
 CUnit_IPAccount::CUnit_IPAccount()
 {
-    m_pIPAccount = NULL;
 }
 
 void CUnit_IPAccount::setUp(void)

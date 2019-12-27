@@ -4,7 +4,6 @@
 
 CUnit_ControlListen::CUnit_ControlListen()
 {
-    m_pControlListen = NULL;
 }
 
 void CUnit_ControlListen::setUp(void)

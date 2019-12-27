@@ -34,7 +34,7 @@ public:
     void Test_CConnectAccount(void);
 
 private:
-    CIPAccount* m_pIPAccount;
+    CIPAccount* m_pIPAccount = NULL;
 };
 
 #endif

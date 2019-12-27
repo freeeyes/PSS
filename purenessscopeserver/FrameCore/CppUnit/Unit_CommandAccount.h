@@ -28,10 +28,10 @@ public:
     void Test_CommandAccount_PortList(void);      //²âÊÔ¶Ë¿ÚÊý¾Ý
 
 private:
-    CCommandAccount* m_pCommandAccount;
-    uint8            m_u1CommandAccount;
-    uint8            m_u1Flow;
-    uint16           m_u2RecvTimeout;
+    CCommandAccount* m_pCommandAccount  = NULL;
+    uint8            m_u1CommandAccount = 1;
+    uint8            m_u1Flow           = 0;
+    uint16           m_u2RecvTimeout    = 30;
 };
 
 #endif

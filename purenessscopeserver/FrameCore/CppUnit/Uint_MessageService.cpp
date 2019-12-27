@@ -4,7 +4,6 @@
 
 CUnit_MessageService::CUnit_MessageService()
 {
-    m_pMessageService = NULL;
 }
 
 void CUnit_MessageService::setUp(void)

@@ -4,7 +4,6 @@
 
 CUnit_WorkThreadAI::CUnit_WorkThreadAI()
 {
-    m_pWorkThreadAI = NULL;
 }
 
 void CUnit_WorkThreadAI::setUp(void)
