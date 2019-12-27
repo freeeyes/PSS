@@ -4,7 +4,6 @@ CAppConfig::CAppConfig(void)
 {
     m_pConfig = std::make_shared<ACE_Configuration_Heap>();
     m_pIniImp = std::make_shared<ACE_Ini_ImpExp>(*m_pConfig);
-    m_szError[0] = '\0';
 }
 
 const char* CAppConfig::GetError()

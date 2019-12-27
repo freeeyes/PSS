@@ -15,22 +15,16 @@
 class _CommandData
 {
 public:
-    uint64 m_u8CommandCost;                //ÃüÁîµÄÖ´ĞĞºÄ·Ñ×ÜÊ±¼ä
-    uint32 m_u4CommandCount;               //ÃüÁîµÄ×Üµ÷ÓÃ´ÎÊı
-    uint32 m_u4PacketSize;                 //ÃüÁî²úÉúµÄ×ÜÁ÷Á¿
-    uint16 m_u2CommandID;                  //ÃüÁîµÄID
-    uint8  m_u1PacketType;                 //Êı¾İ°üÀ´Ô´ÀàĞÍ
-    uint8  m_u1CommandType;                //ÃüÁîµÄÀàĞÍ£¬0ÊÇÊÕµ½µÄÃüÁî£¬1ÊÇ·¢³öµÄÃüÁî
-    ACE_Time_Value m_tvCommandTime;        //ÃüÁîµÄ×îºó´¦ÀíÊ±¼ä
+    uint64 m_u8CommandCost      = 0;                  //ÃüÁîµÄÖ´ĞĞºÄ·Ñ×ÜÊ±¼ä
+    uint32 m_u4CommandCount     = 0;                  //ÃüÁîµÄ×Üµ÷ÓÃ´ÎÊı
+    uint32 m_u4PacketSize       = 0;                  //ÃüÁî²úÉúµÄ×ÜÁ÷Á¿
+    uint16 m_u2CommandID        = 0;                  //ÃüÁîµÄID
+    uint8  m_u1PacketType       = CONNECT_IO_TCP;     //Êı¾İ°üÀ´Ô´ÀàĞÍ
+    uint8  m_u1CommandType      = COMMAND_TYPE_IN;    //ÃüÁîµÄÀàĞÍ£¬0ÊÇÊÕµ½µÄÃüÁî£¬1ÊÇ·¢³öµÄÃüÁî
+    ACE_Time_Value m_tvCommandTime;                   //ÃüÁîµÄ×îºó´¦ÀíÊ±¼ä
 
     _CommandData()
     {
-        m_u2CommandID    = 0;
-        m_u4CommandCount = 0;
-        m_u8CommandCost  = 0;
-        m_u4PacketSize   = 0;
-        m_u1PacketType   = CONNECT_IO_TCP;
-        m_u1CommandType  = COMMAND_TYPE_IN;
     }
 
     _CommandData& operator += (const _CommandData& ar)
@@ -53,19 +47,14 @@ public:
 class _CommandAlertData
 {
 public:
-    uint32 m_u4CommandCount;
-    uint32 m_u4MailID;
-    uint32 m_u4CurrCount;
-    uint16 m_u2CommandID;
-    uint8  m_u1Minute;
+    uint32 m_u4CommandCount = 0;
+    uint32 m_u4MailID       = 0;
+    uint32 m_u4CurrCount    = 0;
+    uint16 m_u2CommandID    = 0;
+    uint8  m_u1Minute       = 0;
 
     _CommandAlertData()
     {
-        m_u2CommandID    = 0;
-        m_u4CommandCount = 0;
-        m_u4MailID       = 0;
-        m_u4CurrCount    = 0;
-        m_u1Minute       = 0;
     }
 };
 typedef vector<_CommandAlertData> vecCommandAlertData;   //¼ÇÂ¼ËùÓĞµÄ¸æ¾¯¼à¿Ø·§Öµ
@@ -74,19 +63,14 @@ typedef vector<_CommandAlertData> vecCommandAlertData;   //¼ÇÂ¼ËùÓĞµÄ¸æ¾¯¼à¿Ø·§Ö
 class _Port_Data_Account
 {
 public:
-    uint8                       m_u1Type;                        //µ±Ç°Á¬½ÓÀàĞÍ
-    uint32                      m_u4Port;                        //µ±Ç°Êı¾İ¶Ë¿Ú
-    uint8                       m_u1Minute;                      //»ñµÃµ±Ç°·ÖÖÓÊı
-    uint32                      m_u4FlowIn;                      //µ±Ç°½øÈëÁ÷Á¿Í³¼Æ(µ¥Î»£¬·ÖÖÓ)
-    uint32                      m_u4FlowOut;                     //µ±Ç°Á÷³öÁ÷Á¿Í³¼Æ(µ¥Î»£¬·ÖÖÓ)
+    uint8                       m_u1Type    = CONNECT_IO_TCP;        //µ±Ç°Á¬½ÓÀàĞÍ
+    uint32                      m_u4Port    = 0;                     //µ±Ç°Êı¾İ¶Ë¿Ú
+    uint8                       m_u1Minute  = 0;                     //»ñµÃµ±Ç°·ÖÖÓÊı
+    uint32                      m_u4FlowIn  = 0;                     //µ±Ç°½øÈëÁ÷Á¿Í³¼Æ(µ¥Î»£¬·ÖÖÓ)
+    uint32                      m_u4FlowOut = 0;                     //µ±Ç°Á÷³öÁ÷Á¿Í³¼Æ(µ¥Î»£¬·ÖÖÓ)
 
     _Port_Data_Account()
     {
-        m_u1Type       = CONNECT_IO_TCP;
-        m_u4Port       = 0;
-        m_u4FlowIn     = 0;
-        m_u4FlowOut    = 0;
-        m_u1Minute     = 0;
     }
 
     _Port_Data_Account& operator += (const _Port_Data_Account& ar)
@@ -224,14 +208,14 @@ private:
                     ACE_Time_Value const& tvTime = ACE_OS::gettimeofday());                 //ÃüÁî¸æ¾¯Í³¼Æ
 
 public:
-    uint64                                    m_u8PacketTimeout;               //°ü´¦Àí³¬Ê±Ê±¼ä
-    uint8                                     m_u1CommandAccount;              //ÊÇ·ñ¿ªÆôÃüÁîÍ³¼Æ£¬1ÊÇ´ò¿ª£¬0ÊÇ¹Ø±Õ
-    uint8                                     m_u1Flow;                        //ÊÇ·ñ´ò¿ªÁ÷Á¿Í³¼Æ£¬1ÊÇ´ò¿ª£¬0ÊÇ¹Ø±Õ
-    uint8                                     m_u1Minute;                      //µ±Ç°·ÖÖÓÊı
-    char                                      m_szName[MAX_BUFF_50];           //µ±Ç°Í³¼ÆµÄÃû×Ö
-    CHashTable<_CommandData>                  m_objCommandDataList;            //ÃüÁîHashÓ³ÉäÁĞ±í
-    vecCommandAlertData                       m_vecCommandAlertData;           //¸æ¾¯·§ÖµÊı×é
-    ACE_Hash_Map<uint32, _Port_Data_Account*> m_objectPortAccount;             //¸ù¾İ¶Ë¿ÚÍ³¼ÆÃ¿ÌõÊı¾İµÄ½ø³öÁ¿
+    uint64                                    m_u8PacketTimeout     = MAX_QUEUE_TIMEOUT * 1000; //°ü´¦Àí³¬Ê±Ê±¼ä
+    uint8                                     m_u1CommandAccount    = 0;                        //ÊÇ·ñ¿ªÆôÃüÁîÍ³¼Æ£¬1ÊÇ´ò¿ª£¬0ÊÇ¹Ø±Õ
+    uint8                                     m_u1Flow              = 0;                        //ÊÇ·ñ´ò¿ªÁ÷Á¿Í³¼Æ£¬1ÊÇ´ò¿ª£¬0ÊÇ¹Ø±Õ
+    uint8                                     m_u1Minute            = 0 ;                       //µ±Ç°·ÖÖÓÊı
+    char                                      m_szName[MAX_BUFF_50] = {'\0'};                   //µ±Ç°Í³¼ÆµÄÃû×Ö
+    CHashTable<_CommandData>                  m_objCommandDataList;                             //ÃüÁîHashÓ³ÉäÁĞ±í
+    vecCommandAlertData                       m_vecCommandAlertData;                            //¸æ¾¯·§ÖµÊı×é
+    ACE_Hash_Map<uint32, _Port_Data_Account*> m_objectPortAccount;                              //¸ù¾İ¶Ë¿ÚÍ³¼ÆÃ¿ÌõÊı¾İµÄ½ø³öÁ¿
 };
 
 #endif

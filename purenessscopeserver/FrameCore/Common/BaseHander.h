@@ -26,23 +26,16 @@ void Recovery_Message(bool blDelete, char*& pMessage);
 class _Send_Message_Param
 {
 public:
-    uint32 m_u4PacketParseInfoID;
-    char*  m_pIP;
-    int    m_nPort;
-    bool   m_blHead;
-    uint16 m_u2CommandID;
-    bool   m_blDlete;
-    uint32 m_u4Len;
+    uint32 m_u4PacketParseInfoID = 0;
+    char*  m_pIP                 = NULL;
+    int    m_nPort               = 0;
+    bool   m_blHead              = true;
+    uint16 m_u2CommandID         = 0;
+    bool   m_blDlete             = false;
+    uint32 m_u4Len               = 0;
 
     _Send_Message_Param()
     {
-        m_u4PacketParseInfoID = 0;
-        m_pIP = NULL;
-        m_nPort = 0;
-        m_blHead = true;
-        m_u2CommandID = 0;
-        m_blDlete = false;
-        m_u4Len = 0;
     }
 };
 
@@ -80,20 +73,15 @@ void Send_MakePacket_Queue(uint32 u4ConnectID, uint32 u4PacketParseID, CPacketPa
 class _File_Message_Param
 {
 public:
-    uint32 m_u4ConnectID;
-    IFileTestManager* m_pFileTest;
-    bool m_blDelete;
-    char* m_pPacketDebugData;
-    uint32 m_u4PacketDebugSize;
+    uint32 m_u4ConnectID          = 0;
+    IFileTestManager* m_pFileTest = NULL;
+    bool m_blDelete               = false;
+    char* m_pPacketDebugData      = NULL;
+    uint32 m_u4PacketDebugSize    = 0;
     ACE_INET_Addr m_addrRemote;
 
     _File_Message_Param()
     {
-        m_u4ConnectID       = 0;
-        m_pFileTest         = NULL;
-        m_blDelete          = false;
-        m_pPacketDebugData  = NULL;
-        m_u4PacketDebugSize = 0;
     }
 };
 
@@ -104,27 +92,19 @@ bool Tcp_Common_File_Message(_File_Message_Param const& obj_File_Message_Param, 
 class _ClientConnectInfo_Param
 {
 public:
-    uint32 m_u4ConnectID;
+    uint32 m_u4ConnectID         = 0;
     ACE_INET_Addr m_addrRemote;
-    uint32 m_u4AllRecvCount;
-    uint32 m_u4AllSendCount;
-    uint32 m_u4AllRecvSize;
-    uint32 m_u4AllSendSize;
-    ACE_Time_Value m_atvConnect;
-    uint32 m_u4RecvQueueCount;
-    uint64 m_u8RecvQueueTimeCost;
-    uint64 m_u8SendQueueTimeCost;
+    uint32 m_u4AllRecvCount      = 0;
+    uint32 m_u4AllSendCount      = 0;
+    uint32 m_u4AllRecvSize       = 0;
+    uint32 m_u4AllSendSize       = 0;
+    ACE_Time_Value m_atvConnect; 
+    uint32 m_u4RecvQueueCount    = 0;
+    uint64 m_u8RecvQueueTimeCost = 0;
+    uint64 m_u8SendQueueTimeCost = 0;
 
     _ClientConnectInfo_Param()
     {
-        m_u4ConnectID         = 0;
-        m_u4AllRecvCount      = 0;
-        m_u4AllSendCount      = 0;
-        m_u4AllRecvSize       = 0;
-        m_u4AllSendSize       = 0;
-        m_u4RecvQueueCount    = 0;
-        m_u8RecvQueueTimeCost = 0;
-        m_u8SendQueueTimeCost = 0;
     }
 };
 
@@ -135,21 +115,15 @@ _ClientConnectInfo Tcp_Common_ClientInfo(_ClientConnectInfo_Param const& obj_Cli
 class _Input_To_Cache_Param
 {
 public:
-    uint32 m_u4ConnectID;
-    uint32 m_u4PacketParseInfoID;
-    uint32 m_u4SendMaxBuffSize;
-    uint8 m_u1SendType;
-    uint16 m_u2CommandID;
-    bool m_blDelete;
+    uint32 m_u4ConnectID         = 0;
+    uint32 m_u4PacketParseInfoID = 0;
+    uint32 m_u4SendMaxBuffSize   = 0;
+    uint8 m_u1SendType           = 0;
+    uint16 m_u2CommandID         = 0;
+    bool m_blDelete              = false;
 
     _Input_To_Cache_Param()
     {
-        m_u4ConnectID         = 0;
-        m_u4PacketParseInfoID = 0;
-        m_u4SendMaxBuffSize   = 0;
-        m_u1SendType          = 0;
-        m_u2CommandID         = 0;
-        m_blDelete            = false;
     }
 };
 
@@ -162,21 +136,15 @@ bool Tcp_Common_Send_Input_To_Cache(_Input_To_Cache_Param obj_Input_To_Cache_Par
 class _Send_Packet_Param
 {
 public:
-    uint32 m_u4ConnectID;
-    uint8  m_u1SendType;
-    uint32 m_u4PacketParseInfoID;
-    uint32 m_u4SendMaxBuffSize;
-    uint16 m_u2CommandID;
-    bool m_blDelete;
+    uint32 m_u4ConnectID         = 0;
+    uint8  m_u1SendType          = 0;
+    uint32 m_u4PacketParseInfoID = 0;
+    uint32 m_u4SendMaxBuffSize   = 0;
+    uint16 m_u2CommandID         = 0;
+    bool m_blDelete              = false;
 
     _Send_Packet_Param()
     {
-        m_u4ConnectID         = 0;
-        m_u1SendType          = 0;
-        m_u4PacketParseInfoID = 0;
-        m_u4SendMaxBuffSize   = 0;
-        m_u2CommandID         = 0;
-        m_blDelete            = false;
     }
 };
 
@@ -195,25 +163,17 @@ bool Tcp_Common_CloseConnect_By_Queue(uint32 u4ConnectID, CSendMessagePool& objS
 class _Post_Message_Param
 {
 public:
-    uint32 m_u4ConnectID;
-    uint8 m_u1SendType;
-    uint16 m_u2CommandID;
-    uint8 m_u1SendState;
-    bool m_blDelete;
-    int m_nMessageID;
-    uint16 m_u2SendQueueMax;
-    uint32 m_u4SendQueuePutTime;
+    uint32 m_u4ConnectID         = 0;
+    uint8 m_u1SendType           = 0;
+    uint16 m_u2CommandID         = 0;
+    uint8 m_u1SendState          = 0;
+    bool m_blDelete              = false;
+    int m_nMessageID             = 0;
+    uint16 m_u2SendQueueMax      = 0;
+    uint32 m_u4SendQueuePutTime  = 0;
 
     _Post_Message_Param()
     {
-        m_u4ConnectID        = 0;
-        m_u1SendType         = 0;
-        m_u2CommandID        = 0;
-        m_u1SendState        = 0;
-        m_blDelete           = false;
-        m_nMessageID         = 0;
-        m_u2SendQueueMax     = 0;
-        m_u4SendQueuePutTime = 0;
     }
 };
 

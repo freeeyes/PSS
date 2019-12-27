@@ -40,8 +40,8 @@ public:
     }
 
 private:
-    char    m_szUsedFileName[MAX_BUFF_100]; //创建此对象的文件名
-    uint32  m_u4UsedLine;                   //创建此对象的行号
+    char    m_szUsedFileName[MAX_BUFF_100] = {'\0'}; //创建此对象的文件名
+    uint32  m_u4UsedLine                   = 0;      //创建此对象的行号
 };
 
 #endif

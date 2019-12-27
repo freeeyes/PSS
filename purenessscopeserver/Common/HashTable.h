@@ -24,28 +24,21 @@ enum EM_HASH_DEBUG
 template <class T>
 struct _Hash_Table_Cell
 {
-    int32 m_nPosIndex;                     //当前对象在对象数组的下标
-    char* m_pKey;                          //当前的key值
-    T*    m_pValue;                        //当前数据体指针
-    short m_sKeyLen;                       //当前的key长度
-    char  m_cExists;                       //当前块是否已经使用,1已经使用，0没有被使用
+    int32 m_nPosIndex   = 0;                       //当前对象在对象数组的下标
+    char* m_pKey        = NULL;                    //当前的key值
+    T*    m_pValue      = NULL;                    //当前数据体指针
+    short m_sKeyLen     = DEF_HASH_KEY_SIZE;       //当前的key长度
+    char  m_cExists     = 0;                       //当前块是否已经使用,1已经使用，0没有被使用
 
     _Hash_Table_Cell()
     {
-        m_cExists       = 0;
-        m_nPosIndex     = 0;
-        m_pKey          = NULL;
-        m_sKeyLen       = DEF_HASH_KEY_SIZE;
-        m_pValue        = NULL;
     }
 
     //初始化对象
     void Init(char* pKey, int32 nKeyLen, int32 nIndex)
     {
-        m_cExists       = 0;
         m_pKey          = pKey;
         m_sKeyLen       = nKeyLen;
-        m_pValue        = NULL;
         m_nPosIndex     = nIndex;
     }
 
@@ -76,19 +69,14 @@ struct _Hash_Table_Cell
 template <class T>
 struct _Hash_Link_Info
 {
-    int32   m_cExists;                          //当前块是否已经使用,1已经使用，0没有被使用
-    int32   m_nPosIndex;                        //当前对象在对象数组的下标
-    _Hash_Table_Cell<T>* m_pData;             //当前数据
-    _Hash_Link_Info*     m_pNext;             //下一个对象指针(用于链表)
-    _Hash_Link_Info*     m_pPerv;             //上一个对象指针(用于链表)
+    int32   m_cExists            = 0;                //当前块是否已经使用,1已经使用，0没有被使用
+    int32   m_nPosIndex          = 0;                //当前对象在对象数组的下标
+    _Hash_Table_Cell<T>* m_pData = NULL;             //当前数据
+    _Hash_Link_Info*     m_pNext = NULL;             //下一个对象指针(用于链表)
+    _Hash_Link_Info*     m_pPerv = NULL;             //上一个对象指针(用于链表)
 
     _Hash_Link_Info()
     {
-        m_cExists   = 0;
-        m_nPosIndex = 0;
-        m_pData     = NULL;
-        m_pNext     = NULL;
-        m_pPerv     = NULL;
     }
 
     //初始化对象
@@ -121,12 +109,6 @@ class CHashPool
 public:
     CHashPool()
     {
-        m_pBase      = NULL;
-        m_lpTable    = NULL;
-        m_nCount     = 0;
-        m_nUsedCount = 0;
-        m_sKeyLen    = DEF_HASH_KEY_SIZE;
-        m_nCurrIndex = 0;
     }
 
     ~CHashPool()
@@ -277,12 +259,12 @@ public:
     }
 
 private:
-    char*                m_pBase;        //当前内存起始位置
-    _Hash_Table_Cell<T>* m_lpTable;      //当前Hash对象数组
-    int32                m_nCount;       //当前Hash数组个数
-    int32                m_nUsedCount;   //当前已使用的Hash对象
-    int32                m_nCurrIndex;   //已经运行到的当前Hash数组位置
-    short                m_sKeyLen;      //当前key的长度
+    char*                m_pBase      = NULL;               //当前内存起始位置
+    _Hash_Table_Cell<T>* m_lpTable    = NULL;               //当前Hash对象数组
+    int32                m_nCount     = 0;                  //当前Hash数组个数
+    int32                m_nUsedCount = 0;                  //当前已使用的Hash对象
+    int32                m_nCurrIndex = 0;                  //已经运行到的当前Hash数组位置
+    short                m_sKeyLen    = DEF_HASH_KEY_SIZE;  //当前key的长度
 };
 
 //HashTable链表类
@@ -292,11 +274,6 @@ class CHashLinkPool
 public:
     CHashLinkPool()
     {
-        m_pBase      = NULL;
-        m_lpTable    = NULL;
-        m_nCount     = 0;
-        m_nUsedCount = 0;
-        m_nCurrIndex = 0;
     }
 
     ~CHashLinkPool()
@@ -429,11 +406,11 @@ public:
     }
 
 private:
-    char*                m_pBase;        //当前内存起始位置
-    _Hash_Link_Info<T>*  m_lpTable;      //当前Hash对象数组
-    int32                m_nCount;       //当前Hash数组个数
-    int32                m_nUsedCount;   //当前已使用的Hash对象
-    int32                m_nCurrIndex;   //已经运行到的当前Hash数组位置
+    char*                m_pBase      = NULL;    //当前内存起始位置
+    _Hash_Link_Info<T>*  m_lpTable    = NULL;    //当前Hash对象数组
+    int32                m_nCount     = 0;       //当前Hash数组个数
+    int32                m_nUsedCount = 0;       //当前已使用的Hash对象
+    int32                m_nCurrIndex = 0;       //已经运行到的当前Hash数组位置
 };
 
 //hashTable类
@@ -443,11 +420,6 @@ class CHashTable
 public:
     CHashTable()
     {
-        m_pBase          = NULL;
-        m_lpTable        = NULL;
-        m_cIsDelete      = 0;
-        m_nCurrLinkIndex = 0;
-        m_emHashDebug    = HASH_DEBUG_OFF; //默认DEBUG是关闭。
     }
 
     ~CHashTable()
@@ -1484,13 +1456,13 @@ private:
     }
 
 private:
-    CHashPool<T>         m_objHashPool;      //Hash对象池
-    CHashLinkPool<T>     m_objHashLinkPool;  //Hash链表对象池
-    _Hash_Link_Info<T>** m_lpTable;          //当前Hash对象数组
-    int32                m_nCurrLinkIndex;   //当前链表位置
-    char*                m_pBase;            //内存块的基础地址
-    char                 m_cIsDelete;        //当前类析构的时候是否回收内存，0是回收，1是不回收。
-    EM_HASH_DEBUG        m_emHashDebug;  //是否开启DEBUG开关
+    CHashPool<T>         m_objHashPool;                        //Hash对象池
+    CHashLinkPool<T>     m_objHashLinkPool;                    //Hash链表对象池
+    _Hash_Link_Info<T>** m_lpTable          = NULL;            //当前Hash对象数组
+    int32                m_nCurrLinkIndex   = 0 ;              //当前链表位置
+    char* m_pBase                           = NULL;            //内存块的基础地址
+    char                 m_cIsDelete        = 0;               //当前类析构的时候是否回收内存，0是回收，1是不回收。
+    EM_HASH_DEBUG        m_emHashDebug      = HASH_DEBUG_OFF;  //是否开启DEBUG开关
 };
 
 

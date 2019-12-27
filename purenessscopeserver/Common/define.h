@@ -667,11 +667,11 @@ enum FILE_TEST_RESULT
 
 typedef struct FILETESTRESULTINFO
 {
-    int32 n4Result;                   //启动测试结果信息
-    int32 n4TimeInterval;             //启动测试时间间隔
-    int32 n4ProNum;                   //启动测试协议条数
-    int32 n4ConnectNum;               //模拟连接数
-    vector<string> vecProFileDesc;  //协议文件描述
+    int32 n4Result        = -1;            //启动测试结果信息
+    int32 n4TimeInterval  = 0;             //启动测试时间间隔
+    int32 n4ProNum        = 0;             //启动测试协议条数
+    int32 n4ConnectNum    = 0;             //模拟连接数
+    vector<string> vecProFileDesc;         //协议文件描述
 
     FILETESTRESULTINFO(const FILETESTRESULTINFO& ar)
     {
@@ -685,11 +685,6 @@ typedef struct FILETESTRESULTINFO
 
     FILETESTRESULTINFO()
     {
-        n4Result = -1;
-        n4TimeInterval = 0;
-        n4ProNum = 0;
-        n4ConnectNum = 0;
-        vecProFileDesc.clear();
     }
 
     ~FILETESTRESULTINFO()
@@ -715,56 +710,47 @@ typedef struct FILETESTRESULTINFO
 //对象创建信息
 struct _Object_Create_Info
 {
-    char   m_szCreateFileName[MAX_BUFF_100];   //声明文件
-    uint32 m_u4Line;                           //声明行数位置
-    uint32 m_u4Count;                          //对象个数
+    char   m_szCreateFileName[MAX_BUFF_100] = {'\0'};   //声明文件
+    uint32 m_u4Line                         = 0;        //声明行数位置
+    uint32 m_u4Count                        = 0;        //对象个数
 
     _Object_Create_Info()
     {
-        m_szCreateFileName[0] = '\0';
-        m_u4Line = 0;
-        m_u4Count = 0;
     }
 };
 
 //客户端连接活跃信息
 struct _Connect_Chart_Info
 {
-    uint32 m_n4ConnectCount;        //当前活跃连接数
-    uint32 m_u4LastConnectCount;    //之前一分钟的连接建立数
+    uint32 m_n4ConnectCount       = 0;        //当前活跃连接数
+    uint32 m_u4LastConnectCount   = 0;    //之前一分钟的连接建立数
     ACE_Time_Value m_tvConnectTime; //收集数据的时间
 
     _Connect_Chart_Info()
     {
-        m_n4ConnectCount     = 0;
-        m_u4LastConnectCount = 0;
     }
 };
 
 //指定命令信息
 struct _Command_Chart_Info
 {
-    uint16 m_u2CommandID;               //命令ID
-    uint32 m_u4CommandCount;            //单位时间数
-    ACE_Time_Value m_tvCommandTime;     //手机数据的时间
+    uint16 m_u2CommandID    = 0;            //命令ID
+    uint32 m_u4CommandCount = 0;            //单位时间数
+    ACE_Time_Value m_tvCommandTime;         //手机数据的时间
 
     _Command_Chart_Info()
     {
-        m_u2CommandID    = 0;
-        m_u4CommandCount = 0;
     }
 };
 
 //文件测试数据信息
 typedef struct FILETESTDATAINFO
 {
-    char                    m_szData[MAX_BUFF_10240];        //当前缓冲中数据的长度
-    uint32                  m_u4DataLength;                  //当前缓冲块中的数据长度
+    char                    m_szData[MAX_BUFF_10240] = {'\0'};        //当前缓冲中数据的长度
+    uint32                  m_u4DataLength           = 0;             //当前缓冲块中的数据长度
 
     FILETESTDATAINFO()
     {
-        ACE_OS::memset(m_szData, 0, MAX_BUFF_10240);
-        m_u4DataLength = 0;
     }
 
     FILETESTDATAINFO(const FILETESTDATAINFO& ar)
@@ -812,19 +798,16 @@ enum VCHARS_TYPE
 #ifndef VCHARS_STR
 typedef  struct _VCHARS_STR
 {
-    char*       text;            //数据指针
-    bool        blCopy;          //是否拷贝数据块，True是拷贝，默认是拷贝
-    bool        blNew;           //是否是new出来的数据
-    uint8       u1Len;           //数据长度
-    VCHARS_TYPE type;            //类型，类型定义见VCHARS_TYPE
+    char*       text    = NULL;             //数据指针
+    bool        blCopy  = true;             //是否拷贝数据块，True是拷贝，默认是拷贝
+    bool        blNew   = false;            //是否是new出来的数据
+    uint8       u1Len   = 0;                //数据长度
+    VCHARS_TYPE type    = VCHARS_TYPE_TEXT; //类型，类型定义见VCHARS_TYPE
 
     _VCHARS_STR(bool blIsCopy = true, VCHARS_TYPE ntype = VCHARS_TYPE_TEXT)
     {
-        text   = NULL;
-        u1Len  = 0;
-        blCopy = blIsCopy;
-        type   = ntype;
-        blNew  = false;
+		blCopy = blIsCopy;
+		type = ntype;
     }
 
     ~_VCHARS_STR()
@@ -891,19 +874,16 @@ typedef  struct _VCHARS_STR
 #ifndef VCHARM_STR
 typedef  struct _VCHARM_STR
 {
-    char*       text;            //数据指针
-    uint16      u2Len;           //数据长度
-    bool        blCopy;          //是否拷贝数据块，True是拷贝，默认是拷贝
-    bool        blNew;           //是否是new出来的数据
-    VCHARS_TYPE type;            //类型，类型定义见VCHARS_TYPE
+    char*       text   = NULL;             //数据指针
+    uint16      u2Len  = 0;                //数据长度
+    bool        blCopy = true;             //是否拷贝数据块，True是拷贝，默认是拷贝
+    bool        blNew  = false;            //是否是new出来的数据
+    VCHARS_TYPE type   = VCHARS_TYPE_TEXT; //类型，类型定义见VCHARS_TYPE
 
     _VCHARM_STR(bool blIsCopy = true, VCHARS_TYPE ntype = VCHARS_TYPE_TEXT)
     {
-        text   = NULL;
-        u2Len  = 0;
         blCopy = blIsCopy;
         type   = ntype;
-        blNew  = false;
     }
 
     ~_VCHARM_STR()
@@ -970,19 +950,16 @@ typedef  struct _VCHARM_STR
 #ifndef VCHARB_STR
 typedef  struct _VCHARB_STR
 {
-    char*       text;            //数据指针
-    uint32      u4Len;           //数据长度
-    bool        blCopy;          //是否拷贝数据块，True是拷贝，默认是拷贝
-    bool        blNew;           //是否是new出来的数据
-    VCHARS_TYPE type;            //类型，类型定义见VCHARS_TYPE
+    char*       text   = NULL;               //数据指针
+    uint32      u4Len  = 0;                  //数据长度
+    bool        blCopy = true;               //是否拷贝数据块，True是拷贝，默认是拷贝
+    bool        blNew  = false;              //是否是new出来的数据
+    VCHARS_TYPE type   = VCHARS_TYPE_TEXT;   //类型，类型定义见VCHARS_TYPE
 
     _VCHARB_STR(bool blIsCopy = true, VCHARS_TYPE ntype = VCHARS_TYPE_TEXT)
     {
-        text   = NULL;
-        u4Len  = 0;
         blCopy = blIsCopy;
         type   = ntype;
-        blNew  = false;
     }
 
     ~_VCHARB_STR()
@@ -1055,88 +1032,61 @@ typedef  struct _VCHARB_STR
 //数据包头结构
 struct _Head_Info
 {
-    uint32             m_u4HeadSrcLen;       //原始数据包头长（解析前）
-    uint32             m_u4HeadCurrLen;      //当前数据包长 （解析后）
-    uint32             m_u4BodySrcLen;       //当前包体长度（解析前）
-    uint16             m_u2PacketCommandID;  //CommandID
-    ACE_Message_Block* m_pmbHead;            //包头消息体
+    uint32             m_u4HeadSrcLen      = 0;       //原始数据包头长（解析前）
+    uint32             m_u4HeadCurrLen     = 0;       //当前数据包长 （解析后）
+    uint32             m_u4BodySrcLen      = 0;       //当前包体长度（解析前）
+    uint16             m_u2PacketCommandID = 0;       //CommandID
+    ACE_Message_Block* m_pmbHead           = NULL;    //包头消息体
 
     _Head_Info()
     {
-        m_u4HeadSrcLen      = 0;
-        m_u4HeadCurrLen     = 0;
-        m_u4BodySrcLen      = 0;
-        m_u2PacketCommandID = 0;
-        m_pmbHead           = NULL;
     }
 };
 
 //数据包体结构
 struct _Body_Info
 {
-    uint32             m_u4BodySrcLen;       //原始数据包体长（解析前）
-    uint32             m_u4BodyCurrLen;      //当前数据包长 （解析后）
-    uint16             m_u2PacketCommandID;  //CommandID(如果有，则直接赋值，如果没有，则保持初始值不变)
-    ACE_Message_Block* m_pmbBody;            //包头消息体
+    uint32             m_u4BodySrcLen      = 0;       //原始数据包体长（解析前）
+    uint32             m_u4BodyCurrLen     = 0;       //当前数据包长 （解析后）
+    uint16             m_u2PacketCommandID = 0;       //CommandID(如果有，则直接赋值，如果没有，则保持初始值不变)
+    ACE_Message_Block* m_pmbBody           = NULL;    //包头消息体
 
     _Body_Info()
     {
-        m_u4BodySrcLen      = 0;
-        m_u4BodyCurrLen     = 0;
-        m_u2PacketCommandID = 0;
-        m_pmbBody           = NULL;
     }
 };
 
 //数据包完整结构
 struct _Packet_Info
 {
-    uint32             m_u4HeadSrcLen;       //原始数据包头长（解析前）
-    uint32             m_u4HeadCurrLen;      //当前数据包长 （解析后）
-    uint32             m_u4BodySrcLen;       //原始数据包头长（解析前）
-    uint32             m_u4BodyCurrLen;      //当前数据包长 （解析后）
-    uint16             m_u2PacketCommandID;  //CommandID
-    ACE_Message_Block* m_pmbHead;            //包头消息体
-    ACE_Message_Block* m_pmbBody;            //包头消息体
+    uint32             m_u4HeadSrcLen      = 0;       //原始数据包头长（解析前）
+    uint32             m_u4HeadCurrLen     = 0;       //当前数据包长 （解析后）
+    uint32             m_u4BodySrcLen      = 0;       //原始数据包头长（解析前）
+    uint32             m_u4BodyCurrLen     = 0;       //当前数据包长 （解析后）
+    uint16             m_u2PacketCommandID = 0;       //CommandID
+    ACE_Message_Block* m_pmbHead           = NULL;    //包头消息体
+    ACE_Message_Block* m_pmbBody           = NULL;    //包头消息体
 
     _Packet_Info()
     {
-        m_u4HeadSrcLen      = 0;
-        m_u4HeadCurrLen     = 0;
-        m_u2PacketCommandID = 0;
-        m_pmbHead           = NULL;
-
-        m_u4BodySrcLen      = 0;
-        m_u4BodyCurrLen     = 0;
-        m_pmbBody           = NULL;
     }
 };
 
 //定时监控数据包和流量的数据信息，用于链接有效性的逻辑判定
 struct _TimeConnectInfo
 {
-    uint32 m_u4RecvPacketCount;       //当前接收包数量
-    uint32 m_u4RecvSize;              //当前接收数据量
-    uint32 m_u4SendPacketCount;       //当前发送包数量
-    uint32 m_u4SendSize;              //当前发送数据量
-    uint32 m_u4ValidRecvPacketCount;  //单位时间可允许接收数据包的上限
-    uint32 m_u4ValidRecvSize;         //单位时间可允许的数据接收量
-    uint32 m_u4ValidSendPacketCount;  //单位时间可允许数据数据包的上限
-    uint32 m_u4ValidSendSize;         //单位时间可允许的数据发送量
-    uint8  m_u1Minutes;               //当前的分钟数
+    uint32 m_u4RecvPacketCount      = 0;         //当前接收包数量
+    uint32 m_u4RecvSize             = 0;         //当前接收数据量
+    uint32 m_u4SendPacketCount      = 0;         //当前发送包数量
+    uint32 m_u4SendSize             = 0;         //当前发送数据量
+    uint32 m_u4ValidRecvPacketCount = 0;         //单位时间可允许接收数据包的上限
+    uint32 m_u4ValidRecvSize        = 0;         //单位时间可允许的数据接收量
+    uint32 m_u4ValidSendPacketCount = 0;         //单位时间可允许数据数据包的上限
+    uint32 m_u4ValidSendSize        = 0;         //单位时间可允许的数据发送量
+    uint8  m_u1Minutes              = 0;         //当前的分钟数
 
     _TimeConnectInfo()
     {
-        m_u1Minutes              = 0;
-        m_u4RecvPacketCount      = 0;
-        m_u4RecvSize             = 0;
-        m_u4SendPacketCount      = 0;
-        m_u4SendSize             = 0;
-
-        m_u4ValidRecvPacketCount = 0;
-        m_u4ValidRecvSize        = 0;
-        m_u4ValidSendPacketCount = 0;
-        m_u4ValidSendSize        = 0;
     }
 
     void Init(uint32 u4RecvPacketCount, uint32 u4RecvSize, uint32 u4SendPacketCount, uint32 u4ValidSendSize)
@@ -1227,56 +1177,42 @@ struct _TimeConnectInfo
 //定时器参数的设置结构
 struct _TimerCheckID
 {
-    uint16 m_u2TimerCheckID;
+    uint16 m_u2TimerCheckID = 0;
 
     _TimerCheckID()
     {
-        m_u2TimerCheckID = 0;
     }
 };
 
 //Message里面数据块结构体
 struct _PacketInfo
 {
-    char*   m_pData;            //解析后的数据头指针
-    int32   m_nDataLen;         //解析后的数据长度
+    char*   m_pData    = NULL;       //解析后的数据头指针
+    int32   m_nDataLen = 0;          //解析后的数据长度
 
     _PacketInfo()
     {
-        m_pData       = NULL;
-        m_nDataLen    = 0;
     }
 };
 
 //客户端链接信息数据结构
 struct _ClientConnectInfo
 {
-    uint64        m_u8RecvQueueTimeCost;  //接受逻辑处理包总时间消耗
-    uint64        m_u8SendQueueTimeCost;  //发送数据总时间消耗
-    uint32        m_u4ConnectID;          //链接ID
-    uint32        m_u4RecvCount;          //接收包数量
-    uint32        m_u4SendCount;          //发送包数量
-    uint32        m_u4AllRecvSize;        //接收字节数
-    uint32        m_u4AllSendSize;        //发送字节数
-    uint32        m_u4BeginTime;          //链接建立时间
-    uint32        m_u4AliveTime;          //存活时间秒数
-    uint32        m_u4RecvQueueCount;     //接受逻辑处理包的个数
-    bool          m_blValid;              //当前链接是否有效
-    ACE_INET_Addr m_addrRemote;           //远程链接地址
+    uint64        m_u8RecvQueueTimeCost = 0;     //接受逻辑处理包总时间消耗
+    uint64        m_u8SendQueueTimeCost = 0;     //发送数据总时间消耗
+    uint32        m_u4ConnectID         = 0;     //链接ID
+    uint32        m_u4RecvCount         = 0;     //接收包数量
+    uint32        m_u4SendCount         = 0;     //发送包数量
+    uint32        m_u4AllRecvSize       = 0;     //接收字节数
+    uint32        m_u4AllSendSize       = 0;     //发送字节数
+    uint32        m_u4BeginTime         = 0;     //链接建立时间
+    uint32        m_u4AliveTime         = 0;     //存活时间秒数
+    uint32        m_u4RecvQueueCount    = 0;     //接受逻辑处理包的个数
+    bool          m_blValid             = false; //当前链接是否有效
+    ACE_INET_Addr m_addrRemote;                  //远程链接地址
 
     _ClientConnectInfo()
     {
-        m_blValid             = false;
-        m_u4ConnectID         = 0;
-        m_u4RecvCount         = 0;
-        m_u4SendCount         = 0;
-        m_u4AllRecvSize       = 0;
-        m_u4AllSendSize       = 0;
-        m_u4BeginTime         = 0;
-        m_u4AliveTime         = 0;
-        m_u4RecvQueueCount    = 0;
-        m_u8RecvQueueTimeCost = 0;
-        m_u8SendQueueTimeCost = 0;
     }
 
     //拷贝构造函数
@@ -1318,19 +1254,15 @@ typedef vector<_ClientConnectInfo> vecClientConnectInfo;
 //要连接的服务器信息
 struct _ServerConnectInfo
 {
-    uint32      m_u4ServerID;     //服务器的ID
-    uint32      m_u4ServerPort;   //服务器的端口
-    uint32      m_u4MaxConn;      //服务器的最大线程连接数
-    uint32      m_u4TimeOut;      //服务器的链接超时时间
-    ACE_TString m_strServerName;  //服务器的名称
-    ACE_TString m_strServerIP;    //服务器的IP
+    uint32      m_u4ServerID   = 0;     //服务器的ID
+    uint32      m_u4ServerPort = 0;     //服务器的端口
+    uint32      m_u4MaxConn    = 0;     //服务器的最大线程连接数
+    uint32      m_u4TimeOut    = 0;     //服务器的链接超时时间
+    ACE_TString m_strServerName;        //服务器的名称
+    ACE_TString m_strServerIP;          //服务器的IP
 
     _ServerConnectInfo()
     {
-        m_u4ServerID   = 0;
-        m_u4ServerPort = 0;
-        m_u4MaxConn    = 0;
-        m_u4TimeOut    = 0;
     }
 };
 
@@ -1390,8 +1322,6 @@ class CTimeCost
 public:
     CTimeCost(unsigned int nMillionSecond, const char* pFunctionName, const char* pFileName, int32 nLine)
     {
-        m_lBegin         = 0;
-        m_lEnd           = 0;
         m_nMillionSecond = nMillionSecond;
         sprintf_safe(m_szFunctionName, MAX_BUFF_100, "%s", pFunctionName);
         sprintf_safe(m_szFileName, MAX_BUFF_300, "%s", pFileName);
@@ -1465,12 +1395,12 @@ private:
     }
 
 private:
-    int64       m_lBegin;
-    int64       m_lEnd;
-    int32        m_nFileLine;
-    uint32       m_nMillionSecond;
-    char         m_szFunctionName[MAX_BUFF_100];
-    char         m_szFileName[MAX_BUFF_300];
+    int64        m_lBegin                       = 0;
+    int64        m_lEnd                         = 0;
+    int32        m_nFileLine                    = 0;
+    uint32       m_nMillionSecond               = 0;
+    char         m_szFunctionName[MAX_BUFF_100] = {'\0'};
+    char         m_szFileName[MAX_BUFF_300]     = { '\0' };
 };
 
 #define __TIMECOST(cost) CTimeCost timecost(cost, __FUNCTION__, __FILE__, __LINE__);
@@ -1675,13 +1605,11 @@ inline int32 SeeLock(int32 fd, int32 start, int32 len)
 //客户端IP信息
 struct _ClientIPInfo
 {
-    char  m_szClientIP[MAX_BUFF_50];   //客户端的IP地址
-    int32 m_nPort;                     //客户端的端口
+    char  m_szClientIP[MAX_BUFF_50] = {'\0'};   //客户端的IP地址
+    int32 m_nPort                   = 0;        //客户端的端口
 
     _ClientIPInfo()
     {
-        m_szClientIP[0] = '\0';
-        m_nPort         = 0;
     }
 
     //拷贝构造函数
@@ -1702,19 +1630,14 @@ struct _ClientIPInfo
 //链接别名映射信息(用于PSS_ClientManager管理)
 struct _ClientNameInfo
 {
-    int32  m_nPort;                     //客户端的端口
-    int32  m_nConnectID;                //连接ID
-    int32  m_nLog;                      //是否记录日志
-    char   m_szName[MAX_BUFF_100];      //连接别名
-    char   m_szClientIP[MAX_BUFF_50];   //客户端的IP地址
+    int32  m_nPort                   = 0;           //客户端的端口
+    int32  m_nConnectID              = 0;           //连接ID
+    int32  m_nLog                    = 0;           //是否记录日志
+    char   m_szName[MAX_BUFF_100]    = {'\0'};      //连接别名
+    char   m_szClientIP[MAX_BUFF_50] = {'\0'};      //客户端的IP地址
 
     _ClientNameInfo()
     {
-        m_szName[0]     = '\0';
-        m_szClientIP[0] = '\0';
-        m_nPort         = 0;
-        m_nConnectID    = 0;
-        m_nLog          = 0;
     }
 
     //拷贝构造函数

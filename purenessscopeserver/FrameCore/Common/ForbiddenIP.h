@@ -18,19 +18,14 @@ const uint16 MAX_IP_SIZE = 50;
 class _ForbiddenIP
 {
 public:
-    uint32         m_u4Second;                  //禁止的秒数
-    uint8          m_u1ConnectType;             //链接的类型，0为TCP，1为UDP
-    uint8          m_u1Type;                    //禁止的类型，0为永久禁止，1为时段禁止。
-    char           m_szClientIP[MAX_IP_SIZE];   //被禁止的IP
-    ACE_Time_Value m_tvBegin;                   //时段禁止开始时间
+    uint32         m_u4Second                = 0;                      //禁止的秒数
+    uint8          m_u1ConnectType           = CONNECT_TCP;            //链接的类型，0为TCP，1为UDP
+    uint8          m_u1Type                  = 0;                      //禁止的类型，0为永久禁止，1为时段禁止。
+    char           m_szClientIP[MAX_IP_SIZE] = {'\0'};                 //被禁止的IP
+    ACE_Time_Value m_tvBegin                 = ACE_OS::gettimeofday(); //时段禁止开始时间
 
     _ForbiddenIP()
     {
-        m_szClientIP[0] = '\0';
-        m_u1Type        = 0;
-        m_u4Second      = 0;
-        m_u1ConnectType = CONNECT_TCP;            //默认为TCP包
-        m_tvBegin       = ACE_OS::gettimeofday(); //默认开始时间为当前时间
     }
 };
 

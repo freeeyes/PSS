@@ -93,16 +93,16 @@ public:
     virtual CBuffPacket& operator << (string& str);
 
 private:
-    char*                      m_szData;                       //数据指针
-    uint32                     m_u4ReadPtr;                    //读包的位置
-    uint32                     m_u4WritePtr;                   //写包的位置
-    uint32                     m_u4PacketLen;                  //包总长度
-    uint32                     m_u4PacketCount;                //当前数据包的个数
-    uint32                     m_u4MaxPacketSize;              //最大当前BuffPacket的容量
-    uint32                     m_u4BuffID;                     //Buffer对象名字，用于核对内存池数据使用，寻找内存泄露。
-    int32                      m_nHashID;                      //记录当前对象在Hash数组中的位置
-    bool                       m_blNetSort;                    //字节序开启开关，false为不转换为主机字节序，true为转换为主机字节序
-    char                       m_szError[MAX_BUFF_500];        //错误信息
+    char*                      m_szData          = NULL;                //数据指针
+    uint32                     m_u4ReadPtr       = 0;                   //读包的位置
+    uint32                     m_u4WritePtr      = 0;                   //写包的位置
+    uint32                     m_u4PacketLen     = 0 ;                  //包总长度
+    uint32                     m_u4PacketCount   = 0;                   //当前数据包的个数
+    uint32                     m_u4MaxPacketSize = 0;                   //最大当前BuffPacket的容量
+    uint32                     m_u4BuffID        = 0;                   //Buffer对象名字，用于核对内存池数据使用，寻找内存泄露。
+    int32                      m_nHashID         = 0;                   //记录当前对象在Hash数组中的位置
+    bool                       m_blNetSort       = 0;                   //字节序开启开关，false为不转换为主机字节序，true为转换为主机字节序
+    char                       m_szError[MAX_BUFF_500] = {'\0'};        //错误信息
 
 public:
     void* operator new(size_t stSize)
