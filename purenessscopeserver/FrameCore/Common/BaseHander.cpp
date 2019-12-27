@@ -9,7 +9,7 @@ void Recovery_Message(bool blDelete, char*& pMessage)
 }
 
 bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param, char*& pMessage,
-                             ACE_Message_Block*& pMbData, ACE_SOCK_Dgram& skRemote)
+                             ACE_Message_Block*& pMbData, const ACE_SOCK_Dgram& skRemote)
 {
     ACE_INET_Addr AddrRemote;
     int nErr = AddrRemote.set(obj_Send_Message_Param.m_nPort, obj_Send_Message_Param.m_pIP);
@@ -199,7 +199,7 @@ uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPa
     return n1Ret;
 }
 
-void Send_MakePacket_Queue(uint32 u4ConnectID, uint32 u4PacketParseID, CPacketParse* pPacketParse, uint8 u1Option, ACE_INET_Addr& addrRemote, const char* pLocalIP, uint32 u4LocalPort, EM_CONNECT_IO_TYPE emIOType)
+void Send_MakePacket_Queue(uint32 u4ConnectID, uint32 u4PacketParseID, CPacketParse* pPacketParse, uint8 u1Option, const ACE_INET_Addr addrRemote, const char* pLocalIP, uint32 u4LocalPort, EM_CONNECT_IO_TYPE emIOType)
 {
     //需要回调发送成功回执
     _MakePacket objMakePacket;
@@ -248,7 +248,7 @@ bool Tcp_Common_File_Message(_File_Message_Param const& obj_File_Message_Param, 
         u4DebugSize = (int)pBuffPacket->GetPacketLen();
     }
 
-    char* pData = (char*)pBuffPacket->GetData();
+    char* pData = pBuffPacket->GetData();
 
     for (uint32 i = 0; i < u4DebugSize; i++)
     {

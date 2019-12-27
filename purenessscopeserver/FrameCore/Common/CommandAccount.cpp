@@ -41,7 +41,7 @@ void CCommandAccount::Close()
     vector<_CommandData*> vecCommandData;
     m_objCommandDataList.Get_All_Used(vecCommandData);
 
-    for(_CommandData* pCommandData : vecCommandData)
+    for(const _CommandData* pCommandData : vecCommandData)
     {
         SAFE_DELETE(pCommandData);
     }
@@ -50,7 +50,7 @@ void CCommandAccount::Close()
     for (ACE_Hash_Map<uint32, _Port_Data_Account*>::iterator iter = m_objectPortAccount.begin();
          iter != m_objectPortAccount.end(); iter++)
     {
-        _Port_Data_Account* p_Port_Data_Account = (*iter).int_id_;
+        const _Port_Data_Account* p_Port_Data_Account = (*iter).int_id_;
         SAFE_DELETE(p_Port_Data_Account);
     }
 

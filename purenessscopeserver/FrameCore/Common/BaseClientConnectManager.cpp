@@ -1,6 +1,6 @@
 #include "BaseClientConnectManager.h"
 
-void Common_Send_ConnectError(ACE_Message_Block* pmblk, ACE_INET_Addr& objAddrServer, IClientMessage* pClientMessage)
+void Common_Send_ConnectError(ACE_Message_Block* pmblk, const ACE_INET_Addr objAddrServer, IClientMessage* pClientMessage)
 {
     if (NULL != pmblk)
     {

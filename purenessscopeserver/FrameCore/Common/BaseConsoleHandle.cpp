@@ -69,7 +69,7 @@ bool check_console_ip(const char* pConsoleIP)
         return true;
     }
 
-    for (auto& objConsoleClient : GetXmlConfigAttribute(xmlConsoleClients)->vec)
+    for (const auto& objConsoleClient : GetXmlConfigAttribute(xmlConsoleClients)->vec)
     {
         if (ACE_OS::strcmp(objConsoleClient.cip.c_str(), pConsoleIP) == 0)
         {
