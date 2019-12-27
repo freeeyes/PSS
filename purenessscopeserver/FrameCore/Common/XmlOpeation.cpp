@@ -3,7 +3,6 @@
 CXmlOpeation::CXmlOpeation(void)
 {
     m_pTiXmlDocument = std::make_shared<TiXmlDocument>();
-    m_pRootElement   = NULL;
 }
 
 bool CXmlOpeation::Init(const char* pFileName)
@@ -217,7 +216,7 @@ const char* CXmlOpeation::GetData(const char* pName, const char* pAttrName)
         return NULL;
     }
 
-    TiXmlElement* pTiXmlElement = m_pRootElement->FirstChildElement(pName);
+    const TiXmlElement* pTiXmlElement = m_pRootElement->FirstChildElement(pName);
 
     if(NULL != pTiXmlElement)
     {

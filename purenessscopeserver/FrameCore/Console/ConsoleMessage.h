@@ -9,7 +9,7 @@ class CConsoleMessage
 public:
     CConsoleMessage();
 
-    int Dispose(ACE_Message_Block* pmb, IBuffPacket* pBuffPacket, uint8& u1OutputType);     //要处理的命令字解析, pBuffPacket为返回要发送给客户端的数据
+    int Dispose(const ACE_Message_Block* pmb, IBuffPacket* pBuffPacket, uint8& u1OutputType);     //要处理的命令字解析, pBuffPacket为返回要发送给客户端的数据
     int ParsePlugInCommand(const char* pCommand, IBuffPacket* pBuffPacket);                 //执行命令
 
     void Close();                                                                           //关闭回收
@@ -30,7 +30,7 @@ private:
     CConsolePromissions m_objConsolePromissions;
 
     //定义统一的函数指针模板
-    typedef void(*DoMessage_Logic)(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
+    typedef void(*DoMessage_Logic)(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);
     typedef ACE_Hash_Map<string, DoMessage_Logic> mapMessageList;
     mapMessageList      m_objHashMessageLogicList;             //处理函数Hash列表
 };

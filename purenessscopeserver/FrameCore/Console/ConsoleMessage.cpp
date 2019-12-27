@@ -61,7 +61,7 @@ int CConsoleMessage::Init()
     return 0;
 }
 
-int CConsoleMessage::Dispose(ACE_Message_Block* pmb, IBuffPacket* pBuffPacket, uint8& u1OutputType)
+int CConsoleMessage::Dispose(const ACE_Message_Block* pmb, IBuffPacket* pBuffPacket, uint8& u1OutputType)
 {
     //¥¶¿Ì√¸¡Ó
     if(NULL == pmb)

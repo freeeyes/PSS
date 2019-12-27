@@ -53,7 +53,7 @@ bool Udp_Common_Recv_Body(ACE_Message_Block* pMBBody, CPacketParse* pPacketParse
 bool Udp_Common_Recv_Stream(ACE_Message_Block* pMbData, CPacketParse* pPacketParse, uint32 u4PacketParseInfoID);
 
 //提交udp数据到工作线程
-bool Udp_Common_Send_WorkThread(CPacketParse*& pPacketParse, ACE_INET_Addr const& addrRemote, ACE_INET_Addr const& addrLocal, ACE_Time_Value& tvCheck);
+bool Udp_Common_Send_WorkThread(CPacketParse*& pPacketParse, const ACE_INET_Addr& addrRemote, const ACE_INET_Addr& addrLocal, const ACE_Time_Value& tvCheck);
 
 //清理数据缓冲
 void Recovery_Common_BuffPacket(bool blDelete, IBuffPacket* pBuffPacket);
@@ -66,7 +66,7 @@ uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPa
 
 //将数据发送入工作线程消息队列
 void Send_MakePacket_Queue(uint32 u4ConnectID, uint32 u4PacketParseID, CPacketParse* pPacketParse, uint8 u1Option,
-                           const ACE_INET_Addr addrRemote, const char* pLocalIP,
+                           const ACE_INET_Addr& addrRemote, const char* pLocalIP,
                            uint32 u4LocalPort, EM_CONNECT_IO_TYPE emIOType = CONNECT_IO_TCP);
 
 //File_Message的参数

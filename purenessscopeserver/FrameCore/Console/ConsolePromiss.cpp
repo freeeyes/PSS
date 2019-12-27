@@ -66,7 +66,7 @@ void CConsolePromissions::Close()
 
 int CConsolePromissions::Check_Promission(const char* pCommandName, const char* pUser)
 {
-    _Console_Command_Info* pConsole_Command_Info = m_objHashCommandList.Get_Hash_Box_Data(pCommandName);
+    const _Console_Command_Info* pConsole_Command_Info = m_objHashCommandList.Get_Hash_Box_Data(pCommandName);
 
     if (NULL == pConsole_Command_Info)
     {

@@ -63,12 +63,12 @@ public:
 
     bool Init();
 
-    bool PutMessageBlock(const _MakePacket* pMakePacket, const ACE_Time_Value tvNow);                                                     //处理消息数据包
-    bool PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, ACE_Time_Value& tvNow);                      //发送失败消息回调
+    bool PutMessageBlock(const _MakePacket* pMakePacket, const ACE_Time_Value& tvNow);                                                     //处理消息数据包
+    bool PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, const ACE_Time_Value& tvNow);                      //发送失败消息回调
 
 private:
-    void SetMessage(const _MakePacket* pMakePacket, CMessage* pMessage, const ACE_Time_Value tvNow);                                      //一般数据包消息
-    void SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, CMessage* pMessage, const ACE_Time_Value tvNow);  //服务发送失败回调数据包消息
+    void SetMessage(const _MakePacket* pMakePacket, CMessage* pMessage, const ACE_Time_Value& tvNow);                                      //一般数据包消息
+    void SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, CMessage* pMessage, const ACE_Time_Value& tvNow);  //服务发送失败回调数据包消息
 
     ACE_Recursive_Thread_Mutex     m_ThreadWriteLock;
 };

@@ -114,7 +114,7 @@ void Combo_Common_VecForbiddenIP(uint8 u1OutputType, VecForbiddenIP* pIPList, IB
     }
 }
 
-void DoMessage_LoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_LoadModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     _FileInfo FileInfo;
 
@@ -160,7 +160,7 @@ void DoMessage_LoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, u
     u2ReturnCommandID = CONSOLE_COMMAND_LOADMOUDLE;
 }
 
-void DoMessage_UnLoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_UnLoadModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (true == App_MessageManager::instance()->UnloadModuleCommand(CommandInfo.m_szCommandExp, (uint8)1, App_MessageServiceGroup::instance()->GetWorkThreadCount()) &&
         true == App_MessageServiceGroup::instance()->PutUpdateCommandMessage(App_MessageManager::instance()->GetUpdateIndex()))
@@ -175,7 +175,7 @@ void DoMessage_UnLoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket,
     u2ReturnCommandID = CONSOLE_COMMAND_UNLOADMOUDLE;
 }
 
-void DoMessage_ReLoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ReLoadModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (true == App_MessageManager::instance()->UnloadModuleCommand(CommandInfo.m_szCommandExp, (uint8)2, App_MessageServiceGroup::instance()->GetWorkThreadCount()) &&
         true == App_MessageServiceGroup::instance()->PutUpdateCommandMessage(App_MessageManager::instance()->GetUpdateIndex()))
@@ -208,7 +208,7 @@ void DoMessage_ReLoadModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket,
     u2ReturnCommandID = CONSOLE_COMMAND_RELOADMOUDLE;
 }
 
-void DoMessage_ClientMessageCount(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ClientMessageCount(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-c") == 0)
     {
@@ -292,7 +292,7 @@ void DoMessage_ClientMessageCount(_CommandInfo& CommandInfo, IBuffPacket* pBuffP
     u2ReturnCommandID = CONSOLE_COMMAND_CLIENTCOUNT;
 }
 
-void DoMessage_ShowModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ShowModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -381,7 +381,7 @@ void DoMessage_ShowModule(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, u
     }
 }
 
-void DoMessage_CommandInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_CommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     uint16 u2CommandID = (uint16)ACE_OS::strtol(CommandInfo.m_szCommandExp, NULL, 16);
 
@@ -467,7 +467,7 @@ void DoMessage_CommandInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, 
     }
 }
 
-void DoMessage_WorkThreadState(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_WorkThreadState(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-s") == 0)
     {
@@ -521,7 +521,7 @@ void DoMessage_WorkThreadState(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
     }
 }
 
-void DoMessage_ClientInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ClientInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -541,7 +541,7 @@ void DoMessage_ClientInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, u
     u2ReturnCommandID = CONSOLE_COMMAND_CLIENTINFO;
 }
 
-void DoMessage_CloseClient(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_CloseClient(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     uint32 u4ConnectID = (uint32)ACE_OS::atoi(CommandInfo.m_szCommandExp);
 #if PSS_PLATFORM == PLATFORM_WIN
@@ -577,7 +577,7 @@ void DoMessage_CloseClient(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, 
     u2ReturnCommandID = CONSOLE_COMMAND_COLSECLIENT;
 }
 
-void DoMessage_ForbiddenIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ForbiddenIP(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     _ForbiddenIP ForbiddenIP;
 
@@ -604,7 +604,7 @@ void DoMessage_ForbiddenIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, 
     u2ReturnCommandID = CONSOLE_COMMAND_FORBIDDENIP;
 }
 
-void DoMessage_ShowForbiddenList(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ShowForbiddenList(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -627,7 +627,7 @@ void DoMessage_ShowForbiddenList(_CommandInfo& CommandInfo, IBuffPacket* pBuffPa
     u2ReturnCommandID = CONSOLE_COMMAND_FORBIDDENIPSHOW;
 }
 
-void DoMessage_LifedIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_LifedIP(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     App_ForbiddenIP::instance()->DelForeverIP(CommandInfo.m_szCommandExp);
     App_ForbiddenIP::instance()->DelTempIP(CommandInfo.m_szCommandExp);
@@ -646,7 +646,7 @@ void DoMessage_LifedIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint
     u2ReturnCommandID = CONSOLE_COMMAND_LIFTED;
 }
 
-void DoMessage_UDPClientInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_UDPClientInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -666,7 +666,7 @@ void DoMessage_UDPClientInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket
     u2ReturnCommandID = CONSOLE_COMMAND_UDPCONNECTINFO;
 }
 
-void DoMessage_ServerConnectTCP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ServerConnectTCP(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -686,7 +686,7 @@ void DoMessage_ServerConnectTCP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPac
     u2ReturnCommandID = CONSOLE_COMMAND_SERVERCONNECT_TCP;
 }
 
-void DoMessage_ServerConnectUDP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ServerConnectUDP(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -706,7 +706,7 @@ void DoMessage_ServerConnectUDP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPac
     u2ReturnCommandID = CONSOLE_COMMAND_SERVERCONNECT_UDP;
 }
 
-void DoMessage_ShowProcessInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ShowProcessInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -787,7 +787,7 @@ void DoMessage_ShowProcessInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
     u2ReturnCommandID = CONSOLE_COMMAND_PROCESSINFO;
 }
 
-void DoMessage_ShowClientHisTory(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ShowClientHisTory(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -846,7 +846,7 @@ void DoMessage_ShowClientHisTory(_CommandInfo& CommandInfo, IBuffPacket* pBuffPa
     u2ReturnCommandID = CONSOLE_COMMAND_CLIENTHISTORY;
 }
 
-void DoMessage_ShowAllCommandInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ShowAllCommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -917,7 +917,7 @@ void DoMessage_ShowAllCommandInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffP
     u2ReturnCommandID = CONSOLE_COMMAND_ALLCOMMANDINFO;
 }
 
-void DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ShowServerInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -1002,7 +1002,7 @@ void DoMessage_ShowServerInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
     u2ReturnCommandID = CONSOLE_COMMAND_SERVERINFO;
 }
 
-void DoMessage_ReConnectServer(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ReConnectServer(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     int nSerevrID = 0;
 
@@ -1027,7 +1027,7 @@ void DoMessage_ReConnectServer(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
     u2ReturnCommandID = CONSOLE_COMMAND_SERVERRECONNECT;
 }
 
-void DoMessage_CommandTimeout(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_CommandTimeout(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -1048,7 +1048,7 @@ void DoMessage_CommandTimeout(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
     u2ReturnCommandID = CONSOLE_COMMAND_COMMANDTIMEOUT;
 }
 
-void DoMessage_CommandTimeoutclr(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_CommandTimeoutclr(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -1067,7 +1067,7 @@ void DoMessage_CommandTimeoutclr(_CommandInfo& CommandInfo, IBuffPacket* pBuffPa
     u2ReturnCommandID = CONSOLE_COMMAND_COMMANDTIMEOUTCLR;
 }
 
-void DoMessage_CommandDataLog(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_CommandDataLog(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -1090,7 +1090,7 @@ void DoMessage_CommandDataLog(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
     u2ReturnCommandID = CONSOLE_COMMAND_COMMANDDATALOG;
 }
 
-void DoMessage_SetDebug(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_SetDebug(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     uint8 u1Debug = 0;
 
@@ -1120,7 +1120,7 @@ void DoMessage_SetDebug(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uin
     u2ReturnCommandID = CONSOLE_COMMAND_SETDEBUG;
 }
 
-void DoMessage_ShowDebug(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ShowDebug(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -1142,7 +1142,7 @@ void DoMessage_ShowDebug(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, ui
     u2ReturnCommandID = CONSOLE_COMMAND_SHOWDEBUG;
 }
 
-void DoMessage_SetTrackIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_SetTrackIP(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     _DyeIPInfo objDyeIPInfo;
 
@@ -1159,7 +1159,7 @@ void DoMessage_SetTrackIP(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, u
     u2ReturnCommandID = CONSOLE_COMMAND_SETTRACKIP;
 }
 
-void DoMessage_SetTraceCommand(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_SetTraceCommand(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     _DyeCommandInfo objDyeCommandInfo;
 
@@ -1184,7 +1184,7 @@ void DoMessage_SetTraceCommand(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
     u2ReturnCommandID = CONSOLE_COMMAND_SETTRACECOMMAND;
 }
 
-void DoMessage_GetTrackCommand(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_GetTrackCommand(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     vec_Dyeing_Command_list objList;
 
@@ -1228,7 +1228,7 @@ void DoMessage_GetTrackCommand(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
     u2ReturnCommandID = CONSOLE_COMMAND_GETTRACKCOMMAND;
 }
 
-void DoMessage_GetConnectIPInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_GetConnectIPInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     int nConnectID = 0;
 
@@ -1281,7 +1281,7 @@ void DoMessage_GetConnectIPInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPac
     u2ReturnCommandID = CONSOLE_COMMAND_GETCONNECTIPINFO;
 }
 
-void DoMessage_GetLogLevelInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_GetLogLevelInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -1351,7 +1351,7 @@ void DoMessage_GetLogLevelInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
     u2ReturnCommandID = CONSOLE_COMMAND_GETLOGINFO;
 }
 
-void DoMessage_SetLogLevelInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_SetLogLevelInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     int nLogLevel = 1;
 
@@ -1374,7 +1374,7 @@ void DoMessage_SetLogLevelInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
     u2ReturnCommandID = CONSOLE_COMMAND_SETLOGLEVEL;
 }
 
-void DoMessage_GetThreadAI(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_GetThreadAI(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -1420,7 +1420,7 @@ void DoMessage_GetThreadAI(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, 
     u2ReturnCommandID = CONSOLE_COMMAND_GETWTAI;
 }
 
-void DoMessage_GetWorkThreadTO(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_GetWorkThreadTO(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -1500,7 +1500,7 @@ void DoMessage_GetWorkThreadTO(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
     u2ReturnCommandID = CONSOLE_COMMAND_GETWTTIMEOUT;
 }
 
-void DoMessage_SetWorkThreadAI(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_SetWorkThreadAI(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     int nAI = 0;
     int nDispose = 0;
@@ -1539,7 +1539,7 @@ void DoMessage_SetWorkThreadAI(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
     u2ReturnCommandID = CONSOLE_COMMAND_SETWTAI;
 }
 
-void DoMessage_GetNickNameInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_GetNickNameInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     char szNickName[MAX_BUFF_100] = { '\0' };
     vecClientNameInfo objClientNameInfo;
@@ -1599,7 +1599,7 @@ void DoMessage_GetNickNameInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPack
     u2ReturnCommandID = CONSOLE_COMMAND_GETNICKNAMEINFO;
 }
 
-void DoMessage_SetConnectLog(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_SetConnectLog(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     uint32 u4ConnectID = 0;
     bool blIsLog = false;
@@ -1627,7 +1627,7 @@ void DoMessage_SetConnectLog(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket
     u2ReturnCommandID = CONSOLE_COMMAND_SETCONNECTLOG;
 }
 
-void DoMessage_SetMaxConnectCount(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_SetMaxConnectCount(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     uint16 u2MaxConnectHandler = 0;
 
@@ -1650,7 +1650,7 @@ void DoMessage_SetMaxConnectCount(_CommandInfo& CommandInfo, IBuffPacket* pBuffP
     u2ReturnCommandID = CONSOLE_COMMAND_SETMAXCONNECTCOUNT;
 }
 
-void DoMessage_AddListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_AddListen(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     bool blState = false;
     _ListenInfo objListenInfo;
@@ -1682,7 +1682,7 @@ void DoMessage_AddListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, ui
     u2ReturnCommandID = CONSOLE_COMMAND_ADD_LISTEN;
 }
 
-void DoMessage_DelListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_DelListen(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     bool blState = false;
     _ListenInfo objListenInfo;
@@ -1710,7 +1710,7 @@ void DoMessage_DelListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, ui
     u2ReturnCommandID = CONSOLE_COMMAND_DEL_LISTEN;
 }
 
-void DoMessage_ShowListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ShowListen(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     uint32 u4ListenCount = 0;
 
@@ -1764,7 +1764,7 @@ void DoMessage_ShowListen(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, u
     u2ReturnCommandID = CONSOLE_COMMAND_SHOW_LISTEN;
 }
 
-void DoMessage_MonitorInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_MonitorInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -1828,7 +1828,7 @@ void DoMessage_MonitorInfo(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, 
     u2ReturnCommandID = CONSOLE_COMMAND_MONITOR_INFO;
 }
 
-void DoMessage_ServerClose(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ServerClose(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (NULL == pBuffPacket)
     {
@@ -1841,7 +1841,7 @@ void DoMessage_ServerClose(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, 
     ACE_UNUSED_ARG(u2ReturnCommandID);
 }
 
-void DoMessage_TestFileStart(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_TestFileStart(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     char szFileName[MAX_BUFF_200] = { '\0' };
 
@@ -1904,7 +1904,7 @@ void DoMessage_TestFileStart(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket
     }
 }
 
-void DoMessage_TestFileStop(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_TestFileStop(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -1924,7 +1924,7 @@ void DoMessage_TestFileStop(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket,
     }
 }
 
-void DoMessage_PortList(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_PortList(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     OUR_DEBUG((LM_INFO, "[DoMessage_PortList]In.\n"));
 
@@ -1972,7 +1972,7 @@ void DoMessage_PortList(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uin
     }
 }
 
-void Do_Message_BuffPacket(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void Do_Message_BuffPacket(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
@@ -2019,7 +2019,7 @@ void Do_Message_BuffPacket(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, 
     }
 }
 
-void Do_Message_PoolSet(_CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void Do_Message_PoolSet(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     _PoolName objPoolName;
 

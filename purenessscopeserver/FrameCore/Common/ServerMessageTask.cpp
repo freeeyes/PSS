@@ -91,12 +91,8 @@ void CServerMessageInfoPool::Close()
     OUR_DEBUG((LM_INFO, "[CMessagePool::Close]End.\n"));
 }
 
-CServerMessageTask::CServerMessageTask():m_mutex(), m_cond(m_mutex)
+CServerMessageTask::CServerMessageTask() : m_mutex(), m_cond(m_mutex)
 {
-    m_u4ThreadID = 0;
-    m_blRun      = false;
-    m_u4MaxQueue = MAX_SERVER_MESSAGE_QUEUE;
-    m_emState    = SERVER_RECV_INIT;
 }
 
 bool CServerMessageTask::Start()

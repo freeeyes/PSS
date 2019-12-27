@@ -1,6 +1,6 @@
 #include "BaseConnectClient.h"
 
-bool Recv_Common_Dispose_Client_Message(uint16 u2CommandID, ACE_Message_Block* pRecvFinish, const _ClientIPInfo objServerIPInfo, IClientMessage* pClientMessage)
+bool Recv_Common_Dispose_Client_Message(uint16 u2CommandID, ACE_Message_Block* pRecvFinish, const _ClientIPInfo& objServerIPInfo, IClientMessage* pClientMessage)
 {
     //有数据需要处理，则处理
     if (GetXmlConfigAttribute(xmlConnectServer)->RunType == 0)
@@ -24,7 +24,7 @@ bool Recv_Common_Dispose_Client_Message(uint16 u2CommandID, ACE_Message_Block* p
     return true;
 }
 
-int Make_Common_Dispose_Client_WorkTread_Message(uint16 u2CommandID, uint32 u4ServerID, ACE_Message_Block* pmblk, const ACE_INET_Addr AddrRemote)
+int Make_Common_Dispose_Client_WorkTread_Message(uint16 u2CommandID, uint32 u4ServerID, ACE_Message_Block* pmblk, const ACE_INET_Addr& AddrRemote)
 {
     //组织数据
     CMessage* pMessage = App_MessageServiceGroup::instance()->CreateMessage(u4ServerID, CONNECT_IO_TCP);

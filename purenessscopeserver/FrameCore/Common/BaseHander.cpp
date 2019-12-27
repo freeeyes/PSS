@@ -127,7 +127,7 @@ bool Udp_Common_Recv_Stream(ACE_Message_Block* pMbData, CPacketParse* pPacketPar
     return true;
 }
 
-bool Udp_Common_Send_WorkThread(CPacketParse*& pPacketParse, ACE_INET_Addr const& addrRemote, ACE_INET_Addr const& addrLocal, ACE_Time_Value& tvCheck)
+bool Udp_Common_Send_WorkThread(CPacketParse*& pPacketParse, const ACE_INET_Addr& addrRemote, const ACE_INET_Addr& addrLocal, const ACE_Time_Value& tvCheck)
 {
     //组织数据包
     _MakePacket objMakePacket;
@@ -199,7 +199,7 @@ uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPa
     return n1Ret;
 }
 
-void Send_MakePacket_Queue(uint32 u4ConnectID, uint32 u4PacketParseID, CPacketParse* pPacketParse, uint8 u1Option, const ACE_INET_Addr addrRemote, const char* pLocalIP, uint32 u4LocalPort, EM_CONNECT_IO_TYPE emIOType)
+void Send_MakePacket_Queue(uint32 u4ConnectID, uint32 u4PacketParseID, CPacketParse* pPacketParse, uint8 u1Option, const ACE_INET_Addr& addrRemote, const char* pLocalIP, uint32 u4LocalPort, EM_CONNECT_IO_TYPE emIOType)
 {
     //需要回调发送成功回执
     _MakePacket objMakePacket;
@@ -248,7 +248,7 @@ bool Tcp_Common_File_Message(_File_Message_Param const& obj_File_Message_Param, 
         u4DebugSize = (int)pBuffPacket->GetPacketLen();
     }
 
-    char* pData = pBuffPacket->GetData();
+    const char* pData = pBuffPacket->GetData();
 
     for (uint32 i = 0; i < u4DebugSize; i++)
     {

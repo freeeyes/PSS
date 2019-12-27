@@ -148,7 +148,7 @@ bool CAppConfig::GetValue(const char* szName, ACE_TString& strValue, const char*
     }
 }
 
-bool CAppConfig::SetValue(const char* szName, const ACE_TString strValue, const char* szRoot)
+bool CAppConfig::SetValue(const char* szName, const ACE_TString& strValue, const char* szRoot)
 {
     try
     {

@@ -52,7 +52,7 @@ public:
 
 private:
     //定时清理Hash数组
-    void Clear_Hash_Data(uint16 u2NowTime, ACE_Date_Time& dtNowTime);
+    void Clear_Hash_Data(uint16 u2NowTime, const ACE_Date_Time& dtNowTime);
 
     uint32                           m_u4MaxConnectCount  = 0;                 //每秒允许的最大连接数，前提是m_nNeedCheck = 0;才会生效
     uint32                           m_u4CurrConnectCount = 0;                 //当前连接总数
@@ -96,14 +96,13 @@ public:
     int32 CheckDisConnectCount();
 
 private:
-    uint32 m_u4CurrConnect;
-    uint32 m_u4CurrDisConnect;
-
-    uint32 m_u4ConnectMin;
-    uint32 m_u4ConnectMax;
-    uint32 m_u4DisConnectMin;
-    uint32 m_u4DisConnectMax;
-    uint8  m_u1Minute;            //当前分钟数
+    uint32 m_u4CurrConnect    = 0;
+    uint32 m_u4CurrDisConnect = 0;
+    uint32 m_u4ConnectMin     = 0;
+    uint32 m_u4ConnectMax     = 0;
+    uint32 m_u4DisConnectMin  = 0;
+    uint32 m_u4DisConnectMax  = 0;
+    uint8  m_u1Minute         = 0;   //当前分钟数
 };
 
 typedef ACE_Singleton<CConnectAccount, ACE_Recursive_Thread_Mutex> App_ConnectAccount;

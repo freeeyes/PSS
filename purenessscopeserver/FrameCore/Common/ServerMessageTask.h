@@ -129,10 +129,10 @@ private:
     //关闭消息队列条件变量
     ACE_Thread_Mutex m_mutex;
     ACE_Condition<ACE_Thread_Mutex> m_cond;
-    uint32               m_u4ThreadID;  //当前线程ID
-    bool                 m_blRun;       //当前线程是否运行
-    uint32               m_u4MaxQueue;  //在队列中的数据最多个数
-    EM_Server_Recv_State m_emState;     //处理状态
+    uint32               m_u4ThreadID         = 0;  //当前线程ID
+    bool                 m_blRun              = false;       //当前线程是否运行
+    uint32               m_u4MaxQueue         = MAX_SERVER_MESSAGE_QUEUE;  //在队列中的数据最多个数
+    EM_Server_Recv_State m_emState            = SERVER_RECV_INIT;     //处理状态
     ACE_Time_Value       m_tvDispose;   //接收数据包处理时间
 
     //记录当前有效的IClientMessage，因为是异步的关系。

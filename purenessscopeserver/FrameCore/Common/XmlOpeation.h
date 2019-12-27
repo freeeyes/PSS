@@ -33,6 +33,6 @@ public:
 
 private:
     std::shared_ptr<TiXmlDocument> m_pTiXmlDocument;
-    TiXmlElement*                  m_pRootElement;
+    TiXmlElement*                  m_pRootElement    = NULL;
 };
 #endif

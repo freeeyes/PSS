@@ -27,17 +27,13 @@ static const char COMMAND_SPLIT_STRING[] = " ";
 class _CommandInfo
 {
 public:
-    uint8 m_u1OutputType;                 //输出类型，0为二进制，1为文本
-    char m_szCommandTitle[MAX_BUFF_100];  //处理命令头
-    char m_szCommandExp[MAX_BUFF_100];    //处理命令扩展参数
-    char m_szUser[MAX_BUFF_50];           //用户信息
+    uint8 m_u1OutputType                = 0;        //输出类型，0为二进制，1为文本
+    char m_szCommandTitle[MAX_BUFF_100] = {'\0'};   //处理命令头
+    char m_szCommandExp[MAX_BUFF_100]   = {'\0'};   //处理命令扩展参数
+    char m_szUser[MAX_BUFF_50]          = {'\0'};   //用户信息
 
     _CommandInfo()
     {
-        m_u1OutputType = 0;
-        m_szCommandTitle[0] = '\0';
-        m_szCommandExp[0] = '\0';
-        m_szUser[0] = '\0';
     }
 };
 
@@ -45,15 +41,12 @@ public:
 class _FileInfo
 {
 public:
-    char m_szFilePath[MAX_BUFF_100];
-    char m_szFileName[MAX_BUFF_100];
-    char m_szFileParam[MAX_BUFF_200];
+    char m_szFilePath[MAX_BUFF_100]  = {'\0'};
+    char m_szFileName[MAX_BUFF_100]  = {'\0'};
+    char m_szFileParam[MAX_BUFF_200] = {'\0'};
 
     _FileInfo()
     {
-        m_szFilePath[0] = '\0';
-        m_szFileName[0] = '\0';
-        m_szFileParam[0] = '\0';
     }
 };
 
@@ -61,17 +54,13 @@ public:
 class _ListenInfo
 {
 public:
-    uint32 m_u4Port;
-    uint32 m_u4PacketParseID;
-    uint8  m_u1IPType;
-    char   m_szListenIP[MAX_BUFF_20];
+    uint32 m_u4Port                  = 0;
+    uint32 m_u4PacketParseID         = 0;
+    uint8  m_u1IPType                = TYPE_IPV4;
+    char   m_szListenIP[MAX_BUFF_20] = {'\0'};
 
     _ListenInfo()
     {
-        m_szListenIP[0] = '\0';
-        m_u4Port = 0;
-        m_u1IPType = TYPE_IPV4;
-        m_u4PacketParseID = 0;
     }
 };
 
@@ -79,23 +68,23 @@ public:
 class _DyeIPInfo
 {
 public:
-    char   m_szClientIP[MAX_BUFF_20];   //染色客户端IP
-    uint16 m_u2MaxCount;                //最大数量
+    char   m_szClientIP[MAX_BUFF_20] = {'\0'};   //染色客户端IP
+    uint16 m_u2MaxCount              = 0;        //最大数量
 };
 
 //染色的CommandID
 class _DyeCommandInfo
 {
 public:
-    uint16 m_u2CommandID;               //染色客户端命令
-    uint16 m_u2MaxCount;                //最大数量
+    uint16 m_u2CommandID = 0;               //染色客户端命令
+    uint16 m_u2MaxCount  = 0;                //最大数量
 };
 
 class _PoolName
 {
 public:
-    char   m_szPoolName[MAX_BUFF_50];   //内存池名字
-    bool   m_blState;                   //当前内存池创建信息状态
+    char   m_szPoolName[MAX_BUFF_50] = {'\0'};   //内存池名字
+    bool   m_blState                 = 0;        //当前内存池创建信息状态
 };
 
 //协议解析, 公用数据部分

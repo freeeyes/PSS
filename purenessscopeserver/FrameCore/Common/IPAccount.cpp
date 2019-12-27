@@ -163,10 +163,8 @@ void CIPAccount::GetInfo(vecIPAccount& VecIPAccount)
     vector<_IPAccount* > vecIPAccount;
     m_objIPList.Get_All_Used(vecIPAccount);
 
-    for (int32 i = 0; i < (int32)vecIPAccount.size(); i++)
+    for (const _IPAccount* pIPAccount : vecIPAccount)
     {
-        _IPAccount* pIPAccount = vecIPAccount[i];
-
         if (NULL != pIPAccount)
         {
             VecIPAccount.push_back(*pIPAccount);
@@ -174,7 +172,7 @@ void CIPAccount::GetInfo(vecIPAccount& VecIPAccount)
     }
 }
 
-void CIPAccount::Clear_Hash_Data(uint16 u2NowTime, ACE_Date_Time& dtNowTime)
+void CIPAccount::Clear_Hash_Data(uint16 u2NowTime, const ACE_Date_Time& dtNowTime)
 {
     //检查当前时间连接总数
     if (m_u1Minute == (uint8)u2NowTime)
@@ -220,13 +218,6 @@ void CIPAccount::Clear_Hash_Data(uint16 u2NowTime, ACE_Date_Time& dtNowTime)
 
 CConnectAccount::CConnectAccount()
 {
-    m_u4ConnectMin = 0;
-    m_u4ConnectMax = 0;
-    m_u4DisConnectMin = 0;
-    m_u4DisConnectMax = 0;
-    m_u4CurrConnect = 0;
-    m_u4CurrDisConnect = 0;
-    m_u1Minute = 0;
 }
 
 CConnectAccount::~CConnectAccount()
