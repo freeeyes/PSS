@@ -33,7 +33,7 @@ void CUnit_ThreadInfo::Test_ThreadInfo(void)
         return;
     }
 
-    _ThreadInfo* pThreadInfo = m_pThreadInfo->GetThreadInfo(0);
+    const _ThreadInfo* pThreadInfo = m_pThreadInfo->GetThreadInfo(0);
 
     if (NULL == pThreadInfo)
     {

@@ -32,7 +32,7 @@ void CUnit_CommandAccount::Test_CommandAccount_Init(void)
     m_pCommandAccount->SaveCommandData(0x1000, 10002, CONNECT_IO_TCP, 10);
     m_pCommandAccount->SaveCommandData(0x1000, 10002, CONNECT_IO_TCP, 10);
 
-    _CommandData* pCommandData = m_pCommandAccount->GetCommandData(0x1000);
+    const _CommandData* pCommandData = m_pCommandAccount->GetCommandData(0x1000);
 
     if (NULL == pCommandData)
     {

@@ -22,7 +22,7 @@ public:
     void Test_MessageDyeingManager(void);
 
 private:
-    CMessageDyeingManager* m_pMessageDyeingManager;
+    CMessageDyeingManager* m_pMessageDyeingManager = NULL;
 };
 
 #endif

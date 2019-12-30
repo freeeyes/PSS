@@ -1836,6 +1836,7 @@ void DoMessage_ServerClose(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
     //这里暂不实现，没必要
     ACE_UNUSED_ARG(CommandInfo);
     (*pBuffPacket) << u2ReturnCommandID;
+    u2ReturnCommandID = CONSOLE_COMMAND_COLSECLIENT;
 }
 
 void DoMessage_TestFileStart(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)

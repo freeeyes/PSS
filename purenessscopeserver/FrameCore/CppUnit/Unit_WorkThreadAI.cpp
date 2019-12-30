@@ -42,7 +42,7 @@ void CUnit_WorkThreadAI::Test_WorkThreadAI(void)
         return;
     }
 
-    char* pData = m_pWorkThreadAI->GetReturnData();
+    const char* pData = m_pWorkThreadAI->GetReturnData();
 
     if (0xff != (unsigned char)pData[0] || 0xff != (unsigned char)pData[1])
     {

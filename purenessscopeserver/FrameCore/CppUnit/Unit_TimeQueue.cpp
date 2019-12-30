@@ -18,7 +18,6 @@ int CTimeTask::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 
 CUnit_TimerManager::CUnit_TimerManager()
 {
-    m_pTimeTask = NULL;
 }
 
 void CUnit_TimerManager::setUp(void)

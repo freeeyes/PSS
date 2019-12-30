@@ -37,17 +37,17 @@ private:
 
     ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;
     //文件测试变量
-    bool m_bFileTesting;          //是否正在进行文件测试
-    int32 m_n4TimerID;            //定时器ID
+    bool m_bFileTesting       = false;       //是否正在进行文件测试
+    int32 m_n4TimerID         = 0;           //定时器ID
 
     CXmlOpeation m_MainConfig;
     string m_strProFilePath;
-    uint32 m_u4TimeInterval;      //定时器事件间隔
-    uint32 m_u4ConnectCount;      //模拟连接数
-    uint32 m_u4ResponseCount;     //期望的应答条数
-    uint32 m_u4ExpectTime;        //期望测试时总的耗时(单位毫秒)
-    uint32 m_u4ParseID;           //解析包ID
-    uint32 m_u4ContentType;       //协议数据类型,1是二进制协议,0是文本协议
+    uint32 m_u4TimeInterval   = 1000;   //定时器事件间隔
+    uint32 m_u4ConnectCount   = 0;      //模拟连接数
+    uint32 m_u4ResponseCount  = 0;      //期望的应答条数
+    uint32 m_u4ExpectTime     = 0;      //期望测试时总的耗时(单位毫秒)
+    uint32 m_u4ParseID        = 0;      //解析包ID
+    uint32 m_u4ContentType    = 0;      //协议数据类型,1是二进制协议,0是文本协议
 
     typedef vector<FileTestDataInfoSt> vecFileTestDataInfoSt;
     vecFileTestDataInfoSt m_vecFileTestDataInfoSt;
@@ -56,20 +56,12 @@ private:
     class ResponseRecordSt
     {
     public:
-        uint64 m_u8StartTime;
-        uint8  m_u1ResponseCount;
-        uint32 m_u4ConnectID;
+        uint64 m_u8StartTime     = 0;
+        uint8  m_u1ResponseCount = 0;
+        uint32 m_u4ConnectID     = 0;
 
         ResponseRecordSt()
         {
-            Init();
-        }
-
-        void Init()
-        {
-            m_u8StartTime      = 0;
-            m_u1ResponseCount  = 0;
-            m_u4ConnectID      = 0;
         }
     } ;
 

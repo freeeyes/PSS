@@ -4,7 +4,6 @@
 
 CUnit_MessageDyeingManager::CUnit_MessageDyeingManager()
 {
-    m_pMessageDyeingManager = NULL;
 }
 
 void CUnit_MessageDyeingManager::setUp(void)

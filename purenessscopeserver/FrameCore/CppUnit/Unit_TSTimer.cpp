@@ -2,7 +2,7 @@
 
 #ifdef _CPPUNIT_TEST
 
-void test_timer_run_execute(ITimerInfo* arg)
+void test_timer_run_execute(const ITimerInfo* arg)
 {
     ACE_UNUSED_ARG(arg);
     OUR_DEBUG((LM_INFO, "[CUnit_TimerThread]timer is active.\n"));

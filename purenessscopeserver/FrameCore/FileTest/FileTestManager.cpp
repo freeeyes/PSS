@@ -2,14 +2,6 @@
 
 CFileTestManager::CFileTestManager(void)
 {
-    m_bFileTesting     = false;
-    m_n4TimerID        = 0;
-    m_u4ConnectCount   = 0;
-    m_u4ParseID        = 0;
-    m_u4ResponseCount  = 0;
-    m_u4ExpectTime     = 1000;
-    m_u4ContentType    = 1;
-    m_u4TimeInterval   = 0;
 }
 
 FileTestResultInfoSt CFileTestManager::FileTestStart(const char* szXmlFileTestName)
