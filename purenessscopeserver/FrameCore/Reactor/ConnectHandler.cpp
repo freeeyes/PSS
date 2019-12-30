@@ -2889,25 +2889,30 @@ void CConnectManagerGroup::GetClientNameInfo(const char* pName, vecClientNameInf
 
 void CConnectManagerGroup::GetCommandData( uint16 u2CommandID, _CommandData& objCommandData )
 {
-    for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
-    {
-        const CConnectManager* pConnectManager = m_objConnnectManagerList[i];
+	for (uint16 i = 0; i < m_u2ThreadQueueCount; i++)
+	{
+		CConnectManager* pConnectManager = m_objConnnectManagerList[i];
 
-        if(NULL != pConnectManager)
-        {
-            objCommandData += (*pConnectManager->GetCommandData(u2CommandID));
-        }
-    }
+		if (NULL != pConnectManager)
+		{
+			const _CommandData* pCommandData = pConnectManager->GetCommandData(u2CommandID);
+
+			if (pCommandData != NULL)
+			{
+				objCommandData += (*pCommandData);
+			}
+		}
+	}
 }
 
 void CConnectManagerGroup::GetFlowInfo(uint32& u4UdpFlowIn, uint32& u4UdpFlowOut)
 {
+	uint32 u4ConnectFlowIn = 0;
+	uint32 u4ConnectFlowOut = 0;
+
     for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
     {
-        uint32 u4ConnectFlowIn  = 0;
-        uint32 u4ConnectFlowOut = 0;
-
-        const CConnectManager* pConnectManager = m_objConnnectManagerList[i];
+        CConnectManager* pConnectManager = m_objConnnectManagerList[i];
 
         if(NULL != pConnectManager)
         {
