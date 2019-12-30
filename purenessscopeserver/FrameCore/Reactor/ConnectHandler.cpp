@@ -2895,7 +2895,7 @@ void CConnectManagerGroup::GetCommandData( uint16 u2CommandID, _CommandData& obj
 
         if(NULL != pConnectManager)
         {
-            objCommandData += pConnectManager->GetCommandData(u2CommandID);
+            objCommandData += (*pConnectManager->GetCommandData(u2CommandID));
         }
     }
 }
