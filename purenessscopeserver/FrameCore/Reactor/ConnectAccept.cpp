@@ -60,7 +60,7 @@ int ConnectAcceptor::make_svc_handler(CConnectHandler*& sh)
     }
 }
 
-int ConnectAcceptor::open2(ACE_INET_Addr& local_addr, ACE_Reactor* reactor, int flags, int backlog)
+int ConnectAcceptor::open2(const ACE_INET_Addr& local_addr, ACE_Reactor* reactor, int flags, int backlog)
 {
     ACE_TRACE("ACE_Acceptor<SVC_HANDLER, PEER_ACCEPTOR>::open");
     this->flags_ = flags;

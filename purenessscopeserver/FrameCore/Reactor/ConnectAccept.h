@@ -24,7 +24,7 @@ protected:
 public:
     //因为基础的open不能满足需求，所以在这里重载了一个open接口
     //提供设置backlog的服务
-    int open2(ACE_INET_Addr& local_addr,
+    int open2(const ACE_INET_Addr& local_addr,
               ACE_Reactor* reactor,
               int flags,
               int backlog);

@@ -581,7 +581,7 @@ bool CClientReConnectManager::ConnectErrorClose(int nServerID)
     //查找已有连接
     char szServerID[10] = {'\0'};
     sprintf_safe(szServerID, 10, "%d", nServerID);
-    CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
+    const CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 
     if (NULL == pClientInfo)
     {

@@ -736,10 +736,6 @@ CMessageServiceGroup::CMessageServiceGroup()
     }
 }
 
-CMessageServiceGroup::~CMessageServiceGroup()
-{
-}
-
 int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 {
     ACE_UNUSED_ARG(arg);

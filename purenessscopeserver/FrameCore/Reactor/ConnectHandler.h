@@ -89,7 +89,7 @@ public:
     int  GetHashID();                                                        //得到Hash数组下标
     void SetSendCacheManager(CSendCacheManager* pSendCacheManager);          //设置缓冲区对象
     bool Test_Paceket_Parse_Stream(ACE_Message_Block* pmb);                  //测试流模式解析数据入口
-    void Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType);        //输出DEBUG信息
+    void Output_Debug_Data(const ACE_Message_Block* pMbData, int nLogType);  //输出DEBUG信息
 
     bool Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPacket);                   //将发送数据写入文件
     bool Send_Input_To_Cache(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, bool blDelete, IBuffPacket* pBuffPacket);       //讲发送对象放入缓存
@@ -183,7 +183,7 @@ public:
     bool AddConnect(uint32 u4ConnectID, CConnectHandler* pConnectHandler);
     bool SetConnectTimeWheel(CConnectHandler* pConnectHandler);                                            //设置消息轮盘
     bool DelConnectTimeWheel(CConnectHandler* pConnectHandler);                                            //删除消息轮盘
-    bool SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket,  uint16 u2CommandID, uint8 u1SendState, uint8 u1SendType, ACE_Time_Value& tvSendBegin, bool blDelete = true, int nMessageID = 0);  //同步发送                                                                     //发送缓冲数据
+    bool SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket,  uint16 u2CommandID, uint8 u1SendState, uint8 u1SendType, const ACE_Time_Value& tvSendBegin, bool blDelete = true, int nMessageID = 0);  //同步发送                                                                     //发送缓冲数据
     bool PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nMessageID = 0); //异步发送
     bool PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nMessageID = 0);                  //异步群发
     bool Close(uint32 u4ConnectID);                                                                          //客户单关闭
@@ -255,7 +255,7 @@ private:
     ACE_Recursive_Thread_Mutex        m_ThreadWriteLock;                     //控制多线程锁
     CHashTable<CConnectHandler>       m_objHashHandleList;                   //Hash管理表
     CObjectArrayList<CConnectHandler> m_objHandlerList;                      //数据列表对象
-    uint32                            m_u4CurrMaxCount;                      //当前池里Handler总数
+    uint32                            m_u4CurrMaxCount = 1;                  //当前池里Handler总数
 };
 
 //经过思考，想把发送对象分在几个线程内去做，提高性能。在这里尝试一下。(多线程模式，一个线程一个队列，这样保持并发能力)

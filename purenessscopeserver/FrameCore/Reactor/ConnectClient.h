@@ -46,7 +46,7 @@ public:
     void ClientClose();                                    //主动关闭
     _ClientConnectInfo GetClientConnectInfo();             //得到当前链接信息
 
-    void Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType, bool blLog = false);     //输出DEBUG信息
+    void Output_Debug_Data(const ACE_Message_Block* pMbData, int nLogType, bool blLog = false);     //输出DEBUG信息
 
 private:
     int RecvData();                                                       //接收数据，正常模式

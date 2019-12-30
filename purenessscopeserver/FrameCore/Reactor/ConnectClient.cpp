@@ -307,7 +307,7 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
 {
     if (CONNECT_IO_FRAME == m_emDispose)
     {
-        _Packet_Parse_Info* pPacketParseInfo = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID);
+        const _Packet_Parse_Info* pPacketParseInfo = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID);
 
         if (NULL != pPacketParseInfo)
         {
@@ -393,7 +393,7 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
     return 0;
 }
 
-void CConnectClient::Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType, bool blLog)
+void CConnectClient::Output_Debug_Data(const ACE_Message_Block* pMbData, int nLogType, bool blLog)
 {
     char szPacketDebugData[MAX_BUFF_1024] = { '\0' };
 
@@ -414,7 +414,7 @@ void CConnectClient::Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType,
             u4DebugSize = (uint32)nDataLen;
         }
 
-        char* pData = pMbData->rd_ptr();
+        const char* pData = pMbData->rd_ptr();
 
         for (uint32 i = 0; i < u4DebugSize; i++)
         {
@@ -473,7 +473,7 @@ int CConnectClient::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
         }
 
         //·¢ËÍÊý¾Ý
-        char* pData = pmbSendData->rd_ptr();
+        const char* pData = pmbSendData->rd_ptr();
 
         if (NULL == pData)
         {

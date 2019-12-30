@@ -957,7 +957,7 @@ void CConnectHandler::Get_Recv_length(int& nCurrCount)
     }
 }
 
-void CConnectHandler::Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType)
+void CConnectHandler::Output_Debug_Data(const ACE_Message_Block* pMbData, int nLogType)
 {
     if (GetXmlConfigAttribute(xmlServerType)->Debug == DEBUG_ON || m_blIsLog == true)
     {
@@ -976,7 +976,7 @@ void CConnectHandler::Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType
             u4DebugSize = (uint32)nDataLen;
         }
 
-        char* pData = pMbData->rd_ptr();
+        const char* pData = pMbData->rd_ptr();
 
         for (uint32 i = 0; i < u4DebugSize; i++)
         {
@@ -1507,9 +1507,8 @@ bool CConnectHandler::Test_Paceket_Parse_Stream(ACE_Message_Block* pmb)
 }
 
 //***************************************************************************
-CConnectManager::CConnectManager(void):m_mutex(), m_cond(m_mutex)
+CConnectManager::CConnectManager(void) : m_cond(m_mutex)
 {
-    m_pTCTimeSendCheck   = NULL;
     m_tvCheckConnect     = ACE_OS::gettimeofday();
 
     //初始化发送对象池
@@ -1658,7 +1657,7 @@ bool CConnectManager::AddConnect(uint32 u4ConnectID, CConnectHandler* pConnectHa
         return false;
     }
 
-    CConnectHandler* pCurrConnectHandler = m_objHashConnectList.Get_Hash_Box_Data_By_Uint32(u4ConnectID);
+    const CConnectHandler* pCurrConnectHandler = m_objHashConnectList.Get_Hash_Box_Data_By_Uint32(u4ConnectID);
 
     if(NULL != pCurrConnectHandler)
     {
@@ -1703,7 +1702,7 @@ bool CConnectManager::DelConnectTimeWheel(CConnectHandler* pConnectHandler)
     return true;
 }
 
-bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint16 u2CommandID, uint8 u1SendState, uint8 u1SendType, ACE_Time_Value& tvSendBegin, bool blDelete, int nMessageID)
+bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint16 u2CommandID, uint8 u1SendState, uint8 u1SendType, const ACE_Time_Value& tvSendBegin, bool blDelete, int nMessageID)
 {
     //因为是队列调用，所以这里不需要加锁了。
     if(NULL == pBuffPacket)
@@ -1853,7 +1852,7 @@ int CConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 
     ACE_Time_Value tvNow = tv;
 
-    _TimerCheckID* pTimerCheckID = (_TimerCheckID*)arg;
+    const _TimerCheckID* pTimerCheckID = (_TimerCheckID*)arg;
 
     if(NULL != pTimerCheckID && pTimerCheckID->m_u2TimerCheckID == PARM_CONNECTHANDLE_CHECK)
     {
@@ -2195,8 +2194,6 @@ bool CConnectManager::Dispose_Queue()
 
 CConnectHandlerPool::CConnectHandlerPool(void)
 {
-    //ConnectID计数器从1开始
-    m_u4CurrMaxCount = 1;
 }
 
 void CConnectHandlerPool::Init(int nObjcetCount)

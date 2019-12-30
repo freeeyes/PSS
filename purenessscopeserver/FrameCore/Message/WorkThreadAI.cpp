@@ -99,7 +99,7 @@ bool CWorkThreadAI::CheckCurrTimeout(uint16 u2CommandID, uint64 u8Now)
         //如果需要检测才走循环
         for(vector<_CommandTimeout>::iterator b = m_vecCommandTimeout.begin(); b != m_vecCommandTimeout.end(); ++b)
         {
-            _CommandTimeout& objCommandTimeout = (_CommandTimeout& )(*b);
+            const _CommandTimeout& objCommandTimeout = (_CommandTimeout& )(*b);
 
             if(objCommandTimeout.m_u2CommandID == u2CommandID)
             {
@@ -188,7 +188,7 @@ void CWorkThreadAI::GetAllTimeout(uint32 u4ThreadID, vecCommandTimeout& objTimeo
 
 void CWorkThreadAI::GetAllForbiden(uint32 u4ThreadID, vecCommandTimeout& objForbiden)
 {
-    for(auto& objCommandTimeout : m_vecCommandTimeout)
+    for(const auto& objCommandTimeout : m_vecCommandTimeout)
     {
         _CommandTimeout objData;
         objData.m_u4ThreadID  = u4ThreadID;
@@ -217,7 +217,7 @@ int CWorkThreadAI::Do_Command_Account(uint16 u2CommandID, uint64 u8Now, uint32 u
             m_vecCommandTime[i]->m_objTime.Add();
 
             //在判断当前环里面最后一个时间是否在间隔时间内
-            _CommandTimeout* pCommandLastTimeout = m_vecCommandTime[i]->m_objTime.GetLinkData(m_u4WTTimeoutCount - 1);
+            const _CommandTimeout* pCommandLastTimeout = m_vecCommandTime[i]->m_objTime.GetLinkData(m_u4WTTimeoutCount - 1);
 
             if (NULL != pCommandLastTimeout)
             {

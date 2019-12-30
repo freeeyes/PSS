@@ -16,7 +16,7 @@ void CConsolePacketParse::Init()
     SetPacket_Body_Message(NULL);
 }
 
-bool CConsolePacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager)
+bool CConsolePacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead, const IMessageBlockManager* pMessageBlockManager)
 {
     char* pData = pmbHead->rd_ptr();
 
@@ -45,7 +45,7 @@ bool CConsolePacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* p
     }
 }
 
-bool CConsolePacketParse::SetPacketBody(uint32 u4ConnectID, ACE_Message_Block* pmbBody, IMessageBlockManager* pMessageBlockManager)
+bool CConsolePacketParse::SetPacketBody(uint32 u4ConnectID, ACE_Message_Block* pmbBody, const IMessageBlockManager* pMessageBlockManager)
 {
     //这里分析出包体内的一些数据，如果包头包含了CommandID，那么包体就不必做解析。
     if(u4ConnectID == 0 && pMessageBlockManager != NULL)
@@ -103,7 +103,7 @@ bool CConsolePacketParse::MakePacket(uint32 u4ConnectID, const char* pData, uint
 
 
 
-uint8 CConsolePacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurrMessage, IMessageBlockManager* pMessageBlockManager)
+uint8 CConsolePacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurrMessage, const IMessageBlockManager* pMessageBlockManager)
 {
     if(0 == u4ConnectID || NULL == pCurrMessage || NULL == pMessageBlockManager)
     {
@@ -111,6 +111,7 @@ uint8 CConsolePacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block
     }
     else
     {
+        OUR_DEBUG((LM_INFO, "[CConsolePacketParse::GetPacketStream]pCurrMessage=%d.\n", pCurrMessage->length));
         return PACKET_GET_ENOUGH;
     }
 }

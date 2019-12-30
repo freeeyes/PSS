@@ -92,15 +92,12 @@ private:
     void UpdateCommandList(const ACE_Message_Block* pmb);        //更新指令列表
     bool Dispose_Queue();                                  //队列消费
 
-    uint64                         m_u8TimeCost         = 0;                     //Put到队列信息的数据处理时间
     uint32                         m_u4ThreadID         = 0;                     //当前线程ID
     uint32                         m_u4MaxQueue         = MAX_MSG_THREADQUEUE;   //线程中最大消息对象个数
     uint32                         m_u4HighMask         = 0;        
     uint32                         m_u4LowMask          = 0;
-    uint32                         m_u4Count            = 0;                     //消息队列接受个数
     uint32                         m_u4WorkQueuePutTime = 0;                     //入队超时时间
     uint16                         m_u2ThreadTimeOut    = 0;
-    uint16                         m_u2ThreadTimeCheck  = 0;
     bool                           m_blRun              = false;                 //线程是否在运行
     bool                           m_blIsCpuAffinity    = false;                 //是否CPU绑定
 
@@ -123,7 +120,6 @@ class CMessageServiceGroup : public ACE_Task<ACE_MT_SYNCH>
 {
 public:
     CMessageServiceGroup();
-    virtual ~CMessageServiceGroup();
 
     virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);
 
