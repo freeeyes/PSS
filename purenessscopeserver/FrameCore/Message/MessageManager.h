@@ -48,16 +48,14 @@ public:
 class CClientCommandList
 {
 private:
-    uint16  m_u2CommandID;                      //当前处理信令ID
-    uint16  m_u2Timeout;                        //当前处理超时时间
+    uint16  m_u2CommandID = 0;                      //当前处理信令ID
+    uint16  m_u2Timeout   = 0;                      //当前处理超时时间
     typedef vector<_ClientCommandInfo*> vecClientCommandList;
     vecClientCommandList m_vecClientCommandList;
 
 public:
     CClientCommandList()
     {
-        m_u2CommandID = 0;
-        m_u2Timeout   = 0;
     }
 
     explicit CClientCommandList(uint16 u2CommandID) : m_u2CommandID(u2CommandID)
@@ -190,13 +188,13 @@ private:
     bool AddClientCommand_Ex(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, _ClientIPInfo* pListenInfo);   //注册命令
     void DeleteCommandByModule(_ClientCommandInfo* pClientCommandInfo);                                                                  //遍历命令列表，删除指定的命令
 
-    uint32                         m_u4UpdateIndex;                    //当前更新ID
-    uint32                         m_u4MaxCommandCount;                //最大命令池中的数量
-    uint32                         m_u4CurrCommandCount;               //当前有效命令数
-    uint16                         m_u2MaxModuleCount;                 //模块池里面的最大个数
-    CHashTable<CClientCommandList> m_objClientCommandList;             //命令持对应的数组
-    CHashTable<_ModuleClient>      m_objModuleClientList;              //加载模块对应的信息
-    ACE_Recursive_Thread_Mutex     m_ThreadWriteLock;                  //数据锁
+    uint32                         m_u4UpdateIndex       = 0;               //当前更新ID
+    uint32                         m_u4MaxCommandCount   = 0;               //最大命令池中的数量
+    uint32                         m_u4CurrCommandCount  = 0;               //当前有效命令数
+    uint16                         m_u2MaxModuleCount    = 0;               //模块池里面的最大个数
+    CHashTable<CClientCommandList> m_objClientCommandList;                  //命令持对应的数组
+    CHashTable<_ModuleClient>      m_objModuleClientList;                   //加载模块对应的信息
+    ACE_Recursive_Thread_Mutex     m_ThreadWriteLock;                       //数据锁
 
 };
 

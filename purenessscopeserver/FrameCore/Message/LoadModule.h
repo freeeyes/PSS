@@ -45,24 +45,18 @@ public:
 class CWaitUnLoadModule
 {
 public:
-    uint32           m_u4UpdateIndex;                //工作线程总数
-    uint32           m_u4ThreadCurrEndCount;         //当前已经结束的工作线程个数
-    uint8            m_u1UnloadState;                //重载状态，1为卸载，2为重载
-    char             m_szModuleName[MAX_BUFF_100];   //插件名称
-    ACE_SHLIB_HANDLE m_hModule;                      //插件的指针
-    int (*UnLoadModuleData)(void);                   //卸载插件的函数指针
-    string           m_strModuleName;                //模块文件名称
-    string           m_strModulePath;                //模块路径
-    string           m_strModuleParam;               //模块启动参数
+    uint32           m_u4UpdateIndex              = 0;         //工作线程总数
+    uint32           m_u4ThreadCurrEndCount       = 0;         //当前已经结束的工作线程个数
+    uint8            m_u1UnloadState              = 0;         //重载状态，1为卸载，2为重载
+    char             m_szModuleName[MAX_BUFF_100] = {'\0'};    //插件名称
+    ACE_SHLIB_HANDLE m_hModule                    = NULL;      //插件的指针
+    int (*UnLoadModuleData)(void)                 = NULL;      //卸载插件的函数指针
+    string           m_strModuleName;                          //模块文件名称
+    string           m_strModulePath;                          //模块路径
+    string           m_strModuleParam;                         //模块启动参数
 
     CWaitUnLoadModule()
     {
-        m_hModule              = 0;
-        m_u1UnloadState        = 0;
-        m_u4ThreadCurrEndCount = 0;
-        m_u4UpdateIndex        = 0;
-        m_szModuleName[0]      = '\0';
-        UnLoadModuleData       = NULL;
     }
 };
 
@@ -104,7 +98,7 @@ private:
     bool LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo, const char* pModulePath);    //开始加载模块的接口和数据
 
     CHashTable<_ModuleInfo>            m_objHashModuleList;
-    char                               m_szModulePath[MAX_BUFF_200];
+    char                               m_szModulePath[MAX_BUFF_200] = {'\0'};
     vector<CWaitUnLoadModule>          m_veCWaitUnLoadModule;
     ACE_Recursive_Thread_Mutex         m_tmModule;
     vector<string>                     m_vecModuleNameList;               //当前插件名称列表

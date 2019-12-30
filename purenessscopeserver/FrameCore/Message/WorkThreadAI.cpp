@@ -2,14 +2,6 @@
 
 CWorkThreadAI::CWorkThreadAI()
 {
-    m_u1WTAI                  = (uint8)0;   //AIÄ¬ÈÏÎª¹Ø±Õ
-    m_u4WTCheckTime           = 0;
-    m_u4WTTimeoutCount        = 0;
-    m_u4WTStopTime            = 0;
-    m_u1WTReturnDataType      = 0;
-    m_u4DisposeTime           = 0;
-    m_u2ReturnDataLen         = 0;
-    m_szWTReturnData[0]       = '\0';
 }
 
 void CWorkThreadAI::Init(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTTimeoutCount, uint32 u4WTStopTime, uint8 u1WTReturnDataType, const char* pReturnData)

@@ -208,21 +208,15 @@ private:
 class _WorkThreadAIInfo
 {
 public:
-    uint32     m_u4ThreadID;                       //工作线程ID
-    uint8      m_u1WTAI;                           //工作线程AI开关，0为关闭，1为打开
-    uint32     m_u4DisposeTime;                    //业务包处理超时时间
-    uint32     m_u4WTCheckTime;                    //工作线程超时包的时间范围，单位是秒
-    uint32     m_u4WTTimeoutCount;                 //工作线程超时包的单位时间内的超时次数上限
-    uint32     m_u4WTStopTime;                     //停止此命令服务的时间
+    uint32     m_u4ThreadID       = 0;                    //工作线程ID
+    uint8      m_u1WTAI           = 0;                    //工作线程AI开关，0为关闭，1为打开
+    uint32     m_u4DisposeTime    = 0;                    //业务包处理超时时间
+    uint32     m_u4WTCheckTime    = 0;                    //工作线程超时包的时间范围，单位是秒
+    uint32     m_u4WTTimeoutCount = 0;                    //工作线程超时包的单位时间内的超时次数上限
+    uint32     m_u4WTStopTime     = 0;                    //停止此命令服务的时间
 
     _WorkThreadAIInfo()
     {
-        m_u4ThreadID       = 0;
-        m_u1WTAI           = 0;
-        m_u4DisposeTime    = 0;
-        m_u4WTCheckTime    = 0;
-        m_u4WTTimeoutCount = 0;
-        m_u4WTStopTime     = 0;
     }
 };
 
@@ -233,17 +227,13 @@ typedef vector<_WorkThreadAIInfo> vecWorkThreadAIInfo;
 class _CommandTimeout
 {
 public:
-    uint32 m_u4ThreadID;        //工作线程ID
-    uint16 m_u2CommandID;       //超时的命令
-    uint64 m_u8Second;          //超时当前时间，以1970年以来开始计算的秒数
-    uint32 m_u4Timeout;         //命令执行时间，单位是毫秒
+    uint32 m_u4ThreadID  = 0;       //工作线程ID
+    uint16 m_u2CommandID = 0;       //超时的命令
+    uint64 m_u8Second    = 0;       //超时当前时间，以1970年以来开始计算的秒数
+    uint32 m_u4Timeout   = 0;       //命令执行时间，单位是毫秒
 
     _CommandTimeout()
     {
-        m_u4ThreadID  = 0;
-        m_u2CommandID = 0;
-        m_u8Second = 0;
-        m_u4Timeout   = 0;
     }
 };
 
@@ -276,25 +266,24 @@ public:
 private:
     int Do_Command_Account(uint16 u2CommandID, uint64 u8Now, uint32 u4TimeCost, bool& blRet);   //统计Command的AI数据
 
-    uint8      m_u1WTAI;                           //工作线程AI开关，0为关闭，1为打开
-    uint16     m_u4DisposeTime;                    //业务包处理超时时间
-    uint32     m_u4WTCheckTime;                    //工作线程超时包的时间范围，单位是秒
-    uint32     m_u4WTTimeoutCount;                 //工作线程超时包的单位时间内的超时次数上限
-    uint32     m_u4WTStopTime;                     //停止此命令服务的时间
-    uint8      m_u1WTReturnDataType;               //返回错误数据的类型，1为二进制，2为文本
-    char       m_szWTReturnData[MAX_BUFF_1024];    //返回的数据体，最多1K
-    uint16     m_u2ReturnDataLen;                  //返回数据体长度
+    uint8      m_u1WTAI                        = 0;           //工作线程AI开关，0为关闭，1为打开
+    uint16     m_u2ReturnDataLen               = 0;           //返回数据体长度
+    uint16     m_u4DisposeTime                 = 0;           //业务包处理超时时间
+    uint32     m_u4WTCheckTime                 = 0;           //工作线程超时包的时间范围，单位是秒
+    uint32     m_u4WTTimeoutCount              = 0;           //工作线程超时包的单位时间内的超时次数上限
+    uint32     m_u4WTStopTime                  = 0;           //停止此命令服务的时间
+    uint8      m_u1WTReturnDataType            = 0;           //返回错误数据的类型，1为二进制，2为文本
+    char       m_szWTReturnData[MAX_BUFF_1024] = {'\0'};      //返回的数据体，最多1K
 
     //超时的命令集合
     class _CommandTime
     {
     public:
-        uint16 m_u2CommandID;
+        uint16 m_u2CommandID = 0;
         CRingLink<_CommandTimeout> m_objTime;
 
         _CommandTime()
         {
-            m_u2CommandID = 0;
         }
     };
 

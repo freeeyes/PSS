@@ -23,7 +23,7 @@ const uint16 LOGICTHREAD_CLOSE_TIMEWAIT = 1000;
 class CLogicThreadMessage
 {
 public:
-    CLogicThreadMessage() : m_nHashID(0), m_nMessageID(0), m_pParam(NULL)
+    CLogicThreadMessage()
     {
         //指针关系也可以在这里直接指定，不必使用的使用再指定
         m_pmbQueuePtr = new ACE_Message_Block(sizeof(CLogicThreadMessage*));
@@ -62,25 +62,23 @@ public:
         return m_pmbQueuePtr;
     }
 
-    int                 m_nHashID;
-    int                 m_nMessageID;
-    void*               m_pParam;
-    ACE_Message_Block*  m_pmbQueuePtr;        //消息队列指针块
+    int                 m_nHashID     = 0;
+    int                 m_nMessageID  = 0;
+    void*               m_pParam      = NULL;
+    ACE_Message_Block*  m_pmbQueuePtr = NULL;        //消息队列指针块
 };
 
 //逻辑线程参数
 class CLogicThreadInfo
 {
 public:
-    CLogicThreadInfo() : m_nLogicThreadID(0),
-        m_nTimeout(0),
-        m_pLogicQueue(NULL)
+    CLogicThreadInfo()
     {
     }
 
-    int          m_nLogicThreadID;
-    int          m_nTimeout;
-    ILogicQueue* m_pLogicQueue;
+    int          m_nLogicThreadID = 0;
+    int          m_nTimeout       = 0;
+    ILogicQueue* m_pLogicQueue    = NULL;
 };
 
 //Message对象池
@@ -125,12 +123,12 @@ private:
     bool Dispose_Queue();                                  //队列消费
 
     CLogicThreadInfo                m_objThreadInfo;
-    bool                            m_blRun;
+    bool                            m_blRun             = false;
     ACE_Thread_Mutex                m_logicthreadmutex;
     ACE_Condition<ACE_Thread_Mutex> m_logicthreadcond;
-    uint32                          m_u4ThreadState;       //当前工作线程状态
-    ACE_Time_Value                  m_tvUpdateTime;        //线程最后处理数据的时间
-    CLogicThreadMessagePool         m_MessagePool;         //消息池
+    uint32                          m_u4ThreadState     = 0;       //当前工作线程状态
+    ACE_Time_Value                  m_tvUpdateTime;                //线程最后处理数据的时间
+    CLogicThreadMessagePool         m_MessagePool;                 //消息池
 };
 
 //逻辑线程管理器
@@ -170,7 +168,7 @@ public:
     CHashTable<CLogicThread>     m_objThreadInfoList;
     CHashTable<CLogicThreadInfo> m_objMessageIDList;
     ACE_Recursive_Thread_Mutex   m_ThreadWriteLock;
-    uint32                       m_u4TimerID;
+    uint32                       m_u4TimerID = 0;
 };
 
 typedef ACE_Singleton<CMessageQueueManager, ACE_Null_Mutex> App_MessageQueueManager;

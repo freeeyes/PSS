@@ -6,20 +6,8 @@
 
 #include "MessageService.h"
 
-CMessageService::CMessageService():m_mutex(), m_cond(m_mutex)
+CMessageService::CMessageService(): m_cond(m_mutex)
 {
-    m_u4ThreadID         = 0;
-    m_u4MaxQueue         = MAX_MSG_THREADQUEUE;
-    m_blRun              = false;
-    m_blIsCpuAffinity    = false;
-    m_u4HighMask         = 0;
-    m_u4LowMask          = 0;
-    m_u8TimeCost         = 0;
-    m_u4Count            = 0;
-    m_emThreadState      = THREAD_STOP;
-    m_u2ThreadTimeCheck  = 0;
-    m_u4WorkQueuePutTime = 0;
-
     uint16 u2ThreadTimeOut = GetXmlConfigAttribute(xmlThreadInfo)->ThreadTimeout;
 
     if(u2ThreadTimeOut == 0)
@@ -736,13 +724,6 @@ bool CMessageService::Dispose_Queue()
 //==========================================================
 CMessageServiceGroup::CMessageServiceGroup()
 {
-    m_u4TimerID      = 0;
-    m_u4MaxQueue     = 0;
-    m_u4HighMask     = 0;
-    m_u4LowMask      = 0;
-    m_u2CurrThreadID = 0;
-    m_u2CpuNumber    = 0;
-
     uint16 u2ThreadTimeCheck = GetXmlConfigAttribute(xmlThreadInfo)->ThreadTimeCheck;
 
     if(u2ThreadTimeCheck == 0)

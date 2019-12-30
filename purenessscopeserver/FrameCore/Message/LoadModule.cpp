@@ -8,7 +8,6 @@
 
 CLoadModule::CLoadModule(void)
 {
-    m_szModulePath[0] = '\0';
 }
 
 void CLoadModule::Init(uint16 u2MaxModuleCount)

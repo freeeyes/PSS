@@ -2,7 +2,6 @@
 
 CMessageDyeingManager::CMessageDyeingManager()
 {
-    m_u2CurrCommandCount = 0;
 }
 
 CMessageDyeingManager::~CMessageDyeingManager()

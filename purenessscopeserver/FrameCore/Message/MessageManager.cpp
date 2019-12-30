@@ -21,10 +21,6 @@ bool Delete_CommandInfo(_ClientCommandInfo* pClientCommandInfo)
 
 CMessageManager::CMessageManager(void)
 {
-    m_u2MaxModuleCount     = 0;
-    m_u4MaxCommandCount    = 0;
-    m_u4CurrCommandCount   = 0;
-    m_u4UpdateIndex        = 0;
 }
 
 void CMessageManager::Init(uint16 u2MaxModuleCount, uint32 u4MaxCommandCount)

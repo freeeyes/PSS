@@ -36,14 +36,14 @@ public:
     ACE_Message_Block*  GetQueueMessage();
 
 private:
-    int           m_nHashID;
-    char          m_szError[MAX_BUFF_500];
-    _MessageBase* m_pMessageBase;
+    int           m_nHashID               = 0;
+    char          m_szError[MAX_BUFF_500] = {'\0'};
+    _MessageBase* m_pMessageBase          = NULL;
 
-    ACE_Message_Block* m_pmbHead;             //包头部分
-    ACE_Message_Block* m_pmbBody;             //包体部分
+    ACE_Message_Block* m_pmbHead          = NULL;    //包头部分
+    ACE_Message_Block* m_pmbBody          = NULL;   //包体部分
 
-    ACE_Message_Block*  m_pmbQueuePtr;        //消息队列指针块
+    ACE_Message_Block*  m_pmbQueuePtr     = NULL;   //消息队列指针块
 };
 
 

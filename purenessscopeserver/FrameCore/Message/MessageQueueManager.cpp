@@ -40,10 +40,8 @@ bool CLogicThreadMessagePool::Delete(CLogicThreadMessage* pMessage)
 }
 
 //========================================================
-CLogicThread::CLogicThread() : m_blRun(false),
-    m_logicthreadmutex(),
-    m_logicthreadcond(m_logicthreadmutex),
-    m_u4ThreadState(0)
+CLogicThread::CLogicThread() :
+    m_logicthreadcond(m_logicthreadmutex)
 {
 }
 
@@ -259,7 +257,6 @@ bool CLogicThread::Dispose_Queue()
 
 CMessageQueueManager::CMessageQueueManager()
 {
-    m_u4TimerID = 0;
 }
 
 int CMessageQueueManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)

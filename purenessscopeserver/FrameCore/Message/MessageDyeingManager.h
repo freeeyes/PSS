@@ -14,22 +14,21 @@ const uint16 MAX_DYEING_COMMAND_COUNT = 10;  //最大染色命令数
 class _Dyeing_IP
 {
 public:
-    uint16  m_u2MaxCount;        //当前需要监控的最大个数
-    uint16  m_u2CurrCount;       //当前的已处理的个数
-    bool m_blIsValid;            //监控是否有效
-    char m_szIP[MAX_BUFF_20];    //用户IP
+    uint16  m_u2MaxCount     = 0;        //当前需要监控的最大个数
+    uint16  m_u2CurrCount    = 0;        //当前的已处理的个数
+    bool m_blIsValid         = false;    //监控是否有效
+    char m_szIP[MAX_BUFF_20] = {'\0'};   //用户IP
 
     _Dyeing_IP()
     {
-        Clear();
     }
 
     void Clear()
     {
-        m_u2MaxCount = 0;
-        m_u2CurrCount = 0;
-        m_blIsValid = false;
-        m_szIP[0] = '\0';
+		m_u2MaxCount = 0;
+		m_u2CurrCount = 0;
+		m_blIsValid = false;
+		m_szIP[0] = '\0';
     }
 };
 
@@ -37,10 +36,10 @@ public:
 class _Dyeing_Command
 {
 public:
-    uint16  m_u2CommandID;       //当前CommandID
-    uint16  m_u2MaxCount;        //当前需要监控的最大个数
-    uint16  m_u2CurrCount;       //当前的已处理的个数
-    bool    m_blIsValid;         //监控是否有效
+    uint16  m_u2CommandID = 0;       //当前CommandID
+    uint16  m_u2MaxCount  = 0;       //当前需要监控的最大个数
+    uint16  m_u2CurrCount = 0;       //当前的已处理的个数
+    bool    m_blIsValid   = false;   //监控是否有效
 
     _Dyeing_Command()
     {
@@ -74,7 +73,7 @@ public:
 private:
     _Dyeing_Command m_objCommandList[MAX_DYEING_COMMAND_COUNT];   //当前允许数据染色的CommandID列表
     _Dyeing_IP      m_objDyeingIP;                                //当前允许染色的IP
-    uint16          m_u2CurrCommandCount;                         //当前正在执行的染色CommandID个数
+    uint16          m_u2CurrCommandCount = 0;                     //当前正在执行的染色CommandID个数
 };
 
 #endif

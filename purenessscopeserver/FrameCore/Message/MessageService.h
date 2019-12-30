@@ -92,19 +92,19 @@ private:
     void UpdateCommandList(ACE_Message_Block* pmb);        //更新指令列表
     bool Dispose_Queue();                                  //队列消费
 
-    uint64                         m_u8TimeCost;           //Put到队列信息的数据处理时间
-    uint32                         m_u4ThreadID;           //当前线程ID
-    uint32                         m_u4MaxQueue;           //线程中最大消息对象个数
-    uint32                         m_u4HighMask;
-    uint32                         m_u4LowMask;
-    uint32                         m_u4Count;              //消息队列接受个数
-    uint32                         m_u4WorkQueuePutTime;   //入队超时时间
-    uint16                         m_u2ThreadTimeOut;
-    uint16                         m_u2ThreadTimeCheck;
-    bool                           m_blRun;                //线程是否在运行
-    bool                           m_blIsCpuAffinity;      //是否CPU绑定
+    uint64                         m_u8TimeCost         = 0;                     //Put到队列信息的数据处理时间
+    uint32                         m_u4ThreadID         = 0;                     //当前线程ID
+    uint32                         m_u4MaxQueue         = MAX_MSG_THREADQUEUE;   //线程中最大消息对象个数
+    uint32                         m_u4HighMask         = 0;        
+    uint32                         m_u4LowMask          = 0;
+    uint32                         m_u4Count            = 0;                     //消息队列接受个数
+    uint32                         m_u4WorkQueuePutTime = 0;                     //入队超时时间
+    uint16                         m_u2ThreadTimeOut    = 0;
+    uint16                         m_u2ThreadTimeCheck  = 0;
+    bool                           m_blRun              = false;                 //线程是否在运行
+    bool                           m_blIsCpuAffinity    = false;                 //是否CPU绑定
 
-    MESSAGE_SERVICE_THREAD_STATE   m_emThreadState;        //当前工作线程状态
+    MESSAGE_SERVICE_THREAD_STATE   m_emThreadState      = THREAD_STOP;           //当前工作线程状态
 
     _ThreadInfo                    m_ThreadInfo;           //当前线程信息
     CWorkThreadAI                  m_WorkThreadAI;         //线程自我监控的AI逻辑
@@ -174,13 +174,13 @@ private:
     vecMessageService m_vecMessageService;
 
 public:
-    uint32                                              m_u4MaxQueue;              //线程中最大消息对象个数
-    uint32                                              m_u4HighMask;              //线程高水位
-    uint32                                              m_u4LowMask;               //线程低水位
-    uint32                                              m_u4TimerID;               //定时器ID
-    uint16                                              m_u2ThreadTimeCheck;       //线程自检时间
-    uint16                                              m_u2CurrThreadID;          //当前轮询到的线程ID
-    uint16                                              m_u2CpuNumber;             //当前CPU的核数
+    uint32                                              m_u4MaxQueue           = 0;              //线程中最大消息对象个数
+    uint32                                              m_u4HighMask           = 0;              //线程高水位
+    uint32                                              m_u4LowMask            = 0;              //线程低水位
+    uint32                                              m_u4TimerID            = 0;              //定时器ID
+    uint16                                              m_u2ThreadTimeCheck    = 0;              //线程自检时间
+    uint16                                              m_u2CurrThreadID       = 0;              //当前轮询到的线程ID
+    uint16                                              m_u2CpuNumber          = 0;              //当前CPU的核数
     CThreadInfoList                                     m_objAllThreadInfo;        //当前所有线程信息
     CMessageDyeingManager                               m_objMessageDyeingManager; //数据染色类
     ACE_Recursive_Thread_Mutex                          m_ThreadLock;              //用于线程操作的线程锁，保证CurrThreadID的数据正常
