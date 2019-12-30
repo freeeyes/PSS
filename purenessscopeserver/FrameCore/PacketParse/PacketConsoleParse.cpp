@@ -111,7 +111,7 @@ uint8 CConsolePacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block
     }
     else
     {
-        OUR_DEBUG((LM_INFO, "[CConsolePacketParse::GetPacketStream]pCurrMessage=%d.\n", pCurrMessage->length));
+        OUR_DEBUG((LM_INFO, "[CConsolePacketParse::GetPacketStream]pCurrMessage=%d.\n", pCurrMessage->length()));
         return PACKET_GET_ENOUGH;
     }
 }
