@@ -38,7 +38,7 @@ public:
 private:
     int           m_nHashID               = 0;
     char          m_szError[MAX_BUFF_500] = {'\0'};
-    _MessageBase* m_pMessageBase          = NULL;
+    _MessageBase* m_pMessageBase          = new _MessageBase();
 
     ACE_Message_Block* m_pmbHead          = NULL;    //包头部分
     ACE_Message_Block* m_pmbBody          = NULL;   //包体部分
