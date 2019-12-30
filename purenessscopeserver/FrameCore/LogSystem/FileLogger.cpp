@@ -1,18 +1,10 @@
 #include "FileLogger.h"
 
 CLogFile::CLogFile(const char* pFileRoot, uint32 u4BufferSize, uint32 u4FileMaxSize)
-    : m_u4BufferSize(u4BufferSize)
+    : m_u4BufferSize(u4BufferSize), 
+      m_u4FileMaxSize(u4FileMaxSize* MAX_BUFF_1024 * MAX_BUFF_1024)
 {
-    m_u2CurrFileIndex = 1;
-    m_u2LogID = 0;
-    m_nDisplay = 0;
-    m_u4CurrFileSize = 0;
-    m_StrServerName = "";
-    m_u2Level = 0;
-    m_StrlogType = "ServerError";
     m_pBuffer = new char[u4BufferSize];   //这里是用于日志拼接时间所用
-    m_u4FileMaxSize = u4FileMaxSize * MAX_BUFF_1024 * MAX_BUFF_1024;
-    m_szLogTime[0] = '\0';
     sprintf_safe(m_szFileRoot, MAX_BUFF_100, "%s", pFileRoot);
 }
 
@@ -443,12 +435,6 @@ void CLogFile::CreatePath()
 
 CFileLogger::CFileLogger()
 {
-    m_pLogFileList   = NULL;
-    m_nCount         = 0;
-    m_u4BlockSize    = 0;
-    m_u4PoolCount    = 0;
-    m_u4CurrLogLevel = 0;
-    m_szLogRoot[0]   = '\0';
 }
 
 void CFileLogger::Close()

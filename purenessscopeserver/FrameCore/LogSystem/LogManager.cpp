@@ -10,12 +10,6 @@ Mutex_Allocator _log_service_mb_allocator;
 
 CLogBlockPool::CLogBlockPool()
 {
-    //初始化，日志池
-    m_pLogBlockInfo = NULL;
-
-    m_u4MaxBlockSize = 0;
-    m_u4PoolCount    = 0;
-    m_u4CurrIndex    = 0;
 }
 
 void CLogBlockPool::Init(uint32 u4BlockSize, uint32 u4PoolCount)
@@ -95,14 +89,8 @@ uint32 CLogBlockPool::GetBlockSize()
 }
 //******************************************************************
 
-CLogManager::CLogManager(void):m_mutex(), m_cond(m_mutex)
+CLogManager::CLogManager(void): m_cond(m_mutex)
 {
-    m_blIsNeedReset = false;
-    m_blRun         = false;
-    m_nThreadCount  = 1;
-    m_nQueueMax     = MAX_MSG_THREADQUEUE;
-    m_pServerLogger = NULL;
-    m_blIsMail      = false;
 }
 
 int CLogManager::open()

@@ -91,7 +91,7 @@ void CServerMessageInfoPool::Close()
     OUR_DEBUG((LM_INFO, "[CMessagePool::Close]End.\n"));
 }
 
-CServerMessageTask::CServerMessageTask() : m_mutex(), m_cond(m_mutex)
+CServerMessageTask::CServerMessageTask() : m_cond(m_mutex)
 {
 }
 

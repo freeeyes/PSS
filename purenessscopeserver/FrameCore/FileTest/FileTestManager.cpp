@@ -402,10 +402,8 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 #endif
 
     //循环将数据包压入对象
-    for (int iLoop = 0; iLoop < (int)m_vecFileTestDataInfoSt.size(); iLoop++)
+    for (const FileTestDataInfoSt& objFileTestDataInfo : m_vecFileTestDataInfoSt)
     {
-        FileTestDataInfoSt& objFileTestDataInfo = m_vecFileTestDataInfoSt[iLoop];
-
         vector<ResponseRecordSt*> vecExistList;
         m_objResponseRecordList.Get_All_Used(vecExistList);
 

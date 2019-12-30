@@ -25,10 +25,10 @@ public:
     uint32 GetBlockSize();
 
 private:
-    _LogBlockInfo* m_pLogBlockInfo;       //日志池
-    uint32         m_u4MaxBlockSize;      //日志池单块最大上限
-    uint32         m_u4PoolCount;         //日志池中的日志块个数
-    uint32         m_u4CurrIndex;         //日志池中当前已用到的日志块ID
+    _LogBlockInfo* m_pLogBlockInfo    = NULL;      //日志池
+    uint32         m_u4MaxBlockSize   = 0;         //日志池单块最大上限
+    uint32         m_u4PoolCount      = 0;         //日志池中的日志块个数
+    uint32         m_u4CurrIndex      = 0;         //日志池中当前已用到的日志块ID
 };
 
 class CLogManager : public ACE_Task<ACE_MT_SYNCH>, public ILogManager
@@ -115,14 +115,14 @@ private:
     //关闭消息队列条件变量
     ACE_Thread_Mutex                  m_mutex;
     ACE_Condition<ACE_Thread_Mutex>   m_cond;
-    bool                              m_blRun;                    //日志系统是否启动
-    bool                              m_blIsNeedReset;            //日志模块等级升级重置标志
-    bool                              m_blIsMail;                 //是否可以发送邮件
-    int                               m_nThreadCount;             //记录日志线程个数，目前默认是1
-    int                               m_nQueueMax;                //日志线程允许的最大队列个数
-    CLogBlockPool                     m_objLogBlockPool;          //日志块池
-    ACE_Recursive_Thread_Mutex        m_Logger_Mutex;             //线程锁
-    IServerLogger*                    m_pServerLogger;            //日志模块指针
+    bool                              m_blRun          = false;               //日志系统是否启动
+    bool                              m_blIsNeedReset  = false;               //日志模块等级升级重置标志
+    bool                              m_blIsMail       = false;               //是否可以发送邮件
+    int                               m_nThreadCount   = 1;                   //记录日志线程个数，目前默认是1
+    int                               m_nQueueMax      = MAX_MSG_THREADQUEUE; //日志线程允许的最大队列个数
+    CLogBlockPool                     m_objLogBlockPool;                      //日志块池
+    ACE_Recursive_Thread_Mutex        m_Logger_Mutex;                         //线程锁
+    IServerLogger*                    m_pServerLogger = NULL;                 //日志模块指针
 };
 
 typedef ACE_Singleton<CLogManager, ACE_Recursive_Thread_Mutex> AppLogManager;

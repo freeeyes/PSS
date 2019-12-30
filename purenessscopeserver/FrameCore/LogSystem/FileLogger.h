@@ -23,19 +23,14 @@ static const char FILELOG_CONFIG[] = "logger.xml";
 class _Log_File_Info
 {
 public:
-    uint16 m_u2LogID;
-    uint8  m_u1FileClass;
-    uint8  m_u1DisPlay;
-    uint16 m_u2LogLevel;
-    char   m_szFileName[MAX_BUFF_100];
+    uint16 m_u2LogID                  = 0;
+    uint8  m_u1FileClass              = 0;
+    uint8  m_u1DisPlay                = 0;
+    uint16 m_u2LogLevel               = 0;
+    char   m_szFileName[MAX_BUFF_100] = {'\0'};
 
     _Log_File_Info()
     {
-        m_u2LogID       = 0;
-        m_u1FileClass   = 0;
-        m_u1DisPlay     = 0;
-        m_u2LogLevel    = 0;
-        m_szFileName[0] = '\0';
     }
 };
 
@@ -124,20 +119,20 @@ public:
     void CreatePath();
 
 private:
-    uint32              m_u4BufferSize;               //日志缓冲最大大小
-    uint32              m_u4CurrFileSize;             //记录当前文件大小
-    uint32              m_u4FileMaxSize;              //单个日志文件的最大大小
-    uint16              m_u2CurrFileIndex;            //当前日志块序号
-    uint16              m_u2LogID;                    //日志编号
-    uint16              m_u2Level;                    //日志等级
-    int                 m_nDisplay;                   //显示还是记录文件
-    char*               m_pBuffer;                    //日志缓冲指针
-    char                m_szLogTime[MAX_TIME_SIZE];   //Log当前时间
-    char                m_szFileRoot[MAX_BUFF_100];   //路径的主目录
-    ACE_TString         m_StrlogName;                 //模块名字
-    ACE_TString         m_StrlogType;                 //日志类型
-    ACE_TString         m_StrServerName;              //服务器前缀
-    ACE_FILE_Connector  m_Connector;                  //I/O操作连接器
+    uint32              m_u4BufferSize             = 0;               //日志缓冲最大大小
+    uint32              m_u4CurrFileSize           = 0;               //记录当前文件大小
+    uint32              m_u4FileMaxSize            = 0;               //单个日志文件的最大大小
+    uint16              m_u2CurrFileIndex          = 1;               //当前日志块序号
+    uint16              m_u2LogID                  = 0;               //日志编号
+    uint16              m_u2Level                  = 0;               //日志等级
+    int                 m_nDisplay                 = 0;               //显示还是记录文件
+    char*               m_pBuffer                  = NULL;            //日志缓冲指针
+    char                m_szLogTime[MAX_TIME_SIZE] = {'\0'};          //Log当前时间
+    char                m_szFileRoot[MAX_BUFF_100] = {'\0'};          //路径的主目录
+    ACE_TString         m_StrlogName;                                 //模块名字
+    ACE_TString         m_StrlogType               = "ServerError";   //日志类型
+    ACE_TString         m_StrServerName;                              //服务器前缀
+    ACE_FILE_Connector  m_Connector;                                  //I/O操作连接器
     ACE_FILE_IO         m_File;
     ACE_FILE_Addr       m_FileAddr;
 };
@@ -166,13 +161,13 @@ public:
     virtual uint16 GetLogInfoByLogLevel(uint16 u2LogID);
 
 private:
-    CLogFile**                     m_pLogFileList;
-    char                           m_szLogRoot[MAX_BUFF_100];
-    int                            m_nCount;
+    CLogFile**                     m_pLogFileList            = NULL;
+    char                           m_szLogRoot[MAX_BUFF_100] = {'\0'};
+    int                            m_nCount                  = 0;
 
-    uint32                         m_u4BlockSize;
-    uint32                         m_u4PoolCount;
-    uint32                         m_u4CurrLogLevel;
+    uint32                         m_u4BlockSize             = 0;
+    uint32                         m_u4PoolCount             = 0;
+    uint32                         m_u4CurrLogLevel          = 0;
 };
 
 #endif
