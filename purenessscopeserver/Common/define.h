@@ -831,8 +831,8 @@ typedef  struct _VCHARS_STR
             if(type == VCHARS_TYPE::VCHARS_TYPE_TEXT)
             {
                 //文本模式
-                uint32 ulen = u1Length + 1;
-                text = new char[ulen];
+                u1Length += 1;
+                text = new char[u1Length];
 
                 if (false == memcpy_safe((char*)pData, u1Length, text, u1Length))
                 {
@@ -907,8 +907,8 @@ typedef  struct _VCHARM_STR
             if(type == VCHARS_TYPE::VCHARS_TYPE_TEXT)
             {
                 //文本模式
-                uint32 ulen = u2Length + 1;
-                text = new char[ulen];
+                u2Length += 1;
+                text = new char[u2Length];
 
                 if (false == memcpy_safe((char*)pData, u2Length, text, u2Length))
                 {
@@ -989,7 +989,8 @@ typedef  struct _VCHARB_STR
             if(type == VCHARS_TYPE::VCHARS_TYPE_TEXT)
             {
                 //文本模式
-                text = new char[u4Length + 1];
+                u4Length += 1;
+                text = new char[u4Length];
 
                 if (false == memcpy_safe((char*)pData, u4Length, text, u4Length))
                 {

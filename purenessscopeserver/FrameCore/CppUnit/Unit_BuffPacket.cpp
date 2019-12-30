@@ -470,7 +470,7 @@ void CUnit_BuffPacket::Check_AddBuff_More_VCHARS_STR(void)
 
     strSrc.text  = szSSrc;
     strSrc.u1Len = (uint8)ACE_OS::strlen(szSSrc);
-    strSrc.type  = VCHARS_TYPE_TEXT;
+    strSrc.type  = VCHARS_TYPE::VCHARS_TYPE_TEXT;
 
     (*m_pBuffPacket) << strSrc;
 
@@ -500,7 +500,7 @@ void CUnit_BuffPacket::Check_AddBuff_More_VCHARM_STR(void)
 
     strMSrc.text  = szMSSrc;
     strMSrc.u2Len = (uint16)ACE_OS::strlen(szMSSrc);
-    strMSrc.type  = VCHARS_TYPE_TEXT;
+    strMSrc.type  = VCHARS_TYPE::VCHARS_TYPE_TEXT;
 
     (*m_pBuffPacket) << strMSrc;
 
@@ -530,7 +530,7 @@ void CUnit_BuffPacket::Check_AddBuff_More_VCHARB_STR(void)
 
     strBSrc.text  = szBSSrc;
     strBSrc.u4Len = (uint32)ACE_OS::strlen(szBSSrc);
-    strBSrc.type  = VCHARS_TYPE_TEXT;
+    strBSrc.type  = VCHARS_TYPE::VCHARS_TYPE_TEXT;
 
     (*m_pBuffPacket) << strBSrc;
 
