@@ -1,8 +1,7 @@
 #include "ReTTyHandler.h"
 
-CReTTyHandler::CReTTyHandler() : m_blState(false), m_blPause(false), m_pTTyMessage(NULL), m_emDispose(CONNECT_IO_PLUGIN), m_u4PacketParseInfoID(0)
+CReTTyHandler::CReTTyHandler() 
 {
-    m_szName[0]   = 0;
     m_pmbReadBuff = new ACE_Message_Block(MAX_BUFF_1024);
 }
 

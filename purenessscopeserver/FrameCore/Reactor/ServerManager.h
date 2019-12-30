@@ -36,14 +36,14 @@ private:
     bool Init_Reactor(uint8 u1ReactorCount, uint8 u1NetMode);
     bool Run();
 
-    bool Start_Tcp_Listen();                             //启动TCP监听
-    bool Start_Udp_Listen();                             //启动UDP监听
-    bool Start_Console_Tcp_Listen();                     //启动Console TCP监听
-    void Multiple_Process_Start();                       //多进程启动
-    ConnectConsoleAcceptor  m_ConnectConsoleAcceptor;    //后台管理链接
-    Frame_Logging_Strategy* m_pFrameLoggingStrategy;     //输出对象
-    CFrameCommand           m_objFrameCommand;           //框架命令
-    CTMService              m_TMService;                  //TS定时器
+    bool Start_Tcp_Listen();                                      //启动TCP监听
+    bool Start_Udp_Listen();                                      //启动UDP监听
+    bool Start_Console_Tcp_Listen();                              //启动Console TCP监听
+    void Multiple_Process_Start();                                //多进程启动
+    ConnectConsoleAcceptor  m_ConnectConsoleAcceptor;             //后台管理链接
+    Frame_Logging_Strategy* m_pFrameLoggingStrategy   = NULL;     //输出对象
+    CFrameCommand           m_objFrameCommand;                    //框架命令
+    CTMService              m_TMService;                          //TS定时器
 };
 
 

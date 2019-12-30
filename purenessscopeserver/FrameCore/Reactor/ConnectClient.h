@@ -54,29 +54,29 @@ private:
 
     int Dispose_Recv_Data(ACE_Message_Block* pCurrMessage);               //处理接收到的数据
 
-    uint32                      m_u4SendSize;           //发送字节数
-    uint32                      m_u4SendCount;          //发送数据包数
-    uint32                      m_u4RecvSize;           //接受字节数
-    uint32                      m_u4RecvCount;          //接受数据包数
-    uint32                      m_u4CostTime;           //消息处理总时间
-    uint32                      m_u4CurrSize;           //当前接收到的字节数
-    uint32                      m_u4MaxPacketSize;      //最大接收包长
-    int                         m_nIOCount;             //当前IO操作的个数
-    int                         m_nServerID;            //服务器ID
-    uint8                       m_u1ConnectState;       //连接状态
-    char                        m_szError[MAX_BUFF_500];
+    uint32                      m_u4SendSize            = 0;          //发送字节数
+    uint32                      m_u4SendCount           = 0;          //发送数据包数
+    uint32                      m_u4RecvSize            = 0;          //接受字节数
+    uint32                      m_u4RecvCount           = 0;          //接受数据包数
+    uint32                      m_u4CostTime            = 0;          //消息处理总时间
+    uint32                      m_u4CurrSize            = 0;          //当前接收到的字节数
+    uint32                      m_u4MaxPacketSize       = MAX_MSG_PACKETLENGTH;      //最大接收包长
+    uint32                      m_u4PacketParseInfoID   = 0;          //框架处理模块ID
+    int                         m_nIOCount              = 1;          //当前IO操作的个数
+    int                         m_nServerID             = 0;          //服务器ID
+    uint8                       m_u1ConnectState        = 0;          //连接状态
+    char                        m_szError[MAX_BUFF_500] = {'\0'};
     ACE_INET_Addr               m_addrRemote;
 
     ACE_Recursive_Thread_Mutex  m_ThreadLock;
-    IClientMessage*             m_pClientMessage;            //消息处理类的指针
-    ACE_Message_Block*          m_pCurrMessage;              //当前的MB对象
-    ACE_Time_Value              m_atvBegin;                  //链接建立时间
+    IClientMessage*             m_pClientMessage = NULL;              //消息处理类的指针
+    ACE_Message_Block*          m_pCurrMessage   = NULL;              //当前的MB对象
+    ACE_Time_Value              m_atvBegin;                           //链接建立时间
 
-    EM_s2s                      m_ems2s;                     //是否需要回调状态
-    ACE_Time_Value              m_atvRecv;                   //数据接收时间
-    EM_Server_Recv_State        m_emRecvState;               //0为未接收数据，1为接收数据完成，2为处理数据完成
-    EM_CONNECT_IO_DISPOSE       m_emDispose;                 //处理模式，框架处理 or 业务处理
-    uint32                      m_u4PacketParseInfoID;       //框架处理模块ID
-    string                      m_strDeviceName;             //转发接口名称
+    EM_s2s                      m_ems2s       = S2S_NEED_CALLBACK;    //是否需要回调状态
+	EM_Server_Recv_State        m_emRecvState = SERVER_RECV_INIT;     //0为未接收数据，1为接收数据完成，2为处理数据完成
+	EM_CONNECT_IO_DISPOSE       m_emDispose   = CONNECT_IO_PLUGIN;    //处理模式，框架处理 or 业务处理
+    ACE_Time_Value              m_atvRecv;                            //数据接收时间
+    string                      m_strDeviceName;                      //转发接口名称
 };
 #endif

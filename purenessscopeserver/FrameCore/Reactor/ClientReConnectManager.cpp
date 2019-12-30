@@ -2,13 +2,6 @@
 
 CReactorClientInfo::CReactorClientInfo()
 {
-    m_pConnectClient         = NULL;
-    m_pClientMessage         = NULL;
-    m_pReactorConnect        = NULL;
-    m_pReactor               = NULL;
-    m_nServerID              = 0;
-    m_emConnectState         = SERVER_CONNECT_READY;
-    m_blIsLocal              = false;
 }
 
 bool CReactorClientInfo::Init(int nServerID, const char* pIP, int nPort, uint8 u1IPType, CConnectClientConnector* pReactorConnect, IClientMessage* pClientMessage, ACE_Reactor* pReactor, uint32 u4PacketParseID)
@@ -245,12 +238,6 @@ void CReactorClientInfo::SetLocalAddr( const char* pIP, int nPort, uint8 u1IPTyp
 
 CClientReConnectManager::CClientReConnectManager(void)
 {
-    m_nTaskID                = -1;
-    m_pReactor               = NULL;
-    m_blReactorFinish        = false;
-    m_u4ConnectServerTimeout = 0;
-    m_u4MaxPoolCount         = 0;
-    m_emS2SRunState          = S2S_Run_State_Init;
 }
 
 bool CClientReConnectManager::Init(ACE_Reactor* pReactor)

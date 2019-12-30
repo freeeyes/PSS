@@ -3,25 +3,6 @@
 
 CConnectClient::CConnectClient(void)
 {
-    m_pCurrMessage      = NULL;
-    m_nIOCount          = 1;
-    m_nServerID         = 0;
-    m_u4SendSize        = 0;
-    m_u4SendCount       = 0;
-    m_u4RecvSize        = 0;
-    m_u4RecvCount       = 0;
-    m_u4CostTime        = 0;
-    m_u4MaxPacketSize   = MAX_MSG_PACKETLENGTH;
-    m_ems2s             = S2S_NEED_CALLBACK;
-    m_szError[0]        = '\0';
-    m_pClientMessage    = NULL;
-    m_u4CurrSize        = 0;
-    m_u1ConnectState    = 0;
-
-    m_emRecvState       = SERVER_RECV_INIT;
-    m_emDispose         = CONNECT_IO_PLUGIN;
-    m_u4PacketParseInfoID = 0;
-
 }
 
 CConnectClient::~CConnectClient(void)

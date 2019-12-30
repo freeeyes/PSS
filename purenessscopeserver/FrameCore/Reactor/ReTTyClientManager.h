@@ -36,12 +36,12 @@ public:
 
     virtual int handle_timeout(const ACE_Time_Value& current_time, const void* act = 0);                 //定时器执行
 private:
-    CHashTable<CReTTyHandler> m_objTTyClientHandlerList;             //连接设备列表
-    ACE_Recursive_Thread_Mutex m_ThreadWritrLock;                    //线程锁
-    ACE_Reactor*               m_pReactor;                           //反应器句柄
-    uint16                     m_u2MaxListCount;                     //最大设备数量
-    uint16                     m_u2TimeCheck;                        //定时器检测时间
-    int                        m_nTaskID;                            //定时器ID
+    CHashTable<CReTTyHandler> m_objTTyClientHandlerList;                         //连接设备列表
+    ACE_Recursive_Thread_Mutex m_ThreadWritrLock;                                //线程锁
+    ACE_Reactor*               m_pReactor       = NULL;                          //反应器句柄
+    uint16                     m_u2MaxListCount = MAX_BUFF_100;                  //最大设备数量
+    uint16                     m_u2TimeCheck    = 120;                           //定时器检测时间
+    int                        m_nTaskID        = -1;                            //定时器ID
 };
 
 typedef ACE_Singleton<CReTTyClientManager, ACE_Recursive_Thread_Mutex> App_ReTTyClientManager;

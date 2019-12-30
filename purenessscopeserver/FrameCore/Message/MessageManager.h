@@ -17,23 +17,17 @@
 class _ClientCommandInfo
 {
 public:
-    uint32          m_u4Count;                          //当前命令被调用的次数
-    uint32          m_u4TimeCost;                       //当前命令总时间消耗
-    uint32          m_u4CurrUsedCount;                  //当前正在使用的引用次数
-    CClientCommand* m_pClientCommand;                   //当前命令指针
-    uint16          m_u2CommandID;                      //当前命令对应的ID
-    char            m_szModuleName[MAX_BUFF_100];       //所属模块名称
-    ACE_Date_Time   m_dtLoadTime;                       //当前命令加载时间
-    _ClientIPInfo   m_objListenIPInfo;                  //当前允许的IP和端口入口，默认是所有当前端口
+    uint32          m_u4Count                    = 0;                  //当前命令被调用的次数
+    uint32          m_u4TimeCost                 = 0;                  //当前命令总时间消耗
+    uint32          m_u4CurrUsedCount            = 0;                  //当前正在使用的引用次数
+    CClientCommand* m_pClientCommand             = NULL;               //当前命令指针
+    uint16          m_u2CommandID                = 0;                  //当前命令对应的ID
+    char            m_szModuleName[MAX_BUFF_100] = {'\0'};             //所属模块名称
+    ACE_Date_Time   m_dtLoadTime;                                      //当前命令加载时间
+    _ClientIPInfo   m_objListenIPInfo;                                 //当前允许的IP和端口入口，默认是所有当前端口
 
     _ClientCommandInfo()
     {
-        m_pClientCommand  = NULL;
-        m_u4Count         = 0;
-        m_u4TimeCost      = 0;
-        m_szModuleName[0] = '\0';
-        m_u4CurrUsedCount = 0;
-        m_u2CommandID     = 0;
     }
 };
 

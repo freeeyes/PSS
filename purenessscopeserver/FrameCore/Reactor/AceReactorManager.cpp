@@ -2,12 +2,6 @@
 
 CAceReactor::CAceReactor()
 {
-    m_pReactor     = NULL;
-    m_nReactorType = 0;
-    m_nThreadCount = 0;
-    m_szError[0]   = '\0';
-    m_blRun        = false;
-    m_u4ReactorID  = 0;
 }
 
 void CAceReactor::SetReactorID(uint32 u4ReactorID)
@@ -259,9 +253,6 @@ ACE_Reactor* CAceReactor::GetReactor()
 
 CAceReactorManager::CAceReactorManager(void)
 {
-    m_pReactorList  = NULL;
-    m_u2RectorCount = 0;
-    ACE_OS::memset(m_szError, 0, MAX_BUFF_500);
 }
 
 void CAceReactorManager::Close()

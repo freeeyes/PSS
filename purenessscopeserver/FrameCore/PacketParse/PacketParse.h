@@ -26,7 +26,7 @@ public:
     int  GetHashID();
 
 private:
-    int m_nHashID;
+    int m_nHashID = 0;
 };
 
 #endif

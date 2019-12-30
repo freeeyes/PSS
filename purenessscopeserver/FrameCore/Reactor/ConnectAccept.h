@@ -41,11 +41,11 @@ public:
     uint32 GetListenPort();
 
 private:
-    char   m_szListenIP[MAX_BUFF_20];
-    uint32 m_u4Port;
-    uint32 m_u4AcceptCount;             //接收的总连接数
-    uint32 m_u4ClientReactorCount;      //客户端反应器的个数
-    uint32 m_u4PacketParseInfoID;       //处理包解析的模块ID
+    char   m_szListenIP[MAX_BUFF_20] = {'\0'};
+    uint32 m_u4Port                  = 0;
+    uint32 m_u4AcceptCount           = 0;        //接收的总连接数
+    uint32 m_u4ClientReactorCount    = 1;        //客户端反应器的个数
+    uint32 m_u4PacketParseInfoID     = 0;        //处理包解析的模块ID
 };
 
 class CConnectAcceptorManager
@@ -66,8 +66,8 @@ public:
 private:
     typedef vector<ConnectAcceptor*> vecConnectAcceptor;
     vecConnectAcceptor m_vecConnectAcceptor;
-    int                m_nAcceptorCount;
-    char               m_szError[MAX_BUFF_500];
+    int                m_nAcceptorCount        = 0;
+    char               m_szError[MAX_BUFF_500] = {'\0'};
 };
 
 typedef ACE_Singleton<CConnectAcceptorManager, ACE_Null_Mutex> App_ConnectAcceptorManager;

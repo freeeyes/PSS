@@ -2,48 +2,6 @@
 
 CConnectHandler::CConnectHandler(void)
 {
-    m_szError[0]          = '\0';
-    m_u4ConnectID         = 0;
-    m_u2SendCount         = 0;
-    m_u4AllRecvCount      = 0;
-    m_u4AllSendCount      = 0;
-    m_u4AllRecvSize       = 0;
-    m_u4AllSendSize       = 0;
-    m_u4SendThresHold     = MAX_MSG_SNEDTHRESHOLD;
-    m_u1ConnectState      = CONNECT_INIT;
-    m_u1SendBuffState     = CONNECT_SENDNON;
-    m_pCurrMessage        = NULL;
-    m_pBlockMessage       = NULL;
-    m_pPacketParse        = NULL;
-    m_u4CurrSize          = 0;
-    m_u4HandlerID         = 0;
-    m_u2MaxConnectTime    = 0;
-    m_u1IsActive          = 0;
-    m_u4MaxPacketSize     = MAX_MSG_PACKETLENGTH;
-    m_blBlockState        = false;
-    m_nBlockCount         = 0;
-    m_nBlockSize          = MAX_BLOCK_SIZE;
-    m_nBlockMaxCount      = MAX_BLOCK_COUNT;
-    m_u8RecvQueueTimeCost = 0;
-    m_u4RecvQueueCount    = 0;
-    m_u8SendQueueTimeCost = 0;
-    m_u4ReadSendSize      = 0;
-    m_u4SuccessSendSize   = 0;
-    m_nHashID             = 0;
-    m_u8SendQueueTimeout  = MAX_QUEUE_TIMEOUT * 1000 * 1000;  //目前因为记录的是纳秒
-    m_u8RecvQueueTimeout  = MAX_QUEUE_TIMEOUT * 1000 * 1000;  //目前因为记录的是纳秒
-    m_u2TcpNodelay        = TCP_NODELAY_ON;
-    m_u4SendMaxBuffSize   = 5*MAX_BUFF_1024;
-    m_szLocalIP[0]        = '\0';
-    m_szConnectName[0]    = '\0';
-    m_blIsLog             = false;
-    m_u4PacketParseInfoID = 0;
-    m_u4PacketDebugSize   = 0;
-    m_pPacketDebugData    = NULL;
-    m_emIOType            = NET_INPUT;
-    m_pFileTest           = NULL;
-    m_u4SendCheckTime     = 0;
-    m_u4LocalPort         = 0;
 }
 
 const char* CConnectHandler::GetError()
@@ -1551,17 +1509,8 @@ bool CConnectHandler::Test_Paceket_Parse_Stream(ACE_Message_Block* pmb)
 //***************************************************************************
 CConnectManager::CConnectManager(void):m_mutex(), m_cond(m_mutex)
 {
-    m_u4TimeCheckID      = 0;
-    m_szError[0]         = '\0';
-
     m_pTCTimeSendCheck   = NULL;
     m_tvCheckConnect     = ACE_OS::gettimeofday();
-    m_blRun              = false;
-
-    m_u4TimeConnect      = 0;
-    m_u4TimeDisConnect   = 0;
-    m_u4SendQueuePutTime = 0;
-    m_u2SendQueueMax     = MAX_MSG_SENDPACKET;
 
     //初始化发送对象池
     m_SendMessagePool.Init();
@@ -2349,9 +2298,6 @@ bool CConnectHandlerPool::Delete(CConnectHandler* pObject)
 //==============================================================
 CConnectManagerGroup::CConnectManagerGroup()
 {
-    m_objConnnectManagerList = NULL;
-    m_u4CurrMaxCount         = 0;
-    m_u2ThreadQueueCount     = SENDQUEUECOUNT;
 }
 
 void CConnectManagerGroup::Close()

@@ -47,32 +47,32 @@ private:
     bool CompareConsoleClinetIP(const char* pIP);                             //检查一个Console连接的IP是否在指定的允许列表中
 
 
-    uint32                     m_u4HandlerID;                  //此Hander生成时的ID
-    uint32                     m_u4ConnectID;                  //链接的ID
-    uint32                     m_u4AllRecvCount;               //当前链接接收数据包的个数
-    uint32                     m_u4AllSendCount;               //当前链接发送数据包的个数
-    uint32                     m_u4AllRecvSize;                //当前链接接收字节总数
-    uint32                     m_u4AllSendSize;                //当前链接发送字节总数
-    uint32                     m_u4SendThresHold;              //发送阀值(消息包的个数)
-    uint32                     m_u4SendCheckTime;              //发送检测时间的阀值
-    uint32                     m_u4CurrSize;                   //当前MB缓冲字符长度
-    int                        m_nIOCount;                     //当前IO操作的个数
-    uint16                     m_u2SendQueueMax;               //发送队列最大长度
-    uint16                     m_u2SendCount;                  //当前数据包的个数
-    uint16                     m_u2MaxConnectTime;             //最大时间链接判定
-    uint8                      m_u1ConnectState;               //目前链接处理状态
-    uint8                      m_u1SendBuffState;              //目前缓冲器是否有等待发送的数据
-    uint8                      m_u1IsClosing;                  //是否应该关闭 0为否，1为是
-    char                       m_szError[MAX_BUFF_500];
+    uint32                     m_u4HandlerID           = 0;                  //此Hander生成时的ID
+    uint32                     m_u4ConnectID           = 0;                  //链接的ID
+    uint32                     m_u4AllRecvCount        = 0;                  //当前链接接收数据包的个数
+    uint32                     m_u4AllSendCount        = 0;                  //当前链接发送数据包的个数
+    uint32                     m_u4AllRecvSize         = 0;                  //当前链接接收字节总数
+    uint32                     m_u4AllSendSize         = 0;                  //当前链接发送字节总数
+    uint32                     m_u4SendThresHold       = MAX_MSG_SNEDTHRESHOLD;    //发送阀值(消息包的个数)
+    uint32                     m_u4SendCheckTime       = 0;                  //发送检测时间的阀值
+    uint32                     m_u4CurrSize            = 0;                  //当前MB缓冲字符长度
+    int                        m_nIOCount              = 1;                  //当前IO操作的个数
+    uint16                     m_u2SendQueueMax        = MAX_MSG_SENDPACKET; //发送队列最大长度
+    uint16                     m_u2SendCount           = 0;                  //当前数据包的个数
+    uint16                     m_u2MaxConnectTime      = 0;                  //最大时间链接判定
+    uint8                      m_u1ConnectState        = CONNECT_INIT;       //目前链接处理状态
+    uint8                      m_u1SendBuffState       = CONNECT_SENDNON;    //目前缓冲器是否有等待发送的数据
+    uint8                      m_u1IsClosing           = HANDLE_ISCLOSE_NO;  //是否应该关闭 0为否，1为是
+    char                       m_szError[MAX_BUFF_500] = {'\0'};
     ACE_INET_Addr              m_addrRemote;
     ACE_Time_Value             m_atvConnect;
     ACE_Time_Value             m_atvInput;
     ACE_Time_Value             m_atvOutput;
     ACE_Time_Value             m_atvSendAlive;
     ACE_Recursive_Thread_Mutex m_ThreadLock;
-    _TimerCheckID*             m_pTCClose;
-    CConsolePacketParse*       m_pPacketParse;                 //数据包解析类
-    ACE_Message_Block*         m_pCurrMessage;                 //当前的MB对象
+    _TimerCheckID*             m_pTCClose             = NULL;
+    CConsolePacketParse*       m_pPacketParse         = NULL;                 //数据包解析类
+    ACE_Message_Block*         m_pCurrMessage         = NULL;                 //当前的MB对象
 };
 
 #endif

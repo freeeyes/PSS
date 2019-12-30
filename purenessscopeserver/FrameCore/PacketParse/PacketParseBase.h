@@ -55,17 +55,17 @@ public:
     void SetPacket_Body_Message(ACE_Message_Block* pmbBody);
 
 private:
-    uint32 m_u4PacketHead;               //包头的长度
-    uint32 m_u4PacketBody;               //包体的长度
-    uint32 m_u4HeadSrcSize;              //包头的原始长度
-    uint32 m_u4BodySrcSize;              //包体的原始长度
-    uint16 m_u2PacketCommandID;          //包命令
-    bool   m_blIsHandleHead;
-    char   m_szPacketVersion[MAX_BUFF_20];   //包解析器版本
-    uint8  m_u1Sort;                         //字节序规则，0为主机字节序，1为网络字节序
+    uint32 m_u4PacketHead                 = 0;         //包头的长度
+    uint32 m_u4PacketBody                 = 0;         //包体的长度
+    uint32 m_u4HeadSrcSize                = 0;         //包头的原始长度
+    uint32 m_u4BodySrcSize                = 0;         //包体的原始长度
+    uint16 m_u2PacketCommandID            = 0;         //包命令
+    bool   m_blIsHandleHead               = true;
+    char   m_szPacketVersion[MAX_BUFF_20] = {'\0'};    //包解析器版本
+    uint8  m_u1Sort                       = 0;         //字节序规则，0为主机字节序，1为网络字节序
 
-    ACE_Message_Block* m_pmbHead;   //包头部分
-    ACE_Message_Block* m_pmbBody;   //包体部分
+    ACE_Message_Block* m_pmbHead          = NULL;      //包头部分
+    ACE_Message_Block* m_pmbBody          = NULL;      //包体部分
 };
 
 #endif

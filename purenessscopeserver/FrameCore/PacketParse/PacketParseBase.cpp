@@ -2,21 +2,8 @@
 
 CPacketParseBase::CPacketParseBase(void)
 {
-    //在这里设置包头的长度，因为大部分的包头长度是固定的。包体长度是可变的。
-    m_u4PacketHead      = 0;
-    m_u2PacketCommandID = 0;
-    m_u4PacketBody      = 0;
-    m_u4HeadSrcSize     = 0;
-    m_u4BodySrcSize     = 0;
-    m_u1Sort            = 0;
-
     //这里修改属于你的包解析版本号
     sprintf_safe(m_szPacketVersion, MAX_BUFF_20, "1.00");
-
-    m_blIsHandleHead    = true;
-
-    m_pmbHead           = NULL;
-    m_pmbBody           = NULL;
 }
 
 void CPacketParseBase::Clear()

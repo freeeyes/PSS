@@ -2,26 +2,6 @@
 
 CConsoleHandler::CConsoleHandler(void)
 {
-    m_szError[0]       = '\0';
-    m_u4ConnectID      = 0;
-    m_u2SendCount      = 0;
-    m_u4AllRecvCount   = 0;
-    m_u4AllSendCount   = 0;
-    m_u4AllRecvSize    = 0;
-    m_u4AllSendSize    = 0;
-    m_nIOCount         = 1;
-    m_u4SendThresHold  = MAX_MSG_SNEDTHRESHOLD;
-    m_u2SendQueueMax   = MAX_MSG_SENDPACKET;
-    m_u1ConnectState   = CONNECT_INIT;
-    m_u1SendBuffState  = CONNECT_SENDNON;
-    m_pTCClose         = NULL;
-    m_u1IsClosing      = HANDLE_ISCLOSE_NO;
-    m_pCurrMessage     = NULL;
-    m_pPacketParse     = NULL;
-    m_u4CurrSize       = 0;
-    m_u4HandlerID      = 0;
-    m_u2MaxConnectTime = 0;
-    m_u4SendCheckTime  = 0;
 }
 
 const char* CConsoleHandler::GetError()

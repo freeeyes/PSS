@@ -2,11 +2,6 @@
 
 ConnectAcceptor::ConnectAcceptor()
 {
-    m_u4AcceptCount        = 0;
-    m_u4ClientReactorCount = 1;
-    m_szListenIP[0]        = '\0';
-    m_u4Port               = 0;
-    m_u4PacketParseInfoID  = 0;
 }
 
 void ConnectAcceptor::InitClientReactor(uint32 u4ClientReactorCount)
@@ -165,8 +160,6 @@ uint32 ConnectAcceptor::GetListenPort()
 
 CConnectAcceptorManager::CConnectAcceptorManager(void)
 {
-    m_nAcceptorCount = 0;
-    m_szError[0]     = '\0';
 }
 
 bool CConnectAcceptorManager::InitConnectAcceptor(int nCount, uint32 u4ClientReactorCount)

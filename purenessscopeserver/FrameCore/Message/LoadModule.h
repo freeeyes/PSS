@@ -18,27 +18,18 @@ public:
     string           strModulePath;         //模块路径
     string           strModuleParam;        //模块启动参数
     ACE_Date_Time    dtCreateTime;          //模块创建时间
-    ACE_SHLIB_HANDLE hModule;
-    int (*LoadModuleData)(CServerObject* pServerObject);
-    int (*InitModule)(CServerObject* pServerObject);
-    int (*UnLoadModuleData)(void);
-    const char* (*GetDesc)(void);
-    const char* (*GetName)(void);
-    const char* (*GetModuleKey)(void);
-    int (*DoModuleMessage)(uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket);
-    bool (*GetModuleState)(uint32& u4AErrorID);
+    ACE_SHLIB_HANDLE hModule                            = NULL;
+    int (*LoadModuleData)(CServerObject* pServerObject) = NULL;
+    int (*InitModule)(CServerObject* pServerObject)     = NULL;
+    int (*UnLoadModuleData)(void)                       = NULL;
+    const char* (*GetDesc)(void)                        = NULL;
+    const char* (*GetName)(void)                        = NULL;
+    const char* (*GetModuleKey)(void)                   = NULL;
+    int (*DoModuleMessage)(uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket) = NULL;
+    bool (*GetModuleState)(uint32& u4AErrorID)          = NULL;
 
     _ModuleInfo()
     {
-        hModule           = NULL;
-        LoadModuleData    = NULL;
-        UnLoadModuleData  = NULL;
-        GetDesc           = NULL;
-        GetName           = NULL;
-        GetModuleKey      = NULL;
-        DoModuleMessage   = NULL;
-        GetModuleState    = NULL;
-        InitModule        = NULL;
     }
 };
 

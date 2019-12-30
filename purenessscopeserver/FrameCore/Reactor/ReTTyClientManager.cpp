@@ -1,6 +1,6 @@
 #include "ReTTyClientManager.h"
 
-CReTTyClientManager::CReTTyClientManager(): m_pReactor(NULL), m_u2MaxListCount(MAX_BUFF_100), m_u2TimeCheck(120), m_nTaskID(-1)
+CReTTyClientManager::CReTTyClientManager()
 {
 
 }

@@ -58,12 +58,12 @@ private:
     void Create_Reactor_TP();
     void Create_DEV_POLL(int nMaxHandleCount);
 
-    ACE_Reactor* m_pReactor;
-    int          m_nReactorType;
-    int          m_nThreadCount;
-    char         m_szError[MAX_BUFF_500];
-    bool         m_blRun;          //反应器是否在运行
-    uint32       m_u4ReactorID;    //反应器的编号
+    ACE_Reactor* m_pReactor              = NULL;
+    int          m_nReactorType          = 0;
+    int          m_nThreadCount          = 0;
+    char         m_szError[MAX_BUFF_500] = {'\0'};
+    bool         m_blRun                 = false;     //反应器是否在运行
+    uint32       m_u4ReactorID           = 0;         //反应器的编号
 };
 
 class CAceReactorManager
@@ -87,9 +87,9 @@ public:
     uint32 GetClientReactorCount();
 
 private:
-    CAceReactor**  m_pReactorList;
-    uint16         m_u2RectorCount;
-    char           m_szError[MAX_BUFF_500];
+    CAceReactor**  m_pReactorList          = NULL;
+    uint16         m_u2RectorCount         = 0;
+    char           m_szError[MAX_BUFF_500] = {'\0'};
 };
 
 typedef ACE_Singleton<CAceReactorManager, ACE_Null_Mutex> App_ReactorManager;
