@@ -789,7 +789,7 @@ typedef struct FILETESTDATAINFO
 } FileTestDataInfoSt;
 
 //标记VCHARS_TYPE的模式
-enum VCHARS_TYPE
+enum class VCHARS_TYPE
 {
     VCHARS_TYPE_TEXT = 0,      //文本模式
     VCHARS_TYPE_BINARY,        //二进制模式
@@ -802,9 +802,9 @@ typedef  struct _VCHARS_STR
     bool        blCopy  = true;             //是否拷贝数据块，True是拷贝，默认是拷贝
     bool        blNew   = false;            //是否是new出来的数据
     uint8       u1Len   = 0;                //数据长度
-    VCHARS_TYPE type    = VCHARS_TYPE_TEXT; //类型，类型定义见VCHARS_TYPE
+    VCHARS_TYPE type    = VCHARS_TYPE::VCHARS_TYPE_TEXT; //类型，类型定义见VCHARS_TYPE
 
-    _VCHARS_STR(bool blIsCopy = true, VCHARS_TYPE ntype = VCHARS_TYPE_TEXT)
+    _VCHARS_STR(bool blIsCopy = true, VCHARS_TYPE ntype = VCHARS_TYPE::VCHARS_TYPE_TEXT)
     {
 		blCopy = blIsCopy;
 		type = ntype;
@@ -828,7 +828,7 @@ typedef  struct _VCHARS_STR
                 SAFE_DELETE(text);
             }
 
-            if(type == VCHARS_TYPE_TEXT)
+            if(type == VCHARS_TYPE::VCHARS_TYPE_TEXT)
             {
                 //文本模式
                 uint32 ulen = u1Length + 1;
@@ -878,9 +878,9 @@ typedef  struct _VCHARM_STR
     uint16      u2Len  = 0;                //数据长度
     bool        blCopy = true;             //是否拷贝数据块，True是拷贝，默认是拷贝
     bool        blNew  = false;            //是否是new出来的数据
-    VCHARS_TYPE type   = VCHARS_TYPE_TEXT; //类型，类型定义见VCHARS_TYPE
+    VCHARS_TYPE type   = VCHARS_TYPE::VCHARS_TYPE_TEXT; //类型，类型定义见VCHARS_TYPE
 
-    _VCHARM_STR(bool blIsCopy = true, VCHARS_TYPE ntype = VCHARS_TYPE_TEXT)
+    _VCHARM_STR(bool blIsCopy = true, VCHARS_TYPE ntype = VCHARS_TYPE::VCHARS_TYPE_TEXT)
     {
         blCopy = blIsCopy;
         type   = ntype;
@@ -904,7 +904,7 @@ typedef  struct _VCHARM_STR
                 SAFE_DELETE(text);
             }
 
-            if(type == VCHARS_TYPE_TEXT)
+            if(type == VCHARS_TYPE::VCHARS_TYPE_TEXT)
             {
                 //文本模式
                 uint32 ulen = u2Length + 1;
@@ -954,9 +954,9 @@ typedef  struct _VCHARB_STR
     uint32      u4Len  = 0;                  //数据长度
     bool        blCopy = true;               //是否拷贝数据块，True是拷贝，默认是拷贝
     bool        blNew  = false;              //是否是new出来的数据
-    VCHARS_TYPE type   = VCHARS_TYPE_TEXT;   //类型，类型定义见VCHARS_TYPE
+    VCHARS_TYPE type   = VCHARS_TYPE::VCHARS_TYPE_TEXT;   //类型，类型定义见VCHARS_TYPE
 
-    _VCHARB_STR(bool blIsCopy = true, VCHARS_TYPE ntype = VCHARS_TYPE_TEXT)
+    _VCHARB_STR(bool blIsCopy = true, VCHARS_TYPE ntype = VCHARS_TYPE::VCHARS_TYPE_TEXT)
     {
         blCopy = blIsCopy;
         type   = ntype;
@@ -986,7 +986,7 @@ typedef  struct _VCHARB_STR
                 SAFE_DELETE(text);
             }
 
-            if(type == VCHARS_TYPE_TEXT)
+            if(type == VCHARS_TYPE::VCHARS_TYPE_TEXT)
             {
                 //文本模式
                 text = new char[u4Length + 1];
@@ -1410,7 +1410,7 @@ private:
 //获得对自己大小端的自我判定
 //添加在mainConfig中，是因为没必要在define.h中判定
 //在框架里自己判定是否转换大小端
-enum ENUM_CHAR_ORDER
+enum class ENUM_CHAR_ORDER
 {
     SYSTEM_LITTLE_ORDER = 0,   //小端字序
     SYSTEM_BIG_ORDER,          //大端字序

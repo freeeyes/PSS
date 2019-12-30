@@ -15,53 +15,53 @@ IConfigOpeation* IConfigOpeation::_array[XML_Config_MAX];
     template<>                                                                  \
     ClassName* XMainConfig::GetXmlConfig<ClassName>()                           \
     {                                                                           \
-        return dynamic_cast<ClassName*>(IConfigOpeation::_array[XMLConfig]);    \
+        return dynamic_cast<ClassName*>(IConfigOpeation::_array[static_cast<int>(XMLConfig)]);    \
     }
 
 
 /*xml配置文件对应类型配置的静态类，需要增加配置文件标签，需要在此添加静态类对象，所有对象不直接使用,也不允许外部使用*/
 /*****************类对象和返回函数一一对应*********************/
-DefineClassAndFunc(xmlRecvInfo, XML_Config_RecvInfo)
-DefineClassAndFunc(xmlSendInfo, XML_Config_SendInfo)
-DefineClassAndFunc(xmlNetWorkMode, XML_Config_NetWorkMode)
-DefineClassAndFunc(xmlTCPServerIPs, XML_Config_TCPServerIPs)
-DefineClassAndFunc(xmlUDPServerIPs, XML_Config_UDPServerIPs)
-DefineClassAndFunc(xmlTTyDrives, XML_Config_TTyDrives)
-DefineClassAndFunc(xmlServer2Server, XML_Config_Server2Servers)
-DefineClassAndFunc(xmlConnectServer, XML_Config_ConnectServer)
-DefineClassAndFunc(xmlClientInfo, XML_Config_ClientInfo)
-DefineClassAndFunc(xmlTTyClientManagerInfo, XML_Config_TTyClientManager)
-DefineClassAndFunc(xmlModuleInfos, XML_Config_ModuleInfos)
-DefineClassAndFunc(xmlModuleMangager, XML_Config_ModuleMangager)
-DefineClassAndFunc(xmlMonitor, XML_Config_Monitor)
-DefineClassAndFunc(xmlThreadInfoAI, XML_Config_ThreadInfoAI)
-DefineClassAndFunc(xmlThreadInfo, XML_Config_ThreadInfo)
-DefineClassAndFunc(xmlConsole, XML_Config_Console)
-DefineClassAndFunc(xmlConsoleKeys, XML_Config_ConsoleKeys)
-DefineClassAndFunc(xmlConsoleClients, XML_Config_ConsoleClients)
-DefineClassAndFunc(xmlAceDebug, XML_Config_AceDebug)
-DefineClassAndFunc(xmlCommandAccount, XML_Config_CommandAccount)
-DefineClassAndFunc(xmlCoreSetting, XML_Config_CoreSetting)
-DefineClassAndFunc(xmlServerType, XML_Config_ServerType)
-DefineClassAndFunc(xmlServerID, XML_Config_ServerID)
-DefineClassAndFunc(xmlServerName, XML_Config_ServerName)
-DefineClassAndFunc(xmlServerVersion, XML_Config_ServerVersion)
-DefineClassAndFunc(xmlPacketParses, XML_Config_PacketParses)
-DefineClassAndFunc(xmlBuffPacket, XML_Config_BuffPacket)
-DefineClassAndFunc(xmlMessage, XML_Config_Message)
-DefineClassAndFunc(xmlTcpRedirection, XML_Config_Redirection)
-DefineClassAndFunc(xmlAlertConnect, XML_Config_AlertConnect)
-DefineClassAndFunc(xmlIP, XML_Config_IP)
-DefineClassAndFunc(xmlClientData, XML_Config_ClientData)
-DefineClassAndFunc(xmlCommandInfos, XML_Config_CommandInfos)
-DefineClassAndFunc(xmlMails, XML_Config_Mails)
-DefineClassAndFunc(xmlCommandsTimeout, XML_Config_Commands_Timeout)
+DefineClassAndFunc(xmlRecvInfo, XmlConfig::XML_Config_RecvInfo)
+DefineClassAndFunc(xmlSendInfo, XmlConfig::XML_Config_SendInfo)
+DefineClassAndFunc(xmlNetWorkMode, XmlConfig::XML_Config_NetWorkMode)
+DefineClassAndFunc(xmlTCPServerIPs, XmlConfig::XML_Config_TCPServerIPs)
+DefineClassAndFunc(xmlUDPServerIPs, XmlConfig::XML_Config_UDPServerIPs)
+DefineClassAndFunc(xmlTTyDrives, XmlConfig::XML_Config_TTyDrives)
+DefineClassAndFunc(xmlServer2Server, XmlConfig::XML_Config_Server2Servers)
+DefineClassAndFunc(xmlConnectServer, XmlConfig::XML_Config_ConnectServer)
+DefineClassAndFunc(xmlClientInfo, XmlConfig::XML_Config_ClientInfo)
+DefineClassAndFunc(xmlTTyClientManagerInfo, XmlConfig::XML_Config_TTyClientManager)
+DefineClassAndFunc(xmlModuleInfos, XmlConfig::XML_Config_ModuleInfos)
+DefineClassAndFunc(xmlModuleMangager, XmlConfig::XML_Config_ModuleMangager)
+DefineClassAndFunc(xmlMonitor, XmlConfig::XML_Config_Monitor)
+DefineClassAndFunc(xmlThreadInfoAI, XmlConfig::XML_Config_ThreadInfoAI)
+DefineClassAndFunc(xmlThreadInfo, XmlConfig::XML_Config_ThreadInfo)
+DefineClassAndFunc(xmlConsole, XmlConfig::XML_Config_Console)
+DefineClassAndFunc(xmlConsoleKeys, XmlConfig::XML_Config_ConsoleKeys)
+DefineClassAndFunc(xmlConsoleClients, XmlConfig::XML_Config_ConsoleClients)
+DefineClassAndFunc(xmlAceDebug, XmlConfig::XML_Config_AceDebug)
+DefineClassAndFunc(xmlCommandAccount, XmlConfig::XML_Config_CommandAccount)
+DefineClassAndFunc(xmlCoreSetting, XmlConfig::XML_Config_CoreSetting)
+DefineClassAndFunc(xmlServerType, XmlConfig::XML_Config_ServerType)
+DefineClassAndFunc(xmlServerID, XmlConfig::XML_Config_ServerID)
+DefineClassAndFunc(xmlServerName, XmlConfig::XML_Config_ServerName)
+DefineClassAndFunc(xmlServerVersion, XmlConfig::XML_Config_ServerVersion)
+DefineClassAndFunc(xmlPacketParses, XmlConfig::XML_Config_PacketParses)
+DefineClassAndFunc(xmlBuffPacket, XmlConfig::XML_Config_BuffPacket)
+DefineClassAndFunc(xmlMessage, XmlConfig::XML_Config_Message)
+DefineClassAndFunc(xmlTcpRedirection, XmlConfig::XML_Config_Redirection)
+DefineClassAndFunc(xmlAlertConnect, XmlConfig::XML_Config_AlertConnect)
+DefineClassAndFunc(xmlIP, XmlConfig::XML_Config_IP)
+DefineClassAndFunc(xmlClientData, XmlConfig::XML_Config_ClientData)
+DefineClassAndFunc(xmlCommandInfos, XmlConfig::XML_Config_CommandInfos)
+DefineClassAndFunc(xmlMails, XmlConfig::XML_Config_Mails)
+DefineClassAndFunc(xmlCommandsTimeout, XmlConfig::XML_Config_Commands_Timeout)
 
 bool XMainConfig::Init()
 {
     //初始化xml文件
-    return InitFile(MAINCONFIG, XML_Config_RecvInfo, XML_Config_Redirection)
-           && InitFile(ALERTCONFIG, XML_Config_AlertConnect, XML_Config_Commands_Timeout);
+    return InitFile(MAINCONFIG, XmlConfig::XML_Config_RecvInfo, XmlConfig::XML_Config_Redirection)
+           && InitFile(ALERTCONFIG, XmlConfig::XML_Config_AlertConnect, XmlConfig::XML_Config_Commands_Timeout);
 }
 
 bool XMainConfig::InitFile(const char* pFileName, XmlConfig start, XmlConfig end)
@@ -75,9 +75,9 @@ bool XMainConfig::InitFile(const char* pFileName, XmlConfig start, XmlConfig end
         1.范围
         2.init函数返回结果
         */
-        int i = start;
+        int i = static_cast<int>(start);
 
-        for (; i <= end && bKet; ++i)
+        for (; i <= static_cast<int>(end) && bKet; ++i)
         {
             bKet = IConfigOpeation::_array[i]->Init(&m_XmlOperation);
         }
@@ -180,12 +180,12 @@ void xmlNetWorkMode::SetLocalByteOrder()
     //判定字节序
     if (O32_HOST_ORDER == O32_LITTLE_ENDIAN)
     {
-        LocalByteOrder = SYSTEM_LITTLE_ORDER;
+        LocalByteOrder = ENUM_CHAR_ORDER::SYSTEM_LITTLE_ORDER;
         OUR_DEBUG((LM_INFO, "[XMainConfig::SetLocalByteOrder]SYSYTEM SYSTEM_LITTLE_ORDER.\n"));
     }
     else
     {
-        LocalByteOrder = SYSTEM_BIG_ORDER;
+        LocalByteOrder = ENUM_CHAR_ORDER::SYSTEM_BIG_ORDER;
         OUR_DEBUG((LM_INFO, "[XMainConfig::SetLocalByteOrder]SYSYTEM SYSTEM_BIG_ORDER.\n"));
     }
 }

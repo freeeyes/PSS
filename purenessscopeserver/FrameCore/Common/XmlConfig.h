@@ -9,17 +9,17 @@
 2.需要增加枚举必须从 MIN到MAX区间范围添加
 3.同文件的枚举必须相连*/
 
-enum XmlStart
+enum class XmlStart
 {
     XML_Config_MIN = 0
 };
 
-enum XmlConfig
+enum class XmlConfig
 {
     /*******************main.xml************************/
 
     /********网络设置********/
-    XML_Config_RecvInfo = XML_Config_MIN,
+    XML_Config_RecvInfo = static_cast<int>(XmlStart::XML_Config_MIN),
     XML_Config_SendInfo,
     XML_Config_NetWorkMode,
     XML_Config_TCPServerIPs,
@@ -69,7 +69,7 @@ enum XmlConfig
 
 enum XmlEnd
 {
-    XML_Config_MAX = XML_Config_End
+    XML_Config_MAX = static_cast<int>(XmlConfig::XML_Config_End)
 };
 
 class IConfigOpeation;
@@ -111,15 +111,14 @@ public:
     }
     virtual ~IConfigOpeation() {}
 protected:
-    IConfigOpeation(XmlConfig config, const char* name)
+    IConfigOpeation(XmlConfig config, const char* name) : m_name(name)
     {
-        m_name = name;
-        _array[config] = this;
+        _array[static_cast<int>(config)] = this;
     }
     virtual bool Init(CXmlOpeation* pXmlOperation) = 0;
 private:
     std::string m_name;
-    static IConfigOpeation* _array[XML_Config_MAX];
+    static IConfigOpeation* _array[static_cast<int>(XmlEnd::XML_Config_MAX)];
 };
 
 
@@ -158,7 +157,7 @@ public:
     uint8 Mode                     = 0;
     uint16 BackLog                 = 0;
     bool NetByteOrder              = false;
-    ENUM_CHAR_ORDER LocalByteOrder = SYSTEM_BIG_ORDER;
+    ENUM_CHAR_ORDER LocalByteOrder = ENUM_CHAR_ORDER::SYSTEM_BIG_ORDER;
     xmlNetWorkMode(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 private:

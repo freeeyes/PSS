@@ -949,7 +949,7 @@ void DoMessage_ShowServerInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuf
             pBuffPacket->WriteStream(GetXmlConfigAttribute(xmlServerVersion)->Version.c_str(), u1PacketVersionLen);
 
             //返回当前服务器是大端还是小端
-            if (GetXmlConfigAttribute(xmlNetWorkMode)->LocalByteOrder == SYSTEM_LITTLE_ORDER)
+            if (GetXmlConfigAttribute(xmlNetWorkMode)->LocalByteOrder == ENUM_CHAR_ORDER::SYSTEM_LITTLE_ORDER)
             {
                 (*pBuffPacket) << (uint8)0;     //小端
             }
