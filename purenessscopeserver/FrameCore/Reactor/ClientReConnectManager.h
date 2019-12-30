@@ -99,7 +99,7 @@ public:
     ACE_Reactor*                    m_pReactor               = NULL;               //当前的反应器
     bool                            m_blReactorFinish        = false;              //Reactor是否已经注册
     uint32                          m_u4ConnectServerTimeout = 0;                  //连接间隔时间
-    int32                           m_u4MaxPoolCount         = NULL;               //连接池的上限
+    int32                           m_u4MaxPoolCount         = 0;                  //连接池的上限
     EM_S2S_Run_State                m_emS2SRunState          = S2S_Run_State_Init; //当前服务连接状态
     vector<CS2SConnectGetRandyInfo> m_GetReadyInfoList;                            //需要等待连接的数据信息
 };
