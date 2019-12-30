@@ -28,10 +28,8 @@ void CLoadModule::Close()
 
     uint32 u4Size = (uint32)vecModuleInfo.size();
 
-    for (uint32 i = 0; i < u4Size; i++)
+    for (const _ModuleInfo* pModuleInfo : vecModuleInfo)
     {
-        _ModuleInfo* pModuleInfo = vecModuleInfo[i];
-
         if(NULL != pModuleInfo)
         {
             obj_vecModuleName.push_back(pModuleInfo->GetName());
@@ -72,7 +70,7 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, c
     }
 
     //查找此模块是否已经被注册，有则把信息老信息清理
-    _ModuleInfo* pOldModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(pModuleInfo->GetName());
+    const _ModuleInfo* pOldModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(pModuleInfo->GetName());
 
     if(NULL != pOldModuleInfo)
     {
@@ -107,7 +105,7 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, c
 bool CLoadModule::UnLoadModule(const char* szModuleName, bool blIsDelete)
 {
     OUR_DEBUG((LM_ERROR, "[CLoadModule::UnLoadModule]szResourceName=%s.\n", szModuleName));
-    _ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(szModuleName);
+    const _ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(szModuleName);
 
     if(NULL == pModuleInfo)
     {
@@ -137,7 +135,7 @@ bool CLoadModule::MoveUnloadList(const char* szModuleName, uint32 u4UpdateIndex,
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_tmModule);
     OUR_DEBUG((LM_ERROR, "[CLoadModule::MoveUnloadList]szResourceName=%s.\n", szModuleName));
-    _ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(szModuleName);
+    const _ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(szModuleName);
 
     if (NULL == pModuleInfo)
     {
@@ -251,7 +249,7 @@ bool CLoadModule::InitModule()
 
 bool CLoadModule::InitModule(const char* pModuleName)
 {
-    _ModuleInfo* pModule = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
+    const _ModuleInfo* pModule = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
 
     if (NULL != pModule)
     {
@@ -359,7 +357,7 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo,
 
 int CLoadModule::SendModuleMessage(const char* pModuleName, uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket)
 {
-    _ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
+    const _ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
 
     if(NULL != pModuleInfo)
     {
@@ -371,7 +369,7 @@ int CLoadModule::SendModuleMessage(const char* pModuleName, uint16 u2CommandID, 
 
 bool CLoadModule::GetModuleExist(const char* pModuleName)
 {
-    _ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
+    const _ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
 
     if(NULL != pModuleInfo)
     {
@@ -385,7 +383,7 @@ bool CLoadModule::GetModuleExist(const char* pModuleName)
 
 const char* CLoadModule::GetModuleParam(const char* pModuleName)
 {
-    _ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
+    const _ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
 
     if(NULL != pModuleInfo)
     {
@@ -399,7 +397,7 @@ const char* CLoadModule::GetModuleParam(const char* pModuleName)
 
 const char* CLoadModule::GetModuleFileName(const char* pModuleName)
 {
-    _ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
+    const _ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
 
     if(NULL != pModuleInfo)
     {
@@ -413,7 +411,7 @@ const char* CLoadModule::GetModuleFileName(const char* pModuleName)
 
 const char* CLoadModule::GetModuleFilePath(const char* pModuleName)
 {
-    _ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
+    const _ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
 
     if(NULL != pModuleInfo)
     {
@@ -427,7 +425,7 @@ const char* CLoadModule::GetModuleFilePath(const char* pModuleName)
 
 const char* CLoadModule::GetModuleFileDesc(const char* pModuleName)
 {
-    _ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
+    const _ModuleInfo* pModuleInfo = m_objHashModuleList.Get_Hash_Box_Data(pModuleName);
 
     if(NULL != pModuleInfo)
     {

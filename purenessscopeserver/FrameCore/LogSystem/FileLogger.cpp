@@ -85,7 +85,7 @@ char* CLogFile::GetFileRoot()
     return m_szFileRoot;
 }
 
-void CLogFile::SetFileAddr(ACE_FILE_Addr& objFileAddr)
+void CLogFile::SetFileAddr(const ACE_FILE_Addr& objFileAddr)
 {
     m_FileAddr = objFileAddr;
 }
@@ -95,7 +95,7 @@ ACE_FILE_Addr& CLogFile::GetFileAddr()
     return m_FileAddr;
 }
 
-void CLogFile::SetConnector(ACE_FILE_Connector& objConnector)
+void CLogFile::SetConnector(const ACE_FILE_Connector& objConnector)
 {
     m_Connector = objConnector;
 }
@@ -105,7 +105,7 @@ ACE_FILE_Connector& CLogFile::GetConnector()
     return m_Connector;
 }
 
-void CLogFile::SetFileIO(ACE_FILE_IO& objFile)
+void CLogFile::SetFileIO(const ACE_FILE_IO& objFile)
 {
     m_File = objFile;
 }
@@ -211,10 +211,10 @@ int CLogFile::doLog(_LogBlockInfo* pLogBlockInfo)
     return 0;
 }
 
-bool CLogFile::SendMail(_LogBlockInfo* pLogBlockInfo, xmlMails::_Mail* pMailInfo)
+bool CLogFile::SendMail(const _LogBlockInfo* pLogBlockInfo, xmlMails::_Mail* pMailInfo)
 {
     //发送邮件
-    xmlMails::_Mail* pMailAlert = NULL;
+    const xmlMails::_Mail* pMailAlert = NULL;
 
     //如果没有单独配置，则从配置文件中直接获得
     if(NULL == pMailInfo)
@@ -574,7 +574,7 @@ bool CFileLogger::Init()
     m_pLogFileList = new CLogFile*[m_nCount];
     memset(m_pLogFileList, 0, sizeof(CLogFile*)*m_nCount);
 
-    for(auto& objFileInfo : objvecLogFileInfo)
+    for(const auto& objFileInfo : objvecLogFileInfo)
     {
         int nPos = objFileInfo.m_u2LogID % m_nCount;
         CLogFile* pLogFile = new CLogFile(m_szLogRoot, m_u4BlockSize, u4FileMaxSize);

@@ -14,7 +14,7 @@
 #include "ConnectHandler.h"
 #endif
 
-bool Delete_CommandInfo(_ClientCommandInfo* pClientCommandInfo)
+bool Delete_CommandInfo(const _ClientCommandInfo* pClientCommandInfo)
 {
     return pClientCommandInfo->m_u4CurrUsedCount == 0;
 }
@@ -55,7 +55,7 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1LoadS
     uint32 u4TmpUpdateIndex = 0;
 
     //获得重载对象相关参数
-    _ModuleInfo* pModuleInfo = App_ModuleLoader::instance()->GetModuleInfo(pModuleName);
+    const _ModuleInfo* pModuleInfo = App_ModuleLoader::instance()->GetModuleInfo(pModuleName);
 
     if(NULL != pModuleInfo)
     {
@@ -65,7 +65,7 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1LoadS
         strModuleParam = pModuleInfo->strModuleParam;
     }
 
-    _ModuleClient* pModuleClient = m_objModuleClientList.Get_Hash_Box_Data(strModuleName.c_str());
+    const _ModuleClient* pModuleClient = m_objModuleClientList.Get_Hash_Box_Data(strModuleName.c_str());
 
     if(NULL != pModuleClient)
     {
@@ -157,7 +157,7 @@ CHashTable<CClientCommandList>* CMessageManager::GetHashCommandList()
     return &m_objClientCommandList;
 }
 
-bool CMessageManager::AddClientCommand_Ex(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, _ClientIPInfo* pListenInfo)
+bool CMessageManager::AddClientCommand_Ex(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, const _ClientIPInfo* pListenInfo)
 {
     if (NULL == pClientCommand)
     {
@@ -166,7 +166,7 @@ bool CMessageManager::AddClientCommand_Ex(uint16 u2CommandID, CClientCommand* pC
     }
 
     //从配置文件获取Timeout设置
-    xmlCommandsTimeout::_CommandsTimeout* pCommandTimeout = GetXmlConfigAttribute(xmlCommandsTimeout)->GetCommandAlert(u2CommandID);
+   const xmlCommandsTimeout::_CommandsTimeout* pCommandTimeout = GetXmlConfigAttribute(xmlCommandsTimeout)->GetCommandAlert(u2CommandID);
 
     CClientCommandList* pClientCommandList = GetClientCommandExist(u2CommandID);
 
@@ -239,7 +239,7 @@ bool CMessageManager::AddClientCommand_Ex(uint16 u2CommandID, CClientCommand* pC
     return true;
 }
 
-void CMessageManager::DeleteCommandByModule(_ClientCommandInfo* pClientCommandInfo)
+void CMessageManager::DeleteCommandByModule(const _ClientCommandInfo* pClientCommandInfo)
 {
     uint16 u2CommandID = pClientCommandInfo->m_u2CommandID;
     CClientCommandList* pClientCommandList = GetClientCommandExist(u2CommandID);

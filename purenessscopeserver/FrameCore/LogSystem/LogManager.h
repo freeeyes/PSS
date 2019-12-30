@@ -110,7 +110,7 @@ private:
     bool Dispose_Queue();
     int ProcessLog(_LogBlockInfo* pLogBlockInfo);
     virtual int CloseMsgQueue();
-    int Update_Log_Block(int nLogType, uint32* pMailID, const char* pTitle, _LogBlockInfo* pLogBlockInfo);
+    int Update_Log_Block(int nLogType, const uint32* pMailID, const char* pTitle, _LogBlockInfo* pLogBlockInfo);
 
     //关闭消息队列条件变量
     ACE_Thread_Mutex                  m_mutex;

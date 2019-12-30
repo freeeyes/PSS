@@ -419,7 +419,7 @@ int CMessageQueueManager::SendLogicThreadMessage(int nMessageID, void* arg)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWriteLock);
 
-    CLogicThreadInfo* pLogicThreadInfo = m_objMessageIDList.Get_Hash_Box_Data_By_Uint32((uint32)nMessageID);
+    const CLogicThreadInfo* pLogicThreadInfo = m_objMessageIDList.Get_Hash_Box_Data_By_Uint32((uint32)nMessageID);
 
     if (NULL == pLogicThreadInfo)
     {

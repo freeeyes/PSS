@@ -85,11 +85,11 @@ private:
     bool ProcessMessage(CMessage* pMessage, uint32 u4ThreadID);
     void CloseCommandList();                                                //清理当前信令列表副本
     CClientCommandList* GetClientCommandList(uint16 u2CommandID);
-    bool DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost, uint16& u2Count, bool& bDeleteFlag);
+    bool DoMessage(const ACE_Time_Value& tvBegin, IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost, uint16& u2Count, bool& bDeleteFlag);
 
     virtual int CloseMsgQueue();
 
-    void UpdateCommandList(ACE_Message_Block* pmb);        //更新指令列表
+    void UpdateCommandList(const ACE_Message_Block* pmb);        //更新指令列表
     bool Dispose_Queue();                                  //队列消费
 
     uint64                         m_u8TimeCost         = 0;                     //Put到队列信息的数据处理时间

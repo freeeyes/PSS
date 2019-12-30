@@ -501,7 +501,7 @@ int CLogManager::CloseMsgQueue()
     return Task_Common_CloseMsgQueue((ACE_Task<ACE_MT_SYNCH>*)this, m_cond, m_mutex);
 }
 
-int CLogManager::Update_Log_Block(int nLogType, uint32* pMailID, const char* pTitle, _LogBlockInfo* pLogBlockInfo)
+int CLogManager::Update_Log_Block(int nLogType, const uint32* pMailID, const char* pTitle, _LogBlockInfo* pLogBlockInfo)
 {
     //查看当前日志是否需要入库
     if (GetLogInfoByLogLevel(nLogType) < m_pServerLogger->GetCurrLevel())

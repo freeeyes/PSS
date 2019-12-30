@@ -50,15 +50,15 @@ public:
 
     char* GetFileRoot();
 
-    void SetFileAddr(ACE_FILE_Addr& objFileAddr);
+    void SetFileAddr(const ACE_FILE_Addr& objFileAddr);
 
     ACE_FILE_Addr& GetFileAddr();
 
-    void SetConnector(ACE_FILE_Connector& objConnector);
+    void SetConnector(const ACE_FILE_Connector& objConnector);
 
     ACE_FILE_Connector& GetConnector();
 
-    void SetFileIO(ACE_FILE_IO& objFile);
+    void SetFileIO(const ACE_FILE_IO& objFile);
 
     ACE_FILE_IO& GetFileIO();
 
@@ -84,7 +84,7 @@ public:
 
     virtual int doLog(_LogBlockInfo* pLogBlockInfo);
 
-    bool SendMail(_LogBlockInfo* pLogBlockInfo, xmlMails::_Mail* pMailInfo = NULL);
+    bool SendMail(const _LogBlockInfo* pLogBlockInfo, xmlMails::_Mail* pMailInfo = NULL);
 
     ACE_TString& GetLoggerName();
 

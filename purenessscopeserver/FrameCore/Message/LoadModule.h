@@ -89,7 +89,6 @@ private:
     bool LoadModuleInfo(string strModuleName, _ModuleInfo* pModuleInfo, const char* pModulePath);    //开始加载模块的接口和数据
 
     CHashTable<_ModuleInfo>            m_objHashModuleList;
-    char                               m_szModulePath[MAX_BUFF_200] = {'\0'};
     vector<CWaitUnLoadModule>          m_veCWaitUnLoadModule;
     ACE_Recursive_Thread_Mutex         m_tmModule;
     vector<string>                     m_vecModuleNameList;               //当前插件名称列表

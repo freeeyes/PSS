@@ -58,7 +58,7 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
     m_objClientCommandList.Init(App_MessageManager::instance()->GetMaxCommandCount());
 
     //初始化CommandID告警阀值相关
-    for(auto& objCommandInfo : GetXmlConfigAttribute(xmlCommandInfos)->vec)
+    for(const auto& objCommandInfo : GetXmlConfigAttribute(xmlCommandInfos)->vec)
     {
         m_CommandAccount.AddCommandAlert(objCommandInfo.CommandID,
                                          objCommandInfo.CommandCount,
@@ -423,7 +423,7 @@ CClientCommandList* CMessageService::GetClientCommandList(uint16 u2CommandID)
     return m_objClientCommandList.Get_Hash_Box_Data_By_Uint32((uint32)u2CommandID);
 }
 
-bool CMessageService::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost, uint16& u2Count, bool& bDeleteFlag)
+bool CMessageService::DoMessage(const ACE_Time_Value& tvBegin, IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost, uint16& u2Count, bool& bDeleteFlag)
 {
     if (NULL == pMessage)
     {
@@ -440,7 +440,7 @@ bool CMessageService::DoMessage(ACE_Time_Value& tvBegin, IMessage* pMessage, uin
 
         for (int i = 0; i < nCount; i++)
         {
-            _ClientCommandInfo* pClientCommandInfo = pClientCommandList->GetClientCommandIndex(i);
+            const _ClientCommandInfo* pClientCommandInfo = pClientCommandList->GetClientCommandIndex(i);
 
             if (NULL != pClientCommandInfo)
             {
@@ -538,7 +538,7 @@ void CMessageService::CopyMessageManagerList()
 
                 for (int j = 0; j < pClientCommandList->GetCount(); j++)
                 {
-                    _ClientCommandInfo* pClientCommandInfo = pClientCommandList->GetClientCommandIndex(j);
+                    const _ClientCommandInfo* pClientCommandInfo = pClientCommandList->GetClientCommandIndex(j);
 
                     if (NULL != pClientCommandInfo)
                     {
@@ -659,7 +659,7 @@ int CMessageService::CloseMsgQueue()
     return Task_Common_CloseMsgQueue((ACE_Task<ACE_MT_SYNCH>*)this, m_cond, m_mutex);
 }
 
-void CMessageService::UpdateCommandList(ACE_Message_Block* pmb)
+void CMessageService::UpdateCommandList(const ACE_Message_Block* pmb)
 {
     uint32 u4UpdateIndex = 0;
     memcpy_safe(pmb->rd_ptr(), sizeof(int), (char*)&u4UpdateIndex, sizeof(int));
@@ -1029,12 +1029,8 @@ bool CMessageServiceGroup::CheckPlugInState()
     vector<_ModuleInfo*> vecModeInfo;
     App_ModuleLoader::instance()->GetAllModuleInfo(vecModeInfo);
 
-    uint32 u4Size = (uint32)vecModeInfo.size();
-
-    for (uint32 i = 0; i < u4Size; i++)
+    for (const _ModuleInfo* pModuleInfo : vecModeInfo)
     {
-        _ModuleInfo* pModuleInfo = vecModeInfo[i];
-
         if (NULL != pModuleInfo)
         {
             uint32 u4ErrorID = 0;
@@ -1199,15 +1195,11 @@ void CMessageServiceGroup::SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCh
 
 void CMessageServiceGroup::GetCommandData(uint16 u2CommandID, _CommandData& objCommandData)
 {
-    uint32 u4Size = (uint32)m_vecMessageService.size();
-
-    for (uint32 i = 0; i < u4Size; i++)
+    for (CMessageService* pMessageService : m_vecMessageService)
     {
-        CMessageService* pMessageService = m_vecMessageService[i];
-
         if (NULL != pMessageService)
         {
-            _CommandData* pCommandData = pMessageService->GetCommandData(u2CommandID);
+            const _CommandData* pCommandData = pMessageService->GetCommandData(u2CommandID);
 
             if (NULL != pCommandData)
             {
