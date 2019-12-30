@@ -166,10 +166,9 @@ private:
     bool CheckPlugInState();                                                                           //检查所有插件状态
     int32 GetWorkThreadID(uint32 u4ConnectID, uint8 u1PacketType);                                     //根据操作类型和ConnectID计算出那个工作线程ID
 
-    typedef vector<CMessageService*> vecMessageService;
-    vecMessageService m_vecMessageService;
-
-public:
+private:
+	typedef vector<CMessageService*> vecMessageService;
+	vecMessageService                                   m_vecMessageService;
     uint32                                              m_u4MaxQueue           = 0;              //线程中最大消息对象个数
     uint32                                              m_u4HighMask           = 0;              //线程高水位
     uint32                                              m_u4LowMask            = 0;              //线程低水位

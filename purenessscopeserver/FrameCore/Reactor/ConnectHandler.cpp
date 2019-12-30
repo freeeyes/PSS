@@ -2494,7 +2494,7 @@ bool CConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPacket
         return false;
     }
 
-    for(auto& u4ConnectID : vecConnectID)
+    for(const auto& u4ConnectID : vecConnectID)
     {
         //判断命中到哪一个线程组里面去
         uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
@@ -2538,7 +2538,7 @@ bool CConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, char*& pDat
         return false;
     }
 
-    for(auto& u4ConnectID : vecConnectID)
+    for(const auto& u4ConnectID : vecConnectID)
     {
         //判断命中到哪一个线程组里面去
         uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
@@ -2889,13 +2889,11 @@ void CConnectManagerGroup::GetClientNameInfo(const char* pName, vecClientNameInf
 
 void CConnectManagerGroup::GetCommandData( uint16 u2CommandID, _CommandData& objCommandData )
 {
-    for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
+    for(const CConnectManager* pConnectManager : m_objConnnectManagerList)
     {
-        CConnectManager* pConnectManager = m_objConnnectManagerList[i];
-
         if(NULL != pConnectManager)
         {
-            _CommandData* pCommandData = pConnectManager->GetCommandData(u2CommandID);
+            const _CommandData* pCommandData = pConnectManager->GetCommandData(u2CommandID);
 
             if(pCommandData != NULL)
             {
@@ -2907,11 +2905,10 @@ void CConnectManagerGroup::GetCommandData( uint16 u2CommandID, _CommandData& obj
 
 void CConnectManagerGroup::GetFlowInfo(uint32& u4UdpFlowIn, uint32& u4UdpFlowOut)
 {
-    for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
+    for(const CConnectManager* pConnectManager : m_objConnnectManagerList)
     {
         uint32 u4ConnectFlowIn  = 0;
         uint32 u4ConnectFlowOut = 0;
-        CConnectManager* pConnectManager = m_objConnnectManagerList[i];
 
         if(NULL != pConnectManager)
         {

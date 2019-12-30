@@ -126,7 +126,6 @@ private:
     uint32                     m_u4RecvQueueCount     = 0;                  //当前链接被处理的数据包数
     uint32                     m_u4SendMaxBuffSize    = 5 * MAX_BUFF_1024;  //发送数据最大缓冲长度
     uint32                     m_u4SendThresHold      = MAX_MSG_SNEDTHRESHOLD;             //发送阀值(消息包的个数)
-    uint32                     m_u4SendCheckTime      = 0;                  //发送检测时间的阀值
     uint32                     m_u4ReadSendSize       = 0;                  //准备发送的字节数（水位标）
     uint32                     m_u4SuccessSendSize    = 0;                  //实际客户端接收到的总字节数（水位标）
     uint32                     m_u4LocalPort          = 0;                  //监听的端口号
@@ -134,10 +133,7 @@ private:
     uint32                     m_u4CurrSize           = 0;                  //当前MB缓冲字符长度
     uint32                     m_u4PacketDebugSize    = 0;                  //记录能存二进制数据包的最大字节
     int                        m_nBlockCount          = 0;                  //发生阻塞的次数
-    int                        m_nBlockMaxCount       = MAX_BLOCK_COUNT;    //阻塞允许发生的最大次数
-    int                        m_nBlockSize           = MAX_BLOCK_SIZE;     //阻塞发生时缓冲区的大小
     int                        m_nHashID              = 0;                  //对应的Pool的Hash数组下标
-    uint16                     m_u2SendCount          = 0;                  //当前数据包的个数
     uint16                     m_u2MaxConnectTime     = 0;                  //最大时间链接判定
     uint16                     m_u2TcpNodelay         = TCP_NODELAY_ON;     //Nagle算法开关
     uint8                      m_u1ConnectState       = CONNECT_INIT;       //目前链接处理状态
