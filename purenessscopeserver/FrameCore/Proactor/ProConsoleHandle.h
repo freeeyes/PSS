@@ -37,8 +37,8 @@ public:
     const char* GetError();
     void        SetConnectID(uint32 u4ConnectID);
     uint32      GetConnectID();
-    uint8       GetConnectState();                                           //得到链接状态
-    uint8       GetSendBuffState();                                          //得到发送状态
+    CONNECTSTATE GetConnectState();                                          //得到链接状态
+    CONNECTSTATE GetSendBuffState();                                         //得到发送状态
     bool        GetIsClosing();                                              //链接是否应该关闭
 
 private:
@@ -59,8 +59,8 @@ private:
     int              m_nIOCount;                     //当前IO操作的个数
     uint16           m_u2SendQueueMax;               //发送队列最大长度
     uint16           m_u2MaxConnectTime;             //最大链接时间判定
-    uint8            m_u1ConnectState;               //目前链接处理状态
-    uint8            m_u1SendBuffState;              //目前缓冲器是否有等待发送的数据
+    CONNECTSTATE     m_u1ConnectState;               //目前链接处理状态
+    CONNECTSTATE     m_u1SendBuffState;              //目前缓冲器是否有等待发送的数据
     bool             m_blCanWrite;                   //上一个数据包是否发送结束
     bool             m_blTimeClose;                  //是否正在关闭
     char             m_szError[MAX_BUFF_500];

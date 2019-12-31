@@ -126,9 +126,9 @@ private:
     bool                            m_blRun             = false;
     ACE_Thread_Mutex                m_logicthreadmutex;
     ACE_Condition<ACE_Thread_Mutex> m_logicthreadcond;
-    uint32                          m_u4ThreadState     = 0;       //当前工作线程状态
-    ACE_Time_Value                  m_tvUpdateTime;                //线程最后处理数据的时间
-    CLogicThreadMessagePool         m_MessagePool;                 //消息池
+    THREADSTATE                     m_u4ThreadState     = THREADSTATE::THREAD_INIT; //当前工作线程状态
+    ACE_Time_Value                  m_tvUpdateTime;                                 //线程最后处理数据的时间
+    CLogicThreadMessagePool         m_MessagePool;                                  //消息池
 };
 
 //逻辑线程管理器

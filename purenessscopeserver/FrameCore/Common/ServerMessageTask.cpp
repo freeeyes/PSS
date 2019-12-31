@@ -361,12 +361,12 @@ bool CServerMessageTask::ProcessMessage(const _Server_Message_Info* pMessage, ui
 
     m_tvDispose = ACE_OS::gettimeofday();
 
-    m_emState   = SERVER_RECV_BEGIN;
+    m_emState   = EM_Server_Recv_State::SERVER_RECV_BEGIN;
     //调用数据包处理
     pMessage->m_pClientMessage->RecvData(pMessage->m_u2CommandID, pMessage->m_pRecvFinish, pMessage->m_objServerIPInfo);
     //回收处理包
     App_MessageBlockManager::instance()->Close(pMessage->m_pRecvFinish);
-    m_emState = SERVER_RECV_END;
+    m_emState = EM_Server_Recv_State::SERVER_RECV_END;
     return true;
 }
 
@@ -374,7 +374,7 @@ bool CServerMessageTask::CheckServerMessageThread(ACE_Time_Value const& tvNow)
 {
     ACE_Time_Value tvIntval(tvNow - m_tvDispose);
 
-    if(m_emState == SERVER_RECV_BEGIN && tvIntval.sec() > MAX_DISPOSE_TIMEOUT)
+    if(m_emState == EM_Server_Recv_State::SERVER_RECV_BEGIN && tvIntval.sec() > MAX_DISPOSE_TIMEOUT)
     {
         return false;
     }

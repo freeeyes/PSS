@@ -109,7 +109,7 @@ bool CProServerManager::Init()
     {
         OUR_DEBUG((LM_INFO, "[CProServerManager::Init()]... i=[%d].\n", i));
 
-        if (GetXmlConfigAttribute(xmlNetWorkMode)->Mode == NETWORKMODE_PRO_IOCP)
+        if (GetXmlConfigAttribute(xmlNetWorkMode)->Mode == NETWORKMODE::NETWORKMODE_PRO_IOCP)
         {
             blState = App_ProactorManager::instance()->AddNewProactor(i, Proactor_WIN32, 1);
             OUR_DEBUG((LM_INFO, "[CProServerManager::Init]AddNewProactor NETWORKMODE = Proactor_WIN32.\n"));

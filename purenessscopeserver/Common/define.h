@@ -251,7 +251,7 @@ enum class EM_IO_TYPE
 };
 
 //对应当前框架支持的网络模式
-enum
+enum class NETWORKMODE
 {
     NETWORKMODE_PRO_IOCP    = 1,    //IOCP模式
     NETWORKMODE_RE_SELECT   = 10,   //Select模式
@@ -261,7 +261,7 @@ enum
 };
 
 //对应链接的状态，用于设置链接时候的状态
-enum
+enum class CONNECTSTATE
 {
     CONNECT_INIT         = 0,
     CONNECT_OPEN         = 1,
@@ -278,14 +278,14 @@ enum
 };
 
 //服务器间通讯，是否需要回调的枚举
-enum EM_s2s
+enum class EM_s2s
 {
     S2S_NEED_CALLBACK = 0,    //需要回调
     S2S_INNEED_CALLBACK,      //不需要回调
 };
 
 //对应处理线程的状态
-enum
+enum class THREADSTATE
 {
     THREAD_INIT      = 0,   //线程初始化
     THREAD_RUNBEGIN  = 1,   //开始处理线程
@@ -294,7 +294,7 @@ enum
 };
 
 //对应服务器间通讯的传输状态
-enum EM_Server_Connect_State
+enum class EM_Server_Connect_State
 {
     SERVER_CONNECT_READY = 0,
     SERVER_CONNECT_FIRST,
@@ -305,7 +305,7 @@ enum EM_Server_Connect_State
 
 //服务器间通讯数据接收状态
 #define SERVER_RECV_TIMEOUT    20   //服务器间接收数据超时时间
-enum EM_Server_Recv_State
+enum class EM_Server_Recv_State
 {
     SERVER_RECV_INIT = 0,     //未接收数据
     SERVER_RECV_BEGIN,        //接收数据完成

@@ -13,8 +13,8 @@ CProConsoleHandle::CProConsoleHandle(void)
     m_u2MaxConnectTime   = 0;
     m_u4SendThresHold    = MAX_MSG_SNEDTHRESHOLD;
     m_u2SendQueueMax     = MAX_MSG_SENDPACKET;
-    m_u1ConnectState     = CONNECT_INIT;
-    m_u1SendBuffState    = CONNECT_SENDNON;
+    m_u1ConnectState     = CONNECTSTATE::CONNECT_INIT;
+    m_u1SendBuffState    = CONNECTSTATE::CONNECT_SENDNON;
     m_pPacketParse       = NULL;
     m_blCanWrite         = false;
     m_blTimeClose        = false;
@@ -83,7 +83,7 @@ bool CProConsoleHandle::ServerClose()
         this->handle(ACE_INVALID_HANDLE);
     }
 
-    m_u1ConnectState = CONNECT_SERVER_CLOSE;
+    m_u1ConnectState = CONNECTSTATE::CONNECT_SERVER_CLOSE;
 
     return true;
 }
@@ -143,7 +143,7 @@ void CProConsoleHandle::open(ACE_HANDLE h, ACE_Message_Block&)
     //ACE_OS::setsockopt(this->get_handle(), SOL_SOCKET, SO_RCVBUF, (char* )&nTecvBuffSize, sizeof(nTecvBuffSize));
     //ACE_OS::setsockopt(h, SOL_SOCKET, SO_SNDBUF, (char* )&nTecvBuffSize, sizeof(nTecvBuffSize));
 
-    m_u1ConnectState = CONNECT_OPEN;
+    m_u1ConnectState = CONNECTSTATE::CONNECT_OPEN;
 
     OUR_DEBUG((LM_DEBUG,"[CProConsoleHandle::open] Open(%d).\n", GetConnectID()));
 
@@ -331,12 +331,12 @@ void CProConsoleHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
     }
 }
 
-uint8 CProConsoleHandle::GetConnectState()
+CONNECTSTATE CProConsoleHandle::GetConnectState()
 {
     return m_u1ConnectState;
 }
 
-uint8 CProConsoleHandle::GetSendBuffState()
+CONNECTSTATE CProConsoleHandle::GetSendBuffState()
 {
     return m_u1SendBuffState;
 }

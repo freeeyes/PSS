@@ -100,7 +100,7 @@ int CLogicThread::open()
 int CLogicThread::svc(void)
 {
     //调用初始化线程操作
-    m_u4ThreadState = THREAD_INIT;
+    m_u4ThreadState = THREADSTATE::THREAD_INIT;
 
     if (NULL != m_objThreadInfo.m_pLogicQueue)
     {
@@ -149,7 +149,7 @@ int CLogicThread::Close()
 
 bool CLogicThread::CheckTimeout(ACE_Time_Value const& tvNow)
 {
-    if (THREAD_RUNBEGIN == m_u4ThreadState)
+    if (THREADSTATE::THREAD_RUNBEGIN == m_u4ThreadState)
     {
         ACE_Time_Value tvInterval = tvNow - m_tvUpdateTime;
 
@@ -229,7 +229,7 @@ bool CLogicThread::Dispose_Queue()
 
         ThreadReturn emRet = THREAD_Task_Finish;
 
-        m_u4ThreadState = THREAD_RUNBEGIN;
+        m_u4ThreadState = THREADSTATE::THREAD_RUNBEGIN;
         m_tvUpdateTime  = ACE_OS::gettimeofday();
 
         if (NULL != m_objThreadInfo.m_pLogicQueue)
@@ -242,7 +242,7 @@ bool CLogicThread::Dispose_Queue()
         //回收消息对象
         m_MessagePool.Delete(msg);
 
-        m_u4ThreadState = THREAD_RUNEND;
+        m_u4ThreadState = THREADSTATE::THREAD_RUNEND;
 
         if (THREAD_Task_Finish == emRet)
         {

@@ -27,7 +27,7 @@ public:
 
     bool Init(const char* pIP, int nPort, uint8 u1IPType, int nServerID, CProAsynchConnect* pProAsynchConnect, IClientMessage* pClientMessage, uint32 u4PacketParseID);  //初始化链接地址和端口
     void SetLocalAddr(const char* pIP, int nPort, uint8 u1IPType);                             //设置本地IP和端口
-    bool Run(bool blIsReadly, EM_Server_Connect_State emState = SERVER_CONNECT_RECONNECT);     //开始链接
+    bool Run(bool blIsReadly, EM_Server_Connect_State emState = EM_Server_Connect_State::SERVER_CONNECT_RECONNECT);     //开始链接
     bool SendData(ACE_Message_Block* pmblk);                                                   //发送数据
     int  GetServerID();                                                                        //得到服务器ID
     bool Close();                                                                              //关闭服务器链接

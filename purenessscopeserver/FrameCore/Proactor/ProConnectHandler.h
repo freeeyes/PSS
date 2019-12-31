@@ -70,8 +70,8 @@ public:
     const char*        GetError();                                            //得到当前链接错误信息
     void               SetConnectID(uint32 u4ConnectID);                      //设置当前链接的ID
     uint32             GetConnectID();                                        //获得当前链接的ID
-    uint8              GetConnectState();                                     //得到链接状态
-    uint8              GetSendBuffState();                                    //得到发送状态
+    CONNECTSTATE       GetConnectState();                                     //得到链接状态
+    CONNECTSTATE       GetSendBuffState();                                    //得到发送状态
     _ClientConnectInfo GetClientInfo();                                       //得到客户端信息
     _ClientIPInfo      GetClientIPInfo();                                     //得到客户端IP信息
     _ClientIPInfo      GetLocalIPInfo();                                      //得到监听IP信息
@@ -131,8 +131,8 @@ private:
     uint16             m_u2SendQueueTimeout;           //发送超时时间,超过这个时间的都会被记录到日志中
     uint16             m_u2RecvQueueTimeout;           //接受超时时间，超过这个时间的都会被记录到日志中
     uint16             m_u2TcpNodelay;                 //Nagle算法开关
-    uint8              m_u1ConnectState;               //目前链接处理状态
-    uint8              m_u1SendBuffState;              //目前缓冲器是否有等待发送的数据
+    CONNECTSTATE       m_u1ConnectState;               //目前链接处理状态
+    CONNECTSTATE       m_u1SendBuffState;              //目前缓冲器是否有等待发送的数据
     uint8              m_u1IsActive;                   //连接是否为激活状态，0为否，1为是
     bool               m_blIsLog;                      //是否写入日志，false为不写入，true为写入
 

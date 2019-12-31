@@ -23,7 +23,7 @@ public:
 
     bool Init(int nServerID, const char* pIP, int nPort, uint8 u1IPType, CConnectClientConnector* pReactorConnect, IClientMessage* pClientMessage, ACE_Reactor* pReactor, uint32 u4PacketParseID);  //初始化链接地址和端口
     void SetLocalAddr(const char* pIP, int nPort, uint8 u1IPType);                         //绑定本地的IP和端口
-    bool Run(bool blIsReady, EM_Server_Connect_State emState = SERVER_CONNECT_RECONNECT);  //开始链接
+    bool Run(bool blIsReady, EM_Server_Connect_State emState = EM_Server_Connect_State::SERVER_CONNECT_RECONNECT);  //开始链接
     bool SendData(ACE_Message_Block* pmblk);                                               //发送数据
     int  GetServerID();                                                                    //得到服务器ID
     bool Close();                                                                          //关闭服务器链接
@@ -46,7 +46,7 @@ private:
     ACE_Reactor*               m_pReactor        = NULL;                  //记录使用的反应器
     bool                       m_blIsLocal       = false;                 //是否需要制定本地端口
     int                        m_nServerID       = 0;                     //远程服务器的ID
-    EM_Server_Connect_State    m_emConnectState  = SERVER_CONNECT_READY;  //连接状态
+    EM_Server_Connect_State    m_emConnectState  = EM_Server_Connect_State::SERVER_CONNECT_READY;  //连接状态
 };
 
 class CClientReConnectManager : public ACE_Event_Handler, public IClientManager

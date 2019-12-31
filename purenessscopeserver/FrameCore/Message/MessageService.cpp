@@ -221,7 +221,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 
     //在这里进行线程自检代码
     m_ThreadInfo.m_tvUpdateTime = ACE_OS::gettimeofday();
-    m_ThreadInfo.m_u4State = THREAD_RUNBEGIN;
+    m_ThreadInfo.m_u4State = THREADSTATE::THREAD_RUNBEGIN;
 
     //判断队列处理时间是否超过了数据入队列的时间
     ACE_Time_Value tvQueueDispose(m_ThreadInfo.m_tvUpdateTime - pMessage->GetMessageBase()->m_tvRecvTime);
@@ -271,7 +271,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
                     PACKET_IS_SELF_RECYC);
 #endif
             DeleteMessage(pMessage);
-            m_ThreadInfo.m_u4State = THREAD_RUNEND;
+            m_ThreadInfo.m_u4State = THREADSTATE::THREAD_RUNEND;
 
             return true;
         }
@@ -308,7 +308,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
         DeleteMessage(pMessage);
     }
 
-    m_ThreadInfo.m_u4State = THREAD_RUNEND;
+    m_ThreadInfo.m_u4State = THREADSTATE::THREAD_RUNEND;
 
     //开始测算数据包处理的时间
     if(m_ThreadInfo.m_u2PacketTime == 0)
@@ -362,7 +362,7 @@ bool CMessageService::SaveThreadInfoData(const ACE_Time_Value& tvNow)
     objCurrThreadInfo.m_tvUpdateTime = ACE_OS::gettimeofday();
 
     //开始查看线程是否超时
-    if(m_ThreadInfo.m_u4State == THREAD_RUNBEGIN && tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec() > m_u2ThreadTimeOut)
+    if(m_ThreadInfo.m_u4State == THREADSTATE::THREAD_RUNBEGIN && tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec() > m_u2ThreadTimeOut)
     {
         AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_WORKTHREAD, "[CMessageService::handle_timeout] pThreadInfo = [%d] State = [%d] Time = [%04d-%02d-%02d %02d:%02d:%02d] PacketCount = [%d] LastCommand = [0x%x] PacketTime = [%d] TimeOut > %d[%d] CurrPacketCount = [%d] QueueCount = [%d] BuffPacketUsed = [%d] BuffPacketFree = [%d].",
                                               m_ThreadInfo.m_u4ThreadID,
@@ -602,7 +602,7 @@ MESSAGE_SERVICE_THREAD_STATE CMessageService::GetThreadState()
     return m_emThreadState;
 }
 
-uint32 CMessageService::GetStepState()
+THREADSTATE CMessageService::GetStepState()
 {
     return m_ThreadInfo.m_u4State;
 }

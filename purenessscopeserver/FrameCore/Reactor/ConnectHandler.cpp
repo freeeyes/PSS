@@ -14,7 +14,7 @@ void CConnectHandler::Close()
     //调用连接断开消息
     App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->DisConnect(GetConnectID());
 
-    if (CONNECT_SERVER_CLOSE == m_u1ConnectState)
+    if (CONNECTSTATE::CONNECT_SERVER_CLOSE == m_u1ConnectState)
     {
         //服务器主动断开
         Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_SDISCONNECT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
@@ -503,9 +503,9 @@ int CConnectHandler::handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask)
     }
 
     //设置发送消息队列不能再发送任何消息
-    if(m_u1ConnectState != CONNECT_SERVER_CLOSE)
+    if(m_u1ConnectState != CONNECTSTATE::CONNECT_SERVER_CLOSE)
     {
-        m_u1ConnectState = CONNECT_CLIENT_CLOSE;
+        m_u1ConnectState = CONNECTSTATE::CONNECT_CLIENT_CLOSE;
     }
 
     //读取发送队列内部的所有数据，标记为无效并回收内存
@@ -696,12 +696,12 @@ void CConnectHandler::SetSendQueueTimeCost(uint32 u4TimeCost)
     }
 }
 
-uint8 CConnectHandler::GetConnectState()
+CONNECTSTATE CConnectHandler::GetConnectState()
 {
     return m_u1ConnectState;
 }
 
-uint8 CConnectHandler::GetSendBuffState()
+CONNECTSTATE CConnectHandler::GetSendBuffState()
 {
     return m_u1SendBuffState;
 }
@@ -719,7 +719,8 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
 
     if (EM_IO_TYPE::NET_INPUT == m_emIOType)
     {
-        if (CONNECT_SERVER_CLOSE == m_u1ConnectState || CONNECT_CLIENT_CLOSE == m_u1ConnectState)
+        if (CONNECTSTATE::CONNECT_SERVER_CLOSE == m_u1ConnectState 
+            || CONNECTSTATE::CONNECT_CLIENT_CLOSE == m_u1ConnectState)
         {
             //在队列里已经存在关闭连接指令，之后的所有数据写请求全部不予发送。
             ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
@@ -772,7 +773,7 @@ bool CConnectHandler::SendCloseMessage()
             return false;
         }
 
-        m_u1ConnectState = CONNECT_SERVER_CLOSE;
+        m_u1ConnectState = CONNECTSTATE::CONNECT_SERVER_CLOSE;
     }
     else
     {
@@ -931,7 +932,7 @@ void CConnectHandler::ConnectOpen()
 
     OUR_DEBUG((LM_DEBUG, "[CConnectHandler::open]Open(%d) Connection from [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
 
-    m_u1ConnectState = CONNECT_OPEN;
+    m_u1ConnectState = CONNECTSTATE::CONNECT_OPEN;
 }
 
 void CConnectHandler::Get_Recv_length(int& nCurrCount)
@@ -1370,7 +1371,7 @@ bool CConnectHandler::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, 
     //如果需要发送完成后删除，则配置标记位
     if (PACKET_SEND_FIN_CLOSE == u1State)
     {
-        m_u1ConnectState = CONNECT_SERVER_CLOSE;
+        m_u1ConnectState = CONNECTSTATE::CONNECT_SERVER_CLOSE;
 
         //添加关闭socket指令
         SendCloseMessage();

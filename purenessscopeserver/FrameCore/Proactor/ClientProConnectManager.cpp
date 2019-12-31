@@ -7,7 +7,7 @@ CProactorClientInfo::CProactorClientInfo()
     m_pClientMessage    = NULL;
     m_nServerID         = 0;
     m_u4PacketParseID   = 0;
-    m_emConnectState    = SERVER_CONNECT_READY;
+    m_emConnectState    = EM_Server_Connect_State::SERVER_CONNECT_READY;
     m_blIsLocal         = false;
 }
 
@@ -58,7 +58,9 @@ bool CProactorClientInfo::Run(bool blIsReadly, EM_Server_Connect_State emState)
         return false;
     }
 
-    if(true == blIsReadly && SERVER_CONNECT_FIRST != m_emConnectState && SERVER_CONNECT_RECONNECT != m_emConnectState)
+    if(true == blIsReadly 
+        && EM_Server_Connect_State::SERVER_CONNECT_FIRST != m_emConnectState 
+        && EM_Server_Connect_State::SERVER_CONNECT_RECONNECT != m_emConnectState)
     {
         m_pProAsynchConnect->SetConnectState(true);
 
@@ -94,7 +96,8 @@ bool CProactorClientInfo::SendData(ACE_Message_Block* pmblk)
     if(NULL == m_pProConnectClient)
     {
         //如果连接正在建立过程中，等待5毫秒，如果
-        if(SERVER_CONNECT_FIRST == m_emConnectState || SERVER_CONNECT_RECONNECT == m_emConnectState)
+        if(EM_Server_Connect_State::SERVER_CONNECT_FIRST == m_emConnectState 
+            || EM_Server_Connect_State::SERVER_CONNECT_RECONNECT == m_emConnectState)
         {
             return false;
         }
@@ -104,9 +107,9 @@ bool CProactorClientInfo::SendData(ACE_Message_Block* pmblk)
             //发送连接建立无信息
             Common_Send_ConnectError(pmblk, m_AddrServer, m_pClientMessage);
 
-            if (SERVER_CONNECT_FIRST != m_emConnectState
-                && SERVER_CONNECT_RECONNECT != m_emConnectState
-                && false == Run(true, SERVER_CONNECT_RECONNECT))
+            if (EM_Server_Connect_State::SERVER_CONNECT_FIRST != m_emConnectState
+                && EM_Server_Connect_State::SERVER_CONNECT_RECONNECT != m_emConnectState
+                && false == Run(true, EM_Server_Connect_State::SERVER_CONNECT_RECONNECT))
             {
                 //如果连接不存在，则建立链接。
                 OUR_DEBUG((LM_INFO, "[CProactorClientInfo::SendData]Run error.\n"));
@@ -171,9 +174,9 @@ CProConnectClient* CProactorClientInfo::GetProConnectClient()
 IClientMessage* CProactorClientInfo::GetClientMessage()
 {
     //这里增加是否是连接重练的判定以及是否是第一次连接的回调
-    if((m_emConnectState == SERVER_CONNECT_RECONNECT || m_emConnectState == SERVER_CONNECT_FIRST) && NULL != m_pClientMessage)
+    if((m_emConnectState == EM_Server_Connect_State::SERVER_CONNECT_RECONNECT || m_emConnectState == EM_Server_Connect_State::SERVER_CONNECT_FIRST) && NULL != m_pClientMessage)
     {
-        m_emConnectState = SERVER_CONNECT_OK;
+        m_emConnectState = EM_Server_Connect_State::SERVER_CONNECT_OK;
         //通知上层某一个连接已经恢复或者已建立
         m_pClientMessage->ReConnect(m_nServerID);
     }
@@ -326,7 +329,7 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, int nPort
     }
 
     //第一次开始链接
-    if(false == pClientInfo->Run(m_blProactorFinish, SERVER_CONNECT_FIRST))
+    if(false == pClientInfo->Run(m_blProactorFinish, EM_Server_Connect_State::SERVER_CONNECT_FIRST))
     {
         SAFE_DELETE(pClientInfo);
         return false;
@@ -373,7 +376,7 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, int nPort
     }
 
     //第一次开始链接
-    if(false == pClientInfo->Run(m_blProactorFinish, SERVER_CONNECT_FIRST))
+    if(false == pClientInfo->Run(m_blProactorFinish, EM_Server_Connect_State::SERVER_CONNECT_FIRST))
     {
         SAFE_DELETE(pClientInfo);
         return false;
@@ -402,7 +405,7 @@ bool CClientProConnectManager::ConnectFrame(int nServerID, const char* pIP, int 
     }
 
     //第一次开始链接
-    if (false == pClientInfo->Run(m_blProactorFinish, SERVER_CONNECT_FIRST))
+    if (false == pClientInfo->Run(m_blProactorFinish, EM_Server_Connect_State::SERVER_CONNECT_FIRST))
     {
         SAFE_DELETE(pClientInfo);
         return false;
@@ -425,7 +428,7 @@ bool CClientProConnectManager::ConnectFrame(int nServerID, const char* pIP, int 
     }
 
     //第一次开始链接
-    if (false == pClientInfo->Run(m_blProactorFinish, SERVER_CONNECT_FIRST))
+    if (false == pClientInfo->Run(m_blProactorFinish, EM_Server_Connect_State::SERVER_CONNECT_FIRST))
     {
         SAFE_DELETE(pClientInfo);
         return false;
@@ -531,7 +534,7 @@ bool CClientProConnectManager::Close(int nServerID)
         return false;
     }
 
-    EM_s2s ems2s = S2S_INNEED_CALLBACK;
+    EM_s2s ems2s = EM_s2s::S2S_INNEED_CALLBACK;
 
     //关闭链接对象
     if(NULL != pClientInfo->GetProConnectClient())
@@ -737,7 +740,7 @@ void CClientProConnectManager::Close()
 
     for(auto* pClientInfo : vecProactorClientInfo)
     {
-        EM_s2s ems2s = S2S_INNEED_CALLBACK;
+        EM_s2s ems2s = EM_s2s::S2S_INNEED_CALLBACK;
 
         if(NULL != pClientInfo)
         {
@@ -786,7 +789,7 @@ int CClientProConnectManager::handle_timeout(const ACE_Time_Value& tv, const voi
             if(NULL == pClientInfo->GetProConnectClient())
             {
                 //如果连接不存在，则重新建立连接
-                if (false == pClientInfo->Run(m_blProactorFinish, SERVER_CONNECT_RECONNECT))
+                if (false == pClientInfo->Run(m_blProactorFinish, EM_Server_Connect_State::SERVER_CONNECT_RECONNECT))
                 {
                     OUR_DEBUG((LM_DEBUG, "[CClientProConnectManager::handle_timeout]Run is fail.\n"));
                 }
@@ -953,7 +956,7 @@ bool CClientProConnectManager::CloseByClient(int nServerID)
     if(NULL != pClientInfo)
     {
         pClientInfo->SetProConnectClient(NULL);
-        pClientInfo->SetServerConnectState(SERVER_CONNECT_FAIL);
+        pClientInfo->SetServerConnectState(EM_Server_Connect_State::SERVER_CONNECT_FAIL);
     }
 
     return true;
@@ -970,7 +973,7 @@ EM_Server_Connect_State CClientProConnectManager::GetConnectState(int nServerID)
     if(NULL == pClientInfo)
     {
         //如果这个链接不存在，则不创建新的链接
-        return SERVER_CONNECT_FAIL;
+        return EM_Server_Connect_State::SERVER_CONNECT_FAIL;
     }
     else
     {
@@ -995,7 +998,7 @@ bool CClientProConnectManager::ReConnect(int nServerID)
     if(NULL == pClientInfo->GetProConnectClient())
     {
         //如果连接不存在，则重新建立连接
-        if (false == pClientInfo->Run(m_blProactorFinish, SERVER_CONNECT_RECONNECT))
+        if (false == pClientInfo->Run(m_blProactorFinish, EM_Server_Connect_State::SERVER_CONNECT_RECONNECT))
         {
             OUR_DEBUG((LM_INFO, "[CClientProConnectManager::ReConnect]Run is fail.\n"));
             return false;
@@ -1091,7 +1094,7 @@ bool CClientProConnectManager::DeleteIClientMessage(IClientMessage* pClientMessa
             //关闭链接对象
             if (NULL != pClientInfo->GetClientMessage())
             {
-                EM_s2s ems2s = S2S_INNEED_CALLBACK;
+                EM_s2s ems2s = EM_s2s::S2S_INNEED_CALLBACK;
                 pClientInfo->GetProConnectClient()->ClientClose(ems2s);
             }
 

@@ -33,12 +33,12 @@ public:
     void Close(int nIOCount = 1);
     bool ServerClose();
 
-    const char* GetError();
-    void        SetConnectID(uint32 u4ConnectID);
-    uint32      GetConnectID();
-    uint8       GetConnectState();                                           //得到链接状态
-    uint8       GetSendBuffState();                                          //得到发送状态
-    uint8       GetIsClosing();                                              //链接是否应该关闭
+    const char*  GetError();
+    void         SetConnectID(uint32 u4ConnectID);
+    uint32       GetConnectID();
+    CONNECTSTATE GetConnectState();                                           //得到链接状态
+    CONNECTSTATE GetSendBuffState();                                          //得到发送状态
+    uint8        GetIsClosing();                                              //链接是否应该关闭
 
 private:
     bool CheckMessage();                                                      //处理接收的数据
@@ -53,8 +53,8 @@ private:
     uint32                     m_u4AllSendSize         = 0;                  //当前链接发送字节总数
     uint32                     m_u4CurrSize            = 0;                  //当前MB缓冲字符长度
     int                        m_nIOCount              = 1;                  //当前IO操作的个数
-    uint8                      m_u1ConnectState        = CONNECT_INIT;       //目前链接处理状态
-    uint8                      m_u1SendBuffState       = CONNECT_SENDNON;    //目前缓冲器是否有等待发送的数据
+    CONNECTSTATE               m_u1ConnectState        = CONNECTSTATE::CONNECT_INIT;       //目前链接处理状态
+    CONNECTSTATE               m_u1SendBuffState       = CONNECTSTATE::CONNECT_SENDNON;    //目前缓冲器是否有等待发送的数据
     uint8                      m_u1IsClosing           = HANDLE_ISCLOSE_NO;  //是否应该关闭 0为否，1为是
     char                       m_szError[MAX_BUFF_500] = {'\0'};
     ACE_INET_Addr              m_addrRemote;

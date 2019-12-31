@@ -69,7 +69,7 @@ public:
     void SaveCommandDataLog();                                             //存储统计日志
     void SetThreadState(MESSAGE_SERVICE_THREAD_STATE emState);             //设置线程状态
     MESSAGE_SERVICE_THREAD_STATE GetThreadState();                         //得到当前线程状态
-    uint32 GetStepState();                                                 //得到当前步数相关信息
+    THREADSTATE GetStepState();                                            //得到当前步数相关信息
     uint32 GetUsedMessageCount();                                          //得到正在使用的Message对象个数
 
     uint32 GetThreadID();

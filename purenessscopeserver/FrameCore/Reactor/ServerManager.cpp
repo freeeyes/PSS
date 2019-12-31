@@ -32,8 +32,8 @@ bool CServerManager::Init()
     OUR_DEBUG((LM_INFO, "[CServerManager::Init]nReactorCount=%d.\n", nReactorCount));
 
     //为多进程做准备，针对epoll和epollet初始化不能在这里去做,因为在多进程里epoll_create必须在子进程里去声明
-    if (NETWORKMODE_RE_EPOLL != GetXmlConfigAttribute(xmlNetWorkMode)->Mode
-        && NETWORKMODE_RE_EPOLL_ET != GetXmlConfigAttribute(xmlNetWorkMode)->Mode)
+    if (NETWORKMODE::NETWORKMODE_RE_EPOLL != GetXmlConfigAttribute(xmlNetWorkMode)->Mode
+        && NETWORKMODE::NETWORKMODE_RE_EPOLL_ET != GetXmlConfigAttribute(xmlNetWorkMode)->Mode)
     {
         //初始化反应器集合
         App_ReactorManager::instance()->Init((uint16)nReactorCount);
@@ -164,7 +164,7 @@ bool CServerManager::Start()
     return true;
 }
 
-bool CServerManager::Init_Reactor(uint8 u1ReactorCount, uint8 u1NetMode)
+bool CServerManager::Init_Reactor(uint8 u1ReactorCount, NETWORKMODE u1NetMode)
 {
     bool blState = true;
 
@@ -173,22 +173,22 @@ bool CServerManager::Init_Reactor(uint8 u1ReactorCount, uint8 u1NetMode)
     {
         OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]... i=[%d].\n", i));
 
-        if (u1NetMode == NETWORKMODE_RE_SELECT)
+        if (u1NetMode == NETWORKMODE::NETWORKMODE_RE_SELECT)
         {
             blState = App_ReactorManager::instance()->AddNewReactor(i, Reactor_Select, 1);
             OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_Select.\n"));
         }
-        else if (u1NetMode == NETWORKMODE_RE_TPSELECT)
+        else if (u1NetMode == NETWORKMODE::NETWORKMODE_RE_TPSELECT)
         {
             blState = App_ReactorManager::instance()->AddNewReactor(i, Reactor_TP, 1);
             OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_TP.\n"));
         }
-        else if (u1NetMode == NETWORKMODE_RE_EPOLL)
+        else if (u1NetMode == NETWORKMODE::NETWORKMODE_RE_EPOLL)
         {
             blState = App_ReactorManager::instance()->AddNewReactor(i, Reactor_DEV_POLL, 1, GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount);
             OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_DEV_POLL.\n"));
         }
-        else if (u1NetMode == NETWORKMODE_RE_EPOLL_ET)
+        else if (u1NetMode == NETWORKMODE::NETWORKMODE_RE_EPOLL_ET)
         {
             blState = App_ReactorManager::instance()->AddNewReactor(i, Reactor_DEV_POLL_ET, 1, GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount);
             OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_DEV_POLL_ET.\n"));
@@ -213,8 +213,8 @@ bool CServerManager::Init_Reactor(uint8 u1ReactorCount, uint8 u1NetMode)
 bool CServerManager::Run()
 {
     //对应多进程，epoll必须在子进程里进行初始化
-    if (NETWORKMODE_RE_EPOLL == GetXmlConfigAttribute(xmlNetWorkMode)->Mode
-        || NETWORKMODE_RE_EPOLL_ET == GetXmlConfigAttribute(xmlNetWorkMode)->Mode)
+    if (NETWORKMODE::NETWORKMODE_RE_EPOLL == GetXmlConfigAttribute(xmlNetWorkMode)->Mode
+        || NETWORKMODE::NETWORKMODE_RE_EPOLL_ET == GetXmlConfigAttribute(xmlNetWorkMode)->Mode)
     {
         //初始化反应器集合
         App_ReactorManager::instance()->Init((uint16)(3 + GetXmlConfigAttribute(xmlMessage)->Msg_Thread));

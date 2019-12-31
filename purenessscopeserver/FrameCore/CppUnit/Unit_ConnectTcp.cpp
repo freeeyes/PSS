@@ -55,7 +55,7 @@ void CUnit_ConnectTcp::Test_Connect_Tcp_Server(void)
     //获得ServerID的连接状态
     EM_Server_Connect_State emConnectState = App_ClientReConnectManager::instance()->GetConnectState(m_nServerID);
 
-    if (emConnectState != SERVER_CONNECT_OK)
+    if (emConnectState != EM_Server_Connect_State::SERVER_CONNECT_OK)
     {
         OUR_DEBUG((LM_INFO, "[Test_Connect_Tcp_Server]App_ClientReConnectManager::instance()->GetConnectState is fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Tcp_Server]App_ClientReConnectManager::instance()->GetConnectState is fail.", true == blRet);
@@ -69,7 +69,7 @@ void CUnit_ConnectTcp::Test_Connect_Tcp_Server(void)
     App_ClientReConnectManager::instance()->GetServerIPInfo(m_nServerID, objServerIPInfo);
 
     //设置OK
-    if (false == App_ClientReConnectManager::instance()->SetServerConnectState(m_nServerID, SERVER_CONNECT_OK))
+    if (false == App_ClientReConnectManager::instance()->SetServerConnectState(m_nServerID, EM_Server_Connect_State::SERVER_CONNECT_OK))
     {
         OUR_DEBUG((LM_INFO, "[Test_Connect_Tcp_Server]App_ClientReConnectManager::instance()->SetServerConnectState is fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Tcp_Server]App_ClientReConnectManager::instance()->SetServerConnectState is fail.", true == blRet);

@@ -98,7 +98,7 @@ void CConnectClient::ClientClose()
     }
     else
     {
-        m_u1ConnectState = CONNECT_CLIENT_CLOSE;
+        m_u1ConnectState = CONNECTSTATE::CONNECT_CLIENT_CLOSE;
         int nWakeupRet = reactor()->schedule_wakeup(this, ACE_Event_Handler::WRITE_MASK);
 
         if (-1 == nWakeupRet)
@@ -158,7 +158,7 @@ int CConnectClient::open(void* p)
         return -1;
     }
 
-    m_u1ConnectState = CONNECT_OPEN;
+    m_u1ConnectState = CONNECTSTATE::CONNECT_OPEN;
 
     OUR_DEBUG((LM_INFO, "[CConnectClient::open] Connection from [%s:%d]\n", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
 
@@ -214,7 +214,7 @@ int CConnectClient::handle_input(ACE_HANDLE fd)
             sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
             objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
 
-            if(S2S_NEED_CALLBACK == m_ems2s)
+            if(EM_s2s::S2S_NEED_CALLBACK == m_ems2s)
             {
                 m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
             }
@@ -236,7 +236,7 @@ int CConnectClient::handle_input(ACE_HANDLE fd)
             sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
             objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
 
-            if(S2S_NEED_CALLBACK == m_ems2s)
+            if(EM_s2s::S2S_NEED_CALLBACK == m_ems2s)
             {
                 m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
             }
@@ -267,7 +267,7 @@ int CConnectClient::RecvData()
         sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
         objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
 
-        if(S2S_NEED_CALLBACK == m_ems2s)
+        if(EM_s2s::S2S_NEED_CALLBACK == m_ems2s)
         {
             m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
         }
@@ -290,7 +290,7 @@ int CConnectClient::RecvData()
 
     Dispose_Recv_Data(m_pCurrMessage);
 
-    m_emRecvState = SERVER_RECV_END;
+    m_emRecvState = EM_Server_Recv_State::SERVER_RECV_END;
 
     m_pCurrMessage->reset();
 
@@ -363,7 +363,7 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
         ACE_Message_Block* pRecvFinish = NULL;
 
         m_atvRecv = ACE_OS::gettimeofday();
-        m_emRecvState = SERVER_RECV_BEGIN;
+        m_emRecvState = EM_Server_Recv_State::SERVER_RECV_BEGIN;
         EM_PACKET_ROUTE em_PacketRoute = PACKET_ROUTE_SELF;
 
         while (true)
@@ -567,7 +567,7 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadLock);
 
-    if (CONNECT_CLIENT_CLOSE == m_u1ConnectState || CONNECT_SERVER_CLOSE == m_u1ConnectState)
+    if (CONNECTSTATE::CONNECT_CLIENT_CLOSE == m_u1ConnectState || CONNECTSTATE::CONNECT_SERVER_CLOSE == m_u1ConnectState)
     {
         //连接已经进入关闭流程，不在接受发送数据。
         App_MessageBlockManager::instance()->Close(pmblk);
@@ -641,7 +641,7 @@ bool CConnectClient::GetTimeout(ACE_Time_Value const& tvNow)
 {
     ACE_Time_Value tvIntval(tvNow - m_atvRecv);
 
-    if(m_emRecvState == SERVER_RECV_BEGIN && tvIntval.sec() > SERVER_RECV_TIMEOUT)
+    if(m_emRecvState == EM_Server_Recv_State::SERVER_RECV_BEGIN && tvIntval.sec() > SERVER_RECV_TIMEOUT)
     {
         //接收数据处理已经超时，在这里打印出来
         OUR_DEBUG((LM_DEBUG,"[CConnectClient::GetTimeout]***(%d)recv dispose is timeout(%d)!***.\n", m_nServerID, tvIntval.sec()));

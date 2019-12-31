@@ -8,7 +8,7 @@ CProConnectClient::CProConnectClient(void)
     m_mbRecv            = NULL;
     m_pClientMessage    = NULL;
     m_u4MaxPacketSize   = MAX_MSG_PACKETLENGTH;
-    m_ems2s             = S2S_NEED_CALLBACK;
+    m_ems2s             = EM_s2s::S2S_NEED_CALLBACK;
 
     m_u4SendSize        = 0;
     m_u4SendCount       = 0;
@@ -16,7 +16,7 @@ CProConnectClient::CProConnectClient(void)
     m_u4RecvCount       = 0;
     m_u4CostTime        = 0;
 
-    m_emRecvState       = SERVER_RECV_INIT;
+    m_emRecvState       = EM_Server_Recv_State::SERVER_RECV_INIT;
     m_emDispose         = EM_CONNECT_IO_DISPOSE::CONNECT_IO_PLUGIN;
 }
 
@@ -82,7 +82,7 @@ void CProConnectClient::ClientClose(EM_s2s& ems2s)
         m_ems2s = ems2s;
 
         //如果对象已经在外面释放，则不需要再次回调
-        if(ems2s == S2S_INNEED_CALLBACK)
+        if(ems2s == EM_s2s::S2S_INNEED_CALLBACK)
         {
             SetClientMessage(NULL);
         }
@@ -184,7 +184,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
 
             //这里只处理远端服务器断开连接的消息，回调ConnectError
             //服务器主动关闭不在回调ConnectError
-            if (S2S_NEED_CALLBACK == m_ems2s)
+            if (EM_s2s::S2S_NEED_CALLBACK == m_ems2s)
             {
                 m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
             }
@@ -265,7 +265,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                 ACE_Message_Block* pRecvFinish = NULL;
 
                 m_atvRecv = ACE_OS::gettimeofday();
-                m_emRecvState = SERVER_RECV_BEGIN;
+                m_emRecvState = EM_Server_Recv_State::SERVER_RECV_BEGIN;
 
                 while (true)
                 {
@@ -292,7 +292,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                 }
             }
 
-            m_emRecvState = SERVER_RECV_END;
+            m_emRecvState = EM_Server_Recv_State::SERVER_RECV_END;
 
             //如果有剩余数据，放入数据包里面去
             if (mb.length() > 0)
@@ -367,7 +367,7 @@ bool CProConnectClient::GetTimeout(ACE_Time_Value const& tvNow)
 {
     ACE_Time_Value tvIntval(tvNow - m_atvRecv);
 
-    if(m_emRecvState == SERVER_RECV_BEGIN && tvIntval.sec() > SERVER_RECV_TIMEOUT)
+    if(m_emRecvState == EM_Server_Recv_State::SERVER_RECV_BEGIN && tvIntval.sec() > SERVER_RECV_TIMEOUT)
     {
         //接收数据处理已经超时，在这里打印出来
         OUR_DEBUG((LM_DEBUG,"[CProConnectClient::GetTimeout]***(%d)recv dispose is timeout(%d)!***.\n", m_nServerID, tvIntval.sec()));
@@ -403,7 +403,7 @@ bool CProConnectClient::RecvData(uint32 u4PacketLen, ACE_Message_Block* pmbSave)
             sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_AddrRemote.get_host_addr());
             objServerIPInfo.m_nPort = m_AddrRemote.get_port_number();
 
-            if(S2S_NEED_CALLBACK == m_ems2s)
+            if(EM_s2s::S2S_NEED_CALLBACK == m_ems2s)
             {
                 m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
             }

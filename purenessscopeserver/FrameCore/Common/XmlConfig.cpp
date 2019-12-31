@@ -148,23 +148,23 @@ bool xmlNetWorkMode::SetIOMode(const std::string& pData)
 
     if (pData.compare("Iocp") == 0)
     {
-        Mode = (uint8)NETWORKMODE_PRO_IOCP;
+        Mode = NETWORKMODE::NETWORKMODE_PRO_IOCP;
     }
     else if (pData.compare("Select") == 0)
     {
-        Mode = (uint8)NETWORKMODE_RE_SELECT;
+        Mode = NETWORKMODE::NETWORKMODE_RE_SELECT;
     }
     else if (pData.compare("Poll") == 0)
     {
-        Mode = (uint8)NETWORKMODE_RE_TPSELECT;
+        Mode = NETWORKMODE::NETWORKMODE_RE_TPSELECT;
     }
     else if (pData.compare("Epoll") == 0)
     {
-        Mode = (uint8)NETWORKMODE_RE_EPOLL;
+        Mode = NETWORKMODE::NETWORKMODE_RE_EPOLL;
     }
     else if (pData.compare("Epoll_et") == 0)
     {
-        Mode = (uint8)NETWORKMODE_RE_EPOLL_ET;
+        Mode = NETWORKMODE::NETWORKMODE_RE_EPOLL_ET;
     }
     else
     {

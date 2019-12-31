@@ -154,7 +154,7 @@ public:
 class xmlNetWorkMode : public IConfigOpeation
 {
 public:
-    uint8 Mode                     = 0;
+    NETWORKMODE Mode               = NETWORKMODE::NETWORKMODE_RE_EPOLL;
     uint16 BackLog                 = 0;
     bool NetByteOrder              = false;
     ENUM_CHAR_ORDER LocalByteOrder = ENUM_CHAR_ORDER::SYSTEM_BIG_ORDER;

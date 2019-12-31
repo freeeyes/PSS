@@ -57,7 +57,7 @@ void CUnit_MessageService::Test_MessageService(void)
         return;
     }
 
-    if (THREAD_INIT != m_pMessageService->GetStepState())
+    if (THREADSTATE::THREAD_INIT != m_pMessageService->GetStepState())
     {
         OUR_DEBUG((LM_INFO, "[Test_MessageService]GetStepState is fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_MessageService]GetStepState is fail.", true == blRet);

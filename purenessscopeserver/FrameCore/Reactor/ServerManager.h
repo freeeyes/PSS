@@ -33,7 +33,7 @@ public:
 
 
 private:
-    bool Init_Reactor(uint8 u1ReactorCount, uint8 u1NetMode);
+    bool Init_Reactor(uint8 u1ReactorCount, NETWORKMODE u1NetMode);
     bool Run();
 
     bool Start_Tcp_Listen();                                      //Æô¶¯TCP¼àÌý

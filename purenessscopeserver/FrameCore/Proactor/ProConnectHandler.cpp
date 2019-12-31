@@ -12,8 +12,8 @@ CProConnectHandler::CProConnectHandler(void) : m_u4LocalPort(0), m_u4SendCheckTi
     m_u4HandlerID          = 0;
     m_u2MaxConnectTime     = 0;
     m_u4SendThresHold      = MAX_MSG_SNEDTHRESHOLD;
-    m_u1ConnectState       = CONNECT_INIT;
-    m_u1SendBuffState      = CONNECT_SENDNON;
+    m_u1ConnectState       = CONNECTSTATE::CONNECT_INIT;
+    m_u1SendBuffState      = CONNECTSTATE::CONNECT_SENDNON;
     m_pPacketParse         = NULL;
     m_u4MaxPacketSize      = MAX_MSG_PACKETLENGTH;
     m_u8RecvQueueTimeCost  = 0;
@@ -128,7 +128,7 @@ void CProConnectHandler::Close(int nIOCount, int nErrno)
 
 
         //如果是服务器关闭，则不理，因为连接已经清理掉了
-        if (CONNECT_SERVER_CLOSE != m_u1ConnectState)
+        if (CONNECTSTATE::CONNECT_SERVER_CLOSE != m_u1ConnectState)
         {
             //组织数据
             Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CDISCONNECT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
@@ -196,7 +196,7 @@ bool CProConnectHandler::ServerClose(EM_Client_Close_status emStatus, uint8 u1Op
                 this->handle(ACE_INVALID_HANDLE);
             }
 
-            m_u1ConnectState = CONNECT_SERVER_CLOSE;
+            m_u1ConnectState = CONNECTSTATE::CONNECT_SERVER_CLOSE;
 
         }
     }
@@ -503,7 +503,7 @@ void CProConnectHandler::open(ACE_HANDLE h, ACE_Message_Block&)
                                           GetConnectID(),
                                           GetHandlerID());
 
-    m_u1ConnectState = CONNECT_OPEN;
+    m_u1ConnectState = CONNECTSTATE::CONNECT_OPEN;
 
     m_pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
 
@@ -730,12 +730,12 @@ void CProConnectHandler::SetSendQueueTimeCost(uint32 u4TimeCost)
     Close();
 }
 
-uint8 CProConnectHandler::GetConnectState()
+CONNECTSTATE CProConnectHandler::GetConnectState()
 {
     return m_u1ConnectState;
 }
 
-uint8 CProConnectHandler::GetSendBuffState()
+CONNECTSTATE CProConnectHandler::GetSendBuffState()
 {
     return m_u1SendBuffState;
 }

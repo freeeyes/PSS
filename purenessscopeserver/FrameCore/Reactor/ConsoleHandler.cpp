@@ -46,7 +46,7 @@ bool CConsoleHandler::ServerClose()
 {
     OUR_DEBUG((LM_ERROR, "[CConsoleHandler::ServerClose]Close(%d) OK.\n", GetConnectID()));
     shutdown();
-    m_u1ConnectState = CONNECT_SERVER_CLOSE;
+    m_u1ConnectState = CONNECTSTATE::CONNECT_SERVER_CLOSE;
     return true;
 }
 
@@ -127,7 +127,7 @@ int CConsoleHandler::open(void*)
         return -1;
     }
 
-    m_u1ConnectState = CONNECT_OPEN;
+    m_u1ConnectState = CONNECTSTATE::CONNECT_OPEN;
     return nRet;
 }
 
@@ -255,12 +255,12 @@ int CConsoleHandler::handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask)
     return 0;
 }
 
-uint8 CConsoleHandler::GetConnectState()
+CONNECTSTATE CConsoleHandler::GetConnectState()
 {
     return m_u1ConnectState;
 }
 
-uint8 CConsoleHandler::GetSendBuffState()
+CONNECTSTATE CConsoleHandler::GetSendBuffState()
 {
     return m_u1SendBuffState;
 }

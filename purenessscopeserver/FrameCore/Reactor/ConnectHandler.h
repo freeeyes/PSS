@@ -76,8 +76,8 @@ public:
     const char* GetError();                                                  //得到当前错误信息
     void        SetConnectID(uint32 u4ConnectID);                            //设置当前链接ID
     uint32      GetConnectID();                                              //得到当前链接ID
-    uint8       GetConnectState();                                           //得到链接状态
-    uint8       GetSendBuffState();                                          //得到发送状态
+    CONNECTSTATE       GetConnectState();                                    //得到链接状态
+    CONNECTSTATE       GetSendBuffState();                                   //得到发送状态
     _ClientConnectInfo GetClientInfo();                                      //得到客户端信息
     _ClientIPInfo      GetClientIPInfo();                                    //得到客户端IP信息
     _ClientIPInfo      GetLocalIPInfo();                                     //得到监听IP信息
@@ -136,8 +136,8 @@ private:
     int                        m_nHashID              = 0;                     //对应的Pool的Hash数组下标
     uint16                     m_u2MaxConnectTime     = 0;                     //最大时间链接判定
     uint16                     m_u2TcpNodelay         = TCP_NODELAY_ON;        //Nagle算法开关
-    uint8                      m_u1ConnectState       = CONNECT_INIT;          //目前链接处理状态
-    uint8                      m_u1SendBuffState      = CONNECT_SENDNON;       //目前缓冲器是否有等待发送的数据
+    CONNECTSTATE               m_u1ConnectState       = CONNECTSTATE::CONNECT_INIT;          //目前链接处理状态
+    CONNECTSTATE               m_u1SendBuffState      = CONNECTSTATE::CONNECT_SENDNON;       //目前缓冲器是否有等待发送的数据
     uint8                      m_u1IsActive           = 0;                     //连接是否为激活状态，0为否，1为是
     bool                       m_blBlockState         = false;                 //是否处于阻塞状态 false为不在阻塞状态，true为在阻塞状态
     bool                       m_blIsLog              = false;                 //是否写入日志，false为不写入，true为写入
