@@ -312,6 +312,11 @@ enum class EM_Server_Recv_State
     SERVER_RECV_END,          //处理数据完成
 };
 
+
+const int REACTOR_CLIENTDEFINE = 0;
+const int REACTOR_POSTDEFINE   = 1;
+const int REACTOR_UDPDEFINE    = 2;
+
 //日志编号声明
 #define LOG_SYSTEM                      1000
 #define LOG_SYSTEM_ERROR                1001
@@ -388,19 +393,6 @@ enum class EM_Server_Recv_State
 *  - '?': print out stack trace (see Stack_Trace.h header comments)
 */
 #define OUR_DEBUG(X) { ACE_DEBUG((LM_INFO, "[%D %P|%t][%N,%l]")); ACE_DEBUG(X); }
-
-enum
-{
-    REACTOR_CLIENTDEFINE  = 0,
-    REACTOR_POSTDEFINE    = 1,
-    REACTOR_UDPDEFINE     = 2,
-};
-
-//中间服务器的ID
-enum
-{
-    POSTSERVER_TEST    = 1,
-};
 
 //*****************************************************************
 //增加两个特殊的命令头，一个是链接建立，一个是链接退出
