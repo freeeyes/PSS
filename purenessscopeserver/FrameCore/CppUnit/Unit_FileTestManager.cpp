@@ -26,7 +26,7 @@ void CUnit_FileTestManager::Test_FileTestStart(void)
     if (objInfo.n4ConnectNum != 1 ||
         objInfo.n4TimeInterval != 10 ||
         objInfo.n4ProNum != 1 ||
-        objInfo.n4Result != 0)
+        objInfo.n4Result != FILE_TEST_RESULT::RESULT_OK)
     {
         OUR_DEBUG((LM_INFO, "[Test_FileTestStart]objInfo.n4ConnectNum=%d.\n", objInfo.n4ConnectNum));
         OUR_DEBUG((LM_INFO, "[Test_FileTestStart]objInfo.n4TimeInterval=%d.\n", objInfo.n4TimeInterval));
