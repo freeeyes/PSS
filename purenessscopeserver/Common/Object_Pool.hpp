@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 #include <assert.h>
-#include <ACEMemory.h>
+#include "ACEMemory.hpp"
 #include "ThreadLock.h"
 
 /*
