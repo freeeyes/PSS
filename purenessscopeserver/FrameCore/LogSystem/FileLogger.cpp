@@ -4,7 +4,6 @@ CLogFile::CLogFile(const char* pFileRoot, uint32 u4BufferSize, uint32 u4FileMaxS
     : m_u4BufferSize(u4BufferSize), 
       m_u4FileMaxSize(u4FileMaxSize* MAX_BUFF_1024 * MAX_BUFF_1024)
 {
-    m_pBuffer = new char[u4BufferSize];   //这里是用于日志拼接时间所用
     sprintf_safe(m_szFileRoot, MAX_BUFF_100, "%s", pFileRoot);
 }
 
@@ -13,6 +12,8 @@ void CLogFile::Init()
     //在这里初始化读取当前文件夹的文件最大序号和文件大小
     ACE_Date_Time dt;
     char szDateBuff[MAX_TIME_SIZE] = { '\0' };
+
+    m_pBuffer = new char[m_u4BufferSize];   //这里是用于日志拼接时间所用
 
     //首先判断文件是否存在
     while (true)
@@ -211,7 +212,7 @@ int CLogFile::doLog(_LogBlockInfo* pLogBlockInfo)
     return 0;
 }
 
-bool CLogFile::SendMail(const _LogBlockInfo* pLogBlockInfo, xmlMails::_Mail* pMailInfo)
+bool CLogFile::SendMail(const _LogBlockInfo* pLogBlockInfo, const xmlMails::_Mail* pMailInfo)
 {
     //发送邮件
     const xmlMails::_Mail* pMailAlert = NULL;

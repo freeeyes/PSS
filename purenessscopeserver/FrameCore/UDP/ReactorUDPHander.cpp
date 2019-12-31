@@ -271,7 +271,7 @@ void CReactorUDPHander::SaveSendInfo(uint32 u4Len)
 
 void CReactorUDPHander::GetCommandData(uint16 u2CommandID, _CommandData& objCommandData)
 {
-    _CommandData* pCommandData = m_CommandAccount.GetCommandData(u2CommandID);
+    const _CommandData* pCommandData = m_CommandAccount.GetCommandData(u2CommandID);
 
     if(pCommandData != NULL)
     {

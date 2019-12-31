@@ -321,8 +321,7 @@ _CommandData* CCommandAccount::GetCommandData(uint16 u2CommandID)
 {
     char szHashID[10] = {'\0'};
     sprintf_safe(szHashID, 10, "%d", u2CommandID);
-    _CommandData* pCommandData = m_objCommandDataList.Get_Hash_Box_Data(szHashID);
-    return pCommandData;
+    return m_objCommandDataList.Get_Hash_Box_Data(szHashID);
 }
 
 void CCommandAccount::GetCommandAlertData(vecCommandAlertData& CommandAlertDataList)
