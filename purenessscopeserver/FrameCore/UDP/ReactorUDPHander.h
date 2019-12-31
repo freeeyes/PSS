@@ -40,19 +40,19 @@ private:
     void SaveSendInfo(uint32 u4Len);                                 //记录发送信息
 
     ACE_SOCK_Dgram          m_skRemote;
-    ACE_INET_Addr           m_addrRemote;                   //数据发送方的IP信息
-    ACE_INET_Addr           m_addrLocal;                    //监听方的IP信息
-    CPacketParse*           m_pPacketParse;                 //数据包解析类
-    char*                   m_pRecvBuff;                    //接收数据缓冲指针
+    ACE_INET_Addr           m_addrRemote;                           //数据发送方的IP信息
+    ACE_INET_Addr           m_addrLocal;                            //监听方的IP信息
+    CPacketParse*           m_pPacketParse = NULL;                  //数据包解析类
+    char*                   m_pRecvBuff    = NULL;                  //接收数据缓冲指针
 
-    ACE_Time_Value          m_atvInput;                     //接收包的时间
-    ACE_Time_Value          m_atvOutput;                    //发送包的时间
-    uint32                  m_u4RecvPacketCount;            //接收数据包的数量
-    uint32                  m_u4SendPacketCount;            //发送数据包的数量
-    uint32                  m_u4RecvSize;                   //接收数据的总大小
-    uint32                  m_u4SendSize;                   //发送数据的总大小
-    uint32                  m_u4MaxRecvSize;                //最大接收数据包尺寸
-    CCommandAccount         m_CommandAccount;               //数据包统计
-    uint32                  m_u4PacketParseInfoID;          //对应处理packetParse的模块ID
+    ACE_Time_Value          m_atvInput;                             //接收包的时间
+    ACE_Time_Value          m_atvOutput;                            //发送包的时间
+    uint32                  m_u4RecvPacketCount   = 0;              //接收数据包的数量
+    uint32                  m_u4SendPacketCount   = 0;              //发送数据包的数量
+    uint32                  m_u4RecvSize          = 0;              //接收数据的总大小
+    uint32                  m_u4SendSize          = 0;              //发送数据的总大小
+    uint32                  m_u4MaxRecvSize       = MAX_BUFF_1024;  //最大接收数据包尺寸
+    uint32                  m_u4PacketParseInfoID = 0;              //对应处理packetParse的模块ID
+    CCommandAccount         m_CommandAccount;                       //数据包统计
 };
 #endif

@@ -105,9 +105,9 @@ bool CConsolePacketParse::MakePacket(uint32 u4ConnectID, const char* pData, uint
 
 uint8 CConsolePacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurrMessage, const IMessageBlockManager* pMessageBlockManager)
 {
-    ACE_UNUSED_ARG(pCurrMessage);
     if(0 == u4ConnectID || NULL == pCurrMessage || NULL == pMessageBlockManager)
     {
+        pCurrMessage->reset();
         return PACKET_GET_ERROR;
     }
     else

@@ -33,13 +33,13 @@ private:
 
     ACE_SOCK_Dgram          m_skRemote;
     ACE_INET_Addr           m_addrRemote;                   //数据发送方的IP信息
-    IClientUDPMessage*      m_pClientUDPMessage;            //消息处理类
+    IClientUDPMessage*      m_pClientUDPMessage = NULL;     //消息处理类
 
     ACE_Time_Value          m_atvInput;                     //接收包的时间
     ACE_Time_Value          m_atvOutput;                    //发送包的时间
-    uint32                  m_u4RecvPacketCount;            //接收数据包的数量
-    uint32                  m_u4SendPacketCount;            //发送数据包的数量
-    uint32                  m_u4RecvSize;                   //接收数据的总大小
-    uint32                  m_u4SendSize;                   //发送数据的总大小
+    uint32                  m_u4RecvPacketCount = 0;        //接收数据包的数量
+    uint32                  m_u4SendPacketCount = 0;        //发送数据包的数量
+    uint32                  m_u4RecvSize        = 0;        //接收数据的总大小
+    uint32                  m_u4SendSize        = 0;        //发送数据的总大小
 };
 #endif

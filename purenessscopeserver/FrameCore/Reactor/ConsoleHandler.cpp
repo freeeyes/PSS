@@ -313,7 +313,7 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
     }
 
     //·¢ËÍÊý¾Ý
-    char* pData = pMbData->rd_ptr();
+    const char* pData = pMbData->rd_ptr();
 
     if (NULL == pData)
     {

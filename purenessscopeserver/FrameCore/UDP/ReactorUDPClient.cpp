@@ -2,11 +2,6 @@
 
 CReactorUDPClient::CReactorUDPClient(void)
 {
-    m_pClientUDPMessage = NULL;
-    m_u4RecvPacketCount = 0;
-    m_u4SendPacketCount = 0;
-    m_u4RecvSize        = 0;
-    m_u4SendSize        = 0;
 }
 
 CReactorUDPClient::~CReactorUDPClient(void)

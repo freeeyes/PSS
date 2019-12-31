@@ -2,14 +2,6 @@
 
 CReactorUDPHander::CReactorUDPHander(void)
 {
-    m_pPacketParse        = NULL;
-    m_u4RecvPacketCount   = 0;
-    m_u4SendPacketCount   = 0;
-    m_u4RecvSize          = 0;
-    m_u4SendSize          = 0;
-    m_u4PacketParseInfoID = 0;
-    m_u4MaxRecvSize       = MAX_BUFF_1024;
-    m_pRecvBuff           = NULL;
 }
 
 CReactorUDPHander::~CReactorUDPHander(void)
