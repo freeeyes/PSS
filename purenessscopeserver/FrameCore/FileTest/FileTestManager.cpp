@@ -11,7 +11,7 @@ FileTestResultInfoSt CFileTestManager::FileTestStart(const char* szXmlFileTestNa
     if(m_bFileTesting)
     {
         OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]m_bFileTesting:%d.\n",m_bFileTesting));
-        objFileTestResult.n4Result = RESULT_ERR_TESTING;
+        objFileTestResult.n4Result = FILE_TEST_RESULT::RESULT_ERR_TESTING;
         return objFileTestResult;
     }
     else
@@ -27,12 +27,12 @@ FileTestResultInfoSt CFileTestManager::FileTestStart(const char* szXmlFileTestNa
             if(-1 == m_n4TimerID)
             {
                 OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]Start timer error\n"));
-                objFileTestResult.n4Result = RESULT_ERR_UNKOWN;
+                objFileTestResult.n4Result = FILE_TEST_RESULT::RESULT_ERR_UNKOWN;
             }
             else
             {
                 OUR_DEBUG((LM_ERROR, "[CMainConfig::LoadXmlCfg]Start timer OK.\n"));
-                objFileTestResult.n4Result = RESULT_OK;
+                objFileTestResult.n4Result = FILE_TEST_RESULT::RESULT_OK;
                 m_bFileTesting = true;
             }
         }
@@ -130,7 +130,7 @@ bool CFileTestManager::LoadXmlCfg(const char* szXmlFileTestName, FileTestResultI
     if(false == m_MainConfig.Init(szXmlFileTestName))
     {
         OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]File Read Error = %s.\n", szXmlFileTestName));
-        objFileTestResult.n4Result = RESULT_ERR_CFGFILE;
+        objFileTestResult.n4Result = FILE_TEST_RESULT::RESULT_ERR_CFGFILE;
         return false;
     }
 
@@ -193,9 +193,9 @@ bool CFileTestManager::LoadXmlCfg(const char* szXmlFileTestName, FileTestResultI
         }
 
         //读取数据包文件内容
-        int nReadFileRet = ReadTestFile(strPathFile.c_str(), m_u4ContentType, objFileTestDataInfo);
+        FILE_TEST_RESULT nReadFileRet = ReadTestFile(strPathFile.c_str(), m_u4ContentType, objFileTestDataInfo);
 
-        if(RESULT_OK == nReadFileRet)
+        if(FILE_TEST_RESULT::RESULT_OK == nReadFileRet)
         {
             m_vecFileTestDataInfoSt.push_back(objFileTestDataInfo);
         }
@@ -213,7 +213,7 @@ bool CFileTestManager::LoadXmlCfg(const char* szXmlFileTestName, FileTestResultI
     return true;
 }
 
-int CFileTestManager::ReadTestFile(const char* pFileName, int nType, FileTestDataInfoSt& objFileTestDataInfo)
+FILE_TEST_RESULT CFileTestManager::ReadTestFile(const char* pFileName, int nType, FileTestDataInfoSt& objFileTestDataInfo)
 {
     ACE_FILE_Connector fConnector;
     ACE_FILE_IO ioFile;
@@ -222,7 +222,7 @@ int CFileTestManager::ReadTestFile(const char* pFileName, int nType, FileTestDat
     if (fConnector.connect(ioFile, fAddr) == -1)
     {
         OUR_DEBUG((LM_INFO, "[CMainConfig::ReadTestFile]Open filename:%s Error.\n", pFileName));
-        return RESULT_ERR_PROFILE;
+        return FILE_TEST_RESULT::RESULT_ERR_PROFILE;
     }
 
     ACE_FILE_Info fInfo;
@@ -231,14 +231,14 @@ int CFileTestManager::ReadTestFile(const char* pFileName, int nType, FileTestDat
     {
         OUR_DEBUG((LM_INFO, "[CMainConfig::ReadTestFile]Get file info filename:%s Error.\n", pFileName));
         ioFile.close();
-        return RESULT_ERR_PROFILE;
+        return FILE_TEST_RESULT::RESULT_ERR_PROFILE;
     }
 
     if (MAX_BUFF_10240 - 1 < fInfo.size_)
     {
         OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]Protocol file too larger filename:%s.\n", pFileName));
         ioFile.close();
-        return RESULT_ERR_PROFILE;
+        return FILE_TEST_RESULT::RESULT_ERR_PROFILE;
     }
     else
     {
@@ -249,7 +249,7 @@ int CFileTestManager::ReadTestFile(const char* pFileName, int nType, FileTestDat
         {
             OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]Read protocol file error filename:%s Error.\n", pFileName));
             ioFile.close();
-            return RESULT_ERR_PROFILE;
+            return FILE_TEST_RESULT::RESULT_ERR_PROFILE;
         }
         else
         {
@@ -276,7 +276,7 @@ int CFileTestManager::ReadTestFile(const char* pFileName, int nType, FileTestDat
         ioFile.close();
     }
 
-    return RESULT_OK;
+    return FILE_TEST_RESULT::RESULT_OK;
 }
 
 int CFileTestManager::InitResponseRecordList()

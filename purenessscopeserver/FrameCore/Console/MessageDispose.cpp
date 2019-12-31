@@ -1854,7 +1854,7 @@ void DoMessage_TestFileStart(const _CommandInfo& CommandInfo, IBuffPacket* pBuff
 
         if (CommandInfo.m_u1OutputType == 0)
         {
-            (*pBuffPacket) << objFileResult.n4Result;
+            (*pBuffPacket) << static_cast<uint32>(objFileResult.n4Result);
             (*pBuffPacket) << objFileResult.n4TimeInterval;
             (*pBuffPacket) << objFileResult.n4ProNum;
             (*pBuffPacket) << (uint16)objFileResult.vecProFileDesc.size();

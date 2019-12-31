@@ -312,6 +312,15 @@ enum class EM_Server_Recv_State
     SERVER_RECV_END,          //处理数据完成
 };
 
+//启动文件测试结果的定义
+enum class FILE_TEST_RESULT
+{
+	RESULT_ERR_UNKOWN = -1,   //未知错误
+	RESULT_OK = 0,            //启动成功
+	RESULT_ERR_TESTING,       //正在测试
+	RESULT_ERR_CFGFILE,       //配置文件错误
+	RESULT_ERR_PROFILE,       //协议文件错误
+};
 
 const int REACTOR_CLIENTDEFINE = 0;
 const int REACTOR_POSTDEFINE   = 1;
@@ -644,23 +653,13 @@ static inline uint32 next_pow_of_2(uint32 x)
     return x+1;
 }
 
-//启动文件测试结果的定义
-enum FILE_TEST_RESULT
-{
-    RESULT_ERR_UNKOWN = -1,   //未知错误
-    RESULT_OK = 0,            //启动成功
-    RESULT_ERR_TESTING,       //正在测试
-    RESULT_ERR_CFGFILE,       //配置文件错误
-    RESULT_ERR_PROFILE,       //协议文件错误
-};
-
 typedef struct FILETESTRESULTINFO
 {
-    int32 n4Result        = -1;            //启动测试结果信息
-    int32 n4TimeInterval  = 0;             //启动测试时间间隔
-    int32 n4ProNum        = 0;             //启动测试协议条数
-    int32 n4ConnectNum    = 0;             //模拟连接数
-    vector<string> vecProFileDesc;         //协议文件描述
+    FILE_TEST_RESULT n4Result = FILE_TEST_RESULT::RESULT_OK; //启动测试结果信息
+    int32 n4TimeInterval      = 0;                           //启动测试时间间隔
+    int32 n4ProNum            = 0;                           //启动测试协议条数
+    int32 n4ConnectNum        = 0;                           //模拟连接数
+    vector<string> vecProFileDesc;                           //协议文件描述
 
     FILETESTRESULTINFO(const FILETESTRESULTINFO& ar)
     {
@@ -678,7 +677,7 @@ typedef struct FILETESTRESULTINFO
 
     ~FILETESTRESULTINFO()
     {
-        n4Result = -1;
+        n4Result = FILE_TEST_RESULT::RESULT_OK;
         n4TimeInterval = 0;
         n4ProNum = 0;
         n4ConnectNum = 0;
@@ -1406,12 +1405,9 @@ enum class ENUM_CHAR_ORDER
     SYSTEM_BIG_ORDER,          //大端字序
 };
 
-enum
-{
-    O32_LITTLE_ENDIAN = 0x03020100ul,
-    O32_BIG_ENDIAN = 0x00010203ul,
-    O32_PDP_ENDIAN = 0x01000302ul
-};
+const unsigned int O32_LITTLE_ENDIAN = 0x03020100ul;
+const unsigned int O32_BIG_ENDIAN    = 0x00010203ul;
+const unsigned int O32_PDP_ENDIAN    = 0x01000302ul;
 
 static const union
 {
