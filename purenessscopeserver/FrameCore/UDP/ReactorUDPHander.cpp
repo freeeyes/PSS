@@ -127,7 +127,7 @@ bool CReactorUDPHander::SendMessage(char*& pMessage, uint32 u4Len, const char* s
     SaveSendInfo(u4Len);
 
     //统计发送信息
-    m_CommandAccount.SaveCommandData(u2CommandID, (uint32)nPort, CONNECT_IO_UDP, u4Len, COMMAND_TYPE_OUT);
+    m_CommandAccount.SaveCommandData(u2CommandID, (uint32)nPort, EM_CONNECT_IO_TYPE::CONNECT_IO_UDP, u4Len, COMMAND_TYPE_OUT);
 
     //释放发送体
     App_MessageBlockManager::instance()->Close(pMbData);

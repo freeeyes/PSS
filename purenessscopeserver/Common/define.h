@@ -186,9 +186,6 @@ static bool Convert_Version(int nTagVserion)
 #define RESOUCE_FROM_CLIENT               0      //客户端数据包
 #define RESOUCE_FROM_SERVER               1      //服务器间数据包
 
-#define CONNECT_TCP                       0      //链接类型为TCP
-#define CONNECT_UDP                       1      //链接类型为UDP
-
 #define SENDMESSAGE_NOMAL                 0      //默认发送数据包模式(走PacketPrase端口)
 #define SENDMESSAGE_JAMPNOMAL             1      //发送数据包模式(不走PacketPrase端口)
 
@@ -223,7 +220,7 @@ static bool Convert_Version(int nTagVserion)
 \"legend\" : {\"data\":[\"time\"]},\"xAxis\" : %s,\"yAxis\" : {\"type\":\"value\"}, \"series\": [%s]}"
 
 //连接的性质类型
-enum EM_CONNECT_IO_TYPE
+enum class EM_CONNECT_IO_TYPE
 {
     CONNECT_IO_TCP = 0,      //IO是TCP
     CONNECT_IO_UDP,          //IO是UDP
@@ -233,21 +230,21 @@ enum EM_CONNECT_IO_TYPE
 };
 
 //服务器间通讯和TTy通讯的处理模式，可以选择是框架处理还是业务处理
-enum EM_CONNECT_IO_DISPOSE
+enum class EM_CONNECT_IO_DISPOSE
 {
     CONNECT_IO_FRAME = 0,     //框架PacketParse处理
     CONNECT_IO_PLUGIN         //插件自己处理
 };
 
 //UDP的播放模式
-enum EM_UDP_TYPE
+enum class EM_UDP_TYPE
 {
     UDP_SINGLE = 0,        //UDP单独连接
     UDP_BROADCAST,         //UDP广播
 };
 
 //对Handler接收数据入口类型的定义
-enum EM_IO_TYPE
+enum class EM_IO_TYPE
 {
     NET_INPUT = 0,      //网络入口
     FILE_INPUT,         //文件入口

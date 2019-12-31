@@ -1,6 +1,6 @@
 #include "ProTTyHandler.h"
 
-CProTTyHandler::CProTTyHandler() : m_blState(false), m_blPause(false), m_pTTyMessage(NULL), m_emDispose(CONNECT_IO_PLUGIN), m_u4PacketParseInfoID(0)
+CProTTyHandler::CProTTyHandler() : m_blState(false), m_blPause(false), m_pTTyMessage(NULL), m_emDispose(EM_CONNECT_IO_DISPOSE::CONNECT_IO_PLUGIN), m_u4PacketParseInfoID(0)
 {
     m_szName[0] = 0;
     m_pmbReadBuff = new ACE_Message_Block(MAX_BUFF_1024);
@@ -62,14 +62,14 @@ void CProTTyHandler::Close()
         m_ObjReadRequire.cancel();
         m_ObjWriteRequire.cancel();
 
-        if (CONNECT_IO_FRAME == m_emDispose)
+        if (EM_CONNECT_IO_DISPOSE::CONNECT_IO_FRAME == m_emDispose)
         {
             //发送packetParse断开消息
             App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->DisConnect(m_u4ConnectID);
 
             //发送框架消息
             ACE_INET_Addr m_addrRemote;
-            Send_MakePacket_Queue(m_u4ConnectID, m_u4PacketParseInfoID, NULL, PACKET_TTY_DISCONNECT, m_addrRemote, "TTy", 0, CONNECT_IO_TTY);
+            Send_MakePacket_Queue(m_u4ConnectID, m_u4PacketParseInfoID, NULL, PACKET_TTY_DISCONNECT, m_addrRemote, "TTy", 0, EM_CONNECT_IO_TYPE::CONNECT_IO_TTY);
         }
 
         //关闭转发接口
@@ -93,7 +93,7 @@ bool CProTTyHandler::Init(uint32 u4ConnectID, const char* pName, ACE_TTY_IO::Ser
     //初始化连接设备
     if (true == ConnectTTy())
     {
-        if (CONNECT_IO_FRAME == m_emDispose)
+        if (EM_CONNECT_IO_DISPOSE::CONNECT_IO_FRAME == m_emDispose)
         {
             //发送packetParse断开消息
             _ClientIPInfo objClientIPInfo;
@@ -104,7 +104,7 @@ bool CProTTyHandler::Init(uint32 u4ConnectID, const char* pName, ACE_TTY_IO::Ser
 
             //发送框架消息
             ACE_INET_Addr m_addrRemote;
-            Send_MakePacket_Queue(m_u4ConnectID, m_u4PacketParseInfoID, NULL, PACKET_TTY_CONNECT, m_addrRemote, "TTy", 0, CONNECT_IO_TTY);
+            Send_MakePacket_Queue(m_u4ConnectID, m_u4PacketParseInfoID, NULL, PACKET_TTY_CONNECT, m_addrRemote, "TTy", 0, EM_CONNECT_IO_TYPE::CONNECT_IO_TTY);
         }
 
         //查看是否存在转发接口
@@ -149,13 +149,13 @@ void CProTTyHandler::handle_read_file(const ACE_Asynch_Read_File::Result& result
         //接收设备数据异常
         OUR_DEBUG((LM_ERROR, "[CProTTyHandler::handle_read_file]Error:%d.\n", (int)result.error()));
 
-        if (CONNECT_IO_PLUGIN == m_emDispose && NULL != m_pTTyMessage)
+        if (EM_CONNECT_IO_DISPOSE::CONNECT_IO_PLUGIN == m_emDispose && NULL != m_pTTyMessage)
         {
             //通知上层应用
             m_pTTyMessage->ReportMessage(m_u4ConnectID, (uint32)result.error(), EM_TTY_EVENT_RW_ERROR);
         }
 
-        if (CONNECT_IO_FRAME == m_emDispose)
+        if (EM_CONNECT_IO_DISPOSE::CONNECT_IO_FRAME == m_emDispose)
         {
             //通知框架消息
         }
@@ -181,7 +181,7 @@ void CProTTyHandler::handle_read_file(const ACE_Asynch_Read_File::Result& result
 
     if (false == m_blPause)
     {
-        if (CONNECT_IO_PLUGIN == m_emDispose && NULL != m_pTTyMessage)
+        if (EM_CONNECT_IO_DISPOSE::CONNECT_IO_PLUGIN == m_emDispose && NULL != m_pTTyMessage)
         {
             //回调接收数据函数
             m_pTTyMessage->RecvData(m_u4ConnectID, mb.rd_ptr(), (uint32)result.bytes_transferred());
@@ -198,7 +198,7 @@ void CProTTyHandler::handle_read_file(const ACE_Asynch_Read_File::Result& result
                               &mb,
                               dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()),
                               &obj_Packet_Info,
-                              CONNECT_IO_TTY);
+                              EM_CONNECT_IO_TYPE::CONNECT_IO_TTY);
 
                 if (PACKET_GET_ENOUGH == n1Ret)
                 {
@@ -213,7 +213,8 @@ void CProTTyHandler::handle_read_file(const ACE_Asynch_Read_File::Result& result
                     pPacketParse->SetPacket_Body_Curr_Length(obj_Packet_Info.m_u4BodyCurrLen);
 
                     ACE_INET_Addr m_addrRemote;
-                    Send_MakePacket_Queue(m_u4ConnectID, m_u4PacketParseInfoID, pPacketParse, PACKET_PARSE, m_addrRemote, "TTy", 0, CONNECT_IO_TTY);
+					Send_MakePacket_Queue(m_u4ConnectID, m_u4PacketParseInfoID, pPacketParse, PACKET_PARSE, m_addrRemote, "TTy", 0, EM_CONNECT_IO_TYPE::CONNECT_IO_TTY);
+					Send_MakePacket_Queue(m_u4ConnectID, m_u4PacketParseInfoID, pPacketParse, PACKET_PARSE, m_addrRemote, "TTy", 0, EM_CONNECT_IO_TYPE::CONNECT_IO_TTY);
 
                     //清理用完的m_pPacketParse
                     App_PacketParsePool::instance()->Delete(pPacketParse);

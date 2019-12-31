@@ -145,7 +145,7 @@ public:
     void GetCommandAlertData(vecCommandAlertData& CommandAlertDataList);                      //得到所有超过告警阀值的命令
     void SaveCommandDataLog();                                                                //存储统计日志
 
-    CMessage* CreateMessage(uint32 u4ConnectID, uint8 u1PacketType);                          //从子线程中获取一个Message对象
+    CMessage* CreateMessage(uint32 u4ConnectID, EM_CONNECT_IO_TYPE u1PacketType);             //从子线程中获取一个Message对象
     void DeleteMessage(uint32 u4ConnectID, CMessage* pMessage);                               //从子线程中回收一个Message对象
 
     void CopyMessageManagerList();                                                            //从MessageManager中获得信令列表副本
@@ -164,7 +164,7 @@ private:
     bool CheckWorkThread(const ACE_Time_Value& tvNow);                                                 //检查所有的工作线程状态
     bool CheckPacketParsePool();                                                                       //检查正在使用的消息解析对象
     bool CheckPlugInState();                                                                           //检查所有插件状态
-    int32 GetWorkThreadID(uint32 u4ConnectID, uint8 u1PacketType);                                     //根据操作类型和ConnectID计算出那个工作线程ID
+    int32 GetWorkThreadID(uint32 u4ConnectID, EM_CONNECT_IO_TYPE u1PacketType);                         //根据操作类型和ConnectID计算出那个工作线程ID
 
 	typedef vector<CMessageService*> vecMessageService;
 	vecMessageService                                   m_vecMessageService;

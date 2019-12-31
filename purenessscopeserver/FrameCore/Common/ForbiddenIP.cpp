@@ -37,11 +37,11 @@ bool CForbiddenIP::Init(const char* szConfigPath)
 
         if (ACE_OS::strcmp(pTypeData, "TCP") == 0)
         {
-            ForbiddenIP.m_u1Type = CONNECT_IO_TCP;
+            ForbiddenIP.m_u1ConnectType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP;
         }
         else
         {
-            ForbiddenIP.m_u1Type = CONNECT_IO_UDP;
+            ForbiddenIP.m_u1ConnectType = EM_CONNECT_IO_TYPE::CONNECT_IO_UDP;
         }
 
         m_VecForeverForbiddenIP.push_back(ForbiddenIP);
@@ -50,7 +50,7 @@ bool CForbiddenIP::Init(const char* szConfigPath)
     return true;
 }
 
-bool CForbiddenIP::CheckIP(const char* pIP, uint8 u1ConnectType)
+bool CForbiddenIP::CheckIP(const char* pIP, EM_CONNECT_IO_TYPE u1ConnectType)
 {
     for(const _ForbiddenIP& objForbiddenIP : m_VecForeverForbiddenIP)
     {
@@ -81,7 +81,7 @@ bool CForbiddenIP::CheckIP(const char* pIP, uint8 u1ConnectType)
     return true;
 }
 
-bool CForbiddenIP::AddForeverIP(const char* pIP, uint8 u1ConnectType)
+bool CForbiddenIP::AddForeverIP(const char* pIP, EM_CONNECT_IO_TYPE u1ConnectType)
 {
     _ForbiddenIP ForbiddenIP;
     sprintf_safe(ForbiddenIP.m_szClientIP, MAX_IP_SIZE, "%s", pIP);
@@ -96,7 +96,7 @@ bool CForbiddenIP::AddForeverIP(const char* pIP, uint8 u1ConnectType)
     return true;
 }
 
-bool CForbiddenIP::AddTempIP(const char* pIP, uint32 u4Second, uint8 u1ConnectType)
+bool CForbiddenIP::AddTempIP(const char* pIP, uint32 u4Second, EM_CONNECT_IO_TYPE u1ConnectType)
 {
     _ForbiddenIP ForbiddenIP;
     sprintf_safe(ForbiddenIP.m_szClientIP, MAX_IP_SIZE, "%s", pIP);
@@ -109,7 +109,7 @@ bool CForbiddenIP::AddTempIP(const char* pIP, uint32 u4Second, uint8 u1ConnectTy
     return true;
 }
 
-bool CForbiddenIP::DelForeverIP(const char* pIP, uint8 u1ConnectType)
+bool CForbiddenIP::DelForeverIP(const char* pIP, EM_CONNECT_IO_TYPE u1ConnectType)
 {
     for(VecForbiddenIP::iterator b = m_VecForeverForbiddenIP.begin(); b != m_VecForeverForbiddenIP.end(); ++b)
     {
@@ -129,7 +129,7 @@ bool CForbiddenIP::DelForeverIP(const char* pIP, uint8 u1ConnectType)
     return true;
 }
 
-bool CForbiddenIP::DelTempIP(const char* pIP, uint8 u1ConnectType)
+bool CForbiddenIP::DelTempIP(const char* pIP, EM_CONNECT_IO_TYPE u1ConnectType)
 {
     for(VecForbiddenIP::iterator b = m_VecTempForbiddenIP.begin(); b !=  m_VecTempForbiddenIP.end(); ++b)
     {
@@ -169,7 +169,7 @@ bool CForbiddenIP::SaveConfig()
 
     for(_ForbiddenIP& objForbiddenIP : m_VecForeverForbiddenIP)
     {
-        if(objForbiddenIP.m_u1ConnectType == CONNECT_TCP)
+        if(objForbiddenIP.m_u1ConnectType == EM_CONNECT_IO_TYPE::CONNECT_IO_TCP)
         {
             sprintf_safe(szTemp, MAX_BUFF_500, "<ForbiddenIP ip=\"%s\" type=\"TCP\" desc=\"ForbiddenIP£¬type is 'TCP' or 'UDP'\" />\r\n", objForbiddenIP.m_szClientIP);
         }

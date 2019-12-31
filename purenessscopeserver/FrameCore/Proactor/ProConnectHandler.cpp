@@ -35,7 +35,7 @@ CProConnectHandler::CProConnectHandler(void) : m_u4LocalPort(0), m_u4SendCheckTi
     m_u4PacketParseInfoID  = 0;
     m_u4PacketDebugSize    = 0;
     m_pPacketDebugData     = NULL;
-    m_emIOType             = NET_INPUT;
+    m_emIOType             = EM_IO_TYPE::NET_INPUT;
     m_pFileTest            = NULL;
 }
 
@@ -169,7 +169,7 @@ void CProConnectHandler::Close(int nIOCount, int nErrno)
 
 bool CProConnectHandler::ServerClose(EM_Client_Close_status emStatus, uint8 u1OptionEvent)
 {
-    if (NET_INPUT == m_emIOType)
+    if (EM_IO_TYPE::NET_INPUT == m_emIOType)
     {
         if (CLIENT_CLOSE_IMMEDIATLY == emStatus)
         {
@@ -242,7 +242,7 @@ uint32 CProConnectHandler::file_open(IFileTestManager* pFileTest)
     m_blIsLog = false;
     m_szConnectName[0] = '\0';
     m_u1IsActive = 1;
-    m_emIOType = FILE_INPUT;
+    m_emIOType = EM_IO_TYPE::FILE_INPUT;
 
     //初始化检查器
     m_TimeConnectInfo.Init(GetXmlConfigAttribute(xmlClientData)->RecvPacketCount,
@@ -293,7 +293,7 @@ int CProConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Siz
 
         //解析消息头
         _Head_Info objHeadInfo;
-        bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Head_Info(GetConnectID(), pMbHead, App_MessageBlockManager::instance(), &objHeadInfo, CONNECT_IO_TCP);
+        bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Head_Info(GetConnectID(), pMbHead, App_MessageBlockManager::instance(), &objHeadInfo, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
 
         if (false == blStateHead)
         {
@@ -326,7 +326,7 @@ int CProConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Siz
                            pMbBody,
                            App_MessageBlockManager::instance(),
                            &obj_Body_Info,
-                           CONNECT_IO_TCP);
+                           EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
 
         if (false == blStateBody)
         {
@@ -368,7 +368,7 @@ int CProConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Siz
         memcpy_safe((char*)pData, u4Size, pMbStream->wr_ptr(), u4Size);
 
         _Packet_Info obj_Packet_Info;
-        uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Stream(GetConnectID(), pMbStream, dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info, CONNECT_IO_TCP);
+        uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Stream(GetConnectID(), pMbStream, dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
 
         if (PACKET_GET_ENOUGH == n1Ret)
         {
@@ -427,7 +427,7 @@ void CProConnectHandler::open(ACE_HANDLE h, ACE_Message_Block&)
     m_blIsLog             = false;
     m_szConnectName[0]    = '\0';
     m_u1IsActive          = 1;
-    m_emIOType            = NET_INPUT;
+    m_emIOType            = EM_IO_TYPE::NET_INPUT;
 
     if (NULL == App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID))
     {
@@ -760,7 +760,7 @@ bool CProConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacke
         return false;
     }
 
-    if (NET_INPUT == m_emIOType)
+    if (EM_IO_TYPE::NET_INPUT == m_emIOType)
     {
         //如果不是直接发送数据，则拼接数据包
         if (u1State == PACKET_SEND_CACHE)
@@ -947,7 +947,7 @@ int CProConnectHandler::Dispose_Paceket_Parse_Head(ACE_Message_Block* pmb)
     //判断头的合法性
     _Head_Info objHeadInfo;
 
-    bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Head_Info(GetConnectID(), pmb, App_MessageBlockManager::instance(), &objHeadInfo, CONNECT_IO_TCP);
+    bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Head_Info(GetConnectID(), pmb, App_MessageBlockManager::instance(), &objHeadInfo, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
 
     if (false == blStateHead)
     {
@@ -1036,7 +1036,7 @@ int CProConnectHandler::Dispose_Paceket_Parse_Body(ACE_Message_Block* pmb)
                        pmb,
                        App_MessageBlockManager::instance(),
                        &obj_Body_Info,
-                       CONNECT_IO_TCP);
+                       EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
 
     if (false == blStateBody)
     {
@@ -1688,7 +1688,7 @@ bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
 
         _ClientIPInfo objClientIP = pConnectHandler->GetLocalIPInfo();
 
-        if (false == m_CommandAccount.SaveCommandData(u2CommandID, (uint32)objClientIP.m_nPort, CONNECT_IO_TCP, u4CommandSize, COMMAND_TYPE_OUT))
+        if (false == m_CommandAccount.SaveCommandData(u2CommandID, (uint32)objClientIP.m_nPort, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP, u4CommandSize, COMMAND_TYPE_OUT))
         {
             OUR_DEBUG((LM_INFO, "[CProConnectManager::SendMessage]ConnectID=%d, CommandID=%d, SaveCommandData error.\n", u4ConnectID, u2CommandID));
         }

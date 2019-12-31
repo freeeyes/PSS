@@ -15,13 +15,13 @@
 class _CommandData
 {
 public:
-    uint64 m_u8CommandCost      = 0;                  //ÃüÁîµÄÖ´ÐÐºÄ·Ñ×ÜÊ±¼ä
-    uint32 m_u4CommandCount     = 0;                  //ÃüÁîµÄ×Üµ÷ÓÃ´ÎÊý
-    uint32 m_u4PacketSize       = 0;                  //ÃüÁî²úÉúµÄ×ÜÁ÷Á¿
-    uint16 m_u2CommandID        = 0;                  //ÃüÁîµÄID
-    uint8  m_u1PacketType       = CONNECT_IO_TCP;     //Êý¾Ý°üÀ´Ô´ÀàÐÍ
-    uint8  m_u1CommandType      = COMMAND_TYPE_IN;    //ÃüÁîµÄÀàÐÍ£¬0ÊÇÊÕµ½µÄÃüÁî£¬1ÊÇ·¢³öµÄÃüÁî
-    ACE_Time_Value m_tvCommandTime;                   //ÃüÁîµÄ×îºó´¦ÀíÊ±¼ä
+    uint64             m_u8CommandCost      = 0;                  //ÃüÁîµÄÖ´ÐÐºÄ·Ñ×ÜÊ±¼ä
+    uint32             m_u4CommandCount     = 0;                  //ÃüÁîµÄ×Üµ÷ÓÃ´ÎÊý
+    uint32             m_u4PacketSize       = 0;                  //ÃüÁî²úÉúµÄ×ÜÁ÷Á¿
+    uint16             m_u2CommandID        = 0;                  //ÃüÁîµÄID
+    EM_CONNECT_IO_TYPE m_u1PacketType       = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP;     //Êý¾Ý°üÀ´Ô´ÀàÐÍ
+    uint8              m_u1CommandType      = COMMAND_TYPE_IN;    //ÃüÁîµÄÀàÐÍ£¬0ÊÇÊÕµ½µÄÃüÁî£¬1ÊÇ·¢³öµÄÃüÁî
+    ACE_Time_Value     m_tvCommandTime;                           //ÃüÁîµÄ×îºó´¦ÀíÊ±¼ä
 
     _CommandData()
     {
@@ -31,14 +31,14 @@ public:
     {
         if(this->m_u2CommandID != ar.m_u2CommandID)
         {
-            this->m_u2CommandID = ar.m_u2CommandID;
+            this->m_u2CommandID  = ar.m_u2CommandID;
+            this->m_u1PacketType = ar.m_u1PacketType;
         }
 
         this->m_u4CommandCount += ar.m_u4CommandCount;
         this->m_u8CommandCost  += ar.m_u8CommandCost;
         this->m_u1CommandType  += ar.m_u1CommandType;
         this->m_u4PacketSize   += ar.m_u4PacketSize;
-        this->m_u1PacketType   += ar.m_u1PacketType;
         this->m_tvCommandTime  += ar.m_tvCommandTime;
         return *this;
     }
@@ -63,7 +63,7 @@ typedef vector<_CommandAlertData> vecCommandAlertData;   //¼ÇÂ¼ËùÓÐµÄ¸æ¾¯¼à¿Ø·§Ö
 class _Port_Data_Account
 {
 public:
-    uint8                       m_u1Type    = CONNECT_IO_TCP;        //µ±Ç°Á¬½ÓÀàÐÍ
+    EM_CONNECT_IO_TYPE          m_u1Type    = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP;  //µ±Ç°Á¬½ÓÀàÐÍ
     uint32                      m_u4Port    = 0;                     //µ±Ç°Êý¾Ý¶Ë¿Ú
     uint8                       m_u1Minute  = 0;                     //»ñµÃµ±Ç°·ÖÖÓÊý
     uint32                      m_u4FlowIn  = 0;                     //µ±Ç°½øÈëÁ÷Á¿Í³¼Æ(µ¥Î»£¬·ÖÖÓ)
@@ -85,7 +85,7 @@ public:
     }
 
     //³õÊ¼»¯Êý¾Ý
-    void Init(uint8 u1Type, uint32 u4Port)
+    void Init(EM_CONNECT_IO_TYPE u1Type, uint32 u4Port)
     {
         m_u1Type = u1Type;
         m_u4Port = u4Port;
@@ -178,7 +178,7 @@ public:
     void Init(uint8 u1CommandAccount, uint8 u1Flow, uint16 u2RecvTimeout);
     void AddCommandAlert(uint16 u2CommandID, uint32 u4Count, uint32 u4MailID);
 
-    bool SaveCommandData(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType = CONNECT_IO_TCP,
+    bool SaveCommandData(uint16 u2CommandID, uint32 u4Port, EM_CONNECT_IO_TYPE u1PacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP,
                          uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,
                          ACE_Time_Value const& tvTime = ACE_OS::gettimeofday());   //¼ÇÂ¼ÃüÁîÖ´ÐÐÐÅÏ¢
     bool SaveCommandDataLog();                         //´æ´¢ÃüÁîÖ´ÐÐÐÅÏ¢µÄÈÕÖ¾
@@ -195,15 +195,15 @@ public:
     void Close();
 
 private:
-    bool Save_Flow(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType = CONNECT_IO_TCP,
+    bool Save_Flow(uint16 u2CommandID, uint32 u4Port, EM_CONNECT_IO_TYPE u1PacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP,
                    uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,
                    ACE_Time_Value const& tvTime = ACE_OS::gettimeofday());                    //Á÷Á¿Í³¼Æ
 
-    bool Save_Command(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType = CONNECT_IO_TCP,
+    bool Save_Command(uint16 u2CommandID, uint32 u4Port, EM_CONNECT_IO_TYPE u1PacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP,
                       uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,
                       ACE_Time_Value const& tvTime = ACE_OS::gettimeofday());                 //ÃüÁîÍ³¼Æ
 
-    bool Save_Alert(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType = CONNECT_IO_TCP,
+    bool Save_Alert(uint16 u2CommandID, uint32 u4Port, EM_CONNECT_IO_TYPE u1PacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP,
                     uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,
                     ACE_Time_Value const& tvTime = ACE_OS::gettimeofday());                 //ÃüÁî¸æ¾¯Í³¼Æ
 

@@ -452,7 +452,7 @@ bool CClientProConnectManager::ConnectUDP(int nServerID, const char* pIP, int nP
 
     int nErr = 0;
 
-    if (emType != UDP_BROADCAST)
+    if (emType != EM_UDP_TYPE::UDP_BROADCAST)
     {
         if (u1IPType == TYPE_IPV4)
         {

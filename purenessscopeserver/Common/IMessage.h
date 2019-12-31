@@ -15,7 +15,7 @@ struct _MessageBase
     uint32             m_u4WorkThreadID;            //工作线程ID
     uint32             m_u4PacketParseID;           //与ConnectID对应的解析器ID
     uint16             m_u2Cmd;                     //命令字的ID
-    uint8              m_u1PacketType;              //数据包来源类型
+    EM_CONNECT_IO_TYPE m_u1PacketType;              //数据包来源类型
     uint8              m_u1ResouceType;             //数据来源，服务器间数据包或者客户端数据包
     char               m_szIP[MAX_BUFF_20];         //客户端IP
     char               m_szListenIP[MAX_BUFF_20];   //监听IP
@@ -25,8 +25,8 @@ struct _MessageBase
 
     _MessageBase()
     {
-        m_u1PacketType    = CONNECT_IO_TCP;          //默认为TCP
-        m_u1ResouceType   = RESOUCE_FROM_CLIENT;     //默认为来源于客户端的数据包
+        m_u1PacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP; //默认为TCP
+        m_u1ResouceType   = RESOUCE_FROM_CLIENT;                //默认为来源于客户端的数据包
         m_u4ConnectID     = 0;
         m_u2Cmd           = 0;
         m_u4HeadSrcSize   = 0;
@@ -42,7 +42,7 @@ struct _MessageBase
 
     void Clear()
     {
-        m_u1PacketType    = CONNECT_IO_TCP;   //默认为TCP
+        m_u1PacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP;   //默认为TCP
         m_u1ResouceType   = RESOUCE_FROM_CLIENT; //默认为来源于客户端的数据包
         m_u4ConnectID     = 0;
         m_u2Cmd           = 0;

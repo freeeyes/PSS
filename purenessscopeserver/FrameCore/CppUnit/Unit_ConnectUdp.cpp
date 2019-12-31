@@ -26,7 +26,7 @@ void CUnit_ConnectUdp::Test_Connect_Udp_Server(void)
             "127.0.0.1",
             20002,
             TYPE_IPV4,
-            UDP_SINGLE,
+            EM_UDP_TYPE::UDP_SINGLE,
             (IClientUDPMessage* )&objUdpPostServerData))
     {
         OUR_DEBUG((LM_INFO, "[Test_Connect_Udp_Server]Connect[127.0.0.1:10003]Udp connect is fail.\n"));

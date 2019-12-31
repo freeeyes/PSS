@@ -1254,7 +1254,7 @@ void CMessageServiceGroup::SaveCommandDataLog()
     }
 }
 
-CMessage* CMessageServiceGroup::CreateMessage(uint32 u4ConnectID, uint8 u1PacketType)
+CMessage* CMessageServiceGroup::CreateMessage(uint32 u4ConnectID, EM_CONNECT_IO_TYPE u1PacketType)
 {
     int32 n4ThreadID = 0;
     n4ThreadID = GetWorkThreadID(u4ConnectID, u1PacketType);
@@ -1318,7 +1318,7 @@ void CMessageServiceGroup::CopyMessageManagerList()
     }
 }
 
-int32 CMessageServiceGroup::GetWorkThreadID(uint32 u4ConnectID, uint8 u1PackeType)
+int32 CMessageServiceGroup::GetWorkThreadID(uint32 u4ConnectID, EM_CONNECT_IO_TYPE u1PackeType)
 {
     int32 n4ThreadID = -1;
 
@@ -1327,14 +1327,14 @@ int32 CMessageServiceGroup::GetWorkThreadID(uint32 u4ConnectID, uint8 u1PackeTyp
         return n4ThreadID;
     }
 
-    if (u1PackeType == CONNECT_IO_TCP
-        || CONNECT_IO_TTY == u1PackeType
-        || CONNECT_IO_SERVER_TCP == u1PackeType
-        || CONNECT_IO_SERVER_UDP == u1PackeType)
+    if (EM_CONNECT_IO_TYPE::CONNECT_IO_TCP == u1PackeType
+        || EM_CONNECT_IO_TYPE::CONNECT_IO_TTY == u1PackeType
+        || EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP == u1PackeType
+        || EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_UDP == u1PackeType)
     {
         n4ThreadID = u4ConnectID % (uint32)m_vecMessageService.size();
     }
-    else if(u1PackeType == CONNECT_IO_UDP)
+    else if(u1PackeType == EM_CONNECT_IO_TYPE::CONNECT_IO_UDP)
     {
         //如果是UDP协议，则记录当前线程的位置，直接+1，调用随机数速度比较慢（因为要读文件）
         m_ThreadLock.acquire();

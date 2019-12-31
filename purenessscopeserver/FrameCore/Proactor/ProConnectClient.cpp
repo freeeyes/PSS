@@ -17,7 +17,7 @@ CProConnectClient::CProConnectClient(void)
     m_u4CostTime        = 0;
 
     m_emRecvState       = SERVER_RECV_INIT;
-    m_emDispose         = CONNECT_IO_PLUGIN;
+    m_emDispose         = EM_CONNECT_IO_DISPOSE::CONNECT_IO_PLUGIN;
 }
 
 CProConnectClient::~CProConnectClient(void)
@@ -46,7 +46,7 @@ void CProConnectClient::Close()
             this->handle(ACE_INVALID_HANDLE);
         }
 
-        if (CONNECT_IO_FRAME == m_emDispose)
+        if (EM_CONNECT_IO_DISPOSE::CONNECT_IO_FRAME == m_emDispose)
         {
             //发送packetParse断开消息
             _ClientIPInfo objClientIPInfo;
@@ -56,7 +56,7 @@ void CProConnectClient::Close()
                     objLocalIPInfo);
 
             //发送框架消息
-            Send_MakePacket_Queue(m_nServerID, m_u4PacketParseInfoID, NULL, PACKET_SERVER_TCP_DISCONNECT, m_AddrRemote, "127.0.0.1", 0, CONNECT_IO_SERVER_TCP);
+            Send_MakePacket_Queue(m_nServerID, m_u4PacketParseInfoID, NULL, PACKET_SERVER_TCP_DISCONNECT, m_AddrRemote, "127.0.0.1", 0, EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP);
         }
 
         App_ClientProConnectManager::instance()->CloseByClient(m_nServerID);
@@ -101,7 +101,7 @@ void CProConnectClient::SetServerID(int nServerID)
 
 void CProConnectClient::SetPacketParseInfoID(uint32 u4PacketParseInfoID)
 {
-    m_emDispose           = CONNECT_IO_FRAME;
+    m_emDispose           = EM_CONNECT_IO_DISPOSE::CONNECT_IO_FRAME;
     m_u4PacketParseInfoID = u4PacketParseInfoID;
 }
 
@@ -141,7 +141,7 @@ void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
 
     OUR_DEBUG((LM_DEBUG,"[CProConnectClient::open] m_nServerID=%d, this=0x%08x.\n", m_nServerID, this));
 
-    if (CONNECT_IO_FRAME == m_emDispose)
+    if (EM_CONNECT_IO_DISPOSE::CONNECT_IO_FRAME == m_emDispose)
     {
         //发送packetParse断开消息
         _ClientIPInfo objClientIPInfo;
@@ -151,7 +151,7 @@ void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
                 objLocalIPInfo);
 
         //发送框架消息
-        Send_MakePacket_Queue(m_nServerID, m_u4PacketParseInfoID, NULL, PACKET_SERVER_TCP_CONNECT, m_AddrRemote, "127.0.0.1", 0, CONNECT_IO_SERVER_TCP);
+        Send_MakePacket_Queue(m_nServerID, m_u4PacketParseInfoID, NULL, PACKET_SERVER_TCP_CONNECT, m_AddrRemote, "127.0.0.1", 0, EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP);
     }
 
     m_strDeviceName = App_ForwardManager::instance()->ConnectRegedit(m_AddrRemote.get_host_addr(),
@@ -204,7 +204,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         }
 
         //处理接收数据(这里不区分是不是完整包，交给上层逻辑自己去判定)
-        if (CONNECT_IO_FRAME == m_emDispose)
+        if (EM_CONNECT_IO_DISPOSE::CONNECT_IO_FRAME == m_emDispose)
         {
             _Packet_Parse_Info* pPacketParseInfo = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID);
 
@@ -215,7 +215,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                               &mb,
                               dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()),
                               &obj_Packet_Info,
-                              CONNECT_IO_SERVER_TCP);
+                              EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP);
 
                 if (PACKET_GET_ENOUGH == n1Ret)
                 {
@@ -231,7 +231,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                     pPacketParse->SetPacket_Body_Curr_Length(obj_Packet_Info.m_u4BodyCurrLen);
 
                     //发送框架消息
-                    Send_MakePacket_Queue(m_nServerID, m_u4PacketParseInfoID, pPacketParse, PACKET_PARSE, m_AddrRemote, "127.0.0.1", 0, CONNECT_IO_SERVER_TCP);
+                    Send_MakePacket_Queue(m_nServerID, m_u4PacketParseInfoID, pPacketParse, PACKET_PARSE, m_AddrRemote, "127.0.0.1", 0, EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP);
 
                     //清理用完的m_pPacketParse
                     App_PacketParsePool::instance()->Delete(pPacketParse);

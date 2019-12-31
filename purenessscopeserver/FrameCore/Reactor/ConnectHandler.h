@@ -112,51 +112,51 @@ private:
     int  Dispose_Recv_Data();                                                 //处理接收数据
     int  Init_Open_Connect();                                                 //当第一次建立连接初始化的时候调用
 
-    uint64                     m_u8RecvQueueTimeCost  = 0;          //成功接收数据到数据处理完成（未发送）花费的时间总和
-    uint64                     m_u8SendQueueTimeCost  = 0;          //成功发送数据到数据处理完成（只发送）花费的时间总和
+    uint64                     m_u8RecvQueueTimeCost  = 0;                     //成功接收数据到数据处理完成（未发送）花费的时间总和
+    uint64                     m_u8SendQueueTimeCost  = 0;                     //成功发送数据到数据处理完成（只发送）花费的时间总和
     uint64                     m_u8SendQueueTimeout   = MAX_QUEUE_TIMEOUT * 1000 * 1000;           //发送超时时间，超过这个时间的都会被记录到日志中
     uint64                     m_u8RecvQueueTimeout   = MAX_QUEUE_TIMEOUT * 1000 * 1000;           //接受超时时间，超过这个时间的都会被记录到日志中
-    uint32                     m_u4HandlerID          = 0;                  //此Hander生成时的ID
-    uint32                     m_u4ConnectID          = 0;                  //链接的ID
-    uint32                     m_u4AllRecvCount       = 0;                  //当前链接接收数据包的个数
-    uint32                     m_u4AllSendCount       = 0;                  //当前链接发送数据包的个数
-    uint32                     m_u4AllRecvSize        = 0;                  //当前链接接收字节总数
-    uint32                     m_u4AllSendSize        = 0;                  //当前链接发送字节总数
-    uint32                     m_u4MaxPacketSize      = MAX_MSG_PACKETLENGTH;              //单个数据包的最大长度
-    uint32                     m_u4RecvQueueCount     = 0;                  //当前链接被处理的数据包数
-    uint32                     m_u4SendMaxBuffSize    = 5 * MAX_BUFF_1024;  //发送数据最大缓冲长度
-    uint32                     m_u4SendThresHold      = MAX_MSG_SNEDTHRESHOLD;             //发送阀值(消息包的个数)
-    uint32                     m_u4ReadSendSize       = 0;                  //准备发送的字节数（水位标）
-    uint32                     m_u4SuccessSendSize    = 0;                  //实际客户端接收到的总字节数（水位标）
-    uint32                     m_u4LocalPort          = 0;                  //监听的端口号
-    uint32                     m_u4PacketParseInfoID  = 0;                  //对应处理packetParse的模块ID
-    uint32                     m_u4CurrSize           = 0;                  //当前MB缓冲字符长度
-    uint32                     m_u4PacketDebugSize    = 0;                  //记录能存二进制数据包的最大字节
-    int                        m_nBlockCount          = 0;                  //发生阻塞的次数
-    int                        m_nHashID              = 0;                  //对应的Pool的Hash数组下标
-    uint16                     m_u2MaxConnectTime     = 0;                  //最大时间链接判定
-    uint16                     m_u2TcpNodelay         = TCP_NODELAY_ON;     //Nagle算法开关
-    uint8                      m_u1ConnectState       = CONNECT_INIT;       //目前链接处理状态
-    uint8                      m_u1SendBuffState      = CONNECT_SENDNON;    //目前缓冲器是否有等待发送的数据
-    uint8                      m_u1IsActive           = 0;                  //连接是否为激活状态，0为否，1为是
-    bool                       m_blBlockState         = false;              //是否处于阻塞状态 false为不在阻塞状态，true为在阻塞状态
-    bool                       m_blIsLog              = false;              //是否写入日志，false为不写入，true为写入
-    char                       m_szError[MAX_BUFF_500]       = {'\0'};      //错误信息描述文字
-    char                       m_szLocalIP[MAX_BUFF_50]      = { '\0' };    //本地的IP端口
-    char                       m_szConnectName[MAX_BUFF_100] = { '\0' };    //连接名称，可以开放给逻辑插件去设置
-    ACE_INET_Addr              m_addrRemote;                                //远程链接客户端地址
-    ACE_Time_Value             m_atvConnect;                                //当前链接建立时间
-    ACE_Time_Value             m_atvInput;                                  //最后一次接收数据时间
-    ACE_Time_Value             m_atvOutput;                                 //最后一次发送数据时间
-    ACE_Time_Value             m_atvSendAlive;                              //链接存活时间
-    CPacketParse*              m_pPacketParse         = NULL;               //数据包解析类
-    ACE_Message_Block*         m_pCurrMessage         = NULL;               //当前的MB对象
-    ACE_Message_Block*         m_pBlockMessage        = NULL;               //当前发送缓冲等待数据块
-    _TimeConnectInfo           m_TimeConnectInfo;                           //链接健康检测器
-    char*                      m_pPacketDebugData     = NULL;               //记录数据包的Debug缓冲字符串
-    EM_IO_TYPE                 m_emIOType             = NET_INPUT;          //当前IO入口类型
-    IFileTestManager*          m_pFileTest            = NULL;               //文件测试接口入口
-    string                     m_strDeviceName;                             //转发接口名称
+    uint32                     m_u4HandlerID          = 0;                     //此Hander生成时的ID
+    uint32                     m_u4ConnectID          = 0;                     //链接的ID
+    uint32                     m_u4AllRecvCount       = 0;                     //当前链接接收数据包的个数
+    uint32                     m_u4AllSendCount       = 0;                     //当前链接发送数据包的个数
+    uint32                     m_u4AllRecvSize        = 0;                     //当前链接接收字节总数
+    uint32                     m_u4AllSendSize        = 0;                     //当前链接发送字节总数
+    uint32                     m_u4MaxPacketSize      = MAX_MSG_PACKETLENGTH;  //单个数据包的最大长度
+    uint32                     m_u4RecvQueueCount     = 0;                     //当前链接被处理的数据包数
+    uint32                     m_u4SendMaxBuffSize    = 5 * MAX_BUFF_1024;     //发送数据最大缓冲长度
+    uint32                     m_u4SendThresHold      = MAX_MSG_SNEDTHRESHOLD; //发送阀值(消息包的个数)
+    uint32                     m_u4ReadSendSize       = 0;                     //准备发送的字节数（水位标）
+    uint32                     m_u4SuccessSendSize    = 0;                     //实际客户端接收到的总字节数（水位标）
+    uint32                     m_u4LocalPort          = 0;                     //监听的端口号
+    uint32                     m_u4PacketParseInfoID  = 0;                     //对应处理packetParse的模块ID
+    uint32                     m_u4CurrSize           = 0;                     //当前MB缓冲字符长度
+    uint32                     m_u4PacketDebugSize    = 0;                     //记录能存二进制数据包的最大字节
+    int                        m_nBlockCount          = 0;                     //发生阻塞的次数
+    int                        m_nHashID              = 0;                     //对应的Pool的Hash数组下标
+    uint16                     m_u2MaxConnectTime     = 0;                     //最大时间链接判定
+    uint16                     m_u2TcpNodelay         = TCP_NODELAY_ON;        //Nagle算法开关
+    uint8                      m_u1ConnectState       = CONNECT_INIT;          //目前链接处理状态
+    uint8                      m_u1SendBuffState      = CONNECT_SENDNON;       //目前缓冲器是否有等待发送的数据
+    uint8                      m_u1IsActive           = 0;                     //连接是否为激活状态，0为否，1为是
+    bool                       m_blBlockState         = false;                 //是否处于阻塞状态 false为不在阻塞状态，true为在阻塞状态
+    bool                       m_blIsLog              = false;                 //是否写入日志，false为不写入，true为写入
+    char                       m_szError[MAX_BUFF_500]       = {'\0'};         //错误信息描述文字
+    char                       m_szLocalIP[MAX_BUFF_50]      = { '\0' };       //本地的IP端口
+    char                       m_szConnectName[MAX_BUFF_100] = { '\0' };       //连接名称，可以开放给逻辑插件去设置
+    ACE_INET_Addr              m_addrRemote;                                   //远程链接客户端地址
+    ACE_Time_Value             m_atvConnect;                                   //当前链接建立时间
+    ACE_Time_Value             m_atvInput;                                     //最后一次接收数据时间
+    ACE_Time_Value             m_atvOutput;                                    //最后一次发送数据时间
+    ACE_Time_Value             m_atvSendAlive;                                 //链接存活时间
+    CPacketParse*              m_pPacketParse         = NULL;                  //数据包解析类
+    ACE_Message_Block*         m_pCurrMessage         = NULL;                  //当前的MB对象
+    ACE_Message_Block*         m_pBlockMessage        = NULL;                  //当前发送缓冲等待数据块
+    _TimeConnectInfo           m_TimeConnectInfo;                              //链接健康检测器
+    char*                      m_pPacketDebugData     = NULL;                  //记录数据包的Debug缓冲字符串
+    EM_IO_TYPE                 m_emIOType             = EM_IO_TYPE::NET_INPUT; //当前IO入口类型
+    IFileTestManager*          m_pFileTest            = NULL;                  //文件测试接口入口
+    string                     m_strDeviceName;                                //转发接口名称
 };
 
 //管理所有已经建立的链接

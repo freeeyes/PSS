@@ -29,8 +29,8 @@ void CUnit_CommandAccount::Test_CommandAccount_Init(void)
 {
     bool blRet             = false;
 
-    m_pCommandAccount->SaveCommandData(0x1000, 10002, CONNECT_IO_TCP, 10);
-    m_pCommandAccount->SaveCommandData(0x1000, 10002, CONNECT_IO_TCP, 10);
+    m_pCommandAccount->SaveCommandData(0x1000, 10002, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP, 10);
+    m_pCommandAccount->SaveCommandData(0x1000, 10002, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP, 10);
 
     const _CommandData* pCommandData = m_pCommandAccount->GetCommandData(0x1000);
 
@@ -45,7 +45,7 @@ void CUnit_CommandAccount::Test_CommandAccount_Init(void)
         0x1000 == pCommandData->m_u2CommandID &&
         20 == pCommandData->m_u4PacketSize &&
         2 == pCommandData->m_u4CommandCount &&
-        CONNECT_IO_TCP == pCommandData->m_u1PacketType)
+        EM_CONNECT_IO_TYPE::CONNECT_IO_TCP == pCommandData->m_u1PacketType)
     {
         blRet = true;
     }
@@ -85,8 +85,8 @@ void CUnit_CommandAccount::Test_CommandAccount_Flow(void)
 {
     bool blRet = false;
 
-    m_pCommandAccount->SaveCommandData(0x1000, 10002, CONNECT_IO_TCP, 10);
-    m_pCommandAccount->SaveCommandData(0x1000, 10002, CONNECT_IO_TCP, 10);
+    m_pCommandAccount->SaveCommandData(0x1000, 10002, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP, 10);
+    m_pCommandAccount->SaveCommandData(0x1000, 10002, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP, 10);
 
     if (20 == m_pCommandAccount->GetFlowIn() &&
         0 == m_pCommandAccount->GetFlowOut() &&
@@ -102,8 +102,8 @@ void CUnit_CommandAccount::Test_CommandAccount_PortList(void)
 {
     bool blRet = false;
 
-    m_pCommandAccount->SaveCommandData(0x1000, 10002, CONNECT_IO_TCP, 10);
-    m_pCommandAccount->SaveCommandData(0x1000, 10002, CONNECT_IO_TCP, 10);
+    m_pCommandAccount->SaveCommandData(0x1000, 10002, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP, 10);
+    m_pCommandAccount->SaveCommandData(0x1000, 10002, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP, 10);
 
     vector<_Port_Data_Account> vec_Port_Data_Account;
     m_pCommandAccount->GetFlowPortList(vec_Port_Data_Account);

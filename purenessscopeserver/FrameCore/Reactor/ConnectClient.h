@@ -75,7 +75,7 @@ private:
 
     EM_s2s                      m_ems2s       = S2S_NEED_CALLBACK;    //是否需要回调状态
 	EM_Server_Recv_State        m_emRecvState = SERVER_RECV_INIT;     //0为未接收数据，1为接收数据完成，2为处理数据完成
-	EM_CONNECT_IO_DISPOSE       m_emDispose   = CONNECT_IO_PLUGIN;    //处理模式，框架处理 or 业务处理
+	EM_CONNECT_IO_DISPOSE       m_emDispose   = EM_CONNECT_IO_DISPOSE::CONNECT_IO_PLUGIN;    //处理模式，框架处理 or 业务处理
     ACE_Time_Value              m_atvRecv;                            //数据接收时间
     string                      m_strDeviceName;                      //转发接口名称
 };

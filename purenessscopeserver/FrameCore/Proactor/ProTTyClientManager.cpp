@@ -286,7 +286,7 @@ int CProTTyClientManager::ConnectFrame(uint16 u2ConnectID, const char* pName, _T
     //°ó¶¨·´Ó¦Æ÷
     pTTyClientHandler->proactor(m_pProactor);
 
-    if (false == pTTyClientHandler->Init(u2ConnectID, pName, inTTyParams, NULL, CONNECT_IO_FRAME, u4PacketParseID))
+    if (false == pTTyClientHandler->Init(u2ConnectID, pName, inTTyParams, NULL, EM_CONNECT_IO_DISPOSE::CONNECT_IO_FRAME, u4PacketParseID))
     {
         OUR_DEBUG((LM_INFO, "[CProTTyClientManager::ConnectFrame](%s)pTTyClientHandler Init Error.\n", pName));
         SAFE_DELETE(pTTyClientHandler);

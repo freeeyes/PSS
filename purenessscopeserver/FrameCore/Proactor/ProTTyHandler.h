@@ -28,7 +28,7 @@ public:
               const char* pName,
               ACE_TTY_IO::Serial_Params inParams,
               ITTyMessage* pTTyMessage,
-              EM_CONNECT_IO_DISPOSE emDispose = CONNECT_IO_PLUGIN,
+              EM_CONNECT_IO_DISPOSE emDispose = EM_CONNECT_IO_DISPOSE::CONNECT_IO_PLUGIN,
               uint32 u4PacketParseInfoID = 0);
     bool GetConnectState();
     ACE_TTY_IO::Serial_Params GetParams();

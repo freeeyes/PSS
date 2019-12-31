@@ -15,19 +15,18 @@ enum EM_S2S_Run_State
 class CS2SConnectGetRandyInfo
 {
 public:
-    CS2SConnectGetRandyInfo() : m_nServerID(0), m_nServerPort(0), m_u1Type(0), m_nLocalPort(0), m_u1LocalIPType(0), m_pClientMessage(NULL)
+    CS2SConnectGetRandyInfo() 
     {
-        m_szServerIP[0] = '\0';
     };
 
-    uint32 m_nServerID;
-    char m_szServerIP[MAX_BUFF_100];
-    int m_nServerPort;
-    uint8 m_u1Type;
-    char m_szLocalIP[MAX_BUFF_100];
-    int m_nLocalPort;
-    uint8 m_u1LocalIPType;
-    IClientMessage* m_pClientMessage;
+    uint32 m_nServerID               = 0;
+    char m_szServerIP[MAX_BUFF_100]  = {'\0'};
+    int m_nServerPort                = 0;
+    uint8 m_u1Type                   = 0;
+    char m_szLocalIP[MAX_BUFF_100]   = {'\0'};
+    int m_nLocalPort                 = 0;
+    uint8 m_u1LocalIPType            = 0;
+    IClientMessage* m_pClientMessage = NULL;
 };
 
 //负责管理服务器间通讯的数据管理

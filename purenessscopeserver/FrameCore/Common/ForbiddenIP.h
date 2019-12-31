@@ -18,11 +18,11 @@ const uint16 MAX_IP_SIZE = 50;
 class _ForbiddenIP
 {
 public:
-    uint32         m_u4Second                = 0;                      //禁止的秒数
-    uint8          m_u1ConnectType           = CONNECT_TCP;            //链接的类型，0为TCP，1为UDP
-    uint8          m_u1Type                  = 0;                      //禁止的类型，0为永久禁止，1为时段禁止。
-    char           m_szClientIP[MAX_IP_SIZE] = {'\0'};                 //被禁止的IP
-    ACE_Time_Value m_tvBegin                 = ACE_OS::gettimeofday(); //时段禁止开始时间
+    uint32             m_u4Second                = 0;                                  //禁止的秒数
+    EM_CONNECT_IO_TYPE m_u1ConnectType           = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP; //链接的类型，0为TCP，1为UDP
+    uint8              m_u1Type                  = 0;                                  //禁止的类型，0为永久禁止，1为时段禁止。
+    char               m_szClientIP[MAX_IP_SIZE] = {'\0'};                             //被禁止的IP
+    ACE_Time_Value     m_tvBegin                 = ACE_OS::gettimeofday();             //时段禁止开始时间
 
     _ForbiddenIP()
     {
@@ -37,11 +37,11 @@ public:
     CForbiddenIP();
 
     bool Init(const char* szConfigPath);                                                    //初始化加载永久封停IP文件
-    bool CheckIP(const char* pIP, uint8 u1ConnectType = CONNECT_TCP);                       //检测IP是否可以链接
-    bool AddForeverIP(const char* pIP, uint8 u1ConnectType = CONNECT_TCP);                  //添加永久封停的IP
-    bool AddTempIP(const char* pIP, uint32 u4Second, uint8 u1ConnectType = CONNECT_TCP);    //添加临时封停的IP
-    bool DelForeverIP(const char* pIP, uint8 u1ConnectType = CONNECT_TCP);                  //删除永久封停IP
-    bool DelTempIP(const char* pIP, uint8 u1ConnectType = CONNECT_TCP);                     //删除临时封停IP
+    bool CheckIP(const char* pIP, EM_CONNECT_IO_TYPE u1ConnectType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);                       //检测IP是否可以链接
+    bool AddForeverIP(const char* pIP, EM_CONNECT_IO_TYPE u1ConnectType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);                  //添加永久封停的IP
+    bool AddTempIP(const char* pIP, uint32 u4Second, EM_CONNECT_IO_TYPE u1ConnectType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);    //添加临时封停的IP
+    bool DelForeverIP(const char* pIP, EM_CONNECT_IO_TYPE u1ConnectType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);                  //删除永久封停IP
+    bool DelTempIP(const char* pIP, EM_CONNECT_IO_TYPE u1ConnectType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);                     //删除临时封停IP
     VecForbiddenIP* ShowForeverIP();                                                        //显示永久封停IP
     VecForbiddenIP* ShowTempIP();                                                           //显示临时封停IP
 

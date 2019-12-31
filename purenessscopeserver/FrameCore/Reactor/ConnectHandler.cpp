@@ -212,7 +212,7 @@ int CConnectHandler::open(void*)
         OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]ConnectID=%d, nWakeupRet=%d, errno=%d.\n", GetConnectID(), nWakeupRet, errno));
     }
 
-    m_emIOType = NET_INPUT;
+    m_emIOType = EM_IO_TYPE::NET_INPUT;
     return nRet;
 }
 
@@ -581,7 +581,7 @@ uint32 CConnectHandler::file_open(IFileTestManager* pFileTest)
 
     ConnectOpen();
 
-    m_emIOType       = FILE_INPUT;
+    m_emIOType       = EM_IO_TYPE::FILE_INPUT;
     m_pFileTest      = pFileTest;
 
     return GetConnectID();
@@ -607,7 +607,7 @@ int CConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Size, 
 
         //解析消息头
         _Head_Info objHeadInfo;
-        bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Head_Info(GetConnectID(), pMbHead, App_MessageBlockManager::instance(), &objHeadInfo, CONNECT_IO_TCP);
+        bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Head_Info(GetConnectID(), pMbHead, App_MessageBlockManager::instance(), &objHeadInfo, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
 
         if (false == blStateHead)
         {
@@ -630,7 +630,7 @@ int CConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Size, 
 
         //解析数据包体
         _Body_Info obj_Body_Info;
-        bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Body_Info(GetConnectID(), pMbBody, App_MessageBlockManager::instance(), &obj_Body_Info, CONNECT_IO_TCP);
+        bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Body_Info(GetConnectID(), pMbBody, App_MessageBlockManager::instance(), &obj_Body_Info, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
 
         if (false == blStateBody)
         {
@@ -717,7 +717,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
         return false;
     }
 
-    if (NET_INPUT == m_emIOType)
+    if (EM_IO_TYPE::NET_INPUT == m_emIOType)
     {
         if (CONNECT_SERVER_CLOSE == m_u1ConnectState || CONNECT_CLIENT_CLOSE == m_u1ConnectState)
         {
@@ -753,7 +753,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
 
 bool CConnectHandler::SendCloseMessage()
 {
-    if (NET_INPUT == m_emIOType)
+    if (EM_IO_TYPE::NET_INPUT == m_emIOType)
     {
         //将连接消息断开放在output去执行，这样就不需要同步加锁了。
         ACE_Message_Block* pMbData = App_MessageBlockManager::instance()->Create(sizeof(int));
@@ -1000,7 +1000,7 @@ void CConnectHandler::Output_Debug_Data(const ACE_Message_Block* pMbData, int nL
 int CConnectHandler::Dispose_Paceket_Parse_Head()
 {
     _Head_Info objHeadInfo;
-    bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Head_Info(GetConnectID(), m_pCurrMessage, App_MessageBlockManager::instance(), &objHeadInfo, CONNECT_IO_TCP);
+    bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Head_Info(GetConnectID(), m_pCurrMessage, App_MessageBlockManager::instance(), &objHeadInfo, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
 
     if (false == blStateHead)
     {
@@ -1089,7 +1089,7 @@ int CConnectHandler::Dispose_Paceket_Parse_Head()
 int CConnectHandler::Dispose_Paceket_Parse_Body()
 {
     _Body_Info obj_Body_Info;
-    bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Body_Info(GetConnectID(), m_pCurrMessage, App_MessageBlockManager::instance(), &obj_Body_Info, CONNECT_IO_TCP);
+    bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Parse_Packet_Body_Info(GetConnectID(), m_pCurrMessage, App_MessageBlockManager::instance(), &obj_Body_Info, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
 
     if (false == blStateBody)
     {
@@ -1730,7 +1730,7 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
         pConnectHandler->SetSendQueueTimeCost(u4SendCost);
 
         _ClientIPInfo objClientIP = pConnectHandler->GetLocalIPInfo();
-        m_CommandAccount.SaveCommandData(u2CommandID, (uint32)objClientIP.m_nPort, CONNECT_IO_TCP, u4PacketSize, COMMAND_TYPE_OUT);
+        m_CommandAccount.SaveCommandData(u2CommandID, (uint32)objClientIP.m_nPort, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP, u4PacketSize, COMMAND_TYPE_OUT);
         return true;
     }
     else

@@ -29,7 +29,7 @@ void CConnectClient::Close()
         //删除链接对象
         App_ClientReConnectManager::instance()->CloseByClient(m_nServerID);
 
-        if (CONNECT_IO_FRAME == m_emDispose)
+        if (EM_CONNECT_IO_DISPOSE::CONNECT_IO_FRAME == m_emDispose)
         {
             //发送packetParse断开消息
             _ClientIPInfo objClientIPInfo;
@@ -46,7 +46,7 @@ void CConnectClient::Close()
                                   m_addrRemote,
                                   "127.0.0.1",
                                   0,
-                                  CONNECT_IO_SERVER_TCP);
+                                  EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP);
         }
 
         //转发接口关闭
@@ -162,7 +162,7 @@ int CConnectClient::open(void* p)
 
     OUR_DEBUG((LM_INFO, "[CConnectClient::open] Connection from [%s:%d]\n", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
 
-    if (CONNECT_IO_FRAME == m_emDispose)
+    if (EM_CONNECT_IO_DISPOSE::CONNECT_IO_FRAME == m_emDispose)
     {
         //发送packetParse断开消息
         _ClientIPInfo objClientIPInfo;
@@ -179,7 +179,7 @@ int CConnectClient::open(void* p)
                               m_addrRemote,
                               "127.0.0.1",
                               0,
-                              CONNECT_IO_SERVER_TCP);
+                              EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP);
     }
 
     m_strDeviceName = App_ForwardManager::instance()->ConnectRegedit(m_addrRemote.get_host_addr(),
@@ -305,7 +305,7 @@ int CConnectClient::SendMessageGroup(uint16 u2CommandID, ACE_Message_Block* pmbl
 
 int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
 {
-    if (CONNECT_IO_FRAME == m_emDispose)
+    if (EM_CONNECT_IO_DISPOSE::CONNECT_IO_FRAME == m_emDispose)
     {
         const _Packet_Parse_Info* pPacketParseInfo = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID);
 
@@ -316,7 +316,7 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
                           pCurrMessage,
                           dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()),
                           &obj_Packet_Info,
-                          CONNECT_IO_SERVER_TCP);
+                          EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP);
 
             if (PACKET_GET_ENOUGH == n1Ret)
             {
@@ -339,7 +339,7 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
                                       m_addrRemote,
                                       "127.0.0.1",
                                       0,
-                                      CONNECT_IO_SERVER_TCP);
+                                      EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP);
 
                 //清理用完的m_pPacketParse
                 App_PacketParsePool::instance()->Delete(pPacketParse);

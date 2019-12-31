@@ -170,7 +170,7 @@ void CMakePacket::SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBo
 
 bool CMakePacket::PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, const ACE_Time_Value& tvNow)
 {
-    CMessage* pMessage = App_MessageServiceGroup::instance()->CreateMessage(u4ConnectID, (uint8)CONNECT_IO_TCP);
+    CMessage* pMessage = App_MessageServiceGroup::instance()->CreateMessage(u4ConnectID, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
 
     if(NULL == pMessage)
     {

@@ -61,7 +61,7 @@ bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param, 
 bool Udp_Common_Recv_Head(ACE_Message_Block* pMBHead, CPacketParse* pPacketParse, uint32 u4PacketParseInfoID, uint32 u4Len)
 {
     _Head_Info obj_Head_Info;
-    bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Parse_Packet_Head_Info(0, pMBHead, App_MessageBlockManager::instance(), &obj_Head_Info, CONNECT_IO_UDP);
+    bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Parse_Packet_Head_Info(0, pMBHead, App_MessageBlockManager::instance(), &obj_Head_Info, EM_CONNECT_IO_TYPE::CONNECT_IO_UDP);
 
     if (false == blStateHead)
     {
@@ -87,7 +87,7 @@ bool Udp_Common_Recv_Head(ACE_Message_Block* pMBHead, CPacketParse* pPacketParse
 bool Udp_Common_Recv_Body(ACE_Message_Block* pMBBody, CPacketParse* pPacketParse, uint32 u4PacketParseInfoID)
 {
     _Body_Info obj_Body_Info;
-    bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Parse_Packet_Body_Info(0, pMBBody, App_MessageBlockManager::instance(), &obj_Body_Info, CONNECT_IO_UDP);
+    bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Parse_Packet_Body_Info(0, pMBBody, App_MessageBlockManager::instance(), &obj_Body_Info, EM_CONNECT_IO_TYPE::CONNECT_IO_UDP);
 
     if (false == blStateBody)
     {
@@ -107,7 +107,7 @@ bool Udp_Common_Recv_Stream(ACE_Message_Block* pMbData, CPacketParse* pPacketPar
     //以数据流处理
     _Packet_Info obj_Packet_Info;
 
-    if (PACKET_GET_ENOUGH == App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Parse_Packet_Stream(0, pMbData, App_MessageBlockManager::instance(), &obj_Packet_Info, CONNECT_IO_UDP))
+    if (PACKET_GET_ENOUGH == App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Parse_Packet_Stream(0, pMbData, App_MessageBlockManager::instance(), &obj_Packet_Info, EM_CONNECT_IO_TYPE::CONNECT_IO_UDP))
     {
         pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
         pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);
@@ -133,7 +133,7 @@ bool Udp_Common_Send_WorkThread(CPacketParse*& pPacketParse, const ACE_INET_Addr
     _MakePacket objMakePacket;
     objMakePacket.m_u4ConnectID = UDP_HANDER_ID;
     objMakePacket.m_pPacketParse = pPacketParse;
-    objMakePacket.m_u1PacketType = CONNECT_IO_UDP;
+    objMakePacket.m_u1PacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_UDP;
     objMakePacket.m_AddrRemote = addrRemote;
     objMakePacket.m_AddrListen = addrLocal;
     objMakePacket.m_u1Option = PACKET_PARSE;
@@ -178,7 +178,7 @@ void Tcp_Common_Send_Message_Error(uint32 u4ConnectID, uint16 u2CommandID, bool 
 uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPacketParse* pPacketParse, uint32 u4PacketParseInfoID)
 {
     _Packet_Info obj_Packet_Info;
-    uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Parse_Packet_Stream(u4ConnectID, pMbData, dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info, CONNECT_IO_UDP);
+    uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Parse_Packet_Stream(u4ConnectID, pMbData, dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info, EM_CONNECT_IO_TYPE::CONNECT_IO_UDP);
 
     if (PACKET_GET_ENOUGH == n1Ret)
     {
@@ -209,9 +209,9 @@ void Send_MakePacket_Queue(uint32 u4ConnectID, uint32 u4PacketParseID, CPacketPa
     objMakePacket.m_u1Option        = u1Option;
     objMakePacket.m_AddrRemote      = addrRemote;
     objMakePacket.m_u4PacketParseID = u4PacketParseID;
-    objMakePacket.m_u1PacketType    = (uint8)emIOType;
+    objMakePacket.m_u1PacketType    = emIOType;
 
-    if (CONNECT_IO_TCP == emIOType || CONNECT_IO_UDP == emIOType)
+    if (EM_CONNECT_IO_TYPE::CONNECT_IO_TCP == emIOType || EM_CONNECT_IO_TYPE::CONNECT_IO_UDP == emIOType)
     {
         if (ACE_OS::strcmp("INADDR_ANY", pLocalIP) == 0)
         {

@@ -61,7 +61,7 @@ void CCommandAccount::Close()
     OUR_DEBUG((LM_ERROR, "CCommandAccount::Close]End.\n"));
 }
 
-bool CCommandAccount::Save_Flow(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
+bool CCommandAccount::Save_Flow(uint16 u2CommandID, uint32 u4Port, EM_CONNECT_IO_TYPE u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
 {
     ACE_UNUSED_ARG(u2CommandID);
 
@@ -89,7 +89,7 @@ bool CCommandAccount::Save_Flow(uint16 u2CommandID, uint32 u4Port, uint8 u1Packe
     return true;
 }
 
-bool CCommandAccount::Save_Command(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
+bool CCommandAccount::Save_Command(uint16 u2CommandID, uint32 u4Port, EM_CONNECT_IO_TYPE u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
 {
     ACE_UNUSED_ARG(u4Port);
 
@@ -142,7 +142,7 @@ bool CCommandAccount::Save_Command(uint16 u2CommandID, uint32 u4Port, uint8 u1Pa
     return true;
 }
 
-bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
+bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint32 u4Port, EM_CONNECT_IO_TYPE u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
 {
     ACE_UNUSED_ARG(u4Port);
     ACE_UNUSED_ARG(u1PacketType);
@@ -188,7 +188,7 @@ bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint32 u4Port, uint8 u1Pack
     return true;
 }
 
-bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint32 u4Port, uint8 u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
+bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint32 u4Port, EM_CONNECT_IO_TYPE u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
 {
     //如果流量开关打开，则记录流量(单位是分钟)
     bool blRet = true;
@@ -248,7 +248,7 @@ bool CCommandAccount::SaveCommandDataLog()
                 strCommandType = "Server Out Data";
             }
 
-            if(pCommandData->m_u1PacketType == CONNECT_IO_TCP)
+            if(pCommandData->m_u1PacketType == EM_CONNECT_IO_TYPE::CONNECT_IO_TCP)
             {
                 strPacketType = "TCP";
             }

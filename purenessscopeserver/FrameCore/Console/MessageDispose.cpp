@@ -1951,7 +1951,7 @@ void DoMessage_PortList(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
         {
             if (CommandInfo.m_u1OutputType == 0)
             {
-                (*pBuffPacket) << vec_Port_Data_Account[i].m_u1Type;
+                (*pBuffPacket) << static_cast<uint8>(vec_Port_Data_Account[i].m_u1Type);
                 (*pBuffPacket) << vec_Port_Data_Account[i].m_u4Port;
                 (*pBuffPacket) << vec_Port_Data_Account[i].m_u4FlowIn;
                 (*pBuffPacket) << vec_Port_Data_Account[i].m_u4FlowOut;

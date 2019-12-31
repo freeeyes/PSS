@@ -288,7 +288,7 @@ int CReTTyClientManager::ConnectFrame(uint16 u2ConnectID, const char* pName, _TT
     //°ó¶¨·´Ó¦Æ÷
     pTTyClientHandler->reactor(m_pReactor);
 
-    if (false == pTTyClientHandler->Init(u2ConnectID, pName, inTTyParams, NULL, CONNECT_IO_FRAME, u4PacketParseID))
+    if (false == pTTyClientHandler->Init(u2ConnectID, pName, inTTyParams, NULL, EM_CONNECT_IO_DISPOSE::CONNECT_IO_FRAME, u4PacketParseID))
     {
         OUR_DEBUG((LM_INFO, "[CReTTyClientManager::Connect](%s)pTTyClientHandler Init Error.\n", pName));
         SAFE_DELETE(pTTyClientHandler);
