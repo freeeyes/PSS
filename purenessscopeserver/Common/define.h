@@ -327,28 +327,28 @@ const int REACTOR_POSTDEFINE   = 1;
 const int REACTOR_UDPDEFINE    = 2;
 
 //»’÷æ±‡∫≈…˘√˜
-#define LOG_SYSTEM                      1000
-#define LOG_SYSTEM_ERROR                1001
-#define LOG_SYSTEM_CONNECT              1002
-#define LOG_SYSTEM_WORKTHREAD           1003
-#define LOG_SYSTEM_POSTTHREAD           1004
-#define LOG_SYSTEM_UDPTHREAD            1005
-#define LOG_SYSTEM_POSTCONNECT          1006
-#define LOG_SYSTEM_PACKETTIME           1007
-#define LOG_SYSTEM_PACKETTHREAD         1008
-#define LOG_SYSTEM_CONNECTABNORMAL      1009
-#define LOG_SYSTEM_RECVQUEUEERROR       1010
-#define LOG_SYSTEM_SENDQUEUEERROR       1011
-#define LOG_SYSTEM_COMMANDDATA          1012
-#define LOG_SYSTEM_CONSOLEDATA          1013
-#define LOG_SYSTEM_DEBUG_CLIENTRECV     1014
-#define LOG_SYSTEM_DEBUG_CLIENTSEND     1015
-#define LOG_SYSTEM_DEBUG_SERVERRECV     1016
-#define LOG_SYSTEM_DEBUG_SERVERSEND     1017
-#define LOG_SYSTEM_MONITOR              1018
+const int LOG_SYSTEM                  = 1000;
+const int LOG_SYSTEM_ERROR            = 1001;
+const int LOG_SYSTEM_CONNECT          = 1002;
+const int LOG_SYSTEM_WORKTHREAD       = 1003;
+const int LOG_SYSTEM_POSTTHREAD       = 1004;
+const int LOG_SYSTEM_UDPTHREAD        = 1005;
+const int LOG_SYSTEM_POSTCONNECT      = 1006;
+const int LOG_SYSTEM_PACKETTIME       = 1007;
+const int LOG_SYSTEM_PACKETTHREAD     = 1008;
+const int LOG_SYSTEM_CONNECTABNORMAL  = 1009;
+const int LOG_SYSTEM_RECVQUEUEERROR   = 1010;
+const int LOG_SYSTEM_SENDQUEUEERROR   = 1011;
+const int LOG_SYSTEM_COMMANDDATA      = 1012;
+const int LOG_SYSTEM_CONSOLEDATA      = 1013;
+const int LOG_SYSTEM_DEBUG_CLIENTRECV = 1014;
+const int LOG_SYSTEM_DEBUG_CLIENTSEND = 1015;
+const int LOG_SYSTEM_DEBUG_SERVERRECV = 1016;
+const int LOG_SYSTEM_DEBUG_SERVERSEND = 1017;
+const int LOG_SYSTEM_MONITOR          = 1018;
 
-#define DEBUG_ON  1
-#define DEBUG_OFF 0
+const int DEBUG_ON  = 1;
+const int DEBUG_OFF = 0;
 
 /**
 * Format a message to the thread-safe ACE logging mechanism.  Valid
