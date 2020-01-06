@@ -12,6 +12,8 @@ project(PacketParse_Interface_WebSocket):acelib{
 	dllout = ../FrameCore/Windows_Bin
   } else {
 	dllout = ../FrameCore/Linux_Bin
+    compile_flags += -Wno-deprecated 
+	compile_flags += -std=c++11	
   }
   includes += ../Common
 }

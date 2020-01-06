@@ -11,6 +11,8 @@ project(PacketParse_Interface_Http):acelib{
   } else {
   macros += __LINUX__
   dllout = ../../Build/Linux
+  compile_flags += -Wno-deprecated 
+  compile_flags += -std=c++11
   } 
   includes += ../Common
 }

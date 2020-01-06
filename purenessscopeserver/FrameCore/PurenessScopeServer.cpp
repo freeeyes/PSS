@@ -35,13 +35,13 @@ int Load_PacketParse_Module()
 	int nPacketParseCount = (int)GetXmlConfigAttribute(xmlPacketParses)->vec.size();
 	App_PacketParseLoader::instance()->Init(nPacketParseCount);
 
-	for (uint8 i = 0; i < nPacketParseCount; i++)
+	for (const xmlPacketParses::_PacketParse& packetparse : GetXmlConfigAttribute(xmlPacketParses)->vec)
 	{
-		bool blState = App_PacketParseLoader::instance()->LoadPacketInfo(GetXmlConfigAttribute(xmlPacketParses)->vec[i].ParseID,
-			GetXmlConfigAttribute(xmlPacketParses)->vec[i].Type,
-			GetXmlConfigAttribute(xmlPacketParses)->vec[i].OrgLength,
-			GetXmlConfigAttribute(xmlPacketParses)->vec[i].ModulePath.c_str(),
-			GetXmlConfigAttribute(xmlPacketParses)->vec[i].ModuleName.c_str());
+		bool blState = App_PacketParseLoader::instance()->LoadPacketInfo(packetparse.ParseID,
+			packetparse.Type,
+			packetparse.OrgLength,
+			packetparse.ModulePath.c_str(),
+			packetparse.ModuleName.c_str());
 
 		if (false == blState)
 		{

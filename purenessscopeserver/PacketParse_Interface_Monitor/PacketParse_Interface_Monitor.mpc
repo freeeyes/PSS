@@ -23,6 +23,8 @@ project(PacketParse_Interface_monitor):acelib{
     dllout = ../../Build/Windows
   } else {
     dllout = ../../Build/Linux
+    compile_flags += -Wno-deprecated 
+	compile_flags += -std=c++11	
   }
   includes += .
 }
