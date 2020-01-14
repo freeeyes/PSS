@@ -465,7 +465,7 @@ bool CMessageService::DoMessage(const ACE_Time_Value& tvBegin, IMessage* pMessag
         }
 
         //判断是否需要记录超时日志
-        if (pClientCommandList->GetCommandTimeout() > 0)
+        if (pClientCommandList->GetCommandTimeout() > 0 && u4TimeCost >= pClientCommandList->GetCommandTimeout())
         {
             AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_WORKTHREAD, "ThreadID=%d, CommandID=%d, Timeout=%d ms, Cost time=%d.",
                                                   m_u4ThreadID,
