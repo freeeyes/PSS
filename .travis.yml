@@ -16,6 +16,7 @@ env:
     - ACE_ROOT=$ACEDIR/ACE_wrappers
     - LD_LIBRARY_PATH=$ACE_ROOT/lib:$LD_LIBRARY_PATH
     - COMPILER=g++-7
+    - LANG="en_US.UTF-8"
 
 before_install:
   - mkdir -p $ACEDIR
