@@ -208,6 +208,12 @@ bool CMessageManager::AddClientCommand_Ex(uint16 u2CommandID, CClientCommand* pC
         //该命令尚未添加
         pClientCommandList = new CClientCommandList(u2CommandID);
 
+		//如果超时时间不为空，设置为超时时间
+		if (NULL != pCommandTimeout)
+		{
+			pClientCommandList->SetCommandTimeout(pCommandTimeout->Timeout);
+		}
+
         _ClientCommandInfo* pClientCommandInfo = pClientCommandList->AddClientCommand(pClientCommand, pModuleName, pListenInfo);
         //设置命令绑定ID
         pClientCommandInfo->m_u2CommandID = u2CommandID;
