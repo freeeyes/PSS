@@ -13,10 +13,10 @@ if defined ACEPath (
 	set VSFind="true"
 ) else (
 	echo "No Find ACE, begin download ace..."
-	powershell -Command "Invoke-WebRequest http://download.dre.vanderbilt.edu/previous_versions/ACE-6.5.0.zip -OutFile ACE-src-6.4.0.zip"
+	powershell -Command "Invoke-WebRequest http://download.dre.vanderbilt.edu/previous_versions/ACE-6.5.0.zip -OutFile ACE-src-6.5.0.zip"
 	echo "download ace ok"
 	echo "download ace expand zip begin..."
-	powershell -Command "Expand-Archive 'ACE-6.4.0.zip' '.\'"
+	powershell -Command "Expand-Archive 'ACE-6.5.0.zip' '.\'"
 	echo "download ace expand zip end..."
 	echo "create ace config.h begin..."
 	powershell -Command "New-Item .\ACE_wrappers\ace\config.h -type file -force"

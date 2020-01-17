@@ -1,6 +1,6 @@
 # PSS编译过程  
 ## (1)第三方软件ACE的安装  
-> 本程序需要依赖ACE才能运行，请到[http://www.cs.wustl.edu/~schmidt/ACE.html](http://www.cs.wustl.edu/~schmidt/ACE.html "ACE官网")下载ACE的运行库。  
+> 本程序需要依赖ACE才能运行，请到[http://download.dre.vanderbilt.edu/ "ACE官网")下载ACE的运行库。  
 > 编译教程请参考[http://www.cs.wustl.edu/~schmidt/ACE-install.html](http://www.cs.wustl.edu/~schmidt/ACE-install.html "ACE安装说明文档地址")  
 > 异或按照如下步骤进行，首先添加环境变量。  
 > vi .bash_profile  

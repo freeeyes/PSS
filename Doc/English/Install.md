@@ -1,6 +1,6 @@
 # PSS compilation process  
 ## (1) installation of third party software ace  
-> this program needs to rely on ace to run, please go to[http://www.cs.wustl.edu/~schmidt/ACE.html](http://www.cs.wustl.edu/~schmidt/ACE.html "ACE url") Download the ace runtime。  
+> this program needs to rely on ace to run, please go to[http://download.dre.vanderbilt.edu/ "ACE url") Download the ace runtime。  
 > Compile the tutorial, see[http://www.cs.wustl.edu/~schmidt/ACE-install.html](http://www.cs.wustl.edu/~schmidt/ACE-install.html "ACE install introduction")  
 > Or follow these steps to add the environment variable first.    
 > vi .bash_profile  
