@@ -17,7 +17,6 @@
 #include "Unit_ConnectUdp.h"
 #include "Unit_BaseHandler.h"
 #include "Unit_MessageDefine.h"
-#include "Unit_Logging.h"
 #include "Unit_IPAccount.h"
 #include "Unit_FrameCommand.h"
 #include "Unit_TimeQueue.h"

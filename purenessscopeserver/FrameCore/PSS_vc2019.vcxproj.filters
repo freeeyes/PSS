@@ -31,9 +31,6 @@
     <ClCompile Include="Common\ForbiddenIP.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="Common\Frame_Logging_Strategy.cpp">
-      <Filter>Common\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="Common\LinuxCPU.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>

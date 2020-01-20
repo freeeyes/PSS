@@ -11,7 +11,6 @@
 #include "ace/OS_NS_errno.h"
 
 #include "ProgramService.h"
-#include "Frame_Logging_Strategy.h"
 
 #define DEFAULT_SERVICE_INIT_STARTUP     SERVICE_AUTO_START
 
@@ -38,8 +37,6 @@ private:
     int m_nOpttype;
     int m_nOptdebug;
     int m_nOptstartup;
-
-    Frame_Logging_Strategy* m_pFrameLoggingStrategy;
 };
 
 typedef ACE_Singleton<Process, ACE_Mutex> App_Process;

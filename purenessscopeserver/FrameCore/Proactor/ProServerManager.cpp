@@ -1,5 +1,4 @@
 #include "ProServerManager.h"
-#include "Frame_Logging_Strategy.h"
 
 CProServerManager::CProServerManager(void)
 {

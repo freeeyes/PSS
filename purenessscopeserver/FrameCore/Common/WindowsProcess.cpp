@@ -10,8 +10,7 @@ Process::Process (void)
       m_nOptkill (0),
       m_nOpttype (0),
       m_nOptdebug (0),
-      m_nOptstartup (0),
-      m_pFrameLoggingStrategy(0)
+      m_nOptstartup (0)
 {
     m_szProgName[0]         = '\0';
 
@@ -185,28 +184,10 @@ int Process::run(int argc, ACE_TCHAR* argv[])
 void Process::startprocesslog()
 {
     stopprocesslog();
-
-    m_pFrameLoggingStrategy = new Frame_Logging_Strategy();
-
-    //是否打开ACE_DEBUG文件存储
-    Logging_Config_Param objParam;
-
-    sprintf_safe(objParam.m_strLogFile, 256, "%s.log", GetXmlConfigAttribute(xmlServerType)->displayname.c_str());
-    objParam.m_iChkInterval    = (int)GetXmlConfigAttribute(xmlAceDebug)->ChkInterval;
-    objParam.m_iLogFileMaxCnt  = (int)GetXmlConfigAttribute(xmlAceDebug)->LogFileMaxCnt;
-    objParam.m_iLogFileMaxSize = (int)GetXmlConfigAttribute(xmlAceDebug)->LogFileMaxSize;
-    sprintf_safe(objParam.m_strLogLevel, 128, "%s", GetXmlConfigAttribute(xmlAceDebug)->Level.c_str());
-
-    m_pFrameLoggingStrategy->InitLogStrategy(objParam);
 }
 
 void Process::stopprocesslog()
 {
-    if(NULL != m_pFrameLoggingStrategy)
-    {
-        m_pFrameLoggingStrategy->EndLogStrategy();
-        SAFE_DELETE(m_pFrameLoggingStrategy);
-    }
 }
 
 #endif
