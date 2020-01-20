@@ -235,9 +235,6 @@
     <ClCompile Include="CppUnit\Unit_MessageDefine.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="CppUnit\Unit_Logging.cpp">
-      <Filter>CppUnit\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="CppUnit\Unit_IPAccount.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
@@ -694,9 +691,6 @@
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
     <ClInclude Include="CppUnit\Unit_MessageDefine.h">
-      <Filter>CppUnit\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="CppUnit\Unit_Logging.h">
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
     <ClInclude Include="CppUnit\Unit_IPAccount.h">

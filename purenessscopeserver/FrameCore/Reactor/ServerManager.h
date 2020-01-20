@@ -39,7 +39,6 @@ private:
     bool Start_Console_Tcp_Listen();                              //启动Console TCP监听
     void Multiple_Process_Start();                                //多进程启动
     ConnectConsoleAcceptor  m_ConnectConsoleAcceptor;             //后台管理链接
-    Frame_Logging_Strategy* m_pFrameLoggingStrategy   = NULL;     //输出对象
     CFrameCommand           m_objFrameCommand;                    //框架命令
     CTMService              m_TMService;                          //TS定时器
 };
