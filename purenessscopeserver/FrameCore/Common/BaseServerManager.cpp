@@ -1,26 +1,5 @@
 #include "BaseServerManager.h"
 
-bool Server_Manager_Common_FrameLogging(Frame_Logging_Strategy*& pFrameLoggingStrategy)
-{
-    if (GetXmlConfigAttribute(xmlAceDebug)->TrunOn == 1)
-    {
-        pFrameLoggingStrategy = new Frame_Logging_Strategy();
-
-        //是否打开ACE_DEBUG文件存储
-        Logging_Config_Param objParam;
-
-        sprintf_safe(objParam.m_strLogFile, 256, "%s", GetXmlConfigAttribute(xmlAceDebug)->DebugName.c_str());
-        objParam.m_iChkInterval = GetXmlConfigAttribute(xmlAceDebug)->ChkInterval;
-        objParam.m_iLogFileMaxCnt = GetXmlConfigAttribute(xmlAceDebug)->LogFileMaxCnt;
-        objParam.m_iLogFileMaxSize = GetXmlConfigAttribute(xmlAceDebug)->LogFileMaxSize;
-        sprintf_safe(objParam.m_strLogLevel, 128, "%s", GetXmlConfigAttribute(xmlAceDebug)->Level.c_str());
-
-        pFrameLoggingStrategy->InitLogStrategy(objParam);
-    }
-
-    return true;
-}
-
 bool Server_Manager_Common_LogSystem()
 {
     //初始化日志系统线程

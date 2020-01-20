@@ -3,14 +3,10 @@
 
 CProServerManager::CProServerManager(void)
 {
-    m_pFrameLoggingStrategy = NULL;
 }
 
 bool CProServerManager::Init()
 {
-    //是否打开ACE_DEBUG文件存储
-    Server_Manager_Common_FrameLogging(m_pFrameLoggingStrategy);
-
     int nServerPortCount    = (int)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
     int nReactorCount       = 3 + GetXmlConfigAttribute(xmlMessage)->Msg_Thread;
 
@@ -458,13 +454,6 @@ bool CProServerManager::Close()
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ConsoleManager OK.\n"));
 
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close end....\n"));
-
-    if(NULL != m_pFrameLoggingStrategy)
-    {
-        m_pFrameLoggingStrategy->EndLogStrategy();
-        m_pFrameLoggingStrategy->Close();
-        SAFE_DELETE(m_pFrameLoggingStrategy);
-    }
 
     //等待所有资源释放完毕
     ACE_Time_Value tvSleep(0, 100);

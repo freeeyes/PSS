@@ -14,13 +14,9 @@
 #include "ModuleMessageManager.h"
 #include "FrameCommand.h"
 #include "BuffPacketManager.h"
-#include "Frame_Logging_Strategy.h"
 #include "IControlListen.h"
 #include "XmlConfig.h"
 #include "Echartlog.h"
-
-//初始化ACE输出性质
-bool Server_Manager_Common_FrameLogging(Frame_Logging_Strategy*& pFrameLoggingStrategy);
 
 //初始化日志系统
 bool Server_Manager_Common_LogSystem();

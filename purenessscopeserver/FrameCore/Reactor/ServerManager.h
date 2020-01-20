@@ -20,8 +20,6 @@
 #include "IpCheck.h"
 #include "TMService.h"
 
-class Frame_Logging_Strategy;
-
 class CServerManager : public IServerManager
 {
 public:

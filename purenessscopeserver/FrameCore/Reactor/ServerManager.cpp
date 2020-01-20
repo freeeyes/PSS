@@ -10,9 +10,6 @@ CServerManager::CServerManager(void)
 
 bool CServerManager::Init()
 {
-    //是否打开ACE_DEBUG文件存储
-    Server_Manager_Common_FrameLogging(m_pFrameLoggingStrategy);
-
     int nServerPortCount = (int)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
     int nReactorCount = 3 + GetXmlConfigAttribute(xmlMessage)->Msg_Thread;
 
@@ -660,13 +657,6 @@ bool CServerManager::Close()
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ConsoleManager OK.\n"));
 
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close end....\n"));
-
-    if (NULL != m_pFrameLoggingStrategy)
-    {
-        m_pFrameLoggingStrategy->EndLogStrategy();
-        m_pFrameLoggingStrategy->Close();
-        SAFE_DELETE(m_pFrameLoggingStrategy);
-    }
 
     return true;
 }
