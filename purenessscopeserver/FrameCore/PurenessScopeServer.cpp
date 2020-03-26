@@ -52,6 +52,31 @@ int Load_PacketParse_Module()
 	return 0;
 }
 
+void Set_Output_To_File(ofstream*& pLogoStream)
+{
+	if (GetXmlConfigAttribute(xmlAceDebug)->DebugName != ""
+		&& GetXmlConfigAttribute(xmlAceDebug)->TrunOn == 1)
+	{
+		//获得当前的日期
+		char szDebugFileName[MAX_BUFF_100] = { '\0' };
+		ACE_Date_Time dt;
+		sprintf_safe(szDebugFileName, MAX_BUFF_100, "%s_%04d%02d%02d.log", GetXmlConfigAttribute(xmlAceDebug)->DebugName.c_str(),
+			dt.year(), dt.month(), dt.day());
+
+		if (NULL == pLogoStream)
+		{
+			pLogoStream = new ofstream(szDebugFileName, ios::out | ios::trunc);
+		}
+		
+		if (!pLogoStream->bad())
+		{
+			ACE_LOG_MSG->msg_ostream(pLogoStream);
+			//同时输出到屏幕
+			ACE_LOG_MSG->set_flags(ACE_Log_Msg::STDERR | ACE_Log_Msg::OSTREAM);
+		}
+	}
+}
+
 #ifndef WIN32
 //关闭消息队列条件变量
 ACE_Thread_Mutex g_mutex;
@@ -344,6 +369,10 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 		return 0;
 	}
 
+	//判断是否需要将当前代码输出到文件里
+	ofstream* pLogoStream = NULL;
+	Set_Output_To_File(pLogoStream);
+
 	//显式加载PacketParse
 	if (0 != Load_PacketParse_Module())
 	{
@@ -371,6 +400,13 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 	if (GetXmlConfigAttribute(xmlServerType)->Type == 1)
 	{
 		App_Process::instance()->stopprocesslog();
+	}
+
+	//如果日志流不等于空，则回收
+	if (NULL != pLogoStream)
+	{
+		pLogoStream->close();
+		SAFE_DELETE(pLogoStream);
 	}
 
 	return 0;

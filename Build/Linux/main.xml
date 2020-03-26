@@ -39,7 +39,7 @@
 	<ClientInfo HandlerCount="5000" MaxHandlerCount="10000" MaxConnectTime="120" CheckAliveTime="60" MaxBuffRecv="1024"  desc="客户端链接相关参数"/>
 	<ConnectServer TimeInterval="500" TimeCheck="30" Recvbuff="1024" RunType="0" Count="100" desc="框架连接其它远程服务器相关参数，TimeInterval是连接每个服务器之间的保护时间，单位是毫秒" />
 	<Monitor CpuAndMemory="0"  CpuMax="50" MemoryMax="1000" desc="是否对CPU和内存定时监控，并输出日志，0为关闭监控，1是打开监控" />
-	<AceDebug TrunOn="0" DebugName="./pssout.file" ChkInterval="600" LogFileMaxSize="10240" LogFileMaxCnt="3" Level="DEBUG" desc="ACEDEBUG文件输出配置，TrunOn=0为不使用，1为使用" />
+	<AceDebug TrunOn="0" DebugName="serverdebug" ChkInterval="600" LogFileMaxSize="10240" LogFileMaxCnt="3" Level="DEBUG" desc="ACEDEBUG文件输出配置，TrunOn=0为不使用，1为使用" />
 	
 	<UDPServerIP uip="127.0.0.1" uport="10003" uParseID="1" uMaxRecvSize="1024" desc="监听UDP服务器的IP和端口，可以是多个" />
 </config>

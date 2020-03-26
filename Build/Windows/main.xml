@@ -68,7 +68,7 @@
 	<!-- CPU&Memory监控相关设置 -->
 	<Monitor CpuAndMemory="1" CpuMax="50" MemoryMax="1000" desc="是否对CPU和内存定时监控，并输出日志，0为关闭监控，1是打开监控" />
 	<!-- 屏幕输出相关设置 -->
-	<AceDebug TrunOn="0" DebugName="./serverdebug.log" ChkInterval="600" LogFileMaxSize="10240" LogFileMaxCnt="3" Level="" desc="ACEDEBUG文件输出配置，TrunOn=0为不使用，1为使用" />
+	<AceDebug TrunOn="1" DebugName="serverdebug" ChkInterval="600" LogFileMaxSize="10240" LogFileMaxCnt="3" Level="" desc="ACEDEBUG文件输出配置，TrunOn=0为不使用，1为使用" />
 	
 	<!-- 设置转发接口,可以是多个, 与端口一一对应 -->
 	<!-- Mode 0 只转发数据，不将回应数据回应客户端。 1 转发数据，并接受转发服务器的回应数据回应给客户端 -->
