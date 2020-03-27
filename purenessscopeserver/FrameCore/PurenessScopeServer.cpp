@@ -26,6 +26,7 @@
 #include "WindowsDump.h"
 #include <windows.h>
 #endif
+#include <fstream>
 
 //加载所有配置文件中的PacketParse模块
 int Load_PacketParse_Module()
@@ -65,7 +66,7 @@ void Set_Output_To_File(ofstream*& pLogoStream)
 
 		if (NULL == pLogoStream)
 		{
-			pLogoStream = new ofstream(szDebugFileName, ios::out | ios::trunc);
+			pLogoStream = new ofstream(szDebugFileName, std::ofstream::out | std::ofstream::trunc);
 		}
 		
 		if (!pLogoStream->bad())
