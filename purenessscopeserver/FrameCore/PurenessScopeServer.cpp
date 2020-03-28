@@ -204,6 +204,10 @@ bool SetAppPath()
 //子进程程序
 int Chlid_Run()
 {
+	//判断是否需要将当前代码输出到文件里
+	ofstream* pLogoStream = NULL;
+	Set_Output_To_File(pLogoStream);
+
 	//判断是否是需要以服务的状态启动
 	if (GetXmlConfigAttribute(xmlServerType)->Type == 1)
 	{
@@ -264,6 +268,13 @@ int Chlid_Run()
 
 	//回收隐式加载PacketParse
 	App_PacketParseLoader::instance()->Close();
+
+	//如果日志流不等于空，则回收
+	if (NULL != pLogoStream)
+	{
+		pLogoStream->close();
+		SAFE_DELETE(pLogoStream);
+	}
 
 	return 0;
 }
