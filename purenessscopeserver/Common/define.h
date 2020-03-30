@@ -1658,7 +1658,7 @@ class ACE_Hash_Map :
 {};
 
 
-inline void Set_Output_To_File(int nTrunOn, ofstream*& pLogoStream, const char* pLogName, int nMaxLogSize)
+inline void Set_Output_To_File(int nTrunOn, ofstream*& pLogoStream, const char* pLogPath, const char* pLogName, int nMaxLogSize)
 {
     //如果不需要输出到日志
     if (nTrunOn == 0)
@@ -1666,8 +1666,8 @@ inline void Set_Output_To_File(int nTrunOn, ofstream*& pLogoStream, const char* 
         return;
     }
 
-    char szDebugFileName[MAX_BUFF_100] = { '\0' };
-    sprintf_safe(szDebugFileName, MAX_BUFF_100, "%s.log", pLogName);
+    char szDebugFileName[MAX_BUFF_200] = { '\0' };
+    sprintf_safe(szDebugFileName, MAX_BUFF_200, "%s/%s.log", pLogPath, pLogName);
 
     if (pLogoStream == NULL)
     {
@@ -1685,10 +1685,11 @@ inline void Set_Output_To_File(int nTrunOn, ofstream*& pLogoStream, const char* 
             if (NULL != pOldLogoStream)
             {
                 ACE_LOG_MSG->msg_ostream(NULL);
+                pOldLogoStream->close();
                 ACE_Date_Time  dt;
                 //转移日志文件
-                char szHistoryLogFile[MAX_BUFF_100] = { '\0' };
-				sprintf_safe(szDebugFileName, MAX_BUFF_100, "%s_%04d%02d%02d_%02d%02d%02d.log", pLogName,
+                char szHistoryLogFile[MAX_BUFF_200] = { '\0' };
+				sprintf_safe(szHistoryLogFile, MAX_BUFF_200, "%s/%s_%04d%02d%02d_%02d%02d%02d.log", pLogPath, pLogName,
 					dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second());
                 ACE_OS::rename(szDebugFileName, szHistoryLogFile);
 

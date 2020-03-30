@@ -407,10 +407,19 @@ bool xmlConsoleClients::Init(CXmlOpeation* pXmlOperation)
 
 bool xmlAceDebug::Init(CXmlOpeation* pXmlOperation)
 {
-    return pXmlOperation->Read_XML_Data_Single_Uint8("AceDebug", "TrunOn", TrunOn)
-           && pXmlOperation->Read_XML_Data_Single_String("AceDebug", "DebugName", DebugName)
-           && pXmlOperation->Read_XML_Data_Single_Uint32("AceDebug", "LogFileMaxSize", LogFileMaxSize)
-           && pXmlOperation->Read_XML_Data_Single_String("AceDebug", "Level", Level);
+    bool bKet = true;
+
+    if (pXmlOperation->Read_XML_Data_Single_Uint8("AceDebug", "TrunOn", TrunOn)
+        && pXmlOperation->Read_XML_Data_Single_String("AceDebug", "DebugPath", DebugPath)
+        && pXmlOperation->Read_XML_Data_Single_String("AceDebug", "DebugName", DebugName)
+        && pXmlOperation->Read_XML_Data_Single_Uint32("AceDebug", "LogFileMaxSize", LogFileMaxSize)
+        && pXmlOperation->Read_XML_Data_Single_String("AceDebug", "Level", Level))
+    {
+        //À©Õ¹µ½×Ö½Ú
+        LogFileMaxSize = LogFileMaxSize * 1024;
+    }
+
+    return bKet;
 }
 
 bool xmlCommandAccount::Init(CXmlOpeation* pXmlOperation)

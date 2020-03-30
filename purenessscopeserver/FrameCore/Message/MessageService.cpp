@@ -768,6 +768,7 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* a
     ofstream* pLogoStream = (ofstream*)ACE_LOG_MSG->msg_ostream();
 	Set_Output_To_File(GetXmlConfigAttribute(xmlAceDebug)->TrunOn,
 		pLogoStream,
+        GetXmlConfigAttribute(xmlAceDebug)->DebugPath.c_str(),
 		GetXmlConfigAttribute(xmlAceDebug)->DebugName.c_str(),
 		GetXmlConfigAttribute(xmlAceDebug)->LogFileMaxSize);
 

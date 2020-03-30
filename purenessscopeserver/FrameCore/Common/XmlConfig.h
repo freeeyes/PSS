@@ -368,6 +368,7 @@ class xmlAceDebug : public IConfigOpeation
 {
 public:
     uint8 TrunOn          = 0;
+    std::string DebugPath = "./";
     std::string DebugName = "serverdebug";
     uint32 LogFileMaxSize = 10240;
     std::string Level;

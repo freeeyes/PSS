@@ -182,6 +182,7 @@ int Chlid_Run()
 	ofstream* pLogoStream = NULL;
 	Set_Output_To_File(GetXmlConfigAttribute(xmlAceDebug)->TrunOn, 
 		pLogoStream, 
+		GetXmlConfigAttribute(xmlAceDebug)->DebugPath.c_str(),
 		GetXmlConfigAttribute(xmlAceDebug)->DebugName.c_str(),
 		GetXmlConfigAttribute(xmlAceDebug)->LogFileMaxSize);
 
@@ -362,6 +363,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 	ofstream* pLogoStream = NULL;
 	Set_Output_To_File(GetXmlConfigAttribute(xmlAceDebug)->TrunOn,
 		pLogoStream,
+		GetXmlConfigAttribute(xmlAceDebug)->DebugPath.c_str(),
 		GetXmlConfigAttribute(xmlAceDebug)->DebugName.c_str(),
 		GetXmlConfigAttribute(xmlAceDebug)->LogFileMaxSize);
 
