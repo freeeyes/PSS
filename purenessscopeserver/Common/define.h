@@ -20,8 +20,10 @@
 #include "ace/High_Res_Timer.h"
 #include "ace/INET_Addr.h"
 #include "ace/Hash_Map_Manager.h"
+#include "ace/Date_Time.h"
 #include <math.h>
 #include <type_traits>
+#include <fstream>
 
 #ifndef WIN32
 #include <unistd.h>
@@ -1654,6 +1656,52 @@ class ACE_Hash_Map :
     public ACE_Hash_Map_Manager_Ex<EXT_ID, INT_ID,
     ACE_Hash<EXT_ID>, ACE_Equal_To<EXT_ID>, ACE_Null_Mutex>
 {};
+
+
+inline void Set_Output_To_File(int nTrunOn, ofstream*& pLogoStream, const char* pLogName, int nMaxLogSize)
+{
+    //如果不需要输出到日志
+    if (nTrunOn == 0)
+    {
+        return;
+    }
+
+    char szDebugFileName[MAX_BUFF_100] = { '\0' };
+    sprintf_safe(szDebugFileName, MAX_BUFF_100, "%s.log", pLogName);
+
+    if (pLogoStream == NULL)
+    {
+        //这个是新建的文件
+        pLogoStream = new ofstream(szDebugFileName, std::ofstream::out | std::ofstream::trunc);
+        ACE_LOG_MSG->msg_ostream(pLogoStream);
+    }
+    else
+    {
+        //获得当前的对象是否已经超过了max的数值
+        if ((size_t)nMaxLogSize <= (size_t)pLogoStream->tellp())
+        {
+            //需要重启一个日志文件
+            ofstream* pOldLogoStream = (ofstream*)ACE_LOG_MSG->msg_ostream();
+            if (NULL != pOldLogoStream)
+            {
+                ACE_LOG_MSG->msg_ostream(NULL);
+                ACE_Date_Time  dt;
+                //转移日志文件
+                char szHistoryLogFile[MAX_BUFF_100] = { '\0' };
+				sprintf_safe(szDebugFileName, MAX_BUFF_100, "%s_%04d%02d%02d_%02d%02d%02d.log", pLogName,
+					dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second());
+                ACE_OS::rename(szDebugFileName, szHistoryLogFile);
+
+                SAFE_DELETE(pOldLogoStream);
+            }
+
+            ofstream* pNewLogoStream = new ofstream(szDebugFileName, std::ofstream::out | std::ofstream::trunc);
+            ACE_LOG_MSG->msg_ostream(pNewLogoStream);
+        }
+    }
+
+    ACE_LOG_MSG->set_flags(ACE_Log_Msg::STDERR | ACE_Log_Msg::OSTREAM);
+}
 
 #ifndef WIN32
 

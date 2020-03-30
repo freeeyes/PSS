@@ -26,7 +26,6 @@
 #include "WindowsDump.h"
 #include <windows.h>
 #endif
-#include <fstream>
 
 //加载所有配置文件中的PacketParse模块
 int Load_PacketParse_Module()
@@ -51,31 +50,6 @@ int Load_PacketParse_Module()
 	}
 
 	return 0;
-}
-
-void Set_Output_To_File(ofstream*& pLogoStream)
-{
-	if (GetXmlConfigAttribute(xmlAceDebug)->DebugName != ""
-		&& GetXmlConfigAttribute(xmlAceDebug)->TrunOn == 1)
-	{
-		//获得当前的日期
-		char szDebugFileName[MAX_BUFF_100] = { '\0' };
-		ACE_Date_Time dt;
-		sprintf_safe(szDebugFileName, MAX_BUFF_100, "%s_%04d%02d%02d.log", GetXmlConfigAttribute(xmlAceDebug)->DebugName.c_str(),
-			dt.year(), dt.month(), dt.day());
-
-		if (NULL == pLogoStream)
-		{
-			pLogoStream = new ofstream(szDebugFileName, std::ofstream::out | std::ofstream::trunc);
-		}
-		
-		if (!pLogoStream->bad())
-		{
-			ACE_LOG_MSG->msg_ostream(pLogoStream);
-			//同时输出到屏幕
-			ACE_LOG_MSG->set_flags(ACE_Log_Msg::STDERR | ACE_Log_Msg::OSTREAM);
-		}
-	}
 }
 
 #ifndef WIN32
@@ -206,7 +180,10 @@ int Chlid_Run()
 {
 	//判断是否需要将当前代码输出到文件里
 	ofstream* pLogoStream = NULL;
-	Set_Output_To_File(pLogoStream);
+	Set_Output_To_File(GetXmlConfigAttribute(xmlAceDebug)->TrunOn, 
+		pLogoStream, 
+		GetXmlConfigAttribute(xmlAceDebug)->DebugName.c_str(),
+		GetXmlConfigAttribute(xmlAceDebug)->LogFileMaxSize);
 
 	//判断是否是需要以服务的状态启动
 	if (GetXmlConfigAttribute(xmlServerType)->Type == 1)
@@ -383,7 +360,10 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 
 	//判断是否需要将当前代码输出到文件里
 	ofstream* pLogoStream = NULL;
-	Set_Output_To_File(pLogoStream);
+	Set_Output_To_File(GetXmlConfigAttribute(xmlAceDebug)->TrunOn,
+		pLogoStream,
+		GetXmlConfigAttribute(xmlAceDebug)->DebugName.c_str(),
+		GetXmlConfigAttribute(xmlAceDebug)->LogFileMaxSize);
 
 	//显式加载PacketParse
 	if (0 != Load_PacketParse_Module())

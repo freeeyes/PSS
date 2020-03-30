@@ -368,10 +368,8 @@ class xmlAceDebug : public IConfigOpeation
 {
 public:
     uint8 TrunOn          = 0;
-    std::string DebugName = "./serverdebug.log";
-    uint16 ChkInterval    = 600;
+    std::string DebugName = "serverdebug";
     uint32 LogFileMaxSize = 10240;
-    uint8 LogFileMaxCnt   = 3;
     std::string Level;
     xmlAceDebug(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);

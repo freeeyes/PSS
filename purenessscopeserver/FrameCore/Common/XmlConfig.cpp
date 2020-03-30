@@ -409,9 +409,7 @@ bool xmlAceDebug::Init(CXmlOpeation* pXmlOperation)
 {
     return pXmlOperation->Read_XML_Data_Single_Uint8("AceDebug", "TrunOn", TrunOn)
            && pXmlOperation->Read_XML_Data_Single_String("AceDebug", "DebugName", DebugName)
-           && pXmlOperation->Read_XML_Data_Single_Uint16("AceDebug", "ChkInterval", ChkInterval)
            && pXmlOperation->Read_XML_Data_Single_Uint32("AceDebug", "LogFileMaxSize", LogFileMaxSize)
-           && pXmlOperation->Read_XML_Data_Single_Uint8("AceDebug", "LogFileMaxCnt", LogFileMaxCnt)
            && pXmlOperation->Read_XML_Data_Single_String("AceDebug", "Level", Level);
 }
 

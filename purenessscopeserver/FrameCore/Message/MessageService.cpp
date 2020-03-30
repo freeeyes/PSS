@@ -764,6 +764,13 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* a
         OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::handle_timeout]CheckPlugInState is fail.\n"));
     }
 
+    //检查日志文件
+    ofstream* pLogoStream = (ofstream*)ACE_LOG_MSG->msg_ostream();
+	Set_Output_To_File(GetXmlConfigAttribute(xmlAceDebug)->TrunOn,
+		pLogoStream,
+		GetXmlConfigAttribute(xmlAceDebug)->DebugName.c_str(),
+		GetXmlConfigAttribute(xmlAceDebug)->LogFileMaxSize);
+
     return 0;
 }
 
