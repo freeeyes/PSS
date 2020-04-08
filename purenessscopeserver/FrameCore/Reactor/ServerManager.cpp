@@ -223,9 +223,6 @@ bool CServerManager::Run()
         }
     }
 
-    //启动中间服务器链接管理器
-    App_ClientReConnectManager::instance()->Init(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_POSTDEFINE));
-
     //初始化TTy连接管理器
     App_ReTTyClientManager::instance()->Init(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_POSTDEFINE),
             GetXmlConfigAttribute(xmlTTyClientManagerInfo)->MaxTTyDevCount,
@@ -288,6 +285,9 @@ bool CServerManager::Run()
         OUR_DEBUG((LM_INFO, "[CServerManager::Run]App_ReactorManager::instance()->StartOtherReactor is error.\n"));
         return false;
     }
+
+	//启动中间服务器链接管理器
+	App_ClientReConnectManager::instance()->Init(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_POSTDEFINE));
 
     //加载所有的插件初始化动作
     if (false == App_ModuleLoader::instance()->InitModule())
