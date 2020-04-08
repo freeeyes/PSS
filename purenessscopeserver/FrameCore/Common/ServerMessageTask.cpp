@@ -407,23 +407,24 @@ int CServerMessageTask::CloseMsgQueue()
 void CServerMessageTask::Add_ValidIClientMessage(IClientMessage* pClientMessage)
 {
     bool blIsFind = false;
-
-    if (NULL != pClientMessage)
+    if (NULL == pClientMessage)
     {
-        for (int i = 0; i < (int)m_vecValidIClientMessage.size(); i++)
-        {
-            if (m_vecValidIClientMessage[i] == pClientMessage)
-            {
-                //找到了
-                blIsFind = true;
-                break;
-            }
-        }
+        return;
+    }
 
-        if (false == blIsFind)
+    for (const IClientMessage* pvecClientMessage : m_vecValidIClientMessage)
+    {
+        if (pvecClientMessage == pClientMessage)
         {
-            m_vecValidIClientMessage.push_back(pClientMessage);
+            //找到了
+            blIsFind = true;
+            break;
         }
+    }
+
+    if (false == blIsFind)
+    {
+        m_vecValidIClientMessage.push_back(pClientMessage);
     }
 }
 

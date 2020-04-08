@@ -32,10 +32,8 @@ void Combo_Common_vecClientConnectInfo(uint8 u1OutputType, vecClientConnectInfo&
 {
     char szIP[MAX_BUFF_100] = { '\0' };
 
-    for (int i = 0; i < (int)VecClientConnectInfo.size(); i++)
+    for (_ClientConnectInfo ClientConnectInfo : VecClientConnectInfo)
     {
-        _ClientConnectInfo ClientConnectInfo = VecClientConnectInfo[i];
-
         if (true == ClientConnectInfo.m_blValid)
         {
             sprintf_safe(szIP, MAX_BUFF_100, "0.0.0.0:0");
@@ -86,29 +84,30 @@ void Combo_Common_vecClientConnectInfo(uint8 u1OutputType, vecClientConnectInfo&
 
 void Combo_Common_VecForbiddenIP(uint8 u1OutputType, VecForbiddenIP* pIPList, IBuffPacket* pBuffPacket)
 {
-    for (int i = 0; i < (int)pIPList->size(); i++)
+    //for (int i = 0; i < (int)pIPList->size(); i++)
+    for(_ForbiddenIP forbidenip : *pIPList)
     {
         if (u1OutputType == 0)
         {
             VCHARS_STR strSName;
-            strSName.text = pIPList->at(i).m_szClientIP;
-            strSName.u1Len = (uint8)ACE_OS::strlen(pIPList->at(i).m_szClientIP);
+            strSName.text = forbidenip.m_szClientIP;
+            strSName.u1Len = (uint8)ACE_OS::strlen(forbidenip.m_szClientIP);
 
             (*pBuffPacket) << strSName;
-            (*pBuffPacket) << pIPList->at(i).m_u1Type;
-            (*pBuffPacket) << (uint32)pIPList->at(i).m_tvBegin.sec();
-            (*pBuffPacket) << pIPList->at(i).m_u4Second;
+            (*pBuffPacket) << forbidenip.m_u1Type;
+            (*pBuffPacket) << (uint32)forbidenip.m_tvBegin.sec();
+            (*pBuffPacket) << forbidenip.m_u4Second;
         }
         else
         {
             char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden(%s)\n", pIPList->at(i).m_szClientIP);
+            sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden(%s)\n", forbidenip.m_szClientIP);
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden Type(%d)\n", pIPList->at(i).m_u1Type);
+            sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden Type(%d)\n", forbidenip.m_u1Type);
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden BeginTime(%d)\n", pIPList->at(i).m_tvBegin.sec());
+            sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden BeginTime(%d)\n", forbidenip.m_tvBegin.sec());
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden IntervalTime(%d)\n", pIPList->at(i).m_u4Second);
+            sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden IntervalTime(%d)\n", forbidenip.m_u4Second);
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
         }
     }
@@ -467,56 +466,60 @@ void DoMessage_CommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
 
 void DoMessage_WorkThreadState(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-s") == 0)
+    if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-s") != 0)
     {
-        //获得当前工作线程状态
-        CThreadInfoList* pThreadInfo = App_MessageServiceGroup::instance()->GetThreadInfo();
+        return;
+    }
 
-        if (NULL != pThreadInfo)
+    //获得当前工作线程状态
+    CThreadInfoList* pThreadInfo = App_MessageServiceGroup::instance()->GetThreadInfo();
+
+    if (NULL ==  pThreadInfo)
+    {
+        return;
+    }
+
+    int nThreadCount = pThreadInfo->GetThreadCount();
+    (*pBuffPacket) << (uint8)nThreadCount;
+
+    for (int i = 0; i < nThreadCount; i++)
+    {
+        const _ThreadInfo* pCurrThreadInfo = pThreadInfo->GetThreadInfo(i);
+
+        if (CommandInfo.m_u1OutputType == 0)
         {
-            int nThreadCount = pThreadInfo->GetThreadCount();
-            (*pBuffPacket) << (uint8)nThreadCount;
-
-            for (int i = 0; i < nThreadCount; i++)
-            {
-                const _ThreadInfo* pCurrThreadInfo = pThreadInfo->GetThreadInfo(i);
-
-                if (CommandInfo.m_u1OutputType == 0)
-                {
-                    (*pBuffPacket) << (uint8)i;
-                    (*pBuffPacket) << (uint32)pCurrThreadInfo->m_tvUpdateTime.sec();
-                    (*pBuffPacket) << (uint32)pCurrThreadInfo->m_tvCreateTime.sec();
-                    (*pBuffPacket) << (uint8)pCurrThreadInfo->m_u4State;
-                    (*pBuffPacket) << (uint32)pCurrThreadInfo->m_u4RecvPacketCount;
-                    (*pBuffPacket) << (uint16)pCurrThreadInfo->m_u2CommandID;
-                    (*pBuffPacket) << (uint16)pCurrThreadInfo->m_u2PacketTime;
-                    (*pBuffPacket) << (uint32)pCurrThreadInfo->m_u4CurrPacketCount;
-                }
-                else
-                {
-                    char szTemp[MAX_BUFF_1024] = { '\0' };
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "ThreadID(%d)\n", i);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "ThreadUpdateTime(%d)\n", pCurrThreadInfo->m_tvUpdateTime.sec());
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "ThreadCreateTime(%d)\n", pCurrThreadInfo->m_tvCreateTime.sec());
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "ThreadState(%d)\n", pCurrThreadInfo->m_u4State);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "ThreadRecvPacketCount(%d)\n", pCurrThreadInfo->m_u4RecvPacketCount);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "ThreadCommandID(%d)\n", pCurrThreadInfo->m_u2CommandID);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "ThreadPacketTime(%d)\n", pCurrThreadInfo->m_u2PacketTime);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "ThreadCurrPacketCount(%d)\n", pCurrThreadInfo->m_u4CurrPacketCount);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                }
-            }
-
-            u2ReturnCommandID = CONSOLE_COMMAND_THREADINFO;
+            (*pBuffPacket) << (uint8)i;
+            (*pBuffPacket) << (uint32)pCurrThreadInfo->m_tvUpdateTime.sec();
+            (*pBuffPacket) << (uint32)pCurrThreadInfo->m_tvCreateTime.sec();
+            (*pBuffPacket) << (uint8)pCurrThreadInfo->m_u4State;
+            (*pBuffPacket) << (uint32)pCurrThreadInfo->m_u4RecvPacketCount;
+            (*pBuffPacket) << (uint16)pCurrThreadInfo->m_u2CommandID;
+            (*pBuffPacket) << (uint16)pCurrThreadInfo->m_u2PacketTime;
+            (*pBuffPacket) << (uint32)pCurrThreadInfo->m_u4CurrPacketCount;
+        }
+        else
+        {
+            char szTemp[MAX_BUFF_1024] = { '\0' };
+            sprintf_safe(szTemp, MAX_BUFF_1024, "ThreadID(%d)\n", i);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            sprintf_safe(szTemp, MAX_BUFF_1024, "ThreadUpdateTime(%d)\n", pCurrThreadInfo->m_tvUpdateTime.sec());
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            sprintf_safe(szTemp, MAX_BUFF_1024, "ThreadCreateTime(%d)\n", pCurrThreadInfo->m_tvCreateTime.sec());
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            sprintf_safe(szTemp, MAX_BUFF_1024, "ThreadState(%d)\n", pCurrThreadInfo->m_u4State);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            sprintf_safe(szTemp, MAX_BUFF_1024, "ThreadRecvPacketCount(%d)\n", pCurrThreadInfo->m_u4RecvPacketCount);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            sprintf_safe(szTemp, MAX_BUFF_1024, "ThreadCommandID(%d)\n", pCurrThreadInfo->m_u2CommandID);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            sprintf_safe(szTemp, MAX_BUFF_1024, "ThreadPacketTime(%d)\n", pCurrThreadInfo->m_u2PacketTime);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            sprintf_safe(szTemp, MAX_BUFF_1024, "ThreadCurrPacketCount(%d)\n", pCurrThreadInfo->m_u4CurrPacketCount);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
         }
     }
+
+    u2ReturnCommandID = CONSOLE_COMMAND_THREADINFO;
 }
 
 void DoMessage_ClientInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
@@ -805,19 +808,25 @@ void DoMessage_ShowClientHisTory(const _CommandInfo& CommandInfo, IBuffPacket* p
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
         }
 
-        for (int i = 0; i < (int)VecIPAccount.size(); i++)
+        for (_IPAccount ipaccount : VecIPAccount)
         {
             if (CommandInfo.m_u1OutputType == 0)
             {
 
-                uint8 u1IPLen = (uint8)VecIPAccount[i].m_strIP.length();
+                uint8 u1IPLen = (uint8)ipaccount.m_strIP.length();
                 (*pBuffPacket) << u1IPLen;
-                pBuffPacket->WriteStream(VecIPAccount[i].m_strIP.c_str(), u1IPLen);
-                (*pBuffPacket) << (uint32)VecIPAccount[i].m_nCount;
-                (*pBuffPacket) << (uint32)VecIPAccount[i].m_nAllCount;
+                pBuffPacket->WriteStream(ipaccount.m_strIP.c_str(), u1IPLen);
+                (*pBuffPacket) << (uint32)ipaccount.m_nCount;
+                (*pBuffPacket) << (uint32)ipaccount.m_nAllCount;
 
                 VCHARS_STR strSName;
-                sprintf_safe(szTime, MAX_BUFF_100, "%04d-%02d-%02d %02d:%02d:%02d", VecIPAccount[i].m_dtLastTime.year(), VecIPAccount[i].m_dtLastTime.month(), VecIPAccount[i].m_dtLastTime.day(), VecIPAccount[i].m_dtLastTime.hour(), VecIPAccount[i].m_dtLastTime.minute(), VecIPAccount[i].m_dtLastTime.second());
+                sprintf_safe(szTime, MAX_BUFF_100, "%04d-%02d-%02d %02d:%02d:%02d", 
+                    ipaccount.m_dtLastTime.year(), 
+                    ipaccount.m_dtLastTime.month(), 
+                    ipaccount.m_dtLastTime.day(), 
+                    ipaccount.m_dtLastTime.hour(), 
+                    ipaccount.m_dtLastTime.minute(), 
+                    ipaccount.m_dtLastTime.second());
                 strSName.text = szTime;
                 strSName.u1Len = (uint8)ACE_OS::strlen(szTime);
 
@@ -826,16 +835,22 @@ void DoMessage_ShowClientHisTory(const _CommandInfo& CommandInfo, IBuffPacket* p
             else
             {
                 char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "IP(%s)\n", VecIPAccount[i].m_strIP.c_str());
+                sprintf_safe(szTemp, MAX_BUFF_1024, "IP(%s)\n", ipaccount.m_strIP.c_str());
                 pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "Count(%d)\n", VecIPAccount[i].m_nCount);
+                sprintf_safe(szTemp, MAX_BUFF_1024, "Count(%d)\n", ipaccount.m_nCount);
                 pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "AllCount(%d)\n", VecIPAccount[i].m_nAllCount);
+                sprintf_safe(szTemp, MAX_BUFF_1024, "AllCount(%d)\n", ipaccount.m_nAllCount);
                 pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "AllCount(%d)\n", VecIPAccount[i].m_nAllCount);
+                sprintf_safe(szTemp, MAX_BUFF_1024, "AllCount(%d)\n", ipaccount.m_nAllCount);
                 pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTime, MAX_BUFF_100, "%04d-%02d-%02d %02d:%02d:%02d", VecIPAccount[i].m_dtLastTime.year(), VecIPAccount[i].m_dtLastTime.month(), VecIPAccount[i].m_dtLastTime.day(), VecIPAccount[i].m_dtLastTime.hour(), VecIPAccount[i].m_dtLastTime.minute(), VecIPAccount[i].m_dtLastTime.second());
-                sprintf_safe(szTemp, MAX_BUFF_1024, "DateTime(%s)\n", VecIPAccount[i].m_nAllCount);
+                sprintf_safe(szTime, MAX_BUFF_100, "%04d-%02d-%02d %02d:%02d:%02d", 
+                    ipaccount.m_dtLastTime.year(), 
+                    ipaccount.m_dtLastTime.month(), 
+                    ipaccount.m_dtLastTime.day(), 
+                    ipaccount.m_dtLastTime.hour(), 
+                    ipaccount.m_dtLastTime.minute(), 
+                    ipaccount.m_dtLastTime.second());
+                sprintf_safe(szTemp, MAX_BUFF_1024, "DateTime(%s)\n", ipaccount.m_nAllCount);
                 pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
             }
         }
@@ -846,68 +861,68 @@ void DoMessage_ShowClientHisTory(const _CommandInfo& CommandInfo, IBuffPacket* p
 
 void DoMessage_ShowAllCommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
+    if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") != 0)
     {
-        CHashTable<_ModuleClient>* pHashModuleClient = App_MessageManager::instance()->GetModuleClient();
+        return;
+    }
 
-        //统计个数
-        uint32 u4Count = 0;
-        vector<_ModuleClient*> vecModuleClient;
-        pHashModuleClient->Get_All_Used(vecModuleClient);
-        u4Count = (uint32)vecModuleClient.size();
+    CHashTable<_ModuleClient>* pHashModuleClient = App_MessageManager::instance()->GetModuleClient();
 
+    //统计个数
+    uint32 u4Count = 0;
+    vector<_ModuleClient*> vecModuleClient;
+    pHashModuleClient->Get_All_Used(vecModuleClient);
+    u4Count = (uint32)vecModuleClient.size();
+
+    if (CommandInfo.m_u1OutputType == 0)
+    {
+        (*pBuffPacket) << u4Count;
+    }
+    else
+    {
+        char szTemp[MAX_BUFF_1024] = { '\0' };
+        sprintf_safe(szTemp, MAX_BUFF_1024, "CommandInfoCount(%d)\n", u4Count);
+        pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+    }
+
+    for (_ModuleClient* pModuleClient : vecModuleClient)
+    {
         if (CommandInfo.m_u1OutputType == 0)
         {
-            (*pBuffPacket) << u4Count;
+            (*pBuffPacket) << (uint32)pModuleClient->m_vecClientCommandInfo.size();
         }
         else
         {
             char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "CommandInfoCount(%d)\n", u4Count);
+            sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleClientCount(%d)\n", pModuleClient->m_vecClientCommandInfo.size());
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
         }
 
-        for (int i = 0; i < (int)vecModuleClient.size(); i++)
+        for (int j = 0; j < (int)pModuleClient->m_vecClientCommandInfo.size(); j++)
         {
-            _ModuleClient* pModuleClient = vecModuleClient[i];
+            _ClientCommandInfo* pClientCommandInfo = pModuleClient->m_vecClientCommandInfo[j];
 
             if (CommandInfo.m_u1OutputType == 0)
             {
-                (*pBuffPacket) << (uint32)pModuleClient->m_vecClientCommandInfo.size();
+                VCHARS_STR strSName;
+                strSName.text = pClientCommandInfo->m_szModuleName;
+                strSName.u1Len = (uint8)ACE_OS::strlen(pClientCommandInfo->m_szModuleName);
+                (*pBuffPacket) << strSName;
+                (*pBuffPacket) << pClientCommandInfo->m_u2CommandID;
+                (*pBuffPacket) << pClientCommandInfo->m_u4Count;
+                (*pBuffPacket) << pClientCommandInfo->m_u4TimeCost;
             }
             else
             {
                 char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleClientCount(%d)\n", pModuleClient->m_vecClientCommandInfo.size());
+                sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleName(%s)\n", pClientCommandInfo->m_szModuleName);
                 pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            }
-
-            for (int j = 0; j < (int)pModuleClient->m_vecClientCommandInfo.size(); j++)
-            {
-                _ClientCommandInfo* pClientCommandInfo = pModuleClient->m_vecClientCommandInfo[j];
-
-                if (CommandInfo.m_u1OutputType == 0)
-                {
-                    VCHARS_STR strSName;
-                    strSName.text = pClientCommandInfo->m_szModuleName;
-                    strSName.u1Len = (uint8)ACE_OS::strlen(pClientCommandInfo->m_szModuleName);
-                    (*pBuffPacket) << strSName;
-                    (*pBuffPacket) << pClientCommandInfo->m_u2CommandID;
-                    (*pBuffPacket) << pClientCommandInfo->m_u4Count;
-                    (*pBuffPacket) << pClientCommandInfo->m_u4TimeCost;
-                }
-                else
-                {
-                    char szTemp[MAX_BUFF_1024] = { '\0' };
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleName(%s)\n", pClientCommandInfo->m_szModuleName);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "CommandID(%d)\n", pClientCommandInfo->m_u2CommandID);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "Count(%d)\n", pClientCommandInfo->m_u4Count);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                    sprintf_safe(szTemp, MAX_BUFF_1024, "TimeCost(%d)\n", pClientCommandInfo->m_u4TimeCost);
-                    pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                }
+                sprintf_safe(szTemp, MAX_BUFF_1024, "CommandID(%d)\n", pClientCommandInfo->m_u2CommandID);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                sprintf_safe(szTemp, MAX_BUFF_1024, "Count(%d)\n", pClientCommandInfo->m_u4Count);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                sprintf_safe(szTemp, MAX_BUFF_1024, "TimeCost(%d)\n", pClientCommandInfo->m_u4TimeCost);
+                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
             }
         }
     }
@@ -1184,42 +1199,44 @@ void DoMessage_SetTraceCommand(const _CommandInfo& CommandInfo, IBuffPacket* pBu
 
 void DoMessage_GetTrackCommand(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
+    if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") != 0)
+    {
+        return;
+    }
+
     vec_Dyeing_Command_list objList;
 
-    if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
-    {
-        //记录总个数(此功能咱不提供)
-        App_MessageServiceGroup::instance()->GetDyeingCommand(objList);
+    //记录总个数(此功能咱不提供)
+    App_MessageServiceGroup::instance()->GetDyeingCommand(objList);
 
+    if (CommandInfo.m_u1OutputType == 0)
+    {
+        (*pBuffPacket) << (uint8)objList.size();
+    }
+    else
+    {
+        char szTemp[MAX_BUFF_1024] = { '\0' };
+        sprintf_safe(szTemp, MAX_BUFF_1024, "CommandID Count(%d)\n", objList.size());
+        pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+    }
+
+    for (_Dyeing_Command dyeingcommand : objList)
+    {
         if (CommandInfo.m_u1OutputType == 0)
         {
-            (*pBuffPacket) << (uint8)objList.size();
+            (*pBuffPacket) << (uint16)dyeingcommand.m_u2CommandID;
+            (*pBuffPacket) << (uint16)dyeingcommand.m_u2CurrCount;
+            (*pBuffPacket) << (uint16)dyeingcommand.m_u2MaxCount;
         }
         else
         {
             char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "CommandID Count(%d)\n", objList.size());
+            sprintf_safe(szTemp, MAX_BUFF_1024, "CommandID ID(%d)\n", dyeingcommand.m_u2CommandID);
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-        }
-
-        for (int i = 0; i < (int)objList.size(); i++)
-        {
-            if (CommandInfo.m_u1OutputType == 0)
-            {
-                (*pBuffPacket) << (uint16)objList[i].m_u2CommandID;
-                (*pBuffPacket) << (uint16)objList[i].m_u2CurrCount;
-                (*pBuffPacket) << (uint16)objList[i].m_u2MaxCount;
-            }
-            else
-            {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "CommandID ID(%d)\n", objList[i].m_u2CommandID);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "CurrCount ID(%d)\n", objList[i].m_u2CurrCount);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "MaxCount ID(%d)\n", objList[i].m_u2MaxCount);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            }
+            sprintf_safe(szTemp, MAX_BUFF_1024, "CurrCount ID(%d)\n", dyeingcommand.m_u2CurrCount);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            sprintf_safe(szTemp, MAX_BUFF_1024, "MaxCount ID(%d)\n", dyeingcommand.m_u2MaxCount);
+            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
         }
     }
 
@@ -1562,33 +1579,33 @@ void DoMessage_GetNickNameInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
         }
 
-        for (uint32 i = 0; i < objClientNameInfo.size(); i++)
+        for (_ClientNameInfo clinetnameinfo : objClientNameInfo)
         {
             VCHARS_STR strIP;
-            strIP.text = objClientNameInfo[i].m_szClientIP;
-            strIP.u1Len = (uint8)ACE_OS::strlen(objClientNameInfo[i].m_szClientIP);
+            strIP.text = clinetnameinfo.m_szClientIP;
+            strIP.u1Len = (uint8)ACE_OS::strlen(clinetnameinfo.m_szClientIP);
 
             VCHARS_STR strName;
-            strName.text = objClientNameInfo[i].m_szName;
-            strName.u1Len = (uint8)ACE_OS::strlen(objClientNameInfo[i].m_szName);
+            strName.text = clinetnameinfo.m_szName;
+            strName.u1Len = (uint8)ACE_OS::strlen(clinetnameinfo.m_szName);
 
             if (CommandInfo.m_u1OutputType == 0)
             {
-                (*pBuffPacket) << (uint32)objClientNameInfo[i].m_nConnectID;
+                (*pBuffPacket) << (uint32)clinetnameinfo.m_nConnectID;
                 (*pBuffPacket) << strIP;
-                (*pBuffPacket) << (uint32)objClientNameInfo[i].m_nPort;
+                (*pBuffPacket) << (uint32)clinetnameinfo.m_nPort;
                 (*pBuffPacket) << strName;
-                (*pBuffPacket) << (uint8)objClientNameInfo[i].m_nLog;
+                (*pBuffPacket) << (uint8)clinetnameinfo.m_nLog;
             }
             else
             {
                 char szTemp[MAX_BUFF_1024] = { '\0' };
                 sprintf_safe(szTemp, MAX_BUFF_1024, "m_nConnectID=%d,strIP=%s,m_nPort=%d,strName=%s,m_nLog=%d.\n",
-                             objClientNameInfo[i].m_nConnectID,
-                             objClientNameInfo[i].m_szClientIP,
-                             objClientNameInfo[i].m_nPort,
-                             objClientNameInfo[i].m_szName,
-                             objClientNameInfo[i].m_nLog);
+                    clinetnameinfo.m_nConnectID,
+                    clinetnameinfo.m_szClientIP,
+                    clinetnameinfo.m_nPort,
+                    clinetnameinfo.m_szName,
+                    clinetnameinfo.m_nLog);
                 pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
             }
         }

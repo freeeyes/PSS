@@ -197,10 +197,8 @@ void CIPAccount::Clear_Hash_Data(uint16 u2NowTime, const ACE_Date_Time& dtNowTim
         vector<_IPAccount* > vecIPAccount;
         m_objIPList.Get_All_Used(vecIPAccount);
 
-        for (int32 i = 0; i < (int32)vecIPAccount.size(); i++)
+        for(_IPAccount* pIPAccount : vecIPAccount)
         {
-            _IPAccount* pIPAccount = vecIPAccount[i];
-
             if (false == pIPAccount->Check(dtNowTime))
             {
                 if (-1 == m_objIPList.Del_Hash_Data(pIPAccount->m_strIP.c_str()))

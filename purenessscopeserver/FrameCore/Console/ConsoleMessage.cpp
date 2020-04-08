@@ -307,9 +307,9 @@ bool CConsoleMessage::SetConsoleKey(vector<xmlConsoleKeys::_ConsoleKey> vecConso
 
 bool CConsoleMessage::CheckConsoleKey(const char* pKey)
 {
-    for (int i = 0; i < (int)m_vecConsolekeyList.size(); i++)
+    for (const xmlConsoleKeys::_ConsoleKey conslseKey : m_vecConsolekeyList)
     {
-        if (ACE_OS::strcmp(m_vecConsolekeyList[i].Key.c_str(), pKey) == 0)
+        if (ACE_OS::strcmp(conslseKey.Key.c_str(), pKey) == 0)
         {
             //key值对上了
             return true;

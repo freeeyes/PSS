@@ -32,9 +32,9 @@ public:
 
     void Close()
     {
-        for(uint32 i = 0; i < m_mbList.size(); i++)
+        for(ACE_Message_Block* pmb : m_mbList)
         {
-            m_mbList[i]->release();
+            pmb->release();
         }
 
         m_mbList.clear();
