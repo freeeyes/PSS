@@ -476,7 +476,7 @@ CBuffPacket& CBuffPacket::operator >> (VCHARS_STR& str)
 
     if(u1Len && m_u4WritePtr - m_u4ReadPtr >= u1Len)
     {
-        char* pData = ReadPtr();
+        const char* pData = ReadPtr();
         ReadPtr((uint32)u1Len);
         str.SetData(pData, u1Len);
     }
@@ -496,7 +496,7 @@ CBuffPacket& CBuffPacket::operator >> (VCHARM_STR& str)
 
     if(u2Len && m_u4WritePtr - m_u4ReadPtr >= u2Len)
     {
-        char* pData = ReadPtr();
+        const char* pData = ReadPtr();
         ReadPtr((uint32)u2Len);
         str.SetData(pData, u2Len);
     }
@@ -516,7 +516,7 @@ CBuffPacket& CBuffPacket::operator >> (VCHARB_STR& str)
 
     if(u4Len && m_u4WritePtr - m_u4ReadPtr >= u4Len)
     {
-        char* pData = ReadPtr();
+        const char* pData = ReadPtr();
         ReadPtr((uint32)u4Len);
         str.SetData(pData, u4Len);
     }
@@ -536,7 +536,7 @@ CBuffPacket& CBuffPacket::operator >> (string& str)
 
     if(u4Len && m_u4WritePtr - m_u4ReadPtr >= u4Len)
     {
-        char* pData = ReadPtr();
+        const char* pData = ReadPtr();
         ReadPtr((uint32)u4Len);
         str = string(pData, u4Len);
     }

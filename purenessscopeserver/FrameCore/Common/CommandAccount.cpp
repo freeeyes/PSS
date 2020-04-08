@@ -97,46 +97,36 @@ bool CCommandAccount::Save_Command(uint16 u2CommandID, uint32 u4Port, EM_CONNECT
     {
         return true;
     }
+
+    char szHashID[10] = { '\0' };
+    sprintf_safe(szHashID, 10, "%d", u2CommandID);
+
+    //查找并添加
+    _CommandData* pCommandData = m_objCommandDataList.Get_Hash_Box_Data(szHashID);
+
+    if (NULL != pCommandData)
+    {
+        //如果已经存在，则直接添加
+        pCommandData->m_u4CommandCount++;
+        pCommandData->m_u1PacketType = u1PacketType;
+        pCommandData->m_u4PacketSize += u4PacketSize;
+        pCommandData->m_tvCommandTime = tvTime;
+    }
     else
     {
-        char szHashID[10] = { '\0' };
-        sprintf_safe(szHashID, 10, "%d", u2CommandID);
+        //添加新的命令统计信息
+        pCommandData = new _CommandData();
+		pCommandData->m_u2CommandID = u2CommandID;
+		pCommandData->m_u4CommandCount = 1;
+		pCommandData->m_u1CommandType = u1CommandType;
+		pCommandData->m_u1PacketType = u1PacketType;
+		pCommandData->m_u4PacketSize += u4PacketSize;
+		pCommandData->m_tvCommandTime = tvTime;
 
-        //查找并添加
-        _CommandData* pCommandData = m_objCommandDataList.Get_Hash_Box_Data(szHashID);
-
-        if (NULL != pCommandData)
-        {
-            //如果已经存在，则直接添加
-            pCommandData->m_u4CommandCount++;
-            pCommandData->m_u1PacketType = u1PacketType;
-            pCommandData->m_u4PacketSize += u4PacketSize;
-            pCommandData->m_tvCommandTime = tvTime;
-        }
-        else
-        {
-            //添加新的命令统计信息
-            pCommandData = new _CommandData();
-
-            if (pCommandData != NULL)
-            {
-                pCommandData->m_u2CommandID = u2CommandID;
-                pCommandData->m_u4CommandCount = 1;
-                pCommandData->m_u1CommandType = u1CommandType;
-                pCommandData->m_u1PacketType = u1PacketType;
-                pCommandData->m_u4PacketSize += u4PacketSize;
-                pCommandData->m_tvCommandTime = tvTime;
-
-                if (-1 == m_objCommandDataList.Add_Hash_Data(szHashID, pCommandData))
-                {
-                    OUR_DEBUG((LM_INFO, "[CCommandAccount::SaveCommandData]szHashID=%s Add Hash Data Error.\n", szHashID));
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
+		if (-1 == m_objCommandDataList.Add_Hash_Data(szHashID, pCommandData))
+		{
+			OUR_DEBUG((LM_INFO, "[CCommandAccount::SaveCommandData]szHashID=%s Add Hash Data Error.\n", szHashID));
+		}
     }
 
     return true;
