@@ -598,11 +598,11 @@ bool xmlMails::Init(CXmlOpeation* pXmlOperation)
 
 xmlMails::_Mail* xmlMails::GetMailAlert(uint16 MailID)
 {
-    for (int i = 0; i < (int)vec.size(); i++)
+    for(_Mail& mail : vec)
     {
-        if (vec[i].MailID == MailID)
+        if (mail.MailID == MailID)
         {
-            return &vec[i];
+            return &mail;
         }
     }
 
@@ -648,11 +648,11 @@ bool xmlCommandsTimeout::Init(CXmlOpeation* pXmlOperation)
 
 xmlCommandsTimeout::_CommandsTimeout* xmlCommandsTimeout::GetCommandAlert(uint16 CommandID)
 {
-    for (int i = 0; i < (int)vec.size(); i++)
+    for (_CommandsTimeout& commandstimeout : vec)
     {
-        if (vec[i].CommandID == CommandID)
+        if (commandstimeout.CommandID == CommandID)
         {
-            return &vec[i];
+            return &commandstimeout;
         }
     }
 

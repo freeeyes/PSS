@@ -144,31 +144,31 @@ bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint32 u4Port, EM_CONNECT_I
 
     int32 size = (int32)m_vecCommandAlertData.size();
 
-    for (int32 i = 0; i < size; i++)
+    for (_CommandAlertData commandalewrtdata : m_vecCommandAlertData)
     {
-        if (m_vecCommandAlertData[i].m_u2CommandID == u2CommandID)
+        if (commandalewrtdata.m_u2CommandID == u2CommandID)
         {
-            if (m_vecCommandAlertData[i].m_u1Minute != u1Minute)
+            if (commandalewrtdata.m_u1Minute != u1Minute)
             {
-                m_vecCommandAlertData[i].m_u4CurrCount = 1;
-                m_vecCommandAlertData[i].m_u1Minute = u1Minute;
+                commandalewrtdata.m_u4CurrCount = 1;
+                commandalewrtdata.m_u1Minute = u1Minute;
+
+                continue;
             }
-            else
+
+            commandalewrtdata.m_u4CurrCount++;
+
+            if (commandalewrtdata.m_u4CurrCount >= commandalewrtdata.m_u4CommandCount)
             {
-                m_vecCommandAlertData[i].m_u4CurrCount++;
+                //如果大于阀值，则记录日志，并且归零当前计数器
+                commandalewrtdata.m_u4CurrCount = 0;
 
-                if (m_vecCommandAlertData[i].m_u4CurrCount >= m_vecCommandAlertData[i].m_u4CommandCount)
-                {
-                    //如果大于阀值，则记录日志，并且归零当前计数器
-                    m_vecCommandAlertData[i].m_u4CurrCount = 0;
-
-                    AppLogManager::instance()->WriteToMail_i(LOG_SYSTEM_PACKETTIME,
-                            m_vecCommandAlertData[i].m_u4MailID,
-                            "Alert",
-                            "u2CommandID=%d, m_u4CommandCount more than [%d].",
-                            u2CommandID,
-                            (uint32)m_vecCommandAlertData[i].m_u4CommandCount);
-                }
+                AppLogManager::instance()->WriteToMail_i(LOG_SYSTEM_PACKETTIME,
+                    commandalewrtdata.m_u4MailID,
+                        "Alert",
+                        "u2CommandID=%d, m_u4CommandCount more than [%d].",
+                        u2CommandID,
+                        commandalewrtdata.m_u4CommandCount);
             }
 
             break;

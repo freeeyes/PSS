@@ -137,7 +137,7 @@ void CTMService::Close()
     vector<CTimerInfo* > vecInfoList;
     m_HashTimerList.Get_All_Used(vecInfoList);
 
-    for (CTimerInfo * pTimerList : vecInfoList)
+    for (const CTimerInfo * pTimerList : vecInfoList)
     {
         SAFE_DELETE(pTimerList);
     }
