@@ -172,40 +172,41 @@ int CLoadModule::UnloadListUpdate(uint32 u4UpdateIndex)
 
     while (itr != m_veCWaitUnLoadModule.end())
     {
-        if ((*itr).m_u4UpdateIndex == u4UpdateIndex)
+        if ((*itr).m_u4UpdateIndex != u4UpdateIndex)
         {
-            if ((*itr).m_u4UpdateIndex > 0)
-            {
-                (*itr).m_u4UpdateIndex--;
-            }
-
-            if ((*itr).m_u4UpdateIndex == 0)
-            {
-                //回调逻辑插件的UnLoadModuleData方法
-                (*itr).UnLoadModuleData();
-
-                //回收插件端口资源
-                OUR_DEBUG((LM_ERROR, "[CLoadModule::UnloadListUpdate]szResourceName=%s UnLoad.\n", (*itr).m_szModuleName));
-                ACE_OS::dlclose((*itr).m_hModule);
-
-                //判断是否需要重载插件
-                if(2 == (*itr).m_u1UnloadState)
-                {
-                    //重新加载
-                    LoadModule((*itr).m_strModulePath.c_str(), (*itr).m_strModuleName.c_str(), (*itr).m_strModuleParam.c_str());
-
-                    //重新加载启动事件
-                    InitModule((*itr).m_strModuleName.c_str());
-                    nRet = 1;
-                }
-
-                //清理vector中的这个对象
-                m_veCWaitUnLoadModule.erase(itr);
-                return nRet;
-            }
+            ++itr;
+            continue;
         }
 
-        ++itr;
+        if ((*itr).m_u4UpdateIndex > 0)
+        {
+            (*itr).m_u4UpdateIndex--;
+        }
+
+        if ((*itr).m_u4UpdateIndex == 0)
+        {
+            //回调逻辑插件的UnLoadModuleData方法
+            (*itr).UnLoadModuleData();
+
+            //回收插件端口资源
+            OUR_DEBUG((LM_ERROR, "[CLoadModule::UnloadListUpdate]szResourceName=%s UnLoad.\n", (*itr).m_szModuleName));
+            ACE_OS::dlclose((*itr).m_hModule);
+
+            //判断是否需要重载插件
+            if(2 == (*itr).m_u1UnloadState)
+            {
+                //重新加载
+                LoadModule((*itr).m_strModulePath.c_str(), (*itr).m_strModuleName.c_str(), (*itr).m_strModuleParam.c_str());
+
+                //重新加载启动事件
+                InitModule((*itr).m_strModuleName.c_str());
+                nRet = 1;
+            }
+
+            //清理vector中的这个对象
+            m_veCWaitUnLoadModule.erase(itr);
+            return nRet;
+        }
     }
 
     return nRet;

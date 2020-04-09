@@ -407,9 +407,9 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
         vector<ResponseRecordSt*> vecExistList;
         m_objResponseRecordList.Get_All_Used(vecExistList);
 
-        for (int jLoop = 0; jLoop < (int)vecExistList.size(); jLoop++)
+        for (ResponseRecordSt* pResponserecordst : vecExistList)
         {
-            uint32 u4ConnectID = vecExistList[jLoop]->m_u4ConnectID;
+            uint32 u4ConnectID = pResponserecordst->m_u4ConnectID;
 #if PSS_PLATFORM == PLATFORM_WIN
             App_ProConnectManager::instance()->handle_write_file_stream(u4ConnectID, objFileTestDataInfo.m_szData, objFileTestDataInfo.m_u4DataLength, m_u4ParseID);
 #else

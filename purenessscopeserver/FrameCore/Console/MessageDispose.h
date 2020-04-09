@@ -137,8 +137,8 @@ static const char CONSOLEMESSATE_POOL_SET[] = "PoolSet";             //ÉèÖÃÄÚ´æ³
 //Í³Ò»·µ»ØÊý¾ÝÆ´×°½Ó¿Ú
 void Combo_Common_Return_Data(uint8 u1OutputType, uint8 u1State, const char* pMessage, IBuffPacket* pBuffPacket);
 void Combo_Common_Head_Data(uint8 u1OutputType, uint32 u4Count, const char* pMessage, IBuffPacket* pBuffPacket);
-void Combo_Common_vecClientConnectInfo(uint8 u1OutputType, vecClientConnectInfo& VecClientConnectInfo, IBuffPacket* pBuffPacket);
-void Combo_Common_VecForbiddenIP(uint8 u1OutputType, VecForbiddenIP* pIPList, IBuffPacket* pBuffPacket);
+void Combo_Common_vecClientConnectInfo(uint8 u1OutputType, const vecClientConnectInfo VecClientConnectInfo, IBuffPacket* pBuffPacket);
+void Combo_Common_VecForbiddenIP(uint8 u1OutputType, const VecForbiddenIP* pIPList, IBuffPacket* pBuffPacket);
 
 //Ð­ÒéÐÅÏ¢´¦Àíº¯Êý¼¯ºÏ
 void DoMessage_LoadModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID);

@@ -28,7 +28,7 @@ void Combo_Common_Head_Data(uint8 u1OutputType, uint32 u4Count, const char* pMes
     }
 }
 
-void Combo_Common_vecClientConnectInfo(uint8 u1OutputType, vecClientConnectInfo& VecClientConnectInfo, IBuffPacket* pBuffPacket)
+void Combo_Common_vecClientConnectInfo(uint8 u1OutputType, const vecClientConnectInfo VecClientConnectInfo, IBuffPacket* pBuffPacket)
 {
     char szIP[MAX_BUFF_100] = { '\0' };
 
@@ -82,9 +82,8 @@ void Combo_Common_vecClientConnectInfo(uint8 u1OutputType, vecClientConnectInfo&
     }
 }
 
-void Combo_Common_VecForbiddenIP(uint8 u1OutputType, VecForbiddenIP* pIPList, IBuffPacket* pBuffPacket)
+void Combo_Common_VecForbiddenIP(uint8 u1OutputType, const VecForbiddenIP* pIPList, IBuffPacket* pBuffPacket)
 {
-    //for (int i = 0; i < (int)pIPList->size(); i++)
     for(_ForbiddenIP forbidenip : *pIPList)
     {
         if (u1OutputType == 0)
@@ -898,10 +897,8 @@ void DoMessage_ShowAllCommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* 
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
         }
 
-        for (int j = 0; j < (int)pModuleClient->m_vecClientCommandInfo.size(); j++)
+        for (_ClientCommandInfo* pClientCommandInfo : pModuleClient->m_vecClientCommandInfo)
         {
-            _ClientCommandInfo* pClientCommandInfo = pModuleClient->m_vecClientCommandInfo[j];
-
             if (CommandInfo.m_u1OutputType == 0)
             {
                 VCHARS_STR strSName;

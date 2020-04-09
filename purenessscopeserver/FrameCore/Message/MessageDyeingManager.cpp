@@ -24,14 +24,14 @@ bool CMessageDyeingManager::AddDyeingCommand(uint16 u2CommandID, uint16 u2MaxCou
         return false;
     }
 
-    for (uint16 i = 0; i < MAX_DYEING_COMMAND_COUNT; i++)
+    for (_Dyeing_Command& dyeing_command : m_objCommandList)
     {
-        if (m_objCommandList[i].m_blIsValid == false)
+        if (dyeing_command.m_blIsValid == false)
         {
-            m_objCommandList[i].m_u2CommandID = u2CommandID;
-            m_objCommandList[i].m_u2CurrCount = 0;
-            m_objCommandList[i].m_u2MaxCount  = u2MaxCount;
-            m_objCommandList[i].m_blIsValid = true;
+            dyeing_command.m_u2CommandID = u2CommandID;
+            dyeing_command.m_u2CurrCount = 0;
+            dyeing_command.m_u2MaxCount  = u2MaxCount;
+            dyeing_command.m_blIsValid = true;
             m_u2CurrCommandCount++;
             return true;
         }
@@ -42,11 +42,11 @@ bool CMessageDyeingManager::AddDyeingCommand(uint16 u2CommandID, uint16 u2MaxCou
 
 void CMessageDyeingManager::GetDyeingCommand(vec_Dyeing_Command_list& objList)
 {
-    for (uint16 i = 0; i < MAX_DYEING_COMMAND_COUNT; i++)
+    for (_Dyeing_Command& dyeing_command : m_objCommandList)
     {
-        if (m_objCommandList[i].m_blIsValid == true)
+        if (dyeing_command.m_blIsValid == true)
         {
-            objList.push_back(m_objCommandList[i]);
+            objList.push_back(dyeing_command);
         }
     }
 }
@@ -73,22 +73,24 @@ string CMessageDyeingManager::GetTraceID(const char* pClientIP, short sClintPort
     //检测命令规则
     if(m_u2CurrCommandCount > 0)
     {
-        for (uint16 i = 0; i < MAX_DYEING_COMMAND_COUNT; i++)
+        for (_Dyeing_Command& dyeing_command : m_objCommandList)
         {
-            if (true == m_objCommandList[i].m_blIsValid && m_objCommandList[i].m_u2CommandID == u2CommandID)
+            if (false == dyeing_command.m_blIsValid || dyeing_command.m_u2CommandID != u2CommandID)
             {
-                m_objCommandList[i].m_u2CurrCount++;
-
-                //判断是否达到最大个数包
-                if (m_objCommandList[i].m_u2CurrCount >= m_objCommandList[i].m_u2MaxCount)
-                {
-                    m_objCommandList[i].Clear();
-                    m_u2CurrCommandCount--;
-                }
-
-                strTraceID = CREATE_TRACE(pClientIP, sClintPort, u2CommandID);
-                return strTraceID;
+                continue;
             }
+
+            dyeing_command.m_u2CurrCount++;
+
+            //判断是否达到最大个数包
+            if (dyeing_command.m_u2CurrCount >= dyeing_command.m_u2MaxCount)
+            {
+                dyeing_command.Clear();
+                m_u2CurrCommandCount--;
+            }
+
+            strTraceID = CREATE_TRACE(pClientIP, sClintPort, u2CommandID);
+            return strTraceID;
         }
     }
 
