@@ -42,7 +42,7 @@ bool CMessageDyeingManager::AddDyeingCommand(uint16 u2CommandID, uint16 u2MaxCou
 
 void CMessageDyeingManager::GetDyeingCommand(vec_Dyeing_Command_list& objList)
 {
-    for (_Dyeing_Command& dyeing_command : m_objCommandList)
+    for (const _Dyeing_Command& dyeing_command : m_objCommandList)
     {
         if (dyeing_command.m_blIsValid == true)
         {

@@ -407,7 +407,7 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
         vector<ResponseRecordSt*> vecExistList;
         m_objResponseRecordList.Get_All_Used(vecExistList);
 
-        for (ResponseRecordSt* pResponserecordst : vecExistList)
+        for (const ResponseRecordSt* pResponserecordst : vecExistList)
         {
             uint32 u4ConnectID = pResponserecordst->m_u4ConnectID;
 #if PSS_PLATFORM == PLATFORM_WIN

@@ -608,8 +608,8 @@ void DoMessage_ShowForbiddenList(const _CommandInfo& CommandInfo, IBuffPacket* p
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
-        VecForbiddenIP* pForeverForbiddenIP = App_ForbiddenIP::instance()->ShowForeverIP();
-        VecForbiddenIP* pTempForbiddenIP = App_ForbiddenIP::instance()->ShowTempIP();
+        const VecForbiddenIP* pForeverForbiddenIP = App_ForbiddenIP::instance()->ShowForeverIP();
+        const VecForbiddenIP* pTempForbiddenIP = App_ForbiddenIP::instance()->ShowTempIP();
 
         if (pForeverForbiddenIP == NULL || pTempForbiddenIP == NULL)
         {
@@ -884,7 +884,7 @@ void DoMessage_ShowAllCommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* 
         pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
     }
 
-    for (_ModuleClient* pModuleClient : vecModuleClient)
+    for (const _ModuleClient* pModuleClient : vecModuleClient)
     {
         if (CommandInfo.m_u1OutputType == 0)
         {

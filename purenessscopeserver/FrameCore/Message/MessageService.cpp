@@ -512,48 +512,50 @@ void CMessageService::CopyMessageManagerList()
 
     CHashTable<CClientCommandList>* pHashtCommandList = App_MessageManager::instance()->GetHashCommandList();
 
-    if (NULL != pHashtCommandList)
+    if (NULL == pHashtCommandList)
     {
-        CClientCommandList* pClientCommandList = NULL;
-        vector<CClientCommandList*> vecClientCommandList;
-        pHashtCommandList->Get_All_Used(vecClientCommandList);
-
-        uint32 u4Size = (uint32)vecClientCommandList.size();
-
-        for (uint32 i = 0; i < u4Size; i++)
-        {
-            pClientCommandList = vecClientCommandList[i];
-
-            if (NULL != pClientCommandList)
-            {
-                CClientCommandList* pCurrClientCommandList = new CClientCommandList();
-
-                if (NULL == pCurrClientCommandList)
-                {
-                    continue;
-                }
-
-                pCurrClientCommandList->SetCommandID(pClientCommandList->GetCommandID());
-                pCurrClientCommandList->SetCommandTimeout(pClientCommandList->GetCommandTimeout());
-
-                for (int j = 0; j < pClientCommandList->GetCount(); j++)
-                {
-                    const _ClientCommandInfo* pClientCommandInfo = pClientCommandList->GetClientCommandIndex(j);
-
-                    if (NULL != pClientCommandInfo)
-                    {
-                        pCurrClientCommandList->AddClientCommand(pClientCommandInfo->m_pClientCommand, pClientCommandInfo->m_szModuleName, NULL);
-                    }
-                }
-
-                if (0 > m_objClientCommandList.Add_Hash_Data_By_Key_Unit32((uint32)pClientCommandList->GetCommandID(), pCurrClientCommandList))
-                {
-                    OUR_DEBUG((LM_INFO, "[CMessageService::CopyMessageManagerList]CommandID=%d add error.\n", pClientCommandList->GetCommandID()));
-                    SAFE_DELETE(pCurrClientCommandList);
-                }
-            }
-        }
+        return;
     }
+
+	CClientCommandList* pClientCommandList = NULL;
+	vector<CClientCommandList*> vecClientCommandList;
+	pHashtCommandList->Get_All_Used(vecClientCommandList);
+
+	uint32 u4Size = (uint32)vecClientCommandList.size();
+
+	for (CClientCommandList* pClientCommandList : vecClientCommandList)
+	{
+        if (NULL == pClientCommandList)
+        {
+            continue;
+        }
+
+		CClientCommandList* pCurrClientCommandList = new CClientCommandList();
+
+		if (NULL == pCurrClientCommandList)
+		{
+			continue;
+		}
+
+		pCurrClientCommandList->SetCommandID(pClientCommandList->GetCommandID());
+		pCurrClientCommandList->SetCommandTimeout(pClientCommandList->GetCommandTimeout());
+
+		for (int j = 0; j < pClientCommandList->GetCount(); j++)
+		{
+			const _ClientCommandInfo* pClientCommandInfo = pClientCommandList->GetClientCommandIndex(j);
+
+			if (NULL != pClientCommandInfo)
+			{
+				pCurrClientCommandList->AddClientCommand(pClientCommandInfo->m_pClientCommand, pClientCommandInfo->m_szModuleName, NULL);
+			}
+		}
+
+		if (0 > m_objClientCommandList.Add_Hash_Data_By_Key_Unit32((uint32)pClientCommandList->GetCommandID(), pCurrClientCommandList))
+		{
+			OUR_DEBUG((LM_INFO, "[CMessageService::CopyMessageManagerList]CommandID=%d add error.\n", pClientCommandList->GetCommandID()));
+			SAFE_DELETE(pCurrClientCommandList);
+		}
+	}
 }
 
 void CMessageService::GetAITO(vecCommandTimeout& objTimeout)
