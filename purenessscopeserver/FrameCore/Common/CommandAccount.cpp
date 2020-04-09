@@ -142,8 +142,6 @@ bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint32 u4Port, EM_CONNECT_I
     ACE_Date_Time dtNowTime(tvTime);
     uint8 u1Minute = (uint8)dtNowTime.minute();
 
-    int32 size = (int32)m_vecCommandAlertData.size();
-
     for (_CommandAlertData commandalewrtdata : m_vecCommandAlertData)
     {
         if (commandalewrtdata.m_u2CommandID == u2CommandID)

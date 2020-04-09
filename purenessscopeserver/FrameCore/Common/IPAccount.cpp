@@ -199,15 +199,17 @@ void CIPAccount::Clear_Hash_Data(uint16 u2NowTime, const ACE_Date_Time& dtNowTim
 
         for(_IPAccount* pIPAccount : vecIPAccount)
         {
-            if (false == pIPAccount->Check(dtNowTime))
+            if (true == pIPAccount->Check(dtNowTime))
             {
-                if (-1 == m_objIPList.Del_Hash_Data(pIPAccount->m_strIP.c_str()))
-                {
-                    OUR_DEBUG((LM_INFO, "[CIPAccount::AddIP]Del_Hash_Data(%s) is error.\n", pIPAccount->m_strIP.c_str()));
-                }
-
-                SAFE_DELETE(pIPAccount);
+                continue;
             }
+
+			if (-1 == m_objIPList.Del_Hash_Data(pIPAccount->m_strIP.c_str()))
+			{
+				OUR_DEBUG((LM_INFO, "[CIPAccount::AddIP]Del_Hash_Data(%s) is error.\n", pIPAccount->m_strIP.c_str()));
+			}
+
+			SAFE_DELETE(pIPAccount);
         }
     }
 }

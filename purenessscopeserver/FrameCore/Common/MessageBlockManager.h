@@ -59,9 +59,9 @@ public:
 
     void Close()
     {
-        for(uint32 i = 0; i < MAX_MEMORY_BLOCK_COUNT; i++)
+        for(_MemoryBlock_List& memoryblock : m_MemoryBlock_List)
         {
-            m_MemoryBlock_List[i].Close();
+            memoryblock.Close();
         }
     }
 
