@@ -181,6 +181,7 @@ public:
 private:
     bool AddClientCommand_Ex(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, const _ClientIPInfo* pListenInfo);   //注册命令
     void DeleteCommandByModule(const _ClientCommandInfo* pClientCommandInfo);                                                                  //遍历命令列表，删除指定的命令
+    void Add_ClientCommandList(const xmlCommandsTimeout::_CommandsTimeout* pCommandTimeout, CClientCommandList* pClientCommandList, uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, const _ClientIPInfo* pListenInfo);
 
     uint32                         m_u4UpdateIndex       = 0;               //当前更新ID
     uint32                         m_u4MaxCommandCount   = 0;               //最大命令池中的数量

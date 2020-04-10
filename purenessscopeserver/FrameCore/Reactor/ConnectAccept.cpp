@@ -194,9 +194,8 @@ void CConnectAcceptorManager::Close()
 {
     OUR_DEBUG((LM_INFO, "[CConnectAcceptorManager::Close]Begin.\n"));
 
-    for (int i = 0; i < (int)m_vecConnectAcceptor.size(); i++)
+    for (ConnectAcceptor* pConnectAcceptor : m_vecConnectAcceptor)
     {
-        ConnectAcceptor* pConnectAcceptor = m_vecConnectAcceptor[i];
         pConnectAcceptor->close();
         delete pConnectAcceptor;
         pConnectAcceptor = NULL;
@@ -210,19 +209,17 @@ void CConnectAcceptorManager::Close()
 bool CConnectAcceptorManager::Close(const char* pIP, uint32 n4Port)
 {
     //找到符合条件指定的端口停止监听
-    for(vecConnectAcceptor::iterator b = m_vecConnectAcceptor.begin(); b != m_vecConnectAcceptor.end(); ++b)
-    {
-        ConnectAcceptor* pConnectAcceptor = (ConnectAcceptor*)(*b);
-
-        if(ACE_OS::strcmp(pConnectAcceptor->GetListenIP(), pIP) == 0
-           && pConnectAcceptor->GetListenPort() == n4Port)
+    for_each(m_vecConnectAcceptor.begin(), m_vecConnectAcceptor.end(), [](ConnectAcceptor* pConnectAcceptor)
         {
-            pConnectAcceptor->close();
-            SAFE_DELETE(pConnectAcceptor);
-            m_vecConnectAcceptor.erase(b);
-            break;
-        }
-    }
+			if (ACE_OS::strcmp(pConnectAcceptor->GetListenIP(), pIP) == 0
+				&& pConnectAcceptor->GetListenPort() == n4Port)
+			{
+				pConnectAcceptor->close();
+				SAFE_DELETE(pConnectAcceptor);
+				m_vecConnectAcceptor.erase(b);
+				break;
+			}
+        });
 
     return true;
 }

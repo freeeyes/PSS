@@ -167,34 +167,7 @@ bool CMessageManager::AddClientCommand_Ex(uint16 u2CommandID, CClientCommand* pC
 
     if (NULL != pClientCommandList)
     {
-        //如果超时时间不为空，设置为超时时间
-        if (NULL != pCommandTimeout)
-        {
-            pClientCommandList->SetCommandTimeout(pCommandTimeout->Timeout);
-        }
-
-        //该命令已存在
-        _ClientCommandInfo* pClientCommandInfo = pClientCommandList->AddClientCommand(pClientCommand, pModuleName, pListenInfo);
-        //设置命令绑定ID
-        pClientCommandInfo->m_u2CommandID = u2CommandID;
-
-        //添加到模块里面
-        string strModule = pModuleName;
-        _ModuleClient* pModuleClient = m_objModuleClientList.Get_Hash_Box_Data(strModule.c_str());
-
-        if (NULL == pModuleClient)
-        {
-            //找不到，创建新的模块信息
-            pModuleClient = new _ModuleClient();
-
-            pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
-            m_objModuleClientList.Add_Hash_Data(strModule.c_str(), pModuleClient);
-        }
-        else
-        {
-            //找到了，添加进去
-            pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
-        }
+        Add_ClientCommandList(pCommandTimeout, pClientCommandList, u2CommandID, pClientCommand, pModuleName, pListenInfo);
 
         OUR_DEBUG((LM_ERROR, "[CMessageManager::AddClientCommand_Ex] u2CommandID = %d Add OK***.\n", u2CommandID));
     }
@@ -203,32 +176,7 @@ bool CMessageManager::AddClientCommand_Ex(uint16 u2CommandID, CClientCommand* pC
         //该命令尚未添加
         pClientCommandList = new CClientCommandList(u2CommandID);
 
-		//如果超时时间不为空，设置为超时时间
-		if (NULL != pCommandTimeout)
-		{
-			pClientCommandList->SetCommandTimeout(pCommandTimeout->Timeout);
-		}
-
-        _ClientCommandInfo* pClientCommandInfo = pClientCommandList->AddClientCommand(pClientCommand, pModuleName, pListenInfo);
-        //设置命令绑定ID
-        pClientCommandInfo->m_u2CommandID = u2CommandID;
-
-        //添加到模块里面
-        string strModule = pModuleName;
-        _ModuleClient* pModuleClient = m_objModuleClientList.Get_Hash_Box_Data(strModule.c_str());
-
-        if (NULL == pModuleClient)
-        {
-            //找不到，创建新的模块信息
-            pModuleClient = new _ModuleClient();
-            pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
-            m_objModuleClientList.Add_Hash_Data(strModule.c_str(), pModuleClient);
-        }
-        else
-        {
-            //找到了，添加进去
-            pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
-        }
+        Add_ClientCommandList(pCommandTimeout, pClientCommandList, u2CommandID, pClientCommand, pModuleName, pListenInfo);
 
         char szCommandID[10] = { '\0' };
         sprintf_safe(szCommandID, 10, "%d", u2CommandID);
@@ -278,6 +226,38 @@ void CMessageManager::DeleteCommandByModule(const _ClientCommandInfo* pClientCom
             break;
         }
     }
+}
+
+void CMessageManager::Add_ClientCommandList(const xmlCommandsTimeout::_CommandsTimeout* pCommandTimeout, CClientCommandList* pClientCommandList, uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, const _ClientIPInfo* pListenInfo)
+{
+	//如果超时时间不为空，设置为超时时间
+	if (NULL != pCommandTimeout)
+	{
+		pClientCommandList->SetCommandTimeout(pCommandTimeout->Timeout);
+	}
+
+	//该命令已存在
+	_ClientCommandInfo* pClientCommandInfo = pClientCommandList->AddClientCommand(pClientCommand, pModuleName, pListenInfo);
+	//设置命令绑定ID
+	pClientCommandInfo->m_u2CommandID = u2CommandID;
+
+	//添加到模块里面
+	string strModule = pModuleName;
+	_ModuleClient* pModuleClient = m_objModuleClientList.Get_Hash_Box_Data(strModule.c_str());
+
+	if (NULL == pModuleClient)
+	{
+		//找不到，创建新的模块信息
+		pModuleClient = new _ModuleClient();
+
+		pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
+		m_objModuleClientList.Add_Hash_Data(strModule.c_str(), pModuleClient);
+	}
+	else
+	{
+		//找到了，添加进去
+		pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
+	}
 }
 
 bool CMessageManager::DelClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand)
