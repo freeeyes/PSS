@@ -434,61 +434,60 @@ bool CMessageService::DoMessage(const ACE_Time_Value& tvBegin, IMessage* pMessag
     //放给需要继承的ClientCommand类去处理
     CClientCommandList* pClientCommandList = GetClientCommandList(u2CommandID);
 
-    if (pClientCommandList != NULL)
+    if (NULL == pClientCommandList)
     {
-        int nCount = pClientCommandList->GetCount();
-
-        for (int i = 0; i < nCount; i++)
-        {
-            const _ClientCommandInfo* pClientCommandInfo = pClientCommandList->GetClientCommandIndex(i);
-
-            if (NULL != pClientCommandInfo)
-            {
-                //判断当前消息是否有指定的监听端口
-                if (pClientCommandInfo->m_objListenIPInfo.m_nPort > 0 &&
-                    (ACE_OS::strcmp(pClientCommandInfo->m_objListenIPInfo.m_szClientIP, pMessage->GetMessageBase()->m_szListenIP) != 0 ||
-                     (uint32)pClientCommandInfo->m_objListenIPInfo.m_nPort != pMessage->GetMessageBase()->m_u4ListenPort))
-                {
-                    continue;
-                }
-
-                //标记当前命令运行状态
-                pClientCommandInfo->m_pClientCommand->DoMessage(pMessage, bDeleteFlag);
-
-                //这里指记录处理毫秒数
-                ACE_Time_Value tvCost = ACE_OS::gettimeofday() - tvBegin;
-                u4TimeCost = (uint32)tvCost.msec();
-
-                //记录命令被调用次数
-                u2Count++;
-            }
-        }
-
-        //判断是否需要记录超时日志
-        if (pClientCommandList->GetCommandTimeout() > 0 && u4TimeCost >= pClientCommandList->GetCommandTimeout())
-        {
-            AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_WORKTHREAD, "ThreadID=%d, CommandID=%d, Timeout=%d ms, Cost time=%d.",
-                                                  m_u4ThreadID,
-                                                  u2CommandID,
-                                                  pClientCommandList->GetCommandTimeout(),
-                                                  u4TimeCost);
-        }
-
-        return true;
-    }
-    else
-    {
-        //没有找到对应的注册指令，如果不是define.h定义的异常，则记录异常命令日志
-        if (u2CommandID >= CLIENT_LINK_USER)
-        {
-			AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_ERROR, "[CommandID=%d][HeadLen=%d][BodyLen=%d] is not plugin dispose.", 
-                u2CommandID,
+		//没有找到对应的注册指令，如果不是define.h定义的异常，则记录异常命令日志
+		if (u2CommandID >= CLIENT_LINK_USER)
+		{
+			AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_ERROR, "[CommandID=%d][HeadLen=%d][BodyLen=%d] is not plugin dispose.",
+				u2CommandID,
 				pMessage->GetMessageBase()->m_u4HeadSrcSize,
 				pMessage->GetMessageBase()->m_u4BodySrcSize);
+		}
+
+        OUR_DEBUG((LM_ERROR, "[CMessageService::DoMessage] pClientCommandList no find.\n"));
+        return false;
+    }
+
+    int nCount = pClientCommandList->GetCount();
+
+    for (int i = 0; i < nCount; i++)
+    {
+        const _ClientCommandInfo* pClientCommandInfo = pClientCommandList->GetClientCommandIndex(i);
+
+        if (NULL != pClientCommandInfo)
+        {
+            //判断当前消息是否有指定的监听端口
+            if (pClientCommandInfo->m_objListenIPInfo.m_nPort > 0 &&
+                (ACE_OS::strcmp(pClientCommandInfo->m_objListenIPInfo.m_szClientIP, pMessage->GetMessageBase()->m_szListenIP) != 0 ||
+                    (uint32)pClientCommandInfo->m_objListenIPInfo.m_nPort != pMessage->GetMessageBase()->m_u4ListenPort))
+            {
+                continue;
+            }
+
+            //标记当前命令运行状态
+            pClientCommandInfo->m_pClientCommand->DoMessage(pMessage, bDeleteFlag);
+
+            //这里指记录处理毫秒数
+            ACE_Time_Value tvCost = ACE_OS::gettimeofday() - tvBegin;
+            u4TimeCost = (uint32)tvCost.msec();
+
+            //记录命令被调用次数
+            u2Count++;
         }
     }
 
-    return false;
+    //判断是否需要记录超时日志
+    if (pClientCommandList->GetCommandTimeout() > 0 && u4TimeCost >= pClientCommandList->GetCommandTimeout())
+    {
+        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_WORKTHREAD, "ThreadID=%d, CommandID=%d, Timeout=%d ms, Cost time=%d.",
+                                                m_u4ThreadID,
+                                                u2CommandID,
+                                                pClientCommandList->GetCommandTimeout(),
+                                                u4TimeCost);
+    }
+
+    return true;
 }
 
 _ThreadInfo* CMessageService::GetThreadInfo()
@@ -517,11 +516,8 @@ void CMessageService::CopyMessageManagerList()
         return;
     }
 
-	CClientCommandList* pClientCommandList = NULL;
 	vector<CClientCommandList*> vecClientCommandList;
 	pHashtCommandList->Get_All_Used(vecClientCommandList);
-
-	uint32 u4Size = (uint32)vecClientCommandList.size();
 
 	for (CClientCommandList* pClientCommandList : vecClientCommandList)
 	{

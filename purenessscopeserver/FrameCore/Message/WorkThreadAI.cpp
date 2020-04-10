@@ -89,38 +89,40 @@ bool CWorkThreadAI::SaveTimeout(uint16 u2CommandID, uint32 u4TimeCost)
 
 bool CWorkThreadAI::CheckCurrTimeout(uint16 u2CommandID, uint64 u8Now)
 {
-    if(m_u1WTAI == 1)
+    if (m_u1WTAI != 1)
     {
-        if(m_vecCommandTimeout.size() == 0)
-        {
-            return false;
-        }
-
-        //如果需要检测才走循环
-        for(vector<_CommandTimeout>::iterator b = m_vecCommandTimeout.begin(); b != m_vecCommandTimeout.end(); ++b)
-        {
-            const _CommandTimeout& objCommandTimeout = (_CommandTimeout& )(*b);
-
-            if(objCommandTimeout.m_u2CommandID == u2CommandID)
-            {
-                if(objCommandTimeout.m_u8Second >= u8Now)
-                {
-                    //在禁止时间内，返回当前命令不应被继续处理
-                    return true;
-                }
-                else
-                {
-                    //已经到达禁止时间，从禁止列表中删除
-                    m_vecCommandTimeout.erase(b);
-                    return false;
-                }
-            }
-        }
-
         return false;
     }
 
-    return false;
+    if(m_vecCommandTimeout.size() == 0)
+    {
+        return false;
+    }
+
+    //如果需要检测才走循环
+    for(vector<_CommandTimeout>::iterator b = m_vecCommandTimeout.begin(); b != m_vecCommandTimeout.end(); ++b)
+    {
+        const _CommandTimeout& objCommandTimeout = (_CommandTimeout& )(*b);
+
+        if (objCommandTimeout.m_u2CommandID != u2CommandID)
+        {
+            continue;
+        }
+
+        if(objCommandTimeout.m_u8Second >= u8Now)
+        {
+            //在禁止时间内，返回当前命令不应被继续处理
+            return true;
+        }
+        else
+        {
+            //已经到达禁止时间，从禁止列表中删除
+            m_vecCommandTimeout.erase(b);
+            return false;
+        }
+    }
+
+	return false;
 }
 
 char* CWorkThreadAI::GetReturnData()
@@ -165,24 +167,26 @@ void CWorkThreadAI::GetAIInfo(_WorkThreadAIInfo& objWorkThreadAIInfo)
 
 void CWorkThreadAI::GetAllTimeout(uint32 u4ThreadID, vecCommandTimeout& objTimeout)
 {
-    for(auto* pCommandTime : m_vecCommandTime)
+    for(_CommandTime* pCommandTime : m_vecCommandTime)
     {
-        if(NULL != pCommandTime)
+        if (NULL == pCommandTime)
         {
-            for(int j = pCommandTime->m_objTime.GetCount() - 1; j >= 0; j--)
-            {
-                _CommandTimeout objData;
-
-                if(pCommandTime->m_objTime.GetLinkData(j)->m_u8Second > 0)
-                {
-                    objData.m_u4ThreadID  = u4ThreadID;
-                    objData.m_u2CommandID = pCommandTime->m_objTime.GetLinkData(j)->m_u2CommandID;
-                    objData.m_u8Second    = pCommandTime->m_objTime.GetLinkData(j)->m_u8Second;
-                    objData.m_u4Timeout   = pCommandTime->m_objTime.GetLinkData(j)->m_u4Timeout;
-                    objTimeout.push_back(objData);
-                }
-            }
+            continue;
         }
+
+		for (int j = pCommandTime->m_objTime.GetCount() - 1; j >= 0; j--)
+		{
+			_CommandTimeout objData;
+
+			if (pCommandTime->m_objTime.GetLinkData(j)->m_u8Second > 0)
+			{
+				objData.m_u4ThreadID = u4ThreadID;
+				objData.m_u2CommandID = pCommandTime->m_objTime.GetLinkData(j)->m_u2CommandID;
+				objData.m_u8Second = pCommandTime->m_objTime.GetLinkData(j)->m_u8Second;
+				objData.m_u4Timeout = pCommandTime->m_objTime.GetLinkData(j)->m_u4Timeout;
+				objTimeout.push_back(objData);
+			}
+		}
     }
 }
 
@@ -200,49 +204,51 @@ void CWorkThreadAI::GetAllForbiden(uint32 u4ThreadID, vecCommandTimeout& objForb
 
 int CWorkThreadAI::Do_Command_Account(uint16 u2CommandID, uint64 u8Now, uint32 u4TimeCost, bool& blRet)
 {
-    for (uint16 i = 0; i < (uint16)m_vecCommandTime.size(); i++)
+    for (_CommandTime* pCommandTime : m_vecCommandTime)
     {
-        if (u2CommandID == m_vecCommandTime[i]->m_u2CommandID)
+        if (u2CommandID != pCommandTime->m_u2CommandID)
         {
-            //首先添加一个到环里面
-            _CommandTimeout* pCommandTimeout = m_vecCommandTime[i]->m_objTime.GetFreeData();
+            continue;
+        }
 
-            if (NULL != pCommandTimeout)
+        //首先添加一个到环里面
+        _CommandTimeout* pCommandTimeout = pCommandTime->m_objTime.GetFreeData();
+
+        if (NULL != pCommandTimeout)
+        {
+            pCommandTimeout->m_u2CommandID = u2CommandID;
+            pCommandTimeout->m_u8Second = u8Now;
+            pCommandTimeout->m_u4Timeout = u4TimeCost;
+        }
+
+        pCommandTime->m_objTime.Add();
+
+        //在判断当前环里面最后一个时间是否在间隔时间内
+        const _CommandTimeout* pCommandLastTimeout = pCommandTime->m_objTime.GetLinkData(m_u4WTTimeoutCount - 1);
+
+        if (NULL != pCommandLastTimeout)
+        {
+            if (u8Now - pCommandLastTimeout->m_u8Second <= m_u4WTCheckTime)
             {
-                pCommandTimeout->m_u2CommandID = u2CommandID;
-                pCommandTimeout->m_u8Second = u8Now;
-                pCommandTimeout->m_u4Timeout = u4TimeCost;
-            }
+                //需要关闭了
+                _CommandTimeout objCommandTimeout;
+                objCommandTimeout.m_u2CommandID = u2CommandID;
+                objCommandTimeout.m_u8Second = u8Now + m_u4WTStopTime;
+                m_vecCommandTimeout.push_back(objCommandTimeout);
 
-            m_vecCommandTime[i]->m_objTime.Add();
-
-            //在判断当前环里面最后一个时间是否在间隔时间内
-            const _CommandTimeout* pCommandLastTimeout = m_vecCommandTime[i]->m_objTime.GetLinkData(m_u4WTTimeoutCount - 1);
-
-            if (NULL != pCommandLastTimeout)
-            {
-                if (u8Now - pCommandLastTimeout->m_u8Second <= m_u4WTCheckTime)
-                {
-                    //需要关闭了
-                    _CommandTimeout objCommandTimeout;
-                    objCommandTimeout.m_u2CommandID = u2CommandID;
-                    objCommandTimeout.m_u8Second = u8Now + m_u4WTStopTime;
-                    m_vecCommandTimeout.push_back(objCommandTimeout);
-
-                    blRet = true;
-                    return 1;
-                }
-                else
-                {
-                    blRet = false;
-                    return 1;
-                }
+                blRet = true;
+                return 1;
             }
             else
             {
                 blRet = false;
                 return 1;
             }
+        }
+        else
+        {
+            blRet = false;
+            return 1;
         }
     }
 
