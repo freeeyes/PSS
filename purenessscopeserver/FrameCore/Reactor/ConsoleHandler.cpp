@@ -394,9 +394,9 @@ bool CConsoleHandler::CompareConsoleClinetIP(const char* pIP)
         return true;
     }
 
-    for (int32 i = 0; i < (int32)GetXmlConfigAttribute(xmlConsoleClients)->vec.size(); i++)
+    for (_ConsoleClient consoleclient : GetXmlConfigAttribute(xmlConsoleClients)->vec)
     {
-        if (ACE_OS::strcmp(GetXmlConfigAttribute(xmlConsoleClients)->vec[i].cip.c_str(), pIP) == 0)
+        if (ACE_OS::strcmp(consoleclient.cip.c_str(), pIP) == 0)
         {
             return true;
         }

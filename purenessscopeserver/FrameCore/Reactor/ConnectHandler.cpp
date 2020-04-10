@@ -1853,7 +1853,7 @@ int CConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 
     ACE_Time_Value tvNow = tv;
 
-    const _TimerCheckID* pTimerCheckID = (_TimerCheckID*)arg;
+    const _TimerCheckID* pTimerCheckID = (const _TimerCheckID*)arg;
 
     if(NULL != pTimerCheckID && pTimerCheckID->m_u2TimerCheckID == PARM_CONNECTHANDLE_CHECK)
     {
@@ -1877,16 +1877,16 @@ void CConnectManager::TimeWheel_Timeout_Callback(void* pArgsContext, vector<CCon
 {
     OUR_DEBUG((LM_INFO, "[CConnectManager::TimeWheel_Timeout_Callback]Timeout Count(%d).\n", vecConnectHandle.size()));
 
-    for (int i = 0; i < (int)vecConnectHandle.size(); i++)
+    for (CConnectHandler* pConnectHandler : vecConnectHandle)
     {
         //断开超时的链接
         CConnectManager* pManager = reinterpret_cast<CConnectManager*>(pArgsContext);
-        OUR_DEBUG((LM_INFO, "[CConnectManager::TimeWheel_Timeout_Callback]ConnectID(%d).\n", vecConnectHandle[i]->GetConnectID()));
+        OUR_DEBUG((LM_INFO, "[CConnectManager::TimeWheel_Timeout_Callback]ConnectID(%d).\n", pConnectHandler->GetConnectID()));
 
         //通知业务插件，超时信息
-        vecConnectHandle[i]->SendTimeoutMessage();
+        pConnectHandler->SendTimeoutMessage();
 
-        if (NULL != pManager && false == pManager->CloseConnect_By_Queue(vecConnectHandle[i]->GetConnectID()))
+        if (NULL != pManager && false == pManager->CloseConnect_By_Queue(pConnectHandler->GetConnectID()))
         {
             OUR_DEBUG((LM_INFO, "[CConnectManager::TimeWheel_Timeout_Callback]CloseConnect_By_Queue error.\n"));
         }

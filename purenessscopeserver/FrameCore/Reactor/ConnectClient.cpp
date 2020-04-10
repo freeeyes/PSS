@@ -374,18 +374,16 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
             {
                 break;
             }
+
+            if (PACKET_ROUTE_SELF == em_PacketRoute)
+            {
+                //直接调用插件内注册的对象处理数据
+                Recv_Common_Dispose_Client_Message(u2CommandID, pRecvFinish, objServerIPInfo, m_pClientMessage);
+            }
             else
             {
-                if (PACKET_ROUTE_SELF == em_PacketRoute)
-                {
-                    //直接调用插件内注册的对象处理数据
-                    Recv_Common_Dispose_Client_Message(u2CommandID, pRecvFinish, objServerIPInfo, m_pClientMessage);
-                }
-                else
-                {
-                    //将数据放回到消息线程
-                    SendMessageGroup(u2CommandID, pRecvFinish);
-                }
+                //将数据放回到消息线程
+                SendMessageGroup(u2CommandID, pRecvFinish);
             }
         }
     }
