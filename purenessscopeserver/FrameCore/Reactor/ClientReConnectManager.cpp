@@ -729,10 +729,8 @@ void CClientReConnectManager::Close()
     vector<CReactorClientInfo*> vecReactorClientInfo;
     m_objClientTCPList.Get_All_Used(vecReactorClientInfo);
 
-    for(int i = 0; i < (int)vecReactorClientInfo.size(); i++)
+    for(CReactorClientInfo* pClientInfo : vecReactorClientInfo)
     {
-        CReactorClientInfo* pClientInfo = vecReactorClientInfo[i];
-
         if(NULL != pClientInfo)
         {
             pClientInfo->GetConnectClient()->ClientClose();
@@ -745,10 +743,8 @@ void CClientReConnectManager::Close()
     vector<CReactorUDPClient*> vecReactorUDPClient;
     m_objClientUDPList.Get_All_Used(vecReactorUDPClient);
 
-    for(int i = 0; i < (int)vecReactorUDPClient.size(); i++)
+    for(CReactorUDPClient* pClientInfo : vecReactorUDPClient)
     {
-        CReactorUDPClient* pClientInfo = vecReactorUDPClient[i];
-
         if(NULL != pClientInfo)
         {
             pClientInfo->Close();
@@ -880,30 +876,30 @@ int CClientReConnectManager::handle_timeout(const ACE_Time_Value& tv, const void
     m_objClientTCPList.Get_All_Used(vecCReactorClientInfo);
     m_ThreadWritrLock.release();
 
-    for (int i = 0; i < (int)vecCReactorClientInfo.size(); i++)
-    {
-        CReactorClientInfo* pClientInfo = vecCReactorClientInfo[i];
-
-        if(NULL != pClientInfo)
+    for (CReactorClientInfo* pClientInfo : vecCReactorClientInfo)
+    { 
+        if (NULL == pClientInfo)
         {
-            if (NULL == pClientInfo->GetConnectClient())
-            {
-                //如果连接不存在，则重新建立连接
-                if (false == pClientInfo->Run(m_blReactorFinish, EM_Server_Connect_State::SERVER_CONNECT_RECONNECT))
-                {
-                    OUR_DEBUG((LM_INFO, "[CClientReConnectManager::handle_timeout]Run error.\n"));
-                }
-            }
-            else
-            {
-                //检查当前连接，是否已挂起或死锁
-                ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+            continue;
+        }
 
-                //如果是异步模式，则需要检查处理线程是否被挂起
-                if(GetXmlConfigAttribute(xmlConnectServer)->RunType == 1)
-                {
-                    App_ServerMessageTask::instance()->CheckServerMessageThread(tvNow);
-                }
+        if (NULL == pClientInfo->GetConnectClient())
+        {
+            //如果连接不存在，则重新建立连接
+            if (false == pClientInfo->Run(m_blReactorFinish, EM_Server_Connect_State::SERVER_CONNECT_RECONNECT))
+            {
+                OUR_DEBUG((LM_INFO, "[CClientReConnectManager::handle_timeout]Run error.\n"));
+            }
+        }
+        else
+        {
+            //检查当前连接，是否已挂起或死锁
+            ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+
+            //如果是异步模式，则需要检查处理线程是否被挂起
+            if(GetXmlConfigAttribute(xmlConnectServer)->RunType == 1)
+            {
+                App_ServerMessageTask::instance()->CheckServerMessageThread(tvNow);
             }
         }
     }
@@ -918,26 +914,26 @@ void CClientReConnectManager::GetConnectInfo(vecClientConnectInfo& VecClientConn
     vector<CReactorClientInfo*> vecReactorClientInfo;
     m_objClientTCPList.Get_All_Used(vecReactorClientInfo);
 
-    for (int i = 0; i < (int)vecReactorClientInfo.size(); i++)
+    for (CReactorClientInfo* pClientInfo : vecReactorClientInfo)
     {
-        CReactorClientInfo* pClientInfo =  vecReactorClientInfo[i];
-
-        if (NULL != pClientInfo)
+        if (NULL == pClientInfo)
         {
-            if (NULL != pClientInfo->GetConnectClient())
-            {
-                _ClientConnectInfo ClientConnectInfo = pClientInfo->GetConnectClient()->GetClientConnectInfo();
-                ClientConnectInfo.m_addrRemote = pClientInfo->GetServerAddr();
-                VecClientConnectInfo.push_back(ClientConnectInfo);
-            }
-            else
-            {
-                _ClientConnectInfo ClientConnectInfo;
-                ClientConnectInfo.m_blValid    = false;
-                ClientConnectInfo.m_addrRemote = pClientInfo->GetServerAddr();
-                VecClientConnectInfo.push_back(ClientConnectInfo);
-            }
+            continue;
         }
+
+		if (NULL != pClientInfo->GetConnectClient())
+		{
+			_ClientConnectInfo ClientConnectInfo = pClientInfo->GetConnectClient()->GetClientConnectInfo();
+			ClientConnectInfo.m_addrRemote = pClientInfo->GetServerAddr();
+			VecClientConnectInfo.push_back(ClientConnectInfo);
+		}
+		else
+		{
+			_ClientConnectInfo ClientConnectInfo;
+			ClientConnectInfo.m_blValid = false;
+			ClientConnectInfo.m_addrRemote = pClientInfo->GetServerAddr();
+			VecClientConnectInfo.push_back(ClientConnectInfo);
+		}
     }
 }
 
@@ -947,15 +943,15 @@ void CClientReConnectManager::GetUDPConnectInfo(vecClientConnectInfo& VecClientC
     vector<CReactorUDPClient*> vecReactorUDPClient;
     m_objClientUDPList.Get_All_Used(vecReactorUDPClient);
 
-    for (int i = 0; i < (int)vecReactorUDPClient.size(); i++)
+    for (CReactorUDPClient* pClientInfo : vecReactorUDPClient)
     {
-        CReactorUDPClient* pClientInfo = vecReactorUDPClient[i];
-
-        if (NULL != pClientInfo)
+        if (NULL == pClientInfo)
         {
-            _ClientConnectInfo ClientConnectInfo = pClientInfo->GetClientConnectInfo();
-            VecClientConnectInfo.push_back(ClientConnectInfo);
+            continue;
         }
+
+        _ClientConnectInfo ClientConnectInfo = pClientInfo->GetClientConnectInfo();
+        VecClientConnectInfo.push_back(ClientConnectInfo);
     }
 }
 
@@ -1118,10 +1114,8 @@ bool CClientReConnectManager::DeleteIClientMessage(IClientMessage* pClientMessag
     vector<CReactorClientInfo*> vecReactorClientInfo;
     m_objClientTCPList.Get_All_Used(vecReactorClientInfo);
 
-    for(int i = 0; i < (int)vecReactorClientInfo.size(); i++)
+    for(CReactorClientInfo* pClientInfo : vecReactorClientInfo)
     {
-        CReactorClientInfo* pClientInfo = vecReactorClientInfo[i];
-
         if(NULL != pClientInfo && pClientInfo->GetClientMessage() == pClientMessage)
         {
             //关闭连接，并删除对象。

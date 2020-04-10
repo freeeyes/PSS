@@ -14,11 +14,6 @@
 #include "ConnectHandler.h"
 #endif
 
-bool Delete_CommandInfo(const _ClientCommandInfo* pClientCommandInfo)
-{
-    return pClientCommandInfo->m_u4CurrUsedCount == 0;
-}
-
 CMessageManager::CMessageManager(void)
 {
 }
