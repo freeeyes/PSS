@@ -566,45 +566,51 @@ void CServerManager::Multiple_Process_Start()
     //启动并监控子进程
     while (1)
     {
-        for (int nChlidIndex = 1; nChlidIndex <= nNumChlid; nChlidIndex++)
-        {
-            //休眠100ms
-            ACE_Time_Value tvSleep(0, 100000);
-            ACE_OS::sleep(tvSleep);
-
-            //测试每个子进程的锁是否还存在
-            nRet = SeeLock(fd_lock, nChlidIndex * sizeof(int), sizeof(int));
-
-            if (nRet == -1 || nRet == 2)
-            {
-                continue;
-            }
-
-            //如果文件锁没有被锁，则设置文件锁，并启动子进程
-            int npid = ACE_OS::fork();
-
-            if (npid == 0)
-            {
-                //上文件锁
-                AcquireWriteLock(fd_lock, nChlidIndex * sizeof(int), sizeof(int));
-
-                //启动子进程
-                if (false == Run())
-                {
-                    OUR_DEBUG((LM_ERROR, "child %d Run failure.\n", nChlidIndex));
-                    exit(1);
-                }
-
-                //子进程在执行完任务后必须退出循环和释放锁
-                ReleaseLock(fd_lock, nChlidIndex * sizeof(int), sizeof(int));
-            }
-        }
+        Run_Child_Process_Start(nNumChlid, fd_lock);
 
         //检查间隔
         ACE_OS::sleep(tvMonitorSleep);
     }
 
 #endif
+}
+
+void CServerManager::Run_Child_Process_Start(int nNumChlid, int& fd_lock)
+{
+    int nRet = 0;
+	for (int nChlidIndex = 1; nChlidIndex <= nNumChlid; nChlidIndex++)
+	{
+		//休眠100ms
+		ACE_Time_Value tvSleep(0, 100000);
+		ACE_OS::sleep(tvSleep);
+
+		//测试每个子进程的锁是否还存在
+		nRet = SeeLock(fd_lock, nChlidIndex * sizeof(int), sizeof(int));
+
+		if (nRet == -1 || nRet == 2)
+		{
+			continue;
+		}
+
+		//如果文件锁没有被锁，则设置文件锁，并启动子进程
+		int npid = ACE_OS::fork();
+
+		if (npid == 0)
+		{
+			//上文件锁
+			AcquireWriteLock(fd_lock, nChlidIndex * sizeof(int), sizeof(int));
+
+			//启动子进程
+			if (false == Run())
+			{
+				OUR_DEBUG((LM_ERROR, "child %d Run failure.\n", nChlidIndex));
+				exit(1);
+			}
+
+			//子进程在执行完任务后必须退出循环和释放锁
+			ReleaseLock(fd_lock, nChlidIndex * sizeof(int), sizeof(int));
+		}
+	}
 }
 
 bool CServerManager::Close()

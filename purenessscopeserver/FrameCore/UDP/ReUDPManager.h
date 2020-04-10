@@ -28,9 +28,8 @@ public:
     {
         ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
 
-        for(int i = 0; i < (int)m_vecReactorUDPHandler.size(); i++)
+        for(CReactorUDPHander* pReactorUDPHandler : m_vecReactorUDPHandler)
         {
-            CReactorUDPHander* pReactorUDPHandler = m_vecReactorUDPHandler[i];
             pReactorUDPHandler->Close();
             SAFE_DELETE(pReactorUDPHandler);
         }
@@ -41,10 +40,8 @@ public:
         ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
         VecClientConnectInfo.clear();
 
-        for(int i = 0; i < (int)m_vecReactorUDPHandler.size(); i++)
+        for(CReactorUDPHander* pReactorUDPHandler : m_vecReactorUDPHandler)
         {
-            CReactorUDPHander* pReactorUDPHandler = m_vecReactorUDPHandler[i];
-
             if(NULL != pReactorUDPHandler)
             {
                 VecClientConnectInfo.push_back(pReactorUDPHandler->GetClientConnectInfo());
@@ -57,11 +54,10 @@ public:
         //得到当前所有UDP的出口流量之和
         ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
 
-        for (int i = 0; i < (int)m_vecReactorUDPHandler.size(); i++)
+        for (CReactorUDPHander* pReactorUDPHandler : m_vecReactorUDPHandler)
         {
             uint32 u4UdpFlowIn  = 0;
             uint32 u4UdpFlowOut = 0;
-            CReactorUDPHander* pReactorUDPHandler = m_vecReactorUDPHandler[i];
 
             if (NULL != pReactorUDPHandler)
             {

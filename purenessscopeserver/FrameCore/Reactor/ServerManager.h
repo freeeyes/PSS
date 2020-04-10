@@ -38,6 +38,7 @@ private:
     bool Start_Udp_Listen();                                      //启动UDP监听
     bool Start_Console_Tcp_Listen();                              //启动Console TCP监听
     void Multiple_Process_Start();                                //多进程启动
+    void Run_Child_Process_Start(int nNumChlid, int& fd_lock);    //运行子进程
     ConnectConsoleAcceptor  m_ConnectConsoleAcceptor;             //后台管理链接
     CFrameCommand           m_objFrameCommand;                    //框架命令
     CTMService              m_TMService;                          //TS定时器
