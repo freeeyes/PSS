@@ -87,7 +87,6 @@ int CBaseCommand::Do_ClientSendTimeout(IMessage* pMessage)
 
 int CBaseCommand::Do_Base(IMessage* pMessage)
 {
-    //OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] TcpTest CommandID = %d", COMMAND_BASE));
     //m_pServerObject->GetLogManager()->WriteToMail(LOG_SYSTEM, 1, "²âÊÔÓÊ¼þ", "²âÊÔ");
 
     IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();
@@ -167,7 +166,7 @@ int CBaseCommand::Do_ClientSendOk(IMessage* pMessage)
     int nMessageID = 0;
     memcpy_safe(HeadPacket.m_pData, sizeof(int),(char* )&nMessageID, sizeof(int));
 
-    OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage]nMessageID=%d, ConnectID=%d.\n", nMessageID, pMessage->GetMessageBase()->m_u4ConnectID));
+    //OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage]nMessageID=%d, ConnectID=%d.\n", nMessageID, pMessage->GetMessageBase()->m_u4ConnectID));
 
     return 0;
 }

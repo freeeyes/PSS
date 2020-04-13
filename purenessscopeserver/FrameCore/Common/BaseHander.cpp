@@ -401,7 +401,6 @@ bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
     //因为是异步发送，发送的数据指针不可以立刻释放，所以需要在这里创建一个新的发送数据块，将数据考入
     pMbData = App_MessageBlockManager::instance()->Create((uint32)pBlockMessage->length());
 
-    OUR_DEBUG((LM_INFO, "[Tcp_Common_Make_Send_Packet]pBlockMessage->length()=%d.\n", pBlockMessage->length()));
     memcpy_safe(pBlockMessage->rd_ptr(), (uint32)pBlockMessage->length(), pMbData->wr_ptr(), (uint32)pBlockMessage->length());
     pMbData->wr_ptr(pBlockMessage->length());
     //放入完成，则清空缓存数据，使命完成
