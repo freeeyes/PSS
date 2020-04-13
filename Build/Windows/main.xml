@@ -34,7 +34,7 @@
 	<!-- <ConsoleClient cip="127.0.0.1" desc="维护端口可以访问的对应的客户端IP地址，可以支持多个" /> -->
 	
 	<!-- 消息处理线程相关参数设置 -->
-	<Message Msg_High_mark="64000" Msg_Low_mark="64000" Msg_Buff_Max_Size="20480" Msg_Thread="5" Msg_MaxQueue="10000" desc="消息处理线程相关参数设置，" />
+	<Message Msg_High_mark="64000" Msg_Low_mark="64000" Msg_Buff_Max_Size="20480" Msg_Thread="5" Msg_Pool="5000" Msg_MaxQueue="10000" desc="消息处理线程相关参数设置，" />
 	
 	<!-- 测试Tcp插件加载流程的用例 -->
 	<ModuleManager MaxCount="100" desc="框架支持的最大插件数量" />

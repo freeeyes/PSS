@@ -65,9 +65,8 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
                                          objCommandInfo.MailID);
     }
 
-
     //ÉèÖÃÏûÏ¢³Ø
-    m_MessagePool.Init(MAX_MESSAGE_POOL, CMessagePool::Init_Callback);
+    m_MessagePool.Init(GetXmlConfigAttribute(xmlMessage)->Msg_Pool, CMessagePool::Init_Callback);
 }
 
 bool CMessageService::Start()
