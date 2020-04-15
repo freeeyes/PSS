@@ -97,6 +97,10 @@ bool CReactorClientInfo::Run(bool blIsReady, EM_Server_Connect_State emState)
                 //这里设置为True，为了让自动重试起作用
                 return true;
             }
+            else
+            {
+                OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::Run](%s:%d) connection ok(ServerID=%d) OK.\n", m_AddrServer.get_host_addr(), m_AddrServer.get_port_number(), m_nServerID));
+            }
         }
 
         m_emConnectState = EM_Server_Connect_State::SERVER_CONNECT_OK;
@@ -183,13 +187,6 @@ CConnectClient* CReactorClientInfo::GetConnectClient()
 
 IClientMessage* CReactorClientInfo::GetClientMessage()
 {
-    if ((m_emConnectState == EM_Server_Connect_State::SERVER_CONNECT_FAIL) && NULL != m_pClientMessage)
-    {
-        m_emConnectState = EM_Server_Connect_State::SERVER_CONNECT_OK;
-        //通知上层某一个连接已经恢复
-        m_pClientMessage->ReConnect(m_nServerID);
-    }
-
     return m_pClientMessage;
 }
 
