@@ -100,6 +100,8 @@ bool CReactorClientInfo::Run(bool blIsReady, EM_Server_Connect_State emState)
         }
 
         m_emConnectState = EM_Server_Connect_State::SERVER_CONNECT_OK;
+        //通知上层已经链接
+        m_pClientMessage->ReConnect(m_nServerID);
     }
 
     return true;
@@ -181,9 +183,12 @@ CConnectClient* CReactorClientInfo::GetConnectClient()
 
 IClientMessage* CReactorClientInfo::GetClientMessage()
 {
-    m_emConnectState = EM_Server_Connect_State::SERVER_CONNECT_OK;
-    //通知上层某一个连接已经恢复
-    m_pClientMessage->ReConnect(m_nServerID);
+    if ((m_emConnectState == EM_Server_Connect_State::SERVER_CONNECT_FAIL) && NULL != m_pClientMessage)
+    {
+        m_emConnectState = EM_Server_Connect_State::SERVER_CONNECT_OK;
+        //通知上层某一个连接已经恢复
+        m_pClientMessage->ReConnect(m_nServerID);
+    }
 
     return m_pClientMessage;
 }
