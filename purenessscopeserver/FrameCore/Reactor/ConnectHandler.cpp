@@ -1347,15 +1347,16 @@ bool CConnectHandler::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, 
         return false;
     }
 
-    //回收内存
-    Recovery_Common_BuffPacket(blDelete, pBuffPacket);
-
     //判断是否超过阈值
     if (false == CheckSendMask((uint32)pMbData->length()))
     {
+        Tcp_Common_Send_Message_Error(GetConnectID(), u2CommandID, blDelete, pBuffPacket);
         App_MessageBlockManager::instance()->Close(pMbData);
         return false;
     }
+
+	//回收内存
+	Recovery_Common_BuffPacket(blDelete, pBuffPacket);
 
     //将消息ID放入MessageBlock
     ACE_Message_Block::ACE_Message_Type objType = ACE_Message_Block::MB_USER + nMessageID;
