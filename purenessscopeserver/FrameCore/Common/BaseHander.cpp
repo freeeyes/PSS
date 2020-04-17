@@ -161,7 +161,7 @@ void Tcp_Common_Send_Message_Error(uint32 u4ConnectID, uint16 u2CommandID, bool 
 {
     ACE_Message_Block* pSendMessage = NULL;
 
-    if (pBuffPacket->GetPacketLen() > 0)
+    if (pBuffPacket != NULL || pBuffPacket->GetPacketLen() > 0)
     {
         ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
         memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
