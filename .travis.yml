@@ -100,7 +100,7 @@ matrix:
         # - cd $TRAVIS_BUILD_DIR/purenessscopeserver/FrameCore/Linux_Bin/.obj
         # - gcovr -r ../ -o ../../report.xml --xml-pretty
         - cd $TRAVIS_BUILD_DIR/Build/Linux/.obj
-        - ls
+        - ls *.gcda
         - cd $TRAVIS_BUILD_DIR/Build/Linux/
         - gcov -r -o ./.obj ../../purenessscopeserver/FrameCore/*.cpp > /dev/null
         - gcov -r -o ./.obj ../../purenessscopeserver/FrameCore/Common/*.cpp > /dev/null
