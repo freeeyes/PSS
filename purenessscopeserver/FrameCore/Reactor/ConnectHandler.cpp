@@ -1222,16 +1222,8 @@ bool CConnectHandler::CheckSendMask(uint32 u4PacketLen)
 {
     m_u4ReadSendSize += u4PacketLen;
 
-    if(m_u4ReadSendSize - m_u4SuccessSendSize >= GetXmlConfigAttribute(xmlSendInfo)->MaxBlockSize)
-    {
-        OUR_DEBUG ((LM_ERROR, "[CConnectHandler::CheckSendMask]ConnectID = %d, SingleConnectMaxSendBuffer is more than DataMask(%d)(%d:%d)!\n", GetConnectID(), GetXmlConfigAttribute(xmlSendInfo)->MaxBlockSize, m_u4ReadSendSize, m_u4SuccessSendSize));
-        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_SENDQUEUEERROR, "]Connection from [%s:%d], SingleConnectMaxSendBuffer is more than(%d)!.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4ReadSendSize - m_u4SuccessSendSize);
-        return false;
-    }
-    else
-    {
-        return true;
-    }
+    //Linux下不用检测，直接返回true
+    return true;
 }
 
 void CConnectHandler::ClearPacketParse()
@@ -1347,27 +1339,26 @@ bool CConnectHandler::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, 
         return false;
     }
 
-    //判断是否超过阈值
-    if (false == CheckSendMask((uint32)pMbData->length()))
-    {
-        Tcp_Common_Send_Message_Error(GetConnectID(), u2CommandID, blDelete, pBuffPacket);
-        App_MessageBlockManager::instance()->Close(pMbData);
-        return false;
-    }
-
 	//回收内存
 	Recovery_Common_BuffPacket(blDelete, pBuffPacket);
 
-    //将消息ID放入MessageBlock
-    ACE_Message_Block::ACE_Message_Type objType = ACE_Message_Block::MB_USER + nMessageID;
-    pMbData->msg_type(objType);
+    //直接发送数据，不在放到队列里，否则在压测过程中处理太慢
+	uint32 u4SendSuc = (uint32)pMbData->length();
+	bool blRet = PutSendPacket(pMbData);
 
-    //将消息放入队列，让output在反应器线程发送。
-
-    if (false == Send_Block_Queue(pMbData))
-    {
-        return false;
-    }
+	if (true == blRet)
+	{
+		if (m_u4ReadSendSize >= m_u4SuccessSendSize + u4SendSuc)
+		{
+			//记录成功发送字节
+			m_u4SuccessSendSize += u4SendSuc;
+		}
+	}
+	else
+	{
+		OUR_DEBUG((LM_INFO, "[CConnectHandler::handle_output]ConnectID=%d write is close.\n", GetConnectID()));
+		return -1;
+	}
 
     //如果需要发送完成后删除，则配置标记位
     if (PACKET_SEND_FIN_CLOSE == u1State)
