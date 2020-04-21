@@ -272,22 +272,9 @@ int CConnectHandler::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
             App_MessageBlockManager::instance()->Close(pmbSendData);
             return -1;
         }
-
-        uint32 u4SendSuc = (uint32)pmbSendData->length();
-        bool blRet = PutSendPacket(pmbSendData);
-
-        if (true == blRet)
-        {
-            if (m_u4ReadSendSize >= m_u4SuccessSendSize + u4SendSuc)
-            {
-                //记录成功发送字节
-                m_u4SuccessSendSize += u4SendSuc;
-            }
-        }
         else
         {
-            OUR_DEBUG((LM_INFO, "[CConnectHandler::handle_output]ConnectID=%d write is close.\n", GetConnectID()));
-            return -1;
+            OUR_DEBUG((LM_INFO, "[CConnectHandler::handle_output]ConnectID=%d unknow command.\n", GetConnectID()));
         }
     }
 
