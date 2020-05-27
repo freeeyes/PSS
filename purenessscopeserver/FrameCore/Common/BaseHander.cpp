@@ -163,15 +163,18 @@ void Tcp_Common_Send_Message_Error(uint32 u4ConnectID, uint16 u2CommandID, bool 
 
     if (pBuffPacket != NULL || pBuffPacket->GetPacketLen() > 0)
     {
-        ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
+        pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
         memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
         pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
-    }
-    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
 
-    if (false == App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow))
+        if (false == App_MakePacket::instance()->PutSendErrorMessage(u4ConnectID, pSendMessage, ACE_OS::gettimeofday()))
+        {
+            OUR_DEBUG((LM_INFO, "[Tcp_Common_Send_Message_Error]Tcp_Common_Send_Message_Error]PutSendErrorMessage error.\n"));
+        }
+    }
+    else
     {
-        OUR_DEBUG((LM_INFO, "Tcp_Common_Send_Message_Error]PutSendErrorMessage error.\n"));
+        OUR_DEBUG((LM_INFO, "[Tcp_Common_Send_Message_Error]u4ConnectID=%d,u2CommandID=%d pBuffPacket error.\n", u4ConnectID, u2CommandID));
     }
 
     Recovery_Common_BuffPacket(blDelete, pBuffPacket);
