@@ -51,9 +51,16 @@ IBuffPacket* CBuffPacketManager::Create(const char* pFileName, uint32 u4Line)
 
 bool CBuffPacketManager::Delete(IBuffPacket* pBuffPacket)
 {
-    CBuffPacket* pBuff = dynamic_cast<CBuffPacket*>(pBuffPacket);
-    pBuff->Clear();
-    return CObjectPoolManager<CBuffPacket, ACE_Recursive_Thread_Mutex>::Delete(pBuff->GetBuffID(), pBuff);
+    if (NULL != pBuffPacket)
+    {
+        CBuffPacket* pBuff = dynamic_cast<CBuffPacket*>(pBuffPacket);
+        pBuff->Clear();
+        return CObjectPoolManager<CBuffPacket, ACE_Recursive_Thread_Mutex>::Delete(pBuff->GetBuffID(), pBuff);
+    }
+    else
+    {
+        return false;
+    }
 }
 
 

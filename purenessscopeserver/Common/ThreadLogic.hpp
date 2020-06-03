@@ -17,8 +17,8 @@ class CMessageInfo
 public:
     using UserFunctor = std::function<void(int, void*)>;
     UserFunctor f;
-    int message_id_;
-    void* arg_;
+    int message_id_ = 0;
+    void* arg_      = NULL;
 };
 
 class CThreadInfo
