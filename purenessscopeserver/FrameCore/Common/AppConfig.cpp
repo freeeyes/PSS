@@ -6,7 +6,7 @@ CAppConfig::CAppConfig(void)
     m_pIniImp = std::make_shared<ACE_Ini_ImpExp>(*m_pConfig);
 }
 
-const char* CAppConfig::GetError()
+const char* CAppConfig::GetError() const
 {
     return m_szError;
 }
@@ -33,7 +33,7 @@ bool CAppConfig::ReadConfig(const char* szConfigname)
             throw std::domain_error(szError);
         }
 
-        int32 nRet = (int32)m_pIniImp->import_config(m_strConfigName.c_str());
+        int nRet = m_pIniImp->import_config(m_strConfigName.c_str());
 
         if (0 != nRet)
         {
@@ -65,7 +65,7 @@ bool CAppConfig::WriteConfig(const char* szConfigname)
             throw std::domain_error("[CAppConfig::WriteConfig]m_pIniImp is NULL.");
         }
 
-        int32 nRet = (int32)m_pIniImp->export_config(szConfigname);
+        int nRet = m_pIniImp->export_config(szConfigname);
 
         if (0 != nRet)
         {
@@ -97,7 +97,7 @@ bool CAppConfig::WriteConfig()
             throw std::domain_error("[CAppConfig::WriteConfig]m_pIniImp is NULL.");
         }
 
-        int32 nRet = (int32)m_pIniImp->export_config(m_strConfigName.c_str());
+        int nRet = m_pIniImp->export_config(m_strConfigName.c_str());
 
         if (0 != nRet)
         {
@@ -130,7 +130,7 @@ bool CAppConfig::GetValue(const char* szName, ACE_TString& strValue, const char*
             m_pConfig->expand_path(m_pConfig->root_section(), szRoot, key, 0);
         }
 
-        int32 nRet = (int32)m_pConfig->get_string_value(key, szName, strValue);
+        int nRet = m_pConfig->get_string_value(key, szName, strValue);
 
         if (0 != nRet)
         {
@@ -163,7 +163,7 @@ bool CAppConfig::SetValue(const char* szName, const ACE_TString& strValue, const
             m_pConfig->expand_path(m_pConfig->root_section(), szRoot, key, 0);
         }
 
-        int32 nRet = (int32)m_pConfig->set_string_value(key, szName, strValue);
+        int nRet = m_pConfig->set_string_value(key, szName, strValue);
 
         if (0 != nRet)
         {

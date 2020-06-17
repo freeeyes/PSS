@@ -23,7 +23,7 @@ public:
     virtual uint32 GetWriteLen();      //得到包写入的长度
     virtual uint32 GetHeadLen();       //得到数据包头的长度
     virtual uint32 GetPacketCount();   //得到缓存数据包的个数
-    virtual char*  GetData();          //得到当前数据指针
+    virtual const char*  GetData() const;  //得到当前数据指针
 
     bool Init(int32 nSize = DEFINE_PACKET_SIZE, int32 nMaxBuffSize = MAX_PACKET_SIZE);
     virtual bool Close();              //删除已经使用的内存

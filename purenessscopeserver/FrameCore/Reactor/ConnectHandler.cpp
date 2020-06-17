@@ -17,12 +17,12 @@ void CConnectHandler::Close()
     if (CONNECTSTATE::CONNECT_SERVER_CLOSE == m_u1ConnectState)
     {
         //服务器主动断开
-        Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_SDISCONNECT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
+        Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_SDISCONNECT, m_addrRemote, m_szLocalIP, m_u2LocalPort);
     }
     else
     {
         //客户端连接断开
-        Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CDISCONNECT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
+        Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CDISCONNECT, m_addrRemote, m_szLocalIP, m_u2LocalPort);
     }
 
     shutdown();
@@ -679,7 +679,7 @@ void CConnectHandler::SetSendQueueTimeCost(uint32 u4TimeCost)
     {
         AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_SENDQUEUEERROR, "[TCP]IP=%s,Prot=%d,m_u8SendQueueTimeout = [%d], Timeout=[%d].", GetClientIPInfo().m_szClientIP, GetClientIPInfo().m_nPort, (uint32)m_u8SendQueueTimeout, u4TimeCost);
 
-        Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_SEND_TIMEOUT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
+        Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_SEND_TIMEOUT, m_addrRemote, m_szLocalIP, m_u2LocalPort);
     }
 }
 
@@ -773,7 +773,7 @@ bool CConnectHandler::SendCloseMessage()
 
 bool CConnectHandler::SendTimeoutMessage ()
 {
-    Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CHEK_TIMEOUT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
+    Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CHEK_TIMEOUT, m_addrRemote, m_szLocalIP, m_u2LocalPort);
 
     return true;
 }
@@ -884,7 +884,7 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
                 objPacketParse.SetPacket_Head_Message(pSendOKData);
                 objPacketParse.SetPacket_Head_Curr_Length((uint32)pSendOKData->length());
 
-                Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, &objPacketParse, PACKET_SEND_OK, m_addrRemote, m_szLocalIP, m_u4LocalPort);
+                Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, &objPacketParse, PACKET_SEND_OK, m_addrRemote, m_szLocalIP, m_u2LocalPort);
 
                 //还原消息类型
                 pMbData->msg_type(ACE_Message_Block::MB_DATA);
@@ -915,7 +915,7 @@ void CConnectHandler::ConnectOpen()
     //告诉PacketParse连接应建立
     App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Connect(GetConnectID(), GetClientIPInfo(), GetLocalIPInfo());
 
-    Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CONNECT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
+    Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CONNECT, m_addrRemote, m_szLocalIP, m_u2LocalPort);
 
     OUR_DEBUG((LM_DEBUG, "[CConnectHandler::open]Open(%d) Connection from [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
 
@@ -1162,7 +1162,7 @@ bool CConnectHandler::CheckMessage()
         return false;
     }
 
-    Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, m_pPacketParse, PACKET_PARSE, m_addrRemote, m_szLocalIP, m_u4LocalPort);
+    Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, m_pPacketParse, PACKET_PARSE, m_addrRemote, m_szLocalIP, m_u2LocalPort);
 
     //更新时间轮盘
     App_ConnectManager::instance()->SetConnectTimeWheel(this);
@@ -1201,7 +1201,7 @@ _ClientIPInfo  CConnectHandler::GetLocalIPInfo()
 {
     _ClientIPInfo ClientIPInfo;
     sprintf_safe(ClientIPInfo.m_szClientIP, MAX_BUFF_50, "%s", m_szLocalIP);
-    ClientIPInfo.m_nPort = (int)m_u4LocalPort;
+    ClientIPInfo.m_nPort = (int)m_u2LocalPort;
     return ClientIPInfo;
 }
 
@@ -1304,6 +1304,7 @@ bool CConnectHandler::Send_Input_To_Cache(uint8 u1SendType, uint32& u4PacketSize
 
 bool CConnectHandler::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, uint8 u1State, int nMessageID, bool blDelete, IBuffPacket* pBuffPacket)
 {
+    ACE_UNUSED_ARG(nMessageID);
     ACE_Message_Block* pMbData = NULL;
 
     _Send_Packet_Param obj_Send_Packet_Param;
@@ -1451,10 +1452,10 @@ int CConnectHandler::GetHashID()
     return m_nHashID;
 }
 
-void CConnectHandler::SetLocalIPInfo(const char* pLocalIP, uint32 u4LocalPort)
+void CConnectHandler::SetLocalIPInfo(const char* pLocalIP, uint16 u2LocalPort)
 {
     sprintf_safe(m_szLocalIP, MAX_BUFF_50, "%s", pLocalIP);
-    m_u4LocalPort = u4LocalPort;
+    m_u2LocalPort = u2LocalPort;
 }
 
 void CConnectHandler::SetSendCacheManager(CSendCacheManager* pSendCacheManager)

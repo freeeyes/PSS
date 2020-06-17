@@ -182,12 +182,12 @@ void CUnit_Basehandler::Test_Udp_Common_Send_Message(void)
 
     _Send_Message_Param obj_Send_Message_Param;
     obj_Send_Message_Param.m_u4PacketParseInfoID = 1;
-    obj_Send_Message_Param.m_blDlete = false;
-    obj_Send_Message_Param.m_blHead = true;
-    obj_Send_Message_Param.m_nPort = 20002;
-    obj_Send_Message_Param.m_pIP = szTestIP;
-    obj_Send_Message_Param.m_u2CommandID = 0x1002;
-    obj_Send_Message_Param.m_u4Len = u4Len;
+    obj_Send_Message_Param.m_blDlete             = false;
+    obj_Send_Message_Param.m_blHead              = true;
+    obj_Send_Message_Param.m_u2Port              = 20002;
+    obj_Send_Message_Param.m_pIP                 = szTestIP;
+    obj_Send_Message_Param.m_u2CommandID         = 0x1002;
+    obj_Send_Message_Param.m_u4Len               = u4Len;
 
     //²âÊÔ´íÎóµÄIPµØÖ·
     bool blState = Udp_Common_Send_Message(obj_Send_Message_Param,

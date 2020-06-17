@@ -12,7 +12,7 @@ bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param, 
                              ACE_Message_Block*& pMbData, const ACE_SOCK_Dgram& skRemote)
 {
     ACE_INET_Addr AddrRemote;
-    int nErr = AddrRemote.set(obj_Send_Message_Param.m_nPort, obj_Send_Message_Param.m_pIP);
+    int nErr = AddrRemote.set(obj_Send_Message_Param.m_u2Port, obj_Send_Message_Param.m_pIP);
 
     if (nErr != 0)
     {
@@ -164,7 +164,7 @@ void Tcp_Common_Send_Message_Error(uint32 u4ConnectID, uint16 u2CommandID, bool 
     if (pBuffPacket != NULL || pBuffPacket->GetPacketLen() > 0)
     {
         pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
-        memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+        memcpy_safe(pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
         pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
 
         if (false == App_MakePacket::instance()->PutSendErrorMessage(u4ConnectID, pSendMessage, ACE_OS::gettimeofday()))
@@ -204,7 +204,7 @@ uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPa
     return n1Ret;
 }
 
-void Send_MakePacket_Queue(uint32 u4ConnectID, uint32 u4PacketParseID, CPacketParse* pPacketParse, uint8 u1Option, const ACE_INET_Addr& addrRemote, const char* pLocalIP, uint32 u4LocalPort, EM_CONNECT_IO_TYPE emIOType)
+void Send_MakePacket_Queue(uint32 u4ConnectID, uint32 u4PacketParseID, CPacketParse* pPacketParse, uint8 u1Option, const ACE_INET_Addr& addrRemote, const char* pLocalIP, uint16 u2LocalPort, EM_CONNECT_IO_TYPE emIOType)
 {
     //需要回调发送成功回执
     _MakePacket objMakePacket;
@@ -220,11 +220,11 @@ void Send_MakePacket_Queue(uint32 u4ConnectID, uint32 u4PacketParseID, CPacketPa
     {
         if (ACE_OS::strcmp("INADDR_ANY", pLocalIP) == 0)
         {
-            objMakePacket.m_AddrListen.set(u4LocalPort);
+            objMakePacket.m_AddrListen.set(u2LocalPort);
         }
         else
         {
-            objMakePacket.m_AddrListen.set(u4LocalPort, pLocalIP);
+            objMakePacket.m_AddrListen.set(u2LocalPort, pLocalIP);
         }
     }
 
@@ -327,7 +327,7 @@ bool Tcp_Common_Send_Input_To_Cache(_Input_To_Cache_Param obj_Input_To_Cache_Par
         OUR_DEBUG((LM_DEBUG, "[Tcp_Common_Send_Input_To_Cache] Connectid=[%d] m_pBlockMessage is not enougth.\n", obj_Input_To_Cache_Param.m_u4ConnectID));
         //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
         ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
-        memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+        memcpy_safe(pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
         pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
         ACE_Time_Value tvNow = ACE_OS::gettimeofday();
         App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
@@ -348,7 +348,7 @@ bool Tcp_Common_Send_Input_To_Cache(_Input_To_Cache_Param obj_Input_To_Cache_Par
         else
         {
             //如果不是SENDMESSAGE_NOMAL，则直接组包
-            memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pBlockMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+            memcpy_safe(pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pBlockMessage->wr_ptr(), pBuffPacket->GetPacketLen());
             pBlockMessage->wr_ptr(pBuffPacket->GetPacketLen());
         }
     }
@@ -382,14 +382,14 @@ bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
     }
     else
     {
-        u4PacketSize = (uint32)pBuffPacket->GetPacketLen();
+        u4PacketSize = pBuffPacket->GetPacketLen();
 
         if (u4PacketSize >= obj_Send_Packet_Param.m_u4SendMaxBuffSize)
         {
             OUR_DEBUG((LM_DEBUG, "[CProConnectHandler::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", obj_Send_Packet_Param.m_u4ConnectID, u4PacketSize, obj_Send_Packet_Param.m_u4SendMaxBuffSize));
             //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
             ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
-            memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+            memcpy_safe(pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
             pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
             ACE_Time_Value tvNow = ACE_OS::gettimeofday();
             App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
@@ -399,7 +399,7 @@ bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
             return false;
         }
 
-        memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pBlockMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+        memcpy_safe(pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pBlockMessage->wr_ptr(), pBuffPacket->GetPacketLen());
         pBlockMessage->wr_ptr(pBuffPacket->GetPacketLen());
     }
 
@@ -443,7 +443,7 @@ bool Tcp_Common_CloseConnect_By_Queue(uint32 u4ConnectID, CSendMessagePool& objS
         //判断队列是否是已经最大
         int nQueueCount = (int)pTask->msg_queue()->message_count();
 
-        if (nQueueCount >= (int)MAX_MSG_THREADQUEUE)
+        if (nQueueCount >= MAX_MSG_THREADQUEUE)
         {
             OUR_DEBUG((LM_ERROR, "[Tcp_Common_CloseConnect_By_Queue] Queue is Full nQueueCount = [%d].\n", nQueueCount));
             objSendMessagePool.Delete(pSendMessage);

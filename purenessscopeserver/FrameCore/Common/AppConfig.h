@@ -28,7 +28,7 @@ public:
     bool GetValue(const char* szName, ACE_TString& strValue, const char* szRoot);
     bool SetValue(const char* szName, const ACE_TString& strValue, const char* szRoot);
 
-    const char* GetError();
+    const char* GetError() const;
 
 private:
     std::shared_ptr<ACE_Configuration_Heap> m_pConfig;

@@ -64,7 +64,7 @@ public:
     bool SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, uint8 u1State, uint8 u1SendType, uint32& u4PacketSize, bool blDelete, int nMessageID);   //发送给客户端数据的函数
     void Close(int nIOCount = 1, int nErrno = 0);                                                  //当前连接对象关闭
     bool ServerClose(EM_Client_Close_status emStatus, uint8 u1OptionEvent = PACKET_SDISCONNECT);   //服务器关闭客户端链接的函数
-    void SetLocalIPInfo(const char* pLocalIP, uint32 u4LocalPort);            //设置监听IP和端口信息
+    void SetLocalIPInfo(const char* pLocalIP, uint16 u2LocalPort);            //设置监听IP和端口信息
 
     uint32             GetHandlerID();                                        //得到当前初始化的HanddlerID
     const char*        GetError();                                            //得到当前链接错误信息
@@ -119,7 +119,7 @@ private:
     uint32             m_u4SendMaxBuffSize;            //发送数据最大缓冲长度
     uint32             m_u4ReadSendSize;               //准备发送的字节数（水位标）
     uint32             m_u4SuccessSendSize;            //实际客户端接收到的总字节数（水位标）
-    uint32             m_u4LocalPort;                  //本地监听端口
+    uint16             m_u2LocalPort;                  //本地监听端口
     uint32             m_u4SendThresHold;              //发送阀值(消息包的个数)
     uint32             m_u4SendCheckTime;              //发送检测时间的阀值
     uint32             m_u4PacketParseInfoID;          //对应处理packetParse的模块ID

@@ -47,7 +47,7 @@ void CCommandAccount::Close()
     }
 
     //回收端口统计内存
-    for (ACE_Hash_Map<uint32, _Port_Data_Account*>::iterator iter = m_objectPortAccount.begin();
+    for (hashmapPortAccount::iterator iter = m_objectPortAccount.begin();
          iter != m_objectPortAccount.end(); iter++)
     {
         const _Port_Data_Account* p_Port_Data_Account = (*iter).int_id_;
@@ -61,7 +61,7 @@ void CCommandAccount::Close()
     OUR_DEBUG((LM_ERROR, "CCommandAccount::Close]End.\n"));
 }
 
-bool CCommandAccount::Save_Flow(uint16 u2CommandID, uint32 u4Port, EM_CONNECT_IO_TYPE u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
+bool CCommandAccount::Save_Flow(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
 {
     ACE_UNUSED_ARG(u2CommandID);
 
@@ -69,7 +69,7 @@ bool CCommandAccount::Save_Flow(uint16 u2CommandID, uint32 u4Port, EM_CONNECT_IO
     {
         //在hashMap中查找是否已存在端口信息
         _Port_Data_Account* p_Port_Data_Account = NULL;
-        m_objectPortAccount.find(u4Port, p_Port_Data_Account);
+        m_objectPortAccount.find(u2Port, p_Port_Data_Account);
 
         if (NULL != p_Port_Data_Account)
         {
@@ -80,18 +80,18 @@ bool CCommandAccount::Save_Flow(uint16 u2CommandID, uint32 u4Port, EM_CONNECT_IO
         {
             //创建新的端口信息
             p_Port_Data_Account = new _Port_Data_Account();
-            p_Port_Data_Account->Init(u1PacketType, u4Port);
+            p_Port_Data_Account->Init(u1PacketType, u2Port);
             p_Port_Data_Account->SetFlow(u1CommandType, u4PacketSize, tvTime);
-            m_objectPortAccount.bind(u4Port, p_Port_Data_Account);
+            m_objectPortAccount.bind(u2Port, p_Port_Data_Account);
         }
     }
 
     return true;
 }
 
-bool CCommandAccount::Save_Command(uint16 u2CommandID, uint32 u4Port, EM_CONNECT_IO_TYPE u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
+bool CCommandAccount::Save_Command(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
 {
-    ACE_UNUSED_ARG(u4Port);
+    ACE_UNUSED_ARG(u2Port);
 
     if (m_u1CommandAccount == 0)
     {
@@ -132,9 +132,9 @@ bool CCommandAccount::Save_Command(uint16 u2CommandID, uint32 u4Port, EM_CONNECT
     return true;
 }
 
-bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint32 u4Port, EM_CONNECT_IO_TYPE u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
+bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
 {
-    ACE_UNUSED_ARG(u4Port);
+    ACE_UNUSED_ARG(u2Port);
     ACE_UNUSED_ARG(u1PacketType);
     ACE_UNUSED_ARG(u4PacketSize);
     ACE_UNUSED_ARG(u1CommandType);
@@ -176,11 +176,11 @@ bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint32 u4Port, EM_CONNECT_I
     return true;
 }
 
-bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint32 u4Port, EM_CONNECT_IO_TYPE u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
+bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
 {
     //如果流量开关打开，则记录流量(单位是分钟)
     bool blRet = true;
-    blRet = Save_Flow(u2CommandID, u4Port, u1PacketType, u4PacketSize, u1CommandType, tvTime);
+    blRet = Save_Flow(u2CommandID, u2Port, u1PacketType, u4PacketSize, u1CommandType, tvTime);
 
     if (false == blRet)
     {
@@ -188,7 +188,7 @@ bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint32 u4Port, EM_CONN
     }
 
     //如果统计开关打开，才开始记录统计信息
-    blRet = Save_Command(u2CommandID, u4Port, u1PacketType, u4PacketSize, u1CommandType, tvTime);
+    blRet = Save_Command(u2CommandID, u2Port, u1PacketType, u4PacketSize, u1CommandType, tvTime);
 
     if (false == blRet)
     {
@@ -196,7 +196,7 @@ bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint32 u4Port, EM_CONN
     }
 
     //判定是否存在告警阀值计算
-    blRet = Save_Alert(u2CommandID, u4Port, u1PacketType, u4PacketSize, u1CommandType, tvTime);
+    blRet = Save_Alert(u2CommandID, u2Port, u1PacketType, u4PacketSize, u1CommandType, tvTime);
 
     if (false == blRet)
     {
@@ -267,7 +267,7 @@ uint32 CCommandAccount::GetFlowIn()
     uint32 u4FlowIn = 0;
 
     //遍历HashMap
-    for (ACE_Hash_Map<uint32, _Port_Data_Account*>::iterator iter = m_objectPortAccount.begin();
+    for (hashmapPortAccount::iterator iter = m_objectPortAccount.begin();
          iter != m_objectPortAccount.end(); iter++)
     {
         _Port_Data_Account* p_Port_Data_Account = (*iter).int_id_;
@@ -286,7 +286,7 @@ uint32 CCommandAccount::GetFlowOut()
     uint32 u4FlowOut = 0;
 
     //遍历HashMap
-    for (ACE_Hash_Map<uint32, _Port_Data_Account*>::iterator iter = m_objectPortAccount.begin();
+    for (hashmapPortAccount::iterator iter = m_objectPortAccount.begin();
          iter != m_objectPortAccount.end(); iter++)
     {
         _Port_Data_Account* p_Port_Data_Account = (*iter).int_id_;
@@ -322,7 +322,7 @@ void CCommandAccount::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_
     vec_Port_Data_Account.clear();
     _Port_Data_Account obj_Port_Data_Account;
 
-    for (ACE_Hash_Map<uint32, _Port_Data_Account*>::iterator iter = m_objectPortAccount.begin();
+    for (hashmapPortAccount::iterator iter = m_objectPortAccount.begin();
          iter != m_objectPortAccount.end(); iter++)
     {
         const _Port_Data_Account* p_Port_Data_Account = (*iter).int_id_;

@@ -67,7 +67,7 @@ public:
 
     void SetRecvQueueTimeCost(uint32 u4TimeCost);                            //记录当前接收数据到模块处理完成的具体时间消耗
     void SetSendQueueTimeCost(uint32 u4TimeCost);                            //记录当前从发送队列到数据发送完成的具体时间消耗
-    void SetLocalIPInfo(const char* pLocalIP, uint32 u4LocalPort);           //设置监听IP和端口信息
+    void SetLocalIPInfo(const char* pLocalIP, uint16 u2LocalPort);           //设置监听IP和端口信息
 
     void Close();                                                            //关闭当前连接
     void CloseFinally();                                                     //替代析构函数，符合roz规则
@@ -128,7 +128,7 @@ private:
     uint32                     m_u4SendThresHold      = MAX_MSG_SNEDTHRESHOLD; //发送阀值(消息包的个数)
     uint32                     m_u4ReadSendSize       = 0;                     //准备发送的字节数（水位标）
     uint32                     m_u4SuccessSendSize    = 0;                     //实际客户端接收到的总字节数（水位标）
-    uint32                     m_u4LocalPort          = 0;                     //监听的端口号
+    uint16                     m_u2LocalPort          = 0;                     //监听的端口号
     uint32                     m_u4PacketParseInfoID  = 0;                     //对应处理packetParse的模块ID
     uint32                     m_u4CurrSize           = 0;                     //当前MB缓冲字符长度
     uint32                     m_u4PacketDebugSize    = 0;                     //记录能存二进制数据包的最大字节

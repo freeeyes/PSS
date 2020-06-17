@@ -27,7 +27,7 @@ public:
 
     int  Run_Open(ACE_Reactor* pReactor);
     void Close();
-    bool SendMessage(char*& pMessage, uint32 u4Len, const char* szIP, int nPort, bool blHead = true, uint16 u2CommandID = 0, bool blDlete = true);
+    bool SendMessage(char*& pMessage, uint32 u4Len, const char* szIP, uint16 u2Port, bool blHead = true, uint16 u2CommandID = 0, bool blDlete = true);
     _ClientConnectInfo GetClientConnectInfo();
     void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);    //获得指定命令统计信息
     void GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut);                    //得到所有的出口流量

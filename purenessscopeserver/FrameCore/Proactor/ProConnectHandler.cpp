@@ -1,6 +1,6 @@
 #include "ProConnectHandler.h"
 
-CProConnectHandler::CProConnectHandler(void) : m_u4LocalPort(0), m_u4SendCheckTime(0)
+CProConnectHandler::CProConnectHandler(void) : m_u2LocalPort(0), m_u4SendCheckTime(0)
 {
     m_szError[0]           = '\0';
     m_u4ConnectID          = 0;
@@ -131,7 +131,7 @@ void CProConnectHandler::Close(int nIOCount, int nErrno)
         if (CONNECTSTATE::CONNECT_SERVER_CLOSE != m_u1ConnectState)
         {
             //组织数据
-            Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CDISCONNECT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
+            Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CDISCONNECT, m_addrRemote, m_szLocalIP, m_u2LocalPort);
 
             m_Reader.cancel();
             m_Writer.cancel();
@@ -174,7 +174,7 @@ bool CProConnectHandler::ServerClose(EM_Client_Close_status emStatus, uint8 u1Op
         if (CLIENT_CLOSE_IMMEDIATLY == emStatus)
         {
             //组织数据
-            Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, u1OptionEvent, m_addrRemote, m_szLocalIP, m_u4LocalPort);
+            Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, u1OptionEvent, m_addrRemote, m_szLocalIP, m_u2LocalPort);
 
             if (PACKET_SDISCONNECT == u1OptionEvent)
             {
@@ -259,7 +259,7 @@ uint32 CProConnectHandler::file_open(IFileTestManager* pFileTest)
     }
 
     //组织数据
-    Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CONNECT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
+    Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CONNECT, m_addrRemote, m_szLocalIP, m_u2LocalPort);
 
     OUR_DEBUG((LM_DEBUG, "[CProConnectHandler::file_open]Open(%d) Connection from [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
     m_pFileTest = pFileTest;
@@ -518,7 +518,7 @@ void CProConnectHandler::open(ACE_HANDLE h, ACE_Message_Block&)
     App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Connect(GetConnectID(), GetClientIPInfo(), GetLocalIPInfo());
 
     //组织数据
-    Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CONNECT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
+    Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CONNECT, m_addrRemote, m_szLocalIP, m_u2LocalPort);
 
     OUR_DEBUG((LM_DEBUG,"[CProConnectHandler::open]Open(%d) Connection from [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
 
@@ -673,7 +673,7 @@ void CProConnectHandler::handle_write_stream(const ACE_Asynch_Write_Stream::Resu
             objPacketParse.SetPacket_Head_Message(pMbData);
             objPacketParse.SetPacket_Head_Curr_Length((uint32)pMbData->length());
 
-            Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, &objPacketParse, PACKET_SEND_OK, m_addrRemote, m_szLocalIP, m_u4LocalPort);
+            Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, &objPacketParse, PACKET_SEND_OK, m_addrRemote, m_szLocalIP, m_u2LocalPort);
 
             //还原消息类型
             result.message_block().msg_type(ACE_Message_Block::MB_DATA);
@@ -724,7 +724,7 @@ void CProConnectHandler::SetSendQueueTimeCost(uint32 u4TimeCost)
         AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_SENDQUEUEERROR, "[TCP]IP=%s,Prot=%d,Timeout=[%d].", GetClientIPInfo().m_szClientIP, GetClientIPInfo().m_nPort, u4TimeCost);
 
         //组织数据
-        Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_SEND_TIMEOUT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
+        Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_SEND_TIMEOUT, m_addrRemote, m_szLocalIP, m_u2LocalPort);
     }
 
     Close();
@@ -833,7 +833,7 @@ bool CProConnectHandler::PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State
             objPacketParse.SetPacket_Body_Message(pMbData);
             objPacketParse.SetPacket_Body_Curr_Length((uint32)pMbData->length());
 
-            Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, &objPacketParse, PACKET_SEND_TIMEOUT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
+            Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, &objPacketParse, PACKET_SEND_TIMEOUT, m_addrRemote, m_szLocalIP, m_u2LocalPort);
 
             return false;
         }
@@ -996,7 +996,7 @@ int CProConnectHandler::Dispose_Paceket_Parse_Head(ACE_Message_Block* pmb)
             OUR_DEBUG((LM_DEBUG, "[CProConnectHandler::handle_read_stream] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
 
             //组织数据
-            Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_SDISCONNECT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
+            Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_SDISCONNECT, m_addrRemote, m_szLocalIP, m_u2LocalPort);
 
             Close(2);
             return -1;
@@ -1074,7 +1074,7 @@ int CProConnectHandler::Dispose_Paceket_Parse_Body(ACE_Message_Block* pmb)
         OUR_DEBUG((LM_DEBUG, "[CProConnectHandler::handle_read_stream] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
 
         //组织数据
-        Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_SDISCONNECT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
+        Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_SDISCONNECT, m_addrRemote, m_szLocalIP, m_u2LocalPort);
 
         Close(2);
         return -1;
@@ -1115,7 +1115,7 @@ int CProConnectHandler::Dispose_Paceket_Parse_Stream(ACE_Message_Block* pCurrMes
                 OUR_DEBUG((LM_DEBUG, "[CProConnectHandler::handle_read_stream](%d) m_pPacketParse new error.\n", GetConnectID()));
 
                 //组织数据
-                Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_SDISCONNECT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
+                Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_SDISCONNECT, m_addrRemote, m_szLocalIP, m_u2LocalPort);
 
                 Close(2);
                 return -1;
@@ -1298,7 +1298,7 @@ bool CProConnectHandler::CheckMessage()
         }
 
         //组织数据
-        Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, m_pPacketParse, PACKET_PARSE, m_addrRemote, m_szLocalIP, m_u4LocalPort);
+        Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, m_pPacketParse, PACKET_PARSE, m_addrRemote, m_szLocalIP, m_u2LocalPort);
 
         //更新时间轮盘
         App_ProConnectManager::instance()->SetConnectTimeWheel(this);
@@ -1343,7 +1343,7 @@ _ClientIPInfo CProConnectHandler::GetLocalIPInfo()
 {
     _ClientIPInfo ClientIPInfo;
     sprintf_safe(ClientIPInfo.m_szClientIP, MAX_BUFF_50, "%s", m_szLocalIP);
-    ClientIPInfo.m_nPort = (int)m_u4LocalPort;
+    ClientIPInfo.m_nPort = (int)m_u2LocalPort;
     return ClientIPInfo;
 }
 
@@ -1408,10 +1408,10 @@ int CProConnectHandler::GetHashID()
     return m_nHashID;
 }
 
-void CProConnectHandler::SetLocalIPInfo(const char* pLocalIP, uint32 u4LocalPort)
+void CProConnectHandler::SetLocalIPInfo(const char* pLocalIP, uint16 u2LocalPort)
 {
     sprintf_safe(m_szLocalIP, MAX_BUFF_50, "%s", pLocalIP);
-    m_u4LocalPort = u4LocalPort;
+    m_u2LocalPort = u2LocalPort;
 }
 
 void CProConnectHandler::PutSendPacketError(ACE_Message_Block* pMbData)
@@ -1441,7 +1441,7 @@ uint32 CProConnectHandler::GetPacketParseInfoID()
 
 bool CProConnectHandler::SendTimeoutMessage()
 {
-    Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CHEK_TIMEOUT, m_addrRemote, m_szLocalIP, m_u4LocalPort);
+    Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CHEK_TIMEOUT, m_addrRemote, m_szLocalIP, m_u2LocalPort);
 
     return true;
 }

@@ -178,7 +178,7 @@ public:
     void Init(uint8 u1CommandAccount, uint8 u1Flow, uint16 u2RecvTimeout);
     void AddCommandAlert(uint16 u2CommandID, uint32 u4Count, uint32 u4MailID);
 
-    bool SaveCommandData(uint16 u2CommandID, uint32 u4Port, EM_CONNECT_IO_TYPE u1PacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP,
+    bool SaveCommandData(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP,
                          uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,
                          ACE_Time_Value const& tvTime = ACE_OS::gettimeofday());   //记录命令执行信息
     bool SaveCommandDataLog();                         //存储命令执行信息的日志
@@ -195,19 +195,20 @@ public:
     void Close();
 
 private:
-    bool Save_Flow(uint16 u2CommandID, uint32 u4Port, EM_CONNECT_IO_TYPE u1PacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP,
+    bool Save_Flow(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP,
                    uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,
                    ACE_Time_Value const& tvTime = ACE_OS::gettimeofday());                    //流量统计
 
-    bool Save_Command(uint16 u2CommandID, uint32 u4Port, EM_CONNECT_IO_TYPE u1PacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP,
+    bool Save_Command(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP,
                       uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,
                       ACE_Time_Value const& tvTime = ACE_OS::gettimeofday());                 //命令统计
 
-    bool Save_Alert(uint16 u2CommandID, uint32 u4Port, EM_CONNECT_IO_TYPE u1PacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP,
+    bool Save_Alert(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP,
                     uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,
                     ACE_Time_Value const& tvTime = ACE_OS::gettimeofday());                 //命令告警统计
 
 public:
+    using hashmapPortAccount = ACE_Hash_Map<uint16, _Port_Data_Account*>;
     uint64                                    m_u8PacketTimeout     = MAX_QUEUE_TIMEOUT * 1000; //包处理超时时间
     uint8                                     m_u1CommandAccount    = 0;                        //是否开启命令统计，1是打开，0是关闭
     uint8                                     m_u1Flow              = 0;                        //是否打开流量统计，1是打开，0是关闭
@@ -215,7 +216,7 @@ public:
     char                                      m_szName[MAX_BUFF_50] = {'\0'};                   //当前统计的名字
     CHashTable<_CommandData>                  m_objCommandDataList;                             //命令Hash映射列表
     vecCommandAlertData                       m_vecCommandAlertData;                            //告警阀值数组
-    ACE_Hash_Map<uint32, _Port_Data_Account*> m_objectPortAccount;                              //根据端口统计每条数据的进出量
+    hashmapPortAccount                        m_objectPortAccount;                              //根据端口统计每条数据的进出量
 };
 
 #endif
