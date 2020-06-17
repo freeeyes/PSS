@@ -79,7 +79,7 @@ bool Server_Manager_Common_IObject(IConnectManager* pConnectManager,
     App_ServerObject::instance()->SetPacketManager(dynamic_cast<IPacketManager*>(App_BuffPacketManager::instance()));
     App_ServerObject::instance()->SetClientManager(pClientManager);
     App_ServerObject::instance()->SetUDPConnectManager(pUDPConnectManager);
-    App_ServerObject::instance()->SetTimerManager(reinterpret_cast<ActiveTimer*>(App_TimerManager::instance()));
+    App_ServerObject::instance()->SetTimerManager(dynamic_cast<ActiveTimer*>(App_TimerManager::instance()));
     App_ServerObject::instance()->SetModuleMessageManager(dynamic_cast<IModuleMessageManager*>(App_ModuleMessageManager::instance()));
     App_ServerObject::instance()->SetControlListen(pControlListen);
     App_ServerObject::instance()->SetModuleInfo(dynamic_cast<IModuleInfo*>(App_ModuleLoader::instance()));
@@ -115,7 +115,7 @@ bool Server_Manager_Common_Module()
     return true;
 }
 
-bool Server_Manager_Common_Addr(uint8 u4IpType, const char* pIP, uint32 u4Port, ACE_INET_Addr& listenAddr)
+bool Server_Manager_Common_Addr(uint8 u4IpType, const char* pIP, uint16 u2Port, ACE_INET_Addr& listenAddr)
 {
     //ÅÐ¶ÏIPv4»¹ÊÇIPv6
     int nErr = 0;
@@ -124,29 +124,29 @@ bool Server_Manager_Common_Addr(uint8 u4IpType, const char* pIP, uint32 u4Port, 
     {
         if (ACE_OS::strcmp(pIP, "INADDR_ANY") == 0)
         {
-            nErr = listenAddr.set(u4Port, (uint32)INADDR_ANY);
+            nErr = listenAddr.set(u2Port, (uint32)INADDR_ANY);
         }
         else
         {
-            nErr = listenAddr.set(u4Port, pIP);
+            nErr = listenAddr.set(u2Port, pIP);
         }
     }
     else
     {
         if (ACE_OS::strcmp(pIP, "INADDR_ANY") == 0)
         {
-            nErr = listenAddr.set(u4Port, (uint32)INADDR_ANY);
+            nErr = listenAddr.set(u2Port, (uint32)INADDR_ANY);
         }
         else
         {
-            nErr = listenAddr.set(u4Port, pIP, 1, PF_INET6);
+            nErr = listenAddr.set(u2Port, pIP, 1, PF_INET6);
         }
 
     }
 
     if (nErr != 0)
     {
-        OUR_DEBUG((LM_INFO, "[Server_Manager_Common_Addr](%d)set_address error[%s:%d].\n", pIP, u4Port, errno));
+        OUR_DEBUG((LM_INFO, "[Server_Manager_Common_Addr](%d)set_address error[%s:%d].\n", pIP, u2Port, errno));
         return false;
     }
 

@@ -93,7 +93,7 @@ bool CBuffPacket::AddBuff(uint32 u4Size)
         uint32 u4OldPacketLen = m_u4PacketLen;
 
         //格式化新创建的内存大小
-        u4Size = (uint32)(((int32)ceil((double)u4Size/(double)DEFINE_PACKET_ADD))*DEFINE_PACKET_ADD);
+        u4Size = (uint32)(((uint32)ceil((double)u4Size/(double)DEFINE_PACKET_ADD))*DEFINE_PACKET_ADD);
         m_u4PacketLen += u4Size;
 
         szNewData = (char*)App_ACEMemory::instance()->malloc(m_u4PacketLen);
