@@ -22,10 +22,11 @@ public:
 
     void Test_LogBlockPool(void);
 
-    void Test_Write_Log(void) const;
+    void Test_Write_Log(void);
 
 private:
     CLogBlockPool* m_pLogBlockPool = NULL;
+    int m_nTestCount = 0;
 };
 
 #endif

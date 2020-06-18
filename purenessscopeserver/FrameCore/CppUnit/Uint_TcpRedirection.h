@@ -25,9 +25,10 @@ public:
     void Test_Redirection(void);
 
 private:
-    int Create_client(int nClientPort, const char* pIP, int nServerPort) const;
+    int Create_client(int nClientPort, const char* pIP, int nServerPort);
 
     CForwardManager* m_pForwardManager = NULL;
+    int m_nTestCount = 0;
 };
 
 #endif

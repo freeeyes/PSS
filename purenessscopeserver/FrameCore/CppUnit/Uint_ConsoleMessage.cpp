@@ -316,7 +316,7 @@ void CUnit_ConsoleMessage::Test_Do_Error_Command(void)
     Create_Command_Error("b xxxxx test");
 }
 
-void CUnit_ConsoleMessage::Test_Check_Console_Ip(void) const
+void CUnit_ConsoleMessage::Test_Check_Console_Ip(void)
 {
     bool blRet = false;
     blRet = check_console_ip("127.0.0.1");
@@ -325,6 +325,7 @@ void CUnit_ConsoleMessage::Test_Check_Console_Ip(void) const
     {
         CPPUNIT_ASSERT_MESSAGE("[Test_Check_Console_Ip]check_console_ip() false.", true == blRet);
     }
+    m_nTestCount++;
 }
 
 void CUnit_ConsoleMessage::Test_Do_Message_CloseClient(void)

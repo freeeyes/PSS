@@ -17,7 +17,7 @@ void CUnit_MessageDefine::tearDown(void)
 }
 
 
-void CUnit_MessageDefine::Test_GetDyeingCommand(void) const
+void CUnit_MessageDefine::Test_GetDyeingCommand(void)
 {
     bool blRet = false;
     _DyeCommandInfo objDyeCommandInfo;
@@ -34,9 +34,10 @@ void CUnit_MessageDefine::Test_GetDyeingCommand(void) const
     }
 
     CPPUNIT_ASSERT_MESSAGE("[Test_GetDyeingCommand]GetDyeingCommand Data is fail.", true == blRet);
+    m_nTestCount++;
 }
 
-void CUnit_MessageDefine::Test_GetDyeingIP(void) const
+void CUnit_MessageDefine::Test_GetDyeingIP(void)
 {
     bool blRet = false;
     _DyeIPInfo objDyeIPInfo;
@@ -53,9 +54,10 @@ void CUnit_MessageDefine::Test_GetDyeingIP(void) const
     }
 
     CPPUNIT_ASSERT_MESSAGE("[Test_GetDyeingIP]GetDyeingIP Data is fail.", true == blRet);
+    m_nTestCount++;
 }
 
-void CUnit_MessageDefine::Test_GetFileInfo(void) const
+void CUnit_MessageDefine::Test_GetFileInfo(void)
 {
     bool blRet = false;
     _FileInfo FileInfo;
@@ -78,9 +80,10 @@ void CUnit_MessageDefine::Test_GetFileInfo(void) const
                FileInfo.m_szFilePath,
                FileInfo.m_szFileParam));
     CPPUNIT_ASSERT_MESSAGE("[Test_GetFileInfo]GetFileInfo Data is fail.", true == blRet);
+    m_nTestCount++;
 }
 
-void CUnit_MessageDefine::Test_GetTrackIP(void) const
+void CUnit_MessageDefine::Test_GetTrackIP(void)
 {
     bool blRet = false;
     _ForbiddenIP objForbiddenIP;
@@ -94,9 +97,10 @@ void CUnit_MessageDefine::Test_GetTrackIP(void) const
     }
 
     CPPUNIT_ASSERT_MESSAGE("[Test_GetTrackIP]GetTrackIP Data is fail.", true == blRet);
+    m_nTestCount++;
 }
 
-void CUnit_MessageDefine::Test_GetLogLevel(void) const
+void CUnit_MessageDefine::Test_GetLogLevel(void)
 {
     bool blRet = false;
     int  nLevel = 0;
@@ -111,9 +115,10 @@ void CUnit_MessageDefine::Test_GetLogLevel(void) const
     }
 
     CPPUNIT_ASSERT_MESSAGE("[Test_GetLogLevel]GetLogLevel Data is fail.", true == blRet);
+    m_nTestCount++;
 }
 
-void CUnit_MessageDefine::Test_GetAIInfo(void) const
+void CUnit_MessageDefine::Test_GetAIInfo(void)
 {
     bool blRet   = false;
     int nAI      = 0;
@@ -133,9 +138,10 @@ void CUnit_MessageDefine::Test_GetAIInfo(void) const
     }
 
     CPPUNIT_ASSERT_MESSAGE("[Test_GetAIInfo]GetAIInfo Data is fail.", true == blRet);
+    m_nTestCount++;
 }
 
-void CUnit_MessageDefine::Test_GetConnectID(void) const
+void CUnit_MessageDefine::Test_GetConnectID(void)
 {
     bool blRet = false;
     uint32 u4ConnectID = 0;
@@ -152,9 +158,10 @@ void CUnit_MessageDefine::Test_GetConnectID(void) const
     }
 
     CPPUNIT_ASSERT_MESSAGE("[Test_GetConnectID]GetConnectID Data is fail.", true == blRet);
+    m_nTestCount++;
 }
 
-void CUnit_MessageDefine::Test_GetMaxConnectCount(void) const
+void CUnit_MessageDefine::Test_GetMaxConnectCount(void)
 {
     bool blRet = false;
     uint16 u2MaxConnectCount = 0;
@@ -168,9 +175,10 @@ void CUnit_MessageDefine::Test_GetMaxConnectCount(void) const
     }
 
     CPPUNIT_ASSERT_MESSAGE("[Test_GetMaxConnectCount]GetMaxConnectCount Data is fail.", true == blRet);
+    m_nTestCount++;
 }
 
-void CUnit_MessageDefine::Test_GetListenInfo(void) const
+void CUnit_MessageDefine::Test_GetListenInfo(void)
 {
     bool blRet = false;
     _ListenInfo objListenInfo;
@@ -188,9 +196,10 @@ void CUnit_MessageDefine::Test_GetListenInfo(void) const
     }
 
     CPPUNIT_ASSERT_MESSAGE("[Test_GetListenInfo]GetListenInfo Data is fail.", true == blRet);
+    m_nTestCount++;
 }
 
-void CUnit_MessageDefine::Test_GetPoolSet(void) const
+void CUnit_MessageDefine::Test_GetPoolSet(void)
 {
     bool blRet = false;
     _PoolName objPoolName;
@@ -206,6 +215,7 @@ void CUnit_MessageDefine::Test_GetPoolSet(void) const
     }
 
     CPPUNIT_ASSERT_MESSAGE("[Test_GetPoolSet]GetPoolSet Data is fail.", true == blRet);
+    m_nTestCount++;
 }
 
 #endif

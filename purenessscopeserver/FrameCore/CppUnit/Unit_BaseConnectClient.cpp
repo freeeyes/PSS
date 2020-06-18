@@ -16,7 +16,7 @@ void CUnit_BaseConnectClient::tearDown(void)
     m_u2CommandID = 0;
 }
 
-void CUnit_BaseConnectClient::Test_Make_Common_Dispose_Client_WorkTread_Message(void) const
+void CUnit_BaseConnectClient::Test_Make_Common_Dispose_Client_WorkTread_Message(void)
 {
     bool blRet = false;
 
@@ -36,9 +36,11 @@ void CUnit_BaseConnectClient::Test_Make_Common_Dispose_Client_WorkTread_Message(
         OUR_DEBUG((LM_INFO, "[Make_Common_Dispose_Client_WorkTread_Message]Error.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Make_Common_Dispose_Client_WorkTread_Message]Error.", true == blRet);
     }
+
+    m_nTestCount++;
 }
 
-void CUnit_BaseConnectClient::Test_Common_Send_ConnectError(void) const
+void CUnit_BaseConnectClient::Test_Common_Send_ConnectError(void)
 {
     ACE_INET_Addr objAddrServer;
     CPostServerData objPostServerData;
@@ -46,6 +48,8 @@ void CUnit_BaseConnectClient::Test_Common_Send_ConnectError(void) const
     ACE_Message_Block* pMb = App_MessageBlockManager::instance()->Create(10);
 
     Common_Send_ConnectError(pMb, objAddrServer, dynamic_cast<IClientMessage*>(&objPostServerData));
+
+    m_nTestCount++;
 }
 
 #endif

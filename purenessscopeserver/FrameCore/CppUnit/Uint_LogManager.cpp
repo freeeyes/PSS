@@ -37,7 +37,7 @@ void CUnit_LogManager::Test_LogBlockPool(void)
 
 }
 
-void CUnit_LogManager::Test_Write_Log(void) const
+void CUnit_LogManager::Test_Write_Log(void)
 {
     bool blRet = false;
     char szData[MAX_BUFF_20] = { '\0' };
@@ -50,6 +50,7 @@ void CUnit_LogManager::Test_Write_Log(void) const
         CPPUNIT_ASSERT_MESSAGE("[Test_Write_Log]WriteLogBinary is fail.", true == blRet);
     }
 
+    m_nTestCount++;
 }
 
 #endif

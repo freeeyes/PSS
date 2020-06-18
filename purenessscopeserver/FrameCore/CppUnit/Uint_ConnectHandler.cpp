@@ -146,7 +146,7 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Debug(void)
     pmb->release();
 }
 
-void CUnit_ConnectHandler::Test_ConnectHandler_Close_Queue(void) const
+void CUnit_ConnectHandler::Test_ConnectHandler_Close_Queue(void)
 {
     bool blRet = false;
     blRet = App_ConnectManager::instance()->CloseConnect(1);
@@ -156,9 +156,10 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Close_Queue(void) const
         OUR_DEBUG((LM_INFO, "[Test_ConnectHandler_Close_Queue]CloseConnect is fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler_Close_Queue]CloseConnect is fail.", true == blRet);
     }
+    m_nTestCount++;
 }
 
-void CUnit_ConnectHandler::Test_ConnectHandler_PostMessage(void) const
+void CUnit_ConnectHandler::Test_ConnectHandler_PostMessage(void)
 {
     bool blRet = false;
     char szData[10] = { '\0' };
@@ -214,9 +215,10 @@ void CUnit_ConnectHandler::Test_ConnectHandler_PostMessage(void) const
     }
 
     App_BuffPacketManager::instance()->Delete(pBuffPacket);
+    m_nTestCount++;
 }
 
-void CUnit_ConnectHandler::Test_Connect_CheckTime(void) const
+void CUnit_ConnectHandler::Test_Connect_CheckTime(void)
 {
     bool blRet = false;
 
@@ -228,6 +230,8 @@ void CUnit_ConnectHandler::Test_Connect_CheckTime(void) const
         CPPUNIT_ASSERT_MESSAGE("[Test_Connect_CheckTime]GetLocalIPInfo is fail.", true == blRet);
         return;
     }
+
+    m_nTestCount++;
 }
 
 #endif

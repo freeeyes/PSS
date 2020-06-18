@@ -16,7 +16,7 @@ void CUnit_LoadModule::tearDown(void)
     sprintf_safe(m_szModuleName, MAX_BUFF_20, "TCPTest");
 }
 
-void CUnit_LoadModule::Test_LoadModule(void) const
+void CUnit_LoadModule::Test_LoadModule(void)
 {
     bool blRet = false;
     char szModuleName[MAX_BUFF_20] = { '\0' };
@@ -60,6 +60,7 @@ void CUnit_LoadModule::Test_LoadModule(void) const
     {
         CPPUNIT_ASSERT_MESSAGE("[Test_LoadModule]GetAllModuleName is error.", true == blRet);
     }
+    m_nTestCount++;
 }
 
 #endif

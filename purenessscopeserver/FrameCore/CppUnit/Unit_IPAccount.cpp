@@ -75,7 +75,7 @@ void CUnit_IPAccount::Test_IPAccount_GetInfo(void)
     CPPUNIT_ASSERT_MESSAGE("[Test_IPAccount_GetInfo]GetInfo is fail.", true == blRet);
 }
 
-void CUnit_IPAccount::Test_CConnectAccount(void) const
+void CUnit_IPAccount::Test_CConnectAccount(void)
 {
     bool blRet = false;
     CConnectAccount objConnectAccount;
@@ -100,6 +100,7 @@ void CUnit_IPAccount::Test_CConnectAccount(void) const
     {
         CPPUNIT_ASSERT_MESSAGE("[Test_CConnectAccount]GetDisConnectMin or GetDisConnectMin is error.", true == blRet);
     }
+    m_nTestCount++;
 }
 
 #endif

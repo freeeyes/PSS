@@ -22,12 +22,13 @@ public:
 
     virtual void tearDown(void);
 
-    void Test_Connect_Tcp_Server(void) const;
+    void Test_Connect_Tcp_Server(void);
 
-    void Test_Connect_Tcp_Server_With_Local(void) const;
+    void Test_Connect_Tcp_Server_With_Local(void);
 
 private:
     int m_nServerID = 0;
+    int m_nTestCount = 0;
 };
 
 #endif

@@ -22,12 +22,13 @@ public:
 
     virtual void tearDown(void);
 
-    void Test_Make_Common_Dispose_Client_WorkTread_Message(void) const;
+    void Test_Make_Common_Dispose_Client_WorkTread_Message(void);
 
-    void Test_Common_Send_ConnectError(void) const;
+    void Test_Common_Send_ConnectError(void);
 
 private:
     uint16 m_u2CommandID = 0;
+    int m_nTestCount = 0;
 };
 
 #endif

@@ -16,7 +16,7 @@ void CUnit_ConnectTcp::tearDown(void)
     m_nServerID = 0;
 }
 
-void CUnit_ConnectTcp::Test_Connect_Tcp_Server(void) const
+void CUnit_ConnectTcp::Test_Connect_Tcp_Server(void)
 {
     bool blRet                 = false;
     CPostServerData objPostServerData;
@@ -112,9 +112,11 @@ void CUnit_ConnectTcp::Test_Connect_Tcp_Server(void) const
         OUR_DEBUG((LM_INFO, "[Test_Connect_Tcp_Server]Close TCP [127.0.0.1:10002] is fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Tcp_Server]Close TCP [127.0.0.1:10002] is fail.\n", true == blRet);
     }
+
+    m_nTestCount++;
 }
 
-void CUnit_ConnectTcp::Test_Connect_Tcp_Server_With_Local(void) const
+void CUnit_ConnectTcp::Test_Connect_Tcp_Server_With_Local(void)
 {
     bool blRet = false;
     CPostServerData objPostServerData;
@@ -151,6 +153,8 @@ void CUnit_ConnectTcp::Test_Connect_Tcp_Server_With_Local(void) const
         OUR_DEBUG((LM_INFO, "[Test_Connect_Tcp_Server_With_Local]ConnectErrorClose is fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Tcp_Server_With_Local]ConnectErrorClose is fail.\n", true == blRet);
     }
+
+    m_nTestCount++;
 }
 
 #endif

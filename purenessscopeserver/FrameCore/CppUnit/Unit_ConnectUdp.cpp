@@ -16,7 +16,7 @@ void CUnit_ConnectUdp::tearDown(void)
     m_nServerID = 0;
 }
 
-void CUnit_ConnectUdp::Test_Connect_Udp_Server(void) const
+void CUnit_ConnectUdp::Test_Connect_Udp_Server(void)
 {
     bool blRet                 = false;
     CPostUdpServerData objUdpPostServerData;
@@ -69,6 +69,7 @@ void CUnit_ConnectUdp::Test_Connect_Udp_Server(void) const
 
     App_ClientReConnectManager::instance()->CloseUDP(m_nServerID);
     OUR_DEBUG((LM_INFO, "[Test_Connect_Udp_Server]Close OK.\n"));
+    m_nTestCount++;
 }
 
 #endif

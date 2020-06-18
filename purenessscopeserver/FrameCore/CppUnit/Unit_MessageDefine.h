@@ -28,18 +28,19 @@ public:
 
     virtual void tearDown(void);
 
-    void Test_GetDyeingCommand(void) const;
-    void Test_GetDyeingIP(void) const;
-    void Test_GetFileInfo(void) const;
-    void Test_GetTrackIP(void) const;
-    void Test_GetLogLevel(void) const;
-    void Test_GetAIInfo(void) const;
-    void Test_GetConnectID(void) const;
-    void Test_GetMaxConnectCount(void) const;
-    void Test_GetListenInfo(void) const;
-    void Test_GetPoolSet(void) const;
+    void Test_GetDyeingCommand(void);
+    void Test_GetDyeingIP(void);
+    void Test_GetFileInfo(void);
+    void Test_GetTrackIP(void);
+    void Test_GetLogLevel(void);
+    void Test_GetAIInfo(void);
+    void Test_GetConnectID(void);
+    void Test_GetMaxConnectCount(void);
+    void Test_GetListenInfo(void);
+    void Test_GetPoolSet(void);
 private:
     int m_nMessageDefine = 0;
+    int m_nTestCount = 0;
 };
 
 #endif

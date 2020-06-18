@@ -54,7 +54,7 @@ void CUnit_Redirection::Test_Redirection(void)
     close(sockclient2);
 }
 
-int CUnit_Redirection::Create_client(int nClientPort, const char* pIP, int nServerPort) const
+int CUnit_Redirection::Create_client(int nClientPort, const char* pIP, int nServerPort)
 {
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -95,6 +95,8 @@ int CUnit_Redirection::Create_client(int nClientPort, const char* pIP, int nServ
     {
         return 0;
     }
+
+    m_nTestCount++;
 }
 
 #endif

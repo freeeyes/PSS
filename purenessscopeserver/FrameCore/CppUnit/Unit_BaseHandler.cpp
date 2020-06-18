@@ -16,7 +16,7 @@ void CUnit_Basehandler::tearDown(void)
     m_nBaseHandlerID = 0;
 }
 
-void CUnit_Basehandler::Test_Tcp_Common_File_Message(void) const
+void CUnit_Basehandler::Test_Tcp_Common_File_Message(void)
 {
     bool blRet = false;
     _File_Message_Param obj_File_Message_Param;
@@ -47,9 +47,10 @@ void CUnit_Basehandler::Test_Tcp_Common_File_Message(void) const
     CPPUNIT_ASSERT_MESSAGE("[Test_Tcp_Common_File_Message]Tcp_Common_File_Message is false.", true == blRet);
 
     App_BuffPacketManager::instance()->Delete(pBuffPacket);
+    m_nTestCount++;
 }
 
-void CUnit_Basehandler::Test_Tcp_Common_ClientInfo(void) const
+void CUnit_Basehandler::Test_Tcp_Common_ClientInfo(void)
 {
     bool blRet = true;
     _ClientConnectInfo_Param obj_ClientConnectInfo_Param;
@@ -57,6 +58,7 @@ void CUnit_Basehandler::Test_Tcp_Common_ClientInfo(void) const
     Tcp_Common_ClientInfo(obj_ClientConnectInfo_Param);
 
     CPPUNIT_ASSERT_MESSAGE("[Test_Tcp_Common_ClientInfo]obj_ClientConnectInfo_Param is false.", true == blRet);
+    m_nTestCount++;
 }
 
 void CUnit_Basehandler::Test_Tcp_Common_Send_Input_To_Cache(void)
@@ -100,16 +102,17 @@ void CUnit_Basehandler::Test_Tcp_Common_Send_Input_To_Cache(void)
     SAFE_DELETE(pMB);
 }
 
-void CUnit_Basehandler::Test_Tcp_Common_Manager_Timeout_CheckInfo(void) const
+void CUnit_Basehandler::Test_Tcp_Common_Manager_Timeout_CheckInfo(void)
 {
     bool blRet = true;
 
     Tcp_Common_Manager_Timeout_CheckInfo(0);
 
     CPPUNIT_ASSERT_MESSAGE("[Test_Tcp_Common_Manager_Timeout_CheckInfo]Tcp_Common_Manager_Timeout_CheckInfo is false.", true == blRet);
+    m_nTestCount++;
 }
 
-void CUnit_Basehandler::Test_Tcp_Common_ClientNameInfo(void) const
+void CUnit_Basehandler::Test_Tcp_Common_ClientNameInfo(void)
 {
     bool blRet = false;
 
@@ -123,9 +126,10 @@ void CUnit_Basehandler::Test_Tcp_Common_ClientNameInfo(void) const
     {
         CPPUNIT_ASSERT_MESSAGE("[Test_Tcp_Common_ClientNameInfo]Tcp_Common_ClientNameInfo is false.", true == blRet);
     }
+    m_nTestCount++;
 }
 
-void CUnit_Basehandler::Test_Udp_Common_Recv_Stream(void) const
+void CUnit_Basehandler::Test_Udp_Common_Recv_Stream(void)
 {
     bool blRet = false;
 
@@ -165,6 +169,7 @@ void CUnit_Basehandler::Test_Udp_Common_Recv_Stream(void) const
     }
 
     App_MessageBlockManager::instance()->Close(pmb);
+    m_nTestCount++;
 }
 
 void CUnit_Basehandler::Test_Udp_Common_Send_Message(void)
@@ -222,7 +227,7 @@ void CUnit_Basehandler::Test_Udp_Common_Send_Message(void)
 
 }
 
-void CUnit_Basehandler::Test_Tcp_Common_Make_Send_Packet(void) const
+void CUnit_Basehandler::Test_Tcp_Common_Make_Send_Packet(void)
 {
     bool blRet = false;
     ACE_Message_Block* pMbData       = NULL;
@@ -273,6 +278,8 @@ void CUnit_Basehandler::Test_Tcp_Common_Make_Send_Packet(void) const
     App_BuffPacketManager::instance()->Delete(pBuffPacket);
     App_MessageBlockManager::instance()->Close(pMbData);
     App_MessageBlockManager::instance()->Close(pBlockMessage);
+
+    m_nTestCount++;
 }
 
 #endif

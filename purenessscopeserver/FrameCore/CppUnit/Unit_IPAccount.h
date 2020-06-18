@@ -31,10 +31,11 @@ public:
 
     void Test_IPAccount_GetInfo(void);
 
-    void Test_CConnectAccount(void) const;
+    void Test_CConnectAccount(void);
 
 private:
     CIPAccount* m_pIPAccount = NULL;
+    int m_nTestCount         = 0;
 };
 
 #endif

@@ -25,17 +25,17 @@ public:
 
     virtual void tearDown(void);
 
-    void Test_Tcp_Common_File_Message(void) const;
-    void Test_Tcp_Common_ClientInfo(void) const;
+    void Test_Tcp_Common_File_Message(void);
+    void Test_Tcp_Common_ClientInfo(void);
     void Test_Tcp_Common_Send_Input_To_Cache(void);
-    void Test_Tcp_Common_Manager_Timeout_CheckInfo(void) const;
-    void Test_Tcp_Common_ClientNameInfo(void) const;
-    void Test_Udp_Common_Recv_Stream(void) const;
+    void Test_Tcp_Common_Manager_Timeout_CheckInfo(void);
+    void Test_Tcp_Common_ClientNameInfo(void);
+    void Test_Udp_Common_Recv_Stream(void);
     void Test_Udp_Common_Send_Message(void);
-    void Test_Tcp_Common_Make_Send_Packet(void) const;
+    void Test_Tcp_Common_Make_Send_Packet(void);
 private:
     int m_nBaseHandlerID = 0;
-
+    int m_nTestCount = 0;
 };
 
 #endif
