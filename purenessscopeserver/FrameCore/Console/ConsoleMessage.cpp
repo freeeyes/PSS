@@ -114,7 +114,7 @@ void CConsoleMessage::Close()
     m_objConsolePromissions.Close();
 }
 
-bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& CommandInfo, bool blCheck)
+bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& CommandInfo, bool blCheck) const
 {
     int nLen = (int)ACE_OS::strlen(pCommand);
     char szKey[MAX_BUFF_100] = {'\0'};

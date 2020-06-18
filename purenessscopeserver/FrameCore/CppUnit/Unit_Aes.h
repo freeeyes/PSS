@@ -30,6 +30,7 @@ public:
 
 private:
     AES* m_pAES = NULL;
+    int m_nTestCount = 0;
 };
 
 #endif

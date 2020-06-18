@@ -83,8 +83,10 @@ void CUnit_Aes::Hex2Byte(const char* src, int len, unsigned char* dest)
 
     for (int i = 0; i < length; ++i)
     {
-        dest[i] = (unsigned char)Char2Int(src[i * 2]) * 16 + Char2Int(src[i * 2 + 1]);
+        dest[i] = (unsigned char)(Char2Int(src[i * 2]) * 16 + Char2Int(src[i * 2 + 1]));
     }
+
+    m_nTestCount++;
 }
 
 int CUnit_Aes::Char2Int(char c) const

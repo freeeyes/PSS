@@ -30,6 +30,8 @@ void CUnit_MakePacket::Test_MakePacket(void)
         OUR_DEBUG((LM_INFO, "[Test_ControlListen]m_pMakePacket->PutSendErrorMessage() Error.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_ControlListen]m_pMakePacket->PutSendErrorMessage() Error.", true == blRet);
     }
+
+    m_nTestCount++;
 }
 
 #endif
