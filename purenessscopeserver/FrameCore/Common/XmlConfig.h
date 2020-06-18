@@ -83,7 +83,7 @@ public:
         _initIsOk = Init();
     }
 
-    bool InitIsOk()
+    bool InitIsOk() const
     {
         return _initIsOk;
     }
@@ -105,7 +105,7 @@ class IConfigOpeation
 {
     friend class XMainConfig;
 public:
-    const std::string& ClassName()
+    const std::string& ClassName() const
     {
         return m_name;
     }

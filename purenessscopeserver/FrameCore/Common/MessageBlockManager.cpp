@@ -80,7 +80,7 @@ bool CMessageBlockManager::Close(ACE_Message_Block* pMessageBlock)
     return true;
 }
 
-uint32 CMessageBlockManager::GetUsedSize()
+uint32 CMessageBlockManager::GetUsedSize() const
 {
     return m_u4UsedSize;
 }

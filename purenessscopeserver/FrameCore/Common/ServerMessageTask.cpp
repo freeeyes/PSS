@@ -239,7 +239,7 @@ int CServerMessageTask::svc(void)
     return 0;
 }
 
-uint32 CServerMessageTask::GetThreadID()
+uint32 CServerMessageTask::GetThreadID() const
 {
     return m_u4ThreadID;
 }
@@ -370,7 +370,7 @@ bool CServerMessageTask::ProcessMessage(const _Server_Message_Info* pMessage, ui
     return true;
 }
 
-bool CServerMessageTask::CheckServerMessageThread(ACE_Time_Value const& tvNow)
+bool CServerMessageTask::CheckServerMessageThread(ACE_Time_Value const& tvNow) const
 {
     ACE_Time_Value tvIntval(tvNow - m_tvDispose);
 

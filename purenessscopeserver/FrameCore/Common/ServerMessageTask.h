@@ -63,7 +63,7 @@ public:
         m_nHashID = nHashID;
     }
 
-    int GetHashID()
+    int GetHashID() const
     {
         return m_nHashID;
     }
@@ -107,7 +107,7 @@ public:
     bool Start();
     int  Close();
 
-    uint32 GetThreadID();
+    uint32 GetThreadID() const;
 
     bool PutMessage(_Server_Message_Info* pMessage);
 
@@ -115,7 +115,7 @@ public:
 
     bool PutMessage_Del_Client(IClientMessage* pClientMessage);
 
-    bool CheckServerMessageThread(ACE_Time_Value const& tvNow);
+    bool CheckServerMessageThread(ACE_Time_Value const& tvNow) const;
 
 private:
     bool CheckValidClientMessage(const IClientMessage* pClientMessage);

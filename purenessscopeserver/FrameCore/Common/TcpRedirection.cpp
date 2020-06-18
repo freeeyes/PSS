@@ -196,9 +196,9 @@ string CForwardManager::Check_Connect_IP(const char* pName, ENUM_FORWARD_TYPE em
 
     if (f != m_mapForwardConnectList.end())
     {
-        CForwardConnectInfo* pForwardConnectInfo = (CForwardConnectInfo*)f->second;
+        CForwardConnectInfo* pForwardConnectInfo = f->second;
         pForwardConnectInfo->m_emForwardType     = em_type;
-        pForwardConnectInfo->m_u1ConnectState    = ConnectState;
+        pForwardConnectInfo->m_u1ConnectState    = (uint8)ConnectState;
         pForwardConnectInfo->m_pDeviceHandler    = pDeviceHandler;
         return pForwardConnectInfo->m_strTarget;
     }

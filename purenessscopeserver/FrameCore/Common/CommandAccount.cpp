@@ -132,7 +132,7 @@ bool CCommandAccount::Save_Command(uint16 u2CommandID, uint16 u2Port, EM_CONNECT
     return true;
 }
 
-bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
+bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime) const
 {
     ACE_UNUSED_ARG(u2Port);
     ACE_UNUSED_ARG(u1PacketType);
@@ -249,9 +249,9 @@ bool CCommandAccount::SaveCommandDataLog()
                                                   (int32)pCommandData->m_u2CommandID,
                                                   strCommandType.c_str(),
                                                   (int32)pCommandData->m_u4CommandCount,
-                                                  (uint64)pCommandData->m_u8CommandCost,
+                                                  pCommandData->m_u8CommandCost,
                                                   strPacketType.c_str(),
-                                                  (uint32)pCommandData->m_u4PacketSize,
+                                                  pCommandData->m_u4PacketSize,
                                                   dtLastTime.year(), dtLastTime.month(), dtLastTime.day(), dtLastTime.hour(), dtLastTime.minute(), dtLastTime.second());
 
         }
@@ -300,7 +300,7 @@ uint32 CCommandAccount::GetFlowOut()
     return u4FlowOut;
 }
 
-uint8 CCommandAccount::GetFLow()
+uint8 CCommandAccount::GetFLow() const
 {
     return m_u1Flow;
 }

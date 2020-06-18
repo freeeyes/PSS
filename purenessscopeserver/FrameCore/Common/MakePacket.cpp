@@ -4,7 +4,7 @@ CMakePacket::CMakePacket(void)
 {
 }
 
-bool CMakePacket::Init()
+bool CMakePacket::Init() const
 {
     return true;
 }
@@ -55,7 +55,7 @@ bool CMakePacket::PutMessageBlock(const _MakePacket* pMakePacket, const ACE_Time
     return true;
 }
 
-void CMakePacket::SetMessage(const _MakePacket* pMakePacket, CMessage* pMessage, const ACE_Time_Value& tvNow)
+void CMakePacket::SetMessage(const _MakePacket* pMakePacket, CMessage* pMessage, const ACE_Time_Value& tvNow) const
 {
     if(NULL != pMessage->GetMessageBase())
     {
@@ -147,7 +147,7 @@ void CMakePacket::SetMessage(const _MakePacket* pMakePacket, CMessage* pMessage,
     }
 }
 
-void CMakePacket::SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, CMessage* pMessage, const ACE_Time_Value& tvNow)
+void CMakePacket::SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, CMessage* pMessage, const ACE_Time_Value& tvNow) const
 {
     if(NULL != pMessage->GetMessageBase())
     {

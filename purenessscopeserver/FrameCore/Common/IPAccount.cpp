@@ -24,10 +24,10 @@ void _IPAccount::Add(ACE_Date_Time const& dtNowTime)
     }
 }
 
-bool _IPAccount::Check(ACE_Date_Time const& dtNowTime)
+bool _IPAccount::Check(ACE_Date_Time const& dtNowTime) const
 {
     //如果3分钟内没有更新，则清理之
-    uint16 u2NowTime = (uint32)dtNowTime.minute();
+    uint16 u2NowTime = (uint16)dtNowTime.minute();
 
     if (u2NowTime - m_nMinute < 0)
     {
@@ -186,7 +186,7 @@ void CIPAccount::Clear_Hash_Data(uint16 u2NowTime, const ACE_Date_Time& dtNowTim
         m_u1Minute = (uint8)u2NowTime;
     }
 
-    if ((int32)(u2NowTime - m_u2CurrTime) < 0)
+    if (u2NowTime - m_u2CurrTime < 0)
     {
         u2NowTime += 60;
     }
@@ -224,32 +224,32 @@ CConnectAccount::~CConnectAccount()
 {
 }
 
-uint32 CConnectAccount::Get4ConnectMin()
+uint32 CConnectAccount::Get4ConnectMin() const
 {
     return m_u4ConnectMin;
 }
 
-uint32 CConnectAccount::GetConnectMax()
+uint32 CConnectAccount::GetConnectMax() const
 {
     return m_u4ConnectMax;
 }
 
-uint32 CConnectAccount::GetDisConnectMin()
+uint32 CConnectAccount::GetDisConnectMin() const
 {
     return m_u4DisConnectMin;
 }
 
-uint32 CConnectAccount::GetDisConnectMax()
+uint32 CConnectAccount::GetDisConnectMax() const
 {
     return m_u4DisConnectMax;
 }
 
-uint32 CConnectAccount::GetCurrConnect()
+uint32 CConnectAccount::GetCurrConnect() const
 {
     return m_u4CurrConnect;
 }
 
-uint32 CConnectAccount::GetCurrDisConnect()
+uint32 CConnectAccount::GetCurrDisConnect() const
 {
     return m_u4CurrDisConnect;
 }
@@ -307,7 +307,7 @@ bool CConnectAccount::AddDisConnect()
     return true;
 }
 
-int32 CConnectAccount::CheckConnectCount()
+int32 CConnectAccount::CheckConnectCount() const
 {
     if (m_u4ConnectMax > 0 && m_u4CurrConnect > m_u4ConnectMax)
     {
@@ -322,7 +322,7 @@ int32 CConnectAccount::CheckConnectCount()
     return 0;
 }
 
-int32 CConnectAccount::CheckDisConnectCount()
+int32 CConnectAccount::CheckDisConnectCount() const
 {
     if (m_u4DisConnectMax > 0 && m_u4CurrDisConnect > m_u4DisConnectMax)
     {

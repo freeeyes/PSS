@@ -47,7 +47,7 @@ public:
 
 private:
     bool SaveConfig();                                                                      //存储配置文件
-    bool CompareIP(const char* pTargetIP, const char* pClientIP);                           //比较是否在当前IP段
+    bool CompareIP(const char* pTargetIP, const char* pClientIP) const;                     //比较是否在当前IP段
 
     CXmlOpeation   m_ForbiddenData;
     VecForbiddenIP m_VecForeverForbiddenIP;           //永久封停的IP列表

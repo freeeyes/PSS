@@ -101,7 +101,7 @@ private:
     uint32                     m_u4MaxPacketSize = 0;                   //最大当前BuffPacket的容量
     uint32                     m_u4BuffID        = 0;                   //Buffer对象名字，用于核对内存池数据使用，寻找内存泄露。
     int32                      m_nHashID         = 0;                   //记录当前对象在Hash数组中的位置
-    bool                       m_blNetSort       = 0;                   //字节序开启开关，false为不转换为主机字节序，true为转换为主机字节序
+    bool                       m_blNetSort       = false;               //字节序开启开关，false为不转换为主机字节序，true为转换为主机字节序
     char                       m_szError[MAX_BUFF_500] = {'\0'};        //错误信息
 
 public:

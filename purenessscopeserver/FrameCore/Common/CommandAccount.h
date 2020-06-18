@@ -186,7 +186,7 @@ public:
 
     uint32 GetFlowIn();                                //得到单位时间进入流量
     uint32 GetFlowOut();                               //得到党委时间流出流量
-    uint8  GetFLow();                                  //得到当前流量开关状态
+    uint8  GetFLow() const;                            //得到当前流量开关状态
 
     void GetCommandAlertData(vecCommandAlertData& CommandAlertDataList); //得到所有的告警命令信息
 
@@ -205,7 +205,7 @@ private:
 
     bool Save_Alert(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP,
                     uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,
-                    ACE_Time_Value const& tvTime = ACE_OS::gettimeofday());                 //命令告警统计
+                    ACE_Time_Value const& tvTime = ACE_OS::gettimeofday()) const;                 //命令告警统计
 
 public:
     using hashmapPortAccount = ACE_Hash_Map<uint16, _Port_Data_Account*>;

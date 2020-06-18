@@ -192,7 +192,7 @@ public:
     ACE_Message_Block* Create(uint32 u4Size);
     bool Close(ACE_Message_Block* pMessageBlock);
 
-    uint32 GetUsedSize();
+    uint32 GetUsedSize() const;
 
 private:
     uint32                     m_u4UsedSize      = 0;                          //当前正在使用的内存大小

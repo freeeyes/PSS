@@ -121,7 +121,7 @@ bool CThreadInfoList::CloseThread(uint32 u4ThreadID)
     }
 }
 
-int CThreadInfoList::GetThreadCount()
+int CThreadInfoList::GetThreadCount() const
 {
     return m_nThreadCount;
 }

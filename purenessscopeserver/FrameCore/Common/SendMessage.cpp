@@ -10,7 +10,7 @@ void CSendMessagePool::Init(int32 nObjcetCount)
 
     //≥ı ºªØHashTable
     m_objSendMessageList.Init((uint32)nObjcetCount);
-    m_objHashHandleList.Init((int32)nObjcetCount);
+    m_objHashHandleList.Init(nObjcetCount);
 
     for(int32 i = 0; i < nObjcetCount; i++)
     {

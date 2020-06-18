@@ -204,7 +204,7 @@ bool CForbiddenIP::SaveConfig()
     return true;
 }
 
-bool CForbiddenIP::CompareIP(const char* pTargetIP, const char* pClientIP)
+bool CForbiddenIP::CompareIP(const char* pTargetIP, const char* pClientIP) const
 {
     char szTargetIP[MAX_IP_SIZE];
     char szClientIP[MAX_IP_SIZE];

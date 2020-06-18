@@ -87,12 +87,12 @@ public:
         return m_pRingLink;
     }
 
-    int GetCount()
+    int GetCount() const
     {
         return m_nMaxCount;
     }
 
-    int GetCurrIndex()
+    int GetCurrIndex() const
     {
         return m_nIndex;
     }

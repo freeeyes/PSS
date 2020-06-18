@@ -123,9 +123,9 @@ int CTMService::Init(int nNeedLoad)
     }
 
     //根据配置文件创建对应函数
-    for (auto it = m_T2MList.begin(); it != m_T2MList.end(); ++it)
+    for (auto& f : m_T2MList)
     {
-        m_ThreadQueueManager.Create(it->first);
+        m_ThreadQueueManager.Create(f.first);
     }
 
     return 0;
@@ -176,7 +176,7 @@ int CTMService::AddMessage(string strName, unsigned long long nMessagePos, long 
 
     if (m_M2TList.end() != ftm)
     {
-        _Message_thread_id = (int)ftm->second;
+        _Message_thread_id = ftm->second;
     }
     else
     {
@@ -204,8 +204,8 @@ int CTMService::AddMessage(string strName, unsigned long long nMessagePos, long 
         objEventsInfo.m_nWorkThreadID    = _Message_thread_id;
         objEventsInfo.m_pIMessagePrecess = pMessagePrecess;
         objEventsInfo.m_nMessagePos      = nMessagePos;
-        objEventsInfo.m_nSec             = sec;
-        objEventsInfo.m_nUsec            = usec;
+        objEventsInfo.m_nSec             = (int)sec;
+        objEventsInfo.m_nUsec            = (int)usec;
         objEventsInfo.m_emTimerMode      = emTimerMode;
 
         pTimerInfo->AddEventsInfo(objEventsInfo);

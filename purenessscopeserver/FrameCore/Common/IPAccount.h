@@ -28,7 +28,7 @@ public:
     void Add(ACE_Date_Time const& dtNowTime);
 
     //false为数据已过期
-    bool Check(ACE_Date_Time const& dtNowTime);
+    bool Check(ACE_Date_Time const& dtNowTime) const;
 };
 
 typedef vector<_IPAccount> vecIPAccount;
@@ -73,17 +73,17 @@ public:
 
     ~CConnectAccount();
 
-    uint32 Get4ConnectMin();
+    uint32 Get4ConnectMin() const;
 
-    uint32 GetConnectMax();
+    uint32 GetConnectMax() const;
 
-    uint32 GetDisConnectMin();
+    uint32 GetDisConnectMin() const;
 
-    uint32 GetDisConnectMax();
+    uint32 GetDisConnectMax() const;
 
-    uint32 GetCurrConnect();
+    uint32 GetCurrConnect() const;
 
-    uint32 GetCurrDisConnect();
+    uint32 GetCurrDisConnect() const;
 
     void Init(uint32 u4ConnectMin, uint32 u4ConnectMax, uint32 u4DisConnectMin, uint32 u4DisConnectMax);
 
@@ -91,9 +91,9 @@ public:
 
     bool AddDisConnect();
 
-    int32 CheckConnectCount();
+    int32 CheckConnectCount() const;
 
-    int32 CheckDisConnectCount();
+    int32 CheckDisConnectCount() const;
 
 private:
     uint32 m_u4CurrConnect    = 0;

@@ -67,7 +67,7 @@ public:
         m_nHashID = nHashID;
     }
 
-    int32 GetHashID()
+    int32 GetHashID() const
     {
         return m_nHashID;
     }
