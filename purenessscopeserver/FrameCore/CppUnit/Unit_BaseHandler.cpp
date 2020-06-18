@@ -16,7 +16,7 @@ void CUnit_Basehandler::tearDown(void)
     m_nBaseHandlerID = 0;
 }
 
-void CUnit_Basehandler::Test_Tcp_Common_File_Message(void)
+void CUnit_Basehandler::Test_Tcp_Common_File_Message(void) const
 {
     bool blRet = false;
     _File_Message_Param obj_File_Message_Param;
@@ -49,7 +49,7 @@ void CUnit_Basehandler::Test_Tcp_Common_File_Message(void)
     App_BuffPacketManager::instance()->Delete(pBuffPacket);
 }
 
-void CUnit_Basehandler::Test_Tcp_Common_ClientInfo(void)
+void CUnit_Basehandler::Test_Tcp_Common_ClientInfo(void) const
 {
     bool blRet = true;
     _ClientConnectInfo_Param obj_ClientConnectInfo_Param;
@@ -100,7 +100,7 @@ void CUnit_Basehandler::Test_Tcp_Common_Send_Input_To_Cache(void)
     SAFE_DELETE(pMB);
 }
 
-void CUnit_Basehandler::Test_Tcp_Common_Manager_Timeout_CheckInfo(void)
+void CUnit_Basehandler::Test_Tcp_Common_Manager_Timeout_CheckInfo(void) const
 {
     bool blRet = true;
 
@@ -109,7 +109,7 @@ void CUnit_Basehandler::Test_Tcp_Common_Manager_Timeout_CheckInfo(void)
     CPPUNIT_ASSERT_MESSAGE("[Test_Tcp_Common_Manager_Timeout_CheckInfo]Tcp_Common_Manager_Timeout_CheckInfo is false.", true == blRet);
 }
 
-void CUnit_Basehandler::Test_Tcp_Common_ClientNameInfo(void)
+void CUnit_Basehandler::Test_Tcp_Common_ClientNameInfo(void) const
 {
     bool blRet = false;
 
@@ -125,7 +125,7 @@ void CUnit_Basehandler::Test_Tcp_Common_ClientNameInfo(void)
     }
 }
 
-void CUnit_Basehandler::Test_Udp_Common_Recv_Stream(void)
+void CUnit_Basehandler::Test_Udp_Common_Recv_Stream(void) const
 {
     bool blRet = false;
 
@@ -139,13 +139,13 @@ void CUnit_Basehandler::Test_Udp_Common_Recv_Stream(void)
     //测试以流模式解数据包
     short sVersion = 1;
     short sCommand = (short)0x1000;
-    int nPacketLen = ACE_OS::strlen(szBodyBuff);
+    int nPacketLen = (int)ACE_OS::strlen(szBodyBuff);
 
     memcpy(szSendUDP, (char*)&sVersion, sizeof(short));
-    memcpy((char*)&szSendUDP[2], (char*)&sCommand, sizeof(short));
-    memcpy((char*)&szSendUDP[4], (char*)&nPacketLen, sizeof(int));
-    memcpy((char*)&szSendUDP[8], (char*)&szSession, sizeof(char) * 32);
-    memcpy((char*)&szSendUDP[40], (char*)szBodyBuff, sizeof(char) * nPacketLen);
+    memcpy(&szSendUDP[2], (char*)&sCommand, sizeof(short));
+    memcpy(&szSendUDP[4], (char*)&nPacketLen, sizeof(int));
+    memcpy(&szSendUDP[8], (char*)&szSession, sizeof(char) * 32);
+    memcpy(&szSendUDP[40], (char*)szBodyBuff, sizeof(char) * nPacketLen);
     uint32 u4SendLen = nPacketLen + 40;
 
     ACE_Message_Block* pmb = App_MessageBlockManager::instance()->Create(u4SendLen);
@@ -222,7 +222,7 @@ void CUnit_Basehandler::Test_Udp_Common_Send_Message(void)
 
 }
 
-void CUnit_Basehandler::Test_Tcp_Common_Make_Send_Packet(void)
+void CUnit_Basehandler::Test_Tcp_Common_Make_Send_Packet(void) const
 {
     bool blRet = false;
     ACE_Message_Block* pMbData       = NULL;

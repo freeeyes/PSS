@@ -16,7 +16,7 @@ void CUnit_LoadModule::tearDown(void)
     sprintf_safe(m_szModuleName, MAX_BUFF_20, "TCPTest");
 }
 
-void CUnit_LoadModule::Test_LoadModule(void)
+void CUnit_LoadModule::Test_LoadModule(void) const
 {
     bool blRet = false;
     char szModuleName[MAX_BUFF_20] = { '\0' };

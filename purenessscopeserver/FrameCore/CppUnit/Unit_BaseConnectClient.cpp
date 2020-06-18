@@ -16,7 +16,7 @@ void CUnit_BaseConnectClient::tearDown(void)
     m_u2CommandID = 0;
 }
 
-void CUnit_BaseConnectClient::Test_Make_Common_Dispose_Client_WorkTread_Message(void)
+void CUnit_BaseConnectClient::Test_Make_Common_Dispose_Client_WorkTread_Message(void) const
 {
     bool blRet = false;
 
@@ -38,7 +38,7 @@ void CUnit_BaseConnectClient::Test_Make_Common_Dispose_Client_WorkTread_Message(
     }
 }
 
-void CUnit_BaseConnectClient::Test_Common_Send_ConnectError(void)
+void CUnit_BaseConnectClient::Test_Common_Send_ConnectError(void) const
 {
     ACE_INET_Addr objAddrServer;
     CPostServerData objPostServerData;

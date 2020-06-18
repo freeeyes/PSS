@@ -507,7 +507,7 @@ bool CServerMessageManager::PutMessage(_Server_Message_Info* pMessage)
     }
 }
 
-bool CServerMessageManager::CheckServerMessageThread(ACE_Time_Value const& tvNow)
+bool CServerMessageManager::CheckServerMessageThread(ACE_Time_Value const& tvNow) const
 {
     if(NULL != m_pServerMessageTask)
     {

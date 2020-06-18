@@ -34,7 +34,7 @@ public:
     int Check_Promission(const char* pCommandName, const char* pUser);
 
 private:
-    int Check_Split_User(const char* pUser, const char* pUserList);
+    int Check_Split_User(const char* pUser, const char* pUserList) const;
 
     CHashTable<_Console_Command_Info> m_objHashCommandList;
 };

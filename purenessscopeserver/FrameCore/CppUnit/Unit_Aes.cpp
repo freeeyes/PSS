@@ -42,7 +42,7 @@ void CUnit_Aes::Test_Aes(void)
     sprintf_safe(szEncry, MAX_BUFF_100, "%s", szTest);
 
     //¼ÓÃÜAes
-    int nTestLen = ACE_OS::strlen(szTest);
+    int nTestLen = (int)ACE_OS::strlen(szTest);
     int nEncryLength = nTestLen + (16 - (nTestLen % 16));
 
     m_pAES->Cipher(szEncry, nEncryLength);
@@ -69,7 +69,7 @@ void CUnit_Aes::Test_Aes(void)
     CPPUNIT_ASSERT_MESSAGE("[Test_Aes]Aes is fail.", true == blRet);
 }
 
-void CUnit_Aes::Byte2Hex(const unsigned char* src, int len, char* dest)
+void CUnit_Aes::Byte2Hex(const unsigned char* src, int len, char* dest) const
 {
     for (int i = 0; i < len; ++i)
     {
@@ -83,11 +83,11 @@ void CUnit_Aes::Hex2Byte(const char* src, int len, unsigned char* dest)
 
     for (int i = 0; i < length; ++i)
     {
-        dest[i] = Char2Int(src[i * 2]) * 16 + Char2Int(src[i * 2 + 1]);
+        dest[i] = (unsigned char)Char2Int(src[i * 2]) * 16 + Char2Int(src[i * 2 + 1]);
     }
 }
 
-int CUnit_Aes::Char2Int(char c)
+int CUnit_Aes::Char2Int(char c) const
 {
     if ('0' <= c && c <= '9')
     {

@@ -26,7 +26,7 @@ bool CUnit_ConsoleMessage::Create_Command(const char* pCommand, uint16 u2ReturnC
     IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     //Æ´½ÓÃüÁî×Ö
-    int nCommandLen = ACE_OS::strlen(pCommand);
+    int nCommandLen = (int)ACE_OS::strlen(pCommand);
 
     pmb = new ACE_Message_Block(ACE_OS::strlen(pCommand));
     memcpy_safe(pCommand, nCommandLen, pmb->wr_ptr(), nCommandLen);
@@ -75,7 +75,7 @@ bool CUnit_ConsoleMessage::Create_Command_Error(const char* pCommand)
     IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     //Æ´½ÓÃüÁî×Ö
-    int nCommandLen = ACE_OS::strlen(pCommand);
+    int nCommandLen = (int)ACE_OS::strlen(pCommand);
 
     pmb = new ACE_Message_Block(ACE_OS::strlen(pCommand));
     memcpy_safe(pCommand, nCommandLen, pmb->wr_ptr(), nCommandLen);
@@ -316,7 +316,7 @@ void CUnit_ConsoleMessage::Test_Do_Error_Command(void)
     Create_Command_Error("b xxxxx test");
 }
 
-void CUnit_ConsoleMessage::Test_Check_Console_Ip(void)
+void CUnit_ConsoleMessage::Test_Check_Console_Ip(void) const
 {
     bool blRet = false;
     blRet = check_console_ip("127.0.0.1");

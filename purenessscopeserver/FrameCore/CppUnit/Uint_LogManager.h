@@ -22,7 +22,7 @@ public:
 
     void Test_LogBlockPool(void);
 
-    void Test_Write_Log(void);
+    void Test_Write_Log(void) const;
 
 private:
     CLogBlockPool* m_pLogBlockPool = NULL;

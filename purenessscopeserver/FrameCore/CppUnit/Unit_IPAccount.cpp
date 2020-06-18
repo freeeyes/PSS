@@ -75,7 +75,7 @@ void CUnit_IPAccount::Test_IPAccount_GetInfo(void)
     CPPUNIT_ASSERT_MESSAGE("[Test_IPAccount_GetInfo]GetInfo is fail.", true == blRet);
 }
 
-void CUnit_IPAccount::Test_CConnectAccount(void)
+void CUnit_IPAccount::Test_CConnectAccount(void) const
 {
     bool blRet = false;
     CConnectAccount objConnectAccount;

@@ -37,7 +37,7 @@ void CUnit_LogManager::Test_LogBlockPool(void)
 
 }
 
-void CUnit_LogManager::Test_Write_Log(void)
+void CUnit_LogManager::Test_Write_Log(void) const
 {
     bool blRet = false;
     char szData[MAX_BUFF_20] = { '\0' };

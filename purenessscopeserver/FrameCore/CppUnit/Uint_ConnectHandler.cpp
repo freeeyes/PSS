@@ -93,13 +93,13 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Stream(void)
     //测试以流模式解数据包
     short sVersion = 1;
     short sCommand = (short)0x1000;
-    int nPacketLen = ACE_OS::strlen(szBuff);
+    int nPacketLen = (int)ACE_OS::strlen(szBuff);
 
     memcpy(szSendData, (char*)&sVersion, sizeof(short));
-    memcpy((char*)&szSendData[2], (char*)&sCommand, sizeof(short));
-    memcpy((char*)&szSendData[4], (char*)&nPacketLen, sizeof(int));
-    memcpy((char*)&szSendData[8], (char*)&szSession, sizeof(char) * 32);
-    memcpy((char*)&szSendData[40], (char*)szBuff, sizeof(char) * nPacketLen);
+    memcpy(&szSendData[2], (char*)&sCommand, sizeof(short));
+    memcpy(&szSendData[4], (char*)&nPacketLen, sizeof(int));
+    memcpy(&szSendData[8], (char*)&szSession, sizeof(char) * 32);
+    memcpy(&szSendData[40], (char*)szBuff, sizeof(char) * nPacketLen);
     uint32 u4SendLen = nPacketLen + 40;
 
     ACE_Message_Block* pmb = App_MessageBlockManager::instance()->Create(u4SendLen);
@@ -136,7 +136,7 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Debug(void)
 
     ACE_Message_Block* pmb = new ACE_Message_Block(20);
 
-    memcpy_safe(szText, ACE_OS::strlen(szText), pmb->wr_ptr(), ACE_OS::strlen(szText));
+    memcpy_safe(szText, (uint32)ACE_OS::strlen(szText), pmb->wr_ptr(), (uint32)ACE_OS::strlen(szText));
     pmb->wr_ptr(ACE_OS::strlen(szText));
 
     m_pConnectHandler->SetIsLog(true);
@@ -146,7 +146,7 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Debug(void)
     pmb->release();
 }
 
-void CUnit_ConnectHandler::Test_ConnectHandler_Close_Queue(void)
+void CUnit_ConnectHandler::Test_ConnectHandler_Close_Queue(void) const
 {
     bool blRet = false;
     blRet = App_ConnectManager::instance()->CloseConnect(1);
@@ -158,7 +158,7 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Close_Queue(void)
     }
 }
 
-void CUnit_ConnectHandler::Test_ConnectHandler_PostMessage(void)
+void CUnit_ConnectHandler::Test_ConnectHandler_PostMessage(void) const
 {
     bool blRet = false;
     char szData[10] = { '\0' };
@@ -216,7 +216,7 @@ void CUnit_ConnectHandler::Test_ConnectHandler_PostMessage(void)
     App_BuffPacketManager::instance()->Delete(pBuffPacket);
 }
 
-void CUnit_ConnectHandler::Test_Connect_CheckTime(void)
+void CUnit_ConnectHandler::Test_Connect_CheckTime(void) const
 {
     bool blRet = false;
 

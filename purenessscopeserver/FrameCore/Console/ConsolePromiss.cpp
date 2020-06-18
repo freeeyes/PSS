@@ -77,7 +77,7 @@ int CConsolePromissions::Check_Promission(const char* pCommandName, const char* 
     return Check_Split_User(pUser, pConsole_Command_Info->m_szUser);
 }
 
-int CConsolePromissions::Check_Split_User(const char* pUser, const char* pUserList)
+int CConsolePromissions::Check_Split_User(const char* pUser, const char* pUserList) const
 {
     char szTempUser[MAX_BUFF_50] = { '\0' };
     const char* pPromissPosBegin = pUserList;

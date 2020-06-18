@@ -19,7 +19,7 @@ public:
 
     virtual void tearDown(void);
 
-    void Test_LoadModule(void);
+    void Test_LoadModule(void) const;
 
 private:
     char m_szModuleName[MAX_BUFF_20] = {'\0'};

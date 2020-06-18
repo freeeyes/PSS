@@ -55,13 +55,13 @@ void CUnit_ServerMessageManager::Test_ServerMessageManager(void)
 
     short sVersion = 1;
     short sCommand = (short)0x1000;
-    int nPacketLen = ACE_OS::strlen(szBuff);
+    int nPacketLen = (int)ACE_OS::strlen(szBuff);
 
     memcpy(szSendBuffer, (char*)&sVersion, sizeof(short));
-    memcpy((char*)&szSendBuffer[2], (char*)&sCommand, sizeof(short));
-    memcpy((char*)&szSendBuffer[4], (char*)&nPacketLen, sizeof(int));
-    memcpy((char*)&szSendBuffer[8], (char*)&szSession, sizeof(char) * 32);
-    memcpy((char*)&szSendBuffer[40], (char*)szBuff, sizeof(char) * nPacketLen);
+    memcpy(&szSendBuffer[2], (char*)&sCommand, sizeof(short));
+    memcpy(&szSendBuffer[4], (char*)&nPacketLen, sizeof(int));
+    memcpy(&szSendBuffer[8], (char*)&szSession, sizeof(char) * 32);
+    memcpy(&szSendBuffer[40], (char*)szBuff, sizeof(char) * nPacketLen);
     uint32 u4SendLen = nPacketLen + 40;
 
     ACE_Message_Block* pmb = App_MessageBlockManager::instance()->Create(u4SendLen);

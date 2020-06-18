@@ -97,7 +97,7 @@ public:
     void Test_Do_Message_BuffPacket(void);
     void Test_Do_Message_LoadModule(void);
     void Test_Do_Error_Command(void);
-    void Test_Check_Console_Ip(void);
+    void Test_Check_Console_Ip(void) const;
     void Test_Do_Message_CloseClient(void);
     void Test_Do_Message_UDPClientInfo(void);
     void Test_Do_Message_SetTrackIP(void);

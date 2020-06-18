@@ -4,7 +4,7 @@ void Combo_Common_Return_Data(uint8 u1OutputType, uint8 u1State, const char* pMe
 {
     if (u1OutputType == 0)
     {
-        (*pBuffPacket) << (uint8)u1State;
+        (*pBuffPacket) << u1State;
     }
     else
     {
@@ -18,7 +18,7 @@ void Combo_Common_Head_Data(uint8 u1OutputType, uint32 u4Count, const char* pMes
 {
     if (u1OutputType == 0)
     {
-        (*pBuffPacket) << (uint32)u4Count;
+        (*pBuffPacket) << u4Count;
     }
     else
     {
@@ -340,7 +340,7 @@ void DoMessage_ShowModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
                 uint8  u1MouduleState = 0;
 
                 pModuleInfo->GetModuleState(u4ErrorID);
-                u1MouduleState = u4ErrorID;
+                u1MouduleState = (uint8)u4ErrorID;
 
                 (*pBuffPacket) << u1MouduleState;
                 (*pBuffPacket) << u4ErrorID;
@@ -491,10 +491,10 @@ void DoMessage_WorkThreadState(const _CommandInfo& CommandInfo, IBuffPacket* pBu
             (*pBuffPacket) << (uint32)pCurrThreadInfo->m_tvUpdateTime.sec();
             (*pBuffPacket) << (uint32)pCurrThreadInfo->m_tvCreateTime.sec();
             (*pBuffPacket) << (uint8)pCurrThreadInfo->m_u4State;
-            (*pBuffPacket) << (uint32)pCurrThreadInfo->m_u4RecvPacketCount;
-            (*pBuffPacket) << (uint16)pCurrThreadInfo->m_u2CommandID;
-            (*pBuffPacket) << (uint16)pCurrThreadInfo->m_u2PacketTime;
-            (*pBuffPacket) << (uint32)pCurrThreadInfo->m_u4CurrPacketCount;
+            (*pBuffPacket) << pCurrThreadInfo->m_u4RecvPacketCount;
+            (*pBuffPacket) << pCurrThreadInfo->m_u2CommandID;
+            (*pBuffPacket) << pCurrThreadInfo->m_u2PacketTime;
+            (*pBuffPacket) << pCurrThreadInfo->m_u4CurrPacketCount;
         }
         else
         {
@@ -934,7 +934,7 @@ void DoMessage_ShowServerInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuf
         if (CommandInfo.m_u1OutputType == 0)
         {
             //返回服务器ID
-            uint16 u2SerevrID = GetXmlConfigAttribute(xmlServerID)->id;
+            uint16 u2SerevrID = (uint16)GetXmlConfigAttribute(xmlServerID)->id;
             (*pBuffPacket) << u2SerevrID;
 
             //返回服务器名称
@@ -1221,9 +1221,9 @@ void DoMessage_GetTrackCommand(const _CommandInfo& CommandInfo, IBuffPacket* pBu
     {
         if (CommandInfo.m_u1OutputType == 0)
         {
-            (*pBuffPacket) << (uint16)dyeingcommand.m_u2CommandID;
-            (*pBuffPacket) << (uint16)dyeingcommand.m_u2CurrCount;
-            (*pBuffPacket) << (uint16)dyeingcommand.m_u2MaxCount;
+            (*pBuffPacket) << dyeingcommand.m_u2CommandID;
+            (*pBuffPacket) << dyeingcommand.m_u2CurrCount;
+            (*pBuffPacket) << dyeingcommand.m_u2MaxCount;
         }
         else
         {
@@ -1369,7 +1369,7 @@ void DoMessage_SetLogLevelInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
 
     if (GetLogLevel(CommandInfo.m_szCommandExp, nLogLevel) == true)
     {
-        AppLogManager::instance()->ResetLogData(nLogLevel);
+        AppLogManager::instance()->ResetLogData((uint16)nLogLevel);
 
         if (CommandInfo.m_u1OutputType == 0)
         {
@@ -1397,7 +1397,7 @@ void DoMessage_GetThreadAI(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
 
         if (CommandInfo.m_u1OutputType == 0)
         {
-            (*pBuffPacket) << (uint16)u2ThreadCount;
+            (*pBuffPacket) << u2ThreadCount;
         }
         else
         {
@@ -1444,7 +1444,7 @@ void DoMessage_GetWorkThreadTO(const _CommandInfo& CommandInfo, IBuffPacket* pBu
 
         if (CommandInfo.m_u1OutputType == 0)
         {
-            (*pBuffPacket) << (uint16)u2ThreadCount;
+            (*pBuffPacket) << u2ThreadCount;
         }
         else
         {
@@ -1480,7 +1480,7 @@ void DoMessage_GetWorkThreadTO(const _CommandInfo& CommandInfo, IBuffPacket* pBu
 
         if (CommandInfo.m_u1OutputType == 0)
         {
-            (*pBuffPacket) << (uint16)u2ThreadCount;
+            (*pBuffPacket) << u2ThreadCount;
         }
         else
         {
@@ -1905,7 +1905,8 @@ void DoMessage_TestFileStart(const _CommandInfo& CommandInfo, IBuffPacket* pBuff
 
         if (CommandInfo.m_u1OutputType == 0)
         {
-            (*pBuffPacket) << (int)-1;
+            int nErrorRet = -1;
+            (*pBuffPacket) << nErrorRet;
         }
         else
         {

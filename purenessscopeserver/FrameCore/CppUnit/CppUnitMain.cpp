@@ -51,7 +51,7 @@ CCppUnitMain::~CCppUnitMain()
 
 }
 
-int CCppUnitMain::Run()
+int CCppUnitMain::Run() const
 {
     ofstream out(CPPUNIT_REPORT_PATH);
 

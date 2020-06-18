@@ -225,7 +225,7 @@ bool GetListenInfo(const char* pCommand, _ListenInfo& objListenInfo)
 
     //获得IP类型
     GetCommandParam(pCommand, "-t ", szTempData, MAX_BUFF_100);
-    objListenInfo.m_u1IPType = ACE_OS::atoi(szTempData);
+    objListenInfo.m_u1IPType = (uint8)ACE_OS::atoi(szTempData);
 
     //获得PacketParseID
     GetCommandParam(pCommand, "-n ", szTempData, MAX_BUFF_100);
@@ -249,7 +249,7 @@ bool GetDyeingIP(const char* pCommand, _DyeIPInfo& objDyeIPInfo)
 
     //获得当前个数
     GetCommandParam(pCommand, "-c ", szTempData, MAX_BUFF_100);
-    objDyeIPInfo.m_u2MaxCount = ACE_OS::atoi(szTempData);
+    objDyeIPInfo.m_u2MaxCount = (uint16)ACE_OS::atoi(szTempData);
 
     return true;
 }
@@ -276,7 +276,7 @@ bool GetDyeingCommand(const char* pCommand, _DyeCommandInfo& objDyeCommandInfo)
 
     //获得当前个数
     GetCommandParam(pCommand, "-c ", szTempData, MAX_BUFF_100);
-    objDyeCommandInfo.m_u2MaxCount = ACE_OS::atoi(szTempData);
+    objDyeCommandInfo.m_u2MaxCount = (uint16)ACE_OS::atoi(szTempData);
 
     return true;
 }

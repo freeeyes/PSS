@@ -22,11 +22,11 @@ public:
 
     void Test_Aes(void);
 
-    void Byte2Hex(const unsigned char* src, int len, char* dest);
+    void Byte2Hex(const unsigned char* src, int len, char* dest) const;
 
     void Hex2Byte(const char* src, int len, unsigned char* dest);
 
-    int Char2Int(char c);
+    int Char2Int(char c) const;
 
 private:
     AES* m_pAES = NULL;

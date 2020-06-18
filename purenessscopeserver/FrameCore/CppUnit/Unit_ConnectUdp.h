@@ -21,7 +21,7 @@ public:
 
     virtual void tearDown(void);
 
-    void Test_Connect_Udp_Server(void);
+    void Test_Connect_Udp_Server(void) const;
 private:
     int m_nServerID = 0;
 };

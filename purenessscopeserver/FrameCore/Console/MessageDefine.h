@@ -84,7 +84,7 @@ class _PoolName
 {
 public:
     char   m_szPoolName[MAX_BUFF_50] = {'\0'};   //内存池名字
-    bool   m_blState                 = 0;        //当前内存池创建信息状态
+    bool   m_blState                 = false;    //当前内存池创建信息状态
 };
 
 //协议解析, 公用数据部分

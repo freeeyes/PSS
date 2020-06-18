@@ -251,7 +251,7 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
     return DoCommand(CommandInfo, pCurrBuffPacket, pBuffPacket);
 }
 
-int CConsoleMessage::DoCommand(const _CommandInfo& CommandInfo, IBuffPacket* pCurrBuffPacket, IBuffPacket* pReturnBuffPacket)
+int CConsoleMessage::DoCommand(const _CommandInfo& CommandInfo, IBuffPacket* pCurrBuffPacket, IBuffPacket* pReturnBuffPacket) const
 {
     uint16 u2ReturnCommandID = CONSOLE_COMMAND_UNKNOW;
 
@@ -305,7 +305,7 @@ bool CConsoleMessage::SetConsoleKey(vector<xmlConsoleKeys::_ConsoleKey> vecConso
     return true;
 }
 
-bool CConsoleMessage::CheckConsoleKey(const char* pKey)
+bool CConsoleMessage::CheckConsoleKey(const char* pKey) const
 {
     for (const xmlConsoleKeys::_ConsoleKey conslseKey : m_vecConsolekeyList)
     {

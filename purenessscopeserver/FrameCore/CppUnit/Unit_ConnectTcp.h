@@ -22,9 +22,9 @@ public:
 
     virtual void tearDown(void);
 
-    void Test_Connect_Tcp_Server(void);
+    void Test_Connect_Tcp_Server(void) const;
 
-    void Test_Connect_Tcp_Server_With_Local(void);
+    void Test_Connect_Tcp_Server_With_Local(void) const;
 
 private:
     int m_nServerID = 0;

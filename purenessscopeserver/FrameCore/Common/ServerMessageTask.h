@@ -151,7 +151,7 @@ public:
     bool Start();
     int  Close();
     bool PutMessage(_Server_Message_Info* pMessage);
-    bool CheckServerMessageThread(ACE_Time_Value const& tvNow);
+    bool CheckServerMessageThread(ACE_Time_Value const& tvNow) const;
 
     bool AddClientMessage(IClientMessage* pClientMessage);
     bool DelClientMessage(IClientMessage* pClientMessage);

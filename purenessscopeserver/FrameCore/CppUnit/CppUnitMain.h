@@ -53,7 +53,7 @@ public:
     CCppUnitMain();
     virtual ~CCppUnitMain();
 
-    int Run();
+    int Run() const;
 };
 
 #endif

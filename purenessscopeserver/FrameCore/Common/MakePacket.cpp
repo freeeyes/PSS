@@ -9,7 +9,7 @@ bool CMakePacket::Init() const
     return true;
 }
 
-bool CMakePacket::PutMessageBlock(const _MakePacket* pMakePacket, const ACE_Time_Value& tvNow)
+bool CMakePacket::PutMessageBlock(const _MakePacket* pMakePacket, const ACE_Time_Value& tvNow) const
 {
     if(NULL == pMakePacket)
     {
@@ -168,7 +168,7 @@ void CMakePacket::SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBo
     }
 }
 
-bool CMakePacket::PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, const ACE_Time_Value& tvNow)
+bool CMakePacket::PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, const ACE_Time_Value& tvNow) const
 {
     CMessage* pMessage = App_MessageServiceGroup::instance()->CreateMessage(u4ConnectID, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
 

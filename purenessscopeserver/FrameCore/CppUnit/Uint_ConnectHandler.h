@@ -30,11 +30,11 @@ public:
 
     void Test_ConnectHandler_Debug(void);
 
-    void Test_ConnectHandler_Close_Queue(void);
+    void Test_ConnectHandler_Close_Queue(void) const;
 
-    void Test_ConnectHandler_PostMessage(void);
+    void Test_ConnectHandler_PostMessage(void) const;
 
-    void Test_Connect_CheckTime(void);
+    void Test_Connect_CheckTime(void) const;
 
 private:
     CConnectHandler* m_pConnectHandler = NULL;

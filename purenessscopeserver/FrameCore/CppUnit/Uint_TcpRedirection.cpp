@@ -42,7 +42,7 @@ void CUnit_Redirection::Test_Redirection(void)
     sprintf_safe(szBuffSend, MAX_BUFF_100, "freeeyes");
     send(sockclient1, szBuffSend, ACE_OS::strlen(szBuffSend), 0);
 
-    int nRecvLen = recv(sockclient2, szBuffRecv, MAX_BUFF_100, 0);
+    int nRecvLen = (int)recv(sockclient2, szBuffRecv, MAX_BUFF_100, 0);
 
     if (nRecvLen != (int)ACE_OS::strlen(szBuffSend))
     {
@@ -54,7 +54,7 @@ void CUnit_Redirection::Test_Redirection(void)
     close(sockclient2);
 }
 
-int CUnit_Redirection::Create_client(int nClientPort, const char* pIP, int nServerPort)
+int CUnit_Redirection::Create_client(int nClientPort, const char* pIP, int nServerPort) const
 {
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -65,7 +65,7 @@ int CUnit_Redirection::Create_client(int nClientPort, const char* pIP, int nServ
 
     mine.sin_family = AF_INET;
 
-    mine.sin_port = htons(nClientPort);
+    mine.sin_port = htons((unsigned short)nClientPort);
 
     inet_pton(AF_INET, pIP, &mine.sin_addr);
 
@@ -73,7 +73,7 @@ int CUnit_Redirection::Create_client(int nClientPort, const char* pIP, int nServ
 
     dest.sin_family = AF_INET;
 
-    dest.sin_port = htons(nServerPort);
+    dest.sin_port = htons((unsigned short)nServerPort);
 
     inet_pton(AF_INET, pIP, &dest.sin_addr);
 

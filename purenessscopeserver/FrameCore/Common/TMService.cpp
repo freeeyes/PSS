@@ -123,7 +123,7 @@ int CTMService::Init(int nNeedLoad)
     }
 
     //根据配置文件创建对应函数
-    for (auto& f : m_T2MList)
+    for (const auto& f : m_T2MList)
     {
         m_ThreadQueueManager.Create(f.first);
     }

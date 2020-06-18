@@ -143,7 +143,7 @@ void CUnit_BuffPacket::Read_Write_Binary_BuffPacket(void)
 
     sprintf_safe(szData, 30, "freeeyes");
 
-    m_pBuffPacket->WriteStream(szData, ACE_OS::strlen(szData));
+    m_pBuffPacket->WriteStream(szData, (uint32)ACE_OS::strlen(szData));
 
     if (m_pBuffPacket->GetWriteLen() != ACE_OS::strlen(szData))
     {
@@ -151,7 +151,7 @@ void CUnit_BuffPacket::Read_Write_Binary_BuffPacket(void)
         return;
     }
 
-    uint32 u4ReadLen = ACE_OS::strlen(szData);
+    uint32 u4ReadLen = (uint32)ACE_OS::strlen(szData);
     m_pBuffPacket->ReadStream(szRetData, u4ReadLen);
 
     if (m_pBuffPacket->GetPacketLen() - m_pBuffPacket->GetReadLen() != 0)
