@@ -23,6 +23,7 @@ public:
 
 private:
     CMakePacket* m_pMakePacket = NULL;
+    int m_nTestCount = 0;
 };
 
 #endif
