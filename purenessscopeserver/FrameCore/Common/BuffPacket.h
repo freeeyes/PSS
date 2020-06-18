@@ -45,12 +45,12 @@ public:
     void SetNetSort(bool blState);              //设置字节序开启开关，false为主机字序，true为网络字序
 
     void SetBuffID(uint32 u4BuffID);            //设置BuffID
-    uint32 GetBuffID();                         //得到BuffID
+    uint32 GetBuffID() const;                   //得到BuffID
 
-    int32 GetHashID();                          //设置HashID
+    int32 GetHashID() const;                    //设置HashID
     void SetHashID(int32 nHashID);              //得到HashID
 
-    char* GetError();                           //返回错误信息
+    const char* GetError() const;               //返回错误信息
 
 private:
     void ReadPtr(uint32 u4Size);

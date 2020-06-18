@@ -79,7 +79,7 @@ bool Server_Manager_Common_IObject(IConnectManager* pConnectManager,
     App_ServerObject::instance()->SetPacketManager(dynamic_cast<IPacketManager*>(App_BuffPacketManager::instance()));
     App_ServerObject::instance()->SetClientManager(pClientManager);
     App_ServerObject::instance()->SetUDPConnectManager(pUDPConnectManager);
-    App_ServerObject::instance()->SetTimerManager(dynamic_cast<ActiveTimer*>(App_TimerManager::instance()));
+    App_ServerObject::instance()->SetTimerManager(App_TimerManager::instance());
     App_ServerObject::instance()->SetModuleMessageManager(dynamic_cast<IModuleMessageManager*>(App_ModuleMessageManager::instance()));
     App_ServerObject::instance()->SetControlListen(pControlListen);
     App_ServerObject::instance()->SetModuleInfo(dynamic_cast<IModuleInfo*>(App_ModuleLoader::instance()));
@@ -124,7 +124,8 @@ bool Server_Manager_Common_Addr(uint8 u4IpType, const char* pIP, uint16 u2Port, 
     {
         if (ACE_OS::strcmp(pIP, "INADDR_ANY") == 0)
         {
-            nErr = listenAddr.set(u2Port, (uint32)INADDR_ANY);
+            uint32 u4IPAddr = INADDR_ANY;
+            nErr = listenAddr.set(u2Port, u4IPAddr);
         }
         else
         {
@@ -135,7 +136,8 @@ bool Server_Manager_Common_Addr(uint8 u4IpType, const char* pIP, uint16 u2Port, 
     {
         if (ACE_OS::strcmp(pIP, "INADDR_ANY") == 0)
         {
-            nErr = listenAddr.set(u2Port, (uint32)INADDR_ANY);
+            uint32 u4IPAddr = INADDR_ANY;
+            nErr = listenAddr.set(u2Port, u4IPAddr);
         }
         else
         {

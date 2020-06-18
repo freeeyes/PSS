@@ -93,7 +93,9 @@ bool CBuffPacket::AddBuff(uint32 u4Size)
         uint32 u4OldPacketLen = m_u4PacketLen;
 
         //格式化新创建的内存大小
-        u4Size = (uint32)(((uint32)ceil((double)u4Size/(double)DEFINE_PACKET_ADD))*DEFINE_PACKET_ADD);
+        double dCurrSize      = u4Size;
+        double dPacketAddSize = DEFINE_PACKET_ADD;
+        u4Size = ceil(dCurrSize / dPacketAddSize)*DEFINE_PACKET_ADD;
         m_u4PacketLen += u4Size;
 
         szNewData = (char*)App_ACEMemory::instance()->malloc(m_u4PacketLen);
@@ -388,7 +390,7 @@ CBuffPacket& CBuffPacket::operator >> (int8& n1Data)
 
     if(m_u4WritePtr - m_u4ReadPtr >= sizeof(n1Data))
     {
-        n1Data = *(int8*)ReadPtr();
+        n1Data = *(reinterpret_cast<uint8*>(ReadPtr()));
         ReadPtr((uint32)sizeof(n1Data));
     }
 
@@ -517,7 +519,7 @@ CBuffPacket& CBuffPacket::operator >> (VCHARB_STR& str)
     if(u4Len && m_u4WritePtr - m_u4ReadPtr >= u4Len)
     {
         const char* pData = ReadPtr();
-        ReadPtr((uint32)u4Len);
+        ReadPtr(u4Len);
         str.SetData(pData, u4Len);
     }
     else
@@ -537,7 +539,7 @@ CBuffPacket& CBuffPacket::operator >> (string& str)
     if(u4Len && m_u4WritePtr - m_u4ReadPtr >= u4Len)
     {
         const char* pData = ReadPtr();
-        ReadPtr((uint32)u4Len);
+        ReadPtr(u4Len);
         str = string(pData, u4Len);
     }
 
@@ -1027,7 +1029,7 @@ CBuffPacket& CBuffPacket::operator << (VCHARB_STR& str)
             *this << str.u4Len;
 
             //写入文本内容
-            memcpy_safe(str.text, (uint32)str.u4Len, WritePtr(), (uint32)str.u4Len);
+            memcpy_safe(str.text, str.u4Len, WritePtr(), str.u4Len);
             WritePtr(str.u4Len);
             return *this;
         }
@@ -1038,7 +1040,7 @@ CBuffPacket& CBuffPacket::operator << (VCHARB_STR& str)
         *this << str.u4Len;
 
         //写入文本内容
-        memcpy_safe(str.text, (uint32)str.u4Len, WritePtr(), (uint32)str.u4Len);
+        memcpy_safe(str.text, str.u4Len, WritePtr(), str.u4Len);
         WritePtr(str.u4Len);
         return *this;
     }
@@ -1094,7 +1096,7 @@ void CBuffPacket::SetBuffID(uint32 u4BuffID)
     m_u4BuffID = u4BuffID;
 }
 
-uint32 CBuffPacket::GetBuffID()
+uint32 CBuffPacket::GetBuffID() const 
 {
     return m_u4BuffID;
 }
@@ -1104,12 +1106,12 @@ void CBuffPacket::SetHashID(int32 nHashID)
     m_nHashID = nHashID;
 }
 
-char* CBuffPacket::GetError()
+const char* CBuffPacket::GetError() const
 {
     return m_szError;
 }
 
-int32 CBuffPacket::GetHashID()
+int32 CBuffPacket::GetHashID() const
 {
     return m_nHashID;
 }
