@@ -6,8 +6,6 @@
 
 #include "LogManager.h"
 
-Mutex_Allocator _log_service_mb_allocator;
-
 CLogBlockPool::CLogBlockPool()
 {
 }
@@ -77,13 +75,13 @@ _LogBlockInfo* CLogBlockPool::GetLogBlockInfo()
     return pLogBlockInfo;
 }
 
-void CLogBlockPool::ReturnBlockInfo(_LogBlockInfo* pLogBlockInfo)
+void CLogBlockPool::ReturnBlockInfo(_LogBlockInfo* pLogBlockInfo) const
 {
     pLogBlockInfo->clear();
     pLogBlockInfo->m_blIsUsed = false;
 }
 
-uint32 CLogBlockPool::GetBlockSize()
+uint32 CLogBlockPool::GetBlockSize() const
 {
     return m_u4MaxBlockSize;
 }
@@ -178,7 +176,7 @@ int CLogManager::Stop()
     return 0;
 }
 
-bool CLogManager::IsRun()
+bool CLogManager::IsRun() const
 {
     return m_blRun;
 }
@@ -367,7 +365,7 @@ int CLogManager::WriteLog_r(int nLogType, const char* fmt, uint32 u4Len)
     return nRet;
 }
 
-int CLogManager::WriteToMail_r(int nLogType, uint32 u4MailID, const char* pTitle, const char* fmt, uint32 u4Len)
+int CLogManager::WriteToMail_r(int nLogType, uint16 u2MailID, const char* pTitle, const char* fmt, uint32 u4Len)
 {
     int nRet = 0;
 
@@ -383,7 +381,7 @@ int CLogManager::WriteToMail_r(int nLogType, uint32 u4MailID, const char* pTitle
     if (NULL != pLogBlockInfo)
     {
         ACE_OS::snprintf(pLogBlockInfo->m_pBlock, m_objLogBlockPool.GetBlockSize() - 1, "%s", fmt);
-        nRet = Update_Log_Block(nLogType, &u4MailID, pTitle, pLogBlockInfo);
+        nRet = Update_Log_Block(nLogType, &u2MailID, pTitle, pLogBlockInfo);
     }
 
     m_Logger_Mutex.release();
@@ -501,7 +499,7 @@ int CLogManager::CloseMsgQueue()
     return Task_Common_CloseMsgQueue((ACE_Task<ACE_MT_SYNCH>*)this, m_cond, m_mutex);
 }
 
-int CLogManager::Update_Log_Block(int nLogType, const uint32* pMailID, const char* pTitle, _LogBlockInfo* pLogBlockInfo)
+int CLogManager::Update_Log_Block(int nLogType, const uint16* pMailID, const char* pTitle, _LogBlockInfo* pLogBlockInfo)
 {
     //查看当前日志是否需要入库
     if (GetLogInfoByLogLevel(nLogType) < m_pServerLogger->GetCurrLevel())
@@ -517,11 +515,11 @@ int CLogManager::Update_Log_Block(int nLogType, const uint32* pMailID, const cha
     {
         if (m_blIsMail == false)
         {
-            pLogBlockInfo->m_u4MailID = 0;
+            pLogBlockInfo->m_u2MailID = 0;
         }
         else
         {
-            pLogBlockInfo->m_u4MailID = *pMailID;
+            pLogBlockInfo->m_u2MailID = *pMailID;
         }
 
         ACE_OS::snprintf(pLogBlockInfo->m_szMailTitle, MAX_BUFF_200, "%s", pTitle);

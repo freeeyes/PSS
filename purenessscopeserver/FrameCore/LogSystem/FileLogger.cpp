@@ -36,7 +36,7 @@ void CLogFile::Init()
             }
 
             fseek(fp, 0L, SEEK_END);
-            uint32 u4FileSize = ftell(fp);
+            uint32 u4FileSize = (uint32)ftell(fp);
             fclose(fp);
 
             if (u4FileSize >= m_u4FileMaxSize)
@@ -148,22 +148,22 @@ void CLogFile::SetCurrFileSize(uint32 u4CirrFileSize)
     m_u4CurrFileSize = u4CirrFileSize;
 }
 
-uint32 CLogFile::GetBufferSize()
+uint32 CLogFile::GetBufferSize() const
 {
     return m_u4BufferSize;
 }
 
-uint32 CLogFile::GetFileMaxSize()
+uint32 CLogFile::GetFileMaxSize() const
 {
     return m_u4FileMaxSize;
 }
 
-uint16 CLogFile::GetCurrFileIndex()
+uint16 CLogFile::GetCurrFileIndex() const
 {
     return m_u2CurrFileIndex;
 }
 
-uint32 CLogFile::GetCurrFileSize()
+uint32 CLogFile::GetCurrFileSize() const
 {
     return m_u4CurrFileSize;
 }
@@ -201,7 +201,7 @@ int CLogFile::doLog(_LogBlockInfo* pLogBlockInfo)
     }
 
     //查看是否要发送邮件
-    if (pLogBlockInfo->m_u4MailID > 0 && false == SendMail(pLogBlockInfo))
+    if (pLogBlockInfo->m_u2MailID > 0 && false == SendMail(pLogBlockInfo))
     {
         OUR_DEBUG((LM_INFO, "[CLogFile::doLog](%s)Send mail fail.\n", m_StrlogName.c_str()));
     }
@@ -212,7 +212,7 @@ int CLogFile::doLog(_LogBlockInfo* pLogBlockInfo)
     return 0;
 }
 
-bool CLogFile::SendMail(const _LogBlockInfo* pLogBlockInfo, const xmlMails::_Mail* pMailInfo)
+bool CLogFile::SendMail(const _LogBlockInfo* pLogBlockInfo, const xmlMails::_Mail* pMailInfo) const
 {
     //发送邮件
     const xmlMails::_Mail* pMailAlert = NULL;
@@ -220,7 +220,7 @@ bool CLogFile::SendMail(const _LogBlockInfo* pLogBlockInfo, const xmlMails::_Mai
     //如果没有单独配置，则从配置文件中直接获得
     if(NULL == pMailInfo)
     {
-        pMailAlert = GetXmlConfigAttribute(xmlMails)->GetMailAlert(pLogBlockInfo->m_u4MailID);
+        pMailAlert = GetXmlConfigAttribute(xmlMails)->GetMailAlert(pLogBlockInfo->m_u2MailID);
     }
     else
     {
@@ -229,7 +229,7 @@ bool CLogFile::SendMail(const _LogBlockInfo* pLogBlockInfo, const xmlMails::_Mai
 
     if (NULL == pMailAlert)
     {
-        OUR_DEBUG((LM_ERROR, "[CLogFile::SendMail]MailID(%d) is no find.\n", pLogBlockInfo->m_u4MailID));
+        OUR_DEBUG((LM_ERROR, "[CLogFile::SendMail]MailID(%d) is no find.\n", pLogBlockInfo->m_u2MailID));
         return false;
     }
 
@@ -266,7 +266,7 @@ ACE_TString& CLogFile::GetServerName()
     return m_StrServerName;
 }
 
-int CLogFile::GetDisPlay()
+int CLogFile::GetDisPlay() const
 {
     return m_nDisplay;
 }
@@ -297,7 +297,7 @@ void CLogFile::SetLoggerClass(int nType)
     OUR_DEBUG((LM_INFO, "[ServerLogger](%d)m_StrlogType=%s.\n", nType, m_StrlogType.c_str()));
 }
 
-int CLogFile::GetLoggerClass()
+int CLogFile::GetLoggerClass() const
 {
     if (LOGTYPE_OPERATION == m_StrlogType)
     {
@@ -319,7 +319,7 @@ void CLogFile::SetLoggerID(uint16 u2LogID)
     m_u2LogID = u2LogID;
 }
 
-uint16 CLogFile::GetLoggerID()
+uint16 CLogFile::GetLoggerID() const
 {
     return m_u2LogID;
 }
@@ -329,7 +329,7 @@ void CLogFile::SetLevel(uint16 u2Level)
     m_u2Level = u2Level;
 }
 
-uint16 CLogFile::GetLevel()
+uint16 CLogFile::GetLevel() const
 {
     return m_u2Level;
 }
@@ -522,7 +522,7 @@ bool CFileLogger::Init()
 
     //得到日志池中的当前日志级别
     //此功能感谢宇/ka程枫 的好想法，赞一个，积少成多就会汇聚洪流
-    objXmlOpeation.Read_XML_Data_Single_Uint32("LogLevel", "CurrLevel", m_u4CurrLogLevel);
+    objXmlOpeation.Read_XML_Data_Single_Uint16("LogLevel", "CurrLevel", m_u2CurrLogLevel);
 
     //添加子类的个数
     TiXmlElement* pNextTiXmlElement        = NULL;
@@ -599,10 +599,10 @@ bool CFileLogger::Init()
     return true;
 }
 
-bool CFileLogger::ReSet(uint32 u4CurrLogLevel)
+bool CFileLogger::ReSet(uint16 u2CurrLogLevel)
 {
     //重置日志等级
-    m_u4CurrLogLevel = u4CurrLogLevel;
+    m_u2CurrLogLevel = u2CurrLogLevel;
     return true;
 }
 
@@ -616,9 +616,9 @@ uint32 CFileLogger::GetPoolCount()
     return m_u4PoolCount;
 }
 
-uint32 CFileLogger::GetCurrLevel()
+uint16 CFileLogger::GetCurrLevel()
 {
-    return m_u4CurrLogLevel;
+    return m_u2CurrLogLevel;
 }
 
 uint16 CFileLogger::GetLogID(uint16 u2Index)

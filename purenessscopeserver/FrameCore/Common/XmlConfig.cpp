@@ -539,7 +539,7 @@ bool xmlAlertConnect::Init(CXmlOpeation* pXmlOperation)
            && pXmlOperation->Read_XML_Data_Single_Uint16("AlertConnect", "DisConnectMin", DisConnectMin)
            && pXmlOperation->Read_XML_Data_Single_Uint32("AlertConnect", "DisConnectMax", DisConnectMax)
            && pXmlOperation->Read_XML_Data_Single_Uint32("AlertConnect", "ConnectAlert", ConnectAlert)
-           && pXmlOperation->Read_XML_Data_Single_Uint32("AlertConnect", "MailID", MailID);
+           && pXmlOperation->Read_XML_Data_Single_Uint16("AlertConnect", "MailID", MailID);
 }
 
 bool xmlIP::Init(CXmlOpeation* pXmlOperation)

@@ -74,39 +74,39 @@ public:
 
     void SetCurrFileSize(uint32 u4CirrFileSize);
 
-    uint32 GetBufferSize();
+    uint32 GetBufferSize() const;
 
-    uint32 GetFileMaxSize();
+    uint32 GetFileMaxSize() const;
 
-    uint16 GetCurrFileIndex();
+    uint16 GetCurrFileIndex() const;
 
-    uint32 GetCurrFileSize();
+    uint32 GetCurrFileSize() const;
 
     virtual int doLog(_LogBlockInfo* pLogBlockInfo);
 
-    bool SendMail(const _LogBlockInfo* pLogBlockInfo, const xmlMails::_Mail* pMailInfo = NULL);
+    bool SendMail(const _LogBlockInfo* pLogBlockInfo, const xmlMails::_Mail* pMailInfo = NULL) const;
 
     ACE_TString& GetLoggerName();
 
     ACE_TString& GetServerName();
 
-    int GetDisPlay();
+    int GetDisPlay() const;
 
     void SetDisplay(int nDisplay);
 
     void SetLoggerClass(int nType);
 
-    int GetLoggerClass();
+    int GetLoggerClass() const;
 
     void SetLoggerName(const char* szLoggerName);
 
     void SetLoggerID(uint16 u2LogID);
 
-    uint16 GetLoggerID();
+    uint16 GetLoggerID() const;
 
     void SetLevel(uint16 u2Level);
 
-    uint16 GetLevel();
+    uint16 GetLevel() const;
 
     void SetServerName(const char* szServerName);
 
@@ -146,13 +146,13 @@ public:
     virtual int GetLogTypeCount();
 
     bool Init();
-    virtual bool ReSet(uint32 u4CurrLogLevel);
+    virtual bool ReSet(uint16 u2CurrLogLevel);
     virtual void Close();
 
     virtual uint32 GetBlockSize();
     virtual uint32 GetPoolCount();
 
-    virtual uint32 GetCurrLevel();
+    virtual uint16 GetCurrLevel();
 
     virtual uint16 GetLogID(uint16 u2Index);
     virtual const char*  GetLogInfoByServerName(uint16 u2LogID);
@@ -167,7 +167,7 @@ private:
 
     uint32                         m_u4BlockSize             = 0;
     uint32                         m_u4PoolCount             = 0;
-    uint32                         m_u4CurrLogLevel          = 0;
+    uint16                         m_u2CurrLogLevel          = 0;
 };
 
 #endif

@@ -491,7 +491,7 @@ public:
     uint16 DisConnectMin = 0;
     uint32 DisConnectMax = 0;
     uint32 ConnectAlert  = 20000;
-    uint32 MailID        = 0;
+    uint16 MailID        = 0;
     xmlAlertConnect(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };

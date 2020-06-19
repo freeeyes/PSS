@@ -25,15 +25,16 @@ private:
     unsigned char w[11][4][4];
 
     void KeyExpansion(const unsigned char* key);
-    unsigned char FFmul(unsigned char a, unsigned char b);
+    void KeyExpansion_single(int& i, int& j, int& r, int& c, unsigned char* rc);
+    unsigned char FFmul(unsigned char a, unsigned char b) const;
 
-    void SubBytes(unsigned char state[][4]);
-    void ShiftRows(unsigned char state[][4]);
+    void SubBytes(unsigned char state[][4]) const;
+    void ShiftRows(unsigned char state[][4]) const;
     void MixColumns(unsigned char state[][4]);
-    void AddRoundKey(unsigned char state[][4], unsigned char k[][4]);
+    void AddRoundKey(unsigned char state[][4], unsigned char k[][4]) const;
 
-    void InvSubBytes(unsigned char state[][4]);
-    void InvShiftRows(unsigned char state[][4]);
+    void InvSubBytes(unsigned char state[][4]) const;
+    void InvShiftRows(unsigned char state[][4]) const;
     void InvMixColumns(unsigned char state[][4]);
 };
 

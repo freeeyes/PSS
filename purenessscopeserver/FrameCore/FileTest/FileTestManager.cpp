@@ -22,7 +22,7 @@ FileTestResultInfoSt CFileTestManager::FileTestStart(const char* szXmlFileTestNa
         }
         else
         {
-            m_n4TimerID = App_TimerManager::instance()->schedule(this, (void*)NULL, ACE_OS::gettimeofday() + ACE_Time_Value(m_u4TimeInterval), ACE_Time_Value(m_u4TimeInterval));
+            m_n4TimerID = (uint32)App_TimerManager::instance()->schedule(this, (void*)NULL, ACE_OS::gettimeofday() + ACE_Time_Value(m_u4TimeInterval), ACE_Time_Value(m_u4TimeInterval));
 
             if(-1 == m_n4TimerID)
             {
@@ -71,7 +71,7 @@ void CFileTestManager::HandlerServerResponse(uint32 u4ConnectID)
     {
         ACE_Time_Value atvResponse = ACE_OS::gettimeofday();
 
-        if(m_u4ExpectTime <= (uint32)((uint64)atvResponse.get_msec() - pResponseRecord->m_u8StartTime))
+        if(m_u4ExpectTime <= (uint32)(atvResponse.get_msec() - pResponseRecord->m_u8StartTime))
         {
             //应答时间超过期望时间限制
             OUR_DEBUG((LM_INFO, "[CFileTestManager::HandlerServerResponse]Response time too long m_u4ExpectTime:%d.\n",m_u4ExpectTime));
@@ -213,7 +213,7 @@ bool CFileTestManager::LoadXmlCfg(const char* szXmlFileTestName, FileTestResultI
     return true;
 }
 
-FILE_TEST_RESULT CFileTestManager::ReadTestFile(const char* pFileName, int nType, FileTestDataInfoSt& objFileTestDataInfo)
+FILE_TEST_RESULT CFileTestManager::ReadTestFile(const char* pFileName, int nType, FileTestDataInfoSt& objFileTestDataInfo) const
 {
     ACE_FILE_Connector fConnector;
     ACE_FILE_IO ioFile;
@@ -334,7 +334,7 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
         for (int i = 0; i < nUsedSize; i++)
         {
             //在上一个轮询周期，没有结束的对象
-            if(m_u4ExpectTime <= (uint32)((uint64)tv.get_msec() - vecList[i]->m_u8StartTime))
+            if(m_u4ExpectTime <= (uint32)(tv.get_msec() - vecList[i]->m_u8StartTime))
             {
                 //超过了执行范围时间
                 OUR_DEBUG((LM_INFO, "[CFileTestManager::handle_timeout]Response time too long m_u4ExpectTime:%d.\n", m_u4ExpectTime));
@@ -411,9 +411,9 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
         {
             uint32 u4ConnectID = pResponserecordst->m_u4ConnectID;
 #if PSS_PLATFORM == PLATFORM_WIN
-            App_ProConnectManager::instance()->handle_write_file_stream(u4ConnectID, objFileTestDataInfo.m_szData, objFileTestDataInfo.m_u4DataLength, m_u4ParseID);
+            App_ProConnectManager::instance()->handle_write_file_stream(u4ConnectID, objFileTestDataInfo.m_szData, objFileTestDataInfo.m_u4DataLength, (uint8)m_u4ParseID);
 #else
-            App_ConnectManager::instance()->handle_write_file_stream(u4ConnectID, objFileTestDataInfo.m_szData, objFileTestDataInfo.m_u4DataLength, m_u4ParseID);
+            App_ConnectManager::instance()->handle_write_file_stream(u4ConnectID, objFileTestDataInfo.m_szData, objFileTestDataInfo.m_u4DataLength, (uint8)m_u4ParseID);
 #endif
         }
     }

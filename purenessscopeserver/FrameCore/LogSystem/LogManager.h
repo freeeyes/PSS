@@ -20,9 +20,9 @@ public:
     void Close();
 
     _LogBlockInfo* GetLogBlockInfo();                       //得到一个空余的日志块
-    void ReturnBlockInfo(_LogBlockInfo* pLogBlockInfo);     //归还一个用完的日志块
+    void ReturnBlockInfo(_LogBlockInfo* pLogBlockInfo) const;     //归还一个用完的日志块
 
-    uint32 GetBlockSize();
+    uint32 GetBlockSize() const;
 
 private:
     _LogBlockInfo* m_pLogBlockInfo    = NULL;      //日志池
@@ -43,7 +43,7 @@ public:
     void Init(int nThreadCount = 1, int nQueueMax = MAX_MSG_THREADQUEUE, uint32 u4MailID = 0);
     int Start();
     int Stop();
-    bool IsRun();
+    bool IsRun() const;
 
     int PutLog(_LogBlockInfo* pLogBlockInfo);
     int RegisterLog(IServerLogger* pServerLogger);
@@ -84,7 +84,7 @@ public:
     };
 
     template <class... Args>
-    int WriteToMail_i(int nLogType, uint32 u4MailID, const char* pTitle, const char* fmt, Args&& ... args)
+    int WriteToMail_i(int nLogType, uint16 u2MailID, const char* pTitle, const char* fmt, Args&& ... args)
     {
         int nRet = 0;
         m_Logger_Mutex.acquire();
@@ -93,7 +93,7 @@ public:
         if (NULL != pLogBlockInfo)
         {
             ACE_OS::snprintf(pLogBlockInfo->m_pBlock, m_objLogBlockPool.GetBlockSize() - 1, fmt, convert(std::forward<Args>(args))...);
-            nRet = Update_Log_Block(nLogType, &u4MailID, pTitle, pLogBlockInfo);
+            nRet = Update_Log_Block(nLogType, &u2MailID, pTitle, pLogBlockInfo);
         }
 
         return nRet;
@@ -104,13 +104,13 @@ public:
 
     virtual int WriteLog_r(int nLogType, const char* fmt, uint32 u4Len);
 
-    virtual int WriteToMail_r(int nLogType, uint32 u4MailID, const char* pTitle, const char* fmt, uint32 u4Len);
+    virtual int WriteToMail_r(int nLogType, uint16 u2MailID, const char* pTitle, const char* fmt, uint32 u4Len);
 
 private:
     bool Dispose_Queue();
     int ProcessLog(_LogBlockInfo* pLogBlockInfo);
     virtual int CloseMsgQueue();
-    int Update_Log_Block(int nLogType, const uint32* pMailID, const char* pTitle, _LogBlockInfo* pLogBlockInfo);
+    int Update_Log_Block(int nLogType, const uint16* pMailID, const char* pTitle, _LogBlockInfo* pLogBlockInfo);
 
     //关闭消息队列条件变量
     ACE_Thread_Mutex                  m_mutex;

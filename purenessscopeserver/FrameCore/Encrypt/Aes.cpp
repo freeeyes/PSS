@@ -198,35 +198,40 @@ void AES::KeyExpansion(const unsigned char* key)
     {
         for(j=0; j<4; j++)
         {
-            unsigned char t[4];
-
-            for(r=0; r<4; r++)
-            {
-                t[r] = j ? w[i][r][j-1] : w[i-1][r][3];
-            }
-
-            if(j == 0)
-            {
-                unsigned char temp = t[0];
-
-                for(r=0; r<3; r++)
-                {
-                    t[r] = Sbox[t[(r+1)%4]];
-                }
-
-                t[3] = Sbox[temp];
-                t[0] ^= rc[i-1];
-            }
-
-            for(r=0; r<4; r++)
-            {
-                w[i][r][j] = w[i-1][r][j] ^ t[r];
-            }
+            KeyExpansion_single(i, j, r, c, rc);
         }
     }
 }
 
-unsigned char AES::FFmul(unsigned char a, unsigned char b)
+void AES::KeyExpansion_single(int& i, int& j, int& r, int& c, unsigned char* rc)
+{
+	unsigned char t[4];
+
+	for (r = 0; r < 4; r++)
+	{
+		t[r] = j ? w[i][r][j - 1] : w[i - 1][r][3];
+	}
+
+	if (j == 0)
+	{
+		unsigned char temp = t[0];
+
+		for (r = 0; r < 3; r++)
+		{
+			t[r] = Sbox[t[(r + 1) % 4]];
+		}
+
+		t[3] = Sbox[temp];
+		t[0] ^= rc[i - 1];
+	}
+
+	for (r = 0; r < 4; r++)
+	{
+		w[i][r][j] = w[i - 1][r][j] ^ t[r];
+	}
+}
+
+unsigned char AES::FFmul(unsigned char a, unsigned char b) const
 {
     unsigned char bw[4];
     unsigned char res=0;
@@ -235,7 +240,7 @@ unsigned char AES::FFmul(unsigned char a, unsigned char b)
 
     for(i=1; i<4; i++)
     {
-        bw[i] = bw[i-1]<<1;
+        bw[i] = (unsigned char)(bw[i-1]<<1);
 
         if(bw[i-1]&0x80)
         {
@@ -254,7 +259,7 @@ unsigned char AES::FFmul(unsigned char a, unsigned char b)
     return res;
 }
 
-void AES::SubBytes(unsigned char state[][4])
+void AES::SubBytes(unsigned char state[][4]) const
 {
     int r = 0;
     int c = 0;
@@ -268,7 +273,7 @@ void AES::SubBytes(unsigned char state[][4])
     }
 }
 
-void AES::ShiftRows(unsigned char state[][4])
+void AES::ShiftRows(unsigned char state[][4]) const
 {
     unsigned char t[4];
     int r = 0;
@@ -311,7 +316,7 @@ void AES::MixColumns(unsigned char state[][4])
     }
 }
 
-void AES::AddRoundKey(unsigned char state[][4], unsigned char k[][4])
+void AES::AddRoundKey(unsigned char state[][4], unsigned char k[][4]) const
 {
     int r = 0;
     int c = 0;
@@ -325,7 +330,7 @@ void AES::AddRoundKey(unsigned char state[][4], unsigned char k[][4])
     }
 }
 
-void AES::InvSubBytes(unsigned char state[][4])
+void AES::InvSubBytes(unsigned char state[][4]) const
 {
     int r = 0;
     int c = 0;
@@ -339,7 +344,7 @@ void AES::InvSubBytes(unsigned char state[][4])
     }
 }
 
-void AES::InvShiftRows(unsigned char state[][4])
+void AES::InvShiftRows(unsigned char state[][4]) const
 {
     unsigned char t[4];
     int r = 0;

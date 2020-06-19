@@ -20,7 +20,7 @@ public:
     bool SetConsoleKey(vector<xmlConsoleKeys::_ConsoleKey> vecConsoleKeyList);       //添加验证允许的key值
 
 private:
-    int  ParseCommand_Plugin(const char* pCommand, IBuffPacket* pBuffPacket, uint8& u1OutputType);                        //执行命令(插件内部调用)
+    int  ParseCommand_Plugin(const char* pCommand, IBuffPacket* pBuffPacket, uint8& u1OutputType) const;                  //执行命令(插件内部调用)
     int  ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket, uint8& u1OutputType);                               //执行命令
     int  DoCommand(const _CommandInfo& CommandInfo, IBuffPacket* pCurrBuffPacket, IBuffPacket* pReturnBuffPacket) const;  //处理命令数据
     bool GetCommandInfo(const char* pCommand, _CommandInfo& CommandInfo, bool blCheck = true) const;                      //把命令切割成应该有的数据格式
