@@ -24,7 +24,7 @@ public:
         char szBuff[MAX_BUFF_1024] = { '\0' };
         ACE_OS::snprintf(szBuff, MAX_BUFF_1024, fmt, convert(std::forward<Args>(args))...);
         uint32 u4Size = (uint32)ACE_OS::strlen(szBuff);
-        return WriteToMail_r(nLogType, u4MailID, pTitle, szBuff, u4Size);
+        return WriteToMail_r(nLogType, u2MailID, pTitle, szBuff, u4Size);
     };
 
     //二进制日志记录
