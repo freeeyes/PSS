@@ -73,7 +73,7 @@ void CUnit_CommandAccount::Test_CommandAccount_Alert(void)
     if (0x1000 == CommandAlertDataList[0].m_u2CommandID &&
         1 == CommandAlertDataList[0].m_u4CommandCount &&
         0 == CommandAlertDataList[0].m_u4CurrCount &&
-        0 == CommandAlertDataList[0].m_u4MailID)
+        0 == CommandAlertDataList[0].m_u2MailID)
     {
         blRet = true;
     }
