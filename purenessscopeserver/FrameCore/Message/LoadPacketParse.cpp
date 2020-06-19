@@ -8,7 +8,7 @@ void CLoadPacketParse::Init(int nCount)
 {
     Close();
     //≥ı ºªØHashTable
-    m_objPacketParseList.Init((int)nCount);
+    m_objPacketParseList.Init(nCount);
 }
 
 bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint32 u4HeadLen, const char* pPacketParsePath, const char* szPacketParseName)

@@ -19,7 +19,7 @@ void CWorkThreadAI::Init(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime,
         CConvertBuffer objConvertBuffer;
 
         int nSize = MAX_BUFF_1024;
-        m_u2ReturnDataLen = objConvertBuffer.GetBufferSize(pReturnData, (int)strlen(pReturnData));
+        m_u2ReturnDataLen = (uint16)objConvertBuffer.GetBufferSize(pReturnData, (int)strlen(pReturnData));
 
         if (false == objConvertBuffer.Convertstr2charArray(pReturnData, (int)strlen(pReturnData), (unsigned char*)m_szWTReturnData, nSize))
         {
@@ -130,7 +130,7 @@ char* CWorkThreadAI::GetReturnData()
     return (char* )m_szWTReturnData;
 }
 
-uint16 CWorkThreadAI::GetReturnDataLength()
+uint16 CWorkThreadAI::GetReturnDataLength() const
 {
     return m_u2ReturnDataLen;
 }
@@ -156,7 +156,7 @@ void CWorkThreadAI::ReSet(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime
     m_u4WTStopTime       = u4WTStopTime;
 }
 
-void CWorkThreadAI::GetAIInfo(_WorkThreadAIInfo& objWorkThreadAIInfo)
+void CWorkThreadAI::GetAIInfo(_WorkThreadAIInfo& objWorkThreadAIInfo) const
 {
     objWorkThreadAIInfo.m_u1WTAI           = m_u1WTAI;
     objWorkThreadAIInfo.m_u4DisposeTime    = m_u4DisposeTime;
@@ -165,7 +165,7 @@ void CWorkThreadAI::GetAIInfo(_WorkThreadAIInfo& objWorkThreadAIInfo)
     objWorkThreadAIInfo.m_u4WTTimeoutCount = m_u4WTTimeoutCount;
 }
 
-void CWorkThreadAI::GetAllTimeout(uint32 u4ThreadID, vecCommandTimeout& objTimeout)
+void CWorkThreadAI::GetAllTimeout(uint32 u4ThreadID, vecCommandTimeout& objTimeout) const
 {
     for(_CommandTime* pCommandTime : m_vecCommandTime)
     {
@@ -190,7 +190,7 @@ void CWorkThreadAI::GetAllTimeout(uint32 u4ThreadID, vecCommandTimeout& objTimeo
     }
 }
 
-void CWorkThreadAI::GetAllForbiden(uint32 u4ThreadID, vecCommandTimeout& objForbiden)
+void CWorkThreadAI::GetAllForbiden(uint32 u4ThreadID, vecCommandTimeout& objForbiden) const
 {
     for(const auto& objCommandTimeout : m_vecCommandTimeout)
     {

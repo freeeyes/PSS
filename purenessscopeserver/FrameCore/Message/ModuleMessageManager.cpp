@@ -27,7 +27,7 @@ int CModuleMessageManager::SendFrameMessage(uint16 u2CommandID, uint32 u4Connect
     if(NULL != pHeadPacket)
     {
         ACE_Message_Block* pMb = App_MessageBlockManager::instance()->Create(pHeadPacket->GetPacketLen());
-        memcpy_safe((char* )pHeadPacket->GetData(), pHeadPacket->GetPacketLen(), pMb->wr_ptr(), pHeadPacket->GetPacketLen());
+        memcpy_safe(pHeadPacket->GetData(), pHeadPacket->GetPacketLen(), pMb->wr_ptr(), pHeadPacket->GetPacketLen());
         pMb->wr_ptr(pHeadPacket->GetPacketLen());
         objPacketParse.SetPacket_Head_Curr_Length(pHeadPacket->GetPacketLen());
         objPacketParse.SetPacket_Head_Src_Length(pHeadPacket->GetPacketLen());
@@ -37,7 +37,7 @@ int CModuleMessageManager::SendFrameMessage(uint16 u2CommandID, uint32 u4Connect
     if(NULL != pBodyBuffPacket)
     {
         ACE_Message_Block* pMb = App_MessageBlockManager::instance()->Create(pBodyBuffPacket->GetPacketLen());
-        memcpy_safe((char* )pBodyBuffPacket->GetData(), pBodyBuffPacket->GetPacketLen(), pMb->wr_ptr(), pBodyBuffPacket->GetPacketLen());
+        memcpy_safe(pBodyBuffPacket->GetData(), pBodyBuffPacket->GetPacketLen(), pMb->wr_ptr(), pBodyBuffPacket->GetPacketLen());
         pMb->wr_ptr(pBodyBuffPacket->GetPacketLen());
         objPacketParse.SetPacket_Body_Curr_Length(pBodyBuffPacket->GetPacketLen());
         objPacketParse.SetPacket_Body_Src_Length(pBodyBuffPacket->GetPacketLen());

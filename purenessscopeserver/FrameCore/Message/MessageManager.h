@@ -61,7 +61,7 @@ public:
         m_u2Timeout = u2Timeout;
     }
 
-    uint16 GetCommandTimeout()
+    uint16 GetCommandTimeout() const
     {
         return m_u2Timeout;
     }
@@ -71,7 +71,7 @@ public:
         m_u2CommandID = u2CommandID;
     }
 
-    uint16 GetCommandID()
+    uint16 GetCommandID() const
     {
         return m_u2CommandID;
     }
@@ -131,7 +131,7 @@ public:
     }
 
     //得到个数
-    int GetCount()
+    int GetCount() const
     {
         return (int)m_vecClientCommandList.size();
     }
@@ -165,7 +165,7 @@ public:
 
     bool UnloadModuleCommand(const char* pModuleName, uint8 u1LoadState, uint32 u4ThreadCount);  //卸载指定模块事件，u1State= 1 卸载，2 重载
 
-    int  GetCommandCount();                                            //得到当前注册命令的个数
+    int  GetCommandCount() const;                                      //得到当前注册命令的个数
     CClientCommandList* GetClientCommandExist(uint16 u2CommandID);     //得到当前指令是否已存在当前列表
 
     CHashTable<_ModuleClient>* GetModuleClient();                      //返回所有模块绑定注册命令信息
@@ -173,8 +173,8 @@ public:
     virtual uint32 GetWorkThreadCount();
     virtual uint32 GetWorkThreadByIndex(uint32 u4Index);
 
-    uint16 GetMaxCommandCount();
-    uint32 GetUpdateIndex();
+    uint16 GetMaxCommandCount() const;
+    uint32 GetUpdateIndex() const;
 
     CHashTable<CClientCommandList>* GetHashCommandList();              //得到当前HashCommandList的副本
 

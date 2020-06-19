@@ -149,7 +149,7 @@ public:
         return true;
     }
 private:
-    bool Get_binary_Char(unsigned char cTag, unsigned char& cDes)
+    bool Get_binary_Char(unsigned char cTag, unsigned char& cDes) const
     {
         if(cTag >='A'&&  cTag <='F')
         {
@@ -197,7 +197,7 @@ private:
             return false;
         }
 
-        cTemp = cTemp << 4;
+        cTemp = (unsigned char)(cTemp << 4);
         cData = cData | cTemp;
 
         return true;
@@ -252,23 +252,23 @@ public:
     bool SaveTimeout(uint16 u2CommandID, uint32 u4TimeCost);
 
     char* GetReturnData();
-    uint16 GetReturnDataLength();
+    uint16 GetReturnDataLength() const;
 
-    void GetAIInfo(_WorkThreadAIInfo& objWorkThreadAIInfo);
+    void GetAIInfo(_WorkThreadAIInfo& objWorkThreadAIInfo) const;
 
     void ReSet(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime);
 
     bool CheckCurrTimeout(uint16 u2CommandID, uint64 u8Now);
 
-    void GetAllTimeout(uint32 u4ThreadID, vecCommandTimeout& objTimeout);
-    void GetAllForbiden(uint32 u4ThreadID, vecCommandTimeout& objForbiden);
+    void GetAllTimeout(uint32 u4ThreadID, vecCommandTimeout& objTimeout) const;
+    void GetAllForbiden(uint32 u4ThreadID, vecCommandTimeout& objForbiden) const;
 
 private:
     int Do_Command_Account(uint16 u2CommandID, uint64 u8Now, uint32 u4TimeCost, bool& blRet);   //统计Command的AI数据
 
     uint8      m_u1WTAI                        = 0;           //工作线程AI开关，0为关闭，1为打开
     uint16     m_u2ReturnDataLen               = 0;           //返回数据体长度
-    uint16     m_u4DisposeTime                 = 0;           //业务包处理超时时间
+    uint32     m_u4DisposeTime                 = 0;           //业务包处理超时时间
     uint32     m_u4WTCheckTime                 = 0;           //工作线程超时包的时间范围，单位是秒
     uint32     m_u4WTTimeoutCount              = 0;           //工作线程超时包的单位时间内的超时次数上限
     uint32     m_u4WTStopTime                  = 0;           //停止此命令服务的时间

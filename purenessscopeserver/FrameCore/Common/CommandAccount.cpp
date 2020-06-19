@@ -21,7 +21,7 @@ void CCommandAccount::Init(uint8 u1CommandAccount, uint8 u1Flow, uint16 u2Packet
     m_vecCommandAlertData.clear();
 }
 
-void CCommandAccount::AddCommandAlert(uint16 u2CommandID, uint32 u4Count, uint32 u4MailID)
+void CCommandAccount::AddCommandAlert(uint16 u2CommandID, uint32 u4Count, uint16 u2MailID)
 {
     if(u4Count > 0)
     {
@@ -29,7 +29,7 @@ void CCommandAccount::AddCommandAlert(uint16 u2CommandID, uint32 u4Count, uint32
 
         objCommandAlertData.m_u2CommandID    = u2CommandID;
         objCommandAlertData.m_u4CommandCount = u4Count;
-        objCommandAlertData.m_u4MailID       = u4MailID;
+        objCommandAlertData.m_u2MailID       = u2MailID;
 
         m_vecCommandAlertData.push_back(objCommandAlertData);
     }
@@ -162,7 +162,7 @@ bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_I
                 commandalewrtdata.m_u4CurrCount = 0;
 
                 AppLogManager::instance()->WriteToMail_i(LOG_SYSTEM_PACKETTIME,
-                    commandalewrtdata.m_u4MailID,
+                        commandalewrtdata.m_u2MailID,
                         "Alert",
                         "u2CommandID=%d, m_u4CommandCount more than [%d].",
                         u2CommandID,

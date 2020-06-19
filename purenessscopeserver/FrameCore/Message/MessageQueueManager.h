@@ -46,7 +46,7 @@ public:
         m_nHashID = nHasnID;
     }
 
-    int GetHashID()
+    int GetHashID() const
     {
         return m_nHashID;
     }

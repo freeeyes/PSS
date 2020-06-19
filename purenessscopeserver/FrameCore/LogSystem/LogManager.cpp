@@ -502,7 +502,7 @@ int CLogManager::CloseMsgQueue()
 int CLogManager::Update_Log_Block(int nLogType, const uint16* pMailID, const char* pTitle, _LogBlockInfo* pLogBlockInfo)
 {
     //查看当前日志是否需要入库
-    if (GetLogInfoByLogLevel(nLogType) < m_pServerLogger->GetCurrLevel())
+    if (GetLogInfoByLogLevel((uint16)nLogType) < m_pServerLogger->GetCurrLevel())
     {
         //低于当前日志等级的全部忽略
         return 0;

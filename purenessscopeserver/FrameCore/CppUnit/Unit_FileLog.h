@@ -26,6 +26,7 @@ public:
 
 private:
     CLogFile* m_pLogFile = NULL;
+    int m_nTestCount = 0;
 };
 
 #endif

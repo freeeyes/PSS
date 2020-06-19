@@ -40,7 +40,7 @@ bool CMessageDyeingManager::AddDyeingCommand(uint16 u2CommandID, uint16 u2MaxCou
     return false;
 }
 
-void CMessageDyeingManager::GetDyeingCommand(vec_Dyeing_Command_list& objList)
+void CMessageDyeingManager::GetDyeingCommand(vec_Dyeing_Command_list& objList) const
 {
     for (const _Dyeing_Command& dyeing_command : m_objCommandList)
     {

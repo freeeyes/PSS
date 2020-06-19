@@ -21,12 +21,12 @@ void CMessage::SetHashID(int nHasnID)
     m_nHashID = nHasnID;
 }
 
-int CMessage::GetHashID()
+int CMessage::GetHashID() const
 {
     return m_nHashID;
 }
 
-const char* CMessage::GetError()
+const char* CMessage::GetError() const
 {
     return m_szError;
 }
@@ -57,7 +57,7 @@ ACE_Message_Block* CMessage::GetMessageBody()
     return m_pmbBody;
 }
 
-_MessageBase* CMessage::GetMessageBase()
+_MessageBase* CMessage::GetMessageBase() const
 {
     return m_pMessageBase;
 }
@@ -181,7 +181,7 @@ void CMessagePool::GetCreateInfoList(vector<_Object_Create_Info>& objCreateList)
 
 CMessage* CMessagePool::Create()
 {
-    return dynamic_cast<CMessage*>(CObjectPoolManager<CMessage, ACE_Recursive_Thread_Mutex>::Create(__FILE__, __LINE__));
+    return CObjectPoolManager<CMessage, ACE_Recursive_Thread_Mutex>::Create(__FILE__, __LINE__);
 }
 
 bool CMessagePool::Delete(CMessage* pMessage)

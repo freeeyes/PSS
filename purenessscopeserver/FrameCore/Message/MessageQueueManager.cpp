@@ -17,7 +17,7 @@ void CLogicThreadMessagePool::Close_Callback(int nIndex, CLogicThreadMessage* pM
 
 CLogicThreadMessage* CLogicThreadMessagePool::Create()
 {
-    return dynamic_cast<CLogicThreadMessage*>(CObjectPoolManager<CLogicThreadMessage, ACE_Recursive_Thread_Mutex>::Create(__FILE__, __LINE__));
+    return CObjectPoolManager<CLogicThreadMessage, ACE_Recursive_Thread_Mutex>::Create(__FILE__, __LINE__);
 }
 
 bool CLogicThreadMessagePool::Delete(CLogicThreadMessage* pMessage)
@@ -283,7 +283,7 @@ void CMessageQueueManager::Init()
     m_objMessageIDList.Init(LOGICTHREAD_MESSAGE_MAX_COUNT);
 
     //启动定时器(默认一分钟一次)
-    m_u4TimerID = App_TimerManager::instance()->schedule(this, NULL, ACE_OS::gettimeofday() + ACE_Time_Value(MAX_MSG_STARTTIME), ACE_Time_Value(MAX_MSG_TIMEDELAYTIME));
+    m_u4TimerID = (uint32)App_TimerManager::instance()->schedule(this, NULL, ACE_OS::gettimeofday() + ACE_Time_Value(MAX_MSG_STARTTIME), ACE_Time_Value(MAX_MSG_TIMEDELAYTIME));
 }
 
 void CMessageQueueManager::Close()

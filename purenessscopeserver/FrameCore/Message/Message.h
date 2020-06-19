@@ -13,25 +13,25 @@ class CMessage : public IMessage
 public:
     CMessage(void);
 
-    void Close();
-    void Clear();
+    virtual void Close();
+    virtual void Clear();
 
     void SetHashID(int nHasnID);
-    int  GetHashID();
+    int  GetHashID() const;
 
-    void SetMessageBase(_MessageBase* pMessageBase);
+    virtual void SetMessageBase(_MessageBase* pMessageBase);
 
     ACE_Message_Block* GetMessageHead();
     ACE_Message_Block* GetMessageBody();
 
-    _MessageBase* GetMessageBase();
+    virtual _MessageBase* GetMessageBase() const;
 
-    bool GetPacketHead(_PacketInfo& PacketInfo);
-    bool GetPacketBody(_PacketInfo& PacketInfo);
-    bool SetPacketHead(ACE_Message_Block* pmbHead);
-    bool SetPacketBody(ACE_Message_Block* pmbBody);
+    virtual bool GetPacketHead(_PacketInfo& PacketInfo);
+    virtual bool GetPacketBody(_PacketInfo& PacketInfo);
+    virtual bool SetPacketHead(ACE_Message_Block* pmbHead);
+    virtual bool SetPacketBody(ACE_Message_Block* pmbBody);
 
-    const char* GetError();
+    virtual const char* GetError() const;
 
     ACE_Message_Block*  GetQueueMessage();
 

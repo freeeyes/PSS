@@ -68,11 +68,11 @@ public:
     void GetCommandAlertData(vecCommandAlertData& CommandAlertDataList);   //得到所有超过告警阀值的命令
     void SaveCommandDataLog();                                             //存储统计日志
     void SetThreadState(MESSAGE_SERVICE_THREAD_STATE emState);             //设置线程状态
-    MESSAGE_SERVICE_THREAD_STATE GetThreadState();                         //得到当前线程状态
-    THREADSTATE GetStepState();                                            //得到当前步数相关信息
+    MESSAGE_SERVICE_THREAD_STATE GetThreadState() const;                   //得到当前线程状态
+    THREADSTATE GetStepState() const;                                      //得到当前步数相关信息
     uint32 GetUsedMessageCount();                                          //得到正在使用的Message对象个数
 
-    uint32 GetThreadID();
+    uint32 GetThreadID() const;
 
     void CopyMessageManagerList();                                         //从MessageManager中获得信令列表副本
 
@@ -132,14 +132,14 @@ public:
     CThreadInfoList* GetThreadInfo();
     uint32 GetUsedMessageCount();
 
-    uint32 GetWorkThreadCount();                                                              //得到当前工作线程的数量
+    uint32 GetWorkThreadCount() const;                                                        //得到当前工作线程的数量
     uint32 GetWorkThreadIDByIndex(uint32 u4Index);                                            //得到指定工作线程的线程ID
     void GetWorkThreadAIInfo(vecWorkThreadAIInfo& objvecWorkThreadAIInfo);                    //得到线程工作AI配置信息
     void GetAITO(vecCommandTimeout& objTimeout);                                              //得到所有的AI超时数据包信息
     void GetAITF(vecCommandTimeout& objTimeout);                                              //得到所有的AI封禁数据包信息
     void SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime);  //设置AI
 
-    void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);                    //获得指定命令统计信息
+    void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData) const;              //获得指定命令统计信息
     void GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut);                                    //获得指定流量相关信息
 
     void GetCommandAlertData(vecCommandAlertData& CommandAlertDataList);                      //得到所有超过告警阀值的命令
@@ -162,9 +162,9 @@ private:
     bool KillTimer();
 
     bool CheckWorkThread(const ACE_Time_Value& tvNow);                                                 //检查所有的工作线程状态
-    bool CheckPacketParsePool();                                                                       //检查正在使用的消息解析对象
-    bool CheckPlugInState();                                                                           //检查所有插件状态
-    int32 GetWorkThreadID(uint32 u4ConnectID, EM_CONNECT_IO_TYPE u1PacketType);                         //根据操作类型和ConnectID计算出那个工作线程ID
+    bool CheckPacketParsePool() const;                                                                 //检查正在使用的消息解析对象
+    bool CheckPlugInState() const;                                                                     //检查所有插件状态
+    int32 GetWorkThreadID(uint32 u4ConnectID, EM_CONNECT_IO_TYPE u1PacketType);                        //根据操作类型和ConnectID计算出那个工作线程ID
 
 	typedef vector<CMessageService*> vecMessageService;
 	vecMessageService                                   m_vecMessageService;

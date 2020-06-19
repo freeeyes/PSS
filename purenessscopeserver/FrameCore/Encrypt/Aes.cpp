@@ -198,12 +198,12 @@ void AES::KeyExpansion(const unsigned char* key)
     {
         for(j=0; j<4; j++)
         {
-            KeyExpansion_single(i, j, r, c, rc);
+            KeyExpansion_single(i, j, r,  rc);
         }
     }
 }
 
-void AES::KeyExpansion_single(int& i, int& j, int& r, int& c, unsigned char* rc)
+void AES::KeyExpansion_single(int i, int j, int r, unsigned char* rc)
 {
 	unsigned char t[4];
 
@@ -293,7 +293,7 @@ void AES::ShiftRows(unsigned char state[][4]) const
     }
 }
 
-void AES::MixColumns(unsigned char state[][4])
+void AES::MixColumns(unsigned char state[][4]) const
 {
     unsigned char t[4];
     int r = 0;
@@ -364,7 +364,7 @@ void AES::InvShiftRows(unsigned char state[][4]) const
     }
 }
 
-void AES::InvMixColumns(unsigned char state[][4])
+void AES::InvMixColumns(unsigned char state[][4]) const
 {
     unsigned char t[4];
     int r = 0;

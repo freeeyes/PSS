@@ -19,9 +19,6 @@
     <ClCompile Include="Common\CommandAccount.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="Console\ConsoleMessage.cpp">
-      <Filter>Console\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="LogSystem\FileLogger.cpp">
       <Filter>Log\cppfile</Filter>
     </ClCompile>
@@ -342,6 +339,9 @@
     </ClCompile>
     <ClCompile Include="CppUnit\Unit_EChartlog.cpp">
       <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Console\ConsoleMessage.cpp">
+      <Filter>Console\cppfile</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

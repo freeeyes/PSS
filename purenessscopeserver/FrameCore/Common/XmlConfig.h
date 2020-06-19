@@ -523,9 +523,9 @@ public:
     class _CommandInfo
     {
     public:
-        uint32 CommandID    = 4096;
+        uint16 CommandID    = 4096;
         uint32 CommandCount = 0;
-        uint32 MailID       = 0;
+        uint16 MailID       = 0;
         _CommandInfo() {}
     };
     std::vector<_CommandInfo> vec;

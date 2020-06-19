@@ -63,10 +63,10 @@ public:
     CMessageDyeingManager();
     ~CMessageDyeingManager();
 
-    void AddDyringIP(const char* pClientIP, uint16 u2MaxCount);                    //添加一个IP染色规则
-    bool AddDyeingCommand(uint16 u2CommandID, uint16 u2MaxCount);                  //添加一个命令染色规则
+    void AddDyringIP(const char* pClientIP, uint16 u2MaxCount);                      //添加一个IP染色规则
+    bool AddDyeingCommand(uint16 u2CommandID, uint16 u2MaxCount);                    //添加一个命令染色规则
 
-    void GetDyeingCommand(vec_Dyeing_Command_list& objList);                       //获得当前命令染色状态
+    void GetDyeingCommand(vec_Dyeing_Command_list& objList) const;                   //获得当前命令染色状态
 
     string GetTraceID(const char* pClientIP, short sClintPort, uint16 u2CommandID);  //看看是否输出新的traceID
 

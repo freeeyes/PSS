@@ -99,7 +99,7 @@ int CConsoleMessage::Dispose(const ACE_Message_Block* pmb, IBuffPacket* pBuffPac
     }
 }
 
-int CConsoleMessage::ParsePlugInCommand(const char* pCommand, IBuffPacket* pBuffPacket)
+int CConsoleMessage::ParsePlugInCommand(const char* pCommand, IBuffPacket* pBuffPacket) const
 {
     uint8 u1OutputType = 0;
 

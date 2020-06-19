@@ -564,9 +564,9 @@ bool xmlCommandInfos::Init(CXmlOpeation* pXmlOperation)
     TiXmlElement* pMailID = NULL;
     _CommandInfo commandInfo;
 
-    while (pXmlOperation->Read_XML_Data_Multiple_Uint32("CommandInfo", "CommandID", commandInfo.CommandID, pCommandID)
+    while (pXmlOperation->Read_XML_Data_Multiple_Uint16("CommandInfo", "CommandID", commandInfo.CommandID, pCommandID)
            && pXmlOperation->Read_XML_Data_Multiple_Uint32("CommandInfo", "CommandCount", commandInfo.CommandCount, pCommandCount)
-           && pXmlOperation->Read_XML_Data_Multiple_Uint32("CommandInfo", "MailID", commandInfo.MailID, pMailID))
+           && pXmlOperation->Read_XML_Data_Multiple_Uint16("CommandInfo", "MailID", commandInfo.MailID, pMailID))
     {
         vec.push_back(commandInfo);
     }

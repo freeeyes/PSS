@@ -124,6 +124,7 @@ void CUnit_FileLogger::Test_SendMail(void)
 
     //这里测试邮件发送
     m_pLogFile->SendMail(&objLogBlockInfo, &objMailInfo);
+    m_nTestCount++;
 }
 
 #endif

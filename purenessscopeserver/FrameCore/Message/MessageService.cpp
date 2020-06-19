@@ -265,7 +265,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
                     ptrReturnData,
                     m_WorkThreadAI.GetReturnDataLength(),
                     SENDMESSAGE_NOMAL,
-                    (uint16)COMMAND_RETURN_BUSY,
+                    COMMAND_RETURN_BUSY,
                     PACKET_SEND_IMMEDIATLY,
                     PACKET_IS_SELF_RECYC);
 #endif
@@ -295,7 +295,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 
         //添加统计信息
         m_CommandAccount.SaveCommandData(u2CommandID,
-                                         pMessage->GetMessageBase()->m_u4ListenPort,
+                                         (uint16)pMessage->GetMessageBase()->m_u4ListenPort,
                                          pMessage->GetMessageBase()->m_u1PacketType,
                                          pMessage->GetMessageBase()->m_u4HeadSrcSize + pMessage->GetMessageBase()->m_u4BodySrcSize,
                                          COMMAND_TYPE_IN,
@@ -499,7 +499,7 @@ void CMessageService::GetAIInfo(_WorkThreadAIInfo& objAIInfo)
     m_WorkThreadAI.GetAIInfo(objAIInfo);
 }
 
-uint32 CMessageService::GetThreadID()
+uint32 CMessageService::GetThreadID() const
 {
     return m_u4ThreadID;
 }
@@ -594,12 +594,12 @@ void CMessageService::SetThreadState(MESSAGE_SERVICE_THREAD_STATE emState)
     m_emThreadState = emState;
 }
 
-MESSAGE_SERVICE_THREAD_STATE CMessageService::GetThreadState()
+MESSAGE_SERVICE_THREAD_STATE CMessageService::GetThreadState() const
 {
     return m_emThreadState;
 }
 
-THREADSTATE CMessageService::GetStepState()
+THREADSTATE CMessageService::GetStepState() const
 {
     return m_ThreadInfo.m_u4State;
 }
@@ -793,7 +793,7 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
     GetSystemInfo(&si);
     m_u2CpuNumber = (uint16)si.dwNumberOfProcessors;
 #else
-    m_u2CpuNumber = sysconf(_SC_NPROCESSORS_CONF);
+    m_u2CpuNumber = sysconf((int)_SC_NPROCESSORS_CONF);
 #endif
 
     OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Init]CPU NUmber is %d.\n", m_u2CpuNumber));
@@ -946,7 +946,7 @@ bool CMessageServiceGroup::StartTimer()
 {
     OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::StartTimer] begin....\n"));
 
-    m_u4TimerID = App_TimerManager::instance()->schedule(this, NULL, ACE_OS::gettimeofday() + ACE_Time_Value(MAX_MSG_STARTTIME), ACE_Time_Value(m_u2ThreadTimeCheck));
+    m_u4TimerID = (uint32)App_TimerManager::instance()->schedule(this, NULL, ACE_OS::gettimeofday() + ACE_Time_Value(MAX_MSG_STARTTIME), ACE_Time_Value(m_u2ThreadTimeCheck));
 
     if(0 == m_u4TimerID)
     {
@@ -990,7 +990,7 @@ bool CMessageServiceGroup::CheckWorkThread(const ACE_Time_Value& tvNow)
     return true;
 }
 
-bool CMessageServiceGroup::CheckPacketParsePool()
+bool CMessageServiceGroup::CheckPacketParsePool() const
 {
     AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_PACKETTHREAD, "[CMessageService::handle_timeout] UsedCount = %d, FreeCount= %d.", App_PacketParsePool::instance()->GetUsedCount(), App_PacketParsePool::instance()->GetFreeCount());
     return true;
@@ -1021,7 +1021,7 @@ bool CMessageServiceGroup::CheckCPUAndMemory(bool blTest)
     return true;
 }
 
-bool CMessageServiceGroup::CheckPlugInState()
+bool CMessageServiceGroup::CheckPlugInState() const
 {
     vector<_ModuleInfo*> vecModeInfo;
     App_ModuleLoader::instance()->GetAllModuleInfo(vecModeInfo);
@@ -1104,7 +1104,7 @@ uint32 CMessageServiceGroup::GetUsedMessageCount()
     return u4Count;
 }
 
-uint32 CMessageServiceGroup::GetWorkThreadCount()
+uint32 CMessageServiceGroup::GetWorkThreadCount() const
 {
     return (uint32)m_vecMessageService.size();
 }
@@ -1117,7 +1117,7 @@ uint32 CMessageServiceGroup::GetWorkThreadIDByIndex(uint32 u4Index)
     }
     else
     {
-        return m_vecMessageService[u4Index]->GetThreadInfo()->m_u4ThreadID;
+        return (uint32)m_vecMessageService[u4Index]->GetThreadInfo()->m_u4ThreadID;
     }
 }
 
@@ -1190,7 +1190,7 @@ void CMessageServiceGroup::SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCh
     }
 }
 
-void CMessageServiceGroup::GetCommandData(uint16 u2CommandID, _CommandData& objCommandData)
+void CMessageServiceGroup::GetCommandData(uint16 u2CommandID, _CommandData& objCommandData) const
 {
     for (CMessageService* pMessageService : m_vecMessageService)
     {

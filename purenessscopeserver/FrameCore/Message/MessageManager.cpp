@@ -84,7 +84,7 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1LoadS
     return true;
 }
 
-int CMessageManager::GetCommandCount()
+int CMessageManager::GetCommandCount() const
 {
     return (int)m_u4CurrCommandCount;
 }
@@ -137,12 +137,12 @@ uint32 CMessageManager::GetWorkThreadByIndex(uint32 u4Index)
     return App_MessageServiceGroup::instance()->GetWorkThreadIDByIndex(u4Index);
 }
 
-NAMESPACE::uint16 CMessageManager::GetMaxCommandCount()
+uint16 CMessageManager::GetMaxCommandCount() const
 {
-    return m_u4MaxCommandCount;
+    return (uint16)m_u4MaxCommandCount;
 }
 
-uint32 CMessageManager::GetUpdateIndex()
+uint32 CMessageManager::GetUpdateIndex() const
 {
     return m_u4UpdateIndex;
 }

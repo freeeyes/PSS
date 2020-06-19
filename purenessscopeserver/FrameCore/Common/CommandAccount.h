@@ -48,7 +48,7 @@ class _CommandAlertData
 {
 public:
     uint32 m_u4CommandCount = 0;
-    uint32 m_u4MailID       = 0;
+    uint16 m_u2MailID       = 0;
     uint32 m_u4CurrCount    = 0;
     uint16 m_u2CommandID    = 0;
     uint8  m_u1Minute       = 0;
@@ -176,7 +176,7 @@ public:
 
     void InitName(const char* pName, uint32 u4CommandCount);
     void Init(uint8 u1CommandAccount, uint8 u1Flow, uint16 u2RecvTimeout);
-    void AddCommandAlert(uint16 u2CommandID, uint32 u4Count, uint32 u4MailID);
+    void AddCommandAlert(uint16 u2CommandID, uint32 u4Count, uint16 u2MailID);
 
     bool SaveCommandData(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP,
                          uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,

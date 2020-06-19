@@ -74,9 +74,9 @@ public:
     virtual bool SetPacketHead(ACE_Message_Block* pmbHead) = 0;               //设置包头数据块
     virtual bool SetPacketBody(ACE_Message_Block* pmbBody) = 0;               //设置包体数据块
 
-    virtual _MessageBase* GetMessageBase()                 = 0;               //得到包连接基本信息
+    virtual _MessageBase* GetMessageBase() const           = 0;               //得到包连接基本信息
 
-    virtual const char* GetError()                         = 0;
+    virtual const char* GetError() const                   = 0;
 };
 
 //中间服务器消息类接口
