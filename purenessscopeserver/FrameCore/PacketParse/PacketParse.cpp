@@ -10,7 +10,7 @@ void CPacketParse::SetHashID(int nHashID)
     m_nHashID = nHashID;
 }
 
-int CPacketParse::GetHashID()
+int CPacketParse::GetHashID() const
 {
     return m_nHashID;
 }

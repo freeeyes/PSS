@@ -21,24 +21,24 @@ public:
 
     void Close();
 
-    const char* GetPacketVersion();
-    uint32 GetPacketHeadLen();
-    uint32 GetPacketBodyLen();
+    const char* GetPacketVersion() const;
+    uint32 GetPacketHeadLen() const;
+    uint32 GetPacketBodyLen() const;
 
-    uint16 GetPacketCommandID();
-    bool GetIsHandleHead();
-    uint32 GetPacketHeadSrcLen();
-    uint32 GetPacketBodySrcLen();
+    uint16 GetPacketCommandID() const;
+    bool GetIsHandleHead() const;
+    uint32 GetPacketHeadSrcLen() const;
+    uint32 GetPacketBodySrcLen() const;
 
     void SetSort(uint8 u1Sort);
 
-    void Check_Recv_Unit16(uint16& u2Data);
-    void Check_Recv_Unit32(uint32& u4Data);
-    void Check_Recv_Unit64(uint64& u2Data);
+    void Check_Recv_Unit16(uint16& u2Data) const;
+    void Check_Recv_Unit32(uint32& u4Data) const;
+    void Check_Recv_Unit64(uint64& u2Data) const;
 
-    void Check_Send_Unit16(uint16& u2Data);
-    void Check_Send_Unit32(uint32& u4Data);
-    void Check_Send_Unit64(uint64& u8Data);
+    void Check_Send_Unit16(uint16& u2Data) const;
+    void Check_Send_Unit32(uint32& u4Data) const;
+    void Check_Send_Unit64(uint64& u8Data) const;
 
     ACE_Message_Block* GetMessageHead();
     ACE_Message_Block* GetMessageBody();

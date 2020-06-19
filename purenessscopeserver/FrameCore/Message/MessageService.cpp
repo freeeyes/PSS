@@ -494,7 +494,7 @@ _ThreadInfo* CMessageService::GetThreadInfo()
     return &m_ThreadInfo;
 }
 
-void CMessageService::GetAIInfo(_WorkThreadAIInfo& objAIInfo)
+void CMessageService::GetAIInfo(_WorkThreadAIInfo& objAIInfo) const
 {
     m_WorkThreadAI.GetAIInfo(objAIInfo);
 }
@@ -553,12 +553,12 @@ void CMessageService::CopyMessageManagerList()
 	}
 }
 
-void CMessageService::GetAITO(vecCommandTimeout& objTimeout)
+void CMessageService::GetAITO(vecCommandTimeout& objTimeout) const
 {
     m_WorkThreadAI.GetAllTimeout(m_u4ThreadID, objTimeout);
 }
 
-void CMessageService::GetAITF(vecCommandTimeout& objTimeout)
+void CMessageService::GetAITF(vecCommandTimeout& objTimeout) const
 {
     m_WorkThreadAI.GetAllForbiden(m_u4ThreadID, objTimeout);
 }
@@ -793,7 +793,7 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
     GetSystemInfo(&si);
     m_u2CpuNumber = (uint16)si.dwNumberOfProcessors;
 #else
-    m_u2CpuNumber = sysconf((int)_SC_NPROCESSORS_CONF);
+    m_u2CpuNumber = (uint16)sysconf(_SC_NPROCESSORS_CONF);
 #endif
 
     OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Init]CPU NUmber is %d.\n", m_u2CpuNumber));
@@ -1060,7 +1060,7 @@ bool CMessageServiceGroup::AddDyeingCommand(uint16 u2CommandID, uint16 u2MaxCoun
     return m_objMessageDyeingManager.AddDyeingCommand(u2CommandID, u2MaxCount);
 }
 
-void CMessageServiceGroup::GetDyeingCommand(vec_Dyeing_Command_list& objList)
+void CMessageServiceGroup::GetDyeingCommand(vec_Dyeing_Command_list& objList) const
 {
     m_objMessageDyeingManager.GetDyeingCommand(objList);
 }

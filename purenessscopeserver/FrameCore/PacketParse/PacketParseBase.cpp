@@ -36,37 +36,37 @@ void CPacketParseBase::Close()
     m_blIsHandleHead = true;
 }
 
-const char* CPacketParseBase::GetPacketVersion()
+const char* CPacketParseBase::GetPacketVersion() const
 {
     return m_szPacketVersion;
 }
 
-uint32 CPacketParseBase::GetPacketHeadLen()
+uint32 CPacketParseBase::GetPacketHeadLen() const
 {
     return m_u4PacketHead;
 }
 
-uint32 CPacketParseBase::GetPacketBodyLen()
+uint32 CPacketParseBase::GetPacketBodyLen() const
 {
     return m_u4PacketBody;
 }
 
-uint16 CPacketParseBase::GetPacketCommandID()
+uint16 CPacketParseBase::GetPacketCommandID() const
 {
     return m_u2PacketCommandID;
 }
 
-bool CPacketParseBase::GetIsHandleHead()
+bool CPacketParseBase::GetIsHandleHead() const
 {
     return m_blIsHandleHead;
 }
 
-uint32 CPacketParseBase::GetPacketHeadSrcLen()
+uint32 CPacketParseBase::GetPacketHeadSrcLen() const
 {
     return m_u4HeadSrcSize;
 }
 
-uint32 CPacketParseBase::GetPacketBodySrcLen()
+uint32 CPacketParseBase::GetPacketBodySrcLen() const
 {
     return m_u4BodySrcSize;
 }
@@ -86,7 +86,7 @@ void CPacketParseBase::SetSort(uint8 u1Sort)
     m_u1Sort = u1Sort;
 }
 
-void CPacketParseBase::Check_Recv_Unit16(uint16& u2Data)
+void CPacketParseBase::Check_Recv_Unit16(uint16& u2Data) const
 {
     if(m_u1Sort == 1)
     {
@@ -95,7 +95,7 @@ void CPacketParseBase::Check_Recv_Unit16(uint16& u2Data)
     }
 }
 
-void CPacketParseBase::Check_Recv_Unit32(uint32& u4Data)
+void CPacketParseBase::Check_Recv_Unit32(uint32& u4Data) const
 {
     if(m_u1Sort == 1)
     {
@@ -104,7 +104,7 @@ void CPacketParseBase::Check_Recv_Unit32(uint32& u4Data)
     }
 }
 
-void CPacketParseBase::Check_Recv_Unit64(uint64& u8Data)
+void CPacketParseBase::Check_Recv_Unit64(uint64& u8Data) const
 {
     if(m_u1Sort == 1)
     {
@@ -113,7 +113,7 @@ void CPacketParseBase::Check_Recv_Unit64(uint64& u8Data)
     }
 }
 
-void CPacketParseBase::Check_Send_Unit16(uint16& u2Data)
+void CPacketParseBase::Check_Send_Unit16(uint16& u2Data) const
 {
     if(m_u1Sort == 1)
     {
@@ -122,7 +122,7 @@ void CPacketParseBase::Check_Send_Unit16(uint16& u2Data)
     }
 }
 
-void CPacketParseBase::Check_Send_Unit32(uint32& u4Data)
+void CPacketParseBase::Check_Send_Unit32(uint32& u4Data) const
 {
     if(m_u1Sort == 1)
     {
@@ -131,7 +131,7 @@ void CPacketParseBase::Check_Send_Unit32(uint32& u4Data)
     }
 }
 
-void CPacketParseBase::Check_Send_Unit64(uint64& u8Data)
+void CPacketParseBase::Check_Send_Unit64(uint64& u8Data) const
 {
     if(m_u1Sort == 1)
     {

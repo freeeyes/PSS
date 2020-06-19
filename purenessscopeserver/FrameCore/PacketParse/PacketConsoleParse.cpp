@@ -18,8 +18,6 @@ void CConsolePacketParse::Init()
 
 bool CConsolePacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead, const IMessageBlockManager* pMessageBlockManager)
 {
-    char* pData = pmbHead->rd_ptr();
-
     ACE_UNUSED_ARG(u4ConnectID);
     ACE_UNUSED_ARG(pMessageBlockManager);
 
@@ -31,7 +29,7 @@ bool CConsolePacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* p
     if(u4Len == sizeof(uint32))
     {
         uint32 u4PacketBody = 0;
-        memcpy_safe((char* )pData, (uint32)sizeof(uint32), (char* )&u4PacketBody, (uint32)sizeof(uint32));
+        memcpy_safe(pmbHead->rd_ptr(), (uint32)sizeof(uint32), (char* )&u4PacketBody, (uint32)sizeof(uint32));
 
         SetPacket_Head_Message(pmbHead);
         SetPacket_Body_Src_Length(u4PacketBody);
@@ -72,17 +70,15 @@ bool CConsolePacketParse::SetPacketBody(uint32 u4ConnectID, ACE_Message_Block* p
 }
 
 
-uint32 CConsolePacketParse::MakePacketLength(uint32 u4ConnectID, uint32 u4DataLen, uint16 u2CommandID)
+uint32 CConsolePacketParse::MakePacketLength(uint32 u4ConnectID, uint32 u4DataLen, uint16 u2CommandID) const
 {
-    if(u4ConnectID == 0 && u2CommandID == 0)
-    {
-        //UDP数据包，没有u4ConnectID
-    }
+    ACE_UNUSED_ARG(u4ConnectID);
+    ACE_UNUSED_ARG(u2CommandID);
 
     return u4DataLen + sizeof(uint32);
 }
 
-bool CConsolePacketParse::MakePacket(uint32 u4ConnectID, const char* pData, uint32 u4Len, ACE_Message_Block* pMbData, uint16 u2CommandID)
+bool CConsolePacketParse::MakePacket(uint32 u4ConnectID, const char* pData, uint32 u4Len, ACE_Message_Block* pMbData, uint16 u2CommandID) const
 {
     ACE_UNUSED_ARG(u4ConnectID);
     ACE_UNUSED_ARG(u2CommandID);
@@ -93,7 +89,7 @@ bool CConsolePacketParse::MakePacket(uint32 u4ConnectID, const char* pData, uint
     }
 
     //拼装数据包
-    memcpy_safe((const char* )&u4Len, (uint32)sizeof(uint32), (char* )pMbData->wr_ptr(), (uint32)sizeof(uint32));
+    memcpy_safe((const char* )&u4Len, (uint32)sizeof(uint32), pMbData->wr_ptr(), (uint32)sizeof(uint32));
     pMbData->wr_ptr(sizeof(uint32));
     memcpy_safe(pData, u4Len, pMbData->wr_ptr(), u4Len);
     pMbData->wr_ptr(u4Len);
@@ -103,7 +99,7 @@ bool CConsolePacketParse::MakePacket(uint32 u4ConnectID, const char* pData, uint
 
 
 
-uint8 CConsolePacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurrMessage, const IMessageBlockManager* pMessageBlockManager)
+uint8 CConsolePacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurrMessage, const IMessageBlockManager* pMessageBlockManager) const
 {
     if(0 == u4ConnectID || NULL == pCurrMessage || NULL == pMessageBlockManager)
     {
@@ -117,7 +113,7 @@ uint8 CConsolePacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block
 }
 
 
-bool CConsolePacketParse::Connect( uint32 u4ConnectID, _ClientIPInfo const& objClientIPInfo, _ClientIPInfo const& objLocalIPInfo)
+bool CConsolePacketParse::Connect( uint32 u4ConnectID, _ClientIPInfo const& objClientIPInfo, _ClientIPInfo const& objLocalIPInfo) const
 {
     //这里添加你对连接建立的逻辑处理，如果没有则不用在这里写任何代码
     //返回false，则连接会断开
@@ -131,7 +127,7 @@ bool CConsolePacketParse::Connect( uint32 u4ConnectID, _ClientIPInfo const& objC
     return true;
 }
 
-void CConsolePacketParse::DisConnect( uint32 u4ConnectID )
+void CConsolePacketParse::DisConnect( uint32 u4ConnectID ) const
 {
     //这里添加你对连接断开的逻辑处理
     if(u4ConnectID == 0)

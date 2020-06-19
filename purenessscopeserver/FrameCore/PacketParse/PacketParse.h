@@ -23,7 +23,7 @@ public:
     void Init();
 
     void SetHashID(int nHashID);
-    int  GetHashID();
+    int  GetHashID() const;
 
 private:
     int m_nHashID = 0;

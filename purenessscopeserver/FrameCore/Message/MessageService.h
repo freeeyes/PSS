@@ -58,9 +58,9 @@ public:
     _ThreadInfo* GetThreadInfo();
     bool SaveThreadInfoData(const ACE_Time_Value& tvNow);   //记录当前工作线程状态信息日志
 
-    void GetAIInfo(_WorkThreadAIInfo& objAIInfo);           //得到所有工作线程的AI配置
-    void GetAITO(vecCommandTimeout& objTimeout);            //得到所有的AI超时数据包信息
-    void GetAITF(vecCommandTimeout& objTimeout);            //得到所有的AI封禁数据包信息
+    void GetAIInfo(_WorkThreadAIInfo& objAIInfo) const;           //得到所有工作线程的AI配置
+    void GetAITO(vecCommandTimeout& objTimeout) const;            //得到所有的AI超时数据包信息
+    void GetAITF(vecCommandTimeout& objTimeout) const;            //得到所有的AI封禁数据包信息
     void SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime);  //设置AI
 
     _CommandData* GetCommandData(uint16 u2CommandID);                      //得到命令相关信息
@@ -152,7 +152,7 @@ public:
 
     void AddDyringIP(const char* pClientIP, uint16 u2MaxCount);                               //染色指定的IP
     bool AddDyeingCommand(uint16 u2CommandID, uint16 u2MaxCount);                             //染色指定的CommandID
-    void GetDyeingCommand(vec_Dyeing_Command_list& objList);                                  //获得当前命令染色状态
+    void GetDyeingCommand(vec_Dyeing_Command_list& objList) const;                            //获得当前命令染色状态
 
     void GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_Account);                  //得到当前列表描述信息
     bool CheckCPUAndMemory(bool blTest = false);                                              //检查CPU和内存
