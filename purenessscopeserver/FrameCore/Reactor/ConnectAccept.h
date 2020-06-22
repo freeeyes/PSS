@@ -16,7 +16,7 @@ public:
 
     void InitClientReactor(uint32 u4ClientReactorCount);
     void SetPacketParseInfoID(uint32 u4PaccketParseInfoID);
-    uint32 GetPacketParseInfoID();
+    uint32 GetPacketParseInfoID() const;
 
 protected:
     virtual int make_svc_handler(CConnectHandler*& sh);
@@ -37,12 +37,12 @@ public:
 
     int Run_Open(ACE_Reactor* reactor);
 
-    char*  GetListenIP();
-    uint32 GetListenPort();
+    const char*  GetListenIP() const;
+    uint32 GetListenPort() const;
 
 private:
     char   m_szListenIP[MAX_BUFF_20] = {'\0'};
-    uint32 m_u4Port                  = 0;
+    uint16 m_u2Port                  = 0;
     uint32 m_u4AcceptCount           = 0;        //接收的总连接数
     uint32 m_u4ClientReactorCount    = 1;        //客户端反应器的个数
     uint32 m_u4PacketParseInfoID     = 0;        //处理包解析的模块ID

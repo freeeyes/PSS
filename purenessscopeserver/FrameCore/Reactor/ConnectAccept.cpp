@@ -17,7 +17,7 @@ void ConnectAcceptor::SetPacketParseInfoID(uint32 u4PaccketParseInfoID)
     m_u4PacketParseInfoID = u4PaccketParseInfoID;
 }
 
-uint32 ConnectAcceptor::GetPacketParseInfoID()
+uint32 ConnectAcceptor::GetPacketParseInfoID() const
 {
     return m_u4PacketParseInfoID;
 }
@@ -40,7 +40,7 @@ int ConnectAcceptor::make_svc_handler(CConnectHandler*& sh)
 
         if (NULL != pConnectHandler)
         {
-            pConnectHandler->SetLocalIPInfo(m_szListenIP, m_u4Port);
+            pConnectHandler->SetLocalIPInfo(m_szListenIP, m_u2Port);
 
             //这里会根据反应器线程配置，自动匹配一个空闲的反应器
             int nIndex = (int)(m_u4AcceptCount % m_u4ClientReactorCount);
@@ -70,7 +70,7 @@ int ConnectAcceptor::open2(const ACE_INET_Addr& local_addr, ACE_Reactor* reactor
 
     //添加记录监听服务器的IP和端口地址
     sprintf_safe(m_szListenIP, MAX_BUFF_20, "%s", local_addr.get_host_addr());
-    m_u4Port = (uint32)local_addr.get_port_number();
+    m_u2Port = local_addr.get_port_number();
 
     if (reactor == 0)
     {
@@ -110,7 +110,7 @@ int ConnectAcceptor::Init_Open(const ACE_INET_Addr& local_addr, int flags, int u
 {
     //添加记录监听服务器的IP和端口地址
     sprintf_safe(m_szListenIP, MAX_BUFF_20, "%s", local_addr.get_host_addr());
-    m_u4Port = (uint32)local_addr.get_port_number();
+    m_u2Port = local_addr.get_port_number();
 
     this->flags_ = flags;
     this->use_select_ = use_select;
@@ -146,14 +146,14 @@ int ConnectAcceptor::Run_Open(ACE_Reactor* reactor)
     return result;
 }
 
-char* ConnectAcceptor::GetListenIP()
+const char* ConnectAcceptor::GetListenIP() const
 {
     return m_szListenIP;
 }
 
-uint32 ConnectAcceptor::GetListenPort()
+uint32 ConnectAcceptor::GetListenPort() const
 {
-    return m_u4Port;
+    return m_u2Port;
 }
 
 //==============================================================================

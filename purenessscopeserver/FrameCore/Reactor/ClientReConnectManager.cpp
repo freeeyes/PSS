@@ -158,7 +158,7 @@ bool CReactorClientInfo::SendData(ACE_Message_Block* pmblk)
     }
 }
 
-int CReactorClientInfo::GetServerID()
+int CReactorClientInfo::GetServerID() const
 {
     return m_nServerID;
 }
@@ -190,12 +190,12 @@ IClientMessage* CReactorClientInfo::GetClientMessage()
     return m_pClientMessage;
 }
 
-ACE_INET_Addr CReactorClientInfo::GetServerAddr()
+ACE_INET_Addr CReactorClientInfo::GetServerAddr() const
 {
     return m_AddrServer;
 }
 
-EM_Server_Connect_State CReactorClientInfo::GetServerConnectState()
+EM_Server_Connect_State CReactorClientInfo::GetServerConnectState() const
 {
     return m_emConnectState;
 }
@@ -210,7 +210,7 @@ void CReactorClientInfo::SetPacketParseID(uint32 u4PacketParseID)
     m_u4PacketParseID = u4PacketParseID;
 }
 
-uint32 CReactorClientInfo::GetPacketParseID()
+uint32 CReactorClientInfo::GetPacketParseID() const
 {
     return m_u4PacketParseID;
 }
@@ -253,10 +253,10 @@ bool CClientReConnectManager::Init(ACE_Reactor* pReactor)
     m_u4MaxPoolCount = GetXmlConfigAttribute(xmlConnectServer)->Count;
 
     //初始化Hash数组(TCP)
-    m_objClientTCPList.Init((int)m_u4MaxPoolCount);
+    m_objClientTCPList.Init(m_u4MaxPoolCount);
 
     //初始化Hash数组(UDP)
-    m_objClientUDPList.Init((int)m_u4MaxPoolCount);
+    m_objClientUDPList.Init(m_u4MaxPoolCount);
 
     m_u4ConnectServerTimeout = GetXmlConfigAttribute(xmlConnectServer)->TimeInterval * 1000; //转换为微妙
 
@@ -481,7 +481,7 @@ bool CClientReConnectManager::ConnectUDP(int nServerID, const char* pIP, uint16 
     else
     {
         //如果是UDP广播
-        AddrLocal.set(u2Port, (uint32)INADDR_ANY);
+        AddrLocal.set(u2Port, INADDR_ANY);
     }
 
     if (nErr != 0)
@@ -648,7 +648,7 @@ bool CClientReConnectManager::SendData(int nServerID, char*& pData, int nSize, b
         return false;
     }
 
-    memcpy_safe((char* )pData, (uint32)nSize, pmblk->wr_ptr(), (uint32)nSize);
+    memcpy_safe(pData, (uint32)nSize, pmblk->wr_ptr(), (uint32)nSize);
     pmblk->wr_ptr(nSize);
 
     if (true == blIsDelete)
@@ -694,7 +694,7 @@ bool CClientReConnectManager::SendDataUDP(int nServerID, const char* pIP, uint16
 bool CClientReConnectManager::StartConnectTask(int nIntervalTime)
 {
     CancelConnectTask();
-    m_nTaskID = App_TimerManager::instance()->schedule(this, (void*)NULL, ACE_OS::gettimeofday() + ACE_Time_Value(nIntervalTime), ACE_Time_Value(nIntervalTime));
+    m_nTaskID = (int)App_TimerManager::instance()->schedule(this, (void*)NULL, ACE_OS::gettimeofday() + ACE_Time_Value(nIntervalTime), ACE_Time_Value(nIntervalTime));
 
     if (m_nTaskID == -1)
     {
@@ -760,7 +760,7 @@ void CClientReConnectManager::Close()
     OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]End.\n"));
 }
 
-bool CClientReConnectManager::ConnectTcpInit(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CReactorClientInfo*& pClientInfo, uint32 u4PacketParseID)
+bool CClientReConnectManager::ConnectTcpInit(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, uint16 u2LocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CReactorClientInfo*& pClientInfo, uint32 u4PacketParseID)
 {
     //查找已有连接
     char szServerID[10] = { '\0' };
@@ -809,9 +809,9 @@ bool CClientReConnectManager::ConnectTcpInit(int nServerID, const char* pIP, uin
     }
 
     //设置本地IP和端口
-    if (NULL != pLocalIP && nLocalPort > 0)
+    if (NULL != pLocalIP && u2LocalPort > 0)
     {
-        pClientInfo->SetLocalAddr(pLocalIP, nLocalPort, u1LocalIPType);
+        pClientInfo->SetLocalAddr(pLocalIP, u2LocalPort, u1LocalIPType);
     }
 
     //添加进hash

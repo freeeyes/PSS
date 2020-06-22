@@ -25,16 +25,16 @@ public:
     void SetLocalAddr(const char* pIP, uint16 u2Port, uint8 u1IPType);                         //绑定本地的IP和端口
     bool Run(bool blIsReady, EM_Server_Connect_State emState = EM_Server_Connect_State::SERVER_CONNECT_RECONNECT);  //开始链接
     bool SendData(ACE_Message_Block* pmblk);                                               //发送数据
-    int  GetServerID();                                                                    //得到服务器ID
+    int  GetServerID() const;                                                              //得到服务器ID
     bool Close();                                                                          //关闭服务器链接
     void SetConnectClient(CConnectClient* pConnectClient);                                 //设置链接状态
     CConnectClient* GetConnectClient();                                                    //得到ProConnectClient指针
     IClientMessage* GetClientMessage();                                                    //获得当前的消息处理指针
-    ACE_INET_Addr GetServerAddr();                                                         //获得服务器的地址
-    EM_Server_Connect_State GetServerConnectState();                                       //得到当前连接状态
+    ACE_INET_Addr GetServerAddr() const;                                                   //获得服务器的地址
+    EM_Server_Connect_State GetServerConnectState() const;                                 //得到当前连接状态
     void SetServerConnectState(EM_Server_Connect_State objState);                          //设置当前连接状态
     void SetPacketParseID(uint32 u4PacketParseID);                                         //设置解析器ID
-    uint32 GetPacketParseID();                                                             //获得解析器ID
+    uint32 GetPacketParseID() const;                                                       //获得解析器ID
 
 private:
     ACE_INET_Addr              m_AddrLocal;                               //本地的连接地址（可以指定）
@@ -87,7 +87,7 @@ public:
     virtual int handle_timeout(const ACE_Time_Value& current_time, const void* act = 0);               //定时器执行
 
 private:
-    bool ConnectTcpInit(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CReactorClientInfo*& pClientInfo, uint32 u4PacketParseID = 0);
+    bool ConnectTcpInit(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, uint16 u2LocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CReactorClientInfo*& pClientInfo, uint32 u4PacketParseID = 0);
     bool ConnectUdpInit(int nServerID, CReactorUDPClient*& pReactorUDPClient);
 
 public:
