@@ -226,9 +226,9 @@ extern "C"
         OUR_DEBUG((LM_INFO, "[CPacketParse::Connect]u4ConnectID=%d,objClientIPInfo=(%s:%d),objLocalIPInfo=(%s:%d).\n",
                    u4ConnectID,
                    objClientIPInfo.m_szClientIP,
-                   objClientIPInfo.m_nPort,
+                   objClientIPInfo.m_u2Port,
                    objLocalIPInfo.m_szClientIP,
-                   objLocalIPInfo.m_nPort));
+                   objLocalIPInfo.m_u2Port));
         return false;
         PACKETPARSE_SHOW_END
 
