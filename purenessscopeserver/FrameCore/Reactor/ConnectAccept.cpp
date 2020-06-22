@@ -212,7 +212,7 @@ bool CConnectAcceptorManager::Close(const char* pIP, uint32 n4Port)
     vecConnectAcceptor::iterator b = m_vecConnectAcceptor.begin();
     while(b != m_vecConnectAcceptor.end())
     {
-        ConnectAcceptor* pConnectAcceptor = (ConnectAcceptor*)(*b);
+        ConnectAcceptor* pConnectAcceptor = *b;
 
 		if (ACE_OS::strcmp(pConnectAcceptor->GetListenIP(), pIP) == 0
 			&& pConnectAcceptor->GetListenPort() == n4Port)
@@ -228,7 +228,7 @@ bool CConnectAcceptorManager::Close(const char* pIP, uint32 n4Port)
     return true;
 }
 
-int CConnectAcceptorManager::GetCount()
+int CConnectAcceptorManager::GetCount() const
 {
     return (int)m_vecConnectAcceptor.size();
 }
@@ -243,7 +243,7 @@ ConnectAcceptor* CConnectAcceptorManager::GetConnectAcceptor(int nIndex)
     return m_vecConnectAcceptor[nIndex];
 }
 
-const char* CConnectAcceptorManager::GetError()
+const char* CConnectAcceptorManager::GetError() const
 {
     return m_szError;
 }
@@ -254,7 +254,7 @@ bool CConnectAcceptorManager::CheckIPInfo(const char* pIP, uint32 n4Port)
 	vecConnectAcceptor::iterator b = m_vecConnectAcceptor.begin();
 	while (b != m_vecConnectAcceptor.end())
     {
-        ConnectAcceptor* pConnectAcceptor = (ConnectAcceptor*)(*b);
+        ConnectAcceptor* pConnectAcceptor = *b;
 
         if (ACE_OS::strcmp(pConnectAcceptor->GetListenIP(), pIP) == 0
             && pConnectAcceptor->GetListenPort() == n4Port)

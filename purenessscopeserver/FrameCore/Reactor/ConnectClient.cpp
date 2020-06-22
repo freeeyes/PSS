@@ -216,7 +216,7 @@ int CConnectClient::handle_input(ACE_HANDLE fd)
 
             if(EM_s2s::S2S_NEED_CALLBACK == m_ems2s)
             {
-                m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+                m_pClientMessage->ConnectError(ACE_OS::last_error(), objServerIPInfo);
             }
         }
 
@@ -238,7 +238,7 @@ int CConnectClient::handle_input(ACE_HANDLE fd)
 
             if(EM_s2s::S2S_NEED_CALLBACK == m_ems2s)
             {
-                m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+                m_pClientMessage->ConnectError(ACE_OS::last_error(), objServerIPInfo);
             }
         }
 
@@ -269,7 +269,7 @@ int CConnectClient::RecvData()
 
         if(EM_s2s::S2S_NEED_CALLBACK == m_ems2s)
         {
-            m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+            m_pClientMessage->ConnectError(ACE_OS::last_error(), objServerIPInfo);
         }
 
         return -1;
@@ -391,7 +391,7 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
     return 0;
 }
 
-void CConnectClient::Output_Debug_Data(const ACE_Message_Block* pMbData, int nLogType, bool blLog)
+void CConnectClient::Output_Debug_Data(const ACE_Message_Block* pMbData, int nLogType, bool blLog) const
 {
     char szPacketDebugData[MAX_BUFF_1024] = { '\0' };
 
@@ -500,7 +500,7 @@ int CConnectClient::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
                 _ClientIPInfo objServerIPInfo;
                 sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
                 objServerIPInfo.m_u2Port = m_addrRemote.get_port_number();
-                m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
+                m_pClientMessage->ConnectError(ACE_OS::last_error(), objServerIPInfo);
 
                 OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, error = %d.\n", GetServerID(), errno));
                 App_MessageBlockManager::instance()->Close(pmbSendData);
@@ -551,7 +551,7 @@ void CConnectClient::SetServerID(int nServerID)
     m_nServerID = nServerID;
 }
 
-int CConnectClient::GetServerID()
+int CConnectClient::GetServerID() const
 {
     return m_nServerID;
 }
@@ -620,7 +620,7 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
     return true;
 }
 
-_ClientConnectInfo CConnectClient::GetClientConnectInfo()
+_ClientConnectInfo CConnectClient::GetClientConnectInfo() const
 {
     _ClientConnectInfo ClientConnectInfo;
     ClientConnectInfo.m_blValid       = true;
@@ -635,7 +635,7 @@ _ClientConnectInfo CConnectClient::GetClientConnectInfo()
     return ClientConnectInfo;
 }
 
-bool CConnectClient::GetTimeout(ACE_Time_Value const& tvNow)
+bool CConnectClient::GetTimeout(ACE_Time_Value const& tvNow) const
 {
     ACE_Time_Value tvIntval(tvNow - m_atvRecv);
 

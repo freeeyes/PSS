@@ -55,10 +55,10 @@ public:
 
     bool InitConnectAcceptor(int nCount, uint32 u4ClientReactorCount);
     void Close();
-    int GetCount();
+    int GetCount() const;
     ConnectAcceptor* GetConnectAcceptor(int nIndex);
     ConnectAcceptor* GetNewConnectAcceptor();
-    const char* GetError();
+    const char* GetError() const;
 
     bool Close(const char* pIP, uint32 n4Port);
     bool CheckIPInfo(const char* pIP, uint32 n4Port);

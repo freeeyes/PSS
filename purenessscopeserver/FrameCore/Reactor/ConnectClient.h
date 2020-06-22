@@ -36,17 +36,17 @@ public:
 
     void SetClientMessage(IClientMessage* pClientMessage); //设置消息接收处理类
     void SetServerID(int nServerID);                       //设置当前的ServerID
-    int  GetServerID();                                    //获得当前ServerID
+    int  GetServerID() const;                              //获得当前ServerID
     void SetPacketParseInfoID(uint32 u4PacketParseInfoID); //设置PacketParseID
     bool SendData(ACE_Message_Block* pmblk);
     void Close();
 
-    bool GetTimeout(ACE_Time_Value const& tvNow);                 //获得当前数据处理是否超时
+    bool GetTimeout(ACE_Time_Value const& tvNow) const;           //获得当前数据处理是否超时
 
-    void ClientClose();                                    //主动关闭
-    _ClientConnectInfo GetClientConnectInfo();             //得到当前链接信息
+    void ClientClose();                                           //主动关闭
+    _ClientConnectInfo GetClientConnectInfo() const;              //得到当前链接信息
 
-    void Output_Debug_Data(const ACE_Message_Block* pMbData, int nLogType, bool blLog = false);     //输出DEBUG信息
+    void Output_Debug_Data(const ACE_Message_Block* pMbData, int nLogType, bool blLog = false) const;     //输出DEBUG信息
 
 private:
     int RecvData();                                                       //接收数据，正常模式
