@@ -158,6 +158,7 @@ matrix:
       # - cd $TRAVIS_BUILD_DIR/Build/Linux/
       # - tail -f -n 10 pssout.file
       - killall -9 PurenessScopeServer  
+      - cd $TRAVIS_BUILD_DIR/Build/Linux/
       - cat pssout.file
       
       - cd $TRAVIS_BUILD_DIR
