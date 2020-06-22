@@ -36,9 +36,9 @@ public:
     void Close();
 
     bool Init(int nReactorType, int nThreadCount, int nMaxHandleCount = 0);
-    const char* GetError();
-    int GetThreadCount();
-    int GetReactorType();
+    const char* GetError() const;
+    int GetThreadCount() const;
+    int GetReactorType() const;
     ACE_Reactor* GetReactor();
 
     bool Start();
@@ -48,7 +48,7 @@ public:
     virtual int svc(void);
 
     void   SetReactorID(uint32 u4ReactorID);
-    uint32 GetReactorID();
+    uint32 GetReactorID() const;
 
 private:
 #if PSS_PLATFORM == PLATFORM_WIN
@@ -75,16 +75,16 @@ public:
 
     bool AddNewReactor(int nReactorID, int nReactorType = Reactor_Select, int nThreadCount = 1, int nMaxHandleCount = 0);
     void Close();
-    const char* GetError();
+    const char* GetError() const;
 
-    bool StartOtherReactor();
-    bool StartClientReactor();
-    bool StopReactor();
+    bool StartOtherReactor() const;
+    bool StartClientReactor() const;
+    bool StopReactor() const;
 
     CAceReactor* GetAceReactor(int nReactorID);
     ACE_Reactor* GetAce_Reactor(int nReactorID);
     ACE_Reactor* GetAce_Client_Reactor(int nReactorID);
-    uint32 GetClientReactorCount();
+    uint32 GetClientReactorCount() const;
 
 private:
     CAceReactor**  m_pReactorList          = NULL;

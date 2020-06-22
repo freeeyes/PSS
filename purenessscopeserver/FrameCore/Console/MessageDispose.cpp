@@ -1278,13 +1278,13 @@ void DoMessage_GetConnectIPInfo(const _CommandInfo& CommandInfo, IBuffPacket* pB
                 strSName.text = objClientIPInfo.m_szClientIP;
                 strSName.u1Len = (uint8)ACE_OS::strlen(objClientIPInfo.m_szClientIP);
 
-                (*pBuffPacket) << strSName;                         //IP
-                (*pBuffPacket) << (uint32)objClientIPInfo.m_nPort;  //¶Ë¿Ú
+                (*pBuffPacket) << strSName;                          //IP
+                (*pBuffPacket) << (uint32)objClientIPInfo.m_u2Port;  //¶Ë¿Ú
             }
             else
             {
                 char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "ClientIP=%s,Port=%d.\n", objClientIPInfo.m_szClientIP, objClientIPInfo.m_nPort);
+                sprintf_safe(szTemp, MAX_BUFF_1024, "ClientIP=%s,Port=%d.\n", objClientIPInfo.m_szClientIP, objClientIPInfo.m_u2Port);
                 pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
             }
         }
@@ -1590,7 +1590,7 @@ void DoMessage_GetNickNameInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
             {
                 (*pBuffPacket) << (uint32)clinetnameinfo.m_nConnectID;
                 (*pBuffPacket) << strIP;
-                (*pBuffPacket) << (uint32)clinetnameinfo.m_nPort;
+                (*pBuffPacket) << (uint32)clinetnameinfo.m_u2Port;
                 (*pBuffPacket) << strName;
                 (*pBuffPacket) << (uint8)clinetnameinfo.m_nLog;
             }
@@ -1600,7 +1600,7 @@ void DoMessage_GetNickNameInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
                 sprintf_safe(szTemp, MAX_BUFF_1024, "m_nConnectID=%d,strIP=%s,m_nPort=%d,strName=%s,m_nLog=%d.\n",
                     clinetnameinfo.m_nConnectID,
                     clinetnameinfo.m_szClientIP,
-                    clinetnameinfo.m_nPort,
+                    clinetnameinfo.m_u2Port,
                     clinetnameinfo.m_szName,
                     clinetnameinfo.m_nLog);
                 pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));

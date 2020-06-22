@@ -457,9 +457,9 @@ bool CMessageService::DoMessage(const ACE_Time_Value& tvBegin, IMessage* pMessag
         if (NULL != pClientCommandInfo)
         {
             //判断当前消息是否有指定的监听端口
-            if (pClientCommandInfo->m_objListenIPInfo.m_nPort > 0 &&
+            if (pClientCommandInfo->m_objListenIPInfo.m_u2Port > 0 &&
                 (ACE_OS::strcmp(pClientCommandInfo->m_objListenIPInfo.m_szClientIP, pMessage->GetMessageBase()->m_szListenIP) != 0 ||
-                    (uint32)pClientCommandInfo->m_objListenIPInfo.m_nPort != pMessage->GetMessageBase()->m_u4ListenPort))
+                    (uint32)pClientCommandInfo->m_objListenIPInfo.m_u2Port != pMessage->GetMessageBase()->m_u4ListenPort))
             {
                 continue;
             }
@@ -1130,7 +1130,7 @@ void CMessageServiceGroup::GetWorkThreadAIInfo(vecWorkThreadAIInfo& objvecWorkTh
     for (uint32 i = 0; i < u4Size; i++)
     {
         _WorkThreadAIInfo objWorkThreadAIInfo;
-        CMessageService* pMessageService = m_vecMessageService[i];
+        const CMessageService* pMessageService = m_vecMessageService[i];
 
         if (NULL != pMessageService)
         {
@@ -1149,7 +1149,7 @@ void CMessageServiceGroup::GetAITO(vecCommandTimeout& objTimeout)
 
     for (uint32 i = 0; i < u4Size; i++)
     {
-        CMessageService* pMessageService = m_vecMessageService[i];
+        const CMessageService* pMessageService = m_vecMessageService[i];
 
         if (NULL != pMessageService)
         {
@@ -1166,7 +1166,7 @@ void CMessageServiceGroup::GetAITF(vecCommandTimeout& objTimeout)
 
     for (uint32 i = 0; i < u4Size; i++)
     {
-        CMessageService* pMessageService = m_vecMessageService[i];
+        const CMessageService* pMessageService = m_vecMessageService[i];
 
         if (NULL != pMessageService)
         {

@@ -134,7 +134,7 @@ bool CReactorUDPClient::CheckMessage(const char* pData, uint32 u4Len)
 
     _ClientIPInfo objServerIPInfo;
     sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-    objServerIPInfo.m_nPort = m_addrRemote.get_port_number();
+    objServerIPInfo.m_u2Port = m_addrRemote.get_port_number();
     m_pClientUDPMessage->RecvData(pData, u4Len, objServerIPInfo);
 
     m_atvInput = ACE_OS::gettimeofday();

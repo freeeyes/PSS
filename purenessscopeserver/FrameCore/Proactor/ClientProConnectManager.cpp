@@ -15,24 +15,24 @@ CProactorClientInfo::~CProactorClientInfo()
 {
 }
 
-bool CProactorClientInfo::Init(const char* pIP, int nPort, uint8 u1IPType, int nServerID, CProAsynchConnect* pProAsynchConnect, IClientMessage* pClientMessage, uint32 u4PacketParseID)
+bool CProactorClientInfo::Init(const char* pIP, uint16 u2Port, uint8 u1IPType, int nServerID, CProAsynchConnect* pProAsynchConnect, IClientMessage* pClientMessage, uint32 u4PacketParseID)
 {
-    OUR_DEBUG((LM_ERROR, "[CProactorClientInfo::Init]SetAddrServer(%s:%d) Begin.\n", pIP, nPort));
+    OUR_DEBUG((LM_ERROR, "[CProactorClientInfo::Init]SetAddrServer(%s:%d) Begin.\n", pIP, u2Port));
 
     int nRet = 0;
 
     if(u1IPType == TYPE_IPV4)
     {
-        nRet = m_AddrServer.set(nPort, pIP);
+        nRet = m_AddrServer.set(u2Port, pIP);
     }
     else
     {
-        nRet = m_AddrServer.set(nPort, pIP, 1, PF_INET6);
+        nRet = m_AddrServer.set(u2Port, pIP, 1, PF_INET6);
     }
 
     if(-1 == nRet)
     {
-        OUR_DEBUG((LM_ERROR, "[CProactorClientInfo::Init]nServerID = %d, adrClient(%s:%d) error.\n", nServerID, pIP, nPort));
+        OUR_DEBUG((LM_ERROR, "[CProactorClientInfo::Init]nServerID = %d, adrClient(%s:%d) error.\n", nServerID, pIP, u2Port));
         return false;
     }
 
@@ -209,15 +209,15 @@ NAMESPACE::uint32 CProactorClientInfo::GetPacketParseID()
     return m_u4PacketParseID;
 }
 
-void CProactorClientInfo::SetLocalAddr( const char* pIP, int nPort, uint8 u1IPType )
+void CProactorClientInfo::SetLocalAddr( const char* pIP, uint16 u2Port, uint8 u1IPType )
 {
     if(u1IPType == TYPE_IPV4)
     {
-        m_AddrLocal.set(nPort, pIP);
+        m_AddrLocal.set(u2Port, pIP);
     }
     else
     {
-        m_AddrLocal.set(nPort, pIP, 1, PF_INET6);
+        m_AddrLocal.set(u2Port, pIP, 1, PF_INET6);
     }
 
     m_blIsLocal = true;
@@ -279,7 +279,7 @@ bool CClientProConnectManager::Init(ACE_Proactor* pProactor)
         {
             Connect(f.m_nServerID,
                     f.m_szServerIP,
-                    f.m_nServerPort,
+                    f.m_u2ServerPort,
                     f.m_u1Type,
                     f.m_pClientMessage);
         }
@@ -287,7 +287,7 @@ bool CClientProConnectManager::Init(ACE_Proactor* pProactor)
         {
             Connect(f.m_nServerID,
                     f.m_szServerIP,
-                    f.m_nServerPort,
+                    f.m_u2ServerPort,
                     f.m_u1Type,
                     f.m_szLocalIP,
                     f.m_nLocalPort,
@@ -301,7 +301,7 @@ bool CClientProConnectManager::Init(ACE_Proactor* pProactor)
     return true;
 }
 
-bool CClientProConnectManager::Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, IClientMessage* pClientMessage)
+bool CClientProConnectManager::Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, IClientMessage* pClientMessage)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     CProactorClientInfo* pClientInfo = NULL;
@@ -313,7 +313,7 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, int nPort
 
         objS2SConnectGetRandyInfo.m_nServerID      = nServerID;
         sprintf_safe(objS2SConnectGetRandyInfo.m_szServerIP, MAX_BUFF_100, "%s", pIP);
-        objS2SConnectGetRandyInfo.m_nServerPort    = nPort;
+        objS2SConnectGetRandyInfo.m_u2ServerPort    = u2Port;
         objS2SConnectGetRandyInfo.m_u1Type         = u1IPType;
         objS2SConnectGetRandyInfo.m_pClientMessage = pClientMessage;
 
@@ -323,7 +323,7 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, int nPort
     }
 
     //连接初始化动作
-    if (false == ConnectTcpInit(nServerID, pIP, nPort, u1IPType, NULL, 0, u1IPType, pClientMessage, pClientInfo))
+    if (false == ConnectTcpInit(nServerID, pIP, u2Port, u1IPType, NULL, 0, u1IPType, pClientMessage, pClientInfo))
     {
         return false;
     }
@@ -346,7 +346,7 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, int nPort
     return true;
 }
 
-bool CClientProConnectManager::Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage)
+bool CClientProConnectManager::Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     CProactorClientInfo* pClientInfo = NULL;
@@ -358,7 +358,7 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, int nPort
 
         objS2SConnectGetRandyInfo.m_nServerID      = nServerID;
         sprintf_safe(objS2SConnectGetRandyInfo.m_szServerIP, MAX_BUFF_100, "%s", pIP);
-        objS2SConnectGetRandyInfo.m_nServerPort    = nPort;
+        objS2SConnectGetRandyInfo.m_u2ServerPort    = u2Port;
         objS2SConnectGetRandyInfo.m_u1Type         = u1IPType;
         sprintf_safe(objS2SConnectGetRandyInfo.m_szLocalIP, MAX_BUFF_100, "%s", pLocalIP);
         objS2SConnectGetRandyInfo.m_nLocalPort     = nLocalPort;
@@ -370,7 +370,7 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, int nPort
     }
 
     //连接初始化动作
-    if (false == ConnectTcpInit(nServerID, pIP, nPort, u1IPType, pLocalIP, nLocalPort, u1LocalIPType, pClientMessage, pClientInfo))
+    if (false == ConnectTcpInit(nServerID, pIP, u2Port, u1IPType, pLocalIP, nLocalPort, u1LocalIPType, pClientMessage, pClientInfo))
     {
         return false;
     }
@@ -393,13 +393,13 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, int nPort
     return true;
 }
 
-bool CClientProConnectManager::ConnectFrame(int nServerID, const char* pIP, int nPort, uint8 u1IPType, uint32 u4PacketParse)
+bool CClientProConnectManager::ConnectFrame(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, uint32 u4PacketParse)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     CProactorClientInfo* pClientInfo = NULL;
 
     //连接初始化动作
-    if (false == ConnectTcpInit(nServerID, pIP, nPort, u1IPType, NULL, 0, u1IPType, NULL, pClientInfo, u4PacketParse))
+    if (false == ConnectTcpInit(nServerID, pIP, u2Port, u1IPType, NULL, 0, u1IPType, NULL, pClientInfo, u4PacketParse))
     {
         return false;
     }
@@ -416,13 +416,13 @@ bool CClientProConnectManager::ConnectFrame(int nServerID, const char* pIP, int 
     return true;
 }
 
-bool CClientProConnectManager::ConnectFrame(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, uint32 u4PacketParse)
+bool CClientProConnectManager::ConnectFrame(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, uint32 u4PacketParse)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     CProactorClientInfo* pClientInfo = NULL;
 
     //连接初始化动作
-    if (false == ConnectTcpInit(nServerID, pIP, nPort, u1IPType, pLocalIP, nLocalPort, u1LocalIPType, NULL, pClientInfo, u4PacketParse))
+    if (false == ConnectTcpInit(nServerID, pIP, u2Port, u1IPType, pLocalIP, nLocalPort, u1LocalIPType, NULL, pClientInfo, u4PacketParse))
     {
         return false;
     }
@@ -439,7 +439,7 @@ bool CClientProConnectManager::ConnectFrame(int nServerID, const char* pIP, int 
     return true;
 }
 
-bool CClientProConnectManager::ConnectUDP(int nServerID, const char* pIP, int nPort, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage)
+bool CClientProConnectManager::ConnectUDP(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     CProactorUDPClient* pProactorUDPClient = NULL;
@@ -459,17 +459,17 @@ bool CClientProConnectManager::ConnectUDP(int nServerID, const char* pIP, int nP
     {
         if (u1IPType == TYPE_IPV4)
         {
-            nErr = AddrLocal.set(nPort, pIP);
+            nErr = AddrLocal.set(u2Port, pIP);
         }
         else
         {
-            nErr = AddrLocal.set(nPort, pIP, 1, PF_INET6);
+            nErr = AddrLocal.set(u2Port, pIP, 1, PF_INET6);
         }
     }
     else
     {
         //如果是UDP广播
-        AddrLocal.set(nPort, (uint32)INADDR_ANY);
+        AddrLocal.set(u2Port, (uint32)INADDR_ANY);
     }
 
     if (nErr != 0)
@@ -671,7 +671,7 @@ bool CClientProConnectManager::SendData(int nServerID, char*& pData, int nSize, 
     return pClientInfo->SendData(pmblk);
 }
 
-bool CClientProConnectManager::SendDataUDP(int nServerID,const char* pIP, int nPort, char*& pMessage, uint32 u4Len, bool blIsDelete)
+bool CClientProConnectManager::SendDataUDP(int nServerID,const char* pIP, uint16 u2Port, char*& pMessage, uint32 u4Len, bool blIsDelete)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     char szServerID[10] = {'\0'};
@@ -693,7 +693,7 @@ bool CClientProConnectManager::SendDataUDP(int nServerID,const char* pIP, int nP
     }
 
     //发送数据
-    bool blSendRet = pClientInfo->SendMessage(pMessage, u4Len, pIP, nPort);
+    bool blSendRet = pClientInfo->SendMessage(pMessage, u4Len, pIP, u2Port);
 
     if(true == blIsDelete)
     {
@@ -811,7 +811,7 @@ int CClientProConnectManager::handle_timeout(const ACE_Time_Value& tv, const voi
     return 0;
 }
 
-bool CClientProConnectManager::ConnectTcpInit(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CProactorClientInfo*& pClientInfo, uint32 u4PacketParseID)
+bool CClientProConnectManager::ConnectTcpInit(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CProactorClientInfo*& pClientInfo, uint32 u4PacketParseID)
 {
     char szServerID[10] = { '\0' };
     sprintf_safe(szServerID, 10, "%d", nServerID);
@@ -834,7 +834,7 @@ bool CClientProConnectManager::ConnectTcpInit(int nServerID, const char* pIP, in
     //初始化链接信息
     pClientInfo = new CProactorClientInfo();
 
-    if (false == pClientInfo->Init(pIP, nPort, u1IPType, nServerID, &m_ProAsynchConnect, pClientMessage, u4PacketParseID))
+    if (false == pClientInfo->Init(pIP, u2Port, u1IPType, nServerID, &m_ProAsynchConnect, pClientMessage, u4PacketParseID))
     {
         SAFE_DELETE(pClientInfo);
         return false;
@@ -1066,7 +1066,7 @@ bool CClientProConnectManager::GetServerIPInfo(int nServerID, _ClientIPInfo& obj
     {
         ACE_INET_Addr remote_addr = pClientInfo->GetServerAddr();
         sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_50, remote_addr.get_host_addr());
-        objServerIPInfo.m_nPort = remote_addr.get_port_number();
+        objServerIPInfo.m_u2Port = remote_addr.get_port_number();
         return true;
     }
     else

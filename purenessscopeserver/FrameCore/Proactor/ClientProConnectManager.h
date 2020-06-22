@@ -25,8 +25,8 @@ public:
     CProactorClientInfo();
     ~CProactorClientInfo();
 
-    bool Init(const char* pIP, int nPort, uint8 u1IPType, int nServerID, CProAsynchConnect* pProAsynchConnect, IClientMessage* pClientMessage, uint32 u4PacketParseID);  //初始化链接地址和端口
-    void SetLocalAddr(const char* pIP, int nPort, uint8 u1IPType);                             //设置本地IP和端口
+    bool Init(const char* pIP, uint16 u2Port, uint8 u1IPType, int nServerID, CProAsynchConnect* pProAsynchConnect, IClientMessage* pClientMessage, uint32 u4PacketParseID);  //初始化链接地址和端口
+    void SetLocalAddr(const char* pIP, uint16 u2Port, uint8 u1IPType);                             //设置本地IP和端口
     bool Run(bool blIsReadly, EM_Server_Connect_State emState = EM_Server_Connect_State::SERVER_CONNECT_RECONNECT);     //开始链接
     bool SendData(ACE_Message_Block* pmblk);                                                   //发送数据
     int  GetServerID();                                                                        //得到服务器ID
@@ -60,18 +60,18 @@ public:
     ~CClientProConnectManager(void);
 
     bool Init(ACE_Proactor* pProactor);                                                                                        //初始化链接器
-    virtual bool Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, IClientMessage* pClientMessage);                   //链接指定的服务器（TCP）
-    virtual bool Connect(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage);  //连接服务器(TCP)，指定本地地址
-    virtual bool ConnectFrame(int nServerID, const char* pIP, int nPort, uint8 u1IPType, uint32 u4PacketParse);                //连接指定的服务器，并给出PacketParseID
-    virtual bool ConnectFrame(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, uint32 u4PacketParse);      //连接指定的服务器，并给出PacketParseID
-    virtual bool ConnectUDP(int nServerID, const char* pIP, int nPort, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage);                                //建立一个指向UDP的链接（UDP）
+    virtual bool Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, IClientMessage* pClientMessage);                   //链接指定的服务器（TCP）
+    virtual bool Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage);  //连接服务器(TCP)，指定本地地址
+    virtual bool ConnectFrame(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, uint32 u4PacketParse);                //连接指定的服务器，并给出PacketParseID
+    virtual bool ConnectFrame(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, uint32 u4PacketParse);      //连接指定的服务器，并给出PacketParseID
+    virtual bool ConnectUDP(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage);                                //建立一个指向UDP的链接（UDP）
     bool ReConnect(int nServerID);                                                                                             //重新连接一个指定的服务器(TCP)
     bool CloseByClient(int nServerID);                                                                                         //远程被动关闭(TCP)
     virtual bool Close(int nServerID);                                                                                                 //关闭连接（TCP）
     virtual bool CloseUDP(int nServerID);                                                                                              //关闭链接（UDP）
     bool ConnectErrorClose(int nServerID);                                                                                     //由内部错误引起的失败，由ProConnectClient调用
     virtual bool SendData(int nServerID, char*& pData, int nSize, bool blIsDelete = true);                                             //发送数据（TCP）
-    virtual bool SendDataUDP(int nServerID,const char* pIP, int nPort, char*& pMessage, uint32 u4Len, bool blIsDelete = true);   //发送数据（UDP）
+    virtual bool SendDataUDP(int nServerID,const char* pIP, uint16 u2Port, char*& pMessage, uint32 u4Len, bool blIsDelete = true);   //发送数据（UDP）
     bool SetHandler(int nServerID, CProConnectClient* pProConnectClient);                                                      //将指定的CProConnectClient*绑定给nServerID
     virtual IClientMessage* GetClientMessage(int nServerID);                                                                           //获得ClientMessage对象
     virtual uint32 GetPacketParseID(int nServerID);                                                                           //获得PacketParseID
@@ -90,7 +90,7 @@ public:
     virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);                       //定时检测
 
 private:
-    bool ConnectTcpInit(int nServerID, const char* pIP, int nPort, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CProactorClientInfo*& pClientInfo, uint32 u4PacketParseID = 0);
+    bool ConnectTcpInit(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CProactorClientInfo*& pClientInfo, uint32 u4PacketParseID = 0);
     bool ConnectUdpInit(int nServerID, CProactorUDPClient*& pProactorUDPClient);
 
 private:

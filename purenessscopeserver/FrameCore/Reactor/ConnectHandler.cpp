@@ -666,7 +666,7 @@ void CConnectHandler::SetRecvQueueTimeCost(uint32 u4TimeCost)
     //如果超过阀值，则记录到日志中去
     if((uint32)(m_u8RecvQueueTimeout * 1000) <= u4TimeCost)
     {
-        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_RECVQUEUEERROR, "[TCP]IP=%s,Prot=%d, m_u8RecvQueueTimeout=[%d], Timeout=[%d].", GetClientIPInfo().m_szClientIP, GetClientIPInfo().m_nPort, (uint32)m_u8RecvQueueTimeout, u4TimeCost);
+        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_RECVQUEUEERROR, "[TCP]IP=%s,Prot=%d, m_u8RecvQueueTimeout=[%d], Timeout=[%d].", GetClientIPInfo().m_szClientIP, GetClientIPInfo().m_u2Port, (uint32)m_u8RecvQueueTimeout, u4TimeCost);
     }
 
     m_u4RecvQueueCount++;
@@ -677,7 +677,7 @@ void CConnectHandler::SetSendQueueTimeCost(uint32 u4TimeCost)
     //如果超过阀值，则记录到日志中去
     if((uint32)(m_u8SendQueueTimeout) <= u4TimeCost)
     {
-        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_SENDQUEUEERROR, "[TCP]IP=%s,Prot=%d,m_u8SendQueueTimeout = [%d], Timeout=[%d].", GetClientIPInfo().m_szClientIP, GetClientIPInfo().m_nPort, (uint32)m_u8SendQueueTimeout, u4TimeCost);
+        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_SENDQUEUEERROR, "[TCP]IP=%s,Prot=%d,m_u8SendQueueTimeout = [%d], Timeout=[%d].", GetClientIPInfo().m_szClientIP, GetClientIPInfo().m_u2Port, (uint32)m_u8SendQueueTimeout, u4TimeCost);
 
         Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_SEND_TIMEOUT, m_addrRemote, m_szLocalIP, m_u2LocalPort);
     }
@@ -1193,7 +1193,7 @@ _ClientIPInfo  CConnectHandler::GetClientIPInfo()
 {
     _ClientIPInfo ClientIPInfo;
     sprintf_safe(ClientIPInfo.m_szClientIP, MAX_BUFF_50, "%s", m_addrRemote.get_host_addr());
-    ClientIPInfo.m_nPort = (int)m_addrRemote.get_port_number();
+    ClientIPInfo.m_u2Port = (int)m_addrRemote.get_port_number();
     return ClientIPInfo;
 }
 
@@ -1201,7 +1201,7 @@ _ClientIPInfo  CConnectHandler::GetLocalIPInfo()
 {
     _ClientIPInfo ClientIPInfo;
     sprintf_safe(ClientIPInfo.m_szClientIP, MAX_BUFF_50, "%s", m_szLocalIP);
-    ClientIPInfo.m_nPort = (int)m_u2LocalPort;
+    ClientIPInfo.m_u2Port = (int)m_u2LocalPort;
     return ClientIPInfo;
 }
 
@@ -1711,7 +1711,7 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
         pConnectHandler->SetSendQueueTimeCost(u4SendCost);
 
         _ClientIPInfo objClientIP = pConnectHandler->GetLocalIPInfo();
-        m_CommandAccount.SaveCommandData(u2CommandID, (uint32)objClientIP.m_nPort, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP, u4PacketSize, COMMAND_TYPE_OUT);
+        m_CommandAccount.SaveCommandData(u2CommandID, (uint32)objClientIP.m_u2Port, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP, u4PacketSize, COMMAND_TYPE_OUT);
         return true;
     }
     else
@@ -2056,7 +2056,7 @@ void CConnectManager::GetClientNameInfo(const char* pName, vecClientNameInfo& ob
             _ClientNameInfo ClientNameInfo = Tcp_Common_ClientNameInfo((int)pConnectHandler->GetConnectID(),
                                              pConnectHandler->GetConnectName(),
                                              pConnectHandler->GetClientIPInfo().m_szClientIP,
-                                             pConnectHandler->GetClientIPInfo().m_nPort,
+                                             pConnectHandler->GetClientIPInfo().m_u2Port,
                                              pConnectHandler->GetIsLog());
 
             objClientNameInfo.push_back(ClientNameInfo);

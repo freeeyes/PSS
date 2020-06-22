@@ -1594,7 +1594,7 @@ inline int32 SeeLock(int32 fd, int32 start, int32 len)
 struct _ClientIPInfo
 {
     char  m_szClientIP[MAX_BUFF_50] = {'\0'};   //客户端的IP地址
-    int32 m_nPort                   = 0;        //客户端的端口
+    int16 m_u2Port                   = 0;        //客户端的端口
 
     _ClientIPInfo()
     {
@@ -1604,13 +1604,13 @@ struct _ClientIPInfo
     _ClientIPInfo(const _ClientIPInfo& ar)
     {
         sprintf_safe(this->m_szClientIP, MAX_BUFF_50, "%s", ar.m_szClientIP);
-        this->m_nPort = ar.m_nPort;
+        this->m_u2Port = ar.m_u2Port;
     }
 
     _ClientIPInfo& operator = (const _ClientIPInfo& ar)
     {
         sprintf_safe(this->m_szClientIP, MAX_BUFF_50, "%s", ar.m_szClientIP);
-        this->m_nPort = ar.m_nPort;
+        this->m_u2Port = ar.m_u2Port;
         return *this;
     }
 };
@@ -1618,7 +1618,7 @@ struct _ClientIPInfo
 //链接别名映射信息(用于PSS_ClientManager管理)
 struct _ClientNameInfo
 {
-    int32  m_nPort                   = 0;           //客户端的端口
+    int16  m_u2Port                  = 0;           //客户端的端口
     int32  m_nConnectID              = 0;           //连接ID
     int32  m_nLog                    = 0;           //是否记录日志
     char   m_szName[MAX_BUFF_100]    = {'\0'};      //连接别名
@@ -1633,7 +1633,7 @@ struct _ClientNameInfo
     {
         sprintf_safe(this->m_szName, MAX_BUFF_100, "%s", ar.m_szName);
         sprintf_safe(this->m_szClientIP, MAX_BUFF_50, "%s", ar.m_szClientIP);
-        this->m_nPort = ar.m_nPort;
+        this->m_u2Port = ar.m_u2Port;
         this->m_nConnectID = ar.m_nConnectID;
         this->m_nLog = ar.m_nLog;
     }
@@ -1642,7 +1642,7 @@ struct _ClientNameInfo
     {
         sprintf_safe(this->m_szName, MAX_BUFF_100, "%s", ar.m_szName);
         sprintf_safe(this->m_szClientIP, MAX_BUFF_50, "%s", ar.m_szClientIP);
-        this->m_nPort      = ar.m_nPort;
+        this->m_u2Port      = ar.m_u2Port;
         this->m_nConnectID = ar.m_nConnectID;
         this->m_nLog       = ar.m_nLog;
         return *this;

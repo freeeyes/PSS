@@ -122,8 +122,8 @@ bool CConsolePacketParse::Connect( uint32 u4ConnectID, _ClientIPInfo const& objC
         //UDP数据包，没有u4ConnectID
     }
 
-    OUR_DEBUG((LM_INFO, "[CConsolePacketParse::Connect]IP=%s,Port=%d.\n", objClientIPInfo.m_szClientIP, objClientIPInfo.m_nPort));
-    OUR_DEBUG((LM_INFO, "[CConsolePacketParse::Connect]LocalIP=%s,Port=%d.\n", objLocalIPInfo.m_szClientIP, objLocalIPInfo.m_nPort));
+    OUR_DEBUG((LM_INFO, "[CConsolePacketParse::Connect]IP=%s,Port=%d.\n", objClientIPInfo.m_szClientIP, objClientIPInfo.m_u2Port));
+    OUR_DEBUG((LM_INFO, "[CConsolePacketParse::Connect]LocalIP=%s,Port=%d.\n", objLocalIPInfo.m_szClientIP, objLocalIPInfo.m_u2Port));
     return true;
 }
 

@@ -615,13 +615,13 @@ void Tcp_Common_Manager_Timeout_CheckInfo(int nActiveConnectCount)
 
 }
 
-_ClientNameInfo Tcp_Common_ClientNameInfo(uint32 u4ConnectID, const char* pConnectName, const char* pClientIP, int nClientPort, bool IsLog)
+_ClientNameInfo Tcp_Common_ClientNameInfo(uint32 u4ConnectID, const char* pConnectName, const char* pClientIP, uint16 u2ClientPort, bool IsLog)
 {
     _ClientNameInfo ClientNameInfo;
     ClientNameInfo.m_nConnectID = (int)u4ConnectID;
     sprintf_safe(ClientNameInfo.m_szName, MAX_BUFF_100, "%s", pConnectName);
     sprintf_safe(ClientNameInfo.m_szClientIP, MAX_BUFF_50, "%s", pClientIP);
-    ClientNameInfo.m_nPort = nClientPort;
+    ClientNameInfo.m_u2Port = u2ClientPort;
 
     if (IsLog == true)
     {

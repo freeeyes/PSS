@@ -13,7 +13,7 @@ void Common_Send_ConnectError(ACE_Message_Block* pmblk, const ACE_INET_Addr& obj
         //服务器已经断开，需要等待重新连接的结果
         _ClientIPInfo objServerIPInfo;
         sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", objAddrServer.get_host_addr());
-        objServerIPInfo.m_nPort = objAddrServer.get_port_number();
+        objServerIPInfo.m_u2Port = objAddrServer.get_port_number();
         pClientMessage->ConnectError(101, objServerIPInfo);
     }
 }

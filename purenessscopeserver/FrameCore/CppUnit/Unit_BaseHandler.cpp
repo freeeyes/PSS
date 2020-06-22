@@ -121,7 +121,7 @@ void CUnit_Basehandler::Test_Tcp_Common_ClientNameInfo(void)
     if (objClientNameInfo.m_nConnectID != 1 ||
         ACE_OS::strcmp(objClientNameInfo.m_szName, "freeeyes") != 0 ||
         ACE_OS::strcmp(objClientNameInfo.m_szClientIP, "127.0.0.1") != 0 ||
-        objClientNameInfo.m_nPort != 20022 ||
+        objClientNameInfo.m_u2Port != 20022 ||
         objClientNameInfo.m_nLog != 1)
     {
         CPPUNIT_ASSERT_MESSAGE("[Test_Tcp_Common_ClientNameInfo]Tcp_Common_ClientNameInfo is false.", true == blRet);

@@ -29,7 +29,7 @@ class CConvertBuffer
 public:
     CConvertBuffer() {}
 
-    int GetBufferSize(const char* pData, int nSrcLen)
+    int GetBufferSize(const char* pData, int nSrcLen) const
     {
         char szData[3] = {'\0'};
         int nPos         = 0;
@@ -60,12 +60,12 @@ public:
                 if(blSrcState == true)
                 {
                     blState = ConvertStr2char(szData, cData);
-
-                    if(blState == true)
-                    {
-                        nConvertSize++;
-                    }
                 }
+
+				if (blState == true)
+				{
+					nConvertSize++;
+				}
 
                 nCurrSize  = 0;
                 blSrcState = true;
@@ -89,7 +89,7 @@ public:
         return nConvertSize;
     }
 
-    bool Convertstr2charArray(const char* pData, int nSrcLen, unsigned char* pDes, int& nMaxLen)
+    bool Convertstr2charArray(const char* pData, int nSrcLen, unsigned char* pDes, int& nMaxLen) const 
     {
         char szData[3] = {'\0'};
         int nPos         = 0;
@@ -119,12 +119,12 @@ public:
                 if(nConvertSize < nMaxLen && blSrcState == true)
                 {
                     blState = ConvertStr2char(szData, pDes[nConvertSize]);
-
-                    if(blState == true)
-                    {
-                        nConvertSize++;
-                    }
                 }
+
+				if (blState == true)
+				{
+					nConvertSize++;
+				}
 
                 nCurrSize  = 0;
                 blSrcState = true;

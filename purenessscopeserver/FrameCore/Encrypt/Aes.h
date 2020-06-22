@@ -25,7 +25,7 @@ private:
     unsigned char w[11][4][4];
 
     void KeyExpansion(const unsigned char* key);
-    void KeyExpansion_single(int i, int j, int r,  unsigned char* rc);
+    void KeyExpansion_single(int i, int j, int r,  const unsigned char* rc);
     unsigned char FFmul(unsigned char a, unsigned char b) const;
 
     void SubBytes(unsigned char state[][4]) const;

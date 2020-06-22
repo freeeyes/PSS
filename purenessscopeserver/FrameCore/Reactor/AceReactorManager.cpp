@@ -9,7 +9,7 @@ void CAceReactor::SetReactorID(uint32 u4ReactorID)
     m_u4ReactorID = u4ReactorID;
 }
 
-uint32 CAceReactor::GetReactorID()
+uint32 CAceReactor::GetReactorID() const
 {
     return m_u4ReactorID;
 }
@@ -44,7 +44,7 @@ void CAceReactor::Create_Reactor_Select()
         throw std::domain_error("[CAceReactor::Init]New ACE_Select_Reactor Error.");
     }
 
-    m_pReactor = new ACE_Reactor(selectreactor, 1);
+    m_pReactor = new ACE_Reactor(selectreactor, true);
 
     if (NULL == m_pReactor)
     {
@@ -63,7 +63,7 @@ void CAceReactor::Create_Reactor_TP()
         throw std::domain_error("[CAceReactor::Init]New ACE_TP_Reactor Error.");
     }
 
-    m_pReactor = new ACE_Reactor(tpreactor, 1);
+    m_pReactor = new ACE_Reactor(tpreactor, true);
 
     if (NULL == m_pReactor)
     {
@@ -83,7 +83,7 @@ void CAceReactor::Create_DEV_POLL(int nMaxHandleCount)
         throw std::domain_error("[CAceReactor::Init]New ACE_Dev_Poll_Reactor Error.");
     }
 
-    m_pReactor = new ACE_Reactor(devreactor, 1);
+    m_pReactor = new ACE_Reactor(devreactor, true);
 
     if (NULL == m_pReactor)
     {
@@ -230,17 +230,17 @@ bool CAceReactor::Stop()
     return true;
 }
 
-const char* CAceReactor::GetError()
+const char* CAceReactor::GetError() const
 {
     return m_szError;
 }
 
-int CAceReactor::GetThreadCount()
+int CAceReactor::GetThreadCount() const
 {
     return m_nThreadCount;
 }
 
-int CAceReactor::GetReactorType()
+int CAceReactor::GetReactorType() const
 {
     return m_nReactorType;
 }
@@ -290,7 +290,7 @@ void CAceReactorManager::Init(uint16 u2Count)
     m_u2RectorCount = u2Count;
 }
 
-const char* CAceReactorManager::GetError()
+const char* CAceReactorManager::GetError() const
 {
     return m_szError;
 }
@@ -327,7 +327,7 @@ bool CAceReactorManager::AddNewReactor(int nReactorID, int nReactorType, int nTh
     return true;
 }
 
-bool CAceReactorManager::StartOtherReactor()
+bool CAceReactorManager::StartOtherReactor() const
 {
     //先启动非总的Rector
     for (uint16 i = 1; i < m_u2RectorCount; i++)
@@ -344,12 +344,12 @@ bool CAceReactorManager::StartOtherReactor()
 }
 
 
-bool CAceReactorManager::StartClientReactor()
+bool CAceReactorManager::StartClientReactor() const
 {
     return m_pReactorList[0]->Start();
 }
 
-bool CAceReactorManager::StopReactor()
+bool CAceReactorManager::StopReactor() const
 {
     for (uint16 i = 0; i < m_u2RectorCount; i++)
     {
@@ -418,7 +418,7 @@ ACE_Reactor* CAceReactorManager::GetAce_Client_Reactor(int nReactorID)
 
 }
 
-uint32 CAceReactorManager::GetClientReactorCount()
+uint32 CAceReactorManager::GetClientReactorCount() const
 {
     uint32 u4Count = (uint32)m_u2RectorCount;
 

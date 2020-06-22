@@ -186,7 +186,7 @@ bool Tcp_Common_Manager_Post_Message(_Post_Message_Param obj_Post_Message_Param,
 void Tcp_Common_Manager_Timeout_CheckInfo(int nActiveConnectCount);
 
 //获得连接姓名
-_ClientNameInfo Tcp_Common_ClientNameInfo(uint32 u4ConnectID, const char* pConnectName, const char* pClientIP, int nClientPort, bool IsLog);
+_ClientNameInfo Tcp_Common_ClientNameInfo(uint32 u4ConnectID, const char* pConnectName, const char* pClientIP, uint16 u2ClientPort, bool IsLog);
 
 //初始化Manager
 void  Tcp_Common_Manager_Init(uint16 u2Index, CCommandAccount& objCommandAccount, uint16& u2SendQueueMax, CSendCacheManager& objSendCacheManager);

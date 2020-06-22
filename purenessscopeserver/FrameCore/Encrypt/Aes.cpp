@@ -203,7 +203,7 @@ void AES::KeyExpansion(const unsigned char* key)
     }
 }
 
-void AES::KeyExpansion_single(int i, int j, int r, unsigned char* rc)
+void AES::KeyExpansion_single(int i, int j, int r, const unsigned char* rc)
 {
 	unsigned char t[4];
 
