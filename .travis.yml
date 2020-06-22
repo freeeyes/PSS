@@ -157,7 +157,8 @@ matrix:
       - ./Test_Pss
       # - cd $TRAVIS_BUILD_DIR/Build/Linux/
       # - tail -f -n 10 pssout.file
-      - killall -9 PurenessScopeServer     
+      - killall -9 PurenessScopeServer  
+      - cat pssout.file
       
       - cd $TRAVIS_BUILD_DIR
       - git init
