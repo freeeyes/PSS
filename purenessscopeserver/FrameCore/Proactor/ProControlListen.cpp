@@ -8,14 +8,14 @@ CProControlListen::~CProControlListen()
 {
 }
 
-bool CProControlListen::AddListen( const char* pListenIP, uint32 u4Port, uint8 u1IPType, int nPacketParseID)
+bool CProControlListen::AddListen( const char* pListenIP, uint16 u2Port, uint8 u1IPType, int nPacketParseID)
 {
-    bool blState = App_ProConnectAcceptManager::instance()->CheckIPInfo(pListenIP, u4Port);
+    bool blState = App_ProConnectAcceptManager::instance()->CheckIPInfo(pListenIP, u2Port);
 
     if(true == blState)
     {
         //当前监听已经存在，不可以重复建设
-        OUR_DEBUG((LM_INFO, "[CProControlListen::AddListen](%s:%d) is exist.\n", pListenIP, u4Port));
+        OUR_DEBUG((LM_INFO, "[CProControlListen::AddListen](%s:%d) is exist.\n", pListenIP, u2Port));
         return false;
     }
 
@@ -24,7 +24,7 @@ bool CProControlListen::AddListen( const char* pListenIP, uint32 u4Port, uint8 u
 
     if(NULL == pProConnectAcceptor)
     {
-        OUR_DEBUG((LM_INFO, "[CProControlListen::AddListen](%s:%d) new ConnectAcceptor error.\n", pListenIP, u4Port));
+        OUR_DEBUG((LM_INFO, "[CProControlListen::AddListen](%s:%d) new ConnectAcceptor error.\n", pListenIP, u2Port));
         return false;
     }
 
@@ -34,22 +34,22 @@ bool CProControlListen::AddListen( const char* pListenIP, uint32 u4Port, uint8 u
 
     if(u1IPType == TYPE_IPV4)
     {
-        nErr = listenAddr.set(u4Port, pListenIP);
+        nErr = listenAddr.set(u2Port, pListenIP);
     }
     else
     {
-        nErr = listenAddr.set(u4Port, pListenIP, 1, PF_INET6);
+        nErr = listenAddr.set(u2Port, pListenIP, 1, PF_INET6);
     }
 
     if(nErr != 0)
     {
-        OUR_DEBUG((LM_INFO, "[CProControlListen::AddListen](%s:%d)set_address error[%d].\n", pListenIP, u4Port, errno));
+        OUR_DEBUG((LM_INFO, "[CProControlListen::AddListen](%s:%d)set_address error[%d].\n", pListenIP, u2Port, errno));
         return false;
     }
 
     //创建新的监听
     //设置监听IP信息
-    pProConnectAcceptor->SetListenInfo(pListenIP, u4Port);
+    pProConnectAcceptor->SetListenInfo(pListenIP, u2Port);
     pProConnectAcceptor->SetPacketParseInfoID(nPacketParseID);
 
     ACE_Proactor* pProactor = App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE);
@@ -68,23 +68,23 @@ bool CProControlListen::AddListen( const char* pListenIP, uint32 u4Port, uint8 u
         return false;
     }
 
-    OUR_DEBUG((LM_INFO, "[CProControlListen::AddListen](%s:%d)Add Listen success.\n", pListenIP, u4Port));
+    OUR_DEBUG((LM_INFO, "[CProControlListen::AddListen](%s:%d)Add Listen success.\n", pListenIP, u2Port));
 
     return true;
 }
 
-bool CProControlListen::DelListen(const char* pListenIP, uint32 u4Port)
+bool CProControlListen::DelListen(const char* pListenIP, uint16 u2Port)
 {
-    bool blState = App_ProConnectAcceptManager::instance()->CheckIPInfo(pListenIP, u4Port);
+    bool blState = App_ProConnectAcceptManager::instance()->CheckIPInfo(pListenIP, u2Port);
 
     if(false == blState)
     {
         //当前监听已经存在，不可以重复建设
-        OUR_DEBUG((LM_INFO, "[CProControlListen::AddListen](%s:%d) is exist.\n", pListenIP, u4Port));
+        OUR_DEBUG((LM_INFO, "[CProControlListen::AddListen](%s:%d) is exist.\n", pListenIP, u2Port));
         return false;
     }
 
-    return App_ProConnectAcceptManager::instance()->Close(pListenIP, u4Port);
+    return App_ProConnectAcceptManager::instance()->Close(pListenIP, u2Port);
 }
 
 uint32 CProControlListen::GetListenCount()

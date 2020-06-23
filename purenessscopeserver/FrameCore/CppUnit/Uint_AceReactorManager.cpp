@@ -41,7 +41,7 @@ void CUnit_AceReactorManager::Test_DoMessage_AceReactorManager(void)
         return;
     }
 
-    CAceReactor* pAceReactor = m_pReactorManager->GetAceReactor(1);
+    const CAceReactor* pAceReactor = m_pReactorManager->GetAceReactor(1);
 
     if (1 != pAceReactor->GetThreadCount() || Reactor_Select != pAceReactor->GetReactorType())
     {

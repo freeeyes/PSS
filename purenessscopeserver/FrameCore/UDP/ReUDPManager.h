@@ -40,7 +40,7 @@ public:
         ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
         VecClientConnectInfo.clear();
 
-        for(CReactorUDPHander* pReactorUDPHandler : m_vecReactorUDPHandler)
+        for(const CReactorUDPHander* pReactorUDPHandler : m_vecReactorUDPHandler)
         {
             if(NULL != pReactorUDPHandler)
             {

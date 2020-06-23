@@ -1671,12 +1671,12 @@ void DoMessage_AddListen(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPack
     {
 #if PSS_PLATFORM == PLATFORM_WIN
         blState = App_ProControlListen::instance()->AddListen(objListenInfo.m_szListenIP,
-                  objListenInfo.m_u4Port,
+                  objListenInfo.m_u2Port,
                   objListenInfo.m_u1IPType,
                   objListenInfo.m_u4PacketParseID);
 #else
         blState = App_ControlListen::instance()->AddListen(objListenInfo.m_szListenIP,
-                  objListenInfo.m_u4Port,
+                  objListenInfo.m_u2Port,
                   objListenInfo.m_u1IPType,
                   objListenInfo.m_u4PacketParseID);
 #endif
@@ -1703,10 +1703,10 @@ void DoMessage_DelListen(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPack
     {
 #if PSS_PLATFORM == PLATFORM_WIN
         blState = App_ProControlListen::instance()->DelListen(objListenInfo.m_szListenIP,
-                  objListenInfo.m_u4Port);
+                  objListenInfo.m_u2Port);
 #else
         blState = App_ControlListen::instance()->DelListen(objListenInfo.m_szListenIP,
-                  objListenInfo.m_u4Port);
+                  objListenInfo.m_u2Port);
 #endif
 
         if (true == blState)

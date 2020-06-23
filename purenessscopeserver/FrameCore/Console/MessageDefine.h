@@ -54,7 +54,7 @@ public:
 class _ListenInfo
 {
 public:
-    uint32 m_u4Port                  = 0;
+    uint32 m_u2Port                  = 0;
     uint32 m_u4PacketParseID         = 0;
     uint8  m_u1IPType                = TYPE_IPV4;
     char   m_szListenIP[MAX_BUFF_20] = {'\0'};

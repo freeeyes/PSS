@@ -221,7 +221,7 @@ bool GetListenInfo(const char* pCommand, _ListenInfo& objListenInfo)
 
     //获得Port
     GetCommandParam(pCommand, "-p ", szTempData, MAX_BUFF_100);
-    objListenInfo.m_u4Port = ACE_OS::atoi(szTempData);
+    objListenInfo.m_u2Port = (uint16)ACE_OS::atoi(szTempData);
 
     //获得IP类型
     GetCommandParam(pCommand, "-t ", szTempData, MAX_BUFF_100);

@@ -369,7 +369,7 @@ bool CProServerManager::Start()
         //开启服务器2服务器监听
         App_ClientProConnectManager::instance()->ConnectFrame(GetXmlConfigAttribute(xmlServer2Server)->vec[i].u4ServerID,
                 GetXmlConfigAttribute(xmlServer2Server)->vec[i].strServerIP.c_str(),
-                GetXmlConfigAttribute(xmlServer2Server)->vec[i].u4ServerPort,
+                GetXmlConfigAttribute(xmlServer2Server)->vec[i].u2ServerPort,
                 u1IPType,
                 GetXmlConfigAttribute(xmlServer2Server)->vec[i].u4PacketParseID);
     }
