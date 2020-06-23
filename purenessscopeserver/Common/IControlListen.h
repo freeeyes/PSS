@@ -21,8 +21,8 @@ class IControlListen
 {
 public:
     virtual ~IControlListen() {}
-    virtual bool   AddListen(const char* pListenIP, uint32 u4Port, uint8 u1IPType, int nPacketParseID) = 0;  //打开一个新的监听端口
-    virtual bool   DelListen(const char* pListenIP, uint32 u4Port)                                     = 0;  //关闭一个已知的连接
+    virtual bool   AddListen(const char* pListenIP, uint16 u2Port, uint8 u1IPType, int nPacketParseID) = 0;  //打开一个新的监听端口
+    virtual bool   DelListen(const char* pListenIP, uint16 u2Port)                                     = 0;  //关闭一个已知的连接
     virtual uint32 GetListenCount()                                                                    = 0;  //得到当前已打开的监听个数
     virtual bool   ShowListen(uint32 u4Index, _ControlInfo& objControlInfo)                                = 0;  //根据索引获得已打开的监听端口信息
 

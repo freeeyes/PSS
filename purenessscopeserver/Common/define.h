@@ -1680,12 +1680,11 @@ inline void Set_Output_To_File(int nTrunOn, ofstream*& pLogoStream, const char* 
         //获得当前的对象是否已经超过了max的数值
         if ((size_t)nMaxLogSize <= (size_t)pLogoStream->tellp())
         {
+            ACE_LOG_MSG->acquire();
             //需要重启一个日志文件
             ofstream* pOldLogoStream = (ofstream*)ACE_LOG_MSG->msg_ostream();
             if (NULL != pOldLogoStream)
             {
-                ACE_LOG_MSG->msg_ostream(NULL);
-                pOldLogoStream->close();
                 ACE_Date_Time  dt;
                 //转移日志文件
                 char szHistoryLogFile[MAX_BUFF_200] = { '\0' };
@@ -1693,11 +1692,10 @@ inline void Set_Output_To_File(int nTrunOn, ofstream*& pLogoStream, const char* 
 					dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second());
                 ACE_OS::rename(szDebugFileName, szHistoryLogFile);
 
-                SAFE_DELETE(pOldLogoStream);
+                pOldLogoStream->open(szDebugFileName, std::ofstream::out);
             }
 
-            ofstream* pNewLogoStream = new ofstream(szDebugFileName, std::ofstream::out | std::ofstream::trunc);
-            ACE_LOG_MSG->msg_ostream(pNewLogoStream);
+            ACE_LOG_MSG->release();
         }
     }
 

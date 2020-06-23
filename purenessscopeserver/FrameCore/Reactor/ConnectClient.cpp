@@ -297,7 +297,7 @@ int CConnectClient::RecvData()
     return 0;
 }
 
-int CConnectClient::SendMessageGroup(uint16 u2CommandID, ACE_Message_Block* pmblk)
+int CConnectClient::SendMessageGroup(uint16 u2CommandID, ACE_Message_Block* pmblk) const
 {
     //组织数据
     return Make_Common_Dispose_Client_WorkTread_Message(u2CommandID, (uint32)GetServerID(), pmblk, m_addrRemote);

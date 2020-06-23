@@ -174,7 +174,7 @@ public:
     {
     public:
         std::string ip       = "";
-        uint32 port          = 0;
+        uint16 port          = 0;
         uint8 ipType         = 0;
         uint32 packetparseid = 0;
         _TCPServerIP() {}
@@ -193,7 +193,7 @@ public:
     public:
         std::string uip       = "127.0.0.1";
         uint8 uipType         = 0;
-        uint32 uport          = 0;
+        uint16 uport          = 0;
         uint32 uMaxRecvSize   = 0;
         uint32 uPacketParseID = 0;
         _UDPServerIP() {}
@@ -287,7 +287,7 @@ public:
 class xmlModuleMangager : public IConfigOpeation
 {
 public:
-    uint32 MaxCount = MAX_BUFF_100;
+    uint16 MaxCount = MAX_BUFF_100;
     xmlModuleMangager(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };

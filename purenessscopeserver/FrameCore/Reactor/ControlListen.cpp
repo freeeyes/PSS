@@ -8,14 +8,14 @@ CControlListen::~CControlListen()
 {
 }
 
-bool CControlListen::AddListen( const char* pListenIP, uint32 u4Port, uint8 u1IPType, int nPacketParseID)
+bool CControlListen::AddListen( const char* pListenIP, uint16 u2Port, uint8 u1IPType, int nPacketParseID)
 {
-    bool blState = App_ConnectAcceptorManager::instance()->CheckIPInfo(pListenIP, u4Port);
+    bool blState = App_ConnectAcceptorManager::instance()->CheckIPInfo(pListenIP, u2Port);
 
     if(true == blState)
     {
         //当前监听已经存在，不可以重复建设
-        OUR_DEBUG((LM_INFO, "[CServerManager::AddListen](%s:%d) is exist.\n", pListenIP, u4Port));
+        OUR_DEBUG((LM_INFO, "[CServerManager::AddListen](%s:%d) is exist.\n", pListenIP, u2Port));
         return false;
     }
 
@@ -26,16 +26,16 @@ bool CControlListen::AddListen( const char* pListenIP, uint32 u4Port, uint8 u1IP
 
     if (u1IPType == TYPE_IPV4)
     {
-        nErr = listenAddr.set(u4Port, pListenIP);
+        nErr = listenAddr.set(u2Port, pListenIP);
     }
     else
     {
-        nErr = listenAddr.set(u4Port, pListenIP, 1, PF_INET6);
+        nErr = listenAddr.set(u2Port, pListenIP, 1, PF_INET6);
     }
 
     if (nErr != 0)
     {
-        OUR_DEBUG((LM_INFO, "[CControlListen::AddListen](%s:%d)set_address error[%d].\n", pListenIP, u4Port, errno));
+        OUR_DEBUG((LM_INFO, "[CControlListen::AddListen](%s:%d)set_address error[%d].\n", pListenIP, u2Port, errno));
         return false;
     }
 
@@ -44,7 +44,7 @@ bool CControlListen::AddListen( const char* pListenIP, uint32 u4Port, uint8 u1IP
 
     if (NULL == pConnectAcceptor)
     {
-        OUR_DEBUG((LM_INFO, "[CControlListen::AddListen](%s:%d)pConnectAcceptor is NULL.\n", pListenIP, u4Port));
+        OUR_DEBUG((LM_INFO, "[CControlListen::AddListen](%s:%d)pConnectAcceptor is NULL.\n", pListenIP, u2Port));
         return false;
     }
 
@@ -68,18 +68,18 @@ bool CControlListen::AddListen( const char* pListenIP, uint32 u4Port, uint8 u1IP
     return true;
 }
 
-bool CControlListen::DelListen( const char* pListenIP, uint32 u4Port )
+bool CControlListen::DelListen( const char* pListenIP, uint16 u2Port )
 {
-    bool blState = App_ConnectAcceptorManager::instance()->CheckIPInfo(pListenIP, u4Port);
+    bool blState = App_ConnectAcceptorManager::instance()->CheckIPInfo(pListenIP, u2Port);
 
     if(false == blState)
     {
         //当前监听已经存在，不可以重复建设
-        OUR_DEBUG((LM_INFO, "[CControlListen::AddListen](%s:%d) is exist.\n", pListenIP, u4Port));
+        OUR_DEBUG((LM_INFO, "[CControlListen::AddListen](%s:%d) is exist.\n", pListenIP, u2Port));
         return false;
     }
 
-    return App_ConnectAcceptorManager::instance()->Close(pListenIP, u4Port);
+    return App_ConnectAcceptorManager::instance()->Close(pListenIP, u2Port);
 }
 
 uint32 CControlListen::GetListenCount()
@@ -105,7 +105,7 @@ uint32 CControlListen::GetListenCount()
     {
         for (int i = 0; i < App_ConnectAcceptorManager::instance()->GetCount(); i++)
         {
-            ConnectAcceptor* pConnectAcceptor = App_ConnectAcceptorManager::instance()->GetConnectAcceptor(i);
+            const ConnectAcceptor* pConnectAcceptor = App_ConnectAcceptorManager::instance()->GetConnectAcceptor(i);
 
             if (NULL != pConnectAcceptor)
             {

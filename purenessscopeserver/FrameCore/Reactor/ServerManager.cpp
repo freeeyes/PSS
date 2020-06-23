@@ -161,7 +161,7 @@ bool CServerManager::Start()
     return true;
 }
 
-bool CServerManager::Init_Reactor(uint8 u1ReactorCount, NETWORKMODE u1NetMode)
+bool CServerManager::Init_Reactor(uint8 u1ReactorCount, NETWORKMODE u1NetMode) const
 {
     bool blState = true;
 
@@ -318,11 +318,11 @@ bool CServerManager::Run()
         objReCom.m_nBaudRate = (int)GetXmlConfigAttribute(xmlTTyDrives)->vec[i].u4Baud;
         objReCom.m_uDatabits = (unsigned char)GetXmlConfigAttribute(xmlTTyDrives)->vec[i].u4DataBits;
         objReCom.m_uStopbits = (unsigned char)GetXmlConfigAttribute(xmlTTyDrives)->vec[i].u4StopBits;
-        objReCom.m_pParitymode = (const char*)GetXmlConfigAttribute(xmlTTyDrives)->vec[i].strParity.c_str();
+        objReCom.m_pParitymode = GetXmlConfigAttribute(xmlTTyDrives)->vec[i].strParity.c_str();
         strcpy_safe(GetXmlConfigAttribute(xmlTTyDrives)->vec[i].strPortName.c_str(), objReCom.m_szDevName, 32);
 
         //添加监听
-        App_ReTTyClientManager::instance()->ConnectFrame(GetXmlConfigAttribute(xmlTTyDrives)->vec[i].u4TTyID,
+        App_ReTTyClientManager::instance()->ConnectFrame((uint16)GetXmlConfigAttribute(xmlTTyDrives)->vec[i].u4TTyID,
                 GetXmlConfigAttribute(xmlTTyDrives)->vec[i].strPortName.c_str(),
                 objReCom,
                 GetXmlConfigAttribute(xmlTTyDrives)->vec[i].u4PacketParseID);
@@ -338,7 +338,7 @@ bool CServerManager::Run()
         Check_IPType(GetXmlConfigAttribute(xmlServer2Server)->vec[i].strServerIP.c_str(), u1IPType);
 
         //开启服务器2服务器监听
-        App_ClientReConnectManager::instance()->ConnectFrame(GetXmlConfigAttribute(xmlServer2Server)->vec[i].u4ServerID,
+        App_ClientReConnectManager::instance()->ConnectFrame((uint16)GetXmlConfigAttribute(xmlServer2Server)->vec[i].u4ServerID,
                 GetXmlConfigAttribute(xmlServer2Server)->vec[i].strServerIP.c_str(),
                 GetXmlConfigAttribute(xmlServer2Server)->vec[i].u4ServerPort,
                 u1IPType,
@@ -365,7 +365,7 @@ bool CServerManager::Run()
     return true;
 }
 
-bool CServerManager::Start_Tcp_Listen()
+bool CServerManager::Start_Tcp_Listen() const
 {
     int nServerPortCount = (int)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
 
@@ -406,7 +406,7 @@ bool CServerManager::Start_Tcp_Listen()
     return true;
 }
 
-bool CServerManager::Start_Udp_Listen()
+bool CServerManager::Start_Udp_Listen() const
 {
     int nUDPServerPortCount = (int)GetXmlConfigAttribute(xmlUDPServerIPs)->vec.size();
 
@@ -458,7 +458,7 @@ bool CServerManager::Start_Console_Tcp_Listen()
         {
             if (ACE_OS::strcmp(GetXmlConfigAttribute(xmlConsole)->sip.c_str(), "INADDR_ANY") == 0)
             {
-                nErr = listenConsoleAddr.set(GetXmlConfigAttribute(xmlConsole)->sport, (uint32)INADDR_ANY);
+                nErr = listenConsoleAddr.set(GetXmlConfigAttribute(xmlConsole)->sport, INADDR_ANY);
             }
             else
             {
@@ -470,7 +470,7 @@ bool CServerManager::Start_Console_Tcp_Listen()
         {
             if (ACE_OS::strcmp(GetXmlConfigAttribute(xmlConsole)->sip.c_str(), "INADDR_ANY") == 0)
             {
-                nErr = listenConsoleAddr.set(GetXmlConfigAttribute(xmlConsole)->sport, (uint32)INADDR_ANY);
+                nErr = listenConsoleAddr.set(GetXmlConfigAttribute(xmlConsole)->sport, INADDR_ANY);
             }
             else
             {
@@ -564,7 +564,7 @@ void CServerManager::Multiple_Process_Start()
     }
 
     //启动并监控子进程
-    while (1)
+    while (true)
     {
         Run_Child_Process_Start(nNumChlid, fd_lock);
 

@@ -29,6 +29,7 @@ public:
 
 private:
     CConnectClient* m_pConnectClient = NULL;
+    int m_nTestCount = 0;
 };
 
 #endif

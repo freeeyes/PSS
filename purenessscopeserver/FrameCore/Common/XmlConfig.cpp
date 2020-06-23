@@ -214,7 +214,7 @@ bool xmlTCPServerIPs::Init(CXmlOpeation* pXmlOperation)
 
     while (bKet
            && pXmlOperation->Read_XML_Data_Multiple_String("TCPServerIP", "ip", tcpServerIP.ip, pIP)
-           && pXmlOperation->Read_XML_Data_Multiple_Uint32("TCPServerIP", "port", tcpServerIP.port, pPort)
+           && pXmlOperation->Read_XML_Data_Multiple_Uint16("TCPServerIP", "port", tcpServerIP.port, pPort)
            && pXmlOperation->Read_XML_Data_Multiple_Uint32("TCPServerIP", "ParseID", tcpServerIP.packetparseid, pPacketParseID))
     {
         bKet = Check_IPType(tcpServerIP.ip, tcpServerIP.ipType);
@@ -236,7 +236,7 @@ bool xmlUDPServerIPs::Init(CXmlOpeation* pXmlOperation)
 
     while (bKet
            && pXmlOperation->Read_XML_Data_Multiple_String("UDPServerIP", "uip", udpServerIP.uip, pUIP)
-           && pXmlOperation->Read_XML_Data_Multiple_Uint32("UDPServerIP", "uport", udpServerIP.uport, pUPort)
+           && pXmlOperation->Read_XML_Data_Multiple_Uint16("UDPServerIP", "uport", udpServerIP.uport, pUPort)
            && pXmlOperation->Read_XML_Data_Multiple_Uint32("UDPServerIP", "uMaxRecvSize", udpServerIP.uMaxRecvSize, pUMaxRecvSize)
            && pXmlOperation->Read_XML_Data_Multiple_Uint32("UDPServerIP", "uParseID", udpServerIP.uPacketParseID, pUPacketParseID))
     {
@@ -337,7 +337,7 @@ bool xmlModuleInfos::Init(CXmlOpeation* pXmlOperation)
 
 bool xmlModuleMangager::Init(CXmlOpeation* pXmlOperation)
 {
-    return pXmlOperation->Read_XML_Data_Single_Uint32("ModuleManager", "MaxCount", MaxCount);
+    return pXmlOperation->Read_XML_Data_Single_Uint16("ModuleManager", "MaxCount", MaxCount);
 }
 
 bool xmlMonitor::Init(CXmlOpeation* pXmlOperation)

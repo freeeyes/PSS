@@ -24,7 +24,7 @@ public:
     uint16 m_u2ServerPort            = 0;
     uint8 m_u1Type                   = 0;
     char m_szLocalIP[MAX_BUFF_100]   = {'\0'};
-    int m_nLocalPort                 = 0;
+    uint16 m_u2LocalPort             = 0;
     uint8 m_u1LocalIPType            = 0;
     IClientMessage* m_pClientMessage = NULL;
 };
@@ -38,12 +38,12 @@ public:
     //设置TCP链接参数，pClientMessage为远端数据到达处理类。
     virtual bool Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, IClientMessage* pClientMessage)                  = 0;
     //设置TCP链接参数，pClientMessage为远端数据到达处理类，可以设置本地IP和端口。
-    virtual bool Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage) = 0;
+    virtual bool Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, uint16 u2LocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage) = 0;
 
     //设置TCP链接参数，pClientMessage为远端数据到达处理类。
     virtual bool ConnectFrame(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, uint32 u4PacketParse) = 0;
     //设置TCP链接参数，pClientMessage为远端数据到达处理类，可以设置本地IP和端口。
-    virtual bool ConnectFrame(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, uint32 u4PacketParse) = 0;
+    virtual bool ConnectFrame(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, uint16 u2LocalPort, uint8 u1LocalIPType, uint32 u4PacketParse) = 0;
 
     //设置UDP链接参数，pClientUDPMessage为远端数据到达处理类。
     virtual bool ConnectUDP(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage) = 0;

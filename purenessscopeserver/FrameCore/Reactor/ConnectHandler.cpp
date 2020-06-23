@@ -4,7 +4,7 @@ CConnectHandler::CConnectHandler(void)
 {
 }
 
-const char* CConnectHandler::GetError()
+const char* CConnectHandler::GetError() const
 {
     return m_szError;
 }
@@ -91,12 +91,12 @@ void CConnectHandler::SetPacketParseInfoID(uint32 u4PacketParseInfoID)
     m_u4PacketParseInfoID = u4PacketParseInfoID;
 }
 
-uint32 CConnectHandler::GetPacketParseInfoID()
+uint32 CConnectHandler::GetPacketParseInfoID() const
 {
     return m_u4PacketParseInfoID;
 }
 
-uint32 CConnectHandler::GetHandlerID()
+uint32 CConnectHandler::GetHandlerID() const
 {
     return m_u4HandlerID;
 }
@@ -106,7 +106,7 @@ void CConnectHandler::SetConnectID(uint32 u4ConnectID)
     m_u4ConnectID = u4ConnectID;
 }
 
-uint32 CConnectHandler::GetConnectID()
+uint32 CConnectHandler::GetConnectID() const
 {
     return m_u4ConnectID;
 }
@@ -683,12 +683,12 @@ void CConnectHandler::SetSendQueueTimeCost(uint32 u4TimeCost)
     }
 }
 
-CONNECTSTATE CConnectHandler::GetConnectState()
+CONNECTSTATE CConnectHandler::GetConnectState() const
 {
     return m_u1ConnectState;
 }
 
-CONNECTSTATE CConnectHandler::GetSendBuffState()
+CONNECTSTATE CConnectHandler::GetSendBuffState() const
 {
     return m_u1SendBuffState;
 }
@@ -711,7 +711,7 @@ bool CConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, 
         {
             //在队列里已经存在关闭连接指令，之后的所有数据写请求全部不予发送。
             ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
-            memcpy_safe((char*)pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), (char*)pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
+            memcpy_safe(pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
             pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
             ACE_Time_Value tvNow = ACE_OS::gettimeofday();
             App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
@@ -922,26 +922,26 @@ void CConnectHandler::ConnectOpen()
     m_u1ConnectState = CONNECTSTATE::CONNECT_OPEN;
 }
 
-void CConnectHandler::Get_Recv_length(int& nCurrCount)
+void CConnectHandler::Get_Recv_length(int& nCurrCount) const
 {
     if("" != m_strDeviceName)
     {
-        nCurrCount = (uint32)GetXmlConfigAttribute(xmlClientInfo)->MaxBuffRecv - (uint32)m_pCurrMessage->length();
+        nCurrCount = GetXmlConfigAttribute(xmlClientInfo)->MaxBuffRecv - (uint32)m_pCurrMessage->length();
     }
     else if (App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u1PacketParseType == PACKET_WITHHEAD)
     {
         if (m_pPacketParse->GetIsHandleHead())
         {
-            nCurrCount = (uint32)App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength - (uint32)m_pCurrMessage->length();
+            nCurrCount = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->m_u4OrgLength - (uint32)m_pCurrMessage->length();
         }
         else
         {
-            nCurrCount = (uint32)m_pPacketParse->GetPacketBodySrcLen() - (uint32)m_pCurrMessage->length();
+            nCurrCount = m_pPacketParse->GetPacketBodySrcLen() - (uint32)m_pCurrMessage->length();
         }
     }
     else
     {
-        nCurrCount = (uint32)GetXmlConfigAttribute(xmlClientInfo)->MaxBuffRecv - (uint32)m_pCurrMessage->length();
+        nCurrCount = GetXmlConfigAttribute(xmlClientInfo)->MaxBuffRecv - (uint32)m_pCurrMessage->length();
     }
 }
 
@@ -1189,11 +1189,11 @@ _ClientConnectInfo CConnectHandler::GetClientInfo()
     return Tcp_Common_ClientInfo(obj_ClientConnectInfo_Param);
 }
 
-_ClientIPInfo  CConnectHandler::GetClientIPInfo()
+_ClientIPInfo  CConnectHandler::GetClientIPInfo() const
 {
     _ClientIPInfo ClientIPInfo;
     sprintf_safe(ClientIPInfo.m_szClientIP, MAX_BUFF_50, "%s", m_addrRemote.get_host_addr());
-    ClientIPInfo.m_u2Port = (int)m_addrRemote.get_port_number();
+    ClientIPInfo.m_u2Port = m_addrRemote.get_port_number();
     return ClientIPInfo;
 }
 
@@ -1201,7 +1201,7 @@ _ClientIPInfo  CConnectHandler::GetLocalIPInfo()
 {
     _ClientIPInfo ClientIPInfo;
     sprintf_safe(ClientIPInfo.m_szClientIP, MAX_BUFF_50, "%s", m_szLocalIP);
-    ClientIPInfo.m_u2Port = (int)m_u2LocalPort;
+    ClientIPInfo.m_u2Port = m_u2LocalPort;
     return ClientIPInfo;
 }
 
@@ -1437,7 +1437,7 @@ char* CConnectHandler::GetConnectName()
     return m_szConnectName;
 }
 
-bool CConnectHandler::GetIsLog()
+bool CConnectHandler::GetIsLog() const
 {
     return m_blIsLog;
 }
@@ -1447,7 +1447,7 @@ void CConnectHandler::SetHashID(int nHashID)
     m_nHashID = nHashID;
 }
 
-int CConnectHandler::GetHashID()
+int CConnectHandler::GetHashID() const
 {
     return m_nHashID;
 }
@@ -1711,7 +1711,7 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
         pConnectHandler->SetSendQueueTimeCost(u4SendCost);
 
         _ClientIPInfo objClientIP = pConnectHandler->GetLocalIPInfo();
-        m_CommandAccount.SaveCommandData(u2CommandID, (uint32)objClientIP.m_u2Port, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP, u4PacketSize, COMMAND_TYPE_OUT);
+        m_CommandAccount.SaveCommandData(u2CommandID, objClientIP.m_u2Port, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP, u4PacketSize, COMMAND_TYPE_OUT);
         return true;
     }
     else
@@ -1747,7 +1747,7 @@ bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
                                            dynamic_cast<ACE_Task<ACE_MT_SYNCH>*>(this));
 }
 
-const char* CConnectManager::GetError()
+const char* CConnectManager::GetError() const
 {
     return m_szError;
 }
@@ -2075,13 +2075,13 @@ void CConnectManager::Init( uint16 u2Index )
     Tcp_Common_Manager_Init(u2Index, m_CommandAccount, m_u2SendQueueMax, m_SendCacheManager);
 
     //初始化Hash表
-    uint16 u2PoolSize = GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount;
-    m_objHashConnectList.Init((int)u2PoolSize);
+    uint32 u4PoolSize = GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount;
+    m_objHashConnectList.Init(u4PoolSize);
 
     //初始化时间轮盘
     m_TimeWheelLink.Init(GetXmlConfigAttribute(xmlClientInfo)->MaxConnectTime,
                          GetXmlConfigAttribute(xmlClientInfo)->CheckAliveTime,
-                         (int)u2PoolSize,
+                         (int)u4PoolSize,
                          CConnectManager::TimeWheel_Timeout_Callback, (void*)this);
 }
 
@@ -2183,9 +2183,9 @@ void CConnectHandlerPool::Init(int nObjcetCount)
 
     //初始化HashTable
     m_objHandlerList.Init((uint32)nObjcetCount);
-    m_objHashHandleList.Init((int)nObjcetCount);
+    m_objHashHandleList.Init((uint32)nObjcetCount);
 
-    for(int i = 0; i < nObjcetCount; i++)
+    for(uint16 i = 0; i < (uint16)nObjcetCount; i++)
     {
         CConnectHandler* pHandler = m_objHandlerList.GetObject(i);
 
@@ -2573,7 +2573,7 @@ bool CConnectManagerGroup::CloseConnect(uint32 u4ConnectID)
     return pConnectManager->CloseConnect_By_Queue(u4ConnectID);
 }
 
-bool CConnectManagerGroup::CloseConnectByClient(uint32 u4ConnectID)
+bool CConnectManagerGroup::CloseConnectByClient(uint32 u4ConnectID) const
 {
     //判断命中到哪一个线程组里面去
     uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
@@ -2624,7 +2624,7 @@ _ClientIPInfo CConnectManagerGroup::GetLocalIPInfo(uint32 u4ConnectID)
 }
 
 
-void CConnectManagerGroup::GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo)
+void CConnectManagerGroup::GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo) const
 {
     for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
     {
@@ -2659,7 +2659,7 @@ void CConnectManagerGroup::CloseAll()
     Close();
 }
 
-bool CConnectManagerGroup::StartTimer()
+bool CConnectManagerGroup::StartTimer() const
 {
     for(uint16 i = 0; i < m_u2ThreadQueueCount; i++)
     {
@@ -2674,7 +2674,7 @@ bool CConnectManagerGroup::StartTimer()
     return true;
 }
 
-bool CConnectManagerGroup::Close(uint32 u4ConnectID)
+bool CConnectManagerGroup::Close(uint32 u4ConnectID) const
 {
     //判断命中到哪一个线程组里面去
     uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
@@ -2690,7 +2690,7 @@ bool CConnectManagerGroup::Close(uint32 u4ConnectID)
     return pConnectManager->Close(u4ConnectID);
 }
 
-bool CConnectManagerGroup::CloseUnLock(uint32 u4ConnectID)
+bool CConnectManagerGroup::CloseUnLock(uint32 u4ConnectID) const
 {
     //判断命中到哪一个线程组里面去
     uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
@@ -2706,12 +2706,12 @@ bool CConnectManagerGroup::CloseUnLock(uint32 u4ConnectID)
     return pConnectManager->CloseUnLock(u4ConnectID);
 }
 
-const char* CConnectManagerGroup::GetError()
+const char* CConnectManagerGroup::GetError() const
 {
     return NULL;
 }
 
-void CConnectManagerGroup::SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4TimeCost)
+void CConnectManagerGroup::SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4TimeCost) const
 {
     //判断命中到哪一个线程组里面去
     uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;
@@ -2868,7 +2868,7 @@ void CConnectManagerGroup::GetClientNameInfo(const char* pName, vecClientNameInf
     }
 }
 
-void CConnectManagerGroup::GetCommandData( uint16 u2CommandID, _CommandData& objCommandData )
+void CConnectManagerGroup::GetCommandData( uint16 u2CommandID, _CommandData& objCommandData ) const
 {
 	for (uint16 i = 0; i < m_u2ThreadQueueCount; i++)
 	{
@@ -2886,7 +2886,7 @@ void CConnectManagerGroup::GetCommandData( uint16 u2CommandID, _CommandData& obj
 	}
 }
 
-void CConnectManagerGroup::GetFlowInfo(uint32& u4UdpFlowIn, uint32& u4UdpFlowOut)
+void CConnectManagerGroup::GetFlowInfo(uint32& u4UdpFlowIn, uint32& u4UdpFlowOut) const
 {
 	uint32 u4ConnectFlowIn = 0;
 	uint32 u4ConnectFlowOut = 0;
@@ -2920,7 +2920,7 @@ EM_Client_Connect_status CConnectManagerGroup::GetConnectState(uint32 u4ConnectI
     return pConnectManager->GetConnectState(u4ConnectID);
 }
 
-int CConnectManagerGroup::handle_write_file_stream(uint32 u4ConnectID, const char* pData, uint32 u4Size, uint8 u1ParseID)
+int CConnectManagerGroup::handle_write_file_stream(uint32 u4ConnectID, const char* pData, uint32 u4Size, uint8 u1ParseID) const
 {
     //判断命中到哪一个线程组里面
     uint16 u2ThreadIndex = u4ConnectID % m_u2ThreadQueueCount;

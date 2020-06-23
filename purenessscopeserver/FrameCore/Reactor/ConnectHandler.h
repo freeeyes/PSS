@@ -57,7 +57,7 @@ public:
 
     void Init(uint16 u2HandlerID);                                           //Connect Pool初始化调用时候调用的方法
     void SetPacketParseInfoID(uint32 u4PacketParseInfoID);                   //设置对应的m_u4PacketParseInfoID
-    uint32 GetPacketParseInfoID();                                           //获得相应的m_u4PacketParseInfoID
+    uint32 GetPacketParseInfoID() const;                                     //获得相应的m_u4PacketParseInfoID
 
 
     bool CheckSendMask(uint32 u4PacketLen);                                  //检测指定的连接发送数据是否超过阻塞阀值
@@ -72,21 +72,21 @@ public:
     void Close();                                                            //关闭当前连接
     void CloseFinally();                                                     //替代析构函数，符合roz规则
 
-    uint32      GetHandlerID();                                              //得到当前的handlerID
-    const char* GetError();                                                  //得到当前错误信息
+    uint32      GetHandlerID() const;                                        //得到当前的handlerID
+    const char* GetError() const;                                            //得到当前错误信息
     void        SetConnectID(uint32 u4ConnectID);                            //设置当前链接ID
-    uint32      GetConnectID();                                              //得到当前链接ID
-    CONNECTSTATE       GetConnectState();                                    //得到链接状态
-    CONNECTSTATE       GetSendBuffState();                                   //得到发送状态
+    uint32      GetConnectID() const;                                        //得到当前链接ID
+    CONNECTSTATE       GetConnectState() const;                              //得到链接状态
+    CONNECTSTATE       GetSendBuffState() const;                             //得到发送状态
     _ClientConnectInfo GetClientInfo();                                      //得到客户端信息
-    _ClientIPInfo      GetClientIPInfo();                                    //得到客户端IP信息
+    _ClientIPInfo      GetClientIPInfo() const;                              //得到客户端IP信息
     _ClientIPInfo      GetLocalIPInfo();                                     //得到监听IP信息
     void SetConnectName(const char* pName);                                  //设置当前连接名称
     char* GetConnectName();                                                  //得到别名
     void SetIsLog(bool blIsLog);                                             //设置当前连接数据是否写入日志
-    bool GetIsLog();                                                         //获得当前连接是否可以写入日志
+    bool GetIsLog() const;                                                   //获得当前连接是否可以写入日志
     void SetHashID(int nHashID);                                             //设置Hash数组下标
-    int  GetHashID();                                                        //得到Hash数组下标
+    int  GetHashID() const;                                                  //得到Hash数组下标
     void SetSendCacheManager(CSendCacheManager* pSendCacheManager);          //设置缓冲区对象
     bool Test_Paceket_Parse_Stream(ACE_Message_Block* pmb);                  //测试流模式解析数据入口
     void Output_Debug_Data(const ACE_Message_Block* pMbData, int nLogType);  //输出DEBUG信息
@@ -97,7 +97,7 @@ public:
 
 private:
     void ConnectOpen();                                                      //设置连接相关打开代码
-    void Get_Recv_length(int& nCurrCount);                                   //得到要处理的数据长度
+    void Get_Recv_length(int& nCurrCount) const;                             //得到要处理的数据长度
     int  Dispose_Paceket_Parse_Head();                                       //处理消息头函数
     int  Dispose_Paceket_Parse_Body();                                       //处理消息头函数
     int  Dispose_Paceket_Parse_Stream(ACE_Message_Block* pCurrMessage);      //处理流消息函数
@@ -199,7 +199,7 @@ public:
     void GetFlowInfo(uint32& u4UdpFlowIn, uint32& u4UdpFlowOut);                                             //得到流量信息
 
     int         GetCount();
-    const char* GetError();
+    const char* GetError() const;
 
     bool SetConnectName(uint32 u4ConnectID, const char* pName);                                              //设置当前连接名称
     bool SetIsLog(uint32 u4ConnectID, bool blIsLog);                                                         //设置当前连接数据是否写入日志
@@ -279,28 +279,28 @@ public:
     virtual bool PostMessageAll(char*& pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL,
                                 uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDelete = true, int nMessageID = 0);
     virtual bool CloseConnect(uint32 u4ConnectID);                                                                   //服务器关闭
-    bool CloseConnectByClient(uint32 u4ConnectID);                                                                   //客户端关闭
+    bool CloseConnectByClient(uint32 u4ConnectID) const;                                                             //客户端关闭
     virtual _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                                                       //得到指定链接信息
     virtual _ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID);                                                        //得到监听链接信息
     virtual void GetClientNameInfo(const char* pName, vecClientNameInfo& objClientNameInfo);                         //得到指定别名的所有设置信息
-    void GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo);                                                 //返回当前存活链接的信息
-    void SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4TimeCost);                                                //记录指定链接数据处理时间
+    void GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo) const;                                           //返回当前存活链接的信息
+    void SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4TimeCost) const;                                          //记录指定链接数据处理时间
     virtual uint16 GetConnectCheckTime();                                                                            //得到TCP检查的时间间隔
 
     virtual int  GetCount();
     void CloseAll();
-    bool Close(uint32 u4ConnectID);                                                                          //客户单关闭
-    bool CloseUnLock(uint32 u4ConnectID);                                                                    //关闭连接，不上锁版本
+    bool Close(uint32 u4ConnectID) const;                                                                    //客户单关闭
+    bool CloseUnLock(uint32 u4ConnectID) const;                                                              //关闭连接，不上锁版本
     bool SetConnectName(uint32 u4ConnectID, const char* pName);                                              //设置当前连接名称
     bool SetIsLog(uint32 u4ConnectID, bool blIsLog);                                                         //设置当前连接数据是否写入日志
-    void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);                                   //获得指定命令统计信息
+    void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData) const;                             //获得指定命令统计信息
 
-    bool StartTimer();                                                                                       //开启定时器
-    const char* GetError();
-    void GetFlowInfo(uint32& u4UdpFlowIn, uint32& u4UdpFlowOut);                                             //得到流量信息
+    bool StartTimer() const;                                                                                 //开启定时器
+    const char* GetError() const;
+    void GetFlowInfo(uint32& u4UdpFlowIn, uint32& u4UdpFlowOut) const;                                       //得到流量信息
     virtual EM_Client_Connect_status GetConnectState(uint32 u4ConnectID);
 
-    int handle_write_file_stream(uint32 u4ConnectID, const char* pData, uint32 u4Size, uint8 u1ParseID);     //文件接口模拟数据包入口
+    int handle_write_file_stream(uint32 u4ConnectID, const char* pData, uint32 u4Size, uint8 u1ParseID) const; //文件接口模拟数据包入口
 
     CConnectManager* GetManagerFormList(int nIndex);                                                       //获得当前Manager的指针
 

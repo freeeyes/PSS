@@ -275,7 +275,7 @@ bool CClientProConnectManager::Init(ACE_Proactor* pProactor)
     //将之前有缓冲的连接信息建立连接
     for (CS2SConnectGetRandyInfo f : m_GetReadyInfoList)
     {
-        if (f.m_nLocalPort == 0)
+        if (f.m_u2LocalPort == 0)
         {
             Connect(f.m_nServerID,
                     f.m_szServerIP,
@@ -290,7 +290,7 @@ bool CClientProConnectManager::Init(ACE_Proactor* pProactor)
                     f.m_u2ServerPort,
                     f.m_u1Type,
                     f.m_szLocalIP,
-                    f.m_nLocalPort,
+                    f.m_u2LocalPort,
                     f.m_u1LocalIPType,
                     f.m_pClientMessage);
         }
@@ -346,7 +346,7 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, uint16 u2
     return true;
 }
 
-bool CClientProConnectManager::Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage)
+bool CClientProConnectManager::Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, uint16 u2LocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     CProactorClientInfo* pClientInfo = NULL;
@@ -361,7 +361,7 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, uint16 u2
         objS2SConnectGetRandyInfo.m_u2ServerPort    = u2Port;
         objS2SConnectGetRandyInfo.m_u1Type         = u1IPType;
         sprintf_safe(objS2SConnectGetRandyInfo.m_szLocalIP, MAX_BUFF_100, "%s", pLocalIP);
-        objS2SConnectGetRandyInfo.m_nLocalPort     = nLocalPort;
+        objS2SConnectGetRandyInfo.m_u2LocalPort     = u2LocalPort;
         objS2SConnectGetRandyInfo.m_u1LocalIPType  = u1LocalIPType;
         objS2SConnectGetRandyInfo.m_pClientMessage = pClientMessage;
         m_GetReadyInfoList.push_back(objS2SConnectGetRandyInfo);
@@ -370,7 +370,7 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, uint16 u2
     }
 
     //连接初始化动作
-    if (false == ConnectTcpInit(nServerID, pIP, u2Port, u1IPType, pLocalIP, nLocalPort, u1LocalIPType, pClientMessage, pClientInfo))
+    if (false == ConnectTcpInit(nServerID, pIP, u2Port, u1IPType, pLocalIP, u2LocalPort, u1LocalIPType, pClientMessage, pClientInfo))
     {
         return false;
     }
@@ -416,13 +416,13 @@ bool CClientProConnectManager::ConnectFrame(int nServerID, const char* pIP, uint
     return true;
 }
 
-bool CClientProConnectManager::ConnectFrame(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, uint32 u4PacketParse)
+bool CClientProConnectManager::ConnectFrame(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, uint16 u2LocalPort, uint8 u1LocalIPType, uint32 u4PacketParse)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     CProactorClientInfo* pClientInfo = NULL;
 
     //连接初始化动作
-    if (false == ConnectTcpInit(nServerID, pIP, u2Port, u1IPType, pLocalIP, nLocalPort, u1LocalIPType, NULL, pClientInfo, u4PacketParse))
+    if (false == ConnectTcpInit(nServerID, pIP, u2Port, u1IPType, pLocalIP, u2LocalPort, u1LocalIPType, NULL, pClientInfo, u4PacketParse))
     {
         return false;
     }

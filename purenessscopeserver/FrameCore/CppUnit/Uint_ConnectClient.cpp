@@ -47,6 +47,7 @@ void CUnit_ConnectClient::Test_GetTimeout(void)
     m_pConnectClient->GetTimeout(tvNow);
 
     CPPUNIT_ASSERT_MESSAGE("[Test_GetTimeout]GetTimeout is fail.", false == blRet);
+    m_nTestCount++;
 }
 
 void CUnit_ConnectClient::Test_Output_Debug_Data(void)
@@ -57,6 +58,7 @@ void CUnit_ConnectClient::Test_Output_Debug_Data(void)
     pMbData->wr_ptr(4);
 
     m_pConnectClient->Output_Debug_Data(pMbData, LOG_SYSTEM_DEBUG_CLIENTRECV, true);
+    m_nTestCount++;
 }
 
 #endif

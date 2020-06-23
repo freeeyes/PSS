@@ -151,7 +151,7 @@ const char* ConnectAcceptor::GetListenIP() const
     return m_szListenIP;
 }
 
-uint32 ConnectAcceptor::GetListenPort() const
+uint16 ConnectAcceptor::GetListenPort() const
 {
     return m_u2Port;
 }
@@ -206,7 +206,7 @@ void CConnectAcceptorManager::Close()
     OUR_DEBUG((LM_INFO, "[CConnectAcceptorManager::Close]End.\n"));
 }
 
-bool CConnectAcceptorManager::Close(const char* pIP, uint32 n4Port)
+bool CConnectAcceptorManager::Close(const char* pIP, uint16 u2Port)
 {
     //找到符合条件指定的端口停止监听
     vecConnectAcceptor::iterator b = m_vecConnectAcceptor.begin();
@@ -215,7 +215,7 @@ bool CConnectAcceptorManager::Close(const char* pIP, uint32 n4Port)
         ConnectAcceptor* pConnectAcceptor = *b;
 
 		if (ACE_OS::strcmp(pConnectAcceptor->GetListenIP(), pIP) == 0
-			&& pConnectAcceptor->GetListenPort() == n4Port)
+			&& pConnectAcceptor->GetListenPort() == u2Port)
 		{
 			pConnectAcceptor->close();
 			SAFE_DELETE(pConnectAcceptor);
@@ -248,16 +248,16 @@ const char* CConnectAcceptorManager::GetError() const
     return m_szError;
 }
 
-bool CConnectAcceptorManager::CheckIPInfo(const char* pIP, uint32 n4Port)
+bool CConnectAcceptorManager::CheckIPInfo(const char* pIP, uint16 u2Port)
 {
     //找到符合条件指定的端口停止监听
 	vecConnectAcceptor::iterator b = m_vecConnectAcceptor.begin();
 	while (b != m_vecConnectAcceptor.end())
     {
-        ConnectAcceptor* pConnectAcceptor = *b;
+        const ConnectAcceptor* pConnectAcceptor = *b;
 
         if (ACE_OS::strcmp(pConnectAcceptor->GetListenIP(), pIP) == 0
-            && pConnectAcceptor->GetListenPort() == n4Port)
+            && pConnectAcceptor->GetListenPort() == u2Port)
         {
             return true;
         }

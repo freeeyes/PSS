@@ -33,18 +33,18 @@ public:
     void Close(int nIOCount = 1);
     bool ServerClose();
 
-    const char*  GetError();
+    const char*  GetError() const;
     void         SetConnectID(uint32 u4ConnectID);
-    uint32       GetConnectID();
-    CONNECTSTATE GetConnectState();                                           //得到链接状态
-    CONNECTSTATE GetSendBuffState();                                          //得到发送状态
-    uint8        GetIsClosing();                                              //链接是否应该关闭
+    uint32       GetConnectID() const;
+    CONNECTSTATE GetConnectState() const;                                     //得到链接状态
+    CONNECTSTATE GetSendBuffState() const;                                    //得到发送状态
+    uint8        GetIsClosing() const;                                        //链接是否应该关闭
 
 private:
     bool CheckMessage();                                                      //处理接收的数据
     bool PutSendPacket(ACE_Message_Block* pMbData);                           //发送数据
     void Clear_PacketParse();                                                 //清理不需要的PacketParse
-    bool CompareConsoleClinetIP(const char* pIP);                             //检查一个Console连接的IP是否在指定的允许列表中
+    bool CompareConsoleClinetIP(const char* pIP) const;                       //检查一个Console连接的IP是否在指定的允许列表中
 
     uint32                     m_u4ConnectID           = 0;                  //链接的ID
     uint32                     m_u4AllRecvCount        = 0;                  //当前链接接收数据包的个数

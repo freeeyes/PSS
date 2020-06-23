@@ -38,7 +38,7 @@ public:
     int Run_Open(ACE_Reactor* reactor);
 
     const char*  GetListenIP() const;
-    uint32 GetListenPort() const;
+    uint16 GetListenPort() const;
 
 private:
     char   m_szListenIP[MAX_BUFF_20] = {'\0'};
@@ -60,8 +60,8 @@ public:
     ConnectAcceptor* GetNewConnectAcceptor();
     const char* GetError() const;
 
-    bool Close(const char* pIP, uint32 n4Port);
-    bool CheckIPInfo(const char* pIP, uint32 n4Port);
+    bool Close(const char* pIP, uint16 n4Port);
+    bool CheckIPInfo(const char* pIP, uint16 n4Port);
 
 private:
     typedef vector<ConnectAcceptor*> vecConnectAcceptor;

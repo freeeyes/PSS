@@ -272,7 +272,7 @@ bool CClientReConnectManager::Init(ACE_Reactor* pReactor)
     //将之前有缓冲的连接信息建立连接
     for(CS2SConnectGetRandyInfo f : m_GetReadyInfoList)
     {
-        if (f.m_nLocalPort == 0)
+        if (f.m_u2LocalPort == 0)
         {
             Connect(f.m_nServerID,
                     f.m_szServerIP,
@@ -287,7 +287,7 @@ bool CClientReConnectManager::Init(ACE_Reactor* pReactor)
                     f.m_u2ServerPort,
                     f.m_u1Type,
                     f.m_szLocalIP,
-                    f.m_nLocalPort,
+                    f.m_u2LocalPort,
                     f.m_u1LocalIPType,
                     f.m_pClientMessage);
         }
@@ -344,7 +344,7 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, uint16 u2P
     return true;
 }
 
-bool CClientReConnectManager::Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage)
+bool CClientReConnectManager::Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, uint16 u2LocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     CReactorClientInfo* pClientInfo = NULL;
@@ -359,7 +359,7 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, uint16 u2P
         objS2SConnectGetRandyInfo.m_u2ServerPort    = u2Port;
         objS2SConnectGetRandyInfo.m_u1Type         = u1IPType;
         sprintf_safe(objS2SConnectGetRandyInfo.m_szLocalIP, MAX_BUFF_100, "%s", pLocalIP);
-        objS2SConnectGetRandyInfo.m_nLocalPort     = nLocalPort;
+        objS2SConnectGetRandyInfo.m_u2LocalPort     = u2LocalPort;
         objS2SConnectGetRandyInfo.m_u1LocalIPType  = u1LocalIPType;
         objS2SConnectGetRandyInfo.m_pClientMessage = pClientMessage;
         m_GetReadyInfoList.push_back(objS2SConnectGetRandyInfo);
@@ -368,7 +368,7 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, uint16 u2P
     }
 
     //连接初始化动作
-    if (false == ConnectTcpInit(nServerID, pIP, u2Port, u1IPType, pLocalIP, nLocalPort, u1LocalIPType, pClientMessage, pClientInfo, 0))
+    if (false == ConnectTcpInit(nServerID, pIP, u2Port, u1IPType, pLocalIP, u2LocalPort, u1LocalIPType, pClientMessage, pClientInfo, 0))
     {
         return false;
     }
@@ -422,13 +422,13 @@ bool CClientReConnectManager::ConnectFrame(int nServerID, const char* pIP, uint1
     return true;
 }
 
-bool CClientReConnectManager::ConnectFrame(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, uint32 u4PacketParseID)
+bool CClientReConnectManager::ConnectFrame(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, uint16 u2LocalPort, uint8 u1LocalIPType, uint32 u4PacketParseID)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     CReactorClientInfo* pClientInfo = NULL;
 
     //连接初始化动作
-    if (false == ConnectTcpInit(nServerID, pIP, u2Port, u1IPType, pLocalIP, nLocalPort, u1LocalIPType, NULL, pClientInfo, u4PacketParseID))
+    if (false == ConnectTcpInit(nServerID, pIP, u2Port, u1IPType, pLocalIP, u2LocalPort, u1LocalIPType, NULL, pClientInfo, u4PacketParseID))
     {
         return false;
     }
@@ -977,7 +977,7 @@ EM_Server_Connect_State CClientReConnectManager::GetConnectState( int nServerID 
     char szServerID[10] = {'\0'};
     sprintf_safe(szServerID, 10, "%d", nServerID);
 
-    CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
+    const CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 
     if (NULL == pClientInfo)
     {
@@ -995,7 +995,7 @@ uint32 CClientReConnectManager::GetPacketParseID(int nServerID)
     char szServerID[10] = { '\0' };
     sprintf_safe(szServerID, 10, "%d", nServerID);
 
-    CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
+    const CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 
     if (NULL != pClientInfo)
     {
@@ -1042,7 +1042,7 @@ ACE_INET_Addr CClientReConnectManager::GetServerAddr(int nServerID)
     char szServerID[10] = {'\0'};
     sprintf_safe(szServerID, 10, "%d", nServerID);
 
-    CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
+    const CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 
     if (NULL == pClientInfo)
     {
@@ -1084,7 +1084,7 @@ bool CClientReConnectManager::GetServerIPInfo( int nServerID, _ClientIPInfo& obj
     char szServerID[10] = {'\0'};
     sprintf_safe(szServerID, 10, "%d", nServerID);
 
-    CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
+    const CReactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 
     if (NULL == pClientInfo)
     {

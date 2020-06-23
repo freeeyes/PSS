@@ -4,7 +4,7 @@ CConsoleHandler::CConsoleHandler(void)
 {
 }
 
-const char* CConsoleHandler::GetError()
+const char* CConsoleHandler::GetError() const
 {
     return m_szError;
 }
@@ -55,7 +55,7 @@ void CConsoleHandler::SetConnectID(uint32 u4ConnectID)
     m_u4ConnectID = u4ConnectID;
 }
 
-uint32 CConsoleHandler::GetConnectID()
+uint32 CConsoleHandler::GetConnectID() const
 {
     return m_u4ConnectID;
 }
@@ -255,17 +255,17 @@ int CConsoleHandler::handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask)
     return 0;
 }
 
-CONNECTSTATE CConsoleHandler::GetConnectState()
+CONNECTSTATE CConsoleHandler::GetConnectState() const
 {
     return m_u1ConnectState;
 }
 
-CONNECTSTATE CConsoleHandler::GetSendBuffState()
+CONNECTSTATE CConsoleHandler::GetSendBuffState() const
 {
     return m_u1SendBuffState;
 }
 
-uint8 CConsoleHandler::GetIsClosing()
+uint8 CConsoleHandler::GetIsClosing() const
 {
     return m_u1IsClosing;
 }
@@ -387,7 +387,7 @@ void CConsoleHandler::Clear_PacketParse()
     SAFE_DELETE(m_pPacketParse);
 }
 
-bool CConsoleHandler::CompareConsoleClinetIP(const char* pIP)
+bool CConsoleHandler::CompareConsoleClinetIP(const char* pIP) const
 {
     if (GetXmlConfigAttribute(xmlConsoleClients)->vec.size() == 0)
     {
@@ -411,7 +411,7 @@ bool CConsoleHandler::CheckMessage()
     IBuffPacket* pBuffPacket = NULL;
     bool blRet = Console_Common_CheckMessage_Data(m_u4AllRecvSize, m_u4AllRecvCount, m_pPacketParse, u1Output, pBuffPacket);
 
-    if (true == blRet && false == SendMessage(dynamic_cast<IBuffPacket*>(pBuffPacket), u1Output))
+    if (true == blRet && false == SendMessage(pBuffPacket, u1Output))
     {
         OUR_DEBUG((LM_INFO, "[CConsoleHandler::CheckMessage]SendMessage error.\n"));
     }
