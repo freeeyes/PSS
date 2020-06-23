@@ -136,7 +136,7 @@ bool CReactorUDPHander::SendMessage(char*& pMessage, uint32 u4Len, const char* s
     return true;
 }
 
-_ClientConnectInfo CReactorUDPHander::GetClientConnectInfo()
+_ClientConnectInfo CReactorUDPHander::GetClientConnectInfo() const
 {
     _ClientConnectInfo ClientConnectInfo;
     ClientConnectInfo.m_blValid       = true;
@@ -170,7 +170,7 @@ bool CReactorUDPHander::CheckMessage(const char* pData, uint32 u4Len)
 
         //将完整的数据包转换为PacketParse对象
         ACE_Message_Block* pMBHead = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadSrcLen());
-        memcpy_safe(pData, m_pPacketParse->GetPacketHeadSrcLen(), (char* )pMBHead->wr_ptr(), m_pPacketParse->GetPacketHeadSrcLen());
+        memcpy_safe(pData, m_pPacketParse->GetPacketHeadSrcLen(), pMBHead->wr_ptr(), m_pPacketParse->GetPacketHeadSrcLen());
         pMBHead->wr_ptr(m_pPacketParse->GetPacketHeadLen());
 
         bool blRet = Udp_Common_Recv_Head(pMBHead, m_pPacketParse, m_u4PacketParseInfoID, u4Len);
@@ -210,7 +210,7 @@ bool CReactorUDPHander::CheckMessage(const char* pData, uint32 u4Len)
     else
     {
         ACE_Message_Block* pMbData = App_MessageBlockManager::instance()->Create(u4Len);
-        memcpy_safe(pData, u4Len, (char* )pMbData->wr_ptr(), u4Len);
+        memcpy_safe(pData, u4Len, pMbData->wr_ptr(), u4Len);
         pMbData->wr_ptr(u4Len);
 
         //以数据流处理
@@ -290,7 +290,7 @@ void CReactorUDPHander::SetRecvSize(uint32 u4RecvSize)
     m_u4MaxRecvSize = u4RecvSize;
 }
 
-uint32 CReactorUDPHander::GetRecvSize()
+uint32 CReactorUDPHander::GetRecvSize() const
 {
     return m_u4MaxRecvSize;
 }

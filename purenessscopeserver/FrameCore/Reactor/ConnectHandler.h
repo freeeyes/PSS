@@ -63,10 +63,10 @@ public:
     bool CheckSendMask(uint32 u4PacketLen);                                  //检测指定的连接发送数据是否超过阻塞阀值
     bool SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, uint8 u1State, uint8 u1SendType, uint32& u4PacketSize, bool blDelete, int nServerID);  //发送当前数据
     bool SendCloseMessage();                                                 //发送连接关闭消息
-    bool SendTimeoutMessage ();                                              //发送连接超时消息
+    bool SendTimeoutMessage() const;                                         //发送连接超时消息
 
     void SetRecvQueueTimeCost(uint32 u4TimeCost);                            //记录当前接收数据到模块处理完成的具体时间消耗
-    void SetSendQueueTimeCost(uint32 u4TimeCost);                            //记录当前从发送队列到数据发送完成的具体时间消耗
+    void SetSendQueueTimeCost(uint32 u4TimeCost) const;                      //记录当前从发送队列到数据发送完成的具体时间消耗
     void SetLocalIPInfo(const char* pLocalIP, uint16 u2LocalPort);           //设置监听IP和端口信息
 
     void Close();                                                            //关闭当前连接
@@ -78,7 +78,7 @@ public:
     uint32      GetConnectID() const;                                        //得到当前链接ID
     CONNECTSTATE       GetConnectState() const;                              //得到链接状态
     CONNECTSTATE       GetSendBuffState() const;                             //得到发送状态
-    _ClientConnectInfo GetClientInfo();                                      //得到客户端信息
+    _ClientConnectInfo GetClientInfo() const;                                //得到客户端信息
     _ClientIPInfo      GetClientIPInfo() const;                              //得到客户端IP信息
     _ClientIPInfo      GetLocalIPInfo();                                     //得到监听IP信息
     void SetConnectName(const char* pName);                                  //设置当前连接名称

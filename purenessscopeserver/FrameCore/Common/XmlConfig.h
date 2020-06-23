@@ -234,7 +234,7 @@ public:
     public:
         uint32 u4ServerID       = 0;
         std::string strServerIP;
-        uint32 u4ServerPort     = 0;
+        uint16 u2ServerPort     = 0;
         uint32 u4PacketParseID  = 0;
         _Server2Server() {}
     };

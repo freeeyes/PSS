@@ -84,10 +84,10 @@ int CReactorUDPClient::handle_close(ACE_HANDLE handle, ACE_Reactor_Mask close_ma
     return 0;
 }
 
-bool CReactorUDPClient::SendMessage(const char* pMessage, uint32 u4Len, const char* szIP, int nPort)
+bool CReactorUDPClient::SendMessage(const char* pMessage, uint32 u4Len, const char* szIP, uint16 u2Port)
 {
     ACE_INET_Addr AddrRemote;
-    int nErr = AddrRemote.set(nPort, szIP);
+    int nErr = AddrRemote.set(u2Port, szIP);
 
     if(nErr != 0)
     {
@@ -111,7 +111,7 @@ bool CReactorUDPClient::SendMessage(const char* pMessage, uint32 u4Len, const ch
     }
 }
 
-_ClientConnectInfo CReactorUDPClient::GetClientConnectInfo()
+_ClientConnectInfo CReactorUDPClient::GetClientConnectInfo() const
 {
     _ClientConnectInfo ClientConnectInfo;
     ClientConnectInfo.m_blValid       = true;

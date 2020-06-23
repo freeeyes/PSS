@@ -672,7 +672,7 @@ void CConnectHandler::SetRecvQueueTimeCost(uint32 u4TimeCost)
     m_u4RecvQueueCount++;
 }
 
-void CConnectHandler::SetSendQueueTimeCost(uint32 u4TimeCost)
+void CConnectHandler::SetSendQueueTimeCost(uint32 u4TimeCost) const
 {
     //如果超过阀值，则记录到日志中去
     if((uint32)(m_u8SendQueueTimeout) <= u4TimeCost)
@@ -771,7 +771,7 @@ bool CConnectHandler::SendCloseMessage()
     return true;
 }
 
-bool CConnectHandler::SendTimeoutMessage ()
+bool CConnectHandler::SendTimeoutMessage() const
 {
     Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CHEK_TIMEOUT, m_addrRemote, m_szLocalIP, m_u2LocalPort);
 
@@ -1172,7 +1172,7 @@ bool CConnectHandler::CheckMessage()
     return true;
 }
 
-_ClientConnectInfo CConnectHandler::GetClientInfo()
+_ClientConnectInfo CConnectHandler::GetClientInfo() const
 {
     _ClientConnectInfo_Param obj_ClientConnectInfo_Param;
     obj_ClientConnectInfo_Param.m_addrRemote = m_addrRemote;
@@ -1950,7 +1950,7 @@ void CConnectManager::GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo)
 
 _ClientIPInfo CConnectManager::GetClientIPInfo(uint32 u4ConnectID)
 {
-    CConnectHandler* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data_By_Uint32(u4ConnectID);
+    const CConnectHandler* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data_By_Uint32(u4ConnectID);
 
     if(NULL != pConnectHandler)
     {
@@ -1989,7 +1989,7 @@ bool CConnectManager::PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType,
 
     uint32 u4ConnectID = 0;
 
-    for(auto* pConnectHandler : objvecConnectManager)
+    for(const auto* pConnectHandler : objvecConnectManager)
     {
         IBuffPacket* pCurrBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 

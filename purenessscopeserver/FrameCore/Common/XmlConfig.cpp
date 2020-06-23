@@ -290,7 +290,7 @@ bool xmlServer2Server::Init(CXmlOpeation* pXmlOperation)
     while (bKet
            && pXmlOperation->Read_XML_Data_Multiple_Uint32("ServerToServer", "S2SID", Server2Server.u4ServerID, pServerID)
            && pXmlOperation->Read_XML_Data_Multiple_String("ServerToServer", "S2SIp", Server2Server.strServerIP, pServerIP)
-           && pXmlOperation->Read_XML_Data_Multiple_Uint32("ServerToServer", "S2SPort", Server2Server.u4ServerPort, pServerPort)
+           && pXmlOperation->Read_XML_Data_Multiple_Uint16("ServerToServer", "S2SPort", Server2Server.u2ServerPort, pServerPort)
            && pXmlOperation->Read_XML_Data_Multiple_Uint32("ServerToServer", "S2SPacketParseID", Server2Server.u4PacketParseID, pParketParseID))
     {
         vec.push_back(Server2Server);

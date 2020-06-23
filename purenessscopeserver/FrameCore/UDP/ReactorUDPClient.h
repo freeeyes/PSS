@@ -25,8 +25,8 @@ public:
 
     int  OpenAddress(const ACE_INET_Addr& AddrRemote, EM_UDP_TYPE emType, ACE_Reactor* pReactor, IClientUDPMessage* pClientUDPMessage);
     void Close();
-    bool SendMessage(const char* pMessage, uint32 u4Len, const char* szIP, int nPort);
-    _ClientConnectInfo GetClientConnectInfo();
+    bool SendMessage(const char* pMessage, uint32 u4Len, const char* szIP, uint16 u2Port);
+    _ClientConnectInfo GetClientConnectInfo() const;
 
 private:
     bool CheckMessage(const char* pData, uint32 u4Len);     //这里解析数据包并放入数据队列
