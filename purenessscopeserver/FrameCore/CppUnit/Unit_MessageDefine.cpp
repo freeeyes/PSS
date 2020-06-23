@@ -189,7 +189,7 @@ void CUnit_MessageDefine::Test_GetListenInfo(void)
 
     if (ACE_OS::strcmp(objListenInfo.m_szListenIP, "127.0.0.1") == 0 &&
         objListenInfo.m_u1IPType == 1 &&
-        objListenInfo.m_u4Port == 10003 &&
+        objListenInfo.m_u2Port == 10003 &&
         objListenInfo.m_u4PacketParseID == 1)
     {
         blRet = true;
