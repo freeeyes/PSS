@@ -1685,14 +1685,18 @@ inline void Set_Output_To_File(int nTrunOn, ofstream*& pLogoStream, const char* 
             ofstream* pOldLogoStream = (ofstream*)ACE_LOG_MSG->msg_ostream();
             if (NULL != pOldLogoStream)
             {
-                ACE_Date_Time  dt;
-                //转移日志文件
-                char szHistoryLogFile[MAX_BUFF_200] = { '\0' };
+				ACE_Date_Time  dt;
+				//转移日志文件
+				char szHistoryLogFile[MAX_BUFF_200] = { '\0' };
 				sprintf_safe(szHistoryLogFile, MAX_BUFF_200, "%s/%s_%04d%02d%02d_%02d%02d%02d.log", pLogPath, pLogName,
 					dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second());
-                ACE_OS::rename(szDebugFileName, szHistoryLogFile);
+				ACE_OS::rename(szDebugFileName, szHistoryLogFile);
 
-                pOldLogoStream->open(szDebugFileName, std::ofstream::out);
+				pOldLogoStream->close();
+
+				ACE_OS::unlink(szDebugFileName);
+
+				pOldLogoStream->open(szDebugFileName, std::ofstream::out | std::ofstream::trunc);
             }
 
             ACE_LOG_MSG->release();
