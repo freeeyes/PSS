@@ -855,6 +855,9 @@
     <ClInclude Include="..\Common\ACEMemory.hpp">
       <Filter>Common\cppfile</Filter>
     </ClInclude>
+    <ClInclude Include="Common\MakePacket_Common.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

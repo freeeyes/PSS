@@ -139,7 +139,7 @@ bool Udp_Common_Send_WorkThread(CPacketParse*& pPacketParse, const ACE_INET_Addr
     objMakePacket.m_u1Option = PACKET_PARSE;
 
     //UDP因为不是面向链接的
-    if (false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvCheck))
+    if (false == App_MakePacket::instance()->PutMessageBlock(objMakePacket, tvCheck))
     {
         OUR_DEBUG((LM_ERROR, "[Udp_Common_Send_WorkThread]PutMessageBlock is error.\n"));
         App_PacketParsePool::instance()->Delete(pPacketParse);
@@ -204,19 +204,10 @@ uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPa
     return n1Ret;
 }
 
-void Send_MakePacket_Queue(uint32 u4ConnectID, uint32 u4PacketParseID, CPacketParse* pPacketParse, uint8 u1Option, const ACE_INET_Addr& addrRemote, const char* pLocalIP, uint16 u2LocalPort, EM_CONNECT_IO_TYPE emIOType)
+void Send_MakePacket_Queue(_MakePacket objMakePacket, const char* pLocalIP, uint16 u2LocalPort)
 {
     //需要回调发送成功回执
-    _MakePacket objMakePacket;
-
-    objMakePacket.m_u4ConnectID     = u4ConnectID;
-    objMakePacket.m_pPacketParse    = pPacketParse;
-    objMakePacket.m_u1Option        = u1Option;
-    objMakePacket.m_AddrRemote      = addrRemote;
-    objMakePacket.m_u4PacketParseID = u4PacketParseID;
-    objMakePacket.m_u1PacketType    = emIOType;
-
-    if (EM_CONNECT_IO_TYPE::CONNECT_IO_TCP == emIOType || EM_CONNECT_IO_TYPE::CONNECT_IO_UDP == emIOType)
+    if (EM_CONNECT_IO_TYPE::CONNECT_IO_TCP == objMakePacket.m_u1PacketType || EM_CONNECT_IO_TYPE::CONNECT_IO_UDP == objMakePacket.m_u1PacketType)
     {
         if (ACE_OS::strcmp("INADDR_ANY", pLocalIP) == 0)
         {
@@ -231,9 +222,9 @@ void Send_MakePacket_Queue(uint32 u4ConnectID, uint32 u4PacketParseID, CPacketPa
     //将数据送入工作线程处理队列
     ACE_Time_Value tvNow = ACE_OS::gettimeofday();
 
-    if (false == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
+    if (false == App_MakePacket::instance()->PutMessageBlock(objMakePacket, tvNow))
     {
-        OUR_DEBUG((LM_ERROR, "[Send_MakePacket_Queue] ConnectID = %d, PACKET_CONNECT is error.\n", u4ConnectID));
+        OUR_DEBUG((LM_ERROR, "[Send_MakePacket_Queue] ConnectID = %d, PACKET_CONNECT is error.\n", objMakePacket.m_u4ConnectID));
     }
 }
 

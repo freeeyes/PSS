@@ -554,6 +554,7 @@
     <ClInclude Include="Common\BaseServerManager.h" />
     <ClInclude Include="Common\BaseTask.h" />
     <ClInclude Include="Common\IDeviceHandler.h" />
+    <ClInclude Include="Common\MakePacket_Common.h" />
     <ClInclude Include="Common\ServerMessageTask.h" />
     <ClInclude Include="Common\TcpRedirection.h" />
     <ClInclude Include="Common\TMService.h" />

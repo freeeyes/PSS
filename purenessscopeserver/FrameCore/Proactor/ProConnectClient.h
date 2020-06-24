@@ -25,7 +25,7 @@ class CProConnectClient : public ACE_Service_Handler, public IDeviceHandler
 {
 public:
     CProConnectClient(void);
-    ~CProConnectClient(void);
+    virtual ~CProConnectClient(void);
 
     virtual void open(ACE_HANDLE h, ACE_Message_Block&);                                               //用户建立一个链接
     virtual void handle_read_stream(const ACE_Asynch_Read_Stream::Result& result);                     //接受用户数据

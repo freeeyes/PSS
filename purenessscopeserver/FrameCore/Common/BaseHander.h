@@ -4,16 +4,17 @@
 #include "ace/Task_T.h"
 
 #include "define.h"
+#include "MakePacket.h"
 #include "SendMessage.h"
 #include "MessageBlockManager.h"
 #include "LoadPacketParse.h"
 #include "PacketParsePool.h"
-#include "MakePacket.h"
 #include "FileTest.h"
 #include "SendCacheManager.h"
 #include "ace/SOCK_Dgram.h"
 #include "XmlConfig.h"
 #include "TcpRedirection.h"
+#include "MakePacket_Common.h"
 
 //所有的handler用到的公共函数
 //add by freeeyes
@@ -39,6 +40,9 @@ public:
     }
 };
 
+//将数据发送入工作线程消息队列
+void Send_MakePacket_Queue(_MakePacket objMakePacket, const char* pLocalIP, uint16 u2LocalPort);
+
 //udp函数发送数据包合成函数
 bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param, char*& pMessage,
                              ACE_Message_Block*& pMbData, const ACE_SOCK_Dgram& skRemote);
@@ -63,11 +67,6 @@ void Tcp_Common_Send_Message_Error(uint32 u4ConnectID, uint16 u2CommandID, bool 
 
 //TCP流消息处理
 uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPacketParse* pPacketParse, uint32 u4PacketParseInfoID);
-
-//将数据发送入工作线程消息队列
-void Send_MakePacket_Queue(uint32 u4ConnectID, uint32 u4PacketParseID, CPacketParse* pPacketParse, uint8 u1Option,
-                           const ACE_INET_Addr& addrRemote, const char* pLocalIP,
-                           uint16 u2LocalPort, EM_CONNECT_IO_TYPE emIOType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
 
 //File_Message的参数
 class _File_Message_Param

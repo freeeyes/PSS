@@ -39,14 +39,16 @@ void CConnectClient::Close()
                     objLocalIPInfo);
 
             //发送框架消息
-            Send_MakePacket_Queue(m_nServerID,
-                                  m_u4PacketParseInfoID,
-                                  NULL,
-                                  PACKET_SERVER_TCP_DISCONNECT,
-                                  m_addrRemote,
-                                  "127.0.0.1",
-                                  0,
-                                  EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP);
+			_MakePacket objMakePacket;
+
+			objMakePacket.m_u4ConnectID     = m_nServerID;
+			objMakePacket.m_pPacketParse    = NULL;
+			objMakePacket.m_u1Option        = PACKET_SERVER_TCP_DISCONNECT;
+			objMakePacket.m_AddrRemote      = m_addrRemote;
+			objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
+            objMakePacket.m_u1PacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
+
+            Send_MakePacket_Queue(objMakePacket, "127.0.0.1", 0);
         }
 
         //转发接口关闭
@@ -172,14 +174,16 @@ int CConnectClient::open(void* p)
                 objLocalIPInfo);
 
         //发送框架消息
-        Send_MakePacket_Queue(m_nServerID,
-                              m_u4PacketParseInfoID,
-                              NULL,
-                              PACKET_SERVER_TCP_CONNECT,
-                              m_addrRemote,
-                              "127.0.0.1",
-                              0,
-                              EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP);
+		_MakePacket objMakePacket;
+
+		objMakePacket.m_u4ConnectID = m_nServerID;
+		objMakePacket.m_pPacketParse = NULL;
+		objMakePacket.m_u1Option = PACKET_SERVER_TCP_CONNECT;
+		objMakePacket.m_AddrRemote = m_addrRemote;
+		objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
+		objMakePacket.m_u1PacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
+
+        Send_MakePacket_Queue(objMakePacket, "127.0.0.1", 0);
     }
 
     m_strDeviceName = App_ForwardManager::instance()->ConnectRegedit(m_addrRemote.get_host_addr(),
@@ -332,14 +336,16 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
                 pPacketParse->SetPacket_Body_Curr_Length(obj_Packet_Info.m_u4BodyCurrLen);
 
                 //发送框架消息
-                Send_MakePacket_Queue(m_nServerID,
-                                      m_u4PacketParseInfoID,
-                                      pPacketParse,
-                                      PACKET_PARSE,
-                                      m_addrRemote,
-                                      "127.0.0.1",
-                                      0,
-                                      EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP);
+				_MakePacket objMakePacket;
+
+				objMakePacket.m_u4ConnectID     = m_nServerID;
+				objMakePacket.m_pPacketParse    = pPacketParse;
+				objMakePacket.m_u1Option        = PACKET_PARSE;
+				objMakePacket.m_AddrRemote      = m_addrRemote;
+				objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
+				objMakePacket.m_u1PacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
+
+                Send_MakePacket_Queue(objMakePacket, "127.0.0.1", 0);
 
                 //清理用完的m_pPacketParse
                 App_PacketParsePool::instance()->Delete(pPacketParse);

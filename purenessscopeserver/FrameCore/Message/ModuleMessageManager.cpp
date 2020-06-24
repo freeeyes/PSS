@@ -51,7 +51,7 @@ int CModuleMessageManager::SendFrameMessage(uint16 u2CommandID, uint32 u4Connect
         objMakePacket.m_pPacketParse = &objPacketParse;
         objMakePacket.m_u1Option = PACKET_PARSE;
 
-        if (true == App_MakePacket::instance()->PutMessageBlock(&objMakePacket, tvNow))
+        if (true == App_MakePacket::instance()->PutMessageBlock(objMakePacket, tvNow))
         {
             return 0;
         }

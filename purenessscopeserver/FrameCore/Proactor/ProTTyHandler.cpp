@@ -69,7 +69,17 @@ void CProTTyHandler::Close()
 
             //发送框架消息
             ACE_INET_Addr m_addrRemote;
-            Send_MakePacket_Queue(m_u4ConnectID, m_u4PacketParseInfoID, NULL, PACKET_TTY_DISCONNECT, m_addrRemote, "TTy", 0, EM_CONNECT_IO_TYPE::CONNECT_IO_TTY);
+
+			_MakePacket objMakePacket;
+
+			objMakePacket.m_u4ConnectID     = m_u4ConnectID;
+			objMakePacket.m_pPacketParse    = NULL;
+			objMakePacket.m_u1Option        = PACKET_TTY_DISCONNECT;
+			objMakePacket.m_AddrRemote      = m_addrRemote;
+			objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
+            objMakePacket.m_u1PacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_TTY;
+
+            Send_MakePacket_Queue(objMakePacket, "TTy", 0);
         }
 
         //关闭转发接口
@@ -104,7 +114,17 @@ bool CProTTyHandler::Init(uint32 u4ConnectID, const char* pName, ACE_TTY_IO::Ser
 
             //发送框架消息
             ACE_INET_Addr m_addrRemote;
-            Send_MakePacket_Queue(m_u4ConnectID, m_u4PacketParseInfoID, NULL, PACKET_TTY_CONNECT, m_addrRemote, "TTy", 0, EM_CONNECT_IO_TYPE::CONNECT_IO_TTY);
+
+            _MakePacket objMakePacket;
+
+			objMakePacket.m_u4ConnectID     = m_u4ConnectID;
+			objMakePacket.m_pPacketParse    = NULL;
+			objMakePacket.m_u1Option        = PACKET_TTY_CONNECT;
+			objMakePacket.m_AddrRemote      = m_addrRemote;
+			objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
+			objMakePacket.m_u1PacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_TTY;
+
+            Send_MakePacket_Queue(objMakePacket, "TTy", 0);
         }
 
         //查看是否存在转发接口
@@ -213,8 +233,17 @@ void CProTTyHandler::handle_read_file(const ACE_Asynch_Read_File::Result& result
                     pPacketParse->SetPacket_Body_Curr_Length(obj_Packet_Info.m_u4BodyCurrLen);
 
                     ACE_INET_Addr m_addrRemote;
-					Send_MakePacket_Queue(m_u4ConnectID, m_u4PacketParseInfoID, pPacketParse, PACKET_PARSE, m_addrRemote, "TTy", 0, EM_CONNECT_IO_TYPE::CONNECT_IO_TTY);
-					Send_MakePacket_Queue(m_u4ConnectID, m_u4PacketParseInfoID, pPacketParse, PACKET_PARSE, m_addrRemote, "TTy", 0, EM_CONNECT_IO_TYPE::CONNECT_IO_TTY);
+
+					_MakePacket objMakePacket;
+
+					objMakePacket.m_u4ConnectID     = m_u4ConnectID;
+					objMakePacket.m_pPacketParse    = pPacketParse;
+					objMakePacket.m_u1Option        = PACKET_PARSE;
+					objMakePacket.m_AddrRemote      = m_addrRemote;
+					objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
+					objMakePacket.m_u1PacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_TTY;
+
+					Send_MakePacket_Queue(objMakePacket, "TTy", 0);
 
                     //清理用完的m_pPacketParse
                     App_PacketParsePool::instance()->Delete(pPacketParse);

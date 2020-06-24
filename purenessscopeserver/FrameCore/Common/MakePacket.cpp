@@ -9,122 +9,116 @@ bool CMakePacket::Init() const
     return true;
 }
 
-bool CMakePacket::PutMessageBlock(const _MakePacket* pMakePacket, const ACE_Time_Value& tvNow) const
+bool CMakePacket::PutMessageBlock(_MakePacket objMakePacket, const ACE_Time_Value& tvNow) const
 {
-    if(NULL == pMakePacket)
-    {
-        OUR_DEBUG((LM_ERROR,"[CMakePacket::PutMessageBlock] pMakePacket is NULL.\n"));
-        return false;
-    }
-
     //根据操作OP，调用相应的方法。
-    CMessage* pMessage = App_MessageServiceGroup::instance()->CreateMessage(pMakePacket->m_u4ConnectID, pMakePacket->m_u1PacketType);
+    CMessage* pMessage = App_MessageServiceGroup::instance()->CreateMessage(objMakePacket.m_u4ConnectID, objMakePacket.m_u1PacketType);
 
     if(NULL == pMessage)
     {
         //回收PacketParse中的包头包体内存
-        if(NULL != pMakePacket->m_pPacketParse)
+        if(NULL != objMakePacket.m_pPacketParse)
         {
-            if(NULL != pMakePacket->m_pPacketParse->GetMessageHead())
+            if(NULL != objMakePacket.m_pPacketParse->GetMessageHead())
             {
-                App_MessageBlockManager::instance()->Close(pMakePacket->m_pPacketParse->GetMessageHead());
+                App_MessageBlockManager::instance()->Close(objMakePacket.m_pPacketParse->GetMessageHead());
             }
 
-            if(NULL != pMakePacket->m_pPacketParse->GetMessageBody())
+            if(NULL != objMakePacket.m_pPacketParse->GetMessageBody())
             {
-                App_MessageBlockManager::instance()->Close(pMakePacket->m_pPacketParse->GetMessageBody());
+                App_MessageBlockManager::instance()->Close(objMakePacket.m_pPacketParse->GetMessageBody());
             }
 
-            pMakePacket->m_pPacketParse->Clear();
+            objMakePacket.m_pPacketParse->Clear();
         }
 
         OUR_DEBUG((LM_ERROR,"[CMakePacket::PutMessageBlock] pMessage is NULL.\n"));
         return false;
     }
 
-    SetMessage(pMakePacket, pMessage, tvNow);
+    SetMessage(objMakePacket, pMessage, tvNow);
 
     //将要处理的消息放入消息处理线程
     if(false == App_MessageServiceGroup::instance()->PutMessage(pMessage))
     {
         OUR_DEBUG((LM_ERROR, "[CMakePacket::ProcessMessageBlock] App_MessageServiceGroup::instance()->PutMessage Error.\n"));
-        App_MessageServiceGroup::instance()->DeleteMessage(pMakePacket->m_u4ConnectID, pMessage);
+        App_MessageServiceGroup::instance()->DeleteMessage(objMakePacket.m_u4ConnectID, pMessage);
         return false;
     }
 
     return true;
 }
 
-void CMakePacket::SetMessage(const _MakePacket* pMakePacket, CMessage* pMessage, const ACE_Time_Value& tvNow) const
+void CMakePacket::SetMessage(_MakePacket objMakePacket, CMessage* pMessage, const ACE_Time_Value& tvNow) const
 {
     if(NULL != pMessage->GetMessageBase())
     {
-        if(PACKET_PARSE == pMakePacket->m_u1Option)
+        if(PACKET_PARSE == objMakePacket.m_u1Option)
         {
-            if (NULL != pMakePacket->m_pPacketParse)
+            if (NULL != objMakePacket.m_pPacketParse)
             {
-                pMessage->GetMessageBase()->m_u2Cmd = pMakePacket->m_pPacketParse->GetPacketCommandID();
+                pMessage->GetMessageBase()->m_u2Cmd = objMakePacket.m_pPacketParse->GetPacketCommandID();
             }
         }
-        else if(pMakePacket->m_u1Option == PACKET_CONNECT)
+        else if(objMakePacket.m_u1Option == PACKET_CONNECT)
         {
             pMessage->GetMessageBase()->m_u2Cmd  = CLIENT_LINK_CONNECT;
         }
-        else if(pMakePacket->m_u1Option == PACKET_CDISCONNECT)
+        else if(objMakePacket.m_u1Option == PACKET_CDISCONNECT)
         {
             pMessage->GetMessageBase()->m_u2Cmd         = CLIENT_LINK_CDISCONNET;
         }
-        else if(pMakePacket->m_u1Option == PACKET_SDISCONNECT)
+        else if(objMakePacket.m_u1Option == PACKET_SDISCONNECT)
         {
             pMessage->GetMessageBase()->m_u2Cmd         = CLIENT_LINK_SDISCONNET;
         }
-        else if(pMakePacket->m_u1Option == PACKET_SEND_TIMEOUT)
+        else if(objMakePacket.m_u1Option == PACKET_SEND_TIMEOUT)
         {
             pMessage->GetMessageBase()->m_u2Cmd         = CLINET_LINK_SENDTIMEOUT;
         }
-        else if(pMakePacket->m_u1Option == PACKET_CHEK_TIMEOUT)
+        else if(objMakePacket.m_u1Option == PACKET_CHEK_TIMEOUT)
         {
             pMessage->GetMessageBase()->m_u2Cmd         = CLINET_LINK_CHECKTIMEOUT;
         }
-        else if(pMakePacket->m_u1Option == PACKET_SEND_OK)
+        else if(objMakePacket.m_u1Option == PACKET_SEND_OK)
         {
             pMessage->GetMessageBase()->m_u2Cmd         = CLIENT_LINK_SENDOK;
         }
-        else if (pMakePacket->m_u1Option == PACKET_TTY_CONNECT)
+        else if (objMakePacket.m_u1Option == PACKET_TTY_CONNECT)
         {
             pMessage->GetMessageBase()->m_u2Cmd         = CLINET_LINK_TTY_CONNECT;
         }
-        else if (pMakePacket->m_u1Option == PACKET_TTY_DISCONNECT)
+        else if (objMakePacket.m_u1Option == PACKET_TTY_DISCONNECT)
         {
             pMessage->GetMessageBase()->m_u2Cmd         = CLINET_LINK_TTY_DISCONNECT;
         }
-        else if (pMakePacket->m_u1Option == PACKET_SERVER_TCP_CONNECT)
+        else if (objMakePacket.m_u1Option == PACKET_SERVER_TCP_CONNECT)
         {
             pMessage->GetMessageBase()->m_u2Cmd         = CLINET_LINK_ST_CONNECT;
         }
-        else if (pMakePacket->m_u1Option == PACKET_SERVER_TCP_DISCONNECT)
+        else if (objMakePacket.m_u1Option == PACKET_SERVER_TCP_DISCONNECT)
         {
             pMessage->GetMessageBase()->m_u2Cmd         = CLINET_LINK_ST_DISCONNECT;
         }
-        else if (pMakePacket->m_u1Option == PACKET_SERVER_UDP_CONNECT)
+        else if (objMakePacket.m_u1Option == PACKET_SERVER_UDP_CONNECT)
         {
             pMessage->GetMessageBase()->m_u2Cmd         = CLINET_LINK_SU_DISCONNECT;
         }
-        else if (pMakePacket->m_u1Option == PACKET_SERVER_UDP_DISCONNECT)
+        else if (objMakePacket.m_u1Option == PACKET_SERVER_UDP_DISCONNECT)
         {
             pMessage->GetMessageBase()->m_u2Cmd         = CLINET_LINK_SU_DISCONNECT;
         }
 
-        pMessage->GetMessageBase()->m_u4ConnectID     = pMakePacket->m_u4ConnectID;
+        pMessage->GetMessageBase()->m_u4ConnectID     = objMakePacket.m_u4ConnectID;
         pMessage->GetMessageBase()->m_tvRecvTime      = tvNow;
-        pMessage->GetMessageBase()->m_u4PacketParseID = pMakePacket->m_u4PacketParseID;
+        pMessage->GetMessageBase()->m_u4PacketParseID = objMakePacket.m_u4PacketParseID;
 
-        if(NULL != pMakePacket->m_pPacketParse)
+        if(NULL != objMakePacket.m_pPacketParse)
         {
-            pMessage->GetMessageBase()->m_u4HeadSrcSize = pMakePacket->m_pPacketParse->GetPacketHeadSrcLen();
-            pMessage->GetMessageBase()->m_u4BodySrcSize = pMakePacket->m_pPacketParse->GetPacketBodySrcLen();
-            pMessage->SetPacketHead(pMakePacket->m_pPacketParse->GetMessageHead());
-            pMessage->SetPacketBody(pMakePacket->m_pPacketParse->GetMessageBody());
+            pMessage->GetMessageBase()->m_u4HeadSrcSize = objMakePacket.m_pPacketParse->GetPacketHeadSrcLen();
+            pMessage->GetMessageBase()->m_u4BodySrcSize = objMakePacket.m_pPacketParse->GetPacketBodySrcLen();
+            pMessage->SetPacketHead(objMakePacket.m_pPacketParse->GetMessageHead());
+            pMessage->SetPacketBody(objMakePacket.m_pPacketParse->GetMessageBody());
         }
         else
         {
@@ -134,16 +128,16 @@ void CMakePacket::SetMessage(const _MakePacket* pMakePacket, CMessage* pMessage,
             pMessage->SetPacketBody(NULL);
         }
 
-        pMessage->GetMessageBase()->m_u1PacketType  = pMakePacket->m_u1PacketType;
+        pMessage->GetMessageBase()->m_u1PacketType  = objMakePacket.m_u1PacketType;
 
-        sprintf_safe(pMessage->GetMessageBase()->m_szIP, MAX_BUFF_20, "%s", pMakePacket->m_AddrRemote.get_host_addr());
-        pMessage->GetMessageBase()->m_u4Port = (uint32)pMakePacket->m_AddrRemote.get_port_number();
-        sprintf_safe(pMessage->GetMessageBase()->m_szListenIP, MAX_BUFF_20, "%s", pMakePacket->m_AddrListen.get_host_addr());
-        pMessage->GetMessageBase()->m_u4ListenPort = (uint32)pMakePacket->m_AddrListen.get_port_number();
+        sprintf_safe(pMessage->GetMessageBase()->m_szIP, MAX_BUFF_20, "%s", objMakePacket.m_AddrRemote.get_host_addr());
+        pMessage->GetMessageBase()->m_u4Port = (uint32)objMakePacket.m_AddrRemote.get_port_number();
+        sprintf_safe(pMessage->GetMessageBase()->m_szListenIP, MAX_BUFF_20, "%s", objMakePacket.m_AddrListen.get_host_addr());
+        pMessage->GetMessageBase()->m_u4ListenPort = (uint32)objMakePacket.m_AddrListen.get_port_number();
     }
     else
     {
-        OUR_DEBUG((LM_ERROR, "[CMakePacket::SetMessage] ConnectID = %d, pMessage->GetMessageBase() is NULL.\n", pMakePacket->m_u4ConnectID));
+        OUR_DEBUG((LM_ERROR, "[CMakePacket::SetMessage] ConnectID = %d, pMessage->GetMessageBase() is NULL.\n", objMakePacket.m_u4ConnectID));
     }
 }
 

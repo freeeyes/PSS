@@ -17,12 +17,28 @@ void CConnectHandler::Close()
     if (CONNECTSTATE::CONNECT_SERVER_CLOSE == m_u1ConnectState)
     {
         //服务器主动断开
-        Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_SDISCONNECT, m_addrRemote, m_szLocalIP, m_u2LocalPort);
+        _MakePacket objMakePacket;
+
+		objMakePacket.m_u4ConnectID     = GetConnectID();
+		objMakePacket.m_pPacketParse    = NULL;
+		objMakePacket.m_u1Option        =  PACKET_SDISCONNECT;
+		objMakePacket.m_AddrRemote      = m_addrRemote;
+		objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
+
+        Send_MakePacket_Queue(objMakePacket, m_szLocalIP, m_u2LocalPort);
     }
     else
     {
+		_MakePacket objMakePacket;
+
+		objMakePacket.m_u4ConnectID     = GetConnectID();
+		objMakePacket.m_pPacketParse    = NULL;
+		objMakePacket.m_u1Option        = PACKET_CDISCONNECT;
+		objMakePacket.m_AddrRemote      = m_addrRemote;
+		objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
+
         //客户端连接断开
-        Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CDISCONNECT, m_addrRemote, m_szLocalIP, m_u2LocalPort);
+        Send_MakePacket_Queue(objMakePacket, m_szLocalIP, m_u2LocalPort);
     }
 
     shutdown();
@@ -679,7 +695,15 @@ void CConnectHandler::SetSendQueueTimeCost(uint32 u4TimeCost) const
     {
         AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_SENDQUEUEERROR, "[TCP]IP=%s,Prot=%d,m_u8SendQueueTimeout = [%d], Timeout=[%d].", GetClientIPInfo().m_szClientIP, GetClientIPInfo().m_u2Port, (uint32)m_u8SendQueueTimeout, u4TimeCost);
 
-        Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_SEND_TIMEOUT, m_addrRemote, m_szLocalIP, m_u2LocalPort);
+		_MakePacket objMakePacket;
+
+		objMakePacket.m_u4ConnectID     = GetConnectID();
+		objMakePacket.m_pPacketParse    = NULL;
+		objMakePacket.m_u1Option        = PACKET_SEND_TIMEOUT;
+		objMakePacket.m_AddrRemote      = m_addrRemote;
+		objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
+
+        Send_MakePacket_Queue(objMakePacket, m_szLocalIP, m_u2LocalPort);
     }
 }
 
@@ -773,7 +797,15 @@ bool CConnectHandler::SendCloseMessage()
 
 bool CConnectHandler::SendTimeoutMessage() const
 {
-    Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CHEK_TIMEOUT, m_addrRemote, m_szLocalIP, m_u2LocalPort);
+	_MakePacket objMakePacket;
+
+	objMakePacket.m_u4ConnectID     = GetConnectID();
+	objMakePacket.m_pPacketParse    = NULL;
+	objMakePacket.m_u1Option        = PACKET_CHEK_TIMEOUT;
+	objMakePacket.m_AddrRemote      = m_addrRemote;
+	objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
+
+    Send_MakePacket_Queue(objMakePacket, m_szLocalIP, m_u2LocalPort);
 
     return true;
 }
@@ -884,7 +916,15 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
                 objPacketParse.SetPacket_Head_Message(pSendOKData);
                 objPacketParse.SetPacket_Head_Curr_Length((uint32)pSendOKData->length());
 
-                Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, &objPacketParse, PACKET_SEND_OK, m_addrRemote, m_szLocalIP, m_u2LocalPort);
+				_MakePacket objMakePacket;
+
+				objMakePacket.m_u4ConnectID     = GetConnectID();
+				objMakePacket.m_pPacketParse    = &objPacketParse;
+				objMakePacket.m_u1Option        = PACKET_SEND_OK;
+				objMakePacket.m_AddrRemote      = m_addrRemote;
+				objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
+
+                Send_MakePacket_Queue(objMakePacket, m_szLocalIP, m_u2LocalPort);
 
                 //还原消息类型
                 pMbData->msg_type(ACE_Message_Block::MB_DATA);
@@ -915,7 +955,15 @@ void CConnectHandler::ConnectOpen()
     //告诉PacketParse连接应建立
     App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Connect(GetConnectID(), GetClientIPInfo(), GetLocalIPInfo());
 
-    Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, NULL, PACKET_CONNECT, m_addrRemote, m_szLocalIP, m_u2LocalPort);
+	_MakePacket objMakePacket;
+
+	objMakePacket.m_u4ConnectID     = GetConnectID();
+	objMakePacket.m_pPacketParse    = NULL;
+	objMakePacket.m_u1Option        = PACKET_CONNECT;
+	objMakePacket.m_AddrRemote      = m_addrRemote;
+	objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
+
+    Send_MakePacket_Queue(objMakePacket, m_szLocalIP, m_u2LocalPort);
 
     OUR_DEBUG((LM_DEBUG, "[CConnectHandler::open]Open(%d) Connection from [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
 
@@ -1162,7 +1210,15 @@ bool CConnectHandler::CheckMessage()
         return false;
     }
 
-    Send_MakePacket_Queue(GetConnectID(), m_u4PacketParseInfoID, m_pPacketParse, PACKET_PARSE, m_addrRemote, m_szLocalIP, m_u2LocalPort);
+	_MakePacket objMakePacket;
+
+	objMakePacket.m_u4ConnectID     = GetConnectID();
+	objMakePacket.m_pPacketParse    = m_pPacketParse;
+	objMakePacket.m_u1Option        = PACKET_PARSE;
+	objMakePacket.m_AddrRemote      = m_addrRemote;
+	objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
+
+    Send_MakePacket_Queue(objMakePacket, m_szLocalIP, m_u2LocalPort);
 
     //更新时间轮盘
     App_ConnectManager::instance()->SetConnectTimeWheel(this);
@@ -1857,7 +1913,7 @@ void CConnectManager::TimeWheel_Timeout_Callback(void* pArgsContext, vector<CCon
 {
     OUR_DEBUG((LM_INFO, "[CConnectManager::TimeWheel_Timeout_Callback]Timeout Count(%d).\n", vecConnectHandle.size()));
 
-    for (CConnectHandler* pConnectHandler : vecConnectHandle)
+    for (const CConnectHandler* pConnectHandler : vecConnectHandle)
     {
         //断开超时的链接
         CConnectManager* pManager = reinterpret_cast<CConnectManager*>(pArgsContext);
@@ -1939,7 +1995,7 @@ void CConnectManager::GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo)
     vector<CConnectHandler*> vecConnectHandler;
     m_objHashConnectList.Get_All_Used(vecConnectHandler);
 
-    for(auto* pConnectHandler : vecConnectHandler)
+    for(const auto* pConnectHandler : vecConnectHandler)
     {
         if(pConnectHandler != NULL)
         {
