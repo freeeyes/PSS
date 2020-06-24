@@ -28,11 +28,11 @@ public:
 
     bool Init() const;
 
-    bool PutMessageBlock(_MakePacket objMakePacket, const ACE_Time_Value& tvNow) const;                                                     //处理消息数据包
+    bool PutMessageBlock(const _MakePacket objMakePacket, const ACE_Time_Value& tvNow) const;                                                     //处理消息数据包
     bool PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, const ACE_Time_Value& tvNow) const;                            //发送失败消息回调
 
 private:
-    void SetMessage(_MakePacket objMakePacket, CMessage* pMessage, const ACE_Time_Value& tvNow) const;                                //一般数据包消息
+    void SetMessage(const _MakePacket objMakePacket, CMessage* pMessage, const ACE_Time_Value& tvNow) const;                                //一般数据包消息
     void SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, CMessage* pMessage, const ACE_Time_Value& tvNow) const;  //服务发送失败回调数据包消息
 
     ACE_Recursive_Thread_Mutex     m_ThreadWriteLock;

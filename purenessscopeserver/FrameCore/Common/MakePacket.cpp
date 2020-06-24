@@ -9,7 +9,7 @@ bool CMakePacket::Init() const
     return true;
 }
 
-bool CMakePacket::PutMessageBlock(_MakePacket objMakePacket, const ACE_Time_Value& tvNow) const
+bool CMakePacket::PutMessageBlock(const _MakePacket objMakePacket, const ACE_Time_Value& tvNow) const
 {
     //根据操作OP，调用相应的方法。
     CMessage* pMessage = App_MessageServiceGroup::instance()->CreateMessage(objMakePacket.m_u4ConnectID, objMakePacket.m_u1PacketType);
@@ -49,7 +49,7 @@ bool CMakePacket::PutMessageBlock(_MakePacket objMakePacket, const ACE_Time_Valu
     return true;
 }
 
-void CMakePacket::SetMessage(_MakePacket objMakePacket, CMessage* pMessage, const ACE_Time_Value& tvNow) const
+void CMakePacket::SetMessage(const _MakePacket objMakePacket, CMessage* pMessage, const ACE_Time_Value& tvNow) const
 {
     if(NULL != pMessage->GetMessageBase())
     {

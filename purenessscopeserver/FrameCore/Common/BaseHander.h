@@ -41,7 +41,7 @@ public:
 };
 
 //将数据发送入工作线程消息队列
-void Send_MakePacket_Queue(_MakePacket objMakePacket, const char* pLocalIP, uint16 u2LocalPort);
+void Send_MakePacket_Queue(const _MakePacket objMakePacket, const char* pLocalIP, uint16 u2LocalPort);
 
 //udp函数发送数据包合成函数
 bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param, char*& pMessage,

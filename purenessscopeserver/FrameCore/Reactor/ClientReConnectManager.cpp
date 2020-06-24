@@ -941,7 +941,7 @@ void CClientReConnectManager::GetUDPConnectInfo(vecClientConnectInfo& VecClientC
     vector<CReactorUDPClient*> vecReactorUDPClient;
     m_objClientUDPList.Get_All_Used(vecReactorUDPClient);
 
-    for (CReactorUDPClient* pClientInfo : vecReactorUDPClient)
+    for (const CReactorUDPClient* pClientInfo : vecReactorUDPClient)
     {
         if (NULL == pClientInfo)
         {
