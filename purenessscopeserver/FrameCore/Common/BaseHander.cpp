@@ -204,7 +204,7 @@ uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPa
     return n1Ret;
 }
 
-void Send_MakePacket_Queue(const _MakePacket objMakePacket, const char* pLocalIP, uint16 u2LocalPort)
+void Send_MakePacket_Queue(_MakePacket objMakePacket, const char* pLocalIP, uint16 u2LocalPort)
 {
     //需要回调发送成功回执
     if (EM_CONNECT_IO_TYPE::CONNECT_IO_TCP == objMakePacket.m_u1PacketType || EM_CONNECT_IO_TYPE::CONNECT_IO_UDP == objMakePacket.m_u1PacketType)
