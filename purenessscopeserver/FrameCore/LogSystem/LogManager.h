@@ -96,6 +96,7 @@ public:
             nRet = Update_Log_Block(nLogType, &u2MailID, pTitle, pLogBlockInfo);
         }
 
+        m_Logger_Mutex.release();
         return nRet;
     };
 
