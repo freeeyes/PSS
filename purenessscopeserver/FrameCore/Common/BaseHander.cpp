@@ -368,7 +368,11 @@ bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
             return false;
         }
 
-        App_PacketParseLoader::instance()->GetPacketParseInfo(obj_Send_Packet_Param.m_u4PacketParseInfoID)->Make_Send_Packet(obj_Send_Packet_Param.m_u4ConnectID, pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pBlockMessage, obj_Send_Packet_Param.m_u2CommandID);
+        if (false == App_PacketParseLoader::instance()->GetPacketParseInfo(obj_Send_Packet_Param.m_u4PacketParseInfoID)->Make_Send_Packet(obj_Send_Packet_Param.m_u4ConnectID, pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pBlockMessage, obj_Send_Packet_Param.m_u2CommandID))
+        {
+            //如果发送组包失败，返回false
+            return false;
+        }
         //这里MakePacket已经加了数据长度，所以在这里不再追加
     }
     else
@@ -377,7 +381,7 @@ bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
 
         if (u4PacketSize >= obj_Send_Packet_Param.m_u4SendMaxBuffSize)
         {
-            OUR_DEBUG((LM_DEBUG, "[CProConnectHandler::SendMessage](%d) u4SendPacketSize is more than(%d)(%d).\n", obj_Send_Packet_Param.m_u4ConnectID, u4PacketSize, obj_Send_Packet_Param.m_u4SendMaxBuffSize));
+            OUR_DEBUG((LM_DEBUG, "[Tcp_Common_Make_Send_Packet](%d) u4SendPacketSize is more than(%d)(%d).\n", obj_Send_Packet_Param.m_u4ConnectID, u4PacketSize, obj_Send_Packet_Param.m_u4SendMaxBuffSize));
             //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
             ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
             memcpy_safe(pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
@@ -394,15 +398,27 @@ bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
         pBlockMessage->wr_ptr(pBuffPacket->GetPacketLen());
     }
 
-    //因为是异步发送，发送的数据指针不可以立刻释放，所以需要在这里创建一个新的发送数据块，将数据考入
-    pMbData = App_MessageBlockManager::instance()->Create((uint32)pBlockMessage->length());
+    //如果发送数据包有数据且长度大于零，才进行组包。
+    if (0 < pBlockMessage->length())
+    {
+        //因为是异步发送，发送的数据指针不可以立刻释放，所以需要在这里创建一个新的发送数据块，将数据考入
+        pMbData = App_MessageBlockManager::instance()->Create((uint32)pBlockMessage->length());
 
-    memcpy_safe(pBlockMessage->rd_ptr(), (uint32)pBlockMessage->length(), pMbData->wr_ptr(), (uint32)pBlockMessage->length());
-    pMbData->wr_ptr(pBlockMessage->length());
-    //放入完成，则清空缓存数据，使命完成
-    pBlockMessage->reset();
+        memcpy_safe(pBlockMessage->rd_ptr(), (uint32)pBlockMessage->length(), pMbData->wr_ptr(), (uint32)pBlockMessage->length());
+        pMbData->wr_ptr(pBlockMessage->length());
+        //放入完成，则清空缓存数据，使命完成
+        pBlockMessage->reset();
+        return true;
+    }
+    else
+    {
+        OUR_DEBUG((LM_DEBUG, "[Tcp_Common_Make_Send_Packet](%d) commandID=%d,m_u1SendType=%d, pBlockMessage is 0.\n", 
+            obj_Send_Packet_Param.m_u4ConnectID, 
+            obj_Send_Packet_Param.m_u2CommandID,
+            obj_Send_Packet_Param.m_u1SendType));
 
-    return true;
+        return false;
+    }
 }
 
 bool Tcp_Common_CloseConnect_By_Queue(uint32 u4ConnectID, CSendMessagePool& objSendMessagePool, uint32 u4SendQueuePutTime, ACE_Task<ACE_MT_SYNCH>* pTask)
