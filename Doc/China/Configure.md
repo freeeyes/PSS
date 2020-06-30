@@ -251,6 +251,17 @@
 			<tr><th>Mode</th><th>0 只转发数据，不将回应数据回应客户端。 1 转发数据，并接受转发服务器的回应数据回应给客户端</th></tr>
             <tr><th>ConnectState</th><th>ConnectState 0 和转发连接不同步。 1 和转发连接同步</th></tr>
         </tr>
+        <tr>
+            <th rowspan="6">ServerToServer</th>
+            <th rowspan="6">服务器间连接信息配置</th>
+            <th>属性</th>
+            <th>说明</th>
+            <tr><th>S2SID</th><th>服务器间链接ID，此ID必须在服务器中唯一</th></tr>
+		    <tr><th>S2SIp</th><th>远程服务器地址</th></tr>
+			<tr><th>S2SPort</th><th>远程服务器端口</th></tr>
+			<tr><th>S2SPacketParseID</th><th>对应消息解析插件PacketParse的ID</th></tr>
+        </tr>
+        
 </table>
 
 ## logger.xml(框架日志配置信息)  

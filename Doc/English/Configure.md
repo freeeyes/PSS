@@ -251,6 +251,16 @@
 			<tr><th>Mode</th><th>0 only forwards data and does not respond to the client with response data. 1 Forward data and accept the response data from the forwarding server to the client</th></tr>
             <tr><th>ConnectState</th><th>0 is out of sync with the forwarding connection. 1 is synchronized with the forwarding connection</th></tr>
         </tr>
+        <tr>
+            <th rowspan="6">ServerToServer</th>
+            <th rowspan="6">Connection information configuration between servers</th>
+            <th>Attribute</th>
+            <th>information</th>
+            <tr><th>S2SID</th><th>Remote server ID, must be unique</th></tr>
+		    <tr><th>S2SIp</th><th>Remote server IP</th></tr>
+			<tr><th>S2SPort</th><th>Remote server port</th></tr>
+			<tr><th>S2SPacketParseID</th><th>The ID of the corresponding message parsing plugin PacketParse</th></tr>
+        </tr>
 
 </table>
 
