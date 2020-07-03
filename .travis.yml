@@ -94,9 +94,8 @@ matrix:
         - sleep 5
         - cd $TRAVIS_BUILD_DIR/Build/Linux
         - killall PurenessScopeServer
-        - sleep 5
-        #- cd $TRAVIS_BUILD_DIR/purenessscopeserver/FrameCore/Linux_Bin
-        - tail -n 10 pssout.file        
+        - sleep 10
+        - tail -f 10 pssout.file        
         - cd $TRAVIS_BUILD_DIR/Build/Linux/.obj
         - ls *.gcda
         - cd $TRAVIS_BUILD_DIR/Build/Linux/
