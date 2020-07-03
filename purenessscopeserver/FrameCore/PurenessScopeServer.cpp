@@ -27,6 +27,11 @@
 #include <windows.h>
 #endif
 
+#include <iostream>
+#include <mutex>
+#include <chrono>
+#include <thread>
+
 //加载所有配置文件中的PacketParse模块
 int Load_PacketParse_Module()
 {
@@ -53,32 +58,6 @@ int Load_PacketParse_Module()
 }
 
 #ifndef WIN32
-//关闭消息队列条件变量
-ACE_Thread_Mutex g_mutex;
-ACE_Condition<ACE_Thread_Mutex> g_cond(g_mutex);
-
-
-//监控信号量线程
-void* thread_Monitor(void* arg)
-{
-	ACE_UNUSED_ARG(arg);
-
-	g_mutex.acquire();
-
-	bool blFlag = true;
-
-	while (WaitQuitSignal::wait(blFlag))
-	{
-		sleep(1);
-	}
-
-	g_cond.signal();
-	g_mutex.release();
-
-	OUR_DEBUG((LM_INFO, "[thread_Monitor]exit.\n"));
-	pthread_exit(0);
-}
-
 int CheckCoreLimit(int nMaxCoreFile)
 {
 	//获得当前Core大小设置
@@ -206,14 +185,27 @@ int Chlid_Run()
 	}
 
 	//设置监控信号量的线程
-	WaitQuitSignal::init();
+	//关闭消息队列条件变量
+	std::mutex g_mutex;
+	WaitQuitSignal g_wait_sigal;
 
-	pthread_t tid;
-	pthread_attr_t attr;
-	pthread_attr_init(&attr);
-	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+	g_wait_sigal.init();
 
-	pthread_create(&tid, &attr, thread_Monitor, NULL);
+	//监控异常中断信号量
+	std::thread th_monitor([g_wait_sigal, &g_mutex ]()
+		{
+			std::lock_guard<std::mutex> lk(g_mutex);
+
+			bool blFlag = true;
+
+			while (g_wait_sigal.wait(blFlag))
+			{
+				std::this_thread::sleep_for(std::chrono::microseconds(500));
+			}
+
+			OUR_DEBUG((LM_INFO, "[thread_Monitor]exit.\n"));
+		});
+	th_monitor.detach();
 
 	//等待线程锁生效
 	ACE_Time_Value tvSleep(0, 1000);
@@ -240,7 +232,7 @@ int Chlid_Run()
 
 	OUR_DEBUG((LM_INFO, "[main]Server Run is End.\n"));
 
-	g_mutex.acquire();
+	std::lock_guard<std::mutex> lk(g_mutex);
 
 	OUR_DEBUG((LM_INFO, "[main]Server Exit.\n"));
 
