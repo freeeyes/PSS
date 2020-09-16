@@ -2210,6 +2210,8 @@ bool CConnectManager::Dispose_Queue()
             if (false == SendMessage(msg->m_u4ConnectID, msg->m_pBuffPacket, msg->m_u2CommandID, msg->m_u1SendState, msg->m_nEvents, msg->m_tvSend, msg->m_blDelete, msg->m_nMessageID))
             {
                 OUR_DEBUG((LM_INFO, "[CConnectManager::Dispose_Queue]SendMessage error.\n"));
+				//»ØÊÕ·¢ËÍ»º³å
+				App_BuffPacketManager::instance()->Delete(msg->m_pBuffPacket);
             }
         }
         else

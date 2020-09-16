@@ -871,10 +871,11 @@ bool CProConnectHandler::PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State
         }
 
         //比较水位标，是否超过一定数值，也就是说发快收慢的时候，如果超过一定数值，断开连接
-        if(m_u4ReadSendSize - m_u4SuccessSendSize >= GetXmlConfigAttribute(xmlSendInfo)->SendDatamark)
+        /*
+        if(GetXmlConfigAttribute(xmlSendInfo)->SendDatamark > 0 && m_u4ReadSendSize - m_u4SuccessSendSize >= GetXmlConfigAttribute(xmlSendInfo)->SendDatamark)
         {
             OUR_DEBUG ((LM_ERROR, "[CProConnectHandler::PutSendPacket]ConnectID = %d, SingleConnectMaxSendBuffer is more than(%d)!\n", GetConnectID(), m_u4ReadSendSize - m_u4SuccessSendSize));
-            AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_SENDQUEUEERROR, "]Connection from [%s:%d], SingleConnectMaxSendBuffer is more than(%d)!.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4ReadSendSize - m_u4SuccessSendSize);
+            //AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_SENDQUEUEERROR, "]Connection from [%s:%d], SingleConnectMaxSendBuffer is more than(%d)!.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4ReadSendSize - m_u4SuccessSendSize);
 
             //这里发送给插件一个消息，告知插件数据超过阈值
             CPacketParse objPacketParse;
@@ -893,6 +894,7 @@ bool CProConnectHandler::PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State
 
             return false;
         }
+        */
 
         //记录水位标
         m_u4ReadSendSize += (uint32)pMbData->length();
@@ -1997,6 +1999,8 @@ int CProConnectManager::svc (void)
                 if (false == SendMessage(msg->m_u4ConnectID, msg->m_pBuffPacket, msg->m_u2CommandID, msg->m_u1SendState, msg->m_nEvents, msg->m_tvSend, msg->m_blDelete, msg->m_nMessageID))
                 {
                     OUR_DEBUG((LM_INFO, "[CProConnectManager::svc]ConnectID=%d, m_u2CommandID=%d, SendMessage error.\n", msg->m_u4ConnectID, msg->m_u2CommandID));
+                    //回收发送缓冲
+                    App_BuffPacketManager::instance()->Delete(msg->m_pBuffPacket);
                 }
             }
             else if (1 == msg->m_u1Type)

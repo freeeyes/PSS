@@ -355,6 +355,11 @@ bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
                                  ACE_Message_Block*& pMbData,
                                  uint32& u4PacketSize)
 {
+    if (pBlockMessage == NULL)
+    {
+        OUR_DEBUG((LM_DEBUG, "[Tcp_Common_Make_Send_Packet](%d) pBlockMessage is NULL.\n", obj_Send_Packet_Param.m_u4ConnectID));
+    }
+
     if (obj_Send_Packet_Param.m_u1SendType == SENDMESSAGE_NOMAL)
     {
         u4PacketSize = App_PacketParseLoader::instance()->GetPacketParseInfo(obj_Send_Packet_Param.m_u4PacketParseInfoID)->Make_Send_Packet_Length(obj_Send_Packet_Param.m_u4ConnectID, pBuffPacket->GetPacketLen(), obj_Send_Packet_Param.m_u2CommandID);
@@ -379,7 +384,7 @@ bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
     {
         u4PacketSize = pBuffPacket->GetPacketLen();
 
-        if (u4PacketSize >= obj_Send_Packet_Param.m_u4SendMaxBuffSize)
+        if (obj_Send_Packet_Param.m_u4SendMaxBuffSize > 0 && u4PacketSize >= obj_Send_Packet_Param.m_u4SendMaxBuffSize)
         {
             OUR_DEBUG((LM_DEBUG, "[Tcp_Common_Make_Send_Packet](%d) u4SendPacketSize is more than(%d)(%d).\n", obj_Send_Packet_Param.m_u4ConnectID, u4PacketSize, obj_Send_Packet_Param.m_u4SendMaxBuffSize));
             //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
@@ -658,5 +663,5 @@ void Tcp_Common_Manager_Init(uint16 u2Index, CCommandAccount& objCommandAccount,
     u2SendQueueMax = GetXmlConfigAttribute(xmlSendInfo)->SendQueueMax;
 
     //初始化发送缓冲池
-    objSendCacheManager.Init(GetXmlConfigAttribute(xmlSendInfo)->BlockCount, GetXmlConfigAttribute(xmlSendInfo)->MaxBlockSize);
+    objSendCacheManager.Init(GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount, GetXmlConfigAttribute(xmlSendInfo)->MaxBlockSize);
 }

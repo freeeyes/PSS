@@ -47,6 +47,7 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
     MESSAGE_FUNCTION(CLINET_LINK_SENDTIMEOUT, Do_ClientSendTimeout, pMessage);
     MESSAGE_FUNCTION(CLIENT_LINK_SENDOK,      Do_ClientSendOk,      pMessage);
     MESSAGE_FUNCTION(COMMAND_BASE,            Do_Base,              pMessage);
+    MESSAGE_FUNCTION(COMMAND_TESTREPLY,       Do_ReplyTest,         pMessage);
     MESSAGE_FUNCTION_END;
 
     return 0;
@@ -169,4 +170,90 @@ int CBaseCommand::Do_ClientSendOk(IMessage* pMessage)
     //OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage]nMessageID=%d, ConnectID=%d.\n", nMessageID, pMessage->GetMessageBase()->m_u4ConnectID));
 
     return 0;
+}
+
+int CBaseCommand::Do_ReplyTest(IMessage* pMessage)
+{
+	_PacketInfo BodyPacket;
+	pMessage->GetPacketBody(BodyPacket);
+	char* pszBuffer = (char*)malloc(BodyPacket.m_nDataLen + 1);
+	memset(pszBuffer, 0x00, BodyPacket.m_nDataLen + 1);
+	strncpy(pszBuffer, BodyPacket.m_pData, BodyPacket.m_nDataLen);
+
+	SendClient(pszBuffer, COMMAND_TESTREPLY, pMessage->GetMessageBase()->m_u4ConnectID, SIGNALING_KEY, SIGNALING_IV, false);
+	free(pszBuffer);
+	return 0;
+}
+
+// 回复给客户端
+int CBaseCommand::SendClient(string pData, short nCommand, uint32 nConnectId, char* pKey, char* pIv, bool nEncrypt)
+{
+	__ENTER_FUNCTION();
+	int nRet = 0;
+	//拼装发送包体
+	//printf("Send: [%d][%#x], %s", nConnectId, nCommand, pData.c_str());
+	char szSession[18] = { '\0' };
+	short sVersion = (short)NET_VERSION;
+	short sCommand = nCommand;
+	uint32 nPacketLen = pData.length();
+	char* pBuffer = (char*)pData.c_str();
+	if (nEncrypt) {
+		//pBuffer = m_CAESClass.aes_encrypt((char*)pData.c_str(), pKey, pIv, nPacketLen);
+	}
+	int nSendLen = nPacketLen + 40;
+	char* szSendBuffer = (char*)malloc(nSendLen + 1);
+	if (!szSendBuffer)
+	{
+		return nRet;
+	}
+	memset(szSendBuffer, 0x00, nSendLen + 1);
+
+	memcpy(szSendBuffer, (char*)&sVersion, sizeof(short));
+	memcpy((char*)&szSendBuffer[2], (char*)&sCommand, sizeof(short));
+	memcpy((char*)&szSendBuffer[4], (char*)&nPacketLen, sizeof(uint32));
+	memcpy((char*)&szSendBuffer[22], (char*)&szSession, sizeof(char) * 18);
+	memcpy((char*)&szSendBuffer[40], (char*)pBuffer, sizeof(char) * nPacketLen);
+
+	nRet = SendData(szSendBuffer, nSendLen, nCommand, nConnectId);
+	if (nEncrypt) {
+		free(pBuffer);
+		pBuffer = NULL;
+	}
+	return nRet;
+	__LEAVE_FUNCTION_WITHRETURN(0);
+}
+
+//发送消息
+int CBaseCommand::SendData(char* SendBuffer, int nSendLen, short nCommand, uint32 nConnectId)
+{
+	__ENTER_FUNCTION();
+	int nRet = 0;
+	IBuffPacket* pResponsesPacket = m_pServerObject->GetPacketManager()->Create();
+	uint16 u2PostCommandID = nCommand;
+
+	pResponsesPacket->WriteStream(SendBuffer, nSendLen + 1);
+	int nMessageID = 0;
+	if (NULL != m_pServerObject->GetConnectManager())
+	{
+
+		nRet = m_pServerObject->GetConnectManager()->PostMessage(nConnectId,
+			pResponsesPacket,
+			SENDMESSAGE_JAMPNOMAL,
+			u2PostCommandID,
+			PACKET_SEND_IMMEDIATLY,
+			PACKET_IS_FRAMEWORK_RECYC,
+			nMessageID);
+	}
+	else
+	{
+		m_pServerObject->GetPacketManager()->Delete(pResponsesPacket);
+	}
+	if (SendBuffer)
+	{
+		free(SendBuffer);
+		SendBuffer = NULL;
+	}
+
+	return nRet;
+	__LEAVE_FUNCTION_WITHRETURN(0);
 }

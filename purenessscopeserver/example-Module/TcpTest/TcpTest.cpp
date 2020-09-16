@@ -66,6 +66,7 @@ int LoadModuleData(CServerObject* pServerObject)
     if(NULL != pMessageManager)
     {
         pMessageManager->AddClientCommand(COMMAND_BASE, g_BaseCommand, g_szName);
+        pMessageManager->AddClientCommand(COMMAND_TESTREPLY, g_BaseCommand, g_szName);
 
         //测试绑定指定的监听端口
         //_ClientIPInfo objClientIPInfo;
