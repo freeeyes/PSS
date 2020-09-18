@@ -1795,9 +1795,9 @@ bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
     }
     else
     {
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CProConnectManager::SendMessage] ConnectID[%d] is not find.", u4ConnectID);
+        //sprintf_safe(m_szError, MAX_BUFF_500, "[CProConnectManager::SendMessage] ConnectID[%d] is not find.", u4ConnectID);
         //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
-        OUR_DEBUG((LM_INFO, "[CProConnectManager::SendMessage]pConnectHandler is NULL.\n"));
+        //OUR_DEBUG((LM_INFO, "[CProConnectManager::SendMessage]pConnectHandler is NULL.\n"));
         Tcp_Common_Send_Message_Error(u4ConnectID, u2CommandID, blDelete, pBuffPacket);
 
         if(true == blDelete)
