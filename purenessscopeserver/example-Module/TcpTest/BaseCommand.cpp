@@ -26,7 +26,7 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
     //如果函数不返回任何变量，你可以使用__LEAVE_FUNCTION即可。
     __ENTER_FUNCTION();
 
-    DO_TRACE("./", pMessage->GetMessageBase()->m_szTraceID);
+    //DO_TRACE("./", pMessage->GetMessageBase()->m_szTraceID);
 
     if(m_pServerObject == NULL)
     {
@@ -176,63 +176,42 @@ int CBaseCommand::Do_ReplyTest(IMessage* pMessage)
 {
 	_PacketInfo BodyPacket;
 	pMessage->GetPacketBody(BodyPacket);
-	char* pszBuffer = (char*)malloc(BodyPacket.m_nDataLen + 1);
-	memset(pszBuffer, 0x00, BodyPacket.m_nDataLen + 1);
-	strncpy(pszBuffer, BodyPacket.m_pData, BodyPacket.m_nDataLen);
 
-	SendClient(pszBuffer, COMMAND_TESTREPLY, pMessage->GetMessageBase()->m_u4ConnectID, SIGNALING_KEY, SIGNALING_IV, false);
-	free(pszBuffer);
+	SendClient(BodyPacket, COMMAND_TESTREPLY, pMessage->GetMessageBase()->m_u4ConnectID, SIGNALING_KEY, SIGNALING_IV, false);
 	return 0;
 }
 
 // 回复给客户端
-int CBaseCommand::SendClient(string pData, short nCommand, uint32 nConnectId, char* pKey, char* pIv, bool nEncrypt)
+int CBaseCommand::SendClient(_PacketInfo BodyPacket, short nCommand, uint32 nConnectId, char* pKey, char* pIv, bool nEncrypt)
 {
 	__ENTER_FUNCTION();
 	int nRet = 0;
 	//拼装发送包体
 	//printf("Send: [%d][%#x], %s", nConnectId, nCommand, pData.c_str());
-	char szSession[18] = { '\0' };
-	short sVersion = (short)NET_VERSION;
-	short sCommand = nCommand;
-	uint32 nPacketLen = pData.length();
-	char* pBuffer = (char*)pData.c_str();
+	char szSession[32] = { '\0' };
+	uint16 u2Version = (short)NET_VERSION;
+	uint16 u2Command = nCommand;
+	uint32 u4PacketLen = BodyPacket.m_nDataLen;
+	char* pBuffer = BodyPacket.m_pData;
+    uint16 u2PostCommandID = nCommand;
+
 	if (nEncrypt) {
 		//pBuffer = m_CAESClass.aes_encrypt((char*)pData.c_str(), pKey, pIv, nPacketLen);
 	}
-	int nSendLen = nPacketLen + 40;
-	char* szSendBuffer = (char*)malloc(nSendLen + 1);
-	if (!szSendBuffer)
-	{
-		return nRet;
-	}
-	memset(szSendBuffer, 0x00, nSendLen + 1);
+	uint32 u4SendLen = u4PacketLen + 40;
 
-	memcpy(szSendBuffer, (char*)&sVersion, sizeof(short));
-	memcpy((char*)&szSendBuffer[2], (char*)&sCommand, sizeof(short));
-	memcpy((char*)&szSendBuffer[4], (char*)&nPacketLen, sizeof(uint32));
-	memcpy((char*)&szSendBuffer[22], (char*)&szSession, sizeof(char) * 18);
-	memcpy((char*)&szSendBuffer[40], (char*)pBuffer, sizeof(char) * nPacketLen);
-
-	nRet = SendData(szSendBuffer, nSendLen, nCommand, nConnectId);
-	if (nEncrypt) {
-		free(pBuffer);
-		pBuffer = NULL;
-	}
-	return nRet;
-	__LEAVE_FUNCTION_WITHRETURN(0);
-}
-
-//发送消息
-int CBaseCommand::SendData(char* SendBuffer, int nSendLen, short nCommand, uint32 nConnectId)
-{
-	__ENTER_FUNCTION();
-	int nRet = 0;
 	IBuffPacket* pResponsesPacket = m_pServerObject->GetPacketManager()->Create();
-	uint16 u2PostCommandID = nCommand;
+	
+    //拼接消息头
+    (*pResponsesPacket) << u2Version;
+    (*pResponsesPacket) << u2Command;
+    (*pResponsesPacket) << u4PacketLen;
+    pResponsesPacket->WriteStream(szSession, 32);
 
-	pResponsesPacket->WriteStream(SendBuffer, nSendLen + 1);
+    //拼接消息体
+	pResponsesPacket->WriteStream(pBuffer, u4PacketLen);
 	int nMessageID = 0;
+
 	if (NULL != m_pServerObject->GetConnectManager())
 	{
 
@@ -248,11 +227,7 @@ int CBaseCommand::SendData(char* SendBuffer, int nSendLen, short nCommand, uint3
 	{
 		m_pServerObject->GetPacketManager()->Delete(pResponsesPacket);
 	}
-	if (SendBuffer)
-	{
-		free(SendBuffer);
-		SendBuffer = NULL;
-	}
+
 
 	return nRet;
 	__LEAVE_FUNCTION_WITHRETURN(0);

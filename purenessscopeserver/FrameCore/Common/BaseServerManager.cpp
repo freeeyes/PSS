@@ -39,6 +39,7 @@ bool Server_Manager_Common_Pool()
 
     //初始化BuffPacket缓冲池.默认都是当前最大连接数的2倍
     App_BuffPacketManager::instance()->Init(GetXmlConfigAttribute(xmlBuffPacket)->Count, CBuffPacketManager::Init_Callback);
+    App_BuffPacketManager::instance()->SetCreateFlag(true);
 
     //初始化服务器间异步接收队列
     App_ServerMessageInfoPool::instance()->Init(GetXmlConfigAttribute(xmlConnectServer)->Count);

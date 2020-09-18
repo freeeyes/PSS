@@ -108,6 +108,15 @@ private:
     CCommandAccount                m_CommandAccount;       //当前线程命令统计数据
     CMessagePool                   m_MessagePool;          //消息池
 
+    //测试消息处理类型对象
+    uint16                         m_u2MessageCount = 0;
+    ACE_Time_Value                 m_avBegin;
+    ACE_Time_Value                 m_avEnd;
+
+	uint16                         m_u2PutMessageCount = 0;
+	ACE_Time_Value                 m_avPutBegin;
+	ACE_Time_Value                 m_avPutEnd;
+
     CHashTable<CClientCommandList>                      m_objClientCommandList;  //可执行的信令列表
 
     ACE_Thread_Mutex m_mutex;

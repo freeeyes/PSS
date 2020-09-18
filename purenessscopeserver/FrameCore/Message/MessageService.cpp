@@ -106,22 +106,23 @@ int CMessageService::open()
 int CMessageService::svc(void)
 {
     //判断是否要绑定CPU
-    if (true == m_blIsCpuAffinity)
-    {
+	//判断是否要绑定CPU
+	if (true == m_blIsCpuAffinity)
+	{
 #if PSS_PLATFORM == PLATFORM_WIN
-        SetThreadAffinityMask(GetCurrentThread(), m_u4ThreadID);
+		SetThreadAffinityMask(GetCurrentThread(), m_u4ThreadID);
 #else
-        cpu_set_t mask;
-        CPU_ZERO(&mask);
-        CPU_SET(m_u4ThreadID, &mask);
+		cpu_set_t mask;
+		CPU_ZERO(&mask);
+		CPU_SET(m_u4ThreadID, &mask);
 
-        if (pthread_setaffinity_np(pthread_self(), sizeof(mask), &mask) != 0)
-        {
-            OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)cound not get thread affinity.\n", m_u4ThreadID));
-        }
+		if (pthread_setaffinity_np(pthread_self(), sizeof(mask), &mask) != 0)
+		{
+			OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)cound not get thread affinity.\n", m_u4ThreadID));
+		}
 
 #endif
-    }
+	}
 
     while(m_blRun)
     {
@@ -165,6 +166,26 @@ bool CMessageService::PutMessage(CMessage* pMessage)
         OUR_DEBUG((LM_ERROR,"[CMessageService::PutMessage] mb new error.\n"));
         return false;
     }
+
+	//测试代码
+	if (0 == m_u2PutMessageCount && pMessage->GetMessageBase()->m_u2Cmd >= CLIENT_LINK_USER)
+	{
+		m_avPutBegin = ACE_OS::gettimeofday();
+        OUR_DEBUG((LM_INFO, "[CMessageService::PutMessage]m_avPutBegin=%d.\n", m_avPutBegin.sec()));
+		m_u2PutMessageCount++;
+	}
+	else if(pMessage->GetMessageBase()->m_u2Cmd >= CLIENT_LINK_USER)
+	{
+        m_u2PutMessageCount++;
+        if (m_u2PutMessageCount >= 1000)
+        {
+            m_avPutEnd = ACE_OS::gettimeofday();
+            ACE_Time_Value tvInterval = m_avPutEnd - m_avPutBegin;
+            OUR_DEBUG((LM_INFO, "[CMessageService::PutMessage]m_avPutEnd=%d.\n", m_avPutEnd.sec()));
+            OUR_DEBUG((LM_INFO, "[CMessageService::PutMessage]tvInterval=%d.\n", tvInterval.msec()));
+            m_u2PutMessageCount = 0;
+        }
+	}
 
     return true;
 }
@@ -279,6 +300,24 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
     uint32 u4TimeCost     = 0;      //命令执行时间
     uint16 u2CommandCount = 0;      //命令被调用次数
     bool   blDeleteFlag   = true;   //用完是否删除，默认是删除
+
+		//测试代码
+	if (0 == m_u2MessageCount && pMessage->GetMessageBase()->m_u2Cmd >= CLIENT_LINK_USER)
+	{
+		m_avBegin = ACE_OS::gettimeofday();
+		m_u2MessageCount++;
+	}
+	else if (pMessage->GetMessageBase()->m_u2Cmd >= CLIENT_LINK_USER)
+	{
+		m_u2MessageCount++;
+		if (m_u2MessageCount >= 1000)
+		{
+			m_avEnd = ACE_OS::gettimeofday();
+			ACE_Time_Value tvInterval = m_avEnd - m_avBegin;
+			OUR_DEBUG((LM_INFO, "[CMessageService::DoMessage]tvInterval=%d.\n", tvInterval.msec()));
+			m_u2MessageCount = 0;
+		}
+	}
 
     DoMessage(m_ThreadInfo.m_tvUpdateTime, pMessage, u2CommandID, u4TimeCost, u2CommandCount, blDeleteFlag);
 
@@ -428,6 +467,24 @@ bool CMessageService::DoMessage(const ACE_Time_Value& tvBegin, IMessage* pMessag
     {
         OUR_DEBUG((LM_ERROR, "[CMessageService::DoMessage] pMessage is NULL.\n"));
         return false;
+    }
+
+    //测试代码
+    if (0 == m_u2MessageCount && pMessage->GetMessageBase()->m_u2Cmd >= CLIENT_LINK_USER)
+    {
+        m_avBegin = ACE_OS::gettimeofday();
+        m_u2MessageCount++;
+    }
+    else if(pMessage->GetMessageBase()->m_u2Cmd >= CLIENT_LINK_USER)
+    {
+        m_u2MessageCount++;
+        if (m_u2MessageCount >= 1000)
+        {
+			m_avEnd = ACE_OS::gettimeofday();
+			ACE_Time_Value tvInterval = m_avEnd - m_avBegin;
+			OUR_DEBUG((LM_INFO, "[CMessageService::DoMessage]tvInterval=%d.\n", tvInterval.msec()));
+			m_u2MessageCount = 0;
+        }
     }
 
     //放给需要继承的ClientCommand类去处理

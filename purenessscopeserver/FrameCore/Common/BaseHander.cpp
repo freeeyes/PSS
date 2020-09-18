@@ -161,7 +161,7 @@ void Tcp_Common_Send_Message_Error(uint32 u4ConnectID, uint16 u2CommandID, bool 
 {
     ACE_Message_Block* pSendMessage = NULL;
 
-    if (pBuffPacket != NULL || pBuffPacket->GetPacketLen() > 0)
+    if (pBuffPacket != NULL && pBuffPacket->GetPacketLen() > 0)
     {
         pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
         memcpy_safe(pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
@@ -358,6 +358,7 @@ bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
     if (pBlockMessage == NULL)
     {
         OUR_DEBUG((LM_DEBUG, "[Tcp_Common_Make_Send_Packet](%d) pBlockMessage is NULL.\n", obj_Send_Packet_Param.m_u4ConnectID));
+        return false;
     }
 
     if (obj_Send_Packet_Param.m_u1SendType == SENDMESSAGE_NOMAL)

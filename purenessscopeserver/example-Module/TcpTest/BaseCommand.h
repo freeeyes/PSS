@@ -42,8 +42,7 @@ private:
     int Do_Base(IMessage* pMessage);
     int Do_ClientSendOk(IMessage* pMessage);
     int Do_ReplyTest(IMessage* pMessage);
-    int SendClient(string pData, short nCommand, uint32 nConnectId, char* pKey, char* pIv, bool nEncrypt);
-    int SendData(char* SendBuffer, int nSendLen, short nCommand, uint32 nConnectId);
+    int SendClient(_PacketInfo BodyPacket, short nCommand, uint32 nConnectId, char* pKey, char* pIv, bool nEncrypt);
 
 private:
     CServerObject* m_pServerObject;
