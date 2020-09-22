@@ -182,17 +182,17 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
 
     uint32 u4Data4Len = 0;
     u4Data4Len = (uint32)(pParamBegin - pCommandBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING));
-    memcpy_safe(pCommandBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), u4Data4Len, (char*)CommandInfo.m_szCommandTitle, (uint32)(pParamBegin - pCommandBegin - (int)ACE_OS::strlen(COMMAND_SPLIT_STRING)));
     if (MAX_BUFF_100 > u4Data4Len)
     {
+        memcpy_safe(pCommandBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), u4Data4Len, (char*)CommandInfo.m_szCommandTitle, u4Data4Len);
         CommandInfo.m_szCommandTitle[u4Data4Len] = '\0';
     }
 
     //获得扩展参数
     u4Data4Len = (uint32)(nLen - (pParamBegin - pCommand - ACE_OS::strlen(COMMAND_SPLIT_STRING)) + 1);
-    memcpy_safe(pParamBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), u4Data4Len, (char*)CommandInfo.m_szCommandExp, u4Data4Len);
     if (MAX_BUFF_100 > u4Data4Len)
     {
+        memcpy_safe(pParamBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), u4Data4Len, (char*)CommandInfo.m_szCommandExp, u4Data4Len);
         CommandInfo.m_szCommandExp[u4Data4Len] = '\0';
     }
 
