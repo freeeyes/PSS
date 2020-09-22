@@ -13,8 +13,8 @@ public:
 
     void Close();
 
-    int AddMessage(string strName, unsigned long long nMessagePos, long sec, long usec, int _Message_id, void* _arg, Enum_Timer_Mode emTimerMode = Timer_Mode_Run_Once, IMessagePrecess* pMessagePrecess = NULL);
-    void* DeleteMessage(string strName, unsigned long long nMessagePos);
+    int AddMessage(const char* pName, unsigned long long nMessagePos, long sec, long usec, int _Message_id, void* _arg, Enum_Timer_Mode emTimerMode = Timer_Mode_Run_Once, IMessagePrecess* pMessagePrecess = NULL);
+    void* DeleteMessage(const char* pName, unsigned long long nMessagePos);
     bool GetRun();
 
 private:

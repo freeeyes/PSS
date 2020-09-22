@@ -215,8 +215,6 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
             if (false == CheckMessage())
             {
                 OUR_DEBUG((LM_INFO, "[CConsoleHandler::handle_input]CheckMessage error.\n"));
-
-                Clear_PacketParse();
                 return -1;
             }
 
@@ -414,7 +412,10 @@ bool CConsoleHandler::CheckMessage()
     if (true == blRet && false == SendMessage(pBuffPacket, u1Output))
     {
         OUR_DEBUG((LM_INFO, "[CConsoleHandler::CheckMessage]SendMessage error.\n"));
+        return false;
     }
-
-    return true;
+    else
+    {
+        return true;
+    }
 }

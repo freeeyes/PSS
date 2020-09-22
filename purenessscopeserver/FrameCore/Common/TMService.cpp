@@ -151,8 +151,9 @@ void CTMService::Close()
     this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
-int CTMService::AddMessage(string strName, unsigned long long nMessagePos, long sec, long usec, int _Message_id, void* _arg, Enum_Timer_Mode emTimerMode, IMessagePrecess* pMessagePrecess)
+int CTMService::AddMessage(const char* pName, unsigned long long nMessagePos, long sec, long usec, int _Message_id, void* _arg, Enum_Timer_Mode emTimerMode, IMessagePrecess* pMessagePrecess)
 {
+    string strName = (string)pName;
     if (0 == m_nActive)
     {
         return -2;
@@ -214,8 +215,9 @@ int CTMService::AddMessage(string strName, unsigned long long nMessagePos, long 
     return 0;
 }
 
-void* CTMService::DeleteMessage(string strName, unsigned long long nMessagePos)
+void* CTMService::DeleteMessage(const char* pName, unsigned long long nMessagePos)
 {
+    string strName = (string)pName;
     if (0 == m_nActive)
     {
         return nullptr;

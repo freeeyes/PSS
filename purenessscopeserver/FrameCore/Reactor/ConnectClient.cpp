@@ -294,10 +294,6 @@ int CConnectClient::RecvData()
 
     Dispose_Recv_Data(m_pCurrMessage);
 
-    m_emRecvState = EM_Server_Recv_State::SERVER_RECV_END;
-
-    m_pCurrMessage->reset();
-
     return 0;
 }
 
@@ -349,6 +345,9 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
 
                 //清理用完的m_pPacketParse
                 App_PacketParsePool::instance()->Delete(pPacketParse);
+
+                m_emRecvState = EM_Server_Recv_State::SERVER_RECV_END;
+                m_pCurrMessage->reset();
             }
             else if (PACKET_GET_ERROR == n1Ret)
             {
@@ -392,6 +391,9 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
                 SendMessageGroup(u2CommandID, pRecvFinish);
             }
         }
+
+		m_emRecvState = EM_Server_Recv_State::SERVER_RECV_END;
+		m_pCurrMessage->reset();
     }
 
     return 0;
