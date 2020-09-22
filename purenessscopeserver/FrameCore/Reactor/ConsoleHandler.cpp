@@ -270,15 +270,10 @@ uint8 CConsoleHandler::GetIsClosing() const
 
 bool CConsoleHandler::SendMessage(IBuffPacket* pBuffPacket, uint8 u1OutputType)
 {
-    m_ThreadLock.acquire();
-    m_nIOCount++;
-    m_ThreadLock.release();
-
     ACE_Message_Block* pMbData = NULL;
 
     if (false == Console_Common_SendMessage_Data_Check(GetConnectID(), pBuffPacket, u1OutputType, pMbData))
     {
-        Close();
         return false;
     }
 
@@ -297,7 +292,6 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
     if (NULL == pMbData)
     {
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::SendPacket] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetConnectID()));
-        Close();
         return false;
     }
 
@@ -306,7 +300,6 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::SendPacket] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetConnectID()));
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConsoleHandler::SendPacket] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetConnectID());
         App_MessageBlockManager::instance()->Close(pMbData);
-        Close();
         return false;
     }
 
@@ -317,7 +310,6 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
     {
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::SendPacket] ConnectID = %d, pData is NULL.\n", GetConnectID()));
         App_MessageBlockManager::instance()->Close(pMbData);
-        Close();
         return false;
     }
 
@@ -342,7 +334,6 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
             OUR_DEBUG((LM_ERROR, "[CConsoleHandler::SendPacket] ConnectID = %d, error = %d.\n", GetConnectID(), errno));
             App_MessageBlockManager::instance()->Close(pMbData);
             m_atvOutput      = ACE_OS::gettimeofday();
-            Close();
             return false;
         }
         else if (nDataLen >= nCurrSendSize)  //当数据包全部发送完毕，清空。
@@ -351,7 +342,6 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
             m_u4AllSendSize  += (uint32)pMbData->length();
             App_MessageBlockManager::instance()->Close(pMbData);
             m_atvOutput      = ACE_OS::gettimeofday();
-            Close();
             return true;
         }
         else
