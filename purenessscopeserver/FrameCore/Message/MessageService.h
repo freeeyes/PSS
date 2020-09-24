@@ -100,6 +100,7 @@ private:
     uint16                         m_u2ThreadTimeOut    = 0;
     bool                           m_blRun              = false;                 //线程是否在运行
     bool                           m_blIsCpuAffinity    = false;                 //是否CPU绑定
+    bool                           m_blOverload         = false;                 //是否过载   
 
     MESSAGE_SERVICE_THREAD_STATE   m_emThreadState      = THREAD_STOP;           //当前工作线程状态
 

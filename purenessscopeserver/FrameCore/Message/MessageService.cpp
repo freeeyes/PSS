@@ -23,7 +23,7 @@ CMessageService::CMessageService(): m_cond(m_mutex)
 void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMask, uint32 u4HighMask, bool blIsCpuAffinity)
 {
     m_u4MaxQueue    = u4MaxQueue;
-    m_u4HighMask    = u4HighMask;
+    m_u4HighMask    = u4MaxQueue * 8;  //这里的高水位标不在以设置为准，而是以最大队列数*指针大小计算
     m_u4LowMask     = u4LowMask;
 
     //添加线程信息
@@ -105,7 +105,6 @@ int CMessageService::open()
 
 int CMessageService::svc(void)
 {
-    //判断是否要绑定CPU
 	//判断是否要绑定CPU
 	if (true == m_blIsCpuAffinity)
 	{
@@ -149,15 +148,41 @@ bool CMessageService::PutMessage(CMessage* pMessage)
 
         if(nQueueCount >= (int)m_u4MaxQueue)
         {
-            OUR_DEBUG((LM_ERROR,"[CMessageService::PutMessage] Queue is Full nQueueCount = [%d].\n", nQueueCount));
+            if (false == m_blOverload)
+            {
+                OUR_DEBUG((LM_ERROR, "[CMessageService::PutMessage] Queue is Full begin nQueueCount = [%d].\n", nQueueCount));
+                //线程处理过载，写入日志
+                AppLogManager::instance()->WriteLog(LOG_SYSTEM_ERROR, 
+                    "[CMessageService::PutMessage](%d)Queue is Full begin nQueueCount = [%d]",
+                    m_u4ThreadID,
+                    nQueueCount);
+
+                m_blOverload = true;
+            }
+
             return false;
+        }
+        else
+        {
+            if (true == m_blOverload)
+            {
+                //超载已经结束了，记录恢复时间
+				OUR_DEBUG((LM_ERROR, "[CMessageService::PutMessage] Queue is Full end nQueueCount = [%d].\n", nQueueCount));
+				//线程处理过载，写入日志
+				AppLogManager::instance()->WriteLog(LOG_SYSTEM_ERROR,
+					"[CMessageService::PutMessage](%d)Queue is Full end nQueueCount = [%d]",
+					m_u4ThreadID,
+					nQueueCount);
+
+				m_blOverload = false;
+            }
         }
 
         ACE_Time_Value xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, m_u4WorkQueuePutTime);
 
         if(this->putq(mb, &xtime) == -1)
         {
-            OUR_DEBUG((LM_ERROR,"[CMessageService::PutMessage] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
+            //由上面进行控制 OUR_DEBUG((LM_ERROR,"[CMessageService::PutMessage] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
             return false;
         }
     }
