@@ -36,7 +36,10 @@ example下有专门的测试用例，可以提供开发者参考。
 ## [数据染色功能](./Doc/China/Dyeing.md)
 ## [如何开发一个逻辑插件](./Doc/China/LogicPlugin.md) 
 ## [如何开发一个解析插件](./Doc/China/PacketParsePlugin.md) 
+## [如何自动生成一个插件](./Doc/China/PluginMake.md)
 ## [更新日志](./Doc/China/Changelog.md)
+
+
 
 ![pss框架流程图](http://on-img.com/chart_image/5a6ae014e4b0d1c5b5b1e6fa.png)
 

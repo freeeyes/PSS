@@ -42,6 +42,7 @@ hope to be able to step by step with you to improve the system, really do a valu
 ## [How to Data dyeing](./Doc/English/Dyeing.md)
 ## [How to develop a logical plugin](./Doc/English/LogicPlugin.md) 
 ## [How to develop a parsing plugin](./Doc/English/PacketParsePlugin.md) 
+## [How to automatically generate a plugin](./Doc/English/PluginMake.md)
 
 ![pss frame flow chart](http://on-img.com/chart_image/5a6ae014e4b0d1c5b5b1e6fa.png)
 

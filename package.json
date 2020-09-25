@@ -17,6 +17,6 @@
   ],
   "license": "Apache License 2.0",
   "dependencies": {
-    "ACE": "6.0.0"
+    "ACE": "6.5.0"
   }
 }
