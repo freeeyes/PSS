@@ -23,7 +23,7 @@ CMessageService::CMessageService(): m_cond(m_mutex)
 void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMask, uint32 u4HighMask, bool blIsCpuAffinity)
 {
     m_u4MaxQueue    = u4MaxQueue;
-    m_u4HighMask    = u4MaxQueue * 8;  //这里的高水位标不在以设置为准，而是以最大队列数*指针大小计算
+    m_u4HighMask    = u4HighMask;
     m_u4LowMask     = u4LowMask;
 
     //添加线程信息
@@ -798,13 +798,13 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* a
     return 0;
 }
 
-bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 u4LowMask, uint32 u4HighMask)
+bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 u4LowMask)
 {
     //删除以前的所有CMessageService对象
 
     //记录当前设置
     m_u4MaxQueue     = u4MaxQueue;
-    m_u4HighMask     = u4HighMask;
+    m_u4HighMask     = u4MaxQueue * 8; //这里的高水位标不在以设置为准，而是以最大队列数*指针大小计算
     m_u4LowMask      = u4LowMask;
     m_u2CurrThreadID = 0;
 
@@ -838,11 +838,11 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
         //如果CPU多于工作线程数量，则自动绑定线程到CPU
         if (m_u2CpuNumber >= u4ThreadCount)
         {
-            pMessageService->Init(i, u4MaxQueue, u4LowMask, u4HighMask, true);
+            pMessageService->Init(i, u4MaxQueue, u4LowMask, m_u4HighMask, true);
         }
         else
         {
-            pMessageService->Init(i, u4MaxQueue, u4LowMask, u4HighMask, false);
+            pMessageService->Init(i, u4MaxQueue, u4LowMask, m_u4HighMask, false);
         }
 
         //将线程信息放入线程组

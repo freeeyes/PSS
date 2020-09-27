@@ -58,8 +58,7 @@ bool Server_Manager_Common_Pool()
     //初始化消息处理线程
     App_MessageServiceGroup::instance()->Init(GetXmlConfigAttribute(xmlMessage)->Msg_Thread,
             GetXmlConfigAttribute(xmlMessage)->Msg_MaxQueue,
-            GetXmlConfigAttribute(xmlMessage)->Msg_Low_mark,
-            GetXmlConfigAttribute(xmlMessage)->Msg_High_mark);
+            GetXmlConfigAttribute(xmlMessage)->Msg_Low_mark);
 
     return true;
 }

@@ -503,8 +503,7 @@ bool xmlMessage::Init(CXmlOpeation* pXmlOperation)
 {
     bool bKet = false;
 
-    if (pXmlOperation->Read_XML_Data_Single_Uint32("Message", "Msg_High_mark", Msg_High_mark)
-        && pXmlOperation->Read_XML_Data_Single_Uint32("Message", "Msg_Low_mark", Msg_Low_mark)
+    if (pXmlOperation->Read_XML_Data_Single_Uint32("Message", "Msg_Low_mark", Msg_Low_mark)
         && pXmlOperation->Read_XML_Data_Single_Uint32("Message", "Msg_Buff_Max_Size", Msg_Buff_Max_Size)
         && pXmlOperation->Read_XML_Data_Single_Uint16("Message", "Msg_Thread", Msg_Thread)
         && pXmlOperation->Read_XML_Data_Single_Uint32("Message", "Msg_MaxQueue", Msg_MaxQueue)

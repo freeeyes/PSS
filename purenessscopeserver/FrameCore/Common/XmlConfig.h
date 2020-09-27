@@ -461,7 +461,6 @@ public:
 class xmlMessage : public IConfigOpeation
 {
 public:
-    uint32 Msg_High_mark     = 64000;
     uint32 Msg_Low_mark      = 64000;
     uint32 Msg_Buff_Max_Size = 20480;
     uint16 Msg_Thread        = 3;

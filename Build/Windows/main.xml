@@ -7,7 +7,7 @@
 	<ServerID id="1001" desc="当前服务器的ID编号" />
 	<ServerName name="Freeeyes" desc="当前服务器的名称" />
 	<ServerVersion Version="1.00" desc="当前服务器版本" />
-	<BuffPacket Count="10000" desc="设置BuffPacket内存池的大小" />
+	<BuffPacket Count="10000" desc="设置BuffPacket内存池的大小, autoIncerment为是否开启自动增量，0关闭，1开启" />
 	<!-- ip自适应Ipv4和Ipv6,不需要额外指定 -->
 	<!-- 如果框架都使用默认的ParseID，则这里可以不需要输入ParseID参数 否则，给出指定的ParseID是谁，比如ParseID="1" --> 
 	<TCPServerIP ip="INADDR_ANY" port="10002" ParseID="1" desc="监听TCP服务器的IP和端口，可以是多个，要用多个" />
@@ -34,7 +34,7 @@
 	<!-- <ConsoleClient cip="127.0.0.1" desc="维护端口可以访问的对应的客户端IP地址，可以支持多个" /> -->
 	
 	<!-- 消息处理线程相关参数设置 -->
-	<Message Msg_High_mark="6400000" Msg_Low_mark="64000" Msg_Buff_Max_Size="20480" Msg_Thread="5" Msg_Pool="20000" Msg_MaxQueue="10000" desc="消息处理线程相关参数设置，" />
+	<Message Msg_Low_mark="64000" Msg_Buff_Max_Size="20480" Msg_Thread="5" Msg_Pool="20000" Msg_MaxQueue="10000" desc="消息处理线程相关参数设置，" />
 	
 	<!-- 测试Tcp插件加载流程的用例 -->
 	<ModuleManager MaxCount="100" desc="框架支持的最大插件数量" />
