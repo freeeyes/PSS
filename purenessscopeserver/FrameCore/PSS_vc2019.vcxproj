@@ -182,6 +182,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Common\Echartlog.cpp" />
+    <ClCompile Include="..\Common\ProformanceCounter.cpp" />
     <ClCompile Include="Common\BaseClientConnectManager.cpp" />
     <ClCompile Include="Common\BaseConnectClient.cpp" />
     <ClCompile Include="Common\BaseConsoleHandle.cpp" />
@@ -206,6 +207,7 @@
     <ClCompile Include="CppUnit\Uint_LogManager.cpp" />
     <ClCompile Include="CppUnit\Uint_MessageService.cpp" />
     <ClCompile Include="CppUnit\Uint_PacketParse.cpp" />
+    <ClCompile Include="CppUnit\Uint_Proformancecount.cpp" />
     <ClCompile Include="CppUnit\Uint_ServerMessageInfoPool.cpp" />
     <ClCompile Include="CppUnit\Uint_ServerMessageManager.cpp" />
     <ClCompile Include="CppUnit\Uint_TcpRedirection.cpp" />
@@ -538,6 +540,7 @@
     <ClInclude Include="..\Common\ObjectPoolManager.h" />
     <ClInclude Include="..\Common\Object_Pool.h" />
     <ClInclude Include="..\Common\ProfileTime.h" />
+    <ClInclude Include="..\Common\ProformanceCounter.h" />
     <ClInclude Include="..\Common\RandomNumber.hpp" />
     <ClInclude Include="..\Common\Threading.hpp" />
     <ClInclude Include="..\Common\ThreadLock.h" />
@@ -574,6 +577,7 @@
     <ClInclude Include="CppUnit\Uint_LogManager.h" />
     <ClInclude Include="CppUnit\Uint_MessageService.h" />
     <ClInclude Include="CppUnit\Uint_PacketParse.h" />
+    <ClInclude Include="CppUnit\Uint_Proformancecount.h" />
     <ClInclude Include="CppUnit\Uint_ServerMessageInfoPool.h" />
     <ClInclude Include="CppUnit\Uint_ServerMessageManager.h" />
     <ClInclude Include="CppUnit\Uint_TcpRedirection.h" />

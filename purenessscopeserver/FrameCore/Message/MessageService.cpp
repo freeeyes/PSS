@@ -326,6 +326,8 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
                                          pMessage->GetMessageBase()->m_u4HeadSrcSize + pMessage->GetMessageBase()->m_u4BodySrcSize,
                                          COMMAND_TYPE_IN,
                                          m_ThreadInfo.m_tvUpdateTime);
+
+        //m_Counter.counter();
     }
 
     if (true == blDeleteFlag)

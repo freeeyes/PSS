@@ -44,6 +44,7 @@
 #include "Unit_TSTimer.h"
 #include "Unit_TMService.h"
 #include "Unit_EChartlog.h"
+#include "Uint_Proformancecount.h"
 
 static const char CPPUNIT_REPORT_PATH[] = "./reports/cppunit/report.xml";
 

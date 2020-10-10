@@ -343,6 +343,12 @@
     <ClCompile Include="Console\ConsoleMessage.cpp">
       <Filter>Console\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="..\Common\ProformanceCounter.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="CppUnit\Uint_Proformancecount.cpp">
+      <Filter>CppUnit\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -857,6 +863,12 @@
     </ClInclude>
     <ClInclude Include="Common\MakePacket_Common.h">
       <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ProformanceCounter.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="CppUnit\Uint_Proformancecount.h">
+      <Filter>CppUnit\hfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

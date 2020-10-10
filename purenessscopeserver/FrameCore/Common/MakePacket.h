@@ -28,7 +28,7 @@ public:
 
     bool Init() const;
 
-    bool PutMessageBlock(_MakePacket const& objMakePacket, const ACE_Time_Value& tvNow) const;                                                     //处理消息数据包
+    bool PutMessageBlock(_MakePacket const& objMakePacket, const ACE_Time_Value& tvNow) const;                                                      //处理消息数据包
     bool PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, const ACE_Time_Value& tvNow) const;                            //发送失败消息回调
 
 private:
