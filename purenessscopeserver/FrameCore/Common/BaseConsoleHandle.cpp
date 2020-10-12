@@ -41,7 +41,7 @@ bool Console_Common_CheckMessage_Data(uint32& u4AllRecvSize, uint32& u4AllRecvCo
     pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     //将数据Buff放入消息体中，传递给处理类。
-    uint32 u4Return = (uint32)App_ConsoleManager::instance()->Dispose(pPacketParse->GetMessageBody(), pBuffPacket, u1Output);
+    auto u4Return = (uint32)App_ConsoleManager::instance()->Dispose(pPacketParse->GetMessageBody(), pBuffPacket, u1Output);
 
     if (CONSOLE_MESSAGE_SUCCESS == u4Return)
     {
@@ -64,7 +64,7 @@ bool Console_Common_CheckMessage_Data(uint32& u4AllRecvSize, uint32& u4AllRecvCo
 bool check_console_ip(const char* pConsoleIP)
 {
     //如果是0个设置，就是允许所有的Ip连接访问
-    if (0 == GetXmlConfigAttribute(xmlConsoleClients)->vec.size())
+    if (nullptr == GetXmlConfigAttribute(xmlConsoleClients) || 0 == GetXmlConfigAttribute(xmlConsoleClients)->vec.size())
     {
         return true;
     }

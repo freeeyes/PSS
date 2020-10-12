@@ -15,6 +15,8 @@
 #include "XmlConfig.h"
 #include "TcpRedirection.h"
 #include "MakePacket_Common.h"
+#include <string>
+#include <sstream>
 
 //所有的handler用到的公共函数
 //add by freeeyes

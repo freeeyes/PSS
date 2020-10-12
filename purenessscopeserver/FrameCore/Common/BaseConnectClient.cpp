@@ -48,7 +48,7 @@ int Make_Common_Dispose_Client_WorkTread_Message(uint16 u2CommandID, uint32 u4Se
         }
 
         //添加消息包头
-        uint32 u4PacketLen = (uint32)pmblk->length();
+        auto u4PacketLen = (uint32)pmblk->length();
         memcpy_safe((char*)&u4PacketLen, sizeof(uint32), pMBBHead->wr_ptr(), sizeof(uint32));
         pMBBHead->wr_ptr(sizeof(uint32));
 

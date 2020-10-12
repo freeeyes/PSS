@@ -53,7 +53,7 @@ bool CBuffPacketManager::Delete(IBuffPacket* pBuffPacket)
 {
     if (NULL != pBuffPacket)
     {
-        CBuffPacket* pBuff = dynamic_cast<CBuffPacket*>(pBuffPacket);
+        auto pBuff = dynamic_cast<CBuffPacket*>(pBuffPacket);
         pBuff->Clear();
         return CObjectPoolManager<CBuffPacket, ACE_Recursive_Thread_Mutex>::Delete(pBuff->GetBuffID(), pBuff);
     }

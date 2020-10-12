@@ -3,7 +3,7 @@
 bool Server_Manager_Common_LogSystem()
 {
     //初始化日志系统线程
-    CFileLogger* pFileLogger = new CFileLogger();
+    auto pFileLogger = new CFileLogger();
 
     if (NULL == pFileLogger)
     {
@@ -96,7 +96,7 @@ bool Server_Manager_Common_IObject(IConnectManager* pConnectManager,
 
 bool Server_Manager_Common_Module()
 {
-    uint16 u2ModuleVCount = (uint16)GetXmlConfigAttribute(xmlModuleInfos)->vec.size();
+    auto u2ModuleVCount = (uint16)GetXmlConfigAttribute(xmlModuleInfos)->vec.size();
 
     for (uint16 i = 0; i < u2ModuleVCount; i++)
     {

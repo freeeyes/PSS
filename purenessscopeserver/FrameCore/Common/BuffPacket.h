@@ -6,6 +6,8 @@
 #include "ACEMemory.hpp"
 #include "IBuffPacket.h"
 #include <stdexcept>
+#include <string>
+#include <sstream>
 
 const uint32 DEFINE_PACKET_SIZE      = 1024;
 const uint32 DEFINE_PACKET_ADD       = 1024;
@@ -102,7 +104,7 @@ private:
     uint32                     m_u4BuffID        = 0;                   //Buffer对象名字，用于核对内存池数据使用，寻找内存泄露。
     int32                      m_nHashID         = 0;                   //记录当前对象在Hash数组中的位置
     bool                       m_blNetSort       = false;               //字节序开启开关，false为不转换为主机字节序，true为转换为主机字节序
-    char                       m_szError[MAX_BUFF_500] = {'\0'};        //错误信息
+    string                     m_strError;                              //错误信息
 
 public:
     void* operator new(size_t stSize)

@@ -48,7 +48,7 @@ bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param, 
         Recovery_Message(obj_Send_Message_Param.m_blDlete, pMessage);
     }
 
-    int nSize = (int)skRemote.send(pMbData->rd_ptr(), pMbData->length(), AddrRemote);
+    auto nSize = (int)skRemote.send(pMbData->rd_ptr(), pMbData->length(), AddrRemote);
 
     if ((uint32)nSize != pMbData->length())
     {
@@ -454,7 +454,7 @@ bool Tcp_Common_CloseConnect_By_Queue(uint32 u4ConnectID, CSendMessagePool& objS
         pSendMessage->m_tvSend = ACE_OS::gettimeofday();
 
         //判断队列是否是已经最大
-        int nQueueCount = (int)pTask->msg_queue()->message_count();
+        auto nQueueCount = (int)pTask->msg_queue()->message_count();
 
         if (nQueueCount >= MAX_MSG_THREADQUEUE)
         {
@@ -522,7 +522,7 @@ bool Tcp_Common_Manager_Post_Message(_Post_Message_Param obj_Post_Message_Param,
         pSendMessage->m_tvSend      = ACE_OS::gettimeofday();
 
         //判断队列是否是已经最大
-        int nQueueCount = (int)pTask->msg_queue()->message_count();
+        auto nQueueCount = (int)pTask->msg_queue()->message_count();
 
         if (nQueueCount >= (int)obj_Post_Message_Param.m_u2SendQueueMax)
         {
@@ -651,9 +651,13 @@ _ClientNameInfo Tcp_Common_ClientNameInfo(uint32 u4ConnectID, const char* pConne
 void Tcp_Common_Manager_Init(uint16 u2Index, CCommandAccount& objCommandAccount, uint16& u2SendQueueMax, CSendCacheManager& objSendCacheManager)
 {
     //按照线程初始化统计模块的名字
-    char szName[MAX_BUFF_50] = { '\0' };
-    sprintf_safe(szName, MAX_BUFF_50, "发送线程(%d)", u2Index);
-    objCommandAccount.InitName(szName, GetXmlConfigAttribute(xmlCommandAccount)->MaxCommandCount);
+	stringstream ss_format;
+    ss_format << "发送线程("
+        << u2Index
+        << ")";
+
+	std::string strThreadName = ss_format.str();
+    objCommandAccount.InitName(strThreadName.c_str(), GetXmlConfigAttribute(xmlCommandAccount)->MaxCommandCount);
 
     //初始化统计模块功能
     objCommandAccount.Init(GetXmlConfigAttribute(xmlCommandAccount)->Account,
