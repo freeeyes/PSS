@@ -525,8 +525,8 @@ void CServerManager::Multiple_Process_Start()
     // 打开（创建）锁文件
     char szFileName[MAX_BUFF_200] = { '\0' };
     ACE_OS::snprintf(szFileName, MAX_BUFF_200, "%s/lockwatch.lk", szWorkDir);
-    //文件打开权限为 O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
-    fd_lock = open(szFileName, S_IRWXU | S_IRWXG);
+    //文件打开权限为  S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
+    fd_lock = open(szFileName, O_RDWR | O_CREAT, S_IRWXU | S_IRWXG);
 
     if (fd_lock < 0)
     {
