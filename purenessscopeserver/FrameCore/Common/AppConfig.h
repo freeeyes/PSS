@@ -15,6 +15,8 @@
 #include "ace/Configuration.h"
 #include "ace/Configuration_Import_Export.h"
 #include <memory>
+#include <string>
+#include <sstream>
 
 class CAppConfig
 {
@@ -34,7 +36,7 @@ private:
     std::shared_ptr<ACE_Configuration_Heap> m_pConfig;
     std::shared_ptr<ACE_Ini_ImpExp>         m_pIniImp;
     ACE_TString             m_strConfigName;
-    char                    m_szError[MAX_BUFF_500] = {'\0'};
+    string                  m_strError;
 };
 
 #endif

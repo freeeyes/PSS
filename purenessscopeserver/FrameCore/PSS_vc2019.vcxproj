@@ -182,7 +182,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Common\Echartlog.cpp" />
-    <ClCompile Include="..\Common\ProformanceCounter.cpp" />
+    <ClCompile Include="..\Common\PerformanceCounter.cpp" />
     <ClCompile Include="Common\BaseClientConnectManager.cpp" />
     <ClCompile Include="Common\BaseConnectClient.cpp" />
     <ClCompile Include="Common\BaseConsoleHandle.cpp" />
@@ -539,8 +539,8 @@
     <ClInclude Include="..\Common\ObjectLru.h" />
     <ClInclude Include="..\Common\ObjectPoolManager.h" />
     <ClInclude Include="..\Common\Object_Pool.h" />
+    <ClInclude Include="..\Common\PerformanceCounter.h" />
     <ClInclude Include="..\Common\ProfileTime.h" />
-    <ClInclude Include="..\Common\ProformanceCounter.h" />
     <ClInclude Include="..\Common\RandomNumber.hpp" />
     <ClInclude Include="..\Common\Threading.hpp" />
     <ClInclude Include="..\Common\ThreadLock.h" />
