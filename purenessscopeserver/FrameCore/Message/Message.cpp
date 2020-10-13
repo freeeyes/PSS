@@ -193,7 +193,7 @@ bool CMessagePool::Delete(CMessage* pMessage)
 
     pMessage->Clear();
 
-    bool blState = CObjectPoolManager<CMessage, ACE_Recursive_Thread_Mutex>::Delete(pMessage->GetHashID(), pMessage);
+    bool blState = CObjectPoolManager<CMessage, ACE_Recursive_Thread_Mutex>::Delete_withoutLock(pMessage->GetHashID(), pMessage);
 
     if(false == blState)
     {

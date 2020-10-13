@@ -67,6 +67,8 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
 
     //设置消息池
     m_MessagePool.Init(GetXmlConfigAttribute(xmlMessage)->Msg_Pool, CMessagePool::Init_Callback);
+
+    m_PerformanceCounter.init("WorkThread");
 }
 
 bool CMessageService::Start()
@@ -141,54 +143,35 @@ bool CMessageService::PutMessage(CMessage* pMessage)
 {
     ACE_Message_Block* mb = pMessage->GetQueueMessage();
 
-    if(NULL != mb)
+    if (true == m_blOverload)
     {
-        //判断队列是否是已经最大
-        int nQueueCount = (int)msg_queue()->message_count();
-
-        if(nQueueCount >= (int)m_u4MaxQueue)
+        size_t nQueueCount = msg_queue()->message_count();
+        if (nQueueCount < m_u4MaxQueue)
         {
-            if (false == m_blOverload)
-            {
-                OUR_DEBUG((LM_ERROR, "[CMessageService::PutMessage] Queue is Full begin nQueueCount = [%d].\n", nQueueCount));
-                //线程处理过载，写入日志
-                AppLogManager::instance()->WriteLog(LOG_SYSTEM_ERROR, 
-                    "[CMessageService::PutMessage](%d)Queue is Full begin nQueueCount = [%d]",
-                    m_u4ThreadID,
-                    nQueueCount);
-
-                m_blOverload = true;
-            }
-
-            return false;
+            //超载已经结束了，记录恢复时间
+            OUR_DEBUG((LM_ERROR, "[CMessageService::PutMessage] Queue is Full end nQueueCount = [%d].\n", nQueueCount));
         }
         else
         {
-            if (true == m_blOverload)
-            {
-                //超载已经结束了，记录恢复时间
-				OUR_DEBUG((LM_ERROR, "[CMessageService::PutMessage] Queue is Full end nQueueCount = [%d].\n", nQueueCount));
-				//线程处理过载，写入日志
-				AppLogManager::instance()->WriteLog(LOG_SYSTEM_ERROR,
-					"[CMessageService::PutMessage](%d)Queue is Full end nQueueCount = [%d]",
-					m_u4ThreadID,
-					nQueueCount);
-
-				m_blOverload = false;
-            }
-        }
-
-        ACE_Time_Value xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, m_u4WorkQueuePutTime);
-
-        if(this->putq(mb, &xtime) == -1)
-        {
-            //由上面进行控制 OUR_DEBUG((LM_ERROR,"[CMessageService::PutMessage] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
+            //超载尚未结束，返回错误
             return false;
         }
+
+		m_blOverload = false;
     }
-    else
+
+    if(this->putq(mb, NULL) == -1)
     {
-        OUR_DEBUG((LM_ERROR,"[CMessageService::PutMessage] mb new error.\n"));
+        int nError = errno;
+		OUR_DEBUG((LM_ERROR, "[CMessageService::PutMessage] Queue is Full errno = [%d].\n", nError));
+		//线程处理过载，写入日志
+		AppLogManager::instance()->WriteLog(LOG_SYSTEM_ERROR,
+			"[CMessageService::PutMessage](%d)Queue is Full begin errno = [%d]",
+			m_u4ThreadID,
+            nError);
+
+		m_blOverload = true;
+           
         return false;
     }
 
@@ -245,18 +228,8 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
     }
 
     //在这里进行线程自检代码
-    m_ThreadInfo.m_tvUpdateTime = ACE_OS::gettimeofday();
+    m_ThreadInfo.m_tvUpdateTime = pMessage->GetMessageBase()->m_tvRecvTime;
     m_ThreadInfo.m_u4State = THREADSTATE::THREAD_RUNBEGIN;
-
-    //判断队列处理时间是否超过了数据入队列的时间
-    ACE_Time_Value tvQueueDispose(m_ThreadInfo.m_tvUpdateTime - pMessage->GetMessageBase()->m_tvRecvTime);
-
-    if (tvQueueDispose.msec() > (uint32)GetXmlConfigAttribute(xmlThreadInfo)->DisposeTimeout)
-    {
-        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_COMMANDDATA, "[CMessageService::ProcessMessage]CommandID=0x%04x, Queue put dispose time interval(%d).\n",
-                                              (int)pMessage->GetMessageBase()->m_u2Cmd,
-                                              tvQueueDispose.msec());
-    }
 
     //将要处理的数据放到逻辑处理的地方去
     uint16 u2CommandID = 0;          //数据包的CommandID
@@ -327,7 +300,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
                                          COMMAND_TYPE_IN,
                                          m_ThreadInfo.m_tvUpdateTime);
 
-        //m_Counter.counter();
+        //m_PerformanceCounter.counter();
     }
 
     if (true == blDeleteFlag)
@@ -708,7 +681,6 @@ void CMessageService::UpdateCommandList(const ACE_Message_Block* pmb)
 bool CMessageService::Dispose_Queue()
 {
     ACE_Message_Block* mb = NULL;
-    ACE_OS::last_error(0);
 
     if (getq(mb, 0) == -1)
     {
@@ -736,7 +708,6 @@ bool CMessageService::Dispose_Queue()
     else
     {
         CMessage* msg = *((CMessage**)mb->base());
-
         if (false == this->ProcessMessage(msg, m_u4ThreadID))
         {
             OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)ProcessMessage is false!\n", m_u4ThreadID));

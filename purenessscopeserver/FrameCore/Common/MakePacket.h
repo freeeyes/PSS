@@ -20,6 +20,7 @@
 #include "ProfileTime.h"
 #include "HashTable.h"
 #include "MakePacket_Common.h"
+#include "PerformanceCounter.h"
 
 class CMakePacket
 {
@@ -28,7 +29,7 @@ public:
 
     bool Init() const;
 
-    bool PutMessageBlock(_MakePacket const& objMakePacket, const ACE_Time_Value& tvNow) const;                                                      //处理消息数据包
+    bool PutMessageBlock(_MakePacket const& objMakePacket, const ACE_Time_Value& tvNow);                                                      //处理消息数据包
     bool PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, const ACE_Time_Value& tvNow) const;                            //发送失败消息回调
 
 private:
@@ -36,6 +37,7 @@ private:
     void SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, CMessage* pMessage, const ACE_Time_Value& tvNow) const;  //服务发送失败回调数据包消息
 
     ACE_Recursive_Thread_Mutex     m_ThreadWriteLock;
+    CPerformanceCounter            m_PerformanceCounter;
 };
 typedef ACE_Singleton<CMakePacket, ACE_Null_Mutex> App_MakePacket;
 

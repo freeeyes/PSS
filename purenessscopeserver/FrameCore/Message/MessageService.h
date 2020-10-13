@@ -18,6 +18,7 @@
 #include "CommandAccount.h"
 #include "MessageDyeingManager.h"
 #include "ObjectLru.h"
+#include "PerformanceCounter.h"
 
 #if PSS_PLATFORM == PLATFORM_WIN
 #include "ProConnectHandler.h"
@@ -113,6 +114,7 @@ private:
 
     ACE_Thread_Mutex m_mutex;
     ACE_Condition<ACE_Thread_Mutex> m_cond;
+    CPerformanceCounter m_PerformanceCounter;
 };
 
 //add by freeeyes

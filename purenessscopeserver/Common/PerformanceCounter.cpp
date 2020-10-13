@@ -38,3 +38,8 @@ void CPerformanceCounter::set_start()
 {
 	m_tvBegin = ACE_OS::gettimeofday();
 }
+
+void CPerformanceCounter::reset()
+{
+	m_u4CurrCount = 0;
+}

@@ -2,6 +2,7 @@
 
 CMakePacket::CMakePacket(void)
 {
+    m_PerformanceCounter.init("PutThread");
 }
 
 bool CMakePacket::Init() const
@@ -9,8 +10,11 @@ bool CMakePacket::Init() const
     return true;
 }
 
-bool CMakePacket::PutMessageBlock(_MakePacket const& objMakePacket, const ACE_Time_Value& tvNow) const
+bool CMakePacket::PutMessageBlock(_MakePacket const& objMakePacket, const ACE_Time_Value& tvNow)
 {
+    uint8 u1Option = objMakePacket.m_u1Option;
+
+    
     //根据操作OP，调用相应的方法。
     CMessage* pMessage = App_MessageServiceGroup::instance()->CreateMessage(objMakePacket.m_u4ConnectID, objMakePacket.m_u1PacketType);
 
@@ -45,6 +49,18 @@ bool CMakePacket::PutMessageBlock(_MakePacket const& objMakePacket, const ACE_Ti
         App_MessageServiceGroup::instance()->DeleteMessage(objMakePacket.m_u4ConnectID, pMessage);
         return false;
     }
+
+    /*
+    if (PACKET_PARSE == u1Option)
+    {
+        m_PerformanceCounter.counter();
+    }
+
+    if (PACKET_CDISCONNECT == u1Option)
+    {
+        m_PerformanceCounter.reset();
+    }
+    */
 
     return true;
 }

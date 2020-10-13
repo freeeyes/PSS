@@ -147,6 +147,21 @@ public:
         return true;
     }
 
+    //归还数据不用加锁
+	bool Delete_withoutLock(uint32 u4Pos, TYPE* pObject)
+	{
+		int32 nPos = m_objHashObjectList.Push_Uint32(u4Pos, pObject);
+
+		if (-1 == nPos)
+		{
+			OUR_DEBUG((LM_INFO, "[CObjectPoolManager::Delete]szPacketID=%d(0x%08x).\n", u4Pos, pObject));
+			return false;
+		}
+
+		m_objCreateInfoList.GetObject(u4Pos)->ClearCreateInfo();
+		return true;
+	}
+
     void GetCreateInfoList(vector<_Object_Create_Info>& objCreateList)
     {
         ACE_Guard<ACE_LOCK> WGuard(m_ThreadLock);

@@ -19,6 +19,8 @@ public:
 
 	void set_start();
 
+	void reset();
+
 private:
 	uint32 m_u4CurrCount = 0;
 	uint32 m_u4MaxCount  = 0;
