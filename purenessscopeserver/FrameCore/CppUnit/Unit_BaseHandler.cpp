@@ -74,6 +74,7 @@ void CUnit_Basehandler::Test_Tcp_Common_Send_Input_To_Cache(void)
     obj_Input_To_Cache_Param.m_u4SendMaxBuffSize   = MAX_BUFF_1024;
 
     ACE_Message_Block* pMB = new ACE_Message_Block(MAX_BUFF_1024);
+   
 
     uint32 u4Data = 1;
 
@@ -82,6 +83,8 @@ void CUnit_Basehandler::Test_Tcp_Common_Send_Input_To_Cache(void)
     (*pBuffPacket) << u4Data;
 
     uint32 u4PacketSize = pBuffPacket->GetPacketLen();
+
+    pMB->copy(pBuffPacket->GetData(), pBuffPacket->GetWriteLen());
 
     blRet = Tcp_Common_Send_Input_To_Cache(obj_Input_To_Cache_Param,
                                            pMB,
@@ -93,13 +96,14 @@ void CUnit_Basehandler::Test_Tcp_Common_Send_Input_To_Cache(void)
     //测试缓冲区小于发送数据的分支
     obj_Input_To_Cache_Param.m_u4SendMaxBuffSize = 2;
 
+    OUR_DEBUG((LM_INFO, "[Tcp_Common_Send_Input_To_Cache]Begin,\n"));
     Tcp_Common_Send_Input_To_Cache(obj_Input_To_Cache_Param,
                                    pMB,
                                    u4PacketSize,
                                    pBuffPacket);
+    OUR_DEBUG((LM_INFO, "[Tcp_Common_Send_Input_To_Cache]End,\n"));
 
     App_BuffPacketManager::instance()->Delete(pBuffPacket);
-    SAFE_DELETE(pMB);
 }
 
 void CUnit_Basehandler::Test_Tcp_Common_Manager_Timeout_CheckInfo(void)
@@ -236,6 +240,8 @@ void CUnit_Basehandler::Test_Tcp_Common_Make_Send_Packet(void)
 
     (*pBuffPacket) << (uint32)10;
 
+    pBlockMessage->copy(pBuffPacket->GetData(), pBuffPacket->GetWriteLen());
+
     _Send_Packet_Param obj_Send_Packet_Param;
     obj_Send_Packet_Param.m_blDelete = false;
     obj_Send_Packet_Param.m_u1SendType = SENDMESSAGE_JAMPNOMAL;
@@ -250,8 +256,10 @@ void CUnit_Basehandler::Test_Tcp_Common_Make_Send_Packet(void)
     bool blState = Tcp_Common_Make_Send_Packet(obj_Send_Packet_Param,
                    pBuffPacket,
                    pBlockMessage,
-                   pMbData,
                    u4PacketSize);
+
+    pMbData = App_MessageBlockManager::instance()->Create(pBlockMessage->length());
+    pMbData->copy(pBlockMessage->rd_ptr(), pBlockMessage->length());
 
     if (blState == true)
     {
@@ -263,10 +271,9 @@ void CUnit_Basehandler::Test_Tcp_Common_Make_Send_Packet(void)
     obj_Send_Packet_Param.m_u4SendMaxBuffSize = MAX_BUFF_200;
 
     blState = Tcp_Common_Make_Send_Packet(obj_Send_Packet_Param,
-                                          pBuffPacket,
-                                          pBlockMessage,
-                                          pMbData,
-                                          u4PacketSize);
+        pBuffPacket,
+		pBlockMessage,
+        u4PacketSize);
 
     if (blState == false)
     {

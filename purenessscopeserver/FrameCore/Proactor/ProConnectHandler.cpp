@@ -834,7 +834,6 @@ bool CProConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacke
 
 bool CProConnectHandler::PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State)
 {
-    //ACE_Message_Block* pmbSend = new ACE_Message_Block(pMbData->length());
     ACE_Message_Block* pmbSend = App_MessageBlockManager::instance()->Create(pMbData->length());
     pmbSend->copy(pMbData->rd_ptr(), pMbData->length());
 
@@ -1767,16 +1766,7 @@ bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
 
 bool CProConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
-    _Post_Message_Param obj_Post_Message_Param;
-    obj_Post_Message_Param.m_blDelete           = blDelete;
-    obj_Post_Message_Param.m_nMessageID         = nMessageID;
-    obj_Post_Message_Param.m_u1SendState        = u1SendState;
-    obj_Post_Message_Param.m_u1SendType         = u1SendType;
-    obj_Post_Message_Param.m_u2CommandID        = u2CommandID;
-    obj_Post_Message_Param.m_u2SendQueueMax     = m_u2SendQueueMax;
-    obj_Post_Message_Param.m_u4ConnectID        = u4ConnectID;
-    obj_Post_Message_Param.m_u4SendQueuePutTime = m_u4SendQueuePutTime;
-
+    //直接发送，不在做队列发送，无意义。
     ACE_Time_Value tvSend = ACE_OS::gettimeofday();
 
     return SendMessage(u4ConnectID, 

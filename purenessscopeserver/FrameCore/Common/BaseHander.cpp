@@ -388,9 +388,9 @@ bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
         {
             OUR_DEBUG((LM_DEBUG, "[Tcp_Common_Make_Send_Packet](%d) u4SendPacketSize is more than(%d)(%d).\n", obj_Send_Packet_Param.m_u4ConnectID, u4PacketSize, obj_Send_Packet_Param.m_u4SendMaxBuffSize));
             //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
-            ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
-            memcpy_safe(pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
-            pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
+            ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(u4PacketSize);
+            memcpy_safe(pBuffPacket->GetData(), u4PacketSize, pSendMessage->wr_ptr(), u4PacketSize);
+            pSendMessage->wr_ptr(u4PacketSize);
             ACE_Time_Value tvNow = ACE_OS::gettimeofday();
             App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
 

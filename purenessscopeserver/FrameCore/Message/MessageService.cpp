@@ -243,7 +243,6 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
         m_ThreadInfo.m_u4CurrPacketCount++;
         m_ThreadInfo.m_u2CommandID   = u2CommandID;
 
-        /*
         bool blIsDead = m_WorkThreadAI.CheckCurrTimeout(pMessage->GetMessageBase()->m_u2Cmd, (uint64)m_ThreadInfo.m_tvUpdateTime.sec());
 
         if(blIsDead == true)
@@ -274,7 +273,6 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
 
             return true;
         }
-        */
     }
 
     uint32 u4TimeCost     = 0;      //命令执行时间
@@ -286,7 +284,7 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
     if(pMessage->GetMessageBase()->m_u2Cmd >= CLIENT_LINK_USER)
     {
         //如果AI启动了，则在这里进行AI判定
-        //m_WorkThreadAI.SaveTimeout(pMessage->GetMessageBase()->m_u2Cmd, u4TimeCost);
+        m_WorkThreadAI.SaveTimeout(pMessage->GetMessageBase()->m_u2Cmd, u4TimeCost);
 
         if(u2CommandCount > 0)
         {
@@ -294,7 +292,6 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
             u4TimeCost = u4TimeCost/u2CommandCount;
         }
 
-        /*
         //添加统计信息
         m_CommandAccount.SaveCommandData(u2CommandID,
                                          (uint16)pMessage->GetMessageBase()->m_u4ListenPort,
@@ -302,7 +299,6 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
                                          pMessage->GetMessageBase()->m_u4HeadSrcSize + pMessage->GetMessageBase()->m_u4BodySrcSize,
                                          COMMAND_TYPE_IN,
                                          m_ThreadInfo.m_tvUpdateTime);
-         */
 
         m_PerformanceCounter.counter();
     }

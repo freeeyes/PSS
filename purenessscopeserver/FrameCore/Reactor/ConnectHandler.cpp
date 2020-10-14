@@ -812,18 +812,16 @@ bool CConnectHandler::SendTimeoutMessage() const
 
 bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
 {
-    if(NULL == pMbData)
-    {
-        return false;
-    }
+	ACE_Message_Block* pmbSend = App_MessageBlockManager::instance()->Create(pMbData->length());
+	pmbSend->copy(pMbData->rd_ptr(), pMbData->length());
 
     //如果是DEBUG状态，记录当前发送包的二进制数据
-    Output_Debug_Data(pMbData, LOG_SYSTEM_DEBUG_CLIENTSEND);
+    Output_Debug_Data(pmbSend, LOG_SYSTEM_DEBUG_CLIENTSEND);
 
     //统计发送数量
     ACE_Date_Time dtNow;
 
-    if(false == m_TimeConnectInfo.SendCheck((uint8)dtNow.minute(), 1, (uint32)pMbData->length()))
+    if(false == m_TimeConnectInfo.SendCheck((uint8)dtNow.minute(), 1, (uint32)pmbSend->length()))
     {
         //超过了限定的阀值，需要关闭链接，并记录日志
         AppLogManager::instance()->WriteToMail_i(LOG_SYSTEM_CONNECTABNORMAL,
@@ -840,7 +838,7 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
         OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, Send Data is more than limit.\n", GetConnectID()));
 
         ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-        App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), pMbData, tvNow);
+        App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), pmbSend, tvNow);
 
         return false;
     }
@@ -848,7 +846,7 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
     //发送超时时间设置
     ACE_Time_Value  nowait(0, m_u4SendThresHold*MAX_BUFF_1000);
 
-    if(NULL == pMbData)
+    if(NULL == pmbSend)
     {
         OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetConnectID()));
         return false;
@@ -859,13 +857,13 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
         OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetConnectID()));
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::PutSendPacket] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetConnectID());
         ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-        App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), pMbData, tvNow);
-        App_MessageBlockManager::instance()->Close(pMbData);
+        App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), pmbSend, tvNow);
+        App_MessageBlockManager::instance()->Close(pmbSend);
         return false;
     }
 
     //发送数据
-    int nSendPacketLen = (int)pMbData->length();
+    int nSendPacketLen = (int)pmbSend->length();
     int nIsSendSize    = 0;
 
     //循环发送，直到数据发送完成。
@@ -874,11 +872,11 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
         if(nSendPacketLen <= 0)
         {
             OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, nCurrSendSize error is %d.\n", GetConnectID(), nSendPacketLen));
-            App_MessageBlockManager::instance()->Close(pMbData);
+            App_MessageBlockManager::instance()->Close(pmbSend);
             return false;
         }
 
-        int nDataLen = (int)this->peer().send(pMbData->rd_ptr(), nSendPacketLen - nIsSendSize, &nowait);
+        int nDataLen = (int)this->peer().send(pmbSend->rd_ptr(), nSendPacketLen - nIsSendSize, &nowait);
 
         if(nDataLen <= 0)
         {
@@ -890,9 +888,9 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
                                                   nIsSendSize);
 
             //错误消息回调
-            pMbData->rd_ptr((size_t)0);
+            pmbSend->rd_ptr((size_t)0);
             ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-            App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), pMbData, tvNow);
+            App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), pmbSend, tvNow);
 
             OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID=%d send cancel.\n", GetConnectID()));
 
@@ -901,10 +899,10 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
         else if(nDataLen >= nSendPacketLen - nIsSendSize)   //当数据包全部发送完毕，清空。
         {
             m_u4AllSendCount    += 1;
-            m_u4AllSendSize     += (uint32)pMbData->length();
+            m_u4AllSendSize     += (uint32)pmbSend->length();
             m_atvOutput         = ACE_OS::gettimeofday();
 
-            int nMessageID = pMbData->msg_type() - ACE_Message_Block::MB_USER;
+            int nMessageID = pmbSend->msg_type() - ACE_Message_Block::MB_USER;
 
             if(nMessageID > 0)
             {
@@ -927,16 +925,16 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData)
                 Send_MakePacket_Queue(objMakePacket, m_szLocalIP, m_u2LocalPort);
 
                 //还原消息类型
-                pMbData->msg_type(ACE_Message_Block::MB_DATA);
+                pmbSend->msg_type(ACE_Message_Block::MB_DATA);
             }
 
-            App_MessageBlockManager::instance()->Close(pMbData);
+            App_MessageBlockManager::instance()->Close(pmbSend);
 
             return true;
         }
         else
         {
-            pMbData->rd_ptr(nDataLen);
+            pmbSend->rd_ptr(nDataLen);
             nIsSendSize      += nDataLen;
             m_atvOutput      = ACE_OS::gettimeofday();
         }
@@ -1361,7 +1359,6 @@ bool CConnectHandler::Send_Input_To_Cache(uint8 u1SendType, uint32& u4PacketSize
 bool CConnectHandler::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, uint8 u1State, int nMessageID, bool blDelete, IBuffPacket* pBuffPacket)
 {
     ACE_UNUSED_ARG(nMessageID);
-    ACE_Message_Block* pMbData = NULL;
 
     _Send_Packet_Param obj_Send_Packet_Param;
     obj_Send_Packet_Param.m_blDelete            = blDelete;
@@ -1372,13 +1369,10 @@ bool CConnectHandler::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, 
     obj_Send_Packet_Param.m_u4SendMaxBuffSize   = m_u4SendMaxBuffSize;
 
     //拼装数据
-    bool blState = Tcp_Common_Make_Send_Packet(obj_Send_Packet_Param,
+    if (false == Tcp_Common_Make_Send_Packet(obj_Send_Packet_Param,
                    pBuffPacket,
                    m_pBlockMessage,
-                   pMbData,
-                   u4PacketSize);
-
-    if (false == blState)
+                   u4PacketSize))
     {
         return false;
     }
@@ -1387,16 +1381,17 @@ bool CConnectHandler::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, 
 	Recovery_Common_BuffPacket(blDelete, pBuffPacket);
 
     //直接发送数据，不在放到队列里，否则在压测过程中处理太慢
-	uint32 u4SendSuc = (uint32)pMbData->length();
-	bool blRet = PutSendPacket(pMbData);
+	bool blRet = PutSendPacket(m_pBlockMessage);
 
 	if (true == blRet)
 	{
-		if (m_u4ReadSendSize >= m_u4SuccessSendSize + u4SendSuc)
+		if (m_u4ReadSendSize >= m_u4SuccessSendSize + m_pBlockMessage->length())
 		{
 			//记录成功发送字节
-			m_u4SuccessSendSize += u4SendSuc;
+			m_u4SuccessSendSize += m_pBlockMessage->length();
 		}
+
+		m_pBlockMessage->reset();
 	}
 	else
 	{
@@ -1787,20 +1782,17 @@ bool CConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, 
 
 bool CConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
-    _Post_Message_Param obj_Post_Message_Param;
-    obj_Post_Message_Param.m_blDelete = blDelete;
-    obj_Post_Message_Param.m_nMessageID = nMessageID;
-    obj_Post_Message_Param.m_u1SendState = u1SendState;
-    obj_Post_Message_Param.m_u1SendType = u1SendType;
-    obj_Post_Message_Param.m_u2CommandID = u2CommandID;
-    obj_Post_Message_Param.m_u2SendQueueMax = m_u2SendQueueMax;
-    obj_Post_Message_Param.m_u4ConnectID = u4ConnectID;
-    obj_Post_Message_Param.m_u4SendQueuePutTime = m_u4SendQueuePutTime;
+    //直接发送，不在做队列发送，无意义。
+	ACE_Time_Value tvSend = ACE_OS::gettimeofday();
 
-    return Tcp_Common_Manager_Post_Message(obj_Post_Message_Param,
-                                           pBuffPacket,
-                                           m_SendMessagePool,
-                                           dynamic_cast<ACE_Task<ACE_MT_SYNCH>*>(this));
+	return SendMessage(u4ConnectID,
+		pBuffPacket,
+		u2CommandID,
+		u1SendState,
+		u1SendType,
+		tvSend,
+		blDelete,
+		nMessageID);
 }
 
 const char* CConnectManager::GetError() const
