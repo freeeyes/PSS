@@ -352,7 +352,6 @@ bool Tcp_Common_Send_Input_To_Cache(_Input_To_Cache_Param obj_Input_To_Cache_Par
 bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
                                  IBuffPacket*& pBuffPacket,
                                  ACE_Message_Block* pBlockMessage,
-                                 ACE_Message_Block*& pMbData,
                                  uint32& u4PacketSize)
 {
     if (pBlockMessage == NULL)
@@ -407,13 +406,7 @@ bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
     //如果发送数据包有数据且长度大于零，才进行组包。
     if (0 < pBlockMessage->length())
     {
-        //因为是异步发送，发送的数据指针不可以立刻释放，所以需要在这里创建一个新的发送数据块，将数据考入
-        pMbData = App_MessageBlockManager::instance()->Create((uint32)pBlockMessage->length());
-
-        memcpy_safe(pBlockMessage->rd_ptr(), (uint32)pBlockMessage->length(), pMbData->wr_ptr(), (uint32)pBlockMessage->length());
-        pMbData->wr_ptr(pBlockMessage->length());
         //放入完成，则清空缓存数据，使命完成
-        pBlockMessage->reset();
         return true;
     }
     else
@@ -537,9 +530,9 @@ bool Tcp_Common_Manager_Post_Message(_Post_Message_Param obj_Post_Message_Param,
             return false;
         }
 
-        ACE_Time_Value xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, obj_Post_Message_Param.m_u4SendQueuePutTime);
+        //ACE_Time_Value xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, obj_Post_Message_Param.m_u4SendQueuePutTime);
 
-        if (pTask->putq(mb, &xtime) == -1)
+        if (pTask->putq(mb, NULL) == -1)
         {
             OUR_DEBUG((LM_ERROR, "[CProConnectManager::PutMessage] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
 

@@ -42,6 +42,7 @@
 #include "XmlConfig.h"
 #include "TcpRedirection.h"
 #include "IDeviceHandler.h"
+#include "PerformanceCounter.h"
 
 class CProConnectHandler : public ACE_Service_Handler, public IDeviceHandler
 {
@@ -160,6 +161,8 @@ private:
 
     Fast_Asynch_Read_Stream  m_Reader;
     Fast_Asynch_Write_Stream m_Writer;
+
+    CPerformanceCounter m_PerformanceCounter;
 };
 
 //管理所有已经建立的链接

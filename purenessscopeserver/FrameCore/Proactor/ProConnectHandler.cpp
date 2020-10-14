@@ -71,6 +71,8 @@ void CProConnectHandler::Init(uint16 u2HandlerID)
 
     m_pPacketDebugData = new char[GetXmlConfigAttribute(xmlServerType)->DebugSize];
     m_u4PacketDebugSize = GetXmlConfigAttribute(xmlServerType)->DebugSize / 5;
+
+    m_PerformanceCounter.init("SendThread");
 }
 
 
@@ -826,106 +828,56 @@ bool CProConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacke
         //文件入口，直接写入日志
         return Write_SendData_To_File(blDelete, pBuffPacket);
     }
+
+    return true;
 }
 
 bool CProConnectHandler::PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State)
 {
-    if(NULL == pMbData)
-    {
-        return false;
-    }
+    //ACE_Message_Block* pmbSend = new ACE_Message_Block(pMbData->length());
+    ACE_Message_Block* pmbSend = App_MessageBlockManager::instance()->Create(pMbData->length());
+    pmbSend->copy(pMbData->rd_ptr(), pMbData->length());
 
     //如果是DEBUG状态，记录当前发送包的二进制数据
-    Output_Debug_Data(pMbData, LOG_SYSTEM_DEBUG_CLIENTSEND);
+    Output_Debug_Data(pmbSend, LOG_SYSTEM_DEBUG_CLIENTSEND);
 
     //统计发送数量
-    ACE_Date_Time dtNow;
-
-    if(false == m_TimeConnectInfo.SendCheck((uint8)dtNow.minute(), 1, (uint32)pMbData->length()))
-    {
-        //超过了限定的阀值，需要关闭链接，并记录日志
-        AppLogManager::instance()->WriteToMail_i(LOG_SYSTEM_CONNECTABNORMAL,
-                GetXmlConfigAttribute(xmlClientData)->MailID,
-                "Alert",
-                "[TCP]IP=%s,Prot=%d,SendPacketCount=%d, SendSize=%d.",
-                m_addrRemote.get_host_addr(),
-                m_addrRemote.get_port_number(),
-                m_TimeConnectInfo.m_u4SendPacketCount,
-                m_TimeConnectInfo.m_u4SendSize);
-
-        //设置封禁时间
-        App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), GetXmlConfigAttribute(xmlIP)->Timeout);
-        OUR_DEBUG((LM_ERROR, "[CProConnectHandler::PutSendPacket] ConnectID = %d, Send Data is more than limit.\n", GetConnectID()));
-
-        App_MessageBlockManager::instance()->Close(pMbData);
-        return false;
-    }
 
     //异步发送方法
-    if(NULL != pMbData)
+    //因为是异步的，所以可能会接收到上次成功的数据包累计，这里需要注意一下。
+    if(m_u4SuccessSendSize > m_u4ReadSendSize)
     {
-        //因为是异步的，所以可能会接收到上次成功的数据包累计，这里需要注意一下。
-        if(m_u4SuccessSendSize > m_u4ReadSendSize)
-        {
-            m_u4SuccessSendSize = m_u4ReadSendSize;
-        }
+        m_u4SuccessSendSize = m_u4ReadSendSize;
+    }
 
-        //比较水位标，是否超过一定数值，也就是说发快收慢的时候，如果超过一定数值，断开连接
-        /*
-        if(GetXmlConfigAttribute(xmlSendInfo)->SendDatamark > 0 && m_u4ReadSendSize - m_u4SuccessSendSize >= GetXmlConfigAttribute(xmlSendInfo)->SendDatamark)
-        {
-            OUR_DEBUG ((LM_ERROR, "[CProConnectHandler::PutSendPacket]ConnectID = %d, SingleConnectMaxSendBuffer is more than(%d)!\n", GetConnectID(), m_u4ReadSendSize - m_u4SuccessSendSize));
-            //AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_SENDQUEUEERROR, "]Connection from [%s:%d], SingleConnectMaxSendBuffer is more than(%d)!.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4ReadSendSize - m_u4SuccessSendSize);
+    //记录水位标
+    m_u4ReadSendSize += (uint32)pmbSend->length();
 
-            //这里发送给插件一个消息，告知插件数据超过阈值
-            CPacketParse objPacketParse;
-            objPacketParse.SetPacket_Body_Message(pMbData);
-            objPacketParse.SetPacket_Body_Curr_Length((uint32)pMbData->length());
+    if(0 != m_Writer.write(*pmbSend, pmbSend->length()))
+    {
 
-			_MakePacket objMakePacket;
-
-			objMakePacket.m_u4ConnectID     = GetConnectID();
-			objMakePacket.m_pPacketParse    = &objPacketParse;
-			objMakePacket.m_u1Option        = PACKET_SEND_TIMEOUT;
-			objMakePacket.m_AddrRemote      = m_addrRemote;
-			objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
-
-            Send_MakePacket_Queue(objMakePacket, m_szLocalIP, m_u2LocalPort);
-
-            return false;
-        }
-        */
-
-        //记录水位标
-        m_u4ReadSendSize += (uint32)pMbData->length();
-
-        if(0 != m_Writer.write(*pMbData, pMbData->length()))
-        {
-
-            OUR_DEBUG ((LM_ERROR, "[CProConnectHandler::PutSendPacket] Connectid=%d mb=%d m_writer.write error(%d)!\n", GetConnectID(),  pMbData->length(), errno));
-            //如果发送失败，在这里返回失败，回调给业务逻辑去处理
-            ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-            App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), pMbData, tvNow);
-            return false;
-        }
-        else
-        {
-            m_u4AllSendCount += 1;
-            m_atvOutput      = ACE_OS::gettimeofday();
-
-            if (PACKET_SEND_FIN_CLOSE == u1State)
-            {
-                this->ServerClose(CLIENT_CLOSE_IMMEDIATLY);
-            }
-
-            return true;
-        }
+        OUR_DEBUG ((LM_ERROR, "[CProConnectHandler::PutSendPacket] Connectid=%d mb=%d m_writer.write error(%d)!\n", GetConnectID(),  pMbData->length(), errno));
+        //如果发送失败，在这里返回失败，回调给业务逻辑去处理
+        ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+        App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), pmbSend, tvNow);
+        return false;
     }
     else
     {
-        OUR_DEBUG ((LM_ERROR,"[CProConnectHandler::PutSendPacket] Connectid=%d mb is NULL!\n", GetConnectID()));;
-        return false;
+        m_u4AllSendCount += 1;
+        //m_atvOutput      = ACE_OS::gettimeofday();
+
+        if (PACKET_SEND_FIN_CLOSE == u1State)
+        {
+            this->ServerClose(CLIENT_CLOSE_IMMEDIATLY);
+        }
+
+        //m_PerformanceCounter.counter();
+        return true;
     }
+
+    m_PerformanceCounter.counter();
+    return true;
 }
 
 void CProConnectHandler::Get_Recv_length()
@@ -1264,8 +1216,6 @@ bool CProConnectHandler::Send_Input_To_Cache(uint8 u1SendType, uint32& u4PacketS
 bool CProConnectHandler::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, uint8 u1State, int nMessageID, bool blDelete, IBuffPacket* pBuffPacket)
 {
     //先判断是否要组装包头，如果需要，则组装在m_pBlockMessage中
-    ACE_Message_Block* pMbData = NULL;
-
     _Send_Packet_Param obj_Send_Packet_Param;
     obj_Send_Packet_Param.m_blDelete            = blDelete;
     obj_Send_Packet_Param.m_u1SendType          = u1SendType;
@@ -1278,7 +1228,6 @@ bool CProConnectHandler::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSiz
     bool blState = Tcp_Common_Make_Send_Packet(obj_Send_Packet_Param,
                    pBuffPacket,
                    m_pBlockMessage,
-                   pMbData,
                    u4PacketSize);
 
     if (false == blState)
@@ -1292,9 +1241,15 @@ bool CProConnectHandler::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSiz
 
     //将消息ID放入MessageBlock
     ACE_Message_Block::ACE_Message_Type objType = ACE_Message_Block::MB_USER + nMessageID;
-    pMbData->msg_type(objType);
+    m_pBlockMessage->msg_type(objType);
 
-    return PutSendPacket(pMbData, u1State);
+    blState = PutSendPacket(m_pBlockMessage, u1State);
+    if (true == blState)
+    {
+        m_pBlockMessage->reset();
+    }
+
+    return blState;
 }
 
 bool CProConnectHandler::RecvClinetPacket(uint32 u4PackeLen)
@@ -1783,7 +1738,7 @@ bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
         {
             OUR_DEBUG((LM_INFO, "[CProConnectManager::SendMessage]ConnectID=%d, CommandID=%d, SendMessage error.\n", u4ConnectID, u2CommandID));
         }
-
+        
         _ClientIPInfo objClientIP = pConnectHandler->GetLocalIPInfo();
 
         if (false == m_CommandAccount.SaveCommandData(u2CommandID, objClientIP.m_u2Port, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP, u4CommandSize, COMMAND_TYPE_OUT))
@@ -1795,7 +1750,6 @@ bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
     }
     else
     {
-        //sprintf_safe(m_szError, MAX_BUFF_500, "[CProConnectManager::SendMessage] ConnectID[%d] is not find.", u4ConnectID);
         //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
         //OUR_DEBUG((LM_INFO, "[CProConnectManager::SendMessage]pConnectHandler is NULL.\n"));
         Tcp_Common_Send_Message_Error(u4ConnectID, u2CommandID, blDelete, pBuffPacket);
@@ -1823,10 +1777,16 @@ bool CProConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
     obj_Post_Message_Param.m_u4ConnectID        = u4ConnectID;
     obj_Post_Message_Param.m_u4SendQueuePutTime = m_u4SendQueuePutTime;
 
-    return Tcp_Common_Manager_Post_Message(obj_Post_Message_Param,
-                                           pBuffPacket,
-                                           m_SendMessagePool,
-                                           dynamic_cast<ACE_Task<ACE_MT_SYNCH>*>(this));
+    ACE_Time_Value tvSend = ACE_OS::gettimeofday();
+
+    return SendMessage(u4ConnectID, 
+        pBuffPacket, 
+        u2CommandID, 
+        u1SendState,
+        u1SendType, 
+        tvSend,
+        blDelete, 
+        nMessageID);
 }
 
 const char* CProConnectManager::GetError()

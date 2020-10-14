@@ -153,7 +153,6 @@ public:
 bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
                                  IBuffPacket*& pBuffPacket,
                                  ACE_Message_Block* pBlockMessage,
-                                 ACE_Message_Block*& pMbData,
                                  uint32& u4PacketSize);
 
 //发送Manager消息队列关闭信息

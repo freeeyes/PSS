@@ -212,22 +212,15 @@ int CBaseCommand::SendClient(_PacketInfo BodyPacket, short nCommand, uint32 nCon
 	pResponsesPacket->WriteStream(pBuffer, u4PacketLen);
 	int nMessageID = 0;
 
-	if (NULL != m_pServerObject->GetConnectManager())
-	{
+    uint32 u4CommandSize = pResponsesPacket->GetPacketLen();
 
-		nRet = m_pServerObject->GetConnectManager()->PostMessage(nConnectId,
-			pResponsesPacket,
-			SENDMESSAGE_JAMPNOMAL,
-			u2PostCommandID,
-			PACKET_SEND_IMMEDIATLY,
-			PACKET_IS_FRAMEWORK_RECYC,
-			nMessageID);
-	}
-	else
-	{
-		m_pServerObject->GetPacketManager()->Delete(pResponsesPacket);
-	}
-
+	nRet = m_pServerObject->GetConnectManager()->PostMessage(nConnectId,
+		pResponsesPacket,
+		SENDMESSAGE_JAMPNOMAL,
+		u2PostCommandID,
+		PACKET_SEND_IMMEDIATLY,
+		PACKET_IS_FRAMEWORK_RECYC,
+		nMessageID);
 
 	return nRet;
 	__LEAVE_FUNCTION_WITHRETURN(0);
