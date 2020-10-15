@@ -59,7 +59,13 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Stream(void)
 
     uint16 u2PostCommand = 0x1001;
     uint32 u4PacketSize = 4;
-    m_pConnectHandler->Send_Input_To_Cache(SENDMESSAGE_JAMPNOMAL, u4PacketSize, u2PostCommand, true, pBuffPacket);
+
+    CSendMessageInfo objSendMessageInfo;
+    objSendMessageInfo.u1SendType = SENDMESSAGE_JAMPNOMAL;
+    objSendMessageInfo.u2CommandID = u2PostCommand;
+    objSendMessageInfo.pBuffPacket = pBuffPacket;
+
+    m_pConnectHandler->Send_Input_To_Cache(objSendMessageInfo, u4PacketSize);
 
     m_pConnectHandler->SetConnectName("127.0.0.1");
 

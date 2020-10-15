@@ -11,10 +11,7 @@ bool CMakePacket::Init() const
 }
 
 bool CMakePacket::PutMessageBlock(_MakePacket const& objMakePacket, const ACE_Time_Value& tvNow)
-{
-    uint8 u1Option = objMakePacket.m_u1Option;
-
-    
+{   
     //根据操作OP，调用相应的方法。
     CMessage* pMessage = App_MessageServiceGroup::instance()->CreateMessage(objMakePacket.m_u4ConnectID, objMakePacket.m_u1PacketType);
 
