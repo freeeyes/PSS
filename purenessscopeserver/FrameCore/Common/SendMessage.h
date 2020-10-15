@@ -6,6 +6,20 @@
 #include "HashTable.h"
 #include "ObjectArrayList.h"
 
+//发送数据体发的数据结构
+class CSendMessageInfo
+{
+public:
+    uint32 u4ConnectID         = 0;
+    IBuffPacket* pBuffPacket   = NULL;
+    uint16 u2CommandID         = 0;
+    uint8 u1SendState          = 0;
+    uint8 u1SendType           = 0; 
+    ACE_Time_Value tvSendBegin = ACE_OS::gettimeofday();
+    bool blDelete              = true;
+    int nMessageID             = 0;
+};
+
 //定义一个发送数据容器，用于异步发送队列
 class _SendMessage final
 {

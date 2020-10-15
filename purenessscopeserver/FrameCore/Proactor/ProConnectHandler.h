@@ -62,7 +62,7 @@ public:
 
     void Init(uint16 u2HandlerID);                                            //Connect Pool初始化调用的函数
 
-    bool SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, uint8 u1State, uint8 u1SendType, uint32& u4PacketSize, bool blDelete, int nMessageID);   //发送给客户端数据的函数
+    bool SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);                   //发送给客户端数据的函数
     void Close(int nIOCount = 1, int nErrno = 0);                                                  //当前连接对象关闭
     bool ServerClose(EM_Client_Close_status emStatus, uint8 u1OptionEvent = PACKET_SDISCONNECT);   //服务器关闭客户端链接的函数
     void SetLocalIPInfo(const char* pLocalIP, uint16 u2LocalPort);            //设置监听IP和端口信息
@@ -97,15 +97,15 @@ private:
     int  Dispose_Paceket_Parse_Body(ACE_Message_Block* pmb);                 //处理消息头函数
     int  Dispose_Paceket_Parse_Stream(ACE_Message_Block* pCurrMessage);      //处理流消息函数
 
-    bool Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPacket);                                                                //将发送数据写入文件
-    bool Send_Input_To_Cache(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, bool blDelete, IBuffPacket* pBuffPacket);       //讲发送对象放入缓存
-    bool Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, uint8 u1State, int nMessageID, bool blDelete, IBuffPacket* pBuffPacket);         //将数据发送给对端
+    bool Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPacket);                             //将发送数据写入文件
+    bool Send_Input_To_Cache(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);              //讲发送对象放入缓存
+    bool Send_Input_To_TCP(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize, uint8 u1State); //将数据发送给对端
 
-    bool RecvClinetPacket(uint32 u4PackeLen);                                 //接受数据包
-    bool CheckMessage();                                                      //处理接收的数据
-    bool PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State);            //将发送数据发送出去
-    void ClearPacketParse(ACE_Message_Block& mbCurrBlock);                    //清理正在使用的PacketParse
-    void PutSendPacketError(ACE_Message_Block* pMbData);                      //发送失败回调
+    bool RecvClinetPacket(uint32 u4PackeLen);                                                         //接受数据包
+    bool CheckMessage();                                                                              //处理接收的数据
+    bool PutSendPacket(ACE_Message_Block* pMbData, uint32 u4Size, uint8 u1State, const ACE_Time_Value tvSend);       //将发送数据发送出去
+    void ClearPacketParse(ACE_Message_Block& mbCurrBlock);                                            //清理正在使用的PacketParse
+    void PutSendPacketError(ACE_Message_Block* pMbData);                                              //发送失败回调
 
     uint64             m_u8RecvQueueTimeCost;          //成功接收数据到数据处理完成（未发送）花费的时间总和
     uint64             m_u8SendQueueTimeCost;          //成功发送数据到数据处理完成（只发送）花费的时间总和
@@ -185,7 +185,7 @@ public:
     bool AddConnect(uint32 u4ConnectID, CProConnectHandler* pConnectHandler);                                 //添加一个新的链接信息
     bool SetConnectTimeWheel(CProConnectHandler* pConnectHandler);                                            //设置消息轮盘
     bool DelConnectTimeWheel(CProConnectHandler* pConnectHandler);                                            //删除消息轮盘
-    bool SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint16 u2CommandID, uint8 u1SendState, uint8 u1SendType, ACE_Time_Value& tvSendBegin, bool blDelete, int nMessageID);          //发送数据
+    bool SendMessage(CSendMessageInfo objSendMessageInfo);                                                    //发送数据
     bool PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,
                      uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDelete = true, int nMessageID = 0);    //异步发送
     bool PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,

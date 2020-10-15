@@ -790,11 +790,11 @@ CONNECTSTATE CProConnectHandler::GetSendBuffState()
     return m_u1SendBuffState;
 }
 
-bool CProConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, uint8 u1State, uint8 u1SendType, uint32& u4PacketSize, bool blDelete, int nMessageID)
+bool CProConnectHandler::SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-    if(NULL == pBuffPacket)
+    if(NULL == objSendMessageInfo.pBuffPacket)
     {
         OUR_DEBUG((LM_DEBUG,"[CProConnectHandler::SendMessage] Connectid=[%d] pBuffPacket is NULL.\n", GetConnectID()));
         return false;
@@ -805,7 +805,10 @@ bool CProConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacke
     {
         //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
         OUR_DEBUG((LM_INFO, "[CProConnectHandler::SendMessage]m_u1IsActive == 0.\n"))
-        Tcp_Common_Send_Message_Error(GetConnectID(), u2CommandID, blDelete, pBuffPacket);
+        Tcp_Common_Send_Message_Error(GetConnectID(), 
+            objSendMessageInfo.u2CommandID, 
+            objSendMessageInfo.blDelete, 
+            objSendMessageInfo.pBuffPacket);
 
         return false;
     }
@@ -813,34 +816,35 @@ bool CProConnectHandler::SendMessage(uint16 u2CommandID, IBuffPacket* pBuffPacke
     if (EM_IO_TYPE::NET_INPUT == m_emIOType)
     {
         //如果不是直接发送数据，则拼接数据包
-        if (u1State == PACKET_SEND_CACHE)
+        if (objSendMessageInfo.u1SendState == PACKET_SEND_CACHE)
         {
-            return Send_Input_To_Cache(u1SendType, u4PacketSize, u2CommandID, blDelete, pBuffPacket);
+            return Send_Input_To_Cache(objSendMessageInfo, u4PacketSize);
         }
         else
         {
             //要发送数据到对端
-            return Send_Input_To_TCP(u1SendType, u4PacketSize, u2CommandID, u1State, nMessageID, blDelete, pBuffPacket);
+            return Send_Input_To_TCP(objSendMessageInfo, u4PacketSize, objSendMessageInfo.u1SendState);
         }
     }
     else
     {
         //文件入口，直接写入日志
-        return Write_SendData_To_File(blDelete, pBuffPacket);
+        return Write_SendData_To_File(objSendMessageInfo.blDelete, objSendMessageInfo.pBuffPacket);
     }
 
     return true;
 }
 
-bool CProConnectHandler::PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State)
+bool CProConnectHandler::PutSendPacket(ACE_Message_Block* pMbData, uint32 u4Size, uint8 u1State, const ACE_Time_Value tvSend)
 {
-    ACE_Message_Block* pmbSend = App_MessageBlockManager::instance()->Create(pMbData->length());
+    ACE_Message_Block* pmbSend = App_MessageBlockManager::instance()->Create(u4Size);
     pmbSend->copy(pMbData->rd_ptr(), pMbData->length());
 
     //如果是DEBUG状态，记录当前发送包的二进制数据
     Output_Debug_Data(pmbSend, LOG_SYSTEM_DEBUG_CLIENTSEND);
 
     //统计发送数量
+    m_atvOutput = tvSend;
 
     //异步发送方法
     //因为是异步的，所以可能会接收到上次成功的数据包累计，这里需要注意一下。
@@ -857,7 +861,7 @@ bool CProConnectHandler::PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State
 
         OUR_DEBUG ((LM_ERROR, "[CProConnectHandler::PutSendPacket] Connectid=%d mb=%d m_writer.write error(%d)!\n", GetConnectID(),  pMbData->length(), errno));
         //如果发送失败，在这里返回失败，回调给业务逻辑去处理
-        ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+        ACE_Time_Value tvNow = tvSend;
         App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), pmbSend, tvNow);
         return false;
     }
@@ -871,11 +875,9 @@ bool CProConnectHandler::PutSendPacket(ACE_Message_Block* pMbData, uint8 u1State
             this->ServerClose(CLIENT_CLOSE_IMMEDIATLY);
         }
 
-        //m_PerformanceCounter.counter();
         return true;
     }
 
-    m_PerformanceCounter.counter();
     return true;
 }
 
@@ -1196,53 +1198,53 @@ bool CProConnectHandler::Write_SendData_To_File(bool blDelete, IBuffPacket* pBuf
                                    m_szConnectName);
 }
 
-bool CProConnectHandler::Send_Input_To_Cache(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, bool blDelete, IBuffPacket* pBuffPacket)
+bool CProConnectHandler::Send_Input_To_Cache(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize)
 {
     _Input_To_Cache_Param obj_Input_To_Cache_Param;
-    obj_Input_To_Cache_Param.m_blDelete            = blDelete;
-    obj_Input_To_Cache_Param.m_u1SendType          = u1SendType;
-    obj_Input_To_Cache_Param.m_u2CommandID         = u2CommandID;
+    obj_Input_To_Cache_Param.m_blDelete            = objSendMessageInfo.blDelete;
+    obj_Input_To_Cache_Param.m_u1SendType          = objSendMessageInfo.u1SendType;
+    obj_Input_To_Cache_Param.m_u2CommandID         = objSendMessageInfo.u2CommandID;
     obj_Input_To_Cache_Param.m_u4ConnectID         = m_u4ConnectID;
     obj_Input_To_Cache_Param.m_u4PacketParseInfoID = m_u4PacketParseInfoID;
     obj_Input_To_Cache_Param.m_u4SendMaxBuffSize   = m_u4SendMaxBuffSize;
 
     return Tcp_Common_Send_Input_To_Cache(obj_Input_To_Cache_Param,
-                                          m_pBlockMessage,
-                                          u4PacketSize,
-                                          pBuffPacket);
+        m_pBlockMessage,
+        u4PacketSize,
+        objSendMessageInfo.pBuffPacket);
 }
 
-bool CProConnectHandler::Send_Input_To_TCP(uint8 u1SendType, uint32& u4PacketSize, uint16 u2CommandID, uint8 u1State, int nMessageID, bool blDelete, IBuffPacket* pBuffPacket)
+bool CProConnectHandler::Send_Input_To_TCP(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize, uint8 u1State)
 {
     //先判断是否要组装包头，如果需要，则组装在m_pBlockMessage中
     _Send_Packet_Param obj_Send_Packet_Param;
-    obj_Send_Packet_Param.m_blDelete            = blDelete;
-    obj_Send_Packet_Param.m_u1SendType          = u1SendType;
-    obj_Send_Packet_Param.m_u2CommandID         = u2CommandID;
+    obj_Send_Packet_Param.m_blDelete            = objSendMessageInfo.blDelete;
+    obj_Send_Packet_Param.m_u1SendType          = objSendMessageInfo.u1SendType;
+    obj_Send_Packet_Param.m_u2CommandID         = objSendMessageInfo.u2CommandID;
     obj_Send_Packet_Param.m_u4ConnectID         = GetConnectID();
     obj_Send_Packet_Param.m_u4PacketParseInfoID = m_u4PacketParseInfoID;
     obj_Send_Packet_Param.m_u4SendMaxBuffSize   = m_u4SendMaxBuffSize;
 
     //拼装数据
     bool blState = Tcp_Common_Make_Send_Packet(obj_Send_Packet_Param,
-                   pBuffPacket,
-                   m_pBlockMessage,
-                   u4PacketSize);
+        objSendMessageInfo.pBuffPacket,
+        m_pBlockMessage,
+        u4PacketSize);
 
     if (false == blState)
     {
         return false;
     }
 
-    Recovery_Common_BuffPacket(blDelete, pBuffPacket);
+    Recovery_Common_BuffPacket(objSendMessageInfo.blDelete, objSendMessageInfo.pBuffPacket);
 
     //判断是否发送完成后关闭连接
 
     //将消息ID放入MessageBlock
-    ACE_Message_Block::ACE_Message_Type objType = ACE_Message_Block::MB_USER + nMessageID;
+    ACE_Message_Block::ACE_Message_Type objType = ACE_Message_Block::MB_USER + objSendMessageInfo.nMessageID;
     m_pBlockMessage->msg_type(objType);
 
-    blState = PutSendPacket(m_pBlockMessage, u1State);
+    blState = PutSendPacket(m_pBlockMessage, (uint32)m_pBlockMessage->length(), u1State, objSendMessageInfo.tvSendBegin);
     if (true == blState)
     {
         m_pBlockMessage->reset();
@@ -1509,7 +1511,15 @@ bool CProConnectHandler::Device_Send_Data(const char* pData, ssize_t nLen)
     uint8 u1SendState   = SENDMESSAGE_JAMPNOMAL;
     uint32 u4PacketSize = 0;
 
-    return SendMessage(u2CommandID, pBuffPacket, u1State, u1SendState, u4PacketSize, true, 0);
+    CSendMessageInfo objSendMessageInfo;
+
+    objSendMessageInfo.u2CommandID = u2CommandID;
+    objSendMessageInfo.pBuffPacket = pBuffPacket;
+    objSendMessageInfo.u1SendType  = u1State;
+    objSendMessageInfo.u1SendState = u1SendState;
+    objSendMessageInfo.blDelete    = true;
+
+    return SendMessage(objSendMessageInfo, u4PacketSize);
 }
 
 //***************************************************************************
@@ -1721,28 +1731,31 @@ bool CProConnectManager::DelConnectTimeWheel(CProConnectHandler* pConnectHandler
     return true;
 }
 
-bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint16 u2CommandID, uint8 u1SendState, uint8 u1SendType, ACE_Time_Value& tvSendBegin, bool blDelete, int nMessageID)
+bool CProConnectManager::SendMessage(CSendMessageInfo objSendMessageInfo)
 {
     m_ThreadWriteLock.acquire();
-    CProConnectHandler* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data_By_Uint32(u4ConnectID);
+    CProConnectHandler* pConnectHandler = m_objHashConnectList.Get_Hash_Box_Data_By_Uint32(objSendMessageInfo.u4ConnectID);
     m_ThreadWriteLock.release();
 
-    uint32 u4CommandSize = pBuffPacket->GetPacketLen();
+    uint32 u4CommandSize = objSendMessageInfo.pBuffPacket->GetPacketLen();
 
     if(NULL != pConnectHandler)
     {
         uint32 u4PacketSize  = 0;
 
-        if (false == pConnectHandler->SendMessage(u2CommandID, pBuffPacket, u1SendState, u1SendType, u4PacketSize, blDelete, nMessageID))
+        if (false == pConnectHandler->SendMessage(objSendMessageInfo, u4PacketSize))
         {
-            OUR_DEBUG((LM_INFO, "[CProConnectManager::SendMessage]ConnectID=%d, CommandID=%d, SendMessage error.\n", u4ConnectID, u2CommandID));
+            OUR_DEBUG((LM_INFO, "[CProConnectManager::SendMessage]ConnectID=%d, CommandID=%d, SendMessage error.\n", 
+                objSendMessageInfo.u4ConnectID, 
+                objSendMessageInfo.u2CommandID));
         }
         
         _ClientIPInfo objClientIP = pConnectHandler->GetLocalIPInfo();
 
-        if (false == m_CommandAccount.SaveCommandData(u2CommandID, objClientIP.m_u2Port, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP, u4CommandSize, COMMAND_TYPE_OUT))
+        if (false == m_CommandAccount.SaveCommandData(objSendMessageInfo.u2CommandID, objClientIP.m_u2Port, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP, u4CommandSize, COMMAND_TYPE_OUT))
         {
-            OUR_DEBUG((LM_INFO, "[CProConnectManager::SendMessage]ConnectID=%d, CommandID=%d, SaveCommandData error.\n", u4ConnectID, u2CommandID));
+            OUR_DEBUG((LM_INFO, "[CProConnectManager::SendMessage]ConnectID=%d, CommandID=%d, SaveCommandData error.\n", 
+                objSendMessageInfo.u4ConnectID, objSendMessageInfo.u2CommandID));
         }
 
         return true;
@@ -1751,11 +1764,14 @@ bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
     {
         //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
         //OUR_DEBUG((LM_INFO, "[CProConnectManager::SendMessage]pConnectHandler is NULL.\n"));
-        Tcp_Common_Send_Message_Error(u4ConnectID, u2CommandID, blDelete, pBuffPacket);
+        Tcp_Common_Send_Message_Error(objSendMessageInfo.u4ConnectID, 
+            objSendMessageInfo.u2CommandID, 
+            objSendMessageInfo.blDelete, 
+            objSendMessageInfo.pBuffPacket);
 
-        if(true == blDelete)
+        if(true == objSendMessageInfo.blDelete)
         {
-            App_BuffPacketManager::instance()->Delete(pBuffPacket);
+            App_BuffPacketManager::instance()->Delete(objSendMessageInfo.pBuffPacket);
         }
 
         return true;
@@ -1767,16 +1783,17 @@ bool CProConnectManager::SendMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacke
 bool CProConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
 {
     //直接发送，不在做队列发送，无意义。
-    ACE_Time_Value tvSend = ACE_OS::gettimeofday();
+    CSendMessageInfo objSendMessageInfo;
 
-    return SendMessage(u4ConnectID, 
-        pBuffPacket, 
-        u2CommandID, 
-        u1SendState,
-        u1SendType, 
-        tvSend,
-        blDelete, 
-        nMessageID);
+    objSendMessageInfo.u4ConnectID = u4ConnectID;
+    objSendMessageInfo.pBuffPacket = pBuffPacket;
+    objSendMessageInfo.u2CommandID = u2CommandID;
+    objSendMessageInfo.u1SendState = u1SendState;
+    objSendMessageInfo.u1SendType  = u1SendType;
+    objSendMessageInfo.blDelete    = blDelete;
+    objSendMessageInfo.nMessageID  = nMessageID;
+
+    return SendMessage(objSendMessageInfo);
 }
 
 const char* CProConnectManager::GetError()
@@ -1943,17 +1960,7 @@ int CProConnectManager::svc (void)
                 continue;
             }
 
-            if (0 == msg->m_u1Type)
-            {
-                //处理发送数据
-                if (false == SendMessage(msg->m_u4ConnectID, msg->m_pBuffPacket, msg->m_u2CommandID, msg->m_u1SendState, msg->m_nEvents, msg->m_tvSend, msg->m_blDelete, msg->m_nMessageID))
-                {
-                    OUR_DEBUG((LM_INFO, "[CProConnectManager::svc]ConnectID=%d, m_u2CommandID=%d, SendMessage error.\n", msg->m_u4ConnectID, msg->m_u2CommandID));
-                    //回收发送缓冲
-                    App_BuffPacketManager::instance()->Delete(msg->m_pBuffPacket);
-                }
-            }
-            else if (1 == msg->m_u1Type)
+            if (1 == msg->m_u1Type)
             {
                 //处理连接服务器主动关闭
                 if (false == CloseConnect(msg->m_u4ConnectID, CLIENT_CLOSE_IMMEDIATLY))
@@ -2046,6 +2053,7 @@ bool CProConnectManager::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendT
     m_ThreadWriteLock.release();
 
     uint32 u4ConnectID = 0;
+    CSendMessageInfo objSendMessageInfo;
 
     for(auto* pProConnectManager : objvecProConnectManager)
     {
@@ -2060,73 +2068,17 @@ bool CProConnectManager::PostMessageAll( IBuffPacket* pBuffPacket, uint8 u1SendT
 
         pCurrBuffPacket->WriteStream(pBuffPacket->GetData(), pBuffPacket->GetPacketLen());
 
-        //放入发送队列
-        _SendMessage* pSendMessage = m_SendMessagePool.Create();
+        //发送数据
+		objSendMessageInfo.u4ConnectID = u4ConnectID;
+		objSendMessageInfo.pBuffPacket = pBuffPacket;
+		objSendMessageInfo.u2CommandID = u2CommandID;
+		objSendMessageInfo.u1SendState = u1SendState;
+		objSendMessageInfo.u1SendType  = u1SendType;
+		objSendMessageInfo.blDelete    = blDelete;
+		objSendMessageInfo.nMessageID  = nMessageID;
 
-        if(NULL == pSendMessage)
-        {
-            OUR_DEBUG((LM_ERROR,"[CProConnectManager::PutMessage] new _SendMessage is error.\n"));
-            App_BuffPacketManager::instance()->Delete(pBuffPacket);
-            return false;
-        }
+		SendMessage(objSendMessageInfo);
 
-        ACE_Message_Block* mb = pSendMessage->GetQueueMessage();
-
-        if(NULL != mb)
-        {
-            pSendMessage->m_u4ConnectID = pProConnectManager->GetConnectID();
-            pSendMessage->m_pBuffPacket = pCurrBuffPacket;
-            pSendMessage->m_nEvents     = u1SendType;
-            pSendMessage->m_u2CommandID = u2CommandID;
-            pSendMessage->m_u1SendState = u1SendState;
-            pSendMessage->m_blDelete    = PACKET_IS_FRAMEWORK_RECYC;
-            pSendMessage->m_nMessageID  = nMessageID;
-            pSendMessage->m_u1Type      = 0;
-            pSendMessage->m_tvSend      = ACE_OS::gettimeofday();
-
-            //判断队列是否是已经最大
-            int nQueueCount = (int)msg_queue()->message_count();
-
-            if(nQueueCount >= (int)m_u2SendQueueMax)
-            {
-                OUR_DEBUG((LM_ERROR,"[CProConnectManager::PutMessage] Queue is Full nQueueCount = [%d].\n", nQueueCount));
-
-                if(true == blDelete)
-                {
-                    App_BuffPacketManager::instance()->Delete(pBuffPacket);
-                }
-
-                m_SendMessagePool.Delete(pSendMessage);
-                return false;
-            }
-
-            ACE_Time_Value xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, MAX_MSG_PUTTIMEOUT);
-
-            if(this->putq(mb, &xtime) == -1)
-            {
-                OUR_DEBUG((LM_ERROR,"[CProConnectManager::PutMessage] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
-
-                if(true == blDelete)
-                {
-                    App_BuffPacketManager::instance()->Delete(pBuffPacket);
-                }
-
-                m_SendMessagePool.Delete(pSendMessage);
-                return false;
-            }
-        }
-        else
-        {
-            OUR_DEBUG((LM_ERROR,"[CProConnectManager::PutMessage] mb new error.\n"));
-
-            if(true == blDelete)
-            {
-                App_BuffPacketManager::instance()->Delete(pBuffPacket);
-            }
-
-            m_SendMessagePool.Delete(pSendMessage);
-            return false;
-        }
     }
 
     return true;
