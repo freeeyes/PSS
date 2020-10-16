@@ -1780,19 +1780,9 @@ bool CProConnectManager::SendMessage(CSendMessageInfo objSendMessageInfo)
     return true;
 }
 
-bool CProConnectManager::PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
+bool CProConnectManager::PostMessage(CSendMessageInfo objSendMessageInfo)
 {
     //直接发送，不在做队列发送，无意义。
-    CSendMessageInfo objSendMessageInfo;
-
-    objSendMessageInfo.u4ConnectID = u4ConnectID;
-    objSendMessageInfo.pBuffPacket = pBuffPacket;
-    objSendMessageInfo.u2CommandID = u2CommandID;
-    objSendMessageInfo.u1SendState = u1SendState;
-    objSendMessageInfo.u1SendType  = u1SendType;
-    objSendMessageInfo.blDelete    = blDelete;
-    objSendMessageInfo.nMessageID  = nMessageID;
-
     return SendMessage(objSendMessageInfo);
 }
 
@@ -2444,7 +2434,17 @@ bool CProConnectManagerGroup::PostMessage(uint32 u4ConnectID, IBuffPacket*& pBuf
         return false;
     }
 
-    return pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, u1SendState, blDelete, nMessageID);
+	CSendMessageInfo objSendMessageInfo;
+
+	objSendMessageInfo.u4ConnectID = u4ConnectID;
+	objSendMessageInfo.pBuffPacket = pBuffPacket;
+	objSendMessageInfo.u2CommandID = u2CommandID;
+	objSendMessageInfo.u1SendState = u1SendState;
+	objSendMessageInfo.u1SendType = u1SendType;
+	objSendMessageInfo.blDelete = blDelete;
+	objSendMessageInfo.nMessageID = nMessageID;
+
+    return pConnectManager->PostMessage(objSendMessageInfo);
 }
 
 bool CProConnectManagerGroup::PostMessage( uint32 u4ConnectID, char*& pData, uint32 nDataLen, uint8 u1SendType, uint16 u2CommandID, uint8 u1SendState, bool blDelete, int nMessageID)
@@ -2486,7 +2486,17 @@ bool CProConnectManagerGroup::PostMessage( uint32 u4ConnectID, char*& pData, uin
 
         if(bWriteResult)
         {
-            return pConnectManager->PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, u1SendState, true, nMessageID);
+			CSendMessageInfo objSendMessageInfo;
+
+			objSendMessageInfo.u4ConnectID = u4ConnectID;
+			objSendMessageInfo.pBuffPacket = pBuffPacket;
+			objSendMessageInfo.u2CommandID = u2CommandID;
+			objSendMessageInfo.u1SendState = u1SendState;
+			objSendMessageInfo.u1SendType  = u1SendType;
+			objSendMessageInfo.blDelete    = blDelete;
+			objSendMessageInfo.nMessageID  = nMessageID;
+
+            return pConnectManager->PostMessage(objSendMessageInfo);
         }
         else
         {
@@ -2540,7 +2550,17 @@ bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, IBuffPac
 
         pCurrBuffPacket->WriteStream(pBuffPacket->GetData(), pBuffPacket->GetWriteLen());
 
-        if (false == pConnectManager->PostMessage(u4ConnectID, pCurrBuffPacket, u1SendType, u2CommandID, u1SendState, true, nMessageID))
+		CSendMessageInfo objSendMessageInfo;
+
+		objSendMessageInfo.u4ConnectID = u4ConnectID;
+		objSendMessageInfo.pBuffPacket = pBuffPacket;
+		objSendMessageInfo.u2CommandID = u2CommandID;
+		objSendMessageInfo.u1SendState = u1SendState;
+		objSendMessageInfo.u1SendType  = u1SendType;
+		objSendMessageInfo.blDelete    = true;
+		objSendMessageInfo.nMessageID  = nMessageID;
+
+        if (false == pConnectManager->PostMessage(objSendMessageInfo))
         {
             OUR_DEBUG((LM_INFO, "[CProConnectManagerGroup::PostMessage]PostMessage(%d) is error.\n", u4ConnectID));
         }
@@ -2586,7 +2606,17 @@ bool CProConnectManagerGroup::PostMessage( vector<uint32> vecConnectID, char*& p
 
         pBuffPacket->WriteStream(pData, nDataLen);
 
-        if (false == PostMessage(u4ConnectID, pBuffPacket, u1SendType, u2CommandID, u1SendState, true, nMessageID))
+		CSendMessageInfo objSendMessageInfo;
+
+		objSendMessageInfo.u4ConnectID = u4ConnectID;
+		objSendMessageInfo.pBuffPacket = pBuffPacket;
+		objSendMessageInfo.u2CommandID = u2CommandID;
+		objSendMessageInfo.u1SendState = u1SendState;
+		objSendMessageInfo.u1SendType = u1SendType;
+		objSendMessageInfo.blDelete = true;
+		objSendMessageInfo.nMessageID = nMessageID;
+
+        if (false == pConnectManager->PostMessage(objSendMessageInfo))
         {
             OUR_DEBUG((LM_INFO, "[ CProConnectManagerGroup::PostMessage]PostMessage(%d) error.\n", u4ConnectID));
         }

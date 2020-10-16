@@ -48,7 +48,7 @@ class CProConnectHandler : public ACE_Service_Handler, public IDeviceHandler
 {
 public:
     CProConnectHandler(void);
-    ~CProConnectHandler(void);
+    virtual ~CProConnectHandler(void);
 
     //重写继承方法
     virtual void open(ACE_HANDLE h, ACE_Message_Block&);                                             //用户建立一个链接
@@ -186,8 +186,7 @@ public:
     bool SetConnectTimeWheel(CProConnectHandler* pConnectHandler);                                            //设置消息轮盘
     bool DelConnectTimeWheel(CProConnectHandler* pConnectHandler);                                            //删除消息轮盘
     bool SendMessage(CSendMessageInfo objSendMessageInfo);                                                    //发送数据
-    bool PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,
-                     uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDelete = true, int nMessageID = 0);    //异步发送
+    bool PostMessage(CSendMessageInfo objSendMessageInfo);                                                    //异步发送
     bool PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,
                         uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDelete = true, int nMessageID = 0);    //异步群发
     bool Close(uint32 u4ConnectID);                                                                          //客户端关闭
