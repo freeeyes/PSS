@@ -180,7 +180,7 @@ public:
     bool SetConnectTimeWheel(CConnectHandler* pConnectHandler);                                            //设置消息轮盘
     bool DelConnectTimeWheel(CConnectHandler* pConnectHandler);                                            //删除消息轮盘
     bool SendMessage(CSendMessageInfo objSendMessageInfo);  //同步发送                                                                     //发送缓冲数据
-    bool PostMessage(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nMessageID = 0); //异步发送
+    bool PostMessage(CSendMessageInfo objSendMessageInfo); //异步发送
     bool PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nMessageID = 0);                  //异步群发
     bool Close(uint32 u4ConnectID);                                                                          //客户单关闭
     bool CloseUnLock(uint32 u4ConnectID);                                                                    //关闭连接，不上锁版本
