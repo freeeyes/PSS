@@ -1,15 +1,9 @@
 #ifndef _FILETESTMANAGER_H_
 #define _FILETESTMANAGER_H_
 
-#ifndef WIN32
-#include "ConnectHandler.h"
-#else
-//Èç¹ûÊÇwindows
-#include "ProConnectHandler.h"
-#endif
-
 #include "HashTable.h"
 #include "XmlOpeation.h"
+#include "HandlerManager.h"
 
 #include "ace/FILE_Addr.h"
 #include "ace/FILE_Connector.h"

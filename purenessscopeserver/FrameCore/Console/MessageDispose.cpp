@@ -212,7 +212,7 @@ void DoMessage_ClientMessageCount(const _CommandInfo& CommandInfo, IBuffPacket* 
     {
         //-c 只返回当前激活的链接数
 #if WIN32
-        int nActiveClient = App_ProConnectManager::instance()->GetCount();
+        int nActiveClient = App_HandlerManager::instance()->GetCount();
 
         if (CommandInfo.m_u1OutputType == 0)
         {
@@ -245,7 +245,7 @@ void DoMessage_ClientMessageCount(const _CommandInfo& CommandInfo, IBuffPacket* 
     {
         //-cp 返回当前激活连接数和池中剩余可分配数
 #if WIN32
-        int nActiveClient = App_ProConnectManager::instance()->GetCount();
+        int nActiveClient = App_HandlerManager::instance()->GetCount();
         int nPoolClient = App_ProConnectHandlerPool::instance()->GetFreeCount();
 
         if (CommandInfo.m_u1OutputType == 0)
@@ -395,16 +395,16 @@ void DoMessage_CommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
             objCommandData += objCommandDataIn;
         }
 
+/*
 #if WIN32
         //查询发送命令
-        App_ProConnectManager::instance()->GetCommandData(u2CommandID, objCommandDataOut);
+        App_HandlerManager::instance()->GetCommandData(u2CommandID, objCommandDataOut);
 
         if (objCommandDataOut.m_u2CommandID == u2CommandID)
         {
 
             objCommandData += objCommandDataOut;
         }
-
 #else
         //查询发送命令
         App_ConnectManager::instance()->GetCommandData(u2CommandID, objCommandDataOut);
@@ -416,6 +416,7 @@ void DoMessage_CommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
         }
 
 #endif
+*/
 
         if (objCommandData.m_u2CommandID == u2CommandID)
         {
@@ -526,11 +527,9 @@ void DoMessage_ClientInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
         vecClientConnectInfo VecClientConnectInfo;
-#if PSS_PLATFORM == PLATFORM_WIN
-        App_ProConnectManager::instance()->GetConnectInfo(VecClientConnectInfo);
-#else
-        App_ConnectManager::instance()->GetConnectInfo(VecClientConnectInfo);
-#endif
+
+        //待实现
+        //App_HandlerManager::instance()->GetConnectInfo(VecClientConnectInfo);
 
         uint32 u4ConnectCount = (uint32)VecClientConnectInfo.size();
         Combo_Common_Head_Data(CommandInfo.m_u1OutputType, u4ConnectCount, "Client IP Count(%d).\n", pBuffPacket);
@@ -544,8 +543,8 @@ void DoMessage_ClientInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
 void DoMessage_CloseClient(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
     uint32 u4ConnectID = (uint32)ACE_OS::atoi(CommandInfo.m_szCommandExp);
-#if PSS_PLATFORM == PLATFORM_WIN
-    App_ProConnectManager::instance()->CloseConnect(u4ConnectID);
+
+    App_HandlerManager::instance()->CloseConnect(u4ConnectID);
 
     if (CommandInfo.m_u1OutputType == 0)
     {
@@ -557,22 +556,6 @@ void DoMessage_CloseClient(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
         sprintf_safe(szTemp, MAX_BUFF_1024, "Client Close is OK\n");
         pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
     }
-
-#else
-    App_ConnectManager::instance()->CloseConnect(u4ConnectID);
-
-    if (CommandInfo.m_u1OutputType == 0)
-    {
-        (*pBuffPacket) << (uint8)0;
-    }
-    else
-    {
-        char szTemp[MAX_BUFF_1024] = { '\0' };
-        sprintf_safe(szTemp, MAX_BUFF_1024, "Client Close is OK\n");
-        pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-    }
-
-#endif
 
     u2ReturnCommandID = CONSOLE_COMMAND_COLSECLIENT;
 }
@@ -728,7 +711,8 @@ void DoMessage_ShowProcessInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
         //得到所有TCP出口流量统计
         uint32 u4ConnectFlowIn = 0;
         uint32 u4ConnectFlowOut = 0;
-        App_ProConnectManager::instance()->GetFlowInfo(u4ConnectFlowIn, u4ConnectFlowOut);
+        //待实现
+        //App_ProConnectManager::instance()->GetFlowInfo(u4ConnectFlowIn, u4ConnectFlowOut);
         u4FlowIn += u4ConnectFlowIn;
         u4FlowOut += u4ConnectFlowOut;
 
@@ -1246,14 +1230,9 @@ void DoMessage_GetConnectIPInfo(const _CommandInfo& CommandInfo, IBuffPacket* pB
 
     if (GetConnectServerID(CommandInfo.m_szCommandExp, nConnectID) == true)
     {
-#if PSS_PLATFORM == PLATFORM_WIN  //如果是windows
-        _ClientIPInfo objClientIPInfo = App_ProConnectManager::instance()->GetClientIPInfo((uint32)nConnectID);
-#else
-        _ClientIPInfo objClientIPInfo = App_ConnectManager::instance()->GetClientIPInfo((uint32)nConnectID);
-#endif
+        _ClientIPInfo objClientIPInfo = App_HandlerManager::instance()->GetClientIPInfo((uint32)nConnectID);
 
-
-        if (ACE_OS::strlen(objClientIPInfo.m_szClientIP) == 0)
+        if (objClientIPInfo.m_strClientIP == "")
         {
             //没有找到对应的IP信息
             if (CommandInfo.m_u1OutputType == 0)
@@ -1275,8 +1254,8 @@ void DoMessage_GetConnectIPInfo(const _CommandInfo& CommandInfo, IBuffPacket* pB
                 (*pBuffPacket) << (uint16)0;
 
                 VCHARS_STR strSName;
-                strSName.text = objClientIPInfo.m_szClientIP;
-                strSName.u1Len = (uint8)ACE_OS::strlen(objClientIPInfo.m_szClientIP);
+                strSName.text = (char* )objClientIPInfo.m_strClientIP.c_str();
+                strSName.u1Len = (uint8)objClientIPInfo.m_strClientIP.length();
 
                 (*pBuffPacket) << strSName;                          //IP
                 (*pBuffPacket) << (uint32)objClientIPInfo.m_u2Port;  //端口
@@ -1284,7 +1263,9 @@ void DoMessage_GetConnectIPInfo(const _CommandInfo& CommandInfo, IBuffPacket* pB
             else
             {
                 char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "ClientIP=%s,Port=%d.\n", objClientIPInfo.m_szClientIP, objClientIPInfo.m_u2Port);
+                sprintf_safe(szTemp, MAX_BUFF_1024, "ClientIP=%s,Port=%d.\n", 
+                    objClientIPInfo.m_strClientIP.c_str(), 
+                    objClientIPInfo.m_u2Port);
                 pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
             }
         }
@@ -1558,11 +1539,8 @@ void DoMessage_GetNickNameInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
 
     if (GetNickName(CommandInfo.m_szCommandExp, szNickName) == true)
     {
-#if PSS_PLATFORM == PLATFORM_WIN
-        App_ProConnectManager::instance()->GetClientNameInfo(szNickName, objClientNameInfo);
-#else
-        App_ConnectManager::instance()->GetClientNameInfo(szNickName, objClientNameInfo);
-#endif
+        //暂时不实现
+        //App_HandlerManager::instance()->GetClientNameInfo(szNickName, objClientNameInfo);
 
         //返回信息列表
         if (CommandInfo.m_u1OutputType == 0)
@@ -1618,11 +1596,7 @@ void DoMessage_SetConnectLog(const _CommandInfo& CommandInfo, IBuffPacket* pBuff
 
     if (GetConnectID(CommandInfo.m_szCommandExp, u4ConnectID, blIsLog) == true)
     {
-#if PSS_PLATFORM == PLATFORM_WIN
-        App_ProConnectManager::instance()->SetIsLog(u4ConnectID, blIsLog);
-#else
-        App_ConnectManager::instance()->SetIsLog(u4ConnectID, blIsLog);
-#endif
+        App_HandlerManager::instance()->SetIsLog(u4ConnectID, blIsLog);
     }
 
     if (CommandInfo.m_u1OutputType == 0)
@@ -1789,11 +1763,9 @@ void DoMessage_MonitorInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
         //得到所有Connect流量统计
         uint32 u4ConnectFlowIn = 0;
         uint32 u4ConnectFlowOut = 0;
-#if WIN32
-        App_ProConnectManager::instance()->GetFlowInfo(u4ConnectFlowIn, u4ConnectFlowOut);
-#else
-        App_ConnectManager::instance()->GetFlowInfo(u4ConnectFlowIn, u4ConnectFlowOut);
-#endif
+        //以后实现
+        //App_HandlerManager::instance()->GetFlowInfo(u4ConnectFlowIn, u4ConnectFlowOut);
+
         u4FlowIn += u4ConnectFlowIn;
         u4FlowOut += u4ConnectFlowOut;
 
@@ -1804,7 +1776,7 @@ void DoMessage_MonitorInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
         int nPoolClient     = 0;
 #if PSS_PLATFORM == PLATFORM_WIN
         App_ProUDPManager::instance()->GetFlowInfo(u4UdpFlowIn, u4UdpFlowOut);
-        nActiveClient = App_ProConnectManager::instance()->GetCount();
+        nActiveClient = App_HandlerManager::instance()->GetCount();
         nPoolClient = App_ProConnectHandlerPool::instance()->GetFreeCount();
 #else
         App_ReUDPManager::instance()->GetFlowInfo(u4UdpFlowIn, u4UdpFlowOut);

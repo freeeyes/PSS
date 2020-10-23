@@ -7,7 +7,6 @@ public:
     virtual ~IDeviceHandler() {};
 
     virtual bool Device_Send_Data(const char* pData, ssize_t nLen) = 0;
-
 };
 
 #endif

@@ -239,6 +239,7 @@
     <ClCompile Include="CppUnit\Unit_TSTimer.cpp" />
     <ClCompile Include="CppUnit\Unit_WorkThreadAI.cpp" />
     <ClCompile Include="Mail\smtps.cpp" />
+    <ClCompile Include="Message\HandlerManager.cpp" />
     <ClCompile Include="Message\MessageDyeingManager.cpp" />
     <ClCompile Include="Message\MessageQueueManager.cpp" />
     <ClCompile Include="Proactor\ProConnectHandler.cpp" />
@@ -429,7 +430,6 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Common\ProgramService.cpp" />
-    <ClCompile Include="Common\SendCacheManager.cpp" />
     <ClCompile Include="Common\SendMessage.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)</ObjectFileName>
@@ -557,6 +557,7 @@
     <ClInclude Include="Common\BaseServerManager.h" />
     <ClInclude Include="Common\BaseTask.h" />
     <ClInclude Include="Common\IDeviceHandler.h" />
+    <ClInclude Include="Common\IHandler.h" />
     <ClInclude Include="Common\MakePacket_Common.h" />
     <ClInclude Include="Common\ServerMessageTask.h" />
     <ClInclude Include="Common\TcpRedirection.h" />
@@ -612,6 +613,7 @@
     <ClInclude Include="FileTest\FileTest.h" />
     <ClInclude Include="FileTest\FileTestManager.h" />
     <ClInclude Include="Mail\smtps.h" />
+    <ClInclude Include="Message\HandlerManager.h" />
     <ClInclude Include="Message\MessageDyeingManager.h" />
     <ClInclude Include="Message\MessageQueueManager.h" />
     <ClInclude Include="PacketParse\PacketConsoleParse.h" />
@@ -658,7 +660,6 @@
     <ClInclude Include="Common\MyACELoggingStrategy.h" />
     <ClInclude Include="Common\ProgramService.h" />
     <ClInclude Include="Common\Ring.h" />
-    <ClInclude Include="Common\SendCacheManager.h" />
     <ClInclude Include="Common\SendMessage.h" />
     <ClInclude Include="Common\ThreadInfo.h" />
     <ClInclude Include="Common\TimerManager.h" />

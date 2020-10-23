@@ -2,6 +2,7 @@
 #define _SENDMESSAGE_H
 
 #include "define.h"
+#include "IConnectManager.h"
 #include "IBuffPacket.h"
 #include "HashTable.h"
 #include "ObjectArrayList.h"
@@ -10,14 +11,14 @@
 class CSendMessageInfo
 {
 public:
-    uint32 u4ConnectID         = 0;
-    IBuffPacket* pBuffPacket   = NULL;
-    uint16 u2CommandID         = 0;
-    uint8 u1SendState          = 0;
-    uint8 u1SendType           = 0; 
-    ACE_Time_Value tvSendBegin = ACE_OS::gettimeofday();
-    bool blDelete              = true;
-    int nMessageID             = 0;
+    uint32 u4ConnectID                 = 0;
+    IBuffPacket* pBuffPacket           = nullptr;
+    uint16 u2CommandID                 = 0;
+    EM_Client_Send_Status emSendState  = EM_Client_Send_Status::CLIENT_SEND_IMMEDIATLY;
+    EM_SEND_PACKET_PARSE emSendType    = EM_SEND_PACKET_PARSE::EM_SENDMESSAGE_JAMPNOMAL;
+    ACE_Time_Value tvSendBegin         = ACE_OS::gettimeofday();
+    bool blDelete                      = true;
+    int nMessageID                     = 0;
 };
 
 //定义一个发送数据容器，用于异步发送队列

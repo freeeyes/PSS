@@ -20,15 +20,14 @@
 #include "FileTestManager.h"
 #include "ConsolePromiss.h"
 #include "XmlConfig.h"
+#include "HandlerManager.h"
 
 #if PSS_PLATFORM == PLATFORM_WIN
-#include "ProConnectHandler.h"
 #include "ClientProConnectManager.h"
 #include "ProUDPManager.h"
 #include "WindowsCPU.h"
 #include "ProControlListen.h"
 #else
-#include "ConnectHandler.h"
 #include "ClientReConnectManager.h"
 #include "ReUDPManager.h"
 #include "LinuxCPU.h"

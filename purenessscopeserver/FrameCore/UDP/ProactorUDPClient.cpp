@@ -173,7 +173,7 @@ bool CProactorUDPClient::CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len)
     }
 
     _ClientIPInfo objServerIPInfo;
-    sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+    objServerIPInfo.m_strClientIP = m_addrRemote.get_host_addr();
     objServerIPInfo.m_u2Port = m_addrRemote.get_port_number();
     m_pClientUDPMessage->RecvData(pMbData->rd_ptr(), u4Len, objServerIPInfo);
 

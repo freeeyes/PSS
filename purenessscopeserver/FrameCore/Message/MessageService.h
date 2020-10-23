@@ -19,16 +19,16 @@
 #include "MessageDyeingManager.h"
 #include "ObjectLru.h"
 #include "PerformanceCounter.h"
+#include "BuffPacketManager.h"
+#include "PacketParsePool.h"
 
 #if PSS_PLATFORM == PLATFORM_WIN
-#include "ProConnectHandler.h"
 #include "WindowsCPU.h"
 #else
-#include "ConnectHandler.h"
 #include "LinuxCPU.h"
 #endif
 
-enum MESSAGE_SERVICE_THREAD_STATE
+enum class MESSAGE_SERVICE_THREAD_STATE
 {
     THREAD_RUN = 0,               //线程正常运行
     THREAD_MODULE_UNLOAD,         //模块重载，需要线程支持此功能
@@ -53,7 +53,7 @@ public:
 
     bool Start();
 
-    bool PutMessage(CMessage* pMessage);
+    bool PutMessage(CWorkThreadMessage* pMessage);
     bool PutUpdateCommandMessage(uint32 u4UpdateIndex);
 
     _ThreadInfo* GetThreadInfo();
@@ -75,16 +75,26 @@ public:
 
     uint32 GetThreadID() const;
 
+    uint32 GetHandlerCount();                                              //得到当前线程中Handler的个数
+
     void CopyMessageManagerList();                                         //从MessageManager中获得信令列表副本
 
-    CMessage* CreateMessage();
-    void DeleteMessage(CMessage* pMessage);
+    CWorkThreadMessage* CreateMessage();
+    void DeleteMessage(CWorkThreadMessage* pMessage);
 
     void GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_Account);  //得到当前列表描述信息
 
+    bool SendPostMessage(CSendMessageInfo objSendMessageInfo);                //发送数据
+    bool SendCloseMessage(uint32 u4ConnectID);                                //关闭指定链接 
+
+    _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                        //得到指定链接的客户单ID
+    _ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID);
+
 private:
-    bool ProcessMessage(CMessage* pMessage, uint32 u4ThreadID);
-    void CloseCommandList();                                                //清理当前信令列表副本
+    bool ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4ThreadID); //处理接收事件
+    bool ProcessSendMessage(CWorkThreadMessage* pMessage, uint32 u4ThreadID); //处理发送事件
+    bool ProcessSendClose(CWorkThreadMessage* pMessage, uint32 u4ThreadID);   //处理发送事件
+    void CloseCommandList();                                                  //清理当前信令列表副本
     CClientCommandList* GetClientCommandList(uint16 u2CommandID);
     bool DoMessage(const ACE_Time_Value& tvBegin, IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost, uint16& u2Count, bool& bDeleteFlag);
 
@@ -103,14 +113,17 @@ private:
     bool                           m_blIsCpuAffinity    = false;                 //是否CPU绑定
     bool                           m_blOverload         = false;                 //是否过载   
 
-    MESSAGE_SERVICE_THREAD_STATE   m_emThreadState      = THREAD_STOP;           //当前工作线程状态
+    MESSAGE_SERVICE_THREAD_STATE   m_emThreadState      = MESSAGE_SERVICE_THREAD_STATE::THREAD_STOP; //当前工作线程状态
 
     _ThreadInfo                    m_ThreadInfo;           //当前线程信息
     CWorkThreadAI                  m_WorkThreadAI;         //线程自我监控的AI逻辑
     CCommandAccount                m_CommandAccount;       //当前线程命令统计数据
+
     CMessagePool                   m_MessagePool;          //消息池
+    CDeviceHandlerPool             m_DeviceHandlerPool;    //对象池 
 
     CHashTable<CClientCommandList>                      m_objClientCommandList;  //可执行的信令列表
+    CHashTable<CWorkThread_Handler_info>                m_objHandlerList;        //对应的Handler列表
 
     ACE_Thread_Mutex m_mutex;
     ACE_Condition<ACE_Thread_Mutex> m_cond;
@@ -127,7 +140,7 @@ public:
     virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);
 
     bool Init(uint32 u4ThreadCount = MAX_MSG_THREADCOUNT, uint32 u4MaxQueue = MAX_MSG_THREADQUEUE, uint32 u4LowMask = MAX_MSG_MASK);
-    bool PutMessage(CMessage* pMessage);                                                     //发送到相应的线程去处理
+    bool PutMessage(CWorkThreadMessage* pMessage);                                                     //发送到相应的线程去处理
     bool PutUpdateCommandMessage(uint32 u4UpdateIndex);                                      //发送消息同步所有的工作线程命令副本
     void Close();
 
@@ -148,8 +161,8 @@ public:
     void GetCommandAlertData(vecCommandAlertData& CommandAlertDataList);                      //得到所有超过告警阀值的命令
     void SaveCommandDataLog();                                                                //存储统计日志
 
-    CMessage* CreateMessage(uint32 u4ConnectID, EM_CONNECT_IO_TYPE u1PacketType);             //从子线程中获取一个Message对象
-    void DeleteMessage(uint32 u4ConnectID, CMessage* pMessage);                               //从子线程中回收一个Message对象
+    CWorkThreadMessage* CreateMessage(uint32 u4ConnectID, EM_CONNECT_IO_TYPE u1PacketType);   //从子线程中获取一个Message对象
+    void DeleteMessage(CWorkThreadMessage* pMessage);                                         //从子线程中回收一个Message对象
 
     void CopyMessageManagerList();                                                            //从MessageManager中获得信令列表副本
 
@@ -160,15 +173,22 @@ public:
     void GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_Account);                  //得到当前列表描述信息
     bool CheckCPUAndMemory(bool blTest = false);                                              //检查CPU和内存
 
+    bool Send_Post_Message(CSendMessageInfo objSendMessageInfo);                              //发送数据信息
+    bool Send_Close_Message(uint32 u4ConnectID);                                              //关闭客户端连接
+    _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                                        //得到指定链接的客户单ID 
+    _ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID);                                         //得到监听的IP信息
+    uint32 GetHandlerCount();                                                                 //得到当前连接总数
+
 private:
+    uint32 GetWorkThreadID(uint32 u4ConnectID, EM_CONNECT_IO_TYPE u1PacketType);              //根据操作类型和ConnectID计算出那个工作线程ID
+
     bool StartTimer();
     bool KillTimer();
 
-    bool CheckWorkThread(const ACE_Time_Value& tvNow);                                                 //检查所有的工作线程状态
-    bool CheckPacketParsePool() const;                                                                 //检查正在使用的消息解析对象
-    bool CheckPlugInState() const;                                                                     //检查所有插件状态
-    int32 GetWorkThreadID(uint32 u4ConnectID, EM_CONNECT_IO_TYPE u1PacketType);                        //根据操作类型和ConnectID计算出那个工作线程ID
-
+    bool CheckWorkThread(const ACE_Time_Value& tvNow);                                        //检查所有的工作线程状态
+    bool CheckPacketParsePool() const;                                                        //检查正在使用的消息解析对象
+    bool CheckPlugInState() const;                                                            //检查所有插件状态
+   
 	typedef vector<CMessageService*> vecMessageService;
 	vecMessageService                                   m_vecMessageService;
     uint32                                              m_u4MaxQueue           = 0;              //线程中最大消息对象个数

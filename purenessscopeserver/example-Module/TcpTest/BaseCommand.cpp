@@ -129,16 +129,15 @@ int CBaseCommand::Do_Base(IMessage* pMessage)
 
     m_pServerObject->GetPacketManager()->Delete(pBodyPacket);
 
+    CSend_Param objSendParam;
+
     if(NULL != m_pServerObject->GetConnectManager())
     {
         //发送全部数据
         m_pServerObject->GetConnectManager()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID,
-                pResponsesPacket,
-                SENDMESSAGE_JAMPNOMAL,
                 u2PostCommandID,
-                PACKET_SEND_IMMEDIATLY,
-                PACKET_IS_FRAMEWORK_RECYC,
-                nMessageID);
+                pResponsesPacket,
+                objSendParam);
     }
     else
     {
@@ -213,14 +212,12 @@ int CBaseCommand::SendClient(_PacketInfo BodyPacket, short nCommand, uint32 nCon
 	int nMessageID = 0;
 
     uint32 u4CommandSize = pResponsesPacket->GetPacketLen();
+    CSend_Param objSendParam;
 
 	nRet = m_pServerObject->GetConnectManager()->PostMessage(nConnectId,
+        u2Command,
 		pResponsesPacket,
-		SENDMESSAGE_JAMPNOMAL,
-		u2PostCommandID,
-		PACKET_SEND_IMMEDIATLY,
-		PACKET_IS_FRAMEWORK_RECYC,
-		nMessageID);
+        objSendParam);
 
 	return nRet;
 	__LEAVE_FUNCTION_WITHRETURN(0);

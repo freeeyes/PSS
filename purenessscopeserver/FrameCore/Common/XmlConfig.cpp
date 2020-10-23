@@ -113,9 +113,7 @@ bool xmlSendInfo::Init(CXmlOpeation* pXmlOperation)
         && pXmlOperation->Read_XML_Data_Single_Uint16("SendInfo", "SendQueueMax", SendQueueMax)
         && pXmlOperation->Read_XML_Data_Single_Uint16("SendInfo", "PutQueueTimeout", PutQueueTimeout)
         && pXmlOperation->Read_XML_Data_Single_Uint32("SendInfo", "BlockCount", BlockCount)
-        && pXmlOperation->Read_XML_Data_Single_Uint32("SendInfo", "MaxBlockSize", MaxBlockSize)
-        && pXmlOperation->Read_XML_Data_Single_Uint16("SendInfo", "SendQueueTimeout", SendQueueTimeout)
-        && pXmlOperation->Read_XML_Data_Single_Uint16("SendInfo", "SendQueueCount", SendQueueCount))
+        && pXmlOperation->Read_XML_Data_Single_Uint32("SendInfo", "MaxBlockSize", MaxBlockSize))
     {
         SendDatamark = MaxBlockSize;
         bKet = pXmlOperation->Read_XML_Data_Single_Uint16("SendInfo", "TcpNodelay", TcpNodelay);

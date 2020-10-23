@@ -133,7 +133,7 @@ bool Udp_Common_Send_WorkThread(CPacketParse*& pPacketParse, const ACE_INET_Addr
     _MakePacket objMakePacket;
     objMakePacket.m_u4ConnectID = UDP_HANDER_ID;
     objMakePacket.m_pPacketParse = pPacketParse;
-    objMakePacket.m_u1PacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_UDP;
+    objMakePacket.m_emPacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_UDP;
     objMakePacket.m_AddrRemote = addrRemote;
     objMakePacket.m_AddrListen = addrLocal;
     objMakePacket.m_u1Option = PACKET_PARSE;
@@ -207,7 +207,7 @@ uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPa
 void Send_MakePacket_Queue(_MakePacket objMakePacket, const char* pLocalIP, uint16 u2LocalPort)
 {
     //需要回调发送成功回执
-    if (EM_CONNECT_IO_TYPE::CONNECT_IO_TCP == objMakePacket.m_u1PacketType || EM_CONNECT_IO_TYPE::CONNECT_IO_UDP == objMakePacket.m_u1PacketType)
+    if (EM_CONNECT_IO_TYPE::CONNECT_IO_TCP == objMakePacket.m_emPacketType || EM_CONNECT_IO_TYPE::CONNECT_IO_UDP == objMakePacket.m_emPacketType)
     {
         if (ACE_OS::strcmp("INADDR_ANY", pLocalIP) == 0)
         {
@@ -289,8 +289,6 @@ _ClientConnectInfo Tcp_Common_ClientInfo(_ClientConnectInfo_Param const& obj_Cli
     ClientConnectInfo.m_u4BeginTime = (uint32)obj_ClientConnectInfo_Param.m_atvConnect.sec();
     ClientConnectInfo.m_u4AliveTime = (uint32)(ACE_OS::gettimeofday().sec() - obj_ClientConnectInfo_Param.m_atvConnect.sec());
     ClientConnectInfo.m_u4RecvQueueCount = obj_ClientConnectInfo_Param.m_u4RecvQueueCount;
-    ClientConnectInfo.m_u8RecvQueueTimeCost = obj_ClientConnectInfo_Param.m_u8RecvQueueTimeCost;
-    ClientConnectInfo.m_u8SendQueueTimeCost = obj_ClientConnectInfo_Param.m_u8SendQueueTimeCost;
 
     return ClientConnectInfo;
 }
@@ -302,7 +300,7 @@ bool Tcp_Common_Send_Input_To_Cache(_Input_To_Cache_Param obj_Input_To_Cache_Par
     //先判断要发送的数据长度，看看是否可以放入缓冲，缓冲是否已经放满。
     uint32 u4SendPacketSize = 0;
 
-    if (obj_Input_To_Cache_Param.m_u1SendType == SENDMESSAGE_NOMAL)
+    if (EM_SEND_PACKET_PARSE::EM_SENDMESSAGE_NOMAL == obj_Input_To_Cache_Param.m_emSendType)
     {
         u4SendPacketSize = App_PacketParseLoader::instance()->GetPacketParseInfo(obj_Input_To_Cache_Param.m_u4PacketParseInfoID)->Make_Send_Packet_Length(obj_Input_To_Cache_Param.m_u4ConnectID, pBuffPacket->GetPacketLen(), obj_Input_To_Cache_Param.m_u2CommandID);
     }
@@ -331,7 +329,7 @@ bool Tcp_Common_Send_Input_To_Cache(_Input_To_Cache_Param obj_Input_To_Cache_Par
     {
         //添加进缓冲区
         //SENDMESSAGE_NOMAL是需要包头的时候，否则，不组包直接发送
-        if (obj_Input_To_Cache_Param.m_u1SendType == SENDMESSAGE_NOMAL)
+        if (EM_SEND_PACKET_PARSE::EM_SENDMESSAGE_NOMAL == obj_Input_To_Cache_Param.m_emSendType)
         {
             //这里组成返回数据包
             App_PacketParseLoader::instance()->GetPacketParseInfo(obj_Input_To_Cache_Param.m_u4PacketParseInfoID)->Make_Send_Packet(obj_Input_To_Cache_Param.m_u4ConnectID, pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pBlockMessage, obj_Input_To_Cache_Param.m_u2CommandID);
@@ -360,7 +358,7 @@ bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
         return false;
     }
 
-    if (obj_Send_Packet_Param.m_u1SendType == SENDMESSAGE_NOMAL)
+    if (EM_SEND_PACKET_PARSE::EM_SENDMESSAGE_NOMAL == obj_Send_Packet_Param.m_emSendType)
     {
         u4PacketSize = App_PacketParseLoader::instance()->GetPacketParseInfo(obj_Send_Packet_Param.m_u4PacketParseInfoID)->Make_Send_Packet_Length(obj_Send_Packet_Param.m_u4ConnectID, pBuffPacket->GetPacketLen(), obj_Send_Packet_Param.m_u2CommandID);
 
@@ -411,10 +409,9 @@ bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
     }
     else
     {
-        OUR_DEBUG((LM_DEBUG, "[Tcp_Common_Make_Send_Packet](%d) commandID=%d,m_u1SendType=%d, pBlockMessage is 0.\n", 
+        OUR_DEBUG((LM_DEBUG, "[Tcp_Common_Make_Send_Packet](%d) commandID=%d, pBlockMessage is 0.\n", 
             obj_Send_Packet_Param.m_u4ConnectID, 
-            obj_Send_Packet_Param.m_u2CommandID,
-            obj_Send_Packet_Param.m_u1SendType));
+            obj_Send_Packet_Param.m_u2CommandID));
 
         return false;
     }
@@ -641,25 +638,3 @@ _ClientNameInfo Tcp_Common_ClientNameInfo(uint32 u4ConnectID, const char* pConne
     return ClientNameInfo;
 }
 
-void Tcp_Common_Manager_Init(uint16 u2Index, CCommandAccount& objCommandAccount, uint16& u2SendQueueMax, CSendCacheManager& objSendCacheManager)
-{
-    //按照线程初始化统计模块的名字
-	stringstream ss_format;
-    ss_format << "发送线程("
-        << u2Index
-        << ")";
-
-	std::string strThreadName = ss_format.str();
-    objCommandAccount.InitName(strThreadName.c_str(), GetXmlConfigAttribute(xmlCommandAccount)->MaxCommandCount);
-
-    //初始化统计模块功能
-    objCommandAccount.Init(GetXmlConfigAttribute(xmlCommandAccount)->Account,
-                           GetXmlConfigAttribute(xmlCommandAccount)->FlowAccount,
-                           GetXmlConfigAttribute(xmlThreadInfo)->DisposeTimeout);
-
-    //初始化队列最大发送缓冲数量
-    u2SendQueueMax = GetXmlConfigAttribute(xmlSendInfo)->SendQueueMax;
-
-    //初始化发送缓冲池
-    objSendCacheManager.Init(GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount, GetXmlConfigAttribute(xmlSendInfo)->MaxBlockSize);
-}

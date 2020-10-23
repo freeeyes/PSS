@@ -77,11 +77,8 @@ void CFileTestManager::HandlerServerResponse(uint32 u4ConnectID)
             OUR_DEBUG((LM_INFO, "[CFileTestManager::HandlerServerResponse]Response time too long m_u4ExpectTime:%d.\n",m_u4ExpectTime));
         }
 
-#ifndef WIN32
-        App_ConnectManager::instance()->Close(u4ConnectID);
-#else
-        App_ProConnectManager::instance()->Close(u4ConnectID);
-#endif
+        App_HandlerManager::instance()->CloseConnect(u4ConnectID);
+
         //回收对象类型
         m_objResponseRecordList.Del_Hash_Data(szConnectID);
         SAFE_DELETE(pResponseRecord);
@@ -359,48 +356,6 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
         }
     }
 
-#ifndef WIN32
-    CConnectHandler* pConnectHandler = NULL;
-
-    for (uint32 iLoop = 0; iLoop < m_u4ConnectCount; iLoop++)
-    {
-        pConnectHandler = App_ConnectHandlerPool::instance()->Create();
-
-        if (NULL != pConnectHandler)
-        {
-            //文件数据包测试不需要用到pProactor对象，因为不需要实际发送数据，所以这里可以直接设置一个固定的pProactor
-            ACE_Reactor* pReactor = App_ReactorManager::instance()->GetAce_Client_Reactor(0);
-            pConnectHandler->reactor(pReactor);
-            pConnectHandler->SetPacketParseInfoID(m_u4ParseID);
-
-            uint32 u4ConnectID = pConnectHandler->file_open(dynamic_cast<IFileTestManager*>(this));
-
-            AddResponseRecordList(u4ConnectID, tv);
-        }
-    }
-
-#else
-    CProConnectHandler* ptrProConnectHandle = NULL;
-
-    for (uint32 iLoop = 0; iLoop < m_u4ConnectCount; iLoop++)
-    {
-        ptrProConnectHandle = App_ProConnectHandlerPool::instance()->Create();
-
-        if (NULL != ptrProConnectHandle)
-        {
-            //文件数据包测试不需要用到pProactor对象，因为不需要实际发送数据，所以这里可以直接设置一个固定的pProactor
-            ACE_Proactor* pPractor = App_ProactorManager::instance()->GetAce_Client_Proactor(0);
-            ptrProConnectHandle->proactor(pPractor);
-            ptrProConnectHandle->SetPacketParseInfoID(m_u4ParseID);
-
-            uint32 u4ConnectID = ptrProConnectHandle->file_open(dynamic_cast<IFileTestManager*>(this));
-
-            AddResponseRecordList(u4ConnectID, tv);
-        }
-    }
-
-#endif
-
     //循环将数据包压入对象
     for (const FileTestDataInfoSt& objFileTestDataInfo : m_vecFileTestDataInfoSt)
     {
@@ -409,12 +364,7 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 
         for (const ResponseRecordSt* pResponserecordst : vecExistList)
         {
-            uint32 u4ConnectID = pResponserecordst->m_u4ConnectID;
-#if PSS_PLATFORM == PLATFORM_WIN
-            App_ProConnectManager::instance()->handle_write_file_stream(u4ConnectID, objFileTestDataInfo.m_szData, objFileTestDataInfo.m_u4DataLength, (uint8)m_u4ParseID);
-#else
-            App_ConnectManager::instance()->handle_write_file_stream(u4ConnectID, objFileTestDataInfo.m_szData, objFileTestDataInfo.m_u4DataLength, (uint8)m_u4ParseID);
-#endif
+            //暂不实现
         }
     }
 

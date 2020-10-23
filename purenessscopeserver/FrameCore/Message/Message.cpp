@@ -8,43 +8,6 @@
 
 CMessage::CMessage(void)
 {
-    //这里设置消息队列模块指针内容，这样就不必反复的new和delete，提升性能
-    //指针关系也可以在这里直接指定，不必使用的使用再指定
-    m_pmbQueuePtr  = new ACE_Message_Block(sizeof(CMessage*));
-
-    CMessage** ppMessage = (CMessage**)m_pmbQueuePtr->base();
-    *ppMessage = this;
-}
-
-void CMessage::SetHashID(int nHasnID)
-{
-    m_nHashID = nHasnID;
-}
-
-int CMessage::GetHashID() const
-{
-    return m_nHashID;
-}
-
-const char* CMessage::GetError() const
-{
-    return m_szError;
-}
-
-ACE_Message_Block* CMessage::GetQueueMessage()
-{
-    return m_pmbQueuePtr;
-}
-
-void CMessage::SetMessageBase(_MessageBase* pMessageBase)
-{
-    if(NULL != m_pMessageBase)
-    {
-        delete m_pMessageBase;
-        m_pMessageBase = NULL;
-    }
-
-    m_pMessageBase = pMessageBase;
 }
 
 ACE_Message_Block* CMessage::GetMessageHead()
@@ -57,14 +20,14 @@ ACE_Message_Block* CMessage::GetMessageBody()
     return m_pmbBody;
 }
 
-_MessageBase* CMessage::GetMessageBase() const
+_MessageBase* CMessage::GetMessageBase()
 {
-    return m_pMessageBase;
+    return &m_MessageBase;
 }
 
 bool CMessage::GetPacketHead(_PacketInfo& PacketInfo)
 {
-    if(m_pmbHead != NULL)
+    if(nullptr != m_pmbHead)
     {
         PacketInfo.m_pData    = m_pmbHead->rd_ptr();
         PacketInfo.m_nDataLen = (int)m_pmbHead->length();
@@ -78,7 +41,7 @@ bool CMessage::GetPacketHead(_PacketInfo& PacketInfo)
 
 bool CMessage::GetPacketBody(_PacketInfo& PacketInfo)
 {
-    if(m_pmbBody != NULL)
+    if(nullptr != m_pmbBody)
     {
         PacketInfo.m_pData    = m_pmbBody->rd_ptr();
         PacketInfo.m_nDataLen = (int)m_pmbBody->length();
@@ -102,59 +65,16 @@ bool CMessage::SetPacketBody(ACE_Message_Block* pmbBody)
     return true;
 }
 
-void CMessage::Close()
-{
-    if(NULL != m_pmbHead)
-    {
-        App_MessageBlockManager::instance()->Close(m_pmbHead);
-        m_pmbHead = NULL;
-    }
-
-    if(NULL != m_pmbBody)
-    {
-        App_MessageBlockManager::instance()->Close(m_pmbBody);
-        m_pmbBody = NULL;
-    }
-
-    if(NULL != m_pmbQueuePtr)
-    {
-        m_pmbQueuePtr->release();
-        m_pmbQueuePtr = NULL;
-    }
-
-    SAFE_DELETE(m_pMessageBase);
-}
-
-void CMessage::Clear()
-{
-    if(NULL != m_pmbHead)
-    {
-        App_MessageBlockManager::instance()->Close(m_pmbHead);
-        m_pmbHead = NULL;
-    }
-
-    if(NULL != m_pmbBody)
-    {
-        App_MessageBlockManager::instance()->Close(m_pmbBody);
-        m_pmbBody = NULL;
-    }
-
-    if (NULL != m_pMessageBase)
-    {
-        m_pMessageBase->Clear();
-    }
-}
-
 CMessagePool::CMessagePool()
 {
 }
 
-void CMessagePool::Init_Callback(int nIndex, CMessage* pMessage)
+void CMessagePool::Init_Callback(int nIndex, CWorkThreadMessage* pMessage)
 {
     pMessage->SetHashID(nIndex);
 }
 
-void CMessagePool::Close_Callback(int nIndex, CMessage* pMessage)
+void CMessagePool::Close_Callback(int nIndex, CWorkThreadMessage* pMessage)
 {
     ACE_UNUSED_ARG(nIndex);
 
@@ -166,42 +86,150 @@ void CMessagePool::Close_Callback(int nIndex, CMessage* pMessage)
 
 int CMessagePool::GetUsedCount()
 {
-    return CObjectPoolManager<CMessage, ACE_Recursive_Thread_Mutex>::GetUsedCount();
+    return CObjectPoolManager<CWorkThreadMessage, ACE_Recursive_Thread_Mutex>::GetUsedCount();
 }
 
 int CMessagePool::GetFreeCount()
 {
-    return CObjectPoolManager<CMessage, ACE_Recursive_Thread_Mutex>::GetFreeCount();
+    return CObjectPoolManager<CWorkThreadMessage, ACE_Recursive_Thread_Mutex>::GetFreeCount();
 }
 
 void CMessagePool::GetCreateInfoList(vector<_Object_Create_Info>& objCreateList)
 {
-    return CObjectPoolManager<CMessage, ACE_Recursive_Thread_Mutex>::GetCreateInfoList(objCreateList);
+    return CObjectPoolManager<CWorkThreadMessage, ACE_Recursive_Thread_Mutex>::GetCreateInfoList(objCreateList);
 }
 
-CMessage* CMessagePool::Create()
+CWorkThreadMessage* CMessagePool::Create()
 {
-    return CObjectPoolManager<CMessage, ACE_Recursive_Thread_Mutex>::Create(__FILE__, __LINE__);
+    return CObjectPoolManager<CWorkThreadMessage, ACE_Recursive_Thread_Mutex>::Create(__FILE__, __LINE__);
 }
 
-bool CMessagePool::Delete(CMessage* pMessage)
+bool CMessagePool::Delete(CWorkThreadMessage* pWorkThreadMessage)
 {
-    if(NULL == pMessage)
+    if(NULL == pWorkThreadMessage)
     {
         return false;
     }
 
-    pMessage->Clear();
-
-    bool blState = CObjectPoolManager<CMessage, ACE_Recursive_Thread_Mutex>::Delete_withoutLock(pMessage->GetHashID(), pMessage);
+    bool blState = CObjectPoolManager<CWorkThreadMessage, ACE_Recursive_Thread_Mutex>::Delete_withoutLock(pWorkThreadMessage->GetHashID(), pWorkThreadMessage);
 
     if(false == blState)
     {
-        OUR_DEBUG((LM_INFO, "[CMessagePool::Delete]HashID=%d(0x%08x).\n", pMessage->GetHashID(), pMessage));
+        OUR_DEBUG((LM_INFO, "[CMessagePool::Delete]HashID=%d(0x%08x).\n", pWorkThreadMessage->GetHashID(), pWorkThreadMessage));
     }
 
     return true;
 }
 
+CWorkThreadMessage::CWorkThreadMessage()
+{
+	//这里设置消息队列模块指针内容，这样就不必反复的new和delete，提升性能
+    //指针关系也可以在这里直接指定，不必使用的使用再指定
+	m_pmbQueuePtr = new ACE_Message_Block(sizeof(CMessage*));
 
+    CWorkThreadMessage** ppMessage = (CWorkThreadMessage**)m_pmbQueuePtr->base();
+	*ppMessage = this;
+}
+
+ACE_Message_Block* CWorkThreadMessage::GetQueueMessage()
+{
+    return m_pmbQueuePtr;
+}
+
+void CWorkThreadMessage::SetHashID(int nHashID)
+{
+    m_nHashID = nHashID;
+}
+
+int CWorkThreadMessage::GetHashID()
+{
+    return m_nHashID;
+}
+
+void CWorkThreadMessage::Clear()
+{
+	if (nullptr != m_pmbRecvHead)
+	{
+		m_pmbRecvHead->release();
+		m_pmbRecvHead = nullptr;
+	}
+
+	if (nullptr != m_pmbRecvBody)
+	{
+		m_pmbRecvBody->release();
+		m_pmbRecvBody = nullptr;
+	}
+}
+
+void CWorkThreadMessage::Close()
+{
+	if (nullptr != m_pmbRecvHead)
+	{
+		m_pmbRecvHead->release();
+		m_pmbRecvHead = nullptr;
+	}
+
+	if (nullptr != m_pmbRecvBody)
+	{
+		m_pmbRecvBody->release();
+		m_pmbRecvBody = nullptr;
+	}
+
+	if (nullptr != m_pmbQueuePtr)
+	{
+		m_pmbQueuePtr->release();
+		m_pmbQueuePtr = nullptr;
+	}
+}
+
+CDeviceHandlerPool::CDeviceHandlerPool()
+{
+}
+
+void CDeviceHandlerPool::Init_Callback(int nIndex, CWorkThread_Handler_info* pHandler)
+{
+    pHandler->SetHashID(nIndex);
+}
+
+void CDeviceHandlerPool::Close_Callback(int nIndex, CWorkThread_Handler_info* pHandler)
+{
+    pHandler->Clear();
+}
+
+CWorkThread_Handler_info* CDeviceHandlerPool::Create()
+{
+    return CObjectPoolManager<CWorkThread_Handler_info, ACE_Recursive_Thread_Mutex>::Create(__FILE__, __LINE__);
+}
+
+bool CDeviceHandlerPool::Delete(CWorkThread_Handler_info* pHandler)
+{
+	if (NULL == pHandler)
+	{
+		return false;
+	}
+
+	bool blState = CObjectPoolManager<CWorkThread_Handler_info, ACE_Recursive_Thread_Mutex>::Delete_withoutLock(pHandler->GetHashID(), pHandler);
+
+	if (false == blState)
+	{
+		OUR_DEBUG((LM_INFO, "[CDeviceHandlerPool::Delete]HashID=%d(0x%08x).\n", pHandler->GetHashID(), pHandler));
+	}
+
+	return true;
+}
+
+int CDeviceHandlerPool::GetUsedCount()
+{
+    return CObjectPoolManager<CWorkThread_Handler_info, ACE_Recursive_Thread_Mutex>::GetUsedCount();
+}
+
+int CDeviceHandlerPool::GetFreeCount()
+{
+    return CObjectPoolManager<CWorkThread_Handler_info, ACE_Recursive_Thread_Mutex>::GetFreeCount();
+}
+
+void CDeviceHandlerPool::GetCreateInfoList(vector<_Object_Create_Info>& objCreateList)
+{
+    return CObjectPoolManager<CWorkThread_Handler_info, ACE_Recursive_Thread_Mutex>::GetCreateInfoList(objCreateList);
+}
 

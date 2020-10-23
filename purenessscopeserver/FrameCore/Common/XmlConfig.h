@@ -143,8 +143,6 @@ public:
     uint32 SendDatamark     = 0;
     uint32 BlockCount       = 0;
     uint16 SendTimeout      = 0;
-    uint16 SendQueueTimeout = 0;
-    uint16 SendQueueCount   = 0;
     uint16 PutQueueTimeout  = 0;
     xmlSendInfo(XmlConfig config, const char* name) : IConfigOpeation::IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);

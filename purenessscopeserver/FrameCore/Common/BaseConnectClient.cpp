@@ -27,9 +27,9 @@ bool Recv_Common_Dispose_Client_Message(uint16 u2CommandID, ACE_Message_Block* p
 int Make_Common_Dispose_Client_WorkTread_Message(uint16 u2CommandID, uint32 u4ServerID, ACE_Message_Block* pmblk, const ACE_INET_Addr& AddrRemote)
 {
     //组织数据
-    CMessage* pMessage = App_MessageServiceGroup::instance()->CreateMessage(u4ServerID, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
+    CWorkThreadMessage* pWorkThreadMessage = App_MessageServiceGroup::instance()->CreateMessage(u4ServerID, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
 
-    if (NULL == pMessage)
+    if (nullptr == pWorkThreadMessage)
     {
         //放入消息框架失败
         OUR_DEBUG((LM_ERROR, "[CConnectClient::SendMessageGroup] ConnectID = %d CreateMessage fail.\n", u4ServerID));
@@ -40,35 +40,23 @@ int Make_Common_Dispose_Client_WorkTread_Message(uint16 u2CommandID, uint32 u4Se
     {
         ACE_Message_Block* pMBBHead = App_MessageBlockManager::instance()->Create(sizeof(uint32));
 
-        if (NULL == pMBBHead)
-        {
-            OUR_DEBUG((LM_ERROR, "[CConnectClient::SendMessageGroup] ConnectID = %d pMBBHead fail.\n", u4ServerID));
-            App_MessageBlockManager::instance()->Close(pmblk);
-            return -1;
-        }
-
         //添加消息包头
         auto u4PacketLen = (uint32)pmblk->length();
         memcpy_safe((char*)&u4PacketLen, sizeof(uint32), pMBBHead->wr_ptr(), sizeof(uint32));
         pMBBHead->wr_ptr(sizeof(uint32));
 
-        sprintf_safe(pMessage->GetMessageBase()->m_szListenIP, MAX_BUFF_20, "%s", AddrRemote.get_host_addr());
-        sprintf_safe(pMessage->GetMessageBase()->m_szIP, MAX_BUFF_20, "127.0.0.1");
-        pMessage->GetMessageBase()->m_u2Cmd = u2CommandID;
-        pMessage->GetMessageBase()->m_u4ConnectID = u4ServerID;
-        pMessage->GetMessageBase()->m_u4ListenPort = (uint32)AddrRemote.get_port_number();
-        pMessage->GetMessageBase()->m_tvRecvTime = ACE_OS::gettimeofday();
-        pMessage->GetMessageBase()->m_u1ResouceType = RESOUCE_FROM_SERVER;
-        pMessage->GetMessageBase()->m_u4HeadSrcSize = sizeof(uint32);
-        pMessage->GetMessageBase()->m_u4BodySrcSize = u4PacketLen;
-        pMessage->SetPacketHead(pMBBHead);
-        pMessage->SetPacketBody(pmblk);
+        pWorkThreadMessage->m_u2Cmd = u2CommandID;
+        pWorkThreadMessage->m_AddrRemote = AddrRemote;
+        pWorkThreadMessage->m_pmbRecvHead = pMBBHead;
+        pWorkThreadMessage->m_pmbRecvBody = pmblk;
+        pWorkThreadMessage->m_emResouceType = EM_PACKET_RESOURCE::PACKET_RESOURCE_FROM_SERVER;
+        pWorkThreadMessage->m_emDirect = EM_WORKTHREAD_DIRECT::EM_WORKTHREAD_DIRECT_INPUT;
 
         //将要处理的消息放入消息处理线程
-        if (false == App_MessageServiceGroup::instance()->PutMessage(pMessage))
+        if (false == App_MessageServiceGroup::instance()->PutMessage(pWorkThreadMessage))
         {
             OUR_DEBUG((LM_ERROR, "[CConnectClient::SendMessageGroup] App_MessageServiceGroup::instance()->PutMessage Error.\n"));
-            App_MessageServiceGroup::instance()->DeleteMessage(u4ServerID, pMessage);
+            App_MessageServiceGroup::instance()->DeleteMessage(pWorkThreadMessage);
             return -1;
         }
     }

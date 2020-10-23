@@ -185,12 +185,6 @@ static bool Convert_Version(int nTagVserion)
 #define MAX_UDP_PACKET_LEN                1024   //UDP数据包的最大大小
 #define UDP_HANDER_ID                     0      //默认UDP的ConnectID
 
-#define RESOUCE_FROM_CLIENT               0      //客户端数据包
-#define RESOUCE_FROM_SERVER               1      //服务器间数据包
-
-#define SENDMESSAGE_NOMAL                 0      //默认发送数据包模式(走PacketPrase端口)
-#define SENDMESSAGE_JAMPNOMAL             1      //发送数据包模式(不走PacketPrase端口)
-
 #define COMMAND_TYPE_IN                   0      //进入服务器命令包状态（用于CommandData，统计命令信息类）
 #define COMMAND_TYPE_OUT                  1      //出服务器的命令包状态（用于CommandData，统计命令信息类）
 
@@ -206,10 +200,6 @@ static bool Convert_Version(int nTagVserion)
 #define PACKET_IS_FRAMEWORK_RECYC         true   //框架回收（数据包回收机制）
 #define PACKET_IS_SELF_RECYC              false  //由逻辑自己回收（数据包回收机制）
 
-#define PACKET_SEND_IMMEDIATLY            0      //立刻发送（数据包发送机制）
-#define PACKET_SEND_CACHE                 1      //缓存发送（数据包发送机制）
-#define PACKET_SEND_FIN_CLOSE             2      //立即发送，发送完成后关闭连接（数据包发送机制）
-
 #define CONNECT_LIMIT_RETRY 30                   //初始化中间服务器链接后定期检查，单位是秒
 
 #define TCP_NODELAY_ON      0                    //TCP Nagle算法开关开关打开
@@ -220,6 +210,13 @@ static bool Convert_Version(int nTagVserion)
 #define OUTPUT_CHART_JSON_Y "{\"name\":\"%d\",\"type\": \"line\",\"smooth\": \"true\",\"data\": [%s]}\n"
 #define OUTPUT_CHART_JSON "{\"title\": {\"text\": \"%s\"},\"tooltip\" : {}, \
 \"legend\" : {\"data\":[\"time\"]},\"xAxis\" : %s,\"yAxis\" : {\"type\":\"value\"}, \"series\": [%s]}"
+
+//数据来源
+enum class EM_PACKET_RESOURCE
+{
+    PACKET_RESOURCE_FROM_CLIENT = 0,      //客户端数据包
+    PACKET_RESOURCE_FROM_SERVER,          //服务器间数据包
+};
 
 //连接的性质类型
 enum class EM_CONNECT_IO_TYPE
@@ -324,6 +321,12 @@ enum class FILE_TEST_RESULT
 	RESULT_ERR_PROFILE,       //协议文件错误
 };
 
+enum class EM_SEND_PACKET_PARSE
+{
+    EM_SENDMESSAGE_NOMAL = 0,      //默认发送数据包模式(走PacketPrase端口)
+    EM_SENDMESSAGE_JAMPNOMAL,      //发送数据包模式(不走PacketPrase端口)
+};
+
 const int REACTOR_CLIENTDEFINE = 0;
 const int REACTOR_POSTDEFINE   = 1;
 const int REACTOR_UDPDEFINE    = 2;
@@ -420,6 +423,7 @@ const int DEBUG_OFF = 0;
 #define CLINET_LINK_ST_DISCONNECT  0x000b      //服务器间TCP连接断开
 #define CLINET_LINK_SU_CONNECT     0x000c      //服务器间UDP连接
 #define CLINET_LINK_SU_DISCONNECT  0x000d      //服务器间UDP连接断开
+#define CLINET_LINK_HANDLER_CLOSE  0x000e      //发送服务器断开指令 
 #define CLIENT_LINK_USER           0x0100      //用户信令开始序列头部
 //*****************************************************************
 
@@ -1593,26 +1597,8 @@ inline int32 SeeLock(int32 fd, int32 start, int32 len)
 //客户端IP信息
 struct _ClientIPInfo
 {
-    char  m_szClientIP[MAX_BUFF_50] = {'\0'};   //客户端的IP地址
-    int16 m_u2Port                   = 0;        //客户端的端口
-
-    _ClientIPInfo()
-    {
-    }
-
-    //拷贝构造函数
-    _ClientIPInfo(const _ClientIPInfo& ar)
-    {
-        sprintf_safe(this->m_szClientIP, MAX_BUFF_50, "%s", ar.m_szClientIP);
-        this->m_u2Port = ar.m_u2Port;
-    }
-
-    _ClientIPInfo& operator = (const _ClientIPInfo& ar)
-    {
-        sprintf_safe(this->m_szClientIP, MAX_BUFF_50, "%s", ar.m_szClientIP);
-        this->m_u2Port = ar.m_u2Port;
-        return *this;
-    }
+    string  m_strClientIP;      //客户端的IP地址
+    int16 m_u2Port  = 0;        //客户端的端口
 };
 
 //链接别名映射信息(用于PSS_ClientManager管理)

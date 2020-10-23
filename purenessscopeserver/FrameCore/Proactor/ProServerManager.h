@@ -1,6 +1,7 @@
 #ifndef _PROSERVERMANAGER_H
 #define _PROSERVERMANAGER_H
 
+#include "HandlerManager.h"
 #include "BaseServerManager.h"
 #include "ProConnectAccept.h"
 #include "ProConsoleAccept.h"

@@ -1065,7 +1065,7 @@ bool CClientProConnectManager::GetServerIPInfo(int nServerID, _ClientIPInfo& obj
     if(NULL != pClientInfo)
     {
         ACE_INET_Addr remote_addr = pClientInfo->GetServerAddr();
-        sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_50, remote_addr.get_host_addr());
+        objServerIPInfo.m_strClientIP = remote_addr.get_host_addr();
         objServerIPInfo.m_u2Port = remote_addr.get_port_number();
         return true;
     }

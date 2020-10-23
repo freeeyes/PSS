@@ -57,6 +57,10 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
     //初始化本地信令列表副本
     m_objClientCommandList.Init(App_MessageManager::instance()->GetMaxCommandCount());
 
+    //初始化当前线程Handler列表
+    uint16 u2PoolSize = GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount;
+    m_objHandlerList.Init(u2PoolSize);
+
     //初始化CommandID告警阀值相关
     for(const auto& objCommandInfo : GetXmlConfigAttribute(xmlCommandInfos)->vec)
     {
@@ -67,6 +71,7 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
 
     //设置消息池
     m_MessagePool.Init(GetXmlConfigAttribute(xmlMessage)->Msg_Pool, CMessagePool::Init_Callback);
+    m_DeviceHandlerPool.Init(u2PoolSize, CDeviceHandlerPool::Init_Callback);
 
     m_PerformanceCounter.init("WorkThread");
 }
@@ -75,12 +80,12 @@ bool CMessageService::Start()
 {
     if(0 != open())
     {
-        m_emThreadState = THREAD_STOP;
+        m_emThreadState = MESSAGE_SERVICE_THREAD_STATE::THREAD_STOP;
         return false;
     }
     else
     {
-        m_emThreadState = THREAD_RUN;
+        m_emThreadState = MESSAGE_SERVICE_THREAD_STATE::THREAD_RUN;
     }
 
     return true;
@@ -135,11 +140,21 @@ int CMessageService::svc(void)
         //使用内存池，这块内存不必再释放
     }
 
+	//关闭所有的链接
+	vector<CWorkThread_Handler_info*> handlerList;
+	m_objHandlerList.Get_All_Used(handlerList);
+
+    for (CWorkThread_Handler_info* handler_info : handlerList)
+    {
+        handler_info->m_pHandler->Close();
+    }
+    m_objHandlerList.Clear();
+
     OUR_DEBUG((LM_INFO,"[CMessageService::svc] svc finish!\n"));
     return 0;
 }
 
-bool CMessageService::PutMessage(CMessage* pMessage)
+bool CMessageService::PutMessage(CWorkThreadMessage* pMessage)
 {
     ACE_Message_Block* mb = pMessage->GetQueueMessage();
 
@@ -163,14 +178,17 @@ bool CMessageService::PutMessage(CMessage* pMessage)
     if(this->putq(mb, NULL) == -1)
     {
         int nError = errno;
-		OUR_DEBUG((LM_ERROR, "[CMessageService::PutMessage] Queue is Full errno = [%d].\n", nError));
-		//线程处理过载，写入日志
-		AppLogManager::instance()->WriteLog(LOG_SYSTEM_ERROR,
-			"[CMessageService::PutMessage](%d)Queue is Full begin errno = [%d]",
-			m_u4ThreadID,
-            nError);
+        if (false == m_blOverload)
+        {
+            OUR_DEBUG((LM_ERROR, "[CMessageService::PutMessage] Queue is Full errno = [%d].\n", nError));
+            //线程处理过载，写入日志
+            AppLogManager::instance()->WriteLog(LOG_SYSTEM_ERROR,
+                "[CMessageService::PutMessage](%d)Queue is Full begin errno = [%d]",
+                m_u4ThreadID,
+                nError);
 
-		m_blOverload = true;
+            m_blOverload = true;
+        }
            
         return false;
     }
@@ -212,62 +230,93 @@ bool CMessageService::PutUpdateCommandMessage(uint32 u4UpdateIndex)
     return true;
 }
 
-bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
+bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4ThreadID)
 {
-    if(NULL == pMessage)
+    //将数据转换成Message对象
+    CMessage objRecvMessage;
+    CWorkThread_Handler_info* pWorkThread_Handler_info = m_objHandlerList.Get_Hash_Box_Data_By_Uint32(pMessage->m_u4ConnectID);
+
+    //判断消息类型
+    if (CLIENT_LINK_CONNECT == pMessage->m_u2Cmd)
     {
-        OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage] [%d]pMessage is NULL.\n", u4ThreadID));
-        return false;
+        //如果是链接建立消息
+        if (nullptr == pWorkThread_Handler_info)
+        {
+            //添加链接对象
+            pWorkThread_Handler_info = m_DeviceHandlerPool.Create();
+
+
+            pWorkThread_Handler_info->m_strLocalIP   = pMessage->m_AddrListen.get_host_addr();
+            pWorkThread_Handler_info->m_u2LocalPort  = pMessage->m_AddrListen.get_port_number();
+			pWorkThread_Handler_info->m_strRemoteIP  = pMessage->m_AddrRemote.get_host_addr();
+			pWorkThread_Handler_info->m_u2RemotePort = pMessage->m_AddrRemote.get_port_number();
+
+            pWorkThread_Handler_info->m_u4ConnectID  = pMessage->m_u4ConnectID;
+            pWorkThread_Handler_info->m_pHandler     = pMessage->m_pHandler;
+
+            m_objHandlerList.Add_Hash_Data_By_Key_Unit32(pMessage->m_u4ConnectID, pWorkThread_Handler_info);
+        }
     }
 
-    if(NULL == pMessage->GetMessageBase())
+	if (nullptr == pWorkThread_Handler_info)
+	{
+		OUR_DEBUG((LM_ERROR, "[CMessageService::ProcessMessage] [%d](%d)pWorkThread_Handler_info is NULL.\n", 
+            u4ThreadID,
+            pMessage->m_u4ConnectID));
+		DeleteMessage(pMessage);
+		return false;
+	}
+
+    uint32 u4PacletHeadLength = 0;
+    uint32 u4PacletBodyLength = 0;
+    if (nullptr != pMessage->m_pmbRecvHead)
     {
-        OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage] [%d]pMessage->GetMessageBase() is NULL.\n", u4ThreadID));
-        DeleteMessage(pMessage);
-        return false;
+        u4PacletHeadLength = (uint32)pMessage->m_pmbRecvHead->length();
     }
+
+    if (nullptr != pMessage->m_pmbRecvBody)
+    {
+        u4PacletBodyLength = (uint32)pMessage->m_pmbRecvBody->length();
+    }
+
+    //拼接消息
+    objRecvMessage.GetMessageBase()->m_u2Cmd         = pMessage->m_u2Cmd;
+    objRecvMessage.GetMessageBase()->m_strClientIP   = pWorkThread_Handler_info->m_strRemoteIP;
+    objRecvMessage.GetMessageBase()->m_u2ClientPort  = pWorkThread_Handler_info->m_u2RemotePort;
+    objRecvMessage.GetMessageBase()->m_strListenIP   = pWorkThread_Handler_info->m_strLocalIP;
+    objRecvMessage.GetMessageBase()->m_u2ListenPort  = pWorkThread_Handler_info->m_u2LocalPort;
+    objRecvMessage.GetMessageBase()->m_tvRecvTime    = pMessage->m_tvMessage;
+    objRecvMessage.GetMessageBase()->m_u4ConnectID   = pMessage->m_u4ConnectID;
+    objRecvMessage.GetMessageBase()->m_u4HeadSrcSize = u4PacletHeadLength;
+    objRecvMessage.GetMessageBase()->m_u4BodySrcSize = u4PacletBodyLength;
+    objRecvMessage.GetMessageBase()->m_emPacketType  = pMessage->m_emPacketType;
+    objRecvMessage.GetMessageBase()->m_emResouceType = pMessage->m_emResouceType;
+
+    objRecvMessage.SetPacketHead(pMessage->m_pmbRecvHead);
+    objRecvMessage.SetPacketBody(pMessage->m_pmbRecvBody);
 
     //在这里进行线程自检代码
-    m_ThreadInfo.m_tvUpdateTime = pMessage->GetMessageBase()->m_tvRecvTime;
+    m_ThreadInfo.m_tvUpdateTime = pMessage->m_tvMessage;
     m_ThreadInfo.m_u4State = THREADSTATE::THREAD_RUNBEGIN;
 
     //将要处理的数据放到逻辑处理的地方去
-    uint16 u2CommandID = 0;          //数据包的CommandID
-
-    u2CommandID = pMessage->GetMessageBase()->m_u2Cmd;
+    uint16 u2CommandID = objRecvMessage.GetMessageBase()->m_u2Cmd;          //数据包的CommandID
 
     //抛出掉链接建立和断开，只计算逻辑数据包
-    if(pMessage->GetMessageBase()->m_u2Cmd >= CLIENT_LINK_USER)
+    if(objRecvMessage.GetMessageBase()->m_u2Cmd >= CLIENT_LINK_USER)
     {
         m_ThreadInfo.m_u4RecvPacketCount++;
         m_ThreadInfo.m_u4CurrPacketCount++;
         m_ThreadInfo.m_u2CommandID   = u2CommandID;
 
-        bool blIsDead = m_WorkThreadAI.CheckCurrTimeout(pMessage->GetMessageBase()->m_u2Cmd, (uint64)m_ThreadInfo.m_tvUpdateTime.sec());
+        bool blIsDead = m_WorkThreadAI.CheckCurrTimeout(objRecvMessage.GetMessageBase()->m_u2Cmd, (uint64)m_ThreadInfo.m_tvUpdateTime.sec());
 
         if(blIsDead == true)
         {
-            OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage]Command(%d) is Delele.\n", pMessage->GetMessageBase()->m_u2Cmd));
-            //直接返回应急数据给客户端，不在到逻辑里去处理
+            OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage]Command(%d) is Delele.\n", objRecvMessage.GetMessageBase()->m_u2Cmd));
+            
+            //不返回任何指令
 
-            char* ptrReturnData = m_WorkThreadAI.GetReturnData();
-#if PSS_PLATFORM == PLATFORM_WIN
-            App_ProConnectManager::instance()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID,
-                    ptrReturnData,
-                    m_WorkThreadAI.GetReturnDataLength(),
-                    SENDMESSAGE_NOMAL,
-                    (uint16)COMMAND_RETURN_BUSY,
-                    PACKET_SEND_IMMEDIATLY,
-                    PACKET_IS_SELF_RECYC);
-#else
-            App_ConnectManager::instance()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID,
-                    ptrReturnData,
-                    m_WorkThreadAI.GetReturnDataLength(),
-                    SENDMESSAGE_NOMAL,
-                    COMMAND_RETURN_BUSY,
-                    PACKET_SEND_IMMEDIATLY,
-                    PACKET_IS_SELF_RECYC);
-#endif
             DeleteMessage(pMessage);
             m_ThreadInfo.m_u4State = THREADSTATE::THREAD_RUNEND;
 
@@ -279,12 +328,12 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
     uint16 u2CommandCount = 0;      //命令被调用次数
     bool   blDeleteFlag   = true;   //用完是否删除，默认是删除
 
-    DoMessage(m_ThreadInfo.m_tvUpdateTime, pMessage, u2CommandID, u4TimeCost, u2CommandCount, blDeleteFlag);
+    DoMessage(m_ThreadInfo.m_tvUpdateTime, &objRecvMessage, u2CommandID, u4TimeCost, u2CommandCount, blDeleteFlag);
 
-    if(pMessage->GetMessageBase()->m_u2Cmd >= CLIENT_LINK_USER)
+    if(objRecvMessage.GetMessageBase()->m_u2Cmd >= CLIENT_LINK_USER)
     {
         //如果AI启动了，则在这里进行AI判定
-        m_WorkThreadAI.SaveTimeout(pMessage->GetMessageBase()->m_u2Cmd, u4TimeCost);
+        m_WorkThreadAI.SaveTimeout(objRecvMessage.GetMessageBase()->m_u2Cmd, u4TimeCost);
 
         if(u2CommandCount > 0)
         {
@@ -293,14 +342,11 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
         }
 
         //添加统计信息
-        m_CommandAccount.SaveCommandData(u2CommandID,
-                                         (uint16)pMessage->GetMessageBase()->m_u4ListenPort,
-                                         pMessage->GetMessageBase()->m_u1PacketType,
-                                         pMessage->GetMessageBase()->m_u4HeadSrcSize + pMessage->GetMessageBase()->m_u4BodySrcSize,
-                                         COMMAND_TYPE_IN,
-                                         m_ThreadInfo.m_tvUpdateTime);
+        pWorkThread_Handler_info->m_RecvSize += u4PacletHeadLength + u4PacletBodyLength;
+        pWorkThread_Handler_info->m_tvInput = pMessage->m_tvMessage;
 
         m_PerformanceCounter.counter();
+
     }
 
     if (true == blDeleteFlag)
@@ -308,20 +354,63 @@ bool CMessageService::ProcessMessage(CMessage* pMessage, uint32 u4ThreadID)
         DeleteMessage(pMessage);
     }
 
+    //如果是断开消息，在这里发还给逻辑线程去处理
+    if (CLIENT_LINK_CDISCONNET == pMessage->m_u2Cmd ||
+        CLIENT_LINK_SDISCONNET == pMessage->m_u2Cmd)
+    {
+        pWorkThread_Handler_info->m_pHandler->Close();
+        m_objHandlerList.Del_Hash_Data_By_Unit32(pMessage->m_u4ConnectID);
+        m_DeviceHandlerPool.Delete(pWorkThread_Handler_info);
+    }
+
     m_ThreadInfo.m_u4State = THREADSTATE::THREAD_RUNEND;
 
-    //开始测算数据包处理的时间
-    if(m_ThreadInfo.m_u2PacketTime == 0)
+    return true;
+}
+
+bool CMessageService::ProcessSendMessage(CWorkThreadMessage* pMessage, uint32 u4ThreadID)
+{
+    int nRet = true;
+	CWorkThread_Handler_info* pWorkThread_Handler_info = m_objHandlerList.Get_Hash_Box_Data_By_Uint32(pMessage->m_SendMessageInfo.u4ConnectID);
+
+    if (nullptr != pWorkThread_Handler_info)
     {
-        m_ThreadInfo.m_u2PacketTime = (uint16)u4TimeCost;
+        uint32 u4PacketSize = 0;
+        nRet = pWorkThread_Handler_info->m_pHandler->SendMessage(pMessage->m_SendMessageInfo, u4PacketSize);
     }
     else
     {
-        //计算数据包的平均处理时间
-        m_ThreadInfo.m_u2PacketTime = (uint16)((m_ThreadInfo.m_u2PacketTime + (uint16)u4TimeCost)/2);
+        nRet = false;
+        OUR_DEBUG((LM_INFO, "[CMessageService::ProcessSendMessage](ThreadID=%d)(CommandID=%d)Handler is NULL.\n", 
+            u4ThreadID,
+            pMessage->m_u4ConnectID));
     }
 
-    return true;
+    DeleteMessage(pMessage);
+    return nRet;
+}
+
+bool CMessageService::ProcessSendClose(CWorkThreadMessage* pMessage, uint32 u4ThreadID)
+{
+	int nRet = true;
+	CWorkThread_Handler_info* pWorkThread_Handler_info = m_objHandlerList.Get_Hash_Box_Data_By_Uint32(pMessage->m_u4ConnectID);
+
+	if (nullptr != pWorkThread_Handler_info)
+	{
+		uint32 u4PacketSize = 0;
+        pWorkThread_Handler_info->m_pHandler->Close();
+        m_objClientCommandList.Del_Hash_Data_By_Unit32(pMessage->m_u4ConnectID);
+	}
+	else
+	{
+		nRet = false;
+		OUR_DEBUG((LM_INFO, "[CMessageService::ProcessSendClose](ThreadID=%d)(CommandID=%d)Handler is NULL.\n",
+			u4ThreadID,
+			pMessage->m_u4ConnectID));
+	}
+
+    DeleteMessage(pMessage);
+    return nRet;
 }
 
 int CMessageService::Close()
@@ -337,7 +426,7 @@ int CMessageService::Close()
     {
         msg_queue()->deactivate();
     }
-
+    
     CloseCommandList();
 
     m_objClientCommandList.Close();
@@ -454,13 +543,12 @@ bool CMessageService::DoMessage(const ACE_Time_Value& tvBegin, IMessage* pMessag
     for (int i = 0; i < nCount; i++)
     {
         const _ClientCommandInfo* pClientCommandInfo = pClientCommandList->GetClientCommandIndex(i);
-
         if (NULL != pClientCommandInfo)
         {
             //判断当前消息是否有指定的监听端口
             if (pClientCommandInfo->m_objListenIPInfo.m_u2Port > 0 &&
-                (ACE_OS::strcmp(pClientCommandInfo->m_objListenIPInfo.m_szClientIP, pMessage->GetMessageBase()->m_szListenIP) != 0 ||
-                    (uint32)pClientCommandInfo->m_objListenIPInfo.m_u2Port != pMessage->GetMessageBase()->m_u4ListenPort))
+                (pClientCommandInfo->m_objListenIPInfo.m_strClientIP != pMessage->GetMessageBase()->m_strListenIP ||
+                    pClientCommandInfo->m_objListenIPInfo.m_u2Port != pMessage->GetMessageBase()->m_u2ListenPort))
             {
                 continue;
             }
@@ -503,6 +591,11 @@ void CMessageService::GetAIInfo(_WorkThreadAIInfo& objAIInfo) const
 uint32 CMessageService::GetThreadID() const
 {
     return m_u4ThreadID;
+}
+
+uint32 CMessageService::GetHandlerCount()
+{
+    return m_objHandlerList.Get_Used_Count();
 }
 
 void CMessageService::CopyMessageManagerList()
@@ -610,20 +703,24 @@ uint32 CMessageService::GetUsedMessageCount()
     return (uint32)m_MessagePool.GetUsedCount();
 }
 
-CMessage* CMessageService::CreateMessage()
+CWorkThreadMessage* CMessageService::CreateMessage()
 {
-    CMessage* pMessage = m_MessagePool.Create();
+    CWorkThreadMessage* pMessage = m_MessagePool.Create();
 
     if(NULL != pMessage)
     {
-        pMessage->GetMessageBase()->m_u4WorkThreadID = GetThreadID();
+        pMessage->m_u4WorkThreadID = GetThreadID();
     }
 
     return pMessage;
 }
 
-void CMessageService::DeleteMessage(CMessage* pMessage)
+void CMessageService::DeleteMessage(CWorkThreadMessage* pMessage)
 {
+    //清理数据
+    pMessage->Clear();
+
+    //归还消息池
     if (false == m_MessagePool.Delete(pMessage))
     {
         OUR_DEBUG((LM_INFO, "[CMessageService::DeleteMessage]pMessage == NULL.\n"));
@@ -633,6 +730,56 @@ void CMessageService::DeleteMessage(CMessage* pMessage)
 void CMessageService::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_Account)
 {
     m_CommandAccount.GetFlowPortList(vec_Port_Data_Account);
+}
+
+bool CMessageService::SendPostMessage(CSendMessageInfo objSendMessageInfo)
+{
+    //将数据放入队列
+    CWorkThreadMessage* pWorkThreadMessage = CreateMessage();
+
+    pWorkThreadMessage->m_emDirect = EM_WORKTHREAD_DIRECT::EM_WORKTHREAD_DIRECT_OUTPUT;
+    pWorkThreadMessage->m_SendMessageInfo = objSendMessageInfo;
+
+    return PutMessage(pWorkThreadMessage);
+}
+
+bool CMessageService::SendCloseMessage(uint32 u4ConnectID)
+{
+	//将数据放入队列
+	CWorkThreadMessage* pWorkThreadMessage = CreateMessage();
+
+	pWorkThreadMessage->m_emDirect = EM_WORKTHREAD_DIRECT::EM_WORKTHREAD_DIRECT_OUTPUT;
+	pWorkThreadMessage->m_u2Cmd = CLINET_LINK_HANDLER_CLOSE;
+
+	return PutMessage(pWorkThreadMessage);
+}
+
+_ClientIPInfo CMessageService::GetClientIPInfo(uint32 u4ConnectID)
+{
+    _ClientIPInfo objClientIPInfo;
+	CWorkThread_Handler_info* pWorkThread_Handler_info = m_objHandlerList.Get_Hash_Box_Data_By_Uint32(u4ConnectID);
+
+    if (nullptr != pWorkThread_Handler_info)
+    {
+        objClientIPInfo.m_strClientIP = pWorkThread_Handler_info->m_strRemoteIP;
+        objClientIPInfo.m_u2Port      = pWorkThread_Handler_info->m_u2RemotePort;
+    }
+
+    return objClientIPInfo;
+}
+
+NAMESPACE::_ClientIPInfo CMessageService::GetLocalIPInfo(uint32 u4ConnectID)
+{
+	_ClientIPInfo objClientIPInfo;
+	CWorkThread_Handler_info* pWorkThread_Handler_info = m_objHandlerList.Get_Hash_Box_Data_By_Uint32(u4ConnectID);
+
+	if (nullptr != pWorkThread_Handler_info)
+	{
+		objClientIPInfo.m_strClientIP = pWorkThread_Handler_info->m_strLocalIP;
+		objClientIPInfo.m_u2Port = pWorkThread_Handler_info->m_u2LocalPort;
+	}
+
+    return objClientIPInfo;
 }
 
 int CMessageService::handle_signal(int signum, siginfo_t* siginfo, ucontext_t* ucontext)
@@ -707,11 +854,29 @@ bool CMessageService::Dispose_Queue()
     }
     else
     {
-        CMessage* msg = *((CMessage**)mb->base());
+        CWorkThreadMessage* msg = *((CWorkThreadMessage**)mb->base());
 
-        if (false == this->ProcessMessage(msg, m_u4ThreadID))
+        if (EM_WORKTHREAD_DIRECT::EM_WORKTHREAD_DIRECT_INPUT == msg->m_emDirect)
         {
-            OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)ProcessMessage is false!\n", m_u4ThreadID));
+            //是接收数据
+            if (false == ProcessRecvMessage(msg, m_u4ThreadID))
+            {
+                OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)ProcessMessage is false!\n", m_u4ThreadID));
+            }
+        }
+        else
+        {
+            //是发送数据和助攻关闭链接
+            if (CLINET_LINK_HANDLER_CLOSE == msg->m_u2Cmd)
+            {
+                //关闭链接
+                ProcessSendClose(msg, m_u4ThreadID);
+            }
+            else
+            {
+                //是发送数据
+                ProcessSendMessage(msg, m_u4ThreadID);
+            }
         }
 
         return true;
@@ -830,33 +995,12 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
     return true;
 }
 
-bool CMessageServiceGroup::PutMessage(CMessage* pMessage)
+bool CMessageServiceGroup::PutMessage(CWorkThreadMessage* pMessage)
 {
-    //判断是否需要数据染色
-    string strTraceID = m_objMessageDyeingManager.GetTraceID(pMessage->GetMessageBase()->m_szIP,
-                        (short)pMessage->GetMessageBase()->m_u4Port,
-                        pMessage->GetMessageBase()->m_u2Cmd);
-
-    if (strTraceID.length() > 0)
-    {
-        //需要染色，生成TraceID
-        sprintf_safe(pMessage->GetMessageBase()->m_szTraceID, MAX_BUFF_50, "%s", strTraceID.c_str());
-    }
-
     //判断是否为TCP包，如果是则按照ConnectID区分。UDP则随机分配一个
-    int32 n4ThreadID = 0;
 
     //得到工作线程ID
-    n4ThreadID = pMessage->GetMessageBase()->m_u4WorkThreadID;
-
-    if (-1 == n4ThreadID)
-    {
-        pMessage->Clear();
-        SAFE_DELETE(pMessage);
-        return false;
-    }
-
-    CMessageService* pMessageService = m_vecMessageService[(uint32)n4ThreadID];
+    CMessageService* pMessageService = m_vecMessageService[pMessage->m_u4WorkThreadID];
 
     if (false == pMessageService->PutMessage(pMessage))
     {
@@ -1019,6 +1163,64 @@ bool CMessageServiceGroup::CheckCPUAndMemory(bool blTest)
     }
 
     return true;
+}
+
+bool CMessageServiceGroup::Send_Post_Message(CSendMessageInfo objSendMessageInfo)
+{
+	//得到这个线程ID
+	uint32 u4ThreadID = GetWorkThreadID(objSendMessageInfo.u4ConnectID, 
+        EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
+
+    CMessageService* pMessageService = m_vecMessageService[u4ThreadID];
+
+    return pMessageService->SendPostMessage(objSendMessageInfo);
+}
+
+bool CMessageServiceGroup::Send_Close_Message(uint32 u4ConnectID)
+{
+	//得到这个线程ID
+	uint32 u4ThreadID = GetWorkThreadID(u4ConnectID,
+		EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
+
+	CMessageService* pMessageService = m_vecMessageService[u4ThreadID];
+
+    return pMessageService->SendCloseMessage(u4ConnectID);
+}
+
+NAMESPACE::_ClientIPInfo CMessageServiceGroup::GetClientIPInfo(uint32 u4ConnectID)
+{
+	//得到这个线程ID
+	uint32 u4ThreadID = GetWorkThreadID(u4ConnectID,
+		EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
+
+	CMessageService* pMessageService = m_vecMessageService[u4ThreadID];
+
+    return pMessageService->GetClientIPInfo(u4ConnectID);
+}
+
+_ClientIPInfo CMessageServiceGroup::GetLocalIPInfo(uint32 u4ConnectID)
+{
+	//得到这个线程ID
+	uint32 u4ThreadID = GetWorkThreadID(u4ConnectID,
+		EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
+
+	CMessageService* pMessageService = m_vecMessageService[u4ThreadID];
+
+	return pMessageService->GetLocalIPInfo(u4ConnectID);
+}
+
+uint32 CMessageServiceGroup::GetHandlerCount()
+{
+    uint32 u4HandlerCount = 0;
+	for (CMessageService* pMessageService : m_vecMessageService)
+	{
+		if (NULL != pMessageService)
+		{
+            u4HandlerCount += pMessageService->GetHandlerCount();
+		}
+	}
+
+    return u4HandlerCount;
 }
 
 bool CMessageServiceGroup::CheckPlugInState() const
@@ -1255,21 +1457,24 @@ void CMessageServiceGroup::SaveCommandDataLog()
     }
 }
 
-CMessage* CMessageServiceGroup::CreateMessage(uint32 u4ConnectID, EM_CONNECT_IO_TYPE u1PacketType)
+CWorkThreadMessage* CMessageServiceGroup::CreateMessage(uint32 u4ConnectID, EM_CONNECT_IO_TYPE u1PacketType)
 {
-    int32 n4ThreadID = 0;
-    n4ThreadID = GetWorkThreadID(u4ConnectID, u1PacketType);
-
-    if (-1 == n4ThreadID)
+    uint32 u4ThreadID = 0;
+    u4ThreadID = GetWorkThreadID(u4ConnectID, u1PacketType);
+   
+    if (-1 == u4ThreadID)
     {
         return NULL;
     }
 
-    CMessageService* pMessageService = m_vecMessageService[(uint32)n4ThreadID];
+    CMessageService* pMessageService = m_vecMessageService[u4ThreadID];
 
     if (NULL != pMessageService)
     {
-        return pMessageService->CreateMessage();
+        CWorkThreadMessage* pWorkThreadMessage = pMessageService->CreateMessage();
+        //设置线程的ID
+        pWorkThreadMessage->m_u4WorkThreadID = u4ThreadID;
+        return pWorkThreadMessage;
     }
     else
     {
@@ -1277,21 +1482,9 @@ CMessage* CMessageServiceGroup::CreateMessage(uint32 u4ConnectID, EM_CONNECT_IO_
     }
 }
 
-void CMessageServiceGroup::DeleteMessage(uint32 u4ConnectID, CMessage* pMessage)
+void CMessageServiceGroup::DeleteMessage(CWorkThreadMessage* pMessage)
 {
-    ACE_UNUSED_ARG(u4ConnectID);
-
-    int32 n4ThreadID = 0;
-    n4ThreadID = pMessage->GetMessageBase()->m_u4WorkThreadID;
-
-    if (-1 == n4ThreadID)
-    {
-        pMessage->Clear();
-        SAFE_DELETE(pMessage);
-        return;
-    }
-
-    CMessageService* pMessageService = m_vecMessageService[(uint32)n4ThreadID];
+    CMessageService* pMessageService = m_vecMessageService[(uint32)pMessage->m_u4WorkThreadID];
 
     if (NULL != pMessageService)
     {
@@ -1319,13 +1512,13 @@ void CMessageServiceGroup::CopyMessageManagerList()
     }
 }
 
-int32 CMessageServiceGroup::GetWorkThreadID(uint32 u4ConnectID, EM_CONNECT_IO_TYPE u1PackeType)
+uint32 CMessageServiceGroup::GetWorkThreadID(uint32 u4ConnectID, EM_CONNECT_IO_TYPE u1PackeType)
 {
-    int32 n4ThreadID = -1;
+    uint32 u4ThreadID = -1;
 
     if(m_vecMessageService.size() == 0)
     {
-        return n4ThreadID;
+        return u4ThreadID;
     }
 
     if (EM_CONNECT_IO_TYPE::CONNECT_IO_TCP == u1PackeType
@@ -1333,13 +1526,13 @@ int32 CMessageServiceGroup::GetWorkThreadID(uint32 u4ConnectID, EM_CONNECT_IO_TY
         || EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP == u1PackeType
         || EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_UDP == u1PackeType)
     {
-        n4ThreadID = u4ConnectID % (uint32)m_vecMessageService.size();
+        u4ThreadID = u4ConnectID % (uint32)m_vecMessageService.size();
     }
     else if(u1PackeType == EM_CONNECT_IO_TYPE::CONNECT_IO_UDP)
     {
         //如果是UDP协议，则记录当前线程的位置，直接+1，调用随机数速度比较慢（因为要读文件）
         m_ThreadLock.acquire();
-        n4ThreadID = m_u2CurrThreadID;
+        u4ThreadID = m_u2CurrThreadID;
 
         //当前m_u2CurrThreadID指向下一个线程ID
         if (m_u2CurrThreadID >= m_objAllThreadInfo.GetThreadCount() - 1)
@@ -1354,6 +1547,6 @@ int32 CMessageServiceGroup::GetWorkThreadID(uint32 u4ConnectID, EM_CONNECT_IO_TY
         m_ThreadLock.release();
     }
 
-    return n4ThreadID;
+    return u4ThreadID;
 }
 

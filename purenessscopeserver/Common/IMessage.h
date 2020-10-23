@@ -7,53 +7,49 @@
 //记录消息的一些参数
 struct _MessageBase
 {
-    uint32             m_u4HeadSrcSize;             //包头原始长度
-    uint32             m_u4BodySrcSize;             //包体原始长度
-    uint32             m_u4ConnectID;               //消息链接ConnectID，如果是UDP则这个值无效
-    uint32             m_u4Port;                    //客户端端口
-    uint32             m_u4ListenPort;              //监听端口
-    uint32             m_u4WorkThreadID;            //工作线程ID
-    uint32             m_u4PacketParseID;           //与ConnectID对应的解析器ID
-    uint16             m_u2Cmd;                     //命令字的ID
-    EM_CONNECT_IO_TYPE m_u1PacketType;              //数据包来源类型
-    uint8              m_u1ResouceType;             //数据来源，服务器间数据包或者客户端数据包
-    char               m_szIP[MAX_BUFF_20];         //客户端IP
-    char               m_szListenIP[MAX_BUFF_20];   //监听IP
-    char               m_szTraceID[MAX_BUFF_50];    //TraceID
-    CProfileTime       m_ProfileTime;               //消息到达时间
-    ACE_Time_Value     m_tvRecvTime;                //消息接收时间
+    uint32             m_u4HeadSrcSize    = 0;              //包头原始长度
+    uint32             m_u4BodySrcSize    = 0;              //包体原始长度
+    uint32             m_u4ConnectID      = 0;              //消息链接ConnectID，如果是UDP则这个值无效
+    uint16             m_u2ClientPort     = 0;              //客户端端口
+    uint16             m_u2ListenPort     = 0;              //监听端口
+    uint32             m_u4WorkThreadID   = 0;              //工作线程ID
+    uint32             m_u4PacketParseID  = 0;              //与ConnectID对应的解析器ID
+    uint16             m_u2Cmd            = 0;              //命令字的ID
+    EM_CONNECT_IO_TYPE m_emPacketType  = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP;               //数据包来源类型
+    EM_PACKET_RESOURCE m_emResouceType = EM_PACKET_RESOURCE::PACKET_RESOURCE_FROM_CLIENT;  //数据来源，服务器间数据包或者客户端数据包
+    string             m_strClientIP;                       //客户端IP
+    string             m_strListenIP;                       //监听IP
+    char               m_szTraceID[MAX_BUFF_50] = {'\0'};   //TraceID
+    CProfileTime       m_ProfileTime;                       //消息到达时间
+    ACE_Time_Value     m_tvRecvTime;                        //消息接收时间
 
     _MessageBase()
     {
-        m_u1PacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP; //默认为TCP
-        m_u1ResouceType   = RESOUCE_FROM_CLIENT;                //默认为来源于客户端的数据包
+        m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP; //默认为TCP
+        m_emResouceType   = EM_PACKET_RESOURCE::PACKET_RESOURCE_FROM_CLIENT; //默认为来源于客户端的数据包
         m_u4ConnectID     = 0;
         m_u2Cmd           = 0;
         m_u4HeadSrcSize   = 0;
         m_u4BodySrcSize   = 0;
         m_u4WorkThreadID  = 0;
         m_u4PacketParseID = 0;
-        m_u4ListenPort    = 0;
-        m_u4Port          = 0;
-        m_szIP[0]         = '\0';
-        m_szListenIP[0]   = '\0';
+        m_u2ListenPort    = 0;
+        m_u2ClientPort     = 0;
         m_szTraceID[0]    = '\0';
     }
 
     void Clear()
     {
-        m_u1PacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP;   //默认为TCP
-        m_u1ResouceType   = RESOUCE_FROM_CLIENT; //默认为来源于客户端的数据包
+		m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP; //默认为TCP
+		m_emResouceType   = EM_PACKET_RESOURCE::PACKET_RESOURCE_FROM_CLIENT; //默认为来源于客户端的数据包
         m_u4ConnectID     = 0;
         m_u2Cmd           = 0;
         m_u4HeadSrcSize   = 0;
         m_u4BodySrcSize   = 0;
         m_u4WorkThreadID  = 0;
         m_u4PacketParseID = 0;
-        m_u4ListenPort    = 0;
-        m_u4Port          = 0;
-        m_szIP[0]         = '\0';
-        m_szListenIP[0]   = '\0';
+        m_u2ListenPort    = 0;
+        m_u2ClientPort    = 0;
         m_szTraceID[0]    = '\0';
     }
 };
@@ -64,19 +60,12 @@ class IMessage
 public:
     virtual ~IMessage() {}
 
-    virtual void Close() = 0;
-    virtual void Clear() = 0;
-
-    virtual void SetMessageBase(_MessageBase* pMessageBase)              = 0; //设置连接基本信息
-
     virtual bool GetPacketHead(_PacketInfo& PacketInfo)    = 0;               //得到包头结构体，并赋值给_PacketInfo对象
     virtual bool GetPacketBody(_PacketInfo& PacketInfo)    = 0;               //得到包体结构体，并赋值给_PacketInfo对象
     virtual bool SetPacketHead(ACE_Message_Block* pmbHead) = 0;               //设置包头数据块
     virtual bool SetPacketBody(ACE_Message_Block* pmbBody) = 0;               //设置包体数据块
 
-    virtual _MessageBase* GetMessageBase() const           = 0;               //得到包连接基本信息
-
-    virtual const char* GetError() const                   = 0;
+    virtual _MessageBase* GetMessageBase()                 = 0;               //得到包连接基本信息
 };
 
 //中间服务器消息类接口

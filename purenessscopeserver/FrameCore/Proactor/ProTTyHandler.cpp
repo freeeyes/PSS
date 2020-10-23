@@ -77,7 +77,7 @@ void CProTTyHandler::Close()
 			objMakePacket.m_u1Option        = PACKET_TTY_DISCONNECT;
 			objMakePacket.m_AddrRemote      = m_addrRemote;
 			objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
-            objMakePacket.m_u1PacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_TTY;
+            objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_TTY;
 
             Send_MakePacket_Queue(objMakePacket, "TTy", 0);
         }
@@ -122,7 +122,7 @@ bool CProTTyHandler::Init(uint32 u4ConnectID, const char* pName, ACE_TTY_IO::Ser
 			objMakePacket.m_u1Option        = PACKET_TTY_CONNECT;
 			objMakePacket.m_AddrRemote      = m_addrRemote;
 			objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
-			objMakePacket.m_u1PacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_TTY;
+			objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_TTY;
 
             Send_MakePacket_Queue(objMakePacket, "TTy", 0);
         }
@@ -241,7 +241,7 @@ void CProTTyHandler::handle_read_file(const ACE_Asynch_Read_File::Result& result
 					objMakePacket.m_u1Option        = PACKET_PARSE;
 					objMakePacket.m_AddrRemote      = m_addrRemote;
 					objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
-					objMakePacket.m_u1PacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_TTY;
+					objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_TTY;
 
 					Send_MakePacket_Queue(objMakePacket, "TTy", 0);
 

@@ -45,9 +45,6 @@ bool CProServerManager::Init()
         App_ProConnectHandlerPool::instance()->Init(GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount);
     }
 
-    //初始化链接管理器
-    App_ProConnectManager::instance()->Init(GetXmlConfigAttribute(xmlSendInfo)->SendQueueCount);
-
     //初始化拆件逻辑线程
     App_MessageQueueManager::instance()->Init();
 
@@ -55,7 +52,7 @@ bool CProServerManager::Init()
     m_TMService.Init();
 
     //初始化给插件的对象接口
-    IConnectManager* pConnectManager           = dynamic_cast<IConnectManager*>(App_ProConnectManager::instance());
+    IConnectManager* pConnectManager           = dynamic_cast<IConnectManager*>(App_HandlerManager::instance());
     IClientManager*  pClientManager            = dynamic_cast<IClientManager*>(App_ClientProConnectManager::instance());
     IUDPConnectManager* pUDPConnectManager     = dynamic_cast<IUDPConnectManager*>(App_ProUDPManager::instance());
     IFrameCommand* pFrameCommand               = dynamic_cast<IFrameCommand*>(&m_objFrameCommand);
@@ -334,9 +331,6 @@ bool CProServerManager::Start()
         App_ServerMessageTask::instance()->Start();
     }
 
-    //开始启动链接发送定时器
-    App_ProConnectManager::instance()->StartTimer();
-
     //开始启动tty相关监听
     int nTTyCount = (int)GetXmlConfigAttribute(xmlTTyDrives)->vec.size();
 
@@ -419,9 +413,6 @@ bool CProServerManager::Close()
     App_MessageServiceGroup::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_MessageServiceGroup OK.\n"));
 
-    App_ProConnectManager::instance()->CloseAll();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ProConnectManager OK.\n"));
-
     AppLogManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close AppLogManager OK\n"));
 
@@ -445,8 +436,6 @@ bool CProServerManager::Close()
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_PacketParsePool OK.\n"));
     App_FileTestManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_FileTestManager OK.\n"));
-    App_ProactorManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ReactorManager OK.\n"));
     App_ProConnectHandlerPool::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ConnectHandlerPool OK.\n"));
     App_ConsoleManager::instance()->Close();

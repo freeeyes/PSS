@@ -63,7 +63,7 @@ void CProConnectClient::Close()
 			objMakePacket.m_u1Option        = PACKET_SERVER_TCP_DISCONNECT;
 			objMakePacket.m_AddrRemote      = m_AddrRemote;
 			objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
-            objMakePacket.m_u1PacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
+            objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
 
             Send_MakePacket_Queue(objMakePacket, "127.0.0.1", 0);
         }
@@ -167,7 +167,7 @@ void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
 		objMakePacket.m_u1Option        = PACKET_SERVER_TCP_CONNECT;
 		objMakePacket.m_AddrRemote      = m_AddrRemote;
 		objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
-        objMakePacket.m_u1PacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
+        objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
 
         Send_MakePacket_Queue(objMakePacket, "127.0.0.1", 0);
     }
@@ -197,7 +197,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         if (NULL != m_pClientMessage)
         {
             _ClientIPInfo objServerIPInfo;
-            sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_AddrRemote.get_host_addr());
+            objServerIPInfo.m_strClientIP = m_AddrRemote.get_host_addr();
             objServerIPInfo.m_u2Port = m_AddrRemote.get_port_number();
 
             //这里只处理远端服务器断开连接的消息，回调ConnectError
@@ -256,7 +256,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
 					objMakePacket.m_u1Option        = PACKET_PARSE;
 					objMakePacket.m_AddrRemote      = m_AddrRemote;
 					objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
-                    objMakePacket.m_u1PacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
+                    objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
 
                     Send_MakePacket_Queue(objMakePacket, "127.0.0.1", 0);
 
@@ -283,7 +283,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
             if (NULL != m_pClientMessage)
             {
                 _ClientIPInfo objServerIPInfo;
-                sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_AddrRemote.get_host_addr());
+                objServerIPInfo.m_strClientIP = m_AddrRemote.get_host_addr();
                 objServerIPInfo.m_u2Port = m_AddrRemote.get_port_number();
                 //m_pClientMessage->RecvData(&mb, objServerIPInfo);
 
@@ -363,7 +363,7 @@ void CProConnectClient::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
         if(NULL != m_pClientMessage)
         {
             _ClientIPInfo objServerIPInfo;
-            sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_AddrRemote.get_host_addr());
+            objServerIPInfo.m_strClientIP = m_AddrRemote.get_host_addr();
             objServerIPInfo.m_u2Port = m_AddrRemote.get_port_number();
             m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
         }
@@ -427,7 +427,7 @@ bool CProConnectClient::RecvData(uint32 u4PacketLen, ACE_Message_Block* pmbSave)
         if(NULL != m_pClientMessage)
         {
             _ClientIPInfo objServerIPInfo;
-            sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_AddrRemote.get_host_addr());
+            objServerIPInfo.m_strClientIP = m_AddrRemote.get_host_addr();
             objServerIPInfo.m_u2Port = m_AddrRemote.get_port_number();
 
             if(EM_s2s::S2S_NEED_CALLBACK == m_ems2s)
@@ -500,7 +500,7 @@ bool CProConnectClient::SendData(ACE_Message_Block* pmblk)
         if(NULL != m_pClientMessage)
         {
             _ClientIPInfo objServerIPInfo;
-            sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_AddrRemote.get_host_addr());
+            objServerIPInfo.m_strClientIP = m_AddrRemote.get_host_addr();
             objServerIPInfo.m_u2Port = m_AddrRemote.get_port_number();
             m_pClientMessage->ConnectError((int)ACE_OS::last_error(), objServerIPInfo);
         }

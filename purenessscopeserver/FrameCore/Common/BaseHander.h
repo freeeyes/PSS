@@ -10,11 +10,11 @@
 #include "LoadPacketParse.h"
 #include "PacketParsePool.h"
 #include "FileTest.h"
-#include "SendCacheManager.h"
 #include "ace/SOCK_Dgram.h"
 #include "XmlConfig.h"
 #include "TcpRedirection.h"
 #include "MakePacket_Common.h"
+#include "IPAccount.h"
 #include <string>
 #include <sstream>
 
@@ -101,8 +101,6 @@ public:
     uint32 m_u4AllSendSize       = 0;
     ACE_Time_Value m_atvConnect; 
     uint32 m_u4RecvQueueCount    = 0;
-    uint64 m_u8RecvQueueTimeCost = 0;
-    uint64 m_u8SendQueueTimeCost = 0;
 
     _ClientConnectInfo_Param()
     {
@@ -116,12 +114,12 @@ _ClientConnectInfo Tcp_Common_ClientInfo(_ClientConnectInfo_Param const& obj_Cli
 class _Input_To_Cache_Param
 {
 public:
-    uint32 m_u4ConnectID         = 0;
-    uint32 m_u4PacketParseInfoID = 0;
-    uint32 m_u4SendMaxBuffSize   = 0;
-    uint8 m_u1SendType           = 0;
-    uint16 m_u2CommandID         = 0;
-    bool m_blDelete              = false;
+    uint32 m_u4ConnectID              = 0;
+    uint32 m_u4PacketParseInfoID      = 0;
+    uint32 m_u4SendMaxBuffSize        = 0;
+    EM_SEND_PACKET_PARSE m_emSendType = EM_SEND_PACKET_PARSE::EM_SENDMESSAGE_JAMPNOMAL;
+    uint16 m_u2CommandID              = 0;
+    bool m_blDelete                   = false;
 
     _Input_To_Cache_Param()
     {
@@ -137,12 +135,12 @@ bool Tcp_Common_Send_Input_To_Cache(_Input_To_Cache_Param obj_Input_To_Cache_Par
 class _Send_Packet_Param
 {
 public:
-    uint32 m_u4ConnectID         = 0;
-    uint8  m_u1SendType          = 0;
-    uint32 m_u4PacketParseInfoID = 0;
-    uint32 m_u4SendMaxBuffSize   = 0;
-    uint16 m_u2CommandID         = 0;
-    bool m_blDelete              = false;
+    uint32 m_u4ConnectID               = 0;
+    EM_SEND_PACKET_PARSE m_emSendType  = EM_SEND_PACKET_PARSE::EM_SENDMESSAGE_JAMPNOMAL;
+    uint32 m_u4PacketParseInfoID       = 0;
+    uint32 m_u4SendMaxBuffSize         = 0;
+    uint16 m_u2CommandID               = 0;
+    bool m_blDelete                    = false;
 
     _Send_Packet_Param()
     {
@@ -187,8 +185,5 @@ void Tcp_Common_Manager_Timeout_CheckInfo(int nActiveConnectCount);
 
 //获得连接姓名
 _ClientNameInfo Tcp_Common_ClientNameInfo(uint32 u4ConnectID, const char* pConnectName, const char* pClientIP, uint16 u2ClientPort, bool IsLog);
-
-//初始化Manager
-void  Tcp_Common_Manager_Init(uint16 u2Index, CCommandAccount& objCommandAccount, uint16& u2SendQueueMax, CSendCacheManager& objSendCacheManager);
 
 #endif

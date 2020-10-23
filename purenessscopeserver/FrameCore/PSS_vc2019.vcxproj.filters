@@ -109,9 +109,6 @@
     <ClCompile Include="PurenessScopeServer.cpp">
       <Filter>Main</Filter>
     </ClCompile>
-    <ClCompile Include="Common\SendCacheManager.cpp">
-      <Filter>Common\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="Common\SendMessage.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
@@ -349,6 +346,9 @@
     <ClCompile Include="..\Common\PerformanceCounter.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="Message\HandlerManager.cpp">
+      <Filter>Message\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -469,9 +469,6 @@
       <Filter>Proactor\hfile</Filter>
     </ClInclude>
     <ClInclude Include="Common\Ring.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\SendCacheManager.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
     <ClInclude Include="Common\SendMessage.h">
@@ -870,6 +867,12 @@
     <ClInclude Include="..\Common\PerformanceCounter.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
+    <ClInclude Include="Common\IHandler.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Message\HandlerManager.h">
+      <Filter>Message\hfile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -898,9 +901,6 @@
     </Filter>
     <Filter Include="Message">
       <UniqueIdentifier>{896581cd-642c-4a01-b5d8-170a98f924ab}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="PacketParse">
-      <UniqueIdentifier>{a13c567d-c6d1-4684-bad8-3f6d992aa777}</UniqueIdentifier>
     </Filter>
     <Filter Include="Main">
       <UniqueIdentifier>{dfc85df2-d608-477b-9f8b-42a2a180038d}</UniqueIdentifier>
@@ -959,12 +959,6 @@
     <Filter Include="tinyXML\hfile">
       <UniqueIdentifier>{c9395047-1d79-4b3d-a7f2-6b377b350f35}</UniqueIdentifier>
     </Filter>
-    <Filter Include="PacketParse\cppfile">
-      <UniqueIdentifier>{8c5c378f-e2ba-4b48-ab70-112851fb0afb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="PacketParse\hfile">
-      <UniqueIdentifier>{435fc3fc-5365-4bd5-8ffe-b55d3faa34f2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Proactor\hfile">
       <UniqueIdentifier>{236514d0-07af-4b1d-8016-50b13c571e3a}</UniqueIdentifier>
     </Filter>
@@ -979,6 +973,15 @@
     </Filter>
     <Filter Include="CppUnit\cppfile">
       <UniqueIdentifier>{0f62b50d-545b-4de3-852e-6f0e85ef76f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PacketParse">
+      <UniqueIdentifier>{a13c567d-c6d1-4684-bad8-3f6d992aa777}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PacketParse\cppfile">
+      <UniqueIdentifier>{8c5c378f-e2ba-4b48-ab70-112851fb0afb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PacketParse\hfile">
+      <UniqueIdentifier>{435fc3fc-5365-4bd5-8ffe-b55d3faa34f2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
