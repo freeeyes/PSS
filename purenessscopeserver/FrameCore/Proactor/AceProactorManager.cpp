@@ -114,7 +114,7 @@ int CAceProactor::open(void* args)
 {
     OUR_DEBUG((LM_ERROR, "CAceProactor::Open Begin nProactorID= [%d].\n", m_u4ProactorID));
 
-    if(activate(THREAD_PARAM, m_nThreadCount)  == -1)
+    if(activate(THREAD_PARAM, MAX_MSG_THREADCOUNT)  == -1)
     {
         m_blRun = false;
         OUR_DEBUG((LM_ERROR, "[CAceProactor::Open]activate error ProactorType = [%d] nThreadCount = [%d] Start!\n", m_nProactorType, m_nThreadCount));
@@ -329,22 +329,9 @@ CAceProactor* CAceProactorManager::GetAceProactor(int nProactorID)
     return m_pAceProactorList[nProactorID];
 }
 
-ACE_Proactor* CAceProactorManager::GetAce_Proactor(int nProactorID)
+ACE_Proactor* CAceProactorManager::GetAce_Proactor()
 {
-    if(nProactorID < 0 || nProactorID >= m_u2ProactorCount)
-    {
-        return NULL;
-    }
-
-    if(NULL != m_pAceProactorList[nProactorID])
-    {
-        return m_pAceProactorList[nProactorID]->GetProactor();
-    }
-    else
-    {
-        return NULL;
-    }
-
+    return m_pAceProactorList[0]->GetProactor();
 }
 
 ACE_Proactor* CAceProactorManager::GetAce_Client_Proactor(int nProactorID)

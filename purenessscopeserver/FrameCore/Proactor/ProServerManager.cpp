@@ -7,7 +7,7 @@ CProServerManager::CProServerManager(void)
 bool CProServerManager::Init()
 {
     int nServerPortCount    = (int)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
-    int nReactorCount       = 3 + GetXmlConfigAttribute(xmlMessage)->Msg_Thread;
+    int nReactorCount       = 1;
 
     bool blState = false;
 
@@ -85,7 +85,7 @@ bool CProServerManager::Init()
     App_MessageServiceGroup::instance()->CopyMessageManagerList();
 
     //初始化连接器
-    uint32 u4ClientProactorCount = (uint32)nReactorCount - 3;
+    uint32 u4ClientProactorCount = 1;
 
     if (!App_ProConnectAcceptManager::instance()->InitConnectAcceptor(nServerPortCount, u4ClientProactorCount))
     {
@@ -103,7 +103,9 @@ bool CProServerManager::Init()
 
         if (GetXmlConfigAttribute(xmlNetWorkMode)->Mode == NETWORKMODE::NETWORKMODE_PRO_IOCP)
         {
-            blState = App_ProactorManager::instance()->AddNewProactor(i, Proactor_WIN32, 1);
+            blState = App_ProactorManager::instance()->AddNewProactor(i, 
+                Proactor_WIN32, 
+                GetXmlConfigAttribute(xmlNetWorkMode)->ThreadCount);
             OUR_DEBUG((LM_INFO, "[CProServerManager::Init]AddNewProactor NETWORKMODE = Proactor_WIN32.\n"));
         }
         else
@@ -154,16 +156,15 @@ bool CProServerManager::Start()
         pConnectAcceptor->SetListenInfo(GetXmlConfigAttribute(xmlTCPServerIPs)->vec[i].ip.c_str(),
                                         (uint32)GetXmlConfigAttribute(xmlTCPServerIPs)->vec[i].port);
 
-        ACE_Proactor* pProactor = App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE);
-
-        if(NULL == pProactor)
-        {
-            OUR_DEBUG((LM_INFO, "[CProServerManager::Start]App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE) is NULL.\n"));
-            return false;
-        }
+        ACE_Proactor* pProactor = App_ProactorManager::instance()->GetAce_Proactor();
 
         int nBackLog = GetXmlConfigAttribute(xmlNetWorkMode)->BackLog;
-        int nRet = pConnectAcceptor->open(listenAddr, 0, 1, GetXmlConfigAttribute(xmlNetWorkMode)->BackLog, 1, pProactor);
+        int nRet = pConnectAcceptor->open(listenAddr, 
+            0, 
+            1, 
+            GetXmlConfigAttribute(xmlNetWorkMode)->BackLog, 
+            1, 
+            pProactor);
 
         if(-1 == nRet)
         {
@@ -202,7 +203,7 @@ bool CProServerManager::Start()
                 return false;
             }
 
-            ACE_Proactor* pProactor = App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE);
+            ACE_Proactor* pProactor = App_ProactorManager::instance()->GetAce_Proactor();
 
             if(NULL == pProactor)
             {
@@ -262,7 +263,7 @@ bool CProServerManager::Start()
             return false;
         }
 
-        ACE_Proactor* pProactor = App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE);
+        ACE_Proactor* pProactor = App_ProactorManager::instance()->GetAce_Proactor();
 
         if(NULL == pProactor)
         {
@@ -305,10 +306,10 @@ bool CProServerManager::Start()
     }
 
     //初始化服务器间通讯类
-    App_ClientProConnectManager::instance()->Init(App_ProactorManager::instance()->GetAce_Proactor(REACTOR_POSTDEFINE));
+    App_ClientProConnectManager::instance()->Init(App_ProactorManager::instance()->GetAce_Proactor());
 
     //初始化TTy连接管理器
-    App_ProTTyClientManager::instance()->Init(App_ProactorManager::instance()->GetAce_Proactor(REACTOR_POSTDEFINE),
+    App_ProTTyClientManager::instance()->Init(App_ProactorManager::instance()->GetAce_Proactor(),
             GetXmlConfigAttribute(xmlTTyClientManagerInfo)->MaxTTyDevCount,
             GetXmlConfigAttribute(xmlTTyClientManagerInfo)->TimeCheck);
 

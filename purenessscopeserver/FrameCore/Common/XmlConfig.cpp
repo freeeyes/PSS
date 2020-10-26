@@ -129,6 +129,7 @@ bool xmlNetWorkMode::Init(CXmlOpeation* pXmlOperation)
     std::string strNetByteOrder;
 
     if (pXmlOperation->Read_XML_Data_Single_String("NetWorkMode", "Mode", strMode)
+        && pXmlOperation->Read_XML_Data_Single_Uint16("NetWorkMode", "ThreadCount", ThreadCount)
         && pXmlOperation->Read_XML_Data_Single_Uint16("NetWorkMode", "BackLog", BackLog)
         && pXmlOperation->Read_XML_Data_Single_String("NetWorkMode", "ByteOrder", strNetByteOrder))
     {

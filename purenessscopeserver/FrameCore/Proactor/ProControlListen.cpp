@@ -52,7 +52,7 @@ bool CProControlListen::AddListen( const char* pListenIP, uint16 u2Port, uint8 u
     pProConnectAcceptor->SetListenInfo(pListenIP, u2Port);
     pProConnectAcceptor->SetPacketParseInfoID(nPacketParseID);
 
-    ACE_Proactor* pProactor = App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE);
+    ACE_Proactor* pProactor = App_ProactorManager::instance()->GetAce_Proactor();
 
     if(NULL == pProactor)
     {

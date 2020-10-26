@@ -83,6 +83,7 @@ public:
     void SetPacketParseInfoID(uint32 u4PacketParseInfoID);                    //设置对应的m_u4PacketParseInfoID
     uint32 GetPacketParseInfoID();                                            //获得相应的m_u4PacketParseInfoID
     bool SendTimeoutMessage();                                                //发送连接超时消息
+    virtual bool PutSendPacket(ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend);       //将发送数据发送出去
 
 private:
     void Send_Hander_Event(uint8 u1Option);                                  //发送Handler的事件通知业务线程
@@ -98,7 +99,7 @@ private:
 
     bool RecvClinetPacket(uint32 u4PackeLen);                                                         //接受数据包
     bool CheckMessage();                                                                              //处理接收的数据
-    bool PutSendPacket(ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend);       //将发送数据发送出去
+
     void ClearPacketParse(ACE_Message_Block& mbCurrBlock);                                            //清理正在使用的PacketParse
     void PutSendPacketError(ACE_Message_Block* pMbData);                                              //发送失败回调
 
@@ -106,8 +107,6 @@ private:
     uint32             m_u4RecvQueueCount;             //当前链接被处理的数据包数
     uint32             m_u4HandlerID;                  //此Hander生成时的ID
     uint32             m_u4ConnectID;                  //当前Connect的流水号
-    uint32             m_u4AllRecvCount;               //当前链接接收数据包的个数
-    uint32             m_u4AllSendCount;               //当前链接发送数据包的个数
     uint32             m_u4AllRecvSize;                //当前链接接收字节总数
     uint32             m_u4AllSendSize;                //当前链接发送字节总数
     uint32             m_u4SendMaxBuffSize;            //发送数据最大缓冲长度
@@ -117,7 +116,6 @@ private:
     uint32             m_u4PacketParseInfoID;          //对应处理packetParse的模块ID
     uint32             m_u4PacketDebugSize;            //记录能存二进制数据包的最大字节
     int                m_nHashID;                      //对应Hash列表中的ID
-    int                m_u4RecvPacketCount;            //接受包的个数
     uint16             m_u2MaxConnectTime;             //最大链接时间判定
     uint16             m_u2RecvQueueTimeout;           //接受超时时间，超过这个时间的都会被记录到日志中
     uint16             m_u2TcpNodelay;                 //Nagle算法开关
@@ -130,13 +128,13 @@ private:
     ACE_Time_Value     m_atvInput;                     //最后一次接收数据时间
     ACE_Time_Value     m_atvOutput;                    //最后一次发送数据时间
     ACE_Time_Value     m_atvSendAlive;                 //链接存活时间
-    CPacketParse*      m_pPacketParse;                 //数据包解析类
+    CPacketParse       m_objPacketParse;               //数据包解析类
     char               m_szConnectName[MAX_BUFF_100];  //连接名称，可以开放给逻辑插件去设置
     char               m_szLocalIP[MAX_BUFF_50];       //本地监听IP
     string             m_strDeviceName;                //转发接口名称
 
-    _TimeConnectInfo    m_TimeConnectInfo;              //链接健康检测器
     ACE_Message_Block*  m_pBlockMessage;                //当前发送缓冲等待数据块
+    _Packet_Parse_Info* m_pPacketParseInfo = nullptr;   //PacketParse的解析器
 
     CPacketParse        m_objSendPacketParse;           //发送数据包组织结构
     char*               m_pPacketDebugData;             //记录数据包的Debug缓冲字符串
@@ -147,7 +145,8 @@ private:
     Fast_Asynch_Read_Stream  m_Reader;
     Fast_Asynch_Write_Stream m_Writer;
 
-    CPerformanceCounter m_PerformanceCounter;
+    CPerformanceCounter m_SendCounter;
+    CPerformanceCounter m_RecvCounter;
 };
 
 //链接ConnectHandler内存池

@@ -2,7 +2,7 @@
 <config>
 	<!-- ByteOrder表明当前使用的是网络字序还是主机字序，NET_ORDER是网络字序，HOST_ORDER为主机字节序 -->
 	<!-- ByteOrder会指定当前所有的使用的BuffPacket，在流入数据的时候，自动转换成你需要的字序，完全不用你写额外的代码-->
-	<NetWorkMode Mode="Iocp" BackLog="100" ByteOrder="HOST_ORDER" desc="设置框架使用的网络模型,windows下mode支持Iocp。Linux下支持Select,Poll和Epoll，如果需要更换修改Mode参数，否则不用改"/>
+	<NetWorkMode Mode="Iocp" BackLog="100" ThreadCount="4" ByteOrder="HOST_ORDER" desc="设置框架使用的网络模型,windows下mode支持Iocp。Linux下支持Select,Poll和Epoll，如果需要更换修改Mode参数，否则不用改"/>
 	<ServerType Type="0" name="Pss Service" displayname="PssService" Debug="0" DebugSize="1000" IsClose="0" desc="Type设置为0为当前启动，1为Linux后台执行，windows启动系统服务，Debug为0关闭debug日志，Debug为1为打开DEBUG日志,IsClose0为允许关闭，1为不允许。" />
 	<ServerID id="1001" desc="当前服务器的ID编号" />
 	<ServerName name="Freeeyes" desc="当前服务器的名称" />
@@ -11,7 +11,7 @@
 	<!-- ip自适应Ipv4和Ipv6,不需要额外指定 -->
 	<!-- 如果框架都使用默认的ParseID，则这里可以不需要输入ParseID参数 否则，给出指定的ParseID是谁，比如ParseID="1" --> 
 	<TCPServerIP ip="INADDR_ANY" port="10002" ParseID="1" desc="监听TCP服务器的IP和端口，可以是多个，要用多个" />
-	<TCPServerIP ip="INADDR_ANY" port="10003" ParseID="1" desc="监听TCP服务器的IP和端口，可以是多个，要用多个" />
+	<!-- <TCPServerIP ip="INADDR_ANY" port="10003" ParseID="1" desc="监听TCP服务器的IP和端口，可以是多个，要用多个" /> -->
 	<!-- <TCPServerIP ip="fe80::d433:372b:d0ee:edc4%12" port="10002" desc="监听TCP服务器的IP和端口，可以是多个(IPv6地址测试)" /> -->
 	<!-- <TCPServerIP ip="127.0.0.1" port="10003" desc="监听TCP服务器的IP和端口，可以是多个，要用多个，只要多写几个这样的节点即可" /> -->
 	

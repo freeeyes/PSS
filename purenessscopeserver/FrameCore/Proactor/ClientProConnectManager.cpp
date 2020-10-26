@@ -480,7 +480,7 @@ bool CClientProConnectManager::ConnectUDP(int nServerID, const char* pIP, uint16
     }
 
     //Á¬½ÓUDP
-    if(0 != pProactorUDPClient->OpenAddress(AddrLocal, emType, App_ProactorManager::instance()->GetAce_Proactor(REACTOR_UDPDEFINE), pClientUDPMessage))
+    if(0 != pProactorUDPClient->OpenAddress(AddrLocal, emType, App_ProactorManager::instance()->GetAce_Proactor(), pClientUDPMessage))
     {
         OUR_DEBUG((LM_INFO, "[CClientProConnectManager::ConnectUDP](%d)UDP OpenAddress error.\n", nServerID));
         SAFE_DELETE(pProactorUDPClient);

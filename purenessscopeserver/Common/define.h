@@ -327,10 +327,6 @@ enum class EM_SEND_PACKET_PARSE
     EM_SENDMESSAGE_JAMPNOMAL,      //发送数据包模式(不走PacketPrase端口)
 };
 
-const int REACTOR_CLIENTDEFINE = 0;
-const int REACTOR_POSTDEFINE   = 1;
-const int REACTOR_UDPDEFINE    = 2;
-
 //日志编号声明
 const int LOG_SYSTEM                  = 1000;
 const int LOG_SYSTEM_ERROR            = 1001;

@@ -72,7 +72,7 @@ public:
     bool StopProactor();
 
     CAceProactor* GetAceProactor(int nProactorID);
-    ACE_Proactor* GetAce_Proactor(int nProactorID);
+    ACE_Proactor* GetAce_Proactor();
     ACE_Proactor* GetAce_Client_Proactor(int nProactorID);
     uint32 GetClientReactorCount();
 

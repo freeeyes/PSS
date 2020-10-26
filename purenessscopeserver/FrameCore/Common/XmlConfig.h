@@ -155,6 +155,7 @@ public:
     NETWORKMODE Mode               = NETWORKMODE::NETWORKMODE_RE_EPOLL;
     uint16 BackLog                 = 0;
     bool NetByteOrder              = false;
+    uint16 ThreadCount             = 1;
     ENUM_CHAR_ORDER LocalByteOrder = ENUM_CHAR_ORDER::SYSTEM_BIG_ORDER;
     xmlNetWorkMode(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);

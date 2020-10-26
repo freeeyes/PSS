@@ -150,13 +150,13 @@ void CWorkThreadMessage::Clear()
 {
 	if (nullptr != m_pmbRecvHead)
 	{
-		m_pmbRecvHead->release();
+        App_MessageBlockManager::instance()->Close(m_pmbRecvHead);
 		m_pmbRecvHead = nullptr;
 	}
 
 	if (nullptr != m_pmbRecvBody)
 	{
-		m_pmbRecvBody->release();
+        App_MessageBlockManager::instance()->Close(m_pmbRecvBody);
 		m_pmbRecvBody = nullptr;
 	}
 }

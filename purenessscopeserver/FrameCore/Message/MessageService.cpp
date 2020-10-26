@@ -73,7 +73,7 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
     m_MessagePool.Init(GetXmlConfigAttribute(xmlMessage)->Msg_Pool, CMessagePool::Init_Callback);
     m_DeviceHandlerPool.Init(u2PoolSize, CDeviceHandlerPool::Init_Callback);
 
-    m_PerformanceCounter.init("WorkThread");
+    m_PerformanceCounter.init("WorkThread", 10000);
 }
 
 bool CMessageService::Start()
