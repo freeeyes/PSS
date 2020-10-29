@@ -86,6 +86,8 @@ public:
     virtual bool PutSendPacket(ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend);       //将发送数据发送出去
 
 private:
+    bool Dispose_Recv_buffer();                                              //处理接收到数据，切包
+    void Move_Recv_buffer();                                                 //整理接收内存缓冲区
     void Send_Hander_Event(uint8 u1Option);                                  //发送Handler的事件通知业务线程
     void Get_Recv_length();                                                  //得到要处理的数据长度
     void Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType);        //输出DEBUG信息
@@ -97,10 +99,10 @@ private:
     bool Send_Input_To_Cache(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);              //讲发送对象放入缓存
     bool Send_Input_To_TCP(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);                //将数据发送给对端
 
-    bool RecvClinetPacket(uint32 u4PackeLen);                                                         //接受数据包
+    bool RecvClinetPacket();                                                                          //接受数据包
     bool CheckMessage();                                                                              //处理接收的数据
 
-    void ClearPacketParse(ACE_Message_Block& mbCurrBlock);                                            //清理正在使用的PacketParse
+    void ClearPacketParse();                                                                          //清理正在使用的PacketParse
     void PutSendPacketError(ACE_Message_Block* pMbData);                                              //发送失败回调
 
     uint32             m_u4MaxPacketSize;              //单个数据包的最大长度
@@ -133,14 +135,15 @@ private:
     char               m_szLocalIP[MAX_BUFF_50];       //本地监听IP
     string             m_strDeviceName;                //转发接口名称
 
-    ACE_Message_Block*  m_pBlockMessage;                //当前发送缓冲等待数据块
-    _Packet_Parse_Info* m_pPacketParseInfo = nullptr;   //PacketParse的解析器
+    ACE_Message_Block*  m_pBlockMessage    = nullptr;  //当前发送缓冲等待数据块
+    ACE_Message_Block*  m_pBlockRecv       = nullptr;  //接收数据缓冲块
+    _Packet_Parse_Info* m_pPacketParseInfo = nullptr;  //PacketParse的解析器
 
-    CPacketParse        m_objSendPacketParse;           //发送数据包组织结构
-    char*               m_pPacketDebugData;             //记录数据包的Debug缓冲字符串
+    CPacketParse        m_objSendPacketParse;          //发送数据包组织结构
+    char*               m_pPacketDebugData;            //记录数据包的Debug缓冲字符串
 
-    EM_IO_TYPE          m_emIOType;                     //当前IO入口类型
-    IFileTestManager*   m_pFileTest;                    //文件测试接口入口
+    EM_IO_TYPE          m_emIOType;                    //当前IO入口类型
+    IFileTestManager*   m_pFileTest;                   //文件测试接口入口
 
     Fast_Asynch_Read_Stream  m_Reader;
     Fast_Asynch_Write_Stream m_Writer;

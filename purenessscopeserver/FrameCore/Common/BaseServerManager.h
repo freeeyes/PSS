@@ -32,7 +32,6 @@ bool Server_Manager_Common_IObject(IConnectManager* pConnectManager,
                                    IServerManager* pIServerManager,
                                    ITMService* pTMService,
                                    ITTyClientManager* pTTyClientManager,
-                                   IMessageQueueManager* pLogicThreadManager,
                                    IControlListen* pControlListen);
 
 //初始化模块插件的加载

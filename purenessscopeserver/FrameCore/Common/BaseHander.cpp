@@ -219,10 +219,7 @@ void Send_MakePacket_Queue(_MakePacket objMakePacket, const char* pLocalIP, uint
         }
     }
 
-    //将数据送入工作线程处理队列
-    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
-    if (false == App_MakePacket::instance()->PutMessageBlock(objMakePacket, tvNow))
+    if (false == App_MakePacket::instance()->PutMessageBlock(objMakePacket, objMakePacket.m_tvRecv))
     {
         OUR_DEBUG((LM_ERROR, "[Send_MakePacket_Queue] ConnectID = %d, PACKET_CONNECT is error.\n", objMakePacket.m_u4ConnectID));
     }

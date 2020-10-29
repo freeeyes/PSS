@@ -8,8 +8,8 @@ class IMessageBlockManager
 {
 public:
     virtual ~IMessageBlockManager() {}
-    virtual ACE_Message_Block* Create(uint32 u4Size)     = 0;
-    virtual bool Close(ACE_Message_Block* pMessageBlock) = 0;
+    virtual ACE_Message_Block* Create(uint32 u4Size)                            = 0;
+    virtual bool Close(ACE_Message_Block* pMessageBlock, uint32 u4BlockLen = 0) = 0;
 };
 
 #endif

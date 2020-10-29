@@ -19,7 +19,7 @@
 #define SIGNALING_IV									"ADMINLUBOCOMr3c"
 
 #define MESSAGE_FUNCTION_BEGIN(x) switch(x) {
-#define MESSAGE_FUNCTION(x,y,z) case x: { y(z); break; }
+#define MESSAGE_FUNCTION(x,y,z,h) case x: { y(z,h); break; }
 #define MESSAGE_FUNCTION_END }
 
 using namespace std;
@@ -30,19 +30,19 @@ public:
     CBaseCommand(void);
     ~CBaseCommand(void);
 
-    int DoMessage(IMessage* pMessage, bool& bDeleteFlag);
+    virtual int DoMessage(IMessage* pMessage, bool& bDeleteFlag, IBuffPacket* pSendBuffPacket);
     void SetServerObject(CServerObject* pServerObject);
 
     void ReadIniFile(const char* pIniFileName);
 
 private:
-    int Do_Connect(IMessage* pMessage);
-    int Do_DisConnect(IMessage* pMessage);
-    int Do_ClientSendTimeout(IMessage* pMessage);
-    int Do_Base(IMessage* pMessage);
-    int Do_ClientSendOk(IMessage* pMessage);
-    int Do_ReplyTest(IMessage* pMessage);
-    int SendClient(_PacketInfo BodyPacket, short nCommand, uint32 nConnectId, char* pKey, char* pIv, bool nEncrypt);
+    int Do_Connect(IMessage* pMessage, IBuffPacket* pSendBuffPacket);
+    int Do_DisConnect(IMessage* pMessage, IBuffPacket* pSendBuffPacket);
+    int Do_ClientSendTimeout(IMessage* pMessage, IBuffPacket* pSendBuffPacket);
+    int Do_Base(IMessage* pMessage, IBuffPacket* pSendBuffPacket);
+    int Do_ClientSendOk(IMessage* pMessage, IBuffPacket* pSendBuffPacket);
+    int Do_ReplyTest(IMessage* pMessage, IBuffPacket* pSendBuffPacket);
+    int SendClient(_PacketInfo BodyPacket, short nCommand, uint32 nConnectId, char* pKey, char* pIv, bool nEncrypt, IBuffPacket* pSendBuffPacket);
 
 private:
     CServerObject* m_pServerObject;

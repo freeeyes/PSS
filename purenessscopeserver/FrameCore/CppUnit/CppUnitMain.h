@@ -40,7 +40,6 @@
 #include "Uint_LogManager.h"
 #include "Unit_LoadModule.h"
 #include "Uint_TcpRedirection.h"
-#include "Unit_LogicThreadManager.h"
 #include "Unit_TSTimer.h"
 #include "Unit_TMService.h"
 #include "Unit_EChartlog.h"

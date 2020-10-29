@@ -21,7 +21,7 @@ enum class EM_Client_Send_Status
 class CSend_Param
 {
 public:
-    EM_SEND_PACKET_PARSE   m_emSendType  = EM_SEND_PACKET_PARSE::EM_SENDMESSAGE_NOMAL;
+    EM_SEND_PACKET_PARSE   m_emSendType  = EM_SEND_PACKET_PARSE::EM_SENDMESSAGE_JAMPNOMAL;
     EM_Client_Send_Status m_emSendState = EM_Client_Send_Status::CLIENT_SEND_IMMEDIATLY;
     int                    m_nMessageID  = 0;
     bool                   m_blDlete     = true;

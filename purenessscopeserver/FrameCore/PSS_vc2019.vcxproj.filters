@@ -316,12 +316,6 @@
     <ClCompile Include="Proactor\ProConnectHandler.cpp">
       <Filter>Proactor\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="CppUnit\Unit_LogicThreadManager.cpp">
-      <Filter>CppUnit\cppfile</Filter>
-    </ClCompile>
-    <ClCompile Include="Message\MessageQueueManager.cpp">
-      <Filter>Message\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="CppUnit\Unit_TSTimer.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
@@ -789,12 +783,6 @@
     <ClInclude Include="..\Common\ILogicThreadManager.h">
       <Filter>IObject</Filter>
     </ClInclude>
-    <ClInclude Include="CppUnit\Unit_LogicThreadManager.h">
-      <Filter>CppUnit\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="Message\MessageQueueManager.h">
-      <Filter>Message\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="..\Common\ITTyClientManager.h">
       <Filter>IObject</Filter>
     </ClInclude>
@@ -851,9 +839,6 @@
     </ClInclude>
     <ClInclude Include="..\Common\ILogicQueue.hpp">
       <Filter>Common\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\IMessageQueueManager.h">
-      <Filter>IObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\ACEMemory.hpp">
       <Filter>Common\cppfile</Filter>

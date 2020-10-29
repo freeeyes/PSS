@@ -70,7 +70,6 @@ bool Server_Manager_Common_IObject(IConnectManager* pConnectManager,
                                    IServerManager* pIServerManager,
                                    ITMService* pTMService,
                                    ITTyClientManager* pTTyClientManager,
-                                   IMessageQueueManager* pMessageQueueManager,
                                    IControlListen* pControlListen)
 {
     App_ServerObject::instance()->SetMessageManager(dynamic_cast<IMessageManager*>(App_MessageManager::instance()));
@@ -88,7 +87,6 @@ bool Server_Manager_Common_IObject(IConnectManager* pConnectManager,
     App_ServerObject::instance()->SetServerManager(pIServerManager);
     App_ServerObject::instance()->SetTMSServce(pTMService);
     App_ServerObject::instance()->SetTTyClientManager(pTTyClientManager);
-    App_ServerObject::instance()->SetMessageQueueManager(pMessageQueueManager);
     App_ServerObject::instance()->SetEchartlog(dynamic_cast<IEchartlog*>(App_Echartlog::instance()));
 
     return true;

@@ -45,9 +45,6 @@ bool CProServerManager::Init()
         App_ProConnectHandlerPool::instance()->Init(GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount);
     }
 
-    //初始化拆件逻辑线程
-    App_MessageQueueManager::instance()->Init();
-
     //初始化TMS系统
     m_TMService.Init();
 
@@ -59,7 +56,6 @@ bool CProServerManager::Init()
     ITMService* pTMService                     = dynamic_cast<ITMService*>(&m_TMService);
     IServerManager* pServerManager             = dynamic_cast<IServerManager*>(this);
     ITTyClientManager* pTTyClientManager       = dynamic_cast<ITTyClientManager*>(App_ProTTyClientManager::instance());
-    IMessageQueueManager* pMessageQueueManager = dynamic_cast<IMessageQueueManager*>(App_MessageQueueManager::instance());
     IControlListen* pControlListen             = dynamic_cast<IControlListen*>(App_ProControlListen::instance());
 
     Server_Manager_Common_IObject(pConnectManager,
@@ -69,7 +65,6 @@ bool CProServerManager::Init()
                                   pServerManager,
                                   pTMService,
                                   pTTyClientManager,
-                                  pMessageQueueManager,
                                   pControlListen);
 
     //初始化模块加载，因为这里可能包含了中间服务器连接加载
@@ -388,9 +383,6 @@ bool CProServerManager::Close()
 
     App_ProConnectAcceptManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ProConnectAcceptManager OK.\n"));
-
-    App_MessageQueueManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_MessageQueueManager OK.\n"));
 
     m_ProConsoleConnectAcceptor.cancel();
     App_TimerManager::instance()->deactivate();

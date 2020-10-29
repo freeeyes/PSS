@@ -228,7 +228,6 @@
     <ClCompile Include="CppUnit\Unit_FrameCommand.cpp" />
     <ClCompile Include="CppUnit\Unit_IPAccount.cpp" />
     <ClCompile Include="CppUnit\Unit_LoadModule.cpp" />
-    <ClCompile Include="CppUnit\Unit_LogicThreadManager.cpp" />
     <ClCompile Include="CppUnit\Unit_MakePacket.cpp" />
     <ClCompile Include="CppUnit\Unit_MessageDefine.cpp" />
     <ClCompile Include="CppUnit\Unit_MessageDyeingManager.cpp" />
@@ -241,7 +240,6 @@
     <ClCompile Include="Mail\smtps.cpp" />
     <ClCompile Include="Message\HandlerManager.cpp" />
     <ClCompile Include="Message\MessageDyeingManager.cpp" />
-    <ClCompile Include="Message\MessageQueueManager.cpp" />
     <ClCompile Include="Proactor\ProConnectHandler.cpp" />
     <ClCompile Include="Proactor\ProTTyClientManager.cpp" />
     <ClCompile Include="Proactor\ProTTyHandler.cpp" />
@@ -521,7 +519,6 @@
     <ClInclude Include="..\Common\IMessage.h" />
     <ClInclude Include="..\Common\IMessageBlockManager.h" />
     <ClInclude Include="..\Common\IMessageManager.h" />
-    <ClInclude Include="..\Common\IMessageQueueManager.h" />
     <ClInclude Include="..\Common\IModuleInfo.h" />
     <ClInclude Include="..\Common\IModuleMessageManager.h" />
     <ClInclude Include="..\Common\IObject.h" />
@@ -600,7 +597,6 @@
     <ClInclude Include="CppUnit\Unit_FrameCommand.h" />
     <ClInclude Include="CppUnit\Unit_IPAccount.h" />
     <ClInclude Include="CppUnit\Unit_LoadModule.h" />
-    <ClInclude Include="CppUnit\Unit_LogicThreadManager.h" />
     <ClInclude Include="CppUnit\Unit_MakePacket.h" />
     <ClInclude Include="CppUnit\Unit_MessageDefine.h" />
     <ClInclude Include="CppUnit\Unit_ModuleMessageManager.h" />
@@ -615,7 +611,6 @@
     <ClInclude Include="Mail\smtps.h" />
     <ClInclude Include="Message\HandlerManager.h" />
     <ClInclude Include="Message\MessageDyeingManager.h" />
-    <ClInclude Include="Message\MessageQueueManager.h" />
     <ClInclude Include="PacketParse\PacketConsoleParse.h" />
     <ClInclude Include="PacketParse\PacketParse.h" />
     <ClInclude Include="PacketParse\PacketParseBase.h" />

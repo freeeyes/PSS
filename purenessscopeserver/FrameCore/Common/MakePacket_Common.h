@@ -17,6 +17,7 @@ public:
 	ACE_INET_Addr       m_AddrRemote;                                            //数据包的来源IP信息
 	ACE_INET_Addr       m_AddrListen;                                            //数据包来源监听IP信息
 	IHandler*           m_pHandler        = nullptr;                             //当前Handler句柄名称
+	ACE_Time_Value      m_tvRecv;                                                //接收数据的时间 
 
 	_MakePacket()
 	{

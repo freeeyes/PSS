@@ -65,62 +65,6 @@ bool CMessage::SetPacketBody(ACE_Message_Block* pmbBody)
     return true;
 }
 
-CMessagePool::CMessagePool()
-{
-}
-
-void CMessagePool::Init_Callback(int nIndex, CWorkThreadMessage* pMessage)
-{
-    pMessage->SetHashID(nIndex);
-}
-
-void CMessagePool::Close_Callback(int nIndex, CWorkThreadMessage* pMessage)
-{
-    ACE_UNUSED_ARG(nIndex);
-
-    if (NULL != pMessage)
-    {
-        pMessage->Close();
-    }
-}
-
-int CMessagePool::GetUsedCount()
-{
-    return CObjectPoolManager<CWorkThreadMessage, ACE_Recursive_Thread_Mutex>::GetUsedCount();
-}
-
-int CMessagePool::GetFreeCount()
-{
-    return CObjectPoolManager<CWorkThreadMessage, ACE_Recursive_Thread_Mutex>::GetFreeCount();
-}
-
-void CMessagePool::GetCreateInfoList(vector<_Object_Create_Info>& objCreateList)
-{
-    return CObjectPoolManager<CWorkThreadMessage, ACE_Recursive_Thread_Mutex>::GetCreateInfoList(objCreateList);
-}
-
-CWorkThreadMessage* CMessagePool::Create()
-{
-    return CObjectPoolManager<CWorkThreadMessage, ACE_Recursive_Thread_Mutex>::Create(__FILE__, __LINE__);
-}
-
-bool CMessagePool::Delete(CWorkThreadMessage* pWorkThreadMessage)
-{
-    if(NULL == pWorkThreadMessage)
-    {
-        return false;
-    }
-
-    bool blState = CObjectPoolManager<CWorkThreadMessage, ACE_Recursive_Thread_Mutex>::Delete_withoutLock(pWorkThreadMessage->GetHashID(), pWorkThreadMessage);
-
-    if(false == blState)
-    {
-        OUR_DEBUG((LM_INFO, "[CMessagePool::Delete]HashID=%d(0x%08x).\n", pWorkThreadMessage->GetHashID(), pWorkThreadMessage));
-    }
-
-    return true;
-}
-
 CWorkThreadMessage::CWorkThreadMessage()
 {
 	//这里设置消息队列模块指针内容，这样就不必反复的new和delete，提升性能
@@ -165,13 +109,13 @@ void CWorkThreadMessage::Close()
 {
 	if (nullptr != m_pmbRecvHead)
 	{
-		m_pmbRecvHead->release();
+        App_MessageBlockManager::instance()->Close(m_pmbRecvHead);
 		m_pmbRecvHead = nullptr;
 	}
 
 	if (nullptr != m_pmbRecvBody)
 	{
-		m_pmbRecvBody->release();
+        App_MessageBlockManager::instance()->Close(m_pmbRecvBody);
 		m_pmbRecvBody = nullptr;
 	}
 

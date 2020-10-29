@@ -54,7 +54,7 @@
 	<!-- 命令包统计相关设置 -->
 	<CommandAccount Account="1" FlowAccount="1" MaxCommandCount="2000" desc="Account为1记录统计命令日志，0为不记录，FlowAccount为流量统计，1为开启，0为关闭" />
 	<!-- 接收数据包连接相关设置 -->
-	<RecvInfo RecvBuffSize="20480" RecvQueueTimeout="50" desc="接收客户端数据配置参数" />
+	<RecvInfo RecvBuffSize="1024" RecvQueueTimeout="50" desc="接收客户端数据配置参数" />
 	<!-- 发送数据包连接相关设置 -->
 	<SendInfo SendQueueMax="10000" TcpNodelay="0" MaxBlockSize="10240" BlockCount="10" SendTimeout="50" SendQueueTimeout="50" PutQueueTimeout="100" desc="发送到客户端需要配置的参数" />
 	<!-- 监控线程相关设置 -->

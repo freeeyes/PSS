@@ -189,8 +189,8 @@ public:
     void Init();
     void Close();
 
-    ACE_Message_Block* Create(uint32 u4Size);
-    bool Close(ACE_Message_Block* pMessageBlock);
+    virtual ACE_Message_Block* Create(uint32 u4Size);
+    virtual bool Close(ACE_Message_Block* pMessageBlock, uint32 u4BlockLen = 0);
 
     uint32 GetUsedSize() const;
 

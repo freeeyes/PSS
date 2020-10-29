@@ -22,7 +22,6 @@
 #include "IFrameCommand.h"
 #include "ITSTimer.h"
 #include "ITTyClientManager.h"
-#include "IMessageQueueManager.h"
 #include "ITMService.h"
 #include "IEchartlog.h"
 
@@ -46,7 +45,6 @@ public:
         m_pFrameCommand         = NULL;
         m_pTMService            = NULL;
         m_pTTyClientManager     = NULL;
-        m_pMessageQueueManager  = NULL;
         m_pEchartlog            = NULL;
     }
 
@@ -115,11 +113,6 @@ public:
         m_pTTyClientManager = pTTyClientManager;
     }
 
-    void SetMessageQueueManager(IMessageQueueManager* pMessageQueueManager)
-    {
-        m_pMessageQueueManager = pMessageQueueManager;
-    }
-
     void SetEchartlog(IEchartlog* pEchartlog)
     {
         m_pEchartlog = pEchartlog;
@@ -185,11 +178,6 @@ public:
         return m_pTTyClientManager;
     }
 
-    IMessageQueueManager* GetMessageQueueManager()
-    {
-        return m_pMessageQueueManager;
-    }
-
     ActiveTimer* GetAceTimerManager()
     {
         return m_pTimerManager;
@@ -216,7 +204,6 @@ private:
     IFrameCommand*         m_pFrameCommand;
     ITMService*            m_pTMService;
     ITTyClientManager*     m_pTTyClientManager;
-    IMessageQueueManager*  m_pMessageQueueManager;
     IEchartlog*            m_pEchartlog;
 };
 

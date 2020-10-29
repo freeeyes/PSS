@@ -73,25 +73,6 @@ public:
     void Close();
 };
 
-//CWorkThreadMessage对象池
-class CMessagePool : public CObjectPoolManager<CWorkThreadMessage, ACE_Recursive_Thread_Mutex>
-{
-public:
-    CMessagePool();
-
-    static void Init_Callback(int nIndex, CWorkThreadMessage* pMessage);
-    static void Close_Callback(int nIndex, CWorkThreadMessage* pMessage);
-
-    CWorkThreadMessage* Create();
-    bool Delete(CWorkThreadMessage* pWorkThreadMessage);
-
-    int GetUsedCount();
-    int GetFreeCount();
-
-    void GetCreateInfoList(vector<_Object_Create_Info>& objCreateList);
-};
-
-
 //线程内维护的Handler对象架构
 class CWorkThread_Handler_info
 {

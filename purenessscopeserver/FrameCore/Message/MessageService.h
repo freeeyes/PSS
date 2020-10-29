@@ -84,6 +84,7 @@ public:
 
     void GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_Account);  //得到当前列表描述信息
 
+    bool Synchronize_SendPostMessage(CWorkThread_Handler_info* pHandlerInfo, const ACE_Time_Value tvMessage);
     bool SendPostMessage(CSendMessageInfo objSendMessageInfo);                //发送数据
     bool SendCloseMessage(uint32 u4ConnectID);                                //关闭指定链接 
 
@@ -96,7 +97,7 @@ private:
     bool ProcessSendClose(CWorkThreadMessage* pMessage, uint32 u4ThreadID);   //处理发送事件
     void CloseCommandList();                                                  //清理当前信令列表副本
     CClientCommandList* GetClientCommandList(uint16 u2CommandID);
-    bool DoMessage(const ACE_Time_Value& tvBegin, IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost, uint16& u2Count, bool& bDeleteFlag);
+    bool DoMessage(IMessage* pMessage, uint16& u2CommandID, uint16& u2Count, bool& bDeleteFlag);
 
     virtual int CloseMsgQueue();
 
@@ -115,11 +116,12 @@ private:
 
     MESSAGE_SERVICE_THREAD_STATE   m_emThreadState      = MESSAGE_SERVICE_THREAD_STATE::THREAD_STOP; //当前工作线程状态
 
+    CBuffPacket                    m_objBuffSendPacket;
+
     _ThreadInfo                    m_ThreadInfo;           //当前线程信息
     CWorkThreadAI                  m_WorkThreadAI;         //线程自我监控的AI逻辑
     CCommandAccount                m_CommandAccount;       //当前线程命令统计数据
 
-    CMessagePool                   m_MessagePool;          //消息池
     CDeviceHandlerPool             m_DeviceHandlerPool;    //对象池 
 
     CHashTable<CClientCommandList>                      m_objClientCommandList;  //可执行的信令列表

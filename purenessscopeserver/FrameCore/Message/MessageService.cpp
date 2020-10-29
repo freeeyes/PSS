@@ -70,8 +70,11 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
     }
 
     //设置消息池
-    m_MessagePool.Init(GetXmlConfigAttribute(xmlMessage)->Msg_Pool, CMessagePool::Init_Callback);
     m_DeviceHandlerPool.Init(u2PoolSize, CDeviceHandlerPool::Init_Callback);
+
+    //初始化发送缓冲
+    m_objBuffSendPacket.Init(DEFINE_PACKET_SIZE, GetXmlConfigAttribute(xmlSendInfo)->MaxBlockSize);
+    m_objBuffSendPacket.SetNetSort(GetXmlConfigAttribute(xmlNetWorkMode)->NetByteOrder);
 
     m_PerformanceCounter.init("WorkThread", 10000);
 }
@@ -302,51 +305,19 @@ bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4
     //将要处理的数据放到逻辑处理的地方去
     uint16 u2CommandID = objRecvMessage.GetMessageBase()->m_u2Cmd;          //数据包的CommandID
 
-    //抛出掉链接建立和断开，只计算逻辑数据包
-    if(objRecvMessage.GetMessageBase()->m_u2Cmd >= CLIENT_LINK_USER)
-    {
-        m_ThreadInfo.m_u4RecvPacketCount++;
-        m_ThreadInfo.m_u4CurrPacketCount++;
-        m_ThreadInfo.m_u2CommandID   = u2CommandID;
-
-        bool blIsDead = m_WorkThreadAI.CheckCurrTimeout(objRecvMessage.GetMessageBase()->m_u2Cmd, (uint64)m_ThreadInfo.m_tvUpdateTime.sec());
-
-        if(blIsDead == true)
-        {
-            OUR_DEBUG((LM_ERROR,"[CMessageService::ProcessMessage]Command(%d) is Delele.\n", objRecvMessage.GetMessageBase()->m_u2Cmd));
-            
-            //不返回任何指令
-
-            DeleteMessage(pMessage);
-            m_ThreadInfo.m_u4State = THREADSTATE::THREAD_RUNEND;
-
-            return true;
-        }
-    }
-
-    uint32 u4TimeCost     = 0;      //命令执行时间
     uint16 u2CommandCount = 0;      //命令被调用次数
     bool   blDeleteFlag   = true;   //用完是否删除，默认是删除
 
-    DoMessage(m_ThreadInfo.m_tvUpdateTime, &objRecvMessage, u2CommandID, u4TimeCost, u2CommandCount, blDeleteFlag);
+    DoMessage(&objRecvMessage, u2CommandID, u2CommandCount, blDeleteFlag);
 
     if(objRecvMessage.GetMessageBase()->m_u2Cmd >= CLIENT_LINK_USER)
     {
-        //如果AI启动了，则在这里进行AI判定
-        m_WorkThreadAI.SaveTimeout(objRecvMessage.GetMessageBase()->m_u2Cmd, u4TimeCost);
-
-        if(u2CommandCount > 0)
-        {
-            //获得单个命令的执行时间
-            u4TimeCost = u4TimeCost/u2CommandCount;
-        }
+        //同步发送数据逻辑
+        Synchronize_SendPostMessage(pWorkThread_Handler_info, pMessage->m_tvMessage);
 
         //添加统计信息
         pWorkThread_Handler_info->m_RecvSize += u4PacletHeadLength + u4PacletBodyLength;
         pWorkThread_Handler_info->m_tvInput = pMessage->m_tvMessage;
-
-        m_PerformanceCounter.counter();
-
     }
 
     if (true == blDeleteFlag)
@@ -361,6 +332,7 @@ bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4
         pWorkThread_Handler_info->m_pHandler->Close();
         m_objHandlerList.Del_Hash_Data_By_Unit32(pMessage->m_u4ConnectID);
         m_DeviceHandlerPool.Delete(pWorkThread_Handler_info);
+        DeleteMessage(pMessage);
     }
 
     m_ThreadInfo.m_u4State = THREADSTATE::THREAD_RUNEND;
@@ -432,8 +404,6 @@ int CMessageService::Close()
     m_objClientCommandList.Close();
 
     m_CommandAccount.Close();
-
-    m_MessagePool.Close_Object(CMessagePool::Close_Callback);
 
     m_WorkThreadAI.Close();
 
@@ -512,7 +482,7 @@ CClientCommandList* CMessageService::GetClientCommandList(uint16 u2CommandID)
     return m_objClientCommandList.Get_Hash_Box_Data_By_Uint32((uint32)u2CommandID);
 }
 
-bool CMessageService::DoMessage(const ACE_Time_Value& tvBegin, IMessage* pMessage, uint16& u2CommandID, uint32& u4TimeCost, uint16& u2Count, bool& bDeleteFlag)
+bool CMessageService::DoMessage(IMessage* pMessage, uint16& u2CommandID, uint16& u2Count, bool& bDeleteFlag)
 {
     if (NULL == pMessage)
     {
@@ -554,25 +524,12 @@ bool CMessageService::DoMessage(const ACE_Time_Value& tvBegin, IMessage* pMessag
             }
 
             //标记当前命令运行状态
-            pClientCommandInfo->m_pClientCommand->DoMessage(pMessage, bDeleteFlag);
+            pClientCommandInfo->m_pClientCommand->DoMessage(pMessage, bDeleteFlag, &m_objBuffSendPacket);
 
-            //这里指记录处理毫秒数
-            ACE_Time_Value tvCost = ACE_OS::gettimeofday() - tvBegin;
-            u4TimeCost = (uint32)tvCost.msec();
-
-            //记录命令被调用次数
-            u2Count++;
         }
-    }
 
-    //判断是否需要记录超时日志
-    if (pClientCommandList->GetCommandTimeout() > 0 && u4TimeCost >= pClientCommandList->GetCommandTimeout())
-    {
-        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_WORKTHREAD, "ThreadID=%d, CommandID=%d, Timeout=%d ms, Cost time=%d.",
-                                                m_u4ThreadID,
-                                                u2CommandID,
-                                                pClientCommandList->GetCommandTimeout(),
-                                                u4TimeCost);
+        //记录命令被调用次数
+        u2Count = (uint16)nCount;
     }
 
     return true;
@@ -700,36 +657,47 @@ THREADSTATE CMessageService::GetStepState() const
 
 uint32 CMessageService::GetUsedMessageCount()
 {
-    return (uint32)m_MessagePool.GetUsedCount();
+    return (uint32)msg_queue()->message_count();
 }
 
 CWorkThreadMessage* CMessageService::CreateMessage()
 {
-    CWorkThreadMessage* pMessage = m_MessagePool.Create();
-
-    if(NULL != pMessage)
-    {
-        pMessage->m_u4WorkThreadID = GetThreadID();
-    }
-
-    return pMessage;
+    return new CWorkThreadMessage();
 }
 
 void CMessageService::DeleteMessage(CWorkThreadMessage* pMessage)
 {
     //清理数据
-    pMessage->Clear();
-
-    //归还消息池
-    if (false == m_MessagePool.Delete(pMessage))
-    {
-        OUR_DEBUG((LM_INFO, "[CMessageService::DeleteMessage]pMessage == NULL.\n"));
-    }
+    pMessage->Close();
+    delete pMessage;
 }
 
 void CMessageService::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_Account)
 {
     m_CommandAccount.GetFlowPortList(vec_Port_Data_Account);
+}
+
+bool CMessageService::Synchronize_SendPostMessage(CWorkThread_Handler_info* pHandlerInfo, const ACE_Time_Value tvMessage)
+{
+	//同步发送数据
+    uint32 u4SendLength = m_objBuffSendPacket.GetPacketLen();
+    if (u4SendLength > 0)
+    {
+        ACE_Message_Block* pBlockSend = new ACE_Message_Block(u4SendLength);
+
+        memcpy_safe(m_objBuffSendPacket.GetData(),
+            u4SendLength,
+            pBlockSend->rd_ptr(),
+            u4SendLength);
+
+        pBlockSend->wr_ptr(u4SendLength);
+
+        pHandlerInfo->m_pHandler->PutSendPacket(pBlockSend, u4SendLength, tvMessage);
+        pBlockSend->release();
+        m_objBuffSendPacket.Clear();
+    }
+
+    return true;
 }
 
 bool CMessageService::SendPostMessage(CSendMessageInfo objSendMessageInfo)

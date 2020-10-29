@@ -15,7 +15,7 @@ void CBaseCommand::SetServerObject(CServerObject* pServerObject)
     m_pServerObject = pServerObject;
 }
 
-int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
+int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag, IBuffPacket* pSendBuffPacket)
 {
     //__ENTER_FUNCTION是自动给你的函数追加try的宏，用于捕捉错误，你可以使用__THROW_FUNCTION()抛出你的错误
     //比如__THROW_FUNCTION("hello"); 它会自动在Log文件夹下的assert.log记录文件名，函数名，行数，描述。
@@ -42,12 +42,12 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
 
     //处理链接建立信息
     MESSAGE_FUNCTION_BEGIN(pMessage->GetMessageBase()->m_u2Cmd);
-    MESSAGE_FUNCTION(CLIENT_LINK_CONNECT,     Do_Connect,           pMessage);
-    MESSAGE_FUNCTION(CLIENT_LINK_CDISCONNET,  Do_DisConnect,        pMessage);
-    MESSAGE_FUNCTION(CLINET_LINK_SENDTIMEOUT, Do_ClientSendTimeout, pMessage);
-    MESSAGE_FUNCTION(CLIENT_LINK_SENDOK,      Do_ClientSendOk,      pMessage);
-    MESSAGE_FUNCTION(COMMAND_BASE,            Do_Base,              pMessage);
-    MESSAGE_FUNCTION(COMMAND_TESTREPLY,       Do_ReplyTest,         pMessage);
+    MESSAGE_FUNCTION(CLIENT_LINK_CONNECT,     Do_Connect,           pMessage, pSendBuffPacket);
+    MESSAGE_FUNCTION(CLIENT_LINK_CDISCONNET,  Do_DisConnect,        pMessage, pSendBuffPacket);
+    MESSAGE_FUNCTION(CLINET_LINK_SENDTIMEOUT, Do_ClientSendTimeout, pMessage, pSendBuffPacket);
+    MESSAGE_FUNCTION(CLIENT_LINK_SENDOK,      Do_ClientSendOk,      pMessage, pSendBuffPacket);
+    MESSAGE_FUNCTION(COMMAND_BASE,            Do_Base,              pMessage, pSendBuffPacket);
+    MESSAGE_FUNCTION(COMMAND_TESTREPLY,       Do_ReplyTest,         pMessage, pSendBuffPacket);
     MESSAGE_FUNCTION_END;
 
     return 0;
@@ -55,7 +55,7 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag)
     __LEAVE_FUNCTION_WITHRETURN(0);
 }
 
-int CBaseCommand::Do_Connect(IMessage* pMessage)
+int CBaseCommand::Do_Connect(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
 {
     OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_Connect] (%d)TCP CLIENT_LINK_CONNECT OK.\n", pMessage->GetMessageBase()->m_u4ConnectID));
 
@@ -70,7 +70,7 @@ int CBaseCommand::Do_Connect(IMessage* pMessage)
     return 0;
 }
 
-int CBaseCommand::Do_DisConnect(IMessage* pMessage)
+int CBaseCommand::Do_DisConnect(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
 {
     //处理连接断开事件
     OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_DisConnect](%d)CLIENT_LINK_CDISCONNET OK.\n", pMessage->GetMessageBase()->m_u4ConnectID));
@@ -78,7 +78,7 @@ int CBaseCommand::Do_DisConnect(IMessage* pMessage)
     return 0;
 }
 
-int CBaseCommand::Do_ClientSendTimeout(IMessage* pMessage)
+int CBaseCommand::Do_ClientSendTimeout(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
 {
     //处理服务器发送客户端数据连接超过阀值的事件
     OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_DisConnect](%d)CLINET_LINK_SNEDTIMEOUT OK.\n", pMessage->GetMessageBase()->m_u4ConnectID));
@@ -86,7 +86,7 @@ int CBaseCommand::Do_ClientSendTimeout(IMessage* pMessage)
     return 0;
 }
 
-int CBaseCommand::Do_Base(IMessage* pMessage)
+int CBaseCommand::Do_Base(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
 {
     //m_pServerObject->GetLogManager()->WriteToMail(LOG_SYSTEM, 1, "测试邮件", "测试");
 
@@ -133,7 +133,7 @@ int CBaseCommand::Do_Base(IMessage* pMessage)
 
     if(NULL != m_pServerObject->GetConnectManager())
     {
-        //发送全部数据
+        //发送全部数据(异步发送)
         m_pServerObject->GetConnectManager()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID,
                 u2PostCommandID,
                 pResponsesPacket,
@@ -158,7 +158,7 @@ void CBaseCommand::ReadIniFile(const char* pIniFileName)
     }
 }
 
-int CBaseCommand::Do_ClientSendOk(IMessage* pMessage)
+int CBaseCommand::Do_ClientSendOk(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
 {
     //接受数据发送成功事件
     _PacketInfo HeadPacket;
@@ -171,17 +171,17 @@ int CBaseCommand::Do_ClientSendOk(IMessage* pMessage)
     return 0;
 }
 
-int CBaseCommand::Do_ReplyTest(IMessage* pMessage)
+int CBaseCommand::Do_ReplyTest(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
 {
 	_PacketInfo BodyPacket;
 	pMessage->GetPacketBody(BodyPacket);
 
-	SendClient(BodyPacket, COMMAND_TESTREPLY, pMessage->GetMessageBase()->m_u4ConnectID, SIGNALING_KEY, SIGNALING_IV, false);
+	SendClient(BodyPacket, COMMAND_TESTREPLY, pMessage->GetMessageBase()->m_u4ConnectID, SIGNALING_KEY, SIGNALING_IV, false, pSendBuffPacket);
 	return 0;
 }
 
 // 回复给客户端
-int CBaseCommand::SendClient(_PacketInfo BodyPacket, short nCommand, uint32 nConnectId, char* pKey, char* pIv, bool nEncrypt)
+int CBaseCommand::SendClient(_PacketInfo BodyPacket, short nCommand, uint32 nConnectId, char* pKey, char* pIv, bool nEncrypt, IBuffPacket* pSendBuffPacket)
 {
 	__ENTER_FUNCTION();
 	int nRet = 0;
@@ -199,25 +199,20 @@ int CBaseCommand::SendClient(_PacketInfo BodyPacket, short nCommand, uint32 nCon
 	}
 	uint32 u4SendLen = u4PacketLen + 40;
 
-	IBuffPacket* pResponsesPacket = m_pServerObject->GetPacketManager()->Create();
-	
+    //这里演示的是同步发送
+    //在需要及时返回的数据需求是，最好使用此方法
+    //效率最快
+
     //拼接消息头
-    (*pResponsesPacket) << u2Version;
-    (*pResponsesPacket) << u2Command;
-    (*pResponsesPacket) << u4PacketLen;
-    pResponsesPacket->WriteStream(szSession, 32);
+    (*pSendBuffPacket) << u2Version;
+    (*pSendBuffPacket) << u2Command;
+    (*pSendBuffPacket) << u4PacketLen;
+    pSendBuffPacket->WriteStream(szSession, 32);
 
     //拼接消息体
-	pResponsesPacket->WriteStream(pBuffer, u4PacketLen);
-	int nMessageID = 0;
+    pSendBuffPacket->WriteStream(pBuffer, u4PacketLen);
 
-    uint32 u4CommandSize = pResponsesPacket->GetPacketLen();
-    CSend_Param objSendParam;
-
-	nRet = m_pServerObject->GetConnectManager()->PostMessage(nConnectId,
-        u2Command,
-		pResponsesPacket,
-        objSendParam);
+    //这里什么都不用处理，数据包会被同步发送回去
 
 	return nRet;
 	__LEAVE_FUNCTION_WITHRETURN(0);
