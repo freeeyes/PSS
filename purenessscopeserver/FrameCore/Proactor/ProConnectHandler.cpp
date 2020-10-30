@@ -7,7 +7,6 @@ CProConnectHandler::CProConnectHandler(void) : m_u2LocalPort(0), m_u4SendCheckTi
     m_u4AllSendSize        = 0;
     m_u4HandlerID          = 0;
     m_u2MaxConnectTime     = 0;
-    m_u4SendThresHold      = MAX_MSG_SNEDTHRESHOLD;
     m_u1ConnectState       = CONNECTSTATE::CONNECT_INIT;
     m_u1SendBuffState      = CONNECTSTATE::CONNECT_SENDNON;
     m_u4MaxPacketSize      = MAX_MSG_PACKETLENGTH;
@@ -47,7 +46,6 @@ void CProConnectHandler::Init(uint16 u2HandlerID)
 {
     m_u4HandlerID = u2HandlerID;
     m_u2MaxConnectTime = GetXmlConfigAttribute(xmlClientInfo)->MaxConnectTime;
-    m_u4SendThresHold = GetXmlConfigAttribute(xmlSendInfo)->SendTimeout;
     m_u4MaxPacketSize = GetXmlConfigAttribute(xmlRecvInfo)->RecvBuffSize;
     m_u2TcpNodelay = GetXmlConfigAttribute(xmlSendInfo)->TcpNodelay;
 
@@ -79,15 +77,7 @@ uint32 CProConnectHandler::GetHandlerID()
 void CProConnectHandler::Close()
 {
     //调用连接断开消息，通知PacketParse接口
-    App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->DisConnect(GetConnectID());
-
-    //通知逻辑接口，连接已经断开
-    AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, SendSize = %d, RecvQueueCount=%d.",
-                                            m_addrRemote.get_host_addr(),
-                                            m_addrRemote.get_port_number(),
-                                            m_u4AllRecvSize,
-                                            m_u4AllSendSize,
-                                            m_u4RecvQueueCount);
+    m_pPacketParseInfo->DisConnect(GetConnectID());
 
     m_Reader.cancel();
     m_Writer.cancel();
@@ -218,7 +208,7 @@ void CProConnectHandler::open(ACE_HANDLE h, ACE_Message_Block&)
     m_u1ConnectState = CONNECTSTATE::CONNECT_OPEN;
 
     //告诉PacketParse连接应建立
-    App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Connect(GetConnectID(), GetClientIPInfo(), GetLocalIPInfo());
+    m_pPacketParseInfo->Connect(GetConnectID(), GetClientIPInfo(), GetLocalIPInfo());
 
     //发送链接建立消息
     Send_Hander_Event(PACKET_CONNECT);
@@ -360,7 +350,6 @@ bool CProConnectHandler::SendMessage(CSendMessageInfo objSendMessageInfo, uint32
 bool CProConnectHandler::PutSendPacket(ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend)
 {
     ACE_Message_Block* pmbSend = App_MessageBlockManager::instance()->Create(u4Size);
-    //pmbSend->copy(pMbData->rd_ptr(), pMbData->length());
     memcpy_safe(pMbData->rd_ptr(),
         u4Size,
         pmbSend->rd_ptr(),
@@ -473,29 +462,41 @@ void CProConnectHandler::Move_Recv_buffer()
 	if (m_pBlockRecv->rd_ptr() != m_pBlockRecv->base() && m_pBlockRecv->length() > 0)
 	{
 		//移动到前面去
-		ACE_Message_Block* pBlockRemain = App_MessageBlockManager::instance()->Create((uint32)m_pBlockRecv->length());
-        pBlockRemain->copy(m_pBlockRecv->rd_ptr(), m_pBlockRecv->length());
-        m_pBlockRecv->reset();
-        m_pBlockRecv->copy(pBlockRemain->rd_ptr(), pBlockRemain->length());
-        App_MessageBlockManager::instance()->Close(pBlockRemain);
+		uint32 u4RemainLength = (uint32)m_pBlockRecv->length();
+		ACE_Message_Block* pBlockRemain = App_MessageBlockManager::instance()->Create(u4RemainLength);
+		memcpy_safe(pBlockRemain->rd_ptr(),
+			u4RemainLength,
+			m_pBlockRecv->rd_ptr(),
+			u4RemainLength);
+		pBlockRemain->wr_ptr(u4RemainLength);
+
+		m_pBlockRecv->reset();
+
+		memcpy_safe(m_pBlockRecv->rd_ptr(),
+			u4RemainLength,
+			pBlockRemain->rd_ptr(),
+			u4RemainLength);
+		m_pBlockRecv->wr_ptr(u4RemainLength);
+		App_MessageBlockManager::instance()->Close(pBlockRemain);
 	}
-    else
-    {
-        //全部重置
-        m_pBlockRecv->reset();
-    }
+	else
+	{
+		//全部重置
+		m_pBlockRecv->reset();
+	}
 }
 
 void CProConnectHandler::Send_Hander_Event(uint8 u1Option)
 {
     _MakePacket objMakePacket;
 
-    objMakePacket.m_u4ConnectID = GetConnectID();
-    objMakePacket.m_pPacketParse = nullptr;
-    objMakePacket.m_u1Option = u1Option;
-    objMakePacket.m_AddrRemote = m_addrRemote;
+    objMakePacket.m_u4ConnectID     = GetConnectID();
+    objMakePacket.m_pPacketParse    = nullptr;
+    objMakePacket.m_u1Option        = u1Option;
+    objMakePacket.m_AddrRemote      = m_addrRemote;
     objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
-    objMakePacket.m_pHandler = this;
+    objMakePacket.m_pHandler        = this;
+    objMakePacket.m_tvRecv          = m_atvInput;
 
     Send_MakePacket_Queue(objMakePacket, m_szLocalIP, m_u2LocalPort);
 }

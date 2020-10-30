@@ -76,6 +76,9 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
     m_objBuffSendPacket.Init(DEFINE_PACKET_SIZE, GetXmlConfigAttribute(xmlSendInfo)->MaxBlockSize);
     m_objBuffSendPacket.SetNetSort(GetXmlConfigAttribute(xmlNetWorkMode)->NetByteOrder);
 
+    //设置最大的等待时间(单位是毫秒)
+    m_u4MaxRecvWait = GetXmlConfigAttribute(xmlClientInfo)->CheckAliveTime * 1000;
+
     m_PerformanceCounter.init("WorkThread", 10000);
 }
 
@@ -248,7 +251,6 @@ bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4
             //添加链接对象
             pWorkThread_Handler_info = m_DeviceHandlerPool.Create();
 
-
             pWorkThread_Handler_info->m_strLocalIP   = pMessage->m_AddrListen.get_host_addr();
             pWorkThread_Handler_info->m_u2LocalPort  = pMessage->m_AddrListen.get_port_number();
 			pWorkThread_Handler_info->m_strRemoteIP  = pMessage->m_AddrRemote.get_host_addr();
@@ -256,6 +258,8 @@ bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4
 
             pWorkThread_Handler_info->m_u4ConnectID  = pMessage->m_u4ConnectID;
             pWorkThread_Handler_info->m_pHandler     = pMessage->m_pHandler;
+
+            pWorkThread_Handler_info->m_tvInput = pMessage->m_tvMessage;
 
             m_objHandlerList.Add_Hash_Data_By_Key_Unit32(pMessage->m_u4ConnectID, pWorkThread_Handler_info);
         }
@@ -281,6 +285,14 @@ bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4
     {
         u4PacletBodyLength = (uint32)pMessage->m_pmbRecvBody->length();
     }
+
+	if (pMessage->m_u2Cmd >= CLIENT_LINK_USER)
+	{
+		//添加Handler统计消息
+		pWorkThread_Handler_info->m_InPacketCount++;
+		pWorkThread_Handler_info->m_RecvSize += u4PacletHeadLength + u4PacletBodyLength;
+		pWorkThread_Handler_info->m_tvInput = pMessage->m_tvMessage;
+	}
 
     //拼接消息
     objRecvMessage.GetMessageBase()->m_u2Cmd         = pMessage->m_u2Cmd;
@@ -314,26 +326,30 @@ bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4
     {
         //同步发送数据逻辑
         Synchronize_SendPostMessage(pWorkThread_Handler_info, pMessage->m_tvMessage);
-
-        //添加统计信息
-        pWorkThread_Handler_info->m_RecvSize += u4PacletHeadLength + u4PacletBodyLength;
-        pWorkThread_Handler_info->m_tvInput = pMessage->m_tvMessage;
-    }
-
-    if (true == blDeleteFlag)
-    {
-        DeleteMessage(pMessage);
     }
 
     //如果是断开消息，在这里发还给逻辑线程去处理
     if (CLIENT_LINK_CDISCONNET == pMessage->m_u2Cmd ||
         CLIENT_LINK_SDISCONNET == pMessage->m_u2Cmd)
     {
+		//写日志
+		AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendCount = %d, SendSize = %d.",
+            pWorkThread_Handler_info->m_strRemoteIP.c_str(),
+            pWorkThread_Handler_info->m_u2RemotePort,
+            pWorkThread_Handler_info->m_InPacketCount,
+            pWorkThread_Handler_info->m_RecvSize,
+            pWorkThread_Handler_info->m_OutPacketCount,
+            pWorkThread_Handler_info->m_SendSize);
+
         pWorkThread_Handler_info->m_pHandler->Close();
         m_objHandlerList.Del_Hash_Data_By_Unit32(pMessage->m_u4ConnectID);
         m_DeviceHandlerPool.Delete(pWorkThread_Handler_info);
-        DeleteMessage(pMessage);
     }
+
+	if (true == blDeleteFlag)
+	{
+		DeleteMessage(pMessage);
+	}
 
     m_ThreadInfo.m_u4State = THREADSTATE::THREAD_RUNEND;
 
@@ -695,9 +711,18 @@ bool CMessageService::Synchronize_SendPostMessage(CWorkThread_Handler_info* pHan
         pHandlerInfo->m_pHandler->PutSendPacket(pBlockSend, u4SendLength, tvMessage);
         pBlockSend->release();
         m_objBuffSendPacket.Clear();
-    }
 
-    return true;
+        //添加Handler统计信息
+        pHandlerInfo->m_OutPacketCount++;
+        pHandlerInfo->m_SendSize += u4SendLength;
+        pHandlerInfo->m_tvOutput = tvMessage;
+
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 bool CMessageService::SendPostMessage(CSendMessageInfo objSendMessageInfo)
@@ -748,6 +773,37 @@ NAMESPACE::_ClientIPInfo CMessageService::GetLocalIPInfo(uint32 u4ConnectID)
 	}
 
     return objClientIPInfo;
+}
+
+void CMessageService::Check_Handler_Recv_Timeout()
+{
+    if (0 == m_u4MaxRecvWait)
+    {
+        //不检查直接退出
+        return;
+    }
+
+    vector<CWorkThread_Handler_info*> vecList;
+    m_objHandlerList.Get_All_Used(vecList);
+
+    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+
+    for (CWorkThread_Handler_info* pHandlerInfo : vecList)
+    {
+        ACE_Time_Value tvTimeWait = tvNow - pHandlerInfo->m_tvInput;
+        if (m_u4MaxRecvWait < tvTimeWait.msec())
+        {
+            OUR_DEBUG((LM_INFO, "[CMessageService::Check_Handler_Recv_Timeout]u2CommandID=%d is recv timeout.\n", pHandlerInfo->m_u4ConnectID));
+
+            //超时了，发送链接断开消息
+			CSendMessageInfo objSendMessageInfo;
+
+			objSendMessageInfo.u2CommandID = CLIENT_LINK_SDISCONNET;
+			objSendMessageInfo.u4ConnectID = pHandlerInfo->m_u4ConnectID;
+
+			SendPostMessage(objSendMessageInfo);
+        }
+    }
 }
 
 int CMessageService::handle_signal(int signum, siginfo_t* siginfo, ucontext_t* ucontext)
@@ -869,6 +925,9 @@ CMessageServiceGroup::CMessageServiceGroup()
 int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 {
     ACE_UNUSED_ARG(arg);
+
+    //检查超时的链接
+    CheckRecvTimeout();
 
     //检查所有工作线程
     if (false == CheckWorkThread(tv))
@@ -1080,6 +1139,16 @@ bool CMessageServiceGroup::KillTimer()
     }
 
     OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::KillTimer] end....\n"));
+    return true;
+}
+
+bool CMessageServiceGroup::CheckRecvTimeout()
+{
+    for (CMessageService* pWorkThread : m_vecMessageService)
+    {
+        pWorkThread->Check_Handler_Recv_Timeout();
+    }
+
     return true;
 }
 

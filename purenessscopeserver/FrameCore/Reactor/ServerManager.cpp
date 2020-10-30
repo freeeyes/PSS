@@ -59,11 +59,6 @@ bool CServerManager::Init()
         App_ConnectHandlerPool::instance()->Init(GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount);
     }
 
-    //初始化链接管理器
-    App_ConnectManager::instance()->Init(GetXmlConfigAttribute(xmlSendInfo)->SendQueueCount);
-
-    //初始化拆件逻辑线程
-    App_MessageQueueManager::instance()->Init();
 
     //初始化TMS系统
 #ifdef _CPPUNIT_TEST
@@ -73,14 +68,13 @@ bool CServerManager::Init()
 #endif
 
     //初始化给插件的对象接口
-    IConnectManager* pConnectManager           = dynamic_cast<IConnectManager*>(App_ConnectManager::instance());
+    IConnectManager* pConnectManager           = dynamic_cast<IConnectManager*>(App_HandlerManager::instance());
     IClientManager*  pClientManager            = dynamic_cast<IClientManager*>(App_ClientReConnectManager::instance());
     IUDPConnectManager* pUDPConnectManager     = dynamic_cast<IUDPConnectManager*>(App_ReUDPManager::instance());
     IFrameCommand* pFrameCommand               = dynamic_cast<IFrameCommand*>(&m_objFrameCommand);
     ITMService* pTMService                     = dynamic_cast<ITMService*>(&m_TMService);
     IServerManager* pServerManager             = dynamic_cast<IServerManager*>(this);
     ITTyClientManager* pTTyClientManager       = dynamic_cast<ITTyClientManager*>(App_ReTTyClientManager::instance());
-    IMessageQueueManager* pMessageQueueManager = dynamic_cast<IMessageQueueManager*>(App_MessageQueueManager::instance());
     IControlListen* pControlListen             = dynamic_cast<IControlListen*>(App_ControlListen::instance());
 
     Server_Manager_Common_IObject(pConnectManager,
@@ -90,7 +84,6 @@ bool CServerManager::Init()
                                   pServerManager,
                                   pTMService,
                                   pTTyClientManager,
-                                  pMessageQueueManager,
                                   pControlListen);
 
     //初始化模块加载，因为这里可能包含了中间服务器连接加载
@@ -305,9 +298,6 @@ bool CServerManager::Run()
         App_ServerMessageTask::instance()->Start();
     }
 
-    //开始启动链接发送定时器
-    App_ConnectManager::instance()->StartTimer();
-
     //开始启动tty相关监听
     int nReTTyCount = (int)GetXmlConfigAttribute(xmlTTyDrives)->vec.size();
 
@@ -458,7 +448,7 @@ bool CServerManager::Start_Console_Tcp_Listen()
         {
             if (ACE_OS::strcmp(GetXmlConfigAttribute(xmlConsole)->sip.c_str(), "INADDR_ANY") == 0)
             {
-                nErr = listenConsoleAddr.set(GetXmlConfigAttribute(xmlConsole)->sport, INADDR_ANY);
+                nErr = listenConsoleAddr.set(GetXmlConfigAttribute(xmlConsole)->sport, (uint32)INADDR_ANY);
             }
             else
             {
@@ -470,7 +460,7 @@ bool CServerManager::Start_Console_Tcp_Listen()
         {
             if (ACE_OS::strcmp(GetXmlConfigAttribute(xmlConsole)->sip.c_str(), "INADDR_ANY") == 0)
             {
-                nErr = listenConsoleAddr.set(GetXmlConfigAttribute(xmlConsole)->sport, INADDR_ANY);
+                nErr = listenConsoleAddr.set(GetXmlConfigAttribute(xmlConsole)->sport, (uint32)INADDR_ANY);
             }
             else
             {
@@ -622,8 +612,6 @@ bool CServerManager::Close()
     App_ConnectAcceptorManager::instance()->Close();
     m_ConnectConsoleAcceptor.close();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]AppLogManager OK\n"));
-    App_MessageQueueManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_MessageQueueManager OK.\n"));
     App_TimerManager::instance()->deactivate();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ReUDPManager OK.\n"));
     App_ReUDPManager::instance()->Close();
@@ -638,8 +626,8 @@ bool CServerManager::Close()
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ServerMessageTask OK.\n"));
     App_MessageServiceGroup::instance()->Close();
     OUR_DEBUG((LM_INFO, "[App_MessageServiceGroup::Close]Close App_MessageServiceGroup OK.\n"));
-    App_ConnectManager::instance()->CloseAll();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ConnectManager OK.\n"));
+    App_ConnectHandlerPool::instance()->Close();
+    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ConnectHandlerPool OK.\n"));
     AppLogManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]AppLogManager OK\n"));
     App_MessageManager::instance()->Close();

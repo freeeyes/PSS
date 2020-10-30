@@ -14,7 +14,6 @@
 #include "ClientReConnectManager.h"
 #include "ReUDPManager.h"
 #include "ReTTyClientManager.h"
-#include "MessageQueueManager.h"
 #include "ControlListen.h"
 #include "FileTestManager.h"
 #include "IpCheck.h"

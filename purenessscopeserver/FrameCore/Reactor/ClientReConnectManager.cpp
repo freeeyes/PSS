@@ -481,7 +481,7 @@ bool CClientReConnectManager::ConnectUDP(int nServerID, const char* pIP, uint16 
     else
     {
         //如果是UDP广播
-        AddrLocal.set(u2Port, INADDR_ANY);
+        AddrLocal.set(u2Port, (uint32)INADDR_ANY);
     }
 
     if (nErr != 0)
@@ -1094,9 +1094,9 @@ bool CClientReConnectManager::GetServerIPInfo( int nServerID, _ClientIPInfo& obj
     }
     else
     {
-        ACE_INET_Addr remote_addr = pClientInfo->GetServerAddr();
-        sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_50, remote_addr.get_host_addr());
-        objServerIPInfo.m_u2Port = remote_addr.get_port_number();
+        ACE_INET_Addr remote_addr     = pClientInfo->GetServerAddr();
+        objServerIPInfo.m_strClientIP = remote_addr.get_host_addr();
+        objServerIPInfo.m_u2Port      = remote_addr.get_port_number();
         return true;
     }
 }

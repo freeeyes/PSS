@@ -343,6 +343,48 @@
     <ClCompile Include="Message\HandlerManager.cpp">
       <Filter>Message\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="Reactor\AceReactorManager.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor\ClientReConnectManager.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor\ConnectAccept.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor\ConnectClient.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor\ConnectHandler.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor\ConsoleAccept.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor\ConsoleHandler.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor\ControlListen.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor\ReTTyClientManager.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor\ReTTyHandler.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor\ServerManager.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Reactor\WaitQuitSignal.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="UDP\ReactorUDPClient.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="UDP\ReactorUDPHander.cpp">
+      <Filter>Reactor\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -858,6 +900,51 @@
     <ClInclude Include="Message\HandlerManager.h">
       <Filter>Message\hfile</Filter>
     </ClInclude>
+    <ClInclude Include="Reactor\AceReactorManager.h">
+      <Filter>Reactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\ClientReConnectManager.h">
+      <Filter>Reactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\ConnectAccept.h">
+      <Filter>Reactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\ConnectClient.h">
+      <Filter>Reactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\ConnectHandler.h">
+      <Filter>Reactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\ConsoleAccept.h">
+      <Filter>Reactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\ConsoleHandler.h">
+      <Filter>Reactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\ControlListen.h">
+      <Filter>Reactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\ReTTyClientManager.h">
+      <Filter>Reactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\ReTTyHandler.h">
+      <Filter>Reactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\ServerManager.h">
+      <Filter>Reactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Reactor\WaitQuitSignal.h">
+      <Filter>Reactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="UDP\ReactorUDPHander.h">
+      <Filter>Reactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="UDP\ReactorUDPClient.h">
+      <Filter>Reactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="UDP\ReUDPManager.h">
+      <Filter>Reactor\hfile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -967,6 +1054,15 @@
     </Filter>
     <Filter Include="PacketParse\hfile">
       <UniqueIdentifier>{435fc3fc-5365-4bd5-8ffe-b55d3faa34f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Reactor">
+      <UniqueIdentifier>{c2e37ef0-a8cb-4c85-a31a-8509ffab02dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Reactor\cppfile">
+      <UniqueIdentifier>{29030742-4263-485d-adee-c8aeeaede4b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Reactor\hfile">
+      <UniqueIdentifier>{30e40fa3-b78f-4b4d-a693-b5ead2134300}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

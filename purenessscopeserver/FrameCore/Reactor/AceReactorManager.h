@@ -28,6 +28,11 @@ enum
     Reactor_DEV_POLL_ET = 0x05,
 };
 
+//定义各个反应器的默认名称
+const int REACTOR_CLIENTDEFINE = 0;
+const int REACTOR_POSTDEFINE   = 1;
+const int REACTOR_UDPDEFINE    = 2;
+
 //反应器对象
 class CAceReactor : public ACE_Task<ACE_MT_SYNCH>
 {

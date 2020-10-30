@@ -46,7 +46,7 @@ void CConnectClient::Close()
 			objMakePacket.m_u1Option        = PACKET_SERVER_TCP_DISCONNECT;
 			objMakePacket.m_AddrRemote      = m_addrRemote;
 			objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
-            objMakePacket.m_u1PacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
+            objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
 
             Send_MakePacket_Queue(objMakePacket, "127.0.0.1", 0);
         }
@@ -181,7 +181,7 @@ int CConnectClient::open(void* p)
 		objMakePacket.m_u1Option = PACKET_SERVER_TCP_CONNECT;
 		objMakePacket.m_AddrRemote = m_addrRemote;
 		objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
-		objMakePacket.m_u1PacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
+		objMakePacket.m_emPacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
 
         Send_MakePacket_Queue(objMakePacket, "127.0.0.1", 0);
     }
@@ -215,7 +215,7 @@ int CConnectClient::handle_input(ACE_HANDLE fd)
         if (NULL != m_pClientMessage)
         {
             _ClientIPInfo objServerIPInfo;
-            sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
+            objServerIPInfo.m_strClientIP = m_addrRemote.get_host_addr();
             objServerIPInfo.m_u2Port = m_addrRemote.get_port_number();
 
             if(EM_s2s::S2S_NEED_CALLBACK == m_ems2s)
@@ -237,8 +237,8 @@ int CConnectClient::handle_input(ACE_HANDLE fd)
         if (NULL != m_pClientMessage)
         {
             _ClientIPInfo objServerIPInfo;
-            sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-            objServerIPInfo.m_u2Port = m_addrRemote.get_port_number();
+            objServerIPInfo.m_strClientIP = m_addrRemote.get_host_addr();
+            objServerIPInfo.m_u2Port      = m_addrRemote.get_port_number();
 
             if(EM_s2s::S2S_NEED_CALLBACK == m_ems2s)
             {
@@ -268,8 +268,8 @@ int CConnectClient::RecvData()
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectClient::handle_input] ConnectID = %d, recv data is error[%d].\n", GetServerID(), nDataLen);
 
         _ClientIPInfo objServerIPInfo;
-        sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-        objServerIPInfo.m_u2Port = m_addrRemote.get_port_number();
+        objServerIPInfo.m_strClientIP = m_addrRemote.get_host_addr();
+        objServerIPInfo.m_u2Port      = m_addrRemote.get_port_number();
 
         if(EM_s2s::S2S_NEED_CALLBACK == m_ems2s)
         {
@@ -339,7 +339,7 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
 				objMakePacket.m_u1Option        = PACKET_PARSE;
 				objMakePacket.m_AddrRemote      = m_addrRemote;
 				objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
-				objMakePacket.m_u1PacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
+				objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
 
                 Send_MakePacket_Queue(objMakePacket, "127.0.0.1", 0);
 
@@ -361,8 +361,8 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
     {
         //接收数据，返回给逻辑层，自己不处理整包完整性判定
         _ClientIPInfo objServerIPInfo;
-        sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-        objServerIPInfo.m_u2Port = m_addrRemote.get_port_number();
+        objServerIPInfo.m_strClientIP = m_addrRemote.get_host_addr();
+        objServerIPInfo.m_u2Port      = m_addrRemote.get_port_number();
 
         uint16 u2CommandID = 0;
         ACE_Message_Block* pRecvFinish = NULL;
@@ -506,8 +506,8 @@ int CConnectClient::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
             if (nDataLen <= 0)
             {
                 _ClientIPInfo objServerIPInfo;
-                sprintf_safe(objServerIPInfo.m_szClientIP, MAX_BUFF_20, "%s", m_addrRemote.get_host_addr());
-                objServerIPInfo.m_u2Port = m_addrRemote.get_port_number();
+                objServerIPInfo.m_strClientIP = m_addrRemote.get_host_addr();
+                objServerIPInfo.m_u2Port      = m_addrRemote.get_port_number();
                 m_pClientMessage->ConnectError(ACE_OS::last_error(), objServerIPInfo);
 
                 OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, error = %d.\n", GetServerID(), errno));

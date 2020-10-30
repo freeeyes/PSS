@@ -30,17 +30,17 @@
 #include "TimerManager.h"
 #include "SendMessage.h"
 #include "CommandAccount.h"
-#include "SendCacheManager.h"
 #include "TimeWheelLink.h"
 #include "FileTest.h"
 #include "TcpRedirection.h"
 #include "IDeviceHandler.h"
+#include "PerformanceCounter.h"
 
 #if PSS_PLATFORM != PLATFORM_WIN
 #include "netinet/tcp.h"
 #endif
 
-class CConnectHandler : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>, public IDeviceHandler
+class CConnectHandler : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>, public IDeviceHandler, public IHandler
 {
 public:
     CConnectHandler(void);
@@ -61,19 +61,16 @@ public:
 
 
     bool CheckSendMask(uint32 u4PacketLen);                                  //检测指定的连接发送数据是否超过阻塞阀值
-    bool SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);  //发送当前数据
-    bool SendCloseMessage();                                                 //发送连接关闭消息
+    virtual bool SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);  //发送当前数据
+
     bool SendTimeoutMessage() const;                                         //发送连接超时消息
 
-    void SetRecvQueueTimeCost(uint32 u4TimeCost);                            //记录当前接收数据到模块处理完成的具体时间消耗
-    void SetSendQueueTimeCost(uint32 u4TimeCost) const;                      //记录当前从发送队列到数据发送完成的具体时间消耗
     void SetLocalIPInfo(const char* pLocalIP, uint16 u2LocalPort);           //设置监听IP和端口信息
 
-    void Close();                                                            //关闭当前连接
+    virtual void Close();                                                    //关闭当前连接
     void CloseFinally();                                                     //替代析构函数，符合roz规则
 
     uint32      GetHandlerID() const;                                        //得到当前的handlerID
-    const char* GetError() const;                                            //得到当前错误信息
     void        SetConnectID(uint32 u4ConnectID);                            //设置当前链接ID
     uint32      GetConnectID() const;                                        //得到当前链接ID
     CONNECTSTATE       GetConnectState() const;                              //得到链接状态
@@ -87,45 +84,38 @@ public:
     bool GetIsLog() const;                                                   //获得当前连接是否可以写入日志
     void SetHashID(int nHashID);                                             //设置Hash数组下标
     int  GetHashID() const;                                                  //得到Hash数组下标
-    void SetSendCacheManager(CSendCacheManager* pSendCacheManager);          //设置缓冲区对象
-    bool Test_Paceket_Parse_Stream(ACE_Message_Block* pmb);                  //测试流模式解析数据入口
     void Output_Debug_Data(const ACE_Message_Block* pMbData, int nLogType);  //输出DEBUG信息
 
-    bool Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPacket);                             //将发送数据写入文件
-    bool Send_Input_To_Cache(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);              //讲发送对象放入缓存
-    bool Send_Input_To_TCP(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize, uint8 u1State); //将数据发送给对端
+    bool Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPacket);                              //将发送数据写入文件
+    bool Send_Input_To_Cache(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);               //讲发送对象放入缓存
+    bool Send_Input_To_TCP(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);                 //将数据发送给对端
+    virtual bool PutSendPacket(ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend);//发送数据
 
 private:
+	bool Dispose_Recv_buffer();                                              //处理接收到数据，切包
+	void Move_Recv_buffer();                                                 //整理接收内存缓冲区
+    void Send_Hander_Event(uint8 u1Option);                                  //发送Handler的事件通知业务线程
     void ConnectOpen();                                                      //设置连接相关打开代码
-    void Get_Recv_length(int& nCurrCount) const;                             //得到要处理的数据长度
-    int  Dispose_Paceket_Parse_Head();                                       //处理消息头函数
-    int  Dispose_Paceket_Parse_Body();                                       //处理消息头函数
+    uint32 Get_Recv_length();                                                //得到要处理的数据长度
+    int  Dispose_Paceket_Parse_Head(ACE_Message_Block* pmbHead);             //处理消息头函数
+    int  Dispose_Paceket_Parse_Body(ACE_Message_Block* pmbBody);             //处理消息头函数
     int  Dispose_Paceket_Parse_Stream(ACE_Message_Block* pCurrMessage);      //处理流消息函数
     bool CheckMessage();                                                     //处理接收的数据
-    bool PutSendPacket(ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend);//发送数据
+    
     void ClearPacketParse();                                                 //清理正在使用的PacketParse
-    bool Send_Block_Queue(ACE_Message_Block* pMb);                           //发送队列停止消息
 
     int  Dispose_Paceket_Parse_Stream_Single(ACE_Message_Block* pCurrMessage);//处理单一数据包
-    int  RecvData();                                                          //接收数据，正常模式
 
     int  Dispose_Recv_Data();                                                 //处理接收数据
     int  Init_Open_Connect();                                                 //当第一次建立连接初始化的时候调用
 
-    uint64                     m_u8RecvQueueTimeCost  = 0;                     //成功接收数据到数据处理完成（未发送）花费的时间总和
-    uint64                     m_u8SendQueueTimeCost  = 0;                     //成功发送数据到数据处理完成（只发送）花费的时间总和
-    uint64                     m_u8SendQueueTimeout   = MAX_QUEUE_TIMEOUT * 1000 * 1000;           //发送超时时间，超过这个时间的都会被记录到日志中
-    uint64                     m_u8RecvQueueTimeout   = MAX_QUEUE_TIMEOUT * 1000 * 1000;           //接受超时时间，超过这个时间的都会被记录到日志中
     uint32                     m_u4HandlerID          = 0;                     //此Hander生成时的ID
     uint32                     m_u4ConnectID          = 0;                     //链接的ID
-    uint32                     m_u4AllRecvCount       = 0;                     //当前链接接收数据包的个数
-    uint32                     m_u4AllSendCount       = 0;                     //当前链接发送数据包的个数
     uint32                     m_u4AllRecvSize        = 0;                     //当前链接接收字节总数
     uint32                     m_u4AllSendSize        = 0;                     //当前链接发送字节总数
     uint32                     m_u4MaxPacketSize      = MAX_MSG_PACKETLENGTH;  //单个数据包的最大长度
     uint32                     m_u4RecvQueueCount     = 0;                     //当前链接被处理的数据包数
     uint32                     m_u4SendMaxBuffSize    = 5 * MAX_BUFF_1024;     //发送数据最大缓冲长度
-    uint32                     m_u4SendThresHold      = MAX_MSG_SNEDTHRESHOLD; //发送阀值(消息包的个数)
     uint32                     m_u4ReadSendSize       = 0;                     //准备发送的字节数（水位标）
     uint32                     m_u4SuccessSendSize    = 0;                     //实际客户端接收到的总字节数（水位标）
     uint16                     m_u2LocalPort          = 0;                     //监听的端口号
@@ -141,95 +131,20 @@ private:
     uint8                      m_u1IsActive           = 0;                     //连接是否为激活状态，0为否，1为是
     bool                       m_blBlockState         = false;                 //是否处于阻塞状态 false为不在阻塞状态，true为在阻塞状态
     bool                       m_blIsLog              = false;                 //是否写入日志，false为不写入，true为写入
-    char                       m_szError[MAX_BUFF_500]       = {'\0'};         //错误信息描述文字
     char                       m_szLocalIP[MAX_BUFF_50]      = { '\0' };       //本地的IP端口
     char                       m_szConnectName[MAX_BUFF_100] = { '\0' };       //连接名称，可以开放给逻辑插件去设置
     ACE_INET_Addr              m_addrRemote;                                   //远程链接客户端地址
     ACE_Time_Value             m_atvConnect;                                   //当前链接建立时间
     ACE_Time_Value             m_atvInput;                                     //最后一次接收数据时间
     ACE_Time_Value             m_atvOutput;                                    //最后一次发送数据时间
-    ACE_Time_Value             m_atvSendAlive;                                 //链接存活时间
-    CPacketParse*              m_pPacketParse         = NULL;                  //数据包解析类
-    ACE_Message_Block*         m_pCurrMessage         = NULL;                  //当前的MB对象
-    ACE_Message_Block*         m_pBlockMessage        = NULL;                  //当前发送缓冲等待数据块
-    _TimeConnectInfo           m_TimeConnectInfo;                              //链接健康检测器
-    char*                      m_pPacketDebugData     = NULL;                  //记录数据包的Debug缓冲字符串
+    CPacketParse               m_objPacketParse;                               //数据包解析类
+    ACE_Message_Block*         m_pBlockRecv           = nullptr;               //接收数据缓冲块
+    ACE_Message_Block*         m_pBlockMessage        = nullptr;               //当前发送缓冲等待数据块
+    char*                      m_pPacketDebugData     = nullptr;               //记录数据包的Debug缓冲字符串
     EM_IO_TYPE                 m_emIOType             = EM_IO_TYPE::NET_INPUT; //当前IO入口类型
-    IFileTestManager*          m_pFileTest            = NULL;                  //文件测试接口入口
+    IFileTestManager*          m_pFileTest            = nullptr;               //文件测试接口入口
     string                     m_strDeviceName;                                //转发接口名称
-};
-
-//管理所有已经建立的链接
-class CConnectManager : public ACE_Task<ACE_MT_SYNCH>
-{
-public:
-    CConnectManager(void);
-
-    virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);   //定时器检查
-
-    static void TimeWheel_Timeout_Callback(void* pArgsContext, vector<CConnectHandler*> vecConnectHandle);
-
-    virtual int open();
-    virtual int svc(void);
-    virtual int close(u_long);
-
-    void Init(uint16 u2Index);
-
-    void CloseAll();
-    bool AddConnect(uint32 u4ConnectID, CConnectHandler* pConnectHandler);
-    bool SetConnectTimeWheel(CConnectHandler* pConnectHandler);                                            //设置消息轮盘
-    bool DelConnectTimeWheel(CConnectHandler* pConnectHandler);                                            //删除消息轮盘
-    bool SendMessage(CSendMessageInfo objSendMessageInfo);  //同步发送                                                                     //发送缓冲数据
-    bool PostMessage(CSendMessageInfo objSendMessageInfo); //异步发送
-    bool PostMessageAll(IBuffPacket* pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL, uint16 u2CommandID = 0, uint8 u1SendState = true, bool blDelete = true, int nMessageID = 0);                  //异步群发
-    bool Close(uint32 u4ConnectID);                                                                          //客户单关闭
-    bool CloseUnLock(uint32 u4ConnectID);                                                                    //关闭连接，不上锁版本
-    bool CloseConnect(uint32 u4ConnectID);                                                                   //服务器关闭
-    bool CloseConnect_By_Queue(uint32 u4ConnectID);                                                          //服务器关闭(主动关闭送到消息队列中关闭)
-    void GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo);                                         //返回当前存活链接的信息
-    void SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4TimeCost);                                        //记录指定链接数据处理时间
-    void GetClientNameInfo(const char* pName, vecClientNameInfo& objClientNameInfo);                         //得到指定别名的所有设置信息
-
-    _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                                                       //得到指定链接信息
-    _ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID);                                                        //得到监听链接信息
-
-    bool StartTimer();                                                                                       //开启定时器
-    bool KillTimer();                                                                                        //关闭定时器
-    _CommandData* GetCommandData(uint16 u2CommandID);                                                        //得到命令相关信息
-    void GetFlowInfo(uint32& u4UdpFlowIn, uint32& u4UdpFlowOut);                                             //得到流量信息
-
-    int         GetCount();
-    const char* GetError() const;
-
-    bool SetConnectName(uint32 u4ConnectID, const char* pName);                                              //设置当前连接名称
-    bool SetIsLog(uint32 u4ConnectID, bool blIsLog);                                                         //设置当前连接数据是否写入日志
-    EM_Client_Connect_status GetConnectState(uint32 u4ConnectID);                                            //得到指定的连接状态
-
-    int handle_write_file_stream(uint32 u4ConnectID, const char* pData, uint32 u4Size, uint8 u1ParseID);     //文件接口模拟数据包入口
-
-private:
-    virtual int CloseMsgQueue();
-    bool Dispose_Queue();
-
-    //关闭消息队列条件变量
-    ACE_Thread_Mutex m_mutex;
-    ACE_Condition<ACE_Thread_Mutex> m_cond;
-
-    uint32                             m_u4TimeCheckID         = 0;                     //定时器检查的TimerID
-    uint32                             m_u4SendQueuePutTime    = 0;                     //发送队列入队超时时间
-    uint32                             m_u4TimeConnect         = 0;                     //单位时间连接建立数
-    uint32                             m_u4TimeDisConnect      = 0;                     //单位时间连接断开数
-    uint16                             m_u2SendQueueMax        = MAX_MSG_SENDPACKET;    //发送队列最大长度
-    bool                               m_blRun                 = false;                 //线程是否在运行
-    char                               m_szError[MAX_BUFF_500] = {'\0'};                //错误信息描述
-    CHashTable<CConnectHandler>        m_objHashConnectList;                            //记录当前已经连接的节点，使用固定内存结构
-    ACE_Recursive_Thread_Mutex         m_ThreadWriteLock;                               //用于循环监控和断开链接时候的数据锁
-    _TimerCheckID*                     m_pTCTimeSendCheck      = NULL;                  //定时器的参数结构体，用于一个定时器执行不同的事件
-    ACE_Time_Value                     m_tvCheckConnect;        //定时器下一次检测链接时间
-    CSendMessagePool                   m_SendMessagePool;       //发送消息体
-    CCommandAccount                    m_CommandAccount;        //当前线程命令统计数据
-    CSendCacheManager                  m_SendCacheManager;      //发送缓冲管理
-    CTimeWheelLink<CConnectHandler>    m_TimeWheelLink;         //连接时间轮盘
+    _Packet_Parse_Info*        m_pPacketParseInfo     = nullptr;               //PacketParse的解析器
 };
 
 //链接ConnectHandler内存池
@@ -251,69 +166,10 @@ private:
     ACE_Recursive_Thread_Mutex        m_ThreadWriteLock;                     //控制多线程锁
     CHashTable<CConnectHandler>       m_objHashHandleList;                   //Hash管理表
     CObjectArrayList<CConnectHandler> m_objHandlerList;                      //数据列表对象
-    uint32                            m_u4CurrMaxCount = 1;                  //当前池里Handler总数
+    uint32                            m_u4CurrCount = 0;                     //当前池里Handler总数
 };
 
-//经过思考，想把发送对象分在几个线程内去做，提高性能。在这里尝试一下。(多线程模式，一个线程一个队列，这样保持并发能力)
-class CConnectManagerGroup : public IConnectManager
-{
-public:
-    CConnectManagerGroup();
 
-    void Init(uint16 u2SendQueueCount);
-    void Close();
-
-    bool AddConnect(CConnectHandler* pConnectHandler);
-    bool SetConnectTimeWheel(CConnectHandler* pConnectHandler);                                            //设置消息轮盘
-    bool DelConnectTimeWheel(CConnectHandler* pConnectHandler);                                            //删除消息轮盘
-    virtual bool PostMessage(uint32 u4ConnectID, IBuffPacket*& pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,
-                             uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDelete = true, int nMessageID = 0);            //异步发送
-    virtual bool PostMessage(uint32 u4ConnectID, char*& pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL,
-                             uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDelete = true, int nMessageID = 0);            //异步发送
-    virtual bool PostMessage(vector<uint32> vecConnectID, IBuffPacket*& pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,
-                             uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDelete = true, int nMessageID = 0);            //异步群发指定的ID
-    virtual bool PostMessage(vector<uint32> vecConnectID, char*& pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL,
-                             uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDelete = true, int nMessageID = 0);   //异步群发指定的ID
-    virtual bool PostMessageAll(IBuffPacket*& pBuffPacket, uint8 u1SendType = SENDMESSAGE_NOMAL,
-                                uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDelete = true, int nMessageID = 0);
-    virtual bool PostMessageAll(char*& pData, uint32 nDataLen, uint8 u1SendType = SENDMESSAGE_NOMAL,
-                                uint16 u2CommandID = 0, uint8 u1SendState = 0, bool blDelete = true, int nMessageID = 0);
-    virtual bool CloseConnect(uint32 u4ConnectID);                                                                   //服务器关闭
-    bool CloseConnectByClient(uint32 u4ConnectID) const;                                                             //客户端关闭
-    virtual _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                                                       //得到指定链接信息
-    virtual _ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID);                                                        //得到监听链接信息
-    virtual void GetClientNameInfo(const char* pName, vecClientNameInfo& objClientNameInfo);                         //得到指定别名的所有设置信息
-    void GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo) const;                                           //返回当前存活链接的信息
-    void SetRecvQueueTimeCost(uint32 u4ConnectID, uint32 u4TimeCost) const;                                          //记录指定链接数据处理时间
-    virtual uint16 GetConnectCheckTime();                                                                            //得到TCP检查的时间间隔
-
-    virtual int  GetCount();
-    void CloseAll();
-    bool Close(uint32 u4ConnectID) const;                                                                    //客户单关闭
-    bool CloseUnLock(uint32 u4ConnectID) const;                                                              //关闭连接，不上锁版本
-    bool SetConnectName(uint32 u4ConnectID, const char* pName);                                              //设置当前连接名称
-    bool SetIsLog(uint32 u4ConnectID, bool blIsLog);                                                         //设置当前连接数据是否写入日志
-    void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData) const;                             //获得指定命令统计信息
-
-    bool StartTimer() const;                                                                                 //开启定时器
-    const char* GetError() const;
-    void GetFlowInfo(uint32& u4UdpFlowIn, uint32& u4UdpFlowOut) const;                                       //得到流量信息
-    virtual EM_Client_Connect_status GetConnectState(uint32 u4ConnectID);
-
-    int handle_write_file_stream(uint32 u4ConnectID, const char* pData, uint32 u4Size, uint8 u1ParseID) const; //文件接口模拟数据包入口
-
-    CConnectManager* GetManagerFormList(int nIndex);                                                       //获得当前Manager的指针
-
-private:
-    uint32 GetGroupIndex();                                                                                  //得到当前链接的ID自增量
-
-    uint32            m_u4CurrMaxCount              = 0;                                                     //当前链接自增量
-    uint16            m_u2ThreadQueueCount          = SENDQUEUECOUNT;                                        //当前发送线程队列个数
-    ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;                                                           //控制多线程锁
-    CConnectManager** m_objConnnectManagerList      = NULL;                                                  //所有链接管理者
-};
-
-typedef ACE_Singleton<CConnectManagerGroup, ACE_Recursive_Thread_Mutex> App_ConnectManager;
 typedef ACE_Singleton<CConnectHandlerPool, ACE_Null_Mutex> App_ConnectHandlerPool;
 
 #endif

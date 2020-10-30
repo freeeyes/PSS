@@ -88,8 +88,10 @@ public:
     bool SendPostMessage(CSendMessageInfo objSendMessageInfo);                //发送数据
     bool SendCloseMessage(uint32 u4ConnectID);                                //关闭指定链接 
 
-    _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                        //得到指定链接的客户单ID
-    _ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID);
+    _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                        //得到客户端接入端口
+    _ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID);                         //得到客户端监听端口
+
+    void Check_Handler_Recv_Timeout();                                        //检查终端连接时间超时
 
 private:
     bool ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4ThreadID); //处理接收事件
@@ -109,6 +111,7 @@ private:
     uint32                         m_u4HighMask         = 0;        
     uint32                         m_u4LowMask          = 0;
     uint32                         m_u4WorkQueuePutTime = 0;                     //入队超时时间
+    uint32                         m_u4MaxRecvWait      = 0;                     //最大等待时间  
     uint16                         m_u2ThreadTimeOut    = 0;
     bool                           m_blRun              = false;                 //线程是否在运行
     bool                           m_blIsCpuAffinity    = false;                 //是否CPU绑定
@@ -187,6 +190,7 @@ private:
     bool StartTimer();
     bool KillTimer();
 
+    bool CheckRecvTimeout();                                                                  //检查所有的超时链接
     bool CheckWorkThread(const ACE_Time_Value& tvNow);                                        //检查所有的工作线程状态
     bool CheckPacketParsePool() const;                                                        //检查正在使用的消息解析对象
     bool CheckPlugInState() const;                                                            //检查所有插件状态

@@ -113,7 +113,6 @@ private:
     uint32             m_u4AllSendSize;                //当前链接发送字节总数
     uint32             m_u4SendMaxBuffSize;            //发送数据最大缓冲长度
     uint16             m_u2LocalPort;                  //本地监听端口
-    uint32             m_u4SendThresHold;              //发送阀值(消息包的个数)
     uint32             m_u4SendCheckTime;              //发送检测时间的阀值
     uint32             m_u4PacketParseInfoID;          //对应处理packetParse的模块ID
     uint32             m_u4PacketDebugSize;            //记录能存二进制数据包的最大字节

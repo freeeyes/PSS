@@ -77,6 +77,7 @@ void CMakePacket::SetMessage(_MakePacket const& objMakePacket, CWorkThreadMessag
             pWorkThreadMessage->m_pHandler       = objMakePacket.m_pHandler;
             pWorkThreadMessage->m_AddrListen     = objMakePacket.m_AddrListen;
             pWorkThreadMessage->m_AddrListen     = objMakePacket.m_AddrListen;
+            pWorkThreadMessage->m_AddrRemote     = objMakePacket.m_AddrRemote;
         }
         else if(objMakePacket.m_u1Option == PACKET_CDISCONNECT)
         {

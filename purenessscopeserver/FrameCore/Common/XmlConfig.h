@@ -137,13 +137,8 @@ public:
 class xmlSendInfo : public IConfigOpeation
 {
 public:
-    uint16 SendQueueMax     = 0;//发送队列中最长的数据包个数
     uint16 TcpNodelay       = TCP_NODELAY_OFF;
     uint32 MaxBlockSize     = 0;
-    uint32 SendDatamark     = 0;
-    uint32 BlockCount       = 0;
-    uint16 SendTimeout      = 0;
-    uint16 PutQueueTimeout  = 0;
     xmlSendInfo(XmlConfig config, const char* name) : IConfigOpeation::IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };
