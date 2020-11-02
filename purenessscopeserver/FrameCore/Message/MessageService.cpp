@@ -181,7 +181,7 @@ bool CMessageService::PutMessage(CWorkThreadMessage* pMessage)
 		m_blOverload = false;
     }
 
-    if(this->putq(mb, NULL) == -1)
+    if(this->putq(mb, nullptr) == -1)
     {
         int nError = errno;
         if (false == m_blOverload)
@@ -206,7 +206,7 @@ bool CMessageService::PutUpdateCommandMessage(uint32 u4UpdateIndex)
 {
     ACE_Message_Block* mblk = App_MessageBlockManager::instance()->Create(sizeof(int));
 
-    if (NULL == mblk)
+    if (nullptr == mblk)
     {
         return false;
     }
@@ -262,7 +262,7 @@ bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4
 
             pWorkThread_Handler_info->m_tvInput      = pMessage->m_tvMessage;
 
-            m_objHandlerList.Add_Hash_Data_By_Key_Unit32(pMessage->m_u4ConnectID, pWorkThread_Handler_info);
+            int32 nPos = m_objHandlerList.Add_Hash_Data_By_Key_Unit32(pMessage->m_u4ConnectID, pWorkThread_Handler_info);
 
 			//写入连接日志
 			AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "Connection from [%s:%d] ConnectID=%d.",
@@ -274,7 +274,7 @@ bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4
 
 	if (nullptr == pWorkThread_Handler_info)
 	{
-		OUR_DEBUG((LM_ERROR, "[CMessageService::ProcessMessage] [%d](%d)pWorkThread_Handler_info is NULL.\n", 
+		OUR_DEBUG((LM_ERROR, "[CMessageService::ProcessMessage] [%d](%d)pWorkThread_Handler_info is nullptr.\n", 
             u4ThreadID,
             pMessage->m_u4ConnectID));
 		DeleteMessage(pMessage);
@@ -376,7 +376,7 @@ bool CMessageService::ProcessSendMessage(CWorkThreadMessage* pMessage, uint32 u4
     else
     {
         nRet = false;
-        OUR_DEBUG((LM_INFO, "[CMessageService::ProcessSendMessage](ThreadID=%d)(CommandID=%d)Handler is NULL.\n", 
+        OUR_DEBUG((LM_INFO, "[CMessageService::ProcessSendMessage](ThreadID=%d)(CommandID=%d)Handler is nullptr.\n", 
             u4ThreadID,
             pMessage->m_u4ConnectID));
     }
@@ -399,7 +399,7 @@ bool CMessageService::ProcessSendClose(CWorkThreadMessage* pMessage, uint32 u4Th
 	else
 	{
 		nRet = false;
-		OUR_DEBUG((LM_INFO, "[CMessageService::ProcessSendClose](ThreadID=%d)(CommandID=%d)Handler is NULL.\n",
+		OUR_DEBUG((LM_INFO, "[CMessageService::ProcessSendClose](ThreadID=%d)(CommandID=%d)Handler is nullptr.\n",
 			u4ThreadID,
 			pMessage->m_u4ConnectID));
 	}
@@ -507,16 +507,16 @@ CClientCommandList* CMessageService::GetClientCommandList(uint16 u2CommandID)
 
 bool CMessageService::DoMessage(IMessage* pMessage, uint16& u2CommandID, uint16& u2Count, bool& bDeleteFlag)
 {
-    if (NULL == pMessage)
+    if (nullptr == pMessage)
     {
-        OUR_DEBUG((LM_ERROR, "[CMessageService::DoMessage] pMessage is NULL.\n"));
+        OUR_DEBUG((LM_ERROR, "[CMessageService::DoMessage] pMessage is nullptr.\n"));
         return false;
     }
 
     //放给需要继承的ClientCommand类去处理
     CClientCommandList* pClientCommandList = GetClientCommandList(u2CommandID);
 
-    if (NULL == pClientCommandList)
+    if (nullptr == pClientCommandList)
     {
 		//没有找到对应的注册指令，如果不是define.h定义的异常，则记录异常命令日志
 		if (u2CommandID >= CLIENT_LINK_USER)
@@ -536,7 +536,7 @@ bool CMessageService::DoMessage(IMessage* pMessage, uint16& u2CommandID, uint16&
     for (int i = 0; i < nCount; i++)
     {
         const _ClientCommandInfo* pClientCommandInfo = pClientCommandList->GetClientCommandIndex(i);
-        if (NULL != pClientCommandInfo)
+        if (nullptr != pClientCommandInfo)
         {
             //判断当前消息是否有指定的监听端口
             if (pClientCommandInfo->m_objListenIPInfo.m_u2Port > 0 &&
@@ -584,7 +584,7 @@ void CMessageService::CopyMessageManagerList()
 
     CHashTable<CClientCommandList>* pHashtCommandList = App_MessageManager::instance()->GetHashCommandList();
 
-    if (NULL == pHashtCommandList)
+    if (nullptr == pHashtCommandList)
     {
         return;
     }
@@ -594,14 +594,14 @@ void CMessageService::CopyMessageManagerList()
 
 	for (CClientCommandList* pClientCommandList : vecClientCommandList)
 	{
-        if (NULL == pClientCommandList)
+        if (nullptr == pClientCommandList)
         {
             continue;
         }
 
 		CClientCommandList* pCurrClientCommandList = new CClientCommandList();
 
-		if (NULL == pCurrClientCommandList)
+		if (nullptr == pCurrClientCommandList)
 		{
 			continue;
 		}
@@ -613,9 +613,9 @@ void CMessageService::CopyMessageManagerList()
 		{
 			const _ClientCommandInfo* pClientCommandInfo = pClientCommandList->GetClientCommandIndex(j);
 
-			if (NULL != pClientCommandInfo)
+			if (nullptr != pClientCommandInfo)
 			{
-				pCurrClientCommandList->AddClientCommand(pClientCommandInfo->m_pClientCommand, pClientCommandInfo->m_szModuleName, NULL);
+				pCurrClientCommandList->AddClientCommand(pClientCommandInfo->m_pClientCommand, pClientCommandInfo->m_szModuleName, nullptr);
 			}
 		}
 
@@ -825,9 +825,9 @@ int CMessageService::handle_signal(int signum, siginfo_t* siginfo, ucontext_t* u
     {
         OUR_DEBUG((LM_INFO,"[CMessageService::handle_signal](%d) will be kill.\n", grp_id()));
 
-        if(NULL != siginfo && NULL != ucontext)
+        if(nullptr != siginfo && nullptr != ucontext)
         {
-            OUR_DEBUG((LM_INFO,"[CMessageService::handle_signal]siginfo is not null.\n"));
+            OUR_DEBUG((LM_INFO,"[CMessageService::handle_signal]siginfo is not nullptr.\n"));
         }
 
         ACE_Thread::exit();
@@ -864,7 +864,7 @@ void CMessageService::UpdateCommandList(const ACE_Message_Block* pmb)
 
 bool CMessageService::Dispose_Queue()
 {
-    ACE_Message_Block* mb = NULL;
+    ACE_Message_Block* mb = nullptr;
 
     if (getq(mb, 0) == -1)
     {
@@ -1008,9 +1008,9 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
     {
         CMessageService* pMessageService = new CMessageService();
 
-        if (NULL == pMessageService)
+        if (nullptr == pMessageService)
         {
-            OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::Init](%d)pMessageService is NULL.\n", i));
+            OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::Init](%d)pMessageService is nullptr.\n", i));
             return false;
         }
 
@@ -1059,7 +1059,7 @@ bool CMessageServiceGroup::PutUpdateCommandMessage(uint32 u4UpdateIndex)
     {
         CMessageService* pMessageService = m_vecMessageService[i];
 
-        if (NULL != pMessageService && false == pMessageService->PutUpdateCommandMessage(u4UpdateIndex))
+        if (nullptr != pMessageService && false == pMessageService->PutUpdateCommandMessage(u4UpdateIndex))
         {
             OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::PutMessage](%d)pMessageService fail.\n", pMessageService->GetThreadID()));
             return false;
@@ -1084,7 +1084,7 @@ void CMessageServiceGroup::Close()
     {
         CMessageService* pMessageService = m_vecMessageService[i];
 
-        if (NULL != pMessageService && 0 != pMessageService->Close())
+        if (nullptr != pMessageService && 0 != pMessageService->Close())
         {
             OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Close](%d)pMessageService fail.\n", pMessageService->GetThreadID()));
         }
@@ -1114,7 +1114,7 @@ bool CMessageServiceGroup::Start()
     {
         CMessageService* pMessageService = m_vecMessageService[i];
 
-        if (NULL != pMessageService && false == pMessageService->Start())
+        if (nullptr != pMessageService && false == pMessageService->Start())
         {
             OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Start](%d)WorkThread is fail.\n", i));
             return false;
@@ -1130,7 +1130,7 @@ bool CMessageServiceGroup::StartTimer()
 {
     OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::StartTimer] begin....\n"));
 
-    m_u4TimerID = (uint32)App_TimerManager::instance()->schedule(this, NULL, ACE_OS::gettimeofday() + ACE_Time_Value(MAX_MSG_STARTTIME), ACE_Time_Value(m_u2ThreadTimeCheck));
+    m_u4TimerID = (uint32)App_TimerManager::instance()->schedule(this, nullptr, ACE_OS::gettimeofday() + ACE_Time_Value(MAX_MSG_STARTTIME), ACE_Time_Value(m_u2ThreadTimeCheck));
 
     if(0 == m_u4TimerID)
     {
@@ -1173,7 +1173,7 @@ bool CMessageServiceGroup::CheckWorkThread(const ACE_Time_Value& tvNow)
     {
         CMessageService* pMessageService = m_vecMessageService[i];
 
-        if (NULL != pMessageService && false == pMessageService->SaveThreadInfoData(tvNow))
+        if (nullptr != pMessageService && false == pMessageService->SaveThreadInfoData(tvNow))
         {
             OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::CheckWorkThread]SaveThreadInfo error.\n"));
         }
@@ -1264,7 +1264,7 @@ uint32 CMessageServiceGroup::GetHandlerCount()
     uint32 u4HandlerCount = 0;
 	for (CMessageService* pMessageService : m_vecMessageService)
 	{
-		if (NULL != pMessageService)
+		if (nullptr != pMessageService)
 		{
             u4HandlerCount += pMessageService->GetHandlerCount();
 		}
@@ -1280,7 +1280,7 @@ bool CMessageServiceGroup::CheckPlugInState() const
 
     for (const _ModuleInfo* pModuleInfo : vecModeInfo)
     {
-        if (NULL != pModuleInfo)
+        if (nullptr != pModuleInfo)
         {
             uint32 u4ErrorID = 0;
             bool blModuleState = pModuleInfo->GetModuleState(u4ErrorID);
@@ -1328,7 +1328,7 @@ void CMessageServiceGroup::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_
     {
         CMessageService* pMessageService = m_vecMessageService[i];
 
-        if (NULL != pMessageService)
+        if (nullptr != pMessageService)
         {
             pMessageService->GetFlowPortList(vec_Service_Port_Data_Account);
 
@@ -1384,7 +1384,7 @@ void CMessageServiceGroup::GetWorkThreadAIInfo(vecWorkThreadAIInfo& objvecWorkTh
         _WorkThreadAIInfo objWorkThreadAIInfo;
         const CMessageService* pMessageService = m_vecMessageService[i];
 
-        if (NULL != pMessageService)
+        if (nullptr != pMessageService)
         {
             pMessageService->GetAIInfo(objWorkThreadAIInfo);
             objWorkThreadAIInfo.m_u4ThreadID = pMessageService->GetThreadID();
@@ -1403,7 +1403,7 @@ void CMessageServiceGroup::GetAITO(vecCommandTimeout& objTimeout)
     {
         const CMessageService* pMessageService = m_vecMessageService[i];
 
-        if (NULL != pMessageService)
+        if (nullptr != pMessageService)
         {
             pMessageService->GetAITO(objTimeout);
         }
@@ -1420,7 +1420,7 @@ void CMessageServiceGroup::GetAITF(vecCommandTimeout& objTimeout)
     {
         const CMessageService* pMessageService = m_vecMessageService[i];
 
-        if (NULL != pMessageService)
+        if (nullptr != pMessageService)
         {
             pMessageService->GetAITF(objTimeout);
         }
@@ -1435,7 +1435,7 @@ void CMessageServiceGroup::SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCh
     {
         CMessageService* pMessageService = m_vecMessageService[i];
 
-        if (NULL != pMessageService)
+        if (nullptr != pMessageService)
         {
             pMessageService->SetAI(u1AI, u4DisposeTime, u4WTCheckTime, u4WTStopTime);
         }
@@ -1446,11 +1446,11 @@ void CMessageServiceGroup::GetCommandData(uint16 u2CommandID, _CommandData& objC
 {
     for (CMessageService* pMessageService : m_vecMessageService)
     {
-        if (NULL != pMessageService)
+        if (nullptr != pMessageService)
         {
             const _CommandData* pCommandData = pMessageService->GetCommandData(u2CommandID);
 
-            if (NULL != pCommandData)
+            if (nullptr != pCommandData)
             {
                 objCommandData += (*pCommandData);
             }
@@ -1468,7 +1468,7 @@ void CMessageServiceGroup::GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut)
         uint32 u4CurrFlowOut = 0;
         CMessageService* pMessageService = m_vecMessageService[i];
 
-        if (NULL != pMessageService)
+        if (nullptr != pMessageService)
         {
             pMessageService->GetFlowInfo(u4CurrFlowIn, u4CurrFlowOut);
             u4FlowIn  += u4CurrFlowIn;
@@ -1485,7 +1485,7 @@ void CMessageServiceGroup::GetCommandAlertData(vecCommandAlertData& CommandAlert
     {
         CMessageService* pMessageService = m_vecMessageService[i];
 
-        if (NULL != pMessageService)
+        if (nullptr != pMessageService)
         {
             pMessageService->GetCommandAlertData(CommandAlertDataList);
         }
@@ -1500,7 +1500,7 @@ void CMessageServiceGroup::SaveCommandDataLog()
     {
         CMessageService* pMessageService = m_vecMessageService[i];
 
-        if (NULL != pMessageService)
+        if (nullptr != pMessageService)
         {
             pMessageService->SaveCommandDataLog();
         }
@@ -1514,12 +1514,12 @@ CWorkThreadMessage* CMessageServiceGroup::CreateMessage(uint32 u4ConnectID, EM_C
    
     if (-1 == u4ThreadID)
     {
-        return NULL;
+        return nullptr;
     }
 
     CMessageService* pMessageService = m_vecMessageService[u4ThreadID];
 
-    if (NULL != pMessageService)
+    if (nullptr != pMessageService)
     {
         CWorkThreadMessage* pWorkThreadMessage = pMessageService->CreateMessage();
         //设置线程的ID
@@ -1528,7 +1528,7 @@ CWorkThreadMessage* CMessageServiceGroup::CreateMessage(uint32 u4ConnectID, EM_C
     }
     else
     {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -1536,7 +1536,7 @@ void CMessageServiceGroup::DeleteMessage(CWorkThreadMessage* pMessage)
 {
     CMessageService* pMessageService = m_vecMessageService[(uint32)pMessage->m_u4WorkThreadID];
 
-    if (NULL != pMessageService)
+    if (nullptr != pMessageService)
     {
         pMessageService->DeleteMessage(pMessage);
     }
@@ -1551,9 +1551,9 @@ void CMessageServiceGroup::CopyMessageManagerList()
     {
         CMessageService* pMessageService = m_vecMessageService[i];
 
-        if (NULL == pMessageService)
+        if (nullptr == pMessageService)
         {
-            OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::CopyMessageManagerList](%d)pMessageService is NULL.\n", i));
+            OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::CopyMessageManagerList](%d)pMessageService is nullptr.\n", i));
         }
         else
         {
@@ -1566,37 +1566,11 @@ uint32 CMessageServiceGroup::GetWorkThreadID(uint32 u4ConnectID, EM_CONNECT_IO_T
 {
     uint32 u4ThreadID = -1;
 
-    if(m_vecMessageService.size() == 0)
+    if (m_vecMessageService.size() == 0)
     {
         return u4ThreadID;
     }
 
-    if (EM_CONNECT_IO_TYPE::CONNECT_IO_TCP == u1PackeType
-        || EM_CONNECT_IO_TYPE::CONNECT_IO_TTY == u1PackeType
-        || EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP == u1PackeType
-        || EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_UDP == u1PackeType)
-    {
-        u4ThreadID = u4ConnectID % (uint32)m_vecMessageService.size();
-    }
-    else if(u1PackeType == EM_CONNECT_IO_TYPE::CONNECT_IO_UDP)
-    {
-        //如果是UDP协议，则记录当前线程的位置，直接+1，调用随机数速度比较慢（因为要读文件）
-        m_ThreadLock.acquire();
-        u4ThreadID = m_u2CurrThreadID;
-
-        //当前m_u2CurrThreadID指向下一个线程ID
-        if (m_u2CurrThreadID >= m_objAllThreadInfo.GetThreadCount() - 1)
-        {
-            m_u2CurrThreadID = 0;
-        }
-        else
-        {
-            m_u2CurrThreadID++;
-        }
-
-        m_ThreadLock.release();
-    }
-
-    return u4ThreadID;
+    return u4ConnectID % (uint32)m_vecMessageService.size();
 }
 

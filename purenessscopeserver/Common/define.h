@@ -1594,7 +1594,7 @@ inline int32 SeeLock(int32 fd, int32 start, int32 len)
 struct _ClientIPInfo
 {
     string  m_strClientIP;      //客户端的IP地址
-    int16 m_u2Port  = 0;        //客户端的端口
+    uint16 m_u2Port  = 0;        //客户端的端口
 };
 
 //链接别名映射信息(用于PSS_ClientManager管理)

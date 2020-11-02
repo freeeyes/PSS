@@ -12,6 +12,7 @@
 #include "ConnectAccept.h"
 #include "ConsoleAccept.h"
 #include "ClientReConnectManager.h"
+#include "ReactorUDPHander.h"
 #include "ReTTyClientManager.h"
 #include "ControlListen.h"
 #include "FileTestManager.h"

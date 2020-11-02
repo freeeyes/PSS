@@ -109,6 +109,13 @@ void CClientUdpSocket::Run()
 
 	bind(sckServer, (SOCKADDR *) &clientsockaddr, sizeof(clientsockaddr));
 
+	//绑定服务器端口
+	struct sockaddr_in clisockaddr;
+	clisockaddr.sin_family = AF_INET;
+	clisockaddr.sin_port = htons(m_pSocket_Info->m_nUdpClientPort);
+	clisockaddr.sin_addr.s_addr = 0;
+	bind(sckClient, (struct sockaddr*)&clisockaddr, sizeof(clisockaddr));
+
 	//发送次数
 	int nSendIndex = 0;
 

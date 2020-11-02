@@ -50,7 +50,10 @@ bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param,
         }
 
         //将发送数据放入缓冲
-        memcpy_safe(pMbData->rd_ptr(), pMbData->length(), pBlockMessage->wr_ptr(), pMbData->length());
+        memcpy_safe(pMbData->rd_ptr(), 
+            (uint32)pMbData->length(), 
+            pBlockMessage->wr_ptr(), 
+            (uint32)pMbData->length());
         pBlockMessage->wr_ptr(pMbData->length());
         pMbData->release();
     }

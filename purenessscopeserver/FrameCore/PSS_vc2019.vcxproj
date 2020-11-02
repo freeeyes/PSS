@@ -696,7 +696,6 @@
     <ClInclude Include="Mail\smtp.h" />
     <ClInclude Include="UDP\ReactorUDPClient.h" />
     <ClInclude Include="UDP\ReactorUDPHander.h" />
-    <ClInclude Include="UDP\ReUDPManager.h" />
     <ClInclude Include="UDP\UDPConnectManager.h" />
   </ItemGroup>
   <ItemGroup>

@@ -60,3 +60,29 @@ _ClientIPInfo CUDPConnectIDManager::GetConnectIP(uint32 u4ConnectID)
 	return objClientInfo;
 }
 
+void CUDPConnectIDManager::GetClientConnectInfo(vecClientConnectInfo& VecClientConnectInfo)
+{
+	_ClientConnectInfo objClientConnectInfo;
+
+	//遍历所有的UDP客户端地址信息
+	for (auto& kv : m_mapConnectManager) 
+	{
+		string strKey = kv.first;
+		uint32 u4ConnectID = kv.second;
+
+		//拆解字符串
+		_ClientIPInfo objClientInfo;
+		vector<string> vecIPInfo;
+		str_split(strKey, ":", vecIPInfo);
+
+		objClientInfo.m_strClientIP = vecIPInfo[0];
+		objClientInfo.m_u2Port = (uint16)ACE_OS::atoi(vecIPInfo[1].c_str());
+
+		objClientConnectInfo.m_u4ConnectID = u4ConnectID;
+		objClientConnectInfo.m_addrRemote.set(objClientInfo.m_u2Port,
+			objClientInfo.m_strClientIP.c_str());
+
+		VecClientConnectInfo.push_back(objClientConnectInfo);
+	}
+}
+

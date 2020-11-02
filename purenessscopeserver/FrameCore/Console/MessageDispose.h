@@ -21,15 +21,14 @@
 #include "ConsolePromiss.h"
 #include "XmlConfig.h"
 #include "HandlerManager.h"
+#include "UDPConnectManager.h"
 
 #if PSS_PLATFORM == PLATFORM_WIN
 #include "ClientProConnectManager.h"
-#include "ProUDPManager.h"
 #include "WindowsCPU.h"
 #include "ProControlListen.h"
 #else
 #include "ClientReConnectManager.h"
-#include "ReUDPManager.h"
 #include "LinuxCPU.h"
 #include "ControlListen.h"
 #endif

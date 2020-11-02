@@ -634,11 +634,7 @@ void DoMessage_UDPClientInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuff
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
         vecClientConnectInfo VecClientConnectInfo;
-#if PSS_PLATFORM == PLATFORM_WIN
-        App_ProUDPManager::instance()->GetClientConnectInfo(VecClientConnectInfo);
-#else
-        App_ReUDPManager::instance()->GetClientConnectInfo(VecClientConnectInfo);
-#endif
+        App_UDPConnectIDManager::instance()->GetClientConnectInfo(VecClientConnectInfo);
 
         uint32 u4ConnectCount = (uint32)VecClientConnectInfo.size();
         Combo_Common_Head_Data(CommandInfo.m_u1OutputType, u4ConnectCount, "UDPClient Count(%d).\n", pBuffPacket);
@@ -719,7 +715,7 @@ void DoMessage_ShowProcessInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
         //得到多有UDP出口流量统计
         uint32 u4UdpFlowIn = 0;
         uint32 u4UdpFlowOut = 0;
-        App_ProUDPManager::instance()->GetFlowInfo(u4UdpFlowIn, u4UdpFlowOut);
+
         u4FlowIn += u4UdpFlowIn;
         u4FlowOut += u4UdpFlowOut;
 
@@ -1775,7 +1771,6 @@ void DoMessage_MonitorInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
         int nActiveClient   = 0;
         int nPoolClient     = 0;
 #if PSS_PLATFORM == PLATFORM_WIN
-        App_ProUDPManager::instance()->GetFlowInfo(u4UdpFlowIn, u4UdpFlowOut);
         nActiveClient = App_HandlerManager::instance()->GetCount();
         nPoolClient = App_ProConnectHandlerPool::instance()->GetFreeCount();
 #else

@@ -945,9 +945,6 @@
     <ClInclude Include="UDP\ReactorUDPClient.h">
       <Filter>Reactor\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="UDP\ReUDPManager.h">
-      <Filter>Reactor\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="UDP\UDPConnectManager.h">
       <Filter>Proactor\hfile</Filter>
     </ClInclude>

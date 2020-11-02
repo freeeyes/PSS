@@ -21,6 +21,8 @@ public:
 
 	_ClientIPInfo GetConnectIP(uint32 u4ConnectID);
 
+	void GetClientConnectInfo(vecClientConnectInfo& VecClientConnectInfo);
+
 private:
 	typedef unordered_map<string, uint32> mapConnectManager;
 	typedef unordered_map<uint32, string> mapConnectID;
