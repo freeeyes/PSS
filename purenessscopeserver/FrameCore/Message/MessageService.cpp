@@ -152,7 +152,7 @@ int CMessageService::svc(void)
 
     for (CWorkThread_Handler_info* handler_info : handlerList)
     {
-        handler_info->m_pHandler->Close();
+        handler_info->m_pHandler->Close(handler_info->m_u4ConnectID);
     }
     m_objHandlerList.Clear();
 
@@ -258,10 +258,17 @@ bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4
 
             pWorkThread_Handler_info->m_u4ConnectID  = pMessage->m_u4ConnectID;
             pWorkThread_Handler_info->m_pHandler     = pMessage->m_pHandler;
+            pWorkThread_Handler_info->m_emPacketType = pMessage->m_emPacketType;
 
-            pWorkThread_Handler_info->m_tvInput = pMessage->m_tvMessage;
+            pWorkThread_Handler_info->m_tvInput      = pMessage->m_tvMessage;
 
             m_objHandlerList.Add_Hash_Data_By_Key_Unit32(pMessage->m_u4ConnectID, pWorkThread_Handler_info);
+
+			//写入连接日志
+			AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "Connection from [%s:%d] ConnectID=%d.",
+                pWorkThread_Handler_info->m_strRemoteIP,
+                pWorkThread_Handler_info->m_u2RemotePort,
+                pMessage->m_u4ConnectID);
         }
     }
 
@@ -341,7 +348,7 @@ bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4
             pWorkThread_Handler_info->m_OutPacketCount,
             pWorkThread_Handler_info->m_SendSize);
 
-        pWorkThread_Handler_info->m_pHandler->Close();
+        pWorkThread_Handler_info->m_pHandler->Close(pMessage->m_u4ConnectID);
         m_objHandlerList.Del_Hash_Data_By_Unit32(pMessage->m_u4ConnectID);
         m_DeviceHandlerPool.Delete(pWorkThread_Handler_info);
     }
@@ -386,7 +393,7 @@ bool CMessageService::ProcessSendClose(CWorkThreadMessage* pMessage, uint32 u4Th
 	if (nullptr != pWorkThread_Handler_info)
 	{
 		uint32 u4PacketSize = 0;
-        pWorkThread_Handler_info->m_pHandler->Close();
+        pWorkThread_Handler_info->m_pHandler->Close(pWorkThread_Handler_info->m_u4ConnectID);
         m_objClientCommandList.Del_Hash_Data_By_Unit32(pMessage->m_u4ConnectID);
 	}
 	else
@@ -708,7 +715,7 @@ bool CMessageService::Synchronize_SendPostMessage(CWorkThread_Handler_info* pHan
 
         pBlockSend->wr_ptr(u4SendLength);
 
-        pHandlerInfo->m_pHandler->PutSendPacket(pBlockSend, u4SendLength, tvMessage);
+        pHandlerInfo->m_pHandler->PutSendPacket(pHandlerInfo->m_u4ConnectID, pBlockSend, u4SendLength, tvMessage);
         pBlockSend->release();
         m_objBuffSendPacket.Clear();
 
@@ -790,6 +797,12 @@ void CMessageService::Check_Handler_Recv_Timeout()
 
     for (CWorkThread_Handler_info* pHandlerInfo : vecList)
     {
+        if (EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP != pHandlerInfo->m_emPacketType)
+        {
+            //如果不是TCP连接，则不做链接检查
+            continue;
+        }
+
         ACE_Time_Value tvTimeWait = tvNow - pHandlerInfo->m_tvInput;
         if (m_u4MaxRecvWait < tvTimeWait.msec())
         {

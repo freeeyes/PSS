@@ -74,10 +74,10 @@ uint32 CProConnectHandler::GetHandlerID()
     return m_u4HandlerID;
 }
 
-void CProConnectHandler::Close()
+void CProConnectHandler::Close(uint32 u4ConnectID)
 {
     //调用连接断开消息，通知PacketParse接口
-    m_pPacketParseInfo->DisConnect(GetConnectID());
+    m_pPacketParseInfo->DisConnect(u4ConnectID);
 
     m_Reader.cancel();
     m_Writer.cancel();
@@ -150,7 +150,7 @@ void CProConnectHandler::open(ACE_HANDLE h, ACE_Message_Block&)
     {
         //如果解析器不存在，则直接断开连接
         OUR_DEBUG((LM_ERROR, "[CProConnectHandler::open](%s)can't find PacketParseInfo.\n", m_addrRemote.get_host_addr()));
-        Close();
+        Close(GetConnectID());
         return;
     }
 
@@ -158,7 +158,7 @@ void CProConnectHandler::open(ACE_HANDLE h, ACE_Message_Block&)
     {
         //在禁止列表中，不允许访问
         OUR_DEBUG((LM_ERROR, "[CProConnectHandler::open]IP Forbidden(%s).\n", m_addrRemote.get_host_addr()));
-        Close();
+        Close(GetConnectID());
         return;
     }
 
@@ -174,7 +174,7 @@ void CProConnectHandler::open(ACE_HANDLE h, ACE_Message_Block&)
                 "Alert IP",
                 "[CProConnectHandler::open] IP is more than IP Max,");
 
-        Close();
+        Close(GetConnectID());
         return;
     }
 
@@ -194,16 +194,9 @@ void CProConnectHandler::open(ACE_HANDLE h, ACE_Message_Block&)
        this->m_Writer.open(*this, h, 0, proactor()) == -1)
     {
         OUR_DEBUG((LM_DEBUG,"[CProConnectHandler::open] m_reader or m_reader == 0.\n"));
-        Close();
+        Close(GetConnectID());
         return;
     }
-
-    //写入连接日志
-    AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "Connection from [%s:%d] ConnectID=%d, GetHandlerID=%d.",
-                                          m_addrRemote.get_host_addr(),
-                                          m_addrRemote.get_port_number(),
-                                          GetConnectID(),
-                                          GetHandlerID());
 
     m_u1ConnectState = CONNECTSTATE::CONNECT_OPEN;
 
@@ -347,7 +340,7 @@ bool CProConnectHandler::SendMessage(CSendMessageInfo objSendMessageInfo, uint32
     return true;
 }
 
-bool CProConnectHandler::PutSendPacket(ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend)
+bool CProConnectHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend)
 {
     ACE_Message_Block* pmbSend = App_MessageBlockManager::instance()->Create(u4Size);
     memcpy_safe(pMbData->rd_ptr(),
@@ -368,13 +361,13 @@ bool CProConnectHandler::PutSendPacket(ACE_Message_Block* pMbData, uint32 u4Size
     {
 
         OUR_DEBUG ((LM_ERROR, "[CProConnectHandler::PutSendPacket] Connectid=%d mb=%d m_writer.write error(%d)!\n", 
-            GetConnectID(), 
+            u4ConnectID,
             pMbData->length(), 
             errno));
 
         //如果发送失败，在这里返回失败，回调给业务逻辑去处理
         ACE_Time_Value tvNow = tvSend;
-        App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), pmbSend, tvNow);
+        App_MakePacket::instance()->PutSendErrorMessage(u4ConnectID, pmbSend, tvNow);
         return false;
     }
 
@@ -771,7 +764,7 @@ bool CProConnectHandler::Send_Input_To_TCP(CSendMessageInfo objSendMessageInfo, 
     ACE_Message_Block::ACE_Message_Type objType = ACE_Message_Block::MB_USER + objSendMessageInfo.nMessageID;
     m_pBlockMessage->msg_type(objType);
 
-    blState = PutSendPacket(m_pBlockMessage, (uint32)m_pBlockMessage->length(), objSendMessageInfo.tvSendBegin);
+    blState = PutSendPacket(GetConnectID(), m_pBlockMessage, (uint32)m_pBlockMessage->length(), objSendMessageInfo.tvSendBegin);
     if (true == blState)
     {
         m_pBlockMessage->reset();
@@ -1041,7 +1034,7 @@ CProConnectHandler* CProConnectHandlerPool::Create()
 	CProConnectHandler* pHandler = m_objHashHandleList.Pop();
 
     //设置新的ConnectID
-    pHandler->SetConnectID(++m_u4CurrCount);
+    pHandler->SetConnectID(App_ConnectCounter::instance()->CreateCounter());
 
 	//没找到空余的
 	return pHandler;

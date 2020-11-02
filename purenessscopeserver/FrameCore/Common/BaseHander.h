@@ -29,13 +29,13 @@ void Recovery_Message(bool blDelete, char*& pMessage);
 class _Send_Message_Param
 {
 public:
-    uint32 m_u4PacketParseInfoID = 0;
-    char*  m_pIP                 = NULL;
-    uint16 m_u2Port               = 0;
-    bool   m_blHead              = true;
-    uint16 m_u2CommandID         = 0;
-    bool   m_blDlete             = false;
-    uint32 m_u4Len               = 0;
+    uint32 m_u4PacketParseInfoID      = 0;
+    uint32 m_u4SendLength             = 0;
+    string m_strClientIP;
+    uint16 m_u2Port                   = 0;
+    uint16 m_u2CommandID              = 0;
+    bool   m_blDlete                  = false;
+    EM_SEND_PACKET_PARSE m_emSendType = EM_SEND_PACKET_PARSE::EM_SENDMESSAGE_JAMPNOMAL;
 
     _Send_Message_Param()
     {
@@ -46,20 +46,19 @@ public:
 void Send_MakePacket_Queue(_MakePacket objMakePacket, const char* pLocalIP, uint16 u2LocalPort);
 
 //udp函数发送数据包合成函数
-bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param, char*& pMessage,
-                             ACE_Message_Block*& pMbData, const ACE_SOCK_Dgram& skRemote);
+bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param, IBuffPacket* pBuffPacket, const ACE_SOCK_Dgram& skRemote, _Packet_Parse_Info* pPacketParseInfo, ACE_Message_Block* pBlockMessage);
 
 //udp处理消息头函数
-bool Udp_Common_Recv_Head(ACE_Message_Block* pMBHead, CPacketParse* pPacketParse, uint32 u4PacketParseInfoID, uint32 u4Len);
+bool Udp_Common_Recv_Head(uint32 u4ConnectID, ACE_Message_Block* pMBHead, CPacketParse* pPacketParse, _Packet_Parse_Info* pPacketParseInfo, uint32 u4Len);
 
 //udp处理消息体函数
-bool Udp_Common_Recv_Body(ACE_Message_Block* pMBBody, CPacketParse* pPacketParse, uint32 u4PacketParseInfoID);
+bool Udp_Common_Recv_Body(uint32 u4ConnectID, ACE_Message_Block* pMBBody, CPacketParse* pPacketParse, _Packet_Parse_Info* pPacketParseInfo);
 
 //udp流消息处理
-bool Udp_Common_Recv_Stream(ACE_Message_Block* pMbData, CPacketParse* pPacketParse, uint32 u4PacketParseInfoID);
+bool Udp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPacketParse* pPacketParse, _Packet_Parse_Info* m_pPacketParseInfo);
 
 //提交udp数据到工作线程
-bool Udp_Common_Send_WorkThread(CPacketParse*& pPacketParse, const ACE_INET_Addr& addrRemote, const ACE_INET_Addr& addrLocal, const ACE_Time_Value& tvCheck);
+bool Udp_Common_Send_WorkThread(uint32 u4ConnectID, CPacketParse* pPacketParse, const ACE_INET_Addr& addrRemote, const ACE_INET_Addr& addrLocal, const ACE_Time_Value& tvCheck);
 
 //清理数据缓冲
 void Recovery_Common_BuffPacket(bool blDelete, IBuffPacket* pBuffPacket);

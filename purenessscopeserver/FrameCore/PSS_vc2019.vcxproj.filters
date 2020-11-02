@@ -385,6 +385,12 @@
     <ClCompile Include="UDP\ReactorUDPHander.cpp">
       <Filter>Reactor\cppfile</Filter>
     </ClCompile>
+    <ClCompile Include="UDP\UDPConnectManager.cpp">
+      <Filter>Proactor\cppfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\ConnectCounter.cpp">
+      <Filter>Common\cppfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AppConfig.h">
@@ -499,9 +505,6 @@
       <Filter>Proactor\hfile</Filter>
     </ClInclude>
     <ClInclude Include="Proactor\ProSigHandle.h">
-      <Filter>Proactor\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="UDP\ProUDPManager.h">
       <Filter>Proactor\hfile</Filter>
     </ClInclude>
     <ClInclude Include="Common\Ring.h">
@@ -944,6 +947,12 @@
     </ClInclude>
     <ClInclude Include="UDP\ReUDPManager.h">
       <Filter>Reactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="UDP\UDPConnectManager.h">
+      <Filter>Proactor\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\ConnectCounter.h">
+      <Filter>Common\hfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

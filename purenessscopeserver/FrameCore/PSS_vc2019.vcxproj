@@ -189,6 +189,7 @@
     <ClCompile Include="Common\BaseHander.cpp" />
     <ClCompile Include="Common\BaseServerManager.cpp" />
     <ClCompile Include="Common\BaseTask.cpp" />
+    <ClCompile Include="Common\ConnectCounter.cpp" />
     <ClCompile Include="Common\IPAccount.cpp" />
     <ClCompile Include="Common\ServerMessageTask.cpp" />
     <ClCompile Include="Common\TcpRedirection.cpp" />
@@ -507,6 +508,7 @@
     <ClCompile Include="Mail\smtp.cpp" />
     <ClCompile Include="UDP\ReactorUDPClient.cpp" />
     <ClCompile Include="UDP\ReactorUDPHander.cpp" />
+    <ClCompile Include="UDP\UDPConnectManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\ACEMemory.hpp" />
@@ -567,6 +569,7 @@
     <ClInclude Include="Common\BaseHander.h" />
     <ClInclude Include="Common\BaseServerManager.h" />
     <ClInclude Include="Common\BaseTask.h" />
+    <ClInclude Include="Common\ConnectCounter.h" />
     <ClInclude Include="Common\IDeviceHandler.h" />
     <ClInclude Include="Common\IHandler.h" />
     <ClInclude Include="Common\MakePacket_Common.h" />
@@ -666,7 +669,6 @@
     <ClInclude Include="Reactor\WaitQuitSignal.h" />
     <ClInclude Include="UDP\ProactorUDPClient.h" />
     <ClInclude Include="UDP\ProactorUDPHandler.h" />
-    <ClInclude Include="UDP\ProUDPManager.h" />
     <ClInclude Include="Common\AppConfig.h" />
     <ClInclude Include="Common\BuffPacket.h" />
     <ClInclude Include="Common\BuffPacketManager.h" />
@@ -695,6 +697,7 @@
     <ClInclude Include="UDP\ReactorUDPClient.h" />
     <ClInclude Include="UDP\ReactorUDPHander.h" />
     <ClInclude Include="UDP\ReUDPManager.h" />
+    <ClInclude Include="UDP\UDPConnectManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

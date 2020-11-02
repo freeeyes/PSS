@@ -65,7 +65,6 @@ bool Server_Manager_Common_Pool()
 
 bool Server_Manager_Common_IObject(IConnectManager* pConnectManager,
                                    IClientManager* pClientManager,
-                                   IUDPConnectManager* pUDPConnectManager,
                                    IFrameCommand* pFrameCommand,
                                    IServerManager* pIServerManager,
                                    ITMService* pTMService,
@@ -77,7 +76,6 @@ bool Server_Manager_Common_IObject(IConnectManager* pConnectManager,
     App_ServerObject::instance()->SetConnectManager(pConnectManager);
     App_ServerObject::instance()->SetPacketManager(dynamic_cast<IPacketManager*>(App_BuffPacketManager::instance()));
     App_ServerObject::instance()->SetClientManager(pClientManager);
-    App_ServerObject::instance()->SetUDPConnectManager(pUDPConnectManager);
     App_ServerObject::instance()->SetTimerManager(App_TimerManager::instance());
     App_ServerObject::instance()->SetModuleMessageManager(dynamic_cast<IModuleMessageManager*>(App_ModuleMessageManager::instance()));
     App_ServerObject::instance()->SetControlListen(pControlListen);

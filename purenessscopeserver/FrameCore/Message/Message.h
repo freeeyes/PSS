@@ -90,6 +90,7 @@ public:
 	uint32             m_RecvSize       = 0;                                             //接收字节数
 	uint32             m_SendSize       = 0;                                             //发送字节数
     uint32             m_u4ConnectID    = 0;                                             //链接对象ID 
+    EM_CONNECT_IO_TYPE m_emPacketType   = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;     //链接类型
     int                m_nHashID        = 0;                                             //Hash对象ID
 
     void SetHashID(int nHashID)

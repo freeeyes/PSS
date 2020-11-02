@@ -19,16 +19,19 @@ bool CPSSHandlerManager::PostMessage(uint32 u4ConnectID, uint16 u2CommandID, IBu
 	}
 	else
 	{
-		//这个是UDP链接
-
+		OUR_DEBUG((LM_INFO, "[CPSSHandlerManager::PostMessage]Cant't send connectid is 0.\n"));
 		return true;
 	}
 }
 
 bool CPSSHandlerManager::CloseConnect(uint32 u4ConnectID)
 {
-	//待实现
-	return true;
+	CSendMessageInfo objSendMessageInfo;
+
+	objSendMessageInfo.u2CommandID = CLIENT_LINK_SDISCONNET;
+	objSendMessageInfo.u4ConnectID = u4ConnectID;
+
+	return App_MessageServiceGroup::instance()->Send_Post_Message(objSendMessageInfo);
 }
 
 _ClientIPInfo CPSSHandlerManager::GetClientIPInfo(uint32 u4ConnectID)

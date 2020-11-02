@@ -8,7 +8,6 @@
 #include "ProTTyClientManager.h"
 #include "AceProactorManager.h"
 #include "ClientProConnectManager.h"
-#include "ProUDPManager.h"
 #include "XmlConfig.h"
 #include "FileTestManager.h"
 #include "IpCheck.h"

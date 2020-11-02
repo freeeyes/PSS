@@ -70,7 +70,6 @@ bool CServerManager::Init()
     //初始化给插件的对象接口
     IConnectManager* pConnectManager           = dynamic_cast<IConnectManager*>(App_HandlerManager::instance());
     IClientManager*  pClientManager            = dynamic_cast<IClientManager*>(App_ClientReConnectManager::instance());
-    IUDPConnectManager* pUDPConnectManager     = dynamic_cast<IUDPConnectManager*>(App_ReUDPManager::instance());
     IFrameCommand* pFrameCommand               = dynamic_cast<IFrameCommand*>(&m_objFrameCommand);
     ITMService* pTMService                     = dynamic_cast<ITMService*>(&m_TMService);
     IServerManager* pServerManager             = dynamic_cast<IServerManager*>(this);
@@ -79,7 +78,6 @@ bool CServerManager::Init()
 
     Server_Manager_Common_IObject(pConnectManager,
                                   pClientManager,
-                                  pUDPConnectManager,
                                   pFrameCommand,
                                   pServerManager,
                                   pTMService,
@@ -240,7 +238,7 @@ bool CServerManager::Run()
 
     for (uint16 i = 0; i < u2UDPServerPortCount; i++)
     {
-        CReactorUDPHander* pReactorUDPHandler = App_ReUDPManager::instance()->GetUDPHandle((uint8)i);
+        CReactorUDPHander* pReactorUDPHandler = new CReactorUDPHander();
 
         if (NULL != pReactorUDPHandler)
         {
@@ -413,7 +411,7 @@ bool CServerManager::Start_Udp_Listen() const
         }
 
         //得到接收器
-        CReactorUDPHander* pReactorUDPHandler = App_ReUDPManager::instance()->Create();
+        CReactorUDPHander* pReactorUDPHandler = new CReactorUDPHander();
 
         if (NULL == pReactorUDPHandler)
         {
@@ -421,7 +419,6 @@ bool CServerManager::Start_Udp_Listen() const
             return false;
         }
 
-        pReactorUDPHandler->SetRecvSize(GetXmlConfigAttribute(xmlUDPServerIPs)->vec[i].uMaxRecvSize);
         pReactorUDPHandler->SetPacketParseInfoID(GetXmlConfigAttribute(xmlUDPServerIPs)->vec[i].uPacketParseID);
         int nRet = pReactorUDPHandler->OpenAddress(listenAddr, App_ReactorManager::instance()->GetAce_Reactor(REACTOR_CLIENTDEFINE));
 
@@ -613,8 +610,6 @@ bool CServerManager::Close()
     m_ConnectConsoleAcceptor.close();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]AppLogManager OK\n"));
     App_TimerManager::instance()->deactivate();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ReUDPManager OK.\n"));
-    App_ReUDPManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ModuleLoader OK.\n"));
     App_ClientReConnectManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ClientReConnectManager OK.\n"));

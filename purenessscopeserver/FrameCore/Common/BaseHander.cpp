@@ -8,60 +8,79 @@ void Recovery_Message(bool blDelete, char*& pMessage)
     }
 }
 
-bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param, char*& pMessage,
-                             ACE_Message_Block*& pMbData, const ACE_SOCK_Dgram& skRemote)
+bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param,
+    IBuffPacket* pBuffPacket, 
+    const ACE_SOCK_Dgram& skRemote,
+    _Packet_Parse_Info* pPacketParseInfo,
+    ACE_Message_Block* pBlockMessage)
 {
+    if (nullptr == pBuffPacket)
+    {
+        OUR_DEBUG((LM_INFO, "[Udp_Common_Send_Message]pBuffPacket is nullptr.\n"));
+        return false;
+    }
+
     ACE_INET_Addr AddrRemote;
-    int nErr = AddrRemote.set(obj_Send_Message_Param.m_u2Port, obj_Send_Message_Param.m_pIP);
+    int nErr = AddrRemote.set(obj_Send_Message_Param.m_u2Port, obj_Send_Message_Param.m_strClientIP.c_str());
 
     if (nErr != 0)
     {
         OUR_DEBUG((LM_INFO, "[Udp_Common_Send_Message]set_address error[%d].\n", errno));
-        Recovery_Message(obj_Send_Message_Param.m_blDlete, pMessage);
         return false;
     }
 
-    if (obj_Send_Message_Param.m_blHead == true)
+    if (obj_Send_Message_Param.m_emSendType == EM_SEND_PACKET_PARSE::EM_SENDMESSAGE_NOMAL)
     {
+        ACE_Message_Block* pMbData = nullptr;
         //如果需要拼接包头，则拼接包头
-        uint32 u4SendLength = App_PacketParseLoader::instance()->GetPacketParseInfo(obj_Send_Message_Param.m_u4PacketParseInfoID)->Make_Send_Packet_Length(0, obj_Send_Message_Param.m_u4Len, obj_Send_Message_Param.m_u2CommandID);
+        uint32 u4SendLength = pPacketParseInfo->Make_Send_Packet_Length(
+            0, 
+            pBuffPacket->GetPacketLen(), 
+            obj_Send_Message_Param.m_u2CommandID);
         pMbData = App_MessageBlockManager::instance()->Create(u4SendLength);
 
-        if (false == App_PacketParseLoader::instance()->GetPacketParseInfo(obj_Send_Message_Param.m_u4PacketParseInfoID)->Make_Send_Packet(0, pMessage, obj_Send_Message_Param.m_u4Len, pMbData, obj_Send_Message_Param.m_u2CommandID))
+        if (false == pPacketParseInfo->Make_Send_Packet(0, 
+            pBuffPacket->GetData(), 
+            pBuffPacket->GetPacketLen(), 
+            pMbData, 
+            obj_Send_Message_Param.m_u2CommandID))
         {
             OUR_DEBUG((LM_INFO, "[Udp_Common_Send_Message]Make_Send_Packet is false.\n"));
-            Recovery_Message(obj_Send_Message_Param.m_blDlete, pMessage);
             return false;
         }
 
-        Recovery_Message(obj_Send_Message_Param.m_blDlete, pMessage);
+        //将发送数据放入缓冲
+        memcpy_safe(pMbData->rd_ptr(), pMbData->length(), pBlockMessage->wr_ptr(), pMbData->length());
+        pBlockMessage->wr_ptr(pMbData->length());
+        pMbData->release();
     }
     else
     {
-        //不需要拼接包头，直接发送
-        pMbData = App_MessageBlockManager::instance()->Create(obj_Send_Message_Param.m_u4Len);
-
         //将数据拷贝到ACE_Message_Block对象中
-        memcpy_safe(pMessage, obj_Send_Message_Param.m_u4Len, pMbData->wr_ptr(), obj_Send_Message_Param.m_u4Len);
-        pMbData->wr_ptr(obj_Send_Message_Param.m_u4Len);
-
-        Recovery_Message(obj_Send_Message_Param.m_blDlete, pMessage);
+        memcpy_safe(pBuffPacket->GetData(), 
+            pBuffPacket->GetPacketLen(),
+            pBlockMessage->wr_ptr(),
+            pBuffPacket->GetPacketLen());
+        pBlockMessage->wr_ptr(pBuffPacket->GetPacketLen());
     }
 
-    auto nSize = (int)skRemote.send(pMbData->rd_ptr(), pMbData->length(), AddrRemote);
+    auto nSize = (int)skRemote.send(pBlockMessage->rd_ptr(), pBlockMessage->length(), AddrRemote);
 
-    if ((uint32)nSize != pMbData->length())
+    if ((uint32)nSize != pBlockMessage->length())
     {
         return false;
     }
+
+    //发送完成释放
+    pBlockMessage->reset();
 
     return true;
 }
 
-bool Udp_Common_Recv_Head(ACE_Message_Block* pMBHead, CPacketParse* pPacketParse, uint32 u4PacketParseInfoID, uint32 u4Len)
+bool Udp_Common_Recv_Head(uint32 u4ConnectID, ACE_Message_Block* pMBHead, CPacketParse* pPacketParse, _Packet_Parse_Info* pPacketParseInfo, uint32 u4Len)
 {
     _Head_Info obj_Head_Info;
-    bool blStateHead = App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Parse_Packet_Head_Info(0, pMBHead, App_MessageBlockManager::instance(), &obj_Head_Info, EM_CONNECT_IO_TYPE::CONNECT_IO_UDP);
+    bool blStateHead = pPacketParseInfo->Parse_Packet_Head_Info(u4ConnectID, pMBHead, App_MessageBlockManager::instance(), &obj_Head_Info, EM_CONNECT_IO_TYPE::CONNECT_IO_UDP);
 
     if (false == blStateHead)
     {
@@ -84,10 +103,10 @@ bool Udp_Common_Recv_Head(ACE_Message_Block* pMBHead, CPacketParse* pPacketParse
     return true;
 }
 
-bool Udp_Common_Recv_Body(ACE_Message_Block* pMBBody, CPacketParse* pPacketParse, uint32 u4PacketParseInfoID)
+bool Udp_Common_Recv_Body(uint32 u4ConnectID, ACE_Message_Block* pMBBody, CPacketParse* pPacketParse, _Packet_Parse_Info* pPacketParseInfo)
 {
     _Body_Info obj_Body_Info;
-    bool blStateBody = App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Parse_Packet_Body_Info(0, pMBBody, App_MessageBlockManager::instance(), &obj_Body_Info, EM_CONNECT_IO_TYPE::CONNECT_IO_UDP);
+    bool blStateBody = pPacketParseInfo->Parse_Packet_Body_Info(u4ConnectID, pMBBody, App_MessageBlockManager::instance(), &obj_Body_Info, EM_CONNECT_IO_TYPE::CONNECT_IO_UDP);
 
     if (false == blStateBody)
     {
@@ -102,12 +121,12 @@ bool Udp_Common_Recv_Body(ACE_Message_Block* pMBBody, CPacketParse* pPacketParse
     return true;
 }
 
-bool Udp_Common_Recv_Stream(ACE_Message_Block* pMbData, CPacketParse* pPacketParse, uint32 u4PacketParseInfoID)
+bool Udp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPacketParse* pPacketParse, _Packet_Parse_Info* m_pPacketParseInfo)
 {
     //以数据流处理
     _Packet_Info obj_Packet_Info;
 
-    if (PACKET_GET_ENOUGH == App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Parse_Packet_Stream(0, pMbData, App_MessageBlockManager::instance(), &obj_Packet_Info, EM_CONNECT_IO_TYPE::CONNECT_IO_UDP))
+    if (PACKET_GET_ENOUGH == m_pPacketParseInfo->Parse_Packet_Stream(u4ConnectID, pMbData, App_MessageBlockManager::instance(), &obj_Packet_Info, EM_CONNECT_IO_TYPE::CONNECT_IO_UDP))
     {
         pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
         pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);
@@ -127,16 +146,16 @@ bool Udp_Common_Recv_Stream(ACE_Message_Block* pMbData, CPacketParse* pPacketPar
     return true;
 }
 
-bool Udp_Common_Send_WorkThread(CPacketParse*& pPacketParse, const ACE_INET_Addr& addrRemote, const ACE_INET_Addr& addrLocal, const ACE_Time_Value& tvCheck)
+bool Udp_Common_Send_WorkThread(uint32 u4ConnectID, CPacketParse* pPacketParse, const ACE_INET_Addr& addrRemote, const ACE_INET_Addr& addrLocal, const ACE_Time_Value& tvCheck)
 {
     //组织数据包
     _MakePacket objMakePacket;
-    objMakePacket.m_u4ConnectID = UDP_HANDER_ID;
+    objMakePacket.m_u4ConnectID  = u4ConnectID;
     objMakePacket.m_pPacketParse = pPacketParse;
     objMakePacket.m_emPacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_UDP;
-    objMakePacket.m_AddrRemote = addrRemote;
-    objMakePacket.m_AddrListen = addrLocal;
-    objMakePacket.m_u1Option = PACKET_PARSE;
+    objMakePacket.m_AddrRemote   = addrRemote;
+    objMakePacket.m_AddrListen   = addrLocal;
+    objMakePacket.m_u1Option     = PACKET_PARSE;
 
     //UDP因为不是面向链接的
     if (false == App_MakePacket::instance()->PutMessageBlock(objMakePacket, tvCheck))

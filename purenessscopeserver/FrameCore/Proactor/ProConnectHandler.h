@@ -42,6 +42,7 @@
 #include "XmlConfig.h"
 #include "TcpRedirection.h"
 #include "PerformanceCounter.h"
+#include "ConnectCounter.h"
 
 class CProConnectHandler : public ACE_Service_Handler, public IDeviceHandler, public IHandler
 {
@@ -62,7 +63,7 @@ public:
     void Init(uint16 u2HandlerID);                                                           //Connect Pool初始化调用的函数
 
     virtual bool SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);     //发送给客户端数据的函数
-    virtual void Close();                                                                    //当前连接对象关闭
+    virtual void Close(uint32 u4ConnectID);                                                  //当前连接对象关闭
     void SetLocalIPInfo(const char* pLocalIP, uint16 u2LocalPort);                           //设置监听IP和端口信息
 
     uint32             GetHandlerID();                                        //得到当前初始化的HanddlerID
@@ -83,7 +84,7 @@ public:
     void SetPacketParseInfoID(uint32 u4PacketParseInfoID);                    //设置对应的m_u4PacketParseInfoID
     uint32 GetPacketParseInfoID();                                            //获得相应的m_u4PacketParseInfoID
     bool SendTimeoutMessage();                                                //发送连接超时消息
-    virtual bool PutSendPacket(ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend);       //将发送数据发送出去
+    virtual bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend);       //将发送数据发送出去
 
 private:
     bool Dispose_Recv_buffer();                                              //处理接收到数据，切包
@@ -171,7 +172,6 @@ private:
 	ACE_Recursive_Thread_Mutex           m_ThreadWriteLock;                     //控制多线程锁
 	CHashTable<CProConnectHandler>       m_objHashHandleList;                   //Hash管理表
 	CObjectArrayList<CProConnectHandler> m_objHandlerList;                      //数据列表对象
-	uint32                               m_u4CurrCount = 0;                     //当前Connect计数器
 };
 
 typedef ACE_Singleton<CProConnectHandlerPool, ACE_Null_Mutex> App_ProConnectHandlerPool;

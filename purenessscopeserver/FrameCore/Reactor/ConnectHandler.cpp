@@ -4,10 +4,10 @@ CConnectHandler::CConnectHandler(void)
 {
 }
 
-void CConnectHandler::Close()
+void CConnectHandler::Close(uint32 u4ConnectID)
 {
     //调用连接断开消息
-    m_pPacketParseInfo->DisConnect(GetConnectID());
+    m_pPacketParseInfo->DisConnect(u4ConnectID);
 
     
 	OUR_DEBUG((LM_ERROR, "[CProConnectHandler::Close](0x%08x)Close(ConnectID=%d), Recv=%d,Send=%d OK.\n",
@@ -324,7 +324,7 @@ int CConnectHandler::handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask)
         App_MessageBlockManager::instance()->Close(pmbSendData);
     }
 
-    Close();
+    Close(GetConnectID());
 
     return 0;
 }
@@ -441,7 +441,7 @@ bool CConnectHandler::SendTimeoutMessage() const
     return true;
 }
 
-bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend)
+bool CConnectHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend)
 {
 	ACE_Message_Block* pmbSend = App_MessageBlockManager::instance()->Create(u4Size);
 	memcpy_safe(pMbData->rd_ptr(),
@@ -467,7 +467,9 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData, uint32 u4Size, c
     {
         if(nSendPacketLen <= 0)
         {
-            OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, nCurrSendSize error is %d.\n", GetConnectID(), nSendPacketLen));
+            OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, nCurrSendSize error is %d.\n", 
+                u4ConnectID,
+                nSendPacketLen));
             App_MessageBlockManager::instance()->Close(pmbSend);
             return false;
         }
@@ -477,7 +479,7 @@ bool CConnectHandler::PutSendPacket(ACE_Message_Block* pMbData, uint32 u4Size, c
         if(nDataLen <= 0)
         {
             int nErrno = errno;
-            OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, error = %d.\n", GetConnectID(), nErrno));
+            OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, error = %d.\n", u4ConnectID, nErrno));
 
             AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "WriteError [%s:%d] nErrno = %d  result.bytes_transferred() = %d, ",
                                                   m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), nErrno,
@@ -656,13 +658,6 @@ void CConnectHandler::Send_Hander_Event(uint8 u1Option)
 
 void CConnectHandler::ConnectOpen()
 {
-    //写入连接日志
-    AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "Connection from [%s:%d]ConnectID=%d, GetHandlerID=%d.",
-                                          m_addrRemote.get_host_addr(),
-                                          m_addrRemote.get_port_number(),
-                                          GetConnectID(),
-                                          GetHandlerID());
-
 	//告诉PacketParse连接应建立
 	m_pPacketParseInfo->Connect(GetConnectID(), GetClientIPInfo(), GetLocalIPInfo());
 
@@ -959,7 +954,8 @@ bool CConnectHandler::Send_Input_To_TCP(CSendMessageInfo objSendMessageInfo, uin
 	Recovery_Common_BuffPacket(objSendMessageInfo.blDelete, objSendMessageInfo.pBuffPacket);
 
     //直接发送数据，不在放到队列里，否则在压测过程中处理太慢
-	bool blRet = PutSendPacket(m_pBlockMessage, 
+	bool blRet = PutSendPacket(GetConnectID(),
+        m_pBlockMessage, 
         (uint32)m_pBlockMessage->length(),
         objSendMessageInfo.tvSendBegin);
 
@@ -1127,7 +1123,7 @@ CConnectHandler* CConnectHandlerPool::Create()
     CConnectHandler* pHandler = m_objHashHandleList.Pop();
 
 	//设置新的ConnectID
-	pHandler->SetConnectID(++m_u4CurrCount);
+	pHandler->SetConnectID(App_ConnectCounter::instance()->CreateCounter());
 
     //没找到空余的
     return pHandler;

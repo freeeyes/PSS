@@ -35,6 +35,7 @@
 #include "TcpRedirection.h"
 #include "IDeviceHandler.h"
 #include "PerformanceCounter.h"
+#include "ConnectCounter.h"
 
 #if PSS_PLATFORM != PLATFORM_WIN
 #include "netinet/tcp.h"
@@ -67,7 +68,7 @@ public:
 
     void SetLocalIPInfo(const char* pLocalIP, uint16 u2LocalPort);           //设置监听IP和端口信息
 
-    virtual void Close();                                                    //关闭当前连接
+    virtual void Close(uint32 u4ConnectID);                                  //关闭当前连接
     void CloseFinally();                                                     //替代析构函数，符合roz规则
 
     uint32      GetHandlerID() const;                                        //得到当前的handlerID
@@ -89,7 +90,7 @@ public:
     bool Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPacket);                              //将发送数据写入文件
     bool Send_Input_To_Cache(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);               //讲发送对象放入缓存
     bool Send_Input_To_TCP(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);                 //将数据发送给对端
-    virtual bool PutSendPacket(ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend);//发送数据
+    virtual bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend);//发送数据
 
 private:
 	bool Dispose_Recv_buffer();                                              //处理接收到数据，切包

@@ -12,7 +12,6 @@
 #include "IConnectManager.h"
 #include "IPacketManager.h"
 #include "IClientManager.h"
-#include "IUDPConnectManager.h"
 #include "ITimerManager.h"
 #include "IModuleMessageManager.h"
 #include "IControlListen.h"
@@ -30,22 +29,21 @@ class CServerObject
 public:
     CServerObject()
     {
-        m_pIMessageManager      = NULL;
-        m_pLogManager           = NULL;
-        m_pConnectManager       = NULL;
-        m_pPacketManager        = NULL;
-        m_pClientManager        = NULL;
-        m_pUDPConnectManager    = NULL;
-        m_pModuleMessageManager = NULL;
-        m_pContorlListen        = NULL;
-        m_pIServerManager       = NULL;
-        m_pMessageBlockManager  = NULL;
-        m_pTimerManager         = NULL;
-        m_pIModuleInfo          = NULL;
-        m_pFrameCommand         = NULL;
-        m_pTMService            = NULL;
-        m_pTTyClientManager     = NULL;
-        m_pEchartlog            = NULL;
+        m_pIMessageManager      = nullptr;
+        m_pLogManager           = nullptr;
+        m_pConnectManager       = nullptr;
+        m_pPacketManager        = nullptr;
+        m_pClientManager        = nullptr;
+        m_pModuleMessageManager = nullptr;
+        m_pContorlListen        = nullptr;
+        m_pIServerManager       = nullptr;
+        m_pMessageBlockManager  = nullptr;
+        m_pTimerManager         = nullptr;
+        m_pIModuleInfo          = nullptr;
+        m_pFrameCommand         = nullptr;
+        m_pTMService            = nullptr;
+        m_pTTyClientManager     = nullptr;
+        m_pEchartlog            = nullptr;
     }
 
     virtual ~CServerObject() {}
@@ -68,10 +66,6 @@ public:
     void SetClientManager(IClientManager* pClientManager)
     {
         m_pClientManager = pClientManager;
-    }
-    void SetUDPConnectManager(IUDPConnectManager* pUDPConnectManager)
-    {
-        m_pUDPConnectManager = pUDPConnectManager;
     }
     void SetTimerManager(ActiveTimer* pTimerManager)
     {
@@ -138,10 +132,6 @@ public:
     {
         return m_pClientManager;
     }
-    IUDPConnectManager*    GetUDPConnectManager()
-    {
-        return m_pUDPConnectManager;
-    }
     IModuleMessageManager* GetModuleMessageManager()
     {
         return m_pModuleMessageManager;
@@ -194,7 +184,6 @@ private:
     IConnectManager*       m_pConnectManager;
     IPacketManager*        m_pPacketManager;
     IClientManager*        m_pClientManager;
-    IUDPConnectManager*    m_pUDPConnectManager;
     ActiveTimer*           m_pTimerManager;
     IModuleMessageManager* m_pModuleMessageManager;
     IControlListen*        m_pContorlListen;

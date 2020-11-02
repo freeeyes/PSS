@@ -51,7 +51,6 @@ bool CProServerManager::Init()
     //初始化给插件的对象接口
     IConnectManager* pConnectManager           = dynamic_cast<IConnectManager*>(App_HandlerManager::instance());
     IClientManager*  pClientManager            = dynamic_cast<IClientManager*>(App_ClientProConnectManager::instance());
-    IUDPConnectManager* pUDPConnectManager     = dynamic_cast<IUDPConnectManager*>(App_ProUDPManager::instance());
     IFrameCommand* pFrameCommand               = dynamic_cast<IFrameCommand*>(&m_objFrameCommand);
     ITMService* pTMService                     = dynamic_cast<ITMService*>(&m_TMService);
     IServerManager* pServerManager             = dynamic_cast<IServerManager*>(this);
@@ -60,7 +59,6 @@ bool CProServerManager::Init()
 
     Server_Manager_Common_IObject(pConnectManager,
                                   pClientManager,
-                                  pUDPConnectManager,
                                   pFrameCommand,
                                   pServerManager,
                                   pTMService,
@@ -178,7 +176,7 @@ bool CProServerManager::Start()
     {
         ACE_INET_Addr listenAddr;
 
-        CProactorUDPHandler* pProactorUDPHandler = App_ProUDPManager::instance()->Create();
+        CProactorUDPHandler* pProactorUDPHandler = new CProactorUDPHandler();
 
         if(NULL == pProactorUDPHandler)
         {
@@ -387,9 +385,6 @@ bool CProServerManager::Close()
     m_ProConsoleConnectAcceptor.cancel();
     App_TimerManager::instance()->deactivate();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_TimerManager OK.\n"));
-
-    App_ProUDPManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ProUDPManager OK.\n"));
 
     App_ClientProConnectManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ClientProConnectManager OK.\n"));

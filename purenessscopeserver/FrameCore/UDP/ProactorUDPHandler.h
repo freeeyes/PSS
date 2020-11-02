@@ -9,24 +9,27 @@
 #include "ace/INET_Addr.h"
 #include "ace/SOCK_Dgram.h"
 
+#include "IHandler.h"
 #include "XmlConfig.h"
 #include "BaseHander.h"
 #include "ForbiddenIP.h"
 #include "CommandAccount.h"
 #include "LoadPacketParse.h"
+#include "UDPConnectManager.h"
 
-class CProactorUDPHandler : public ACE_Service_Handler
+class CProactorUDPHandler : public ACE_Service_Handler, public IHandler
 {
 public:
     CProactorUDPHandler(void);
-    ~CProactorUDPHandler(void);
+    virtual ~CProactorUDPHandler(void);
 
     void SetPacketParseInfoID(uint32 u4PacketParseInfoID);                    //设置对应的m_u4PacketParseInfoID
     virtual void handle_read_dgram(const ACE_Asynch_Read_Dgram::Result& result);
 
     int  OpenAddress(const ACE_INET_Addr& AddrLocal, ACE_Proactor* pProactor);
-    void Close();
-    bool SendMessage(char*& pMessage, uint32 u4Len, const char* szIP, uint16 u2Port, bool blHead = true, uint16 u2CommandID = 0, bool blDlete = true);
+    virtual void Close(uint32 u4ConnectID);
+    virtual bool SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);
+    virtual bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend);
     _ClientConnectInfo GetClientConnectInfo();
     void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);    //获得指定命令统计信息
     void GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut);                    //得到所有的流量信息
@@ -34,11 +37,12 @@ public:
     uint32 GetRecvSize();                                                     //得到数据包最大尺寸
 
 private:
-    bool CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len);              //这里解析数据包并放入数据队列
-    void SaveProSendInfo(uint32 u4Len);                                       //记录发送信息
+    bool CheckMessage(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Len, ACE_INET_Addr addrRemote);  //这里解析数据包并放入数据队列
+    void SaveProSendInfo(uint32 u4Len);                                                                         //记录发送信息
+    void Send_Hander_Event(uint32 u4ConnandID, uint8 u1Option, ACE_INET_Addr addrRemote);                       //发送链接建立消息
 
-    CPacketParse*           m_pPacketParse;                 //数据包解析类
-    ACE_INET_Addr           m_addrRemote;                   //数据发送方的IP信息
+    CPacketParse            m_objPacketParse;               //数据包解析类
+    _Packet_Parse_Info*     m_pPacketParseInfo = nullptr;   //处理业务的PacketParse库
     ACE_INET_Addr           m_addrLocal;                    //监听方的IP信息
     ACE_SOCK_Dgram          m_skRemote;
     ACE_Asynch_Read_Dgram   m_Read;
@@ -54,6 +58,9 @@ private:
     uint32                  m_u4MaxRecvSize;                //最大接收数据包尺寸
     char                    m_szCompletionkey[MAX_BUFF_20]; //完成端口的Key
     char                    m_szAct[MAX_BUFF_20];           //动作
+	ACE_Message_Block*      m_pBlockMessage = nullptr;      //当前发送缓冲等待数据块
+	ACE_Message_Block*      m_pBlockRecv    = nullptr;      //接收数据缓冲块
+
     _TimeConnectInfo        m_TimeConnectInfo;              //链接健康检测器
     CCommandAccount         m_CommandAccount;               //数据包统计
 

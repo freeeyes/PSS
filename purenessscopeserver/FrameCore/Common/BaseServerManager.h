@@ -27,7 +27,6 @@ bool Server_Manager_Common_Pool();
 //初始化插件所有的接口对象
 bool Server_Manager_Common_IObject(IConnectManager* pConnectManager,
                                    IClientManager* pClientManager,
-                                   IUDPConnectManager* pUDPConnectManager,
                                    IFrameCommand* pFrameCommand,
                                    IServerManager* pIServerManager,
                                    ITMService* pTMService,
