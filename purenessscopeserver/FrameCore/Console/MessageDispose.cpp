@@ -211,7 +211,6 @@ void DoMessage_ClientMessageCount(const _CommandInfo& CommandInfo, IBuffPacket* 
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-c") == 0)
     {
         //-c 只返回当前激活的链接数
-#if WIN32
         int nActiveClient = App_HandlerManager::instance()->GetCount();
 
         if (CommandInfo.m_u1OutputType == 0)
@@ -224,50 +223,17 @@ void DoMessage_ClientMessageCount(const _CommandInfo& CommandInfo, IBuffPacket* 
             sprintf_safe(szTemp, MAX_BUFF_200, "ActiveClient(%d).\n", nActiveClient);
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
         }
-
-#else
-        int nActiveClient = App_ConnectManager::instance()->GetCount();
-
-        if (CommandInfo.m_u1OutputType == 0)
-        {
-            (*pBuffPacket) << (uint32)nActiveClient;
-        }
-        else
-        {
-            char szTemp[MAX_BUFF_200] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_200, "ActiveClient(%d).\n", nActiveClient);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-        }
-
-#endif
     }
     else if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-cp") == 0)
     {
         //-cp 返回当前激活连接数和池中剩余可分配数
-#if WIN32
+
         int nActiveClient = App_HandlerManager::instance()->GetCount();
+#if PSS_PLATFORM == PLATFORM_WIN
         int nPoolClient = App_ProConnectHandlerPool::instance()->GetFreeCount();
-
-        if (CommandInfo.m_u1OutputType == 0)
-        {
-            (*pBuffPacket) << (uint32)nActiveClient;
-            (*pBuffPacket) << (uint32)nPoolClient;
-            (*pBuffPacket) << (uint16)GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount;
-        }
-        else
-        {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "ActiveClient(%d).\nPoolClient(%d).\nMaxHandlerCount(%d).\n",
-                         nActiveClient,
-                         nPoolClient,
-                         GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-        }
-
 #else
-        int nActiveClient = App_ConnectManager::instance()->GetCount();
         int nPoolClient = App_ConnectHandlerPool::instance()->GetFreeCount();
-
+#endif
         if (CommandInfo.m_u1OutputType == 0)
         {
             (*pBuffPacket) << (uint32)nActiveClient;
@@ -283,8 +249,6 @@ void DoMessage_ClientMessageCount(const _CommandInfo& CommandInfo, IBuffPacket* 
                          GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount);
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
         }
-
-#endif
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_CLIENTCOUNT;
@@ -396,7 +360,7 @@ void DoMessage_CommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
         }
 
 /*
-#if WIN32
+#if PSS_PLATFORM == PLATFORM_WIN
         //查询发送命令
         App_HandlerManager::instance()->GetCommandData(u2CommandID, objCommandDataOut);
 
@@ -703,19 +667,21 @@ void DoMessage_ShowProcessInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
         u4FlowIn += u4MessageFlowIn;
         u4FlowOut += u4MessageFlowOut;
 
+		uint32 u4ConnectFlowIn  = 0;
+		uint32 u4ConnectFlowOut = 0;
+		uint32 u4UdpFlowIn      = 0;
+		uint32 u4UdpFlowOut     = 0;
+
 #if PSS_PLATFORM == PLATFORM_WIN  //如果是windows
         //得到所有TCP出口流量统计
-        uint32 u4ConnectFlowIn = 0;
-        uint32 u4ConnectFlowOut = 0;
+
         //待实现
         //App_ProConnectManager::instance()->GetFlowInfo(u4ConnectFlowIn, u4ConnectFlowOut);
         u4FlowIn += u4ConnectFlowIn;
         u4FlowOut += u4ConnectFlowOut;
 
         //得到多有UDP出口流量统计
-        uint32 u4UdpFlowIn = 0;
-        uint32 u4UdpFlowOut = 0;
-
+        //待实现
         u4FlowIn += u4UdpFlowIn;
         u4FlowOut += u4UdpFlowOut;
 
@@ -723,16 +689,10 @@ void DoMessage_ShowProcessInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
         nMemorySize = GetProcessMemorySize();
 #else   //如果是linux
         //得到所有TCP出口流量统计
-        uint32 u4ConnectFlowIn = 0;
-        uint32 u4ConnectFlowOut = 0;
-        App_ConnectManager::instance()->GetFlowInfo(u4ConnectFlowIn, u4ConnectFlowOut);
-        u4FlowIn += u4MessageFlowIn;
-        u4FlowOut += u4MessageFlowOut;
+        u4FlowIn += u4ConnectFlowIn;
+        u4FlowOut += u4ConnectFlowOut;
 
         //得到多有UDP出口流量统计
-        uint32 u4UdpFlowIn = 0;
-        uint32 u4UdpFlowOut = 0;
-        App_ReUDPManager::instance()->GetFlowInfo(u4UdpFlowIn, u4UdpFlowOut);
         u4FlowIn += u4UdpFlowIn;
         u4FlowOut += u4UdpFlowOut;
 
@@ -1770,12 +1730,11 @@ void DoMessage_MonitorInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
         uint32 u4UdpFlowOut = 0;
         int nActiveClient   = 0;
         int nPoolClient     = 0;
-#if PSS_PLATFORM == PLATFORM_WIN
+
         nActiveClient = App_HandlerManager::instance()->GetCount();
+#if PSS_PLATFORM == PLATFORM_WIN
         nPoolClient = App_ProConnectHandlerPool::instance()->GetFreeCount();
 #else
-        App_ReUDPManager::instance()->GetFlowInfo(u4UdpFlowIn, u4UdpFlowOut);
-        nActiveClient = App_ConnectManager::instance()->GetCount();
         nPoolClient = App_ConnectHandlerPool::instance()->GetFreeCount();
 #endif
         u4FlowIn += u4UdpFlowIn;

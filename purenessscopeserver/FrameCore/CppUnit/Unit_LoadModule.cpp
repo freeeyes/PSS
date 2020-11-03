@@ -47,7 +47,7 @@ void CUnit_LoadModule::Test_LoadModule(void)
         return;
     }
 
-    if (2 != App_ModuleLoader::instance()->GetModuleCount())
+    if (1 != App_ModuleLoader::instance()->GetModuleCount())
     {
         CPPUNIT_ASSERT_MESSAGE("[Test_LoadModule]ModuleCount is error.", true == blRet);
         return;

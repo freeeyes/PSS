@@ -5,6 +5,7 @@
 
 #include "Unit_Common.h"
 #include "ConnectHandler.h"
+#include "HandlerManager.h"
 
 class CUnit_ConnectHandler : public CppUnit::TestFixture
 {

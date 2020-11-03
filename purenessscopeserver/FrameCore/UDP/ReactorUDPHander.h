@@ -17,7 +17,7 @@ class CReactorUDPHander : public ACE_Event_Handler, public IHandler
 {
 public:
     CReactorUDPHander(void);
-    ~CReactorUDPHander(void);
+    virtual ~CReactorUDPHander(void);
 
     virtual ACE_HANDLE get_handle(void) const;
     virtual int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE);

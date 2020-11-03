@@ -37,7 +37,7 @@ void CUnit_Basehandler::Test_Tcp_Common_File_Message(void)
 
     obj_File_Message_Param.m_addrRemote        = addrRemote;
     obj_File_Message_Param.m_blDelete          = false;
-    obj_File_Message_Param.m_pFileTest         = NULL;
+    obj_File_Message_Param.m_pFileTest         = nullptr;
     obj_File_Message_Param.m_pPacketDebugData  = (char* )szPacketDebugData;
     obj_File_Message_Param.m_u4ConnectID       = 1;
     obj_File_Message_Param.m_u4PacketDebugSize = u4PacketDebugSize;
@@ -66,7 +66,7 @@ void CUnit_Basehandler::Test_Tcp_Common_Send_Input_To_Cache(void)
     bool blRet = false;
 
     _Input_To_Cache_Param obj_Input_To_Cache_Param;
-    obj_Input_To_Cache_Param.m_u1SendType          = SENDMESSAGE_JAMPNOMAL;
+    obj_Input_To_Cache_Param.m_emSendType          = NAMESPACE::EM_SEND_PACKET_PARSE::EM_SENDMESSAGE_JAMPNOMAL;
     obj_Input_To_Cache_Param.m_blDelete            = false;
     obj_Input_To_Cache_Param.m_u2CommandID         = 0x1001;
     obj_Input_To_Cache_Param.m_u4ConnectID         = 1;
@@ -160,9 +160,11 @@ void CUnit_Basehandler::Test_Udp_Common_Recv_Stream(void)
     memcpy_safe(szSendUDP, u4SendLen, pmb->wr_ptr(), u4SendLen);
     pmb->wr_ptr(u4SendLen);
 
+    _Packet_Parse_Info* pPacketParseInfo = App_PacketParseLoader::instance()->GetPacketParseInfo(1);
+
     CPacketParse* pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
 
-    if (false == Udp_Common_Recv_Stream(pmb, pPacketParse, 1))
+    if (false == Udp_Common_Recv_Stream(1, pmb, pPacketParse, pPacketParseInfo))
     {
         OUR_DEBUG((LM_INFO, "[Test_Udp_Common_Recv_Stream]Udp_Common_Recv_Stream is fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_Udp_Common_Recv_Stream]Udp_Common_Recv_Stream is fail.", true == blRet);
@@ -179,12 +181,8 @@ void CUnit_Basehandler::Test_Udp_Common_Recv_Stream(void)
 void CUnit_Basehandler::Test_Udp_Common_Send_Message(void)
 {
     bool blRet = false;
-    ACE_Message_Block* pMbData = NULL;
+    ACE_Message_Block* pMbData = App_MessageBlockManager::instance()->Create(200);
     ACE_SOCK_Dgram skRemote;
-
-    uint32 u4Len = MAX_BUFF_20;
-    char* pMessage = new char[u4Len];
-    memset(pMessage, 0, u4Len);
 
     char szTestIP[MAX_BUFF_50] = { '\0' };
     sprintf_safe(szTestIP, MAX_BUFF_50, "300.0.0.1");
@@ -192,17 +190,24 @@ void CUnit_Basehandler::Test_Udp_Common_Send_Message(void)
     _Send_Message_Param obj_Send_Message_Param;
     obj_Send_Message_Param.m_u4PacketParseInfoID = 1;
     obj_Send_Message_Param.m_blDlete             = false;
-    obj_Send_Message_Param.m_blHead              = true;
+    obj_Send_Message_Param.m_emSendType          = EM_SEND_PACKET_PARSE::EM_SENDMESSAGE_JAMPNOMAL;
     obj_Send_Message_Param.m_u2Port              = 20002;
-    obj_Send_Message_Param.m_pIP                 = szTestIP;
+    obj_Send_Message_Param.m_strClientIP         = szTestIP;
     obj_Send_Message_Param.m_u2CommandID         = 0x1002;
-    obj_Send_Message_Param.m_u4Len               = u4Len;
+    obj_Send_Message_Param.m_u4SendLength        = 4;
+
+    _Packet_Parse_Info* pPacketParseInfo = App_PacketParseLoader::instance()->GetPacketParseInfo(1);
+
+    CBuffPacket objtestBuffPacket;
+
+    objtestBuffPacket << (uint32)1;
 
     //测试错误的IP地址
     bool blState = Udp_Common_Send_Message(obj_Send_Message_Param,
-                                           pMessage,
-                                           pMbData,
-                                           skRemote);
+        &objtestBuffPacket,
+        skRemote,
+        pPacketParseInfo,
+        pMbData);
 
     if (blState == true)
     {
@@ -213,11 +218,12 @@ void CUnit_Basehandler::Test_Udp_Common_Send_Message(void)
 
     //测试正常的数据解析
     sprintf_safe(szTestIP, MAX_BUFF_50, "127.0.0.1");
-    obj_Send_Message_Param.m_pIP = szTestIP;
-    blState = Udp_Common_Send_Message(obj_Send_Message_Param,
-                                      pMessage,
-                                      pMbData,
-                                      skRemote);
+    obj_Send_Message_Param.m_strClientIP = szTestIP;
+	blState = Udp_Common_Send_Message(obj_Send_Message_Param,
+		&objtestBuffPacket,
+		skRemote,
+		pPacketParseInfo,
+		pMbData);
 
     if (blState == true)
     {
@@ -226,7 +232,6 @@ void CUnit_Basehandler::Test_Udp_Common_Send_Message(void)
         return;
     }
 
-    SAFE_DELETE_ARRAY(pMessage);
     App_MessageBlockManager::instance()->Close(pMbData);
 
 }
@@ -234,7 +239,7 @@ void CUnit_Basehandler::Test_Udp_Common_Send_Message(void)
 void CUnit_Basehandler::Test_Tcp_Common_Make_Send_Packet(void)
 {
     bool blRet = false;
-    ACE_Message_Block* pMbData       = NULL;
+    ACE_Message_Block* pMbData       = nullptr;
     ACE_Message_Block* pBlockMessage = App_MessageBlockManager::instance()->Create(MAX_BUFF_200);
     IBuffPacket* pBuffPacket         = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
@@ -244,7 +249,7 @@ void CUnit_Basehandler::Test_Tcp_Common_Make_Send_Packet(void)
 
     _Send_Packet_Param obj_Send_Packet_Param;
     obj_Send_Packet_Param.m_blDelete = false;
-    obj_Send_Packet_Param.m_u1SendType = SENDMESSAGE_JAMPNOMAL;
+    obj_Send_Packet_Param.m_emSendType  = EM_SEND_PACKET_PARSE::EM_SENDMESSAGE_JAMPNOMAL;
     obj_Send_Packet_Param.m_u2CommandID = 0x2001;
     obj_Send_Packet_Param.m_u4ConnectID = 1;
     obj_Send_Packet_Param.m_u4PacketParseInfoID = 1;

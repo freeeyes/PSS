@@ -29,7 +29,7 @@ bool CheckTcpMulipleThreadPacket(int nCount, _ClientInfo& objClientInfo, _Result
 bool Thread_CheckUdpPacket(_ClientInfo& objClientInfo, _ResultInfo& objResultInfo, _ResultInfo& objRecvResultInfo);
 
 //测试UDP包接收
-bool Thread_CheckUdpPacket_Recv(_ClientInfo& objClientInfo, _ResultInfo& objResultInfo);
+bool Thread_CheckUdpPacket_Recv(int nClientSocket, _ClientInfo& objClientInfo, _ResultInfo& objResultInfo);
 
 //测试Console连接
 bool CheckConsolePacket(_ResultInfo& objResultInfo);

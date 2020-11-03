@@ -809,7 +809,7 @@ void* Thread_CheckRecvUdpPacket(void* arg)
 
     if(NULL != pThreadParam)
     {
-        Thread_CheckUdpPacket_Recv(*pThreadParam->m_pClientInfo, *pThreadParam->m_pResultInfo);
+        Thread_CheckUdpPacket_Recv(pThreadParam ->m_nClientSocket, *pThreadParam->m_pClientInfo, *pThreadParam->m_pResultInfo);
     }
 
     pthread_barrier_wait(pThreadParam->m_Barrier);
@@ -896,6 +896,13 @@ bool Thread_CheckUdpPacket(_ClientInfo& objClientInfo, _ResultInfo& objResultInf
 
     sckClient = socket(AF_INET, SOCK_DGRAM, 0);
 
+	//绑定服务器端口
+	struct sockaddr_in clisockaddr;
+	clisockaddr.sin_family = AF_INET;
+	clisockaddr.sin_port = htons(20002);
+	clisockaddr.sin_addr.s_addr = 0;
+	bind(sckClient, (struct sockaddr*)&clisockaddr, sizeof(clisockaddr));
+
     //拼装发送包体
     char szSendBuffer[MAX_BUFF_200] = {'\0'};
 
@@ -919,9 +926,10 @@ bool Thread_CheckUdpPacket(_ClientInfo& objClientInfo, _ResultInfo& objResultInf
     //初始化栅栏
     pthread_barrier_init(&barrier, NULL, 1 + 1);
 
-    pThreadParam->m_pClientInfo = &objClientInfo;
-    pThreadParam->m_pResultInfo = &objRecvResultInfo;
-    pThreadParam->m_Barrier     = &barrier;
+    pThreadParam->m_pClientInfo   = &objClientInfo;
+    pThreadParam->m_pResultInfo   = &objRecvResultInfo;
+    pThreadParam->m_Barrier       = &barrier;
+    pThreadParam->m_nClientSocket = sckClient;
 
     pthread_create(&pid, NULL, &Thread_CheckRecvUdpPacket, (void* )pThreadParam);
 
@@ -961,43 +969,23 @@ bool Thread_CheckUdpPacket(_ClientInfo& objClientInfo, _ResultInfo& objResultInf
     return true;
 }
 
-bool Thread_CheckUdpPacket_Recv(_ClientInfo& objClientInfo, _ResultInfo& objResultInfo)
+bool Thread_CheckUdpPacket_Recv(int nClientSocket, _ClientInfo& objClientInfo, _ResultInfo& objResultInfo)
 {
     struct timeval ttStart, ttEnd;
     int sockListen = socket(AF_INET, SOCK_DGRAM, 0);
+    struct sockaddr_in recvAddr;
 
     gettimeofday(&ttStart, NULL);
     sprintf(objResultInfo.m_szTestName, "single UDP packet recv test");
 
-    int set = 1;
-    setsockopt(sockListen, SOL_SOCKET, SO_REUSEADDR, &set, sizeof(int));
-    struct sockaddr_in recvAddr;
-    memset(&recvAddr, 0, sizeof(struct sockaddr_in));
-    recvAddr.sin_family = AF_INET;
-    recvAddr.sin_port = htons(20002);
-    recvAddr.sin_addr.s_addr = inet_addr(objClientInfo.m_szServerIP);
-
-    //设置超时时间
-    struct timeval timeout = {3,0};
-    setsockopt(sockListen, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(struct timeval));
-
-    // 必须绑定，否则无法监听
-    if(bind(sockListen, (struct sockaddr*)&recvAddr, sizeof(struct sockaddr)) == -1)
-    {
-        close(sockListen);
-        gettimeofday(&ttEnd, NULL);
-        sprintf(objResultInfo.m_szResult, "[e][%s:%d]client Udp bind error.[%s]", objClientInfo.m_szServerIP, 20002, strerror(errno));
-        objResultInfo.m_nRet = 1;
-        objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-        return false;
-    }
+	int set = 1;
 
     printf("[Thread_CheckUdpPacket_Recv]Begin Listen UDP.\n");
     int recvbytes;
     char recvbuf[128];
     int addrLen = sizeof(struct sockaddr_in);
 
-    if((recvbytes = recvfrom(sockListen, recvbuf, 128, 0,
+    if((recvbytes = recvfrom(nClientSocket, recvbuf, 128, 0,
                              (struct sockaddr*)&recvAddr, (socklen_t*)&addrLen)) != -1)
     {
         recvbuf[recvbytes] = '\0';
@@ -1019,11 +1007,11 @@ bool Thread_CheckUdpPacket_Recv(_ClientInfo& objClientInfo, _ResultInfo& objResu
             objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
         }
 
-        close(sockListen);
+        close(nClientSocket);
     }
     else
     {
-        close(sockListen);
+        close(nClientSocket);
         gettimeofday(&ttEnd, NULL);
         sprintf(objResultInfo.m_szResult, "[e][%s:%d]client Udp bind error.[%s]", objClientInfo.m_szServerIP, 20002, strerror(errno));
         objResultInfo.m_nRet = 1;

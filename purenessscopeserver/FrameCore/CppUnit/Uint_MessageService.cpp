@@ -31,9 +31,9 @@ void CUnit_MessageService::Test_MessageService(void)
         return;
     }
 
-    m_pMessageService->SetThreadState(THREAD_RUN);
+    m_pMessageService->SetThreadState(MESSAGE_SERVICE_THREAD_STATE::THREAD_RUN);
 
-    if (THREAD_RUN != m_pMessageService->GetThreadState())
+    if (MESSAGE_SERVICE_THREAD_STATE::THREAD_RUN != m_pMessageService->GetThreadState())
     {
         OUR_DEBUG((LM_INFO, "[Test_MessageService]GetThreadState is fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_MessageService]GetThreadState is fail.", true == blRet);

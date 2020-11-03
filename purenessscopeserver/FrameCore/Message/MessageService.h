@@ -185,7 +185,7 @@ public:
     uint32 GetHandlerCount();                                                                 //得到当前连接总数
 
 private:
-    uint32 GetWorkThreadID(uint32 u4ConnectID, EM_CONNECT_IO_TYPE u1PacketType);              //根据操作类型和ConnectID计算出那个工作线程ID
+    uint32 GetWorkThreadID(uint32 u4ConnectID, EM_CONNECT_IO_TYPE emPacketType);              //根据操作类型和ConnectID计算出那个工作线程ID
 
     bool StartTimer();
     bool KillTimer();

@@ -52,11 +52,14 @@ uint32 CPSSHandlerManager::GetCount()
 bool CPSSHandlerManager::SetIsLog(uint32 u4ConnectID, bool blIsLog)
 {
 	//待实现
+	ACE_UNUSED_ARG(u4ConnectID);
+	ACE_UNUSED_ARG(blIsLog);
 	return true;
 }
 
 EM_Client_Connect_status CPSSHandlerManager::GetConnectState(uint32 u4ConnectID)
 {
 	//待实现
+	ACE_UNUSED_ARG(u4ConnectID);
 	return EM_Client_Connect_status::CLIENT_CONNECT_EXIST;
 }

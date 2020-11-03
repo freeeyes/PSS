@@ -166,6 +166,8 @@ bool CProactorUDPHandler::SendMessage(CSendMessageInfo objSendMessageInfo, uint3
     obj_Send_Message_Param.m_u2CommandID         = objSendMessageInfo.u2CommandID;
     obj_Send_Message_Param.m_emSendType          = objSendMessageInfo.emSendType;
 
+    u4PacketSize = objSendMessageInfo.pBuffPacket->GetPacketLen();
+
     bool blState = Udp_Common_Send_Message(obj_Send_Message_Param,
         objSendMessageInfo.pBuffPacket,
         m_skRemote,
@@ -200,15 +202,22 @@ bool CProactorUDPHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* p
 	ACE_INET_Addr AddrRemote;
 	int nErr = AddrRemote.set(objClientIPInfo.m_u2Port, objClientIPInfo.m_strClientIP.c_str());
 
-	auto nSize = (int)m_skRemote.send(pMbData->rd_ptr(), pMbData->length(), AddrRemote);
+	if (nErr != 0)
+	{
+		OUR_DEBUG((LM_INFO, "[PutSendPacket]set_address error[%d].\n", errno));
+		return false;
+	}
 
-	if ((uint32)nSize != pMbData->length())
+	auto u3SendSize = (uint32)m_skRemote.send(pMbData->rd_ptr(), pMbData->length(), AddrRemote);
+
+	if (u3SendSize != u4Size)
 	{
 		return false;
 	}
     else
     {
-	    SaveProSendInfo(nSize);
+	    SaveProSendInfo(u3SendSize);
+        m_atvOutput = tvSend;
     }
 
     //发送完成回收

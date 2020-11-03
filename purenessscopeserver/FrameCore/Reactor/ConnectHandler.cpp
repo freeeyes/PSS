@@ -34,14 +34,17 @@ void CConnectHandler::Close(uint32 u4ConnectID)
 
 void CConnectHandler::CloseFinally()
 {
+    //OUR_DEBUG((LM_INFO, "[CConnectHandler::CloseFinally]m_u4HandlerID=%d.\n", m_u4HandlerID));
 	if (nullptr != m_pBlockMessage)
 	{
 		m_pBlockMessage->release();
+        m_pBlockMessage = nullptr;
 	}
 
 	if (nullptr != m_pBlockRecv)
 	{
 		m_pBlockRecv->release();
+        m_pBlockMessage = nullptr;
 	}
 
     this->closing_ = true;
@@ -203,10 +206,6 @@ int CConnectHandler::Dispose_Recv_Data()
 {
     ACE_Time_Value nowait(0, MAX_QUEUE_TIMEOUT);
 
-    //新数据包大小
-    uint32 u4NewPacketSize = 0;
-
-
     //计算应该接收的数据长度
     uint32 u4CurrCount = Get_Recv_length();
 
@@ -217,9 +216,6 @@ int CConnectHandler::Dispose_Recv_Data()
 
 		//清理PacketParse
 		ClearPacketParse();
-
-		//发送链接关闭消息
-		Send_Hander_Event(PACKET_CDISCONNECT);
 
         return -1;
     }
@@ -263,9 +259,6 @@ int CConnectHandler::Dispose_Recv_Data()
 		//清理PacketParse
 		ClearPacketParse();
 
-		//发送链接关闭消息
-		Send_Hander_Event(PACKET_CDISCONNECT);
-
 		return -1;
 	}
 
@@ -282,7 +275,6 @@ int CConnectHandler::Init_Open_Connect()
     m_atvInput            = m_atvConnect;
     m_atvOutput           = m_atvConnect;
 
-    m_u4ConnectID         = 0;
     m_u4AllRecvSize       = 0;
     m_u4AllSendSize       = 0;
     m_u4RecvQueueCount    = 0;
@@ -315,16 +307,8 @@ int CConnectHandler::handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask)
         m_u1ConnectState = CONNECTSTATE::CONNECT_CLIENT_CLOSE;
     }
 
-    //读取发送队列内部的所有数据，标记为无效并回收内存
-    ACE_Message_Block* pmbSendData = nullptr;
-    ACE_Time_Value nowait(ACE_OS::gettimeofday());
-
-    while (-1 != this->getq(pmbSendData, &nowait))
-    {
-        App_MessageBlockManager::instance()->Close(pmbSendData);
-    }
-
-    Close(GetConnectID());
+	//发送链接关闭消息
+	Send_Hander_Event(PACKET_CDISCONNECT);
 
     return 0;
 }
@@ -354,13 +338,16 @@ bool CConnectHandler::Device_Send_Data(const char* pData, ssize_t nLen)
 uint32 CConnectHandler::file_open(IFileTestManager* pFileTest)
 {
     //先不实现
-
+    ACE_UNUSED_ARG(pFileTest);
     return 0;
 }
 
 int CConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Size, uint8 u1ParseID)
 {
     //暂不实现
+    ACE_UNUSED_ARG(pData);
+    ACE_UNUSED_ARG(u4Size);
+    ACE_UNUSED_ARG(u1ParseID);
     return 0;
 }
 
@@ -804,9 +791,6 @@ int CConnectHandler::Dispose_Paceket_Parse_Body(ACE_Message_Block* pmbBody)
 
 	if (false == CheckMessage())
 	{
-		//关闭当前连接
-		Send_Hander_Event(PACKET_SDISCONNECT);
-
 		return -1;
 	}
 
@@ -850,6 +834,7 @@ bool CConnectHandler::CheckMessage()
 	objMakePacket.m_AddrRemote      = m_addrRemote;
 	objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
 
+    //OUR_DEBUG((LM_INFO, "[CConnectHandler::CheckMessage]objMakePacket.m_u4ConnectID=%d.\n", objMakePacket.m_u4ConnectID));
     Send_MakePacket_Queue(objMakePacket, m_szLocalIP, m_u2LocalPort);
 
     m_objPacketParse.Clear();

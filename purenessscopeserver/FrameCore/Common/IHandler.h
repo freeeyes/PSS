@@ -10,6 +10,8 @@
 class IHandler
 {
 public:
+	virtual ~IHandler() {};
+
 	virtual void Close(uint32 u4ConnectID) = 0;
 
 	virtual bool SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize) = 0;

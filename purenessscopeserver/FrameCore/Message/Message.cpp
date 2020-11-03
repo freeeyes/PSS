@@ -137,6 +137,7 @@ void CDeviceHandlerPool::Init_Callback(int nIndex, CWorkThread_Handler_info* pHa
 
 void CDeviceHandlerPool::Close_Callback(int nIndex, CWorkThread_Handler_info* pHandler)
 {
+    ACE_UNUSED_ARG(nIndex);
     pHandler->Clear();
 }
 

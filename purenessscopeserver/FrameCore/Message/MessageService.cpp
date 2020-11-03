@@ -262,11 +262,11 @@ bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4
 
             pWorkThread_Handler_info->m_tvInput      = pMessage->m_tvMessage;
 
-            int32 nPos = m_objHandlerList.Add_Hash_Data_By_Key_Unit32(pMessage->m_u4ConnectID, pWorkThread_Handler_info);
+            m_objHandlerList.Add_Hash_Data_By_Key_Unit32(pMessage->m_u4ConnectID, pWorkThread_Handler_info);
 
 			//写入连接日志
 			AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "Connection from [%s:%d] ConnectID=%d.",
-                pWorkThread_Handler_info->m_strRemoteIP,
+                pWorkThread_Handler_info->m_strRemoteIP.c_str(),
                 pWorkThread_Handler_info->m_u2RemotePort,
                 pMessage->m_u4ConnectID);
         }
@@ -392,7 +392,6 @@ bool CMessageService::ProcessSendClose(CWorkThreadMessage* pMessage, uint32 u4Th
 
 	if (nullptr != pWorkThread_Handler_info)
 	{
-		uint32 u4PacketSize = 0;
         pWorkThread_Handler_info->m_pHandler->Close(pWorkThread_Handler_info->m_u4ConnectID);
         m_objClientCommandList.Del_Hash_Data_By_Unit32(pMessage->m_u4ConnectID);
 	}
@@ -748,8 +747,9 @@ bool CMessageService::SendCloseMessage(uint32 u4ConnectID)
 	//将数据放入队列
 	CWorkThreadMessage* pWorkThreadMessage = CreateMessage();
 
-	pWorkThreadMessage->m_emDirect = EM_WORKTHREAD_DIRECT::EM_WORKTHREAD_DIRECT_OUTPUT;
-	pWorkThreadMessage->m_u2Cmd = CLINET_LINK_HANDLER_CLOSE;
+	pWorkThreadMessage->m_emDirect    = EM_WORKTHREAD_DIRECT::EM_WORKTHREAD_DIRECT_OUTPUT;
+	pWorkThreadMessage->m_u2Cmd       = CLINET_LINK_HANDLER_CLOSE;
+    pWorkThreadMessage->m_u4ConnectID = u4ConnectID;
 
 	return PutMessage(pWorkThreadMessage);
 }
@@ -797,7 +797,8 @@ void CMessageService::Check_Handler_Recv_Timeout()
 
     for (CWorkThread_Handler_info* pHandlerInfo : vecList)
     {
-        if (EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP != pHandlerInfo->m_emPacketType)
+        if (EM_CONNECT_IO_TYPE::CONNECT_IO_TCP != pHandlerInfo->m_emPacketType 
+            && EM_CONNECT_IO_TYPE::CONNECT_IO_UDP != pHandlerInfo->m_emPacketType)
         {
             //如果不是TCP连接，则不做链接检查
             continue;
@@ -1511,11 +1512,6 @@ CWorkThreadMessage* CMessageServiceGroup::CreateMessage(uint32 u4ConnectID, EM_C
 {
     uint32 u4ThreadID = 0;
     u4ThreadID = GetWorkThreadID(u4ConnectID, u1PacketType);
-   
-    if (-1 == u4ThreadID)
-    {
-        return nullptr;
-    }
 
     CMessageService* pMessageService = m_vecMessageService[u4ThreadID];
 
@@ -1562,9 +1558,10 @@ void CMessageServiceGroup::CopyMessageManagerList()
     }
 }
 
-uint32 CMessageServiceGroup::GetWorkThreadID(uint32 u4ConnectID, EM_CONNECT_IO_TYPE u1PackeType)
+uint32 CMessageServiceGroup::GetWorkThreadID(uint32 u4ConnectID, EM_CONNECT_IO_TYPE emPackeType)
 {
-    uint32 u4ThreadID = -1;
+    ACE_UNUSED_ARG(emPackeType);
+    uint32 u4ThreadID = 0;
 
     if (m_vecMessageService.size() == 0)
     {

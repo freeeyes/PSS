@@ -356,17 +356,7 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
         }
     }
 
-    //循环将数据包压入对象
-    for (const FileTestDataInfoSt& objFileTestDataInfo : m_vecFileTestDataInfoSt)
-    {
-        vector<ResponseRecordSt*> vecExistList;
-        m_objResponseRecordList.Get_All_Used(vecExistList);
-
-        for (const ResponseRecordSt* pResponserecordst : vecExistList)
-        {
-            //暂不实现
-        }
-    }
+    //循环将数据包压入对象(暂不实现)
 
 
     return 0;

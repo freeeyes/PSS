@@ -101,12 +101,14 @@ struct _ThreadParam
 	_ClientInfo*       m_pClientInfo;
 	_ResultInfo*       m_pResultInfo;
 	pthread_barrier_t* m_Barrier;
+	int                m_nClientSocket;
 	
 	_ThreadParam()
 	{
-		m_pClientInfo = NULL;
-		m_pResultInfo = NULL;
-		m_Barrier     = NULL;
+		m_pClientInfo   = NULL;
+		m_pResultInfo   = NULL;
+		m_Barrier       = NULL;
+		m_nClientSocket = 0;
 	}
 };
 
