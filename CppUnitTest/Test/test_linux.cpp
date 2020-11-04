@@ -6,15 +6,12 @@ using namespace std;
 
 int main()
 {
-    printf("Test 111.\n");
     //运行测试用例
     int nTestCount = 0;
     string strResultInfo;
     char szHtmlResult[MAX_BUFF_1024] = {'\0'};
     _ResultInfo objResultInfo;
     _ClientInfo objClientInfo;
-
-    printf("Test 222.\n");
 
     //获得当前测试运行时间
     time_t ttCurrentTime;
@@ -40,15 +37,11 @@ int main()
     objClientInfo.m_nSendLength = (int)strlen(szBuff);
     objClientInfo.m_nRecvLength = (int)strlen(szBuff);
 
-    printf("Test Begin.\n");
-
     CheckTcpPacket(objClientInfo, objResultInfo);
     objResultInfo.Display();
     objResultInfo.To_Html(szHtmlResult);
     strResultInfo += szHtmlResult;
     nTestCount++;
-
-    printf("Test Begin (%d)\n", nTestCount);
 
     CheckMultipleTcpPacket(10, objClientInfo, objResultInfo);
     objResultInfo.Display();
@@ -56,15 +49,11 @@ int main()
     strResultInfo += szHtmlResult;
     nTestCount++;
 
-    printf("Test Begin (%d)\n", nTestCount);
-
     CheckMultipleTcpConnect(10, objClientInfo, objResultInfo);
     objResultInfo.Display();
     objResultInfo.To_Html(szHtmlResult);
     strResultInfo += szHtmlResult;
     nTestCount++;
-
-    printf("Test Begin (%d)\n", nTestCount);
 
     CheckTcpErrorPacketHead(objClientInfo, objResultInfo);
     objResultInfo.Display();
@@ -72,23 +61,17 @@ int main()
     strResultInfo += szHtmlResult;
     nTestCount++;
 
-    printf("Test Begin (%d)\n", nTestCount);
-
     CheckTcpHalfPacket(objClientInfo, objResultInfo);
     objResultInfo.Display();
     objResultInfo.To_Html(szHtmlResult);
     strResultInfo += szHtmlResult;
     nTestCount++;
 
-    printf("Test Begin (%d)\n", nTestCount);
-
     CheckTcpMulipleThreadPacket(10, objClientInfo, objResultInfo);
     objResultInfo.Display();
     objResultInfo.To_Html(szHtmlResult);
     strResultInfo += szHtmlResult;
     nTestCount++;
-
-    printf("Test Begin (%d)\n", nTestCount);
 
     _ResultInfo objRecvResultInfo;
     Thread_CheckUdpPacket(objClientInfo, objResultInfo, objRecvResultInfo);
@@ -101,16 +84,12 @@ int main()
     strResultInfo += szHtmlResult;
     nTestCount++;
 
-    printf("Test Begin (%d)\n", nTestCount);
-
     CheckConsolePacket(objResultInfo);
     objResultInfo.Display();
     objResultInfo.To_Html(szHtmlResult);
     strResultInfo += szHtmlResult;
     nTestCount++;
-
-    printf("Test Begin (%d)\n", nTestCount);
-
+    
     //输出成文件格式
     char* pHtmlFile = new char[nTestCount*MAX_BUFF_1024];
     memset(pHtmlFile, 0, nTestCount*MAX_BUFF_1024);
@@ -125,8 +104,6 @@ int main()
 
         fclose(pFile);
     }
-
-    printf("Test End.\n");
 
     return 0;
 }

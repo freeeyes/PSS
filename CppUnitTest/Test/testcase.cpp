@@ -887,27 +887,34 @@ bool Thread_CheckUdpPacket(_ClientInfo& objClientInfo, _ResultInfo& objResultInf
     sprintf(szSession, "FREEEYES");
 
     //socket创建的准备工作
-    struct sockaddr_in sockaddr_Client;
+    struct sockaddr_in sockaddr_Server;
 
-    memset(&sockaddr_Client, 0, sizeof(sockaddr_Client));
-    sockaddr_Client.sin_family = AF_INET;
-    sockaddr_Client.sin_port   = htons(10003);
-    sockaddr_Client.sin_addr.s_addr = inet_addr(objClientInfo.m_szServerIP);
+    memset(&sockaddr_Server, 0, sizeof(sockaddr_Server));
+    sockaddr_Server.sin_family = AF_INET;
+    sockaddr_Server.sin_port   = htons(10003);
+    sockaddr_Server.sin_addr.s_addr = inet_addr(objClientInfo.m_szServerIP);
+    printf("[Thread_CheckUdpPacket]objClientInfo.m_szServerIP=%s.\n", objClientInfo.m_szServerIP);
 
     sckClient = socket(AF_INET, SOCK_DGRAM, 0);
 
-	//绑定服务器端口
-	struct sockaddr_in clisockaddr;
-	clisockaddr.sin_family = AF_INET;
-	clisockaddr.sin_port = htons(20002);
-	clisockaddr.sin_addr.s_addr = 0;
-	bind(sckClient, (struct sockaddr*)&clisockaddr, sizeof(clisockaddr));
+		//绑定服务器端口
+		struct sockaddr_in sockaddr_Client;
+		memset(&sockaddr_Client, 0, sizeof(sockaddr_Client));
+		sockaddr_Client.sin_family = AF_INET;
+		sockaddr_Client.sin_port = htons(20002);
+		sockaddr_Client.sin_addr.s_addr = 0;
+		if(-1 == bind(sckClient, (struct sockaddr*)&sockaddr_Client, sizeof(sockaddr_Client)))
+		{
+			printf("[Thread_CheckUdpPacket]Bind 20002 error.\n");
+		}
+		
+		printf("[Thread_CheckUdpPacket]sckClient=%d.\n", sckClient);
 
     //拼装发送包体
     char szSendBuffer[MAX_BUFF_200] = {'\0'};
 
     short sVersion = 1;
-    short sCommand = (short)COMMAND_AUTOTEST_UDP_HEAD;
+    short sCommand = (short)COMMAND_AUTOTEST_HEAD;
     int nPacketLen = objClientInfo.m_nSendLength;
 
     memcpy(szSendBuffer, (char* )&sVersion, sizeof(short));
@@ -944,7 +951,7 @@ bool Thread_CheckUdpPacket(_ClientInfo& objClientInfo, _ResultInfo& objResultInf
 
     printf("[Thread_CheckUdpPacket]nTotalSendLen=%d.\n", nTotalSendLen);
 
-    if( sendto(sckClient, szSendBuffer, nTotalSendLen, 0, (struct sockaddr*)&sockaddr_Client, sizeof(sockaddr_Client)) == -1)
+    if( sendto(sckClient, szSendBuffer, nTotalSendLen, 0, (struct sockaddr*)&sockaddr_Server, sizeof(sockaddr_Server)) == -1)
     {
         close(sckClient);
         gettimeofday(&ttEnd, NULL);
@@ -958,12 +965,12 @@ bool Thread_CheckUdpPacket(_ClientInfo& objClientInfo, _ResultInfo& objResultInf
     gettimeofday(&ttEnd, NULL);
     objResultInfo.m_nRet = 0;
     objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
-    close(sckClient);
 
     //等待接收线程返回信息
     pthread_barrier_wait(&barrier);
     pthread_barrier_destroy(&barrier);
 
+		close(sckClient);
     delete pThreadParam;
 
     return true;
@@ -976,11 +983,11 @@ bool Thread_CheckUdpPacket_Recv(int nClientSocket, _ClientInfo& objClientInfo, _
     struct sockaddr_in recvAddr;
 
     gettimeofday(&ttStart, NULL);
-    sprintf(objResultInfo.m_szTestName, "single UDP packet recv test");
+    sprintf(objResultInfo.m_szTestName, "single UDP packet recv test.");
 
-	int set = 1;
+		int set = 1;
 
-    printf("[Thread_CheckUdpPacket_Recv]Begin Listen UDP.\n");
+    printf("[Thread_CheckUdpPacket_Recv]Begin Listen UDP(%d).\n", nClientSocket);
     int recvbytes;
     char recvbuf[128];
     int addrLen = sizeof(struct sockaddr_in);
@@ -990,8 +997,8 @@ bool Thread_CheckUdpPacket_Recv(int nClientSocket, _ClientInfo& objClientInfo, _
     {
         recvbuf[recvbytes] = '\0';
 
-        //printf("receive a broadCast messgse:%s\n", recvbuf);
-        if(recvbytes == 14 && strcmp(recvbuf, "Hello  friend.") == 0)
+        printf("receive a broadCast messgse:(%d)\n", recvbytes);
+        if(recvbytes == 12)
         {
             sprintf(objResultInfo.m_szResult, "[s][%s:%d]success.", objClientInfo.m_szServerIP, 20002);
             gettimeofday(&ttEnd, NULL);
@@ -1000,8 +1007,8 @@ bool Thread_CheckUdpPacket_Recv(int nClientSocket, _ClientInfo& objClientInfo, _
         }
         else
         {
-            printf("[Thread_CheckUdpPacket_Recv]Recv Data Error.\n");
-            sprintf(objResultInfo.m_szResult, "[s][%s:%d]Recv Data Error.", objClientInfo.m_szServerIP, 20002);
+            printf("[Thread_CheckUdpPacket_Recv]Recv Data Error(%d).\n", errno);
+            sprintf(objResultInfo.m_szResult, "[s][%s:%d]Recv Data Error.\n", objClientInfo.m_szServerIP, 20002);
             gettimeofday(&ttEnd, NULL);
             objResultInfo.m_nRet = 0;
             objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
