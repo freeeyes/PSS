@@ -120,14 +120,6 @@ bool CServerManager::Start()
         return blRet;
     }
 
-    //启动UDP监听
-    blRet = Start_Udp_Listen();
-
-    if (false == blRet)
-    {
-        return blRet;
-    }
-
     //启动后台管理端口监听
     blRet = Start_Console_Tcp_Listen();
 
@@ -214,6 +206,14 @@ bool CServerManager::Run()
         }
     }
 
+	//启动UDP监听
+	bool blRet = Start_Udp_Listen();
+
+	if (false == blRet)
+	{
+		return blRet;
+	}
+
     //初始化TTy连接管理器
     App_ReTTyClientManager::instance()->Init(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_POSTDEFINE),
             GetXmlConfigAttribute(xmlTTyClientManagerInfo)->MaxTTyDevCount,
@@ -232,19 +232,6 @@ bool CServerManager::Run()
     }
 
     m_ConnectConsoleAcceptor.Run_Open(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_CLIENTDEFINE));
-
-    //创建和启动UDP反应器
-    uint16 u2UDPServerPortCount = (uint16)GetXmlConfigAttribute(xmlUDPServerIPs)->vec.size();
-
-    for (uint16 i = 0; i < u2UDPServerPortCount; i++)
-    {
-        CReactorUDPHander* pReactorUDPHandler = new CReactorUDPHander();
-
-        if (NULL != pReactorUDPHandler)
-        {
-            pReactorUDPHandler->Run_Open(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_CLIENTDEFINE));
-        }
-    }
 
     //启动日志服务线程
     if (0 != AppLogManager::instance()->Start())

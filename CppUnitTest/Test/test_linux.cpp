@@ -6,12 +6,15 @@ using namespace std;
 
 int main()
 {
+    printf("Test 111.\n");
     //运行测试用例
     int nTestCount = 0;
     string strResultInfo;
     char szHtmlResult[MAX_BUFF_1024] = {'\0'};
     _ResultInfo objResultInfo;
     _ClientInfo objClientInfo;
+
+    printf("Test 222.\n");
 
     //获得当前测试运行时间
     time_t ttCurrentTime;

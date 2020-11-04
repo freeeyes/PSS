@@ -77,7 +77,7 @@ matrix:
         # make PlugIn
         - cd $TRAVIS_BUILD_DIR/purenessscopeserver/example-Module/TcpTest
         - $ACE_ROOT/bin/mwc.pl -type gnuace
-        - make -j 4       
+        - make -j 4    
         # Execute some tests
         - cd $TRAVIS_BUILD_DIR/Build/Linux/
         - nohup ./PurenessScopeServer > pssout.file 2>&1 &
@@ -132,29 +132,30 @@ matrix:
       - secure: "Tqz9j2VlU+mJgCcnceaam/X/N8cgQa+O92qeGUFOKGAqJkxiKHQAPnqj7+YmgCAKVEbBEMPo08Putcro00YQKElkrWpuUc2J49+DYzd8ZoSXgUEOPuYwTzPSIcSCN1cKogjBuTxJrp5WbmRAiH6gIhB+m4r2ToCGnZ6MXnkVGracjRaPoqLC4j3S5FXuq/Ilp2ZW9SqRQiy+yGQzW7UvbyE0LRhoXb/ptFFMgW/NomoUlOIyCFSqXfPMxQsHFGD4ifcjl8pGWGE5OB0Sm9IMbe9/DOL11ouSPy/0OevPH23VuYmiIz+acVa7A48Dm1Z5sFsHvyFAiU5tiXCVS7VTCqxL4M4Ac1NlpDDMngwkms0w4M9J9TXNzNA958glhfBoMaIWcHMpZ0hEdWrulAKIrBZnevm0yMvTfnxmyA4Pie98UFrAlljZXiUTZtrHGC2Z1oSJZ92sOfc5uDyA1lZMf7XiLN9HbCHBZtKdo5PS2PhF97oOTZdOvpRKkwgMb+sqfVM/JGsdsS8eSmkIyCB0JkDjJKWuA7q8f3xDlPyigjUtFXkllEa8eyYsRFdoLYIK/vLWo+/J7PoICxCdXUnC3YmcXkGaisQxnjgAyhnEnG8z38Ra2uDh2W7ltLfgEtaAChYp6UZMR4XboM7F1DzB2zFSociUJ61tn4fibIzPGOg="
     script:
       - export
-      # - cd $TRAVIS_BUILD_DIR/purenessscopeserver/PacketParse_Interface
-      # - $ACE_ROOT/bin/mwc.pl -type gnuace
-      # - make -j 4
-      # - cd $TRAVIS_BUILD_DIR/purenessscopeserver/example-Module/TcpTest
-      # - $ACE_ROOT/bin/mwc.pl -type gnuace
-      # - make -j 4
-      # - cd $TRAVIS_BUILD_DIR/Build/Linux/
-      # - $ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc
-      # - ls
-      # - make -j 4
-      # - nohup ./PurenessScopeServer > pssout.file 2>&1 &
-      # - sleep 10
+      - cd $TRAVIS_BUILD_DIR/purenessscopeserver/PacketParse_Interface
+      - $ACE_ROOT/bin/mwc.pl -type gnuace
+      - make -j 4
+      # make PlugIn
+      - cd $TRAVIS_BUILD_DIR/purenessscopeserver/example-Module/TcpTest
+      - $ACE_ROOT/bin/mwc.pl -type gnuace
+      - make -j 4
+      - cd $TRAVIS_BUILD_DIR/Build/Linux/
+      - $ACE_ROOT/bin/mwc.pl -type gnuace pss.mwc
+      - ls
+      - make -j 4
+      - nohup ./PurenessScopeServer > pssout.file 2>&1 &
+      - sleep 10
       - cd $TRAVIS_BUILD_DIR/CppUnitTest/Test
       - make -j 4
       - ./Test_Pss
       # - cd $TRAVIS_BUILD_DIR/Build/Linux/
       # - tail -f -n 10 pssout.file
-      # - killall -9 PurenessScopeServer  
+      - killall -9 PurenessScopeServer  
       
-      # - cd $TRAVIS_BUILD_DIR
-      # - git init
-      # - git config user.name "freeeyes"
-      # - git config user.email "freeeyes@163.com"
-      # - git add -u ./testresult/result.md
-      # - git commit -m "[ci skip]Travis CI Update result.md"
-      # - git push -f "https://${GH_TOKEN}@${GH_REF}" HEAD:master
+      - cd $TRAVIS_BUILD_DIR
+      - git init
+      - git config user.name "freeeyes"
+      - git config user.email "freeeyes@163.com"
+      - git add -u ./testresult/result.md
+      - git commit -m "[ci skip]Travis CI Update result.md"
+      - git push -f "https://${GH_TOKEN}@${GH_REF}" HEAD:master

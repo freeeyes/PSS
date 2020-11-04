@@ -31,20 +31,13 @@ int CReactorUDPHander::OpenAddress(const ACE_INET_Addr& AddrRemote, ACE_Reactor*
 
     reactor(pReactor);
 
+	if (-1 == this->reactor()->register_handler(this, ACE_Event_Handler::READ_MASK))
+	{
+		OUR_DEBUG((LM_ERROR, "[CReactorUDPHander::OpenAddress] Addr is register_handler error(%d).\n", errno));
+		return -1;
+	}
+
     return Init_Open_Address(AddrRemote);
-}
-
-int CReactorUDPHander::Run_Open(ACE_Reactor* pReactor)
-{
-    reactor(pReactor);
-
-    if (-1 == this->reactor()->register_handler(this, ACE_Event_Handler::READ_MASK))
-    {
-        OUR_DEBUG((LM_ERROR, "[CReactorUDPHander::OpenAddress] Addr is register_handler error(%d).\n", errno));
-        return -1;
-    }
-
-    return 0;
 }
 
 void CReactorUDPHander::Close(uint32 u4ConnectID)

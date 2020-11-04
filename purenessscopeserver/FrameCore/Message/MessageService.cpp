@@ -736,7 +736,9 @@ bool CMessageService::SendPostMessage(CSendMessageInfo objSendMessageInfo)
     //将数据放入队列
     CWorkThreadMessage* pWorkThreadMessage = CreateMessage();
 
-    pWorkThreadMessage->m_emDirect = EM_WORKTHREAD_DIRECT::EM_WORKTHREAD_DIRECT_OUTPUT;
+    pWorkThreadMessage->m_u4ConnectID     = objSendMessageInfo.u4ConnectID;
+    pWorkThreadMessage->m_u2Cmd           = objSendMessageInfo.u2CommandID;
+    pWorkThreadMessage->m_emDirect        = EM_WORKTHREAD_DIRECT::EM_WORKTHREAD_DIRECT_OUTPUT;
     pWorkThreadMessage->m_SendMessageInfo = objSendMessageInfo;
 
     return PutMessage(pWorkThreadMessage);
@@ -905,7 +907,7 @@ bool CMessageService::Dispose_Queue()
         else
         {
             //是发送数据和助攻关闭链接
-            if (CLINET_LINK_HANDLER_CLOSE == msg->m_u2Cmd)
+            if (CLIENT_LINK_SDISCONNET == msg->m_u2Cmd)
             {
                 //关闭链接
                 ProcessSendClose(msg, m_u4ThreadID);
