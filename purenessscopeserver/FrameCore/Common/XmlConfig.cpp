@@ -501,7 +501,7 @@ bool xmlMessage::Init(CXmlOpeation* pXmlOperation)
         && pXmlOperation->Read_XML_Data_Single_Uint32("Message", "Msg_Buff_Max_Size", Msg_Buff_Max_Size)
         && pXmlOperation->Read_XML_Data_Single_Uint16("Message", "Msg_Thread", Msg_Thread)
         && pXmlOperation->Read_XML_Data_Single_Uint32("Message", "Msg_MaxQueue", Msg_MaxQueue)
-        && pXmlOperation->Read_XML_Data_Single_Uint32("Message", "Msg_Pool", Msg_Pool))
+        && pXmlOperation->Read_XML_Data_Single_Uint8("Message", "Packet_Counter", Packet_Counter))
     {
         pXmlOperation->Read_XML_Data_Single_Uint16("Message", "Msg_Process", Msg_Process);
         bKet = true;

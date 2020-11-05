@@ -30,6 +30,8 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
     m_u4ThreadID = u4ThreadID;
     m_ThreadInfo.m_u4ThreadID   = u4ThreadID;
 
+    m_objWorkThreadProcess.m_objPacketCounter.m_u1ThreadID = (uint8)u4ThreadID;
+
     //设置当前线程是否CPU绑定
     m_blIsCpuAffinity = blIsCpuAffinity;
 
@@ -47,12 +49,8 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
     //按照线程初始化统计模块的名字
     char szName[MAX_BUFF_50] = {'\0'};
     sprintf_safe(szName, MAX_BUFF_50, "工作线程(%d)", u4ThreadID);
-    m_CommandAccount.InitName(szName, GetXmlConfigAttribute(xmlCommandAccount)->MaxCommandCount);
 
-    //初始化统计模块功能
-    m_CommandAccount.Init(GetXmlConfigAttribute(xmlCommandAccount)->Account,
-                          GetXmlConfigAttribute(xmlCommandAccount)->FlowAccount,
-                          GetXmlConfigAttribute(xmlThreadInfo)->ThreadTimeout);
+    m_u1PacketCounter = GetXmlConfigAttribute(xmlMessage)->Packet_Counter;
 
     //初始化本地信令列表副本
     m_objClientCommandList.Init(App_MessageManager::instance()->GetMaxCommandCount());
@@ -60,14 +58,6 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
     //初始化当前线程Handler列表
     uint16 u2PoolSize = GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount;
     m_objHandlerList.Init(u2PoolSize);
-
-    //初始化CommandID告警阀值相关
-    for(const auto& objCommandInfo : GetXmlConfigAttribute(xmlCommandInfos)->vec)
-    {
-        m_CommandAccount.AddCommandAlert(objCommandInfo.CommandID,
-                                         objCommandInfo.CommandCount,
-                                         objCommandInfo.MailID);
-    }
 
     //设置消息池
     m_DeviceHandlerPool.Init(u2PoolSize, CDeviceHandlerPool::Init_Callback);
@@ -243,7 +233,8 @@ bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4
     CWorkThread_Handler_info* pWorkThread_Handler_info = m_objHandlerList.Get_Hash_Box_Data_By_Uint32(pMessage->m_u4ConnectID);
 
     //判断消息类型
-    if (CLIENT_LINK_CONNECT == pMessage->m_u2Cmd)
+    if (CLIENT_LINK_CONNECT == pMessage->m_u2Cmd ||
+        CLINET_LINK_TTY_CONNECT == pMessage->m_u2Cmd)
     {
         //如果是链接建立消息
         if (nullptr == pWorkThread_Handler_info)
@@ -299,6 +290,12 @@ bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4
 		pWorkThread_Handler_info->m_InPacketCount++;
 		pWorkThread_Handler_info->m_RecvSize += u4PacletHeadLength + u4PacletBodyLength;
 		pWorkThread_Handler_info->m_tvInput = pMessage->m_tvMessage;
+
+        if (m_u1PacketCounter != 0)
+        {
+            m_objWorkThreadProcess.AddPacketIn(u4PacletHeadLength + u4PacletBodyLength,
+                pMessage->m_tvMessage);
+        }
 	}
 
     //拼接消息
@@ -337,7 +334,8 @@ bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4
 
     //如果是断开消息，在这里发还给逻辑线程去处理
     if (CLIENT_LINK_CDISCONNET == pMessage->m_u2Cmd ||
-        CLIENT_LINK_SDISCONNET == pMessage->m_u2Cmd)
+        CLIENT_LINK_SDISCONNET == pMessage->m_u2Cmd ||
+        CLINET_LINK_TTY_DISCONNECT == pMessage->m_u2Cmd)
     {
 		//写日志
 		AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendCount = %d, SendSize = %d.",
@@ -372,6 +370,12 @@ bool CMessageService::ProcessSendMessage(CWorkThreadMessage* pMessage, uint32 u4
     {
         uint32 u4PacketSize = 0;
         nRet = pWorkThread_Handler_info->m_pHandler->SendMessage(pMessage->m_SendMessageInfo, u4PacketSize);
+
+        if (m_u1PacketCounter != 0)
+        {
+            m_objWorkThreadProcess.AddPacketOut(u4PacketSize,
+                pMessage->m_tvMessage);
+        }
     }
     else
     {
@@ -445,8 +449,6 @@ int CMessageService::Close()
     CloseCommandList();
 
     m_objClientCommandList.Close();
-
-    m_CommandAccount.Close();
 
     m_WorkThreadAI.Close();
 
@@ -662,27 +664,6 @@ void CMessageService::SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTi
     m_WorkThreadAI.ReSet(u1AI, u4DisposeTime, u4WTCheckTime, u4WTStopTime);
 }
 
-_CommandData* CMessageService::GetCommandData(uint16 u2CommandID)
-{
-    return m_CommandAccount.GetCommandData(u2CommandID);
-}
-
-void CMessageService::GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut)
-{
-    u4FlowIn  = m_CommandAccount.GetFlowIn();
-    u4FlowOut = m_CommandAccount.GetFlowOut();
-}
-
-void CMessageService::GetCommandAlertData(vecCommandAlertData& CommandAlertDataList)
-{
-    m_CommandAccount.GetCommandAlertData(CommandAlertDataList);
-}
-
-void CMessageService::SaveCommandDataLog()
-{
-    m_CommandAccount.SaveCommandDataLog();
-}
-
 void CMessageService::SetThreadState(MESSAGE_SERVICE_THREAD_STATE emState)
 {
     m_emThreadState = emState;
@@ -715,9 +696,9 @@ void CMessageService::DeleteMessage(CWorkThreadMessage* pMessage)
     delete pMessage;
 }
 
-void CMessageService::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_Account)
+void CMessageService::GetFlowPortList(const ACE_Time_Value tvNow, vector<CWorkThread_Packet_Info>& vec_Port_Data_Account)
 {
-    m_CommandAccount.GetFlowPortList(vec_Port_Data_Account);
+    vec_Port_Data_Account.push_back(m_objWorkThreadProcess.GetCurrInfo(tvNow));
 }
 
 bool CMessageService::Synchronize_SendPostMessage(CWorkThread_Handler_info* pHandlerInfo, const ACE_Time_Value tvMessage)
@@ -743,6 +724,12 @@ bool CMessageService::Synchronize_SendPostMessage(CWorkThread_Handler_info* pHan
         pHandlerInfo->m_OutPacketCount++;
         pHandlerInfo->m_SendSize += u4SendLength;
         pHandlerInfo->m_tvOutput = tvMessage;
+
+        if (m_u1PacketCounter != 0)
+        {
+            m_objWorkThreadProcess.AddPacketOut(u4SendLength,
+                tvMessage);
+        }
 
         return true;
     }
@@ -1346,10 +1333,10 @@ void CMessageServiceGroup::GetDyeingCommand(vec_Dyeing_Command_list& objList) co
     m_objMessageDyeingManager.GetDyeingCommand(objList);
 }
 
-void CMessageServiceGroup::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_Account)
+void CMessageServiceGroup::GetFlowPortList(vector<CWorkThread_Packet_Info>& vec_Port_Data_Account)
 {
     vec_Port_Data_Account.clear();
-    vector<_Port_Data_Account> vec_Service_Port_Data_Account;
+    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
 
     uint32 u4Size = (uint32)m_vecMessageService.size();
 
@@ -1359,9 +1346,7 @@ void CMessageServiceGroup::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_
 
         if (nullptr != pMessageService)
         {
-            pMessageService->GetFlowPortList(vec_Service_Port_Data_Account);
-
-            Combo_Port_List(vec_Service_Port_Data_Account, vec_Port_Data_Account);
+            pMessageService->GetFlowPortList(tvNow, vec_Port_Data_Account);
         }
     }
 }
@@ -1467,71 +1452,6 @@ void CMessageServiceGroup::SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCh
         if (nullptr != pMessageService)
         {
             pMessageService->SetAI(u1AI, u4DisposeTime, u4WTCheckTime, u4WTStopTime);
-        }
-    }
-}
-
-void CMessageServiceGroup::GetCommandData(uint16 u2CommandID, _CommandData& objCommandData) const
-{
-    for (CMessageService* pMessageService : m_vecMessageService)
-    {
-        if (nullptr != pMessageService)
-        {
-            const _CommandData* pCommandData = pMessageService->GetCommandData(u2CommandID);
-
-            if (nullptr != pCommandData)
-            {
-                objCommandData += (*pCommandData);
-            }
-        }
-    }
-}
-
-void CMessageServiceGroup::GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut)
-{
-    uint32 u4Size = (uint32)m_vecMessageService.size();
-
-    for (uint32 i = 0; i < u4Size; i++)
-    {
-        uint32 u4CurrFlowIn  = 0;
-        uint32 u4CurrFlowOut = 0;
-        CMessageService* pMessageService = m_vecMessageService[i];
-
-        if (nullptr != pMessageService)
-        {
-            pMessageService->GetFlowInfo(u4CurrFlowIn, u4CurrFlowOut);
-            u4FlowIn  += u4CurrFlowIn;
-            u4FlowOut += u4CurrFlowOut;
-        }
-    }
-}
-
-void CMessageServiceGroup::GetCommandAlertData(vecCommandAlertData& CommandAlertDataList)
-{
-    uint32 u4Size = (uint32)m_vecMessageService.size();
-
-    for (uint32 i = 0; i < u4Size; i++)
-    {
-        CMessageService* pMessageService = m_vecMessageService[i];
-
-        if (nullptr != pMessageService)
-        {
-            pMessageService->GetCommandAlertData(CommandAlertDataList);
-        }
-    }
-}
-
-void CMessageServiceGroup::SaveCommandDataLog()
-{
-    uint32 u4Size = (uint32)m_vecMessageService.size();
-
-    for (uint32 i = 0; i < u4Size; i++)
-    {
-        CMessageService* pMessageService = m_vecMessageService[i];
-
-        if (nullptr != pMessageService)
-        {
-            pMessageService->SaveCommandDataLog();
         }
     }
 }

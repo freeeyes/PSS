@@ -460,7 +460,7 @@ public:
     uint16 Msg_Thread        = 3;
     uint16 Msg_Process       = 1;
     uint32 Msg_MaxQueue      = 10000;
-    uint32 Msg_Pool          = 5000;
+    uint8  Packet_Counter    = 1;
     xmlMessage(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation);
 };

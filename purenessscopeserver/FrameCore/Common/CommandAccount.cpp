@@ -334,29 +334,3 @@ void CCommandAccount::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_
         }
     }
 }
-
-void Combo_Port_List(vecPortDataAccount& vec_Port_Data_Account, vecPortDataAccount& vec_Port_Data_All_Account)
-{
-    int n4PartSize = (int)vec_Port_Data_Account.size();
-
-    for (int iLoop = 0; iLoop < n4PartSize; iLoop++)
-    {
-        int n4AllSize = (int)vec_Port_Data_All_Account.size();
-        bool bFound = false;
-
-        for (int jLoop = 0; jLoop < n4AllSize; jLoop++)
-        {
-            if (vec_Port_Data_Account[iLoop].m_u4Port == vec_Port_Data_All_Account[jLoop].m_u4Port)
-            {
-                vec_Port_Data_All_Account[jLoop] += vec_Port_Data_Account[iLoop];
-                bFound = true;
-                break;
-            }
-        }
-
-        if (false == bFound)
-        {
-            vec_Port_Data_All_Account.push_back(vec_Port_Data_Account[iLoop]);
-        }
-    }
-}

@@ -15,7 +15,6 @@
 #include "BuffPacket.h"
 #include "TimerManager.h"
 #include "WorkThreadAI.h"
-#include "CommandAccount.h"
 #include "MessageDyeingManager.h"
 #include "ObjectLru.h"
 #include "PerformanceCounter.h"
@@ -33,6 +32,68 @@ enum class MESSAGE_SERVICE_THREAD_STATE
     THREAD_RUN = 0,               //线程正常运行
     THREAD_MODULE_UNLOAD,         //模块重载，需要线程支持此功能
     THREAD_STOP,                  //线程停止
+};
+
+class CWorkThread_Packet_Info
+{
+public:
+    uint8  m_u1ThreadID  = 0;
+    uint32 m_u4PacketIn  = 0;
+    uint32 m_u4PacketOut = 0;
+    uint32 m_u4RecvSize  = 0;
+    uint32 m_u4SendSize  = 0;
+    
+    uint32 m_u4Minute    = 0;    //当前时间，按照分钟统计
+
+    void Clear()
+    {
+        m_u4PacketIn  = 0;
+        m_u4PacketOut = 0;
+        m_u4RecvSize  = 0;
+        m_u4SendSize  = 0;
+    }
+};
+
+//工作线程数据包和数据量统计
+class CWorkThread_Process
+{
+public:
+    CWorkThread_Packet_Info m_objPacketCounter;
+
+    void Clear(uint32 u4NowMinite)
+    {
+        if (u4NowMinite != m_objPacketCounter.m_u4Minute)
+        {
+            m_objPacketCounter.Clear();
+            m_objPacketCounter.m_u4Minute = u4NowMinite;
+        }
+    }
+
+    void AddPacketIn(uint32 m_u4PacketIn, const ACE_Time_Value tvNow)
+    {
+        uint32 u4NowMinite = (uint32)(tvNow.sec() / 60);
+        Clear(u4NowMinite);
+        
+        m_objPacketCounter.m_u4PacketIn++;
+        m_objPacketCounter.m_u4RecvSize = m_u4PacketIn;
+    }
+
+    void AddPacketOut(uint32 m_u4PacketOut, const ACE_Time_Value tvNow)
+    {
+        uint32 u4NowMinite = (uint32)(tvNow.sec() / 60);
+        Clear(u4NowMinite);
+
+        m_objPacketCounter.m_u4PacketOut++;
+        m_objPacketCounter.m_u4SendSize = m_u4PacketOut;
+    }
+
+    CWorkThread_Packet_Info GetCurrInfo(const ACE_Time_Value tvNow)
+    {
+        uint32 u4NowMinite = (uint32)(tvNow.sec() / 60);
+        Clear(u4NowMinite);
+
+        return m_objPacketCounter;
+    }
 };
 
 //工作线程时序模式
@@ -64,10 +125,6 @@ public:
     void GetAITF(vecCommandTimeout& objTimeout) const;            //得到所有的AI封禁数据包信息
     void SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime);  //设置AI
 
-    _CommandData* GetCommandData(uint16 u2CommandID);                      //得到命令相关信息
-    void GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut);                 //得到流量相关信息
-    void GetCommandAlertData(vecCommandAlertData& CommandAlertDataList);   //得到所有超过告警阀值的命令
-    void SaveCommandDataLog();                                             //存储统计日志
     void SetThreadState(MESSAGE_SERVICE_THREAD_STATE emState);             //设置线程状态
     MESSAGE_SERVICE_THREAD_STATE GetThreadState() const;                   //得到当前线程状态
     THREADSTATE GetStepState() const;                                      //得到当前步数相关信息
@@ -82,7 +139,7 @@ public:
     CWorkThreadMessage* CreateMessage();
     void DeleteMessage(CWorkThreadMessage* pMessage);
 
-    void GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_Account);  //得到当前列表描述信息
+    void GetFlowPortList(const ACE_Time_Value tvNow, vector<CWorkThread_Packet_Info>& vec_Port_Data_Account); //得到当前列表描述信息
 
     bool Synchronize_SendPostMessage(CWorkThread_Handler_info* pHandlerInfo, const ACE_Time_Value tvMessage);
     bool SendPostMessage(CSendMessageInfo objSendMessageInfo);                //发送数据
@@ -114,6 +171,7 @@ private:
     uint32                         m_u4WorkQueuePutTime = 0;                     //入队超时时间
     uint32                         m_u4MaxRecvWait      = 0;                     //最大等待时间  
     uint16                         m_u2ThreadTimeOut    = 0;
+    uint8                          m_u1PacketCounter    = 0;                     //是否开启性能统开关,0是关闭，1是开启
     bool                           m_blRun              = false;                 //线程是否在运行
     bool                           m_blIsCpuAffinity    = false;                 //是否CPU绑定
     bool                           m_blOverload         = false;                 //是否过载   
@@ -124,7 +182,7 @@ private:
 
     _ThreadInfo                    m_ThreadInfo;           //当前线程信息
     CWorkThreadAI                  m_WorkThreadAI;         //线程自我监控的AI逻辑
-    CCommandAccount                m_CommandAccount;       //当前线程命令统计数据
+    CWorkThread_Process            m_objWorkThreadProcess; //统计线程一分钟的数据包处理量
 
     CDeviceHandlerPool             m_DeviceHandlerPool;    //对象池 
 
@@ -161,12 +219,6 @@ public:
     void GetAITF(vecCommandTimeout& objTimeout);                                              //得到所有的AI封禁数据包信息
     void SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime);  //设置AI
 
-    void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData) const;              //获得指定命令统计信息
-    void GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut);                                    //获得指定流量相关信息
-
-    void GetCommandAlertData(vecCommandAlertData& CommandAlertDataList);                      //得到所有超过告警阀值的命令
-    void SaveCommandDataLog();                                                                //存储统计日志
-
     CWorkThreadMessage* CreateMessage(uint32 u4ConnectID, EM_CONNECT_IO_TYPE u1PacketType);   //从子线程中获取一个Message对象
     void DeleteMessage(CWorkThreadMessage* pMessage);                                         //从子线程中回收一个Message对象
 
@@ -176,7 +228,7 @@ public:
     bool AddDyeingCommand(uint16 u2CommandID, uint16 u2MaxCount);                             //染色指定的CommandID
     void GetDyeingCommand(vec_Dyeing_Command_list& objList) const;                            //获得当前命令染色状态
 
-    void GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_Account);                  //得到当前列表描述信息
+    void GetFlowPortList(vector<CWorkThread_Packet_Info>& vec_Port_Data_Account);             //得到当前列表描述信息
     bool CheckCPUAndMemory(bool blTest = false);                                              //检查CPU和内存
 
     bool Send_Post_Message(CSendMessageInfo objSendMessageInfo);                              //发送数据信息

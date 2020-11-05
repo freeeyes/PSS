@@ -351,36 +351,10 @@ void DoMessage_CommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
         _CommandData objCommandDataIn;
         _CommandData objCommandDataOut;
 
-        //先查询接收命令
-        App_MessageServiceGroup::instance()->GetCommandData(u2CommandID, objCommandDataIn);
-
         if (objCommandDataIn.m_u2CommandID == u2CommandID)
         {
             objCommandData += objCommandDataIn;
         }
-
-/*
-#if PSS_PLATFORM == PLATFORM_WIN
-        //查询发送命令
-        App_HandlerManager::instance()->GetCommandData(u2CommandID, objCommandDataOut);
-
-        if (objCommandDataOut.m_u2CommandID == u2CommandID)
-        {
-
-            objCommandData += objCommandDataOut;
-        }
-#else
-        //查询发送命令
-        App_ConnectManager::instance()->GetCommandData(u2CommandID, objCommandDataOut);
-
-        if (objCommandDataOut.m_u2CommandID == u2CommandID)
-        {
-
-            objCommandData += objCommandDataOut;
-        }
-
-#endif
-*/
 
         if (objCommandData.m_u2CommandID == u2CommandID)
         {
@@ -655,50 +629,22 @@ void DoMessage_ShowProcessInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
     {
         int nCPU = 0;
         int nMemorySize = 0;
-        uint8 u1Flow = GetXmlConfigAttribute(xmlCommandAccount)->FlowAccount;      //流量统计标记位
+        uint8 u1Flow = GetXmlConfigAttribute(xmlMessage)->Packet_Counter;      //流量统计标记位
         uint32 u4FlowIn = 0;      //总流量流入字节
         uint32 u4FlowOut = 0;      //总流量流出字节
-
 
         //得到入口的所有流量统计
         uint32 u4MessageFlowIn = 0;
         uint32 u4MessageFlowOut = 0;
-        App_MessageServiceGroup::instance()->GetFlowInfo(u4MessageFlowIn, u4MessageFlowOut);
-        u4FlowIn += u4MessageFlowIn;
-        u4FlowOut += u4MessageFlowOut;
 
-		uint32 u4ConnectFlowIn  = 0;
-		uint32 u4ConnectFlowOut = 0;
-		uint32 u4UdpFlowIn      = 0;
-		uint32 u4UdpFlowOut     = 0;
+        vector<CWorkThread_Packet_Info> vec_Port_Data_Account;
+        App_MessageServiceGroup::instance()->GetFlowPortList(vec_Port_Data_Account);
 
-#if PSS_PLATFORM == PLATFORM_WIN  //如果是windows
-        //得到所有TCP出口流量统计
-
-        //待实现
-        //App_ProConnectManager::instance()->GetFlowInfo(u4ConnectFlowIn, u4ConnectFlowOut);
-        u4FlowIn += u4ConnectFlowIn;
-        u4FlowOut += u4ConnectFlowOut;
-
-        //得到多有UDP出口流量统计
-        //待实现
-        u4FlowIn += u4UdpFlowIn;
-        u4FlowOut += u4UdpFlowOut;
-
-        nCPU = GetProcessCPU_Idel();
-        nMemorySize = GetProcessMemorySize();
-#else   //如果是linux
-        //得到所有TCP出口流量统计
-        u4FlowIn += u4ConnectFlowIn;
-        u4FlowOut += u4ConnectFlowOut;
-
-        //得到多有UDP出口流量统计
-        u4FlowIn += u4UdpFlowIn;
-        u4FlowOut += u4UdpFlowOut;
-
-        nCPU = GetProcessCPU_Idel_Linux();
-        nMemorySize = GetProcessMemorySize_Linux();
-#endif
+        for (const CWorkThread_Packet_Info& objCWorkThread_Packet_Info : vec_Port_Data_Account)
+        {
+            u4FlowIn += objCWorkThread_Packet_Info.m_u4RecvSize;
+            u4FlowOut += objCWorkThread_Packet_Info.m_u4SendSize;
+        }
 
         if (CommandInfo.m_u1OutputType == 0)
         {
@@ -1021,8 +967,7 @@ void DoMessage_CommandDataLog(const _CommandInfo& CommandInfo, IBuffPacket* pBuf
 {
     if (ACE_OS::strcmp(CommandInfo.m_szCommandExp, "-a") == 0)
     {
-        //存储所有接收统计日志
-        App_MessageServiceGroup::instance()->SaveCommandDataLog();
+        //不实现
 
         if (CommandInfo.m_u1OutputType == 0)
         {
@@ -1714,20 +1659,15 @@ void DoMessage_MonitorInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
         uint32 u4FlowOut = 0;
 
         //得到入口的所有流量统计
-        App_MessageServiceGroup::instance()->GetFlowInfo(u4FlowIn, u4FlowOut);
+        vector<CWorkThread_Packet_Info> vec_Port_Data_Account;
+        App_MessageServiceGroup::instance()->GetFlowPortList(vec_Port_Data_Account);
 
-        //得到所有Connect流量统计
-        uint32 u4ConnectFlowIn = 0;
-        uint32 u4ConnectFlowOut = 0;
-        //以后实现
-        //App_HandlerManager::instance()->GetFlowInfo(u4ConnectFlowIn, u4ConnectFlowOut);
+        for (CWorkThread_Packet_Info& objCWorkThread_Packet_Info : vec_Port_Data_Account)
+        {
+            u4FlowIn += objCWorkThread_Packet_Info.m_u4RecvSize;
+            u4FlowOut += objCWorkThread_Packet_Info.m_u4SendSize;
+        }
 
-        u4FlowIn += u4ConnectFlowIn;
-        u4FlowOut += u4ConnectFlowOut;
-
-        //得到所有UDP的流量统计
-        uint32 u4UdpFlowIn  = 0;
-        uint32 u4UdpFlowOut = 0;
         int nActiveClient   = 0;
         int nPoolClient     = 0;
 
@@ -1737,8 +1677,6 @@ void DoMessage_MonitorInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
 #else
         nPoolClient = App_ConnectHandlerPool::instance()->GetFreeCount();
 #endif
-        u4FlowIn += u4UdpFlowIn;
-        u4FlowOut += u4UdpFlowOut;
 
         if (CommandInfo.m_u1OutputType == 0)
         {
@@ -1872,7 +1810,7 @@ void DoMessage_PortList(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
         OUR_DEBUG((LM_INFO, "[DoMessage_PortList]In 1.\n"));
         u2ReturnCommandID = CONSOLE_COMMAND_PORT_FLOW;
 
-        vector<_Port_Data_Account> vec_Port_Data_Account;
+        vector<CWorkThread_Packet_Info> vec_Port_Data_Account;
         App_MessageServiceGroup::instance()->GetFlowPortList(vec_Port_Data_Account);
 
         uint32 u4Count = (uint32)vec_Port_Data_Account.size();
@@ -1892,19 +1830,19 @@ void DoMessage_PortList(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
         {
             if (CommandInfo.m_u1OutputType == 0)
             {
-                (*pBuffPacket) << static_cast<uint8>(vec_Port_Data_Account[i].m_u1Type);
-                (*pBuffPacket) << vec_Port_Data_Account[i].m_u4Port;
-                (*pBuffPacket) << vec_Port_Data_Account[i].m_u4FlowIn;
-                (*pBuffPacket) << vec_Port_Data_Account[i].m_u4FlowOut;
+                (*pBuffPacket) << vec_Port_Data_Account[i].m_u1ThreadID;
+                (*pBuffPacket) << vec_Port_Data_Account[i].m_u4Minute;
+                (*pBuffPacket) << vec_Port_Data_Account[i].m_u4PacketIn;
+                (*pBuffPacket) << vec_Port_Data_Account[i].m_u4PacketOut;
             }
             else
             {
                 char szTemp[MAX_BUFF_1024] = { '\0' };
                 sprintf_safe(szTemp, MAX_BUFF_1024, "m_u1Type=%d,m_u4Port=%d,m_u4FlowIn=%d,m_u4FlowOut=%d.\n",
-                             vec_Port_Data_Account[i].m_u1Type,
-                             vec_Port_Data_Account[i].m_u4Port,
-                             vec_Port_Data_Account[i].m_u4FlowIn,
-                             vec_Port_Data_Account[i].m_u4FlowOut);
+                             vec_Port_Data_Account[i].m_u1ThreadID,
+                             vec_Port_Data_Account[i].m_u4Minute,
+                             vec_Port_Data_Account[i].m_u4PacketIn,
+                             vec_Port_Data_Account[i].m_u4PacketOut);
                 pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
             }
         }
