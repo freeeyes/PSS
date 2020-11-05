@@ -191,6 +191,11 @@ bool CReactorUDPHander::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMb
 	return true;
 }
 
+void CReactorUDPHander::SetIsLog(bool blIsLog)
+{
+    ACE_UNUSED_ARG(blIsLog);
+}
+
 _ClientConnectInfo CReactorUDPHander::GetClientConnectInfo() const
 {
     _ClientConnectInfo ClientConnectInfo;

@@ -30,6 +30,7 @@ public:
     virtual void Close(uint32 u4ConnectID);
     virtual bool SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);
     virtual bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend);
+    virtual void SetIsLog(bool blIsLog);                                      //记录日志
     _ClientConnectInfo GetClientConnectInfo();
     void GetCommandData(uint16 u2CommandID, _CommandData& objCommandData);    //获得指定命令统计信息
     void GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut);                    //得到所有的流量信息

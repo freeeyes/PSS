@@ -407,6 +407,27 @@ bool CMessageService::ProcessSendClose(CWorkThreadMessage* pMessage, uint32 u4Th
     return nRet;
 }
 
+bool CMessageService::ProcessSendIsLog(CWorkThreadMessage* pMessage, uint32 u4ThreadID)
+{
+    int nRet = true;
+    CWorkThread_Handler_info* pWorkThread_Handler_info = m_objHandlerList.Get_Hash_Box_Data_By_Uint32(pMessage->m_u4ConnectID);
+
+    if (nullptr != pWorkThread_Handler_info)
+    {
+        if (pMessage->m_SendMessageInfo.nMessageID == 0)
+        {
+            pWorkThread_Handler_info->m_pHandler->SetIsLog(false);
+        }
+        else
+        {
+            pWorkThread_Handler_info->m_pHandler->SetIsLog(true);
+        }
+    }
+
+    DeleteMessage(pMessage);
+    return nRet;
+}
+
 int CMessageService::Close()
 {
     if(m_blRun)
@@ -911,6 +932,11 @@ bool CMessageService::Dispose_Queue()
             {
                 //关闭链接
                 ProcessSendClose(msg, m_u4ThreadID);
+            }
+            else if (CLINET_LINK_IS_LOG == msg->m_u2Cmd)
+            {
+                //处理日志
+                ProcessSendIsLog(msg, m_u4ThreadID);
             }
             else
             {

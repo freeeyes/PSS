@@ -76,7 +76,7 @@ public:
     _ClientIPInfo      GetLocalIPInfo();                                      //得到监听IP信息
     void               SetConnectName(const char* pName);                     //设置当前连接名称
     char*              GetConnectName();                                      //得到别名
-    void               SetIsLog(bool blIsLog);                                //设置当前连接数据是否写入日志
+    virtual void       SetIsLog(bool blIsLog);                                //设置当前连接数据是否写入日志
     bool               GetIsLog();                                            //得到是否可以写日志
     void               SetHashID(int nHashID);                                //设置HashID
     int                GetHashID();                                           //得到当前HashID

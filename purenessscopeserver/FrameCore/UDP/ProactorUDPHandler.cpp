@@ -226,6 +226,12 @@ bool CProactorUDPHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* p
     return true;
 }
 
+void CProactorUDPHandler::SetIsLog(bool blIsLog)
+{
+    ACE_UNUSED_ARG(blIsLog);
+    //UDP‘›≤ª µœ÷
+}
+
 _ClientConnectInfo CProactorUDPHandler::GetClientConnectInfo()
 {
     _ClientConnectInfo ClientConnectInfo;

@@ -420,6 +420,7 @@ const int DEBUG_OFF = 0;
 #define CLINET_LINK_SU_CONNECT     0x000c      //服务器间UDP连接
 #define CLINET_LINK_SU_DISCONNECT  0x000d      //服务器间UDP连接断开
 #define CLINET_LINK_HANDLER_CLOSE  0x000e      //发送服务器断开指令 
+#define CLINET_LINK_IS_LOG         0x000f      //发送日志开启和关闭指令 
 #define CLIENT_LINK_USER           0x0100      //用户信令开始序列头部
 //*****************************************************************
 

@@ -97,6 +97,7 @@ private:
     bool ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4ThreadID); //处理接收事件
     bool ProcessSendMessage(CWorkThreadMessage* pMessage, uint32 u4ThreadID); //处理发送事件
     bool ProcessSendClose(CWorkThreadMessage* pMessage, uint32 u4ThreadID);   //处理发送事件
+    bool ProcessSendIsLog(CWorkThreadMessage* pMessage, uint32 u4ThreadID);   //处理发送事件
     void CloseCommandList();                                                  //清理当前信令列表副本
     CClientCommandList* GetClientCommandList(uint16 u2CommandID);
     bool DoMessage(IMessage* pMessage, uint16& u2CommandID, uint16& u2Count, bool& bDeleteFlag);

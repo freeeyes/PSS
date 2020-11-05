@@ -51,10 +51,21 @@ uint32 CPSSHandlerManager::GetCount()
 
 bool CPSSHandlerManager::SetIsLog(uint32 u4ConnectID, bool blIsLog)
 {
-	//´ýÊµÏÖ
-	ACE_UNUSED_ARG(u4ConnectID);
-	ACE_UNUSED_ARG(blIsLog);
-	return true;
+	CSendMessageInfo objSendMessageInfo;
+
+	objSendMessageInfo.u2CommandID = CLINET_LINK_IS_LOG;
+	objSendMessageInfo.u4ConnectID = u4ConnectID;
+	//½èÓÃnMessageID´æ´¢blIsLog
+	if (true == blIsLog)
+	{
+		objSendMessageInfo.nMessageID = 1;
+	}
+	else
+	{
+		objSendMessageInfo.nMessageID = 0;
+	}
+
+	return App_MessageServiceGroup::instance()->Send_Post_Message(objSendMessageInfo);
 }
 
 EM_Client_Connect_status CPSSHandlerManager::GetConnectState(uint32 u4ConnectID)
