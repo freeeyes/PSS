@@ -1,6 +1,6 @@
 #include "ProTTyClientManager.h"
 
-CProTTyClientManager::CProTTyClientManager(): m_pProactor(NULL), m_u2MaxListCount(MAX_BUFF_100), m_u2TimeCheck(120), m_nTaskID(-1)
+CProTTyClientManager::CProTTyClientManager(): m_pProactor(nullptr), m_u2MaxListCount(MAX_BUFF_100), m_u2TimeCheck(120), m_nTaskID(-1)
 {
 
 }
@@ -13,7 +13,7 @@ CProTTyClientManager::~CProTTyClientManager()
 bool CProTTyClientManager::StartConnectTask()
 {
     CancelConnectTask();
-    m_nTaskID = App_TimerManager::instance()->schedule(this, (void*)NULL, ACE_OS::gettimeofday() + ACE_Time_Value(m_u2TimeCheck), ACE_Time_Value(m_u2TimeCheck));
+    m_nTaskID = App_TimerManager::instance()->schedule(this, (void*)nullptr, ACE_OS::gettimeofday() + ACE_Time_Value(m_u2TimeCheck), ACE_Time_Value(m_u2TimeCheck));
 
     if (m_nTaskID == -1)
     {
@@ -64,9 +64,9 @@ void CProTTyClientManager::Close()
     {
         CProTTyHandler* pTTyClientHandler = vecTTyClientHandlerInfo[i];
 
-        if (NULL != pTTyClientHandler)
+        if (nullptr != pTTyClientHandler)
         {
-            pTTyClientHandler->Close();
+            pTTyClientHandler->Close(pTTyClientHandler->GetConnectID());
             SAFE_DELETE(pTTyClientHandler);
         }
     }
@@ -84,7 +84,7 @@ bool CProTTyClientManager::Close(uint16 u2ConnectID)
 
     CProTTyHandler* pTTyClientHandler = m_objTTyClientHandlerList.Get_Hash_Box_Data(szConnectID);
 
-    if (NULL == pTTyClientHandler)
+    if (nullptr == pTTyClientHandler)
     {
         OUR_DEBUG((LM_INFO, "[CProTTyClientManager::Close](u2ConnectID=%d) is no exist.\n", u2ConnectID));
         return false;
@@ -92,7 +92,7 @@ bool CProTTyClientManager::Close(uint16 u2ConnectID)
     else
     {
         m_objTTyClientHandlerList.Del_Hash_Data(szConnectID);
-        pTTyClientHandler->Close();
+        pTTyClientHandler->Close(pTTyClientHandler->GetConnectID());
         SAFE_DELETE(pTTyClientHandler);
         return true;
     }
@@ -108,7 +108,7 @@ bool CProTTyClientManager::Pause(uint16 u2ConnectID)
 
     CProTTyHandler* pTTyClientHandler = m_objTTyClientHandlerList.Get_Hash_Box_Data(szConnectID);
 
-    if (NULL == pTTyClientHandler)
+    if (nullptr == pTTyClientHandler)
     {
         OUR_DEBUG((LM_INFO, "[CProTTyClientManager::Pause](u2ConnectID=%d) is no exist.\n", u2ConnectID));
         return false;
@@ -130,7 +130,7 @@ bool CProTTyClientManager::Resume(uint16 u2ConnectID)
 
     CProTTyHandler* pTTyClientHandler = m_objTTyClientHandlerList.Get_Hash_Box_Data(szConnectID);
 
-    if (NULL == pTTyClientHandler)
+    if (nullptr == pTTyClientHandler)
     {
         OUR_DEBUG((LM_INFO, "[CProTTyClientManager::Resume](u2ConnectID=%d) is no exist.\n", u2ConnectID));
         return false;
@@ -152,7 +152,7 @@ bool CProTTyClientManager::SendMessage(uint16 u2ConnectID, char*& pMessage, uint
 
     CProTTyHandler* pTTyClientHandler = m_objTTyClientHandlerList.Get_Hash_Box_Data(szConnectID);
 
-    if (NULL == pTTyClientHandler)
+    if (nullptr == pTTyClientHandler)
     {
         OUR_DEBUG((LM_INFO, "[CProTTyClientManager::SendMessage](u2ConnectID=%d) is no exist.\n", u2ConnectID));
         return false;
@@ -180,7 +180,7 @@ int CProTTyClientManager::handle_timeout(const ACE_Time_Value& tv, const void* a
     {
         CProTTyHandler* pTTyClientHandler = vecTTyClientHandlerInfo[i];
 
-        if (NULL != pTTyClientHandler)
+        if (nullptr != pTTyClientHandler)
         {
             pTTyClientHandler->ConnectTTy();
         }
@@ -199,7 +199,7 @@ int CProTTyClientManager::Connect(uint16 u2ConnectID, const char* pName, _TTyDev
 
     CProTTyHandler* pTTyClientHandler = m_objTTyClientHandlerList.Get_Hash_Box_Data(szConnectID);
 
-    if (NULL != pTTyClientHandler)
+    if (nullptr != pTTyClientHandler)
     {
         OUR_DEBUG((LM_INFO, "[CProTTyClientManager::Connect](%s) is exist.\n", pName));
         return -1;
@@ -256,7 +256,7 @@ int CProTTyClientManager::ConnectFrame(uint16 u2ConnectID, const char* pName, _T
 
     CProTTyHandler* pTTyClientHandler = m_objTTyClientHandlerList.Get_Hash_Box_Data(szConnectID);
 
-    if (NULL != pTTyClientHandler)
+    if (nullptr != pTTyClientHandler)
     {
         OUR_DEBUG((LM_INFO, "[CProTTyClientManager::ConnectFrame](%s) is exist.\n", pName));
         return -1;
@@ -286,7 +286,7 @@ int CProTTyClientManager::ConnectFrame(uint16 u2ConnectID, const char* pName, _T
     //°ó¶¨·´Ó¦Æ÷
     pTTyClientHandler->proactor(m_pProactor);
 
-    if (false == pTTyClientHandler->Init(u2ConnectID, pName, inTTyParams, NULL, EM_CONNECT_IO_DISPOSE::CONNECT_IO_FRAME, u4PacketParseID))
+    if (false == pTTyClientHandler->Init(u2ConnectID, pName, inTTyParams, nullptr, EM_CONNECT_IO_DISPOSE::CONNECT_IO_FRAME, u4PacketParseID))
     {
         OUR_DEBUG((LM_INFO, "[CProTTyClientManager::ConnectFrame](%s)pTTyClientHandler Init Error.\n", pName));
         SAFE_DELETE(pTTyClientHandler);
@@ -313,7 +313,7 @@ bool CProTTyClientManager::GetClientDevInfo(uint16 u2ConnectID, _TTyDevParam& ou
 
     CProTTyHandler* pTTyClientHandler = m_objTTyClientHandlerList.Get_Hash_Box_Data(szConnectID);
 
-    if (NULL == pTTyClientHandler)
+    if (nullptr == pTTyClientHandler)
     {
         OUR_DEBUG((LM_INFO, "[CProTTyClientManager::GetClientDevInfo](u2ConnectID=%d) is no exist.\n", u2ConnectID));
         return false;
@@ -348,7 +348,7 @@ bool CProTTyClientManager::IsConnect(uint16 u2ConnectID)
 
     CProTTyHandler* pTTyClientHandler = m_objTTyClientHandlerList.Get_Hash_Box_Data(szConnectID);
 
-    if (NULL == pTTyClientHandler)
+    if (nullptr == pTTyClientHandler)
     {
         OUR_DEBUG((LM_INFO, "[ CProTTyClientManager::IsConnect](u2ConnectID=%d) is no exist.\n", u2ConnectID));
         return false;

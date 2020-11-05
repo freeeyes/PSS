@@ -14,8 +14,9 @@
 #include "BaseHander.h"
 #include "TcpRedirection.h"
 #include "IDeviceHandler.h"
+#include "IHandler.h"
 
-class CProTTyHandler : public ACE_Handler, public IDeviceHandler
+class CProTTyHandler : public ACE_Handler, public IDeviceHandler, public IHandler
 {
 public:
     CProTTyHandler();
@@ -23,7 +24,11 @@ public:
 
     bool ConnectTTy();                          //连接指定的设备
 
-    void Close();
+    virtual void Close(uint32 u4ConnectID);
+    virtual bool SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);
+    virtual bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend);
+    virtual void SetIsLog(bool blIsLog);
+
     bool Init(uint32 u4ConnectID,
               const char* pName,
               ACE_TTY_IO::Serial_Params inParams,
@@ -43,8 +48,11 @@ public:
 
     virtual bool Device_Send_Data(const char* pData, ssize_t nLen);          //透传数据接口
 
+    uint32 GetConnectID();                                                   //得到ConnectID
+
 private:
     void Ready_To_Read_Buff();
+    void Send_Hander_Event(uint8 u1Option);                                  //发送Handler的事件通知业务线程
 
 private:
 
@@ -53,15 +61,16 @@ private:
     ACE_DEV_Connector                     m_Connector;
     ACE_Asynch_Read_File                  m_ObjReadRequire;
     ACE_Asynch_Write_File                 m_ObjWriteRequire;
-    ACE_Message_Block*                    m_pmbReadBuff;
+    ACE_Message_Block*                    m_pmbReadBuff   = nullptr;
     ACE_TTY_IO::Serial_Params             m_ObjParams;                 //设备接口参数
-    bool                                  m_blState;                   //当前设备连接状态
-    bool                                  m_blPause;                   //是否暂停
-    uint32                                m_u4ConnectID;               //当前设备ID
-    ITTyMessage*                          m_pTTyMessage;               //TTyMessage对象
-    EM_CONNECT_IO_DISPOSE                 m_emDispose;                 //处理模式，框架处理 or 业务处理
-    uint32                                m_u4PacketParseInfoID;       //框架处理模块ID
+    bool                                  m_blState       = false;     //当前设备连接状态
+    bool                                  m_blPause       = true;      //是否暂停
+    uint32                                m_u4ConnectID   = 0;         //当前设备ID
+    ITTyMessage*                          m_pTTyMessage   = nullptr;   //TTyMessage对象
+    EM_CONNECT_IO_DISPOSE                 m_emDispose     = EM_CONNECT_IO_DISPOSE::CONNECT_IO_FRAME; //处理模式，框架处理 or 业务处理
+    uint32                                m_u4PacketParseInfoID = 0;   //框架处理模块ID
     string                                m_strDeviceName;             //转发接口名称
+    _Packet_Parse_Info*                   m_pPacketParse   = nullptr;  //数据包Packetparse函数接口
 };
 #endif
 

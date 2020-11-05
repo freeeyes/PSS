@@ -17,8 +17,9 @@
 #include "BaseHander.h"
 #include "TcpRedirection.h"
 #include "IDeviceHandler.h"
+#include "IHandler.h"
 
-class CReTTyHandler : public ACE_Event_Handler, public IDeviceHandler
+class CReTTyHandler : public ACE_Event_Handler, public IDeviceHandler, public IHandler
 {
 public:
     CReTTyHandler();
@@ -26,7 +27,10 @@ public:
 
     bool ConnectTTy();                          //连接指定的设备
 
-    void Close();
+    virtual void Close(uint32 u4ConnectID);
+    virtual bool SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);
+    virtual bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend);
+    virtual void SetIsLog(bool blIsLog);
 
     bool Init(uint32 u4ConnectID,
               const char* pName,
@@ -47,6 +51,10 @@ public:
 
     bool Send_Data(const char* pData, ssize_t nLen);                         //向设备发送数据
     virtual bool Device_Send_Data(const char* pData, ssize_t nLen);          //透传数据接口
+    uint32 GetConnectID();
+
+private:
+    void Send_Hander_Event(uint8 u1Option);                                  //发送Handler的事件通知业务线程
 
 private:
     char                                  m_szName[MAX_BUFF_100] = {'\0'};
@@ -61,6 +69,7 @@ private:
     EM_CONNECT_IO_DISPOSE                 m_emDispose            = EM_CONNECT_IO_DISPOSE::CONNECT_IO_PLUGIN; //处理模式，框架处理 or 业务处理
     uint32                                m_u4PacketParseInfoID  = 0;                 //框架处理模块ID
     string                                m_strDeviceName;                            //转发接口名称
+    _Packet_Parse_Info*                   m_pPacketParse         = nullptr;           //数据包Packetparse函数接口
 };
 
 #endif

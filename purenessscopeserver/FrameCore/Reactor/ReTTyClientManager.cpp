@@ -68,7 +68,7 @@ void CReTTyClientManager::Close()
 
         if (NULL != pTTyClientHandler)
         {
-            pTTyClientHandler->Close();
+            pTTyClientHandler->Close(pTTyClientHandler->GetConnectID());
             SAFE_DELETE(pTTyClientHandler);
         }
     }
@@ -94,7 +94,7 @@ bool CReTTyClientManager::Close(uint16 u2ConnectID)
     else
     {
         m_objTTyClientHandlerList.Del_Hash_Data(szConnectID);
-        pTTyClientHandler->Close();
+        pTTyClientHandler->Close(pTTyClientHandler->GetConnectID());
         SAFE_DELETE(pTTyClientHandler);
         return true;
     }

@@ -8,7 +8,7 @@ CReTTyHandler::CReTTyHandler()
 CReTTyHandler::~CReTTyHandler()
 {
     OUR_DEBUG((LM_INFO, "[CReTTyHandler::~CReTTyHandler].\n"));
-    Close();
+    Close(GetConnectID());
 
     //回收资源
     SAFE_DELETE(m_pTTyMessage);
@@ -47,28 +47,17 @@ bool CReTTyHandler::ConnectTTy()
     return true;
 }
 
-void CReTTyHandler::Close()
+void CReTTyHandler::Close(uint32 u4ConnectID)
 {
     if (true == m_blState)
     {
-        if (EM_CONNECT_IO_DISPOSE::CONNECT_IO_FRAME == m_emDispose)
+        if (EM_CONNECT_IO_DISPOSE::CONNECT_IO_FRAME == m_emDispose && u4ConnectID == m_u4ConnectID)
         {
             //发送packetParse断开消息
             App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->DisConnect(m_u4ConnectID);
 
             //发送框架消息
-            ACE_INET_Addr m_addrRemote;
-
-			_MakePacket objMakePacket;
-
-			objMakePacket.m_u4ConnectID     = m_u4ConnectID;
-			objMakePacket.m_pPacketParse    = NULL;
-			objMakePacket.m_u1Option        = PACKET_TTY_DISCONNECT;
-			objMakePacket.m_AddrRemote      = m_addrRemote;
-			objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
-			objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_TTY;
-
-            Send_MakePacket_Queue(objMakePacket, "TTy", 0);
+            Send_Hander_Event(PACKET_TTY_DISCONNECT);
         }
 
         //关闭转发接口
@@ -76,8 +65,47 @@ void CReTTyHandler::Close()
         m_strDeviceName = "";
 
         m_ReTtyio.close();
-        m_blState = false;
+        m_blState     = false;
+        m_u4ConnectID = 0;
     }
+}
+
+bool CReTTyHandler::SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize)
+{
+    if (nullptr != objSendMessageInfo.pBuffPacket &&
+        objSendMessageInfo.pBuffPacket->GetHeadLen() > 0)
+    {
+        //发送数据
+        u4PacketSize = objSendMessageInfo.pBuffPacket->GetHeadLen();
+        return Send_Data(objSendMessageInfo.pBuffPacket->GetData(), objSendMessageInfo.pBuffPacket->GetHeadLen());
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool CReTTyHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend)
+{
+    ACE_UNUSED_ARG(u4ConnectID);
+    ACE_UNUSED_ARG(tvSend);
+
+    if (nullptr != pMbData &&
+        u4Size > 0)
+    {
+        //发送数据
+        return Send_Data(pMbData->rd_ptr(), u4Size);
+    }
+    else
+    {
+        return false;
+    }
+}
+
+void CReTTyHandler::SetIsLog(bool blIsLog)
+{
+    ACE_UNUSED_ARG(blIsLog);
+    //暂不实现
 }
 
 bool CReTTyHandler::Init(uint32 u4ConnectID, const char* pName, ACE_TTY_IO::Serial_Params inParams, ITTyMessage* pTTyMessage, EM_CONNECT_IO_DISPOSE emDispose, uint32 u4PacketParseInfoID)
@@ -89,6 +117,15 @@ bool CReTTyHandler::Init(uint32 u4ConnectID, const char* pName, ACE_TTY_IO::Seri
     m_emDispose           = emDispose;
     m_u4PacketParseInfoID = u4PacketParseInfoID;
 
+    m_pPacketParse = App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID);
+
+    if (nullptr == m_pPacketParse)
+    {
+        //找不到解析器
+        OUR_DEBUG((LM_INFO, "[CProTTyHandler::Init]u4PacketParseInfoID is not exist.\n"));
+        return false;
+    }
+
     //初始化连接设备
     bool blRet = ConnectTTy();
 
@@ -98,23 +135,9 @@ bool CReTTyHandler::Init(uint32 u4ConnectID, const char* pName, ACE_TTY_IO::Seri
         _ClientIPInfo objLocalIPInfo;
 
         //发送packetParse断开消息
-        App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID)->Connect(m_u4ConnectID,
+        m_pPacketParse->Connect(m_u4ConnectID,
                 objClientIPInfo,
                 objLocalIPInfo);
-
-        //发送框架消息
-        ACE_INET_Addr m_addrRemote;
-
-		_MakePacket objMakePacket;
-
-		objMakePacket.m_u4ConnectID     = m_u4ConnectID;
-		objMakePacket.m_pPacketParse    = NULL;
-		objMakePacket.m_u1Option        = PACKET_TTY_CONNECT;
-		objMakePacket.m_AddrRemote      = m_addrRemote;
-		objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
-		objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_TTY;
-
-        Send_MakePacket_Queue(objMakePacket, "TTy", 0);
     }
 
     //查看是否存在转发接口
@@ -161,8 +184,8 @@ int CReTTyHandler::handle_input(ACE_HANDLE handle)
         //通知上层应用
         m_pTTyMessage->ReportMessage(m_u4ConnectID, (uint32)errno, EM_TTY_EVENT_RW_ERROR);
 
-        //断开当前设备
-        Close();
+        //发送框架消息
+        Send_Hander_Event(PACKET_TTY_DISCONNECT);
     }
     else
     {
@@ -182,45 +205,40 @@ int CReTTyHandler::handle_input(ACE_HANDLE handle)
             else
             {
                 //调用框架的函数处理
-                _Packet_Parse_Info* pPacketParse = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID);
+                _Packet_Info obj_Packet_Info;
+                uint8 n1Ret = m_pPacketParse->Parse_Packet_Stream(m_u4ConnectID,
+                                m_pmbReadBuff,
+                                dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()),
+                                &obj_Packet_Info,
+                                EM_CONNECT_IO_TYPE::CONNECT_IO_TTY);
 
-                if (NULL != pPacketParse)
+                if (PACKET_GET_ENOUGH == n1Ret)
                 {
-                    _Packet_Info obj_Packet_Info;
-                    uint8 n1Ret = pPacketParse->Parse_Packet_Stream(m_u4ConnectID,
-                                  m_pmbReadBuff,
-                                  dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()),
-                                  &obj_Packet_Info,
-                                  EM_CONNECT_IO_TYPE::CONNECT_IO_TTY);
+                    //发送消息给消息框架
+                    CPacketParse* pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
+                    pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
+                    pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);
+                    pPacketParse->SetPacket_CommandID(obj_Packet_Info.m_u2PacketCommandID);
+                    pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4HeadSrcLen);
+                    pPacketParse->SetPacket_Head_Curr_Length(obj_Packet_Info.m_u4HeadCurrLen);
+                    pPacketParse->SetPacket_Body_Src_Length(obj_Packet_Info.m_u4BodySrcLen);
+                    pPacketParse->SetPacket_Body_Curr_Length(obj_Packet_Info.m_u4BodyCurrLen);
 
-                    if (PACKET_GET_ENOUGH == n1Ret)
-                    {
-                        //发送消息给消息框架
-                        CPacketParse* pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
-                        pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
-                        pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);
-                        pPacketParse->SetPacket_CommandID(obj_Packet_Info.m_u2PacketCommandID);
-                        pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4HeadSrcLen);
-                        pPacketParse->SetPacket_Head_Curr_Length(obj_Packet_Info.m_u4HeadCurrLen);
-                        pPacketParse->SetPacket_Body_Src_Length(obj_Packet_Info.m_u4BodySrcLen);
-                        pPacketParse->SetPacket_Body_Curr_Length(obj_Packet_Info.m_u4BodyCurrLen);
+                    ACE_INET_Addr m_addrRemote;
 
-                        ACE_INET_Addr m_addrRemote;
+					_MakePacket objMakePacket;
 
-						_MakePacket objMakePacket;
+					objMakePacket.m_u4ConnectID     = m_u4ConnectID;
+					objMakePacket.m_pPacketParse    = pPacketParse;
+					objMakePacket.m_u1Option        = PACKET_PARSE;
+					objMakePacket.m_AddrRemote      = m_addrRemote;
+					objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
+					objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_TTY;
 
-						objMakePacket.m_u4ConnectID     = m_u4ConnectID;
-						objMakePacket.m_pPacketParse    = pPacketParse;
-						objMakePacket.m_u1Option        = PACKET_PARSE;
-						objMakePacket.m_AddrRemote      = m_addrRemote;
-						objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
-						objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_TTY;
+                    Send_MakePacket_Queue(objMakePacket, "TTy", 0);
 
-                        Send_MakePacket_Queue(objMakePacket, "TTy", 0);
-
-                        //清理用完的m_pPacketParse
-                        App_PacketParsePool::instance()->Delete(pPacketParse);
-                    }
+                    //清理用完的m_pPacketParse
+                    App_PacketParsePool::instance()->Delete(pPacketParse);
                 }
             }
         }
@@ -267,9 +285,6 @@ bool CReTTyHandler::Send_Data(const char* pData, ssize_t nLen)
         {
             //发送数据失败
             m_pTTyMessage->ReportMessage(m_u4ConnectID, (uint32)errno, EM_TTY_EVENT_RW_ERROR);
-
-            //中断设备
-            Close();
         }
 
         return true;
@@ -284,5 +299,24 @@ bool CReTTyHandler::Send_Data(const char* pData, ssize_t nLen)
 bool CReTTyHandler::Device_Send_Data(const char* pData, ssize_t nLen)
 {
     return Send_Data(pData, nLen);
+}
+
+void CReTTyHandler::Send_Hander_Event(uint8 u1Option)
+{
+    _MakePacket objMakePacket;
+
+    objMakePacket.m_u4ConnectID = GetConnectID();
+    objMakePacket.m_pPacketParse = nullptr;
+    objMakePacket.m_u1Option = u1Option;
+    objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
+    objMakePacket.m_pHandler = this;
+    objMakePacket.m_emPacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_TTY;
+
+    Send_MakePacket_Queue(objMakePacket, "tty", 0);
+}
+
+uint32 CReTTyHandler::GetConnectID()
+{
+    return m_u4ConnectID;
 }
 
