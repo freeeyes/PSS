@@ -633,10 +633,6 @@ void DoMessage_ShowProcessInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
         uint32 u4FlowIn = 0;      //总流量流入字节
         uint32 u4FlowOut = 0;      //总流量流出字节
 
-        //得到入口的所有流量统计
-        uint32 u4MessageFlowIn = 0;
-        uint32 u4MessageFlowOut = 0;
-
         vector<CWorkThread_Packet_Info> vec_Port_Data_Account;
         App_MessageServiceGroup::instance()->GetFlowPortList(vec_Port_Data_Account);
 

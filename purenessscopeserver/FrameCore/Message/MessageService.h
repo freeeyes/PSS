@@ -149,6 +149,7 @@ public:
     _ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID);                         //得到客户端监听端口
 
     void Check_Handler_Recv_Timeout();                                        //检查终端连接时间超时
+    EM_Client_Connect_status GetConnectState(uint32 u4ConnectID);             //得到当前连接状态 
 
 private:
     bool ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4ThreadID); //处理接收事件
@@ -236,6 +237,7 @@ public:
     _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                                        //得到指定链接的客户单ID 
     _ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID);                                         //得到监听的IP信息
     uint32 GetHandlerCount();                                                                 //得到当前连接总数
+    EM_Client_Connect_status GetConnectState(uint32 u4ConnectID);                             //得到当前连接状态 
 
 private:
     uint32 GetWorkThreadID(uint32 u4ConnectID, EM_CONNECT_IO_TYPE emPacketType);              //根据操作类型和ConnectID计算出那个工作线程ID

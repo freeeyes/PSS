@@ -413,6 +413,7 @@ bool CMessageService::ProcessSendClose(CWorkThreadMessage* pMessage, uint32 u4Th
 
 bool CMessageService::ProcessSendIsLog(CWorkThreadMessage* pMessage, uint32 u4ThreadID)
 {
+    ACE_UNUSED_ARG(u4ThreadID);
     int nRet = true;
     CWorkThread_Handler_info* pWorkThread_Handler_info = m_objHandlerList.Get_Hash_Box_Data_By_Uint32(pMessage->m_u4ConnectID);
 
@@ -827,6 +828,18 @@ void CMessageService::Check_Handler_Recv_Timeout()
 
 			SendPostMessage(objSendMessageInfo);
         }
+    }
+}
+
+EM_Client_Connect_status CMessageService::GetConnectState(uint32 u4ConnectID)
+{
+    if (nullptr == m_objHandlerList.Get_Hash_Box_Data_By_Uint32(u4ConnectID))
+    {
+        return EM_Client_Connect_status::CLIENT_CONNECT_NO_EXIST;
+    }
+    else
+    {
+        return EM_Client_Connect_status::CLIENT_CONNECT_EXIST;
     }
 }
 
@@ -1287,6 +1300,15 @@ uint32 CMessageServiceGroup::GetHandlerCount()
 	}
 
     return u4HandlerCount;
+}
+
+EM_Client_Connect_status CMessageServiceGroup::GetConnectState(uint32 u4ConnectID)
+{
+    //得到这个线程ID
+    uint32 u4ThreadID = GetWorkThreadID(u4ConnectID,
+        EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
+
+    return m_vecMessageService[u4ThreadID]->GetConnectState(u4ConnectID);
 }
 
 bool CMessageServiceGroup::CheckPlugInState() const

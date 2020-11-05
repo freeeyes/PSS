@@ -70,7 +70,5 @@ bool CPSSHandlerManager::SetIsLog(uint32 u4ConnectID, bool blIsLog)
 
 EM_Client_Connect_status CPSSHandlerManager::GetConnectState(uint32 u4ConnectID)
 {
-	//´ýÊµÏÖ
-	ACE_UNUSED_ARG(u4ConnectID);
-	return EM_Client_Connect_status::CLIENT_CONNECT_EXIST;
+	return App_MessageServiceGroup::instance()->GetConnectState(u4ConnectID);
 }

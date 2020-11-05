@@ -40,16 +40,6 @@ void CUnit_MessageService::Test_MessageService(void)
         return;
     }
 
-    vecCommandAlertData CommandAlertDataList;
-    m_pMessageService->GetCommandAlertData(CommandAlertDataList);
-
-    if (0 != CommandAlertDataList.size())
-    {
-        OUR_DEBUG((LM_INFO, "[Test_MessageService]GetCommandAlertData is fail.\n"));
-        CPPUNIT_ASSERT_MESSAGE("[Test_MessageService]GetCommandAlertData is fail.", true == blRet);
-        return;
-    }
-
     if (0 != m_pMessageService->GetUsedMessageCount())
     {
         OUR_DEBUG((LM_INFO, "[Test_MessageService]GetUsedMessageCount is fail(%d).\n", m_pMessageService->GetUsedMessageCount()));
