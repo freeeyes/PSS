@@ -1658,7 +1658,7 @@ void DoMessage_MonitorInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
         vector<CWorkThread_Packet_Info> vec_Port_Data_Account;
         App_MessageServiceGroup::instance()->GetFlowPortList(vec_Port_Data_Account);
 
-        for (CWorkThread_Packet_Info& objCWorkThread_Packet_Info : vec_Port_Data_Account)
+        for (const CWorkThread_Packet_Info& objCWorkThread_Packet_Info : vec_Port_Data_Account)
         {
             u4FlowIn += objCWorkThread_Packet_Info.m_u4RecvSize;
             u4FlowOut += objCWorkThread_Packet_Info.m_u4SendSize;
