@@ -490,8 +490,9 @@ void CProConnectHandler::Send_Hander_Event(uint8 u1Option)
     objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
     objMakePacket.m_pHandler        = this;
     objMakePacket.m_tvRecv          = m_atvInput;
+    objMakePacket.m_AddrListen      = m_addrListen;
 
-    Send_MakePacket_Queue(objMakePacket, m_szLocalIP, m_u2LocalPort);
+    Send_MakePacket_Queue(objMakePacket);
 }
 
 void CProConnectHandler::Get_Recv_length()
@@ -711,7 +712,6 @@ bool CProConnectHandler::Write_SendData_To_File(bool blDelete, IBuffPacket* pBuf
     obj_File_Message_Param.m_addrRemote        = m_addrRemote;
     obj_File_Message_Param.m_blDelete          = blDelete;
     obj_File_Message_Param.m_pFileTest         = m_pFileTest;
-    obj_File_Message_Param.m_pPacketDebugData  = m_pPacketDebugData;
     obj_File_Message_Param.m_u4ConnectID       = GetConnectID();
     obj_File_Message_Param.m_u4PacketDebugSize = m_u4PacketDebugSize;
 
@@ -816,8 +816,9 @@ bool CProConnectHandler::CheckMessage()
 		objMakePacket.m_AddrRemote      = m_addrRemote;
 		objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
         objMakePacket.m_tvRecv          = m_atvInput;
+        objMakePacket.m_AddrListen      = m_addrListen;
 
-        Send_MakePacket_Queue(objMakePacket, m_szLocalIP, m_u2LocalPort);
+        Send_MakePacket_Queue(objMakePacket);
 
         /*
         //≤‚ ‘¥˙¬Î
@@ -916,6 +917,15 @@ void CProConnectHandler::SetLocalIPInfo(const char* pLocalIP, uint16 u2LocalPort
 {
     sprintf_safe(m_szLocalIP, MAX_BUFF_50, "%s", pLocalIP);
     m_u2LocalPort = u2LocalPort;
+
+    if (ACE_OS::strcmp("INADDR_ANY", pLocalIP) == 0)
+    {
+        m_addrListen.set(u2LocalPort);
+    }
+    else
+    {
+        m_addrListen.set(u2LocalPort, pLocalIP);
+    }
 }
 
 void CProConnectHandler::PutSendPacketError(ACE_Message_Block* pMbData)
@@ -942,8 +952,9 @@ bool CProConnectHandler::SendTimeoutMessage()
 	objMakePacket.m_u1Option        = PACKET_CHEK_TIMEOUT;
 	objMakePacket.m_AddrRemote      = m_addrRemote;
 	objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
+    objMakePacket.m_AddrListen      = m_addrListen;
 
-    Send_MakePacket_Queue(objMakePacket, m_szLocalIP, m_u2LocalPort);
+    Send_MakePacket_Queue(objMakePacket);
 
     return true;
 }

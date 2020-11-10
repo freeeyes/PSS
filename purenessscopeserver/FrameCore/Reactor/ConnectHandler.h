@@ -135,6 +135,7 @@ private:
     char                       m_szLocalIP[MAX_BUFF_50]      = { '\0' };       //本地的IP端口
     char                       m_szConnectName[MAX_BUFF_100] = { '\0' };       //连接名称，可以开放给逻辑插件去设置
     ACE_INET_Addr              m_addrRemote;                                   //远程链接客户端地址
+    ACE_INET_Addr              m_addrLocal;                                    //远程链接客户端地址
     ACE_Time_Value             m_atvConnect;                                   //当前链接建立时间
     ACE_Time_Value             m_atvInput;                                     //最后一次接收数据时间
     ACE_Time_Value             m_atvOutput;                                    //最后一次发送数据时间

@@ -422,8 +422,9 @@ bool CConnectHandler::SendTimeoutMessage() const
 	objMakePacket.m_u1Option        = PACKET_CHEK_TIMEOUT;
 	objMakePacket.m_AddrRemote      = m_addrRemote;
 	objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
+    objMakePacket.m_AddrListen      = m_addrLocal;
 
-    Send_MakePacket_Queue(objMakePacket, m_szLocalIP, m_u2LocalPort);
+    Send_MakePacket_Queue(objMakePacket);
 
     return true;
 }
@@ -505,8 +506,9 @@ bool CConnectHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbDa
 				objMakePacket.m_u1Option        = PACKET_SEND_OK;
 				objMakePacket.m_AddrRemote      = m_addrRemote;
 				objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
+                objMakePacket.m_AddrListen      = m_addrLocal;
 
-                Send_MakePacket_Queue(objMakePacket, m_szLocalIP, m_u2LocalPort);
+                Send_MakePacket_Queue(objMakePacket);
 
                 //还原消息类型
                 pmbSend->msg_type(ACE_Message_Block::MB_DATA);
@@ -639,8 +641,9 @@ void CConnectHandler::Send_Hander_Event(uint8 u1Option)
 	objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
 	objMakePacket.m_pHandler        = this;
     objMakePacket.m_tvRecv          = m_atvInput;
+    objMakePacket.m_AddrListen      = m_addrLocal;
 
-	Send_MakePacket_Queue(objMakePacket, m_szLocalIP, m_u2LocalPort);
+	Send_MakePacket_Queue(objMakePacket);
 }
 
 void CConnectHandler::ConnectOpen()
@@ -833,9 +836,9 @@ bool CConnectHandler::CheckMessage()
 	objMakePacket.m_u1Option        = PACKET_PARSE;
 	objMakePacket.m_AddrRemote      = m_addrRemote;
 	objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
+    objMakePacket.m_AddrListen      = m_addrLocal;
 
-    //OUR_DEBUG((LM_INFO, "[CConnectHandler::CheckMessage]objMakePacket.m_u4ConnectID=%d.\n", objMakePacket.m_u4ConnectID));
-    Send_MakePacket_Queue(objMakePacket, m_szLocalIP, m_u2LocalPort);
+    Send_MakePacket_Queue(objMakePacket);
 
     m_objPacketParse.Clear();
 
@@ -891,7 +894,6 @@ bool CConnectHandler::Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPa
     obj_File_Message_Param.m_addrRemote        = m_addrRemote;
     obj_File_Message_Param.m_blDelete          = blDelete;
     obj_File_Message_Param.m_pFileTest         = m_pFileTest;
-    obj_File_Message_Param.m_pPacketDebugData  = m_pPacketDebugData;
     obj_File_Message_Param.m_u4ConnectID       = GetConnectID();
     obj_File_Message_Param.m_u4PacketDebugSize = m_u4PacketDebugSize;
 
@@ -1031,6 +1033,15 @@ void CConnectHandler::SetLocalIPInfo(const char* pLocalIP, uint16 u2LocalPort)
 {
     sprintf_safe(m_szLocalIP, MAX_BUFF_50, "%s", pLocalIP);
     m_u2LocalPort = u2LocalPort;
+
+    if (ACE_OS::strcmp("INADDR_ANY", pLocalIP) == 0)
+    {
+        m_addrLocal.set(u2LocalPort);
+    }
+    else
+    {
+        m_addrLocal.set(u2LocalPort, pLocalIP);
+    }
 }
 
 //*********************************************************************************

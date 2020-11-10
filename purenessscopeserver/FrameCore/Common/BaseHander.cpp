@@ -11,7 +11,7 @@ void Recovery_Message(bool blDelete, char*& pMessage)
 bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param,
     IBuffPacket* pBuffPacket, 
     const ACE_SOCK_Dgram& skRemote,
-    _Packet_Parse_Info* pPacketParseInfo,
+    const _Packet_Parse_Info* pPacketParseInfo,
     ACE_Message_Block* pBlockMessage)
 {
     if (nullptr == pBuffPacket)
@@ -80,7 +80,7 @@ bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param,
     return true;
 }
 
-bool Udp_Common_Recv_Head(uint32 u4ConnectID, ACE_Message_Block* pMBHead, CPacketParse* pPacketParse, _Packet_Parse_Info* pPacketParseInfo, uint32 u4Len)
+bool Udp_Common_Recv_Head(uint32 u4ConnectID, ACE_Message_Block* pMBHead, CPacketParse* pPacketParse, const _Packet_Parse_Info* pPacketParseInfo, uint32 u4Len)
 {
     _Head_Info obj_Head_Info;
     bool blStateHead = pPacketParseInfo->Parse_Packet_Head_Info(u4ConnectID, pMBHead, App_MessageBlockManager::instance(), &obj_Head_Info, EM_CONNECT_IO_TYPE::CONNECT_IO_UDP);
@@ -106,7 +106,7 @@ bool Udp_Common_Recv_Head(uint32 u4ConnectID, ACE_Message_Block* pMBHead, CPacke
     return true;
 }
 
-bool Udp_Common_Recv_Body(uint32 u4ConnectID, ACE_Message_Block* pMBBody, CPacketParse* pPacketParse, _Packet_Parse_Info* pPacketParseInfo)
+bool Udp_Common_Recv_Body(uint32 u4ConnectID, ACE_Message_Block* pMBBody, CPacketParse* pPacketParse, const _Packet_Parse_Info* pPacketParseInfo)
 {
     _Body_Info obj_Body_Info;
     bool blStateBody = pPacketParseInfo->Parse_Packet_Body_Info(u4ConnectID, pMBBody, App_MessageBlockManager::instance(), &obj_Body_Info, EM_CONNECT_IO_TYPE::CONNECT_IO_UDP);
@@ -124,12 +124,12 @@ bool Udp_Common_Recv_Body(uint32 u4ConnectID, ACE_Message_Block* pMBBody, CPacke
     return true;
 }
 
-bool Udp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPacketParse* pPacketParse, _Packet_Parse_Info* m_pPacketParseInfo)
+bool Udp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPacketParse* pPacketParse, const _Packet_Parse_Info* pPacketParseInfo)
 {
     //以数据流处理
     _Packet_Info obj_Packet_Info;
 
-    if (PACKET_GET_ENOUGH == m_pPacketParseInfo->Parse_Packet_Stream(u4ConnectID, pMbData, App_MessageBlockManager::instance(), &obj_Packet_Info, EM_CONNECT_IO_TYPE::CONNECT_IO_UDP))
+    if (PACKET_GET_ENOUGH == pPacketParseInfo->Parse_Packet_Stream(u4ConnectID, pMbData, App_MessageBlockManager::instance(), &obj_Packet_Info, EM_CONNECT_IO_TYPE::CONNECT_IO_UDP))
     {
         pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
         pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);
@@ -226,21 +226,9 @@ uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPa
     return n1Ret;
 }
 
-void Send_MakePacket_Queue(_MakePacket objMakePacket, const char* pLocalIP, uint16 u2LocalPort)
+void Send_MakePacket_Queue(_MakePacket objMakePacket)
 {
-    //需要回调发送成功回执
-    if (EM_CONNECT_IO_TYPE::CONNECT_IO_TCP == objMakePacket.m_emPacketType || EM_CONNECT_IO_TYPE::CONNECT_IO_UDP == objMakePacket.m_emPacketType)
-    {
-        if (ACE_OS::strcmp("INADDR_ANY", pLocalIP) == 0)
-        {
-            objMakePacket.m_AddrListen.set(u2LocalPort);
-        }
-        else
-        {
-            objMakePacket.m_AddrListen.set(u2LocalPort, pLocalIP);
-        }
-    }
-
+    //放入消息队列
     if (false == App_MakePacket::instance()->PutMessageBlock(objMakePacket, objMakePacket.m_tvRecv))
     {
         OUR_DEBUG((LM_ERROR, "[Send_MakePacket_Queue] ConnectID = %d, PACKET_CONNECT is error.\n", objMakePacket.m_u4ConnectID));
@@ -249,7 +237,9 @@ void Send_MakePacket_Queue(_MakePacket objMakePacket, const char* pLocalIP, uint
 
 bool Tcp_Common_File_Message(_File_Message_Param const& obj_File_Message_Param, IBuffPacket*& pBuffPacket, const char* pConnectName)
 {
-    char szLog[10] = { '\0' };
+    string strHexChar;     //单个十六进制的字符
+    string strHexData;     //十六进制的字符串
+
     uint32 u4DebugSize = 0;
     bool blblMore = false;
 
@@ -267,19 +257,19 @@ bool Tcp_Common_File_Message(_File_Message_Param const& obj_File_Message_Param, 
 
     for (uint32 i = 0; i < u4DebugSize; i++)
     {
-        sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
-        sprintf_safe(obj_File_Message_Param.m_pPacketDebugData + 5 * i, MAX_BUFF_1024 - 5 * i, "0x%02X ", (unsigned char)pData[i]);
-    }
+        std::stringstream ss_format;
 
-    obj_File_Message_Param.m_pPacketDebugData[5 * u4DebugSize] = '\0';
+        ss_format << "0x" << std::uppercase << std::setfill('0') << std::setw(2) << std::hex << (int)pData[i] << " ";
+        strHexData += ss_format.str();
+    }
 
     if (blblMore == true)
     {
-        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_DEBUG_CLIENTSEND, "[(%s)%s:%d]%s.(数据包过长)", pConnectName, obj_File_Message_Param.m_addrRemote.get_host_addr(), obj_File_Message_Param.m_addrRemote.get_port_number(), obj_File_Message_Param.m_pPacketDebugData);
+        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_DEBUG_CLIENTSEND, "[(%s)%s:%d]%s.(数据包过长)", pConnectName, obj_File_Message_Param.m_addrRemote.get_host_addr(), obj_File_Message_Param.m_addrRemote.get_port_number(), strHexData.c_str());
     }
     else
     {
-        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_DEBUG_CLIENTSEND, "[(%s)%s:%d]%s.", pConnectName, obj_File_Message_Param.m_addrRemote.get_host_addr(), obj_File_Message_Param.m_addrRemote.get_port_number(), obj_File_Message_Param.m_pPacketDebugData);
+        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_DEBUG_CLIENTSEND, "[(%s)%s:%d]%s.", pConnectName, obj_File_Message_Param.m_addrRemote.get_host_addr(), obj_File_Message_Param.m_addrRemote.get_port_number(), strHexData.c_str());
     }
 
     //回调测试文件管理接口
@@ -298,11 +288,11 @@ _ClientConnectInfo Tcp_Common_ClientInfo(_ClientConnectInfo_Param const& obj_Cli
 {
     _ClientConnectInfo ClientConnectInfo;
 
-    ClientConnectInfo.m_blValid = true;
-    ClientConnectInfo.m_u4ConnectID = obj_ClientConnectInfo_Param.m_u4ConnectID;
-    ClientConnectInfo.m_addrRemote = obj_ClientConnectInfo_Param.m_addrRemote;
-    ClientConnectInfo.m_u4RecvCount = obj_ClientConnectInfo_Param.m_u4AllRecvCount;
-    ClientConnectInfo.m_u4SendCount = obj_ClientConnectInfo_Param.m_u4AllSendCount;
+    ClientConnectInfo.m_blValid       = true;
+    ClientConnectInfo.m_u4ConnectID   = obj_ClientConnectInfo_Param.m_u4ConnectID;
+    ClientConnectInfo.m_addrRemote    = obj_ClientConnectInfo_Param.m_addrRemote;
+    ClientConnectInfo.m_u4RecvCount   = obj_ClientConnectInfo_Param.m_u4AllRecvCount;
+    ClientConnectInfo.m_u4SendCount   = obj_ClientConnectInfo_Param.m_u4AllSendCount;
     ClientConnectInfo.m_u4AllRecvSize = obj_ClientConnectInfo_Param.m_u4AllRecvSize;
     ClientConnectInfo.m_u4AllSendSize = obj_ClientConnectInfo_Param.m_u4AllSendSize;
     ClientConnectInfo.m_u4BeginTime = (uint32)obj_ClientConnectInfo_Param.m_atvConnect.sec();
@@ -545,8 +535,6 @@ bool Tcp_Common_Manager_Post_Message(_Post_Message_Param obj_Post_Message_Param,
             objSendMessagePool.Delete(pSendMessage);
             return false;
         }
-
-        //ACE_Time_Value xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, obj_Post_Message_Param.m_u4SendQueuePutTime);
 
         if (pTask->putq(mb, NULL) == -1)
         {

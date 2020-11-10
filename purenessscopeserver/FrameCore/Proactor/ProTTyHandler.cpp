@@ -264,7 +264,7 @@ void CProTTyHandler::handle_read_file(const ACE_Asynch_Read_File::Result& result
 					objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
 					objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_TTY;
 
-					Send_MakePacket_Queue(objMakePacket, "TTy", 0);
+					Send_MakePacket_Queue(objMakePacket);
 
                     //清理用完的m_pPacketParse
                     App_PacketParsePool::instance()->Delete(pPacketParse);
@@ -344,5 +344,5 @@ void CProTTyHandler::Send_Hander_Event(uint8 u1Option)
     objMakePacket.m_pHandler        = this;
     objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_TTY;
 
-    Send_MakePacket_Queue(objMakePacket, "tty", 0);
+    Send_MakePacket_Queue(objMakePacket);
 }

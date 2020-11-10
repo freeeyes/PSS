@@ -126,6 +126,7 @@ private:
     bool               m_blIsLog;                      //是否写入日志，false为不写入，true为写入
 
     ACE_INET_Addr      m_addrRemote;                   //远程链接客户端地址
+    ACE_INET_Addr      m_addrListen;                   //本地监听地址
     ACE_Time_Value     m_atvConnect;                   //当前链接建立时间
     ACE_Time_Value     m_atvInput;                     //最后一次接收数据时间
     ACE_Time_Value     m_atvOutput;                    //最后一次发送数据时间

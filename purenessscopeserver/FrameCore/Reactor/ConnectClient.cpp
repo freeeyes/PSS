@@ -48,7 +48,7 @@ void CConnectClient::Close()
 			objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
             objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
 
-            Send_MakePacket_Queue(objMakePacket, "127.0.0.1", 0);
+            Send_MakePacket_Queue(objMakePacket);
         }
 
         //转发接口关闭
@@ -183,7 +183,7 @@ int CConnectClient::open(void* p)
 		objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
 		objMakePacket.m_emPacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
 
-        Send_MakePacket_Queue(objMakePacket, "127.0.0.1", 0);
+        Send_MakePacket_Queue(objMakePacket);
     }
 
     m_strDeviceName = App_ForwardManager::instance()->ConnectRegedit(m_addrRemote.get_host_addr(),
@@ -341,7 +341,7 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
 				objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
 				objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
 
-                Send_MakePacket_Queue(objMakePacket, "127.0.0.1", 0);
+                Send_MakePacket_Queue(objMakePacket);
 
                 //清理用完的m_pPacketParse
                 App_PacketParsePool::instance()->Delete(pPacketParse);

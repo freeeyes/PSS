@@ -64,7 +64,7 @@ bool Console_Common_CheckMessage_Data(uint32& u4AllRecvSize, uint32& u4AllRecvCo
 bool check_console_ip(const char* pConsoleIP)
 {
     //如果是0个设置，就是允许所有的Ip连接访问
-    if (nullptr == GetXmlConfigAttribute(xmlConsoleClients) || 0 == GetXmlConfigAttribute(xmlConsoleClients)->vec.size())
+    if (nullptr == GetXmlConfigAttribute(xmlConsoleClients) || true == GetXmlConfigAttribute(xmlConsoleClients)->vec.empty())
     {
         return true;
     }

@@ -335,8 +335,9 @@ void CProactorUDPHandler::Send_Hander_Event(uint32 u4ConnandID, uint8 u1Option, 
 	objMakePacket.m_pHandler        = this;
 	objMakePacket.m_tvRecv          = m_atvInput;
     objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_UDP;
+    objMakePacket.m_AddrListen      = m_addrLocal;
 
-	Send_MakePacket_Queue(objMakePacket, m_addrLocal.get_host_addr(), m_addrLocal.get_port_number());
+	Send_MakePacket_Queue(objMakePacket);
 }
 
 void CProactorUDPHandler::GetCommandData(uint16 u2CommandID, _CommandData& objCommandData)

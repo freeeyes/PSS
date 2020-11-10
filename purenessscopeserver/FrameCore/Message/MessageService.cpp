@@ -63,7 +63,7 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
     m_DeviceHandlerPool.Init(u2PoolSize, CDeviceHandlerPool::Init_Callback);
 
     //初始化发送缓冲
-    m_objBuffSendPacket.Init(DEFINE_PACKET_SIZE, GetXmlConfigAttribute(xmlSendInfo)->MaxBlockSize);
+    m_objBuffSendPacket.Init(DEFINE_PACKET_SIZE, GetXmlConfigAttribute(xmlMessage)->Msg_Buff_Max_Size);
     m_objBuffSendPacket.SetNetSort(GetXmlConfigAttribute(xmlNetWorkMode)->NetByteOrder);
 
     //设置最大的等待时间(单位是毫秒)
@@ -916,6 +916,8 @@ bool CMessageService::Dispose_Queue()
     else
     {
         CWorkThreadMessage* msg = *((CWorkThreadMessage**)mb->base());
+
+        m_objBuffSendPacket.GetHeadLen();
 
         if (EM_WORKTHREAD_DIRECT::EM_WORKTHREAD_DIRECT_INPUT == msg->m_emDirect)
         {
