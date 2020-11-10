@@ -84,7 +84,7 @@ bool CBuffPacket::AddBuff(uint32 u4Size)
     {
         char* szNewData = NULL;
 
-        if(u4Size + m_u4PacketLen >= m_u4MaxPacketSize)
+        if(u4Size + m_u4WritePtr >= m_u4MaxPacketSize)
         {
             OUR_DEBUG((LM_ERROR, "[CBuffPacket::AddBuff] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", u4Size, m_u4PacketLen));
 

@@ -550,7 +550,7 @@ bool CMessageService::DoMessage(IMessage* pMessage, uint16& u2CommandID, uint16&
 				pMessage->GetMessageBase()->m_u4BodySrcSize);
 		}
 
-        OUR_DEBUG((LM_ERROR, "[CMessageService::DoMessage] pClientCommandList no find.\n"));
+        OUR_DEBUG((LM_ERROR, "[CMessageService::DoMessage] pClientCommandList no find(%d).\n", u2CommandID));
         return false;
     }
 

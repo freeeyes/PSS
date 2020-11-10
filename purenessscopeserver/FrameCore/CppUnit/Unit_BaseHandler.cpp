@@ -38,7 +38,6 @@ void CUnit_Basehandler::Test_Tcp_Common_File_Message(void)
     obj_File_Message_Param.m_addrRemote        = addrRemote;
     obj_File_Message_Param.m_blDelete          = false;
     obj_File_Message_Param.m_pFileTest         = nullptr;
-    obj_File_Message_Param.m_pPacketDebugData  = (char* )szPacketDebugData;
     obj_File_Message_Param.m_u4ConnectID       = 1;
     obj_File_Message_Param.m_u4PacketDebugSize = u4PacketDebugSize;
 
