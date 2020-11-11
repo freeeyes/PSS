@@ -2,6 +2,8 @@
 #define _LINUXCPU_H
 
 #include "define.h"
+#include <string>
+#include <sstream>
 
 const char szVmRSS[] = "VmRSS:";
 const char szVmSize[] = "VmSize:";

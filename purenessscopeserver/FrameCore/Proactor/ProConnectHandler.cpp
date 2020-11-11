@@ -93,7 +93,9 @@ void CProConnectHandler::Close(uint32 u4ConnectID)
     //清理转发接口
     if ("" != m_strDeviceName)
     {
-        App_ForwardManager::instance()->DisConnectRegedit(m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), ENUM_FORWARD_TCP_CLINET);
+        App_ForwardManager::instance()->DisConnectRegedit(m_addrRemote.get_host_addr(), 
+            m_addrRemote.get_port_number(), 
+            ENUM_FORWARD_TYPE::ENUM_FORWARD_TCP_CLINET);
         m_strDeviceName = "";
     }
 
@@ -210,9 +212,9 @@ void CProConnectHandler::open(ACE_HANDLE h, ACE_Message_Block&)
 
     //查看是否存在转发服务
     m_strDeviceName = App_ForwardManager::instance()->ConnectRegedit(m_addrRemote.get_host_addr(),
-                      m_addrRemote.get_port_number(),
-                      ENUM_FORWARD_TCP_CLINET,
-                      dynamic_cast<IDeviceHandler*>(this));
+        m_addrRemote.get_port_number(),
+        ENUM_FORWARD_TYPE::ENUM_FORWARD_TCP_CLINET,
+        dynamic_cast<IDeviceHandler*>(this));
 
     //获得接收缓冲区大小
     Get_Recv_length();

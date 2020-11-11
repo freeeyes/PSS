@@ -91,7 +91,7 @@ void CUnit_MessageDefine::Test_GetTrackIP(void)
 
     CPPUNIT_ASSERT_MESSAGE("[Test_GetTrackIP]GetTrackIP is fail.", true == blRet);
 
-    if (ACE_OS::strcmp(objForbiddenIP.m_szClientIP, "127.0.0.1") == 0)
+    if (objForbiddenIP.m_strClientIP == "127.0.0.1")
     {
         blRet = true;
     }

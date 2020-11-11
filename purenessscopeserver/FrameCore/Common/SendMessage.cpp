@@ -19,9 +19,11 @@ void CSendMessagePool::Init(int32 nObjcetCount)
         if(NULL != pMessage)
         {
             //添加到hash数组里面
-            char szMessageID[10] = {'\0'};
-            sprintf_safe(szMessageID, 10, "%d", i);
-            int32 nHashPos = m_objHashHandleList.Add_Hash_Data(szMessageID, pMessage);
+            std::stringstream ss_format;
+            ss_format << i;
+            string strHashID = ss_format.str();
+
+            int32 nHashPos = m_objHashHandleList.Add_Hash_Data(strHashID.c_str(), pMessage);
 
             if(-1 != nHashPos)
             {
@@ -66,14 +68,16 @@ bool CSendMessagePool::Delete(_SendMessage* pObject)
         return false;
     }
 
-    char szHashID[10] = {'\0'};
-    sprintf_safe(szHashID, 10, "%d", pObject->GetHashID());
+    std::stringstream ss_format;
+    ss_format << pObject->GetHashID();
+    string strHashID = ss_format.str();
+
     pObject->Clear();
-    bool blState = m_objHashHandleList.Push(szHashID, pObject);
+    bool blState = m_objHashHandleList.Push(strHashID.c_str(), pObject);
 
     if(false == blState)
     {
-        OUR_DEBUG((LM_INFO, "[CSendMessagePool::Delete]HashID=%s(0x%08x).\n", szHashID, pObject));
+        OUR_DEBUG((LM_INFO, "[CSendMessagePool::Delete]HashID=%s(0x%08x).\n", strHashID.c_str(), pObject));
     }
 
     return true;

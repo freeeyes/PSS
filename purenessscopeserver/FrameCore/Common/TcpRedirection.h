@@ -14,10 +14,12 @@
 #include "IConnectManager.h"
 #include "IDeviceHandler.h"
 #include <unordered_map>
+#include <string>
+#include <sstream>
 
 static const char FORWARD_XML[] = "forward.xml";
 
-enum ENUM_FORWARD_TYPE
+enum class ENUM_FORWARD_TYPE
 {
     ENUM_FORWARD_TCP_UNKNOW = 0,    //初始化状态
     ENUM_FORWARD_TCP_CLINET,        //客户端接入
@@ -44,7 +46,7 @@ public:
     string            m_strSource;
     string            m_strTarget;
     uint32            m_u4ConnectID    = 0;
-    ENUM_FORWARD_TYPE m_emForwardType  = ENUM_FORWARD_TCP_UNKNOW;
+    ENUM_FORWARD_TYPE m_emForwardType  = ENUM_FORWARD_TYPE::ENUM_FORWARD_TCP_UNKNOW;
     uint8             m_u1ConnectState = 0;  //0是关闭，1是打开
     IDeviceHandler*   m_pDeviceHandler = NULL;  //驱动指针
 };

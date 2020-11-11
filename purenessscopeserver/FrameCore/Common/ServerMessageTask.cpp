@@ -18,9 +18,11 @@ void CServerMessageInfoPool::Init(uint32 u4PacketCount /*= MAX_SERVER_MESSAGE_IN
         if(NULL != pPacket)
         {
             //添加到Hash数组里面
-            char szMessageID[10] = {'\0'};
-            sprintf_safe(szMessageID, 10, "%d", i);
-            int nHashPos = m_objServerMessageList.Add_Hash_Data(szMessageID, pPacket);
+            std::stringstream ss_format;
+            ss_format << i;
+            string strHashID = ss_format.str();
+
+            int nHashPos = m_objServerMessageList.Add_Hash_Data(strHashID.c_str(), pPacket);
 
             if(-1 != nHashPos)
             {
@@ -64,13 +66,15 @@ bool CServerMessageInfoPool::Delete(_Server_Message_Info* pObject)
         return false;
     }
 
-    char szHashID[10] = {'\0'};
-    sprintf_safe(szHashID, 10, "%d", pObject->GetHashID());
-    bool blState = m_objServerMessageList.Push(szHashID, pObject);
+    std::stringstream ss_format;
+    ss_format << pObject->GetHashID();
+    string strHashID = ss_format.str();
+
+    bool blState = m_objServerMessageList.Push(strHashID.c_str(), pObject);
 
     if(false == blState)
     {
-        OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Delete]szHandlerID=%s(0x%08x).\n", szHashID, pObject));
+        OUR_DEBUG((LM_INFO, "[CServerMessageInfoPool::Delete]szHandlerID=%s(0x%08x).\n", strHashID.c_str(), pObject));
     }
 
     return true;
@@ -251,11 +255,11 @@ bool CServerMessageTask::PutMessage(_Server_Message_Info* pMessage)
     if(NULL != mb)
     {
         //判断队列是否是已经最大
-        int nQueueCount = (int)msg_queue()->message_count();
+        auto u4QueueCount = (uint32)msg_queue()->message_count();
 
-        if(nQueueCount >= (int)m_u4MaxQueue)
+        if(u4QueueCount >= m_u4MaxQueue)
         {
-            OUR_DEBUG((LM_ERROR,"[CServerMessageTask::PutMessage] Queue is Full nQueueCount = [%d].\n", nQueueCount));
+            OUR_DEBUG((LM_ERROR,"[CServerMessageTask::PutMessage] Queue is Full nQueueCount = [%d].\n", u4QueueCount));
             return false;
         }
 
@@ -263,7 +267,7 @@ bool CServerMessageTask::PutMessage(_Server_Message_Info* pMessage)
 
         if(this->putq(mb, &xtime) == -1)
         {
-            OUR_DEBUG((LM_ERROR,"[CServerMessageTask::PutMessage] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
+            OUR_DEBUG((LM_ERROR,"[CServerMessageTask::PutMessage] Queue putq  error nQueueCount = [%d] errno = [%d].\n", u4QueueCount, errno));
             return false;
         }
     }
@@ -291,11 +295,11 @@ bool CServerMessageTask::PutMessage_Add_Client(IClientMessage* pClientMessage)
     pmb->msg_type(ADD_SERVER_CLIENT);
 
     //判断队列是否是已经最大
-    int nQueueCount = (int)msg_queue()->message_count();
+    auto u4QueueCount = (uint32)msg_queue()->message_count();
 
-    if (nQueueCount >= (int)m_u4MaxQueue)
+    if (u4QueueCount >= m_u4MaxQueue)
     {
-        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::PutMessage_Add_Client] Queue is Full nQueueCount = [%d].\n", nQueueCount));
+        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::PutMessage_Add_Client] Queue is Full nQueueCount = [%d].\n", u4QueueCount));
         return false;
     }
 
@@ -303,7 +307,7 @@ bool CServerMessageTask::PutMessage_Add_Client(IClientMessage* pClientMessage)
 
     if (this->putq(pmb, &xtime) == -1)
     {
-        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::PutMessage_Add_Client] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
+        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::PutMessage_Add_Client] Queue putq  error nQueueCount = [%d] errno = [%d].\n", u4QueueCount, errno));
         return false;
     }
 
@@ -325,11 +329,11 @@ bool CServerMessageTask::PutMessage_Del_Client(IClientMessage* pClientMessage)
     pmb->msg_type(DEL_SERVER_CLIENT);
 
     //判断队列是否是已经最大
-    int nQueueCount = (int)msg_queue()->message_count();
+    auto u4QueueCount = (uint32)msg_queue()->message_count();
 
-    if (nQueueCount >= (int)m_u4MaxQueue)
+    if (u4QueueCount >= m_u4MaxQueue)
     {
-        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::PutMessage_Del_Client] Queue is Full nQueueCount = [%d].\n", nQueueCount));
+        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::PutMessage_Del_Client] Queue is Full nQueueCount = [%d].\n", u4QueueCount));
         return false;
     }
 
@@ -337,7 +341,7 @@ bool CServerMessageTask::PutMessage_Del_Client(IClientMessage* pClientMessage)
 
     if (this->putq(pmb, &xtime) == -1)
     {
-        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::PutMessage_Del_Client] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
+        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::PutMessage_Del_Client] Queue putq  error nQueueCount = [%d] errno = [%d].\n", u4QueueCount, errno));
         return false;
     }
 
@@ -386,11 +390,9 @@ bool CServerMessageTask::CheckServerMessageThread(ACE_Time_Value const& tvNow) c
 
 bool CServerMessageTask::CheckValidClientMessage(const IClientMessage* pClientMessage)
 {
-    uint32 u4Size = (uint32)m_vecValidIClientMessage.size();
-
-    for(uint32 i = 0; i < u4Size; i++)
+    for(IClientMessage* pVecClientMessage : m_vecValidIClientMessage)
     {
-        if(m_vecValidIClientMessage[i] == pClientMessage)
+        if(pVecClientMessage == pClientMessage)
         {
             return true;
         }

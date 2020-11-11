@@ -58,11 +58,11 @@ int CForwardManager::Init()
     }
 
     //–¥»Î¿‡–Õ
-    int nSize = (int)m_vecForwardInfo.size();
+    auto nSize = (int)m_vecForwardInfo.size();
 
     for (int i = 0; i < nSize; i++)
     {
-        CForwardConnectInfo* pForwardConnectInfo = new CForwardConnectInfo();
+        auto pForwardConnectInfo = new CForwardConnectInfo();
         pForwardConnectInfo->m_strSource = m_vecForwardInfo[i].m_strSource;
         pForwardConnectInfo->m_strTarget = m_vecForwardInfo[i].m_strTarget;
 
@@ -95,11 +95,11 @@ string CForwardManager::ConnectRegedit(const char* pIP, int nPort, ENUM_FORWARD_
         return "";
     }
 
-    char szSource[MAX_BUFF_100] = { '\0' };
+    std::stringstream ss_format;
+    ss_format << pIP << ":" << nPort;
+    string strSource = ss_format.str();
 
-    sprintf_safe(szSource, MAX_BUFF_100, "%s:%d", pIP, nPort);
-
-    return Check_Connect_IP(szSource, em_type, 1, pDeviceHandler);
+    return Check_Connect_IP(strSource.c_str(), em_type, 1, pDeviceHandler);
 }
 
 string CForwardManager::ConnectRegedit(const char* pName, ENUM_FORWARD_TYPE em_type, IDeviceHandler* pDeviceHandler)
@@ -119,11 +119,11 @@ void CForwardManager::DisConnectRegedit(const char* pIP, int nPort, ENUM_FORWARD
         return;
     }
 
-    char szSource[MAX_BUFF_100] = { '\0' };
+    std::stringstream ss_format;
+    ss_format << pIP << ":" << nPort;
+    string strSource = ss_format.str();
 
-    sprintf_safe(szSource, MAX_BUFF_100, "%s:%d", pIP, nPort);
-
-    Check_Connect_IP(szSource, em_type, 0);
+    Check_Connect_IP(strSource.c_str(), em_type, 0);
 }
 
 void CForwardManager::DisConnectRegedit(const char* pName, ENUM_FORWARD_TYPE em_type)
@@ -167,7 +167,7 @@ void CForwardManager::AddForward(string strSource, string strTarget)
 
     m_vecForwardInfo.push_back(objForwardInfo);
 
-    CForwardConnectInfo* pForwardConnectInfo = new CForwardConnectInfo();
+    auto pForwardConnectInfo = new CForwardConnectInfo();
     pForwardConnectInfo->m_strSource = objForwardInfo.m_strSource;
     pForwardConnectInfo->m_strTarget = objForwardInfo.m_strTarget;
 

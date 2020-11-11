@@ -89,8 +89,8 @@ void Combo_Common_VecForbiddenIP(uint8 u1OutputType, const VecForbiddenIP* pIPLi
         if (u1OutputType == 0)
         {
             VCHARS_STR strSName;
-            strSName.text = forbidenip.m_szClientIP;
-            strSName.u1Len = (uint8)ACE_OS::strlen(forbidenip.m_szClientIP);
+            strSName.text = (char* )forbidenip.m_strClientIP.c_str();
+            strSName.u1Len = (uint8)forbidenip.m_strClientIP.length();
 
             (*pBuffPacket) << strSName;
             (*pBuffPacket) << forbidenip.m_u1Type;
@@ -100,7 +100,7 @@ void Combo_Common_VecForbiddenIP(uint8 u1OutputType, const VecForbiddenIP* pIPLi
         else
         {
             char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden(%s)\n", forbidenip.m_szClientIP);
+            sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden(%s)\n", forbidenip.m_strClientIP.c_str());
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
             sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden Type(%d)\n", forbidenip.m_u1Type);
             pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
@@ -507,12 +507,12 @@ void DoMessage_ForbiddenIP(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
         if (ForbiddenIP.m_u1Type == 0)
         {
             //ÓÀ¾Ã·â½ûIP
-            App_ForbiddenIP::instance()->AddForeverIP(ForbiddenIP.m_szClientIP);
+            App_ForbiddenIP::instance()->AddForeverIP(ForbiddenIP.m_strClientIP.c_str());
         }
         else
         {
             //·â½ûÊ±¶ÎIP
-            App_ForbiddenIP::instance()->AddTempIP(ForbiddenIP.m_szClientIP, ForbiddenIP.m_u4Second);
+            App_ForbiddenIP::instance()->AddTempIP(ForbiddenIP.m_strClientIP.c_str(), ForbiddenIP.m_u4Second);
         }
 
         Combo_Common_Return_Data(CommandInfo.m_u1OutputType, 0, "IP Forbidden is OK.\n", pBuffPacket);

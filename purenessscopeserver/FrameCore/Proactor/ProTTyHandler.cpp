@@ -69,7 +69,7 @@ void CProTTyHandler::Close(uint32 u4ConnectID)
         }
 
         //关闭转发接口
-        App_ForwardManager::instance()->DisConnectRegedit(m_szName, ENUM_FORWARD_TCP_TTY);
+        App_ForwardManager::instance()->DisConnectRegedit(m_szName, ENUM_FORWARD_TYPE::ENUM_FORWARD_TCP_TTY);
         m_strDeviceName = "";
 
         m_Ttyio.close();
@@ -152,8 +152,8 @@ bool CProTTyHandler::Init(uint32 u4ConnectID, const char* pName, ACE_TTY_IO::Ser
 
         //查看是否存在转发接口
         m_strDeviceName = App_ForwardManager::instance()->ConnectRegedit(pName,
-                          ENUM_FORWARD_TCP_TTY,
-                          dynamic_cast<IDeviceHandler*>(this));
+            ENUM_FORWARD_TYPE::ENUM_FORWARD_TCP_TTY,
+            dynamic_cast<IDeviceHandler*>(this));
 
         //准备接受数据
         Ready_To_Read_Buff();

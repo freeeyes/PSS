@@ -3,13 +3,14 @@
 int32 GetProcessCPU_Idel_Linux()
 {
     int32 nRet = 0;
-    ACE_TString strcmd ="ps -aux | grep ";
-    char szbuffid[MAX_BUFF_20];
+    string strcmd ="ps -aux | grep ";
     ACE_TString strpid;
-    sprintf_safe(szbuffid, MAX_BUFF_20, "%d", ACE_OS::getpid());
-    strpid = szbuffid;
-    strcmd += strpid;
-    ACE_TString strCPU = strcmd;
+
+    std::stringstream ss_format;
+    ss_format << ACE_OS::getpid();
+    strcmd += ss_format.str();
+
+    string strCPU = strcmd;
     strCPU +="  |awk '{print $2,$3}' >> aasnowy.txt";
     nRet = system(strCPU.c_str());   //获取CPU命令
 
@@ -27,7 +28,7 @@ int32 GetProcessCPU_Idel_Linux()
         return -1;
     }
 
-    const char* pReturn = fgets(szbuffer,sizeof(szbuffer),fd);
+    const char* pReturn = ACE_OS::fgets(szbuffer,sizeof(szbuffer),fd);
 
     if (NULL == pReturn)
     {
@@ -37,7 +38,7 @@ int32 GetProcessCPU_Idel_Linux()
 
     //切分出CPU数据
     bool blFlag = false;
-    int32 nLen = (int32)ACE_OS::strlen(szbuffer);
+    auto nLen = (int32)ACE_OS::strlen(szbuffer);
     int32 i = 0;
 
     for(i = 0; i < nLen; i++)

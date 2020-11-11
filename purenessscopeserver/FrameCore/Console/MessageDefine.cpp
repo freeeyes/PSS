@@ -80,7 +80,7 @@ bool GetForbiddenIP(const char* pCommand, _ForbiddenIP& ForbiddenIP)
 
     //获得IP地址
     GetCommandParam(pCommand, "-c ", szTempData, MAX_BUFF_100);
-    sprintf_safe(ForbiddenIP.m_szClientIP, MAX_IP_SIZE, szTempData);
+    ForbiddenIP.m_strClientIP = szTempData;
 
     //获得IP类型，UDP or TCP
     GetCommandParam(pCommand, "-t ", szTempData, MAX_BUFF_100);
@@ -99,7 +99,7 @@ bool GetTrackIP(const char* pCommand, _ForbiddenIP& ForbiddenIP)
 
     //获得IP地址
     GetCommandParam(pCommand, "-c ", szTempData, MAX_BUFF_100);
-    sprintf_safe(ForbiddenIP.m_szClientIP, MAX_IP_SIZE, szTempData);
+    ForbiddenIP.m_strClientIP = szTempData;
 
     return true;
 }

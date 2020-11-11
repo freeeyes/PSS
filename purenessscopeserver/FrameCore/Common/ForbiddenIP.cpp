@@ -33,7 +33,7 @@ bool CForbiddenIP::Init(const char* szConfigPath)
             break;
         }
 
-        sprintf_safe(ForbiddenIP.m_szClientIP, MAX_BUFF_20, "%s", pIpData);
+        ForbiddenIP.m_strClientIP = pIpData;
 
         if (ACE_OS::strcmp(pTypeData, "TCP") == 0)
         {
@@ -55,7 +55,7 @@ bool CForbiddenIP::CheckIP(const char* pIP, EM_CONNECT_IO_TYPE u1ConnectType)
     for(const _ForbiddenIP& objForbiddenIP : m_VecForeverForbiddenIP)
     {
         if(objForbiddenIP.m_u1ConnectType == u1ConnectType
-           && CompareIP(objForbiddenIP.m_szClientIP, pIP) == true)
+           && CompareIP(objForbiddenIP.m_strClientIP.c_str(), pIP) == true)
         {
             return false;
         }
@@ -63,7 +63,7 @@ bool CForbiddenIP::CheckIP(const char* pIP, EM_CONNECT_IO_TYPE u1ConnectType)
 
     for(VecForbiddenIP::iterator b = m_VecTempForbiddenIP.begin(); b != m_VecTempForbiddenIP.end(); ++b)
     {
-        if((*b).m_u1ConnectType == u1ConnectType && CompareIP((*b).m_szClientIP, pIP) == true)
+        if((*b).m_u1ConnectType == u1ConnectType && CompareIP((*b).m_strClientIP.c_str(), pIP) == true)
         {
             //如果是禁止时间段内，则返回false，否则删除定时信息。
             if ((*b).m_tvBegin + ACE_Time_Value((*b).m_u4Second, 0) > ACE_OS::gettimeofday())
@@ -84,7 +84,7 @@ bool CForbiddenIP::CheckIP(const char* pIP, EM_CONNECT_IO_TYPE u1ConnectType)
 bool CForbiddenIP::AddForeverIP(const char* pIP, EM_CONNECT_IO_TYPE u1ConnectType)
 {
     _ForbiddenIP ForbiddenIP;
-    sprintf_safe(ForbiddenIP.m_szClientIP, MAX_IP_SIZE, "%s", pIP);
+    ForbiddenIP.m_strClientIP   = pIP;
     ForbiddenIP.m_u1ConnectType = u1ConnectType;
     m_VecForeverForbiddenIP.push_back(ForbiddenIP);
 
@@ -99,7 +99,7 @@ bool CForbiddenIP::AddForeverIP(const char* pIP, EM_CONNECT_IO_TYPE u1ConnectTyp
 bool CForbiddenIP::AddTempIP(const char* pIP, uint32 u4Second, EM_CONNECT_IO_TYPE u1ConnectType)
 {
     _ForbiddenIP ForbiddenIP;
-    sprintf_safe(ForbiddenIP.m_szClientIP, MAX_IP_SIZE, "%s", pIP);
+    ForbiddenIP.m_strClientIP   = pIP;
     ForbiddenIP.m_u1Type        = 1;
     ForbiddenIP.m_tvBegin       = ACE_OS::gettimeofday();
     ForbiddenIP.m_u4Second      = u4Second;
@@ -113,7 +113,7 @@ bool CForbiddenIP::DelForeverIP(const char* pIP, EM_CONNECT_IO_TYPE u1ConnectTyp
 {
     for(VecForbiddenIP::iterator b = m_VecForeverForbiddenIP.begin(); b != m_VecForeverForbiddenIP.end(); ++b)
     {
-        if(ACE_OS::strcmp(pIP, (*b).m_szClientIP) == 0 && (*b).m_u1ConnectType == u1ConnectType)
+        if(ACE_OS::strcmp(pIP, (*b).m_strClientIP.c_str()) == 0 && (*b).m_u1ConnectType == u1ConnectType)
         {
             m_VecForeverForbiddenIP.erase(b);
 
@@ -133,7 +133,7 @@ bool CForbiddenIP::DelTempIP(const char* pIP, EM_CONNECT_IO_TYPE u1ConnectType)
 {
     for(VecForbiddenIP::iterator b = m_VecTempForbiddenIP.begin(); b !=  m_VecTempForbiddenIP.end(); ++b)
     {
-        if(ACE_OS::strcmp(pIP, (*b).m_szClientIP) == 0 && (*b).m_u1ConnectType == u1ConnectType)
+        if(ACE_OS::strcmp(pIP, (*b).m_strClientIP.c_str()) == 0 && (*b).m_u1ConnectType == u1ConnectType)
         {
             m_VecTempForbiddenIP.erase(b);
             return true;
@@ -172,14 +172,14 @@ bool CForbiddenIP::SaveConfig()
         if(objForbiddenIP.m_u1ConnectType == EM_CONNECT_IO_TYPE::CONNECT_IO_TCP)
         {
             ss_format << "<ForbiddenIP ip=\"" 
-                << objForbiddenIP.m_szClientIP 
+                << objForbiddenIP.m_strClientIP 
                 << "\" type=\"TCP\" desc=\"ForbiddenIP，type is 'TCP' or 'UDP'\" />\r\n";
             strTemp = ss_format.str();
         }
         else
         {
             ss_format << "<ForbiddenIP ip=\"" 
-                << objForbiddenIP.m_szClientIP 
+                << objForbiddenIP.m_strClientIP
                 << "\" type=\"UDP\" desc=\"ForbiddenIP，type is 'TCP' or 'UDP'\" />\r\n";
             strTemp = ss_format.str();
         }

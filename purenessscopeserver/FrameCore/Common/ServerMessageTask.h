@@ -12,6 +12,8 @@
 #include "HashTable.h"
 #include "ObjectArrayList.h"
 #include "BaseTask.h"
+#include <string>
+#include <sstream>
 
 //处理服务器间接收数据包过程代码
 //如果服务器间线程处理挂起了，会尝试重启服务
@@ -40,7 +42,7 @@ public:
         //指针关系也可以在这里直接指定，不必使用的使用再指定
         m_pmbQueuePtr = new ACE_Message_Block(sizeof(_Server_Message_Info*));
 
-        _Server_Message_Info** ppMessage = (_Server_Message_Info**)m_pmbQueuePtr->base();
+        auto ppMessage = (_Server_Message_Info**)m_pmbQueuePtr->base();
         *ppMessage = this;
     }
 

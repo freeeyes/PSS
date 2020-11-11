@@ -118,7 +118,7 @@ protected:
     virtual bool Init(CXmlOpeation* pXmlOperation) = 0;
 private:
     std::string m_name;
-    static IConfigOpeation* _array[static_cast<int>(XmlEnd::XML_Config_MAX)];
+    static IConfigOpeation* _array[XmlEnd::XML_Config_MAX];
 };
 
 

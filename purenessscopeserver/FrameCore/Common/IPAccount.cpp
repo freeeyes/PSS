@@ -27,7 +27,7 @@ void _IPAccount::Add(ACE_Date_Time const& dtNowTime)
 bool _IPAccount::Check(ACE_Date_Time const& dtNowTime) const
 {
     //如果3分钟内没有更新，则清理之
-    uint16 u2NowTime = (uint16)dtNowTime.minute();
+    auto u2NowTime = (uint16)dtNowTime.minute();
 
     if (u2NowTime - m_nMinute < 0)
     {
@@ -80,7 +80,7 @@ bool CIPAccount::AddIP(string strIP)
 
     //检查当前时间，10分钟清理一轮当前Hash数组
     ACE_Date_Time  dtNowTime;
-    uint16 u2NowTime = (uint16)dtNowTime.minute();
+    auto u2NowTime = (uint16)dtNowTime.minute();
 
     Clear_Hash_Data(u2NowTime, dtNowTime);
 
@@ -144,7 +144,7 @@ int32 CIPAccount::GetCount()
 uint32 CIPAccount::GetLastConnectCount()
 {
     ACE_Date_Time  dtNowTime;
-    uint16 u2NowTime = (uint16)dtNowTime.minute();
+    auto u2NowTime = (uint16)dtNowTime.minute();
 
     //检查当前时间连接总数
     if (m_u1Minute != (uint8)u2NowTime)

@@ -23,7 +23,7 @@ public:
     uint32             m_u4Second                = 0;                                  //禁止的秒数
     EM_CONNECT_IO_TYPE m_u1ConnectType           = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP; //链接的类型，0为TCP，1为UDP
     uint8              m_u1Type                  = 0;                                  //禁止的类型，0为永久禁止，1为时段禁止。
-    char               m_szClientIP[MAX_IP_SIZE] = {'\0'};                             //被禁止的IP
+    string             m_strClientIP;                                                  //被禁止的IP
     ACE_Time_Value     m_tvBegin                 = ACE_OS::gettimeofday();             //时段禁止开始时间
 
     _ForbiddenIP()

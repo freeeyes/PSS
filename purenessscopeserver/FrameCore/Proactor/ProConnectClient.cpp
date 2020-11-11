@@ -73,7 +73,9 @@ void CProConnectClient::Close()
         //转发接口关闭
         if ("" != m_strDeviceName)
         {
-            App_ForwardManager::instance()->DisConnectRegedit(m_AddrRemote.get_host_addr(), m_AddrRemote.get_port_number(), ENUM_FORWARD_TCP_S2S);
+            App_ForwardManager::instance()->DisConnectRegedit(m_AddrRemote.get_host_addr(), 
+                m_AddrRemote.get_port_number(), 
+                ENUM_FORWARD_TYPE::ENUM_FORWARD_TCP_S2S);
             m_strDeviceName = "";
         }
 
@@ -173,9 +175,9 @@ void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
     }
 
     m_strDeviceName = App_ForwardManager::instance()->ConnectRegedit(m_AddrRemote.get_host_addr(),
-                      m_AddrRemote.get_port_number(),
-                      ENUM_FORWARD_TCP_S2S,
-                      dynamic_cast<IDeviceHandler*>(this));
+        m_AddrRemote.get_port_number(),
+        ENUM_FORWARD_TYPE::ENUM_FORWARD_TCP_S2S,
+        dynamic_cast<IDeviceHandler*>(this));
 
     if (false == RecvData(GetXmlConfigAttribute(xmlConnectServer)->Recvbuff, NULL))
     {

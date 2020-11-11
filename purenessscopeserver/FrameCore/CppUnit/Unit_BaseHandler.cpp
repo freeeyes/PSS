@@ -21,7 +21,6 @@ void CUnit_Basehandler::Test_Tcp_Common_File_Message(void)
     bool blRet = false;
     _File_Message_Param obj_File_Message_Param;
     char szConnectName[MAX_BUFF_100] = { '\0' };
-    char szPacketDebugData[10]       = { '\0' };
     uint32 u4PacketDebugSize         = 4;
     ACE_INET_Addr addrRemote;
     addrRemote.set(10002, "127.0.0.1");

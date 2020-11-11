@@ -38,7 +38,7 @@ bool CThreadInfoList::AddThreadInfo(uint32 u4ThreadID)
     }
     else
     {
-        _ThreadInfo* pThreadInfo = new _ThreadInfo();
+        auto pThreadInfo = new _ThreadInfo();
 
         pThreadInfo->m_u4ThreadID = u4ThreadID;
 
@@ -61,7 +61,7 @@ bool CThreadInfoList::AddThreadInfo(uint32 u4ThreadID, _ThreadInfo* pOrcThreadIn
     }
     else
     {
-        _ThreadInfo* pThreadInfo = new _ThreadInfo();
+        auto pThreadInfo = new _ThreadInfo();
 
         (*pThreadInfo) = (*pOrcThreadInfo);
         pThreadInfo->m_u4ThreadID = u4ThreadID;

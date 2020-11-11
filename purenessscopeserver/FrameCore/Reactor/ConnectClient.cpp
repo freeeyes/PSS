@@ -54,7 +54,9 @@ void CConnectClient::Close()
         //转发接口关闭
         if ("" != m_strDeviceName)
         {
-            App_ForwardManager::instance()->DisConnectRegedit(m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), ENUM_FORWARD_TCP_S2S);
+            App_ForwardManager::instance()->DisConnectRegedit(m_addrRemote.get_host_addr(), 
+                m_addrRemote.get_port_number(), 
+                ENUM_FORWARD_TYPE::ENUM_FORWARD_TCP_S2S);
             m_strDeviceName = "";
         }
 
@@ -187,9 +189,9 @@ int CConnectClient::open(void* p)
     }
 
     m_strDeviceName = App_ForwardManager::instance()->ConnectRegedit(m_addrRemote.get_host_addr(),
-                      m_addrRemote.get_port_number(),
-                      ENUM_FORWARD_TCP_S2S,
-                      dynamic_cast<IDeviceHandler*>(this));
+        m_addrRemote.get_port_number(),
+        ENUM_FORWARD_TYPE::ENUM_FORWARD_TCP_S2S,
+        dynamic_cast<IDeviceHandler*>(this));
 
     int nRet = this->reactor()->register_handler(this, ACE_Event_Handler::READ_MASK | ACE_Event_Handler::WRITE_MASK);
 

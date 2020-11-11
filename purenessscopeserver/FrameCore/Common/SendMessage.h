@@ -6,6 +6,8 @@
 #include "IBuffPacket.h"
 #include "HashTable.h"
 #include "ObjectArrayList.h"
+#include <string>
+#include <sstream>
 
 //发送数据体发的数据结构
 class CSendMessageInfo
@@ -45,7 +47,7 @@ public:
         //指针关系也可以在这里直接指定，不必使用的使用再指定
         m_pmbQueuePtr  = new ACE_Message_Block(sizeof(_SendMessage*));
 
-        _SendMessage** ppMessage = (_SendMessage**)m_pmbQueuePtr->base();
+        auto ppMessage = (_SendMessage**)m_pmbQueuePtr->base();
         *ppMessage = this;
     }
 

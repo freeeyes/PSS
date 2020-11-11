@@ -2,17 +2,15 @@
 
 CMessageBlockManager::CMessageBlockManager(void)
 {
-    Init();
+    //不在使用内存对象池技术，在线程锁频繁的情况下影响数据处理速度
 }
 
-void CMessageBlockManager::Init()
+void CMessageBlockManager::Init() const 
 {
-    //m_MemoryBlock_Pool.Init(GetXmlConfigAttribute(xmlServerType)->Debug);
 }
 
-void CMessageBlockManager::Close()
+void CMessageBlockManager::Close() const
 {
-    //m_MemoryBlock_Pool.Close();
 }
 
 ACE_Message_Block* CMessageBlockManager::Create(uint32 u4Size)
@@ -31,5 +29,5 @@ bool CMessageBlockManager::Close(ACE_Message_Block* pMessageBlock, uint32 u4Bloc
 
 uint32 CMessageBlockManager::GetUsedSize() const
 {
-    return m_u4UsedSize;
+    return 0;
 }
