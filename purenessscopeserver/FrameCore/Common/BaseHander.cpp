@@ -226,7 +226,7 @@ uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPa
     return n1Ret;
 }
 
-void Send_MakePacket_Queue(const _MakePacket objMakePacket)
+void Send_MakePacket_Queue(_MakePacket const objMakePacket)
 {
     //放入消息队列
     if (false == App_MakePacket::instance()->PutMessageBlock(objMakePacket, objMakePacket.m_tvRecv))
@@ -424,61 +424,6 @@ bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
 
         return false;
     }
-}
-
-bool Tcp_Common_CloseConnect_By_Queue(uint32 u4ConnectID, CSendMessagePool& objSendMessagePool, uint32 u4SendQueuePutTime, ACE_Task<ACE_MT_SYNCH>* pTask)
-{
-    //放入发送队列
-    _SendMessage* pSendMessage = objSendMessagePool.Create();
-
-    if (NULL == pSendMessage)
-    {
-        OUR_DEBUG((LM_ERROR, "[Tcp_Common_CloseConnect_By_Queue] new _SendMessage is error.\n"));
-        return false;
-    }
-
-    ACE_Message_Block* mb = pSendMessage->GetQueueMessage();
-
-    if (NULL != mb)
-    {
-        //组装关闭连接指令
-        pSendMessage->m_u4ConnectID = u4ConnectID;
-        pSendMessage->m_pBuffPacket = NULL;
-        pSendMessage->m_nEvents = 0;
-        pSendMessage->m_u2CommandID = 0;
-        pSendMessage->m_u1SendState = 0;
-        pSendMessage->m_blDelete = false;
-        pSendMessage->m_nMessageID = 0;
-        pSendMessage->m_u1Type = 1;
-        pSendMessage->m_tvSend = ACE_OS::gettimeofday();
-
-        //判断队列是否是已经最大
-        auto nQueueCount = (int)pTask->msg_queue()->message_count();
-
-        if (nQueueCount >= MAX_MSG_THREADQUEUE)
-        {
-            OUR_DEBUG((LM_ERROR, "[Tcp_Common_CloseConnect_By_Queue] Queue is Full nQueueCount = [%d].\n", nQueueCount));
-            objSendMessagePool.Delete(pSendMessage);
-            return false;
-        }
-
-        ACE_Time_Value xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, u4SendQueuePutTime);
-
-        if (pTask->putq(mb, &xtime) == -1)
-        {
-            OUR_DEBUG((LM_ERROR, "[Tcp_Common_CloseConnect_By_Queue] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
-            objSendMessagePool.Delete(pSendMessage);
-            return false;
-        }
-    }
-    else
-    {
-        OUR_DEBUG((LM_ERROR, "[Tcp_Common_CloseConnect_By_Queue] mb new error.\n"));
-        objSendMessagePool.Delete(pSendMessage);
-        return false;
-    }
-
-    return true;
 }
 
 bool Tcp_Common_Manager_Post_Message(_Post_Message_Param obj_Post_Message_Param, IBuffPacket* pBuffPacket,

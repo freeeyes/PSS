@@ -40,7 +40,7 @@ public:
 };
 
 //将数据发送入工作线程消息队列
-void Send_MakePacket_Queue(const _MakePacket objMakePacket);
+void Send_MakePacket_Queue(_MakePacket const objMakePacket);
 
 //udp函数发送数据包合成函数
 bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param, IBuffPacket* pBuffPacket, const ACE_SOCK_Dgram& skRemote, const _Packet_Parse_Info* pPacketParseInfo, ACE_Message_Block* pBlockMessage);
@@ -147,10 +147,6 @@ bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
                                  IBuffPacket*& pBuffPacket,
                                  ACE_Message_Block* pBlockMessage,
                                  uint32& u4PacketSize);
-
-//发送Manager消息队列关闭信息
-bool Tcp_Common_CloseConnect_By_Queue(uint32 u4ConnectID, CSendMessagePool& objSendMessagePool,
-                                      uint32 u4SendQueuePutTime, ACE_Task<ACE_MT_SYNCH>* pTask);
 
 //Tcp_Common_Manager_Post_Message的参数
 class _Post_Message_Param

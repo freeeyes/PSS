@@ -13,7 +13,7 @@ public:
     virtual ~CModuleMessageManager();
 
     int SendModuleMessage(const char* pModuleName, uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket);
-    int SendFrameMessage(uint16 u2CommandID, uint32 u4ConnectID, IBuffPacket* pHeadPacket, IBuffPacket* pBodyBuffPacket);
+    int SendFrameMessage(uint16 u2CommandID, uint32 u4WorkThreadID, IBuffPacket* pHeadPacket, IBuffPacket* pBodyBuffPacket);
 };
 
 typedef ACE_Singleton<CModuleMessageManager, ACE_Null_Mutex> App_ModuleMessageManager;

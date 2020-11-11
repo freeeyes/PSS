@@ -166,7 +166,7 @@ bool CForbiddenIP::SaveConfig()
         return false;
     }
 
-    for(_ForbiddenIP& objForbiddenIP : m_VecForeverForbiddenIP)
+    for(const _ForbiddenIP& objForbiddenIP : m_VecForeverForbiddenIP)
     {
         std::stringstream ss_format;
         if(objForbiddenIP.m_u1ConnectType == EM_CONNECT_IO_TYPE::CONNECT_IO_TCP)
