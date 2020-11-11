@@ -10,6 +10,8 @@
 #include "define.h"
 #include "LogManager.h"
 #include "HashTable.h"
+#include <string>
+#include <sstream>
 
 //统计信息，里面有要统计的命令信息定义
 class _CommandData
@@ -95,7 +97,7 @@ public:
     {
         //得到此刻的流量入数据
         ACE_Date_Time dtNowTime(ACE_OS::gettimeofday());
-        uint8 u1Minute = (uint8)dtNowTime.minute();
+        auto u1Minute = (uint8)dtNowTime.minute();
 
         if (u1Minute != m_u1Minute)
         {
@@ -114,7 +116,7 @@ public:
     {
         //得到此刻的流量出数据
         ACE_Date_Time dtNowTime(ACE_OS::gettimeofday());
-        uint8 u1Minute = (uint8)dtNowTime.minute();
+        auto u1Minute = (uint8)dtNowTime.minute();
 
         if (u1Minute != m_u1Minute)
         {
@@ -133,7 +135,7 @@ public:
     {
         //记录端口流量
         ACE_Date_Time dtNowTime(tvNow);
-        uint8 u1Minute = (uint8)dtNowTime.minute();
+        auto u1Minute = (uint8)dtNowTime.minute();
 
         if (u1Minute != m_u1Minute)
         {
@@ -213,7 +215,7 @@ public:
     uint8                                     m_u1CommandAccount    = 0;                        //是否开启命令统计，1是打开，0是关闭
     uint8                                     m_u1Flow              = 0;                        //是否打开流量统计，1是打开，0是关闭
     uint8                                     m_u1Minute            = 0 ;                       //当前分钟数
-    char                                      m_szName[MAX_BUFF_50] = {'\0'};                   //当前统计的名字
+    string                                    m_strName;                                        //当前统计的名字
     CHashTable<_CommandData>                  m_objCommandDataList;                             //命令Hash映射列表
     vecCommandAlertData                       m_vecCommandAlertData;                            //告警阀值数组
     hashmapPortAccount                        m_objectPortAccount;                              //根据端口统计每条数据的进出量

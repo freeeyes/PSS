@@ -12,6 +12,8 @@
 #include "define.h"
 #include "XmlOpeation.h"
 #include "ace/Singleton.h"
+#include <string>
+#include <sstream>
 
 const uint16 MAX_IP_SIZE = 50;
 

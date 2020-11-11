@@ -155,12 +155,11 @@ bool CForbiddenIP::SaveConfig()
         return false;
     }
 
-    char szTemp[MAX_BUFF_500] = {'\0'};
-    sprintf_safe(szTemp, MAX_BUFF_500, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<config>\r\n");
+    string strTemp = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<config>\r\n";
 
-    size_t stSize = ACE_OS::fwrite(szTemp, sizeof(char), ACE_OS::strlen(szTemp), pFile);
+    size_t stSize = ACE_OS::fwrite(strTemp.c_str(), sizeof(char), strTemp.length(), pFile);
 
-    if(stSize !=  ACE_OS::strlen(szTemp))
+    if(stSize != strTemp.length())
     {
         OUR_DEBUG((LM_ERROR, "[CForbiddenIP::SaveConfig]Write file fail.\n"));
         ACE_OS::fclose(pFile);
@@ -169,18 +168,25 @@ bool CForbiddenIP::SaveConfig()
 
     for(_ForbiddenIP& objForbiddenIP : m_VecForeverForbiddenIP)
     {
+        std::stringstream ss_format;
         if(objForbiddenIP.m_u1ConnectType == EM_CONNECT_IO_TYPE::CONNECT_IO_TCP)
         {
-            sprintf_safe(szTemp, MAX_BUFF_500, "<ForbiddenIP ip=\"%s\" type=\"TCP\" desc=\"ForbiddenIP，type is 'TCP' or 'UDP'\" />\r\n", objForbiddenIP.m_szClientIP);
+            ss_format << "<ForbiddenIP ip=\"" 
+                << objForbiddenIP.m_szClientIP 
+                << "\" type=\"TCP\" desc=\"ForbiddenIP，type is 'TCP' or 'UDP'\" />\r\n";
+            strTemp = ss_format.str();
         }
         else
         {
-            sprintf_safe(szTemp, MAX_BUFF_500, "<ForbiddenIP ip=\"%s\" type=\"UDP\" desc=\"ForbiddenIP，type is 'TCP' or 'UDP'\" />\r\n", objForbiddenIP.m_szClientIP);
+            ss_format << "<ForbiddenIP ip=\"" 
+                << objForbiddenIP.m_szClientIP 
+                << "\" type=\"UDP\" desc=\"ForbiddenIP，type is 'TCP' or 'UDP'\" />\r\n";
+            strTemp = ss_format.str();
         }
 
-        stSize = ACE_OS::fwrite(szTemp, sizeof(char), ACE_OS::strlen(szTemp), pFile);
+        stSize = ACE_OS::fwrite(strTemp.c_str(), sizeof(char), strTemp.length(), pFile);
 
-        if(stSize !=  ACE_OS::strlen(szTemp))
+        if(stSize != strTemp.length())
         {
             OUR_DEBUG((LM_ERROR, "[CForbiddenIP::SaveConfig]Write file fail.\n"));
             ACE_OS::fclose(pFile);
@@ -188,11 +194,11 @@ bool CForbiddenIP::SaveConfig()
         }
     }
 
-    sprintf_safe(szTemp, MAX_BUFF_500, "</config>\r\n");
+    strTemp = "</config>\r\n";
 
-    stSize = ACE_OS::fwrite(szTemp, sizeof(char), ACE_OS::strlen(szTemp), pFile);
+    stSize = ACE_OS::fwrite(strTemp.c_str(), sizeof(char), strTemp.length(), pFile);
 
-    if(stSize !=  ACE_OS::strlen(szTemp))
+    if(stSize != strTemp.length())
     {
         OUR_DEBUG((LM_ERROR, "[CForbiddenIP::SaveConfig]Write file fail.\n"));
         ACE_OS::fclose(pFile);
@@ -206,56 +212,10 @@ bool CForbiddenIP::SaveConfig()
 
 bool CForbiddenIP::CompareIP(const char* pTargetIP, const char* pClientIP) const
 {
-    char szTargetIP[MAX_IP_SIZE];
-    char szClientIP[MAX_IP_SIZE];
-
-    char szTarget[5];
-    char szClient[5];
-
-    memcpy_safe(pTargetIP, (uint32)ACE_OS::strlen(pTargetIP), szTargetIP, (uint32)MAX_IP_SIZE, true);
-
-    memcpy_safe(pClientIP, (uint32)ACE_OS::strlen(pClientIP), szClientIP, (uint32)MAX_IP_SIZE, true);
-
-    char* pTargetPos = (char* )szTargetIP;
-    char* pClientPos = (char* )szClientIP;
-
-    char* pTargetTPos = ACE_OS::strstr(pTargetPos, ".");
-    char* pClientTPos = ACE_OS::strstr(pClientPos, ".");
-
-    while(pTargetTPos)
+    //这里不必在对查询做*的匹配操作，因为无意义。
+    if (ACE_OS::strcmp(pTargetIP, pClientIP) == 0)
     {
-        if(pClientTPos == NULL)
-        {
-            return false;
-        }
-
-        memcpy_safe(pTargetPos, (uint32)(pTargetTPos - pTargetPos), szTarget, (uint32)MAX_IP_SIZE);
-        szTarget[(int32)(pTargetTPos - pTargetPos)] = '\0';
-        memcpy_safe(pClientPos, (uint32)(pClientTPos - pClientPos), szClient, (uint32)MAX_IP_SIZE);
-        szClient[(int32)(pClientTPos - pClientPos)] = '\0';
-
-        if(strcmp(szTarget, "*") != 0 && strcmp(szTarget, szClient) != 0)
-        {
-            return false;
-        }
-
-        pTargetPos = pTargetTPos + 1;
-        pClientPos = pClientTPos + 1;
-
-        pTargetTPos = ACE_OS::strstr(pTargetPos + 1, ".");
-        pClientTPos = ACE_OS::strstr(pClientPos + 1, ".");
-    }
-
-    if(strcmp(pTargetPos, "*") != 0)
-    {
-        if(strcmp(pTargetPos, pClientPos) != 0)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        return false;
     }
     else
     {

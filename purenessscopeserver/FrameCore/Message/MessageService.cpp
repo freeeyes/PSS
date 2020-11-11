@@ -917,8 +917,6 @@ bool CMessageService::Dispose_Queue()
     {
         CWorkThreadMessage* msg = *((CWorkThreadMessage**)mb->base());
 
-        m_objBuffSendPacket.GetHeadLen();
-
         if (EM_WORKTHREAD_DIRECT::EM_WORKTHREAD_DIRECT_INPUT == msg->m_emDirect)
         {
             //是接收数据

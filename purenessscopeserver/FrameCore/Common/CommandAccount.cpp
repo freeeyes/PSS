@@ -6,7 +6,7 @@ CCommandAccount::CCommandAccount()
 
 void CCommandAccount::InitName(const char* pName, uint32 u4CommandCount)
 {
-    sprintf_safe(m_szName, MAX_BUFF_50, "%s", pName);
+    m_strName = pName;
 
     //初始化HashTable
     m_objCommandDataList.Init((int32)u4CommandCount);
@@ -98,11 +98,12 @@ bool CCommandAccount::Save_Command(uint16 u2CommandID, uint16 u2Port, EM_CONNECT
         return true;
     }
 
-    char szHashID[10] = { '\0' };
-    sprintf_safe(szHashID, 10, "%d", u2CommandID);
+    std::stringstream ss_format;
+    ss_format << u2CommandID;
+    string strCommandID = ss_format.str();
 
     //查找并添加
-    _CommandData* pCommandData = m_objCommandDataList.Get_Hash_Box_Data(szHashID);
+    _CommandData* pCommandData = m_objCommandDataList.Get_Hash_Box_Data(strCommandID.c_str());
 
     if (NULL != pCommandData)
     {
@@ -123,9 +124,9 @@ bool CCommandAccount::Save_Command(uint16 u2CommandID, uint16 u2Port, EM_CONNECT
 		pCommandData->m_u4PacketSize += u4PacketSize;
 		pCommandData->m_tvCommandTime = tvTime;
 
-		if (-1 == m_objCommandDataList.Add_Hash_Data(szHashID, pCommandData))
+		if (-1 == m_objCommandDataList.Add_Hash_Data(strCommandID.c_str(), pCommandData))
 		{
-			OUR_DEBUG((LM_INFO, "[CCommandAccount::SaveCommandData]szHashID=%s Add Hash Data Error.\n", szHashID));
+			OUR_DEBUG((LM_INFO, "[CCommandAccount::SaveCommandData]szHashID=%s Add Hash Data Error.\n", strCommandID.c_str()));
 		}
     }
 
@@ -140,7 +141,7 @@ bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_I
     ACE_UNUSED_ARG(u1CommandType);
 
     ACE_Date_Time dtNowTime(tvTime);
-    uint8 u1Minute = (uint8)dtNowTime.minute();
+    auto u1Minute = (uint8)dtNowTime.minute();
 
     for (_CommandAlertData commandalewrtdata : m_vecCommandAlertData)
     {
@@ -215,7 +216,7 @@ bool CCommandAccount::SaveCommandDataLog()
         return true;
     }
 
-    AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_COMMANDDATA, "<Command Data Account[%s]>", m_szName);
+    AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_COMMANDDATA, "<Command Data Account[%s]>", m_strName.c_str());
     vector<_CommandData*> vecCommandData;
     m_objCommandDataList.Get_All_Used(vecCommandData);
 
@@ -307,9 +308,10 @@ uint8 CCommandAccount::GetFLow() const
 
 _CommandData* CCommandAccount::GetCommandData(uint16 u2CommandID)
 {
-    char szHashID[10] = {'\0'};
-    sprintf_safe(szHashID, 10, "%d", u2CommandID);
-    return m_objCommandDataList.Get_Hash_Box_Data(szHashID);
+    std::stringstream ss_format;
+    ss_format << u2CommandID;
+    string strCommandID = ss_format.str();
+    return m_objCommandDataList.Get_Hash_Box_Data(strCommandID.c_str());
 }
 
 void CCommandAccount::GetCommandAlertData(vecCommandAlertData& CommandAlertDataList)
