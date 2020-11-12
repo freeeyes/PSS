@@ -5,12 +5,14 @@ CMessageBlockManager::CMessageBlockManager(void)
     //不在使用内存对象池技术，在线程锁频繁的情况下影响数据处理速度
 }
 
-void CMessageBlockManager::Init() const 
+void CMessageBlockManager::Init() 
 {
+    m_u4UsedSize = 0;
 }
 
-void CMessageBlockManager::Close() const
+void CMessageBlockManager::Close()
 {
+    m_u4UsedSize = 0;
 }
 
 ACE_Message_Block* CMessageBlockManager::Create(uint32 u4Size)

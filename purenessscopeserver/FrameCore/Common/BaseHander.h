@@ -40,7 +40,7 @@ public:
 };
 
 //将数据发送入工作线程消息队列
-void Send_MakePacket_Queue(_MakePacket const objMakePacket);
+void Send_MakePacket_Queue(_MakePacket const& objMakePacket);
 
 //udp函数发送数据包合成函数
 bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param, IBuffPacket* pBuffPacket, const ACE_SOCK_Dgram& skRemote, const _Packet_Parse_Info* pPacketParseInfo, ACE_Message_Block* pBlockMessage);

@@ -48,7 +48,7 @@ public:
     VecForbiddenIP* ShowTempIP();                                                           //显示临时封停IP
 
 private:
-    bool SaveConfig();                                                                      //存储配置文件
+    bool SaveConfig() const;                                                                //存储配置文件
     bool CompareIP(const char* pTargetIP, const char* pClientIP) const;                     //比较是否在当前IP段
 
     CXmlOpeation   m_ForbiddenData;

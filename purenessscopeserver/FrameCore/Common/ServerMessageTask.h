@@ -120,7 +120,7 @@ public:
     bool CheckServerMessageThread(ACE_Time_Value const& tvNow) const;
 
 private:
-    bool CheckValidClientMessage(const IClientMessage* pClientMessage);
+    bool CheckValidClientMessage(const IClientMessage* pClientMessage) const;
     bool ProcessMessage(const _Server_Message_Info* pMessage, uint32 u4ThreadID);
 
     virtual int CloseMsgQueue();

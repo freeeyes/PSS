@@ -474,7 +474,7 @@ void CProConnectHandler::Move_Recv_buffer()
 		m_pBlockRecv->wr_ptr(u4RemainLength);
 		App_MessageBlockManager::instance()->Close(pBlockRemain);
 	}
-	else
+	else if(m_pBlockRecv->length() == 0) //如果全部接受完成才清理
 	{
 		//全部重置
 		m_pBlockRecv->reset();

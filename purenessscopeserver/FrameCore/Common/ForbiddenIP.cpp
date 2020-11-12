@@ -143,7 +143,7 @@ bool CForbiddenIP::DelTempIP(const char* pIP, EM_CONNECT_IO_TYPE u1ConnectType)
     return true;
 }
 
-bool CForbiddenIP::SaveConfig()
+bool CForbiddenIP::SaveConfig() const
 {
 
     //将修改的配置信息写入文件

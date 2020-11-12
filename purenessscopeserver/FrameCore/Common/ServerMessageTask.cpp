@@ -388,9 +388,9 @@ bool CServerMessageTask::CheckServerMessageThread(ACE_Time_Value const& tvNow) c
     }
 }
 
-bool CServerMessageTask::CheckValidClientMessage(const IClientMessage* pClientMessage)
+bool CServerMessageTask::CheckValidClientMessage(const IClientMessage* pClientMessage) const
 {
-    for(IClientMessage* pVecClientMessage : m_vecValidIClientMessage)
+    for(const IClientMessage* pVecClientMessage : m_vecValidIClientMessage)
     {
         if(pVecClientMessage == pClientMessage)
         {

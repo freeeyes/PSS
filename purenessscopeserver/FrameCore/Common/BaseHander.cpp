@@ -226,7 +226,7 @@ uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPa
     return n1Ret;
 }
 
-void Send_MakePacket_Queue(_MakePacket const objMakePacket)
+void Send_MakePacket_Queue(_MakePacket const& objMakePacket)
 {
     //放入消息队列
     if (false == App_MakePacket::instance()->PutMessageBlock(objMakePacket, objMakePacket.m_tvRecv))

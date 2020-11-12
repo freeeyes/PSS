@@ -26,14 +26,15 @@ class CMessageBlockManager : public IMessageBlockManager
 public:
     CMessageBlockManager(void);
 
-    void Init() const;
-    void Close() const;
+    void Init();
+    void Close();
 
     virtual ACE_Message_Block* Create(uint32 u4Size);
     virtual bool Close(ACE_Message_Block* pMessageBlock, uint32 u4BlockLen = 0);
 
     uint32 GetUsedSize() const;
-
+private:
+    uint32 m_u4UsedSize = 0;
 };
 
 typedef ACE_Singleton<CMessageBlockManager,ACE_Null_Mutex> App_MessageBlockManager;

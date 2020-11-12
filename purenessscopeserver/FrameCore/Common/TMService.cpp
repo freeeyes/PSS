@@ -59,7 +59,7 @@ int CTMService::Init(int nNeedLoad)
            && objXmlOperation.Read_XML_Data_Multiple_Int("Timer", "EventMaxCount", nMaxQueueList, pMaxEvent))
     {
         //写入配置文件
-        CTimerInfo* pTimerInfo = new CTimerInfo();
+        auto pTimerInfo = new CTimerInfo();
 
         pTimerInfo->m_nID                  = nID;
         pTimerInfo->m_szName               = szName;
@@ -86,7 +86,7 @@ int CTMService::Init(int nNeedLoad)
 
 
     //添加定时器
-    int nTimerSize = (int)vecInfoList.size();
+    auto nTimerSize = (int)vecInfoList.size();
 
     for (int i = 0; i < nTimerSize; i++)
     {
