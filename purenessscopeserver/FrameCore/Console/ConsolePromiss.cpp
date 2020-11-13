@@ -27,7 +27,7 @@ void CConsolePromissions::Init(const char* pFileName)
         const char* pCommandNameData = NULL;
         const char* pUserData        = NULL;
 
-        _Console_Command_Info* pConsole_Command_Info = new _Console_Command_Info();
+        auto pConsole_Command_Info = new _Console_Command_Info();
         pCommandNameData = m_ConcoleConfig.GetData("CommandInfo", "CommandName", pNextTiXmlCommandName);
         pUserData = m_ConcoleConfig.GetData("CommandInfo", "User", pNextTiXmlUser);
 
@@ -37,13 +37,13 @@ void CConsolePromissions::Init(const char* pFileName)
             break;
         }
 
-        sprintf_safe(pConsole_Command_Info->m_szCommand, MAX_BUFF_50, "%s", pCommandNameData);
-        sprintf_safe(pConsole_Command_Info->m_szUser, MAX_BUFF_200, "%s", pUserData);
+        pConsole_Command_Info->m_strCommand = pCommandNameData;
+        pConsole_Command_Info->m_strUser    = pUserData;
 
-        if (-1 == m_objHashCommandList.Add_Hash_Data(pConsole_Command_Info->m_szCommand, pConsole_Command_Info))
+        if (-1 == m_objHashCommandList.Add_Hash_Data(pConsole_Command_Info->m_strCommand.c_str(), pConsole_Command_Info))
         {
             SAFE_DELETE(pConsole_Command_Info);
-            OUR_DEBUG((LM_INFO, "[CConsolePromissions::Init](%s)Add error.\n", pConsole_Command_Info->m_szCommand));
+            OUR_DEBUG((LM_INFO, "[CConsolePromissions::Init](%s)Add error.\n", pConsole_Command_Info->m_strCommand.c_str()));
         }
     }
 }
@@ -54,7 +54,7 @@ void CConsolePromissions::Close()
     vector<_Console_Command_Info*> vecConsoleCommandList;
     m_objHashCommandList.Get_All_Used(vecConsoleCommandList);
 
-    uint32 u4Size = (uint32)vecConsoleCommandList.size();
+    auto u4Size = (uint32)vecConsoleCommandList.size();
 
     for (uint32 i = 0; i < u4Size; i++)
     {
@@ -66,7 +66,7 @@ void CConsolePromissions::Close()
 
 int CConsolePromissions::Check_Promission(const char* pCommandName, const char* pUser)
 {
-    const _Console_Command_Info* pConsole_Command_Info = m_objHashCommandList.Get_Hash_Box_Data(pCommandName);
+    auto pConsole_Command_Info = m_objHashCommandList.Get_Hash_Box_Data(pCommandName);
 
     if (NULL == pConsole_Command_Info)
     {
@@ -74,12 +74,12 @@ int CConsolePromissions::Check_Promission(const char* pCommandName, const char* 
         return -1;
     }
 
-    return Check_Split_User(pUser, pConsole_Command_Info->m_szUser);
+    return Check_Split_User(pUser, pConsole_Command_Info->m_strUser.c_str());
 }
 
 int CConsolePromissions::Check_Split_User(const char* pUser, const char* pUserList) const
 {
-    char szTempUser[MAX_BUFF_50] = { '\0' };
+    string strTempUser;
     const char* pPromissPosBegin = pUserList;
     const char* pPromissPos = ACE_OS::strstr(pPromissPosBegin, ",");
 
@@ -94,18 +94,16 @@ int CConsolePromissions::Check_Split_User(const char* pUser, const char* pUserLi
             continue;
         }
 
-        if (true == memcpy_safe(pPromissPosBegin, u4NameLen, szTempUser, u4NameLen))
-        {
-            szTempUser[u4NameLen] = '\0';
-        }
+        strTempUser.append(pPromissPosBegin, u4NameLen);
 
-        if (0 == ACE_OS::strcmp(szTempUser, pUser))
+        if (strTempUser == pUser)
         {
             return 0;
         }
 
         pPromissPosBegin = pPromissPos + 1;
         pPromissPos = ACE_OS::strstr(pPromissPosBegin, ",");
+        strTempUser = "";
     }
 
     //判断最后一个User
@@ -117,18 +115,16 @@ int CConsolePromissions::Check_Split_User(const char* pUser, const char* pUserLi
         {
             //只有一个
             u4NameLen = (uint32)ACE_OS::strlen(pUserList);
-            memcpy_safe(pPromissPosBegin, u4NameLen, szTempUser, u4NameLen);
-            szTempUser[u4NameLen] = '\0';
+            strTempUser.append(pPromissPosBegin, u4NameLen);
         }
         else
         {
             //最后一个
-            u4NameLen = (uint32)strlen(pUserList) - (uint32)(pPromissPosBegin - pUserList - 1);
-            memcpy_safe(pPromissPosBegin, u4NameLen, szTempUser, u4NameLen);
-            szTempUser[u4NameLen] = '\0';
+            u4NameLen = (uint32)strlen(pUserList) - (uint32)(pPromissPosBegin - pUserList - 1);;
+            strTempUser.append(pPromissPosBegin, u4NameLen);
         }
 
-        if (0 == ACE_OS::strcmp(szTempUser, pUser))
+        if (strTempUser == pUser)
         {
             return 0;
         }

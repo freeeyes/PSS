@@ -13,13 +13,11 @@ const uint32 MAX_COMSOLE_COMMAND_COUNT = 100;
 class _Console_Command_Info
 {
 public:
-    char m_szCommand[MAX_BUFF_50];
-    char m_szUser[MAX_BUFF_200];
+    string m_strCommand;
+    string m_strUser;
 
     _Console_Command_Info()
     {
-        m_szCommand[0] = '\0';
-        m_szUser[0] = '\0';
     }
 };
 

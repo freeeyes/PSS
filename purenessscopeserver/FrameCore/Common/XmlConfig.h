@@ -113,17 +113,15 @@ public:
         return m_name;
     }
 
-    XmlConfig GetArrayIndex()
+    XmlConfig GetArrayIndex() const
     {
         return m_emconfig;
     }
 
     virtual ~IConfigOpeation() {}
 protected:
-    IConfigOpeation(XmlConfig config, const char* name)
+    IConfigOpeation(XmlConfig config, const char* name) : m_name(name), m_emconfig(config)
     {
-        m_name     = name;
-        m_emconfig = config;
     }
     virtual bool Init(CXmlOpeation* pXmlOperation) = 0;
 private:

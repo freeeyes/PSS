@@ -3,6 +3,8 @@
 
 #include "MessageDispose.h"
 #include "XmlConfig.h"
+#include <string>
+#include <sstream>
 
 class CConsoleMessage
 {

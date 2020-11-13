@@ -70,31 +70,24 @@ int CConsoleMessage::Dispose(const ACE_Message_Block* pmb, IBuffPacket* pBuffPac
         return CONSOLE_MESSAGE_FAIL;
     }
 
-    char* pCommand = new char[(uint32)pmb->length() + 1];
+    string strCommand;
+    char* p = pmb->rd_ptr();
+    size_t t = pmb->length();
+    strCommand.append(pmb->rd_ptr(), pmb->length());
 
-    pCommand[(uint32)pmb->length() - 1] = '\0';
-
-    memcpy_safe(pmb->rd_ptr(), (uint32)pmb->length(), pCommand, (uint32)pmb->length());
-
-    //去除数据尾部的终止符
-    if (pCommand[pmb->length() - 1] == '&')
+    //判断结尾是不是& 如果是，则去除
+    if (strCommand[strCommand.length() - 1] == '&')
     {
-        pCommand[pmb->length() - 1] = '\0';
-    }
-    else
-    {
-        pCommand[pmb->length() - 3] = '\0';
+        strCommand[strCommand.length() - 1] = '\0';
     }
 
     //解析命令，把数据切割出来
-    if(CONSOLE_MESSAGE_SUCCESS != ParseCommand(pCommand, pBuffPacket, u1OutputType))
+    if(CONSOLE_MESSAGE_SUCCESS != ParseCommand(strCommand.c_str(), pBuffPacket, u1OutputType))
     {
-        SAFE_DELETE_ARRAY(pCommand);
         return CONSOLE_MESSAGE_FAIL;
     }
     else
     {
-        SAFE_DELETE_ARRAY(pCommand);
         return CONSOLE_MESSAGE_SUCCESS;
     }
 }
@@ -103,10 +96,12 @@ int CConsoleMessage::ParsePlugInCommand(const char* pCommand, IBuffPacket* pBuff
 {
     uint8 u1OutputType = 0;
 
+    std::stringstream ss_format;
+    ss_format << "b plugin " << pCommand;
+    string strPluginCommand = ss_format.str();
+
     //拼接插件调用完整指令
-    char szPluginCommand[MAX_BUFF_200] = { '\0' };
-    sprintf_safe(szPluginCommand, MAX_BUFF_200, "b plugin %s", pCommand);
-    return ParseCommand_Plugin(szPluginCommand, pBuffPacket, u1OutputType);
+    return ParseCommand_Plugin(strPluginCommand.c_str(), pBuffPacket, u1OutputType);
 }
 
 void CConsoleMessage::Close()
@@ -117,7 +112,8 @@ void CConsoleMessage::Close()
 bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& CommandInfo, bool blCheck) const
 {
     int nLen = (int)ACE_OS::strlen(pCommand);
-    char szKey[MAX_BUFF_100] = {'\0'};
+    string strKey;
+    string strOutputType;
 
     AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONSOLEDATA, "<Command>%s.", pCommand);
 
@@ -128,7 +124,7 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
     }
 
     //获得输出模式
-    char szOutputType[MAX_BUFF_100] = { '\0' };
+    
     const char* pKeyBegin = ACE_OS::strstr(pCommand, COMMAND_SPLIT_STRING);
 
     if (NULL == pKeyBegin)
@@ -137,9 +133,9 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
         return false;
     }
 
-    memcpy_safe(pCommand, (int)(pKeyBegin - pCommand), szOutputType, (int)(pKeyBegin - pCommand), true);
+    strOutputType.append(pCommand, (int)(pKeyBegin - pCommand));
 
-    if (ACE_OS::strcmp(szOutputType, "b") == 0)
+    if (strOutputType == "b")
     {
         CommandInfo.m_u1OutputType = 0;
     }
@@ -157,15 +153,12 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
         return false;
     }
 
-    memcpy_safe(pKeyBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING),
-                (int)(pCommandBegin - pKeyBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING)),
-                szKey,
-                MAX_BUFF_100,
-                true);
+    strKey.append((char* )(pKeyBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING)), 
+        (int)(pCommandBegin - pKeyBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING)));
 
-    memcpy_safe(szKey, (uint32)ACE_OS::strlen(szKey), CommandInfo.m_szUser, MAX_BUFF_50, true);
+    CommandInfo.m_strUser = strKey;
 
-    if (true == blCheck && false == CheckConsoleKey(szKey))
+    if (true == blCheck && false == CheckConsoleKey(strKey.c_str()))
     {
         OUR_DEBUG((LM_ERROR, "[CConsoleMessage::GetCommandInfo]szKey is invalid.\n"));
         return false;
@@ -184,16 +177,16 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
     u4Data4Len = (uint32)(pParamBegin - pCommandBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING));
     if (MAX_BUFF_100 > u4Data4Len)
     {
-        memset(CommandInfo.m_szCommandTitle, 0, MAX_BUFF_100);
-        memcpy_safe(pCommandBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), u4Data4Len, (char*)CommandInfo.m_szCommandTitle, u4Data4Len);
+        CommandInfo.m_strCommandTitle.append((char* )(pCommandBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING)),
+            u4Data4Len);
     }
 
     //获得扩展参数
     u4Data4Len = (uint32)(nLen - (pParamBegin - pCommand - ACE_OS::strlen(COMMAND_SPLIT_STRING)) + 1);
     if (MAX_BUFF_100 > u4Data4Len)
     {
-        memset(CommandInfo.m_szCommandExp, 0, MAX_BUFF_100);
-        memcpy_safe(pParamBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), u4Data4Len, (char*)CommandInfo.m_szCommandExp, u4Data4Len);
+        CommandInfo.m_strCommandExp.append((char*)(pParamBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING)),
+            u4Data4Len);
     }
 
     return true;
@@ -243,7 +236,7 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
     }
 
     //判断当前命令是否可以执行
-    int nPromission = m_objConsolePromissions.Check_Promission(CommandInfo.m_szCommandTitle, CommandInfo.m_szUser);
+    int nPromission = m_objConsolePromissions.Check_Promission(CommandInfo.m_strCommandTitle.c_str(), CommandInfo.m_strUser.c_str());
 
     if (0 != nPromission)
     {
@@ -269,7 +262,7 @@ int CConsoleMessage::DoCommand(const _CommandInfo& CommandInfo, IBuffPacket* pCu
 
     //查找并处理指令信息
     DoMessage_Logic fn_DoMessage_Logic = NULL;
-    m_objHashMessageLogicList.find((string)CommandInfo.m_szCommandTitle, fn_DoMessage_Logic);
+    m_objHashMessageLogicList.find((string)CommandInfo.m_strCommandTitle.c_str(), fn_DoMessage_Logic);
 
     if (NULL != fn_DoMessage_Logic)
     {

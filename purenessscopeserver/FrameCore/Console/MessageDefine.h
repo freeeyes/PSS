@@ -28,9 +28,9 @@ class _CommandInfo
 {
 public:
     uint8 m_u1OutputType                = 0;        //输出类型，0为二进制，1为文本
-    char m_szCommandTitle[MAX_BUFF_100] = {'\0'};   //处理命令头
-    char m_szCommandExp[MAX_BUFF_100]   = {'\0'};   //处理命令扩展参数
-    char m_szUser[MAX_BUFF_50]          = {'\0'};   //用户信息
+    string m_strCommandTitle;                       //处理命令头
+    string m_strCommandExp;                         //处理命令扩展参数
+    string m_strUser  = {'\0'};                     //用户信息
 
     _CommandInfo()
     {
