@@ -2,10 +2,6 @@
 #include "define.h"
 #include "IpCheck.h"
 
-/*数组元素对应的元素位置已经在构造时候按枚举确认*/
-IConfigOpeation* IConfigOpeation::_array[XML_Config_MAX];
-
-
 /*定义静态类对象并绑定对应枚举，实现返回模板函数*/
 
 #define CLASSNAME(ClassName) (this##ClassName)
@@ -15,9 +11,10 @@ IConfigOpeation* IConfigOpeation::_array[XML_Config_MAX];
     template<>                                                                  \
     ClassName* XMainConfig::GetXmlConfig<ClassName>()                           \
     {                                                                           \
-        return dynamic_cast<ClassName*>(IConfigOpeation::_array[static_cast<int>(XMLConfig)]);    \
+        return dynamic_cast<ClassName*>(_array.at(static_cast<int>(XMLConfig)));    \
     }
 
+#define CreateArrayList(ClassName) _array.at(static_cast<int>(this##ClassName.GetArrayIndex())) = &this##ClassName;
 
 /*xml配置文件对应类型配置的静态类，需要增加配置文件标签，需要在此添加静态类对象，所有对象不直接使用,也不允许外部使用*/
 /*****************类对象和返回函数一一对应*********************/
@@ -59,6 +56,43 @@ DefineClassAndFunc(xmlCommandsTimeout, XmlConfig::XML_Config_Commands_Timeout)
 
 bool XMainConfig::Init()
 {
+    //初始化数组
+    CreateArrayList(xmlRecvInfo);
+    CreateArrayList(xmlSendInfo);
+    CreateArrayList(xmlNetWorkMode);
+    CreateArrayList(xmlTCPServerIPs);
+    CreateArrayList(xmlUDPServerIPs);
+    CreateArrayList(xmlTTyDrives);
+    CreateArrayList(xmlServer2Server);
+    CreateArrayList(xmlConnectServer);
+    CreateArrayList(xmlClientInfo);
+    CreateArrayList(xmlTTyClientManagerInfo);
+    CreateArrayList(xmlModuleInfos);
+    CreateArrayList(xmlModuleMangager);
+    CreateArrayList(xmlMonitor);
+    CreateArrayList(xmlThreadInfoAI);
+    CreateArrayList(xmlThreadInfo);
+    CreateArrayList(xmlConsole);
+    CreateArrayList(xmlConsoleKeys);
+    CreateArrayList(xmlConsoleClients);
+    CreateArrayList(xmlAceDebug);
+    CreateArrayList(xmlCommandAccount);
+    CreateArrayList(xmlCoreSetting);
+    CreateArrayList(xmlServerType);
+    CreateArrayList(xmlServerID);
+    CreateArrayList(xmlServerName);
+    CreateArrayList(xmlServerVersion);
+    CreateArrayList(xmlPacketParses);
+    CreateArrayList(xmlBuffPacket);
+    CreateArrayList(xmlMessage);
+    CreateArrayList(xmlTcpRedirection);
+    CreateArrayList(xmlAlertConnect);
+    CreateArrayList(xmlIP);
+    CreateArrayList(xmlClientData);
+    CreateArrayList(xmlCommandInfos);
+    CreateArrayList(xmlMails);
+    CreateArrayList(xmlCommandsTimeout);
+
     //初始化xml文件
     return InitFile(MAINCONFIG, XmlConfig::XML_Config_RecvInfo, XmlConfig::XML_Config_Redirection)
            && InitFile(ALERTCONFIG, XmlConfig::XML_Config_AlertConnect, XmlConfig::XML_Config_Commands_Timeout);
@@ -75,17 +109,17 @@ bool XMainConfig::InitFile(const char* pFileName, XmlConfig start, XmlConfig end
         1.范围
         2.init函数返回结果
         */
-        int i = static_cast<int>(start);
+        auto i = static_cast<int>(start);
 
         for (; i <= static_cast<int>(end) && bKet; ++i)
         {
-            bKet = IConfigOpeation::_array[i]->Init(&m_XmlOperation);
+            bKet = _array.at(i)->Init(&m_XmlOperation);
         }
 
         if (false == bKet)
         {
             OUR_DEBUG((LM_INFO, "[XMainConfig::InitFile](%s) Init is false.\n",
-                       IConfigOpeation::_array[i]->ClassName().c_str()));
+                       _array.at(i)->ClassName().c_str()));
         }
     }
     else

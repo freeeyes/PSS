@@ -2,6 +2,7 @@
 
 #include "define.h"
 #include "XmlOpeation.h"
+#include <array>
 
 //main.xml≈‰÷√√∂æŸ
 
@@ -14,7 +15,7 @@ enum class XmlStart
     XML_Config_MIN = 0
 };
 
-enum class XmlConfig
+enum class XmlConfig : uint8
 {
     /*******************main.xml************************/
 
@@ -94,7 +95,9 @@ public:
 private:
     bool _initIsOk;
     bool InitFile(const char* pFileName, XmlConfig start, XmlConfig end);
+
     CXmlOpeation m_XmlOperation;
+    std::array<IConfigOpeation*, static_cast<int>(XmlEnd::XML_Config_MAX)> _array;
 };
 
 typedef ACE_Singleton<XMainConfig, ACE_Null_Mutex> App_XmlConfig;
@@ -105,20 +108,27 @@ class IConfigOpeation
 {
     friend class XMainConfig;
 public:
-    const std::string& ClassName() const
+    std::string ClassName() const
     {
         return m_name;
     }
+
+    XmlConfig GetArrayIndex()
+    {
+        return m_emconfig;
+    }
+
     virtual ~IConfigOpeation() {}
 protected:
-    IConfigOpeation(XmlConfig config, const char* name) : m_name(name)
+    IConfigOpeation(XmlConfig config, const char* name)
     {
-        _array[static_cast<int>(config)] = this;
+        m_name     = name;
+        m_emconfig = config;
     }
     virtual bool Init(CXmlOpeation* pXmlOperation) = 0;
 private:
     std::string m_name;
-    static IConfigOpeation* _array[XmlEnd::XML_Config_MAX];
+    XmlConfig m_emconfig = XmlConfig::XML_Config_End;
 };
 
 
