@@ -71,8 +71,6 @@ int CConsoleMessage::Dispose(const ACE_Message_Block* pmb, IBuffPacket* pBuffPac
     }
 
     string strCommand;
-    char* p = pmb->rd_ptr();
-    size_t t = pmb->length();
     strCommand.append(pmb->rd_ptr(), pmb->length());
 
     //判断结尾是不是& 如果是，则去除
@@ -111,7 +109,7 @@ void CConsoleMessage::Close()
 
 bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& CommandInfo, bool blCheck) const
 {
-    int nLen = (int)ACE_OS::strlen(pCommand);
+    auto nLen = (int)ACE_OS::strlen(pCommand);
     string strKey;
     string strOutputType;
 
@@ -153,7 +151,7 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
         return false;
     }
 
-    strKey.append((char* )(pKeyBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING)), 
+    strKey.append(pKeyBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), 
         (int)(pCommandBegin - pKeyBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING)));
 
     CommandInfo.m_strUser = strKey;
@@ -177,7 +175,7 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
     u4Data4Len = (uint32)(pParamBegin - pCommandBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING));
     if (MAX_BUFF_100 > u4Data4Len)
     {
-        CommandInfo.m_strCommandTitle.append((char* )(pCommandBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING)),
+        CommandInfo.m_strCommandTitle.append(pCommandBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING),
             u4Data4Len);
     }
 
