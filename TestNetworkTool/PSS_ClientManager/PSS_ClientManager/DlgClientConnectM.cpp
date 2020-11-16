@@ -135,8 +135,8 @@ void CDlgClientConnectM::OnBnClickedButton2()
             //开始还原数据结构
             _ClientConnectInfo ClientConnectInfo;
 
-            memcpy_s(&nStrLen, sizeof(char), &szRecvBuff[nPos], sizeof(char));
-            nPos += sizeof(char);
+            memcpy_s(&nStrLen, sizeof(int), &szRecvBuff[nPos], sizeof(int));
+            nPos += sizeof(int);
 
             memcpy_s(ClientConnectInfo.m_szIP, nStrLen, &szRecvBuff[nPos], nStrLen);
             nPos += nStrLen;

@@ -222,8 +222,8 @@ void CDlgClientConnect::OnBnClickedButton6()
             memcpy_s(&IPAccount.m_nAllCount, sizeof(int), &szRecvBuff[nPos], sizeof(int));
             nPos += sizeof(int);
 
-            memcpy_s(&nStrLen, sizeof(char), &szRecvBuff[nPos], sizeof(char));
-            nPos += sizeof(char);
+            memcpy_s(&nStrLen, sizeof(int), &szRecvBuff[nPos], sizeof(int));
+            nPos += sizeof(int);
 
             memcpy_s(IPAccount.m_szDate, nStrLen, &szRecvBuff[nPos], nStrLen);
             nPos += nStrLen;

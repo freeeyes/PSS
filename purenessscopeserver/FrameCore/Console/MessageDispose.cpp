@@ -36,11 +36,7 @@ void Combo_Common_vecClientConnectInfo(uint8 u1OutputType, const vecClientConnec
 
             if (u1OutputType == 0)
             {
-                VCHARS_STR strSName;
-                strSName.text = (char* )strIP.c_str();
-                strSName.u1Len = (uint8)strIP.length();
-
-                (*pBuffPacket) << strSName;
+                (*pBuffPacket) << strIP;
                 (*pBuffPacket) << ClientConnectInfo.m_u4ConnectID;
                 (*pBuffPacket) << ClientConnectInfo.m_u4RecvCount;
                 (*pBuffPacket) << ClientConnectInfo.m_u4SendCount;
@@ -77,11 +73,7 @@ void Combo_Common_VecForbiddenIP(uint8 u1OutputType, const VecForbiddenIP* pIPLi
     {
         if (u1OutputType == 0)
         {
-            VCHARS_STR strSName;
-            strSName.text = (char* )forbidenip.m_strClientIP.c_str();
-            strSName.u1Len = (uint8)forbidenip.m_strClientIP.length();
-
-            (*pBuffPacket) << strSName;
+            (*pBuffPacket) << forbidenip.m_strClientIP;
             (*pBuffPacket) << forbidenip.m_u1Type;
             (*pBuffPacket) << (uint32)forbidenip.m_tvBegin.sec();
             (*pBuffPacket) << forbidenip.m_u4Second;
@@ -270,23 +262,22 @@ void DoMessage_ShowModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
         {
             if (CommandInfo.m_u1OutputType == 0)
             {
-                uint8 u1ModuleNameLen = (uint8)ACE_OS::strlen(pModuleInfo->GetName());
+                auto u1ModuleNameLen = (uint8)ACE_OS::strlen(pModuleInfo->GetName());
                 (*pBuffPacket) << u1ModuleNameLen;
                 pBuffPacket->WriteStream(pModuleInfo->GetName(), u1ModuleNameLen);
-                uint8 u1SModileFileLen = (uint8)ACE_OS::strlen(pModuleInfo->strModuleName.c_str());
+                auto u1SModileFileLen = (uint8)ACE_OS::strlen(pModuleInfo->strModuleName.c_str());
                 (*pBuffPacket) << u1SModileFileLen;
                 pBuffPacket->WriteStream(pModuleInfo->strModuleName.c_str(), u1SModileFileLen);
-                uint8 u1SModilePathLen = (uint8)ACE_OS::strlen(pModuleInfo->strModulePath.c_str());
+                auto u1SModilePathLen = (uint8)ACE_OS::strlen(pModuleInfo->strModulePath.c_str());
                 (*pBuffPacket) << u1SModilePathLen;
                 pBuffPacket->WriteStream(pModuleInfo->strModulePath.c_str(), u1SModilePathLen);
-                uint8 u1SModileParamLen = (uint8)ACE_OS::strlen(pModuleInfo->strModuleParam.c_str());
+                auto u1SModileParamLen = (uint8)ACE_OS::strlen(pModuleInfo->strModuleParam.c_str());
                 (*pBuffPacket) << u1SModileParamLen;
                 pBuffPacket->WriteStream(pModuleInfo->strModuleParam.c_str(), u1SModileParamLen);
-                uint8 u1SModileDescLen = (uint8)ACE_OS::strlen(pModuleInfo->GetDesc());
+                auto u1SModileDescLen = (uint8)ACE_OS::strlen(pModuleInfo->GetDesc());
                 (*pBuffPacket) << u1SModileDescLen;
                 pBuffPacket->WriteStream(pModuleInfo->GetDesc(), u1SModileDescLen);
 
-                VCHARS_STR strSName;
                 std::stringstream ss_format;
                 ss_format << pModuleInfo->dtCreateTime.year()
                     << "-" << std::setfill('0') << std::setw(2) << pModuleInfo->dtCreateTime.month()
@@ -295,9 +286,7 @@ void DoMessage_ShowModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
                     << ":" << std::setfill('0') << std::setw(2) << pModuleInfo->dtCreateTime.minute()
                     << ":" << std::setfill('0') << std::setw(2) << pModuleInfo->dtCreateTime.second();
                 string strTime = ss_format.str();
-                strSName.text = (char* )strTime.c_str();
-                strSName.u1Len = (uint8)strTime.length();
-                (*pBuffPacket) << strSName;
+                (*pBuffPacket) << strTime;
 
                 //写入Module当前状态
                 uint32 u4ErrorID = 0;
@@ -343,7 +332,7 @@ void DoMessage_ShowModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
 
 void DoMessage_CommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    uint16 u2CommandID = (uint16)ACE_OS::strtol(CommandInfo.m_strCommandExp.c_str(), NULL, 16);
+    auto u2CommandID = (uint16)ACE_OS::strtol(CommandInfo.m_strCommandExp.c_str(), NULL, 16);
 
     if (u2CommandID != 0)
     {
@@ -472,7 +461,7 @@ void DoMessage_ClientInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
 
 void DoMessage_CloseClient(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    uint32 u4ConnectID = (uint32)ACE_OS::atoi(CommandInfo.m_strCommandExp.c_str());
+    auto u4ConnectID = (uint32)ACE_OS::atoi(CommandInfo.m_strCommandExp.c_str());
 
     App_HandlerManager::instance()->CloseConnect(u4ConnectID);
 
@@ -588,7 +577,7 @@ void DoMessage_ServerConnectTCP(const _CommandInfo& CommandInfo, IBuffPacket* pB
         App_ClientReConnectManager::instance()->GetConnectInfo(VecClientConnectInfo);
 #endif
 
-        uint32 u4ConnectCount = (uint32)VecClientConnectInfo.size();
+        auto u4ConnectCount = (uint32)VecClientConnectInfo.size();
         Combo_Common_Head_Data(CommandInfo.m_u1OutputType, u4ConnectCount, "ServerConnect Count(%d).\n", pBuffPacket);
 
         Combo_Common_vecClientConnectInfo(CommandInfo.m_u1OutputType, VecClientConnectInfo, pBuffPacket);
@@ -608,7 +597,7 @@ void DoMessage_ServerConnectUDP(const _CommandInfo& CommandInfo, IBuffPacket* pB
         App_ClientReConnectManager::instance()->GetUDPConnectInfo(VecClientConnectInfo);
 #endif
 
-        uint32 u4ConnectCount = (uint32)VecClientConnectInfo.size();
+        auto u4ConnectCount = (uint32)VecClientConnectInfo.size();
         Combo_Common_Head_Data(CommandInfo.m_u1OutputType, u4ConnectCount, "ServerConnect Count(%d).\n", pBuffPacket);
 
         Combo_Common_vecClientConnectInfo(CommandInfo.m_u1OutputType, VecClientConnectInfo, pBuffPacket);
@@ -684,13 +673,12 @@ void DoMessage_ShowClientHisTory(const _CommandInfo& CommandInfo, IBuffPacket* p
             if (CommandInfo.m_u1OutputType == 0)
             {
 
-                uint8 u1IPLen = (uint8)ipaccount.m_strIP.length();
+                auto u1IPLen = (uint8)ipaccount.m_strIP.length();
                 (*pBuffPacket) << u1IPLen;
                 pBuffPacket->WriteStream(ipaccount.m_strIP.c_str(), u1IPLen);
                 (*pBuffPacket) << (uint32)ipaccount.m_nCount;
                 (*pBuffPacket) << (uint32)ipaccount.m_nAllCount;
 
-                VCHARS_STR strSName;
                 std::stringstream ss_format;
                 ss_format << ipaccount.m_dtLastTime.year()
                     << "-" << std::setfill('0') << std::setw(2) << ipaccount.m_dtLastTime.month()
@@ -699,11 +687,7 @@ void DoMessage_ShowClientHisTory(const _CommandInfo& CommandInfo, IBuffPacket* p
                     << ":" << std::setfill('0') << std::setw(2) << ipaccount.m_dtLastTime.minute()
                     << ":" << std::setfill('0') << std::setw(2) << ipaccount.m_dtLastTime.second();
                 string strTime = ss_format.str();
-
-                strSName.text = (char* )strTime.c_str();
-                strSName.u1Len = (uint8)strTime.length();
-
-                (*pBuffPacket) << strSName;
+                (*pBuffPacket) << strTime;
             }
             else
             {
@@ -803,16 +787,16 @@ void DoMessage_ShowServerInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuf
         if (CommandInfo.m_u1OutputType == 0)
         {
             //返回服务器ID
-            uint16 u2SerevrID = (uint16)GetXmlConfigAttribute(xmlServerID)->id;
+            auto u2SerevrID = (uint16)GetXmlConfigAttribute(xmlServerID)->id;
             (*pBuffPacket) << u2SerevrID;
 
             //返回服务器名称
-            uint8 u1ServerNameLen = (uint8)GetXmlConfigAttribute(xmlServerName)->name.length();
+            auto u1ServerNameLen = (uint8)GetXmlConfigAttribute(xmlServerName)->name.length();
             (*pBuffPacket) << u1ServerNameLen;
             pBuffPacket->WriteStream(GetXmlConfigAttribute(xmlServerName)->name.c_str(), u1ServerNameLen);
 
             //返回服务器版本
-            uint8 u1ServerVersionLen = (uint8)GetXmlConfigAttribute(xmlServerVersion)->Version.length();
+            auto u1ServerVersionLen = (uint8)GetXmlConfigAttribute(xmlServerVersion)->Version.length();
             (*pBuffPacket) << u1ServerVersionLen;
             pBuffPacket->WriteStream(GetXmlConfigAttribute(xmlServerVersion)->Version.c_str(), u1ServerVersionLen);
 
@@ -825,7 +809,7 @@ void DoMessage_ShowServerInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuf
             (*pBuffPacket) << (uint16)App_MessageServiceGroup::instance()->GetThreadInfo()->GetThreadCount();
 
             //返回当前协议包的版本号
-            uint8 u1PacketVersionLen = (uint8)GetXmlConfigAttribute(xmlServerVersion)->Version.length();
+            auto u1PacketVersionLen = (uint8)GetXmlConfigAttribute(xmlServerVersion)->Version.length();
             (*pBuffPacket) << u1PacketVersionLen;
             pBuffPacket->WriteStream(GetXmlConfigAttribute(xmlServerVersion)->Version.c_str(), u1PacketVersionLen);
 
@@ -894,7 +878,7 @@ void DoMessage_ReConnectServer(const _CommandInfo& CommandInfo, IBuffPacket* pBu
         App_ClientReConnectManager::instance()->GetConnectInfo(VecClientConnectInfo);
 #endif
 
-        uint32 u4ConnectCount = (uint32)VecClientConnectInfo.size();
+        auto u4ConnectCount = (uint32)VecClientConnectInfo.size();
         Combo_Common_Head_Data(CommandInfo.m_u1OutputType, u4ConnectCount, "ConnectServerCount(%d)\n", pBuffPacket);
 
         Combo_Common_vecClientConnectInfo(CommandInfo.m_u1OutputType, VecClientConnectInfo, pBuffPacket);
@@ -1132,11 +1116,7 @@ void DoMessage_GetConnectIPInfo(const _CommandInfo& CommandInfo, IBuffPacket* pB
                 //找到了对应的IP信息
                 (*pBuffPacket) << (uint16)0;
 
-                VCHARS_STR strSName;
-                strSName.text = (char* )objClientIPInfo.m_strClientIP.c_str();
-                strSName.u1Len = (uint8)objClientIPInfo.m_strClientIP.length();
-
-                (*pBuffPacket) << strSName;                          //IP
+                (*pBuffPacket) << objClientIPInfo.m_strClientIP;                          //IP
                 (*pBuffPacket) << (uint32)objClientIPInfo.m_u2Port;  //端口
             }
             else
@@ -1183,7 +1163,7 @@ void DoMessage_GetLogLevelInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
                 continue;
             }
 
-            uint8 u1ServerNameLen = (uint8)ACE_OS::strlen(pServerName);
+            auto u1ServerNameLen = (uint8)ACE_OS::strlen(pServerName);
 
             const char* pLogName = AppLogManager::instance()->GetLogInfoByLogName(u2LogID);
 
@@ -1193,9 +1173,9 @@ void DoMessage_GetLogLevelInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
                 return;
             }
 
-            uint8 u1LogNameLen = (uint8)ACE_OS::strlen(pLogName);
+            auto u1LogNameLen = (uint8)ACE_OS::strlen(pLogName);
 
-            uint8 u1LogType = (uint8)AppLogManager::instance()->GetLogInfoByLogDisplay(u2LogID);
+            auto u1LogType = (uint8)AppLogManager::instance()->GetLogInfoByLogDisplay(u2LogID);
 
             if (CommandInfo.m_u1OutputType == 0)
             {
@@ -1253,7 +1233,7 @@ void DoMessage_GetThreadAI(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
         vecWorkThreadAIInfo objvecWorkThreadAIInfo;
         App_MessageServiceGroup::instance()->GetWorkThreadAIInfo(objvecWorkThreadAIInfo);
 
-        uint16 u2ThreadCount = (uint16)objvecWorkThreadAIInfo.size();
+        auto u2ThreadCount = (uint16)objvecWorkThreadAIInfo.size();
 
         if (CommandInfo.m_u1OutputType == 0)
         {
@@ -1301,7 +1281,7 @@ void DoMessage_GetWorkThreadTO(const _CommandInfo& CommandInfo, IBuffPacket* pBu
         vecCommandTimeout objTimeoutF;
         App_MessageServiceGroup::instance()->GetAITO(objTimeout);
 
-        uint16 u2ThreadCount = (uint16)objTimeout.size();
+        auto u2ThreadCount = (uint16)objTimeout.size();
 
         if (CommandInfo.m_u1OutputType == 0)
         {
@@ -1792,7 +1772,7 @@ void DoMessage_PortList(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
         vector<CWorkThread_Packet_Info> vec_Port_Data_Account;
         App_MessageServiceGroup::instance()->GetFlowPortList(vec_Port_Data_Account);
 
-        uint32 u4Count = (uint32)vec_Port_Data_Account.size();
+        auto u4Count = (uint32)vec_Port_Data_Account.size();
 
         if (CommandInfo.m_u1OutputType == 0)
         {

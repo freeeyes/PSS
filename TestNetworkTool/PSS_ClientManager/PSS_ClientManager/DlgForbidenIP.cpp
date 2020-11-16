@@ -234,8 +234,8 @@ void CDlgForbidenIP::OnBnClickedButton3()
             //开始还原数据结构
             _ForbiddenIP ForbiddenIP;
 
-            memcpy_s(&nStrLen, sizeof(char), &szRecvBuff[nPos], sizeof(char));
-            nPos += sizeof(char);
+            memcpy_s(&nStrLen, sizeof(int), &szRecvBuff[nPos], sizeof(int));
+            nPos += sizeof(int);
 
             memcpy_s(ForbiddenIP.m_szIP, nStrLen, &szRecvBuff[nPos], nStrLen);
             nPos += nStrLen;

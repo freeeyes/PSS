@@ -301,8 +301,8 @@ void CDlgTrackIP::OnBnClickedButton6()
             char szIP[20]         = {'\0'};
             int  nPort            = 0;
 
-            memcpy_s(&nStrLen, sizeof(char), &szRecvBuff[nPos], sizeof(char));
-            nPos += sizeof(char);
+            memcpy_s(&nStrLen, sizeof(int), &szRecvBuff[nPos], sizeof(int));
+            nPos += sizeof(int);
 
             //ªÒµ√IPµÿ÷∑
             memcpy_s(szIP, nStrLen, &szRecvBuff[nPos], nStrLen);

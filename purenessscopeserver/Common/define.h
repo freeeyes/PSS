@@ -828,7 +828,7 @@ typedef  struct _VCHARS_STR
                 uint8 u1targetLen = u1Length + 1;
                 text = new char[u1targetLen];
 
-                if (false == memcpy_safe((char*)pData, u1Length, text, u1Length))
+                if (false == memcpy_safe(pData, u1Length, text, u1Length))
                 {
                     OUR_DEBUG((LM_INFO, "[_VCHARS_STR::SetData]memcpy_safe error.\n"));
                     SAFE_DELETE(text);
@@ -843,7 +843,7 @@ typedef  struct _VCHARS_STR
                 //二进制模式
                 text = new char[u1Length];
 
-                if (false == memcpy_safe((char*)pData, u1Length, text, u1Length))
+                if (false == memcpy_safe(pData, u1Length, text, u1Length))
                 {
                     OUR_DEBUG((LM_INFO, "[_VCHARS_STR::SetData]binary memcpy_safe error.\n"));
                     SAFE_DELETE(text);

@@ -323,8 +323,8 @@ void CDlgClientMain::OnBnClickedButton3()
             nPos += nStrLen;
             ModuleInfo.szModuleDesc[nStrLen] = '\0';
 
-            memcpy_s(&nStrLen, sizeof(char), &szRecvBuff[nPos], sizeof(char));
-            nPos += sizeof(char);
+            memcpy_s(&nStrLen, sizeof(int), &szRecvBuff[nPos], sizeof(int));
+            nPos += sizeof(int);
 
             memcpy_s(ModuleInfo.szModuleCreateDate, nStrLen, &szRecvBuff[nPos], nStrLen);
             nPos += nStrLen;
