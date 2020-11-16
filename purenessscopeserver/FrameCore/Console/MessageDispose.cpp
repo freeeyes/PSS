@@ -8,9 +8,7 @@ void Combo_Common_Return_Data(uint8 u1OutputType, uint8 u1State, const char* pMe
     }
     else
     {
-        char szTemp[MAX_BUFF_200] = { '\0' };
-        sprintf_safe(szTemp, MAX_BUFF_200, pMessage);
-        pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        pBuffPacket->WriteStream(pMessage, (uint32)ACE_OS::strlen(pMessage));
     }
 }
 
@@ -22,27 +20,25 @@ void Combo_Common_Head_Data(uint8 u1OutputType, uint32 u4Count, const char* pMes
     }
     else
     {
-        char szTemp[MAX_BUFF_200] = { '\0' };
-        sprintf_safe(szTemp, MAX_BUFF_200, pMessage);
-        pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        pBuffPacket->WriteStream(pMessage, (uint32)ACE_OS::strlen(pMessage));
     }
 }
 
 void Combo_Common_vecClientConnectInfo(uint8 u1OutputType, const vecClientConnectInfo VecClientConnectInfo, IBuffPacket* pBuffPacket)
 {
-    char szIP[MAX_BUFF_100] = { '\0' };
+    string strIP;
 
     for (_ClientConnectInfo ClientConnectInfo : VecClientConnectInfo)
     {
         if (true == ClientConnectInfo.m_blValid)
         {
-            sprintf_safe(szIP, MAX_BUFF_100, "0.0.0.0:0");
+            strIP = "0.0.0.0:0";
 
             if (u1OutputType == 0)
             {
                 VCHARS_STR strSName;
-                strSName.text = szIP;
-                strSName.u1Len = (uint8)ACE_OS::strlen(szIP);
+                strSName.text = (char* )strIP.c_str();
+                strSName.u1Len = (uint8)strIP.length();
 
                 (*pBuffPacket) << strSName;
                 (*pBuffPacket) << ClientConnectInfo.m_u4ConnectID;
@@ -58,25 +54,18 @@ void Combo_Common_vecClientConnectInfo(uint8 u1OutputType, const vecClientConnec
             }
             else
             {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "UDP IP(%s)\n", szIP);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "UDP Command(%d)\n", ClientConnectInfo.m_u4ConnectID);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "UDP RecvCount(%d)\n", ClientConnectInfo.m_u4RecvCount);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "UDP SendCount(%d)\n", ClientConnectInfo.m_u4SendCount);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "UDP AllRecvSize(%d)\n", ClientConnectInfo.m_u4AllRecvSize);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "UDP AllSendSize(%d)\n", ClientConnectInfo.m_u4AllSendSize);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "UDP BeginTime(%d)\n", ClientConnectInfo.m_u4BeginTime);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "UDP AliveTime(%d)\n", ClientConnectInfo.m_u4AliveTime);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "UDP RecvQueueCount(%d)\n", ClientConnectInfo.m_u4RecvQueueCount);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                std::stringstream ss_format;
+                ss_format << "UDP IP(" << strIP << ")\n"
+                    << "UDP Command(" << ClientConnectInfo.m_u4ConnectID << ")\n"
+                    << "UDP RecvCount(" << ClientConnectInfo.m_u4RecvCount << ")\n"
+                    << "UDP SendCount(" << ClientConnectInfo.m_u4SendCount << ")\n"
+                    << "UDP AllRecvSize(" << ClientConnectInfo.m_u4AllRecvSize << ")\n"
+                    << "UDP AllSendSize(" << ClientConnectInfo.m_u4AllSendSize << ")\n"
+                    << "UDP BeginTime(" << ClientConnectInfo.m_u4BeginTime << ")\n"
+                    << "UDP RecvQueueCount(" << ClientConnectInfo.m_u4AliveTime << ")\n"
+                    << "UDP AliveTime(" << ClientConnectInfo.m_u4RecvQueueCount << ")\n";
+                string strLineText = ss_format.str();
+                pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
             }
         }
     }
@@ -99,15 +88,14 @@ void Combo_Common_VecForbiddenIP(uint8 u1OutputType, const VecForbiddenIP* pIPLi
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden(%s)\n", forbidenip.m_strClientIP.c_str());
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden Type(%d)\n", forbidenip.m_u1Type);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden BeginTime(%d)\n", forbidenip.m_tvBegin.sec());
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden IntervalTime(%d)\n", forbidenip.m_u4Second);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "IP Forbidden(" << forbidenip.m_strClientIP << ")\n"
+                << "IP Forbidden Type(" << forbidenip.m_u1Type << ")\n"
+                << "IP Forbidden BeginTime(" << forbidenip.m_tvBegin.sec() << ")\n"
+                << "IP Forbidden IntervalTime(" << forbidenip.m_u4Second << ")\n";
+            string strLineText = ss_format.str();
+
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
     }
 }
@@ -186,9 +174,10 @@ void DoMessage_ReLoadModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffP
         }
         else
         {
-            char szTemp[MAX_BUFF_200] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_200, "ReloadModule(%s) is ok.\n", CommandInfo.m_strCommandExp.c_str());
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "ReloadModule(" << CommandInfo.m_strCommandExp << ") is ok.\n";
+            string strLineText = ss_format.str();
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
     }
     else
@@ -199,9 +188,10 @@ void DoMessage_ReLoadModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffP
         }
         else
         {
-            char szTemp[MAX_BUFF_200] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_200, "ReloadModule(%s) is false.\n", CommandInfo.m_strCommandExp.c_str());
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "ReloadModule(" << CommandInfo.m_strCommandExp << ") is fail.\n";
+            string strLineText = ss_format.str();
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
     }
 
@@ -221,9 +211,10 @@ void DoMessage_ClientMessageCount(const _CommandInfo& CommandInfo, IBuffPacket* 
         }
         else
         {
-            char szTemp[MAX_BUFF_200] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_200, "ActiveClient(%d).\n", nActiveClient);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "ActiveClient(" << CommandInfo.m_strCommandExp << ").\n";
+            string strLineText = ss_format.str();
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
     }
     else if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-cp") == 0)
@@ -244,12 +235,12 @@ void DoMessage_ClientMessageCount(const _CommandInfo& CommandInfo, IBuffPacket* 
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "ActiveClient(%d).\nPoolClient(%d).\nMaxHandlerCount(%d).\n",
-                         nActiveClient,
-                         nPoolClient,
-                         GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "ActiveClient(" << nActiveClient << ").\n"
+                << "PoolClient(" << nPoolClient << ").\n"
+                << "MaxHandlerCount(" << GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount << ")\n";
+            string strLineText = ss_format.str();
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
     }
 
@@ -269,9 +260,10 @@ void DoMessage_ShowModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleCount(%d)\n", App_ModuleLoader::instance()->GetCurrModuleCount());
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "ModuleCount(" << App_ModuleLoader::instance()->GetCurrModuleCount() << ")\n";
+            string strLineText = ss_format.str();
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
 
         for (const _ModuleInfo* pModuleInfo : vecModeInfo)
@@ -295,10 +287,16 @@ void DoMessage_ShowModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
                 pBuffPacket->WriteStream(pModuleInfo->GetDesc(), u1SModileDescLen);
 
                 VCHARS_STR strSName;
-                char szTime[MAX_BUFF_100] = { '\0' };
-                sprintf_safe(szTime, MAX_BUFF_100, "%04d-%02d-%02d %02d:%02d:%02d", pModuleInfo->dtCreateTime.year(), pModuleInfo->dtCreateTime.month(), pModuleInfo->dtCreateTime.day(), pModuleInfo->dtCreateTime.hour(), pModuleInfo->dtCreateTime.minute(), pModuleInfo->dtCreateTime.second());
-                strSName.text = szTime;
-                strSName.u1Len = (uint8)ACE_OS::strlen(szTime);
+                std::stringstream ss_format;
+                ss_format << pModuleInfo->dtCreateTime.year()
+                    << "-" << std::setfill('0') << std::setw(2) << pModuleInfo->dtCreateTime.month()
+                    << "-" << std::setfill('0') << std::setw(2) << pModuleInfo->dtCreateTime.day()
+                    << " " << std::setfill('0') << std::setw(2) << pModuleInfo->dtCreateTime.hour()
+                    << ":" << std::setfill('0') << std::setw(2) << pModuleInfo->dtCreateTime.minute()
+                    << ":" << std::setfill('0') << std::setw(2) << pModuleInfo->dtCreateTime.second();
+                string strTime = ss_format.str();
+                strSName.text = (char* )strTime.c_str();
+                strSName.u1Len = (uint8)strTime.length();
                 (*pBuffPacket) << strSName;
 
                 //写入Module当前状态
@@ -313,25 +311,25 @@ void DoMessage_ShowModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
             }
             else
             {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleName(%s)\n", pModuleInfo->GetName());
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleFileName(%s)\n", pModuleInfo->strModuleName.c_str());
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleFilePath(%s)\n", pModuleInfo->strModulePath.c_str());
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleParam(%s)\n", pModuleInfo->strModuleParam.c_str());
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleDesc(%s)\n", pModuleInfo->GetDesc());
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "CreeateTime(%04d-%02d-%02d %02d:%02d:%02d)\n", pModuleInfo->dtCreateTime.year(), pModuleInfo->dtCreateTime.month(), pModuleInfo->dtCreateTime.day(), pModuleInfo->dtCreateTime.hour(), pModuleInfo->dtCreateTime.minute(), pModuleInfo->dtCreateTime.second());
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-
                 uint32 u4ErrorID = 0;
-
                 pModuleInfo->GetModuleState(u4ErrorID);
-                sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleState Run u4ErrorID=%d.\n", u4ErrorID);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+
+                std::stringstream ss_format;
+                ss_format << "ModuleName(" << pModuleInfo->GetName() << ")\n"
+                    << "ModuleFileName(" << pModuleInfo->strModuleName << ")\n"
+                    << "ModuleFilePath(" << pModuleInfo->strModulePath << ")\n"
+                    << "ModuleParam(" << pModuleInfo->strModuleParam << ")\n"
+                    << "ModuleDesc(" << pModuleInfo->GetDesc() << ")\n"
+                    << "CreeateTime(" << pModuleInfo->dtCreateTime.year()
+                    << "-" << std::setfill('0') << std::setw(2) << pModuleInfo->dtCreateTime.month()
+                    << "-" << std::setfill('0') << std::setw(2) << pModuleInfo->dtCreateTime.day()
+                    << " " << std::setfill('0') << std::setw(2) << pModuleInfo->dtCreateTime.hour()
+                    << ":" << std::setfill('0') << std::setw(2) << pModuleInfo->dtCreateTime.minute()
+                    << ":" << std::setfill('0') << std::setw(2) << pModuleInfo->dtCreateTime.second()
+                    << ")\n"
+                    << "ModuleState Run u4ErrorID(" << u4ErrorID << ")\n";
+                string strLineText = ss_format.str();
+                pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
             }
         }
 
@@ -370,15 +368,13 @@ void DoMessage_CommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
             }
             else
             {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "CommandID is Find.\n");
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "CommandID(0x%08x)\n", u2CommandID);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "CommandCount(%d)\n", objCommandData.m_u4CommandCount);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "CommandCost(%d)\n", objCommandData.m_u8CommandCost);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                std::stringstream ss_format;
+                ss_format << "CommandID is Find\n"
+                    << "CommandID(" << u2CommandID << ")\n"
+                    << "CommandCount(" << objCommandData.m_u4CommandCount << ")\n"
+                    << "CommandCost(" << objCommandData.m_u8CommandCost << ")\n";
+                string strLineText = ss_format.str();
+                pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
             }
         }
         else
@@ -394,9 +390,10 @@ void DoMessage_CommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
             }
             else
             {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "CommandID is no Find.\n");
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                std::stringstream ss_format;
+                ss_format << "CommandID is no Find.\n";
+                string strLineText = ss_format.str();
+                pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
             }
         }
 
@@ -439,23 +436,17 @@ void DoMessage_WorkThreadState(const _CommandInfo& CommandInfo, IBuffPacket* pBu
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "ThreadID(%d)\n", i);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "ThreadUpdateTime(%d)\n", pCurrThreadInfo->m_tvUpdateTime.sec());
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "ThreadCreateTime(%d)\n", pCurrThreadInfo->m_tvCreateTime.sec());
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "ThreadState(%d)\n", pCurrThreadInfo->m_u4State);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "ThreadRecvPacketCount(%d)\n", pCurrThreadInfo->m_u4RecvPacketCount);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "ThreadCommandID(%d)\n", pCurrThreadInfo->m_u2CommandID);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "ThreadPacketTime(%d)\n", pCurrThreadInfo->m_u2PacketTime);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "ThreadCurrPacketCount(%d)\n", pCurrThreadInfo->m_u4CurrPacketCount);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "ThreadID(" << i << ")\n"
+                << "ThreadUpdateTime(" << pCurrThreadInfo->m_tvUpdateTime.sec() << ")\n"
+                << "ThreadCreateTime(" << pCurrThreadInfo->m_tvCreateTime.sec() << ")\n"
+                << "ThreadState(" << (int)pCurrThreadInfo->m_u4State << ")\n"
+                << "ThreadRecvPacketCount(" << pCurrThreadInfo->m_u4RecvPacketCount << ")\n"
+                << "ThreadCommandID(" << pCurrThreadInfo->m_u2CommandID << ")\n"
+                << "ThreadPacketTime(" << pCurrThreadInfo->m_u2PacketTime << ")\n"
+                << "ThreadCurrPacketCount(" << pCurrThreadInfo->m_u4CurrPacketCount << ")\n";
+            string strLineText = ss_format.str();
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
     }
 
@@ -469,7 +460,6 @@ void DoMessage_ClientInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
         vecClientConnectInfo VecClientConnectInfo;
 
         //待实现
-        //App_HandlerManager::instance()->GetConnectInfo(VecClientConnectInfo);
 
         uint32 u4ConnectCount = (uint32)VecClientConnectInfo.size();
         Combo_Common_Head_Data(CommandInfo.m_u1OutputType, u4ConnectCount, "Client IP Count(%d).\n", pBuffPacket);
@@ -492,9 +482,10 @@ void DoMessage_CloseClient(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
     }
     else
     {
-        char szTemp[MAX_BUFF_1024] = { '\0' };
-        sprintf_safe(szTemp, MAX_BUFF_1024, "Client Close is OK\n");
-        pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        std::stringstream ss_format;
+        ss_format << "Client Close is OK";
+        string strLineText = ss_format.str();
+        pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_COLSECLIENT;
@@ -561,9 +552,10 @@ void DoMessage_LifedIP(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket
     }
     else
     {
-        char szTemp[MAX_BUFF_1024] = { '\0' };
-        sprintf_safe(szTemp, MAX_BUFF_1024, "IP Forbidden cancel OK\n");
-        pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        std::stringstream ss_format;
+        ss_format << "IP Forbidden cancel OK";
+        string strLineText = ss_format.str();
+        pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_LIFTED;
@@ -654,17 +646,14 @@ void DoMessage_ShowProcessInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "CPUUsedRote(%d%%)\n", nCPU);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "MemorySize(%d Byte)\n", nMemorySize);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "FLowSize(%d)\n", u1Flow);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "FlowIn(%d)\n", u4FlowIn);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "FlowOut(%d)\n", u4FlowOut);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "CPUUsedRote(" << nCPU << "%%)\n"
+                << "MemorySize(" << nMemorySize << ")\n"
+                << "FLowSize(" << u1Flow << ")\n"
+                << "FLowSize(" << u4FlowIn << ")\n"
+                << "FlowOut(" << u4FlowOut << ")\n";
+            string strLineText = ss_format.str();
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
     }
 
@@ -675,8 +664,6 @@ void DoMessage_ShowClientHisTory(const _CommandInfo& CommandInfo, IBuffPacket* p
 {
     if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") == 0)
     {
-        char szTime[MAX_BUFF_100] = { '\0' };
-
         vecIPAccount VecIPAccount;
         App_IPAccount::instance()->GetInfo(VecIPAccount);
 
@@ -686,9 +673,10 @@ void DoMessage_ShowClientHisTory(const _CommandInfo& CommandInfo, IBuffPacket* p
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "ClientHisToryCount(%d)\n", VecIPAccount.size());
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "ClientHisToryCount(" << VecIPAccount.size() << ")\n";
+            string strLineText = ss_format.str();
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
 
         for (_IPAccount ipaccount : VecIPAccount)
@@ -703,38 +691,35 @@ void DoMessage_ShowClientHisTory(const _CommandInfo& CommandInfo, IBuffPacket* p
                 (*pBuffPacket) << (uint32)ipaccount.m_nAllCount;
 
                 VCHARS_STR strSName;
-                sprintf_safe(szTime, MAX_BUFF_100, "%04d-%02d-%02d %02d:%02d:%02d", 
-                    ipaccount.m_dtLastTime.year(), 
-                    ipaccount.m_dtLastTime.month(), 
-                    ipaccount.m_dtLastTime.day(), 
-                    ipaccount.m_dtLastTime.hour(), 
-                    ipaccount.m_dtLastTime.minute(), 
-                    ipaccount.m_dtLastTime.second());
-                strSName.text = szTime;
-                strSName.u1Len = (uint8)ACE_OS::strlen(szTime);
+                std::stringstream ss_format;
+                ss_format << ipaccount.m_dtLastTime.year()
+                    << "-" << std::setfill('0') << std::setw(2) << ipaccount.m_dtLastTime.month()
+                    << "-" << std::setfill('0') << std::setw(2) << ipaccount.m_dtLastTime.day()
+                    << " " << std::setfill('0') << std::setw(2) << ipaccount.m_dtLastTime.hour()
+                    << ":" << std::setfill('0') << std::setw(2) << ipaccount.m_dtLastTime.minute()
+                    << ":" << std::setfill('0') << std::setw(2) << ipaccount.m_dtLastTime.second();
+                string strTime = ss_format.str();
+
+                strSName.text = (char* )strTime.c_str();
+                strSName.u1Len = (uint8)strTime.length();
 
                 (*pBuffPacket) << strSName;
             }
             else
             {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "IP(%s)\n", ipaccount.m_strIP.c_str());
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "Count(%d)\n", ipaccount.m_nCount);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "AllCount(%d)\n", ipaccount.m_nAllCount);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "AllCount(%d)\n", ipaccount.m_nAllCount);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTime, MAX_BUFF_100, "%04d-%02d-%02d %02d:%02d:%02d", 
-                    ipaccount.m_dtLastTime.year(), 
-                    ipaccount.m_dtLastTime.month(), 
-                    ipaccount.m_dtLastTime.day(), 
-                    ipaccount.m_dtLastTime.hour(), 
-                    ipaccount.m_dtLastTime.minute(), 
-                    ipaccount.m_dtLastTime.second());
-                sprintf_safe(szTemp, MAX_BUFF_1024, "DateTime(%s)\n", ipaccount.m_nAllCount);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                std::stringstream ss_format;
+                ss_format << "IP(" << ipaccount.m_strIP << ")\n"
+                    << "Count(" << ipaccount.m_nCount << ")\n"
+                    << "AllCount(" << ipaccount.m_nAllCount << ")\n"
+                    << "Time(" << ipaccount.m_dtLastTime.year() 
+                    << "-" << std::setfill('0') << std::setw(2) << ipaccount.m_dtLastTime.month()
+                    << "-" << std::setfill('0') << std::setw(2) << ipaccount.m_dtLastTime.day()
+                    << " " << std::setfill('0') << std::setw(2) << ipaccount.m_dtLastTime.hour()
+                    << ":" << std::setfill('0') << std::setw(2) << ipaccount.m_dtLastTime.minute()
+                    << ":" << std::setfill('0') << std::setw(2) << ipaccount.m_dtLastTime.second()
+                    << ")\n";
+                string strLineText = ss_format.str();
+                pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
             }
         }
     }
@@ -763,9 +748,10 @@ void DoMessage_ShowAllCommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* 
     }
     else
     {
-        char szTemp[MAX_BUFF_1024] = { '\0' };
-        sprintf_safe(szTemp, MAX_BUFF_1024, "CommandInfoCount(%d)\n", u4Count);
-        pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        std::stringstream ss_format;
+        ss_format << "CommandInfoCount(" << u4Count << ")\n";
+        string strLineText = ss_format.str();
+        pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
     }
 
     for (const _ModuleClient* pModuleClient : vecModuleClient)
@@ -776,9 +762,10 @@ void DoMessage_ShowAllCommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* 
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleClientCount(%d)\n", pModuleClient->m_vecClientCommandInfo.size());
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "ModuleClientCount(" << pModuleClient->m_vecClientCommandInfo.size() << ")\n";
+            string strLineText = ss_format.str();
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
 
         for (_ClientCommandInfo* pClientCommandInfo : pModuleClient->m_vecClientCommandInfo)
@@ -795,15 +782,13 @@ void DoMessage_ShowAllCommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* 
             }
             else
             {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "ModuleName(%s)\n", pClientCommandInfo->m_szModuleName);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "CommandID(%d)\n", pClientCommandInfo->m_u2CommandID);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "Count(%d)\n", pClientCommandInfo->m_u4Count);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "TimeCost(%d)\n", pClientCommandInfo->m_u4TimeCost);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                std::stringstream ss_format;
+                ss_format << "ModuleName(" << pClientCommandInfo->m_szModuleName << ")\n"
+                    << "CommandID(" << pClientCommandInfo->m_u2CommandID << ")\n"
+                    << "Count(" << pClientCommandInfo->m_u4Count << ")\n"
+                    << "TimeCost(" << pClientCommandInfo->m_u4TimeCost << ")\n";
+                string strLineText = ss_format.str();
+                pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
             }
         }
     }
@@ -867,29 +852,26 @@ void DoMessage_ShowServerInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuf
         else
         {
             //文本输出
-            char szCharOrder[MAX_BUFF_20] = { '\0' };
+            string strCharOrder;
 
             if (GetXmlConfigAttribute(xmlNetWorkMode)->NetByteOrder == false)
             {
-                sprintf_safe(szCharOrder, MAX_BUFF_20, "HostOrder");   //主机字序
+                strCharOrder = "HostOrder";   //主机字序
             }
             else
             {
-                sprintf_safe(szCharOrder, MAX_BUFF_20, "NetOrder");    //网络字序
+                strCharOrder = "NetOrder";    //网络字序
             }
 
-
-            char szConsoleOutput[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szConsoleOutput, MAX_BUFF_1024, "ServerID:%d\nServerName:%s\nServerVersion:%s\nServerModuleCount=%d\nWorkthreadCount:%d\nServerProtocol:%s\nCharOrder:%s\n",
-                         GetXmlConfigAttribute(xmlServerID)->id,
-                         GetXmlConfigAttribute(xmlServerName)->name.c_str(),
-                         GetXmlConfigAttribute(xmlServerVersion)->Version.c_str(),
-                         App_ModuleLoader::instance()->GetCurrModuleCount(),
-                         App_MessageServiceGroup::instance()->GetThreadInfo()->GetThreadCount(),
-                         GetXmlConfigAttribute(xmlServerVersion)->Version.c_str(),
-                         szCharOrder);
-
-            pBuffPacket->WriteStream(szConsoleOutput, (uint32)ACE_OS::strlen(szConsoleOutput));
+            std::stringstream ss_format;
+            ss_format << "ServerID(" << GetXmlConfigAttribute(xmlServerID)->id << ")\n"
+                << "ServerName(" << GetXmlConfigAttribute(xmlServerName)->name << ")\n"
+                << "ServerVersion(" << GetXmlConfigAttribute(xmlServerVersion)->Version << ")\n"
+                << "ServerModuleCount(" << App_ModuleLoader::instance()->GetCurrModuleCount() << ")\n"
+                << "WorkthreadCount(" << App_MessageServiceGroup::instance()->GetThreadInfo()->GetThreadCount() << ")\n"
+                << "CharOrder(" << strCharOrder << ")\n";
+            string strLineText = ss_format.str();
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
     }
 
@@ -933,9 +915,10 @@ void DoMessage_CommandTimeout(const _CommandInfo& CommandInfo, IBuffPacket* pBuf
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "CommandTimeoutCount(%d)\n", u4Count);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "CommandTimeoutCount(" << u4Count << ")\n";
+            string strLineText = ss_format.str();
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
     }
 
@@ -952,9 +935,8 @@ void DoMessage_CommandTimeoutclr(const _CommandInfo& CommandInfo, IBuffPacket* p
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "State(OK)\n");
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            string strLineText = "State(OK)\n";
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
     }
 
@@ -974,9 +956,8 @@ void DoMessage_CommandDataLog(const _CommandInfo& CommandInfo, IBuffPacket* pBuf
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "State(OK)\n");
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            string strLineText = "State(OK)\n";
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
     }
 
@@ -1004,9 +985,8 @@ void DoMessage_SetDebug(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "State(OK)\n");
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            string strLineText = "State(OK)\n";
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
     }
 
@@ -1024,11 +1004,11 @@ void DoMessage_ShowDebug(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPack
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "DebugState(%d)\n", GetXmlConfigAttribute(xmlAceDebug)->TrunOn);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "State(OK)\n");
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "DebugState("<< GetXmlConfigAttribute(xmlAceDebug)->TrunOn << ")\n"
+                << "State(OK)\n";
+            string strLineText = ss_format.str();
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
     }
 
@@ -1096,9 +1076,10 @@ void DoMessage_GetTrackCommand(const _CommandInfo& CommandInfo, IBuffPacket* pBu
     }
     else
     {
-        char szTemp[MAX_BUFF_1024] = { '\0' };
-        sprintf_safe(szTemp, MAX_BUFF_1024, "CommandID Count(%d)\n", objList.size());
-        pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        std::stringstream ss_format;
+        ss_format << "CommandID Count(" << objList.size() << ")\n";
+        string strLineText = ss_format.str();
+        pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
     }
 
     for (_Dyeing_Command dyeingcommand : objList)
@@ -1111,13 +1092,12 @@ void DoMessage_GetTrackCommand(const _CommandInfo& CommandInfo, IBuffPacket* pBu
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "CommandID ID(%d)\n", dyeingcommand.m_u2CommandID);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "CurrCount ID(%d)\n", dyeingcommand.m_u2CurrCount);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-            sprintf_safe(szTemp, MAX_BUFF_1024, "MaxCount ID(%d)\n", dyeingcommand.m_u2MaxCount);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "CommandID ID(" << dyeingcommand.m_u2CommandID << ")\n"
+                << "CurrCount ID(" << dyeingcommand.m_u2CurrCount << ")\n"
+                << "MaxCount ID(" << dyeingcommand.m_u2MaxCount << ")\n";
+            string strLineText = ss_format.str();
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
     }
 
@@ -1141,9 +1121,8 @@ void DoMessage_GetConnectIPInfo(const _CommandInfo& CommandInfo, IBuffPacket* pB
             }
             else
             {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "IP not find\n");
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                string strLineText = "IP not find\n";
+                pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
             }
         }
         else
@@ -1162,11 +1141,11 @@ void DoMessage_GetConnectIPInfo(const _CommandInfo& CommandInfo, IBuffPacket* pB
             }
             else
             {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "ClientIP=%s,Port=%d.\n", 
-                    objClientIPInfo.m_strClientIP.c_str(), 
-                    objClientIPInfo.m_u2Port);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                std::stringstream ss_format;
+                ss_format << "ClientIP(" << objClientIPInfo.m_strClientIP << ")\n"
+                    << "Port(" << objClientIPInfo.m_u2Port << ")\n";
+                string strLineText = ss_format.str();
+                pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
             }
         }
     }
@@ -1185,9 +1164,11 @@ void DoMessage_GetLogLevelInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "LogCount=%d,LogLevel=%d.\n", AppLogManager::instance()->GetLogCount(), AppLogManager::instance()->GetCurrLevel());
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "LogCount(" << AppLogManager::instance()->GetLogCount() << ")\n"
+                << "LogLevel(" << AppLogManager::instance()->GetCurrLevel() << ")\n";
+            string strLineText = ss_format.str();
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
 
         for (uint16 i = 0; i < (uint16)AppLogManager::instance()->GetLogCount(); i++)
@@ -1228,15 +1209,14 @@ void DoMessage_GetLogLevelInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
             }
             else
             {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "m_u1OutputType=%d.\n", u2LogID);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "pServerName=%d.\n", pServerName);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "pLogName=%d.\n", pLogName);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
-                sprintf_safe(szTemp, MAX_BUFF_1024, "u1LogType=%d,GetLogInfoByLogLevel=%d.\n", u1LogType, AppLogManager::instance()->GetLogInfoByLogLevel(i));
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                std::stringstream ss_format;
+                ss_format << "m_u1OutputType(" << u2LogID << ")\n"
+                    << "pServerName(" << pServerName << ")\n"
+                    << "pLogName(" << pLogName << ")\n"
+                    << "u1LogType(" << u1LogType << ")\n"
+                    << "GetLogInfoByLogLevel(" << AppLogManager::instance()->GetLogInfoByLogLevel(i) << ")\n";
+                string strLineText = ss_format.str();
+                pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
             }
         }
     }
@@ -1258,9 +1238,8 @@ void DoMessage_SetLogLevelInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "OK.\n");
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            string strLineText = "OK.\n";
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
     }
 
@@ -1282,9 +1261,10 @@ void DoMessage_GetThreadAI(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "u2ThreadCount=%d.\n", u2ThreadCount);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "u2ThreadCount(" << u2ThreadCount << ")\n";
+            string strLineText = ss_format.str();
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
 
         for (uint16 i = 0; i < u2ThreadCount; i++)
@@ -1300,12 +1280,12 @@ void DoMessage_GetThreadAI(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
             }
             else
             {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "m_u4ThreadID=%d,m_u1WTAI=%d,m_u4WTTimeoutCount=%d.\n",
-                             objvecWorkThreadAIInfo[i].m_u4ThreadID,
-                             objvecWorkThreadAIInfo[i].m_u1WTAI,
-                             objvecWorkThreadAIInfo[i].m_u4WTTimeoutCount);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                std::stringstream ss_format;
+                ss_format << "m_u4ThreadID(" << objvecWorkThreadAIInfo[i].m_u4ThreadID << ")\n"
+                    << "m_u1WTAI(" << objvecWorkThreadAIInfo[i].m_u1WTAI << ")\n"
+                    << "m_u4WTTimeoutCount(" << objvecWorkThreadAIInfo[i].m_u4WTTimeoutCount << ")\n";
+                string strLineText = ss_format.str();
+                pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
             }
         }
     }
@@ -1329,9 +1309,10 @@ void DoMessage_GetWorkThreadTO(const _CommandInfo& CommandInfo, IBuffPacket* pBu
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "u2ThreadCount=%d.\n", u2ThreadCount);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "u2ThreadCount(" << u2ThreadCount << ")\n";
+            string strLineText = ss_format.str();
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
 
         for (uint16 i = 0; i < u2ThreadCount; i++)
@@ -1345,13 +1326,13 @@ void DoMessage_GetWorkThreadTO(const _CommandInfo& CommandInfo, IBuffPacket* pBu
             }
             else
             {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "m_u4ThreadID=%d,m_u2CommandID=%d,m_u4Second=%d,m_u4Timeout=%d.\n",
-                             objTimeout[i].m_u4ThreadID,
-                             objTimeout[i].m_u2CommandID,
-                             (uint32)objTimeout[i].m_u8Second,
-                             objTimeout[i].m_u4Timeout);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                std::stringstream ss_format;
+                ss_format << "m_u4ThreadID" << objTimeout[i].m_u4ThreadID << ")\n"
+                    << "m_u2CommandID(" << objTimeout[i].m_u2CommandID << ")\n"
+                    << "m_u4Second(" << (uint32)objTimeout[i].m_u8Second << ")\n"
+                    << "m_u4Timeout(" << objTimeout[i].m_u4Timeout << ")\n";
+                string strLineText = ss_format.str();
+                pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
             }
         }
 
@@ -1365,9 +1346,10 @@ void DoMessage_GetWorkThreadTO(const _CommandInfo& CommandInfo, IBuffPacket* pBu
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "u2ThreadCount=%d.\n", u2ThreadCount);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "u2ThreadCount(" << u2ThreadCount << ")\n";
+            string strLineText = ss_format.str();
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
 
         for (uint16 i = 0; i < u2ThreadCount; i++)
@@ -1380,12 +1362,12 @@ void DoMessage_GetWorkThreadTO(const _CommandInfo& CommandInfo, IBuffPacket* pBu
             }
             else
             {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "m_u4ThreadID=%d,m_u2CommandID=%d,m_u4Second=%d.\n",
-                             objTimeoutF[i].m_u4ThreadID,
-                             objTimeoutF[i].m_u2CommandID,
-                             (uint32)objTimeoutF[i].m_u8Second);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                std::stringstream ss_format;
+                ss_format << "m_u4ThreadID(" << objTimeoutF[i].m_u4ThreadID << ")\n"
+                    << "m_u2CommandID=" << objTimeoutF[i].m_u2CommandID << ")\n"
+                    << "m_u4Second=" << (uint32)objTimeoutF[i].m_u8Second << ")\n";
+                string strLineText = ss_format.str();
+                pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
             }
         }
     }
@@ -1424,9 +1406,8 @@ void DoMessage_SetWorkThreadAI(const _CommandInfo& CommandInfo, IBuffPacket* pBu
     }
     else
     {
-        char szTemp[MAX_BUFF_1024] = { '\0' };
-        sprintf_safe(szTemp, MAX_BUFF_1024, "OK.\n");
-        pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        string strLineText = "OK.\n";
+        pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_SETWTAI;
@@ -1440,7 +1421,6 @@ void DoMessage_GetNickNameInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
     if (GetNickName(CommandInfo.m_strCommandExp.c_str(), strNickName) == true)
     {
         //暂时不实现
-        //App_HandlerManager::instance()->GetClientNameInfo(szNickName, objClientNameInfo);
 
         //返回信息列表
         if (CommandInfo.m_u1OutputType == 0)
@@ -1449,9 +1429,10 @@ void DoMessage_GetNickNameInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "objClientNameInfo size=%d.\n", objClientNameInfo.size());
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "objClientNameInfo size(" << objClientNameInfo.size() << ")\n";
+            string strLineText = ss_format.str();
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
 
         for (_ClientNameInfo clinetnameinfo : objClientNameInfo)
@@ -1474,14 +1455,14 @@ void DoMessage_GetNickNameInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
             }
             else
             {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "m_nConnectID=%d,strIP=%s,m_nPort=%d,strName=%s,m_nLog=%d.\n",
-                    clinetnameinfo.m_nConnectID,
-                    clinetnameinfo.m_szClientIP,
-                    clinetnameinfo.m_u2Port,
-                    clinetnameinfo.m_szName,
-                    clinetnameinfo.m_nLog);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                std::stringstream ss_format;
+                ss_format << "m_nConnectID(" << clinetnameinfo.m_nConnectID << ")\n"
+                    << "strIP(" << clinetnameinfo.m_szClientIP << ")\n"
+                    << "m_nPort(" << clinetnameinfo.m_u2Port << ")\n"
+                    << "strName(" << clinetnameinfo.m_szName << ")\n"
+                    << "m_nLog=%(" << clinetnameinfo.m_nLog << ")\n";
+                string strLineText = ss_format.str();
+                pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
             }
         }
     }
@@ -1505,9 +1486,8 @@ void DoMessage_SetConnectLog(const _CommandInfo& CommandInfo, IBuffPacket* pBuff
     }
     else
     {
-        char szTemp[MAX_BUFF_1024] = { '\0' };
-        sprintf_safe(szTemp, MAX_BUFF_1024, "OK.\n");
-        pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        string strLineText = "OK.\n";
+        pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_SETCONNECTLOG;
@@ -1528,9 +1508,8 @@ void DoMessage_SetMaxConnectCount(const _CommandInfo& CommandInfo, IBuffPacket* 
     }
     else
     {
-        char szTemp[MAX_BUFF_1024] = { '\0' };
-        sprintf_safe(szTemp, MAX_BUFF_1024, "OK.\n");
-        pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+        string strLineText = "OK.\n";
+        pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
     }
 
     u2ReturnCommandID = CONSOLE_COMMAND_SETMAXCONNECTCOUNT;
@@ -1614,9 +1593,10 @@ void DoMessage_ShowListen(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "objControlInfo Count=%d.\n", u4ListenCount);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "objControlInfo(" << u4ListenCount << ")\n";
+            string strLineText = ss_format.str();
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
 
         for (uint32 i = 0; i < u4ListenCount; i++)
@@ -1638,11 +1618,11 @@ void DoMessage_ShowListen(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
             }
             else
             {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "strIP=%s,m_u4Port=%d.\n",
-                             obj_ControlInfo.m_szListenIP,
-                             obj_ControlInfo.m_u4Port);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                std::stringstream ss_format;
+                ss_format << "strIP(" << obj_ControlInfo.m_szListenIP << ")\n"
+                    << "m_u4Port(" << obj_ControlInfo.m_u4Port << ")\n";
+                string strLineText = ss_format.str();
+                pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
             }
         }
     }
@@ -1688,15 +1668,15 @@ void DoMessage_MonitorInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "nActiveClient=%d,nPoolClient=%d,MaxHandlerCoun=%d,CurrConnect=%d,u4FlowIn=%d,u4FlowOut=%d.\n",
-                         nActiveClient,
-                         nPoolClient,
-                         GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount,
-                         App_ConnectAccount::instance()->GetCurrConnect(),
-                         u4FlowIn,
-                         u4FlowOut);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "nActiveClient(" << nActiveClient << ")\n"
+                << "nPoolClient(" << nPoolClient << ")\n"
+                << "MaxHandlerCoun(" << GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount << ")\n"
+                << "CurrConnect(" << App_ConnectAccount::instance()->GetCurrConnect() << ")\n"
+                << "u4FlowIn(" << u4FlowIn << ")\n"
+                << "u4FlowOut(" << u4FlowIn << ")\n";
+            string strLineText = ss_format.str();
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
     }
 
@@ -1738,13 +1718,13 @@ void DoMessage_TestFileStart(const _CommandInfo& CommandInfo, IBuffPacket* pBuff
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "n4Result=%d,n4TimeInterval=%d,n4ProNum=%d,vecProFileDesc=%d.\n",
-                         objFileResult.n4Result,
-                         objFileResult.n4TimeInterval,
-                         objFileResult.n4ProNum,
-                         objFileResult.vecProFileDesc.size());
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "n4Result(" << (int)objFileResult.n4Result << ")\n"
+                << "n4TimeInterval(" << objFileResult.n4TimeInterval << ")\n"
+                << "n4ProNum(" << objFileResult.n4ProNum << ")\n"
+                << "vecProFileDesc(" << objFileResult.vecProFileDesc.size() << ")\n";
+            string strLineText = ss_format.str();
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
 
         for (uint16 i = 0; i < (uint16)objFileResult.vecProFileDesc.size(); i++)
@@ -1755,10 +1735,10 @@ void DoMessage_TestFileStart(const _CommandInfo& CommandInfo, IBuffPacket* pBuff
             }
             else
             {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "vecProFileDesc=%s.\n",
-                             objFileResult.vecProFileDesc[i].c_str());
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                std::stringstream ss_format;
+                ss_format << "vecProFileDesc(" << objFileResult.vecProFileDesc[i].c_str() << ")\n";
+                string strLineText = ss_format.str();
+                pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
             }
         }
     }
@@ -1773,9 +1753,8 @@ void DoMessage_TestFileStart(const _CommandInfo& CommandInfo, IBuffPacket* pBuff
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "Fail.\n");
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            string strLineText = "Fail.\n";
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
     }
 }
@@ -1793,9 +1772,10 @@ void DoMessage_TestFileStop(const _CommandInfo& CommandInfo, IBuffPacket* pBuffP
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "Ret=%d.\n", nRet);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "Ret(" << nRet << ")\n";
+            string strLineText = ss_format.str();
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
     }
 }
@@ -1820,9 +1800,10 @@ void DoMessage_PortList(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "u4Count=%d.\n", u4Count);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "u4Count(" << u4Count << ")\n";
+            string strLineText = ss_format.str();
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
 
         for (uint32 i = 0; i < u4Count; i++)
@@ -1836,13 +1817,13 @@ void DoMessage_PortList(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
             }
             else
             {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "m_u1Type=%d,m_u4Port=%d,m_u4FlowIn=%d,m_u4FlowOut=%d.\n",
-                             vec_Port_Data_Account[i].m_u1ThreadID,
-                             vec_Port_Data_Account[i].m_u4Minute,
-                             vec_Port_Data_Account[i].m_u4PacketIn,
-                             vec_Port_Data_Account[i].m_u4PacketOut);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                std::stringstream ss_format;
+                ss_format << "m_u1Type(" << vec_Port_Data_Account[i].m_u1ThreadID << ")\n"
+                    << "m_u4Port(" << vec_Port_Data_Account[i].m_u4Minute << ")\n"
+                    << "m_u4FlowIn(" << vec_Port_Data_Account[i].m_u4PacketIn << ")\n"
+                    << "m_u4FlowOut(" << vec_Port_Data_Account[i].m_u4PacketOut << ")\n";
+                string strLineText = ss_format.str();
+                pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
             }
         }
     }
@@ -1862,9 +1843,10 @@ void Do_Message_BuffPacket(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
         }
         else
         {
-            char szTemp[MAX_BUFF_1024] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_1024, "u4Count=%d.\n", u4Count);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "u4Count(" << u4Count << ")\n";
+            string strLineText = ss_format.str();
+            pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
 
         for (uint32 i = 0; i < u4Count; i++)
@@ -1884,12 +1866,12 @@ void Do_Message_BuffPacket(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
             }
             else
             {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "strFileName=%s,m_u4Line=%d,m_u4Count=%d.\n",
-                             objCreateInfo.m_szCreateFileName,
-                             objCreateInfo.m_u4Line,
-                             objCreateInfo.m_u4Count);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                std::stringstream ss_format;
+                ss_format << "strFileName(" << objCreateInfo.m_szCreateFileName << ")\n"
+                    << "m_u4Line(" << objCreateInfo.m_u4Line << ")\n"
+                    << "m_u4Count(" << objCreateInfo.m_u4Count << ")\n";
+                string strLineText = ss_format.str();
+                pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
             }
         }
     }
@@ -1913,9 +1895,8 @@ void Do_Message_PoolSet(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
             }
             else
             {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "Set ok.\n");
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                string strLineText = "Set ok.\n";
+                pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
             }
         }
         else if (objPoolName.m_strPoolName == "PacketParse")
@@ -1928,9 +1909,8 @@ void Do_Message_PoolSet(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
             }
             else
             {
-                char szTemp[MAX_BUFF_1024] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_1024, "Set ok.\n");
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                string strLineText = "Set ok.\n";
+                pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
             }
         }
     }
