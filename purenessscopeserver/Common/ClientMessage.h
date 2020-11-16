@@ -8,7 +8,7 @@
 #include "IMessageBlockManager.h"
 
 //收到的数据包数据回路
-enum EM_PACKET_ROUTE
+enum class EM_PACKET_ROUTE
 {
     PACKET_ROUTE_SELF = 0,   //数据包回路，需要m_pClientMessage自己去处理
     PACKET_ROUTE_CLIENT_MESSAHE,   //数据包回路，回应到CMessageService去处理

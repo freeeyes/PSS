@@ -55,7 +55,7 @@ public:
     //这里提供接受数据拼包算法，组成完整数据包后会调用RecvData方法
     virtual bool Recv_Format_data(ACE_Message_Block* mbRecv, IMessageBlockManager* pMessageBlockManager, uint16& u2CommandID, ACE_Message_Block*& mbFinishRecv, EM_PACKET_ROUTE& emPacketRoute)
     {
-        emPacketRoute = PACKET_ROUTE_SELF;
+        emPacketRoute = EM_PACKET_ROUTE::PACKET_ROUTE_SELF;
         u2CommandID = 0x1000;
 
         //判断返回数据块是否小于8或者超过最大缓冲大小
@@ -67,25 +67,26 @@ public:
         else
         {
             //统一贴入缓冲，再有缓冲切割发送数据
-            ACE_OS::memcpy(&m_szRecvBuffData[m_u2RecvBuffLength], mbRecv->rd_ptr(), mbRecv->length());
             m_u2RecvBuffLength += (uint16)mbRecv->length();
-            mbRecv->rd_ptr(mbRecv->length());
         }
 
 
 
         //这里添加完整数据包算法
         uint32 u4Count = 0;
-        memcpy_safe(&m_szRecvBuffData[0], sizeof(uint32), (char*)&u4Count, sizeof(uint32));
+        memcpy_safe(mbRecv->rd_ptr(), sizeof(uint32), (char*)&u4Count, sizeof(uint32));
+        mbRecv->rd_ptr(sizeof(uint32));
 
-        uint32 u4RecvFinish = u4Count + sizeof(uint32);
+        //记录数据包图
+        uint32 u4RecvFinish = u4Count;
 
         if (u4RecvFinish <= m_u2RecvBuffLength)
         {
             //完整数据包处理
             mbFinishRecv = pMessageBlockManager->Create(u4RecvFinish);
-            memcpy_safe(&m_szRecvBuffData[0], u4RecvFinish, mbFinishRecv->rd_ptr(), u4RecvFinish);
+            memcpy_safe(mbRecv->rd_ptr(), u4RecvFinish, mbFinishRecv->rd_ptr(), u4RecvFinish);
             mbFinishRecv->wr_ptr(u4RecvFinish);
+            mbRecv->rd_ptr(u4RecvFinish);
 
             m_u2RecvBuffLength -= u4RecvFinish;
         }
@@ -122,7 +123,6 @@ public:
 
 private:
     uint32                     m_u4ServerID                     = 0;
-    char                       m_szRecvBuffData[RECV_BUFF_SIZE] = {'\0'};  //接收缓冲池
     uint16                     m_u2RecvBuffLength               = 0;       //接收缓冲长度
 };
 
