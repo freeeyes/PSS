@@ -296,7 +296,9 @@ void CProConnectHandler::handle_write_stream(const ACE_Asynch_Write_Stream::Resu
         //清理发送数据信息
         App_MessageBlockManager::instance()->Close(&result.message_block());
 
+#ifdef SET_PROFILE_OUTPUT
         m_SendCounter.counter();
+#endif
 
         return;
     }
@@ -840,8 +842,9 @@ bool CProConnectHandler::CheckMessage()
 
 		m_objPacketParse.Clear();
 		
-
+#ifdef SET_PROFILE_OUTPUT        
         m_RecvCounter.counter();
+#endif
     }
     else
     {

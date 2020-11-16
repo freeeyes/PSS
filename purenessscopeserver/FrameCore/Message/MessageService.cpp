@@ -299,17 +299,18 @@ bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4
 	}
 
     //Æ´½ÓÏûÏ¢
-    objRecvMessage.GetMessageBase()->m_u2Cmd         = pMessage->m_u2Cmd;
-    objRecvMessage.GetMessageBase()->m_strClientIP   = pWorkThread_Handler_info->m_strRemoteIP;
-    objRecvMessage.GetMessageBase()->m_u2ClientPort  = pWorkThread_Handler_info->m_u2RemotePort;
-    objRecvMessage.GetMessageBase()->m_strListenIP   = pWorkThread_Handler_info->m_strLocalIP;
-    objRecvMessage.GetMessageBase()->m_u2ListenPort  = pWorkThread_Handler_info->m_u2LocalPort;
-    objRecvMessage.GetMessageBase()->m_tvRecvTime    = pMessage->m_tvMessage;
-    objRecvMessage.GetMessageBase()->m_u4ConnectID   = pMessage->m_u4ConnectID;
-    objRecvMessage.GetMessageBase()->m_u4HeadSrcSize = u4PacletHeadLength;
-    objRecvMessage.GetMessageBase()->m_u4BodySrcSize = u4PacletBodyLength;
-    objRecvMessage.GetMessageBase()->m_emPacketType  = pMessage->m_emPacketType;
-    objRecvMessage.GetMessageBase()->m_emResouceType = pMessage->m_emResouceType;
+    objRecvMessage.GetMessageBase()->m_u2Cmd          = pMessage->m_u2Cmd;
+    objRecvMessage.GetMessageBase()->m_strClientIP    = pWorkThread_Handler_info->m_strRemoteIP;
+    objRecvMessage.GetMessageBase()->m_u2ClientPort   = pWorkThread_Handler_info->m_u2RemotePort;
+    objRecvMessage.GetMessageBase()->m_strListenIP    = pWorkThread_Handler_info->m_strLocalIP;
+    objRecvMessage.GetMessageBase()->m_u2ListenPort   = pWorkThread_Handler_info->m_u2LocalPort;
+    objRecvMessage.GetMessageBase()->m_tvRecvTime     = pMessage->m_tvMessage;
+    objRecvMessage.GetMessageBase()->m_u4ConnectID    = pMessage->m_u4ConnectID;
+    objRecvMessage.GetMessageBase()->m_u4HeadSrcSize  = u4PacletHeadLength;
+    objRecvMessage.GetMessageBase()->m_u4BodySrcSize  = u4PacletBodyLength;
+    objRecvMessage.GetMessageBase()->m_emPacketType   = pMessage->m_emPacketType;
+    objRecvMessage.GetMessageBase()->m_emResouceType  = pMessage->m_emResouceType;
+    objRecvMessage.GetMessageBase()->m_u4WorkThreadID = m_u4ThreadID;
 
     objRecvMessage.SetPacketHead(pMessage->m_pmbRecvHead);
     objRecvMessage.SetPacketBody(pMessage->m_pmbRecvBody);

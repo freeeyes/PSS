@@ -85,7 +85,7 @@ int CConsolePromissions::Check_Split_User(const char* pUser, const char* pUserLi
 
     while (NULL != pPromissPos)
     {
-        uint32 u4NameLen = (uint32)(pPromissPos - pPromissPosBegin);
+        auto u4NameLen = (uint32)(pPromissPos - pPromissPosBegin);
 
         if (u4NameLen > MAX_BUFF_50)
         {
@@ -120,7 +120,7 @@ int CConsolePromissions::Check_Split_User(const char* pUser, const char* pUserLi
         else
         {
             //最后一个
-            u4NameLen = (uint32)strlen(pUserList) - (uint32)(pPromissPosBegin - pUserList - 1);;
+            u4NameLen = (uint32)strlen(pUserList) - (uint32)(pPromissPosBegin - pUserList - 1);
             strTempUser.append(pPromissPosBegin, u4NameLen);
         }
 

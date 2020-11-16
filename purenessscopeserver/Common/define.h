@@ -60,6 +60,8 @@ BEGIN_NAMESPACE
 #define NULL 0
 #endif
 
+#define SET_PROFILE_OUTPUT    1   //是否打开性能监控选项
+
 #define MAINCONFIG            "main.xml"
 #define ALERTCONFIG           "alert.xml"
 #define FORBIDDENIP_FILE      "forbiddenIP.xml"

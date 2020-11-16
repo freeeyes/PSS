@@ -124,7 +124,7 @@ void DoMessage_LoadModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
 
     //加载文件MessageManager
     //消息所有的工作线程同步更新一下各自的消息列表副本
-    if (true == App_ModuleLoader::instance()->LoadModule(FileInfo.m_szFilePath, FileInfo.m_szFileName, FileInfo.m_szFileParam) &&
+    if (true == App_ModuleLoader::instance()->LoadModule(FileInfo.m_strFilePath.c_str(), FileInfo.m_strFileName.c_str(), FileInfo.m_strFileParam.c_str()) &&
         true == App_MessageServiceGroup::instance()->PutUpdateCommandMessage(App_MessageManager::instance()->GetUpdateIndex()))
     {
         if (CommandInfo.m_u1OutputType == 0)
@@ -133,9 +133,10 @@ void DoMessage_LoadModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
         }
         else
         {
-            char szTemp[MAX_BUFF_200] = { '\0' };
-            sprintf_safe(szTemp, MAX_BUFF_200, "LoadModule(%s) is fail.\n", FileInfo.m_szFileName);
-            pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+            std::stringstream ss_format;
+            ss_format << "LoadModule(" << FileInfo.m_strFileName << ") is fail.\n";
+            string strOutput = ss_format.str();
+            pBuffPacket->WriteStream(strOutput.c_str(), (uint32)strOutput.length());
         }
     }
     else
@@ -148,9 +149,10 @@ void DoMessage_LoadModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
             }
             else
             {
-                char szTemp[MAX_BUFF_200] = { '\0' };
-                sprintf_safe(szTemp, MAX_BUFF_200, "LoadModule(%s) is OK.\n", FileInfo.m_szFileName);
-                pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
+                std::stringstream ss_format;
+                ss_format << "LoadModule(" << FileInfo.m_strFileName << ") is OK.\n";
+                string strOutput = ss_format.str();
+                pBuffPacket->WriteStream(strOutput.c_str(), (uint32)strOutput.length());
             }
         }
     }
@@ -1039,7 +1041,8 @@ void DoMessage_SetTrackIP(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
 
     if (true == GetDyeingIP(CommandInfo.m_strCommandExp.c_str(), objDyeIPInfo))
     {
-        App_MessageServiceGroup::instance()->AddDyringIP(objDyeIPInfo.m_szClientIP, objDyeIPInfo.m_u2MaxCount);
+        App_MessageServiceGroup::instance()->AddDyringIP(objDyeIPInfo.m_strClientIP.c_str(), 
+            objDyeIPInfo.m_u2MaxCount);
         Combo_Common_Return_Data(CommandInfo.m_u1OutputType, 0, "State(OK).\n", pBuffPacket);
     }
     else
@@ -1431,10 +1434,10 @@ void DoMessage_SetWorkThreadAI(const _CommandInfo& CommandInfo, IBuffPacket* pBu
 
 void DoMessage_GetNickNameInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    char szNickName[MAX_BUFF_100] = { '\0' };
+    string strNickName;
     vecClientNameInfo objClientNameInfo;
 
-    if (GetNickName(CommandInfo.m_strCommandExp.c_str(), szNickName) == true)
+    if (GetNickName(CommandInfo.m_strCommandExp.c_str(), strNickName) == true)
     {
         //暂时不实现
         //App_HandlerManager::instance()->GetClientNameInfo(szNickName, objClientNameInfo);
@@ -1541,12 +1544,12 @@ void DoMessage_AddListen(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPack
     if (GetListenInfo(CommandInfo.m_strCommandExp.c_str(), objListenInfo) == true)
     {
 #if PSS_PLATFORM == PLATFORM_WIN
-        blState = App_ProControlListen::instance()->AddListen(objListenInfo.m_szListenIP,
+        blState = App_ProControlListen::instance()->AddListen(objListenInfo.m_strListenIP.c_str(),
                   objListenInfo.m_u2Port,
                   objListenInfo.m_u1IPType,
                   objListenInfo.m_u4PacketParseID);
 #else
-        blState = App_ControlListen::instance()->AddListen(objListenInfo.m_szListenIP,
+        blState = App_ControlListen::instance()->AddListen(objListenInfo.m_strListenIP.c_str(),
                   objListenInfo.m_u2Port,
                   objListenInfo.m_u1IPType,
                   objListenInfo.m_u4PacketParseID);
@@ -1573,10 +1576,10 @@ void DoMessage_DelListen(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPack
     if (GetListenInfo(CommandInfo.m_strCommandExp.c_str(), objListenInfo) == true)
     {
 #if PSS_PLATFORM == PLATFORM_WIN
-        blState = App_ProControlListen::instance()->DelListen(objListenInfo.m_szListenIP,
+        blState = App_ProControlListen::instance()->DelListen(objListenInfo.m_strListenIP.c_str(),
                   objListenInfo.m_u2Port);
 #else
-        blState = App_ControlListen::instance()->DelListen(objListenInfo.m_szListenIP,
+        blState = App_ControlListen::instance()->DelListen(objListenInfo.m_strListenIP.c_str(),
                   objListenInfo.m_u2Port);
 #endif
 
@@ -1715,16 +1718,16 @@ void DoMessage_ServerClose(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
 
 void DoMessage_TestFileStart(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    char szFileName[MAX_BUFF_200] = { '\0' };
+    string strFileName;
 
-    if (GetTestFileName(CommandInfo.m_strCommandExp.c_str(), szFileName) == true)
+    if (GetTestFileName(CommandInfo.m_strCommandExp.c_str(), strFileName) == true)
     {
-        OUR_DEBUG((LM_INFO, "[Do_Message_TestFileStart]file=%s.\n", szFileName));
+        OUR_DEBUG((LM_INFO, "[Do_Message_TestFileStart]file=%s.\n", strFileName.c_str()));
         u2ReturnCommandID = CONSOLE_COMMAND_FILE_TEST_START;
 
         FileTestResultInfoSt objFileResult;
 
-        objFileResult = App_FileTestManager::instance()->FileTestStart(szFileName);
+        objFileResult = App_FileTestManager::instance()->FileTestStart(strFileName.c_str());
 
         if (CommandInfo.m_u1OutputType == 0)
         {
@@ -1900,7 +1903,7 @@ void Do_Message_PoolSet(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
     {
         u2ReturnCommandID = CONSOLE_COMMAND_POOL_SET;
 
-        if (ACE_OS::strcmp(objPoolName.m_szPoolName, "BuffPacket") == 0)
+        if (objPoolName.m_strPoolName == "BuffPacket")
         {
             App_BuffPacketManager::instance()->SetCreateFlag(objPoolName.m_blState);
 
@@ -1915,7 +1918,7 @@ void Do_Message_PoolSet(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
                 pBuffPacket->WriteStream(szTemp, (uint32)ACE_OS::strlen(szTemp));
             }
         }
-        else if (ACE_OS::strcmp(objPoolName.m_szPoolName, "PacketParse") == 0)
+        else if (objPoolName.m_strPoolName == "PacketParse")
         {
             App_PacketParsePool::instance()->SetCreateFlag(objPoolName.m_blState);
 

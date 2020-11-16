@@ -183,7 +183,7 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
     u4Data4Len = (uint32)(nLen - (pParamBegin - pCommand - ACE_OS::strlen(COMMAND_SPLIT_STRING)) + 1);
     if (MAX_BUFF_100 > u4Data4Len)
     {
-        CommandInfo.m_strCommandExp.append((char*)(pParamBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING)),
+        CommandInfo.m_strCommandExp.append(pParamBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING),
             u4Data4Len);
     }
 

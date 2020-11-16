@@ -48,7 +48,7 @@ void CUnit_MessageDefine::Test_GetDyeingIP(void)
 
     blRet = false;
 
-    if (ACE_OS::strcmp(objDyeIPInfo.m_szClientIP, "127.0.0.1") == 0 && objDyeIPInfo.m_u2MaxCount == 5)
+    if (objDyeIPInfo.m_strClientIP == "127.0.0.1" && objDyeIPInfo.m_u2MaxCount == 5)
     {
         blRet = true;
     }
@@ -68,17 +68,17 @@ void CUnit_MessageDefine::Test_GetFileInfo(void)
 
     blRet = false;
 
-    if (ACE_OS::strcmp(FileInfo.m_szFileName, "TcpTest.so") == 0
-        && ACE_OS::strcmp(FileInfo.m_szFilePath, "./") == 0
-        && ACE_OS::strcmp(FileInfo.m_szFileParam, "Param") == 0)
+    if (FileInfo.m_strFileName == "TcpTest.so"
+        && FileInfo.m_strFilePath == "./"
+        && FileInfo.m_strFileParam == "Param")
     {
         blRet = true;
     }
 
     OUR_DEBUG((LM_INFO, "[Test_GetFileInfo]m_szFileName=%s,m_szFilePath=%s,m_szFileParam=%s.",
-               FileInfo.m_szFileName,
-               FileInfo.m_szFilePath,
-               FileInfo.m_szFileParam));
+               FileInfo.m_strFileName.c_str(),
+               FileInfo.m_strFilePath.c_str(),
+               FileInfo.m_strFileParam.c_str()));
     CPPUNIT_ASSERT_MESSAGE("[Test_GetFileInfo]GetFileInfo Data is fail.", true == blRet);
     m_nTestCount++;
 }
@@ -187,7 +187,7 @@ void CUnit_MessageDefine::Test_GetListenInfo(void)
 
     CPPUNIT_ASSERT_MESSAGE("[Test_GetListenInfo]GetListenInfo is fail.", true == blRet);
 
-    if (ACE_OS::strcmp(objListenInfo.m_szListenIP, "127.0.0.1") == 0 &&
+    if (objListenInfo.m_strListenIP == "127.0.0.1" &&
         objListenInfo.m_u1IPType == 1 &&
         objListenInfo.m_u2Port == 10003 &&
         objListenInfo.m_u4PacketParseID == 1)
@@ -208,7 +208,7 @@ void CUnit_MessageDefine::Test_GetPoolSet(void)
 
     CPPUNIT_ASSERT_MESSAGE("[Test_GetPoolSet]GetPoolSet is fail.", true == blRet);
 
-    if (ACE_OS::strcmp(objPoolName.m_szPoolName, "freeeyes") == 0 &&
+    if (objPoolName.m_strPoolName == "freeeyes" &&
         objPoolName.m_blState == true)
     {
         blRet = true;
