@@ -298,12 +298,12 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
 
                 while (true)
                 {
-                    EM_PACKET_ROUTE em_PacketRoute = PACKET_ROUTE_SELF;
+                    EM_PACKET_ROUTE em_PacketRoute = EM_PACKET_ROUTE::PACKET_ROUTE_SELF;
                     bool blRet = m_pClientMessage->Recv_Format_data(&mb, App_MessageBlockManager::instance(), u2CommandID, pRecvFinish, em_PacketRoute);
 
                     if (true == blRet)
                     {
-                        if (PACKET_ROUTE_SELF == em_PacketRoute)
+                        if (EM_PACKET_ROUTE::PACKET_ROUTE_SELF == em_PacketRoute)
                         {
                             //直接调用插件内注册的对象处理数据
                             Recv_Common_Dispose_Client_Message(u2CommandID, pRecvFinish, objServerIPInfo, m_pClientMessage);

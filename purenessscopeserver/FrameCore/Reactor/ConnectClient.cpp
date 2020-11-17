@@ -371,7 +371,7 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
 
         m_atvRecv = ACE_OS::gettimeofday();
         m_emRecvState = EM_Server_Recv_State::SERVER_RECV_BEGIN;
-        EM_PACKET_ROUTE em_PacketRoute = PACKET_ROUTE_SELF;
+        EM_PACKET_ROUTE em_PacketRoute = EM_PACKET_ROUTE::PACKET_ROUTE_SELF;
 
         while (true)
         {
@@ -382,7 +382,7 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
                 break;
             }
 
-            if (PACKET_ROUTE_SELF == em_PacketRoute)
+            if (EM_PACKET_ROUTE::PACKET_ROUTE_SELF == em_PacketRoute)
             {
                 //直接调用插件内注册的对象处理数据
                 Recv_Common_Dispose_Client_Message(u2CommandID, pRecvFinish, objServerIPInfo, m_pClientMessage);
