@@ -6,14 +6,6 @@
 
 #include "BuffPacket.h"
 
-CBuffPacket::CBuffPacket()
-{
-}
-
-CBuffPacket::~CBuffPacket(void)
-{
-}
-
 bool CBuffPacket::Init(int32 nSize, int32 nMaxBuffSize)
 {
     try

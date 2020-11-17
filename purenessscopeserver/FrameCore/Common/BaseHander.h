@@ -76,9 +76,7 @@ public:
     uint32 m_u4PacketDebugSize    = 0;
     ACE_INET_Addr m_addrRemote;
 
-    _File_Message_Param()
-    {
-    }
+    _File_Message_Param() = default;
 };
 
 //文件压测数据入工作线程
@@ -97,9 +95,7 @@ public:
     ACE_Time_Value m_atvConnect; 
     uint32 m_u4RecvQueueCount    = 0;
 
-    _ClientConnectInfo_Param()
-    {
-    }
+    _ClientConnectInfo_Param() = default;
 };
 
 //返回当前Handler的信息
@@ -116,9 +112,7 @@ public:
     uint16 m_u2CommandID              = 0;
     bool m_blDelete                   = false;
 
-    _Input_To_Cache_Param()
-    {
-    }
+    _Input_To_Cache_Param() = default;
 };
 
 //将数据添加入发送缓冲区
@@ -137,9 +131,7 @@ public:
     uint16 m_u2CommandID               = 0;
     bool m_blDelete                    = false;
 
-    _Send_Packet_Param()
-    {
-    }
+    _Send_Packet_Param() = default;
 };
 
 //组装发送数据
@@ -161,9 +153,7 @@ public:
     uint16 m_u2SendQueueMax      = 0;
     uint32 m_u4SendQueuePutTime  = 0;
 
-    _Post_Message_Param()
-    {
-    }
+    _Post_Message_Param() = default;
 };
 
 //发送Manager消息队列发送数据消息

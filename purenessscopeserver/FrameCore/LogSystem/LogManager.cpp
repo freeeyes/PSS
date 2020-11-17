@@ -119,7 +119,6 @@ int CLogManager::svc(void)
 
     //回收日志对象
     m_pServerLogger->Close();
-    SAFE_DELETE(m_pServerLogger);
 
     //回收日志块池
     m_objLogBlockPool.Close();
@@ -222,24 +221,15 @@ int CLogManager::PutLog(_LogBlockInfo* pLogBlockInfo)
     return -1;
 }
 
-int CLogManager::RegisterLog(IServerLogger* pServerLogger)
+int CLogManager::RegisterLog(shared_ptr<IServerLogger> pServerLogger)
 {
-    if(pServerLogger == nullptr)
-    {
-        return -1;
-    }
-
-    //填入日志类型对象
-    if(m_pServerLogger != nullptr)
-    {
-        SAFE_DELETE(m_pServerLogger);
-    }
-
     m_pServerLogger = pServerLogger;
 
     //初始化日志池
-    OUR_DEBUG((LM_ERROR,"[CLogManager::RegisterLog] GetBlockSize=%d, GetPoolCount=%d!\n", pServerLogger->GetBlockSize(), pServerLogger->GetPoolCount()));
-    m_objLogBlockPool.Init(pServerLogger->GetBlockSize(), pServerLogger->GetPoolCount());
+    OUR_DEBUG((LM_ERROR,"[CLogManager::RegisterLog] GetBlockSize=%d, GetPoolCount=%d!\n", 
+        m_pServerLogger->GetBlockSize(),
+        m_pServerLogger->GetPoolCount()));
+    m_objLogBlockPool.Init(m_pServerLogger->GetBlockSize(), m_pServerLogger->GetPoolCount());
 
     return 0;
 }
@@ -248,7 +238,7 @@ int CLogManager::UnRegisterLog()
 {
     if(m_pServerLogger != nullptr)
     {
-        SAFE_DELETE(m_pServerLogger);
+        m_pServerLogger->Close();
     }
 
     return 0;

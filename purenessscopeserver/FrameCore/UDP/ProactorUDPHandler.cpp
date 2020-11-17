@@ -340,16 +340,6 @@ void CProactorUDPHandler::Send_Hander_Event(uint32 u4ConnandID, uint8 u1Option, 
 	Send_MakePacket_Queue(objMakePacket);
 }
 
-void CProactorUDPHandler::GetCommandData(uint16 u2CommandID, _CommandData& objCommandData)
-{
-    _CommandData* pCommandData = m_CommandAccount.GetCommandData(u2CommandID);
-
-    if(pCommandData != nullptr)
-    {
-        objCommandData += (*pCommandData);
-    }
-}
-
 void CProactorUDPHandler::GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut)
 {
     u4FlowIn  = m_CommandAccount.GetFlowIn();

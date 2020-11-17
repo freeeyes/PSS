@@ -16,35 +16,35 @@ const uint8  USER_PACKET_MEMORY_POOL = 1; //定义使用ACE内存池分配
 class CBuffPacket : public IBuffPacket
 {
 public:
-    CBuffPacket();
-    ~CBuffPacket(void);
+    CBuffPacket() = default;
+    ~CBuffPacket(void) final = default;
 
-    virtual uint32 GetPacketSize();    //得到数据包的格式化长度
-    virtual uint32 GetPacketLen();     //得到数据包的实际长度
-    virtual uint32 GetReadLen();       //得到包读取的长度
-    virtual uint32 GetWriteLen();      //得到包写入的长度
-    virtual uint32 GetHeadLen();       //得到数据包头的长度
-    virtual uint32 GetPacketCount();   //得到缓存数据包的个数
-    virtual const char*  GetData() const;  //得到当前数据指针
+    uint32 GetPacketSize() final;       //得到数据包的格式化长度
+    uint32 GetPacketLen() final;        //得到数据包的实际长度
+    uint32 GetReadLen() final;          //得到包读取的长度
+    uint32 GetWriteLen() final;         //得到包写入的长度
+    uint32 GetHeadLen() final;          //得到数据包头的长度
+    uint32 GetPacketCount() final;      //得到缓存数据包的个数
+    const char*  GetData() const final; //得到当前数据指针
 
     bool Init(int32 nSize = DEFINE_PACKET_SIZE, int32 nMaxBuffSize = MAX_PACKET_SIZE);
-    virtual bool Close();              //删除已经使用的内存
-    virtual bool Clear();              //清除所有的标志位，并不删除内存。
+    bool Close() final;              //删除已经使用的内存
+    bool Clear() final;              //清除所有的标志位，并不删除内存。
 
-    virtual bool WriteStream(const char* pData, uint32 u4Len);
-    virtual bool ReadStream(char* pData, uint32& u4Len);
-    virtual char* ReadPtr();                            //获得读指针
-    virtual char* WritePtr();                           //获得写指针
-    virtual void SetReadPtr(uint32 u4Pos);              //设置读指针的位置
-    virtual void SetPacketCount(uint32 u4PacketCount);  //设置缓存数据包的个数
-    virtual bool RollBack(uint32 u4Len);                //将取出的数据删除，将后面的数据加上
-    virtual void ReadBuffPtr(uint32 u4Size);
-    virtual void WriteBuffPtr(uint32 u4Size);
+    bool WriteStream(const char* pData, uint32 u4Len) final;
+    bool ReadStream(char* pData, uint32& u4Len) final;
+    char* ReadPtr() final;                            //获得读指针
+    char* WritePtr() final;                           //获得写指针
+    void SetReadPtr(uint32 u4Pos) final;              //设置读指针的位置
+    void SetPacketCount(uint32 u4PacketCount) final;  //设置缓存数据包的个数
+    bool RollBack(uint32 u4Len) final;                //将取出的数据删除，将后面的数据加上
+    void ReadBuffPtr(uint32 u4Size) final;
+    void WriteBuffPtr(uint32 u4Size) final;
 
-    bool AddBuff(uint32 u4Size);                //增加Packet的包大小
+    bool AddBuff(uint32 u4Size) final;                //增加Packet的包大小
 
 
-    void SetNetSort(bool blState);              //设置字节序开启开关，false为主机字序，true为网络字序
+    void SetNetSort(bool blState) final;              //设置字节序开启开关，false为主机字序，true为网络字序
 
     void SetBuffID(uint32 u4BuffID);            //设置BuffID
     uint32 GetBuffID() const;                   //得到BuffID
@@ -61,38 +61,38 @@ private:
 
 public:
     //读取
-    virtual CBuffPacket& operator >> (uint8& u1Data);
-    virtual CBuffPacket& operator >> (uint16& u2Data);
-    virtual CBuffPacket& operator >> (uint32& u4Data);
-    virtual CBuffPacket& operator >> (uint64& u8Data);
-    virtual CBuffPacket& operator >> (int8& n1Data);
-    virtual CBuffPacket& operator >> (int16& n2Data);
-    virtual CBuffPacket& operator >> (int32& n8Data);
+    CBuffPacket& operator >> (uint8& u1Data) final;
+    CBuffPacket& operator >> (uint16& u2Data) final;
+    CBuffPacket& operator >> (uint32& u4Data) final;
+    CBuffPacket& operator >> (uint64& u8Data) final;
+    CBuffPacket& operator >> (int8& n1Data) final;
+    CBuffPacket& operator >> (int16& n2Data) final;
+    CBuffPacket& operator >> (int32& n8Data) final;
 
-    virtual CBuffPacket& operator >> (float32& f4Data);
-    virtual CBuffPacket& operator >> (float64& f8Data);
+    CBuffPacket& operator >> (float32& f4Data) final;
+    CBuffPacket& operator >> (float64& f8Data) final;
 
-    virtual CBuffPacket& operator >> (VCHARS_STR& str);
-    virtual CBuffPacket& operator >> (VCHARM_STR& str);
-    virtual CBuffPacket& operator >> (VCHARB_STR& str);
-    virtual CBuffPacket& operator >> (string& str);
+    CBuffPacket& operator >> (VCHARS_STR& str) final;
+    CBuffPacket& operator >> (VCHARM_STR& str) final;
+    CBuffPacket& operator >> (VCHARB_STR& str) final;
+    CBuffPacket& operator >> (string& str) final;
 
     //写入
-    virtual CBuffPacket& operator << (uint8 u1Data);
-    virtual CBuffPacket& operator << (uint16 u2Data);
-    virtual CBuffPacket& operator << (uint32 u4Data);
-    virtual CBuffPacket& operator << (uint64 u8Data);
-    virtual CBuffPacket& operator << (int8 u1Data);
-    virtual CBuffPacket& operator << (int16 u2Data);
-    virtual CBuffPacket& operator << (int32 u4Data);
+    CBuffPacket& operator << (uint8 u1Data) final;
+    CBuffPacket& operator << (uint16 u2Data) final;
+    CBuffPacket& operator << (uint32 u4Data) final;
+    CBuffPacket& operator << (uint64 u8Data) final;
+    CBuffPacket& operator << (int8 u1Data) final;
+    CBuffPacket& operator << (int16 u2Data) final;
+    CBuffPacket& operator << (int32 u4Data) final;
 
-    virtual CBuffPacket& operator << (float32 f4Data);
-    virtual CBuffPacket& operator << (float64 f8Data);
+    CBuffPacket& operator << (float32 f4Data) final;
+    CBuffPacket& operator << (float64 f8Data) final;
 
-    virtual CBuffPacket& operator << (VCHARS_STR& str);
-    virtual CBuffPacket& operator << (VCHARM_STR& str);
-    virtual CBuffPacket& operator << (VCHARB_STR& str);
-    virtual CBuffPacket& operator << (string& str);
+    CBuffPacket& operator << (VCHARS_STR& str) final;
+    CBuffPacket& operator << (VCHARM_STR& str) final;
+    CBuffPacket& operator << (VCHARB_STR& str) final;
+    CBuffPacket& operator << (string& str) final;
 
 private:
     char*                      m_szData          = nullptr;                //数据指针

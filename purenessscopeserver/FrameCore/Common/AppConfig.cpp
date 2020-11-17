@@ -125,19 +125,19 @@ bool CAppConfig::WriteConfig()
     }
 }
 
-bool CAppConfig::GetValue(const char* szName, ACE_TString& strValue, const char* szRoot)
+bool CAppConfig::GetValue(const char* szName, ACE_TString& strValue, string strRoot)
 {
     try
     {
         ACE_Configuration_Section_Key key;
 
-        if (ACE_OS::strlen(szRoot) == 0)
+        if (strRoot == "")
         {
             key = m_pConfig->root_section();
         }
         else
         {
-            m_pConfig->expand_path(m_pConfig->root_section(), szRoot, key, 0);
+            m_pConfig->expand_path(m_pConfig->root_section(), strRoot.c_str(), key, 0);
         }
 
         int nRet = m_pConfig->get_string_value(key, szName, strValue);
@@ -150,7 +150,7 @@ bool CAppConfig::GetValue(const char* szName, ACE_TString& strValue, const char*
 				<< ", szName = "
 				<< szName
                 << ", szRoot = "
-                << szRoot
+                << strRoot.c_str()
                 << ", nRet ="
                 << nRet;
 			std::string strError = ss_format.str();
@@ -166,19 +166,19 @@ bool CAppConfig::GetValue(const char* szName, ACE_TString& strValue, const char*
     }
 }
 
-bool CAppConfig::SetValue(const char* szName, const ACE_TString& strValue, const char* szRoot)
+bool CAppConfig::SetValue(const char* szName, const ACE_TString& strValue, string strRoot)
 {
     try
     {
         ACE_Configuration_Section_Key key;
 
-        if (ACE_OS::strlen(szRoot) == 0)
+        if (strRoot == "")
         {
             key = m_pConfig->root_section();
         }
         else
         {
-            m_pConfig->expand_path(m_pConfig->root_section(), szRoot, key, 0);
+            m_pConfig->expand_path(m_pConfig->root_section(), strRoot.c_str(), key, 0);
         }
 
         int nRet = m_pConfig->set_string_value(key, szName, strValue);
@@ -191,7 +191,7 @@ bool CAppConfig::SetValue(const char* szName, const ACE_TString& strValue, const
 				<< ", szName = "
 				<< szName
 				<< ", szRoot = "
-				<< szRoot
+				<< strRoot.c_str()
 				<< ", nRet ="
 				<< nRet;
 			std::string strError = ss_format.str();

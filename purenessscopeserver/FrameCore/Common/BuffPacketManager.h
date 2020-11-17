@@ -14,21 +14,21 @@
 class CBuffPacketManager : public CObjectPoolManager<CBuffPacket, ACE_Recursive_Thread_Mutex>, public IPacketManager
 {
 public:
-    CBuffPacketManager();
+    CBuffPacketManager() = default;
     virtual ~CBuffPacketManager() = default;
 
     static void Init_Callback(int nIndex, CBuffPacket* pBuffPacket);
     static void Close_Callback(int nIndex, CBuffPacket* pBuffPacket);
 
-    virtual uint32 GetBuffPacketUsedCount();
-    virtual uint32 GetBuffPacketFreeCount();
-    virtual void OutputCreateInfo();
-    virtual void SetCreateFlag(bool blTagCreateInfo);
+    uint32 GetBuffPacketUsedCount() final;
+    uint32 GetBuffPacketFreeCount() final;
+    void OutputCreateInfo() final;
+    void SetCreateFlag(bool blTagCreateInfo) final;
 
-    virtual IBuffPacket* Create(const char* pFileName, uint32 u4Line);
-    virtual bool Delete(IBuffPacket* pBuffPacket);
-    virtual uint32 GetCreateInfoCount();
-    virtual bool GetCreateInfoList(uint32 u4Index, _Object_Create_Info& objCreateInfo);
+    IBuffPacket* Create(const char* pFileName, uint32 u4Line) final;
+    bool Delete(IBuffPacket* pBuffPacket) final;
+    uint32 GetCreateInfoCount() final;
+    bool GetCreateInfoList(uint32 u4Index, _Object_Create_Info& objCreateInfo) final;
 private:
     vector<_Object_Create_Info> m_objCreateList;
 };

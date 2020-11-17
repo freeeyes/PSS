@@ -1,10 +1,5 @@
 #include "BuffPacketManager.h"
 
-CBuffPacketManager::CBuffPacketManager()
-{
-
-}
-
 void CBuffPacketManager::Init_Callback(int nIndex, CBuffPacket* pBuffPacket)
 {
     //ÉèÖÃBuffPacketÄ¬ÈÏ×ÖĞò

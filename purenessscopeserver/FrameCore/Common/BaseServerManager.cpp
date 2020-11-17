@@ -3,7 +3,7 @@
 bool Server_Manager_Common_LogSystem()
 {
     //初始化日志系统线程
-    auto pFileLogger = new CFileLogger();
+    auto pFileLogger = std::make_shared<CFileLogger>();
 
     if (nullptr == pFileLogger)
     {

@@ -46,7 +46,7 @@ public:
     bool IsRun() const;
 
     int PutLog(_LogBlockInfo* pLogBlockInfo);
-    int RegisterLog(IServerLogger* pServerLogger);
+    int RegisterLog(shared_ptr<IServerLogger> pServerLogger);
     int UnRegisterLog();
 
     void SetReset(bool blReset);
@@ -123,7 +123,7 @@ private:
     int                               m_nQueueMax      = MAX_MSG_THREADQUEUE; //日志线程允许的最大队列个数
     CLogBlockPool                     m_objLogBlockPool;                      //日志块池
     ACE_Recursive_Thread_Mutex        m_Logger_Mutex;                         //线程锁
-    IServerLogger*                    m_pServerLogger = nullptr;                 //日志模块指针
+    shared_ptr<IServerLogger>         m_pServerLogger = nullptr;                 //日志模块指针
 };
 
 typedef ACE_Singleton<CLogManager, ACE_Recursive_Thread_Mutex> AppLogManager;

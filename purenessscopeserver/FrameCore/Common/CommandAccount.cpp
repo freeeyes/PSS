@@ -1,15 +1,11 @@
 #include     "CommandAccount.h"
 
-CCommandAccount::CCommandAccount()
-{
-}
-
 void CCommandAccount::InitName(const char* pName, uint32 u4CommandCount)
 {
     m_strName = pName;
 
     //初始化HashTable
-    m_objCommandDataList.Init((int32)u4CommandCount);
+    ACE_UNUSED_ARG(u4CommandCount);
 }
 
 void CCommandAccount::Init(uint8 u1CommandAccount, uint8 u1Flow, uint16 u2PacketTimeout)
@@ -38,25 +34,10 @@ void CCommandAccount::AddCommandAlert(uint16 u2CommandID, uint32 u4Count, uint16
 void CCommandAccount::Close()
 {
     OUR_DEBUG((LM_ERROR, "CCommandAccount::Close]Begin.\n"));
-    vector<_CommandData*> vecCommandData;
-    m_objCommandDataList.Get_All_Used(vecCommandData);
 
-    for(const _CommandData* pCommandData : vecCommandData)
-    {
-        SAFE_DELETE(pCommandData);
-    }
+    m_objCommandDataList.clear();
+    m_objectPortAccount.clear();
 
-    //回收端口统计内存
-    for (hashmapPortAccount::iterator iter = m_objectPortAccount.begin();
-         iter != m_objectPortAccount.end(); iter++)
-    {
-        const _Port_Data_Account* p_Port_Data_Account = (*iter).int_id_;
-        SAFE_DELETE(p_Port_Data_Account);
-    }
-
-    m_objectPortAccount.close();
-
-    m_objCommandDataList.Close();
     m_u1CommandAccount = 0;
     OUR_DEBUG((LM_ERROR, "CCommandAccount::Close]End.\n"));
 }
@@ -64,25 +45,25 @@ void CCommandAccount::Close()
 bool CCommandAccount::Save_Flow(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
 {
     ACE_UNUSED_ARG(u2CommandID);
+    shared_ptr<_Port_Data_Account> p_Port_Data_Account = nullptr;
 
     if (m_u1Flow == 1)
     {
         //在hashMap中查找是否已存在端口信息
-        _Port_Data_Account* p_Port_Data_Account = nullptr;
-        m_objectPortAccount.find(u2Port, p_Port_Data_Account);
+        hashmapPortAccount::iterator f = m_objectPortAccount.find(u2Port);
 
-        if (nullptr != p_Port_Data_Account)
+        if (m_objectPortAccount.end() != f)
         {
             //找到了
-            p_Port_Data_Account->SetFlow(u1CommandType, u4PacketSize, tvTime);
+            f->second->SetFlow(u1CommandType, u4PacketSize, tvTime);
         }
         else
         {
             //创建新的端口信息
-            p_Port_Data_Account = new _Port_Data_Account();
+            p_Port_Data_Account = std::make_shared<_Port_Data_Account>();
             p_Port_Data_Account->Init(u1PacketType, u2Port);
             p_Port_Data_Account->SetFlow(u1CommandType, u4PacketSize, tvTime);
-            m_objectPortAccount.bind(u2Port, p_Port_Data_Account);
+            m_objectPortAccount[u2Port] = p_Port_Data_Account;
         }
     }
 
@@ -103,11 +84,14 @@ bool CCommandAccount::Save_Command(uint16 u2CommandID, uint16 u2Port, EM_CONNECT
     string strCommandID = ss_format.str();
 
     //查找并添加
-    _CommandData* pCommandData = m_objCommandDataList.Get_Hash_Box_Data(strCommandID.c_str());
+    shared_ptr<_CommandData> pCommandData = nullptr;
+    hashmapCommandData::iterator f = m_objCommandDataList.find(strCommandID.c_str());
 
-    if (nullptr != pCommandData)
+    if (m_objCommandDataList.end() != f)
     {
         //如果已经存在，则直接添加
+        pCommandData = f->second;
+
         pCommandData->m_u4CommandCount++;
         pCommandData->m_u1PacketType = u1PacketType;
         pCommandData->m_u4PacketSize += u4PacketSize;
@@ -116,7 +100,7 @@ bool CCommandAccount::Save_Command(uint16 u2CommandID, uint16 u2Port, EM_CONNECT
     else
     {
         //添加新的命令统计信息
-        pCommandData = new _CommandData();
+        pCommandData = std::make_shared<_CommandData>();
 		pCommandData->m_u2CommandID = u2CommandID;
 		pCommandData->m_u4CommandCount = 1;
 		pCommandData->m_u1CommandType = u1CommandType;
@@ -124,10 +108,7 @@ bool CCommandAccount::Save_Command(uint16 u2CommandID, uint16 u2Port, EM_CONNECT
 		pCommandData->m_u4PacketSize += u4PacketSize;
 		pCommandData->m_tvCommandTime = tvTime;
 
-		if (-1 == m_objCommandDataList.Add_Hash_Data(strCommandID.c_str(), pCommandData))
-		{
-			OUR_DEBUG((LM_INFO, "[CCommandAccount::SaveCommandData]szHashID=%s Add Hash Data Error.\n", strCommandID.c_str()));
-		}
+        m_objCommandDataList[strCommandID.c_str()] = pCommandData;
     }
 
     return true;
@@ -217,11 +198,12 @@ bool CCommandAccount::SaveCommandDataLog()
     }
 
     AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_COMMANDDATA, "<Command Data Account[%s]>", m_strName.c_str());
-    vector<_CommandData*> vecCommandData;
-    m_objCommandDataList.Get_All_Used(vecCommandData);
 
-    for(const _CommandData* pCommandData : vecCommandData)
+
+    for (hashmapCommandData::iterator iter = m_objCommandDataList.begin();
+        iter != m_objCommandDataList.end(); iter++)
     {
+        auto pCommandData = iter->second;
         if(pCommandData != nullptr)
         {
             ACE_Date_Time dtLastTime(pCommandData->m_tvCommandTime);
@@ -271,7 +253,7 @@ uint32 CCommandAccount::GetFlowIn()
     for (hashmapPortAccount::iterator iter = m_objectPortAccount.begin();
          iter != m_objectPortAccount.end(); iter++)
     {
-        _Port_Data_Account* p_Port_Data_Account = (*iter).int_id_;
+        auto p_Port_Data_Account = (*iter).second;
 
         if (nullptr != p_Port_Data_Account)
         {
@@ -290,7 +272,7 @@ uint32 CCommandAccount::GetFlowOut()
     for (hashmapPortAccount::iterator iter = m_objectPortAccount.begin();
          iter != m_objectPortAccount.end(); iter++)
     {
-        _Port_Data_Account* p_Port_Data_Account = (*iter).int_id_;
+        auto p_Port_Data_Account = (*iter).second;
 
         if (nullptr != p_Port_Data_Account)
         {
@@ -306,14 +288,6 @@ uint8 CCommandAccount::GetFLow() const
     return m_u1Flow;
 }
 
-_CommandData* CCommandAccount::GetCommandData(uint16 u2CommandID)
-{
-    std::stringstream ss_format;
-    ss_format << u2CommandID;
-    string strCommandID = ss_format.str();
-    return m_objCommandDataList.Get_Hash_Box_Data(strCommandID.c_str());
-}
-
 void CCommandAccount::GetCommandAlertData(vecCommandAlertData& CommandAlertDataList)
 {
     CommandAlertDataList.insert(CommandAlertDataList.end(), m_vecCommandAlertData.begin(), m_vecCommandAlertData.end());
@@ -327,7 +301,7 @@ void CCommandAccount::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_
     for (hashmapPortAccount::iterator iter = m_objectPortAccount.begin();
          iter != m_objectPortAccount.end(); iter++)
     {
-        const _Port_Data_Account* p_Port_Data_Account = (*iter).int_id_;
+        auto p_Port_Data_Account = (*iter).second;
 
         if (nullptr != p_Port_Data_Account)
         {

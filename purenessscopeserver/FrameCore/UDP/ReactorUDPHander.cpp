@@ -333,16 +333,6 @@ void CReactorUDPHander::Send_Hander_Event(uint32 u4ConnandID, uint8 u1Option, AC
 	Send_MakePacket_Queue(objMakePacket);
 }
 
-void CReactorUDPHander::GetCommandData(uint16 u2CommandID, _CommandData& objCommandData)
-{
-    const _CommandData* pCommandData = m_CommandAccount.GetCommandData(u2CommandID);
-
-    if(pCommandData != nullptr)
-    {
-        objCommandData += (*pCommandData);
-    }
-}
-
 void CReactorUDPHander::GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut)
 {
     u4FlowIn  = m_CommandAccount.GetFlowIn();

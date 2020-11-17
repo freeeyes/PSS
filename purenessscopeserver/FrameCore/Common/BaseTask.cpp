@@ -6,7 +6,7 @@ int Task_Common_CloseMsgQueue(ACE_Task<ACE_MT_SYNCH>* pTask, ACE_Condition<ACE_T
     // queue, and process them into the svc() method. Chose the last option.
     int retval;
 
-    ACE_Message_Block* mblk = 0;
+    ACE_Message_Block* mblk = nullptr;
     ACE_NEW_RETURN(mblk, ACE_Message_Block(0, ACE_Message_Block::MB_STOP), -1);
 
     // If queue is full, flush it before block in while

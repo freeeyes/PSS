@@ -9,9 +9,9 @@
 #include "ace/Date_Time.h"
 #include "define.h"
 #include "LogManager.h"
-#include "HashTable.h"
 #include <string>
 #include <sstream>
+#include <unordered_map>
 
 //统计信息，里面有要统计的命令信息定义
 class _CommandData
@@ -25,9 +25,7 @@ public:
     uint8              m_u1CommandType      = COMMAND_TYPE_IN;    //命令的类型，0是收到的命令，1是发出的命令
     ACE_Time_Value     m_tvCommandTime;                           //命令的最后处理时间
 
-    _CommandData()
-    {
-    }
+    _CommandData() = default;
 
     _CommandData& operator += (const _CommandData& ar)
     {
@@ -55,11 +53,9 @@ public:
     uint16 m_u2CommandID    = 0;
     uint8  m_u1Minute       = 0;
 
-    _CommandAlertData()
-    {
-    }
+    _CommandAlertData() = default;
 };
-typedef vector<_CommandAlertData> vecCommandAlertData;   //记录所有的告警监控阀值
+using vecCommandAlertData = vector<_CommandAlertData>;   //记录所有的告警监控阀值
 
 //对应端口数据接收信息
 class _Port_Data_Account
@@ -71,9 +67,7 @@ public:
     uint32                      m_u4FlowIn  = 0;                     //当前进入流量统计(单位，分钟)
     uint32                      m_u4FlowOut = 0;                     //当前流出流量统计(单位，分钟)
 
-    _Port_Data_Account()
-    {
-    }
+    _Port_Data_Account() = default;
 
     _Port_Data_Account& operator += (const _Port_Data_Account& ar)
     {
@@ -165,16 +159,12 @@ public:
         }
     }
 };
-typedef vector<_Port_Data_Account> vecPortDataAccount;
-
-//合并结果集
-void Combo_Port_List(vecPortDataAccount& vec_Port_Data_Account, vecPortDataAccount& vec_Port_Data_All_Account);
 
 //统计所有进出框架的命令执行情况，目前不包括向其他服务器请求的统计，因为这部分协议无法统一。
 class CCommandAccount
 {
 public:
-    CCommandAccount();
+    CCommandAccount() = default;
 
     void InitName(const char* pName, uint32 u4CommandCount);
     void Init(uint8 u1CommandAccount, uint8 u1Flow, uint16 u2RecvTimeout);
@@ -184,7 +174,6 @@ public:
                          uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,
                          ACE_Time_Value const& tvTime = ACE_OS::gettimeofday());   //记录命令执行信息
     bool SaveCommandDataLog();                         //存储命令执行信息的日志
-    _CommandData* GetCommandData(uint16 u2CommandID);  //获得指定命令的相关数据
 
     uint32 GetFlowIn();                                //得到单位时间进入流量
     uint32 GetFlowOut();                               //得到党委时间流出流量
@@ -209,14 +198,15 @@ private:
                     uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,
                     ACE_Time_Value const& tvTime = ACE_OS::gettimeofday()) const;                 //命令告警统计
 
-public:
-    using hashmapPortAccount = ACE_Hash_Map<uint16, _Port_Data_Account*>;
+public:                                                                                                                                  
+    using hashmapPortAccount = unordered_map<uint16, shared_ptr<_Port_Data_Account>>;
+    using hashmapCommandData = unordered_map<string, shared_ptr<_CommandData>>;
     uint64                                    m_u8PacketTimeout     = MAX_QUEUE_TIMEOUT * 1000; //包处理超时时间
     uint8                                     m_u1CommandAccount    = 0;                        //是否开启命令统计，1是打开，0是关闭
     uint8                                     m_u1Flow              = 0;                        //是否打开流量统计，1是打开，0是关闭
     uint8                                     m_u1Minute            = 0 ;                       //当前分钟数
     string                                    m_strName;                                        //当前统计的名字
-    CHashTable<_CommandData>                  m_objCommandDataList;                             //命令Hash映射列表
+    hashmapCommandData                        m_objCommandDataList;                             //命令Hash映射列表
     vecCommandAlertData                       m_vecCommandAlertData;                            //告警阀值数组
     hashmapPortAccount                        m_objectPortAccount;                              //根据端口统计每条数据的进出量
 };

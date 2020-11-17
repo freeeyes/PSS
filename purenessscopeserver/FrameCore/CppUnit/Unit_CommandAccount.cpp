@@ -29,27 +29,8 @@ void CUnit_CommandAccount::Test_CommandAccount_Init(void)
 {
     bool blRet             = false;
 
-    m_pCommandAccount->SaveCommandData(0x1000, 10002, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP, 10);
-    m_pCommandAccount->SaveCommandData(0x1000, 10002, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP, 10);
-
-    const _CommandData* pCommandData = m_pCommandAccount->GetCommandData(0x1000);
-
-    if (nullptr == pCommandData)
-    {
-        OUR_DEBUG((LM_INFO, "[Test_CommandAccount_Init]GetCommandData is nullptr.\n"));
-        CPPUNIT_ASSERT_MESSAGE("[Test_CommandAccount_Init]GetCommandData is nullptr.", true == blRet);
-        return;
-    }
-
-    if (COMMAND_TYPE_IN == pCommandData->m_u1CommandType &&
-        0x1000 == pCommandData->m_u2CommandID &&
-        20 == pCommandData->m_u4PacketSize &&
-        2 == pCommandData->m_u4CommandCount &&
-        EM_CONNECT_IO_TYPE::CONNECT_IO_TCP == pCommandData->m_u1PacketType)
-    {
-        blRet = true;
-    }
-
+    blRet = m_pCommandAccount->SaveCommandData(0x1000, 10002, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP, 10);
+    blRet = m_pCommandAccount->SaveCommandData(0x1000, 10002, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP, 10);
 
     CPPUNIT_ASSERT_MESSAGE("[Test_CommandAccount_Init]pCommandData is Error.", true == blRet);
 }
