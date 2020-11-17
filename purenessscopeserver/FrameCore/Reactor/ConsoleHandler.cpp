@@ -29,7 +29,7 @@ void CConsoleHandler::Close(int nIOCount)
     if (m_nIOCount == 0)
     {
         //删除对象缓冲的PacketParse
-        if (m_pCurrMessage != NULL)
+        if (m_pCurrMessage != nullptr)
         {
             App_MessageBlockManager::instance()->Close(m_pCurrMessage);
         }
@@ -109,7 +109,7 @@ int CConsoleHandler::open(void*)
     ACE_OS::setsockopt(this->get_handle(), SOL_SOCKET, SO_SNDBUF, (char*)&nTecvBuffSize, sizeof(nTecvBuffSize));
     m_pPacketParse = new CConsolePacketParse();
 
-    if (NULL == m_pPacketParse)
+    if (nullptr == m_pPacketParse)
     {
         OUR_DEBUG((LM_DEBUG, "[%t|CConnectHandle::open] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
         return -1;
@@ -120,10 +120,10 @@ int CConsoleHandler::open(void*)
     //申请头的大小对应的mb
     m_pCurrMessage = App_MessageBlockManager::instance()->Create(CONSOLE_PACKET_MAX_SIZE);
 
-    if (m_pCurrMessage == NULL)
+    if (m_pCurrMessage == nullptr)
     {
         AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount);
-        OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvClinetPacket] pmb new is NULL.\n"));
+        OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvClinetPacket] pmb new is nullptr.\n"));
         return -1;
     }
 
@@ -140,20 +140,20 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
     ACE_Time_Value nowait(MAX_MSG_PACKETTIMEOUT);
     m_atvInput = ACE_OS::gettimeofday();
 
-    if (fd == ACE_INVALID_HANDLE || NULL == m_pPacketParse)
+    if (fd == ACE_INVALID_HANDLE || nullptr == m_pPacketParse)
     {
         m_u4CurrSize = 0;
-        OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input]fd == ACE_INVALID_HANDLE or m_pPacketParse is NULL.\n"));
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CConsoleHandler::handle_input]fd == ACE_INVALID_HANDLE or m_pPacketParse is NULL.");
+        OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input]fd == ACE_INVALID_HANDLE or m_pPacketParse is nullptr.\n"));
+        sprintf_safe(m_szError, MAX_BUFF_500, "[CConsoleHandler::handle_input]fd == ACE_INVALID_HANDLE or m_pPacketParse is nullptr.");
         return -1;
     }
 
-    //判断缓冲是否为NULL
-    if (m_pCurrMessage == NULL)
+    //判断缓冲是否为nullptr
+    if (m_pCurrMessage == nullptr)
     {
         m_u4CurrSize = 0;
-        OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input]m_pCurrMessage == NULL.\n"));
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CConsoleHandler::handle_input]m_pCurrMessage == NULL.");
+        OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input]m_pCurrMessage == nullptr.\n"));
+        sprintf_safe(m_szError, MAX_BUFF_500, "[CConsoleHandler::handle_input]m_pCurrMessage == nullptr.");
 
         Clear_PacketParse();
         return -1;
@@ -204,7 +204,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
         //组装包头
         ACE_Message_Block* pmbHead = App_MessageBlockManager::instance()->Create(sizeof(int));
 
-        if (NULL != pmbHead)
+        if (nullptr != pmbHead)
         {
             memcpy_safe(pmbHead->wr_ptr(), sizeof(int), (char*)&u4Len, sizeof(int));
             pmbHead->wr_ptr(sizeof(int));
@@ -227,10 +227,10 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
         //申请头的大小对应的mb
         m_pCurrMessage = App_MessageBlockManager::instance()->Create(CONSOLE_PACKET_MAX_SIZE);
 
-        if (m_pCurrMessage == NULL)
+        if (m_pCurrMessage == nullptr)
         {
             AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount);
-            OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvClinetPacket] pmb new is NULL.\n"));
+            OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvClinetPacket] pmb new is nullptr.\n"));
             return -1;
         }
 
@@ -245,7 +245,7 @@ int CConsoleHandler::handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask)
 {
     if (h == ACE_INVALID_HANDLE)
     {
-        OUR_DEBUG((LM_DEBUG, "[CConsoleHandler::handle_close] h is NULL mask=%d.\n", (int)mask));
+        OUR_DEBUG((LM_DEBUG, "[CConsoleHandler::handle_close] h is nullptr mask=%d.\n", (int)mask));
     }
 
     OUR_DEBUG((LM_DEBUG, "[CConsoleHandler::handle_close]Connectid=[%d] begin(%d)...\n", GetConnectID(), errno));
@@ -270,7 +270,7 @@ uint8 CConsoleHandler::GetIsClosing() const
 
 bool CConsoleHandler::SendMessage(IBuffPacket* pBuffPacket, uint8 u1OutputType)
 {
-    ACE_Message_Block* pMbData = NULL;
+    ACE_Message_Block* pMbData = nullptr;
 
     if (false == Console_Common_SendMessage_Data_Check(GetConnectID(), pBuffPacket, u1OutputType, pMbData))
     {
@@ -289,7 +289,7 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
 {
     ACE_Time_Value     nowait(MAX_MSG_PACKETTIMEOUT);
 
-    if (NULL == pMbData)
+    if (nullptr == pMbData)
     {
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::SendPacket] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetConnectID()));
         return false;
@@ -306,9 +306,9 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
     //发送数据
     const char* pData = pMbData->rd_ptr();
 
-    if (NULL == pData)
+    if (nullptr == pData)
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleHandler::SendPacket] ConnectID = %d, pData is NULL.\n", GetConnectID()));
+        OUR_DEBUG((LM_ERROR, "[CConsoleHandler::SendPacket] ConnectID = %d, pData is nullptr.\n", GetConnectID()));
         App_MessageBlockManager::instance()->Close(pMbData);
         return false;
     }
@@ -355,22 +355,22 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
 
 void CConsoleHandler::Clear_PacketParse()
 {
-    if (m_pPacketParse->GetMessageHead() != NULL)
+    if (m_pPacketParse->GetMessageHead() != nullptr)
     {
         App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
     }
 
-    if (m_pPacketParse->GetMessageBody() != NULL)
+    if (m_pPacketParse->GetMessageBody() != nullptr)
     {
         App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
     }
 
-    if (m_pCurrMessage != NULL && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageHead() != m_pCurrMessage)
+    if (m_pCurrMessage != nullptr && m_pPacketParse->GetMessageBody() != m_pCurrMessage && m_pPacketParse->GetMessageHead() != m_pCurrMessage)
     {
         App_MessageBlockManager::instance()->Close(m_pCurrMessage);
     }
 
-    m_pCurrMessage = NULL;
+    m_pCurrMessage = nullptr;
 
     SAFE_DELETE(m_pPacketParse);
 }
@@ -396,7 +396,7 @@ bool CConsoleHandler::CompareConsoleClinetIP(const char* pIP) const
 bool CConsoleHandler::CheckMessage()
 {
     uint8 u1Output = 0;
-    IBuffPacket* pBuffPacket = NULL;
+    IBuffPacket* pBuffPacket = nullptr;
     bool blRet = Console_Common_CheckMessage_Data(m_u4AllRecvSize, m_u4AllRecvCount, m_pPacketParse, u1Output, pBuffPacket);
 
     if (true == blRet && false == SendMessage(pBuffPacket, u1Output))

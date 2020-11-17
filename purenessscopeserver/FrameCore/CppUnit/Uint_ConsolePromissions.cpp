@@ -15,7 +15,7 @@ void CUnit_ConsolePromissions::setUp(void)
 void CUnit_ConsolePromissions::tearDown(void)
 {
     delete m_pConsolePromissions;
-    m_pConsolePromissions = NULL;
+    m_pConsolePromissions = nullptr;
 }
 
 void CUnit_ConsolePromissions::Test_Promission_User(void)

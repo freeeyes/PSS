@@ -40,7 +40,7 @@ static size_t os_wcs_to_mbs(const wchar_t* str, size_t len, char* dst, size_t ds
         return 0;
     }
 
-    out_len = dst ? (dst_size - 1) : wcstombs_s(&out_len, NULL, 0, str, len);
+    out_len = dst ? (dst_size - 1) : wcstombs_s(&out_len, nullptr, 0, str, len);
 
     if (dst)
     {
@@ -74,9 +74,9 @@ typedef BOOL(WINAPI* ver_query_value_w_t)(
     LPVOID* buf,
     PUINT sizeout);
 
-static get_file_version_info_size_w_t get_file_version_info_size = NULL;
-static get_file_version_info_w_t get_file_version_info = NULL;
-static ver_query_value_w_t ver_query_value = NULL;
+static get_file_version_info_size_w_t get_file_version_info_size = nullptr;
+static get_file_version_info_w_t get_file_version_info = nullptr;
+static ver_query_value_w_t ver_query_value = nullptr;
 static bool ver_initialized = false;
 static bool ver_initialize_success = false;
 static bool initialize_version_functions(void)
@@ -117,7 +117,7 @@ static bool initialize_version_functions(void)
 
 static bool get_dll_ver(const wchar_t* lib, struct win_version_info* ver_info)
 {
-    VS_FIXEDFILEINFO* info = NULL;
+    VS_FIXEDFILEINFO* info = nullptr;
     UINT len = 0;
     BOOL success;
     LPVOID data;
@@ -134,7 +134,7 @@ static bool get_dll_ver(const wchar_t* lib, struct win_version_info* ver_info)
     }
 
 
-    size = get_file_version_info_size(lib, NULL);
+    size = get_file_version_info_size(lib, nullptr);
 
     if (!size)
     {
@@ -201,7 +201,7 @@ static void get_win_ver(struct win_version_info* info)
 
             size = sizeof(win10_revision);
 
-            status = RegQueryValueExW(key, L"UBR", NULL, NULL,
+            status = RegQueryValueExW(key, L"UBR", nullptr, nullptr,
                                       (LPBYTE)&win10_revision, &size);
 
             if (status == ERROR_SUCCESS)
@@ -371,7 +371,7 @@ static inline void init_sym_info(struct exception_handler_data* data)
 
     if (!sym_initialize_called)
     {
-        data->sym_initialize(data->process, NULL, true);
+        data->sym_initialize(data->process, nullptr, true);
     }
     else
     {
@@ -401,8 +401,8 @@ static inline void init_cpu_info(struct exception_handler_data* data)
         wchar_t str[1024];
         DWORD size = 1024;
 
-        status = RegQueryValueExW(key, L"ProcessorNameString", NULL,
-                                  NULL, (LPBYTE)str, &size);
+        status = RegQueryValueExW(key, L"ProcessorNameString", nullptr,
+                                  nullptr, (LPBYTE)str, &size);
 
         if (status == ERROR_SUCCESS)
         {
@@ -541,8 +541,8 @@ static inline bool walk_stack(struct exception_handler_data* data,
 
     bool success = data->stack_walk64(trace->image_type,
                                       data->process, thread, &trace->frame, &trace->context,
-                                      NULL, data->sym_function_table_access64,
-                                      data->sym_get_module_base64, NULL);
+                                      nullptr, data->sym_function_table_access64,
+                                      data->sym_get_module_base64, nullptr);
 
     if (!success)
     {
@@ -774,7 +774,7 @@ NORETURN static void def_crash_handler(const char* format, va_list args,
 }
 
 static int  crashing = 0;
-static void* crash_param = NULL;
+static void* crash_param = nullptr;
 static crashhandler _crashhandler = def_crash_handler;
 
 void bcrash(const char* format, ...)
@@ -823,7 +823,7 @@ static void main_crash_handler(const char* format, va_list args, void* param)
 
     vsnprintf(text, MAX_CRASH_REPORT_SIZE, format, args);
 
-    FILE* fp = NULL;
+    FILE* fp = nullptr;
     fopen_s(&fp, "crashlog.log", "w");
 
     fwrite(text, 1, strlen(text) + 1, fp);

@@ -359,9 +359,9 @@ bool CServerManager::Start_Tcp_Listen() const
         //得到接收器
         ConnectAcceptor* pConnectAcceptor = App_ConnectAcceptorManager::instance()->GetConnectAcceptor(i);
 
-        if (NULL == pConnectAcceptor)
+        if (nullptr == pConnectAcceptor)
         {
-            OUR_DEBUG((LM_INFO, "[CServerManager::Start]pConnectAcceptor[%d] is NULL.\n", i));
+            OUR_DEBUG((LM_INFO, "[CServerManager::Start]pConnectAcceptor[%d] is nullptr.\n", i));
             return false;
         }
 
@@ -400,9 +400,9 @@ bool CServerManager::Start_Udp_Listen() const
         //得到接收器
         CReactorUDPHander* pReactorUDPHandler = new CReactorUDPHander();
 
-        if (NULL == pReactorUDPHandler)
+        if (nullptr == pReactorUDPHandler)
         {
-            OUR_DEBUG((LM_INFO, "[CServerManager::Start]UDP pReactorUDPHandler[%d] is NULL.\n", i));
+            OUR_DEBUG((LM_INFO, "[CServerManager::Start]UDP pReactorUDPHandler[%d] is nullptr.\n", i));
             return false;
         }
 

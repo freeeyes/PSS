@@ -138,9 +138,9 @@ bool CProServerManager::Start()
         //得到接收器
         ProConnectAcceptor* pConnectAcceptor = App_ProConnectAcceptManager::instance()->GetConnectAcceptor(i);
 
-        if(NULL == pConnectAcceptor)
+        if(nullptr == pConnectAcceptor)
         {
-            OUR_DEBUG((LM_INFO, "[CProServerManager::Start]pConnectAcceptor[%d] is NULL.\n", i));
+            OUR_DEBUG((LM_INFO, "[CProServerManager::Start]pConnectAcceptor[%d] is nullptr.\n", i));
             return false;
         }
 
@@ -178,9 +178,9 @@ bool CProServerManager::Start()
 
         CProactorUDPHandler* pProactorUDPHandler = new CProactorUDPHandler();
 
-        if(NULL == pProactorUDPHandler)
+        if(nullptr == pProactorUDPHandler)
         {
-            OUR_DEBUG((LM_INFO, "[CProServerManager::Start] pProactorUDPHandler is NULL[%d] is error.\n", i));
+            OUR_DEBUG((LM_INFO, "[CProServerManager::Start] pProactorUDPHandler is nullptr[%d] is error.\n", i));
             return false;
         }
         else
@@ -198,9 +198,9 @@ bool CProServerManager::Start()
 
             ACE_Proactor* pProactor = App_ProactorManager::instance()->GetAce_Proactor();
 
-            if(NULL == pProactor)
+            if(nullptr == pProactor)
             {
-                OUR_DEBUG((LM_INFO, "[CProServerManager::Start]UDP App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE) is NULL.\n"));
+                OUR_DEBUG((LM_INFO, "[CProServerManager::Start]UDP App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE) is nullptr.\n"));
                 return false;
             }
 
@@ -258,9 +258,9 @@ bool CProServerManager::Start()
 
         ACE_Proactor* pProactor = App_ProactorManager::instance()->GetAce_Proactor();
 
-        if(NULL == pProactor)
+        if(nullptr == pProactor)
         {
-            OUR_DEBUG((LM_INFO, "[CProServerManager::Start]App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE) is NULL.\n"));
+            OUR_DEBUG((LM_INFO, "[CProServerManager::Start]App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE) is nullptr.\n"));
             return false;
         }
 

@@ -7,7 +7,7 @@ CXmlOpeation::CXmlOpeation(void)
 
 bool CXmlOpeation::Init(const char* pFileName)
 {
-    if(NULL == m_pTiXmlDocument)
+    if(nullptr == m_pTiXmlDocument)
     {
         return false;
     }
@@ -27,7 +27,7 @@ bool CXmlOpeation::Read_XML_Data_Single_String(const char* pTag, const char* pNa
 {
     const char* pData = GetData(pTag, pName);
 
-    if (pData != NULL)
+    if (pData != nullptr)
     {
         sprintf_safe(pValue, nMaxSize, "%s", pData);
         return true;
@@ -43,7 +43,7 @@ bool CXmlOpeation::Read_XML_Data_Single_String(const char* pTag, const char* pNa
 {
     const char* pData = GetData(pTag, pName);
 
-    if (pData != NULL)
+    if (pData != nullptr)
     {
         strValue = (string)pData;
         return true;
@@ -59,7 +59,7 @@ bool CXmlOpeation::Read_XML_Data_Multiple_String(const char* pTag, const char* p
 {
     const char* pData = GetData(pTag, pName, pTi);
 
-    if (pData != NULL)
+    if (pData != nullptr)
     {
         sprintf_safe(pValue, nMaxSize, "%s", pData);
         return true;
@@ -74,7 +74,7 @@ bool CXmlOpeation::Read_XML_Data_Multiple_String(const char* pTag, const char* p
 {
     const char* pData = GetData(pTag, pName, pTi);
 
-    if (pData != NULL)
+    if (pData != nullptr)
     {
         strValue = (string)pData;
         return true;
@@ -89,7 +89,7 @@ bool CXmlOpeation::Read_XML_Data_Single_Uint32(const char* pTag, const char* pNa
 {
     const char* pData = GetData(pTag, pName);
 
-    if (pData != NULL)
+    if (pData != nullptr)
     {
         u4Value = (uint32)ACE_OS::atoi(pData);
         return true;
@@ -105,7 +105,7 @@ bool CXmlOpeation::Read_XML_Data_Multiple_Uint32(const char* pTag, const char* p
 {
     const char* pData = GetData(pTag, pName, pTi);
 
-    if (pData != NULL)
+    if (pData != nullptr)
     {
         u4Value = (uint32)atoi(pData);
         return true;
@@ -120,7 +120,7 @@ bool CXmlOpeation::Read_XML_Data_Single_Uint16(const char* pTag, const char* pNa
 {
     const char* pData = GetData(pTag, pName);
 
-    if (pData != NULL)
+    if (pData != nullptr)
     {
         u2Value = (uint16)ACE_OS::atoi(pData);
         return true;
@@ -136,7 +136,7 @@ bool CXmlOpeation::Read_XML_Data_Multiple_Uint16(const char* pTag, const char* p
 {
     const char* pData = GetData(pTag, pName, pTi);
 
-    if (pData != NULL)
+    if (pData != nullptr)
     {
         u2Value = (uint16)atoi(pData);
         return true;
@@ -151,7 +151,7 @@ bool CXmlOpeation::Read_XML_Data_Single_Uint8(const char* pTag, const char* pNam
 {
     const char* pData = GetData(pTag, pName);
 
-    if (pData != NULL)
+    if (pData != nullptr)
     {
         u1Value = (uint8)ACE_OS::atoi(pData);
         return true;
@@ -167,7 +167,7 @@ bool CXmlOpeation::Read_XML_Data_Single_Int(const char* pTag, const char* pName,
 {
     const char* pData = GetData(pTag, pName);
 
-    if (pData != NULL)
+    if (pData != nullptr)
     {
         nValue = ACE_OS::atoi(pData);
         return true;
@@ -183,7 +183,7 @@ bool CXmlOpeation::Read_XML_Data_Multiple_Uint8(const char* pTag, const char* pN
 {
     const char* pData = GetData(pTag, pName, pTi);
 
-    if (pData != NULL)
+    if (pData != nullptr)
     {
         u1Value = (uint8)atoi(pData);
         return true;
@@ -198,7 +198,7 @@ bool CXmlOpeation::Read_XML_Data_Multiple_Int(const char* pTag, const char* pNam
 {
     const char* pData = GetData(pTag, pName, pTi);
 
-    if (pData != NULL)
+    if (pData != nullptr)
     {
         u4Value = atoi(pData);
         return true;
@@ -211,31 +211,31 @@ bool CXmlOpeation::Read_XML_Data_Multiple_Int(const char* pTag, const char* pNam
 
 const char* CXmlOpeation::GetData(const char* pName, const char* pAttrName)
 {
-    if(m_pRootElement == NULL)
+    if(m_pRootElement == nullptr)
     {
-        return NULL;
+        return nullptr;
     }
 
     const TiXmlElement* pTiXmlElement = m_pRootElement->FirstChildElement(pName);
 
-    if(NULL != pTiXmlElement)
+    if(nullptr != pTiXmlElement)
     {
         return pTiXmlElement->Attribute(pAttrName);
     }
 
-    return NULL;
+    return nullptr;
 }
 
 const char* CXmlOpeation::GetData( const char* pName, const char* pAttrName, TiXmlElement*& pNextTiXmlElement )
 {
-    if(m_pRootElement == NULL)
+    if(m_pRootElement == nullptr)
     {
-        return NULL;
+        return nullptr;
     }
 
-    TiXmlElement* pTiXmlElement = NULL;
+    TiXmlElement* pTiXmlElement = nullptr;
 
-    if(NULL == pNextTiXmlElement)
+    if(nullptr == pNextTiXmlElement)
     {
         pTiXmlElement = m_pRootElement->FirstChildElement(pName);
         pNextTiXmlElement = pTiXmlElement;
@@ -246,12 +246,12 @@ const char* CXmlOpeation::GetData( const char* pName, const char* pAttrName, TiX
         pNextTiXmlElement = pTiXmlElement;
     }
 
-    if(NULL != pTiXmlElement)
+    if(nullptr != pTiXmlElement)
     {
         return pTiXmlElement->Attribute(pAttrName);
     }
 
-    return NULL;
+    return nullptr;
 }
 
 

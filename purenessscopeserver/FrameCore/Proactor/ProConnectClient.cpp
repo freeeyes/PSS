@@ -5,8 +5,8 @@ CProConnectClient::CProConnectClient(void)
 {
     m_nIOCount          = 1;
     m_nServerID         = 0;
-    m_mbRecv            = NULL;
-    m_pClientMessage    = NULL;
+    m_mbRecv            = nullptr;
+    m_pClientMessage    = nullptr;
     m_u4MaxPacketSize   = MAX_MSG_PACKETLENGTH;
     m_ems2s             = EM_s2s::S2S_NEED_CALLBACK;
 
@@ -59,7 +59,7 @@ void CProConnectClient::Close()
 			_MakePacket objMakePacket;
 
 			objMakePacket.m_u4ConnectID     = m_nServerID;
-			objMakePacket.m_pPacketParse    = NULL;
+			objMakePacket.m_pPacketParse    = nullptr;
 			objMakePacket.m_u1Option        = PACKET_SERVER_TCP_DISCONNECT;
 			objMakePacket.m_AddrRemote      = m_AddrRemote;
 			objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
@@ -95,7 +95,7 @@ void CProConnectClient::ClientClose(EM_s2s& ems2s)
         //如果对象已经在外面释放，则不需要再次回调
         if(ems2s == EM_s2s::S2S_INNEED_CALLBACK)
         {
-            SetClientMessage(NULL);
+            SetClientMessage(nullptr);
         }
 
         ACE_OS::shutdown(this->handle(), SD_SEND);
@@ -165,7 +165,7 @@ void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
 		_MakePacket objMakePacket;
 
 		objMakePacket.m_u4ConnectID     = m_nServerID;
-		objMakePacket.m_pPacketParse    = NULL;
+		objMakePacket.m_pPacketParse    = nullptr;
 		objMakePacket.m_u1Option        = PACKET_SERVER_TCP_CONNECT;
 		objMakePacket.m_AddrRemote      = m_AddrRemote;
 		objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
@@ -179,7 +179,7 @@ void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
         ENUM_FORWARD_TYPE::ENUM_FORWARD_TCP_S2S,
         dynamic_cast<IDeviceHandler*>(this));
 
-    if (false == RecvData(GetXmlConfigAttribute(xmlConnectServer)->Recvbuff, NULL))
+    if (false == RecvData(GetXmlConfigAttribute(xmlConnectServer)->Recvbuff, nullptr))
     {
         OUR_DEBUG((LM_DEBUG, "[CProConnectClient::open](%d)GetConnectServerRecvBuffer is error.\n", m_nServerID));
     }
@@ -196,7 +196,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
     {
         mb.release();
 
-        if (NULL != m_pClientMessage)
+        if (nullptr != m_pClientMessage)
         {
             _ClientIPInfo objServerIPInfo;
             objServerIPInfo.m_strClientIP = m_AddrRemote.get_host_addr();
@@ -228,7 +228,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         {
             _Packet_Parse_Info* pPacketParseInfo = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID);
 
-            if (NULL != pPacketParseInfo)
+            if (nullptr != pPacketParseInfo)
             {
                 _Packet_Info obj_Packet_Info;
                 uint8 n1Ret = pPacketParseInfo->Parse_Packet_Stream(m_nServerID,
@@ -273,7 +273,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                 }
 
                 //等待下一个数据
-                if (false == RecvData(GetXmlConfigAttribute(xmlConnectServer)->Recvbuff, NULL))
+                if (false == RecvData(GetXmlConfigAttribute(xmlConnectServer)->Recvbuff, nullptr))
                 {
                     OUR_DEBUG((LM_INFO, "[CProConnectClient::handle_read_stream](%d)RecvData is fail.\n", m_nServerID));
                 }
@@ -282,7 +282,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         else
         {
 
-            if (NULL != m_pClientMessage)
+            if (nullptr != m_pClientMessage)
             {
                 _ClientIPInfo objServerIPInfo;
                 objServerIPInfo.m_strClientIP = m_AddrRemote.get_host_addr();
@@ -291,7 +291,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
 
                 //这里处理一下是不是完整包
                 uint16 u2CommandID = 0;
-                ACE_Message_Block* pRecvFinish = NULL;
+                ACE_Message_Block* pRecvFinish = nullptr;
 
                 m_atvRecv = ACE_OS::gettimeofday();
                 m_emRecvState = EM_Server_Recv_State::SERVER_RECV_BEGIN;
@@ -328,7 +328,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
             {
                 ACE_Message_Block* pmbSave = App_MessageBlockManager::instance()->Create((uint32)mb.length());
 
-                if (NULL != pmbSave)
+                if (nullptr != pmbSave)
                 {
                     memcpy_safe(pmbSave->wr_ptr(), (uint32)mb.length(), mb.rd_ptr(), (uint32)mb.length());
                     pmbSave->wr_ptr(mb.length());
@@ -341,7 +341,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
             }
             else
             {
-                if (false == RecvData(GetXmlConfigAttribute(xmlConnectServer)->Recvbuff, NULL))
+                if (false == RecvData(GetXmlConfigAttribute(xmlConnectServer)->Recvbuff, nullptr))
                 {
                     OUR_DEBUG((LM_INFO, "[CProConnectClient::handle_read_stream](%d)RecvData is fail.\n", m_nServerID));
                 }
@@ -362,7 +362,7 @@ void CProConnectClient::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
         OUR_DEBUG((LM_DEBUG, "[CProConnectClient::handle_write_stream]Write error(%d).\n", ACE_OS::last_error()));
         mblk.release();
 
-        if(NULL != m_pClientMessage)
+        if(nullptr != m_pClientMessage)
         {
             _ClientIPInfo objServerIPInfo;
             objServerIPInfo.m_strClientIP = m_AddrRemote.get_host_addr();
@@ -413,7 +413,7 @@ bool CProConnectClient::RecvData(uint32 u4PacketLen, ACE_Message_Block* pmbSave)
     //ACE_NEW_NORETURN(m_mbRecv, ACE_Message_Block(u4PacketLen));
     m_mbRecv = App_MessageBlockManager::instance()->Create(u4PacketLen);
 
-    if (NULL != pmbSave && 0 < pmbSave->length())
+    if (nullptr != pmbSave && 0 < pmbSave->length())
     {
         //如果有剩余数据，则直接加进去。
         memcpy_safe(m_mbRecv->wr_ptr(), (uint32)pmbSave->length(), pmbSave->rd_ptr(), (uint32)pmbSave->length());
@@ -426,7 +426,7 @@ bool CProConnectClient::RecvData(uint32 u4PacketLen, ACE_Message_Block* pmbSave)
         OUR_DEBUG((LM_DEBUG,"[CProConnectClient::open] m_reader is error(%d).\n", (int)ACE_OS::last_error()));
         App_MessageBlockManager::instance()->Close(m_mbRecv);
 
-        if(NULL != m_pClientMessage)
+        if(nullptr != m_pClientMessage)
         {
             _ClientIPInfo objServerIPInfo;
             objServerIPInfo.m_strClientIP = m_AddrRemote.get_host_addr();
@@ -499,7 +499,7 @@ bool CProConnectClient::SendData(ACE_Message_Block* pmblk)
         OUR_DEBUG((LM_DEBUG,"[CProConnectClient::SendData] Send Error(%d).\n", ACE_OS::last_error()));
         App_MessageBlockManager::instance()->Close(pmblk);
 
-        if(NULL != m_pClientMessage)
+        if(nullptr != m_pClientMessage)
         {
             _ClientIPInfo objServerIPInfo;
             objServerIPInfo.m_strClientIP = m_AddrRemote.get_host_addr();

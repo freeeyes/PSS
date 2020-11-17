@@ -412,19 +412,19 @@ My_ACE_Logging_Strategy::~My_ACE_Logging_Strategy (void)
 int
 My_ACE_Logging_Strategy::fini (void)
 {
-    if (NULL != this->filename_)
+    if (nullptr != this->filename_)
     {
         delete[] this->filename_;
     }
 
     this->filename_ = 0; // Avoid double deletions.
 
-    if (NULL != this->logger_key_)
+    if (nullptr != this->logger_key_)
     {
         delete[] this->logger_key_;
     }
 
-    if (NULL != this->program_name_)
+    if (nullptr != this->program_name_)
     {
         delete[] this->program_name_;
     }

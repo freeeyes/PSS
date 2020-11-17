@@ -22,7 +22,7 @@ public:
     void Test_ProformanceCounter(void);
 
 private:
-    CPerformanceCounter* m_pPerformanceCounter = NULL;
+    CPerformanceCounter* m_pPerformanceCounter = nullptr;
 };
 
 #endif

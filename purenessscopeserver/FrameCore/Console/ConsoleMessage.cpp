@@ -64,9 +64,9 @@ int CConsoleMessage::Init()
 int CConsoleMessage::Dispose(const ACE_Message_Block* pmb, IBuffPacket* pBuffPacket, uint8& u1OutputType)
 {
     //处理命令
-    if(NULL == pmb)
+    if(nullptr == pmb)
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::Dispose]pmb is NULL.\n"));
+        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::Dispose]pmb is nullptr.\n"));
         return CONSOLE_MESSAGE_FAIL;
     }
 
@@ -125,7 +125,7 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
     
     const char* pKeyBegin = ACE_OS::strstr(pCommand, COMMAND_SPLIT_STRING);
 
-    if (NULL == pKeyBegin)
+    if (nullptr == pKeyBegin)
     {
         OUR_DEBUG((LM_ERROR, "[CConsoleMessage::GetCommandInfo]OutputType is no find.\n"));
         return false;
@@ -145,7 +145,7 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
     //获得key值
     const char* pCommandBegin = ACE_OS::strstr(pKeyBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), COMMAND_SPLIT_STRING);
 
-    if (NULL == pCommandBegin)
+    if (nullptr == pCommandBegin)
     {
         OUR_DEBUG((LM_ERROR, "[CConsoleMessage::GetCommandInfo]CommandBegin is no find.\n"));
         return false;
@@ -165,7 +165,7 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
     //获得命令头
     const char* pParamBegin = ACE_OS::strstr(pCommandBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), COMMAND_SPLIT_STRING);
 
-    if (NULL == pParamBegin)
+    if (nullptr == pParamBegin)
     {
         OUR_DEBUG((LM_ERROR, "[CConsoleMessage::GetCommandInfo]ParamBegin is no find.\n"));
         return false;
@@ -196,9 +196,9 @@ int CConsoleMessage::ParseCommand_Plugin(const char* pCommand, IBuffPacket* pBuf
 
     IBuffPacket* pCurrBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
-    if (NULL == pCurrBuffPacket)
+    if (nullptr == pCurrBuffPacket)
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]pCurrBuffPacket is NULL.\n"));
+        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]pCurrBuffPacket is nullptr.\n"));
         return CONSOLE_MESSAGE_FAIL;
     }
 
@@ -220,9 +220,9 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
 
     IBuffPacket* pCurrBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
-    if(NULL == pCurrBuffPacket)
+    if(nullptr == pCurrBuffPacket)
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]pCurrBuffPacket is NULL.\n"));
+        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]pCurrBuffPacket is nullptr.\n"));
         return CONSOLE_MESSAGE_FAIL;
     }
 
@@ -252,17 +252,17 @@ int CConsoleMessage::DoCommand(const _CommandInfo& CommandInfo, IBuffPacket* pCu
 {
     uint16 u2ReturnCommandID = CONSOLE_COMMAND_UNKNOW;
 
-    if (NULL == pCurrBuffPacket)
+    if (nullptr == pCurrBuffPacket)
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]pCurrBuffPacket is NULL.\n"));
+        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]pCurrBuffPacket is nullptr.\n"));
         return CONSOLE_MESSAGE_FAIL;
     }
 
     //查找并处理指令信息
-    DoMessage_Logic fn_DoMessage_Logic = NULL;
+    DoMessage_Logic fn_DoMessage_Logic = nullptr;
     m_objHashMessageLogicList.find((string)CommandInfo.m_strCommandTitle.c_str(), fn_DoMessage_Logic);
 
-    if (NULL != fn_DoMessage_Logic)
+    if (nullptr != fn_DoMessage_Logic)
     {
         //找到了，执行指令
         fn_DoMessage_Logic(CommandInfo, pCurrBuffPacket, u2ReturnCommandID);

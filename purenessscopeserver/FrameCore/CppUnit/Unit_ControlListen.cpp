@@ -14,7 +14,7 @@ void CUnit_ControlListen::setUp(void)
 void CUnit_ControlListen::tearDown(void)
 {
     delete m_pControlListen;
-    m_pControlListen = NULL;
+    m_pControlListen = nullptr;
 }
 
 void CUnit_ControlListen::Test_ControlListen(void)

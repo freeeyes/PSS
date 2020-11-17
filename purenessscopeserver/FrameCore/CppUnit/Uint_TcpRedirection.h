@@ -27,7 +27,7 @@ public:
 private:
     int Create_client(int nClientPort, const char* pIP, int nServerPort);
 
-    CForwardManager* m_pForwardManager = NULL;
+    CForwardManager* m_pForwardManager = nullptr;
     int m_nTestCount = 0;
 };
 

@@ -25,7 +25,7 @@ public:
     void Test_handle_timeout(void);
 
 private:
-    CFileTestManager* m_pFileTestManager = NULL;
+    CFileTestManager* m_pFileTestManager = nullptr;
 };
 
 #endif

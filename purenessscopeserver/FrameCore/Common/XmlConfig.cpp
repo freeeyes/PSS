@@ -234,9 +234,9 @@ void xmlNetWorkMode::SetNetByteOrder(const std::string& pData)
 bool xmlTCPServerIPs::Init(CXmlOpeation* pXmlOperation)
 {
     bool bKet = true;
-    TiXmlElement* pIP = NULL;
-    TiXmlElement* pPort = NULL;
-    TiXmlElement* pPacketParseID = NULL;
+    TiXmlElement* pIP = nullptr;
+    TiXmlElement* pPort = nullptr;
+    TiXmlElement* pPacketParseID = nullptr;
 
     _TCPServerIP tcpServerIP;
 
@@ -255,10 +255,10 @@ bool xmlTCPServerIPs::Init(CXmlOpeation* pXmlOperation)
 bool xmlUDPServerIPs::Init(CXmlOpeation* pXmlOperation)
 {
     bool bKet = true;
-    TiXmlElement* pUIP = NULL;
-    TiXmlElement* pUPort = NULL;
-    TiXmlElement* pUMaxRecvSize = NULL;
-    TiXmlElement* pUPacketParseID = NULL;
+    TiXmlElement* pUIP = nullptr;
+    TiXmlElement* pUPort = nullptr;
+    TiXmlElement* pUMaxRecvSize = nullptr;
+    TiXmlElement* pUPacketParseID = nullptr;
 
     _UDPServerIP udpServerIP;
 
@@ -278,14 +278,14 @@ bool xmlUDPServerIPs::Init(CXmlOpeation* pXmlOperation)
 bool xmlTTyDrives::Init(CXmlOpeation* pXmlOperation)
 {
     bool bKet = true;
-    TiXmlElement* pTTyID          = NULL;
-    TiXmlElement* pParseID        = NULL;
-    TiXmlElement* pBaud           = NULL;
-    TiXmlElement* pDataBits       = NULL;
-    TiXmlElement* pStopBits       = NULL;
-    TiXmlElement* pParity         = NULL;
-    TiXmlElement* pPortName       = NULL;
-    TiXmlElement* pPortDesc       = NULL;
+    TiXmlElement* pTTyID          = nullptr;
+    TiXmlElement* pParseID        = nullptr;
+    TiXmlElement* pBaud           = nullptr;
+    TiXmlElement* pDataBits       = nullptr;
+    TiXmlElement* pStopBits       = nullptr;
+    TiXmlElement* pParity         = nullptr;
+    TiXmlElement* pPortName       = nullptr;
+    TiXmlElement* pPortDesc       = nullptr;
 
     _TTyDrives TTyDrives;
 
@@ -308,10 +308,10 @@ bool xmlTTyDrives::Init(CXmlOpeation* pXmlOperation)
 bool xmlServer2Server::Init(CXmlOpeation* pXmlOperation)
 {
     bool bKet = true;
-    TiXmlElement* pServerID      = NULL;
-    TiXmlElement* pServerIP      = NULL;
-    TiXmlElement* pServerPort    = NULL;
-    TiXmlElement* pParketParseID = NULL;
+    TiXmlElement* pServerID      = nullptr;
+    TiXmlElement* pServerIP      = nullptr;
+    TiXmlElement* pServerPort    = nullptr;
+    TiXmlElement* pParketParseID = nullptr;
 
     _Server2Server Server2Server;
 
@@ -347,9 +347,9 @@ bool xmlClientInfo::Init(CXmlOpeation* pXmlOperation)
 
 bool xmlModuleInfos::Init(CXmlOpeation* pXmlOperation)
 {
-    TiXmlElement* pName = NULL;
-    TiXmlElement* pPath = NULL;
-    TiXmlElement* pParam = NULL;
+    TiXmlElement* pName = nullptr;
+    TiXmlElement* pPath = nullptr;
+    TiXmlElement* pParam = nullptr;
 
     _ModuleInfo moduleInfo;
 
@@ -409,7 +409,7 @@ bool xmlConsole::Init(CXmlOpeation* pXmlOperation)
 
 bool xmlConsoleKeys::Init(CXmlOpeation* pXmlOperation)
 {
-    TiXmlElement* pKey = NULL;
+    TiXmlElement* pKey = nullptr;
     _ConsoleKey consolekey;
 
     while (pXmlOperation->Read_XML_Data_Multiple_String("ConsoleKey", "Key", consolekey.Key, pKey))
@@ -422,7 +422,7 @@ bool xmlConsoleKeys::Init(CXmlOpeation* pXmlOperation)
 
 bool xmlConsoleClients::Init(CXmlOpeation* pXmlOperation)
 {
-    TiXmlElement* pCip = NULL;
+    TiXmlElement* pCip = nullptr;
     _ConsoleClient consoleclient;
 
     while (pXmlOperation->Read_XML_Data_Multiple_String("ConsoleClient", "cip", consoleclient.cip, pCip))
@@ -490,11 +490,11 @@ bool xmlServerVersion::Init(CXmlOpeation* pXmlOperation)
 
 bool xmlPacketParses::Init(CXmlOpeation* pXmlOperation)
 {
-    TiXmlElement* pParseID = NULL;
-    TiXmlElement* pPath = NULL;
-    TiXmlElement* pName = NULL;
-    TiXmlElement* pType = NULL;
-    TiXmlElement* pOrg = NULL;
+    TiXmlElement* pParseID = nullptr;
+    TiXmlElement* pPath = nullptr;
+    TiXmlElement* pName = nullptr;
+    TiXmlElement* pType = nullptr;
+    TiXmlElement* pOrg = nullptr;
 
     _PacketParse packetparse;
     string Type;
@@ -586,9 +586,9 @@ bool xmlClientData::Init(CXmlOpeation* pXmlOperation)
 
 bool xmlCommandInfos::Init(CXmlOpeation* pXmlOperation)
 {
-    TiXmlElement* pCommandID = NULL;
-    TiXmlElement* pCommandCount = NULL;
-    TiXmlElement* pMailID = NULL;
+    TiXmlElement* pCommandID = nullptr;
+    TiXmlElement* pCommandCount = nullptr;
+    TiXmlElement* pMailID = nullptr;
     _CommandInfo commandInfo;
 
     while (pXmlOperation->Read_XML_Data_Multiple_Uint16("CommandInfo", "CommandID", commandInfo.CommandID, pCommandID)
@@ -603,12 +603,12 @@ bool xmlCommandInfos::Init(CXmlOpeation* pXmlOperation)
 
 bool xmlMails::Init(CXmlOpeation* pXmlOperation)
 {
-    TiXmlElement* pMailID = NULL;
-    TiXmlElement* pfromMailAddr = NULL;
-    TiXmlElement* ptoMailAddr = NULL;
-    TiXmlElement* pMailPass = NULL;
-    TiXmlElement* pMailUrl = NULL;
-    TiXmlElement* pMailPort = NULL;
+    TiXmlElement* pMailID = nullptr;
+    TiXmlElement* pfromMailAddr = nullptr;
+    TiXmlElement* ptoMailAddr = nullptr;
+    TiXmlElement* pMailPass = nullptr;
+    TiXmlElement* pMailUrl = nullptr;
+    TiXmlElement* pMailPort = nullptr;
     _Mail mail;
 
     while (pXmlOperation->Read_XML_Data_Multiple_Uint16("Mail", "MailID", mail.MailID, pMailID)
@@ -634,16 +634,16 @@ xmlMails::_Mail* xmlMails::GetMailAlert(uint16 MailID)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 bool xmlTcpRedirection::Init(CXmlOpeation* pXmlOperation)
 {
-    TiXmlElement* pSrcPort         = NULL;
-    TiXmlElement* pRedirectionIP   = NULL;
-    TiXmlElement* pRedirectionPort = NULL;
-    TiXmlElement* pMode            = NULL;
-    TiXmlElement* pConnectState    = NULL;
+    TiXmlElement* pSrcPort         = nullptr;
+    TiXmlElement* pRedirectionIP   = nullptr;
+    TiXmlElement* pRedirectionPort = nullptr;
+    TiXmlElement* pMode            = nullptr;
+    TiXmlElement* pConnectState    = nullptr;
     _RedirectionInfo redirecttioninfo;
 
     while (pXmlOperation->Read_XML_Data_Multiple_Uint32("TcpRedirection", "SrcPort", redirecttioninfo.SrcPort, pSrcPort)
@@ -660,8 +660,8 @@ bool xmlTcpRedirection::Init(CXmlOpeation* pXmlOperation)
 
 bool xmlCommandsTimeout::Init(CXmlOpeation* pXmlOperation)
 {
-    TiXmlElement* pCommandID = NULL;
-    TiXmlElement* pTimeout = NULL;
+    TiXmlElement* pCommandID = nullptr;
+    TiXmlElement* pTimeout = nullptr;
 
     _CommandsTimeout CommandsTimeout;
 
@@ -684,5 +684,5 @@ xmlCommandsTimeout::_CommandsTimeout* xmlCommandsTimeout::GetCommandAlert(uint16
         }
     }
 
-    return NULL;
+    return nullptr;
 }

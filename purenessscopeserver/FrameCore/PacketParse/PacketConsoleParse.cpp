@@ -12,8 +12,8 @@ void CConsolePacketParse::Init()
 {
     SetPacket_IsHandleHead(true);
 
-    SetPacket_Head_Message(NULL);
-    SetPacket_Body_Message(NULL);
+    SetPacket_Head_Message(nullptr);
+    SetPacket_Body_Message(nullptr);
 }
 
 bool CConsolePacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* pmbHead, const IMessageBlockManager* pMessageBlockManager)
@@ -46,7 +46,7 @@ bool CConsolePacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* p
 bool CConsolePacketParse::SetPacketBody(uint32 u4ConnectID, ACE_Message_Block* pmbBody, const IMessageBlockManager* pMessageBlockManager)
 {
     //这里分析出包体内的一些数据，如果包头包含了CommandID，那么包体就不必做解析。
-    if(u4ConnectID == 0 && pMessageBlockManager != NULL)
+    if(u4ConnectID == 0 && pMessageBlockManager != nullptr)
     {
         //UDP数据包，没有u4ConnectID
     }
@@ -83,7 +83,7 @@ bool CConsolePacketParse::MakePacket(uint32 u4ConnectID, const char* pData, uint
     ACE_UNUSED_ARG(u4ConnectID);
     ACE_UNUSED_ARG(u2CommandID);
 
-    if(pMbData == NULL)
+    if(pMbData == nullptr)
     {
         return false;
     }

@@ -8,8 +8,8 @@ CPacketParseBase::CPacketParseBase(void)
 
 void CPacketParseBase::Clear()
 {
-    m_pmbHead = NULL;
-    m_pmbBody = NULL;
+    m_pmbHead = nullptr;
+    m_pmbBody = nullptr;
 
     m_blIsHandleHead    = true;
 
@@ -21,16 +21,16 @@ void CPacketParseBase::Clear()
 
 void CPacketParseBase::Close()
 {
-    if(m_pmbHead != NULL)
+    if(m_pmbHead != nullptr)
     {
         m_pmbHead->release();
-        m_pmbHead = NULL;
+        m_pmbHead = nullptr;
     }
 
-    if(m_pmbBody != NULL)
+    if(m_pmbBody != nullptr)
     {
         m_pmbBody->release();
-        m_pmbBody = NULL;
+        m_pmbBody = nullptr;
     }
 
     m_blIsHandleHead = true;

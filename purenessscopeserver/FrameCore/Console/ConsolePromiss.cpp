@@ -19,19 +19,19 @@ void CConsolePromissions::Init(const char* pFileName)
         return;
     }
 
-    TiXmlElement* pNextTiXmlCommandName = NULL;
-    TiXmlElement* pNextTiXmlUser        = NULL;
+    TiXmlElement* pNextTiXmlCommandName = nullptr;
+    TiXmlElement* pNextTiXmlUser        = nullptr;
 
     while (true)
     {
-        const char* pCommandNameData = NULL;
-        const char* pUserData        = NULL;
+        const char* pCommandNameData = nullptr;
+        const char* pUserData        = nullptr;
 
         auto pConsole_Command_Info = new _Console_Command_Info();
         pCommandNameData = m_ConcoleConfig.GetData("CommandInfo", "CommandName", pNextTiXmlCommandName);
         pUserData = m_ConcoleConfig.GetData("CommandInfo", "User", pNextTiXmlUser);
 
-        if (NULL == pCommandNameData || NULL == pUserData)
+        if (nullptr == pCommandNameData || nullptr == pUserData)
         {
             SAFE_DELETE(pConsole_Command_Info);
             break;
@@ -68,9 +68,9 @@ int CConsolePromissions::Check_Promission(const char* pCommandName, const char* 
 {
     auto pConsole_Command_Info = m_objHashCommandList.Get_Hash_Box_Data(pCommandName);
 
-    if (NULL == pConsole_Command_Info)
+    if (nullptr == pConsole_Command_Info)
     {
-        OUR_DEBUG((LM_INFO, "[CConsolePromissions::Check_Promission](%s)CommandName is null.\n", pCommandName));
+        OUR_DEBUG((LM_INFO, "[CConsolePromissions::Check_Promission](%s)CommandName is nullptr.\n", pCommandName));
         return -1;
     }
 
@@ -83,7 +83,7 @@ int CConsolePromissions::Check_Split_User(const char* pUser, const char* pUserLi
     const char* pPromissPosBegin = pUserList;
     const char* pPromissPos = ACE_OS::strstr(pPromissPosBegin, ",");
 
-    while (NULL != pPromissPos)
+    while (nullptr != pPromissPos)
     {
         auto u4NameLen = (uint32)(pPromissPos - pPromissPosBegin);
 

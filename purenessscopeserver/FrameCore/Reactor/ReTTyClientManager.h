@@ -38,7 +38,7 @@ public:
 private:
     CHashTable<CReTTyHandler> m_objTTyClientHandlerList;                         //连接设备列表
     ACE_Recursive_Thread_Mutex m_ThreadWritrLock;                                //线程锁
-    ACE_Reactor*               m_pReactor       = NULL;                          //反应器句柄
+    ACE_Reactor*               m_pReactor       = nullptr;                          //反应器句柄
     uint16                     m_u2MaxListCount = MAX_BUFF_100;                  //最大设备数量
     uint16                     m_u2TimeCheck    = 120;                           //定时器检测时间
     int                        m_nTaskID        = -1;                            //定时器ID

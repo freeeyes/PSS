@@ -37,7 +37,7 @@ public:
     void Close();
 
 private:
-    _ThreadInfo** m_pAllThreadInfo = NULL;
+    _ThreadInfo** m_pAllThreadInfo = nullptr;
     int           m_nThreadCount   = 0;
 };
 #endif

@@ -15,7 +15,7 @@ void CUnit_MessageService::setUp(void)
 void CUnit_MessageService::tearDown(void)
 {
     delete m_pMessageService;
-    m_pMessageService = NULL;
+    m_pMessageService = nullptr;
 }
 
 void CUnit_MessageService::Test_MessageService(void)

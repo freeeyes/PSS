@@ -181,9 +181,9 @@ void Recovery_Common_BuffPacket(bool blDelete, IBuffPacket* pBuffPacket)
 
 void Tcp_Common_Send_Message_Error(uint32 u4ConnectID, uint16 u2CommandID, bool blDelete, IBuffPacket* pBuffPacket)
 {
-    ACE_Message_Block* pSendMessage = NULL;
+    ACE_Message_Block* pSendMessage = nullptr;
 
-    if (pBuffPacket != NULL && pBuffPacket->GetPacketLen() > 0)
+    if (pBuffPacket != nullptr && pBuffPacket->GetPacketLen() > 0)
     {
         pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
         memcpy_safe(pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
@@ -273,7 +273,7 @@ bool Tcp_Common_File_Message(_File_Message_Param const& obj_File_Message_Param, 
     }
 
     //回调测试文件管理接口
-    if (NULL != obj_File_Message_Param.m_pFileTest)
+    if (nullptr != obj_File_Message_Param.m_pFileTest)
     {
         obj_File_Message_Param.m_pFileTest->HandlerServerResponse(obj_File_Message_Param.m_u4ConnectID);
     }
@@ -361,9 +361,9 @@ bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
                                  ACE_Message_Block* pBlockMessage,
                                  uint32& u4PacketSize)
 {
-    if (pBlockMessage == NULL)
+    if (pBlockMessage == nullptr)
     {
-        OUR_DEBUG((LM_DEBUG, "[Tcp_Common_Make_Send_Packet](%d) pBlockMessage is NULL.\n", obj_Send_Packet_Param.m_u4ConnectID));
+        OUR_DEBUG((LM_DEBUG, "[Tcp_Common_Make_Send_Packet](%d) pBlockMessage is nullptr.\n", obj_Send_Packet_Param.m_u4ConnectID));
         return false;
     }
 
@@ -430,16 +430,16 @@ bool Tcp_Common_Manager_Post_Message(_Post_Message_Param obj_Post_Message_Param,
                                      CSendMessagePool& objSendMessagePool,
                                      ACE_Task<ACE_MT_SYNCH>* pTask)
 {
-    if (NULL == pBuffPacket)
+    if (nullptr == pBuffPacket)
     {
-        OUR_DEBUG((LM_ERROR, "[CProConnectManager::PutMessage] pBuffPacket is NULL.\n"));
+        OUR_DEBUG((LM_ERROR, "[CProConnectManager::PutMessage] pBuffPacket is nullptr.\n"));
         return false;
     }
 
     //放入发送队列
     _SendMessage* pSendMessage = objSendMessagePool.Create();
 
-    if (NULL == pSendMessage)
+    if (nullptr == pSendMessage)
     {
         OUR_DEBUG((LM_ERROR, "[CProConnectManager::PutMessage] new _SendMessage is error.\n"));
 
@@ -453,7 +453,7 @@ bool Tcp_Common_Manager_Post_Message(_Post_Message_Param obj_Post_Message_Param,
 
     ACE_Message_Block* mb = pSendMessage->GetQueueMessage();
 
-    if (NULL != mb)
+    if (nullptr != mb)
     {
         pSendMessage->m_u4ConnectID = obj_Post_Message_Param.m_u4ConnectID;
         pSendMessage->m_pBuffPacket = pBuffPacket;
@@ -481,7 +481,7 @@ bool Tcp_Common_Manager_Post_Message(_Post_Message_Param obj_Post_Message_Param,
             return false;
         }
 
-        if (pTask->putq(mb, NULL) == -1)
+        if (pTask->putq(mb, nullptr) == -1)
         {
             OUR_DEBUG((LM_ERROR, "[CProConnectManager::PutMessage] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
 

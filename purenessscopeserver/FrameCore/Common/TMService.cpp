@@ -2,7 +2,7 @@
 
 void timer_run_execute(ITimerInfo* timer_info)
 {
-    if (NULL != timer_info)
+    if (nullptr != timer_info)
     {
         timer_info->run();
     }
@@ -41,10 +41,10 @@ int CTMService::Init(int nNeedLoad)
 
     objXmlOperation.Read_XML_Data_Single_Int("Info", "TimerCount", m_nTimerMaxCount);
 
-    TiXmlElement* pID       = NULL;
-    TiXmlElement* pName     = NULL;
-    TiXmlElement* pInterval = NULL;
-    TiXmlElement* pMaxEvent = NULL;
+    TiXmlElement* pID       = nullptr;
+    TiXmlElement* pName     = nullptr;
+    TiXmlElement* pInterval = nullptr;
+    TiXmlElement* pMaxEvent = nullptr;
 
     m_HashTimerList.Init(m_nTimerMaxCount, MAX_BUFF_100);
 
@@ -98,8 +98,8 @@ int CTMService::Init(int nNeedLoad)
     m_T2MList.clear();
     m_M2TList.clear();
 
-    TiXmlElement* pWorkThreadID = NULL;
-    TiXmlElement* pMessageID    = NULL;
+    TiXmlElement* pWorkThreadID = nullptr;
+    TiXmlElement* pMessageID    = nullptr;
 
     int nWorkThreadID = 0;
     int nMessageID    = 0;
@@ -161,7 +161,7 @@ int CTMService::AddMessage(const char* pName, unsigned long long nMessagePos, lo
 
     CTimerInfo* pTimerInfo = m_HashTimerList.Get_Hash_Box_Data(strName.c_str());
 
-    if (NULL == pTimerInfo)
+    if (nullptr == pTimerInfo)
     {
         return -1;
     }
@@ -225,7 +225,7 @@ void* CTMService::DeleteMessage(const char* pName, unsigned long long nMessagePo
 
     CTimerInfo* pTimerInfo = m_HashTimerList.Get_Hash_Box_Data(strName.c_str());
 
-    if (NULL == pTimerInfo)
+    if (nullptr == pTimerInfo)
     {
         return nullptr;
     }

@@ -14,7 +14,7 @@ void CUnit_MakePacket::setUp(void)
 void CUnit_MakePacket::tearDown(void)
 {
     delete m_pMakePacket;
-    m_pMakePacket = NULL;
+    m_pMakePacket = nullptr;
 }
 
 void CUnit_MakePacket::Test_MakePacket(void)

@@ -25,7 +25,7 @@ public:
     void Test_SendMail(void);
 
 private:
-    CLogFile* m_pLogFile = NULL;
+    CLogFile* m_pLogFile = nullptr;
     int m_nTestCount = 0;
 };
 

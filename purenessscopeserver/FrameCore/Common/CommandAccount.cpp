@@ -68,10 +68,10 @@ bool CCommandAccount::Save_Flow(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO
     if (m_u1Flow == 1)
     {
         //在hashMap中查找是否已存在端口信息
-        _Port_Data_Account* p_Port_Data_Account = NULL;
+        _Port_Data_Account* p_Port_Data_Account = nullptr;
         m_objectPortAccount.find(u2Port, p_Port_Data_Account);
 
-        if (NULL != p_Port_Data_Account)
+        if (nullptr != p_Port_Data_Account)
         {
             //找到了
             p_Port_Data_Account->SetFlow(u1CommandType, u4PacketSize, tvTime);
@@ -105,7 +105,7 @@ bool CCommandAccount::Save_Command(uint16 u2CommandID, uint16 u2Port, EM_CONNECT
     //查找并添加
     _CommandData* pCommandData = m_objCommandDataList.Get_Hash_Box_Data(strCommandID.c_str());
 
-    if (NULL != pCommandData)
+    if (nullptr != pCommandData)
     {
         //如果已经存在，则直接添加
         pCommandData->m_u4CommandCount++;
@@ -222,7 +222,7 @@ bool CCommandAccount::SaveCommandDataLog()
 
     for(const _CommandData* pCommandData : vecCommandData)
     {
-        if(pCommandData != NULL)
+        if(pCommandData != nullptr)
         {
             ACE_Date_Time dtLastTime(pCommandData->m_tvCommandTime);
             ACE_TString   strCommandType;
@@ -273,7 +273,7 @@ uint32 CCommandAccount::GetFlowIn()
     {
         _Port_Data_Account* p_Port_Data_Account = (*iter).int_id_;
 
-        if (NULL != p_Port_Data_Account)
+        if (nullptr != p_Port_Data_Account)
         {
             u4FlowIn += p_Port_Data_Account->GetFlowIn();
         }
@@ -292,7 +292,7 @@ uint32 CCommandAccount::GetFlowOut()
     {
         _Port_Data_Account* p_Port_Data_Account = (*iter).int_id_;
 
-        if (NULL != p_Port_Data_Account)
+        if (nullptr != p_Port_Data_Account)
         {
             u4FlowOut += p_Port_Data_Account->GetFlowOut();
         }
@@ -329,7 +329,7 @@ void CCommandAccount::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_
     {
         const _Port_Data_Account* p_Port_Data_Account = (*iter).int_id_;
 
-        if (NULL != p_Port_Data_Account)
+        if (nullptr != p_Port_Data_Account)
         {
             obj_Port_Data_Account = *p_Port_Data_Account;
             vec_Port_Data_Account.push_back(obj_Port_Data_Account);

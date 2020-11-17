@@ -28,7 +28,7 @@ public:
     void Test_Output_Debug_Data(void);
 
 private:
-    CConnectClient* m_pConnectClient = NULL;
+    CConnectClient* m_pConnectClient = nullptr;
     int m_nTestCount = 0;
 };
 

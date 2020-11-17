@@ -86,7 +86,7 @@ char* base64_encode(char* out, int out_size, const unsigned char* in, int in_siz
 
     if (out_size < BASE64_SIZE(in_size))
     {
-        return NULL;
+        return nullptr;
     }
 
     ret = dst = out;

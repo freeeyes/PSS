@@ -14,7 +14,7 @@ void CUnit_ConnectClient::setUp(void)
 void CUnit_ConnectClient::tearDown(void)
 {
     delete m_pConnectClient;
-    m_pConnectClient = NULL;
+    m_pConnectClient = nullptr;
 }
 
 void CUnit_ConnectClient::Test_handle_input(void)

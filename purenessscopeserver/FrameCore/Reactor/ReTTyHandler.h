@@ -60,12 +60,12 @@ private:
     char                                  m_szName[MAX_BUFF_100] = {'\0'};
     ACE_TTY_IO                            m_ReTtyio;
     ACE_DEV_Connector                     m_ReConnector;
-    ACE_Message_Block*                    m_pmbReadBuff          = NULL;
+    ACE_Message_Block*                    m_pmbReadBuff          = nullptr;
     ACE_TTY_IO::Serial_Params             m_ObjParams;                                //设备接口参数
     bool                                  m_blState              = false;             //当前设备连接状态
     bool                                  m_blPause              = false;             //是否暂停
     uint32                                m_u4ConnectID          = 0;                 //当前设备ID
-    ITTyMessage*                          m_pTTyMessage          = NULL;              //TTyMessage对象
+    ITTyMessage*                          m_pTTyMessage          = nullptr;              //TTyMessage对象
     EM_CONNECT_IO_DISPOSE                 m_emDispose            = EM_CONNECT_IO_DISPOSE::CONNECT_IO_PLUGIN; //处理模式，框架处理 or 业务处理
     uint32                                m_u4PacketParseInfoID  = 0;                 //框架处理模块ID
     string                                m_strDeviceName;                            //转发接口名称

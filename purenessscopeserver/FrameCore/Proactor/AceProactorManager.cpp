@@ -2,7 +2,7 @@
 
 CAceProactor::CAceProactor()
 {
-    m_pProactor     = NULL;
+    m_pProactor     = nullptr;
     m_nProactorType = 0;
     m_nThreadCount  = 0;
     m_szError[0]    = '\0';
@@ -28,7 +28,7 @@ uint32 CAceProactor::GetProactorID()
 
 void CAceProactor::Close()
 {
-    if (NULL != m_pProactor)
+    if (nullptr != m_pProactor)
     {
         ACE_Time_Value tvSleep(0, 1000);
         m_pProactor->proactor_end_event_loop();
@@ -53,14 +53,14 @@ bool CAceProactor::Init(int nProactorType, int nThreadCount)
             {
                 ACE_WIN32_Proactor* pWin32Proactor = new ACE_WIN32_Proactor(nThreadCount);
 
-                if(NULL == pWin32Proactor)
+                if(nullptr == pWin32Proactor)
                 {
                     throw std::domain_error("[CAceProactor::Init]New ACE_WIN32_Proactor Error.");
                 }
 
                 m_pProactor = new ACE_Proactor(pWin32Proactor, 1);
 
-                if(NULL == m_pProactor)
+                if(nullptr == m_pProactor)
                 {
                     throw std::domain_error("[CAceProactor::Init]New m_pProactor Error[ACE_WIN32_Proactor].");
                 }
@@ -75,14 +75,14 @@ bool CAceProactor::Init(int nProactorType, int nThreadCount)
             {
                 ACE_POSIX_Proactor* pPosixProactor = new ACE_POSIX_Proactor();
 
-                if(NULL == pPosixProactor)
+                if(nullptr == pPosixProactor)
                 {
                     throw std::domain_error("[CAceProactor::Init]New ACE_POSIX_Proactor Error.");
                 }
 
                 m_pProactor = new ACE_Proactor(pPosixProactor, 1);
 
-                if(NULL == m_pProactor)
+                if(nullptr == m_pProactor)
                 {
                     throw std::domain_error("[CAceProactor::Init]New m_pProactor Error[ACE_POSIX_Proactor].");
                 }
@@ -130,9 +130,9 @@ int CAceProactor::open(void* args)
 
 int CAceProactor::svc()
 {
-    if(NULL == m_pProactor)
+    if(nullptr == m_pProactor)
     {
-        OUR_DEBUG((LM_ERROR, "[CAceProactor::Svc]m_pProactor is NULL.\n", m_nProactorType, m_nThreadCount));
+        OUR_DEBUG((LM_ERROR, "[CAceProactor::Svc]m_pProactor is nullptr.\n", m_nProactorType, m_nThreadCount));
         return -1;
     }
     else
@@ -160,9 +160,9 @@ bool CAceProactor::Start()
 
 bool CAceProactor::Stop()
 {
-    if(NULL == m_pProactor)
+    if(nullptr == m_pProactor)
     {
-        OUR_DEBUG((LM_ERROR, "[CAceProactor::Stop]m_pProactor is NULL.\n", m_nProactorType, m_nThreadCount));
+        OUR_DEBUG((LM_ERROR, "[CAceProactor::Stop]m_pProactor is nullptr.\n", m_nProactorType, m_nThreadCount));
         return false;
     }
 
@@ -198,7 +198,7 @@ ACE_Proactor* CAceProactor::GetProactor()
 
 CAceProactorManager::CAceProactorManager(void)
 {
-    m_pAceProactorList = NULL;
+    m_pAceProactorList = nullptr;
     m_u2ProactorCount  = 0;
     ACE_OS::memset(m_szError, 0, MAX_BUFF_500);
 }
@@ -210,13 +210,13 @@ CAceProactorManager::~CAceProactorManager(void)
 
 void CAceProactorManager::Close()
 {
-    if(NULL != m_pAceProactorList)
+    if(nullptr != m_pAceProactorList)
     {
         for(uint16 i = 0; i < m_u2ProactorCount; i++)
         {
             CAceProactor* pAceProactor = m_pAceProactorList[i];
 
-            if(NULL != pAceProactor)
+            if(nullptr != pAceProactor)
             {
                 pAceProactor->Close();
                 SAFE_DELETE(pAceProactor);
@@ -252,9 +252,9 @@ bool CAceProactorManager::AddNewProactor(int nProactorID, int nProactorType, int
 
     CAceProactor* pAceProactor = new CAceProactor();
 
-    if(NULL == pAceProactor)
+    if(nullptr == pAceProactor)
     {
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CAceProactorManager::AddNewProactor]New CAceProactor is NULL.");
+        sprintf_safe(m_szError, MAX_BUFF_500, "[CAceProactorManager::AddNewProactor]New CAceProactor is nullptr.");
         return false;
     }
 
@@ -268,7 +268,7 @@ bool CAceProactorManager::AddNewProactor(int nProactorID, int nProactorType, int
         return false;
     }
 
-    if(NULL != m_pAceProactorList[nProactorID])
+    if(nullptr != m_pAceProactorList[nProactorID])
     {
         sprintf_safe(m_szError, MAX_BUFF_500, "[CAceProactorManager::AddNewProactor]CAceProactor is exist[%d].", nProactorID);
         SAFE_DELETE(pAceProactor);
@@ -285,7 +285,7 @@ bool CAceProactorManager::StartOtherProactor()
     //先启动非总的Rector
     for(uint16 i = 1; i < m_u2ProactorCount; i++)
     {
-        if(NULL != m_pAceProactorList[i])
+        if(nullptr != m_pAceProactorList[i])
         {
             m_pAceProactorList[i]->Start();
         }
@@ -305,7 +305,7 @@ bool CAceProactorManager::StopProactor()
     {
         CAceProactor* pAceProactor = m_pAceProactorList[i];
 
-        if(NULL != pAceProactor)
+        if(nullptr != pAceProactor)
         {
             OUR_DEBUG((LM_ERROR, "[CAceProactorManager::StopProactor]ProactorID=%d.\n", pAceProactor->GetProactorID()));
 
@@ -323,7 +323,7 @@ CAceProactor* CAceProactorManager::GetAceProactor(int nProactorID)
 {
     if(nProactorID < 0 || nProactorID >= m_u2ProactorCount)
     {
-        return NULL;
+        return nullptr;
     }
 
     return m_pAceProactorList[nProactorID];
@@ -340,16 +340,16 @@ ACE_Proactor* CAceProactorManager::GetAce_Client_Proactor(int nProactorID)
 
     if(nClientProactor < 0 || nClientProactor >= m_u2ProactorCount)
     {
-        return NULL;
+        return nullptr;
     }
 
-    if(NULL != m_pAceProactorList[nClientProactor])
+    if(nullptr != m_pAceProactorList[nClientProactor])
     {
         return m_pAceProactorList[nClientProactor]->GetProactor();
     }
     else
     {
-        return NULL;
+        return nullptr;
     }
 }
 

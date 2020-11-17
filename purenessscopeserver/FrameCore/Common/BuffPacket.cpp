@@ -55,10 +55,10 @@ bool CBuffPacket::Init(int32 nSize, int32 nMaxBuffSize)
 
 bool CBuffPacket::Close()
 {
-    if(NULL != m_szData)
+    if(nullptr != m_szData)
     {
         App_ACEMemory::instance()->free((void* )m_szData);
-        m_szData          = NULL;
+        m_szData          = nullptr;
         m_u4ReadPtr       = 0;
         m_u4WritePtr      = 0;
         m_u4PacketLen     = 0;
@@ -82,7 +82,7 @@ bool CBuffPacket::AddBuff(uint32 u4Size)
 {
     try
     {
-        char* szNewData = NULL;
+        char* szNewData = nullptr;
 
         if(u4Size + m_u4WritePtr >= m_u4MaxPacketSize)
         {
@@ -110,7 +110,7 @@ bool CBuffPacket::AddBuff(uint32 u4Size)
 
         szNewData = (char*)App_ACEMemory::instance()->malloc(m_u4PacketLen);
 
-        if(NULL == szNewData)
+        if(nullptr == szNewData)
         {
             OUR_DEBUG((LM_ERROR, "[CBuffPacket::AddBuff] nSize [%d] is new error.\n", m_u4PacketLen));
 			stringstream ss_format;
@@ -122,7 +122,7 @@ bool CBuffPacket::AddBuff(uint32 u4Size)
 			throw std::domain_error(strError);
         }
 
-        if(NULL == m_szData)
+        if(nullptr == m_szData)
         {
             m_szData = szNewData;
         }
@@ -256,7 +256,7 @@ bool CBuffPacket::RollBack(uint32 u4Len)
 
 bool CBuffPacket::WriteStream(const char* pData, uint32 u4Len)
 {
-    if (NULL == pData || u4Len == 0)
+    if (nullptr == pData || u4Len == 0)
     {
         return false;
     }
@@ -291,7 +291,7 @@ bool CBuffPacket::WriteStream(const char* pData, uint32 u4Len)
 
 bool CBuffPacket::ReadStream(char* pData, uint32& u4Len)
 {
-    if(pData == NULL || u4Len > m_u4PacketLen - m_u4ReadPtr)
+    if(pData == nullptr || u4Len > m_u4PacketLen - m_u4ReadPtr)
     {
         return false;
     }
@@ -497,7 +497,7 @@ CBuffPacket& CBuffPacket::operator >> (VCHARS_STR& str)
     }
     else
     {
-        str.text  = NULL;
+        str.text  = nullptr;
         str.u1Len = 0;
     }
 
@@ -517,7 +517,7 @@ CBuffPacket& CBuffPacket::operator >> (VCHARM_STR& str)
     }
     else
     {
-        str.text  = NULL;
+        str.text  = nullptr;
         str.u2Len = 0;
     }
 
@@ -537,7 +537,7 @@ CBuffPacket& CBuffPacket::operator >> (VCHARB_STR& str)
     }
     else
     {
-        str.text  = NULL;
+        str.text  = nullptr;
         str.u4Len = 0;
     }
 

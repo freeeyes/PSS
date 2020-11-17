@@ -14,7 +14,7 @@ void CUnit_ModuleMessageManager::setUp(void)
 void CUnit_ModuleMessageManager::tearDown(void)
 {
     delete m_pModuleMessageManager;
-    m_pModuleMessageManager = NULL;
+    m_pModuleMessageManager = nullptr;
 }
 
 void CUnit_ModuleMessageManager::Test_SendModuleMessage(void)

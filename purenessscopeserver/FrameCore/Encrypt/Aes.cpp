@@ -50,7 +50,7 @@ AES::AES()
 
 bool AES::SetKey(const unsigned char* szKey)
 {
-    if (NULL == szKey)
+    if (nullptr == szKey)
     {
         return false;
     }

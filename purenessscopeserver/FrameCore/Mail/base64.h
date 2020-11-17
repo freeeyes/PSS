@@ -27,7 +27,7 @@
  * Decode a base64-encoded string.
  *
  * @param out      buffer for decoded data
- * @param in       null-terminated input string
+ * @param in       nullptr-terminated input string
  * @param out_size size in bytes of the out buffer, must be at
  *                 least 3/4 of the length of in
  * @return         number of bytes written, or a negative value in case of
@@ -36,13 +36,13 @@
 int base64_decode(unsigned char* out, const char* in, int out_size);
 
 /**
- * Encode data to base64 and null-terminate.
+ * Encode data to base64 and nullptr-terminate.
  *
  * @param out      buffer for encoded data
  * @param out_size size in bytes of the output buffer, must be at
  *                 least BASE64_SIZE(in_size)
  * @param in_size  size in bytes of the 'in' buffer
- * @return         'out' or NULL in case of error
+ * @return         'out' or nullptr in case of error
  */
 char* base64_encode(char* out, int out_size, const unsigned char* in, int in_size);
 

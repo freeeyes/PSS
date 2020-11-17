@@ -2,9 +2,9 @@
 
 CProactorClientInfo::CProactorClientInfo()
 {
-    m_pProConnectClient = NULL;
-    m_pProAsynchConnect = NULL;
-    m_pClientMessage    = NULL;
+    m_pProConnectClient = nullptr;
+    m_pProAsynchConnect = nullptr;
+    m_pClientMessage    = nullptr;
     m_nServerID         = 0;
     m_u4PacketParseID   = 0;
     m_emConnectState    = EM_Server_Connect_State::SERVER_CONNECT_READY;
@@ -46,15 +46,15 @@ bool CProactorClientInfo::Init(const char* pIP, uint16 u2Port, uint8 u1IPType, i
 
 bool CProactorClientInfo::Run(bool blIsReadly, EM_Server_Connect_State emState)
 {
-    if(NULL != m_pProConnectClient)
+    if(nullptr != m_pProConnectClient)
     {
         OUR_DEBUG((LM_ERROR, "[CProactorClientInfo::Run]Connect is exist.\n"));
         return false;
     }
 
-    if(NULL == m_pProAsynchConnect)
+    if(nullptr == m_pProAsynchConnect)
     {
-        OUR_DEBUG((LM_ERROR, "[CProactorClientInfo::Run]m_pAsynchConnect is NULL.\n"));
+        OUR_DEBUG((LM_ERROR, "[CProactorClientInfo::Run]m_pAsynchConnect is nullptr.\n"));
         return false;
     }
 
@@ -93,7 +93,7 @@ bool CProactorClientInfo::Run(bool blIsReadly, EM_Server_Connect_State emState)
 
 bool CProactorClientInfo::SendData(ACE_Message_Block* pmblk)
 {
-    if(NULL == m_pProConnectClient)
+    if(nullptr == m_pProConnectClient)
     {
         //如果连接正在建立过程中，等待5毫秒，如果
         if(EM_Server_Connect_State::SERVER_CONNECT_FIRST == m_emConnectState 
@@ -102,7 +102,7 @@ bool CProactorClientInfo::SendData(ACE_Message_Block* pmblk)
             return false;
         }
 
-        if(NULL == m_pProConnectClient)
+        if(nullptr == m_pProConnectClient)
         {
             //发送连接建立无信息
             Common_Send_ConnectError(pmblk, m_AddrServer, m_pClientMessage);
@@ -122,7 +122,7 @@ bool CProactorClientInfo::SendData(ACE_Message_Block* pmblk)
     if(true == m_pClientMessage->Need_Send_Format())
     {
         //调用数据发送组装
-        ACE_Message_Block* pSend = NULL;
+        ACE_Message_Block* pSend = nullptr;
 
         if(false == Common_Send_Data(pmblk, m_pClientMessage, pSend))
         {
@@ -141,7 +141,7 @@ bool CProactorClientInfo::SendData(ACE_Message_Block* pmblk)
 
 int CProactorClientInfo::GetServerID()
 {
-    if(NULL == m_pProConnectClient)
+    if(nullptr == m_pProConnectClient)
     {
         return 0;
     }
@@ -153,9 +153,9 @@ int CProactorClientInfo::GetServerID()
 
 bool CProactorClientInfo::Close()
 {
-    if(NULL != m_pProConnectClient)
+    if(nullptr != m_pProConnectClient)
     {
-        SetProConnectClient(NULL);
+        SetProConnectClient(nullptr);
     }
 
     return true;
@@ -174,7 +174,7 @@ CProConnectClient* CProactorClientInfo::GetProConnectClient()
 IClientMessage* CProactorClientInfo::GetClientMessage()
 {
     //这里增加是否是连接重练的判定以及是否是第一次连接的回调
-    if((m_emConnectState == EM_Server_Connect_State::SERVER_CONNECT_RECONNECT || m_emConnectState == EM_Server_Connect_State::SERVER_CONNECT_FIRST) && NULL != m_pClientMessage)
+    if((m_emConnectState == EM_Server_Connect_State::SERVER_CONNECT_RECONNECT || m_emConnectState == EM_Server_Connect_State::SERVER_CONNECT_FIRST) && nullptr != m_pClientMessage)
     {
         m_emConnectState = EM_Server_Connect_State::SERVER_CONNECT_OK;
         //通知上层某一个连接已经恢复或者已建立
@@ -239,9 +239,9 @@ CClientProConnectManager::~CClientProConnectManager(void)
 
 bool CClientProConnectManager::Init(ACE_Proactor* pProactor)
 {
-    if(pProactor == NULL)
+    if(pProactor == nullptr)
     {
-        OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Init]pProactor is NULL.\n"));
+        OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Init]pProactor is nullptr.\n"));
         return false;
     }
 
@@ -304,7 +304,7 @@ bool CClientProConnectManager::Init(ACE_Proactor* pProactor)
 bool CClientProConnectManager::Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, IClientMessage* pClientMessage)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-    CProactorClientInfo* pClientInfo = NULL;
+    CProactorClientInfo* pClientInfo = nullptr;
 
     if (S2S_Run_State_Init == m_emS2SRunState)
     {
@@ -323,7 +323,7 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, uint16 u2
     }
 
     //连接初始化动作
-    if (false == ConnectTcpInit(nServerID, pIP, u2Port, u1IPType, NULL, 0, u1IPType, pClientMessage, pClientInfo))
+    if (false == ConnectTcpInit(nServerID, pIP, u2Port, u1IPType, nullptr, 0, u1IPType, pClientMessage, pClientInfo))
     {
         return false;
     }
@@ -349,7 +349,7 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, uint16 u2
 bool CClientProConnectManager::Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, uint16 u2LocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-    CProactorClientInfo* pClientInfo = NULL;
+    CProactorClientInfo* pClientInfo = nullptr;
 
     if (S2S_Run_State_Init == m_emS2SRunState)
     {
@@ -396,10 +396,10 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, uint16 u2
 bool CClientProConnectManager::ConnectFrame(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, uint32 u4PacketParse)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-    CProactorClientInfo* pClientInfo = NULL;
+    CProactorClientInfo* pClientInfo = nullptr;
 
     //连接初始化动作
-    if (false == ConnectTcpInit(nServerID, pIP, u2Port, u1IPType, NULL, 0, u1IPType, NULL, pClientInfo, u4PacketParse))
+    if (false == ConnectTcpInit(nServerID, pIP, u2Port, u1IPType, nullptr, 0, u1IPType, nullptr, pClientInfo, u4PacketParse))
     {
         return false;
     }
@@ -419,10 +419,10 @@ bool CClientProConnectManager::ConnectFrame(int nServerID, const char* pIP, uint
 bool CClientProConnectManager::ConnectFrame(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, uint16 u2LocalPort, uint8 u1LocalIPType, uint32 u4PacketParse)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-    CProactorClientInfo* pClientInfo = NULL;
+    CProactorClientInfo* pClientInfo = nullptr;
 
     //连接初始化动作
-    if (false == ConnectTcpInit(nServerID, pIP, u2Port, u1IPType, pLocalIP, u2LocalPort, u1LocalIPType, NULL, pClientInfo, u4PacketParse))
+    if (false == ConnectTcpInit(nServerID, pIP, u2Port, u1IPType, pLocalIP, u2LocalPort, u1LocalIPType, nullptr, pClientInfo, u4PacketParse))
     {
         return false;
     }
@@ -442,7 +442,7 @@ bool CClientProConnectManager::ConnectFrame(int nServerID, const char* pIP, uint
 bool CClientProConnectManager::ConnectUDP(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-    CProactorUDPClient* pProactorUDPClient = NULL;
+    CProactorUDPClient* pProactorUDPClient = nullptr;
 
     //链接初始化
     if (false == ConnectUdpInit(nServerID, pProactorUDPClient))
@@ -492,9 +492,9 @@ bool CClientProConnectManager::ConnectUDP(int nServerID, const char* pIP, uint16
 
 bool CClientProConnectManager::SetHandler(int nServerID, CProConnectClient* pProConnectClient)
 {
-    if(NULL == pProConnectClient)
+    if(nullptr == pProConnectClient)
     {
-        OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::SetHandler]pProConnectClient is NULL.\n"));
+        OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::SetHandler]pProConnectClient is nullptr.\n"));
         return false;
     }
 
@@ -504,7 +504,7 @@ bool CClientProConnectManager::SetHandler(int nServerID, CProConnectClient* pPro
 
     CProactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 
-    if(NULL != pClientInfo)
+    if(nullptr != pClientInfo)
     {
         pClientInfo->SetProConnectClient(pProConnectClient);
     }
@@ -528,16 +528,16 @@ bool CClientProConnectManager::Close(int nServerID)
 
     CProactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 
-    if(NULL == pClientInfo)
+    if(nullptr == pClientInfo)
     {
-        OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Close]nServerID =(%d) pClientInfo is NULL.\n", nServerID));
+        OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Close]nServerID =(%d) pClientInfo is nullptr.\n", nServerID));
         return false;
     }
 
     EM_s2s ems2s = EM_s2s::S2S_INNEED_CALLBACK;
 
     //关闭链接对象
-    if(NULL != pClientInfo->GetProConnectClient())
+    if(nullptr != pClientInfo->GetProConnectClient())
     {
         pClientInfo->GetProConnectClient()->ClientClose(ems2s);
         SAFE_DELETE(pClientInfo);
@@ -558,9 +558,9 @@ bool CClientProConnectManager::CloseUDP(int nServerID)
 
     CProactorUDPClient* pClientInfo = m_objClientUDPList.Get_Hash_Box_Data(szServerID);
 
-    if(NULL == pClientInfo)
+    if(nullptr == pClientInfo)
     {
-        OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::CloseUDP]nServerID =(%d) pClientInfo is NULL.\n", nServerID));
+        OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::CloseUDP]nServerID =(%d) pClientInfo is nullptr.\n", nServerID));
         return false;
     }
 
@@ -579,9 +579,9 @@ bool CClientProConnectManager::ConnectErrorClose(int nServerID)
 
     CProactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 
-    if(NULL == pClientInfo)
+    if(nullptr == pClientInfo)
     {
-        OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::ConnectErrorClose]nServerID =(%d) pClientInfo is NULL.\n", nServerID));
+        OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::ConnectErrorClose]nServerID =(%d) pClientInfo is nullptr.\n", nServerID));
         return false;
     }
 
@@ -600,12 +600,12 @@ IClientMessage* CClientProConnectManager::GetClientMessage(int nServerID)
 
     CProactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 
-    if(NULL != pClientInfo)
+    if(nullptr != pClientInfo)
     {
         return pClientInfo->GetClientMessage();
     }
 
-    return NULL;
+    return nullptr;
 }
 
 uint32 CClientProConnectManager::GetPacketParseID(int nServerID)
@@ -616,7 +616,7 @@ uint32 CClientProConnectManager::GetPacketParseID(int nServerID)
 
     CProactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 
-    if (NULL != pClientInfo)
+    if (nullptr != pClientInfo)
     {
         return pClientInfo->GetPacketParseID();
     }
@@ -632,7 +632,7 @@ bool CClientProConnectManager::SendData(int nServerID, char*& pData, int nSize, 
 
     CProactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 
-    if(NULL == pClientInfo)
+    if(nullptr == pClientInfo)
     {
         //如果这个链接不存在，则不创建新的链接
         OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::SendData]nServerID =(%d) is not exist.\n", nServerID));
@@ -647,9 +647,9 @@ bool CClientProConnectManager::SendData(int nServerID, char*& pData, int nSize, 
 
     ACE_Message_Block* pmblk = App_MessageBlockManager::instance()->Create(nSize);
 
-    if(NULL == pmblk)
+    if(nullptr == pmblk)
     {
-        OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::SendData]nServerID =(%d) pmblk is NULL.\n", nServerID));
+        OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::SendData]nServerID =(%d) pmblk is nullptr.\n", nServerID));
 
         if(true == blIsDelete)
         {
@@ -662,7 +662,7 @@ bool CClientProConnectManager::SendData(int nServerID, char*& pData, int nSize, 
     memcpy_safe((char* )pData, (uint32)nSize, (char* )pmblk->wr_ptr(), (uint32)nSize);
     pmblk->wr_ptr(nSize);
 
-    if(true == blIsDelete && NULL != pData)
+    if(true == blIsDelete && nullptr != pData)
     {
         SAFE_DELETE_ARRAY(pData);
     }
@@ -679,7 +679,7 @@ bool CClientProConnectManager::SendDataUDP(int nServerID,const char* pIP, uint16
 
     CProactorUDPClient* pClientInfo = m_objClientUDPList.Get_Hash_Box_Data(szServerID);
 
-    if(NULL == pClientInfo)
+    if(nullptr == pClientInfo)
     {
         //如果这个链接不存在，则不创建新的链接
         OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::SendDataUDP]nServerID =(%d) is not exist.\n", nServerID));
@@ -706,7 +706,7 @@ bool CClientProConnectManager::SendDataUDP(int nServerID,const char* pIP, uint16
 bool CClientProConnectManager::StartConnectTask(int nIntervalTime)
 {
     CancelConnectTask();
-    m_nTaskID = App_TimerManager::instance()->schedule(this, (void* )NULL, ACE_OS::gettimeofday() + ACE_Time_Value(nIntervalTime), ACE_Time_Value(nIntervalTime));
+    m_nTaskID = App_TimerManager::instance()->schedule(this, (void* )nullptr, ACE_OS::gettimeofday() + ACE_Time_Value(nIntervalTime), ACE_Time_Value(nIntervalTime));
 
     if(m_nTaskID == -1)
     {
@@ -742,7 +742,7 @@ void CClientProConnectManager::Close()
     {
         EM_s2s ems2s = EM_s2s::S2S_INNEED_CALLBACK;
 
-        if(NULL != pClientInfo)
+        if(nullptr != pClientInfo)
         {
             pClientInfo->GetProConnectClient()->ClientClose(ems2s);
             SAFE_DELETE(pClientInfo);
@@ -756,7 +756,7 @@ void CClientProConnectManager::Close()
 
     for(auto* pClientInfo : vecProactorUDPClient)
     {
-        if(NULL != pClientInfo)
+        if(nullptr != pClientInfo)
         {
             pClientInfo->Close();
             SAFE_DELETE(pClientInfo);
@@ -784,9 +784,9 @@ int CClientProConnectManager::handle_timeout(const ACE_Time_Value& tv, const voi
 
     for(auto* pClientInfo : vecProactorClientInfo)
     {
-        if(NULL != pClientInfo)
+        if(nullptr != pClientInfo)
         {
-            if(NULL == pClientInfo->GetProConnectClient())
+            if(nullptr == pClientInfo->GetProConnectClient())
             {
                 //如果连接不存在，则重新建立连接
                 if (false == pClientInfo->Run(m_blProactorFinish, EM_Server_Connect_State::SERVER_CONNECT_RECONNECT))
@@ -817,7 +817,7 @@ bool CClientProConnectManager::ConnectTcpInit(int nServerID, const char* pIP, ui
     sprintf_safe(szServerID, 10, "%d", nServerID);
     pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 
-    if (NULL != pClientInfo)
+    if (nullptr != pClientInfo)
     {
         //如果这个链接已经存在，则不创建新的链接
         OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) is exist.\n", nServerID));
@@ -841,7 +841,7 @@ bool CClientProConnectManager::ConnectTcpInit(int nServerID, const char* pIP, ui
     }
 
     //设置本地IP和端口
-    if (NULL != pLocalIP && nLocalPort > 0)
+    if (nullptr != pLocalIP && nLocalPort > 0)
     {
         pClientInfo->SetLocalAddr(pLocalIP, nLocalPort, u1LocalIPType);
     }
@@ -863,7 +863,7 @@ bool CClientProConnectManager::ConnectUdpInit(int nServerID, CProactorUDPClient*
     sprintf_safe(szServerID, 10, "%d", nServerID);
     pProactorUDPClient = m_objClientUDPList.Get_Hash_Box_Data(szServerID);
 
-    if (NULL != pProactorUDPClient)
+    if (nullptr != pProactorUDPClient)
     {
         //如果这个链接已经存在，则不创建新的链接
         OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::ConnectUDP]nServerID =(%d) is exist.\n", nServerID));
@@ -879,9 +879,9 @@ bool CClientProConnectManager::ConnectUdpInit(int nServerID, CProactorUDPClient*
 
     pProactorUDPClient = new CProactorUDPClient();
 
-    if (NULL == pProactorUDPClient)
+    if (nullptr == pProactorUDPClient)
     {
-        OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::ConnectUDP]nServerID =(%d) pProactorUDPClient is NULL.\n", nServerID));
+        OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::ConnectUDP]nServerID =(%d) pProactorUDPClient is nullptr.\n", nServerID));
         return false;
     }
 
@@ -906,9 +906,9 @@ void CClientProConnectManager::GetConnectInfo(vecClientConnectInfo& VecClientCon
 
     for(auto* pClientInfo : vecProactorClientInfo)
     {
-        if(NULL != pClientInfo)
+        if(nullptr != pClientInfo)
         {
-            if(NULL != pClientInfo->GetProConnectClient())
+            if(nullptr != pClientInfo->GetProConnectClient())
             {
                 //链接已经建立
                 _ClientConnectInfo ClientConnectInfo = pClientInfo->GetProConnectClient()->GetClientConnectInfo();
@@ -935,7 +935,7 @@ void CClientProConnectManager::GetUDPConnectInfo(vecClientConnectInfo& VecClient
 
     for(auto* pClientInfo : vecProactorUDPClient)
     {
-        if(NULL != pClientInfo)
+        if(nullptr != pClientInfo)
         {
             _ClientConnectInfo ClientConnectInfo = pClientInfo->GetClientConnectInfo();
             VecClientConnectInfo.push_back(ClientConnectInfo);
@@ -953,9 +953,9 @@ bool CClientProConnectManager::CloseByClient(int nServerID)
 
     CProactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 
-    if(NULL != pClientInfo)
+    if(nullptr != pClientInfo)
     {
-        pClientInfo->SetProConnectClient(NULL);
+        pClientInfo->SetProConnectClient(nullptr);
         pClientInfo->SetServerConnectState(EM_Server_Connect_State::SERVER_CONNECT_FAIL);
     }
 
@@ -970,7 +970,7 @@ EM_Server_Connect_State CClientProConnectManager::GetConnectState(int nServerID)
 
     CProactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 
-    if(NULL == pClientInfo)
+    if(nullptr == pClientInfo)
     {
         //如果这个链接不存在，则不创建新的链接
         return EM_Server_Connect_State::SERVER_CONNECT_FAIL;
@@ -990,12 +990,12 @@ bool CClientProConnectManager::ReConnect(int nServerID)
 
     CProactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 
-    if(NULL == pClientInfo)
+    if(nullptr == pClientInfo)
     {
         return false;
     }
 
-    if(NULL == pClientInfo->GetProConnectClient())
+    if(nullptr == pClientInfo->GetProConnectClient())
     {
         //如果连接不存在，则重新建立连接
         if (false == pClientInfo->Run(m_blProactorFinish, EM_Server_Connect_State::SERVER_CONNECT_RECONNECT))
@@ -1022,7 +1022,7 @@ ACE_INET_Addr CClientProConnectManager::GetServerAddr(int nServerID)
 
     CProactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 
-    if(NULL != pClientInfo)
+    if(nullptr != pClientInfo)
     {
         remote_addr = pClientInfo->GetServerAddr();
         return remote_addr;
@@ -1042,7 +1042,7 @@ bool CClientProConnectManager::SetServerConnectState(int nServerID, EM_Server_Co
 
     CProactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 
-    if(NULL != pClientInfo)
+    if(nullptr != pClientInfo)
     {
         pClientInfo->SetServerConnectState(objState);
         return true;
@@ -1062,7 +1062,7 @@ bool CClientProConnectManager::GetServerIPInfo(int nServerID, _ClientIPInfo& obj
 
     CProactorClientInfo* pClientInfo = m_objClientTCPList.Get_Hash_Box_Data(szServerID);
 
-    if(NULL != pClientInfo)
+    if(nullptr != pClientInfo)
     {
         ACE_INET_Addr remote_addr = pClientInfo->GetServerAddr();
         objServerIPInfo.m_strClientIP = remote_addr.get_host_addr();
@@ -1088,11 +1088,11 @@ bool CClientProConnectManager::DeleteIClientMessage(IClientMessage* pClientMessa
 
     for(auto* pClientInfo : vecProactorClientInfo)
     {
-        if(NULL != pClientInfo && pClientInfo->GetClientMessage() == pClientMessage)
+        if(nullptr != pClientInfo && pClientInfo->GetClientMessage() == pClientMessage)
         {
             //关闭连接，并删除对象。
             //关闭链接对象
-            if (NULL != pClientInfo->GetClientMessage())
+            if (nullptr != pClientInfo->GetClientMessage())
             {
                 EM_s2s ems2s = EM_s2s::S2S_INNEED_CALLBACK;
                 pClientInfo->GetProConnectClient()->ClientClose(ems2s);

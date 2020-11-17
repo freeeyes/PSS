@@ -15,7 +15,7 @@ void CUnit_ProformanceCounter::setUp(void)
 void CUnit_ProformanceCounter::tearDown(void)
 {
     delete m_pPerformanceCounter;
-    m_pPerformanceCounter = NULL;
+    m_pPerformanceCounter = nullptr;
 }
 
 void CUnit_ProformanceCounter::Test_ProformanceCounter(void)

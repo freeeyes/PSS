@@ -22,7 +22,7 @@ public:
     void Test_ControlListen(void);
 
 private:
-    CControlListen* m_pControlListen = NULL;
+    CControlListen* m_pControlListen = nullptr;
 };
 
 #endif

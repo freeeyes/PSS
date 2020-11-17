@@ -61,7 +61,7 @@ bool CWorkThreadAI::SaveTimeout(uint16 u2CommandID, uint32 u4TimeCost)
         pCheckCommandTime->m_objTime.Init(m_u4WTTimeoutCount);
         _CommandTimeout* pCommandTimeout = pCheckCommandTime->m_objTime.GetFreeData();
 
-        if(NULL != pCommandTimeout)
+        if(nullptr != pCommandTimeout)
         {
             pCommandTimeout->m_u2CommandID = u2CommandID;
             pCommandTimeout->m_u8Second    = u8Now;
@@ -169,7 +169,7 @@ void CWorkThreadAI::GetAllTimeout(uint32 u4ThreadID, vecCommandTimeout& objTimeo
 {
     for(_CommandTime* pCommandTime : m_vecCommandTime)
     {
-        if (NULL == pCommandTime)
+        if (nullptr == pCommandTime)
         {
             continue;
         }
@@ -214,7 +214,7 @@ int CWorkThreadAI::Do_Command_Account(uint16 u2CommandID, uint64 u8Now, uint32 u
         //首先添加一个到环里面
         _CommandTimeout* pCommandTimeout = pCommandTime->m_objTime.GetFreeData();
 
-        if (NULL != pCommandTimeout)
+        if (nullptr != pCommandTimeout)
         {
             pCommandTimeout->m_u2CommandID = u2CommandID;
             pCommandTimeout->m_u8Second = u8Now;
@@ -226,7 +226,7 @@ int CWorkThreadAI::Do_Command_Account(uint16 u2CommandID, uint64 u8Now, uint32 u
         //在判断当前环里面最后一个时间是否在间隔时间内
         const _CommandTimeout* pCommandLastTimeout = pCommandTime->m_objTime.GetLinkData(m_u4WTTimeoutCount - 1);
 
-        if (NULL != pCommandLastTimeout)
+        if (nullptr != pCommandLastTimeout)
         {
             if (u8Now - pCommandLastTimeout->m_u8Second <= m_u4WTCheckTime)
             {

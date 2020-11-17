@@ -25,7 +25,7 @@ public:
     uint32 GetBlockSize() const;
 
 private:
-    _LogBlockInfo* m_pLogBlockInfo    = NULL;      //日志池
+    _LogBlockInfo* m_pLogBlockInfo    = nullptr;      //日志池
     uint32         m_u4MaxBlockSize   = 0;         //日志池单块最大上限
     uint32         m_u4PoolCount      = 0;         //日志池中的日志块个数
     uint32         m_u4CurrIndex      = 0;         //日志池中当前已用到的日志块ID
@@ -73,10 +73,10 @@ public:
         m_Logger_Mutex.acquire();
         _LogBlockInfo* pLogBlockInfo = m_objLogBlockPool.GetLogBlockInfo();
 
-        if (NULL != pLogBlockInfo)
+        if (nullptr != pLogBlockInfo)
         {
             ACE_OS::snprintf(pLogBlockInfo->m_pBlock, m_objLogBlockPool.GetBlockSize() - 1, fmt, convert(std::forward<Args>(args))...);
-            nRet = Update_Log_Block(nLogType, NULL, NULL, pLogBlockInfo);
+            nRet = Update_Log_Block(nLogType, nullptr, nullptr, pLogBlockInfo);
         }
 
         m_Logger_Mutex.release();
@@ -90,7 +90,7 @@ public:
         m_Logger_Mutex.acquire();
         _LogBlockInfo* pLogBlockInfo = m_objLogBlockPool.GetLogBlockInfo();
 
-        if (NULL != pLogBlockInfo)
+        if (nullptr != pLogBlockInfo)
         {
             ACE_OS::snprintf(pLogBlockInfo->m_pBlock, m_objLogBlockPool.GetBlockSize() - 1, fmt, convert(std::forward<Args>(args))...);
             nRet = Update_Log_Block(nLogType, &u2MailID, pTitle, pLogBlockInfo);
@@ -123,7 +123,7 @@ private:
     int                               m_nQueueMax      = MAX_MSG_THREADQUEUE; //日志线程允许的最大队列个数
     CLogBlockPool                     m_objLogBlockPool;                      //日志块池
     ACE_Recursive_Thread_Mutex        m_Logger_Mutex;                         //线程锁
-    IServerLogger*                    m_pServerLogger = NULL;                 //日志模块指针
+    IServerLogger*                    m_pServerLogger = nullptr;                 //日志模块指针
 };
 
 typedef ACE_Singleton<CLogManager, ACE_Recursive_Thread_Mutex> AppLogManager;

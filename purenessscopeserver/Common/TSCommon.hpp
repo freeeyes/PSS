@@ -45,7 +45,7 @@ public:
     Enum_Timer_Mode             m_emTimerMode;
     IMessagePrecess*            m_pIMessagePrecess;
 
-    CEventsInfo() : m_pArg(NULL), m_nMessageID(0), m_nWorkThreadID(0), m_nMessagePos(0), m_nSec(0), m_nUsec(0), m_emMessageState(Message_Run), m_emTimerMode(Timer_Mode_Run_Once), m_pIMessagePrecess(NULL)
+    CEventsInfo() : m_pArg(nullptr), m_nMessageID(0), m_nWorkThreadID(0), m_nMessagePos(0), m_nSec(0), m_nUsec(0), m_emMessageState(Message_Run), m_emTimerMode(Timer_Mode_Run_Once), m_pIMessagePrecess(nullptr)
     {
     }
 };
@@ -56,7 +56,7 @@ using vecEventsList = vector<CEventsInfo>;
 class CTimerInfo : public ITimerInfo
 {
 public:
-    CTimerInfo() : m_nID(0), m_szName{ '\0' }, m_nInterval(0), m_nMaxQueueList(0), m_pMessageQueueManager(NULL)
+    CTimerInfo() : m_nID(0), m_szName{ '\0' }, m_nInterval(0), m_nMaxQueueList(0), m_pMessageQueueManager(nullptr)
     {
     }
 
@@ -101,7 +101,7 @@ public:
                 //到时的数据，拿出来处理
                 std::cout << "[CTaskTimeNode::Run](" << m_szName.c_str() << ") is Arrived.\n" << endl;
 
-                if (NULL != m_pMessageQueueManager)
+                if (nullptr != m_pMessageQueueManager)
                 {
                     m_pMessageQueueManager->AddMessageClass((*it).m_nWorkThreadID,
                                                             (*it).m_pIMessagePrecess,

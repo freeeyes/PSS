@@ -16,7 +16,7 @@ void CUnit_ThreadInfo::tearDown(void)
 {
     m_pThreadInfo->Close();
     delete m_pThreadInfo;
-    m_pThreadInfo = NULL;
+    m_pThreadInfo = nullptr;
 }
 
 void CUnit_ThreadInfo::Test_ThreadInfo(void)
@@ -35,7 +35,7 @@ void CUnit_ThreadInfo::Test_ThreadInfo(void)
 
     const _ThreadInfo* pThreadInfo = m_pThreadInfo->GetThreadInfo(0);
 
-    if (NULL == pThreadInfo)
+    if (nullptr == pThreadInfo)
     {
         OUR_DEBUG((LM_INFO, "[Test_ThreadInfo]m_pThreadInfo->GetThreadInfo(0) is fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_ThreadInfo]m_pThreadInfo->GetThreadInfo(0) is fail.", true == blRet);

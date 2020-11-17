@@ -5,9 +5,9 @@ bool Server_Manager_Common_LogSystem()
     //初始化日志系统线程
     auto pFileLogger = new CFileLogger();
 
-    if (NULL == pFileLogger)
+    if (nullptr == pFileLogger)
     {
-        OUR_DEBUG((LM_INFO, "[CServerManager::Init]pFileLogger new is NULL.\n"));
+        OUR_DEBUG((LM_INFO, "[CServerManager::Init]pFileLogger new is nullptr.\n"));
         return false;
     }
 

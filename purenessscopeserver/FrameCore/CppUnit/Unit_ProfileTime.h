@@ -22,7 +22,7 @@ public:
     void Test_ProfileTime(void);
 
 private:
-    CProfileTime* m_pProfileTime = NULL;
+    CProfileTime* m_pProfileTime = nullptr;
 };
 
 #endif

@@ -48,7 +48,7 @@ public:
     uint32            m_u4ConnectID    = 0;
     ENUM_FORWARD_TYPE m_emForwardType  = ENUM_FORWARD_TYPE::ENUM_FORWARD_TCP_UNKNOW;
     uint8             m_u1ConnectState = 0;  //0是关闭，1是打开
-    IDeviceHandler*   m_pDeviceHandler = NULL;  //驱动指针
+    IDeviceHandler*   m_pDeviceHandler = nullptr;  //驱动指针
 };
 
 class CForwardManager
@@ -73,7 +73,7 @@ public:
     void AddForward(string strSource, string strTarget);
 
 private:
-    string Check_Connect_IP(const char* pName, ENUM_FORWARD_TYPE em_type, int ConnectState, IDeviceHandler* pDeviceHandler = NULL);
+    string Check_Connect_IP(const char* pName, ENUM_FORWARD_TYPE em_type, int ConnectState, IDeviceHandler* pDeviceHandler = nullptr);
 
     IDeviceHandler* Get_Device_Handler(string strTarget);
 

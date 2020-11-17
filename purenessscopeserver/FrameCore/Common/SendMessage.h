@@ -53,10 +53,10 @@ public:
 
     void Close()
     {
-        if (NULL != m_pmbQueuePtr)
+        if (nullptr != m_pmbQueuePtr)
         {
             m_pmbQueuePtr->release();
-            m_pmbQueuePtr = NULL;
+            m_pmbQueuePtr = nullptr;
         }
     }
 
@@ -64,7 +64,7 @@ public:
     {
         m_u1SendState = 0;
         m_blDelete    = true;
-        m_pBuffPacket = NULL;
+        m_pBuffPacket = nullptr;
         m_u4ConnectID = 0;
         m_nEvents     = 0;
         m_u2CommandID = 0;

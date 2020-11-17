@@ -25,7 +25,7 @@ public:
     void Test_Write_Log(void);
 
 private:
-    CLogBlockPool* m_pLogBlockPool = NULL;
+    CLogBlockPool* m_pLogBlockPool = nullptr;
     int m_nTestCount = 0;
 };
 

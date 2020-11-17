@@ -6,6 +6,8 @@
 #include "Unit_Common.h"
 #include "ConsoleMessage.h"
 #include "BaseConsoleHandle.h"
+#include <string>
+#include <sstream>
 
 class CUnit_ConsoleMessage : public CppUnit::TestFixture
 {
@@ -116,7 +118,7 @@ private:
     bool Create_Command(const char* pCommand, uint16 u2ReturnCommandID);
     bool Create_Command_Error(const char* pCommand);
 
-    CConsoleMessage* m_pConsoleMessage = NULL;
+    CConsoleMessage* m_pConsoleMessage = nullptr;
     int m_nTestCount = 0;
 };
 

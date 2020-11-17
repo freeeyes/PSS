@@ -25,7 +25,7 @@ public:
     void Test_SendFrameMessage(void);   //测试消息队列
 
 private:
-    CModuleMessageManager* m_pModuleMessageManager = NULL;
+    CModuleMessageManager* m_pModuleMessageManager = nullptr;
 };
 
 #endif

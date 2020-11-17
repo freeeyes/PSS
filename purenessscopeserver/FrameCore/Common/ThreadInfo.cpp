@@ -16,7 +16,7 @@ void CThreadInfoList::Init(int nCount)
 
     m_pAllThreadInfo = new _ThreadInfo*[nCount];
 
-    if (NULL != m_pAllThreadInfo)
+    if (nullptr != m_pAllThreadInfo)
     {
         memset(m_pAllThreadInfo, 0, sizeof(_ThreadInfo*)*nCount);
     }
@@ -31,7 +31,7 @@ bool CThreadInfoList::AddThreadInfo(uint32 u4ThreadID)
         return false;
     }
 
-    if(NULL != m_pAllThreadInfo[u4ThreadID])
+    if(nullptr != m_pAllThreadInfo[u4ThreadID])
     {
         OUR_DEBUG((LM_ERROR, "[CThreadInfoList::AddThreadInfo] u4ThreadID = %d is exist.\n", u4ThreadID));
         return false;
@@ -55,7 +55,7 @@ bool CThreadInfoList::AddThreadInfo(uint32 u4ThreadID, _ThreadInfo* pOrcThreadIn
         return false;
     }
 
-    if (NULL != m_pAllThreadInfo[u4ThreadID])
+    if (nullptr != m_pAllThreadInfo[u4ThreadID])
     {
         m_pAllThreadInfo[u4ThreadID] = pOrcThreadInfo;
     }
@@ -97,7 +97,7 @@ _ThreadInfo* CThreadInfoList::GetThreadInfo(uint32 u4ThreadID)
     //这里不再单独判断ThreadID，因为一个svc目前只有一个线程ID
     if(u4ThreadID >= (uint32)m_nThreadCount)
     {
-        return NULL;
+        return nullptr;
     }
 
     return m_pAllThreadInfo[u4ThreadID];
@@ -110,7 +110,7 @@ bool CThreadInfoList::CloseThread(uint32 u4ThreadID)
         return false;
     }
 
-    if(NULL != m_pAllThreadInfo[u4ThreadID])
+    if(nullptr != m_pAllThreadInfo[u4ThreadID])
     {
         SAFE_DELETE(m_pAllThreadInfo[u4ThreadID]);
         return true;

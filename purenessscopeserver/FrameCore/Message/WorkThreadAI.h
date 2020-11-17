@@ -174,7 +174,7 @@ private:
 
     bool ConvertStr2char(const char* pData, unsigned char& cData) const
     {
-        if(pData == NULL || strlen(pData) != 2)
+        if(pData == nullptr || strlen(pData) != 2)
         {
             return false;
         }

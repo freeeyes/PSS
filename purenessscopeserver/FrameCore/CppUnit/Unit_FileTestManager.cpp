@@ -15,7 +15,7 @@ void CUnit_FileTestManager::tearDown(void)
 {
     m_pFileTestManager->Close();
     delete m_pFileTestManager;
-    m_pFileTestManager = NULL;
+    m_pFileTestManager = nullptr;
 }
 
 void CUnit_FileTestManager::Test_FileTestStart(void)
@@ -69,7 +69,7 @@ void CUnit_FileTestManager::Test_handle_timeout(void)
     }
 
     ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-    int nRet = m_pFileTestManager->handle_timeout(tvNow, NULL);
+    int nRet = m_pFileTestManager->handle_timeout(tvNow, nullptr);
 
     if (0 == nRet)
     {

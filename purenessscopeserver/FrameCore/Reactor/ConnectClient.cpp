@@ -42,7 +42,7 @@ void CConnectClient::Close()
 			_MakePacket objMakePacket;
 
 			objMakePacket.m_u4ConnectID     = m_nServerID;
-			objMakePacket.m_pPacketParse    = NULL;
+			objMakePacket.m_pPacketParse    = nullptr;
 			objMakePacket.m_u1Option        = PACKET_SERVER_TCP_DISCONNECT;
 			objMakePacket.m_AddrRemote      = m_addrRemote;
 			objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
@@ -72,9 +72,9 @@ void CConnectClient::ClientClose()
     //将连接消息断开放在output去执行，这样就不需要同步加锁了。
     ACE_Message_Block* pMbData = App_MessageBlockManager::instance()->Create(sizeof(int));
 
-    if (NULL == pMbData)
+    if (nullptr == pMbData)
     {
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::ClientClose] Connectid=%d, pMbData is NULL.\n", GetServerID()));
+        OUR_DEBUG((LM_ERROR, "[CConnectClient::ClientClose] Connectid=%d, pMbData is nullptr.\n", GetServerID()));
         return;
     }
 
@@ -82,7 +82,7 @@ void CConnectClient::ClientClose()
     pMbData->msg_type(objType);
 
     //这里主动关闭，不在要求回调连接断开消息
-    SetClientMessage(NULL);
+    SetClientMessage(nullptr);
 
     //将消息放入队列，让output在反应器线程发送。
     ACE_Time_Value xtime = ACE_OS::gettimeofday();
@@ -114,9 +114,9 @@ void CConnectClient::ClientClose()
 
 int CConnectClient::open(void* p)
 {
-    if (p != NULL)
+    if (p != nullptr)
     {
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::open]p is not NULL.\n"));
+        OUR_DEBUG((LM_ERROR, "[CConnectClient::open]p is not nullptr.\n"));
     }
 
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadLock);
@@ -156,9 +156,9 @@ int CConnectClient::open(void* p)
     //申请当前的MessageBlock
     m_pCurrMessage = App_MessageBlockManager::instance()->Create(GetXmlConfigAttribute(xmlConnectServer)->Recvbuff);
 
-    if (m_pCurrMessage == NULL)
+    if (m_pCurrMessage == nullptr)
     {
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::RecvClinetPacket] pmb new is NULL.\n"));
+        OUR_DEBUG((LM_ERROR, "[CConnectClient::RecvClinetPacket] pmb new is nullptr.\n"));
         return -1;
     }
 
@@ -179,7 +179,7 @@ int CConnectClient::open(void* p)
 		_MakePacket objMakePacket;
 
 		objMakePacket.m_u4ConnectID = m_nServerID;
-		objMakePacket.m_pPacketParse = NULL;
+		objMakePacket.m_pPacketParse = nullptr;
 		objMakePacket.m_u1Option = PACKET_SERVER_TCP_CONNECT;
 		objMakePacket.m_AddrRemote = m_addrRemote;
 		objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
@@ -214,7 +214,7 @@ int CConnectClient::handle_input(ACE_HANDLE fd)
         OUR_DEBUG((LM_ERROR, "[CConnectClient::handle_input]fd == ACE_INVALID_HANDLE.\n"));
         sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::handle_input]fd == ACE_INVALID_HANDLE.");
 
-        if (NULL != m_pClientMessage)
+        if (nullptr != m_pClientMessage)
         {
             _ClientIPInfo objServerIPInfo;
             objServerIPInfo.m_strClientIP = m_addrRemote.get_host_addr();
@@ -229,14 +229,14 @@ int CConnectClient::handle_input(ACE_HANDLE fd)
         return -1;
     }
 
-    //判断缓冲是否为NULL
-    if (m_pCurrMessage == NULL)
+    //判断缓冲是否为nullptr
+    if (m_pCurrMessage == nullptr)
     {
         m_u4CurrSize = 0;
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::handle_input]m_pCurrMessage == NULL.\n"));
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectClient::handle_input]m_pCurrMessage == NULL.");
+        OUR_DEBUG((LM_ERROR, "[CConnectClient::handle_input]m_pCurrMessage == nullptr.\n"));
+        sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectClient::handle_input]m_pCurrMessage == nullptr.");
 
-        if (NULL != m_pClientMessage)
+        if (nullptr != m_pClientMessage)
         {
             _ClientIPInfo objServerIPInfo;
             objServerIPInfo.m_strClientIP = m_addrRemote.get_host_addr();
@@ -311,7 +311,7 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
     {
         const _Packet_Parse_Info* pPacketParseInfo = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID);
 
-        if (NULL != pPacketParseInfo)
+        if (nullptr != pPacketParseInfo)
         {
             _Packet_Info obj_Packet_Info;
             uint8 n1Ret = pPacketParseInfo->Parse_Packet_Stream(m_nServerID,
@@ -367,7 +367,7 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
         objServerIPInfo.m_u2Port      = m_addrRemote.get_port_number();
 
         uint16 u2CommandID = 0;
-        ACE_Message_Block* pRecvFinish = NULL;
+        ACE_Message_Block* pRecvFinish = nullptr;
 
         m_atvRecv = ACE_OS::gettimeofday();
         m_emRecvState = EM_Server_Recv_State::SERVER_RECV_BEGIN;
@@ -447,7 +447,7 @@ int CConnectClient::handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask)
 {
     if (h == ACE_INVALID_HANDLE)
     {
-        OUR_DEBUG((LM_DEBUG, "[CConnectClient::handle_close] h is NULL mask=%d.\n", GetServerID(), (int)mask));
+        OUR_DEBUG((LM_DEBUG, "[CConnectClient::handle_close] h is nullptr mask=%d.\n", GetServerID(), (int)mask));
     }
 
     Close();
@@ -463,14 +463,14 @@ int CConnectClient::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
         return -1;
     }
 
-    ACE_Message_Block* pmbSendData = NULL;
+    ACE_Message_Block* pmbSendData = nullptr;
     ACE_Time_Value nowait(ACE_OS::gettimeofday());
 
     while (-1 != this->getq(pmbSendData, &nowait))
     {
-        if (NULL == pmbSendData)
+        if (nullptr == pmbSendData)
         {
-            OUR_DEBUG((LM_INFO, "[CConnectClient::handle_output]ConnectID=%d pmbSendData is NULL.\n", GetServerID()));
+            OUR_DEBUG((LM_INFO, "[CConnectClient::handle_output]ConnectID=%d pmbSendData is nullptr.\n", GetServerID()));
             break;
         }
 
@@ -483,9 +483,9 @@ int CConnectClient::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
         //发送数据
         const char* pData = pmbSendData->rd_ptr();
 
-        if (NULL == pData)
+        if (nullptr == pData)
         {
-            OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, pData is NULL.\n", GetServerID()));
+            OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, pData is nullptr.\n", GetServerID()));
             App_MessageBlockManager::instance()->Close(pmbSendData);
             return -1;
         }
@@ -582,7 +582,7 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
         return false;
     }
 
-    if (NULL == pmblk)
+    if (nullptr == pmblk)
     {
         OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetServerID()));
         return false;

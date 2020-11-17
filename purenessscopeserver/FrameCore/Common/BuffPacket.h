@@ -95,7 +95,7 @@ public:
     virtual CBuffPacket& operator << (string& str);
 
 private:
-    char*                      m_szData          = NULL;                //数据指针
+    char*                      m_szData          = nullptr;                //数据指针
     uint32                     m_u4ReadPtr       = 0;                   //读包的位置
     uint32                     m_u4WritePtr      = 0;                   //写包的位置
     uint32                     m_u4PacketLen     = 0 ;                  //包总长度

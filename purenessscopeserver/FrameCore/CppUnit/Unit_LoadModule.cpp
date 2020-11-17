@@ -25,25 +25,25 @@ void CUnit_LoadModule::Test_LoadModule(void)
 
     const char* pModuleFileName = App_ModuleLoader::instance()->GetModuleFileName(m_szModuleName);
 
-    if (NULL == pModuleFileName)
+    if (nullptr == pModuleFileName)
     {
-        CPPUNIT_ASSERT_MESSAGE("[Test_LoadModule]pModuleFileName is NULL.", true == blRet);
+        CPPUNIT_ASSERT_MESSAGE("[Test_LoadModule]pModuleFileName is nullptr.", true == blRet);
         return;
     }
 
     const char* pModuleFilePath = App_ModuleLoader::instance()->GetModuleFilePath(m_szModuleName);
 
-    if (NULL == pModuleFilePath)
+    if (nullptr == pModuleFilePath)
     {
-        CPPUNIT_ASSERT_MESSAGE("[Test_LoadModule]pModuleFilePath is NULL.", true == blRet);
+        CPPUNIT_ASSERT_MESSAGE("[Test_LoadModule]pModuleFilePath is nullptr.", true == blRet);
         return;
     }
 
     const char* pModuleFileDesc = App_ModuleLoader::instance()->GetModuleFileDesc(m_szModuleName);
 
-    if (NULL == pModuleFileDesc)
+    if (nullptr == pModuleFileDesc)
     {
-        CPPUNIT_ASSERT_MESSAGE("[Test_LoadModule]pModuleFileDesc is NULL.", true == blRet);
+        CPPUNIT_ASSERT_MESSAGE("[Test_LoadModule]pModuleFileDesc is nullptr.", true == blRet);
         return;
     }
 

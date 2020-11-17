@@ -74,8 +74,8 @@ class IPostMessage
 public:
     IPostMessage()
     {
-        m_pRecvPacket = NULL;
-        m_pSendPacket = NULL;
+        m_pRecvPacket = nullptr;
+        m_pSendPacket = nullptr;
         m_u4ServerID  = 0;
         m_u2CommandID = 0;
         m_blDelete    = true;
@@ -88,16 +88,16 @@ public:
 
     virtual void Close()
     {
-        if(NULL != m_pRecvPacket)
+        if(nullptr != m_pRecvPacket)
         {
             delete m_pRecvPacket;
-            m_pRecvPacket = NULL;
+            m_pRecvPacket = nullptr;
         }
 
-        if(NULL != m_pSendPacket)
+        if(nullptr != m_pSendPacket)
         {
             delete m_pSendPacket;
-            m_pSendPacket = NULL;
+            m_pSendPacket = nullptr;
         }
 
         m_u4ServerID  = 0;
@@ -107,7 +107,7 @@ public:
 
     virtual bool SetRecvPacket(IBuffPacket* pRecvPacket)
     {
-        if(NULL == pRecvPacket)
+        if(nullptr == pRecvPacket)
         {
             return false;
         }
@@ -118,7 +118,7 @@ public:
 
     virtual bool SetSendPacket(IBuffPacket* pSendPacket)
     {
-        if(NULL == pSendPacket)
+        if(nullptr == pSendPacket)
         {
             return false;
         }

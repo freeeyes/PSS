@@ -31,7 +31,7 @@ public:
     virtual bool Send_Format_data(char* pData, uint32 u4Len, IMessageBlockManager* pMessageBlockManager, ACE_Message_Block*& mbSend)
     {
         //判断缓冲池是否存在，如果不存在则返回失败
-        if(NULL == pMessageBlockManager)
+        if(nullptr == pMessageBlockManager)
         {
             return false;
         }
@@ -39,9 +39,9 @@ public:
         //申请发送的内存
         mbSend = pMessageBlockManager->Create(u4Len);
 
-        if(NULL == mbSend)
+        if(nullptr == mbSend)
         {
-            OUR_DEBUG((LM_INFO, "[CPostServerData::Send_Format_data](%d)Format Create Data NULL(%d) OK.\n", m_u4ServerID, u4Len));
+            OUR_DEBUG((LM_INFO, "[CPostServerData::Send_Format_data](%d)Format Create Data nullptr(%d) OK.\n", m_u4ServerID, u4Len));
             return false;
         }
 

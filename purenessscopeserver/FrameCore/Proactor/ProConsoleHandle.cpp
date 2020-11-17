@@ -15,7 +15,7 @@ CProConsoleHandle::CProConsoleHandle(void)
     m_u2SendQueueMax     = MAX_MSG_SENDPACKET;
     m_u1ConnectState     = CONNECTSTATE::CONNECT_INIT;
     m_u1SendBuffState    = CONNECTSTATE::CONNECT_SENDNON;
-    m_pPacketParse       = NULL;
+    m_pPacketParse       = nullptr;
     m_blCanWrite         = false;
     m_blTimeClose        = false;
     m_u4RecvPacketCount  = 0;
@@ -149,7 +149,7 @@ void CProConsoleHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 
     m_pPacketParse = new CConsolePacketParse();
 
-    if(NULL == m_pPacketParse)
+    if(nullptr == m_pPacketParse)
     {
         OUR_DEBUG((LM_DEBUG,"[CProConsoleHandle::open] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
         Close();
@@ -173,12 +173,12 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
     if(!result.success() || result.bytes_transferred() == 0)
     {
         //链接断开
-        if(m_pPacketParse->GetMessageHead() != NULL)
+        if(m_pPacketParse->GetMessageHead() != nullptr)
         {
             App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
         }
 
-        if(m_pPacketParse->GetMessageBody() != NULL)
+        if(m_pPacketParse->GetMessageBody() != nullptr)
         {
             App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
         }
@@ -214,12 +214,12 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
 
         if (-1 == m_Reader.read(mb, nRead))
         {
-            if (m_pPacketParse->GetMessageHead() != NULL)
+            if (m_pPacketParse->GetMessageHead() != nullptr)
             {
                 App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
             }
 
-            if (m_pPacketParse->GetMessageBody() != NULL)
+            if (m_pPacketParse->GetMessageBody() != nullptr)
             {
                 App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
             }
@@ -244,7 +244,7 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         //完整命令包
         ACE_Message_Block* pmbHead = App_MessageBlockManager::instance()->Create(sizeof(int));
 
-        if (NULL != pmbHead)
+        if (nullptr != pmbHead)
         {
             //组装包头
             memcpy_safe(pmbHead->wr_ptr(), sizeof(int), (char* )&u4Len, sizeof(int));
@@ -257,12 +257,12 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
             {
                 OUR_DEBUG((LM_INFO, "[CProConsoleHandle::handle_input]CheckMessage error.\n"));
 
-                if (m_pPacketParse->GetMessageHead() != NULL)
+                if (m_pPacketParse->GetMessageHead() != nullptr)
                 {
                     App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
                 }
 
-                if (m_pPacketParse->GetMessageBody() != NULL)
+                if (m_pPacketParse->GetMessageBody() != nullptr)
                 {
                     App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
                 }
@@ -279,12 +279,12 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
             }
         }
 
-        if (m_pPacketParse->GetMessageHead() != NULL)
+        if (m_pPacketParse->GetMessageHead() != nullptr)
         {
             App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
         }
 
-        if (m_pPacketParse->GetMessageBody() != NULL)
+        if (m_pPacketParse->GetMessageBody() != nullptr)
         {
             App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
         }
@@ -348,7 +348,7 @@ bool CProConsoleHandle::GetIsClosing()
 
 bool CProConsoleHandle::SendMessage(IBuffPacket* pBuffPacket, uint8 u1OutputType)
 {
-    ACE_Message_Block* pMbData = NULL;
+    ACE_Message_Block* pMbData = nullptr;
 
     if (false == Console_Common_SendMessage_Data_Check(GetConnectID(), pBuffPacket, u1OutputType, pMbData))
     {
@@ -371,7 +371,7 @@ bool CProConsoleHandle::PutSendPacket(ACE_Message_Block* pMbData)
     m_ThreadWriteLock.release();
 
     //异步发送方法
-    if(NULL != pMbData)
+    if(nullptr != pMbData)
     {
         if(0 != m_Writer.write(*pMbData, pMbData->length()))
         {
@@ -389,7 +389,7 @@ bool CProConsoleHandle::PutSendPacket(ACE_Message_Block* pMbData)
     }
     else
     {
-        OUR_DEBUG ((LM_ERROR,"[CConnectHandler::PutSendPacket] Connectid=%d mb is NULL!\n", GetConnectID()));
+        OUR_DEBUG ((LM_ERROR,"[CConnectHandler::PutSendPacket] Connectid=%d mb is nullptr!\n", GetConnectID()));
         Close();
         return false;
     }
@@ -403,16 +403,16 @@ bool CProConsoleHandle::RecvClinetPacket(uint32 u4PackeLen)
 
     ACE_Message_Block* pmb = App_MessageBlockManager::instance()->Create(u4PackeLen);
 
-    if(pmb == NULL)
+    if(pmb == nullptr)
     {
-        OUR_DEBUG((LM_ERROR, "[CProConsoleHandle::RecvClinetPacket] pmb new is NULL.\n"));
+        OUR_DEBUG((LM_ERROR, "[CProConsoleHandle::RecvClinetPacket] pmb new is nullptr.\n"));
 
-        if(m_pPacketParse->GetMessageHead() != NULL)
+        if(m_pPacketParse->GetMessageHead() != nullptr)
         {
             App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
         }
 
-        if(m_pPacketParse->GetMessageBody() != NULL)
+        if(m_pPacketParse->GetMessageBody() != nullptr)
         {
             App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
         }
@@ -429,12 +429,12 @@ bool CProConsoleHandle::RecvClinetPacket(uint32 u4PackeLen)
 
         App_MessageBlockManager::instance()->Close(pmb);
 
-        if(m_pPacketParse->GetMessageHead() != NULL)
+        if(m_pPacketParse->GetMessageHead() != nullptr)
         {
             App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
         }
 
-        if(m_pPacketParse->GetMessageBody() != NULL)
+        if(m_pPacketParse->GetMessageBody() != nullptr)
         {
             App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
         }
@@ -450,7 +450,7 @@ bool CProConsoleHandle::RecvClinetPacket(uint32 u4PackeLen)
 bool CProConsoleHandle::CheckMessage()
 {
     uint8 u1Output           = 0;
-    IBuffPacket* pBuffPacket = NULL;
+    IBuffPacket* pBuffPacket = nullptr;
     bool blRet = Console_Common_CheckMessage_Data(m_u4AllRecvSize, m_u4AllRecvCount, m_pPacketParse, u1Output, pBuffPacket);
 
     if (true == blRet && false == SendMessage(dynamic_cast<IBuffPacket*>(pBuffPacket), u1Output))

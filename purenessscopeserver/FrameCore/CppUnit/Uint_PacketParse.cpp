@@ -15,7 +15,7 @@ void CUnit_PacketParse::setUp(void)
 void CUnit_PacketParse::tearDown(void)
 {
     delete m_pPacketParsePool;
-    m_pPacketParsePool = NULL;
+    m_pPacketParsePool = nullptr;
 }
 
 void CUnit_PacketParse::Test_PacketParsePool(void)
@@ -25,7 +25,7 @@ void CUnit_PacketParse::Test_PacketParsePool(void)
 
     CPacketParse* pPacketParse = m_pPacketParsePool->Create(__FILE__, __LINE__);
 
-    if (NULL == pPacketParse)
+    if (nullptr == pPacketParse)
     {
         OUR_DEBUG((LM_INFO, "[Test_PacketParsePool]m_pPacketParsePool->Create().\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_PacketParsePool]m_pPacketParsePool->Create() is fail.", true == blRet);

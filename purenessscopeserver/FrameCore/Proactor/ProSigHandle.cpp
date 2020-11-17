@@ -18,7 +18,7 @@ int CProSigHandle::RegisterSignal(ACE_Proactor* pProactor)
     signalSet.sig_add(SIGPIPE);
     signalSet.sig_add(SIGALRM);
 
-    if(NULL == pProactor)
+    if(nullptr == pProactor)
     {
         //return ACE_Proactor::instance()->register_handle(signalSet,this);
     }

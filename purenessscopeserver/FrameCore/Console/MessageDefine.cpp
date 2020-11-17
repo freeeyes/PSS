@@ -7,7 +7,7 @@ bool GetCommandParam(const char* pCommand, const char* pTag, string& strValue)
     const char* pPosBegin = ACE_OS::strstr(pCommand, pTag);
 
     //判断是否包含指定的关键字
-    if (NULL == pPosBegin)
+    if (nullptr == pPosBegin)
     {
         OUR_DEBUG((LM_INFO, "[GetCommandParam](%s)no find(%s) key.\n", pCommand, pTag));
         return false;
@@ -17,7 +17,7 @@ bool GetCommandParam(const char* pCommand, const char* pTag, string& strValue)
 
     int nLen = 0;
 
-    if (NULL == pPosEnd)
+    if (nullptr == pPosEnd)
     {
         //没有找到 " "结尾,直接从最后计算
         nLen = (int)(pCommand - pPosBegin - 3);
@@ -262,7 +262,7 @@ bool GetDyeingCommand(const char* pCommand, _DyeCommandInfo& objDyeCommandInfo)
     }
 
     strCommandID.append(&strTemp.at(2), (uint32)(strTemp.length() - 2));
-    objDyeCommandInfo.m_u2CommandID = (uint16)ACE_OS::strtol(strCommandID.c_str(), NULL, 16);
+    objDyeCommandInfo.m_u2CommandID = (uint16)ACE_OS::strtol(strCommandID.c_str(), nullptr, 16);
 
     //获得当前个数
     GetCommandParam(pCommand, "-c ", strTemp);

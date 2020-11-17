@@ -159,7 +159,7 @@ static unsigned int GetValueByIP(const char* pIP)
 //定义一个函数，可以支持内存越界检查
 inline void sprintf_trace_safe(char* szText, int nLen, const char* fmt ...)
 {
-    if (szText == NULL)
+    if (szText == nullptr)
     {
         return;
     }
@@ -203,17 +203,17 @@ inline void WriteTrace(const char* pFilePath, const char* pTraceID, const char* 
     char szFileLog[400] = { '\0' };
     char szTemp[1024] = { '\0' };
 
-    if (NULL != pTraceID && 0 < strlen(pTraceID))
+    if (nullptr != pTraceID && 0 < strlen(pTraceID))
     {
         sprintf_trace_safe(szFileLog, 200, "%s/%s.xml", pFilePath, pTraceID);
 #if defined(_WIN32)
-        FILE* pFile = NULL;
+        FILE* pFile = nullptr;
         fopen_s(&pFile, szFileLog, "a+");
 #else
         FILE* pFile = fopen(szFileLog, "w");
 #endif
 
-        if (NULL != pFile)
+        if (nullptr != pFile)
         {
             sprintf_trace_safe(szTemp, 1024, "<Info Time=\"%lld\" FileName=\"%s\" CodeLine=\"%d\"/>\n",
                                GetSysTimeMicros(),
@@ -253,33 +253,33 @@ inline void ShowKey(const char* pTraceID)
     char szCommandID[50] = { '\0' };
 
     //将traceID的信息展现出来
-    if (NULL == pTraceID || strlen(pTraceID) != 48)
+    if (nullptr == pTraceID || strlen(pTraceID) != 48)
     {
         return;
     }
 
     memcpy(szTime, (char*)pTraceID, 16);
-    int64_t n8Time = strtoull(szTime, NULL, 16);
+    int64_t n8Time = strtoull(szTime, nullptr, 16);
     printf("[ShowKey]Time=%lld.\n", (long long int)n8Time);
 
     memcpy(szPID, (char*)&pTraceID[16], 8);
-    int nPID = (int)strtoul(szPID, NULL, 16);
+    int nPID = (int)strtoul(szPID, nullptr, 16);
     printf("[ShowKey]PTD=%d.\n", nPID);
 
     memcpy(szTID, (char*)&pTraceID[24], 8);
-    int nTID = (int)strtoul(szTID, NULL, 16);
+    int nTID = (int)strtoul(szTID, nullptr, 16);
     printf("[ShowKey]PTD=%d.\n", nTID);
 
     memcpy(szIP, (char*)&pTraceID[32], 8);
-    int nIP = (int)strtoul(szIP, NULL, 16);
+    int nIP = (int)strtoul(szIP, nullptr, 16);
     printf("[ShowKey]PTD=%d.\n", nIP);
 
     memcpy(szPort, (char*)&pTraceID[40], 4);
-    int nPort = (int)strtoul(szPort, NULL, 16);
+    int nPort = (int)strtoul(szPort, nullptr, 16);
     printf("[ShowKey]PTD=%d.\n", nPort);
 
     memcpy(szCommandID, (char*)&pTraceID[44], 4);
-    int nCommandID = (int)strtoul(szCommandID, NULL, 16);
+    int nCommandID = (int)strtoul(szCommandID, nullptr, 16);
     printf("[ShowKey]PTD=0x%04x.\n", nCommandID);
 }
 

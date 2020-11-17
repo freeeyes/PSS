@@ -13,7 +13,7 @@ CLogBlockPool::CLogBlockPool()
 void CLogBlockPool::Init(uint32 u4BlockSize, uint32 u4PoolCount)
 {
     //初始化，日志池
-    if(NULL != m_pLogBlockInfo)
+    if(nullptr != m_pLogBlockInfo)
     {
         Close();
     }
@@ -46,12 +46,12 @@ void CLogBlockPool::Close()
 
 _LogBlockInfo* CLogBlockPool::GetLogBlockInfo()
 {
-    if(NULL == m_pLogBlockInfo)
+    if(nullptr == m_pLogBlockInfo)
     {
-        return NULL;
+        return nullptr;
     }
 
-    _LogBlockInfo* pLogBlockInfo = NULL;
+    _LogBlockInfo* pLogBlockInfo = nullptr;
 
     if(m_u4CurrIndex  == m_u4PoolCount - 1)
     {
@@ -67,7 +67,7 @@ _LogBlockInfo* CLogBlockPool::GetLogBlockInfo()
     else
     {
         OUR_DEBUG((LM_ERROR,"[CLogBlockPool::GetLogBlockInfo]***CLogBlockPool is all used!***\n"));
-        return NULL;
+        return nullptr;
     }
 
     m_u4CurrIndex++;
@@ -224,13 +224,13 @@ int CLogManager::PutLog(_LogBlockInfo* pLogBlockInfo)
 
 int CLogManager::RegisterLog(IServerLogger* pServerLogger)
 {
-    if(pServerLogger == NULL)
+    if(pServerLogger == nullptr)
     {
         return -1;
     }
 
     //填入日志类型对象
-    if(m_pServerLogger != NULL)
+    if(m_pServerLogger != nullptr)
     {
         SAFE_DELETE(m_pServerLogger);
     }
@@ -246,7 +246,7 @@ int CLogManager::RegisterLog(IServerLogger* pServerLogger)
 
 int CLogManager::UnRegisterLog()
 {
-    if(m_pServerLogger != NULL)
+    if(m_pServerLogger != nullptr)
     {
         SAFE_DELETE(m_pServerLogger);
     }
@@ -256,7 +256,7 @@ int CLogManager::UnRegisterLog()
 
 bool CLogManager::Dispose_Queue()
 {
-    ACE_Message_Block* mb = NULL;
+    ACE_Message_Block* mb = nullptr;
     ACE_OS::last_error(0);
 
     if (getq(mb, 0) == -1)
@@ -280,7 +280,7 @@ bool CLogManager::Dispose_Queue()
 
         if (!pLogBlockInfo)
         {
-            OUR_DEBUG((LM_ERROR, "[CLogManager::svc] CLogManager mb log == NULL!\n"));
+            OUR_DEBUG((LM_ERROR, "[CLogManager::svc] CLogManager mb log == nullptr!\n"));
             return true;
         }
 
@@ -298,7 +298,7 @@ bool CLogManager::Dispose_Queue()
 
 int CLogManager::ProcessLog(_LogBlockInfo* pLogBlockInfo)
 {
-    if(NULL == m_pServerLogger)
+    if(nullptr == m_pServerLogger)
     {
         return -1;
     }
@@ -322,7 +322,7 @@ int CLogManager::WriteLogBinary(int nLogType, const char* pData, int nLen)
     m_Logger_Mutex.acquire();
     _LogBlockInfo* pLogBlockInfo = m_objLogBlockPool.GetLogBlockInfo();
 
-    if (NULL != pLogBlockInfo)
+    if (nullptr != pLogBlockInfo)
     {
         //二进制数据
         char szLog[10] = { '\0' };
@@ -335,7 +335,7 @@ int CLogManager::WriteLogBinary(int nLogType, const char* pData, int nLen)
 
         pLogBlockInfo->m_u4Length = (uint32)(nLen * 5);
 
-        nRet = Update_Log_Block(nLogType, NULL, NULL, pLogBlockInfo);
+        nRet = Update_Log_Block(nLogType, nullptr, nullptr, pLogBlockInfo);
     }
 
     m_Logger_Mutex.release();
@@ -355,10 +355,10 @@ int CLogManager::WriteLog_r(int nLogType, const char* fmt, uint32 u4Len)
     m_Logger_Mutex.acquire();
     _LogBlockInfo* pLogBlockInfo = m_objLogBlockPool.GetLogBlockInfo();
 
-    if (NULL != pLogBlockInfo)
+    if (nullptr != pLogBlockInfo)
     {
         ACE_OS::snprintf(pLogBlockInfo->m_pBlock, m_objLogBlockPool.GetBlockSize() - 1, "%s", fmt);
-        nRet = Update_Log_Block(nLogType, NULL, NULL, pLogBlockInfo);
+        nRet = Update_Log_Block(nLogType, nullptr, nullptr, pLogBlockInfo);
     }
 
     m_Logger_Mutex.release();
@@ -378,7 +378,7 @@ int CLogManager::WriteToMail_r(int nLogType, uint16 u2MailID, const char* pTitle
     m_Logger_Mutex.acquire();
     _LogBlockInfo* pLogBlockInfo = m_objLogBlockPool.GetLogBlockInfo();
 
-    if (NULL != pLogBlockInfo)
+    if (nullptr != pLogBlockInfo)
     {
         ACE_OS::snprintf(pLogBlockInfo->m_pBlock, m_objLogBlockPool.GetBlockSize() - 1, "%s", fmt);
         nRet = Update_Log_Block(nLogType, &u2MailID, pTitle, pLogBlockInfo);
@@ -412,7 +412,7 @@ void CLogManager::ResetLogData(uint16 u2LogLevel)
 
 uint32 CLogManager::GetLogCount()
 {
-    if(m_pServerLogger != NULL)
+    if(m_pServerLogger != nullptr)
     {
         return m_pServerLogger->GetLogTypeCount();
     }
@@ -424,7 +424,7 @@ uint32 CLogManager::GetLogCount()
 
 uint32 CLogManager::GetCurrLevel()
 {
-    if(m_pServerLogger != NULL)
+    if(m_pServerLogger != nullptr)
     {
         return m_pServerLogger->GetCurrLevel();
     }
@@ -436,7 +436,7 @@ uint32 CLogManager::GetCurrLevel()
 
 uint16 CLogManager::GetLogID(uint16 u2Index)
 {
-    if(m_pServerLogger != NULL)
+    if(m_pServerLogger != nullptr)
     {
         return m_pServerLogger->GetLogID(u2Index);
     }
@@ -448,31 +448,31 @@ uint16 CLogManager::GetLogID(uint16 u2Index)
 
 const char* CLogManager::GetLogInfoByServerName(uint16 u2LogID)
 {
-    if(m_pServerLogger != NULL)
+    if(m_pServerLogger != nullptr)
     {
         return m_pServerLogger->GetLogInfoByServerName(u2LogID);
     }
     else
     {
-        return NULL;
+        return nullptr;
     }
 }
 
 const char* CLogManager::GetLogInfoByLogName(uint16 u2LogID)
 {
-    if(m_pServerLogger != NULL)
+    if(m_pServerLogger != nullptr)
     {
         return m_pServerLogger->GetLogInfoByLogName(u2LogID);
     }
     else
     {
-        return NULL;
+        return nullptr;
     }
 }
 
 int CLogManager::GetLogInfoByLogDisplay(uint16 u2LogID)
 {
-    if(m_pServerLogger != NULL)
+    if(m_pServerLogger != nullptr)
     {
         return m_pServerLogger->GetLogInfoByLogDisplay(u2LogID);
     }
@@ -484,7 +484,7 @@ int CLogManager::GetLogInfoByLogDisplay(uint16 u2LogID)
 
 uint16 CLogManager::GetLogInfoByLogLevel(uint16 u2LogID)
 {
-    if(m_pServerLogger != NULL)
+    if(m_pServerLogger != nullptr)
     {
         return m_pServerLogger->GetLogInfoByLogLevel(u2LogID);
     }
@@ -511,7 +511,7 @@ int CLogManager::Update_Log_Block(int nLogType, const uint16* pMailID, const cha
     pLogBlockInfo->m_u4Length = (uint32)strlen(pLogBlockInfo->m_pBlock);
     pLogBlockInfo->m_u4LogID = (uint32)nLogType;
 
-    if (NULL != pMailID && NULL != pTitle)
+    if (nullptr != pMailID && nullptr != pTitle)
     {
         if (m_blIsMail == false)
         {

@@ -63,7 +63,7 @@ private:
     void Create_Reactor_TP();
     void Create_DEV_POLL(int nMaxHandleCount);
 
-    ACE_Reactor* m_pReactor              = NULL;
+    ACE_Reactor* m_pReactor              = nullptr;
     int          m_nReactorType          = 0;
     int          m_nThreadCount          = 0;
     char         m_szError[MAX_BUFF_500] = {'\0'};
@@ -92,7 +92,7 @@ public:
     uint32 GetClientReactorCount() const;
 
 private:
-    CAceReactor**  m_pReactorList          = NULL;
+    CAceReactor**  m_pReactorList          = nullptr;
     uint16         m_u2RectorCount         = 0;
     char           m_szError[MAX_BUFF_500] = {'\0'};
 };

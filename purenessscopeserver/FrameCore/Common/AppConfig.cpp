@@ -64,7 +64,7 @@ bool CAppConfig::WriteConfig(const char* szConfigname)
 
         if (m_pIniImp == nullptr)
         {
-            throw std::domain_error("[CAppConfig::WriteConfig]m_pIniImp is NULL.");
+            throw std::domain_error("[CAppConfig::WriteConfig]m_pIniImp is nullptr.");
         }
 
         int nRet = m_pIniImp->export_config(szConfigname);
@@ -98,9 +98,9 @@ bool CAppConfig::WriteConfig()
             throw std::domain_error("[CAppConfig::WriteConfig]m_strConfigName no exist.");
         }
 
-        if (m_pIniImp == NULL)
+        if (m_pIniImp == nullptr)
         {
-            throw std::domain_error("[CAppConfig::WriteConfig]m_pIniImp is NULL.");
+            throw std::domain_error("[CAppConfig::WriteConfig]m_pIniImp is nullptr.");
         }
 
         int nRet = m_pIniImp->export_config(m_strConfigName.c_str());

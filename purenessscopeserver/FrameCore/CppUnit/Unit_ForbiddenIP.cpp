@@ -14,7 +14,7 @@ void CUnit_ForbiddenIP::setUp(void)
 void CUnit_ForbiddenIP::tearDown(void)
 {
     delete m_pForbiddenIP;
-    m_pForbiddenIP = NULL;
+    m_pForbiddenIP = nullptr;
 }
 
 void CUnit_ForbiddenIP::Test_ForbiddenIP(void)

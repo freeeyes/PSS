@@ -158,7 +158,7 @@ bool SetAppPath()
 int Chlid_Run()
 {
 	//判断是否需要将当前代码输出到文件里
-	ofstream* pLogoStream = NULL;
+	ofstream* pLogoStream = nullptr;
 	Set_Output_To_File(GetXmlConfigAttribute(xmlAceDebug)->TrunOn, 
 		pLogoStream, 
 		GetXmlConfigAttribute(xmlAceDebug)->DebugPath.c_str(),
@@ -175,7 +175,7 @@ int Chlid_Run()
 	//显式加载PacketParse
 	if (0 != Load_PacketParse_Module())
 	{
-		pthread_exit(NULL);
+		pthread_exit(nullptr);
 	}
 
 	//判断当前Core文件尺寸是否需要调整
@@ -240,7 +240,7 @@ int Chlid_Run()
 	App_PacketParseLoader::instance()->Close();
 
 	//如果日志流不等于空，则回收
-	if (NULL != pLogoStream)
+	if (nullptr != pLogoStream)
 	{
 		pLogoStream->close();
 		SAFE_DELETE(pLogoStream);
@@ -352,7 +352,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 	}
 
 	//判断是否需要将当前代码输出到文件里
-	ofstream* pLogoStream = NULL;
+	ofstream* pLogoStream = nullptr;
 	Set_Output_To_File(GetXmlConfigAttribute(xmlAceDebug)->TrunOn,
 		pLogoStream,
 		GetXmlConfigAttribute(xmlAceDebug)->DebugPath.c_str(),
@@ -389,7 +389,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 	}
 
 	//如果日志流不等于空，则回收
-	if (NULL != pLogoStream)
+	if (nullptr != pLogoStream)
 	{
 		pLogoStream->close();
 		SAFE_DELETE(pLogoStream);

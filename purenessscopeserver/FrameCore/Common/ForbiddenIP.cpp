@@ -20,15 +20,15 @@ bool CForbiddenIP::Init(const char* szConfigPath)
 
     _ForbiddenIP ForbiddenIP;
 
-    TiXmlElement* pNextTiXmlElementIP   = NULL;
-    TiXmlElement* pNextTiXmlElementType = NULL;
+    TiXmlElement* pNextTiXmlElementIP   = nullptr;
+    TiXmlElement* pNextTiXmlElementType = nullptr;
 
     while(true)
     {
         const char* pIpData   = m_ForbiddenData.GetData("ForbiddenIP", "ip", pNextTiXmlElementIP);
         const char* pTypeData = m_ForbiddenData.GetData("ForbiddenIP", "type", pNextTiXmlElementType);
 
-        if(NULL == pIpData || NULL == pTypeData)
+        if(nullptr == pIpData || nullptr == pTypeData)
         {
             break;
         }
@@ -149,7 +149,7 @@ bool CForbiddenIP::SaveConfig() const
     //将修改的配置信息写入文件
     FILE* pFile = ACE_OS::fopen(FORBIDDENIP_FILE, "wb+");
 
-    if(NULL == pFile)
+    if(nullptr == pFile)
     {
         OUR_DEBUG((LM_ERROR, "[CForbiddenIP::SaveConfig]Open file fail.\n"));
         return false;

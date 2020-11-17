@@ -37,7 +37,7 @@ void CUnit_TimerManager::Test_TimerManager(void)
     objActiveTimer.activate();
 
     ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-    long lTimerID = objActiveTimer.schedule(m_pTimeTask, NULL, tvNow + ACE_Time_Value(0, 1000));
+    long lTimerID = objActiveTimer.schedule(m_pTimeTask, nullptr, tvNow + ACE_Time_Value(0, 1000));
 
     if (-1 == lTimerID)
     {

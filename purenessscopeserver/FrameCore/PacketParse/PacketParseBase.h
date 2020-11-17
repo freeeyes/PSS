@@ -64,8 +64,8 @@ private:
     char   m_szPacketVersion[MAX_BUFF_20] = {'\0'};    //包解析器版本
     uint8  m_u1Sort                       = 0;         //字节序规则，0为主机字节序，1为网络字节序
 
-    ACE_Message_Block* m_pmbHead          = NULL;      //包头部分
-    ACE_Message_Block* m_pmbBody          = NULL;      //包体部分
+    ACE_Message_Block* m_pmbHead          = nullptr;      //包头部分
+    ACE_Message_Block* m_pmbBody          = nullptr;      //包体部分
 };
 
 #endif

@@ -121,7 +121,7 @@ void DoMessage_LoadModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
     }
     else
     {
-        if (NULL != pBuffPacket)
+        if (nullptr != pBuffPacket)
         {
             if (CommandInfo.m_u1OutputType == 0)
             {
@@ -332,7 +332,7 @@ void DoMessage_ShowModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
 
 void DoMessage_CommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    auto u2CommandID = (uint16)ACE_OS::strtol(CommandInfo.m_strCommandExp.c_str(), NULL, 16);
+    auto u2CommandID = (uint16)ACE_OS::strtol(CommandInfo.m_strCommandExp.c_str(), nullptr, 16);
 
     if (u2CommandID != 0)
     {
@@ -400,7 +400,7 @@ void DoMessage_WorkThreadState(const _CommandInfo& CommandInfo, IBuffPacket* pBu
     //获得当前工作线程状态
     CThreadInfoList* pThreadInfo = App_MessageServiceGroup::instance()->GetThreadInfo();
 
-    if (NULL ==  pThreadInfo)
+    if (nullptr ==  pThreadInfo)
     {
         return;
     }
@@ -514,7 +514,7 @@ void DoMessage_ShowForbiddenList(const _CommandInfo& CommandInfo, IBuffPacket* p
         const VecForbiddenIP* pForeverForbiddenIP = App_ForbiddenIP::instance()->ShowForeverIP();
         const VecForbiddenIP* pTempForbiddenIP = App_ForbiddenIP::instance()->ShowTempIP();
 
-        if (pForeverForbiddenIP == NULL || pTempForbiddenIP == NULL)
+        if (pForeverForbiddenIP == nullptr || pTempForbiddenIP == nullptr)
         {
             return;
         }
@@ -1157,7 +1157,7 @@ void DoMessage_GetLogLevelInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
 
             const char* pServerName = AppLogManager::instance()->GetLogInfoByServerName(u2LogID);
 
-            if (NULL == pServerName)
+            if (nullptr == pServerName)
             {
                 //如果服务器名称为空则直接返回
                 continue;
@@ -1167,7 +1167,7 @@ void DoMessage_GetLogLevelInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
 
             const char* pLogName = AppLogManager::instance()->GetLogInfoByLogName(u2LogID);
 
-            if (NULL == pLogName)
+            if (nullptr == pLogName)
             {
                 //如果服务器名称为空则直接返回
                 return;
@@ -1665,7 +1665,7 @@ void DoMessage_MonitorInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
 
 void DoMessage_ServerClose(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (NULL == pBuffPacket)
+    if (nullptr == pBuffPacket)
     {
         return;
     }

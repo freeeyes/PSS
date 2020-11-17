@@ -38,7 +38,7 @@ int ConnectAcceptor::make_svc_handler(CConnectHandler*& sh)
         //ÔÊÐíÁ´½Ó
         CConnectHandler* pConnectHandler = App_ConnectHandlerPool::instance()->Create();
 
-        if (NULL != pConnectHandler)
+        if (nullptr != pConnectHandler)
         {
             pConnectHandler->SetLocalIPInfo(m_szListenIP, m_u2Port);
 
@@ -172,7 +172,7 @@ bool CConnectAcceptorManager::InitConnectAcceptor(int nCount, uint32 u4ClientRea
         {
             ConnectAcceptor* pConnectAcceptor = new ConnectAcceptor();
 
-            if (NULL == pConnectAcceptor)
+            if (nullptr == pConnectAcceptor)
             {
                 throw std::domain_error("[CConnectAcceptorManager::InitConnectAcceptor]pConnectAcceptor new is fail.");
             }
@@ -198,7 +198,7 @@ void CConnectAcceptorManager::Close()
     {
         pConnectAcceptor->close();
         delete pConnectAcceptor;
-        pConnectAcceptor = NULL;
+        pConnectAcceptor = nullptr;
     }
 
     m_vecConnectAcceptor.clear();
@@ -237,7 +237,7 @@ ConnectAcceptor* CConnectAcceptorManager::GetConnectAcceptor(int nIndex)
 {
     if (nIndex < 0 || nIndex >= (int)m_vecConnectAcceptor.size())
     {
-        return NULL;
+        return nullptr;
     }
 
     return m_vecConnectAcceptor[nIndex];
@@ -272,9 +272,9 @@ ConnectAcceptor* CConnectAcceptorManager::GetNewConnectAcceptor()
 {
     ConnectAcceptor* pConnectAcceptor = new ConnectAcceptor();
 
-    if(NULL == pConnectAcceptor)
+    if(nullptr == pConnectAcceptor)
     {
-        return NULL;
+        return nullptr;
     }
 
     m_vecConnectAcceptor.push_back(pConnectAcceptor);

@@ -22,7 +22,7 @@ public:
     void Test_ServerMessageInfoPool(void);
 
 private:
-    CServerMessageInfoPool* m_pServerMessageInfoPool = NULL;
+    CServerMessageInfoPool* m_pServerMessageInfoPool = nullptr;
 };
 
 #endif

@@ -15,7 +15,7 @@ CProConnectClient* CProAsynchConnect::make_handler()
 {
     CProConnectClient* pProConnectClient = new CProConnectClient();
 
-    if(NULL != pProConnectClient)
+    if(nullptr != pProConnectClient)
     {
         //在这里设置连接的相关参数
         pProConnectClient->SetServerID(m_nServerID);
@@ -56,7 +56,7 @@ int CProAsynchConnect::validate_connection(const ACE_Asynch_Connect::Result& res
 
         _ProConnectState_Info* pProConnectStateInfo = static_cast<_ProConnectState_Info* >(const_cast<void*>(result.act()));
 
-        if(NULL != pProConnectStateInfo)
+        if(nullptr != pProConnectStateInfo)
         {
             m_nServerID = pProConnectStateInfo->m_nServerID;
             SAFE_DELETE(pProConnectStateInfo);
@@ -72,7 +72,7 @@ int CProAsynchConnect::validate_connection(const ACE_Asynch_Connect::Result& res
 
     _ProConnectState_Info* pProConnectStateInfo = static_cast<_ProConnectState_Info* >(const_cast<void*>(result.act()));
 
-    if(NULL != pProConnectStateInfo)
+    if(nullptr != pProConnectStateInfo)
     {
         m_nServerID = pProConnectStateInfo->m_nServerID;
         SAFE_DELETE(pProConnectStateInfo);

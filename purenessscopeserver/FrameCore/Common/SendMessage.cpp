@@ -16,7 +16,7 @@ void CSendMessagePool::Init(int32 nObjcetCount)
     {
         _SendMessage* pMessage = m_objSendMessageList.GetObject(i);
 
-        if(NULL != pMessage)
+        if(nullptr != pMessage)
         {
             //添加到hash数组里面
             std::stringstream ss_format;
@@ -63,7 +63,7 @@ bool CSendMessagePool::Delete(_SendMessage* pObject)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-    if(NULL == pObject)
+    if(nullptr == pObject)
     {
         return false;
     }

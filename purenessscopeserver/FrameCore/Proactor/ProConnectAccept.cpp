@@ -28,7 +28,7 @@ CProConnectHandler* ProConnectAcceptor::make_handler(void)
 {
     CProConnectHandler* pProConnectHandle = App_ProConnectHandlerPool::instance()->Create();
 
-    if(NULL != pProConnectHandle)
+    if(nullptr != pProConnectHandle)
     {
         pProConnectHandle->SetLocalIPInfo(m_szListenIP, m_u4Port);
         //这里会根据反应器线程配置，自动匹配一个空闲的反应器
@@ -99,7 +99,7 @@ bool CProConnectAcceptManager::InitConnectAcceptor(int nCount, uint32 u4ClientPr
         {
             ProConnectAcceptor* pConnectAcceptor = new ProConnectAcceptor();
 
-            if(NULL == pConnectAcceptor)
+            if(nullptr == pConnectAcceptor)
             {
                 throw "[CProConnectAcceptManager::InitConnectAcceptor]pConnectAcceptor new is fail.";
             }
@@ -123,7 +123,7 @@ void CProConnectAcceptManager::Close()
 
     for(auto* pConnectAcceptor : m_vecConnectAcceptor)
     {
-        if(NULL != pConnectAcceptor)
+        if(nullptr != pConnectAcceptor)
         {
             pConnectAcceptor->cancel();
             ACE_OS::sleep(tvSleep);
@@ -142,7 +142,7 @@ bool CProConnectAcceptManager::Close( const char* pIP, uint32 n4Port )
     {
         ProConnectAcceptor* pConnectAcceptor = (ProConnectAcceptor*)(*b);
 
-        if (NULL != pConnectAcceptor)
+        if (nullptr != pConnectAcceptor)
         {
             if(ACE_OS::strcmp(pConnectAcceptor->GetListenIP(), pIP) == 0
                && pConnectAcceptor->GetListenPort() == n4Port)
@@ -167,7 +167,7 @@ ProConnectAcceptor* CProConnectAcceptManager::GetConnectAcceptor(int nIndex)
 {
     if(nIndex < 0 || nIndex >= (int)m_vecConnectAcceptor.size())
     {
-        return NULL;
+        return nullptr;
     }
 
     return m_vecConnectAcceptor[nIndex];
@@ -183,7 +183,7 @@ bool CProConnectAcceptManager::CheckIPInfo(const char* pIP, uint32 n4Port)
     //找到符合条件指定的端口停止监听
     for(auto* ProConnectAcceptor : m_vecConnectAcceptor)
     {
-        if (NULL != ProConnectAcceptor)
+        if (nullptr != ProConnectAcceptor)
         {
             if(ACE_OS::strcmp(ProConnectAcceptor->GetListenIP(), pIP) == 0
                && ProConnectAcceptor->GetListenPort() == n4Port)
@@ -200,9 +200,9 @@ ProConnectAcceptor* CProConnectAcceptManager::GetNewConnectAcceptor()
 {
     ProConnectAcceptor* pConnectAcceptor = new ProConnectAcceptor();
 
-    if(NULL == pConnectAcceptor)
+    if(nullptr == pConnectAcceptor)
     {
-        return NULL;
+        return nullptr;
     }
 
     m_vecConnectAcceptor.push_back(pConnectAcceptor);

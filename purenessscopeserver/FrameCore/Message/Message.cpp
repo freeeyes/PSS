@@ -148,7 +148,7 @@ CWorkThread_Handler_info* CDeviceHandlerPool::Create()
 
 bool CDeviceHandlerPool::Delete(CWorkThread_Handler_info* pHandler)
 {
-	if (NULL == pHandler)
+	if (nullptr == pHandler)
 	{
 		return false;
 	}

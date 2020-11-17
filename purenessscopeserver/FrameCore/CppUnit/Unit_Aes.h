@@ -29,7 +29,7 @@ public:
     int Char2Int(char c) const;
 
 private:
-    AES* m_pAES = NULL;
+    AES* m_pAES = nullptr;
     int m_nTestCount = 0;
 };
 

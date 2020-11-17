@@ -11,7 +11,7 @@ class CObjectArrayList
 public:
     CObjectArrayList()
     {
-        m_pMemoryList = NULL;
+        m_pMemoryList = nullptr;
         m_u4Count     = 0;
     }
 
@@ -33,7 +33,7 @@ public:
         }
         else
         {
-            return NULL;
+            return nullptr;
         }
     }
 
@@ -51,7 +51,7 @@ private:
         }
         catch (...)
         {
-            if (m_pMemoryList == NULL)
+            if (m_pMemoryList == nullptr)
             {
                 //³ÌÐò´íÎóÍË³öÃ¶¾Ù
                 OUR_DEBUG((LM_INFO, "[CreateMemory::CreateMemory]Create List(%d) error.\n", u4Count));

@@ -16,7 +16,7 @@ void CUnit_LogManager::tearDown(void)
 {
     m_pLogBlockPool->Close();
     delete m_pLogBlockPool;
-    m_pLogBlockPool = NULL;
+    m_pLogBlockPool = nullptr;
 }
 
 void CUnit_LogManager::Test_LogBlockPool(void)
@@ -26,7 +26,7 @@ void CUnit_LogManager::Test_LogBlockPool(void)
 
     _LogBlockInfo* pLogBlockInfo = m_pLogBlockPool->GetLogBlockInfo();
 
-    if (NULL == pLogBlockInfo)
+    if (nullptr == pLogBlockInfo)
     {
         OUR_DEBUG((LM_INFO, "[Test_LogBlockPool]GetLogBlockInfo is fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_LogBlockPool]GetLogBlockInfo is fail.", true == blRet);

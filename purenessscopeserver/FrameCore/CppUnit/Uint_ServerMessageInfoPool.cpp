@@ -15,7 +15,7 @@ void CUnit_ServerMessageInfoPool::setUp(void)
 void CUnit_ServerMessageInfoPool::tearDown(void)
 {
     delete m_pServerMessageInfoPool;
-    m_pServerMessageInfoPool = NULL;
+    m_pServerMessageInfoPool = nullptr;
 }
 
 void CUnit_ServerMessageInfoPool::Test_ServerMessageInfoPool(void)
@@ -24,10 +24,10 @@ void CUnit_ServerMessageInfoPool::Test_ServerMessageInfoPool(void)
 
     _Server_Message_Info* pServerMessageInfo = m_pServerMessageInfoPool->Create();
 
-    if (NULL == pServerMessageInfo)
+    if (nullptr == pServerMessageInfo)
     {
-        OUR_DEBUG((LM_INFO, "[Test_ServerMessageInfoPool]pServerMessageInfo is NULL.\n"));
-        CPPUNIT_ASSERT_MESSAGE("[Test_ServerMessageInfoPool]pServerMessageInfo is NULL.", true == blRet);
+        OUR_DEBUG((LM_INFO, "[Test_ServerMessageInfoPool]pServerMessageInfo is nullptr.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[Test_ServerMessageInfoPool]pServerMessageInfo is nullptr.", true == blRet);
         return;
     }
 

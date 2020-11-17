@@ -22,7 +22,7 @@ bool CProControlListen::AddListen( const char* pListenIP, uint16 u2Port, uint8 u
     //创建一个新的accept对象
     ProConnectAcceptor* pProConnectAcceptor = App_ProConnectAcceptManager::instance()->GetNewConnectAcceptor();
 
-    if(NULL == pProConnectAcceptor)
+    if(nullptr == pProConnectAcceptor)
     {
         OUR_DEBUG((LM_INFO, "[CProControlListen::AddListen](%s:%d) new ConnectAcceptor error.\n", pListenIP, u2Port));
         return false;
@@ -54,9 +54,9 @@ bool CProControlListen::AddListen( const char* pListenIP, uint16 u2Port, uint8 u
 
     ACE_Proactor* pProactor = App_ProactorManager::instance()->GetAce_Proactor();
 
-    if(NULL == pProactor)
+    if(nullptr == pProactor)
     {
-        OUR_DEBUG((LM_INFO, "[CProControlListen::AddListen]App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE) is NULL.\n"));
+        OUR_DEBUG((LM_INFO, "[CProControlListen::AddListen]App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE) is nullptr.\n"));
         return false;
     }
 
@@ -112,7 +112,7 @@ uint32 CProControlListen::GetListenCount()
         {
             ProConnectAcceptor* pProConnectAcceptor = App_ProConnectAcceptManager::instance()->GetConnectAcceptor(i);
 
-            if (NULL != pProConnectAcceptor)
+            if (nullptr != pProConnectAcceptor)
             {
                 _ControlInfo objInfo;
                 sprintf_safe(objInfo.m_szListenIP,

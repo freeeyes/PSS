@@ -29,7 +29,7 @@ void CLogFile::Init()
             //如果文件已存在，判断文件长度是否超过阈值
             FILE* fp = ACE_OS::fopen(strLogName.c_str(), "r");
 
-            if (NULL == fp)
+            if (nullptr == fp)
             {
                 OUR_DEBUG((LM_INFO, "[CLogFile::Init]File(%s) fopen error.\n", strLogName.c_str()));
                 return;
@@ -215,10 +215,10 @@ int CLogFile::doLog(_LogBlockInfo* pLogBlockInfo)
 bool CLogFile::SendMail(const _LogBlockInfo* pLogBlockInfo, const xmlMails::_Mail* pMailInfo) const
 {
     //发送邮件
-    const xmlMails::_Mail* pMailAlert = NULL;
+    const xmlMails::_Mail* pMailAlert = nullptr;
 
     //如果没有单独配置，则从配置文件中直接获得
-    if(NULL == pMailInfo)
+    if(nullptr == pMailInfo)
     {
         pMailAlert = GetXmlConfigAttribute(xmlMails)->GetMailAlert(pLogBlockInfo->m_u2MailID);
     }
@@ -227,7 +227,7 @@ bool CLogFile::SendMail(const _LogBlockInfo* pLogBlockInfo, const xmlMails::_Mai
         pMailAlert = pMailInfo;
     }
 
-    if (NULL == pMailAlert)
+    if (nullptr == pMailAlert)
     {
         OUR_DEBUG((LM_ERROR, "[CLogFile::SendMail]MailID(%d) is no find.\n", pLogBlockInfo->m_u2MailID));
         return false;
@@ -442,11 +442,11 @@ void CFileLogger::Close()
 {
     OUR_DEBUG((LM_INFO, "[CFileLogger::Close]Begin.\n"));
 
-    if(NULL != m_pLogFileList)
+    if(nullptr != m_pLogFileList)
     {
         for(int i = 0; i < m_nCount; i++)
         {
-            if (NULL != m_pLogFileList[i])
+            if (nullptr != m_pLogFileList[i])
             {
                 m_pLogFileList[i]->Close();
                 SAFE_DELETE(m_pLogFileList[i]);
@@ -465,7 +465,7 @@ int CFileLogger::DoLog(int nLogType, _LogBlockInfo* pLogBlockInfo)
     //根据LogType取余，获得当前日志映射位置
     int nIndex = nLogType % m_nCount;
 
-    if(NULL != m_pLogFileList[nIndex])
+    if(nullptr != m_pLogFileList[nIndex])
     {
         m_pLogFileList[nIndex]->doLog(pLogBlockInfo);
     }
@@ -525,11 +525,11 @@ bool CFileLogger::Init()
     objXmlOpeation.Read_XML_Data_Single_Uint16("LogLevel", "CurrLevel", m_u2CurrLogLevel);
 
     //添加子类的个数
-    TiXmlElement* pNextTiXmlElement        = NULL;
-    TiXmlElement* pNextTiXmlElementPos     = NULL;
-    TiXmlElement* pNextTiXmlElementIdx     = NULL;
-    TiXmlElement* pNextTiXmlElementDisplay = NULL;
-    TiXmlElement* pNextTiXmlElementLevel   = NULL;
+    TiXmlElement* pNextTiXmlElement        = nullptr;
+    TiXmlElement* pNextTiXmlElementPos     = nullptr;
+    TiXmlElement* pNextTiXmlElementIdx     = nullptr;
+    TiXmlElement* pNextTiXmlElementDisplay = nullptr;
+    TiXmlElement* pNextTiXmlElementLevel   = nullptr;
 
     while(true)
     {

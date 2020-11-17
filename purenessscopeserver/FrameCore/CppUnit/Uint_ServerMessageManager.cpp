@@ -15,7 +15,7 @@ void CUnit_ServerMessageManager::setUp(void)
 void CUnit_ServerMessageManager::tearDown(void)
 {
     delete m_pServerMessageManager;
-    m_pServerMessageManager = NULL;
+    m_pServerMessageManager = nullptr;
 }
 
 void CUnit_ServerMessageManager::Test_ServerMessageManager(void)
@@ -37,10 +37,10 @@ void CUnit_ServerMessageManager::Test_ServerMessageManager(void)
 
     _Server_Message_Info* pMessage = App_ServerMessageInfoPool::instance()->Create();
 
-    if (NULL == pMessage)
+    if (nullptr == pMessage)
     {
-        OUR_DEBUG((LM_INFO, "[Test_ServerMessageManager]App_ServerMessageInfoPool::instance()->Create() is NULL.\n"));
-        CPPUNIT_ASSERT_MESSAGE("[Test_ServerMessageManager]App_ServerMessageInfoPool::instance()->Create() is NULL.", true == blRet);
+        OUR_DEBUG((LM_INFO, "[Test_ServerMessageManager]App_ServerMessageInfoPool::instance()->Create() is nullptr.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[Test_ServerMessageManager]App_ServerMessageInfoPool::instance()->Create() is nullptr.", true == blRet);
         return;
     }
 
@@ -82,8 +82,8 @@ void CUnit_ServerMessageManager::Test_ServerMessageManager(void)
 
     if (false == m_pServerMessageManager->CheckServerMessageThread(ACE_OS::gettimeofday()))
     {
-        OUR_DEBUG((LM_INFO, "[Test_ServerMessageManager]m_pServerMessageManager->CheckServerMessageThread() is NULL.\n"));
-        CPPUNIT_ASSERT_MESSAGE("[Test_ServerMessageManager]m_pServerMessageManager->CheckServerMessageThread() is NULL.", true == blRet);
+        OUR_DEBUG((LM_INFO, "[Test_ServerMessageManager]m_pServerMessageManager->CheckServerMessageThread() is nullptr.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[Test_ServerMessageManager]m_pServerMessageManager->CheckServerMessageThread() is nullptr.", true == blRet);
         return;
     }
 

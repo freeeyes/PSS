@@ -84,7 +84,7 @@ public:
 
     virtual int doLog(_LogBlockInfo* pLogBlockInfo);
 
-    bool SendMail(const _LogBlockInfo* pLogBlockInfo, const xmlMails::_Mail* pMailInfo = NULL) const;
+    bool SendMail(const _LogBlockInfo* pLogBlockInfo, const xmlMails::_Mail* pMailInfo = nullptr) const;
 
     ACE_TString& GetLoggerName();
 
@@ -126,7 +126,7 @@ private:
     uint16              m_u2LogID                  = 0;               //日志编号
     uint16              m_u2Level                  = 0;               //日志等级
     int                 m_nDisplay                 = 0;               //显示还是记录文件
-    char*               m_pBuffer                  = NULL;            //日志缓冲指针
+    char*               m_pBuffer                  = nullptr;            //日志缓冲指针
     char                m_szLogTime[MAX_TIME_SIZE] = {'\0'};          //Log当前时间
     char                m_szFileRoot[MAX_BUFF_100] = {'\0'};          //路径的主目录
     ACE_TString         m_StrlogName;                                 //模块名字
@@ -161,7 +161,7 @@ public:
     virtual uint16 GetLogInfoByLogLevel(uint16 u2LogID);
 
 private:
-    CLogFile**                     m_pLogFileList            = NULL;
+    CLogFile**                     m_pLogFileList            = nullptr;
     char                           m_szLogRoot[MAX_BUFF_100] = {'\0'};
     int                            m_nCount                  = 0;
 

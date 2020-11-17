@@ -28,7 +28,7 @@ static size_t read_callback(void* ptr, size_t size, size_t nmemb, void* userp)
 static struct timeval tvnow(void)
 {
     struct timeval now;
-    now.tv_sec = (long)time(NULL);
+    now.tv_sec = (long)time(nullptr);
     now.tv_usec = 0;
     return now;
 
@@ -49,7 +49,7 @@ int Send_Mail_From_Ssl(const char* pUser, const char* pPass, const char* pFrom, 
     int still_running = 1;
     struct timeval mp_start;
     struct WriteThis pooh;
-    struct curl_slist* rcpt_list = NULL;
+    struct curl_slist* rcpt_list = nullptr;
 
     //组装发送内容
     char** textList = new char* [5];
@@ -64,7 +64,7 @@ int Send_Mail_From_Ssl(const char* pUser, const char* pPass, const char* pFrom, 
     sprintf(textList[1], "\n");
     sprintf(textList[2], "%s\n", pData);
     sprintf(textList[3], "\n");
-    textList[4] = NULL;
+    textList[4] = nullptr;
 
     pooh.counter = 0;
     pooh.pText = textList;

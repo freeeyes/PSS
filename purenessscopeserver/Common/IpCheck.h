@@ -55,7 +55,7 @@ static EM_CHECK_IP_TYPE Check_IP_V6(vector<string> vecIpSection)
             continue;
         }
 
-        char* pStop = NULL;
+        char* pStop = nullptr;
         long int nSection = (long int)strtol(vecIpSection[i].c_str(), &pStop, 16);
 
         int nDataLength = (int)(pStop - vecIpSection[i].c_str());
@@ -86,7 +86,7 @@ static EM_CHECK_IP_TYPE Check_IP_V4(vector<string> vecIpSection)
 
     for (int i = 0; i < (int)vecIpSection.size(); i++)
     {
-        char* pStop = NULL;
+        char* pStop = nullptr;
         long int nSection = (long int)strtol(vecIpSection[i].c_str(), &pStop, 10);
 
         int nDataLength = (int)(pStop - vecIpSection[i].c_str());

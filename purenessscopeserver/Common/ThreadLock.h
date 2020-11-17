@@ -39,7 +39,7 @@ public:
 #if PSS_PLATFORM == PLATFORM_WIN
         InitializeCriticalSection(&m_lock);
 #else
-        pthread_mutex_init(&m_lock, NULL);
+        pthread_mutex_init(&m_lock, nullptr);
 #endif
     }
 
@@ -86,14 +86,14 @@ public:
     {
         m_pThreadLock = pThreadLock;
 
-        if(NULL != m_pThreadLock)
+        if(nullptr != m_pThreadLock)
         {
             m_pThreadLock->Lock();
         }
     }
     ~CAutoLock()
     {
-        if(NULL != m_pThreadLock)
+        if(nullptr != m_pThreadLock)
         {
             m_pThreadLock->UnLock();
         }

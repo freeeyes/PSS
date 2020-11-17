@@ -124,13 +124,13 @@ public :
     }
 
 
-    // Convert a TiXmlString into a null-terminated char *
+    // Convert a TiXmlString into a nullptr-terminated char *
     const char* c_str () const
     {
         return rep_->str;
     }
 
-    // Convert a TiXmlString into a char * (need not be null terminated).
+    // Convert a TiXmlString into a char * (need not be nullptr terminated).
     const char* data () const
     {
         return rep_->str;

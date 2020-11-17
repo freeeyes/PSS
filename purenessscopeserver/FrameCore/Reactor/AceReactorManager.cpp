@@ -19,14 +19,14 @@ void CAceReactor::Create_Reactor_WFMO()
 {
     ACE_WFMO_Reactor* wfmoreactor = new ACE_WFMO_Reactor();
 
-    if (NULL == wfmoreactor)
+    if (nullptr == wfmoreactor)
     {
         throw std::domain_error("[CAceReactor::Init]New ACE_WFMO_Reactor Error.");
     }
 
     m_pReactor = new ACE_Reactor(wfmoreactor, 1);
 
-    if (NULL == m_pReactor)
+    if (nullptr == m_pReactor)
     {
         throw std::domain_error("[CAceReactor::Init]New m_pReactor Error[ACE_WFMO_Reactor].");
     }
@@ -39,14 +39,14 @@ void CAceReactor::Create_Reactor_Select()
 {
     ACE_Select_Reactor* selectreactor = new ACE_Select_Reactor();
 
-    if (NULL == selectreactor)
+    if (nullptr == selectreactor)
     {
         throw std::domain_error("[CAceReactor::Init]New ACE_Select_Reactor Error.");
     }
 
     m_pReactor = new ACE_Reactor(selectreactor, true);
 
-    if (NULL == m_pReactor)
+    if (nullptr == m_pReactor)
     {
         throw std::domain_error("[CAceReactor::Init]New m_pReactor Error[ACE_Select_Reactor].");
     }
@@ -58,14 +58,14 @@ void CAceReactor::Create_Reactor_TP()
 {
     ACE_TP_Reactor* tpreactor = new ACE_TP_Reactor();
 
-    if (NULL == tpreactor)
+    if (nullptr == tpreactor)
     {
         throw std::domain_error("[CAceReactor::Init]New ACE_TP_Reactor Error.");
     }
 
     m_pReactor = new ACE_Reactor(tpreactor, true);
 
-    if (NULL == m_pReactor)
+    if (nullptr == m_pReactor)
     {
         throw std::domain_error("[CAceReactor::Init]New m_pReactor Error[ACE_TP_Reactor].");
     }
@@ -78,14 +78,14 @@ void CAceReactor::Create_DEV_POLL(int nMaxHandleCount)
 #ifdef ACE_HAS_EVENT_POLL
     ACE_Dev_Poll_Reactor* devreactor = new ACE_Dev_Poll_Reactor(nMaxHandleCount);
 
-    if (NULL == devreactor)
+    if (nullptr == devreactor)
     {
         throw std::domain_error("[CAceReactor::Init]New ACE_Dev_Poll_Reactor Error.");
     }
 
     m_pReactor = new ACE_Reactor(devreactor, true);
 
-    if (NULL == m_pReactor)
+    if (nullptr == m_pReactor)
     {
         throw std::domain_error("[CAceReactor::Init]New m_pReactor Error[ACE_Dev_Poll_Reactor].");
     }
@@ -100,7 +100,7 @@ void CAceReactor::Close()
 {
     OUR_DEBUG((LM_INFO, "[CAceReactor::Close]Begin.\n"));
 
-    if (NULL != m_pReactor)
+    if (nullptr != m_pReactor)
     {
         m_pReactor->close();
         SAFE_DELETE(m_pReactor)
@@ -174,9 +174,9 @@ int CAceReactor::open()
 
 int CAceReactor::svc()
 {
-    if (NULL == m_pReactor)
+    if (nullptr == m_pReactor)
     {
-        OUR_DEBUG((LM_ERROR, "[CAceReactor::Svc]m_pReactor is NULL.\n", m_nReactorType, m_nThreadCount));
+        OUR_DEBUG((LM_ERROR, "[CAceReactor::Svc]m_pReactor is nullptr.\n", m_nReactorType, m_nThreadCount));
         return -1;
     }
     else
@@ -213,9 +213,9 @@ bool CAceReactor::Start()
 
 bool CAceReactor::Stop()
 {
-    if (NULL == m_pReactor)
+    if (nullptr == m_pReactor)
     {
-        OUR_DEBUG((LM_ERROR, "[CAceReactor::Stop]m_pReactor is NULL.\n", m_nReactorType, m_nThreadCount));
+        OUR_DEBUG((LM_ERROR, "[CAceReactor::Stop]m_pReactor is nullptr.\n", m_nReactorType, m_nThreadCount));
         return false;
     }
 
@@ -259,13 +259,13 @@ void CAceReactorManager::Close()
 {
     OUR_DEBUG((LM_ERROR, "[CAceReactor::Close] Begin.\n"));
 
-    if(NULL != m_pReactorList)
+    if(nullptr != m_pReactorList)
     {
         for (uint16 i = 0; i < m_u2RectorCount; i++)
         {
             CAceReactor* pAceReactor = m_pReactorList[i];
 
-            if (NULL != pAceReactor)
+            if (nullptr != pAceReactor)
             {
                 pAceReactor->Stop();
 
@@ -315,7 +315,7 @@ bool CAceReactorManager::AddNewReactor(int nReactorID, int nReactorType, int nTh
         return false;
     }
 
-    if(NULL != m_pReactorList[nReactorID])
+    if(nullptr != m_pReactorList[nReactorID])
     {
         sprintf_safe(m_szError, MAX_BUFF_500, "[CAceReactorManager::AddNewReactor]CAceReactor is exist[%d].", nReactorID);
         delete pAceReactor;
@@ -334,7 +334,7 @@ bool CAceReactorManager::StartOtherReactor() const
     {
         CAceReactor* pAceReactor = m_pReactorList[i];
 
-        if (NULL != pAceReactor && false == pAceReactor->Start())
+        if (nullptr != pAceReactor && false == pAceReactor->Start())
         {
             OUR_DEBUG((LM_INFO, "[CAceReactorManager::AddNewReactor]Start error.\n"));
         }
@@ -355,7 +355,7 @@ bool CAceReactorManager::StopReactor() const
     {
         CAceReactor* pAceReactor = m_pReactorList[i];
 
-        if (NULL != pAceReactor)
+        if (nullptr != pAceReactor)
         {
             OUR_DEBUG((LM_ERROR, "[CAceReactorManager::StopReactor]nReactorID=%d.\n", pAceReactor->GetReactorID()));
 
@@ -373,7 +373,7 @@ CAceReactor* CAceReactorManager::GetAceReactor(int nReactorID)
 {
     if(nReactorID < 0 || nReactorID >= m_u2RectorCount)
     {
-        return NULL;
+        return nullptr;
     }
 
     return m_pReactorList[nReactorID];
@@ -383,16 +383,16 @@ ACE_Reactor* CAceReactorManager::GetAce_Reactor(int nReactorID)
 {
     if(nReactorID < 0 || nReactorID >= m_u2RectorCount)
     {
-        return NULL;
+        return nullptr;
     }
 
-    if (NULL != m_pReactorList[nReactorID])
+    if (nullptr != m_pReactorList[nReactorID])
     {
         return m_pReactorList[nReactorID]->GetReactor();
     }
     else
     {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -404,16 +404,16 @@ ACE_Reactor* CAceReactorManager::GetAce_Client_Reactor(int nReactorID)
 
     if(nClientReactor < 0 || nClientReactor >= m_u2RectorCount)
     {
-        return NULL;
+        return nullptr;
     }
 
-    if (NULL != m_pReactorList[nClientReactor])
+    if (nullptr != m_pReactorList[nClientReactor])
     {
         return m_pReactorList[nClientReactor]->GetReactor();
     }
     else
     {
-        return NULL;
+        return nullptr;
     }
 
 }

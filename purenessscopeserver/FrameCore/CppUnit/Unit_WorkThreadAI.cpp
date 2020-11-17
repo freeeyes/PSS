@@ -15,7 +15,7 @@ void CUnit_WorkThreadAI::setUp(void)
 void CUnit_WorkThreadAI::tearDown(void)
 {
     delete m_pWorkThreadAI;
-    m_pWorkThreadAI = NULL;
+    m_pWorkThreadAI = nullptr;
 }
 
 void CUnit_WorkThreadAI::Test_WorkThreadAI(void)

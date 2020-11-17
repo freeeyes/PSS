@@ -24,7 +24,7 @@ int CModuleMessageManager::SendFrameMessage(uint16 u2CommandID, uint32 u4WorkThr
 
     objPacketParse.SetPacket_CommandID(u2CommandID);
 
-    if(NULL != pHeadPacket)
+    if(nullptr != pHeadPacket)
     {
         ACE_Message_Block* pMb = App_MessageBlockManager::instance()->Create(pHeadPacket->GetPacketLen());
         memcpy_safe(pHeadPacket->GetData(), pHeadPacket->GetPacketLen(), pMb->wr_ptr(), pHeadPacket->GetPacketLen());
@@ -34,7 +34,7 @@ int CModuleMessageManager::SendFrameMessage(uint16 u2CommandID, uint32 u4WorkThr
         objPacketParse.SetPacket_Head_Message(pMb);
     }
 
-    if(NULL != pBodyBuffPacket)
+    if(nullptr != pBodyBuffPacket)
     {
         ACE_Message_Block* pMb = App_MessageBlockManager::instance()->Create(pBodyBuffPacket->GetPacketLen());
         memcpy_safe(pBodyBuffPacket->GetData(), pBodyBuffPacket->GetPacketLen(), pMb->wr_ptr(), pBodyBuffPacket->GetPacketLen());

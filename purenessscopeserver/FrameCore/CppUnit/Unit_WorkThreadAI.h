@@ -22,7 +22,7 @@ public:
     void Test_WorkThreadAI(void);
 
 private:
-    CWorkThreadAI* m_pWorkThreadAI = NULL;
+    CWorkThreadAI* m_pWorkThreadAI = nullptr;
 };
 
 #endif

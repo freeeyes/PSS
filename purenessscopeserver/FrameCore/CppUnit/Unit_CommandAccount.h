@@ -28,7 +28,7 @@ public:
     void Test_CommandAccount_PortList(void);      //²âÊÔ¶Ë¿ÚÊý¾Ý
 
 private:
-    CCommandAccount* m_pCommandAccount  = NULL;
+    CCommandAccount* m_pCommandAccount  = nullptr;
     uint8            m_u1CommandAccount = 1;
     uint8            m_u1Flow           = 0;
     uint16           m_u2RecvTimeout    = 30;

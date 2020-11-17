@@ -33,7 +33,7 @@ void CMessageManager::Init(uint16 u2MaxModuleCount, uint32 u4MaxCommandCount)
 
 bool CMessageManager::AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName)
 {
-    return AddClientCommand_Ex(u2CommandID, pClientCommand, pModuleName, NULL);
+    return AddClientCommand_Ex(u2CommandID, pClientCommand, pModuleName, nullptr);
 }
 
 bool CMessageManager::AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, _ClientIPInfo* pListenInfo)
@@ -52,7 +52,7 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1LoadS
     //获得重载对象相关参数
     const _ModuleInfo* pModuleInfo = App_ModuleLoader::instance()->GetModuleInfo(pModuleName);
 
-    if(NULL != pModuleInfo)
+    if(nullptr != pModuleInfo)
     {
         //获取对象信息
         strModuleN     = pModuleInfo->strModuleName;
@@ -62,7 +62,7 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1LoadS
 
     const _ModuleClient* pModuleClient = m_objModuleClientList.Get_Hash_Box_Data(strModuleName.c_str());
 
-    if(NULL != pModuleClient)
+    if(nullptr != pModuleClient)
     {
         //从插件目前注册的命令里面找到所有该插件的信息，一个个释放
         for(const auto* pClientCommandInfo : pModuleClient->m_vecClientCommandInfo)
@@ -154,9 +154,9 @@ CHashTable<CClientCommandList>* CMessageManager::GetHashCommandList()
 
 bool CMessageManager::AddClientCommand_Ex(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, const _ClientIPInfo* pListenInfo)
 {
-    if (NULL == pClientCommand)
+    if (nullptr == pClientCommand)
     {
-        OUR_DEBUG((LM_ERROR, "[CMessageManager::AddClientCommand_Ex] u2CommandID = %d pClientCommand is NULL.\n", u2CommandID));
+        OUR_DEBUG((LM_ERROR, "[CMessageManager::AddClientCommand_Ex] u2CommandID = %d pClientCommand is nullptr.\n", u2CommandID));
         return false;
     }
 
@@ -165,7 +165,7 @@ bool CMessageManager::AddClientCommand_Ex(uint16 u2CommandID, CClientCommand* pC
 
     CClientCommandList* pClientCommandList = GetClientCommandExist(u2CommandID);
 
-    if (NULL != pClientCommandList)
+    if (nullptr != pClientCommandList)
     {
         Add_ClientCommandList(pCommandTimeout, pClientCommandList, u2CommandID, pClientCommand, pModuleName, pListenInfo);
 
@@ -193,7 +193,7 @@ void CMessageManager::DeleteCommandByModule(const _ClientCommandInfo* pClientCom
     uint16 u2CommandID = pClientCommandInfo->m_u2CommandID;
     CClientCommandList* pClientCommandList = GetClientCommandExist(u2CommandID);
 
-    if (NULL == pClientCommandList)
+    if (nullptr == pClientCommandList)
     {
         return;
     }
@@ -231,7 +231,7 @@ void CMessageManager::DeleteCommandByModule(const _ClientCommandInfo* pClientCom
 void CMessageManager::Add_ClientCommandList(const xmlCommandsTimeout::_CommandsTimeout* pCommandTimeout, CClientCommandList* pClientCommandList, uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, const _ClientIPInfo* pListenInfo)
 {
 	//如果超时时间不为空，设置为超时时间
-	if (NULL != pCommandTimeout)
+	if (nullptr != pCommandTimeout)
 	{
 		pClientCommandList->SetCommandTimeout(pCommandTimeout->Timeout);
 	}
@@ -245,7 +245,7 @@ void CMessageManager::Add_ClientCommandList(const xmlCommandsTimeout::_CommandsT
 	string strModule = pModuleName;
 	_ModuleClient* pModuleClient = m_objModuleClientList.Get_Hash_Box_Data(strModule.c_str());
 
-	if (NULL == pModuleClient)
+	if (nullptr == pModuleClient)
 	{
 		//找不到，创建新的模块信息
 		pModuleClient = new _ModuleClient();
@@ -267,7 +267,7 @@ bool CMessageManager::DelClientCommand(uint16 u2CommandID, CClientCommand* pClie
 
     CClientCommandList* pClientCommandList = GetClientCommandExist(u2CommandID);
 
-    if (NULL != pClientCommandList)
+    if (nullptr != pClientCommandList)
     {
         if (true == pClientCommandList->DelClientCommand(pClientCommand))
         {

@@ -22,7 +22,7 @@ public:
     void Test_MessageService(void);
 
 private:
-    CMessageService* m_pMessageService = NULL;
+    CMessageService* m_pMessageService = nullptr;
 };
 
 #endif

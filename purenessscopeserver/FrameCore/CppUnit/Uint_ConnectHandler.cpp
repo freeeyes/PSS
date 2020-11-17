@@ -19,7 +19,7 @@ void CUnit_ConnectHandler::tearDown(void)
 {
     m_pConnectHandler->CloseFinally();
     delete m_pConnectHandler;
-    m_pConnectHandler = NULL;
+    m_pConnectHandler = nullptr;
 }
 
 void CUnit_ConnectHandler::Test_ConnectHandler_Stream(void)
@@ -28,11 +28,9 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Stream(void)
     bool blRet = true;
 
     //拼装测试发送数据
-    char szSendData[MAX_BUFF_200] = { '\0' };
-    char szBuff[20] = { '\0' };
-    char szSession[32] = { '\0' };
-    sprintf_safe(szBuff, 20, "testtcp");
-    sprintf_safe(szSession, 32, "FREEEYES");
+    CBuffPacket send_buffpecket;
+    string strBuff = "testtcp";
+    string szSession = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 
     _ClientConnectInfo objClientConnectInfo = m_pConnectHandler->GetClientInfo();
 
@@ -87,18 +85,18 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Stream(void)
 
     //测试以流模式解数据包
     short sVersion = 1;
-    short sCommand = (short)0x1000;
-    int nPacketLen = (int)ACE_OS::strlen(szBuff);
+    auto sCommand = (short)0x1000;
+    auto nPacketLen = (int)strBuff.length();
 
-    memcpy(szSendData, (char*)&sVersion, sizeof(short));
-    memcpy(&szSendData[2], (char*)&sCommand, sizeof(short));
-    memcpy(&szSendData[4], (char*)&nPacketLen, sizeof(int));
-    memcpy(&szSendData[8], (char*)&szSession, sizeof(char) * 32);
-    memcpy(&szSendData[40], (char*)szBuff, sizeof(char) * nPacketLen);
-    uint32 u4SendLen = nPacketLen + 40;
+    send_buffpecket << (uint16)sVersion;
+    send_buffpecket << (uint16)sCommand;
+    send_buffpecket << (uint32)nPacketLen;
+    send_buffpecket.WriteStream(szSession.c_str(), szSession.length());
+    send_buffpecket.WriteStream(strBuff.c_str(), strBuff.length());
 
+    uint32 u4SendLen = send_buffpecket.GetPacketLen();
     ACE_Message_Block* pmb = App_MessageBlockManager::instance()->Create(u4SendLen);
-    memcpy_safe(szSendData, u4SendLen, pmb->wr_ptr(), u4SendLen);
+    memcpy_safe(send_buffpecket.GetData(), u4SendLen, pmb->wr_ptr(), u4SendLen);
     pmb->wr_ptr(u4SendLen);
 
     if (false == blRet)
@@ -108,29 +106,14 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Stream(void)
     }
 }
 
-void CUnit_ConnectHandler::Test_ConnectHandler_CloseMessages(void)
-{
-    bool blRet = true;
-
-    //不做测试
-
-    if (false == blRet)
-    {
-        OUR_DEBUG((LM_INFO, "[Test_ConnectHandler_CloseMessages]SendCloseMessage is fail.\n"));
-        CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler_CloseMessages]SendCloseMessage is fail.", true == blRet);
-    }
-}
-
 void CUnit_ConnectHandler::Test_ConnectHandler_Debug(void)
 {
-    char szText[MAX_BUFF_20] = { '\0' };
+    string strText = "freeeyes";
 
-    sprintf_safe(szText, MAX_BUFF_20, "freeeyes");
+    auto pmb = new ACE_Message_Block(20);
 
-    ACE_Message_Block* pmb = new ACE_Message_Block(20);
-
-    memcpy_safe(szText, (uint32)ACE_OS::strlen(szText), pmb->wr_ptr(), (uint32)ACE_OS::strlen(szText));
-    pmb->wr_ptr(ACE_OS::strlen(szText));
+    memcpy_safe(strText.c_str(), (uint32)strText.length(), pmb->wr_ptr(), (uint32)strText.length());
+    pmb->wr_ptr(strText.length());
 
     m_pConnectHandler->SetIsLog(true);
 
@@ -155,8 +138,6 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Close_Queue(void)
 void CUnit_ConnectHandler::Test_ConnectHandler_PostMessage(void)
 {
     bool blRet = false;
-    char szData[10] = { '\0' };
-    sprintf_safe(szData, 10, "freeeyes");
 
     IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
@@ -185,13 +166,6 @@ void CUnit_ConnectHandler::Test_ConnectHandler_PostMessage(void)
     }
 
     App_BuffPacketManager::instance()->Delete(pBuffPacket);
-    m_nTestCount++;
-}
-
-void CUnit_ConnectHandler::Test_Connect_CheckTime(void)
-{
-    //不需要测试
-
     m_nTestCount++;
 }
 

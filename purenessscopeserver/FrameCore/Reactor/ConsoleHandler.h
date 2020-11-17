@@ -63,9 +63,9 @@ private:
     ACE_Time_Value             m_atvOutput;
     ACE_Time_Value             m_atvSendAlive;
     ACE_Recursive_Thread_Mutex m_ThreadLock;
-    _TimerCheckID*             m_pTCClose             = NULL;
-    CConsolePacketParse*       m_pPacketParse         = NULL;                 //数据包解析类
-    ACE_Message_Block*         m_pCurrMessage         = NULL;                 //当前的MB对象
+    _TimerCheckID*             m_pTCClose             = nullptr;
+    CConsolePacketParse*       m_pPacketParse         = nullptr;                 //数据包解析类
+    ACE_Message_Block*         m_pCurrMessage         = nullptr;                 //当前的MB对象
 };
 
 #endif

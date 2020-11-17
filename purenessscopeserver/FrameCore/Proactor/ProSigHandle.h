@@ -15,7 +15,7 @@ public:
     ~CProSigHandle(void);
 
     virtual int handle_signal(int nSigNum, siginfo_t* pSigInfo = 0, ucontext_t* pContext = 0);
-    int RegisterSignal(ACE_Proactor* pProactor = NULL);
+    int RegisterSignal(ACE_Proactor* pProactor = nullptr);
 };
 
 typedef ACE_Singleton<CProSigHandle, ACE_Null_Mutex> App_ProSigHandler;

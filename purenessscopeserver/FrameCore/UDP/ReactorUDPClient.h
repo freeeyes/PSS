@@ -33,7 +33,7 @@ private:
 
     ACE_SOCK_Dgram          m_skRemote;
     ACE_INET_Addr           m_addrRemote;                   //数据发送方的IP信息
-    IClientUDPMessage*      m_pClientUDPMessage = NULL;     //消息处理类
+    IClientUDPMessage*      m_pClientUDPMessage = nullptr;     //消息处理类
 
     ACE_Time_Value          m_atvInput;                     //接收包的时间
     ACE_Time_Value          m_atvOutput;                    //发送包的时间

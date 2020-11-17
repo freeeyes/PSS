@@ -22,7 +22,7 @@ void CUnit_CommandAccount::tearDown(void)
 {
     m_pCommandAccount->Close();
     delete m_pCommandAccount;
-    m_pCommandAccount = NULL;
+    m_pCommandAccount = nullptr;
 }
 
 void CUnit_CommandAccount::Test_CommandAccount_Init(void)
@@ -34,10 +34,10 @@ void CUnit_CommandAccount::Test_CommandAccount_Init(void)
 
     const _CommandData* pCommandData = m_pCommandAccount->GetCommandData(0x1000);
 
-    if (NULL == pCommandData)
+    if (nullptr == pCommandData)
     {
-        OUR_DEBUG((LM_INFO, "[Test_CommandAccount_Init]GetCommandData is NULL.\n"));
-        CPPUNIT_ASSERT_MESSAGE("[Test_CommandAccount_Init]GetCommandData is NULL.", true == blRet);
+        OUR_DEBUG((LM_INFO, "[Test_CommandAccount_Init]GetCommandData is nullptr.\n"));
+        CPPUNIT_ASSERT_MESSAGE("[Test_CommandAccount_Init]GetCommandData is nullptr.", true == blRet);
         return;
     }
 

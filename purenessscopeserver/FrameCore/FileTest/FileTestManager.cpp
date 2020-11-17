@@ -22,7 +22,7 @@ FileTestResultInfoSt CFileTestManager::FileTestStart(const char* szXmlFileTestNa
         }
         else
         {
-            m_n4TimerID = (uint32)App_TimerManager::instance()->schedule(this, (void*)NULL, ACE_OS::gettimeofday() + ACE_Time_Value(m_u4TimeInterval), ACE_Time_Value(m_u4TimeInterval));
+            m_n4TimerID = (uint32)App_TimerManager::instance()->schedule(this, (void*)nullptr, ACE_OS::gettimeofday() + ACE_Time_Value(m_u4TimeInterval), ACE_Time_Value(m_u4TimeInterval));
 
             if(-1 == m_n4TimerID)
             {
@@ -61,7 +61,7 @@ void CFileTestManager::HandlerServerResponse(uint32 u4ConnectID)
 
     ResponseRecordSt* pResponseRecord = m_objResponseRecordList.Get_Hash_Box_Data(szConnectID);
 
-    if (NULL == pResponseRecord)
+    if (nullptr == pResponseRecord)
     {
         OUR_DEBUG((LM_INFO, "[CFileTestManager::HandlerServerResponse]Response time too long m_u4ExpectTimeNo find connectID=%d.\n", u4ConnectID));
         return;
@@ -164,8 +164,8 @@ bool CFileTestManager::LoadXmlCfg(const char* szXmlFileTestName, FileTestResultI
     m_MainConfig.Read_XML_Data_Single_Uint32("FileTestConfig", "ContentType", m_u4ContentType);
 
     //√¸¡Óº‡øÿœ‡πÿ≈‰÷√
-    TiXmlElement* pNextTiXmlElementFileName     = NULL;
-    TiXmlElement* pNextTiXmlElementDesc         = NULL;
+    TiXmlElement* pNextTiXmlElementFileName     = nullptr;
+    TiXmlElement* pNextTiXmlElementDesc         = nullptr;
 
     while(true)
     {

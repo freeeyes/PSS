@@ -14,7 +14,7 @@ void CUnit_ProfileTime::setUp(void)
 void CUnit_ProfileTime::tearDown(void)
 {
     delete m_pProfileTime;
-    m_pProfileTime = NULL;
+    m_pProfileTime = nullptr;
 }
 
 void CUnit_ProfileTime::Test_ProfileTime(void)

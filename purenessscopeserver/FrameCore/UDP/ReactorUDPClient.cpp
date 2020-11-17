@@ -127,7 +127,7 @@ _ClientConnectInfo CReactorUDPClient::GetClientConnectInfo() const
 
 bool CReactorUDPClient::CheckMessage(const char* pData, uint32 u4Len)
 {
-    if(NULL == m_pClientUDPMessage || NULL == pData)
+    if(nullptr == m_pClientUDPMessage || nullptr == pData)
     {
         return false;
     }

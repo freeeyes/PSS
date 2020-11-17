@@ -28,7 +28,7 @@ void CUnit_Aes::setUp(void)
 void CUnit_Aes::tearDown(void)
 {
     delete m_pAES;
-    m_pAES = NULL;
+    m_pAES = nullptr;
 }
 
 void CUnit_Aes::Test_Aes(void)

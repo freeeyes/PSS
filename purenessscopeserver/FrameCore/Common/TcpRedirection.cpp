@@ -39,8 +39,8 @@ int CForwardManager::Init()
 
     Close();
 
-    TiXmlElement* pSource = NULL;
-    TiXmlElement* pTarget = NULL;
+    TiXmlElement* pSource = nullptr;
+    TiXmlElement* pTarget = nullptr;
 
     string strSource;
     string strTarget;
@@ -145,7 +145,7 @@ void CForwardManager::SendData(string strTarget, ACE_Message_Block* pmb)
 
     IDeviceHandler* pIDeviceHandler = Get_Device_Handler(strTarget);
 
-    if (NULL != pIDeviceHandler)
+    if (nullptr != pIDeviceHandler)
     {
         pIDeviceHandler->Device_Send_Data(pmb->wr_ptr(), pmb->length());
         pmb->wr_ptr(pmb->length());
@@ -217,5 +217,5 @@ IDeviceHandler* CForwardManager::Get_Device_Handler(string strTarget)
         return f->second->m_pDeviceHandler;
     }
 
-    return NULL;
+    return nullptr;
 }

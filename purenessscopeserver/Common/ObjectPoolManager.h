@@ -45,7 +45,7 @@ public:
         {
             TYPE* pObject = m_objObjectList.GetObject(i);
 
-            if(NULL != pObject)
+            if(nullptr != pObject)
             {
                 //执行函数初始化动作
                 fn_Init_Callback(i, pObject);
@@ -70,7 +70,7 @@ public:
         {
             TYPE* pObject = m_objObjectList.GetObject(i);
 
-            if (NULL != pObject)
+            if (nullptr != pObject)
             {
                 fn_Close_Callback(i, pObject);
             }
@@ -102,7 +102,7 @@ public:
         uint32 u4Pos = 0;
         TYPE* pObject = dynamic_cast<TYPE*>(m_objHashObjectList.Pop_Uint32(u4Pos));
 
-        if (NULL != pObject)
+        if (nullptr != pObject)
         {
             if (true == m_blTagCreateInfo)
             {
@@ -127,7 +127,7 @@ public:
                            objCreateList[i].m_u4Count));
             }
 
-            return NULL;
+            return nullptr;
         }
     }
 
@@ -254,7 +254,7 @@ public:
 
             if (fConnector.connect(ioFile, fAddr) != -1)
             {
-                time_t tNow = time(NULL);
+                time_t tNow = time(nullptr);
                 struct tm* tmNow = ACE_OS::localtime(&tNow);
 
                 for (int i = 0; i < n4Size; i++)

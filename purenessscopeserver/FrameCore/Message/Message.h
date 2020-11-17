@@ -28,8 +28,8 @@ public:
 private:
     _MessageBase  m_MessageBase;
 
-    ACE_Message_Block* m_pmbHead          = NULL;    //包头部分
-    ACE_Message_Block* m_pmbBody          = NULL;   //包体部分
+    ACE_Message_Block* m_pmbHead          = nullptr;    //包头部分
+    ACE_Message_Block* m_pmbBody          = nullptr;   //包体部分
 };
 
 enum class EM_WORKTHREAD_DIRECT

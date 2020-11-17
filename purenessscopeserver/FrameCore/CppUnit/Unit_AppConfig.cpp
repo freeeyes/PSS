@@ -15,7 +15,7 @@ void CUnit_AppConfig::setUp(void)
 void CUnit_AppConfig::tearDown(void)
 {
     delete m_pAppConfig;
-    m_pAppConfig = NULL;
+    m_pAppConfig = nullptr;
 }
 
 void CUnit_AppConfig::Test_XML_Read(void)

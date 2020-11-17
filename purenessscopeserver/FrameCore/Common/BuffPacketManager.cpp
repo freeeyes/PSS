@@ -51,7 +51,7 @@ IBuffPacket* CBuffPacketManager::Create(const char* pFileName, uint32 u4Line)
 
 bool CBuffPacketManager::Delete(IBuffPacket* pBuffPacket)
 {
-    if (NULL != pBuffPacket)
+    if (nullptr != pBuffPacket)
     {
         auto pBuff = dynamic_cast<CBuffPacket*>(pBuffPacket);
         pBuff->Clear();

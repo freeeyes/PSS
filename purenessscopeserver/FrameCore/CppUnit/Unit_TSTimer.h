@@ -23,7 +23,7 @@ public:
     void Test_TimerThread(void);
 
 private:
-    CTimerManager*          m_pTimerThread = NULL;
+    CTimerManager*          m_pTimerThread = nullptr;
 };
 
 #endif

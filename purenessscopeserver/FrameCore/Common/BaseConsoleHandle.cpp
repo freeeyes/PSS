@@ -5,7 +5,7 @@ bool Console_Common_SendMessage_Data_Check(uint32 u4ConnectID, IBuffPacket* pBuf
 {
     CConsolePacketParse PacketParse;
 
-    if (NULL == pBuffPacket)
+    if (nullptr == pBuffPacket)
     {
         return false;
     }

@@ -2,7 +2,7 @@
 
 CProactorUDPClient::CProactorUDPClient(void)
 {
-    m_pClientUDPMessage = NULL;
+    m_pClientUDPMessage = nullptr;
     m_u4RecvPacketCount = 0;
     m_u4SendPacketCount = 0;
     m_u4RecvSize        = 0;
@@ -37,7 +37,7 @@ int CProactorUDPClient::OpenAddress(const ACE_INET_Addr& AddrLocal, EM_UDP_TYPE 
     //设置wsaIoctl
     bool blBehavior = false;
     unsigned long lRet = 0;
-    int nStatus = ACE_OS::ioctl(m_skRemote.get_handle(), SIO_UDP_CONNRESET, &blBehavior, sizeof(blBehavior), NULL, 0, &lRet, NULL, NULL);
+    int nStatus = ACE_OS::ioctl(m_skRemote.get_handle(), SIO_UDP_CONNRESET, &blBehavior, sizeof(blBehavior), nullptr, 0, &lRet, nullptr, nullptr);
 
     if(0 != nStatus)
     {
@@ -46,7 +46,7 @@ int CProactorUDPClient::OpenAddress(const ACE_INET_Addr& AddrLocal, EM_UDP_TYPE 
 
 #endif
 
-    char* pCompletionKey = NULL;
+    char* pCompletionKey = nullptr;
 
     if(m_Read.open(*this, m_skRemote.get_handle(), pCompletionKey, pProactor) == -1)
     {
@@ -60,12 +60,12 @@ int CProactorUDPClient::OpenAddress(const ACE_INET_Addr& AddrLocal, EM_UDP_TYPE 
         return -1;
     }
 
-    char* pAct = NULL;
+    char* pAct = nullptr;
     ACE_Message_Block* pMBBuff = App_MessageBlockManager::instance()->Create(MAX_UDP_PACKET_LEN);
 
-    if(NULL == pMBBuff)
+    if(nullptr == pMBBuff)
     {
-        OUR_DEBUG((LM_ERROR, "[CProactorUDPClient::OpenAddress]pMBBuff is NULL.\n"));
+        OUR_DEBUG((LM_ERROR, "[CProactorUDPClient::OpenAddress]pMBBuff is nullptr.\n"));
         return -1;
     }
 
@@ -85,7 +85,7 @@ void CProactorUDPClient::Close()
 void CProactorUDPClient::handle_read_dgram(const ACE_Asynch_Read_Dgram::Result& result)
 {
     //因为UDP是一次性发送完整的数据包，所以不必做粘包处理
-    ACE_Message_Block* pMBBuff = NULL;
+    ACE_Message_Block* pMBBuff = nullptr;
 
     ACE_Message_Block* pMb = result.message_block();
     int nPacketLen = (int)result.bytes_transferred();
@@ -112,14 +112,14 @@ void CProactorUDPClient::handle_read_dgram(const ACE_Asynch_Read_Dgram::Result& 
         pMBBuff = pMb;
     }
 
-    if(NULL == pMBBuff)
+    if(nullptr == pMBBuff)
     {
-        OUR_DEBUG((LM_INFO, "[CProactorUDPClient::handle_read_dgram]pMBBuff is NULL.\n"));
+        OUR_DEBUG((LM_INFO, "[CProactorUDPClient::handle_read_dgram]pMBBuff is nullptr.\n"));
     }
     else
     {
         size_t stRecvLen = MAX_UDP_PACKET_LEN;
-        m_Read.recv(pMBBuff, stRecvLen, 0, PF_INET, NULL);
+        m_Read.recv(pMBBuff, stRecvLen, 0, PF_INET, nullptr);
     }
 }
 
@@ -167,7 +167,7 @@ _ClientConnectInfo CProactorUDPClient::GetClientConnectInfo()
 
 bool CProactorUDPClient::CheckMessage(ACE_Message_Block* pMbData, uint32 u4Len)
 {
-    if(NULL == m_pClientUDPMessage || NULL == pMbData)
+    if(nullptr == m_pClientUDPMessage || nullptr == pMbData)
     {
         return false;
     }

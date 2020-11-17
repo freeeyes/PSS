@@ -72,7 +72,7 @@ int CProactorUDPHandler::OpenAddress(const ACE_INET_Addr& AddrLocal, ACE_Proacto
     //…Ë÷√wsaIoctl
     bool blBehavior = false;
     unsigned long lRet = 0;
-    int nStatus = ACE_OS::ioctl(m_skRemote.get_handle(), SIO_UDP_CONNRESET, &blBehavior, sizeof(blBehavior), NULL, 0, &lRet, NULL, NULL);
+    int nStatus = ACE_OS::ioctl(m_skRemote.get_handle(), SIO_UDP_CONNRESET, &blBehavior, sizeof(blBehavior), nullptr, 0, &lRet, nullptr, nullptr);
 
     if(0 != nStatus)
     {
@@ -344,7 +344,7 @@ void CProactorUDPHandler::GetCommandData(uint16 u2CommandID, _CommandData& objCo
 {
     _CommandData* pCommandData = m_CommandAccount.GetCommandData(u2CommandID);
 
-    if(pCommandData != NULL)
+    if(pCommandData != nullptr)
     {
         objCommandData += (*pCommandData);
     }

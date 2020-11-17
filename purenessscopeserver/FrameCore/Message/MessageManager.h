@@ -20,7 +20,7 @@ public:
     uint32          m_u4Count                    = 0;                  //当前命令被调用的次数
     uint32          m_u4TimeCost                 = 0;                  //当前命令总时间消耗
     uint32          m_u4CurrUsedCount            = 0;                  //当前正在使用的引用次数
-    CClientCommand* m_pClientCommand             = NULL;               //当前命令指针
+    CClientCommand* m_pClientCommand             = nullptr;               //当前命令指针
     uint16          m_u2CommandID                = 0;                  //当前命令对应的ID
     char            m_szModuleName[MAX_BUFF_100] = {'\0'};             //所属模块名称
     ACE_Date_Time   m_dtLoadTime;                                      //当前命令加载时间
@@ -95,7 +95,7 @@ public:
 
         sprintf_safe(pClientCommandInfo->m_szModuleName, MAX_BUFF_100, "%s", pMuduleName);
 
-        if (NULL != pListenInfo)
+        if (nullptr != pListenInfo)
         {
             pClientCommandInfo->m_objListenIPInfo = (*pListenInfo);
         }
@@ -112,7 +112,7 @@ public:
         {
             const _ClientCommandInfo* pClientCommandInfo = (*b);
 
-            if(NULL != pClientCommandInfo && pClientCommand == pClientCommandInfo->m_pClientCommand)
+            if(nullptr != pClientCommandInfo && pClientCommand == pClientCommandInfo->m_pClientCommand)
             {
                 SAFE_DELETE(pClientCommandInfo);
                 m_vecClientCommandList.erase(b);
@@ -141,7 +141,7 @@ public:
     {
         if(nIndex >= (int)m_vecClientCommandList.size())
         {
-            return NULL;
+            return nullptr;
         }
         else
         {

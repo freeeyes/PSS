@@ -23,14 +23,14 @@ int32 GetProcessCPU_Idel_Linux()
 
     FILE* fd = ACE_OS::fopen("aasnowy.txt","r");
 
-    if (NULL == fd)
+    if (nullptr == fd)
     {
         return -1;
     }
 
     const char* pReturn = ACE_OS::fgets(szbuffer,sizeof(szbuffer),fd);
 
-    if (NULL == pReturn)
+    if (nullptr == pReturn)
     {
         fclose(fd);
         return -1;
@@ -84,7 +84,7 @@ int32 GetProcessMemorySize_Linux()
 
     fd = fopen(file_name, "r");
 
-    if (NULL == fd)
+    if (nullptr == fd)
     {
         return 0;
     }
@@ -93,7 +93,7 @@ int32 GetProcessMemorySize_Linux()
     int vmrss = 0;
     int vmsize = 0;
 
-    while (fgets(line_buff, sizeof(line_buff), fd) != NULL)
+    while (fgets(line_buff, sizeof(line_buff), fd) != nullptr)
     {
         if (strncmp(line_buff, szVmRSS, strlen(szVmRSS)) == 0)
         {

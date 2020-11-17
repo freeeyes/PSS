@@ -31,9 +31,9 @@ class _Server_Message_Info
 public:
     int                m_nHashID        = 0;
     uint16             m_u2CommandID    = 0;
-    IClientMessage*    m_pClientMessage = NULL;
-    ACE_Message_Block* m_pRecvFinish    = NULL;
-    ACE_Message_Block* m_pmbQueuePtr    = NULL;        //消息队列指针块
+    IClientMessage*    m_pClientMessage = nullptr;
+    ACE_Message_Block* m_pRecvFinish    = nullptr;
+    ACE_Message_Block* m_pmbQueuePtr    = nullptr;        //消息队列指针块
     _ClientIPInfo      m_objServerIPInfo;
 
     _Server_Message_Info()
@@ -48,10 +48,10 @@ public:
 
     void Close()
     {
-        if (NULL != m_pmbQueuePtr)
+        if (nullptr != m_pmbQueuePtr)
         {
             m_pmbQueuePtr->release();
-            m_pmbQueuePtr = NULL;
+            m_pmbQueuePtr = nullptr;
         }
     }
 
@@ -159,7 +159,7 @@ public:
     bool DelClientMessage(IClientMessage* pClientMessage);
 
 private:
-    CServerMessageTask*         m_pServerMessageTask = NULL;
+    CServerMessageTask*         m_pServerMessageTask = nullptr;
     ACE_Recursive_Thread_Mutex  m_ThreadWritrLock;
 };
 

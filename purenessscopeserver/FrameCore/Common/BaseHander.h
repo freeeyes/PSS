@@ -71,7 +71,7 @@ class _File_Message_Param
 {
 public:
     uint32 m_u4ConnectID          = 0;
-    IFileTestManager* m_pFileTest = NULL;
+    IFileTestManager* m_pFileTest = nullptr;
     bool m_blDelete               = false;
     uint32 m_u4PacketDebugSize    = 0;
     ACE_INET_Addr m_addrRemote;

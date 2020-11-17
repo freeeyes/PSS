@@ -19,7 +19,7 @@ public:
               const void* completion_key = 0,
               ACE_Proactor* proactor = 0)
     {
-        if(implementation_==NULL)
+        if(implementation_==nullptr)
         {
             proactor = this->get_proactor (proactor, handler);
 
@@ -50,7 +50,7 @@ public:
               const void* completion_key = 0,
               ACE_Proactor* proactor = 0)
     {
-        if(implementation_==NULL)
+        if(implementation_==nullptr)
         {
             proactor = this->get_proactor (proactor, handler);
 

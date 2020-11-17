@@ -40,21 +40,21 @@ bool CPacketParsePool::Delete(CPacketParse* pPacketParse, bool blDelete)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-    if (NULL == pPacketParse)
+    if (nullptr == pPacketParse)
     {
-        OUR_DEBUG((LM_INFO, "[CPacketParsePool::Delete] pPacketParse is NULL.\n"));
+        OUR_DEBUG((LM_INFO, "[CPacketParsePool::Delete] pPacketParse is nullptr.\n"));
         return false;
     }
 
     if (true == blDelete)
     {
         //清理包头和包体的内存
-        if (NULL != pPacketParse->GetMessageHead())
+        if (nullptr != pPacketParse->GetMessageHead())
         {
             App_MessageBlockManager::instance()->Close(pPacketParse->GetMessageHead());
         }
 
-        if (NULL != pPacketParse->GetMessageBody())
+        if (nullptr != pPacketParse->GetMessageBody())
         {
             App_MessageBlockManager::instance()->Close(pPacketParse->GetMessageBody());
         }

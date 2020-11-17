@@ -69,8 +69,8 @@ private:
     ACE_INET_Addr               m_addrRemote;
 
     ACE_Recursive_Thread_Mutex  m_ThreadLock;
-    IClientMessage*             m_pClientMessage = NULL;              //消息处理类的指针
-    ACE_Message_Block*          m_pCurrMessage   = NULL;              //当前的MB对象
+    IClientMessage*             m_pClientMessage = nullptr;              //消息处理类的指针
+    ACE_Message_Block*          m_pCurrMessage   = nullptr;              //当前的MB对象
     ACE_Time_Value              m_atvBegin;                           //链接建立时间
 
     EM_s2s                      m_ems2s       = EM_s2s::S2S_NEED_CALLBACK;    //是否需要回调状态

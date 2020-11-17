@@ -14,7 +14,7 @@ void CUnit_Redirection::setUp(void)
 
 void CUnit_Redirection::tearDown(void)
 {
-    m_pForwardManager = NULL;
+    m_pForwardManager = nullptr;
 }
 
 void CUnit_Redirection::Test_Redirection(void)

@@ -14,7 +14,7 @@ void CUnit_MessageDyeingManager::setUp(void)
 void CUnit_MessageDyeingManager::tearDown(void)
 {
     delete m_pMessageDyeingManager;
-    m_pMessageDyeingManager = NULL;
+    m_pMessageDyeingManager = nullptr;
 }
 
 void CUnit_MessageDyeingManager::Test_MessageDyeingManager(void)

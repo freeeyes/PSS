@@ -29,13 +29,13 @@ bool CEchartlog::Writelog(const char* pPath, const char* pFileName, const char* 
 
     FILE* pFile = ACE_OS::fopen(szFileName, "a+");
 
-    if (NULL == pFile)
+    if (nullptr == pFile)
     {
         OUR_DEBUG((LM_ERROR, "[CEchartlog::Writelog]open file error(%s).\n", szFileName));
         return false;
     }
 
-    time_t tNow = time(NULL);
+    time_t tNow = time(nullptr);
     struct tm* tmNow = ACE_OS::localtime(&tNow);
 
     sprintf_safe(szLogText, MAX_BUFF_500, "%s|%04d-%02d-%02d %02d:%02d:%2d|%s",

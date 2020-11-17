@@ -21,12 +21,12 @@ bool CUnit_ConsoleMessage::Create_Command(const char* pCommand, uint16 u2ReturnC
 {
     bool blRet             = false;
     uint8 u1Output         = 0;
-    ACE_Message_Block* pmb = NULL;
+    ACE_Message_Block* pmb = nullptr;
 
     IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     //Æ´½ÓÃüÁî×Ö
-    int nCommandLen = (int)ACE_OS::strlen(pCommand);
+    auto nCommandLen = (int)ACE_OS::strlen(pCommand);
 
     pmb = new ACE_Message_Block(ACE_OS::strlen(pCommand));
     memcpy_safe(pCommand, nCommandLen, pmb->wr_ptr(), nCommandLen);
@@ -35,9 +35,11 @@ bool CUnit_ConsoleMessage::Create_Command(const char* pCommand, uint16 u2ReturnC
     //Ö´ÐÐÃüÁî
     if (CONSOLE_MESSAGE_SUCCESS != m_pConsoleMessage->Dispose(pmb, pBuffPacket, u1Output))
     {
-        char szError[MAX_BUFF_200] = { '\0' };
-        sprintf_safe(szError, MAX_BUFF_200, "[Create_Command](%s)m_pConsoleMessage->Dispose.", pCommand);
-        CPPUNIT_ASSERT_MESSAGE(szError, true == blRet);
+        std::stringstream ss_format;
+        ss_format << "[Create_Command](" << pCommand << ")m_pConsoleMessage->Dispose.";
+        string strError = ss_format.str();
+
+        CPPUNIT_ASSERT_MESSAGE(strError.c_str(), true == blRet);
         return false;
     }
 
@@ -70,7 +72,7 @@ bool CUnit_ConsoleMessage::Create_Command_Error(const char* pCommand)
 {
     bool blRet = false;
     uint8 u1Output = 0;
-    ACE_Message_Block* pmb = NULL;
+    ACE_Message_Block* pmb = nullptr;
 
     IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 

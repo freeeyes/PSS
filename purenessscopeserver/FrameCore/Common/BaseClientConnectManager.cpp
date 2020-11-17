@@ -2,13 +2,13 @@
 
 void Common_Send_ConnectError(ACE_Message_Block* pmblk, const ACE_INET_Addr& objAddrServer, IClientMessage* pClientMessage)
 {
-    if (NULL != pmblk)
+    if (nullptr != pmblk)
     {
         App_MessageBlockManager::instance()->Close(pmblk);
     }
 
     //如果消息有处理接口，则返回失败接口
-    if (NULL != pClientMessage)
+    if (nullptr != pClientMessage)
     {
         //服务器已经断开，需要等待重新连接的结果
         _ClientIPInfo objServerIPInfo;

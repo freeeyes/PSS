@@ -17,7 +17,7 @@ void CUnit_BuffPacket::setUp(void)
 void CUnit_BuffPacket::tearDown(void)
 {
     delete m_pBuffPacket;
-    m_pBuffPacket = NULL;
+    m_pBuffPacket = nullptr;
 }
 
 void CUnit_BuffPacket::Read_Write_BuffPacket(void)

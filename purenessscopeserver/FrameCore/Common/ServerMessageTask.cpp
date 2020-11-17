@@ -15,7 +15,7 @@ void CServerMessageInfoPool::Init(uint32 u4PacketCount /*= MAX_SERVER_MESSAGE_IN
     {
         _Server_Message_Info* pPacket = m_objArrayList.GetObject(i);
 
-        if(NULL != pPacket)
+        if(nullptr != pPacket)
         {
             //添加到Hash数组里面
             std::stringstream ss_format;
@@ -61,7 +61,7 @@ bool CServerMessageInfoPool::Delete(_Server_Message_Info* pObject)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-    if(NULL == pObject)
+    if(nullptr == pObject)
     {
         return false;
     }
@@ -115,9 +115,9 @@ int CServerMessageTask::handle_signal (int signum,siginfo_t* siginfo,ucontext_t*
     {
         OUR_DEBUG((LM_INFO,"[CServerMessageTask::handle_signal](%d) will be kill.\n", grp_id()));
 
-        if(NULL != siginfo && NULL != ucontext)
+        if(nullptr != siginfo && nullptr != ucontext)
         {
-            OUR_DEBUG((LM_INFO,"[CServerMessageTask::handle_signal]siginfo is not null.\n"));
+            OUR_DEBUG((LM_INFO,"[CServerMessageTask::handle_signal]siginfo is not nullptr.\n"));
         }
 
         ACE_Thread::exit();
@@ -173,7 +173,7 @@ int CServerMessageTask::svc(void)
 {
     while(m_blRun)
     {
-        ACE_Message_Block* mb = NULL;
+        ACE_Message_Block* mb = nullptr;
         ACE_OS::last_error(0);
 
         if(getq(mb, 0) == -1)
@@ -198,7 +198,7 @@ int CServerMessageTask::svc(void)
             //处理ClientMessage对象添加
             if (mb->msg_type() == ADD_SERVER_CLIENT)
             {
-                IClientMessage* pClientMessage = NULL;
+                IClientMessage* pClientMessage = nullptr;
                 memcpy_safe(mb->rd_ptr(), sizeof(IClientMessage*), (char* )&pClientMessage, sizeof(IClientMessage*));
 
                 Add_ValidIClientMessage(pClientMessage);
@@ -209,7 +209,7 @@ int CServerMessageTask::svc(void)
 
             if (mb->msg_type() == DEL_SERVER_CLIENT)
             {
-                IClientMessage* pClientMessage = NULL;
+                IClientMessage* pClientMessage = nullptr;
                 memcpy_safe(mb->rd_ptr(), sizeof(IClientMessage*), (char*)&pClientMessage, sizeof(IClientMessage*));
 
                 Update_ValidIClientMessage(pClientMessage);
@@ -222,7 +222,7 @@ int CServerMessageTask::svc(void)
 
             if (! msg)
             {
-                OUR_DEBUG((LM_ERROR,"[CMessageService::svc] mb msg == NULL CurrthreadNo=[%d]!\n", m_u4ThreadID));
+                OUR_DEBUG((LM_ERROR,"[CMessageService::svc] mb msg == nullptr CurrthreadNo=[%d]!\n", m_u4ThreadID));
                 continue;
             }
 
@@ -252,7 +252,7 @@ bool CServerMessageTask::PutMessage(_Server_Message_Info* pMessage)
 {
     ACE_Message_Block* mb = pMessage->GetQueueMessage();
 
-    if(NULL != mb)
+    if(nullptr != mb)
     {
         //判断队列是否是已经最大
         auto u4QueueCount = (uint32)msg_queue()->message_count();
@@ -284,9 +284,9 @@ bool CServerMessageTask::PutMessage_Add_Client(IClientMessage* pClientMessage)
 {
     ACE_Message_Block* pmb = App_MessageBlockManager::instance()->Create(sizeof(IClientMessage*));
 
-    if (NULL == pmb)
+    if (nullptr == pmb)
     {
-        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::PutMessage_Add_Client] ACE_Message_Block is NULL.\n"));
+        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::PutMessage_Add_Client] ACE_Message_Block is nullptr.\n"));
         return false;
     }
 
@@ -318,9 +318,9 @@ bool CServerMessageTask::PutMessage_Del_Client(IClientMessage* pClientMessage)
 {
     ACE_Message_Block* pmb = App_MessageBlockManager::instance()->Create(sizeof(IClientMessage*));
 
-    if (NULL == pmb)
+    if (nullptr == pmb)
     {
-        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::PutMessage_Del_Client] ACE_Message_Block is NULL.\n"));
+        OUR_DEBUG((LM_ERROR, "[CServerMessageTask::PutMessage_Del_Client] ACE_Message_Block is nullptr.\n"));
         return false;
     }
 
@@ -350,16 +350,16 @@ bool CServerMessageTask::PutMessage_Del_Client(IClientMessage* pClientMessage)
 
 bool CServerMessageTask::ProcessMessage(const _Server_Message_Info* pMessage, uint32 u4ThreadID)
 {
-    if(NULL == pMessage)
+    if(nullptr == pMessage)
     {
-        OUR_DEBUG((LM_DEBUG, "[CServerMessageTask::ProcessMessage]u4ThreadID=%d, pMessage is NULL\n", u4ThreadID));
+        OUR_DEBUG((LM_DEBUG, "[CServerMessageTask::ProcessMessage]u4ThreadID=%d, pMessage is nullptr\n", u4ThreadID));
         return false;
     }
 
     //如果此数据处理指针已经不是有效指针，直接返回。
     if(CheckValidClientMessage(pMessage->m_pClientMessage) == false)
     {
-        OUR_DEBUG((LM_DEBUG, "[CServerMessageTask::ProcessMessage]u4ThreadID=%d, m_pClientMessage is NULL\n", u4ThreadID));
+        OUR_DEBUG((LM_DEBUG, "[CServerMessageTask::ProcessMessage]u4ThreadID=%d, m_pClientMessage is nullptr\n", u4ThreadID));
         return true;
     }
 
@@ -409,7 +409,7 @@ int CServerMessageTask::CloseMsgQueue()
 void CServerMessageTask::Add_ValidIClientMessage(IClientMessage* pClientMessage)
 {
     bool blIsFind = false;
-    if (NULL == pClientMessage)
+    if (nullptr == pClientMessage)
     {
         return;
     }
@@ -432,7 +432,7 @@ void CServerMessageTask::Add_ValidIClientMessage(IClientMessage* pClientMessage)
 
 void CServerMessageTask::Update_ValidIClientMessage(const IClientMessage* pClientMessage)
 {
-    if (NULL != pClientMessage)
+    if (nullptr != pClientMessage)
     {
         //先查找有效的列表中是否包含此指针
         for (vecValidIClientMessage::iterator b = m_vecValidIClientMessage.begin(); b != m_vecValidIClientMessage.end(); ++b)
@@ -457,7 +457,7 @@ CServerMessageManager::CServerMessageManager()
 
 void CServerMessageManager::Init()
 {
-    if(NULL == m_pServerMessageTask)
+    if(nullptr == m_pServerMessageTask)
     {
         m_pServerMessageTask = new CServerMessageTask();
     }
@@ -465,7 +465,7 @@ void CServerMessageManager::Init()
 
 bool CServerMessageManager::Start()
 {
-    if(NULL != m_pServerMessageTask)
+    if(nullptr != m_pServerMessageTask)
     {
         bool blState = m_pServerMessageTask->Start();
 
@@ -479,7 +479,7 @@ bool CServerMessageManager::Start()
 
 int CServerMessageManager::Close()
 {
-    if(NULL != m_pServerMessageTask)
+    if(nullptr != m_pServerMessageTask)
     {
         if (0 != m_pServerMessageTask->Close())
         {
@@ -499,7 +499,7 @@ int CServerMessageManager::Close()
 
 bool CServerMessageManager::PutMessage(_Server_Message_Info* pMessage)
 {
-    if(NULL != m_pServerMessageTask)
+    if(nullptr != m_pServerMessageTask)
     {
         return m_pServerMessageTask->PutMessage(pMessage);
     }
@@ -511,7 +511,7 @@ bool CServerMessageManager::PutMessage(_Server_Message_Info* pMessage)
 
 bool CServerMessageManager::CheckServerMessageThread(ACE_Time_Value const& tvNow) const
 {
-    if(NULL != m_pServerMessageTask)
+    if(nullptr != m_pServerMessageTask)
     {
         bool blRet = m_pServerMessageTask->CheckServerMessageThread(tvNow);
 
@@ -532,7 +532,7 @@ bool CServerMessageManager::CheckServerMessageThread(ACE_Time_Value const& tvNow
 
 bool CServerMessageManager::AddClientMessage(IClientMessage* pClientMessage)
 {
-    if(NULL != m_pServerMessageTask)
+    if(nullptr != m_pServerMessageTask)
     {
         return m_pServerMessageTask->PutMessage_Add_Client(pClientMessage);
     }
@@ -542,7 +542,7 @@ bool CServerMessageManager::AddClientMessage(IClientMessage* pClientMessage)
 
 bool CServerMessageManager::DelClientMessage(IClientMessage* pClientMessage)
 {
-    if(NULL != m_pServerMessageTask)
+    if(nullptr != m_pServerMessageTask)
     {
         return m_pServerMessageTask->PutMessage_Del_Client(pClientMessage);
     }

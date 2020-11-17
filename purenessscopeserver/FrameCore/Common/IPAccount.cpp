@@ -91,7 +91,7 @@ bool CIPAccount::AddIP(string strIP)
     {
         _IPAccount* pIPAccount = m_objIPList.Get_Hash_Box_Data(strIP.c_str());
 
-        if (NULL == pIPAccount)
+        if (nullptr == pIPAccount)
         {
             //没有找到，添加
             pIPAccount = new _IPAccount();
@@ -165,7 +165,7 @@ void CIPAccount::GetInfo(vecIPAccount& VecIPAccount)
 
     for (const _IPAccount* pIPAccount : vecIPAccount)
     {
-        if (NULL != pIPAccount)
+        if (nullptr != pIPAccount)
         {
             VecIPAccount.push_back(*pIPAccount);
         }

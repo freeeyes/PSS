@@ -18,7 +18,7 @@ public:
     using UserFunctor = std::function<void(int, void*)>;
     UserFunctor f;
     int message_id_ = 0;
-    void* arg_      = NULL;
+    void* arg_      = nullptr;
 };
 
 class CThreadInfo
@@ -70,7 +70,7 @@ static void thread_run(CThreadInfo* _thread_info)
 
     //printf("[thread_run]<%d> is close.\n", _thread_info->thread_logic_id_);
     delete _thread_info;
-    _thread_info = NULL;
+    _thread_info = nullptr;
 }
 
 class CThreadQueueManager

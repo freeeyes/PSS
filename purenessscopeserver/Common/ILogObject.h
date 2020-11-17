@@ -20,7 +20,7 @@ public:
 
     _LogBlockInfo()
     {
-        m_pBlock         = NULL;
+        m_pBlock         = nullptr;
         m_u4Length       = 0;
         m_u4LogID        = 0;
         m_blIsUsed       = false;
@@ -51,7 +51,7 @@ public:
 
     _LogBlockInfo& operator = (const _LogBlockInfo& ar)
     {
-        if(NULL != this->m_pBlock)
+        if(nullptr != this->m_pBlock)
         {
             SAFE_DELETE(this->m_pBlock);
         }
@@ -71,10 +71,10 @@ public:
 
     ~_LogBlockInfo()
     {
-        if(NULL != m_pmbQueuePtr)
+        if(nullptr != m_pmbQueuePtr)
         {
             m_pmbQueuePtr->release();
-            m_pmbQueuePtr = NULL;
+            m_pmbQueuePtr = nullptr;
         }
     }
 

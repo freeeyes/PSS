@@ -9,16 +9,16 @@
 
 int stringCut(const unsigned char* pcSrc, const char* start, const char* end, char* pcDest)
 {
-    unsigned char* posStart = NULL;
-    unsigned char* posEnd = NULL;
+    unsigned char* posStart = nullptr;
+    unsigned char* posEnd = nullptr;
     int len;
 
-    if (0 == *pcSrc || NULL == pcDest)
+    if (0 == *pcSrc || nullptr == pcDest)
     {
         return -1;
     }
 
-    if (NULL == start)
+    if (nullptr == start)
     {
         posStart = (unsigned char*)pcSrc;
     }
@@ -26,7 +26,7 @@ int stringCut(const unsigned char* pcSrc, const char* start, const char* end, ch
     {
         posStart = (unsigned char* )ACE_OS::strstr((char* )pcSrc, (char* )start);
 
-        if (NULL == posStart)
+        if (nullptr == posStart)
         {
             return -1;
         }
@@ -35,7 +35,7 @@ int stringCut(const unsigned char* pcSrc, const char* start, const char* end, ch
         posStart++;
     }
 
-    if (NULL == end)
+    if (nullptr == end)
     {
         posEnd = posStart + ACE_OS::strlen((char* )posStart);
     }
@@ -43,7 +43,7 @@ int stringCut(const unsigned char* pcSrc, const char* start, const char* end, ch
     {
         posEnd = (unsigned char* )ACE_OS::strstr((char* )pcSrc, (char* )end);
 
-        if (NULL == posEnd)
+        if (nullptr == posEnd)
         {
             return -1;
         }
@@ -63,7 +63,7 @@ int connectSmtp(ACE_HANDLE& socketFd, const unsigned char* smtpUrl, const unsign
     ACE_HOSTENT_DATA buf  = {'\0'};
     int    hosterr        = 0;
 
-    if(NULL == ACE_OS::gethostbyname_r((char* )smtpUrl, &host, buf, &hosterr))
+    if(nullptr == ACE_OS::gethostbyname_r((char* )smtpUrl, &host, buf, &hosterr))
     {
         ACE_DEBUG((LM_ERROR, "[connectSmtp]mail gethostbyname error.\n"));
         return -1;
@@ -245,7 +245,7 @@ int authEmail(const ACE_HANDLE socketFd, const unsigned char* mailAddr, const un
     ACE_OS::memset(&userName, 0, MAX_EMAIL_LEN);
     ACE_OS::memset(&writeData, 0, SMTP_MTU);
 
-    if (0 > stringCut((unsigned char*)mailAddr, NULL, (char*)"@", userName))
+    if (0 > stringCut((unsigned char*)mailAddr, nullptr, (char*)"@", userName))
     {
         ACE_DEBUG((LM_INFO, "[authEmail]stringCut error.\n"));
         return -1;
@@ -377,16 +377,16 @@ int sendEmail(const ACE_HANDLE socketFd, const unsigned char* fromMail, const un
     return 0;
 }
 
-/* subject and body could be null. */
+/* subject and body could be nullptr. */
 int mailText(unsigned char** mail, const unsigned char* fromMail, const unsigned char* toMail,
              const unsigned char* mailSubject, const unsigned char* mailBody)
 {
-    char* szMailText = NULL;
+    char* szMailText = nullptr;
     int mailTextLen = 0;
     char fromName[MAX_EMAIL_LEN] = {0};
     char toName[MAX_EMAIL_LEN] = {0};
 
-    if ((NULL == *mail) || (NULL == fromMail) || (NULL == toMail))
+    if ((nullptr == *mail) || (nullptr == fromMail) || (nullptr == toMail))
     {
         ACE_DEBUG((LM_ERROR, "[mailText][%s][%d] \r\n", __FILE__, __LINE__));
         return -1;
@@ -399,7 +399,7 @@ int mailText(unsigned char** mail, const unsigned char* fromMail, const unsigned
 
     szMailText = (char* )ACE_OS::calloc(mailTextLen, 1);
 
-    if (NULL == szMailText)
+    if (nullptr == szMailText)
     {
         ACE_DEBUG((LM_ERROR, "[mailText]szMailText malloc fail!\n"));
         free(szMailText);
@@ -408,7 +408,7 @@ int mailText(unsigned char** mail, const unsigned char* fromMail, const unsigned
 
     ACE_OS::memset(&fromName, 0, MAX_EMAIL_LEN);
 
-    if (-1 == stringCut(fromMail, NULL, "@", fromName))
+    if (-1 == stringCut(fromMail, nullptr, "@", fromName))
     {
         ACE_DEBUG((LM_ERROR, "[mailText]stringCut fromMail fail!\n"));
         free(szMailText);
@@ -417,7 +417,7 @@ int mailText(unsigned char** mail, const unsigned char* fromMail, const unsigned
 
     ACE_OS::memset(&toName, 0, MAX_EMAIL_LEN);
 
-    if (-1 == stringCut(toMail, NULL, "@", toName))
+    if (-1 == stringCut(toMail, nullptr, "@", toName))
     {
         ACE_DEBUG((LM_ERROR, "[mailText]stringCut toMail fail!\n"));
         free(szMailText);
@@ -428,7 +428,7 @@ int mailText(unsigned char** mail, const unsigned char* fromMail, const unsigned
 
     *mail = (unsigned char* )realloc(*mail, strlen((char* )*mail)+strlen(szMailText)+1);
 
-    if (NULL == *mail)
+    if (nullptr == *mail)
     {
         ACE_DEBUG((LM_ERROR, "[mailText]realloc fail.\n"));
         free(szMailText);
@@ -447,7 +447,7 @@ int mailText(unsigned char** mail, const unsigned char* fromMail, const unsigned
 int mailAttachment(unsigned char** mail, const unsigned char* filePath)
 {
     int fileSize, base64Size, headerSize;
-    char* attach = NULL, *base64Attach = NULL, *attachHeader = NULL;
+    char* attach = nullptr, *base64Attach = nullptr, *attachHeader = nullptr;
     char fileName[MAX_EMAIL_LEN] = {0};
     const char* contentType = "Content-Type: application/octet-stream";
     const char* contentEncode = "Content-Transfer-Encoding: base64";
@@ -455,7 +455,7 @@ int mailAttachment(unsigned char** mail, const unsigned char* filePath)
 
     FILE* fp = ACE_OS::fopen((char* )filePath, "rb");
 
-    if (NULL == fp)
+    if (nullptr == fp)
     {
         ACE_DEBUG((LM_ERROR, "[mailAttachment]fp fopen fail.\n"));
         return -1;
@@ -475,7 +475,7 @@ int mailAttachment(unsigned char** mail, const unsigned char* filePath)
 
     attach = (char* )calloc(fileSize, 1);
 
-    if (NULL == attach)
+    if (nullptr == attach)
     {
         ACE_DEBUG((LM_ERROR, "[mailAttachment]fp calloc fileSize fail.\n"));
         ACE_OS::fclose(fp);
@@ -485,7 +485,7 @@ int mailAttachment(unsigned char** mail, const unsigned char* filePath)
     headerSize = (int)ACE_OS::strlen(contentType)+(int)ACE_OS::strlen(contentEncode)+(int)ACE_OS::strlen(contentDes)+200;
     attachHeader = (char* )calloc(headerSize, 1);
 
-    if (NULL == attachHeader)
+    if (nullptr == attachHeader)
     {
         ACE_DEBUG((LM_ERROR, "[mailAttachment]fp calloc headerSize fail.\n"));
         ACE_OS::fclose(fp);
@@ -494,7 +494,7 @@ int mailAttachment(unsigned char** mail, const unsigned char* filePath)
     }
 
     /* attachment header */
-    if (-1 == stringCut(filePath, "/", NULL, fileName))
+    if (-1 == stringCut(filePath, "/", nullptr, fileName))
     {
         ACE_DEBUG((LM_INFO, "[mailAttachment]stringCut filePath fail.\n"));
         ACE_OS::fclose(fp);
@@ -508,7 +508,7 @@ int mailAttachment(unsigned char** mail, const unsigned char* filePath)
     base64Size = BASE64_SIZE(fileSize);
     base64Attach = (char* )calloc(base64Size, 1);
 
-    if (NULL == base64Attach)
+    if (nullptr == base64Attach)
     {
         ACE_DEBUG((LM_ERROR, "[mailAttachment]fp calloc base64Size fail.\n"));
         ACE_OS::fclose(fp);
@@ -536,7 +536,7 @@ int mailAttachment(unsigned char** mail, const unsigned char* filePath)
 
     *mail = (unsigned char* )realloc(*mail, strlen((char* )*mail)+headerSize+base64Size+1);
 
-    if (NULL == *mail)
+    if (nullptr == *mail)
     {
         ACE_DEBUG((LM_ERROR, "[mailAttachment]fp realloc base64Size fail.\n"));
         ACE_OS::fclose(fp);
@@ -568,7 +568,7 @@ int mailEnd(unsigned char** mail)
 
     *mail = (unsigned char* )ACE_OS::realloc((char* )*mail, strlen((char* )*mail)+len+1);
 
-    if (NULL == *mail)
+    if (nullptr == *mail)
     {
         ACE_DEBUG((LM_ERROR, "[mailEnd]realloc mail fail.\n"));
         return -1;
@@ -585,7 +585,7 @@ int mailEnd(unsigned char** mail)
 int main()
 {
     int ret = 0;
-    unsigned char *mail = NULL;
+    unsigned char *mail = nullptr;
     const unsigned char *filePath = (const unsigned char*)"./test.jpg";
     const unsigned char *mailSubject = (const unsigned char*)"test";
     const unsigned char *mailBody = (const unsigned char*)"hello smtp!!";

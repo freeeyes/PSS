@@ -42,9 +42,9 @@ bool CControlListen::AddListen( const char* pListenIP, uint16 u2Port, uint8 u1IP
     //得到接收器
     ConnectAcceptor* pConnectAcceptor = App_ConnectAcceptorManager::instance()->GetNewConnectAcceptor();
 
-    if (NULL == pConnectAcceptor)
+    if (nullptr == pConnectAcceptor)
     {
-        OUR_DEBUG((LM_INFO, "[CControlListen::AddListen](%s:%d)pConnectAcceptor is NULL.\n", pListenIP, u2Port));
+        OUR_DEBUG((LM_INFO, "[CControlListen::AddListen](%s:%d)pConnectAcceptor is nullptr.\n", pListenIP, u2Port));
         return false;
     }
 
@@ -107,7 +107,7 @@ uint32 CControlListen::GetListenCount()
         {
             const ConnectAcceptor* pConnectAcceptor = App_ConnectAcceptorManager::instance()->GetConnectAcceptor(i);
 
-            if (NULL != pConnectAcceptor)
+            if (nullptr != pConnectAcceptor)
             {
                 _ControlInfo objInfo;
                 sprintf_safe(objInfo.m_szListenIP,

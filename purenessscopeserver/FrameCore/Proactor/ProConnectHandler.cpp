@@ -1060,7 +1060,7 @@ bool CProConnectHandlerPool::Delete(CProConnectHandler* pObject)
 {
 	ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadWriteLock);
 
-	if (NULL == pObject)
+	if (nullptr == pObject)
 	{
 		return false;
 	}

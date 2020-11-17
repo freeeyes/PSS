@@ -32,11 +32,11 @@ public:
         m_nTimeCycle          = 0;
         m_nContainSize        = 0;
         m_nCurrBlockID        = 0;
-        m_fn_Timeout_Callback = NULL;
-        m_pBlockIDList        = NULL;
+        m_fn_Timeout_Callback = nullptr;
+        m_pBlockIDList        = nullptr;
         m_nBlockIDListIndex   = 0;
         m_nBlackCount         = 0;
-        m_pArgContext         = NULL;
+        m_pArgContext         = nullptr;
     }
 
     ~CTimeWheelLink()
@@ -105,10 +105,10 @@ public:
 
         m_vecHashContain.clear();
 
-        if (NULL != m_pBlockIDList)
+        if (nullptr != m_pBlockIDList)
         {
             delete[] m_pBlockIDList;
-            m_pBlockIDList = NULL;
+            m_pBlockIDList = nullptr;
         }
 
         m_nBlockIDListIndex = 0;
@@ -121,7 +121,7 @@ public:
         //首先判断该指针是否存在在某一个容器中
         char szKey[MAX_TIMEWHEEL_KEY] = { '\0' };
 
-        if (NULL == pEntey)
+        if (nullptr == pEntey)
         {
             return false;
         }
@@ -130,7 +130,7 @@ public:
 
         int* pCurrBlockListID = m_htIndexList.Get_Hash_Box_Data(szKey);
 
-        if (NULL == pCurrBlockListID || INVAILD_BLOCKID == *pCurrBlockListID)
+        if (nullptr == pCurrBlockListID || INVAILD_BLOCKID == *pCurrBlockListID)
         {
             //没有在任何指定的容器里，添加到现有最新容器指针中
             if (0 > m_vecHashContain[m_nCurrBlockID]->Add_Hash_Data(szKey, pEntey))
@@ -142,7 +142,7 @@ public:
                 //添加索引表
                 int* pBlockID = Get_BlockIDList_Cell();
 
-                if(NULL != pBlockID)
+                if(nullptr != pBlockID)
                 {
                     *pBlockID = m_nCurrBlockID;
                     int n4Result = m_htIndexList.Add_Hash_Data(szKey, pBlockID);
@@ -191,7 +191,7 @@ public:
                     //添加索引表
                     int* pBlockID = Get_BlockIDList_Cell();
 
-                    if(NULL != pBlockID)
+                    if(nullptr != pBlockID)
                     {
                         *pBlockID = m_nCurrBlockID;
                         int n4Result = m_htIndexList.Add_Hash_Data(szKey, pBlockID);
@@ -221,7 +221,7 @@ public:
 
         int* pCurrBlockListID = m_htIndexList.Get_Hash_Box_Data(szKey);
 
-        if (NULL != pCurrBlockListID && INVAILD_BLOCKID != *pCurrBlockListID)
+        if (nullptr != pCurrBlockListID && INVAILD_BLOCKID != *pCurrBlockListID)
         {
             // 删除这个指针在旧容器里面的数据，将这个数据放在最新的容器中。
             m_vecHashContain[*pCurrBlockListID]->Del_Hash_Data(szKey);
@@ -266,7 +266,7 @@ public:
             }
         }
 
-        return NULL;
+        return nullptr;
     }
 
     //轮盘转动
@@ -285,7 +285,7 @@ public:
         }
 
         //得到最后一次需要清除的对象信息
-        if (NULL != m_vecHashContain[nLastBlockID])
+        if (nullptr != m_vecHashContain[nLastBlockID])
         {
             vector<T*> vecEntey;
             m_vecHashContain[nLastBlockID]->Get_All_Used(vecEntey);
@@ -300,7 +300,7 @@ public:
                 Del_TimeWheel_Object(vecEntey[i]);
             }
 
-            if (NULL != m_fn_Timeout_Callback)
+            if (nullptr != m_fn_Timeout_Callback)
             {
                 m_fn_Timeout_Callback(m_pArgContext, vecEntey);
             }
@@ -310,7 +310,7 @@ public:
         }
         else
         {
-            OUR_DEBUG((LM_INFO, "[CTimeWheelLink::Tick]m_vecHashContain is NULL,nLastBlockID=%d.\n", nLastBlockID));
+            OUR_DEBUG((LM_INFO, "[CTimeWheelLink::Tick]m_vecHashContain is nullptr,nLastBlockID=%d.\n", nLastBlockID));
         }
 
         m_nCurrBlockID = nLastBlockID;

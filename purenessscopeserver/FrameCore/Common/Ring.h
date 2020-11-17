@@ -24,10 +24,10 @@ public:
 
     void Close()
     {
-        if(NULL != m_pRingLink)
+        if(nullptr != m_pRingLink)
         {
             delete[] m_pRingLink;
-            m_pRingLink = NULL;
+            m_pRingLink = nullptr;
         }
 
         m_nMaxCount = 0;
@@ -36,13 +36,13 @@ public:
 
     T* GetFreeData()
     {
-        if(NULL != m_pRingLink)
+        if(nullptr != m_pRingLink)
         {
             return reinterpret_cast<T*>(m_pRingLink + m_nIndex);
         }
         else
         {
-            return NULL;
+            return nullptr;
         }
     }
 
@@ -67,7 +67,7 @@ public:
     {
         if(nIndex >= m_nMaxCount)
         {
-            return NULL;
+            return nullptr;
         }
         else
         {
@@ -100,7 +100,7 @@ public:
 private:
     int m_nMaxCount = 0;
     int m_nIndex    = 0;
-    T*  m_pRingLink = NULL;
+    T*  m_pRingLink = nullptr;
 };
 
 #endif

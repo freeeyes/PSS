@@ -16,17 +16,17 @@ bool CMakePacket::PutMessageBlock(_MakePacket const& objMakePacket, const ACE_Ti
     CWorkThreadMessage* pMessage = App_MessageServiceGroup::instance()->CreateMessage(objMakePacket.m_u4ConnectID, 
         objMakePacket.m_emPacketType);
 
-    if(NULL == pMessage)
+    if(nullptr == pMessage)
     {
         //回收PacketParse中的包头包体内存
-        if(NULL != objMakePacket.m_pPacketParse)
+        if(nullptr != objMakePacket.m_pPacketParse)
         {
-            if(NULL != objMakePacket.m_pPacketParse->GetMessageHead())
+            if(nullptr != objMakePacket.m_pPacketParse->GetMessageHead())
             {
                 App_MessageBlockManager::instance()->Close(objMakePacket.m_pPacketParse->GetMessageHead());
             }
 
-            if(NULL != objMakePacket.m_pPacketParse->GetMessageBody())
+            if(nullptr != objMakePacket.m_pPacketParse->GetMessageBody())
             {
                 App_MessageBlockManager::instance()->Close(objMakePacket.m_pPacketParse->GetMessageBody());
             }
@@ -34,7 +34,7 @@ bool CMakePacket::PutMessageBlock(_MakePacket const& objMakePacket, const ACE_Ti
             objMakePacket.m_pPacketParse->Clear();
         }
 
-        OUR_DEBUG((LM_ERROR,"[CMakePacket::PutMessageBlock] pMessage is NULL.\n"));
+        OUR_DEBUG((LM_ERROR,"[CMakePacket::PutMessageBlock] pMessage is nullptr.\n"));
         return false;
     }
 
@@ -112,7 +112,7 @@ void CMakePacket::SetMessage(_MakePacket const& objMakePacket, CWorkThreadMessag
             pWorkThreadMessage->m_u2Cmd         = CLINET_LINK_SU_DISCONNECT;
         }
 
-        if (NULL != objMakePacket.m_pPacketParse)
+        if (nullptr != objMakePacket.m_pPacketParse)
         {
             pWorkThreadMessage->m_pmbRecvHead = objMakePacket.m_pPacketParse->GetMessageHead();
             pWorkThreadMessage->m_pmbRecvBody = objMakePacket.m_pPacketParse->GetMessageBody();
@@ -131,7 +131,7 @@ void CMakePacket::SetMessage(_MakePacket const& objMakePacket, CWorkThreadMessag
     }
     else
     {
-        OUR_DEBUG((LM_ERROR, "[CMakePacket::SetMessage] ConnectID = %d, pMessage->GetMessageBase() is NULL.\n", objMakePacket.m_u4ConnectID));
+        OUR_DEBUG((LM_ERROR, "[CMakePacket::SetMessage] ConnectID = %d, pMessage->GetMessageBase() is nullptr.\n", objMakePacket.m_u4ConnectID));
     }
 }
 
@@ -149,9 +149,9 @@ bool CMakePacket::PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBo
 {
     CWorkThreadMessage* pMessage = App_MessageServiceGroup::instance()->CreateMessage(u4ConnectID, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
 
-    if(NULL == pMessage)
+    if(nullptr == pMessage)
     {
-        OUR_DEBUG((LM_ERROR, "[CMakePacket::PutSendErrorMessage] pMessage is NULL.\n"));
+        OUR_DEBUG((LM_ERROR, "[CMakePacket::PutSendErrorMessage] pMessage is nullptr.\n"));
         App_MessageBlockManager::instance()->Close(pBodyMessage);
         return false;
     }
