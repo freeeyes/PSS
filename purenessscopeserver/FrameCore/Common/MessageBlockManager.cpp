@@ -1,10 +1,5 @@
 #include "MessageBlockManager.h"
 
-CMessageBlockManager::CMessageBlockManager(void)
-{
-    //不在使用内存对象池技术，在线程锁频繁的情况下影响数据处理速度
-}
-
 void CMessageBlockManager::Init() 
 {
     m_u4UsedSize = 0;

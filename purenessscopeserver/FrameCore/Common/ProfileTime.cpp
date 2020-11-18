@@ -8,10 +8,7 @@ CProfileTime::CProfileTime(void)
     ::QueryPerformanceFrequency(&m_liPerfStart);
     ::QueryPerformanceFrequency(&m_liPerfStop);
 #endif
-}
-
-CProfileTime::~CProfileTime(void)
-{
+    m_blIsRun = false;
 }
 
 bool CProfileTime::Start()
@@ -21,7 +18,7 @@ bool CProfileTime::Start()
 #else
     m_HighResTimer.start();
 #endif
-
+    m_blIsRun = true;
     return true;
 }
 
@@ -36,6 +33,8 @@ uint64 CProfileTime::Stop()
 
     uint64 u8TimeCost = 0;
     m_HighResTimer.elapsed_time(u8TimeCost);
+
+    m_blIsRun = false;
     return u8TimeCost;
 #endif
 }

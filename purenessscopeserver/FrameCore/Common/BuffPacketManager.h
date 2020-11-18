@@ -15,7 +15,7 @@ class CBuffPacketManager : public CObjectPoolManager<CBuffPacket, ACE_Recursive_
 {
 public:
     CBuffPacketManager() = default;
-    virtual ~CBuffPacketManager() = default;
+    ~CBuffPacketManager() final = default;
 
     static void Init_Callback(int nIndex, CBuffPacket* pBuffPacket);
     static void Close_Callback(int nIndex, CBuffPacket* pBuffPacket);
@@ -33,5 +33,5 @@ private:
     vector<_Object_Create_Info> m_objCreateList;
 };
 
-typedef ACE_Singleton<CBuffPacketManager, ACE_Null_Mutex> App_BuffPacketManager;
+using App_BuffPacketManager = ACE_Singleton<CBuffPacketManager, ACE_Null_Mutex>;
 #endif

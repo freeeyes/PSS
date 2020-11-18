@@ -13,7 +13,6 @@ class CProfileTime
 {
 public:
     CProfileTime(void);
-    ~CProfileTime(void);
 
     bool       Start();               //开始计时
     uint64     Stop();                //结束计时，并返回处理时间，单位是纳秒
@@ -26,6 +25,7 @@ private:
 #else
     ACE_High_Res_Timer m_HighResTimer;
 #endif
+    bool m_blIsRun = false;
 
 };
 #endif

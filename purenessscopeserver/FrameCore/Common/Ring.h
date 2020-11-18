@@ -2,16 +2,20 @@
 #define _RING_H
 
 //实现环状数据的完整读写
+//在现代C++中，使用vector替换可变数组。array是静态替换的方法
 //add by freeeyes
+
 #include <stdio.h>
+#include <memory>
+#include <vector>
+
+using namespace std;
 
 template <class T>
 class CRingLink
 {
 public:
-    CRingLink()
-    {
-    }
+    CRingLink() = default;
 
     void Init(int nMaxCount)
     {
@@ -19,36 +23,25 @@ public:
 
         m_nMaxCount = nMaxCount;
         m_nIndex    = 0;
-        m_pRingLink = new T[nMaxCount];
+
+        for (int i = 0; i < m_nMaxCount; i++)
+        {
+            auto t = std::make_shared<T>();
+            m_pRingLink.emplace_back(t);
+        }
     }
 
     void Close()
     {
-        if(nullptr != m_pRingLink)
-        {
-            delete[] m_pRingLink;
-            m_pRingLink = nullptr;
-        }
+        m_pRingLink.clear();
 
         m_nMaxCount = 0;
         m_nIndex    = 0;
     }
 
-    T* GetFreeData()
+    std::shared_ptr<T> GetFreeData()
     {
-        if(nullptr != m_pRingLink)
-        {
-            return reinterpret_cast<T*>(m_pRingLink + m_nIndex);
-        }
-        else
-        {
-            return nullptr;
-        }
-    }
-
-    void Clear()
-    {
-        memset(m_pRingLink, 0, sizeof(T)*m_nMaxCount);
+        return m_pRingLink[m_nIndex];
     }
 
     void Add()
@@ -63,28 +56,21 @@ public:
         }
     }
 
-    T* GetLinkData(int nIndex)
+    std::shared_ptr<T> GetLinkData(int nIndex)
     {
-        if(nIndex >= m_nMaxCount)
-        {
-            return nullptr;
-        }
-        else
-        {
-            int nCurrIndex = (m_nIndex - 1 - nIndex) % m_nMaxCount;
+        int nCurrIndex = (m_nIndex - 1 - nIndex) % m_nMaxCount;
 
-            if(nCurrIndex < 0)
-            {
-                nCurrIndex = m_nMaxCount + nCurrIndex;
-            }
-
-            return reinterpret_cast<T*>(m_pRingLink + nCurrIndex);
+        if (nCurrIndex < 0)
+        {
+            nCurrIndex = m_nMaxCount + nCurrIndex;
         }
+
+        return m_pRingLink[nCurrIndex];
     }
 
-    T* GetBase()
+    std::shared_ptr<T> GetBase()
     {
-        return m_pRingLink;
+        return m_pRingLink[0];
     }
 
     int GetCount() const
@@ -100,7 +86,7 @@ public:
 private:
     int m_nMaxCount = 0;
     int m_nIndex    = 0;
-    T*  m_pRingLink = nullptr;
+    vector<std::shared_ptr<T>> m_pRingLink;
 };
 
 #endif

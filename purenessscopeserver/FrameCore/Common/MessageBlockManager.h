@@ -24,18 +24,18 @@
 class CMessageBlockManager : public IMessageBlockManager
 {
 public:
-    CMessageBlockManager(void);
+    CMessageBlockManager(void) = default;
 
     void Init();
     void Close();
 
-    virtual ACE_Message_Block* Create(uint32 u4Size);
-    virtual bool Close(ACE_Message_Block* pMessageBlock, uint32 u4BlockLen = 0);
+    ACE_Message_Block* Create(uint32 u4Size) final;
+    bool Close(ACE_Message_Block* pMessageBlock, uint32 u4BlockLen = 0) final;
 
     uint32 GetUsedSize() const;
 private:
     uint32 m_u4UsedSize = 0;
 };
 
-typedef ACE_Singleton<CMessageBlockManager,ACE_Null_Mutex> App_MessageBlockManager;
+using App_MessageBlockManager = ACE_Singleton<CMessageBlockManager,ACE_Null_Mutex>;
 #endif

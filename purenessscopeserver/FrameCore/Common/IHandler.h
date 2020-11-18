@@ -10,7 +10,7 @@
 class IHandler
 {
 public:
-	virtual ~IHandler() {};
+	virtual ~IHandler() = default;
 
 	virtual void Close(uint32 u4ConnectID) = 0;
 

@@ -31,12 +31,12 @@ public:
     }
 };
 
-typedef vector<_ForbiddenIP> VecForbiddenIP;
+using VecForbiddenIP = vector<_ForbiddenIP>;
 
 class CForbiddenIP
 {
 public:
-    CForbiddenIP();
+    CForbiddenIP() = default;
 
     bool Init(const char* szConfigPath);                                                    //初始化加载永久封停IP文件
     bool CheckIP(const char* pIP, EM_CONNECT_IO_TYPE u1ConnectType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);                       //检测IP是否可以链接
@@ -56,6 +56,6 @@ private:
     VecForbiddenIP m_VecTempForbiddenIP;              //临时封停的IP列表
 };
 
-typedef ACE_Singleton<CForbiddenIP, ACE_Null_Mutex> App_ForbiddenIP;
+using App_ForbiddenIP = ACE_Singleton<CForbiddenIP, ACE_Null_Mutex>;
 
 #endif

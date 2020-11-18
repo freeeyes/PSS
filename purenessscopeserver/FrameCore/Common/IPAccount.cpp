@@ -54,21 +54,12 @@ CIPAccount::CIPAccount()
 
 void CIPAccount::Close()
 {
-    for (int32 i = 0; i < m_objIPList.Get_Count(); i++)
-    {
-        const _IPAccount* pIPAccount = m_objIPList.Pop();
-        SAFE_DELETE(pIPAccount);
-    }
-
-    m_objIPList.Close();
+    m_objIPList.clear();
 }
 
 void CIPAccount::Init(uint32 u4IPCount)
 {
     m_u4MaxConnectCount = u4IPCount;
-
-    //初始化HashTable
-    m_objIPList.Init((int32)u4IPCount);
 
     ACE_Date_Time  dtNowTime;
     m_u2CurrTime = (uint16)dtNowTime.minute();
@@ -89,32 +80,21 @@ bool CIPAccount::AddIP(string strIP)
     //看看需要不需要判定，如果需要，则进行IP统计
     if (m_u4MaxConnectCount > 0)
     {
-        _IPAccount* pIPAccount = m_objIPList.Get_Hash_Box_Data(strIP.c_str());
-
-        if (nullptr == pIPAccount)
+        auto f = m_objIPList.find(strIP.c_str());
+        if (f == m_objIPList.end())
         {
             //没有找到，添加
-            pIPAccount = new _IPAccount();
+            auto pIPAccount = std::make_shared<_IPAccount>();
 
             pIPAccount->m_strIP = strIP;
             pIPAccount->Add(dtNowTime);
 
-            //查看缓冲是否已满
-            if (m_objIPList.Get_Count() == m_objIPList.Get_Used_Count()
-                || -1 == m_objIPList.Add_Hash_Data(strIP.c_str(), pIPAccount))
-            {
-                //暂时不处理
-                OUR_DEBUG((LM_INFO, "[CIPAccount::AddIP]Add_Hash_Data(%s) is error.\n", strIP.c_str()));
-                SAFE_DELETE(pIPAccount);
-                blRet = false;
-            }
-            else
-            {
-                blRet = true;
-            }
+            //添加入队列
+            m_objIPList[strIP] = pIPAccount;
         }
         else
         {
+            auto pIPAccount = f->second;
             pIPAccount->Add(dtNowTime);
 
             if ((uint32)pIPAccount->m_nCount >= m_u4MaxConnectCount)
@@ -138,7 +118,7 @@ bool CIPAccount::AddIP(string strIP)
 
 int32 CIPAccount::GetCount()
 {
-    return m_objIPList.Get_Used_Count();
+    return (int32)m_objIPList.size();
 }
 
 uint32 CIPAccount::GetLastConnectCount()
@@ -160,16 +140,13 @@ uint32 CIPAccount::GetLastConnectCount()
 void CIPAccount::GetInfo(vecIPAccount& VecIPAccount)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
-    vector<_IPAccount* > vecIPAccount;
-    m_objIPList.Get_All_Used(vecIPAccount);
 
-    for (const _IPAccount* pIPAccount : vecIPAccount)
-    {
-        if (nullptr != pIPAccount)
-        {
-            VecIPAccount.push_back(*pIPAccount);
-        }
-    }
+    for_each(m_objIPList.begin(), m_objIPList.end(), [&VecIPAccount](const std::pair<string, shared_ptr<_IPAccount>>& iter) {
+        _IPAccount objIPAccount;
+        auto pIPAccount = iter.second;
+        objIPAccount = *pIPAccount;
+        VecIPAccount.push_back(objIPAccount);
+        });
 }
 
 void CIPAccount::Clear_Hash_Data(uint16 u2NowTime, const ACE_Date_Time& dtNowTime)
@@ -194,36 +171,20 @@ void CIPAccount::Clear_Hash_Data(uint16 u2NowTime, const ACE_Date_Time& dtNowTim
     if (u2NowTime - m_u2CurrTime >= 10)
     {
         //清理Hash数组
-        vector<_IPAccount* > vecIPAccount;
-        m_objIPList.Get_All_Used(vecIPAccount);
+        hashmapIPAccount::iterator b = m_objIPList.begin();
+        hashmapIPAccount::iterator e = m_objIPList.end();
 
-        for(_IPAccount* pIPAccount : vecIPAccount)
+        for (; b != e; ++b)
         {
-            if (true == pIPAccount->Check(dtNowTime))
+            if (false == b->second->Check(dtNowTime))
             {
-                continue;
+                m_objIPList.erase(b++);
             }
-
-			if (-1 == m_objIPList.Del_Hash_Data(pIPAccount->m_strIP.c_str()))
-			{
-				OUR_DEBUG((LM_INFO, "[CIPAccount::AddIP]Del_Hash_Data(%s) is error.\n", pIPAccount->m_strIP.c_str()));
-			}
-
-			SAFE_DELETE(pIPAccount);
         }
     }
 }
 
 //*********************************************************
-
-CConnectAccount::CConnectAccount()
-{
-}
-
-CConnectAccount::~CConnectAccount()
-{
-}
-
 uint32 CConnectAccount::Get4ConnectMin() const
 {
     return m_u4ConnectMin;

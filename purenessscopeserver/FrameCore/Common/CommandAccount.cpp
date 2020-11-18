@@ -199,18 +199,16 @@ bool CCommandAccount::SaveCommandDataLog()
 
     AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_COMMANDDATA, "<Command Data Account[%s]>", m_strName.c_str());
 
-
-    for (hashmapCommandData::iterator iter = m_objCommandDataList.begin();
-        iter != m_objCommandDataList.end(); iter++)
-    {
-        auto pCommandData = iter->second;
-        if(pCommandData != nullptr)
+    //使用lambda表达式遍历map
+    for_each(m_objCommandDataList.begin(), m_objCommandDataList.end(), [](const std::pair<string, shared_ptr<_CommandData>>& iter) {
+        auto pCommandData = iter.second;
+        if (pCommandData != nullptr)
         {
             ACE_Date_Time dtLastTime(pCommandData->m_tvCommandTime);
             ACE_TString   strCommandType;
             ACE_TString   strPacketType;
 
-            if(pCommandData->m_u1CommandType == COMMAND_TYPE_IN)
+            if (pCommandData->m_u1CommandType == COMMAND_TYPE_IN)
             {
                 strCommandType = "Server In Data";
             }
@@ -219,7 +217,7 @@ bool CCommandAccount::SaveCommandDataLog()
                 strCommandType = "Server Out Data";
             }
 
-            if(pCommandData->m_u1PacketType == EM_CONNECT_IO_TYPE::CONNECT_IO_TCP)
+            if (pCommandData->m_u1PacketType == EM_CONNECT_IO_TYPE::CONNECT_IO_TCP)
             {
                 strPacketType = "TCP";
             }
@@ -229,16 +227,15 @@ bool CCommandAccount::SaveCommandDataLog()
             }
 
             AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_COMMANDDATA, "CommandID=0x%04x, CommandType=%s, CommandCount=%d, CommandCost=%lldns, PacketType=%s, PacketSize=%d, CommandLastTime=%04d-%02d-%02d %02d:%02d:%02d%",
-                                                  (int32)pCommandData->m_u2CommandID,
-                                                  strCommandType.c_str(),
-                                                  (int32)pCommandData->m_u4CommandCount,
-                                                  pCommandData->m_u8CommandCost,
-                                                  strPacketType.c_str(),
-                                                  pCommandData->m_u4PacketSize,
-                                                  dtLastTime.year(), dtLastTime.month(), dtLastTime.day(), dtLastTime.hour(), dtLastTime.minute(), dtLastTime.second());
-
+                (int32)pCommandData->m_u2CommandID,
+                strCommandType.c_str(),
+                (int32)pCommandData->m_u4CommandCount,
+                pCommandData->m_u8CommandCost,
+                strPacketType.c_str(),
+                pCommandData->m_u4PacketSize,
+                dtLastTime.year(), dtLastTime.month(), dtLastTime.day(), dtLastTime.hour(), dtLastTime.minute(), dtLastTime.second());
         }
-    }
+        });
 
     AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_COMMANDDATA, "<(%s)Command Data Account End>", "CCommandAccount");
 
@@ -250,16 +247,14 @@ uint32 CCommandAccount::GetFlowIn()
     uint32 u4FlowIn = 0;
 
     //遍历HashMap
-    for (hashmapPortAccount::iterator iter = m_objectPortAccount.begin();
-         iter != m_objectPortAccount.end(); iter++)
-    {
-        auto p_Port_Data_Account = (*iter).second;
+    for_each(m_objectPortAccount.begin(), m_objectPortAccount.end(), [&u4FlowIn](const std::pair<uint16, shared_ptr<_Port_Data_Account>>& iter) {
+        auto p_Port_Data_Account = iter.second;
 
         if (nullptr != p_Port_Data_Account)
         {
             u4FlowIn += p_Port_Data_Account->GetFlowIn();
         }
-    }
+        });
 
     return u4FlowIn;
 }
@@ -269,16 +264,14 @@ uint32 CCommandAccount::GetFlowOut()
     uint32 u4FlowOut = 0;
 
     //遍历HashMap
-    for (hashmapPortAccount::iterator iter = m_objectPortAccount.begin();
-         iter != m_objectPortAccount.end(); iter++)
-    {
-        auto p_Port_Data_Account = (*iter).second;
+    for_each(m_objectPortAccount.begin(), m_objectPortAccount.end(), [&u4FlowOut](const std::pair<uint16, shared_ptr<_Port_Data_Account>>& iter) {
+        auto p_Port_Data_Account = iter.second;
 
         if (nullptr != p_Port_Data_Account)
         {
             u4FlowOut += p_Port_Data_Account->GetFlowOut();
         }
-    }
+        });
 
     return u4FlowOut;
 }
@@ -296,17 +289,16 @@ void CCommandAccount::GetCommandAlertData(vecCommandAlertData& CommandAlertDataL
 void CCommandAccount::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_Account)
 {
     vec_Port_Data_Account.clear();
-    _Port_Data_Account obj_Port_Data_Account;
+    
 
-    for (hashmapPortAccount::iterator iter = m_objectPortAccount.begin();
-         iter != m_objectPortAccount.end(); iter++)
-    {
-        auto p_Port_Data_Account = (*iter).second;
+    for_each(m_objectPortAccount.begin(), m_objectPortAccount.end(), [&vec_Port_Data_Account](const std::pair<uint16, shared_ptr<_Port_Data_Account>>& iter) {
+        auto p_Port_Data_Account = iter.second;
 
+        _Port_Data_Account obj_Port_Data_Account;
         if (nullptr != p_Port_Data_Account)
         {
             obj_Port_Data_Account = *p_Port_Data_Account;
             vec_Port_Data_Account.push_back(obj_Port_Data_Account);
         }
-    }
+        });
 }

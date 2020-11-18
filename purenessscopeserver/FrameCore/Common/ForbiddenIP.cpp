@@ -1,10 +1,5 @@
 #include "ForbiddenIP.h"
 
-CForbiddenIP::CForbiddenIP()
-{
-
-}
-
 bool CForbiddenIP::Init(const char* szConfigPath)
 {
     OUR_DEBUG((LM_INFO, "[CForbiddenIP::Init]Filename = %s.\n", szConfigPath));

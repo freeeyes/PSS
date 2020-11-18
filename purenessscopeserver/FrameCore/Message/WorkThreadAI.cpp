@@ -59,7 +59,7 @@ bool CWorkThreadAI::SaveTimeout(uint16 u2CommandID, uint32 u4TimeCost)
         _CommandTime* pCheckCommandTime = new _CommandTime();
         pCheckCommandTime->m_u2CommandID = u2CommandID;
         pCheckCommandTime->m_objTime.Init(m_u4WTTimeoutCount);
-        _CommandTimeout* pCommandTimeout = pCheckCommandTime->m_objTime.GetFreeData();
+        shared_ptr<_CommandTimeout> pCommandTimeout = pCheckCommandTime->m_objTime.GetFreeData();
 
         if(nullptr != pCommandTimeout)
         {
@@ -212,7 +212,7 @@ int CWorkThreadAI::Do_Command_Account(uint16 u2CommandID, uint64 u8Now, uint32 u
         }
 
         //首先添加一个到环里面
-        _CommandTimeout* pCommandTimeout = pCommandTime->m_objTime.GetFreeData();
+        shared_ptr<_CommandTimeout> pCommandTimeout = pCommandTime->m_objTime.GetFreeData();
 
         if (nullptr != pCommandTimeout)
         {
@@ -224,7 +224,7 @@ int CWorkThreadAI::Do_Command_Account(uint16 u2CommandID, uint64 u8Now, uint32 u
         pCommandTime->m_objTime.Add();
 
         //在判断当前环里面最后一个时间是否在间隔时间内
-        const _CommandTimeout* pCommandLastTimeout = pCommandTime->m_objTime.GetLinkData(m_u4WTTimeoutCount - 1);
+        const shared_ptr<_CommandTimeout> pCommandLastTimeout = pCommandTime->m_objTime.GetLinkData(m_u4WTTimeoutCount - 1);
 
         if (nullptr != pCommandLastTimeout)
         {

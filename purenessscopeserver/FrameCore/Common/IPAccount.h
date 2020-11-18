@@ -10,8 +10,8 @@
 #include <string>
 #include "ace/Date_Time.h"
 #include "define.h"
-#include "HashTable.h"
 #include "ace/Recursive_Thread_Mutex.h"
+#include <unordered_map>
 
 //IP访问统计模块
 class _IPAccount
@@ -31,7 +31,7 @@ public:
     bool Check(ACE_Date_Time const& dtNowTime) const;
 };
 
-typedef vector<_IPAccount> vecIPAccount;
+using vecIPAccount = vector<_IPAccount>;
 
 class CIPAccount
 {
@@ -54,24 +54,24 @@ private:
     //定时清理Hash数组
     void Clear_Hash_Data(uint16 u2NowTime, const ACE_Date_Time& dtNowTime);
 
+    using hashmapIPAccount = unordered_map<string, shared_ptr<_IPAccount>>;
+
     uint32                           m_u4MaxConnectCount  = 0;                 //每秒允许的最大连接数，前提是m_nNeedCheck = 0;才会生效
     uint32                           m_u4CurrConnectCount = 0;                 //当前连接总数
     uint32                           m_u4LastConnectCount = 0;                 //之前一分钟的连接总数记录
     uint16                           m_u2CurrTime         = 0;                 //当前时间
     uint8                            m_u1Minute           = 0;                 //当前分钟数
-    CHashTable<_IPAccount>           m_objIPList;                              //IP统计信息
+    hashmapIPAccount                 m_objIPList;                              //IP统计信息
     ACE_Recursive_Thread_Mutex       m_ThreadLock;                             //多线程锁
 };
 
-typedef ACE_Singleton<CIPAccount, ACE_Recursive_Thread_Mutex> App_IPAccount;
+using App_IPAccount = ACE_Singleton<CIPAccount, ACE_Recursive_Thread_Mutex>;
 
 //单位时间连接数统计
 class CConnectAccount
 {
 public:
-    CConnectAccount();
-
-    ~CConnectAccount();
+    CConnectAccount() = default;
 
     uint32 Get4ConnectMin() const;
 
@@ -105,5 +105,5 @@ private:
     uint8  m_u1Minute         = 0;   //当前分钟数
 };
 
-typedef ACE_Singleton<CConnectAccount, ACE_Recursive_Thread_Mutex> App_ConnectAccount;
+using App_ConnectAccount = ACE_Singleton<CConnectAccount, ACE_Recursive_Thread_Mutex>;
 #endif

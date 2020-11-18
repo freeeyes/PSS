@@ -39,6 +39,6 @@ private:
     ACE_Recursive_Thread_Mutex     m_ThreadWriteLock;
     CPerformanceCounter            m_PerformanceCounter;
 };
-typedef ACE_Singleton<CMakePacket, ACE_Null_Mutex> App_MakePacket;
+using App_MakePacket = ACE_Singleton<CMakePacket, ACE_Null_Mutex>;
 
 #endif

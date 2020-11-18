@@ -11,7 +11,7 @@ public:
 	uint32              m_u4ConnectID     = 0;                                   //链接ID
 	uint32              m_u4PacketParseID = 0;                                   //对应ConnectID的PacketParseID
 	int32               m_nHashID         = 0;                                   //对应记录hash的ID
-	CPacketParse*       m_pPacketParse    = nullptr;                                //数据包数据指针
+	CPacketParse*       m_pPacketParse    = nullptr;                             //数据包数据指针
 	EM_CONNECT_IO_TYPE  m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP;  //数据包类型
 	uint8               m_u1Option        = 0;                                   //操作类型
 	ACE_INET_Addr       m_AddrRemote;                                            //数据包的来源IP信息
@@ -19,9 +19,7 @@ public:
 	IHandler*           m_pHandler        = nullptr;                             //当前Handler句柄名称
 	ACE_Time_Value      m_tvRecv;                                                //接收数据的时间 
 
-	_MakePacket()
-	{
-	}
+	_MakePacket() = default;
 
 	void Clear()
 	{
