@@ -18,7 +18,7 @@ public:
     virtual void run() = 0;
 };
 
-using TimerFunctor = std::function<void(ITimerInfo*)>;
+using TimerFunctor = std::function<void(shared_ptr<ITimerInfo>)>;
 
 //节点信息
 class CTimerNodeInfo
@@ -54,27 +54,25 @@ public:
     }
 
 public:
-    int timer_id_;                            //定时器ID
-    milliseconds timer_interval_;             //具体时间间隔
-    steady_clock::time_point next_time_;      //下一次执行时间
-    steady_clock::time_point begin_time_;     //定时器开始时间
-    TimerFunctor timer_function_;             //定时器执行函数
-    ITimerInfo*  function_arg_;               //执行函数参数
+    int timer_id_ = 0;                                           //定时器ID
+    milliseconds             timer_interval_ = milliseconds(0);  //具体时间间隔
+    steady_clock::time_point next_time_ = steady_clock::now();   //下一次执行时间
+    steady_clock::time_point begin_time_ = steady_clock::now();  //定时器开始时间
+    TimerFunctor             timer_function_;                    //定时器执行函数
+    shared_ptr<ITimerInfo>   function_arg_;                      //执行函数参数
 };
 
 //镜像信息
 class CRunNodeInfo
 {
 public:
-    CRunNodeInfo() : timer_id_(0), curr_time_(steady_clock::now()), timer_interval_(0), function_arg_(nullptr)
-    {
-    };
+    CRunNodeInfo() = default;
 
-    int                      timer_id_;
-    steady_clock::time_point curr_time_;
-    microseconds             timer_interval_;
-    TimerFunctor             timer_function_;             //定时器执行函数
-    ITimerInfo*              function_arg_;               //执行函数参数
+    int                      timer_id_       = 0;
+    steady_clock::time_point curr_time_      = steady_clock::now();
+    microseconds             timer_interval_ = microseconds(0);
+    TimerFunctor             timer_function_ = nullptr;             //定时器执行函数
+    shared_ptr<ITimerInfo>   function_arg_   = nullptr;             //执行函数参数
 };
 
 class CTimerNodeList
@@ -86,7 +84,7 @@ public:
     };
     ~CTimerNodeList() {};
 
-    void add_timer_node_info(int timer_id, milliseconds interval, TimerFunctor f, ITimerInfo* arg)
+    void add_timer_node_info(int timer_id, milliseconds interval, TimerFunctor f, shared_ptr<ITimerInfo> arg)
     {
         std::shared_ptr<CTimerNodeInfo> timer_node_info = std::make_shared<CTimerNodeInfo>();
         steady_clock::time_point timer_now = steady_clock::now();

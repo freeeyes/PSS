@@ -116,7 +116,7 @@ bool CIPAccount::AddIP(string strIP)
     return blRet;
 }
 
-int32 CIPAccount::GetCount()
+int32 CIPAccount::GetCount() const
 {
     return (int32)m_objIPList.size();
 }
@@ -171,10 +171,7 @@ void CIPAccount::Clear_Hash_Data(uint16 u2NowTime, const ACE_Date_Time& dtNowTim
     if (u2NowTime - m_u2CurrTime >= 10)
     {
         //清理Hash数组
-        hashmapIPAccount::iterator b = m_objIPList.begin();
-        hashmapIPAccount::iterator e = m_objIPList.end();
-
-        for (; b != e; ++b)
+        for (hashmapIPAccount::iterator b = m_objIPList.begin(); b != m_objIPList.end(); ++b)
         {
             if (false == b->second->Check(dtNowTime))
             {

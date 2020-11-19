@@ -200,7 +200,7 @@ bool CCommandAccount::SaveCommandDataLog()
     AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_COMMANDDATA, "<Command Data Account[%s]>", m_strName.c_str());
 
     //使用lambda表达式遍历map
-    for_each(m_objCommandDataList.begin(), m_objCommandDataList.end(), [](const std::pair<string, shared_ptr<_CommandData>>& iter) {
+    for_each(m_objCommandDataList.begin(), m_objCommandDataList.end(), [&](const std::pair<string, shared_ptr<_CommandData>>& iter) {
         auto pCommandData = iter.second;
         if (pCommandData != nullptr)
         {

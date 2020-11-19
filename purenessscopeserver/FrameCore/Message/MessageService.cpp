@@ -597,6 +597,11 @@ uint32 CMessageService::GetThreadID() const
     return m_u4ThreadID;
 }
 
+NAMESPACE::uint32 CMessageService::GetThreadID()
+{
+    return m_u4ThreadID;
+}
+
 uint32 CMessageService::GetHandlerCount()
 {
     return m_objHandlerList.Get_Used_Count();
@@ -1017,8 +1022,6 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
     m_u4LowMask      = u4LowMask;
     m_u2CurrThreadID = 0;
 
-    m_objAllThreadInfo.Init((int)u4ThreadCount);
-
     //时序模式开启
     OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Init]Timing sequence Start.\n"));
 
@@ -1053,11 +1056,6 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
         {
             pMessageService->Init(i, u4MaxQueue, u4LowMask, m_u4HighMask, false);
         }
-
-        //将线程信息放入线程组
-        _ThreadInfo* pThreadInfo = pMessageService->GetThreadInfo();
-
-        m_objAllThreadInfo.AddThreadInfo(i, pThreadInfo);
 
         m_vecMessageService.push_back(pMessageService);
     }
@@ -1124,8 +1122,6 @@ void CMessageServiceGroup::Close()
     }
 
     m_vecMessageService.clear();
-
-    m_objAllThreadInfo.Close();
 
 }
 
@@ -1374,9 +1370,12 @@ void CMessageServiceGroup::GetFlowPortList(vector<CWorkThread_Packet_Info>& vec_
     }
 }
 
-CThreadInfoList* CMessageServiceGroup::GetThreadInfo()
+void CMessageServiceGroup::GetThreadInfo(vector<_ThreadInfo>& vecWorkThreadList)
 {
-    return &m_objAllThreadInfo;
+    for (auto pMessageService : m_vecMessageService)
+    {
+        vecWorkThreadList.emplace_back(*pMessageService->GetThreadInfo());
+    }
 }
 
 uint32 CMessageServiceGroup::GetUsedMessageCount()

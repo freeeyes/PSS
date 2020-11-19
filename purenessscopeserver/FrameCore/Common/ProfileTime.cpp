@@ -1,15 +1,14 @@
 #include "ProfileTime.h"
 
+#if PSS_PLATFORM == PLATFORM_WIN
 CProfileTime::CProfileTime(void)
 {
     //在windows下，获得滴答的频率
-#if PSS_PLATFORM == PLATFORM_WIN
     ::QueryPerformanceFrequency(&m_liPerfFreq);
     ::QueryPerformanceFrequency(&m_liPerfStart);
     ::QueryPerformanceFrequency(&m_liPerfStop);
-#endif
-    m_blIsRun = false;
 }
+#endif
 
 bool CProfileTime::Start()
 {

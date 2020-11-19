@@ -12,7 +12,11 @@
 class CProfileTime
 {
 public:
+#if PSS_PLATFORM != PLATFORM_WIN
+    CProfileTime(void) = default;
+#else
     CProfileTime(void);
+#endif
 
     bool       Start();               //开始计时
     uint64     Stop();                //结束计时，并返回处理时间，单位是纳秒

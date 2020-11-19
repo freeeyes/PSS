@@ -2,6 +2,9 @@
 #define _THREADINFO_H
 
 #include "define.h"
+#include <vector>
+
+using namespace std;
 
 class _ThreadInfo
 {
@@ -16,28 +19,7 @@ public:
     ACE_Time_Value      m_tvUpdateTime      = ACE_OS::gettimeofday();    //线程最后处理数据的时间
     ACE_Time_Value      m_tvCreateTime      = ACE_OS::gettimeofday();    //线程创建时间
 
-    _ThreadInfo()
-    {
-    }
+    _ThreadInfo() = default;
 };
 
-class CThreadInfoList
-{
-public:
-    CThreadInfoList(void);
-
-    void Init(int nCount);
-
-    bool AddThreadInfo(uint32 u4ThreadID);
-    bool AddThreadInfo(uint32 u4ThreadID, _ThreadInfo* pOrcThreadInfo);
-    int  GetThreadCount() const;
-    _ThreadInfo* GetThreadInfo(uint32 u4ThreadID);
-    _ThreadInfo* GetThreadInfo();
-    bool CloseThread(uint32 u4ThreadID);
-    void Close();
-
-private:
-    _ThreadInfo** m_pAllThreadInfo = nullptr;
-    int           m_nThreadCount   = 0;
-};
 #endif

@@ -1,9 +1,5 @@
 #include "SendMessage.h"
 
-CSendMessagePool::CSendMessagePool(void)
-{
-}
-
 void CSendMessagePool::Init(int32 nObjcetCount)
 {
     Close();

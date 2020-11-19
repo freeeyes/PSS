@@ -1,9 +1,5 @@
 #include "ServerMessageTask.h"
 
-CServerMessageInfoPool::CServerMessageInfoPool()
-{
-}
-
 void CServerMessageInfoPool::Init(uint32 u4PacketCount /*= MAX_SERVER_MESSAGE_INFO_COUNT*/)
 {
     Close();
@@ -176,7 +172,7 @@ int CServerMessageTask::svc(void)
         ACE_Message_Block* mb = nullptr;
         ACE_OS::last_error(0);
 
-        if(getq(mb, 0) == -1)
+        if(getq(mb, nullptr) == -1)
         {
             OUR_DEBUG((LM_ERROR,"[CMessageService::svc] getq error errno = [%d].\n", ACE_OS::last_error()));
             m_blRun = false;
@@ -459,7 +455,7 @@ void CServerMessageManager::Init()
 {
     if(nullptr == m_pServerMessageTask)
     {
-        m_pServerMessageTask = new CServerMessageTask();
+        m_pServerMessageTask = std::make_shared<CServerMessageTask>();
     }
 }
 
@@ -481,13 +477,11 @@ int CServerMessageManager::Close()
 {
     if(nullptr != m_pServerMessageTask)
     {
+        OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::Close]SAFE_DELETE Begin.\n"));
         if (0 != m_pServerMessageTask->Close())
         {
             OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::Close]Close error.\n"));
         }
-
-        OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::Close]SAFE_DELETE Begin.\n"));
-        SAFE_DELETE(m_pServerMessageTask);
         OUR_DEBUG((LM_DEBUG, "[CServerMessageManager::Close]SAFE_DELETE End.\n"));
         return 0;
     }

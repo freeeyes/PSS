@@ -102,12 +102,12 @@ class CMessageService : public ACE_Task<ACE_MT_SYNCH>
 public:
     CMessageService();
 
-    virtual int handle_signal (int signum,
-                               siginfo_t*  = 0,
-                               ucontext_t* = 0);
+    int handle_signal (int signum,
+                       siginfo_t*  = nullptr,
+                       ucontext_t* = nullptr) final;
 
     int open();
-    virtual int svc (void);
+    int svc (void) final;
     int Close();
 
     void Init(uint32 u4ThreadID, uint32 u4MaxQueue = MAX_MSG_THREADQUEUE, uint32 u4LowMask = MAX_MSG_MASK, uint32 u4HighMask = MAX_MSG_MASK, bool blIsCpuAffinity = false);
@@ -150,6 +150,8 @@ public:
 
     void Check_Handler_Recv_Timeout();                                        //检查终端连接时间超时
     EM_Client_Connect_status GetConnectState(uint32 u4ConnectID);             //得到当前连接状态 
+
+    uint32 GetThreadID();
 
 private:
     bool ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4ThreadID); //处理接收事件
@@ -210,7 +212,7 @@ public:
     void Close();
 
     bool Start();
-    CThreadInfoList* GetThreadInfo();
+    void GetThreadInfo(vector<_ThreadInfo>& vecWorkThreadList);
     uint32 GetUsedMessageCount();
 
     uint32 GetWorkThreadCount() const;                                                        //得到当前工作线程的数量
@@ -259,7 +261,6 @@ private:
     uint16                                              m_u2ThreadTimeCheck    = 0;              //线程自检时间
     uint16                                              m_u2CurrThreadID       = 0;              //当前轮询到的线程ID
     uint16                                              m_u2CpuNumber          = 0;              //当前CPU的核数
-    CThreadInfoList                                     m_objAllThreadInfo;        //当前所有线程信息
     CMessageDyeingManager                               m_objMessageDyeingManager; //数据染色类
     ACE_Recursive_Thread_Mutex                          m_ThreadLock;              //用于线程操作的线程锁，保证CurrThreadID的数据正常
 };

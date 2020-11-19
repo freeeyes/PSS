@@ -8,7 +8,7 @@
 #include <time.h>
 #include "date.h"
 
-enum em_timer_events_state
+enum class em_timer_events_state
 {
     em_execute_timer = 0,     //执行定时器事件
     em_insert_timer,          //添加定时器
@@ -56,16 +56,13 @@ inline std::string get_curr_time()
 class CTimerEvents
 {
 public:
-    CTimerEvents() : em_timer_events_state_(em_execute_timer), timer_id_(0), timer_interval_(0), function_arg_(nullptr)
-    {
+    CTimerEvents() = default;
 
-    }
-
-    em_timer_events_state em_timer_events_state_;
-    int timer_id_;
-    milliseconds timer_interval_;
-    TimerFunctor timer_function_;
-    ITimerInfo*  function_arg_;
+    em_timer_events_state em_timer_events_state_ = em_timer_events_state::em_execute_timer;
+    int timer_id_                                = 0;
+    milliseconds            timer_interval_      = milliseconds(0);
+    TimerFunctor            timer_function_      = nullptr;
+    shared_ptr<ITimerInfo>  function_arg_        = nullptr;
 };
 
 class CTimerThreadInfo
@@ -173,7 +170,7 @@ static void timer_thread_run(CTimerThreadInfo* timer_thread_info)
 
         for (auto f : timer_events_temp_list_)
         {
-            if (em_insert_timer == f.em_timer_events_state_)
+            if (em_timer_events_state::em_insert_timer == f.em_timer_events_state_)
             {
                 std::cout << "[timer_thread_run]add_timer_id = " << f.timer_id_ << endl;
                 timer_thread_info->timer_node_list_.add_timer_node_info(f.timer_id_,
@@ -200,10 +197,10 @@ static void timer_thread_run(CTimerThreadInfo* timer_thread_info)
 class CTimerManager : public ITSTimerManager
 {
 public:
-    CTimerManager() {};
-    virtual ~CTimerManager() {};
+    CTimerManager() = default;
+    ~CTimerManager() final = default;
 
-    virtual bool Add_Timer(int timer_id, milliseconds timer_interval, TimerFunctor&& f, ITimerInfo* arg)
+    bool Add_Timer(int timer_id, milliseconds timer_interval, TimerFunctor&& f, shared_ptr<ITimerInfo> arg) final
     {
         //如果线程没有启动，则启动定时器线程
         run();
@@ -211,7 +208,7 @@ public:
         std::lock_guard <std::mutex> lock(timer_thread_info_.thread_mutex_);
 
         CTimerEvents timer_event;
-        timer_event.em_timer_events_state_ = em_insert_timer;
+        timer_event.em_timer_events_state_ = em_timer_events_state::em_insert_timer;
         timer_event.timer_id_ = timer_id;
         timer_event.timer_interval_ = timer_interval;
         timer_event.timer_function_ = std::move(f);
@@ -224,12 +221,12 @@ public:
         return true;
     };
 
-    virtual bool Del_Timer(int timer_id)
+    bool Del_Timer(int timer_id) final
     {
         std::lock_guard <std::mutex> lock(timer_thread_info_.thread_mutex_);
 
         CTimerEvents timer_event;
-        timer_event.em_timer_events_state_ = em_delete_timer;
+        timer_event.em_timer_events_state_ = em_timer_events_state::em_delete_timer;
         timer_event.timer_id_ = timer_id;
         timer_event.timer_interval_ = milliseconds(0);
         timer_thread_info_.timer_events_list_.push_back(timer_event);
@@ -238,12 +235,12 @@ public:
         return true;
     };
 
-    virtual bool Pause()
+    virtual bool Pause() final
     {
         return true;
     };
 
-    virtual bool Restore()
+    virtual bool Restore() final
     {
         return true;
     };

@@ -30,7 +30,7 @@ enum class ENUM_FORWARD_TYPE
 class CForwardInfo
 {
 public:
-    CForwardInfo() {};
+    CForwardInfo() = default;
 
     string m_strSource;
     string m_strTarget;
@@ -39,9 +39,7 @@ public:
 class CForwardConnectInfo
 {
 public:
-    CForwardConnectInfo()
-    {
-    };
+    CForwardConnectInfo() = default;
 
     string            m_strSource;
     string            m_strTarget;
@@ -54,7 +52,7 @@ public:
 class CForwardManager
 {
 public:
-    CForwardManager();
+    CForwardManager() = default;
 
     void Close();
 
@@ -77,12 +75,12 @@ private:
 
     IDeviceHandler* Get_Device_Handler(string strTarget);
 
-    typedef unordered_map<string, CForwardConnectInfo*> mapForwardConnectList;
+    using mapForwardConnectList = unordered_map<string, shared_ptr<CForwardConnectInfo>>;
     vector<CForwardInfo> m_vecForwardInfo;          //需要关注的转发接口信息
     mapForwardConnectList m_mapForwardConnectList;
     int m_nActive = 0;
 };
 
-typedef ACE_Singleton<CForwardManager, ACE_Null_Mutex> App_ForwardManager;
+using App_ForwardManager = ACE_Singleton<CForwardManager, ACE_Null_Mutex>;
 
 #endif

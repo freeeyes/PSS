@@ -44,7 +44,7 @@ public:
 
     bool AddIP(string strIP);
 
-    int32 GetCount();
+    int32 GetCount() const;
 
     uint32 GetLastConnectCount();
 

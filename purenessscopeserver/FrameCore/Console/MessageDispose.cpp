@@ -398,42 +398,35 @@ void DoMessage_WorkThreadState(const _CommandInfo& CommandInfo, IBuffPacket* pBu
     }
 
     //获得当前工作线程状态
-    CThreadInfoList* pThreadInfo = App_MessageServiceGroup::instance()->GetThreadInfo();
+    vector<_ThreadInfo> vecWorkThreadList;
+    App_MessageServiceGroup::instance()->GetThreadInfo(vecWorkThreadList);
 
-    if (nullptr ==  pThreadInfo)
+    (*pBuffPacket) << (uint8)vecWorkThreadList.size();
+
+    for (auto pCurrThreadInfo : vecWorkThreadList)
     {
-        return;
-    }
-
-    int nThreadCount = pThreadInfo->GetThreadCount();
-    (*pBuffPacket) << (uint8)nThreadCount;
-
-    for (int i = 0; i < nThreadCount; i++)
-    {
-        const _ThreadInfo* pCurrThreadInfo = pThreadInfo->GetThreadInfo(i);
-
         if (CommandInfo.m_u1OutputType == 0)
         {
-            (*pBuffPacket) << (uint8)i;
-            (*pBuffPacket) << (uint32)pCurrThreadInfo->m_tvUpdateTime.sec();
-            (*pBuffPacket) << (uint32)pCurrThreadInfo->m_tvCreateTime.sec();
-            (*pBuffPacket) << (uint8)pCurrThreadInfo->m_u4State;
-            (*pBuffPacket) << pCurrThreadInfo->m_u4RecvPacketCount;
-            (*pBuffPacket) << pCurrThreadInfo->m_u2CommandID;
-            (*pBuffPacket) << pCurrThreadInfo->m_u2PacketTime;
-            (*pBuffPacket) << pCurrThreadInfo->m_u4CurrPacketCount;
+            (*pBuffPacket) << (uint8)pCurrThreadInfo.m_u4ThreadID;
+            (*pBuffPacket) << (uint32)pCurrThreadInfo.m_tvUpdateTime.sec();
+            (*pBuffPacket) << (uint32)pCurrThreadInfo.m_tvCreateTime.sec();
+            (*pBuffPacket) << (uint8)pCurrThreadInfo.m_u4State;
+            (*pBuffPacket) << pCurrThreadInfo.m_u4RecvPacketCount;
+            (*pBuffPacket) << pCurrThreadInfo.m_u2CommandID;
+            (*pBuffPacket) << pCurrThreadInfo.m_u2PacketTime;
+            (*pBuffPacket) << pCurrThreadInfo.m_u4CurrPacketCount;
         }
         else
         {
             std::stringstream ss_format;
-            ss_format << "ThreadID(" << i << ")\n"
-                << "ThreadUpdateTime(" << pCurrThreadInfo->m_tvUpdateTime.sec() << ")\n"
-                << "ThreadCreateTime(" << pCurrThreadInfo->m_tvCreateTime.sec() << ")\n"
-                << "ThreadState(" << (int)pCurrThreadInfo->m_u4State << ")\n"
-                << "ThreadRecvPacketCount(" << pCurrThreadInfo->m_u4RecvPacketCount << ")\n"
-                << "ThreadCommandID(" << pCurrThreadInfo->m_u2CommandID << ")\n"
-                << "ThreadPacketTime(" << pCurrThreadInfo->m_u2PacketTime << ")\n"
-                << "ThreadCurrPacketCount(" << pCurrThreadInfo->m_u4CurrPacketCount << ")\n";
+            ss_format << "ThreadID(" << pCurrThreadInfo.m_u4ThreadID << ")\n"
+                << "ThreadUpdateTime(" << pCurrThreadInfo.m_tvUpdateTime.sec() << ")\n"
+                << "ThreadCreateTime(" << pCurrThreadInfo.m_tvCreateTime.sec() << ")\n"
+                << "ThreadState(" << (int)pCurrThreadInfo.m_u4State << ")\n"
+                << "ThreadRecvPacketCount(" << pCurrThreadInfo.m_u4RecvPacketCount << ")\n"
+                << "ThreadCommandID(" << pCurrThreadInfo.m_u2CommandID << ")\n"
+                << "ThreadPacketTime(" << pCurrThreadInfo.m_u2PacketTime << ")\n"
+                << "ThreadCurrPacketCount(" << pCurrThreadInfo.m_u4CurrPacketCount << ")\n";
             string strLineText = ss_format.str();
             pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
@@ -806,7 +799,7 @@ void DoMessage_ShowServerInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuf
 
 
             //返回工作线程个数
-            (*pBuffPacket) << (uint16)App_MessageServiceGroup::instance()->GetThreadInfo()->GetThreadCount();
+            (*pBuffPacket) << (uint16)App_MessageServiceGroup::instance()->GetWorkThreadCount();
 
             //返回当前协议包的版本号
             auto u1PacketVersionLen = (uint8)GetXmlConfigAttribute(xmlServerVersion)->Version.length();
@@ -852,7 +845,7 @@ void DoMessage_ShowServerInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuf
                 << "ServerName(" << GetXmlConfigAttribute(xmlServerName)->name << ")\n"
                 << "ServerVersion(" << GetXmlConfigAttribute(xmlServerVersion)->Version << ")\n"
                 << "ServerModuleCount(" << App_ModuleLoader::instance()->GetCurrModuleCount() << ")\n"
-                << "WorkthreadCount(" << App_MessageServiceGroup::instance()->GetThreadInfo()->GetThreadCount() << ")\n"
+                << "WorkthreadCount(" << App_MessageServiceGroup::instance()->GetWorkThreadCount() << ")\n"
                 << "CharOrder(" << strCharOrder << ")\n";
             string strLineText = ss_format.str();
             pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());

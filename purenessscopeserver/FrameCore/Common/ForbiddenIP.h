@@ -26,9 +26,7 @@ public:
     string             m_strClientIP;                                                  //被禁止的IP
     ACE_Time_Value     m_tvBegin                 = ACE_OS::gettimeofday();             //时段禁止开始时间
 
-    _ForbiddenIP()
-    {
-    }
+    _ForbiddenIP() = default;
 };
 
 using VecForbiddenIP = vector<_ForbiddenIP>;

@@ -78,7 +78,7 @@ const uint32 MAX_SERVER_MESSAGE_INFO_COUNT = 100;
 class CServerMessageInfoPool
 {
 public:
-    CServerMessageInfoPool();
+    CServerMessageInfoPool() = default;
 
     void Init(uint32 u4PacketCount = MAX_SERVER_MESSAGE_INFO_COUNT);
     void Close();
@@ -102,9 +102,9 @@ public:
     CServerMessageTask();
 
     int open();
-    virtual int svc (void);
+    int svc (void) final;
 
-    virtual int handle_signal (int signum,siginfo_t*   = 0,ucontext_t* = 0);
+    int handle_signal (int signum,siginfo_t*   = nullptr, ucontext_t* = nullptr) final;
 
     bool Start();
     int  Close();
@@ -139,7 +139,7 @@ private:
 
     //记录当前有效的IClientMessage，因为是异步的关系。
     //这里必须保证回调的时候IClientMessage是合法的。
-    typedef vector<IClientMessage*> vecValidIClientMessage;
+    using vecValidIClientMessage = vector<IClientMessage*>;
     vecValidIClientMessage m_vecValidIClientMessage;
 };
 
@@ -159,10 +159,10 @@ public:
     bool DelClientMessage(IClientMessage* pClientMessage);
 
 private:
-    CServerMessageTask*         m_pServerMessageTask = nullptr;
-    ACE_Recursive_Thread_Mutex  m_ThreadWritrLock;
+    shared_ptr<CServerMessageTask> m_pServerMessageTask = nullptr;
+    ACE_Recursive_Thread_Mutex     m_ThreadWritrLock;
 };
 
-typedef ACE_Singleton<CServerMessageManager, ACE_Recursive_Thread_Mutex> App_ServerMessageTask;
-typedef ACE_Singleton<CServerMessageInfoPool, ACE_Recursive_Thread_Mutex> App_ServerMessageInfoPool;
+using App_ServerMessageTask = ACE_Singleton<CServerMessageManager, ACE_Recursive_Thread_Mutex>;
+using App_ServerMessageInfoPool = ACE_Singleton<CServerMessageInfoPool, ACE_Recursive_Thread_Mutex>;
 #endif

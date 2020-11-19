@@ -1,20 +1,11 @@
 #include "TMService.h"
 
-void timer_run_execute(ITimerInfo* timer_info)
+void timer_run_execute(shared_ptr<ITimerInfo> timer_info)
 {
     if (nullptr != timer_info)
     {
         timer_info->run();
     }
-}
-
-CTMService::CTMService()
-{
-}
-
-CTMService::~CTMService()
-{
-
 }
 
 int CTMService::Init(int nNeedLoad)
@@ -46,7 +37,7 @@ int CTMService::Init(int nNeedLoad)
     TiXmlElement* pInterval = nullptr;
     TiXmlElement* pMaxEvent = nullptr;
 
-    m_HashTimerList.Init(m_nTimerMaxCount, MAX_BUFF_100);
+    ACE_UNUSED_ARG(m_nTimerMaxCount);
 
     string szName;
     int  nID           = 0;
@@ -59,7 +50,7 @@ int CTMService::Init(int nNeedLoad)
            && objXmlOperation.Read_XML_Data_Multiple_Int("Timer", "EventMaxCount", nMaxQueueList, pMaxEvent))
     {
         //写入配置文件
-        auto pTimerInfo = new CTimerInfo();
+        auto pTimerInfo = std::make_shared<CTimerInfo>();
 
         pTimerInfo->m_nID                  = nID;
         pTimerInfo->m_szName               = szName;
@@ -67,32 +58,20 @@ int CTMService::Init(int nNeedLoad)
         pTimerInfo->m_nMaxQueueList        = nMaxQueueList;
         pTimerInfo->m_pMessageQueueManager = &m_ThreadQueueManager;
 
-        if (0 > m_HashTimerList.Add_Hash_Data(pTimerInfo->m_szName.c_str(), pTimerInfo))
-        {
-            delete pTimerInfo;
-            return -2;
-        }
+        m_HashTimerList[pTimerInfo->m_szName] = pTimerInfo;
+
+        //插入Timer定时器
+        milliseconds timer_interval = milliseconds(pTimerInfo->m_nInterval);
+        timer_events_.Add_Timer(pTimerInfo->m_nID, timer_interval, timer_run_execute, pTimerInfo);
+
     }
 
-    if (m_HashTimerList.Get_Used_Count() > m_nTimerMaxCount)
+    if (m_HashTimerList.size() > (size_t)m_nTimerMaxCount)
     {
         return -1;
     }
 
     this_thread::sleep_for(std::chrono::milliseconds(100));
-
-    vector<CTimerInfo* > vecInfoList;
-    m_HashTimerList.Get_All_Used(vecInfoList);
-
-
-    //添加定时器
-    auto nTimerSize = (int)vecInfoList.size();
-
-    for (int i = 0; i < nTimerSize; i++)
-    {
-        milliseconds timer_interval = milliseconds(vecInfoList[i]->m_nInterval);
-        timer_events_.Add_Timer(vecInfoList[i]->m_nID, timer_interval, timer_run_execute, vecInfoList[i]);
-    }
 
     //获得当前工作线程配置列表
     m_T2MList.clear();
@@ -134,15 +113,7 @@ int CTMService::Init(int nNeedLoad)
 void CTMService::Close()
 {
     //清空
-    vector<CTimerInfo* > vecInfoList;
-    m_HashTimerList.Get_All_Used(vecInfoList);
-
-    for (const CTimerInfo * pTimerList : vecInfoList)
-    {
-        SAFE_DELETE(pTimerList);
-    }
-
-    m_HashTimerList.Close();
+    m_HashTimerList.clear();
 
     m_ThreadQueueManager.Close();
 
@@ -159,13 +130,14 @@ int CTMService::AddMessage(const char* pName, unsigned long long nMessagePos, lo
         return -2;
     }
 
-    CTimerInfo* pTimerInfo = m_HashTimerList.Get_Hash_Box_Data(strName.c_str());
+    auto f =m_HashTimerList.find(strName.c_str());
 
-    if (nullptr == pTimerInfo)
+    if (m_HashTimerList.end() == f)
     {
         return -1;
     }
 
+    auto pTimerInfo = f->second;
     if ((int)pTimerInfo->m_vecEventsList.size() >= pTimerInfo->m_nMaxQueueList)
     {
         return -1;
@@ -223,12 +195,14 @@ void* CTMService::DeleteMessage(const char* pName, unsigned long long nMessagePo
         return nullptr;
     }
 
-    CTimerInfo* pTimerInfo = m_HashTimerList.Get_Hash_Box_Data(strName.c_str());
+    auto f = m_HashTimerList.find(strName.c_str());
 
-    if (nullptr == pTimerInfo)
+    if (m_HashTimerList.end() == f)
     {
         return nullptr;
     }
+
+    auto pTimerInfo = f->second;
 
     return pTimerInfo->DeleteEventInfo(nMessagePos);
 }

@@ -9,8 +9,6 @@
 #include <memory>
 #include <vector>
 
-using namespace std;
-
 template <class T>
 class CRingLink
 {
@@ -86,7 +84,7 @@ public:
 private:
     int m_nMaxCount = 0;
     int m_nIndex    = 0;
-    vector<std::shared_ptr<T>> m_pRingLink;
+    std::vector<std::shared_ptr<T>> m_pRingLink;
 };
 
 #endif
