@@ -1,17 +1,11 @@
 #include "ConsolePromiss.h"
 
-CConsolePromissions::CConsolePromissions()
-{
-
-}
-
 void CConsolePromissions::Init(const char* pFileName)
 {
     CXmlOpeation m_ConcoleConfig;
 
     //初始化队列
     Close();
-    m_objHashCommandList.Init(MAX_COMSOLE_COMMAND_COUNT);
 
     if (false == m_ConcoleConfig.Init(pFileName))
     {
@@ -27,24 +21,19 @@ void CConsolePromissions::Init(const char* pFileName)
         const char* pCommandNameData = nullptr;
         const char* pUserData        = nullptr;
 
-        auto pConsole_Command_Info = new _Console_Command_Info();
+        auto pConsole_Command_Info = std::make_shared<_Console_Command_Info>();
         pCommandNameData = m_ConcoleConfig.GetData("CommandInfo", "CommandName", pNextTiXmlCommandName);
         pUserData = m_ConcoleConfig.GetData("CommandInfo", "User", pNextTiXmlUser);
 
         if (nullptr == pCommandNameData || nullptr == pUserData)
         {
-            SAFE_DELETE(pConsole_Command_Info);
             break;
         }
 
         pConsole_Command_Info->m_strCommand = pCommandNameData;
         pConsole_Command_Info->m_strUser    = pUserData;
 
-        if (-1 == m_objHashCommandList.Add_Hash_Data(pConsole_Command_Info->m_strCommand.c_str(), pConsole_Command_Info))
-        {
-            SAFE_DELETE(pConsole_Command_Info);
-            OUR_DEBUG((LM_INFO, "[CConsolePromissions::Init](%s)Add error.\n", pConsole_Command_Info->m_strCommand.c_str()));
-        }
+        m_objHashCommandList[pConsole_Command_Info->m_strCommand] = pConsole_Command_Info;
     }
 }
 
@@ -52,27 +41,21 @@ void CConsolePromissions::Close()
 {
     //清理配置列表
     vector<_Console_Command_Info*> vecConsoleCommandList;
-    m_objHashCommandList.Get_All_Used(vecConsoleCommandList);
 
-    auto u4Size = (uint32)vecConsoleCommandList.size();
-
-    for (uint32 i = 0; i < u4Size; i++)
-    {
-        SAFE_DELETE(vecConsoleCommandList[i]);
-    }
-
-    m_objHashCommandList.Close();
+    m_objHashCommandList.clear();
 }
 
 int CConsolePromissions::Check_Promission(const char* pCommandName, const char* pUser)
 {
-    auto pConsole_Command_Info = m_objHashCommandList.Get_Hash_Box_Data(pCommandName);
-
-    if (nullptr == pConsole_Command_Info)
+    auto f = m_objHashCommandList.find(pCommandName);
+    
+    if (m_objHashCommandList.end() == f)
     {
         OUR_DEBUG((LM_INFO, "[CConsolePromissions::Check_Promission](%s)CommandName is nullptr.\n", pCommandName));
         return -1;
     }
+
+    auto pConsole_Command_Info = f->second;
 
     return Check_Split_User(pUser, pConsole_Command_Info->m_strUser.c_str());
 }

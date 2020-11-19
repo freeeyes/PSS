@@ -15,7 +15,7 @@
 #include <string>
 
 //命令处理返回值类型定义
-enum
+enum class EM_CONSOLE_MESSAGE
 {
     CONSOLE_MESSAGE_SUCCESS = 0,
     CONSOLE_MESSAGE_FAIL    = 1,
@@ -33,9 +33,7 @@ public:
     string m_strCommandExp;                         //处理命令扩展参数
     string m_strUser  = {'\0'};                     //用户信息
 
-    _CommandInfo()
-    {
-    }
+    _CommandInfo() = default;
 };
 
 //文件名结构
@@ -46,9 +44,7 @@ public:
     string m_strFileName;
     string m_strFileParam;
 
-    _FileInfo()
-    {
-    }
+    _FileInfo() = default;
 };
 
 //监听端口信息
@@ -60,9 +56,7 @@ public:
     uint8  m_u1IPType                = TYPE_IPV4;
     string m_strListenIP;
 
-    _ListenInfo()
-    {
-    }
+    _ListenInfo() = default;
 };
 
 //染色IP信息

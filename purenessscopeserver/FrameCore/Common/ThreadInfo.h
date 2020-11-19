@@ -2,9 +2,6 @@
 #define _THREADINFO_H
 
 #include "define.h"
-#include <vector>
-
-using namespace std;
 
 class _ThreadInfo
 {

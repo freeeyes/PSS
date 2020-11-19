@@ -33,7 +33,7 @@ bool CUnit_ConsoleMessage::Create_Command(const char* pCommand, uint16 u2ReturnC
     pmb->wr_ptr(ACE_OS::strlen(pCommand));
 
     //Ö´ÐÐÃüÁî
-    if (CONSOLE_MESSAGE_SUCCESS != m_pConsoleMessage->Dispose(pmb, pBuffPacket, u1Output))
+    if (EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_SUCCESS != m_pConsoleMessage->Dispose(pmb, pBuffPacket, u1Output))
     {
         std::stringstream ss_format;
         ss_format << "[Create_Command](" << pCommand << ")m_pConsoleMessage->Dispose.";
@@ -84,7 +84,7 @@ bool CUnit_ConsoleMessage::Create_Command_Error(const char* pCommand)
     pmb->wr_ptr(ACE_OS::strlen(pCommand));
 
     //Ö´ÐÐÃüÁî
-    if (CONSOLE_MESSAGE_FAIL != m_pConsoleMessage->Dispose(pmb, pBuffPacket, u1Output))
+    if (EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_FAIL != m_pConsoleMessage->Dispose(pmb, pBuffPacket, u1Output))
     {
         char szError[MAX_BUFF_200] = { '\0' };
         sprintf_safe(szError, MAX_BUFF_200, "[Create_Command_Error](%s)m_pConsoleMessage->Dispose.", pCommand);

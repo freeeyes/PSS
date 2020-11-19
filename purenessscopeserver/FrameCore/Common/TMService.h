@@ -16,7 +16,7 @@ public:
 
     int AddMessage(const char* pName, unsigned long long nMessagePos, long sec, long usec, int _Message_id, void* _arg, Enum_Timer_Mode emTimerMode = Timer_Mode_Run_Once, IMessagePrecess* pMessagePrecess = nullptr) final;
     void* DeleteMessage(const char* pName, unsigned long long nMessagePos) final;
-    bool GetRun();
+    bool GetRun() final;
 
 private:
     using hashmapPortAccount = unordered_map<string, shared_ptr<CTimerInfo>>;

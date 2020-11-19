@@ -31,6 +31,43 @@ void CCommandAccount::AddCommandAlert(uint16 u2CommandID, uint32 u4Count, uint16
     }
 }
 
+void CCommandAccount::Save_Command_To_File(shared_ptr<_CommandData> pCommandData)
+{
+    if (pCommandData != nullptr)
+    {
+        ACE_Date_Time dtLastTime(pCommandData->m_tvCommandTime);
+        ACE_TString   strCommandType;
+        ACE_TString   strPacketType;
+
+        if (pCommandData->m_u1CommandType == COMMAND_TYPE_IN)
+        {
+            strCommandType = "Server In Data";
+        }
+        else
+        {
+            strCommandType = "Server Out Data";
+        }
+
+        if (pCommandData->m_u1PacketType == EM_CONNECT_IO_TYPE::CONNECT_IO_TCP)
+        {
+            strPacketType = "TCP";
+        }
+        else
+        {
+            strPacketType = "UDP";
+        }
+
+        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_COMMANDDATA, "CommandID=0x%04x, CommandType=%s, CommandCount=%d, CommandCost=%lldns, PacketType=%s, PacketSize=%d, CommandLastTime=%04d-%02d-%02d %02d:%02d:%02d%",
+            (int32)pCommandData->m_u2CommandID,
+            strCommandType.c_str(),
+            (int32)pCommandData->m_u4CommandCount,
+            pCommandData->m_u8CommandCost,
+            strPacketType.c_str(),
+            pCommandData->m_u4PacketSize,
+            dtLastTime.year(), dtLastTime.month(), dtLastTime.day(), dtLastTime.hour(), dtLastTime.minute(), dtLastTime.second());
+    }
+}
+
 void CCommandAccount::Close()
 {
     OUR_DEBUG((LM_ERROR, "CCommandAccount::Close]Begin.\n"));
@@ -200,41 +237,9 @@ bool CCommandAccount::SaveCommandDataLog()
     AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_COMMANDDATA, "<Command Data Account[%s]>", m_strName.c_str());
 
     //使用lambda表达式遍历map
-    for_each(m_objCommandDataList.begin(), m_objCommandDataList.end(), [&](const std::pair<string, shared_ptr<_CommandData>>& iter) {
-        auto pCommandData = iter.second;
-        if (pCommandData != nullptr)
-        {
-            ACE_Date_Time dtLastTime(pCommandData->m_tvCommandTime);
-            ACE_TString   strCommandType;
-            ACE_TString   strPacketType;
-
-            if (pCommandData->m_u1CommandType == COMMAND_TYPE_IN)
-            {
-                strCommandType = "Server In Data";
-            }
-            else
-            {
-                strCommandType = "Server Out Data";
-            }
-
-            if (pCommandData->m_u1PacketType == EM_CONNECT_IO_TYPE::CONNECT_IO_TCP)
-            {
-                strPacketType = "TCP";
-            }
-            else
-            {
-                strPacketType = "UDP";
-            }
-
-            AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_COMMANDDATA, "CommandID=0x%04x, CommandType=%s, CommandCount=%d, CommandCost=%lldns, PacketType=%s, PacketSize=%d, CommandLastTime=%04d-%02d-%02d %02d:%02d:%02d%",
-                (int32)pCommandData->m_u2CommandID,
-                strCommandType.c_str(),
-                (int32)pCommandData->m_u4CommandCount,
-                pCommandData->m_u8CommandCost,
-                strPacketType.c_str(),
-                pCommandData->m_u4PacketSize,
-                dtLastTime.year(), dtLastTime.month(), dtLastTime.day(), dtLastTime.hour(), dtLastTime.minute(), dtLastTime.second());
-        }
+    for_each(m_objCommandDataList.begin(), m_objCommandDataList.end(), [this](const std::pair<string, shared_ptr<_CommandData>>& iter) {
+        //写入文件
+        this->Save_Command_To_File(iter.second);
         });
 
     AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_COMMANDDATA, "<(%s)Command Data Account End>", "CCommandAccount");

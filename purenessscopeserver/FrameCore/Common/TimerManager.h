@@ -10,5 +10,5 @@
 #include "define.h"
 #include "ITimerManager.h"
 
-typedef ACE_Singleton<ActiveTimer, ACE_Null_Mutex> App_TimerManager;
+using App_TimerManager = ACE_Singleton<ActiveTimer, ACE_Null_Mutex>;
 #endif

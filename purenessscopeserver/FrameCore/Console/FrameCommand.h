@@ -7,10 +7,10 @@
 class CFrameCommand : public IFrameCommand
 {
 public:
-    CFrameCommand();
-    virtual ~CFrameCommand();
+    CFrameCommand() = default;
+    ~CFrameCommand() final = default;
 
-    int DoFrameCommand(const char* pCommand, IBuffPacket* pBuffPacket);
+    int DoFrameCommand(const char* pCommand, IBuffPacket* pBuffPacket) final;
 };
 
 #endif

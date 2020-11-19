@@ -41,14 +41,14 @@ bool Console_Common_CheckMessage_Data(uint32& u4AllRecvSize, uint32& u4AllRecvCo
     pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     //将数据Buff放入消息体中，传递给处理类。
-    auto u4Return = (uint32)App_ConsoleManager::instance()->Dispose(pPacketParse->GetMessageBody(), pBuffPacket, u1Output);
+    auto emReturn = App_ConsoleManager::instance()->Dispose(pPacketParse->GetMessageBody(), pBuffPacket, u1Output);
 
-    if (CONSOLE_MESSAGE_SUCCESS == u4Return)
+    if (EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_SUCCESS == emReturn)
     {
         //需要发送返回包
         return true;
     }
-    else if (CONSOLE_MESSAGE_FAIL == u4Return)
+    else if (EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_FAIL == emReturn)
     {
         OUR_DEBUG((LM_INFO, "[CProConsoleHandle::CheckMessage]Dispose CONSOLE_MESSAGE_FAIL.\n"));
         App_BuffPacketManager::instance()->Delete(pBuffPacket);

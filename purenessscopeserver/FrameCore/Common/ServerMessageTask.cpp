@@ -105,23 +105,6 @@ bool CServerMessageTask::Start()
     return true;
 }
 
-int CServerMessageTask::handle_signal (int signum,siginfo_t* siginfo,ucontext_t* ucontext)
-{
-    if (signum == SIGUSR1 + grp_id())
-    {
-        OUR_DEBUG((LM_INFO,"[CServerMessageTask::handle_signal](%d) will be kill.\n", grp_id()));
-
-        if(nullptr != siginfo && nullptr != ucontext)
-        {
-            OUR_DEBUG((LM_INFO,"[CServerMessageTask::handle_signal]siginfo is not nullptr.\n"));
-        }
-
-        ACE_Thread::exit();
-    }
-
-    return 0;
-}
-
 int CServerMessageTask::open()
 {
     m_blRun = true;
@@ -459,7 +442,7 @@ void CServerMessageManager::Init()
     }
 }
 
-bool CServerMessageManager::Start()
+bool CServerMessageManager::Start() const
 {
     if(nullptr != m_pServerMessageTask)
     {
@@ -473,7 +456,7 @@ bool CServerMessageManager::Start()
     }
 }
 
-int CServerMessageManager::Close()
+int CServerMessageManager::Close() const
 {
     if(nullptr != m_pServerMessageTask)
     {
@@ -491,7 +474,7 @@ int CServerMessageManager::Close()
     }
 }
 
-bool CServerMessageManager::PutMessage(_Server_Message_Info* pMessage)
+bool CServerMessageManager::PutMessage(_Server_Message_Info* pMessage) const
 {
     if(nullptr != m_pServerMessageTask)
     {
@@ -524,7 +507,7 @@ bool CServerMessageManager::CheckServerMessageThread(ACE_Time_Value const& tvNow
     }
 }
 
-bool CServerMessageManager::AddClientMessage(IClientMessage* pClientMessage)
+bool CServerMessageManager::AddClientMessage(IClientMessage* pClientMessage) const
 {
     if(nullptr != m_pServerMessageTask)
     {
@@ -534,7 +517,7 @@ bool CServerMessageManager::AddClientMessage(IClientMessage* pClientMessage)
     return false;
 }
 
-bool CServerMessageManager::DelClientMessage(IClientMessage* pClientMessage)
+bool CServerMessageManager::DelClientMessage(IClientMessage* pClientMessage) const
 {
     if(nullptr != m_pServerMessageTask)
     {

@@ -1,9 +1,5 @@
 #include "ConsoleMessage.h"
 
-CConsoleMessage::CConsoleMessage()
-{
-}
-
 int CConsoleMessage::Init()
 {
     m_objConsolePromissions.Init(CONSOLECONFIG);
@@ -61,13 +57,13 @@ int CConsoleMessage::Init()
     return 0;
 }
 
-int CConsoleMessage::Dispose(const ACE_Message_Block* pmb, IBuffPacket* pBuffPacket, uint8& u1OutputType)
+EM_CONSOLE_MESSAGE CConsoleMessage::Dispose(const ACE_Message_Block* pmb, IBuffPacket* pBuffPacket, uint8& u1OutputType)
 {
     //处理命令
     if(nullptr == pmb)
     {
         OUR_DEBUG((LM_ERROR, "[CConsoleMessage::Dispose]pmb is nullptr.\n"));
-        return CONSOLE_MESSAGE_FAIL;
+        return EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_FAIL;
     }
 
     string strCommand;
@@ -80,17 +76,17 @@ int CConsoleMessage::Dispose(const ACE_Message_Block* pmb, IBuffPacket* pBuffPac
     }
 
     //解析命令，把数据切割出来
-    if(CONSOLE_MESSAGE_SUCCESS != ParseCommand(strCommand.c_str(), pBuffPacket, u1OutputType))
+    if(EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_SUCCESS != ParseCommand(strCommand.c_str(), pBuffPacket, u1OutputType))
     {
-        return CONSOLE_MESSAGE_FAIL;
+        return EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_FAIL;
     }
     else
     {
-        return CONSOLE_MESSAGE_SUCCESS;
+        return EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_SUCCESS;
     }
 }
 
-int CConsoleMessage::ParsePlugInCommand(const char* pCommand, IBuffPacket* pBuffPacket) const
+EM_CONSOLE_MESSAGE CConsoleMessage::ParsePlugInCommand(const char* pCommand, IBuffPacket* pBuffPacket) const
 {
     uint8 u1OutputType = 0;
 
@@ -190,7 +186,7 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
     return true;
 }
 
-int CConsoleMessage::ParseCommand_Plugin(const char* pCommand, IBuffPacket* pBuffPacket, uint8& u1OutputType) const
+EM_CONSOLE_MESSAGE CConsoleMessage::ParseCommand_Plugin(const char* pCommand, IBuffPacket* pBuffPacket, uint8& u1OutputType) const
 {
     _CommandInfo CommandInfo;
 
@@ -199,13 +195,13 @@ int CConsoleMessage::ParseCommand_Plugin(const char* pCommand, IBuffPacket* pBuf
     if (nullptr == pCurrBuffPacket)
     {
         OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]pCurrBuffPacket is nullptr.\n"));
-        return CONSOLE_MESSAGE_FAIL;
+        return EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_FAIL;
     }
 
     if (false == GetCommandInfo(pCommand, CommandInfo, false))
     {
         OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]pCommand format is error.\n"));
-        return CONSOLE_MESSAGE_FAIL;
+        return EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_FAIL;
     }
 
     u1OutputType = CommandInfo.m_u1OutputType;
@@ -214,7 +210,7 @@ int CConsoleMessage::ParseCommand_Plugin(const char* pCommand, IBuffPacket* pBuf
     return DoCommand(CommandInfo, pCurrBuffPacket, pBuffPacket);
 }
 
-int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket, uint8& u1OutputType)
+EM_CONSOLE_MESSAGE CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket, uint8& u1OutputType)
 {
     _CommandInfo CommandInfo;
 
@@ -223,14 +219,14 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
     if(nullptr == pCurrBuffPacket)
     {
         OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]pCurrBuffPacket is nullptr.\n"));
-        return CONSOLE_MESSAGE_FAIL;
+        return EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_FAIL;
     }
 
     if(false == GetCommandInfo(pCommand, CommandInfo))
     {
         OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]pCommand format is error.\n"));
         App_BuffPacketManager::instance()->Delete(pCurrBuffPacket);
-        return CONSOLE_MESSAGE_FAIL;
+        return EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_FAIL;
     }
 
     //判断当前命令是否可以执行
@@ -239,7 +235,7 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
     if (0 != nPromission)
     {
         App_BuffPacketManager::instance()->Delete(pCurrBuffPacket);
-        return CONSOLE_MESSAGE_FAIL;
+        return EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_FAIL;
     }
 
     u1OutputType = CommandInfo.m_u1OutputType;
@@ -248,14 +244,14 @@ int CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket
     return DoCommand(CommandInfo, pCurrBuffPacket, pBuffPacket);
 }
 
-int CConsoleMessage::DoCommand(const _CommandInfo& CommandInfo, IBuffPacket* pCurrBuffPacket, IBuffPacket* pReturnBuffPacket) const
+EM_CONSOLE_MESSAGE CConsoleMessage::DoCommand(const _CommandInfo& CommandInfo, IBuffPacket* pCurrBuffPacket, IBuffPacket* pReturnBuffPacket) const
 {
     uint16 u2ReturnCommandID = CONSOLE_COMMAND_UNKNOW;
 
     if (nullptr == pCurrBuffPacket)
     {
         OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]pCurrBuffPacket is nullptr.\n"));
-        return CONSOLE_MESSAGE_FAIL;
+        return EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_FAIL;
     }
 
     //查找并处理指令信息
@@ -278,7 +274,7 @@ int CConsoleMessage::DoCommand(const _CommandInfo& CommandInfo, IBuffPacket* pCu
     if (u4PacketSize == 0 || CONSOLE_COMMAND_UNKNOW == u2ReturnCommandID)
     {
         App_BuffPacketManager::instance()->Delete(pCurrBuffPacket);
-        return CONSOLE_MESSAGE_FAIL;
+        return EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_FAIL;
     }
 
     if (CommandInfo.m_u1OutputType == 0)
@@ -293,7 +289,7 @@ int CConsoleMessage::DoCommand(const _CommandInfo& CommandInfo, IBuffPacket* pCu
         App_BuffPacketManager::instance()->Delete(pCurrBuffPacket);
     }
 
-    return CONSOLE_MESSAGE_SUCCESS;
+    return EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_SUCCESS;
 }
 
 bool CConsoleMessage::SetConsoleKey(vector<xmlConsoleKeys::_ConsoleKey> vecConsoleKeyList)

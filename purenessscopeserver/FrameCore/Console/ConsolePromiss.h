@@ -4,6 +4,7 @@
 #include "define.h"
 #include "HashTable.h"
 #include "XmlOpeation.h"
+#include <unordered_map>
 
 //Console»®œﬁ±Ì
 //add by freeeyes
@@ -24,7 +25,7 @@ public:
 class CConsolePromissions
 {
 public:
-    CConsolePromissions();
+    CConsolePromissions() = default;
 
     void Init(const char* pFileName);
     void Close();
@@ -34,7 +35,8 @@ public:
 private:
     int Check_Split_User(const char* pUser, const char* pUserList) const;
 
-    CHashTable<_Console_Command_Info> m_objHashCommandList;
+    using hashmapCommandInfo = unordered_map <string, shared_ptr<_Console_Command_Info>>;
+    hashmapCommandInfo m_objHashCommandList;
 };
 
 #endif

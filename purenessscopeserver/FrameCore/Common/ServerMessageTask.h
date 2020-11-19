@@ -104,8 +104,6 @@ public:
     int open();
     int svc (void) final;
 
-    int handle_signal (int signum,siginfo_t*   = nullptr, ucontext_t* = nullptr) final;
-
     bool Start();
     int  Close();
 
@@ -150,13 +148,13 @@ public:
 
     void Init();
 
-    bool Start();
-    int  Close();
-    bool PutMessage(_Server_Message_Info* pMessage);
+    bool Start() const;
+    int  Close() const;
+    bool PutMessage(_Server_Message_Info* pMessage) const;
     bool CheckServerMessageThread(ACE_Time_Value const& tvNow) const;
 
-    bool AddClientMessage(IClientMessage* pClientMessage);
-    bool DelClientMessage(IClientMessage* pClientMessage);
+    bool AddClientMessage(IClientMessage* pClientMessage) const;
+    bool DelClientMessage(IClientMessage* pClientMessage) const;
 
 private:
     shared_ptr<CServerMessageTask> m_pServerMessageTask = nullptr;

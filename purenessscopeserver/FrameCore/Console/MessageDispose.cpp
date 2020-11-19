@@ -443,7 +443,7 @@ void DoMessage_ClientInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
 
         //´ýÊµÏÖ
 
-        uint32 u4ConnectCount = (uint32)VecClientConnectInfo.size();
+        auto u4ConnectCount = (uint32)VecClientConnectInfo.size();
         Combo_Common_Head_Data(CommandInfo.m_u1OutputType, u4ConnectCount, "Client IP Count(%d).\n", pBuffPacket);
 
         Combo_Common_vecClientConnectInfo(CommandInfo.m_u1OutputType, VecClientConnectInfo, pBuffPacket);
@@ -550,7 +550,7 @@ void DoMessage_UDPClientInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuff
         vecClientConnectInfo VecClientConnectInfo;
         App_UDPConnectIDManager::instance()->GetClientConnectInfo(VecClientConnectInfo);
 
-        uint32 u4ConnectCount = (uint32)VecClientConnectInfo.size();
+        auto u4ConnectCount = (uint32)VecClientConnectInfo.size();
         Combo_Common_Head_Data(CommandInfo.m_u1OutputType, u4ConnectCount, "UDPClient Count(%d).\n", pBuffPacket);
 
         Combo_Common_vecClientConnectInfo(CommandInfo.m_u1OutputType, VecClientConnectInfo, pBuffPacket);
