@@ -13,16 +13,16 @@ class CUnit_WorkThreadAI : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_WorkThreadAI();
+    CUnit_WorkThreadAI() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_WorkThreadAI(void);
 
 private:
-    CWorkThreadAI* m_pWorkThreadAI = nullptr;
+    shared_ptr<CWorkThreadAI> m_pWorkThreadAI = nullptr;
 };
 
 #endif

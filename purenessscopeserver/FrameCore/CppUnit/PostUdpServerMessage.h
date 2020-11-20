@@ -12,16 +12,12 @@
 class CPostUdpServerData : public IClientUDPMessage
 {
 public:
-    CPostUdpServerData()
-    {
-    }
+    CPostUdpServerData() = default;
 
-    virtual ~CPostUdpServerData()
-    {
-    }
+    ~CPostUdpServerData() final = default;
 
     //这里提供接受数据拼包算法，组成完整数据包后会调用RecvData方法
-    virtual bool RecvData(const char* pData, int nLen, _ClientIPInfo const& objServerIPInfo)
+    bool RecvData(const char* pData, int nLen, _ClientIPInfo const& objServerIPInfo) final
     {
         //数据包已经收全，在这里处理数据
         ACE_UNUSED_ARG(pData);

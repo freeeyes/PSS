@@ -13,16 +13,16 @@ class CUnit_ControlListen : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_ControlListen();
+    CUnit_ControlListen() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_ControlListen(void);
 
 private:
-    CControlListen* m_pControlListen = nullptr;
+    shared_ptr<CControlListen> m_pControlListen = nullptr;
 };
 
 #endif

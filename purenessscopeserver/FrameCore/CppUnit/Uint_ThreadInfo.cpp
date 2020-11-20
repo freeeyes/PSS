@@ -2,17 +2,14 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_ThreadInfo::CUnit_ThreadInfo()
-{
-}
-
 void CUnit_ThreadInfo::setUp(void)
 {
+    m_pThreadInfo = std::make_shared<_ThreadInfo>();
 }
 
 void CUnit_ThreadInfo::tearDown(void)
 {
-    m_pThreadInfo = nullptr;
+    OUR_DEBUG((LM_INFO, "[CUnit_ThreadInfo::tearDown]Finish.\n"));
 }
 
 void CUnit_ThreadInfo::Test_ThreadInfo(void)

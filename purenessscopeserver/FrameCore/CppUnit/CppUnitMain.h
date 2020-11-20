@@ -51,7 +51,7 @@ class CCppUnitMain
 {
 public:
     CCppUnitMain();
-    virtual ~CCppUnitMain();
+    ~CCppUnitMain() = default;
 
     int Run() const;
 };

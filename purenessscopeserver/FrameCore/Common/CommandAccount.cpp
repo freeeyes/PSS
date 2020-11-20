@@ -31,7 +31,7 @@ void CCommandAccount::AddCommandAlert(uint16 u2CommandID, uint32 u4Count, uint16
     }
 }
 
-void CCommandAccount::Save_Command_To_File(shared_ptr<_CommandData> pCommandData)
+void CCommandAccount::Save_Command_To_File(shared_ptr<_CommandData> pCommandData) const
 {
     if (pCommandData != nullptr)
     {

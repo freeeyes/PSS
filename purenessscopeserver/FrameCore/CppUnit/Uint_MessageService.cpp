@@ -2,20 +2,15 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_MessageService::CUnit_MessageService()
-{
-}
-
 void CUnit_MessageService::setUp(void)
 {
-    m_pMessageService = new CMessageService();
+    m_pMessageService = std::make_shared<CMessageService>();
     m_pMessageService->Init(1);
 }
 
 void CUnit_MessageService::tearDown(void)
 {
-    delete m_pMessageService;
-    m_pMessageService = nullptr;
+    OUR_DEBUG((LM_INFO, "[CUnit_MessageService::tearDown]Finish.\n"));
 }
 
 void CUnit_MessageService::Test_MessageService(void)

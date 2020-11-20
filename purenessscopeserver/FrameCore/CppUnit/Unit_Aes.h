@@ -14,11 +14,11 @@ class CUnit_Aes : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_Aes();
+    CUnit_Aes() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_Aes(void);
 
@@ -29,7 +29,7 @@ public:
     int Char2Int(char c) const;
 
 private:
-    AES* m_pAES = nullptr;
+    shared_ptr<AES> m_pAES = nullptr;
     int m_nTestCount = 0;
 };
 

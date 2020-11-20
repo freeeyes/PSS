@@ -2,20 +2,15 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_ProformanceCounter::CUnit_ProformanceCounter()
-{
-}
-
 void CUnit_ProformanceCounter::setUp(void)
 {
-    m_pPerformanceCounter = new CPerformanceCounter();
+    m_pPerformanceCounter = std::make_shared<CPerformanceCounter>();
     m_pPerformanceCounter->init("Test");
 }
 
 void CUnit_ProformanceCounter::tearDown(void)
 {
-    delete m_pPerformanceCounter;
-    m_pPerformanceCounter = nullptr;
+    OUR_DEBUG((LM_INFO, "[CUnit_ProformanceCounter::tearDown]Finish.\n"));
 }
 
 void CUnit_ProformanceCounter::Test_ProformanceCounter(void)

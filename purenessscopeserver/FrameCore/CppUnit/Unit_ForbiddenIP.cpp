@@ -2,19 +2,14 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_ForbiddenIP::CUnit_ForbiddenIP()
-{
-}
-
 void CUnit_ForbiddenIP::setUp(void)
 {
-    m_pForbiddenIP = new CForbiddenIP();
+    m_pForbiddenIP = std::make_shared <CForbiddenIP>();
 }
 
 void CUnit_ForbiddenIP::tearDown(void)
 {
-    delete m_pForbiddenIP;
-    m_pForbiddenIP = nullptr;
+    OUR_DEBUG((LM_INFO, "[CUnit_ForbiddenIP::tearDown]Finish.\n"));
 }
 
 void CUnit_ForbiddenIP::Test_ForbiddenIP(void)

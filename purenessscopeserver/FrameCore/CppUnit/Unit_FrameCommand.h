@@ -13,16 +13,16 @@ class CUnit_FrameCommand: public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_FrameCommand();
+    CUnit_FrameCommand() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_Frame_Command(void);
 
 private:
-    CFrameCommand* m_pFrameCommand = nullptr;
+    shared_ptr<CFrameCommand> m_pFrameCommand = nullptr;
 };
 
 #endif

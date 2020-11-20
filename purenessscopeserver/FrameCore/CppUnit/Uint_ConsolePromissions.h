@@ -13,15 +13,15 @@ class CUnit_ConsolePromissions : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_ConsolePromissions();
+    CUnit_ConsolePromissions() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_Promission_User(void);
 private:
-    CConsolePromissions* m_pConsolePromissions = nullptr;
+    shared_ptr<CConsolePromissions> m_pConsolePromissions = nullptr;
 };
 
 #endif

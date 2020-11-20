@@ -17,11 +17,11 @@ class CUnit_ConnectHandler : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_ConnectHandler();
+    CUnit_ConnectHandler() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_ConnectHandler_Stream(void);
 
@@ -32,7 +32,7 @@ public:
     void Test_ConnectHandler_PostMessage(void);
 
 private:
-    CConnectHandler* m_pConnectHandler = nullptr;
+    shared_ptr<CConnectHandler> m_pConnectHandler = nullptr;
     int m_nTestCount = 0;
 };
 

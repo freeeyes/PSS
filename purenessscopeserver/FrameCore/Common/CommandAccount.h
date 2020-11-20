@@ -170,7 +170,7 @@ public:
     void Init(uint8 u1CommandAccount, uint8 u1Flow, uint16 u2RecvTimeout);
     void AddCommandAlert(uint16 u2CommandID, uint32 u4Count, uint16 u2MailID);
 
-    void Save_Command_To_File(shared_ptr<_CommandData> pCommandData);
+    void Save_Command_To_File(shared_ptr<_CommandData> pCommandData) const;
 
     bool SaveCommandData(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP,
                          uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,

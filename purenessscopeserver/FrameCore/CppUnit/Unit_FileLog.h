@@ -14,18 +14,18 @@ class CUnit_FileLogger : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_FileLogger();
+    CUnit_FileLogger() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_FileLogger(void);
 
     void Test_SendMail(void);
 
 private:
-    CLogFile* m_pLogFile = nullptr;
+    shared_ptr<CLogFile> m_pLogFile = nullptr;
     int m_nTestCount = 0;
 };
 

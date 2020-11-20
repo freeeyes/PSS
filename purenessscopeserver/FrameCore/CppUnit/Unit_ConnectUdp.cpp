@@ -2,10 +2,6 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_ConnectUdp::CUnit_ConnectUdp()
-{
-}
-
 void CUnit_ConnectUdp::setUp(void)
 {
     m_nServerID = 2;

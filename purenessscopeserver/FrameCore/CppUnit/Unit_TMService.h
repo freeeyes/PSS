@@ -9,7 +9,7 @@
 class CTestUser : public IMessagePrecess
 {
 public:
-    void DoMessage(int _message_id, void* _arg)
+    void DoMessage(int _message_id, void* _arg) final
     {
         OUR_DEBUG((LM_INFO, "[CTestUser::DoMessage]_message_id=%d.\n", _message_id));
         int* nData = (int*)_arg;
@@ -24,11 +24,11 @@ class CUnit_TMService : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_TMService();
+    CUnit_TMService() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_TMService(void);
 

@@ -61,11 +61,11 @@ class CUnit_ConsoleMessage : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_ConsoleMessage();
+    CUnit_ConsoleMessage() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_DoMessage_ShowModule(void);
     void Test_DoMessage_ClientMessageCount(void);
@@ -118,7 +118,7 @@ private:
     bool Create_Command(const char* pCommand, uint16 u2ReturnCommandID);
     bool Create_Command_Error(const char* pCommand);
 
-    CConsoleMessage* m_pConsoleMessage = nullptr;
+    shared_ptr<CConsoleMessage> m_pConsoleMessage = nullptr;
     int m_nTestCount = 0;
 };
 

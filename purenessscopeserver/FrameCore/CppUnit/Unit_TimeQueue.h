@@ -10,9 +10,9 @@
 class CTimeTask : public ACE_Task<ACE_MT_SYNCH>
 {
 public:
-    CTimeTask(void);
+    CTimeTask(void) = default;
 
-    virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);
+    int handle_timeout(const ACE_Time_Value& tv, const void* arg) final;
 };
 
 class CUnit_TimerManager : public CppUnit::TestFixture
@@ -22,11 +22,11 @@ class CUnit_TimerManager : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_TimerManager();
+    CUnit_TimerManager() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_TimerManager(void);
 

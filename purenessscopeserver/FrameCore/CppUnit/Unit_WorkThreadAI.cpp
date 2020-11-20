@@ -2,20 +2,15 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_WorkThreadAI::CUnit_WorkThreadAI()
-{
-}
-
 void CUnit_WorkThreadAI::setUp(void)
 {
-    m_pWorkThreadAI = new CWorkThreadAI();
+    m_pWorkThreadAI = std::make_shared<CWorkThreadAI>();
     m_pWorkThreadAI->Init(1, 10, 30, 1, 1, 1, "ff ff");
 }
 
 void CUnit_WorkThreadAI::tearDown(void)
 {
-    delete m_pWorkThreadAI;
-    m_pWorkThreadAI = nullptr;
+    OUR_DEBUG((LM_INFO, "[CUnit_WorkThreadAI::tearDown]Finish.\n"));
 }
 
 void CUnit_WorkThreadAI::Test_WorkThreadAI(void)

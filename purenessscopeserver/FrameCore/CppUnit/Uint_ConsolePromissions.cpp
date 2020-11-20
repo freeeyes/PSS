@@ -2,20 +2,15 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_ConsolePromissions::CUnit_ConsolePromissions()
-{
-}
-
 void CUnit_ConsolePromissions::setUp(void)
 {
-    m_pConsolePromissions = new CConsolePromissions();
+    m_pConsolePromissions = std::make_shared<CConsolePromissions>();
     m_pConsolePromissions->Init(CONSOLECONFIG);
 }
 
 void CUnit_ConsolePromissions::tearDown(void)
 {
-    delete m_pConsolePromissions;
-    m_pConsolePromissions = nullptr;
+    OUR_DEBUG((LM_INFO, "[CUnit_ConsolePromissions::tearDown]Finish.\n"));
 }
 
 void CUnit_ConsolePromissions::Test_Promission_User(void)

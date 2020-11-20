@@ -14,16 +14,16 @@ class CUnit_ServerMessageManager : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_ServerMessageManager();
+    CUnit_ServerMessageManager() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_ServerMessageManager(void);
 
 private:
-    CServerMessageManager* m_pServerMessageManager = nullptr;
+    shared_ptr<CServerMessageManager> m_pServerMessageManager = nullptr;
 };
 
 #endif

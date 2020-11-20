@@ -2,19 +2,15 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_ConsoleMessage::CUnit_ConsoleMessage()
-{
-}
-
 void CUnit_ConsoleMessage::setUp(void)
 {
-    m_pConsoleMessage = new CConsoleMessage();
+    m_pConsoleMessage = std::make_shared<CConsoleMessage>();
     m_pConsoleMessage->Init();
 }
 
 void CUnit_ConsoleMessage::tearDown(void)
 {
-    SAFE_DELETE(m_pConsoleMessage);
+    OUR_DEBUG((LM_INFO, "[CUnit_ConsoleMessage::tearDown]Finish.\n"));
 }
 
 bool CUnit_ConsoleMessage::Create_Command(const char* pCommand, uint16 u2ReturnCommandID)

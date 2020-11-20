@@ -2,20 +2,16 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_IPAccount::CUnit_IPAccount()
-{
-}
-
 void CUnit_IPAccount::setUp(void)
 {
-    m_pIPAccount = new CIPAccount();
+    m_pIPAccount = std::make_shared<CIPAccount>();
 
     m_pIPAccount->Init(10);
 }
 
 void CUnit_IPAccount::tearDown(void)
 {
-    SAFE_DELETE(m_pIPAccount);
+    OUR_DEBUG((LM_INFO, "[CUnit_IPAccount::tearDown]Finish.\n"));
 }
 
 void CUnit_IPAccount::Test_IPAccount_Add(void)

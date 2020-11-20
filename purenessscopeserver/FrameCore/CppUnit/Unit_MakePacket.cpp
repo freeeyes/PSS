@@ -2,19 +2,14 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_MakePacket::CUnit_MakePacket()
-{
-}
-
 void CUnit_MakePacket::setUp(void)
 {
-    m_pMakePacket = new CMakePacket();
+    m_pMakePacket = std::make_shared<CMakePacket>();
 }
 
 void CUnit_MakePacket::tearDown(void)
 {
-    delete m_pMakePacket;
-    m_pMakePacket = nullptr;
+    OUR_DEBUG((LM_INFO, "[CUnit_MakePacket::tearDown]Finish.\n"));
 }
 
 void CUnit_MakePacket::Test_MakePacket(void)

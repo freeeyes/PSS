@@ -46,11 +46,6 @@ CCppUnitMain::CCppUnitMain()
     CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CUnit_ProformanceCounter, "pss");
 }
 
-CCppUnitMain::~CCppUnitMain()
-{
-
-}
-
 int CCppUnitMain::Run() const
 {
     ofstream out(CPPUNIT_REPORT_PATH);

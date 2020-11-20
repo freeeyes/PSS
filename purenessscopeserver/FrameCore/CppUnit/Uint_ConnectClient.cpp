@@ -2,19 +2,14 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_ConnectClient::CUnit_ConnectClient()
-{
-}
-
 void CUnit_ConnectClient::setUp(void)
 {
-    m_pConnectClient = new CConnectClient();
+    m_pConnectClient = std::make_shared<CConnectClient>();
 }
 
 void CUnit_ConnectClient::tearDown(void)
 {
-    delete m_pConnectClient;
-    m_pConnectClient = nullptr;
+    OUR_DEBUG((LM_INFO, "[CUnit_ConnectClient::tearDown]Finish.\n"));
 }
 
 void CUnit_ConnectClient::Test_handle_input(void)

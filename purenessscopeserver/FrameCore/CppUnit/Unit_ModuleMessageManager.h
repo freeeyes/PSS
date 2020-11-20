@@ -14,18 +14,18 @@ class CUnit_ModuleMessageManager : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_ModuleMessageManager();
+    CUnit_ModuleMessageManager() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_SendModuleMessage(void);  //测试模块间数据发送
 
     void Test_SendFrameMessage(void);   //测试消息队列
 
 private:
-    CModuleMessageManager* m_pModuleMessageManager = nullptr;
+    shared_ptr<CModuleMessageManager> m_pModuleMessageManager = nullptr;
 };
 
 #endif

@@ -13,16 +13,16 @@ class CUnit_ThreadInfo : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_ThreadInfo();
+    CUnit_ThreadInfo() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_ThreadInfo(void);
 
 private:
-    _ThreadInfo* m_pThreadInfo = nullptr;
+    shared_ptr<_ThreadInfo> m_pThreadInfo = nullptr;
 };
 
 #endif

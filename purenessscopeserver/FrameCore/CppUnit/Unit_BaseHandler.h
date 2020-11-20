@@ -19,11 +19,11 @@ class CUnit_Basehandler : public CppUnit::TestFixture
     CPPUNIT_TEST(Test_Tcp_Common_Make_Send_Packet);
     CPPUNIT_TEST_SUITE_END();
 public:
-    CUnit_Basehandler();
+    CUnit_Basehandler() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_Tcp_Common_File_Message(void);
     void Test_Tcp_Common_ClientInfo(void);

@@ -12,15 +12,11 @@
 class CPostServerData : public IClientMessage
 {
 public:
-    CPostServerData()
-    {
-    }
+    CPostServerData() = default;
 
-    virtual ~CPostServerData()
-    {
-    }
+    ~CPostServerData() final = default;
 
-    virtual bool Need_Send_Format()
+    bool Need_Send_Format() final
     {
         //如果需要调用发送组装函数，则这里返回true
         //不需要的话这里返回false，Send_Format_data函数就不会被调用
@@ -28,7 +24,7 @@ public:
     }
 
     //处理服务期间发送数据的组装
-    virtual bool Send_Format_data(char* pData, uint32 u4Len, IMessageBlockManager* pMessageBlockManager, ACE_Message_Block*& mbSend)
+    bool Send_Format_data(char* pData, uint32 u4Len, IMessageBlockManager* pMessageBlockManager, ACE_Message_Block*& mbSend) final
     {
         //判断缓冲池是否存在，如果不存在则返回失败
         if(nullptr == pMessageBlockManager)
@@ -53,7 +49,7 @@ public:
     }
 
     //这里提供接受数据拼包算法，组成完整数据包后会调用RecvData方法
-    virtual bool Recv_Format_data(ACE_Message_Block* mbRecv, IMessageBlockManager* pMessageBlockManager, uint16& u2CommandID, ACE_Message_Block*& mbFinishRecv, EM_PACKET_ROUTE& emPacketRoute)
+    bool Recv_Format_data(ACE_Message_Block* mbRecv, IMessageBlockManager* pMessageBlockManager, uint16& u2CommandID, ACE_Message_Block*& mbFinishRecv, EM_PACKET_ROUTE& emPacketRoute) final
     {
         emPacketRoute = EM_PACKET_ROUTE::PACKET_ROUTE_SELF;
         u2CommandID = 0x1000;
@@ -94,7 +90,7 @@ public:
         return true;
     }
 
-    virtual bool RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv,  const _ClientIPInfo& objServerIPInfo)
+    bool RecvData(uint16 u2CommandID, ACE_Message_Block* mbRecv,  const _ClientIPInfo& objServerIPInfo) final
     {
         //数据包已经收全，在这里处理数据
         ACE_UNUSED_ARG(u2CommandID);
@@ -104,12 +100,12 @@ public:
         return true;
     }
 
-    virtual void ReConnect(int nServerID)
+    void ReConnect(int nServerID) final
     {
         OUR_DEBUG((LM_INFO, "[CPostServerData::ReConnect]nServerID=%d.\n", nServerID));
     }
 
-    virtual bool ConnectError(int nError, _ClientIPInfo const& objServerIPInfo)
+    bool ConnectError(int nError, _ClientIPInfo const& objServerIPInfo) final
     {
         ACE_UNUSED_ARG(objServerIPInfo);
         OUR_DEBUG((LM_INFO, "[CPostServerData::ConnectError]nServerID=%d, nError=%d.\n", m_u4ServerID, nError));

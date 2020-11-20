@@ -2,10 +2,6 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_Redirection::CUnit_Redirection()
-{
-}
-
 void CUnit_Redirection::setUp(void)
 {
     m_pForwardManager = App_ForwardManager::instance();

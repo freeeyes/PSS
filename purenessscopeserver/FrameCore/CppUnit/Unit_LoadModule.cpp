@@ -2,10 +2,6 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_LoadModule::CUnit_LoadModule()
-{
-}
-
 void CUnit_LoadModule::setUp(void)
 {
     sprintf_safe(m_szModuleName, MAX_BUFF_20, "TCPTest");

@@ -13,16 +13,16 @@ class CUnit_PacketParse : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_PacketParse();
+    CUnit_PacketParse() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_PacketParsePool(void);
 
 private:
-    CPacketParsePool* m_pPacketParsePool = nullptr;
+    shared_ptr<CPacketParsePool> m_pPacketParsePool = nullptr;
 };
 
 #endif

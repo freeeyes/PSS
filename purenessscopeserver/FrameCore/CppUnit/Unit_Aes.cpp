@@ -2,13 +2,9 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_Aes::CUnit_Aes()
-{
-}
-
 void CUnit_Aes::setUp(void)
 {
-    m_pAES = new AES();
+    m_pAES = std::make_shared<AES>();
 
     unsigned char szkey[] =
     {
@@ -27,8 +23,7 @@ void CUnit_Aes::setUp(void)
 
 void CUnit_Aes::tearDown(void)
 {
-    delete m_pAES;
-    m_pAES = nullptr;
+    OUR_DEBUG((LM_INFO, "[CUnit_Aes::tearDown]Finish.\n"));
 }
 
 void CUnit_Aes::Test_Aes(void)

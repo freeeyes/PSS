@@ -2,10 +2,6 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_MessageDefine::CUnit_MessageDefine()
-{
-}
-
 void CUnit_MessageDefine::setUp(void)
 {
     m_nMessageDefine = 1;

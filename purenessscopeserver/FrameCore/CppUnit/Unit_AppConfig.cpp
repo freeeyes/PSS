@@ -2,20 +2,15 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_AppConfig::CUnit_AppConfig()
-{
-}
-
 void CUnit_AppConfig::setUp(void)
 {
-    m_pAppConfig = new CAppConfig();
+    m_pAppConfig = std::make_shared<CAppConfig>();
 }
 
 
 void CUnit_AppConfig::tearDown(void)
 {
-    delete m_pAppConfig;
-    m_pAppConfig = nullptr;
+    OUR_DEBUG((LM_INFO, "[CUnit_AppConfig::tearDown]Finish.\n"));
 }
 
 void CUnit_AppConfig::Test_XML_Read(void)

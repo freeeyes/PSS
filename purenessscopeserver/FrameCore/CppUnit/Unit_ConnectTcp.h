@@ -16,11 +16,11 @@ class CUnit_ConnectTcp : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_ConnectTcp();
+    CUnit_ConnectTcp() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_Connect_Tcp_Server(void);
 

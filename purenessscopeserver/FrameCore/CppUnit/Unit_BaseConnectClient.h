@@ -15,11 +15,11 @@ class CUnit_BaseConnectClient : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_BaseConnectClient();
+    CUnit_BaseConnectClient() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_Common_Send_ConnectError(void);
 

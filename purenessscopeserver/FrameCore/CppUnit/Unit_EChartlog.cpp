@@ -2,10 +2,6 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_EChartlog::CUnit_EChartlog()
-{
-}
-
 void CUnit_EChartlog::setUp(void)
 {
     m_pEchartlog = App_Echartlog::instance();

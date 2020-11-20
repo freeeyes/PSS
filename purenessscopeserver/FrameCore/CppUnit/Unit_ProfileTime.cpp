@@ -2,19 +2,14 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_ProfileTime::CUnit_ProfileTime()
-{
-}
-
 void CUnit_ProfileTime::setUp(void)
 {
-    m_pProfileTime = new CProfileTime();
+    m_pProfileTime = std::make_shared<CProfileTime>();
 }
 
 void CUnit_ProfileTime::tearDown(void)
 {
-    delete m_pProfileTime;
-    m_pProfileTime = nullptr;
+    OUR_DEBUG((LM_INFO, "[CUnit_ProfileTime::tearDown]Finish.\n"));
 }
 
 void CUnit_ProfileTime::Test_ProfileTime(void)

@@ -13,11 +13,11 @@ class CUnit_EChartlog : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_EChartlog();
+    CUnit_EChartlog() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_EChartlog(void);
 

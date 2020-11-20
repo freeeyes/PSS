@@ -16,11 +16,11 @@ class CUnit_CommandAccount : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_CommandAccount();
+    CUnit_CommandAccount() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_CommandAccount_Init(void);          //测试正常输出
     void Test_CommandAccount_Alert(void);         //测试告警输出
@@ -28,10 +28,10 @@ public:
     void Test_CommandAccount_PortList(void);      //测试端口数据
 
 private:
-    CCommandAccount* m_pCommandAccount  = nullptr;
-    uint8            m_u1CommandAccount = 1;
-    uint8            m_u1Flow           = 0;
-    uint16           m_u2RecvTimeout    = 30;
+    shared_ptr<CCommandAccount> m_pCommandAccount  = nullptr;
+    uint8                       m_u1CommandAccount = 1;
+    uint8                       m_u1Flow           = 0;
+    uint16                      m_u2RecvTimeout    = 30;
 };
 
 #endif

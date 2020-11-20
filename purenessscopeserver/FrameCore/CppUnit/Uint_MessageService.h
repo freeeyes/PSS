@@ -13,16 +13,16 @@ class CUnit_MessageService : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_MessageService();
+    CUnit_MessageService() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_MessageService(void);
 
 private:
-    CMessageService* m_pMessageService = nullptr;
+    shared_ptr<CMessageService> m_pMessageService = nullptr;
 };
 
 #endif

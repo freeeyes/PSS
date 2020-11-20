@@ -22,11 +22,11 @@ class CUnit_MessageDefine : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_MessageDefine();
+    CUnit_MessageDefine() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_GetDyeingCommand(void);
     void Test_GetDyeingIP(void);

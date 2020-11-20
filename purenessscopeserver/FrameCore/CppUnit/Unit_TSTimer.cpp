@@ -8,19 +8,14 @@ void test_timer_run_execute(shared_ptr<ITimerInfo> arg)
     OUR_DEBUG((LM_INFO, "[CUnit_TimerThread]timer is active.\n"));
 }
 
-CUnit_TimerThread::CUnit_TimerThread()
-{
-}
-
 void CUnit_TimerThread::setUp(void)
 {
-    m_pTimerThread = new CTimerManager();
+    m_pTimerThread = std::make_shared<CTimerManager>();
 }
 
 void CUnit_TimerThread::tearDown(void)
 {
     m_pTimerThread->Close();
-    SAFE_DELETE(m_pTimerThread);
 }
 
 void CUnit_TimerThread::Test_TimerThread(void)

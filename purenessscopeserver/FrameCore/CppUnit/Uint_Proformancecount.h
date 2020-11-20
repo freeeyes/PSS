@@ -13,16 +13,16 @@ class CUnit_ProformanceCounter : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_ProformanceCounter();
+    CUnit_ProformanceCounter() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_ProformanceCounter(void);
 
 private:
-    CPerformanceCounter* m_pPerformanceCounter = nullptr;
+    shared_ptr<CPerformanceCounter> m_pPerformanceCounter = nullptr;
 };
 
 #endif

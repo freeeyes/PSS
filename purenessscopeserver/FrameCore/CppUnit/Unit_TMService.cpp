@@ -2,10 +2,6 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_TMService::CUnit_TMService()
-{
-}
-
 void CUnit_TMService::setUp(void)
 {
     m_pTMService = App_ServerObject::instance()->GetTMService();

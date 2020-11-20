@@ -33,11 +33,11 @@ class CUnit_BuffPacket : public CppUnit::TestFixture
     CPPUNIT_TEST(Test_PacketCount);
     CPPUNIT_TEST_SUITE_END();
 public:
-    CUnit_BuffPacket();
+    CUnit_BuffPacket() = default;
 
-    virtual void setUp(void);
+    virtual void setUp(void) final;
 
-    virtual void tearDown(void);
+    virtual void tearDown(void) final;
 
     void Read_Write_BuffPacket(void);          //¶ÁÐ´²âÊÔ
     void Read_Write_String_BuffPacket(void);   //¶ÁÐ´×Ö·û´®²âÊÔ
@@ -63,7 +63,7 @@ public:
     void Test_PacketCount();
 
 private:
-    CBuffPacket* m_pBuffPacket = nullptr;
+    shared_ptr<CBuffPacket> m_pBuffPacket = nullptr;
 };
 
 #endif

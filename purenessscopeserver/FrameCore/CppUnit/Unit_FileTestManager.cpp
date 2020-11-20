@@ -2,20 +2,14 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_FileTestManager::CUnit_FileTestManager()
-{
-}
-
 void CUnit_FileTestManager::setUp(void)
 {
-    m_pFileTestManager = new CFileTestManager();
+    m_pFileTestManager = std::make_shared <CFileTestManager>();
 }
 
 void CUnit_FileTestManager::tearDown(void)
 {
     m_pFileTestManager->Close();
-    delete m_pFileTestManager;
-    m_pFileTestManager = nullptr;
 }
 
 void CUnit_FileTestManager::Test_FileTestStart(void)

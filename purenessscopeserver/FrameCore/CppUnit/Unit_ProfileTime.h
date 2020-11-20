@@ -13,16 +13,16 @@ class CUnit_ProfileTime : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_ProfileTime();
+    CUnit_ProfileTime() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_ProfileTime(void);
 
 private:
-    CProfileTime* m_pProfileTime = nullptr;
+    shared_ptr<CProfileTime> m_pProfileTime = nullptr;
 };
 
 #endif

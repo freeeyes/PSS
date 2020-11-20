@@ -2,10 +2,6 @@
 
 #ifdef _CPPUNIT_TEST
 
-CTimeTask::CTimeTask(void)
-{
-}
-
 int CTimeTask::handle_timeout(const ACE_Time_Value& tv, const void* arg)
 {
     ACE_UNUSED_ARG(tv);
@@ -16,10 +12,6 @@ int CTimeTask::handle_timeout(const ACE_Time_Value& tv, const void* arg)
     return 0;
 }
 
-CUnit_TimerManager::CUnit_TimerManager()
-{
-}
-
 void CUnit_TimerManager::setUp(void)
 {
     m_pTimeTask = new CTimeTask();
@@ -27,7 +19,7 @@ void CUnit_TimerManager::setUp(void)
 
 void CUnit_TimerManager::tearDown(void)
 {
-    SAFE_DELETE(m_pTimeTask);
+    OUR_DEBUG((LM_INFO, "[CUnit_TimerManager::tearDown]Finish.\n"));
 }
 
 void CUnit_TimerManager::Test_TimerManager(void)

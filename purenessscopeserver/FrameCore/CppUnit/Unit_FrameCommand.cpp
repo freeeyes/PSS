@@ -2,18 +2,14 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_FrameCommand::CUnit_FrameCommand()
-{
-}
-
 void CUnit_FrameCommand::setUp(void)
 {
-    m_pFrameCommand = new CFrameCommand();
+    m_pFrameCommand = std::make_shared<CFrameCommand>();
 }
 
 void CUnit_FrameCommand::tearDown(void)
 {
-    SAFE_DELETE(m_pFrameCommand);
+    OUR_DEBUG((LM_INFO, "[CUnit_FrameCommand::tearDown]Finish.\n"));
 }
 
 void CUnit_FrameCommand::Test_Frame_Command(void)

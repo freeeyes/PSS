@@ -14,16 +14,16 @@ class CUnit_AppConfig : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_AppConfig();
+    CUnit_AppConfig() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_XML_Read(void);
     void Test_XML_Write(void);
 private:
-    CAppConfig* m_pAppConfig = nullptr;
+    shared_ptr<CAppConfig> m_pAppConfig = nullptr;
 };
 
 #endif

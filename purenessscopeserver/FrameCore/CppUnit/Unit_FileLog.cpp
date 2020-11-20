@@ -2,18 +2,14 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_FileLogger::CUnit_FileLogger()
-{
-}
-
 void CUnit_FileLogger::setUp(void)
 {
-    m_pLogFile = new CLogFile("./", 8192, 1024);
+    m_pLogFile = std::make_shared<CLogFile>("./", 8192, 1024);
 }
 
 void CUnit_FileLogger::tearDown(void)
 {
-    SAFE_DELETE(m_pLogFile);
+    OUR_DEBUG((LM_INFO, "[CUnit_FileLogger::tearDown]Finish.\n"));
 }
 
 void CUnit_FileLogger::Test_FileLogger(void)

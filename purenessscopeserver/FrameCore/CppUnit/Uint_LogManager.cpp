@@ -2,21 +2,15 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_LogManager::CUnit_LogManager()
-{
-}
-
 void CUnit_LogManager::setUp(void)
 {
-    m_pLogBlockPool = new CLogBlockPool();
+    m_pLogBlockPool = std::make_shared<CLogBlockPool>();
     m_pLogBlockPool->Init(20, 2);
 }
 
 void CUnit_LogManager::tearDown(void)
 {
     m_pLogBlockPool->Close();
-    delete m_pLogBlockPool;
-    m_pLogBlockPool = nullptr;
 }
 
 void CUnit_LogManager::Test_LogBlockPool(void)

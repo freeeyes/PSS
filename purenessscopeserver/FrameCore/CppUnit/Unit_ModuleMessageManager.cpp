@@ -2,19 +2,14 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_ModuleMessageManager::CUnit_ModuleMessageManager()
-{
-}
-
 void CUnit_ModuleMessageManager::setUp(void)
 {
-    m_pModuleMessageManager = new CModuleMessageManager();
+    m_pModuleMessageManager = std::make_shared<CModuleMessageManager>();
 }
 
 void CUnit_ModuleMessageManager::tearDown(void)
 {
-    delete m_pModuleMessageManager;
-    m_pModuleMessageManager = nullptr;
+    OUR_DEBUG((LM_INFO, "[CUnit_ModuleMessageManager::tearDown]Finish.\n"));
 }
 
 void CUnit_ModuleMessageManager::Test_SendModuleMessage(void)

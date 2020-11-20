@@ -2,13 +2,9 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_CommandAccount::CUnit_CommandAccount()
-{
-}
-
 void CUnit_CommandAccount::setUp(void)
 {
-    m_pCommandAccount = new CCommandAccount();
+    m_pCommandAccount = std::make_shared<CCommandAccount>();
 
     m_u1CommandAccount     = 1;
     m_u1Flow               = 1;
@@ -21,8 +17,6 @@ void CUnit_CommandAccount::setUp(void)
 void CUnit_CommandAccount::tearDown(void)
 {
     m_pCommandAccount->Close();
-    delete m_pCommandAccount;
-    m_pCommandAccount = nullptr;
 }
 
 void CUnit_CommandAccount::Test_CommandAccount_Init(void)

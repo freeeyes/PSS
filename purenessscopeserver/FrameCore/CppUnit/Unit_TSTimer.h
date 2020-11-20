@@ -14,16 +14,16 @@ class CUnit_TimerThread : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_TimerThread();
+    CUnit_TimerThread() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_TimerThread(void);
 
 private:
-    CTimerManager*          m_pTimerThread = nullptr;
+    shared_ptr<CTimerManager>          m_pTimerThread = nullptr;
 };
 
 #endif

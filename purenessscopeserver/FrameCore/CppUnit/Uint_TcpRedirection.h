@@ -16,11 +16,11 @@ class CUnit_Redirection : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_Redirection();
+    CUnit_Redirection() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_Redirection(void);
 

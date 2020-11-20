@@ -2,20 +2,15 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_ServerMessageManager::CUnit_ServerMessageManager()
-{
-}
-
 void CUnit_ServerMessageManager::setUp(void)
 {
-    m_pServerMessageManager = new CServerMessageManager();
+    m_pServerMessageManager = std::make_shared<CServerMessageManager>();
     m_pServerMessageManager->Init();
 }
 
 void CUnit_ServerMessageManager::tearDown(void)
 {
-    delete m_pServerMessageManager;
-    m_pServerMessageManager = nullptr;
+    OUR_DEBUG((LM_INFO, "[CUnit_ServerMessageManager::tearDown]Finish.\n"));
 }
 
 void CUnit_ServerMessageManager::Test_ServerMessageManager(void)

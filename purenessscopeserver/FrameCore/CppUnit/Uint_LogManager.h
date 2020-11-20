@@ -14,18 +14,18 @@ class CUnit_LogManager : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_LogManager();
+    CUnit_LogManager() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_LogBlockPool(void);
 
     void Test_Write_Log(void);
 
 private:
-    CLogBlockPool* m_pLogBlockPool = nullptr;
+    shared_ptr<CLogBlockPool> m_pLogBlockPool = nullptr;
     int m_nTestCount = 0;
 };
 

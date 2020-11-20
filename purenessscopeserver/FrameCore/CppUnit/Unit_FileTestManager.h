@@ -14,18 +14,18 @@ class CUnit_FileTestManager : public CppUnit::TestFixture
     CPPUNIT_TEST(Test_FileTestStop);
     CPPUNIT_TEST_SUITE_END();
 public:
-    CUnit_FileTestManager();
+    CUnit_FileTestManager() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_FileTestStart(void);
     void Test_FileTestStop(void);
     void Test_handle_timeout(void);
 
 private:
-    CFileTestManager* m_pFileTestManager = nullptr;
+    shared_ptr<CFileTestManager> m_pFileTestManager = nullptr;
 };
 
 #endif

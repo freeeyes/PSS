@@ -2,13 +2,9 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_ConnectHandler::CUnit_ConnectHandler()
-{
-}
-
 void CUnit_ConnectHandler::setUp(void)
 {
-    m_pConnectHandler = new CConnectHandler();
+    m_pConnectHandler = std::make_shared<CConnectHandler>();
 
     m_pConnectHandler->Init(1);
     m_pConnectHandler->SetConnectID(111);
@@ -18,8 +14,6 @@ void CUnit_ConnectHandler::setUp(void)
 void CUnit_ConnectHandler::tearDown(void)
 {
     m_pConnectHandler->CloseFinally();
-    delete m_pConnectHandler;
-    m_pConnectHandler = nullptr;
 }
 
 void CUnit_ConnectHandler::Test_ConnectHandler_Stream(void)

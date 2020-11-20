@@ -15,11 +15,11 @@ class CUnit_ConnectClient : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_ConnectClient();
+    CUnit_ConnectClient() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_handle_input(void);
 
@@ -28,7 +28,7 @@ public:
     void Test_Output_Debug_Data(void);
 
 private:
-    CConnectClient* m_pConnectClient = nullptr;
+    shared_ptr<CConnectClient> m_pConnectClient = nullptr;
     int m_nTestCount = 0;
 };
 

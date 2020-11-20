@@ -2,13 +2,9 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_BuffPacket::CUnit_BuffPacket()
-{
-}
-
 void CUnit_BuffPacket::setUp(void)
 {
-    m_pBuffPacket = new CBuffPacket();
+    m_pBuffPacket = std::make_shared<CBuffPacket>();
 
     m_pBuffPacket->Init(DEFINE_PACKET_SIZE, TEST_BUFFPACKET_MAX_SIZE);
     m_pBuffPacket->SetNetSort(false);
@@ -16,8 +12,7 @@ void CUnit_BuffPacket::setUp(void)
 
 void CUnit_BuffPacket::tearDown(void)
 {
-    delete m_pBuffPacket;
-    m_pBuffPacket = nullptr;
+    OUR_DEBUG((LM_INFO, "[CUnit_BuffPacket::tearDown]Finish.\n"));
 }
 
 void CUnit_BuffPacket::Read_Write_BuffPacket(void)

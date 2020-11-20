@@ -13,16 +13,16 @@ class CUnit_MakePacket : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_MakePacket();
+    CUnit_MakePacket() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_MakePacket(void);
 
 private:
-    CMakePacket* m_pMakePacket = nullptr;
+    shared_ptr<CMakePacket> m_pMakePacket = nullptr;
     int m_nTestCount = 0;
 };
 

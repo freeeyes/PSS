@@ -13,16 +13,16 @@ class CUnit_ServerMessageInfoPool : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_ServerMessageInfoPool();
+    CUnit_ServerMessageInfoPool() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_ServerMessageInfoPool(void);
 
 private:
-    CServerMessageInfoPool* m_pServerMessageInfoPool = nullptr;
+    shared_ptr<CServerMessageInfoPool> m_pServerMessageInfoPool = nullptr;
 };
 
 #endif

@@ -2,19 +2,14 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_ControlListen::CUnit_ControlListen()
-{
-}
-
 void CUnit_ControlListen::setUp(void)
 {
-    m_pControlListen = new CControlListen();
+    m_pControlListen = std::make_shared<CControlListen>();
 }
 
 void CUnit_ControlListen::tearDown(void)
 {
-    delete m_pControlListen;
-    m_pControlListen = nullptr;
+    OUR_DEBUG((LM_INFO, "[CUnit_ControlListen::tearDown]Finish.\n"));
 }
 
 void CUnit_ControlListen::Test_ControlListen(void)

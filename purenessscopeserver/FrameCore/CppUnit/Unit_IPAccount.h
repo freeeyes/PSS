@@ -17,11 +17,11 @@ class CUnit_IPAccount : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_IPAccount();
+    CUnit_IPAccount() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_IPAccount_Add(void);
 
@@ -34,7 +34,7 @@ public:
     void Test_CConnectAccount(void);
 
 private:
-    CIPAccount* m_pIPAccount = nullptr;
+    shared_ptr<CIPAccount> m_pIPAccount = nullptr;
     int m_nTestCount         = 0;
 };
 

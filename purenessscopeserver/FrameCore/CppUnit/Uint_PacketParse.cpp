@@ -2,20 +2,15 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_PacketParse::CUnit_PacketParse()
-{
-}
-
 void CUnit_PacketParse::setUp(void)
 {
-    m_pPacketParsePool = new CPacketParsePool();
+    m_pPacketParsePool = std::make_shared<CPacketParsePool>();
     m_pPacketParsePool->Init(1, CPacketParsePool::Init_Callback);
 }
 
 void CUnit_PacketParse::tearDown(void)
 {
-    delete m_pPacketParsePool;
-    m_pPacketParsePool = nullptr;
+    OUR_DEBUG((LM_INFO, "[CUnit_PacketParse::tearDown]Finish.\n"));
 }
 
 void CUnit_PacketParse::Test_PacketParsePool(void)

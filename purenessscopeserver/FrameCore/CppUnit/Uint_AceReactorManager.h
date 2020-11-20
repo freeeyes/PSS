@@ -13,16 +13,16 @@ class CUnit_AceReactorManager : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_AceReactorManager();
+    CUnit_AceReactorManager() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_DoMessage_AceReactorManager(void);
 
 private:
-    CAceReactorManager* m_pReactorManager = nullptr;
+    shared_ptr<CAceReactorManager> m_pReactorManager = nullptr;
 };
 
 #endif

@@ -17,9 +17,7 @@ public:
     string m_strCommand;
     string m_strUser;
 
-    _Console_Command_Info()
-    {
-    }
+    _Console_Command_Info() = default;
 };
 
 class CConsolePromissions

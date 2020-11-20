@@ -2,10 +2,6 @@
 
 #ifdef _CPPUNIT_TEST
 
-CUnit_Basehandler::CUnit_Basehandler()
-{
-}
-
 void CUnit_Basehandler::setUp(void)
 {
     m_nBaseHandlerID = 1;

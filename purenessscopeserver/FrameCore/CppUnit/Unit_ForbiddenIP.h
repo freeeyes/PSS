@@ -13,16 +13,16 @@ class CUnit_ForbiddenIP : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    CUnit_ForbiddenIP();
+    CUnit_ForbiddenIP() = default;
 
-    virtual void setUp(void);
+    void setUp(void) final;
 
-    virtual void tearDown(void);
+    void tearDown(void) final;
 
     void Test_ForbiddenIP(void);
 
 private:
-    CForbiddenIP* m_pForbiddenIP = nullptr;
+    shared_ptr<CForbiddenIP> m_pForbiddenIP = nullptr;
 };
 
 #endif
