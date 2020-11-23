@@ -51,7 +51,7 @@ public:
 
     void SetFileRoot(const char* pFileRoot);
 
-    const char* GetFileRoot();
+    const char* GetFileRoot() const;
 
     void SetFileAddr(const ACE_FILE_Addr& objFileAddr);
 
@@ -67,7 +67,7 @@ public:
 
     void SetLogTime(const char* pLogTime);
 
-    const char* GetLogTime();
+    const char* GetLogTime() const;
 
     void SetBufferSize(uint32 u4BufferSize);
 
@@ -119,7 +119,7 @@ public:
 
     void CheckLogFileBlock();
 
-    void CreatePath();
+    void CreatePath() const;
 
 private:
     uint32              m_u4BufferSize             = 0;               //日志缓冲最大大小

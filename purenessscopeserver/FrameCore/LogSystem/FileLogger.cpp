@@ -1,10 +1,10 @@
 #include "FileLogger.h"
 
 CLogFile::CLogFile(const char* pFileRoot, uint32 u4BufferSize, uint32 u4FileMaxSize)
-    : m_u4BufferSize(u4BufferSize), 
-      m_u4FileMaxSize(u4FileMaxSize* MAX_BUFF_1024 * MAX_BUFF_1024)
+    : m_u4BufferSize(u4BufferSize),
+    m_u4FileMaxSize(u4FileMaxSize* MAX_BUFF_1024 * MAX_BUFF_1024),
+    m_strFileRoot(pFileRoot)
 {
-    m_strFileRoot = pFileRoot;
 }
 
 void CLogFile::Init()
@@ -46,7 +46,7 @@ void CLogFile::Init()
             }
 
             fseek(fp, 0L, SEEK_END);
-            uint32 u4FileSize = (uint32)ftell(fp);
+            auto u4FileSize = (uint32)ftell(fp);
             fclose(fp);
 
             if (u4FileSize >= m_u4FileMaxSize)
@@ -91,7 +91,7 @@ void CLogFile::SetFileRoot(const char* pFileRoot)
     m_strFileRoot = pFileRoot;
 }
 
-const char* CLogFile::GetFileRoot()
+const char* CLogFile::GetFileRoot() const
 {
     return m_strFileRoot.c_str();
 }
@@ -131,7 +131,7 @@ void CLogFile::SetLogTime(const char* pLogTime)
     m_strLogTime = pLogTime;
 }
 
-const char* CLogFile::GetLogTime()
+const char* CLogFile::GetLogTime() const
 {
     return m_strLogTime.c_str();
 }
@@ -433,7 +433,7 @@ void CLogFile::CheckLogFileBlock()
     }
 }
 
-void CLogFile::CreatePath()
+void CLogFile::CreatePath() const
 {
     int n4Return = -1;
     int nError = 0;
@@ -595,7 +595,6 @@ bool CFileLogger::Init()
     //创建对象列表
     for(const auto& objFileInfo : objvecLogFileInfo)
     {
-        int nPos = objFileInfo.m_u2LogID % m_nCount;
         auto pLogFile = std::make_shared<CLogFile>(m_strLogRoot.c_str(), m_u4BlockSize, u4FileMaxSize);
 
         pLogFile->SetLoggerName(objFileInfo.m_szFileName);

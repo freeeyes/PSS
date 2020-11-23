@@ -267,7 +267,7 @@ bool CFileTestManager::AddResponseRecordList(uint32 u4ConnectID, const ACE_Time_
 
     if (0 != u4ConnectID)
     {
-        shared_ptr<ResponseRecordSt> pResponseRecord = std::make_shared<ResponseRecordSt>();
+        auto pResponseRecord = std::make_shared<ResponseRecordSt>();
         pResponseRecord->m_u1ResponseCount = 0;
         pResponseRecord->m_u8StartTime = tv.get_msec();
         pResponseRecord->m_u4ConnectID = u4ConnectID;
