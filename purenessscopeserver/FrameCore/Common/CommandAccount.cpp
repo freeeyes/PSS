@@ -116,13 +116,9 @@ bool CCommandAccount::Save_Command(uint16 u2CommandID, uint16 u2Port, EM_CONNECT
         return true;
     }
 
-    std::stringstream ss_format;
-    ss_format << u2CommandID;
-    string strCommandID = ss_format.str();
-
     //查找并添加
     shared_ptr<_CommandData> pCommandData = nullptr;
-    hashmapCommandData::iterator f = m_objCommandDataList.find(strCommandID.c_str());
+    hashmapCommandData::iterator f = m_objCommandDataList.find(u2CommandID);
 
     if (m_objCommandDataList.end() != f)
     {
@@ -145,7 +141,7 @@ bool CCommandAccount::Save_Command(uint16 u2CommandID, uint16 u2Port, EM_CONNECT
 		pCommandData->m_u4PacketSize += u4PacketSize;
 		pCommandData->m_tvCommandTime = tvTime;
 
-        m_objCommandDataList[strCommandID.c_str()] = pCommandData;
+        m_objCommandDataList[u2CommandID] = pCommandData;
     }
 
     return true;
@@ -237,7 +233,7 @@ bool CCommandAccount::SaveCommandDataLog()
     AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_COMMANDDATA, "<Command Data Account[%s]>", m_strName.c_str());
 
     //使用lambda表达式遍历map
-    for_each(m_objCommandDataList.begin(), m_objCommandDataList.end(), [this](const std::pair<string, shared_ptr<_CommandData>>& iter) {
+    for_each(m_objCommandDataList.begin(), m_objCommandDataList.end(), [this](const std::pair<uint16, shared_ptr<_CommandData>>& iter) {
         //写入文件
         this->Save_Command_To_File(iter.second);
         });

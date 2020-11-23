@@ -4,25 +4,35 @@ CLogFile::CLogFile(const char* pFileRoot, uint32 u4BufferSize, uint32 u4FileMaxS
     : m_u4BufferSize(u4BufferSize), 
       m_u4FileMaxSize(u4FileMaxSize* MAX_BUFF_1024 * MAX_BUFF_1024)
 {
-    sprintf_safe(m_szFileRoot, MAX_BUFF_100, "%s", pFileRoot);
+    m_strFileRoot = pFileRoot;
 }
 
 void CLogFile::Init()
 {
     //在这里初始化读取当前文件夹的文件最大序号和文件大小
     ACE_Date_Time dt;
-    char szDateBuff[MAX_TIME_SIZE] = { '\0' };
+    stringstream ss_format;
+    ss_format << dt.year()
+        << "-" << dt.month()
+        << "-" << dt.day()
+        << m_u2CurrFileIndex
+        << ".log";
+    string strDate = ss_format.str();
 
     m_pBuffer = new char[m_u4BufferSize];   //这里是用于日志拼接时间所用
 
     //首先判断文件是否存在
     while (true)
     {
-        sprintf_safe(szDateBuff, MAX_TIME_SIZE, "_%04d-%02d-%02d_%d.log", dt.year(), dt.month(), dt.day(), m_u2CurrFileIndex);
-        ACE_TString strLogModulePath = m_szFileRoot;
-        ACE_TString strLogName = strLogModulePath + "/Log/" + m_StrlogType + "/" + m_StrlogName + "/" + m_StrServerName + m_StrlogName + szDateBuff;
+        ACE_TString strLogModulePath = m_strFileRoot.c_str();
+        ACE_TString strLogName = strLogModulePath + "/Log/" 
+            + m_StrlogType + "/" 
+            + m_StrlogName + "/" 
+            + m_StrServerName 
+            + m_StrlogName 
+            + strDate.c_str();
 
-        int nRet = ACE_OS::access(strLogName.c_str(), R_OK);
+        auto nRet = ACE_OS::access(strLogName.c_str(), R_OK);
 
         if (0 == nRet)
         {
@@ -78,12 +88,12 @@ void CLogFile::Close()
 
 void CLogFile::SetFileRoot(const char* pFileRoot)
 {
-    sprintf_safe(m_szFileRoot, MAX_BUFF_100, "%s", pFileRoot);
+    m_strFileRoot = pFileRoot;
 }
 
-char* CLogFile::GetFileRoot()
+const char* CLogFile::GetFileRoot()
 {
-    return m_szFileRoot;
+    return m_strFileRoot.c_str();
 }
 
 void CLogFile::SetFileAddr(const ACE_FILE_Addr& objFileAddr)
@@ -118,12 +128,12 @@ ACE_FILE_IO& CLogFile::GetFileIO()
 
 void CLogFile::SetLogTime(const char* pLogTime)
 {
-    sprintf_safe(m_szLogTime, MAX_TIME_SIZE, "%s", pLogTime);
+    m_strLogTime = pLogTime;
 }
 
-char* CLogFile::GetLogTime()
+const char* CLogFile::GetLogTime()
 {
-    return m_szLogTime;
+    return m_strLogTime.c_str();
 }
 
 void CLogFile::SetBufferSize(uint32 u4BufferSize)
@@ -177,17 +187,23 @@ int CLogFile::doLog(_LogBlockInfo* pLogBlockInfo)
     m_u4CurrFileSize += pLogBlockInfo->m_u4Length;
 
     ACE_Date_Time dt;
-    char szDateBuff[MAX_TIME_SIZE] = { '\0' };
-
-    sprintf_safe(szDateBuff, MAX_TIME_SIZE, "%04d-%02d-%02d %02d:%02d:%02d%02d,", dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second(), dt.microsec() / 10000);
+    stringstream ss_format;
+    ss_format << dt.year()
+        << "-" << dt.month()
+        << "-" << dt.day()
+        << " " << dt.hour()
+        << ":" << dt.minute()
+        << ":" << dt.second()
+        << dt.microsec() / 10000;
+    string strDate = ss_format.str();
 
     //拼接实际的日志字符串
-    sprintf_safe(m_pBuffer, m_u4BufferSize, "%s %s\n", szDateBuff, pLogBlockInfo->m_pBlock);
+    sprintf_safe(m_pBuffer, m_u4BufferSize, "%s %s\n", strDate.c_str(), pLogBlockInfo->m_pBlock);
 
     if (m_nDisplay == 0)
     {
         //计入日志
-        int nLen = (int)m_File.send(m_pBuffer, strlen(m_pBuffer));
+        auto nLen = (int)m_File.send(m_pBuffer, strlen(m_pBuffer));
 
         if (nLen != (int)strlen(m_pBuffer))
         {
@@ -233,18 +249,18 @@ bool CLogFile::SendMail(const _LogBlockInfo* pLogBlockInfo, const xmlMails::_Mai
         return false;
     }
 
-    char szMailURL[MAX_BUFF_100] = { '\0' };
-
-    sprintf_safe(szMailURL, MAX_BUFF_100, "%s:%d", pMailAlert->MailUrl.c_str(), pMailAlert->MailPort);
+    stringstream ss_format;
+    ss_format << pMailAlert->MailUrl << ":" << pMailAlert->MailPort;
+    string szMailURL = ss_format.str();
 
     //发送smtps邮件
     int nRet = Send_Mail_From_Ssl(pMailAlert->fromMailAddr.c_str(),
-                                  pMailAlert->MailPass.c_str(),
-                                  pMailAlert->fromMailAddr.c_str(),
-                                  pMailAlert->toMailAddr.c_str(),
-                                  szMailURL,
-                                  pLogBlockInfo->m_szMailTitle,
-                                  pLogBlockInfo->m_pBlock);
+        pMailAlert->MailPass.c_str(),
+        pMailAlert->fromMailAddr.c_str(),
+        pMailAlert->toMailAddr.c_str(),
+        szMailURL.c_str(),
+        pLogBlockInfo->m_szMailTitle,
+        pLogBlockInfo->m_pBlock);
 
     if (0 != nRet)
     {
@@ -342,23 +358,37 @@ void CLogFile::SetServerName(const char* szServerName)
 bool CLogFile::Run()
 {
     ACE_Date_Time dt;
-    char szDateBuff[MAX_TIME_SIZE] = { '\0' };
+    stringstream ss_format;
+    ss_format << dt.year()
+        << "-" << dt.month()
+        << "-" << dt.day()
+        << m_u2CurrFileIndex
+        << ".log";
+    string strDate = ss_format.str();
+
 
     dt.update(ACE_OS::gettimeofday());
 
     CreatePath();       //如果目录不存在则创建目录
 
-    sprintf_safe(szDateBuff, MAX_TIME_SIZE, "_%04d-%02d-%02d_%d.log", dt.year(), dt.month(), dt.day(), m_u2CurrFileIndex);
-    sprintf_safe(m_szLogTime, MAX_TIME_SIZE, "%04d-%02d-%02d", dt.year(), dt.month(), dt.day());
+    ss_format.clear();
+    ss_format << dt.year() << "-" << dt.month() << "-" << dt.day();
+    m_strLogTime = ss_format.str();
 
-    ACE_TString strLogModulePath = m_szFileRoot;
-    ACE_TString strLogName = strLogModulePath + "/Log/" + m_StrlogType + "/" + m_StrlogName + "/" + m_StrServerName + m_StrlogName + szDateBuff;
+    ACE_TString strLogModulePath = m_strFileRoot.c_str();
+    ACE_TString strLogName = strLogModulePath 
+        + "/Log/" 
+        + m_StrlogType 
+        + "/" + m_StrlogName 
+        + "/" + m_StrServerName 
+        + m_StrlogName 
+        + strDate.c_str();
 
     m_File.close();
 
     m_FileAddr.set(strLogName.c_str());
 
-    if (m_Connector.connect(m_File, m_FileAddr, 0, ACE_Addr::sap_any, 0, O_WRONLY | O_CREAT | O_APPEND) == -1)
+    if (m_Connector.connect(m_File, m_FileAddr, nullptr, ACE_Addr::sap_any, 0, O_WRONLY | O_CREAT | O_APPEND) == -1)
     {
         OUR_DEBUG((LM_INFO, "[ServerLogger]Create file error[%s].\n", strLogName.c_str()));
         return false;
@@ -374,11 +404,15 @@ bool CLogFile::Run()
 void CLogFile::CheckTime()
 {
     ACE_Date_Time dt;
-    dt.update(ACE_OS::gettimeofday());
-    char szDate[MAX_TIME_SIZE] = { '\0' };
-    sprintf_safe(szDate, MAX_TIME_SIZE, "%04d-%02d-%02d", dt.year(), dt.month(), dt.day());
+    stringstream ss_format;
 
-    if (ACE_OS::strcmp(szDate, m_szLogTime) != 0 && false == Run())
+    dt.update(ACE_OS::gettimeofday());
+
+    ss_format.clear();
+    ss_format << dt.year() << "-" << dt.month() << "-" << dt.day();
+    string strDate = ss_format.str();
+
+    if (strDate != m_strLogTime && false == Run())
     {
         OUR_DEBUG((LM_INFO, "[ServerLogger](%s)Run fail.\n", m_StrlogName.c_str()));
     }
@@ -403,59 +437,47 @@ void CLogFile::CreatePath()
 {
     int n4Return = -1;
     int nError = 0;
-    char szPath[MAX_CMD_NUM] = { '\0' };
-    sprintf_safe(szPath, MAX_CMD_NUM, "%s/Log/", m_szFileRoot);
-    n4Return = ACE_OS::mkdir(szPath);
+    string strPath = m_strFileRoot + "/Log/";
+    n4Return = ACE_OS::mkdir(strPath.c_str());
     nError = errno;
 
     if (-1 == n4Return && EEXIST != nError)
     {
-        OUR_DEBUG((LM_INFO, "[ServerLogger](%s)CreatePath fail.\n", szPath));
+        OUR_DEBUG((LM_INFO, "[ServerLogger](%s)CreatePath fail.\n", strPath.c_str()));
     }
 
-    sprintf_safe(szPath, MAX_CMD_NUM, "%s/Log/%s/", m_szFileRoot, m_StrlogType.c_str());
-    n4Return = ACE_OS::mkdir(szPath);
+    strPath = m_strFileRoot + "/Log/" + m_StrlogType.c_str();
+    n4Return = ACE_OS::mkdir(strPath.c_str());
     nError = errno;
 
     if (-1 == n4Return && EEXIST != nError)
     {
-        OUR_DEBUG((LM_INFO, "[ServerLogger](%s)CreatePath fail.\n", szPath));
+        OUR_DEBUG((LM_INFO, "[ServerLogger](%s)CreatePath fail.\n", strPath.c_str()));
     }
 
-    sprintf_safe(szPath, MAX_CMD_NUM, "%s/Log/%s/%s", m_szFileRoot, m_StrlogType.c_str(), m_StrlogName.c_str());
-    n4Return = ACE_OS::mkdir(szPath);
+    strPath = m_strFileRoot + "/Log/" + m_StrlogType.c_str() + "/" + m_StrlogName.c_str();
+    n4Return = ACE_OS::mkdir(strPath.c_str());
     nError = errno;
 
     if (-1 == n4Return && EEXIST != nError)
     {
-        OUR_DEBUG((LM_INFO, "[ServerLogger](%s)CreatePath fail.\n", szPath));
+        OUR_DEBUG((LM_INFO, "[ServerLogger](%s)CreatePath fail.\n", strPath.c_str()));
     }
 }
 
 //********************************************************
 
-CFileLogger::CFileLogger()
-{
-}
-
 void CFileLogger::Close()
 {
     OUR_DEBUG((LM_INFO, "[CFileLogger::Close]Begin.\n"));
 
-    if(nullptr != m_pLogFileList)
+    for (auto objLogFile : m_vecLogFileList)
     {
-        for(int i = 0; i < m_nCount; i++)
-        {
-            if (nullptr != m_pLogFileList[i])
-            {
-                m_pLogFileList[i]->Close();
-                SAFE_DELETE(m_pLogFileList[i]);
-            }
-        }
-
-        SAFE_DELETE_ARRAY(m_pLogFileList);
-        m_nCount = 0;
+        objLogFile->Close();
     }
+
+    m_vecLogFileList.clear();
+    m_nCount = 0;
 
     OUR_DEBUG((LM_INFO, "[CFileLogger::Close]End.\n"));
 }
@@ -465,10 +487,7 @@ int CFileLogger::DoLog(int nLogType, _LogBlockInfo* pLogBlockInfo)
     //根据LogType取余，获得当前日志映射位置
     int nIndex = nLogType % m_nCount;
 
-    if(nullptr != m_pLogFileList[nIndex])
-    {
-        m_pLogFileList[nIndex]->doLog(pLogBlockInfo);
-    }
+    m_vecLogFileList[nIndex]->doLog(pLogBlockInfo);
 
     return 0;
 }
@@ -491,6 +510,7 @@ bool CFileLogger::Init()
     char szFile[MAX_BUFF_1024]      = {'\0'};
     char szFileName[MAX_BUFF_100]   = {'\0'};
     char szServerName[MAX_BUFF_100] = {'\0'};
+    char szLogRoot[MAX_BUFF_100]    = {'\0'};
     vector<_Log_File_Info> objvecLogFileInfo;
 
     Close();
@@ -511,8 +531,9 @@ bool CFileLogger::Init()
     objXmlOpeation.Read_XML_Data_Single_Uint32("ServerLogHead", "LogFileMaxSize", u4FileMaxSize);
 
     //得到绝对路径
-    objXmlOpeation.Read_XML_Data_Single_String("LogPath", "Path", m_szLogRoot, MAX_BUFF_100);
-    OUR_DEBUG((LM_ERROR, "[CFileLogger::readConfig]m_strRoot=%s\n", m_szLogRoot));
+    objXmlOpeation.Read_XML_Data_Single_String("LogPath", "Path", szLogRoot, MAX_BUFF_100);
+    m_strLogRoot = szLogRoot;
+    OUR_DEBUG((LM_ERROR, "[CFileLogger::readConfig]m_strRoot=%s\n", m_strLogRoot.c_str()));
 
     //得到日志池配置信息，日志块的大小
     objXmlOpeation.Read_XML_Data_Single_Uint32("LogPool", "BlockSize", m_u4BlockSize);
@@ -572,13 +593,10 @@ bool CFileLogger::Init()
     }
 
     //创建对象列表
-    m_pLogFileList = new CLogFile*[m_nCount];
-    memset(m_pLogFileList, 0, sizeof(CLogFile*)*m_nCount);
-
     for(const auto& objFileInfo : objvecLogFileInfo)
     {
         int nPos = objFileInfo.m_u2LogID % m_nCount;
-        CLogFile* pLogFile = new CLogFile(m_szLogRoot, m_u4BlockSize, u4FileMaxSize);
+        auto pLogFile = std::make_shared<CLogFile>(m_strLogRoot.c_str(), m_u4BlockSize, u4FileMaxSize);
 
         pLogFile->SetLoggerName(objFileInfo.m_szFileName);
         pLogFile->SetLoggerID(objFileInfo.m_u2LogID);
@@ -593,7 +611,7 @@ bool CFileLogger::Init()
             OUR_DEBUG((LM_INFO, "[CFileLogger::Init]Run error.\n"));
         }
 
-        m_pLogFileList[nPos] = pLogFile;
+        m_vecLogFileList.emplace_back(pLogFile);
     }
 
     return true;
@@ -628,35 +646,35 @@ uint16 CFileLogger::GetLogID(uint16 u2Index)
         return 0;
     }
 
-    return m_pLogFileList[u2Index]->GetLoggerID();
+    return m_vecLogFileList[u2Index]->GetLoggerID();
 }
 
 const char* CFileLogger::GetLogInfoByServerName(uint16 u2LogID)
 {
     int nIndex = u2LogID % m_nCount;
 
-    return m_pLogFileList[nIndex]->GetServerName().c_str();
+    return m_vecLogFileList[nIndex]->GetServerName().c_str();
 }
 
 const char* CFileLogger::GetLogInfoByLogName(uint16 u2LogID)
 {
     int nIndex = u2LogID % m_nCount;
 
-    return m_pLogFileList[nIndex]->GetLoggerName().c_str();
+    return m_vecLogFileList[nIndex]->GetLoggerName().c_str();
 }
 
 int CFileLogger::GetLogInfoByLogDisplay(uint16 u2LogID)
 {
     int nIndex = u2LogID % m_nCount;
 
-    return m_pLogFileList[nIndex]->GetDisPlay();
+    return m_vecLogFileList[nIndex]->GetDisPlay();
 }
 
 uint16 CFileLogger::GetLogInfoByLogLevel(uint16 u2LogID)
 {
     int nIndex = u2LogID % m_nCount;
 
-    return m_pLogFileList[nIndex]->GetLevel();
+    return m_vecLogFileList[nIndex]->GetLevel();
 }
 
 

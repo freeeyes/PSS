@@ -1,9 +1,5 @@
 #include "FileTestManager.h"
 
-CFileTestManager::CFileTestManager(void)
-{
-}
-
 FileTestResultInfoSt CFileTestManager::FileTestStart(const char* szXmlFileTestName)
 {
     FileTestResultInfoSt objFileTestResult;
@@ -56,17 +52,16 @@ int CFileTestManager::FileTestEnd()
 void CFileTestManager::HandlerServerResponse(uint32 u4ConnectID)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGrard(m_ThreadWriteLock);
-    char szConnectID[10] = { '\0' };
-    sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
 
-    ResponseRecordSt* pResponseRecord = m_objResponseRecordList.Get_Hash_Box_Data(szConnectID);
+    auto f = m_objResponseRecordList.find(u4ConnectID);
 
-    if (nullptr == pResponseRecord)
+    if (m_objResponseRecordList.end() == f)
     {
         OUR_DEBUG((LM_INFO, "[CFileTestManager::HandlerServerResponse]Response time too long m_u4ExpectTimeNo find connectID=%d.\n", u4ConnectID));
         return;
     }
 
+    auto pResponseRecord = f->second;
     if((uint32)(pResponseRecord->m_u1ResponseCount + 1) == m_u4ResponseCount)
     {
         ACE_Time_Value atvResponse = ACE_OS::gettimeofday();
@@ -80,8 +75,7 @@ void CFileTestManager::HandlerServerResponse(uint32 u4ConnectID)
         App_HandlerManager::instance()->CloseConnect(u4ConnectID);
 
         //回收对象类型
-        m_objResponseRecordList.Del_Hash_Data(szConnectID);
-        SAFE_DELETE(pResponseRecord);
+        m_objResponseRecordList.erase(f);
     }
     else
     {
@@ -101,23 +95,7 @@ void CFileTestManager::Close()
     }
 
     //清理m_objResponseRecordList
-    vector<ResponseRecordSt*> vecList;
-    m_objResponseRecordList.Get_All_Used(vecList);
-
-    int nUsedSize = (int)vecList.size();
-
-    if (nUsedSize > 0)
-    {
-        for (int i = 0; i < nUsedSize; i++)
-        {
-            char szConnectID[10] = { '\0' };
-            sprintf_safe(szConnectID, 10, "%d", vecList[i]->m_u4ConnectID);
-            m_objResponseRecordList.Del_Hash_Data(szConnectID);
-            SAFE_DELETE(vecList[i]);
-        }
-    }
-
-    m_objResponseRecordList.Close();
+    m_objResponseRecordList.clear();
 }
 
 bool CFileTestManager::LoadXmlCfg(const char* szXmlFileTestName, FileTestResultInfoSt& objFileTestResult)
@@ -279,8 +257,7 @@ FILE_TEST_RESULT CFileTestManager::ReadTestFile(const char* pFileName, int nType
 int CFileTestManager::InitResponseRecordList()
 {
     //初始化Hash表
-    m_objResponseRecordList.Close();
-    m_objResponseRecordList.Init((int)m_u4ConnectCount);
+    m_objResponseRecordList.clear();
 
     return 0;
 }
@@ -290,23 +267,13 @@ bool CFileTestManager::AddResponseRecordList(uint32 u4ConnectID, const ACE_Time_
 
     if (0 != u4ConnectID)
     {
-        ResponseRecordSt* pResponseRecord = new ResponseRecordSt();
+        shared_ptr<ResponseRecordSt> pResponseRecord = std::make_shared<ResponseRecordSt>();
         pResponseRecord->m_u1ResponseCount = 0;
         pResponseRecord->m_u8StartTime = tv.get_msec();
         pResponseRecord->m_u4ConnectID = u4ConnectID;
 
-        char szConnectID[10] = { '\0' };
-        sprintf_safe(szConnectID, 10, "%d", u4ConnectID);
-
-        if (-1 == m_objResponseRecordList.Add_Hash_Data(szConnectID, pResponseRecord))
-        {
-            OUR_DEBUG((LM_INFO, "[CFileTestManager::AddResponseRecordList]Add m_objResponseRecordList error, ConnectID=%d.\n", u4ConnectID));
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        m_objResponseRecordList[u4ConnectID] = pResponseRecord;
+        return true;
     }
     else
     {
@@ -320,44 +287,7 @@ int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
     ACE_UNUSED_ARG(arg);
     ACE_UNUSED_ARG(tv);
 
-    //首先遍历上一次定时器的执行数据对象是否已经全部释放
-    vector<ResponseRecordSt*> vecList;
-    m_objResponseRecordList.Get_All_Used(vecList);
-
-    int nUsedSize = (int)vecList.size();
-
-    if (nUsedSize > 0)
-    {
-        for (int i = 0; i < nUsedSize; i++)
-        {
-            //在上一个轮询周期，没有结束的对象
-            if(m_u4ExpectTime <= (uint32)(tv.get_msec() - vecList[i]->m_u8StartTime))
-            {
-                //超过了执行范围时间
-                OUR_DEBUG((LM_INFO, "[CFileTestManager::handle_timeout]Response time too long m_u4ExpectTime:%d.\n", m_u4ExpectTime));
-                AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_ERROR, "[CFileTestManager::handle_timeout]Response time too long connectID=%d, m_u4ExpectTime=%d.",
-                                                      vecList[i]->m_u4ConnectID,
-                                                      m_u4TimeInterval);
-            }
-            else
-            {
-                //超过了定时器时间
-                OUR_DEBUG((LM_INFO, "[CFileTestManager::handle_timeout]Response time too long m_u4TimeInterval:%d.\n", m_u4TimeInterval));
-                //写入错误日志
-                AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_ERROR, "[CFileTestManager::handle_timeout]Response time too long connectID=%d, m_u4TimeInterval=%d.",
-                                                      vecList[i]->m_u4ConnectID,
-                                                      m_u4TimeInterval);
-            }
-
-            char szConnectID[10] = { '\0' };
-            sprintf_safe(szConnectID, 10, "%d", vecList[i]->m_u4ConnectID);
-            m_objResponseRecordList.Del_Hash_Data(szConnectID);
-            SAFE_DELETE(vecList[i]);
-        }
-    }
-
-    //循环将数据包压入对象(暂不实现)
-
+    //暂不实现
 
     return 0;
 }

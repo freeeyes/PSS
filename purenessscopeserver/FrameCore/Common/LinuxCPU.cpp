@@ -1,6 +1,6 @@
 #include "LinuxCPU.h"
 
-const vector<string> split_string(const string& s, const char& c)
+vector<string> split_string(const string& s, const char& c)
 {
     string buff{ "" };
     vector<string> v;
@@ -84,7 +84,7 @@ int32 GetProcessCPU_Idel_Linux()
 
     if (blFlag == true)
     {
-        strTmp.append(strContent[i], nLen - i);
+        strTmp.append(&strContent[i], (size_t)(nLen - i));
     }
 
     float fcpu;

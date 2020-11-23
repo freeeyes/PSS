@@ -9,19 +9,21 @@
 #include "ace/FILE_Connector.h"
 #include "ace/FILE_IO.h"
 #include "FileTest.h"
+#include <sstream>
+#include <unordered_map>
 
 class CFileTestManager : public ACE_Task<ACE_MT_SYNCH>, public IFileTestManager
 {
 public:
-    CFileTestManager(void);
+    CFileTestManager(void) = default;
 
     //文件测试方法
     FileTestResultInfoSt FileTestStart(const char* szXmlFileTestName);      //开始文件测试
     int FileTestEnd();                                                      //结束文件测试
-    void HandlerServerResponse(uint32 u4ConnectID);                         //当前连接发送数据包的回调方法
+    void HandlerServerResponse(uint32 u4ConnectID) final;                   //当前连接发送数据包的回调方法
     void Close();                                                           //清理
 
-    virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);
+    int handle_timeout(const ACE_Time_Value& tv, const void* arg) final;
 
 private:
     bool LoadXmlCfg(const char* szXmlFileTestName, FileTestResultInfoSt& objFileTestResult);        //读取测试配置文件
@@ -43,7 +45,7 @@ private:
     uint32 m_u4ParseID        = 0;      //解析包ID
     uint32 m_u4ContentType    = 0;      //协议数据类型,1是二进制协议,0是文本协议
 
-    typedef vector<FileTestDataInfoSt> vecFileTestDataInfoSt;
+    using vecFileTestDataInfoSt = vector<FileTestDataInfoSt>;
     vecFileTestDataInfoSt m_vecFileTestDataInfoSt;
 
     //内部使用的映射类
@@ -54,15 +56,14 @@ private:
         uint8  m_u1ResponseCount = 0;
         uint32 m_u4ConnectID     = 0;
 
-        ResponseRecordSt()
-        {
-        }
+        ResponseRecordSt() = default;
     } ;
 
     //定义接收参数
-    CHashTable<ResponseRecordSt> m_objResponseRecordList;
+    using hashmapResponseRecord = unordered_map<uint32, shared_ptr<ResponseRecordSt>>;
+    hashmapResponseRecord m_objResponseRecordList;
 
 };
 
-typedef ACE_Singleton<CFileTestManager, ACE_Null_Mutex> App_FileTestManager;
+using App_FileTestManager = ACE_Singleton<CFileTestManager, ACE_Null_Mutex>;
 #endif //_FILETESTMANAGER_H_

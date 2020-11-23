@@ -10,6 +10,9 @@
 #include "ILogObject.h"
 #include "smtps.h"
 #include "XmlConfig.h"
+#include <string>
+#include <sstream>
+#include <vector>
 
 const uint16 MAX_CMD_NUM = 100;
 const uint16 MAX_TIME_SIZE = 100;
@@ -48,7 +51,7 @@ public:
 
     void SetFileRoot(const char* pFileRoot);
 
-    char* GetFileRoot();
+    const char* GetFileRoot();
 
     void SetFileAddr(const ACE_FILE_Addr& objFileAddr);
 
@@ -64,7 +67,7 @@ public:
 
     void SetLogTime(const char* pLogTime);
 
-    char* GetLogTime();
+    const char* GetLogTime();
 
     void SetBufferSize(uint32 u4BufferSize);
 
@@ -126,9 +129,9 @@ private:
     uint16              m_u2LogID                  = 0;               //日志编号
     uint16              m_u2Level                  = 0;               //日志等级
     int                 m_nDisplay                 = 0;               //显示还是记录文件
-    char*               m_pBuffer                  = nullptr;            //日志缓冲指针
-    char                m_szLogTime[MAX_TIME_SIZE] = {'\0'};          //Log当前时间
-    char                m_szFileRoot[MAX_BUFF_100] = {'\0'};          //路径的主目录
+    char*               m_pBuffer                  = nullptr;         //日志缓冲指针
+    string              m_strLogTime;                                 //Log当前时间
+    string              m_strFileRoot;                                //路径的主目录
     ACE_TString         m_StrlogName;                                 //模块名字
     ACE_TString         m_StrlogType               = "ServerError";   //日志类型
     ACE_TString         m_StrServerName;                              //服务器前缀
@@ -140,29 +143,30 @@ private:
 class CFileLogger : public IServerLogger
 {
 public:
-    CFileLogger();
+    CFileLogger() = default;
+    ~CFileLogger() final = default;
 
-    virtual int DoLog(int nLogType, _LogBlockInfo* pLogBlockInfo);
-    virtual int GetLogTypeCount();
+    int DoLog(int nLogType, _LogBlockInfo* pLogBlockInfo) final;
+    int GetLogTypeCount() final;
 
     bool Init();
-    virtual bool ReSet(uint16 u2CurrLogLevel);
-    virtual void Close();
+    bool ReSet(uint16 u2CurrLogLevel);
+    void Close() final;
 
-    virtual uint32 GetBlockSize();
-    virtual uint32 GetPoolCount();
+    uint32 GetBlockSize() final;
+    uint32 GetPoolCount() final;
 
-    virtual uint16 GetCurrLevel();
+    uint16 GetCurrLevel() final;
 
-    virtual uint16 GetLogID(uint16 u2Index);
-    virtual const char*  GetLogInfoByServerName(uint16 u2LogID);
-    virtual const char*  GetLogInfoByLogName(uint16 u2LogID);
-    virtual int    GetLogInfoByLogDisplay(uint16 u2LogID);
-    virtual uint16 GetLogInfoByLogLevel(uint16 u2LogID);
+    uint16 GetLogID(uint16 u2Index) final;
+    const char*  GetLogInfoByServerName(uint16 u2LogID) final;
+    const char*  GetLogInfoByLogName(uint16 u2LogID) final;
+    int    GetLogInfoByLogDisplay(uint16 u2LogID) final;
+    uint16 GetLogInfoByLogLevel(uint16 u2LogID) final;
 
 private:
-    CLogFile**                     m_pLogFileList            = nullptr;
-    char                           m_szLogRoot[MAX_BUFF_100] = {'\0'};
+    vector<shared_ptr<CLogFile>>   m_vecLogFileList;
+    string                         m_strLogRoot;
     int                            m_nCount                  = 0;
 
     uint32                         m_u4BlockSize             = 0;

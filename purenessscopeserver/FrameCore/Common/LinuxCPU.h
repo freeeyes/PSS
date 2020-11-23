@@ -7,7 +7,7 @@
 #include <sstream>
 #include <fstream>
 
-const vector<string> split_string(const string& s, const char& c);
+vector<string> split_string(const string& s, const char& c);
 
 void trim(string& s);
 

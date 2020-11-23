@@ -251,8 +251,6 @@ bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4
             pWorkThread_Handler_info->m_pHandler     = pMessage->m_pHandler;
             pWorkThread_Handler_info->m_emPacketType = pMessage->m_emPacketType;
 
-            pWorkThread_Handler_info->m_tvInput      = pMessage->m_tvMessage;
-
             m_objHandlerList.Add_Hash_Data_By_Key_Unit32(pMessage->m_u4ConnectID, pWorkThread_Handler_info);
 
 			//写入连接日志
@@ -271,6 +269,9 @@ bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4
 		DeleteMessage(pMessage);
 		return false;
 	}
+
+    //更新接收包的时间
+    pWorkThread_Handler_info->m_tvInput = pMessage->m_tvMessage;
 
     uint32 u4PacletHeadLength = 0;
     uint32 u4PacletBodyLength = 0;

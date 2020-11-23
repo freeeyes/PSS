@@ -202,7 +202,7 @@ private:
 
 public:                                                                                                                                  
     using hashmapPortAccount = unordered_map<uint16, shared_ptr<_Port_Data_Account>>;
-    using hashmapCommandData = unordered_map<string, shared_ptr<_CommandData>>;
+    using hashmapCommandData = unordered_map<uint16, shared_ptr<_CommandData>>;
     uint64                                    m_u8PacketTimeout     = MAX_QUEUE_TIMEOUT * 1000; //包处理超时时间
     uint8                                     m_u1CommandAccount    = 0;                        //是否开启命令统计，1是打开，0是关闭
     uint8                                     m_u1Flow              = 0;                        //是否打开流量统计，1是打开，0是关闭
