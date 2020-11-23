@@ -1,9 +1,54 @@
 #include "LinuxCPU.h"
 
+const vector<string> split_string(const string& s, const char& c)
+{
+    string buff{ "" };
+    vector<string> v;
+
+    for (auto n : s)
+    {
+        if (n != c) buff += n; else
+            if (n == c && buff != "") { v.push_back(buff); buff = ""; }
+    }
+    if (buff != "") v.push_back(buff);
+
+    return v;
+}
+
+void trim(string& s)
+{
+    int index = 0;
+
+    if (!s.empty())
+    {
+        while ((index = (int)s.find(' ', index)) != (int)string::npos)
+        {
+            s.erase(index, 1);
+        }
+    }
+
+    //去掉前面的09和后面的KB,只得到数字部分
+    s.erase(0, s.find_first_not_of(0x09));
+    s.erase(s.find_last_not_of("kB") + 1);
+}
+
+string GetFileContent(string strFileName)
+{
+    string strContent;
+#if PSS_PLATFORM != PLATFORM_WIN
+    std::ifstream in(strFileName.c_str(), std::ios::in);
+    std::stringstream buf;
+    buf << in.rdbuf();
+    strContent = buf.str();
+    in.close();
+#endif
+    return strContent;
+}
+
 int32 GetProcessCPU_Idel_Linux()
 {
     int32 nRet = 0;
-    string strcmd ="ps -aux | grep ";
+    string strcmd = "ps -aux | grep ";
     ACE_TString strpid;
 
     std::stringstream ss_format;
@@ -11,7 +56,7 @@ int32 GetProcessCPU_Idel_Linux()
     strcmd += ss_format.str();
 
     string strCPU = strcmd;
-    strCPU +="  |awk '{print $2,$3}' >> aasnowy.txt";
+    strCPU += "  |awk '{print $2,$3}' >> aasnowy.txt";
     nRet = system(strCPU.c_str());   //获取CPU命令
 
     if (nRet == -1)
@@ -19,47 +64,32 @@ int32 GetProcessCPU_Idel_Linux()
         return 0;
     }
 
-    char szbuffer[50];
-
-    FILE* fd = ACE_OS::fopen("aasnowy.txt","r");
-
-    if (nullptr == fd)
-    {
-        return -1;
-    }
-
-    const char* pReturn = ACE_OS::fgets(szbuffer,sizeof(szbuffer),fd);
-
-    if (nullptr == pReturn)
-    {
-        fclose(fd);
-        return -1;
-    }
+    string strContent = GetFileContent("aasnowy.txt");
 
     //切分出CPU数据
     bool blFlag = false;
-    auto nLen = (int32)ACE_OS::strlen(szbuffer);
+    auto nLen = (int32)strContent.length();
     int32 i = 0;
 
-    for(i = 0; i < nLen; i++)
+    for (i = 0; i < nLen; i++)
     {
-        if(szbuffer[i] == ' ')
+        if (strContent[i] == ' ')
         {
             blFlag = true;
             break;
         }
     }
 
-    char szTmp[50] = {'\0'};
+    string strTmp;
 
-    if(blFlag == true)
+    if (blFlag == true)
     {
-        memcpy_safe(&szbuffer[i], (uint32)nLen - i, szTmp, (uint32)50, true);
+        strTmp.append(strContent[i], nLen - i);
     }
 
     float fcpu;
-    fcpu = (float)atof(szTmp);
-    fclose(fd);
+    fcpu = (float)atof(strTmp.c_str());
+
     strCPU = "rm -rf aasnowy.txt";
     nRet = system(strCPU.c_str());
 
@@ -69,46 +99,46 @@ int32 GetProcessCPU_Idel_Linux()
     }
     else
     {
-        return (int32)(fcpu*100);
+        return (int32)(fcpu * 100);
     }
 }
 
 int32 GetProcessMemorySize_Linux()
 {
     int nMomorySize = 0;
-#ifndef WIN32
-    char file_name[64] = { 0 };
-    FILE* fd;
-    char line_buff[512] = { 0 };
-    snprintf(file_name, 64, "/proc/%d/status", getpid());
+#if PSS_PLATFORM != PLATFORM_WIN
+    string strFileName;
 
-    fd = fopen(file_name, "r");
+    std::stringstream ss_format;
+    ss_format << "//proc//" << ACE_OS::getpid() << "//status";
+    strFileName = ss_format.str();
 
-    if (nullptr == fd)
-    {
-        return 0;
-    }
+    string strContent = GetFileContent(strFileName);
 
-    char name[64];
     int vmrss = 0;
     int vmsize = 0;
 
-    while (fgets(line_buff, sizeof(line_buff), fd) != nullptr)
-    {
-        if (strncmp(line_buff, szVmRSS, strlen(szVmRSS)) == 0)
-        {
-            sscanf(line_buff, "%s %d", name, &vmrss);
-            vmrss = vmrss / 1024;
-        }
+    auto lines = split_string(strContent, '\n');
 
-        if (strncmp(line_buff, szVmSize, strlen(szVmSize)) == 0)
+    OUR_DEBUG((LM_INFO, "[strContent]lines=%d.\n", lines.size()));
+
+    for (auto strline : lines)
+    {
+        auto memory_info = split_string(strline, ':');
+
+        if (memory_info.size() == 2 && memory_info[0] == "VmRSS")
         {
-            sscanf(line_buff, "%s %d", name, &vmsize);
-            vmsize = vmsize / 1024;
+            string strValue = memory_info[1].c_str();
+            trim(strValue);
+            vmrss = atoi(strValue.c_str()) / 1024;
+        }
+        else if (memory_info.size() == 2 && memory_info[0] == "VmSize")
+        {
+            string strValue = memory_info[1].c_str();
+            trim(strValue);
+            vmsize = atoi(strValue.c_str()) / 1024;
         }
     }
-
-    fclose(fd);
 
     nMomorySize = vmrss + vmsize;
 #endif
