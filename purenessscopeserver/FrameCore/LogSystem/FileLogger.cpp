@@ -507,32 +507,30 @@ bool CFileLogger::Init()
     uint16 u2LogLevel               = 0;
     uint8  u1FileClass              = 0;
     uint8  u1DisPlay                = 0;
-    char szFile[MAX_BUFF_1024]      = {'\0'};
-    char szFileName[MAX_BUFF_100]   = {'\0'};
-    char szServerName[MAX_BUFF_100] = {'\0'};
-    char szLogRoot[MAX_BUFF_100]    = {'\0'};
+    string strFile;
+    string strFileName;
+    string strServerName;
     vector<_Log_File_Info> objvecLogFileInfo;
 
     Close();
 
-    sprintf_safe(szFile, MAX_BUFF_1024, "%s", FILELOG_CONFIG);
+    strFile = FILELOG_CONFIG;
 
-    if(false == objXmlOpeation.Init(szFile))
+    if(false == objXmlOpeation.Init(strFile.c_str()))
     {
-        OUR_DEBUG((LM_ERROR,"[CFileLogger::Init] Read Configfile[%s] failed\n", szFile));
+        OUR_DEBUG((LM_ERROR,"[CFileLogger::Init] Read Configfile[%s] failed\n", strFile.c_str()));
         return false;
     }
 
     //得到服务器名称
-    objXmlOpeation.Read_XML_Data_Single_String("ServerLogHead", "Text", szServerName, MAX_BUFF_100);
-    OUR_DEBUG((LM_ERROR, "[CFileLogger::readConfig]strServerName=%s\n", szServerName));
+    objXmlOpeation.Read_XML_Data_Single_String("ServerLogHead", "Text", strServerName);
+    OUR_DEBUG((LM_ERROR, "[CFileLogger::readConfig]strServerName=%s\n", strServerName.c_str()));
 
     //得到单个日志最大大小
     objXmlOpeation.Read_XML_Data_Single_Uint32("ServerLogHead", "LogFileMaxSize", u4FileMaxSize);
 
     //得到绝对路径
-    objXmlOpeation.Read_XML_Data_Single_String("LogPath", "Path", szLogRoot, MAX_BUFF_100);
-    m_strLogRoot = szLogRoot;
+    objXmlOpeation.Read_XML_Data_Single_String("LogPath", "Path", m_strLogRoot);
     OUR_DEBUG((LM_ERROR, "[CFileLogger::readConfig]m_strRoot=%s\n", m_strLogRoot.c_str()));
 
     //得到日志池配置信息，日志块的大小
@@ -565,8 +563,8 @@ bool CFileLogger::Init()
         }
 
         //得到日志名称
-        objXmlOpeation.Read_XML_Data_Multiple_String("LogInfo", "logname", szFileName, MAX_BUFF_100, pNextTiXmlElement);
-        OUR_DEBUG((LM_ERROR, "[CFileLogger::readConfig]strFileValue=%s\n", szFileName));
+        objXmlOpeation.Read_XML_Data_Multiple_String("LogInfo", "logname", strFileName, pNextTiXmlElement);
+        OUR_DEBUG((LM_ERROR, "[CFileLogger::readConfig]strFileValue=%s\n", strFileName.c_str()));
 
         //得到日志类型
         objXmlOpeation.Read_XML_Data_Multiple_Uint8("LogInfo", "logtype", u1FileClass, pNextTiXmlElementPos);
@@ -586,7 +584,7 @@ bool CFileLogger::Init()
         obj_Log_File_Info.m_u1FileClass = u1FileClass;
         obj_Log_File_Info.m_u1DisPlay   = u1DisPlay;
         obj_Log_File_Info.m_u2LogLevel  = u2LogLevel;
-        sprintf_safe(obj_Log_File_Info.m_szFileName, 100, "%s", szFileName);
+        obj_Log_File_Info.m_strFileName = strFileName;
 
         objvecLogFileInfo.push_back(obj_Log_File_Info);
         m_nCount++;
@@ -597,11 +595,11 @@ bool CFileLogger::Init()
     {
         auto pLogFile = std::make_shared<CLogFile>(m_strLogRoot.c_str(), m_u4BlockSize, u4FileMaxSize);
 
-        pLogFile->SetLoggerName(objFileInfo.m_szFileName);
+        pLogFile->SetLoggerName(objFileInfo.m_strFileName.c_str());
         pLogFile->SetLoggerID(objFileInfo.m_u2LogID);
         pLogFile->SetLoggerClass(objFileInfo.m_u1FileClass);
         pLogFile->SetLevel(objFileInfo.m_u2LogLevel);
-        pLogFile->SetServerName(szServerName);
+        pLogFile->SetServerName(strServerName.c_str());
         pLogFile->SetDisplay(objFileInfo.m_u1DisPlay);
         pLogFile->Init();
 

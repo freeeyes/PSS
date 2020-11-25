@@ -99,7 +99,7 @@ private:
     void ConnectOpen();                                                      //设置连接相关打开代码
     uint32 Get_Recv_length();                                                //得到要处理的数据长度
     int  Dispose_Paceket_Parse_Head(ACE_Message_Block* pmbHead);             //处理消息头函数
-    int  Dispose_Paceket_Parse_Body(ACE_Message_Block* pmbBody);             //处理消息头函数
+    int  Dispose_Paceket_Parse_Body(ACE_Message_Block* pmbBody, uint32 u4SrcBodyLength); //处理消息头函数
     int  Dispose_Paceket_Parse_Stream(ACE_Message_Block* pCurrMessage);      //处理流消息函数
     bool CheckMessage();                                                     //处理接收的数据
     

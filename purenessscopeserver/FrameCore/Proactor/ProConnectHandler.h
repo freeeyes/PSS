@@ -93,7 +93,7 @@ private:
     void Get_Recv_length();                                                  //得到要处理的数据长度
     void Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType);        //输出DEBUG信息
     int  Dispose_Paceket_Parse_Head(ACE_Message_Block* pmb);                 //处理消息头函数
-    int  Dispose_Paceket_Parse_Body(ACE_Message_Block* pmb);                 //处理消息头函数
+    int  Dispose_Paceket_Parse_Body(ACE_Message_Block* pmb, uint32 u4SrcBodyLength);                 //处理消息头函数
     int  Dispose_Paceket_Parse_Stream(ACE_Message_Block* pCurrMessage);      //处理流消息函数
 
     bool Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPacket);                             //将发送数据写入文件

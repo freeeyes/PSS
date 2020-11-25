@@ -825,6 +825,8 @@ void CMessageService::Check_Handler_Recv_Timeout()
         ACE_Time_Value tvTimeWait = tvNow - pHandlerInfo->m_tvInput;
         if (m_u4MaxRecvWait < tvTimeWait.msec())
         {
+            OUR_DEBUG((LM_INFO, "[CMessageService::Check_Handler_Recv_Timeout]u2CommandID=%d tvNow=%d.\n", pHandlerInfo->m_u4ConnectID, tvNow.sec()));
+            OUR_DEBUG((LM_INFO, "[CMessageService::Check_Handler_Recv_Timeout]u2CommandID=%d tvNow=%d.\n", pHandlerInfo->m_u4ConnectID, pHandlerInfo->m_tvInput.sec()));
             OUR_DEBUG((LM_INFO, "[CMessageService::Check_Handler_Recv_Timeout]u2CommandID=%d is recv timeout.\n", pHandlerInfo->m_u4ConnectID));
 
             //超时了，发送链接断开消息

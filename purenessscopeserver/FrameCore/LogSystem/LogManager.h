@@ -14,7 +14,7 @@
 class CLogBlockPool
 {
 public:
-    CLogBlockPool();
+    CLogBlockPool() = default;
 
     void Init(uint32 u4BlockSize, uint32 u4PoolCount);
     void Close();

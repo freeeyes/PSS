@@ -6,10 +6,6 @@
 
 #include "LogManager.h"
 
-CLogBlockPool::CLogBlockPool()
-{
-}
-
 void CLogBlockPool::Init(uint32 u4BlockSize, uint32 u4PoolCount)
 {
     //初始化，日志池

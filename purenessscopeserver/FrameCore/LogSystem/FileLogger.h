@@ -30,11 +30,9 @@ public:
     uint8  m_u1FileClass              = 0;
     uint8  m_u1DisPlay                = 0;
     uint16 m_u2LogLevel               = 0;
-    char   m_szFileName[MAX_BUFF_100] = {'\0'};
+    string m_strFileName;
 
-    _Log_File_Info()
-    {
-    }
+    _Log_File_Info() = default;
 };
 
 //单元模式日志类
@@ -150,7 +148,7 @@ public:
     int GetLogTypeCount() final;
 
     bool Init();
-    bool ReSet(uint16 u2CurrLogLevel);
+    bool ReSet(uint16 u2CurrLogLevel) final;
     void Close() final;
 
     uint32 GetBlockSize() final;

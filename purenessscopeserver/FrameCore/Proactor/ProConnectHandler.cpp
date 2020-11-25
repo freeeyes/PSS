@@ -425,7 +425,7 @@ bool CProConnectHandler::Dispose_Recv_buffer()
                         u4BodyLength);
                     pBody->wr_ptr(u4BodyLength);
 
-					if (0 != Dispose_Paceket_Parse_Body(pBody))
+					if (0 != Dispose_Paceket_Parse_Body(pBody, u4BodyLength))
 					{
 						blRet = false;
 						break;
@@ -437,6 +437,10 @@ bool CProConnectHandler::Dispose_Recv_buffer()
                 else
                 {
                     //没接收完全，继续接收
+
+                    //处理接收的包头结构体的回收,下一次会重新组织包头
+                    pHead->release();
+
                     Move_Recv_buffer();
                     blRet = true;
 					break;
@@ -461,17 +465,17 @@ void CProConnectHandler::Move_Recv_buffer()
 		//移动到前面去
 		uint32 u4RemainLength = (uint32)m_pBlockRecv->length();
 		ACE_Message_Block* pBlockRemain = App_MessageBlockManager::instance()->Create(u4RemainLength);
-		memcpy_safe(pBlockRemain->rd_ptr(),
+		memcpy_safe(m_pBlockRecv->rd_ptr(),
 			u4RemainLength,
-			m_pBlockRecv->rd_ptr(),
+            pBlockRemain->rd_ptr(),
 			u4RemainLength);
 		pBlockRemain->wr_ptr(u4RemainLength);
 
 		m_pBlockRecv->reset();
 
-		memcpy_safe(m_pBlockRecv->rd_ptr(),
+		memcpy_safe(pBlockRemain->rd_ptr(),
 			u4RemainLength,
-			pBlockRemain->rd_ptr(),
+            m_pBlockRecv->rd_ptr(),
 			u4RemainLength);
 		m_pBlockRecv->wr_ptr(u4RemainLength);
 		App_MessageBlockManager::instance()->Close(pBlockRemain);
@@ -612,7 +616,7 @@ int CProConnectHandler::Dispose_Paceket_Parse_Head(ACE_Message_Block* pmb)
     return 0;
 }
 
-int CProConnectHandler::Dispose_Paceket_Parse_Body(ACE_Message_Block* pmb)
+int CProConnectHandler::Dispose_Paceket_Parse_Body(ACE_Message_Block* pmb, uint32 u4SrcBodyLength)
 {
     //接受完整数据完成，开始分析完整数据包
     _Body_Info obj_Body_Info;
