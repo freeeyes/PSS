@@ -67,7 +67,7 @@ public:
 
     const char* GetLogTime() const;
 
-    void SetBufferSize(uint32 u4BufferSize);
+    void SetBufferSize(uint32 u4BufferSize) const;
 
     void SetFileMaxSize(uint32 u4FileMaxSize);
 

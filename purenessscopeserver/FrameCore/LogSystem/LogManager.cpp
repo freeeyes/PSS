@@ -11,7 +11,7 @@ int CLogManager::open()
     m_blRun = true;
 
     //开启一个线程队列处理
-    std::thread tt_dispose([&]()
+    std::thread tt_dispose([this]()
         {
             svc();
         });
@@ -119,7 +119,7 @@ int CLogManager::RegisterLog(shared_ptr<IServerLogger> pServerLogger)
     return 0;
 }
 
-int CLogManager::UnRegisterLog()
+int CLogManager::UnRegisterLog() const
 {
     if(m_pServerLogger != nullptr)
     {
@@ -139,7 +139,7 @@ bool CLogManager::Dispose_Queue(shared_ptr<_LogBlockInfo> msg)
     return true;
 }
 
-int CLogManager::ProcessLog(shared_ptr<_LogBlockInfo> msg)
+int CLogManager::ProcessLog(shared_ptr<_LogBlockInfo> msg) const
 {
     if(nullptr == m_pServerLogger)
     {
@@ -204,7 +204,7 @@ void CLogManager::ResetLogData(uint16 u2LogLevel)
     SetReset(false);
 }
 
-uint32 CLogManager::GetLogCount()
+uint32 CLogManager::GetLogCount() const
 {
     if(m_pServerLogger != nullptr)
     {
@@ -216,7 +216,7 @@ uint32 CLogManager::GetLogCount()
     }
 }
 
-uint32 CLogManager::GetCurrLevel()
+uint32 CLogManager::GetCurrLevel() const
 {
     if(m_pServerLogger != nullptr)
     {
@@ -228,7 +228,7 @@ uint32 CLogManager::GetCurrLevel()
     }
 }
 
-uint16 CLogManager::GetLogID(uint16 u2Index)
+uint16 CLogManager::GetLogID(uint16 u2Index) const
 {
     if(m_pServerLogger != nullptr)
     {
@@ -240,7 +240,7 @@ uint16 CLogManager::GetLogID(uint16 u2Index)
     }
 }
 
-const char* CLogManager::GetLogInfoByServerName(uint16 u2LogID)
+const char* CLogManager::GetLogInfoByServerName(uint16 u2LogID) const
 {
     if(m_pServerLogger != nullptr)
     {
@@ -252,7 +252,7 @@ const char* CLogManager::GetLogInfoByServerName(uint16 u2LogID)
     }
 }
 
-const char* CLogManager::GetLogInfoByLogName(uint16 u2LogID)
+const char* CLogManager::GetLogInfoByLogName(uint16 u2LogID) const
 {
     if(m_pServerLogger != nullptr)
     {
@@ -264,7 +264,7 @@ const char* CLogManager::GetLogInfoByLogName(uint16 u2LogID)
     }
 }
 
-int CLogManager::GetLogInfoByLogDisplay(uint16 u2LogID)
+int CLogManager::GetLogInfoByLogDisplay(uint16 u2LogID) const
 {
     if(m_pServerLogger != nullptr)
     {
@@ -276,7 +276,7 @@ int CLogManager::GetLogInfoByLogDisplay(uint16 u2LogID)
     }
 }
 
-uint16 CLogManager::GetLogInfoByLogLevel(uint16 u2LogID)
+uint16 CLogManager::GetLogInfoByLogLevel(uint16 u2LogID) const
 {
     if(m_pServerLogger != nullptr)
     {

@@ -29,21 +29,21 @@ public:
 
     int PutLog(shared_ptr<_LogBlockInfo> pLogBlockInfo);
     int RegisterLog(shared_ptr<IServerLogger> pServerLogger);
-    int UnRegisterLog();
+    int UnRegisterLog() const;
 
     void SetReset(bool blReset);
 
     void ResetLogData(uint16 u2LogLevel);
 
     //对维护接口
-    uint32 GetLogCount();
-    uint32 GetCurrLevel();
+    uint32 GetLogCount() const;
+    uint32 GetCurrLevel() const;
 
-    uint16 GetLogID(uint16 u2Index);
-    const char*  GetLogInfoByServerName(uint16 u2LogID);
-    const char*  GetLogInfoByLogName(uint16 u2LogID);
-    int    GetLogInfoByLogDisplay(uint16 u2LogID);
-    uint16 GetLogInfoByLogLevel(uint16 u2LogID);
+    uint16 GetLogID(uint16 u2Index) const;
+    const char*  GetLogInfoByServerName(uint16 u2LogID) const;
+    const char*  GetLogInfoByLogName(uint16 u2LogID) const;
+    int    GetLogInfoByLogDisplay(uint16 u2LogID) const;
+    uint16 GetLogInfoByLogLevel(uint16 u2LogID) const;
 
     //对内写日志的接口
     int WriteLog_i(uint16 u2LogType, string strLog);
@@ -59,7 +59,7 @@ public:
 
 private:
     bool Dispose_Queue(shared_ptr<_LogBlockInfo> msg);
-    int ProcessLog(shared_ptr<_LogBlockInfo> msg);
+    int ProcessLog(shared_ptr<_LogBlockInfo> msg) const;
 
     //关闭消息队列条件变量
     bool                                     m_blRun          = false;               //日志系统是否启动

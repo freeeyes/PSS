@@ -131,7 +131,7 @@ const char* CLogFile::GetLogTime() const
     return m_strLogTime.c_str();
 }
 
-void CLogFile::SetBufferSize(uint32 u4BufferSize)
+void CLogFile::SetBufferSize(uint32 u4BufferSize) const
 {
     ACE_UNUSED_ARG(u4BufferSize);
 }
@@ -461,7 +461,7 @@ void CFileLogger::Close()
 {
     OUR_DEBUG((LM_INFO, "[CFileLogger::Close]Begin.\n"));
 
-    for_each(m_mapLogFileList.begin(), m_mapLogFileList.end(), [this](const std::pair<uint16, shared_ptr<CLogFile>>& iter) {
+    for_each(m_mapLogFileList.begin(), m_mapLogFileList.end(), [](const std::pair<uint16, shared_ptr<CLogFile>>& iter) {
         //Ð´ÈëÎÄ¼þ
         iter.second->Close();
         });
@@ -641,7 +641,7 @@ const char* CFileLogger::GetLogInfoByServerName(uint16 u2LogID)
 {
     if (nullptr == m_mapLogFileList[u2LogID])
     {
-        return 0;
+        return nullptr;
     }
 
     return m_mapLogFileList[u2LogID]->GetServerName().c_str();
@@ -651,7 +651,7 @@ const char* CFileLogger::GetLogInfoByLogName(uint16 u2LogID)
 {
     if (nullptr == m_mapLogFileList[u2LogID])
     {
-        return 0;
+        return nullptr;
     }
 
     return m_mapLogFileList[u2LogID]->GetLoggerName().c_str();
