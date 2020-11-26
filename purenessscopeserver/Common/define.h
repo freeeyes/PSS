@@ -31,6 +31,10 @@
 #include <sys/resource.h>
 #endif
 
+//这里使用第三方的格式化代码
+#define FMT_HEADER_ONLY
+#include "fmt/format.h"
+
 #include <memory>
 #include <vector>
 
@@ -1690,6 +1694,19 @@ inline void Set_Output_To_File(int nTrunOn, ofstream*& pLogoStream, const char* 
     }
 
     ACE_LOG_MSG->set_flags(ACE_Log_Msg::STDERR | ACE_Log_Msg::OSTREAM);
+}
+
+//格式化，讲一段二进制输出为十六进制
+inline string buffer_to_Hex_string(string strText)
+{
+    string strValue;
+
+    for (auto f : strText)
+    {
+        strValue += fmt::format("{0:#x} ", (unsigned char)f);
+    }
+
+    return strValue;
 }
 
 #ifndef WIN32

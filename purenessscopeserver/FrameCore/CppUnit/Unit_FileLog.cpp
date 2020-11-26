@@ -85,13 +85,12 @@ void CUnit_FileLogger::Test_FileLogger(void)
         return;
     }
 
-    _LogBlockInfo objLogBlockInfo;
-    char szData[20] = { '\0' };
-    sprintf_safe(szData, 20, "freeeyes OK");
-    objLogBlockInfo.m_pBlock   = reinterpret_cast<char*>(szData);
-    objLogBlockInfo.m_u4Length = (uint32)ACE_OS::strlen(szData);
+    auto objLogBlockInfo = std::make_shared<_LogBlockInfo>();
+    string strData = "freeeyes";
+;   objLogBlockInfo->m_strBlock   = strData;
+    objLogBlockInfo->m_u4Length = (uint32)strData.length();
 
-    if (0 != m_pLogFile->doLog(&objLogBlockInfo))
+    if (0 != m_pLogFile->doLog(objLogBlockInfo))
     {
         OUR_DEBUG((LM_INFO, "[Test_FileLogger]m_pLogFile->doLog() fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_FileLogger]m_pLogFile->doLog() fail.", true == blRet);
@@ -101,15 +100,11 @@ void CUnit_FileLogger::Test_FileLogger(void)
 
 void CUnit_FileLogger::Test_SendMail(void)
 {
-    _LogBlockInfo   objLogBlockInfo;
+    auto objLogBlockInfo = std::make_shared<_LogBlockInfo>();
     xmlMails::_Mail objMailInfo;
 
-    char szMailBody[MAX_BUFF_200] = { '\0' };
-
-    sprintf_safe(objLogBlockInfo.m_szMailTitle, MAX_BUFF_200, "Pss Test");
-    sprintf_safe(szMailBody, MAX_BUFF_200, "Pss Test");
-
-    objLogBlockInfo.m_pBlock = (char* )szMailBody;
+    objLogBlockInfo->m_strMailTitle = "Pss Test";
+    objLogBlockInfo->m_strBlock = "Pss Test";
 
     objMailInfo.MailID       = 1;
     objMailInfo.fromMailAddr = "freeeyes@163.com";
@@ -119,7 +114,7 @@ void CUnit_FileLogger::Test_SendMail(void)
     objMailInfo.MailPort     = 465;
 
     //这里测试邮件发送
-    m_pLogFile->SendMail(&objLogBlockInfo, &objMailInfo);
+    m_pLogFile->SendMail(objLogBlockInfo, &objMailInfo);
     m_nTestCount++;
 }
 

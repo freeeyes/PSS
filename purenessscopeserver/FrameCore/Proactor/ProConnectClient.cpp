@@ -453,6 +453,8 @@ int CProConnectClient::SendMessageGroup(uint16 u2CommandID, ACE_Message_Block* p
 
 bool CProConnectClient::SendData(ACE_Message_Block* pmblk)
 {
+    string strHexChar;     //单个十六进制的字符
+    string strHexData;     //十六进制的字符串
     //OUR_DEBUG((LM_DEBUG, "[CProConnectClient::SendData]Begin.\n"));
 
     //如果是DEBUG状态，记录当前接受包的二进制数据
@@ -460,34 +462,44 @@ bool CProConnectClient::SendData(ACE_Message_Block* pmblk)
     {
         char szDebugData[MAX_BUFF_1024] = {'\0'};
         char szLog[10]  = {'\0'};
-        int  nDebugSize = 0;
+        uint32 u4DebugSize = 0;
         bool blblMore   = false;
 
         if(pmblk->length() >= MAX_BUFF_200)
         {
-            nDebugSize = MAX_BUFF_200;
+            u4DebugSize = MAX_BUFF_200;
             blblMore   = true;
         }
         else
         {
-            nDebugSize = (int)pmblk->length();
+            u4DebugSize = (int)pmblk->length();
         }
 
-        char* pData = pmblk->rd_ptr();
+        const char* pData = pmblk->rd_ptr();
 
-        for(int i = 0; i < nDebugSize; i++)
+        for (uint32 i = 0; i < u4DebugSize; i++)
         {
-            sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
-            sprintf_safe(szDebugData + 5*i, MAX_BUFF_1024 - 5*i, "%s", szLog);
+            std::stringstream ss_format;
+
+            ss_format << "0x" << std::uppercase << std::setfill('0') << std::setw(2) << std::hex << (int)pData[i] << " ";
+            strHexData += ss_format.str();
         }
 
         if(blblMore == true)
         {
-            AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_DEBUG_SERVERSEND, "[%s:%d]%s.(数据包过长只记录前200字节)", m_AddrRemote.get_host_addr(), m_AddrRemote.get_port_number(), szDebugData);
+            string strLog = fmt::format("[{0}:{1}]{2}.(packet is more than 200)",
+                m_AddrRemote.get_host_addr(),
+                m_AddrRemote.get_port_number(),
+                strHexData);
+            AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_DEBUG_SERVERSEND, strLog);
         }
         else
         {
-            AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_DEBUG_SERVERSEND, "[%s:%d]%s.", m_AddrRemote.get_host_addr(), m_AddrRemote.get_port_number(), szDebugData);
+            string strLog = fmt::format("[{0}:{1}]{2}.",
+                m_AddrRemote.get_host_addr(),
+                m_AddrRemote.get_port_number(),
+                strHexData);
+            AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_DEBUG_SERVERSEND, strLog);
         }
     }
 

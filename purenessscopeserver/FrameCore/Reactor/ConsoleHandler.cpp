@@ -122,7 +122,15 @@ int CConsoleHandler::open(void*)
 
     if (m_pCurrMessage == nullptr)
     {
-        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount);
+        string strLog = fmt::format("Close Connection from [{0}:{1}] RecvSize = {2}, RecvCount = {3}, SendSize = {4}, SendCount = {5}.",
+            m_addrRemote.get_host_addr(), 
+            m_addrRemote.get_port_number(), 
+            m_u4AllRecvSize, 
+            m_u4AllRecvCount, 
+            m_u4AllSendSize, 
+            m_u4AllSendCount);
+
+        AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_CONNECT, strLog);
         OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvClinetPacket] pmb new is nullptr.\n"));
         return -1;
     }
@@ -229,7 +237,15 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
 
         if (m_pCurrMessage == nullptr)
         {
-            AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount);
+            string strLog = fmt::format("Close Connection from [{0}:{1}] RecvSize = {2}, RecvCount = {3}, SendSize = {4}, SendCount = {5}.",
+                m_addrRemote.get_host_addr(), 
+                m_addrRemote.get_port_number(), 
+                m_u4AllRecvSize, 
+                m_u4AllRecvCount, 
+                m_u4AllSendSize, 
+                m_u4AllSendCount);
+
+            AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_CONNECT, strLog);
             OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvClinetPacket] pmb new is nullptr.\n"));
             return -1;
         }

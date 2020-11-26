@@ -56,15 +56,6 @@ void CCommandAccount::Save_Command_To_File(shared_ptr<_CommandData> pCommandData
         {
             strPacketType = "UDP";
         }
-
-        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_COMMANDDATA, "CommandID=0x%04x, CommandType=%s, CommandCount=%d, CommandCost=%lldns, PacketType=%s, PacketSize=%d, CommandLastTime=%04d-%02d-%02d %02d:%02d:%02d%",
-            (int32)pCommandData->m_u2CommandID,
-            strCommandType.c_str(),
-            (int32)pCommandData->m_u4CommandCount,
-            pCommandData->m_u8CommandCost,
-            strPacketType.c_str(),
-            pCommandData->m_u4PacketSize,
-            dtLastTime.year(), dtLastTime.month(), dtLastTime.day(), dtLastTime.hour(), dtLastTime.minute(), dtLastTime.second());
     }
 }
 
@@ -176,12 +167,14 @@ bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_I
                 //如果大于阀值，则记录日志，并且归零当前计数器
                 commandalewrtdata.m_u4CurrCount = 0;
 
+                string strLog = fmt::format("u2CommandID=%d, m_u4CommandCount more than [%d].",
+                    u2CommandID,
+                    commandalewrtdata.m_u4CommandCount);
+
                 AppLogManager::instance()->WriteToMail_i(LOG_SYSTEM_PACKETTIME,
-                        commandalewrtdata.m_u2MailID,
-                        "Alert",
-                        "u2CommandID=%d, m_u4CommandCount more than [%d].",
-                        u2CommandID,
-                        commandalewrtdata.m_u4CommandCount);
+                    commandalewrtdata.m_u2MailID,
+                    "Alert",
+                    strLog);
             }
 
             break;
@@ -230,7 +223,9 @@ bool CCommandAccount::SaveCommandDataLog()
         return true;
     }
 
-    AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_COMMANDDATA, "<Command Data Account[%s]>", m_strName.c_str());
+    string strLog = fmt::format("<Command Data Account[{0}]>.", m_strName);
+
+    AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_COMMANDDATA, strLog);
 
     //使用lambda表达式遍历map
     for_each(m_objCommandDataList.begin(), m_objCommandDataList.end(), [this](const std::pair<uint16, shared_ptr<_CommandData>>& iter) {
@@ -238,7 +233,8 @@ bool CCommandAccount::SaveCommandDataLog()
         this->Save_Command_To_File(iter.second);
         });
 
-    AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_COMMANDDATA, "<(%s)Command Data Account End>", "CCommandAccount");
+    strLog = fmt::format("<({0}Command Data Account End>.", m_strName);
+    AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_COMMANDDATA, strLog);
 
     return true;
 }

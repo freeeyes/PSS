@@ -132,10 +132,13 @@ int CConnectHandler::open(void*)
         App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), GetXmlConfigAttribute(xmlIP)->Timeout);
 
         //发送告警邮件
-        AppLogManager::instance()->WriteToMail_i(LOG_SYSTEM_CONNECT,
-                GetXmlConfigAttribute(xmlAlertConnect)->MailID,
-                "Alert IP",
-                "[CConnectHandler::open]IP is more than IP Max(%s).", m_addrRemote.get_host_addr());
+        string strLog = fmt::format("[CConnectHandler::open]IP is more than IP Max({0}).",
+            m_addrRemote.get_host_addr());
+
+        AppLogManager::instance()->WriteToMail_r(LOG_SYSTEM_CONNECT,
+            GetXmlConfigAttribute(xmlAlertConnect)->MailID,
+            "Alert IP",
+            strLog);
 
         return -1;
     }
@@ -471,9 +474,13 @@ bool CConnectHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbDa
             int nErrno = errno;
             OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, error = %d.\n", u4ConnectID, nErrno));
 
-            AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "WriteError [%s:%d] nErrno = %d  result.bytes_transferred() = %d, ",
-                                                  m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), nErrno,
-                                                  nIsSendSize);
+            string strLog = fmt::format("WriteError [{0}:{1}] nErrno = {2}  result.bytes_transferred() = {3},",
+                m_addrRemote.get_host_addr(), 
+                m_addrRemote.get_port_number(), 
+                nErrno,
+                nIsSendSize);
+
+            AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, strLog);
 
             //错误消息回调
             pmbSend->rd_ptr((size_t)0);
@@ -670,12 +677,14 @@ uint32 CConnectHandler::Get_Recv_length()
     return (uint32)(m_pBlockRecv->size() - m_pBlockRecv->length());
 }
 
-void CConnectHandler::Output_Debug_Data(const ACE_Message_Block* pMbData, int nLogType)
+void CConnectHandler::Output_Debug_Data(const ACE_Message_Block* pMbData, uint16 u2LogType)
 {
+    string strHexChar;     //单个十六进制的字符
+    string strHexData;     //十六进制的字符串
+
     if (GetXmlConfigAttribute(xmlServerType)->Debug == DEBUG_ON || m_blIsLog == true)
     {
         int nDataLen = (int)pMbData->length();
-        char szLog[10] = { '\0' };
         uint32 u4DebugSize = 0;
         bool blblMore = false;
 
@@ -693,19 +702,30 @@ void CConnectHandler::Output_Debug_Data(const ACE_Message_Block* pMbData, int nL
 
         for (uint32 i = 0; i < u4DebugSize; i++)
         {
-            sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
-            sprintf_safe(m_pPacketDebugData + 5 * i, MAX_BUFF_1024 - 5 * i, "%s", szLog);
+            std::stringstream ss_format;
+
+            ss_format << "0x" << std::uppercase << std::setfill('0') << std::setw(2) << std::hex << (int)pData[i] << " ";
+            strHexData += ss_format.str();
         }
+
 
         m_pPacketDebugData[5 * u4DebugSize] = '\0';
 
         if (blblMore == true)
         {
-            AppLogManager::instance()->WriteLog_i(nLogType, "[(%s)%s:%d]%s.(数据包过长只记录前200字节)", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_pPacketDebugData);
+            string strLog = fmt::format("[{0}:{1}]{2}.(packet is more than 200)",
+                m_addrRemote.get_host_addr(),
+                m_addrRemote.get_port_number(),
+                strHexData);
+            AppLogManager::instance()->WriteLog_r(u2LogType, strLog);
         }
         else
         {
-            AppLogManager::instance()->WriteLog_i(nLogType, "[(%s)%s:%d]%s.", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_pPacketDebugData);
+            string strLog = fmt::format("[{0}:{1}]{2}.",
+                m_addrRemote.get_host_addr(),
+                m_addrRemote.get_port_number(),
+                strHexData);
+            AppLogManager::instance()->WriteLog_r(u2LogType, strLog);
         }
     }
 }

@@ -12,7 +12,7 @@
 #include "XmlConfig.h"
 #include <string>
 #include <sstream>
-#include <vector>
+#include <unordered_map>
 
 const uint16 MAX_CMD_NUM = 100;
 const uint16 MAX_TIME_SIZE = 100;
@@ -83,9 +83,9 @@ public:
 
     uint32 GetCurrFileSize() const;
 
-    virtual int doLog(_LogBlockInfo* pLogBlockInfo);
+    int doLog(shared_ptr<_LogBlockInfo> pLogBlockInfo);
 
-    bool SendMail(const _LogBlockInfo* pLogBlockInfo, const xmlMails::_Mail* pMailInfo = nullptr) const;
+    bool SendMail(shared_ptr<_LogBlockInfo> pLogBlockInfo, const xmlMails::_Mail* pMailInfo = nullptr) const;
 
     ACE_TString& GetLoggerName();
 
@@ -144,7 +144,7 @@ public:
     CFileLogger() = default;
     ~CFileLogger() final = default;
 
-    int DoLog(int nLogType, _LogBlockInfo* pLogBlockInfo) final;
+    int DoLog(uint16 nLogType, shared_ptr<_LogBlockInfo> pLogBlockInfo) final;
     int GetLogTypeCount() final;
 
     bool Init();
@@ -163,7 +163,8 @@ public:
     uint16 GetLogInfoByLogLevel(uint16 u2LogID) final;
 
 private:
-    vector<shared_ptr<CLogFile>>   m_vecLogFileList;
+    using hashmapFileList = unordered_map<uint16, shared_ptr<CLogFile>>;
+    hashmapFileList                m_mapLogFileList;
     string                         m_strLogRoot;
     int                            m_nCount                  = 0;
 

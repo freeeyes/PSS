@@ -236,11 +236,11 @@ bool CServerManager::Run()
     //启动日志服务线程
     if (0 != AppLogManager::instance()->Start())
     {
-        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM, "[CServerManager::Init]AppLogManager is [%s].", "error");
+        AppLogManager::instance()->WriteLog_r(LOG_SYSTEM, "[CServerManager::Init]AppLogManager is [error].");
     }
     else
     {
-        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM, "[CServerManager::Init]AppLogManager is [%s].", "ok");
+        AppLogManager::instance()->WriteLog_r(LOG_SYSTEM, "[CServerManager::Init]AppLogManager is [ok].");
     }
 
     //启动服务器间检查线程

@@ -558,6 +558,7 @@
     <ClInclude Include="..\Common\Threading.hpp" />
     <ClInclude Include="..\Common\ThreadLock.h" />
     <ClInclude Include="..\Common\ThreadLogic.hpp" />
+    <ClInclude Include="..\Common\ThreadQueue.h" />
     <ClInclude Include="..\Common\TimerEvent.hpp" />
     <ClInclude Include="..\Common\TimerNodeList.hpp" />
     <ClInclude Include="..\Common\TimeWheelLink.h" />

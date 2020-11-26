@@ -170,8 +170,7 @@ void CProConnectHandler::open(ACE_HANDLE h, ACE_Message_Block&)
         OUR_DEBUG((LM_ERROR, "[CProConnectHandler::open]IP(%s) connect frequently.\n", m_addrRemote.get_host_addr()));
         App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), GetXmlConfigAttribute(xmlIP)->Timeout);
 
-        //发送告警邮件
-        AppLogManager::instance()->WriteToMail_i(LOG_SYSTEM_CONNECT,
+        AppLogManager::instance()->WriteToMail_r(LOG_SYSTEM_CONNECT,
                 GetXmlConfigAttribute(xmlClientData)->MailID,
                 "Alert IP",
                 "[CProConnectHandler::open] IP is more than IP Max,");
@@ -276,9 +275,13 @@ void CProConnectHandler::handle_write_stream(const ACE_Asynch_Write_Stream::Resu
         int nErrno = errno;
         OUR_DEBUG ((LM_DEBUG,"[CProConnectHandler::handle_write_stream] Connectid=[%d] begin(%d)...\n",GetConnectID(), nErrno));
 
-        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "WriteError [%s:%d] nErrno = %d  result.bytes_transferred() = %d, ",
-                                              m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), nErrno,
-                                              result.bytes_transferred());
+        string strLog = fmt::format("WriteError [{0}:{1}] nErrno = {2}  result.bytes_transferred() = {3}, ",
+            m_addrRemote.get_host_addr(), 
+            m_addrRemote.get_port_number(), 
+            nErrno,
+            result.bytes_transferred());
+
+        AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_CONNECT, strLog);
 
         OUR_DEBUG((LM_DEBUG,"[CProConnectHandler::handle_write_stream] Connectid=[%d] finish ok...\n", GetConnectID()));
         m_atvOutput = ACE_OS::gettimeofday();
@@ -510,40 +513,53 @@ void CProConnectHandler::Get_Recv_length()
 
 void CProConnectHandler::Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType)
 {
+    string strHexChar;     //单个十六进制的字符
+    string strHexData;     //十六进制的字符串
+
     //如果是DEBUG状态，记录当前接受包的二进制数据
     if (GetXmlConfigAttribute(xmlServerType)->Debug == DEBUG_ON || m_blIsLog == true)
     {
         char szLog[10] = { '\0' };
-        int  nDebugSize = 0;
+        uint32  u4DebugSize = 0;
         bool blblMore = false;
 
         if (pMbData->length() >= m_u4PacketDebugSize)
         {
-            nDebugSize = m_u4PacketDebugSize - 1;
+            u4DebugSize = m_u4PacketDebugSize - 1;
             blblMore = true;
         }
         else
         {
-            nDebugSize = (int)pMbData->length();
+            u4DebugSize = (uint32)pMbData->length();
         }
 
-        char* pData = pMbData->rd_ptr();
+        const char* pData = pMbData->rd_ptr();
 
-        for (int i = 0; i < nDebugSize; i++)
+        for (uint32 i = 0; i < u4DebugSize; i++)
         {
-            sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
-            sprintf_safe(m_pPacketDebugData + 5 * i, MAX_BUFF_1024 - 5 * i, "%s", szLog);
-        }
+            std::stringstream ss_format;
 
-        m_pPacketDebugData[5 * nDebugSize] = '\0';
+            ss_format << "0x" << std::uppercase << std::setfill('0') << std::setw(2) << std::hex << (int)pData[i] << " ";
+            strHexData += ss_format.str();
+        }
 
         if (blblMore == true)
         {
-            AppLogManager::instance()->WriteLog_i(nLogType, "[(%s)%s:%d]%s.(数据包过长只记录前200字节)", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_pPacketDebugData);
+            string strLog = fmt::format("[{0}:{1}]{2}.(Packet is more than 200)",
+                m_addrRemote.get_host_addr(), 
+                m_addrRemote.get_port_number(), 
+                m_pPacketDebugData);
+
+            AppLogManager::instance()->WriteLog_r(nLogType, strLog);
         }
         else
         {
-            AppLogManager::instance()->WriteLog_i(nLogType, "[(%s)%s:%d]%s.", m_szConnectName, m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_pPacketDebugData);
+            string strLog = fmt::format("[{0}:{1}]{2}.",
+                m_addrRemote.get_host_addr(),
+                m_addrRemote.get_port_number(),
+                m_pPacketDebugData);
+
+            AppLogManager::instance()->WriteLog_r(nLogType, strLog);
         }
     }
 }

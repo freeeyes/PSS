@@ -401,14 +401,14 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
     return 0;
 }
 
-void CConnectClient::Output_Debug_Data(const ACE_Message_Block* pMbData, int nLogType, bool blLog) const
+void CConnectClient::Output_Debug_Data(const ACE_Message_Block* pMbData, uint16 u2LogType, bool blLog) const
 {
-    char szPacketDebugData[MAX_BUFF_1024] = { '\0' };
+    string strHexChar;     //单个十六进制的字符
+    string strHexData;     //十六进制的字符串
 
     if (GetXmlConfigAttribute(xmlServerType)->Debug == DEBUG_ON || false == blLog)
     {
         int nDataLen = (int)pMbData->length();
-        char szLog[10] = { '\0' };
         uint32 u4DebugSize = 0;
         bool blblMore = false;
 
@@ -426,19 +426,27 @@ void CConnectClient::Output_Debug_Data(const ACE_Message_Block* pMbData, int nLo
 
         for (uint32 i = 0; i < u4DebugSize; i++)
         {
-            sprintf_safe(szLog, 10, "0x%02X ", (unsigned char)pData[i]);
-            sprintf_safe(szPacketDebugData + 5 * i, MAX_BUFF_1024 - 5 * i, "%s", szLog);
-        }
+            std::stringstream ss_format;
 
-        szPacketDebugData[5 * u4DebugSize] = '\0';
+            ss_format << "0x" << std::uppercase << std::setfill('0') << std::setw(2) << std::hex << (int)pData[i] << " ";
+            strHexData += ss_format.str();
+        }
 
         if (blblMore == true)
         {
-            AppLogManager::instance()->WriteLog(nLogType, "[%s:%d]%s.(数据包过长只记录前200字节)", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szPacketDebugData);
+            string strLog = fmt::format("[{0}:{1}]{2}.(packet is more than 200)",
+                m_addrRemote.get_host_addr(),
+                m_addrRemote.get_port_number(),
+                strHexData);
+            AppLogManager::instance()->WriteLog_r(u2LogType, strLog);
         }
         else
         {
-            AppLogManager::instance()->WriteLog(nLogType, "[%s:%d]%s.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), szPacketDebugData);
+            string strLog = fmt::format("[{0}:{1}]{2}.",
+                m_addrRemote.get_host_addr(),
+                m_addrRemote.get_port_number(),
+                strHexData);
+            AppLogManager::instance()->WriteLog_r(u2LogType, strLog);
         }
     }
 }

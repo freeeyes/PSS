@@ -4,41 +4,21 @@
 
 void CUnit_LogManager::setUp(void)
 {
-    m_pLogBlockPool = std::make_shared<CLogBlockPool>();
-    m_pLogBlockPool->Init(20, 2);
+    m_nTestCount = 0;
 }
 
 void CUnit_LogManager::tearDown(void)
 {
-    m_pLogBlockPool->Close();
-}
-
-void CUnit_LogManager::Test_LogBlockPool(void)
-{
-    //测试创建指定的反应器
-    bool blRet = false;
-
-    _LogBlockInfo* pLogBlockInfo = m_pLogBlockPool->GetLogBlockInfo();
-
-    if (nullptr == pLogBlockInfo)
-    {
-        OUR_DEBUG((LM_INFO, "[Test_LogBlockPool]GetLogBlockInfo is fail.\n"));
-        CPPUNIT_ASSERT_MESSAGE("[Test_LogBlockPool]GetLogBlockInfo is fail.", true == blRet);
-        return;
-    }
-
-    m_pLogBlockPool->ReturnBlockInfo(pLogBlockInfo);
-
+    m_nTestCount = 0;
 }
 
 void CUnit_LogManager::Test_Write_Log(void)
 {
     bool blRet = false;
-    char szData[MAX_BUFF_20] = { '\0' };
-    sprintf_safe(szData, MAX_BUFF_20, "freeeyes");
+    string strName = "freeeyes";
 
     //测试二进制写入
-    if (-1 == AppLogManager::instance()->WriteLogBinary(LOG_SYSTEM, szData, (int)ACE_OS::strlen(szData)))
+    if (-1 == AppLogManager::instance()->WriteLogBinary(LOG_SYSTEM, strName))
     {
         OUR_DEBUG((LM_INFO, "[Test_Write_Log]WriteLogBinary is fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_Write_Log]WriteLogBinary is fail.", true == blRet);

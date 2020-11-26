@@ -124,8 +124,6 @@ void CProConsoleHandle::open(ACE_HANDLE h, ACE_Message_Block&)
     ACE_Time_Value tvOpenEnd(ACE_OS::gettimeofday());
     ACE_Time_Value tvOpen(tvOpenEnd - tvOpenBegin);
 
-    //AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "Connection from [%s:%d] DisposeTime = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), tvOpen.msec());
-
     this->handle(h);
 
     if(this->m_Reader.open(*this, h, 0, App_ProactorManager::instance()->GetAce_Proactor()) == -1 ||
@@ -192,8 +190,6 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         SAFE_DELETE(m_pPacketParse);
 
         OUR_DEBUG((LM_DEBUG,"[CConnectHandler::handle_read_stream]Connectid=[%d] error(%d)...\n", GetConnectID(), errno));
-        //AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount);
-        //因为是要关闭连接，所以要多关闭一次IO，对应Open设置的1的初始值
 
         Close(2);
 
@@ -232,8 +228,6 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
             SAFE_DELETE(m_pPacketParse);
 
             OUR_DEBUG((LM_ERROR, "[CProConsoleHandle::handle_input]Read Shoter error(%d).", errno));
-            //AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount);
-            //因为是要关闭连接，所以要多关闭一次IO，对应Open设置的1的初始值
 
             Close(2);
             return;
@@ -309,11 +303,7 @@ void CProConsoleHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
     if(!result.success() || result.bytes_transferred()==0)
     {
         //链接断开
-        OUR_DEBUG ((LM_DEBUG,"[CConnectHandler::handle_write_stream] Connectid=[%d] begin(%d)...\n",GetConnectID(), errno));
-
-        //AppLogManager::instance()->WriteLog(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendSize = %d, SendCount = %d.",m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_u4AllRecvSize, m_u4AllRecvCount, m_u4AllSendSize, m_u4AllSendCount);
-
-        OUR_DEBUG((LM_DEBUG,"[CConnectHandler::handle_write_stream] Connectid=[%d] finish ok...\n", GetConnectID()));
+        OUR_DEBUG ((LM_DEBUG,"[CConnectHandler::handle_write_stream] Connectid=[%d] write(%d)...\n",GetConnectID(), errno));
         m_atvOutput = ACE_OS::gettimeofday();
         App_MessageBlockManager::instance()->Close(&result.message_block());
         Close();

@@ -14,8 +14,8 @@ void CLogFile::Init()
     stringstream ss_format;
     ss_format << dt.year()
         << "-" << dt.month()
-        << "-" << dt.day()
-        << m_u2CurrFileIndex
+        << "_" << dt.day()
+        << "_" << m_u2CurrFileIndex
         << ".log";
     string strDate = ss_format.str();
 
@@ -178,7 +178,7 @@ uint32 CLogFile::GetCurrFileSize() const
     return m_u4CurrFileSize;
 }
 
-int CLogFile::doLog(_LogBlockInfo* pLogBlockInfo)
+int CLogFile::doLog(shared_ptr<_LogBlockInfo> pLogBlockInfo)
 {
     //每次自动检测
     CheckTime();
@@ -198,14 +198,15 @@ int CLogFile::doLog(_LogBlockInfo* pLogBlockInfo)
     string strDate = ss_format.str();
 
     //拼接实际的日志字符串
-    sprintf_safe(m_pBuffer, m_u4BufferSize, "%s %s\n", strDate.c_str(), pLogBlockInfo->m_pBlock);
+    string strBuffer = strDate + " " + pLogBlockInfo->m_strBlock + "\n";
 
+    size_t u4BufferLength = strBuffer.length();
     if (m_nDisplay == 0)
     {
         //计入日志
-        auto nLen = (int)m_File.send(m_pBuffer, strlen(m_pBuffer));
+        auto u4Len = (uint32)m_File.send(strBuffer.c_str(), u4BufferLength);
 
-        if (nLen != (int)strlen(m_pBuffer))
+        if (u4Len != u4BufferLength)
         {
             OUR_DEBUG((LM_INFO, "[%s]Write error[%s].\n", m_StrlogName.c_str(), m_pBuffer));
         }
@@ -228,7 +229,7 @@ int CLogFile::doLog(_LogBlockInfo* pLogBlockInfo)
     return 0;
 }
 
-bool CLogFile::SendMail(const _LogBlockInfo* pLogBlockInfo, const xmlMails::_Mail* pMailInfo) const
+bool CLogFile::SendMail(shared_ptr<_LogBlockInfo> pLogBlockInfo, const xmlMails::_Mail* pMailInfo) const
 {
     //发送邮件
     const xmlMails::_Mail* pMailAlert = nullptr;
@@ -259,8 +260,8 @@ bool CLogFile::SendMail(const _LogBlockInfo* pLogBlockInfo, const xmlMails::_Mai
         pMailAlert->fromMailAddr.c_str(),
         pMailAlert->toMailAddr.c_str(),
         szMailURL.c_str(),
-        pLogBlockInfo->m_szMailTitle,
-        pLogBlockInfo->m_pBlock);
+        pLogBlockInfo->m_strMailTitle.c_str(),
+        pLogBlockInfo->m_strBlock.c_str());
 
     if (0 != nRet)
     {
@@ -361,8 +362,8 @@ bool CLogFile::Run()
     stringstream ss_format;
     ss_format << dt.year()
         << "-" << dt.month()
-        << "-" << dt.day()
-        << m_u2CurrFileIndex
+        << "_" << dt.day()
+        << "_" << m_u2CurrFileIndex
         << ".log";
     string strDate = ss_format.str();
 
@@ -471,23 +472,24 @@ void CFileLogger::Close()
 {
     OUR_DEBUG((LM_INFO, "[CFileLogger::Close]Begin.\n"));
 
-    for (auto objLogFile : m_vecLogFileList)
-    {
-        objLogFile->Close();
-    }
+    for_each(m_mapLogFileList.begin(), m_mapLogFileList.end(), [this](const std::pair<uint16, shared_ptr<CLogFile>>& iter) {
+        //写入文件
+        iter.second->Close();
+        });
 
-    m_vecLogFileList.clear();
+    m_mapLogFileList.clear();
     m_nCount = 0;
 
     OUR_DEBUG((LM_INFO, "[CFileLogger::Close]End.\n"));
 }
 
-int CFileLogger::DoLog(int nLogType, _LogBlockInfo* pLogBlockInfo)
+int CFileLogger::DoLog(uint16 nLogType, shared_ptr<_LogBlockInfo> pLogBlockInfo)
 {
     //根据LogType取余，获得当前日志映射位置
-    int nIndex = nLogType % m_nCount;
-
-    m_vecLogFileList[nIndex]->doLog(pLogBlockInfo);
+    if (nullptr != m_mapLogFileList[nLogType])
+    {
+        m_mapLogFileList[nLogType]->doLog(pLogBlockInfo);
+    }
 
     return 0;
 }
@@ -608,7 +610,7 @@ bool CFileLogger::Init()
             OUR_DEBUG((LM_INFO, "[CFileLogger::Init]Run error.\n"));
         }
 
-        m_vecLogFileList.emplace_back(pLogFile);
+        m_mapLogFileList[objFileInfo.m_u2LogID] = pLogFile;
     }
 
     return true;
@@ -638,40 +640,52 @@ uint16 CFileLogger::GetCurrLevel()
 
 uint16 CFileLogger::GetLogID(uint16 u2Index)
 {
-    if(u2Index >= m_nCount)
+    if(nullptr == m_mapLogFileList[u2Index])
     {
         return 0;
     }
 
-    return m_vecLogFileList[u2Index]->GetLoggerID();
+    return m_mapLogFileList[u2Index]->GetLoggerID();
 }
 
 const char* CFileLogger::GetLogInfoByServerName(uint16 u2LogID)
 {
-    int nIndex = u2LogID % m_nCount;
+    if (nullptr == m_mapLogFileList[u2LogID])
+    {
+        return 0;
+    }
 
-    return m_vecLogFileList[nIndex]->GetServerName().c_str();
+    return m_mapLogFileList[u2LogID]->GetServerName().c_str();
 }
 
 const char* CFileLogger::GetLogInfoByLogName(uint16 u2LogID)
 {
-    int nIndex = u2LogID % m_nCount;
+    if (nullptr == m_mapLogFileList[u2LogID])
+    {
+        return 0;
+    }
 
-    return m_vecLogFileList[nIndex]->GetLoggerName().c_str();
+    return m_mapLogFileList[u2LogID]->GetLoggerName().c_str();
 }
 
 int CFileLogger::GetLogInfoByLogDisplay(uint16 u2LogID)
 {
-    int nIndex = u2LogID % m_nCount;
+    if (nullptr == m_mapLogFileList[u2LogID])
+    {
+        return 0;
+    }
 
-    return m_vecLogFileList[nIndex]->GetDisPlay();
+    return m_mapLogFileList[u2LogID]->GetDisPlay();
 }
 
 uint16 CFileLogger::GetLogInfoByLogLevel(uint16 u2LogID)
 {
-    int nIndex = u2LogID % m_nCount;
+    if (nullptr == m_mapLogFileList[u2LogID])
+    {
+        return 0;
+    }
 
-    return m_vecLogFileList[nIndex]->GetLevel();
+    return m_mapLogFileList[u2LogID]->GetLevel();
 }
 
 

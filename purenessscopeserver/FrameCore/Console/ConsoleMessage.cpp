@@ -109,7 +109,9 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
     string strKey;
     string strOutputType;
 
-    AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONSOLEDATA, "<Command>%s.", pCommand);
+    string strLog = fmt::format("<Command>{%s}", pCommand);
+
+    AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONSOLEDATA, strLog);
 
     if(nLen > MAX_BUFF_100*2 + 1)
     {

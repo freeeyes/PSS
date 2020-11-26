@@ -177,11 +177,12 @@ bool CMessageService::PutMessage(CWorkThreadMessage* pMessage)
         if (false == m_blOverload)
         {
             OUR_DEBUG((LM_ERROR, "[CMessageService::PutMessage] Queue is Full errno = [%d].\n", nError));
+
             //线程处理过载，写入日志
-            AppLogManager::instance()->WriteLog(LOG_SYSTEM_ERROR,
-                "[CMessageService::PutMessage](%d)Queue is Full begin errno = [%d]",
+            string strLog = fmt::format("[CMessageService::PutMessage]{0}Queue is Full begin errno = {1}", 
                 m_u4ThreadID,
                 nError);
+            AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_ERROR, strLog);
 
             m_blOverload = true;
         }
@@ -254,10 +255,12 @@ bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4
             m_objHandlerList.Add_Hash_Data_By_Key_Unit32(pMessage->m_u4ConnectID, pWorkThread_Handler_info);
 
 			//写入连接日志
-			AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "Connection from [%s:%d] ConnectID=%d.",
-                pWorkThread_Handler_info->m_strRemoteIP.c_str(),
+            string strLog = fmt::format("Connection from [{0}:{1}] ConnectID={2}.",
+                pWorkThread_Handler_info->m_strRemoteIP,
                 pWorkThread_Handler_info->m_u2RemotePort,
                 pMessage->m_u4ConnectID);
+
+			AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_CONNECT, strLog);
         }
     }
 
@@ -340,13 +343,15 @@ bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4
         CLINET_LINK_TTY_DISCONNECT == pMessage->m_u2Cmd)
     {
 		//写日志
-		AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONNECT, "Close Connection from [%s:%d] RecvSize = %d, RecvCount = %d, SendCount = %d, SendSize = %d.",
-            pWorkThread_Handler_info->m_strRemoteIP.c_str(),
+        string strLog = fmt::format("Close Connection from [{0}:{1}] RecvSize = {2}, RecvCount = {3}, SendCount = {4}, SendSize = {5}.",
+            pWorkThread_Handler_info->m_strRemoteIP,
             pWorkThread_Handler_info->m_u2RemotePort,
             pWorkThread_Handler_info->m_InPacketCount,
             pWorkThread_Handler_info->m_RecvSize,
             pWorkThread_Handler_info->m_OutPacketCount,
             pWorkThread_Handler_info->m_SendSize);
+
+		AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_CONNECT, strLog);
 
         pWorkThread_Handler_info->m_pHandler->Close(pMessage->m_u4ConnectID);
         m_objHandlerList.Del_Hash_Data_By_Unit32(pMessage->m_u4ConnectID);
@@ -471,37 +476,43 @@ bool CMessageService::SaveThreadInfoData(const ACE_Time_Value& tvNow)
     //开始查看线程是否超时
     if(m_ThreadInfo.m_u4State == THREADSTATE::THREAD_RUNBEGIN && tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec() > m_u2ThreadTimeOut)
     {
-        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_WORKTHREAD, "[CMessageService::handle_timeout] pThreadInfo = [%d] State = [%d] Time = [%04d-%02d-%02d %02d:%02d:%02d] PacketCount = [%d] LastCommand = [0x%x] PacketTime = [%d] TimeOut > %d[%d] CurrPacketCount = [%d] QueueCount = [%d] BuffPacketUsed = [%d] BuffPacketFree = [%d].",
-                                              m_ThreadInfo.m_u4ThreadID,
-                                              m_ThreadInfo.m_u4State,
-                                              dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second(),
-                                              m_ThreadInfo.m_u4RecvPacketCount,
-                                              m_ThreadInfo.m_u2CommandID,
-                                              m_ThreadInfo.m_u2PacketTime,
-                                              m_u2ThreadTimeOut,
-                                              tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec(),
-                                              m_ThreadInfo.m_u4CurrPacketCount,
-                                              (int)msg_queue()->message_count(),
-                                              App_BuffPacketManager::instance()->GetBuffPacketUsedCount(),
-                                              App_BuffPacketManager::instance()->GetBuffPacketFreeCount());
+        string strLog = fmt::format("[CMessageService::handle_timeout] pThreadInfo = {0} State = {1} Time = [{2}-{3}-{4} {5}:{6}:{7}] PacketCount = {8} LastCommand = {9:#x} PacketTime = {10} TimeOut > {11}{12} CurrPacketCount = {13} QueueCount = {14} BuffPacketUsed = {15} BuffPacketFree = {16}.",
+            m_ThreadInfo.m_u4ThreadID,
+            m_ThreadInfo.m_u4State,
+            dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second(),
+            m_ThreadInfo.m_u4RecvPacketCount,
+            m_ThreadInfo.m_u2CommandID,
+            m_ThreadInfo.m_u2PacketTime,
+            m_u2ThreadTimeOut,
+            tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec(),
+            m_ThreadInfo.m_u4CurrPacketCount,
+            (int)msg_queue()->message_count(),
+            App_BuffPacketManager::instance()->GetBuffPacketUsedCount(),
+            App_BuffPacketManager::instance()->GetBuffPacketFreeCount());
 
+        AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_WORKTHREAD, strLog);
+
+        strLog = fmt::format("[CMessageService::handle_timeout] ThreadID = {0} Thread is reset.",
+            m_u4ThreadID);
         //发现阻塞线程，需要重启相应的线程
-        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_WORKTHREAD, "[CMessageService::handle_timeout] ThreadID = [%d] Thread is reset.", m_u4ThreadID);
+        AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_WORKTHREAD, strLog);
         return false;
     }
     else
     {
-        AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_WORKTHREAD, "[CMessageService::handle_timeout] pThreadInfo = [%d] State = [%d] Time = [%04d-%02d-%02d %02d:%02d:%02d] PacketCount = [%d] LastCommand = [0x%x] PacketTime = [%d] CurrPacketCount = [%d] QueueCount = [%d] BuffPacketUsed = [%d] BuffPacketFree = [%d].",
-                                              m_ThreadInfo.m_u4ThreadID,
-                                              m_ThreadInfo.m_u4State,
-                                              dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second(),
-                                              m_ThreadInfo.m_u4RecvPacketCount,
-                                              m_ThreadInfo.m_u2CommandID,
-                                              m_ThreadInfo.m_u2PacketTime,
-                                              m_ThreadInfo.m_u4CurrPacketCount,
-                                              (int)msg_queue()->message_count(),
-                                              App_BuffPacketManager::instance()->GetBuffPacketUsedCount(),
-                                              App_BuffPacketManager::instance()->GetBuffPacketFreeCount());
+        string strLog = fmt::format("[CMessageService::handle_timeout] pThreadInfo = {0} State = {1} Time = [{2}-{3}-{4}{5}:{6}:{7}] PacketCount = {8} LastCommand = {9:#x} PacketTime = {10} CurrPacketCount = {11} QueueCount = {12} BuffPacketUsed = {13} BuffPacketFree = {14}.",
+            m_ThreadInfo.m_u4ThreadID,
+            m_ThreadInfo.m_u4State,
+            dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second(),
+            m_ThreadInfo.m_u4RecvPacketCount,
+            m_ThreadInfo.m_u2CommandID,
+            m_ThreadInfo.m_u2PacketTime,
+            m_ThreadInfo.m_u4CurrPacketCount,
+            (int)msg_queue()->message_count(),
+            App_BuffPacketManager::instance()->GetBuffPacketUsedCount(),
+            App_BuffPacketManager::instance()->GetBuffPacketFreeCount());
+
+        AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_WORKTHREAD, strLog);
 
         m_ThreadInfo.m_u4CurrPacketCount = 0;
         return true;
@@ -546,10 +557,12 @@ bool CMessageService::DoMessage(IMessage* pMessage, uint16& u2CommandID, uint16&
 		//没有找到对应的注册指令，如果不是define.h定义的异常，则记录异常命令日志
 		if (u2CommandID >= CLIENT_LINK_USER)
 		{
-			AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_ERROR, "[CommandID=%d][HeadLen=%d][BodyLen=%d] is not plugin dispose.",
-				u2CommandID,
-				pMessage->GetMessageBase()->m_u4HeadSrcSize,
-				pMessage->GetMessageBase()->m_u4BodySrcSize);
+            string strLog = fmt::format("[CommandID={0}][HeadLen={1}][BodyLen={2}] is not plugin dispose.",
+                u2CommandID,
+                pMessage->GetMessageBase()->m_u4HeadSrcSize,
+                pMessage->GetMessageBase()->m_u4BodySrcSize);
+
+            AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_ERROR, strLog);
 		}
 
         OUR_DEBUG((LM_ERROR, "[CMessageService::DoMessage] pClientCommandList no find(%d).\n", u2CommandID));
@@ -1215,7 +1228,11 @@ bool CMessageServiceGroup::CheckWorkThread(const ACE_Time_Value& tvNow)
 
 bool CMessageServiceGroup::CheckPacketParsePool() const
 {
-    AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_PACKETTHREAD, "[CMessageService::handle_timeout] UsedCount = %d, FreeCount= %d.", App_PacketParsePool::instance()->GetUsedCount(), App_PacketParsePool::instance()->GetFreeCount());
+    string strLog = fmt::format("[CMessageService::handle_timeout] UsedCount = {0}, FreeCount= {1}.",
+        App_PacketParsePool::instance()->GetUsedCount(), 
+        App_PacketParsePool::instance()->GetFreeCount());
+
+    AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_PACKETTHREAD, strLog);
     return true;
 }
 
@@ -1237,7 +1254,13 @@ bool CMessageServiceGroup::CheckCPUAndMemory(bool blTest)
         if (u4CurrCpu > GetXmlConfigAttribute(xmlMonitor)->CpuMax || u4MessageBlockUsedSize > GetXmlConfigAttribute(xmlMonitor)->MemoryMax)
         {
             OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::handle_timeout]CPU Rote=%d,MessageBlock=%d,u4BuffPacketCount=%d,u4MessageCount=%d ALERT.\n", u4CurrCpu, u4MessageBlockUsedSize, u4BuffPacketCount, u4MessageCount));
-            AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_MONITOR, "[Monitor] CPU Rote=%d,MessageBlock=%d,u4BuffPacketCount=%d,u4MessageCount=%d.", u4CurrCpu, u4MessageBlockUsedSize, u4BuffPacketCount, u4MessageCount);
+
+            string strLog = fmt::format("[Monitor] CPU Rote={0},MessageBlock={1},u4BuffPacketCount={2},u4MessageCount={3}.",
+                u4CurrCpu, 
+                u4MessageBlockUsedSize, 
+                u4BuffPacketCount, 
+                u4MessageCount);
+            AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_MONITOR, strLog);
         }
     }
 
@@ -1328,11 +1351,14 @@ bool CMessageServiceGroup::CheckPlugInState() const
                 char szTitle[MAX_BUFF_50] = { '\0' };
                 sprintf_safe(szTitle, MAX_BUFF_50, "ModuleStateError");
 
+                string strLog = fmt::format("Module ErrorID={0}.\n",
+                    u4ErrorID);
+
                 //发送邮件
-                AppLogManager::instance()->WriteToMail_i(LOG_SYSTEM_MONITOR, 1,
-                        szTitle,
-                        "Module ErrorID=%d.\n",
-                        u4ErrorID);
+                AppLogManager::instance()->WriteToMail_r(LOG_SYSTEM_MONITOR, 
+                    1,
+                    szTitle,
+                    strLog);
             }
         }
     }

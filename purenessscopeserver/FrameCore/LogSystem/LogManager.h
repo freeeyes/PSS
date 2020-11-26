@@ -1,43 +1,25 @@
 #ifndef _LOGMANAGER_H
 #define _LOGMANAGER_H
 
+//管理日志块的池
+//一个使用者提议，对日志采用分级管理。
+//也就是日志里面包含了
+//使用C11线程队列替换ACE_Task,用现代化的写法
+//add by freeeyes
+
 #include <stdio.h>
 #include "ILogObject.h"
 #include "ILogManager.h"
 #include "BaseTask.h"
+#include "ThreadQueue.h"
 
-//管理日志块的池
-//一个使用者提议，对日志采用分级管理。
-//也就是日志里面包含了
-//add by freeeyes
-
-class CLogBlockPool
+class CLogManager : public ILogManager
 {
 public:
-    CLogBlockPool() = default;
+    CLogManager(void) = default;
 
-    void Init(uint32 u4BlockSize, uint32 u4PoolCount);
-    void Close();
-
-    _LogBlockInfo* GetLogBlockInfo();                       //得到一个空余的日志块
-    void ReturnBlockInfo(_LogBlockInfo* pLogBlockInfo) const;     //归还一个用完的日志块
-
-    uint32 GetBlockSize() const;
-
-private:
-    _LogBlockInfo* m_pLogBlockInfo    = nullptr;      //日志池
-    uint32         m_u4MaxBlockSize   = 0;         //日志池单块最大上限
-    uint32         m_u4PoolCount      = 0;         //日志池中的日志块个数
-    uint32         m_u4CurrIndex      = 0;         //日志池中当前已用到的日志块ID
-};
-
-class CLogManager : public ACE_Task<ACE_MT_SYNCH>, public ILogManager
-{
-public:
-    CLogManager(void);
-
-    int open ();
-    virtual int svc(void);
+    int open();
+    int svc(void);
     int Close();
 
     void Init(int nThreadCount = 1, int nQueueMax = MAX_MSG_THREADQUEUE, uint32 u4MailID = 0);
@@ -45,7 +27,7 @@ public:
     int Stop();
     bool IsRun() const;
 
-    int PutLog(_LogBlockInfo* pLogBlockInfo);
+    int PutLog(shared_ptr<_LogBlockInfo> pLogBlockInfo);
     int RegisterLog(shared_ptr<IServerLogger> pServerLogger);
     int UnRegisterLog();
 
@@ -64,68 +46,31 @@ public:
     uint16 GetLogInfoByLogLevel(uint16 u2LogID);
 
     //对内写日志的接口
-    template <class... Args>
-    int WriteLog_i(int nLogType, const char* fmt, Args&& ... args)
-    {
-        //从日志块池里面找到一块空余的日志块
-        int nRet = 0;
+    int WriteLog_i(uint16 u2LogType, string strLog);
 
-        m_Logger_Mutex.acquire();
-        _LogBlockInfo* pLogBlockInfo = m_objLogBlockPool.GetLogBlockInfo();
-
-        if (nullptr != pLogBlockInfo)
-        {
-            ACE_OS::snprintf(pLogBlockInfo->m_pBlock, m_objLogBlockPool.GetBlockSize() - 1, fmt, convert(std::forward<Args>(args))...);
-            nRet = Update_Log_Block(nLogType, nullptr, nullptr, pLogBlockInfo);
-        }
-
-        m_Logger_Mutex.release();
-        return nRet;
-    };
-
-    template <class... Args>
-    int WriteToMail_i(int nLogType, uint16 u2MailID, const char* pTitle, const char* fmt, Args&& ... args)
-    {
-        int nRet = 0;
-        m_Logger_Mutex.acquire();
-        _LogBlockInfo* pLogBlockInfo = m_objLogBlockPool.GetLogBlockInfo();
-
-        if (nullptr != pLogBlockInfo)
-        {
-            ACE_OS::snprintf(pLogBlockInfo->m_pBlock, m_objLogBlockPool.GetBlockSize() - 1, fmt, convert(std::forward<Args>(args))...);
-            nRet = Update_Log_Block(nLogType, &u2MailID, pTitle, pLogBlockInfo);
-        }
-
-        m_Logger_Mutex.release();
-        return nRet;
-    };
+    int WriteToMail_i(uint16 u2LogType, uint16 u2MailID, string strTitle, string strLog);
 
     //对外写日志的接口
-    virtual int WriteLogBinary(int nLogType, const char* pData, int nLen);
+    int WriteLogBinary(uint16 u2LogType, string strLog) final;
 
-    virtual int WriteLog_r(int nLogType, const char* fmt, uint32 u4Len);
+    int WriteLog_r(uint16 u2LogType, string strLog) final;
 
-    virtual int WriteToMail_r(int nLogType, uint16 u2MailID, const char* pTitle, const char* fmt, uint32 u4Len);
+    int WriteToMail_r(uint16 u2LogType, uint16 u2MailID, string strTitle, string strLog) final;
 
 private:
-    bool Dispose_Queue();
-    int ProcessLog(_LogBlockInfo* pLogBlockInfo);
-    virtual int CloseMsgQueue();
-    int Update_Log_Block(int nLogType, const uint16* pMailID, const char* pTitle, _LogBlockInfo* pLogBlockInfo);
+    bool Dispose_Queue(shared_ptr<_LogBlockInfo> msg);
+    int ProcessLog(shared_ptr<_LogBlockInfo> msg);
 
     //关闭消息队列条件变量
-    ACE_Thread_Mutex                  m_mutex;
-    ACE_Condition<ACE_Thread_Mutex>   m_cond;
-    bool                              m_blRun          = false;               //日志系统是否启动
-    bool                              m_blIsNeedReset  = false;               //日志模块等级升级重置标志
-    bool                              m_blIsMail       = false;               //是否可以发送邮件
-    int                               m_nThreadCount   = 1;                   //记录日志线程个数，目前默认是1
-    int                               m_nQueueMax      = MAX_MSG_THREADQUEUE; //日志线程允许的最大队列个数
-    CLogBlockPool                     m_objLogBlockPool;                      //日志块池
-    ACE_Recursive_Thread_Mutex        m_Logger_Mutex;                         //线程锁
-    shared_ptr<IServerLogger>         m_pServerLogger = nullptr;                 //日志模块指针
+    bool                                     m_blRun          = false;               //日志系统是否启动
+    bool                                     m_blIsNeedReset  = false;               //日志模块等级升级重置标志
+    bool                                     m_blIsMail       = false;               //是否可以发送邮件
+    int                                      m_nThreadCount   = 1;                   //记录日志线程个数，目前默认是1
+    int                                      m_nQueueMax      = MAX_MSG_THREADQUEUE; //日志线程允许的最大队列个数
+    shared_ptr<IServerLogger>                m_pServerLogger = nullptr;                 //日志模块指针
+    CMessageQueue<shared_ptr<_LogBlockInfo>> m_objThreadQueue;
 };
 
-typedef ACE_Singleton<CLogManager, ACE_Recursive_Thread_Mutex> AppLogManager;
+using AppLogManager = ACE_Singleton<CLogManager, ACE_Recursive_Thread_Mutex>;
 
 #endif

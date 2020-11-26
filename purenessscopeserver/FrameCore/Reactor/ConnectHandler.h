@@ -85,7 +85,7 @@ public:
     bool GetIsLog() const;                                                   //获得当前连接是否可以写入日志
     void SetHashID(int nHashID);                                             //设置Hash数组下标
     int  GetHashID() const;                                                  //得到Hash数组下标
-    void Output_Debug_Data(const ACE_Message_Block* pMbData, int nLogType);  //输出DEBUG信息
+    void Output_Debug_Data(const ACE_Message_Block* pMbData, uint16 u2LogType);                       //输出DEBUG信息
 
     bool Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPacket);                              //将发送数据写入文件
     bool Send_Input_To_Cache(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);               //讲发送对象放入缓存
