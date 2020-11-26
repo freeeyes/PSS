@@ -233,6 +233,9 @@ bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4
     CMessage objRecvMessage;
     CWorkThread_Handler_info* pWorkThread_Handler_info = m_objHandlerList.Get_Hash_Box_Data_By_Uint32(pMessage->m_u4ConnectID);
 
+    //记录最后一次处理的命令ID
+    m_ThreadInfo.m_u2CommandID = pMessage->m_u2Cmd;
+
     //判断消息类型
     if (CLIENT_LINK_CONNECT == pMessage->m_u2Cmd ||
         CLINET_LINK_TTY_CONNECT == pMessage->m_u2Cmd)
@@ -300,6 +303,9 @@ bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4
             m_objWorkThreadProcess.AddPacketIn(u4PacletHeadLength + u4PacletBodyLength,
                 pMessage->m_tvMessage);
         }
+
+        //添加线程统计信息
+        m_ThreadInfo.m_u4RecvPacketCount++;
 	}
 
     //拼接消息
@@ -469,14 +475,10 @@ bool CMessageService::SaveThreadInfoData(const ACE_Time_Value& tvNow)
     //这里进行线程自检
     ACE_Date_Time dt(m_ThreadInfo.m_tvUpdateTime);
 
-    //添加到线程信息历史数据表
-    _ThreadInfo objCurrThreadInfo    = m_ThreadInfo;
-    objCurrThreadInfo.m_tvUpdateTime = ACE_OS::gettimeofday();
-
     //开始查看线程是否超时
     if(m_ThreadInfo.m_u4State == THREADSTATE::THREAD_RUNBEGIN && tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec() > m_u2ThreadTimeOut)
     {
-        string strLog = fmt::format("[CMessageService::handle_timeout] pThreadInfo = {0} State = {1} Time = [{2}-{3}-{4} {5}:{6}:{7}] PacketCount = {8} LastCommand = {9:#x} PacketTime = {10} TimeOut > {11}{12} CurrPacketCount = {13} QueueCount = {14} BuffPacketUsed = {15} BuffPacketFree = {16}.",
+        string strLog = fmt::format("[WorkThread_timeout] pThreadInfo = {0} State = {1} Time = [{2:04d}-{3:02d}-{4:02d} {5:02d}:{6:02d}:{7:02d}] PacketCount = {8} LastCommand = {9:#x} PacketTime = {10} TimeOut > {11}{12} QueueCount = {13} BuffPacketUsed = {14} BuffPacketFree = {15}.",
             m_ThreadInfo.m_u4ThreadID,
             m_ThreadInfo.m_u4State,
             dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second(),
@@ -485,7 +487,6 @@ bool CMessageService::SaveThreadInfoData(const ACE_Time_Value& tvNow)
             m_ThreadInfo.m_u2PacketTime,
             m_u2ThreadTimeOut,
             tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec(),
-            m_ThreadInfo.m_u4CurrPacketCount,
             (int)msg_queue()->message_count(),
             App_BuffPacketManager::instance()->GetBuffPacketUsedCount(),
             App_BuffPacketManager::instance()->GetBuffPacketFreeCount());
@@ -500,14 +501,13 @@ bool CMessageService::SaveThreadInfoData(const ACE_Time_Value& tvNow)
     }
     else
     {
-        string strLog = fmt::format("[CMessageService::handle_timeout] pThreadInfo = {0} State = {1} Time = [{2}-{3}-{4}{5}:{6}:{7}] PacketCount = {8} LastCommand = {9:#x} PacketTime = {10} CurrPacketCount = {11} QueueCount = {12} BuffPacketUsed = {13} BuffPacketFree = {14}.",
+        string strLog = fmt::format("[WorkThread_nomal] pThreadInfo = {0} State = {1} Time = [{2:04d}-{3:02d}-{4:02d}{5:02d}:{6:02d}:{7:02d}] PacketCount = {8} LastCommand = {9:#x} PacketTime = {10} QueueCount = {11} BuffPacketUsed = {12} BuffPacketFree = {13}.",
             m_ThreadInfo.m_u4ThreadID,
             m_ThreadInfo.m_u4State,
             dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second(),
             m_ThreadInfo.m_u4RecvPacketCount,
             m_ThreadInfo.m_u2CommandID,
             m_ThreadInfo.m_u2PacketTime,
-            m_ThreadInfo.m_u4CurrPacketCount,
             (int)msg_queue()->message_count(),
             App_BuffPacketManager::instance()->GetBuffPacketUsedCount(),
             App_BuffPacketManager::instance()->GetBuffPacketFreeCount());

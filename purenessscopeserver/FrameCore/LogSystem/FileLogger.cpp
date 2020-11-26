@@ -11,15 +11,11 @@ void CLogFile::Init()
 {
     //在这里初始化读取当前文件夹的文件最大序号和文件大小
     ACE_Date_Time dt;
-    stringstream ss_format;
-    ss_format << dt.year()
-        << "-" << dt.month()
-        << "_" << dt.day()
-        << "_" << m_u2CurrFileIndex
-        << ".log";
-    string strDate = ss_format.str();
-
-    m_pBuffer = new char[m_u4BufferSize];   //这里是用于日志拼接时间所用
+    string strDate = fmt::format("{0:04d}_{1:02d}_{2:02d}_{3}.log", 
+        dt.year(),
+        dt.month(),
+        dt.day(),
+        m_u2CurrFileIndex);
 
     //首先判断文件是否存在
     while (true)
@@ -80,7 +76,6 @@ void CLogFile::Init()
 void CLogFile::Close()
 {
     OUR_DEBUG((LM_INFO, "[CLogFile::Close]m_StrlogName=%s.\n", m_StrlogName.c_str()));
-    SAFE_DELETE_ARRAY(m_pBuffer);
     m_u4BufferSize = 0;
     m_File.close();
     OUR_DEBUG((LM_INFO, "[CLogFile::Close] End.\n"));
@@ -138,9 +133,7 @@ const char* CLogFile::GetLogTime() const
 
 void CLogFile::SetBufferSize(uint32 u4BufferSize)
 {
-    SAFE_DELETE_ARRAY(m_pBuffer);
-    m_pBuffer = new char[u4BufferSize];   //这里是用于日志拼接时间所用
-    m_u4BufferSize = u4BufferSize;
+    ACE_UNUSED_ARG(u4BufferSize);
 }
 
 void CLogFile::SetFileMaxSize(uint32 u4FileMaxSize)
@@ -187,15 +180,13 @@ int CLogFile::doLog(shared_ptr<_LogBlockInfo> pLogBlockInfo)
     m_u4CurrFileSize += pLogBlockInfo->m_u4Length;
 
     ACE_Date_Time dt;
-    stringstream ss_format;
-    ss_format << dt.year()
-        << "-" << dt.month()
-        << "-" << dt.day()
-        << " " << dt.hour()
-        << ":" << dt.minute()
-        << ":" << dt.second()
-        << dt.microsec() / 10000;
-    string strDate = ss_format.str();
+    string strDate = fmt::format("{0:04d}-{1:02d}-{2:02d} {3:02d}:{4:02d}:{5:02d}",
+        dt.year(),
+        dt.month(),
+        dt.day(),
+        dt.hour(),
+        dt.minute(),
+        dt.second());
 
     //拼接实际的日志字符串
     string strBuffer = strDate + " " + pLogBlockInfo->m_strBlock + "\n";
@@ -208,13 +199,13 @@ int CLogFile::doLog(shared_ptr<_LogBlockInfo> pLogBlockInfo)
 
         if (u4Len != u4BufferLength)
         {
-            OUR_DEBUG((LM_INFO, "[%s]Write error[%s].\n", m_StrlogName.c_str(), m_pBuffer));
+            OUR_DEBUG((LM_INFO, "[%s]Write error[%s].\n", m_StrlogName.c_str(), strBuffer.c_str()));
         }
     }
     else
     {
         //输出到屏幕
-        OUR_DEBUG((LM_INFO, "%s.\n", m_pBuffer));
+        OUR_DEBUG((LM_INFO, "%s.\n", strBuffer.c_str()));
     }
 
     //查看是否要发送邮件
@@ -359,22 +350,20 @@ void CLogFile::SetServerName(const char* szServerName)
 bool CLogFile::Run()
 {
     ACE_Date_Time dt;
-    stringstream ss_format;
-    ss_format << dt.year()
-        << "-" << dt.month()
-        << "_" << dt.day()
-        << "_" << m_u2CurrFileIndex
-        << ".log";
-    string strDate = ss_format.str();
-
+    string strDate = fmt::format("{0:04d}_{1:02d}_{2:02d}_{3}.log", 
+        dt.year(),
+        dt.month(),
+        dt.day(),
+        m_u2CurrFileIndex);
 
     dt.update(ACE_OS::gettimeofday());
 
     CreatePath();       //如果目录不存在则创建目录
 
-    ss_format.clear();
-    ss_format << dt.year() << "-" << dt.month() << "-" << dt.day();
-    m_strLogTime = ss_format.str();
+    m_strLogTime = fmt::format("{0:04d}-{1:02d}-{2:02d}",
+        dt.year(),
+        dt.month(),
+        dt.day());
 
     ACE_TString strLogModulePath = m_strFileRoot.c_str();
     ACE_TString strLogName = strLogModulePath 
@@ -405,13 +394,13 @@ bool CLogFile::Run()
 void CLogFile::CheckTime()
 {
     ACE_Date_Time dt;
-    stringstream ss_format;
 
     dt.update(ACE_OS::gettimeofday());
 
-    ss_format.clear();
-    ss_format << dt.year() << "-" << dt.month() << "-" << dt.day();
-    string strDate = ss_format.str();
+    string strDate = fmt::format("{0:04d}-{1:02d}-{2:02d}",
+        dt.year(),
+        dt.month(),
+        dt.day());
 
     if (strDate != m_strLogTime && false == Run())
     {

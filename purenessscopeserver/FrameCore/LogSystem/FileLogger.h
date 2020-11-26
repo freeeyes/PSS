@@ -127,7 +127,6 @@ private:
     uint16              m_u2LogID                  = 0;               //日志编号
     uint16              m_u2Level                  = 0;               //日志等级
     int                 m_nDisplay                 = 0;               //显示还是记录文件
-    char*               m_pBuffer                  = nullptr;         //日志缓冲指针
     string              m_strLogTime;                                 //Log当前时间
     string              m_strFileRoot;                                //路径的主目录
     ACE_TString         m_StrlogName;                                 //模块名字
