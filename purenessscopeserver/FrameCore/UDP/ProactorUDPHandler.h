@@ -42,7 +42,7 @@ private:
     void Send_Hander_Event(uint32 u4ConnandID, uint8 u1Option, ACE_INET_Addr addrRemote);                       //发送链接建立消息
 
     CPacketParse            m_objPacketParse;               //数据包解析类
-    _Packet_Parse_Info*     m_pPacketParseInfo = nullptr;   //处理业务的PacketParse库
+    shared_ptr<_Packet_Parse_Info> m_pPacketParseInfo = nullptr;   //处理业务的PacketParse库
     ACE_INET_Addr           m_addrLocal;                    //监听方的IP信息
     ACE_SOCK_Dgram          m_skRemote;
     ACE_Asynch_Read_Dgram   m_Read;

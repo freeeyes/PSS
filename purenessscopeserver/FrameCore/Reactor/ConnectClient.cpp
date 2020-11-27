@@ -309,7 +309,7 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
 {
     if (EM_CONNECT_IO_DISPOSE::CONNECT_IO_FRAME == m_emDispose)
     {
-        const _Packet_Parse_Info* pPacketParseInfo = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID);
+        auto pPacketParseInfo = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID);
 
         if (nullptr != pPacketParseInfo)
         {

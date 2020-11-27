@@ -11,7 +11,7 @@ void Recovery_Message(bool blDelete, char*& pMessage)
 bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param,
     IBuffPacket* pBuffPacket, 
     const ACE_SOCK_Dgram& skRemote,
-    const _Packet_Parse_Info* pPacketParseInfo,
+    shared_ptr<_Packet_Parse_Info> pPacketParseInfo,
     ACE_Message_Block* pBlockMessage)
 {
     if (nullptr == pBuffPacket)
@@ -80,7 +80,7 @@ bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param,
     return true;
 }
 
-bool Udp_Common_Recv_Head(uint32 u4ConnectID, ACE_Message_Block* pMBHead, CPacketParse* pPacketParse, const _Packet_Parse_Info* pPacketParseInfo, uint32 u4Len)
+bool Udp_Common_Recv_Head(uint32 u4ConnectID, ACE_Message_Block* pMBHead, CPacketParse* pPacketParse, shared_ptr<_Packet_Parse_Info> pPacketParseInfo, uint32 u4Len)
 {
     _Head_Info obj_Head_Info;
     bool blStateHead = pPacketParseInfo->Parse_Packet_Head_Info(u4ConnectID, pMBHead, App_MessageBlockManager::instance(), &obj_Head_Info, EM_CONNECT_IO_TYPE::CONNECT_IO_UDP);
@@ -106,7 +106,7 @@ bool Udp_Common_Recv_Head(uint32 u4ConnectID, ACE_Message_Block* pMBHead, CPacke
     return true;
 }
 
-bool Udp_Common_Recv_Body(uint32 u4ConnectID, ACE_Message_Block* pMBBody, CPacketParse* pPacketParse, const _Packet_Parse_Info* pPacketParseInfo)
+bool Udp_Common_Recv_Body(uint32 u4ConnectID, ACE_Message_Block* pMBBody, CPacketParse* pPacketParse, shared_ptr<_Packet_Parse_Info> pPacketParseInfo)
 {
     _Body_Info obj_Body_Info;
     bool blStateBody = pPacketParseInfo->Parse_Packet_Body_Info(u4ConnectID, pMBBody, App_MessageBlockManager::instance(), &obj_Body_Info, EM_CONNECT_IO_TYPE::CONNECT_IO_UDP);
@@ -124,7 +124,7 @@ bool Udp_Common_Recv_Body(uint32 u4ConnectID, ACE_Message_Block* pMBBody, CPacke
     return true;
 }
 
-bool Udp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPacketParse* pPacketParse, const _Packet_Parse_Info* pPacketParseInfo)
+bool Udp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPacketParse* pPacketParse, shared_ptr<_Packet_Parse_Info> pPacketParseInfo)
 {
     //以数据流处理
     _Packet_Info obj_Packet_Info;

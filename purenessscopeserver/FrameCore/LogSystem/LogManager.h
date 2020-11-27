@@ -58,7 +58,7 @@ public:
     int WriteToMail_r(uint16 u2LogType, uint16 u2MailID, string strTitle, string strLog) final;
 
 private:
-    bool Dispose_Queue(shared_ptr<_LogBlockInfo> msg);
+    bool Dispose_Queue(shared_ptr<_LogBlockInfo> msg) const;
     int ProcessLog(shared_ptr<_LogBlockInfo> msg) const;
 
     //关闭消息队列条件变量

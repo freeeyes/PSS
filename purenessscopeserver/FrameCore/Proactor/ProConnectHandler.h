@@ -138,7 +138,7 @@ private:
 
     ACE_Message_Block*  m_pBlockMessage    = nullptr;  //当前发送缓冲等待数据块
     ACE_Message_Block*  m_pBlockRecv       = nullptr;  //接收数据缓冲块
-    _Packet_Parse_Info* m_pPacketParseInfo = nullptr;  //PacketParse的解析器
+    shared_ptr<_Packet_Parse_Info> m_pPacketParseInfo = nullptr;  //PacketParse的解析器
 
     CPacketParse        m_objSendPacketParse;          //发送数据包组织结构
     char*               m_pPacketDebugData;            //记录数据包的Debug缓冲字符串

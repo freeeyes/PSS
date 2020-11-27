@@ -49,7 +49,7 @@ void CUnit_LoadModule::Test_LoadModule(void)
         return;
     }
 
-    vector<_ModuleInfo*> vecModeInfo;
+    vector<shared_ptr<_ModuleInfo>> vecModeInfo;
     App_ModuleLoader::instance()->GetAllModuleInfo(vecModeInfo);
 
     if (false == App_ModuleLoader::instance()->GetAllModuleName(0, szModuleName, u2ModuleNameLen))

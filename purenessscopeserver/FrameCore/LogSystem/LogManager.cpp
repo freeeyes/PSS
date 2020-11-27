@@ -129,7 +129,7 @@ int CLogManager::UnRegisterLog() const
     return 0;
 }
 
-bool CLogManager::Dispose_Queue(shared_ptr<_LogBlockInfo> msg)
+bool CLogManager::Dispose_Queue(shared_ptr<_LogBlockInfo> msg) const
 {
     if (0 != ProcessLog(msg))
     {

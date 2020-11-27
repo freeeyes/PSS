@@ -243,7 +243,7 @@ void DoMessage_ShowModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
 {
     if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") == 0)
     {
-        vector<_ModuleInfo*> vecModeInfo;
+        vector<shared_ptr<_ModuleInfo>> vecModeInfo;
         App_ModuleLoader::instance()->GetAllModuleInfo(vecModeInfo);
 
         if (CommandInfo.m_u1OutputType == 0)
@@ -258,7 +258,7 @@ void DoMessage_ShowModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
             pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
 
-        for (const _ModuleInfo* pModuleInfo : vecModeInfo)
+        for (auto pModuleInfo : vecModeInfo)
         {
             if (CommandInfo.m_u1OutputType == 0)
             {

@@ -53,7 +53,7 @@ private:
     CCommandAccount         m_CommandAccount;                       //数据包统计
 	ACE_Message_Block*      m_pBlockMessage            = nullptr;   //当前发送缓冲等待数据块
 	ACE_Message_Block*      m_pBlockRecv               = nullptr;   //接收数据缓冲块
-    _Packet_Parse_Info*     m_pPacketParseInfo         = nullptr;   //PacketParse解析器
+    shared_ptr<_Packet_Parse_Info> m_pPacketParseInfo         = nullptr;   //PacketParse解析器
 
 };
 #endif

@@ -226,7 +226,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         //处理接收数据(这里不区分是不是完整包，交给上层逻辑自己去判定)
         if (EM_CONNECT_IO_DISPOSE::CONNECT_IO_FRAME == m_emDispose)
         {
-            _Packet_Parse_Info* pPacketParseInfo = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID);
+            auto pPacketParseInfo = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID);
 
             if (nullptr != pPacketParseInfo)
             {

@@ -1,21 +1,17 @@
 #include "LoadPacketParse.h"
 
-CLoadPacketParse::CLoadPacketParse()
-{
-}
-
 void CLoadPacketParse::Init(int nCount)
 {
     Close();
     //初始化HashTable
-    m_objPacketParseList.Init(nCount);
+    m_nModuleCount = nCount;
 }
 
 bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint32 u4HeadLen, const char* pPacketParsePath, const char* szPacketParseName)
 {
     int nRet = 0;
     //隐式加载PacketParse接口
-    _Packet_Parse_Info* pPacketParseInfo = new _Packet_Parse_Info();
+    auto pPacketParseInfo = std::make_shared<_Packet_Parse_Info>();
 
     if (nullptr == pPacketParseInfo)
     {
@@ -33,7 +29,6 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
     if(nullptr == pPacketParseInfo->m_hModule)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, pModuleInfo->hModule is nullptr(%s)!\n", szPacketParseName, ACE_OS::dlerror()));
-        SAFE_DELETE(pPacketParseInfo);
         return false;
     }
 
@@ -44,7 +39,6 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function Parse_Packet_Head_Info is error!\n", szPacketParseName));
         nRet = ACE_OS::dlclose(pPacketParseInfo->m_hModule);
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo]PacketID=%d, ret=%d.\n", pPacketParseInfo->m_u4PacketParseID, nRet));
-        SAFE_DELETE(pPacketParseInfo);
         return false;
     }
 
@@ -55,7 +49,6 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function Parse_Packet_Body_Info is error!\n", szPacketParseName));
         nRet = ACE_OS::dlclose(pPacketParseInfo->m_hModule);
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo]PacketID=%d, ret=%d.\n", pPacketParseInfo->m_u4PacketParseID, nRet));
-        SAFE_DELETE(pPacketParseInfo);
         return false;
     }
 
@@ -66,7 +59,6 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function Parse_Packet_Stream is error!\n", szPacketParseName));
         nRet = ACE_OS::dlclose(pPacketParseInfo->m_hModule);
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo]PacketID=%d, ret=%d.\n", pPacketParseInfo->m_u4PacketParseID, nRet));
-        SAFE_DELETE(pPacketParseInfo);
         return false;
     }
 
@@ -77,7 +69,6 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function Make_Send_Packet is error!\n", szPacketParseName));
         nRet = ACE_OS::dlclose(pPacketParseInfo->m_hModule);
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo]PacketID=%d, ret=%d.\n", pPacketParseInfo->m_u4PacketParseID, nRet));
-        SAFE_DELETE(pPacketParseInfo);
         return false;
     }
 
@@ -88,7 +79,6 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function Make_Send_Packet_Length is error!\n", szPacketParseName));
         nRet = ACE_OS::dlclose(pPacketParseInfo->m_hModule);
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo]PacketID=%d, ret=%d.\n", pPacketParseInfo->m_u4PacketParseID, nRet));
-        SAFE_DELETE(pPacketParseInfo);
         return false;
     }
 
@@ -99,7 +89,6 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function Connect is error!\n", szPacketParseName));
         nRet = ACE_OS::dlclose(pPacketParseInfo->m_hModule);
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo]PacketID=%d, ret=%d.\n", pPacketParseInfo->m_u4PacketParseID, nRet));
-        SAFE_DELETE(pPacketParseInfo);
         return false;
     }
 
@@ -110,7 +99,6 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function DisConnect is error!\n", szPacketParseName));
         nRet = ACE_OS::dlclose(pPacketParseInfo->m_hModule);
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo]PacketID=%d, ret=%d.\n", pPacketParseInfo->m_u4PacketParseID, nRet));
-        SAFE_DELETE(pPacketParseInfo);
         return false;
     }
 
@@ -121,65 +109,40 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function Close is error!\n", szPacketParseName));
         nRet = ACE_OS::dlclose(pPacketParseInfo->m_hModule);
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo]PacketID=%d, ret=%d.\n", pPacketParseInfo->m_u4PacketParseID, nRet));
-        SAFE_DELETE(pPacketParseInfo);
         return false;
     }
 
     //添加到HashPool里面
-    char szPacketID[10] = { '\0' };
-    sprintf_safe(szPacketID, 10, "%d", pPacketParseInfo->m_u4PacketParseID);
-    int32 nHashPos = m_objPacketParseList.Add_Hash_Data(szPacketID, pPacketParseInfo);
-
-    if (nHashPos < 0)
-    {
-        SAFE_DELETE(pPacketParseInfo);
-        return false;
-    }
-    else
-    {
-        return true;
-    }
+    m_objPacketParseList[pPacketParseInfo->m_u4PacketParseID] = pPacketParseInfo;
+    return true;
 }
 
-_Packet_Parse_Info* CLoadPacketParse::GetPacketParseInfo(uint32 u4PacketParseID)
+shared_ptr<_Packet_Parse_Info> CLoadPacketParse::GetPacketParseInfo(uint32 u4PacketParseID)
 {
-    char szPacketID[10] = { '\0' };
-    sprintf_safe(szPacketID, 10, "%d", u4PacketParseID);
+    auto f = m_objPacketParseList.find(u4PacketParseID);
 
-    _Packet_Parse_Info* pPacketParseInfo = m_objPacketParseList.Get_Hash_Box_Data(szPacketID);
-
-    if(nullptr == pPacketParseInfo)
+    if(m_objPacketParseList.end() == f)
     {
         //这里打印输出错误
         OUR_DEBUG((LM_INFO, "[CLoadPacketParse::GetPacketParseInfo]can't find u4PacketParseID(%d).\n", u4PacketParseID));
+        return nullptr;
     }
-
-    return pPacketParseInfo;
+    else
+    {
+        return f->second;
+    }
 }
 
 void CLoadPacketParse::Close()
 {
+    OUR_DEBUG((LM_INFO, "[CLoadPacketParse::Close]Begin.\n"));
     //清理所有已存在的指针
-    vector<_Packet_Parse_Info*> vecPacketParseList;
-    m_objPacketParseList.Get_All_Used(vecPacketParseList);
+    for_each(m_objPacketParseList.begin(), m_objPacketParseList.end(), [](const std::pair<uint32, shared_ptr<_Packet_Parse_Info>>& iter) {
+        //关闭模块接口
+        iter.second->Close();
+        ACE_OS::dlclose(iter.second->m_hModule);
+        });
 
-    uint32 u4Size = (uint32)vecPacketParseList.size();
-
-    OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::Close]u4Size=%d.\n", u4Size));
-
-    for (uint32 i = 0; i < u4Size; i++)
-    {
-        if (nullptr != vecPacketParseList[i] && nullptr != vecPacketParseList[i]->m_hModule)
-        {
-            vecPacketParseList[i]->Close();
-            int nRet = ACE_OS::dlclose(vecPacketParseList[i]->m_hModule);
-            OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::Close]PacketID=%d, ret=%d.\n", vecPacketParseList[i]->m_u4PacketParseID, nRet));
-        }
-
-        SAFE_DELETE(vecPacketParseList[i]);
-    }
-
-    vecPacketParseList.clear();
-
-    m_objPacketParseList.Close();
+    m_objPacketParseList.clear();
+    OUR_DEBUG((LM_INFO, "[CLoadPacketParse::Close]End.\n"));
 }

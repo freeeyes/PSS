@@ -69,7 +69,7 @@ private:
     EM_CONNECT_IO_DISPOSE                 m_emDispose            = EM_CONNECT_IO_DISPOSE::CONNECT_IO_PLUGIN; //处理模式，框架处理 or 业务处理
     uint32                                m_u4PacketParseInfoID  = 0;                 //框架处理模块ID
     string                                m_strDeviceName;                            //转发接口名称
-    _Packet_Parse_Info*                   m_pPacketParse         = nullptr;           //数据包Packetparse函数接口
+    shared_ptr<_Packet_Parse_Info>        m_pPacketParse         = nullptr;           //数据包Packetparse函数接口
 };
 
 #endif

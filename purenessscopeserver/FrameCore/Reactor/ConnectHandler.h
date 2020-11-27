@@ -146,7 +146,7 @@ private:
     EM_IO_TYPE                 m_emIOType             = EM_IO_TYPE::NET_INPUT; //当前IO入口类型
     IFileTestManager*          m_pFileTest            = nullptr;               //文件测试接口入口
     string                     m_strDeviceName;                                //转发接口名称
-    _Packet_Parse_Info*        m_pPacketParseInfo     = nullptr;               //PacketParse的解析器
+    shared_ptr<_Packet_Parse_Info> m_pPacketParseInfo     = nullptr;               //PacketParse的解析器
 };
 
 //链接ConnectHandler内存池

@@ -43,16 +43,16 @@ public:
 void Send_MakePacket_Queue(_MakePacket const& objMakePacket);
 
 //udp函数发送数据包合成函数
-bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param, IBuffPacket* pBuffPacket, const ACE_SOCK_Dgram& skRemote, const _Packet_Parse_Info* pPacketParseInfo, ACE_Message_Block* pBlockMessage);
+bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param, IBuffPacket* pBuffPacket, const ACE_SOCK_Dgram& skRemote, shared_ptr<_Packet_Parse_Info> pPacketParseInfo, ACE_Message_Block* pBlockMessage);
 
 //udp处理消息头函数
-bool Udp_Common_Recv_Head(uint32 u4ConnectID, ACE_Message_Block* pMBHead, CPacketParse* pPacketParse, const _Packet_Parse_Info* pPacketParseInfo, uint32 u4Len);
+bool Udp_Common_Recv_Head(uint32 u4ConnectID, ACE_Message_Block* pMBHead, CPacketParse* pPacketParse, shared_ptr<_Packet_Parse_Info> pPacketParseInfo, uint32 u4Len);
 
 //udp处理消息体函数
-bool Udp_Common_Recv_Body(uint32 u4ConnectID, ACE_Message_Block* pMBBody, CPacketParse* pPacketParse, const _Packet_Parse_Info* pPacketParseInfo);
+bool Udp_Common_Recv_Body(uint32 u4ConnectID, ACE_Message_Block* pMBBody, CPacketParse* pPacketParse, shared_ptr<_Packet_Parse_Info> pPacketParseInfo);
 
 //udp流消息处理
-bool Udp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPacketParse* pPacketParse, const _Packet_Parse_Info* m_pPacketParseInfo);
+bool Udp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPacketParse* pPacketParse, shared_ptr<_Packet_Parse_Info> pPacketParseInfo);
 
 //提交udp数据到工作线程
 bool Udp_Common_Send_WorkThread(uint32 u4ConnectID, CPacketParse* pPacketParse, const ACE_INET_Addr& addrRemote, const ACE_INET_Addr& addrLocal, const ACE_Time_Value& tvCheck);

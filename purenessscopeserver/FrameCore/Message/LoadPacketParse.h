@@ -7,8 +7,8 @@
 #include "ace/OS_NS_dlfcn.h"
 
 #include "define.h"
-#include "HashTable.h"
 #include "IMessageBlockManager.h"
+#include <unordered_map>
 
 class _Packet_Parse_Info
 {
@@ -27,15 +27,13 @@ public:
     void (*DisConnect)(uint32 u4ConnectID) = nullptr;
     void(*Close)() = nullptr;
 
-    _Packet_Parse_Info()
-    {
-    }
+    _Packet_Parse_Info() = default;
 };
 
 class CLoadPacketParse
 {
 public:
-    CLoadPacketParse();
+    CLoadPacketParse() = default;
 
     void Init(int nCount);
 
@@ -43,12 +41,14 @@ public:
 
     void Close();
 
-    _Packet_Parse_Info* GetPacketParseInfo(uint32 u4PacketParseID);
+    shared_ptr<_Packet_Parse_Info> GetPacketParseInfo(uint32 u4PacketParseID);
 
 private:
-    CHashTable<_Packet_Parse_Info>        m_objPacketParseList;                  //HashÄÚ´æ³Ø
+    using hashmapPacketParseModuleList = unordered_map<uint32, shared_ptr<_Packet_Parse_Info>>;
+    hashmapPacketParseModuleList        m_objPacketParseList;                  //HashÄÚ´æ³Ø
+    int m_nModuleCount = 0;
 };
 
-typedef ACE_Singleton<CLoadPacketParse, ACE_Null_Mutex> App_PacketParseLoader;
+using App_PacketParseLoader = ACE_Singleton<CLoadPacketParse, ACE_Null_Mutex>;
 
 #endif

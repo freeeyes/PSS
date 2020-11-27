@@ -501,7 +501,7 @@ bool CMessageService::SaveThreadInfoData(const ACE_Time_Value& tvNow)
     }
     else
     {
-        string strLog = fmt::format("[WorkThread_nomal] pThreadInfo = {0} State = {1} Time = [{2:04d}-{3:02d}-{4:02d}{5:02d}:{6:02d}:{7:02d}] PacketCount = {8} LastCommand = {9:#x} PacketTime = {10} QueueCount = {11} BuffPacketUsed = {12} BuffPacketFree = {13}.",
+        string strLog = fmt::format("[WorkThread_nomal] pThreadInfo = {0} State = {1} Time = [{2:04d}-{3:02d}-{4:02d} {5:02d}:{6:02d}:{7:02d}] PacketCount = {8} LastCommand = {9:#x} PacketTime = {10} QueueCount = {11} BuffPacketUsed = {12} BuffPacketFree = {13}.",
             m_ThreadInfo.m_u4ThreadID,
             m_ThreadInfo.m_u4State,
             dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second(),
@@ -1336,10 +1336,10 @@ EM_Client_Connect_status CMessageServiceGroup::GetConnectState(uint32 u4ConnectI
 
 bool CMessageServiceGroup::CheckPlugInState() const
 {
-    vector<_ModuleInfo*> vecModeInfo;
+    vector<shared_ptr<_ModuleInfo>> vecModeInfo;
     App_ModuleLoader::instance()->GetAllModuleInfo(vecModeInfo);
 
-    for (const _ModuleInfo* pModuleInfo : vecModeInfo)
+    for (auto pModuleInfo : vecModeInfo)
     {
         if (nullptr != pModuleInfo)
         {

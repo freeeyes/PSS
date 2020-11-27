@@ -154,7 +154,7 @@ void CUnit_Basehandler::Test_Udp_Common_Recv_Stream(void)
     memcpy_safe(szSendUDP, u4SendLen, pmb->wr_ptr(), u4SendLen);
     pmb->wr_ptr(u4SendLen);
 
-    _Packet_Parse_Info* pPacketParseInfo = App_PacketParseLoader::instance()->GetPacketParseInfo(1);
+    auto pPacketParseInfo = App_PacketParseLoader::instance()->GetPacketParseInfo(1);
 
     CPacketParse* pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
 
@@ -190,7 +190,7 @@ void CUnit_Basehandler::Test_Udp_Common_Send_Message(void)
     obj_Send_Message_Param.m_u2CommandID         = 0x1002;
     obj_Send_Message_Param.m_u4SendLength        = 4;
 
-    _Packet_Parse_Info* pPacketParseInfo = App_PacketParseLoader::instance()->GetPacketParseInfo(1);
+    auto pPacketParseInfo = App_PacketParseLoader::instance()->GetPacketParseInfo(1);
 
     CBuffPacket objtestBuffPacket;
 

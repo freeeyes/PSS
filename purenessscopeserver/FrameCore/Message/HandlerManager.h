@@ -7,21 +7,21 @@
 class CPSSHandlerManager : public IConnectManager
 {
 public:
-	virtual bool PostMessage(uint32 u4ConnectID, uint16 u2CommandID, IBuffPacket*& pBuffPacket, CSend_Param objSendParam);
+	bool PostMessage(uint32 u4ConnectID, uint16 u2CommandID, IBuffPacket*& pBuffPacket, CSend_Param objSendParam) final;
 	
-	virtual bool CloseConnect(uint32 u4ConnectID);
+	bool CloseConnect(uint32 u4ConnectID) final;
 
-	virtual _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);
+	_ClientIPInfo GetClientIPInfo(uint32 u4ConnectID) final;
 
-	virtual _ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID);
+	_ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID) final;
 
-	virtual uint32 GetCount();
+	uint32 GetCount() final;
 
-	virtual bool SetIsLog(uint32 u4ConnectID, bool blIsLog);
+	bool SetIsLog(uint32 u4ConnectID, bool blIsLog) final;
 
-	virtual EM_Client_Connect_status GetConnectState(uint32 u4ConnectID);
+	 EM_Client_Connect_status GetConnectState(uint32 u4ConnectID) final;
 };
 
-typedef ACE_Singleton<CPSSHandlerManager, ACE_Null_Mutex> App_HandlerManager;
+using App_HandlerManager = ACE_Singleton<CPSSHandlerManager, ACE_Null_Mutex>;
 
 #endif

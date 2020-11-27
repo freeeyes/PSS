@@ -50,7 +50,7 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1LoadS
     uint32 u4TmpUpdateIndex = 0;
 
     //获得重载对象相关参数
-    const _ModuleInfo* pModuleInfo = App_ModuleLoader::instance()->GetModuleInfo(pModuleName);
+    auto pModuleInfo = App_ModuleLoader::instance()->GetModuleInfo(pModuleName);
 
     if(nullptr != pModuleInfo)
     {
