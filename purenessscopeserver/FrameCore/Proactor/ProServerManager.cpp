@@ -392,20 +392,20 @@ bool CProServerManager::Close()
     App_ProTTyClientManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ProTTyClientManager OK.\n"));
 
+    App_MessageManager::instance()->Close();
+    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_MessageManager OK.\n"));
+
+    App_MessageServiceGroup::instance()->Close();
+    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_MessageServiceGroup OK.\n"));
+
     App_ModuleLoader::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ModuleLoader OK.\n"));
 
     App_ServerMessageTask::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ServerMessageTask OK.\n"));
 
-    App_MessageServiceGroup::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_MessageServiceGroup OK.\n"));
-
     AppLogManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close AppLogManager OK\n"));
-
-    App_MessageManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_MessageManager OK.\n"));
 
     App_BuffPacketManager::instance()->Close_Object(CBuffPacketManager::Close_Callback);
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_BuffPacketManager OK\n"));

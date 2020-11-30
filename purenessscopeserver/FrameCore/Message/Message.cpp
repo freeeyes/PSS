@@ -6,10 +6,6 @@
 
 #include "Message.h"
 
-CMessage::CMessage(void)
-{
-}
-
 ACE_Message_Block* CMessage::GetMessageHead()
 {
     return m_pmbHead;
@@ -85,7 +81,7 @@ void CWorkThreadMessage::SetHashID(int nHashID)
     m_nHashID = nHashID;
 }
 
-int CWorkThreadMessage::GetHashID()
+int CWorkThreadMessage::GetHashID() const
 {
     return m_nHashID;
 }
@@ -124,10 +120,6 @@ void CWorkThreadMessage::Close()
 		m_pmbQueuePtr->release();
 		m_pmbQueuePtr = nullptr;
 	}
-}
-
-CDeviceHandlerPool::CDeviceHandlerPool()
-{
 }
 
 void CDeviceHandlerPool::Init_Callback(int nIndex, CWorkThread_Handler_info* pHandler)

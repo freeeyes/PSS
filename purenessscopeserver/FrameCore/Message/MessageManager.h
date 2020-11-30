@@ -7,6 +7,7 @@
 #include "Message.h"
 #include "LoadModule.h"
 #include "HashTable.h"
+#include <unordered_map>
 
 //这里修改一下，如果一个命令对应一个模块是有限制的。
 //这里改为一个信令可以对应任意数量的处理模块，这样就比较好了。
@@ -20,22 +21,20 @@ public:
     uint32          m_u4Count                    = 0;                  //当前命令被调用的次数
     uint32          m_u4TimeCost                 = 0;                  //当前命令总时间消耗
     uint32          m_u4CurrUsedCount            = 0;                  //当前正在使用的引用次数
-    CClientCommand* m_pClientCommand             = nullptr;               //当前命令指针
+    shared_ptr<CClientCommand> m_pClientCommand  = nullptr;            //当前命令指针
     uint16          m_u2CommandID                = 0;                  //当前命令对应的ID
-    char            m_szModuleName[MAX_BUFF_100] = {'\0'};             //所属模块名称
+    string          m_strModuleName;                                   //所属模块名称
     ACE_Date_Time   m_dtLoadTime;                                      //当前命令加载时间
     _ClientIPInfo   m_objListenIPInfo;                                 //当前允许的IP和端口入口，默认是所有当前端口
 
-    _ClientCommandInfo()
-    {
-    }
+    _ClientCommandInfo() = default;
 };
 
 //模块和_ClientCommandInfo之间的对应关系
 class _ModuleClient
 {
 public:
-    vector<_ClientCommandInfo*> m_vecClientCommandInfo;    //一个模块所有对应命令列表
+    vector<shared_ptr<_ClientCommandInfo>> m_vecClientCommandInfo;    //一个模块所有对应命令列表
 };
 
 //一个消息可以对应一个CClientCommand*的数组，当消息到达的时候分发给这些订阅者
@@ -44,13 +43,11 @@ class CClientCommandList
 private:
     uint16  m_u2CommandID = 0;                      //当前处理信令ID
     uint16  m_u2Timeout   = 0;                      //当前处理超时时间
-    typedef vector<_ClientCommandInfo*> vecClientCommandList;
+    using vecClientCommandList = vector<shared_ptr<_ClientCommandInfo>>;
     vecClientCommandList m_vecClientCommandList;
 
 public:
-    CClientCommandList()
-    {
-    }
+    CClientCommandList() = default;
 
     explicit CClientCommandList(uint16 u2CommandID) : m_u2CommandID(u2CommandID)
     {
@@ -78,43 +75,35 @@ public:
 
     void Close()
     {
-        uint32 u4Size = (uint32)m_vecClientCommandList.size();
-
-        for(uint32 i = 0; i < u4Size; i++)
-        {
-            SAFE_DELETE(m_vecClientCommandList[i]);
-        }
-
         m_vecClientCommandList.clear();
     }
 
-    _ClientCommandInfo* AddClientCommand(CClientCommand* pClientCommand, const char* pMuduleName, const _ClientIPInfo* pListenInfo)
+    shared_ptr<_ClientCommandInfo> AddClientCommand(shared_ptr<CClientCommand> pClientCommand, const char* pMuduleName, const _ClientIPInfo* pListenInfo)
     {
-        _ClientCommandInfo* pClientCommandInfo = new _ClientCommandInfo();
-        pClientCommandInfo->m_pClientCommand  = pClientCommand;
-
-        sprintf_safe(pClientCommandInfo->m_szModuleName, MAX_BUFF_100, "%s", pMuduleName);
+        auto pClientCommandInfo = std::make_shared<_ClientCommandInfo>();
+        pClientCommandInfo->m_pClientCommand   = pClientCommand;
+        pClientCommandInfo->m_strModuleName    = pMuduleName;
 
         if (nullptr != pListenInfo)
         {
             pClientCommandInfo->m_objListenIPInfo = (*pListenInfo);
         }
 
-        m_vecClientCommandList.push_back(pClientCommandInfo);
+        m_vecClientCommandList.emplace_back(pClientCommandInfo);
 
         return pClientCommandInfo;
     }
 
     //如果返回为true，证明这个消息已经没有对应项，需要外围Hash中除去
-    bool DelClientCommand(const CClientCommand* pClientCommand)
+    bool DelClientCommand(shared_ptr<CClientCommand> pClientCommand)
     {
         for(vecClientCommandList::iterator b = m_vecClientCommandList.begin(); b!= m_vecClientCommandList.end(); ++b)
         {
-            const _ClientCommandInfo* pClientCommandInfo = (*b);
+            auto pClientCommandInfo = *b;
 
-            if(nullptr != pClientCommandInfo && pClientCommand == pClientCommandInfo->m_pClientCommand)
+            if(nullptr != pClientCommandInfo 
+                && pClientCommand == pClientCommandInfo->m_pClientCommand)
             {
-                SAFE_DELETE(pClientCommandInfo);
                 m_vecClientCommandList.erase(b);
                 break;
             }
@@ -137,7 +126,7 @@ public:
     }
 
     //得到指定位置的指针
-    _ClientCommandInfo* GetClientCommandIndex(int nIndex)
+    shared_ptr<_ClientCommandInfo> GetClientCommandIndex(int nIndex)
     {
         if(nIndex >= (int)m_vecClientCommandList.size())
         {
@@ -150,48 +139,57 @@ public:
     }
 };
 
+using hashmapClientCommandList = unordered_map<uint16, shared_ptr<CClientCommandList>>;
+using hashmapModuleClientList = unordered_map<string, shared_ptr<_ModuleClient>>;
+
 class CMessageManager : public IMessageManager
 {
 public:
-    CMessageManager(void);
+    CMessageManager(void) = default;
 
     void Init(uint16 u2MaxModuleCount, uint32 u4MaxCommandCount);
 
     void Close();
 
-    virtual bool AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, _ClientIPInfo* pListenInfo);   //注册命令
-    virtual bool AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName);   //注册命令
-    virtual bool DelClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand);                            //卸载命令
+    bool AddClientCommand(uint16 u2CommandID, shared_ptr<CClientCommand> pClientCommand, const char* pModuleName, _ClientIPInfo* pListenInfo) final;   //注册命令
+    bool AddClientCommand(uint16 u2CommandID, shared_ptr<CClientCommand> pClientCommand, const char* pModuleName) final;   //注册命令
+    bool DelClientCommand(uint16 u2CommandID, shared_ptr<CClientCommand> pClientCommand) final;                            //卸载命令
 
     bool UnloadModuleCommand(const char* pModuleName, uint8 u1LoadState, uint32 u4ThreadCount);  //卸载指定模块事件，u1State= 1 卸载，2 重载
 
     int  GetCommandCount() const;                                      //得到当前注册命令的个数
-    CClientCommandList* GetClientCommandExist(uint16 u2CommandID);     //得到当前指令是否已存在当前列表
+    shared_ptr<CClientCommandList> GetClientCommandExist(uint16 u2CommandID);     //得到当前指令是否已存在当前列表
 
-    CHashTable<_ModuleClient>* GetModuleClient();                      //返回所有模块绑定注册命令信息
+    hashmapModuleClientList GetModuleClient();                      //返回所有模块绑定注册命令信息
 
-    virtual uint32 GetWorkThreadCount();
-    virtual uint32 GetWorkThreadByIndex(uint32 u4Index);
+    uint32 GetWorkThreadCount() final;
+    uint32 GetWorkThreadByIndex(uint32 u4Index) final;
 
     uint16 GetMaxCommandCount() const;
     uint32 GetUpdateIndex() const;
 
-    CHashTable<CClientCommandList>* GetHashCommandList();              //得到当前HashCommandList的副本
+    hashmapClientCommandList GetHashCommandList();              //得到当前HashCommandList的副本
 
 private:
-    bool AddClientCommand_Ex(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, const _ClientIPInfo* pListenInfo);   //注册命令
-    void DeleteCommandByModule(const _ClientCommandInfo* pClientCommandInfo);                                                                  //遍历命令列表，删除指定的命令
-    void Add_ClientCommandList(const xmlCommandsTimeout::_CommandsTimeout* pCommandTimeout, CClientCommandList* pClientCommandList, uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, const _ClientIPInfo* pListenInfo);
+    bool AddClientCommand_Ex(uint16 u2CommandID, shared_ptr<CClientCommand> pClientCommand, const char* pModuleName, const _ClientIPInfo* pListenInfo);   //注册命令
+    void DeleteCommandByModule(shared_ptr<_ClientCommandInfo> pClientCommandInfo);                                                                  //遍历命令列表，删除指定的命令
+    void Add_ClientCommandList(const xmlCommandsTimeout::_CommandsTimeout* pCommandTimeout, 
+        shared_ptr<CClientCommandList> 
+        pClientCommandList, 
+        uint16 u2CommandID, 
+        shared_ptr<CClientCommand> pClientCommand, 
+        const char* pModuleName, 
+        const _ClientIPInfo* pListenInfo);
 
     uint32                         m_u4UpdateIndex       = 0;               //当前更新ID
     uint32                         m_u4MaxCommandCount   = 0;               //最大命令池中的数量
     uint32                         m_u4CurrCommandCount  = 0;               //当前有效命令数
     uint16                         m_u2MaxModuleCount    = 0;               //模块池里面的最大个数
-    CHashTable<CClientCommandList> m_objClientCommandList;                  //命令持对应的数组
-    CHashTable<_ModuleClient>      m_objModuleClientList;                   //加载模块对应的信息
+    hashmapClientCommandList       m_objClientCommandList;                  //命令持对应的数组
+    hashmapModuleClientList        m_objModuleClientList;                   //加载模块对应的信息
     ACE_Recursive_Thread_Mutex     m_ThreadWriteLock;                       //数据锁
 
 };
 
-typedef ACE_Singleton<CMessageManager, ACE_Null_Mutex> App_MessageManager;
+using App_MessageManager = ACE_Singleton<CMessageManager, ACE_Null_Mutex>;
 #endif

@@ -36,19 +36,14 @@ extern "C"
     DECLDIR bool GetModuleState(uint32& u4ErrorID);
 }
 
-CBaseCommand*        g_BaseCommand   = NULL;
-CServerObject*       g_pServerObject = NULL;
+shared_ptr<CBaseCommand>   g_BaseCommand   = NULL;
+CServerObject*             g_pServerObject = NULL;
 
 int LoadModuleData(CServerObject* pServerObject)
 {
     g_pServerObject = pServerObject;
 
-    if(NULL != g_BaseCommand)
-    {
-        SAFE_DELETE(g_BaseCommand);
-    }
-
-    g_BaseCommand = new CBaseCommand();
+    g_BaseCommand = std::make_shared<CBaseCommand>();
 
     OUR_DEBUG((LM_INFO, "[Base LoadModuleData] Begin.\n"));
 
@@ -118,8 +113,6 @@ int UnLoadModuleData()
 {
     //卸载插件，会自动调用插件回收，不需要在手动pMessageManager->DelClientCommand
     OUR_DEBUG((LM_INFO, "[Base UnLoadModuleData] Begin.\n"));
-
-    SAFE_DELETE(g_BaseCommand);
 
     OUR_DEBUG((LM_INFO, "[Base UnLoadModuleData] End.\n"));
     return 0;

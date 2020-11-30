@@ -16,7 +16,7 @@ void CLoadModule::Init(uint16 u2MaxModuleCount)
 void CLoadModule::Close()
 {
     //关闭当前活跃模块
-    for_each(m_objHashModuleList.begin(), m_objHashModuleList.end(), [this](const std::pair<string, shared_ptr<_ModuleInfo>>& iter) {
+    for_each(m_objHashModuleList.begin(), m_objHashModuleList.end(), [](const std::pair<string, shared_ptr<_ModuleInfo>>& iter) {
         //关闭模块接口
         iter.second->UnLoadModuleData();
 
@@ -185,12 +185,12 @@ int CLoadModule::UnloadListUpdate(uint32 u4UpdateIndex)
     return nRet;
 }
 
-int CLoadModule::GetCurrModuleCount()
+int CLoadModule::GetCurrModuleCount() const
 {
     return (int)m_objHashModuleList.size();
 }
 
-int CLoadModule::GetModulePoolCount()
+int CLoadModule::GetModulePoolCount() const
 {
     return m_u2MaxModuleCount;
 }
@@ -211,9 +211,8 @@ shared_ptr<_ModuleInfo> CLoadModule::GetModuleInfo(const char* pModuleName)
 
 bool CLoadModule::InitModule()
 {
-    for_each(m_objHashModuleList.begin(), m_objHashModuleList.end(), [this](const std::pair<string, shared_ptr<_ModuleInfo>>& iter) {
+    for_each(m_objHashModuleList.begin(), m_objHashModuleList.end(), [](const std::pair<string, shared_ptr<_ModuleInfo>>& iter) {
         //执行所有的插件数据进入前的准备
-        iter.second->InitModule;
         iter.second->InitModule(App_ServerObject::instance());
         });
 
@@ -234,7 +233,7 @@ bool CLoadModule::InitModule(const char* pModuleName)
 
 bool CLoadModule::LoadModuleInfo(string strModuleName, shared_ptr<_ModuleInfo> pModuleInfo, const char* pModulePath)
 {
-    char szModuleFile[MAX_BUFF_200] = {'\0'};
+    string strModuleFile;
 
     if(nullptr == pModuleInfo)
     {
@@ -244,11 +243,11 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, shared_ptr<_ModuleInfo> p
 
     pModuleInfo->strModulePath = (string)pModulePath;
 
-    sprintf_safe(szModuleFile, MAX_BUFF_200, "%s%s", pModulePath, strModuleName.c_str());
+    strModuleFile = fmt::format("{0}{1}", pModulePath, strModuleName);
 
     m_tmModule.acquire();
 
-    pModuleInfo->hModule = ACE_OS::dlopen((ACE_TCHAR*)szModuleFile, RTLD_NOW);
+    pModuleInfo->hModule = ACE_OS::dlopen((ACE_TCHAR*)strModuleFile.c_str(), RTLD_NOW);
 
     if(nullptr == pModuleInfo->hModule || !pModuleInfo->hModule)
     {

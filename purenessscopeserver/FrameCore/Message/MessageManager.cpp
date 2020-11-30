@@ -14,29 +14,19 @@
 #include "ConnectHandler.h"
 #endif
 
-CMessageManager::CMessageManager(void)
-{
-}
-
 void CMessageManager::Init(uint16 u2MaxModuleCount, uint32 u4MaxCommandCount)
 {
-    //初始化对象数组
-    m_objClientCommandList.Init((int)u4MaxCommandCount);
-
-    //初始化HashTable
-    m_objModuleClientList.Init((int)u2MaxModuleCount);
-
     m_u2MaxModuleCount  = u2MaxModuleCount;
     m_u4MaxCommandCount = u4MaxCommandCount;
     m_u4UpdateIndex     = 0;
 }
 
-bool CMessageManager::AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName)
+bool CMessageManager::AddClientCommand(uint16 u2CommandID, shared_ptr<CClientCommand> pClientCommand, const char* pModuleName)
 {
     return AddClientCommand_Ex(u2CommandID, pClientCommand, pModuleName, nullptr);
 }
 
-bool CMessageManager::AddClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, _ClientIPInfo* pListenInfo)
+bool CMessageManager::AddClientCommand(uint16 u2CommandID, shared_ptr<CClientCommand> pClientCommand, const char* pModuleName, _ClientIPInfo* pListenInfo)
 {
     return AddClientCommand_Ex(u2CommandID, pClientCommand, pModuleName, pListenInfo);
 }
@@ -60,12 +50,12 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1LoadS
         strModuleParam = pModuleInfo->strModuleParam;
     }
 
-    const _ModuleClient* pModuleClient = m_objModuleClientList.Get_Hash_Box_Data(strModuleName.c_str());
+    auto f = m_objModuleClientList.find(strModuleName.c_str());
 
-    if(nullptr != pModuleClient)
+    if(m_objModuleClientList.end() != f)
     {
         //从插件目前注册的命令里面找到所有该插件的信息，一个个释放
-        for(const auto* pClientCommandInfo : pModuleClient->m_vecClientCommandInfo)
+        for(auto pClientCommandInfo : f->second->m_vecClientCommandInfo)
         {
             //在命令列表中删除指定命令的映射关系
             DeleteCommandByModule(pClientCommandInfo);
@@ -92,39 +82,18 @@ int CMessageManager::GetCommandCount() const
 void CMessageManager::Close()
 {
     //类关闭的清理工作
-    vector<CClientCommandList*> vecClientCommandList;
-    m_objClientCommandList.Get_All_Used(vecClientCommandList);
+    m_objClientCommandList.clear();
 
-    uint32 u4Size = (uint32)vecClientCommandList.size();
-
-    for (uint32 i = 0; i < u4Size; i++)
-    {
-        vecClientCommandList[i]->Close();
-        SAFE_DELETE(vecClientCommandList[i]);
-    }
-
-    m_objClientCommandList.Close();
-
-    vector<_ModuleClient*> vecModuleClient;
-    m_objModuleClientList.Get_All_Used(vecModuleClient);
-
-    u4Size = (uint32)vecModuleClient.size();
-
-    for (uint32 i = 0; i < u4Size; i++)
-    {
-        SAFE_DELETE(vecModuleClient[i]);
-    }
-
-    m_objModuleClientList.Close();
+    m_objModuleClientList.clear();
 
     m_u2MaxModuleCount  = 0;
     m_u4MaxCommandCount = 0;
 
 }
 
-CHashTable<_ModuleClient>* CMessageManager::GetModuleClient()
+hashmapModuleClientList CMessageManager::GetModuleClient()
 {
-    return &m_objModuleClientList;
+    return m_objModuleClientList;
 }
 
 uint32 CMessageManager::GetWorkThreadCount()
@@ -147,12 +116,12 @@ uint32 CMessageManager::GetUpdateIndex() const
     return m_u4UpdateIndex;
 }
 
-CHashTable<CClientCommandList>* CMessageManager::GetHashCommandList()
+hashmapClientCommandList CMessageManager::GetHashCommandList()
 {
-    return &m_objClientCommandList;
+    return m_objClientCommandList;
 }
 
-bool CMessageManager::AddClientCommand_Ex(uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, const _ClientIPInfo* pListenInfo)
+bool CMessageManager::AddClientCommand_Ex(uint16 u2CommandID, shared_ptr<CClientCommand> pClientCommand, const char* pModuleName, const _ClientIPInfo* pListenInfo)
 {
     if (nullptr == pClientCommand)
     {
@@ -163,7 +132,7 @@ bool CMessageManager::AddClientCommand_Ex(uint16 u2CommandID, CClientCommand* pC
     //从配置文件获取Timeout设置
    const xmlCommandsTimeout::_CommandsTimeout* pCommandTimeout = GetXmlConfigAttribute(xmlCommandsTimeout)->GetCommandAlert(u2CommandID);
 
-    CClientCommandList* pClientCommandList = GetClientCommandExist(u2CommandID);
+    shared_ptr<CClientCommandList> pClientCommandList = GetClientCommandExist(u2CommandID);
 
     if (nullptr != pClientCommandList)
     {
@@ -174,13 +143,11 @@ bool CMessageManager::AddClientCommand_Ex(uint16 u2CommandID, CClientCommand* pC
     else
     {
         //该命令尚未添加
-        pClientCommandList = new CClientCommandList(u2CommandID);
+        pClientCommandList = std::make_shared<CClientCommandList>(u2CommandID);
 
         Add_ClientCommandList(pCommandTimeout, pClientCommandList, u2CommandID, pClientCommand, pModuleName, pListenInfo);
 
-        char szCommandID[10] = { '\0' };
-        sprintf_safe(szCommandID, 10, "%d", u2CommandID);
-        m_objClientCommandList.Add_Hash_Data(szCommandID, pClientCommandList);
+        m_objClientCommandList[u2CommandID] = pClientCommandList;
         m_u4CurrCommandCount++;
         OUR_DEBUG((LM_ERROR, "[CMessageManager::AddClientCommand_Ex]AddClientCommand u2CommandID = %d Add OK***.\n", u2CommandID));
     }
@@ -188,10 +155,10 @@ bool CMessageManager::AddClientCommand_Ex(uint16 u2CommandID, CClientCommand* pC
     return true;
 }
 
-void CMessageManager::DeleteCommandByModule(const _ClientCommandInfo* pClientCommandInfo)
+void CMessageManager::DeleteCommandByModule(shared_ptr<_ClientCommandInfo> pClientCommandInfo)
 {
     uint16 u2CommandID = pClientCommandInfo->m_u2CommandID;
-    CClientCommandList* pClientCommandList = GetClientCommandExist(u2CommandID);
+    shared_ptr<CClientCommandList> pClientCommandList = GetClientCommandExist(u2CommandID);
 
     if (nullptr == pClientCommandList)
     {
@@ -213,22 +180,12 @@ void CMessageManager::DeleteCommandByModule(const _ClientCommandInfo* pClientCom
                 OUR_DEBUG((LM_INFO, "[CMessageManager::UnloadModuleCommand]DelClientCommand(%d) is OK.\n", pClientCommandInfo->m_u2CommandID));
             }
 
-            //如果该指令下的命令已经不存在，则删除之
-            if (pClientCommandList->GetCount() == 0)
-            {
-                SAFE_DELETE(pClientCommandList);
-                char szCommandID[10] = { '\0' };
-                sprintf_safe(szCommandID, 10, "%d", u2CommandID);
-                m_objClientCommandList.Del_Hash_Data(szCommandID);
-                m_u4CurrCommandCount--;
-            }
-
             break;
         }
     }
 }
 
-void CMessageManager::Add_ClientCommandList(const xmlCommandsTimeout::_CommandsTimeout* pCommandTimeout, CClientCommandList* pClientCommandList, uint16 u2CommandID, CClientCommand* pClientCommand, const char* pModuleName, const _ClientIPInfo* pListenInfo)
+void CMessageManager::Add_ClientCommandList(const xmlCommandsTimeout::_CommandsTimeout* pCommandTimeout, shared_ptr<CClientCommandList> pClientCommandList, uint16 u2CommandID, shared_ptr<CClientCommand> pClientCommand, const char* pModuleName, const _ClientIPInfo* pListenInfo)
 {
 	//如果超时时间不为空，设置为超时时间
 	if (nullptr != pCommandTimeout)
@@ -237,64 +194,66 @@ void CMessageManager::Add_ClientCommandList(const xmlCommandsTimeout::_CommandsT
 	}
 
 	//该命令已存在
-	_ClientCommandInfo* pClientCommandInfo = pClientCommandList->AddClientCommand(pClientCommand, pModuleName, pListenInfo);
+	shared_ptr<_ClientCommandInfo> pClientCommandInfo = pClientCommandList->AddClientCommand(pClientCommand, pModuleName, pListenInfo);
 	//设置命令绑定ID
 	pClientCommandInfo->m_u2CommandID = u2CommandID;
 
 	//添加到模块里面
 	string strModule = pModuleName;
-	_ModuleClient* pModuleClient = m_objModuleClientList.Get_Hash_Box_Data(strModule.c_str());
+	auto f = m_objModuleClientList.find(strModule.c_str());
 
-	if (nullptr == pModuleClient)
+	if (m_objModuleClientList.end() == f)
 	{
 		//找不到，创建新的模块信息
-		pModuleClient = new _ModuleClient();
+		auto pModuleClient = std::make_shared<_ModuleClient>();
 
 		pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
-		m_objModuleClientList.Add_Hash_Data(strModule.c_str(), pModuleClient);
+		m_objModuleClientList[strModule.c_str()] = pModuleClient;
 	}
 	else
 	{
 		//找到了，添加进去
-		pModuleClient->m_vecClientCommandInfo.push_back(pClientCommandInfo);
+		f->second->m_vecClientCommandInfo.push_back(pClientCommandInfo);
 	}
 }
 
-bool CMessageManager::DelClientCommand(uint16 u2CommandID, CClientCommand* pClientCommand)
+bool CMessageManager::DelClientCommand(uint16 u2CommandID, shared_ptr<CClientCommand> pClientCommand)
 {
     char szCommandID[10] = { '\0' };
     sprintf_safe(szCommandID, 10, "%d", u2CommandID);
 
-    CClientCommandList* pClientCommandList = GetClientCommandExist(u2CommandID);
+    auto f = m_objClientCommandList.find(u2CommandID);
 
-    if (nullptr != pClientCommandList)
-    {
-        if (true == pClientCommandList->DelClientCommand(pClientCommand))
-        {
-            SAFE_DELETE(pClientCommandList);
-            m_objClientCommandList.Del_Hash_Data(szCommandID);
-            OUR_DEBUG((LM_ERROR, "[CMessageManager::DelClientCommand] u2CommandID = %d List Del OK.\n", u2CommandID));
-        }
-        else
-        {
-            OUR_DEBUG((LM_ERROR, "[CMessageManager::DelClientCommand] u2CommandID = %d Del Command OK.\n", u2CommandID));
-        }
-
-        return true;
-    }
-    else
+    if (m_objClientCommandList.end() == f)
     {
         OUR_DEBUG((LM_ERROR, "[CMessageManager::DelClientCommand] u2CommandID = %d is not exist.\n", u2CommandID));
         return false;
     }
+
+    auto pClientCommandList = f->second;
+
+    if (true == pClientCommandList->DelClientCommand(pClientCommand))
+    {
+        m_objClientCommandList.erase(f);
+        OUR_DEBUG((LM_ERROR, "[CMessageManager::DelClientCommand] u2CommandID = %d List Del OK.\n", u2CommandID));
+    }
+    else
+    {
+        OUR_DEBUG((LM_ERROR, "[CMessageManager::DelClientCommand] u2CommandID = %d Del Command OK.\n", u2CommandID));
+    }
+
+    return true;
 }
 
-CClientCommandList* CMessageManager::GetClientCommandExist(uint16 u2CommandID)
+shared_ptr<CClientCommandList> CMessageManager::GetClientCommandExist(uint16 u2CommandID)
 {
-    char szCommandID[10] = { '\0' };
-    sprintf_safe(szCommandID, 10, "%d", u2CommandID);
-    CClientCommandList* pClientCommandList = m_objClientCommandList.Get_Hash_Box_Data(szCommandID);
+    auto f = m_objClientCommandList.find(u2CommandID);
 
-    return pClientCommandList;
+    if (m_objClientCommandList.end() == f)
+    {
+        return nullptr;
+    }
+
+    return f->second;
 }
 

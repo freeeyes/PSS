@@ -13,17 +13,17 @@
 class CMessage : public IMessage
 {
 public:
-    CMessage(void);
+    CMessage(void) = default;
 
     ACE_Message_Block* GetMessageHead();
     ACE_Message_Block* GetMessageBody();
 
-    virtual _MessageBase* GetMessageBase();
+    _MessageBase* GetMessageBase() final;
 
-    virtual bool GetPacketHead(_PacketInfo& PacketInfo);
-    virtual bool GetPacketBody(_PacketInfo& PacketInfo);
-    virtual bool SetPacketHead(ACE_Message_Block* pmbHead);
-    virtual bool SetPacketBody(ACE_Message_Block* pmbBody);
+    bool GetPacketHead(_PacketInfo& PacketInfo) final;
+    bool GetPacketBody(_PacketInfo& PacketInfo) final;
+    bool SetPacketHead(ACE_Message_Block* pmbHead) final;
+    bool SetPacketBody(ACE_Message_Block* pmbBody) final;
 
 private:
     _MessageBase  m_MessageBase;
@@ -66,7 +66,7 @@ public:
 
     void SetHashID(int nHashID);
 
-    int GetHashID();
+    int GetHashID() const;
 
     void Clear();
 
@@ -98,7 +98,7 @@ public:
         m_nHashID = nHashID;
     };
 
-    int GetHashID()
+    int GetHashID() const
     {
         return m_nHashID;
     };
@@ -117,7 +117,7 @@ public:
 class CDeviceHandlerPool : public CObjectPoolManager<CWorkThread_Handler_info, ACE_Recursive_Thread_Mutex>
 {
 public:
-    CDeviceHandlerPool();
+    CDeviceHandlerPool() = default;
 
 	static void Init_Callback(int nIndex, CWorkThread_Handler_info* pHandler);
 	static void Close_Callback(int nIndex, CWorkThread_Handler_info* pHandler);

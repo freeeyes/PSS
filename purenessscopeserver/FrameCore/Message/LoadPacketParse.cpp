@@ -22,9 +22,10 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
     pPacketParseInfo->m_u4PacketParseID   = u4PacketParseID;
     pPacketParseInfo->m_u1PacketParseType = u1Type;
     pPacketParseInfo->m_u4OrgLength       = u4HeadLen;
-    char szFilePath[MAX_BUFF_500]         = { '\0' };
-    sprintf_safe(szFilePath, MAX_BUFF_500, "%s%s", pPacketParsePath, szPacketParseName);
-    pPacketParseInfo->m_hModule           = ACE_OS::dlopen((ACE_TCHAR*)szFilePath, RTLD_NOW);
+    string strFilePath;
+
+    strFilePath = fmt::format("{0}{1}", pPacketParsePath, szPacketParseName);
+    pPacketParseInfo->m_hModule = ACE_OS::dlopen((ACE_TCHAR*)strFilePath.c_str(), RTLD_NOW);
 
     if(nullptr == pPacketParseInfo->m_hModule)
     {

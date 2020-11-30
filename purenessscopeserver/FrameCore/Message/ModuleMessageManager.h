@@ -9,13 +9,13 @@
 class CModuleMessageManager : public IModuleMessageManager
 {
 public:
-    CModuleMessageManager();
-    virtual ~CModuleMessageManager();
+    CModuleMessageManager() = default;
+    ~CModuleMessageManager() final = default;
 
-    int SendModuleMessage(const char* pModuleName, uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket);
-    int SendFrameMessage(uint16 u2CommandID, uint32 u4WorkThreadID, IBuffPacket* pHeadPacket, IBuffPacket* pBodyBuffPacket);
+    int SendModuleMessage(const char* pModuleName, uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket) final;
+    int SendFrameMessage(uint16 u2CommandID, uint32 u4WorkThreadID, IBuffPacket* pHeadPacket, IBuffPacket* pBodyBuffPacket) final;
 };
 
-typedef ACE_Singleton<CModuleMessageManager, ACE_Null_Mutex> App_ModuleMessageManager;
+using App_ModuleMessageManager = ACE_Singleton<CModuleMessageManager, ACE_Null_Mutex>;
 
 #endif

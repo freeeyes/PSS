@@ -141,7 +141,7 @@ public:
 
     void GetFlowPortList(const ACE_Time_Value tvNow, vector<CWorkThread_Packet_Info>& vec_Port_Data_Account); //得到当前列表描述信息
 
-    bool Synchronize_SendPostMessage(CWorkThread_Handler_info* pHandlerInfo, const ACE_Time_Value tvMessage);
+    bool Synchronize_SendPostMessage(shared_ptr<CWorkThread_Handler_info> pHandlerInfo, const ACE_Time_Value tvMessage);
     bool SendPostMessage(CSendMessageInfo objSendMessageInfo);                //发送数据
     bool SendCloseMessage(uint32 u4ConnectID);                                //关闭指定链接 
 
@@ -159,7 +159,7 @@ private:
     bool ProcessSendClose(CWorkThreadMessage* pMessage, uint32 u4ThreadID);   //处理发送事件
     bool ProcessSendIsLog(CWorkThreadMessage* pMessage, uint32 u4ThreadID);   //处理发送事件
     void CloseCommandList();                                                  //清理当前信令列表副本
-    CClientCommandList* GetClientCommandList(uint16 u2CommandID);
+    shared_ptr<CClientCommandList> GetClientCommandList(uint16 u2CommandID);
     bool DoMessage(IMessage* pMessage, uint16& u2CommandID, uint16& u2Count, bool& bDeleteFlag);
 
     virtual int CloseMsgQueue();
@@ -189,8 +189,10 @@ private:
 
     CDeviceHandlerPool             m_DeviceHandlerPool;    //对象池 
 
-    CHashTable<CClientCommandList>                      m_objClientCommandList;  //可执行的信令列表
-    CHashTable<CWorkThread_Handler_info>                m_objHandlerList;        //对应的Handler列表
+    using hashmapClientCommandList = unordered_map<uint16, shared_ptr<CClientCommandList>>;
+    using hashmapHandlerInfoList   = unordered_map<uint32, shared_ptr<CWorkThread_Handler_info>>;
+    hashmapClientCommandList                            m_objClientCommandList;  //可执行的信令列表
+    hashmapHandlerInfoList                              m_objHandlerList;        //对应的Handler列表
 
     ACE_Thread_Mutex m_mutex;
     ACE_Condition<ACE_Thread_Mutex> m_cond;
@@ -252,7 +254,7 @@ private:
     bool CheckPacketParsePool() const;                                                        //检查正在使用的消息解析对象
     bool CheckPlugInState() const;                                                            //检查所有插件状态
    
-	typedef vector<CMessageService*> vecMessageService;
+	using vecMessageService = vector<shared_ptr<CMessageService>>;
 	vecMessageService                                   m_vecMessageService;
     uint32                                              m_u4MaxQueue           = 0;              //线程中最大消息对象个数
     uint32                                              m_u4HighMask           = 0;              //线程高水位
@@ -265,5 +267,5 @@ private:
     ACE_Recursive_Thread_Mutex                          m_ThreadLock;              //用于线程操作的线程锁，保证CurrThreadID的数据正常
 };
 
-typedef ACE_Singleton<CMessageServiceGroup, ACE_Null_Mutex> App_MessageServiceGroup;
+using App_MessageServiceGroup = ACE_Singleton<CMessageServiceGroup, ACE_Null_Mutex>;
 #endif

@@ -1,20 +1,11 @@
 #include "MessageDyeingManager.h"
 
-CMessageDyeingManager::CMessageDyeingManager()
-{
-}
-
-CMessageDyeingManager::~CMessageDyeingManager()
-{
-
-}
-
 void CMessageDyeingManager::AddDyringIP(const char* pClientIP, uint16 u2MaxCount)
 {
-    m_objDyeingIP.m_u2MaxCount = u2MaxCount;
+    m_objDyeingIP.m_u2MaxCount  = u2MaxCount;
     m_objDyeingIP.m_u2CurrCount = 0;
-    sprintf_safe(m_objDyeingIP.m_szIP, MAX_BUFF_20, "%s", pClientIP);
-    m_objDyeingIP.m_blIsValid = true;
+    m_objDyeingIP.m_strIP       = pClientIP;
+    m_objDyeingIP.m_blIsValid   = true;
 }
 
 bool CMessageDyeingManager::AddDyeingCommand(uint16 u2CommandID, uint16 u2MaxCount)
@@ -42,7 +33,7 @@ bool CMessageDyeingManager::AddDyeingCommand(uint16 u2CommandID, uint16 u2MaxCou
 
 void CMessageDyeingManager::GetDyeingCommand(vec_Dyeing_Command_list& objList) const
 {
-    for (const _Dyeing_Command& dyeing_command : m_objCommandList)
+    for (auto dyeing_command : m_objCommandList)
     {
         if (dyeing_command.m_blIsValid == true)
         {
@@ -56,7 +47,7 @@ string CMessageDyeingManager::GetTraceID(const char* pClientIP, short sClintPort
     string strTraceID = "";
 
     //检验IP规则
-    if (true == m_objDyeingIP.m_blIsValid && ACE_OS::strcmp(m_objDyeingIP.m_szIP, pClientIP) == 0)
+    if (true == m_objDyeingIP.m_blIsValid && m_objDyeingIP.m_strIP == (string)pClientIP)
     {
         m_objDyeingIP.m_u2CurrCount++;
 
@@ -73,7 +64,7 @@ string CMessageDyeingManager::GetTraceID(const char* pClientIP, short sClintPort
     //检测命令规则
     if(m_u2CurrCommandCount > 0)
     {
-        for (_Dyeing_Command& dyeing_command : m_objCommandList)
+        for (auto dyeing_command : m_objCommandList)
         {
             if (false == dyeing_command.m_blIsValid || dyeing_command.m_u2CommandID != u2CommandID)
             {

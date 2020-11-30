@@ -63,8 +63,8 @@ public:
 
     int  SendModuleMessage(const char* pModuleName, uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket);
 
-    int  GetCurrModuleCount();
-    int  GetModulePoolCount();
+    int  GetCurrModuleCount() const;
+    int  GetModulePoolCount() const;
     shared_ptr<_ModuleInfo> GetModuleInfo(const char* pModuleName);
 
     bool InitModule();                             //反应器启动完毕后，开始加载插件。

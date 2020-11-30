@@ -711,12 +711,16 @@ void DoMessage_ShowAllCommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* 
         return;
     }
 
-    CHashTable<_ModuleClient>* pHashModuleClient = App_MessageManager::instance()->GetModuleClient();
+    hashmapModuleClientList pHashModuleClient = App_MessageManager::instance()->GetModuleClient();
 
     //统计个数
     uint32 u4Count = 0;
-    vector<_ModuleClient*> vecModuleClient;
-    pHashModuleClient->Get_All_Used(vecModuleClient);
+    vector<shared_ptr<_ModuleClient>> vecModuleClient;
+
+    for_each(pHashModuleClient.begin(), pHashModuleClient.end(), [&vecModuleClient](const std::pair<string, shared_ptr<_ModuleClient>>& iter) {
+        vecModuleClient.emplace_back(iter.second);
+        });
+
     u4Count = (uint32)vecModuleClient.size();
 
     if (CommandInfo.m_u1OutputType == 0)
@@ -731,7 +735,7 @@ void DoMessage_ShowAllCommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* 
         pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
     }
 
-    for (const _ModuleClient* pModuleClient : vecModuleClient)
+    for (auto pModuleClient : vecModuleClient)
     {
         if (CommandInfo.m_u1OutputType == 0)
         {
@@ -745,13 +749,13 @@ void DoMessage_ShowAllCommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* 
             pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
 
-        for (_ClientCommandInfo* pClientCommandInfo : pModuleClient->m_vecClientCommandInfo)
+        for (shared_ptr<_ClientCommandInfo> pClientCommandInfo : pModuleClient->m_vecClientCommandInfo)
         {
             if (CommandInfo.m_u1OutputType == 0)
             {
                 VCHARS_STR strSName;
-                strSName.text = pClientCommandInfo->m_szModuleName;
-                strSName.u1Len = (uint8)ACE_OS::strlen(pClientCommandInfo->m_szModuleName);
+                strSName.text = (char* )pClientCommandInfo->m_strModuleName.c_str();
+                strSName.u1Len = (uint8)pClientCommandInfo->m_strModuleName.length();
                 (*pBuffPacket) << strSName;
                 (*pBuffPacket) << pClientCommandInfo->m_u2CommandID;
                 (*pBuffPacket) << pClientCommandInfo->m_u4Count;
@@ -760,7 +764,7 @@ void DoMessage_ShowAllCommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* 
             else
             {
                 std::stringstream ss_format;
-                ss_format << "ModuleName(" << pClientCommandInfo->m_szModuleName << ")\n"
+                ss_format << "ModuleName(" << pClientCommandInfo->m_strModuleName << ")\n"
                     << "CommandID(" << pClientCommandInfo->m_u2CommandID << ")\n"
                     << "Count(" << pClientCommandInfo->m_u4Count << ")\n"
                     << "TimeCost(" << pClientCommandInfo->m_u4TimeCost << ")\n";
