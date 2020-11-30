@@ -13,7 +13,7 @@ bool CMakePacket::Init() const
 bool CMakePacket::PutMessageBlock(_MakePacket const& objMakePacket, const ACE_Time_Value& tvNow) const 
 {   
     //根据操作OP，调用相应的方法。
-    CWorkThreadMessage* pMessage = App_MessageServiceGroup::instance()->CreateMessage(objMakePacket.m_u4ConnectID, 
+    auto pMessage = App_MessageServiceGroup::instance()->CreateMessage(objMakePacket.m_u4ConnectID, 
         objMakePacket.m_emPacketType);
 
     if(nullptr == pMessage)
@@ -51,7 +51,7 @@ bool CMakePacket::PutMessageBlock(_MakePacket const& objMakePacket, const ACE_Ti
     return true;
 }
 
-void CMakePacket::SetMessage(_MakePacket const& objMakePacket, CWorkThreadMessage* pWorkThreadMessage, const ACE_Time_Value& tvNow) const
+void CMakePacket::SetMessage(_MakePacket const& objMakePacket, shared_ptr<CWorkThreadMessage> pWorkThreadMessage, const ACE_Time_Value& tvNow) const
 {
     if(nullptr != pWorkThreadMessage)
     {
@@ -135,7 +135,7 @@ void CMakePacket::SetMessage(_MakePacket const& objMakePacket, CWorkThreadMessag
     }
 }
 
-void CMakePacket::SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, CWorkThreadMessage* pWorkThreadMessage, const ACE_Time_Value& tvNow) const
+void CMakePacket::SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, shared_ptr<CWorkThreadMessage> pWorkThreadMessage, const ACE_Time_Value& tvNow) const
 {
     //开始组装数据
     pWorkThreadMessage->m_u4ConnectID   = u4ConnectID;
@@ -147,7 +147,7 @@ void CMakePacket::SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBo
 
 bool CMakePacket::PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, const ACE_Time_Value& tvNow) const
 {
-    CWorkThreadMessage* pMessage = App_MessageServiceGroup::instance()->CreateMessage(u4ConnectID, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
+    auto pMessage = App_MessageServiceGroup::instance()->CreateMessage(u4ConnectID, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
 
     if(nullptr == pMessage)
     {

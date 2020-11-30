@@ -61,21 +61,6 @@ bool CMessage::SetPacketBody(ACE_Message_Block* pmbBody)
     return true;
 }
 
-CWorkThreadMessage::CWorkThreadMessage()
-{
-	//这里设置消息队列模块指针内容，这样就不必反复的new和delete，提升性能
-    //指针关系也可以在这里直接指定，不必使用的使用再指定
-	m_pmbQueuePtr = new ACE_Message_Block(sizeof(CMessage*));
-
-    CWorkThreadMessage** ppMessage = (CWorkThreadMessage**)m_pmbQueuePtr->base();
-	*ppMessage = this;
-}
-
-ACE_Message_Block* CWorkThreadMessage::GetQueueMessage()
-{
-    return m_pmbQueuePtr;
-}
-
 void CWorkThreadMessage::SetHashID(int nHashID)
 {
     m_nHashID = nHashID;
@@ -113,12 +98,6 @@ void CWorkThreadMessage::Close()
 	{
         App_MessageBlockManager::instance()->Close(m_pmbRecvBody);
 		m_pmbRecvBody = nullptr;
-	}
-
-	if (nullptr != m_pmbQueuePtr)
-	{
-		m_pmbQueuePtr->release();
-		m_pmbQueuePtr = nullptr;
 	}
 }
 

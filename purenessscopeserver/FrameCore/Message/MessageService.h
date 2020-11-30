@@ -97,20 +97,20 @@ public:
 };
 
 //工作线程时序模式
-class CMessageService : public ACE_Task<ACE_MT_SYNCH>
+class CMessageService
 {
 public:
     CMessageService();
 
     int open();
-    int svc (void) final;
+    int svc (void);
     int Close();
 
     void Init(uint32 u4ThreadID, uint32 u4MaxQueue = MAX_MSG_THREADQUEUE, uint32 u4LowMask = MAX_MSG_MASK, uint32 u4HighMask = MAX_MSG_MASK, bool blIsCpuAffinity = false);
 
     bool Start();
 
-    bool PutMessage(CWorkThreadMessage* pMessage);
+    bool PutMessage(shared_ptr<CWorkThreadMessage> pMessage);
     bool PutUpdateCommandMessage(uint32 u4UpdateIndex);
 
     _ThreadInfo* GetThreadInfo();
@@ -132,8 +132,8 @@ public:
 
     void CopyMessageManagerList();                                         //从MessageManager中获得信令列表副本
 
-    CWorkThreadMessage* CreateMessage();
-    void DeleteMessage(CWorkThreadMessage* pMessage);
+    shared_ptr<CWorkThreadMessage> CreateMessage();
+    void DeleteMessage(shared_ptr<CWorkThreadMessage> pMessage);
 
     void GetFlowPortList(const ACE_Time_Value& tvNow, vector<CWorkThread_Packet_Info>& vec_Port_Data_Account); //得到当前列表描述信息
 
@@ -150,18 +150,16 @@ public:
     uint32 GetThreadID();
 
 private:
-    bool ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4ThreadID); //处理接收事件
-    bool ProcessSendMessage(CWorkThreadMessage* pMessage, uint32 u4ThreadID); //处理发送事件
-    bool ProcessSendClose(CWorkThreadMessage* pMessage, uint32 u4ThreadID);   //处理发送事件
-    bool ProcessSendIsLog(CWorkThreadMessage* pMessage, uint32 u4ThreadID);   //处理发送事件
+    bool ProcessRecvMessage(shared_ptr<CWorkThreadMessage> pMessage, uint32 u4ThreadID); //处理接收事件
+    bool ProcessSendMessage(shared_ptr<CWorkThreadMessage> pMessage, uint32 u4ThreadID); //处理发送事件
+    bool ProcessSendClose(shared_ptr<CWorkThreadMessage> pMessage, uint32 u4ThreadID);   //处理发送事件
+    bool ProcessSendIsLog(shared_ptr<CWorkThreadMessage> pMessage, uint32 u4ThreadID);   //处理发送事件
     void CloseCommandList();                                                  //清理当前信令列表副本
     shared_ptr<CClientCommandList> GetClientCommandList(uint16 u2CommandID);
     bool DoMessage(IMessage* pMessage, uint16& u2CommandID, uint16& u2Count, bool& bDeleteFlag);
 
-    virtual int CloseMsgQueue();
-
-    void UpdateCommandList(const ACE_Message_Block* pmb);        //更新指令列表
-    bool Dispose_Queue();                                  //队列消费
+    void UpdateCommandList(uint32 u4UpdateIndex);                //更新指令列表
+    bool Dispose_Queue(shared_ptr<CWorkThreadMessage> msg);      //队列消费
 
     uint32                         m_u4ThreadID         = 0;                     //当前线程ID
     uint32                         m_u4MaxQueue         = MAX_MSG_THREADQUEUE;   //线程中最大消息对象个数
@@ -190,9 +188,9 @@ private:
     hashmapClientCommandList                            m_objClientCommandList;  //可执行的信令列表
     hashmapHandlerInfoList                              m_objHandlerList;        //对应的Handler列表
 
-    ACE_Thread_Mutex m_mutex;
-    ACE_Condition<ACE_Thread_Mutex> m_cond;
     CPerformanceCounter m_PerformanceCounter;
+    std::thread                                         m_ttQueue;               //消息队列线程
+    CMessageQueue<shared_ptr<CWorkThreadMessage>>       m_objThreadQueue;        //业务消息队列
 };
 
 //add by freeeyes
@@ -205,7 +203,7 @@ public:
     int handle_timeout(const ACE_Time_Value& tv, const void* arg) final;
 
     bool Init(uint32 u4ThreadCount = MAX_MSG_THREADCOUNT, uint32 u4MaxQueue = MAX_MSG_THREADQUEUE, uint32 u4LowMask = MAX_MSG_MASK);
-    bool PutMessage(CWorkThreadMessage* pMessage);                                                     //发送到相应的线程去处理
+    bool PutMessage(shared_ptr<CWorkThreadMessage> pMessage);                                //发送到相应的线程去处理
     bool PutUpdateCommandMessage(uint32 u4UpdateIndex);                                      //发送消息同步所有的工作线程命令副本
     void Close();
 
@@ -220,8 +218,8 @@ public:
     void GetAITF(vecCommandTimeout& objTimeout) const;                                        //得到所有的AI封禁数据包信息
     void SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime) const;  //设置AI
 
-    CWorkThreadMessage* CreateMessage(uint32 u4ConnectID, EM_CONNECT_IO_TYPE u1PacketType);   //从子线程中获取一个Message对象
-    void DeleteMessage(CWorkThreadMessage* pMessage);                                         //从子线程中回收一个Message对象
+    shared_ptr<CWorkThreadMessage> CreateMessage(uint32 u4ConnectID, EM_CONNECT_IO_TYPE u1PacketType);   //从子线程中获取一个Message对象
+    void DeleteMessage(shared_ptr<CWorkThreadMessage> pMessage);                                         //从子线程中回收一个Message对象
 
     void CopyMessageManagerList() const;                                                      //从MessageManager中获得信令列表副本
 

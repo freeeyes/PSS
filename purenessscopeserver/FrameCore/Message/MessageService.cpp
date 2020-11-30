@@ -6,7 +6,7 @@
 
 #include "MessageService.h"
 
-CMessageService::CMessageService(): m_cond(m_mutex)
+CMessageService::CMessageService()
 {
     uint16 u2ThreadTimeOut = GetXmlConfigAttribute(xmlThreadInfo)->ThreadTimeout;
 
@@ -76,19 +76,15 @@ bool CMessageService::Start()
 int CMessageService::open()
 {
     m_blRun = true;
-    msg_queue()->high_water_mark(m_u4HighMask);
-    msg_queue()->low_water_mark(m_u4LowMask);
 
     OUR_DEBUG((LM_INFO,"[CMessageService::open] m_u4HighMask = [%d] m_u4LowMask = [%d]\n", m_u4HighMask, m_u4LowMask));
 
-    if(activate(THREAD_PARAM, MAX_MSG_THREADCOUNT) == -1)
-    {
-        OUR_DEBUG((LM_ERROR, "[CMessageService::open] activate error ThreadCount = [%d].\n", MAX_MSG_THREADCOUNT));
-        m_blRun = false;
-        return -1;
-    }
+    //开启一个线程队列处理
+    m_ttQueue = std::thread([this]()
+        {
+            svc();
+        });
 
-    resume();
     return 0;
 }
 
@@ -114,7 +110,10 @@ int CMessageService::svc(void)
 
     while(m_blRun)
     {
-        if (false == Dispose_Queue())
+        shared_ptr<CWorkThreadMessage> msg;
+        m_objThreadQueue.Pop(msg);
+
+        if (false == Dispose_Queue(msg))
         {
             break;
         }
@@ -136,88 +135,38 @@ int CMessageService::svc(void)
 
     m_objHandlerList.clear();
 
+    //关闭所有指令集
+    CloseCommandList();
+
+    m_objClientCommandList.clear();
+
+    m_WorkThreadAI.Close();
+
     OUR_DEBUG((LM_INFO,"[CMessageService::svc] svc finish!\n"));
     return 0;
 }
 
-bool CMessageService::PutMessage(CWorkThreadMessage* pMessage)
+bool CMessageService::PutMessage(shared_ptr<CWorkThreadMessage> pMessage)
 {
-    ACE_Message_Block* mb = pMessage->GetQueueMessage();
-
-    if (true == m_blOverload)
-    {
-        size_t nQueueCount = msg_queue()->message_count();
-        if (nQueueCount < m_u4MaxQueue)
-        {
-            //超载已经结束了，记录恢复时间
-            OUR_DEBUG((LM_ERROR, "[CMessageService::PutMessage] Queue is Full end nQueueCount = [%d].\n", nQueueCount));
-        }
-        else
-        {
-            //超载尚未结束，返回错误
-            return false;
-        }
-
-		m_blOverload = false;
-    }
-
-    if(this->putq(mb, nullptr) == -1)
-    {
-        int nError = errno;
-        if (false == m_blOverload)
-        {
-            OUR_DEBUG((LM_ERROR, "[CMessageService::PutMessage] Queue is Full errno = [%d].\n", nError));
-
-            //线程处理过载，写入日志
-            string strLog = fmt::format("[CMessageService::PutMessage]{0}Queue is Full begin errno = {1}", 
-                m_u4ThreadID,
-                nError);
-            AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_ERROR, strLog);
-
-            m_blOverload = true;
-        }
-           
-        return false;
-    }
+    m_objThreadQueue.Push(pMessage);
 
     return true;
 }
 
 bool CMessageService::PutUpdateCommandMessage(uint32 u4UpdateIndex)
 {
-    ACE_Message_Block* mblk = App_MessageBlockManager::instance()->Create(sizeof(int));
+    auto pMessage = std::make_shared<CWorkThreadMessage>();
 
-    if (nullptr == mblk)
-    {
-        return false;
-    }
+    //设置消息类型和更新Index
+    pMessage->m_emPacketType = EM_CONNECT_IO_TYPE::COMMAND_UPDATE;
+    pMessage->m_u4ConnectID = u4UpdateIndex;
 
-    memcpy_safe((char* )&u4UpdateIndex, sizeof(int), mblk->wr_ptr(), sizeof(int));
-    mblk->wr_ptr(sizeof(int));
-
-    mblk->msg_type(ACE_Message_Block::MB_USER);
-
-    //判断队列是否是已经最大
-    auto nQueueCount = (uint32)msg_queue()->message_count();
-
-    if (nQueueCount >= m_u4MaxQueue)
-    {
-        OUR_DEBUG((LM_ERROR, "[CMessageService::PutUpdateCommandMessage] Queue is Full nQueueCount = [%d].\n", nQueueCount));
-        return false;
-    }
-
-    ACE_Time_Value xtime = ACE_OS::gettimeofday() + ACE_Time_Value(0, m_u4WorkQueuePutTime);
-
-    if (this->putq(mblk, &xtime) == -1)
-    {
-        OUR_DEBUG((LM_ERROR, "[CMessageService::PutUpdateCommandMessage] Queue putq  error nQueueCount = [%d] errno = [%d].\n", nQueueCount, errno));
-        return false;
-    }
+    m_objThreadQueue.Push(pMessage);
 
     return true;
 }
 
-bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4ThreadID)
+bool CMessageService::ProcessRecvMessage(shared_ptr<CWorkThreadMessage> pMessage, uint32 u4ThreadID)
 {
     //将数据转换成Message对象
     CMessage objRecvMessage;
@@ -365,7 +314,7 @@ bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4
     return true;
 }
 
-bool CMessageService::ProcessSendMessage(CWorkThreadMessage* pMessage, uint32 u4ThreadID)
+bool CMessageService::ProcessSendMessage(shared_ptr<CWorkThreadMessage> pMessage, uint32 u4ThreadID)
 {
     int nRet = true;
 	auto f = m_objHandlerList.find(pMessage->m_SendMessageInfo.u4ConnectID);
@@ -394,7 +343,7 @@ bool CMessageService::ProcessSendMessage(CWorkThreadMessage* pMessage, uint32 u4
     return nRet;
 }
 
-bool CMessageService::ProcessSendClose(CWorkThreadMessage* pMessage, uint32 u4ThreadID)
+bool CMessageService::ProcessSendClose(shared_ptr<CWorkThreadMessage> pMessage, uint32 u4ThreadID)
 {
 	int nRet = true;
 	auto f = m_objHandlerList.find(pMessage->m_u4ConnectID);
@@ -417,7 +366,7 @@ bool CMessageService::ProcessSendClose(CWorkThreadMessage* pMessage, uint32 u4Th
     return nRet;
 }
 
-bool CMessageService::ProcessSendIsLog(CWorkThreadMessage* pMessage, uint32 u4ThreadID)
+bool CMessageService::ProcessSendIsLog(shared_ptr<CWorkThreadMessage> pMessage, uint32 u4ThreadID)
 {
     ACE_UNUSED_ARG(u4ThreadID);
     int nRet = true;
@@ -442,25 +391,20 @@ bool CMessageService::ProcessSendIsLog(CWorkThreadMessage* pMessage, uint32 u4Th
 
 int CMessageService::Close()
 {
-    if(m_blRun)
+    if (true == m_blRun)
     {
-        if (false == this->CloseMsgQueue())
-        {
-            OUR_DEBUG((LM_INFO, "[CMessageService::Close]CloseMsgQueue is fail.\n"));
-        }
+        m_blRun = false;
     }
-    else
-    {
-        msg_queue()->deactivate();
-    }
-    
-    CloseCommandList();
 
-    m_objClientCommandList.clear();
+    //发一个消息，告诉线程终止了
+    auto p = std::make_shared<CWorkThreadMessage>();
+    p->m_emPacketType = EM_CONNECT_IO_TYPE::WORKTHREAD_CLOSE;
+    PutMessage(p);
 
-    m_WorkThreadAI.Close();
+    //等待线程处理完毕
+    m_ttQueue.join();
 
-    OUR_DEBUG((LM_INFO, "[CMessageService::close] Close().\n"));
+    OUR_DEBUG((LM_INFO, "[CMessageService::Close] Close Finish.\n"));
     return 0;
 }
 
@@ -481,7 +425,7 @@ bool CMessageService::SaveThreadInfoData(const ACE_Time_Value& tvNow)
             m_ThreadInfo.m_u2PacketTime,
             m_u2ThreadTimeOut,
             tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec(),
-            (int)msg_queue()->message_count(),
+            (int)m_objThreadQueue.Size(),
             App_BuffPacketManager::instance()->GetBuffPacketUsedCount(),
             App_BuffPacketManager::instance()->GetBuffPacketFreeCount());
 
@@ -502,7 +446,7 @@ bool CMessageService::SaveThreadInfoData(const ACE_Time_Value& tvNow)
             m_ThreadInfo.m_u4RecvPacketCount,
             m_ThreadInfo.m_u2CommandID,
             m_ThreadInfo.m_u2PacketTime,
-            (int)msg_queue()->message_count(),
+            (int)m_objThreadQueue.Size(),
             App_BuffPacketManager::instance()->GetBuffPacketUsedCount(),
             App_BuffPacketManager::instance()->GetBuffPacketFreeCount());
 
@@ -701,19 +645,18 @@ THREADSTATE CMessageService::GetStepState() const
 
 uint32 CMessageService::GetUsedMessageCount()
 {
-    return (uint32)msg_queue()->message_count();
+    return (uint32)m_objThreadQueue.Size();
 }
 
-CWorkThreadMessage* CMessageService::CreateMessage()
+shared_ptr<CWorkThreadMessage> CMessageService::CreateMessage()
 {
-    return new CWorkThreadMessage();
+    return std::make_shared<CWorkThreadMessage>();
 }
 
-void CMessageService::DeleteMessage(CWorkThreadMessage* pMessage)
+void CMessageService::DeleteMessage(shared_ptr<CWorkThreadMessage> pMessage)
 {
     //清理数据
     pMessage->Close();
-    delete pMessage;
 }
 
 void CMessageService::GetFlowPortList(const ACE_Time_Value& tvNow, vector<CWorkThread_Packet_Info>& vec_Port_Data_Account)
@@ -762,7 +705,7 @@ bool CMessageService::Synchronize_SendPostMessage(shared_ptr<CWorkThread_Handler
 bool CMessageService::SendPostMessage(const CSendMessageInfo& objSendMessageInfo)
 {
     //将数据放入队列
-    CWorkThreadMessage* pWorkThreadMessage = CreateMessage();
+    auto pWorkThreadMessage = CreateMessage();
 
     pWorkThreadMessage->m_u4ConnectID     = objSendMessageInfo.u4ConnectID;
     pWorkThreadMessage->m_u2Cmd           = objSendMessageInfo.u2CommandID;
@@ -775,7 +718,7 @@ bool CMessageService::SendPostMessage(const CSendMessageInfo& objSendMessageInfo
 bool CMessageService::SendCloseMessage(uint32 u4ConnectID)
 {
 	//将数据放入队列
-	CWorkThreadMessage* pWorkThreadMessage = CreateMessage();
+	auto pWorkThreadMessage = CreateMessage();
 
 	pWorkThreadMessage->m_emDirect    = EM_WORKTHREAD_DIRECT::EM_WORKTHREAD_DIRECT_OUTPUT;
 	pWorkThreadMessage->m_u2Cmd       = CLINET_LINK_HANDLER_CLOSE;
@@ -870,17 +813,8 @@ EM_Client_Connect_status CMessageService::GetConnectState(uint32 u4ConnectID)
     }
 }
 
-int CMessageService::CloseMsgQueue()
+void CMessageService::UpdateCommandList(uint32 u4UpdateIndex)
 {
-    return Task_Common_CloseMsgQueue((ACE_Task<ACE_MT_SYNCH>*)this, m_cond, m_mutex);
-}
-
-void CMessageService::UpdateCommandList(const ACE_Message_Block* pmb)
-{
-    uint32 u4UpdateIndex = 0;
-    memcpy_safe(pmb->rd_ptr(), sizeof(int), (char*)&u4UpdateIndex, sizeof(int));
-    OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)<UpDateIndex=%d>CopyMessageManagerList.\n", m_ThreadInfo.m_u4ThreadID, u4UpdateIndex));
-
     if (u4UpdateIndex > 0)
     {
         int nReload = App_ModuleLoader::instance()->UnloadListUpdate(u4UpdateIndex);
@@ -896,67 +830,51 @@ void CMessageService::UpdateCommandList(const ACE_Message_Block* pmb)
     }
 }
 
-bool CMessageService::Dispose_Queue()
+bool CMessageService::Dispose_Queue(shared_ptr<CWorkThreadMessage> msg)
 {
-    ACE_Message_Block* mb = nullptr;
-
-    if (getq(mb, nullptr) == -1)
+    if (EM_CONNECT_IO_TYPE::COMMAND_UPDATE == msg->m_emPacketType)
     {
-        OUR_DEBUG((LM_ERROR, "[CMessageService::Dispose_Queue] PutMessage error errno = [%d].\n", ACE_OS::last_error()));
-        m_blRun = false;
-        return false;
-    }
-    else if (mb->msg_type() == ACE_Message_Block::MB_USER)
-    {
-        UpdateCommandList(mb);
+        //如果是当前命令刷新
+        UpdateCommandList(msg->m_u4ConnectID);
 
-        App_MessageBlockManager::instance()->Close(mb);
         return true;
     }
-    else if (mb->msg_type() == ACE_Message_Block::MB_STOP)
+
+    if (EM_CONNECT_IO_TYPE::WORKTHREAD_CLOSE == msg->m_emPacketType)
     {
-        m_mutex.acquire();
-        mb->release();
-        this->msg_queue()->deactivate();
-        m_cond.signal();
-        m_mutex.release();
-        m_blRun = false;
-        return false;
+        //线程退出
+        return true;
+    }
+
+    if (EM_WORKTHREAD_DIRECT::EM_WORKTHREAD_DIRECT_INPUT == msg->m_emDirect)
+    {
+        //是接收数据
+        if (false == ProcessRecvMessage(msg, m_u4ThreadID))
+        {
+            OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)ProcessMessage is false!\n", m_u4ThreadID));
+        }
     }
     else
     {
-        CWorkThreadMessage* msg = *((CWorkThreadMessage**)mb->base());
-
-        if (EM_WORKTHREAD_DIRECT::EM_WORKTHREAD_DIRECT_INPUT == msg->m_emDirect)
+        //是发送数据和助攻关闭链接
+        if (CLIENT_LINK_SDISCONNET == msg->m_u2Cmd)
         {
-            //是接收数据
-            if (false == ProcessRecvMessage(msg, m_u4ThreadID))
-            {
-                OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)ProcessMessage is false!\n", m_u4ThreadID));
-            }
+            //关闭链接
+            ProcessSendClose(msg, m_u4ThreadID);
+        }
+        else if (CLINET_LINK_IS_LOG == msg->m_u2Cmd)
+        {
+            //处理日志
+            ProcessSendIsLog(msg, m_u4ThreadID);
         }
         else
         {
-            //是发送数据和助攻关闭链接
-            if (CLIENT_LINK_SDISCONNET == msg->m_u2Cmd)
-            {
-                //关闭链接
-                ProcessSendClose(msg, m_u4ThreadID);
-            }
-            else if (CLINET_LINK_IS_LOG == msg->m_u2Cmd)
-            {
-                //处理日志
-                ProcessSendIsLog(msg, m_u4ThreadID);
-            }
-            else
-            {
-                //是发送数据
-                ProcessSendMessage(msg, m_u4ThreadID);
-            }
+            //是发送数据
+            ProcessSendMessage(msg, m_u4ThreadID);
         }
-
-        return true;
     }
+
+    return true;
 }
 
 //==========================================================
@@ -1067,7 +985,7 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
     return true;
 }
 
-bool CMessageServiceGroup::PutMessage(CWorkThreadMessage* pMessage)
+bool CMessageServiceGroup::PutMessage(shared_ptr<CWorkThreadMessage> pMessage)
 {
     //判断是否为TCP包，如果是则按照ConnectID区分。UDP则随机分配一个
 
@@ -1446,7 +1364,7 @@ void CMessageServiceGroup::SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCh
     }
 }
 
-CWorkThreadMessage* CMessageServiceGroup::CreateMessage(uint32 u4ConnectID, EM_CONNECT_IO_TYPE u1PacketType)
+shared_ptr<CWorkThreadMessage> CMessageServiceGroup::CreateMessage(uint32 u4ConnectID, EM_CONNECT_IO_TYPE u1PacketType)
 {
     uint32 u4ThreadID = 0;
     u4ThreadID = GetWorkThreadID(u4ConnectID, u1PacketType);
@@ -1455,7 +1373,7 @@ CWorkThreadMessage* CMessageServiceGroup::CreateMessage(uint32 u4ConnectID, EM_C
 
     if (nullptr != pMessageService)
     {
-        CWorkThreadMessage* pWorkThreadMessage = pMessageService->CreateMessage();
+        auto pWorkThreadMessage = pMessageService->CreateMessage();
         //设置线程的ID
         pWorkThreadMessage->m_u4WorkThreadID = u4ThreadID;
         return pWorkThreadMessage;
@@ -1466,7 +1384,7 @@ CWorkThreadMessage* CMessageServiceGroup::CreateMessage(uint32 u4ConnectID, EM_C
     }
 }
 
-void CMessageServiceGroup::DeleteMessage(CWorkThreadMessage* pMessage)
+void CMessageServiceGroup::DeleteMessage(shared_ptr<CWorkThreadMessage> pMessage)
 {
     m_vecMessageService[pMessage->m_u4WorkThreadID]->DeleteMessage(pMessage);
 }

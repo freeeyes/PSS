@@ -27,7 +27,7 @@ bool Recv_Common_Dispose_Client_Message(uint16 u2CommandID, ACE_Message_Block* p
 int Make_Common_Dispose_Client_WorkTread_Message(uint16 u2CommandID, uint32 u4ServerID, ACE_Message_Block* pmblk, const ACE_INET_Addr& AddrRemote)
 {
     //组织数据
-    CWorkThreadMessage* pWorkThreadMessage = App_MessageServiceGroup::instance()->CreateMessage(u4ServerID, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
+    auto pWorkThreadMessage = App_MessageServiceGroup::instance()->CreateMessage(u4ServerID, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
 
     if (nullptr == pWorkThreadMessage)
     {

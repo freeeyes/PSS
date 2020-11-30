@@ -52,7 +52,7 @@ public:
     EM_WORKTHREAD_DIRECT m_emDirect      = EM_WORKTHREAD_DIRECT::EM_WORKTHREAD_DIRECT_INPUT;  //接收还是发送
     ACE_Message_Block* m_pmbRecvHead     = nullptr;                                          //接收包头部分
 	ACE_Message_Block* m_pmbRecvBody     = nullptr;                                          //接收包体部分
-    ACE_Message_Block* m_pmbQueuePtr     = nullptr;                                          //消息队列指针块
+
     IHandler*          m_pHandler        = nullptr;                                          //Handler指针
     ACE_Time_Value     m_tvMessage;                                                          //消息处理时间
 	ACE_INET_Addr      m_AddrRemote;                                                         //数据包的来源IP信息
@@ -60,9 +60,7 @@ public:
      
     CSendMessageInfo   m_SendMessageInfo;                                                    //发送数据内容           
 
-    CWorkThreadMessage();
-
-    ACE_Message_Block* GetQueueMessage();
+    CWorkThreadMessage() = default;
 
     void SetHashID(int nHashID);
 

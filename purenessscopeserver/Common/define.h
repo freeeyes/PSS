@@ -232,7 +232,9 @@ enum class EM_CONNECT_IO_TYPE
     CONNECT_IO_TTY,          //IO是TTY
     CONNECT_IO_SERVER_TCP,   //IO是服务期间连接TCP
     CONNECT_IO_SERVER_UDP,   //IO是服务期间连接UDP
-    CONNECT_IO_FRAME         //来自插件间的回调
+    CONNECT_IO_FRAME,        //来自插件间的回调
+    COMMAND_UPDATE,          //来自插件更新  
+    WORKTHREAD_CLOSE         //关闭当前工作线程
 };
 
 //服务器间通讯和TTy通讯的处理模式，可以选择是框架处理还是业务处理
