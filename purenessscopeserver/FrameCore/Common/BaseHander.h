@@ -156,11 +156,6 @@ public:
     _Post_Message_Param() = default;
 };
 
-//发送Manager消息队列发送数据消息
-bool Tcp_Common_Manager_Post_Message(_Post_Message_Param obj_Post_Message_Param, IBuffPacket* pBuffPacket,
-                                     CSendMessagePool& objSendMessagePool,
-                                     ACE_Task<ACE_MT_SYNCH>* pTask);
-
 //定时器输出统计日志
 void Tcp_Common_Manager_Timeout_CheckInfo(int nActiveConnectCount);
 

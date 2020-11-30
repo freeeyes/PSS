@@ -132,8 +132,8 @@ public:
 
     void CopyMessageManagerList();                                         //从MessageManager中获得信令列表副本
 
-    shared_ptr<CWorkThreadMessage> CreateMessage();
-    void DeleteMessage(shared_ptr<CWorkThreadMessage> pMessage);
+    shared_ptr<CWorkThreadMessage> CreateMessage() const;
+    void DeleteMessage(shared_ptr<CWorkThreadMessage> pMessage) const;
 
     void GetFlowPortList(const ACE_Time_Value& tvNow, vector<CWorkThread_Packet_Info>& vec_Port_Data_Account); //得到当前列表描述信息
 
@@ -171,7 +171,6 @@ private:
     uint8                          m_u1PacketCounter    = 0;                     //是否开启性能统开关,0是关闭，1是开启
     bool                           m_blRun              = false;                 //线程是否在运行
     bool                           m_blIsCpuAffinity    = false;                 //是否CPU绑定
-    bool                           m_blOverload         = false;                 //是否过载   
 
     MESSAGE_SERVICE_THREAD_STATE   m_emThreadState      = MESSAGE_SERVICE_THREAD_STATE::THREAD_STOP; //当前工作线程状态
 
@@ -204,7 +203,7 @@ public:
 
     bool Init(uint32 u4ThreadCount = MAX_MSG_THREADCOUNT, uint32 u4MaxQueue = MAX_MSG_THREADQUEUE, uint32 u4LowMask = MAX_MSG_MASK);
     bool PutMessage(shared_ptr<CWorkThreadMessage> pMessage);                                //发送到相应的线程去处理
-    bool PutUpdateCommandMessage(uint32 u4UpdateIndex);                                      //发送消息同步所有的工作线程命令副本
+    bool PutUpdateCommandMessage(uint32 u4UpdateIndex) const;                                //发送消息同步所有的工作线程命令副本
     void Close();
 
     bool Start();
@@ -228,7 +227,7 @@ public:
     void GetDyeingCommand(vec_Dyeing_Command_list& objList) const;                            //获得当前命令染色状态
 
     void GetFlowPortList(vector<CWorkThread_Packet_Info>& vec_Port_Data_Account) const;       //得到当前列表描述信息
-    bool CheckCPUAndMemory(bool blTest = false);                                              //检查CPU和内存
+    bool CheckCPUAndMemory(bool blTest = false) const;                                        //检查CPU和内存
 
     bool Send_Post_Message(const CSendMessageInfo& objSendMessageInfo);                       //发送数据信息
     bool Send_Close_Message(uint32 u4ConnectID);                                              //关闭客户端连接

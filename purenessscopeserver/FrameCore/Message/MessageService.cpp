@@ -648,12 +648,12 @@ uint32 CMessageService::GetUsedMessageCount()
     return (uint32)m_objThreadQueue.Size();
 }
 
-shared_ptr<CWorkThreadMessage> CMessageService::CreateMessage()
+shared_ptr<CWorkThreadMessage> CMessageService::CreateMessage() const
 {
     return std::make_shared<CWorkThreadMessage>();
 }
 
-void CMessageService::DeleteMessage(shared_ptr<CWorkThreadMessage> pMessage)
+void CMessageService::DeleteMessage(shared_ptr<CWorkThreadMessage> pMessage) const
 {
     //清理数据
     pMessage->Close();
@@ -1000,7 +1000,7 @@ bool CMessageServiceGroup::PutMessage(shared_ptr<CWorkThreadMessage> pMessage)
     return true;
 }
 
-bool CMessageServiceGroup::PutUpdateCommandMessage(uint32 u4UpdateIndex)
+bool CMessageServiceGroup::PutUpdateCommandMessage(uint32 u4UpdateIndex) const
 {
     //向所有工作线程群发副本更新消息
     for (auto pMessageService : m_vecMessageService)
@@ -1125,7 +1125,7 @@ bool CMessageServiceGroup::CheckPacketParsePool() const
     return true;
 }
 
-bool CMessageServiceGroup::CheckCPUAndMemory(bool blTest)
+bool CMessageServiceGroup::CheckCPUAndMemory(bool blTest) const
 {
     if (GetXmlConfigAttribute(xmlMonitor)->CpuAndMemory == 1 || true == blTest)
     {

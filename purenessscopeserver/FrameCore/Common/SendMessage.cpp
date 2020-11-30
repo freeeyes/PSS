@@ -35,12 +35,6 @@ void CSendMessagePool::Close()
     //清理所有已存在的指针
     m_objHashHandleList.Close();
 
-    //回收所有指针
-    for (uint32 i = 0; i < m_objSendMessageList.GetCount(); i++)
-    {
-        m_objSendMessageList.GetObject(i)->Close();
-    }
-
     OUR_DEBUG((LM_INFO, "[CSendMessagePool::Close]End.\n"));
 }
 

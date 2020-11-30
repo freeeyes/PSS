@@ -37,7 +37,7 @@ public:
 };
 
 //AI配置信息表
-typedef vector<_WorkThreadAIInfo> vecWorkThreadAIInfo;
+using vecWorkThreadAIInfo = vector<_WorkThreadAIInfo>;
 
 //超时命令单元
 class _CommandTimeout
