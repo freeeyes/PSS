@@ -46,10 +46,6 @@ void CMessageService::Init(uint32 u4ThreadID, uint32 u4MaxQueue, uint32 u4LowMas
                         GetXmlConfigAttribute(xmlThreadInfoAI)->ReturnDataType,
                         GetXmlConfigAttribute(xmlThreadInfoAI)->ReturnData.c_str());
 
-    //按照线程初始化统计模块的名字
-    char szName[MAX_BUFF_50] = {'\0'};
-    sprintf_safe(szName, MAX_BUFF_50, "工作线程(%d)", u4ThreadID);
-
     m_u1PacketCounter = GetXmlConfigAttribute(xmlMessage)->Packet_Counter;
 
     //初始化发送缓冲
@@ -202,9 +198,9 @@ bool CMessageService::PutUpdateCommandMessage(uint32 u4UpdateIndex)
     mblk->msg_type(ACE_Message_Block::MB_USER);
 
     //判断队列是否是已经最大
-    int nQueueCount = (int)msg_queue()->message_count();
+    auto nQueueCount = (uint32)msg_queue()->message_count();
 
-    if (nQueueCount >= (int)m_u4MaxQueue)
+    if (nQueueCount >= m_u4MaxQueue)
     {
         OUR_DEBUG((LM_ERROR, "[CMessageService::PutUpdateCommandMessage] Queue is Full nQueueCount = [%d].\n", nQueueCount));
         return false;
@@ -240,31 +236,27 @@ bool CMessageService::ProcessRecvMessage(CWorkThreadMessage* pMessage, uint32 u4
     if (CLIENT_LINK_CONNECT == pMessage->m_u2Cmd ||
         CLINET_LINK_TTY_CONNECT == pMessage->m_u2Cmd)
     {
-        //如果是链接建立消息
-        if (nullptr == pWorkThread_Handler_info)
-        {
-            //添加链接对象
-            pWorkThread_Handler_info = std::make_shared<CWorkThread_Handler_info>();
+        //添加链接对象
+        pWorkThread_Handler_info = std::make_shared<CWorkThread_Handler_info>();
 
-            pWorkThread_Handler_info->m_strLocalIP   = pMessage->m_AddrListen.get_host_addr();
-            pWorkThread_Handler_info->m_u2LocalPort  = pMessage->m_AddrListen.get_port_number();
-			pWorkThread_Handler_info->m_strRemoteIP  = pMessage->m_AddrRemote.get_host_addr();
-			pWorkThread_Handler_info->m_u2RemotePort = pMessage->m_AddrRemote.get_port_number();
+        pWorkThread_Handler_info->m_strLocalIP   = pMessage->m_AddrListen.get_host_addr();
+        pWorkThread_Handler_info->m_u2LocalPort  = pMessage->m_AddrListen.get_port_number();
+		pWorkThread_Handler_info->m_strRemoteIP  = pMessage->m_AddrRemote.get_host_addr();
+		pWorkThread_Handler_info->m_u2RemotePort = pMessage->m_AddrRemote.get_port_number();
 
-            pWorkThread_Handler_info->m_u4ConnectID  = pMessage->m_u4ConnectID;
-            pWorkThread_Handler_info->m_pHandler     = pMessage->m_pHandler;
-            pWorkThread_Handler_info->m_emPacketType = pMessage->m_emPacketType;
+        pWorkThread_Handler_info->m_u4ConnectID  = pMessage->m_u4ConnectID;
+        pWorkThread_Handler_info->m_pHandler     = pMessage->m_pHandler;
+        pWorkThread_Handler_info->m_emPacketType = pMessage->m_emPacketType;
 
-            m_objHandlerList[pMessage->m_u4ConnectID] = pWorkThread_Handler_info;
+        m_objHandlerList[pMessage->m_u4ConnectID] = pWorkThread_Handler_info;
 
-			//写入连接日志
-            string strLog = fmt::format("Connection from [{0}:{1}] ConnectID={2}.",
-                pWorkThread_Handler_info->m_strRemoteIP,
-                pWorkThread_Handler_info->m_u2RemotePort,
-                pMessage->m_u4ConnectID);
+		//写入连接日志
+        string strLog = fmt::format("Connection from [{0}:{1}] ConnectID={2}.",
+            pWorkThread_Handler_info->m_strRemoteIP,
+            pWorkThread_Handler_info->m_u2RemotePort,
+            pMessage->m_u4ConnectID);
 
-			AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_CONNECT, strLog);
-        }
+		AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_CONNECT, strLog);
     }
 
 	if (nullptr == pWorkThread_Handler_info)
@@ -530,11 +522,9 @@ void CMessageService::CloseCommandList()
         vecClientCommandList.emplace_back(iter.second);
         });
 
-    uint32 u4Size = (uint32)vecClientCommandList.size();
-
-    for (uint32 i = 0; i < u4Size; i++)
+    for (auto ClientCommand : vecClientCommandList)
     {
-        vecClientCommandList[i]->Close();
+        ClientCommand->Close();
     }
 
     m_objClientCommandList.clear();
@@ -628,7 +618,7 @@ NAMESPACE::uint32 CMessageService::GetThreadID()
     return m_u4ThreadID;
 }
 
-uint32 CMessageService::GetHandlerCount()
+uint32 CMessageService::GetHandlerCount() const
 {
     return (uint32)m_objHandlerList.size();
 }
@@ -653,7 +643,7 @@ void CMessageService::CopyMessageManagerList()
             continue;
         }
 
-		shared_ptr<CClientCommandList> pCurrClientCommandList = std::make_shared<CClientCommandList>();
+		auto pCurrClientCommandList = std::make_shared<CClientCommandList>();
 
 		if (nullptr == pCurrClientCommandList)
 		{
@@ -726,18 +716,18 @@ void CMessageService::DeleteMessage(CWorkThreadMessage* pMessage)
     delete pMessage;
 }
 
-void CMessageService::GetFlowPortList(const ACE_Time_Value tvNow, vector<CWorkThread_Packet_Info>& vec_Port_Data_Account)
+void CMessageService::GetFlowPortList(ACE_Time_Value& tvNow, vector<CWorkThread_Packet_Info>& vec_Port_Data_Account)
 {
     vec_Port_Data_Account.push_back(m_objWorkThreadProcess.GetCurrInfo(tvNow));
 }
 
-bool CMessageService::Synchronize_SendPostMessage(shared_ptr<CWorkThread_Handler_info> pHandlerInfo, const ACE_Time_Value tvMessage)
+bool CMessageService::Synchronize_SendPostMessage(shared_ptr<CWorkThread_Handler_info> pHandlerInfo, ACE_Time_Value& tvMessage)
 {
 	//同步发送数据
     uint32 u4SendLength = m_objBuffSendPacket.GetPacketLen();
     if (u4SendLength > 0)
     {
-        ACE_Message_Block* pBlockSend = new ACE_Message_Block(u4SendLength);
+        auto pBlockSend = App_MessageBlockManager::instance()->Create(u4SendLength);
 
         memcpy_safe(m_objBuffSendPacket.GetData(),
             u4SendLength,
@@ -769,7 +759,7 @@ bool CMessageService::Synchronize_SendPostMessage(shared_ptr<CWorkThread_Handler
     }
 }
 
-bool CMessageService::SendPostMessage(CSendMessageInfo objSendMessageInfo)
+bool CMessageService::SendPostMessage(const CSendMessageInfo objSendMessageInfo)
 {
     //将数据放入队列
     CWorkThreadMessage* pWorkThreadMessage = CreateMessage();
@@ -880,23 +870,6 @@ EM_Client_Connect_status CMessageService::GetConnectState(uint32 u4ConnectID)
     }
 }
 
-int CMessageService::handle_signal(int signum, siginfo_t* siginfo, ucontext_t* ucontext)
-{
-    if (signum == SIGUSR1 + grp_id())
-    {
-        OUR_DEBUG((LM_INFO,"[CMessageService::handle_signal](%d) will be kill.\n", grp_id()));
-
-        if(nullptr != siginfo && nullptr != ucontext)
-        {
-            OUR_DEBUG((LM_INFO,"[CMessageService::handle_signal]siginfo is not nullptr.\n"));
-        }
-
-        ACE_Thread::exit();
-    }
-
-    return 0;
-}
-
 int CMessageService::CloseMsgQueue()
 {
     return Task_Common_CloseMsgQueue((ACE_Task<ACE_MT_SYNCH>*)this, m_cond, m_mutex);
@@ -927,7 +900,7 @@ bool CMessageService::Dispose_Queue()
 {
     ACE_Message_Block* mb = nullptr;
 
-    if (getq(mb, 0) == -1)
+    if (getq(mb, nullptr) == -1)
     {
         OUR_DEBUG((LM_ERROR, "[CMessageService::Dispose_Queue] PutMessage error errno = [%d].\n", ACE_OS::last_error()));
         m_blRun = false;
@@ -1033,7 +1006,7 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* a
     }
 
     //检查日志文件
-    ofstream* pLogoStream = (ofstream*)ACE_LOG_MSG->msg_ostream();
+    auto pLogoStream = (ofstream*)ACE_LOG_MSG->msg_ostream();
 	Set_Output_To_File(GetXmlConfigAttribute(xmlAceDebug)->TrunOn,
 		pLogoStream,
         GetXmlConfigAttribute(xmlAceDebug)->DebugPath.c_str(),
@@ -1112,12 +1085,8 @@ bool CMessageServiceGroup::PutMessage(CWorkThreadMessage* pMessage)
 bool CMessageServiceGroup::PutUpdateCommandMessage(uint32 u4UpdateIndex)
 {
     //向所有工作线程群发副本更新消息
-    uint32 u4Size = (uint32)m_vecMessageService.size();
-
-    for (uint32 i = 0; i < u4Size; i++)
+    for (auto pMessageService : m_vecMessageService)
     {
-        auto pMessageService = m_vecMessageService[i];
-
         if (nullptr != pMessageService && false == pMessageService->PutUpdateCommandMessage(u4UpdateIndex))
         {
             OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::PutMessage](%d)pMessageService fail.\n", pMessageService->GetThreadID()));
@@ -1137,12 +1106,8 @@ void CMessageServiceGroup::Close()
 
     ACE_Time_Value tvSleep(0, 1000);
 
-    uint32 u4Size = (uint32)m_vecMessageService.size();
-
-    for (uint32 i = 0; i < u4Size; i++)
+    for (auto pMessageService : m_vecMessageService)
     {
-        auto pMessageService = m_vecMessageService[i];
-
         if (nullptr != pMessageService && 0 != pMessageService->Close())
         {
             OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Close](%d)pMessageService fail.\n", pMessageService->GetThreadID()));
@@ -1164,19 +1129,15 @@ bool CMessageServiceGroup::Start()
 
     OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Start]Work thread count=%d.\n", m_vecMessageService.size()));
 
-    uint32 u4Size = (uint32)m_vecMessageService.size();
-
-    for (uint32 i = 0; i < u4Size; i++)
+    for (auto pMessageService : m_vecMessageService)
     {
-        auto pMessageService = m_vecMessageService[i];
-
         if (nullptr != pMessageService && false == pMessageService->Start())
         {
-            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Start](%d)WorkThread is fail.\n", i));
+            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Start](%d)WorkThread is fail.\n", pMessageService->GetThreadID()));
             return false;
         }
 
-        OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Start](%d)WorkThread is OK.\n", i));
+        OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Start](%d)WorkThread is OK.\n", pMessageService->GetThreadID()));
     }
 
     return true;
@@ -1211,7 +1172,7 @@ bool CMessageServiceGroup::KillTimer()
     return true;
 }
 
-bool CMessageServiceGroup::CheckRecvTimeout()
+bool CMessageServiceGroup::CheckRecvTimeout() const
 {
     for (auto pWorkThread : m_vecMessageService)
     {
@@ -1223,12 +1184,8 @@ bool CMessageServiceGroup::CheckRecvTimeout()
 
 bool CMessageServiceGroup::CheckWorkThread(const ACE_Time_Value& tvNow)
 {
-    uint32 u4Size = (uint32)m_vecMessageService.size();
-
-    for (uint32 i = 0; i < u4Size; i++)
+    for (auto pMessageService : m_vecMessageService)
     {
-        auto pMessageService = m_vecMessageService[i];
-
         if (nullptr != pMessageService && false == pMessageService->SaveThreadInfoData(tvNow))
         {
             OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::CheckWorkThread]SaveThreadInfo error.\n"));
@@ -1255,9 +1212,9 @@ bool CMessageServiceGroup::CheckCPUAndMemory(bool blTest)
     if (GetXmlConfigAttribute(xmlMonitor)->CpuAndMemory == 1 || true == blTest)
     {
 #if PSS_PLATFORM == PLATFORM_WIN
-        uint32 u4CurrCpu = (uint32)GetProcessCPU_Idel();
+        auto u4CurrCpu = (uint32)GetProcessCPU_Idel();
 #else
-        uint32 u4CurrCpu = (uint32)GetProcessCPU_Idel_Linux();
+        auto u4CurrCpu = (uint32)GetProcessCPU_Idel_Linux();
 #endif
 
         //获得相关Messageblock,BuffPacket,MessageCount,内存大小
@@ -1281,7 +1238,7 @@ bool CMessageServiceGroup::CheckCPUAndMemory(bool blTest)
     return true;
 }
 
-bool CMessageServiceGroup::Send_Post_Message(CSendMessageInfo objSendMessageInfo)
+bool CMessageServiceGroup::Send_Post_Message(const CSendMessageInfo objSendMessageInfo)
 {
 	//得到这个线程ID
 	uint32 u4ThreadID = GetWorkThreadID(objSendMessageInfo.u4ConnectID, 
@@ -1325,7 +1282,7 @@ _ClientIPInfo CMessageServiceGroup::GetLocalIPInfo(uint32 u4ConnectID)
 	return pMessageService->GetLocalIPInfo(u4ConnectID);
 }
 
-uint32 CMessageServiceGroup::GetHandlerCount()
+uint32 CMessageServiceGroup::GetHandlerCount() const
 {
     uint32 u4HandlerCount = 0;
 	for (auto pMessageService : m_vecMessageService)
@@ -1362,8 +1319,7 @@ bool CMessageServiceGroup::CheckPlugInState() const
 
             if (false == blModuleState)
             {
-                char szTitle[MAX_BUFF_50] = { '\0' };
-                sprintf_safe(szTitle, MAX_BUFF_50, "ModuleStateError");
+                string strTitle = "ModuleStateError";
 
                 string strLog = fmt::format("Module ErrorID={0}.\n",
                     u4ErrorID);
@@ -1371,7 +1327,7 @@ bool CMessageServiceGroup::CheckPlugInState() const
                 //发送邮件
                 AppLogManager::instance()->WriteToMail_r(LOG_SYSTEM_MONITOR, 
                     1,
-                    szTitle,
+                    strTitle.c_str(),
                     strLog);
             }
         }
@@ -1400,20 +1356,13 @@ void CMessageServiceGroup::GetFlowPortList(vector<CWorkThread_Packet_Info>& vec_
     vec_Port_Data_Account.clear();
     ACE_Time_Value tvNow = ACE_OS::gettimeofday();
 
-    uint32 u4Size = (uint32)m_vecMessageService.size();
-
-    for (uint32 i = 0; i < u4Size; i++)
+    for (auto pMessageService : m_vecMessageService)
     {
-        auto pMessageService = m_vecMessageService[i];
-
-        if (nullptr != pMessageService)
-        {
-            pMessageService->GetFlowPortList(tvNow, vec_Port_Data_Account);
-        }
+        pMessageService->GetFlowPortList(tvNow, vec_Port_Data_Account);
     }
 }
 
-void CMessageServiceGroup::GetThreadInfo(vector<_ThreadInfo>& vecWorkThreadList)
+void CMessageServiceGroup::GetThreadInfo(vector<_ThreadInfo>& vecWorkThreadList) const
 {
     for (auto pMessageService : m_vecMessageService)
     {
@@ -1424,12 +1373,9 @@ void CMessageServiceGroup::GetThreadInfo(vector<_ThreadInfo>& vecWorkThreadList)
 uint32 CMessageServiceGroup::GetUsedMessageCount()
 {
     uint32 u4Count = 0;
-
-    uint32 u4Size = (uint32)m_vecMessageService.size();
-
-    for (uint32 i = 0; i < u4Size; i++)
+    for (auto pMessageService : m_vecMessageService)
     {
-        u4Count += m_vecMessageService[i]->GetUsedMessageCount();
+        u4Count += pMessageService->GetUsedMessageCount();
     }
 
     return u4Count;
@@ -1452,7 +1398,7 @@ uint32 CMessageServiceGroup::GetWorkThreadIDByIndex(uint32 u4Index)
     }
 }
 
-void CMessageServiceGroup::GetWorkThreadAIInfo(vecWorkThreadAIInfo& objvecWorkThreadAIInfo)
+void CMessageServiceGroup::GetWorkThreadAIInfo(vecWorkThreadAIInfo& objvecWorkThreadAIInfo) const
 {
     objvecWorkThreadAIInfo.clear();
 
@@ -1469,7 +1415,7 @@ void CMessageServiceGroup::GetWorkThreadAIInfo(vecWorkThreadAIInfo& objvecWorkTh
     }
 }
 
-void CMessageServiceGroup::GetAITO(vecCommandTimeout& objTimeout)
+void CMessageServiceGroup::GetAITO(vecCommandTimeout& objTimeout) const
 {
     objTimeout.clear();
 
@@ -1482,16 +1428,13 @@ void CMessageServiceGroup::GetAITO(vecCommandTimeout& objTimeout)
     }
 }
 
-void CMessageServiceGroup::GetAITF(vecCommandTimeout& objTimeout)
+void CMessageServiceGroup::GetAITF(vecCommandTimeout& objTimeout) const
 {
     objTimeout.clear();
 
     for (auto pMessageService : m_vecMessageService)
     {
-        if (nullptr != pMessageService)
-        {
-            pMessageService->GetAITF(objTimeout);
-        }
+        pMessageService->GetAITF(objTimeout);
     }
 }
 
@@ -1499,10 +1442,7 @@ void CMessageServiceGroup::SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCh
 {
     for (auto pMessageService : m_vecMessageService)
     {
-        if (nullptr != pMessageService)
-        {
-            pMessageService->SetAI(u1AI, u4DisposeTime, u4WTCheckTime, u4WTStopTime);
-        }
+        pMessageService->SetAI(u1AI, u4DisposeTime, u4WTCheckTime, u4WTStopTime);
     }
 }
 
@@ -1528,21 +1468,17 @@ CWorkThreadMessage* CMessageServiceGroup::CreateMessage(uint32 u4ConnectID, EM_C
 
 void CMessageServiceGroup::DeleteMessage(CWorkThreadMessage* pMessage)
 {
-    m_vecMessageService[(uint32)pMessage->m_u4WorkThreadID]->DeleteMessage(pMessage);
+    m_vecMessageService[pMessage->m_u4WorkThreadID]->DeleteMessage(pMessage);
 }
 
 void CMessageServiceGroup::CopyMessageManagerList()
 {
     //初始化所有的Message对象
-    uint32 u4Size = (uint32)m_vecMessageService.size();
-
-    for (uint32 i = 0; i < u4Size; i++)
+    for (auto pMessageService : m_vecMessageService)
     {
-        auto pMessageService = m_vecMessageService[i];
-
         if (nullptr == pMessageService)
         {
-            OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::CopyMessageManagerList](%d)pMessageService is nullptr.\n", i));
+            OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::CopyMessageManagerList](%d)pMessageService is nullptr.\n", pMessageService->GetThreadID()));
         }
         else
         {
@@ -1551,7 +1487,7 @@ void CMessageServiceGroup::CopyMessageManagerList()
     }
 }
 
-uint32 CMessageServiceGroup::GetWorkThreadID(uint32 u4ConnectID, EM_CONNECT_IO_TYPE emPackeType)
+uint32 CMessageServiceGroup::GetWorkThreadID(uint32 u4ConnectID, EM_CONNECT_IO_TYPE emPackeType) const
 {
     ACE_UNUSED_ARG(emPackeType);
     uint32 u4ThreadID = 0;

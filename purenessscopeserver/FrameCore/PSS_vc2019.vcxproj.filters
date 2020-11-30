@@ -954,6 +954,9 @@
     <ClInclude Include="..\Common\ThreadQueue.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\ConvertBuffer.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

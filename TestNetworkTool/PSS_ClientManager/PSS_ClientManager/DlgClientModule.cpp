@@ -85,14 +85,12 @@ void CDlgClientModule::OnBnClickedButton2()
             {
                 //开始还原数据结构
                 _CommandInfo CommandInfo;
-                /*
-                memcpy_s(&nStrLen, sizeof(char), &szRecvBuff[nPos], sizeof(char));
-                nPos += sizeof(char);
+                memcpy_s(&nStrLen, sizeof(int), &szRecvBuff[nPos], sizeof(int));
+                nPos += sizeof(int);
 
                 memcpy_s(CommandInfo.szModuleName, nStrLen, &szRecvBuff[nPos], nStrLen);
                 nPos += nStrLen;
                 CommandInfo.szModuleName[nStrLen] = '\0';
-                */
 
                 int nCommandID = 0;
                 memcpy_s(&nCommandID, sizeof(short), &szRecvBuff[nPos], sizeof(short));

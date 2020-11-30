@@ -1,9 +1,5 @@
 #include "WorkThreadAI.h"
 
-CWorkThreadAI::CWorkThreadAI()
-{
-}
-
 void CWorkThreadAI::Init(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTTimeoutCount, uint32 u4WTStopTime, uint8 u1WTReturnDataType, const char* pReturnData)
 {
     m_u1WTAI             = u1AI;
@@ -56,7 +52,7 @@ bool CWorkThreadAI::SaveTimeout(uint16 u2CommandID, uint32 u4TimeCost)
         }
 
         //如果不在监控列表中，添加一个监控列表
-        _CommandTime* pCheckCommandTime = new _CommandTime();
+        auto pCheckCommandTime = std::make_shared<_CommandTime>();
         pCheckCommandTime->m_u2CommandID = u2CommandID;
         pCheckCommandTime->m_objTime.Init(m_u4WTTimeoutCount);
         shared_ptr<_CommandTimeout> pCommandTimeout = pCheckCommandTime->m_objTime.GetFreeData();
@@ -69,7 +65,7 @@ bool CWorkThreadAI::SaveTimeout(uint16 u2CommandID, uint32 u4TimeCost)
         }
 
         pCheckCommandTime->m_objTime.Add();
-        m_vecCommandTime.push_back(pCheckCommandTime);
+        m_vecCommandTime.emplace_back(pCheckCommandTime);
 
         //如果是只需要1个包就关闭，那么在这里人到屏蔽列表中
         if(m_u4WTTimeoutCount <= 1)
@@ -94,7 +90,7 @@ bool CWorkThreadAI::CheckCurrTimeout(uint16 u2CommandID, uint64 u8Now)
         return false;
     }
 
-    if(m_vecCommandTimeout.size() == 0)
+    if(m_vecCommandTimeout.empty())
     {
         return false;
     }
@@ -137,10 +133,9 @@ uint16 CWorkThreadAI::GetReturnDataLength() const
 
 void CWorkThreadAI::Close()
 {
-    for(auto* pCommandTime : m_vecCommandTime)
+    for(auto pCommandTime : m_vecCommandTime)
     {
         pCommandTime->m_objTime.Close();
-        SAFE_DELETE(pCommandTime);
     }
 
     m_vecCommandTime.clear();
@@ -167,7 +162,7 @@ void CWorkThreadAI::GetAIInfo(_WorkThreadAIInfo& objWorkThreadAIInfo) const
 
 void CWorkThreadAI::GetAllTimeout(uint32 u4ThreadID, vecCommandTimeout& objTimeout) const
 {
-    for(_CommandTime* pCommandTime : m_vecCommandTime)
+    for(auto pCommandTime : m_vecCommandTime)
     {
         if (nullptr == pCommandTime)
         {
@@ -204,7 +199,7 @@ void CWorkThreadAI::GetAllForbiden(uint32 u4ThreadID, vecCommandTimeout& objForb
 
 int CWorkThreadAI::Do_Command_Account(uint16 u2CommandID, uint64 u8Now, uint32 u4TimeCost, bool& blRet)
 {
-    for (_CommandTime* pCommandTime : m_vecCommandTime)
+    for (auto pCommandTime : m_vecCommandTime)
     {
         if (u2CommandID != pCommandTime->m_u2CommandID)
         {

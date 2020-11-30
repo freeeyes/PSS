@@ -160,7 +160,7 @@ public:
     int  GetCommandCount() const;                                      //得到当前注册命令的个数
     shared_ptr<CClientCommandList> GetClientCommandExist(uint16 u2CommandID);     //得到当前指令是否已存在当前列表
 
-    hashmapModuleClientList GetModuleClient();                      //返回所有模块绑定注册命令信息
+    hashmapModuleClientList GetModuleClient() const;                      //返回所有模块绑定注册命令信息
 
     uint32 GetWorkThreadCount() final;
     uint32 GetWorkThreadByIndex(uint32 u4Index) final;
@@ -168,7 +168,7 @@ public:
     uint16 GetMaxCommandCount() const;
     uint32 GetUpdateIndex() const;
 
-    hashmapClientCommandList GetHashCommandList();              //得到当前HashCommandList的副本
+    hashmapClientCommandList GetHashCommandList() const;              //得到当前HashCommandList的副本
 
 private:
     bool AddClientCommand_Ex(uint16 u2CommandID, shared_ptr<CClientCommand> pClientCommand, const char* pModuleName, const _ClientIPInfo* pListenInfo);   //注册命令

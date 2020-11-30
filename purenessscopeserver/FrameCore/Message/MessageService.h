@@ -69,27 +69,27 @@ public:
         }
     }
 
-    void AddPacketIn(uint32 m_u4PacketIn, const ACE_Time_Value tvNow)
+    void AddPacketIn(uint32 m_u4PacketIn, const ACE_Time_Value& tvNow)
     {
-        uint32 u4NowMinite = (uint32)(tvNow.sec() / 60);
+        auto u4NowMinite = (uint32)(tvNow.sec() / 60);
         Clear(u4NowMinite);
         
         m_objPacketCounter.m_u4PacketIn++;
         m_objPacketCounter.m_u4RecvSize = m_u4PacketIn;
     }
 
-    void AddPacketOut(uint32 m_u4PacketOut, const ACE_Time_Value tvNow)
+    void AddPacketOut(uint32 m_u4PacketOut, const ACE_Time_Value& tvNow)
     {
-        uint32 u4NowMinite = (uint32)(tvNow.sec() / 60);
+        auto u4NowMinite = (uint32)(tvNow.sec() / 60);
         Clear(u4NowMinite);
 
         m_objPacketCounter.m_u4PacketOut++;
         m_objPacketCounter.m_u4SendSize = m_u4PacketOut;
     }
 
-    CWorkThread_Packet_Info GetCurrInfo(const ACE_Time_Value tvNow)
+    CWorkThread_Packet_Info GetCurrInfo(const ACE_Time_Value& tvNow)
     {
-        uint32 u4NowMinite = (uint32)(tvNow.sec() / 60);
+        auto u4NowMinite = (uint32)(tvNow.sec() / 60);
         Clear(u4NowMinite);
 
         return m_objPacketCounter;
@@ -101,10 +101,6 @@ class CMessageService : public ACE_Task<ACE_MT_SYNCH>
 {
 public:
     CMessageService();
-
-    int handle_signal (int signum,
-                       siginfo_t*  = nullptr,
-                       ucontext_t* = nullptr) final;
 
     int open();
     int svc (void) final;
@@ -132,17 +128,17 @@ public:
 
     uint32 GetThreadID() const;
 
-    uint32 GetHandlerCount();                                              //得到当前线程中Handler的个数
+    uint32 GetHandlerCount() const;                                        //得到当前线程中Handler的个数
 
     void CopyMessageManagerList();                                         //从MessageManager中获得信令列表副本
 
     CWorkThreadMessage* CreateMessage();
     void DeleteMessage(CWorkThreadMessage* pMessage);
 
-    void GetFlowPortList(const ACE_Time_Value tvNow, vector<CWorkThread_Packet_Info>& vec_Port_Data_Account); //得到当前列表描述信息
+    void GetFlowPortList(ACE_Time_Value& tvNow, vector<CWorkThread_Packet_Info>& vec_Port_Data_Account); //得到当前列表描述信息
 
-    bool Synchronize_SendPostMessage(shared_ptr<CWorkThread_Handler_info> pHandlerInfo, const ACE_Time_Value tvMessage);
-    bool SendPostMessage(CSendMessageInfo objSendMessageInfo);                //发送数据
+    bool Synchronize_SendPostMessage(shared_ptr<CWorkThread_Handler_info> pHandlerInfo, ACE_Time_Value& tvMessage);
+    bool SendPostMessage(const CSendMessageInfo objSendMessageInfo);          //发送数据
     bool SendCloseMessage(uint32 u4ConnectID);                                //关闭指定链接 
 
     _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                        //得到客户端接入端口
@@ -206,7 +202,7 @@ class CMessageServiceGroup : public ACE_Task<ACE_MT_SYNCH>
 public:
     CMessageServiceGroup();
 
-    virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);
+    int handle_timeout(const ACE_Time_Value& tv, const void* arg) final;
 
     bool Init(uint32 u4ThreadCount = MAX_MSG_THREADCOUNT, uint32 u4MaxQueue = MAX_MSG_THREADQUEUE, uint32 u4LowMask = MAX_MSG_MASK);
     bool PutMessage(CWorkThreadMessage* pMessage);                                                     //发送到相应的线程去处理
@@ -214,14 +210,14 @@ public:
     void Close();
 
     bool Start();
-    void GetThreadInfo(vector<_ThreadInfo>& vecWorkThreadList);
+    void GetThreadInfo(vector<_ThreadInfo>& vecWorkThreadList) const;
     uint32 GetUsedMessageCount();
 
     uint32 GetWorkThreadCount() const;                                                        //得到当前工作线程的数量
     uint32 GetWorkThreadIDByIndex(uint32 u4Index);                                            //得到指定工作线程的线程ID
-    void GetWorkThreadAIInfo(vecWorkThreadAIInfo& objvecWorkThreadAIInfo);                    //得到线程工作AI配置信息
-    void GetAITO(vecCommandTimeout& objTimeout);                                              //得到所有的AI超时数据包信息
-    void GetAITF(vecCommandTimeout& objTimeout);                                              //得到所有的AI封禁数据包信息
+    void GetWorkThreadAIInfo(vecWorkThreadAIInfo& objvecWorkThreadAIInfo) const;              //得到线程工作AI配置信息
+    void GetAITO(vecCommandTimeout& objTimeout) const;                                        //得到所有的AI超时数据包信息
+    void GetAITF(vecCommandTimeout& objTimeout) const;                                        //得到所有的AI封禁数据包信息
     void SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime);  //设置AI
 
     CWorkThreadMessage* CreateMessage(uint32 u4ConnectID, EM_CONNECT_IO_TYPE u1PacketType);   //从子线程中获取一个Message对象
@@ -236,20 +232,20 @@ public:
     void GetFlowPortList(vector<CWorkThread_Packet_Info>& vec_Port_Data_Account);             //得到当前列表描述信息
     bool CheckCPUAndMemory(bool blTest = false);                                              //检查CPU和内存
 
-    bool Send_Post_Message(CSendMessageInfo objSendMessageInfo);                              //发送数据信息
+    bool Send_Post_Message(const CSendMessageInfo objSendMessageInfo);                        //发送数据信息
     bool Send_Close_Message(uint32 u4ConnectID);                                              //关闭客户端连接
     _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                                        //得到指定链接的客户单ID 
     _ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID);                                         //得到监听的IP信息
-    uint32 GetHandlerCount();                                                                 //得到当前连接总数
+    uint32 GetHandlerCount() const;                                                           //得到当前连接总数
     EM_Client_Connect_status GetConnectState(uint32 u4ConnectID);                             //得到当前连接状态 
 
 private:
-    uint32 GetWorkThreadID(uint32 u4ConnectID, EM_CONNECT_IO_TYPE emPacketType);              //根据操作类型和ConnectID计算出那个工作线程ID
+    uint32 GetWorkThreadID(uint32 u4ConnectID, EM_CONNECT_IO_TYPE emPacketType) const;        //根据操作类型和ConnectID计算出那个工作线程ID
 
     bool StartTimer();
     bool KillTimer();
 
-    bool CheckRecvTimeout();                                                                  //检查所有的超时链接
+    bool CheckRecvTimeout() const;                                                            //检查所有的超时链接
     bool CheckWorkThread(const ACE_Time_Value& tvNow);                                        //检查所有的工作线程状态
     bool CheckPacketParsePool() const;                                                        //检查正在使用的消息解析对象
     bool CheckPlugInState() const;                                                            //检查所有插件状态

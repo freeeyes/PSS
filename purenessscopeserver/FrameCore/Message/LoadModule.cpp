@@ -247,7 +247,7 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, shared_ptr<_ModuleInfo> p
 
     m_tmModule.acquire();
 
-    pModuleInfo->hModule = ACE_OS::dlopen((ACE_TCHAR*)strModuleFile.c_str(), RTLD_NOW);
+    pModuleInfo->hModule = ACE_OS::dlopen(strModuleFile.c_str(), RTLD_NOW);
 
     if(nullptr == pModuleInfo->hModule || !pModuleInfo->hModule)
     {

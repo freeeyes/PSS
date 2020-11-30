@@ -91,7 +91,7 @@ void CMessageManager::Close()
 
 }
 
-hashmapModuleClientList CMessageManager::GetModuleClient()
+hashmapModuleClientList CMessageManager::GetModuleClient() const
 {
     return m_objModuleClientList;
 }
@@ -116,7 +116,7 @@ uint32 CMessageManager::GetUpdateIndex() const
     return m_u4UpdateIndex;
 }
 
-hashmapClientCommandList CMessageManager::GetHashCommandList()
+hashmapClientCommandList CMessageManager::GetHashCommandList() const
 {
     return m_objClientCommandList;
 }
@@ -219,9 +219,6 @@ void CMessageManager::Add_ClientCommandList(const xmlCommandsTimeout::_CommandsT
 
 bool CMessageManager::DelClientCommand(uint16 u2CommandID, shared_ptr<CClientCommand> pClientCommand)
 {
-    char szCommandID[10] = { '\0' };
-    sprintf_safe(szCommandID, 10, "%d", u2CommandID);
-
     auto f = m_objClientCommandList.find(u2CommandID);
 
     if (m_objClientCommandList.end() == f)

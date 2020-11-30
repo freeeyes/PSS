@@ -25,7 +25,7 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
     string strFilePath;
 
     strFilePath = fmt::format("{0}{1}", pPacketParsePath, szPacketParseName);
-    pPacketParseInfo->m_hModule = ACE_OS::dlopen((ACE_TCHAR*)strFilePath.c_str(), RTLD_NOW);
+    pPacketParseInfo->m_hModule = ACE_OS::dlopen(strFilePath.c_str(), RTLD_NOW);
 
     if(nullptr == pPacketParseInfo->m_hModule)
     {

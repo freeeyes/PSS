@@ -54,7 +54,7 @@ public:
     }
 };
 
-typedef vector<_Dyeing_Command> vec_Dyeing_Command_list;  //CommandID染色列表
+using vec_Dyeing_Command_list = vector<_Dyeing_Command>;  //CommandID染色列表
 
 class CMessageDyeingManager
 {

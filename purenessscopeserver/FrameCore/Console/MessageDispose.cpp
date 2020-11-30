@@ -753,10 +753,7 @@ void DoMessage_ShowAllCommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* 
         {
             if (CommandInfo.m_u1OutputType == 0)
             {
-                VCHARS_STR strSName;
-                strSName.text = (char* )pClientCommandInfo->m_strModuleName.c_str();
-                strSName.u1Len = (uint8)pClientCommandInfo->m_strModuleName.length();
-                (*pBuffPacket) << strSName;
+                (*pBuffPacket) << pClientCommandInfo->m_strModuleName;
                 (*pBuffPacket) << pClientCommandInfo->m_u2CommandID;
                 (*pBuffPacket) << pClientCommandInfo->m_u4Count;
                 (*pBuffPacket) << pClientCommandInfo->m_u4TimeCost;

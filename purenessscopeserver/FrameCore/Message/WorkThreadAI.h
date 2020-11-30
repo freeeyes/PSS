@@ -20,189 +20,7 @@
 
 #include "Ring.h"
 #include "define.h"
-
-const uint16 COMMAND_RETURN_BUSY = 0xffff;
-
-//二进制换砖类，负责二进制的代码转换
-class CConvertBuffer
-{
-public:
-    CConvertBuffer() {}
-
-    int GetBufferSize(const char* pData, int nSrcLen) const
-    {
-        char szData[3] = {'\0'};
-        int nPos         = 0;
-        int nCurrSize    = 0;
-        int nConvertSize = 0;
-        bool blState     = false;   //转换后的字符串是否有效
-        bool blSrcState  = true;    //元字符串是否有效
-        unsigned char cData;
-
-        while(nPos < nSrcLen)
-        {
-            if(pData[nPos] == '\r' || pData[nPos] == '\n' || pData[nPos] == ' ' || nPos == nSrcLen - 1)
-            {
-                if(nPos == nSrcLen - 1 && nCurrSize < 2)
-                {
-                    szData[nCurrSize++] = pData[nPos];
-                }
-
-                if (nCurrSize < 3)
-                {
-                    szData[nCurrSize] = '\0';
-                }
-                else
-                {
-                    blSrcState = false;
-                }
-
-                if(blSrcState == true)
-                {
-                    blState = ConvertStr2char(szData, cData);
-                }
-
-				if (blState == true)
-				{
-					nConvertSize++;
-				}
-
-                nCurrSize  = 0;
-                blSrcState = true;
-                nPos++;
-            }
-            else
-            {
-                if(nCurrSize < 2)
-                {
-                    szData[nCurrSize++] = pData[nPos];
-                }
-                else
-                {
-                    blSrcState = false;
-                }
-
-                nPos++;
-            }
-        }
-
-        return nConvertSize;
-    }
-
-    bool Convertstr2charArray(const char* pData, int nSrcLen, unsigned char* pDes, int& nMaxLen) const 
-    {
-        char szData[3] = {'\0'};
-        int nPos         = 0;
-        int nCurrSize    = 0;
-        int nConvertSize = 0;
-        bool blState     = false;   //转换后的字符串是否有效
-        bool blSrcState  = true;    //元字符串是否有效
-
-        while(nPos < nSrcLen)
-        {
-            if(pData[nPos] == '\r' || pData[nPos] == '\n' || pData[nPos] == ' ' || nPos == nSrcLen - 1)
-            {
-                if(nPos == nSrcLen - 1 && nCurrSize < 2)
-                {
-                    szData[nCurrSize++] = pData[nPos];
-                }
-
-                if (nCurrSize < 3)
-                {
-                    szData[nCurrSize] = '\0';
-                }
-                else
-                {
-                    blSrcState = false;
-                }
-
-                if(nConvertSize < nMaxLen && blSrcState == true)
-                {
-                    blState = ConvertStr2char(szData, pDes[nConvertSize]);
-                }
-
-				if (blState == true)
-				{
-					nConvertSize++;
-				}
-
-                nCurrSize  = 0;
-                blSrcState = true;
-                nPos++;
-            }
-            else
-            {
-                if(nCurrSize < 2)
-                {
-                    szData[nCurrSize++] = pData[nPos];
-                }
-                else
-                {
-                    blSrcState = false;
-                }
-
-                nPos++;
-            }
-        }
-
-        nMaxLen = nConvertSize;
-        return true;
-    }
-private:
-    bool Get_binary_Char(unsigned char cTag, unsigned char& cDes) const
-    {
-        if(cTag >='A'&&  cTag <='F')
-        {
-            cDes = cTag - 'A' + 10;
-            return true;
-        }
-        else if(cTag >='a'&&  cTag <='f')
-        {
-            cDes = cTag - 'a' + 10;
-            return true;
-        }
-        else if(cTag >= '0'&& cTag<= '9')
-        {
-            cDes = cTag-'0';
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    bool ConvertStr2char(const char* pData, unsigned char& cData) const
-    {
-        if(pData == nullptr || strlen(pData) != 2)
-        {
-            return false;
-        }
-
-        char cFirst = pData[1];
-        unsigned char cTemp = 0;
-        bool blStste = Get_binary_Char(cFirst, cTemp);
-
-        if(false == blStste)
-        {
-            return false;
-        }
-
-        cData = cTemp;
-        char cSecond = pData[0];
-        blStste  = Get_binary_Char(cSecond, cTemp);
-
-        if(false == blStste)
-        {
-            return false;
-        }
-
-        cTemp = (unsigned char)(cTemp << 4);
-        cData = cData | cTemp;
-
-        return true;
-    }
-};
+#include "ConvertBuffer.h"
 
 //相关参数设计
 class _WorkThreadAIInfo
@@ -215,9 +33,7 @@ public:
     uint32     m_u4WTTimeoutCount = 0;                    //工作线程超时包的单位时间内的超时次数上限
     uint32     m_u4WTStopTime     = 0;                    //停止此命令服务的时间
 
-    _WorkThreadAIInfo()
-    {
-    }
+    _WorkThreadAIInfo() = default;
 };
 
 //AI配置信息表
@@ -232,18 +48,16 @@ public:
     uint64 m_u8Second    = 0;       //超时当前时间，以1970年以来开始计算的秒数
     uint32 m_u4Timeout   = 0;       //命令执行时间，单位是毫秒
 
-    _CommandTimeout()
-    {
-    }
+    _CommandTimeout() = default;
 };
 
 //这里用户回传相关查询信息
-typedef vector<_CommandTimeout> vecCommandTimeout;
+using vecCommandTimeout = vector<_CommandTimeout>;
 
 class CWorkThreadAI
 {
 public:
-    CWorkThreadAI();
+    CWorkThreadAI() = default;
 
     void Close();
 
@@ -282,12 +96,10 @@ private:
         uint16 m_u2CommandID = 0;
         CRingLink<_CommandTimeout> m_objTime;
 
-        _CommandTime()
-        {
-        }
+        _CommandTime() = default;
     };
 
-    vector<_CommandTime*>   m_vecCommandTime;
+    vector<shared_ptr<_CommandTime>> m_vecCommandTime;
     vector<_CommandTimeout> m_vecCommandTimeout;
 };
 #endif
