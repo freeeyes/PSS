@@ -155,7 +155,7 @@ public:
 
     uint16 GetCurrLevel() final;
 
-    uint16 GetLogID(uint16 u2Index) final;
+    uint16 GetLogID(uint16 u2LogID) final;
     const char*  GetLogInfoByServerName(uint16 u2LogID) final;
     const char*  GetLogInfoByLogName(uint16 u2LogID) final;
     int    GetLogInfoByLogDisplay(uint16 u2LogID) final;

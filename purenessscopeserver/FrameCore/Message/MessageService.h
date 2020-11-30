@@ -135,10 +135,10 @@ public:
     CWorkThreadMessage* CreateMessage();
     void DeleteMessage(CWorkThreadMessage* pMessage);
 
-    void GetFlowPortList(ACE_Time_Value& tvNow, vector<CWorkThread_Packet_Info>& vec_Port_Data_Account); //得到当前列表描述信息
+    void GetFlowPortList(const ACE_Time_Value& tvNow, vector<CWorkThread_Packet_Info>& vec_Port_Data_Account); //得到当前列表描述信息
 
-    bool Synchronize_SendPostMessage(shared_ptr<CWorkThread_Handler_info> pHandlerInfo, ACE_Time_Value& tvMessage);
-    bool SendPostMessage(const CSendMessageInfo objSendMessageInfo);          //发送数据
+    bool Synchronize_SendPostMessage(shared_ptr<CWorkThread_Handler_info> pHandlerInfo, const ACE_Time_Value& tvMessage);
+    bool SendPostMessage(const CSendMessageInfo& objSendMessageInfo);          //发送数据
     bool SendCloseMessage(uint32 u4ConnectID);                                //关闭指定链接 
 
     _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                        //得到客户端接入端口
@@ -211,28 +211,28 @@ public:
 
     bool Start();
     void GetThreadInfo(vector<_ThreadInfo>& vecWorkThreadList) const;
-    uint32 GetUsedMessageCount();
+    uint32 GetUsedMessageCount() const;
 
     uint32 GetWorkThreadCount() const;                                                        //得到当前工作线程的数量
     uint32 GetWorkThreadIDByIndex(uint32 u4Index);                                            //得到指定工作线程的线程ID
     void GetWorkThreadAIInfo(vecWorkThreadAIInfo& objvecWorkThreadAIInfo) const;              //得到线程工作AI配置信息
     void GetAITO(vecCommandTimeout& objTimeout) const;                                        //得到所有的AI超时数据包信息
     void GetAITF(vecCommandTimeout& objTimeout) const;                                        //得到所有的AI封禁数据包信息
-    void SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime);  //设置AI
+    void SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime) const;  //设置AI
 
     CWorkThreadMessage* CreateMessage(uint32 u4ConnectID, EM_CONNECT_IO_TYPE u1PacketType);   //从子线程中获取一个Message对象
     void DeleteMessage(CWorkThreadMessage* pMessage);                                         //从子线程中回收一个Message对象
 
-    void CopyMessageManagerList();                                                            //从MessageManager中获得信令列表副本
+    void CopyMessageManagerList() const;                                                      //从MessageManager中获得信令列表副本
 
     void AddDyringIP(const char* pClientIP, uint16 u2MaxCount);                               //染色指定的IP
     bool AddDyeingCommand(uint16 u2CommandID, uint16 u2MaxCount);                             //染色指定的CommandID
     void GetDyeingCommand(vec_Dyeing_Command_list& objList) const;                            //获得当前命令染色状态
 
-    void GetFlowPortList(vector<CWorkThread_Packet_Info>& vec_Port_Data_Account);             //得到当前列表描述信息
+    void GetFlowPortList(vector<CWorkThread_Packet_Info>& vec_Port_Data_Account) const;       //得到当前列表描述信息
     bool CheckCPUAndMemory(bool blTest = false);                                              //检查CPU和内存
 
-    bool Send_Post_Message(const CSendMessageInfo objSendMessageInfo);                        //发送数据信息
+    bool Send_Post_Message(const CSendMessageInfo& objSendMessageInfo);                       //发送数据信息
     bool Send_Close_Message(uint32 u4ConnectID);                                              //关闭客户端连接
     _ClientIPInfo GetClientIPInfo(uint32 u4ConnectID);                                        //得到指定链接的客户单ID 
     _ClientIPInfo GetLocalIPInfo(uint32 u4ConnectID);                                         //得到监听的IP信息
@@ -246,7 +246,7 @@ private:
     bool KillTimer();
 
     bool CheckRecvTimeout() const;                                                            //检查所有的超时链接
-    bool CheckWorkThread(const ACE_Time_Value& tvNow);                                        //检查所有的工作线程状态
+    bool CheckWorkThread(const ACE_Time_Value& tvNow) const;                                  //检查所有的工作线程状态
     bool CheckPacketParsePool() const;                                                        //检查正在使用的消息解析对象
     bool CheckPlugInState() const;                                                            //检查所有插件状态
    

@@ -462,7 +462,7 @@ void CFileLogger::Close()
     OUR_DEBUG((LM_INFO, "[CFileLogger::Close]Begin.\n"));
 
     for_each(m_mapLogFileList.begin(), m_mapLogFileList.end(), [](const std::pair<uint16, shared_ptr<CLogFile>>& iter) {
-        //写入文件
+        //关闭写入文件
         iter.second->Close();
         });
 
@@ -627,19 +627,21 @@ uint16 CFileLogger::GetCurrLevel()
     return m_u2CurrLogLevel;
 }
 
-uint16 CFileLogger::GetLogID(uint16 u2Index)
+uint16 CFileLogger::GetLogID(uint16 u2LogID)
 {
-    if(nullptr == m_mapLogFileList[u2Index])
+    auto f = m_mapLogFileList.find(u2LogID);
+    if (m_mapLogFileList.end() == f)
     {
         return 0;
     }
 
-    return m_mapLogFileList[u2Index]->GetLoggerID();
+    return m_mapLogFileList[u2LogID]->GetLoggerID();
 }
 
 const char* CFileLogger::GetLogInfoByServerName(uint16 u2LogID)
 {
-    if (nullptr == m_mapLogFileList[u2LogID])
+    auto f = m_mapLogFileList.find(u2LogID);
+    if (m_mapLogFileList.end() == f)
     {
         return nullptr;
     }
@@ -649,7 +651,8 @@ const char* CFileLogger::GetLogInfoByServerName(uint16 u2LogID)
 
 const char* CFileLogger::GetLogInfoByLogName(uint16 u2LogID)
 {
-    if (nullptr == m_mapLogFileList[u2LogID])
+    auto f = m_mapLogFileList.find(u2LogID);
+    if (m_mapLogFileList.end() == f)
     {
         return nullptr;
     }
@@ -659,7 +662,8 @@ const char* CFileLogger::GetLogInfoByLogName(uint16 u2LogID)
 
 int CFileLogger::GetLogInfoByLogDisplay(uint16 u2LogID)
 {
-    if (nullptr == m_mapLogFileList[u2LogID])
+    auto f = m_mapLogFileList.find(u2LogID);
+    if (m_mapLogFileList.end() == f)
     {
         return 0;
     }
@@ -669,7 +673,8 @@ int CFileLogger::GetLogInfoByLogDisplay(uint16 u2LogID)
 
 uint16 CFileLogger::GetLogInfoByLogLevel(uint16 u2LogID)
 {
-    if (nullptr == m_mapLogFileList[u2LogID])
+    auto f = m_mapLogFileList.find(u2LogID);
+    if (m_mapLogFileList.end() == f)
     {
         return 0;
     }

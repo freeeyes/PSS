@@ -67,8 +67,9 @@ private:
     bool                                     m_blIsMail       = false;               //是否可以发送邮件
     int                                      m_nThreadCount   = 1;                   //记录日志线程个数，目前默认是1
     int                                      m_nQueueMax      = MAX_MSG_THREADQUEUE; //日志线程允许的最大队列个数
-    shared_ptr<IServerLogger>                m_pServerLogger = nullptr;                 //日志模块指针
+    shared_ptr<IServerLogger>                m_pServerLogger = nullptr;              //日志模块指针
     CMessageQueue<shared_ptr<_LogBlockInfo>> m_objThreadQueue;
+    std::thread                              m_ttQueue;                              //消息队列线程
 };
 
 using AppLogManager = ACE_Singleton<CLogManager, ACE_Recursive_Thread_Mutex>;

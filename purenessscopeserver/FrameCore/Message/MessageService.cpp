@@ -716,12 +716,12 @@ void CMessageService::DeleteMessage(CWorkThreadMessage* pMessage)
     delete pMessage;
 }
 
-void CMessageService::GetFlowPortList(ACE_Time_Value& tvNow, vector<CWorkThread_Packet_Info>& vec_Port_Data_Account)
+void CMessageService::GetFlowPortList(const ACE_Time_Value& tvNow, vector<CWorkThread_Packet_Info>& vec_Port_Data_Account)
 {
     vec_Port_Data_Account.push_back(m_objWorkThreadProcess.GetCurrInfo(tvNow));
 }
 
-bool CMessageService::Synchronize_SendPostMessage(shared_ptr<CWorkThread_Handler_info> pHandlerInfo, ACE_Time_Value& tvMessage)
+bool CMessageService::Synchronize_SendPostMessage(shared_ptr<CWorkThread_Handler_info> pHandlerInfo, const ACE_Time_Value& tvMessage)
 {
 	//同步发送数据
     uint32 u4SendLength = m_objBuffSendPacket.GetPacketLen();
@@ -759,7 +759,7 @@ bool CMessageService::Synchronize_SendPostMessage(shared_ptr<CWorkThread_Handler
     }
 }
 
-bool CMessageService::SendPostMessage(const CSendMessageInfo objSendMessageInfo)
+bool CMessageService::SendPostMessage(const CSendMessageInfo& objSendMessageInfo)
 {
     //将数据放入队列
     CWorkThreadMessage* pWorkThreadMessage = CreateMessage();
@@ -1182,7 +1182,7 @@ bool CMessageServiceGroup::CheckRecvTimeout() const
     return true;
 }
 
-bool CMessageServiceGroup::CheckWorkThread(const ACE_Time_Value& tvNow)
+bool CMessageServiceGroup::CheckWorkThread(const ACE_Time_Value& tvNow) const
 {
     for (auto pMessageService : m_vecMessageService)
     {
@@ -1238,7 +1238,7 @@ bool CMessageServiceGroup::CheckCPUAndMemory(bool blTest)
     return true;
 }
 
-bool CMessageServiceGroup::Send_Post_Message(const CSendMessageInfo objSendMessageInfo)
+bool CMessageServiceGroup::Send_Post_Message(const CSendMessageInfo& objSendMessageInfo)
 {
 	//得到这个线程ID
 	uint32 u4ThreadID = GetWorkThreadID(objSendMessageInfo.u4ConnectID, 
@@ -1351,7 +1351,7 @@ void CMessageServiceGroup::GetDyeingCommand(vec_Dyeing_Command_list& objList) co
     m_objMessageDyeingManager.GetDyeingCommand(objList);
 }
 
-void CMessageServiceGroup::GetFlowPortList(vector<CWorkThread_Packet_Info>& vec_Port_Data_Account)
+void CMessageServiceGroup::GetFlowPortList(vector<CWorkThread_Packet_Info>& vec_Port_Data_Account) const
 {
     vec_Port_Data_Account.clear();
     ACE_Time_Value tvNow = ACE_OS::gettimeofday();
@@ -1370,7 +1370,7 @@ void CMessageServiceGroup::GetThreadInfo(vector<_ThreadInfo>& vecWorkThreadList)
     }
 }
 
-uint32 CMessageServiceGroup::GetUsedMessageCount()
+uint32 CMessageServiceGroup::GetUsedMessageCount() const
 {
     uint32 u4Count = 0;
     for (auto pMessageService : m_vecMessageService)
@@ -1438,7 +1438,7 @@ void CMessageServiceGroup::GetAITF(vecCommandTimeout& objTimeout) const
     }
 }
 
-void CMessageServiceGroup::SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime)
+void CMessageServiceGroup::SetAI(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime, uint32 u4WTStopTime) const
 {
     for (auto pMessageService : m_vecMessageService)
     {
@@ -1471,7 +1471,7 @@ void CMessageServiceGroup::DeleteMessage(CWorkThreadMessage* pMessage)
     m_vecMessageService[pMessage->m_u4WorkThreadID]->DeleteMessage(pMessage);
 }
 
-void CMessageServiceGroup::CopyMessageManagerList()
+void CMessageServiceGroup::CopyMessageManagerList() const
 {
     //初始化所有的Message对象
     for (auto pMessageService : m_vecMessageService)

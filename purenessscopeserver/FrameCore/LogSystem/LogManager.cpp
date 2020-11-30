@@ -11,12 +11,10 @@ int CLogManager::open()
     m_blRun = true;
 
     //开启一个线程队列处理
-    std::thread tt_dispose([this]()
+    m_ttQueue = std::thread([this]()
         {
             svc();
         });
-
-    tt_dispose.detach();
 
     return 0;
 }
@@ -28,17 +26,10 @@ int CLogManager::svc(void)
     while(m_blRun)
     {
         shared_ptr<_LogBlockInfo> msg;
-        if (true == m_objThreadQueue.Pop(msg))
-        {
-            //消息处理
-            Dispose_Queue(msg);
-        }
-        else
-        {
-            //消息接收失败
-            break;
-        }
+        m_objThreadQueue.Pop(msg);
 
+        //消息处理
+        Dispose_Queue(msg);
     }
 
     //回收日志对象
@@ -54,6 +45,13 @@ int CLogManager::Close()
     {
         m_blRun = false;
     }
+
+    //发一个消息，告诉线程终止了
+    auto p = std::make_shared<_LogBlockInfo>();
+    PutLog(p);
+
+    //等待线程处理完毕
+    m_ttQueue.join();
 
     return 0;
 }
@@ -131,6 +129,12 @@ int CLogManager::UnRegisterLog() const
 
 bool CLogManager::Dispose_Queue(shared_ptr<_LogBlockInfo> msg) const
 {
+    if (msg->m_u2LogID == 0)
+    {
+        //线程处理关闭命令
+        return true;
+    }
+
     if (0 != ProcessLog(msg))
     {
         OUR_DEBUG((LM_ERROR, "[CLogManager::svc] ProcessLog is false.\n"));
