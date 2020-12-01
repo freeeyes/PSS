@@ -1,9 +1,5 @@
 #include "AceReactorManager.h"
 
-CAceReactor::CAceReactor()
-{
-}
-
 void CAceReactor::SetReactorID(uint32 u4ReactorID)
 {
     m_u4ReactorID = u4ReactorID;
@@ -31,13 +27,13 @@ void CAceReactor::Create_Reactor_WFMO()
         throw std::domain_error("[CAceReactor::Init]New m_pReactor Error[ACE_WFMO_Reactor].");
     }
 
-    m_nReactorType = Reactor_WFMO;
+    m_emReactorType = EM_REACTOR_MODULE::Reactor_WFMO;
 }
 #endif
 
 void CAceReactor::Create_Reactor_Select()
 {
-    ACE_Select_Reactor* selectreactor = new ACE_Select_Reactor();
+    auto selectreactor = new ACE_Select_Reactor();
 
     if (nullptr == selectreactor)
     {
@@ -51,12 +47,12 @@ void CAceReactor::Create_Reactor_Select()
         throw std::domain_error("[CAceReactor::Init]New m_pReactor Error[ACE_Select_Reactor].");
     }
 
-    m_nReactorType = Reactor_Select;
+    m_emReactorType = EM_REACTOR_MODULE::Reactor_Select;
 }
 
 void CAceReactor::Create_Reactor_TP()
 {
-    ACE_TP_Reactor* tpreactor = new ACE_TP_Reactor();
+    auto tpreactor = new ACE_TP_Reactor();
 
     if (nullptr == tpreactor)
     {
@@ -70,13 +66,13 @@ void CAceReactor::Create_Reactor_TP()
         throw std::domain_error("[CAceReactor::Init]New m_pReactor Error[ACE_TP_Reactor].");
     }
 
-    m_nReactorType = Reactor_TP;
+    m_emReactorType = EM_REACTOR_MODULE::Reactor_TP;
 }
 
 void CAceReactor::Create_DEV_POLL(int nMaxHandleCount)
 {
 #ifdef ACE_HAS_EVENT_POLL
-    ACE_Dev_Poll_Reactor* devreactor = new ACE_Dev_Poll_Reactor(nMaxHandleCount);
+    auto devreactor = new ACE_Dev_Poll_Reactor(nMaxHandleCount);
 
     if (nullptr == devreactor)
     {
@@ -90,7 +86,7 @@ void CAceReactor::Create_DEV_POLL(int nMaxHandleCount)
         throw std::domain_error("[CAceReactor::Init]New m_pReactor Error[ACE_Dev_Poll_Reactor].");
     }
 
-    m_nReactorType = Reactor_DEV_POLL;
+    m_emReactorType = EM_REACTOR_MODULE::Reactor_DEV_POLL;
 #else
     OUR_DEBUG((LM_INFO, "[CAceReactor::Create_DEV_POLL]this OS isn't support.\n"));
 #endif
@@ -106,43 +102,43 @@ void CAceReactor::Close()
         SAFE_DELETE(m_pReactor)
     }
 
-    m_nReactorType = 0;
-    m_nThreadCount = 0;
-    m_blRun        = false;
+    m_emReactorType = EM_REACTOR_MODULE::Reactor_DEV_POLL;
+    m_nThreadCount  = 0;
+    m_blRun         = false;
     OUR_DEBUG((LM_INFO, "[CAceReactor::Close]End.\n"));
 }
 
-bool CAceReactor::Init(int nReactorType, int nThreadCount, int nMaxHandleCount)
+bool CAceReactor::Init(EM_REACTOR_MODULE emReactorType, int nThreadCount, int nMaxHandleCount)
 {
     try
     {
-        switch (nReactorType)
+        switch (emReactorType)
         {
 #if PSS_PLATFORM == PLATFORM_WIN
 
-        case Reactor_WFMO:    //这个功能限制于Windows操作的默认反应器，如果是COM服务器可以使用Reactor_WFMO_msg
+        case EM_REACTOR_MODULE::Reactor_WFMO:    //这个功能限制于Windows操作的默认反应器，如果是COM服务器可以使用Reactor_WFMO_msg
             Create_Reactor_WFMO();
             break;
 #endif
 
-        case Reactor_Select:    //这个类的功能是服务于非Windows的默认反应器
+        case EM_REACTOR_MODULE::Reactor_Select:    //这个类的功能是服务于非Windows的默认反应器
             Create_Reactor_Select();
             break;
 
-        case Reactor_TP:
+        case EM_REACTOR_MODULE::Reactor_TP:
             Create_Reactor_TP();
             break;
 
 #ifdef ACE_HAS_EVENT_POLL     //Linux下的EPoll模型
 
-        case Reactor_DEV_POLL:
-        case Reactor_DEV_POLL_ET:
+        case EM_REACTOR_MODULE::Reactor_DEV_POLL:
+        case EM_REACTOR_MODULE::Reactor_DEV_POLL_ET:
             Create_DEV_POLL(nMaxHandleCount);
             break;
 #endif
 
         default:
-            OUR_DEBUG((LM_INFO, "[CAceReactor::Init]Unknow nReactorType(%d).\n", nReactorType));
+            OUR_DEBUG((LM_INFO, "[CAceReactor::Init]Unknow nReactorType(%d).\n", emReactorType));
             return false;
         }
 
@@ -151,7 +147,7 @@ bool CAceReactor::Init(int nReactorType, int nThreadCount, int nMaxHandleCount)
     }
     catch (const std::domain_error& ex)
     {
-        sprintf_safe(m_szError, MAX_BUFF_500, "%s", ex.what());
+        m_strError = ex.what();
         return false;
     }
 }
@@ -162,7 +158,7 @@ int CAceReactor::open()
 
     if (activate(THREAD_PARAM, m_nThreadCount)  == -1)
     {
-        OUR_DEBUG((LM_ERROR, "[CAceReactor::Open]activate error ReactorType = [%d] nThreadCount = [%d] Start!\n", m_nReactorType, m_nThreadCount));
+        OUR_DEBUG((LM_ERROR, "[CAceReactor::Open]activate error ReactorType = [%d] nThreadCount = [%d] Start!\n", m_emReactorType, m_nThreadCount));
         return -1;
     }
     else
@@ -176,7 +172,7 @@ int CAceReactor::svc()
 {
     if (nullptr == m_pReactor)
     {
-        OUR_DEBUG((LM_ERROR, "[CAceReactor::Svc]m_pReactor is nullptr.\n", m_nReactorType, m_nThreadCount));
+        OUR_DEBUG((LM_ERROR, "[CAceReactor::Svc]m_pReactor is nullptr.\n", m_emReactorType, m_nThreadCount));
         return -1;
     }
     else
@@ -198,7 +194,7 @@ int CAceReactor::svc()
 
 bool CAceReactor::Start()
 {
-    OUR_DEBUG((LM_INFO, "[CAceReactor::Start] ReactorID = [%d] ReactorType = [%d] nThreadCount = [%d] Start!\n", GetReactorID(), m_nReactorType, m_nThreadCount));
+    OUR_DEBUG((LM_INFO, "[CAceReactor::Start] ReactorID = [%d] ReactorType = [%d] nThreadCount = [%d] Start!\n", GetReactorID(), m_emReactorType, m_nThreadCount));
 
     if (0 == open())
     {
@@ -215,7 +211,7 @@ bool CAceReactor::Stop()
 {
     if (nullptr == m_pReactor)
     {
-        OUR_DEBUG((LM_ERROR, "[CAceReactor::Stop]m_pReactor is nullptr.\n", m_nReactorType, m_nThreadCount));
+        OUR_DEBUG((LM_ERROR, "[CAceReactor::Stop]m_pReactor is nullptr.\n", m_emReactorType, m_nThreadCount));
         return false;
     }
 
@@ -232,7 +228,7 @@ bool CAceReactor::Stop()
 
 const char* CAceReactor::GetError() const
 {
-    return m_szError;
+    return m_strError.c_str();
 }
 
 int CAceReactor::GetThreadCount() const
@@ -240,9 +236,9 @@ int CAceReactor::GetThreadCount() const
     return m_nThreadCount;
 }
 
-int CAceReactor::GetReactorType() const
+EM_REACTOR_MODULE CAceReactor::GetReactorType() const
 {
-    return m_nReactorType;
+    return m_emReactorType;
 }
 
 ACE_Reactor* CAceReactor::GetReactor()
@@ -250,95 +246,79 @@ ACE_Reactor* CAceReactor::GetReactor()
     return m_pReactor;
 }
 
-
-CAceReactorManager::CAceReactorManager(void)
-{
-}
-
 void CAceReactorManager::Close()
 {
     OUR_DEBUG((LM_ERROR, "[CAceReactor::Close] Begin.\n"));
 
-    if(nullptr != m_pReactorList)
-    {
-        for (uint16 i = 0; i < m_u2RectorCount; i++)
-        {
-            CAceReactor* pAceReactor = m_pReactorList[i];
+    for_each(m_pReactorList.begin(), m_pReactorList.end(), [this](const std::pair<uint16, CAceReactor*>& iter) {
+        //清除对象
+        auto pAceReactor = iter.second;
+        pAceReactor->Stop();
 
-            if (nullptr != pAceReactor)
-            {
-                pAceReactor->Stop();
+        //等待SVC结束
+        ACE_Time_Value tvSleep(0, 50000);
+        ACE_OS::sleep(tvSleep);
 
-                //等待SVC结束
-                ACE_Time_Value tvSleep(0, 50000);
-                ACE_OS::sleep(tvSleep);
+        SAFE_DELETE(pAceReactor);
+        });
 
-                SAFE_DELETE(pAceReactor);
-            }
-        }
-    }
-
-    SAFE_DELETE_ARRAY(m_pReactorList);
     m_u2RectorCount = 0;
     OUR_DEBUG((LM_ERROR, "[CAceReactor::Close] End.\n"));
 }
 
 void CAceReactorManager::Init(uint16 u2Count)
 {
-    m_pReactorList  = (CAceReactor** )new char[sizeof(CAceReactor*)*u2Count];
-    ACE_OS::memset(m_pReactorList, 0, sizeof(CAceReactor*)*u2Count);
     m_u2RectorCount = u2Count;
 }
 
 const char* CAceReactorManager::GetError() const
 {
-    return m_szError;
+    return m_strError.c_str();
 }
 
-bool CAceReactorManager::AddNewReactor(int nReactorID, int nReactorType, int nThreadCount, int nMaxHandleCount)
+bool CAceReactorManager::AddNewReactor(int nReactorID, EM_REACTOR_MODULE emReactorType, int nThreadCount, int nMaxHandleCount)
 {
     if(nReactorID < 0 || nReactorID > m_u2RectorCount)
     {
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CAceProactorManager::AddNewProactor]New CAceProactor is more than max Proactor list.");
+        m_strError = "[CAceProactorManager::AddNewProactor]New CAceProactor is more than max Proactor list.";
         return false;
     }
 
-    CAceReactor* pAceReactor = new CAceReactor();
+    auto pAceReactor = new CAceReactor();
 
     pAceReactor->SetReactorID((uint32)nReactorID);
-    bool blState = pAceReactor->Init(nReactorType, nThreadCount, nMaxHandleCount);
+    bool blState = pAceReactor->Init(emReactorType, nThreadCount, nMaxHandleCount);
 
     if (!blState)
     {
-        sprintf_safe(m_szError, MAX_BUFF_500, "%s", pAceReactor->GetError());
+        m_strError = pAceReactor->GetError();
         delete pAceReactor;
         return false;
     }
 
     if(nullptr != m_pReactorList[nReactorID])
     {
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CAceReactorManager::AddNewReactor]CAceReactor is exist[%d].", nReactorID);
+        m_strError = fmt::format("[CAceReactorManager::AddNewReactor]CAceReactor is exist[{0}].", nReactorID);
         delete pAceReactor;
         return false;
     }
 
     m_pReactorList[nReactorID] = pAceReactor;
-    OUR_DEBUG((LM_INFO, "[CAceReactorManager::AddNewReactor]New [%d] ReactorTxype = [%d] nThreadCount = [%d]. pAceReactor=[%@]\n", nReactorID, nReactorType, nThreadCount, pAceReactor));
+    OUR_DEBUG((LM_INFO, "[CAceReactorManager::AddNewReactor]New [%d] ReactorTxype = [%d] nThreadCount = [%d]. pAceReactor=[%@]\n", nReactorID, emReactorType, nThreadCount, pAceReactor));
     return true;
 }
 
 bool CAceReactorManager::StartOtherReactor() const
 {
-    //先启动非总的Rector
-    for (uint16 i = 1; i < m_u2RectorCount; i++)
-    {
-        CAceReactor* pAceReactor = m_pReactorList[i];
+    for_each(m_pReactorList.begin(), m_pReactorList.end(), [this](const std::pair<uint16, CAceReactor*>& iter) {
+        //先启动非总的Rector
+        auto pAceReactor = iter.second;
 
-        if (nullptr != pAceReactor && false == pAceReactor->Start())
+        if (nullptr != pAceReactor && pAceReactor->GetReactorID() != 0 && false == pAceReactor->Start())
         {
             OUR_DEBUG((LM_INFO, "[CAceReactorManager::AddNewReactor]Start error.\n"));
         }
-    }
+        });
 
     return true;
 }
@@ -346,49 +326,54 @@ bool CAceReactorManager::StartOtherReactor() const
 
 bool CAceReactorManager::StartClientReactor() const
 {
-    return m_pReactorList[0]->Start();
+    auto f = m_pReactorList.find(0);
+
+    if (m_pReactorList.end() != f)
+    {
+        return f->second->Start();
+    }
+    else
+    {
+        return false;
+    }
 }
 
 bool CAceReactorManager::StopReactor() const
 {
-    for (uint16 i = 0; i < m_u2RectorCount; i++)
-    {
-        CAceReactor* pAceReactor = m_pReactorList[i];
+    for_each(m_pReactorList.begin(), m_pReactorList.end(), [this](const std::pair<uint16, CAceReactor*>& iter) {
+        //先启动非总的Rector
+        auto pAceReactor = iter.second;
 
-        if (nullptr != pAceReactor)
+        if (false == pAceReactor->Stop())
         {
-            OUR_DEBUG((LM_ERROR, "[CAceReactorManager::StopReactor]nReactorID=%d.\n", pAceReactor->GetReactorID()));
-
-            if (false == pAceReactor->Stop())
-            {
-                OUR_DEBUG((LM_ERROR, "[CAceReactorManager::StopReactor]pAceReactor Stop.\n"));
-            }
+            OUR_DEBUG((LM_ERROR, "[CAceReactorManager::StopReactor]pAceReactor Stop.\n"));
         }
-    }
+        });
 
     return true;
 }
 
 CAceReactor* CAceReactorManager::GetAceReactor(int nReactorID)
 {
-    if(nReactorID < 0 || nReactorID >= m_u2RectorCount)
+    auto f = m_pReactorList.find(nReactorID);
+
+    if (m_pReactorList.end() != f)
+    {
+        return f->second;
+    }
+    else
     {
         return nullptr;
     }
-
-    return m_pReactorList[nReactorID];
 }
 
 ACE_Reactor* CAceReactorManager::GetAce_Reactor(int nReactorID)
 {
-    if(nReactorID < 0 || nReactorID >= m_u2RectorCount)
-    {
-        return nullptr;
-    }
+    auto f = m_pReactorList.find(nReactorID);
 
-    if (nullptr != m_pReactorList[nReactorID])
+    if (m_pReactorList.end() != f)
     {
-        return m_pReactorList[nReactorID]->GetReactor();
+        return f->second->GetReactor();
     }
     else
     {
@@ -420,14 +405,5 @@ ACE_Reactor* CAceReactorManager::GetAce_Client_Reactor(int nReactorID)
 
 uint32 CAceReactorManager::GetClientReactorCount() const
 {
-    uint32 u4Count = (uint32)m_u2RectorCount;
-
-    if(u4Count > 3)
-    {
-        return u4Count - 3;
-    }
-    else
-    {
-        return 0;
-    }
+    return (uint32)m_pReactorList.size();
 }

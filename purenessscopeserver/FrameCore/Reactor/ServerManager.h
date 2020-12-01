@@ -22,7 +22,7 @@
 class CServerManager : public IServerManager
 {
 public:
-    CServerManager(void);
+    CServerManager(void) = default;
 
     bool Init();
     bool Start();

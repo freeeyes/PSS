@@ -12,7 +12,7 @@
 class CPacketParsePool : public CObjectPoolManager<CPacketParse, ACE_Recursive_Thread_Mutex>
 {
 public:
-    CPacketParsePool();
+    CPacketParsePool() = default;
 
     static void Init_Callback(int nIndex, CPacketParse* pPacketParse);
     void Close();
@@ -27,6 +27,6 @@ private:
     ACE_Recursive_Thread_Mutex m_ThreadWriteLock;                     //控制多线程锁
 };
 
-typedef ACE_Singleton<CPacketParsePool, ACE_Null_Mutex> App_PacketParsePool;
+using App_PacketParsePool = ACE_Singleton<CPacketParsePool, ACE_Null_Mutex>;
 
 #endif

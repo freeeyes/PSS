@@ -22,7 +22,7 @@ bool CConsolePacketParse::SetPacketHead(uint32 u4ConnectID, ACE_Message_Block* p
     ACE_UNUSED_ARG(pMessageBlockManager);
 
     //这里添加自己对包头的分析，主要分析出包长度。
-    uint32 u4Len = (uint32)pmbHead->length();
+    auto u4Len = (uint32)pmbHead->length();
 
     SetPacket_Head_Curr_Length(u4Len);
 
@@ -51,7 +51,7 @@ bool CConsolePacketParse::SetPacketBody(uint32 u4ConnectID, ACE_Message_Block* p
         //UDP数据包，没有u4ConnectID
     }
 
-    uint32 u4Len = (uint32)pmbBody->length();
+    auto u4Len = (uint32)pmbBody->length();
 
     SetPacket_Body_Src_Length(u4Len);
     SetPacket_Body_Curr_Length(u4Len);
@@ -99,7 +99,7 @@ bool CConsolePacketParse::MakePacket(uint32 u4ConnectID, const char* pData, uint
 
 
 
-uint8 CConsolePacketParse::GetPacketStream(uint32 u4ConnectID, ACE_Message_Block* pCurrMessage, const IMessageBlockManager* pMessageBlockManager) const
+uint8 CConsolePacketParse::GetPacketStream(uint32 u4ConnectID, const ACE_Message_Block* pCurrMessage, const IMessageBlockManager* pMessageBlockManager) const
 {
     ACE_UNUSED_ARG(pMessageBlockManager);
     ACE_UNUSED_ARG(pCurrMessage);

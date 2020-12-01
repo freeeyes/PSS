@@ -4,10 +4,6 @@
 #include "CppUnitMain.h"
 #endif
 
-CServerManager::CServerManager(void)
-{
-}
-
 bool CServerManager::Init()
 {
     int nServerPortCount = (int)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
@@ -155,22 +151,22 @@ bool CServerManager::Init_Reactor(uint8 u1ReactorCount, NETWORKMODE u1NetMode) c
 
         if (u1NetMode == NETWORKMODE::NETWORKMODE_RE_SELECT)
         {
-            blState = App_ReactorManager::instance()->AddNewReactor(i, Reactor_Select, 1);
+            blState = App_ReactorManager::instance()->AddNewReactor(i, EM_REACTOR_MODULE::Reactor_Select, 1);
             OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_Select.\n"));
         }
         else if (u1NetMode == NETWORKMODE::NETWORKMODE_RE_TPSELECT)
         {
-            blState = App_ReactorManager::instance()->AddNewReactor(i, Reactor_TP, 1);
+            blState = App_ReactorManager::instance()->AddNewReactor(i, EM_REACTOR_MODULE::Reactor_TP, 1);
             OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_TP.\n"));
         }
         else if (u1NetMode == NETWORKMODE::NETWORKMODE_RE_EPOLL)
         {
-            blState = App_ReactorManager::instance()->AddNewReactor(i, Reactor_DEV_POLL, 1, GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount);
+            blState = App_ReactorManager::instance()->AddNewReactor(i, EM_REACTOR_MODULE::Reactor_DEV_POLL, 1, GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount);
             OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_DEV_POLL.\n"));
         }
         else if (u1NetMode == NETWORKMODE::NETWORKMODE_RE_EPOLL_ET)
         {
-            blState = App_ReactorManager::instance()->AddNewReactor(i, Reactor_DEV_POLL_ET, 1, GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount);
+            blState = App_ReactorManager::instance()->AddNewReactor(i, EM_REACTOR_MODULE::Reactor_DEV_POLL_ET, 1, GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount);
             OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_DEV_POLL_ET.\n"));
         }
         else

@@ -14,12 +14,12 @@
 const uint32 RE_CONNECT_SERVER_TIMEOUT = 100 * 1000;
 const uint32 WAIT_FOR_RECONNECT_FINISH = 5000;
 
-typedef ACE_Connector<CConnectClient, ACE_SOCK_CONNECTOR> CConnectClientConnector;
+using CConnectClientConnector = ACE_Connector<CConnectClient, ACE_SOCK_CONNECTOR>;
 
 class CReactorClientInfo
 {
 public:
-    CReactorClientInfo();
+    CReactorClientInfo()  = default;
 
     bool Init(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, CConnectClientConnector* pReactorConnect, IClientMessage* pClientMessage, ACE_Reactor* pReactor, uint32 u4PacketParseID);  //初始化链接地址和端口
     void SetLocalAddr(const char* pIP, uint16 u2Port, uint8 u1IPType);                         //绑定本地的IP和端口
@@ -39,11 +39,11 @@ public:
 private:
     ACE_INET_Addr              m_AddrLocal;                               //本地的连接地址（可以指定）
     ACE_INET_Addr              m_AddrServer;                              //远程服务器的地址
-    CConnectClient*            m_pConnectClient  = nullptr;                  //当前链接对象
-    CConnectClientConnector*   m_pReactorConnect = nullptr;                  //Connector链接对象
-    IClientMessage*            m_pClientMessage  = nullptr;                  //回调函数类，回调返回错误和返回数据方法
+    CConnectClient*            m_pConnectClient  = nullptr;               //当前链接对象
+    CConnectClientConnector*   m_pReactorConnect = nullptr;               //Connector链接对象
+    IClientMessage*            m_pClientMessage  = nullptr;               //回调函数类，回调返回错误和返回数据方法
     uint32                     m_u4PacketParseID = 0;                     //可设置的PacketParseID
-    ACE_Reactor*               m_pReactor        = nullptr;                  //记录使用的反应器
+    ACE_Reactor*               m_pReactor        = nullptr;               //记录使用的反应器
     bool                       m_blIsLocal       = false;                 //是否需要制定本地端口
     int                        m_nServerID       = 0;                     //远程服务器的ID
     EM_Server_Connect_State    m_emConnectState  = EM_Server_Connect_State::SERVER_CONNECT_READY;  //连接状态
@@ -96,13 +96,13 @@ public:
     CConnectClientConnector         m_ReactorConnect;                              //Reactor连接客户端对象
     ACE_Recursive_Thread_Mutex      m_ThreadWritrLock;                             //线程锁
     int                             m_nTaskID                = -1;                 //定时检测工具
-    ACE_Reactor*                    m_pReactor               = nullptr;               //当前的反应器
+    ACE_Reactor*                    m_pReactor               = nullptr;            //当前的反应器
     bool                            m_blReactorFinish        = false;              //Reactor是否已经注册
     uint32                          m_u4ConnectServerTimeout = 0;                  //连接间隔时间
     int32                           m_u4MaxPoolCount         = 0;                  //连接池的上限
-    EM_S2S_Run_State                m_emS2SRunState          = S2S_Run_State_Init; //当前服务连接状态
+    EM_S2S_Run_State                m_emS2SRunState          = EM_S2S_Run_State::S2S_Run_State_Init; //当前服务连接状态
     vector<CS2SConnectGetRandyInfo> m_GetReadyInfoList;                            //需要等待连接的数据信息
 };
 
-typedef ACE_Singleton<CClientReConnectManager, ACE_Recursive_Thread_Mutex> App_ClientReConnectManager;
+using App_ClientReConnectManager = ACE_Singleton<CClientReConnectManager, ACE_Recursive_Thread_Mutex>;
 #endif

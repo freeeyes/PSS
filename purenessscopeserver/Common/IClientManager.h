@@ -5,7 +5,7 @@
 #include "ClientUDPMassage.h"
 
 //Server 2 server
-enum EM_S2S_Run_State
+enum class EM_S2S_Run_State
 {
     S2S_Run_State_Init = 0,
     S2S_Run_State_Run,

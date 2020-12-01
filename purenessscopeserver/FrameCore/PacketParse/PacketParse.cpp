@@ -1,10 +1,5 @@
 #include "PacketParse.h"
 
-
-CPacketParse::CPacketParse(void)
-{
-}
-
 void CPacketParse::SetHashID(int nHashID)
 {
     m_nHashID = nHashID;

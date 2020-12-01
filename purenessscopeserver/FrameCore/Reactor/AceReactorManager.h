@@ -18,8 +18,9 @@
 #include "ace/Task.h"
 #include "ace/Singleton.h"
 #include <stdexcept>
+#include <unordered_map>
 
-enum
+enum class EM_REACTOR_MODULE
 {
     Reactor_Select      = 0x01,
     Reactor_TP          = 0x02,
@@ -37,20 +38,20 @@ const int REACTOR_UDPDEFINE    = 2;
 class CAceReactor : public ACE_Task<ACE_MT_SYNCH>
 {
 public:
-    CAceReactor();
+    CAceReactor() = default;
     void Close();
 
-    bool Init(int nReactorType, int nThreadCount, int nMaxHandleCount = 0);
+    bool Init(EM_REACTOR_MODULE emReactorType, int nThreadCount, int nMaxHandleCount = 0);
     const char* GetError() const;
     int GetThreadCount() const;
-    int GetReactorType() const;
+    EM_REACTOR_MODULE GetReactorType() const;
     ACE_Reactor* GetReactor();
 
     bool Start();
     bool Stop();
 
     int open();
-    virtual int svc(void);
+    int svc(void) final;
 
     void   SetReactorID(uint32 u4ReactorID);
     uint32 GetReactorID() const;
@@ -63,22 +64,22 @@ private:
     void Create_Reactor_TP();
     void Create_DEV_POLL(int nMaxHandleCount);
 
-    ACE_Reactor* m_pReactor              = nullptr;
-    int          m_nReactorType          = 0;
-    int          m_nThreadCount          = 0;
-    char         m_szError[MAX_BUFF_500] = {'\0'};
-    bool         m_blRun                 = false;     //反应器是否在运行
-    uint32       m_u4ReactorID           = 0;         //反应器的编号
+    ACE_Reactor*      m_pReactor              = nullptr;
+    EM_REACTOR_MODULE m_emReactorType         = EM_REACTOR_MODULE::Reactor_DEV_POLL;
+    int               m_nThreadCount          = 0;
+    string            m_strError;
+    bool              m_blRun                 = false;     //反应器是否在运行
+    uint32            m_u4ReactorID           = 0;         //反应器的编号
 };
 
 class CAceReactorManager
 {
 public:
-    CAceReactorManager(void);
+    CAceReactorManager(void) = default;
 
     void Init(uint16 u2Count);
 
-    bool AddNewReactor(int nReactorID, int nReactorType = Reactor_Select, int nThreadCount = 1, int nMaxHandleCount = 0);
+    bool AddNewReactor(int nReactorID, EM_REACTOR_MODULE emReactorType = EM_REACTOR_MODULE::Reactor_Select, int nThreadCount = 1, int nMaxHandleCount = 0);
     void Close();
     const char* GetError() const;
 
@@ -92,11 +93,12 @@ public:
     uint32 GetClientReactorCount() const;
 
 private:
-    CAceReactor**  m_pReactorList          = nullptr;
-    uint16         m_u2RectorCount         = 0;
-    char           m_szError[MAX_BUFF_500] = {'\0'};
+    using hashmapReactorList = unordered_map<uint16, CAceReactor*>;
+    hashmapReactorList  m_pReactorList;
+    uint16              m_u2RectorCount         = 0;
+    string              m_strError;
 };
 
-typedef ACE_Singleton<CAceReactorManager, ACE_Null_Mutex> App_ReactorManager;
+using App_ReactorManager = ACE_Singleton<CAceReactorManager, ACE_Null_Mutex>;
 
 #endif

@@ -35,7 +35,7 @@
 //加载所有配置文件中的PacketParse模块
 int Load_PacketParse_Module()
 {
-	int nPacketParseCount = (int)GetXmlConfigAttribute(xmlPacketParses)->vec.size();
+	auto nPacketParseCount = (int)GetXmlConfigAttribute(xmlPacketParses)->vec.size();
 	App_PacketParseLoader::instance()->Init(nPacketParseCount);
 
 	for (const xmlPacketParses::_PacketParse& packetparse : GetXmlConfigAttribute(xmlPacketParses)->vec)
@@ -105,32 +105,17 @@ int CheckCoreLimit(int nMaxCoreFile)
 //设置当前代码路径
 bool SetAppPath()
 {
-	int nSize = (int)pathconf(".", _PC_PATH_MAX);
-
-	if (nSize <= 0)
-	{
-		OUR_DEBUG((LM_INFO, "[SetAppPath]pathconf is error(%d).\n", nSize));
-		return false;
-	}
-
-	char* pFilePath = new char[nSize];
+	string strFilePath = fmt::format("/proc/{0}/exe", getpid());
 
 	char szPath[MAX_BUFF_300] = { '\0' };
-	memset(pFilePath, 0, nSize);
-	ACE_OS::snprintf(pFilePath, MAX_BUFF_300, "/proc/%d/exe", getpid());
 
 	//从符号链接中获得当前文件全路径和文件名
-	ssize_t stPathSize = readlink(pFilePath, szPath, MAX_BUFF_300 - 1);
+	ssize_t stPathSize = readlink(strFilePath.c_str(), szPath, MAX_BUFF_300 - 1);
 
 	if (stPathSize <= 0)
 	{
 		OUR_DEBUG((LM_INFO, "[SetAppPath]no find work Path.\n", szPath));
-		SAFE_DELETE_ARRAY(pFilePath);
 		return false;
-	}
-	else
-	{
-		SAFE_DELETE_ARRAY(pFilePath);
 	}
 
 	while (szPath[stPathSize - 1] != '/')
@@ -155,7 +140,7 @@ bool SetAppPath()
 }
 
 //子进程程序
-int Chlid_Run()
+int Chlid_Run(std::thread& th_monitor)
 {
 	//判断是否需要将当前代码输出到文件里
 	ofstream* pLogoStream = nullptr;
@@ -192,7 +177,7 @@ int Chlid_Run()
 	g_wait_sigal.init();
 
 	//监控异常中断信号量
-	std::thread th_monitor([g_wait_sigal, &g_mutex ]()
+	th_monitor = std::thread([g_wait_sigal, &g_mutex ]()
 		{
 			std::lock_guard<std::mutex> lk(g_mutex);
 
@@ -205,7 +190,6 @@ int Chlid_Run()
 
 			OUR_DEBUG((LM_INFO, "[thread_Monitor]exit.\n"));
 		});
-	th_monitor.detach();
 
 	//等待线程锁生效
 	ACE_Time_Value tvSleep(0, 1000);
@@ -246,6 +230,8 @@ int Chlid_Run()
 		SAFE_DELETE(pLogoStream);
 	}
 
+	th_monitor.join();
+
 	return 0;
 }
 
@@ -274,7 +260,8 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 		return 0;
 	}
 
-	if (0 != Chlid_Run())
+	std::thread th_monitor;
+	if (0 != Chlid_Run(th_monitor))
 	{
 		OUR_DEBUG((LM_INFO, "[main]Chlid_Run error.\n"));
 	}

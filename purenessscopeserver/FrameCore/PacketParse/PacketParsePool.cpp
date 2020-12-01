@@ -1,9 +1,5 @@
 #include "PacketParsePool.h"
 
-CPacketParsePool::CPacketParsePool()
-{
-}
-
 void CPacketParsePool::Init_Callback(int nIndex, CPacketParse* pPacketParse)
 {
     pPacketParse->Init();

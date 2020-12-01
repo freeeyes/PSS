@@ -65,7 +65,6 @@ public:
 
     bool SaveTimeout(uint16 u2CommandID, uint32 u4TimeCost);
 
-    char* GetReturnData();
     uint16 GetReturnDataLength() const;
 
     void GetAIInfo(_WorkThreadAIInfo& objWorkThreadAIInfo) const;
@@ -87,7 +86,7 @@ private:
     uint32     m_u4WTTimeoutCount              = 0;           //工作线程超时包的单位时间内的超时次数上限
     uint32     m_u4WTStopTime                  = 0;           //停止此命令服务的时间
     uint8      m_u1WTReturnDataType            = 0;           //返回错误数据的类型，1为二进制，2为文本
-    char       m_szWTReturnData[MAX_BUFF_1024] = {'\0'};      //返回的数据体，最多1K
+    string     m_strWTReturnData;                             //返回的数据体，最多1K
 
     //超时的命令集合
     class _CommandTime

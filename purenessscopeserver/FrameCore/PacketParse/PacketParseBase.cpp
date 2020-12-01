@@ -3,7 +3,7 @@
 CPacketParseBase::CPacketParseBase(void)
 {
     //这里修改属于你的包解析版本号
-    sprintf_safe(m_szPacketVersion, MAX_BUFF_20, "1.00");
+    m_strPacketVersion = "2.00";
 }
 
 void CPacketParseBase::Clear()
@@ -38,7 +38,7 @@ void CPacketParseBase::Close()
 
 const char* CPacketParseBase::GetPacketVersion() const
 {
-    return m_szPacketVersion;
+    return m_strPacketVersion.c_str();
 }
 
 uint32 CPacketParseBase::GetPacketHeadLen() const

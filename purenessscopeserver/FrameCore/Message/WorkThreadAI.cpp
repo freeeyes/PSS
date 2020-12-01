@@ -8,26 +8,7 @@ void CWorkThreadAI::Init(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime,
     m_u4WTStopTime       = u4WTStopTime;
     m_u1WTReturnDataType = u1WTReturnDataType;
     m_u4DisposeTime      = u4DisposeTime;
-
-    if(m_u1WTReturnDataType == 1)
-    {
-        //如果是二进制，变换为二进制存储
-        CConvertBuffer objConvertBuffer;
-
-        int nSize = MAX_BUFF_1024;
-        m_u2ReturnDataLen = (uint16)objConvertBuffer.GetBufferSize(pReturnData, (int)strlen(pReturnData));
-
-        if (false == objConvertBuffer.Convertstr2charArray(pReturnData, (int)strlen(pReturnData), (unsigned char*)m_szWTReturnData, nSize))
-        {
-            OUR_DEBUG((LM_INFO, "[CWorkThreadAI::Init]Convertstr2charArray error.\n"));
-        }
-    }
-    else
-    {
-        //如果是文本直接copy
-        sprintf_safe(m_szWTReturnData, MAX_BUFF_1024, "%s", pReturnData);
-        m_u2ReturnDataLen = (uint16)ACE_OS::strlen(m_szWTReturnData);
-    }
+    m_strWTReturnData    = pReturnData;
 }
 
 bool CWorkThreadAI::SaveTimeout(uint16 u2CommandID, uint32 u4TimeCost)
@@ -119,11 +100,6 @@ bool CWorkThreadAI::CheckCurrTimeout(uint16 u2CommandID, uint64 u8Now)
     }
 
 	return false;
-}
-
-char* CWorkThreadAI::GetReturnData()
-{
-    return (char* )m_szWTReturnData;
 }
 
 uint16 CWorkThreadAI::GetReturnDataLength() const

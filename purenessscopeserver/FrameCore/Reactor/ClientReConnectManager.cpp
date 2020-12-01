@@ -1,9 +1,5 @@
 #include "ClientReConnectManager.h"
 
-CReactorClientInfo::CReactorClientInfo()
-{
-}
-
 bool CReactorClientInfo::Init(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, CConnectClientConnector* pReactorConnect, IClientMessage* pClientMessage, ACE_Reactor* pReactor, uint32 u4PacketParseID)
 {
     int nRet = 0;
@@ -267,7 +263,7 @@ bool CClientReConnectManager::Init(ACE_Reactor* pReactor)
 
     m_pReactor        = pReactor;
 
-    m_emS2SRunState = S2S_Run_State_Run;
+    m_emS2SRunState = EM_S2S_Run_State::S2S_Run_State_Run;
 
     //将之前有缓冲的连接信息建立连接
     for(CS2SConnectGetRandyInfo f : m_GetReadyInfoList)
@@ -303,7 +299,7 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, uint16 u2P
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     CReactorClientInfo* pClientInfo = nullptr;
 
-    if (S2S_Run_State_Init == m_emS2SRunState)
+    if (EM_S2S_Run_State::S2S_Run_State_Init == m_emS2SRunState)
     {
         //如果反应器还没初始化，添加到一个列表中，等待反应器初始化后调用
         CS2SConnectGetRandyInfo objS2SConnectGetRandyInfo;
@@ -349,7 +345,7 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, uint16 u2P
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     CReactorClientInfo* pClientInfo = nullptr;
 
-    if (S2S_Run_State_Init == m_emS2SRunState)
+    if (EM_S2S_Run_State::S2S_Run_State_Init == m_emS2SRunState)
     {
         //如果反应器还没初始化，添加到一个列表中，等待反应器初始化后调用
         CS2SConnectGetRandyInfo objS2SConnectGetRandyInfo;

@@ -17,10 +17,10 @@ const uint32 PACKET_HEAD_LENGTH = 40;
 class CPacketParse : public CPacketParseBase
 {
 public:
-    CPacketParse(void);
+    CPacketParse(void) = default;
 
     //≥ı ºªØPacketParsed
-    void Init();
+    void Init() final;
 
     void SetHashID(int nHashID);
     int  GetHashID() const;
