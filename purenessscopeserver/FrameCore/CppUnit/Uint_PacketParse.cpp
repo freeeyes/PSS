@@ -34,7 +34,7 @@ void CUnit_PacketParse::Test_PacketParsePool(void)
     pPacketParse->SetPacket_Body_Message(pmbBody);
 
     //²âÊÔ°æ±¾ºÅ
-    if (0 != ACE_OS::strcmp(pPacketParse->GetPacketVersion(), "1.00"))
+    if (0 != ACE_OS::strcmp(pPacketParse->GetPacketVersion(), "2.00"))
     {
         OUR_DEBUG((LM_INFO, "[Test_PacketParsePool]m_pPacketParsePool->GetPacketVersion().\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_PacketParsePool]m_pPacketParsePool->GetPacketVersion() is fail.", true == blRet);

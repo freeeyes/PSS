@@ -37,16 +37,7 @@ void CUnit_WorkThreadAI::Test_WorkThreadAI(void)
         return;
     }
 
-    const char* pData = m_pWorkThreadAI->GetReturnData();
-
-    if (0xff != (unsigned char)pData[0] || 0xff != (unsigned char)pData[1])
-    {
-        OUR_DEBUG((LM_INFO, "[Test_WorkThreadAI]m_pWorkThreadAI->GetReturnData() Error.\n"));
-        CPPUNIT_ASSERT_MESSAGE("[Test_WorkThreadAI]m_pWorkThreadAI->GetReturnData() Error.", true == blRet);
-        return;
-    }
-
-    if (2 != m_pWorkThreadAI->GetReturnDataLength())
+    if (5 != m_pWorkThreadAI->GetReturnDataLength())
     {
         OUR_DEBUG((LM_INFO, "[Test_WorkThreadAI]m_pWorkThreadAI->GetReturnDataLength() Error.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_WorkThreadAI]m_pWorkThreadAI->GetReturnDataLength() Error.", true == blRet);

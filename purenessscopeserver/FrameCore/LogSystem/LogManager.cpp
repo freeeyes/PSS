@@ -44,14 +44,14 @@ int CLogManager::Close()
     if(true == m_blRun)
     {
         m_blRun = false;
+
+        //发一个消息，告诉线程终止了
+        auto p = std::make_shared<_LogBlockInfo>();
+        PutLog(p);
+
+        //等待线程处理完毕
+        m_ttQueue.join();
     }
-
-    //发一个消息，告诉线程终止了
-    auto p = std::make_shared<_LogBlockInfo>();
-    PutLog(p);
-
-    //等待线程处理完毕
-    m_ttQueue.join();
 
     return 0;
 }

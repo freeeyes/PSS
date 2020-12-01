@@ -17,7 +17,7 @@ void CUnit_AceReactorManager::Test_DoMessage_AceReactorManager(void)
 {
     //测试创建指定的反应器
     int blRet = false;
-    blRet = m_pReactorManager->AddNewReactor(1, Reactor_Select);
+    blRet = m_pReactorManager->AddNewReactor(11, EM_REACTOR_MODULE::Reactor_Select);
 
     if (false == blRet)
     {
@@ -26,7 +26,7 @@ void CUnit_AceReactorManager::Test_DoMessage_AceReactorManager(void)
         return;
     }
 
-    blRet = m_pReactorManager->AddNewReactor(2, Reactor_TP);
+    blRet = m_pReactorManager->AddNewReactor(12, EM_REACTOR_MODULE::Reactor_TP);
 
     if (false == blRet)
     {
@@ -35,18 +35,18 @@ void CUnit_AceReactorManager::Test_DoMessage_AceReactorManager(void)
         return;
     }
 
-    const CAceReactor* pAceReactor = m_pReactorManager->GetAceReactor(1);
+    const CAceReactor* pAceReactor = m_pReactorManager->GetAceReactor(11);
 
-    if (1 != pAceReactor->GetThreadCount() || Reactor_Select != pAceReactor->GetReactorType())
+    if (1 != pAceReactor->GetThreadCount() || EM_REACTOR_MODULE::Reactor_Select != pAceReactor->GetReactorType())
     {
         OUR_DEBUG((LM_INFO, "[Test_DoMessage_AceReactorManager]Reactor_Select GetThreadCount(%s) is fail.\n", pAceReactor->GetError()));
         CPPUNIT_ASSERT_MESSAGE("[Test_DoMessage_AceReactorManager]Reactor_Select GetThreadCount is fail.", true == blRet);
         return;
     }
 
-    pAceReactor = m_pReactorManager->GetAceReactor(2);
+    pAceReactor = m_pReactorManager->GetAceReactor(12);
 
-    if (1 != pAceReactor->GetThreadCount() || Reactor_TP != pAceReactor->GetReactorType())
+    if (1 != pAceReactor->GetThreadCount() || EM_REACTOR_MODULE::Reactor_TP != pAceReactor->GetReactorType())
     {
         OUR_DEBUG((LM_INFO, "[Test_DoMessage_AceReactorManager]Reactor_TP GetThreadCount(%s) is fail.\n", pAceReactor->GetError()));
         CPPUNIT_ASSERT_MESSAGE("[Test_DoMessage_AceReactorManager]Reactor_TP GetThreadCount is fail.", true == blRet);

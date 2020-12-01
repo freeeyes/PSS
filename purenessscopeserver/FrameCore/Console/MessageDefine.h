@@ -22,7 +22,7 @@ enum class EM_CONSOLE_MESSAGE
     CONSOLE_MESSAGE_CLOSE   = 2,
 };
 
-static const char COMMAND_SPLIT_STRING[] = " ";
+static const string COMMAND_SPLIT_STRING = " ";
 
 //命令处理参数
 class _CommandInfo
@@ -83,21 +83,21 @@ public:
 };
 
 //协议解析, 公用数据部分
-bool GetCommandParam(const char* pCommand, const char* pTag, string& strValue);                           //解析出指定的Command参数
-bool GetFileInfo(const char* pFile, _FileInfo& FileInfo);                                                 //将一个全路径切分成文件名
-bool GetForbiddenIP(const char* pCommand, _ForbiddenIP& ForbiddenIP);                                     //得到禁止的IP列表
-bool GetConnectServerID(const char* pCommand, int& nServerID);                                            //得到一个指定的服务器ID
-bool GetDebug(const char* pCommand, uint8& u1Debug);                                                      //得到当前设置的BUDEG
-bool GetTrackIP(const char* pCommand, _ForbiddenIP& ForbiddenIP);                                         //得到设置的追踪IP
-bool GetLogLevel(const char* pCommand, int& nLogLevel);                                                   //得到日志等级
-bool GetAIInfo(const char* pCommand, int& nAI, int& nDispose, int& nCheck, int& nStop);                   //得到AI设置
-bool GetNickName(const char* pCommand, string& strName);                                                  //得到连接别名
-bool GetConnectID(const char* pCommand, uint32& u4ConnectID, bool& blFlag);                               //得到ConnectID
-bool GetMaxConnectCount(const char* pCommand, uint16& u2MaxConnectCount);                                 //得到最大的连接总数
-bool GetListenInfo(const char* pCommand, _ListenInfo& objListenInfo);                                     //得到监听端口信息
-bool GetTestFileName(const char* pCommand, string& strFileName);                                          //获得加载测试文件名
-bool GetDyeingIP(const char* pCommand, _DyeIPInfo& objDyeIPInfo);                                         //获得染色IP的相关信息
-bool GetDyeingCommand(const char* pCommand, _DyeCommandInfo& objDyeCommandInfo);                          //获得染色Command的相关信息
-bool GetPoolSet(const char* pCommand, _PoolName& objPoolName);                                            //获得内存池的名字
+bool GetCommandParam(const string& strCommand, const char* pTag, string& strValue);                             //解析出指定的Command参数
+bool GetFileInfo(const string& strFile, _FileInfo& FileInfo);                                                 //将一个全路径切分成文件名
+bool GetForbiddenIP(const string& Command, _ForbiddenIP& ForbiddenIP);                                     //得到禁止的IP列表
+bool GetConnectServerID(const string& strCommand, int& nServerID);                                            //得到一个指定的服务器ID
+bool GetDebug(const string& strCommand, uint8& u1Debug);                                                      //得到当前设置的BUDEG
+bool GetTrackIP(const string& strCommand, _ForbiddenIP& ForbiddenIP);                                         //得到设置的追踪IP
+bool GetLogLevel(const string& strCommand, int& nLogLevel);                                                   //得到日志等级
+bool GetAIInfo(const string& strCommand, int& nAI, int& nDispose, int& nCheck, int& nStop);                   //得到AI设置
+bool GetNickName(const string& strCommand, string& strName);                                                  //得到连接别名
+bool GetConnectID(const string& strCommand, uint32& u4ConnectID, bool& blFlag);                               //得到ConnectID
+bool GetMaxConnectCount(const string& strCommand, uint16& u2MaxConnectCount);                                 //得到最大的连接总数
+bool GetListenInfo(const string& strCommand, _ListenInfo& objListenInfo);                                     //得到监听端口信息
+bool GetTestFileName(const string& strCommand, string& strFileName);                                          //获得加载测试文件名
+bool GetDyeingIP(const string& strCommand, _DyeIPInfo& objDyeIPInfo);                                         //获得染色IP的相关信息
+bool GetDyeingCommand(const string& strCommand, _DyeCommandInfo& objDyeCommandInfo);                          //获得染色Command的相关信息
+bool GetPoolSet(const string& strCommand, _PoolName& objPoolName);                                            //获得内存池的名字
 
 #endif

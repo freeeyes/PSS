@@ -9,6 +9,7 @@ void CWorkThreadAI::Init(uint8 u1AI, uint32 u4DisposeTime, uint32 u4WTCheckTime,
     m_u1WTReturnDataType = u1WTReturnDataType;
     m_u4DisposeTime      = u4DisposeTime;
     m_strWTReturnData    = pReturnData;
+    m_u2ReturnDataLen    = (uint16)m_strWTReturnData.length();
 }
 
 bool CWorkThreadAI::SaveTimeout(uint16 u2CommandID, uint32 u4TimeCost)

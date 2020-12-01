@@ -210,11 +210,11 @@ bool CForbiddenIP::CompareIP(const char* pTargetIP, const char* pClientIP) const
     //这里不必在对查询做*的匹配操作，因为无意义。
     if (ACE_OS::strcmp(pTargetIP, pClientIP) == 0)
     {
-        return false;
+        return true;
     }
     else
     {
-        return true;
+        return false;
     }
 }
 

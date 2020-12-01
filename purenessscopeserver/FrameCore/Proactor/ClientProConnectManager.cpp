@@ -229,7 +229,7 @@ CClientProConnectManager::CClientProConnectManager(void)
     m_blProactorFinish       = false;
     m_u4MaxPoolCount         = 0;
     m_u4ConnectServerTimeout = 0;
-    m_emS2SRunState          = S2S_Run_State_Init;
+    m_emS2SRunState          = EM_S2S_Run_State::S2S_Run_State_Init;
 }
 
 CClientProConnectManager::~CClientProConnectManager(void)
@@ -270,7 +270,7 @@ bool CClientProConnectManager::Init(ACE_Proactor* pProactor)
     //标记Proactor已经连接成功
     m_blProactorFinish = true;
 
-    m_emS2SRunState = S2S_Run_State_Run;
+    m_emS2SRunState = EM_S2S_Run_State::S2S_Run_State_Run;
 
     //将之前有缓冲的连接信息建立连接
     for (CS2SConnectGetRandyInfo f : m_GetReadyInfoList)
@@ -306,7 +306,7 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, uint16 u2
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     CProactorClientInfo* pClientInfo = nullptr;
 
-    if (S2S_Run_State_Init == m_emS2SRunState)
+    if (EM_S2S_Run_State::S2S_Run_State_Init == m_emS2SRunState)
     {
         //如果反应器还没初始化，添加到一个列表中，等待反应器初始化后调用
         CS2SConnectGetRandyInfo objS2SConnectGetRandyInfo;
@@ -351,7 +351,7 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, uint16 u2
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     CProactorClientInfo* pClientInfo = nullptr;
 
-    if (S2S_Run_State_Init == m_emS2SRunState)
+    if (EM_S2S_Run_State::S2S_Run_State_Init == m_emS2SRunState)
     {
         //如果反应器还没初始化，添加到一个列表中，等待反应器初始化后调用
         CS2SConnectGetRandyInfo objS2SConnectGetRandyInfo;

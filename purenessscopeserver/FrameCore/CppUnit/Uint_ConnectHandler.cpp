@@ -153,7 +153,7 @@ void CUnit_ConnectHandler::Test_ConnectHandler_PostMessage(void)
         return;
     }
 
-    if (EM_Client_Connect_status::CLIENT_CONNECT_EXIST != App_HandlerManager::instance()->GetConnectState(1))
+    if (EM_Client_Connect_status::CLIENT_CONNECT_NO_EXIST != App_HandlerManager::instance()->GetConnectState(1))
     {
         OUR_DEBUG((LM_INFO, "[Test_ConnectHandler_PostMessage]GetConnectState is fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler_PostMessage]GetConnectState is fail.", true == blRet);

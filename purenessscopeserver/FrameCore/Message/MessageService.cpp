@@ -394,17 +394,18 @@ int CMessageService::Close()
     if (true == m_blRun)
     {
         m_blRun = false;
+
+        //发一个消息，告诉线程终止了
+        auto p = std::make_shared<CWorkThreadMessage>();
+        p->m_emPacketType = EM_CONNECT_IO_TYPE::WORKTHREAD_CLOSE;
+        PutMessage(p);
+
+        //等待线程处理完毕
+        m_ttQueue.join();
+
+        OUR_DEBUG((LM_INFO, "[CMessageService::Close] Close Finish.\n"));
     }
 
-    //发一个消息，告诉线程终止了
-    auto p = std::make_shared<CWorkThreadMessage>();
-    p->m_emPacketType = EM_CONNECT_IO_TYPE::WORKTHREAD_CLOSE;
-    PutMessage(p);
-
-    //等待线程处理完毕
-    m_ttQueue.join();
-
-    OUR_DEBUG((LM_INFO, "[CMessageService::Close] Close Finish.\n"));
     return 0;
 }
 

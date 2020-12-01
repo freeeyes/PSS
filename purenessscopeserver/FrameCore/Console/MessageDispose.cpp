@@ -96,7 +96,7 @@ void DoMessage_LoadModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
 {
     _FileInfo FileInfo;
 
-    if (false == GetFileInfo(CommandInfo.m_strCommandExp.c_str(), FileInfo) && CommandInfo.m_u1OutputType == 0)
+    if (false == GetFileInfo(CommandInfo.m_strCommandExp, FileInfo) && CommandInfo.m_u1OutputType == 0)
     {
         (*pBuffPacket) << (uint8)1;
         return;
@@ -192,7 +192,7 @@ void DoMessage_ReLoadModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffP
 
 void DoMessage_ClientMessageCount(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-c") == 0)
+    if (CommandInfo.m_strCommandExp == "-c")
     {
         //-c 只返回当前激活的链接数
         int nActiveClient = App_HandlerManager::instance()->GetCount();
@@ -209,7 +209,7 @@ void DoMessage_ClientMessageCount(const _CommandInfo& CommandInfo, IBuffPacket* 
             pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
         }
     }
-    else if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-cp") == 0)
+    else if (CommandInfo.m_strCommandExp == "-cp")
     {
         //-cp 返回当前激活连接数和池中剩余可分配数
 
@@ -241,7 +241,7 @@ void DoMessage_ClientMessageCount(const _CommandInfo& CommandInfo, IBuffPacket* 
 
 void DoMessage_ShowModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") == 0)
+    if (CommandInfo.m_strCommandExp == "-a")
     {
         vector<shared_ptr<_ModuleInfo>> vecModeInfo;
         App_ModuleLoader::instance()->GetAllModuleInfo(vecModeInfo);
@@ -392,7 +392,7 @@ void DoMessage_CommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
 
 void DoMessage_WorkThreadState(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-s") != 0)
+    if (CommandInfo.m_strCommandExp != "-s")
     {
         return;
     }
@@ -437,7 +437,7 @@ void DoMessage_WorkThreadState(const _CommandInfo& CommandInfo, IBuffPacket* pBu
 
 void DoMessage_ClientInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") == 0)
+    if (CommandInfo.m_strCommandExp == "-a")
     {
         vecClientConnectInfo VecClientConnectInfo;
 
@@ -477,7 +477,7 @@ void DoMessage_ForbiddenIP(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
 {
     _ForbiddenIP ForbiddenIP;
 
-    if (GetForbiddenIP(CommandInfo.m_strCommandExp.c_str(), ForbiddenIP) == true)
+    if (GetForbiddenIP(CommandInfo.m_strCommandExp, ForbiddenIP) == true)
     {
         if (ForbiddenIP.m_u1Type == 0)
         {
@@ -502,7 +502,7 @@ void DoMessage_ForbiddenIP(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
 
 void DoMessage_ShowForbiddenList(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") == 0)
+    if (CommandInfo.m_strCommandExp == "-a")
     {
         const VecForbiddenIP* pForeverForbiddenIP = App_ForbiddenIP::instance()->ShowForeverIP();
         const VecForbiddenIP* pTempForbiddenIP = App_ForbiddenIP::instance()->ShowTempIP();
@@ -545,7 +545,7 @@ void DoMessage_LifedIP(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket
 
 void DoMessage_UDPClientInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") == 0)
+    if (CommandInfo.m_strCommandExp == "-a")
     {
         vecClientConnectInfo VecClientConnectInfo;
         App_UDPConnectIDManager::instance()->GetClientConnectInfo(VecClientConnectInfo);
@@ -561,7 +561,7 @@ void DoMessage_UDPClientInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuff
 
 void DoMessage_ServerConnectTCP(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") == 0)
+    if (CommandInfo.m_strCommandExp == "-a")
     {
         vecClientConnectInfo VecClientConnectInfo;
 #if PSS_PLATFORM == PLATFORM_WIN
@@ -581,7 +581,7 @@ void DoMessage_ServerConnectTCP(const _CommandInfo& CommandInfo, IBuffPacket* pB
 
 void DoMessage_ServerConnectUDP(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") == 0)
+    if (CommandInfo.m_strCommandExp == "-a")
     {
         vecClientConnectInfo VecClientConnectInfo;
 #if PSS_PLATFORM == PLATFORM_WIN
@@ -601,7 +601,7 @@ void DoMessage_ServerConnectUDP(const _CommandInfo& CommandInfo, IBuffPacket* pB
 
 void DoMessage_ShowProcessInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") == 0)
+    if (CommandInfo.m_strCommandExp == "-a")
     {
         int nCPU = 0;
         int nMemorySize = 0;
@@ -644,7 +644,7 @@ void DoMessage_ShowProcessInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
 
 void DoMessage_ShowClientHisTory(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") == 0)
+    if (CommandInfo.m_strCommandExp == "-a")
     {
         vecIPAccount VecIPAccount;
         App_IPAccount::instance()->GetInfo(VecIPAccount);
@@ -706,7 +706,7 @@ void DoMessage_ShowClientHisTory(const _CommandInfo& CommandInfo, IBuffPacket* p
 
 void DoMessage_ShowAllCommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") != 0)
+    if (CommandInfo.m_strCommandExp != "-a")
     {
         return;
     }
@@ -776,7 +776,7 @@ void DoMessage_ShowAllCommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* 
 
 void DoMessage_ShowServerInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") == 0)
+    if (CommandInfo.m_strCommandExp == "-a")
     {
         if (CommandInfo.m_u1OutputType == 0)
         {
@@ -860,7 +860,7 @@ void DoMessage_ReConnectServer(const _CommandInfo& CommandInfo, IBuffPacket* pBu
 {
     int nSerevrID = 0;
 
-    if (GetConnectServerID(CommandInfo.m_strCommandExp.c_str(), nSerevrID) == true)
+    if (GetConnectServerID(CommandInfo.m_strCommandExp, nSerevrID) == true)
     {
         //获得当前连接状态
         vecClientConnectInfo VecClientConnectInfo;
@@ -883,7 +883,7 @@ void DoMessage_ReConnectServer(const _CommandInfo& CommandInfo, IBuffPacket* pBu
 
 void DoMessage_CommandTimeout(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") == 0)
+    if (CommandInfo.m_strCommandExp == "-a")
     {
         uint32 u4Count = 0;
 
@@ -905,7 +905,7 @@ void DoMessage_CommandTimeout(const _CommandInfo& CommandInfo, IBuffPacket* pBuf
 
 void DoMessage_CommandTimeoutclr(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") == 0)
+    if (CommandInfo.m_strCommandExp == "-a")
     {
         if (CommandInfo.m_u1OutputType == 0)
         {
@@ -923,7 +923,7 @@ void DoMessage_CommandTimeoutclr(const _CommandInfo& CommandInfo, IBuffPacket* p
 
 void DoMessage_CommandDataLog(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") == 0)
+    if (CommandInfo.m_strCommandExp == "-a")
     {
         //不实现
 
@@ -946,7 +946,7 @@ void DoMessage_SetDebug(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
 {
     uint8 u1Debug = 0;
 
-    if (GetDebug(CommandInfo.m_strCommandExp.c_str(), u1Debug) == true)
+    if (GetDebug(CommandInfo.m_strCommandExp, u1Debug) == true)
     {
         if (u1Debug == DEBUG_OFF)
         {
@@ -973,7 +973,7 @@ void DoMessage_SetDebug(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
 
 void DoMessage_ShowDebug(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") == 0)
+    if (CommandInfo.m_strCommandExp == "-a")
     {
         if (CommandInfo.m_u1OutputType == 0)
         {
@@ -997,7 +997,7 @@ void DoMessage_SetTrackIP(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
 {
     _DyeIPInfo objDyeIPInfo;
 
-    if (true == GetDyeingIP(CommandInfo.m_strCommandExp.c_str(), objDyeIPInfo))
+    if (true == GetDyeingIP(CommandInfo.m_strCommandExp, objDyeIPInfo))
     {
         App_MessageServiceGroup::instance()->AddDyringIP(objDyeIPInfo.m_strClientIP.c_str(), 
             objDyeIPInfo.m_u2MaxCount);
@@ -1015,7 +1015,7 @@ void DoMessage_SetTraceCommand(const _CommandInfo& CommandInfo, IBuffPacket* pBu
 {
     _DyeCommandInfo objDyeCommandInfo;
 
-    if (true == GetDyeingCommand(CommandInfo.m_strCommandExp.c_str(), objDyeCommandInfo))
+    if (true == GetDyeingCommand(CommandInfo.m_strCommandExp, objDyeCommandInfo))
     {
         //清除追踪(此功能咱不提供)
         if (true == App_MessageServiceGroup::instance()->AddDyeingCommand(objDyeCommandInfo.m_u2CommandID, objDyeCommandInfo.m_u2MaxCount))
@@ -1038,7 +1038,7 @@ void DoMessage_SetTraceCommand(const _CommandInfo& CommandInfo, IBuffPacket* pBu
 
 void DoMessage_GetTrackCommand(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") != 0)
+    if (CommandInfo.m_strCommandExp != "-a")
     {
         return;
     }
@@ -1086,7 +1086,7 @@ void DoMessage_GetConnectIPInfo(const _CommandInfo& CommandInfo, IBuffPacket* pB
 {
     int nConnectID = 0;
 
-    if (GetConnectServerID(CommandInfo.m_strCommandExp.c_str(), nConnectID) == true)
+    if (GetConnectServerID(CommandInfo.m_strCommandExp, nConnectID) == true)
     {
         _ClientIPInfo objClientIPInfo = App_HandlerManager::instance()->GetClientIPInfo((uint32)nConnectID);
 
@@ -1129,7 +1129,7 @@ void DoMessage_GetConnectIPInfo(const _CommandInfo& CommandInfo, IBuffPacket* pB
 
 void DoMessage_GetLogLevelInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") == 0)
+    if (CommandInfo.m_strCommandExp == "-a")
     {
         if (CommandInfo.m_u1OutputType == 0)
         {
@@ -1202,7 +1202,7 @@ void DoMessage_SetLogLevelInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
 {
     int nLogLevel = 1;
 
-    if (GetLogLevel(CommandInfo.m_strCommandExp.c_str(), nLogLevel) == true)
+    if (GetLogLevel(CommandInfo.m_strCommandExp, nLogLevel) == true)
     {
         AppLogManager::instance()->ResetLogData((uint16)nLogLevel);
 
@@ -1222,7 +1222,7 @@ void DoMessage_SetLogLevelInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
 
 void DoMessage_GetThreadAI(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") == 0)
+    if (CommandInfo.m_strCommandExp == "-a")
     {
         vecWorkThreadAIInfo objvecWorkThreadAIInfo;
         App_MessageServiceGroup::instance()->GetWorkThreadAIInfo(objvecWorkThreadAIInfo);
@@ -1269,7 +1269,7 @@ void DoMessage_GetThreadAI(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
 
 void DoMessage_GetWorkThreadTO(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") == 0)
+    if (CommandInfo.m_strCommandExp ==  "-a")
     {
         vecCommandTimeout objTimeout;
         vecCommandTimeout objTimeoutF;
@@ -1356,7 +1356,7 @@ void DoMessage_SetWorkThreadAI(const _CommandInfo& CommandInfo, IBuffPacket* pBu
     int nCheck = 0;
     int nStop = 0;
 
-    if (GetAIInfo(CommandInfo.m_strCommandExp.c_str(), nAI, nDispose, nCheck, nStop) == true
+    if (GetAIInfo(CommandInfo.m_strCommandExp, nAI, nDispose, nCheck, nStop) == true
         && nDispose > 0
         && nCheck > 0
         && nStop > 0)
@@ -1392,7 +1392,7 @@ void DoMessage_GetNickNameInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
     string strNickName;
     vecClientNameInfo objClientNameInfo;
 
-    if (GetNickName(CommandInfo.m_strCommandExp.c_str(), strNickName) == true)
+    if (GetNickName(CommandInfo.m_strCommandExp, strNickName) == true)
     {
         //暂时不实现
 
@@ -1449,7 +1449,7 @@ void DoMessage_SetConnectLog(const _CommandInfo& CommandInfo, IBuffPacket* pBuff
     uint32 u4ConnectID = 0;
     bool blIsLog = false;
 
-    if (GetConnectID(CommandInfo.m_strCommandExp.c_str(), u4ConnectID, blIsLog) == true)
+    if (GetConnectID(CommandInfo.m_strCommandExp, u4ConnectID, blIsLog) == true)
     {
         App_HandlerManager::instance()->SetIsLog(u4ConnectID, blIsLog);
     }
@@ -1471,7 +1471,7 @@ void DoMessage_SetMaxConnectCount(const _CommandInfo& CommandInfo, IBuffPacket* 
 {
     uint16 u2MaxConnectHandler = 0;
 
-    if (GetMaxConnectCount(CommandInfo.m_strCommandExp.c_str(), u2MaxConnectHandler) == true && u2MaxConnectHandler > 0)
+    if (GetMaxConnectCount(CommandInfo.m_strCommandExp, u2MaxConnectHandler) == true && u2MaxConnectHandler > 0)
     {
         GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount = u2MaxConnectHandler;
     }
@@ -1494,7 +1494,7 @@ void DoMessage_AddListen(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPack
     bool blState = false;
     _ListenInfo objListenInfo;
 
-    if (GetListenInfo(CommandInfo.m_strCommandExp.c_str(), objListenInfo) == true)
+    if (GetListenInfo(CommandInfo.m_strCommandExp, objListenInfo) == true)
     {
 #if PSS_PLATFORM == PLATFORM_WIN
         blState = App_ProControlListen::instance()->AddListen(objListenInfo.m_strListenIP.c_str(),
@@ -1526,7 +1526,7 @@ void DoMessage_DelListen(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPack
     bool blState = false;
     _ListenInfo objListenInfo;
 
-    if (GetListenInfo(CommandInfo.m_strCommandExp.c_str(), objListenInfo) == true)
+    if (GetListenInfo(CommandInfo.m_strCommandExp, objListenInfo) == true)
     {
 #if PSS_PLATFORM == PLATFORM_WIN
         blState = App_ProControlListen::instance()->DelListen(objListenInfo.m_strListenIP.c_str(),
@@ -1553,7 +1553,7 @@ void DoMessage_ShowListen(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
 {
     uint32 u4ListenCount = 0;
 
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") == 0)
+    if (CommandInfo.m_strCommandExp == "-a")
     {
 #if PSS_PLATFORM == PLATFORM_WIN
         u4ListenCount = App_ProControlListen::instance()->GetListenCount();
@@ -1606,7 +1606,7 @@ void DoMessage_ShowListen(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
 
 void DoMessage_MonitorInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") == 0)
+    if (CommandInfo.m_strCommandExp == "-a")
     {
         uint32 u4FlowIn = 0;
         uint32 u4FlowOut = 0;
@@ -1674,7 +1674,7 @@ void DoMessage_TestFileStart(const _CommandInfo& CommandInfo, IBuffPacket* pBuff
 {
     string strFileName;
 
-    if (GetTestFileName(CommandInfo.m_strCommandExp.c_str(), strFileName) == true)
+    if (GetTestFileName(CommandInfo.m_strCommandExp, strFileName) == true)
     {
         OUR_DEBUG((LM_INFO, "[Do_Message_TestFileStart]file=%s.\n", strFileName.c_str()));
         u2ReturnCommandID = CONSOLE_COMMAND_FILE_TEST_START;
@@ -1735,7 +1735,7 @@ void DoMessage_TestFileStart(const _CommandInfo& CommandInfo, IBuffPacket* pBuff
 
 void DoMessage_TestFileStop(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") == 0)
+    if (CommandInfo.m_strCommandExp == "-a")
     {
         u2ReturnCommandID = CONSOLE_COMMAND_FILE_TEST_STOP;
         int nRet = App_FileTestManager::instance()->FileTestEnd();
@@ -1758,7 +1758,7 @@ void DoMessage_PortList(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
 {
     OUR_DEBUG((LM_INFO, "[DoMessage_PortList]In.\n"));
 
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") == 0)
+    if (CommandInfo.m_strCommandExp == "-a")
     {
         OUR_DEBUG((LM_INFO, "[DoMessage_PortList]In 1.\n"));
         u2ReturnCommandID = CONSOLE_COMMAND_PORT_FLOW;
@@ -1805,7 +1805,7 @@ void DoMessage_PortList(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
 
 void Do_Message_BuffPacket(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
 {
-    if (ACE_OS::strcmp(CommandInfo.m_strCommandExp.c_str(), "-a") == 0)
+    if (CommandInfo.m_strCommandExp == "-a")
     {
         u2ReturnCommandID = CONSOLE_COMMAND_PACKET_STATE;
 
@@ -1855,7 +1855,7 @@ void Do_Message_PoolSet(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
 {
     _PoolName objPoolName;
 
-    if (GetPoolSet(CommandInfo.m_strCommandExp.c_str(), objPoolName) == true)
+    if (GetPoolSet(CommandInfo.m_strCommandExp, objPoolName) == true)
     {
         u2ReturnCommandID = CONSOLE_COMMAND_POOL_SET;
 

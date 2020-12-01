@@ -103,13 +103,13 @@ void CConsoleMessage::Close()
     m_objConsolePromissions.Close();
 }
 
-bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& CommandInfo, bool blCheck) const
+bool CConsoleMessage::GetCommandInfo(const string& strCommand, _CommandInfo& CommandInfo, bool blCheck) const
 {
-    auto nLen = (int)ACE_OS::strlen(pCommand);
+    auto nLen = (int)strCommand.length();
     string strKey;
     string strOutputType;
 
-    string strLog = fmt::format("<Command>{0}", pCommand);
+    string strLog = fmt::format("<Command>{0}", strCommand);
 
     AppLogManager::instance()->WriteLog_i(LOG_SYSTEM_CONSOLEDATA, strLog);
 
@@ -120,8 +120,9 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
     }
 
     //获得输出模式
+    auto nSplitLength = (int)COMMAND_SPLIT_STRING.length();
     
-    const char* pKeyBegin = ACE_OS::strstr(pCommand, COMMAND_SPLIT_STRING);
+    const char* pKeyBegin = ACE_OS::strstr(strCommand.c_str(), COMMAND_SPLIT_STRING.c_str());
 
     if (nullptr == pKeyBegin)
     {
@@ -129,7 +130,7 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
         return false;
     }
 
-    strOutputType.append(pCommand, (int)(pKeyBegin - pCommand));
+    strOutputType.append(strCommand.c_str(), (int)(pKeyBegin - strCommand.c_str()));
 
     if (strOutputType == "b")
     {
@@ -141,7 +142,7 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
     }
 
     //获得key值
-    const char* pCommandBegin = ACE_OS::strstr(pKeyBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), COMMAND_SPLIT_STRING);
+    const char* pCommandBegin = ACE_OS::strstr(pKeyBegin + nSplitLength, COMMAND_SPLIT_STRING.c_str());
 
     if (nullptr == pCommandBegin)
     {
@@ -149,8 +150,8 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
         return false;
     }
 
-    strKey.append(pKeyBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), 
-        (int)(pCommandBegin - pKeyBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING)));
+    strKey.append(pKeyBegin + nSplitLength,
+        (int)(pCommandBegin - pKeyBegin - nSplitLength));
 
     CommandInfo.m_strUser = strKey;
 
@@ -161,7 +162,7 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
     }
 
     //获得命令头
-    const char* pParamBegin = ACE_OS::strstr(pCommandBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING), COMMAND_SPLIT_STRING);
+    const char* pParamBegin = ACE_OS::strstr(pCommandBegin + nSplitLength, COMMAND_SPLIT_STRING.c_str());
 
     if (nullptr == pParamBegin)
     {
@@ -170,18 +171,18 @@ bool CConsoleMessage::GetCommandInfo(const char* pCommand, _CommandInfo& Command
     }
 
     uint32 u4Data4Len = 0;
-    u4Data4Len = (uint32)(pParamBegin - pCommandBegin - ACE_OS::strlen(COMMAND_SPLIT_STRING));
+    u4Data4Len = (uint32)(pParamBegin - pCommandBegin - nSplitLength);
     if (MAX_BUFF_100 > u4Data4Len)
     {
-        CommandInfo.m_strCommandTitle.append(pCommandBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING),
+        CommandInfo.m_strCommandTitle.append(pCommandBegin + nSplitLength,
             u4Data4Len);
     }
 
     //获得扩展参数
-    u4Data4Len = (uint32)(nLen - (pParamBegin - pCommand - ACE_OS::strlen(COMMAND_SPLIT_STRING)) + 1);
+    u4Data4Len = (uint32)(nLen - (pParamBegin - strCommand.c_str() + nSplitLength));
     if (MAX_BUFF_100 > u4Data4Len)
     {
-        CommandInfo.m_strCommandExp.append(pParamBegin + ACE_OS::strlen(COMMAND_SPLIT_STRING),
+        CommandInfo.m_strCommandExp.append(pParamBegin + nSplitLength,
             u4Data4Len);
     }
 

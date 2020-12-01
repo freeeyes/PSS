@@ -262,6 +262,8 @@ void CAceReactorManager::Close()
         SAFE_DELETE(pAceReactor);
         });
 
+    m_pReactorList.clear();
+
     m_u2RectorCount = 0;
     OUR_DEBUG((LM_ERROR, "[CAceReactor::Close] End.\n"));
 }
@@ -278,12 +280,6 @@ const char* CAceReactorManager::GetError() const
 
 bool CAceReactorManager::AddNewReactor(int nReactorID, EM_REACTOR_MODULE emReactorType, int nThreadCount, int nMaxHandleCount)
 {
-    if(nReactorID < 0 || nReactorID > m_u2RectorCount)
-    {
-        m_strError = "[CAceProactorManager::AddNewProactor]New CAceProactor is more than max Proactor list.";
-        return false;
-    }
-
     auto pAceReactor = new CAceReactor();
 
     pAceReactor->SetReactorID((uint32)nReactorID);
@@ -384,17 +380,11 @@ ACE_Reactor* CAceReactorManager::GetAce_Reactor(int nReactorID)
 ACE_Reactor* CAceReactorManager::GetAce_Client_Reactor(int nReactorID)
 {
     //这里返回客户端连接服务器需要用到的反应器
-    //这里的反应器必须是3个基础反应器之外的，如果只有三个基础反应器，则默认取得第一个。
-    int nClientReactor = nReactorID + 3;
+    auto f = m_pReactorList.find(nReactorID);
 
-    if(nClientReactor < 0 || nClientReactor >= m_u2RectorCount)
+    if (m_pReactorList.end() != f)
     {
-        return nullptr;
-    }
-
-    if (nullptr != m_pReactorList[nClientReactor])
-    {
-        return m_pReactorList[nClientReactor]->GetReactor();
+        return f->second->GetReactor();
     }
     else
     {

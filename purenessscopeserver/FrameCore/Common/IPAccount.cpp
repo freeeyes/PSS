@@ -91,6 +91,7 @@ bool CIPAccount::AddIP(string strIP)
 
             //添加入队列
             m_objIPList[strIP] = pIPAccount;
+            blRet = true;
         }
         else
         {
