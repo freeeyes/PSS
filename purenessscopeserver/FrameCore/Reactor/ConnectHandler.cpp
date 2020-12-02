@@ -1,9 +1,5 @@
 #include "ConnectHandler.h"
 
-CConnectHandler::CConnectHandler(void)
-{
-}
-
 void CConnectHandler::Close(uint32 u4ConnectID)
 {
     //调用连接断开消息
@@ -36,7 +32,6 @@ void CConnectHandler::Close(uint32 u4ConnectID)
 
 void CConnectHandler::CloseFinally()
 {
-    //OUR_DEBUG((LM_INFO, "[CConnectHandler::CloseFinally]m_u4HandlerID=%d.\n", m_u4HandlerID));
 	if (nullptr != m_pBlockMessage)
 	{
 		m_pBlockMessage->release();
@@ -50,7 +45,6 @@ void CConnectHandler::CloseFinally()
 	}
 
     this->closing_ = true;
-    SAFE_DELETE_ARRAY(m_pPacketDebugData);
     m_u4PacketDebugSize = 0;
 }
 
@@ -62,10 +56,9 @@ void CConnectHandler::Init(uint16 u2HandlerID)
     m_u2TcpNodelay     = GetXmlConfigAttribute(xmlSendInfo)->TcpNodelay;
 
     m_u4SendMaxBuffSize  = GetXmlConfigAttribute(xmlSendInfo)->MaxBlockSize;
-	m_pBlockMessage      = new ACE_Message_Block(m_u4SendMaxBuffSize);
-	m_pBlockRecv         = new ACE_Message_Block(m_u4MaxPacketSize);
+	m_pBlockMessage      = App_MessageBlockManager::instance()->Create(m_u4SendMaxBuffSize);
+	m_pBlockRecv         = App_MessageBlockManager::instance()->Create(m_u4MaxPacketSize);
 
-    m_pPacketDebugData   = new char[GetXmlConfigAttribute(xmlServerType)->DebugSize];
     m_u4PacketDebugSize  = GetXmlConfigAttribute(xmlServerType)->DebugSize / 5;
 }
 
@@ -97,10 +90,7 @@ uint32 CConnectHandler::GetConnectID() const
 int CConnectHandler::open(void*)
 {
     m_blBlockState        = false;
-    m_nBlockCount         = 0;
     m_blIsLog             = false;
-    m_szConnectName[0]    = '\0';
-    m_u1IsActive          = 1;
 
     //获得解析器指针
     m_pPacketParseInfo = App_PacketParseLoader::instance()->GetPacketParseInfo(m_u4PacketParseInfoID);
@@ -225,12 +215,12 @@ int CConnectHandler::Dispose_Recv_Data()
         return -1;
     }
 
-    int nDataLen = (int)this->peer().recv(m_pBlockRecv->wr_ptr(), u4CurrCount, MSG_NOSIGNAL, &nowait);
+    auto nDataLen = (int)this->peer().recv(m_pBlockRecv->wr_ptr(), u4CurrCount, MSG_NOSIGNAL, &nowait);
 
     if (nDataLen <= 0)
     {
         m_u4CurrSize = 0;
-        uint32 u4Error = (uint32)errno;
+        auto u4Error = (uint32)errno;
 
         //如果是-1 且为11的错误，忽略之
         if (nDataLen == -1 && u4Error == EAGAIN)
@@ -282,11 +272,7 @@ int CConnectHandler::Init_Open_Connect()
 
     m_u4AllRecvSize       = 0;
     m_u4AllSendSize       = 0;
-    m_u4RecvQueueCount    = 0;
     m_u4CurrSize          = 0;
-
-    m_u4ReadSendSize      = 0;
-    m_u4SuccessSendSize   = 0;
 
     if (m_u2TcpNodelay == TCP_NODELAY_OFF)
     {
@@ -340,14 +326,14 @@ bool CConnectHandler::Device_Send_Data(const char* pData, ssize_t nLen)
 	return SendMessage(objSendMessageInfo, u4PacketSize);
 }
 
-uint32 CConnectHandler::file_open(IFileTestManager* pFileTest)
+uint32 CConnectHandler::file_open(const IFileTestManager* pFileTest) const
 {
     //先不实现
     ACE_UNUSED_ARG(pFileTest);
     return 0;
 }
 
-int CConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Size, uint8 u1ParseID)
+int CConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Size, uint8 u1ParseID) const
 {
     //暂不实现
     ACE_UNUSED_ARG(pData);
@@ -368,17 +354,13 @@ CONNECTSTATE CConnectHandler::GetSendBuffState() const
 
 bool CConnectHandler::SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize)
 {
-    //如果当前连接已被别的线程关闭，则这里不做处理，直接退出
-    if (m_u1IsActive == 0)
-    {
-        //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
-        Tcp_Common_Send_Message_Error(GetConnectID(), 
-            objSendMessageInfo.u2CommandID, 
-            objSendMessageInfo.blDelete, 
-            objSendMessageInfo.pBuffPacket);
+    //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
+    Tcp_Common_Send_Message_Error(GetConnectID(), 
+        objSendMessageInfo.u2CommandID, 
+        objSendMessageInfo.blDelete, 
+        objSendMessageInfo.pBuffPacket);
 
-        return false;
-    }
+    return false;
 
     if (EM_IO_TYPE::NET_INPUT == m_emIOType)
     {
@@ -434,7 +416,7 @@ bool CConnectHandler::SendTimeoutMessage() const
     return true;
 }
 
-bool CConnectHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend)
+bool CConnectHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value& tvSend)
 {
 	ACE_Message_Block* pmbSend = App_MessageBlockManager::instance()->Create(u4Size);
 	memcpy_safe(pMbData->rd_ptr(),
@@ -452,7 +434,7 @@ bool CConnectHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbDa
     ACE_Time_Value  nowait(0, MAX_BUFF_1000 * MAX_BUFF_1000);
 
     //发送数据
-    int nSendPacketLen = (int)pmbSend->length();
+    auto nSendPacketLen = (int)pmbSend->length();
     int nIsSendSize    = 0;
 
     //循环发送，直到数据发送完成。
@@ -467,7 +449,7 @@ bool CConnectHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbDa
             return false;
         }
 
-        int nDataLen = (int)this->peer().send(pmbSend->rd_ptr(), nSendPacketLen - nIsSendSize, &nowait);
+        auto nDataLen = (int)this->peer().send(pmbSend->rd_ptr(), size_t(nSendPacketLen - nIsSendSize), &nowait);
 
         if(nDataLen <= 0)
         {
@@ -575,7 +557,7 @@ bool CConnectHandler::Dispose_Recv_buffer()
 				if (u4AllPacketLength <= (uint32)m_pBlockRecv->length())
 				{
 					ACE_Message_Block* pBody = App_MessageBlockManager::instance()->Create(u4BodyLength);
-					memcpy_safe((char*)(m_pBlockRecv->rd_ptr() + m_pPacketParseInfo->m_u4OrgLength),
+					memcpy_safe(m_pBlockRecv->rd_ptr() + m_pPacketParseInfo->m_u4OrgLength,
 						u4BodyLength,
 						pBody->wr_ptr(),
 						u4BodyLength);
@@ -618,7 +600,7 @@ void CConnectHandler::Move_Recv_buffer()
 	if (m_pBlockRecv->rd_ptr() != m_pBlockRecv->base() && m_pBlockRecv->length() > 0)
 	{
 		//移动到前面去
-        uint32 u4RemainLength = (uint32)m_pBlockRecv->length();
+        auto u4RemainLength = (uint32)m_pBlockRecv->length();
 		ACE_Message_Block* pBlockRemain = App_MessageBlockManager::instance()->Create(u4RemainLength);
         memcpy_safe(m_pBlockRecv->rd_ptr(),
             u4RemainLength,
@@ -672,7 +654,7 @@ void CConnectHandler::ConnectOpen()
     m_u1ConnectState = CONNECTSTATE::CONNECT_OPEN;
 }
 
-uint32 CConnectHandler::Get_Recv_length()
+uint32 CConnectHandler::Get_Recv_length() const
 {
     return (uint32)(m_pBlockRecv->size() - m_pBlockRecv->length());
 }
@@ -684,18 +666,18 @@ void CConnectHandler::Output_Debug_Data(const ACE_Message_Block* pMbData, uint16
 
     if (GetXmlConfigAttribute(xmlServerType)->Debug == DEBUG_ON || m_blIsLog == true)
     {
-        int nDataLen = (int)pMbData->length();
+        auto u4DataLen = (uint32)pMbData->length();
         uint32 u4DebugSize = 0;
         bool blblMore = false;
 
-        if ((uint32)nDataLen >= m_u4PacketDebugSize)
+        if (u4DataLen >= m_u4PacketDebugSize)
         {
             u4DebugSize = m_u4PacketDebugSize - 1;
             blblMore = true;
         }
         else
         {
-            u4DebugSize = (uint32)nDataLen;
+            u4DebugSize = u4DataLen;
         }
 
         const char* pData = pMbData->rd_ptr();
@@ -707,9 +689,6 @@ void CConnectHandler::Output_Debug_Data(const ACE_Message_Block* pMbData, uint16
             ss_format << "0x" << std::uppercase << std::setfill('0') << std::setw(2) << std::hex << (int)pData[i] << " ";
             strHexData += ss_format.str();
         }
-
-
-        m_pPacketDebugData[5 * u4DebugSize] = '\0';
 
         if (blblMore == true)
         {
@@ -882,7 +861,6 @@ _ClientConnectInfo CConnectHandler::GetClientInfo() const
     obj_ClientConnectInfo_Param.m_u4AllRecvSize = m_u4AllRecvSize;
     obj_ClientConnectInfo_Param.m_u4AllSendSize = m_u4AllSendSize;
     obj_ClientConnectInfo_Param.m_u4ConnectID = GetConnectID();
-    obj_ClientConnectInfo_Param.m_u4RecvQueueCount = m_u4RecvQueueCount;
 
     return Tcp_Common_ClientInfo(obj_ClientConnectInfo_Param);
 }
@@ -895,17 +873,17 @@ _ClientIPInfo  CConnectHandler::GetClientIPInfo() const
     return ClientIPInfo;
 }
 
-_ClientIPInfo  CConnectHandler::GetLocalIPInfo()
+_ClientIPInfo  CConnectHandler::GetLocalIPInfo() const
 {
     _ClientIPInfo ClientIPInfo;
-    ClientIPInfo.m_strClientIP =(string)m_szLocalIP;
+    ClientIPInfo.m_strClientIP = m_strLocalIP;
     ClientIPInfo.m_u2Port = m_u2LocalPort;
     return ClientIPInfo;
 }
 
 bool CConnectHandler::CheckSendMask(uint32 u4PacketLen)
 {
-    m_u4ReadSendSize += u4PacketLen;
+    ACE_UNUSED_ARG(u4PacketLen);
 
     //Linux下不用检测，直接返回true
     return true;
@@ -928,7 +906,7 @@ bool CConnectHandler::Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPa
 
     return Tcp_Common_File_Message(obj_File_Message_Param,
                                    pBuffPacket,
-                                   m_szConnectName);
+                                   m_strConnectName.c_str());
 }
 
 bool CConnectHandler::Send_Input_To_Cache(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize)
@@ -977,12 +955,6 @@ bool CConnectHandler::Send_Input_To_TCP(CSendMessageInfo objSendMessageInfo, uin
 
 	if (true == blRet)
 	{
-		if (m_u4ReadSendSize >= m_u4SuccessSendSize + m_pBlockMessage->length())
-		{
-			//记录成功发送字节
-			m_u4SuccessSendSize += (uint32)m_pBlockMessage->length();
-		}
-
 		m_pBlockMessage->reset();
 	}
 	else
@@ -1030,7 +1002,7 @@ int CConnectHandler::Dispose_Paceket_Parse_Stream_Single(ACE_Message_Block* pCur
 
 void CConnectHandler::SetConnectName(const char* pName)
 {
-    sprintf_safe(m_szConnectName, MAX_BUFF_100, "%s", pName);
+    m_strConnectName = pName;
 }
 
 void CConnectHandler::SetIsLog(bool blIsLog)
@@ -1038,9 +1010,9 @@ void CConnectHandler::SetIsLog(bool blIsLog)
     m_blIsLog = blIsLog;
 }
 
-char* CConnectHandler::GetConnectName()
+const char* CConnectHandler::GetConnectName()
 {
-    return m_szConnectName;
+    return m_strConnectName.c_str();
 }
 
 bool CConnectHandler::GetIsLog() const
@@ -1060,7 +1032,7 @@ int CConnectHandler::GetHashID() const
 
 void CConnectHandler::SetLocalIPInfo(const char* pLocalIP, uint16 u2LocalPort)
 {
-    sprintf_safe(m_szLocalIP, MAX_BUFF_50, "%s", pLocalIP);
+    m_strLocalIP  = pLocalIP;
     m_u2LocalPort = u2LocalPort;
 
     if (ACE_OS::strcmp("INADDR_ANY", pLocalIP) == 0)
@@ -1074,10 +1046,6 @@ void CConnectHandler::SetLocalIPInfo(const char* pLocalIP, uint16 u2LocalPort)
 }
 
 //*********************************************************************************
-
-CConnectHandlerPool::CConnectHandlerPool(void)
-{
-}
 
 void CConnectHandlerPool::Init(int nObjcetCount)
 {
@@ -1094,9 +1062,9 @@ void CConnectHandlerPool::Init(int nObjcetCount)
         if(nullptr != pHandler)
         {
             //将ID和Handler指针的关系存入hashTable
-            char szHandlerID[10] = {'\0'};
-            sprintf_safe(szHandlerID, 10, "%d", i);
-            int nHashPos = m_objHashHandleList.Add_Hash_Data(szHandlerID, pHandler);
+
+            string strHandlerID = fmt::format("{0}", i);
+            int nHashPos = m_objHashHandleList.Add_Hash_Data(strHandlerID.c_str(), pHandler);
 
             if(-1 != nHashPos)
             {
@@ -1163,13 +1131,12 @@ bool CConnectHandlerPool::Delete(CConnectHandler* pObject)
         return false;
     }
 
-    char szHandlerID[10] = {'\0'};
-    sprintf_safe(szHandlerID, 10, "%d", pObject->GetHandlerID());
-    bool blState = m_objHashHandleList.Push(szHandlerID, pObject);
+    string strHandlerID = fmt::format("{0}", pObject->GetHandlerID());
+    bool blState = m_objHashHandleList.Push(strHandlerID.c_str(), pObject);
 
     if(false == blState)
     {
-        OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Delete]szHandlerID=%s(0x%08x).\n", szHandlerID, pObject));
+        OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Delete]szHandlerID=%s(0x%08x).\n", strHandlerID.c_str(), pObject));
     }
 
     return true;

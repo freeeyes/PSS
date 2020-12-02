@@ -2,7 +2,7 @@
 
 CReTTyHandler::CReTTyHandler() 
 {
-    m_pmbReadBuff = new ACE_Message_Block(MAX_BUFF_1024);
+    m_pmbReadBuff = App_MessageBlockManager::instance()->Create(MAX_BUFF_1024);
 }
 
 CReTTyHandler::~CReTTyHandler()
@@ -85,7 +85,7 @@ bool CReTTyHandler::SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4P
     }
 }
 
-bool CReTTyHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend)
+bool CReTTyHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value& tvSend)
 {
     ACE_UNUSED_ARG(u4ConnectID);
     ACE_UNUSED_ARG(tvSend);

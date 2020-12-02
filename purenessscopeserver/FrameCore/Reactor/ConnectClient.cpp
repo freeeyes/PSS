@@ -1,14 +1,6 @@
 #include "ConnectClient.h"
 #include "ClientReConnectManager.h"
 
-CConnectClient::CConnectClient(void)
-{
-}
-
-CConnectClient::~CConnectClient(void)
-{
-}
-
 void CConnectClient::Close()
 {
     m_ThreadLock.acquire();
@@ -134,7 +126,7 @@ int CConnectClient::open(void* p)
     if (this->peer().enable(ACE_NONBLOCK) == -1)
     {
         OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]this->peer().enable  = ACE_NONBLOCK error.\n"));
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectClient::open]this->peer().enable  = ACE_NONBLOCK error.");
+        m_strError = "[CConnectClient::open]this->peer().enable  = ACE_NONBLOCK error.";
         return -1;
     }
 
@@ -142,7 +134,7 @@ int CConnectClient::open(void* p)
     if (this->peer().get_remote_addr(m_addrRemote) == -1)
     {
         OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]this->peer().get_remote_addr error.\n"));
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectClient::open]this->peer().get_remote_addr error.");
+        m_strError = "[CConnectClient::open]this->peer().get_remote_addr error.";
         return -1;
     }
 
@@ -212,7 +204,7 @@ int CConnectClient::handle_input(ACE_HANDLE fd)
     if (fd == ACE_INVALID_HANDLE)
     {
         OUR_DEBUG((LM_ERROR, "[CConnectClient::handle_input]fd == ACE_INVALID_HANDLE.\n"));
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectHandler::handle_input]fd == ACE_INVALID_HANDLE.");
+        m_strError = "[CConnectHandler::handle_input]fd == ACE_INVALID_HANDLE.";
 
         if (nullptr != m_pClientMessage)
         {
@@ -234,8 +226,8 @@ int CConnectClient::handle_input(ACE_HANDLE fd)
     {
         m_u4CurrSize = 0;
         OUR_DEBUG((LM_ERROR, "[CConnectClient::handle_input]m_pCurrMessage == nullptr.\n"));
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectClient::handle_input]m_pCurrMessage == nullptr.");
-
+        m_strError = "[CConnectClient::handle_input]m_pCurrMessage == nullptr.";
+             
         if (nullptr != m_pClientMessage)
         {
             _ClientIPInfo objServerIPInfo;
@@ -258,16 +250,16 @@ int CConnectClient::RecvData()
 {
     ACE_Time_Value nowait(MAX_MSG_PACKETTIMEOUT);
 
-    int nCurrCount = (uint32)m_pCurrMessage->size();
+    auto nCurrCount = (uint32)m_pCurrMessage->size();
 
-    int nDataLen = (int)this->peer().recv(m_pCurrMessage->wr_ptr(), nCurrCount, MSG_NOSIGNAL, &nowait);
+    auto nDataLen = (int)this->peer().recv(m_pCurrMessage->wr_ptr(), nCurrCount, MSG_NOSIGNAL, &nowait);
 
     if (nDataLen <= 0)
     {
         m_u4CurrSize = 0;
-        uint32 u4Error = (uint32)errno;
+        auto u4Error = (uint32)errno;
         OUR_DEBUG((LM_ERROR, "[CConnectClient::handle_input] ConnectID = %d, recv data is error nDataLen = [%d] errno = [%d].\n", GetServerID(), nDataLen, u4Error));
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectClient::handle_input] ConnectID = %d, recv data is error[%d].\n", GetServerID(), nDataLen);
+        m_strError = fmt::format("[CConnectClient::handle_input] ConnectID = {0}, recv data is error{1}.", GetServerID(), nDataLen);
 
         _ClientIPInfo objServerIPInfo;
         objServerIPInfo.m_strClientIP = m_addrRemote.get_host_addr();
@@ -408,7 +400,7 @@ void CConnectClient::Output_Debug_Data(const ACE_Message_Block* pMbData, uint16 
 
     if (GetXmlConfigAttribute(xmlServerType)->Debug == DEBUG_ON || false == blLog)
     {
-        int nDataLen = (int)pMbData->length();
+        auto nDataLen = (int)pMbData->length();
         uint32 u4DebugSize = 0;
         bool blblMore = false;
 
@@ -498,7 +490,7 @@ int CConnectClient::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
             return -1;
         }
 
-        int nSendLen = (int)pmbSendData->length();   //发送数据的总长度
+        auto nSendLen = (int)pmbSendData->length();   //发送数据的总长度
         int nIsSendSize = 0;
 
         //循环发送，直到数据发送完成。
@@ -511,7 +503,7 @@ int CConnectClient::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
                 return -1;
             }
 
-            int nDataLen = (int)this->peer().send(pmbSendData->rd_ptr(), nSendLen - nIsSendSize, &nowait);
+            auto nDataLen = (int)this->peer().send(pmbSendData->rd_ptr(), nSendLen - nIsSendSize, &nowait);
 
             if (nDataLen <= 0)
             {
@@ -604,7 +596,7 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
     if (get_handle() == ACE_INVALID_HANDLE)
     {
         OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetServerID()));
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CConnectClient::SendData] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetServerID());
+        m_strError = fmt::format("[CConnectClient::SendData] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.", GetServerID());
         App_MessageBlockManager::instance()->Close(pmblk);
         return false;
     }

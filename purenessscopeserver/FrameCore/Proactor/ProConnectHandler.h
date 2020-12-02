@@ -84,7 +84,7 @@ public:
     void SetPacketParseInfoID(uint32 u4PacketParseInfoID);                    //设置对应的m_u4PacketParseInfoID
     uint32 GetPacketParseInfoID();                                            //获得相应的m_u4PacketParseInfoID
     bool SendTimeoutMessage();                                                //发送连接超时消息
-    virtual bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend);       //将发送数据发送出去
+    virtual bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value& tvSend);       //将发送数据发送出去
 
 private:
     bool Dispose_Recv_buffer();                                              //处理接收到数据，切包

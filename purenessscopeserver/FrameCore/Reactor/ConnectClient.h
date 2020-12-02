@@ -25,14 +25,14 @@
 class CConnectClient : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>, public IDeviceHandler
 {
 public:
-    CConnectClient(void);
-    ~CConnectClient(void);
+    CConnectClient(void) = default;
+    ~CConnectClient(void) final = default;
 
-    virtual int open(void*);
-    virtual int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE);
-    virtual int handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask);
-    virtual int handle_output(ACE_HANDLE fd = ACE_INVALID_HANDLE);
-    virtual bool Device_Send_Data(const char* pData, ssize_t nLen);                                    //透传数据接口
+    virtual int open(void*) final;
+    virtual int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE) final;
+    virtual int handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask) final;
+    virtual int handle_output(ACE_HANDLE fd = ACE_INVALID_HANDLE) final;
+    virtual bool Device_Send_Data(const char* pData, ssize_t nLen) final; //透传数据接口
 
     void SetClientMessage(IClientMessage* pClientMessage); //设置消息接收处理类
     void SetServerID(int nServerID);                       //设置当前的ServerID
@@ -65,7 +65,7 @@ private:
     int                         m_nIOCount              = 1;          //当前IO操作的个数
     int                         m_nServerID             = 0;          //服务器ID
     CONNECTSTATE                m_u1ConnectState        = CONNECTSTATE::CONNECT_INIT; //连接状态
-    char                        m_szError[MAX_BUFF_500] = {'\0'};
+    string                      m_strError;
     ACE_INET_Addr               m_addrRemote;
 
     ACE_Recursive_Thread_Mutex  m_ThreadLock;

@@ -85,7 +85,7 @@ public:
     EM_Server_Connect_State GetConnectState(int nServerID) final;         //得到一个当前连接状态
     uint32 GetPacketParseID(int nServerID) final;                         //得到当前的PacketParseID
 
-    int handle_timeout(const ACE_Time_Value& current_time, const void* act = nullptr) final;               //定时器执行
+    int handle_timeout(const ACE_Time_Value& current_time, const void* act) final;               //定时器执行
 
 private:
     shared_ptr<CReactorClientInfo> ConnectTcpInit(int nServerID);

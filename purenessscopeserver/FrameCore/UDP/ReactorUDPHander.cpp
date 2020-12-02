@@ -1,9 +1,5 @@
 #include "ReactorUDPHander.h"
 
-CReactorUDPHander::CReactorUDPHander(void)
-{
-}
-
 CReactorUDPHander::~CReactorUDPHander(void)
 {
 	if (nullptr != m_pBlockMessage)
@@ -153,7 +149,7 @@ bool CReactorUDPHander::SendMessage(CSendMessageInfo objSendMessageInfo, uint32&
     return true;
 }
 
-bool CReactorUDPHander::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend)
+bool CReactorUDPHander::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value& tvSend)
 {
 	//Á¢¼´·¢ËÍ
 	_ClientIPInfo objClientIPInfo = App_UDPConnectIDManager::instance()->GetConnectIP(u4ConnectID);

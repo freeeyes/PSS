@@ -44,17 +44,17 @@
 class CConnectHandler : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>, public IDeviceHandler, public IHandler
 {
 public:
-    CConnectHandler(void);
+    CConnectHandler(void) = default;
 
     //重写继承方法
-    virtual int open(void*);                                                 //用户建立一个链接
-    virtual int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE);            //接受客户端收到的数据块
-    virtual int handle_output(ACE_HANDLE fd = ACE_INVALID_HANDLE);           //发送客户端数据
-    virtual int handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask);           //链接关闭事件
-    virtual bool Device_Send_Data(const char* pData, ssize_t nLen);          //透传数据接口
+    int open(void*) final;                                                 //用户建立一个链接
+    int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE) final;            //接受客户端收到的数据块
+    int handle_output(ACE_HANDLE fd = ACE_INVALID_HANDLE) final;           //发送客户端数据
+    int handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask) final;           //链接关闭事件
+    bool Device_Send_Data(const char* pData, ssize_t nLen) final;          //透传数据接口
 
-    uint32 file_open(IFileTestManager* pFileTest);                                           //文件入口打开接口
-    int handle_write_file_stream(const char* pData, uint32 u4Size, uint8 u1ParseID);         //文件接口模拟数据包入口
+    uint32 file_open(const IFileTestManager* pFileTest) const;                               //文件入口打开接口
+    int handle_write_file_stream(const char* pData, uint32 u4Size, uint8 u1ParseID) const;   //文件接口模拟数据包入口
 
     void Init(uint16 u2HandlerID);                                           //Connect Pool初始化调用时候调用的方法
     void SetPacketParseInfoID(uint32 u4PacketParseInfoID);                   //设置对应的m_u4PacketParseInfoID
@@ -62,13 +62,13 @@ public:
 
 
     bool CheckSendMask(uint32 u4PacketLen);                                  //检测指定的连接发送数据是否超过阻塞阀值
-    virtual bool SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);  //发送当前数据
+    bool SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize) final;  //发送当前数据
 
     bool SendTimeoutMessage() const;                                         //发送连接超时消息
 
     void SetLocalIPInfo(const char* pLocalIP, uint16 u2LocalPort);           //设置监听IP和端口信息
 
-    virtual void Close(uint32 u4ConnectID);                                  //关闭当前连接
+    void Close(uint32 u4ConnectID) final;                                    //关闭当前连接
     void CloseFinally();                                                     //替代析构函数，符合roz规则
 
     uint32      GetHandlerID() const;                                        //得到当前的handlerID
@@ -78,10 +78,10 @@ public:
     CONNECTSTATE       GetSendBuffState() const;                             //得到发送状态
     _ClientConnectInfo GetClientInfo() const;                                //得到客户端信息
     _ClientIPInfo      GetClientIPInfo() const;                              //得到客户端IP信息
-    _ClientIPInfo      GetLocalIPInfo();                                     //得到监听IP信息
+    _ClientIPInfo      GetLocalIPInfo() const;                               //得到监听IP信息
     void SetConnectName(const char* pName);                                  //设置当前连接名称
-    char* GetConnectName();                                                  //得到别名
-    virtual void SetIsLog(bool blIsLog);                                     //设置当前连接数据是否写入日志
+    const char* GetConnectName();                                            //得到别名
+    void SetIsLog(bool blIsLog) final;                                       //设置当前连接数据是否写入日志
     bool GetIsLog() const;                                                   //获得当前连接是否可以写入日志
     void SetHashID(int nHashID);                                             //设置Hash数组下标
     int  GetHashID() const;                                                  //得到Hash数组下标
@@ -90,14 +90,14 @@ public:
     bool Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPacket);                              //将发送数据写入文件
     bool Send_Input_To_Cache(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);               //讲发送对象放入缓存
     bool Send_Input_To_TCP(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);                 //将数据发送给对端
-    virtual bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend);//发送数据
+    bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value& tvSend) final;//发送数据
 
 private:
 	bool Dispose_Recv_buffer();                                              //处理接收到数据，切包
 	void Move_Recv_buffer();                                                 //整理接收内存缓冲区
     void Send_Hander_Event(uint8 u1Option);                                  //发送Handler的事件通知业务线程
     void ConnectOpen();                                                      //设置连接相关打开代码
-    uint32 Get_Recv_length();                                                //得到要处理的数据长度
+    uint32 Get_Recv_length() const;                                          //得到要处理的数据长度
     int  Dispose_Paceket_Parse_Head(ACE_Message_Block* pmbHead);             //处理消息头函数
     int  Dispose_Paceket_Parse_Body(ACE_Message_Block* pmbBody, uint32 u4SrcBodyLength); //处理消息头函数
     int  Dispose_Paceket_Parse_Stream(ACE_Message_Block* pCurrMessage);      //处理流消息函数
@@ -115,25 +115,20 @@ private:
     uint32                     m_u4AllRecvSize        = 0;                     //当前链接接收字节总数
     uint32                     m_u4AllSendSize        = 0;                     //当前链接发送字节总数
     uint32                     m_u4MaxPacketSize      = MAX_MSG_PACKETLENGTH;  //单个数据包的最大长度
-    uint32                     m_u4RecvQueueCount     = 0;                     //当前链接被处理的数据包数
     uint32                     m_u4SendMaxBuffSize    = 5 * MAX_BUFF_1024;     //发送数据最大缓冲长度
-    uint32                     m_u4ReadSendSize       = 0;                     //准备发送的字节数（水位标）
-    uint32                     m_u4SuccessSendSize    = 0;                     //实际客户端接收到的总字节数（水位标）
     uint16                     m_u2LocalPort          = 0;                     //监听的端口号
     uint32                     m_u4PacketParseInfoID  = 0;                     //对应处理packetParse的模块ID
     uint32                     m_u4CurrSize           = 0;                     //当前MB缓冲字符长度
     uint32                     m_u4PacketDebugSize    = 0;                     //记录能存二进制数据包的最大字节
-    int                        m_nBlockCount          = 0;                     //发生阻塞的次数
     int                        m_nHashID              = 0;                     //对应的Pool的Hash数组下标
     uint16                     m_u2MaxConnectTime     = 0;                     //最大时间链接判定
     uint16                     m_u2TcpNodelay         = TCP_NODELAY_ON;        //Nagle算法开关
     CONNECTSTATE               m_u1ConnectState       = CONNECTSTATE::CONNECT_INIT;          //目前链接处理状态
     CONNECTSTATE               m_u1SendBuffState      = CONNECTSTATE::CONNECT_SENDNON;       //目前缓冲器是否有等待发送的数据
-    uint8                      m_u1IsActive           = 0;                     //连接是否为激活状态，0为否，1为是
     bool                       m_blBlockState         = false;                 //是否处于阻塞状态 false为不在阻塞状态，true为在阻塞状态
     bool                       m_blIsLog              = false;                 //是否写入日志，false为不写入，true为写入
-    char                       m_szLocalIP[MAX_BUFF_50]      = { '\0' };       //本地的IP端口
-    char                       m_szConnectName[MAX_BUFF_100] = { '\0' };       //连接名称，可以开放给逻辑插件去设置
+    string                     m_strLocalIP;                                   //本地的IP端口
+    string                     m_strConnectName;                               //连接名称，可以开放给逻辑插件去设置
     ACE_INET_Addr              m_addrRemote;                                   //远程链接客户端地址
     ACE_INET_Addr              m_addrLocal;                                    //远程链接客户端地址
     ACE_Time_Value             m_atvConnect;                                   //当前链接建立时间
@@ -142,7 +137,6 @@ private:
     CPacketParse               m_objPacketParse;                               //数据包解析类
     ACE_Message_Block*         m_pBlockRecv           = nullptr;               //接收数据缓冲块
     ACE_Message_Block*         m_pBlockMessage        = nullptr;               //当前发送缓冲等待数据块
-    char*                      m_pPacketDebugData     = nullptr;               //记录数据包的Debug缓冲字符串
     EM_IO_TYPE                 m_emIOType             = EM_IO_TYPE::NET_INPUT; //当前IO入口类型
     IFileTestManager*          m_pFileTest            = nullptr;               //文件测试接口入口
     string                     m_strDeviceName;                                //转发接口名称
@@ -153,7 +147,7 @@ private:
 class CConnectHandlerPool
 {
 public:
-    CConnectHandlerPool(void);
+    CConnectHandlerPool(void) = default;
 
     void Init(int nObjcetCount);
     void Close();

@@ -16,20 +16,20 @@
 class CReactorUDPHander : public ACE_Event_Handler, public IHandler
 {
 public:
-    CReactorUDPHander(void);
-    virtual ~CReactorUDPHander(void);
+    CReactorUDPHander(void) = default;
+    ~CReactorUDPHander(void) final;
 
-    virtual ACE_HANDLE get_handle(void) const;
-    virtual int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE);
-    virtual int handle_close(ACE_HANDLE handle, ACE_Reactor_Mask close_mask);
+    ACE_HANDLE get_handle(void) const final;
+    int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE) final;
+    int handle_close(ACE_HANDLE handle, ACE_Reactor_Mask close_mask) final;
 
     void SetPacketParseInfoID(uint32 u4PacketParseInfoID);                    //设置对应的m_u4PacketParseInfoID
     int  OpenAddress(const ACE_INET_Addr& AddrRemote, ACE_Reactor* pReactor);
 
-    virtual void Close(uint32 u4ConnectID);
-    virtual bool SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);
-    virtual bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend);
-    virtual void SetIsLog(bool blIsLog);
+    void Close(uint32 u4ConnectID) final;
+    bool SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize) final;
+    bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value& tvSend) final;
+    void SetIsLog(bool blIsLog) final;
     _ClientConnectInfo GetClientConnectInfo() const;
     void GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut);                    //得到所有的出口流量
 
@@ -53,7 +53,7 @@ private:
     CCommandAccount         m_CommandAccount;                       //数据包统计
 	ACE_Message_Block*      m_pBlockMessage            = nullptr;   //当前发送缓冲等待数据块
 	ACE_Message_Block*      m_pBlockRecv               = nullptr;   //接收数据缓冲块
-    shared_ptr<_Packet_Parse_Info> m_pPacketParseInfo         = nullptr;   //PacketParse解析器
+    shared_ptr<_Packet_Parse_Info> m_pPacketParseInfo  = nullptr;   //PacketParse解析器
 
 };
 #endif

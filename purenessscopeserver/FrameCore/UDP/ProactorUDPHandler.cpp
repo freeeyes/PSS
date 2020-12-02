@@ -188,7 +188,7 @@ bool CProactorUDPHandler::SendMessage(CSendMessageInfo objSendMessageInfo, uint3
     return true;
 }
 
-bool CProactorUDPHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value tvSend)
+bool CProactorUDPHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value& tvSend)
 {
     //Á¢¼´·¢ËÍ
 	_ClientIPInfo objClientIPInfo = App_UDPConnectIDManager::instance()->GetConnectIP(u4ConnectID);

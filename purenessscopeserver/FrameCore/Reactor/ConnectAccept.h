@@ -19,7 +19,7 @@ public:
     uint32 GetPacketParseInfoID() const;
 
 protected:
-    virtual int make_svc_handler(CConnectHandler*& sh);
+    int make_svc_handler(CConnectHandler*& sh) final;
 
 public:
     //因为基础的open不能满足需求，所以在这里重载了一个open接口
