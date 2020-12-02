@@ -62,23 +62,23 @@ public:
     bool ConnectFrame(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, uint32 u4PacketParseID) final;                //连接指定的服务器，并给出PacketParseID
     bool ConnectFrame(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, uint16 u2LocalPort, uint8 u1LocalIPType, uint32 u4PacketParseID) final;    //连接指定的服务器，并给出PacketParseID
 
-    virtual bool ConnectUDP(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage);                                //建立一个指向UDP的链接（UDP）
-    bool ReConnect(int nServerID);                                                                                             //重新连接一个指定的服务器(TCP)
-    bool CloseByClient(int nServerID);                                                                                         //远程被动关闭(TCP)
-    virtual bool Close(int nServerID);                                                                                                 //关闭连接
-    virtual bool CloseUDP(int nServerID);                                                                                              //关闭链接（UDP）
-    bool ConnectErrorClose(int nServerID);                                                                                     //由内部错误引起的失败，由ProConnectClient调用
-    virtual bool SendData(int nServerID, char*& pData, int nSize, bool blIsDelete = true);                                              //发送数据
-    virtual bool SendDataUDP(int nServerID, const char* pIP, uint16 u2Port, char*& pMessage, uint32 u4Len, bool blIsDelete = true);   //发送数据（UDP）
-    bool SetHandler(int nServerID, CConnectClient* pConnectClient);                                                            //将指定的CProConnectClient*绑定给nServerID
-    virtual IClientMessage* GetClientMessage(int nServerID);                                                                           //获得ClientMessage对象
-    virtual bool StartConnectTask(int nIntervalTime = CONNECT_LIMIT_RETRY);                                                            //设置自动重连的定时器
-    virtual void CancelConnectTask();                                                                                                  //关闭重连定时器
-    virtual void Close();                                                                                                              //关闭所有连接
-    ACE_INET_Addr GetServerAddr(int nServerID);                                                                                //得到指定服务器的远程地址连接信息
-    bool SetServerConnectState(int nServerID, EM_Server_Connect_State objState);                                               //设置指定连接的连接状态
-    virtual bool GetServerIPInfo(int nServerID, _ClientIPInfo& objServerIPInfo);                                                       //得到一个nServerID对应的ServerIP信息
-    virtual bool DeleteIClientMessage(IClientMessage* pClientMessage);                                                                 //删除一个生命周期结束的IClientMessage
+    bool ConnectUDP(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage) final;                                //建立一个指向UDP的链接（UDP）
+    bool ReConnect(int nServerID);                                                                                                  //重新连接一个指定的服务器(TCP)
+    bool CloseByClient(int nServerID);                                                                                              //远程被动关闭(TCP)
+    bool Close(int nServerID) final;                                                                                                //关闭连接
+    bool CloseUDP(int nServerID) final;                                                                                             //关闭链接（UDP）
+    bool ConnectErrorClose(int nServerID);                                                                                          //由内部错误引起的失败，由ProConnectClient调用
+    bool SendData(int nServerID, char*& pData, int nSize, bool blIsDelete = true) final;                                            //发送数据
+    bool SendDataUDP(int nServerID, const char* pIP, uint16 u2Port, char*& pMessage, uint32 u4Len, bool blIsDelete = true) final;   //发送数据（UDP）
+    bool SetHandler(int nServerID, CConnectClient* pConnectClient);                                                                 //将指定的CProConnectClient*绑定给nServerID
+    IClientMessage* GetClientMessage(int nServerID) final;                                                                          //获得ClientMessage对象
+    bool StartConnectTask(int nIntervalTime = CONNECT_LIMIT_RETRY) final;                                                           //设置自动重连的定时器
+    void CancelConnectTask() final;                                                                                                 //关闭重连定时器
+    void Close() final;                                                                                                             //关闭所有连接
+    ACE_INET_Addr GetServerAddr(int nServerID);                                                                                     //得到指定服务器的远程地址连接信息
+    bool SetServerConnectState(int nServerID, EM_Server_Connect_State objState);                                                    //设置指定连接的连接状态
+    bool GetServerIPInfo(int nServerID, _ClientIPInfo& objServerIPInfo) final;                                                      //得到一个nServerID对应的ServerIP信息
+    bool DeleteIClientMessage(IClientMessage* pClientMessage) final;                                                                //删除一个生命周期结束的IClientMessage
 
     void GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo);      //返回当前存活链接的信息（TCP）
     void GetUDPConnectInfo(vecClientConnectInfo& VecClientConnectInfo);   //返回当前存活链接的信息（UDP）
