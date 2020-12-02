@@ -428,7 +428,7 @@ bool CServerManager::Start_Console_Tcp_Listen()
         {
             if (ACE_OS::strcmp(GetXmlConfigAttribute(xmlConsole)->sip.c_str(), "INADDR_ANY") == 0)
             {
-                nErr = listenConsoleAddr.set(GetXmlConfigAttribute(xmlConsole)->sport, (uint32)INADDR_ANY);
+                nErr = listenConsoleAddr.set(GetXmlConfigAttribute(xmlConsole)->sport, PSS_INADDR_ANY);
             }
             else
             {
@@ -440,7 +440,7 @@ bool CServerManager::Start_Console_Tcp_Listen()
         {
             if (ACE_OS::strcmp(GetXmlConfigAttribute(xmlConsole)->sip.c_str(), "INADDR_ANY") == 0)
             {
-                nErr = listenConsoleAddr.set(GetXmlConfigAttribute(xmlConsole)->sport, (uint32)INADDR_ANY);
+                nErr = listenConsoleAddr.set(GetXmlConfigAttribute(xmlConsole)->sport, PSS_INADDR_ANY);
             }
             else
             {

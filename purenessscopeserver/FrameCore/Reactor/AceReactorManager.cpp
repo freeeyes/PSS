@@ -250,7 +250,7 @@ void CAceReactorManager::Close()
 {
     OUR_DEBUG((LM_ERROR, "[CAceReactor::Close] Begin.\n"));
 
-    for_each(m_pReactorList.begin(), m_pReactorList.end(), [this](const std::pair<uint16, CAceReactor*>& iter) {
+    for_each(m_pReactorList.begin(), m_pReactorList.end(), [](const std::pair<uint16, CAceReactor*>& iter) {
         //清除对象
         auto pAceReactor = iter.second;
         pAceReactor->Stop();
@@ -281,6 +281,7 @@ const char* CAceReactorManager::GetError() const
 bool CAceReactorManager::AddNewReactor(int nReactorID, EM_REACTOR_MODULE emReactorType, int nThreadCount, int nMaxHandleCount)
 {
     auto pAceReactor = new CAceReactor();
+    auto u2ReactorID = (uint16)nReactorID;
 
     pAceReactor->SetReactorID((uint32)nReactorID);
     bool blState = pAceReactor->Init(emReactorType, nThreadCount, nMaxHandleCount);
@@ -292,21 +293,21 @@ bool CAceReactorManager::AddNewReactor(int nReactorID, EM_REACTOR_MODULE emReact
         return false;
     }
 
-    if(nullptr != m_pReactorList[nReactorID])
+    if(nullptr != m_pReactorList[u2ReactorID])
     {
         m_strError = fmt::format("[CAceReactorManager::AddNewReactor]CAceReactor is exist[{0}].", nReactorID);
         delete pAceReactor;
         return false;
     }
 
-    m_pReactorList[nReactorID] = pAceReactor;
+    m_pReactorList[u2ReactorID] = pAceReactor;
     OUR_DEBUG((LM_INFO, "[CAceReactorManager::AddNewReactor]New [%d] ReactorTxype = [%d] nThreadCount = [%d]. pAceReactor=[%@]\n", nReactorID, emReactorType, nThreadCount, pAceReactor));
     return true;
 }
 
 bool CAceReactorManager::StartOtherReactor() const
 {
-    for_each(m_pReactorList.begin(), m_pReactorList.end(), [this](const std::pair<uint16, CAceReactor*>& iter) {
+    for_each(m_pReactorList.begin(), m_pReactorList.end(), [](const std::pair<uint16, CAceReactor*>& iter) {
         //先启动非总的Rector
         auto pAceReactor = iter.second;
 
@@ -336,7 +337,7 @@ bool CAceReactorManager::StartClientReactor() const
 
 bool CAceReactorManager::StopReactor() const
 {
-    for_each(m_pReactorList.begin(), m_pReactorList.end(), [this](const std::pair<uint16, CAceReactor*>& iter) {
+    for_each(m_pReactorList.begin(), m_pReactorList.end(), [](const std::pair<uint16, CAceReactor*>& iter) {
         //先启动非总的Rector
         auto pAceReactor = iter.second;
 

@@ -1,11 +1,5 @@
 #include "PacketParseBase.h"
 
-CPacketParseBase::CPacketParseBase(void)
-{
-    //这里修改属于你的包解析版本号
-    m_strPacketVersion = "2.00";
-}
-
 void CPacketParseBase::Clear()
 {
     m_pmbHead = nullptr;

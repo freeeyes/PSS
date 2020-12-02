@@ -20,13 +20,14 @@ public:
     };
 
     uint32 m_nServerID               = 0;
-    char m_szServerIP[MAX_BUFF_100]  = {'\0'};
+    string m_strServerIP;
     uint16 m_u2ServerPort            = 0;
     uint8 m_u1Type                   = 0;
-    char m_szLocalIP[MAX_BUFF_100]   = {'\0'};
+    string m_strLocalIP;
     uint16 m_u2LocalPort             = 0;
     uint8 m_u1LocalIPType            = 0;
     IClientMessage* m_pClientMessage = NULL;
+    uint32 m_u4PacketParseID         = 0;
 };
 
 //负责管理服务器间通讯的数据管理
@@ -36,9 +37,9 @@ public:
     virtual ~IClientManager() {}
 
     //设置TCP链接参数，pClientMessage为远端数据到达处理类。
-    virtual bool Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, IClientMessage* pClientMessage)                  = 0;
+    virtual bool Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, IClientMessage* pClientMessage, uint32 u4PacketParseID) = 0;
     //设置TCP链接参数，pClientMessage为远端数据到达处理类，可以设置本地IP和端口。
-    virtual bool Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, uint16 u2LocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage) = 0;
+    virtual bool Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, uint16 u2LocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, uint32 u4PacketParseID) = 0;
 
     //设置TCP链接参数，pClientMessage为远端数据到达处理类。
     virtual bool ConnectFrame(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, uint32 u4PacketParse) = 0;

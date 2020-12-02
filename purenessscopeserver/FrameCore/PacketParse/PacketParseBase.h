@@ -13,7 +13,7 @@
 class CPacketParseBase
 {
 public:
-    CPacketParseBase(void);
+    CPacketParseBase(void) = default;
 
     virtual ~CPacketParseBase() = default;
 
@@ -61,7 +61,7 @@ private:
     uint32 m_u4BodySrcSize                = 0;         //包体的原始长度
     uint16 m_u2PacketCommandID            = 0;         //包命令
     bool   m_blIsHandleHead               = true;
-    string m_strPacketVersion;                         //包解析器版本
+    string m_strPacketVersion             = "2.0.0";   //包解析器版本
     uint8  m_u1Sort                       = 0;         //字节序规则，0为主机字节序，1为网络字节序
 
     ACE_Message_Block* m_pmbHead          = nullptr;      //包头部分

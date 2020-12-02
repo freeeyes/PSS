@@ -60,11 +60,11 @@ public:
     ~CClientProConnectManager(void);
 
     bool Init(ACE_Proactor* pProactor);                                                                                        //初始化链接器
-    virtual bool Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, IClientMessage* pClientMessage);                   //链接指定的服务器（TCP）
-    virtual bool Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, uint16 u2LocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage);  //连接服务器(TCP)，指定本地地址
-    virtual bool ConnectFrame(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, uint32 u4PacketParse);                //连接指定的服务器，并给出PacketParseID
-    virtual bool ConnectFrame(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, uint16 u2LocalPort, uint8 u1LocalIPType, uint32 u4PacketParse);      //连接指定的服务器，并给出PacketParseID
-    virtual bool ConnectUDP(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage);                                //建立一个指向UDP的链接（UDP）
+    bool Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, IClientMessage* pClientMessage, uint32 u4PacketParseID) final;                   //链接指定的服务器（TCP）
+    bool Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, uint16 u2LocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, uint32 u4PacketParseID) final;  //连接服务器(TCP)，指定本地地址
+    bool ConnectFrame(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, uint32 u4PacketParse) final;                //连接指定的服务器，并给出PacketParseID
+    bool ConnectFrame(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, uint16 u2LocalPort, uint8 u1LocalIPType, uint32 u4PacketParse) final;      //连接指定的服务器，并给出PacketParseID
+    bool ConnectUDP(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage) final;                                //建立一个指向UDP的链接（UDP）
     bool ReConnect(int nServerID);                                                                                             //重新连接一个指定的服务器(TCP)
     bool CloseByClient(int nServerID);                                                                                         //远程被动关闭(TCP)
     virtual bool Close(int nServerID);                                                                                                 //关闭连接（TCP）

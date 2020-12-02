@@ -20,10 +20,11 @@ void CUnit_ConnectTcp::Test_Connect_Tcp_Server(void)
 
     //连接远程服务器
     if (false == App_ClientReConnectManager::instance()->Connect(m_nServerID,
-            "127.0.0.1",
-            10002,
-            TYPE_IPV4,
-            (IClientMessage*)&objPostServerData))
+        "127.0.0.1",
+        10002,
+        TYPE_IPV4,
+        (IClientMessage*)&objPostServerData, 
+        0))
     {
         OUR_DEBUG((LM_INFO, "[Test_Connect_Tcp_Server]Connect[127.0.0.1:10002]Tcp connect is fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Tcp_Server]Connect[127.0.0.1:10002]Tcp connect is fail.", true == blRet);
@@ -120,13 +121,14 @@ void CUnit_ConnectTcp::Test_Connect_Tcp_Server_With_Local(void)
 
     //连接远程服务器
     if (false == App_ClientReConnectManager::instance()->Connect(2,
-            "127.0.0.1",
-            10002,
-            TYPE_IPV4,
-            "127.0.0.1",
-            20032,
-            TYPE_IPV4,
-            (IClientMessage*)&objPostServerData))
+        "127.0.0.1",
+        10002,
+        TYPE_IPV4,
+        "127.0.0.1",
+        20032,
+        TYPE_IPV4,
+        (IClientMessage*)&objPostServerData, 
+        0))
     {
         OUR_DEBUG((LM_INFO, "[Test_Connect_Tcp_Server_With_Local]Connect[127.0.0.1:10002]Tcp connect is fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Tcp_Server_With_Local]Connect[127.0.0.1:10002]Tcp connect is fail.", true == blRet);

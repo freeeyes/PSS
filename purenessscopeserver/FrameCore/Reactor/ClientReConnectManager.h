@@ -10,6 +10,7 @@
 #include "HashTable.h"
 #include "XmlConfig.h"
 #include "ConnectClient.h"
+#include <unordered_map>
 
 const uint32 RE_CONNECT_SERVER_TIMEOUT = 100 * 1000;
 const uint32 WAIT_FOR_RECONNECT_FINISH = 5000;
@@ -52,14 +53,14 @@ private:
 class CClientReConnectManager : public ACE_Event_Handler, public IClientManager
 {
 public:
-    CClientReConnectManager(void);
+    CClientReConnectManager(void) = default;
 
     bool Init(ACE_Reactor* pReactor);
-    virtual bool Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, IClientMessage* pClientMessage);                                                             //链接服务器(TCP)
-    virtual bool Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, uint16 u2LocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage);  //连接服务器(TCP)，指定本地地址
+    bool Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, IClientMessage* pClientMessage, uint32 u4PacketParseID) final;                                                                 //链接服务器(TCP)
+    bool Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, uint16 u2LocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, uint32 u4PacketParseID) final;  //连接服务器(TCP)，指定本地地址
 
-    virtual bool ConnectFrame(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, uint32 u4PacketParseID);                //连接指定的服务器，并给出PacketParseID
-    virtual bool ConnectFrame(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, uint16 u2LocalPort, uint8 u1LocalIPType, uint32 u4PacketParseID);    //连接指定的服务器，并给出PacketParseID
+    bool ConnectFrame(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, uint32 u4PacketParseID) final;                //连接指定的服务器，并给出PacketParseID
+    bool ConnectFrame(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, uint16 u2LocalPort, uint8 u1LocalIPType, uint32 u4PacketParseID) final;    //连接指定的服务器，并给出PacketParseID
 
     virtual bool ConnectUDP(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, EM_UDP_TYPE emType, IClientUDPMessage* pClientUDPMessage);                                //建立一个指向UDP的链接（UDP）
     bool ReConnect(int nServerID);                                                                                             //重新连接一个指定的服务器(TCP)
@@ -87,19 +88,21 @@ public:
     virtual int handle_timeout(const ACE_Time_Value& current_time, const void* act = 0);               //定时器执行
 
 private:
-    bool ConnectTcpInit(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, uint16 u2LocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CReactorClientInfo*& pClientInfo, uint32 u4PacketParseID = 0);
-    bool ConnectUdpInit(int nServerID, CReactorUDPClient*& pReactorUDPClient);
+    shared_ptr<CReactorClientInfo> ConnectTcpInit(int nServerID);
+    shared_ptr<CReactorUDPClient> ConnectUdpInit(int nServerID);
 
 public:
-    CHashTable<CReactorClientInfo>  m_objClientTCPList;                            //TCP客户端链接
-    CHashTable<CReactorUDPClient>   m_objClientUDPList;                            //UDP客户端链接
+    using hashmapClientTCPList = unordered_map<int, shared_ptr<CReactorClientInfo>>;
+    using hashmapClientUDPList = unordered_map<int, shared_ptr<CReactorUDPClient>>;
+    hashmapClientTCPList            m_objClientTCPList;                            //TCP客户端链接
+    hashmapClientUDPList            m_objClientUDPList;                            //UDP客户端链接
     CConnectClientConnector         m_ReactorConnect;                              //Reactor连接客户端对象
     ACE_Recursive_Thread_Mutex      m_ThreadWritrLock;                             //线程锁
     int                             m_nTaskID                = -1;                 //定时检测工具
     ACE_Reactor*                    m_pReactor               = nullptr;            //当前的反应器
     bool                            m_blReactorFinish        = false;              //Reactor是否已经注册
     uint32                          m_u4ConnectServerTimeout = 0;                  //连接间隔时间
-    int32                           m_u4MaxPoolCount         = 0;                  //连接池的上限
+    uint32                          m_u4MaxPoolCount         = 0;                  //连接池的上限
     EM_S2S_Run_State                m_emS2SRunState          = EM_S2S_Run_State::S2S_Run_State_Init; //当前服务连接状态
     vector<CS2SConnectGetRandyInfo> m_GetReadyInfoList;                            //需要等待连接的数据信息
 };

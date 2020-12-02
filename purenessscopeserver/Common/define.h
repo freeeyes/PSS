@@ -505,6 +505,8 @@ typedef std::string _tstring;
 #define SAFE_DELETE_ARRAY(x) if( (x) != NULL ) {delete[] (x); (x) = NULL; }
 #endif
 
+const uint32 PSS_INADDR_ANY = (uint32)INADDR_ANY;
+
 template<typename T>
 struct item_return
 {

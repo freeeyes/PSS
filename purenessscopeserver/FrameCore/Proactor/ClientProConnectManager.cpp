@@ -278,21 +278,23 @@ bool CClientProConnectManager::Init(ACE_Proactor* pProactor)
         if (f.m_u2LocalPort == 0)
         {
             Connect(f.m_nServerID,
-                    f.m_szServerIP,
+                    f.m_strServerIP.c_str(),
                     f.m_u2ServerPort,
                     f.m_u1Type,
-                    f.m_pClientMessage);
+                    f.m_pClientMessage, 
+                f.m_u4PacketParseID);
         }
         else
         {
             Connect(f.m_nServerID,
-                    f.m_szServerIP,
+                    f.m_strServerIP.c_str(),
                     f.m_u2ServerPort,
                     f.m_u1Type,
-                    f.m_szLocalIP,
+                    f.m_strLocalIP.c_str(),
                     f.m_u2LocalPort,
                     f.m_u1LocalIPType,
-                    f.m_pClientMessage);
+                    f.m_pClientMessage, 
+                f.m_u4PacketParseID);
         }
     }
 
@@ -301,7 +303,7 @@ bool CClientProConnectManager::Init(ACE_Proactor* pProactor)
     return true;
 }
 
-bool CClientProConnectManager::Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, IClientMessage* pClientMessage)
+bool CClientProConnectManager::Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, IClientMessage* pClientMessage, uint32 u4PacketParseID)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     CProactorClientInfo* pClientInfo = nullptr;
@@ -311,19 +313,19 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, uint16 u2
         //如果反应器还没初始化，添加到一个列表中，等待反应器初始化后调用
         CS2SConnectGetRandyInfo objS2SConnectGetRandyInfo;
 
-        objS2SConnectGetRandyInfo.m_nServerID      = nServerID;
-        sprintf_safe(objS2SConnectGetRandyInfo.m_szServerIP, MAX_BUFF_100, "%s", pIP);
+        objS2SConnectGetRandyInfo.m_nServerID       = nServerID;
+        objS2SConnectGetRandyInfo.m_strServerIP     = pIP;
         objS2SConnectGetRandyInfo.m_u2ServerPort    = u2Port;
-        objS2SConnectGetRandyInfo.m_u1Type         = u1IPType;
-        objS2SConnectGetRandyInfo.m_pClientMessage = pClientMessage;
-
-        m_GetReadyInfoList.push_back(objS2SConnectGetRandyInfo);
+        objS2SConnectGetRandyInfo.m_u1Type          = u1IPType;
+        objS2SConnectGetRandyInfo.m_pClientMessage  = pClientMessage;
+        objS2SConnectGetRandyInfo.m_u4PacketParseID = u4PacketParseID;
+        m_GetReadyInfoList.emplace_back(objS2SConnectGetRandyInfo);
 
         return true;
     }
 
     //连接初始化动作
-    if (false == ConnectTcpInit(nServerID, pIP, u2Port, u1IPType, nullptr, 0, u1IPType, pClientMessage, pClientInfo))
+    if (false == ConnectTcpInit(nServerID, pIP, u2Port, u1IPType, nullptr, 0, u1IPType, pClientMessage, pClientInfo, u4PacketParseID))
     {
         return false;
     }
@@ -346,7 +348,7 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, uint16 u2
     return true;
 }
 
-bool CClientProConnectManager::Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, uint16 u2LocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage)
+bool CClientProConnectManager::Connect(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, uint16 u2LocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, uint32 u4PacketParseID)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     CProactorClientInfo* pClientInfo = nullptr;
@@ -356,21 +358,22 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, uint16 u2
         //如果反应器还没初始化，添加到一个列表中，等待反应器初始化后调用
         CS2SConnectGetRandyInfo objS2SConnectGetRandyInfo;
 
-        objS2SConnectGetRandyInfo.m_nServerID      = nServerID;
-        sprintf_safe(objS2SConnectGetRandyInfo.m_szServerIP, MAX_BUFF_100, "%s", pIP);
+        objS2SConnectGetRandyInfo.m_nServerID       = nServerID;
+        objS2SConnectGetRandyInfo.m_strServerIP     = pIP;
         objS2SConnectGetRandyInfo.m_u2ServerPort    = u2Port;
-        objS2SConnectGetRandyInfo.m_u1Type         = u1IPType;
-        sprintf_safe(objS2SConnectGetRandyInfo.m_szLocalIP, MAX_BUFF_100, "%s", pLocalIP);
+        objS2SConnectGetRandyInfo.m_u1Type          = u1IPType;
+        objS2SConnectGetRandyInfo.m_strLocalIP      = pLocalIP;
         objS2SConnectGetRandyInfo.m_u2LocalPort     = u2LocalPort;
-        objS2SConnectGetRandyInfo.m_u1LocalIPType  = u1LocalIPType;
-        objS2SConnectGetRandyInfo.m_pClientMessage = pClientMessage;
-        m_GetReadyInfoList.push_back(objS2SConnectGetRandyInfo);
+        objS2SConnectGetRandyInfo.m_u1LocalIPType   = u1LocalIPType;
+        objS2SConnectGetRandyInfo.m_pClientMessage  = pClientMessage;
+        objS2SConnectGetRandyInfo.m_u4PacketParseID = u4PacketParseID;
+        m_GetReadyInfoList.emplace_back(objS2SConnectGetRandyInfo);
 
         return true;
     }
 
     //连接初始化动作
-    if (false == ConnectTcpInit(nServerID, pIP, u2Port, u1IPType, pLocalIP, u2LocalPort, u1LocalIPType, pClientMessage, pClientInfo))
+    if (false == ConnectTcpInit(nServerID, pIP, u2Port, u1IPType, pLocalIP, u2LocalPort, u1LocalIPType, pClientMessage, pClientInfo, u4PacketParseID))
     {
         return false;
     }
@@ -469,7 +472,7 @@ bool CClientProConnectManager::ConnectUDP(int nServerID, const char* pIP, uint16
     else
     {
         //如果是UDP广播
-        AddrLocal.set(u2Port, (uint32)INADDR_ANY);
+        AddrLocal.set(u2Port, PSS_INADDR_ANY);
     }
 
     if (nErr != 0)

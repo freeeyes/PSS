@@ -228,7 +228,7 @@ bool CProServerManager::Start()
             if(ACE_OS::strcmp(GetXmlConfigAttribute(xmlConsole)->sip.c_str(), "INADDR_ANY") == 0)
             {
                 nErr = listenConsoleAddr.set(GetXmlConfigAttribute(xmlConsole)->sport,
-                                             (uint32)INADDR_ANY);
+                    PSS_INADDR_ANY);
             }
             else
             {
@@ -241,7 +241,7 @@ bool CProServerManager::Start()
             if(ACE_OS::strcmp(GetXmlConfigAttribute(xmlConsole)->sip.c_str(), "INADDR_ANY") == 0)
             {
                 nErr = listenConsoleAddr.set(GetXmlConfigAttribute(xmlConsole)->sport,
-                                             (uint32)INADDR_ANY);
+                    PSS_INADDR_ANY);
             }
             else
             {
