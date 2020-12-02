@@ -352,7 +352,8 @@ bool CAceReactorManager::StopReactor() const
 
 CAceReactor* CAceReactorManager::GetAceReactor(int nReactorID)
 {
-    auto f = m_pReactorList.find(nReactorID);
+    auto u2ReactorID = (uint16)nReactorID;
+    auto f = m_pReactorList.find(u2ReactorID);
 
     if (m_pReactorList.end() != f)
     {
@@ -366,7 +367,8 @@ CAceReactor* CAceReactorManager::GetAceReactor(int nReactorID)
 
 ACE_Reactor* CAceReactorManager::GetAce_Reactor(int nReactorID)
 {
-    auto f = m_pReactorList.find(nReactorID);
+    auto u2ReactorID = (uint16)nReactorID;
+    auto f = m_pReactorList.find(u2ReactorID);
 
     if (m_pReactorList.end() != f)
     {
@@ -381,7 +383,8 @@ ACE_Reactor* CAceReactorManager::GetAce_Reactor(int nReactorID)
 ACE_Reactor* CAceReactorManager::GetAce_Client_Reactor(int nReactorID)
 {
     //这里返回客户端连接服务器需要用到的反应器
-    auto f = m_pReactorList.find(nReactorID);
+    auto u2ReactorID = (uint16)nReactorID;
+    auto f = m_pReactorList.find(u2ReactorID);
 
     if (m_pReactorList.end() != f)
     {

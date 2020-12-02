@@ -12,7 +12,7 @@
 class ConnectAcceptor : public ACE_Acceptor<CConnectHandler, ACE_SOCK_ACCEPTOR>
 {
 public:
-    ConnectAcceptor();
+    ConnectAcceptor() = default;
 
     void InitClientReactor(uint32 u4ClientReactorCount);
     void SetPacketParseInfoID(uint32 u4PaccketParseInfoID);
@@ -41,7 +41,7 @@ public:
     uint16 GetListenPort() const;
 
 private:
-    char   m_szListenIP[MAX_BUFF_20] = {'\0'};
+    string m_strListenIP;
     uint16 m_u2Port                  = 0;
     uint32 m_u4AcceptCount           = 0;        //接收的总连接数
     uint32 m_u4ClientReactorCount    = 1;        //客户端反应器的个数
@@ -51,24 +51,24 @@ private:
 class CConnectAcceptorManager
 {
 public:
-    CConnectAcceptorManager(void);
+    CConnectAcceptorManager(void) = default;
 
     bool InitConnectAcceptor(int nCount, uint32 u4ClientReactorCount);
     void Close();
     int GetCount() const;
-    ConnectAcceptor* GetConnectAcceptor(int nIndex);
-    ConnectAcceptor* GetNewConnectAcceptor();
+    shared_ptr<ConnectAcceptor> GetConnectAcceptor(int nIndex);
+    shared_ptr<ConnectAcceptor> GetNewConnectAcceptor();
     const char* GetError() const;
 
     bool Close(const char* pIP, uint16 n4Port);
     bool CheckIPInfo(const char* pIP, uint16 n4Port);
 
 private:
-    typedef vector<ConnectAcceptor*> vecConnectAcceptor;
+    using vecConnectAcceptor = vector<shared_ptr<ConnectAcceptor>>;
     vecConnectAcceptor m_vecConnectAcceptor;
     int                m_nAcceptorCount        = 0;
-    char               m_szError[MAX_BUFF_500] = {'\0'};
+    string             m_strError;
 };
 
-typedef ACE_Singleton<CConnectAcceptorManager, ACE_Null_Mutex> App_ConnectAcceptorManager;
+using App_ConnectAcceptorManager = ACE_Singleton<CConnectAcceptorManager, ACE_Null_Mutex>;
 #endif

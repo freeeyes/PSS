@@ -82,10 +82,10 @@ public:
 
     void GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo);      //返回当前存活链接的信息（TCP）
     void GetUDPConnectInfo(vecClientConnectInfo& VecClientConnectInfo);   //返回当前存活链接的信息（UDP）
-    virtual EM_Server_Connect_State GetConnectState(int nServerID);               //得到一个当前连接状态
-    virtual uint32 GetPacketParseID(int nServerID);                       //得到当前的PacketParseID
+    EM_Server_Connect_State GetConnectState(int nServerID) final;         //得到一个当前连接状态
+    uint32 GetPacketParseID(int nServerID) final;                         //得到当前的PacketParseID
 
-    virtual int handle_timeout(const ACE_Time_Value& current_time, const void* act = 0);               //定时器执行
+    int handle_timeout(const ACE_Time_Value& current_time, const void* act = nullptr) final;               //定时器执行
 
 private:
     shared_ptr<CReactorClientInfo> ConnectTcpInit(int nServerID);

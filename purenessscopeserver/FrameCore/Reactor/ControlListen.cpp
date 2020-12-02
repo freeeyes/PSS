@@ -40,7 +40,7 @@ bool CControlListen::AddListen( const char* pListenIP, uint16 u2Port, uint8 u1IP
     }
 
     //得到接收器
-    ConnectAcceptor* pConnectAcceptor = App_ConnectAcceptorManager::instance()->GetNewConnectAcceptor();
+    auto pConnectAcceptor = App_ConnectAcceptorManager::instance()->GetNewConnectAcceptor();
 
     if (nullptr == pConnectAcceptor)
     {
@@ -105,7 +105,7 @@ uint32 CControlListen::GetListenCount()
     {
         for (int i = 0; i < App_ConnectAcceptorManager::instance()->GetCount(); i++)
         {
-            const ConnectAcceptor* pConnectAcceptor = App_ConnectAcceptorManager::instance()->GetConnectAcceptor(i);
+            auto pConnectAcceptor = App_ConnectAcceptorManager::instance()->GetConnectAcceptor(i);
 
             if (nullptr != pConnectAcceptor)
             {

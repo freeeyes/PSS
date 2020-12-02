@@ -221,7 +221,7 @@ bool CServerManager::Run()
     for (uint16 i = 0; i < u2ServerPortCount; i++)
     {
         //得到接收器
-        ConnectAcceptor* pConnectAcceptor = App_ConnectAcceptorManager::instance()->GetConnectAcceptor(i);
+        auto pConnectAcceptor = App_ConnectAcceptorManager::instance()->GetConnectAcceptor(i);
 
         //打开监听对应事件
         pConnectAcceptor->Run_Open(App_ReactorManager::instance()->GetAce_Reactor(REACTOR_CLIENTDEFINE));
@@ -353,7 +353,7 @@ bool CServerManager::Start_Tcp_Listen() const
         }
 
         //得到接收器
-        ConnectAcceptor* pConnectAcceptor = App_ConnectAcceptorManager::instance()->GetConnectAcceptor(i);
+        auto pConnectAcceptor = App_ConnectAcceptorManager::instance()->GetConnectAcceptor(i);
 
         if (nullptr == pConnectAcceptor)
         {
