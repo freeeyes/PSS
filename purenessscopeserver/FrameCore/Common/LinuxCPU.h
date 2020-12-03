@@ -7,8 +7,6 @@
 #include <sstream>
 #include <fstream>
 
-vector<string> split_string(const string& s, const char& c);
-
 void trim(string& s);
 
 int32 GetProcessCPU_Idel_Linux();

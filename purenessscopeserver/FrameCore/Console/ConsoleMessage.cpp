@@ -233,7 +233,7 @@ EM_CONSOLE_MESSAGE CConsoleMessage::ParseCommand(const char* pCommand, IBuffPack
     }
 
     //判断当前命令是否可以执行
-    int nPromission = m_objConsolePromissions.Check_Promission(CommandInfo.m_strCommandTitle.c_str(), CommandInfo.m_strUser.c_str());
+    int nPromission = m_objConsolePromissions.Check_Promission(CommandInfo.m_strCommandTitle, CommandInfo.m_strUser);
 
     if (0 != nPromission)
     {

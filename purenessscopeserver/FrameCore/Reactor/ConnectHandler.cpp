@@ -354,34 +354,9 @@ CONNECTSTATE CConnectHandler::GetSendBuffState() const
 
 bool CConnectHandler::SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize)
 {
-    //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
-    Tcp_Common_Send_Message_Error(GetConnectID(), 
-        objSendMessageInfo.u2CommandID, 
-        objSendMessageInfo.blDelete, 
-        objSendMessageInfo.pBuffPacket);
-
-    return false;
-
+    //发送数据
     if (EM_IO_TYPE::NET_INPUT == m_emIOType)
     {
-        if (CONNECTSTATE::CONNECT_SERVER_CLOSE == m_u1ConnectState 
-            || CONNECTSTATE::CONNECT_CLIENT_CLOSE == m_u1ConnectState)
-        {
-            //在队列里已经存在关闭连接指令，之后的所有数据写请求全部不予发送。
-            ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(objSendMessageInfo.pBuffPacket->GetPacketLen());
-            memcpy_safe(objSendMessageInfo.pBuffPacket->GetData(), 
-                objSendMessageInfo.pBuffPacket->GetPacketLen(), 
-                pSendMessage->wr_ptr(),
-                objSendMessageInfo.pBuffPacket->GetPacketLen());
-            pSendMessage->wr_ptr(objSendMessageInfo.pBuffPacket->GetPacketLen());
-            ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-            App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, objSendMessageInfo.tvSendBegin);
-
-            Recovery_Common_BuffPacket(objSendMessageInfo.blDelete, objSendMessageInfo.pBuffPacket);
-
-            return false;
-        }
-
         //如果不是直接发送数据，则拼接数据包
         if (EM_Client_Send_Status::CLIENT_SEND_CACHE == objSendMessageInfo.emSendState)
         {

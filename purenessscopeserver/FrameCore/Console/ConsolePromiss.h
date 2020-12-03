@@ -28,10 +28,10 @@ public:
     void Init(const char* pFileName);
     void Close();
 
-    int Check_Promission(const char* pCommandName, const char* pUser);
+    int Check_Promission(string pCommandName, string pUser);
 
 private:
-    int Check_Split_User(const char* pUser, const char* pUserList) const;
+    int Check_Split_User(string pUser, string pUserList) const;
 
     using hashmapCommandInfo = unordered_map <string, shared_ptr<_Console_Command_Info>>;
     hashmapCommandInfo m_objHashCommandList;

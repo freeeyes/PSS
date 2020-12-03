@@ -45,75 +45,36 @@ void CConsolePromissions::Close()
     m_objHashCommandList.clear();
 }
 
-int CConsolePromissions::Check_Promission(const char* pCommandName, const char* pUser)
+int CConsolePromissions::Check_Promission(string pCommandName, string pUser)
 {
     auto f = m_objHashCommandList.find(pCommandName);
     
     if (m_objHashCommandList.end() == f)
     {
-        OUR_DEBUG((LM_INFO, "[CConsolePromissions::Check_Promission](%s)CommandName is nullptr.\n", pCommandName));
+        OUR_DEBUG((LM_INFO, "[CConsolePromissions::Check_Promission](%s)CommandName is nullptr.\n", pCommandName.c_str()));
         return -1;
     }
 
     auto pConsole_Command_Info = f->second;
 
-    return Check_Split_User(pUser, pConsole_Command_Info->m_strUser.c_str());
+    return Check_Split_User(pUser, pConsole_Command_Info->m_strUser);
 }
 
-int CConsolePromissions::Check_Split_User(const char* pUser, const char* pUserList) const
+int CConsolePromissions::Check_Split_User(string pUser, string pUserList) const
 {
-    string strTempUser;
-    const char* pPromissPosBegin = pUserList;
-    const char* pPromissPos = ACE_OS::strstr(pPromissPosBegin, ",");
+    vector<string> strUserList;
 
-    while (nullptr != pPromissPos)
+    auto vecUserList = split_string(pUserList, ',');
+
+    for (auto strFrameUser : vecUserList)
     {
-        auto u4NameLen = (uint32)(pPromissPos - pPromissPosBegin);
-
-        if (u4NameLen > MAX_BUFF_50)
-        {
-            pPromissPosBegin = pPromissPos + 1;
-            pPromissPos = ACE_OS::strstr(pUserList, ",");
-            continue;
-        }
-
-        strTempUser.append(pPromissPosBegin, u4NameLen);
-
-        if (strTempUser == pUser)
-        {
-            return 0;
-        }
-
-        pPromissPosBegin = pPromissPos + 1;
-        pPromissPos = ACE_OS::strstr(pPromissPosBegin, ",");
-        strTempUser = "";
-    }
-
-    //判断最后一个User
-    if ((uint32)(pPromissPosBegin - pUserList) < (uint32)ACE_OS::strlen(pUserList))
-    {
-        uint32 u4NameLen = 0;
-
-        if (pUserList == pPromissPosBegin)
-        {
-            //只有一个
-            u4NameLen = (uint32)ACE_OS::strlen(pUserList);
-            strTempUser.append(pPromissPosBegin, u4NameLen);
-        }
-        else
-        {
-            //最后一个
-            u4NameLen = (uint32)strlen(pUserList) - (uint32)(pPromissPosBegin - pUserList - 1);
-            strTempUser.append(pPromissPosBegin, u4NameLen);
-        }
-
-        if (strTempUser == pUser)
+        if (pUser == strFrameUser)
         {
             return 0;
         }
     }
 
-    OUR_DEBUG((LM_INFO, "[CConsolePromissions::Check_Promission][%s]user is no promission.\n", pUser));
+    OUR_DEBUG((LM_INFO, "[CConsolePromissions::Check_Promission][%s]user is no promission.\n", pUser.c_str()));
     return -2;
 }
 
