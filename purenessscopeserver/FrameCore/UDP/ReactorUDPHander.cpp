@@ -1,22 +1,22 @@
 #include "ReactorUDPHander.h"
 
-CReactorUDPHander::~CReactorUDPHander(void)
+void CReactorUDPHander::CloseFinaly()
 {
-    OUR_DEBUG((LM_INFO, "[CReactorUDPHander::~CReactorUDPHander]Begin.\n"));
-	if (nullptr != m_pBlockMessage)
-	{
-		m_pBlockMessage->release();
-	}
+    OUR_DEBUG((LM_INFO, "[CReactorUDPHander::~CloseFinaly]Begin.\n"));
+    if (nullptr != m_pBlockMessage)
+    {
+        m_pBlockMessage->release();
+    }
 
-	if (nullptr != m_pBlockRecv)
-	{
-		m_pBlockRecv->release();
-	}
+    if (nullptr != m_pBlockRecv)
+    {
+        m_pBlockRecv->release();
+    }
 
     ACE_Reactor_Mask close_mask = ACE_Event_Handler::ALL_EVENTS_MASK | ACE_Event_Handler::DONT_CALL;
-    this->reactor()->remove_handler(this, close_mask);
-	m_skRemote.close();
-    OUR_DEBUG((LM_INFO, "[CReactorUDPHander::~CReactorUDPHander]End.\n"));
+    reactor()->remove_handler(this, close_mask);
+    m_skRemote.close();
+    OUR_DEBUG((LM_INFO, "[CReactorUDPHander::~CloseFinaly]End.\n"));
 }
 
 int CReactorUDPHander::OpenAddress(const ACE_INET_Addr& AddrRemote, ACE_Reactor* pReactor)
@@ -57,7 +57,7 @@ int CReactorUDPHander::handle_input(ACE_HANDLE fd)
     }
 
     ACE_INET_Addr addrRemote;
-    int nDataLen = (int)m_skRemote.recv(m_pBlockRecv->wr_ptr(), m_pBlockRecv->size(), addrRemote);
+    auto nDataLen = (int)m_skRemote.recv(m_pBlockRecv->wr_ptr(), m_pBlockRecv->size(), addrRemote);
 
     if(nDataLen > 0)
     {
@@ -179,7 +179,7 @@ bool CReactorUDPHander::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMb
 	}
 	else
 	{
-        SaveSendInfo((uint32)u4SendSize);
+        SaveSendInfo(u4SendSize);
         m_atvOutput = tvSend;
 	}
 
@@ -208,7 +208,7 @@ _ClientConnectInfo CReactorUDPHander::GetClientConnectInfo() const
     return ClientConnectInfo;
 }
 
-bool CReactorUDPHander::CheckMessage(uint32 u4ConnectID, const char* pData, uint32 u4Len, ACE_INET_Addr addrRemote)
+bool CReactorUDPHander::CheckMessage(uint32 u4ConnectID, const char* pData, uint32 u4Len, const ACE_INET_Addr& addrRemote)
 {
     m_atvInput = ACE_OS::gettimeofday();
 
@@ -284,17 +284,16 @@ int CReactorUDPHander::Init_Open_Address(const ACE_INET_Addr& AddrRemote)
     m_addrLocal = AddrRemote;
 
     //按照线程初始化统计模块的名字
-    char szName[MAX_BUFF_50] = { '\0' };
-    sprintf_safe(szName, MAX_BUFF_50, "发送线程");
-    m_CommandAccount.InitName(szName, GetXmlConfigAttribute(xmlCommandAccount)->MaxCommandCount);
+    string strName = "发送线程";
+    m_CommandAccount.InitName(strName.c_str(), GetXmlConfigAttribute(xmlCommandAccount)->MaxCommandCount);
 
     //初始化统计模块功能
     m_CommandAccount.Init(GetXmlConfigAttribute(xmlCommandAccount)->Account,
                           GetXmlConfigAttribute(xmlCommandAccount)->FlowAccount,
                           GetXmlConfigAttribute(xmlThreadInfo)->DisposeTimeout);
 
-	m_pBlockMessage = new ACE_Message_Block(GetXmlConfigAttribute(xmlSendInfo)->MaxBlockSize);
-	m_pBlockRecv    = new ACE_Message_Block(GetXmlConfigAttribute(xmlRecvInfo)->RecvBuffSize);
+	m_pBlockMessage = App_MessageBlockManager::instance()->Create(GetXmlConfigAttribute(xmlSendInfo)->MaxBlockSize);
+	m_pBlockRecv    = App_MessageBlockManager::instance()->Create(GetXmlConfigAttribute(xmlRecvInfo)->RecvBuffSize);
 
     //设置发送超时时间（因为UDP如果客户端不存在的话，sendto会引起一个recv错误）
     //在这里设置一个超时，让个recv不会无限等下去
@@ -314,7 +313,7 @@ void CReactorUDPHander::SaveSendInfo(uint32 u4Len)
     m_u4SendPacketCount++;
 }
 
-void CReactorUDPHander::Send_Hander_Event(uint32 u4ConnandID, uint8 u1Option, ACE_INET_Addr addrRemote)
+void CReactorUDPHander::Send_Hander_Event(uint32 u4ConnandID, uint8 u1Option, const ACE_INET_Addr& addrRemote)
 {
 	_MakePacket objMakePacket;
 

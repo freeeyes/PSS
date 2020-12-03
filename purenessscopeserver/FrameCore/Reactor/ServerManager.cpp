@@ -617,6 +617,10 @@ bool CServerManager::Close()
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_PacketParsePool OK.\n"));
     App_FileTestManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_FileTestManager OK.\n"));
+    for (auto UdpServer : m_vecUDPList)
+    {
+        UdpServer->CloseFinaly();
+    }
     m_vecUDPList.clear();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close UDP Listen OK.\n"));
     App_ReactorManager::instance()->Close();

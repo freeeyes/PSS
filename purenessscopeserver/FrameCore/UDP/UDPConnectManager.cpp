@@ -57,12 +57,12 @@ _ClientIPInfo CUDPConnectIDManager::GetConnectIP(uint32 u4ConnectID)
 	return objClientInfo;
 }
 
-void CUDPConnectIDManager::GetClientConnectInfo(vecClientConnectInfo& VecClientConnectInfo)
+void CUDPConnectIDManager::GetClientConnectInfo(vecClientConnectInfo& VecClientConnectInfo) const
 {
 	_ClientConnectInfo objClientConnectInfo;
 
 	//遍历所有的UDP客户端地址信息
-	for (auto& kv : m_mapConnectManager) 
+	for (auto kv : m_mapConnectManager) 
 	{
 		string strKey = kv.first;
 		uint32 u4ConnectID = kv.second;

@@ -28,10 +28,10 @@ void WaitQuitSignal::init()
     sigaddset(&m_wait_mask, SIGQUIT);
     sigaddset(&m_wait_mask, SIGTERM);
     sigaddset(&m_wait_mask, SIGKILL);
-    pthread_sigmask(SIG_BLOCK, &m_wait_mask, 0);
+    pthread_sigmask(SIG_BLOCK, &m_wait_mask, nullptr);
 
-    m_time.tv_sec=0;
-    m_time.tv_nsec =0;
+    m_time.tv_sec  = 0;
+    m_time.tv_nsec = 0;
 }
 bool WaitQuitSignal::wait(bool& blFlag)
 {

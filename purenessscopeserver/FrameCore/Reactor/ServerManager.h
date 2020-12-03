@@ -26,7 +26,7 @@ public:
 
     bool Init();
     bool Start();
-    bool Close();
+    bool Close() final;
 
 private:
     bool Init_Reactor(uint8 u1ReactorCount, NETWORKMODE u1NetMode) const;

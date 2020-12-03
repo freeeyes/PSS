@@ -10,8 +10,6 @@
 #include <unordered_map>
 #include "ConnectCounter.h"
 
-using namespace std;
-
 class CUDPConnectIDManager
 {
 public:
@@ -21,15 +19,15 @@ public:
 
 	_ClientIPInfo GetConnectIP(uint32 u4ConnectID);
 
-	void GetClientConnectInfo(vecClientConnectInfo& VecClientConnectInfo);
+	void GetClientConnectInfo(vecClientConnectInfo& VecClientConnectInfo) const;
 
 private:
-	typedef unordered_map<string, uint32> mapConnectManager;
-	typedef unordered_map<uint32, string> mapConnectID;
+	using mapConnectManager = unordered_map<string, uint32>;
+	using mapConnectID = unordered_map<uint32, string>;
 	mapConnectManager m_mapConnectManager;
 	mapConnectID      m_mapConnectID;
 };
 
-typedef ACE_Singleton<CUDPConnectIDManager, ACE_Null_Mutex> App_UDPConnectIDManager;
+using App_UDPConnectIDManager = ACE_Singleton<CUDPConnectIDManager, ACE_Null_Mutex>;
 
 #endif

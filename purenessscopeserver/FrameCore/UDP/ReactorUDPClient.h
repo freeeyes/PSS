@@ -16,12 +16,12 @@
 class CReactorUDPClient : public ACE_Event_Handler
 {
 public:
-    CReactorUDPClient(void);
-    ~CReactorUDPClient(void);
+    CReactorUDPClient(void) = default;
+    ~CReactorUDPClient(void) final = default;
 
-    virtual ACE_HANDLE get_handle(void) const;
-    virtual int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE);
-    virtual int handle_close(ACE_HANDLE handle, ACE_Reactor_Mask close_mask);
+    ACE_HANDLE get_handle(void) const final;
+    int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE) final;
+    int handle_close(ACE_HANDLE handle, ACE_Reactor_Mask close_mask) final;
 
     int  OpenAddress(const ACE_INET_Addr& AddrRemote, EM_UDP_TYPE emType, ACE_Reactor* pReactor, IClientUDPMessage* pClientUDPMessage);
     void Close();

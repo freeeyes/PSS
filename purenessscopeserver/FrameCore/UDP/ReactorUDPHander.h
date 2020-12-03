@@ -17,7 +17,8 @@ class CReactorUDPHander : public ACE_Event_Handler, public IHandler
 {
 public:
     CReactorUDPHander(void) = default;
-    ~CReactorUDPHander(void) final;
+
+    void CloseFinaly();
 
     ACE_HANDLE get_handle(void) const final;
     int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE) final;
@@ -34,10 +35,10 @@ public:
     void GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut);                    //得到所有的出口流量
 
 private:
-    bool CheckMessage(uint32 u4ConnectID, const char* pData, uint32 u4Len, ACE_INET_Addr addrRemote); //这里解析数据包并放入数据队列
-    int  Init_Open_Address(const ACE_INET_Addr& AddrRemote);                                          //初始化UDP连接对象
-    void SaveSendInfo(uint32 u4Len);                                                                  //记录发送信息
-    void Send_Hander_Event(uint32 u4ConnandID, uint8 u1Option, ACE_INET_Addr addrRemote);             //发送链接建立消息
+    bool CheckMessage(uint32 u4ConnectID, const char* pData, uint32 u4Len, const ACE_INET_Addr& addrRemote); //这里解析数据包并放入数据队列
+    int  Init_Open_Address(const ACE_INET_Addr& AddrRemote);                                                 //初始化UDP连接对象
+    void SaveSendInfo(uint32 u4Len);                                                                         //记录发送信息
+    void Send_Hander_Event(uint32 u4ConnandID, uint8 u1Option, const ACE_INET_Addr& addrRemote);             //发送链接建立消息
 
     ACE_SOCK_Dgram          m_skRemote;
     ACE_INET_Addr           m_addrLocal;                            //监听方的IP信息

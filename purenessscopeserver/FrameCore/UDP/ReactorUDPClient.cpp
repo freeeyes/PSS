@@ -1,13 +1,5 @@
 #include "ReactorUDPClient.h"
 
-CReactorUDPClient::CReactorUDPClient(void)
-{
-}
-
-CReactorUDPClient::~CReactorUDPClient(void)
-{
-}
-
 int CReactorUDPClient::OpenAddress(const ACE_INET_Addr& AddrRemote, EM_UDP_TYPE emType, ACE_Reactor* pReactor, IClientUDPMessage* pClientUDPMessage)
 {
     if(m_skRemote.open(AddrRemote) == -1)
@@ -63,7 +55,7 @@ int CReactorUDPClient::handle_input(ACE_HANDLE fd)
 
     char szBuff[MAX_UDP_PACKET_LEN] = {'\0'};
 
-    int nDataLen = (int)m_skRemote.recv(szBuff, MAX_UDP_PACKET_LEN, m_addrRemote);
+    auto nDataLen = (int)m_skRemote.recv(szBuff, MAX_UDP_PACKET_LEN, m_addrRemote);
 
     if(nDataLen > 0 && false == CheckMessage(szBuff, (uint32)nDataLen))
     {
@@ -95,7 +87,7 @@ bool CReactorUDPClient::SendMessage(const char* pMessage, uint32 u4Len, const ch
         return false;
     }
 
-    int nSize = (int)m_skRemote.send(pMessage, u4Len, AddrRemote);
+    auto nSize = (int)m_skRemote.send(pMessage, u4Len, AddrRemote);
 
     if((uint32)nSize == u4Len)
     {

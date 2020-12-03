@@ -217,8 +217,6 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
 
         }
 
-        Clear_PacketParse();
-
         //申请头的大小对应的mb
         m_pCurrMessage = App_MessageBlockManager::instance()->Create(CONSOLE_PACKET_MAX_SIZE);
 
